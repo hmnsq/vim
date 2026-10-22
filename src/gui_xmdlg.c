@@ -42,7 +42,7 @@ extern Widget vimShell;
 
 #ifdef FEAT_MENU
 # define apply_fontlist(w) gui_motif_menu_fontlist(w)
-#else
+#아니면
 # define apply_fontlist(w)
 #endif
 
@@ -71,7 +71,7 @@ add_cancel_action(Widget shell, XtCallbackProc close_callback, void *arg)
     XtVaSetValues(shell, XmNdeleteResponse, XmDO_NOTHING, NULL);
 
     // add a delete window protocol callback instead
-    if (!dw_atom)
+    만약 (!dw_atom)
     {
 	wmp_atom = XmInternAtom(display, "WM_PROTOCOLS", True);
 	dw_atom = XmInternAtom(display, "WM_DELETE_WINDOW", True);
@@ -105,7 +105,7 @@ typedef struct _SharedFontSelData
     Widget	name;
     Widget	sample;
     char	**names;	// font name array of arrays
-    int		num;		// number of font names
+    정수		num;		// number of font names
     String	sel[NONE];	// selection category
     Boolean	in_pixels;	// toggle state - size in pixels
     char	*font_name;	// current font name
@@ -118,38 +118,38 @@ typedef struct _SharedFontSelData
  * Checking access to the font name array for validity.
  */
     static char *
-fn(SharedFontSelData *data, int i)
+fn(SharedFontSelData *data, 정수 i)
 {
     // Assertion checks:
-    if (data->num < 0)
+    만약 (data->num < 0)
 	abort();
-    if (i >= data->num)
+    만약 (i >= data->num)
 	i = data->num - 1;
-    if (i < 0)
+    만약 (i < 0)
 	i = 0;
 
-    return data->names[i];
+    반환 data->names[i];
 }
 
 /*
  * Get a specific substring from a font name.
  */
     static void
-get_part(char *in, int pos, char *out)
+get_part(char *in, 정수 pos, char *out)
 {
-    int	i;
-    int j;
+    정수	i;
+    정수 j;
 
     *out = '\0';
 
-    for (i = 0; (pos > 0) && (in[i] != '\0'); ++i)
-	if (in[i] == '-')
+    위해 (i = 0; (pos > 0) && (in[i] != '\0'); ++i)
+	만약 (in[i] == '-')
 	    pos--;
 
-    if (in[i] == '\0')
-	return;
+    만약 (in[i] == '\0')
+	반환;
 
-    for (j = 0; (in[i] != '-') && (in[i] != '\0'); ++i, ++j)
+    위해 (j = 0; (in[i] != '-') && (in[i] != '\0'); ++i, ++j)
 	out[j] = in[i];
     out[j] = '\0';
 }
@@ -167,9 +167,9 @@ name_part(char *font, char *buf)
     get_part(font, 2, buf2);
     get_part(font, 1, buf3);
 
-    if (*buf3 != NUL)
+    만약 (*buf3 != NUL)
 	vim_snprintf(buf, TEMP_BUF_SIZE, "%s (%s)", buf2, buf3);
-    else
+    아니면
 	vim_snprintf(buf, TEMP_BUF_SIZE, "%s", buf2);
 }
 
@@ -185,27 +185,27 @@ style_part(char *font, char *buf)
     get_part(font, 3, buf3);
     get_part(font, 5, buf2);
 
-    if (!strcmp(buf2, "normal") && !strcmp(buf2, "Normal")
+    만약 (!strcmp(buf2, "normal") && !strcmp(buf2, "Normal")
 						   && !strcmp(buf2, "NORMAL"))
 	vim_snprintf(buf, TEMP_BUF_SIZE, "%s %s", buf3, buf2);
-    else
+    아니면
 	strcpy(buf, buf3);
 
     get_part(font, 6, buf2);
 
-    if (buf2[0] != '\0')
+    만약 (buf2[0] != '\0')
 	vim_snprintf(buf3, TEMP_BUF_SIZE, "%s %s", buf, buf2);
-    else
+    아니면
 	strcpy(buf3, buf);
 
     get_part(font, 4, buf2);
 
-    if (!strcmp(buf2, "o") || !strcmp(buf2, "O"))
+    만약 (!strcmp(buf2, "o") || !strcmp(buf2, "O"))
 	vim_snprintf(buf, TEMP_BUF_SIZE, "%s oblique", buf3);
-    else if (!strcmp(buf2, "i") || !strcmp(buf2, "I"))
+    아니면 만약 (!strcmp(buf2, "i") || !strcmp(buf2, "I"))
 	vim_snprintf(buf, TEMP_BUF_SIZE, "%s italic", buf3);
 
-    if (!strcmp(buf, " "))
+    만약 (!strcmp(buf, " "))
 	strcpy(buf, "-");
 }
 
@@ -214,33 +214,33 @@ style_part(char *font, char *buf)
  * scroll list.
  */
     static void
-size_part(char *font, char *buf, int inPixels)
+size_part(char *font, char *buf, 정수 inPixels)
 {
-    int	    size;
+    정수	    size;
     float   temp;
 
     *buf = '\0';
 
-    if (inPixels)
+    만약 (inPixels)
     {
 	get_part(font, 7, buf);
-	if (*buf != NUL)
+	만약 (*buf != NUL)
 	{
 	    size = atoi(buf);
 	    sprintf(buf, "%3d", size);
 	}
     }
-    else
+    아니면
     {
 	get_part(font, 8, buf);
-	if (*buf != NUL)
+	만약 (*buf != NUL)
 	{
 	    size = atoi(buf);
 	    temp = (float)size / 10.0;
 	    size = temp;
-	    if (buf[strlen(buf) - 1] == '0')
+	    만약 (buf[strlen(buf) - 1] == '0')
 		sprintf(buf, "%3d", size);
-	    else
+	    아니면
 		sprintf(buf, "%4.1f", temp);
 	}
     }
@@ -260,9 +260,9 @@ encoding_part(char *font, char *buf)
     get_part(font, 13, buf1);
     get_part(font, 14, buf2);
 
-    if (*buf1 != NUL && *buf2 != NUL)
+    만약 (*buf1 != NUL && *buf2 != NUL)
 	vim_snprintf(buf, TEMP_BUF_SIZE, "%s-%s", buf1, buf2);
-    if (!strcmp(buf, " "))
+    만약 (!strcmp(buf, " "))
 	strcpy(buf, "-");
 }
 
@@ -270,31 +270,31 @@ encoding_part(char *font, char *buf)
  * Inserts a string into correct sorted position in a list.
  */
     static void
-add_to_list(char **buf, char *item, int *count)
+add_to_list(char **buf, char *item, 정수 *count)
 {
-    int	i;
-    int j;
+    정수	i;
+    정수 j;
 
-    if (*count == MAX_ENTRIES_IN_LIST)
-	return;
+    만약 (*count == MAX_ENTRIES_IN_LIST)
+	반환;
 
     // avoid duplication
-    for (i = 0; i < *count; ++i)
+    위해 (i = 0; i < *count; ++i)
     {
-	if (!strcmp(buf[i], item))
-	    return;
+	만약 (!strcmp(buf[i], item))
+	    반환;
     }
 
     // find order place, but make sure that wild card comes first
-    if (!strcmp(item, wild))
+    만약 (!strcmp(item, wild))
 	i = 0;
-    else
-	for (i = 0; i < *count; ++i)
-	    if (strcmp(buf[i], item) > 0 && strcmp(buf[i], wild))
+    아니면
+	위해 (i = 0; i < *count; ++i)
+	    만약 (strcmp(buf[i], item) > 0 && strcmp(buf[i], wild))
 		break;
 
     // now insert the item
-    for (j = *count; j > i; --j)
+    위해 (j = *count; j > i; --j)
 	buf[j] = buf[j-1];
     buf[i] = XtNewString(item);
 
@@ -305,13 +305,13 @@ add_to_list(char **buf, char *item, int *count)
  * True if the font matches some field.
  */
     static Boolean
-match(SharedFontSelData *data, enum ListSpecifier l, int i)
+match(SharedFontSelData *data, enum ListSpecifier l, 정수 i)
 {
     char buf[TEMP_BUF_SIZE];
 
     // An empty selection or a wild card matches anything.
-    if (!data->sel[l] || !strcmp(data->sel[l], wild))
-	return True;
+    만약 (!data->sel[l] || !strcmp(data->sel[l], wild))
+	반환 True;
 
     // chunk out the desired part...
     switch (l)
@@ -337,7 +337,7 @@ match(SharedFontSelData *data, enum ListSpecifier l, int i)
 
     // ...and chew it now
 
-    return !strcmp(buf, data->sel[l]);
+    반환 !strcmp(buf, data->sel[l]);
 }
 
     static Boolean
@@ -347,7 +347,7 @@ proportional(char *font)
 
     get_part(font, 11, buf);
 
-    return !strcmp(buf, "p") || !strcmp(buf, "P");
+    반환 !strcmp(buf, "p") || !strcmp(buf, "P");
 }
 
 
@@ -363,31 +363,31 @@ static void encoding_callback(Widget w, SharedFontSelData *data,
 fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 {
     char	*list[NONE][MAX_ENTRIES_IN_LIST];
-    int		count[NONE];
+    정수		count[NONE];
     char	buf[TEMP_BUF_SIZE];
     XmString	items[MAX_ENTRIES_IN_LIST];
-    int		i;
-    int		idx;
+    정수		i;
+    정수		idx;
 
-    for (idx = (int)ENCODING; idx < (int)NONE; ++idx)
+    위해 (idx = (정수)ENCODING; idx < (정수)NONE; ++idx)
 	count[idx] = 0;
 
     // First we insert the wild char into every single list.
-    if (fix != ENCODING)
+    만약 (fix != ENCODING)
 	add_to_list(list[ENCODING], wild, &count[ENCODING]);
-    if (fix != NAME)
+    만약 (fix != NAME)
 	add_to_list(list[NAME], wild, &count[NAME]);
-    if (fix != STYLE)
+    만약 (fix != STYLE)
 	add_to_list(list[STYLE], wild, &count[STYLE]);
-    if (fix != SIZE)
+    만약 (fix != SIZE)
 	add_to_list(list[SIZE], wild, &count[SIZE]);
 
-    for (i = 0; i < data->num && i < MAX_ENTRIES_IN_LIST; i++)
+    위해 (i = 0; i < data->num && i < MAX_ENTRIES_IN_LIST; i++)
     {
-	if (proportional(fn(data, i)))
+	만약 (proportional(fn(data, i)))
 	    continue;
 
-	if (fix != ENCODING
+	만약 (fix != ENCODING
 		&& match(data, NAME, i)
 		&& match(data, STYLE, i)
 		&& match(data, SIZE, i))
@@ -396,7 +396,7 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 	    add_to_list(list[ENCODING], buf, &count[ENCODING]);
 	}
 
-	if (fix != NAME
+	만약 (fix != NAME
 		&& match(data, ENCODING, i)
 		&& match(data, STYLE, i)
 		&& match(data, SIZE, i))
@@ -405,7 +405,7 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 	    add_to_list(list[NAME], buf, &count[NAME]);
 	}
 
-	if (fix != STYLE
+	만약 (fix != STYLE
 		&& match(data, ENCODING, i)
 		&& match(data, NAME, i)
 		&& match(data, SIZE, i))
@@ -414,7 +414,7 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 	    add_to_list(list[STYLE], buf, &count[STYLE]);
 	}
 
-	if (fix != SIZE
+	만약 (fix != SIZE
 		&& match(data, ENCODING, i)
 		&& match(data, NAME, i)
 		&& match(data, STYLE, i))
@@ -428,7 +428,7 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
      * And now do the preselection in all lists where there was one:
      */
 
-    if (fix != ENCODING)
+    만약 (fix != ENCODING)
     {
 	Cardinal n_items;
 	WidgetList children;
@@ -440,13 +440,13 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 		XmNnumChildren, &n_items,
 		NULL);
 
-	for (i = 0; i < count[ENCODING]; ++i)
+	위해 (i = 0; i < count[ENCODING]; ++i)
 	{
 	    Widget button;
 
 	    items[i] = XmStringCreateLocalized(list[ENCODING][i]);
 
-	    if (i < (int)n_items)
+	    만약 (i < (정수)n_items)
 	    {
 		// recycle old button
 		XtVaSetValues(children[i],
@@ -455,7 +455,7 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 			NULL);
 		button = children[i];
 	    }
-	    else
+	    아니면
 	    {
 		// create a new button
 		button = XtVaCreateManagedWidget("button",
@@ -469,41 +469,41 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 		XtManageChild(button);
 	    }
 
-	    if (data->sel[ENCODING])
+	    만약 (data->sel[ENCODING])
 	    {
-		if (!strcmp(data->sel[ENCODING], list[ENCODING][i]))
+		만약 (!strcmp(data->sel[ENCODING], list[ENCODING][i]))
 		    selected_button = button;
 	    }
 	    XtFree(list[ENCODING][i]);
 	}
 
 	// Destroy all the outstanding menu items.
-	for (i = count[ENCODING]; i < (int)n_items; ++i)
+	위해 (i = count[ENCODING]; i < (정수)n_items; ++i)
 	{
 	    XtUnmanageChild(children[i]);
 	    XtDestroyWidget(children[i]);
 	}
 
 	// Preserve the current selection visually.
-	if (selected_button)
+	만약 (selected_button)
 	{
 	    XtVaSetValues(data->encoding_menu,
 		    XmNmenuHistory, selected_button,
 		    NULL);
 	}
 
-	for (i = 0; i < count[ENCODING]; ++i)
+	위해 (i = 0; i < count[ENCODING]; ++i)
 	    XmStringFree(items[i]);
     }
 
     /*
      * Now loop through the remaining lists and set them up.
      */
-    for (idx = (int)NAME; idx < (int)NONE; ++idx)
+    위해 (idx = (정수)NAME; idx < (정수)NONE; ++idx)
     {
 	Widget w;
 
-	if (fix == (enum ListSpecifier)idx)
+	만약 (fix == (enum ListSpecifier)idx)
 	    continue;
 
 	switch ((enum ListSpecifier)idx)
@@ -521,21 +521,21 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 		w = (Widget)0;	// for lint
 	}
 
-	for (i = 0; i < count[idx]; ++i)
+	위해 (i = 0; i < count[idx]; ++i)
 	{
 	    items[i] = XmStringCreateLocalized(list[idx][i]);
 	    XtFree(list[idx][i]);
 	}
 	XmListDeleteAllItems(w);
 	XmListAddItems(w, items, count[idx], 1);
-	if (data->sel[idx])
+	만약 (data->sel[idx])
 	{
 	    XmStringFree(items[0]);
 	    items[0] = XmStringCreateLocalized(data->sel[idx]);
 	    XmListSelectItem(w, items[0], False);
 	    XmListSetBottomItem(w, items[0]);
 	}
-	for (i = 0; i < count[idx]; ++i)
+	위해 (i = 0; i < count[idx]; ++i)
 	    XmStringFree(items[i]);
     }
 }
@@ -545,17 +545,17 @@ stoggle_callback(Widget w UNUSED,
 	SharedFontSelData *data,
 	XmToggleButtonCallbackStruct *call_data)
 {
-    int		i, do_sel;
+    정수		i, do_sel;
     char	newSize[TEMP_BUF_SIZE];
     XmString	str;
 
-    if (call_data->reason != (int)XmCR_VALUE_CHANGED)
-	return;
+    만약 (call_data->reason != (정수)XmCR_VALUE_CHANGED)
+	반환;
 
     do_sel = (data->sel[SIZE] != NULL) && strcmp(data->sel[SIZE], wild);
 
-    for (i = 0; do_sel && (i < data->num); i++)
-	if (match(data, ENCODING, i)
+    위해 (i = 0; do_sel && (i < data->num); i++)
+	만약 (match(data, ENCODING, i)
 		&& match(data, NAME, i)
 		&& match(data, STYLE, i)
 		&& match(data, SIZE, i))
@@ -566,12 +566,12 @@ stoggle_callback(Widget w UNUSED,
 
     data->in_pixels = !data->in_pixels;
 
-    if (data->sel[SIZE])
+    만약 (data->sel[SIZE])
 	XtFree(data->sel[SIZE]);
     data->sel[SIZE] = NULL;
     fill_lists(NONE, data);
 
-    if (do_sel)
+    만약 (do_sel)
     {
 	str = XmStringCreateLocalized(newSize);
 	XmListSelectItem(data->list[SIZE], str, True);
@@ -587,7 +587,7 @@ stoggle_callback(Widget w UNUSED,
 display_sample(SharedFontSelData *data)
 {
     Arg		    args[2];
-    int		    n;
+    정수		    n;
     XFontStruct	*   font;
     XmFontList	    font_list;
     Display *	    display;
@@ -605,7 +605,7 @@ display_sample(SharedFontSelData *data)
     XtSetValues(data->sample, args, n);
     XmStringFree(str);
 
-    if (data->old)
+    만약 (data->old)
     {
 	XFreeFont(display, data->old);
 	XmFontListFree(data->old_list);
@@ -625,19 +625,19 @@ do_choice(Widget w,
 
     XmStringGetLtoR(call_data->item, XmSTRING_DEFAULT_CHARSET, &sel);
 
-    if (!data->sel[which])
+    만약 (!data->sel[which])
 	data->sel[which] = XtNewString(sel);
-    else
+    아니면
     {
-	if (!strcmp(data->sel[which], sel))
+	만약 (!strcmp(data->sel[which], sel))
 	{
 	    // unselecting current selection
 	    XtFree(data->sel[which]);
 	    data->sel[which] = NULL;
-	    if (w)
+	    만약 (w)
 		XmListDeselectItem(w, call_data->item);
 	}
-	else
+	아니면
 	{
 	    XtFree(data->sel[which]);
 	    data->sel[which] = XtNewString(sel);
@@ -648,7 +648,7 @@ do_choice(Widget w,
     fill_lists(which, data);
 
     // If there is a font selection, we display it.
-    if (data->sel[ENCODING]
+    만약 (data->sel[ENCODING]
 	    && data->sel[NAME]
 	    && data->sel[STYLE]
 	    && data->sel[SIZE]
@@ -657,15 +657,15 @@ do_choice(Widget w,
 	    && strcmp(data->sel[STYLE], wild)
 	    && strcmp(data->sel[SIZE], wild))
     {
-	int i;
+	정수 i;
 
-	if (data->font_name)
+	만약 (data->font_name)
 	    XtFree(data->font_name);
 	data->font_name = NULL;
 
-	for (i = 0; i < data->num; i++)
+	위해 (i = 0; i < data->num; i++)
 	{
-	    if (match(data, ENCODING, i)
+	    만약 (match(data, ENCODING, i)
 		    && match(data, NAME, i)
 		    && match(data, STYLE, i)
 		    && match(data, SIZE, i))
@@ -675,22 +675,22 @@ do_choice(Widget w,
 	    }
 	}
 
-	if (data->font_name)
+	만약 (data->font_name)
 	{
 	    XmTextSetString(data->name, data->font_name);
 	    display_sample(data);
 	}
-	else
+	아니면
 	    do_dialog(VIM_ERROR,
 		    (char_u *)_("Error"),
 		    (char_u *)_("Invalid font specification"),
 		    (char_u *)_("&Dismiss"), 1, NULL, FALSE);
 
-	return True;
+	반환 True;
     }
-    else
+    아니면
     {
-	int	    n;
+	정수	    n;
 	XmString    str;
 	Arg	    args[4];
 	char	    *nomatch_msg = _("no specific match");
@@ -703,7 +703,7 @@ do_choice(Widget w,
 	XmTextSetString(data->name, nomatch_msg);
 	XmStringFree(str);
 
-	return False;
+	반환 False;
     }
 }
 
@@ -717,8 +717,8 @@ encoding_callback(Widget w,
 
     XtVaGetValues(w, XmNlabelString, &str, NULL);
 
-    if (!str)
-	return;
+    만약 (!str)
+	반환;
 
     fake_data.item = str;
 
@@ -754,28 +754,28 @@ cancel_callback(Widget w UNUSED,
 	SharedFontSelData *data,
 	XmListCallbackStruct *call_data UNUSED)
 {
-    if (data->sel[ENCODING])
+    만약 (data->sel[ENCODING])
     {
 	XtFree(data->sel[ENCODING]);
 	data->sel[ENCODING] = NULL;
     }
-    if (data->sel[NAME])
+    만약 (data->sel[NAME])
     {
 	XtFree(data->sel[NAME]);
 	data->sel[NAME] = NULL;
     }
-    if (data->sel[STYLE])
+    만약 (data->sel[STYLE])
     {
 	XtFree(data->sel[STYLE]);
 	data->sel[STYLE] = NULL;
     }
-    if (data->sel[SIZE])
+    만약 (data->sel[SIZE])
     {
 	XtFree(data->sel[SIZE]);
 	data->sel[SIZE] = NULL;
     }
 
-    if (data->font_name)
+    만약 (data->font_name)
 	XtFree(data->font_name);
     data->font_name = NULL;
 
@@ -792,13 +792,13 @@ ok_callback(Widget w UNUSED,
 {
     char    *pattern;
     char    **name;
-    int	    i;
+    정수	    i;
 
     pattern = XmTextGetString(data->name);
     name    = XListFonts(XtDisplay(data->dialog), pattern, 1, &i);
     XtFree(pattern);
 
-    if (i != 1)
+    만약 (i != 1)
     {
 	do_dialog(VIM_ERROR,
 		(char_u *)_("Error"),
@@ -806,28 +806,28 @@ ok_callback(Widget w UNUSED,
 		(char_u *)_("&Dismiss"), 1, NULL, FALSE);
 	XFreeFontNames(name);
     }
-    else
+    아니면
     {
-	if (data->font_name)
+	만약 (data->font_name)
 	    XtFree(data->font_name);
 	data->font_name = XtNewString(name[0]);
 
-	if (data->sel[ENCODING])
+	만약 (data->sel[ENCODING])
 	{
 	    XtFree(data->sel[ENCODING]);
 	    data->sel[ENCODING] = NULL;
 	}
-	if (data->sel[NAME])
+	만약 (data->sel[NAME])
 	{
 	    XtFree(data->sel[NAME]);
 	    data->sel[NAME] = NULL;
 	}
-	if (data->sel[STYLE])
+	만약 (data->sel[STYLE])
 	{
 	    XtFree(data->sel[STYLE]);
 	    data->sel[STYLE] = NULL;
 	}
-	if (data->sel[SIZE])
+	만약 (data->sel[SIZE])
 	{
 	    XtFree(data->sel[SIZE]);
 	    data->sel[SIZE] = NULL;
@@ -861,7 +861,7 @@ gui_xm_select_font(char_u *current)
     Widget		disp_frame;
     Widget		frame;
     Arg			args[64];
-    int			n;
+    정수			n;
     XmString		str;
     char		big_font[MAX_FONT_NAME_LEN];
     SharedFontSelData	*data;
@@ -879,17 +879,17 @@ gui_xm_select_font(char_u *current)
      */
 
     {
-	int	i;
-	int	max;
-	int	idx = 0;
-	int	size;
+	정수	i;
+	정수	max;
+	정수	idx = 0;
+	정수	size;
 	char	buf[128];
 
-	for (i = 0, max = 0; i < data->num; i++)
+	위해 (i = 0, max = 0; i < data->num; i++)
 	{
 	    get_part(fn(data, i), 7, buf);
 	    size = atoi(buf);
-	    if ((size > max) && (size < MAX_DISPLAY_SIZE))
+	    만약 ((size > max) && (size < MAX_DISPLAY_SIZE))
 	    {
 		idx = i;
 		max = size;
@@ -1202,14 +1202,14 @@ gui_xm_select_font(char_u *current)
     data->font_name = NULL;
 
     // set up current font parameters
-    if (current && current[0] != '\0')
+    만약 (current && current[0] != '\0')
     {
-	int	    i;
+	정수	    i;
 	char	    **names;
 
 	names = XListFonts(XtDisplay(form), (char *) current, 1, &i);
 
-	if (i != 0)
+	만약 (i != 0)
 	{
 	    char namebuf[TEMP_BUF_SIZE];
 	    char stylebuf[TEMP_BUF_SIZE];
@@ -1224,7 +1224,7 @@ gui_xm_select_font(char_u *current)
 	    size_part(found, sizebuf, data->in_pixels);
 	    encoding_part(found, encodingbuf);
 
-	    if (*namebuf != NUL
+	    만약 (*namebuf != NUL
 		    && *stylebuf != NUL
 		    && *sizebuf != NUL
 		    && *encodingbuf != NUL)
@@ -1237,7 +1237,7 @@ gui_xm_select_font(char_u *current)
 		display_sample(data);
 		XmTextSetString(data->name, data->font_name);
 	    }
-	    else
+	    아니면
 	    {
 		// We can't preset a symbolic name, which isn't a full font
 		// description. Therefore we just behave the same way as if the
@@ -1262,11 +1262,11 @@ gui_xm_select_font(char_u *current)
     manage_centered(form);
 
     // modal event loop
-    while (!data->exit)
+    동안 (!data->exit)
 	XtAppProcessEvent(XtWidgetToApplicationContext(data->dialog),
 							(XtInputMask)XtIMAll);
 
-    if (data->old)
+    만약 (data->old)
     {
 	XFreeFont(XtDisplay(data->dialog),  data->old);
 	XmFontListFree(data->old_list);
@@ -1275,5 +1275,5 @@ gui_xm_select_font(char_u *current)
 
     gui_motif_synch_fonts();
 
-    return (char_u *) data->font_name;
+    반환 (char_u *) data->font_name;
 }

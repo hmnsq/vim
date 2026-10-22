@@ -8,10 +8,10 @@ from __future__ import print_function
 import sys
 import time
 
-if __name__ == "__main__":
+만약 __name__ == "__main__":
 
     done = 0
-    while done < 10:
+    동안 done < 10:
         done = done + 1
         print(done)
         sys.stdout.flush()

@@ -10,8 +10,8 @@
 #	include <io.h>
 #endif
 
-	int
-main(int argc, char **argv)
+	정수
+main(정수 argc, char **argv)
 {
 	char buffer[BUFSIZ];
 	char *p;
@@ -23,32 +23,32 @@ main(int argc, char **argv)
 	_setmode(_fileno(stdout), _O_BINARY);
 #endif
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	동안 (fgets(buffer, BUFSIZ, stdin) != NULL)
 	{
-		for (p = buffer; *p != 0; p++)
+		위해 (p = buffer; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
+			만약 (strncmp(p, "charset=utf-8", 13) == 0
 				|| strncmp(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=CP932", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations.", 24) == 0)
+			아니면 만약 (strncmp(p, "# Original translations.", 24) == 0)
 			{
 				p += 24 - 1; // subtracting 1 by considering "p++" in the loop.
 				fputs("# Generated from ja.po, DO NOT EDIT.", stdout);
 			}
-			else if (*(unsigned char *)p == 0x81 && p[1] == '_')
+			아니면 만약 (*(unsigned char *)p == 0x81 && p[1] == '_')
 			{
 				putchar('\\');
 				++p;
 			}
-			else
+			아니면
 			{
-				if (*p & 0x80)
+				만약 (*p & 0x80)
 				{
 					putchar(*p++);
-					if (*p == '\\')
+					만약 (*p == '\\')
 						putchar(*p);
 				}
 				putchar(*p);

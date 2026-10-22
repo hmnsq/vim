@@ -63,45 +63,45 @@
 # ifdef bind_textdomain_codeset
 #  undef bind_textdomain_codeset
 # endif
-# if defined(FEAT_GETTEXT) && !defined(ENABLE_NLS)
+# 만약 defined(FEAT_GETTEXT) && !defined(ENABLE_NLS)
 #  define ENABLE_NLS	// so the texts in the dialog boxes are translated
 # endif
 # include <gnome.h>
 #endif
 
 #ifdef FEAT_GUI_GTK
-# if GTK_CHECK_VERSION(3,0,0)
+# 만약 GTK_CHECK_VERSION(3,0,0)
 #  include <gdk/gdkkeysyms-compat.h>
-# else
+# 아니면
 #  include <gdk/gdkkeysyms.h>
 # endif
 # include <gdk/gdk.h>
 # ifdef MSWIN
 #  include <gdk/gdkwin32.h>
-# else
+# 아니면
 #  include <gdk/gdkx.h>
 # endif
 
 # include <gtk/gtk.h>
-#else
+#아니면
 // define these items to be able to generate prototypes without GTK
-typedef int GtkWidget;
-# define gpointer int
-# define guint8 int
-# define GdkPixmap int
-# define GdkBitmap int
-# define GtkIconFactory int
-# define GtkToolbar int
-# define GtkAdjustment int
-# define gboolean int
-# define GdkEventKey int
-# define CancelData int
+typedef 정수 GtkWidget;
+# define gpointer 정수
+# define guint8 정수
+# define GdkPixmap 정수
+# define GdkBitmap 정수
+# define GtkIconFactory 정수
+# define GtkToolbar 정수
+# define GtkAdjustment 정수
+# define gboolean 정수
+# define GdkEventKey 정수
+# define CancelData 정수
 #endif
 
 static void entry_activate_cb(GtkWidget *widget, gpointer data);
 static void entry_changed_cb(GtkWidget *entry, GtkWidget *dialog);
 static void find_replace_cb(GtkWidget *widget, gpointer data);
-#if defined(FEAT_BROWSE)
+#만약 defined(FEAT_BROWSE)
 static void recent_func_log_func(
 	const gchar *log_domain,
 	GLogLevelFlags log_level,
@@ -109,13 +109,13 @@ static void recent_func_log_func(
 	gpointer user_data);
 #endif
 
-#if defined(FEAT_TOOLBAR)
+#만약 defined(FEAT_TOOLBAR)
 /*
  * Table from BuiltIn## icon indices to GTK+ stock IDs.  Order must exactly
  * match toolbar_names[] in menu.c!  All stock icons including the "vim-*"
  * ones can be overridden in your gtkrc file.
  */
-# if GTK_CHECK_VERSION(3,10,0)
+# 만약 GTK_CHECK_VERSION(3,10,0)
 static const char * const menu_themed_names[] =
 {
     /* 00 */ "document-new",		// sub. GTK_STOCK_NEW
@@ -129,14 +129,14 @@ static const char * const menu_themed_names[] =
     /* 08 */ "document-print",		// sub. GTK_STOCK_PRINT
     /* 09 */ "help-browser",		// sub. GTK_STOCK_HELP
     /* 10 */ "edit-find",		// sub. GTK_STOCK_FIND
-#  if GTK_CHECK_VERSION(3,14,0)
+#  만약 GTK_CHECK_VERSION(3,14,0)
     // Use the file names in gui_gtk_res.xml, cutting off the extension.
     // Similar changes follow.
     /* 11 */ "stock_vim_save_all",
     /* 12 */ "stock_vim_session_save",
     /* 13 */ "stock_vim_session_new",
     /* 14 */ "stock_vim_session_load",
-#  else
+#  아니면
     /* 11 */ "vim-save-all",
     /* 12 */ "vim-session-save",
     /* 13 */ "vim-session-new",
@@ -145,12 +145,12 @@ static const char * const menu_themed_names[] =
     /* 15 */ "system-run",		// sub. GTK_STOCK_EXECUTE
     /* 16 */ "edit-find-replace",	// sub. GTK_STOCK_FIND_AND_REPLACE
     /* 17 */ "window-close",		// sub. GTK_STOCK_CLOSE, FIXME: fuzzy
-#  if GTK_CHECK_VERSION(3,14,0)
+#  만약 GTK_CHECK_VERSION(3,14,0)
     /* 18 */ "stock_vim_window_maximize",
     /* 19 */ "stock_vim_window_minimize",
     /* 20 */ "stock_vim_window_split",
     /* 21 */ "stock_vim_shell",
-#  else
+#  아니면
     /* 18 */ "vim-window-maximize",
     /* 19 */ "vim-window-minimize",
     /* 20 */ "vim-window-split",
@@ -158,19 +158,19 @@ static const char * const menu_themed_names[] =
 #  endif
     /* 22 */ "go-previous",		// sub. GTK_STOCK_GO_BACK
     /* 23 */ "go-next",			// sub. GTK_STOCK_GO_FORWARD
-#  if GTK_CHECK_VERSION(3,14,0)
+#  만약 GTK_CHECK_VERSION(3,14,0)
     /* 24 */ "stock_vim_find_help",
-#  else
+#  아니면
     /* 24 */ "vim-find-help",
 #  endif
     /* 25 */ "gtk-convert",		// sub. GTK_STOCK_CONVERT
     /* 26 */ "go-jump",			// sub. GTK_STOCK_JUMP_TO
-#  if GTK_CHECK_VERSION(3,14,0)
+#  만약 GTK_CHECK_VERSION(3,14,0)
     /* 27 */ "stock_vim_build_tags",
     /* 28 */ "stock_vim_window_split_vertical",
     /* 29 */ "stock_vim_window_maximize_width",
     /* 30 */ "stock_vim_window_minimize_width",
-#  else
+#  아니면
     /* 27 */ "vim-build-tags",
     /* 28 */ "vim-window-split-vertical",
     /* 29 */ "vim-window-maximize-width",
@@ -178,7 +178,7 @@ static const char * const menu_themed_names[] =
 #  endif
     /* 31 */ "application-exit",	// GTK_STOCK_QUIT
 };
-# else // !GTK_CHECK_VERSION(3,10,0)
+# 아니면 // !GTK_CHECK_VERSION(3,10,0)
 static const char * const menu_stock_ids[] =
 {
     /* 00 */ GTK_STOCK_NEW,
@@ -217,7 +217,7 @@ static const char * const menu_stock_ids[] =
 # endif // !GTK_CHECK_VERSION(3,10,0)
 
 # ifdef USE_GRESOURCE
-#  if !GTK_CHECK_VERSION(3,10,0)
+#  만약 !GTK_CHECK_VERSION(3,10,0)
 typedef struct IconNames {
     const char *icon_name;
     const char *file_name;
@@ -247,7 +247,7 @@ static IconNames stock_vim_icons[] = {
 add_stock_icon(GtkIconFactory	*factory,
 	       const char	*stock_id,
 	       const guint8	*inline_data,
-	       int		data_length)
+	       정수		data_length)
 {
     GdkPixbuf	*pixbuf;
     GtkIconSet	*icon_set;
@@ -262,29 +262,29 @@ add_stock_icon(GtkIconFactory	*factory,
 }
 # endif
 
-    static int
+    static 정수
 lookup_menu_iconfile(char_u *iconfile, char_u *dest)
 {
     expand_env(iconfile, dest, MAXPATHL);
 
-    if (mch_isFullName(dest))
+    만약 (mch_isFullName(dest))
     {
-	return vim_fexists(dest);
+	반환 vim_fexists(dest);
     }
-    else
+    아니면
     {
 	static const char   suffixes[][4] = {"png", "xpm", "bmp"};
 	char_u		    buf[MAXPATHL];
-	unsigned int	    i;
+	unsigned 정수	    i;
 
-	for (i = 0; i < G_N_ELEMENTS(suffixes); ++i)
-	    if (gui_find_bitmap(dest, buf, (char *)suffixes[i]) == OK)
+	위해 (i = 0; i < G_N_ELEMENTS(suffixes); ++i)
+	    만약 (gui_find_bitmap(dest, buf, (char *)suffixes[i]) == OK)
 	    {
 		STRCPY(dest, buf);
-		return TRUE;
+		반환 TRUE;
 	    }
 
-	return FALSE;
+	반환 FALSE;
     }
 }
 
@@ -292,8 +292,8 @@ lookup_menu_iconfile(char_u *iconfile, char_u *dest)
 load_menu_iconfile(char_u *name, GtkIconSize icon_size)
 {
     GtkWidget	    *image = NULL;
-# if GTK_CHECK_VERSION(3,10,0)
-    int		     pixel_size = -1;
+# 만약 GTK_CHECK_VERSION(3,10,0)
+    정수		     pixel_size = -1;
 
     switch (icon_size)
     {
@@ -322,22 +322,22 @@ load_menu_iconfile(char_u *name, GtkIconSize icon_size)
 	    break;
     }
 
-    if (pixel_size > 0 || pixel_size == -1)
+    만약 (pixel_size > 0 || pixel_size == -1)
     {
 	GdkPixbuf * const pixbuf
 	    = gdk_pixbuf_new_from_file_at_scale((const char *)name,
 		pixel_size, pixel_size, TRUE, NULL);
-	if (pixbuf != NULL)
+	만약 (pixbuf != NULL)
 	{
 	    image = gtk_image_new_from_pixbuf(pixbuf);
 	    g_object_unref(pixbuf);
 	}
     }
-    if (image == NULL)
+    만약 (image == NULL)
 	image = gtk_image_new_from_icon_name("image-missing", icon_size);
 
-    return image;
-# else // !GTK_CHECK_VERSION(3,10,0)
+    반환 image;
+# 아니면 // !GTK_CHECK_VERSION(3,10,0)
     GtkIconSet	    *icon_set;
     GtkIconSource   *icon_source;
 
@@ -357,7 +357,7 @@ load_menu_iconfile(char_u *name, GtkIconSize icon_size)
     gtk_icon_source_free(icon_source);
     gtk_icon_set_unref(icon_set);
 
-    return image;
+    반환 image;
 # endif // !GTK_CHECK_VERSION(3,10,0)
 }
 
@@ -368,41 +368,41 @@ create_menu_icon(vimmenu_T *menu, GtkIconSize icon_size)
     char_u	buf[MAXPATHL];
 
     // First use a specified "icon=" argument.
-    if (menu->iconfile != NULL && lookup_menu_iconfile(menu->iconfile, buf))
+    만약 (menu->iconfile != NULL && lookup_menu_iconfile(menu->iconfile, buf))
 	image = load_menu_iconfile(buf, icon_size);
 
     // If not found and not builtin specified try using the menu name.
-    if (image == NULL && !menu->icon_builtin
+    만약 (image == NULL && !menu->icon_builtin
 				     && lookup_menu_iconfile(menu->name, buf))
 	image = load_menu_iconfile(buf, icon_size);
 
     // Still not found?  Then use a builtin icon, a blank one as fallback.
-    if (image == NULL)
+    만약 (image == NULL)
     {
-# if GTK_CHECK_VERSION(3,10,0)
+# 만약 GTK_CHECK_VERSION(3,10,0)
 	const char *icon_name = NULL;
-	const int   n_names = G_N_ELEMENTS(menu_themed_names);
+	const 정수   n_names = G_N_ELEMENTS(menu_themed_names);
 
-	if (menu->iconidx >= 0 && menu->iconidx < n_names)
+	만약 (menu->iconidx >= 0 && menu->iconidx < n_names)
 	    icon_name = menu_themed_names[menu->iconidx];
-	if (icon_name == NULL)
+	만약 (icon_name == NULL)
 	    icon_name = "image-missing";
 
 	image = gtk_image_new_from_icon_name(icon_name, icon_size);
-# else
+# 아니면
 	const char  *stock_id;
-	const int   n_ids = G_N_ELEMENTS(menu_stock_ids);
+	const 정수   n_ids = G_N_ELEMENTS(menu_stock_ids);
 
-	if (menu->iconidx >= 0 && menu->iconidx < n_ids)
+	만약 (menu->iconidx >= 0 && menu->iconidx < n_ids)
 	    stock_id = menu_stock_ids[menu->iconidx];
-	else
+	아니면
 	    stock_id = GTK_STOCK_MISSING_IMAGE;
 
 	image = gtk_image_new_from_stock(stock_id, icon_size);
 # endif
     }
 
-    return image;
+    반환 image;
 }
 
     static gint
@@ -413,14 +413,14 @@ toolbar_button_focus_in_event(GtkWidget *widget UNUSED,
     // When we're in a GtkPlug, we don't have window focus events, only widget
     // focus.  To emulate stand-alone gvim, if a button gets focus (e.g.,
     // <Tab> into GtkPlug) immediately pass it to mainwin.
-    if (gtk_socket_id != 0)
+    만약 (gtk_socket_id != 0)
 	gtk_widget_grab_focus(gui.drawarea);
 
-    return TRUE;
+    반환 TRUE;
 }
 #endif // FEAT_TOOLBAR
 
-#if defined(FEAT_TOOLBAR)
+#만약 defined(FEAT_TOOLBAR)
 
     void
 gui_gtk_register_stock_icons(void)
@@ -430,7 +430,7 @@ gui_gtk_register_stock_icons(void)
     GtkIconFactory *factory;
 
     factory = gtk_icon_factory_new();
-#  define ADD_ICON(Name, Data) add_stock_icon(factory, Name, Data, (int)sizeof(Data))
+#  define ADD_ICON(Name, Data) add_stock_icon(factory, Name, Data, (정수)sizeof(Data))
 
     ADD_ICON("vim-build-tags",		  stock_vim_build_tags);
     ADD_ICON("vim-find-help",		  stock_vim_find_help);
@@ -450,33 +450,33 @@ gui_gtk_register_stock_icons(void)
 
     gtk_icon_factory_add_default(factory);
     g_object_unref(factory);
-# else // defined(USE_GRESOURCE)
+# 아니면 // defined(USE_GRESOURCE)
     const char * const path_prefix = "/org/vim/gui/icon";
-#  if GTK_CHECK_VERSION(3,14,0)
+#  만약 GTK_CHECK_VERSION(3,14,0)
     GdkScreen    *screen = NULL;
     GtkIconTheme *icon_theme = NULL;
 
-    if (GTK_IS_WIDGET(gui.mainwin))
+    만약 (GTK_IS_WIDGET(gui.mainwin))
 	screen = gtk_widget_get_screen(gui.mainwin);
-    else
+    아니면
 	screen = gdk_screen_get_default();
     icon_theme = gtk_icon_theme_get_for_screen(screen);
     gtk_icon_theme_add_resource_path(icon_theme, path_prefix);
 #  elif GTK_CHECK_VERSION(3,0,0)
     IconNames *names;
 
-    for (names = stock_vim_icons; names->icon_name != NULL; names++)
+    위해 (names = stock_vim_icons; names->icon_name != NULL; names++)
     {
 	char path[MAXPATHL];
 
 	vim_snprintf(path, MAXPATHL, "%s/%s", path_prefix, names->file_name);
 	GdkPixbuf *pixbuf = NULL;
 	pixbuf = gdk_pixbuf_new_from_resource(path, NULL);
-	if (pixbuf != NULL)
+	만약 (pixbuf != NULL)
 	{
 	    const gint size = MAX(gdk_pixbuf_get_width(pixbuf),
 				  gdk_pixbuf_get_height(pixbuf));
-	    if (size > 16)
+	    만약 (size > 16)
 	    {
 		// An icon theme is supposed to provide fixed-size
 		// image files for each size, e.g., 16, 22, 24, ...
@@ -494,27 +494,27 @@ gui_gtk_register_stock_icons(void)
 		pixbuf = gdk_pixbuf_scale_simple(src,
 						 16, 16,
 						 GDK_INTERP_BILINEAR);
-		if (pixbuf == NULL)
+		만약 (pixbuf == NULL)
 		    pixbuf = src;
-		else
+		아니면
 		    g_object_unref(src);
 	    }
 	    gtk_icon_theme_add_builtin_icon(names->icon_name, size, pixbuf);
 	    g_object_unref(pixbuf);
 	}
     }
-#  else // !GTK_CHECK_VERSION(3,0.0)
+#  아니면 // !GTK_CHECK_VERSION(3,0.0)
     GtkIconFactory * const factory = gtk_icon_factory_new();
     IconNames *names;
 
-    for (names = stock_vim_icons; names->icon_name != NULL; names++)
+    위해 (names = stock_vim_icons; names->icon_name != NULL; names++)
     {
 	char path[MAXPATHL];
 	GdkPixbuf *pixbuf;
 
 	vim_snprintf(path, MAXPATHL, "%s/%s", path_prefix, names->file_name);
 	pixbuf = gdk_pixbuf_new_from_resource(path, NULL);
-	if (pixbuf != NULL)
+	만약 (pixbuf != NULL)
 	{
 	    GtkIconSet *icon_set = gtk_icon_set_new_from_pixbuf(pixbuf);
 	    gtk_icon_factory_add(factory, names->icon_name, icon_set);
@@ -531,7 +531,7 @@ gui_gtk_register_stock_icons(void)
 
 #endif // FEAT_TOOLBAR
 
-#if defined(FEAT_MENU)
+#만약 defined(FEAT_MENU)
 
 /*
  * Translate Vim's mnemonic tagging to GTK+ style and convert to UTF-8
@@ -544,41 +544,41 @@ gui_gtk_register_stock_icons(void)
  *	<Tab>		end of menu label text
  */
     static char_u *
-translate_mnemonic_tag(char_u *name, int use_mnemonic)
+translate_mnemonic_tag(char_u *name, 정수 use_mnemonic)
 {
     char_u  *buf;
     char_u  *psrc;
     char_u  *pdest;
-    int	    n_underscores = 0;
+    정수	    n_underscores = 0;
 
     name = CONVERT_TO_UTF8(name);
-    if (name == NULL)
-	return NULL;
+    만약 (name == NULL)
+	반환 NULL;
 
-    for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
-	if (*psrc == '_')
+    위해 (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	만약 (*psrc == '_')
 	    ++n_underscores;
 
     buf = alloc(psrc - name + n_underscores + 1);
-    if (buf != NULL)
+    만약 (buf != NULL)
     {
 	pdest = buf;
-	for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	위해 (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
 	{
-	    if (*psrc == '_')
+	    만약 (*psrc == '_')
 	    {
 		*pdest++ = '_';
 		*pdest++ = '_';
 	    }
-	    else if (*psrc != '&')
+	    아니면 만약 (*psrc != '&')
 	    {
 		*pdest++ = *psrc;
 	    }
-	    else if (*(psrc + 1) == '&')
+	    아니면 만약 (*(psrc + 1) == '&')
 	    {
 		*pdest++ = *psrc++;
 	    }
-	    else if (use_mnemonic)
+	    아니면 만약 (use_mnemonic)
 	    {
 		*pdest++ = '_';
 	    }
@@ -587,7 +587,7 @@ translate_mnemonic_tag(char_u *name, int use_mnemonic)
     }
 
     CONVERT_TO_UTF8_FREE(name);
-    return buf;
+    반환 buf;
 }
 
     static void
@@ -595,16 +595,16 @@ menu_item_new(vimmenu_T *menu, GtkWidget *parent_widget)
 {
     GtkWidget	*box;
     char_u	*text;
-    int		use_mnemonic;
+    정수		use_mnemonic;
 
     // It would be neat to have image menu items, but that would require major
     // changes to Vim's menu system.  Not to mention that all the translations
     // had to be updated.
     menu->id = gtk_menu_item_new();
-# if GTK_CHECK_VERSION(3,2,0)
+# 만약 GTK_CHECK_VERSION(3,2,0)
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 20);
     gtk_box_set_homogeneous(GTK_BOX(box), FALSE);
-# else
+# 아니면
     box = gtk_hbox_new(FALSE, 20);
 # endif
 
@@ -616,7 +616,7 @@ menu_item_new(vimmenu_T *menu, GtkWidget *parent_widget)
 
     gtk_box_pack_start(GTK_BOX(box), menu->label, FALSE, FALSE, 0);
 
-    if (menu->actext != NULL && menu->actext[0] != NUL)
+    만약 (menu->actext != NULL && menu->actext[0] != NUL)
     {
 	text = CONVERT_TO_UTF8(menu->actext);
 
@@ -632,29 +632,29 @@ menu_item_new(vimmenu_T *menu, GtkWidget *parent_widget)
 }
 
     void
-gui_mch_add_menu(vimmenu_T *menu, int idx)
+gui_mch_add_menu(vimmenu_T *menu, 정수 idx)
 {
     vimmenu_T	*parent;
     GtkWidget	*parent_widget;
 
-    if (menu->name[0] == ']' || menu_is_popup(menu->name))
+    만약 (menu->name[0] == ']' || menu_is_popup(menu->name))
     {
 	menu->submenu_id = gtk_menu_new();
-	return;
+	반환;
     }
 
     parent = menu->parent;
 
-    if ((parent != NULL && parent->submenu_id == NULL)
+    만약 ((parent != NULL && parent->submenu_id == NULL)
 	    || !menu_is_menubar(menu->name))
-	return;
+	반환;
 
     parent_widget = (parent != NULL) ? parent->submenu_id : gui.menubar;
     menu_item_new(menu, parent_widget);
 
-# if !GTK_CHECK_VERSION(3,4,0)
+# 만약 !GTK_CHECK_VERSION(3,4,0)
     // since the tearoff should always appear first, increment idx
-    if (parent != NULL && !menu_is_popup(parent->name))
+    만약 (parent != NULL && !menu_is_popup(parent->name))
 	++idx;
 # endif
 
@@ -665,14 +665,14 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
     gtk_menu_set_accel_group(GTK_MENU(menu->submenu_id), gui.accel_group);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu->id), menu->submenu_id);
 
-# if !GTK_CHECK_VERSION(3,4,0)
+# 만약 !GTK_CHECK_VERSION(3,4,0)
     menu->tearoff_handle = gtk_tearoff_menu_item_new();
-    if (vim_strchr(p_go, GO_TEAROFF) != NULL)
+    만약 (vim_strchr(p_go, GO_TEAROFF) != NULL)
 	gtk_widget_show(menu->tearoff_handle);
-#  if GTK_CHECK_VERSION(3,0,0)
+#  만약 GTK_CHECK_VERSION(3,0,0)
     gtk_menu_shell_prepend(GTK_MENU_SHELL(menu->submenu_id),
 	    menu->tearoff_handle);
-#  else
+#  아니면
     gtk_menu_prepend(GTK_MENU(menu->submenu_id), menu->tearoff_handle);
 #  endif
 # endif
@@ -689,20 +689,20 @@ menu_item_select(GtkWidget *widget UNUSED, gpointer data)
 {
     vimmenu_T	*menu;
     char_u	*tooltip;
-    static int	did_msg = FALSE;
+    static 정수	did_msg = FALSE;
 
-    if (State & MODE_CMDLINE)
-	return;
+    만약 (State & MODE_CMDLINE)
+	반환;
     menu = (vimmenu_T *)data;
     tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-    if (tooltip != NULL && utf_valid_string(tooltip, NULL))
+    만약 (tooltip != NULL && utf_valid_string(tooltip, NULL))
     {
 	msg((char *)tooltip);
 	did_msg = TRUE;
 	setcursor();
 	out_flush_cursor(TRUE, FALSE);
     }
-    else if (did_msg)
+    아니면 만약 (did_msg)
     {
 	msg("");
 	did_msg = FALSE;
@@ -713,23 +713,23 @@ menu_item_select(GtkWidget *widget UNUSED, gpointer data)
 }
 
     void
-gui_mch_add_menu_item(vimmenu_T *menu, int idx)
+gui_mch_add_menu_item(vimmenu_T *menu, 정수 idx)
 {
     vimmenu_T *parent;
 
     parent = menu->parent;
 
 # ifdef FEAT_TOOLBAR
-    if (menu_is_toolbar(parent->name))
+    만약 (menu_is_toolbar(parent->name))
     {
 	GtkToolbar *toolbar;
 
 	toolbar = GTK_TOOLBAR(gui.toolbar);
 	menu->submenu_id = NULL;
 
-	if (menu_is_separator(menu->name))
+	만약 (menu_is_separator(menu->name))
 	{
-#  if GTK_CHECK_VERSION(3,0,0)
+#  만약 GTK_CHECK_VERSION(3,0,0)
 	    GtkToolItem *item = gtk_separator_tool_item_new();
 	    gtk_separator_tool_item_set_draw(GTK_SEPARATOR_TOOL_ITEM(item),
 		    TRUE);
@@ -737,24 +737,24 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    gtk_widget_show(GTK_WIDGET(item));
 
 	    gtk_toolbar_insert(toolbar, item, idx);
-#  else
+#  아니면
 	    gtk_toolbar_insert_space(toolbar, idx);
 #  endif
 	    menu->id = NULL;
 	}
-	else
+	아니면
 	{
 	    char_u *text;
 	    char_u *tooltip;
 
 	    text    = CONVERT_TO_UTF8(menu->dname);
 	    tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-	    if (tooltip != NULL && !utf_valid_string(tooltip, NULL))
+	    만약 (tooltip != NULL && !utf_valid_string(tooltip, NULL))
 		// Invalid text, can happen when 'encoding' is changed.  Avoid
 		// a nasty GTK error message, skip the tooltip.
 		CONVERT_TO_UTF8_FREE(tooltip);
 
-#  if GTK_CHECK_VERSION(3,0,0)
+#  만약 GTK_CHECK_VERSION(3,0,0)
 	    {
 		GtkWidget *icon;
 		GtkToolItem *item;
@@ -771,7 +771,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 
 		menu->id = GTK_WIDGET(item);
 	    }
-#  else
+#  아니면
 	    menu->id = gtk_toolbar_insert_item(
 		    toolbar,
 		    (const char *)text,
@@ -783,7 +783,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 		    idx);
 #  endif
 
-	    if (gtk_socket_id != 0)
+	    만약 (gtk_socket_id != 0)
 		g_signal_connect(G_OBJECT(menu->id), "focus-in-event",
 			G_CALLBACK(toolbar_button_focus_in_event), NULL);
 
@@ -791,26 +791,26 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    CONVERT_TO_UTF8_FREE(tooltip);
 	}
     }
-    else
+    아니면
 # endif // FEAT_TOOLBAR
     {
 	// No parent, must be a non-menubar menu
-	if (parent == NULL || parent->submenu_id == NULL)
-	    return;
+	만약 (parent == NULL || parent->submenu_id == NULL)
+	    반환;
 
-# if !GTK_CHECK_VERSION(3,4,0)
+# 만약 !GTK_CHECK_VERSION(3,4,0)
 	// Make place for the possible tearoff handle item.  Not in the popup
 	// menu, it doesn't have a tearoff item.
-	if (!menu_is_popup(parent->name))
+	만약 (!menu_is_popup(parent->name))
 	    ++idx;
 # endif
 
-	if (menu_is_separator(menu->name))
+	만약 (menu_is_separator(menu->name))
 	{
 	    // Separator: Just add it
-# if GTK_CHECK_VERSION(3,0,0)
+# 만약 GTK_CHECK_VERSION(3,0,0)
 	    menu->id = gtk_separator_menu_item_new();
-# else
+# 아니면
 	    menu->id = gtk_menu_item_new();
 	    gtk_widget_set_sensitive(menu->id, FALSE);
 # endif
@@ -818,7 +818,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    gtk_menu_shell_insert(GTK_MENU_SHELL(parent->submenu_id),
 		    menu->id, idx);
 
-	    return;
+	    반환;
 	}
 
 	// Add textual menu item.
@@ -827,7 +827,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	gtk_menu_shell_insert(GTK_MENU_SHELL(parent->submenu_id),
 		menu->id, idx);
 
-	if (menu->id != NULL)
+	만약 (menu->id != NULL)
 	{
 	    g_signal_connect(G_OBJECT(menu->id), "activate",
 			     G_CALLBACK(menu_item_activate), menu);
@@ -840,25 +840,25 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 
 
     void
-gui_mch_set_text_area_pos(int x, int y, int w, int h)
+gui_mch_set_text_area_pos(정수 x, 정수 y, 정수 w, 정수 h)
 {
     gui_gtk_form_move_resize(GTK_FORM(gui.formwin), gui.drawarea, x, y, w, h);
 }
 
 
-#if defined(FEAT_MENU)
+#만약 defined(FEAT_MENU)
 /*
  * Enable or disable accelerators for the toplevel menus.
  */
     void
-gui_gtk_set_mnemonics(int enable)
+gui_gtk_set_mnemonics(정수 enable)
 {
     vimmenu_T	*menu;
     char_u	*name;
 
     FOR_ALL_MENUS(menu)
     {
-	if (menu->id == NULL)
+	만약 (menu->id == NULL)
 	    continue;
 
 	name = translate_mnemonic_tag(menu->name, enable);
@@ -868,18 +868,18 @@ gui_gtk_set_mnemonics(int enable)
     }
 }
 
-# if !GTK_CHECK_VERSION(3,4,0)
+# 만약 !GTK_CHECK_VERSION(3,4,0)
     static void
-recurse_tearoffs(vimmenu_T *menu, int val)
+recurse_tearoffs(vimmenu_T *menu, 정수 val)
 {
-    for (; menu != NULL; menu = menu->next)
+    위해 (; menu != NULL; menu = menu->next)
     {
-	if (menu->submenu_id != NULL && menu->tearoff_handle != NULL
+	만약 (menu->submenu_id != NULL && menu->tearoff_handle != NULL
 		&& menu->name[0] != ']' && !menu_is_popup(menu->name))
 	{
-	    if (val)
+	    만약 (val)
 		gtk_widget_show(menu->tearoff_handle);
-	    else
+	    아니면
 		gtk_widget_hide(menu->tearoff_handle);
 	}
 	recurse_tearoffs(menu->children, val);
@@ -887,54 +887,54 @@ recurse_tearoffs(vimmenu_T *menu, int val)
 }
 # endif
 
-# if GTK_CHECK_VERSION(3,4,0)
+# 만약 GTK_CHECK_VERSION(3,4,0)
     void
-gui_mch_toggle_tearoffs(int enable UNUSED)
+gui_mch_toggle_tearoffs(정수 enable UNUSED)
 {
     // Do nothing
 }
-# else
+# 아니면
     void
-gui_mch_toggle_tearoffs(int enable)
+gui_mch_toggle_tearoffs(정수 enable)
 {
     recurse_tearoffs(root_menu, enable);
 }
 # endif
 #endif // FEAT_MENU
 
-#if defined(FEAT_TOOLBAR)
-    static int
+#만약 defined(FEAT_TOOLBAR)
+    static 정수
 get_menu_position(vimmenu_T *menu)
 {
     vimmenu_T	*node;
-    int		idx = 0;
+    정수		idx = 0;
 
-    for (node = menu->parent->children; node != menu; node = node->next)
+    위해 (node = menu->parent->children; node != menu; node = node->next)
     {
 	g_return_val_if_fail(node != NULL, -1);
 	++idx;
     }
 
-    return idx;
+    반환 idx;
 }
 #endif // FEAT_TOOLBAR
 
 
-#if defined(FEAT_TOOLBAR)
+#만약 defined(FEAT_TOOLBAR)
     void
 gui_mch_menu_set_tip(vimmenu_T *menu)
 {
-    if (menu->id == NULL || menu->parent == NULL || gui.toolbar == NULL)
-	return;
+    만약 (menu->id == NULL || menu->parent == NULL || gui.toolbar == NULL)
+	반환;
 
     char_u *tooltip;
 
     tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-    if (tooltip != NULL && utf_valid_string(tooltip, NULL))
-# if GTK_CHECK_VERSION(3,0,0)
+    만약 (tooltip != NULL && utf_valid_string(tooltip, NULL))
+# 만약 GTK_CHECK_VERSION(3,0,0)
 	// Only set the tooltip when it's valid utf-8.
 	gtk_widget_set_tooltip_text(menu->id, (const gchar *)tooltip);
-# else
+# 아니면
     // Only set the tooltip when it's valid utf-8.
     gtk_tooltips_set_tip(GTK_TOOLBAR(gui.toolbar)->tooltips,
 	    menu->id, (const char *)tooltip, NULL);
@@ -944,7 +944,7 @@ gui_mch_menu_set_tip(vimmenu_T *menu)
 #endif // FEAT_TOOLBAR
 
 
-#if defined(FEAT_MENU)
+#만약 defined(FEAT_MENU)
 /*
  * Destroy the machine specific menu widget.
  */
@@ -952,48 +952,48 @@ gui_mch_menu_set_tip(vimmenu_T *menu)
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
     // Don't let gtk_container_remove automatically destroy menu->id.
-    if (menu->id != NULL)
+    만약 (menu->id != NULL)
 	g_object_ref(menu->id);
 
     // Workaround for a spurious gtk warning in Ubuntu: "Trying to remove
     // a child that doesn't believe we're its parent."
     // Remove widget from gui.menubar before destroying it.
-    if (menu->id != NULL && gui.menubar != NULL
+    만약 (menu->id != NULL && gui.menubar != NULL
 			    && gtk_widget_get_parent(menu->id) == gui.menubar)
 	gtk_container_remove(GTK_CONTAINER(gui.menubar), menu->id);
 
 # ifdef FEAT_TOOLBAR
-    if (menu->parent != NULL && menu_is_toolbar(menu->parent->name))
+    만약 (menu->parent != NULL && menu_is_toolbar(menu->parent->name))
     {
-	if (menu_is_separator(menu->name))
-#  if GTK_CHECK_VERSION(3,0,0)
+	만약 (menu_is_separator(menu->name))
+#  만약 GTK_CHECK_VERSION(3,0,0)
 	{
 	    GtkToolItem *item = NULL;
 
 	    item = gtk_toolbar_get_nth_item(GTK_TOOLBAR(gui.toolbar),
 					    get_menu_position(menu));
-	    if (item != NULL)
+	    만약 (item != NULL)
 		gtk_container_remove(GTK_CONTAINER(gui.toolbar),
 				     GTK_WIDGET(item));
 	}
-#  else
+#  아니면
 	    gtk_toolbar_remove_space(GTK_TOOLBAR(gui.toolbar),
 				     get_menu_position(menu));
 #  endif
-	else if (menu->id != NULL)
+	아니면 만약 (menu->id != NULL)
 	    gtk_widget_destroy(menu->id);
     }
-    else
+    아니면
 # endif // FEAT_TOOLBAR
     {
-	if (menu->submenu_id != NULL)
+	만약 (menu->submenu_id != NULL)
 	    gtk_widget_destroy(menu->submenu_id);
 
-	if (menu->id != NULL)
+	만약 (menu->id != NULL)
 	    gtk_widget_destroy(menu->id);
     }
 
-    if (menu->id != NULL)
+    만약 (menu->id != NULL)
 	g_object_unref(menu->id);
     menu->submenu_id = NULL;
     menu->id = NULL;
@@ -1007,8 +1007,8 @@ gui_mch_destroy_menu(vimmenu_T *menu)
     void
 gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
 {
-    if (sb->id == NULL)
-	return;
+    만약 (sb->id == NULL)
+	반환;
 
     GtkAdjustment *adjustment;
 
@@ -1029,7 +1029,7 @@ gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
 
     --hold_gui_events;
 
-#if !GTK_CHECK_VERSION(3,18,0)
+#만약 !GTK_CHECK_VERSION(3,18,0)
     gtk_adjustment_changed(adjustment);
 #endif
 
@@ -1038,41 +1038,41 @@ gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
 }
 
     void
-gui_mch_set_scrollbar_pos(scrollbar_T *sb, int x, int y, int w, int h)
+gui_mch_set_scrollbar_pos(scrollbar_T *sb, 정수 x, 정수 y, 정수 w, 정수 h)
 {
-    if (sb->id != NULL)
+    만약 (sb->id != NULL)
 	gui_gtk_form_move_resize(GTK_FORM(gui.formwin), sb->id, x, y, w, h);
 }
 
-    int
+    정수
 gui_mch_get_scrollbar_xpadding(void)
 {
-    int xpad;
-#if GTK_CHECK_VERSION(3,0,0)
+    정수 xpad;
+#만약 GTK_CHECK_VERSION(3,0,0)
     xpad = gtk_widget_get_allocated_width(gui.formwin)
 	  - gtk_widget_get_allocated_width(gui.drawarea) - gui.scrollbar_width;
-#else
+#아니면
     xpad = gui.formwin->allocation.width - gui.drawarea->allocation.width
 							 - gui.scrollbar_width;
 #endif
-    if (gui.which_scrollbars[SBAR_LEFT] && gui.which_scrollbars[SBAR_RIGHT])
+    만약 (gui.which_scrollbars[SBAR_LEFT] && gui.which_scrollbars[SBAR_RIGHT])
 	xpad -= gui.scrollbar_width;
 
-    return (xpad < 0) ? 0 : xpad;
+    반환 (xpad < 0) ? 0 : xpad;
 }
 
-    int
+    정수
 gui_mch_get_scrollbar_ypadding(void)
 {
-    int ypad;
-#if GTK_CHECK_VERSION(3,0,0)
+    정수 ypad;
+#만약 GTK_CHECK_VERSION(3,0,0)
     ypad = gtk_widget_get_allocated_height(gui.formwin)
 	- gtk_widget_get_allocated_height(gui.drawarea) - gui.scrollbar_height;
-#else
+#아니면
     ypad = gui.formwin->allocation.height - gui.drawarea->allocation.height
 							- gui.scrollbar_height;
 #endif
-    return (ypad < 0) ? 0 : ypad;
+    반환 (ypad < 0) ? 0 : ypad;
 }
 
 /*
@@ -1083,17 +1083,17 @@ adjustment_value_changed(GtkAdjustment *adjustment, gpointer data)
 {
     scrollbar_T	*sb;
     long	value;
-    int		dragging = FALSE;
+    정수		dragging = FALSE;
 
 #ifdef FEAT_XIM
     // cancel any preediting
-    if (im_is_preediting())
+    만약 (im_is_preediting())
 	xim_reset();
 #endif
 
     sb = gui_find_scrollbar((long)data);
     value = gtk_adjustment_get_value(adjustment);
-#if !GTK_CHECK_VERSION(3,0,0)
+#만약 !GTK_CHECK_VERSION(3,0,0)
     /*
      * The dragging argument must be right for the scrollbar to work with
      * closed folds.  This isn't documented, hopefully this will keep on
@@ -1103,31 +1103,31 @@ adjustment_value_changed(GtkAdjustment *adjustment, gpointer data)
      * HACK: Get the mouse pointer position, if it appears to be on an arrow
      * button set "dragging" to FALSE.  This assumes square buttons!
      */
-    if (sb != NULL)
+    만약 (sb != NULL)
     {
 	dragging = TRUE;
 
-	if (sb->wp != NULL && GDK_IS_DRAWABLE(sb->id->window))
+	만약 (sb->wp != NULL && GDK_IS_DRAWABLE(sb->id->window))
 	{
-	    int			x;
-	    int			y;
+	    정수			x;
+	    정수			y;
 	    GdkModifierType	state;
-	    int			width;
-	    int			height;
+	    정수			width;
+	    정수			height;
 
 	    // vertical scrollbar: need to set "dragging" properly in case
 	    // there are closed folds.
 	    gdk_window_get_pointer(sb->id->window, &x, &y, &state);
 	    gdk_window_get_size(sb->id->window, &width, &height);
-	    if (x >= 0 && x < width && y >= 0 && y < height)
+	    만약 (x >= 0 && x < width && y >= 0 && y < height)
 	    {
-		if (y < width)
+		만약 (y < width)
 		{
 		    // up arrow: move one (closed fold) line up
 		    dragging = FALSE;
 		    value = sb->wp->w_topline - 2;
 		}
-		else if (y > height - width)
+		아니면 만약 (y > height - width)
 		{
 		    // down arrow: move one (closed fold) line down
 		    dragging = FALSE;
@@ -1142,23 +1142,23 @@ adjustment_value_changed(GtkAdjustment *adjustment, gpointer data)
 
 // SBAR_VERT or SBAR_HORIZ
     void
-gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
+gui_mch_create_scrollbar(scrollbar_T *sb, 정수 orient)
 {
-    if (orient == SBAR_HORIZ)
-#if GTK_CHECK_VERSION(3,2,0)
+    만약 (orient == SBAR_HORIZ)
+#만약 GTK_CHECK_VERSION(3,2,0)
 	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_HORIZONTAL, NULL);
-#else
+#아니면
 	sb->id = gtk_hscrollbar_new(NULL);
 #endif
-    else if (orient == SBAR_VERT)
-#if GTK_CHECK_VERSION(3,2,0)
+    아니면 만약 (orient == SBAR_VERT)
+#만약 GTK_CHECK_VERSION(3,2,0)
 	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, NULL);
-#else
+#아니면
 	sb->id = gtk_vscrollbar_new(NULL);
 #endif
 
-    if (sb->id == NULL)
-	return;
+    만약 (sb->id == NULL)
+	반환;
 
     GtkAdjustment *adjustment;
 
@@ -1177,7 +1177,7 @@ gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
     void
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
-    if (sb->id != NULL)
+    만약 (sb->id != NULL)
     {
 	gtk_widget_destroy(sb->id);
 	sb->id = NULL;
@@ -1185,7 +1185,7 @@ gui_mch_destroy_scrollbar(scrollbar_T *sb)
     gui_mch_update();
 }
 
-#if defined(FEAT_BROWSE)
+#만약 defined(FEAT_BROWSE)
 /*
  * Implementation of the file selector related stuff
  */
@@ -1201,16 +1201,16 @@ gui_mch_destroy_scrollbar(scrollbar_T *sb)
  * filter			file name filter
  */
     char_u *
-gui_mch_browse(int saving,
+gui_mch_browse(정수 saving,
 	       char_u *title,
 	       char_u *dflt,
 	       char_u *ext UNUSED,
 	       char_u *initdir,
 	       char_u *filter)
 {
-# if GTK_CHECK_VERSION(3,20,0)
+# 만약 GTK_CHECK_VERSION(3,20,0)
     GtkFileChooserNative	*fc;
-# else
+# 아니면
     GtkWidget			*fc;
 # endif
     char_u		dirbuf[MAXPATHL];
@@ -1220,9 +1220,9 @@ gui_mch_browse(int saving,
     title = CONVERT_TO_UTF8(title);
 
     // GTK has a bug, it only works with an absolute path.
-    if (initdir == NULL || *initdir == NUL)
+    만약 (initdir == NULL || *initdir == NUL)
 	mch_dirname(dirbuf, MAXPATHL);
-    else if (vim_FullName(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
+    아니면 만약 (vim_FullName(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
 	dirbuf[0] = NUL;
     // Always need a trailing slash for a directory.
     add_pathsep(dirbuf);
@@ -1237,22 +1237,22 @@ gui_mch_browse(int saving,
 
     // We create the dialog each time, so that the button text can be "Open"
     // or "Save" according to the action.
-# if GTK_CHECK_VERSION(3,20,0)
+# 만약 GTK_CHECK_VERSION(3,20,0)
     fc = gtk_file_chooser_native_new(
-# else
+# 아니면
     fc = gtk_file_chooser_dialog_new(
 # endif
 	    (const gchar *)title,
 	    GTK_WINDOW(gui.mainwin),
 	    saving ? GTK_FILE_CHOOSER_ACTION_SAVE
 					   : GTK_FILE_CHOOSER_ACTION_OPEN,
-# if GTK_CHECK_VERSION(3,20,0)
+# 만약 GTK_CHECK_VERSION(3,20,0)
 	    saving ? _("_Save") : _("_Open"), _("_Cancel"));
-# else
-#  if GTK_CHECK_VERSION(3,10,0)
+# 아니면
+#  만약 GTK_CHECK_VERSION(3,10,0)
 	    _("_Cancel"), GTK_RESPONSE_CANCEL,
 	    saving ? _("_Save") : _("_Open"), GTK_RESPONSE_ACCEPT,
-#  else
+#  아니면
 	    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 	    saving ? GTK_STOCK_SAVE : GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
 #  endif
@@ -1261,40 +1261,40 @@ gui_mch_browse(int saving,
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(fc),
 						       (const gchar *)dirbuf);
 
-    if (filter != NULL && *filter != NUL)
+    만약 (filter != NULL && *filter != NUL)
     {
-	int     i = 0;
+	정수     i = 0;
 	char_u  *patt;
 	char_u  *p = filter;
 	GtkFileFilter	*gfilter;
 
 	gfilter = gtk_file_filter_new();
 	patt = alloc(STRLEN(filter));
-	if (patt != NULL)
+	만약 (patt != NULL)
 	{
-	    while (p != NULL && *p != NUL)
+	    동안 (p != NULL && *p != NUL)
 	    {
-		if (*p == '\n' || *p == ';' || *p == '\t')
+		만약 (*p == '\n' || *p == ';' || *p == '\t')
 		{
 		    STRNCPY(patt, filter, i);
 		    patt[i] = '\0';
-		    if (*p == '\t')
+		    만약 (*p == '\t')
 			gtk_file_filter_set_name(gfilter, (gchar *)patt);
-		    else
+		    아니면
 		    {
 			gtk_file_filter_add_pattern(gfilter, (gchar *)patt);
-			if (*p == '\n')
+			만약 (*p == '\n')
 			{
 			    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(fc),
 				    gfilter);
-			    if (*(p + 1) != NUL)
+			    만약 (*(p + 1) != NUL)
 				gfilter = gtk_file_filter_new();
 			}
 		    }
 		    filter = ++p;
 		    i = 0;
 		}
-		else
+		아니면
 		{
 		    p++;
 		    i++;
@@ -1303,14 +1303,14 @@ gui_mch_browse(int saving,
 	}
 	vim_free(patt);
     }
-    if (saving && dflt != NULL && *dflt != NUL)
+    만약 (saving && dflt != NULL && *dflt != NUL)
 	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(fc), (char *)dflt);
 
     gui.browse_fname = NULL;
-# if GTK_CHECK_VERSION(3,20,0)
-    if (gtk_native_dialog_run(GTK_NATIVE_DIALOG(fc)) == GTK_RESPONSE_ACCEPT)
-# else
-    if (gtk_dialog_run(GTK_DIALOG(fc)) == GTK_RESPONSE_ACCEPT)
+# 만약 GTK_CHECK_VERSION(3,20,0)
+    만약 (gtk_native_dialog_run(GTK_NATIVE_DIALOG(fc)) == GTK_RESPONSE_ACCEPT)
+# 아니면
+    만약 (gtk_dialog_run(GTK_DIALOG(fc)) == GTK_RESPONSE_ACCEPT)
 # endif
     {
 	char *filename;
@@ -1319,20 +1319,20 @@ gui_mch_browse(int saving,
 	gui.browse_fname = (char_u *)g_strdup(filename);
 	g_free(filename);
     }
-# if GTK_CHECK_VERSION(3,20,0)
+# 만약 GTK_CHECK_VERSION(3,20,0)
     g_object_unref(fc);
-# else
+# 아니면
     gtk_widget_destroy(GTK_WIDGET(fc));
 # endif
 
     g_log_remove_handler(domain, log_handler);
 
     CONVERT_TO_UTF8_FREE(title);
-    if (gui.browse_fname == NULL)
-	return NULL;
+    만약 (gui.browse_fname == NULL)
+	반환 NULL;
 
     // shorten the file name if possible
-    return vim_strsave(shorten_fname1(gui.browse_fname));
+    반환 vim_strsave(shorten_fname1(gui.browse_fname));
 }
 
 /*
@@ -1347,7 +1347,7 @@ gui_mch_browsedir(
 	       char_u *title,
 	       char_u *initdir)
 {
-# if defined(GTK_FILE_CHOOSER)	    // Only in GTK 2.4 and later.
+# 만약 defined(GTK_FILE_CHOOSER)	    // Only in GTK 2.4 and later.
     char_u		dirbuf[MAXPATHL];
     char_u		*p;
     GtkWidget		*dirdlg;	    // file selection dialog
@@ -1359,10 +1359,10 @@ gui_mch_browsedir(
 	    (const gchar *)title,
 	    GTK_WINDOW(gui.mainwin),
 	    GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-#  if GTK_CHECK_VERSION(3,10,0)
+#  만약 GTK_CHECK_VERSION(3,10,0)
 	    _("_Cancel"), GTK_RESPONSE_CANCEL,
 	    _("_OK"), GTK_RESPONSE_ACCEPT,
-#  else
+#  아니면
 	    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 	    GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
 #  endif
@@ -1374,7 +1374,7 @@ gui_mch_browsedir(
     gui_mch_mousehide(FALSE);
 
     // GTK appears to insist on an absolute path.
-    if (initdir == NULL || *initdir == NUL
+    만약 (initdir == NULL || *initdir == NUL
 	       || vim_FullName(initdir, dirbuf, MAXPATHL - 10, FALSE) == FAIL)
 	mch_dirname(dirbuf, MAXPATHL - 10);
 
@@ -1386,31 +1386,31 @@ gui_mch_browsedir(
 						      (const gchar *)dirbuf);
 
     // Run the dialog.
-    if (gtk_dialog_run(GTK_DIALOG(dirdlg)) == GTK_RESPONSE_ACCEPT)
+    만약 (gtk_dialog_run(GTK_DIALOG(dirdlg)) == GTK_RESPONSE_ACCEPT)
 	dirname = (char_u *)gtk_file_chooser_get_filename(
 						    GTK_FILE_CHOOSER(dirdlg));
     gtk_widget_destroy(dirdlg);
-    if (dirname == NULL)
-	return NULL;
+    만약 (dirname == NULL)
+	반환 NULL;
 
     // shorten the file name if possible
     p = vim_strsave(shorten_fname1(dirname));
     g_free(dirname);
-    return p;
+    반환 p;
 
-# else // !defined(GTK_FILE_CHOOSER)
+# 아니면 // !defined(GTK_FILE_CHOOSER)
     // For GTK 2.2 and earlier: fall back to ordinary file selector.
-    return gui_mch_browse(0, title, NULL, NULL, initdir, NULL);
+    반환 gui_mch_browse(0, title, NULL, NULL, initdir, NULL);
 # endif // !defined(GTK_FILE_CHOOSER)
 }
 
 
 #endif	// FEAT_BROWSE
 
-#if defined(FEAT_GUI_DIALOG)
+#만약 defined(FEAT_GUI_DIALOG)
 
     static GtkWidget *
-create_message_dialog(int type, char_u *title, char_u *message)
+create_message_dialog(정수 type, char_u *title, char_u *message)
 {
     GtkWidget	    *dialog;
     GtkMessageType  message_type;
@@ -1431,18 +1431,18 @@ create_message_dialog(int type, char_u *title, char_u *message)
 				     "%s", (const char *)message);
     CONVERT_TO_UTF8_FREE(message);
 
-    if (title != NULL)
+    만약 (title != NULL)
     {
 	title = CONVERT_TO_UTF8(title);
 	gtk_window_set_title(GTK_WINDOW(dialog), (const char *)title);
 	CONVERT_TO_UTF8_FREE(title);
     }
-    else if (type == VIM_GENERIC)
+    아니면 만약 (type == VIM_GENERIC)
     {
 	gtk_window_set_title(GTK_WINDOW(dialog), "VIM");
     }
 
-    return dialog;
+    반환 dialog;
 }
 
 /*
@@ -1452,63 +1452,63 @@ create_message_dialog(int type, char_u *title, char_u *message)
  * Return an allocated array of pointers into button_string.
  */
     static char **
-split_button_string(char_u *button_string, int *n_buttons)
+split_button_string(char_u *button_string, 정수 *n_buttons)
 {
     char	    **array;
     char_u	    *p;
-    unsigned int    count = 1;
+    unsigned 정수    count = 1;
 
-    for (p = button_string; *p != NUL; ++p)
-	if (*p == DLG_BUTTON_SEP)
+    위해 (p = button_string; *p != NUL; ++p)
+	만약 (*p == DLG_BUTTON_SEP)
 	    ++count;
 
     array = ALLOC_MULT(char *, count + 1);
     count = 0;
 
-    if (array != NULL)
+    만약 (array != NULL)
     {
 	array[count++] = (char *)button_string;
-	for (p = button_string; *p != NUL; )
+	위해 (p = button_string; *p != NUL; )
 	{
-	    if (*p == DLG_BUTTON_SEP)
+	    만약 (*p == DLG_BUTTON_SEP)
 	    {
 		*p++ = NUL;
 		array[count++] = (char *)p;
 	    }
-	    else if (*p == DLG_HOTKEY_CHAR)
+	    아니면 만약 (*p == DLG_HOTKEY_CHAR)
 		*p++ = '_';
-	    else
+	    아니면
 		MB_PTR_ADV(p);
 	}
 	array[count] = NULL; // currently not relied upon, but doesn't hurt
     }
 
     *n_buttons = count;
-    return array;
+    반환 array;
 }
 
-# if !GTK_CHECK_VERSION(3,10,0)
+# 만약 !GTK_CHECK_VERSION(3,10,0)
     static char **
 split_button_translation(const char *message)
 {
     char    **buttons = NULL;
     char_u  *str;
-    int	    n_buttons = 0;
-    int	    n_expected = 1;
+    정수	    n_buttons = 0;
+    정수	    n_expected = 1;
 
-    for (str = (char_u *)message; *str != NUL; ++str)
-	if (*str == DLG_BUTTON_SEP)
+    위해 (str = (char_u *)message; *str != NUL; ++str)
+	만약 (*str == DLG_BUTTON_SEP)
 	    ++n_expected;
 
     str = (char_u *)_(message);
-    if (str != NULL)
+    만약 (str != NULL)
     {
-	if (output_conv.vc_type != CONV_NONE)
+	만약 (output_conv.vc_type != CONV_NONE)
 	    str = string_convert(&output_conv, str, NULL);
-	else
+	아니면
 	    str = vim_strsave(str);
 
-	if (str != NULL)
+	만약 (str != NULL)
 	    buttons = split_button_string(str, &n_buttons);
     }
     /*
@@ -1516,63 +1516,63 @@ split_button_translation(const char *message)
      * if the translation is broken, thus fall back to the untranslated
      * buttons string in case of emergency.
      */
-    if (buttons == NULL || n_buttons != n_expected)
+    만약 (buttons == NULL || n_buttons != n_expected)
     {
 	vim_free(buttons);
 	vim_free(str);
 	buttons = NULL;
 	str = vim_strsave((char_u *)message);
 
-	if (str != NULL)
+	만약 (str != NULL)
 	    buttons = split_button_string(str, &n_buttons);
-	if (buttons == NULL)
+	만약 (buttons == NULL)
 	    vim_free(str);
     }
 
-    return buttons;
+    반환 buttons;
 }
 
-    static int
+    static 정수
 button_equal(const char *a, const char *b)
 {
-    while (*a != '\0' && *b != '\0')
+    동안 (*a != '\0' && *b != '\0')
     {
-	if (*a == '_' && *++a == '\0')
+	만약 (*a == '_' && *++a == '\0')
 	    break;
-	if (*b == '_' && *++b == '\0')
+	만약 (*b == '_' && *++b == '\0')
 	    break;
 
-	if (g_unichar_tolower(g_utf8_get_char(a))
+	만약 (g_unichar_tolower(g_utf8_get_char(a))
 		!= g_unichar_tolower(g_utf8_get_char(b)))
-	    return FALSE;
+	    반환 FALSE;
 
 	a = g_utf8_next_char(a);
 	b = g_utf8_next_char(b);
     }
 
-    return (*a == '\0' && *b == '\0');
+    반환 (*a == '\0' && *b == '\0');
 }
 # endif
 
     static void
 dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
 {
-# if !GTK_CHECK_VERSION(3,10,0)
+# 만약 !GTK_CHECK_VERSION(3,10,0)
     char    **ok;
     char    **ync;  // "yes no cancel"
 # endif
     char    **buttons;
-    int	    n_buttons = 0;
-    int	    idx;
+    정수	    n_buttons = 0;
+    정수	    idx;
 
     button_string = vim_strsave(button_string); // must be writable
-    if (button_string == NULL)
-	return;
+    만약 (button_string == NULL)
+	반환;
 
     // Check 'v' flag in 'guioptions': vertical button placement.
-    if (vim_strchr(p_go, GO_VERTICAL) != NULL)
+    만약 (vim_strchr(p_go, GO_VERTICAL) != NULL)
     {
-# if !GTK_CHECK_VERSION(3,0,0)
+# 만약 !GTK_CHECK_VERSION(3,0,0)
 	GtkWidget	*vbutton_box;
 
 	vbutton_box = gtk_vbutton_box_new();
@@ -1589,7 +1589,7 @@ dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
      * this way has the compelling advantage that translations need not to
      * be touched at all.  See below what 'ok' and 'ync' are used for.
      */
-# if !GTK_CHECK_VERSION(3,10,0)
+# 만약 !GTK_CHECK_VERSION(3,10,0)
     ok	    = split_button_translation(N_("&Ok"));
     ync     = split_button_translation(N_("&Yes\n&No\n&Cancel"));
 # endif
@@ -1601,7 +1601,7 @@ dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
      * Well, apparently somebody changed his mind: with GTK 2.2.4 it works the
      * other way around...
      */
-    for (idx = 1; idx <= n_buttons; ++idx)
+    위해 (idx = 1; idx <= n_buttons; ++idx)
     {
 	char	*label;
 	char_u	*label8;
@@ -1616,17 +1616,17 @@ dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
 	 * since anyone can create their own dialogs using Vim functions.
 	 * Thus we have to check for those too.
 	 */
-# if !GTK_CHECK_VERSION(3,10,0)
-	if (ok != NULL && ync != NULL) // almost impossible to fail
+# 만약 !GTK_CHECK_VERSION(3,10,0)
+	만약 (ok != NULL && ync != NULL) // almost impossible to fail
 	{
-	    if	    (button_equal(label, ok[0]))    label = GTK_STOCK_OK;
-	    else if (button_equal(label, ync[0]))   label = GTK_STOCK_YES;
-	    else if (button_equal(label, ync[1]))   label = GTK_STOCK_NO;
-	    else if (button_equal(label, ync[2]))   label = GTK_STOCK_CANCEL;
-	    else if (button_equal(label, "Ok"))     label = GTK_STOCK_OK;
-	    else if (button_equal(label, "Yes"))    label = GTK_STOCK_YES;
-	    else if (button_equal(label, "No"))     label = GTK_STOCK_NO;
-	    else if (button_equal(label, "Cancel")) label = GTK_STOCK_CANCEL;
+	    만약	    (button_equal(label, ok[0]))    label = GTK_STOCK_OK;
+	    아니면 만약 (button_equal(label, ync[0]))   label = GTK_STOCK_YES;
+	    아니면 만약 (button_equal(label, ync[1]))   label = GTK_STOCK_NO;
+	    아니면 만약 (button_equal(label, ync[2]))   label = GTK_STOCK_CANCEL;
+	    아니면 만약 (button_equal(label, "Ok"))     label = GTK_STOCK_OK;
+	    아니면 만약 (button_equal(label, "Yes"))    label = GTK_STOCK_YES;
+	    아니면 만약 (button_equal(label, "No"))     label = GTK_STOCK_NO;
+	    아니면 만약 (button_equal(label, "Cancel")) label = GTK_STOCK_CANCEL;
 	}
 # endif
 	label8 = CONVERT_TO_UTF8((char_u *)label);
@@ -1634,10 +1634,10 @@ dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
 	CONVERT_TO_UTF8_FREE(label8);
     }
 
-# if !GTK_CHECK_VERSION(3,10,0)
-    if (ok != NULL)
+# 만약 !GTK_CHECK_VERSION(3,10,0)
+    만약 (ok != NULL)
 	vim_free(*ok);
-    if (ync != NULL)
+    만약 (ync != NULL)
 	vim_free(*ync);
     vim_free(ok);
     vim_free(ync);
@@ -1654,8 +1654,8 @@ dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
  */
 typedef struct _DialogInfo
 {
-    int		ignore_enter;	    // no default button, ignore "Enter"
-    int		noalt;		    // accept accelerators without Alt
+    정수		ignore_enter;	    // no default button, ignore "Enter"
+    정수		noalt;		    // accept accelerators without Alt
     GtkDialog	*dialog;	    // Widget of the dialog
 } DialogInfo;
 
@@ -1665,43 +1665,43 @@ dialog_key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer data)
     DialogInfo *di = (DialogInfo *)data;
 
     // Ignore hitting Enter (or Space) when there is no default button.
-    if (di->ignore_enter && (event->keyval == GDK_Return
+    만약 (di->ignore_enter && (event->keyval == GDK_Return
 						     || event->keyval == ' '))
-	return TRUE;
-    else    // A different key was pressed, return to normal behavior
+	반환 TRUE;
+    아니면    // A different key was pressed, return to normal behavior
 	di->ignore_enter = FALSE;
 
     // Close the dialog when hitting "Esc".
-    if (event->keyval == GDK_Escape)
+    만약 (event->keyval == GDK_Escape)
     {
 	gtk_dialog_response(di->dialog, GTK_RESPONSE_REJECT);
-	return TRUE;
+	반환 TRUE;
     }
 
-    if (di->noalt
+    만약 (di->noalt
 	      && (event->state & gtk_accelerator_get_default_mod_mask()) == 0)
     {
-	return gtk_window_mnemonic_activate(
+	반환 gtk_window_mnemonic_activate(
 		   GTK_WINDOW(widget), event->keyval,
 		   gtk_window_get_mnemonic_modifier(GTK_WINDOW(widget)));
     }
 
-    return FALSE; // continue emission
+    반환 FALSE; // continue emission
 }
 
-    int
-gui_mch_dialog(int	type,	    // type of dialog
+    정수
+gui_mch_dialog(정수	type,	    // type of dialog
 	       char_u	*title,	    // title of dialog
 	       char_u	*message,   // message text
 	       char_u	*buttons,   // names of buttons
-	       int	def_but,    // default button
+	       정수	def_but,    // default button
 	       char_u	*textfield, // text for textfield or NULL
-	       int	ex_cmd UNUSED)
+	       정수	ex_cmd UNUSED)
 {
     GtkWidget	*dialog;
     GtkWidget	*entry = NULL;
     char_u	*text;
-    int		response;
+    정수		response;
     DialogInfo  dialoginfo;
 
     ++gui.dialogs_active;
@@ -1710,7 +1710,7 @@ gui_mch_dialog(int	type,	    // type of dialog
     dialoginfo.dialog = GTK_DIALOG(dialog);
     dialog_add_buttons(GTK_DIALOG(dialog), buttons);
 
-    if (textfield != NULL)
+    만약 (textfield != NULL)
     {
 	GtkWidget *alignment;
 
@@ -1724,14 +1724,14 @@ gui_mch_dialog(int	type,	    // type of dialog
 	gtk_entry_set_text(GTK_ENTRY(entry), (const char *)text);
 	CONVERT_TO_UTF8_FREE(text);
 
-# if GTK_CHECK_VERSION(3,14,0)
+# 만약 GTK_CHECK_VERSION(3,14,0)
 	gtk_widget_set_halign(GTK_WIDGET(entry), GTK_ALIGN_CENTER);
 	gtk_widget_set_valign(GTK_WIDGET(entry), GTK_ALIGN_CENTER);
 	gtk_widget_set_hexpand(GTK_WIDGET(entry), TRUE);
 	gtk_widget_set_vexpand(GTK_WIDGET(entry), TRUE);
 
 	alignment = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-# else
+# 아니면
 	alignment = gtk_alignment_new((float)0.5, (float)0.5,
 						      (float)1.0, (float)1.0);
 # endif
@@ -1739,20 +1739,20 @@ gui_mch_dialog(int	type,	    // type of dialog
 	gtk_container_set_border_width(GTK_CONTAINER(alignment), 5);
 	gtk_widget_show(alignment);
 
-# if GTK_CHECK_VERSION(3,0,0)
+# 만약 GTK_CHECK_VERSION(3,0,0)
 	{
 	    GtkWidget * const vbox
 		= gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 	    gtk_box_pack_start(GTK_BOX(vbox),
 		    alignment, TRUE, FALSE, 0);
 	}
-# else
+# 아니면
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
 			   alignment, TRUE, FALSE, 0);
 # endif
 	dialoginfo.noalt = FALSE;
     }
-    else
+    아니면
 	dialoginfo.noalt = TRUE;
 
     // Allow activation of mnemonic accelerators without pressing <Alt> when
@@ -1760,12 +1760,12 @@ gui_mch_dialog(int	type,	    // type of dialog
     g_signal_connect(G_OBJECT(dialog), "key-press-event",
 			 G_CALLBACK(&dialog_key_press_event_cb), &dialoginfo);
 
-    if (def_but > 0)
+    만약 (def_but > 0)
     {
 	gtk_dialog_set_default_response(GTK_DIALOG(dialog), def_but);
 	dialoginfo.ignore_enter = FALSE;
     }
-    else
+    아니면
 	// No default button, ignore pressing Enter.
 	dialoginfo.ignore_enter = TRUE;
 
@@ -1775,11 +1775,11 @@ gui_mch_dialog(int	type,	    // type of dialog
     response = gtk_dialog_run(GTK_DIALOG(dialog));
 
     // GTK_RESPONSE_NONE means the dialog was programmatically destroyed.
-    if (response != GTK_RESPONSE_NONE)
+    만약 (response != GTK_RESPONSE_NONE)
     {
-	if (response == GTK_RESPONSE_ACCEPT)	    // Enter pressed
+	만약 (response == GTK_RESPONSE_ACCEPT)	    // Enter pressed
 	    response = def_but;
-	if (textfield != NULL)
+	만약 (textfield != NULL)
 	{
 	    text = (char_u *)gtk_entry_get_text(GTK_ENTRY(entry));
 	    text = CONVERT_FROM_UTF8(text);
@@ -1791,26 +1791,26 @@ gui_mch_dialog(int	type,	    // type of dialog
 	gtk_widget_destroy(dialog);
     }
 
-    if (gui.dialogs_active > 0)
+    만약 (gui.dialogs_active > 0)
 	--gui.dialogs_active;
-    return response > 0 ? response : 0;
+    반환 response > 0 ? response : 0;
 }
 
 #endif // FEAT_GUI_DIALOG
 
 
-#if defined(FEAT_MENU)
+#만약 defined(FEAT_MENU)
 
     void
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
-# if defined(FEAT_XIM)
+# 만약 defined(FEAT_XIM)
     /*
      * Append a submenu for selecting an input method.	This is
      * currently the only way to switch input methods at runtime.
      */
-#  if !GTK_CHECK_VERSION(3,10,0)
-    if (xic != NULL && g_object_get_data(G_OBJECT(menu->submenu_id),
+#  만약 !GTK_CHECK_VERSION(3,10,0)
+    만약 (xic != NULL && g_object_get_data(G_OBJECT(menu->submenu_id),
 					 "vim-has-im-menu") == NULL)
     {
 	GtkWidget   *menuitem;
@@ -1839,7 +1839,7 @@ gui_mch_show_popupmenu(vimmenu_T *menu)
 #  endif
 # endif // FEAT_XIM
 
-# if GTK_CHECK_VERSION(3,22,2)
+# 만약 GTK_CHECK_VERSION(3,22,2)
     {
 	GdkEventButton trigger;
 
@@ -1863,7 +1863,7 @@ gui_mch_show_popupmenu(vimmenu_T *menu)
 	gtk_menu_popup_at_pointer(GTK_MENU(menu->submenu_id),
 				  (GdkEvent *)&trigger);
     }
-# else
+# 아니면
     gtk_menu_popup(GTK_MENU(menu->submenu_id),
 		   NULL, NULL,
 		   (GtkMenuPositionFunc)NULL, NULL,
@@ -1873,7 +1873,7 @@ gui_mch_show_popupmenu(vimmenu_T *menu)
 
 // Ugly global variable to pass "mouse_pos" flag from gui_make_popup() to
 // popup_menu_position_func().
-static int popup_mouse_pos;
+static 정수 popup_mouse_pos;
 
 /*
  * Menu position callback; used by gui_make_popup() to place the menu
@@ -1890,15 +1890,15 @@ popup_menu_position_func(GtkMenu *menu UNUSED,
 {
     gdk_window_get_origin(gtk_widget_get_window(gui.drawarea), x, y);
 
-    if (popup_mouse_pos)
+    만약 (popup_mouse_pos)
     {
-	int	mx, my;
+	정수	mx, my;
 
 	gui_mch_getmouse(&mx, &my);
 	*x += mx;
 	*y += my;
     }
-    else if (curwin != NULL && gui.drawarea != NULL &&
+    아니면 만약 (curwin != NULL && gui.drawarea != NULL &&
 	     gtk_widget_get_window(gui.drawarea) != NULL)
     {
 	// Find the cursor position in the current window
@@ -1908,17 +1908,17 @@ popup_menu_position_func(GtkMenu *menu UNUSED,
 }
 
     void
-gui_make_popup(char_u *path_name, int mouse_pos)
+gui_make_popup(char_u *path_name, 정수 mouse_pos)
 {
     vimmenu_T *menu;
 
     popup_mouse_pos = mouse_pos;
 
     menu = gui_find_menu(path_name);
-    if (menu == NULL || menu->submenu_id == NULL)
-	return;
+    만약 (menu == NULL || menu->submenu_id == NULL)
+	반환;
 
-# if GTK_CHECK_VERSION(3,22,2)
+# 만약 GTK_CHECK_VERSION(3,22,2)
     GdkWindow * const win = gtk_widget_get_window(gui.drawarea);
     GdkEventButton trigger;
 
@@ -1940,10 +1940,10 @@ gui_make_popup(char_u *path_name, int mouse_pos)
     trigger.x_root     = 0.0;
     trigger.y_root     = 0.0;
 
-    if (mouse_pos)
+    만약 (mouse_pos)
 	gtk_menu_popup_at_pointer(GTK_MENU(menu->submenu_id),
 		(GdkEvent *)&trigger);
-    else
+    아니면
     {
 	gint origin_x, origin_y;
 	GdkRectangle rect = { 0, 0, 0, 0 };
@@ -1961,7 +1961,7 @@ gui_make_popup(char_u *path_name, int mouse_pos)
 		GDK_GRAVITY_NORTH_WEST,
 		(GdkEvent *)&trigger);
     }
-# else
+# 아니면
     gtk_menu_popup(GTK_MENU(menu->submenu_id),
 	    NULL, NULL,
 	    &popup_menu_position_func, NULL,
@@ -1993,7 +1993,7 @@ typedef struct _SharedFindReplace
 static SharedFindReplace find_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 static SharedFindReplace repl_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
-    static int
+    static 정수
 find_key_press_event(
 		GtkWidget	*widget UNUSED,
 		GdkEventKey	*event,
@@ -2001,28 +2001,28 @@ find_key_press_event(
 {
     // If the user is holding one of the key modifiers we will just bail out,
     // thus preserving the possibility of normal focus traversal.
-    if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
-	return FALSE;
+    만약 (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
+	반환 FALSE;
 
     // the Escape key synthesizes a cancellation action
-    if (event->keyval == GDK_Escape)
+    만약 (event->keyval == GDK_Escape)
     {
 	gtk_widget_hide(frdp->dialog);
 
-	return TRUE;
+	반환 TRUE;
     }
 
     // It would be delightful if it where possible to do search history
     // operations on the K_UP and K_DOWN keys here.
 
-    return FALSE;
+    반환 FALSE;
 }
 
     static GtkWidget *
-#if GTK_CHECK_VERSION(3,10,0)
+#만약 GTK_CHECK_VERSION(3,10,0)
 create_image_button(const char *stock_id UNUSED,
 		    const char *label)
-#else
+#아니면
 create_image_button(const char *stock_id,
 		    const char *label)
 #endif
@@ -2034,14 +2034,14 @@ create_image_button(const char *stock_id,
 
     text = CONVERT_TO_UTF8((char_u *)label);
 
-#if GTK_CHECK_VERSION(3,2,0)
+#만약 GTK_CHECK_VERSION(3,2,0)
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 3);
     gtk_box_set_homogeneous(GTK_BOX(box), FALSE);
-#else
+#아니면
     box = gtk_hbox_new(FALSE, 3);
 #endif
-#if !GTK_CHECK_VERSION(3,10,0)
-    if (stock_id != NULL)
+#만약 !GTK_CHECK_VERSION(3,10,0)
+    만약 (stock_id != NULL)
 	gtk_box_pack_start(GTK_BOX(box),
 			   gtk_image_new_from_stock(stock_id, GTK_ICON_SIZE_BUTTON),
 			   FALSE, FALSE, 0);
@@ -2052,14 +2052,14 @@ create_image_button(const char *stock_id,
 
     CONVERT_TO_UTF8_FREE(text);
 
-#if GTK_CHECK_VERSION(3,14,0)
+#만약 GTK_CHECK_VERSION(3,14,0)
     gtk_widget_set_halign(GTK_WIDGET(box), GTK_ALIGN_CENTER);
     gtk_widget_set_valign(GTK_WIDGET(box), GTK_ALIGN_CENTER);
     gtk_widget_set_hexpand(GTK_WIDGET(box), TRUE);
     gtk_widget_set_vexpand(GTK_WIDGET(box), TRUE);
 
     alignment = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-#else
+#아니면
     alignment = gtk_alignment_new((float)0.5, (float)0.5,
 						      (float)0.0, (float)0.0);
 #endif
@@ -2069,7 +2069,7 @@ create_image_button(const char *stock_id,
     button = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(button), alignment);
 
-    return button;
+    반환 button;
 }
 
 /*
@@ -2080,13 +2080,13 @@ create_image_button(const char *stock_id,
     static const char *
 convert_localized_message(char_u **buffer, const char *message)
 {
-    if (output_conv.vc_type == CONV_NONE)
-	return message;
+    만약 (output_conv.vc_type == CONV_NONE)
+	반환 message;
 
     vim_free(*buffer);
     *buffer = string_convert(&output_conv, (char_u *)message, NULL);
 
-    return (const char *)*buffer;
+    반환 (const char *)*buffer;
 }
 
 /*
@@ -2098,28 +2098,28 @@ entry_get_text_length(GtkEntry *entry)
     g_return_val_if_fail(entry != NULL, 0);
     g_return_val_if_fail(GTK_IS_ENTRY(entry) == TRUE, 0);
 
-#if GTK_CHECK_VERSION(2,18,0)
+#만약 GTK_CHECK_VERSION(2,18,0)
     // 2.18 introduced a new object GtkEntryBuffer to handle text data for
     // GtkEntry instead of letting each instance of the latter have its own
     // storage for that.  The code below is almost identical to the
     // implementation of gtk_entry_get_text_length() for the versions >= 2.18.
-    return gtk_entry_buffer_get_length(gtk_entry_get_buffer(entry));
+    반환 gtk_entry_buffer_get_length(gtk_entry_get_buffer(entry));
 #elif GTK_CHECK_VERSION(2,14,0)
     // 2.14 introduced a new function to avoid memory management bugs which can
     // happen when gtk_entry_get_text() is used without due care and attention.
-    return gtk_entry_get_text_length(entry);
-#else
+    반환 gtk_entry_get_text_length(entry);
+#아니면
     // gtk_entry_get_text() returns the pointer to the storage allocated
     // internally by the widget.  Accordingly, use the one with great care:
     // Don't free it nor modify the contents it points to; call the function
     // every time you need the pointer since its value may have been changed
     // by the widget.
-    return g_utf8_strlen(gtk_entry_get_text(entry), -1);
+    반환 g_utf8_strlen(gtk_entry_get_text(entry), -1);
 #endif
 }
 
     static void
-find_replace_dialog_create(char_u *arg, int do_replace)
+find_replace_dialog_create(char_u *arg, 정수 do_replace)
 {
     GtkWidget	*hbox;		// main top down box
     GtkWidget	*actionarea;
@@ -2129,8 +2129,8 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     gboolean	sensitive;
     SharedFindReplace *frdp;
     char_u	*entry_text;
-    int		wword = FALSE;
-    int		mcase = !p_ic;
+    정수		wword = FALSE;
+    정수		mcase = !p_ic;
     char_u	*conv_buffer = NULL;
 #define CONV(message) convert_localized_message(&conv_buffer, (message))
 
@@ -2139,7 +2139,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     // Get the search string to use.
     entry_text = get_find_dialog_text(arg, &wword, &mcase);
 
-    if (entry_text != NULL && output_conv.vc_type != CONV_NONE)
+    만약 (entry_text != NULL && output_conv.vc_type != CONV_NONE)
     {
 	char_u *old_text = entry_text;
 	entry_text = string_convert(&output_conv, entry_text, NULL);
@@ -2149,9 +2149,9 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     /*
      * If the dialog already exists, just raise it.
      */
-    if (frdp->dialog)
+    만약 (frdp->dialog)
     {
-	if (entry_text != NULL)
+	만약 (entry_text != NULL)
 	{
 	    gtk_entry_set_text(GTK_ENTRY(frdp->what), (char *)entry_text);
 	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(frdp->wword),
@@ -2165,67 +2165,67 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	// For :promptrepl dialog, give it to 'with' entry if 'what' has a
 	// non-empty entry; otherwise, to 'what' entry.
 	gtk_widget_grab_focus(frdp->what);
-	if (do_replace && entry_get_text_length(GTK_ENTRY(frdp->what)) > 0)
+	만약 (do_replace && entry_get_text_length(GTK_ENTRY(frdp->what)) > 0)
 	    gtk_widget_grab_focus(frdp->with);
 
 	vim_free(entry_text);
-	return;
+	반환;
     }
 
     frdp->dialog = gtk_dialog_new();
-#if GTK_CHECK_VERSION(3,0,0)
+#만약 GTK_CHECK_VERSION(3,0,0)
     // Nothing equivalent to gtk_dialog_set_has_separator() in GTK+ 3.
-#else
+#아니면
     gtk_dialog_set_has_separator(GTK_DIALOG(frdp->dialog), FALSE);
 #endif
     gtk_window_set_transient_for(GTK_WINDOW(frdp->dialog), GTK_WINDOW(gui.mainwin));
     gtk_window_set_destroy_with_parent(GTK_WINDOW(frdp->dialog), TRUE);
 
-    if (do_replace)
+    만약 (do_replace)
     {
 	gtk_window_set_title(GTK_WINDOW(frdp->dialog),
 			     CONV(_("VIM - Search and Replace...")));
     }
-    else
+    아니면
     {
 	gtk_window_set_title(GTK_WINDOW(frdp->dialog),
 			     CONV(_("VIM - Search...")));
     }
 
-#if GTK_CHECK_VERSION(3,2,0)
+#만약 GTK_CHECK_VERSION(3,2,0)
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
-#else
+#아니면
     hbox = gtk_hbox_new(FALSE, 0);
 #endif
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 10);
-#if GTK_CHECK_VERSION(3,0,0)
+#만약 GTK_CHECK_VERSION(3,0,0)
     {
 	GtkWidget * const dialog_vbox
 	    = gtk_dialog_get_content_area(GTK_DIALOG(frdp->dialog));
 	gtk_container_add(GTK_CONTAINER(dialog_vbox), hbox);
     }
-#else
+#아니면
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(frdp->dialog)->vbox), hbox);
 #endif
 
-    if (do_replace)
-#if GTK_CHECK_VERSION(3,4,0)
+    만약 (do_replace)
+#만약 GTK_CHECK_VERSION(3,4,0)
 	table = gtk_grid_new();
-#else
+#아니면
 	table = gtk_table_new(1024, 4, FALSE);
 #endif
-    else
-#if GTK_CHECK_VERSION(3,4,0)
+    아니면
+#만약 GTK_CHECK_VERSION(3,4,0)
 	table = gtk_grid_new();
-#else
+#아니면
 	table = gtk_table_new(1024, 3, FALSE);
 #endif
     gtk_box_pack_start(GTK_BOX(hbox), table, TRUE, TRUE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(table), 4);
 
     tmp = gtk_label_new(CONV(_("Find what:")));
-#if GTK_CHECK_VERSION(3,16,0)
+#만약 GTK_CHECK_VERSION(3,16,0)
     gtk_label_set_xalign(GTK_LABEL(tmp), 0.0);
     gtk_label_set_yalign(GTK_LABEL(tmp), 0.5);
 #elif GTK_CHECK_VERSION(3,14,0)
@@ -2242,35 +2242,35 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 
 	g_value_unset(&align_val);
     }
-#else
+#아니면
     gtk_misc_set_alignment(GTK_MISC(tmp), (gfloat)0.0, (gfloat)0.5);
 #endif
-#if GTK_CHECK_VERSION(3,4,0)
+#만약 GTK_CHECK_VERSION(3,4,0)
     gtk_grid_attach(GTK_GRID(table), tmp, 0, 0, 2, 1);
-#else
+#아니면
     gtk_table_attach(GTK_TABLE(table), tmp, 0, 1, 0, 1,
 		     GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
     frdp->what = gtk_entry_new();
     sensitive = (entry_text != NULL && entry_text[0] != NUL);
-    if (entry_text != NULL)
+    만약 (entry_text != NULL)
 	gtk_entry_set_text(GTK_ENTRY(frdp->what), (char *)entry_text);
     g_signal_connect(G_OBJECT(frdp->what), "changed",
 		     G_CALLBACK(entry_changed_cb), frdp->dialog);
     g_signal_connect_after(G_OBJECT(frdp->what), "key-press-event",
 			   G_CALLBACK(find_key_press_event),
 			   (gpointer) frdp);
-#if GTK_CHECK_VERSION(3,4,0)
+#만약 GTK_CHECK_VERSION(3,4,0)
     gtk_grid_attach(GTK_GRID(table), frdp->what, 2, 0, 5, 1);
-#else
+#아니면
     gtk_table_attach(GTK_TABLE(table), frdp->what, 1, 1024, 0, 1,
 		     GTK_EXPAND | GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
 
-    if (do_replace)
+    만약 (do_replace)
     {
 	tmp = gtk_label_new(CONV(_("Replace with:")));
-#if GTK_CHECK_VERSION(3,16,0)
+#만약 GTK_CHECK_VERSION(3,16,0)
 	gtk_label_set_xalign(GTK_LABEL(tmp), 0.0);
 	gtk_label_set_yalign(GTK_LABEL(tmp), 0.5);
 #elif GTK_CHECK_VERSION(3,14,0)
@@ -2287,12 +2287,12 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 
 	    g_value_unset(&align_val);
 	}
-#else
+#아니면
 	gtk_misc_set_alignment(GTK_MISC(tmp), (gfloat)0.0, (gfloat)0.5);
 #endif
-#if GTK_CHECK_VERSION(3,4,0)
+#만약 GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), tmp, 0, 1, 2, 1);
-#else
+#아니면
 	gtk_table_attach(GTK_TABLE(table), tmp, 0, 1, 1, 2,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
@@ -2303,9 +2303,9 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	g_signal_connect_after(G_OBJECT(frdp->with), "key-press-event",
 			       G_CALLBACK(find_key_press_event),
 			       (gpointer) frdp);
-#if GTK_CHECK_VERSION(3,4,0)
+#만약 GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), frdp->with, 2, 1, 5, 1);
-#else
+#아니면
 	gtk_table_attach(GTK_TABLE(table), frdp->with, 1, 1024, 1, 2,
 			 GTK_EXPAND | GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
@@ -2317,7 +2317,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	g_signal_connect(G_OBJECT(frdp->what), "activate",
 			 G_CALLBACK(entry_activate_cb), frdp->with);
     }
-    else
+    아니면
     {
 	/*
 	 * Make the entry activation do the search.
@@ -2331,17 +2331,17 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     frdp->wword = gtk_check_button_new_with_label(CONV(_("Match whole word only")));
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(frdp->wword),
 							(gboolean)wword);
-    if (do_replace)
-#if GTK_CHECK_VERSION(3,4,0)
+    만약 (do_replace)
+#만약 GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), frdp->wword, 0, 2, 5, 1);
-#else
+#아니면
 	gtk_table_attach(GTK_TABLE(table), frdp->wword, 0, 1023, 2, 3,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
-    else
-#if GTK_CHECK_VERSION(3,4,0)
+    아니면
+#만약 GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), frdp->wword, 0, 3, 5, 1);
-#else
+#아니면
 	gtk_table_attach(GTK_TABLE(table), frdp->wword, 0, 1023, 1, 2,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
@@ -2350,40 +2350,40 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     frdp->mcase = gtk_check_button_new_with_label(CONV(_("Match case")));
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(frdp->mcase),
 							     (gboolean)mcase);
-    if (do_replace)
-#if GTK_CHECK_VERSION(3,4,0)
+    만약 (do_replace)
+#만약 GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), frdp->mcase, 0, 3, 5, 1);
-#else
+#아니면
 	gtk_table_attach(GTK_TABLE(table), frdp->mcase, 0, 1023, 3, 4,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
-    else
-#if GTK_CHECK_VERSION(3,4,0)
+    아니면
+#만약 GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), frdp->mcase, 0, 4, 5, 1);
-#else
+#아니면
 	gtk_table_attach(GTK_TABLE(table), frdp->mcase, 0, 1023, 2, 3,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
 
     tmp = gtk_frame_new(CONV(_("Direction")));
-    if (do_replace)
-#if GTK_CHECK_VERSION(3,4,0)
+    만약 (do_replace)
+#만약 GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), tmp, 5, 2, 2, 4);
-#else
+#아니면
 	gtk_table_attach(GTK_TABLE(table), tmp, 1023, 1024, 2, 4,
 			 GTK_FILL, GTK_FILL, 2, 2);
 #endif
-    else
-#if GTK_CHECK_VERSION(3,4,0)
+    아니면
+#만약 GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), tmp, 5, 2, 1, 3);
-#else
+#아니면
 	gtk_table_attach(GTK_TABLE(table), tmp, 1023, 1024, 1, 3,
 			 GTK_FILL, GTK_FILL, 2, 2);
 #endif
-#if GTK_CHECK_VERSION(3,2,0)
+#만약 GTK_CHECK_VERSION(3,2,0)
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_box_set_homogeneous(GTK_BOX(vbox), FALSE);
-#else
+#아니면
     vbox = gtk_vbox_new(FALSE, 0);
 #endif
     gtk_container_set_border_width(GTK_CONTAINER(vbox), 0);
@@ -2400,18 +2400,18 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     gtk_box_pack_start(GTK_BOX(vbox), frdp->down, TRUE, TRUE, 0);
 
     // vbox to hold the action buttons
-#if GTK_CHECK_VERSION(3,2,0)
+#만약 GTK_CHECK_VERSION(3,2,0)
     actionarea = gtk_button_box_new(GTK_ORIENTATION_VERTICAL);
-#else
+#아니면
     actionarea = gtk_vbutton_box_new();
 #endif
     gtk_container_set_border_width(GTK_CONTAINER(actionarea), 2);
     gtk_box_pack_end(GTK_BOX(hbox), actionarea, FALSE, FALSE, 0);
 
     // 'Find Next' button
-#if GTK_CHECK_VERSION(3,10,0)
+#만약 GTK_CHECK_VERSION(3,10,0)
     frdp->find = create_image_button(NULL, _("Find Next"));
-#else
+#아니면
     frdp->find = create_image_button(GTK_STOCK_FIND, _("Find Next"));
 #endif
     gtk_widget_set_sensitive(frdp->find, sensitive);
@@ -2425,12 +2425,12 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     gtk_box_pack_start(GTK_BOX(actionarea), frdp->find, FALSE, FALSE, 0);
     gtk_widget_grab_default(frdp->find);
 
-    if (do_replace)
+    만약 (do_replace)
     {
 	// 'Replace' button
-#if GTK_CHECK_VERSION(3,10,0)
+#만약 GTK_CHECK_VERSION(3,10,0)
 	frdp->replace = create_image_button(NULL, _("Replace"));
-#else
+#아니면
 	frdp->replace = create_image_button(GTK_STOCK_CONVERT, _("Replace"));
 #endif
 	gtk_widget_set_sensitive(frdp->replace, sensitive);
@@ -2441,9 +2441,9 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 			 GINT_TO_POINTER(FRD_REPLACE));
 
 	// 'Replace All' button
-#if GTK_CHECK_VERSION(3,10,0)
+#만약 GTK_CHECK_VERSION(3,10,0)
 	frdp->all = create_image_button(NULL, _("Replace All"));
-#else
+#아니면
 	frdp->all = create_image_button(GTK_STOCK_CONVERT, _("Replace All"));
 #endif
 	gtk_widget_set_sensitive(frdp->all, sensitive);
@@ -2455,9 +2455,9 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     }
 
     // 'Cancel' button
-#if GTK_CHECK_VERSION(3,10,0)
+#만약 GTK_CHECK_VERSION(3,10,0)
     tmp = gtk_button_new_with_mnemonic(_("_Close"));
-#else
+#아니면
     tmp = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
 #endif
     gtk_widget_set_can_default(tmp, TRUE);
@@ -2469,19 +2469,19 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 			     "delete-event", G_CALLBACK(gtk_widget_hide_on_delete),
 			     G_OBJECT(frdp->dialog));
 
-#if GTK_CHECK_VERSION(3,2,0)
+#만약 GTK_CHECK_VERSION(3,2,0)
     tmp = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
-#else
+#아니면
     tmp = gtk_vseparator_new();
 #endif
     gtk_box_pack_end(GTK_BOX(hbox), tmp, FALSE, FALSE, 10);
 
     // Suppress automatic show of the unused action area
-#if GTK_CHECK_VERSION(3,0,0)
-# if !GTK_CHECK_VERSION(3,12,0)
+#만약 GTK_CHECK_VERSION(3,0,0)
+# 만약 !GTK_CHECK_VERSION(3,12,0)
     gtk_widget_hide(gtk_dialog_get_action_area(GTK_DIALOG(frdp->dialog)));
 # endif
-#else
+#아니면
     gtk_widget_hide(GTK_DIALOG(frdp->dialog)->action_area);
 #endif
     gtk_widget_show_all(hbox);
@@ -2495,14 +2495,14 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     void
 gui_mch_find_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
+    만약 (gui.in_use)
 	find_replace_dialog_create(eap->arg, FALSE);
 }
 
     void
 gui_mch_replace_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
+    만약 (gui.in_use)
 	find_replace_dialog_create(eap->arg, TRUE);
 }
 
@@ -2512,21 +2512,21 @@ gui_mch_replace_dialog(exarg_T *eap)
     static void
 find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
 {
-    int			flags;
+    정수			flags;
     char_u		*find_text;
     char_u		*repl_text;
     gboolean		direction_down;
     SharedFindReplace	*sfr;
 
-    flags = (int)(long)data;	    // avoid a lint warning here
+    flags = (정수)(long)data;	    // avoid a lint warning here
 
     // Get the search/replace strings from the dialog
-    if (flags == FRD_FINDNEXT)
+    만약 (flags == FRD_FINDNEXT)
     {
 	repl_text = NULL;
 	sfr = &find_widgets;
     }
-    else
+    아니면
     {
 	repl_text = (char_u *)gtk_entry_get_text(GTK_ENTRY(repl_widgets.with));
 	sfr = &repl_widgets;
@@ -2535,9 +2535,9 @@ find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
     find_text = (char_u *)gtk_entry_get_text(GTK_ENTRY(sfr->what));
     direction_down = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sfr->down));
 
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sfr->wword)))
+    만약 (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sfr->wword)))
 	flags |= FRD_WHOLE_WORD;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sfr->mcase)))
+    만약 (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sfr->mcase)))
 	flags |= FRD_MATCH_CASE;
 
     repl_text = CONVERT_FROM_UTF8(repl_text);
@@ -2573,15 +2573,15 @@ entry_changed_cb(GtkWidget * entry, GtkWidget * dialog)
 
     entry_text = gtk_entry_get_text(GTK_ENTRY(entry));
 
-    if (!entry_text)
-	return;			// shouldn't happen
+    만약 (!entry_text)
+	반환;			// shouldn't happen
 
     nonempty = (entry_text[0] != '\0');
 
-    if (dialog == find_widgets.dialog)
+    만약 (dialog == find_widgets.dialog)
 	gtk_widget_set_sensitive(find_widgets.find, nonempty);
 
-    if (dialog == repl_widgets.dialog)
+    만약 (dialog == repl_widgets.dialog)
     {
 	gtk_widget_set_sensitive(repl_widgets.find, nonempty);
 	gtk_widget_set_sensitive(repl_widgets.replace, nonempty);
@@ -2600,7 +2600,7 @@ ex_helpfind(exarg_T *eap UNUSED)
     do_cmdline_cmd((char_u *)"emenu ToolBar.FindHelp");
 }
 
-#if defined(FEAT_BROWSE)
+#만약 defined(FEAT_BROWSE)
     static void
 recent_func_log_func(const gchar *log_domain UNUSED,
 		     GLogLevelFlags log_level UNUSED,
@@ -2613,10 +2613,10 @@ recent_func_log_func(const gchar *log_domain UNUSED,
 #endif
 
     void
-gui_mch_set_fullscreen(int flag)
+gui_mch_set_fullscreen(정수 flag)
 {
-    if (flag)
+    만약 (flag)
 	gtk_window_fullscreen(GTK_WINDOW(gui.mainwin));
-    else
+    아니면
 	gtk_window_unfullscreen(GTK_WINDOW(gui.mainwin));
 }

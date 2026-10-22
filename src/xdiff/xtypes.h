@@ -20,7 +20,7 @@
  *
  */
 
-#if !defined(XTYPES_H)
+#만약 !defined(XTYPES_H)
 #define XTYPES_H
 
 

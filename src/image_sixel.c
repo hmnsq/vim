@@ -28,7 +28,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_IMAGE_SIXEL)
+#만약 defined(FEAT_IMAGE_SIXEL)
 
 // Palette size cap (sixel allows up to 256 color registers; index 0 is
 // reserved as a transparent key, so usable colors are 1..MAX_COLORS).
@@ -42,23 +42,23 @@ typedef struct
 {
     char_u  *bits;	// bitmask buffer, width * paletteSize bytes
     size_t   bits_len;	// allocated bytes in "bits"
-    int	    *seen;	// per-color "used in this band" flags
-    int	    *used;	// colors used in this band
-    int	    *xmin;	// leftmost x used by color in this band
-    int	    *xmax;	// rightmost x used by color in this band
-    int	     color_len;	// allocated length for per-color arrays
-    int	     seen_gen;	// generation counter to avoid memset
+    정수	    *seen;	// per-color "used in this band" flags
+    정수	    *used;	// colors used in this band
+    정수	    *xmin;	// leftmost x used by color in this band
+    정수	    *xmax;	// rightmost x used by color in this band
+    정수	     color_len;	// allocated length for per-color arrays
+    정수	     seen_gen;	// generation counter to avoid memset
 } sixel_band_T;
 
 typedef struct
 {
-    unsigned int    *keys;	// hash keys for dynamic palette lookup
+    unsigned 정수    *keys;	// hash keys for dynamic palette lookup
     char_u	    *vals;	// hash values for dynamic palette lookup
-    int		     hash_cap;	// allocated slots in keys/vals
+    정수		     hash_cap;	// allocated slots in keys/vals
     char_u	    *idx;	// width * height paletted image
     size_t	     idx_len;	// allocated bytes in idx
     char_u	    *pal;	// dynamic palette storage (RGB triples)
-    int		     pal_len;	// allocated bytes in pal
+    정수		     pal_len;	// allocated bytes in pal
     sixel_band_T     band;	// reusable band scratch
 } sixel_state_T;
 
@@ -69,10 +69,10 @@ typedef struct
 typedef struct
 {
     char_u  *idx; // Is width*height bytes, indices 1..npal (0 = transparent)
-    int      width;
-    int      height;
+    정수      width;
+    정수      height;
     char_u  *pal; // Is npal*3 bytes, RGB triples
-    int      npal;
+    정수      npal;
 } sixel_image8_T;
 
 /*
@@ -81,18 +81,18 @@ typedef struct
 typedef struct
 {
     char_u  *idx; // Points at (x0,y0) inside the parent buffer
-    int      stride; // Row length of the *parent* image, not this view
-    int      width;
-    int      height;
+    정수      stride; // Row length of the *parent* image, not this view
+    정수      width;
+    정수      height;
     char_u  *pal;
-    int      npal;
+    정수      npal;
 } sixel_view_T;
 
 typedef struct
 {
     // These are offsets relative to the top left of the image.
-    int	    row_off;
-    int	    col_off;
+    정수	    row_off;
+    정수	    col_off;
     char_u  *seq[2]; // Header + body
 } sixel_chunk_T;
 
@@ -107,7 +107,7 @@ typedef struct
     bool		visible_init;
     sixel_chunk_T	*chunks;    // Cached sixel sequence (stored as multiple
 				    // chunks).
-    int			n_chunks;
+    정수			n_chunks;
 } image_placement_sixel_T;
 
 static char_u		sixel_fixed_palette[240 * 3];
@@ -148,60 +148,60 @@ sixel_uninit(void)
     static void
 sixel_init_fixed_tables(void)
 {
-    int	    r, g, b, gr, n;
+    정수	    r, g, b, gr, n;
 
-    if (sixel_fixed_tables_ready)
-	return;
+    만약 (sixel_fixed_tables_ready)
+	반환;
 
     n = 0;
-    for (r = 0; r < 6; r++)
-	for (g = 0; g < 6; g++)
-	    for (b = 0; b < 6; b++)
+    위해 (r = 0; r < 6; r++)
+	위해 (g = 0; g < 6; g++)
+	    위해 (b = 0; b < 6; b++)
 	    {
 		sixel_fixed_palette[n * 3]     = (char_u)(r * 51);
 		sixel_fixed_palette[n * 3 + 1] = (char_u)(g * 51);
 		sixel_fixed_palette[n * 3 + 2] = (char_u)(b * 51);
 		n++;
 	    }
-    for (gr = 0; gr < 24; gr++)
+    위해 (gr = 0; gr < 24; gr++)
     {
-	int v = 8 + gr * 10;
+	정수 v = 8 + gr * 10;
 
 	sixel_fixed_palette[n * 3]     = (char_u)v;
 	sixel_fixed_palette[n * 3 + 1] = (char_u)v;
 	sixel_fixed_palette[n * 3 + 2] = (char_u)v;
 	n++;
     }
-    for (n = 0; n < 256; n++)
+    위해 (n = 0; n < 256; n++)
     {
-	int idx = n / 43;
+	정수 idx = n / 43;
 
 	sixel_rgb_cube_idx[n] = (char_u)(idx > 5 ? 5 : idx);
     }
     sixel_fixed_tables_ready = true;
 }
 
-    static int
-sixel_ensure_hash_capacity(int max_colors, int *cap_out)
+    static 정수
+sixel_ensure_hash_capacity(정수 max_colors, 정수 *cap_out)
 {
-    int cap = 1024;
+    정수 cap = 1024;
 
-    while (cap < max_colors * 4)
+    동안 (cap < max_colors * 4)
 	cap <<= 1;
-    if (cap > sixel_state.hash_cap)
+    만약 (cap > sixel_state.hash_cap)
     {
-	unsigned int	*keys;
+	unsigned 정수	*keys;
 	char_u		*vals;
 
-	keys = ALLOC_MULT(unsigned int, cap);
+	keys = ALLOC_MULT(unsigned 정수, cap);
 	vals = ALLOC_MULT(char_u, cap);
-	if (keys == NULL || vals == NULL)
+	만약 (keys == NULL || vals == NULL)
 	{
 	    vim_free(keys);
 	    vim_free(vals);
-	    return FAIL;
+	    반환 FAIL;
 	}
-	if (sixel_state.hash_cap > 0)
+	만약 (sixel_state.hash_cap > 0)
 	{
 	    mch_memmove(keys, sixel_state.keys,
 		    (size_t)sixel_state.hash_cap * sizeof(*keys));
@@ -216,72 +216,72 @@ sixel_ensure_hash_capacity(int max_colors, int *cap_out)
     }
     vim_memset(sixel_state.keys, 0, (size_t)cap * sizeof(*sixel_state.keys));
     *cap_out = cap;
-    return OK;
+    반환 OK;
 }
 
-    static int
+    static 정수
 sixel_ensure_idx_capacity(size_t pixels)
 {
-    if (pixels > sixel_state.idx_len)
+    만약 (pixels > sixel_state.idx_len)
     {
 	char_u *idx = vim_realloc(sixel_state.idx, pixels);
 
-	if (idx == NULL)
-	    return FAIL;
+	만약 (idx == NULL)
+	    반환 FAIL;
 	sixel_state.idx = idx;
 	sixel_state.idx_len = pixels;
     }
-    return OK;
+    반환 OK;
 }
 
-    static int
-sixel_ensure_pal_capacity(int max_colors)
+    static 정수
+sixel_ensure_pal_capacity(정수 max_colors)
 {
-    int need = max_colors * 3;
+    정수 need = max_colors * 3;
 
-    if (need > sixel_state.pal_len)
+    만약 (need > sixel_state.pal_len)
     {
 	char_u *pal = vim_realloc(sixel_state.pal, (size_t)need);
 
-	if (pal == NULL)
-	    return FAIL;
+	만약 (pal == NULL)
+	    반환 FAIL;
 	sixel_state.pal = pal;
 	sixel_state.pal_len = need;
     }
-    return OK;
+    반환 OK;
 }
 
-    static int
-sixel_ensure_band_capacity(int width, int npal)
+    static 정수
+sixel_ensure_band_capacity(정수 width, 정수 npal)
 {
     size_t	    bits_need = (size_t)width * (npal + 1);
     sixel_band_T    *band = &sixel_state.band;
 
-    if (bits_need > band->bits_len)
+    만약 (bits_need > band->bits_len)
     {
 	char_u *bits = vim_realloc(band->bits, bits_need);
 
-	if (bits == NULL)
-	    return FAIL;
+	만약 (bits == NULL)
+	    반환 FAIL;
 	band->bits = bits;
 	band->bits_len = bits_need;
     }
-    if (npal + 1 > band->color_len)
+    만약 (npal + 1 > band->color_len)
     {
-	int *seen = ALLOC_MULT(int, npal + 1);
-	int *used = ALLOC_MULT(int, npal + 1);
-	int *xmin = ALLOC_MULT(int, npal + 1);
-	int *xmax = ALLOC_MULT(int, npal + 1);
+	정수 *seen = ALLOC_MULT(정수, npal + 1);
+	정수 *used = ALLOC_MULT(정수, npal + 1);
+	정수 *xmin = ALLOC_MULT(정수, npal + 1);
+	정수 *xmax = ALLOC_MULT(정수, npal + 1);
 
-	if (seen == NULL || used == NULL || xmin == NULL || xmax == NULL)
+	만약 (seen == NULL || used == NULL || xmin == NULL || xmax == NULL)
 	{
 	    vim_free(seen);
 	    vim_free(used);
 	    vim_free(xmin);
 	    vim_free(xmax);
-	    return FAIL;
+	    반환 FAIL;
 	}
-	if (band->color_len > 0)
+	만약 (band->color_len > 0)
 	{
 	    mch_memmove(seen, band->seen,
 		    (size_t)band->color_len * sizeof(*seen));
@@ -316,7 +316,7 @@ sixel_ensure_band_capacity(int width, int npal)
 	band->xmax = xmax;
 	band->color_len = npal + 1;
     }
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -338,31 +338,31 @@ sixel_ensure_band_capacity(int width, int npal)
  * Returns OK on success, FAIL when colors exceed max_colors (caller may fall
  * back to a fixed palette) or on OOM.
  */
-    static int
+    static 정수
 rgb_to_paletted_fast(
 	char_u	*pixels,
-	int	 width,
-	int	 height,
+	정수	 width,
+	정수	 height,
 	bool	 has_alpha,
-	int	 max_colors,
+	정수	 max_colors,
 	char_u **pal_out,
-	int	*npal_out,
+	정수	*npal_out,
 	char_u **idx_out)
 {
-    int		     cap;
-    int		     mask;
-    int		     used = 0;
-    unsigned int    *keys;
+    정수		     cap;
+    정수		     mask;
+    정수		     used = 0;
+    unsigned 정수    *keys;
     char_u	    *vals;
     char_u	    *idx;
     char_u	    *pal;
-    int		     i, n;
-    int		     bpp = has_alpha ? 4 : 3;
+    정수		     i, n;
+    정수		     bpp = has_alpha ? 4 : 3;
 
-    if (sixel_ensure_hash_capacity(max_colors, &cap) == FAIL
+    만약 (sixel_ensure_hash_capacity(max_colors, &cap) == FAIL
 	    || sixel_ensure_idx_capacity((size_t)width * height) == FAIL
 	    || sixel_ensure_pal_capacity(max_colors) == FAIL)
-	return FAIL;
+	반환 FAIL;
     keys = sixel_state.keys;
     vals = sixel_state.vals;
     idx = sixel_state.idx;
@@ -370,30 +370,30 @@ rgb_to_paletted_fast(
     mask = cap - 1;
 
     n = width * height;
-    for (i = 0; i < n; i++)
+    위해 (i = 0; i < n; i++)
     {
 	char_u		*p = pixels + (size_t)i * bpp;
-	unsigned int	 key;
-	unsigned int	 h;
-	int		 slot;
+	unsigned 정수	 key;
+	unsigned 정수	 h;
+	정수		 slot;
 
-	if (has_alpha && p[3] < 128)
+	만약 (has_alpha && p[3] < 128)
 	{
 	    idx[i] = 0;	    // transparent -- terminal leaves cell as-is
 	    continue;
 	}
-	key = ((unsigned int)p[0] << 16)
-	    | ((unsigned int)p[1] << 8)
-	    | (unsigned int)p[2];
+	key = ((unsigned 정수)p[0] << 16)
+	    | ((unsigned 정수)p[1] << 8)
+	    | (unsigned 정수)p[2];
 	h = key * 2654435761u;
-	slot = (int)(h & mask);
+	slot = (정수)(h & mask);
 
-	for (;;)
+	위해 (;;)
 	{
-	    if (keys[slot] == 0)
+	    만약 (keys[slot] == 0)
 	    {
 		// new color
-		if (used >= max_colors)
+		만약 (used >= max_colors)
 		    goto too_many;
 		keys[slot] = key + 1;
 		vals[slot] = (char_u)(used + 1);    // 1-based palette index
@@ -404,7 +404,7 @@ rgb_to_paletted_fast(
 		idx[i] = vals[slot];
 		break;
 	    }
-	    if (keys[slot] == key + 1)
+	    만약 (keys[slot] == key + 1)
 	    {
 		idx[i] = vals[slot];
 		break;
@@ -415,10 +415,10 @@ rgb_to_paletted_fast(
     *pal_out = pal;
     *npal_out = used;
     *idx_out = idx;
-    return OK;
+    반환 OK;
 
 too_many:
-    return FAIL;
+    반환 FAIL;
 }
 
 /*
@@ -431,33 +431,33 @@ too_many:
  * leaving the cell's underlying terminal contents visible (transparency); see
  * rgb_to_paletted_fast() for why the cut is at half coverage.
  */
-    static int
+    static 정수
 rgb_to_paletted_fixed(
 	char_u	*pixels,
-	int	width,
-	int	height,
+	정수	width,
+	정수	height,
 	bool	has_alpha,
 	char_u	**pal_out,
-	int	*npal_out,
+	정수	*npal_out,
 	char_u	**idx_out)
 {
     char_u  *idx;
-    int	     n;
-    int	     bpp = has_alpha ? 4 : 3;
+    정수	     n;
+    정수	     bpp = has_alpha ? 4 : 3;
 
-    if (sixel_ensure_idx_capacity((size_t)width * height) == FAIL)
-	return FAIL;
+    만약 (sixel_ensure_idx_capacity((size_t)width * height) == FAIL)
+	반환 FAIL;
     idx = sixel_state.idx;
 
     sixel_init_fixed_tables();
 
     // map every pixel to the nearest cube cell
-    for (n = 0; n < width * height; n++)
+    위해 (n = 0; n < width * height; n++)
     {
 	char_u	*p = pixels + (size_t)n * bpp;
-	int	 ri, gi, bi;
+	정수	 ri, gi, bi;
 
-	if (has_alpha && p[3] < 128)
+	만약 (has_alpha && p[3] < 128)
 	{
 	    idx[n] = 0;
 	    continue;
@@ -471,7 +471,7 @@ rgb_to_paletted_fixed(
     *pal_out = sixel_fixed_palette;
     *npal_out = 240;
     *idx_out = idx;
-    return OK;
+    반환 OK;
 }
 
     static void
@@ -485,21 +485,21 @@ sixel_image8_clear(sixel_image8_T *simg)
  * Quantize an RGB(A) image to an 8bpp paletted image. Returns OK on success,
  * FAIL on invalid input or OOM.
  */
-    static int
+    static 정수
 sixel_image_quantize(image_T *img, sixel_image8_T *out)
 {
     char_u  *pal = NULL;
     char_u  *idx = NULL;
-    int	     npal = 0;
+    정수	     npal = 0;
 
-    if (rgb_to_paletted_fast(img->data, img->width, img->height,
+    만약 (rgb_to_paletted_fast(img->data, img->width, img->height,
 		img->fmt == IMAGE_FORMAT_RGBA,
 		SIXEL_MAX_COLORS, &pal, &npal, &idx) == FAIL)
     {
-	if (rgb_to_paletted_fixed(img->data, img->width, img->height,
+	만약 (rgb_to_paletted_fixed(img->data, img->width, img->height,
 		    img->fmt == IMAGE_FORMAT_RGBA,
 		    &pal, &npal, &idx) == FAIL)
-	    return FAIL;
+	    반환 FAIL;
     }
 
     out->idx = vim_memsave(idx, (size_t)img->width * img->height);
@@ -508,12 +508,12 @@ sixel_image_quantize(image_T *img, sixel_image8_T *out)
     out->pal = vim_memsave(pal, (size_t)npal * 3);
     out->npal = npal;
 
-    if (out->pal == NULL || out->idx == NULL)
+    만약 (out->pal == NULL || out->idx == NULL)
     {
 	sixel_image8_clear(out);
-	return FAIL;
+	반환 FAIL;
     }
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -525,35 +525,35 @@ sixel_image_quantize(image_T *img, sixel_image8_T *out)
  * height==0), which sixel_encode_view() rejects. Returns OK on success and FAIL
  * on failure.
  */
-    static int
+    static 정수
 sixel_image8_crop(
 	sixel_image8_T	*src,
-	int		 x,
-	int		 y,
-	int		 w,
-	int		 h,
+	정수		 x,
+	정수		 y,
+	정수		 w,
+	정수		 h,
 	sixel_view_T	*out)
 {
-    int x0, y0, x1, y1;   // clamped rectangle, half-open [x0,x1) x [y0,y1)
+    정수 x0, y0, x1, y1;   // clamped rectangle, half-open [x0,x1) x [y0,y1)
 
-    if (src == NULL || out == NULL)
-	return FAIL;
+    만약 (src == NULL || out == NULL)
+	반환 FAIL;
 
     x0 = x < 0 ? 0 : x;
     y0 = y < 0 ? 0 : y;
     x1 = x + w;
     y1 = y + h;
-    if (x1 > src->width)
+    만약 (x1 > src->width)
 	x1 = src->width;
-    if (y1 > src->height)
+    만약 (y1 > src->height)
 	y1 = src->height;
-    if (x1 < x0)
+    만약 (x1 < x0)
 	x1 = x0;
-    if (y1 < y0)
+    만약 (y1 < y0)
 	y1 = y0;
 
-    if (x1 <= x0 || y1 <= y0)
-	return FAIL;
+    만약 (x1 <= x0 || y1 <= y0)
+	반환 FAIL;
 
     out->stride = src->width;
     out->idx    = (x1 > x0 && y1 > y0)
@@ -564,39 +564,39 @@ sixel_image8_crop(
     out->pal    = src->pal;
     out->npal   = src->npal;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Emit a run of `cnt` identical sixel data bytes (ch in 0..63) into gap.
  * Uses RLE form `!N{c}` when it shortens the output.
  */
-    static int
-emit_run(garray_T *gap, char_u ch, int cnt)
+    static 정수
+emit_run(garray_T *gap, char_u ch, 정수 cnt)
 {
     char_u  c = (char_u)(63 + ch);
 
-    while (cnt > 255)
+    동안 (cnt > 255)
     {
-	if (ga_concat_bytes(gap, "!255", 4) == FAIL
+	만약 (ga_concat_bytes(gap, "!255", 4) == FAIL
 		|| ga_append(gap, c) == FAIL)
-	    return FAIL;
+	    반환 FAIL;
 	cnt -= 255;
     }
-    if (cnt <= 0)
-	return OK;
-    if (cnt <= 3)
+    만약 (cnt <= 0)
+	반환 OK;
+    만약 (cnt <= 3)
     {
-	while (cnt-- > 0)
-	    if (ga_append(gap, c) == FAIL)
-		return FAIL;
-	return OK;
+	동안 (cnt-- > 0)
+	    만약 (ga_append(gap, c) == FAIL)
+		반환 FAIL;
+	반환 OK;
     }
-    if (ga_append(gap, '!') == FAIL
+    만약 (ga_append(gap, '!') == FAIL
 	    || ga_concat_int(gap, cnt) == FAIL
 	    || ga_append(gap, c) == FAIL)
-	return FAIL;
-    return OK;
+	반환 FAIL;
+    반환 OK;
 }
 
 /*
@@ -608,7 +608,7 @@ emit_run(garray_T *gap, char_u ch, int cnt)
  * Note that check if each string is NULL! Probably can't happen but be safe.
  * Returns FAIL on failure.
  */
-    static int
+    static 정수
 sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 {
     garray_T	    hdr;    // DCS introducer, raster attrs, used-color defs
@@ -616,9 +616,9 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     sixel_band_T    *band_state = &sixel_state.band;
     char_u	    *idx;
     char_u	    *pal;
-    int		    npal;
-    int		    width, height;
-    int		    band, p, x, n;
+    정수		    npal;
+    정수		    width, height;
+    정수		    band, p, x, n;
     bool	    defined[256];   // register already defined in header
 
     idx = view->idx;
@@ -638,7 +638,7 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     // alpha < 128 pixels are emitted as palette index 0 (which we never
     // write to the bitmask), so the terminal leaves the popup's underlying
     // cell colour visible there -- no flatten, no colour-match drift.
-    if (ga_concat_bytes(&hdr, "\033P0;1;8q\"1;1;", 13) == FAIL
+    만약 (ga_concat_bytes(&hdr, "\033P0;1;8q\"1;1;", 13) == FAIL
 	    || ga_concat_int(&hdr, width) == FAIL
 	    || ga_append(&hdr, ';') == FAIL
 	    || ga_concat_int(&hdr, height) == FAIL)
@@ -648,45 +648,45 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     // unused index 0.  Sized off the view's width, not the parent image's
     // width, so encoding a small crop out of a large quantized image only
     // needs scratch space proportional to the crop.
-    if (sixel_ensure_band_capacity(width, npal) == FAIL)
+    만약 (sixel_ensure_band_capacity(width, npal) == FAIL)
 	goto fail;
 
-    for (band = 0; band < (height + 5) / 6; band++)
+    위해 (band = 0; band < (height + 5) / 6; band++)
     {
-	int gen;
-	int last_was_cr = 0;
-	int used_count = 0;
+	정수 gen;
+	정수 last_was_cr = 0;
+	정수 used_count = 0;
 
-	if (++band_state->seen_gen <= 0)
+	만약 (++band_state->seen_gen <= 0)
 	{
-	    vim_memset(band_state->seen, 0, (npal + 1) * sizeof(int));
+	    vim_memset(band_state->seen, 0, (npal + 1) * sizeof(정수));
 	    band_state->seen_gen = 1;
 	}
 	gen = band_state->seen_gen;
 
-	if (band > 0 && ga_append(&body, '-') == FAIL)
+	만약 (band > 0 && ga_append(&body, '-') == FAIL)
 	    goto fail;
 
 	// Fill the bitmask for this band.
-	for (p = 0; p < 6; p++)
+	위해 (p = 0; p < 6; p++)
 	{
-	    int y = band * 6 + p;
+	    정수 y = band * 6 + p;
 	    char_u  rowmask = (char_u)(1 << p);
 	    char_u  *row;
 
-	    if (y >= height)
+	    만약 (y >= height)
 		continue;
 	    // Use the *parent* stride to find the row -- "idx" already
 	    // points at the crop's top-left corner, so only the row-to-row
 	    // step needs to know about the parent's real width.
 	    row = idx + (size_t)y * view->stride;
-	    for (x = 0; x < width; x++)
+	    위해 (x = 0; x < width; x++)
 	    {
 		char_u  pix = row[x];
 
-		if (pix == 0)
+		만약 (pix == 0)
 		    continue;
-		if (band_state->seen[pix] != gen)
+		만약 (band_state->seen[pix] != gen)
 		{
 		    band_state->seen[pix] = gen;
 		    band_state->used[used_count++] = pix;
@@ -694,25 +694,25 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 		    band_state->xmax[pix] = x;
 		    vim_memset(band_state->bits + (size_t)pix * width, 0, width);
 		}
-		else
+		아니면
 		{
-		    if (x < band_state->xmin[pix])
+		    만약 (x < band_state->xmin[pix])
 			band_state->xmin[pix] = x;
-		    if (x > band_state->xmax[pix])
+		    만약 (x > band_state->xmax[pix])
 			band_state->xmax[pix] = x;
 		}
 		band_state->bits[(size_t)pix * width + x] |= rowmask;
 	    }
 	}
 
-	for (n = 0; n < used_count; n++)
+	위해 (n = 0; n < used_count; n++)
 	{
-	    int	     pix = band_state->used[n];
+	    정수	     pix = band_state->used[n];
 	    char_u  *row;
 	    char_u   ch0;
-	    int	     cnt;
-	    int	     start = band_state->xmin[pix];
-	    int	     end = band_state->xmax[pix];
+	    정수	     cnt;
+	    정수	     start = band_state->xmin[pix];
+	    정수	     end = band_state->xmax[pix];
 
 	    // First time this colour is used in the subrect: add its
 	    // definition "#N;2;R;G;B" (RGB scaled to 0..100) to the header.
@@ -722,14 +722,14 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 	    // darker.  This matters when the popup blends RGBA alpha onto the
 	    // terminal background: truncation made the flattened bg visibly
 	    // darker than the surrounding terminal cells.
-	    if (!defined[pix])
+	    만약 (!defined[pix])
 	    {
-		int r = (pal[(pix - 1) * 3]     * 100 + 127) / 255;
-		int g = (pal[(pix - 1) * 3 + 1] * 100 + 127) / 255;
-		int b = (pal[(pix - 1) * 3 + 2] * 100 + 127) / 255;
+		정수 r = (pal[(pix - 1) * 3]     * 100 + 127) / 255;
+		정수 g = (pal[(pix - 1) * 3 + 1] * 100 + 127) / 255;
+		정수 b = (pal[(pix - 1) * 3 + 2] * 100 + 127) / 255;
 
 		defined[pix] = true;
-		if (ga_append(&hdr, '#') == FAIL
+		만약 (ga_append(&hdr, '#') == FAIL
 			|| ga_concat_int(&hdr, pix) == FAIL
 			|| ga_concat_bytes(&hdr, ";2;", 3) == FAIL
 			|| ga_concat_int(&hdr, r) == FAIL
@@ -740,66 +740,66 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 		    goto fail;
 	    }
 
-	    if (last_was_cr && ga_append(&body, '$') == FAIL)
+	    만약 (last_was_cr && ga_append(&body, '$') == FAIL)
 		goto fail;
-	    if (ga_append(&body, '#') == FAIL
+	    만약 (ga_append(&body, '#') == FAIL
 		    || ga_concat_int(&body, pix) == FAIL)
 		goto fail;
 
 	    row = band_state->bits + (size_t)pix * width;
-	    if (start > 0 && emit_run(&body, 0, start) == FAIL)
+	    만약 (start > 0 && emit_run(&body, 0, start) == FAIL)
 		goto fail;
 	    ch0 = row[start];
 	    cnt = 1;
-	    for (x = start + 1; x <= end; x++)
+	    위해 (x = start + 1; x <= end; x++)
 	    {
 		char_u  ch = row[x];
 
-		if (ch == ch0)
+		만약 (ch == ch0)
 		{
 		    cnt++;
 		    continue;
 		}
-		if (emit_run(&body, ch0, cnt) == FAIL)
+		만약 (emit_run(&body, ch0, cnt) == FAIL)
 		    goto fail;
 		ch0 = ch;
 		cnt = 1;
 	    }
-	    if (emit_run(&body, ch0, cnt) == FAIL)
+	    만약 (emit_run(&body, ch0, cnt) == FAIL)
 		goto fail;
 	    last_was_cr = 1;
 	}
     }
 
-    if (ga_append(&hdr, NUL) == FAIL
+    만약 (ga_append(&hdr, NUL) == FAIL
 	    || ga_concat_bytes(&body, "\033\\", 3) == FAIL)
 	goto fail;
 
     seq[0] = (char_u *)hdr.ga_data;
     seq[1] = (char_u *)body.ga_data;
 
-    return OK;
+    반환 OK;
 
 fail:
     ga_clear(&hdr);
     ga_clear(&body);
-    return FAIL;
+    반환 FAIL;
 }
 
-    int
+    정수
 image_sixel_init(image_T *img)
 {
     image_sixel_T *ctx;
 
     ctx = ALLOC_CLEAR_ONE(image_sixel_T);
-    if (ctx == NULL || sixel_image_quantize(img, &ctx->image8) == FAIL)
+    만약 (ctx == NULL || sixel_image_quantize(img, &ctx->image8) == FAIL)
     {
 	vim_free(ctx);
-	return FAIL;
+	반환 FAIL;
     }
 
-#if defined(FEAT_IMAGE_SIXEL) && defined(FEAT_TERMRESPONSE)
-    if (!sent_decsdm)
+#만약 defined(FEAT_IMAGE_SIXEL) && defined(FEAT_TERMRESPONSE)
+    만약 (!sent_decsdm)
     {
 	// Disable sixel scrolling using DECSDM
 	out_str((char_u *)"\033[?80l");
@@ -808,7 +808,7 @@ image_sixel_init(image_T *img)
 #endif
 
     img->backend_data = ctx;
-    return OK;
+    반환 OK;
 }
 
     void
@@ -820,24 +820,24 @@ image_sixel_uninit(image_T *img)
     vim_free(img->backend_data);
 }
 
-    int
+    정수
 image_placement_sixel_init(image_placement_T *place)
 {
     image_placement_sixel_T *ctx = ALLOC_CLEAR_ONE(image_placement_sixel_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    만약 (ctx == NULL)
+	반환 FAIL;
     place->backend_data = ctx;
-    return OK;
+    반환 OK;
 }
 
     static void
 clear_chunks(image_placement_sixel_T *ctx)
 {
-    if (ctx->chunks == NULL)
-	return;
+    만약 (ctx->chunks == NULL)
+	반환;
 
-    for (int i = 0; i < ctx->n_chunks; i++)
+    위해 (정수 i = 0; i < ctx->n_chunks; i++)
     {
 	vim_free(ctx->chunks[i].seq[0]);
 	vim_free(ctx->chunks[i].seq[1]);
@@ -851,7 +851,7 @@ image_placement_sixel_uninit(image_placement_T *place)
 {
     image_placement_sixel_T *ctx = place->backend_data;
 
-    if (ctx->visible_init)
+    만약 (ctx->visible_init)
 	pixman_region32_fini(&ctx->visible_region);
     clear_chunks(ctx);
     vim_free(ctx);
@@ -865,56 +865,56 @@ image_placement_sixel_draw(image_placement_T *place)
     image_placement_sixel_T *ctx = place->backend_data;
     sixel_view_T	    view;
     pixman_box32_t	    *rects;
-    int			    n_rects;
+    정수			    n_rects;
 
     // Check if visible region is still the same, if so then use the cached
     // sixel sequences.
-    if (!(place->flags & IMAGEPF_FORCE) && ctx->visible_init
+    만약 (!(place->flags & IMAGEPF_FORCE) && ctx->visible_init
 	    && pixman_region32_equal(&ctx->visible_region, &place->visible))
     {
-	for (int i = 0; i < pixman_region32_n_rects(&ctx->visible_region); i++)
+	위해 (정수 i = 0; i < pixman_region32_n_rects(&ctx->visible_region); i++)
 	{
 	    sixel_chunk_T *chunk = ctx->chunks + i;
 
 	    windgoto(place->row + place->row_off
 		    + chunk->row_off, place->col + chunk->col_off);
-	    if (chunk->seq[0] != NULL)
+	    만약 (chunk->seq[0] != NULL)
 		out_str(chunk->seq[0]);
-	    if (chunk->seq[1] != NULL)
+	    만약 (chunk->seq[1] != NULL)
 		out_str(chunk->seq[1]);
 	    screen_start();
 	}
-	return;
+	반환;
     }
 
     rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (rects == NULL || n_rects == 0)
-	return;
+    만약 (rects == NULL || n_rects == 0)
+	반환;
 
     clear_chunks(ctx);
     ctx->chunks = ALLOC_CLEAR_MULT(sixel_chunk_T, n_rects);
 
-    if (ctx->chunks == NULL)
-	return;
+    만약 (ctx->chunks == NULL)
+	반환;
 
-    for (int i = 0; i < n_rects; i++)
+    위해 (정수 i = 0; i < n_rects; i++)
     {
 	pixman_box32_t	rect = rects[i];
-	int		row, col;
-	int		x, y, w, h;
+	정수		row, col;
+	정수		x, y, w, h;
 	sixel_chunk_T	*chunk = ctx->chunks + i;
 	char_u		*seq[2];
 
 	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, false);
 
-	if (sixel_image8_crop(&ictx->image8, x, y, w, h, &view) == FAIL
+	만약 (sixel_image8_crop(&ictx->image8, x, y, w, h, &view) == FAIL
 		|| sixel_encode_view(&view, seq) == FAIL)
 	    continue;
 
 	windgoto(row, col);
-	if (seq[0] != NULL)
+	만약 (seq[0] != NULL)
 	    out_str(seq[0]);
-	if (seq[1] != NULL)
+	만약 (seq[1] != NULL)
 	    out_str(seq[1]);
 	screen_start();
 
@@ -925,7 +925,7 @@ image_placement_sixel_draw(image_placement_T *place)
 	ctx->n_chunks++;
     }
 
-    if (ctx->visible_init)
+    만약 (ctx->visible_init)
 	pixman_region32_clear(&ctx->visible_region);
     pixman_region32_copy(&ctx->visible_region, &place->visible);
     ctx->visible_init = true;

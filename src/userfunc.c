@@ -13,7 +13,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * All user-defined functions are found in this hashtable.
  */
@@ -29,12 +29,12 @@ static funccall_T *current_funccal = NULL;
 // item in it is still being used.
 static funccall_T *previous_funccal = NULL;
 
-static void funccal_unref(funccall_T *fc, ufunc_T *fp, int force);
-static void func_clear(ufunc_T *fp, int force);
-static int func_free(ufunc_T *fp, int force);
+static void funccal_unref(funccall_T *fc, ufunc_T *fp, 정수 force);
+static void func_clear(ufunc_T *fp, 정수 force);
+static 정수 func_free(ufunc_T *fp, 정수 force);
 static char_u *untrans_function_name(char_u *name);
 static void handle_defer_one(funccall_T *funccal);
-static char_u *trans_function_name_ext(char_u **pp, int *is_global, int skip, int flags, funcdict_T *fdp, partial_T **partial, type_T **type, ufunc_T **ufunc);
+static char_u *trans_function_name_ext(char_u **pp, 정수 *is_global, 정수 skip, 정수 flags, funcdict_T *fdp, partial_T **partial, type_T **type, ufunc_T **ufunc);
 
     void
 func_init(void)
@@ -48,7 +48,7 @@ func_init(void)
     hashtab_T *
 func_tbl_get(void)
 {
-    return &func_hashtab;
+    반환 &func_hashtab;
 }
 
 /*
@@ -65,71 +65,71 @@ one_function_arg(
 	char_u	    *arg,
 	garray_T    *newargs,
 	garray_T    *argtypes,
-	int	    types_optional,
+	정수	    types_optional,
 	garray_T    *arg_objm,
 	evalarg_T   *evalarg,
 	exarg_T	    *eap,
-	int	    is_vararg,
-	int	    skip)
+	정수	    is_vararg,
+	정수	    skip)
 {
     char_u	*p = arg;
     char_u	*arg_copy = NULL;
-    int		is_underscore = FALSE;
+    정수		is_underscore = FALSE;
 
-    while (ASCII_ISALNUM(*p) || *p == '_')
+    동안 (ASCII_ISALNUM(*p) || *p == '_')
 	++p;
-    if (arg == p || SAFE_isdigit(*arg)
+    만약 (arg == p || SAFE_isdigit(*arg)
 	    || (argtypes == NULL
 		&& ((p - arg == 9 && STRNCMP(arg, "firstline", 9) == 0)
 		    || (p - arg == 8 && STRNCMP(arg, "lastline", 8) == 0))))
     {
-	if (!skip)
+	만약 (!skip)
 	    semsg(_(e_illegal_argument_str), arg);
-	return arg;
+	반환 arg;
     }
 
     // Extra checks in Vim9 script.
-    if (!skip && argtypes != NULL)
+    만약 (!skip && argtypes != NULL)
     {
-	int c = *p;
+	정수 c = *p;
 	*p = NUL;
-	int r = check_reserved_name(arg, FALSE);
+	정수 r = check_reserved_name(arg, FALSE);
 	*p = c;
-	if (r == FAIL)
-	    return arg;
+	만약 (r == FAIL)
+	    반환 arg;
 
 	// Cannot use script var name for argument. In function: also check
 	// local vars and arguments.
-	if (check_defined(arg, p - arg,
+	만약 (check_defined(arg, p - arg,
 				   evalarg == NULL ? NULL : evalarg->eval_cctx,
 			       eap == NULL ? NULL : eap->cstack, TRUE) == FAIL)
-	    return arg;
+	    반환 arg;
     }
 
-    if (newargs != NULL && ga_grow(newargs, 1) == FAIL)
-	return arg;
-    if (newargs != NULL)
+    만약 (newargs != NULL && ga_grow(newargs, 1) == FAIL)
+	반환 arg;
+    만약 (newargs != NULL)
     {
-	int	c;
-	int	i;
+	정수	c;
+	정수	i;
 
 	c = *p;
 	*p = NUL;
 	arg_copy = vim_strsave(arg);
-	if (arg_copy == NULL)
+	만약 (arg_copy == NULL)
 	{
 	    *p = c;
-	    return arg;
+	    반환 arg;
 	}
 	is_underscore = arg_copy[0] == '_' && arg_copy[1] == NUL;
-	if (argtypes == NULL || !is_underscore)
+	만약 (argtypes == NULL || !is_underscore)
 	    // Check for duplicate argument name.
-	    for (i = 0; i < newargs->ga_len; ++i)
-		if (STRCMP(((char_u **)(newargs->ga_data))[i], arg_copy) == 0)
+	    위해 (i = 0; i < newargs->ga_len; ++i)
+		만약 (STRCMP(((char_u **)(newargs->ga_data))[i], arg_copy) == 0)
 		{
 		    semsg(_(e_duplicate_argument_name_str), arg_copy);
 		    vim_free(arg_copy);
-		    return arg;
+		    반환 arg;
 		}
 	((char_u **)(newargs->ga_data))[newargs->ga_len] = arg_copy;
 	newargs->ga_len++;
@@ -138,44 +138,44 @@ one_function_arg(
     }
 
     // get any type from "arg: type"
-    if (argtypes != NULL && (skip || ga_grow(argtypes, 1) == OK)
+    만약 (argtypes != NULL && (skip || ga_grow(argtypes, 1) == OK)
 		&& arg_objm != NULL && (skip || ga_grow(arg_objm, 1) == OK))
     {
 	char_u *type = NULL;
 
-	if (VIM_ISWHITE(*p) && *skipwhite(p) == ':')
+	만약 (VIM_ISWHITE(*p) && *skipwhite(p) == ':')
 	{
 	    semsg(_(e_no_white_space_allowed_before_colon_str),
 					    arg_copy == NULL ? arg : arg_copy);
 	    p = skipwhite(p);
 	}
-	if (*p == ':')
+	만약 (*p == ':')
 	{
 	    ++p;
-	    if (!skip && !VIM_ISWHITE(*p))
+	    만약 (!skip && !VIM_ISWHITE(*p))
 	    {
 		semsg(_(e_white_space_required_after_str_str), ":", p - 1);
-		return arg;
+		반환 arg;
 	    }
 	    type = skipwhite(p);
 	    p = skip_type(type, TRUE);
-	    if (!skip)
+	    만약 (!skip)
 		type = vim_strnsave(type, p - type);
 	}
-	else if (*skipwhite(p) != '=' && !types_optional && !is_underscore)
+	아니면 만약 (*skipwhite(p) != '=' && !types_optional && !is_underscore)
 	{
 	    semsg(_(e_missing_argument_type_for_str),
 					    arg_copy == NULL ? arg : arg_copy);
-	    return arg;
+	    반환 arg;
 	}
-	if (!skip)
+	만약 (!skip)
 	{
-	    if (type == NULL && types_optional)
+	    만약 (type == NULL && types_optional)
 	    {
 		// lambda arguments default to "any" type
-		if (is_vararg)
+		만약 (is_vararg)
 		    type = vim_strnsave((char_u *)"list<any>", 9);
-		else
+		아니면
 		    type = vim_strnsave((char_u *)"any", 3);
 	    }
 	    ((char_u **)argtypes->ga_data)[argtypes->ga_len++] = type;
@@ -183,7 +183,7 @@ one_function_arg(
 	}
     }
 
-    return p;
+    반환 p;
 }
 
 /*
@@ -195,18 +195,18 @@ one_function_arg(
 get_function_line(
 	exarg_T		*eap,
 	garray_T	*lines_to_free,
-	int		indent,
+	정수		indent,
 	getline_opt_T	getline_options)
 {
     char_u *theline;
 
-    if (eap->ea_getline == NULL)
+    만약 (eap->ea_getline == NULL)
 	theline = getcmdline(':', 0L, indent, 0);
-    else
+    아니면
 	theline = eap->ea_getline(':', eap->cookie, indent, getline_options);
-    if (theline != NULL)
+    만약 (theline != NULL)
     {
-	if (lines_to_free->ga_len > 0
+	만약 (lines_to_free->ga_len > 0
 		&& eap->cmdlinep != NULL
 		&& *eap->cmdlinep == ((char_u **)lines_to_free->ga_data)
 						   [lines_to_free->ga_len - 1])
@@ -214,7 +214,7 @@ get_function_line(
 	(void)ga_add_string(lines_to_free, theline);
     }
 
-    return theline;
+    반환 theline;
 }
 
 /*
@@ -222,41 +222,41 @@ get_function_line(
  * "argp" should point to just after the "(", possibly to white space.
  * "argp" is advanced just after "endchar".
  */
-    static int
+    static 정수
 get_function_args(
     char_u	**argp,
     char_u	endchar,
     garray_T	*newargs,
     garray_T	*argtypes,	// NULL unless using :def
-    int		types_optional,	// types optional if "argtypes" is not NULL
+    정수		types_optional,	// types optional if "argtypes" is not NULL
     garray_T	*arg_objm,	// NULL unless using :def
     evalarg_T	*evalarg,	// context or NULL
-    int		*varargs,
+    정수		*varargs,
     garray_T	*default_args,
-    int		skip,
+    정수		skip,
     exarg_T	*eap,		// can be NULL
-    int		in_class,	// non-zero when inside a class or interface
+    정수		in_class,	// non-zero when inside a class or interface
     garray_T	*newlines,	// function body lines
     garray_T	*lines_to_free)
 {
-    int		mustend = FALSE;
+    정수		mustend = FALSE;
     char_u	*arg;
     char_u	*p;
-    int		c;
-    int		any_default = FALSE;
+    정수		c;
+    정수		any_default = FALSE;
     char_u	*whitep = *argp;
-    int		need_expr = FALSE;
+    정수		need_expr = FALSE;
 
-    if (newargs != NULL)
+    만약 (newargs != NULL)
 	ga_init2(newargs, sizeof(char_u *), 3);
-    if (argtypes != NULL)
+    만약 (argtypes != NULL)
 	ga_init2(argtypes, sizeof(char_u *), 3);
-    if (arg_objm != NULL)
+    만약 (arg_objm != NULL)
 	ga_init2(arg_objm, sizeof(int8_T), 3);
-    if (!skip && default_args != NULL)
+    만약 (!skip && default_args != NULL)
 	ga_init2(default_args, sizeof(char_u *), 3);
 
-    if (varargs != NULL)
+    만약 (varargs != NULL)
 	*varargs = FALSE;
 
     /*
@@ -264,43 +264,43 @@ get_function_args(
      */
     arg = skipwhite(*argp);
     p = arg;
-    while (*p != endchar)
+    동안 (*p != endchar)
     {
-	while (eap != NULL && eap->ea_getline != NULL
+	동안 (eap != NULL && eap->ea_getline != NULL
 			 && (*p == NUL || (VIM_ISWHITE(*whitep) && *p == '#')))
 	{
 	    // End of the line, get the next one.
 	    char_u *theline = get_function_line(eap, lines_to_free, 0,
 							  GETLINE_CONCAT_CONT);
 
-	    if (theline == NULL)
+	    만약 (theline == NULL)
 		break;
 	    whitep = (char_u *)" ";
 	    p = skipwhite(theline);
 	}
 
-	if (mustend && *p != endchar)
+	만약 (mustend && *p != endchar)
 	{
-	    if (!skip)
+	    만약 (!skip)
 		semsg(_(e_invalid_argument_str), *argp);
 	    goto err_ret;
 	}
-	if (*p == endchar && !need_expr)
+	만약 (*p == endchar && !need_expr)
 	    break;
 
-	if (p[0] == '.' && p[1] == '.' && p[2] == '.')
+	만약 (p[0] == '.' && p[1] == '.' && p[2] == '.')
 	{
-	    if (varargs != NULL)
+	    만약 (varargs != NULL)
 		*varargs = TRUE;
 	    p += 3;
 	    mustend = TRUE;
 
-	    if (argtypes != NULL)
+	    만약 (argtypes != NULL)
 	    {
 		// ...name: list<type>
-		if (!eval_isnamec1(*p))
+		만약 (!eval_isnamec1(*p))
 		{
-		    if (!skip)
+		    만약 (!skip)
 			emsg(_(e_missing_name_after_dots));
 		    goto err_ret;
 		}
@@ -308,26 +308,26 @@ get_function_args(
 		arg = p;
 		p = one_function_arg(p, newargs, argtypes, types_optional,
 					arg_objm, evalarg, eap, TRUE, skip);
-		if (p == arg)
+		만약 (p == arg)
 		    break;
-		if (*skipwhite(p) == '=')
+		만약 (*skipwhite(p) == '=')
 		{
 		    emsg(_(e_cannot_use_default_for_variable_arguments));
 		    break;
 		}
 	    }
 	}
-	else if (in_class && STRNCMP(p, "this.", 5) == 0)
+	아니면 만약 (in_class && STRNCMP(p, "this.", 5) == 0)
 	{
 	    // this.memberName
 	    p += 5;
 	    arg = p;
-	    while (ASCII_ISALNUM(*p) || *p == '_')
+	    동안 (ASCII_ISALNUM(*p) || *p == '_')
 		++p;
 	    char_u *argend = p;
 
 	    // object variable this. can be used only in a constructor
-	    if (STRNCMP(eap->arg, "new", 3) != 0)
+	    만약 (STRNCMP(eap->arg, "new", 3) != 0)
 	    {
 		c = *argend;
 		*argend = NUL;
@@ -336,10 +336,10 @@ get_function_args(
 		break;
 	    }
 
-	    if (*skipwhite(p) == '=')
+	    만약 (*skipwhite(p) == '=')
 	    {
 		char_u *defval = skipwhite(skipwhite(p) + 1);
-		if (STRNCMP(defval, "v:none", 6) != 0)
+		만약 (STRNCMP(defval, "v:none", 6) != 0)
 		{
 		    semsg(_(e_constructor_default_value_must_be_vnone_str), p);
 		    goto err_ret;
@@ -347,32 +347,32 @@ get_function_args(
 		any_default = TRUE;
 		p = defval + 6;
 
-		if (ga_grow(default_args, 1) == FAIL)
+		만약 (ga_grow(default_args, 1) == FAIL)
 		    goto err_ret;
 
 		char_u *expr = vim_strnsave((char_u *)"v:none", 6);
-		if (expr == NULL)
+		만약 (expr == NULL)
 		    goto err_ret;
 		((char_u **)(default_args->ga_data))
 						 [default_args->ga_len] = expr;
 		default_args->ga_len++;
 	    }
-	    else if (any_default)
+	    아니면 만약 (any_default)
 	    {
 		emsg(_(e_non_default_argument_follows_default_argument));
 		goto err_ret;
 	    }
 
 	    // TODO: check the argument is indeed a member
-	    if (newargs != NULL && ga_grow(newargs, 1) == FAIL)
-		return FAIL;
-	    if (newargs != NULL)
+	    만약 (newargs != NULL && ga_grow(newargs, 1) == FAIL)
+		반환 FAIL;
+	    만약 (newargs != NULL)
 	    {
 		((char_u **)(newargs->ga_data))[newargs->ga_len] =
 					       vim_strnsave(arg, argend - arg);
 		newargs->ga_len++;
 
-		if (argtypes != NULL && ga_grow(argtypes, 1) == OK
+		만약 (argtypes != NULL && ga_grow(argtypes, 1) == OK
 			    && arg_objm != NULL && ga_grow(arg_objm, 1) == OK)
 		{
 		    // TODO: use the actual type
@@ -381,22 +381,22 @@ get_function_args(
 		    ((int8_T *)arg_objm->ga_data)[arg_objm->ga_len++] = TRUE;
 
 		    // Add a line to the function body for the assignment.
-		    if (ga_grow(newlines, 1) == OK)
+		    만약 (ga_grow(newlines, 1) == OK)
 		    {
 			// "this.name = name"
-			int len = 5 + (argend - arg) + 3 + (argend - arg) + 1;
-			if (any_default)
+			정수 len = 5 + (argend - arg) + 3 + (argend - arg) + 1;
+			만약 (any_default)
 			    len += 14 + 10;
 			char_u *assignment = alloc(len);
-			if (assignment != NULL)
+			만약 (assignment != NULL)
 			{
 			    c = *argend;
 			    *argend = NUL;
-			    if (any_default)
+			    만약 (any_default)
 				vim_snprintf((char *)assignment, len,
 						"ifargisset %d this.%s = %s",
 					   default_args->ga_len - 1, arg, arg);
-			    else
+			    아니면
 				vim_snprintf((char *)assignment, len,
 						     "this.%s = %s", arg, arg);
 			    *argend = c;
@@ -406,23 +406,23 @@ get_function_args(
 		    }
 		}
 	    }
-	    if (*p == ',')
+	    만약 (*p == ',')
 		++p;
 	}
-	else
+	아니면
 	{
 	    char_u *np;
 
 	    arg = p;
 	    p = one_function_arg(p, newargs, argtypes, types_optional,
 					arg_objm, evalarg, eap, FALSE, skip);
-	    if (p == arg)
+	    만약 (p == arg)
 		break;
 
 	    // Recognize " = expr" but not " == expr".  A lambda can have
 	    // "(a = expr" but "(a == expr" and "(a =~ expr" are not a lambda.
 	    np = skipwhite(p);
-	    if (*np == '=' && np[1] != '=' && np[1] != '~'
+	    만약 (*np == '=' && np[1] != '=' && np[1] != '~'
 						       && default_args != NULL)
 	    {
 		typval_T	rettv;
@@ -431,22 +431,22 @@ get_function_args(
 		any_default = TRUE;
 		p = skipwhite(np + 1);
 		char_u *expr = p;
-		if (eval1(&p, &rettv, NULL) != FAIL)
+		만약 (eval1(&p, &rettv, NULL) != FAIL)
 		{
-		    if (!skip)
+		    만약 (!skip)
 		    {
-			if (ga_grow(default_args, 1) == FAIL)
+			만약 (ga_grow(default_args, 1) == FAIL)
 			    goto err_ret;
 
-			if (need_expr)
+			만약 (need_expr)
 			    need_expr = FALSE;
 			// trim trailing whitespace
-			while (p > expr && VIM_ISWHITE(p[-1]))
+			동안 (p > expr && VIM_ISWHITE(p[-1]))
 			    p--;
 			c = *p;
 			*p = NUL;
 			expr = vim_strsave(expr);
-			if (expr == NULL)
+			만약 (expr == NULL)
 			{
 			    *p = c;
 			    goto err_ret;
@@ -457,111 +457,111 @@ get_function_args(
 			*p = c;
 		    }
 		}
-		else
+		아니면
 		{
 		    mustend = TRUE;
-		    if (*skipwhite(p) == NUL)
+		    만약 (*skipwhite(p) == NUL)
 			need_expr = TRUE;
 		}
 	    }
-	    else if (any_default)
+	    아니면 만약 (any_default)
 	    {
 		emsg(_(e_non_default_argument_follows_default_argument));
 		goto err_ret;
 	    }
 
-	    if (VIM_ISWHITE(*p) && *skipwhite(p) == ',')
+	    만약 (VIM_ISWHITE(*p) && *skipwhite(p) == ',')
 	    {
 		// Be tolerant when skipping
-		if (!skip)
+		만약 (!skip)
 		{
 		    semsg(_(e_no_white_space_allowed_before_str_str), ",", p);
 		    goto err_ret;
 		}
 		p = skipwhite(p);
 	    }
-	    if (*p == ',')
+	    만약 (*p == ',')
 	    {
 		++p;
 		// Don't give this error when skipping, it makes the "->" not
 		// found in "{k,v -> x}" and give a confusing error.
 		// Allow missing space after comma in legacy functions.
-		if (!skip && argtypes != NULL
+		만약 (!skip && argtypes != NULL
 				      && !IS_WHITE_OR_NUL(*p) && *p != endchar)
 		{
 		    semsg(_(e_white_space_required_after_str_str), ",", p - 1);
 		    goto err_ret;
 		}
 	    }
-	    else
+	    아니면
 		mustend = TRUE;
 	}
 	whitep = p;
 	p = skipwhite(p);
     }
 
-    if (*p != endchar)
+    만약 (*p != endchar)
 	goto err_ret;
     ++p;	// skip "endchar"
 
     *argp = p;
-    return OK;
+    반환 OK;
 
 err_ret:
-    if (newargs != NULL)
+    만약 (newargs != NULL)
 	ga_clear_strings(newargs);
-    if (!skip && default_args != NULL)
+    만약 (!skip && default_args != NULL)
 	ga_clear_strings(default_args);
-    return FAIL;
+    반환 FAIL;
 }
 
 /*
  * Parse the argument types, filling "fp->uf_arg_types".
  * Return OK or FAIL.
  */
-    static int
+    static 정수
 parse_argument_types(
     ufunc_T	*fp,
     garray_T	*argtypes,
-    int		varargs,
+    정수		varargs,
     garray_T	*arg_objm,
     ocmember_T	*obj_members,
-    int		obj_member_count,
+    정수		obj_member_count,
     cctx_T	*cctx)
 {
-    int len = 0;
+    정수 len = 0;
 
     ga_init2(&fp->uf_type_list, sizeof(type_T *), 10);
-    if (argtypes->ga_len > 0)
+    만약 (argtypes->ga_len > 0)
     {
 	// When "varargs" is set the last name/type goes into uf_va_name
 	// and uf_va_type.
 	len = argtypes->ga_len - (varargs ? 1 : 0);
 
-	if (len > 0)
+	만약 (len > 0)
 	    fp->uf_arg_types = ALLOC_CLEAR_MULT(type_T *, len);
-	if (fp->uf_arg_types != NULL)
+	만약 (fp->uf_arg_types != NULL)
 	{
-	    int	i;
+	    정수	i;
 	    type_T	*type;
 
-	    for (i = 0; i < len; ++ i)
+	    위해 (i = 0; i < len; ++ i)
 	    {
 		char_u *p = ((char_u **)argtypes->ga_data)[i];
 
-		if (p == NULL)
+		만약 (p == NULL)
 		    // will get the type from the default value
 		    type = &t_unknown;
-		else
+		아니면
 		{
-		    if (arg_objm != NULL && ((int8_T *)arg_objm->ga_data)[i])
+		    만약 (arg_objm != NULL && ((int8_T *)arg_objm->ga_data)[i])
 		    {
 			char_u *aname = ((char_u **)fp->uf_args.ga_data)[i];
 
 			type = &t_any;
-			for (int om = 0; om < obj_member_count; ++om)
+			위해 (정수 om = 0; om < obj_member_count; ++om)
 			{
-			    if (obj_members != NULL
+			    만약 (obj_members != NULL
 				    && STRCMP(aname,
 					obj_members[om].ocm_name.string) == 0)
 			    {
@@ -570,29 +570,29 @@ parse_argument_types(
 			    }
 			}
 		    }
-		    else
+		    아니면
 			type = parse_type(&p, &fp->uf_type_list, fp, cctx, TRUE);
 		}
-		if (type == NULL || !valid_declaration_type(type))
-		    return FAIL;
+		만약 (type == NULL || !valid_declaration_type(type))
+		    반환 FAIL;
 		fp->uf_arg_types[i] = type;
-		if (i < fp->uf_args.ga_len
+		만약 (i < fp->uf_args.ga_len
 			&& (type->tt_type == VAR_FUNC
 			    || type->tt_type == VAR_PARTIAL))
 		{
 		    char_u *name = ((char_u **)fp->uf_args.ga_data)[i];
-		    if (obj_members != NULL && *name == '_')
+		    만약 (obj_members != NULL && *name == '_')
 			// protected object method
 			name++;
 
-		    if (var_wrong_func_name(name, TRUE))
-			return FAIL;
+		    만약 (var_wrong_func_name(name, TRUE))
+			반환 FAIL;
 		}
 	    }
 	}
     }
 
-    if (varargs)
+    만약 (varargs)
     {
 	char_u *p;
 
@@ -602,63 +602,63 @@ parse_argument_types(
 	fp->uf_va_name = ((char_u **)fp->uf_args.ga_data)[fp->uf_args.ga_len];
 	((char_u **)fp->uf_args.ga_data)[fp->uf_args.ga_len] = NULL;
 	p = ((char_u **)argtypes->ga_data)[len];
-	if (p == NULL)
+	만약 (p == NULL)
 	    // TODO: get type from default value
 	    fp->uf_va_type = &t_list_any;
-	else
+	아니면
 	{
 	    fp->uf_va_type = parse_type(&p, &fp->uf_type_list, fp, cctx, TRUE);
-	    if (fp->uf_va_type != NULL && fp->uf_va_type->tt_type != VAR_LIST)
+	    만약 (fp->uf_va_type != NULL && fp->uf_va_type->tt_type != VAR_LIST)
 	    {
 		semsg(_(e_variable_arguments_type_must_be_list_str),
 					  ((char_u **)argtypes->ga_data)[len]);
-		return FAIL;
+		반환 FAIL;
 	    }
 	}
-	if (fp->uf_va_type == NULL)
-	    return FAIL;
+	만약 (fp->uf_va_type == NULL)
+	    반환 FAIL;
     }
 
-    return OK;
+    반환 OK;
 }
 
-    static int
+    static 정수
 parse_return_type(ufunc_T *fp, char_u *ret_type, cctx_T *cctx)
 {
-    if (ret_type == NULL)
+    만약 (ret_type == NULL)
 	fp->uf_ret_type = &t_void;
-    else
+    아니면
     {
 	char_u *p = ret_type;
 
 	fp->uf_ret_type = parse_type(&p, &fp->uf_type_list, fp, cctx, TRUE);
-	if (fp->uf_ret_type == NULL)
+	만약 (fp->uf_ret_type == NULL)
 	{
 	    fp->uf_ret_type = &t_void;
-	    return FAIL;
+	    반환 FAIL;
 	}
     }
-    return OK;
+    반환 OK;
 }
 
 /*
  * Register function "fp" as using "current_funccal" as its scope.
  */
-    static int
+    static 정수
 register_closure(ufunc_T *fp)
 {
-    if (fp->uf_scoped == current_funccal)
+    만약 (fp->uf_scoped == current_funccal)
 	// no change
-	return OK;
+	반환 OK;
     funccal_unref(fp->uf_scoped, fp, FALSE);
     fp->uf_scoped = current_funccal;
     current_funccal->fc_refcount++;
 
-    if (ga_grow(&current_funccal->fc_ufuncs, 1) == FAIL)
-	return FAIL;
+    만약 (ga_grow(&current_funccal->fc_ufuncs, 1) == FAIL)
+	반환 FAIL;
     ((ufunc_T **)current_funccal->fc_ufuncs.ga_data)
 				    [current_funccal->fc_ufuncs.ga_len++] = fp;
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -672,15 +672,15 @@ make_ufunc_name_readable(char_u *name, char_u *buf, size_t bufsize)
 {
     size_t len;
 
-    if (name[0] != K_SPECIAL)
-	return name;
+    만약 (name[0] != K_SPECIAL)
+	반환 name;
     len = STRLEN(name);
-    if (len + 3 > bufsize)
-	return name;
+    만약 (len + 3 > bufsize)
+	반환 name;
 
     mch_memmove(buf + 5, name + 3, len - 2);  // Include trailing NUL
     mch_memmove(buf, "<SNR>", 5);
-    return buf;
+    반환 buf;
 }
 
 static char_u	lambda_name[8 + NUMBUFLEN];
@@ -691,20 +691,20 @@ static char_u	lambda_name[8 + NUMBUFLEN];
     string_T
 get_lambda_name(void)
 {
-    static int	lambda_no = 0;
-    int		n;
+    static 정수	lambda_no = 0;
+    정수		n;
     string_T	ret;
 
     n = vim_snprintf((char *)lambda_name, sizeof(lambda_name), "<lambda>%d", ++lambda_no);
-    if (n < 1)
+    만약 (n < 1)
 	ret.length = 0;
-    else if (n >= (int)sizeof(lambda_name))
+    아니면 만약 (n >= (정수)sizeof(lambda_name))
 	ret.length = sizeof(lambda_name) - 1;
-    else
+    아니면
 	ret.length = (size_t)n;
 
     ret.string = lambda_name;
-    return ret;
+    반환 ret;
 }
 
 /*
@@ -721,26 +721,26 @@ alloc_ufunc(char_u *name, size_t namelen)
     // the whole struct, including any padding.
     len = offsetof(ufunc_T, uf_name) + namelen + 1;
     fp = alloc_clear(len < sizeof(ufunc_T) ? sizeof(ufunc_T) : len);
-    if (fp != NULL)
+    만약 (fp != NULL)
     {
 	// Add a type cast to avoid a warning for an overflow, the uf_name[] array
 	// can actually extend beyond the struct.
 	STRCPY((void *)fp->uf_name, name);
 	fp->uf_namelen = namelen;
 
-	if (name[0] == K_SPECIAL)
+	만약 (name[0] == K_SPECIAL)
 	{
 	    len = namelen + 3;		    // including +1 for NUL
 	    fp->uf_name_exp = alloc(len);
-	    if (fp->uf_name_exp != NULL)
+	    만약 (fp->uf_name_exp != NULL)
 		vim_snprintf((char *)fp->uf_name_exp, len, "<SNR>%s", fp->uf_name + 3);
 	}
     }
 
-    return fp;
+    반환 fp;
 }
 
-#if defined(FEAT_LUA)
+#만약 defined(FEAT_LUA)
 /*
  * Registers a native C callback which can be called from Vim script.
  * Returns the name of the Vim script function.
@@ -752,8 +752,8 @@ register_cfunc(cfunc_T cb, cfunc_free_T cb_free, void *state)
     ufunc_T	*fp;
 
     fp = alloc_ufunc(name.string, name.length);
-    if (fp == NULL)
-	return NULL;
+    만약 (fp == NULL)
+	반환 NULL;
 
     fp->uf_def_status = UF_NOT_COMPILED;
     fp->uf_refcount = 1;
@@ -767,7 +767,7 @@ register_cfunc(cfunc_T cb, cfunc_free_T cb_free, void *state)
 
     hash_add(&func_hashtab, UF2HIKEY(fp), "add C function");
 
-    return name.string;
+    반환 name.string;
 }
 #endif
 
@@ -781,49 +781,49 @@ register_cfunc(cfunc_T cb, cfunc_free_T cb_free, void *state)
     static char_u *
 skip_arrow(
 	char_u	*start,
-	int	equal_arrow,
+	정수	equal_arrow,
 	char_u	**ret_type,
-	int	*white_error)
+	정수	*white_error)
 {
     char_u  *s = start;
     char_u  *bef = start - 2; // "start" points to > of ->
 
-    if (equal_arrow)
+    만약 (equal_arrow)
     {
-	if (*s == ':')
+	만약 (*s == ':')
 	{
-	    if (white_error != NULL && !VIM_ISWHITE(s[1]))
+	    만약 (white_error != NULL && !VIM_ISWHITE(s[1]))
 	    {
 		*white_error = TRUE;
 		semsg(_(e_white_space_required_after_str_str), ":", s);
-		return NULL;
+		반환 NULL;
 	    }
 	    s = skipwhite(s + 1);
 	    *ret_type = s;
 	    s = skip_type(s, TRUE);
-	    if (s == *ret_type)
+	    만약 (s == *ret_type)
 	    {
 		emsg(_(e_missing_return_type));
-		return NULL;
+		반환 NULL;
 	    }
 	}
 	bef = s;
 	s = skipwhite(s);
-	if (*s != '=')
-	    return NULL;
+	만약 (*s != '=')
+	    반환 NULL;
 	++s;
     }
-    if (*s != '>')
-	return NULL;
-    if (white_error != NULL && ((!VIM_ISWHITE(*bef) && *bef != '{')
+    만약 (*s != '>')
+	반환 NULL;
+    만약 (white_error != NULL && ((!VIM_ISWHITE(*bef) && *bef != '{')
 		|| !IS_WHITE_OR_NUL(s[1])))
     {
 	*white_error = TRUE;
 	semsg(_(e_white_space_required_before_and_after_str_at_str),
 					       equal_arrow ? "=>" : "->", bef);
-	return NULL;
+	반환 NULL;
     }
-    return skipwhite(s + 1);
+    반환 skipwhite(s + 1);
 }
 
 /*
@@ -832,19 +832,19 @@ skip_arrow(
  * Otherwise return FALSE;
  * Do not consider "function(" to be a command.
  */
-    static int
+    static 정수
 is_function_cmd(char_u **cmd)
 {
     char_u *p = *cmd;
 
-    if (checkforcmd(&p, "function", 2))
+    만약 (checkforcmd(&p, "function", 2))
     {
-	if (*p == '(')
-	    return FALSE;
+	만약 (*p == '(')
+	    반환 FALSE;
 	*cmd = p;
-	return TRUE;
+	반환 TRUE;
     }
-    return FALSE;
+    반환 FALSE;
 }
 
 /*
@@ -855,24 +855,24 @@ is_function_cmd(char_u **cmd)
     static void
 function_using_block_scopes(ufunc_T *fp, cstack_T *cstack)
 {
-    if (cstack == NULL || cstack->cs_idx < 0)
-	return;
+    만약 (cstack == NULL || cstack->cs_idx < 0)
+	반환;
 
-    int	    count = cstack->cs_idx + 1;
-    int	    i;
+    정수	    count = cstack->cs_idx + 1;
+    정수	    i;
 
-    fp->uf_block_ids = ALLOC_MULT(int, count);
-    if (fp->uf_block_ids != NULL)
+    fp->uf_block_ids = ALLOC_MULT(정수, count);
+    만약 (fp->uf_block_ids != NULL)
     {
 	mch_memmove(fp->uf_block_ids, cstack->cs_block_id,
-		sizeof(int) * count);
+		sizeof(정수) * count);
 	fp->uf_block_depth = count;
     }
 
     // Set flag in each block to indicate a function was defined.  This
     // is used to keep the variable when leaving the block, see
     // hide_script_var().
-    for (i = 0; i <= cstack->cs_idx; ++i)
+    위해 (i = 0; i <= cstack->cs_idx; ++i)
 	cstack->cs_flags[i] |= CSF_FUNC_DEF;
 }
 
@@ -886,22 +886,22 @@ function_using_block_scopes(ufunc_T *fp, cstack_T *cstack)
 skip_single_quote_string(char_u *p)
 {
     p++;	    // skip the beginning single quote
-    while (*p != NUL)
+    동안 (*p != NUL)
     {
 	// Within the string, a single quote can be escaped by using
 	// two single quotes.
-	if (*p == '\'' && *(p + 1) == '\'')
+	만약 (*p == '\'' && *(p + 1) == '\'')
 	    p += 2;
-	else if (*p == '\'')
+	아니면 만약 (*p == '\'')
 	{
 	    p++;    // skip the ending single quote
 	    break;
 	}
-	else
+	아니면
 	    MB_PTR_ADV(p);
     }
 
-    return p;
+    반환 p;
 }
 
 /*
@@ -914,22 +914,22 @@ skip_single_quote_string(char_u *p)
 skip_double_quote_string(char_u *p)
 {
     p++;	    // skip the beginning double quote
-    while (*p != NUL)
+    동안 (*p != NUL)
     {
 	// Within the string, a double quote can be escaped by
 	// preceding it with a backslash.
-	if (*p == '\\' && *(p + 1) == '"')
+	만약 (*p == '\\' && *(p + 1) == '"')
 	    p += 2;
-	else if (*p == '"')
+	아니면 만약 (*p == '"')
 	{
 	    p++;    // skip the ending double quote
 	    break;
 	}
-	else
+	아니면
 	    MB_PTR_ADV(p);
     }
 
-    return p;
+    반환 p;
 }
 
 /*
@@ -942,24 +942,24 @@ find_start_of_vim9_comment(char_u *line)
 {
     char_u	*p = line;
 
-    while (*p != NUL)
+    동안 (*p != NUL)
     {
-	if (*p == '\'')
+	만약 (*p == '\'')
 	    // Skip a single quoted string.
 	    p = skip_single_quote_string(p);
-	else if (*p == '"')
+	아니면 만약 (*p == '"')
 	    // Skip a double quoted string.
 	    p = skip_double_quote_string(p);
-	else
+	아니면
 	{
-	    if (*p == '#')
+	    만약 (*p == '#')
 		// Found the start of a Vim9 comment
 		break;
 	    MB_PTR_ADV(p);
 	}
     }
 
-    return p;
+    반환 p;
 }
 
 /*
@@ -968,7 +968,7 @@ find_start_of_vim9_comment(char_u *line)
  * "newlines" must already have been initialized.
  * "eap->cmdidx" is CMD_function, CMD_def or CMD_block;
  */
-    static int
+    static 정수
 get_function_body(
 	exarg_T	    *eap,
 	garray_T    *newlines,
@@ -977,36 +977,36 @@ get_function_body(
 {
     linenr_T	sourcing_lnum_top = SOURCING_LNUM;
     linenr_T	sourcing_lnum_off;
-    int		saved_wait_return = need_wait_return;
+    정수		saved_wait_return = need_wait_return;
     char_u	*line_arg = line_arg_in;
-    int		vim9_function = eap->cmdidx == CMD_def
+    정수		vim9_function = eap->cmdidx == CMD_def
 						   || eap->cmdidx == CMD_block;
 #define MAX_FUNC_NESTING 50
     char	nesting_def[MAX_FUNC_NESTING];
     char	nesting_inline[MAX_FUNC_NESTING];
-    int		nesting = 0;
+    정수		nesting = 0;
     getline_opt_T getline_options;
-    int		indent = 2;
+    정수		indent = 2;
     char_u	*skip_until = NULL;
-    int		ret = FAIL;
-    int		is_heredoc = FALSE;
-    int		heredoc_concat_len = 0;
+    정수		ret = FAIL;
+    정수		is_heredoc = FALSE;
+    정수		heredoc_concat_len = 0;
     garray_T	heredoc_ga;
     char_u	*heredoc_trimmed = NULL;
     size_t	heredoc_trimmedlen = 0;
-    int		did_emsg_start = did_emsg;
+    정수		did_emsg_start = did_emsg;
 
     ga_init2(&heredoc_ga, 1, 500);
 
     // Detect having skipped over comment lines to find the return
     // type.  Add NULL lines to keep the line count correct.
     sourcing_lnum_off = get_sourced_lnum(eap->ea_getline, eap->cookie);
-    if (SOURCING_LNUM < sourcing_lnum_off)
+    만약 (SOURCING_LNUM < sourcing_lnum_off)
     {
 	sourcing_lnum_off -= SOURCING_LNUM;
-	if (ga_grow(newlines, sourcing_lnum_off) == FAIL)
+	만약 (ga_grow(newlines, sourcing_lnum_off) == FAIL)
 	    goto theend;
-	while (sourcing_lnum_off-- > 0)
+	동안 (sourcing_lnum_off-- > 0)
 	    ((char_u **)(newlines->ga_data))[newlines->ga_len++] = NULL;
     }
 
@@ -1014,80 +1014,80 @@ get_function_body(
     nesting_inline[0] = eap->cmdidx == CMD_block;
     getline_options = vim9_function
 				? GETLINE_CONCAT_CONTBAR : GETLINE_CONCAT_CONT;
-    for (;;)
+    위해 (;;)
     {
 	char_u	*theline;
 	char_u	*p;
 	char_u	*arg;
 
-	if (KeyTyped)
+	만약 (KeyTyped)
 	{
 	    msg_scroll = TRUE;
 	    saved_wait_return = FALSE;
 	}
 	need_wait_return = FALSE;
 
-	if (line_arg != NULL)
+	만약 (line_arg != NULL)
 	{
 	    // Use eap->arg, split up in parts by line breaks.
 	    theline = line_arg;
 	    p = vim_strchr(theline, '\n');
-	    if (p == NULL)
+	    만약 (p == NULL)
 		line_arg += STRLEN(line_arg);
-	    else
+	    아니면
 	    {
 		*p = NUL;
 		line_arg = p + 1;
 	    }
 	}
-	else
+	아니면
 	{
 	    theline = get_function_line(eap, lines_to_free, indent,
 							      getline_options);
 	}
-	if (KeyTyped)
+	만약 (KeyTyped)
 	    lines_left = Rows - 1;
-	if (theline == NULL)
+	만약 (theline == NULL)
 	{
 	    // Use the start of the function for the line number.
 	    SOURCING_LNUM = sourcing_lnum_top;
-	    if (skip_until != NULL)
+	    만약 (skip_until != NULL)
 		semsg(_(e_missing_heredoc_end_marker_str), skip_until);
-	    else if (nesting_inline[nesting])
+	    아니면 만약 (nesting_inline[nesting])
 		emsg(_(e_missing_end_block));
-	    else if (eap->cmdidx == CMD_def)
+	    아니면 만약 (eap->cmdidx == CMD_def)
 		emsg(_(e_missing_enddef));
-	    else
+	    아니면
 		emsg(_(e_missing_endfunction));
 	    goto theend;
 	}
 
 	// Detect line continuation: SOURCING_LNUM increased more than one.
 	sourcing_lnum_off = get_sourced_lnum(eap->ea_getline, eap->cookie);
-	if (SOURCING_LNUM < sourcing_lnum_off)
+	만약 (SOURCING_LNUM < sourcing_lnum_off)
 	    sourcing_lnum_off -= SOURCING_LNUM;
-	else
+	아니면
 	    sourcing_lnum_off = 0;
 
-	if (skip_until != NULL)
+	만약 (skip_until != NULL)
 	{
 	    // Don't check for ":endfunc"/":enddef" between
 	    // * ":append" and "."
 	    // * ":python <<EOF" and "EOF"
 	    // * ":let {var-name} =<< [trim] {marker}" and "{marker}"
-	    if (heredoc_trimmed == NULL
+	    만약 (heredoc_trimmed == NULL
 		    || (is_heredoc && skipwhite(theline) == theline)
 		    || STRNCMP(theline, heredoc_trimmed,
 						 heredoc_trimmedlen) == 0)
 	    {
-		if (heredoc_trimmed == NULL)
+		만약 (heredoc_trimmed == NULL)
 		    p = theline;
-		else if (is_heredoc)
+		아니면 만약 (is_heredoc)
 		    p = skipwhite(theline) == theline
 				 ? theline : theline + heredoc_trimmedlen;
-		else
+		아니면
 		    p = theline + heredoc_trimmedlen;
-		if (STRCMP(p, skip_until) == 0)
+		만약 (STRCMP(p, skip_until) == 0)
 		{
 		    VIM_CLEAR(skip_until);
 		    VIM_CLEAR(heredoc_trimmed);
@@ -1096,7 +1096,7 @@ get_function_body(
 				? GETLINE_CONCAT_CONTBAR : GETLINE_CONCAT_CONT;
 		    is_heredoc = FALSE;
 
-		    if (heredoc_concat_len > 0)
+		    만약 (heredoc_concat_len > 0)
 		    {
 			// Replace the starting line with all the concatenated
 			// lines.
@@ -1112,60 +1112,60 @@ get_function_body(
 		}
 	    }
 	}
-	else
+	아니면
 	{
-	    int	    c;
+	    정수	    c;
 	    char_u  *end;
 	    char_u  *cmd;
 	    bool    colon = false;
 
 	    // skip ':' and blanks
-	    for (p = theline; VIM_ISWHITE(*p) || *p == ':'; ++p)
+	    위해 (p = theline; VIM_ISWHITE(*p) || *p == ':'; ++p)
 	    {
-		if (*p == ':')
+		만약 (*p == ':')
 		    colon = true;
 	    }
 
 	    // Check for "endfunction", "enddef" or "}".
 	    // When a ":" follows it must be a dict key; "enddef: value,"
 	    cmd = p;
-	    if (nesting_inline[nesting]
+	    만약 (nesting_inline[nesting]
 		    ? *p == '}'
 		    : (checkforcmd(&p, nesting_def[nesting]
 						? "enddef" : "endfunction", 4)
 			&& *p != ':'))
 	    {
-		if (!nesting_inline[nesting] && nesting_def[nesting]
+		만약 (!nesting_inline[nesting] && nesting_def[nesting]
 								&& p < cmd + 6)
 		    semsg(_(e_command_cannot_be_shortened_str), cmd);
-		if (nesting-- == 0)
+		만약 (nesting-- == 0)
 		{
 		    char_u *nextcmd = NULL;
 
-		    if (*p == '|' || *p == '}')
+		    만약 (*p == '|' || *p == '}')
 			nextcmd = p + 1;
-		    else if (line_arg != NULL && *skipwhite(line_arg) != NUL)
+		    아니면 만약 (line_arg != NULL && *skipwhite(line_arg) != NUL)
 			nextcmd = line_arg;
-		    else if (*p != NUL && *p != (vim9_function ? '#' : '"')
+		    아니면 만약 (*p != NUL && *p != (vim9_function ? '#' : '"')
 					   && (vim9_function || p_verbose > 0))
 		    {
 			SOURCING_LNUM = sourcing_lnum_top
 							+ newlines->ga_len + 1;
-			if (eap->cmdidx == CMD_def)
+			만약 (eap->cmdidx == CMD_def)
 			    semsg(_(e_text_found_after_str_str), "enddef", p);
-			else
+			아니면
 			    give_warning2((char_u *)
 				   _("W22: Text found after :endfunction: %s"),
 				   p, TRUE);
 		    }
-		    if (nextcmd != NULL && *skipwhite(nextcmd) != NUL)
+		    만약 (nextcmd != NULL && *skipwhite(nextcmd) != NUL)
 		    {
 			// Another command follows. If the line came from "eap"
 			// we can simply point into it, otherwise we need to
 			// change "eap->cmdlinep" to point to the last fetched
 			// line.
 			eap->nextcmd = nextcmd;
-			if (lines_to_free->ga_len > 0
+			만약 (lines_to_free->ga_len > 0
 				&& *eap->cmdlinep !=
 					    ((char_u **)lines_to_free->ga_data)
 						   [lines_to_free->ga_len - 1])
@@ -1187,19 +1187,19 @@ get_function_body(
 	    // for "enddef".
 	    // We continue to find the end of the function, although we might
 	    // not find it.
-	    else if (nesting_def[nesting])
+	    아니면 만약 (nesting_def[nesting])
 	    {
-		if (checkforcmd(&p, "endfunction", 4) && *p != ':')
+		만약 (checkforcmd(&p, "endfunction", 4) && *p != ':')
 		    emsg(_(e_mismatched_endfunction));
 	    }
-	    else if (eap->cmdidx == CMD_def && checkforcmd(&p, "enddef", 4))
+	    아니면 만약 (eap->cmdidx == CMD_def && checkforcmd(&p, "enddef", 4))
 		emsg(_(e_mismatched_enddef));
 
 	    // Increase indent inside "if", "while", "for" and "try", decrease
 	    // at "end".
-	    if (indent > 2 && (*p == '}' || STRNCMP(p, "end", 3) == 0))
+	    만약 (indent > 2 && (*p == '}' || STRNCMP(p, "end", 3) == 0))
 		indent -= 2;
-	    else if (STRNCMP(p, "if", 2) == 0
+	    아니면 만약 (STRNCMP(p, "if", 2) == 0
 		    || STRNCMP(p, "wh", 2) == 0
 		    || STRNCMP(p, "for", 3) == 0
 		    || STRNCMP(p, "try", 3) == 0)
@@ -1209,24 +1209,24 @@ get_function_body(
 	    // Only recognize "def" inside "def", not inside "function",
 	    // For backwards compatibility, see Test_function_python().
 	    c = *p;
-	    if (is_function_cmd(&p)
+	    만약 (is_function_cmd(&p)
 		    || (eap->cmdidx == CMD_def && checkforcmd(&p, "def", 3)))
 	    {
-		if (*p == '!')
+		만약 (*p == '!')
 		    p = skipwhite(p + 1);
 		p += eval_fname_script(p);
 		vim_free(trans_function_name(&p, NULL, TRUE, 0));
-		if (vim9_function && *p == '<')
+		만약 (vim9_function && *p == '<')
 		{
 		    // skip generic function
-		    if (skip_generic_func_type_args(&p) == FAIL)
+		    만약 (skip_generic_func_type_args(&p) == FAIL)
 			goto theend;
 		}
-		if (*skipwhite(p) == '(')
+		만약 (*skipwhite(p) == '(')
 		{
-		    if (nesting == MAX_FUNC_NESTING - 1)
+		    만약 (nesting == MAX_FUNC_NESTING - 1)
 			emsg(_(e_function_nesting_too_deep));
-		    else
+		    아니면
 		    {
 			++nesting;
 			nesting_def[nesting] = (c == 'd');
@@ -1236,39 +1236,39 @@ get_function_body(
 		}
 	    }
 
-	    if (nesting_def[nesting] ? *p != '#' : *p != '"')
+	    만약 (nesting_def[nesting] ? *p != '#' : *p != '"')
 	    {
 		// Not a comment line: check for nested inline function.
 
-		if (nesting_inline[nesting])
+		만약 (nesting_inline[nesting])
 		{
 		    // A comment (#) can follow the opening curly brace of a
 		    // block statement.  Need to ignore the comment and look
 		    // for the opening curly brace before the comment.
 		    end = find_start_of_vim9_comment(p) - 1;
 		}
-		else
+		아니면
 		    end = p + STRLEN(p) - 1;
 
-		while (end > p && VIM_ISWHITE(*end))
+		동안 (end > p && VIM_ISWHITE(*end))
 		    --end;
-		if (end > p + 1 && *end == '{' && VIM_ISWHITE(end[-1]))
+		만약 (end > p + 1 && *end == '{' && VIM_ISWHITE(end[-1]))
 		{
-		    int	    is_block;
+		    정수	    is_block;
 
 		    // check for trailing "=> {": start of an inline function
 		    --end;
-		    while (end > p && VIM_ISWHITE(*end))
+		    동안 (end > p && VIM_ISWHITE(*end))
 			--end;
 		    is_block = end > p + 2 && end[-1] == '=' && end[0] == '>';
-		    if (!is_block)
+		    만약 (!is_block)
 			is_block = find_cmd_block_start(p) != NULL;
 
-		    if (is_block)
+		    만약 (is_block)
 		    {
-			if (nesting == MAX_FUNC_NESTING - 1)
+			만약 (nesting == MAX_FUNC_NESTING - 1)
 			    emsg(_(e_function_nesting_too_deep));
-			else
+			아니면
 			{
 			    ++nesting;
 			    nesting_def[nesting] = TRUE;
@@ -1282,21 +1282,21 @@ get_function_body(
 	    // Check for ":append", ":change", ":insert".  Not for :def.
 	    // In Vim9 script a range comes after a colon; without one a
 	    // leading "'" starts a string, not a mark.
-	    if (!vim9_function || colon)
+	    만약 (!vim9_function || colon)
 		p = skip_range(p, FALSE, NULL);
 	    char_u *tp = p;
-	    if (!vim9_function
+	    만약 (!vim9_function
 		&& (checkforcmd(&p, "append", 1)
 		    || checkforcmd(&p, "change", 1)
 		    || checkforcmd(&p, "insert", 1))
 		    && (*p == '!' || *p == '|' || IS_WHITE_NL_OR_NUL(*p)))
 		skip_until = vim_strnsave((char_u *)".", 1);
-	    else
+	    아니면
 		p = tp;
 
 	    // Check for ":python <<EOF", ":tcl <<EOF", etc.
 	    arg = skipwhite(skiptowhite(p));
-	    if (arg[0] == '<' && arg[1] =='<'
+	    만약 (arg[0] == '<' && arg[1] =='<'
 		    && ((p[0] == 'p' && p[1] == 'y'
 				    && (!ASCII_ISALNUM(p[2]) || p[2] == 't'
 					|| ((p[2] == '3' || p[2] == 'x')
@@ -1315,58 +1315,58 @@ get_function_body(
 	    {
 		// ":python <<" continues until a dot, like ":append"
 		p = skipwhite(arg + 2);
-		if (STRNCMP(p, "trim", 4) == 0
+		만약 (STRNCMP(p, "trim", 4) == 0
 			&& (p[4] == NUL || VIM_ISWHITE(p[4])))
 		{
 		    // Ignore leading white space.
 		    p = skipwhite(p + 4);
 		    heredoc_trimmedlen = skipwhite(theline) - theline;
 		    heredoc_trimmed = vim_strnsave(theline, heredoc_trimmedlen);
-		    if (heredoc_trimmed == NULL)
+		    만약 (heredoc_trimmed == NULL)
 			heredoc_trimmedlen = 0;
 		}
-		if (*p == NUL)
+		만약 (*p == NUL)
 		    skip_until = vim_strnsave((char_u *)".", 1);
-		else
+		아니면
 		    skip_until = vim_strnsave(p, skiptowhite(p) - p);
 		getline_options = GETLINE_NONE;
 		is_heredoc = TRUE;
-		if (vim9_function && nesting == 0)
+		만약 (vim9_function && nesting == 0)
 		    heredoc_concat_len = newlines->ga_len + 1;
 	    }
 
-	    if (!is_heredoc)
+	    만약 (!is_heredoc)
 	    {
 		// Check for ":cmd v =<< [trim] EOF"
 		//       and ":cmd [a, b] =<< [trim] EOF"
 		//       and "lines =<< [trim] EOF" for Vim9
 		// Where "cmd" can be "let", "var", "final" or "const".
 		arg = p;
-		if (checkforcmd(&arg, "let", 2)
+		만약 (checkforcmd(&arg, "let", 2)
 			|| checkforcmd(&arg, "var", 3)
 			|| checkforcmd(&arg, "final", 5)
 			|| checkforcmd(&arg, "const", 5)
 			|| vim9_function)
 		{
-		    int		save_sc_version = current_sctx.sc_version;
-		    int		var_count = 0;
-		    int		semicolon = 0;
+		    정수		save_sc_version = current_sctx.sc_version;
+		    정수		var_count = 0;
+		    정수		semicolon = 0;
 
 		    current_sctx.sc_version
 				     = vim9_function ? SCRIPT_VERSION_VIM9 : 1;
 		    arg = skip_var_list(arg, TRUE, &var_count, &semicolon,
 									 TRUE);
-		    if (arg != NULL)
+		    만약 (arg != NULL)
 			arg = skipwhite(arg);
 		    current_sctx.sc_version = save_sc_version;
-		    if (arg != NULL && STRNCMP(arg, "=<<", 3) == 0)
+		    만약 (arg != NULL && STRNCMP(arg, "=<<", 3) == 0)
 		    {
-			int has_trim = FALSE;
+			정수 has_trim = FALSE;
 
 			p = skipwhite(arg + 3);
-			while (TRUE)
+			동안 (TRUE)
 			{
-			    if (STRNCMP(p, "trim", 4) == 0
+			    만약 (STRNCMP(p, "trim", 4) == 0
 				    && (p[4] == NUL || VIM_ISWHITE(p[4])))
 			    {
 				// Ignore leading white space.
@@ -1374,7 +1374,7 @@ get_function_body(
 				has_trim = TRUE;
 				continue;
 			    }
-			    if (STRNCMP(p, "eval", 4) == 0
+			    만약 (STRNCMP(p, "eval", 4) == 0
 				    && (p[4] == NUL || VIM_ISWHITE(p[4])))
 			    {
 				// Ignore leading white space.
@@ -1383,11 +1383,11 @@ get_function_body(
 			    }
 			    break;
 			}
-			if (has_trim)
+			만약 (has_trim)
 			{
 			    heredoc_trimmedlen = skipwhite(theline) - theline;
 			    heredoc_trimmed = vim_strnsave(theline, heredoc_trimmedlen);
-			    if (heredoc_trimmed == NULL)
+			    만약 (heredoc_trimmed == NULL)
 				heredoc_trimmedlen = 0;
 			}
 			skip_until = vim_strnsave(p, skiptowhite(p) - p);
@@ -1399,10 +1399,10 @@ get_function_body(
 	}
 
 	// Add the line to the function.
-	if (ga_grow_id(newlines, 1 + sourcing_lnum_off, aid_get_func) == FAIL)
+	만약 (ga_grow_id(newlines, 1 + sourcing_lnum_off, aid_get_func) == FAIL)
 	    goto theend;
 
-	if (heredoc_concat_len > 0)
+	만약 (heredoc_concat_len > 0)
 	{
 	    // For a :def function "python << EOF" concatenates all the lines,
 	    // to be used for the instruction later.
@@ -1410,30 +1410,30 @@ get_function_body(
 	    GA_CONCAT_LITERAL(&heredoc_ga, "\n");
 	    p = vim_strnsave((char_u *)"", 0);
 	}
-	else
+	아니면
 	{
 	    // Copy the line to newly allocated memory.  get_one_sourceline()
 	    // allocates 250 bytes per line, this saves 80% on average.  The
 	    // cost is an extra alloc/free.
 	    p = vim_strsave(theline);
 	}
-	if (p == NULL)
+	만약 (p == NULL)
 	    goto theend;
 	((char_u **)(newlines->ga_data))[newlines->ga_len++] = p;
 
 	// Add NULL lines for continuation lines, so that the line count is
 	// equal to the index in the growarray.
-	while (sourcing_lnum_off-- > 0)
+	동안 (sourcing_lnum_off-- > 0)
 	    ((char_u **)(newlines->ga_data))[newlines->ga_len++] = NULL;
 
 	// Check for end of eap->arg.
-	if (line_arg != NULL && *line_arg == NUL)
+	만약 (line_arg != NULL && *line_arg == NUL)
 	    line_arg = NULL;
     }
 
     // Return OK when no error was detected here; "did_emsg" may already be
     // set by an earlier error in the same command.
-    if (did_emsg == did_emsg_start)
+    만약 (did_emsg == did_emsg_start)
 	ret = OK;
 
 theend:
@@ -1441,7 +1441,7 @@ theend:
     vim_free(heredoc_trimmed);
     vim_free(heredoc_ga.ga_data);
     need_wait_return |= saved_wait_return;
-    return ret;
+    반환 ret;
 }
 
 /*
@@ -1450,43 +1450,43 @@ theend:
  * When not evaluating "newargs" is NULL.
  * When successful "rettv" is set to a funcref.
  */
-    static int
+    static 정수
 lambda_function_body(
 	char_u	    **arg,
 	typval_T    *rettv,
 	evalarg_T   *evalarg,
 	garray_T    *newargs,
 	garray_T    *argtypes,
-	int	    varargs,
+	정수	    varargs,
 	garray_T    *default_args,
 	char_u	    *ret_type)
 {
     char_u	*start = *arg;
-    int		evaluate = (evalarg->eval_flags & EVAL_EVALUATE);
+    정수		evaluate = (evalarg->eval_flags & EVAL_EVALUATE);
     garray_T	*gap = &evalarg->eval_ga;
     garray_T	*freegap = &evalarg->eval_freega;
     ufunc_T	*ufunc = NULL;
     exarg_T	eap;
     garray_T	newlines;
     char_u	*cmdline = NULL;
-    int		ret = FAIL;
+    정수		ret = FAIL;
     partial_T	*pt;
     string_T	name;
-    int		lnum_save = -1;
+    정수		lnum_save = -1;
     linenr_T	sourcing_lnum_top = SOURCING_LNUM;
     char_u	*line_arg = NULL;
 
     *arg = skipwhite(*arg + 1);
-    if (**arg == '|' || !ends_excmd2(start, *arg))
+    만약 (**arg == '|' || !ends_excmd2(start, *arg))
     {
 	semsg(_(e_trailing_characters_str), *arg);
-	return FAIL;
+	반환 FAIL;
     }
 
     // When there is a line break use what follows for the lambda body.
     // Makes lambda body initializers work for object and enum member
     // variables.
-    if (**arg == '\n')
+    만약 (**arg == '\n')
 	line_arg = *arg + 1;
 
     CLEAR_FIELD(eap);
@@ -1494,79 +1494,79 @@ lambda_function_body(
     eap.forceit = FALSE;
     eap.cmdlinep = &cmdline;
     eap.skip = !evaluate;
-    if (evalarg->eval_cctx != NULL)
+    만약 (evalarg->eval_cctx != NULL)
 	fill_exarg_from_cctx(&eap, evalarg->eval_cctx);
-    else
+    아니면
     {
 	eap.ea_getline = evalarg->eval_getline;
 	eap.cookie = evalarg->eval_cookie;
     }
 
     ga_init2(&newlines, sizeof(char_u *), 10);
-    if (get_function_body(&eap, &newlines, line_arg,
+    만약 (get_function_body(&eap, &newlines, line_arg,
 					     &evalarg->eval_tofree_ga) == FAIL)
 	goto erret;
 
     // When inside a lambda must add the function lines to evalarg.eval_ga.
     evalarg->eval_break_count += newlines.ga_len;
-    if (gap->ga_itemsize > 0)
+    만약 (gap->ga_itemsize > 0)
     {
-	int	idx;
+	정수	idx;
 	char_u	*last;
 	size_t  plen;
 	char_u  *pnl;
 
-	for (idx = 0; idx < newlines.ga_len; ++idx)
+	위해 (idx = 0; idx < newlines.ga_len; ++idx)
 	{
 	    char_u  *p = ((char_u **)newlines.ga_data)[idx];
-	    if (p == NULL)
+	    만약 (p == NULL)
 		// comment line in the lambda body
 		continue;
 
 	    p = skipwhite(p);
 
-	    if (ga_grow(gap, 1) == FAIL || ga_grow(freegap, 1) == FAIL)
+	    만약 (ga_grow(gap, 1) == FAIL || ga_grow(freegap, 1) == FAIL)
 		goto erret;
 
 	    // Going to concatenate the lines after parsing.  For an empty or
 	    // comment line use an empty string.
 	    // Insert NL characters at the start of each line, the string will
 	    // be split again later in .get_lambda_tv().
-	    if (*p == NUL || vim9_comment_start(p))
+	    만약 (*p == NUL || vim9_comment_start(p))
 	    {
 		p = (char_u *)"";
 		plen = 0;
 	    }
-	    else
+	    아니면
 		plen = STRLEN(p);
 	    pnl = vim_strnsave((char_u *)"\n", plen + 1);
-	    if (pnl != NULL)
+	    만약 (pnl != NULL)
 		mch_memmove(pnl + 1, p, plen + 1);
 	    ((char_u **)gap->ga_data)[gap->ga_len++] = pnl;
 	    ((char_u **)freegap->ga_data)[freegap->ga_len++] = pnl;
 	}
-	if (ga_grow(gap, 1) == FAIL || ga_grow(freegap, 1) == FAIL)
+	만약 (ga_grow(gap, 1) == FAIL || ga_grow(freegap, 1) == FAIL)
 	    goto erret;
-	if (eap.nextcmd != NULL)
+	만약 (eap.nextcmd != NULL)
 	{
 	    // more is following after the "}", which was skipped
 	    last = cmdline;
 	    plen = STRLEN(last);
 	}
-	else
+	아니면
 	{
 	    // nothing is following the "}"
 	    last = (char_u *)"}";
 	    plen = 1;
 	}
 	pnl = vim_strnsave((char_u *)"\n", plen + 1);
-	if (pnl != NULL)
+	만약 (pnl != NULL)
 	    mch_memmove(pnl + 1, last, plen + 1);
 	((char_u **)gap->ga_data)[gap->ga_len++] = pnl;
 	((char_u **)freegap->ga_data)[freegap->ga_len++] = pnl;
     }
 
-    if (eap.nextcmd != NULL)
+    만약 (eap.nextcmd != NULL)
     {
 	garray_T *tfgap = &evalarg->eval_tofree_ga;
 
@@ -1574,16 +1574,16 @@ lambda_function_body(
 	*arg = eap.nextcmd;
 
 	// "arg" points into cmdline, need to keep the line and free it later.
-	if (ga_grow(tfgap, 1) == OK)
+	만약 (ga_grow(tfgap, 1) == OK)
 	{
 	    ((char_u **)(tfgap->ga_data))[tfgap->ga_len++] = cmdline;
 	    evalarg->eval_using_cmdline = TRUE;
 	}
     }
-    else
+    아니면
 	*arg = (char_u *)"";
 
-    if (!evaluate)
+    만약 (!evaluate)
     {
 	ret = OK;
 	goto erret;
@@ -1591,9 +1591,9 @@ lambda_function_body(
 
     name = get_lambda_name();
     ufunc = alloc_ufunc(name.string, name.length);
-    if (ufunc == NULL)
+    만약 (ufunc == NULL)
 	goto erret;
-    if (hash_add(&func_hashtab, UF2HIKEY(ufunc), "add function") == FAIL)
+    만약 (hash_add(&func_hashtab, UF2HIKEY(ufunc), "add function") == FAIL)
 	goto erret;
     ufunc->uf_flags = FC_LAMBDA;
     ufunc->uf_refcount = 1;
@@ -1609,7 +1609,7 @@ lambda_function_body(
 
     // parse argument types, the type variables of the function being
     // compiled may be used
-    if (parse_argument_types(ufunc, argtypes, varargs, NULL, NULL, 0,
+    만약 (parse_argument_types(ufunc, argtypes, varargs, NULL, NULL, 0,
 					    evalarg->eval_cctx) == FAIL)
     {
 	SOURCING_LNUM = lnum_save;
@@ -1617,20 +1617,20 @@ lambda_function_body(
     }
 
     // parse the return type, if any
-    if (parse_return_type(ufunc, ret_type, evalarg->eval_cctx) == FAIL)
+    만약 (parse_return_type(ufunc, ret_type, evalarg->eval_cctx) == FAIL)
 	goto erret;
 
     pt = ALLOC_CLEAR_ONE(partial_T);
-    if (pt == NULL)
+    만약 (pt == NULL)
 	goto erret;
     pt->pt_func = ufunc;
     pt->pt_refcount = 1;
 
     ufunc->uf_lines = newlines;
     newlines.ga_data = NULL;
-    if (sandbox)
+    만약 (sandbox)
 	ufunc->uf_flags |= FC_SANDBOX;
-    if (!ASCII_ISUPPER(*ufunc->uf_name))
+    만약 (!ASCII_ISUPPER(*ufunc->uf_name))
 	ufunc->uf_flags |= FC_VIM9;
     ufunc->uf_script_ctx = current_sctx;
     ufunc->uf_script_ctx_version = current_sctx.sc_version;
@@ -1645,18 +1645,18 @@ lambda_function_body(
     ret = OK;
 
 erret:
-    if (lnum_save >= 0)
+    만약 (lnum_save >= 0)
 	SOURCING_LNUM = lnum_save;
     ga_clear_strings(&newlines);
-    if (newargs != NULL)
+    만약 (newargs != NULL)
 	ga_clear_strings(newargs);
     ga_clear_strings(default_args);
-    if (ufunc != NULL)
+    만약 (ufunc != NULL)
     {
 	func_clear(ufunc, TRUE);
 	func_free(ufunc, TRUE);
     }
-    return ret;
+    반환 ret;
 }
 
 /*
@@ -1665,15 +1665,15 @@ erret:
  * When "types_optional" is TRUE optionally take argument types.
  * Return OK or FAIL.  Returns NOTDONE for dict or {expr}.
  */
-    int
+    정수
 get_lambda_tv(
 	char_u	    **arg,
 	typval_T    *rettv,
-	int	    types_optional,
+	정수	    types_optional,
 	evalarg_T   *evalarg,
 	cctx_T	    *cctx)
 {
-    int		evaluate = evalarg != NULL
+    정수		evaluate = evalarg != NULL
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
     garray_T	newargs;
     garray_T	newlines;
@@ -1683,22 +1683,22 @@ get_lambda_tv(
     garray_T	arg_objm;
     ufunc_T	*fp = NULL;
     partial_T   *pt = NULL;
-    int		varargs;
+    정수		varargs;
     char_u	*ret_type = NULL;
-    int		ret;
+    정수		ret;
     char_u	*s;
     char_u	*start, *end;
-    int		*old_eval_lavars = eval_lavars_used;
-    int		eval_lavars = FALSE;
+    정수		*old_eval_lavars = eval_lavars_used;
+    정수		eval_lavars = FALSE;
     char_u	*tofree2 = NULL;
-    int		equal_arrow = **arg == '(';
-    int		white_error = FALSE;
-    int		called_emsg_start = called_emsg;
-    int		vim9script = in_vim9script();
+    정수		equal_arrow = **arg == '(';
+    정수		white_error = FALSE;
+    정수		called_emsg_start = called_emsg;
+    정수		vim9script = in_vim9script();
     long	start_lnum = SOURCING_LNUM;
 
-    if (equal_arrow && !vim9script)
-	return NOTDONE;
+    만약 (equal_arrow && !vim9script)
+	반환 NOTDONE;
 
     ga_init(&newargs);
     ga_init(&newlines);
@@ -1710,20 +1710,20 @@ get_lambda_tv(
 	    types_optional ? &argtypes : NULL, types_optional,
 			types_optional ? &arg_objm : NULL, evalarg,
 			NULL, &default_args, TRUE, NULL, FALSE, NULL, NULL);
-    if (ret == FAIL || skip_arrow(s, equal_arrow, &ret_type, NULL) == NULL)
+    만약 (ret == FAIL || skip_arrow(s, equal_arrow, &ret_type, NULL) == NULL)
     {
-	if (types_optional)
+	만약 (types_optional)
 	{
 	    ga_clear_strings(&argtypes);
 	    ga_clear(&arg_objm);
 	}
-	return called_emsg == called_emsg_start ? NOTDONE : FAIL;
+	반환 called_emsg == called_emsg_start ? NOTDONE : FAIL;
     }
 
     // Parse the arguments for real.
-    if (evaluate)
+    만약 (evaluate)
 	pnewargs = &newargs;
-    else
+    아니면
 	pnewargs = NULL;
     *arg += 1;
     ret = get_function_args(arg, equal_arrow ? ')' : '-', pnewargs,
@@ -1731,47 +1731,47 @@ get_lambda_tv(
 			types_optional ? &arg_objm : NULL, evalarg,
 					    &varargs, &default_args,
 					    FALSE, NULL, FALSE, NULL, NULL);
-    if (ret == FAIL
+    만약 (ret == FAIL
 		  || (s = skip_arrow(*arg, equal_arrow, &ret_type,
 		equal_arrow || vim9script ? &white_error : NULL)) == NULL)
     {
-	if (types_optional)
+	만약 (types_optional)
 	{
 	    ga_clear_strings(&argtypes);
 	    ga_clear(&arg_objm);
 	}
 	ga_clear_strings(&newargs);
-	return white_error ? FAIL : NOTDONE;
+	반환 white_error ? FAIL : NOTDONE;
     }
     *arg = s;
 
     // Skipping over linebreaks may make "ret_type" invalid, make a copy.
-    if (ret_type != NULL)
+    만약 (ret_type != NULL)
     {
 	ret_type = vim_strsave(ret_type);
 	tofree2 = ret_type;
     }
 
     // Set up a flag for checking local variables and arguments.
-    if (evaluate)
+    만약 (evaluate)
 	eval_lavars_used = &eval_lavars;
 
     *arg = skipwhite_and_linebreak(*arg, evalarg);
 
     // Recognize "{" as the start of a function body.
-    if (equal_arrow && **arg == '{')
+    만약 (equal_arrow && **arg == '{')
     {
-	if (evalarg == NULL)
+	만약 (evalarg == NULL)
 	    // cannot happen?
 	    goto theend;
 	SOURCING_LNUM = start_lnum;  // used for where lambda is defined
-	if (lambda_function_body(arg, rettv, evalarg, pnewargs,
+	만약 (lambda_function_body(arg, rettv, evalarg, pnewargs,
 			   types_optional ? &argtypes : NULL, varargs,
 			   &default_args, ret_type) == FAIL)
 	    goto errret;
 	goto theend;
     }
-    if (default_args.ga_len > 0)
+    만약 (default_args.ga_len > 0)
     {
 	emsg(_(e_cannot_use_default_values_in_lambda));
 	goto errret;
@@ -1780,13 +1780,13 @@ get_lambda_tv(
     // Get the start and the end of the expression.
     start = *arg;
     ret = skip_expr_concatenate(arg, &start, &end, evalarg);
-    if (ret == FAIL)
+    만약 (ret == FAIL)
 	goto errret;
 
-    if (!equal_arrow)
+    만약 (!equal_arrow)
     {
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg != '}')
+	만약 (**arg != '}')
 	{
 	    semsg(_(e_expected_right_curly_str), *arg);
 	    goto errret;
@@ -1794,94 +1794,94 @@ get_lambda_tv(
 	++*arg;
     }
 
-    if (evaluate)
+    만약 (evaluate)
     {
-	int	    len;
-	int	    flags = FC_LAMBDA;
+	정수	    len;
+	정수	    flags = FC_LAMBDA;
 	char_u	    *p;
 	char_u	    *line_end;
 	string_T    name = get_lambda_name();
 
 	fp = alloc_ufunc(name.string, name.length);
-	if (fp == NULL)
+	만약 (fp == NULL)
 	    goto errret;
 	fp->uf_def_status = UF_NOT_COMPILED;
 	pt = ALLOC_CLEAR_ONE(partial_T);
-	if (pt == NULL)
+	만약 (pt == NULL)
 	    goto errret;
 
 	ga_init2(&newlines, sizeof(char_u *), 1);
-	if (ga_grow(&newlines, 1) == FAIL)
+	만약 (ga_grow(&newlines, 1) == FAIL)
 	    goto errret;
 
 	// If there are line breaks, we need to split up the string.
 	line_end = vim_strchr(start, '\n');
-	if (line_end == NULL || line_end > end)
+	만약 (line_end == NULL || line_end > end)
 	    line_end = end;
 
 	// Add "return " before the expression (or the first line).
-	len = 7 + (int)(line_end - start) + 1;
+	len = 7 + (정수)(line_end - start) + 1;
 	p = alloc(len);
-	if (p == NULL)
+	만약 (p == NULL)
 	    goto errret;
 	((char_u **)(newlines.ga_data))[newlines.ga_len++] = p;
 	STRCPY(p, "return ");
 	vim_strncpy(p + 7, start, line_end - start);
 
-	if (line_end != end)
+	만약 (line_end != end)
 	{
 	    // Add more lines, split by line breaks.  Thus is used when a
 	    // lambda with { cmds } is encountered.
-	    while (line_end < end && *line_end == '\n')
+	    동안 (line_end < end && *line_end == '\n')
 	    {
-		if (ga_grow(&newlines, 1) == FAIL)
+		만약 (ga_grow(&newlines, 1) == FAIL)
 		    goto errret;
 		start = line_end + 1;
 		line_end = vim_strchr(start, '\n');
-		if (line_end == NULL || line_end > end)
+		만약 (line_end == NULL || line_end > end)
 		    line_end = end;
 		((char_u **)(newlines.ga_data))[newlines.ga_len++] =
 					 vim_strnsave(start, line_end - start);
 	    }
 	}
 
-	if (strstr((char *)p + 7, "a:") == NULL)
+	만약 (strstr((char *)p + 7, "a:") == NULL)
 	    // No a: variables are used for sure.
 	    flags |= FC_NOARGS;
 
 	fp->uf_refcount = 1;
 	fp->uf_args = newargs;
 	ga_init(&fp->uf_def_args);
-	if (types_optional)
+	만약 (types_optional)
 	{
-	    if (parse_argument_types(fp, &argtypes,
+	    만약 (parse_argument_types(fp, &argtypes,
 				vim9script && varargs, NULL, NULL, 0,
 				cctx) == FAIL)
 		goto errret;
-	    if (ret_type != NULL)
+	    만약 (ret_type != NULL)
 	    {
 		fp->uf_ret_type = parse_type(&ret_type, &fp->uf_type_list,
 					     NULL, cctx, TRUE);
-		if (fp->uf_ret_type == NULL)
+		만약 (fp->uf_ret_type == NULL)
 		    goto errret;
 	    }
-	    else
+	    아니면
 		fp->uf_ret_type = &t_unknown;
 	}
 
 	fp->uf_lines = newlines;
-	if (current_funccal != NULL && eval_lavars)
+	만약 (current_funccal != NULL && eval_lavars)
 	{
 	    flags |= FC_CLOSURE;
-	    if (register_closure(fp) == FAIL)
+	    만약 (register_closure(fp) == FAIL)
 		goto errret;
 	}
 
 #ifdef FEAT_PROFILE
-	if (prof_def_func())
+	만약 (prof_def_func())
 	    func_do_profile(fp);
 #endif
-	if (sandbox)
+	만약 (sandbox)
 	    flags |= FC_SANDBOX;
 	// In legacy script a lambda can be called with more args than
 	// uf_args.ga_len.  In Vim9 script "...name" has to be used.
@@ -1905,24 +1905,24 @@ get_lambda_tv(
 theend:
     eval_lavars_used = old_eval_lavars;
     vim_free(tofree2);
-    if (types_optional)
+    만약 (types_optional)
     {
 	ga_clear_strings(&argtypes);
 	ga_clear(&arg_objm);
     }
 
-    return OK;
+    반환 OK;
 
 errret:
     ga_clear_strings(&newargs);
     ga_clear_strings(&newlines);
     ga_clear_strings(&default_args);
-    if (types_optional)
+    만약 (types_optional)
     {
 	ga_clear_strings(&argtypes);
 	ga_clear(&arg_objm);
     }
-    if (fp != NULL)
+    만약 (fp != NULL)
     {
 	vim_free(fp->uf_arg_types);
 	vim_free(fp->uf_name_exp);
@@ -1933,7 +1933,7 @@ errret:
     vim_free(pt);
     vim_free(tofree2);
     eval_lavars_used = old_eval_lavars;
-    return FAIL;
+    반환 FAIL;
 }
 
 /*
@@ -1949,21 +1949,21 @@ errret:
     char_u *
 deref_func_name(
 	char_u	    *name,
-	int	    *lenp,
+	정수	    *lenp,
 	partial_T   **partialp,
 	type_T	    **type,
-	int	    no_autoload,
-	int	    new_function,
-	int	    *found_var)
+	정수	    no_autoload,
+	정수	    new_function,
+	정수	    *found_var)
 {
     dictitem_T	*v;
     typval_T	*tv = NULL;
-    int		cc;
+    정수		cc;
     char_u	*s = NULL;
     hashtab_T	*ht;
-    int		did_type = FALSE;
+    정수		did_type = FALSE;
 
-    if (partialp != NULL)
+    만약 (partialp != NULL)
 	*partialp = NULL;
 
     cc = name[*lenp];
@@ -1971,17 +1971,17 @@ deref_func_name(
 
     v = find_var_also_in_script(name, &ht, no_autoload);
     name[*lenp] = cc;
-    if (v != NULL)
+    만약 (v != NULL)
     {
 	tv = &v->di_tv;
     }
-    else if (in_vim9script() || STRNCMP(name, "s:", 2) == 0)
+    아니면 만약 (in_vim9script() || STRNCMP(name, "s:", 2) == 0)
     {
 	imported_T  *import;
 	char_u	    *p = name;
-	int	    len = *lenp;
+	정수	    len = *lenp;
 
-	if (STRNCMP(name, "s:", 2) == 0)
+	만약 (STRNCMP(name, "s:", 2) == 0)
 	{
 	    p = name + 2;
 	    len -= 2;
@@ -1989,73 +1989,73 @@ deref_func_name(
 	import = find_imported(p, len, FALSE);
 
 	// imported function from another script
-	if (import != NULL)
+	만약 (import != NULL)
 	{
 	    name[len] = NUL;
-	    if (new_function)
+	    만약 (new_function)
 		semsg(_(e_redefining_imported_item_str), name);
-	    else
+	    아니면
 		semsg(_(e_cannot_use_str_itself_it_is_imported), name);
 	    name[len] = cc;
 	    *lenp = 0;
-	    return (char_u *)"";	// just in case
+	    반환 (char_u *)"";	// just in case
 	}
     }
 
-    if (tv != NULL)
+    만약 (tv != NULL)
     {
-	if (found_var != NULL)
+	만약 (found_var != NULL)
 	    *found_var = TRUE;
-	if (tv->v_type == VAR_FUNC)
+	만약 (tv->v_type == VAR_FUNC)
 	{
-	    if (tv->vval.v_string == NULL)
+	    만약 (tv->vval.v_string == NULL)
 	    {
 		*lenp = 0;
-		return (char_u *)"";	// just in case
+		반환 (char_u *)"";	// just in case
 	    }
 	    s = tv->vval.v_string;
 	    char_u *p = generic_func_find_open_bracket(s);
-	    if (p != NULL && generic_func_find_open_bracket(name) != NULL)
+	    만약 (p != NULL && generic_func_find_open_bracket(name) != NULL)
 	    {
 		// the funcref name already has generic types but types are
 		// specified when using the funcref.
 		*lenp = 0;
-		return (char_u *)"";
+		반환 (char_u *)"";
 	    }
-	    if (p != NULL)
+	    만약 (p != NULL)
 		*lenp = p - s;
-	    else
-		*lenp = (int)STRLEN(s);
+	    아니면
+		*lenp = (정수)STRLEN(s);
 	}
-	else if (tv->v_type == VAR_PARTIAL)
+	아니면 만약 (tv->v_type == VAR_PARTIAL)
 	{
 	    partial_T *pt = tv->vval.v_partial;
 
-	    if (pt == NULL)
+	    만약 (pt == NULL)
 	    {
 		*lenp = 0;
-		return (char_u *)"";	// just in case
+		반환 (char_u *)"";	// just in case
 	    }
-	    if (partialp != NULL)
+	    만약 (partialp != NULL)
 		*partialp = pt;
 	    s = partial_name(pt);
-	    *lenp = (int)STRLEN(s);
+	    *lenp = (정수)STRLEN(s);
 	}
 
-	if (s != NULL)
+	만약 (s != NULL)
 	{
-	    if (!did_type && type != NULL && ht == get_script_local_ht())
+	    만약 (!did_type && type != NULL && ht == get_script_local_ht())
 	    {
 		svar_T  *sv = find_typval_in_script(tv, 0, TRUE);
 
-		if (sv != NULL)
+		만약 (sv != NULL)
 		    *type = sv->sv_type;
 	    }
-	    return s;
+	    반환 s;
 	}
     }
 
-    return name;
+    반환 name;
 }
 
 /*
@@ -2067,10 +2067,10 @@ emsg_funcname(char *ermsg, char_u *name)
 {
     char_u	*p = name;
 
-    if (name[0] == K_SPECIAL && name[1] != NUL && name[2] != NUL)
+    만약 (name[0] == K_SPECIAL && name[1] != NUL && name[2] != NUL)
 	p = concat_str((char_u *)"<SNR>", name + 3);
     semsg(_(ermsg), p);
-    if (p != name)
+    만약 (p != name)
 	vim_free(p);
 }
 
@@ -2079,37 +2079,37 @@ emsg_funcname(char *ermsg, char_u *name)
  * Return them in "*argvars[MAX_FUNC_ARGS + 1]" and the count in "argcount".
  * On failure FAIL is returned but the "argvars[argcount]" are still set.
  */
-    int
+    정수
 get_func_arguments(
 	char_u	    **arg,
 	evalarg_T   *evalarg,
-	int	    partial_argc,
+	정수	    partial_argc,
 	typval_T    *argvars,
-	int	    *argcount,
-	int	    is_builtin)
+	정수	    *argcount,
+	정수	    is_builtin)
 {
     char_u	*argp = *arg;
-    int		ret = OK;
-    int		vim9script = in_vim9script();
-    int		evaluate = evalarg == NULL
+    정수		ret = OK;
+    정수		vim9script = in_vim9script();
+    정수		evaluate = evalarg == NULL
 			       ? FALSE : (evalarg->eval_flags & EVAL_EVALUATE);
 
-    while (*argcount < MAX_FUNC_ARGS - partial_argc)
+    동안 (*argcount < MAX_FUNC_ARGS - partial_argc)
     {
 	// skip the '(' or ',' and possibly line breaks
 	argp = skipwhite_and_linebreak(argp + 1, evalarg);
 
-	if (*argp == ')' || *argp == ',' || *argp == NUL)
+	만약 (*argp == ')' || *argp == ',' || *argp == NUL)
 	    break;
 
-	int arg_idx = *argcount;
-	if (eval1(&argp, &argvars[arg_idx], evalarg) == FAIL)
+	정수 arg_idx = *argcount;
+	만약 (eval1(&argp, &argvars[arg_idx], evalarg) == FAIL)
 	{
 	    ret = FAIL;
 	    break;
 	}
 	++*argcount;
-	if (!is_builtin && check_typval_is_value(&argvars[arg_idx]) == FAIL)
+	만약 (!is_builtin && check_typval_is_value(&argvars[arg_idx]) == FAIL)
 	{
 	    ret = FAIL;
 	    break;
@@ -2117,24 +2117,24 @@ get_func_arguments(
 
 	// The comma should come right after the argument, but this wasn't
 	// checked previously, thus only enforce it in Vim9 script.
-	if (vim9script)
+	만약 (vim9script)
 	{
-	    if (*argp != ',' && *skipwhite(argp) == ',')
+	    만약 (*argp != ',' && *skipwhite(argp) == ',')
 	    {
-		if (evaluate)
+		만약 (evaluate)
 		    semsg(_(e_no_white_space_allowed_before_str_str),
 								    ",", argp);
 		ret = FAIL;
 		break;
 	    }
 	}
-	else
+	아니면
 	    argp = skipwhite(argp);
-	if (*argp != ',')
+	만약 (*argp != ',')
 	    break;
-	if (vim9script && !IS_WHITE_NL_OR_NUL(argp[1]))
+	만약 (vim9script && !IS_WHITE_NL_OR_NUL(argp[1]))
 	{
-	    if (evaluate)
+	    만약 (evaluate)
 		semsg(_(e_white_space_required_after_str_str), ",", argp);
 	    ret = FAIL;
 	    break;
@@ -2142,33 +2142,33 @@ get_func_arguments(
     }
 
     argp = skipwhite_and_linebreak(argp, evalarg);
-    if (*argp == ')')
+    만약 (*argp == ')')
 	++argp;
-    else
+    아니면
 	ret = FAIL;
     *arg = argp;
-    return ret;
+    반환 ret;
 }
 
 /*
  * Call a function and put the result in "rettv".
  * Return OK or FAIL.
  */
-    int
+    정수
 get_func_tv(
     char_u	*name,		// name of the function
-    int		len,		// length of "name" or -1 to use strlen()
+    정수		len,		// length of "name" or -1 to use strlen()
     typval_T	*rettv,
     char_u	**arg,		// argument, pointing to the '('
     evalarg_T	*evalarg,	// for line continuation
     funcexe_T	*funcexe)	// various values
 {
     char_u	*argp;
-    int		ret;
+    정수		ret;
     typval_T	argvars[MAX_FUNC_ARGS + 1];	// vars for arguments
-    int		argcount = 0;			// number of arguments found
-    int		vim9script = in_vim9script();
-    int		evaluate = evalarg == NULL
+    정수		argcount = 0;			// number of arguments found
+    정수		vim9script = in_vim9script();
+    정수		evaluate = evalarg == NULL
 			       ? FALSE : (evalarg->eval_flags & EVAL_EVALUATE);
 
     argp = *arg;
@@ -2176,25 +2176,25 @@ get_func_tv(
 	    (funcexe->fe_partial == NULL ? 0 : funcexe->fe_partial->pt_argc),
 			       argvars, &argcount, builtin_function(name, -1));
 
-    if (ret == OK)
+    만약 (ret == OK)
     {
-	int	i = 0;
-	int	did_emsg_before = did_emsg;
+	정수	i = 0;
+	정수	did_emsg_before = did_emsg;
 
-	if (get_vim_var_nr(VV_TESTING))
+	만약 (get_vim_var_nr(VV_TESTING))
 	{
 	    // Prepare for calling test_garbagecollect_now(), need to know
 	    // what variables are used on the call stack.
-	    if (funcargs.ga_itemsize == 0)
+	    만약 (funcargs.ga_itemsize == 0)
 		ga_init2(&funcargs, sizeof(typval_T *), 50);
-	    for (i = 0; i < argcount; ++i)
-		if (ga_grow(&funcargs, 1) == OK)
+	    위해 (i = 0; i < argcount; ++i)
+		만약 (ga_grow(&funcargs, 1) == OK)
 		    ((typval_T **)funcargs.ga_data)[funcargs.ga_len++] =
 								  &argvars[i];
 	}
 
 	ret = call_func(name, len, rettv, argcount, argvars, funcexe);
-	if (vim9script && did_emsg > did_emsg_before)
+	만약 (vim9script && did_emsg > did_emsg_before)
 	{
 	    // An error in a builtin function does not return FAIL, but we do
 	    // want to abort further processing if an error was given.
@@ -2204,32 +2204,32 @@ get_func_tv(
 
 	funcargs.ga_len -= i;
     }
-    else if (!aborting() && evaluate)
+    아니면 만약 (!aborting() && evaluate)
     {
-	if (argcount == MAX_FUNC_ARGS)
+	만약 (argcount == MAX_FUNC_ARGS)
 	    emsg_funcname(e_too_many_arguments_for_function_str_2, name);
-	else
+	아니면
 	    emsg_funcname(e_invalid_arguments_for_function_str, name);
     }
 
-    while (--argcount >= 0)
+    동안 (--argcount >= 0)
 	clear_tv(&argvars[argcount]);
 
-    if (vim9script)
+    만약 (vim9script)
 	*arg = argp;
-    else
+    아니면
 	*arg = skipwhite(argp);
-    return ret;
+    반환 ret;
 }
 
 /*
  * Return TRUE if "p" starts with "<SID>" or "s:".
  * Only works if eval_fname_script() returned non-zero for "p"!
  */
-    static int
+    static 정수
 eval_fname_sid(char_u *p)
 {
-    return (*p == 's' || TOUPPER_ASC(p[2]) == 'I');
+    반환 (*p == 's' || TOUPPER_ASC(p[2]) == 'I');
 }
 
 /*
@@ -2251,20 +2251,20 @@ fname_trans_sid(
     size_t	fname_buflen;
 
     script_name = name + eval_fname_script(name);
-    if (script_name == name)
-	return name;  // no prefix
+    만약 (script_name == name)
+	반환 name;  // no prefix
 
     fname_buf[0] = K_SPECIAL;
     fname_buf[1] = KS_EXTRA;
-    fname_buf[2] = (int)KE_SNR;
+    fname_buf[2] = (정수)KE_SNR;
     fname_buflen = 3;
-    if (!eval_fname_sid(name))	// "<SID>" or "s:"
+    만약 (!eval_fname_sid(name))	// "<SID>" or "s:"
 	fname_buf[fname_buflen] = NUL;
-    else
+    아니면
     {
-	if (current_sctx.sc_sid <= 0)
+	만약 (current_sctx.sc_sid <= 0)
 	    *error = FCERR_SCRIPT;
-	else
+	아니면
 	{
 	    fname_buflen += vim_snprintf((char *)fname_buf + 3,
 						FLEN_FIXED - 3,
@@ -2273,23 +2273,23 @@ fname_trans_sid(
 	}
     }
     fnamelen = fname_buflen + STRLEN(script_name);
-    if (fnamelen < FLEN_FIXED)
+    만약 (fnamelen < FLEN_FIXED)
     {
 	STRCPY(fname_buf + fname_buflen, script_name);
 	fname = fname_buf;
     }
-    else
+    아니면
     {
 	fname = alloc(fnamelen + 1);
-	if (fname == NULL)
+	만약 (fname == NULL)
 	    *error = FCERR_OTHER;
-	else
+	아니면
 	{
 	    *tofree = fname;
 	    vim_snprintf((char *)fname, fnamelen + 1, "%s%s", fname_buf, script_name);
 	}
     }
-    return fname;
+    반환 fname;
 }
 
 /*
@@ -2297,12 +2297,12 @@ fname_trans_sid(
  * "buffer" must have size MAX_FUNC_NAME_LEN.
  */
     void
-func_name_with_sid(char_u *name, int sid, char_u *buffer)
+func_name_with_sid(char_u *name, 정수 sid, char_u *buffer)
 {
     // A script-local function is stored as "<SNR>99_name".
     buffer[0] = K_SPECIAL;
     buffer[1] = KS_EXTRA;
-    buffer[2] = (int)KE_SNR;
+    buffer[2] = (정수)KE_SNR;
     vim_snprintf((char *)buffer + 3, MAX_FUNC_NAME_LEN - 3, "%ld_%s",
 							      (long)sid, name);
 }
@@ -2311,37 +2311,37 @@ func_name_with_sid(char_u *name, int sid, char_u *buffer)
  * Find a function "name" in script "sid".
  */
     static ufunc_T *
-find_func_with_sid(char_u *name, int sid)
+find_func_with_sid(char_u *name, 정수 sid)
 {
     hashitem_T	    *hi;
     char_u	    buffer[MAX_FUNC_NAME_LEN];
 
-    if (!SCRIPT_ID_VALID(sid))
-	return NULL;	// not in a script
+    만약 (!SCRIPT_ID_VALID(sid))
+	반환 NULL;	// not in a script
 
     func_name_with_sid(name, sid, buffer);
     hi = hash_find(&func_hashtab, buffer);
-    if (!HASHITEM_EMPTY(hi))
-	return HI2UF(hi);
-    return NULL;
+    만약 (!HASHITEM_EMPTY(hi))
+	반환 HI2UF(hi);
+    반환 NULL;
 }
 
 /*
  * Find a function "name" in script "sid" prefixing the autoload prefix.
  */
     static ufunc_T *
-find_func_with_prefix(char_u *name, int sid)
+find_func_with_prefix(char_u *name, 정수 sid)
 {
     hashitem_T	    *hi;
     char_u	    buffer[MAX_FUNC_NAME_LEN];
     scriptitem_T    *si;
 
-    if (vim_strchr(name, AUTOLOAD_CHAR) != NULL)
-	return NULL;	// already has the prefix
-    if (!SCRIPT_ID_VALID(sid))
-	return NULL;	// not in a script
+    만약 (vim_strchr(name, AUTOLOAD_CHAR) != NULL)
+	반환 NULL;	// already has the prefix
+    만약 (!SCRIPT_ID_VALID(sid))
+	반환 NULL;	// not in a script
     si = SCRIPT_ITEM(sid);
-    if (si->sn_autoload_prefix != NULL)
+    만약 (si->sn_autoload_prefix != NULL)
     {
 	size_t	len = STRLEN(si->sn_autoload_prefix) + STRLEN(name) + 1;
 	char_u	*auto_name;
@@ -2349,28 +2349,28 @@ find_func_with_prefix(char_u *name, int sid)
 
 	// skip a "<SNR>99_" prefix
 	namep = untrans_function_name(name);
-	if (namep == NULL)
+	만약 (namep == NULL)
 	    namep = name;
 
 	// An exported function in an autoload script is stored as
 	// "dir#path#name".
-	if (len < sizeof(buffer))
+	만약 (len < sizeof(buffer))
 	    auto_name = buffer;
-	else
+	아니면
 	    auto_name = alloc(len);
-	if (auto_name != NULL)
+	만약 (auto_name != NULL)
 	{
 	    vim_snprintf((char *)auto_name, len, "%s%s",
 						si->sn_autoload_prefix, namep);
 	    hi = hash_find(&func_hashtab, auto_name);
-	    if (auto_name != buffer)
+	    만약 (auto_name != buffer)
 		vim_free(auto_name);
-	    if (!HASHITEM_EMPTY(hi))
-		return HI2UF(hi);
+	    만약 (!HASHITEM_EMPTY(hi))
+		반환 HI2UF(hi);
 	}
     }
 
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -2381,48 +2381,48 @@ find_func_with_prefix(char_u *name, int sid)
  * Return NULL for unknown function.
  */
     ufunc_T *
-find_func_even_dead(char_u *name, int flags)
+find_func_even_dead(char_u *name, 정수 flags)
 {
     hashitem_T	*hi;
     ufunc_T	*func;
 
-    if ((flags & FFED_IS_GLOBAL) == 0)
+    만약 ((flags & FFED_IS_GLOBAL) == 0)
     {
 	// Find script-local function before global one.
-	if (in_vim9script() && eval_isnamec1(*name)
+	만약 (in_vim9script() && eval_isnamec1(*name)
 					   && (name[1] != ':' || *name == 's'))
 	{
 	    func = find_func_with_sid(name[0] == 's' && name[1] == ':'
 				       ? name + 2 : name, current_sctx.sc_sid);
-	    if (func != NULL)
-		return func;
+	    만약 (func != NULL)
+		반환 func;
 	}
-	if (in_vim9script() && STRNCMP(name, "<SNR>", 5) == 0)
+	만약 (in_vim9script() && STRNCMP(name, "<SNR>", 5) == 0)
 	{
 	    char_u  *p = name + 5;
 	    long    sid;
 
 	    // printable "<SNR>123_Name" form
 	    sid = getdigits(&p);
-	    if (*p == '_')
+	    만약 (*p == '_')
 	    {
-		func = find_func_with_sid(p + 1, (int)sid);
-		if (func != NULL)
-		    return func;
+		func = find_func_with_sid(p + 1, (정수)sid);
+		만약 (func != NULL)
+		    반환 func;
 	    }
 	}
     }
 
-    if ((flags & FFED_NO_GLOBAL) == 0)
+    만약 ((flags & FFED_NO_GLOBAL) == 0)
     {
 	hi = hash_find(&func_hashtab,
 				STRNCMP(name, "g:", 2) == 0 ? name + 2 : name);
-	if (!HASHITEM_EMPTY(hi))
-	    return HI2UF(hi);
+	만약 (!HASHITEM_EMPTY(hi))
+	    반환 HI2UF(hi);
     }
 
     // Find autoload function if this is an autoload script.
-    return find_func_with_prefix(name[0] == 's' && name[1] == ':'
+    반환 find_func_with_prefix(name[0] == 's' && name[1] == ':'
 				       ? name + 2 : name, current_sctx.sc_sid);
 }
 
@@ -2432,31 +2432,31 @@ find_func_even_dead(char_u *name, int flags)
  * Return NULL for unknown or dead function.
  */
     ufunc_T *
-find_func(char_u *name, int is_global)
+find_func(char_u *name, 정수 is_global)
 {
     ufunc_T	*fp = find_func_even_dead(name, is_global ? FFED_IS_GLOBAL : 0);
 
-    if (fp != NULL && (fp->uf_flags & FC_DEAD) == 0)
-	return fp;
-    return NULL;
+    만약 (fp != NULL && (fp->uf_flags & FC_DEAD) == 0)
+	반환 fp;
+    반환 NULL;
 }
 
 /*
  * Return TRUE if "ufunc" is a global function.
  */
-    int
+    정수
 func_is_global(ufunc_T *ufunc)
 {
-    return ufunc->uf_name[0] != K_SPECIAL;
+    반환 ufunc->uf_name[0] != K_SPECIAL;
 }
 
 /*
  * Return TRUE if "ufunc" must be called with a g: prefix in Vim9 script.
  */
-    int
+    정수
 func_requires_g_prefix(ufunc_T *ufunc)
 {
-    return func_is_global(ufunc)
+    반환 func_is_global(ufunc)
 	    && (ufunc->uf_flags & FC_LAMBDA) == 0
 	    && !IS_GENERIC_FUNC(ufunc)
 	    && vim_strchr(ufunc->uf_name, AUTOLOAD_CHAR) == NULL
@@ -2468,17 +2468,17 @@ func_requires_g_prefix(ufunc_T *ufunc)
  * "buf" must be able to hold the function name plus three bytes.
  * Takes care of script-local function names.
  */
-    static int
+    static 정수
 cat_func_name(char_u *buf, size_t bufsize, ufunc_T *fp)
 {
-    int	len;
+    정수	len;
 
-    if (!func_is_global(fp))
+    만약 (!func_is_global(fp))
 	len = vim_snprintf((char *)buf, bufsize, "<SNR>%s", fp->uf_name + 3);
-    else
+    아니면
 	len = vim_snprintf((char *)buf, bufsize, "%s", fp->uf_name);
 
-    return (len >= (int)bufsize) ? (int)bufsize - 1 : len;
+    반환 (len >= (정수)bufsize) ? (정수)bufsize - 1 : len;
 }
 
 /*
@@ -2505,9 +2505,9 @@ add_nr_var(
     static void
 free_funccal(funccall_T *fc)
 {
-    int	i;
+    정수	i;
 
-    for (i = 0; i < fc->fc_ufuncs.ga_len; ++i)
+    위해 (i = 0; i < fc->fc_ufuncs.ga_len; ++i)
     {
 	ufunc_T *fp = ((ufunc_T **)(fc->fc_ufuncs.ga_data))[i];
 
@@ -2515,7 +2515,7 @@ free_funccal(funccall_T *fc)
 	// function that references it, clear its uf_scoped field.
 	// The function may have been redefined and point to another
 	// funccall_T, don't clear it then.
-	if (fp != NULL && fp->uf_scoped == fc)
+	만약 (fp != NULL && fp->uf_scoped == fc)
 	    fp->uf_scoped = NULL;
     }
     ga_clear(&fc->fc_ufuncs);
@@ -2554,35 +2554,35 @@ free_funccal_contents(funccall_T *fc)
     static void
 cleanup_function_call(funccall_T *fc)
 {
-    int	may_free_fc = fc->fc_refcount <= 0;
-    int	free_fc = TRUE;
+    정수	may_free_fc = fc->fc_refcount <= 0;
+    정수	free_fc = TRUE;
 
     current_funccal = fc->fc_caller;
 
     // Free all l: variables if not referred.
-    if (may_free_fc && fc->fc_l_vars.dv_refcount == DO_NOT_FREE_CNT)
+    만약 (may_free_fc && fc->fc_l_vars.dv_refcount == DO_NOT_FREE_CNT)
 	vars_clear(&fc->fc_l_vars.dv_hashtab);
-    else
+    아니면
 	free_fc = FALSE;
 
     // If the a:000 list and the l: and a: dicts are not referenced and
     // there is no closure using it, we can free the funccall_T and what's
     // in it.
-    if (may_free_fc && fc->fc_l_avars.dv_refcount == DO_NOT_FREE_CNT)
+    만약 (may_free_fc && fc->fc_l_avars.dv_refcount == DO_NOT_FREE_CNT)
 	vars_clear_ext(&fc->fc_l_avars.dv_hashtab, FALSE);
-    else
+    아니면
     {
-	int	    todo;
+	정수	    todo;
 	hashitem_T  *hi;
 	dictitem_T  *di;
 
 	free_fc = FALSE;
 
 	// Make a copy of the a: variables, since we didn't do that above.
-	todo = (int)fc->fc_l_avars.dv_hashtab.ht_used;
+	todo = (정수)fc->fc_l_avars.dv_hashtab.ht_used;
 	FOR_ALL_HASHTAB_ITEMS(&fc->fc_l_avars.dv_hashtab, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    만약 (!HASHITEM_EMPTY(hi))
 	    {
 		--todo;
 		di = HI2DI(hi);
@@ -2591,9 +2591,9 @@ cleanup_function_call(funccall_T *fc)
 	}
     }
 
-    if (may_free_fc && fc->fc_l_varlist.lv_refcount == DO_NOT_FREE_CNT)
+    만약 (may_free_fc && fc->fc_l_varlist.lv_refcount == DO_NOT_FREE_CNT)
 	fc->fc_l_varlist.lv_first = NULL;
-    else
+    아니면
     {
 	listitem_T *li;
 
@@ -2604,11 +2604,11 @@ cleanup_function_call(funccall_T *fc)
 	    copy_tv(&li->li_tv, &li->li_tv);
     }
 
-    if (free_fc)
+    만약 (free_fc)
 	free_funccal(fc);
-    else
+    아니면
     {
-	static int made_copy = 0;
+	static 정수 made_copy = 0;
 
 	// "fc" is still in use.  This can happen when returning "a:000",
 	// assigning "l:" to a global variable or defining a closure.
@@ -2616,10 +2616,10 @@ cleanup_function_call(funccall_T *fc)
 	fc->fc_caller = previous_funccal;
 	previous_funccal = fc;
 
-	if (want_garbage_collect)
+	만약 (want_garbage_collect)
 	    // If garbage collector is ready, clear count.
 	    made_copy = 0;
-	else if (++made_copy >= (int)((4096 * 1024) / sizeof(*fc)))
+	아니면 만약 (++made_copy >= (정수)((4096 * 1024) / sizeof(*fc)))
 	{
 	    // We have made a lot of copies, worth 4 Mbyte.  This can happen
 	    // when repetitively calling a function that creates a reference to
@@ -2634,10 +2634,10 @@ cleanup_function_call(funccall_T *fc)
 /*
  * Return TRUE if "name" is a numbered function, ignoring a "g:" prefix.
  */
-    static int
+    static 정수
 numbered_function(char_u *name)
 {
-    return SAFE_isdigit(*name)
+    반환 SAFE_isdigit(*name)
 	    || (name[0] == 'g' && name[1] == ':' && SAFE_isdigit(name[2]));
 }
 
@@ -2650,10 +2650,10 @@ numbered_function(char_u *name)
  * using function() does not count as a reference, because the function is
  * looked up by name.
  */
-    int
+    정수
 func_name_refcount(char_u *name)
 {
-    return numbered_function(name) || (name[0] == '<' && name[1] == 'l');
+    반환 numbered_function(name) || (name[0] == '<' && name[1] == 'l');
 }
 
 /*
@@ -2662,29 +2662,29 @@ func_name_refcount(char_u *name)
  * When "force" is TRUE we are exiting.
  */
     static void
-funccal_unref(funccall_T *fc, ufunc_T *fp, int force)
+funccal_unref(funccall_T *fc, ufunc_T *fp, 정수 force)
 {
     funccall_T	**pfc;
-    int		i;
+    정수		i;
 
-    if (fc == NULL)
-	return;
+    만약 (fc == NULL)
+	반환;
 
-    if (--fc->fc_refcount <= 0 && (force || (
+    만약 (--fc->fc_refcount <= 0 && (force || (
 		fc->fc_l_varlist.lv_refcount == DO_NOT_FREE_CNT
 		&& fc->fc_l_vars.dv_refcount == DO_NOT_FREE_CNT
 		&& fc->fc_l_avars.dv_refcount == DO_NOT_FREE_CNT)))
-	for (pfc = &previous_funccal; *pfc != NULL; pfc = &(*pfc)->fc_caller)
+	위해 (pfc = &previous_funccal; *pfc != NULL; pfc = &(*pfc)->fc_caller)
 	{
-	    if (fc == *pfc)
+	    만약 (fc == *pfc)
 	    {
 		*pfc = fc->fc_caller;
 		free_funccal_contents(fc);
-		return;
+		반환;
 	    }
 	}
-    for (i = 0; i < fc->fc_ufuncs.ga_len; ++i)
-	if (((ufunc_T **)(fc->fc_ufuncs.ga_data))[i] == fp)
+    위해 (i = 0; i < fc->fc_ufuncs.ga_len; ++i)
+	만약 (((ufunc_T **)(fc->fc_ufuncs.ga_data))[i] == fp)
 	    ((ufunc_T **)(fc->fc_ufuncs.ga_data))[i] = NULL;
 }
 
@@ -2693,32 +2693,32 @@ funccal_unref(funccall_T *fc, ufunc_T *fp, int force)
  * deleted while it still has references this was already done.
  * Return TRUE if the entry was deleted, FALSE if it wasn't found.
  */
-    static int
+    static 정수
 func_remove(ufunc_T *fp)
 {
     hashitem_T	*hi;
 
     // Return if it was already virtually deleted.
-    if (fp->uf_flags & FC_DEAD)
-	return FALSE;
+    만약 (fp->uf_flags & FC_DEAD)
+	반환 FALSE;
 
     hi = hash_find(&func_hashtab, UF2HIKEY(fp));
     // Another function with the same name may be in the table, e.g. a global
     // function with the name of a class method, do not remove it.
-    if (HASHITEM_EMPTY(hi) || HI2UF(hi) != fp)
-	return FALSE;
+    만약 (HASHITEM_EMPTY(hi) || HI2UF(hi) != fp)
+	반환 FALSE;
 
     // When there is a def-function index do not actually remove the
     // function, so we can find the index when defining the function again.
     // Do remove it when it's a copy.
-    if (fp->uf_def_status == UF_COMPILED && (fp->uf_flags & FC_COPY) == 0)
+    만약 (fp->uf_def_status == UF_COMPILED && (fp->uf_flags & FC_COPY) == 0)
     {
 	fp->uf_flags |= FC_DEAD;
-	return FALSE;
+	반환 FALSE;
     }
     hash_remove(&func_hashtab, hi, "remove function");
     fp->uf_flags |= FC_DELETED;
-    return TRUE;
+    반환 TRUE;
 }
 
     static void
@@ -2732,7 +2732,7 @@ func_clear_items(ufunc_T *fp)
     VIM_CLEAR(fp->uf_va_name);
     clear_func_type_list(&fp->uf_type_list, &fp->uf_func_type);
 
-    if (IS_GENERIC_FUNC(fp))
+    만약 (IS_GENERIC_FUNC(fp))
 	generic_func_clear_items(fp);
 
     // Increment the refcount of this function to avoid it being freed
@@ -2743,7 +2743,7 @@ func_clear_items(ufunc_T *fp)
     fp->uf_refcount -= 3;
 
 #ifdef FEAT_LUA
-    if (fp->uf_cb_free != NULL)
+    만약 (fp->uf_cb_free != NULL)
     {
 	fp->uf_cb_free(fp->uf_cb_state);
 	fp->uf_cb_free = NULL;
@@ -2765,10 +2765,10 @@ func_clear_items(ufunc_T *fp)
  * When "force" is TRUE we are exiting.
  */
     static void
-func_clear(ufunc_T *fp, int force)
+func_clear(ufunc_T *fp, 정수 force)
 {
-    if (fp->uf_cleared)
-	return;
+    만약 (fp->uf_cleared)
+	반환;
     fp->uf_cleared = TRUE;
 
     // clear this function
@@ -2783,23 +2783,23 @@ func_clear(ufunc_T *fp, int force)
  * When "force" is TRUE we are exiting.
  * Returns OK when the function was actually freed.
  */
-    static int
-func_free(ufunc_T *fp, int force)
+    static 정수
+func_free(ufunc_T *fp, 정수 force)
 {
     // Only remove it when not done already, otherwise we would remove a newer
     // version of the function with the same name.
-    if ((fp->uf_flags & (FC_DELETED | FC_REMOVED)) == 0)
+    만약 ((fp->uf_flags & (FC_DELETED | FC_REMOVED)) == 0)
 	func_remove(fp);
 
-    if ((fp->uf_flags & FC_DEAD) == 0 || force)
+    만약 ((fp->uf_flags & FC_DEAD) == 0 || force)
     {
-	if (fp->uf_dfunc_idx > 0)
+	만약 (fp->uf_dfunc_idx > 0)
 	    unlink_def_function(fp);
 	VIM_CLEAR(fp->uf_name_exp);
 	vim_free(fp);
-	return OK;
+	반환 OK;
     }
-    return FAIL;
+    반환 FAIL;
 }
 
 /*
@@ -2807,13 +2807,13 @@ func_free(ufunc_T *fp, int force)
  * When "force" is TRUE we are exiting.
  */
     void
-func_clear_free(ufunc_T *fp, int force)
+func_clear_free(ufunc_T *fp, 정수 force)
 {
     func_clear(fp, force);
-    if (force || fp->uf_dfunc_idx == 0 || func_name_refcount(fp->uf_name)
+    만약 (force || fp->uf_dfunc_idx == 0 || func_name_refcount(fp->uf_name)
 						   || (fp->uf_flags & FC_COPY))
 	func_free(fp, force);
-    else
+    아니면
 	fp->uf_flags |= FC_DEAD;
 }
 
@@ -2821,7 +2821,7 @@ func_clear_free(ufunc_T *fp, int force)
  * Copy already defined function "lambda" to a new function with name "global".
  * This is for when a compiled function defines a global function.
  */
-    int
+    정수
 copy_lambda_to_global_func(
 	char_u		*lambda,
 	char_u		*global,
@@ -2831,46 +2831,46 @@ copy_lambda_to_global_func(
     ufunc_T *ufunc = find_func_even_dead(lambda, FFED_IS_GLOBAL);
     ufunc_T *fp = NULL;
 
-    if (ufunc == NULL)
+    만약 (ufunc == NULL)
     {
 	semsg(_(e_lambda_function_not_found_str), lambda);
-	return FAIL;
+	반환 FAIL;
     }
 
     fp = find_func(global, TRUE);
-    if (fp != NULL)
+    만약 (fp != NULL)
     {
 	// TODO: handle ! to overwrite
 	semsg(_(e_function_str_already_exists_add_bang_to_replace), global);
-	return FAIL;
+	반환 FAIL;
     }
 
     fp = alloc_ufunc(global, STRLEN(global));
-    if (fp == NULL)
-	return FAIL;
+    만약 (fp == NULL)
+	반환 FAIL;
 
     fp->uf_varargs = ufunc->uf_varargs;
     fp->uf_flags = (ufunc->uf_flags & ~FC_VIM9) | FC_COPY;
     fp->uf_def_status = ufunc->uf_def_status;
     fp->uf_dfunc_idx = ufunc->uf_dfunc_idx;
-    if (ga_copy_strings(&ufunc->uf_args, &fp->uf_args) == FAIL
+    만약 (ga_copy_strings(&ufunc->uf_args, &fp->uf_args) == FAIL
 	    || ga_copy_strings(&ufunc->uf_def_args, &fp->uf_def_args)
 								    == FAIL
 	    || ga_copy_strings(&ufunc->uf_lines, &fp->uf_lines) == FAIL)
 	goto failed;
 
-    if (ufunc->uf_arg_types != NULL)
+    만약 (ufunc->uf_arg_types != NULL)
     {
 	fp->uf_arg_types = ALLOC_MULT(type_T *, fp->uf_args.ga_len);
-	if (fp->uf_arg_types == NULL)
+	만약 (fp->uf_arg_types == NULL)
 	    goto failed;
 	mch_memmove(fp->uf_arg_types, ufunc->uf_arg_types,
 				    sizeof(type_T *) * fp->uf_args.ga_len);
     }
-    if (ufunc->uf_va_name != NULL)
+    만약 (ufunc->uf_va_name != NULL)
     {
 	fp->uf_va_name = vim_strsave(ufunc->uf_va_name);
-	if (fp->uf_va_name == NULL)
+	만약 (fp->uf_va_name == NULL)
 	    goto failed;
     }
     fp->uf_ret_type = ufunc->uf_ret_type;
@@ -2885,13 +2885,13 @@ copy_lambda_to_global_func(
     // Create a partial to store the context of the function where it was
     // instantiated.  Only needs to be done once.  Do this on the original
     // function, "dfunc->df_ufunc" will point to it.
-    if ((ufunc->uf_flags & FC_CLOSURE) && ufunc->uf_partial == NULL)
+    만약 ((ufunc->uf_flags & FC_CLOSURE) && ufunc->uf_partial == NULL)
     {
 	partial_T   *pt = ALLOC_CLEAR_ONE(partial_T);
 
-	if (pt == NULL)
+	만약 (pt == NULL)
 	    goto failed;
-	if (fill_partial_and_closure(pt, ufunc, loopvarinfo, ectx) == FAIL)
+	만약 (fill_partial_and_closure(pt, ufunc, loopvarinfo, ectx) == FAIL)
 	{
 	    vim_free(pt);
 	    goto failed;
@@ -2899,30 +2899,30 @@ copy_lambda_to_global_func(
 	ufunc->uf_partial = pt;
     }
 
-    return OK;
+    반환 OK;
 
 failed:
     func_clear_free(fp, TRUE);
-    return FAIL;
+    반환 FAIL;
 }
 
-static int	funcdepth = 0;
+static 정수	funcdepth = 0;
 
 /*
  * Increment the function call depth count.
  * Return FAIL when going over 'maxfuncdepth'.
  * Otherwise return OK, must call funcdepth_decrement() later!
  */
-    int
+    정수
 funcdepth_increment(void)
 {
-    if (funcdepth >= p_mfd)
+    만약 (funcdepth >= p_mfd)
     {
 	emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-	return FAIL;
+	반환 FAIL;
     }
     ++funcdepth;
-    return OK;
+    반환 OK;
 }
 
     void
@@ -2934,10 +2934,10 @@ funcdepth_decrement(void)
 /*
  * Get the current function call depth.
  */
-    int
+    정수
 funcdepth_get(void)
 {
-    return funcdepth;
+    반환 funcdepth;
 }
 
 /*
@@ -2946,7 +2946,7 @@ funcdepth_get(void)
  * times as funcdepth_increment().
  */
     void
-funcdepth_restore(int depth)
+funcdepth_restore(정수 depth)
 {
     funcdepth = depth;
 }
@@ -2962,14 +2962,14 @@ create_funccal(ufunc_T *fp, typval_T *rettv)
 {
     funccall_T *fc = ALLOC_CLEAR_ONE(funccall_T);
 
-    if (fc == NULL)
-	return NULL;
+    만약 (fc == NULL)
+	반환 NULL;
     fc->fc_caller = current_funccal;
     current_funccal = fc;
     fc->fc_func = fp;
     func_ptr_ref(fp);
     fc->fc_rettv = rettv;
-    return fc;
+    반환 fc;
 }
 
 /*
@@ -2991,7 +2991,7 @@ remove_funccal(void)
     static funcerror_T
 call_user_func(
     ufunc_T	*fp,		// pointer to function
-    int		argcount,	// nr of args
+    정수		argcount,	// nr of args
     typval_T	*argvars,	// arguments
     typval_T	*rettv,		// return value
     funcexe_T	*funcexe,	// context
@@ -2999,22 +2999,22 @@ call_user_func(
 {
     sctx_T	save_current_sctx;
     ectx_T	*save_current_ectx;
-    int		using_sandbox = FALSE;
-    int		save_sticky_cmdmod_flags = sticky_cmdmod_flags;
+    정수		using_sandbox = FALSE;
+    정수		save_sticky_cmdmod_flags = sticky_cmdmod_flags;
     funccall_T	*fc;
-    int		save_did_emsg;
+    정수		save_did_emsg;
     funcerror_T retval = FCERR_NONE;
-    int		default_arg_err = FALSE;
+    정수		default_arg_err = FALSE;
     dictitem_T	*v;
-    int		fixvar_idx = 0;	// index in fc_fixvar[]
-    int		i;
-    int		ai;
-    int		islambda = FALSE;
+    정수		fixvar_idx = 0;	// index in fc_fixvar[]
+    정수		i;
+    정수		ai;
+    정수		islambda = FALSE;
     char_u	numbuf[NUMBUFLEN];
     char_u	*name;
     size_t	namelen;
     typval_T	*tv_to_free[MAX_FUNC_ARGS];
-    int		tv_to_free_len = 0;
+    정수		tv_to_free_len = 0;
 #ifdef FEAT_PROFILE
     profinfo_T	profile_info;
 #endif
@@ -3025,18 +3025,18 @@ call_user_func(
 #endif
 
     // If depth of calling is getting too high, don't execute the function.
-    if (funcdepth_increment() == FAIL)
+    만약 (funcdepth_increment() == FAIL)
     {
 	rettv->v_type = VAR_NUMBER;
 	rettv->vval.v_number = -1;
-	return FCERR_FAILED;
+	반환 FCERR_FAILED;
     }
 
     line_breakcheck();		// check for CTRL-C hit
 
     fc = create_funccal(fp, rettv);
-    if (fc == NULL)
-	return FCERR_OTHER;
+    만약 (fc == NULL)
+	반환 FCERR_OTHER;
     fc->fc_level = ex_nesting_level;
     // Check if this function has a breakpoint.
     fc->fc_breakpoint = dbg_find_breakpoint(FALSE, fp->uf_name, (linenr_T)0);
@@ -3044,9 +3044,9 @@ call_user_func(
     // Set up fields for closure.
     ga_init2(&fc->fc_ufuncs, sizeof(ufunc_T *), 1);
 
-    if (fp->uf_def_status != UF_NOT_COMPILED)
+    만약 (fp->uf_def_status != UF_NOT_COMPILED)
     {
-	if (fp->uf_flags & FC_SANDBOX)
+	만약 (fp->uf_flags & FC_SANDBOX)
 	{
 	    using_sandbox = TRUE;
 	    ++sandbox;
@@ -3056,24 +3056,24 @@ call_user_func(
 #endif
 	// Execute the function, possibly compiling it first.
 #ifdef FEAT_PROFILE
-	if (do_profiling == PROF_YES)
+	만약 (do_profiling == PROF_YES)
 	    profile_may_start_func(&profile_info, fp, caller);
 #endif
 	sticky_cmdmod_flags = 0;
-	if (call_def_function(fp, argcount, argvars, 0,
+	만약 (call_def_function(fp, argcount, argvars, 0,
 		   funcexe->fe_partial, funcexe->fe_object, fc, rettv) == FAIL)
 	    retval = FCERR_FAILED;
-	if (using_sandbox)
+	만약 (using_sandbox)
 	    --sandbox;
 	funcdepth_decrement();
 #ifdef FEAT_PROFILE
-	if (do_profiling == PROF_YES && (fp->uf_profiling
+	만약 (do_profiling == PROF_YES && (fp->uf_profiling
 				  || (caller != NULL && caller->uf_profiling)))
 	    profile_may_end_func(&profile_info, fp, caller);
 #endif
 	remove_funccal();
 	sticky_cmdmod_flags = save_sticky_cmdmod_flags;
-	return retval;
+	반환 retval;
     }
 
     islambda = fp->uf_flags & FC_LAMBDA;
@@ -3087,7 +3087,7 @@ call_user_func(
      * Init l: variables.
      */
     init_var_dict(&fc->fc_l_vars, &fc->fc_l_vars_var, VAR_DEF_SCOPE);
-    if (selfdict != NULL)
+    만약 (selfdict != NULL)
     {
 	// Set l:self to "selfdict".  Use "name" to avoid a warning from
 	// some compiler that checks the destination size.
@@ -3108,12 +3108,12 @@ call_user_func(
      * Set a:000 to a list with room for the "..." arguments.
      */
     init_var_dict(&fc->fc_l_avars, &fc->fc_l_avars_var, VAR_SCOPE);
-    if ((fp->uf_flags & FC_NOARGS) == 0)
+    만약 ((fp->uf_flags & FC_NOARGS) == 0)
 	add_nr_var(&fc->fc_l_avars, &fc->fc_fixvar[fixvar_idx++].var, "0",
 				(varnumber_T)(argcount >= fp->uf_args.ga_len
 				    ? argcount - fp->uf_args.ga_len : 0));
     fc->fc_l_avars.dv_lock = VAR_FIXED;
-    if ((fp->uf_flags & FC_NOARGS) == 0)
+    만약 ((fp->uf_flags & FC_NOARGS) == 0)
     {
 	// Use "name" to avoid a warning from some compiler that checks the
 	// destination size.
@@ -3136,32 +3136,32 @@ call_user_func(
      * Set a:N to the "..." arguments.
      * Skipped when no a: variables used (in lambda).
      */
-    if ((fp->uf_flags & FC_NOARGS) == 0)
+    만약 ((fp->uf_flags & FC_NOARGS) == 0)
     {
 	add_nr_var(&fc->fc_l_avars, &fc->fc_fixvar[fixvar_idx++].var,
 			      "firstline", (varnumber_T)funcexe->fe_firstline);
 	add_nr_var(&fc->fc_l_avars, &fc->fc_fixvar[fixvar_idx++].var,
 				"lastline", (varnumber_T)funcexe->fe_lastline);
     }
-    for (i = 0; i < argcount || i < fp->uf_args.ga_len; ++i)
+    위해 (i = 0; i < argcount || i < fp->uf_args.ga_len; ++i)
     {
-	int	    addlocal = FALSE;
+	정수	    addlocal = FALSE;
 	typval_T    def_rettv;
-	int	    isdefault = FALSE;
+	정수	    isdefault = FALSE;
 
 	ai = i - fp->uf_args.ga_len;
-	if (ai < 0)
+	만약 (ai < 0)
 	{
 	    // named argument a:name
 	    name = FUNCARG(fp, i);
-	    if (islambda)
+	    만약 (islambda)
 		addlocal = TRUE;
 
 	    // evaluate named argument default expression
 	    isdefault = ai + fp->uf_def_args.ga_len >= 0
 		       && (i >= argcount || (argvars[i].v_type == VAR_SPECIAL
 				   && argvars[i].vval.v_number == VVAL_NONE));
-	    if (isdefault)
+	    만약 (isdefault)
 	    {
 		char_u	    *default_expr = NULL;
 
@@ -3170,7 +3170,7 @@ call_user_func(
 
 		default_expr = ((char_u **)(fp->uf_def_args.ga_data))
 						 [ai + fp->uf_def_args.ga_len];
-		if (eval1(&default_expr, &def_rettv, &EVALARG_EVALUATE) == FAIL)
+		만약 (eval1(&default_expr, &def_rettv, &EVALARG_EVALUATE) == FAIL)
 		{
 		    default_arg_err = 1;
 		    break;
@@ -3179,9 +3179,9 @@ call_user_func(
 
 	    namelen = STRLEN(name);
 	}
-	else
+	아니면
 	{
-	    if ((fp->uf_flags & FC_NOARGS) != 0)
+	    만약 ((fp->uf_flags & FC_NOARGS) != 0)
 		// Bail out if no a: arguments used (in lambda).
 		break;
 
@@ -3189,16 +3189,16 @@ call_user_func(
 	    namelen = vim_snprintf((char *)numbuf, sizeof(numbuf), "%d", ai + 1);
 	    name = numbuf;
 	}
-	if (fixvar_idx < FIXVAR_CNT && namelen <= VAR_SHORT_LEN)
+	만약 (fixvar_idx < FIXVAR_CNT && namelen <= VAR_SHORT_LEN)
 	{
 	    v = &fc->fc_fixvar[fixvar_idx++].var;
 	    v->di_flags = DI_FLAGS_RO | DI_FLAGS_FIX;
 	    STRCPY(v->di_key, name);
 	}
-	else
+	아니면
 	{
 	    v = dictitem_alloc(name);
-	    if (v == NULL)
+	    만약 (v == NULL)
 		break;
 	    v->di_flags |= DI_FLAGS_RO | DI_FLAGS_FIX;
 	}
@@ -3208,21 +3208,21 @@ call_user_func(
 	v->di_tv = isdefault ? def_rettv : argvars[i];
 	v->di_tv.v_lock = VAR_FIXED;
 
-	if (isdefault)
+	만약 (isdefault)
 	    // Need to free this later, no matter where it's stored.
 	    tv_to_free[tv_to_free_len++] = &v->di_tv;
 
-	if (addlocal)
+	만약 (addlocal)
 	{
 	    // Named arguments should be accessed without the "a:" prefix in
 	    // lambda expressions.  Add to the l: dict.
 	    copy_tv(&v->di_tv, &v->di_tv);
 	    hash_add(&fc->fc_l_vars.dv_hashtab, DI2HIKEY(v), "local variable");
 	}
-	else
+	아니면
 	    hash_add(&fc->fc_l_avars.dv_hashtab, DI2HIKEY(v), "add variable");
 
-	if (ai >= 0 && ai < MAX_FUNC_ARGS)
+	만약 (ai >= 0 && ai < MAX_FUNC_ARGS)
 	{
 	    listitem_T *li = &fc->fc_l_listitems[ai];
 
@@ -3235,7 +3235,7 @@ call_user_func(
     // Don't redraw while executing the function.
     ++RedrawingDisabled;
 
-    if (fp->uf_flags & FC_SANDBOX)
+    만약 (fp->uf_flags & FC_SANDBOX)
     {
 	using_sandbox = TRUE;
 	++sandbox;
@@ -3243,13 +3243,13 @@ call_user_func(
 
     estack_push_ufunc(fp, 1);
     ESTACK_CHECK_SETUP;
-    if (p_verbose >= 12)
+    만약 (p_verbose >= 12)
     {
 	++no_wait_return;
 	verbose_enter_scroll();
 
 	smsg(_("calling %s"), SOURCING_NAME);
-	if (p_verbose >= 14)
+	만약 (p_verbose >= 14)
 	{
 	    char_u	buf[MSG_BUF_LEN];
 	    char_u	numbuf2[NUMBUFLEN];
@@ -3257,21 +3257,21 @@ call_user_func(
 	    char_u	*s;
 
 	    msg_puts("(");
-	    for (i = 0; i < argcount; ++i)
+	    위해 (i = 0; i < argcount; ++i)
 	    {
-		if (i > 0)
+		만약 (i > 0)
 		    msg_puts(", ");
-		if (argvars[i].v_type == VAR_NUMBER)
+		만약 (argvars[i].v_type == VAR_NUMBER)
 		    msg_outnum((long)argvars[i].vval.v_number);
-		else
+		아니면
 		{
 		    // Do not want errors such as E724 here.
 		    ++emsg_off;
 		    s = tv2string(&argvars[i], &tofree, numbuf2, 0);
 		    --emsg_off;
-		    if (s != NULL)
+		    만약 (s != NULL)
 		    {
-			if (vim_strsize(s) > MSG_BUF_CLEN)
+			만약 (vim_strsize(s) > MSG_BUF_CLEN)
 			{
 			    trunc_string(s, buf, MSG_BUF_CLEN, MSG_BUF_LEN);
 			    s = buf;
@@ -3289,7 +3289,7 @@ call_user_func(
 	--no_wait_return;
     }
 #ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    만약 (do_profiling == PROF_YES)
 	profile_may_start_func(&profile_info, fp,
 			fc->fc_caller == NULL ? NULL : fc->fc_caller->fc_func);
 #endif
@@ -3307,12 +3307,12 @@ call_user_func(
     save_did_emsg = did_emsg;
     did_emsg = FALSE;
 
-    if (default_arg_err && (fp->uf_flags & FC_ABORT || trylevel > 0 ))
+    만약 (default_arg_err && (fp->uf_flags & FC_ABORT || trylevel > 0 ))
     {
 	did_emsg = TRUE;
 	retval = FCERR_FAILED;
     }
-    else if (islambda)
+    아니면 만약 (islambda)
     {
 	char_u *p = *(char_u **)fp->uf_lines.ga_data + 7;
 
@@ -3322,7 +3322,7 @@ call_user_func(
 	(void)eval1(&p, rettv, &EVALARG_EVALUATE);
 	--ex_nesting_level;
     }
-    else
+    아니면
 	// call do_cmdline() to execute the lines
 	do_cmdline(NULL, get_func_line, (void *)fc,
 				     DOCMD_NOWAIT|DOCMD_VERBOSE|DOCMD_REPEAT);
@@ -3330,11 +3330,11 @@ call_user_func(
     // Invoke functions added with ":defer".
     handle_defer_one(current_funccal);
 
-    if (RedrawingDisabled > 0)
+    만약 (RedrawingDisabled > 0)
 	--RedrawingDisabled;
 
     // when the function was aborted because of an error, return -1
-    if ((did_emsg && (fp->uf_flags & FC_ABORT)) || rettv->v_type == VAR_UNKNOWN)
+    만약 ((did_emsg && (fp->uf_flags & FC_ABORT)) || rettv->v_type == VAR_UNKNOWN)
     {
 	clear_tv(rettv);
 	rettv->v_type = VAR_NUMBER;
@@ -3342,32 +3342,32 @@ call_user_func(
 
 	// In corner cases returning a "failed" value is not backwards
 	// compatible.  Only do this for Vim9 script.
-	if (in_vim9script())
+	만약 (in_vim9script())
 	    retval = FCERR_FAILED;
     }
 
 #ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    만약 (do_profiling == PROF_YES)
     {
 	ufunc_T *caller = fc->fc_caller == NULL ? NULL : fc->fc_caller->fc_func;
 
-	if (fp->uf_profiling || (caller != NULL && caller->uf_profiling))
+	만약 (fp->uf_profiling || (caller != NULL && caller->uf_profiling))
 	    profile_may_end_func(&profile_info, fp, caller);
     }
 #endif
 
     // when being verbose, mention the return value
-    if (p_verbose >= 12)
+    만약 (p_verbose >= 12)
     {
 	++no_wait_return;
 	verbose_enter_scroll();
 
-	if (aborting())
+	만약 (aborting())
 	    smsg(_("%s aborted"), SOURCING_NAME);
-	else if (fc->fc_rettv->v_type == VAR_NUMBER)
+	아니면 만약 (fc->fc_rettv->v_type == VAR_NUMBER)
 	    smsg(_("%s returning #%ld"), SOURCING_NAME,
 					    (long)fc->fc_rettv->vval.v_number);
-	else
+	아니면
 	{
 	    char_u	buf[MSG_BUF_LEN];
 	    char_u	numbuf2[NUMBUFLEN];
@@ -3380,9 +3380,9 @@ call_user_func(
 	    ++emsg_off;
 	    s = tv2string(fc->fc_rettv, &tofree, numbuf2, 0);
 	    --emsg_off;
-	    if (s != NULL)
+	    만약 (s != NULL)
 	    {
-		if (vim_strsize(s) > MSG_BUF_CLEN)
+		만약 (vim_strsize(s) > MSG_BUF_CLEN)
 		{
 		    trunc_string(s, buf, MSG_BUF_CLEN, MSG_BUF_LEN);
 		    s = buf;
@@ -3403,14 +3403,14 @@ call_user_func(
     restore_current_ectx(save_current_ectx);
 
 #ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    만약 (do_profiling == PROF_YES)
 	script_prof_restore(&profile_info.pi_wait_start);
 #endif
-    if (using_sandbox)
+    만약 (using_sandbox)
 	--sandbox;
     sticky_cmdmod_flags = save_sticky_cmdmod_flags;
 
-    if (p_verbose >= 12 && SOURCING_NAME != NULL)
+    만약 (p_verbose >= 12 && SOURCING_NAME != NULL)
     {
 	++no_wait_return;
 	verbose_enter_scroll();
@@ -3424,11 +3424,11 @@ call_user_func(
 
     did_emsg |= save_did_emsg;
     funcdepth_decrement();
-    for (i = 0; i < tv_to_free_len; ++i)
+    위해 (i = 0; i < tv_to_free_len; ++i)
 	clear_tv(tv_to_free[i]);
     cleanup_function_call(fc);
 
-    return retval;
+    반환 retval;
 }
 
 /*
@@ -3436,15 +3436,15 @@ call_user_func(
  * Return FCERR_UNKNOWN if OK, FCERR_TOOFEW or FCERR_TOOMANY otherwise.
  */
     funcerror_T
-check_user_func_argcount(ufunc_T *fp, int argcount)
+check_user_func_argcount(ufunc_T *fp, 정수 argcount)
 {
-    int regular_args = fp->uf_args.ga_len;
+    정수 regular_args = fp->uf_args.ga_len;
 
-    if (argcount < regular_args - fp->uf_def_args.ga_len)
-	return FCERR_TOOFEW;
-    else if (!has_varargs(fp) && argcount > regular_args)
-	return FCERR_TOOMANY;
-    return FCERR_UNKNOWN;
+    만약 (argcount < regular_args - fp->uf_def_args.ga_len)
+	반환 FCERR_TOOFEW;
+    아니면 만약 (!has_varargs(fp) && argcount > regular_args)
+	반환 FCERR_TOOMANY;
+    반환 FCERR_UNKNOWN;
 }
 
 /*
@@ -3453,7 +3453,7 @@ check_user_func_argcount(ufunc_T *fp, int argcount)
     funcerror_T
 call_user_func_check(
 	ufunc_T	    *fp,
-	int	    argcount,
+	정수	    argcount,
 	typval_T    *argvars,
 	typval_T    *rettv,
 	funcexe_T   *funcexe,
@@ -3462,27 +3462,27 @@ call_user_func_check(
     funcerror_T error = FCERR_NONE;
 
 #ifdef FEAT_LUA
-    if (fp->uf_flags & FC_CFUNC)
+    만약 (fp->uf_flags & FC_CFUNC)
     {
 	cfunc_T cb = fp->uf_cb;
 
-	return (*cb)(argcount, argvars, rettv, fp->uf_cb_state);
+	반환 (*cb)(argcount, argvars, rettv, fp->uf_cb_state);
     }
 #endif
 
-    if (fp->uf_flags & FC_RANGE && funcexe->fe_doesrange != NULL)
+    만약 (fp->uf_flags & FC_RANGE && funcexe->fe_doesrange != NULL)
 	*funcexe->fe_doesrange = TRUE;
     error = check_user_func_argcount(fp, argcount);
-    if (error != FCERR_UNKNOWN)
-	return error;
+    만약 (error != FCERR_UNKNOWN)
+	반환 error;
 
-    if ((fp->uf_flags & FC_DICT) && selfdict == NULL)
+    만약 ((fp->uf_flags & FC_DICT) && selfdict == NULL)
     {
 	error = FCERR_DICT;
     }
-    else
+    아니면
     {
-	int		did_save_redo = FALSE;
+	정수		did_save_redo = FALSE;
 	save_redo_T	save_redo;
 
 	/*
@@ -3491,7 +3491,7 @@ call_user_func_check(
 	 * redo buffer.
 	 */
 	save_search_patterns();
-	if (!ins_compl_active())
+	만약 (!ins_compl_active())
 	{
 	    saveRedobuff(&save_redo);
 	    did_save_redo = TRUE;
@@ -3499,15 +3499,15 @@ call_user_func_check(
 	++fp->uf_calls;
 	error = call_user_func(fp, argcount, argvars, rettv, funcexe,
 				   (fp->uf_flags & FC_DICT) ? selfdict : NULL);
-	if (--fp->uf_calls <= 0 && fp->uf_refcount <= 0)
+	만약 (--fp->uf_calls <= 0 && fp->uf_refcount <= 0)
 	    // Function was unreferenced while being used, free it now.
 	    func_clear_free(fp, FALSE);
-	if (did_save_redo)
+	만약 (did_save_redo)
 	    restoreRedobuff(&save_redo);
 	restore_search_patterns();
     }
 
-    return error;
+    반환 error;
 }
 
 static funccal_entry_T *funccal_stack = NULL;
@@ -3528,9 +3528,9 @@ save_funccal(funccal_entry_T *entry)
     void
 restore_funccal(void)
 {
-    if (funccal_stack == NULL)
+    만약 (funccal_stack == NULL)
 	internal_error("restore_funccal()");
-    else
+    아니면
     {
 	current_funccal = funccal_stack->top_funccal;
 	funccal_stack = funccal_stack->next;
@@ -3540,7 +3540,7 @@ restore_funccal(void)
     funccall_T *
 get_current_funccal(void)
 {
-    return current_funccal;
+    반환 current_funccal;
 }
 
 /*
@@ -3549,17 +3549,17 @@ get_current_funccal(void)
  * - not executing an autocommand
  * Note that when an autocommand sources a script the result is FALSE;
  */
-    int
+    정수
 at_script_level(void)
 {
-    return current_funccal == NULL && autocmd_match == NULL;
+    반환 current_funccal == NULL && autocmd_match == NULL;
 }
 
 /*
  * Mark all functions of script "sid" as deleted.
  */
     void
-delete_script_functions(int sid)
+delete_script_functions(정수 sid)
 {
     hashitem_T	*hi;
     ufunc_T	*fp;
@@ -3569,36 +3569,36 @@ delete_script_functions(int sid)
 
     buf[0] = K_SPECIAL;
     buf[1] = KS_EXTRA;
-    buf[2] = (int)KE_SNR;
+    buf[2] = (정수)KE_SNR;
     len = 3 + vim_snprintf((char *)buf + 3, sizeof(buf) - 3, "%d_", sid);
 
-    while (todo > 0)
+    동안 (todo > 0)
     {
 	todo = func_hashtab.ht_used;
 	FOR_ALL_HASHTAB_ITEMS(&func_hashtab, hi, todo)
-	    if (!HASHITEM_EMPTY(hi))
+	    만약 (!HASHITEM_EMPTY(hi))
 	    {
 		fp = HI2UF(hi);
-		if (STRNCMP(fp->uf_name, buf, len) == 0)
+		만약 (STRNCMP(fp->uf_name, buf, len) == 0)
 		{
-		    int changed = func_hashtab.ht_changed;
+		    정수 changed = func_hashtab.ht_changed;
 
 		    fp->uf_flags |= FC_DEAD;
 
-		    if (fp->uf_calls > 0)
+		    만약 (fp->uf_calls > 0)
 		    {
 			// Function is executing, don't free it but do remove
 			// it from the hashtable.
-			if (func_remove(fp))
+			만약 (func_remove(fp))
 			    fp->uf_refcount--;
 		    }
-		    else
+		    아니면
 		    {
 			func_clear(fp, TRUE);
 			// When clearing a function another function can be
 			// cleared as a side effect.  When that happens start
 			// over.
-			if (changed != func_hashtab.ht_changed)
+			만약 (changed != func_hashtab.ht_changed)
 			    break;
 		    }
 		}
@@ -3607,7 +3607,7 @@ delete_script_functions(int sid)
     }
 }
 
-#if defined(EXITFREE)
+#만약 defined(EXITFREE)
     void
 free_all_functions(void)
 {
@@ -3615,25 +3615,25 @@ free_all_functions(void)
     ufunc_T	*fp;
     long_u	skipped = 0;
     long_u	todo = 1;
-    int		changed;
+    정수		changed;
 
     // Clean up the current_funccal chain and the funccal stack.
-    while (current_funccal != NULL)
+    동안 (current_funccal != NULL)
     {
 	clear_tv(current_funccal->fc_rettv);
 	cleanup_function_call(current_funccal);
-	if (current_funccal == NULL && funccal_stack != NULL)
+	만약 (current_funccal == NULL && funccal_stack != NULL)
 	    restore_funccal();
     }
 
     // First clear what the functions contain.  Since this may lower the
     // reference count of a function, it may also free a function and change
     // the hash table. Restart if that happens.
-    while (todo > 0)
+    동안 (todo > 0)
     {
 	todo = func_hashtab.ht_used;
 	FOR_ALL_HASHTAB_ITEMS(&func_hashtab, hi, todo)
-	    if (!HASHITEM_EMPTY(hi))
+	    만약 (!HASHITEM_EMPTY(hi))
 	    {
 		// clear the def function index now
 		fp = HI2UF(hi);
@@ -3642,13 +3642,13 @@ free_all_functions(void)
 
 		// Only free functions that are not refcounted, those are
 		// supposed to be freed when no longer referenced.
-		if (func_name_refcount(fp->uf_name))
+		만약 (func_name_refcount(fp->uf_name))
 		    ++skipped;
-		else
+		아니면
 		{
 		    changed = func_hashtab.ht_changed;
 		    func_clear(fp, TRUE);
-		    if (changed != func_hashtab.ht_changed)
+		    만약 (changed != func_hashtab.ht_changed)
 		    {
 			skipped = 0;
 			break;
@@ -3661,21 +3661,21 @@ free_all_functions(void)
     // Now actually free the functions.  Need to start all over every time,
     // because func_free() may change the hash table.
     skipped = 0;
-    while (func_hashtab.ht_used > skipped)
+    동안 (func_hashtab.ht_used > skipped)
     {
 	todo = func_hashtab.ht_used;
 	FOR_ALL_HASHTAB_ITEMS(&func_hashtab, hi, todo)
-	    if (!HASHITEM_EMPTY(hi))
+	    만약 (!HASHITEM_EMPTY(hi))
 	    {
 		--todo;
 		// Only free functions that are not refcounted, those are
 		// supposed to be freed when no longer referenced.
 		fp = HI2UF(hi);
-		if (func_name_refcount(fp->uf_name))
+		만약 (func_name_refcount(fp->uf_name))
 		    ++skipped;
-		else
+		아니면
 		{
-		    if (func_free(fp, FALSE) == OK)
+		    만약 (func_free(fp, FALSE) == OK)
 		    {
 			skipped = 0;
 			break;
@@ -3685,7 +3685,7 @@ free_all_functions(void)
 		}
 	    }
     }
-    if (skipped == 0)
+    만약 (skipped == 0)
 	hash_clear(&func_hashtab);
 
     free_def_functions();
@@ -3698,29 +3698,29 @@ free_all_functions(void)
  * name.
  * "len" is the length of "name", or -1 for NUL terminated.
  */
-    int
-builtin_function(char_u *name, int len)
+    정수
+builtin_function(char_u *name, 정수 len)
 {
-    int i;
+    정수 i;
 
-    if (!ASCII_ISLOWER(name[0]) || name[1] == ':')
-	return FALSE;
-    for (i = 0; name[i] != NUL && (len < 0 || i < len); ++i)
+    만약 (!ASCII_ISLOWER(name[0]) || name[1] == ':')
+	반환 FALSE;
+    위해 (i = 0; name[i] != NUL && (len < 0 || i < len); ++i)
     {
-	if (name[i] == AUTOLOAD_CHAR)
-	    return FALSE;
-	if (!eval_isnamec(name[i]))
+	만약 (name[i] == AUTOLOAD_CHAR)
+	    반환 FALSE;
+	만약 (!eval_isnamec(name[i]))
 	{
 	    // "name.something" is not a builtin function
-	    if (name[i] == '.')
-		return FALSE;
+	    만약 (name[i] == '.')
+		반환 FALSE;
 	    break;
 	}
     }
-    return TRUE;
+    반환 TRUE;
 }
 
-    int
+    정수
 func_call(
     char_u	*name,
     typval_T	*args,
@@ -3731,13 +3731,13 @@ func_call(
     list_T	*l = args->vval.v_list;
     listitem_T	*item;
     typval_T	argv[MAX_FUNC_ARGS + 1];
-    int		argc = 0;
-    int		r = 0;
+    정수		argc = 0;
+    정수		r = 0;
 
     CHECK_LIST_MATERIALIZE(l);
     FOR_ALL_LIST_ITEMS(l, item)
     {
-	if (argc == MAX_FUNC_ARGS - (partial == NULL ? 0 : partial->pt_argc))
+	만약 (argc == MAX_FUNC_ARGS - (partial == NULL ? 0 : partial->pt_argc))
 	{
 	    emsg(_(e_too_many_arguments));
 	    break;
@@ -3747,18 +3747,18 @@ func_call(
 	copy_tv(&item->li_tv, &argv[argc++]);
     }
 
-    if (item == NULL)
+    만약 (item == NULL)
     {
 	funcexe_T	funcexe;
-	int		namelen = -1;
+	정수		namelen = -1;
 
-	if (in_vim9script())
+	만약 (in_vim9script())
 	{
 	    char_u *p = generic_func_find_open_bracket(name);
 
-	    if (p != NULL)
+	    만약 (p != NULL)
 	    {
-		if (skip_generic_func_type_args(&p) == FAIL)
+		만약 (skip_generic_func_type_args(&p) == FAIL)
 		    goto done;
 		namelen = p - name + 1;
 	    }
@@ -3769,10 +3769,10 @@ func_call(
 	funcexe.fe_lastline = curwin->w_cursor.lnum;
 	funcexe.fe_evaluate = TRUE;
 	funcexe.fe_partial = partial;
-	if (partial != NULL)
+	만약 (partial != NULL)
 	{
 	    funcexe.fe_object = partial->pt_obj;
-	    if (funcexe.fe_object != NULL)
+	    만약 (funcexe.fe_object != NULL)
 		++funcexe.fe_object->obj_refcount;
 	}
 	funcexe.fe_selfdict = selfdict;
@@ -3780,53 +3780,53 @@ func_call(
     }
 
     // Free the arguments.
-    while (argc > 0)
+    동안 (argc > 0)
 	clear_tv(&argv[--argc]);
 
 done:
-    return r;
+    반환 r;
 }
 
-static int callback_depth = 0;
+static 정수 callback_depth = 0;
 
-    int
+    정수
 get_callback_depth(void)
 {
-    return callback_depth;
+    반환 callback_depth;
 }
 
 /*
  * Invoke call_func() with a callback.
  * Returns FAIL if the callback could not be called.
  */
-    int
+    정수
 call_callback(
     callback_T	*callback,
-    int		len,		// length of "name" or -1 to use strlen()
+    정수		len,		// length of "name" or -1 to use strlen()
     typval_T	*rettv,		// return value goes here
-    int		argcount,	// number of "argvars"
+    정수		argcount,	// number of "argvars"
     typval_T	*argvars)	// vars for arguments, must have "argcount"
 				// PLUS ONE elements!
 {
     funcexe_T	funcexe;
-    int		ret;
+    정수		ret;
 
-    if (callback->cb_name == NULL || *callback->cb_name == NUL)
-	return FAIL;
+    만약 (callback->cb_name == NULL || *callback->cb_name == NUL)
+	반환 FAIL;
 
-    if (callback_depth > p_mfd)
+    만약 (callback_depth > p_mfd)
     {
 	emsg(_(e_command_too_recursive));
-	return FAIL;
+	반환 FAIL;
     }
 
     CLEAR_FIELD(funcexe);
     funcexe.fe_evaluate = TRUE;
     funcexe.fe_partial = callback->cb_partial;
-    if (callback->cb_partial != NULL)
+    만약 (callback->cb_partial != NULL)
     {
 	funcexe.fe_object = callback->cb_partial->pt_obj;
-	if (funcexe.fe_object != NULL)
+	만약 (funcexe.fe_object != NULL)
 	    ++funcexe.fe_object->obj_refcount;
     }
     ++callback_depth;
@@ -3836,13 +3836,13 @@ call_callback(
 
     // When a :def function was called that uses :try an error would be turned
     // into an exception.  Need to give the error here.
-    if (need_rethrow && current_exception != NULL && trylevel == 0)
+    만약 (need_rethrow && current_exception != NULL && trylevel == 0)
     {
 	need_rethrow = FALSE;
 	handle_did_throw();
     }
 
-    return ret;
+    반환 ret;
 }
 
 /*
@@ -3853,19 +3853,19 @@ call_callback(
     varnumber_T
 call_callback_retnr(
     callback_T	*callback,
-    int		argcount,	// number of "argvars"
+    정수		argcount,	// number of "argvars"
     typval_T	*argvars)	// vars for arguments, must have "argcount"
 				// PLUS ONE elements!
 {
     typval_T	rettv;
     varnumber_T	retval;
 
-    if (call_callback(callback, -1, &rettv, argcount, argvars) == FAIL)
-	return -2;
+    만약 (call_callback(callback, -1, &rettv, argcount, argvars) == FAIL)
+	반환 -2;
 
     retval = tv_get_number_chk(&rettv, NULL);
     clear_tv(&rettv);
-    return retval;
+    반환 retval;
 }
 
 /*
@@ -3873,14 +3873,14 @@ call_callback_retnr(
  * Nothing if "error" is FCERR_NONE.
  */
     void
-user_func_error(funcerror_T error, char_u *name, int found_var)
+user_func_error(funcerror_T error, char_u *name, 정수 found_var)
 {
     switch (error)
     {
 	case FCERR_UNKNOWN:
-		if (found_var)
+		만약 (found_var)
 		    emsg_funcname(e_not_callable_type_str, name);
-		else
+		아니면
 		    emsg_funcname(e_unknown_function_str, name);
 		break;
 	case FCERR_NOTMETHOD:
@@ -3923,20 +3923,20 @@ user_func_error(funcerror_T error, char_u *name, int found_var)
 may_check_argument_types(
 	funcexe_T   *funcexe,
 	typval_T    *argvars,
-	int	    argcount,
-	int	    base_included,
+	정수	    argcount,
+	정수	    base_included,
 	char_u	    *name)
 {
-    if (funcexe->fe_check_type != NULL && funcexe->fe_evaluate)
+    만약 (funcexe->fe_check_type != NULL && funcexe->fe_evaluate)
     {
 	// Check that the argument types are OK for the types of the funcref.
-	if (check_argument_types(funcexe->fe_check_type,
+	만약 (check_argument_types(funcexe->fe_check_type,
 			  argvars, argcount,
 			  base_included ? NULL : funcexe->fe_basetv,
 			  name) == FAIL)
-	    return FCERR_OTHER;
+	    반환 FCERR_OTHER;
     }
-    return FCERR_NONE;
+    반환 FCERR_NONE;
 }
 
 /*
@@ -3945,31 +3945,31 @@ may_check_argument_types(
  * Return FAIL when the function can't be called,  OK otherwise.
  * Also returns OK when an error was encountered while executing the function.
  */
-    int
+    정수
 call_func(
     char_u	*funcname,	// name of the function
-    int		len,		// length of "name" or -1 to use strlen()
+    정수		len,		// length of "name" or -1 to use strlen()
     typval_T	*rettv,		// return value goes here
-    int		argcount_in,	// number of "argvars"
+    정수		argcount_in,	// number of "argvars"
     typval_T	*argvars_in,	// vars for arguments, must have "argcount"
 				// PLUS ONE elements!
     funcexe_T	*funcexe)	// more arguments
 {
-    int		ret = FAIL;
+    정수		ret = FAIL;
     funcerror_T	error = FCERR_NONE;
-    int		i;
+    정수		i;
     ufunc_T	*fp = NULL;
     char_u	fname_buf[FLEN_FIXED + 1];
     char_u	*tofree = NULL;
     char_u	*fname = NULL;
     char_u	*name = NULL;
-    int		argcount = argcount_in;
+    정수		argcount = argcount_in;
     typval_T	*argvars = argvars_in;
     dict_T	*selfdict = funcexe->fe_selfdict;
     typval_T	argv[MAX_FUNC_ARGS + 1]; // used when "partial" or
 					 // "funcexe->fe_basetv" is not NULL
-    int		argv_clear = 0;
-    int		argv_base = 0;
+    정수		argv_clear = 0;
+    정수		argv_base = 0;
     partial_T	*partial = funcexe->fe_partial;
     type_T	check_type;
     type_T	*check_type_args[MAX_FUNC_ARGS];
@@ -3981,21 +3981,21 @@ call_func(
 
     generic_func_args_table_init(&gfatab);
 
-    if (partial != NULL)
+    만약 (partial != NULL)
 	fp = partial->pt_func;
-    if (fp == NULL)
+    만약 (fp == NULL)
 	fp = funcexe->fe_ufunc;
 
-    if (fp == NULL)
+    만약 (fp == NULL)
     {
-	if (in_vim9script())
+	만약 (in_vim9script())
 	{
 	    char_u *p = generic_func_find_open_bracket(funcname);
 
-	    if (p != NULL)
+	    만약 (p != NULL)
 	    {
 		len = p - funcname;
-		if (parse_generic_func_type_args(funcname, len, p, &gfatab,
+		만약 (parse_generic_func_type_args(funcname, len, p, &gfatab,
 						funcexe->fe_cctx) == NULL)
 		    goto theend;
 	    }
@@ -4004,39 +4004,39 @@ call_func(
 	// Make a copy of the name, if it comes from a funcref variable it
 	// could be changed or deleted in the called function.
 	name = len > 0 ? vim_strnsave(funcname, len) : vim_strsave(funcname);
-	if (name == NULL)
+	만약 (name == NULL)
 	    goto theend;
 
 	fname = fname_trans_sid(name, fname_buf, &tofree, &error);
     }
 
-    if (funcexe->fe_doesrange != NULL)
+    만약 (funcexe->fe_doesrange != NULL)
 	*funcexe->fe_doesrange = FALSE;
 
-    if (partial != NULL)
+    만약 (partial != NULL)
     {
 	// When the function has a partial with a dict and there is a dict
 	// argument, use the dict argument.  That is backwards compatible.
 	// When the dict was bound explicitly use the one from the partial.
-	if (partial->pt_dict != NULL && (selfdict == NULL || !partial->pt_auto))
+	만약 (partial->pt_dict != NULL && (selfdict == NULL || !partial->pt_auto))
 	    selfdict = partial->pt_dict;
-	if (error == FCERR_NONE && partial->pt_argc > 0)
+	만약 (error == FCERR_NONE && partial->pt_argc > 0)
 	{
-	    for (argv_clear = 0; argv_clear < partial->pt_argc; ++argv_clear)
+	    위해 (argv_clear = 0; argv_clear < partial->pt_argc; ++argv_clear)
 	    {
-		if (argv_clear + argcount_in >= MAX_FUNC_ARGS)
+		만약 (argv_clear + argcount_in >= MAX_FUNC_ARGS)
 		{
 		    error = FCERR_TOOMANY;
 		    goto theend;
 		}
 		copy_tv(&partial->pt_argv[argv_clear], &argv[argv_clear]);
 	    }
-	    for (i = 0; i < argcount_in; ++i)
+	    위해 (i = 0; i < argcount_in; ++i)
 		argv[i + argv_clear] = argvars_in[i];
 	    argvars = argv;
 	    argcount = partial->pt_argc + argcount_in;
 
-	    if (funcexe->fe_check_type != NULL
+	    만약 (funcexe->fe_check_type != NULL
 				  && funcexe->fe_check_type->tt_argcount != -1)
 	    {
 		// Now funcexe->fe_check_type is missing the added arguments,
@@ -4045,7 +4045,7 @@ call_func(
 		funcexe->fe_check_type = &check_type;
 		check_type.tt_args = check_type_args;
 		CLEAR_FIELD(check_type_args);
-		for (i = 0; i < check_type.tt_argcount; ++i)
+		위해 (i = 0; i < check_type.tt_argcount; ++i)
 		    check_type_args[i + partial->pt_argc] =
 							 check_type.tt_args[i];
 		check_type.tt_argcount += partial->pt_argc;
@@ -4054,18 +4054,18 @@ call_func(
 	}
     }
 
-    if (error == FCERR_NONE)
+    만약 (error == FCERR_NONE)
 	// check the argument types if possible
 	error = may_check_argument_types(funcexe, argvars, argcount, FALSE,
 					     (name != NULL) ? name : funcname);
 
-    if (error == FCERR_NONE && funcexe->fe_evaluate)
+    만약 (error == FCERR_NONE && funcexe->fe_evaluate)
     {
 	char_u *rfname = fname;
-	int	is_global = FALSE;
+	정수	is_global = FALSE;
 
 	// Skip "g:" before a function name.
-	if (fp == NULL && fname[0] == 'g' && fname[1] == ':')
+	만약 (fp == NULL && fname[0] == 'g' && fname[1] == ':')
 	{
 	    is_global = TRUE;
 	    rfname = fname + 2;
@@ -4075,15 +4075,15 @@ call_func(
 	rettv->vval.v_number = 0;
 	error = FCERR_UNKNOWN;
 
-	if (fp != NULL || !builtin_function(rfname, -1))
+	만약 (fp != NULL || !builtin_function(rfname, -1))
 	{
 	    /*
 	     * User defined function.
 	     */
-	    if (fp == NULL)
+	    만약 (fp == NULL)
 	    {
 		fp = find_func(rfname, is_global);
-		if (fp != NULL && !is_global && in_vim9script()
+		만약 (fp != NULL && !is_global && in_vim9script()
 						 && func_requires_g_prefix(fp))
 		    // In Vim9 script g: is required to find a global
 		    // non-autoload function.
@@ -4091,7 +4091,7 @@ call_func(
 	    }
 
 	    // Trigger FuncUndefined event, may load the function.
-	    if (fp == NULL
+	    만약 (fp == NULL
 		    && apply_autocmds(EVENT_FUNCUNDEFINED,
 						    rfname, rfname, TRUE, NULL)
 		    && !aborting())
@@ -4100,32 +4100,32 @@ call_func(
 		fp = find_func(rfname, is_global);
 	    }
 	    // Try loading a package.
-	    if (fp == NULL && script_autoload(rfname, TRUE) && !aborting())
+	    만약 (fp == NULL && script_autoload(rfname, TRUE) && !aborting())
 	    {
 		// loaded a package, search for the function again
 		fp = find_func(rfname, is_global);
 	    }
-	    if (fp == NULL)
+	    만약 (fp == NULL)
 	    {
 		char_u *p = untrans_function_name(rfname);
 
 		// If using Vim9 script try not local to the script.
 		// Don't do this if the name starts with "s:".
-		if (p != NULL && (funcname[0] != 's' || funcname[1] != ':'))
+		만약 (p != NULL && (funcname[0] != 's' || funcname[1] != ':'))
 		    fp = find_func(p, is_global);
 	    }
 
-	    if (partial == NULL && fp != NULL && IS_GENERIC_FUNC(fp))
+	    만약 (partial == NULL && fp != NULL && IS_GENERIC_FUNC(fp))
 	    {
 		// generic function call
 		fp = generic_func_get(fp, &gfatab);
-		if (fp == NULL)
+		만약 (fp == NULL)
 		{
 		    error = FCERR_FAILED;
 		    goto theend;
 		}
 	    }
-	    else if (generic_func_args_table_size(&gfatab) > 0)
+	    아니면 만약 (generic_func_args_table_size(&gfatab) > 0)
 	    {
 		emsg_funcname(fp != NULL ? e_not_a_generic_function_str
 				: e_unknown_generic_function_str, rfname);
@@ -4133,18 +4133,18 @@ call_func(
 		goto theend;
 	    }
 
-	    if (fp != NULL && (fp->uf_flags & FC_DELETED))
+	    만약 (fp != NULL && (fp->uf_flags & FC_DELETED))
 		error = FCERR_DELETED;
-	    else if (fp != NULL)
+	    아니면 만약 (fp != NULL)
 	    {
-		int need_arg_check = FALSE;
-		if (funcexe->fe_check_type == NULL)
+		정수 need_arg_check = FALSE;
+		만약 (funcexe->fe_check_type == NULL)
 		{
 		    funcexe->fe_check_type = fp->uf_func_type;
 		    need_arg_check = TRUE;
 		}
 
-		if (funcexe->fe_argv_func != NULL)
+		만약 (funcexe->fe_argv_func != NULL)
 		{
 		    // postponed filling in the arguments, do it now
 		    argcount = funcexe->fe_argv_func(argcount, argvars,
@@ -4152,7 +4152,7 @@ call_func(
 		    need_arg_check = TRUE;
 		}
 
-		if (funcexe->fe_basetv != NULL)
+		만약 (funcexe->fe_basetv != NULL)
 		{
 		    // Method call: base->Method()
 		    mch_memmove(&argv[1], argvars, sizeof(typval_T) * argcount);
@@ -4165,16 +4165,16 @@ call_func(
 
 		// Check the argument types now that the function type and all
 		// argument values are known, if not done above.
-		if (need_arg_check)
+		만약 (need_arg_check)
 		    error = may_check_argument_types(funcexe, argvars, argcount,
 				       TRUE, (name != NULL) ? name : funcname);
 
-		if (error == FCERR_NONE || error == FCERR_UNKNOWN)
+		만약 (error == FCERR_NONE || error == FCERR_UNKNOWN)
 		    error = call_user_func_check(fp, argcount, argvars, rettv,
 							    funcexe, selfdict);
 	    }
 	}
-	else if (funcexe->fe_basetv != NULL)
+	아니면 만약 (funcexe->fe_basetv != NULL)
 	{
 	    /*
 	     * expr->method(): Find the method name in the table, call its
@@ -4183,7 +4183,7 @@ call_func(
 	    error = call_internal_method(fname, argcount, argvars, rettv,
 							   funcexe->fe_basetv);
 	}
-	else
+	아니면
 	{
 	    /*
 	     * Find the function name in the table, call its implementation.
@@ -4203,7 +4203,7 @@ call_func(
 	 */
 	update_force_abort();
     }
-    if (error == FCERR_NONE)
+    만약 (error == FCERR_NONE)
 	ret = OK;
 
 theend:
@@ -4211,19 +4211,19 @@ theend:
      * Report an error unless the argument evaluation or function call has been
      * cancelled due to an aborting error, an interrupt, or an exception.
      */
-    if (!aborting())
+    만약 (!aborting())
 	user_func_error(error, (name != NULL) ? name : funcname,
 							funcexe->fe_found_var);
 
     // clear the copies made from the partial
-    while (argv_clear > 0)
+    동안 (argv_clear > 0)
 	clear_tv(&argv[--argv_clear + argv_base]);
 
     vim_free(tofree);
     vim_free(name);
     generic_func_args_table_clear(&gfatab);
 
-    return ret;
+    반환 ret;
 }
 
 /*
@@ -4232,20 +4232,20 @@ theend:
  * To be used by "expr" options.
  * Returns NOTDONE when the function could not be found.
  */
-    int
+    정수
 call_simple_func(
     char_u	*funcname,	// name of the function
     size_t	len,		// length of "name"
     typval_T	*rettv)		// return value goes here
 {
-    int		ret = FAIL;
+    정수		ret = FAIL;
     funcerror_T	error = FCERR_NONE;
     char_u	fname_buf[FLEN_FIXED + 1];
     char_u	*tofree = NULL;
     char_u	*name;
     char_u	*fname;
     char_u	*rfname;
-    int		is_global = FALSE;
+    정수		is_global = FALSE;
     ufunc_T	*fp;
 
     rettv->v_type = VAR_NUMBER;	// default rettv is number zero
@@ -4253,30 +4253,30 @@ call_simple_func(
 
     // Make a copy of the name, an option can be changed in the function.
     name = vim_strnsave(funcname, len);
-    if (name == NULL)
-	return ret;
+    만약 (name == NULL)
+	반환 ret;
 
     fname = fname_trans_sid(name, fname_buf, &tofree, &error);
 
     // Skip "g:" before a function name.
-    if (fname[0] == 'g' && fname[1] == ':')
+    만약 (fname[0] == 'g' && fname[1] == ':')
     {
 	is_global = TRUE;
 	rfname = fname + 2;
     }
-    else
+    아니면
 	rfname = fname;
     fp = find_func(rfname, is_global);
-    if (fp != NULL && !is_global && in_vim9script()
+    만약 (fp != NULL && !is_global && in_vim9script()
 						 && func_requires_g_prefix(fp))
 	// In Vim9 script g: is required to find a global non-autoload
 	// function.
 	fp = NULL;
-    if (fp == NULL)
+    만약 (fp == NULL)
 	ret = NOTDONE;
-    else if (fp != NULL && (fp->uf_flags & FC_DELETED))
+    아니면 만약 (fp != NULL && (fp->uf_flags & FC_DELETED))
 	error = FCERR_DELETED;
-    else if (fp != NULL)
+    아니면 만약 (fp != NULL)
     {
 	typval_T argvars[1];
 	funcexe_T	funcexe;
@@ -4286,7 +4286,7 @@ call_simple_func(
 	funcexe.fe_evaluate = TRUE;
 
 	error = call_user_func_check(fp, 0, argvars, rettv, &funcexe, NULL);
-	if (error == FCERR_NONE)
+	만약 (error == FCERR_NONE)
 	    ret = OK;
     }
 
@@ -4294,59 +4294,59 @@ call_simple_func(
     vim_free(tofree);
     vim_free(name);
 
-    return ret;
+    반환 ret;
 }
 
     char_u *
 printable_func_name(ufunc_T *fp)
 {
-    return fp->uf_name_exp != NULL ? fp->uf_name_exp : fp->uf_name;
+    반환 fp->uf_name_exp != NULL ? fp->uf_name_exp : fp->uf_name;
 }
 
 /*
  * When "prev_ht_changed" does not equal "ht_changed" give an error and return
  * TRUE.  Otherwise return FALSE.
  */
-    static int
-function_list_modified(int prev_ht_changed)
+    static 정수
+function_list_modified(정수 prev_ht_changed)
 {
-    if (prev_ht_changed != func_hashtab.ht_changed)
+    만약 (prev_ht_changed != func_hashtab.ht_changed)
     {
 	emsg(_(e_function_list_was_modified));
-	return TRUE;
+	반환 TRUE;
     }
-    return FALSE;
+    반환 FALSE;
 }
 
 /*
  * List the head of the function: "function name(arg1, arg2)".
  */
-    static int
-list_func_head(ufunc_T *fp, int indent)
+    static 정수
+list_func_head(ufunc_T *fp, 정수 indent)
 {
-    int		prev_ht_changed = func_hashtab.ht_changed;
-    int		j;
+    정수		prev_ht_changed = func_hashtab.ht_changed;
+    정수		j;
 
     msg_start();
 
     // a timer at the more prompt may have deleted the function
-    if (function_list_modified(prev_ht_changed))
-	return FAIL;
+    만약 (function_list_modified(prev_ht_changed))
+	반환 FAIL;
 
-    if (indent)
+    만약 (indent)
 	msg_puts("   ");
-    if (fp->uf_def_status != UF_NOT_COMPILED)
+    만약 (fp->uf_def_status != UF_NOT_COMPILED)
 	msg_puts("def ");
-    else
+    아니면
 	msg_puts("function ");
     msg_puts((char *)printable_func_name(fp));
     msg_putchar('(');
-    for (j = 0; j < fp->uf_args.ga_len; ++j)
+    위해 (j = 0; j < fp->uf_args.ga_len; ++j)
     {
-	if (j)
+	만약 (j)
 	    msg_puts(", ");
 	msg_puts((char *)FUNCARG(fp, j));
-	if (fp->uf_arg_types != NULL)
+	만약 (fp->uf_arg_types != NULL)
 	{
 	    char *tofree;
 
@@ -4354,29 +4354,29 @@ list_func_head(ufunc_T *fp, int indent)
 	    msg_puts(type_name(fp->uf_arg_types[j], &tofree));
 	    vim_free(tofree);
 	}
-	if (j >= fp->uf_args.ga_len - fp->uf_def_args.ga_len)
+	만약 (j >= fp->uf_args.ga_len - fp->uf_def_args.ga_len)
 	{
 	    msg_puts(" = ");
 	    msg_puts(((char **)(fp->uf_def_args.ga_data))
 		       [j - fp->uf_args.ga_len + fp->uf_def_args.ga_len]);
 	}
     }
-    if (fp->uf_varargs)
+    만약 (fp->uf_varargs)
     {
-	if (j)
+	만약 (j)
 	    msg_puts(", ");
 	msg_puts("...");
     }
-    if (fp->uf_va_name != NULL)
+    만약 (fp->uf_va_name != NULL)
     {
-	if (!fp->uf_varargs)
+	만약 (!fp->uf_varargs)
 	{
-	    if (j)
+	    만약 (j)
 		msg_puts(", ");
 	    msg_puts("...");
 	}
 	msg_puts((char *)fp->uf_va_name);
-	if (fp->uf_va_type != NULL)
+	만약 (fp->uf_va_type != NULL)
 	{
 	    char *tofree;
 
@@ -4387,9 +4387,9 @@ list_func_head(ufunc_T *fp, int indent)
     }
     msg_putchar(')');
 
-    if (fp->uf_def_status != UF_NOT_COMPILED)
+    만약 (fp->uf_def_status != UF_NOT_COMPILED)
     {
-	if (fp->uf_ret_type != &t_void)
+	만약 (fp->uf_ret_type != &t_void)
 	{
 	    char *tofree;
 
@@ -4398,19 +4398,19 @@ list_func_head(ufunc_T *fp, int indent)
 	    vim_free(tofree);
 	}
     }
-    else if (fp->uf_flags & FC_ABORT)
+    아니면 만약 (fp->uf_flags & FC_ABORT)
 	msg_puts(" abort");
-    if (fp->uf_flags & FC_RANGE)
+    만약 (fp->uf_flags & FC_RANGE)
 	msg_puts(" range");
-    if (fp->uf_flags & FC_DICT)
+    만약 (fp->uf_flags & FC_DICT)
 	msg_puts(" dict");
-    if (fp->uf_flags & FC_CLOSURE)
+    만약 (fp->uf_flags & FC_CLOSURE)
 	msg_puts(" closure");
     msg_clr_eos();
-    if (p_verbose > 0)
+    만약 (p_verbose > 0)
 	last_set_msg(fp->uf_script_ctx);
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -4430,11 +4430,11 @@ list_func_head(ufunc_T *fp, int indent)
     char_u *
 trans_function_name(
     char_u	**pp,
-    int		*is_global,
-    int		skip,		// only find the end, don't evaluate
-    int		flags)
+    정수		*is_global,
+    정수		skip,		// only find the end, don't evaluate
+    정수		flags)
 {
-    return trans_function_name_ext(pp, is_global, skip, flags,
+    반환 trans_function_name_ext(pp, is_global, skip, flags,
 	    NULL, NULL, NULL, NULL);
 }
 
@@ -4445,9 +4445,9 @@ trans_function_name(
     static char_u *
 trans_function_name_ext(
     char_u	**pp,
-    int		*is_global,
-    int		skip,		// only find the end, don't evaluate
-    int		flags,
+    정수		*is_global,
+    정수		skip,		// only find the end, don't evaluate
+    정수		flags,
     funcdict_T	*fdp,		// return: info about dictionary used
     partial_T	**partial,	// return: partial of a FuncRef
     type_T	**type,		// return: type of funcref
@@ -4456,114 +4456,114 @@ trans_function_name_ext(
     char_u	*name = NULL;
     char_u	*start;
     char_u	*end;
-    int		lead;
+    정수		lead;
     char_u	sid_buf[20];
-    int		len;
-    int		extra = 0;
-    int		prefix_g = FALSE;
+    정수		len;
+    정수		extra = 0;
+    정수		prefix_g = FALSE;
     lval_T	lv;
-    int		vim9script = in_vim9script();
-    int		vim9_local;
+    정수		vim9script = in_vim9script();
+    정수		vim9_local;
 
-    if (fdp != NULL)
+    만약 (fdp != NULL)
 	CLEAR_POINTER(fdp);
     start = *pp;
 
     // Check for hard coded <SNR>: already translated function ID (from a user
     // command).
-    if ((*pp)[0] == K_SPECIAL && (*pp)[1] == KS_EXTRA
-						   && (*pp)[2] == (int)KE_SNR)
+    만약 ((*pp)[0] == K_SPECIAL && (*pp)[1] == KS_EXTRA
+						   && (*pp)[2] == (정수)KE_SNR)
     {
 	*pp += 3;
 	len = get_id_len(pp) + 3;
-	return vim_strnsave(start, len);
+	반환 vim_strnsave(start, len);
     }
 
     // A name starting with "<SID>" or "<SNR>" is local to a script.  But
     // don't skip over "s:", get_lval() needs it for "s:dict.func".
     lead = eval_fname_script(start);
-    if (lead > 2)
+    만약 (lead > 2)
 	start += lead;
 
     // Note that TFN_ flags use the same values as GLV_ flags.
     end = get_lval(start, NULL, &lv, FALSE, skip,
 			flags | GLV_READ_ONLY | GLV_PREFER_FUNC,
 					      lead > 2 ? 0 : FNE_CHECK_START);
-    if (end == start || (vim9script && end != NULL
+    만약 (end == start || (vim9script && end != NULL
 				   && end[-1] == AUTOLOAD_CHAR && *end == '('))
     {
-	if (!skip)
+	만약 (!skip)
 	    emsg(_(e_function_name_required));
 	goto theend;
     }
-    if (end == NULL || (lv.ll_tv != NULL && (lead > 2 || lv.ll_range)))
+    만약 (end == NULL || (lv.ll_tv != NULL && (lead > 2 || lv.ll_range)))
     {
 	/*
 	 * Report an invalid expression in braces, unless the expression
 	 * evaluation has been cancelled due to an aborting error, an
 	 * interrupt, or an exception.
 	 */
-	if (!aborting())
+	만약 (!aborting())
 	{
-	    if (end != NULL)
+	    만약 (end != NULL)
 		semsg(_(e_invalid_argument_str), start);
 	}
-	else
+	아니면
 	    *pp = find_name_end(start, NULL, NULL, FNE_INCL_BR);
 	goto theend;
     }
 
-    if (lv.ll_ufunc != NULL)
+    만약 (lv.ll_ufunc != NULL)
     {
-	if (ufunc != NULL)
+	만약 (ufunc != NULL)
 	    *ufunc = lv.ll_ufunc;
 	name = vim_strnsave(lv.ll_ufunc->uf_name, lv.ll_ufunc->uf_namelen);
 	*pp = end;
 	goto theend;
     }
 
-    if (lv.ll_tv != NULL)
+    만약 (lv.ll_tv != NULL)
     {
-	if (fdp != NULL)
+	만약 (fdp != NULL)
 	{
 	    fdp->fd_dict = lv.ll_dict;
 	    fdp->fd_newkey = lv.ll_newkey;
 	    lv.ll_newkey = NULL;
 	    fdp->fd_di = lv.ll_di;
 	}
-	if (lv.ll_tv->v_type == VAR_FUNC && lv.ll_tv->vval.v_string != NULL)
+	만약 (lv.ll_tv->v_type == VAR_FUNC && lv.ll_tv->vval.v_string != NULL)
 	{
 	    name = vim_strsave(lv.ll_tv->vval.v_string);
 	    *pp = end;
 	}
-	else if (lv.ll_tv->v_type == VAR_CLASS
+	아니면 만약 (lv.ll_tv->v_type == VAR_CLASS
 					     && lv.ll_tv->vval.v_class != NULL)
 	{
 	    name = vim_strnsave(lv.ll_tv->vval.v_class->class_name.string,
 		lv.ll_tv->vval.v_class->class_name.length);
 	    *pp = end;
 	}
-	else if (lv.ll_tv->v_type == VAR_PARTIAL
+	아니면 만약 (lv.ll_tv->v_type == VAR_PARTIAL
 					  && lv.ll_tv->vval.v_partial != NULL)
 	{
 	    name = vim_strsave(partial_name(lv.ll_tv->vval.v_partial));
 	    *pp = end;
-	    if (partial != NULL)
+	    만약 (partial != NULL)
 		*partial = lv.ll_tv->vval.v_partial;
 	}
-	else
+	아니면
 	{
-	    if (!skip && !(flags & TFN_QUIET) && (fdp == NULL
+	    만약 (!skip && !(flags & TFN_QUIET) && (fdp == NULL
 			     || lv.ll_dict == NULL || fdp->fd_newkey == NULL))
 		emsg(_(e_funcref_required));
-	    else
+	    아니면
 		*pp = end;
 	    name = NULL;
 	}
 	goto theend;
     }
 
-    if (lv.ll_name == NULL)
+    만약 (lv.ll_name == NULL)
     {
 	// Error found, but continue after the function name.
 	*pp = end;
@@ -4571,30 +4571,30 @@ trans_function_name_ext(
     }
 
     // Check if the name is a Funcref.  If so, use the value.
-    if (lv.ll_exp_name != NULL)
+    만약 (lv.ll_exp_name != NULL)
     {
-	len = (int)STRLEN(lv.ll_exp_name);
+	len = (정수)STRLEN(lv.ll_exp_name);
 	name = deref_func_name(lv.ll_exp_name, &len, partial, type,
 			  flags & TFN_NO_AUTOLOAD, flags & TFN_NEW_FUNC, NULL);
-	if (name == lv.ll_exp_name)
+	만약 (name == lv.ll_exp_name)
 	    name = NULL;
     }
-    else if (lv.ll_sid > 0)
+    아니면 만약 (lv.ll_sid > 0)
     {
 	scriptitem_T	*si = SCRIPT_ITEM(lv.ll_sid);
-	int		cc = *lv.ll_name_end;
+	정수		cc = *lv.ll_name_end;
 
 	// function in another script.  Prefix <SNR>99_ or the autoload prefix.
 	*lv.ll_name_end = NUL;
-	if (si->sn_autoload_prefix != NULL)
+	만약 (si->sn_autoload_prefix != NULL)
 	{
 	    name = concat_str(si->sn_autoload_prefix, lv.ll_name);
 	}
-	else
+	아니면
 	{
 	    sid_buf[0] = K_SPECIAL;
 	    sid_buf[1] = KS_EXTRA;
-	    sid_buf[2] = (int)KE_SNR;
+	    sid_buf[2] = (정수)KE_SNR;
 	    vim_snprintf((char *)sid_buf + 3, sizeof(sid_buf) - 3,
 						      "%ld_", (long)lv.ll_sid);
 	    name = concat_str(sid_buf, lv.ll_name);
@@ -4603,33 +4603,33 @@ trans_function_name_ext(
 	*pp = end;
 	goto theend;
     }
-    else if (!(flags & TFN_NO_DEREF))
+    아니면 만약 (!(flags & TFN_NO_DEREF))
     {
-	len = (int)(end - *pp);
+	len = (정수)(end - *pp);
 	name = deref_func_name(*pp, &len, partial, type,
 			  flags & TFN_NO_AUTOLOAD, flags & TFN_NEW_FUNC, NULL);
-	if (name == *pp)
+	만약 (name == *pp)
 	    name = NULL;
     }
-    if (name != NULL)
+    만약 (name != NULL)
     {
 	name = vim_strsave(name);
 	*pp = end;
-	if (name != NULL && STRNCMP(name, "<SNR>", 5) == 0)
+	만약 (name != NULL && STRNCMP(name, "<SNR>", 5) == 0)
 	{
 	    // Change "<SNR>" to the byte sequence.
 	    name[0] = K_SPECIAL;
 	    name[1] = KS_EXTRA;
-	    name[2] = (int)KE_SNR;
+	    name[2] = (정수)KE_SNR;
 	    mch_memmove(name + 3, name + 5, STRLEN(name + 5) + 1);
 	}
 	goto theend;
     }
 
-    if (lv.ll_exp_name != NULL)
+    만약 (lv.ll_exp_name != NULL)
     {
-	len = (int)STRLEN(lv.ll_exp_name);
-	if (lead <= 2 && lv.ll_name == lv.ll_exp_name
+	len = (정수)STRLEN(lv.ll_exp_name);
+	만약 (lead <= 2 && lv.ll_name == lv.ll_exp_name
 					 && STRNCMP(lv.ll_name, "s:", 2) == 0)
 	{
 	    // When there was "s:" already or the name expanded to get a
@@ -4639,18 +4639,18 @@ trans_function_name_ext(
 	    lead = 2;
 	}
     }
-    else
+    아니면
     {
 	// skip over "s:" and "g:"
-	if (lead == 2 || (lv.ll_name[0] == 'g' && lv.ll_name[1] == ':'))
+	만약 (lead == 2 || (lv.ll_name[0] == 'g' && lv.ll_name[1] == ':'))
 	{
-	    if (lv.ll_name[0] == 'g')
+	    만약 (lv.ll_name[0] == 'g')
 	    {
-		if (is_global != NULL)
+		만약 (is_global != NULL)
 		{
 		    *is_global = TRUE;
 		}
-		else
+		아니면
 		{
 		    // dropping "g:" without setting "is_global" won't work in
 		    // Vim9 script, put it back later
@@ -4660,11 +4660,11 @@ trans_function_name_ext(
 	    }
 	    lv.ll_name += 2;
 	}
-	len = (int)(end - lv.ll_name);
+	len = (정수)(end - lv.ll_name);
     }
-    if (len <= 0)
+    만약 (len <= 0)
     {
-	if (!skip)
+	만약 (!skip)
 	    emsg(_(e_function_name_required));
 	goto theend;
     }
@@ -4679,13 +4679,13 @@ trans_function_name_ext(
      * Accept <SID>name() inside a script, translate into <SNR>123_name().
      * Accept <SNR>123_name() outside a script.
      */
-    if (skip)
+    만약 (skip)
 	lead = 0;	// do nothing
-    else if (lead > 0 || vim9_local)
+    아니면 만약 (lead > 0 || vim9_local)
     {
-	if (!vim9_local)
+	만약 (!vim9_local)
 	{
-	    if (vim9script && lead == 2 && !ASCII_ISUPPER(*lv.ll_name)
+	    만약 (vim9script && lead == 2 && !ASCII_ISUPPER(*lv.ll_name)
 						   && current_script_is_vim9())
 	    {
 		semsg(_(e_function_name_must_start_with_capital_str), start);
@@ -4693,29 +4693,29 @@ trans_function_name_ext(
 	    }
 	    lead = 3;
 	}
-	if (vim9_local || (lv.ll_exp_name != NULL
+	만약 (vim9_local || (lv.ll_exp_name != NULL
 					     && eval_fname_sid(lv.ll_exp_name))
 						       || eval_fname_sid(*pp))
 	{
 	    size_t  sid_buflen;
 
 	    // It's script-local, "s:" or "<SID>"
-	    if (current_sctx.sc_sid <= 0)
+	    만약 (current_sctx.sc_sid <= 0)
 	    {
 		emsg(_(e_using_sid_not_in_script_context));
 		goto theend;
 	    }
 	    sid_buflen = vim_snprintf((char *)sid_buf, sizeof(sid_buf), "%ld_", (long)current_sctx.sc_sid);
-	    if (vim9_local)
-		extra = 3 + (int)sid_buflen;
-	    else
-		lead += (int)sid_buflen;
+	    만약 (vim9_local)
+		extra = 3 + (정수)sid_buflen;
+	    아니면
+		lead += (정수)sid_buflen;
 	}
     }
     // The function name must start with an upper case letter (unless it is a
     // Vim9 class new() function or a Vim9 class private method or one of the
     // supported Vim9 object builtin functions)
-    else if (!(flags & TFN_INT)
+    아니면 만약 (!(flags & TFN_INT)
 	    && (builtin_function(lv.ll_name, len)
 				   || (vim9script && *lv.ll_name == '_'))
 	    && !((flags & TFN_IN_CLASS)
@@ -4727,11 +4727,11 @@ trans_function_name_ext(
 									start);
 	goto theend;
     }
-    if (!skip && !(flags & TFN_QUIET) && !(flags & TFN_NO_DEREF))
+    만약 (!skip && !(flags & TFN_QUIET) && !(flags & TFN_NO_DEREF))
     {
 	char_u *cp = vim_strchr(lv.ll_name, ':');
 
-	if (cp != NULL && cp < end)
+	만약 (cp != NULL && cp < end)
 	{
 	    semsg(_(e_function_name_cannot_contain_colon_str), start);
 	    goto theend;
@@ -4739,17 +4739,17 @@ trans_function_name_ext(
     }
 
     name = alloc(len + lead + extra + 1);
-    if (name != NULL)
+    만약 (name != NULL)
     {
-	if (!skip && (lead > 0 || vim9_local))
+	만약 (!skip && (lead > 0 || vim9_local))
 	{
 	    name[0] = K_SPECIAL;
 	    name[1] = KS_EXTRA;
-	    name[2] = (int)KE_SNR;
-	    if (vim9_local || lead > 3)	// If it's "<SID>"
+	    name[2] = (정수)KE_SNR;
+	    만약 (vim9_local || lead > 3)	// If it's "<SID>"
 		STRCPY(name + 3, sid_buf);
 	}
-	else if (prefix_g)
+	아니면 만약 (prefix_g)
 	{
 	    name[0] = 'g';
 	    name[1] = ':';
@@ -4761,7 +4761,7 @@ trans_function_name_ext(
 
 theend:
     clear_lval(&lv);
-    return name;
+    반환 name;
 }
 
 /*
@@ -4776,13 +4776,13 @@ untrans_function_name(char_u *name)
 {
     char_u *p;
 
-    if (*name == K_SPECIAL && in_vim9script())
+    만약 (*name == K_SPECIAL && in_vim9script())
     {
 	p = vim_strchr(name, '_');
-	if (p != NULL)
-	    return p + 1;
+	만약 (p != NULL)
+	    반환 p + 1;
     }
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4797,48 +4797,48 @@ get_scriptlocal_funcname(char_u *funcname)
 {
     char	sid_buf[25];
     size_t	sid_buflen;
-    int		off;
+    정수		off;
     char_u	*newname;
     size_t	newnamesize;
     char_u	*p = funcname;
 
-    if (funcname == NULL)
-	return NULL;
+    만약 (funcname == NULL)
+	반환 NULL;
 
-    if (STRNCMP(funcname, "s:", 2) != 0
+    만약 (STRNCMP(funcname, "s:", 2) != 0
 		&& STRNCMP(funcname, "<SID>", 5) != 0)
     {
 	ufunc_T	    *ufunc;
 
 	// The function name does not have a script-local prefix.  Try finding
 	// it when in a Vim9 script and there is no "g:" prefix.
-	if (!in_vim9script() || STRNCMP(funcname, "g:", 2) == 0)
-	    return NULL;
+	만약 (!in_vim9script() || STRNCMP(funcname, "g:", 2) == 0)
+	    반환 NULL;
 	ufunc = find_func(funcname, FALSE);
-	if (ufunc == NULL || func_is_global(ufunc)
+	만약 (ufunc == NULL || func_is_global(ufunc)
 			      || (p = vim_strchr(ufunc->uf_name, '_')) == NULL)
-	    return NULL;
+	    반환 NULL;
 	++p;
 	off = 0;
     }
-    else
+    아니면
 	off = *funcname == 's' ? 2 : 5;
 
-    if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+    만약 (!SCRIPT_ID_VALID(current_sctx.sc_sid))
     {
 	emsg(_(e_using_sid_not_in_script_context));
-	return NULL;
+	반환 NULL;
     }
     // Expand s: prefix into <SNR>nr_<name>
     sid_buflen = vim_snprintf(sid_buf, sizeof(sid_buf), "<SNR>%ld_",
 	    (long)current_sctx.sc_sid);
     newnamesize = sid_buflen + STRLEN(p + off) + 1;
     newname = alloc(newnamesize);
-    if (newname == NULL)
-	return NULL;
+    만약 (newname == NULL)
+	반환 NULL;
     vim_snprintf((char *)newname, newnamesize, "%s%s", sid_buf, p + off);
 
-    return newname;
+    반환 newname;
 }
 
 /*
@@ -4850,12 +4850,12 @@ alloc_printable_func_name(char_u *fname)
 {
     char_u *n = alloc(STRLEN(fname + 3) + 6);
 
-    if (n != NULL)
+    만약 (n != NULL)
     {
 	STRCPY(n, "<SNR>");
 	STRCPY(n + 5, fname + 3);
     }
-    return n;
+    반환 n;
 }
 
 /*
@@ -4865,27 +4865,27 @@ alloc_printable_func_name(char_u *fname)
     char_u *
 save_function_name(
 	char_u	    **name,
-	int	    *is_global,
-	int	    skip,
-	int	    flags,
+	정수	    *is_global,
+	정수	    skip,
+	정수	    flags,
 	funcdict_T  *fudi)
 {
     char_u *p = *name;
     char_u *saved;
 
-    if (STRNCMP(p, "<lambda>", 8) == 0)
+    만약 (STRNCMP(p, "<lambda>", 8) == 0)
     {
 	p += 8;
 	(void)getdigits(&p);
 	saved = vim_strnsave(*name, p - *name);
-	if (fudi != NULL)
+	만약 (fudi != NULL)
 	    CLEAR_POINTER(fudi);
     }
-    else
+    아니면
 	saved = trans_function_name_ext(&p, is_global, skip,
 						flags, fudi, NULL, NULL, NULL);
     *name = p;
-    return saved;
+    반환 saved;
 }
 
 /*
@@ -4895,28 +4895,28 @@ save_function_name(
     void
 list_functions(regmatch_T *regmatch)
 {
-    int		prev_ht_changed = func_hashtab.ht_changed;
+    정수		prev_ht_changed = func_hashtab.ht_changed;
     long_u	todo = func_hashtab.ht_used;
     hashitem_T	*hi;
 
-    for (hi = func_hashtab.ht_array; todo > 0 && !got_int; ++hi)
+    위해 (hi = func_hashtab.ht_array; todo > 0 && !got_int; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	만약 (!HASHITEM_EMPTY(hi))
 	{
 	    ufunc_T	*fp = HI2UF(hi);
 
 	    --todo;
-	    if ((fp->uf_flags & FC_DEAD) == 0
+	    만약 ((fp->uf_flags & FC_DEAD) == 0
 		    && (regmatch == NULL
 			? !message_filtered(fp->uf_name)
 			    && !func_name_refcount(fp->uf_name)
 			: !SAFE_isdigit(*fp->uf_name)
 			    && vim_regexec(regmatch, fp->uf_name, 0)))
 	    {
-		if (list_func_head(fp, FALSE) == FAIL)
-		    return;
-		if (function_list_modified(prev_ht_changed))
-		    return;
+		만약 (list_func_head(fp, FALSE) == FAIL)
+		    반환;
+		만약 (function_list_modified(prev_ht_changed))
+		    반환;
 	    }
 	}
     }
@@ -4932,7 +4932,7 @@ list_functions_matching_pat(exarg_T *eap)
     char_u	c;
 
     p = skip_regexp(eap->arg + 1, '/', TRUE);
-    if (!eap->skip)
+    만약 (!eap->skip)
     {
 	regmatch_T	regmatch;
 
@@ -4940,17 +4940,17 @@ list_functions_matching_pat(exarg_T *eap)
 	*p = NUL;
 	regmatch.regprog = vim_regcomp(eap->arg + 1, RE_MAGIC);
 	*p = c;
-	if (regmatch.regprog != NULL)
+	만약 (regmatch.regprog != NULL)
 	{
 	    regmatch.rm_ic = p_ic;
 	    list_functions(&regmatch);
 	    vim_regfree(regmatch.regprog);
 	}
     }
-    if (*p == '/')
+    만약 (*p == '/')
 	++p;
 
-    return p;
+    반환 p;
 }
 
 /*
@@ -4958,79 +4958,79 @@ list_functions_matching_pat(exarg_T *eap)
  * Returns the function pointer or NULL on failure.
  */
     static ufunc_T *
-list_one_function(exarg_T *eap, char_u *name, char_u *p, int is_global)
+list_one_function(exarg_T *eap, char_u *name, char_u *p, 정수 is_global)
 {
     ufunc_T	*fp = NULL;
-    int		j;
+    정수		j;
 
-    if (!ends_excmd(*skipwhite(p)))
+    만약 (!ends_excmd(*skipwhite(p)))
     {
 	semsg(_(e_trailing_characters_str), p);
-	return NULL;
+	반환 NULL;
     }
 
     set_nextcmd(eap, p);
 
-    if (eap->nextcmd != NULL)
+    만약 (eap->nextcmd != NULL)
 	*p = NUL;
 
-    if (eap->skip || got_int)
-	return NULL;
+    만약 (eap->skip || got_int)
+	반환 NULL;
 
     fp = find_func(name, is_global);
-    if (fp == NULL && ASCII_ISUPPER(*eap->arg))
+    만약 (fp == NULL && ASCII_ISUPPER(*eap->arg))
     {
 	char_u *up = untrans_function_name(name);
 
 	// With Vim9 script the name was made script-local, if not
 	// found try again with the original name.
-	if (up != NULL)
+	만약 (up != NULL)
 	    fp = find_func(up, FALSE);
     }
 
-    if (fp == NULL)
+    만약 (fp == NULL)
     {
 	emsg_funcname(e_undefined_function_str, eap->arg);
-	return NULL;
+	반환 NULL;
     }
 
     // Check no function was added or removed from a timer, e.g. at
     // the more prompt.  "fp" may then be invalid.
-    int prev_ht_changed = func_hashtab.ht_changed;
+    정수 prev_ht_changed = func_hashtab.ht_changed;
 
-    if (list_func_head(fp, TRUE) != OK)
-	return fp;
+    만약 (list_func_head(fp, TRUE) != OK)
+	반환 fp;
 
-    for (j = 0; j < fp->uf_lines.ga_len && !got_int; ++j)
+    위해 (j = 0; j < fp->uf_lines.ga_len && !got_int; ++j)
     {
-	if (FUNCLINE(fp, j) == NULL)
+	만약 (FUNCLINE(fp, j) == NULL)
 	    continue;
 	msg_putchar('\n');
 	msg_outnum((long)(j + 1));
-	if (j < 9)
+	만약 (j < 9)
 	    msg_putchar(' ');
-	if (j < 99)
+	만약 (j < 99)
 	    msg_putchar(' ');
-	if (function_list_modified(prev_ht_changed))
+	만약 (function_list_modified(prev_ht_changed))
 	    break;
 	msg_prt_line(FUNCLINE(fp, j), FALSE);
 	out_flush();	// show a line at a time
 	ui_breakcheck();
     }
 
-    if (!got_int)
+    만약 (!got_int)
     {
 	msg_putchar('\n');
-	if (!function_list_modified(prev_ht_changed))
+	만약 (!function_list_modified(prev_ht_changed))
 	{
-	    if (fp->uf_def_status != UF_NOT_COMPILED)
+	    만약 (fp->uf_def_status != UF_NOT_COMPILED)
 		msg_puts("   enddef");
-	    else
+	    아니면
 		msg_puts("   endfunction");
 	}
     }
 
-    return fp;
+    반환 fp;
 }
 
 /*
@@ -5048,16 +5048,16 @@ define_function(
 	exarg_T	    *eap,
 	char_u	    *name_arg,
 	garray_T    *lines_to_free,
-	int	    class_flags,
+	정수	    class_flags,
 	ocmember_T  *obj_members,
-	int         obj_member_count,
+	정수         obj_member_count,
 	cctx_T	    *cctx)
 {
-    int		j;
-    int		saved_did_emsg = FALSE;
+    정수		j;
+    정수		saved_did_emsg = FALSE;
     char_u	*name = name_arg;
     size_t	namelen = 0;
-    int		is_global = FALSE;
+    정수		is_global = FALSE;
     char_u	*p;
     char_u	*arg;
     char_u	*whitep;
@@ -5068,39 +5068,39 @@ define_function(
     garray_T	default_args;
     garray_T	newlines;
     gfargs_tab_T gfatab;
-    int		varargs = FALSE;
-    int		flags = 0;
+    정수		varargs = FALSE;
+    정수		flags = 0;
     char_u	*ret_type = NULL;
     ufunc_T	*fp = NULL;
-    int		fp_allocated = FALSE;
-    int		free_fp = FALSE;
-    int		overwrite = FALSE;
+    정수		fp_allocated = FALSE;
+    정수		free_fp = FALSE;
+    정수		overwrite = FALSE;
     dictitem_T	*v;
     funcdict_T	fudi;
-    static int	func_nr = 0;	    // number for nameless function
-    int		paren;
+    static 정수	func_nr = 0;	    // number for nameless function
+    정수		paren;
     hashitem_T	*hi;
     linenr_T	sourcing_lnum_top;
-    int		vim9script = in_vim9script();
+    정수		vim9script = in_vim9script();
     imported_T	*import = NULL;
 
     // ":function" without argument: list functions.
-    if (ends_excmd2(eap->cmd, eap->arg))
+    만약 (ends_excmd2(eap->cmd, eap->arg))
     {
-	if (!eap->skip)
+	만약 (!eap->skip)
 	    list_functions(NULL);
 	set_nextcmd(eap, eap->arg);
-	return NULL;
+	반환 NULL;
     }
 
     /*
      * ":function /pat": list functions matching pattern.
      */
-    if (*eap->arg == '/')
+    만약 (*eap->arg == '/')
     {
 	p = list_functions_matching_pat(eap);
 	set_nextcmd(eap, p);
-	return NULL;
+	반환 NULL;
     }
 
     ga_init(&newargs);
@@ -5126,69 +5126,69 @@ define_function(
      * g:func	    global function name, same as "func"
      */
     p = eap->arg;
-    if (name_arg != NULL)
+    만약 (name_arg != NULL)
     {
 	// nested function, argument is (args).
 	paren = TRUE;
 	CLEAR_FIELD(fudi);
     }
-    else
+    아니면
     {
-	if (vim9script)
+	만약 (vim9script)
 	{
-	    if (p[0] == 's' && p[1] == ':')
+	    만약 (p[0] == 's' && p[1] == ':')
 	    {
 		semsg(_(e_cannot_use_s_colon_in_vim9_script_str), p);
-		return NULL;
+		반환 NULL;
 	    }
 	    p = to_name_end(p, TRUE);
-	    if (*skipwhite(p) == '.' && vim_strchr(p, '(') != NULL)
+	    만약 (*skipwhite(p) == '.' && vim_strchr(p, '(') != NULL)
 	    {
 		semsg(_(e_cannot_define_dict_func_in_vim9_script_str),
 								     eap->arg);
-		return NULL;
+		반환 NULL;
 	    }
 
 	    p = eap->arg;
 	}
 
-	int tfn_flags = TFN_NO_AUTOLOAD | TFN_NEW_FUNC
+	정수 tfn_flags = TFN_NO_AUTOLOAD | TFN_NEW_FUNC
 				       | (class_flags != 0 ? TFN_IN_CLASS : 0);
 	name = save_function_name(&p, &is_global, eap->skip, tfn_flags, &fudi);
 	paren = (vim_strchr(p, '(') != NULL);
-	if (name == NULL && (fudi.fd_dict == NULL || !paren) && !eap->skip)
+	만약 (name == NULL && (fudi.fd_dict == NULL || !paren) && !eap->skip)
 	{
 	    /*
 	     * Return on an invalid expression in braces, unless the expression
 	     * evaluation has been cancelled due to an aborting error, an
 	     * interrupt, or an exception.
 	     */
-	    if (!aborting())
+	    만약 (!aborting())
 	    {
-		if (!eap->skip && fudi.fd_newkey != NULL)
+		만약 (!eap->skip && fudi.fd_newkey != NULL)
 		    semsg(_(e_key_not_present_in_dictionary_str),
 							       fudi.fd_newkey);
 		vim_free(fudi.fd_newkey);
-		return NULL;
+		반환 NULL;
 	    }
-	    else
+	    아니면
 		eap->skip = TRUE;
 	}
 
 	// For "export def FuncName()" in an autoload script the function name
 	// is stored with the legacy autoload name "dir#script#FuncName" so
 	// that it can also be found in legacy script.
-	if (is_export && name != NULL)
+	만약 (is_export && name != NULL)
 	{
 	    char_u *prefixed = may_prefix_autoload(name);
 
-	    if (prefixed != NULL && prefixed != name)
+	    만약 (prefixed != NULL && prefixed != name)
 	    {
 		vim_free(name);
 		name = prefixed;
 	    }
 	}
-	else if (paren && vim9script && name != NULL
+	아니면 만약 (paren && vim9script && name != NULL
 				    && vim_strchr(name, AUTOLOAD_CHAR) != NULL)
 	{
 	    emsg(_(e_cannot_use_name_with_hash_in_vim9_script_use_export_instead));
@@ -5204,7 +5204,7 @@ define_function(
     /*
      * ":function func" with only function name: list function.
      */
-    if (!paren)
+    만약 (!paren)
     {
 	fp = list_one_function(eap, name, p, is_global);
 	goto ret_free;
@@ -5214,11 +5214,11 @@ define_function(
      * :function func<type, type..>() is a generic function
      */
     p = skipwhite(p);
-    if (vim9script && eap->cmdidx == CMD_def && *p == '<')
+    만약 (vim9script && eap->cmdidx == CMD_def && *p == '<')
     {
 	// generic function
 	p = parse_generic_func_type_params(name, p, &gfatab, cctx);
-	if (p == NULL)
+	만약 (p == NULL)
 	    goto ret_free;
     }
 
@@ -5226,26 +5226,26 @@ define_function(
      * ":function name(arg1, arg2)" Define function.
      */
     p = skipwhite(p);
-    if (*p != '(')
+    만약 (*p != '(')
     {
-	if (!eap->skip)
+	만약 (!eap->skip)
 	{
 	    semsg(_(e_missing_paren_str), eap->arg);
 	    goto ret_free;
 	}
 	// attempt to continue by skipping some text
-	if (vim_strchr(p, '(') != NULL)
+	만약 (vim_strchr(p, '(') != NULL)
 	    p = vim_strchr(p, '(');
     }
 
-    if ((vim9script || eap->cmdidx == CMD_def) && VIM_ISWHITE(p[-1]))
+    만약 ((vim9script || eap->cmdidx == CMD_def) && VIM_ISWHITE(p[-1]))
     {
 	semsg(_(e_no_white_space_allowed_before_str_str), "(", p - 1);
 	goto ret_free;
     }
 
     // In Vim9 script only global functions can be redefined.
-    if (vim9script && eap->forceit && !is_global)
+    만약 (vim9script && eap->forceit && !is_global)
     {
 	emsg(_(e_no_bang_allowed));
 	goto ret_free;
@@ -5253,40 +5253,40 @@ define_function(
 
     ga_init2(&newlines, sizeof(char_u *), 10);
 
-    if (!eap->skip && name_arg == NULL)
+    만약 (!eap->skip && name_arg == NULL)
     {
 	// Check the name of the function.  Unless it's a dictionary function
 	// (that we are overwriting).
-	if (name != NULL)
+	만약 (name != NULL)
 	    arg = name;
-	else
+	아니면
 	    arg = fudi.fd_newkey;
-	if (arg != NULL && (fudi.fd_di == NULL
+	만약 (arg != NULL && (fudi.fd_di == NULL
 				     || (fudi.fd_di->di_tv.v_type != VAR_FUNC
 				 && fudi.fd_di->di_tv.v_type != VAR_PARTIAL)))
 	{
 	    char_u  *name_base = arg;
-	    int	    i;
+	    정수	    i;
 
 	    // When defining a dictionary function with bracket notation
 	    // (e.g. obj['foo-bar']()), the key is a dictionary key and is not
 	    // required to follow function naming rules.  Skip the identifier
 	    // check in that case.
-	    if (arg != fudi.fd_newkey)
+	    만약 (arg != fudi.fd_newkey)
 	    {
-		if (*arg == K_SPECIAL)
+		만약 (*arg == K_SPECIAL)
 		{
 		    name_base = vim_strchr(arg, '_');
-		    if (name_base == NULL)
+		    만약 (name_base == NULL)
 			name_base = arg + 3;
-		    else
+		    아니면
 			++name_base;
 		}
-		for (i = 0; name_base[i] != NUL && (i == 0
+		위해 (i = 0; name_base[i] != NUL && (i == 0
 					    ? eval_isnamec1(name_base[i])
 					    : eval_isnamec(name_base[i])); ++i)
 		    ;
-		if (name_base[i] != NUL)
+		만약 (name_base[i] != NUL)
 		{
 		    emsg_funcname(e_invalid_argument_str, arg);
 		    goto ret_free;
@@ -5294,7 +5294,7 @@ define_function(
 
 		// In Vim9 script a function cannot have the same name as a
 		// variable.
-		if (vim9script && *arg == K_SPECIAL
+		만약 (vim9script && *arg == K_SPECIAL
 		    && eval_variable(name_base, i, 0, NULL,
 			NULL, EVAL_VAR_NOAUTOLOAD + EVAL_VAR_IMPORT
 						     + EVAL_VAR_NO_FUNC) == OK)
@@ -5305,7 +5305,7 @@ define_function(
 	    }
 	}
 	// Disallow using the g: dict.
-	if (fudi.fd_dict != NULL && fudi.fd_dict->dv_scope == VAR_DEF_SCOPE)
+	만약 (fudi.fd_dict != NULL && fudi.fd_dict->dv_scope == VAR_DEF_SCOPE)
 	{
 	    emsg(_(e_cannot_use_g_here));
 	    goto ret_free;
@@ -5315,7 +5315,7 @@ define_function(
     // This may get more lines and make the pointers into the first line
     // invalid.
     ++p;
-    if (get_function_args(&p, ')', &newargs,
+    만약 (get_function_args(&p, ')', &newargs,
 			 eap->cmdidx == CMD_def ? &argtypes : NULL, FALSE,
 			 eap->cmdidx == CMD_def ? &arg_objm : NULL,
 			 NULL, &varargs, &default_args, eap->skip,
@@ -5323,27 +5323,27 @@ define_function(
 	goto errret_2;
     whitep = p;
 
-    if (eap->cmdidx == CMD_def)
+    만약 (eap->cmdidx == CMD_def)
     {
 	// find the return type: :def Func(): type
-	if (*skipwhite(p) == ':')
+	만약 (*skipwhite(p) == ':')
 	{
-	    if (*p != ':')
+	    만약 (*p != ':')
 	    {
 		semsg(_(e_no_white_space_allowed_before_colon_str), p);
 		p = skipwhite(p);
 	    }
-	    else if (!IS_WHITE_OR_NUL(p[1]))
+	    아니면 만약 (!IS_WHITE_OR_NUL(p[1]))
 		semsg(_(e_white_space_required_after_str_str), ":", p);
 	    ret_type = skipwhite(p + 1);
 	    p = skip_type(ret_type, FALSE);
-	    if (p > ret_type)
+	    만약 (p > ret_type)
 	    {
 		ret_type = vim_strnsave(ret_type, p - ret_type);
 		whitep = p;
 		p = skipwhite(p);
 	    }
-	    else
+	    아니면
 	    {
 		semsg(_(e_expected_type_str), ret_type);
 		ret_type = NULL;
@@ -5351,47 +5351,47 @@ define_function(
 	}
 	p = skipwhite(p);
     }
-    else
+    아니면
 	// find extra arguments "range", "dict", "abort" and "closure"
-	for (;;)
+	위해 (;;)
 	{
 	    whitep = p;
 	    p = skipwhite(p);
-	    if (STRNCMP(p, "range", 5) == 0)
+	    만약 (STRNCMP(p, "range", 5) == 0)
 	    {
 		flags |= FC_RANGE;
 		p += 5;
 	    }
-	    else if (STRNCMP(p, "dict", 4) == 0)
+	    아니면 만약 (STRNCMP(p, "dict", 4) == 0)
 	    {
 		flags |= FC_DICT;
 		p += 4;
 	    }
-	    else if (STRNCMP(p, "abort", 5) == 0)
+	    아니면 만약 (STRNCMP(p, "abort", 5) == 0)
 	    {
 		flags |= FC_ABORT;
 		p += 5;
 	    }
-	    else if (STRNCMP(p, "closure", 7) == 0)
+	    아니면 만약 (STRNCMP(p, "closure", 7) == 0)
 	    {
 		flags |= FC_CLOSURE;
 		p += 7;
-		if (current_funccal == NULL)
+		만약 (current_funccal == NULL)
 		{
 		    emsg_funcname(e_closure_function_should_not_be_at_top_level_str,
 			    name == NULL ? (char_u *)"" : name);
 		    goto erret;
 		}
 	    }
-	    else
+	    아니면
 		break;
 	}
 
     // When there is a line break use what follows for the function body.
     // Makes 'exe "func Test()\n...\nendfunc"' work.
-    if (*p == '\n')
+    만약 (*p == '\n')
 	line_arg = p + 1;
-    else if (*p != NUL
+    아니면 만약 (*p != NUL
 	    && !(*p == '"' && (!vim9script || eap->cmdidx == CMD_function)
 						     && eap->cmdidx != CMD_def)
 	    && !(VIM_ISWHITE(*whitep) && *p == '#'
@@ -5404,20 +5404,20 @@ define_function(
      * Read the body of the function, until "}", ":endfunction" or ":enddef" is
      * found.
      */
-    if (KeyTyped)
+    만약 (KeyTyped)
     {
 	// Check if the function already exists, don't let the user type the
 	// whole function before telling him it doesn't work!  For a script we
 	// need to skip the body to be able to find what follows.
-	if (!eap->skip && !eap->forceit)
+	만약 (!eap->skip && !eap->forceit)
 	{
-	    if (fudi.fd_dict != NULL && fudi.fd_newkey == NULL)
+	    만약 (fudi.fd_dict != NULL && fudi.fd_newkey == NULL)
 		emsg(_(e_dictionary_entry_already_exists));
-	    else if (name != NULL && find_func(name, is_global) != NULL)
+	    아니면 만약 (name != NULL && find_func(name, is_global) != NULL)
 		emsg_funcname(e_function_str_already_exists_add_bang_to_replace, name);
 	}
 
-	if (!eap->skip && did_emsg)
+	만약 (!eap->skip && did_emsg)
 	    goto erret;
 
 	msg_putchar('\n');	    // don't overwrite the function name
@@ -5429,7 +5429,7 @@ define_function(
 
     // Do not define the function when getting the body fails, when the header
     // had an error (the body is still read to find the end) and when skipping.
-    if (((class_flags & CF_INTERFACE) == 0
+    만약 (((class_flags & CF_INTERFACE) == 0
 		&& (class_flags & CF_ABSTRACT_METHOD) == 0
 		&& (get_function_body(eap, &newlines, line_arg, lines_to_free)
 							== FAIL || did_emsg))
@@ -5439,24 +5439,24 @@ define_function(
     /*
      * If there are no errors, add the function
      */
-    if (fudi.fd_dict != NULL)
+    만약 (fudi.fd_dict != NULL)
     {
 	char	numbuf[NUMBUFLEN];
 
 	fp = NULL;
-	if (fudi.fd_newkey == NULL && !eap->forceit)
+	만약 (fudi.fd_newkey == NULL && !eap->forceit)
 	{
 	    emsg(_(e_dictionary_entry_already_exists));
 	    goto erret;
 	}
-	if (fudi.fd_di == NULL)
+	만약 (fudi.fd_di == NULL)
 	{
 	    // Can't add a function to a locked dictionary
-	    if (value_check_lock(fudi.fd_dict->dv_lock, eap->arg, FALSE))
+	    만약 (value_check_lock(fudi.fd_dict->dv_lock, eap->arg, FALSE))
 		goto erret;
 	}
 	    // Can't change an existing function if it is locked
-	else if (value_check_lock(fudi.fd_di->di_tv.v_lock, eap->arg, FALSE))
+	아니면 만약 (value_check_lock(fudi.fd_di->di_tv.v_lock, eap->arg, FALSE))
 	    goto erret;
 
 	// Give the function a sequential number.  Can only be used with a
@@ -5464,90 +5464,90 @@ define_function(
 	vim_free(name);
 	namelen = vim_snprintf(numbuf, sizeof(numbuf), "%d", ++func_nr);
 	name = vim_strnsave((char_u *)numbuf, namelen);
-	if (name == NULL)
+	만약 (name == NULL)
 	    goto erret;
     }
-    else if (class_flags == 0)
+    아니면 만약 (class_flags == 0)
     {
 	hashtab_T	*ht;
 	char_u		*find_name = name;
-	int		var_conflict = FALSE;
-	int		ffed_flags = is_global ? FFED_IS_GLOBAL : 0;
+	정수		var_conflict = FALSE;
+	정수		ffed_flags = is_global ? FFED_IS_GLOBAL : 0;
 
 	v = find_var(name, &ht, TRUE);
-	if (v != NULL && (vim9script || v->di_tv.v_type == VAR_FUNC))
+	만약 (v != NULL && (vim9script || v->di_tv.v_type == VAR_FUNC))
 	    var_conflict = TRUE;
 
-	if (SCRIPT_ID_VALID(current_sctx.sc_sid))
+	만약 (SCRIPT_ID_VALID(current_sctx.sc_sid))
 	{
 	    scriptitem_T *si = SCRIPT_ITEM(current_sctx.sc_sid);
 
-	    if (si->sn_autoload_prefix != NULL)
+	    만약 (si->sn_autoload_prefix != NULL)
 	    {
-		if (is_export)
+		만약 (is_export)
 		{
 		    find_name = name + STRLEN(si->sn_autoload_prefix);
 		    v = find_var(find_name, &ht, TRUE);
-		    if (v != NULL)
+		    만약 (v != NULL)
 			var_conflict = TRUE;
 		    // Only check if the function already exists in the script,
 		    // global functions can be shadowed.
 		    ffed_flags |= FFED_NO_GLOBAL;
 		}
-		else
+		아니면
 		{
 		    char_u *prefixed = may_prefix_autoload(name);
 
-		    if (prefixed != NULL && prefixed != name)
+		    만약 (prefixed != NULL && prefixed != name)
 		    {
 			v = find_var(prefixed, &ht, TRUE);
-			if (v != NULL)
+			만약 (v != NULL)
 			    var_conflict = TRUE;
 			vim_free(prefixed);
 		    }
 		}
 	    }
 	}
-	if (var_conflict)
+	만약 (var_conflict)
 	{
 	    emsg_funcname(e_function_name_conflicts_with_variable_str, name);
 	    goto erret;
 	}
 
 	fp = find_func_even_dead(find_name, ffed_flags);
-	if (vim9script)
+	만약 (vim9script)
 	{
 	    char_u *uname = untrans_function_name(name);
 
 	    import = find_imported(uname == NULL ? name : uname, 0, FALSE);
 	}
 
-	if (fp != NULL || import != NULL)
+	만약 (fp != NULL || import != NULL)
 	{
-	    int dead = fp != NULL && (fp->uf_flags & FC_DEAD);
+	    정수 dead = fp != NULL && (fp->uf_flags & FC_DEAD);
 
 	    // Function can be replaced with "function!" and when sourcing the
 	    // same script again, but only once.
 	    // A name that is used by an import can not be overruled.
-	    if (import != NULL
+	    만약 (import != NULL
 		    || (!dead && !eap->forceit
 			&& (fp->uf_script_ctx.sc_sid != current_sctx.sc_sid
 			  || fp->uf_script_ctx.sc_seq == current_sctx.sc_seq)))
 	    {
 		SOURCING_LNUM = sourcing_lnum_top;
-		if (vim9script)
+		만약 (vim9script)
 		    emsg_funcname(e_name_already_defined_str, name);
-		else
+		아니면
 		    emsg_funcname(e_function_str_already_exists_add_bang_to_replace, name);
 		goto errret_keep;
 	    }
-	    if (fp->uf_calls > 0)
+	    만약 (fp->uf_calls > 0)
 	    {
 		emsg_funcname(
 			    e_cannot_redefine_function_str_it_is_in_use, name);
 		goto errret_keep;
 	    }
-	    if (fp->uf_refcount > 1)
+	    만약 (fp->uf_refcount > 1)
 	    {
 		// This function is referenced somewhere, don't redefine it but
 		// create a new one.
@@ -5556,7 +5556,7 @@ define_function(
 		fp = NULL;
 		overwrite = TRUE;
 	    }
-	    else
+	    아니면
 	    {
 		char_u *exp_name = fp->uf_name_exp;
 
@@ -5576,30 +5576,30 @@ define_function(
 	}
     }
 
-    if (fp == NULL)
+    만약 (fp == NULL)
     {
-	if (fudi.fd_dict == NULL && vim_strchr(name, AUTOLOAD_CHAR) != NULL)
+	만약 (fudi.fd_dict == NULL && vim_strchr(name, AUTOLOAD_CHAR) != NULL)
 	{
-	    int	    slen, plen;
+	    정수	    slen, plen;
 	    char_u  *scriptname;
 
 	    // Check that the autoload name matches the script name.
 	    j = FAIL;
-	    if (SOURCING_NAME != NULL)
+	    만약 (SOURCING_NAME != NULL)
 	    {
 		scriptname = autoload_name(name);
-		if (scriptname != NULL)
+		만약 (scriptname != NULL)
 		{
 		    p = vim_strchr(scriptname, '/');
-		    plen = (int)STRLEN(p);
-		    slen = (int)STRLEN(SOURCING_NAME);
-		    if (slen > plen && fnamecmp(p,
+		    plen = (정수)STRLEN(p);
+		    slen = (정수)STRLEN(SOURCING_NAME);
+		    만약 (slen > plen && fnamecmp(p,
 					    SOURCING_NAME + slen - plen) == 0)
 			j = OK;
 		    vim_free(scriptname);
 		}
 	    }
-	    if (j == FAIL)
+	    만약 (j == FAIL)
 	    {
 		linenr_T save_lnum = SOURCING_LNUM;
 
@@ -5611,33 +5611,33 @@ define_function(
 	    }
 	}
 
-	if (namelen == 0)
+	만약 (namelen == 0)
 	    namelen = STRLEN(name);
 	fp = alloc_ufunc(name, namelen);
-	if (fp == NULL)
+	만약 (fp == NULL)
 	    goto erret;
 	fp_allocated = TRUE;
 
-	if (fudi.fd_dict != NULL)
+	만약 (fudi.fd_dict != NULL)
 	{
 	    char_u *func_name = vim_strnsave(name, namelen);
 
-	    if (func_name == NULL)
+	    만약 (func_name == NULL)
 	    {
 		VIM_CLEAR(fp);
 		goto erret;
 	    }
-	    if (fudi.fd_di == NULL)
+	    만약 (fudi.fd_di == NULL)
 	    {
 		// add new dict entry
 		fudi.fd_di = dictitem_alloc(fudi.fd_newkey);
-		if (fudi.fd_di == NULL)
+		만약 (fudi.fd_di == NULL)
 		{
 		    vim_free(func_name);
 		    VIM_CLEAR(fp);
 		    goto erret;
 		}
-		if (dict_add(fudi.fd_dict, fudi.fd_di) == FAIL)
+		만약 (dict_add(fudi.fd_dict, fudi.fd_di) == FAIL)
 		{
 		    vim_free(fudi.fd_di);
 		    vim_free(func_name);
@@ -5645,7 +5645,7 @@ define_function(
 		    goto erret;
 		}
 	    }
-	    else
+	    아니면
 		// overwrite existing dict entry
 		clear_tv(&fudi.fd_di->di_tv);
 	    fudi.fd_di->di_tv.v_type = VAR_FUNC;
@@ -5660,14 +5660,14 @@ define_function(
     fp->uf_ret_type = &t_any;
     fp->uf_func_type = &t_func_any;
 
-    if (eap->cmdidx == CMD_def)
+    만약 (eap->cmdidx == CMD_def)
     {
-	int	    lnum_save = SOURCING_LNUM;
+	정수	    lnum_save = SOURCING_LNUM;
 	cstack_T    *cstack = eap->cstack;
 
 	fp->uf_def_status = UF_TO_BE_COMPILED;
 
-	if (generic_func_args_table_size(&gfatab) > 0)
+	만약 (generic_func_args_table_size(&gfatab) > 0)
 	{
 	    // initialize generic function state
 	    flags |= FC_GENERIC;
@@ -5684,10 +5684,10 @@ define_function(
 	// In that case, the imported file will be sourced.  To avoid treating
 	// everything in the imported file as exported, temporarily reset
 	// is_export.
-	int save_is_export = is_export;
+	정수 save_is_export = is_export;
 	is_export = FALSE;
 
-	if (parse_argument_types(fp, &argtypes, varargs, &arg_objm,
+	만약 (parse_argument_types(fp, &argtypes, varargs, &arg_objm,
 				obj_members, obj_member_count, cctx) == FAIL)
 	{
 	    SOURCING_LNUM = lnum_save;
@@ -5698,7 +5698,7 @@ define_function(
 	varargs = FALSE;
 
 	// parse the return type, if any
-	if (parse_return_type(fp, ret_type, cctx) == FAIL)
+	만약 (parse_return_type(fp, ret_type, cctx) == FAIL)
 	{
 	    SOURCING_LNUM = lnum_save;
 	    free_fp = fp_allocated;
@@ -5708,18 +5708,18 @@ define_function(
 	is_export = save_is_export;
 	SOURCING_LNUM = lnum_save;
     }
-    else
+    아니면
 	fp->uf_def_status = UF_NOT_COMPILED;
 
-    if (fp_allocated)
+    만약 (fp_allocated)
     {
 	// insert the new function in the function list
-	if (overwrite)
+	만약 (overwrite)
 	{
 	    hi = hash_find(&func_hashtab, name);
 	    hi->hi_key = UF2HIKEY(fp);
 	}
-	else if (class_flags == 0 && hash_add(&func_hashtab,
+	아니면 만약 (class_flags == 0 && hash_add(&func_hashtab,
 					 UF2HIKEY(fp), "add function") == FAIL)
 	{
 	    free_fp = TRUE;
@@ -5730,22 +5730,22 @@ define_function(
 
     fp->uf_lines = newlines;
     newlines.ga_data = NULL;
-    if ((flags & FC_CLOSURE) != 0)
+    만약 ((flags & FC_CLOSURE) != 0)
     {
-	if (register_closure(fp) == FAIL)
+	만약 (register_closure(fp) == FAIL)
 	    goto erret;
     }
-    else
+    아니면
 	fp->uf_scoped = NULL;
 
 #ifdef FEAT_PROFILE
-    if (prof_def_func())
+    만약 (prof_def_func())
 	func_do_profile(fp);
 #endif
     fp->uf_varargs = varargs;
-    if (sandbox)
+    만약 (sandbox)
 	flags |= FC_SANDBOX;
-    if (vim9script && !ASCII_ISUPPER(*fp->uf_name))
+    만약 (vim9script && !ASCII_ISUPPER(*fp->uf_name))
 	flags |= FC_VIM9;
     fp->uf_flags = flags;
     fp->uf_calls = 0;
@@ -5753,27 +5753,27 @@ define_function(
     fp->uf_script_ctx = current_sctx;
     fp->uf_script_ctx_version = current_sctx.sc_version;
     fp->uf_script_ctx.sc_lnum += sourcing_lnum_top;
-    if (is_export)
+    만약 (is_export)
     {
 	fp->uf_flags |= FC_EXPORT;
 	// let do_one_cmd() know the export worked.
 	is_export = FALSE;
     }
 
-    if (eap->cmdidx == CMD_def)
+    만약 (eap->cmdidx == CMD_def)
 	set_function_type(fp);
-    else if (fp->uf_script_ctx.sc_version == SCRIPT_VERSION_VIM9)
+    아니면 만약 (fp->uf_script_ctx.sc_version == SCRIPT_VERSION_VIM9)
 	// :func does not use Vim9 script syntax, even in a Vim9 script file
 	fp->uf_script_ctx.sc_version = SCRIPT_VERSION_MAX;
 
     // If test_override('defcompile' 1) is used, then compile the function now
-    if (eap->cmdidx == CMD_def && override_defcompile)
+    만약 (eap->cmdidx == CMD_def && override_defcompile)
 	defcompile_function(fp, NULL);
 
     goto ret_free;
 
 erret:
-    if (fp != NULL)
+    만약 (fp != NULL)
     {
 	// these were set to "newargs" and "default_args", which are cleared
 	// below
@@ -5781,17 +5781,17 @@ erret:
 	ga_init(&fp->uf_def_args);
     }
 errret_2:
-    if (fp != NULL)
+    만약 (fp != NULL)
     {
 	VIM_CLEAR(fp->uf_arg_types);
 	VIM_CLEAR(fp->uf_va_name);
 	VIM_CLEAR(fp->uf_name_exp);
 	clear_func_type_list(&fp->uf_type_list, &fp->uf_func_type);
 	// the generic types were moved from "gfatab" to "fp"
-	if (IS_GENERIC_FUNC(fp))
+	만약 (IS_GENERIC_FUNC(fp))
 	    generic_func_clear_items(fp);
     }
-    if (free_fp)
+    만약 (free_fp)
 	VIM_CLEAR(fp);
 errret_keep:
     ga_clear_strings(&newargs);
@@ -5805,12 +5805,12 @@ ret_free:
     ga_clear(&gfatab.gfat_param_types);
     generic_func_args_table_clear(&gfatab);
     vim_free(fudi.fd_newkey);
-    if (name != name_arg)
+    만약 (name != name_arg)
 	vim_free(name);
     vim_free(ret_type);
     did_emsg |= saved_did_emsg;
 
-    return fp;
+    반환 fp;
 }
 
 /*
@@ -5826,21 +5826,21 @@ ex_function(exarg_T *eap)
     ga_clear_strings(&lines_to_free);
 }
 
-    int
-get_func_arity(char_u *name, int *required, int *optional, int *varargs)
+    정수
+get_func_arity(char_u *name, 정수 *required, 정수 *optional, 정수 *varargs)
 {
     ufunc_T	*ufunc = NULL;
-    int		argcount = 0;
-    int		min_argcount = 0;
-    int		idx;
+    정수		argcount = 0;
+    정수		min_argcount = 0;
+    정수		idx;
 
     idx = find_internal_func(name);
-    if (idx >= 0)
+    만약 (idx >= 0)
     {
 	internal_func_get_argcount(idx, &argcount, &min_argcount);
 	*varargs = FALSE;
     }
-    else
+    아니면
     {
 	char_u	fname_buf[FLEN_FIXED + 1];
 	char_u	*tofree = NULL;
@@ -5849,12 +5849,12 @@ get_func_arity(char_u *name, int *required, int *optional, int *varargs)
 
 	// May need to translate <SNR>123_ to K_SNR.
 	fname = fname_trans_sid(name, fname_buf, &tofree, &error);
-	if (error == FCERR_NONE)
+	만약 (error == FCERR_NONE)
 	    ufunc = find_func(fname, FALSE);
 	vim_free(tofree);
 
-	if (ufunc == NULL)
-	    return FAIL;
+	만약 (ufunc == NULL)
+	    반환 FAIL;
 
 	argcount = ufunc->uf_args.ga_len;
 	min_argcount = ufunc->uf_args.ga_len - ufunc->uf_def_args.ga_len;
@@ -5864,7 +5864,7 @@ get_func_arity(char_u *name, int *required, int *optional, int *varargs)
     *required = min_argcount;
     *optional = argcount - min_argcount;
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -5879,79 +5879,79 @@ find_func_by_name(char_u *name, compiletype_T *compile_type)
     char_u	*arg = name;
     char_u	*fname;
     ufunc_T	*ufunc;
-    int		is_global = FALSE;
+    정수		is_global = FALSE;
     char_u	*bracket_start = NULL;
     char_u	*generic_func_name = name;
 
-    if (STRNCMP(arg, "profile", 7) == 0 && VIM_ISWHITE(arg[7]))
+    만약 (STRNCMP(arg, "profile", 7) == 0 && VIM_ISWHITE(arg[7]))
     {
 	*compile_type = CT_PROFILE;
 	arg = skipwhite(arg + 7);
     }
-    else if (STRNCMP(arg, "debug", 5) == 0 && VIM_ISWHITE(arg[5]))
+    아니면 만약 (STRNCMP(arg, "debug", 5) == 0 && VIM_ISWHITE(arg[5]))
     {
 	*compile_type = CT_DEBUG;
 	arg = skipwhite(arg + 5);
     }
 
-    if (STRNCMP(arg, "<lambda>", 8) == 0)
+    만약 (STRNCMP(arg, "<lambda>", 8) == 0)
     {
 	arg += 8;
 	(void)getdigits(&arg);
 	fname = vim_strnsave(name, arg - name);
     }
-    else
+    아니면
     {
 	// First try finding a method in a class, trans_function_name() will
 	// give an error if the function is not found.
 	ufunc = find_class_func(&arg);
-	if (ufunc != NULL)
-	    return ufunc;
+	만약 (ufunc != NULL)
+	    반환 ufunc;
 
 	fname = trans_function_name_ext(&arg, &is_global, FALSE,
 		      TFN_INT | TFN_QUIET | TFN_NO_AUTOLOAD | TFN_NO_DECL,
 		      NULL, NULL, NULL, &ufunc);
-	if (ufunc != NULL)
+	만약 (ufunc != NULL)
 	{
 	    vim_free(fname);
-	    return ufunc;
+	    반환 ufunc;
 	}
-	if (fname != NULL && *arg == '<')
+	만약 (fname != NULL && *arg == '<')
 	{
 	    generic_func_name = name;
 	    bracket_start = arg;
-	    if (skip_generic_func_type_args(&arg) == FAIL)
+	    만약 (skip_generic_func_type_args(&arg) == FAIL)
 	    {
 		vim_free(fname);
-		return NULL;
+		반환 NULL;
 	    }
 	}
     }
-    if (fname == NULL)
+    만약 (fname == NULL)
     {
 	semsg(_(e_invalid_argument_str), name);
-	return NULL;
+	반환 NULL;
     }
-    if (!ends_excmd2(name, arg))
+    만약 (!ends_excmd2(name, arg))
     {
 	vim_free(fname);
 	emsg(ex_errmsg(e_trailing_characters_str, arg));
-	return NULL;
+	반환 NULL;
     }
 
     ufunc = find_func(fname, is_global);
-    if (ufunc == NULL)
+    만약 (ufunc == NULL)
     {
 	char_u *p = untrans_function_name(fname);
 
-	if (p != NULL)
+	만약 (p != NULL)
 	    // Try again without making it script-local.
 	    ufunc = find_func(p, FALSE);
 
-	if (ufunc == NULL)
+	만약 (ufunc == NULL)
 	{
 	    bracket_start = generic_func_find_open_bracket(fname);
-	    if (bracket_start != NULL)
+	    만약 (bracket_start != NULL)
 	    {
 		generic_func_name = fname;
 		*bracket_start = NUL;
@@ -5961,10 +5961,10 @@ find_func_by_name(char_u *name, compiletype_T *compile_type)
 	}
     }
 
-    if (ufunc != NULL)
+    만약 (ufunc != NULL)
     {
 	// handle generic functions
-	if (bracket_start == NULL)
+	만약 (bracket_start == NULL)
 	    bracket_start = generic_func_name + STRLEN(generic_func_name);
 
 	ufunc = eval_generic_func(ufunc, generic_func_name, &bracket_start);
@@ -5972,9 +5972,9 @@ find_func_by_name(char_u *name, compiletype_T *compile_type)
 
     vim_free(fname);
 
-    if (ufunc == NULL)
+    만약 (ufunc == NULL)
 	semsg(_(e_cannot_find_function_str), name);
-    return ufunc;
+    반환 ufunc;
 }
 
 /*
@@ -5986,9 +5986,9 @@ defcompile_function(ufunc_T *ufunc, class_T *cl)
 {
     compiletype_T compile_type = CT_NONE;
 
-    if (func_needs_compiling(ufunc, compile_type))
+    만약 (func_needs_compiling(ufunc, compile_type))
 	(void)compile_def_function(ufunc, FALSE, compile_type, NULL);
-    else
+    아니면
 	smsg(_("Function %s%s%s does not need compiling"),
 				cl != NULL ? cl->class_name.string : (char_u *)"",
 				cl != NULL ? (char_u *)"." : (char_u *)"",
@@ -6002,22 +6002,22 @@ defcompile_function(ufunc_T *ufunc, class_T *cl)
 defcompile_funcs_in_script(void)
 {
     long	todo = (long)func_hashtab.ht_used;
-    int		changed = func_hashtab.ht_changed;
+    정수		changed = func_hashtab.ht_changed;
     hashitem_T	*hi;
 
-    for (hi = func_hashtab.ht_array; todo > 0 && !got_int; ++hi)
+    위해 (hi = func_hashtab.ht_array; todo > 0 && !got_int; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	만약 (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    ufunc_T *ufunc = HI2UF(hi);
-	    if (ufunc->uf_script_ctx.sc_sid == current_sctx.sc_sid
+	    만약 (ufunc->uf_script_ctx.sc_sid == current_sctx.sc_sid
 		    && ufunc->uf_def_status == UF_TO_BE_COMPILED
 		    && (ufunc->uf_flags & FC_DEAD) == 0)
 	    {
 		(void)compile_def_function(ufunc, FALSE, CT_NONE, NULL);
 
-		if (func_hashtab.ht_changed != changed)
+		만약 (func_hashtab.ht_changed != changed)
 		{
 		    // a function has been added or removed, need to start
 		    // over
@@ -6039,26 +6039,26 @@ defcompile_funcs_in_script(void)
     void
 ex_defcompile(exarg_T *eap)
 {
-    if (*eap->arg != NUL)
+    만약 (*eap->arg != NUL)
     {
 	typval_T tv;
 
-	if (is_class_name(eap->arg, &tv))
+	만약 (is_class_name(eap->arg, &tv))
 	{
 	    class_T *cl = tv.vval.v_class;
 
-	    if (cl != NULL)
+	    만약 (cl != NULL)
 		defcompile_class(cl);
 	}
-	else
+	아니면
 	{
 	    compiletype_T compile_type = CT_NONE;
 	    ufunc_T *ufunc = find_func_by_name(eap->arg, &compile_type);
-	    if (ufunc != NULL)
+	    만약 (ufunc != NULL)
 		defcompile_function(ufunc, NULL);
 	}
     }
-    else
+    아니면
     {
 	defcompile_funcs_in_script();
 
@@ -6072,148 +6072,148 @@ ex_defcompile(exarg_T *eap)
  * Return 2 if "p" starts with "s:".
  * Return 0 otherwise.
  */
-    int
+    정수
 eval_fname_script(char_u *p)
 {
     // Use MB_STRICMP() because in Turkish comparing the "I" may not work with
     // the standard library function.
-    if (p[0] == '<' && (MB_STRNICMP(p + 1, "SID>", 4) == 0
+    만약 (p[0] == '<' && (MB_STRNICMP(p + 1, "SID>", 4) == 0
 				       || MB_STRNICMP(p + 1, "SNR>", 4) == 0))
-	return 5;
-    if (p[0] == 's' && p[1] == ':')
-	return 2;
-    return 0;
+	반환 5;
+    만약 (p[0] == 's' && p[1] == ':')
+	반환 2;
+    반환 0;
 }
 
-    int
-translated_function_exists(char_u *name, int is_global)
+    정수
+translated_function_exists(char_u *name, 정수 is_global)
 {
-    if (builtin_function(name, -1))
-	return has_internal_func(name);
-    return find_func(name, is_global) != NULL;
+    만약 (builtin_function(name, -1))
+	반환 has_internal_func(name);
+    반환 find_func(name, is_global) != NULL;
 }
 
 /*
  * Return TRUE when "ufunc" has old-style "..." varargs
  * or named varargs "...name: type".
  */
-    int
+    정수
 has_varargs(ufunc_T *ufunc)
 {
-    return ufunc->uf_varargs || ufunc->uf_va_name != NULL;
+    반환 ufunc->uf_varargs || ufunc->uf_va_name != NULL;
 }
 
 /*
  * Return TRUE if a function "name" exists.
  * If "no_defef" is TRUE, do not dereference a Funcref.
  */
-    int
-function_exists(char_u *name, int no_deref)
+    정수
+function_exists(char_u *name, 정수 no_deref)
 {
     char_u  *nm = name;
     char_u  *p;
-    int	    n = FALSE;
-    int	    flag;
-    int	    is_global = FALSE;
+    정수	    n = FALSE;
+    정수	    flag;
+    정수	    is_global = FALSE;
 
     flag = TFN_INT | TFN_QUIET | TFN_NO_AUTOLOAD;
-    if (no_deref)
+    만약 (no_deref)
 	flag |= TFN_NO_DEREF;
     p = trans_function_name(&nm, &is_global, FALSE, flag);
     nm = skipwhite(nm);
 
     // Only accept "funcname", "funcname ", "funcname (..." and
     // "funcname(...", not "funcname!...".
-    if (p != NULL && (*nm == NUL || *nm == '('))
+    만약 (p != NULL && (*nm == NUL || *nm == '('))
 	n = translated_function_exists(p, is_global);
     vim_free(p);
-    return n;
+    반환 n;
 }
 
 /*
  * Add what getinfo() reports for the user defined function "name" to "d".
  * Returns FAIL when there is no such function.
  */
-    int
+    정수
 user_func_info(char_u *name, dict_T *d)
 {
     char_u	*nm = name;
     char_u	*p;
-    int		is_global = FALSE;
+    정수		is_global = FALSE;
     ufunc_T	*fp = NULL;
     list_T	*args;
-    int		is_def;
+    정수		is_def;
     char	*tofree;
 
-    if (*name == NUL)
-	return FAIL;
+    만약 (*name == NUL)
+	반환 FAIL;
     p = trans_function_name(&nm, &is_global, FALSE,
 			 TFN_INT | TFN_QUIET | TFN_NO_AUTOLOAD | TFN_NO_DEREF);
-    if (p != NULL && *skipwhite(nm) == NUL)
+    만약 (p != NULL && *skipwhite(nm) == NUL)
 	fp = find_func(p, is_global);
     vim_free(p);
-    if (fp == NULL)
-	return FAIL;
+    만약 (fp == NULL)
+	반환 FAIL;
 
     is_def = fp->uf_def_status != UF_NOT_COMPILED;
     dict_add_string(d, "name", printable_func_name(fp));
     dict_add_string(d, "kind", (char_u *)(is_def ? "def" : "function"));
     dict_add_bool(d, "available", TRUE);
     args = list_alloc();
-    if (args == NULL || dict_add_list(d, "args", args) == FAIL)
+    만약 (args == NULL || dict_add_list(d, "args", args) == FAIL)
     {
 	list_unref(args);
-	return FAIL;
+	반환 FAIL;
     }
-    for (int j = 0; j < fp->uf_args.ga_len; ++j)
+    위해 (정수 j = 0; j < fp->uf_args.ga_len; ++j)
     {
 	dict_T	*arg = dict_alloc();
 
-	if (arg == NULL || list_append_dict(args, arg) == FAIL)
+	만약 (arg == NULL || list_append_dict(args, arg) == FAIL)
 	{
 	    dict_unref(arg);
-	    return FAIL;
+	    반환 FAIL;
 	}
 	dict_add_string(arg, "name", FUNCARG(fp, j));
-	if (fp->uf_arg_types == NULL)
+	만약 (fp->uf_arg_types == NULL)
 	    dict_add_string(arg, "type", (char_u *)"any");
-	else
+	아니면
 	{
 	    dict_add_string(arg, "type",
 			     (char_u *)type_name(fp->uf_arg_types[j], &tofree));
 	    vim_free(tofree);
 	}
-	if (j >= fp->uf_args.ga_len - fp->uf_def_args.ga_len)
+	만약 (j >= fp->uf_args.ga_len - fp->uf_def_args.ga_len)
 	    dict_add_string(arg, "default", ((char_u **)fp->uf_def_args.ga_data)
 			     [j - fp->uf_args.ga_len + fp->uf_def_args.ga_len]);
     }
-    if (has_varargs(fp))
+    만약 (has_varargs(fp))
     {
 	dict_T	*va = dict_alloc();
 
-	if (va == NULL || dict_add_dict(d, "varargs", va) == FAIL)
+	만약 (va == NULL || dict_add_dict(d, "varargs", va) == FAIL)
 	{
 	    dict_unref(va);
-	    return FAIL;
+	    반환 FAIL;
 	}
 	dict_add_string(va, "name",
 			 fp->uf_va_name == NULL ? (char_u *)"" : fp->uf_va_name);
-	if (fp->uf_va_type == NULL)
+	만약 (fp->uf_va_type == NULL)
 	    dict_add_string(va, "type", (char_u *)"list<any>");
-	else
+	아니면
 	{
 	    dict_add_string(va, "type",
 				 (char_u *)type_name(fp->uf_va_type, &tofree));
 	    vim_free(tofree);
 	}
     }
-    if (is_def)
+    만약 (is_def)
     {
 	dict_add_string(d, "returns",
 				 (char_u *)type_name(fp->uf_ret_type, &tofree));
 	vim_free(tofree);
     }
-    else
+    아니면
 	dict_add_string(d, "returns", (char_u *)"any");
     dict_add_bool(d, "abort", (fp->uf_flags & FC_ABORT) != 0);
     dict_add_bool(d, "range", (fp->uf_flags & FC_RANGE) != 0);
@@ -6221,25 +6221,25 @@ user_func_info(char_u *name, dict_T *d)
     dict_add_bool(d, "closure", (fp->uf_flags & FC_CLOSURE) != 0);
     dict_add_number(d, "sid", fp->uf_script_ctx.sc_sid);
     dict_add_number(d, "lnum", fp->uf_script_ctx.sc_lnum);
-    return OK;
+    반환 OK;
 }
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#만약 defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
     char_u *
-get_expanded_name(char_u *name, int check)
+get_expanded_name(char_u *name, 정수 check)
 {
     char_u	*nm = name;
     char_u	*p;
-    int		is_global = FALSE;
+    정수		is_global = FALSE;
 
     p = trans_function_name(&nm, &is_global, FALSE, TFN_INT|TFN_QUIET);
 
-    if (p != NULL && *nm == NUL
+    만약 (p != NULL && *nm == NUL
 		       && (!check || translated_function_exists(p, is_global)))
-	return p;
+	반환 p;
 
     vim_free(p);
-    return NULL;
+    반환 NULL;
 }
 #endif
 
@@ -6248,51 +6248,51 @@ get_expanded_name(char_u *name, int check)
  * function names.
  */
     char_u *
-get_user_func_name(expand_T *xp, int idx)
+get_user_func_name(expand_T *xp, 정수 idx)
 {
     static long_u	done;
-    static int		changed;
+    static 정수		changed;
     static hashitem_T	*hi;
     ufunc_T		*fp;
 
-    if (idx == 0)
+    만약 (idx == 0)
     {
 	done = 0;
 	hi = func_hashtab.ht_array;
 	changed = func_hashtab.ht_changed;
     }
-    if (changed == func_hashtab.ht_changed && done < func_hashtab.ht_used)
+    만약 (changed == func_hashtab.ht_changed && done < func_hashtab.ht_used)
     {
-	int len;
+	정수 len;
 
-	if (done++ > 0)
+	만약 (done++ > 0)
 	    ++hi;
-	while (HASHITEM_EMPTY(hi))
+	동안 (HASHITEM_EMPTY(hi))
 	    ++hi;
 	fp = HI2UF(hi);
 
 	// don't show dead, dict and lambda functions
-	if ((fp->uf_flags & FC_DEAD) || (fp->uf_flags & FC_DICT)
+	만약 ((fp->uf_flags & FC_DEAD) || (fp->uf_flags & FC_DICT)
 				|| STRNCMP(fp->uf_name, "<lambda>", 8) == 0)
-	    return (char_u *)"";
+	    반환 (char_u *)"";
 
-	if (fp->uf_namelen + 4 >= IOSIZE)
-	    return fp->uf_name;	// prevents overflow
+	만약 (fp->uf_namelen + 4 >= IOSIZE)
+	    반환 fp->uf_name;	// prevents overflow
 
 	len = cat_func_name(IObuff, IOSIZE, fp);
-	if (xp->xp_context != EXPAND_USER_FUNC
+	만약 (xp->xp_context != EXPAND_USER_FUNC
 				       && xp->xp_context != EXPAND_DISASSEMBLE)
 	{
 	    STRCPY(IObuff + len, "(");
-	    if (!has_varargs(fp) && fp->uf_args.ga_len == 0)
+	    만약 (!has_varargs(fp) && fp->uf_args.ga_len == 0)
 	    {
 		++len;
 		STRCPY(IObuff + len, ")");
 	    }
 	}
-	return IObuff;
+	반환 IObuff;
     }
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -6303,11 +6303,11 @@ get_user_func_name(expand_T *xp, int idx)
  * Returns NULL when out of memory.
  */
     ufunc_T *
-copy_function(ufunc_T *fp, int extra_namelen)
+copy_function(ufunc_T *fp, 정수 extra_namelen)
 {
     ufunc_T *ufunc = alloc_ufunc(fp->uf_name, fp->uf_namelen + extra_namelen);
-    if (ufunc == NULL)
-	return NULL;
+    만약 (ufunc == NULL)
+	반환 NULL;
 
     // Most things can just be copied.
     // The call to alloc_ufunc() above allocates a new uf_name_exp.  So save
@@ -6331,11 +6331,11 @@ copy_function(ufunc_T *fp, int extra_namelen)
     ga_copy_strings(&fp->uf_args, &ufunc->uf_args);
     ga_copy_strings(&fp->uf_def_args, &ufunc->uf_def_args);
 
-    if (ufunc->uf_arg_types != NULL)
+    만약 (ufunc->uf_arg_types != NULL)
     {
 	// "uf_arg_types" is an allocated array, make a copy.
 	type_T **at = ALLOC_CLEAR_MULT(type_T *, ufunc->uf_args.ga_len);
-	if (at != NULL)
+	만약 (at != NULL)
 	{
 	    mch_memmove(at, ufunc->uf_arg_types,
 				     sizeof(type_T *) * ufunc->uf_args.ga_len);
@@ -6356,7 +6356,7 @@ copy_function(ufunc_T *fp, int extra_namelen)
     // copy generic function related state
     copy_generic_function(fp, ufunc);
 
-    if (ufunc->uf_va_name != NULL)
+    만약 (ufunc->uf_va_name != NULL)
 	ufunc->uf_va_name = vim_strsave(ufunc->uf_va_name);
 
     // TODO:
@@ -6371,13 +6371,13 @@ copy_function(ufunc_T *fp, int extra_namelen)
 #ifdef FEAT_PROFILE
     // Profile the copy when the function is profiled, e.g. after
     // ":profile! file", which only applies when a function is defined.
-    if (fp->uf_profiling)
+    만약 (fp->uf_profiling)
 	func_do_profile(ufunc);
 #endif
 
     ufunc->uf_refcount = 1;
 
-    return ufunc;
+    반환 ufunc;
 }
 
 /*
@@ -6390,79 +6390,79 @@ ex_delfunction(exarg_T *eap)
     char_u	*p;
     char_u	*name;
     funcdict_T	fudi;
-    int		is_global = FALSE;
+    정수		is_global = FALSE;
 
     p = eap->arg;
     name = trans_function_name_ext(&p, &is_global, eap->skip, TFN_NO_DECL, &fudi,
 							     NULL, NULL, NULL);
     vim_free(fudi.fd_newkey);
-    if (name == NULL)
+    만약 (name == NULL)
     {
-	if (fudi.fd_dict != NULL && !eap->skip)
+	만약 (fudi.fd_dict != NULL && !eap->skip)
 	    emsg(_(e_funcref_required));
-	return;
+	반환;
     }
-    if (!ends_excmd(*skipwhite(p)))
+    만약 (!ends_excmd(*skipwhite(p)))
     {
 	vim_free(name);
 	semsg(_(e_trailing_characters_str), p);
-	return;
+	반환;
     }
     set_nextcmd(eap, p);
-    if (eap->nextcmd != NULL)
+    만약 (eap->nextcmd != NULL)
 	*p = NUL;
 
-    if (numbered_function(name) && fudi.fd_dict == NULL)
+    만약 (numbered_function(name) && fudi.fd_dict == NULL)
     {
-	if (!eap->skip)
+	만약 (!eap->skip)
 	    semsg(_(e_invalid_argument_str), eap->arg);
 	vim_free(name);
-	return;
+	반환;
     }
-    if (!eap->skip)
+    만약 (!eap->skip)
 	fp = find_func(name, is_global);
     vim_free(name);
 
-    if (!eap->skip)
+    만약 (!eap->skip)
     {
-	if (fp == NULL)
+	만약 (fp == NULL)
 	{
-	    if (!eap->forceit)
+	    만약 (!eap->forceit)
 		semsg(_(e_unknown_function_str), eap->arg);
-	    return;
+	    반환;
 	}
-	if (fp->uf_calls > 0)
+	만약 (fp->uf_calls > 0)
 	{
 	    semsg(_(e_cannot_delete_function_str_it_is_in_use), eap->arg);
-	    return;
+	    반환;
 	}
-	if (fp->uf_flags & FC_VIM9)
+	만약 (fp->uf_flags & FC_VIM9)
 	{
 	    semsg(_(e_cannot_delete_vim9_script_function_str), eap->arg);
-	    return;
+	    반환;
 	}
 
-	if (fudi.fd_dict != NULL)
+	만약 (fudi.fd_dict != NULL)
 	{
 	    // Delete the dict item that refers to the function, it will
 	    // invoke func_unref() and possibly delete the function.
 	    dictitem_remove(fudi.fd_dict, fudi.fd_di, "delfunction");
 	}
-	else
+	아니면
 	{
 	    // A normal function (not a numbered function or lambda) has a
 	    // refcount of 1 for the entry in the hashtable.  When deleting
 	    // it and the refcount is more than one, it should be kept.
 	    // A numbered function and lambda should be kept if the refcount is
 	    // one or more.
-	    if (fp->uf_refcount > (func_name_refcount(fp->uf_name) ? 0 : 1))
+	    만약 (fp->uf_refcount > (func_name_refcount(fp->uf_name) ? 0 : 1))
 	    {
 		// Function is still referenced somewhere.  Don't free it but
 		// do remove it from the hashtable.
-		if (func_remove(fp))
+		만약 (func_remove(fp))
 		    fp->uf_refcount--;
 	    }
-	    else
+	    아니면
 		func_clear_free(fp, FALSE);
 	}
     }
@@ -6477,13 +6477,13 @@ func_unref(char_u *name)
 {
     ufunc_T *fp = NULL;
 
-    if (name == NULL || !func_name_refcount(name))
-	return;
+    만약 (name == NULL || !func_name_refcount(name))
+	반환;
     fp = find_func(name, FALSE);
-    if (fp == NULL && numbered_function(name))
+    만약 (fp == NULL && numbered_function(name))
     {
 #ifdef EXITFREE
-	if (!entered_free_all_mem)
+	만약 (!entered_free_all_mem)
 #endif
 	    internal_error("func_unref()");
     }
@@ -6498,14 +6498,14 @@ func_unref(char_u *name)
     void
 func_ptr_unref(ufunc_T *fp)
 {
-    if (fp != NULL && (--fp->uf_refcount <= 0
+    만약 (fp != NULL && (--fp->uf_refcount <= 0
 		|| (fp->uf_refcount == 1 && fp->uf_partial != NULL
 					 && fp->uf_partial->pt_refcount <= 1
 					 && fp->uf_partial->pt_func == fp)))
     {
 	// Only delete it when it's not being used.  Otherwise it's done
 	// when "uf_calls" becomes zero.
-	if (fp->uf_calls == 0)
+	만약 (fp->uf_calls == 0)
 	    func_clear_free(fp, FALSE);
     }
 }
@@ -6518,12 +6518,12 @@ func_ref(char_u *name)
 {
     ufunc_T *fp;
 
-    if (name == NULL || !func_name_refcount(name))
-	return;
+    만약 (name == NULL || !func_name_refcount(name))
+	반환;
     fp = find_func(name, FALSE);
-    if (fp != NULL)
+    만약 (fp != NULL)
 	++fp->uf_refcount;
-    else if (numbered_function(name))
+    아니면 만약 (numbered_function(name))
 	// Only give an error for a numbered function.
 	// Fail silently, when named or lambda function isn't found.
 	internal_error("func_ref()");
@@ -6535,7 +6535,7 @@ func_ref(char_u *name)
     void
 func_ptr_ref(ufunc_T *fp)
 {
-    if (fp != NULL)
+    만약 (fp != NULL)
 	++fp->uf_refcount;
 }
 
@@ -6543,10 +6543,10 @@ func_ptr_ref(ufunc_T *fp)
  * Return TRUE if items in "fc" do not have "copyID".  That means they are not
  * referenced from anywhere that is in use.
  */
-    static int
-can_free_funccal(funccall_T *fc, int copyID)
+    static 정수
+can_free_funccal(funccall_T *fc, 정수 copyID)
 {
-    return (fc->fc_l_varlist.lv_copyID != copyID
+    반환 (fc->fc_l_varlist.lv_copyID != copyID
 	    && fc->fc_l_vars.dv_copyID != copyID
 	    && fc->fc_l_avars.dv_copyID != copyID
 	    && fc->fc_copyID != copyID);
@@ -6560,32 +6560,32 @@ ex_return(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
     typval_T	rettv;
-    int		returning = FALSE;
+    정수		returning = FALSE;
     evalarg_T	evalarg;
 
-    if (current_funccal == NULL)
+    만약 (current_funccal == NULL)
     {
 	emsg(_(e_return_not_inside_function));
-	return;
+	반환;
     }
 
     init_evalarg(&evalarg);
     evalarg.eval_flags = eap->skip ? 0 : EVAL_EVALUATE;
 
-    if (eap->skip)
+    만약 (eap->skip)
 	++emsg_skip;
 
     eap->nextcmd = NULL;
-    if ((*arg != NUL && *arg != '|' && *arg != '\n')
+    만약 ((*arg != NUL && *arg != '|' && *arg != '\n')
 				  && eval0(arg, &rettv, eap, &evalarg) != FAIL)
     {
-	if (!eap->skip)
+	만약 (!eap->skip)
 	    returning = do_return(eap, FALSE, TRUE, &rettv);
-	else
+	아니면
 	    clear_tv(&rettv);
     }
     // It's safer to return also on error.
-    else if (!eap->skip)
+    아니면 만약 (!eap->skip)
     {
 	// In return statement, cause_abort should be force_abort.
 	update_force_abort();
@@ -6594,19 +6594,19 @@ ex_return(exarg_T *eap)
 	 * Return unless the expression evaluation has been cancelled due to an
 	 * aborting error, an interrupt, or an exception.
 	 */
-	if (!aborting())
+	만약 (!aborting())
 	    returning = do_return(eap, FALSE, TRUE, NULL);
     }
 
     // When skipping or the return gets pending, advance to the next command
     // in this line (!returning).  Otherwise, ignore the rest of the line.
     // Following lines will be ignored by get_func_line().
-    if (returning)
+    만약 (returning)
 	eap->nextcmd = NULL;
-    else if (eap->nextcmd == NULL)	    // no argument
+    아니면 만약 (eap->nextcmd == NULL)	    // no argument
 	set_nextcmd(eap, arg);
 
-    if (eap->skip)
+    만약 (eap->skip)
 	--emsg_skip;
     clear_evalarg(&evalarg, eap);
 }
@@ -6614,7 +6614,7 @@ ex_return(exarg_T *eap)
 /*
  * Lower level implementation of "call".  Only called when not skipping.
  */
-    static int
+    static 정수
 ex_call_inner(
 	exarg_T	    *eap,
 	char_u	    *name,
@@ -6624,18 +6624,18 @@ ex_call_inner(
 	evalarg_T   *evalarg)
 {
     linenr_T	lnum;
-    int		doesrange;
+    정수		doesrange;
     typval_T	rettv;
-    int		failed = FALSE;
+    정수		failed = FALSE;
 
     lnum = eap->line1;
-    for ( ; lnum <= eap->line2; ++lnum)
+    위해 ( ; lnum <= eap->line2; ++lnum)
     {
 	funcexe_T funcexe;
 
-	if (eap->addr_count > 0)
+	만약 (eap->addr_count > 0)
 	{
-	    if (lnum > curbuf->b_ml.ml_line_count)
+	    만약 (lnum > curbuf->b_ml.ml_line_count)
 	    {
 		// If the function deleted lines or switched to another buffer
 		// the line number may become invalid.
@@ -6651,16 +6651,16 @@ ex_call_inner(
 	funcexe = *funcexe_init;
 	funcexe.fe_doesrange = &doesrange;
 	rettv.v_type = VAR_UNKNOWN;	// clear_tv() uses this
-	if (get_func_tv(name, -1, &rettv, arg, evalarg, &funcexe) == FAIL)
+	만약 (get_func_tv(name, -1, &rettv, arg, evalarg, &funcexe) == FAIL)
 	{
 	    failed = TRUE;
 	    break;
 	}
-	if (has_watchexpr())
+	만약 (has_watchexpr())
 	    dbg_check_breakpoint(eap);
 
 	// Handle a function returning a Funcref, Dictionary or List.
-	if (handle_subscript(arg, NULL, &rettv,
+	만약 (handle_subscript(arg, NULL, &rettv,
 					      &EVALARG_EVALUATE, TRUE) == FAIL)
 	{
 	    failed = TRUE;
@@ -6668,24 +6668,24 @@ ex_call_inner(
 	}
 
 	clear_tv(&rettv);
-	if (doesrange)
+	만약 (doesrange)
 	    break;
 
 	// Stop when immediately aborting on error, or when an interrupt
 	// occurred or an exception was thrown but not caught.
 	// get_func_tv() returned OK, so that the check for trailing
 	// characters below is executed.
-	if (aborting())
+	만약 (aborting())
 	    break;
     }
-    return failed;
+    반환 failed;
 }
 
 /*
  * Core part of ":defer func(arg)".  "arg" points to the "(" and is advanced.
  * Returns FAIL or OK.
  */
-    static int
+    static 정수
 ex_defer_inner(
 	char_u	    *name,
 	char_u	    **arg,
@@ -6694,64 +6694,64 @@ ex_defer_inner(
 	evalarg_T   *evalarg)
 {
     typval_T	argvars[MAX_FUNC_ARGS + 1];	// vars for arguments
-    int		partial_argc = 0;		// number of partial arguments
-    int		argcount = 0;			// number of arguments found
-    int		r;
+    정수		partial_argc = 0;		// number of partial arguments
+    정수		argcount = 0;			// number of arguments found
+    정수		r;
 
-    if (current_funccal == NULL)
+    만약 (current_funccal == NULL)
     {
 	semsg(_(e_str_not_inside_function), "defer");
-	return FAIL;
+	반환 FAIL;
     }
-    if (partial != NULL)
+    만약 (partial != NULL)
     {
-	if (partial->pt_dict != NULL)
+	만약 (partial->pt_dict != NULL)
 	{
 	    emsg(_(e_cannot_use_partial_with_dictionary_for_defer));
-	    return FAIL;
+	    반환 FAIL;
 	}
-	if (partial->pt_argc > 0)
+	만약 (partial->pt_argc > 0)
 	{
-	    int i;
+	    정수 i;
 
 	    partial_argc = partial->pt_argc;
-	    for (i = 0; i < partial_argc; ++i)
+	    위해 (i = 0; i < partial_argc; ++i)
 		copy_tv(&partial->pt_argv[i], &argvars[i]);
 	}
     }
-    int is_builtin = builtin_function(name, -1);
+    정수 is_builtin = builtin_function(name, -1);
     r = get_func_arguments(arg, evalarg, FALSE,
 				argvars + partial_argc, &argcount, is_builtin);
     argcount += partial_argc;
 
-    if (r == OK)
+    만약 (r == OK)
     {
-	if (type != NULL)
+	만약 (type != NULL)
 	{
 	    // Check that the arguments are OK for the types of the funcref.
 	    r = check_argument_types(type, argvars, argcount, NULL, name);
 	}
-	else if (is_builtin)
+	아니면 만약 (is_builtin)
 	{
-	    int idx = find_internal_func(name);
+	    정수 idx = find_internal_func(name);
 
-	    if (idx < 0)
+	    만약 (idx < 0)
 	    {
 		emsg_funcname(e_unknown_function_str, name);
 		r = FAIL;
 	    }
-	    else if (check_internal_func(idx, argcount) == -1)
+	    아니면 만약 (check_internal_func(idx, argcount) == -1)
 		r = FAIL;
 	}
-	else
+	아니면
 	{
 	    ufunc_T *ufunc = find_func(name, FALSE);
 
 	    // we tolerate an unknown function here, it might be defined later
-	    if (ufunc != NULL)
+	    만약 (ufunc != NULL)
 	    {
 		funcerror_T error = check_user_func_argcount(ufunc, argcount);
-		if (error != FCERR_UNKNOWN)
+		만약 (error != FCERR_UNKNOWN)
 		{
 		    user_func_error(error, name, FALSE);
 		    r = FAIL;
@@ -6760,28 +6760,28 @@ ex_defer_inner(
 	}
     }
 
-    if (r == FAIL)
+    만약 (r == FAIL)
     {
-	while (--argcount >= 0)
+	동안 (--argcount >= 0)
 	    clear_tv(&argvars[argcount]);
-	return FAIL;
+	반환 FAIL;
     }
-    return add_defer(name, argcount, argvars);
+    반환 add_defer(name, argcount, argvars);
 }
 
 /*
  * Return TRUE if currently inside a function call.
  * Give an error message and return FALSE when not.
  */
-    int
+    정수
 can_add_defer(void)
 {
-    if (!in_def_function() && get_current_funccal() == NULL)
+    만약 (!in_def_function() && get_current_funccal() == NULL)
     {
 	semsg(_(e_str_not_inside_function), "defer");
-	return FALSE;
+	반환 FALSE;
     }
-    return TRUE;
+    반환 TRUE;
 }
 
 /*
@@ -6791,29 +6791,29 @@ can_add_defer(void)
  * not NULL.
  * Returns OK or FAIL.
  */
-    int
-add_defer(char_u *name, int argcount_arg, typval_T *argvars)
+    정수
+add_defer(char_u *name, 정수 argcount_arg, typval_T *argvars)
 {
     char_u	*saved_name = vim_strsave(name);
-    int		argcount = argcount_arg;
+    정수		argcount = argcount_arg;
     defer_T	*dr;
-    int		ret = FAIL;
+    정수		ret = FAIL;
 
-    if (saved_name == NULL)
+    만약 (saved_name == NULL)
 	goto theend;
-    if (in_def_function())
+    만약 (in_def_function())
     {
-	if (add_defer_function(saved_name, argcount, argvars) == OK)
+	만약 (add_defer_function(saved_name, argcount, argvars) == OK)
 	{
 	    argcount = 0;
 	    ret = OK;
 	}
     }
-    else
+    아니면
     {
-	if (current_funccal->fc_defer.ga_itemsize == 0)
+	만약 (current_funccal->fc_defer.ga_itemsize == 0)
 	    ga_init2(&current_funccal->fc_defer, sizeof(defer_T), 10);
-	if (ga_grow_id(&current_funccal->fc_defer, 1, aid_defer) == FAIL)
+	만약 (ga_grow_id(&current_funccal->fc_defer, 1, aid_defer) == FAIL)
 	{
 	    vim_free(saved_name);
 	    goto theend;
@@ -6822,7 +6822,7 @@ add_defer(char_u *name, int argcount_arg, typval_T *argvars)
 					  + current_funccal->fc_defer.ga_len++;
 	dr->dr_name = saved_name;
 	dr->dr_argcount = argcount;
-	while (argcount > 0)
+	동안 (argcount > 0)
 	{
 	    --argcount;
 	    dr->dr_argvars[argcount] = argvars[argcount];
@@ -6831,9 +6831,9 @@ add_defer(char_u *name, int argcount_arg, typval_T *argvars)
     }
 
 theend:
-    while (--argcount >= 0)
+    동안 (--argcount >= 0)
 	clear_tv(&argvars[argcount]);
-    return ret;
+    반환 ret;
 }
 
 /*
@@ -6842,13 +6842,13 @@ theend:
     static void
 handle_defer_one(funccall_T *funccal)
 {
-    int	    idx;
+    정수	    idx;
 
-    for (idx = funccal->fc_defer.ga_len - 1; idx >= 0; --idx)
+    위해 (idx = funccal->fc_defer.ga_len - 1; idx >= 0; --idx)
     {
 	defer_T	    *dr = ((defer_T *)funccal->fc_defer.ga_data) + idx;
 
-	if (dr->dr_name == NULL)
+	만약 (dr->dr_name == NULL)
 	    // already being called, can happen if function does ":qa"
 	    continue;
 
@@ -6876,7 +6876,7 @@ handle_defer_one(funccall_T *funccal)
 
 	clear_tv(&rettv);
 	vim_free(name);
-	for (int i = dr->dr_argcount - 1; i >= 0; --i)
+	위해 (정수 i = dr->dr_argcount - 1; i >= 0; --i)
 	    clear_tv(&dr->dr_argvars[i]);
     }
     ga_clear(&funccal->fc_defer);
@@ -6885,13 +6885,13 @@ handle_defer_one(funccall_T *funccal)
     static void
 invoke_funccall_defer(funccall_T *fc)
 {
-    if (fc->fc_ectx != NULL)
+    만약 (fc->fc_ectx != NULL)
     {
 	// :def function
 	unwind_def_callstack(fc->fc_ectx);
 	may_invoke_defer_funcs(fc->fc_ectx);
     }
-    else
+    아니면
     {
 	// legacy function
 	handle_defer_one(fc);
@@ -6904,11 +6904,11 @@ invoke_funccall_defer(funccall_T *fc)
     void
 invoke_all_defer(void)
 {
-    for (funccall_T *fc = current_funccal; fc != NULL; fc = fc->fc_caller)
+    위해 (funccall_T *fc = current_funccal; fc != NULL; fc = fc->fc_caller)
 	invoke_funccall_defer(fc);
 
-    for (funccal_entry_T *fce = funccal_stack; fce != NULL; fce = fce->next)
-	for (funccall_T *fc = fce->top_funccal; fc != NULL; fc = fc->fc_caller)
+    위해 (funccal_entry_T *fce = funccal_stack; fce != NULL; fce = fce->next)
+	위해 (funccall_T *fc = fce->top_funccal; fc != NULL; fc = fc->fc_caller)
 	    invoke_funccall_defer(fc);
 }
 
@@ -6923,18 +6923,18 @@ ex_call(exarg_T *eap)
     char_u	*startarg;
     char_u	*name;
     char_u	*tofree;
-    int		len;
-    int		failed = FALSE;
+    정수		len;
+    정수		failed = FALSE;
     funcdict_T	fudi;
     ufunc_T	*ufunc = NULL;
     partial_T	*partial = NULL;
     evalarg_T	evalarg;
     type_T	*type = NULL;
-    int		found_var = FALSE;
-    int		vim9script = in_vim9script();
+    정수		found_var = FALSE;
+    정수		vim9script = in_vim9script();
 
     fill_evalarg_from_eap(&evalarg, eap, eap->skip);
-    if (eap->skip)
+    만약 (eap->skip)
     {
 	typval_T	rettv;
 
@@ -6942,42 +6942,42 @@ ex_call(exarg_T *eap)
 	// instead to skip to any following command, e.g. for:
 	//   :if 0 | call dict.foo().bar() | endif
 	++emsg_skip;
-	if (eval0(eap->arg, &rettv, eap, &evalarg) != FAIL)
+	만약 (eval0(eap->arg, &rettv, eap, &evalarg) != FAIL)
 	    clear_tv(&rettv);
 	--emsg_skip;
 	clear_evalarg(&evalarg, eap);
-	return;
+	반환;
     }
 
     tofree = trans_function_name_ext(&arg, NULL, FALSE, TFN_INT | TFN_NO_DECL,
 			   &fudi, &partial, vim9script ? &type : NULL, &ufunc);
-    if (fudi.fd_newkey != NULL)
+    만약 (fudi.fd_newkey != NULL)
     {
 	// Still need to give an error message for missing key.
 	semsg(_(e_key_not_present_in_dictionary_str), fudi.fd_newkey);
 	vim_free(fudi.fd_newkey);
     }
-    if (tofree == NULL)
-	return;
+    만약 (tofree == NULL)
+	반환;
 
     // Increase refcount on dictionary, it could get deleted when evaluating
     // the arguments.
-    if (fudi.fd_dict != NULL)
+    만약 (fudi.fd_dict != NULL)
 	++fudi.fd_dict->dv_refcount;
 
     // If it is the name of a variable of type VAR_FUNC or VAR_PARTIAL use its
     // contents.  For VAR_PARTIAL get its partial, unless we already have one
     // from trans_function_name().
-    len = (int)STRLEN(tofree);
+    len = (정수)STRLEN(tofree);
     name = deref_func_name(tofree, &len, partial != NULL ? NULL : &partial,
 				vim9script && type == NULL ? &type : NULL,
 						     FALSE, FALSE, &found_var);
 
-    if (*arg == '<')
+    만약 (*arg == '<')
     {
 	// generic function call
 	name = append_generic_func_type_args(name, STRLEN(name), &arg);
-	if (name == NULL)
+	만약 (name == NULL)
 	    goto end;
 	vim_free(tofree);
 	tofree = name;
@@ -6986,23 +6986,23 @@ ex_call(exarg_T *eap)
     // Skip white space to allow ":call func ()".  Not good, but required for
     // backward compatibility.
     startarg = skipwhite(arg);
-    if (*startarg != '(')
+    만약 (*startarg != '(')
     {
 	semsg(_(e_missing_parenthesis_str), eap->arg);
 	goto end;
     }
-    if (vim9script && startarg > arg)
+    만약 (vim9script && startarg > arg)
     {
 	semsg(_(e_no_white_space_allowed_before_str_str), "(", eap->arg);
 	goto end;
     }
 
-    if (eap->cmdidx == CMD_defer)
+    만약 (eap->cmdidx == CMD_defer)
     {
 	arg = startarg;
 	failed = ex_defer_inner(name, &arg, type, partial, &evalarg) == FAIL;
     }
-    else
+    아니면
     {
 	funcexe_T funcexe;
 
@@ -7020,19 +7020,19 @@ ex_call(exarg_T *eap)
 
     // When inside :try we need to check for following "| catch" or "| endtry".
     // Not when there was an error, but do check if an exception was thrown.
-    if ((!aborting() || did_throw) && (!failed || eap->cstack->cs_trylevel > 0))
+    만약 ((!aborting() || did_throw) && (!failed || eap->cstack->cs_trylevel > 0))
     {
 	// Check for trailing illegal characters and a following command.
 	arg = skipwhite(arg);
-	if (!ends_excmd2(eap->arg, arg))
+	만약 (!ends_excmd2(eap->arg, arg))
 	{
-	    if (!failed && !aborting())
+	    만약 (!failed && !aborting())
 	    {
 		emsg_severe = TRUE;
 		semsg(_(e_trailing_characters_str), arg);
 	    }
 	}
-	else
+	아니면
 	    set_nextcmd(eap, arg);
     }
     // Must be after using "arg", it may point into memory cleared here.
@@ -7051,17 +7051,17 @@ end:
  * with the return rettv.  Returns TRUE when the return can be carried out,
  * FALSE when the return gets pending.
  */
-    int
+    정수
 do_return(
     exarg_T	*eap,
-    int		reanimate,
-    int		is_cmd,
+    정수		reanimate,
+    정수		is_cmd,
     void	*rettv)
 {
-    int		idx;
+    정수		idx;
     cstack_T	*cstack = eap->cstack;
 
-    if (reanimate)
+    만약 (reanimate)
 	// Undo the return.
 	current_funccal->fc_returned = FALSE;
 
@@ -7072,34 +7072,34 @@ do_return(
      * Otherwise, return normally.
      */
     idx = cleanup_conditionals(eap->cstack, 0, TRUE);
-    if (idx >= 0)
+    만약 (idx >= 0)
     {
 	cstack->cs_pending[idx] = CSTP_RETURN;
 
-	if (!is_cmd && !reanimate)
+	만약 (!is_cmd && !reanimate)
 	    // A pending return again gets pending.  "rettv" points to an
 	    // allocated variable with the rettv of the original ":return"'s
 	    // argument if present or is NULL else.
 	    cstack->cs_rettv[idx] = rettv;
-	else
+	아니면
 	{
 	    // When undoing a return in order to make it pending, get the stored
 	    // return rettv.
-	    if (reanimate)
+	    만약 (reanimate)
 		rettv = current_funccal->fc_rettv;
 
-	    if (rettv != NULL)
+	    만약 (rettv != NULL)
 	    {
 		// Store the value of the pending return.
-		if ((cstack->cs_rettv[idx] = alloc_tv()) != NULL)
+		만약 ((cstack->cs_rettv[idx] = alloc_tv()) != NULL)
 		    *(typval_T *)cstack->cs_rettv[idx] = *(typval_T *)rettv;
-		else
+		아니면
 		    emsg(_(e_out_of_memory));
 	    }
-	    else
+	    아니면
 		cstack->cs_rettv[idx] = NULL;
 
-	    if (reanimate)
+	    만약 (reanimate)
 	    {
 		// The pending return value could be overwritten by a ":return"
 		// without argument in a finally clause; reset the default
@@ -7110,23 +7110,23 @@ do_return(
 	}
 	report_make_pending(CSTP_RETURN, rettv);
     }
-    else
+    아니면
     {
 	current_funccal->fc_returned = TRUE;
 
 	// If the return is carried out now, store the return value.  For
 	// a return immediately after reanimation, the value is already
 	// there.
-	if (!reanimate && rettv != NULL)
+	만약 (!reanimate && rettv != NULL)
 	{
 	    clear_tv(current_funccal->fc_rettv);
 	    *current_funccal->fc_rettv = *(typval_T *)rettv;
-	    if (!is_cmd)
+	    만약 (!is_cmd)
 		vim_free(rettv);
 	}
     }
 
-    return idx < 0;
+    반환 idx < 0;
 }
 
 /*
@@ -7151,23 +7151,23 @@ get_return_cmd(void *rettv)
     size_t	slen = 0;
     size_t	IObufflen;
 
-    if (rettv != NULL)
+    만약 (rettv != NULL)
 	s = echo_string((typval_T *)rettv, &tofree, numbuf, 0);
-    if (s == NULL)
+    만약 (s == NULL)
 	s = (char_u *)"";
-    else
+    아니면
 	slen = STRLEN(s);
 
     STRCPY(IObuff, ":return ");
     STRNCPY(IObuff + 8, s, IOSIZE - 8);
     IObufflen = 8 + slen;
-    if (IObufflen >= IOSIZE)
+    만약 (IObufflen >= IOSIZE)
     {
 	STRCPY(IObuff + IOSIZE - 4, "...");
 	IObufflen = IOSIZE - 1;
     }
     vim_free(tofree);
-    return vim_strnsave(IObuff, IObufflen);
+    반환 vim_strnsave(IObuff, IObufflen);
 }
 
 /*
@@ -7177,9 +7177,9 @@ get_return_cmd(void *rettv)
  */
     char_u *
 get_func_line(
-    int	    c UNUSED,
+    정수	    c UNUSED,
     void    *cookie,
-    int	    indent UNUSED,
+    정수	    indent UNUSED,
     getline_opt_T options UNUSED)
 {
     funccall_T	*fcp = (funccall_T *)cookie;
@@ -7188,42 +7188,42 @@ get_func_line(
     garray_T	*gap;  // growarray with function lines
 
     // If breakpoints have been added/deleted need to check for it.
-    if (fcp->fc_dbg_tick != debug_tick)
+    만약 (fcp->fc_dbg_tick != debug_tick)
     {
 	fcp->fc_breakpoint = dbg_find_breakpoint(FALSE, fp->uf_name,
 							       SOURCING_LNUM);
 	fcp->fc_dbg_tick = debug_tick;
     }
 #ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    만약 (do_profiling == PROF_YES)
 	func_line_end(cookie);
 #endif
 
     gap = &fp->uf_lines;
-    if (((fp->uf_flags & FC_ABORT) && did_emsg && !aborted_in_try())
+    만약 (((fp->uf_flags & FC_ABORT) && did_emsg && !aborted_in_try())
 	    || fcp->fc_returned)
 	retval = NULL;
-    else
+    아니면
     {
 	// Skip NULL lines (continuation lines).
-	while (fcp->fc_linenr < gap->ga_len
+	동안 (fcp->fc_linenr < gap->ga_len
 			&& ((char_u **)(gap->ga_data))[fcp->fc_linenr] == NULL)
 	    ++fcp->fc_linenr;
-	if (fcp->fc_linenr >= gap->ga_len)
+	만약 (fcp->fc_linenr >= gap->ga_len)
 	    retval = NULL;
-	else
+	아니면
 	{
 	    retval = vim_strsave(((char_u **)(gap->ga_data))[fcp->fc_linenr++]);
 	    SOURCING_LNUM = fcp->fc_linenr;
 #ifdef FEAT_PROFILE
-	    if (do_profiling == PROF_YES)
+	    만약 (do_profiling == PROF_YES)
 		func_line_start(cookie, SOURCING_LNUM);
 #endif
 	}
     }
 
     // Did we encounter a breakpoint?
-    if (fcp->fc_breakpoint != 0 && fcp->fc_breakpoint <= SOURCING_LNUM)
+    만약 (fcp->fc_breakpoint != 0 && fcp->fc_breakpoint <= SOURCING_LNUM)
     {
 	dbg_breakpoint(fp->uf_name, SOURCING_LNUM);
 	// Find next breakpoint.
@@ -7232,21 +7232,21 @@ get_func_line(
 	fcp->fc_dbg_tick = debug_tick;
     }
 
-    return retval;
+    반환 retval;
 }
 
 /*
  * Return TRUE if the currently active function should be ended, because a
  * return was encountered or an error occurred.  Used inside a ":while".
  */
-    int
+    정수
 func_has_ended(void *cookie)
 {
     funccall_T  *fcp = (funccall_T *)cookie;
 
     // Ignore the "abort" flag if the abortion behavior has been changed due to
     // an error inside a try conditional.
-    return (((fcp->fc_func->uf_flags & FC_ABORT)
+    반환 (((fcp->fc_func->uf_flags & FC_ABORT)
 					      && did_emsg && !aborted_in_try())
 	    || fcp->fc_returned);
 }
@@ -7254,11 +7254,11 @@ func_has_ended(void *cookie)
 /*
  * return TRUE if cookie indicates a function which "abort"s on errors.
  */
-    int
+    정수
 func_has_abort(
     void    *cookie)
 {
-    return ((funccall_T *)cookie)->fc_func->uf_flags & FC_ABORT;
+    반환 ((funccall_T *)cookie)->fc_func->uf_flags & FC_ABORT;
 }
 
 
@@ -7277,22 +7277,22 @@ make_partial(dict_T *selfdict_in, typval_T *rettv)
     char_u	fname_buf[FLEN_FIXED + 1];
     dict_T	*selfdict = selfdict_in;
 
-    if (rettv->v_type == VAR_PARTIAL  && rettv->vval.v_partial != NULL
+    만약 (rettv->v_type == VAR_PARTIAL  && rettv->vval.v_partial != NULL
 				     && rettv->vval.v_partial->pt_func != NULL)
 	fp = rettv->vval.v_partial->pt_func;
-    else
+    아니면
     {
 	fname = rettv->v_type == VAR_FUNC ? rettv->vval.v_string
 					 : rettv->vval.v_partial == NULL ? NULL
 					      : rettv->vval.v_partial->pt_name;
-	if (fname == NULL)
+	만약 (fname == NULL)
 	{
 	    // There is no point binding a dict to a NULL function, just create
 	    // a function reference.
 	    rettv->v_type = VAR_FUNC;
 	    rettv->vval.v_string = NULL;
 	}
-	else
+	아니면
 	{
 	    char_u	*tofree = NULL;
 	    funcerror_T	error;
@@ -7304,50 +7304,50 @@ make_partial(dict_T *selfdict_in, typval_T *rettv)
 	}
     }
 
-    if (fp != NULL && (fp->uf_flags & FC_DICT))
+    만약 (fp != NULL && (fp->uf_flags & FC_DICT))
     {
 	partial_T	*pt = ALLOC_CLEAR_ONE(partial_T);
 
-	if (pt != NULL)
+	만약 (pt != NULL)
 	{
 	    pt->pt_refcount = 1;
 	    pt->pt_dict = selfdict;
 	    pt->pt_auto = TRUE;
 	    selfdict = NULL;
-	    if (rettv->v_type == VAR_FUNC)
+	    만약 (rettv->v_type == VAR_FUNC)
 	    {
 		// Just a function: Take over the function name and use
 		// selfdict.
 		pt->pt_name = rettv->vval.v_string;
 	    }
-	    else
+	    아니면
 	    {
 		partial_T	*ret_pt = rettv->vval.v_partial;
-		int		i;
+		정수		i;
 
 		// Partial: copy the function name, use selfdict and copy
 		// args.  Can't take over name or args, the partial might
 		// be referenced elsewhere.
-		if (ret_pt->pt_name != NULL)
+		만약 (ret_pt->pt_name != NULL)
 		{
 		    pt->pt_name = vim_strsave(ret_pt->pt_name);
 		    func_ref(pt->pt_name);
 		}
-		else
+		아니면
 		{
 		    pt->pt_func = ret_pt->pt_func;
 		    func_ptr_ref(pt->pt_func);
 		}
-		if (ret_pt->pt_argc > 0)
+		만약 (ret_pt->pt_argc > 0)
 		{
 		    pt->pt_argv = ALLOC_MULT(typval_T, ret_pt->pt_argc);
-		    if (pt->pt_argv == NULL)
+		    만약 (pt->pt_argv == NULL)
 			// out of memory: drop the arguments
 			pt->pt_argc = 0;
-		    else
+		    아니면
 		    {
 			pt->pt_argc = ret_pt->pt_argc;
-			for (i = 0; i < pt->pt_argc; i++)
+			위해 (i = 0; i < pt->pt_argc; i++)
 			    copy_tv(&ret_pt->pt_argv[i], &pt->pt_argv[i]);
 		    }
 		}
@@ -7357,7 +7357,7 @@ make_partial(dict_T *selfdict_in, typval_T *rettv)
 	    rettv->vval.v_partial = pt;
 	}
     }
-    return selfdict;
+    반환 selfdict;
 }
 
 /*
@@ -7366,7 +7366,7 @@ make_partial(dict_T *selfdict_in, typval_T *rettv)
     char_u *
 func_name(void *cookie)
 {
-    return ((funccall_T *)cookie)->fc_func->uf_name;
+    반환 ((funccall_T *)cookie)->fc_func->uf_name;
 }
 
 /*
@@ -7375,46 +7375,46 @@ func_name(void *cookie)
     linenr_T *
 func_breakpoint(void *cookie)
 {
-    return &((funccall_T *)cookie)->fc_breakpoint;
+    반환 &((funccall_T *)cookie)->fc_breakpoint;
 }
 
 /*
  * Return the address holding the debug tick for a funccall cookie.
  */
-    int *
+    정수 *
 func_dbg_tick(void *cookie)
 {
-    return &((funccall_T *)cookie)->fc_dbg_tick;
+    반환 &((funccall_T *)cookie)->fc_dbg_tick;
 }
 
 /*
  * Return the nesting level for a funccall cookie.
  */
-    int
+    정수
 func_level(void *cookie)
 {
-    return ((funccall_T *)cookie)->fc_level;
+    반환 ((funccall_T *)cookie)->fc_level;
 }
 
 /*
  * Return TRUE when a function was ended by a ":return" command.
  */
-    int
+    정수
 current_func_returned(void)
 {
-    return current_funccal->fc_returned;
+    반환 current_funccal->fc_returned;
 }
 
-    int
-free_unref_funccal(int copyID, int testing)
+    정수
+free_unref_funccal(정수 copyID, 정수 testing)
 {
-    int		did_free = FALSE;
-    int		did_free_funccal = FALSE;
+    정수		did_free = FALSE;
+    정수		did_free_funccal = FALSE;
     funccall_T	*fc, **pfc;
 
-    for (pfc = &previous_funccal; *pfc != NULL; )
+    위해 (pfc = &previous_funccal; *pfc != NULL; )
     {
-	if (can_free_funccal(*pfc, copyID))
+	만약 (can_free_funccal(*pfc, copyID))
 	{
 	    fc = *pfc;
 	    *pfc = fc->fc_caller;
@@ -7422,15 +7422,15 @@ free_unref_funccal(int copyID, int testing)
 	    did_free = TRUE;
 	    did_free_funccal = TRUE;
 	}
-	else
+	아니면
 	    pfc = &(*pfc)->fc_caller;
     }
-    if (did_free_funccal)
+    만약 (did_free_funccal)
 	// When a funccal was freed some more items might be garbage
 	// collected, so run again.
 	(void)garbage_collect(testing);
 
-    return did_free;
+    반환 did_free;
 }
 
 /*
@@ -7439,24 +7439,24 @@ free_unref_funccal(int copyID, int testing)
     static funccall_T *
 get_funccal(void)
 {
-    int		i;
+    정수		i;
     funccall_T	*funccal;
     funccall_T	*temp_funccal;
 
     funccal = current_funccal;
-    if (debug_backtrace_level > 0)
+    만약 (debug_backtrace_level > 0)
     {
-	for (i = 0; i < debug_backtrace_level; i++)
+	위해 (i = 0; i < debug_backtrace_level; i++)
 	{
 	    temp_funccal = funccal->fc_caller;
-	    if (temp_funccal)
+	    만약 (temp_funccal)
 		funccal = temp_funccal;
-	    else
+	    아니면
 		// backtrace level overflow. reset to max
 		debug_backtrace_level = i;
 	}
     }
-    return funccal;
+    반환 funccal;
 }
 
 /*
@@ -7470,12 +7470,12 @@ get_funccal_for_vars(void)
 {
     funccall_T	*funccal = NULL;
 
-    if (current_funccal == NULL)
-	return NULL;
+    만약 (current_funccal == NULL)
+	반환 NULL;
     funccal = get_funccal();
-    if (funccal == NULL || funccal->fc_l_vars.dv_refcount == 0)
-	return NULL;
-    return funccal;
+    만약 (funccal == NULL || funccal->fc_l_vars.dv_refcount == 0)
+	반환 NULL;
+    반환 funccal;
 }
 
 /*
@@ -7487,7 +7487,7 @@ get_funccal_local_ht(void)
 {
     funccall_T	*funccal = get_funccal_for_vars();
 
-    return funccal == NULL ? NULL : &funccal->fc_l_vars.dv_hashtab;
+    반환 funccal == NULL ? NULL : &funccal->fc_l_vars.dv_hashtab;
 }
 
 /*
@@ -7499,7 +7499,7 @@ get_funccal_local_var(void)
 {
     funccall_T	*funccal = get_funccal_for_vars();
 
-    return funccal == NULL ? NULL : &funccal->fc_l_vars_var;
+    반환 funccal == NULL ? NULL : &funccal->fc_l_vars_var;
 }
 
 /*
@@ -7511,7 +7511,7 @@ get_funccal_args_ht(void)
 {
     funccall_T	*funccal = get_funccal_for_vars();
 
-    return funccal == NULL ? NULL : &funccal->fc_l_avars.dv_hashtab;
+    반환 funccal == NULL ? NULL : &funccal->fc_l_avars.dv_hashtab;
 }
 
 /*
@@ -7523,16 +7523,16 @@ get_funccal_args_var(void)
 {
     funccall_T	*funccal = get_funccal_for_vars();
 
-    return funccal == NULL ? NULL : &funccal->fc_l_avars_var;
+    반환 funccal == NULL ? NULL : &funccal->fc_l_avars_var;
 }
 
 /*
  * List function variables, if there is a function.
  */
     void
-list_func_vars(int *first)
+list_func_vars(정수 *first)
 {
-    if (current_funccal != NULL && current_funccal->fc_l_vars.dv_refcount > 0)
+    만약 (current_funccal != NULL && current_funccal->fc_l_vars.dv_refcount > 0)
 	list_hashtable_vars(&current_funccal->fc_l_vars.dv_hashtab,
 							   "l:", FALSE, first);
 }
@@ -7545,10 +7545,10 @@ list_func_vars(int *first)
     dict_T *
 get_current_funccal_dict(hashtab_T *ht)
 {
-    if (current_funccal != NULL
+    만약 (current_funccal != NULL
 	    && ht == &current_funccal->fc_l_vars.dv_hashtab)
-	return &current_funccal->fc_l_vars;
-    return NULL;
+	반환 &current_funccal->fc_l_vars;
+    반환 NULL;
 }
 
 /*
@@ -7562,167 +7562,167 @@ find_hi_in_scoped_ht(char_u *name, hashtab_T **pht)
     hashitem_T	*hi = NULL;
     char_u	*varname;
 
-    if (current_funccal == NULL || current_funccal->fc_func->uf_scoped == NULL)
-	return NULL;
+    만약 (current_funccal == NULL || current_funccal->fc_func->uf_scoped == NULL)
+	반환 NULL;
 
     // Search in parent scope, which can be referenced from a lambda.
     current_funccal = current_funccal->fc_func->uf_scoped;
-    while (current_funccal != NULL)
+    동안 (current_funccal != NULL)
     {
 	ht = find_var_ht(name, &varname);
-	if (ht != NULL && *varname != NUL)
+	만약 (ht != NULL && *varname != NUL)
 	{
 	    hi = hash_find(ht, varname);
-	    if (!HASHITEM_EMPTY(hi))
+	    만약 (!HASHITEM_EMPTY(hi))
 	    {
 		*pht = ht;
 		break;
 	    }
 	}
-	if (current_funccal == current_funccal->fc_func->uf_scoped)
+	만약 (current_funccal == current_funccal->fc_func->uf_scoped)
 	    break;
 	current_funccal = current_funccal->fc_func->uf_scoped;
     }
     current_funccal = old_current_funccal;
 
-    return hi;
+    반환 hi;
 }
 
 /*
  * Search variable in parent scope.
  */
     dictitem_T *
-find_var_in_scoped_ht(char_u *name, int no_autoload)
+find_var_in_scoped_ht(char_u *name, 정수 no_autoload)
 {
     dictitem_T	*v = NULL;
     funccall_T	*old_current_funccal = current_funccal;
     hashtab_T	*ht;
     char_u	*varname;
 
-    if (current_funccal == NULL || current_funccal->fc_func->uf_scoped == NULL)
-	return NULL;
+    만약 (current_funccal == NULL || current_funccal->fc_func->uf_scoped == NULL)
+	반환 NULL;
 
     // Search in parent scope which is possible to reference from lambda
     current_funccal = current_funccal->fc_func->uf_scoped;
-    while (current_funccal)
+    동안 (current_funccal)
     {
 	ht = find_var_ht(name, &varname);
-	if (ht != NULL && *varname != NUL)
+	만약 (ht != NULL && *varname != NUL)
 	{
 	    v = find_var_in_ht(ht, *name, varname, no_autoload);
-	    if (v != NULL)
+	    만약 (v != NULL)
 		break;
 	}
-	if (current_funccal == current_funccal->fc_func->uf_scoped)
+	만약 (current_funccal == current_funccal->fc_func->uf_scoped)
 	    break;
 	current_funccal = current_funccal->fc_func->uf_scoped;
     }
     current_funccal = old_current_funccal;
 
-    return v;
+    반환 v;
 }
 
 /*
  * Set "copyID + 1" in previous_funccal and callers.
  */
-    int
-set_ref_in_previous_funccal(int copyID)
+    정수
+set_ref_in_previous_funccal(정수 copyID)
 {
     funccall_T	*fc;
 
-    for (fc = previous_funccal; fc != NULL; fc = fc->fc_caller)
+    위해 (fc = previous_funccal; fc != NULL; fc = fc->fc_caller)
     {
 	fc->fc_copyID = copyID + 1;
-	if (set_ref_in_ht(&fc->fc_l_vars.dv_hashtab, copyID + 1, NULL, NULL)
+	만약 (set_ref_in_ht(&fc->fc_l_vars.dv_hashtab, copyID + 1, NULL, NULL)
 		|| set_ref_in_ht(&fc->fc_l_avars.dv_hashtab, copyID + 1, NULL, NULL)
 		|| set_ref_in_list_items(&fc->fc_l_varlist, copyID + 1, NULL, NULL))
-	    return TRUE;
+	    반환 TRUE;
     }
-    return FALSE;
+    반환 FALSE;
 }
 
-    static int
-set_ref_in_funccal(funccall_T *fc, int copyID)
+    static 정수
+set_ref_in_funccal(funccall_T *fc, 정수 copyID)
 {
-    if (fc->fc_copyID != copyID)
+    만약 (fc->fc_copyID != copyID)
     {
 	fc->fc_copyID = copyID;
-	if (set_ref_in_ht(&fc->fc_l_vars.dv_hashtab, copyID, NULL, NULL)
+	만약 (set_ref_in_ht(&fc->fc_l_vars.dv_hashtab, copyID, NULL, NULL)
 		|| set_ref_in_ht(&fc->fc_l_avars.dv_hashtab, copyID, NULL, NULL)
 		|| set_ref_in_list_items(&fc->fc_l_varlist, copyID, NULL, NULL)
 		|| set_ref_in_func(NULL, fc->fc_func, copyID))
-	    return TRUE;
+	    반환 TRUE;
     }
-    return FALSE;
+    반환 FALSE;
 }
 
 /*
  * Set "copyID" in all local vars and arguments in the call stack.
  */
-    int
-set_ref_in_call_stack(int copyID)
+    정수
+set_ref_in_call_stack(정수 copyID)
 {
     funccall_T		*fc;
     funccal_entry_T	*entry;
 
-    for (fc = current_funccal; fc != NULL; fc = fc->fc_caller)
-	if (set_ref_in_funccal(fc, copyID))
-	    return TRUE;
+    위해 (fc = current_funccal; fc != NULL; fc = fc->fc_caller)
+	만약 (set_ref_in_funccal(fc, copyID))
+	    반환 TRUE;
 
     // Also go through the funccal_stack.
-    for (entry = funccal_stack; entry != NULL; entry = entry->next)
-	for (fc = entry->top_funccal; fc != NULL; fc = fc->fc_caller)
-	    if (set_ref_in_funccal(fc, copyID))
-		return TRUE;
-    return FALSE;
+    위해 (entry = funccal_stack; entry != NULL; entry = entry->next)
+	위해 (fc = entry->top_funccal; fc != NULL; fc = fc->fc_caller)
+	    만약 (set_ref_in_funccal(fc, copyID))
+		반환 TRUE;
+    반환 FALSE;
 }
 
 /*
  * Set "copyID" in all functions available by name.
  */
-    int
-set_ref_in_functions(int copyID)
+    정수
+set_ref_in_functions(정수 copyID)
 {
-    int		todo;
+    정수		todo;
     hashitem_T	*hi = NULL;
     ufunc_T	*fp;
 
-    todo = (int)func_hashtab.ht_used;
-    for (hi = func_hashtab.ht_array; todo > 0 && !got_int; ++hi)
+    todo = (정수)func_hashtab.ht_used;
+    위해 (hi = func_hashtab.ht_array; todo > 0 && !got_int; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	만약 (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    fp = HI2UF(hi);
-	    if (!func_name_refcount(fp->uf_name)
+	    만약 (!func_name_refcount(fp->uf_name)
 					  && set_ref_in_func(NULL, fp, copyID))
-		return TRUE;
+		반환 TRUE;
 	}
     }
-    return FALSE;
+    반환 FALSE;
 }
 
 /*
  * Set "copyID" in all function arguments.
  */
-    int
-set_ref_in_func_args(int copyID)
+    정수
+set_ref_in_func_args(정수 copyID)
 {
-    int i;
+    정수 i;
 
-    for (i = 0; i < funcargs.ga_len; ++i)
-	if (set_ref_in_item(((typval_T **)funcargs.ga_data)[i],
+    위해 (i = 0; i < funcargs.ga_len; ++i)
+	만약 (set_ref_in_item(((typval_T **)funcargs.ga_data)[i],
 						copyID, NULL, NULL, NULL))
-	    return TRUE;
-    return FALSE;
+	    반환 TRUE;
+    반환 FALSE;
 }
 
 /*
  * Mark all lists and dicts referenced through function "name" with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_func(char_u *name, ufunc_T *fp_in, int copyID)
+    정수
+set_ref_in_func(char_u *name, ufunc_T *fp_in, 정수 copyID)
 {
     ufunc_T	*fp = fp_in;
     funccall_T	*fc;
@@ -7730,24 +7730,24 @@ set_ref_in_func(char_u *name, ufunc_T *fp_in, int copyID)
     char_u	fname_buf[FLEN_FIXED + 1];
     char_u	*tofree = NULL;
     char_u	*fname;
-    int		abort = FALSE;
+    정수		abort = FALSE;
 
-    if (name == NULL && fp_in == NULL)
-	return FALSE;
+    만약 (name == NULL && fp_in == NULL)
+	반환 FALSE;
 
-    if (fp_in == NULL)
+    만약 (fp_in == NULL)
     {
 	fname = fname_trans_sid(name, fname_buf, &tofree, &error);
 	fp = find_func(fname, FALSE);
     }
-    if (fp != NULL)
+    만약 (fp != NULL)
     {
-	for (fc = fp->uf_scoped; fc != NULL; fc = fc->fc_func->uf_scoped)
+	위해 (fc = fp->uf_scoped; fc != NULL; fc = fc->fc_func->uf_scoped)
 	    abort = abort || set_ref_in_funccal(fc, copyID);
     }
 
     vim_free(tofree);
-    return abort;
+    반환 abort;
 }
 
 #endif // FEAT_EVAL

@@ -85,16 +85,16 @@ typedef enum {
  */
 #ifdef AMIGA
 # define DFLT_EFM	"%f>%l:%c:%t:%n:%m,%f:%l: %t%*\\D%n: %m,%f %l %t%*\\D%n: %m,%*[^\"]\"%f\"%*\\D%l: %m,%f:%l:%m,%f|%l| %m"
-#else
-# if defined(MSWIN)
+#아니면
+# 만약 defined(MSWIN)
 #  define DFLT_EFM	"%f(%l): %t%*\\D%n: %m,%f(%l\\,%c): %t%*\\D%n: %m,%f(%l) \\=: %t%*\\D%n: %m,%*[^\"]\"%f\"%*\\D%l: %m,%f(%l) \\=: %m,%*[^ ] %f %l: %m,%f:%l:%c:%m,%f(%l):%m,%f:%l:%m,%f|%l| %m"
-# else
-#  if defined(__QNX__)
+# 아니면
+#  만약 defined(__QNX__)
 #   define DFLT_EFM	"%f(%l):%*[^WE]%t%*\\D%n:%m,%f|%l| %m"
-#  else
+#  아니면
 #   ifdef VMS
 #    define DFLT_EFM	"%A%p^,%C%%CC-%t-%m,%Cat line number %l in file %f,%f|%l| %m"
-#   else // Unix, probably
+#   아니면 // Unix, probably
 #    define DFLT_EFM	"%*[^\"]\"%f\"%*\\D%l: %m,\"%f\"%*\\D%l: %m,%-Gg%\\?make[%*\\d]: *** [%f:%l:%m,%-Gg%\\?make: *** [%f:%l:%m,%-G%f:%l: (Each undeclared identifier is reported only once,%-G%f:%l: for each function it appears in.),%-GIn file included from %f:%l:%c:,%-GIn file included from %f:%l:%c\\,,%-GIn file included from %f:%l:%c,%-GIn file included from %f:%l,%-G%*[ ]from %f:%l:%c,%-G%*[ ]from %f:%l:,%-G%*[ ]from %f:%l\\,,%-G%*[ ]from %f:%l,%f:%l:%c:%m,%f(%l):%m,%f:%l:%m,\"%f\"\\, line %l%*\\D%c%*[^ ] %m,%D%*\\a[%*\\d]: Entering directory %*[`']%f',%X%*\\a[%*\\d]: Leaving directory %*[`']%f',%D%*\\a: Entering directory %*[`']%f',%X%*\\a: Leaving directory %*[`']%f',%DMaking %*\\a in %f,%f|%l| %m"
 #   endif
 #  endif
@@ -113,13 +113,13 @@ typedef enum {
 # define DFLT_FFS_VIM	"dos,unix"
 # define DFLT_FFS_VI	"dos,unix"	// also autodetect in compatible mode
 # define DFLT_TEXTAUTO	TRUE
-#else
+#아니면
 # define DFLT_FF	"unix"
 # define DFLT_FFS_VIM	"unix,dos"
 # ifdef __CYGWIN__
 #  define DFLT_FFS_VI	"unix,dos"	// Cygwin always needs file detection
 #  define DFLT_TEXTAUTO TRUE
-# else
+# 아니면
 #  define DFLT_FFS_VI	""
 #  define DFLT_TEXTAUTO FALSE
 # endif
@@ -130,9 +130,9 @@ typedef enum {
 #define ENC_UCSBOM	"ucs-bom"	// check for BOM at start of file
 
 // default value for 'encoding'
-#if defined(MSWIN) || defined(__MVS__)
+#만약 defined(MSWIN) || defined(__MVS__)
 # define ENC_DFLT	"utf-8"
-#else
+#아니면
 # define ENC_DFLT	"latin1"
 #endif
 
@@ -411,16 +411,16 @@ EXTERN long	p_aleph;	// 'aleph'
 #endif
 EXTERN char_u	*p_ambw;	// 'ambiwidth'
 #ifdef FEAT_AUTOCHDIR
-EXTERN int	p_acd;		// 'autochdir'
+EXTERN 정수	p_acd;		// 'autochdir'
 #endif
 #ifdef FEAT_AUTOSHELLDIR
-EXTERN int	p_asd;		// 'autoshelldir'
+EXTERN 정수	p_asd;		// 'autoshelldir'
 #endif
-EXTERN int	p_ai;		// 'autoindent'
-EXTERN int	p_bin;		// 'binary'
-EXTERN int	p_bomb;		// 'bomb'
-EXTERN int	p_bl;		// 'buflisted'
-EXTERN int	p_cin;		// 'cindent'
+EXTERN 정수	p_ai;		// 'autoindent'
+EXTERN 정수	p_bin;		// 'binary'
+EXTERN 정수	p_bomb;		// 'bomb'
+EXTERN 정수	p_bl;		// 'buflisted'
+EXTERN 정수	p_cin;		// 'cindent'
 EXTERN char_u	*p_cink;	// 'cinkeys'
 EXTERN char_u	*p_cinsd;	// 'cinscopedecls'
 EXTERN char_u	*p_cinw;	// 'cinwords'
@@ -429,16 +429,16 @@ EXTERN char_u	*p_cfu;		// 'completefunc'
 EXTERN char_u	*p_ofu;		// 'omnifunc'
 EXTERN char_u	*p_tsrfu;	// 'thesaurusfunc'
 #endif
-EXTERN int	p_ci;		// 'copyindent'
-#if defined(FEAT_GUI) && defined(MACOS_X)
-EXTERN int	*p_antialias;	// 'antialias'
+EXTERN 정수	p_ci;		// 'copyindent'
+#만약 defined(FEAT_GUI) && defined(MACOS_X)
+EXTERN 정수	*p_antialias;	// 'antialias'
 #endif
-EXTERN int	p_ar;		// 'autoread'
-EXTERN int	p_aw;		// 'autowrite'
-EXTERN int	p_awa;		// 'autowriteall'
+EXTERN 정수	p_ar;		// 'autoread'
+EXTERN 정수	p_aw;		// 'autowrite'
+EXTERN 정수	p_awa;		// 'autowriteall'
 EXTERN char_u	*p_bs;		// 'backspace'
 EXTERN char_u	*p_bg;		// 'background'
-EXTERN int	p_bk;		// 'backup'
+EXTERN 정수	p_bk;		// 'backup'
 EXTERN char_u	*p_bkc;		// 'backupcopy'
 EXTERN unsigned	bkc_flags;	// flags from 'backupcopy'
 #define BKC_YES		0x001
@@ -479,14 +479,14 @@ EXTERN char_u	*p_cm;		// 'cryptmethod'
 #endif
 #ifdef FEAT_BEVAL
 # ifdef FEAT_BEVAL_GUI
-EXTERN int	p_beval;	// 'ballooneval'
+EXTERN 정수	p_beval;	// 'ballooneval'
 # endif
 EXTERN long	p_bdlay;	// 'balloondelay'
 # ifdef FEAT_EVAL
 EXTERN char_u	*p_bexpr;
 # endif
 # ifdef FEAT_BEVAL_TERM
-EXTERN int	p_bevalterm;	// 'balloonevalterm'
+EXTERN 정수	p_bevalterm;	// 'balloonevalterm'
 # endif
 #endif
 #ifdef FEAT_BROWSE
@@ -502,11 +502,11 @@ EXTERN unsigned	cmp_flags;
 #define CMP_INTERNAL		0x001
 #define CMP_KEEPASCII		0x002
 EXTERN char_u	*p_enc;		// 'encoding'
-EXTERN int	p_deco;		// 'delcombine'
+EXTERN 정수	p_deco;		// 'delcombine'
 #ifdef FEAT_EVAL
 EXTERN char_u	*p_ccv;		// 'charconvert'
 #endif
-EXTERN int	p_cdh;		// 'cdhome'
+EXTERN 정수	p_cdh;		// 'cdhome'
 EXTERN char_u	*p_cino;	// 'cinoptions'
 EXTERN char_u	*p_cedit;	// 'cedit'
 EXTERN long	p_cwh;		// 'cmdwinheight'
@@ -518,17 +518,17 @@ EXTERN long	p_ch;		// 'cmdheight'
 EXTERN char_u	*p_cms;		// 'commentstring'
 EXTERN char_u	*p_cpt;		// 'complete'
 EXTERN long	p_cto;		// 'completetimeout'
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-EXTERN int	p_confirm;	// 'confirm'
+#만약 defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+EXTERN 정수	p_confirm;	// 'confirm'
 #endif
-EXTERN int	p_cp;		// 'compatible'
+EXTERN 정수	p_cp;		// 'compatible'
 EXTERN char_u	*p_cfc;		// 'completefuzzycollect'
 EXTERN unsigned cfc_flags;	// flags from "completefuzzycollect"
 EXTERN char_u	*p_cia;		// 'completeitemalign'
 EXTERN unsigned cia_flags;	// order flags of 'completeitemalign'
 EXTERN char_u	*p_cot;		// 'completeopt'
 EXTERN unsigned	cot_flags;	// flags from 'completeopt'
-EXTERN int	p_ac;		// 'autocomplete'
+EXTERN 정수	p_ac;		// 'autocomplete'
 EXTERN long	p_act;		// 'autocompletetimeout'
 EXTERN long	p_acl;		// 'autocompletedelay'
 // Keep in sync with p_cot_values in optionstr.c
@@ -564,16 +564,16 @@ EXTERN char_u	*p_com;		// 'comments'
 EXTERN char_u	*p_cpo;		// 'cpoptions'
 #ifdef FEAT_CSCOPE
 EXTERN char_u	*p_csprg;	// 'cscopeprg'
-EXTERN int	p_csre;		// 'cscoperelative'
+EXTERN 정수	p_csre;		// 'cscoperelative'
 # ifdef FEAT_QUICKFIX
 EXTERN char_u	*p_csqf;	// 'cscopequickfix'
 #  define	CSQF_CMDS   "sgdctefia"
 #  define	CSQF_FLAGS  "+-0"
 # endif
-EXTERN int	p_cst;		// 'cscopetag'
+EXTERN 정수	p_cst;		// 'cscopetag'
 EXTERN long	p_csto;		// 'cscopetagorder'
 EXTERN long	p_cspc;		// 'cscopepathcomp'
-EXTERN int	p_csverbose;	// 'cscopeverbose'
+EXTERN 정수	p_csverbose;	// 'cscopeverbose'
 #endif
 EXTERN char_u	*p_debug;	// 'debug'
 #ifdef FEAT_FIND_ID
@@ -589,7 +589,7 @@ EXTERN char_u	*p_dex;		// 'diffexpr'
 #endif
 EXTERN char_u	*p_dict;	// 'dictionary'
 #ifdef FEAT_DIGRAPHS
-EXTERN int	p_dg;		// 'digraph'
+EXTERN 정수	p_dg;		// 'digraph'
 #endif
 EXTERN char_u	*p_dir;		// 'directory'
 EXTERN char_u	*p_dy;		// 'display'
@@ -597,35 +597,35 @@ EXTERN unsigned	dy_flags;
 #define DY_LASTLINE		0x001
 #define DY_TRUNCATE		0x002
 #define DY_UHEX			0x004
-EXTERN int	p_ed;		// 'edcompatible'
+EXTERN 정수	p_ed;		// 'edcompatible'
 EXTERN char_u	*p_ead;		// 'eadirection'
 EXTERN char_u	*p_emoji;	// 'emoji'
-EXTERN int	p_ea;		// 'equalalways'
+EXTERN 정수	p_ea;		// 'equalalways'
 EXTERN char_u	*p_ep;		// 'equalprg'
-EXTERN int	p_eb;		// 'errorbells'
+EXTERN 정수	p_eb;		// 'errorbells'
 #ifdef FEAT_QUICKFIX
 EXTERN char_u	*p_ef;		// 'errorfile'
 EXTERN char_u	*p_efm;		// 'errorformat'
 EXTERN char_u	*p_gefm;	// 'grepformat'
 EXTERN char_u	*p_gp;		// 'grepprg'
 #endif
-EXTERN int	p_eof;		// 'endoffile'
-EXTERN int	p_eol;		// 'endofline'
-EXTERN int	p_ek;		// 'esckeys'
+EXTERN 정수	p_eof;		// 'endoffile'
+EXTERN 정수	p_eol;		// 'endofline'
+EXTERN 정수	p_ek;		// 'esckeys'
 EXTERN char_u	*p_ei;		// 'eventignore'
-EXTERN int	p_et;		// 'expandtab'
-EXTERN int	p_exrc;		// 'exrc'
+EXTERN 정수	p_et;		// 'expandtab'
+EXTERN 정수	p_exrc;		// 'exrc'
 EXTERN char_u	*p_fenc;	// 'fileencoding'
 EXTERN char_u	*p_fencs;	// 'fileencodings'
 EXTERN char_u	*p_ff;		// 'fileformat'
 EXTERN char_u	*p_ffs;		// 'fileformats'
-EXTERN int	p_fic;		// 'fileignorecase'
+EXTERN 정수	p_fic;		// 'fileignorecase'
 EXTERN char_u	*p_ft;		// 'filetype'
 EXTERN char_u	*p_fcs;		// 'fillchar'
 #ifdef FEAT_EVAL
 EXTERN char_u	*p_ffu;		// 'findfunc'
 #endif
-EXTERN int	p_fixeol;	// 'fixendofline'
+EXTERN 정수	p_fixeol;	// 'fixendofline'
 #ifdef FEAT_FOLDING
 EXTERN char_u	*p_fcl;		// 'foldclose'
 EXTERN long	p_fdls;		// 'foldlevelstart'
@@ -643,16 +643,16 @@ EXTERN unsigned	fdo_flags;
 # define FDO_UNDO		0x200
 # define FDO_JUMP		0x400
 #endif
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 EXTERN char_u	*p_fex;		// 'formatexpr'
 #endif
 EXTERN char_u	*p_flp;		// 'formatlistpat'
 EXTERN char_u	*p_fo;		// 'formatoptions'
 EXTERN char_u	*p_fp;		// 'formatprg'
 #ifdef HAVE_FSYNC
-EXTERN int	p_fs;		// 'fsync'
+EXTERN 정수	p_fs;		// 'fsync'
 #endif
-EXTERN int	p_gd;		// 'gdefault'
+EXTERN 정수	p_gd;		// 'gdefault'
 EXTERN char_u	*p_jop;		// 'jumpoptions'
 EXTERN unsigned	jop_flags;	//
 #define JOP_STACK		0x001
@@ -669,26 +669,26 @@ EXTERN char_u	*p_penc;	// 'printencoding'
 EXTERN char_u	*p_pmfn;	// 'printmbfont'
 EXTERN char_u	*p_pmcs;	// 'printmbcharset'
 # endif
-# if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+# 만약 defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
 EXTERN char_u	*p_pexpr;	// 'printexpr'
 # endif
 EXTERN char_u	*p_pfn;		// 'printfont'
 EXTERN char_u	*p_popt;	// 'printoptions'
 EXTERN char_u	*p_header;	// 'printheader'
 #endif
-EXTERN int	p_prompt;	// 'prompt'
+EXTERN 정수	p_prompt;	// 'prompt'
 #ifdef FEAT_GUI
 EXTERN char_u	*p_guifont;	// 'guifont'
 # ifdef FEAT_XFONTSET
 EXTERN char_u	*p_guifontset;	// 'guifontset'
 # endif
 EXTERN char_u	*p_guifontwide;	// 'guifontwide'
-EXTERN int	p_guipty;	// 'guipty'
+EXTERN 정수	p_guipty;	// 'guipty'
 #endif
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+#만약 defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 EXTERN char_u	*p_guiligatures;  // 'guiligatures'
 #endif
-#if (defined(FEAT_GUI_GTK) && !defined(USE_GTK4)) || defined(FEAT_GUI_X11)
+#만약 (defined(FEAT_GUI_GTK) && !defined(USE_GTK4)) || defined(FEAT_GUI_X11)
 EXTERN long	p_ghr;		// 'guiheadroom'
 #endif
 #ifdef CURSOR_SHAPE
@@ -697,10 +697,10 @@ EXTERN char_u	*p_guicursor;	// 'guicursor'
 #ifdef FEAT_MOUSESHAPE
 EXTERN char_u	*p_mouseshape;	// 'mouseshape'
 #endif
-#if defined(FEAT_GUI)
+#만약 defined(FEAT_GUI)
 EXTERN char_u	*p_go;		// 'guioptions'
 #endif
-#if defined(FEAT_GUI_TABLINE)
+#만약 defined(FEAT_GUI_TABLINE)
 EXTERN char_u	*p_gtl;		// 'guitablabel'
 EXTERN char_u	*p_gtt;		// 'guitabtooltip'
 #endif
@@ -709,21 +709,21 @@ EXTERN long	p_hh;		// 'helpheight'
 #ifdef FEAT_MULTI_LANG
 EXTERN char_u	*p_hlg;		// 'helplang'
 #endif
-EXTERN int	p_hid;		// 'hidden'
+EXTERN 정수	p_hid;		// 'hidden'
 EXTERN char_u	*p_hl;		// 'highlight'
-EXTERN int	p_hls;		// 'hlsearch'
+EXTERN 정수	p_hls;		// 'hlsearch'
 EXTERN long	p_hi;		// 'history'
 #ifdef FEAT_RIGHTLEFT
-EXTERN int	p_hkmap;	// 'hkmap'
-EXTERN int	p_hkmapp;	// 'hkmapp'
+EXTERN 정수	p_hkmap;	// 'hkmap'
+EXTERN 정수	p_hkmapp;	// 'hkmapp'
 # ifdef FEAT_ARABIC
-EXTERN int	p_arshape;	// 'arabicshape'
+EXTERN 정수	p_arshape;	// 'arabicshape'
 # endif
 #endif
-EXTERN int	p_icon;		// 'icon'
+EXTERN 정수	p_icon;		// 'icon'
 EXTERN char_u	*p_iconstring;	// 'iconstring'
-EXTERN int	p_ic;		// 'ignorecase'
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+EXTERN 정수	p_ic;		// 'ignorecase'
+#만약 defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 EXTERN char_u	*p_imak;	// 'imactivatekey'
 # define IM_ON_THE_SPOT		0L
 # define IM_OVER_THE_SPOT	1L
@@ -732,29 +732,29 @@ EXTERN long	p_imst;		// 'imstyle'
 #ifdef FEAT_IMAGE
 EXTERN char_u	*p_ipc;		// 'imageprotocol'
 #endif
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 EXTERN char_u	*p_imaf;	// 'imactivatefunc'
 EXTERN char_u	*p_imsf;	// 'imstatusfunc'
 #endif
-EXTERN int	p_imcmdline;	// 'imcmdline'
-EXTERN int	p_imdisable;	// 'imdisable'
+EXTERN 정수	p_imcmdline;	// 'imcmdline'
+EXTERN 정수	p_imdisable;	// 'imdisable'
 EXTERN long	p_iminsert;	// 'iminsert'
 EXTERN long	p_imsearch;	// 'imsearch'
-EXTERN int	p_inf;		// 'infercase'
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
+EXTERN 정수	p_inf;		// 'infercase'
+#만약 defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
 EXTERN char_u	*p_inex;	// 'includeexpr'
 #endif
-EXTERN int	p_is;		// 'incsearch'
-#if defined(FEAT_EVAL)
+EXTERN 정수	p_is;		// 'incsearch'
+#만약 defined(FEAT_EVAL)
 EXTERN char_u	*p_inde;	// 'indentexpr'
 EXTERN char_u	*p_indk;	// 'indentkeys'
 #endif
-EXTERN int	p_im;		// 'insertmode'
+EXTERN 정수	p_im;		// 'insertmode'
 EXTERN char_u	*p_isf;		// 'isfname'
 EXTERN char_u	*p_isi;		// 'isident'
 EXTERN char_u	*p_isk;		// 'iskeyword'
 EXTERN char_u	*p_isp;		// 'isprint'
-EXTERN int	p_js;		// 'joinspaces'
+EXTERN 정수	p_js;		// 'joinspaces'
 #ifdef FEAT_CRYPT
 EXTERN char_u	*p_key;		// 'key'
 #endif
@@ -766,28 +766,28 @@ EXTERN char_u	*p_km;		// 'keymodel'
 EXTERN char_u	*p_kpc;		// 'keyprotocol'
 #ifdef FEAT_LANGMAP
 EXTERN char_u	*p_langmap;	// 'langmap'
-EXTERN int	p_lnr;		// 'langnoremap'
-EXTERN int	p_lrm;		// 'langremap'
+EXTERN 정수	p_lnr;		// 'langnoremap'
+EXTERN 정수	p_lrm;		// 'langremap'
 #endif
-#if defined(FEAT_MENU) && defined(FEAT_MULTI_LANG)
+#만약 defined(FEAT_MENU) && defined(FEAT_MULTI_LANG)
 EXTERN char_u	*p_lm;		// 'langmenu'
 #endif
 #ifdef FEAT_GUI
 EXTERN long	p_linespace;	// 'linespace'
 #endif
-EXTERN int	p_lisp;		// 'lisp'
+EXTERN 정수	p_lisp;		// 'lisp'
 EXTERN char_u	*p_lop;		// 'lispoptions'
 EXTERN char_u	*p_lispwords;	// 'lispwords'
 EXTERN long	p_ls;		// 'laststatus'
 EXTERN long	p_stal;		// 'showtabline'
 EXTERN char_u	*p_lcs;		// 'listchars'
 
-EXTERN int	p_lz;		// 'lazyredraw'
-EXTERN int	p_lpl;		// 'loadplugins'
-#if defined(DYNAMIC_LUA)
+EXTERN 정수	p_lz;		// 'lazyredraw'
+EXTERN 정수	p_lpl;		// 'loadplugins'
+#만약 defined(DYNAMIC_LUA)
 EXTERN char_u	*p_luadll;	// 'luadll'
 #endif
-EXTERN int	p_magic;	// 'magic'
+EXTERN 정수	p_magic;	// 'magic'
 EXTERN char_u	*p_menc;	// 'makeencoding'
 #ifdef FEAT_QUICKFIX
 EXTERN char_u	*p_mef;		// 'makeef'
@@ -811,90 +811,90 @@ EXTERN long	p_msc;		// 'maxsearchcount'
 #ifdef FEAT_SPELL
 EXTERN char_u	*p_msm;		// 'mkspellmem'
 #endif
-EXTERN int	p_ml;		// 'modeline'
-EXTERN int	p_mle;		// 'modelineexpr'
+EXTERN 정수	p_ml;		// 'modeline'
+EXTERN 정수	p_mle;		// 'modelineexpr'
 EXTERN long	p_mls;		// 'modelines'
-EXTERN int	p_mlstr;	// 'modelinestrict'
-EXTERN int	p_ma;		// 'modifiable'
-EXTERN int	p_mod;		// 'modified'
+EXTERN 정수	p_mlstr;	// 'modelinestrict'
+EXTERN 정수	p_ma;		// 'modifiable'
+EXTERN 정수	p_mod;		// 'modified'
 EXTERN char_u	*p_mouse;	// 'mouse'
 #ifdef FEAT_GUI
-EXTERN int	p_mousef;	// 'mousefocus'
-EXTERN int	p_mh;		// 'mousehide'
+EXTERN 정수	p_mousef;	// 'mousefocus'
+EXTERN 정수	p_mh;		// 'mousehide'
 #endif
 EXTERN char_u	*p_mousem;	// 'mousemodel'
 #ifdef FEAT_GUI
-EXTERN int	p_mousemev;	// 'mousemoveevent'
+EXTERN 정수	p_mousemev;	// 'mousemoveevent'
 #endif
 EXTERN long	p_mouset;	// 'mousetime'
-EXTERN int	p_more;		// 'more'
+EXTERN 정수	p_more;		// 'more'
 #ifdef FEAT_MZSCHEME
 EXTERN long	p_mzq;		// 'mzquantum
-# if defined(DYNAMIC_MZSCHEME)
+# 만약 defined(DYNAMIC_MZSCHEME)
 EXTERN char_u	*p_mzschemedll;	// 'mzschemedll'
 EXTERN char_u	*p_mzschemegcdll; // 'mzschemegcdll'
 # endif
 #endif
 EXTERN char_u	*p_nf;		// 'nrformats'
-#if defined(MSWIN)
-EXTERN int	p_odev;		// 'opendevice'
+#만약 defined(MSWIN)
+EXTERN 정수	p_odev;		// 'opendevice'
 #endif
 EXTERN long	p_ost;		// 'osctimeoutlen'
 EXTERN char_u	*p_opfunc;	// 'operatorfunc'
 EXTERN char_u	*p_para;	// 'paragraphs'
-EXTERN int	p_paste;	// 'paste'
+EXTERN 정수	p_paste;	// 'paste'
 EXTERN char_u	*p_pt;		// 'pastetoggle'
-#if defined(FEAT_EVAL) && defined(FEAT_DIFF)
+#만약 defined(FEAT_EVAL) && defined(FEAT_DIFF)
 EXTERN char_u	*p_pex;		// 'patchexpr'
 #endif
 EXTERN char_u	*p_pm;		// 'patchmode'
 EXTERN char_u	*p_path;	// 'path'
 EXTERN char_u	*p_cdpath;	// 'cdpath'
-#if defined(DYNAMIC_PERL)
+#만약 defined(DYNAMIC_PERL)
 EXTERN char_u	*p_perldll;	// 'perldll'
 #endif
-EXTERN int	p_pi;		// 'preserveindent'
-#if defined(DYNAMIC_PYTHON3)
+EXTERN 정수	p_pi;		// 'preserveindent'
+#만약 defined(DYNAMIC_PYTHON3)
 EXTERN char_u	*p_py3dll;	// 'pythonthreedll'
 #endif
 #ifdef FEAT_PYTHON3
 EXTERN char_u	*p_py3home;	// 'pythonthreehome'
 #endif
-#if defined(DYNAMIC_PYTHON)
+#만약 defined(DYNAMIC_PYTHON)
 EXTERN char_u	*p_pydll;	// 'pythondll'
 #endif
 #ifdef FEAT_PYTHON
 EXTERN char_u	*p_pyhome;	// 'pythonhome'
 #endif
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#만약 defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 EXTERN long	p_pyx;		// 'pyxversion'
 #endif
 EXTERN char_u	*p_qe;		// 'quoteescape'
-EXTERN int	p_ro;		// 'readonly'
+EXTERN 정수	p_ro;		// 'readonly'
 #ifdef FEAT_RELTIME
 EXTERN long	p_rdt;		// 'redrawtime'
 #endif
-EXTERN int	p_remap;	// 'remap'
+EXTERN 정수	p_remap;	// 'remap'
 EXTERN long	p_re;		// 'regexpengine'
 #ifdef FEAT_RENDER_OPTIONS
 EXTERN char_u	*p_rop;		// 'renderoptions'
 #endif
 EXTERN long	p_report;	// 'report'
-#if defined(FEAT_QUICKFIX)
+#만약 defined(FEAT_QUICKFIX)
 EXTERN long	p_pvh;		// 'previewheight'
 EXTERN long     p_chi;          // 'chistory'
 #endif
 #ifdef MSWIN
-EXTERN int	p_rs;		// 'restorescreen'
+EXTERN 정수	p_rs;		// 'restorescreen'
 #endif
 #ifdef FEAT_RIGHTLEFT
-EXTERN int	p_ari;		// 'allowrevins'
-EXTERN int	p_ri;		// 'revins'
+EXTERN 정수	p_ari;		// 'allowrevins'
+EXTERN 정수	p_ri;		// 'revins'
 #endif
-#if defined(DYNAMIC_RUBY)
+#만약 defined(DYNAMIC_RUBY)
 EXTERN char_u	*p_rubydll;	// 'rubydll'
 #endif
-EXTERN int	p_ru;		// 'ruler'
+EXTERN 정수	p_ru;		// 'ruler'
 #ifdef FEAT_STL_OPT
 EXTERN char_u	*p_ruf;		// 'rulerformat'
 #endif
@@ -904,14 +904,14 @@ EXTERN char_u	*p_qftf;	// 'quickfixtextfunc'
 #endif
 EXTERN char_u	*p_rtp;		// 'runtimepath'
 EXTERN long	p_sj;		// 'scrolljump'
-#if defined(MSWIN) && defined(FEAT_GUI)
-EXTERN int	p_scf;		// 'scrollfocus'
+#만약 defined(MSWIN) && defined(FEAT_GUI)
+EXTERN 정수	p_scf;		// 'scrollfocus'
 #endif
 EXTERN long	p_so;		// 'scrolloff'
 EXTERN long	p_sop;		// 'scrolloffpad'
 EXTERN char_u	*p_sbo;		// 'scrollopt'
 EXTERN char_u	*p_sections;	// 'sections'
-EXTERN int	p_secure;	// 'secure'
+EXTERN 정수	p_secure;	// 'secure'
 EXTERN char_u	*p_sel;		// 'selection'
 EXTERN char_u	*p_slm;		// 'selectmode'
 #ifdef FEAT_SESSION
@@ -948,35 +948,35 @@ EXTERN char_u	*p_srr;		// 'shellredir'
 #ifdef AMIGA
 EXTERN long	p_st;		// 'shelltype'
 #endif
-EXTERN int	p_stmp;		// 'shelltemp'
+EXTERN 정수	p_stmp;		// 'shelltemp'
 #ifdef BACKSLASH_IN_FILENAME
-EXTERN int	p_ssl;		// 'shellslash'
+EXTERN 정수	p_ssl;		// 'shellslash'
 #endif
 #ifdef FEAT_STL_OPT
 EXTERN char_u	*p_stl;		// 'statusline'
 EXTERN char_u	*p_stlo;	// 'statuslineopt'
 #endif
-EXTERN int	p_sr;		// 'shiftround'
+EXTERN 정수	p_sr;		// 'shiftround'
 EXTERN long	p_sw;		// 'shiftwidth'
 EXTERN char_u	*p_shm;		// 'shortmess'
-EXTERN int	p_sn;		// 'shortname'
+EXTERN 정수	p_sn;		// 'shortname'
 #ifdef FEAT_LINEBREAK
 EXTERN char_u	*p_sbr;		// 'showbreak'
 #endif
-EXTERN int	p_sc;		// 'showcmd'
+EXTERN 정수	p_sc;		// 'showcmd'
 EXTERN char_u	*p_sloc;	// 'showcmdloc'
-EXTERN int	p_sft;		// 'showfulltag'
-EXTERN int	p_sm;		// 'showmatch'
-EXTERN int	p_smd;		// 'showmode'
+EXTERN 정수	p_sft;		// 'showfulltag'
+EXTERN 정수	p_sm;		// 'showmatch'
+EXTERN 정수	p_smd;		// 'showmode'
 EXTERN long	p_ss;		// 'sidescroll'
 EXTERN long	p_siso;		// 'sidescrolloff'
-EXTERN int	p_scs;		// 'smartcase'
-EXTERN int	p_si;		// 'smartindent'
-EXTERN int	p_sta;		// 'smarttab'
+EXTERN 정수	p_scs;		// 'smartcase'
+EXTERN 정수	p_si;		// 'smartindent'
+EXTERN 정수	p_sta;		// 'smarttab'
 EXTERN long	p_sts;		// 'softtabstop'
-EXTERN int	p_sb;		// 'splitbelow'
+EXTERN 정수	p_sb;		// 'splitbelow'
 EXTERN char_u	*p_sua;		// 'suffixesadd'
-EXTERN int	p_swf;		// 'swapfile'
+EXTERN 정수	p_swf;		// 'swapfile'
 #ifdef FEAT_SYN_HL
 EXTERN long	p_smc;		// 'synmaxcol'
 #endif
@@ -994,8 +994,8 @@ EXTERN char_u	*p_spl;		// 'spelllang'
 EXTERN char_u	*p_spo;		// 'spelloptions'
 EXTERN char_u	*p_sps;		// 'spellsuggest'
 #endif
-EXTERN int	p_spr;		// 'splitright'
-EXTERN int	p_sol;		// 'startofline'
+EXTERN 정수	p_spr;		// 'splitright'
+EXTERN 정수	p_sol;		// 'startofline'
 EXTERN char_u	*p_su;		// 'suffixes'
 EXTERN char_u	*p_sws;		// 'swapsync'
 EXTERN char_u	*p_swb;		// 'switchbuf'
@@ -1010,7 +1010,7 @@ EXTERN unsigned	swb_flags;
 
 EXTERN char_u	*p_spk;		// 'splitkeep'
 
-#if defined(FEAT_TABPANEL)
+#만약 defined(FEAT_TABPANEL)
 EXTERN char_u	*p_tpl;		// 'tabpanel'
 EXTERN long	p_stpl;		// 'showtabpanel'
 EXTERN char_u	*p_tplo;	// 'tabpanelopt'
@@ -1024,7 +1024,7 @@ EXTERN unsigned	tcl_flags;	// flags from 'tabclose'
 #define TCL_LEFT		0x001
 #define TCL_USELAST		0x002
 EXTERN long	p_ts;		// 'tabstop'
-EXTERN int	p_tbs;		// 'tagbsearch'
+EXTERN 정수	p_tbs;		// 'tagbsearch'
 EXTERN char_u	*p_tc;		// 'tagcase'
 EXTERN unsigned tc_flags;       // flags from 'tagcase'
 #define TC_FOLLOWIC		0x01
@@ -1033,47 +1033,47 @@ EXTERN unsigned tc_flags;       // flags from 'tagcase'
 #define TC_FOLLOWSCS		0x08
 #define TC_SMART		0x10
 EXTERN long	p_tl;		// 'taglength'
-EXTERN int	p_tr;		// 'tagrelative'
+EXTERN 정수	p_tr;		// 'tagrelative'
 EXTERN char_u	*p_tags;	// 'tags'
-EXTERN int	p_tagsecure;    // 'tagsecure'
-EXTERN int	p_tgst;		// 'tagstack'
-#if defined(DYNAMIC_TCL)
+EXTERN 정수	p_tagsecure;    // 'tagsecure'
+EXTERN 정수	p_tgst;		// 'tagstack'
+#만약 defined(DYNAMIC_TCL)
 EXTERN char_u	*p_tcldll;	// 'tcldll'
 #endif
 #ifdef FEAT_ARABIC
-EXTERN int	p_tbidi;	// 'termbidi'
+EXTERN 정수	p_tbidi;	// 'termbidi'
 #endif
 EXTERN char_u	*p_tenc;	// 'termencoding'
 #ifdef FEAT_TERMGUICOLORS
-EXTERN int	p_tgc;		// 'termguicolors'
+EXTERN 정수	p_tgc;		// 'termguicolors'
 #endif
 #ifdef UNIX
 EXTERN char_u	*p_trz;		// 'termresize'
 #endif
-EXTERN int	p_tsy;		// 'termsync'
+EXTERN 정수	p_tsy;		// 'termsync'
 #ifdef FEAT_TERMINAL
 EXTERN long	p_twsl;		// 'termwinscroll'
 #endif
-#if defined(MSWIN) && defined(FEAT_TERMINAL)
+#만약 defined(MSWIN) && defined(FEAT_TERMINAL)
 EXTERN char_u	*p_twt;		// 'termwintype'
 #endif
-EXTERN int	p_terse;	// 'terse'
-EXTERN int	p_ta;		// 'textauto'
-EXTERN int	p_tx;		// 'textmode'
+EXTERN 정수	p_terse;	// 'terse'
+EXTERN 정수	p_ta;		// 'textauto'
+EXTERN 정수	p_tx;		// 'textmode'
 EXTERN long	p_tw;		// 'textwidth'
-EXTERN int	p_to;		// 'tildeop'
-EXTERN int	p_timeout;	// 'timeout'
+EXTERN 정수	p_to;		// 'tildeop'
+EXTERN 정수	p_timeout;	// 'timeout'
 EXTERN long	p_tm;		// 'timeoutlen'
-EXTERN int	p_title;	// 'title'
+EXTERN 정수	p_title;	// 'title'
 EXTERN long	p_titlelen;	// 'titlelen'
 EXTERN char_u	*p_titleold;	// 'titleold'
 EXTERN char_u	*p_titlestring;	// 'titlestring'
 EXTERN char_u	*p_tsr;		// 'thesaurus'
-EXTERN int	p_ttimeout;	// 'ttimeout'
+EXTERN 정수	p_ttimeout;	// 'ttimeout'
 EXTERN long	p_ttm;		// 'ttimeoutlen'
-EXTERN int	p_tbi;		// 'ttybuiltin'
-EXTERN int	p_tf;		// 'ttyfast'
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+EXTERN 정수	p_tbi;		// 'ttybuiltin'
+EXTERN 정수	p_tf;		// 'ttyfast'
+#만약 defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
 EXTERN char_u	*p_toolbar;	// 'toolbar'
 EXTERN unsigned toolbar_flags;
 # define TOOLBAR_TEXT		0x01
@@ -1081,7 +1081,7 @@ EXTERN unsigned toolbar_flags;
 # define TOOLBAR_TOOLTIPS	0x04
 # define TOOLBAR_HORIZ		0x08
 #endif
-#if defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
+#만약 defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
 EXTERN char_u	*p_tbis;	// 'toolbariconsize'
 EXTERN unsigned tbis_flags;
 # define TBIS_TINY		0x01
@@ -1092,7 +1092,7 @@ EXTERN unsigned tbis_flags;
 # define TBIS_GIANT		0x20
 #endif
 EXTERN long	p_ttyscroll;	// 'ttyscroll'
-#if defined(UNIX) || defined(VMS)
+#만약 defined(UNIX) || defined(VMS)
 EXTERN char_u	*p_ttym;	// 'ttymouse'
 EXTERN unsigned ttym_flags;
 # define TTYM_XTERM		0x01
@@ -1106,7 +1106,7 @@ EXTERN unsigned ttym_flags;
 #endif
 #ifdef FEAT_PERSISTENT_UNDO
 EXTERN char_u	*p_udir;	// 'undodir'
-EXTERN int	p_udf;		// 'undofile'
+EXTERN 정수	p_udf;		// 'undofile'
 #endif
 EXTERN long	p_ul;		// 'undolevels'
 EXTERN long	p_ur;		// 'undoreload'
@@ -1125,7 +1125,7 @@ EXTERN char_u	*p_vdir;	// 'viewdir'
 EXTERN char_u	*p_vop;		// 'viewoptions'
 EXTERN unsigned	vop_flags;	// uses SSOP_ flags
 #endif
-EXTERN int	p_vb;		// 'visualbell'
+EXTERN 정수	p_vb;		// 'visualbell'
 EXTERN char_u	*p_ve;		// 'virtualedit'
 EXTERN unsigned ve_flags;
 #define VE_BLOCK	5	// includes "all"
@@ -1137,25 +1137,25 @@ EXTERN unsigned ve_flags;
 EXTERN long	p_verbose;	// 'verbose'
 #ifdef IN_OPTION_C
 char_u	*p_vfile = (char_u *)""; // used before options are initialized
-#else
+#아니면
 extern char_u	*p_vfile;	// 'verbosefile'
 #endif
-EXTERN int	p_warn;		// 'warn'
+EXTERN 정수	p_warn;		// 'warn'
 EXTERN char_u	*p_wop;		// 'wildoptions'
 EXTERN long	p_window;	// 'window'
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) || defined(LINT) \
+#만약 defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) || defined(LINT) \
 	|| defined (FEAT_GUI_GTK) || defined(FEAT_GUI_PHOTON)
 # define FEAT_WAK
 EXTERN char_u	*p_wak;		// 'winaltkeys'
 #endif
 EXTERN char_u	*p_wig;		// 'wildignore'
-EXTERN int	p_wiv;		// 'weirdinvert'
+EXTERN 정수	p_wiv;		// 'weirdinvert'
 EXTERN char_u	*p_ww;		// 'whichwrap'
 EXTERN long	p_wc;		// 'wildchar'
 EXTERN long	p_wcm;		// 'wildcharm'
-EXTERN int	p_wic;		// 'wildignorecase'
+EXTERN 정수	p_wic;		// 'wildignorecase'
 EXTERN char_u	*p_wim;		// 'wildmode'
-EXTERN int	p_wmnu;		// 'wildmenu'
+EXTERN 정수	p_wmnu;		// 'wildmenu'
 EXTERN long	p_wh;		// 'winheight'
 EXTERN long	p_wmh;		// 'winminheight'
 EXTERN long	p_wmw;		// 'winminwidth'
@@ -1164,16 +1164,16 @@ EXTERN long	p_wiw;		// 'winwidth'
 EXTERN char_u	*p_wse;		// 'wlseat'
 EXTERN long     p_wtm;		// 'wltimeoutlen'
 #endif
-#if defined(MSWIN) && defined(FEAT_TERMINAL)
+#만약 defined(MSWIN) && defined(FEAT_TERMINAL)
 EXTERN char_u	*p_winptydll;	// 'winptydll'
 #endif
 EXTERN long	p_wm;		// 'wrapmargin'
-EXTERN int	p_ws;		// 'wrapscan'
-EXTERN int	p_write;	// 'write'
-EXTERN int	p_wa;		// 'writeany'
-EXTERN int	p_wb;		// 'writebackup'
+EXTERN 정수	p_ws;		// 'wrapscan'
+EXTERN 정수	p_write;	// 'write'
+EXTERN 정수	p_wa;		// 'writeany'
+EXTERN 정수	p_wb;		// 'writebackup'
 EXTERN long	p_wd;		// 'writedelay'
-EXTERN int	p_xtermcodes;	// 'xtermcodes'
+EXTERN 정수	p_xtermcodes;	// 'xtermcodes'
 
 /*
  * "indir" values for buffer-local options.
@@ -1244,11 +1244,11 @@ enum
     , BV_FT
     , BV_IMI
     , BV_IMS
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
     , BV_INDE
     , BV_INDK
 #endif
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
+#만약 defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
     , BV_INEX
 #endif
     , BV_INF
@@ -1371,7 +1371,7 @@ enum
 #ifdef FEAT_LINEBREAK
     , WV_NUW
 #endif
-#if defined(FEAT_QUICKFIX)
+#만약 defined(FEAT_QUICKFIX)
     , WV_PVW
     , WV_LHI
 #endif

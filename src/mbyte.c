@@ -83,7 +83,7 @@
 # ifndef WIN32_LEAN_AND_MEAN
 #  define WIN32_LEAN_AND_MEAN
 # endif
-# if defined(FEAT_GUI) || defined(FEAT_XCLIPBOARD)
+# 만약 defined(FEAT_GUI) || defined(FEAT_XCLIPBOARD)
 #  ifdef __CYGWIN__
     // ControlMask from <X11/X.h> (included in "vim.h") is conflicting with
     // <w32api/windows.h> (included in <X11/Xwindows.h>).
@@ -91,18 +91,18 @@
 #  endif
 #  include <X11/Xwindows.h>
 #  define WINBYTE wBYTE
-# else
+# 아니면
 #  include <windows.h>
 #  define WINBYTE BYTE
 # endif
 # ifdef WIN32
 #  undef WIN32	    // Some windows.h define WIN32, we don't want that here.
 # endif
-#else
+#아니면
 # define WINBYTE BYTE
 #endif
 
-#if defined(MSWIN) || defined(WIN32UNIX)
+#만약 defined(MSWIN) || defined(WIN32UNIX)
 # include <winnls.h>
 #endif
 
@@ -111,7 +111,7 @@
 #endif
 #ifdef X_LOCALE
 # include <X11/Xlocale.h>
-# if !defined(HAVE_MBLEN) && !defined(mblen)
+# 만약 !defined(HAVE_MBLEN) && !defined(mblen)
 #  define mblen _Xmblen
 # endif
 #endif
@@ -120,20 +120,20 @@
 # include <wchar.h>
 #endif
 
-static int dbcs_char2len(int c);
-static int dbcs_char2bytes(int c, char_u *buf);
-static int dbcs_ptr2len(char_u *p);
-static int dbcs_ptr2len_len(char_u *p, int size);
-static int utf_ptr2cells_len(char_u *p, int size);
-static int dbcs_char2cells(int c);
-static int dbcs_ptr2cells_len(char_u *p, int size);
-static int dbcs_ptr2char(char_u *p);
-static int dbcs_head_off(char_u *base, char_u *p);
-static inline int utf_ptr2char_and_len(char_u *p, int *lenp);
-static inline int utf_ptr2char_and_len_len(char_u *p, int size, int *lenp);
-static inline int utf_iscomposinglike_char(int c1, int c2);
+static 정수 dbcs_char2len(정수 c);
+static 정수 dbcs_char2bytes(정수 c, char_u *buf);
+static 정수 dbcs_ptr2len(char_u *p);
+static 정수 dbcs_ptr2len_len(char_u *p, 정수 size);
+static 정수 utf_ptr2cells_len(char_u *p, 정수 size);
+static 정수 dbcs_char2cells(정수 c);
+static 정수 dbcs_ptr2cells_len(char_u *p, 정수 size);
+static 정수 dbcs_ptr2char(char_u *p);
+static 정수 dbcs_head_off(char_u *base, char_u *p);
+static inline 정수 utf_ptr2char_and_len(char_u *p, 정수 *lenp);
+static inline 정수 utf_ptr2char_and_len_len(char_u *p, 정수 size, 정수 *lenp);
+static inline 정수 utf_iscomposinglike_char(정수 c1, 정수 c2);
 #ifdef FEAT_EVAL
-static int cw_value(int c);
+static 정수 cw_value(정수 c);
 #endif
 
 /*
@@ -175,7 +175,7 @@ static char utf8len_tab_zero[256] =
  * "iso-8859-n" is handled by enc_canonize() directly.
  */
 static struct
-{   char *name;		int prop;		int codepage;}
+{   char *name;		정수 prop;		정수 codepage;}
 enc_canon_table[] =
 {
 #define IDX_LATIN_1	0
@@ -315,7 +315,7 @@ enc_canon_table[] =
  * Aliases for encoding names.
  */
 static struct
-{   char *name;		int canon;}
+{   char *name;		정수 canon;}
 enc_alias_table[] =
 {
     {"ansi",		IDX_LATIN_1},
@@ -329,7 +329,7 @@ enc_alias_table[] =
     {"greek",		IDX_ISO_7},
 #ifdef MSWIN
     {"hebrew",		IDX_CP1255},
-#else
+#아니면
     {"hebrew",		IDX_ISO_8},
 #endif
     {"latin5",		IDX_ISO_9},
@@ -375,14 +375,14 @@ enc_alias_table[] =
     {"euccn",		IDX_EUC_CN},
     {"gb2312",		IDX_EUC_CN},
     {"euctw",		IDX_EUC_TW},
-#if defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
+#만약 defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
     {"japan",		IDX_CP932},
     {"korea",		IDX_CP949},
     {"prc",		IDX_CP936},
     {"chinese",		IDX_CP936},
     {"taiwan",		IDX_CP950},
     {"big5",		IDX_CP950},
-#else
+#아니면
     {"japan",		IDX_EUC_JP},
     {"korea",		IDX_EUC_KR},
     {"prc",		IDX_EUC_CN},
@@ -404,15 +404,15 @@ enc_alias_table[] =
  * Find encoding "name" in the list of canonical encoding names.
  * Returns -1 if not found.
  */
-    static int
+    static 정수
 enc_canon_search(char_u *name)
 {
-    int		i;
+    정수		i;
 
-    for (i = 0; i < IDX_COUNT; ++i)
-	if (STRCMP(name, enc_canon_table[i].name) == 0)
-	    return i;
-    return -1;
+    위해 (i = 0; i < IDX_COUNT; ++i)
+	만약 (STRCMP(name, enc_canon_table[i].name) == 0)
+	    반환 i;
+    반환 -1;
 }
 
 
@@ -420,37 +420,37 @@ enc_canon_search(char_u *name)
  * Find canonical encoding "name" in the list and return its properties.
  * Returns 0 if not found.
  */
-    int
+    정수
 enc_canon_props(char_u *name)
 {
-    int		i;
+    정수		i;
 
     i = enc_canon_search(name);
-    if (i >= 0)
-	return enc_canon_table[i].prop;
+    만약 (i >= 0)
+	반환 enc_canon_table[i].prop;
 #ifdef MSWIN
-    if (name[0] == 'c' && name[1] == 'p' && VIM_ISDIGIT(name[2]))
+    만약 (name[0] == 'c' && name[1] == 'p' && VIM_ISDIGIT(name[2]))
     {
 	CPINFO	cpinfo;
 
 	// Get info on this codepage to find out what it is.
-	if (GetCPInfo(atoi((char *)name + 2), &cpinfo) != 0)
+	만약 (GetCPInfo(atoi((char *)name + 2), &cpinfo) != 0)
 	{
-	    if (cpinfo.MaxCharSize == 1) // some single-byte encoding
-		return ENC_8BIT;
-	    if (cpinfo.MaxCharSize == 2
+	    만약 (cpinfo.MaxCharSize == 1) // some single-byte encoding
+		반환 ENC_8BIT;
+	    만약 (cpinfo.MaxCharSize == 2
 		    && (cpinfo.LeadByte[0] != 0 || cpinfo.LeadByte[1] != 0))
 		// must be a DBCS encoding
-		return ENC_DBCS;
+		반환 ENC_DBCS;
 	}
-	return 0;
+	반환 0;
     }
 #endif
-    if (STRNCMP(name, "2byte-", 6) == 0)
-	return ENC_DBCS;
-    if (STRNCMP(name, "8bit-", 5) == 0 || STRNCMP(name, "iso-8859-", 9) == 0)
-	return ENC_8BIT;
-    return 0;
+    만약 (STRNCMP(name, "2byte-", 6) == 0)
+	반환 ENC_DBCS;
+    만약 (STRNCMP(name, "8bit-", 5) == 0 || STRNCMP(name, "iso-8859-", 9) == 0)
+	반환 ENC_8BIT;
+    반환 0;
 }
 
 /*
@@ -468,111 +468,111 @@ enc_canon_props(char_u *name)
     char *
 mb_init(void)
 {
-    int		i;
-    int		idx;
-    int		n;
-    int		enc_dbcs_new = 0;
-#if defined(USE_ICONV) && !defined(MSWIN) && !defined(WIN32UNIX) \
+    정수		i;
+    정수		idx;
+    정수		n;
+    정수		enc_dbcs_new = 0;
+#만약 defined(USE_ICONV) && !defined(MSWIN) && !defined(WIN32UNIX) \
 	&& !defined(MACOS_CONVERT)
 # define LEN_FROM_CONV
     vimconv_T	vimconv;
     char_u	*p;
 #endif
 
-    if (p_enc == NULL)
+    만약 (p_enc == NULL)
     {
 	// Just starting up: set the whole table to one's.
-	for (i = 0; i < 256; ++i)
+	위해 (i = 0; i < 256; ++i)
 	    mb_bytelen_tab[i] = 1;
 	input_conv.vc_type = CONV_NONE;
 	input_conv.vc_factor = 1;
 	output_conv.vc_type = CONV_NONE;
-	return NULL;
+	반환 NULL;
     }
 
 #ifdef MSWIN
-    if (p_enc[0] == 'c' && p_enc[1] == 'p' && VIM_ISDIGIT(p_enc[2]))
+    만약 (p_enc[0] == 'c' && p_enc[1] == 'p' && VIM_ISDIGIT(p_enc[2]))
     {
 	CPINFO	cpinfo;
 
 	// Get info on this codepage to find out what it is.
-	if (GetCPInfo(atoi((char *)p_enc + 2), &cpinfo) != 0)
+	만약 (GetCPInfo(atoi((char *)p_enc + 2), &cpinfo) != 0)
 	{
-	    if (cpinfo.MaxCharSize == 1)
+	    만약 (cpinfo.MaxCharSize == 1)
 	    {
 		// some single-byte encoding
 		enc_unicode = 0;
 		enc_utf8 = FALSE;
 	    }
-	    else if (cpinfo.MaxCharSize == 2
+	    아니면 만약 (cpinfo.MaxCharSize == 2
 		    && (cpinfo.LeadByte[0] != 0 || cpinfo.LeadByte[1] != 0))
 	    {
 		// must be a DBCS encoding, check below
 		enc_dbcs_new = atoi((char *)p_enc + 2);
 	    }
-	    else
+	    아니면
 		goto codepage_invalid;
 	}
-	else if (GetLastError() == ERROR_INVALID_PARAMETER)
+	아니면 만약 (GetLastError() == ERROR_INVALID_PARAMETER)
 	{
 codepage_invalid:
-	    return N_(e_not_valid_codepage);
+	    반환 N_(e_not_valid_codepage);
 	}
     }
 #endif
-    else if (STRNCMP(p_enc, "8bit-", 5) == 0
+    아니면 만약 (STRNCMP(p_enc, "8bit-", 5) == 0
 	    || STRNCMP(p_enc, "iso-8859-", 9) == 0)
     {
 	// Accept any "8bit-" or "iso-8859-" name.
 	enc_unicode = 0;
 	enc_utf8 = FALSE;
     }
-    else if (STRNCMP(p_enc, "2byte-", 6) == 0)
+    아니면 만약 (STRNCMP(p_enc, "2byte-", 6) == 0)
     {
 #ifdef MSWIN
 	// Windows: accept only valid codepage numbers, check below.
-	if (p_enc[6] != 'c' || p_enc[7] != 'p'
+	만약 (p_enc[6] != 'c' || p_enc[7] != 'p'
 			      || (enc_dbcs_new = atoi((char *)p_enc + 8)) == 0)
-	    return e_invalid_argument;
-#else
+	    반환 e_invalid_argument;
+#아니면
 	// Unix: accept any "2byte-" name, assume current locale.
 	enc_dbcs_new = DBCS_2BYTE;
 #endif
     }
-    else if ((idx = enc_canon_search(p_enc)) >= 0)
+    아니면 만약 ((idx = enc_canon_search(p_enc)) >= 0)
     {
 	i = enc_canon_table[idx].prop;
-	if (i & ENC_UNICODE)
+	만약 (i & ENC_UNICODE)
 	{
 	    // Unicode
 	    enc_utf8 = TRUE;
-	    if (i & (ENC_2BYTE | ENC_2WORD))
+	    만약 (i & (ENC_2BYTE | ENC_2WORD))
 		enc_unicode = 2;
-	    else if (i & ENC_4BYTE)
+	    아니면 만약 (i & ENC_4BYTE)
 		enc_unicode = 4;
-	    else
+	    아니면
 		enc_unicode = 0;
 	}
-	else if (i & ENC_DBCS)
+	아니면 만약 (i & ENC_DBCS)
 	{
 	    // 2byte, handle below
 	    enc_dbcs_new = enc_canon_table[idx].codepage;
 	}
-	else
+	아니면
 	{
 	    // Must be 8-bit.
 	    enc_unicode = 0;
 	    enc_utf8 = FALSE;
 	}
     }
-    else    // Don't know what encoding this is, reject it.
-	return e_invalid_argument;
+    아니면    // Don't know what encoding this is, reject it.
+	반환 e_invalid_argument;
 
-    if (enc_dbcs_new != 0)
+    만약 (enc_dbcs_new != 0)
     {
 #ifdef MSWIN
 	// Check if the DBCS code page is OK.
-	if (!IsValidCodePage(enc_dbcs_new))
+	만약 (!IsValidCodePage(enc_dbcs_new))
 	    goto codepage_invalid;
 #endif
 	enc_unicode = 0;
@@ -581,7 +581,7 @@ codepage_invalid:
     enc_dbcs = enc_dbcs_new;
     has_mbyte = (enc_dbcs != 0 || enc_utf8);
 
-#if defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
+#만약 defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
     enc_codepage = encname2codepage(p_enc);
     enc_latin9 = (STRCMP(p_enc, "iso-8859-15") == 0);
 #endif
@@ -593,7 +593,7 @@ codepage_invalid:
     /*
      * Set the function pointers.
      */
-    if (enc_utf8)
+    만약 (enc_utf8)
     {
 	mb_ptr2len = utfc_ptr2len;
 	mb_ptr2len_len = utfc_ptr2len_len;
@@ -606,7 +606,7 @@ codepage_invalid:
 	mb_ptr2char = utf_ptr2char;
 	mb_head_off = utf_head_off;
     }
-    else if (enc_dbcs != 0)
+    아니면 만약 (enc_dbcs != 0)
     {
 	mb_ptr2len = dbcs_ptr2len;
 	mb_ptr2len_len = dbcs_ptr2len_len;
@@ -619,7 +619,7 @@ codepage_invalid:
 	mb_ptr2char = dbcs_ptr2char;
 	mb_head_off = dbcs_head_off;
     }
-    else
+    아니면
     {
 	mb_ptr2len = latin_ptr2len;
 	mb_ptr2len_len = latin_ptr2len_len;
@@ -640,10 +640,10 @@ codepage_invalid:
     // When 'encoding' is different from the current locale mblen() won't
     // work.  Use conversion to "utf-8" instead.
     vimconv.vc_type = CONV_NONE;
-    if (enc_dbcs)
+    만약 (enc_dbcs)
     {
 	p = enc_locale();
-	if (p == NULL || STRCMP(p, p_enc) != 0)
+	만약 (p == NULL || STRCMP(p, p_enc) != 0)
 	{
 	    convert_setup(&vimconv, p_enc, (char_u *)"utf-8");
 	    vimconv.vc_fail = TRUE;
@@ -652,23 +652,23 @@ codepage_invalid:
     }
 #endif
 
-    for (i = 0; i < 256; ++i)
+    위해 (i = 0; i < 256; ++i)
     {
 	// Our own function to reliably check the length of UTF-8 characters,
 	// independent of mblen().
-	if (enc_utf8)
+	만약 (enc_utf8)
 	    n = utf8len_tab[i];
-	else if (enc_dbcs == 0)
+	아니면 만약 (enc_dbcs == 0)
 	    n = 1;
-	else
+	아니면
 	{
-#if defined(MSWIN) || defined(WIN32UNIX)
+#만약 defined(MSWIN) || defined(WIN32UNIX)
 	    // enc_dbcs is set by setting 'fileencoding'.  It becomes a Windows
 	    // CodePage identifier, which we can pass directly in to Windows
 	    // API
 	    n = IsDBCSLeadByteEx(enc_dbcs, (WINBYTE)i) ? 2 : 1;
-#else
-# if defined(__amigaos4__) || defined(__ANDROID__) || \
+#아니면
+# 만약 defined(__amigaos4__) || defined(__ANDROID__) || \
 				   !(defined(HAVE_MBLEN) || defined(X_LOCALE))
 	    /*
 	     * if mblen() is not available, character which MSB is turned on
@@ -676,32 +676,32 @@ codepage_invalid:
 	     * is not always true.)
 	     */
 	    n = (i & 0x80) ? 2 : 1;
-# else
+# 아니면
 	    char buf[MB_MAXBYTES + 1];
 
-	    if (i == NUL)	// just in case mblen() can't handle ""
+	    만약 (i == NUL)	// just in case mblen() can't handle ""
 		n = 1;
-	    else
+	    아니면
 	    {
 		buf[0] = i;
 		buf[1] = 0;
 #  ifdef LEN_FROM_CONV
-		if (vimconv.vc_type != CONV_NONE)
+		만약 (vimconv.vc_type != CONV_NONE)
 		{
 		    /*
 		     * string_convert() should fail when converting the first
 		     * byte of a double-byte character.
 		     */
 		    p = string_convert(&vimconv, (char_u *)buf, NULL);
-		    if (p != NULL)
+		    만약 (p != NULL)
 		    {
 			vim_free(p);
 			n = 1;
 		    }
-		    else
+		    아니면
 			n = 2;
 		}
-		else
+		아니면
 #  endif
 		{
 		    /*
@@ -711,9 +711,9 @@ codepage_invalid:
 		     * Therefore, following condition includes 0.
 		     */
 		    vim_ignored = mblen(NULL, 0);  // First reset the state.
-		    if (mblen(buf, (size_t)1) <= 0)
+		    만약 (mblen(buf, (size_t)1) <= 0)
 			n = 2;
-		    else
+		    아니면
 			n = 1;
 		}
 	    }
@@ -735,10 +735,10 @@ codepage_invalid:
     screenalloc(FALSE);
 
     // When using Unicode, set default for 'fileencodings'.
-    if (enc_utf8 && !option_was_set((char_u *)"fencs"))
+    만약 (enc_utf8 && !option_was_set((char_u *)"fencs"))
 	set_fencs_unicode();
 
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET) && defined(FEAT_GETTEXT)
+#만약 defined(HAVE_BIND_TEXTDOMAIN_CODESET) && defined(FEAT_GETTEXT)
     // GNU gettext 0.10.37 supports this feature: set the codeset used for
     // translated messages independently from the current locale.
     (void)bind_textdomain_codeset(VIMPACKAGE,
@@ -748,7 +748,7 @@ codepage_invalid:
 #ifdef MSWIN
     // When changing 'encoding' while starting up, then convert the command
     // line arguments from the active codepage to 'encoding'.
-    if (starting != 0)
+    만약 (starting != 0)
 	fix_arg_enc();
 #endif
 
@@ -761,7 +761,7 @@ codepage_invalid:
     spell_reload();
 #endif
 
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -771,51 +771,51 @@ codepage_invalid:
  * 4 - UCS-4 BOM
  * 3 - UTF-8 BOM
  */
-    int
+    정수
 bomb_size(void)
 {
-    int n = 0;
+    정수 n = 0;
 
-    if (curbuf->b_p_bomb && !curbuf->b_p_bin)
+    만약 (curbuf->b_p_bomb && !curbuf->b_p_bin)
     {
-	if (*curbuf->b_p_fenc == NUL)
+	만약 (*curbuf->b_p_fenc == NUL)
 	{
-	    if (enc_utf8)
+	    만약 (enc_utf8)
 	    {
-		if (enc_unicode != 0)
+		만약 (enc_unicode != 0)
 		    n = enc_unicode;
-		else
+		아니면
 		    n = 3;
 	    }
 	}
-	else if (STRCMP(curbuf->b_p_fenc, "utf-8") == 0)
+	아니면 만약 (STRCMP(curbuf->b_p_fenc, "utf-8") == 0)
 	    n = 3;
-	else if (STRNCMP(curbuf->b_p_fenc, "ucs-2", 5) == 0
+	아니면 만약 (STRNCMP(curbuf->b_p_fenc, "ucs-2", 5) == 0
 		|| STRNCMP(curbuf->b_p_fenc, "utf-16", 6) == 0)
 	    n = 2;
-	else if (STRNCMP(curbuf->b_p_fenc, "ucs-4", 5) == 0)
+	아니면 만약 (STRNCMP(curbuf->b_p_fenc, "ucs-4", 5) == 0)
 	    n = 4;
     }
-    return n;
+    반환 n;
 }
 
-#if defined(FEAT_QUICKFIX)
+#만약 defined(FEAT_QUICKFIX)
 /*
  * Remove all BOM from "s" by moving remaining text.
  */
     void
 remove_bom(char_u *s)
 {
-    if (!enc_utf8)
-	return;
+    만약 (!enc_utf8)
+	반환;
 
     char_u *p = s;
 
-    while ((p = vim_strbyte(p, 0xef)) != NULL)
+    동안 ((p = vim_strbyte(p, 0xef)) != NULL)
     {
-	if (p[1] == 0xbb && p[2] == 0xbf)
+	만약 (p[1] == 0xbb && p[2] == 0xbf)
 	    STRMOVE(p, p + 3);
-	else
+	아니면
 	    ++p;
     }
 }
@@ -828,35 +828,35 @@ remove_bom(char_u *s)
  * 2 for an alphanumeric word character
  * >2 for other word characters, including CJK and emoji
  */
-    int
+    정수
 mb_get_class(char_u *p)
 {
-    return mb_get_class_buf(p, curbuf);
+    반환 mb_get_class_buf(p, curbuf);
 }
 
-    int
+    정수
 mb_get_class_buf(char_u *p, buf_T *buf)
 {
-    if (MB_BYTE2LEN(p[0]) == 1)
+    만약 (MB_BYTE2LEN(p[0]) == 1)
     {
-	if (p[0] == NUL || VIM_ISWHITE(p[0]))
-	    return 0;
-	if (vim_iswordc_buf(p[0], buf))
-	    return 2;
-	return 1;
+	만약 (p[0] == NUL || VIM_ISWHITE(p[0]))
+	    반환 0;
+	만약 (vim_iswordc_buf(p[0], buf))
+	    반환 2;
+	반환 1;
     }
-    if (enc_dbcs != 0 && p[0] != NUL && p[1] != NUL)
-	return dbcs_class(p[0], p[1]);
-    if (enc_utf8)
-	return utf_class_buf(utf_ptr2char(p), buf);
-    return 0;
+    만약 (enc_dbcs != 0 && p[0] != NUL && p[1] != NUL)
+	반환 dbcs_class(p[0], p[1]);
+    만약 (enc_utf8)
+	반환 utf_class_buf(utf_ptr2char(p), buf);
+    반환 0;
 }
 
 /*
  * Get class of a double-byte character.  This always returns 3 or bigger.
  * TODO: Should return 1 for punctuation.
  */
-    int
+    정수
 dbcs_class(unsigned lead, unsigned trail)
 {
     switch (enc_dbcs)
@@ -871,22 +871,22 @@ dbcs_class(unsigned lead, unsigned trail)
 		unsigned char tb = trail;
 
 		// convert process code to JIS
-#if defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
+#만약 defined(MSWIN) || defined(WIN32UNIX) || defined(MACOS_X)
 		// process code is SJIS
-		if (lb <= 0x9f)
+		만약 (lb <= 0x9f)
 		    lb = (lb - 0x81) * 2 + 0x21;
-		else
+		아니면
 		    lb = (lb - 0xc1) * 2 + 0x21;
-		if (tb <= 0x7e)
+		만약 (tb <= 0x7e)
 		    tb -= 0x1f;
-		else if (tb <= 0x9e)
+		아니면 만약 (tb <= 0x9e)
 		    tb -= 0x20;
-		else
+		아니면
 		{
 		    tb -= 0x7e;
 		    lb += 1;
 		}
-#else
+#아니면
 		/*
 		 * XXX: Code page identification can not use with all
 		 *	    system! So, some other encoding information
@@ -904,14 +904,14 @@ dbcs_class(unsigned lead, unsigned trail)
 		switch (lb << 8 | tb)
 		{
 		    case 0x2121: // ZENKAKU space
-			return 0;
+			반환 0;
 		    case 0x2122: // TOU-TEN (Japanese comma)
 		    case 0x2123: // KU-TEN (Japanese period)
 		    case 0x2124: // ZENKAKU comma
 		    case 0x2125: // ZENKAKU period
-			return 1;
+			반환 1;
 		    case 0x213c: // prolongedsound handled as KATAKANA
-			return 13;
+			반환 13;
 		}
 		// sieved by KU code
 		switch (lb)
@@ -919,28 +919,28 @@ dbcs_class(unsigned lead, unsigned trail)
 		    case 0x21:
 		    case 0x22:
 			// special symbols
-			return 10;
+			반환 10;
 		    case 0x23:
 			// alphanumeric
-			return 11;
+			반환 11;
 		    case 0x24:
 			// hiragana
-			return 12;
+			반환 12;
 		    case 0x25:
 			// katakana
-			return 13;
+			반환 13;
 		    case 0x26:
 			// greek
-			return 14;
+			반환 14;
 		    case 0x27:
 			// russian
-			return 15;
+			반환 15;
 		    case 0x28:
 			// lines
-			return 16;
+			반환 16;
 		    default:
 			// kanji
-			return 17;
+			반환 17;
 		}
 	    }
 
@@ -965,63 +965,63 @@ dbcs_class(unsigned lead, unsigned trail)
 		 * 30 : Cyrillic Letter
 		 */
 
-		if (c1 >= 0xB0 && c1 <= 0xC8)
+		만약 (c1 >= 0xB0 && c1 <= 0xC8)
 		    // Hangul
-		    return 20;
-#if defined(MSWIN) || defined(WIN32UNIX)
-		else if (c1 <= 0xA0 || c2 <= 0xA0)
+		    반환 20;
+#만약 defined(MSWIN) || defined(WIN32UNIX)
+		아니면 만약 (c1 <= 0xA0 || c2 <= 0xA0)
 		    // Extended Hangul Region : MS UHC(Unified Hangul Code)
 		    // c1: 0x81-0xA0 with c2: 0x41-0x5A, 0x61-0x7A, 0x81-0xFE
 		    // c1: 0xA1-0xC6 with c2: 0x41-0x5A, 0x61-0x7A, 0x81-0xA0
-		    return 20;
+		    반환 20;
 #endif
 
-		else if (c1 >= 0xCA && c1 <= 0xFD)
+		아니면 만약 (c1 >= 0xCA && c1 <= 0xFD)
 		    // Hanja
-		    return 21;
-		else switch (c1)
+		    반환 21;
+		아니면 switch (c1)
 		{
 		    case 0xA1:
 		    case 0xA2:
 			// Symbols
-			return 22;
+			반환 22;
 		    case 0xA3:
 			// Alphanumeric
-			return 23;
+			반환 23;
 		    case 0xA4:
 			// Hangul Letter(Alphabet)
-			return 24;
+			반환 24;
 		    case 0xA5:
 			// Roman Numeral/Greek Letter
-			return 25;
+			반환 25;
 		    case 0xA6:
 			// Box Drawings
-			return 26;
+			반환 26;
 		    case 0xA7:
 			// Unit Symbols
-			return 27;
+			반환 27;
 		    case 0xA8:
 		    case 0xA9:
-			if (c2 <= 0xAF)
-			    return 25;  // Roman Letter
-			else if (c2 >= 0xF6)
-			    return 22;  // Symbols
-			else
+			만약 (c2 <= 0xAF)
+			    반환 25;  // Roman Letter
+			아니면 만약 (c2 >= 0xF6)
+			    반환 22;  // Symbols
+			아니면
 			    // Circled/Parenthesized Letter
-			    return 28;
+			    반환 28;
 		    case 0xAA:
 		    case 0xAB:
 			// Hiragana/Katakana
-			return 29;
+			반환 29;
 		    case 0xAC:
 			// Cyrillic Letter
-			return 30;
+			반환 30;
 		}
 	    }
 	default:
 	    break;
     }
-    return 3;
+    반환 3;
 }
 
 /*
@@ -1029,19 +1029,19 @@ dbcs_class(unsigned lead, unsigned trail)
  * Return length in bytes of character "c".
  * Returns 1 for a single-byte character.
  */
-    int
-latin_char2len(int c UNUSED)
+    정수
+latin_char2len(정수 c UNUSED)
 {
-    return 1;
+    반환 1;
 }
 
-    static int
+    static 정수
 dbcs_char2len(
-    int		c)
+    정수		c)
 {
-    if (c >= 0x100)
-	return 2;
-    return 1;
+    만약 (c >= 0x100)
+	반환 2;
+    반환 1;
 }
 
 /*
@@ -1049,57 +1049,57 @@ dbcs_char2len(
  * Convert a character to its bytes.
  * Returns the length in bytes.
  */
-    int
-latin_char2bytes(int c, char_u *buf)
+    정수
+latin_char2bytes(정수 c, char_u *buf)
 {
     buf[0] = c;
-    return 1;
+    반환 1;
 }
 
-    static int
-dbcs_char2bytes(int c, char_u *buf)
+    static 정수
+dbcs_char2bytes(정수 c, char_u *buf)
 {
-    if (c >= 0x100)
+    만약 (c >= 0x100)
     {
 	buf[0] = (unsigned)c >> 8;
 	buf[1] = c;
 	// Never use a NUL byte, it causes lots of trouble.  It's an invalid
 	// character anyway.
-	if (buf[1] == NUL)
+	만약 (buf[1] == NUL)
 	    buf[1] = '\n';
-	return 2;
+	반환 2;
     }
     buf[0] = c;
-    return 1;
+    반환 1;
 }
 
 /*
  * Get byte length of character at "*p".  Returns zero when "*p" is NUL.
  * Used for mb_ptr2len() when 'encoding' latin.
  */
-    int
+    정수
 latin_ptr2len(char_u *p)
 {
-    return *p == NUL ? 0 : 1;
+    반환 *p == NUL ? 0 : 1;
 }
 
 /*
  * Get byte length of character at "*p".  Returns zero when "*p" is NUL.
  * Used for mb_ptr2len() when 'encoding' DBCS.
  */
-    static int
+    static 정수
 dbcs_ptr2len(char_u *p)
 {
-    int		len;
+    정수		len;
 
-    if (*p == NUL)
-	return 0;
+    만약 (*p == NUL)
+	반환 0;
 
     // if the second byte is missing the length is 1
     len = MB_BYTE2LEN(*p);
-    if (len == 2 && p[1] == NUL)
+    만약 (len == 2 && p[1] == NUL)
 	len = 1;
-    return len;
+    반환 len;
 }
 
 /*
@@ -1108,28 +1108,28 @@ dbcs_ptr2len(char_u *p)
  * Returns 0 for an empty string.
  * Returns 1 for an illegal char or an incomplete byte sequence.
  */
-    int
-latin_ptr2len_len(char_u *p, int size)
+    정수
+latin_ptr2len_len(char_u *p, 정수 size)
 {
-    if (size < 1 || *p == NUL)
-	return 0;
-    return 1;
+    만약 (size < 1 || *p == NUL)
+	반환 0;
+    반환 1;
 }
 
-    static int
-dbcs_ptr2len_len(char_u *p, int size)
+    static 정수
+dbcs_ptr2len_len(char_u *p, 정수 size)
 {
-    int		len;
+    정수		len;
 
-    if (size < 1 || *p == NUL)
-	return 0;
-    if (size == 1)
-	return 1;
+    만약 (size < 1 || *p == NUL)
+	반환 0;
+    만약 (size == 1)
+	반환 1;
     // Check that second byte is not missing.
     len = MB_BYTE2LEN(*p);
-    if (len == 2 && p[1] == NUL)
+    만약 (len == 2 && p[1] == NUL)
 	len = 1;
-    return len;
+    반환 len;
 }
 
 struct interval
@@ -1141,29 +1141,29 @@ struct interval
 /*
  * Return TRUE if "c" is in "table[size / sizeof(struct interval)]".
  */
-    static int
-intable(struct interval *table, size_t size, int c)
+    static 정수
+intable(struct interval *table, size_t size, 정수 c)
 {
-    int mid, bot, top;
+    정수 mid, bot, top;
 
     // first quick check for Latin1 etc. characters
-    if (c < table[0].first)
-	return FALSE;
+    만약 (c < table[0].first)
+	반환 FALSE;
 
     // binary search in table
     bot = 0;
-    top = (int)(size / sizeof(struct interval) - 1);
-    while (top >= bot)
+    top = (정수)(size / sizeof(struct interval) - 1);
+    동안 (top >= bot)
     {
 	mid = (bot + top) / 2;
-	if (table[mid].last < c)
+	만약 (table[mid].last < c)
 	    bot = mid + 1;
-	else if (table[mid].first > c)
+	아니면 만약 (table[mid].first > c)
 	    top = mid - 1;
-	else
-	    return TRUE;
+	아니면
+	    반환 TRUE;
     }
-    return FALSE;
+    반환 FALSE;
 }
 
 // Sorted list of non-overlapping intervals of East Asian Ambiguous
@@ -1351,16 +1351,16 @@ static struct interval ambiguous[] =
     {0x100000, 0x10fffd}
 };
 
-#if defined(FEAT_TERMINAL)
+#만약 defined(FEAT_TERMINAL)
 /*
  * utf_char2cells() with different argument type for libvterm.
  */
-    int
+    정수
 utf_uint2cells(UINT32_T c)
 {
-    if (c >= 0x100 && utf_iscomposing((int)c))
-	return 0;
-    return utf_char2cells((int)c);
+    만약 (c >= 0x100 && utf_iscomposing((정수)c))
+	반환 0;
+    반환 utf_char2cells((정수)c);
 }
 #endif
 
@@ -1371,8 +1371,8 @@ utf_uint2cells(UINT32_T c)
  * When p_ambw is "double", return 2 for a character with East Asian Width
  * class 'A'(mbiguous).
  */
-    int
-utf_char2cells(int c)
+    정수
+utf_char2cells(정수 c)
 {
     // Sorted list of non-overlapping intervals of East Asian double width
     // characters, generated with ../runtime/tools/unicode.vim.
@@ -1590,32 +1590,32 @@ utf_char2cells(int c)
 #ifdef FEAT_EVAL
     // Use the value from setcellwidths() at 0x80 and higher, unless the
     // character is not printable.
-    if (c >= 0x80 && vim_isprintc(c))
+    만약 (c >= 0x80 && vim_isprintc(c))
     {
-	int n = cw_value(c);
-	if (n != 0)
-	    return n;
+	정수 n = cw_value(c);
+	만약 (n != 0)
+	    반환 n;
     }
 #endif
 
-    if (c >= 0x100)
+    만약 (c >= 0x100)
     {
-	if (!utf_printable(c))
-	    return 6;		// unprintable, displays <xxxx>
-	if (intable(doublewidth, sizeof(doublewidth), c))
-	    return 2;
-	if (p_emoji && intable(emoji_wide, sizeof(emoji_wide), c))
-	    return 2;
+	만약 (!utf_printable(c))
+	    반환 6;		// unprintable, displays <xxxx>
+	만약 (intable(doublewidth, sizeof(doublewidth), c))
+	    반환 2;
+	만약 (p_emoji && intable(emoji_wide, sizeof(emoji_wide), c))
+	    반환 2;
     }
 
     // Characters below 0x100 are influenced by 'isprint' option
-    else if (c >= 0x80 && !vim_isprintc(c))
-	return 4;		// unprintable, displays <xx>
+    아니면 만약 (c >= 0x80 && !vim_isprintc(c))
+	반환 4;		// unprintable, displays <xx>
 
-    if (c >= 0x80 && *p_ambw == 'd' && intable(ambiguous, sizeof(ambiguous), c))
-	return 2;
+    만약 (c >= 0x80 && *p_ambw == 'd' && intable(ambiguous, sizeof(ambiguous), c))
+	반환 2;
 
-    return 1;
+    반환 1;
 }
 
 /*
@@ -1623,42 +1623,42 @@ utf_char2cells(int c)
  * Return the number of display cells character at "*p" occupies.
  * This doesn't take care of unprintable characters, use ptr2cells() for that.
  */
-    int
+    정수
 latin_ptr2cells(char_u *p UNUSED)
 {
-    return 1;
+    반환 1;
 }
 
-    int
+    정수
 utf_ptr2cells(
     char_u	*p)
 {
-    int		c;
-    int		len;
+    정수		c;
+    정수		len;
 
     // Need to convert to a character number.
-    if (*p >= 0x80)
+    만약 (*p >= 0x80)
     {
 	c = utf_ptr2char_and_len(p, &len);
 	// An illegal byte is displayed as <xx>.
-	if (len == 1 || c == NUL)
-	    return 4;
+	만약 (len == 1 || c == NUL)
+	    반환 4;
 	// If the char is ASCII it must be an overlong sequence.
-	if (c < 0x80)
-	    return vim_isprintc(c) ? char2cells(c) : 4;
-	return utf_char2cells(c);
+	만약 (c < 0x80)
+	    반환 vim_isprintc(c) ? char2cells(c) : 4;
+	반환 utf_char2cells(c);
     }
-    return 1;
+    반환 1;
 }
 
-    int
+    정수
 dbcs_ptr2cells(char_u *p)
 {
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (enc_dbcs == DBCS_JPNU && *p == 0x8e)
-	return 1;
-    return MB_BYTE2LEN(*p);
+    만약 (enc_dbcs == DBCS_JPNU && *p == 0x8e)
+	반환 1;
+    반환 MB_BYTE2LEN(*p);
 }
 
 /*
@@ -1666,43 +1666,43 @@ dbcs_ptr2cells(char_u *p)
  * Like mb_ptr2cells(), but limit string length to "size".
  * For an empty string or truncated character returns 1.
  */
-    int
-latin_ptr2cells_len(char_u *p UNUSED, int size UNUSED)
+    정수
+latin_ptr2cells_len(char_u *p UNUSED, 정수 size UNUSED)
 {
-    return 1;
+    반환 1;
 }
 
-    static int
-utf_ptr2cells_len(char_u *p, int size)
+    static 정수
+utf_ptr2cells_len(char_u *p, 정수 size)
 {
-    int		c;
-    int		len;
+    정수		c;
+    정수		len;
 
     // Need to convert to a wide character.
-    if (size > 0 && *p >= 0x80)
+    만약 (size > 0 && *p >= 0x80)
     {
 	c = utf_ptr2char_and_len_len(p, size, &len);
-	if (len > size)
-	    return 4;  // truncated, display as illegal byte
+	만약 (len > size)
+	    반환 4;  // truncated, display as illegal byte
 	// An illegal byte is displayed as <xx>.
-	if (len == 1 || c == NUL)
-	    return 4;
+	만약 (len == 1 || c == NUL)
+	    반환 4;
 	// If the char is ASCII it must be an overlong sequence.
-	if (c < 0x80)
-	    return vim_isprintc(c) ? char2cells(c) : 4;
-	return utf_char2cells(c);
+	만약 (c < 0x80)
+	    반환 vim_isprintc(c) ? char2cells(c) : 4;
+	반환 utf_char2cells(c);
     }
-    return 1;
+    반환 1;
 }
 
-    static int
-dbcs_ptr2cells_len(char_u *p, int size)
+    static 정수
+dbcs_ptr2cells_len(char_u *p, 정수 size)
 {
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (size <= 1 || (enc_dbcs == DBCS_JPNU && *p == 0x8e))
-	return 1;
-    return MB_BYTE2LEN(*p);
+    만약 (size <= 1 || (enc_dbcs == DBCS_JPNU && *p == 0x8e))
+	반환 1;
+    반환 MB_BYTE2LEN(*p);
 }
 
 /*
@@ -1710,36 +1710,36 @@ dbcs_ptr2cells_len(char_u *p, int size)
  * Return the number of display cells character "c" occupies.
  * Only takes care of multi-byte chars, not "^C" and such.
  */
-    int
-latin_char2cells(int c UNUSED)
+    정수
+latin_char2cells(정수 c UNUSED)
 {
-    return 1;
+    반환 1;
 }
 
-    static int
-dbcs_char2cells(int c)
+    static 정수
+dbcs_char2cells(정수 c)
 {
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (enc_dbcs == DBCS_JPNU && ((unsigned)c >> 8) == 0x8e)
-	return 1;
+    만약 (enc_dbcs == DBCS_JPNU && ((unsigned)c >> 8) == 0x8e)
+	반환 1;
     // use the first byte
-    return MB_BYTE2LEN((unsigned)c >> 8);
+    반환 MB_BYTE2LEN((unsigned)c >> 8);
 }
 
 /*
  * Return the number of cells occupied by string "p".
  * Stop at a NUL character.  When "len" >= 0 stop at character "p[len]".
  */
-    int
-mb_string2cells(char_u *p, int len)
+    정수
+mb_string2cells(char_u *p, 정수 len)
 {
-    int i;
-    int clen = 0;
+    정수 i;
+    정수 clen = 0;
 
-    for (i = 0; (len < 0 || i < len) && p[i] != NUL; i += (*mb_ptr2len)(p + i))
+    위해 (i = 0; (len < 0 || i < len) && p[i] != NUL; i += (*mb_ptr2len)(p + i))
 	clen += (*mb_ptr2cells)(p + i);
-    return clen;
+    반환 clen;
 }
 
 /*
@@ -1747,48 +1747,48 @@ mb_string2cells(char_u *p, int len)
  * Return number of display cells for char at ScreenLines[off].
  * We make sure that the offset used is less than "max_off".
  */
-    int
+    정수
 latin_off2cells(unsigned off UNUSED, unsigned max_off UNUSED)
 {
-    return 1;
+    반환 1;
 }
 
-    int
+    정수
 dbcs_off2cells(unsigned off, unsigned max_off)
 {
     // never check beyond end of the line
-    if (off >= max_off)
-	return 1;
+    만약 (off >= max_off)
+	반환 1;
 
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
-	return 1;
-    return MB_BYTE2LEN(ScreenLines[off]);
+    만약 (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
+	반환 1;
+    반환 MB_BYTE2LEN(ScreenLines[off]);
 }
 
-    int
+    정수
 utf_off2cells(unsigned off, unsigned max_off)
 {
-    return (off + 1 < max_off && ScreenLines[off + 1] == 0) ? 2 : 1;
+    반환 (off + 1 < max_off && ScreenLines[off + 1] == 0) ? 2 : 1;
 }
 
 /*
  * mb_ptr2char() function pointer.
  * Convert a byte sequence into a character.
  */
-    int
+    정수
 latin_ptr2char(char_u *p)
 {
-    return *p;
+    반환 *p;
 }
 
-    static int
+    static 정수
 dbcs_ptr2char(char_u *p)
 {
-    if (MB_BYTE2LEN(*p) > 1 && p[1] != NUL)
-	return (p[0] << 8) + p[1];
-    return *p;
+    만약 (MB_BYTE2LEN(*p) > 1 && p[1] != NUL)
+	반환 (p[0] << 8) + p[1];
+    반환 *p;
 }
 
 /*
@@ -1796,78 +1796,78 @@ dbcs_ptr2char(char_u *p)
  * Returns the character and sets "*lenp" to its byte length.
  * Illegal bytes are returned as-is with a length of one.
  */
-    static inline int
-utf_ptr2char_and_len(char_u *p, int *lenp)
+    static inline 정수
+utf_ptr2char_and_len(char_u *p, 정수 *lenp)
 {
-    int		len;
-    int		c;
+    정수		len;
+    정수		c;
 
-    if (p[0] < 0x80)
+    만약 (p[0] < 0x80)
     {
 	*lenp = p[0] == NUL ? 0 : 1;
-	return p[0];
+	반환 p[0];
     }
 
     len = utf8len_tab_zero[p[0]];
-    if (len <= 1 || (p[1] & 0xc0) != 0x80)
+    만약 (len <= 1 || (p[1] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	반환 p[0];
     }
 
     c = ((p[0] & 0x1f) << 6) + (p[1] & 0x3f);
-    if (len == 2)
+    만약 (len == 2)
     {
 	*lenp = 2;
-	return c;
+	반환 c;
     }
-    if ((p[2] & 0xc0) != 0x80)
+    만약 ((p[2] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	반환 p[0];
     }
 
     c = ((p[0] & 0x0f) << 12) + ((p[1] & 0x3f) << 6) + (p[2] & 0x3f);
-    if (len == 3)
+    만약 (len == 3)
     {
 	*lenp = 3;
-	return c;
+	반환 c;
     }
-    if ((p[3] & 0xc0) != 0x80)
+    만약 ((p[3] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	반환 p[0];
     }
 
     c = ((p[0] & 0x07) << 18) + ((p[1] & 0x3f) << 12)
 				 + ((p[2] & 0x3f) << 6) + (p[3] & 0x3f);
-    if (len == 4)
+    만약 (len == 4)
     {
 	*lenp = 4;
-	return c;
+	반환 c;
     }
-    if ((p[4] & 0xc0) != 0x80)
+    만약 ((p[4] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	반환 p[0];
     }
 
     c = ((p[0] & 0x03) << 24) + ((p[1] & 0x3f) << 18)
 				+ ((p[2] & 0x3f) << 12)
 				+ ((p[3] & 0x3f) << 6) + (p[4] & 0x3f);
-    if (len == 5)
+    만약 (len == 5)
     {
 	*lenp = 5;
-	return c;
+	반환 c;
     }
-    if ((p[5] & 0xc0) != 0x80)
+    만약 ((p[5] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	반환 p[0];
     }
 
     *lenp = 6;
-    return ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
+    반환 ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
 				+ ((p[2] & 0x3f) << 18)
 				+ ((p[3] & 0x3f) << 12)
 				+ ((p[4] & 0x3f) << 6) + (p[5] & 0x3f);
@@ -1877,119 +1877,119 @@ utf_ptr2char_and_len(char_u *p, int *lenp)
  * Like utf_ptr2char_and_len(), but never reads beyond "size" bytes.
  * For an incomplete sequence "*lenp" is set to the expected length.
  */
-    static inline int
-utf_ptr2char_and_len_len(char_u *p, int size, int *lenp)
+    static inline 정수
+utf_ptr2char_and_len_len(char_u *p, 정수 size, 정수 *lenp)
 {
-    int		len;
-    int		c;
+    정수		len;
+    정수		c;
 
-    if (size < 1)
+    만약 (size < 1)
     {
 	*lenp = 1;
-	return NUL;
+	반환 NUL;
     }
-    if (p[0] < 0x80)
+    만약 (p[0] < 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	반환 p[0];
     }
 
     len = utf8len_tab_zero[p[0]];
-    if (len <= 1)
+    만약 (len <= 1)
     {
 	*lenp = 1;
-	return p[0];
+	반환 p[0];
     }
-    if (len > size)
+    만약 (len > size)
     {
-	int		i;
+	정수		i;
 
 	// Incomplete sequence: validate continuation bytes within range.
-	for (i = 1; i < size; ++i)
-	    if ((p[i] & 0xc0) != 0x80)
+	위해 (i = 1; i < size; ++i)
+	    만약 ((p[i] & 0xc0) != 0x80)
 	    {
 		*lenp = 1;
-		return p[0];
+		반환 p[0];
 	    }
 	*lenp = len;
-	return p[0];
+	반환 p[0];
     }
-    if ((p[1] & 0xc0) != 0x80)
+    만약 ((p[1] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	반환 p[0];
     }
 
     c = ((p[0] & 0x1f) << 6) + (p[1] & 0x3f);
-    if (len == 2)
+    만약 (len == 2)
     {
 	*lenp = 2;
-	return c;
+	반환 c;
     }
-    if ((p[2] & 0xc0) != 0x80)
+    만약 ((p[2] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	반환 p[0];
     }
 
     c = ((p[0] & 0x0f) << 12) + ((p[1] & 0x3f) << 6) + (p[2] & 0x3f);
-    if (len == 3)
+    만약 (len == 3)
     {
 	*lenp = 3;
-	return c;
+	반환 c;
     }
-    if ((p[3] & 0xc0) != 0x80)
+    만약 ((p[3] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	반환 p[0];
     }
 
     c = ((p[0] & 0x07) << 18) + ((p[1] & 0x3f) << 12)
 				 + ((p[2] & 0x3f) << 6) + (p[3] & 0x3f);
-    if (len == 4)
+    만약 (len == 4)
     {
 	*lenp = 4;
-	return c;
+	반환 c;
     }
-    if ((p[4] & 0xc0) != 0x80)
+    만약 ((p[4] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	반환 p[0];
     }
 
     c = ((p[0] & 0x03) << 24) + ((p[1] & 0x3f) << 18)
 				+ ((p[2] & 0x3f) << 12)
 				+ ((p[3] & 0x3f) << 6) + (p[4] & 0x3f);
-    if (len == 5)
+    만약 (len == 5)
     {
 	*lenp = 5;
-	return c;
+	반환 c;
     }
-    if ((p[5] & 0xc0) != 0x80)
+    만약 ((p[5] & 0xc0) != 0x80)
     {
 	*lenp = 1;
-	return p[0];
+	반환 p[0];
     }
 
     *lenp = 6;
-    return ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
+    반환 ((p[0] & 0x01) << 30) + ((p[1] & 0x3f) << 24)
 				+ ((p[2] & 0x3f) << 18)
 				+ ((p[3] & 0x3f) << 12)
 				+ ((p[4] & 0x3f) << 6) + (p[5] & 0x3f);
 }
 
-    static inline int
-utf_iscomposinglike_char(int c1, int c2)
+    static inline 정수
+utf_iscomposinglike_char(정수 c1, 정수 c2)
 {
-    if (utf_iscomposing(c2))
-	return TRUE;
+    만약 (utf_iscomposing(c2))
+	반환 TRUE;
 #ifdef FEAT_ARABIC
-    if (!arabic_maycombine(c2))
-	return FALSE;
-    return arabic_combine(c1, c2);
-#else
+    만약 (!arabic_maycombine(c2))
+	반환 FALSE;
+    반환 arabic_combine(c1, c2);
+#아니면
     (void)c1;
-    return FALSE;
+    반환 FALSE;
 #endif
 }
 
@@ -2000,12 +2000,12 @@ utf_iscomposinglike_char(int c1, int c2)
  * For an overlong sequence this may return zero.
  * Does not include composing characters, of course.
  */
-    int
+    정수
 utf_ptr2char(char_u *p)
 {
-    int		len;
+    정수		len;
 
-    return utf_ptr2char_and_len(p, &len);
+    반환 utf_ptr2char_and_len(p, &len);
 }
 
 /*
@@ -2024,24 +2024,24 @@ utf_ptr2char(char_u *p)
  * If byte sequence is illegal or incomplete, returns -1 and does not advance
  * "s".
  */
-    static int
+    static 정수
 utf_safe_read_char_adv(char_u **s, size_t *n)
 {
-    int		c, k;
+    정수		c, k;
 
-    if (*n == 0) // end of buffer
-	return 0;
+    만약 (*n == 0) // end of buffer
+	반환 0;
 
     k = utf8len_tab_zero[**s];
 
-    if (k == 1)
+    만약 (k == 1)
     {
 	// ASCII character or NUL
 	(*n)--;
-	return *(*s)++;
+	반환 *(*s)++;
     }
 
-    if ((size_t)k <= *n)
+    만약 ((size_t)k <= *n)
     {
 	// We have a multibyte sequence and it isn't truncated by buffer
 	// limits so utf_ptr2char() is safe to use. Or the first byte is
@@ -2053,67 +2053,67 @@ utf_safe_read_char_adv(char_u **s, size_t *n)
 	// which equals the first byte of its own UTF-8 representation is
 	// U+00C3 (UTF-8: 0xC3 0x83), so need to check that special case too.
 	// It's safe even if n=1, else we would have k=2 > n.
-	if (c != (int)(**s) || (c == 0xC3 && (*s)[1] == 0x83))
+	만약 (c != (정수)(**s) || (c == 0xC3 && (*s)[1] == 0x83))
 	{
 	    // byte sequence was successfully decoded
 	    *s += k;
 	    *n -= k;
-	    return c;
+	    반환 c;
 	}
     }
 
     // byte sequence is incomplete or illegal
-    return -1;
+    반환 -1;
 }
 
 /*
  * Get character at **pp and advance *pp to the next character.
  * Note: composing characters are skipped!
  */
-    int
+    정수
 mb_ptr2char_adv(char_u **pp)
 {
-    int		c;
+    정수		c;
 
     c = (*mb_ptr2char)(*pp);
     *pp += (*mb_ptr2len)(*pp);
-    return c;
+    반환 c;
 }
 
 /*
  * Get character at **pp and advance *pp to the next character.
  * Note: composing characters are returned as separate characters.
  */
-    int
+    정수
 mb_cptr2char_adv(char_u **pp)
 {
-    int		c;
+    정수		c;
 
     c = (*mb_ptr2char)(*pp);
-    if (enc_utf8)
+    만약 (enc_utf8)
 	*pp += utf_ptr2len(*pp);
-    else
+    아니면
 	*pp += (*mb_ptr2len)(*pp);
-    return c;
+    반환 c;
 }
 
-#if defined(FEAT_ARABIC)
+#만약 defined(FEAT_ARABIC)
 /*
  * Check if the character pointed to by "p2" is a composing character when it
  * comes after "p1".  For Arabic sometimes "ab" is replaced with "c", which
  * behaves like a composing character.
  */
-    int
+    정수
 utf_composinglike(char_u *p1, char_u *p2)
 {
-    int		c2;
+    정수		c2;
 
     c2 = utf_ptr2char(p2);
-    if (utf_iscomposing(c2))
-	return TRUE;
-    if (!arabic_maycombine(c2))
-	return FALSE;
-    return arabic_combine(utf_ptr2char(p1), c2);
+    만약 (utf_iscomposing(c2))
+	반환 TRUE;
+    만약 (!arabic_maycombine(c2))
+	반환 FALSE;
+    반환 arabic_combine(utf_ptr2char(p1), c2);
 }
 #endif
 
@@ -2121,88 +2121,88 @@ utf_composinglike(char_u *p1, char_u *p2)
  * Convert a UTF-8 byte string to a wide character.  Also get up to MAX_MCO
  * composing characters.
  */
-    int
+    정수
 utfc_ptr2char(
     char_u	*p,
-    int		*pcc)	// return: composing chars, last one is 0
+    정수		*pcc)	// return: composing chars, last one is 0
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
-    int		i = 0;
+    정수		len;
+    정수		c;
+    정수		cc;
+    정수		cc_len;
+    정수		i = 0;
 
     c = utf_ptr2char_and_len(p, &len);
 
     // Only accept a composing char when the first char isn't illegal.
-    if ((len > 1 || *p < 0x80) && p[len] >= 0x80)
+    만약 ((len > 1 || *p < 0x80) && p[len] >= 0x80)
     {
 	cc = utf_ptr2char_and_len(p + len, &cc_len);
-	if (utf_iscomposinglike_char(c, cc))
+	만약 (utf_iscomposinglike_char(c, cc))
 	{
-	    for (;;)
+	    위해 (;;)
 	    {
 		pcc[i++] = cc;
-		if (i == MAX_MCO)
+		만약 (i == MAX_MCO)
 		    break;
 		len += cc_len;
-		if (p[len] < 0x80)
+		만약 (p[len] < 0x80)
 		    break;
 		cc = utf_ptr2char_and_len(p + len, &cc_len);
-		if (!utf_iscomposing(cc))
+		만약 (!utf_iscomposing(cc))
 		    break;
 	    }
 	}
     }
 
-    if (i < MAX_MCO)	// last composing char must be 0
+    만약 (i < MAX_MCO)	// last composing char must be 0
 	pcc[i] = 0;
 
-    return c;
+    반환 c;
 }
 
 /*
  * Convert a UTF-8 byte string to a wide character.  Also get up to MAX_MCO
  * composing characters.  Use no more than p[maxlen].
  */
-    int
+    정수
 utfc_ptr2char_len(
     char_u	*p,
-    int		*pcc,	// return: composing chars, last one is 0
-    int		maxlen)
+    정수		*pcc,	// return: composing chars, last one is 0
+    정수		maxlen)
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
-    int		i = 0;
+    정수		len;
+    정수		c;
+    정수		cc;
+    정수		cc_len;
+    정수		i = 0;
 
     c = utf_ptr2char_and_len_len(p, maxlen, &len);
     // Only accept a composing char when the first char isn't illegal.
-    if ((len > 1 || *p < 0x80) && len < maxlen && p[len] >= 0x80)
+    만약 ((len > 1 || *p < 0x80) && len < maxlen && p[len] >= 0x80)
     {
 	cc = utf_ptr2char_and_len_len(p + len, maxlen - len, &cc_len);
-	if (cc_len <= maxlen - len && utf_iscomposinglike_char(c, cc))
+	만약 (cc_len <= maxlen - len && utf_iscomposinglike_char(c, cc))
 	{
-	    for (;;)
+	    위해 (;;)
 	    {
 		pcc[i++] = cc;
-		if (i == MAX_MCO)
+		만약 (i == MAX_MCO)
 		    break;
 		len += cc_len;
-		if (len >= maxlen || p[len] < 0x80)
+		만약 (len >= maxlen || p[len] < 0x80)
 		    break;
 		cc = utf_ptr2char_and_len_len(p + len, maxlen - len, &cc_len);
-		if (cc_len > maxlen - len || !utf_iscomposing(cc))
+		만약 (cc_len > maxlen - len || !utf_iscomposing(cc))
 		    break;
 	    }
 	}
     }
 
-    if (i < MAX_MCO)	// last composing char must be 0
+    만약 (i < MAX_MCO)	// last composing char must be 0
 	pcc[i] = 0;
 
-    return c;
+    반환 c;
 }
 
 /*
@@ -2212,20 +2212,20 @@ utfc_ptr2char_len(
  * Only to be used when ScreenLinesUC[off] != 0.
  * Returns the produced number of bytes.
  */
-    int
-utfc_char2bytes(int off, char_u *buf)
+    정수
+utfc_char2bytes(정수 off, char_u *buf)
 {
-    int		len;
-    int		i;
+    정수		len;
+    정수		i;
 
     len = utf_char2bytes(ScreenLinesUC[off], buf);
-    for (i = 0; i < Screen_mco; ++i)
+    위해 (i = 0; i < Screen_mco; ++i)
     {
-	if (ScreenLinesC[i][off] == 0)
+	만약 (ScreenLinesC[i][off] == 0)
 	    break;
 	len += utf_char2bytes(ScreenLinesC[i][off], buf + len);
     }
-    return len;
+    반환 len;
 }
 
 /*
@@ -2234,13 +2234,13 @@ utfc_char2bytes(int off, char_u *buf)
  * Returns 0 for "".
  * Returns 1 for an illegal byte sequence.
  */
-    int
+    정수
 utf_ptr2len(char_u *p)
 {
-    int		len;
+    정수		len;
 
     utf_ptr2char_and_len(p, &len);
-    return len;
+    반환 len;
 }
 
 /*
@@ -2248,10 +2248,10 @@ utf_ptr2len(char_u *p)
  * "b" must be between 0 and 255!
  * Returns 1 for an invalid first byte value.
  */
-    int
-utf_byte2len(int b)
+    정수
+utf_byte2len(정수 b)
 {
-    return utf8len_tab[b];
+    반환 utf8len_tab[b];
 }
 
 /*
@@ -2259,10 +2259,10 @@ utf_byte2len(int b)
  * "b" must be between 0 and 255!
  * Returns 0 for an invalid first byte value.
  */
-    int
-utf_byte2len_zero(int b)
+    정수
+utf_byte2len_zero(정수 b)
 {
-    return utf8len_tab_zero[b];
+    반환 utf8len_tab_zero[b];
 }
 
 /*
@@ -2273,13 +2273,13 @@ utf_byte2len_zero(int b)
  * Returns number > "size" for an incomplete byte sequence.
  * Never returns zero.
  */
-    int
-utf_ptr2len_len(char_u *p, int size)
+    정수
+utf_ptr2len_len(char_u *p, 정수 size)
 {
-    int		len;
+    정수		len;
 
     utf_ptr2char_and_len_len(p, size, &len);
-    return len;
+    반환 len;
 }
 
 /*
@@ -2287,47 +2287,47 @@ utf_ptr2len_len(char_u *p, int size)
  * This includes following composing characters.
  * Returns zero for NUL.
  */
-    int
+    정수
 utfc_ptr2len(char_u *p)
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
-    int		b0 = *p;
+    정수		len;
+    정수		c;
+    정수		cc;
+    정수		cc_len;
+    정수		b0 = *p;
 
-    if (b0 == NUL)
-	return 0;
-    if (b0 < 0x80 && p[1] < 0x80)	// be quick for ASCII
-	return 1;
+    만약 (b0 == NUL)
+	반환 0;
+    만약 (b0 < 0x80 && p[1] < 0x80)	// be quick for ASCII
+	반환 1;
 
     // Skip over first UTF-8 char, stopping at a NUL byte.
     c = utf_ptr2char_and_len(p, &len);
 
     // Check for illegal byte.
-    if (len == 1 && b0 >= 0x80)
-	return 1;
+    만약 (len == 1 && b0 >= 0x80)
+	반환 1;
 
     /*
      * Check for composing characters.  We can handle only the first six, but
      * skip all of them (otherwise the cursor would get stuck).
      */
-    if (p[len] < 0x80)
-	return len;
+    만약 (p[len] < 0x80)
+	반환 len;
 
     cc = utf_ptr2char_and_len(p + len, &cc_len);
-    if (!utf_iscomposinglike_char(c, cc))
-	return len;
+    만약 (!utf_iscomposinglike_char(c, cc))
+	반환 len;
 
-    for (;;)
+    위해 (;;)
     {
 	// Skip over composing char
 	len += cc_len;
-	if (p[len] < 0x80)
-	    return len;
+	만약 (p[len] < 0x80)
+	    반환 len;
 	cc = utf_ptr2char_and_len(p + len, &cc_len);
-	if (!utf_iscomposing(cc))
-	    return len;
+	만약 (!utf_iscomposing(cc))
+	    반환 len;
     }
 }
 
@@ -2337,113 +2337,113 @@ utfc_ptr2len(char_u *p)
  * Returns 0 for an empty string.
  * Returns 1 for an illegal char or an incomplete byte sequence.
  */
-    int
-utfc_ptr2len_len(char_u *p, int size)
+    정수
+utfc_ptr2len_len(char_u *p, 정수 size)
 {
-    int		len;
-    int		c;
-    int		cc;
-    int		cc_len;
+    정수		len;
+    정수		c;
+    정수		cc;
+    정수		cc_len;
 
-    if (size < 1 || *p == NUL)
-	return 0;
-    if (p[0] < 0x80 && (size == 1 || p[1] < 0x80)) // be quick for ASCII
-	return 1;
+    만약 (size < 1 || *p == NUL)
+	반환 0;
+    만약 (p[0] < 0x80 && (size == 1 || p[1] < 0x80)) // be quick for ASCII
+	반환 1;
 
     // Skip over first UTF-8 char, stopping at a NUL byte.
     c = utf_ptr2char_and_len_len(p, size, &len);
 
     // Check for illegal byte and incomplete byte sequence.
-    if ((len == 1 && p[0] >= 0x80) || len > size)
-	return 1;
+    만약 ((len == 1 && p[0] >= 0x80) || len > size)
+	반환 1;
 
     /*
      * Check for composing characters.  We can handle only the first six, but
      * skip all of them (otherwise the cursor would get stuck).
      */
-    if (len >= size || p[len] < 0x80)
-	return len;
+    만약 (len >= size || p[len] < 0x80)
+	반환 len;
 
     cc = utf_ptr2char_and_len_len(p + len, size - len, &cc_len);
-    if (cc_len > size - len || !utf_iscomposinglike_char(c, cc))
-	return len;
+    만약 (cc_len > size - len || !utf_iscomposinglike_char(c, cc))
+	반환 len;
 
-    while (len < size)
+    동안 (len < size)
     {
 	// Skip over composing char
 	len += cc_len;
-	if (len >= size || p[len] < 0x80)
+	만약 (len >= size || p[len] < 0x80)
 	    break;
 	cc = utf_ptr2char_and_len_len(p + len, size - len, &cc_len);
-	if (cc_len > size - len)
+	만약 (cc_len > size - len)
 	    break;
-	if (!utf_iscomposing(cc))
+	만약 (!utf_iscomposing(cc))
 	    break;
     }
-    return len;
+    반환 len;
 }
 
 /*
  * Return the number of bytes the UTF-8 encoding of character "c" takes.
  * This does not include composing characters.
  */
-    int
-utf_char2len(int c)
+    정수
+utf_char2len(정수 c)
 {
-    if (c < 0x80)
-	return 1;
-    if (c < 0x800)
-	return 2;
-    if (c < 0x10000)
-	return 3;
-    if (c < 0x200000)
-	return 4;
-    if (c < 0x4000000)
-	return 5;
-    return 6;
+    만약 (c < 0x80)
+	반환 1;
+    만약 (c < 0x800)
+	반환 2;
+    만약 (c < 0x10000)
+	반환 3;
+    만약 (c < 0x200000)
+	반환 4;
+    만약 (c < 0x4000000)
+	반환 5;
+    반환 6;
 }
 
 /*
  * Convert Unicode character "c" to UTF-8 string in "buf[]".
  * Returns the number of bytes.
  */
-    int
-utf_char2bytes(int c, char_u *buf)
+    정수
+utf_char2bytes(정수 c, char_u *buf)
 {
-    if (c < 0x80)		// 7 bits
+    만약 (c < 0x80)		// 7 bits
     {
 	buf[0] = c;
-	return 1;
+	반환 1;
     }
-    if (c < 0x800)		// 11 bits
+    만약 (c < 0x800)		// 11 bits
     {
 	buf[0] = 0xc0 + ((unsigned)c >> 6);
 	buf[1] = 0x80 + (c & 0x3f);
-	return 2;
+	반환 2;
     }
-    if (c < 0x10000)		// 16 bits
+    만약 (c < 0x10000)		// 16 bits
     {
 	buf[0] = 0xe0 + ((unsigned)c >> 12);
 	buf[1] = 0x80 + (((unsigned)c >> 6) & 0x3f);
 	buf[2] = 0x80 + (c & 0x3f);
-	return 3;
+	반환 3;
     }
-    if (c < 0x200000)		// 21 bits
+    만약 (c < 0x200000)		// 21 bits
     {
 	buf[0] = 0xf0 + ((unsigned)c >> 18);
 	buf[1] = 0x80 + (((unsigned)c >> 12) & 0x3f);
 	buf[2] = 0x80 + (((unsigned)c >> 6) & 0x3f);
 	buf[3] = 0x80 + (c & 0x3f);
-	return 4;
+	반환 4;
     }
-    if (c < 0x4000000)		// 26 bits
+    만약 (c < 0x4000000)		// 26 bits
     {
 	buf[0] = 0xf8 + ((unsigned)c >> 24);
 	buf[1] = 0x80 + (((unsigned)c >> 18) & 0x3f);
 	buf[2] = 0x80 + (((unsigned)c >> 12) & 0x3f);
 	buf[3] = 0x80 + (((unsigned)c >> 6) & 0x3f);
 	buf[4] = 0x80 + (c & 0x3f);
-	return 5;
+	반환 5;
     }
 				// 31 bits
     buf[0] = 0xfc + ((unsigned)c >> 30);
@@ -2452,17 +2452,17 @@ utf_char2bytes(int c, char_u *buf)
     buf[3] = 0x80 + (((unsigned)c >> 12) & 0x3f);
     buf[4] = 0x80 + (((unsigned)c >> 6) & 0x3f);
     buf[5] = 0x80 + (c & 0x3f);
-    return 6;
+    반환 6;
 }
 
-#if defined(FEAT_TERMINAL)
+#만약 defined(FEAT_TERMINAL)
 /*
  * utf_iscomposing() with different argument type for libvterm.
  */
-    int
+    정수
 utf_iscomposing_uint(UINT32_T c)
 {
-    return utf_iscomposing((int)c);
+    반환 utf_iscomposing((정수)c);
 }
 #endif
 
@@ -2471,8 +2471,8 @@ utf_iscomposing_uint(UINT32_T c)
  * drawn on top of the preceding character.
  * Based on code from Markus Kuhn.
  */
-    int
-utf_iscomposing(int c)
+    정수
+utf_iscomposing(정수 c)
 {
     // Sorted list of non-overlapping intervals.
     // Generated by ../runtime/tools/unicode.vim.
@@ -2834,15 +2834,15 @@ utf_iscomposing(int c)
 	{0xe0100, 0xe01ef}
     };
 
-    return intable(combining, sizeof(combining), c);
+    반환 intable(combining, sizeof(combining), c);
 }
 
 /*
  * Return TRUE for characters that can be displayed in a normal way.
  * Only for characters of 0x100 and above!
  */
-    int
-utf_printable(int c)
+    정수
+utf_printable(정수 c)
 {
     // Sorted list of non-overlapping intervals.
     // 0xd800-0xdfff is reserved for UTF-16, actually illegal.
@@ -2853,7 +2853,7 @@ utf_printable(int c)
 	{0xfffe, 0xffff}
     };
 
-    return !intable(nonprint, sizeof(nonprint), c);
+    반환 !intable(nonprint, sizeof(nonprint), c);
 }
 
 // Sorted list of non-overlapping intervals of all Emoji characters,
@@ -3016,21 +3016,21 @@ static struct interval emoji_all[] =
  * 1: punctuation
  * 2 or bigger: some class of word character.
  */
-    int
-utf_class(int c)
+    정수
+utf_class(정수 c)
 {
-    return utf_class_buf(c, curbuf);
+    반환 utf_class_buf(c, curbuf);
 }
 
-    int
-utf_class_buf(int c, buf_T *buf)
+    정수
+utf_class_buf(정수 c, buf_T *buf)
 {
     // sorted list of non-overlapping intervals
     static struct clinterval
     {
-	unsigned int first;
-	unsigned int last;
-	unsigned int class;
+	unsigned 정수 first;
+	unsigned 정수 last;
+	unsigned 정수 class;
     } classes[] =
     {
 	{0x037e, 0x037e, 1},		// Greek question mark
@@ -3106,44 +3106,44 @@ utf_class_buf(int c, buf_T *buf)
 	{0x2f800, 0x2fa1f, 0x4e00},	// CJK Ideographs
     };
 
-    int bot = 0;
-    int top = ARRAY_LENGTH(classes) - 1;
-    int mid;
+    정수 bot = 0;
+    정수 top = ARRAY_LENGTH(classes) - 1;
+    정수 mid;
 
     // First quick check for Latin1 characters, use 'iskeyword'.
-    if (c < 0x100)
+    만약 (c < 0x100)
     {
-	if (c == ' ' || c == '\t' || c == NUL || c == 0xa0)
-	    return 0;	    // blank
-	if (vim_iswordc_buf(c, buf))
-	    return 2;	    // word character
-	return 1;	    // punctuation
+	만약 (c == ' ' || c == '\t' || c == NUL || c == 0xa0)
+	    반환 0;	    // blank
+	만약 (vim_iswordc_buf(c, buf))
+	    반환 2;	    // word character
+	반환 1;	    // punctuation
     }
 
     // emoji
-    if (intable(emoji_all, sizeof(emoji_all), c))
-	return 3;
+    만약 (intable(emoji_all, sizeof(emoji_all), c))
+	반환 3;
 
     // binary search in table
-    while (top >= bot)
+    동안 (top >= bot)
     {
 	mid = (bot + top) / 2;
-	if (classes[mid].last < (unsigned int)c)
+	만약 (classes[mid].last < (unsigned 정수)c)
 	    bot = mid + 1;
-	else if (classes[mid].first > (unsigned int)c)
+	아니면 만약 (classes[mid].first > (unsigned 정수)c)
 	    top = mid - 1;
-	else
-	    return (int)classes[mid].class;
+	아니면
+	    반환 (정수)classes[mid].class;
     }
 
     // most other characters are "word" characters
-    return 2;
+    반환 2;
 }
 
-    int
-utf_ambiguous_width(int c)
+    정수
+utf_ambiguous_width(정수 c)
 {
-    return c >= 0x80 && (intable(ambiguous, sizeof(ambiguous), c)
+    반환 c >= 0x80 && (intable(ambiguous, sizeof(ambiguous), c)
 	    || intable(emoji_all, sizeof(emoji_all), c));
 }
 
@@ -3163,10 +3163,10 @@ utf_ambiguous_width(int c)
  */
 typedef struct
 {
-    int rangeStart;
-    int rangeEnd;
-    int step;
-    int offset;
+    정수 rangeStart;
+    정수 rangeEnd;
+    정수 step;
+    정수 offset;
 } convertStruct;
 
 static convertStruct foldCase[] =
@@ -3384,46 +3384,46 @@ static convertStruct foldCase[] =
  * Return the converted equivalent of "a", which is a UCS-4 character.  Use
  * the given conversion "table".  Uses binary search on "table".
  */
-    static int
+    static 정수
 utf_convert(
-    int			a,
+    정수			a,
     convertStruct	table[],
-    int			tableSize)
+    정수			tableSize)
 {
-    int start, mid, end; // indices into table
-    int entries = tableSize / sizeof(convertStruct);
+    정수 start, mid, end; // indices into table
+    정수 entries = tableSize / sizeof(convertStruct);
 
     start = 0;
     end = entries;
-    while (start < end)
+    동안 (start < end)
     {
 	// need to search further
 	mid = (end + start) / 2;
-	if (table[mid].rangeEnd < a)
+	만약 (table[mid].rangeEnd < a)
 	    start = mid + 1;
-	else
+	아니면
 	    end = mid;
     }
-    if (start < entries
+    만약 (start < entries
 	    && table[start].rangeStart <= a
 	    && a <= table[start].rangeEnd
 	    && (a - table[start].rangeStart) % table[start].step == 0)
-	return (a + table[start].offset);
-    else
-	return a;
+	반환 (a + table[start].offset);
+    아니면
+	반환 a;
 }
 
 /*
  * Return the folded-case equivalent of "a", which is a UCS-4 character.  Uses
  * simple case folding.
  */
-    int
-utf_fold(int a)
+    정수
+utf_fold(정수 a)
 {
-    if (a < 0x80)
+    만약 (a < 0x80)
 	// be fast for ASCII
-	return a >= 0x41 && a <= 0x5a ? a + 32 : a;
-    return utf_convert(a, foldCase, (int)sizeof(foldCase));
+	반환 a >= 0x41 && a <= 0x5a ? a + 32 : a;
+    반환 utf_convert(a, foldCase, (정수)sizeof(foldCase));
 }
 
 static convertStruct toLower[] =
@@ -3821,99 +3821,99 @@ static convertStruct toUpper[] =
  * Return the upper-case equivalent of "a", which is a UCS-4 character.  Use
  * simple case folding.
  */
-    int
-utf_toupper(int a)
+    정수
+utf_toupper(정수 a)
 {
     // If 'casemap' contains "keepascii" use ASCII style toupper().
-    if (a < 128 && (cmp_flags & CMP_KEEPASCII))
-	return TOUPPER_ASC(a);
+    만약 (a < 128 && (cmp_flags & CMP_KEEPASCII))
+	반환 TOUPPER_ASC(a);
 
-#if defined(HAVE_TOWUPPER) && defined(__STDC_ISO_10646__)
+#만약 defined(HAVE_TOWUPPER) && defined(__STDC_ISO_10646__)
     // If towupper() is available and handles Unicode, use it.
-    if (!(cmp_flags & CMP_INTERNAL))
-	return towupper(a);
+    만약 (!(cmp_flags & CMP_INTERNAL))
+	반환 towupper(a);
 #endif
 
     // For characters below 128 use locale sensitive toupper().
-    if (a < 128)
-	return TOUPPER_LOC(a);
+    만약 (a < 128)
+	반환 TOUPPER_LOC(a);
 
     // For any other characters use the above mapping table.
-    return utf_convert(a, toUpper, (int)sizeof(toUpper));
+    반환 utf_convert(a, toUpper, (정수)sizeof(toUpper));
 }
 
-    int
-utf_islower(int a)
+    정수
+utf_islower(정수 a)
 {
     // German sharp s is lower case but has no upper case equivalent.
-    return (utf_toupper(a) != a) || a == 0xdf;
+    반환 (utf_toupper(a) != a) || a == 0xdf;
 }
 
 /*
  * Return the lower-case equivalent of "a", which is a UCS-4 character.  Use
  * simple case folding.
  */
-    int
-utf_tolower(int a)
+    정수
+utf_tolower(정수 a)
 {
     // If 'casemap' contains "keepascii" use ASCII style tolower().
-    if (a < 128 && (cmp_flags & CMP_KEEPASCII))
-	return TOLOWER_ASC(a);
+    만약 (a < 128 && (cmp_flags & CMP_KEEPASCII))
+	반환 TOLOWER_ASC(a);
 
-#if defined(HAVE_TOWLOWER) && defined(__STDC_ISO_10646__)
+#만약 defined(HAVE_TOWLOWER) && defined(__STDC_ISO_10646__)
     // If towlower() is available and handles Unicode, use it.
-    if (!(cmp_flags & CMP_INTERNAL))
-	return towlower(a);
+    만약 (!(cmp_flags & CMP_INTERNAL))
+	반환 towlower(a);
 #endif
 
     // For characters below 128 use locale sensitive tolower().
-    if (a < 128)
-	return TOLOWER_LOC(a);
+    만약 (a < 128)
+	반환 TOLOWER_LOC(a);
 
     // For any other characters use the above mapping table.
-    return utf_convert(a, toLower, (int)sizeof(toLower));
+    반환 utf_convert(a, toLower, (정수)sizeof(toLower));
 }
 
-    int
-utf_isupper(int a)
+    정수
+utf_isupper(정수 a)
 {
-    return (utf_tolower(a) != a);
+    반환 (utf_tolower(a) != a);
 }
 
-    static int
+    static 정수
 utf_strnicmp(
     char_u      *s1,
     char_u      *s2,
     size_t      n1,
     size_t      n2)
 {
-    int		c1, c2, cdiff;
+    정수		c1, c2, cdiff;
     char_u	buffer[6];
 
-    for (;;)
+    위해 (;;)
     {
 	c1 = utf_safe_read_char_adv(&s1, &n1);
 	c2 = utf_safe_read_char_adv(&s2, &n2);
 
-	if (c1 <= 0 || c2 <= 0)
+	만약 (c1 <= 0 || c2 <= 0)
 	    break;
 
-	if (c1 == c2)
+	만약 (c1 == c2)
 	    continue;
 
 	cdiff = utf_fold(c1) - utf_fold(c2);
-	if (cdiff != 0)
-	    return cdiff;
+	만약 (cdiff != 0)
+	    반환 cdiff;
     }
 
     // some string ended or has an incomplete/illegal character sequence
 
-    if (c1 == 0 || c2 == 0)
+    만약 (c1 == 0 || c2 == 0)
     {
 	// some string ended. shorter string is smaller
-	if (c1 == 0 && c2 == 0)
-	    return 0;
-	return c1 == 0 ? -1 : 1;
+	만약 (c1 == 0 && c2 == 0)
+	    반환 0;
+	반환 c1 == 0 ? -1 : 1;
     }
 
     // Continue with bytewise comparison to produce some result that
@@ -3923,22 +3923,22 @@ utf_strnicmp(
     // folded version of the other string. In this case it is enough
     // to fold just one character to determine the result of comparison.
 
-    if (c1 != -1 && c2 == -1)
+    만약 (c1 != -1 && c2 == -1)
     {
 	n1 = utf_char2bytes(utf_fold(c1), buffer);
 	s1 = buffer;
     }
-    else if (c2 != -1 && c1 == -1)
+    아니면 만약 (c2 != -1 && c1 == -1)
     {
 	n2 = utf_char2bytes(utf_fold(c2), buffer);
 	s2 = buffer;
     }
 
-    while (n1 > 0 && n2 > 0 && *s1 != NUL && *s2 != NUL)
+    동안 (n1 > 0 && n2 > 0 && *s1 != NUL && *s2 != NUL)
     {
-	cdiff = (int)(*s1) - (int)(*s2);
-	if (cdiff != 0)
-	    return cdiff;
+	cdiff = (정수)(*s1) - (정수)(*s2);
+	만약 (cdiff != 0)
+	    반환 cdiff;
 
 	s1++;
 	s2++;
@@ -3946,14 +3946,14 @@ utf_strnicmp(
 	n2--;
     }
 
-    if (n1 > 0 && *s1 == NUL)
+    만약 (n1 > 0 && *s1 == NUL)
 	n1 = 0;
-    if (n2 > 0 && *s2 == NUL)
+    만약 (n2 > 0 && *s2 == NUL)
 	n2 = 0;
 
-    if (n1 == 0 && n2 == 0)
-	return 0;
-    return n1 == 0 ? -1 : 1;
+    만약 (n1 == 0 && n2 == 0)
+	반환 0;
+    반환 n1 == 0 ? -1 : 1;
 }
 
 /*
@@ -3964,56 +3964,56 @@ utf_strnicmp(
  * Returns zero if s1 and s2 are equal (ignoring case), the difference between
  * two characters otherwise.
  */
-    int
+    정수
 mb_strnicmp2(char_u *s1, char_u *s2, size_t n1, size_t n2)
 {
-    if (n1 == n2 || !enc_utf8)
-	return mb_strnicmp(s1, s2, n1);
-    else
-	return utf_strnicmp(s1, s2, n1, n2);
+    만약 (n1 == n2 || !enc_utf8)
+	반환 mb_strnicmp(s1, s2, n1);
+    아니면
+	반환 utf_strnicmp(s1, s2, n1, n2);
 }
 
-    int
+    정수
 mb_strnicmp(char_u *s1, char_u *s2, size_t nn)
 {
-    int		i, l;
-    int		cdiff;
-    int		n = (int)nn;
+    정수		i, l;
+    정수		cdiff;
+    정수		n = (정수)nn;
 
-    if (enc_utf8)
+    만약 (enc_utf8)
     {
-	return utf_strnicmp(s1, s2, nn, nn);
+	반환 utf_strnicmp(s1, s2, nn, nn);
     }
-    else
+    아니면
     {
-	for (i = 0; i < n; i += l)
+	위해 (i = 0; i < n; i += l)
 	{
-	    if (s1[i] == NUL && s2[i] == NUL)	// both strings end
-		return 0;
+	    만약 (s1[i] == NUL && s2[i] == NUL)	// both strings end
+		반환 0;
 
 	    l = (*mb_ptr2len)(s1 + i);
-	    if (l <= 1)
+	    만약 (l <= 1)
 	    {
 		// Single byte: first check normally, then with ignore case.
-		if (s1[i] != s2[i])
+		만약 (s1[i] != s2[i])
 		{
 		    cdiff = MB_TOLOWER(s1[i]) - MB_TOLOWER(s2[i]);
-		    if (cdiff != 0)
-			return cdiff;
+		    만약 (cdiff != 0)
+			반환 cdiff;
 		}
 	    }
-	    else
+	    아니면
 	    {
 		// For non-Unicode multi-byte don't ignore case.
-		if (l > n - i)
+		만약 (l > n - i)
 		    l = n - i;
 		cdiff = STRNCMP(s1 + i, s2 + i, l);
-		if (cdiff != 0)
-		    return cdiff;
+		만약 (cdiff != 0)
+		    반환 cdiff;
 	    }
 	}
     }
-    return 0;
+    반환 0;
 }
 
 /*
@@ -4023,29 +4023,29 @@ mb_strnicmp(char_u *s1, char_u *s2, size_t nn)
     void
 show_utf8(void)
 {
-    int		len;
-    int		rlen = 0;
+    정수		len;
+    정수		rlen = 0;
     char_u	*line;
-    int		clen;
-    int		i;
+    정수		clen;
+    정수		i;
 
     // Get the byte length of the char under the cursor, including composing
     // characters.
     line = ml_get_cursor();
     len = utfc_ptr2len(line);
-    if (len == 0)
+    만약 (len == 0)
     {
 	msg("NUL");
-	return;
+	반환;
     }
 
     clen = 0;
-    for (i = 0; i < len; ++i)
+    위해 (i = 0; i < len; ++i)
     {
-	if (clen == 0)
+	만약 (clen == 0)
 	{
 	    // start of (composing) character, get its length
-	    if (i > 0)
+	    만약 (i > 0)
 	    {
 		STRCPY(IObuff + rlen, "+ ");
 		rlen += 2;
@@ -4055,8 +4055,8 @@ show_utf8(void)
 	sprintf((char *)IObuff + rlen, "%02x ",
 		(line[i] == NL) ? NUL : line[i]);  // NUL is stored as NL
 	--clen;
-	rlen += (int)STRLEN(IObuff + rlen);
-	if (rlen > IOSIZE - 20)
+	rlen += (정수)STRLEN(IObuff + rlen);
+	만약 (rlen > IOSIZE - 20)
 	    break;
     }
 
@@ -4069,35 +4069,35 @@ show_utf8(void)
  * If "p" points to the NUL at the end of the string return 0.
  * Returns 0 when already at the first byte of a character.
  */
-    int
+    정수
 latin_head_off(char_u *base UNUSED, char_u *p UNUSED)
 {
-    return 0;
+    반환 0;
 }
 
-    static int
+    static 정수
 dbcs_head_off(char_u *base, char_u *p)
 {
     char_u	*q;
 
     // It can't be a trailing byte when not using DBCS, at the start of the
     // string or the previous byte can't start a double-byte.
-    if (p <= base || MB_BYTE2LEN(p[-1]) == 1 || *p == NUL)
-	return 0;
+    만약 (p <= base || MB_BYTE2LEN(p[-1]) == 1 || *p == NUL)
+	반환 0;
 
     // This is slow: need to start at the base and go forward until the
     // byte we are looking for.  Return 1 when we went past it, 0 otherwise.
     q = base;
-    while (q < p)
+    동안 (q < p)
 	q += dbcs_ptr2len(q);
-    return (q == p) ? 0 : 1;
+    반환 (q == p) ? 0 : 1;
 }
 
 /*
  * Special version of dbcs_head_off() that works for ScreenLines[], where
  * single-width DBCS_JPNU characters are stored separately.
  */
-    int
+    정수
 dbcs_screen_head_off(char_u *base, char_u *p)
 {
     char_u	*q;
@@ -4106,25 +4106,25 @@ dbcs_screen_head_off(char_u *base, char_u *p)
     // string or the previous byte can't start a double-byte.
     // For euc-jp an 0x8e byte in the previous cell always means we have a
     // lead byte in the current cell.
-    if (p <= base
+    만약 (p <= base
 	    || (enc_dbcs == DBCS_JPNU && p[-1] == 0x8e)
 	    || MB_BYTE2LEN(p[-1]) == 1
 	    || *p == NUL)
-	return 0;
+	반환 0;
 
     // This is slow: need to start at the base and go forward until the
     // byte we are looking for.  Return 1 when we went past it, 0 otherwise.
     // For DBCS_JPNU look out for 0x8e, which means the second byte is not
     // stored as the next byte.
     q = base;
-    while (q < p)
+    동안 (q < p)
     {
-	if (enc_dbcs == DBCS_JPNU && *q == 0x8e)
+	만약 (enc_dbcs == DBCS_JPNU && *q == 0x8e)
 	    ++q;
-	else
+	아니면
 	    q += dbcs_ptr2len(q);
     }
-    return (q == p) ? 0 : 1;
+    반환 (q == p) ? 0 : 1;
 }
 
 /*
@@ -4132,69 +4132,69 @@ dbcs_screen_head_off(char_u *base, char_u *p)
  * characters.  "base" must be the start of the string, which must be NUL
  * terminated.
  */
-    int
+    정수
 utf_head_off(char_u *base, char_u *p)
 {
     char_u	*q;
     char_u	*s;
-    int		c;
-    int		len;
+    정수		c;
+    정수		len;
 #ifdef FEAT_ARABIC
     char_u	*j;
 #endif
 
-    if (*p < 0x80)		// be quick for ASCII
-	return 0;
+    만약 (*p < 0x80)		// be quick for ASCII
+	반환 0;
 
     // Skip backwards over trailing bytes: 10xx.xxxx
     // Skip backwards again if on a composing char.
-    for (q = p; ; --q)
+    위해 (q = p; ; --q)
     {
 	// Move s to the last byte of this char.
-	for (s = q; (s[1] & 0xc0) == 0x80; ++s)
+	위해 (s = q; (s[1] & 0xc0) == 0x80; ++s)
 	    ;
 	// Move q to the first byte of this char.
-	while (q > base && (*q & 0xc0) == 0x80)
+	동안 (q > base && (*q & 0xc0) == 0x80)
 	    --q;
 	// Check for illegal sequence. Do allow an illegal byte after where we
 	// started.
 	len = utf8len_tab[*q];
-	if (len != (int)(s - q + 1) && len != (int)(p - q + 1))
-	    return 0;
+	만약 (len != (정수)(s - q + 1) && len != (정수)(p - q + 1))
+	    반환 0;
 
-	if (q <= base)
+	만약 (q <= base)
 	    break;
 
 	c = utf_ptr2char(q);
-	if (utf_iscomposing(c))
+	만약 (utf_iscomposing(c))
 	    continue;
 
 #ifdef FEAT_ARABIC
-	if (arabic_maycombine(c))
+	만약 (arabic_maycombine(c))
 	{
 	    // Advance to get a sneak-peak at the next char
 	    j = q;
 	    --j;
 	    // Move j to the first byte of this char.
-	    while (j > base && (*j & 0xc0) == 0x80)
+	    동안 (j > base && (*j & 0xc0) == 0x80)
 		--j;
-	    if (arabic_combine(utf_ptr2char(j), c))
+	    만약 (arabic_combine(utf_ptr2char(j), c))
 		continue;
 	}
 #endif
 	break;
     }
 
-    return (int)(p - q);
+    반환 (정수)(p - q);
 }
 
 /*
  * Whether space is NOT allowed before/after 'c'.
  */
-    int
-utf_eat_space(int cc)
+    정수
+utf_eat_space(정수 cc)
 {
-    return ((cc >= 0x2000 && cc <= 0x206F)	// General punctuations
+    반환 ((cc >= 0x2000 && cc <= 0x206F)	// General punctuations
 	 || (cc >= 0x2e00 && cc <= 0x2e7f)	// Supplemental punctuations
 	 || (cc >= 0x3000 && cc <= 0x303f)	// CJK symbols and punctuations
 	 || (cc >= 0xff01 && cc <= 0xff0f)	// Full width ASCII punctuations
@@ -4206,10 +4206,10 @@ utf_eat_space(int cc)
 /*
  * Whether line break is allowed before "cc".
  */
-    int
-utf_allow_break_before(int cc)
+    정수
+utf_allow_break_before(정수 cc)
 {
-    static const int BOL_prohibition_punct[] =
+    static const 정수 BOL_prohibition_punct[] =
     {
 	'!',
 	'%',
@@ -4256,32 +4256,32 @@ utf_allow_break_before(int cc)
 	0xff5d, // ｝ fullwidth right curly bracket
     };
 
-    int first = 0;
-    int last  = ARRAY_LENGTH(BOL_prohibition_punct) - 1;
-    int mid   = 0;
+    정수 first = 0;
+    정수 last  = ARRAY_LENGTH(BOL_prohibition_punct) - 1;
+    정수 mid   = 0;
 
-    while (first < last)
+    동안 (first < last)
     {
 	mid = (first + last)/2;
 
-	if (cc == BOL_prohibition_punct[mid])
-	    return FALSE;
-	else if (cc > BOL_prohibition_punct[mid])
+	만약 (cc == BOL_prohibition_punct[mid])
+	    반환 FALSE;
+	아니면 만약 (cc > BOL_prohibition_punct[mid])
 	    first = mid + 1;
-	else
+	아니면
 	    last = mid - 1;
     }
 
-    return cc != BOL_prohibition_punct[first];
+    반환 cc != BOL_prohibition_punct[first];
 }
 
 /*
  * Whether line break is allowed after "cc".
  */
-    static int
-utf_allow_break_after(int cc)
+    static 정수
+utf_allow_break_after(정수 cc)
 {
-    static const int EOL_prohibition_punct[] =
+    static const 정수 EOL_prohibition_punct[] =
     {
 	'(',
 	'<',
@@ -4306,38 +4306,38 @@ utf_allow_break_after(int cc)
 	0xff5b, // ｛ fullwidth left curly bracket
     };
 
-    int first = 0;
-    int last  = ARRAY_LENGTH(EOL_prohibition_punct) - 1;
-    int mid   = 0;
+    정수 first = 0;
+    정수 last  = ARRAY_LENGTH(EOL_prohibition_punct) - 1;
+    정수 mid   = 0;
 
-    while (first < last)
+    동안 (first < last)
     {
 	mid = (first + last)/2;
 
-	if (cc == EOL_prohibition_punct[mid])
-	    return FALSE;
-	else if (cc > EOL_prohibition_punct[mid])
+	만약 (cc == EOL_prohibition_punct[mid])
+	    반환 FALSE;
+	아니면 만약 (cc > EOL_prohibition_punct[mid])
 	    first = mid + 1;
-	else
+	아니면
 	    last = mid - 1;
     }
 
-    return cc != EOL_prohibition_punct[first];
+    반환 cc != EOL_prohibition_punct[first];
 }
 
 /*
  * Whether line break is allowed between "cc" and "ncc".
  */
-    int
-utf_allow_break(int cc, int ncc)
+    정수
+utf_allow_break(정수 cc, 정수 ncc)
 {
     // don't break between two-letter punctuations
-    if (cc == ncc
+    만약 (cc == ncc
 	    && (cc == 0x2014 // em dash
 		|| cc == 0x2026)) // horizontal ellipsis
-	return FALSE;
+	반환 FALSE;
 
-    return utf_allow_break_after(cc) && utf_allow_break_before(ncc);
+    반환 utf_allow_break_after(cc) && utf_allow_break_before(ncc);
 }
 
 /*
@@ -4346,7 +4346,7 @@ utf_allow_break(int cc, int ncc)
     void
 mb_copy_char(char_u **fp, char_u **tp)
 {
-    int	    l = (*mb_ptr2len)(*fp);
+    정수	    l = (*mb_ptr2len)(*fp);
 
     mch_memmove(*tp, *fp, (size_t)l);
     *tp += l;
@@ -4358,15 +4358,15 @@ mb_copy_char(char_u **fp, char_u **tp)
  * at the start of a character 0 is returned, otherwise the offset to the next
  * character.  Can start anywhere in a stream of bytes.
  */
-    int
+    정수
 mb_off_next(char_u *base, char_u *p)
 {
-    int		head_off = (*mb_head_off)(base, p);
+    정수		head_off = (*mb_head_off)(base, p);
 
-    if (head_off == 0)
-	return 0;
+    만약 (head_off == 0)
+	반환 0;
 
-    return (*mb_ptr2len)(p - head_off) - head_off;
+    반환 (*mb_ptr2len)(p - head_off) - head_off;
 }
 
 /*
@@ -4374,36 +4374,36 @@ mb_off_next(char_u *base, char_u *p)
  * into.  Can start anywhere in a stream of bytes.
  * Composing characters are not included.
  */
-    int
+    정수
 mb_tail_off(char_u *base, char_u *p)
 {
-    int		i;
-    int		j;
+    정수		i;
+    정수		j;
 
-    if (*p == NUL)
-	return 0;
+    만약 (*p == NUL)
+	반환 0;
 
-    if (enc_utf8)
+    만약 (enc_utf8)
     {
 	// Find the last character that is 10xx.xxxx
-	for (i = 0; (p[i + 1] & 0xc0) == 0x80; ++i)
+	위해 (i = 0; (p[i + 1] & 0xc0) == 0x80; ++i)
 	    ;
 	// Check for illegal sequence.
-	for (j = 0; p - j > base; ++j)
-	    if ((p[-j] & 0xc0) != 0x80)
+	위해 (j = 0; p - j > base; ++j)
+	    만약 ((p[-j] & 0xc0) != 0x80)
 		break;
-	if (utf8len_tab[p[-j]] != i + j + 1)
-	    return 0;
-	return i;
+	만약 (utf8len_tab[p[-j]] != i + j + 1)
+	    반환 0;
+	반환 i;
     }
 
     // It can't be the first byte if a double-byte when not using DBCS, at the
     // end of the string or the byte can't start a double-byte.
-    if (enc_dbcs == 0 || p[1] == NUL || MB_BYTE2LEN(*p) == 1)
-	return 0;
+    만약 (enc_dbcs == 0 || p[1] == NUL || MB_BYTE2LEN(*p) == 1)
+	반환 0;
 
     // Return 1 when on the lead byte, 0 when on the tail byte.
-    return 1 - dbcs_head_off(base, p);
+    반환 1 - dbcs_head_off(base, p);
 }
 
 /*
@@ -4414,12 +4414,12 @@ utf_find_illegal(void)
 {
     pos_T	pos = curwin->w_cursor;
     char_u	*p;
-    int		len;
+    정수		len;
     vimconv_T	vimconv;
     char_u	*tofree = NULL;
 
     vimconv.vc_type = CONV_NONE;
-    if (enc_utf8 && (enc_canon_props(curbuf->b_p_fenc) & ENC_8BIT))
+    만약 (enc_utf8 && (enc_canon_props(curbuf->b_p_fenc) & ENC_8BIT))
     {
 	// 'encoding' is "utf-8" but we are editing a 8-bit encoded file,
 	// possibly a utf-8 file with illegal bytes.  Setup for conversion
@@ -4428,34 +4428,34 @@ utf_find_illegal(void)
     }
 
     curwin->w_cursor.coladd = 0;
-    for (;;)
+    위해 (;;)
     {
 	p = ml_get_cursor();
-	if (vimconv.vc_type != CONV_NONE)
+	만약 (vimconv.vc_type != CONV_NONE)
 	{
 	    vim_free(tofree);
 	    tofree = string_convert(&vimconv, p, NULL);
-	    if (tofree == NULL)
+	    만약 (tofree == NULL)
 		break;
 	    p = tofree;
 	}
 
-	while (*p != NUL)
+	동안 (*p != NUL)
 	{
 	    // Illegal means that there are not enough trail bytes (checked by
 	    // utf_ptr2len()) or too many of them (overlong sequence).
 	    len = utf_ptr2len(p);
-	    if (*p >= 0x80 && (len == 1
+	    만약 (*p >= 0x80 && (len == 1
 				     || utf_char2len(utf_ptr2char(p)) != len))
 	    {
-		if (vimconv.vc_type == CONV_NONE)
+		만약 (vimconv.vc_type == CONV_NONE)
 		    curwin->w_cursor.col += (colnr_T)(p - ml_get_cursor());
-		else
+		아니면
 		{
-		    int	    l;
+		    정수	    l;
 
-		    len = (int)(p - tofree);
-		    for (p = ml_get_cursor(); *p != NUL && len-- > 0; p += l)
+		    len = (정수)(p - tofree);
+		    위해 (p = ml_get_cursor(); *p != NUL && len-- > 0; p += l)
 		    {
 			l = utf_ptr2len(p);
 			curwin->w_cursor.col += l;
@@ -4466,7 +4466,7 @@ utf_find_illegal(void)
 	    }
 	    p += len;
 	}
-	if (curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
+	만약 (curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
 	    break;
 	++curwin->w_cursor.lnum;
 	curwin->w_cursor.col = 0;
@@ -4481,51 +4481,51 @@ theend:
     convert_setup(&vimconv, NULL, NULL);
 }
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_SPELL) || defined(FEAT_EVAL)
+#만약 defined(FEAT_GUI_GTK) || defined(FEAT_SPELL) || defined(FEAT_EVAL)
 /*
  * Return TRUE if string "s" is a valid utf-8 string.
  * When "end" is NULL stop at the first NUL.  Otherwise stop at "end".
  */
-    int
+    정수
 utf_valid_string(char_u *s, char_u *end)
 {
-    int		l;
+    정수		l;
     char_u	*p = s;
 
-    while (end == NULL ? *p != NUL : p < end)
+    동안 (end == NULL ? *p != NUL : p < end)
     {
 	l = utf8len_tab_zero[*p];
-	if (l == 0)
-	    return FALSE;	// invalid lead byte
-	if (end != NULL && p + l > end)
-	    return FALSE;	// incomplete byte sequence
+	만약 (l == 0)
+	    반환 FALSE;	// invalid lead byte
+	만약 (end != NULL && p + l > end)
+	    반환 FALSE;	// incomplete byte sequence
 	++p;
-	while (--l > 0)
-	    if ((*p++ & 0xc0) != 0x80)
-		return FALSE;	// invalid trail byte
+	동안 (--l > 0)
+	    만약 ((*p++ & 0xc0) != 0x80)
+		반환 FALSE;	// invalid trail byte
     }
-    return TRUE;
+    반환 TRUE;
 }
 #endif
 
-#if defined(FEAT_GUI)
+#만약 defined(FEAT_GUI)
 /*
  * Special version of mb_tail_off() for use in ScreenLines[].
  */
-    int
+    정수
 dbcs_screen_tail_off(char_u *base, char_u *p)
 {
     // It can't be the first byte if a double-byte when not using DBCS, at the
     // end of the string or the byte can't start a double-byte.
     // For euc-jp an 0x8e byte always means we have a lead byte in the current
     // cell.
-    if (*p == NUL || p[1] == NUL
+    만약 (*p == NUL || p[1] == NUL
 	    || (enc_dbcs == DBCS_JPNU && *p == 0x8e)
 	    || MB_BYTE2LEN(*p) == 1)
-	return 0;
+	반환 0;
 
     // Return 1 when on the lead byte, 0 when on the tail byte.
-    return 1 - dbcs_screen_head_off(base, p);
+    반환 1 - dbcs_screen_head_off(base, p);
 }
 #endif
 
@@ -4549,16 +4549,16 @@ mb_adjustpos(buf_T *buf, pos_T *lp)
 {
     char_u	*p;
 
-    if (lp->col > 0 || lp->coladd > 1)
+    만약 (lp->col > 0 || lp->coladd > 1)
     {
 	p = ml_get_buf(buf, lp->lnum, FALSE);
-	if (*p == NUL || ml_get_buf_len(buf, lp->lnum) < lp->col)
+	만약 (*p == NUL || ml_get_buf_len(buf, lp->lnum) < lp->col)
 	    lp->col = 0;
-	else
+	아니면
 	    lp->col -= (*mb_head_off)(p, p + lp->col);
 	// Reset "coladd" when the cursor would be on the right half of a
 	// double-wide character.
-	if (lp->coladd == 1
+	만약 (lp->coladd == 1
 		&& p[lp->col] != TAB
 		&& vim_isprintc((*mb_ptr2char)(p + lp->col))
 		&& ptr2cells(p + lp->col) > 1)
@@ -4574,43 +4574,43 @@ mb_prevptr(
     char_u *line,	// start of the string
     char_u *p)
 {
-    if (p > line)
+    만약 (p > line)
 	MB_PTR_BACK(line, p);
-    return p;
+    반환 p;
 }
 
 /*
  * Return the character length of "str".  Each multi-byte character (with
  * following composing characters) counts as one.
  */
-    int
+    정수
 mb_charlen(char_u *str)
 {
     char_u	*p = str;
-    int		count;
+    정수		count;
 
-    if (p == NULL)
-	return 0;
+    만약 (p == NULL)
+	반환 0;
 
-    for (count = 0; *p != NUL; count++)
+    위해 (count = 0; *p != NUL; count++)
 	p += (*mb_ptr2len)(p);
 
-    return count;
+    반환 count;
 }
 
 /*
  * Like mb_charlen() but for a string with specified length.
  */
-    int
-mb_charlen_len(char_u *str, int len)
+    정수
+mb_charlen_len(char_u *str, 정수 len)
 {
     char_u	*p = str;
-    int		count;
+    정수		count;
 
-    for (count = 0; *p != NUL && p < str + len; count++)
+    위해 (count = 0; *p != NUL && p < str + len; count++)
 	p += (*mb_ptr2len)(p);
 
-    return count;
+    반환 count;
 }
 
 /*
@@ -4624,56 +4624,56 @@ mb_charlen_len(char_u *str, int len)
 mb_unescape(char_u **pp)
 {
     static char_u	buf[6];
-    int			n;
-    int			m = 0;
+    정수			n;
+    정수			m = 0;
     char_u		*str = *pp;
 
     // Must translate K_SPECIAL KS_SPECIAL KE_FILLER to K_SPECIAL and CSI
     // KS_EXTRA KE_CSI to CSI.
     // Maximum length of a utf-8 character is 4 bytes.
-    for (n = 0; str[n] != NUL && m < 4; ++n)
+    위해 (n = 0; str[n] != NUL && m < 4; ++n)
     {
-	if (str[n] == K_SPECIAL
+	만약 (str[n] == K_SPECIAL
 		&& str[n + 1] == KS_SPECIAL
 		&& str[n + 2] == KE_FILLER)
 	{
 	    buf[m++] = K_SPECIAL;
 	    n += 2;
 	}
-	else if ((str[n] == K_SPECIAL
+	아니면 만약 ((str[n] == K_SPECIAL
 #ifdef FEAT_GUI
 		    || str[n] == CSI
 #endif
 		 )
 		&& str[n + 1] == KS_EXTRA
-		&& str[n + 2] == (int)KE_CSI)
+		&& str[n + 2] == (정수)KE_CSI)
 	{
 	    buf[m++] = CSI;
 	    n += 2;
 	}
-	else if (str[n] == K_SPECIAL
+	아니면 만약 (str[n] == K_SPECIAL
 #ifdef FEAT_GUI
 		|| str[n] == CSI
 #endif
 		)
 	    break;		// a special key can't be a multibyte char
-	else
+	아니면
 	    buf[m++] = str[n];
 	buf[m] = NUL;
 
 	// Return a multi-byte character if it's found.  An illegal sequence
 	// will result in a 1 here.
-	if ((*mb_ptr2len)(buf) > 1)
+	만약 ((*mb_ptr2len)(buf) > 1)
 	{
 	    *pp = str + n + 1;
-	    return buf;
+	    반환 buf;
 	}
 
 	// Bail out quickly for ASCII.
-	if (buf[0] < 128)
+	만약 (buf[0] < 128)
 	    break;
     }
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4681,10 +4681,10 @@ mb_unescape(char_u **pp)
  * of a double-width character.
  * Caller must make sure "row" and "col" are not invalid!
  */
-    int
-mb_lefthalve(int row, int col)
+    정수
+mb_lefthalve(정수 row, 정수 col)
 {
-    return (*mb_off2cells)(LineOffset[row] + col,
+    반환 (*mb_off2cells)(LineOffset[row] + col,
 					LineOffset[row] + screen_Columns) > 1;
 }
 
@@ -4692,26 +4692,26 @@ mb_lefthalve(int row, int col)
  * Correct a position on the screen, if it's the right half of a double-wide
  * char move it to the left half.  Returns the corrected column.
  */
-    int
-mb_fix_col(int col, int row)
+    정수
+mb_fix_col(정수 col, 정수 row)
 {
-    int off;
+    정수 off;
 
     col = check_col(col);
     row = check_row(row);
     off = LineOffset[row] + col;
-    if (has_mbyte && ScreenLines != NULL && col > 0
+    만약 (has_mbyte && ScreenLines != NULL && col > 0
 	    && ((enc_dbcs
 		    && ScreenLines[off] != NUL
 		    && dbcs_screen_head_off(ScreenLines + LineOffset[row],
 					 ScreenLines + off))
 		|| (enc_utf8 && ScreenLines[off] == 0
 						  && ScreenLinesUC[off] == 0)))
-	return col - 1;
-    return col;
+	반환 col - 1;
+    반환 col;
 }
 
-static int enc_alias_search(char_u *name);
+static 정수 enc_alias_search(char_u *name);
 
 /*
  * Skip the Vim specific head of a 'encoding' name.
@@ -4719,11 +4719,11 @@ static int enc_alias_search(char_u *name);
     char_u *
 enc_skip(char_u *p)
 {
-    if (STRNCMP(p, "2byte-", 6) == 0)
-	return p + 6;
-    if (STRNCMP(p, "8bit-", 5) == 0)
-	return p + 5;
-    return p;
+    만약 (STRNCMP(p, "2byte-", 6) == 0)
+	반환 p + 6;
+    만약 (STRNCMP(p, "8bit-", 5) == 0)
+	반환 p + 5;
+    반환 p;
 }
 
 /*
@@ -4737,34 +4737,34 @@ enc_canonize(char_u *enc)
 {
     char_u	*r;
     char_u	*p, *s;
-    int		i;
+    정수		i;
 
-    if (STRCMP(enc, "default") == 0)
+    만약 (STRCMP(enc, "default") == 0)
     {
 #ifdef MSWIN
 	// Use the system encoding, the default is always utf-8.
 	r = enc_locale();
-#else
+#아니면
 	// Use the default encoding as it's found by set_init_1().
 	r = get_encoding_default();
 #endif
-	if (r == NULL)
+	만약 (r == NULL)
 	    r = (char_u *)ENC_DFLT;
-	return vim_strsave(r);
+	반환 vim_strsave(r);
     }
 
     // copy "enc" to allocated memory, with room for two '-'
     r = alloc(STRLEN(enc) + 3);
-    if (r == NULL)
-	return NULL;
+    만약 (r == NULL)
+	반환 NULL;
 
     // Make it all lower case and replace '_' with '-'.
     p = r;
-    for (s = enc; *s != NUL; ++s)
+    위해 (s = enc; *s != NUL; ++s)
     {
-	if (*s == '_')
+	만약 (*s == '_')
 	    *p++ = '-';
-	else
+	아니면
 	    *p++ = TOLOWER_ASC(*s);
     }
     *p = NUL;
@@ -4773,55 +4773,55 @@ enc_canonize(char_u *enc)
     p = enc_skip(r);
 
     // Change "microsoft-cp" to "cp".  Used in some spell files.
-    if (STRNCMP(p, "microsoft-cp", 12) == 0)
+    만약 (STRNCMP(p, "microsoft-cp", 12) == 0)
 	STRMOVE(p, p + 10);
 
     // "iso8859" -> "iso-8859"
-    if (STRNCMP(p, "iso8859", 7) == 0)
+    만약 (STRNCMP(p, "iso8859", 7) == 0)
     {
 	STRMOVE(p + 4, p + 3);
 	p[3] = '-';
     }
 
     // "iso-8859n" -> "iso-8859-n"
-    if (STRNCMP(p, "iso-8859", 8) == 0 && SAFE_isdigit(p[8]))
+    만약 (STRNCMP(p, "iso-8859", 8) == 0 && SAFE_isdigit(p[8]))
     {
 	STRMOVE(p + 9, p + 8);
 	p[8] = '-';
     }
 
     // "latin-N" -> "latinN"
-    if (STRNCMP(p, "latin-", 6) == 0)
+    만약 (STRNCMP(p, "latin-", 6) == 0)
 	STRMOVE(p + 5, p + 6);
 
-    if (enc_canon_search(p) >= 0)
+    만약 (enc_canon_search(p) >= 0)
     {
 	// canonical name can be used unmodified
-	if (p != r)
+	만약 (p != r)
 	    STRMOVE(r, p);
     }
-    else if ((i = enc_alias_search(p)) >= 0)
+    아니면 만약 ((i = enc_alias_search(p)) >= 0)
     {
 	// alias recognized, get canonical name
 	vim_free(r);
 	r = vim_strsave((char_u *)enc_canon_table[i].name);
     }
-    return r;
+    반환 r;
 }
 
 /*
  * Search for an encoding alias of "name".
  * Returns -1 when not found.
  */
-    static int
+    static 정수
 enc_alias_search(char_u *name)
 {
-    int		i;
+    정수		i;
 
-    for (i = 0; enc_alias_table[i].name != NULL; ++i)
-	if (STRCMP(name, enc_alias_table[i].name) == 0)
-	    return enc_alias_table[i].canon;
-    return -1;
+    위해 (i = 0; enc_alias_table[i].name != NULL; ++i)
+	만약 (STRCMP(name, enc_alias_table[i].name) == 0)
+	    반환 enc_alias_table[i].canon;
+    반환 -1;
 }
 
 
@@ -4829,7 +4829,7 @@ enc_alias_search(char_u *name)
 # include <langinfo.h>
 #endif
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#만약 !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 /*
  * Get the canonicalized encoding from the specified locale string "locale"
  * or from the environment variables LC_ALL, LC_CTYPE and LANG.
@@ -4840,16 +4840,16 @@ enc_locale_env(char *locale)
 {
     char	*s = locale;
     char	*p;
-    int		i;
+    정수		i;
     char	buf[50];
 
-    if (s == NULL || *s == NUL)
-	if ((s = getenv("LC_ALL")) == NULL || *s == NUL)
-	    if ((s = getenv("LC_CTYPE")) == NULL || *s == NUL)
+    만약 (s == NULL || *s == NUL)
+	만약 ((s = getenv("LC_ALL")) == NULL || *s == NUL)
+	    만약 ((s = getenv("LC_CTYPE")) == NULL || *s == NUL)
 		s = getenv("LANG");
 
-    if (s == NULL || *s == NUL)
-	return NULL;
+    만약 (s == NULL || *s == NUL)
+	반환 NULL;
 
     // The most generic locale format is:
     // language[_territory][.codeset][@modifier][+special][,[sponsor][_revision]]
@@ -4858,10 +4858,10 @@ enc_locale_env(char *locale)
     // Make the name lowercase and replace '_' with '-'.
     // Exception: "ja_JP.EUC" == "euc-jp", "zh_CN.EUC" = "euc-cn",
     // "ko_KR.EUC" == "euc-kr"
-    if ((p = (char *)vim_strchr((char_u *)s, '.')) != NULL)
+    만약 ((p = (char *)vim_strchr((char_u *)s, '.')) != NULL)
     {
-	if (p > s + 2 && STRNICMP(p + 1, "EUC", 3) == 0
-			&& !SAFE_isalnum((int)p[4]) && p[4] != '-' && p[-3] == '_')
+	만약 (p > s + 2 && STRNICMP(p + 1, "EUC", 3) == 0
+			&& !SAFE_isalnum((정수)p[4]) && p[4] != '-' && p[-3] == '_')
 	{
 	    // copy "XY.EUC" to "euc-XY" to buf[10]
 	    STRCPY(buf + 10, "euc-");
@@ -4870,21 +4870,21 @@ enc_locale_env(char *locale)
 	    buf[16] = 0;
 	    s = buf + 10;
 	}
-	else
+	아니면
 	    s = p + 1;
     }
-    for (i = 0; i < (int)sizeof(buf) - 1 && s[i] != NUL; ++i)
+    위해 (i = 0; i < (정수)sizeof(buf) - 1 && s[i] != NUL; ++i)
     {
-	if (s[i] == '_' || s[i] == '-')
+	만약 (s[i] == '_' || s[i] == '-')
 	    buf[i] = '-';
-	else if (SAFE_isalnum(s[i]))
+	아니면 만약 (SAFE_isalnum(s[i]))
 	    buf[i] = TOLOWER_ASC(s[i]);
-	else
+	아니면
 	    break;
     }
     buf[i] = NUL;
 
-    return enc_canonize((char_u *)buf);
+    반환 enc_canonize((char_u *)buf);
 }
 #endif
 
@@ -4899,61 +4899,61 @@ enc_locale(void)
     char	buf[50];
     long	acp = GetACP();
 
-    if (acp == 1200)
+    만약 (acp == 1200)
 	STRCPY(buf, "ucs-2le");
-    else if (acp == 1252)	    // cp1252 is used as latin1
+    아니면 만약 (acp == 1252)	    // cp1252 is used as latin1
 	STRCPY(buf, "latin1");
-    else if (acp == 65001)
+    아니면 만약 (acp == 65001)
 	STRCPY(buf, "utf-8");
-    else
+    아니면
 	sprintf(buf, "cp%ld", acp);
 
-    return enc_canonize((char_u *)buf);
-#else
+    반환 enc_canonize((char_u *)buf);
+#아니면
     char	*s;
 
 # ifdef HAVE_NL_LANGINFO_CODESET
-    if ((s = nl_langinfo(CODESET)) == NULL || *s == NUL)
+    만약 ((s = nl_langinfo(CODESET)) == NULL || *s == NUL)
 # endif
-# if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-	if ((s = setlocale(LC_CTYPE, NULL)) == NULL || *s == NUL)
+# 만약 defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+	만약 ((s = setlocale(LC_CTYPE, NULL)) == NULL || *s == NUL)
 # endif
 	    s = NULL;
 
-    return enc_locale_env(s);
+    반환 enc_locale_env(s);
 #endif
 }
 
-#if defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
+#만약 defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
 /*
  * Convert an encoding name to an MS-Windows codepage.
  * Returns zero if no codepage can be figured out.
  */
-    int
+    정수
 encname2codepage(char_u *name)
 {
-    int		cp;
+    정수		cp;
     char_u	*p = name;
-    int		idx;
+    정수		idx;
 
-    if (STRNCMP(p, "8bit-", 5) == 0)
+    만약 (STRNCMP(p, "8bit-", 5) == 0)
 	p += 5;
-    else if (STRNCMP(p_enc, "2byte-", 6) == 0)
+    아니면 만약 (STRNCMP(p_enc, "2byte-", 6) == 0)
 	p += 6;
 
-    if (p[0] == 'c' && p[1] == 'p')
+    만약 (p[0] == 'c' && p[1] == 'p')
 	cp = atoi((char *)p + 2);
-    else if ((idx = enc_canon_search(p)) >= 0)
+    아니면 만약 ((idx = enc_canon_search(p)) >= 0)
 	cp = enc_canon_table[idx].codepage;
-    else
-	return 0;
-    if (IsValidCodePage(cp))
-	return cp;
-    return 0;
+    아니면
+	반환 0;
+    만약 (IsValidCodePage(cp))
+	반환 cp;
+    반환 0;
 }
 #endif
 
-#if defined(USE_ICONV)
+#만약 defined(USE_ICONV)
 
 /*
  * Call iconv_open() with a check if iconv() works properly (there are broken
@@ -4969,20 +4969,20 @@ my_iconv_open(char_u *to, char_u *from)
     char_u	tobuf[ICONV_TESTLEN];
     char	*p;
     size_t	tolen;
-    static int	iconv_ok = -1;
+    static 정수	iconv_ok = -1;
 
-    if (iconv_ok == FALSE)
-	return (void *)-1;	// detected a broken iconv() previously
+    만약 (iconv_ok == FALSE)
+	반환 (void *)-1;	// detected a broken iconv() previously
 
 # ifdef DYNAMIC_ICONV
     // Check if the iconv.dll can be found.
-    if (!iconv_enabled(TRUE))
-	return (void *)-1;
+    만약 (!iconv_enabled(TRUE))
+	반환 (void *)-1;
 # endif
 
     fd = iconv_open((char *)enc_skip(to), (char *)enc_skip(from));
 
-    if (fd != (iconv_t)-1 && iconv_ok == -1)
+    만약 (fd != (iconv_t)-1 && iconv_ok == -1)
     {
 	/*
 	 * Do a dummy iconv() call to check if it actually works.  There is a
@@ -4994,17 +4994,17 @@ my_iconv_open(char_u *to, char_u *from)
 	p = (char *)tobuf;
 	tolen = ICONV_TESTLEN;
 	(void)iconv(fd, NULL, NULL, &p, &tolen);
-	if (p == NULL)
+	만약 (p == NULL)
 	{
 	    iconv_ok = FALSE;
 	    iconv_close(fd);
 	    fd = (iconv_t)-1;
 	}
-	else
+	아니면
 	    iconv_ok = TRUE;
     }
 
-    return (void *)fd;
+    반환 (void *)fd;
 }
 
 /*
@@ -5018,9 +5018,9 @@ my_iconv_open(char_u *to, char_u *from)
 iconv_string(
     vimconv_T	*vcp,
     char_u	*str,
-    int		slen,
-    int		*unconvlenp,
-    int		*resultlenp)
+    정수		slen,
+    정수		*unconvlenp,
+    정수		*resultlenp)
 {
     const char	*from;
     size_t	fromlen;
@@ -5030,23 +5030,23 @@ iconv_string(
     size_t	done = 0;
     char_u	*result = NULL;
     char_u	*p;
-    int		l;
+    정수		l;
 
     from = (char *)str;
     fromlen = slen;
-    for (;;)
+    위해 (;;)
     {
-	if (len == 0 || ICONV_ERRNO == ICONV_E2BIG)
+	만약 (len == 0 || ICONV_ERRNO == ICONV_E2BIG)
 	{
 	    // Allocate enough room for most conversions.  When re-allocating
 	    // increase the buffer size.
 	    len = len + fromlen * 2 + 40;
 	    p = alloc(len);
-	    if (p != NULL && done > 0)
+	    만약 (p != NULL && done > 0)
 		mch_memmove(p, result, done);
 	    vim_free(result);
 	    result = p;
-	    if (result == NULL)	// out of memory
+	    만약 (result == NULL)	// out of memory
 		break;
 	}
 
@@ -5054,7 +5054,7 @@ iconv_string(
 	tolen = len - done - 2;
 	// Avoid a warning for systems with a wrong iconv() prototype by
 	// casting the second argument to void *.
-	if (iconv(vcp->vc_fd, (void *)&from, &fromlen, &to, &tolen)
+	만약 (iconv(vcp->vc_fd, (void *)&from, &fromlen, &to, &tolen)
 								!= (size_t)-1)
 	{
 	    // Finished, append a NUL.
@@ -5064,18 +5064,18 @@ iconv_string(
 
 	// Check both ICONV_EINVAL and EINVAL, because the dynamically loaded
 	// iconv library may use one of them.
-	if (!vcp->vc_fail && unconvlenp != NULL
+	만약 (!vcp->vc_fail && unconvlenp != NULL
 		&& (ICONV_ERRNO == ICONV_EINVAL || ICONV_ERRNO == EINVAL))
 	{
 	    // Handle an incomplete sequence at the end.
 	    *to = NUL;
-	    *unconvlenp = (int)fromlen;
+	    *unconvlenp = (정수)fromlen;
 	    break;
 	}
 
 	// Check both ICONV_EILSEQ and EILSEQ, because the dynamically loaded
 	// iconv library may use one of them.
-	else if (!vcp->vc_fail
+	아니면 만약 (!vcp->vc_fail
 		&& (ICONV_ERRNO == ICONV_EILSEQ || ICONV_ERRNO == EILSEQ
 		    || ICONV_ERRNO == ICONV_EINVAL || ICONV_ERRNO == EINVAL))
 	{
@@ -5083,20 +5083,20 @@ iconv_string(
 	    // conversion from 'encoding' to something else.  In other
 	    // situations we don't know what to skip anyway.
 	    *to++ = '?';
-	    if ((*mb_ptr2cells)((char_u *)from) > 1)
+	    만약 ((*mb_ptr2cells)((char_u *)from) > 1)
 		*to++ = '?';
-	    if (enc_utf8)
-		l = utfc_ptr2len_len((char_u *)from, (int)fromlen);
-	    else
+	    만약 (enc_utf8)
+		l = utfc_ptr2len_len((char_u *)from, (정수)fromlen);
+	    아니면
 	    {
 		l = (*mb_ptr2len)((char_u *)from);
-		if (l > (int)fromlen)
-		    l = (int)fromlen;
+		만약 (l > (정수)fromlen)
+		    l = (정수)fromlen;
 	    }
 	    from += l;
 	    fromlen -= l;
 	}
-	else if (ICONV_ERRNO != ICONV_E2BIG)
+	아니면 만약 (ICONV_ERRNO != ICONV_E2BIG)
 	{
 	    // conversion failed
 	    VIM_CLEAR(result);
@@ -5106,18 +5106,18 @@ iconv_string(
 	done = to - (char *)result;
     }
 
-    if (resultlenp != NULL && result != NULL)
-	*resultlenp = (int)(to - (char *)result);
-    return result;
+    만약 (resultlenp != NULL && result != NULL)
+	*resultlenp = (정수)(to - (char *)result);
+    반환 result;
 }
 
-# if defined(DYNAMIC_ICONV)
+# 만약 defined(DYNAMIC_ICONV)
 /*
  * Dynamically load the "iconv.dll" on Win32.
  */
 
 #  ifndef DYNAMIC_ICONV	    // must be generating prototypes
-#   define HINSTANCE int
+#   define HINSTANCE 정수
 #  endif
 static HINSTANCE hIconvDLL = 0;
 static HINSTANCE hMsvcrtDLL = 0;
@@ -5135,36 +5135,36 @@ static HINSTANCE hMsvcrtDLL = 0;
 /*
  * Try opening the iconv.dll and return TRUE if iconv() can be used.
  */
-    int
-iconv_enabled(int verbose)
+    정수
+iconv_enabled(정수 verbose)
 {
-    if (hIconvDLL != 0 && hMsvcrtDLL != 0)
-	return TRUE;
+    만약 (hIconvDLL != 0 && hMsvcrtDLL != 0)
+	반환 TRUE;
 
     // The iconv DLL file goes under different names, try them all.
     // Do the "2" version first, it's newer.
 #  ifdef DYNAMIC_ICONV_DLL_ALT2
-    if (hIconvDLL == 0)
+    만약 (hIconvDLL == 0)
 	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL_ALT2);
 #  endif
 #  ifdef DYNAMIC_ICONV_DLL_ALT3
-    if (hIconvDLL == 0)
+    만약 (hIconvDLL == 0)
 	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL_ALT3);
 #  endif
-    if (hIconvDLL == 0)
+    만약 (hIconvDLL == 0)
 	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL);
 #  ifdef DYNAMIC_ICONV_DLL_ALT1
-    if (hIconvDLL == 0)
+    만약 (hIconvDLL == 0)
 	hIconvDLL = vimLoadLib(DYNAMIC_ICONV_DLL_ALT1);
 #  endif
 
-    if (hIconvDLL != 0)
+    만약 (hIconvDLL != 0)
 	hMsvcrtDLL = vimLoadLib(DYNAMIC_MSVCRT_DLL);
-    if (hIconvDLL == 0 || hMsvcrtDLL == 0)
+    만약 (hIconvDLL == 0 || hMsvcrtDLL == 0)
     {
 	// Only give the message when 'verbose' is set, otherwise it might be
 	// done whenever a conversion is attempted.
-	if (verbose && p_verbose > 0)
+	만약 (verbose && p_verbose > 0)
 	{
 	    verbose_enter();
 	    semsg(_(e_could_not_load_library_str_str),
@@ -5173,7 +5173,7 @@ iconv_enabled(int verbose)
 	    verbose_leave();
 	}
 	iconv_end();
-	return FALSE;
+	반환 FALSE;
     }
 
     iconv	= (size_t (*)(iconv_t, const char **,
@@ -5181,40 +5181,40 @@ iconv_enabled(int verbose)
 				GetProcAddress(hIconvDLL, "libiconv");
     iconv_open	= (iconv_t (*)(const char *, const char *))
 				GetProcAddress(hIconvDLL, "libiconv_open");
-    iconv_close	= (int (*)(iconv_t))
+    iconv_close	= (정수 (*)(iconv_t))
 				GetProcAddress(hIconvDLL, "libiconv_close");
-    iconvctl	= (int (*)(iconv_t, int, void *))
+    iconvctl	= (정수 (*)(iconv_t, 정수, void *))
 				GetProcAddress(hIconvDLL, "libiconvctl");
-    iconv_errno	= (int *(*)(void))get_dll_import_func(hIconvDLL, "_errno");
-    if (iconv_errno == NULL)
-	iconv_errno = (int *(*)(void))GetProcAddress(hMsvcrtDLL, "_errno");
-    if (iconv == NULL || iconv_open == NULL || iconv_close == NULL
+    iconv_errno	= (정수 *(*)(void))get_dll_import_func(hIconvDLL, "_errno");
+    만약 (iconv_errno == NULL)
+	iconv_errno = (정수 *(*)(void))GetProcAddress(hMsvcrtDLL, "_errno");
+    만약 (iconv == NULL || iconv_open == NULL || iconv_close == NULL
 	    || iconvctl == NULL || iconv_errno == NULL)
     {
 	iconv_end();
-	if (verbose && p_verbose > 0)
+	만약 (verbose && p_verbose > 0)
 	{
 	    verbose_enter();
 	    semsg(_(e_could_not_load_library_function_str), "for libiconv");
 	    verbose_leave();
 	}
-	return FALSE;
+	반환 FALSE;
     }
-    return TRUE;
+    반환 TRUE;
 }
 
     void
 iconv_end(void)
 {
     // Don't use iconv() when inputting or outputting characters.
-    if (input_conv.vc_type == CONV_ICONV)
+    만약 (input_conv.vc_type == CONV_ICONV)
 	convert_setup(&input_conv, NULL, NULL);
-    if (output_conv.vc_type == CONV_ICONV)
+    만약 (output_conv.vc_type == CONV_ICONV)
 	convert_setup(&output_conv, NULL, NULL);
 
-    if (hIconvDLL != 0)
+    만약 (hIconvDLL != 0)
 	FreeLibrary(hIconvDLL);
-    if (hMsvcrtDLL != 0)
+    만약 (hMsvcrtDLL != 0)
 	FreeLibrary(hMsvcrtDLL);
     hIconvDLL = 0;
     hMsvcrtDLL = 0;
@@ -5222,14 +5222,14 @@ iconv_end(void)
 # endif // DYNAMIC_ICONV
 #endif // USE_ICONV
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * "getimstatus()" function
  */
     void
 f_getimstatus(typval_T *argvars UNUSED, typval_T *rettv)
 {
-# if defined(HAVE_INPUT_METHOD)
+# 만약 defined(HAVE_INPUT_METHOD)
     rettv->vval.v_number = im_get_status();
 # endif
 }
@@ -5248,11 +5248,11 @@ f_iconv(typval_T *argvars UNUSED, typval_T *rettv)
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script()
+    만약 (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
-	return;
+	반환;
 
     str = tv_get_string(&argvars[0]);
     from = enc_canonize(enc_skip(tv_get_string_buf(&argvars[1], buf1)));
@@ -5261,9 +5261,9 @@ f_iconv(typval_T *argvars UNUSED, typval_T *rettv)
     convert_setup(&vimconv, from, to);
 
     // If the encodings are equal, no conversion needed.
-    if (vimconv.vc_type == CONV_NONE)
+    만약 (vimconv.vc_type == CONV_NONE)
 	rettv->vval.v_string = vim_strsave(str);
-    else
+    아니면
 	rettv->vval.v_string = string_convert(&vimconv, str, NULL);
 
     convert_setup(&vimconv, NULL, NULL);
@@ -5281,32 +5281,32 @@ f_iconv(typval_T *argvars UNUSED, typval_T *rettv)
  * Afterwards invoke with "from" and "to" equal to NULL to cleanup.
  * Return FAIL when conversion is not supported, OK otherwise.
  */
-    int
+    정수
 convert_setup(vimconv_T *vcp, char_u *from, char_u *to)
 {
-    return convert_setup_ext(vcp, from, TRUE, to, TRUE);
+    반환 convert_setup_ext(vcp, from, TRUE, to, TRUE);
 }
 
 /*
  * As convert_setup(), but only when from_unicode_is_utf8 is TRUE will all
  * "from" unicode charsets be considered utf-8.  Same for "to".
  */
-    int
+    정수
 convert_setup_ext(
     vimconv_T	*vcp,
     char_u	*from,
-    int		from_unicode_is_utf8,
+    정수		from_unicode_is_utf8,
     char_u	*to,
-    int		to_unicode_is_utf8)
+    정수		to_unicode_is_utf8)
 {
-    int		from_prop;
-    int		to_prop;
-    int		from_is_utf8;
-    int		to_is_utf8;
+    정수		from_prop;
+    정수		to_prop;
+    정수		from_is_utf8;
+    정수		to_is_utf8;
 
     // Reset to no conversion.
 #ifdef USE_ICONV
-    if (vcp->vc_type == CONV_ICONV && vcp->vc_fd != (iconv_t)-1)
+    만약 (vcp->vc_type == CONV_ICONV && vcp->vc_fd != (iconv_t)-1)
 	iconv_close(vcp->vc_fd);
 #endif
     vcp->vc_type = CONV_NONE;
@@ -5314,46 +5314,46 @@ convert_setup_ext(
     vcp->vc_fail = FALSE;
 
     // No conversion when one of the names is empty or they are equal.
-    if (from == NULL || *from == NUL || to == NULL || *to == NUL
+    만약 (from == NULL || *from == NUL || to == NULL || *to == NUL
 						     || STRCMP(from, to) == 0)
-	return OK;
+	반환 OK;
 
     from_prop = enc_canon_props(from);
     to_prop = enc_canon_props(to);
-    if (from_unicode_is_utf8)
+    만약 (from_unicode_is_utf8)
 	from_is_utf8 = from_prop & ENC_UNICODE;
-    else
+    아니면
 	from_is_utf8 = from_prop == ENC_UNICODE;
-    if (to_unicode_is_utf8)
+    만약 (to_unicode_is_utf8)
 	to_is_utf8 = to_prop & ENC_UNICODE;
-    else
+    아니면
 	to_is_utf8 = to_prop == ENC_UNICODE;
 
-    if ((from_prop & ENC_LATIN1) && to_is_utf8)
+    만약 ((from_prop & ENC_LATIN1) && to_is_utf8)
     {
 	// Internal latin1 -> utf-8 conversion.
 	vcp->vc_type = CONV_TO_UTF8;
 	vcp->vc_factor = 2;	// up to twice as long
     }
-    else if ((from_prop & ENC_LATIN9) && to_is_utf8)
+    아니면 만약 ((from_prop & ENC_LATIN9) && to_is_utf8)
     {
 	// Internal latin9 -> utf-8 conversion.
 	vcp->vc_type = CONV_9_TO_UTF8;
 	vcp->vc_factor = 3;	// up to three as long (euro sign)
     }
-    else if (from_is_utf8 && (to_prop & ENC_LATIN1))
+    아니면 만약 (from_is_utf8 && (to_prop & ENC_LATIN1))
     {
 	// Internal utf-8 -> latin1 conversion.
 	vcp->vc_type = CONV_TO_LATIN1;
     }
-    else if (from_is_utf8 && (to_prop & ENC_LATIN9))
+    아니면 만약 (from_is_utf8 && (to_prop & ENC_LATIN9))
     {
 	// Internal utf-8 -> latin9 conversion.
 	vcp->vc_type = CONV_TO_LATIN9;
     }
 #ifdef MSWIN
     // Win32-specific codepage <-> codepage conversion without iconv.
-    else if ((from_is_utf8 || encname2codepage(from) > 0)
+    아니면 만약 ((from_is_utf8 || encname2codepage(from) > 0)
 	    && (to_is_utf8 || encname2codepage(to) > 0))
     {
 	vcp->vc_type = CONV_CODEPAGE;
@@ -5363,54 +5363,54 @@ convert_setup_ext(
     }
 #endif
 #ifdef MACOS_CONVERT
-    else if ((from_prop & ENC_MACROMAN) && (to_prop & ENC_LATIN1))
+    아니면 만약 ((from_prop & ENC_MACROMAN) && (to_prop & ENC_LATIN1))
     {
 	vcp->vc_type = CONV_MAC_LATIN1;
     }
-    else if ((from_prop & ENC_MACROMAN) && to_is_utf8)
+    아니면 만약 ((from_prop & ENC_MACROMAN) && to_is_utf8)
     {
 	vcp->vc_type = CONV_MAC_UTF8;
 	vcp->vc_factor = 2;	// up to twice as long
     }
-    else if ((from_prop & ENC_LATIN1) && (to_prop & ENC_MACROMAN))
+    아니면 만약 ((from_prop & ENC_LATIN1) && (to_prop & ENC_MACROMAN))
     {
 	vcp->vc_type = CONV_LATIN1_MAC;
     }
-    else if (from_is_utf8 && (to_prop & ENC_MACROMAN))
+    아니면 만약 (from_is_utf8 && (to_prop & ENC_MACROMAN))
     {
 	vcp->vc_type = CONV_UTF8_MAC;
     }
 #endif
 #ifdef USE_ICONV
-    else
+    아니면
     {
 	// Use iconv() for conversion.
 	vcp->vc_fd = (iconv_t)my_iconv_open(
 		to_is_utf8 ? (char_u *)"utf-8" : to,
 		from_is_utf8 ? (char_u *)"utf-8" : from);
-	if (vcp->vc_fd != (iconv_t)-1)
+	만약 (vcp->vc_fd != (iconv_t)-1)
 	{
 	    vcp->vc_type = CONV_ICONV;
 	    vcp->vc_factor = 4;	// could be longer too...
 	}
     }
 #endif
-    if (vcp->vc_type == CONV_NONE)
-	return FAIL;
+    만약 (vcp->vc_type == CONV_NONE)
+	반환 FAIL;
 
-    return OK;
+    반환 OK;
 }
 
-#if defined(FEAT_GUI) || defined(AMIGA) || defined(MSWIN)
+#만약 defined(FEAT_GUI) || defined(AMIGA) || defined(MSWIN)
 /*
  * Do conversion on typed input characters in-place.
  * The input and output are not NUL terminated!
  * Returns the length after conversion.
  */
-    int
-convert_input(char_u *ptr, int len, int maxlen)
+    정수
+convert_input(char_u *ptr, 정수 len, 정수 maxlen)
 {
-    return convert_input_safe(ptr, len, maxlen, NULL, NULL);
+    반환 convert_input_safe(ptr, len, maxlen, NULL, NULL);
 }
 #endif
 
@@ -5419,41 +5419,41 @@ convert_input(char_u *ptr, int len, int maxlen)
  * end return that as an allocated string in "restp" and set "*restlenp" to
  * the length.  If "restp" is NULL it is not used.
  */
-    int
+    정수
 convert_input_safe(
     char_u	*ptr,
-    int		len,
-    int		maxlen,
+    정수		len,
+    정수		maxlen,
     char_u	**restp,
-    int		*restlenp)
+    정수		*restlenp)
 {
     char_u	*d;
-    int		dlen = len;
-    int		unconvertlen = 0;
+    정수		dlen = len;
+    정수		unconvertlen = 0;
 
     d = string_convert_ext(&input_conv, ptr, &dlen,
 					restp == NULL ? NULL : &unconvertlen);
-    if (d == NULL)
-	return dlen;
+    만약 (d == NULL)
+	반환 dlen;
 
-    if (dlen <= maxlen)
+    만약 (dlen <= maxlen)
     {
-	if (unconvertlen > 0)
+	만약 (unconvertlen > 0)
 	{
 	    // Move the unconverted characters to allocated memory.
 	    *restp = alloc(unconvertlen);
-	    if (*restp != NULL)
+	    만약 (*restp != NULL)
 		mch_memmove(*restp, ptr + len - unconvertlen, unconvertlen);
 	    *restlenp = unconvertlen;
 	}
 	mch_memmove(ptr, d, dlen);
     }
-    else
+    아니면
 	// result is too long, keep the unconverted text (the caller must
 	// have done something wrong!)
 	dlen = len;
     vim_free(d);
-    return dlen;
+    반환 dlen;
 }
 
 /*
@@ -5467,9 +5467,9 @@ convert_input_safe(
 string_convert(
     vimconv_T	*vcp,
     char_u	*ptr,
-    int		*lenp)
+    정수		*lenp)
 {
-    return string_convert_ext(vcp, ptr, lenp, NULL);
+    반환 string_convert_ext(vcp, ptr, lenp, NULL);
 }
 
 /*
@@ -5481,52 +5481,52 @@ string_convert(
 string_convert_ext(
     vimconv_T	*vcp,
     char_u	*ptr,
-    int		*lenp,
-    int		*unconvlenp)
+    정수		*lenp,
+    정수		*unconvlenp)
 {
     char_u	*retval = NULL;
     char_u	*d;
-    int		len;
-    int		i;
-    int		l;
-    int		c;
+    정수		len;
+    정수		i;
+    정수		l;
+    정수		c;
 
-    if (lenp == NULL)
-	len = (int)STRLEN(ptr);
-    else
+    만약 (lenp == NULL)
+	len = (정수)STRLEN(ptr);
+    아니면
 	len = *lenp;
-    if (len == 0)
-	return vim_strsave((char_u *)"");
+    만약 (len == 0)
+	반환 vim_strsave((char_u *)"");
 
     switch (vcp->vc_type)
     {
 	case CONV_TO_UTF8:	// latin1 to utf-8 conversion
 	    retval = alloc(len * 2 + 1);
-	    if (retval == NULL)
+	    만약 (retval == NULL)
 		break;
 	    d = retval;
-	    for (i = 0; i < len; ++i)
+	    위해 (i = 0; i < len; ++i)
 	    {
 		c = ptr[i];
-		if (c < 0x80)
+		만약 (c < 0x80)
 		    *d++ = c;
-		else
+		아니면
 		{
 		    *d++ = 0xc0 + ((unsigned)c >> 6);
 		    *d++ = 0x80 + (c & 0x3f);
 		}
 	    }
 	    *d = NUL;
-	    if (lenp != NULL)
-		*lenp = (int)(d - retval);
+	    만약 (lenp != NULL)
+		*lenp = (정수)(d - retval);
 	    break;
 
 	case CONV_9_TO_UTF8:	// latin9 to utf-8 conversion
 	    retval = alloc(len * 3 + 1);
-	    if (retval == NULL)
+	    만약 (retval == NULL)
 		break;
 	    d = retval;
-	    for (i = 0; i < len; ++i)
+	    위해 (i = 0; i < len; ++i)
 	    {
 		c = ptr[i];
 		switch (c)
@@ -5543,32 +5543,32 @@ string_convert_ext(
 		d += utf_char2bytes(c, d);
 	    }
 	    *d = NUL;
-	    if (lenp != NULL)
-		*lenp = (int)(d - retval);
+	    만약 (lenp != NULL)
+		*lenp = (정수)(d - retval);
 	    break;
 
 	case CONV_TO_LATIN1:	// utf-8 to latin1 conversion
 	case CONV_TO_LATIN9:	// utf-8 to latin9 conversion
 	    retval = alloc(len + 1);
-	    if (retval == NULL)
+	    만약 (retval == NULL)
 		break;
 	    d = retval;
-	    for (i = 0; i < len; ++i)
+	    위해 (i = 0; i < len; ++i)
 	    {
 		l = utf_ptr2len_len(ptr + i, len - i);
-		if (l == 0)
+		만약 (l == 0)
 		    *d++ = NUL;
-		else if (l == 1)
+		아니면 만약 (l == 1)
 		{
-		    int l_w = utf8len_tab_zero[ptr[i]];
+		    정수 l_w = utf8len_tab_zero[ptr[i]];
 
-		    if (l_w == 0)
+		    만약 (l_w == 0)
 		    {
 			// Illegal utf-8 byte cannot be converted
 			vim_free(retval);
-			return NULL;
+			반환 NULL;
 		    }
-		    if (unconvlenp != NULL && l_w > len - i)
+		    만약 (unconvlenp != NULL && l_w > len - i)
 		    {
 			// Incomplete sequence at the end.
 			*unconvlenp = len - i;
@@ -5576,10 +5576,10 @@ string_convert_ext(
 		    }
 		    *d++ = ptr[i];
 		}
-		else
+		아니면
 		{
 		    c = utf_ptr2char(ptr + i);
-		    if (vcp->vc_type == CONV_TO_LATIN9)
+		    만약 (vcp->vc_type == CONV_TO_LATIN9)
 			switch (c)
 			{
 			    case 0x20ac: c = 0xa4; break;   // euro
@@ -5599,19 +5599,19 @@ string_convert_ext(
 			    case 0xbd:
 			    case 0xbe: c = 0x100; break; // not in latin9
 			}
-		    if (!utf_iscomposing(c))	// skip composing chars
+		    만약 (!utf_iscomposing(c))	// skip composing chars
 		    {
-			if (c < 0x100)
+			만약 (c < 0x100)
 			    *d++ = c;
-			else if (vcp->vc_fail)
+			아니면 만약 (vcp->vc_fail)
 			{
 			    vim_free(retval);
-			    return NULL;
+			    반환 NULL;
 			}
-			else
+			아니면
 			{
 			    *d++ = 0xbf;
-			    if (utf_char2cells(c) > 1)
+			    만약 (utf_char2cells(c) > 1)
 				*d++ = '?';
 			}
 		    }
@@ -5619,8 +5619,8 @@ string_convert_ext(
 		}
 	    }
 	    *d = NUL;
-	    if (lenp != NULL)
-		*lenp = (int)(d - retval);
+	    만약 (lenp != NULL)
+		*lenp = (정수)(d - retval);
 	    break;
 
 #ifdef MACOS_CONVERT
@@ -5653,57 +5653,57 @@ string_convert_ext(
 #ifdef MSWIN
 	case CONV_CODEPAGE:		// codepage -> codepage
 	{
-	    int		retlen;
-	    int		tmp_len;
+	    정수		retlen;
+	    정수		tmp_len;
 	    short_u	*tmp;
 
 	    // 1. codepage/UTF-8  ->  ucs-2.
-	    if (vcp->vc_cpfrom == 0)
+	    만약 (vcp->vc_cpfrom == 0)
 		tmp_len = utf8_to_utf16(ptr, len, NULL, NULL);
-	    else
+	    아니면
 	    {
 		tmp_len = MultiByteToWideChar(vcp->vc_cpfrom,
 					unconvlenp ? MB_ERR_INVALID_CHARS : 0,
 					(char *)ptr, len, 0, 0);
-		if (tmp_len == 0
+		만약 (tmp_len == 0
 			&& GetLastError() == ERROR_NO_UNICODE_TRANSLATION)
 		{
-		    if (lenp != NULL)
+		    만약 (lenp != NULL)
 			*lenp = 0;
-		    if (unconvlenp != NULL)
+		    만약 (unconvlenp != NULL)
 			*unconvlenp = len;
 		    retval = alloc(1);
-		    if (retval)
+		    만약 (retval)
 			retval[0] = NUL;
-		    return retval;
+		    반환 retval;
 		}
 	    }
 	    tmp = ALLOC_MULT(short_u, tmp_len);
-	    if (tmp == NULL)
+	    만약 (tmp == NULL)
 		break;
-	    if (vcp->vc_cpfrom == 0)
+	    만약 (vcp->vc_cpfrom == 0)
 		utf8_to_utf16(ptr, len, tmp, unconvlenp);
-	    else
+	    아니면
 		MultiByteToWideChar(vcp->vc_cpfrom, 0,
 			(char *)ptr, len, tmp, tmp_len);
 
 	    // 2. ucs-2  ->  codepage/UTF-8.
-	    if (vcp->vc_cpto == 0)
+	    만약 (vcp->vc_cpto == 0)
 		retlen = utf16_to_utf8(tmp, tmp_len, NULL);
-	    else
+	    아니면
 		retlen = WideCharToMultiByte(vcp->vc_cpto, 0,
 						    tmp, tmp_len, 0, 0, 0, 0);
 	    retval = alloc(retlen + 1);
-	    if (retval != NULL)
+	    만약 (retval != NULL)
 	    {
-		if (vcp->vc_cpto == 0)
+		만약 (vcp->vc_cpto == 0)
 		    utf16_to_utf8(tmp, tmp_len, retval);
-		else
+		아니면
 		    WideCharToMultiByte(vcp->vc_cpto, 0,
 					  tmp, tmp_len,
 					  (char *)retval, retlen, 0, 0);
 		retval[retlen] = NUL;
-		if (lenp != NULL)
+		만약 (lenp != NULL)
 		    *lenp = retlen;
 	    }
 	    vim_free(tmp);
@@ -5712,24 +5712,24 @@ string_convert_ext(
 #endif
     }
 
-    return retval;
+    반환 retval;
 }
 
 /*
  * Return 1 or 2 when "c" is in the cellwidth table.
  * Return 0 if not.
  */
-    int
-get_cellwidth(int c UNUSED)
+    정수
+get_cellwidth(정수 c UNUSED)
 {
 #ifdef FEAT_EVAL
-    return cw_value(c);
-#else
-    return 0;
+    반환 cw_value(c);
+#아니면
+    반환 0;
 #endif
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 
 /*
  * Table set by setcellwidths().
@@ -5748,41 +5748,41 @@ static size_t		cw_table_size = 0;
  * Return 1 or 2 when "c" is in the cellwidth table.
  * Return 0 if not.
  */
-    static int
-cw_value(int c)
+    static 정수
+cw_value(정수 c)
 {
-    int mid, bot, top;
+    정수 mid, bot, top;
 
-    if (cw_table == NULL)
-	return 0;
+    만약 (cw_table == NULL)
+	반환 0;
 
     // first quick check for Latin1 etc. characters
-    if (c < cw_table[0].first)
-	return 0;
+    만약 (c < cw_table[0].first)
+	반환 0;
 
     // binary search in table
     bot = 0;
-    top = (int)cw_table_size - 1;
-    while (top >= bot)
+    top = (정수)cw_table_size - 1;
+    동안 (top >= bot)
     {
 	mid = (bot + top) / 2;
-	if (cw_table[mid].last < c)
+	만약 (cw_table[mid].last < c)
 	    bot = mid + 1;
-	else if (cw_table[mid].first > c)
+	아니면 만약 (cw_table[mid].first > c)
 	    top = mid - 1;
-	else
-	    return cw_table[mid].width;
+	아니면
+	    반환 cw_table[mid].width;
     }
-    return 0;
+    반환 0;
 }
 
-    static int
+    static 정수
 tv_nr_compare(const void *a1, const void *a2)
 {
     listitem_T *li1 = *(listitem_T **)a1;
     listitem_T *li2 = *(listitem_T **)a2;
 
-    return li1->li_tv.vval.v_number == li2->li_tv.vval.v_number ? 0 :
+    반환 li1->li_tv.vval.v_number == li2->li_tv.vval.v_number ? 0 :
 	li1->li_tv.vval.v_number > li2->li_tv.vval.v_number ? 1 : -1;
 }
 
@@ -5791,8 +5791,8 @@ f_setcellwidths(typval_T *argvars, typval_T *rettv UNUSED)
 {
     list_T	    *l;
     listitem_T	    *li;
-    int		    item;
-    int		    i;
+    정수		    item;
+    정수		    i;
     listitem_T	    **ptrs;
     cw_interval_T   *table = NULL;
     size_t	    table_size;
@@ -5800,18 +5800,18 @@ f_setcellwidths(typval_T *argvars, typval_T *rettv UNUSED)
     size_t	    cw_table_size_save;
     char	    *error = NULL;
 
-    if (check_for_nonnull_list_arg(argvars, 0) == FAIL)
-	return;
+    만약 (check_for_nonnull_list_arg(argvars, 0) == FAIL)
+	반환;
 
     l = argvars[0].vval.v_list;
     table_size = (size_t)l->lv_len;
-    if (table_size == 0)
+    만약 (table_size == 0)
 	// Clearing the table.
 	goto update;
 
     ptrs = ALLOC_MULT(listitem_T *, table_size);
-    if (ptrs == NULL)
-	return;
+    만약 (ptrs == NULL)
+	반환;
 
     // Check that all entries are a list with three numbers, the range is
     // valid and the cell width is valid.
@@ -5821,48 +5821,48 @@ f_setcellwidths(typval_T *argvars, typval_T *rettv UNUSED)
 	listitem_T *lili;
 	varnumber_T n1;
 
-	if (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
+	만약 (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
 	{
 	    semsg(_(e_list_item_nr_is_not_list), item);
 	    vim_free(ptrs);
-	    return;
+	    반환;
 	}
 
 	lili = li->li_tv.vval.v_list->lv_first;
 	ptrs[item] = lili;
-	for (i = 0; lili != NULL; lili = lili->li_next, ++i)
+	위해 (i = 0; lili != NULL; lili = lili->li_next, ++i)
 	{
-	    if (lili->li_tv.v_type != VAR_NUMBER)
+	    만약 (lili->li_tv.v_type != VAR_NUMBER)
 		break;
-	    if (i == 0)
+	    만약 (i == 0)
 	    {
 		n1 = lili->li_tv.vval.v_number;
-		if (n1 < 0x80)
+		만약 (n1 < 0x80)
 		{
 		    emsg(_(e_only_values_of_0x80_and_higher_supported));
 		    vim_free(ptrs);
-		    return;
+		    반환;
 		}
 	    }
-	    else if (i == 1 && lili->li_tv.vval.v_number < n1)
+	    아니면 만약 (i == 1 && lili->li_tv.vval.v_number < n1)
 	    {
 		semsg(_(e_list_item_nr_range_invalid), item);
 		vim_free(ptrs);
-		return;
+		반환;
 	    }
-	    else if (i == 2 && (lili->li_tv.vval.v_number < 1
+	    아니면 만약 (i == 2 && (lili->li_tv.vval.v_number < 1
 					     || lili->li_tv.vval.v_number > 2))
 	    {
 		semsg(_(e_list_item_nr_cell_width_invalid), item);
 		vim_free(ptrs);
-		return;
+		반환;
 	    }
 	}
-	if (i != 3)
+	만약 (i != 3)
 	{
 	    semsg(_(e_list_item_nr_does_not_contain_3_numbers), item);
 	    vim_free(ptrs);
-	    return;
+	    반환;
 	}
 	++item;
     }
@@ -5871,25 +5871,25 @@ f_setcellwidths(typval_T *argvars, typval_T *rettv UNUSED)
     qsort((void *)ptrs, table_size, sizeof(listitem_T *), tv_nr_compare);
 
     table = ALLOC_MULT(cw_interval_T, table_size);
-    if (table == NULL)
+    만약 (table == NULL)
     {
 	vim_free(ptrs);
-	return;
+	반환;
     }
 
     // Store the items in the new table.
-    for (item = 0; (size_t)item < table_size; ++item)
+    위해 (item = 0; (size_t)item < table_size; ++item)
     {
 	listitem_T	*lili = ptrs[item];
 	varnumber_T	n1;
 
 	n1 = lili->li_tv.vval.v_number;
-	if (item > 0 && n1 <= table[item - 1].last)
+	만약 (item > 0 && n1 <= table[item - 1].last)
 	{
 	    semsg(_(e_overlapping_ranges_for_nr), (long)n1);
 	    vim_free(ptrs);
 	    vim_free(table);
-	    return;
+	    반환;
 	}
 	table[item].first = n1;
 	lili = lili->li_next;
@@ -5909,13 +5909,13 @@ update:
     // Check that the new value does not conflict with 'listchars' or
     // 'fillchars'.
     error = check_chars_options();
-    if (error != NULL)
+    만약 (error != NULL)
     {
 	emsg(_(error));
 	cw_table = cw_table_save;
 	cw_table_size = cw_table_size_save;
 	vim_free(table);
-	return;
+	반환;
     }
 
     vim_free(cw_table_save);
@@ -5926,15 +5926,15 @@ update:
     void
 f_getcellwidths(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    만약 (rettv_list_alloc(rettv) == FAIL)
+	반환;
 
-    for (size_t i = 0; i < cw_table_size; i++)
+    위해 (size_t i = 0; i < cw_table_size; i++)
     {
 	list_T *entry = list_alloc();
-	if (entry == NULL)
+	만약 (entry == NULL)
 	    break;
-	if (list_append_number(entry, (varnumber_T)cw_table[i].first) == FAIL
+	만약 (list_append_number(entry, (varnumber_T)cw_table[i].first) == FAIL
 	   || list_append_number(entry, (varnumber_T)cw_table[i].last) == FAIL
 	   || list_append_number(entry, (varnumber_T)cw_table[i].width) == FAIL
 	   || list_append_list(rettv->vval.v_list, entry) == FAIL)
@@ -5948,9 +5948,9 @@ f_getcellwidths(typval_T *argvars UNUSED, typval_T *rettv)
     void
 f_charclass(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (check_for_string_arg(argvars, 0) == FAIL
+    만약 (check_for_string_arg(argvars, 0) == FAIL
 	    || argvars[0].vval.v_string == NULL)
-	return;
+	반환;
     rettv->vval.v_number = mb_get_class(argvars[0].vval.v_string);
 }
 #endif
@@ -5960,10 +5960,10 @@ f_charclass(typval_T *argvars, typval_T *rettv UNUSED)
  * encoding options.
  */
     char_u *
-get_encoding_name(expand_T *xp UNUSED, int idx)
+get_encoding_name(expand_T *xp UNUSED, 정수 idx)
 {
-    if (idx >= (int)(sizeof(enc_canon_table) / sizeof(enc_canon_table[0])))
-	return NULL;
+    만약 (idx >= (정수)(sizeof(enc_canon_table) / sizeof(enc_canon_table[0])))
+	반환 NULL;
 
-    return (char_u*)enc_canon_table[idx].name;
+    반환 (char_u*)enc_canon_table[idx].name;
 }

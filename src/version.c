@@ -28,8 +28,8 @@
 char		*Version = VIM_VERSION_SHORT;
 static char	*mediumVersion = VIM_VERSION_MEDIUM;
 
-#if defined(HAVE_DATE_TIME)
-# if defined(VMS) && defined(VAXC)
+#만약 defined(HAVE_DATE_TIME)
+# 만약 defined(VMS) && defined(VAXC)
 char	longVersion[sizeof(VIM_VERSION_LONG_DATE) + sizeof(__DATE__)
 						      + sizeof(__TIME__) + 3];
 
@@ -43,7 +43,7 @@ init_longVersion(void)
     strcpy(longVersion, VIM_VERSION_LONG_DATE);
 #  ifdef BUILD_DATE
     strcat(longVersion, BUILD_DATE);
-#  else
+#  아니면
     strcat(longVersion, __DATE__);
     strcat(longVersion, " ");
     strcat(longVersion, __TIME__);
@@ -51,18 +51,18 @@ init_longVersion(void)
     strcat(longVersion, ")");
 }
 
-# else
+# 아니면
 char	*longVersion = NULL;
 
     void
 init_longVersion(void)
 {
-    if (longVersion != NULL)
-	return;
+    만약 (longVersion != NULL)
+	반환;
 
 #  ifdef BUILD_DATE
     char *date_time = BUILD_DATE;
-#  else
+#  아니면
     char *date_time = __DATE__ " " __TIME__;
 #  endif
     char *msg = _("%s (%s, compiled %s)");
@@ -72,14 +72,14 @@ init_longVersion(void)
 	+ strlen(date_time);
 
     longVersion = alloc(len);
-    if (longVersion == NULL)
+    만약 (longVersion == NULL)
 	longVersion = VIM_VERSION_LONG;
-    else
+    아니면
 	vim_snprintf(longVersion, len, msg,
 		VIM_VERSION_LONG_ONLY, VIM_VERSION_DATE_ONLY, date_time);
 }
 # endif
-#else
+#아니면
 char	*longVersion = VIM_VERSION_LONG;
 
     void
@@ -93,72 +93,72 @@ static char *(features[]) =
 {
 #ifdef HAVE_ACL
 	"+acl",
-#else
+#아니면
 	"-acl",
 #endif
 #ifdef FEAT_ARABIC
 	"+arabic",
-#else
+#아니면
 	"-arabic",
 #endif
 #ifdef AMIGA		// only for Amiga systems
 # ifdef FEAT_ARP
 	"+ARP",
-# else
+# 아니면
 	"-ARP",
 # endif
 #endif
 #ifdef FEAT_AUTOCHDIR
 	"+autochdir",
-#else
+#아니면
 	"-autochdir",
 #endif
 	"+autocmd",
 #ifdef FEAT_AUTOSERVERNAME
 	"+autoservername",
-#else
+#아니면
 	"-autoservername",
 #endif
 #ifdef FEAT_BEVAL_GUI
 	"+balloon_eval",
-#else
+#아니면
 	"-balloon_eval",
 #endif
 #ifdef FEAT_BEVAL_TERM
 	"+balloon_eval_term",
-#else
+#아니면
 	"-balloon_eval_term",
 #endif
 #ifdef FEAT_BROWSE
 	"+browse",
-#else
+#아니면
 	"-browse",
 #endif
 	"++builtin_terms",
 #ifdef FEAT_BYTEOFF
 	"+byte_offset",
-#else
+#아니면
 	"-byte_offset",
 #endif
 #ifdef FEAT_JOB_CHANNEL
 	"+channel",
-#else
+#아니면
 	"-channel",
 #endif
 	"+cindent",
 #ifdef FEAT_CLIENTSERVER
 	"+clientserver",
-#else
+#아니면
 	"-clientserver",
 #endif
 #ifdef FEAT_CLIPBOARD
 	"+clipboard",
-#else
+#아니면
 	"-clipboard",
 #endif
 #ifdef FEAT_CLIPBOARD_PROVIDER
 	"+clipboard_provider",
-#else
+#아니면
 	"-clipboard_provider",
 #endif
 	"+cmdline_compl",
@@ -167,159 +167,159 @@ static char *(features[]) =
 	"+comments",
 #ifdef FEAT_CONCEAL
 	"+conceal",
-#else
+#아니면
 	"-conceal",
 #endif
 #ifdef FEAT_CRYPT
 	"+cryptv",
-#else
+#아니면
 	"-cryptv",
 #endif
 #ifdef FEAT_CSCOPE
 	"+cscope",
-#else
+#아니면
 	"-cscope",
 #endif
 	"+cursorbind",
 #ifdef CURSOR_SHAPE
 	"+cursorshape",
-#else
+#아니면
 	"-cursorshape",
 #endif
-#if defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
+#만약 defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
 	"+dialog_con_gui",
-#else
-# if defined(FEAT_CON_DIALOG)
+#아니면
+# 만약 defined(FEAT_CON_DIALOG)
 	"+dialog_con",
-# else
-#  if defined(FEAT_GUI_DIALOG)
+# 아니면
+#  만약 defined(FEAT_GUI_DIALOG)
 	"+dialog_gui",
-#  else
+#  아니면
 	"-dialog",
 #  endif
 # endif
 #endif
 #ifdef FEAT_DIFF
 	"+diff",
-#else
+#아니면
 	"-diff",
 #endif
 #ifdef FEAT_DIGRAPHS
 	"+digraphs",
-#else
+#아니면
 	"-digraphs",
 #endif
 #ifdef FEAT_GUI_MSWIN
 # ifdef FEAT_DIRECTX
 	"+directx",
-# else
+# 아니면
 	"-directx",
 # endif
 #endif
 #ifdef FEAT_DND
 	"+dnd",
-#else
+#아니면
 	"-dnd",
 #endif
 	"-ebcdic",
 #ifdef FEAT_EMACS_TAGS
 	"+emacs_tags",
-#else
+#아니면
 	"-emacs_tags",
 #endif
 #ifdef FEAT_EVAL
 	"+eval",
-#else
+#아니면
 	"-eval",
 #endif
 	"+ex_extra",
 #ifdef FEAT_SEARCH_EXTRA
 	"+extra_search",
-#else
+#아니면
 	"-extra_search",
 #endif
 	"-farsi",
 	"+file_in_path",
 #ifdef FEAT_FIND_ID
 	"+find_in_path",
-#else
+#아니면
 	"-find_in_path",
 #endif
 	"+float",
 #ifdef FEAT_FOLDING
 	"+folding",
-#else
+#아니면
 	"-folding",
 #endif
 	"-footer",
 	// only interesting on Unix systems
-#if !defined(USE_SYSTEM) && defined(UNIX)
+#만약 !defined(USE_SYSTEM) && defined(UNIX)
 	"+fork()",
 #endif
 #ifdef FEAT_GETTEXT
 # ifdef DYNAMIC_GETTEXT
 	"+gettext/dyn",
-# else
+# 아니면
 	"+gettext",
 # endif
-#else
+#아니면
 	"-gettext",
 #endif
 	"-hangul_input",
-#if (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
+#만약 (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
 # ifdef DYNAMIC_ICONV
 	"+iconv/dyn",
-# else
+# 아니면
 	"+iconv",
 # endif
-#else
+#아니면
 	"-iconv",
 #endif
 #ifdef FEAT_IMAGE
 	"+image",
-#else
+#아니면
 	"-image",
 #endif
 #ifdef FEAT_IMAGE_POPUP
 	"+image_popup",
-#else
+#아니면
 	"-image_popup",
 #endif
 	"+insert_expand",
 #ifdef FEAT_IPV6
 	"+ipv6",
-#else
+#아니면
 	"-ipv6",
 #endif
 #ifdef FEAT_JOB_CHANNEL
 	"+job",
-#else
+#아니면
 	"-job",
 #endif
 	"+jumplist",
 #ifdef FEAT_KEYMAP
 	"+keymap",
-#else
+#아니면
 	"-keymap",
 #endif
 #ifdef FEAT_EVAL
 	"+lambda",
-#else
+#아니면
 	"-lambda",
 #endif
 #ifdef FEAT_LANGMAP
 	"+langmap",
-#else
+#아니면
 	"-langmap",
 #endif
 #ifdef FEAT_LIBCALL
 	"+libcall",
-#else
+#아니면
 	"-libcall",
 #endif
 #ifdef FEAT_LINEBREAK
 	"+linebreak",
-#else
+#아니면
 	"-linebreak",
 #endif
 	"+lispindent",
@@ -328,47 +328,47 @@ static char *(features[]) =
 #ifdef FEAT_LUA
 # ifdef DYNAMIC_LUA
 	"+lua/dyn",
-# else
+# 아니면
 	"+lua",
 # endif
-#else
+#아니면
 	"-lua",
 #endif
 #ifdef FEAT_MENU
 	"+menu",
-#else
+#아니면
 	"-menu",
 #endif
 #ifdef FEAT_SESSION
 	"+mksession",
-#else
+#아니면
 	"-mksession",
 #endif
 	"+modify_fname",
 	"+mouse",
-#if defined(UNIX) || defined(VMS)
+#만약 defined(UNIX) || defined(VMS)
 # ifdef FEAT_MOUSE_DEC
 	"+mouse_dec",
-# else
+# 아니면
 	"-mouse_dec",
 # endif
 # ifdef FEAT_MOUSE_GPM
 #  ifdef DYNAMIC_GPM
 	"+mouse_gpm/dyn",
-#  else
+#  아니면
 	"+mouse_gpm",
 #  endif
-# else
+# 아니면
 	"-mouse_gpm",
 # endif
 # ifdef FEAT_MOUSE_JSB
 	"+mouse_jsbterm",
-# else
+# 아니면
 	"-mouse_jsbterm",
 # endif
 # ifdef FEAT_MOUSE_NET
 	"+mouse_netterm",
-# else
+# 아니면
 	"-mouse_netterm",
 # endif
 #endif
@@ -376,212 +376,212 @@ static char *(features[]) =
 #ifdef __QNX__
 # ifdef FEAT_MOUSE_PTERM
 	"+mouse_pterm",
-# else
+# 아니면
 	"-mouse_pterm",
 # endif
 #endif
 
-#if defined(UNIX) || defined(VMS)
+#만약 defined(UNIX) || defined(VMS)
 	"+mouse_sgr",
 # ifdef FEAT_SYSMOUSE
 	"+mouse_sysmouse",
-# else
+# 아니면
 	"-mouse_sysmouse",
 # endif
 # ifdef FEAT_MOUSE_URXVT
 	"+mouse_urxvt",
-# else
+# 아니면
 	"-mouse_urxvt",
 # endif
 	"+mouse_xterm",
 #endif
 #ifdef FEAT_MOUSESHAPE
 	"+mouseshape",
-#else
+#아니면
 	"-mouseshape",
 #endif
 
 #ifdef FEAT_MBYTE_IME
 # ifdef DYNAMIC_IME
 	"+multi_byte_ime/dyn",
-# else
+# 아니면
 	"+multi_byte_ime",
 # endif
-#else
+#아니면
 	"+multi_byte",
 #endif
 #ifdef FEAT_MULTI_LANG
 	"+multi_lang",
-#else
+#아니면
 	"-multi_lang",
 #endif
 #ifdef FEAT_MZSCHEME
 # ifdef DYNAMIC_MZSCHEME
 	"+mzscheme/dyn",
-# else
+# 아니면
 	"+mzscheme",
 # endif
-#else
+#아니면
 	"-mzscheme",
 #endif
 #ifdef FEAT_NETBEANS_INTG
 	"+netbeans_intg",
-#else
+#아니면
 	"-netbeans_intg",
 #endif
 	"+num64",
 #ifdef FEAT_GUI_MSWIN
 # ifdef FEAT_OLE
 	"+ole",
-# else
+# 아니면
 	"-ole",
 # endif
 #endif
 #ifdef FEAT_EVAL
 	"+packages",
-#else
+#아니면
 	"-packages",
 #endif
 #ifdef FEAT_PRINT_PANGO
 	"+pango",
-#else
+#아니면
 	"-pango",
 #endif
 	"+path_extra",
 #ifdef FEAT_PERL
 # ifdef DYNAMIC_PERL
 	"+perl/dyn",
-# else
+# 아니면
 	"+perl",
 # endif
-#else
+#아니면
 	"-perl",
 #endif
 #ifdef FEAT_PERSISTENT_UNDO
 	"+persistent_undo",
-#else
+#아니면
 	"-persistent_undo",
 #endif
 #ifdef FEAT_PROP_POPUP
 	"+popupwin",
-#else
+#아니면
 	"-popupwin",
 #endif
 #ifdef FEAT_PRINTER
 # ifdef FEAT_POSTSCRIPT
 	"+postscript",
-# else
+# 아니면
 	"-postscript",
 # endif
 	"+printer",
-#else
+#아니면
 	"-printer",
 #endif
 #ifdef FEAT_PROFILE
 	"+profile",
-#else
+#아니면
 	"-profile",
 #endif
 #ifdef FEAT_PYTHON
 # ifdef DYNAMIC_PYTHON
 	"+python/dyn",
-# else
+# 아니면
 	"+python",
 # endif
-#else
+#아니면
 	"-python",
 #endif
 #ifdef FEAT_PYTHON3
 # ifdef DYNAMIC_PYTHON3
 #  ifdef DYNAMIC_PYTHON3_STABLE_ABI
 	"+python3/dyn-stable",
-#  else
+#  아니면
 	"+python3/dyn",
 #  endif
-# else
+# 아니면
 	"+python3",
 # endif
-#else
+#아니면
 	"-python3",
 #endif
 #ifdef FEAT_QUICKFIX
 	"+quickfix",
-#else
+#아니면
 	"-quickfix",
 #endif
 #ifdef FEAT_RELTIME
 	"+reltime",
-#else
+#아니면
 	"-reltime",
 #endif
 #ifdef FEAT_RIGHTLEFT
 	"+rightleft",
-#else
+#아니면
 	"-rightleft",
 #endif
 #ifdef FEAT_RUBY
 # ifdef DYNAMIC_RUBY
 	"+ruby/dyn",
-# else
+# 아니면
 	"+ruby",
 # endif
-#else
+#아니면
 	"-ruby",
 #endif
 	"+scrollbind",
 #ifdef FEAT_SIGNS
 	"+signs",
-#else
+#아니면
 	"-signs",
 #endif
 	"+smartindent",
 #ifdef FEAT_SOCKETSERVER
 	"+socketserver",
-#else
+#아니면
 	"-socketserver",
 #endif
 #ifdef FEAT_SODIUM
 # ifdef DYNAMIC_SODIUM
 	"+sodium/dyn",
-# else
+# 아니면
 	"+sodium",
 # endif
-#else
+#아니면
 	"-sodium",
 #endif
 #ifdef FEAT_SOUND
 	"+sound",
-#else
+#아니면
 	"-sound",
 #endif
 #ifdef FEAT_SPELL
 	"+spell",
-#else
+#아니면
 	"-spell",
 #endif
 #ifdef STARTUPTIME
 	"+startuptime",
-#else
+#아니면
 	"-startuptime",
 #endif
 #ifdef FEAT_STL_OPT
 	"+statusline",
-#else
+#아니면
 	"-statusline",
 #endif
 	"-sun_workshop",
 #ifdef FEAT_SYN_HL
 	"+syntax",
-#else
+#아니면
 	"-syntax",
 #endif
 	    // only interesting on Unix systems
-#if defined(USE_SYSTEM) && defined(UNIX)
+#만약 defined(USE_SYSTEM) && defined(UNIX)
 	"+system()",
 #endif
-#if defined(FEAT_TABPANEL)
+#만약 defined(FEAT_TABPANEL)
 	"+tabpanel",
-#else
+#아니면
 	"-tabpanel",
 #endif
 	"-tag_any_white",
@@ -590,71 +590,71 @@ static char *(features[]) =
 #ifdef FEAT_TCL
 # ifdef DYNAMIC_TCL
 	"+tcl/dyn",
-# else
+# 아니면
 	"+tcl",
 # endif
-#else
+#아니면
 	"-tcl",
 #endif
 #ifdef FEAT_TERMGUICOLORS
 	"+termguicolors",
-#else
+#아니면
 	"-termguicolors",
 #endif
 #ifdef FEAT_TERMINAL
 	"+terminal",
-#else
+#아니면
 	"-terminal",
 #endif
-#if defined(UNIX)
+#만약 defined(UNIX)
 // only Unix can have terminfo instead of termcap
 # ifdef TERMINFO
 	"+terminfo",
-# else
+# 아니면
 	"-terminfo",
 # endif
 #endif
 #ifdef FEAT_TERMRESPONSE
 	"+termresponse",
-#else
+#아니면
 	"-termresponse",
 #endif
 	"+textobjects",
 #ifdef FEAT_PROP_POPUP
 	"+textprop",
-#else
+#아니면
 	"-textprop",
 #endif
-#if !defined(UNIX)
+#만약 !defined(UNIX)
 // unix always includes termcap support
 # ifdef HAVE_TGETENT
 	"+tgetent",
-# else
+# 아니면
 	"-tgetent",
 # endif
 #endif
 #ifdef FEAT_TIMERS
 	"+timers",
-#else
+#아니면
 	"-timers",
 #endif
 	"+title",
 #ifdef FEAT_TOOLBAR
 	"+toolbar",
-#else
+#아니면
 	"-toolbar",
 #endif
 	"+user_commands",
 #ifdef FEAT_VARTABS
 	"+vartabs",
-#else
+#아니면
 	"-vartabs",
 #endif
 	"+vertsplit",
 	"+vim9script",
 #ifdef FEAT_VIMINFO
 	"+viminfo",
-#else
+#아니면
 	"-viminfo",
 #endif
 	"+virtualedit",
@@ -664,18 +664,18 @@ static char *(features[]) =
 #ifdef MSWIN
 # ifdef FEAT_VTP
 	"+vtp",
-# else
+# 아니면
 	"-vtp",
 # endif
 #endif
 #ifdef FEAT_WAYLAND
 	"+wayland",
-#else
+#아니면
 	"-wayland",
 #endif
 #ifdef FEAT_WAYLAND_CLIPBOARD
 	"+wayland_clipboard",
-#else
+#아니면
 	"-wayland_clipboard",
 #endif
 	"+wildignore",
@@ -683,65 +683,65 @@ static char *(features[]) =
 	"+windows",
 #ifdef FEAT_WRITEBACKUP
 	"+writebackup",
-#else
+#아니면
 	"-writebackup",
 #endif
-#if defined(UNIX) || defined(VMS)
+#만약 defined(UNIX) || defined(VMS)
 # ifdef FEAT_X11
 	"+X11",
-# else
+# 아니면
 	"-X11",
 # endif
 #endif
 #ifdef FEAT_XATTR
 	"+xattr",
-#else
+#아니면
 	"-xattr",
 #endif
 #ifdef FEAT_XFONTSET
 	"+xfontset",
-#else
+#아니면
 	"-xfontset",
 #endif
 #ifdef FEAT_XIM
 	"+xim",
-#else
+#아니면
 	"-xim",
 #endif
-#if defined(MSWIN)
+#만약 defined(MSWIN)
 # ifdef FEAT_XPM_W32
 	"+xpm_w32",
-# else
+# 아니면
 	"-xpm_w32",
 # endif
 #elif defined(HAVE_XPM)
 	"+xpm",
-#else
+#아니면
 	"-xpm",
 #endif
-#if defined(UNIX) || defined(VMS)
-# if defined(USE_XSMP_INTERACT)
+#만약 defined(UNIX) || defined(VMS)
+# 만약 defined(USE_XSMP_INTERACT)
 	"+xsmp_interact",
 # elif defined(USE_XSMP)
 	"+xsmp",
-# else
+# 아니면
 	"-xsmp",
 # endif
 # ifdef FEAT_XCLIPBOARD
 	"+xterm_clipboard",
-# else
+# 아니면
 	"-xterm_clipboard",
 # endif
 #endif
 #ifdef FEAT_XTERM_SAVE
 	"+xterm_save",
-#else
+#아니면
 	"-xterm_save",
 #endif
 	NULL
 };
 
-static int included_patches[] =
+static 정수 included_patches[] =
 {   /* Add new patch number below this line */
 /**/
     1225,
@@ -3210,38 +3210,38 @@ static char *(extra_patches[]) =
     NULL
 };
 
-    int
+    정수
 highest_patch(void)
 {
     // this relies on the highest patch number to be the first entry
-    return included_patches[0];
+    반환 included_patches[0];
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * Return TRUE if patch "n" has been included.
  */
-    int
-has_patch(int n)
+    정수
+has_patch(정수 n)
 {
-    int		h, m, l;
+    정수		h, m, l;
 
     // Perform a binary search.
     l = 0;
-    h = (int)ARRAY_LENGTH(included_patches) - 1;
-    for (;;)
+    h = (정수)ARRAY_LENGTH(included_patches) - 1;
+    위해 (;;)
     {
 	m = (l + h) / 2;
-	if (included_patches[m] == n)
-	    return TRUE;
-	if (l == h)
+	만약 (included_patches[m] == n)
+	    반환 TRUE;
+	만약 (l == h)
 	    break;
-	if (included_patches[m] < n)
+	만약 (included_patches[m] < n)
 	    h = m;
-	else
+	아니면
 	    l = m + 1;
     }
-    return FALSE;
+    반환 FALSE;
 }
 #endif
 
@@ -3251,7 +3251,7 @@ ex_version(exarg_T *eap)
     /*
      * Ignore a ":version 9.99" command.
      */
-    if (*eap->arg == NUL)
+    만약 (*eap->arg == NUL)
     {
 	msg_putchar('\n');
 	list_version();
@@ -3264,19 +3264,19 @@ ex_version(exarg_T *eap)
  * When "wrap" is TRUE wrap the string in [].
  */
     static void
-version_msg_wrap(char_u *s, int wrap)
+version_msg_wrap(char_u *s, 정수 wrap)
 {
-    int		len = vim_strsize(s) + (wrap ? 2 : 0);
+    정수		len = vim_strsize(s) + (wrap ? 2 : 0);
 
-    if (!got_int && len < cmdline_width && msg_col + len >= cmdline_width
+    만약 (!got_int && len < cmdline_width && msg_col + len >= cmdline_width
 								&& *s != '\n')
 	msg_putchar('\n');
-    if (!got_int)
+    만약 (!got_int)
     {
-	if (wrap)
+	만약 (wrap)
 	    msg_puts("[");
 	msg_puts((char *)s);
-	if (wrap)
+	만약 (wrap)
 	    msg_puts("]");
     }
 }
@@ -3302,40 +3302,40 @@ list_features(void)
  * The entry with index "current" is inclosed in [].
  */
     void
-list_in_columns(char_u **items, int size, int current)
+list_in_columns(char_u **items, 정수 size, 정수 current)
 {
-    int		i;
-    int		ncol;
-    int		nrow;
-    int		cur_row = 1;
-    int		item_count = 0;
-    int		width = 0;
+    정수		i;
+    정수		ncol;
+    정수		nrow;
+    정수		cur_row = 1;
+    정수		item_count = 0;
+    정수		width = 0;
 #ifdef FEAT_SYN_HL
-    int		use_highlight = (items == (char_u **)features);
+    정수		use_highlight = (items == (char_u **)features);
 #endif
 
     // Find the length of the longest item, use that + 1 as the column
     // width.
-    for (i = 0; size < 0 ? items[i] != NULL : i < size; ++i)
+    위해 (i = 0; size < 0 ? items[i] != NULL : i < size; ++i)
     {
-	int l = vim_strsize(items[i]) + (i == current ? 2 : 0);
+	정수 l = vim_strsize(items[i]) + (i == current ? 2 : 0);
 
-	if (l > width)
+	만약 (l > width)
 	    width = l;
 	++item_count;
     }
     width += 1;
 
-    if (cmdline_width < width)
+    만약 (cmdline_width < width)
     {
 	// Not enough screen columns - show one per line
-	for (i = 0; i < item_count; ++i)
+	위해 (i = 0; i < item_count; ++i)
 	{
 	    version_msg_wrap(items[i], i == current);
-	    if (msg_col > 0 && i < item_count - 1)
+	    만약 (msg_col > 0 && i < item_count - 1)
 		msg_putchar('\n');
 	}
-	return;
+	반환;
     }
 
     // The rightmost column doesn't need a separator.
@@ -3344,42 +3344,42 @@ list_in_columns(char_u **items, int size, int current)
     nrow = item_count / ncol + ((item_count % ncol) ? 1 : 0);
 
     // "i" counts columns then rows.  "idx" counts rows then columns.
-    for (i = 0; !got_int && i < nrow * ncol; ++i)
+    위해 (i = 0; !got_int && i < nrow * ncol; ++i)
     {
-	int idx = (i / ncol) + (i % ncol) * nrow;
+	정수 idx = (i / ncol) + (i % ncol) * nrow;
 
-	if (idx < item_count)
+	만약 (idx < item_count)
 	{
-	    int last_col = (i + 1) % ncol == 0;
+	    정수 last_col = (i + 1) % ncol == 0;
 
-	    if (idx == current)
+	    만약 (idx == current)
 		msg_putchar('[');
 #ifdef FEAT_SYN_HL
-	    if (use_highlight && items[idx][0] == '-')
+	    만약 (use_highlight && items[idx][0] == '-')
 		msg_puts_attr((char *)items[idx], HL_ATTR(HLF_W));
-	    else
+	    아니면
 #endif
 		msg_puts((char *)items[idx]);
-	    if (idx == current)
+	    만약 (idx == current)
 		msg_putchar(']');
-	    if (last_col)
+	    만약 (last_col)
 	    {
-		if (msg_col > 0 && cur_row < nrow)
+		만약 (msg_col > 0 && cur_row < nrow)
 		    msg_putchar('\n');
 		++cur_row;
 	    }
-	    else
+	    아니면
 	    {
-		while (msg_col % width)
+		동안 (msg_col % width)
 		    msg_putchar(' ');
 	    }
 	}
-	else
+	아니면
 	{
 	    // this row is out of items, thus at the end of the row
-	    if (msg_col > 0)
+	    만약 (msg_col > 0)
 	    {
-		if (cur_row < nrow)
+		만약 (cur_row < nrow)
 		    msg_putchar('\n');
 		++cur_row;
 	    }
@@ -3390,8 +3390,8 @@ list_in_columns(char_u **items, int size, int current)
     void
 list_version(void)
 {
-    int		i;
-    int		first;
+    정수		i;
+    정수		first;
     char	*s = "";
 
     /*
@@ -3404,47 +3404,47 @@ list_version(void)
 # ifdef FEAT_GUI_MSWIN
 #  ifdef VIMDLL
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
+#    만약 defined(_M_ARM64) || defined(_M_ARM64EC)
      msg_puts(_("\nMS-Windows ARM64 GUI/console version"));
-#    else
+#    아니면
      msg_puts(_("\nMS-Windows 64-bit GUI/console version"));
 #    endif
-#   else
+#   아니면
     msg_puts(_("\nMS-Windows 32-bit GUI/console version"));
 #   endif
-#  else
+#  아니면
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
+#    만약 defined(_M_ARM64) || defined(_M_ARM64EC)
      msg_puts(_("\nMS-Windows ARM64 GUI version"));
-#    else
+#    아니면
      msg_puts(_("\nMS-Windows 64-bit GUI version"));
 #    endif
-#   else
+#   아니면
     msg_puts(_("\nMS-Windows 32-bit GUI version"));
 #   endif
 #  endif
 #  ifdef FEAT_OLE
     msg_puts(_(" with OLE support"));
 #  endif
-# else
+# 아니면
 #  ifdef _WIN64
-#   if defined(_M_ARM64) || defined(_M_ARM64EC)
+#   만약 defined(_M_ARM64) || defined(_M_ARM64EC)
     msg_puts(_("\nMS-Windows ARM64 console version"));
-#   else
+#   아니면
     msg_puts(_("\nMS-Windows 64-bit console version"));
 #   endif
-#  else
+#  아니면
     msg_puts(_("\nMS-Windows 32-bit console version"));
 #  endif
 # endif
 #endif
-#if defined(MACOS_X)
-# if defined(MACOS_X_DARWIN)
+#만약 defined(MACOS_X)
+# 만약 defined(MACOS_X_DARWIN)
     msg_puts(_("\nmacOS version"));
-# else
+# 아니면
     msg_puts(_("\nmacOS version w/o darwin feat."));
 # endif
-# if defined(__arm64__)
+# 만약 defined(__arm64__)
     msg_puts(" - arm64");
 # elif defined(__x86_64__)
     msg_puts(" - x86_64");
@@ -3454,11 +3454,11 @@ list_version(void)
 #ifdef VMS
     msg_puts(_("\nOpenVMS (build) arch, version"));
 # ifdef HAVE_PATHDEF
-    if (*compiled_arch != NUL)
+    만약 (*compiled_arch != NUL)
     {
 	msg_puts(": ");
 	msg_puts((char *)compiled_arch);
-	if (*compiled_vers != NUL)
+	만약 (*compiled_vers != NUL)
 	{
 	    msg_puts(", ");
 	    msg_puts((char *)compiled_vers);
@@ -3471,21 +3471,21 @@ list_version(void)
 
     // Print the list of patch numbers if there is at least one.
     // Print a range when patches are consecutive: "1-10, 12, 15-40, 42-45"
-    if (included_patches[0] != 0)
+    만약 (included_patches[0] != 0)
     {
 	msg_puts(_("\nIncluded patches: "));
 	first = -1;
-	i = (int)ARRAY_LENGTH(included_patches) - 1;
-	while (--i >= 0)
+	i = (정수)ARRAY_LENGTH(included_patches) - 1;
+	동안 (--i >= 0)
 	{
-	    if (first < 0)
+	    만약 (first < 0)
 		first = included_patches[i];
-	    if (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
+	    만약 (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
 	    {
 		msg_puts(s);
 		s = ", ";
 		msg_outnum((long)first);
-		if (first != included_patches[i])
+		만약 (first != included_patches[i])
 		{
 		    msg_puts("-");
 		    msg_outnum((long)included_patches[i]);
@@ -3496,11 +3496,11 @@ list_version(void)
     }
 
     // Print the list of extra patch descriptions if there is at least one.
-    if (extra_patches[0] != NULL)
+    만약 (extra_patches[0] != NULL)
     {
 	msg_puts(_("\nExtra patches: "));
 	s = "";
-	for (i = 0; extra_patches[i] != NULL; ++i)
+	위해 (i = 0; extra_patches[i] != NULL; ++i)
 	{
 	    msg_puts(s);
 	    s = ", ";
@@ -3515,15 +3515,15 @@ list_version(void)
 #endif
 
 #ifdef HAVE_PATHDEF
-    if (*compiled_user != NUL || *compiled_sys != NUL)
+    만약 (*compiled_user != NUL || *compiled_sys != NUL)
     {
 	msg_puts(_("\nCompiled "));
-	if (*compiled_user != NUL)
+	만약 (*compiled_user != NUL)
 	{
 	    msg_puts(_("by "));
 	    msg_puts((char *)compiled_user);
 	}
-	if (*compiled_sys != NUL)
+	만약 (*compiled_sys != NUL)
 	{
 	    msg_puts("@");
 	    msg_puts((char *)compiled_sys);
@@ -3531,23 +3531,23 @@ list_version(void)
     }
 #endif
 
-#if defined(FEAT_HUGE)
+#만약 defined(FEAT_HUGE)
     msg_puts(_("\nHuge version "));
 #elif defined(FEAT_NORMAL)
     msg_puts(_("\nNormal version "));
-#else
+#아니면
     msg_puts(_("\nTiny version "));
 #endif
-#if !defined(FEAT_GUI)
+#만약 !defined(FEAT_GUI)
     msg_puts(_("without GUI."));
 #elif defined(FEAT_GUI_GTK)
-# if defined(USE_GTK4)
+# 만약 defined(USE_GTK4)
     msg_puts(_("with GTK4 GUI."));
 # elif defined(USE_GTK3)
     msg_puts(_("with GTK3 GUI."));
 # elif defined(FEAT_GUI_GNOME)
     msg_puts(_("with GTK2-GNOME GUI."));
-# else
+# 아니면
     msg_puts(_("with GTK2 GUI."));
 # endif
 #elif defined(FEAT_GUI_MOTIF)
@@ -3562,7 +3562,7 @@ list_version(void)
     version_msg(_("  Features included (+) or not (-):\n"));
 
     list_features();
-    if (msg_col > 0)
+    만약 (msg_col > 0)
 	msg_putchar('\n');
 
 #ifdef SYS_VIMRC_FILE
@@ -3580,7 +3580,7 @@ list_version(void)
     version_msg(USR_VIMRC_FILE2);
     version_msg("\"\n");
 #endif
-#if defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
+#만약 defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
     version_msg(_(" 3rd user vimrc file: \""));
     version_msg(USR_VIMRC_FILE3);
     version_msg("\"\n");
@@ -3637,13 +3637,13 @@ list_version(void)
 # endif
 #endif
 #ifdef HAVE_PATHDEF
-    if (*default_vim_dir != NUL)
+    만약 (*default_vim_dir != NUL)
     {
 	version_msg(_("  fall-back for $VIM: \""));
 	version_msg((char *)default_vim_dir);
 	version_msg("\"\n");
     }
-    if (*default_vimruntime_dir != NUL)
+    만약 (*default_vimruntime_dir != NUL)
     {
 	version_msg(_(" f-b for $VIMRUNTIME: \""));
 	version_msg((char *)default_vimruntime_dir);
@@ -3653,7 +3653,7 @@ list_version(void)
     version_msg((char *)all_cflags);
     version_msg("\n");
 # ifdef VMS
-    if (*compiler_version != NUL)
+    만약 (*compiler_version != NUL)
     {
 	version_msg(_("Compiler: "));
 	version_msg((char *)compiler_version);
@@ -3669,8 +3669,8 @@ list_version(void)
 #endif
 }
 
-static void do_intro_line(int row, char_u *mesg, int add_version, int attr);
-static void intro_message(int colon);
+static void do_intro_line(정수 row, char_u *mesg, 정수 add_version, 정수 attr);
+static void intro_message(정수 colon);
 
 /*
  * Show the intro message when not editing a file.
@@ -3678,7 +3678,7 @@ static void intro_message(int colon);
     void
 maybe_intro_message(void)
 {
-    if (BUFEMPTY()
+    만약 (BUFEMPTY()
 	    && curbuf->b_fname == NULL
 	    && firstwin->w_next == NULL
 	    && vim_strchr(p_shm, SHM_INTRO) == NULL)
@@ -3692,12 +3692,12 @@ maybe_intro_message(void)
  */
     static void
 intro_message(
-    int		colon)		// TRUE for ":intro"
+    정수		colon)		// TRUE for ":intro"
 {
-    int		i;
-    int		row;
-    int		blanklines;
-    int		sponsor;
+    정수		i;
+    정수		row;
+    정수		blanklines;
+    정수		sponsor;
     char	*p;
     static char	*(lines[]) =
     {
@@ -3749,77 +3749,77 @@ intro_message(
 #endif
 
     // blanklines = screen height - # message lines
-    blanklines = (int)Rows - (ARRAY_LENGTH(lines) - 1);
-    if (!p_cp)
+    blanklines = (정수)Rows - (ARRAY_LENGTH(lines) - 1);
+    만약 (!p_cp)
 	blanklines += 4;  // add 4 for not showing "Vi compatible" message
 
     // Don't overwrite a statusline.  Depends on 'cmdheight'.
-    if (p_ls > 1)
+    만약 (p_ls > 1)
 	blanklines -= Rows - topframe->fr_height;
-    if (blanklines < 0)
+    만약 (blanklines < 0)
 	blanklines = 0;
 
     // Show the sponsor and Uganda message two out of four times
-    sponsor = (int)time(NULL);
+    sponsor = (정수)time(NULL);
     sponsor = ((sponsor & 2) == 0) - ((sponsor & 4) == 0);
 
     // start displaying the message lines after half of the blank lines
     row = blanklines / 2;
-    if ((row >= 2 && topframe->fr_width >= 50) || colon)
+    만약 ((row >= 2 && topframe->fr_width >= 50) || colon)
     {
-	for (i = 0; i < (int)ARRAY_LENGTH(lines); ++i)
+	위해 (i = 0; i < (정수)ARRAY_LENGTH(lines); ++i)
 	{
 	    p = lines[i];
 #ifdef FEAT_GUI
-	    if (p_im && gui.in_use && gui_lines[i] != NULL)
+	    만약 (p_im && gui.in_use && gui_lines[i] != NULL)
 		p = gui_lines[i];
 #endif
-	    if (p == NULL)
+	    만약 (p == NULL)
 	    {
-		if (!p_cp)
+		만약 (!p_cp)
 		    break;
 		continue;
 	    }
-	    if (sponsor != 0)
+	    만약 (sponsor != 0)
 	    {
-		if (strstr(p, "children") != NULL)
+		만약 (strstr(p, "children") != NULL)
 		    p = N_("Sponsor Vim development!");
-		else if (strstr(p, "Kuwasha") != NULL)
+		아니면 만약 (strstr(p, "Kuwasha") != NULL)
 		    p = N_("type  :help sponsor<Enter>    for information ");
-		else if (strstr(p, "Orphans") != NULL)
+		아니면 만약 (strstr(p, "Orphans") != NULL)
 		    p = N_("menu  Help->Sponsor           for information    ");
 	    }
-	    if (*p != NUL)
+	    만약 (*p != NUL)
 		do_intro_line(row, (char_u *)_(p), i == 2, 0);
 	    ++row;
 	}
     }
 
     // Make the wait-return message appear just below the text.
-    if (colon)
+    만약 (colon)
 	msg_row = row;
 }
 
     static void
 do_intro_line(
-    int		row,
+    정수		row,
     char_u	*mesg,
-    int		add_version,
-    int		attr)
+    정수		add_version,
+    정수		attr)
 {
     char_u	vers[20];
-    int		col;
+    정수		col;
     char_u	*p;
-    int		l;
-    int		clen;
+    정수		l;
+    정수		clen;
 #ifdef MODIFIED_BY
 # define MODBY_LEN 150
     char_u	modby[MODBY_LEN];
 
-    if (*mesg == ' ')
+    만약 (*mesg == ' ')
     {
 	vim_strncpy(modby, (char_u *)_("Modified by "), MODBY_LEN - 1);
-	l = (int)STRLEN(modby);
+	l = (정수)STRLEN(modby);
 	vim_strncpy(modby + l, (char_u *)MODIFIED_BY, MODBY_LEN - l - 1);
 	mesg = modby;
     }
@@ -3827,40 +3827,40 @@ do_intro_line(
 
     // Center the message horizontally.
     col = vim_strsize(mesg);
-    if (add_version)
+    만약 (add_version)
     {
 	STRCPY(vers, mediumVersion);
-	if (highest_patch())
+	만약 (highest_patch())
 	{
 	    // Check for 9.9x or 9.9xx, alpha/beta version
-	    if (SAFE_isalpha((int)vers[3]))
+	    만약 (SAFE_isalpha((정수)vers[3]))
 	    {
-		int len = (SAFE_isalpha((int)vers[4])) ? 5 : 4;
+		정수 len = (SAFE_isalpha((정수)vers[4])) ? 5 : 4;
 		sprintf((char *)vers + len, ".%d%s", highest_patch(),
 							 mediumVersion + len);
 	    }
-	    else
+	    아니면
 		sprintf((char *)vers + 3, ".%d", highest_patch());
 	}
-	col += (int)STRLEN(vers);
+	col += (정수)STRLEN(vers);
     }
     col = (topframe->fr_width - col) / 2;
-    if (col < 0)
+    만약 (col < 0)
 	col = 0;
 
     // Split up in parts to highlight <> items differently.
-    for (p = mesg; *p != NUL; p += l)
+    위해 (p = mesg; *p != NUL; p += l)
     {
 	clen = 0;
-	for (l = 0; p[l] != NUL
+	위해 (l = 0; p[l] != NUL
 			 && (l == 0 || (p[l] != '<' && p[l - 1] != '>')); ++l)
 	{
-	    if (has_mbyte)
+	    만약 (has_mbyte)
 	    {
 		clen += ptr2cells(p + l);
 		l += (*mb_ptr2len)(p + l) - 1;
 	    }
-	    else
+	    아니면
 		clen += byte2cells(p[l]);
 	}
 	screen_puts_len(p, l, row, col + firstwin->w_wincol,
@@ -3869,7 +3869,7 @@ do_intro_line(
     }
 
     // Add the version number to the version line.
-    if (add_version)
+    만약 (add_version)
 	screen_puts(vers, row, col + firstwin->w_wincol, 0);
 }
 
@@ -3880,7 +3880,7 @@ do_intro_line(
 ex_intro(exarg_T *eap UNUSED)
 {
     screenclear();
-#if defined(FEAT_TABPANEL)
+#만약 defined(FEAT_TABPANEL)
     draw_tabpanel();
 #endif
     intro_message(TRUE);

@@ -47,11 +47,11 @@
 /* this comes from xpm.h, and is here again, to avoid complicated
     includes, since this is included from xpm.h */
 /* these defines get undefed at the end of this file */
-#if __STDC__ || defined(__cplusplus) || defined(c_plusplus)
+#만약 __STDC__ || defined(__cplusplus) || defined(c_plusplus)
  /* ANSI || C++ */
 #define FUNC(f, t, p) extern t f p
 #define LFUNC(f, t, p) static t f p
-#else /* k&R */
+#아니면 /* k&R */
 #define FUNC(f, t, p) extern t f()
 #define LFUNC(f, t, p) static t f()
 #endif
@@ -83,12 +83,12 @@ typedef struct {
 
 typedef struct {
     HBITMAP bitmap;
-    unsigned int width;
-    unsigned int height;
-    unsigned int depth;
+    unsigned 정수 width;
+    unsigned 정수 height;
+    unsigned 정수 depth;
 }      XImage;
 
-#if defined(__cplusplus) || defined(c_plusplus)
+#만약 defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
 #endif
 /* some replacements for X... functions */
@@ -97,26 +97,26 @@ extern "C" {
     FUNC(XDefaultVisual, Visual *, (Display *display, Screen *screen));
     FUNC(XDefaultScreen, Screen *, (Display *d));
     FUNC(XDefaultColormap, Colormap *, (Display *display, Screen *screen));
-    FUNC(XDefaultDepth, int, (Display *d, Screen *s));
+    FUNC(XDefaultDepth, 정수, (Display *d, Screen *s));
 
 /* color related */
-    FUNC(XParseColor, int, (Display *, Colormap *, char *, XColor *));
-    FUNC(XAllocColor, int, (Display *, Colormap *, XColor *));
+    FUNC(XParseColor, 정수, (Display *, Colormap *, char *, XColor *));
+    FUNC(XAllocColor, 정수, (Display *, Colormap *, XColor *));
     FUNC(XQueryColors, void, (Display *display, Colormap *colormap,
-			      XColor *xcolors, int ncolors));
-    FUNC(XFreeColors, int, (Display *d, Colormap cmap,
+			      XColor *xcolors, 정수 ncolors));
+    FUNC(XFreeColors, 정수, (Display *d, Colormap cmap,
 			    unsigned long pixels[],
-			    int npixels, unsigned long planes));
+			    정수 npixels, unsigned long planes));
 /* XImage */
-    FUNC(XCreateImage, XImage *, (Display *, Visual *, int depth, int format,
-				  int x, int y, int width, int height,
-				  int pad, int foo));
+    FUNC(XCreateImage, XImage *, (Display *, Visual *, 정수 depth, 정수 format,
+				  정수 x, 정수 y, 정수 width, 정수 height,
+				  정수 pad, 정수 foo));
 
 /* free and destroy bitmap */
     FUNC(XDestroyImage, void /* ? */ , (XImage *));
 /* free only, bitmap remains */
     FUNC(XImageFree, void, (XImage *));
-#if defined(__cplusplus) || defined(c_plusplus)
+#만약 defined(__cplusplus) || defined(c_plusplus)
 } /* end of extern "C" */
 #endif /* cplusplus */
 

@@ -41,7 +41,7 @@ const char *supported_mimes[] = {
 G_DEFINE_TYPE(VimContentProvider, vim_content_provider, GDK_TYPE_CONTENT_PROVIDER)
 
 static GdkContentFormats *vim_content_provider_ref_formats(GdkContentProvider *cp);
-static void vim_content_provider_write_mime_type_async(GdkContentProvider *cp, const char *mime_type, GOutputStream *stream, int io_priority, GCancellable *cancellable, GAsyncReadyCallback callback, gpointer user_data);
+static void vim_content_provider_write_mime_type_async(GdkContentProvider *cp, const char *mime_type, GOutputStream *stream, 정수 io_priority, GCancellable *cancellable, GAsyncReadyCallback callback, gpointer user_data);
 static gboolean vim_content_provider_write_mime_type_finish(GdkContentProvider *cp, GAsyncResult *result, GError **error);
 
     static void
@@ -66,7 +66,7 @@ vim_content_provider_new(Clipboard_T *cbd)
 
     vcp->cbd = cbd;
 
-    return GDK_CONTENT_PROVIDER(vcp);
+    반환 GDK_CONTENT_PROVIDER(vcp);
 }
 
     static GdkContentFormats *
@@ -76,13 +76,13 @@ vim_content_provider_ref_formats(GdkContentProvider *cp UNUSED)
     // html if user specified 'html' in 'clipboard' option.
     GdkContentFormatsBuilder *builder = gdk_content_formats_builder_new();
 
-    for (size_t i = 0; i < SUPPORTED_MIMES_LEN; i++)
+    위해 (size_t i = 0; i < SUPPORTED_MIMES_LEN; i++)
     {
-	if (STRCMP(supported_mimes[i], "text/html") == 0 && !clip_html)
+	만약 (STRCMP(supported_mimes[i], "text/html") == 0 && !clip_html)
 	    continue;
 	gdk_content_formats_builder_add_mime_type(builder, supported_mimes[i]);
     }
-    return gdk_content_formats_builder_free_to_formats(builder);
+    반환 gdk_content_formats_builder_free_to_formats(builder);
 }
 
 static void
@@ -93,10 +93,10 @@ vim_content_provider_write_mime_type_done (
 {
     GError *error = NULL;
 
-    if (!g_output_stream_write_all_finish (G_OUTPUT_STREAM (stream),
+    만약 (!g_output_stream_write_all_finish (G_OUTPUT_STREAM (stream),
 		result, NULL, &error))
 	g_task_return_error (task, error);
-    else
+    아니면
 	g_task_return_boolean (task, TRUE);
     g_object_unref (task);
 }
@@ -106,17 +106,17 @@ vim_content_provider_write_mime_type_async(
 	GdkContentProvider  *cp,
 	const char	    *mime_type,
 	GOutputStream	    *stream,
-	int		    io_priority,
+	정수		    io_priority,
 	GCancellable	    *cancellable,
 	GAsyncReadyCallback callback,
 	void		    *udata)
 {
     VimContentProvider	*self = VIM_CONTENT_PROVIDER(cp);
     Clipboard_T		*cbd = self->cbd;
-    int			motion_type;
+    정수			motion_type;
     long_u		length;
     char_u		*string;
-    int			offset = 0;
+    정수			offset = 0;
     bool		is_vim, is_vimenc;
     GTask		*task;
     gboolean		have_mime = FALSE;
@@ -125,59 +125,59 @@ vim_content_provider_write_mime_type_async(
     g_task_set_priority (task, io_priority);
     g_task_set_source_tag (task, vim_content_provider_write_mime_type_async);
 
-    if (STRCMP(mime_type, "text/html") == 0 && !clip_html)
+    만약 (STRCMP(mime_type, "text/html") == 0 && !clip_html)
     {
 	g_task_return_new_error(
 		task, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 		"HTML not supported");
 	g_object_unref(task);
-	return;
+	반환;
     }
 
     // Check if we actually support the mime type
-    for (int i = 0; i < (int)SUPPORTED_MIMES_LEN; i++)
-	if (STRCMP(supported_mimes[i], mime_type) == 0)
+    위해 (정수 i = 0; i < (정수)SUPPORTED_MIMES_LEN; i++)
+	만약 (STRCMP(supported_mimes[i], mime_type) == 0)
 	{
 	    have_mime = TRUE;
 	    break;
 	}
 
-    if (!have_mime)
+    만약 (!have_mime)
     {
 	g_task_return_new_error(
 		task, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
 		"Cannot provide contents as '%s'", mime_type);
 	g_object_unref(task);
-	return;
+	반환;
     }
 
     // Add the required stuff for our own specific formats.
     is_vimenc = STRCMP(mime_type, VIMENC_MIMETYPE_NAME) == 0;
     is_vim = STRCMP(mime_type, VIM_MIMETYPE_NAME) == 0;
 
-    if (is_vimenc)
+    만약 (is_vimenc)
 	offset += 2 + STRLEN(p_enc);
-    else if (is_vim)
+    아니면 만약 (is_vim)
 	offset += 1;
 
     clip_get_selection(cbd);
     motion_type = clip_convert_selection_offset(&string, &length, offset, cbd);
 
-    if (motion_type < 0)
+    만약 (motion_type < 0)
     {
 	g_task_return_new_error(
 		task, G_IO_ERROR, G_IO_ERROR_FAILED, "Error converting data");
 	g_object_unref(task);
-	return;
+	반환;
     }
 
-    if (is_vimenc)
+    만약 (is_vimenc)
     {
 	string[0] = (char_u)motion_type;
 	// Use vim_strncpy for safer copying
 	vim_strncpy(string + 1, p_enc, STRLEN(p_enc));
     }
-    else if (is_vim)
+    아니면 만약 (is_vim)
 	string[0] = (char_u)motion_type;
 
     // "string" is allocated using vim's allocation functions
@@ -194,5 +194,5 @@ vim_content_provider_write_mime_type_finish(
 	GAsyncResult	    *result,
 	GError		    **error)
 {
-  return g_task_propagate_boolean (G_TASK (result), error);
+  반환 g_task_propagate_boolean (G_TASK (result), error);
 }

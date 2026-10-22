@@ -57,10 +57,10 @@ typedef struct _XmEnhancedButtonPart
     String pixmap_data;
     String pixmap_file;
     Dimension spacing;
-    int label_location;
+    정수 label_location;
 
     // private resources
-    int pixmap_depth;
+    정수 pixmap_depth;
     Dimension pixmap_width;
     Dimension pixmap_height;
     Pixmap normal_pixmap;
@@ -68,8 +68,8 @@ typedef struct _XmEnhancedButtonPart
     Pixmap insensitive_pixmap;
     Pixmap highlight_pixmap;
 
-    int doing_setvalues;
-    int doing_destroy;
+    정수 doing_setvalues;
+    정수 doing_destroy;
 } XmEnhancedButtonPart;
 
 

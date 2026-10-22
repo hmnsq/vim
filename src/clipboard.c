@@ -33,12 +33,12 @@
 
 
 #ifdef FEAT_CLIPBOARD_PROVIDER
-static int clip_provider_is_available(char_u *provider);
+static 정수 clip_provider_is_available(char_u *provider);
 #endif
 
-#if defined(FEAT_CLIPBOARD)
+#만약 defined(FEAT_CLIPBOARD)
 
-# if defined(FEAT_WAYLAND_CLIPBOARD)
+# 만약 defined(FEAT_WAYLAND_CLIPBOARD)
 
 #  include "wayland.h"
 
@@ -86,13 +86,13 @@ static const char *supported_mimes[] = {
 clip_wl_T clip_wl;
 
 static void
-clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd);
+clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, 정수 fd);
 static void clip_wl_request_selection(Clipboard_T *cbd);
-static int clip_wl_own_selection(Clipboard_T *cbd);
+static 정수 clip_wl_own_selection(Clipboard_T *cbd);
 static void clip_wl_lose_selection(Clipboard_T *cbd);
 static void clip_wl_set_selection(Clipboard_T *cbd);
 
-#  if defined(USE_SYSTEM)
+#  만약 defined(USE_SYSTEM)
 static bool clip_wl_owner_exists(Clipboard_T *cbd);
 #  endif
 
@@ -110,15 +110,15 @@ static bool clip_wl_owner_exists(Clipboard_T *cbd);
  * the GUI starts.
  */
     void
-clip_init(int can_use)
+clip_init(정수 can_use)
 {
     Clipboard_T *cb;
 
     cb = &clip_star;
-    for (;;)
+    위해 (;;)
     {
 	// No need to init again if cbd is already available
-	if (can_use && cb->available)
+	만약 (can_use && cb->available)
 	    goto skip;
 
 	cb->available  = can_use;
@@ -130,7 +130,7 @@ clip_init(int can_use)
 	cb->state      = SELECT_CLEARED;
 
 skip:
-	if (cb == &clip_plus)
+	만약 (cb == &clip_plus)
 	    break;
 	cb = &clip_plus;
     }
@@ -149,21 +149,21 @@ clip_update_selection(Clipboard_T *clip)
     pos_T	    start, end;
 
     // If visual mode is only due to a redo command ("."), then ignore it
-    if (!redo_VIsual_busy && VIsual_active && (State & MODE_NORMAL))
+    만약 (!redo_VIsual_busy && VIsual_active && (State & MODE_NORMAL))
     {
-	if (LT_POS(VIsual, curwin->w_cursor))
+	만약 (LT_POS(VIsual, curwin->w_cursor))
 	{
 	    start = VIsual;
 	    end = curwin->w_cursor;
-	    if (has_mbyte)
+	    만약 (has_mbyte)
 		end.col += (*mb_ptr2len)(ml_get_cursor()) - 1;
 	}
-	else
+	아니면
 	{
 	    start = curwin->w_cursor;
 	    end = VIsual;
 	}
-	if (!EQUAL_POS(clip->start, start)
+	만약 (!EQUAL_POS(clip->start, start)
 		|| !EQUAL_POS(clip->end, end)
 		|| clip->vmode != VIsual_mode)
 	{
@@ -178,32 +178,32 @@ clip_update_selection(Clipboard_T *clip)
     }
 }
 
-    static int
+    static 정수
 clip_gen_own_selection(Clipboard_T *cbd)
 {
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# 만약 defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
-	return clip_mch_own_selection(cbd);
-    else
+    만약 (gui.in_use)
+	반환 clip_mch_own_selection(cbd);
+    아니면
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	만약 (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
-	    return clip_wl_own_selection(cbd);
+	    반환 clip_wl_own_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	아니면 만약 (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
-	    return clip_xterm_own_selection(cbd);
+	    반환 clip_xterm_own_selection(cbd);
 #  endif
 	}
     }
-    return FAIL;
-# else
-    return clip_mch_own_selection(cbd);
+    반환 FAIL;
+# 아니면
+    반환 clip_mch_own_selection(cbd);
 # endif
 }
 
@@ -214,20 +214,20 @@ clip_own_selection(Clipboard_T *cbd)
      * Also want to check somehow that we are reading from the keyboard rather
      * than a mapping etc.
      */
-# if defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
+# 만약 defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
     // Always own the selection, we might have lost it without being
     // notified, e.g. during a ":sh" command.
-    if (cbd->available)
+    만약 (cbd->available)
     {
-	int was_owned = cbd->owned;
+	정수 was_owned = cbd->owned;
 
 	cbd->owned = (clip_gen_own_selection(cbd) == OK);
-	if (!was_owned && (cbd == &clip_star || cbd == &clip_plus))
+	만약 (!was_owned && (cbd == &clip_star || cbd == &clip_plus))
 	{
 	    // May have to show a different kind of highlighting for the
 	    // selected area.  There is no specific redraw command for this,
 	    // just redraw all windows on the current buffer.
-	    if (cbd->owned
+	    만약 (cbd->owned
 		    && (get_real_state() == MODE_VISUAL
 					    || get_real_state() == MODE_SELECT)
 		    && (cbd == &clip_star ? clip_isautosel_star()
@@ -236,9 +236,9 @@ clip_own_selection(Clipboard_T *cbd)
 		redraw_curbuf_later(UPD_INVERTED_ALL);
 	}
     }
-# else
+# 아니면
     // Only own the clipboard when we didn't own it yet.
-    if (!cbd->owned && cbd->available)
+    만약 (!cbd->owned && cbd->available)
 	cbd->owned = (clip_gen_own_selection(cbd) == OK);
 # endif
 }
@@ -246,27 +246,27 @@ clip_own_selection(Clipboard_T *cbd)
     static void
 clip_gen_lose_selection(Clipboard_T *cbd)
 {
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# 만약 defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    만약 (gui.in_use)
 	clip_mch_lose_selection(cbd);
-    else
+    아니면
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	만약 (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
 	    clip_wl_lose_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	아니면 만약 (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
 	    clip_xterm_lose_selection(cbd);
 #  endif
 	}
     }
-# else
+# 아니면
     clip_mch_lose_selection(cbd);
 # endif
 }
@@ -275,25 +275,25 @@ clip_gen_lose_selection(Clipboard_T *cbd)
 clip_lose_selection(Clipboard_T *cbd)
 {
 # ifdef FEAT_X11
-    int	    was_owned = cbd->owned;
+    정수	    was_owned = cbd->owned;
 # endif
-    int     visual_selection = FALSE;
+    정수     visual_selection = FALSE;
 
-    if (cbd == &clip_star || cbd == &clip_plus)
+    만약 (cbd == &clip_star || cbd == &clip_plus)
 	visual_selection = TRUE;
 
     clip_free_selection(cbd);
     cbd->owned = FALSE;
-    if (visual_selection)
+    만약 (visual_selection)
 	clip_clear_selection(cbd);
     clip_gen_lose_selection(cbd);
 # ifdef FEAT_X11
-    if (visual_selection)
+    만약 (visual_selection)
     {
 	// May have to show a different kind of highlighting for the selected
 	// area.  There is no specific redraw command for this, just redraw all
 	// windows on the current buffer.
-	if (was_owned
+	만약 (was_owned
 		&& (get_real_state() == MODE_VISUAL
 		    || get_real_state() == MODE_SELECT)
 		&& (cbd == &clip_star ?
@@ -313,12 +313,12 @@ clip_lose_selection(Clipboard_T *cbd)
     static void
 clip_copy_selection(Clipboard_T *clip)
 {
-    if (VIsual_active && (State & MODE_NORMAL) && clip->available)
+    만약 (VIsual_active && (State & MODE_NORMAL) && clip->available)
     {
 	clip_update_selection(clip);
 	clip_free_selection(clip);
 	clip_own_selection(clip);
-	if (clip->owned)
+	만약 (clip->owned)
 	    clip_get_selection(clip);
 	clip_gen_set_selection(clip);
     }
@@ -329,9 +329,9 @@ clip_copy_selection(Clipboard_T *clip)
  * prevents accessing the clipboard very often which might slow down Vim
  * considerably.
  */
-static int global_change_count = 0; // if set, inside a start_global_changes
-static int clipboard_needs_update = FALSE; // clipboard needs to be updated
-static int clip_did_set_selection = TRUE;
+static 정수 global_change_count = 0; // if set, inside a start_global_changes
+static 정수 clipboard_needs_update = FALSE; // clipboard needs to be updated
+static 정수 clip_did_set_selection = TRUE;
 
 /*
  * Save clip_unnamed and reset it.
@@ -339,12 +339,12 @@ static int clip_did_set_selection = TRUE;
     void
 start_global_changes(void)
 {
-    if (++global_change_count > 1)
-	return;
+    만약 (++global_change_count > 1)
+	반환;
     clip_unnamed_saved = clip_unnamed;
     clipboard_needs_update = FALSE;
 
-    if (clip_did_set_selection)
+    만약 (clip_did_set_selection)
     {
 	clip_unnamed = 0;
 	clip_did_set_selection = FALSE;
@@ -355,10 +355,10 @@ start_global_changes(void)
  * Return TRUE if setting the clipboard was postponed, it already contains the
  * right text.
  */
-    static int
+    static 정수
 is_clipboard_needs_update(void)
 {
-    return clipboard_needs_update;
+    반환 clipboard_needs_update;
 }
 
 /*
@@ -367,24 +367,24 @@ is_clipboard_needs_update(void)
     void
 end_global_changes(void)
 {
-    if (--global_change_count > 0)
+    만약 (--global_change_count > 0)
 	// recursive
-	return;
-    if (!clip_did_set_selection)
+	반환;
+    만약 (!clip_did_set_selection)
     {
 	clip_did_set_selection = TRUE;
 	clip_unnamed = clip_unnamed_saved;
 	clip_unnamed_saved = 0;
-	if (clipboard_needs_update)
+	만약 (clipboard_needs_update)
 	{
 	    // only store something in the clipboard,
 	    // if we have yanked anything to it
-	    if (clip_unnamed & CLIP_UNNAMED)
+	    만약 (clip_unnamed & CLIP_UNNAMED)
 	    {
 		clip_own_selection(&clip_star);
 		clip_gen_set_selection(&clip_star);
 	    }
-	    if (clip_unnamed & CLIP_UNNAMED_PLUS)
+	    만약 (clip_unnamed & CLIP_UNNAMED_PLUS)
 	    {
 		clip_own_selection(&clip_plus);
 		clip_gen_set_selection(&clip_plus);
@@ -400,9 +400,9 @@ end_global_changes(void)
     void
 clip_auto_select(void)
 {
-    if (clip_isautosel_star())
+    만약 (clip_isautosel_star())
 	clip_copy_selection(&clip_star);
-    if (clip_isautosel_plus())
+    만약 (clip_isautosel_plus())
 	clip_copy_selection(&clip_plus);
 }
 
@@ -410,37 +410,37 @@ clip_auto_select(void)
  * Return TRUE if automatic selection of Visual area is desired for the *
  * register.
  */
-    int
+    정수
 clip_isautosel_star(void)
 {
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    if (clipmethod == CLIPMETHOD_PROVIDER)
-	return false;
+    만약 (clipmethod == CLIPMETHOD_PROVIDER)
+	반환 false;
 # endif
 # ifdef FEAT_GUI
-    if (gui.in_use)
-	return vim_strchr(p_go, GO_ASEL) != NULL
+    만약 (gui.in_use)
+	반환 vim_strchr(p_go, GO_ASEL) != NULL
 	    && vim_strchr(p_go, GO_ASELPLUS) == NULL;
 # endif
-    return clip_autoselect_star;
+    반환 clip_autoselect_star;
 }
 
 /*
  * Return TRUE if automatic selection of Visual area is desired for the +
  * register.
  */
-    int
+    정수
 clip_isautosel_plus(void)
 {
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    if (clipmethod == CLIPMETHOD_PROVIDER)
-	return false;
+    만약 (clipmethod == CLIPMETHOD_PROVIDER)
+	반환 false;
 # endif
 # ifdef FEAT_GUI
-    if (gui.in_use)
-	return vim_strchr(p_go, GO_ASELPLUS) != NULL;
+    만약 (gui.in_use)
+	반환 vim_strchr(p_go, GO_ASELPLUS) != NULL;
 # endif
-    return clip_autoselect_plus;
+    반환 clip_autoselect_plus;
 }
 
 
@@ -451,18 +451,18 @@ clip_isautosel_plus(void)
 /*
  * Compare two screen positions ala strcmp()
  */
-    static int
+    static 정수
 clip_compare_pos(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2)
+    정수		row1,
+    정수		col1,
+    정수		row2,
+    정수		col2)
 {
-    if (row1 > row2) return(1);
-    if (row1 < row2) return(-1);
-    if (col1 > col2) return(1);
-    if (col1 < col2) return(-1);
-    return(0);
+    만약 (row1 > row2) 반환(1);
+    만약 (row1 < row2) 반환(-1);
+    만약 (col1 > col2) 반환(1);
+    만약 (col1 < col2) 반환(-1);
+    반환(0);
 }
 
 // "how" flags for clip_invert_area()
@@ -477,40 +477,40 @@ clip_compare_pos(
     static void
 clip_invert_rectangle(
 	Clipboard_T	*cbd UNUSED,
-	int		row_arg,
-	int		col_arg,
-	int		height_arg,
-	int		width_arg,
-	int		invert)
+	정수		row_arg,
+	정수		col_arg,
+	정수		height_arg,
+	정수		width_arg,
+	정수		invert)
 {
-    int		row = row_arg;
-    int		col = col_arg;
-    int		height = height_arg;
-    int		width = width_arg;
+    정수		row = row_arg;
+    정수		col = col_arg;
+    정수		height = height_arg;
+    정수		width = width_arg;
 
 # ifdef FEAT_PROP_POPUP
     // this goes on top of all popup windows
     screen_zindex = CLIP_ZINDEX;
 
-    if (col < cbd->min_col)
+    만약 (col < cbd->min_col)
     {
 	width -= cbd->min_col - col;
 	col = cbd->min_col;
     }
-    if (width > cbd->max_col - col)
+    만약 (width > cbd->max_col - col)
 	width = cbd->max_col - col;
-    if (row < cbd->min_row)
+    만약 (row < cbd->min_row)
     {
 	height -= cbd->min_row - row;
 	row = cbd->min_row;
     }
-    if (height > cbd->max_row - row + 1)
+    만약 (height > cbd->max_row - row + 1)
 	height = cbd->max_row - row + 1;
 # endif
 # ifdef FEAT_GUI
-    if (gui.in_use)
+    만약 (gui.in_use)
 	gui_mch_invert_rectangle(row, col, height, width);
-    else
+    아니면
 # endif
 	screen_draw_rectangle(row, col, height, width, invert, FALSE);
 # ifdef FEAT_PROP_POPUP
@@ -529,28 +529,28 @@ clip_invert_rectangle(
     static void
 clip_invert_area(
 	Clipboard_T	*cbd,
-	int		row1,
-	int		col1,
-	int		row2,
-	int		col2,
-	int		how)
+	정수		row1,
+	정수		col1,
+	정수		row2,
+	정수		col2,
+	정수		how)
 {
-    int		invert = FALSE;
-    int		max_col;
+    정수		invert = FALSE;
+    정수		max_col;
 
 # ifdef FEAT_PROP_POPUP
     max_col = cbd->max_col - 1;
-# else
+# 아니면
     max_col = Columns - 1;
 # endif
 
-    if (how == CLIP_SET)
+    만약 (how == CLIP_SET)
 	invert = TRUE;
 
     // Swap the from and to positions so the from is always before
-    if (clip_compare_pos(row1, col1, row2, col2) > 0)
+    만약 (clip_compare_pos(row1, col1, row2, col2) > 0)
     {
-	int tmp_row, tmp_col;
+	정수 tmp_row, tmp_col;
 
 	tmp_row = row1;
 	tmp_col = col1;
@@ -559,35 +559,35 @@ clip_invert_area(
 	row2	= tmp_row;
 	col2	= tmp_col;
     }
-    else if (how == CLIP_TOGGLE)
+    아니면 만약 (how == CLIP_TOGGLE)
 	invert = TRUE;
 
     // If all on the same line, do it the easy way
-    if (row1 == row2)
+    만약 (row1 == row2)
     {
 	clip_invert_rectangle(cbd, row1, col1, 1, col2 - col1, invert);
     }
-    else
+    아니면
     {
 	// Handle a piece of the first line
-	if (col1 > 0)
+	만약 (col1 > 0)
 	{
 	    clip_invert_rectangle(cbd, row1, col1, 1,
-						  (int)Columns - col1, invert);
+						  (정수)Columns - col1, invert);
 	    row1++;
 	}
 
 	// Handle a piece of the last line
-	if (col2 < max_col)
+	만약 (col2 < max_col)
 	{
 	    clip_invert_rectangle(cbd, row2, 0, 1, col2, invert);
 	    row2--;
 	}
 
 	// Handle the rectangle that's left
-	if (row2 >= row1)
+	만약 (row2 >= row1)
 	    clip_invert_rectangle(cbd, row1, 0, row2 - row1 + 1,
-							 (int)Columns, invert);
+							 (정수)Columns, invert);
     }
 }
 
@@ -596,33 +596,33 @@ clip_invert_area(
  * command-line, in the cmdline window and when the mouse is in a popup window.
  */
     void
-clip_modeless(int button, int is_click, int is_drag)
+clip_modeless(정수 button, 정수 is_click, 정수 is_drag)
 {
-    int		repeat;
+    정수		repeat;
 
     repeat = ((clip_star.mode == SELECT_MODE_CHAR
 		|| clip_star.mode == SELECT_MODE_LINE)
 					      && (mod_mask & MOD_MASK_2CLICK))
 	    || (clip_star.mode == SELECT_MODE_WORD
 					     && (mod_mask & MOD_MASK_3CLICK));
-    if (is_click && button == MOUSE_RIGHT)
+    만약 (is_click && button == MOUSE_RIGHT)
     {
 	// Right mouse button: If there was no selection, start one.
 	// Otherwise extend the existing selection.
-	if (clip_star.state == SELECT_CLEARED)
+	만약 (clip_star.state == SELECT_CLEARED)
 	    clip_start_selection(mouse_col, mouse_row, FALSE);
 	clip_process_selection(button, mouse_col, mouse_row, repeat);
     }
-    else if (is_click)
+    아니면 만약 (is_click)
 	clip_start_selection(mouse_col, mouse_row, repeat);
-    else if (is_drag)
+    아니면 만약 (is_drag)
     {
 	// Don't try extending a selection if there isn't one.  Happens when
 	// button-down is in the cmdline and them moving mouse upwards.
-	if (clip_star.state != SELECT_CLEARED)
+	만약 (clip_star.state != SELECT_CLEARED)
 	    clip_process_selection(button, mouse_col, mouse_row, repeat);
     }
-    else // release
+    아니면 // release
 	clip_process_selection(MOUSE_RELEASE, mouse_col, mouse_row, FALSE);
 }
 
@@ -633,24 +633,24 @@ clip_modeless(int button, int is_click, int is_drag)
     static void
 clip_update_modeless_selection(
     Clipboard_T    *cb,
-    int		    row1,
-    int		    col1,
-    int		    row2,
-    int		    col2)
+    정수		    row1,
+    정수		    col1,
+    정수		    row2,
+    정수		    col2)
 {
     // See if we changed at the beginning of the selection
-    if (row1 != cb->start.lnum || col1 != (int)cb->start.col)
+    만약 (row1 != cb->start.lnum || col1 != (정수)cb->start.col)
     {
-	clip_invert_area(cb, row1, col1, (int)cb->start.lnum, cb->start.col,
+	clip_invert_area(cb, row1, col1, (정수)cb->start.lnum, cb->start.col,
 								 CLIP_TOGGLE);
 	cb->start.lnum = row1;
 	cb->start.col  = col1;
     }
 
     // See if we changed at the end of the selection
-    if (row2 != cb->end.lnum || col2 != (int)cb->end.col)
+    만약 (row2 != cb->end.lnum || col2 != (정수)cb->end.col)
     {
-	clip_invert_area(cb, (int)cb->end.lnum, cb->end.col, row2, col2,
+	clip_invert_area(cb, (정수)cb->end.lnum, cb->end.col, row2, col2,
 								 CLIP_TOGGLE);
 	cb->end.lnum = row2;
 	cb->end.col  = col2;
@@ -664,39 +664,39 @@ clip_update_modeless_selection(
 # define CHAR_CLASS(c)	(c <= ' ' ? ' ' : vim_iswordc(c))
 
     static void
-clip_get_word_boundaries(Clipboard_T *cb, int row, int col)
+clip_get_word_boundaries(Clipboard_T *cb, 정수 row, 정수 col)
 {
-    int		start_class;
-    int		temp_col;
+    정수		start_class;
+    정수		temp_col;
     char_u	*p;
-    int		mboff;
+    정수		mboff;
 
-    if (row >= screen_Rows || col >= screen_Columns || ScreenLines == NULL)
-	return;
+    만약 (row >= screen_Rows || col >= screen_Columns || ScreenLines == NULL)
+	반환;
 
     p = ScreenLines + LineOffset[row];
     // Correct for starting in the right half of a double-wide char
-    if (enc_dbcs != 0)
+    만약 (enc_dbcs != 0)
 	col -= dbcs_screen_head_off(p, p + col);
-    else if (enc_utf8 && p[col] == 0)
+    아니면 만약 (enc_utf8 && p[col] == 0)
 	--col;
     start_class = CHAR_CLASS(p[col]);
 
     temp_col = col;
-    for ( ; temp_col > 0; temp_col--)
-	if (enc_dbcs != 0
+    위해 ( ; temp_col > 0; temp_col--)
+	만약 (enc_dbcs != 0
 		   && (mboff = dbcs_screen_head_off(p, p + temp_col - 1)) > 0)
 	    temp_col -= mboff;
-	else if (CHAR_CLASS(p[temp_col - 1]) != start_class
+	아니면 만약 (CHAR_CLASS(p[temp_col - 1]) != start_class
 		&& !(enc_utf8 && p[temp_col - 1] == 0))
 	    break;
     cb->word_start_col = temp_col;
 
     temp_col = col;
-    for ( ; temp_col < screen_Columns; temp_col++)
-	if (enc_dbcs != 0 && dbcs_ptr2cells(p + temp_col) == 2)
+    위해 ( ; temp_col < screen_Columns; temp_col++)
+	만약 (enc_dbcs != 0 && dbcs_ptr2cells(p + temp_col) == 2)
 	    ++temp_col;
-	else if (CHAR_CLASS(p[temp_col]) != start_class
+	아니면 만약 (CHAR_CLASS(p[temp_col]) != start_class
 		&& !(enc_utf8 && p[temp_col] == 0))
 	    break;
     cb->word_end_col = temp_col;
@@ -706,45 +706,45 @@ clip_get_word_boundaries(Clipboard_T *cb, int row, int col)
  * Find the column position for the last non-whitespace character on the given
  * line at or before start_col.
  */
-    static int
-clip_get_line_end(Clipboard_T *cbd UNUSED, int row)
+    static 정수
+clip_get_line_end(Clipboard_T *cbd UNUSED, 정수 row)
 {
-    int	    i;
+    정수	    i;
 
-    if (row >= screen_Rows || ScreenLines == NULL)
-	return 0;
-    for (i =
+    만약 (row >= screen_Rows || ScreenLines == NULL)
+	반환 0;
+    위해 (i =
 # ifdef FEAT_PROP_POPUP
 	    cbd->max_col;
-# else
+# 아니면
 	    screen_Columns;
 # endif
 			    i > 0; i--)
-	if (ScreenLines[LineOffset[row] + i - 1] != ' ')
+	만약 (ScreenLines[LineOffset[row] + i - 1] != ' ')
 	    break;
-    return i;
+    반환 i;
 }
 
 /*
  * Start the selection
  */
     void
-clip_start_selection(int col, int row, int repeated_click)
+clip_start_selection(정수 col, 정수 row, 정수 repeated_click)
 {
     Clipboard_T	*cb = &clip_star;
 # ifdef FEAT_PROP_POPUP
     win_T	*wp;
-    int		row_cp = row;
-    int		col_cp = col;
+    정수		row_cp = row;
+    정수		col_cp = col;
 
     wp = mouse_find_win(&row_cp, &col_cp, FIND_POPUP);
-    if (wp != NULL && WIN_IS_POPUP(wp)
+    만약 (wp != NULL && WIN_IS_POPUP(wp)
 				  && popup_is_in_scrollbar(wp, row_cp, col_cp))
 	// click or double click in scrollbar does not start a selection
-	return;
+	반환;
 # endif
 
-    if (cb->state == SELECT_DONE)
+    만약 (cb->state == SELECT_DONE)
 	clip_clear_selection(cb);
 
     row = check_row(row);
@@ -757,20 +757,20 @@ clip_start_selection(int col, int row, int repeated_click)
     cb->origin_row  = (short_u)cb->start.lnum;
     cb->state	    = SELECT_IN_PROGRESS;
 # ifdef FEAT_PROP_POPUP
-    if (wp != NULL && WIN_IS_POPUP(wp))
+    만약 (wp != NULL && WIN_IS_POPUP(wp))
     {
 	// Click in a popup window restricts selection to that window,
 	// excluding the border.
 	cb->min_col = wp->w_wincol + wp->w_popup_border[3];
 	cb->max_col = wp->w_wincol + popup_width(wp)
 				 - wp->w_popup_border[1] - wp->w_has_scrollbar;
-	if (cb->max_col > screen_Columns)
+	만약 (cb->max_col > screen_Columns)
 	    cb->max_col = screen_Columns;
 	cb->min_row = wp->w_winrow + wp->w_popup_border[0];
 	cb->max_row = wp->w_winrow + popup_height(wp) - 1
 						   - wp->w_popup_border[2];
     }
-    else
+    아니면
     {
 	cb->min_col = 0;
 	cb->max_col = screen_Columns;
@@ -779,17 +779,17 @@ clip_start_selection(int col, int row, int repeated_click)
     }
 # endif
 
-    if (repeated_click)
+    만약 (repeated_click)
     {
-	if (++cb->mode > SELECT_MODE_LINE)
+	만약 (++cb->mode > SELECT_MODE_LINE)
 	    cb->mode = SELECT_MODE_CHAR;
     }
-    else
+    아니면
 	cb->mode = SELECT_MODE_CHAR;
 
 # ifdef FEAT_GUI
     // clear the cursor until the selection is made
-    if (gui.in_use)
+    만약 (gui.in_use)
 	gui_undraw_cursor();
 # endif
 
@@ -797,23 +797,23 @@ clip_start_selection(int col, int row, int repeated_click)
     {
 	case SELECT_MODE_CHAR:
 	    cb->origin_start_col = cb->start.col;
-	    cb->word_end_col = clip_get_line_end(cb, (int)cb->start.lnum);
+	    cb->word_end_col = clip_get_line_end(cb, (정수)cb->start.lnum);
 	    break;
 
 	case SELECT_MODE_WORD:
-	    clip_get_word_boundaries(cb, (int)cb->start.lnum, cb->start.col);
+	    clip_get_word_boundaries(cb, (정수)cb->start.lnum, cb->start.col);
 	    cb->origin_start_col = cb->word_start_col;
 	    cb->origin_end_col	 = cb->word_end_col;
 
-	    clip_invert_area(cb, (int)cb->start.lnum, cb->word_start_col,
-			    (int)cb->end.lnum, cb->word_end_col, CLIP_SET);
+	    clip_invert_area(cb, (정수)cb->start.lnum, cb->word_start_col,
+			    (정수)cb->end.lnum, cb->word_end_col, CLIP_SET);
 	    cb->start.col = cb->word_start_col;
 	    cb->end.col   = cb->word_end_col;
 	    break;
 
 	case SELECT_MODE_LINE:
-	    clip_invert_area(cb, (int)cb->start.lnum, 0, (int)cb->start.lnum,
-			    (int)Columns, CLIP_SET);
+	    clip_invert_area(cb, (정수)cb->start.lnum, 0, (정수)cb->start.lnum,
+			    (정수)Columns, CLIP_SET);
 	    cb->start.col = 0;
 	    cb->end.col   = Columns;
 	    break;
@@ -831,36 +831,36 @@ clip_start_selection(int col, int row, int repeated_click)
  */
     void
 clip_process_selection(
-    int		button,
-    int		col,
-    int		row,
+    정수		button,
+    정수		col,
+    정수		row,
     int_u	repeated_click)
 {
     Clipboard_T	*cb = &clip_star;
-    int		diff;
-    int		slen = 1;	// cursor shape width
+    정수		diff;
+    정수		slen = 1;	// cursor shape width
 
-    if (button == MOUSE_RELEASE)
+    만약 (button == MOUSE_RELEASE)
     {
-	if (cb->state != SELECT_IN_PROGRESS)
-	    return;
+	만약 (cb->state != SELECT_IN_PROGRESS)
+	    반환;
 
 	// Check to make sure we have something selected
-	if (cb->start.lnum == cb->end.lnum && cb->start.col == cb->end.col)
+	만약 (cb->start.lnum == cb->end.lnum && cb->start.col == cb->end.col)
 	{
 # ifdef FEAT_GUI
-	    if (gui.in_use)
+	    만약 (gui.in_use)
 		gui_update_cursor(FALSE, FALSE);
 # endif
 	    cb->state = SELECT_CLEARED;
-	    return;
+	    반환;
 	}
 
 # ifdef DEBUG_SELECTION
 	printf("Selection ended: (%ld,%d) to (%ld,%d)\n", cb->start.lnum,
 		cb->start.col, cb->end.lnum, cb->end.col);
 # endif
-	if (clip_isautosel_star() || clip_isautosel_plus()
+	만약 (clip_isautosel_star() || clip_isautosel_plus()
 		|| (
 # ifdef FEAT_GUI
 		    gui.in_use ? (vim_strchr(p_go, GO_ASELML) != NULL) :
@@ -868,53 +868,53 @@ clip_process_selection(
 		    clip_autoselectml))
 	    clip_copy_modeless_selection(FALSE);
 # ifdef FEAT_GUI
-	if (gui.in_use)
+	만약 (gui.in_use)
 	    gui_update_cursor(FALSE, FALSE);
 # endif
 
 	cb->state = SELECT_DONE;
-	return;
+	반환;
     }
 
     row = check_row(row);
     col = check_col(col);
     col = mb_fix_col(col, row);
 
-    if (col == (int)cb->prev.col && row == cb->prev.lnum && !repeated_click)
-	return;
+    만약 (col == (정수)cb->prev.col && row == cb->prev.lnum && !repeated_click)
+	반환;
 
     /*
      * When extending the selection with the right mouse button, swap the
      * start and end if the position is before half the selection
      */
-    if (cb->state == SELECT_DONE && button == MOUSE_RIGHT)
+    만약 (cb->state == SELECT_DONE && button == MOUSE_RIGHT)
     {
 	/*
 	 * If the click is before the start, or the click is inside the
 	 * selection and the start is the closest side, set the origin to the
 	 * end of the selection.
 	 */
-	if (clip_compare_pos(row, col, (int)cb->start.lnum, cb->start.col) < 0
+	만약 (clip_compare_pos(row, col, (정수)cb->start.lnum, cb->start.col) < 0
 		|| (clip_compare_pos(row, col,
-					   (int)cb->end.lnum, cb->end.col) < 0
+					   (정수)cb->end.lnum, cb->end.col) < 0
 		    && (((cb->start.lnum == cb->end.lnum
 			    && cb->end.col - col > col - cb->start.col))
 			|| ((diff = (cb->end.lnum - row) -
 						   (row - cb->start.lnum)) > 0
-			    || (diff == 0 && col < (int)(cb->start.col +
+			    || (diff == 0 && col < (정수)(cb->start.col +
 							 cb->end.col) / 2)))))
 	{
 	    cb->origin_row = (short_u)cb->end.lnum;
 	    cb->origin_start_col = cb->end.col - 1;
 	    cb->origin_end_col = cb->end.col;
 	}
-	else
+	아니면
 	{
 	    cb->origin_row = (short_u)cb->start.lnum;
 	    cb->origin_start_col = cb->start.col;
 	    cb->origin_end_col = cb->start.col;
 	}
-	if (cb->mode == SELECT_MODE_WORD && !repeated_click)
+	만약 (cb->mode == SELECT_MODE_WORD && !repeated_click)
 	    cb->mode = SELECT_MODE_CHAR;
     }
 
@@ -925,40 +925,40 @@ clip_process_selection(
     printf("Selection extending to (%d,%d)\n", row, col);
 # endif
 
-    if (repeated_click && ++cb->mode > SELECT_MODE_LINE)
+    만약 (repeated_click && ++cb->mode > SELECT_MODE_LINE)
 	cb->mode = SELECT_MODE_CHAR;
 
     switch (cb->mode)
     {
 	case SELECT_MODE_CHAR:
 	    // If we're on a different line, find where the line ends
-	    if (row != cb->prev.lnum)
+	    만약 (row != cb->prev.lnum)
 		cb->word_end_col = clip_get_line_end(cb, row);
 
 	    // See if we are before or after the origin of the selection
-	    if (clip_compare_pos(row, col, cb->origin_row,
+	    만약 (clip_compare_pos(row, col, cb->origin_row,
 						   cb->origin_start_col) >= 0)
 	    {
-		if (col >= (int)cb->word_end_col)
+		만약 (col >= (정수)cb->word_end_col)
 		    clip_update_modeless_selection(cb, cb->origin_row,
-			    cb->origin_start_col, row, (int)Columns);
-		else
+			    cb->origin_start_col, row, (정수)Columns);
+		아니면
 		{
-		    if (has_mbyte && mb_lefthalve(row, col))
+		    만약 (has_mbyte && mb_lefthalve(row, col))
 			slen = 2;
 		    clip_update_modeless_selection(cb, cb->origin_row,
 			    cb->origin_start_col, row, col + slen);
 		}
 	    }
-	    else
+	    아니면
 	    {
-		if (has_mbyte
+		만약 (has_mbyte
 			&& mb_lefthalve(cb->origin_row, cb->origin_start_col))
 		    slen = 2;
-		if (col >= (int)cb->word_end_col)
+		만약 (col >= (정수)cb->word_end_col)
 		    clip_update_modeless_selection(cb, row, cb->word_end_col,
 			    cb->origin_row, cb->origin_start_col + slen);
-		else
+		아니면
 		    clip_update_modeless_selection(cb, row, col,
 			    cb->origin_row, cb->origin_start_col + slen);
 	    }
@@ -966,34 +966,34 @@ clip_process_selection(
 
 	case SELECT_MODE_WORD:
 	    // If we are still within the same word, do nothing
-	    if (row == cb->prev.lnum && col >= (int)cb->word_start_col
-		    && col < (int)cb->word_end_col && !repeated_click)
-		return;
+	    만약 (row == cb->prev.lnum && col >= (정수)cb->word_start_col
+		    && col < (정수)cb->word_end_col && !repeated_click)
+		반환;
 
 	    // Get new word boundaries
 	    clip_get_word_boundaries(cb, row, col);
 
 	    // Handle being after the origin point of selection
-	    if (clip_compare_pos(row, col, cb->origin_row,
+	    만약 (clip_compare_pos(row, col, cb->origin_row,
 		    cb->origin_start_col) >= 0)
 		clip_update_modeless_selection(cb, cb->origin_row,
 			cb->origin_start_col, row, cb->word_end_col);
-	    else
+	    아니면
 		clip_update_modeless_selection(cb, row, cb->word_start_col,
 			cb->origin_row, cb->origin_end_col);
 	    break;
 
 	case SELECT_MODE_LINE:
-	    if (row == cb->prev.lnum && !repeated_click)
-		return;
+	    만약 (row == cb->prev.lnum && !repeated_click)
+		반환;
 
-	    if (clip_compare_pos(row, col, cb->origin_row,
+	    만약 (clip_compare_pos(row, col, cb->origin_row,
 		    cb->origin_start_col) >= 0)
 		clip_update_modeless_selection(cb, cb->origin_row, 0, row,
-			(int)Columns);
-	    else
+			(정수)Columns);
+	    아니면
 		clip_update_modeless_selection(cb, row, 0, cb->origin_row,
-			(int)Columns);
+			(정수)Columns);
 	    break;
     }
 
@@ -1006,26 +1006,26 @@ clip_process_selection(
 # endif
 }
 
-# if defined(FEAT_GUI)
+# 만약 defined(FEAT_GUI)
 /*
  * Redraw part of the selection if character at "row,col" is inside of it.
  * Only used for the GUI.
  */
     void
-clip_may_redraw_selection(int row, int col, int len)
+clip_may_redraw_selection(정수 row, 정수 col, 정수 len)
 {
-    int		start = col;
-    int		end = col + len;
+    정수		start = col;
+    정수		end = col + len;
 
-    if (clip_star.state != SELECT_CLEARED
+    만약 (clip_star.state != SELECT_CLEARED
 	    && row >= clip_star.start.lnum
 	    && row <= clip_star.end.lnum)
     {
-	if (row == clip_star.start.lnum && start < (int)clip_star.start.col)
+	만약 (row == clip_star.start.lnum && start < (정수)clip_star.start.col)
 	    start = clip_star.start.col;
-	if (row == clip_star.end.lnum && end > (int)clip_star.end.col)
+	만약 (row == clip_star.end.lnum && end > (정수)clip_star.end.col)
 	    end = clip_star.end.col;
-	if (end > start)
+	만약 (end > start)
 	    clip_invert_area(&clip_star, row, start, row, end, 0);
     }
 }
@@ -1038,11 +1038,11 @@ clip_may_redraw_selection(int row, int col, int len)
 clip_clear_selection(Clipboard_T *cbd)
 {
 
-    if (cbd->state == SELECT_CLEARED)
-	return;
+    만약 (cbd->state == SELECT_CLEARED)
+	반환;
 
-    clip_invert_area(cbd, (int)cbd->start.lnum, cbd->start.col,
-				 (int)cbd->end.lnum, cbd->end.col, CLIP_CLEAR);
+    clip_invert_area(cbd, (정수)cbd->start.lnum, cbd->start.col,
+				 (정수)cbd->end.lnum, cbd->end.col, CLIP_CLEAR);
     cbd->state = SELECT_CLEARED;
 }
 
@@ -1050,9 +1050,9 @@ clip_clear_selection(Clipboard_T *cbd)
  * Clear the selection if any lines from "row1" to "row2" are inside of it.
  */
     void
-clip_may_clear_selection(int row1, int row2)
+clip_may_clear_selection(정수 row1, 정수 row2)
 {
-    if (clip_star.state == SELECT_DONE
+    만약 (clip_star.state == SELECT_DONE
 	    && row2 >= clip_star.start.lnum
 	    && row1 <= clip_star.end.lnum)
 	clip_clear_selection(&clip_star);
@@ -1064,27 +1064,27 @@ clip_may_clear_selection(int row1, int row2)
  */
     void
 clip_scroll_selection(
-    int	    rows)		// negative for scroll down
+    정수	    rows)		// negative for scroll down
 {
-    int	    lnum;
+    정수	    lnum;
 
-    if (clip_star.state == SELECT_CLEARED)
-	return;
+    만약 (clip_star.state == SELECT_CLEARED)
+	반환;
 
     lnum = clip_star.start.lnum - rows;
-    if (lnum <= 0)
+    만약 (lnum <= 0)
 	clip_star.start.lnum = 0;
-    else if (lnum >= screen_Rows)	// scrolled off of the screen
+    아니면 만약 (lnum >= screen_Rows)	// scrolled off of the screen
 	clip_star.state = SELECT_CLEARED;
-    else
+    아니면
 	clip_star.start.lnum = lnum;
 
     lnum = clip_star.end.lnum - rows;
-    if (lnum < 0)			// scrolled off of the screen
+    만약 (lnum < 0)			// scrolled off of the screen
 	clip_star.state = SELECT_CLEARED;
-    else if (lnum >= screen_Rows)
+    아니면 만약 (lnum >= screen_Rows)
 	clip_star.end.lnum = screen_Rows - 1;
-    else
+    아니면
 	clip_star.end.lnum = lnum;
 }
 
@@ -1094,7 +1094,7 @@ clip_scroll_selection(
  * When "both" is TRUE also copy to the other register.
  */
     void
-clip_copy_modeless_selection(int both UNUSED)
+clip_copy_modeless_selection(정수 both UNUSED)
 {
     // The info for the modeless selection is stored in '*' register, however if
     // we are using the '+' register for modeless autoselect, we copy to
@@ -1102,154 +1102,154 @@ clip_copy_modeless_selection(int both UNUSED)
     Clipboard_T *cbd = clip_isautosel_plus() ? &clip_plus : &clip_star;
     char_u	*buffer;
     char_u	*bufp;
-    int		row;
-    int		start_col;
-    int		end_col;
-    int		line_end_col;
-    int		add_newline_flag = FALSE;
-    int		len;
+    정수		row;
+    정수		start_col;
+    정수		end_col;
+    정수		line_end_col;
+    정수		add_newline_flag = FALSE;
+    정수		len;
     char_u	*p;
-    int		row1 = clip_star.start.lnum;
-    int		col1 = clip_star.start.col;
-    int		row2 = clip_star.end.lnum;
-    int		col2 = clip_star.end.col;
+    정수		row1 = clip_star.start.lnum;
+    정수		col1 = clip_star.start.col;
+    정수		row2 = clip_star.end.lnum;
+    정수		col2 = clip_star.end.col;
 
     // Can't use ScreenLines unless initialized
-    if (ScreenLines == NULL)
-	return;
+    만약 (ScreenLines == NULL)
+	반환;
 
     /*
      * Make sure row1 <= row2, and if row1 == row2 that col1 <= col2.
      */
-    if (row1 > row2)
+    만약 (row1 > row2)
     {
 	row = row1; row1 = row2; row2 = row;
 	row = col1; col1 = col2; col2 = row;
     }
-    else if (row1 == row2 && col1 > col2)
+    아니면 만약 (row1 == row2 && col1 > col2)
     {
 	row = col1; col1 = col2; col2 = row;
     }
 # ifdef FEAT_PROP_POPUP
-    if (col1 < clip_star.min_col)
+    만약 (col1 < clip_star.min_col)
 	col1 = clip_star.min_col;
-    if (col2 > clip_star.max_col)
+    만약 (col2 > clip_star.max_col)
 	col2 = clip_star.max_col;
-    if (row1 > clip_star.max_row || row2 < clip_star.min_row)
-	return;
-    if (row1 < clip_star.min_row)
+    만약 (row1 > clip_star.max_row || row2 < clip_star.min_row)
+	반환;
+    만약 (row1 < clip_star.min_row)
 	row1 = clip_star.min_row;
-    if (row2 > clip_star.max_row)
+    만약 (row2 > clip_star.max_row)
 	row2 = clip_star.max_row;
 # endif
     // correct starting point for being on right half of double-wide char
     p = ScreenLines + LineOffset[row1];
-    if (enc_dbcs != 0)
+    만약 (enc_dbcs != 0)
 	col1 -= (*mb_head_off)(p, p + col1);
-    else if (enc_utf8 && p[col1] == 0)
+    아니면 만약 (enc_utf8 && p[col1] == 0)
 	--col1;
 
     // Create a temporary buffer for storing the text
     len = (row2 - row1 + 1) * Columns + 1;
-    if (enc_dbcs != 0)
+    만약 (enc_dbcs != 0)
 	len *= 2;	// max. 2 bytes per display cell
-    else if (enc_utf8)
+    아니면 만약 (enc_utf8)
 	len *= MB_MAXBYTES;
     // A newline is added after each row
     len += row2 - row1 + 2;
     buffer = alloc(len);
-    if (buffer == NULL)	    // out of memory
-	return;
+    만약 (buffer == NULL)	    // out of memory
+	반환;
 
     // Process each row in the selection
-    for (bufp = buffer, row = row1; row <= row2; row++)
+    위해 (bufp = buffer, row = row1; row <= row2; row++)
     {
-	if (row == row1)
+	만약 (row == row1)
 	    start_col = col1;
-	else
+	아니면
 # ifdef FEAT_PROP_POPUP
 	    start_col = clip_star.min_col;
-# else
+# 아니면
 	    start_col = 0;
 # endif
 
-	if (row == row2)
+	만약 (row == row2)
 	    end_col = col2;
-	else
+	아니면
 # ifdef FEAT_PROP_POPUP
 	    end_col = clip_star.max_col;
-# else
+# 아니면
 	    end_col = Columns;
 # endif
 
 	line_end_col = clip_get_line_end(&clip_star, row);
 
 	// See if we need to nuke some trailing whitespace
-	if (end_col >=
+	만약 (end_col >=
 # ifdef FEAT_PROP_POPUP
 		clip_star.max_col
-# else
+# 아니면
 		Columns
 # endif
 		    && (row < row2 || end_col > line_end_col))
 	{
 	    // Get rid of trailing whitespace
 	    end_col = line_end_col;
-	    if (end_col < start_col)
+	    만약 (end_col < start_col)
 		end_col = start_col;
 
 	    // If the last line extended to the end, add an extra newline
-	    if (row == row2)
+	    만약 (row == row2)
 		add_newline_flag = TRUE;
 	}
 
 	// If after the first row, we need to always add a newline
-	if (row > row1 && !LineWraps[row - 1])
+	만약 (row > row1 && !LineWraps[row - 1])
 	    *bufp++ = NL;
 
 	// Safetey check for in case resizing went wrong
-	if (row < screen_Rows && end_col <= screen_Columns)
+	만약 (row < screen_Rows && end_col <= screen_Columns)
 	{
-	    if (enc_dbcs != 0)
+	    만약 (enc_dbcs != 0)
 	    {
-		int	i;
+		정수	i;
 
 		p = ScreenLines + LineOffset[row];
-		for (i = start_col; i < end_col; ++i)
-		    if (enc_dbcs == DBCS_JPNU && p[i] == 0x8e)
+		위해 (i = start_col; i < end_col; ++i)
+		    만약 (enc_dbcs == DBCS_JPNU && p[i] == 0x8e)
 		    {
 			// single-width double-byte char
 			*bufp++ = 0x8e;
 			*bufp++ = ScreenLines2[LineOffset[row] + i];
 		    }
-		    else
+		    아니면
 		    {
 			*bufp++ = p[i];
-			if (MB_BYTE2LEN(p[i]) == 2)
+			만약 (MB_BYTE2LEN(p[i]) == 2)
 			    *bufp++ = p[++i];
 		    }
 	    }
-	    else if (enc_utf8)
+	    아니면 만약 (enc_utf8)
 	    {
-		int	off;
-		int	i;
+		정수	off;
+		정수	i;
 
 		off = LineOffset[row];
-		for (i = start_col; i < end_col; ++i)
+		위해 (i = start_col; i < end_col; ++i)
 		{
 		    // The base character is either in ScreenLinesUC[] or
 		    // ScreenLines[].
-		    if (ScreenLinesUC[off + i] == 0)
+		    만약 (ScreenLinesUC[off + i] == 0)
 			*bufp++ = ScreenLines[off + i];
-		    else
+		    아니면
 			// Includes the composing characters.
 			bufp += utfc_char2bytes(off + i, bufp);
 		    // Skip right half of double-wide character.
-		    if (ScreenLines[off + i + 1] == 0)
+		    만약 (ScreenLines[off + i + 1] == 0)
 			++i;
 		}
 	    }
-	    else
+	    아니면
 	    {
 		STRNCPY(bufp, ScreenLines + LineOffset[row] + start_col,
 							 end_col - start_col);
@@ -1259,7 +1259,7 @@ clip_copy_modeless_selection(int both UNUSED)
     }
 
     // Add a newline at the end if the selection ended there
-    if (add_newline_flag)
+    만약 (add_newline_flag)
 	*bufp++ = NL;
 
     // First cleanup any old selection and become the owner.
@@ -1273,7 +1273,7 @@ clip_copy_modeless_selection(int both UNUSED)
     clip_gen_set_selection(cbd);
 
 # ifdef FEAT_X11
-    if (both)
+    만약 (both)
     {
 	Clipboard_T *other = cbd == &clip_star ? &clip_plus : &clip_star;
 	// Do the same for the '+' register.
@@ -1289,38 +1289,38 @@ clip_copy_modeless_selection(int both UNUSED)
     void
 clip_gen_set_selection(Clipboard_T *cbd)
 {
-    if (!clip_did_set_selection)
+    만약 (!clip_did_set_selection)
     {
 	// Updating postponed, so that accessing the system clipboard won't
 	// hang Vim when accessing it many times (e.g. on a :g command).
-	if ((cbd == &clip_plus && (clip_unnamed_saved & CLIP_UNNAMED_PLUS))
+	만약 ((cbd == &clip_plus && (clip_unnamed_saved & CLIP_UNNAMED_PLUS))
 		|| (cbd == &clip_star && (clip_unnamed_saved & CLIP_UNNAMED)))
 	{
 	    clipboard_needs_update = TRUE;
-	    return;
+	    반환;
 	}
     }
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# 만약 defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    만약 (gui.in_use)
 	clip_mch_set_selection(cbd);
-    else
+    아니면
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	만약 (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
 	    clip_wl_set_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	아니면 만약 (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
 	    clip_xterm_set_selection(cbd);
 #  endif
 	}
     }
-# else
+# 아니면
     clip_mch_set_selection(cbd);
 # endif
 }
@@ -1328,68 +1328,68 @@ clip_gen_set_selection(Clipboard_T *cbd)
     static void
 clip_gen_request_selection(Clipboard_T *cbd)
 {
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+# 만약 defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    만약 (gui.in_use)
 	clip_mch_request_selection(cbd);
-    else
+    아니면
 #  endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	만약 (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #  ifdef FEAT_WAYLAND_CLIPBOARD
 	    clip_wl_request_selection(cbd);
 #  endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	아니면 만약 (clipmethod == CLIPMETHOD_X11)
 	{
 #  ifdef FEAT_XCLIPBOARD
 	    clip_xterm_request_selection(cbd);
 #  endif
 	}
     }
-# else
+# 아니면
     clip_mch_request_selection(cbd);
 # endif
 }
 
-# if (defined(FEAT_X11) && defined(FEAT_XCLIPBOARD) && defined(USE_SYSTEM))
-    static int
+# 만약 (defined(FEAT_X11) && defined(FEAT_XCLIPBOARD) && defined(USE_SYSTEM))
+    static 정수
 clip_x11_owner_exists(Clipboard_T *cbd)
 {
-    return XGetSelectionOwner(X_DISPLAY, cbd->sel_atom) != None;
+    반환 XGetSelectionOwner(X_DISPLAY, cbd->sel_atom) != None;
 }
 # endif
 
-# if (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)) \
+# 만약 (defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)) \
 	&& defined(USE_SYSTEM)
-    int
+    정수
 clip_gen_owner_exists(Clipboard_T *cbd UNUSED)
 {
-#  if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+#  만약 defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
 #   ifdef FEAT_GUI_GTK
-    if (gui.in_use)
-	return clip_gtk_owner_exists(cbd);
-    else
+    만약 (gui.in_use)
+	반환 clip_gtk_owner_exists(cbd);
+    아니면
 #   endif
     {
-	if (clipmethod == CLIPMETHOD_WAYLAND)
+	만약 (clipmethod == CLIPMETHOD_WAYLAND)
 	{
 #   ifdef FEAT_WAYLAND_CLIPBOARD
-	    return clip_wl_owner_exists(cbd);
+	    반환 clip_wl_owner_exists(cbd);
 #   endif
 	}
-	else if (clipmethod == CLIPMETHOD_X11)
+	아니면 만약 (clipmethod == CLIPMETHOD_X11)
 	{
 #   ifdef FEAT_XCLIPBOARD
-	    return clip_x11_owner_exists(cbd);
+	    반환 clip_x11_owner_exists(cbd);
 #   endif
 	}
-	else
-	    return FALSE;
+	아니면
+	    반환 FALSE;
     }
-#  else
-    return TRUE;
+#  아니면
+    반환 TRUE;
 #  endif
 }
 # endif
@@ -1398,7 +1398,7 @@ clip_gen_owner_exists(Clipboard_T *cbd UNUSED)
  * Stuff for the X clipboard.  Shared between VMS and Unix.
  */
 
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11)
+# 만약 defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11)
 #  include <X11/Xatom.h>
 #  include <X11/Intrinsic.h>
 
@@ -1409,7 +1409,7 @@ clip_gen_owner_exists(Clipboard_T *cbd UNUSED)
     void
 open_app_context(void)
 {
-    if (app_context == NULL)
+    만약 (app_context == NULL)
     {
 	XtToolkitInitialize();
 	app_context = XtCreateApplicationContext();
@@ -1456,25 +1456,25 @@ clip_x11_convert_selection_cb(
     Atom	*type,
     XtPointer	*value,
     long_u	*length,
-    int		*format)
+    정수		*format)
 {
     static char_u   *save_result = NULL;
     static long_u   save_length = 0;
     char_u	    *string;
-    int		    motion_type;
+    정수		    motion_type;
     Clipboard_T    *cbd;
-    int		    i;
+    정수		    i;
 
-    if (*sel_atom == clip_plus.sel_atom)
+    만약 (*sel_atom == clip_plus.sel_atom)
 	cbd = &clip_plus;
-    else
+    아니면
 	cbd = &clip_star;
 
-    if (!cbd->owned)
-	return False;	    // Shouldn't ever happen
+    만약 (!cbd->owned)
+	반환 False;	    // Shouldn't ever happen
 
     // requestor wants to know what target types we support
-    if (*target == targets_atom)
+    만약 (*target == targets_atom)
     {
 	static Atom array[9];
 
@@ -1485,7 +1485,7 @@ clip_x11_convert_selection_cb(
 	array[i++] = vim_atom;
 	array[i++] = vimenc_mt_atom;
 	array[i++] = vim_mt_atom;
-	if (enc_utf8)
+	만약 (enc_utf8)
 	    array[i++] = utf8_atom;
 	array[i++] = XA_STRING;
 	array[i++] = text_atom;
@@ -1496,10 +1496,10 @@ clip_x11_convert_selection_cb(
 	// crashes on 64 bit machines. (Peter Derr)
 	*format = 32;
 	*length = i;
-	return True;
+	반환 True;
     }
 
-    if (       *target != XA_STRING
+    만약 (       *target != XA_STRING
 	    && *target != vimenc_atom
 	    && *target != vimenc_mt_atom
 	    && (*target != utf8_atom || !enc_utf8)
@@ -1507,53 +1507,53 @@ clip_x11_convert_selection_cb(
 	    && *target != vim_mt_atom
 	    && *target != text_atom
 	    && *target != compound_text_atom)
-	return False;
+	반환 False;
 
     clip_get_selection(cbd);
     motion_type = clip_convert_selection(&string, length, cbd);
-    if (motion_type < 0)
-	return False;
+    만약 (motion_type < 0)
+	반환 False;
 
     // For our own format, the first byte contains the motion type
-    if (*target == vim_atom || *target == vim_mt_atom)
+    만약 (*target == vim_atom || *target == vim_mt_atom)
 	(*length)++;
 
     // Our own format with encoding: motion 'encoding' NUL text
-    if (*target == vimenc_atom || *target == vimenc_mt_atom)
+    만약 (*target == vimenc_atom || *target == vimenc_mt_atom)
 	*length += STRLEN(p_enc) + 2;
 
-    if (save_length < *length || save_length / 2 >= *length)
+    만약 (save_length < *length || save_length / 2 >= *length)
 	*value = XtRealloc((char *)save_result, (Cardinal)*length + 1);
-    else
+    아니면
 	*value = save_result;
-    if (*value == NULL)
+    만약 (*value == NULL)
     {
 	vim_free(string);
-	return False;
+	반환 False;
     }
     save_result = (char_u *)*value;
     save_length = *length;
 
-    if (*target == XA_STRING || (*target == utf8_atom && enc_utf8))
+    만약 (*target == XA_STRING || (*target == utf8_atom && enc_utf8))
     {
 	mch_memmove(save_result, string, (size_t)(*length));
 	*type = *target;
     }
-    else if (*target == compound_text_atom || *target == text_atom)
+    아니면 만약 (*target == compound_text_atom || *target == text_atom)
     {
 	XTextProperty	text_prop;
 	char		*string_nt = (char *)save_result;
-	int		conv_result;
+	정수		conv_result;
 
 	// create NUL terminated string which XmbTextListToTextProperty wants
 	mch_memmove(string_nt, string, (size_t)*length);
 	string_nt[*length] = NUL;
 	conv_result = XmbTextListToTextProperty(X_DISPLAY, &string_nt,
 					   1, XCompoundTextStyle, &text_prop);
-	if (conv_result != Success)
+	만약 (conv_result != Success)
 	{
 	    vim_free(string);
-	    return False;
+	    반환 False;
 	}
 	*value = (XtPointer)(text_prop.value);	//    from plain text
 	*length = text_prop.nitems;
@@ -1562,38 +1562,38 @@ clip_x11_convert_selection_cb(
 	save_result = (char_u *)*value;
 	save_length = *length;
     }
-    else if (*target == vimenc_atom || *target == vimenc_mt_atom)
+    아니면 만약 (*target == vimenc_atom || *target == vimenc_mt_atom)
     {
-	int l = STRLEN(p_enc);
+	정수 l = STRLEN(p_enc);
 
 	save_result[0] = motion_type;
 	STRCPY(save_result + 1, p_enc);
 	mch_memmove(save_result + l + 2, string, (size_t)(*length - l - 2));
-	if (*target == vimenc_atom)
+	만약 (*target == vimenc_atom)
 	    *type = vimenc_atom;
-	else
+	아니면
 	    *type = vimenc_mt_atom;
     }
-    else
+    아니면
     {
 	save_result[0] = motion_type;
 	mch_memmove(save_result + 1, string, (size_t)(*length - 1));
-	if (*target == vim_atom)
+	만약 (*target == vim_atom)
 	    *type = vim_atom;
-	else
+	아니면
 	    *type = vim_mt_atom;
     }
     *format = 8;	    // 8 bits per char
     vim_free(string);
-    return True;
+    반환 True;
 }
 
     static void
 clip_x11_lose_ownership_cb(Widget w UNUSED, Atom *sel_atom)
 {
-    if (*sel_atom == clip_plus.sel_atom)
+    만약 (*sel_atom == clip_plus.sel_atom)
 	clip_lose_selection(&clip_plus);
-    else
+    아니면
 	clip_lose_selection(&clip_star);
 }
 
@@ -1606,7 +1606,7 @@ clip_x11_notify_cb(Widget w UNUSED, Atom *sel_atom UNUSED, Atom *target UNUSED)
 /*
  * Property callback to get a timestamp for XtOwnSelection.
  */
-#  if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+#  만약 defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
     static void
 clip_x11_timestamp_cb(
     Widget	w,
@@ -1615,40 +1615,40 @@ clip_x11_timestamp_cb(
     Boolean	*cont UNUSED)
 {
     Atom	    actual_type;
-    int		    format;
+    정수		    format;
     unsigned  long  nitems, bytes_after;
     unsigned char   *prop=NULL;
     XPropertyEvent  *xproperty=&event->xproperty;
 
     // Must be a property notify, state can't be Delete (True), has to be
     // one of the supported selection types.
-    if (event->type != PropertyNotify || xproperty->state
+    만약 (event->type != PropertyNotify || xproperty->state
 	    || (xproperty->atom != clip_star.sel_atom
 				    && xproperty->atom != clip_plus.sel_atom))
-	return;
+	반환;
 
-    if (XGetWindowProperty(xproperty->display, xproperty->window,
+    만약 (XGetWindowProperty(xproperty->display, xproperty->window,
 	  xproperty->atom, 0, 0, False, timestamp_atom, &actual_type, &format,
 						&nitems, &bytes_after, &prop))
-	return;
+	반환;
 
-    if (prop)
+    만약 (prop)
 	XFree(prop);
 
     // Make sure the property type is "TIMESTAMP" and it's 32 bits.
-    if (actual_type != timestamp_atom || format != 32)
-	return;
+    만약 (actual_type != timestamp_atom || format != 32)
+	반환;
 
     // Get the selection, using the event timestamp.
-    if (XtOwnSelection(w, xproperty->atom, xproperty->time,
+    만약 (XtOwnSelection(w, xproperty->atom, xproperty->time,
 	    clip_x11_convert_selection_cb, clip_x11_lose_ownership_cb,
 	    clip_x11_notify_cb) == OK)
     {
 	// Set the "owned" flag now, there may have been a call to
 	// lose_ownership_cb in between.
-	if (xproperty->atom == clip_plus.sel_atom)
+	만약 (xproperty->atom == clip_plus.sel_atom)
 	    clip_plus.owned = TRUE;
-	else
+	아니면
 	    clip_star.owned = TRUE;
     }
 }
@@ -1669,39 +1669,39 @@ clip_x11_request_selection_cb(
     Atom	*type,
     XtPointer	value,
     long_u	*length,
-    int		*format)
+    정수		*format)
 {
-    int		motion_type = MAUTO;
+    정수		motion_type = MAUTO;
     long_u	len;
     char_u	*p;
     char	**text_list = NULL;
     Clipboard_T	*cbd;
     char_u	*tmpbuf = NULL;
 
-    if (*sel_atom == clip_plus.sel_atom)
+    만약 (*sel_atom == clip_plus.sel_atom)
 	cbd = &clip_plus;
-    else
+    아니면
 	cbd = &clip_star;
 
-    if (value == NULL || *length == 0)
+    만약 (value == NULL || *length == 0)
     {
 	clip_free_selection(cbd);	// nothing received, clear register
-	*(int *)success = FALSE;
-	return;
+	*(정수 *)success = FALSE;
+	반환;
     }
     p = (char_u *)value;
     len = *length;
-    if (*type == vim_atom || *type == vim_mt_atom)
+    만약 (*type == vim_atom || *type == vim_mt_atom)
     {
 	motion_type = *p++;
 	len--;
     }
 
-    else if (*type == vimenc_atom || *type == vimenc_mt_atom)
+    아니면 만약 (*type == vimenc_atom || *type == vimenc_mt_atom)
     {
 	char_u		*enc;
 	vimconv_T	conv;
-	int		convlen;
+	정수		convlen;
 
 	motion_type = *p++;
 	--len;
@@ -1714,52 +1714,52 @@ clip_x11_request_selection_cb(
 	// converting it.
 	conv.vc_type = CONV_NONE;
 	convert_setup(&conv, enc, p_enc);
-	if (conv.vc_type != CONV_NONE)
+	만약 (conv.vc_type != CONV_NONE)
 	{
 	    convlen = len;	// Need to use an int here.
 	    tmpbuf = string_convert(&conv, p, &convlen);
 	    len = convlen;
-	    if (tmpbuf != NULL)
+	    만약 (tmpbuf != NULL)
 		p = tmpbuf;
 	    convert_setup(&conv, NULL, NULL);
 	}
     }
 
-    else if (*type == compound_text_atom
+    아니면 만약 (*type == compound_text_atom
 	    || *type == utf8_atom
 	    || (enc_dbcs != 0 && *type == text_atom))
     {
 	XTextProperty	text_prop;
-	int		n_text = 0;
-	int		status;
+	정수		n_text = 0;
+	정수		status;
 
 	text_prop.value = (unsigned char *)value;
 	text_prop.encoding = *type;
 	text_prop.format = *format;
 	text_prop.nitems = len;
-#  if defined(X_HAVE_UTF8_STRING)
-	if (*type == utf8_atom)
+#  만약 defined(X_HAVE_UTF8_STRING)
+	만약 (*type == utf8_atom)
 	    status = Xutf8TextPropertyToTextList(X_DISPLAY, &text_prop,
 							 &text_list, &n_text);
-	else
+	아니면
 #  endif
 	    status = XmbTextPropertyToTextList(X_DISPLAY, &text_prop,
 							 &text_list, &n_text);
-	if (status != Success || n_text < 1)
+	만약 (status != Success || n_text < 1)
 	{
-	    *(int *)success = FALSE;
-	    return;
+	    *(정수 *)success = FALSE;
+	    반환;
 	}
 	p = (char_u *)text_list[0];
 	len = STRLEN(p);
     }
     clip_yank_selection(motion_type, p, (long)len, cbd);
 
-    if (text_list != NULL)
+    만약 (text_list != NULL)
 	XFreeStringList(text_list);
     vim_free(tmpbuf);
     XtFree((char *)value);
-    *(int *)success = TRUE;
+    *(정수 *)success = TRUE;
 }
 
     void
@@ -1770,12 +1770,12 @@ clip_x11_request_selection(
 {
     XEvent	event;
     Atom	type;
-    static int	success;
-    int		i;
+    static 정수	success;
+    정수		i;
     time_t	start_time;
-    int		timed_out = FALSE;
+    정수		timed_out = FALSE;
 
-    for (i = 0; i < 8; i++)
+    위해 (i = 0; i < 8; i++)
     {
 	switch (i)
 	{
@@ -1788,8 +1788,8 @@ clip_x11_request_selection(
 	    case 6:  type = text_atom;		break;
 	    default: type = XA_STRING;
 	}
-	if (type == utf8_atom
-#  if defined(X_HAVE_UTF8_STRING)
+	만약 (type == utf8_atom
+#  만약 defined(X_HAVE_UTF8_STRING)
 		&& !enc_utf8
 #  endif
 		)
@@ -1810,9 +1810,9 @@ clip_x11_request_selection(
 	 * paste!  Don't worry, we will catch up with any other events later.
 	 */
 	start_time = time(NULL);
-	while (success == MAYBE)
+	동안 (success == MAYBE)
 	{
-	    if (XCheckTypedEvent(dpy, PropertyNotify, &event)
+	    만약 (XCheckTypedEvent(dpy, PropertyNotify, &event)
 		    || XCheckTypedEvent(dpy, SelectionNotify, &event)
 		    || XCheckTypedEvent(dpy, SelectionRequest, &event))
 	    {
@@ -1831,7 +1831,7 @@ clip_x11_request_selection(
 	    // event may still come later when the selection owner comes back
 	    // to life and the text gets inserted unexpectedly.  Don't know
 	    // why that happens or how to avoid that :-(.
-	    if (time(NULL) > start_time + 2)
+	    만약 (time(NULL) > start_time + 2)
 	    {
 		timed_out = TRUE;
 		break;
@@ -1844,12 +1844,12 @@ clip_x11_request_selection(
 	    ui_delay(1L, TRUE);
 	}
 
-	if (success == TRUE)
-	    return;
+	만약 (success == TRUE)
+	    반환;
 
 	// don't do a retry with another type after timing out, otherwise we
 	// hang for 15 seconds.
-	if (timed_out)
+	만약 (timed_out)
 	    break;
     }
 
@@ -1864,7 +1864,7 @@ clip_x11_lose_selection(Widget myShell, Clipboard_T *cbd)
 				XtLastTimestampProcessed(XtDisplay(myShell)));
 }
 
-    int
+    정수
 clip_x11_own_selection(Widget myShell, Clipboard_T *cbd)
 {
     // When using the GUI we have proper timestamps, use the one of the last
@@ -1872,24 +1872,24 @@ clip_x11_own_selection(Widget myShell, Clipboard_T *cbd)
     // them), Get the time by a zero-length append, clip_x11_timestamp_cb will
     // be called with the current timestamp.
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    만약 (gui.in_use)
     {
-	if (XtOwnSelection(myShell, cbd->sel_atom,
+	만약 (XtOwnSelection(myShell, cbd->sel_atom,
 	       XtLastTimestampProcessed(XtDisplay(myShell)),
 	       clip_x11_convert_selection_cb, clip_x11_lose_ownership_cb,
 	       clip_x11_notify_cb) == False)
-	    return FAIL;
+	    반환 FAIL;
     }
-    else
+    아니면
 #  endif
     {
-	if (!XChangeProperty(XtDisplay(myShell), XtWindow(myShell),
+	만약 (!XChangeProperty(XtDisplay(myShell), XtWindow(myShell),
 		  cbd->sel_atom, timestamp_atom, 32, PropModeAppend, NULL, 0))
-	    return FAIL;
+	    반환 FAIL;
     }
     // Flush is required in a terminal as nothing else is doing it.
     XFlush(XtDisplay(myShell));
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -1903,7 +1903,7 @@ clip_x11_set_selection(Clipboard_T *cbd UNUSED)
 
 # endif
 
-# if (defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)) \
+# 만약 (defined(FEAT_XCLIPBOARD) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)) \
 	&& !defined(USE_GTK4)
 /*
  * Get the contents of the X CUT_BUFFER0 and put it in "cbd".
@@ -1911,27 +1911,27 @@ clip_x11_set_selection(Clipboard_T *cbd UNUSED)
     void
 yank_cut_buffer0(Display *dpy, Clipboard_T *cbd)
 {
-    int		nbytes = 0;
+    정수		nbytes = 0;
     char_u	*buffer = (char_u *)XFetchBuffer(dpy, &nbytes, 0);
 
-    if (nbytes > 0)
+    만약 (nbytes > 0)
     {
-	int  done = FALSE;
+	정수  done = FALSE;
 
 	// CUT_BUFFER0 is supposed to be always latin1.  Convert to 'enc' when
 	// using a multi-byte encoding.  Conversion between two 8-bit
 	// character sets usually fails and the text might actually be in
 	// 'enc' anyway.
-	if (has_mbyte)
+	만약 (has_mbyte)
 	{
 	    char_u	*conv_buf;
 	    vimconv_T	vc;
 
 	    vc.vc_type = CONV_NONE;
-	    if (convert_setup(&vc, (char_u *)"latin1", p_enc) == OK)
+	    만약 (convert_setup(&vc, (char_u *)"latin1", p_enc) == OK)
 	    {
 		conv_buf = string_convert(&vc, buffer, &nbytes);
-		if (conv_buf != NULL)
+		만약 (conv_buf != NULL)
 		{
 		    clip_yank_selection(MCHAR, conv_buf, (long)nbytes, cbd);
 		    vim_free(conv_buf);
@@ -1940,10 +1940,10 @@ yank_cut_buffer0(Display *dpy, Clipboard_T *cbd)
 		convert_setup(&vc, NULL, NULL);
 	    }
 	}
-	if (!done)  // use the text without conversion
+	만약 (!done)  // use the text without conversion
 	    clip_yank_selection(MCHAR, buffer, (long)nbytes, cbd);
 	XFree((void *)buffer);
-	if (p_verbose > 0)
+	만약 (p_verbose > 0)
 	{
 	    verbose_enter();
 	    verb_msg(_("Used CUT_BUFFER0 instead of empty selection"));
@@ -1980,66 +1980,66 @@ yank_cut_buffer0(Display *dpy, Clipboard_T *cbd)
  * 'permanent' of the two), otherwise the PRIMARY one.
  * For now, use a hard-coded sanity limit of 1Mb of data.
  */
-# if defined(FEAT_X11) && defined(FEAT_CLIPBOARD)
+# 만약 defined(FEAT_X11) && defined(FEAT_CLIPBOARD)
     void
 x11_export_final_selection(void)
 {
     Display	*dpy;
     char_u	*str = NULL;
     long_u	len = 0;
-    int		motion_type = -1;
+    정수		motion_type = -1;
 
 #  ifdef FEAT_GUI
-    if (gui.in_use)
+    만약 (gui.in_use)
 	dpy = X_DISPLAY;
-    else
+    아니면
 #  endif
 #  ifdef FEAT_XCLIPBOARD
 	dpy = xterm_dpy;
-#  else
-	return;
+#  아니면
+	반환;
 #  endif
 
     // Get selection to export
-    if (clip_plus.owned)
+    만약 (clip_plus.owned)
 	motion_type = clip_convert_selection(&str, &len, &clip_plus);
-    else if (clip_star.owned)
+    아니면 만약 (clip_star.owned)
 	motion_type = clip_convert_selection(&str, &len, &clip_star);
 
     // Check it's OK
-    if (dpy != NULL && str != NULL && motion_type >= 0
+    만약 (dpy != NULL && str != NULL && motion_type >= 0
 					       && len < 1024*1024 && len > 0)
     {
-	int ok = TRUE;
+	정수 ok = TRUE;
 
 	// The CUT_BUFFER0 is supposed to always contain latin1.  Convert from
 	// 'enc' when it is a multi-byte encoding.  When 'enc' is an 8-bit
 	// encoding conversion usually doesn't work, so keep the text as-is.
-	if (has_mbyte)
+	만약 (has_mbyte)
 	{
 	    vimconv_T	vc;
 
 	    vc.vc_type = CONV_NONE;
-	    if (convert_setup(&vc, p_enc, (char_u *)"latin1") == OK)
+	    만약 (convert_setup(&vc, p_enc, (char_u *)"latin1") == OK)
 	    {
-		int	intlen = len;
+		정수	intlen = len;
 		char_u	*conv_str;
 
 		vc.vc_fail = TRUE;
 		conv_str = string_convert(&vc, str, &intlen);
 		len = intlen;
-		if (conv_str != NULL)
+		만약 (conv_str != NULL)
 		{
 		    vim_free(str);
 		    str = conv_str;
 		}
-		else
+		아니면
 		{
 		    ok = FALSE;
 		}
 		convert_setup(&vc, NULL, NULL);
 	    }
-	    else
+	    아니면
 	    {
 		ok = FALSE;
 	    }
@@ -2047,9 +2047,9 @@ x11_export_final_selection(void)
 
 	// Do not store the string if conversion failed.  Better to use any
 	// other selection than garbled text.
-	if (ok)
+	만약 (ok)
 	{
-	    XStoreBuffer(dpy, (char *)str, (int)len, 0);
+	    XStoreBuffer(dpy, (char *)str, (정수)len, 0);
 	    XFlush(dpy);
 	}
     }
@@ -2063,9 +2063,9 @@ clip_free_selection(Clipboard_T *cbd)
 {
     yankreg_T *y_ptr = get_y_current();
 
-    if (cbd == &clip_plus)
+    만약 (cbd == &clip_plus)
 	set_y_current(get_y_register(PLUS_REGISTER));
-    else
+    아니면
 	set_y_current(get_y_register(STAR_REGISTER));
     free_yank_all();
     get_y_current()->y_size = 0;
@@ -2081,21 +2081,21 @@ clip_get_selection(Clipboard_T *cbd)
     yankreg_T	*old_y_previous, *old_y_current;
     pos_T	old_cursor;
     pos_T	old_visual;
-    int		old_visual_mode;
+    정수		old_visual_mode;
     colnr_T	old_virtcol;
     colnr_T	old_curswant;
-    int		old_set_curswant;
+    정수		old_set_curswant;
     pos_T	old_op_start, old_op_end;
     oparg_T	oa;
     cmdarg_T	ca;
 
-    if (cbd->owned)
+    만약 (cbd->owned)
     {
-	if ((cbd == &clip_plus
+	만약 ((cbd == &clip_plus
 		&& get_y_register(PLUS_REGISTER)->y_array != NULL)
 		|| (cbd == &clip_star
 		    && get_y_register(STAR_REGISTER)->y_array != NULL))
-	    return;
+	    반환;
 
 	// Avoid triggering autocmds such as TextYankPost.
 	block_autocmds();
@@ -2136,7 +2136,7 @@ clip_get_selection(Clipboard_T *cbd)
 
 	unblock_autocmds();
     }
-    else if (!is_clipboard_needs_update())
+    아니면 만약 (!is_clipboard_needs_update())
     {
 	clip_free_selection(cbd);
 
@@ -2150,16 +2150,16 @@ clip_get_selection(Clipboard_T *cbd)
  */
     void
 clip_yank_selection(
-    int		type,
+    정수		type,
     char_u	*str,
     long	len,
     Clipboard_T *cbd)
 {
     yankreg_T *y_ptr;
 
-    if (cbd == &clip_plus)
+    만약 (cbd == &clip_plus)
 	y_ptr = get_y_register(PLUS_REGISTER);
-    else
+    아니면
 	y_ptr = get_y_register(STAR_REGISTER);
 
     clip_free_selection(cbd);
@@ -2167,54 +2167,54 @@ clip_yank_selection(
     str_to_reg(y_ptr, type, str, len, -1, FALSE);
 }
 
-    int
+    정수
 clip_convert_selection_offset(
 	char_u	    **str,
 	long_u	    *len,
-	int	    offset, // Extra space to add in *str and the offset to
+	정수	    offset, // Extra space to add in *str and the offset to
 			    // place the actual string in *str.
 	Clipboard_T *cbd)
 {
     char_u	*p;
-    int		lnum;
-    int		i, j;
+    정수		lnum;
+    정수		i, j;
     int_u	eolsize;
     yankreg_T	*y_ptr;
 
-    if (cbd == &clip_plus)
+    만약 (cbd == &clip_plus)
 	y_ptr = get_y_register(PLUS_REGISTER);
-    else
+    아니면
 	y_ptr = get_y_register(STAR_REGISTER);
 
 # ifdef USE_CRNL
     eolsize = 2;
-# else
+# 아니면
     eolsize = 1;
 # endif
 
     *str = NULL;
     *len = 0;
-    if (y_ptr->y_array == NULL)
-	return -1;
+    만약 (y_ptr->y_array == NULL)
+	반환 -1;
 
-    for (i = 0; i < y_ptr->y_size; i++)
+    위해 (i = 0; i < y_ptr->y_size; i++)
 	*len += (long_u)y_ptr->y_array[i].length + eolsize;
 
     // Don't want newline character at end of last line if we're in MCHAR mode.
-    if (y_ptr->y_type == MCHAR && *len >= eolsize)
+    만약 (y_ptr->y_type == MCHAR && *len >= eolsize)
 	*len -= eolsize;
 
     *len += offset;
     p = *str = alloc(*len + 1);	// add one to avoid zero
-    if (p == NULL)
-	return -1;
+    만약 (p == NULL)
+	반환 -1;
     p += offset;
     lnum = 0;
-    for (i = 0, j = 0; i < (int)*len - offset; i++, j++)
+    위해 (i = 0, j = 0; i < (정수)*len - offset; i++, j++)
     {
-	if (y_ptr->y_array[lnum].string[j] == '\n')
+	만약 (y_ptr->y_array[lnum].string[j] == '\n')
 	    p[i] = NUL;
-	else if (y_ptr->y_array[lnum].string[j] == NUL)
+	아니면 만약 (y_ptr->y_array[lnum].string[j] == NUL)
 	{
 # ifdef USE_CRNL
 	    p[i++] = '\r';
@@ -2223,10 +2223,10 @@ clip_convert_selection_offset(
 	    lnum++;
 	    j = -1;
 	}
-	else
+	아니면
 	    p[i] = y_ptr->y_array[lnum].string[j];
     }
-    return y_ptr->y_type;
+    반환 y_ptr->y_type;
 }
 
 /*
@@ -2234,34 +2234,34 @@ clip_convert_selection_offset(
  * with length *len.
  * Returns the motion type, or -1 for failure.
  */
-    int
+    정수
 clip_convert_selection(char_u **str, long_u *len, Clipboard_T *cbd)
 {
-    return clip_convert_selection_offset(str, len, 0, cbd);
+    반환 clip_convert_selection_offset(str, len, 0, cbd);
 }
 
 /*
  * When "regname" is a clipboard register, obtain the selection.  If it's not
  * available return zero, otherwise return "regname".
  */
-    int
-may_get_selection(int regname)
+    정수
+may_get_selection(정수 regname)
 {
-    if (regname == '*')
+    만약 (regname == '*')
     {
-	if (!clip_star.available)
+	만약 (!clip_star.available)
 	    regname = 0;
-	else
+	아니면
 	    clip_get_selection(&clip_star);
     }
-    else if (regname == '+')
+    아니면 만약 (regname == '+')
     {
-	if (!clip_plus.available)
+	만약 (!clip_plus.available)
 	    regname = 0;
-	else
+	아니면
 	    clip_get_selection(&clip_plus);
     }
-    return regname;
+    반환 regname;
 }
 
 /*
@@ -2270,13 +2270,13 @@ may_get_selection(int regname)
     void
 may_set_selection(void)
 {
-    if ((get_y_current() == get_y_register(STAR_REGISTER))
+    만약 ((get_y_current() == get_y_register(STAR_REGISTER))
 	    && clip_star.available)
     {
 	clip_own_selection(&clip_star);
 	clip_gen_set_selection(&clip_star);
     }
-    else if ((get_y_current() == get_y_register(PLUS_REGISTER))
+    아니면 만약 ((get_y_current() == get_y_register(PLUS_REGISTER))
 	    && clip_plus.available)
     {
 	clip_own_selection(&clip_plus);
@@ -2284,7 +2284,7 @@ may_set_selection(void)
     }
 }
 
-# if defined(FEAT_WAYLAND_CLIPBOARD)
+# 만약 defined(FEAT_WAYLAND_CLIPBOARD)
 
     static clip_wl_selection_T *
 clip_wl_get_selection(wayland_selection_T sel)
@@ -2292,45 +2292,45 @@ clip_wl_get_selection(wayland_selection_T sel)
     switch (sel)
     {
 	case WAYLAND_SELECTION_REGULAR:
-	    return &clip_wl.regular;
+	    반환 &clip_wl.regular;
 	case WAYLAND_SELECTION_PRIMARY:
-	    return &clip_wl.primary;
+	    반환 &clip_wl.primary;
 	default:
-	    return NULL;
+	    반환 NULL;
     }
 }
 
     static clip_wl_selection_T *
 clip_wl_get_selection_from_cbd(Clipboard_T *cbd)
 {
-    if (cbd == &clip_plus)
-	return &clip_wl.regular;
-    else if (cbd == &clip_star)
-	return &clip_wl.primary;
-    else
-	return NULL;
+    만약 (cbd == &clip_plus)
+	반환 &clip_wl.regular;
+    아니면 만약 (cbd == &clip_star)
+	반환 &clip_wl.primary;
+    아니면
+	반환 NULL;
 }
 
     static Clipboard_T *
 clip_wl_get_cbd_from_selection(clip_wl_selection_T *sel)
 {
-    if (sel == &clip_wl.regular)
-	return &clip_plus;
-    else if (sel == &clip_wl.primary)
-	return &clip_star;
-    else
-	return NULL;
+    만약 (sel == &clip_wl.regular)
+	반환 &clip_plus;
+    아니면 만약 (sel == &clip_wl.primary)
+	반환 &clip_star;
+    아니면
+	반환 NULL;
 }
 
     static wayland_selection_T
 clip_wl_get_selection_type(clip_wl_selection_T *sel)
 {
-    if (sel == &clip_wl.regular)
-	return WAYLAND_SELECTION_REGULAR;
-    else if (sel == &clip_wl.primary)
-	return WAYLAND_SELECTION_PRIMARY;
-    else
-	return WAYLAND_SELECTION_NONE;
+    만약 (sel == &clip_wl.regular)
+	반환 WAYLAND_SELECTION_REGULAR;
+    아니면 만약 (sel == &clip_wl.primary)
+	반환 WAYLAND_SELECTION_PRIMARY;
+    아니면
+	반환 WAYLAND_SELECTION_NONE;
 }
 
     static bool
@@ -2341,10 +2341,10 @@ wl_data_offer_listener_event_offer(
 )
 {
     // Only accept mime type if we support it
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes); i++)
-	if (STRCMP(mime_type, supported_mimes[i]) == 0)
-	    return true;
-    return FALSE;
+    위해 (정수 i = 0; i < (정수)ARRAY_LENGTH(supported_mimes); i++)
+	만약 (STRCMP(mime_type, supported_mimes[i]) == 0)
+	    반환 true;
+    반환 FALSE;
 }
 
 static const vwl_data_offer_listener_T vwl_data_offer_listener = {
@@ -2376,13 +2376,13 @@ vwl_data_device_listener_event_selection(
     // There are two cases when sel->offer is NULL
     // 1. No one owns the selection
     // 2. We own the selection (we'll just access the register directly)
-    if (offer == NULL || sel->source != NULL)
+    만약 (offer == NULL || sel->source != NULL)
     {
 	// Selection event is from us, so we are the source client. Therefore
 	// ignore it. Or the selection is cleared, so set sel->offer to NULL
 	vwl_data_offer_destroy(offer);
 	sel->offer = NULL;
-	return;
+	반환;
     }
 
     // Save offer. When we want to request data, then we'll actually call the
@@ -2401,19 +2401,19 @@ vwl_data_device_listener_event_finished(
     // invalid? If so, let the user call :wlrestore! to reset. There wouldn't be
     // any point in trying to create another data device for the same seat,
     // since the seat is in an invalid state.
-    if (device == clip_wl.regular.device)
+    만약 (device == clip_wl.regular.device)
     {
 	sel = &clip_wl.regular;
 	clip_wl.regular.device = NULL;
     }
-    else if (device == clip_wl.primary.device)
+    아니면 만약 (device == clip_wl.primary.device)
     {
 	sel = &clip_wl.primary;
 	clip_wl.primary.device = NULL;
     }
-    else
+    아니면
 	// Shouldn't happen
-	return;
+	반환;
 
     vim_free(sel->contents);
     vwl_data_source_destroy(sel->source);
@@ -2433,55 +2433,55 @@ static const vwl_data_device_listener_T vwl_data_device_listener = {
  * Initialize the clipboard for Wayland using the global Wayland connection.
  * Returns OK on success and FAIL on failure.
  */
-    int
+    정수
 clip_init_wayland(void)
 {
     int_u supported = WAYLAND_SELECTION_NONE;
 
-    if (wayland_ct == NULL)
-	return FAIL;
+    만약 (wayland_ct == NULL)
+	반환 FAIL;
 
     memset(&clip_wl, 0, sizeof(clip_wl));
 
     clip_wl.seat = vwl_connection_get_seat(wayland_ct, (char *)p_wse);
 
-    if (clip_wl.seat == NULL)
-	return FAIL;
+    만약 (clip_wl.seat == NULL)
+	반환 FAIL;
 
     clip_wl.regular.manager = vwl_connection_get_data_device_manager(
 	    wayland_ct, WAYLAND_SELECTION_REGULAR, &supported);
 
-    if (clip_wl.regular.manager != NULL)
+    만약 (clip_wl.regular.manager != NULL)
     {
 	clip_wl.regular.device = vwl_data_device_manager_get_data_device(
 		clip_wl.regular.manager, clip_wl.seat);
 
-	if (clip_wl.regular.device != NULL)
+	만약 (clip_wl.regular.device != NULL)
 	    clip_wl.regular.available = true;
-	else
+	아니면
 	{
 	    // Shouldn't happen
 	    vwl_data_device_manager_discard(clip_wl.regular.manager);
 	    clip_wl.regular.manager = NULL;
-	    return FAIL;
+	    반환 FAIL;
 	}
     }
 
     // If we still don't support the primary selection, try finding one for it
     // specifically.
-    if (!(supported & WAYLAND_SELECTION_PRIMARY))
+    만약 (!(supported & WAYLAND_SELECTION_PRIMARY))
     {
 	clip_wl.primary.manager = vwl_connection_get_data_device_manager(
 		wayland_ct, WAYLAND_SELECTION_PRIMARY, &supported);
 
-	if (clip_wl.primary.manager != NULL)
+	만약 (clip_wl.primary.manager != NULL)
 	{
 	    clip_wl.primary.device = vwl_data_device_manager_get_data_device(
 		    clip_wl.primary.manager, clip_wl.seat);
 
-	    if (clip_wl.primary.device != NULL)
+	    만약 (clip_wl.primary.device != NULL)
 		clip_wl.primary.available = true;
-	    else
+	    아니면
 	    {
 		vwl_data_device_manager_discard(clip_wl.primary.manager);
 		clip_wl.primary.manager = NULL;
@@ -2489,7 +2489,7 @@ clip_init_wayland(void)
 	}
     }
 
-    if (clip_wl.regular.available && !clip_wl.primary.available)
+    만약 (clip_wl.regular.available && !clip_wl.primary.available)
     {
 	// The protocol supports both regular and primary selections, just use
 	// one data device manager and one data device. Or the primary selection
@@ -2499,20 +2499,20 @@ clip_init_wayland(void)
 	clip_wl.primary.device = clip_wl.regular.device;
     }
 
-    if (!clip_wl.regular.available && !clip_wl.primary.available)
-	return FAIL;
+    만약 (!clip_wl.regular.available && !clip_wl.primary.available)
+	반환 FAIL;
 
     // Start listening for selection updates
-    if (clip_wl.regular.device != NULL)
+    만약 (clip_wl.regular.device != NULL)
 	vwl_data_device_add_listener(clip_wl.regular.device,
 		&vwl_data_device_listener, NULL);
     // Don't want to listen to the same data device twice
-    if (clip_wl.primary.device != NULL
+    만약 (clip_wl.primary.device != NULL
 	    && clip_wl.primary.device != clip_wl.regular.device)
 	vwl_data_device_add_listener(clip_wl.primary.device,
 		&vwl_data_device_listener, NULL);
 
-    return OK;
+    반환 OK;
 }
 
     void
@@ -2520,32 +2520,32 @@ clip_uninit_wayland(void)
 {
     clip_wl_selection_T *sel;
 
-    if (clipmethod == CLIPMETHOD_WAYLAND)
+    만약 (clipmethod == CLIPMETHOD_WAYLAND)
     {
-	if (clip_star.owned)
+	만약 (clip_star.owned)
 	    clip_lose_selection(&clip_star);
-	if (clip_plus.owned)
+	만약 (clip_plus.owned)
 	    clip_lose_selection(&clip_plus);
     }
 
     // Don't want to double free
-    if (clip_wl.regular.manager != clip_wl.primary.manager)
+    만약 (clip_wl.regular.manager != clip_wl.primary.manager)
 	vwl_data_device_manager_discard(clip_wl.primary.manager);
     vwl_data_device_manager_discard(clip_wl.regular.manager);
 
-    if (clip_wl.regular.device != clip_wl.primary.device)
+    만약 (clip_wl.regular.device != clip_wl.primary.device)
 	vwl_data_device_destroy(clip_wl.primary.device);
     vwl_data_device_destroy(clip_wl.regular.device);
 
     sel = &clip_wl.regular;
-    while (true)
+    동안 (true)
     {
 	vim_free(sel->contents);
 	vwl_data_source_destroy(sel->source);
 	vwl_data_offer_destroy(sel->offer);
 	sel->available = false;
 
-	if (sel == &clip_wl.primary)
+	만약 (sel == &clip_wl.primary)
 	    break;
 	sel = &clip_wl.primary;
     }
@@ -2553,17 +2553,17 @@ clip_uninit_wayland(void)
     vim_memset(&clip_wl, 0, sizeof(clip_wl));
 }
 
-    int
+    정수
 clip_reset_wayland(void)
 {
     wayland_uninit_connection();
 
-    if (wayland_init_connection(wayland_display_name) == FAIL
+    만약 (wayland_init_connection(wayland_display_name) == FAIL
 	    || clip_init_wayland() == FAIL)
-	return FAIL;
+	반환 FAIL;
 
     choose_clipmethod();
-    return OK;
+    반환 OK;
 }
 
 
@@ -2571,12 +2571,12 @@ clip_reset_wayland(void)
  * Read data from a file descriptor and write it to the given clipboard.
  */
     static void
-clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd)
+clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, 정수 fd)
 {
     char_u	*start, *final;
     long	len;
     garray_T	buf;
-    int		motion_type = MAUTO;
+    정수		motion_type = MAUTO;
     ssize_t	r = 0;
     char_u	*tofree = NULL;
 #  ifndef HAVE_SELECT
@@ -2584,7 +2584,7 @@ clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd)
 
     pfd.fd = fd;
     pfd.events = POLLIN;
-#  else
+#  아니면
     fd_set rfds;
     struct timeval  tv;
 
@@ -2593,32 +2593,32 @@ clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd)
 #  endif
 
     // Make pipe (read end) non-blocking
-    if (fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK) == -1)
-	return;
+    만약 (fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK) == -1)
+	반환;
 
     ga_init2(&buf, 1, 4096);
 
     // 4096 bytes seems reasonable for initial buffer size, memory is cheap
     // anyways.
-    if (ga_grow(&buf, 4096) == FAIL)
-	return;
+    만약 (ga_grow(&buf, 4096) == FAIL)
+	반환;
 
     start = buf.ga_data;
 
 #  ifndef HAVE_SELECT
-    while (poll(&pfd, 1, p_wtm) > 0)
-#  else
-    while (tv.tv_sec = p_wtm / 1000, tv.tv_usec = (p_wtm % 1000) * 1000,
+    동안 (poll(&pfd, 1, p_wtm) > 0)
+#  아니면
+    동안 (tv.tv_sec = p_wtm / 1000, tv.tv_usec = (p_wtm % 1000) * 1000,
 	    select(fd + 1, &rfds, NULL, NULL, &tv) > 0)
 #  endif
     {
 	r = read(fd, start, buf.ga_maxlen - 1 - buf.ga_len);
 
-	if (r == 0)
+	만약 (r == 0)
 	    break;
-	else if (r < 0)
+	아니면 만약 (r < 0)
 	{
-	    if (errno == EAGAIN || errno == EINTR)
+	    만약 (errno == EAGAIN || errno == EINTR)
 		continue;
 	    break;
 	}
@@ -2627,25 +2627,25 @@ clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd)
 	buf.ga_len += r;
 
 	// Realloc if we are at the end of the buffer
-	if (buf.ga_len >= buf.ga_maxlen - 1)
+	만약 (buf.ga_len >= buf.ga_maxlen - 1)
 	{
-	    if (ga_grow(&buf, 8192) == FAIL)
+	    만약 (ga_grow(&buf, 8192) == FAIL)
 		break;
 	    start = (char_u *)buf.ga_data + buf.ga_len;
 	}
     }
 
-    if (buf.ga_len == 0)
+    만약 (buf.ga_len == 0)
     {
 	clip_free_selection(cbd); // Nothing received, clear register
 	ga_clear(&buf);
-	return;
+	반환;
     }
 
     final = buf.ga_data;
     len = buf.ga_len;
 
-    if (clip_convert_data(&final, &len, &motion_type,
+    만약 (clip_convert_data(&final, &len, &motion_type,
 	    STRCMP(mime_type, VIM_ATOM_NAME) == 0
 	    || STRCMP(mime_type, VIM_MIMETYPE_NAME) == 0,
 	    STRCMP(mime_type, VIMENC_ATOM_NAME) == 0
@@ -2663,20 +2663,20 @@ clip_wl_receive_data(Clipboard_T *cbd, const char *mime_type, int fd)
 clip_wl_request_selection(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
-    int			fds[2];
-    int			mime_types_len;
+    정수			fds[2];
+    정수			mime_types_len;
     const char		**mime_types;
     const char		*chosen_mime = NULL;
 
-    if (!sel->available)
+    만약 (!sel->available)
 	goto clear;
 
     // Dispatch any events that still queued up before checking for a data
     // offer.
-    if (vwl_connection_roundtrip(wayland_ct) == FAIL)
+    만약 (vwl_connection_roundtrip(wayland_ct) == FAIL)
 	goto clear;
 
-    if (sel->offer == NULL)
+    만약 (sel->offer == NULL)
 	goto clear;
 
     mime_types_len = sel->offer->mime_types.ga_len;
@@ -2684,15 +2684,15 @@ clip_wl_request_selection(Clipboard_T *cbd)
 
     // Choose mime type to receive from. Mime types with a lower index in the
     // "supported_mimes" array are prioritized over ones after it.
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes)
+    위해 (정수 i = 0; i < (정수)ARRAY_LENGTH(supported_mimes)
 	    && chosen_mime == NULL; i++)
     {
-	for (int k = 0; k < mime_types_len && chosen_mime == NULL; k++)
-	    if (STRCMP(mime_types[k], supported_mimes[i]) == 0)
+	위해 (정수 k = 0; k < mime_types_len && chosen_mime == NULL; k++)
+	    만약 (STRCMP(mime_types[k], supported_mimes[i]) == 0)
 		chosen_mime = supported_mimes[i];
     }
 
-    if (chosen_mime == NULL || pipe(fds) == -1)
+    만약 (chosen_mime == NULL || pipe(fds) == -1)
 	goto clear;
 
     vwl_data_offer_receive(sel->offer, chosen_mime, fds[1]);
@@ -2700,12 +2700,12 @@ clip_wl_request_selection(Clipboard_T *cbd)
     close(fds[1]); // Close before we read data so that when the source client
 		   // closes their end we receive an EOF.
 
-    if (vwl_connection_flush(wayland_ct) >= 0)
+    만약 (vwl_connection_flush(wayland_ct) >= 0)
 	clip_wl_receive_data(cbd, chosen_mime, fds[0]);
 
     close(fds[0]);
 
-    return;
+    반환;
 clear:
     clip_free_selection(cbd);
 }
@@ -2721,11 +2721,11 @@ vwl_data_source_listener_event_send(
     clip_wl_selection_T *sel = data;
     Clipboard_T		*cbd = clip_wl_get_cbd_from_selection(sel);
     bool		have_mime = false;
-    int			motion_type;
+    정수			motion_type;
     long_u		length;
     char_u		*string; // Will be reallocated to a bigger size if
 				 // needed.
-    int			offset = 0;
+    정수			offset = 0;
     bool		is_vim, is_vimenc;
     size_t		total = 0;
 #  ifndef HAVE_SELECT
@@ -2733,7 +2733,7 @@ vwl_data_source_listener_event_send(
 
     pfd.fd = fd;
     pfd.events = POLLOUT;
-#  else
+#  아니면
     fd_set	    wfds;
     struct timeval  tv;
 
@@ -2742,14 +2742,14 @@ vwl_data_source_listener_event_send(
 #  endif
 
     // Check if we actually have mime type
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes); i++)
-	if (STRCMP(supported_mimes[i], mime_type) == 0)
+    위해 (정수 i = 0; i < (정수)ARRAY_LENGTH(supported_mimes); i++)
+	만약 (STRCMP(supported_mimes[i], mime_type) == 0)
 	{
 	    have_mime = true;
 	    break;
 	}
 
-    if (!have_mime)
+    만약 (!have_mime)
 	goto exit;
 
     // First byte sent is motion type for vim specific formats. For the vimenc
@@ -2761,38 +2761,38 @@ vwl_data_source_listener_event_send(
     is_vim = STRCMP(mime_type, VIM_ATOM_NAME) == 0
 	|| STRCMP(mime_type, VIM_MIMETYPE_NAME) == 0;
 
-    if (is_vimenc)
+    만약 (is_vimenc)
 	offset += 2 + STRLEN(p_enc);
-    else if (is_vim)
+    아니면 만약 (is_vim)
 	offset += 1;
 
     clip_get_selection(cbd);
     motion_type = clip_convert_selection_offset(&string, &length, offset, cbd);
 
-    if (motion_type < 0)
+    만약 (motion_type < 0)
 	goto exit;
 
-    if (is_vimenc)
+    만약 (is_vimenc)
     {
 	string[0] = (char_u)motion_type;
 	// Use vim_strncpy for safer copying
 	vim_strncpy(string + 1, p_enc, STRLEN(p_enc));
     }
-    else if (is_vim)
+    아니면 만약 (is_vim)
 	string[0] = (char_u)motion_type;
 
 
-    while (total < (size_t)length &&
+    동안 (total < (size_t)length &&
 #  ifndef HAVE_SELECT
 	    poll(&pfd, 1, p_wtm) > 0)
-#  else
+#  아니면
 	    ((tv.tv_sec = p_wtm / 1000, tv.tv_usec = (p_wtm % 1000) * 1000),
 	    select(fd + 1, NULL, &wfds, NULL, &tv) > 0))
 #  endif
     {
 	ssize_t w = write(fd, string + total, length - total);
 
-	if (w == -1)
+	만약 (w == -1)
 	    break;
 	total += w;
     }
@@ -2834,25 +2834,25 @@ clip_wl_do_set_selection(void *data, uint32_t serial)
  * other Wayland clients so they can receive data from us. Returns OK on success
  * and FAIL on failure.
  */
-    static int
+    static 정수
 clip_wl_own_selection(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
     wayland_selection_T sel_type = clip_wl_get_selection_type(sel);
 
-    if (!sel->available || vwl_connection_roundtrip(wayland_ct) == FAIL)
-	return FAIL;
+    만약 (!sel->available || vwl_connection_roundtrip(wayland_ct) == FAIL)
+	반환 FAIL;
 
-    if (sel->source != NULL)
+    만약 (sel->source != NULL)
     {
-	if (sel_type == WAYLAND_SELECTION_PRIMARY)
+	만약 (sel_type == WAYLAND_SELECTION_PRIMARY)
 	    // We already own the selection, ignore (only do this for primary
 	    // selection). We don't re set the selection because then we would
 	    // be setting the selection every time the user moves the visual
 	    // selection cursor, which is messy and inefficient. Some
 	    // applications like Google Chrome do it this way however.
-	    return OK;
-	else if (sel_type == WAYLAND_SELECTION_REGULAR)
+	    반환 OK;
+	아니면 만약 (sel_type == WAYLAND_SELECTION_REGULAR)
 	{
 	    // Technically we don't need to do this as we already own the
 	    // selection, however if a user yanks text a second time, the
@@ -2864,29 +2864,29 @@ clip_wl_own_selection(Clipboard_T *cbd)
 	    // seem to set the selection every time.
 	    vwl_data_source_destroy(sel->source);
 	}
-	else
+	아니면
 	    // Shouldn't happen
-	    return FAIL;
+	    반환 FAIL;
     }
 
     sel->source = vwl_data_device_manager_create_data_source(sel->manager);
     vwl_data_source_add_listener(sel->source, &vwl_data_source_listener, sel);
 
     // Advertise mime types
-    for (int i = 0; i < (int)ARRAY_LENGTH(supported_mimes); i++)
+    위해 (정수 i = 0; i < (정수)ARRAY_LENGTH(supported_mimes); i++)
 	vwl_data_source_offer(sel->source, supported_mimes[i]);
 
     sel->own_success = false;
     clip_wl_do_set_selection(sel, 0);
 
-    if (!sel->own_success)
+    만약 (!sel->own_success)
 	goto fail;
 
-    return OK;
+    반환 OK;
 fail:
     vwl_data_source_destroy(sel->source);
     sel->source = NULL;
-    return FAIL;
+    반환 FAIL;
 }
 
 /*
@@ -2897,8 +2897,8 @@ clip_wl_lose_selection(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
 
-    if (!sel->available)
-	return;
+    만약 (!sel->available)
+	반환;
 
     vwl_data_source_destroy(sel->source);
     sel->source = NULL;
@@ -2913,7 +2913,7 @@ clip_wl_set_selection(Clipboard_T *cbd UNUSED)
 {
 }
 
-#  if defined(USE_SYSTEM)
+#  만약 defined(USE_SYSTEM)
 /*
  * Return true if we own the selection corresponding to cbd or another client
  * does.
@@ -2923,10 +2923,10 @@ clip_wl_owner_exists(Clipboard_T *cbd)
 {
     clip_wl_selection_T *sel = clip_wl_get_selection_from_cbd(cbd);
 
-    if (vwl_connection_roundtrip(wayland_ct) == FAIL)
-	return false;
+    만약 (vwl_connection_roundtrip(wayland_ct) == FAIL)
+	반환 false;
 
-    return sel->available && (sel->source != NULL || sel->offer != NULL);
+    반환 sel->available && (sel->source != NULL || sel->offer != NULL);
 }
 #  endif
 
@@ -2943,43 +2943,43 @@ clip_wl_owner_exists(Clipboard_T *cbd)
     static clipmethod_T
 get_clipmethod(char_u *str)
 {
-    int		len	= (int)STRLEN(str) + 1;
+    정수		len	= (정수)STRLEN(str) + 1;
     char_u	*buf	= alloc(len);
 
-    if (buf == NULL)
-	return CLIPMETHOD_FAIL;
+    만약 (buf == NULL)
+	반환 CLIPMETHOD_FAIL;
 
     clipmethod_T ret = CLIPMETHOD_FAIL;
     char_u	*p = str;
 
-    while (*p != NUL)
+    동안 (*p != NUL)
     {
 	clipmethod_T method = CLIPMETHOD_NONE;
 
 	(void)copy_option_part(&p, buf, len, ",");
 
-	if (STRCMP(buf, "wayland") == 0)
+	만약 (STRCMP(buf, "wayland") == 0)
 	{
 # ifdef FEAT_GUI
-	    if (!gui.in_use)
+	    만약 (!gui.in_use)
 # endif
 	    {
 # ifdef FEAT_WAYLAND_CLIPBOARD
-		if (clip_wl.regular.available || clip_wl.primary.available)
+		만약 (clip_wl.regular.available || clip_wl.primary.available)
 		    method = CLIPMETHOD_WAYLAND;
 # endif
 	    }
 	}
-	else if (STRCMP(buf, "x11") == 0)
+	아니면 만약 (STRCMP(buf, "x11") == 0)
 	{
 # ifdef FEAT_GUI
-	    if (!gui.in_use)
+	    만약 (!gui.in_use)
 # endif
 	    {
 # ifdef FEAT_XCLIPBOARD
 		// x_IOerror_handler() in os_unix.c should set xterm_dpy to NULL if
 		// we lost connection to the X server.
-		if (xterm_dpy != NULL)
+		만약 (xterm_dpy != NULL)
 		{
 		    // If the X connection is lost then that handler will longjmp
 		    // somewhere else, in that case we will call choose_clipmethod()
@@ -2991,24 +2991,24 @@ get_clipmethod(char_u *str)
 # endif
 	    }
 	}
-	else
+	아니면
 	{
 # ifdef FEAT_CLIPBOARD_PROVIDER
 	    // Check if name matches a clipboard provider
-	    int r = clip_provider_is_available(buf);
+	    정수 r = clip_provider_is_available(buf);
 
-	    if (r == 1)
+	    만약 (r == 1)
 	    {
 		method = CLIPMETHOD_PROVIDER;
-		if (ret == CLIPMETHOD_FAIL)
+		만약 (ret == CLIPMETHOD_FAIL)
 		{
 		    vim_free(clip_provider);
 		    clip_provider = vim_strsave(buf);
-		    if (clip_provider == NULL)
+		    만약 (clip_provider == NULL)
 			goto fail;
 		}
 	    }
-	    else if (r == -1)
+	    아니면 만약 (r == -1)
 # endif
 	    {
 # ifdef FEAT_CLIPBOARD_PROVIDER
@@ -3020,7 +3020,7 @@ fail:
 	}
 
 	// Keep on going in order to catch errors
-	if (method != CLIPMETHOD_NONE && ret == CLIPMETHOD_FAIL)
+	만약 (method != CLIPMETHOD_NONE && ret == CLIPMETHOD_FAIL)
 	    ret = method;
     }
 
@@ -3029,7 +3029,7 @@ fail:
 
 exit:
     vim_free(buf);
-    return ret;
+    반환 ret;
 }
 
 
@@ -3042,15 +3042,15 @@ clipmethod_to_str(clipmethod_T method)
     switch(method)
     {
 	case CLIPMETHOD_WAYLAND:
-	    return (char_u *)"wayland";
+	    반환 (char_u *)"wayland";
 	case CLIPMETHOD_X11:
-	    return (char_u *)"x11";
+	    반환 (char_u *)"x11";
 	case CLIPMETHOD_PROVIDER:
 # ifdef FEAT_EVAL
-	    return clip_provider;
+	    반환 clip_provider;
 # endif
 	default:
-	    return (char_u *)"none";
+	    반환 (char_u *)"none";
     }
 }
 
@@ -3063,15 +3063,15 @@ choose_clipmethod(void)
 {
     clipmethod_T method = get_clipmethod(p_cpm);
 
-    if (method == CLIPMETHOD_FAIL)
-	return e_invalid_argument;
+    만약 (method == CLIPMETHOD_FAIL)
+	반환 e_invalid_argument;
 
 // If GUI is running or we are not on a system with Wayland or X11, then always
 // return CLIPMETHOD_NONE. System or GUI clipboard handling always overrides.
 // This is unless a provider is being used.
-# if defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
-#  if defined(FEAT_GUI)
-    if (method != CLIPMETHOD_PROVIDER && gui.in_use)
+# 만약 defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)
+#  만약 defined(FEAT_GUI)
+    만약 (method != CLIPMETHOD_PROVIDER && gui.in_use)
     {
 #   ifdef FEAT_WAYLAND
 	// We only interact with Wayland for the clipboard, we can just deinit
@@ -3083,12 +3083,12 @@ choose_clipmethod(void)
 	goto lose_sel_exit;
     }
 #  endif
-# else
+# 아니면
     // If on a system like windows or macos, then clipmethod is irrelevant, we
     // use their way of accessing the clipboard. This is unless we are using the
     // clipboard provider
 #  ifdef FEAT_CLIPBOARD_PROVIDER
-    if (method != CLIPMETHOD_PROVIDER)
+    만약 (method != CLIPMETHOD_PROVIDER)
 #  endif
     {
 	method = CLIPMETHOD_NONE;
@@ -3098,28 +3098,28 @@ choose_clipmethod(void)
 
 # ifdef FEAT_CLIPBOARD
     // Deinitialize clipboard if there is no way to access clipboard
-    if (method == CLIPMETHOD_NONE)
+    만약 (method == CLIPMETHOD_NONE)
 	clip_init(FALSE);
     // If we have a clipmethod that works now, then initialize clipboard
-    else if (clipmethod == CLIPMETHOD_NONE && method != CLIPMETHOD_NONE)
+    아니면 만약 (clipmethod == CLIPMETHOD_NONE && method != CLIPMETHOD_NONE)
     {
 	clip_init(TRUE);
 	did_warn_clipboard = false;
     }
     // Disown clipboard if we are switching to a new method
-    else if (clipmethod != CLIPMETHOD_NONE && method != clipmethod)
+    아니면 만약 (clipmethod != CLIPMETHOD_NONE && method != clipmethod)
     {
-#  if (defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)) \
+#  만약 (defined(FEAT_XCLIPBOARD) || defined(FEAT_WAYLAND_CLIPBOARD)) \
 	&& defined(FEAT_GUI)
 lose_sel_exit:
 #  endif
-	if (clip_star.owned)
+	만약 (clip_star.owned)
 	    clip_lose_selection(&clip_star);
-	if (clip_plus.owned)
+	만약 (clip_plus.owned)
 	    clip_lose_selection(&clip_plus);
 
-#  if defined(FEAT_GUI)
-	if (!gui.in_use)
+#  만약 defined(FEAT_GUI)
+	만약 (!gui.in_use)
 #  endif
 	{
 	    clip_init(TRUE);
@@ -3128,7 +3128,7 @@ lose_sel_exit:
     }
 # endif // FEAT_CLIPBOARD
 
-# if !defined(FEAT_XCLIPBOARD) && !defined(FEAT_WAYLAND_CLIPBOARD)
+# 만약 !defined(FEAT_XCLIPBOARD) && !defined(FEAT_WAYLAND_CLIPBOARD)
 exit:
 # endif
 
@@ -3138,7 +3138,7 @@ exit:
     set_vim_var_string(VV_CLIPMETHOD, (char_u*)clipmethod_to_str(method), -1);
 # endif
 
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -3151,9 +3151,9 @@ ex_clipreset(exarg_T *eap UNUSED)
 
     choose_clipmethod();
 
-    if (clipmethod == CLIPMETHOD_NONE)
+    만약 (clipmethod == CLIPMETHOD_NONE)
 	smsg(_("Could not find a way to access the clipboard."));
-    else if (clipmethod != prev)
+    아니면 만약 (clipmethod != prev)
 	smsg(_("Switched to clipboard method '%s'."),
 		clipmethod_to_str(clipmethod));
 }
@@ -3163,29 +3163,29 @@ ex_clipreset(exarg_T *eap UNUSED)
  * used always and the clipboard being available.
  */
     void
-adjust_clip_reg(int *rp)
+adjust_clip_reg(정수 *rp)
 {
 # ifdef FEAT_CLIPBOARD_PROVIDER
-    if (clipmethod == CLIPMETHOD_PROVIDER)
+    만약 (clipmethod == CLIPMETHOD_PROVIDER)
     {
-	if (*rp == 0 && clip_unnamed != 0)
+	만약 (*rp == 0 && clip_unnamed != 0)
 	    *rp = ((clip_unnamed & CLIP_UNNAMED_PLUS)) ? '+' : '*';
-	return;
+	반환;
     }
 # endif
 # ifdef FEAT_CLIPBOARD
     // If no reg. specified, and "unnamed" or "unnamedplus" is in 'clipboard',
     // use '*' or '+' reg, respectively. "unnamedplus" prevails.
-    if (*rp == 0 && (clip_unnamed != 0 || clip_unnamed_saved != 0))
+    만약 (*rp == 0 && (clip_unnamed != 0 || clip_unnamed_saved != 0))
     {
-	if (clip_unnamed != 0)
+	만약 (clip_unnamed != 0)
 	    *rp = ((clip_unnamed & CLIP_UNNAMED_PLUS) && clip_plus.available)
 								  ? '+' : '*';
-	else
+	아니면
 	    *rp = ((clip_unnamed_saved & CLIP_UNNAMED_PLUS)
 					   && clip_plus.available) ? '+' : '*';
     }
-    if ((!clip_star.available && *rp == '*') ||
+    만약 ((!clip_star.available && *rp == '*') ||
 	   (!clip_plus.available && *rp == '+'))
     {
 	msg_warn_missing_clipboard();
@@ -3201,80 +3201,80 @@ adjust_clip_reg(int *rp)
     char *
 did_set_clipboard(optset_T *args UNUSED)
 {
-    int		new_unnamed = 0;
+    정수		new_unnamed = 0;
 # ifdef FEAT_CLIPBOARD
-    int		new_autoselect_star = FALSE;
-    int		new_autoselect_plus = FALSE;
-    int		new_autoselectml = FALSE;
-    int		new_html = FALSE;
+    정수		new_autoselect_star = FALSE;
+    정수		new_autoselect_plus = FALSE;
+    정수		new_autoselectml = FALSE;
+    정수		new_html = FALSE;
 # endif
     regprog_T	*new_exclude_prog = NULL;
     char	*errmsg = NULL;
     char_u	*p;
 
-    for (p = p_cb; *p != NUL; )
+    위해 (p = p_cb; *p != NUL; )
     {
 	// Note: Keep this in sync with p_cb_values.
-	if (STRNCMP(p, "unnamed", 7) == 0 && (p[7] == ',' || p[7] == NUL))
+	만약 (STRNCMP(p, "unnamed", 7) == 0 && (p[7] == ',' || p[7] == NUL))
 	{
 	    new_unnamed |= CLIP_UNNAMED;
 	    p += 7;
 	}
-	else if (STRNCMP(p, "unnamedplus", 11) == 0
+	아니면 만약 (STRNCMP(p, "unnamedplus", 11) == 0
 					    && (p[11] == ',' || p[11] == NUL))
 	{
 	    new_unnamed |= CLIP_UNNAMED_PLUS;
 	    p += 11;
 	}
 # ifdef FEAT_CLIPBOARD
-	else if (STRNCMP(p, "autoselect", 10) == 0
+	아니면 만약 (STRNCMP(p, "autoselect", 10) == 0
 					    && (p[10] == ',' || p[10] == NUL))
 	{
 	    new_autoselect_star = TRUE;
 	    p += 10;
 	}
-	else if (STRNCMP(p, "autoselectplus", 14) == 0
+	아니면 만약 (STRNCMP(p, "autoselectplus", 14) == 0
 					    && (p[14] == ',' || p[14] == NUL))
 	{
 	    new_autoselect_plus = TRUE;
 	    p += 14;
 	}
-	else if (STRNCMP(p, "autoselectml", 12) == 0
+	아니면 만약 (STRNCMP(p, "autoselectml", 12) == 0
 					    && (p[12] == ',' || p[12] == NUL))
 	{
 	    new_autoselectml = TRUE;
 	    p += 12;
 	}
-	else if (STRNCMP(p, "html", 4) == 0 && (p[4] == ',' || p[4] == NUL))
+	아니면 만약 (STRNCMP(p, "html", 4) == 0 && (p[4] == ',' || p[4] == NUL))
 	{
 	    new_html = TRUE;
 	    p += 4;
 	}
-	else if (STRNCMP(p, "exclude:", 8) == 0 && new_exclude_prog == NULL)
+	아니면 만약 (STRNCMP(p, "exclude:", 8) == 0 && new_exclude_prog == NULL)
 	{
 	    p += 8;
 	    new_exclude_prog = vim_regcomp(p, RE_MAGIC);
-	    if (new_exclude_prog == NULL)
+	    만약 (new_exclude_prog == NULL)
 		errmsg = e_invalid_argument;
 	    break;
 	}
 # endif
-	else
+	아니면
 	{
 	    errmsg = e_invalid_argument;
 	    break;
 	}
-	if (*p == ',')
+	만약 (*p == ',')
 	    ++p;
     }
-    if (errmsg == NULL)
+    만약 (errmsg == NULL)
     {
 # ifdef FEAT_CLIPBOARD
-	if (global_busy)
+	만약 (global_busy)
 	    // clip_unnamed will be reset to clip_unnamed_saved
 	    // at end_global_changes
 	    clip_unnamed_saved = new_unnamed;
-	else
+	아니면
 # endif
 	    clip_unnamed = new_unnamed;
 # ifdef FEAT_CLIPBOARD
@@ -3285,13 +3285,13 @@ did_set_clipboard(optset_T *args UNUSED)
 	vim_regfree(clip_exclude_prog);
 	clip_exclude_prog = new_exclude_prog;
 # endif
-# if defined(FEAT_GUI_GTK)
-	if (gui.in_use)
+# 만약 defined(FEAT_GUI_GTK)
+	만약 (gui.in_use)
 	{
 #  ifdef USE_GTK4
 	    gui_gtk_update_selection_formats(&clip_plus);
 	    gui_gtk_update_selection_formats(&clip_star);
-#  else
+#  아니면
 	    gui_gtk_set_selection_targets((GdkAtom)GDK_SELECTION_PRIMARY);
 	    gui_gtk_set_selection_targets((GdkAtom)clip_plus.gtk_sel_atom);
 #  endif
@@ -3301,10 +3301,10 @@ did_set_clipboard(optset_T *args UNUSED)
 	}
 # endif
     }
-    else
+    아니면
 	vim_regfree(new_exclude_prog);
 
-    return errmsg;
+    반환 errmsg;
 }
 
 #endif // HAVE_CLIPMETHOD
@@ -3315,7 +3315,7 @@ did_set_clipboard(optset_T *args UNUSED)
  * Check if a clipboard provider with given name is available. Returns 1 if available,
  * 0 if not available, and -1 on error
  */
-    static int
+    static 정수
 clip_provider_is_available(char_u *provider)
 {
     dict_T	*providers = get_vim_var_dict(VV_CLIPPROVIDERS);
@@ -3323,31 +3323,31 @@ clip_provider_is_available(char_u *provider)
     callback_T	callback = {0};
     typval_T	rettv = {0};
     typval_T	func_tv = {0};
-    int		res = 0;
+    정수		res = 0;
 
-    if (dict_get_tv(providers, (char *)provider, &provider_tv) == FAIL
+    만약 (dict_get_tv(providers, (char *)provider, &provider_tv) == FAIL
 	    || provider_tv.v_type != VAR_DICT)
 	// clipboard provider not defined
-	return -1;
+	반환 -1;
 
-    if (dict_get_tv(provider_tv.vval.v_dict, "available", &func_tv) == FAIL)
+    만약 (dict_get_tv(provider_tv.vval.v_dict, "available", &func_tv) == FAIL)
     {
 	clear_tv(&provider_tv);
 	// If "available" function not specified assume always TRUE
-	return 1;
+	반환 1;
     }
 
-    if ((callback = get_callback(&func_tv)).cb_name == NULL)
+    만약 ((callback = get_callback(&func_tv)).cb_name == NULL)
 	goto fail;
 
-    if (call_callback(&callback, -1, &rettv, 0, NULL) == FAIL ||
+    만약 (call_callback(&callback, -1, &rettv, 0, NULL) == FAIL ||
 	    (rettv.v_type != VAR_BOOL && rettv.v_type != VAR_NUMBER))
 	goto fail;
 
-    if (rettv.vval.v_number)
+    만약 (rettv.vval.v_number)
 	res = 1;
 
-    if (FALSE)
+    만약 (FALSE)
 fail:
 	res = -1;
 
@@ -3356,14 +3356,14 @@ fail:
     clear_tv(&rettv);
     clear_tv(&provider_tv);
 
-    return res;
+    반환 res;
 }
 
 /*
  * Get the specified callback "function" from the provider dictionary for
  * register "reg".
  */
-    static int
+    static 정수
 clip_provider_get_callback(
 	char_u *reg,
 	char_u *provider,
@@ -3376,39 +3376,39 @@ clip_provider_get_callback(
     typval_T	func_tv;
     callback_T	cb;
 
-    if (dict_get_tv(providers, (char *)provider, &provider_tv) == FAIL)
-	return FAIL;
-    else if (provider_tv.v_type != VAR_DICT)
+    만약 (dict_get_tv(providers, (char *)provider, &provider_tv) == FAIL)
+	반환 FAIL;
+    아니면 만약 (provider_tv.v_type != VAR_DICT)
     {
 	clear_tv(&provider_tv);
-	return FAIL;
+	반환 FAIL;
     }
-    else if (dict_get_tv(
+    아니면 만약 (dict_get_tv(
 		provider_tv.vval.v_dict,
 		(char *)function,
 		&action_tv) == FAIL)
     {
 	clear_tv(&provider_tv);
-	return FAIL;
+	반환 FAIL;
     }
-    else if (action_tv.v_type != VAR_DICT)
+    아니면 만약 (action_tv.v_type != VAR_DICT)
     {
 	clear_tv(&provider_tv);
 	clear_tv(&action_tv);
-	return FAIL;
+	반환 FAIL;
     }
-    else if (dict_get_tv(action_tv.vval.v_dict, (char *)reg, &func_tv) == FAIL)
+    아니면 만약 (dict_get_tv(action_tv.vval.v_dict, (char *)reg, &func_tv) == FAIL)
     {
 	clear_tv(&provider_tv);
 	clear_tv(&action_tv);
-	return FAIL;
+	반환 FAIL;
     }
-    else if ((cb = get_callback(&func_tv)).cb_name == NULL)
+    아니면 만약 ((cb = get_callback(&func_tv)).cb_name == NULL)
     {
 	clear_tv(&provider_tv);
 	clear_tv(&action_tv);
 	clear_tv(&func_tv);
-	return FAIL;
+	반환 FAIL;
     }
     clear_tv(&provider_tv);
     clear_tv(&action_tv);
@@ -3416,7 +3416,7 @@ clip_provider_get_callback(
     // func_tv owns the function name, so we must make a copy for the callback
     set_callback(callback, &cb);
     clear_tv(&func_tv);
-    return OK;
+    반환 OK;
 }
 
     static void
@@ -3430,20 +3430,20 @@ clip_provider_copy(char_u *reg, char_u *provider)
     char_u	type[2 + NUMBUFLEN] = {0};
     list_T	*list = NULL;
 
-    if (recursive)
-	return;
+    만약 (recursive)
+	반환;
 
-    if (clip_provider_get_callback(
+    만약 (clip_provider_get_callback(
 		reg,
 		provider,
 		(char_u *)"copy",
 		&callback) == FAIL)
-	return;
+	반환;
 
     // Convert register type into a string
-    if (*reg == '+')
+    만약 (*reg == '+')
 	y_ptr = get_y_register(REAL_PLUS_REGISTER);
-    else
+    아니면
 	y_ptr = get_y_register(STAR_REGISTER);
 
     switch (y_ptr->y_type)
@@ -3471,19 +3471,19 @@ clip_provider_copy(char_u *reg, char_u *provider)
     // Get register contents by creating a list of lines
     list = list_alloc();
 
-    if (list == NULL)
+    만약 (list == NULL)
     {
 	free_callback(&callback);
-	return;
+	반환;
     }
 
-    for (int i = 0; i < y_ptr->y_size; i++)
-	if (list_append_string(list, y_ptr->y_array[i].string,
-	    (int)y_ptr->y_array[i].length) == FAIL)
+    위해 (정수 i = 0; i < y_ptr->y_size; i++)
+	만약 (list_append_string(list, y_ptr->y_array[i].string,
+	    (정수)y_ptr->y_array[i].length) == FAIL)
 	{
 	    free_callback(&callback);
 	    list_unref(list);
-	    return;
+	    반환;
 	}
 
     list->lv_refcount++;
@@ -3512,19 +3512,19 @@ clip_provider_paste(char_u *reg, char_u *provider)
     callback_T	callback;
     typval_T	argvars[2];
     typval_T	rettv;
-    int		ret;
+    정수		ret;
     char_u	*reg_type;
     list_T	*lines;
 
-    if (recursive)
-	return;
+    만약 (recursive)
+	반환;
 
-    if (clip_provider_get_callback(
+    만약 (clip_provider_get_callback(
 		reg,
 		provider,
 		(char_u *)"paste",
 		&callback) == FAIL)
-	return;
+	반환;
 
     argvars[0].v_type = VAR_STRING;
     argvars[0].vval.v_string = reg;
@@ -3537,9 +3537,9 @@ clip_provider_paste(char_u *reg, char_u *provider)
     recursive = false;
     textlock--;
 
-    if (ret == FAIL)
+    만약 (ret == FAIL)
 	goto exit;
-    else if (rettv.v_type == VAR_TUPLE
+    아니면 만약 (rettv.v_type == VAR_TUPLE
 	    && TUPLE_LEN(rettv.vval.v_tuple) == 2
 	    && TUPLE_ITEM(rettv.vval.v_tuple, 0)->v_type == VAR_STRING
 	    && TUPLE_ITEM(rettv.vval.v_tuple, 1)->v_type == VAR_LIST)
@@ -3547,7 +3547,7 @@ clip_provider_paste(char_u *reg, char_u *provider)
 	reg_type = TUPLE_ITEM(rettv.vval.v_tuple, 0)->vval.v_string;
 	lines = TUPLE_ITEM(rettv.vval.v_tuple, 1)->vval.v_list;
     }
-    else if (rettv.v_type == VAR_LIST
+    아니면 만약 (rettv.v_type == VAR_LIST
 	    && rettv.vval.v_list->lv_len == 2
 	    && rettv.vval.v_list->lv_first->li_tv.v_type == VAR_STRING
 	    && rettv.vval.v_list->lv_first->li_next->li_tv.v_type == VAR_LIST)
@@ -3555,7 +3555,7 @@ clip_provider_paste(char_u *reg, char_u *provider)
 	reg_type = rettv.vval.v_list->lv_first->li_tv.vval.v_string;
 	lines = rettv.vval.v_list->lv_first->li_next->li_tv.vval.v_list;
     }
-    else
+    아니면
 	goto exit;
 
     {
@@ -3569,7 +3569,7 @@ clip_provider_paste(char_u *reg, char_u *provider)
 	char_u		**curallocval;
 	char_u		*strval;
 	listitem_T	*li;
-	int		len;
+	정수		len;
 
 	// If the list is NULL handle like an empty list.
 	len = lines == NULL ? 0 : lines->lv_len;
@@ -3577,26 +3577,26 @@ clip_provider_paste(char_u *reg, char_u *provider)
 	// First half: use for pointers to result lines; second half: use for
 	// pointers to allocated copies.
 	lstval = ALLOC_MULT(char_u *, (len + 1) * 2);
-	if (lstval == NULL)
+	만약 (lstval == NULL)
 	    goto exit;
 	curval = lstval;
 	allocval = lstval + len + 2;
 	curallocval = allocval;
 
-	if (lines != NULL)
+	만약 (lines != NULL)
 	{
 	    CHECK_LIST_MATERIALIZE(lines);
 	    FOR_ALL_LIST_ITEMS(lines, li)
 	    {
 		strval = tv_get_string_buf_chk(&li->li_tv, buf);
-		if (strval == NULL)
+		만약 (strval == NULL)
 		    goto free_lstval;
-		if (strval == buf)
+		만약 (strval == buf)
 		{
 		    // Need to make a copy, next tv_get_string_buf_chk() will
 		    // overwrite the string.
 		    strval = vim_strsave(buf);
-		    if (strval == NULL)
+		    만약 (strval == NULL)
 			goto free_lstval;
 		    *curallocval++ = strval;
 		}
@@ -3605,16 +3605,16 @@ clip_provider_paste(char_u *reg, char_u *provider)
 	}
 	*curval++ = NULL;
 
-	if (*reg_type != NUL && (STRLEN(reg_type) == 0
+	만약 (*reg_type != NUL && (STRLEN(reg_type) == 0
 		|| get_yank_type(&reg_type, &yank_type, &block_len) == FAIL))
 	{
 	    emsg(e_invalid_argument);
 	    goto free_lstval;
 	}
 
-	if (*reg == '+')
+	만약 (*reg == '+')
 	    y_ptr = get_y_register(REAL_PLUS_REGISTER);
-	else
+	아니면
 	    y_ptr = get_y_register(STAR_REGISTER);
 
 	// Free previous register contents
@@ -3634,7 +3634,7 @@ clip_provider_paste(char_u *reg, char_u *provider)
 		TRUE);
 
 free_lstval:
-	while (curallocval > allocval)
+	동안 (curallocval > allocval)
 	    vim_free(*--curallocval);
 	vim_free(lstval);
     }
@@ -3650,45 +3650,45 @@ exit:
 //
 // If -1 then allow provider callback to be called then set to one. Default
 // value (is allowed) is -2.
-static int star_pause_count = -2, plus_pause_count = -2;
+static 정수 star_pause_count = -2, plus_pause_count = -2;
 
     void
-call_clip_provider_request(int reg)
+call_clip_provider_request(정수 reg)
 {
-    if (clipmethod != CLIPMETHOD_PROVIDER)
-	return;
+    만약 (clipmethod != CLIPMETHOD_PROVIDER)
+	반환;
 
-    if (reg == '+' && plus_pause_count < 0)
+    만약 (reg == '+' && plus_pause_count < 0)
     {
-	if (plus_pause_count == -1)
+	만약 (plus_pause_count == -1)
 	    plus_pause_count = 1;
 	clip_provider_paste((char_u *)"+", clip_provider);
     }
-    else if (reg == '*' && star_pause_count < 0)
+    아니면 만약 (reg == '*' && star_pause_count < 0)
     {
-	if (star_pause_count == -1)
+	만약 (star_pause_count == -1)
 	    star_pause_count = 1;
 	clip_provider_paste((char_u *)"*", clip_provider);
     }
-    else
-	return;
+    아니면
+	반환;
 }
 
     void
-call_clip_provider_set(int reg)
+call_clip_provider_set(정수 reg)
 {
-    if (clipmethod != CLIPMETHOD_PROVIDER)
-	return;
+    만약 (clipmethod != CLIPMETHOD_PROVIDER)
+	반환;
 
-    if (reg == '+' && plus_pause_count < 0)
+    만약 (reg == '+' && plus_pause_count < 0)
     {
-	if (plus_pause_count == -1)
+	만약 (plus_pause_count == -1)
 	    plus_pause_count = 1;
 	clip_provider_copy((char_u *)"+", clip_provider);
     }
-    else if (reg == '*' && star_pause_count < 0)
+    아니면 만약 (reg == '*' && star_pause_count < 0)
     {
-	if (star_pause_count == -1)
+	만약 (star_pause_count == -1)
 	    star_pause_count = 1;
 	clip_provider_copy((char_u *)"*", clip_provider);
     }
@@ -3711,20 +3711,20 @@ inc_clip_provider(void)
     void
 dec_clip_provider(void)
 {
-    if (plus_pause_count != -2)
+    만약 (plus_pause_count != -2)
 	plus_pause_count = plus_pause_count == -1 ? -1 : plus_pause_count - 1;
-    if (star_pause_count != -2)
+    만약 (star_pause_count != -2)
 	star_pause_count = star_pause_count == -1 ? -1 : star_pause_count - 1;
 
-    if (plus_pause_count == 0 || plus_pause_count == -1)
+    만약 (plus_pause_count == 0 || plus_pause_count == -1)
 	plus_pause_count = -2;
-    if (star_pause_count == 0 || star_pause_count == -1)
+    만약 (star_pause_count == 0 || star_pause_count == -1)
 	star_pause_count = -2;
 }
 
 #endif // FEAT_CLIPBOARD_PROVIDER
 
-#if defined(FEAT_WAYLAND_CLIPBOARD) || (defined(FEAT_GUI_GTK) && defined(USE_GTK4))
+#만약 defined(FEAT_WAYLAND_CLIPBOARD) || (defined(FEAT_GUI_GTK) && defined(USE_GTK4))
 /*
  * If "vim" is TRUE, then get the motion type. If "vimenc" is TRUE, then get the
  * motion type and also convert "*buf". "buf" and "len_store" will be updated to
@@ -3733,11 +3733,11 @@ dec_clip_provider(void)
  * otherwise use the free func for which "*buf" was allocated with. In both
  * cases use vim_free() on "*tofree". Returns OK on success and FAIL on failure.
  */
-    int
+    정수
 clip_convert_data(
 	char_u	**buf,
 	long	*len_store,
-	int	*motion,
+	정수	*motion,
 	bool	vim,
 	bool	vimenc,
 	char_u	**tofree)
@@ -3746,15 +3746,15 @@ clip_convert_data(
     char_u  *enc;
     long    len = *len_store;
 
-    if (vim && len >= 2)
+    만약 (vim && len >= 2)
     {
 	*motion = *final++;
 	len--;
     }
-    else if (vimenc && len >= 3)
+    아니면 만약 (vimenc && len >= 3)
     {
 	vimconv_T   conv;
-	int	    convlen;
+	정수	    convlen;
 
 	// First byte is motion type
 	*motion = *final++;
@@ -3765,8 +3765,8 @@ clip_convert_data(
 
 	// Skip the encoding type including null terminator in final text
 	final = memchr(final, NUL, len);
-	if (final == NULL)
-	    return FAIL;
+	만약 (final == NULL)
+	    반환 FAIL;
 	final++; // Skip NUL
 
 	// Subtract pointers to get length of encoding;
@@ -3774,14 +3774,14 @@ clip_convert_data(
 
 	conv.vc_type = CONV_NONE;
 	convert_setup(&conv, enc, p_enc);
-	if (conv.vc_type != CONV_NONE)
+	만약 (conv.vc_type != CONV_NONE)
 	{
 	   char_u *tmp;
 
 	   convlen = len;
 	   tmp = string_convert(&conv, final, &convlen);
 	   len = convlen;
-	   if (tmp != NULL)
+	   만약 (tmp != NULL)
 	   {
 		final = tmp;
 		*tofree = final;
@@ -3791,6 +3791,6 @@ clip_convert_data(
     }
     *buf = final;
     *len_store = len;
-    return OK;
+    반환 OK;
 }
 #endif

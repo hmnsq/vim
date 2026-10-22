@@ -15,36 +15,36 @@ except ImportError:
 def make_dap_message(obj):
     payload = json.dumps(obj).encode("utf-8")
     header = f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
-    return header + payload
+    반환 header + payload
 
 
 def parse_messages(buffer):
     messages = []
 
-    while True:
+    동안 True:
         hdr_end = buffer.find(b"\r\n\r\n")
-        if hdr_end == -1:
+        만약 hdr_end == -1:
             break
 
         header = buffer[:hdr_end].decode("ascii", errors="ignore")
         content_length = None
 
-        for line in header.split("\r\n"):
-            if line.lower().startswith("content-length:"):
-                content_length = int(line.split(":")[1].strip())
+        위해 line in header.split("\r\n"):
+            만약 line.lower().startswith("content-length:"):
+                content_length = 정수(line.split(":")[1].strip())
 
-        if content_length is None:
+        만약 content_length is None:
             break
 
         total_len = hdr_end + 4 + content_length
-        if len(buffer) < total_len:
+        만약 len(buffer) < total_len:
             break  # partial
 
         body = buffer[hdr_end + 4:total_len]
         messages.append(json.loads(body.decode("utf-8")))
         buffer = buffer[total_len:]
 
-    return messages, buffer
+    반환 messages, buffer
 
 
 class DAPHandler(socketserver.BaseRequestHandler):
@@ -77,31 +77,31 @@ class DAPHandler(socketserver.BaseRequestHandler):
     def handle_request(self, msg):
         cmd = msg.get("command")
 
-        if cmd == "initialize":
+        만약 cmd == "initialize":
             self.send_response(msg, {
                 "supportsConfigurationDoneRequest": True
             })
             self.send_event("initialized")
-        else:
+        아니면:
             self.send_response(msg)
 
-        return True
+        반환 True
 
     def handle(self):
         buffer = b""
 
-        while True:
+        동안 True:
             data = self.request.recv(4096)
-            if not data:
+            만약 not data:
                 break
 
             buffer += data
             messages, buffer = parse_messages(buffer)
 
-            for msg in messages:
-                if msg.get("type") == "request":
-                    if not self.handle_request(msg):
-                        return
+            위해 msg in messages:
+                만약 msg.get("type") == "request":
+                    만약 not self.handle_request(msg):
+                        반환
 
 
 class ThreadedDAPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -125,11 +125,11 @@ def main():
     thread.start()
 
     try:
-        while thread.is_alive():
+        동안 thread.is_alive():
             thread.join(1)
     except KeyboardInterrupt:
         server.shutdown()
 
-if __name__ == "__main__":
+만약 __name__ == "__main__":
     main()
 

@@ -14,13 +14,13 @@
 #define USING_FLOAT_STUFF
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 
 /////////////////////////////////////////////////////////////////////
 // Following generate_ functions expect the caller to call ga_grow().
 
-#define RETURN_NULL_IF_SKIP(cctx) if (cctx->ctx_skip == SKIP_YES) return NULL
-#define RETURN_OK_IF_SKIP(cctx) if (cctx->ctx_skip == SKIP_YES) return OK
+#define RETURN_NULL_IF_SKIP(cctx) 만약 (cctx->ctx_skip == SKIP_YES) 반환 NULL
+#define RETURN_OK_IF_SKIP(cctx) 만약 (cctx->ctx_skip == SKIP_YES) 반환 OK
 
 /*
  * Generate an instruction without arguments.
@@ -33,14 +33,14 @@ generate_instr(cctx_T *cctx, isntype_T isn_type)
     isn_T	*isn;
 
     RETURN_NULL_IF_SKIP(cctx);
-    if (GA_GROW_FAILS(instr, 1))
-	return NULL;
+    만약 (GA_GROW_FAILS(instr, 1))
+	반환 NULL;
     isn = ((isn_T *)instr->ga_data) + instr->ga_len;
     isn->isn_type = isn_type;
     isn->isn_lnum = cctx->ctx_lnum + 1;
     ++instr->ga_len;
 
-    return isn;
+    반환 isn;
 }
 
 /*
@@ -49,11 +49,11 @@ generate_instr(cctx_T *cctx, isntype_T isn_type)
  * Returns a pointer to the new instruction, NULL if failed.
  */
     isn_T *
-generate_instr_drop(cctx_T *cctx, isntype_T isn_type, int drop)
+generate_instr_drop(cctx_T *cctx, isntype_T isn_type, 정수 drop)
 {
     RETURN_NULL_IF_SKIP(cctx);
     cctx->ctx_type_stack.ga_len -= drop;
-    return generate_instr(cctx, isn_type);
+    반환 generate_instr(cctx, isn_type);
 }
 
 /*
@@ -69,14 +69,14 @@ generate_instr_type2(
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr(cctx, isn_type)) == NULL)
-	return NULL;
+    만약 ((isn = generate_instr(cctx, isn_type)) == NULL)
+	반환 NULL;
 
-    if (push_type_stack2(cctx, type == NULL ? &t_any : type,
+    만약 (push_type_stack2(cctx, type == NULL ? &t_any : type,
 			       decl_type == NULL ? &t_any : decl_type) == FAIL)
-	return NULL;
+	반환 NULL;
 
-    return isn;
+    반환 isn;
 }
 
 /*
@@ -87,7 +87,7 @@ generate_instr_type2(
     isn_T *
 generate_instr_type(cctx_T *cctx, isntype_T isn_type, type_T *type)
 {
-    return generate_instr_type2(cctx, isn_type, type, &t_any);
+    반환 generate_instr_type2(cctx, isn_type, type, &t_any);
 }
 
 /*
@@ -100,86 +100,86 @@ generate_instr_debug(cctx_T *cctx)
     dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_data)
 					       + cctx->ctx_ufunc->uf_dfunc_idx;
 
-    if ((isn = generate_instr(cctx, ISN_DEBUG)) == NULL)
-	return NULL;
+    만약 ((isn = generate_instr(cctx, ISN_DEBUG)) == NULL)
+	반환 NULL;
     isn->isn_arg.debug.dbg_var_names_len = dfunc->df_var_names.ga_len;
     isn->isn_arg.debug.dbg_break_lnum = cctx->ctx_prev_lnum;
-    return isn;
+    반환 isn;
 }
 
 /*
  * Generate an ISN_CONSTRUCT instruction.
  * The object will have "size" members.
  */
-    int
+    정수
 generate_CONSTRUCT(cctx_T *cctx, class_T *cl)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_CONSTRUCT)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_CONSTRUCT)) == NULL)
+	반환 FAIL;
     isn->isn_arg.construct.construct_size = sizeof(object_T)
 			       + cl->class_obj_member_count * sizeof(typval_T);
     isn->isn_arg.construct.construct_class = cl;
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate ISN_GET_OBJ_MEMBER - access member of object at bottom of stack by
  * index.
  */
-    int
-generate_GET_OBJ_MEMBER(cctx_T *cctx, int idx, type_T *type)
+    정수
+generate_GET_OBJ_MEMBER(cctx_T *cctx, 정수 idx, type_T *type)
 {
     RETURN_OK_IF_SKIP(cctx);
 
     // drop the object type
     isn_T *isn = generate_instr_drop(cctx, ISN_GET_OBJ_MEMBER, 1);
-    if (isn == NULL)
-	return FAIL;
+    만약 (isn == NULL)
+	반환 FAIL;
 
     isn->isn_arg.classmember.cm_class = NULL;
     isn->isn_arg.classmember.cm_idx = idx;
-    return push_type_stack2(cctx, type, &t_any);
+    반환 push_type_stack2(cctx, type, &t_any);
 }
 
 /*
  * Generate ISN_GET_ITF_MEMBER - access member of interface at bottom of stack
  * by index.
  */
-    int
-generate_GET_ITF_MEMBER(cctx_T *cctx, class_T *itf, int idx, type_T *type)
+    정수
+generate_GET_ITF_MEMBER(cctx_T *cctx, class_T *itf, 정수 idx, type_T *type)
 {
     RETURN_OK_IF_SKIP(cctx);
 
     // drop the object type
     isn_T *isn = generate_instr_drop(cctx, ISN_GET_ITF_MEMBER, 1);
-    if (isn == NULL)
-	return FAIL;
+    만약 (isn == NULL)
+	반환 FAIL;
 
     isn->isn_arg.classmember.cm_class = itf;
     ++itf->class_refcount;
     isn->isn_arg.classmember.cm_idx = idx;
-    return push_type_stack2(cctx, type, &t_any);
+    반환 push_type_stack2(cctx, type, &t_any);
 }
 
 /*
  * Generate ISN_STORE_THIS - store value in member of "this" object with member
  * index "idx".
  */
-    int
-generate_STORE_THIS(cctx_T *cctx, int idx)
+    정수
+generate_STORE_THIS(cctx_T *cctx, 정수 idx)
 {
     RETURN_OK_IF_SKIP(cctx);
 
     // drop the value type
     isn_T *isn = generate_instr_drop(cctx, ISN_STORE_THIS, 1);
-    if (isn == NULL)
-	return FAIL;
+    만약 (isn == NULL)
+	반환 FAIL;
 
     isn->isn_arg.number = idx;
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -189,8 +189,8 @@ generate_STORE_THIS(cctx_T *cctx, int idx)
  * strings.  When tostring_flags has TOSTRING_INTERPOLATE, convert a List or a
  * Dict to the corresponding textual representation.
  */
-    int
-may_generate_2STRING(int offset, int tostring_flags, cctx_T *cctx)
+    정수
+may_generate_2STRING(정수 offset, 정수 tostring_flags, cctx_T *cctx)
 {
     isn_T	*isn;
     isntype_T	isntype = ISN_2STRING;
@@ -202,7 +202,7 @@ may_generate_2STRING(int offset, int tostring_flags, cctx_T *cctx)
     switch (type->tt_type)
     {
 	// nothing to be done
-	case VAR_STRING: return OK;
+	case VAR_STRING: 반환 OK;
 
 	// conversion possible
 	case VAR_SPECIAL:
@@ -221,12 +221,12 @@ may_generate_2STRING(int offset, int tostring_flags, cctx_T *cctx)
 	case VAR_LIST:
 	case VAR_TUPLE:
 	case VAR_DICT:
-			 if (tostring_flags & TOSTRING_TOLERANT)
+			 만약 (tostring_flags & TOSTRING_TOLERANT)
 			 {
 			     isntype = ISN_2STRING_ANY;
 			     break;
 			 }
-			 if (tostring_flags & TOSTRING_INTERPOLATE)
+			 만약 (tostring_flags & TOSTRING_INTERPOLATE)
 			     break;
 			 // FALLTHROUGH
 
@@ -242,56 +242,56 @@ may_generate_2STRING(int offset, int tostring_flags, cctx_T *cctx)
 	case VAR_OBJECT:
 	case VAR_TYPEALIAS:
 			 to_string_error(type->tt_type);
-			 return FAIL;
+			 반환 FAIL;
     }
 
     set_type_on_stack(cctx, &t_string, -1 - offset);
-    if ((isn = generate_instr(cctx, isntype)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, isntype)) == NULL)
+	반환 FAIL;
     isn->isn_arg.tostring.offset = offset;
     isn->isn_arg.tostring.flags = tostring_flags;
 
-    return OK;
+    반환 OK;
 }
 
-    static int
+    static 정수
 check_number_or_float(type_T *typ1, type_T *typ2, char_u *op)
 {
     vartype_T	    type1 = typ1->tt_type;
     vartype_T	    type2 = typ2->tt_type;
-    if (!((type1 == VAR_NUMBER || type1 == VAR_FLOAT
+    만약 (!((type1 == VAR_NUMBER || type1 == VAR_FLOAT
 				   || type1 == VAR_ANY || type1 == VAR_UNKNOWN)
 	    && (type2 == VAR_NUMBER || type2 == VAR_FLOAT
 				 || type2 == VAR_ANY || type2 == VAR_UNKNOWN)))
     {
-	if (check_type_is_value(typ1) == FAIL
+	만약 (check_type_is_value(typ1) == FAIL
 		|| check_type_is_value(typ2) == FAIL)
-	    return FAIL;
-	if (*op == '+')
+	    반환 FAIL;
+	만약 (*op == '+')
 	    emsg(_(e_wrong_argument_type_for_plus));
-	else
+	아니면
 	    semsg(_(e_char_requires_number_or_float_arguments), *op);
-	return FAIL;
+	반환 FAIL;
     }
-    return OK;
+    반환 OK;
 }
 
 /*
  * Append the tuple item types from "tuple_type" to the grow array "gap".
  */
-    static int
+    static 정수
 ga_append_tuple_types(type_T *tuple_type, garray_T *gap)
 {
-    for (int i = 0; i < tuple_type->tt_argcount; i++)
+    위해 (정수 i = 0; i < tuple_type->tt_argcount; i++)
     {
-	if (ga_grow(gap, 1) == FAIL)
-	    return FAIL;
+	만약 (ga_grow(gap, 1) == FAIL)
+	    반환 FAIL;
 
 	((type_T **)gap->ga_data)[gap->ga_len] = tuple_type->tt_args[i];
 	gap->ga_len++;
     }
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -301,7 +301,7 @@ ga_append_tuple_types(type_T *tuple_type, garray_T *gap)
  *
  * Returns OK on success and FAIL on memory allocation failure.
  */
-    static int
+    static 정수
 set_tuple_union_type_on_stack(type_T *type1, type_T *type2, cctx_T *cctx)
 {
     // The concatenated tuple has the union of types from both the tuples
@@ -309,15 +309,15 @@ set_tuple_union_type_on_stack(type_T *type1, type_T *type2, cctx_T *cctx)
 
     ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
 
-    if (type1->tt_argcount > 0)
+    만약 (type1->tt_argcount > 0)
 	ga_append_tuple_types(type1, &tuple_types_ga);
-    if (!(type1->tt_flags & TTFLAG_VARARGS) && (type2->tt_argcount > 0))
+    만약 (!(type1->tt_flags & TTFLAG_VARARGS) && (type2->tt_argcount > 0))
 	ga_append_tuple_types(type2, &tuple_types_ga);
 
     type_T *new_tuple_type = get_tuple_type(&tuple_types_ga,
 							cctx->ctx_type_list);
     // result inherits the variadic flag from the operands
-    if ((new_tuple_type->tt_flags & TTFLAG_STATIC) == 0)
+    만약 ((new_tuple_type->tt_flags & TTFLAG_STATIC) == 0)
 	new_tuple_type->tt_flags |= (type1->tt_flags & TTFLAG_VARARGS)
 					| (type2->tt_flags & TTFLAG_VARARGS);
 
@@ -326,13 +326,13 @@ set_tuple_union_type_on_stack(type_T *type1, type_T *type2, cctx_T *cctx)
 
     ga_clear(&tuple_types_ga);
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate instruction for "+".  For a list this creates a new list.
  */
-    int
+    정수
 generate_add_instr(
 	cctx_T	    *cctx,
 	vartype_T   vartype,
@@ -348,38 +348,38 @@ generate_add_instr(
 		    : vartype == VAR_FLOAT ? ISN_OPFLOAT
 		    : ISN_OPANY, 1);
 
-    if (vartype != VAR_LIST && vartype != VAR_BLOB && vartype != VAR_TUPLE
+    만약 (vartype != VAR_LIST && vartype != VAR_BLOB && vartype != VAR_TUPLE
 	    && type1->tt_type != VAR_ANY
 	    && type1->tt_type != VAR_UNKNOWN
 	    && type2->tt_type != VAR_ANY
 	    && type2->tt_type != VAR_UNKNOWN
 	    && check_number_or_float(type1, type2, (char_u *)"+") == FAIL)
-	return FAIL;
+	반환 FAIL;
 
-    if (isn != NULL)
+    만약 (isn != NULL)
     {
-	if (isn->isn_type == ISN_ADDLIST)
+	만약 (isn->isn_type == ISN_ADDLIST)
 	    isn->isn_arg.op.op_type = expr_type;
-	else
+	아니면
 	    isn->isn_arg.op.op_type = EXPR_ADD;
     }
 
     // When concatenating two lists with different member types the member type
     // becomes "any".
-    if (vartype == VAR_LIST
+    만약 (vartype == VAR_LIST
 	    && type1->tt_type == VAR_LIST && type2->tt_type == VAR_LIST
 	    && type1->tt_member != type2->tt_member)
 	set_type_on_stack(cctx, &t_list_any, 0);
-    else if (vartype == VAR_TUPLE)
+    아니면 만약 (vartype == VAR_TUPLE)
     {
-	if (!check_tuples_addable(type1, type2))
-	    return FAIL;
+	만약 (!check_tuples_addable(type1, type2))
+	    반환 FAIL;
 
-	if (set_tuple_union_type_on_stack(type1, type2, cctx) == FAIL)
-	    return FAIL;
+	만약 (set_tuple_union_type_on_stack(type1, type2, cctx) == FAIL)
+	    반환 FAIL;
     }
 
-    return isn == NULL ? FAIL : OK;
+    반환 isn == NULL ? FAIL : OK;
 }
 
 /*
@@ -390,21 +390,21 @@ generate_add_instr(
     vartype_T
 operator_type(type_T *type1, type_T *type2)
 {
-    if (type1->tt_type == type2->tt_type
+    만약 (type1->tt_type == type2->tt_type
 	    && (type1->tt_type == VAR_NUMBER
 		|| type1->tt_type == VAR_LIST
 		|| type1->tt_type == VAR_TUPLE
 		|| type1->tt_type == VAR_FLOAT
 		|| type1->tt_type == VAR_BLOB))
-	return type1->tt_type;
-    return VAR_ANY;
+	반환 type1->tt_type;
+    반환 VAR_ANY;
 }
 
 /*
  * Generate an instruction with two arguments.  The instruction depends on the
  * type of the arguments.
  */
-    int
+    정수
 generate_two_op(cctx_T *cctx, char_u *op)
 {
     type_T	*type1;
@@ -422,27 +422,27 @@ generate_two_op(cctx_T *cctx, char_u *op)
     switch (*op)
     {
 	case '+':
-		  if (generate_add_instr(cctx, vartype, type1, type2,
+		  만약 (generate_add_instr(cctx, vartype, type1, type2,
 							    EXPR_COPY) == FAIL)
-		      return FAIL;
+		      반환 FAIL;
 		  break;
 
 	case '-':
 	case '*':
-	case '/': if (check_number_or_float(type1, type2, op) == FAIL)
-		      return FAIL;
-		  if (vartype == VAR_NUMBER)
+	case '/': 만약 (check_number_or_float(type1, type2, op) == FAIL)
+		      반환 FAIL;
+		  만약 (vartype == VAR_NUMBER)
 		      isn = generate_instr_drop(cctx, ISN_OPNR, 1);
-		  else if (vartype == VAR_FLOAT)
+		  아니면 만약 (vartype == VAR_FLOAT)
 		      isn = generate_instr_drop(cctx, ISN_OPFLOAT, 1);
-		  else
+		  아니면
 		      isn = generate_instr_drop(cctx, ISN_OPANY, 1);
-		  if (isn != NULL)
+		  만약 (isn != NULL)
 		      isn->isn_arg.op.op_type = *op == '*'
 				 ? EXPR_MULT : *op == '/'? EXPR_DIV : EXPR_SUB;
 		  break;
 
-	case '%': if ((type1->tt_type != VAR_ANY
+	case '%': 만약 ((type1->tt_type != VAR_ANY
 			      && type1->tt_type != VAR_UNKNOWN
 					       && type1->tt_type != VAR_NUMBER)
 			  || (type2->tt_type != VAR_ANY
@@ -450,28 +450,28 @@ generate_two_op(cctx_T *cctx, char_u *op)
 					      && type2->tt_type != VAR_NUMBER))
 		  {
 		      emsg(_(e_percent_requires_number_arguments));
-		      return FAIL;
+		      반환 FAIL;
 		  }
 		  isn = generate_instr_drop(cctx,
 			      vartype == VAR_NUMBER ? ISN_OPNR : ISN_OPANY, 1);
-		  if (isn != NULL)
+		  만약 (isn != NULL)
 		      isn->isn_arg.op.op_type = EXPR_REM;
 		  break;
     }
 
     // correct type of result
-    if (vartype == VAR_ANY)
+    만약 (vartype == VAR_ANY)
     {
 	type_T *type = &t_any;
 
 	// float+number and number+float results in float
-	if ((type1->tt_type == VAR_NUMBER || type1->tt_type == VAR_FLOAT)
+	만약 ((type1->tt_type == VAR_NUMBER || type1->tt_type == VAR_FLOAT)
 	      && (type2->tt_type == VAR_NUMBER || type2->tt_type == VAR_FLOAT))
 	    type = &t_float;
 	set_type_on_stack(cctx, type, 0);
     }
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -480,11 +480,11 @@ generate_two_op(cctx_T *cctx, char_u *op)
     static isntype_T
 compare_isn_not_values(typval_T *tv, type_T *type)
 {
-    if (tv != NULL)
+    만약 (tv != NULL)
 	(void)check_typval_is_value(tv);
-    else
+    아니면
 	(void)check_type_is_value(type);
-    return ISN_DROP;
+    반환 ISN_DROP;
 }
 
 /*
@@ -504,12 +504,12 @@ get_compare_isn(
     vartype_T	vartype1 = tv1 != NULL ? tv1->v_type : type1->tt_type;
     vartype_T	vartype2 = tv2 != NULL ? tv2->v_type : type2->tt_type;
 
-    if (vartype1 == VAR_CLASS || vartype1 == VAR_TYPEALIAS)
-	return compare_isn_not_values(tv1, type1);
-    if (vartype2 == VAR_CLASS || vartype2 == VAR_TYPEALIAS)
-	return compare_isn_not_values(tv2, type2);
+    만약 (vartype1 == VAR_CLASS || vartype1 == VAR_TYPEALIAS)
+	반환 compare_isn_not_values(tv1, type1);
+    만약 (vartype2 == VAR_CLASS || vartype2 == VAR_TYPEALIAS)
+	반환 compare_isn_not_values(tv2, type2);
 
-    if (vartype1 == vartype2)
+    만약 (vartype1 == vartype2)
     {
 	switch (vartype1)
 	{
@@ -527,15 +527,15 @@ get_compare_isn(
 	    default: isntype = ISN_COMPAREANY; break;
 	}
     }
-    else if (vartype1 == VAR_ANY || vartype2 == VAR_ANY
+    아니면 만약 (vartype1 == VAR_ANY || vartype2 == VAR_ANY
 	    || ((vartype1 == VAR_NUMBER || vartype1 == VAR_FLOAT)
 			  && (vartype2 == VAR_NUMBER || vartype2 == VAR_FLOAT))
 	    || (vartype1 == VAR_FUNC && vartype2 == VAR_PARTIAL)
 	    || (vartype1 == VAR_PARTIAL && vartype2 == VAR_FUNC))
 	isntype = ISN_COMPAREANY;
-    else if (vartype1 == VAR_SPECIAL || vartype2 == VAR_SPECIAL)
+    아니면 만약 (vartype1 == VAR_SPECIAL || vartype2 == VAR_SPECIAL)
     {
-	if ((vartype1 == VAR_SPECIAL
+	만약 ((vartype1 == VAR_SPECIAL
 		&& (tv1 != NULL ? tv1->vval.v_number == VVAL_NONE
 							    : type1 == &t_none)
 		&& vartype2 != VAR_STRING)
@@ -546,14 +546,14 @@ get_compare_isn(
 	{
 	    semsg(_(e_cannot_compare_str_with_str),
 			       vartype_name(vartype1), vartype_name(vartype2));
-	    return ISN_DROP;
+	    반환 ISN_DROP;
 	}
 	// although comparing null with number, float or bool is not useful, we
 	// allow it
 	isntype = ISN_COMPARENULL;
     }
 
-    if ((exprtype == EXPR_IS || exprtype == EXPR_ISNOT)
+    만약 ((exprtype == EXPR_IS || exprtype == EXPR_ISNOT)
 	    && (isntype == ISN_COMPAREBOOL
 	    || isntype == ISN_COMPARESPECIAL
 	    || isntype == ISN_COMPARENR
@@ -561,16 +561,16 @@ get_compare_isn(
     {
 	semsg(_(e_cannot_use_str_with_str),
 		exprtype == EXPR_IS ? "is" : "isnot" , vartype_name(vartype1));
-	return ISN_DROP;
+	반환 ISN_DROP;
     }
-    if (!(exprtype == EXPR_IS || exprtype == EXPR_ISNOT
+    만약 (!(exprtype == EXPR_IS || exprtype == EXPR_ISNOT
 		|| exprtype == EXPR_EQUAL || exprtype == EXPR_NEQUAL)
 	    && (isntype == ISN_COMPAREOBJECT))
     {
 	semsg(_(e_invalid_operation_for_str), vartype_name(vartype1));
-	return ISN_DROP;
+	반환 ISN_DROP;
     }
-    if (isntype == ISN_DROP
+    만약 (isntype == ISN_DROP
 	    || (isntype != ISN_COMPARENULL
 		&& (((exprtype != EXPR_EQUAL
 			&& exprtype != EXPR_NEQUAL
@@ -585,24 +585,24 @@ get_compare_isn(
     {
 	semsg(_(e_cannot_compare_str_with_str),
 		vartype_name(vartype1), vartype_name(vartype2));
-	return ISN_DROP;
+	반환 ISN_DROP;
     }
-    return isntype;
+    반환 isntype;
 }
 
-    int
+    정수
 check_compare_types(exprtype_T type, typval_T *tv1, typval_T *tv2)
 {
-    if (get_compare_isn(type, tv1, tv2, NULL, NULL) == ISN_DROP)
-	return FAIL;
-    return OK;
+    만약 (get_compare_isn(type, tv1, tv2, NULL, NULL) == ISN_DROP)
+	반환 FAIL;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_COMPARE* instruction with a boolean result.
  */
-    int
-generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
+    정수
+generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, 정수 ic)
 {
     isntype_T	isntype;
     isn_T	*isn;
@@ -615,11 +615,11 @@ generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
     // checking.
     isntype = get_compare_isn(exprtype, NULL, NULL,
 		       get_type_on_stack(cctx, 1), get_type_on_stack(cctx, 0));
-    if (isntype == ISN_DROP)
-	return FAIL;
+    만약 (isntype == ISN_DROP)
+	반환 FAIL;
 
-    if ((isn = generate_instr(cctx, isntype)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, isntype)) == NULL)
+	반환 FAIL;
     isn->isn_arg.op.op_type = exprtype;
     isn->isn_arg.op.op_ic = ic;
 
@@ -627,7 +627,7 @@ generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
     --stack->ga_len;
     set_type_on_stack(cctx, &t_bool, 0);
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -636,94 +636,94 @@ generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
  * greater or equal to one.
  * The caller ensures all the "count" elements on the stack have the right type.
  */
-    int
-generate_CONCAT(cctx_T *cctx, int count)
+    정수
+generate_CONCAT(cctx_T *cctx, 정수 count)
 {
     isn_T	*isn;
     garray_T	*stack = &cctx->ctx_type_stack;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if ((isn = generate_instr(cctx, ISN_CONCAT)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_CONCAT)) == NULL)
+	반환 FAIL;
     isn->isn_arg.number = count;
 
     // drop the argument types
     stack->ga_len -= count - 1;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_2BOOL instruction.
  * "offset" is the offset in the type stack.
  */
-    int
-generate_2BOOL(cctx_T *cctx, int invert, int offset)
+    정수
+generate_2BOOL(cctx_T *cctx, 정수 invert, 정수 offset)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_2BOOL)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_2BOOL)) == NULL)
+	반환 FAIL;
     isn->isn_arg.tobool.invert = invert;
     isn->isn_arg.tobool.offset = offset;
 
     // type becomes bool
     set_type_on_stack(cctx, &t_bool, -1 - offset);
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_COND2BOOL instruction.
  */
-    int
+    정수
 generate_COND2BOOL(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-    if (generate_instr(cctx, ISN_COND2BOOL) == NULL)
-	return FAIL;
+    만약 (generate_instr(cctx, ISN_COND2BOOL) == NULL)
+	반환 FAIL;
 
     // type becomes bool
     set_type_on_stack(cctx, &t_bool, 0);
 
-    return OK;
+    반환 OK;
 }
 
-    int
+    정수
 generate_TYPECHECK(
 	cctx_T	    *cctx,
 	type_T	    *expected,
-	int	    typechk_flags,	// type check flags
-	int	    offset,
-	int	    is_var,
-	int	    argidx)
+	정수	    typechk_flags,	// type check flags
+	정수	    offset,
+	정수	    is_var,
+	정수	    argidx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_CHECKTYPE)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_CHECKTYPE)) == NULL)
+	반환 FAIL;
     type_T *tt;
-    if ((expected->tt_type == VAR_FLOAT
+    만약 ((expected->tt_type == VAR_FLOAT
 		&& (typechk_flags & TYPECHK_NUMBER_OK))
 	    || (expected->tt_type == VAR_LIST
 		&& (typechk_flags & TYPECHK_TUPLE_OK)))
     {
 	// always allocate, also for static types
 	tt = ALLOC_ONE(type_T);
-	if (tt != NULL)
+	만약 (tt != NULL)
 	{
 	    *tt = *expected;
 	    tt->tt_flags &= ~TTFLAG_STATIC;
-	    if (typechk_flags & TYPECHK_NUMBER_OK)
+	    만약 (typechk_flags & TYPECHK_NUMBER_OK)
 		tt->tt_flags |= TTFLAG_NUMBER_OK;
-	    else
+	    아니면
 		tt->tt_flags |= TTFLAG_TUPLE_OK;
 	}
     }
-    else
+    아니면
 	tt = alloc_type(expected);
 
     isn->isn_arg.type.ct_type = tt;
@@ -734,10 +734,10 @@ generate_TYPECHECK(
     // type becomes expected
     set_type_on_stack(cctx, expected, -1 - offset);
 
-    return OK;
+    반환 OK;
 }
 
-    int
+    정수
 generate_SETTYPE(
 	cctx_T	    *cctx,
 	type_T	    *expected)
@@ -745,46 +745,46 @@ generate_SETTYPE(
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_SETTYPE)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_SETTYPE)) == NULL)
+	반환 FAIL;
     isn->isn_arg.type.ct_type = alloc_type(expected);
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_PUSHOBJ instruction.  Object is always NULL.
  */
-    int
+    정수
 generate_PUSHOBJ(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-    if (generate_instr_type(cctx, ISN_PUSHOBJ, &t_object_any) == NULL)
-	return FAIL;
-    return OK;
+    만약 (generate_instr_type(cctx, ISN_PUSHOBJ, &t_object_any) == NULL)
+	반환 FAIL;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_PUSHCLASS instruction.  "class" can be NULL.
  */
-    static int
+    static 정수
 generate_PUSHCLASS(cctx_T *cctx, class_T *class)
 {
     RETURN_OK_IF_SKIP(cctx);
     isn_T *isn = generate_instr_type(cctx, ISN_PUSHCLASS,
 				  class == NULL ? &t_any : &class->class_type);
-    if (isn == NULL)
-	return FAIL;
+    만약 (isn == NULL)
+	반환 FAIL;
     isn->isn_arg.classarg = class;
-    if (class != NULL)
+    만약 (class != NULL)
 	++class->class_refcount;
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate a PUSH instruction for "tv".
  * "tv" will be consumed or cleared.
  */
-    int
+    정수
 generate_tv_PUSH(cctx_T *cctx, typval_T *tv)
 {
     switch (tv->v_type)
@@ -806,53 +806,53 @@ generate_tv_PUSH(cctx_T *cctx, typval_T *tv)
 	    tv->vval.v_blob = NULL;
 	    break;
 	case VAR_LIST:
-	    if (tv->vval.v_list != NULL)
+	    만약 (tv->vval.v_list != NULL)
 		iemsg("non-empty list constant not supported");
 	    generate_NEWLIST(cctx, 0, TRUE);
 	    break;
 	case VAR_TUPLE:
-	    if (tv->vval.v_tuple != NULL)
+	    만약 (tv->vval.v_tuple != NULL)
 		iemsg("non-empty tuple constant not supported");
 	    generate_NEWTUPLE(cctx, 0, TRUE);
 	    break;
 	case VAR_DICT:
-	    if (tv->vval.v_dict != NULL)
+	    만약 (tv->vval.v_dict != NULL)
 		iemsg("non-empty dict constant not supported");
 	    generate_NEWDICT(cctx, 0, TRUE);
 	    break;
 #ifdef FEAT_JOB_CHANNEL
 	case VAR_JOB:
-	    if (tv->vval.v_job != NULL)
+	    만약 (tv->vval.v_job != NULL)
 		iemsg("non-null job constant not supported");
 	    generate_PUSHJOB(cctx);
 	    break;
 	case VAR_CHANNEL:
-	    if (tv->vval.v_channel != NULL)
+	    만약 (tv->vval.v_channel != NULL)
 		iemsg("non-null channel constant not supported");
 	    generate_PUSHCHANNEL(cctx);
 	    break;
 #endif
 	case VAR_FUNC:
-	    if (tv->vval.v_string != NULL)
+	    만약 (tv->vval.v_string != NULL)
 		iemsg("non-null function constant not supported");
 	    generate_PUSHFUNC(cctx, NULL, &t_func_unknown, TRUE);
 	    break;
 	case VAR_PARTIAL:
-	    if (tv->vval.v_partial != NULL)
+	    만약 (tv->vval.v_partial != NULL)
 		iemsg("non-null partial constant not supported");
-	    if (generate_instr_type(cctx, ISN_NEWPARTIAL, &t_func_unknown)
+	    만약 (generate_instr_type(cctx, ISN_NEWPARTIAL, &t_func_unknown)
 								   == NULL)
-		return FAIL;
+		반환 FAIL;
 	    break;
 	case VAR_STRING:
 	    generate_PUSHS(cctx, &tv->vval.v_string);
 	    tv->vval.v_string = NULL;
 	    break;
 	case VAR_OBJECT:
-	    if (tv->vval.v_object != NULL)
+	    만약 (tv->vval.v_object != NULL)
 	    {
 		emsg(_(e_cannot_use_non_null_object));
-		return FAIL;
+		반환 FAIL;
 	    }
 	    generate_PUSHOBJ(cctx);
 	    break;
@@ -862,78 +862,78 @@ generate_tv_PUSH(cctx_T *cctx, typval_T *tv)
 	default:
 	    siemsg("constant type %d not supported", tv->v_type);
 	    clear_tv(tv);
-	    return FAIL;
+	    반환 FAIL;
     }
     tv->v_type = VAR_UNKNOWN;
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_PUSHNR instruction.
  */
-    int
+    정수
 generate_PUSHNR(cctx_T *cctx, varnumber_T number)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHNR, &t_number)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr_type(cctx, ISN_PUSHNR, &t_number)) == NULL)
+	반환 FAIL;
     isn->isn_arg.number = number;
 
-    if (number == 0 || number == 1)
+    만약 (number == 0 || number == 1)
 	// A 0 or 1 number can also be used as a bool.
 	set_type_on_stack(cctx, &t_number_bool, 0);
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_PUSHBOOL instruction.
  */
-    int
+    정수
 generate_PUSHBOOL(cctx_T *cctx, varnumber_T number)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHBOOL, &t_bool)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr_type(cctx, ISN_PUSHBOOL, &t_bool)) == NULL)
+	반환 FAIL;
     isn->isn_arg.number = number;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_PUSHSPEC instruction.
  */
-    int
+    정수
 generate_PUSHSPEC(cctx_T *cctx, varnumber_T number)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHSPEC,
+    만약 ((isn = generate_instr_type(cctx, ISN_PUSHSPEC,
 			     number == VVAL_NULL ? &t_null : &t_none)) == NULL)
-	return FAIL;
+	반환 FAIL;
     isn->isn_arg.number = number;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_PUSHF instruction.
  */
-    int
+    정수
 generate_PUSHF(cctx_T *cctx, float_T fnumber)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHF, &t_float)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr_type(cctx, ISN_PUSHF, &t_float)) == NULL)
+	반환 FAIL;
     isn->isn_arg.fnumber = fnumber;
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -942,58 +942,58 @@ generate_PUSHF(cctx_T *cctx, float_T fnumber)
  * Note that if "str" is used in the instruction OK is returned and "*str" is
  * not set to NULL.
  */
-    int
+    정수
 generate_PUSHS(cctx_T *cctx, char_u **str)
 {
     isn_T	*isn;
-    int		ret = OK;
+    정수		ret = OK;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    만약 (cctx->ctx_skip != SKIP_YES)
     {
-	if ((isn = generate_instr_type(cctx, ISN_PUSHS, &t_string)) == NULL)
+	만약 ((isn = generate_instr_type(cctx, ISN_PUSHS, &t_string)) == NULL)
 	    ret = FAIL;
-	else
+	아니면
 	{
 	    isn->isn_arg.string = str == NULL ? NULL : *str;
-	    return OK;
+	    반환 OK;
 	}
     }
-    if (str != NULL)
+    만약 (str != NULL)
 	VIM_CLEAR(*str);
-    return ret;
+    반환 ret;
 }
 
 /*
  * Generate an ISN_PUSHCHANNEL instruction.  Channel is always NULL.
  */
-    int
+    정수
 generate_PUSHCHANNEL(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
 #ifdef FEAT_JOB_CHANNEL
-    if (generate_instr_type(cctx, ISN_PUSHCHANNEL, &t_channel) == NULL)
-	return FAIL;
-    return OK;
-#else
+    만약 (generate_instr_type(cctx, ISN_PUSHCHANNEL, &t_channel) == NULL)
+	반환 FAIL;
+    반환 OK;
+#아니면
     emsg(_(e_channel_job_feature_not_available));
-    return FAIL;
+    반환 FAIL;
 #endif
 }
 
 /*
  * Generate an ISN_PUSHJOB instruction.  Job is always NULL.
  */
-    int
+    정수
 generate_PUSHJOB(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
 #ifdef FEAT_JOB_CHANNEL
-    if (generate_instr_type(cctx, ISN_PUSHJOB, &t_job) == NULL)
-	return FAIL;
-    return OK;
-#else
+    만약 (generate_instr_type(cctx, ISN_PUSHJOB, &t_job) == NULL)
+	반환 FAIL;
+    반환 OK;
+#아니면
     emsg(_(e_channel_job_feature_not_available));
-    return FAIL;
+    반환 FAIL;
 #endif
 }
 
@@ -1001,18 +1001,18 @@ generate_PUSHJOB(cctx_T *cctx)
  * Generate an ISN_PUSHBLOB instruction.
  * Consumes "blob".
  */
-    int
+    정수
 generate_PUSHBLOB(cctx_T *cctx, blob_T *blob)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type2(cctx, ISN_PUSHBLOB,
+    만약 ((isn = generate_instr_type2(cctx, ISN_PUSHBLOB,
 					&t_blob, &t_blob)) == NULL)
-	return FAIL;
+	반환 FAIL;
     isn->isn_arg.blob = blob;
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -1020,25 +1020,25 @@ generate_PUSHBLOB(cctx_T *cctx, blob_T *blob)
  * When "may_prefix" is TRUE prefix "g:" unless "name" is script-local or
  * autoload.
  */
-    int
-generate_PUSHFUNC(cctx_T *cctx, char_u *name, type_T *type, int may_prefix)
+    정수
+generate_PUSHFUNC(cctx_T *cctx, char_u *name, type_T *type, 정수 may_prefix)
 {
     isn_T	*isn;
     char_u	*funcname;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHFUNC, type)) == NULL)
-	return FAIL;
-    if (name == NULL)
+    만약 ((isn = generate_instr_type(cctx, ISN_PUSHFUNC, type)) == NULL)
+	반환 FAIL;
+    만약 (name == NULL)
 	funcname = NULL;
-    else if (!may_prefix
+    아니면 만약 (!may_prefix
 	    || *name == K_SPECIAL			    // script-local
 	    || vim_strchr(name, AUTOLOAD_CHAR) != NULL)	    // autoload
 	funcname = vim_strsave(name);
-    else
+    아니면
     {
 	funcname = alloc(STRLEN(name) + 3);
-	if (funcname != NULL)
+	만약 (funcname != NULL)
 	{
 	    STRCPY(funcname, "g:");
 	    STRCPY(funcname + 2, name);
@@ -1046,24 +1046,24 @@ generate_PUSHFUNC(cctx_T *cctx, char_u *name, type_T *type, int may_prefix)
     }
 
     isn->isn_arg.string = funcname;
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_AUTOLOAD instruction.
  */
-    int
+    정수
 generate_AUTOLOAD(cctx_T *cctx, char_u *name, type_T *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_AUTOLOAD, type)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr_type(cctx, ISN_AUTOLOAD, type)) == NULL)
+	반환 FAIL;
     isn->isn_arg.string = vim_strsave(name);
-    if (isn->isn_arg.string == NULL)
-	return FAIL;
-    return OK;
+    만약 (isn->isn_arg.string == NULL)
+	반환 FAIL;
+    반환 OK;
 }
 
 /*
@@ -1072,8 +1072,8 @@ generate_AUTOLOAD(cctx_T *cctx, char_u *name, type_T *type)
  * value below the list with values.
  * Caller must check the type is a list.
  */
-    int
-generate_GETITEM(cctx_T *cctx, int index, int with_op)
+    정수
+generate_GETITEM(cctx_T *cctx, 정수 index, 정수 with_op)
 {
     isn_T	*isn;
     type_T	*type = get_type_on_stack(cctx, with_op ? 1 : 0);
@@ -1082,13 +1082,13 @@ generate_GETITEM(cctx_T *cctx, int index, int with_op)
     RETURN_OK_IF_SKIP(cctx);
 
     item_type = get_item_type(type);
-    if ((isn = generate_instr(cctx, ISN_GETITEM)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_GETITEM)) == NULL)
+	반환 FAIL;
     isn->isn_arg.getitem.gi_index = index;
     isn->isn_arg.getitem.gi_with_op = with_op;
 
     // add the item type to the type stack
-    return push_type_stack(cctx, item_type);
+    반환 push_type_stack(cctx, item_type);
 }
 
 /*
@@ -1096,26 +1096,26 @@ generate_GETITEM(cctx_T *cctx, int index, int with_op)
  * items of the tuple with type "type".
  */
     static void
-set_tuple_slice_type_on_stack(type_T *type, int count, cctx_T *cctx)
+set_tuple_slice_type_on_stack(type_T *type, 정수 count, cctx_T *cctx)
 {
     garray_T	tuple_types_ga;
 
     // The item types are only known for a tuple with a fixed number of items.
-    if ((type->tt_flags & TTFLAG_VARARGS) || type->tt_argcount <= count)
+    만약 ((type->tt_flags & TTFLAG_VARARGS) || type->tt_argcount <= count)
     {
 	set_type_on_stack(cctx, &t_tuple_any, 0);
-	return;
+	반환;
     }
 
     ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
 
-    for (int i = count; i < type->tt_argcount; i++)
+    위해 (정수 i = count; i < type->tt_argcount; i++)
     {
-	if (ga_grow(&tuple_types_ga, 1) == FAIL)
+	만약 (ga_grow(&tuple_types_ga, 1) == FAIL)
 	{
 	    ga_clear(&tuple_types_ga);
 	    set_type_on_stack(cctx, &t_tuple_any, 0);
-	    return;
+	    반환;
 	}
 	((type_T **)tuple_types_ga.ga_data)[tuple_types_ga.ga_len] =
 							     type->tt_args[i];
@@ -1131,308 +1131,308 @@ set_tuple_slice_type_on_stack(type_T *type, int count, cctx_T *cctx)
 /*
  * Generate an ISN_SLICE instruction with "count".
  */
-    int
-generate_SLICE(cctx_T *cctx, int count)
+    정수
+generate_SLICE(cctx_T *cctx, 정수 count)
 {
     isn_T	*isn;
     type_T	*type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_SLICE)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_SLICE)) == NULL)
+	반환 FAIL;
     isn->isn_arg.number = count;
 
     // Slicing a tuple leaves a tuple with the remaining item types, not the
     // type of the whole tuple.
     type = get_type_on_stack(cctx, 0);
-    if (type->tt_type == VAR_TUPLE)
+    만약 (type->tt_type == VAR_TUPLE)
 	set_tuple_slice_type_on_stack(type, count, cctx);
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_CHECKLEN instruction with "min_len".
  */
-    int
-generate_CHECKLEN(cctx_T *cctx, int min_len, int more_OK)
+    정수
+generate_CHECKLEN(cctx_T *cctx, 정수 min_len, 정수 more_OK)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if ((isn = generate_instr(cctx, ISN_CHECKLEN)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_CHECKLEN)) == NULL)
+	반환 FAIL;
     isn->isn_arg.checklen.cl_min_len = min_len;
     isn->isn_arg.checklen.cl_more_OK = more_OK;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_STORE instruction.
  */
-    int
-generate_STORE(cctx_T *cctx, isntype_T isn_type, int idx, char_u *name)
+    정수
+generate_STORE(cctx_T *cctx, isntype_T isn_type, 정수 idx, char_u *name)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, isn_type, 1)) == NULL)
-	return FAIL;
-    if (name != NULL)
+    만약 ((isn = generate_instr_drop(cctx, isn_type, 1)) == NULL)
+	반환 FAIL;
+    만약 (name != NULL)
 	isn->isn_arg.string = vim_strsave(name);
-    else
+    아니면
 	isn->isn_arg.number = idx;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_LOAD_CLASSMEMBER ("load" == TRUE) or ISN_STORE_CLASSMEMBER
  * ("load" == FALSE) instruction.
  */
-    int
+    정수
 generate_CLASSMEMBER(
 	cctx_T	    *cctx,
-	int	    load,
+	정수	    load,
 	class_T	    *cl,
-	int	    idx)
+	정수	    idx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (load)
+    만약 (load)
     {
 	ocmember_T *m = &cl->class_class_members[idx];
 	isn = generate_instr_type(cctx, ISN_LOAD_CLASSMEMBER, m->ocm_type);
     }
-    else
+    아니면
     {
 	isn = generate_instr_drop(cctx, ISN_STORE_CLASSMEMBER, 1);
     }
-    if (isn == NULL)
-	return FAIL;
+    만약 (isn == NULL)
+	반환 FAIL;
     isn->isn_arg.classmember.cm_class = cl;
     ++cl->class_refcount;
     isn->isn_arg.classmember.cm_idx = idx;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_STOREOUTER instruction.
  */
-    static int
+    static 정수
 generate_STOREOUTER(
 	cctx_T	    *cctx,
-	int	    idx,
-	int	    level,
-	int	    loop_depth,
-	int	    loop_idx)
+	정수	    idx,
+	정수	    level,
+	정수	    loop_depth,
+	정수	    loop_idx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, ISN_STOREOUTER, 1)) == NULL)
-	return FAIL;
-    if (level == 1 && loop_idx >= 0 && idx >= loop_idx)
+    만약 ((isn = generate_instr_drop(cctx, ISN_STOREOUTER, 1)) == NULL)
+	반환 FAIL;
+    만약 (level == 1 && loop_idx >= 0 && idx >= loop_idx)
     {
 	// Store a variable defined in a loop.  A copy will be made at the end
 	// of the loop.
 	isn->isn_arg.outer.outer_idx = idx - loop_idx;
 	isn->isn_arg.outer.outer_depth = -loop_depth - 1;
     }
-    else
+    아니면
     {
 	isn->isn_arg.outer.outer_idx = idx;
 	isn->isn_arg.outer.outer_depth = level;
     }
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_STORENR instruction (short for ISN_PUSHNR + ISN_STORE)
  */
-    int
-generate_STORENR(cctx_T *cctx, int idx, varnumber_T value)
+    정수
+generate_STORENR(cctx_T *cctx, 정수 idx, varnumber_T value)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_STORENR)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_STORENR)) == NULL)
+	반환 FAIL;
     isn->isn_arg.storenr.stnr_idx = idx;
     isn->isn_arg.storenr.stnr_val = value;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_STOREOPT or ISN_STOREFUNCOPT instruction
  */
-    static int
+    static 정수
 generate_STOREOPT(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
 	char_u	    *name,
-	int	    opt_flags)
+	정수	    opt_flags)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, isn_type, 1)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr_drop(cctx, isn_type, 1)) == NULL)
+	반환 FAIL;
     isn->isn_arg.storeopt.so_name = vim_strsave(name);
     isn->isn_arg.storeopt.so_flags = opt_flags;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_LOAD or similar instruction.
  */
-    int
+    정수
 generate_LOAD(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
-	int	    idx,
+	정수	    idx,
 	char_u	    *name,
 	type_T	    *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type2(cctx, isn_type, type, type)) == NULL)
-	return FAIL;
-    if (name != NULL)
+    만약 ((isn = generate_instr_type2(cctx, isn_type, type, type)) == NULL)
+	반환 FAIL;
+    만약 (name != NULL)
 	isn->isn_arg.string = vim_strsave(name);
-    else
+    아니면
 	isn->isn_arg.number = idx;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_LOADOUTER instruction
  */
-    int
+    정수
 generate_LOADOUTER(
 	cctx_T	    *cctx,
-	int	    idx,
-	int	    nesting,
-	int	    loop_depth,
-	int	    loop_idx,
+	정수	    idx,
+	정수	    nesting,
+	정수	    loop_depth,
+	정수	    loop_idx,
 	type_T	    *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type2(cctx, ISN_LOADOUTER, type, type)) == NULL)
-	return FAIL;
-    if (nesting == 1 && loop_idx >= 0 && idx >= loop_idx)
+    만약 ((isn = generate_instr_type2(cctx, ISN_LOADOUTER, type, type)) == NULL)
+	반환 FAIL;
+    만약 (nesting == 1 && loop_idx >= 0 && idx >= loop_idx)
     {
 	// Load a variable defined in a loop.  A copy will be made at the end
 	// of the loop.
 	isn->isn_arg.outer.outer_idx = idx - loop_idx;
 	isn->isn_arg.outer.outer_depth = -loop_depth - 1;
     }
-    else
+    아니면
     {
 	isn->isn_arg.outer.outer_idx = idx;
 	isn->isn_arg.outer.outer_depth = nesting;
     }
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_LOADV instruction for v:var.
  */
-    int
+    정수
 generate_LOADV(
 	cctx_T	    *cctx,
 	char_u	    *name)
 {
-    int	    di_flags;
-    int	    vidx = find_vim_var(name, &di_flags);
+    정수	    di_flags;
+    정수	    vidx = find_vim_var(name, &di_flags);
     type_T  *type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (vidx < 0)
+    만약 (vidx < 0)
     {
 	semsg(_(e_variable_not_found_str), name);
-	return FAIL;
+	반환 FAIL;
     }
     type = get_vim_var_type(vidx, cctx->ctx_type_list);
-    return generate_LOAD(cctx, ISN_LOADV, vidx, NULL, type);
+    반환 generate_LOAD(cctx, ISN_LOADV, vidx, NULL, type);
 }
 
 /*
  * Generate an ISN_UNLET instruction.
  */
-    int
-generate_UNLET(cctx_T *cctx, isntype_T isn_type, char_u *name, int forceit)
+    정수
+generate_UNLET(cctx_T *cctx, isntype_T isn_type, char_u *name, 정수 forceit)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, isn_type)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, isn_type)) == NULL)
+	반환 FAIL;
     isn->isn_arg.unlet.ul_name = vim_strsave(name);
     isn->isn_arg.unlet.ul_forceit = forceit;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_LOCKCONST instruction.
  */
-    int
+    정수
 generate_LOCKCONST(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-    if (generate_instr(cctx, ISN_LOCKCONST) == NULL)
-	return FAIL;
-    return OK;
+    만약 (generate_instr(cctx, ISN_LOCKCONST) == NULL)
+	반환 FAIL;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_LOADS instruction.
  */
-    int
+    정수
 generate_OLDSCRIPT(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
 	char_u	    *name,
-	int	    sid,
+	정수	    sid,
 	type_T	    *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (isn_type == ISN_LOADS || isn_type == ISN_LOADEXPORT)
+    만약 (isn_type == ISN_LOADS || isn_type == ISN_LOADEXPORT)
 	isn = generate_instr_type(cctx, isn_type, type);
-    else
+    아니면
 	isn = generate_instr_drop(cctx, isn_type, 1);
-    if (isn == NULL)
-	return FAIL;
+    만약 (isn == NULL)
+	반환 FAIL;
     isn->isn_arg.loadstore.ls_name = vim_strsave(name);
     isn->isn_arg.loadstore.ls_sid = sid;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_LOADSCRIPT or ISN_STORESCRIPT instruction.
  */
-    int
+    정수
 generate_VIM9SCRIPT(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
-	int	    sid,
-	int	    idx,
+	정수	    sid,
+	정수	    idx,
 	type_T	    *type)
 {
     isn_T	*isn;
@@ -1440,32 +1440,32 @@ generate_VIM9SCRIPT(
     scriptitem_T *si = SCRIPT_ITEM(sid);
 
     RETURN_OK_IF_SKIP(cctx);
-    if (isn_type == ISN_LOADSCRIPT)
+    만약 (isn_type == ISN_LOADSCRIPT)
 	isn = generate_instr_type2(cctx, isn_type, type, type);
-    else
+    아니면
 	isn = generate_instr_drop(cctx, isn_type, 1);
-    if (isn == NULL)
-	return FAIL;
+    만약 (isn == NULL)
+	반환 FAIL;
 
     // This requires three arguments, which doesn't fit in an instruction, thus
     // we need to allocate a struct for this.
     sref = ALLOC_ONE(scriptref_T);
-    if (sref == NULL)
-	return FAIL;
+    만약 (sref == NULL)
+	반환 FAIL;
     isn->isn_arg.script.scriptref = sref;
     sref->sref_sid = sid;
     sref->sref_idx = idx;
     sref->sref_seq = si->sn_script_seq;
     sref->sref_type = type;
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_NEWLIST instruction for "count" items.
  * "use_null" is TRUE for null_list.
  */
-    int
-generate_NEWLIST(cctx_T *cctx, int count, int use_null)
+    정수
+generate_NEWLIST(cctx_T *cctx, 정수 count, 정수 use_null)
 {
     isn_T	*isn;
     type_T	*member_type;
@@ -1473,14 +1473,14 @@ generate_NEWLIST(cctx_T *cctx, int count, int use_null)
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_NEWLIST)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_NEWLIST)) == NULL)
+	반환 FAIL;
     isn->isn_arg.number = use_null ? -1 : count;
 
     // Get the member type and the declared member type from all the items on
     // the stack.
-    if ((member_type = get_member_type_from_stack(count, 1, cctx)) == NULL)
-	return FAIL;
+    만약 ((member_type = get_member_type_from_stack(count, 1, cctx)) == NULL)
+	반환 FAIL;
     type = get_list_type(member_type, cctx->ctx_type_list);
     decl_type = get_list_type(&t_any, cctx->ctx_type_list);
 
@@ -1488,23 +1488,23 @@ generate_NEWLIST(cctx_T *cctx, int count, int use_null)
     cctx->ctx_type_stack.ga_len -= count;
 
     // add the list type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    반환 push_type_stack2(cctx, type, decl_type);
 }
 
 /*
  * Generate an ISN_NEWTUPLE instruction for "count" items.
  * "use_null" is TRUE for null_tuple.
  */
-    int
-generate_NEWTUPLE(cctx_T *cctx, int count, int use_null)
+    정수
+generate_NEWTUPLE(cctx_T *cctx, 정수 count, 정수 use_null)
 {
     isn_T	*isn;
     type_T	*type;
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_NEWTUPLE)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_NEWTUPLE)) == NULL)
+	반환 FAIL;
     isn->isn_arg.number = use_null ? -1 : count;
 
     // Get the member type and the declared member type from all the items on
@@ -1512,10 +1512,10 @@ generate_NEWTUPLE(cctx_T *cctx, int count, int use_null)
     garray_T	tuple_types_ga;
     ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
 
-    if (get_tuple_type_from_stack(count, &tuple_types_ga, cctx) < 0)
+    만약 (get_tuple_type_from_stack(count, &tuple_types_ga, cctx) < 0)
     {
 	ga_clear(&tuple_types_ga);
-	return FAIL;
+	반환 FAIL;
     }
 
     type = get_tuple_type(&tuple_types_ga, cctx->ctx_type_list);
@@ -1527,15 +1527,15 @@ generate_NEWTUPLE(cctx_T *cctx, int count, int use_null)
     cctx->ctx_type_stack.ga_len -= count;
 
     // add the tuple type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    반환 push_type_stack2(cctx, type, decl_type);
 }
 
 /*
  * Generate an ISN_NEWDICT instruction.
  * "use_null" is TRUE for null_dict.
  */
-    int
-generate_NEWDICT(cctx_T *cctx, int count, int use_null)
+    정수
+generate_NEWDICT(cctx_T *cctx, 정수 count, 정수 use_null)
 {
     isn_T	*isn;
     type_T	*member_type;
@@ -1543,12 +1543,12 @@ generate_NEWDICT(cctx_T *cctx, int count, int use_null)
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_NEWDICT)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_NEWDICT)) == NULL)
+	반환 FAIL;
     isn->isn_arg.number = use_null ? -1 : count;
 
-    if ((member_type = get_member_type_from_stack(count, 2, cctx)) == NULL)
-	return FAIL;
+    만약 ((member_type = get_member_type_from_stack(count, 2, cctx)) == NULL)
+	반환 FAIL;
     type = get_dict_type(member_type, cctx->ctx_type_list);
     decl_type = get_dict_type(&t_any, cctx->ctx_type_list);
 
@@ -1556,7 +1556,7 @@ generate_NEWDICT(cctx_T *cctx, int count, int use_null)
     cctx->ctx_type_stack.ga_len -= 2 * count;
 
     // add the dict type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    반환 push_type_stack2(cctx, type, decl_type);
 }
 
 /*
@@ -1567,37 +1567,37 @@ generate_NEWDICT(cctx_T *cctx, int count, int use_null)
  * be set later.  The index is used instead of a pointer to the instruction
  * because the instruction memory can be reallocated.
  */
-    int
+    정수
 generate_FUNCREF(
 	cctx_T	    *cctx,
 	ufunc_T	    *ufunc,
 	class_T	    *cl,
-	int	    object_method,
-	int	    fi,
-	int	    *isn_idx)
+	정수	    object_method,
+	정수	    fi,
+	정수	    *isn_idx)
 {
     isn_T	    *isn;
     type_T	    *type;
     funcref_extra_T *extra;
     loopvarinfo_T   loopinfo;
-    int		    has_vars;
+    정수		    has_vars;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_FUNCREF)) == NULL)
-	return FAIL;
-    if (isn_idx != NULL)
+    만약 ((isn = generate_instr(cctx, ISN_FUNCREF)) == NULL)
+	반환 FAIL;
+    만약 (isn_idx != NULL)
 	// save the index of the new instruction
 	*isn_idx = cctx->ctx_instr.ga_len - 1;
 
     has_vars = get_loop_var_info(cctx, &loopinfo);
-    if (ufunc->uf_def_status == UF_NOT_COMPILED || has_vars || cl != NULL)
+    만약 (ufunc->uf_def_status == UF_NOT_COMPILED || has_vars || cl != NULL)
     {
 	extra = ALLOC_CLEAR_ONE(funcref_extra_T);
-	if (extra == NULL)
-	    return FAIL;
+	만약 (extra == NULL)
+	    반환 FAIL;
 	isn->isn_arg.funcref.fr_extra = extra;
 	extra->fre_loopvar_info = loopinfo;
-	if (cl != NULL)
+	만약 (cl != NULL)
 	{
 	    extra->fre_class = cl;
 	    ++cl->class_refcount;
@@ -1605,11 +1605,11 @@ generate_FUNCREF(
 	    extra->fre_method_idx = fi;
 	}
     }
-    if (ufunc->uf_def_status == UF_NOT_COMPILED || cl != NULL)
+    만약 (ufunc->uf_def_status == UF_NOT_COMPILED || cl != NULL)
 	extra->fre_func_name = vim_strnsave(ufunc->uf_name, ufunc->uf_namelen);
-    if (ufunc->uf_def_status != UF_NOT_COMPILED && cl == NULL)
+    만약 (ufunc->uf_def_status != UF_NOT_COMPILED && cl == NULL)
     {
-	if (isn_idx == NULL && ufunc->uf_def_status == UF_TO_BE_COMPILED)
+	만약 (isn_idx == NULL && ufunc->uf_def_status == UF_TO_BE_COMPILED)
 	    // compile the function now, we need the uf_dfunc_idx value
 	    (void)compile_def_function(ufunc, FALSE, CT_NONE, NULL);
 	isn->isn_arg.funcref.fr_dfunc_idx = ufunc->uf_dfunc_idx;
@@ -1622,12 +1622,12 @@ generate_FUNCREF(
     // If the referenced function is a closure, it may use items further up in
     // the nested context, including this one.  But not a function defined at
     // the script level.
-    if ((ufunc->uf_flags & FC_CLOSURE)
+    만약 ((ufunc->uf_flags & FC_CLOSURE)
 			       && func_name_refcount(cctx->ctx_ufunc->uf_name))
 	cctx->ctx_ufunc->uf_flags |= FC_CLOSURE;
 
     type = ufunc->uf_func_type == NULL ? &t_func_any : ufunc->uf_func_type;
-    return push_type_stack(cctx, type);
+    반환 push_type_stack(cctx, type);
 }
 
 /*
@@ -1635,26 +1635,26 @@ generate_FUNCREF(
  * "lambda_name" and "func_name" must be in allocated memory and will be
  * consumed.
  */
-    int
+    정수
 generate_NEWFUNC(
 	cctx_T	*cctx,
 	char_u	*lambda_name,
 	char_u	*func_name)
 {
     isn_T	*isn;
-    int		ret = OK;
+    정수		ret = OK;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    만약 (cctx->ctx_skip != SKIP_YES)
     {
-	if ((isn = generate_instr(cctx, ISN_NEWFUNC)) == NULL)
+	만약 ((isn = generate_instr(cctx, ISN_NEWFUNC)) == NULL)
 	    ret = FAIL;
-	else
+	아니면
 	{
 	    newfuncarg_T *arg = ALLOC_CLEAR_ONE(newfuncarg_T);
 
-	    if (arg == NULL)
+	    만약 (arg == NULL)
 		ret = FAIL;
-	    else
+	    아니면
 	    {
 		// Reserve an extra variable to keep track of the number of
 		// closures created.
@@ -1664,138 +1664,138 @@ generate_NEWFUNC(
 		arg->nfa_lambda = lambda_name;
 		arg->nfa_global = func_name;
 		(void)get_loop_var_info(cctx, &arg->nfa_loopvar_info);
-		return OK;
+		반환 OK;
 	    }
 	}
     }
     vim_free(lambda_name);
     vim_free(func_name);
-    return ret;
+    반환 ret;
 }
 
 /*
  * Generate an ISN_DEF instruction: list functions
  */
-    int
+    정수
 generate_DEF(cctx_T *cctx, char_u *name, size_t len)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_DEF)) == NULL)
-	return FAIL;
-    if (len > 0)
+    만약 ((isn = generate_instr(cctx, ISN_DEF)) == NULL)
+	반환 FAIL;
+    만약 (len > 0)
     {
 	isn->isn_arg.string = vim_strnsave(name, len);
-	if (isn->isn_arg.string == NULL)
-	    return FAIL;
+	만약 (isn->isn_arg.string == NULL)
+	    반환 FAIL;
     }
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_JUMP instruction.
  */
-    int
-generate_JUMP(cctx_T *cctx, jumpwhen_T when, int where)
+    정수
+generate_JUMP(cctx_T *cctx, jumpwhen_T when, 정수 where)
 {
     isn_T	*isn;
     garray_T	*stack = &cctx->ctx_type_stack;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_JUMP)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_JUMP)) == NULL)
+	반환 FAIL;
     isn->isn_arg.jump.jump_when = when;
     isn->isn_arg.jump.jump_where = where;
 
-    if (when != JUMP_ALWAYS && stack->ga_len > 0)
+    만약 (when != JUMP_ALWAYS && stack->ga_len > 0)
 	--stack->ga_len;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_WHILE instruction.  Similar to ISN_JUMP for :while
  */
-    int
-generate_WHILE(cctx_T *cctx, int funcref_idx)
+    정수
+generate_WHILE(cctx_T *cctx, 정수 funcref_idx)
 {
     isn_T	*isn;
     garray_T	*stack = &cctx->ctx_type_stack;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_WHILE)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_WHILE)) == NULL)
+	반환 FAIL;
     isn->isn_arg.whileloop.while_funcref_idx = funcref_idx;
     isn->isn_arg.whileloop.while_end = 0;  // filled in later
 
-    if (stack->ga_len > 0)
+    만약 (stack->ga_len > 0)
 	--stack->ga_len;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_JUMP_IF_ARG_SET or ISN_JUMP_IF_ARG_NOT_SET instruction.
  */
-    int
-generate_JUMP_IF_ARG(cctx_T *cctx, isntype_T isn_type, int arg_off)
+    정수
+generate_JUMP_IF_ARG(cctx_T *cctx, isntype_T isn_type, 정수 arg_off)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, isn_type)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, isn_type)) == NULL)
+	반환 FAIL;
     isn->isn_arg.jumparg.jump_arg_off = arg_off;
     // jump_where is set later
-    return OK;
+    반환 OK;
 }
 
-    int
-generate_FOR(cctx_T *cctx, int loop_idx)
+    정수
+generate_FOR(cctx_T *cctx, 정수 loop_idx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_FOR)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_FOR)) == NULL)
+	반환 FAIL;
     isn->isn_arg.forloop.for_loop_idx = loop_idx;
 
     // type doesn't matter, will be stored next
-    return push_type_stack(cctx, &t_any);
+    반환 push_type_stack(cctx, &t_any);
 }
 
-    int
+    정수
 generate_ENDLOOP(cctx_T *cctx, loop_info_T *loop_info)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_ENDLOOP)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_ENDLOOP)) == NULL)
+	반환 FAIL;
     isn->isn_arg.endloop.end_depth = loop_info->li_depth;
     isn->isn_arg.endloop.end_funcref_idx = loop_info->li_funcref_idx;
     isn->isn_arg.endloop.end_var_idx = loop_info->li_local_count;
     isn->isn_arg.endloop.end_var_count =
 			   cctx->ctx_locals.ga_len - loop_info->li_local_count;
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_TRYCONT instruction.
  */
-    int
-generate_TRYCONT(cctx_T *cctx, int levels, int where)
+    정수
+generate_TRYCONT(cctx_T *cctx, 정수 levels, 정수 where)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_TRYCONT)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_TRYCONT)) == NULL)
+	반환 FAIL;
     isn->isn_arg.trycont.tct_levels = levels;
     isn->isn_arg.trycont.tct_where = where;
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -1803,65 +1803,65 @@ generate_TRYCONT(cctx_T *cctx, int levels, int where)
  * Give an error and return FAIL if something is wrong.
  * When "method_call" is NULL no code is generated.
  */
-    int
+    정수
 check_internal_func_args(
 	cctx_T	*cctx,
-	int	func_idx,
-	int	argcount,
-	int	method_call,
+	정수	func_idx,
+	정수	argcount,
+	정수	method_call,
 	type2_T **argtypes,
 	type2_T *shuffled_argtypes)
 {
     garray_T	*stack = &cctx->ctx_type_stack;
-    int		argoff = check_internal_func(func_idx, argcount);
+    정수		argoff = check_internal_func(func_idx, argcount);
 
-    if (argoff < 0)
-	return FAIL;
+    만약 (argoff < 0)
+	반환 FAIL;
 
-    if (method_call && argoff > 1)
+    만약 (method_call && argoff > 1)
     {
-	if (argcount < argoff)
+	만약 (argcount < argoff)
 	{
 	    semsg(_(e_not_enough_arguments_for_function_str),
 						 internal_func_name(func_idx));
-	    return FAIL;
+	    반환 FAIL;
 	}
 
 	isn_T	*isn = generate_instr(cctx, ISN_SHUFFLE);
-	if (isn  == NULL)
-	    return FAIL;
+	만약 (isn  == NULL)
+	    반환 FAIL;
 	isn->isn_arg.shuffle.shfl_item = argcount;
 	isn->isn_arg.shuffle.shfl_up = argoff - 1;
     }
 
-    if (argcount > 0)
+    만약 (argcount > 0)
     {
 	type2_T	*typep = ((type2_T *)stack->ga_data) + stack->ga_len - argcount;
 
 	// Check the types of the arguments.
-	if (method_call && argoff > 1)
+	만약 (method_call && argoff > 1)
 	{
-	    int i;
+	    정수 i;
 
-	    for (i = 0; i < argcount; ++i)
+	    위해 (i = 0; i < argcount; ++i)
 		shuffled_argtypes[i] = (i < argoff - 1)
 				    ? typep[i + 1]
 				    : (i == argoff - 1) ? typep[0] : typep[i];
 	    *argtypes = shuffled_argtypes;
 	}
-	else
+	아니면
 	{
-	    int i;
+	    정수 i;
 
-	    for (i = 0; i < argcount; ++i)
+	    위해 (i = 0; i < argcount; ++i)
 		shuffled_argtypes[i] = typep[i];
 	    *argtypes = shuffled_argtypes;
 	}
-	if (internal_func_check_arg_types(*argtypes, func_idx, argcount,
+	만약 (internal_func_check_arg_types(*argtypes, func_idx, argcount,
 								 cctx) == FAIL)
-	    return FAIL;
+	    반환 FAIL;
     }
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -1869,8 +1869,8 @@ check_internal_func_args(
  * "method_call" is TRUE for "value->method()"
  * Return FAIL if the number of arguments is wrong.
  */
-    int
-generate_BCALL(cctx_T *cctx, int func_idx, int argcount, int method_call)
+    정수
+generate_BCALL(cctx_T *cctx, 정수 func_idx, 정수 argcount, 정수 method_call)
 {
     isn_T	*isn;
     garray_T	*stack = &cctx->ctx_type_stack;
@@ -1882,15 +1882,15 @@ generate_BCALL(cctx_T *cctx, int func_idx, int argcount, int method_call)
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if (check_internal_func_args(cctx, func_idx, argcount, method_call,
+    만약 (check_internal_func_args(cctx, func_idx, argcount, method_call,
 					 &argtypes, shuffled_argtypes) == FAIL)
-	return FAIL;
+	반환 FAIL;
 
-    if (internal_func_is_map(func_idx))
+    만약 (internal_func_is_map(func_idx))
 	maptype = argtypes;
 
-    if ((isn = generate_instr(cctx, ISN_BCALL)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_BCALL)) == NULL)
+	반환 FAIL;
     isn->isn_arg.bfunc.cbf_idx = func_idx;
     isn->isn_arg.bfunc.cbf_argcount = argcount;
 
@@ -1898,22 +1898,22 @@ generate_BCALL(cctx_T *cctx, int func_idx, int argcount, int method_call)
     stack->ga_len -= argcount;
     type = internal_func_ret_type(func_idx, argcount, argtypes, &decl_type,
 							  cctx->ctx_type_list);
-    if (push_type_stack2(cctx, type, decl_type) == FAIL)
-	return FAIL;
+    만약 (push_type_stack2(cctx, type, decl_type) == FAIL)
+	반환 FAIL;
 
-    if (maptype != NULL && maptype[0].type_decl->tt_member != NULL
+    만약 (maptype != NULL && maptype[0].type_decl->tt_member != NULL
 				  && maptype[0].type_decl->tt_member != &t_any)
 	// Check that map() didn't change the item types.
 	generate_TYPECHECK(cctx, maptype[0].type_decl, 0, -1, FALSE, 1);
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_LISTAPPEND instruction.  Works like add().
  * Argument count is already checked.
  */
-    int
+    정수
 generate_LISTAPPEND(cctx_T *cctx)
 {
     type_T	*list_type;
@@ -1924,41 +1924,41 @@ generate_LISTAPPEND(cctx_T *cctx)
     // For checking the item type we use the declared type of the list and the
     // current type of the added item, adding a string to [1, 2] is OK.
     list_type = get_decl_type_on_stack(cctx, 1);
-    if (arg_type_modifiable(list_type, 1) == FAIL)
-	return FAIL;
+    만약 (arg_type_modifiable(list_type, 1) == FAIL)
+	반환 FAIL;
     item_type = get_type_on_stack(cctx, 0);
     expected = list_type->tt_member;
-    if (need_type(item_type, expected, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
-	return FAIL;
+    만약 (need_type(item_type, expected, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
+	반환 FAIL;
 
-    if (generate_instr(cctx, ISN_LISTAPPEND) == NULL)
-	return FAIL;
+    만약 (generate_instr(cctx, ISN_LISTAPPEND) == NULL)
+	반환 FAIL;
 
     --cctx->ctx_type_stack.ga_len;	    // drop the argument
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_BLOBAPPEND instruction.  Works like add().
  * Argument count is already checked.
  */
-    int
+    정수
 generate_BLOBAPPEND(cctx_T *cctx)
 {
     type_T	*item_type;
 
     // Caller already checked that blob_type is a blob, check it is modifiable.
-    if (arg_type_modifiable(get_decl_type_on_stack(cctx, 1), 1) == FAIL)
-	return FAIL;
+    만약 (arg_type_modifiable(get_decl_type_on_stack(cctx, 1), 1) == FAIL)
+	반환 FAIL;
     item_type = get_type_on_stack(cctx, 0);
-    if (need_type(item_type, &t_number, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
-	return FAIL;
+    만약 (need_type(item_type, &t_number, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
+	반환 FAIL;
 
-    if (generate_instr(cctx, ISN_BLOBAPPEND) == NULL)
-	return FAIL;
+    만약 (generate_instr(cctx, ISN_BLOBAPPEND) == NULL)
+	반환 FAIL;
 
     --cctx->ctx_type_stack.ga_len;	    // drop the argument
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -1974,23 +1974,23 @@ isn_get_calltype(
 	ufunc_T	    *ufunc,
 	class_T	    *cl)
 {
-    if (cl != NULL)
-	return ISN_METHODCALL;
+    만약 (cl != NULL)
+	반환 ISN_METHODCALL;
 
-    if (ufunc->uf_def_status == UF_NOT_COMPILED)
-	return ISN_UCALL;
+    만약 (ufunc->uf_def_status == UF_NOT_COMPILED)
+	반환 ISN_UCALL;
 
     // function invoked from a lambda
-    if (cctx->ctx_ufunc->uf_flags & FC_LAMBDA)
+    만약 (cctx->ctx_ufunc->uf_flags & FC_LAMBDA)
     {
 	// Script-local funcs in a lambda may be redefined by re-sourcing;
 	// resolve by name at runtime.  Patched to ISN_DCALL on next call once
 	// recompiled.
-	if (ufunc->uf_name[0] == K_SPECIAL)
-	    return ISN_UCALL;
+	만약 (ufunc->uf_name[0] == K_SPECIAL)
+	    반환 ISN_UCALL;
     }
 
-    return ISN_DCALL;
+    반환 ISN_DCALL;
 }
 
 /*
@@ -2001,92 +2001,92 @@ isn_get_calltype(
  * directly to determine ufunc.
  * Return FAIL if the number of arguments is wrong.
  */
-    int
+    정수
 generate_CALL(
 	cctx_T	    *cctx,
 	ufunc_T	    *ufunc,
 	class_T	    *cl,
-	int	    mi,
-	int	    pushed_argcount,
-	int	    is_super)
+	정수	    mi,
+	정수	    pushed_argcount,
+	정수	    is_super)
 {
     isn_T	*isn;
-    int		regular_args = ufunc->uf_args.ga_len;
-    int		argcount = pushed_argcount;
+    정수		regular_args = ufunc->uf_args.ga_len;
+    정수		argcount = pushed_argcount;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (argcount > regular_args && !has_varargs(ufunc))
+    만약 (argcount > regular_args && !has_varargs(ufunc))
     {
 	semsg(_(e_too_many_arguments_for_function_str),
 						   printable_func_name(ufunc));
-	return FAIL;
+	반환 FAIL;
     }
-    if (argcount < regular_args - ufunc->uf_def_args.ga_len)
+    만약 (argcount < regular_args - ufunc->uf_def_args.ga_len)
     {
 	semsg(_(e_not_enough_arguments_for_function_str),
 						   printable_func_name(ufunc));
-	return FAIL;
+	반환 FAIL;
     }
 
-    if (ufunc->uf_def_status != UF_NOT_COMPILED
+    만약 (ufunc->uf_def_status != UF_NOT_COMPILED
 	    && ufunc->uf_def_status != UF_COMPILE_ERROR)
     {
-	int		i;
+	정수		i;
 	compiletype_T	compile_type;
 
-	for (i = 0; i < argcount; ++i)
+	위해 (i = 0; i < argcount; ++i)
 	{
 	    type_T *expected;
 	    type_T *actual;
 
 	    actual = get_type_on_stack(cctx, argcount - i - 1);
-	    if (check_type_is_value(actual) == FAIL)
-		return FAIL;
-	    if (actual->tt_type == VAR_SPECIAL
+	    만약 (check_type_is_value(actual) == FAIL)
+		반환 FAIL;
+	    만약 (actual->tt_type == VAR_SPECIAL
 			      && i >= regular_args - ufunc->uf_def_args.ga_len)
 	    {
 		// assume v:none used for default argument value
 		continue;
 	    }
-	    if (i < regular_args)
+	    만약 (i < regular_args)
 	    {
-		if (ufunc->uf_arg_types == NULL)
+		만약 (ufunc->uf_arg_types == NULL)
 		    continue;
 		expected = ufunc->uf_arg_types[i];
 	    }
-	    else if (ufunc->uf_va_type == NULL
+	    아니면 만약 (ufunc->uf_va_type == NULL
 					   || ufunc->uf_va_type == &t_list_any)
 		// possibly a lambda or "...: any"
 		expected = &t_any;
-	    else
+	    아니면
 		expected = ufunc->uf_va_type->tt_member;
-	    if (need_type(actual, expected, 0,
+	    만약 (need_type(actual, expected, 0,
 			      -argcount + i, i + 1, cctx, TRUE, FALSE) == FAIL)
 	    {
 		arg_type_mismatch(expected, actual, i + 1);
-		return FAIL;
+		반환 FAIL;
 	    }
 	}
 	compile_type = get_compile_type(ufunc);
-	if (func_needs_compiling(ufunc, compile_type)
+	만약 (func_needs_compiling(ufunc, compile_type)
 		&& compile_def_function(ufunc, ufunc->uf_ret_type == NULL,
 						   compile_type, NULL) == FAIL)
-	    return FAIL;
+	    반환 FAIL;
     }
-    if (ufunc->uf_def_status == UF_COMPILE_ERROR)
+    만약 (ufunc->uf_def_status == UF_COMPILE_ERROR)
     {
 	emsg_funcname(e_call_to_function_that_failed_to_compile_str,
 							       ufunc->uf_name);
-	return FAIL;
+	반환 FAIL;
     }
 
-    if ((isn = generate_instr(cctx, isn_get_calltype(cctx, ufunc, cl))) == NULL)
-	return FAIL;
-    if (cl != NULL /* isn->isn_type == ISN_METHODCALL */)
+    만약 ((isn = generate_instr(cctx, isn_get_calltype(cctx, ufunc, cl))) == NULL)
+	반환 FAIL;
+    만약 (cl != NULL /* isn->isn_type == ISN_METHODCALL */)
     {
 	isn->isn_arg.mfunc = ALLOC_ONE(cmfunc_T);
-	if (isn->isn_arg.mfunc == NULL)
-	    return FAIL;
+	만약 (isn->isn_arg.mfunc == NULL)
+	    반환 FAIL;
 	isn->isn_arg.mfunc->cmf_itf = cl;
 	++cl->class_refcount;
 	isn->isn_arg.mfunc->cmf_idx = mi;
@@ -2096,18 +2096,18 @@ generate_CALL(
 	// the object class is created with the same type arguments when
 	// called.
 	isn->isn_arg.mfunc->cmf_ufunc = NULL;
-	if (ufunc != cl->class_obj_methods[mi])
+	만약 (ufunc != cl->class_obj_methods[mi])
 	    isn->isn_arg.mfunc->cmf_ufunc = ufunc;
 	isn->isn_arg.mfunc->cmf_cache_cl = NULL;
 	isn->isn_arg.mfunc->cmf_cache_generic = NULL;
 	isn->isn_arg.mfunc->cmf_cache_ufunc = NULL;
     }
-    else if (isn->isn_type == ISN_DCALL)
+    아니면 만약 (isn->isn_type == ISN_DCALL)
     {
 	isn->isn_arg.dfunc.cdf_idx = ufunc->uf_dfunc_idx;
 	isn->isn_arg.dfunc.cdf_argcount = argcount;
     }
-    else
+    아니면
     {
 	// A user function may be deleted and redefined later, can't use the
 	// ufunc pointer, need to look it up again at runtime.
@@ -2119,30 +2119,30 @@ generate_CALL(
     cctx->ctx_type_stack.ga_len -= argcount;
 
     // For an object or class method call, drop the object/class type.
-    if (ufunc->uf_class != NULL)
+    만약 (ufunc->uf_class != NULL)
     {
 	// When a class method is called without the class name prefix, then
 	// the type will not be in the stack.
 	type_T *stype = get_type_on_stack(cctx, 0);
-	if (stype->tt_type == VAR_CLASS || stype->tt_type == VAR_OBJECT)
+	만약 (stype->tt_type == VAR_CLASS || stype->tt_type == VAR_OBJECT)
 	    cctx->ctx_type_stack.ga_len--;
     }
 
     // add return type
-    return push_type_stack(cctx, ufunc->uf_ret_type);
+    반환 push_type_stack(cctx, ufunc->uf_ret_type);
 }
 
 /*
  * Generate an ISN_UCALL instruction when the function isn't defined yet.
  */
-    int
-generate_UCALL(cctx_T *cctx, char_u *name, int argcount)
+    정수
+generate_UCALL(cctx_T *cctx, char_u *name, 정수 argcount)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_UCALL)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_UCALL)) == NULL)
+	반환 FAIL;
     isn->isn_arg.ufunc.cuf_name = vim_strsave(name);
     isn->isn_arg.ufunc.cuf_argcount = argcount;
 
@@ -2150,112 +2150,112 @@ generate_UCALL(cctx_T *cctx, char_u *name, int argcount)
     cctx->ctx_type_stack.ga_len -= argcount;
 
     // add return value
-    return push_type_stack(cctx, &t_any);
+    반환 push_type_stack(cctx, &t_any);
 }
 
 /*
  * Check the arguments of function "type" against the types on the stack.
  * Returns OK or FAIL;
  */
-    int
+    정수
 check_func_args_from_type(
 	cctx_T	*cctx,
 	type_T	*type,
-	int	argcount,
-	int	at_top,
+	정수	argcount,
+	정수	at_top,
 	char_u	*name)
 {
-    if (type->tt_argcount != -1)
+    만약 (type->tt_argcount != -1)
     {
-	int	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
+	정수	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
 
-	if (argcount < type->tt_min_argcount - varargs)
+	만약 (argcount < type->tt_min_argcount - varargs)
 	{
 	    emsg_funcname(e_not_enough_arguments_for_function_str, name);
-	    return FAIL;
+	    반환 FAIL;
 	}
-	if (!varargs && argcount > type->tt_argcount)
+	만약 (!varargs && argcount > type->tt_argcount)
 	{
 	    emsg_funcname(e_too_many_arguments_for_function_str, name);
-	    return FAIL;
+	    반환 FAIL;
 	}
-	if (type->tt_args != NULL)
+	만약 (type->tt_args != NULL)
 	{
-	    int i;
+	    정수 i;
 
-	    for (i = 0; i < argcount; ++i)
+	    위해 (i = 0; i < argcount; ++i)
 	    {
-		int	offset = -argcount + i - (at_top ? 0 : 1);
+		정수	offset = -argcount + i - (at_top ? 0 : 1);
 		type_T	*actual = get_type_on_stack(cctx, -1 - offset);
 		type_T	*expected;
 
-		if (check_type_is_value(actual) == FAIL)
-		    return FAIL;
-		if (varargs && i >= type->tt_argcount - 1)
+		만약 (check_type_is_value(actual) == FAIL)
+		    반환 FAIL;
+		만약 (varargs && i >= type->tt_argcount - 1)
 		{
 		    expected = type->tt_args[type->tt_argcount - 1];
-		    if (expected != NULL && expected->tt_type == VAR_LIST)
+		    만약 (expected != NULL && expected->tt_type == VAR_LIST)
 			expected = expected->tt_member;
-		    if (expected == NULL)
+		    만약 (expected == NULL)
 			expected = &t_any;
 		}
-		else if (i >= type->tt_min_argcount
+		아니면 만약 (i >= type->tt_min_argcount
 					     && actual->tt_type == VAR_SPECIAL)
 		    expected = &t_any;
-		else
+		아니면
 		    expected = type->tt_args[i];
-		if (need_type(actual, expected, 0,
+		만약 (need_type(actual, expected, 0,
 				     offset, i + 1, cctx, TRUE, FALSE) == FAIL)
 		{
 		    arg_type_mismatch(expected, actual, i + 1);
-		    return FAIL;
+		    반환 FAIL;
 		}
 	    }
 	}
     }
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_PCALL instruction.
  * "type" is the type of the FuncRef.
  */
-    int
+    정수
 generate_PCALL(
 	cctx_T	*cctx,
-	int	argcount,
+	정수	argcount,
 	char_u	*name,
 	type_T	*type,
-	int	at_top)
+	정수	at_top)
 {
     isn_T	*isn;
     type_T	*ret_type;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if (type->tt_type == VAR_ANY || type->tt_type == VAR_UNKNOWN
+    만약 (type->tt_type == VAR_ANY || type->tt_type == VAR_UNKNOWN
 						|| type == &t_object_any)
 	ret_type = &t_any;
-    else if (type->tt_type == VAR_FUNC || type->tt_type == VAR_PARTIAL)
+    아니면 만약 (type->tt_type == VAR_FUNC || type->tt_type == VAR_PARTIAL)
     {
-	if (check_func_args_from_type(cctx, type, argcount, at_top, name)
+	만약 (check_func_args_from_type(cctx, type, argcount, at_top, name)
 								       == FAIL)
-	    return FAIL;
+	    반환 FAIL;
 
 	ret_type = type->tt_member;
-	if (ret_type == &t_unknown)
+	만약 (ret_type == &t_unknown)
 	    // return type not known yet, use a runtime check
 	    ret_type = &t_any;
     }
-    else
+    아니면
     {
 	semsg(_(e_not_callable_type_str), name);
-	return FAIL;
+	반환 FAIL;
     }
 
-    if ((isn = generate_instr(cctx, ISN_PCALL)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_PCALL)) == NULL)
+	반환 FAIL;
     isn->isn_arg.pfunc.cpf_top = at_top;
     isn->isn_arg.pfunc.cpf_argcount = argcount;
 
@@ -2267,45 +2267,45 @@ generate_PCALL(
 
     // If partial is above the arguments it must be cleared and replaced with
     // the return value.
-    if (at_top && generate_instr(cctx, ISN_PCALL_END) == NULL)
-	return FAIL;
+    만약 (at_top && generate_instr(cctx, ISN_PCALL_END) == NULL)
+	반환 FAIL;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_DEFER instruction.
  */
-    int
-generate_DEFER(cctx_T *cctx, int var_idx, int argcount)
+    정수
+generate_DEFER(cctx_T *cctx, 정수 var_idx, 정수 argcount)
 {
     isn_T *isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, ISN_DEFER, argcount + 1)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr_drop(cctx, ISN_DEFER, argcount + 1)) == NULL)
+	반환 FAIL;
     isn->isn_arg.defer.defer_var_idx = var_idx;
     isn->isn_arg.defer.defer_argcount = argcount;
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_STRINGMEMBER instruction.
  */
-    int
+    정수
 generate_STRINGMEMBER(cctx_T *cctx, char_u *name, size_t len)
 {
     isn_T	*isn;
     type_T	*type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_STRINGMEMBER)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_STRINGMEMBER)) == NULL)
+	반환 FAIL;
     isn->isn_arg.string = vim_strnsave(name, len);
 
     // check for dict type
     type = get_type_on_stack(cctx, 0);
-    if (type->tt_type != VAR_DICT
+    만약 (type->tt_type != VAR_DICT
 	    && type->tt_type != VAR_OBJECT
 	    && type->tt_type != VAR_ANY
 	    && type->tt_type != VAR_UNKNOWN)
@@ -2315,97 +2315,97 @@ generate_STRINGMEMBER(cctx_T *cctx, char_u *name, size_t len)
 	semsg(_(e_expected_dictionary_for_using_key_str_but_got_str),
 					       name, type_name(type, &tofree));
 	vim_free(tofree);
-	return FAIL;
+	반환 FAIL;
     }
     // change dict type to dict member type
-    if (type->tt_type == VAR_DICT)
+    만약 (type->tt_type == VAR_DICT)
     {
 	type_T *ntype = type->tt_member->tt_type == VAR_UNKNOWN
 						    ? &t_any : type->tt_member;
 	set_type_on_stack(cctx, ntype, 0);
     }
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_ECHO instruction.
  */
-    int
-generate_ECHO(cctx_T *cctx, int with_white, int count)
+    정수
+generate_ECHO(cctx_T *cctx, 정수 with_white, 정수 count)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, ISN_ECHO, count)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr_drop(cctx, ISN_ECHO, count)) == NULL)
+	반환 FAIL;
     isn->isn_arg.echo.echo_with_white = with_white;
     isn->isn_arg.echo.echo_count = count;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_EXECUTE/ISN_ECHOMSG/ISN_ECHOERR instruction.
  */
-    int
-generate_MULT_EXPR(cctx_T *cctx, isntype_T isn_type, int count)
+    정수
+generate_MULT_EXPR(cctx_T *cctx, isntype_T isn_type, 정수 count)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, isn_type, count)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr_drop(cctx, isn_type, count)) == NULL)
+	반환 FAIL;
     isn->isn_arg.number = count;
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_ECHOWINDOW instruction
  */
-    int
-generate_ECHOWINDOW(cctx_T *cctx, int count, long time)
+    정수
+generate_ECHOWINDOW(cctx_T *cctx, 정수 count, long time)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr_drop(cctx, ISN_ECHOWINDOW, count)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr_drop(cctx, ISN_ECHOWINDOW, count)) == NULL)
+	반환 FAIL;
     isn->isn_arg.echowin.ewin_count = count;
     isn->isn_arg.echowin.ewin_time = time;
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_SOURCE instruction.
  */
-    int
-generate_SOURCE(cctx_T *cctx, int sid)
+    정수
+generate_SOURCE(cctx_T *cctx, 정수 sid)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr(cctx, ISN_SOURCE)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_SOURCE)) == NULL)
+	반환 FAIL;
     isn->isn_arg.number = sid;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an ISN_PUT or ISN_IPUT instruction depending on fixindent.
  */
-    int
-generate_PUT(cctx_T *cctx, int regname, linenr_T lnum, int fixindent)
+    정수
+generate_PUT(cctx_T *cctx, 정수 regname, linenr_T lnum, 정수 fixindent)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
     isn = (fixindent) ? generate_instr(cctx, ISN_IPUT) :
 			generate_instr(cctx, ISN_PUT);
-    if (isn == NULL)
-	return FAIL;
+    만약 (isn == NULL)
+	반환 FAIL;
     isn->isn_arg.put.put_regname = regname;
     isn->isn_arg.put.put_lnum = lnum;
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -2416,147 +2416,147 @@ generate_PUT(cctx_T *cctx, int regname, linenr_T lnum, int fixindent)
  * - if the root item is a function argument
  * A copy is made of "line".
  */
-    int
-generate_LOCKUNLOCK(cctx_T *cctx, char_u *line, int is_arg)
+    정수
+generate_LOCKUNLOCK(cctx_T *cctx, char_u *line, 정수 is_arg)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_LOCKUNLOCK)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_LOCKUNLOCK)) == NULL)
+	반환 FAIL;
     class_T *cl = cctx->ctx_ufunc != NULL ? cctx->ctx_ufunc->uf_class : NULL;
     isn->isn_arg.lockunlock.lu_string = vim_strsave(line);
     isn->isn_arg.lockunlock.lu_cl_exec = cl;
-    if (cl != NULL)
+    만약 (cl != NULL)
 	++cl->class_refcount;
     isn->isn_arg.lockunlock.lu_is_arg = is_arg;
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an EXEC instruction that takes a string argument.
  * A copy is made of "line".
  */
-    int
+    정수
 generate_EXEC_copy(cctx_T *cctx, isntype_T isntype, char_u *line)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, isntype)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, isntype)) == NULL)
+	반환 FAIL;
     isn->isn_arg.string = vim_strsave(line);
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an EXEC instruction that takes a string argument.
  * "str" must be allocated, it is consumed.
  */
-    int
+    정수
 generate_EXEC(cctx_T *cctx, isntype_T isntype, char_u *str)
 {
     isn_T	*isn;
-    int		ret = OK;
+    정수		ret = OK;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    만약 (cctx->ctx_skip != SKIP_YES)
     {
-	if ((isn = generate_instr(cctx, isntype)) == NULL)
+	만약 ((isn = generate_instr(cctx, isntype)) == NULL)
 	    ret = FAIL;
-	else
+	아니면
 	{
 	    isn->isn_arg.string = str;
-	    return OK;
+	    반환 OK;
 	}
     }
     vim_free(str);
-    return ret;
+    반환 ret;
 }
 
-    int
+    정수
 generate_LEGACY_EVAL(cctx_T *cctx, char_u *line)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_LEGACY_EVAL)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_LEGACY_EVAL)) == NULL)
+	반환 FAIL;
     isn->isn_arg.string = vim_strsave(line);
 
-    return push_type_stack(cctx, &t_any);
+    반환 push_type_stack(cctx, &t_any);
 }
 
-    int
-generate_EXECCONCAT(cctx_T *cctx, int count)
+    정수
+generate_EXECCONCAT(cctx_T *cctx, 정수 count)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr_drop(cctx, ISN_EXECCONCAT, count)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr_drop(cctx, ISN_EXECCONCAT, count)) == NULL)
+	반환 FAIL;
     isn->isn_arg.number = count;
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate ISN_RANGE.  Consumes "range".  Return OK/FAIL.
  */
-    int
+    정수
 generate_RANGE(cctx_T *cctx, char_u *range)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr(cctx, ISN_RANGE)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_RANGE)) == NULL)
+	반환 FAIL;
     isn->isn_arg.string = range;
 
-    return push_type_stack(cctx, &t_number);
+    반환 push_type_stack(cctx, &t_number);
 }
 
-    int
-generate_UNPACK(cctx_T *cctx, int var_count, int semicolon)
+    정수
+generate_UNPACK(cctx_T *cctx, 정수 var_count, 정수 semicolon)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_UNPACK)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_UNPACK)) == NULL)
+	반환 FAIL;
     isn->isn_arg.unpack.unp_count = var_count;
     isn->isn_arg.unpack.unp_semicolon = semicolon;
-    return OK;
+    반환 OK;
 }
 
 /*
  * Generate an instruction for any command modifiers.
  */
-    int
+    정수
 generate_cmdmods(cctx_T *cctx, cmdmod_T *cmod)
 {
     isn_T	*isn;
 
-    if (has_cmdmod(cmod, FALSE))
+    만약 (has_cmdmod(cmod, FALSE))
     {
 	cctx->ctx_has_cmdmod = TRUE;
 
-	if ((isn = generate_instr(cctx, ISN_CMDMOD)) == NULL)
-	    return FAIL;
+	만약 ((isn = generate_instr(cctx, ISN_CMDMOD)) == NULL)
+	    반환 FAIL;
 	isn->isn_arg.cmdmod.cf_cmdmod = ALLOC_ONE(cmdmod_T);
-	if (isn->isn_arg.cmdmod.cf_cmdmod == NULL)
-	    return FAIL;
+	만약 (isn->isn_arg.cmdmod.cf_cmdmod == NULL)
+	    반환 FAIL;
 	mch_memmove(isn->isn_arg.cmdmod.cf_cmdmod, cmod, sizeof(cmdmod_T));
 	// filter program now belongs to the instruction
 	cmod->cmod_filter_regmatch.regprog = NULL;
     }
 
-    return OK;
+    반환 OK;
 }
 
-    int
+    정수
 generate_undo_cmdmods(cctx_T *cctx)
 {
-    if (cctx->ctx_has_cmdmod && generate_instr(cctx, ISN_CMDMOD_REV) == NULL)
-	return FAIL;
+    만약 (cctx->ctx_has_cmdmod && generate_instr(cctx, ISN_CMDMOD_REV) == NULL)
+	반환 FAIL;
     cctx->ctx_has_cmdmod = FALSE;
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -2564,12 +2564,12 @@ generate_undo_cmdmods(cctx_T *cctx)
  * "lhs" might be NULL.
  * Return FAIL when out of memory.
  */
-    int
+    정수
 generate_store_var(
 	cctx_T		*cctx,
 	assign_dest_T	dest,
-	int		opt_flags,
-	int		vimvaridx,
+	정수		opt_flags,
+	정수		vimvaridx,
 	type_T		*type,
 	char_u		*name,
 	lhs_T		*lhs)
@@ -2577,44 +2577,44 @@ generate_store_var(
     switch (dest)
     {
 	case dest_option:
-	    return generate_STOREOPT(cctx, ISN_STOREOPT,
+	    반환 generate_STOREOPT(cctx, ISN_STOREOPT,
 					skip_option_env_lead(name), opt_flags);
 	case dest_func_option:
-	    return generate_STOREOPT(cctx, ISN_STOREFUNCOPT,
+	    반환 generate_STOREOPT(cctx, ISN_STOREFUNCOPT,
 					skip_option_env_lead(name), opt_flags);
 	case dest_global:
 	    // include g: with the name, easier to execute that way
-	    return generate_STORE(cctx, vim_strchr(name, AUTOLOAD_CHAR) == NULL
+	    반환 generate_STORE(cctx, vim_strchr(name, AUTOLOAD_CHAR) == NULL
 					? ISN_STOREG : ISN_STOREAUTO, 0, name);
 	case dest_buffer:
 	    // include b: with the name, easier to execute that way
-	    return generate_STORE(cctx, ISN_STOREB, 0, name);
+	    반환 generate_STORE(cctx, ISN_STOREB, 0, name);
 	case dest_window:
 	    // include w: with the name, easier to execute that way
-	    return generate_STORE(cctx, ISN_STOREW, 0, name);
+	    반환 generate_STORE(cctx, ISN_STOREW, 0, name);
 	case dest_tab:
 	    // include t: with the name, easier to execute that way
-	    return generate_STORE(cctx, ISN_STORET, 0, name);
+	    반환 generate_STORE(cctx, ISN_STORET, 0, name);
 	case dest_env:
-	    return generate_STORE(cctx, ISN_STOREENV, 0, name + 1);
+	    반환 generate_STORE(cctx, ISN_STOREENV, 0, name + 1);
 	case dest_reg:
-	    return generate_STORE(cctx, ISN_STOREREG,
+	    반환 generate_STORE(cctx, ISN_STOREREG,
 					 name[1] == '@' ? '"' : name[1], NULL);
 	case dest_vimvar:
-	    return generate_STORE(cctx, ISN_STOREV, vimvaridx, NULL);
+	    반환 generate_STORE(cctx, ISN_STOREV, vimvaridx, NULL);
 	case dest_script:
 	case dest_script_v9:
 	    {
-		int	    scriptvar_idx = lhs->lhs_scriptvar_idx;
-		int	    scriptvar_sid = lhs->lhs_scriptvar_sid;
-		if (scriptvar_idx < 0)
+		정수	    scriptvar_idx = lhs->lhs_scriptvar_idx;
+		정수	    scriptvar_sid = lhs->lhs_scriptvar_sid;
+		만약 (scriptvar_idx < 0)
 		{
 		    isntype_T   isn_type = ISN_STORES;
 
 		    // If "sn_import_autoload", generate ISN_STOREEXPORT (not
 		    // ISN_STORES) if destination is in a vim9script or if
 		    // there is no "sn_autoload_prefix".
-		    if (SCRIPT_ID_VALID(scriptvar_sid)
+		    만약 (SCRIPT_ID_VALID(scriptvar_sid)
 			     && SCRIPT_ITEM(scriptvar_sid)->sn_import_autoload
 			     && ((SCRIPT_ITEM(scriptvar_sid)
 						  ->sn_autoload_prefix == NULL)
@@ -2622,20 +2622,20 @@ generate_store_var(
 		    {
 			// "import autoload './dir/script.vim'" - load script
 			// first
-			if (generate_SOURCE(cctx, scriptvar_sid) == FAIL)
-			    return FAIL;
+			만약 (generate_SOURCE(cctx, scriptvar_sid) == FAIL)
+			    반환 FAIL;
 			isn_type = ISN_STOREEXPORT;
 		    }
 
 		    // "s:" may be included in the name.
-		    return generate_OLDSCRIPT(cctx, isn_type, name,
+		    반환 generate_OLDSCRIPT(cctx, isn_type, name,
 							  scriptvar_sid, type);
 		}
-		return generate_VIM9SCRIPT(cctx, ISN_STORESCRIPT,
+		반환 generate_VIM9SCRIPT(cctx, ISN_STORESCRIPT,
 					   scriptvar_sid, scriptvar_idx, type);
 	    }
 	case dest_class_member:
-	    return generate_CLASSMEMBER(cctx, FALSE,
+	    반환 generate_CLASSMEMBER(cctx, FALSE,
 				     lhs->lhs_class, lhs->lhs_classmember_idx);
 
 	case dest_local:
@@ -2643,38 +2643,38 @@ generate_store_var(
 	    // cannot happen
 	    break;
     }
-    return FAIL;
+    반환 FAIL;
 }
 
 /*
  * Return TRUE when inside a "for" or "while" loop.
  */
-    int
+    정수
 inside_loop_scope(cctx_T *cctx)
 {
     scope_T	*scope = cctx->ctx_scope;
 
-    for (;;)
+    위해 (;;)
     {
-	if (scope == NULL)
+	만약 (scope == NULL)
 	    break;
-	if (scope->se_type == FOR_SCOPE || scope->se_type == WHILE_SCOPE)
-	    return TRUE;
+	만약 (scope->se_type == FOR_SCOPE || scope->se_type == WHILE_SCOPE)
+	    반환 TRUE;
 	scope = scope->se_outer;
     }
-    return FALSE;
+    반환 FALSE;
 }
 
-    int
-generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_count, int is_decl)
+    정수
+generate_store_lhs(cctx_T *cctx, lhs_T *lhs, 정수 instr_count, 정수 is_decl)
 {
-    if (lhs->lhs_dest != dest_local)
-	return generate_store_var(cctx, lhs->lhs_dest,
+    만약 (lhs->lhs_dest != dest_local)
+	반환 generate_store_var(cctx, lhs->lhs_dest,
 			    lhs->lhs_opt_flags, lhs->lhs_vimvaridx,
 			    lhs->lhs_type, lhs->lhs_name, lhs);
 
-    if (lhs->lhs_lvar == NULL)
-	return OK;
+    만약 (lhs->lhs_lvar == NULL)
+	반환 OK;
 
     garray_T	*instr = &cctx->ctx_instr;
     isn_T		*isn = ((isn_T *)instr->ga_data) + instr->ga_len - 1;
@@ -2682,34 +2682,34 @@ generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_count, int is_decl)
     // Optimization: turn "var = 123" from ISN_PUSHNR + ISN_STORE into
     // ISN_STORENR.
     // And "var = 0" does not need any instruction.
-    if (lhs->lhs_lvar->lv_from_outer == 0
+    만약 (lhs->lhs_lvar->lv_from_outer == 0
 	    && instr->ga_len == instr_count + 1
 	    && isn->isn_type == ISN_PUSHNR)
     {
 	varnumber_T val = isn->isn_arg.number;
 	garray_T    *stack = &cctx->ctx_type_stack;
 
-	if (val == 0 && is_decl && !inside_loop_scope(cctx))
+	만약 (val == 0 && is_decl && !inside_loop_scope(cctx))
 	{
 	    // zero is the default value, no need to do anything
 	    --instr->ga_len;
 	}
-	else
+	아니면
 	{
 	    isn->isn_type = ISN_STORENR;
 	    isn->isn_arg.storenr.stnr_idx = lhs->lhs_lvar->lv_idx;
 	    isn->isn_arg.storenr.stnr_val = val;
 	}
-	if (stack->ga_len > 0)
+	만약 (stack->ga_len > 0)
 	    --stack->ga_len;
     }
-    else if (lhs->lhs_lvar->lv_from_outer > 0)
+    아니면 만약 (lhs->lhs_lvar->lv_from_outer > 0)
 	generate_STOREOUTER(cctx, lhs->lhs_lvar->lv_idx,
 		lhs->lhs_lvar->lv_from_outer, lhs->lhs_lvar->lv_loop_depth,
 		lhs->lhs_lvar->lv_loop_idx);
-    else
+    아니면
 	generate_STORE(cctx, ISN_STORE, lhs->lhs_lvar->lv_idx, NULL);
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -2717,23 +2717,23 @@ generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_count, int is_decl)
  * object member variable initialization expression in the context of the
  * script where the class is defined.
  */
-    int
+    정수
 generate_SCRIPTCTX_SET(cctx_T *cctx, sctx_T new_sctx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_SCRIPTCTX_SET)) == NULL)
-	return FAIL;
+    만약 ((isn = generate_instr(cctx, ISN_SCRIPTCTX_SET)) == NULL)
+	반환 FAIL;
     isn->isn_arg.setsctx = new_sctx;
-    return OK;
+    반환 OK;
 }
 
-#if defined(FEAT_PROFILE)
+#만약 defined(FEAT_PROFILE)
     void
-may_generate_prof_end(cctx_T *cctx, int prof_lnum)
+may_generate_prof_end(cctx_T *cctx, 정수 prof_lnum)
 {
-    if (cctx->ctx_compile_type == CT_PROFILE && prof_lnum >= 0)
+    만약 (cctx->ctx_compile_type == CT_PROFILE && prof_lnum >= 0)
 	generate_instr(cctx, ISN_PROF_END);
 }
 #endif
@@ -2781,11 +2781,11 @@ delete_instr(isn_T *isn)
 
 	case ISN_SUBSTITUTE:
 	    {
-		int	idx;
+		정수	idx;
 		isn_T	*list = isn->isn_arg.subs.subs_instr;
 
 		vim_free(isn->isn_arg.subs.subs_cmd);
-		for (idx = 0; list[idx].isn_type != ISN_FINISH; ++idx)
+		위해 (idx = 0; list[idx].isn_type != ISN_FINISH; ++idx)
 		    delete_instr(list + idx);
 		vim_free(list);
 	    }
@@ -2793,10 +2793,10 @@ delete_instr(isn_T *isn)
 
 	case ISN_INSTR:
 	    {
-		int	idx;
+		정수	idx;
 		isn_T	*list = isn->isn_arg.instr;
 
-		for (idx = 0; list[idx].isn_type != ISN_FINISH; ++idx)
+		위해 (idx = 0; list[idx].isn_type != ISN_FINISH; ++idx)
 		    delete_instr(list + idx);
 		vim_free(list);
 	    }
@@ -2836,25 +2836,25 @@ delete_instr(isn_T *isn)
 		funcref_T	*funcref = &isn->isn_arg.funcref;
 		funcref_extra_T *extra = funcref->fr_extra;
 
-		if (extra == NULL || extra->fre_func_name == NULL)
+		만약 (extra == NULL || extra->fre_func_name == NULL)
 		{
 		    dfunc_T *dfunc = ((dfunc_T *)def_functions.ga_data)
 						       + funcref->fr_dfunc_idx;
 		    ufunc_T *ufunc = dfunc->df_ufunc;
 
-		    if (ufunc != NULL && func_name_refcount(ufunc->uf_name))
+		    만약 (ufunc != NULL && func_name_refcount(ufunc->uf_name))
 			func_ptr_unref(ufunc);
 		}
-		if (extra != NULL)
+		만약 (extra != NULL)
 		{
 		    char_u *name = extra->fre_func_name;
 
-		    if (name != NULL)
+		    만약 (name != NULL)
 		    {
 			func_unref(name);
 			vim_free(name);
 		    }
-		    if (extra->fre_class != NULL)
+		    만약 (extra->fre_class != NULL)
 			class_unref(extra->fre_class);
 		    vim_free(extra);
 		}
@@ -2866,7 +2866,7 @@ delete_instr(isn_T *isn)
 		dfunc_T *dfunc = ((dfunc_T *)def_functions.ga_data)
 		    + isn->isn_arg.dfunc.cdf_idx;
 
-		if (dfunc->df_ufunc != NULL
+		만약 (dfunc->df_ufunc != NULL
 			&& func_name_refcount(dfunc->df_ufunc->uf_name))
 		    func_ptr_unref(dfunc->df_ufunc);
 	    }
@@ -2885,12 +2885,12 @@ delete_instr(isn_T *isn)
 	    {
 		newfuncarg_T *arg = isn->isn_arg.newfunc.nf_arg;
 
-		if (arg != NULL)
+		만약 (arg != NULL)
 		{
 		    ufunc_T *ufunc = find_func_even_dead(
 					      arg->nfa_lambda, FFED_IS_GLOBAL);
 
-		    if (ufunc != NULL)
+		    만약 (ufunc != NULL)
 		    {
 			unlink_def_function(ufunc);
 			func_ptr_unref(ufunc);
@@ -3060,9 +3060,9 @@ delete_instr(isn_T *isn)
     void
 clear_instr_ga(garray_T *gap)
 {
-    int idx;
+    정수 idx;
 
-    for (idx = 0; idx < gap->ga_len; ++idx)
+    위해 (idx = 0; idx < gap->ga_len; ++idx)
 	delete_instr(((isn_T *)gap->ga_data) + idx);
     ga_clear(gap);
 }

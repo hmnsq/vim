@@ -34,7 +34,7 @@ typedef interface IVim IVim;
 
 #ifdef __cplusplus
 typedef class Vim Vim;
-#else
+#아니면
 typedef struct Vim Vim;
 #endif // __cplusplus
 
@@ -64,7 +64,7 @@ typedef struct Vim Vim;
 
 EXTERN_C const IID IID_IVim;
 
-#if defined(__cplusplus) && !defined(CINTERFACE)
+#만약 defined(__cplusplus) && !defined(CINTERFACE)
 
     interface DECLSPEC_UUID("0F0BFAE2-4C90-11d1-82D7-0004AC368519")
     IVim : public IDispatch
@@ -84,7 +84,7 @@ EXTERN_C const IID IID_IVim;
 
     };
 
-#else	// C style interface
+#아니면	// C style interface
 
     typedef struct IVimVtbl
     {

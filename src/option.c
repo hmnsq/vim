@@ -39,37 +39,37 @@
 #include "vim.h"
 #include "optiondefs.h"
 
-static void set_options_default(int opt_flags);
-static void set_string_default_esc(char *name, char_u *val, int escape);
+static void set_options_default(정수 opt_flags);
+static void set_string_default_esc(char *name, char_u *val, 정수 escape);
 static char_u *find_dup_item(char_u *origval, char_u *newval, size_t newvallen, long_u flags);
-static char_u *option_expand(int opt_idx, char_u *val);
+static char_u *option_expand(정수 opt_idx, char_u *val);
 static void didset_options(void);
 static void didset_options2(void);
-#if defined(FEAT_EVAL)
-static long_u *insecure_flag(win_T *wp, int opt_idx, int opt_flags);
-#else
+#만약 defined(FEAT_EVAL)
+static long_u *insecure_flag(win_T *wp, 정수 opt_idx, 정수 opt_flags);
+#아니면
 # define insecure_flag(wp, opt_idx, opt_flags) (&options[opt_idx].flags)
 #endif
-static char *set_bool_option(int opt_idx, char_u *varp, int value, int opt_flags);
-static char *set_num_option(int opt_idx, char_u *varp, long value, char *errbuf, size_t errbuflen, int opt_flags);
-static int find_key_option(char_u *arg_arg, int has_lt);
-static void showoptions(int all, int opt_flags);
-static int optval_default(struct vimoption *, char_u *varp, int compatible);
-static void showoneopt(struct vimoption *, int opt_flags);
-static int put_setstring(FILE *fd, bool legacy, char *cmd, char *name, char_u **valuep, long_u flags);
-static int put_setnum(FILE *fd, char *cmd, char *name, long *valuep);
-static int put_setbool(FILE *fd, char *cmd, char *name, int value);
-static int istermoption(struct vimoption *p);
-static int istermoption_idx(int opt_idx);
-static char_u *get_varp_scope(struct vimoption *p, int scope);
+static char *set_bool_option(정수 opt_idx, char_u *varp, 정수 value, 정수 opt_flags);
+static char *set_num_option(정수 opt_idx, char_u *varp, long value, char *errbuf, size_t errbuflen, 정수 opt_flags);
+static 정수 find_key_option(char_u *arg_arg, 정수 has_lt);
+static void showoptions(정수 all, 정수 opt_flags);
+static 정수 optval_default(struct vimoption *, char_u *varp, 정수 compatible);
+static void showoneopt(struct vimoption *, 정수 opt_flags);
+static 정수 put_setstring(FILE *fd, bool legacy, char *cmd, char *name, char_u **valuep, long_u flags);
+static 정수 put_setnum(FILE *fd, char *cmd, char *name, long *valuep);
+static 정수 put_setbool(FILE *fd, char *cmd, char *name, 정수 value);
+static 정수 istermoption(struct vimoption *p);
+static 정수 istermoption_idx(정수 opt_idx);
+static char_u *get_varp_scope(struct vimoption *p, 정수 scope);
 static char_u *get_varp(struct vimoption *);
 static void check_win_options(win_T *win);
-static void option_value2string(struct vimoption *, int scope);
+static void option_value2string(struct vimoption *, 정수 scope);
 static void check_winopt(winopt_T *wop);
-static int wc_use_keyname(char_u *varp, long *wcp);
+static 정수 wc_use_keyname(char_u *varp, long *wcp);
 static void compatible_set(void);
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 static char *(p_bin_dep_opts[])    = {"textwidth", "wrapmargin", "modeline", "expandtab", NULL};
 static char *(p_paste_dep_opts[])  = {"autoindent", "expandtab", "ruler", "showmatch", "smarttab",
     "softtabstop", "textwidth", "wrapmargin",
@@ -80,7 +80,7 @@ static char *(p_paste_dep_opts[])  = {"autoindent", "expandtab", "ruler", "showm
     "varsofttabstop",
 # endif
     NULL};
-static void didset_options_sctx(int opt_flags, char **buf);
+static void didset_options_sctx(정수 opt_flags, char **buf);
 #endif
 
 
@@ -94,33 +94,33 @@ set_init_default_shell(void)
 
     // Find default value for 'shell' option.
     // Don't use it if it is empty.
-    if (((p = mch_getenv((char_u *)"SHELL")) != NULL && *p != NUL)
-#if defined(MSWIN)
+    만약 (((p = mch_getenv((char_u *)"SHELL")) != NULL && *p != NUL)
+#만약 defined(MSWIN)
 	    || ((p = mch_getenv((char_u *)"COMSPEC")) != NULL && *p != NUL)
 	    || ((p = (char_u *)default_shell()) != NULL && *p != NUL)
 #endif
 	    )
-#if defined(MSWIN)
+#만약 defined(MSWIN)
     {
 	// For MS-Windows put the path in quotes instead of escaping spaces.
 	char_u	    *cmd;
 	size_t	    len;
 
-	if (vim_strchr(p, ' ') != NULL)
+	만약 (vim_strchr(p, ' ') != NULL)
 	{
 	    len = STRLEN(p) + 3;  // two quotes and a trailing NUL
 	    cmd = alloc(len);
-	    if (cmd != NULL)
+	    만약 (cmd != NULL)
 	    {
 		vim_snprintf((char *)cmd, len, "\"%s\"", p);
 		set_string_default("sh", cmd);
 		vim_free(cmd);
 	    }
 	}
-	else
+	아니면
 	    set_string_default("sh", p);
     }
-#else
+#아니면
 	set_string_default_esc("sh", p, TRUE);
 #endif
 }
@@ -132,13 +132,13 @@ set_init_default_shell(void)
     static void
 set_init_default_backupskip(void)
 {
-    int		opt_idx;
-    int		i;
+    정수		opt_idx;
+    정수		i;
     char_u	*p;
-    int		plen;
+    정수		plen;
 #ifdef UNIX
     static char	*(names[4]) = {"", "TMPDIR", "TEMP", "TMP"};
-#else
+#아니면
     static char	*(names[3]) = {"TMPDIR", "TEMP", "TMP"};
 #endif
     garray_T	ga;
@@ -146,38 +146,38 @@ set_init_default_backupskip(void)
     opt_idx = findoption((char_u *)"backupskip");
 
     ga_init2(&ga, 1, 100);
-    for (i = 0; i < (int)ARRAY_LENGTH(names); ++i)
+    위해 (i = 0; i < (정수)ARRAY_LENGTH(names); ++i)
     {
-	int		mustfree = FALSE;
+	정수		mustfree = FALSE;
 #ifdef UNIX
-	if (*names[i] == NUL)
+	만약 (*names[i] == NUL)
 	{
 # ifdef MACOS_X
 	    p = (char_u *)"/private/tmp";
-	    plen = (int)STRLEN_LITERAL("/private/tmp");
-# else
+	    plen = (정수)STRLEN_LITERAL("/private/tmp");
+# 아니면
 	    p = (char_u *)"/tmp";
-	    plen = (int)STRLEN_LITERAL("/tmp");
+	    plen = (정수)STRLEN_LITERAL("/tmp");
 # endif
 	}
-	else
+	아니면
 #endif
 	{
 	    p = vim_getenv((char_u *)names[i], &mustfree);
 	    plen = 0;	    // will be calculated below
 	}
-	if (p != NULL && *p != NUL)
+	만약 (p != NULL && *p != NUL)
 	{
 	    char_u  *item;
 	    size_t  itemsize;
-	    int	    has_trailing_path_sep = FALSE;
+	    정수	    has_trailing_path_sep = FALSE;
 
-	    if (plen == 0)
+	    만약 (plen == 0)
 	    {
 		// the value was retrieved from the environment
-		plen = (int)STRLEN(p);
+		plen = (정수)STRLEN(p);
 		// does the value include a trailing path separator?
-		if (after_pathsep(p, p + plen))
+		만약 (after_pathsep(p, p + plen))
 		    has_trailing_path_sep = TRUE;
 	    }
 
@@ -185,7 +185,7 @@ set_init_default_backupskip(void)
 	    // note: the value (and therefore plen) may already include a path separator
 	    itemsize = plen + (has_trailing_path_sep ? 0 : 1) + 2;
 	    item = alloc(itemsize);
-	    if (item != NULL)
+	    만약 (item != NULL)
 	    {
 		// add a preceding comma as a separator after the first item
 		size_t	itemseplen = (ga.ga_len == 0) ? 0 : 1;
@@ -193,8 +193,8 @@ set_init_default_backupskip(void)
 
 		itemlen = vim_snprintf((char *)item, itemsize, "%s%s*", p, (has_trailing_path_sep) ? "" : PATHSEPSTR);
 
-		if (find_dup_item(ga.ga_data, item, itemlen, options[opt_idx].flags) == NULL
-			&& ga_grow(&ga, (int)(itemseplen + itemlen + 1)) == OK)
+		만약 (find_dup_item(ga.ga_data, item, itemlen, options[opt_idx].flags) == NULL
+			&& ga_grow(&ga, (정수)(itemseplen + itemlen + 1)) == OK)
 		{
 		    ga.ga_len += vim_snprintf((char *)ga.ga_data + ga.ga_len,
 				    itemseplen + itemlen + 1,
@@ -203,10 +203,10 @@ set_init_default_backupskip(void)
 		vim_free(item);
 	    }
 	}
-	if (mustfree)
+	만약 (mustfree)
 	    vim_free(p);
     }
-    if (ga.ga_data != NULL)
+    만약 (ga.ga_data != NULL)
     {
 	set_string_default("bsk", ga.ga_data);
 	vim_free(ga.ga_data);
@@ -220,32 +220,32 @@ set_init_default_backupskip(void)
     static void
 set_init_default_maxmemtot(void)
 {
-    int		opt_idx;
+    정수		opt_idx;
     long_u	n;
 
     opt_idx = findoption((char_u *)"maxmemtot");
-    if (opt_idx < 0)
-	return;
+    만약 (opt_idx < 0)
+	반환;
 
-#if !defined(HAVE_AVAIL_MEM) && !defined(HAVE_TOTAL_MEM)
-    if (options[opt_idx].def_val[VI_DEFAULT] == (char_u *)0L)
+#만약 !defined(HAVE_AVAIL_MEM) && !defined(HAVE_TOTAL_MEM)
+    만약 (options[opt_idx].def_val[VI_DEFAULT] == (char_u *)0L)
 #endif
     {
-#if defined(HAVE_AVAIL_MEM)
+#만약 defined(HAVE_AVAIL_MEM)
 	// Use amount of memory available at this moment.
 	n = (mch_avail_mem(FALSE) >> 1);
 #elif defined(HAVE_TOTAL_MEM)
 	// Use amount of memory available to Vim.
 	n = (mch_total_mem(FALSE) >> 1);
-#else
+#아니면
 	n = (0x7fffffff >> 11);
 #endif
 	options[opt_idx].def_val[VI_DEFAULT] = (char_u *)n;
 	opt_idx = findoption((char_u *)"maxmem");
-	if (opt_idx >= 0)
+	만약 (opt_idx >= 0)
 	{
-#if !defined(HAVE_AVAIL_MEM) && !defined(HAVE_TOTAL_MEM)
-	    if ((long)(long_i)options[opt_idx].def_val[VI_DEFAULT] > (long)n
+#만약 !defined(HAVE_AVAIL_MEM) && !defined(HAVE_TOTAL_MEM)
+	    만약 ((long)(long_i)options[opt_idx].def_val[VI_DEFAULT] > (long)n
 		    || (long)(long_i)options[opt_idx].def_val[VI_DEFAULT] == 0L)
 #endif
 		options[opt_idx].def_val[VI_DEFAULT] = (char_u *)n;
@@ -259,44 +259,44 @@ set_init_default_maxmemtot(void)
     static void
 set_init_default_cdpath(void)
 {
-    int		opt_idx;
+    정수		opt_idx;
     char_u	*cdpath;
     char_u	*buf;
-    int	i;
-    int	j;
-    int	mustfree = FALSE;
+    정수	i;
+    정수	j;
+    정수	mustfree = FALSE;
 
     cdpath = vim_getenv((char_u *)"CDPATH", &mustfree);
-    if (cdpath == NULL)
-	return;
+    만약 (cdpath == NULL)
+	반환;
 
     buf = alloc((STRLEN(cdpath) << 1) + 2);
-    if (buf != NULL)
+    만약 (buf != NULL)
     {
 	buf[0] = ',';	    // start with ",", current dir first
 	j = 1;
-	for (i = 0; cdpath[i] != NUL; ++i)
+	위해 (i = 0; cdpath[i] != NUL; ++i)
 	{
-	    if (vim_ispathlistsep(cdpath[i]))
+	    만약 (vim_ispathlistsep(cdpath[i]))
 		buf[j++] = ',';
-	    else
+	    아니면
 	    {
-		if (cdpath[i] == ' ' || cdpath[i] == ',')
+		만약 (cdpath[i] == ' ' || cdpath[i] == ',')
 		    buf[j++] = '\\';
 		buf[j++] = cdpath[i];
 	    }
 	}
 	buf[j] = NUL;
 	opt_idx = findoption((char_u *)"cdpath");
-	if (opt_idx >= 0)
+	만약 (opt_idx >= 0)
 	{
 	    options[opt_idx].def_val[VI_DEFAULT] = buf;
 	    options[opt_idx].flags |= P_DEF_ALLOCED;
 	}
-	else
+	아니면
 	    vim_free(buf); // cannot happen
     }
-    if (mustfree)
+    만약 (mustfree)
 	vim_free(cdpath);
 }
 
@@ -306,24 +306,24 @@ set_init_default_cdpath(void)
     static void
 set_init_default_printencoding(void)
 {
-#if defined(FEAT_POSTSCRIPT) && \
+#만약 defined(FEAT_POSTSCRIPT) && \
     (defined(MSWIN) || defined(VMS) || defined(MAC) || defined(hpux))
     // Set print encoding on platforms that don't default to latin1
     set_string_default("penc",
-# if defined(MSWIN)
+# 만약 defined(MSWIN)
 	    (char_u *)"cp1252"
 # elif defined(VMS)
 	    (char_u *)"dec-mcs"
 # elif defined(MAC)
 	    (char_u *)"mac-roman"
-# else // HPUX
+# 아니면 // HPUX
 	    (char_u *)"hp-roman8"
 # endif
 	    );
 #endif
 }
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#만약 defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
 /*
  * Initialize the 'printexpr' option to a default value.
  */
@@ -332,12 +332,12 @@ set_init_default_printexpr(void)
 {
     // 'printexpr' must be allocated to be able to evaluate it.
     set_string_default("pexpr",
-# if defined(MSWIN)
+# 만약 defined(MSWIN)
 	    (char_u *)"system('copy' . ' ' . v:fname_in . (&printdevice == '' ? ' LPT1:' : (' \"' . &printdevice . '\"'))) . delete(v:fname_in)"
 # elif defined(VMS)
 	    (char_u *)"system('print/delete' . (&printdevice == '' ? '' : ' /queue=' . &printdevice) . ' ' . v:fname_in)"
 
-# else
+# 아니면
 	    (char_u *)"system('lpr' . (&printdevice == '' ? '' : ' -P' . &printdevice) . ' ' . v:fname_in) . delete(v:fname_in) + v:shell_error"
 # endif
 	    );
@@ -354,9 +354,9 @@ set_init_restricted_mode(void)
     char_u	*p;
 
     p = get_isolated_shell_name();
-    if (p == NULL)
-	return;
-    if (fnamecmp(p, "nologin") == 0 || fnamecmp(p, "false") == 0)
+    만약 (p == NULL)
+	반환;
+    만약 (fnamecmp(p, "nologin") == 0 || fnamecmp(p, "false") == 0)
 	restricted = TRUE;
     vim_free(p);
 }
@@ -370,17 +370,17 @@ set_init_restricted_mode(void)
     static void
 set_init_clean_rtp(void)
 {
-    int		opt_idx;
+    정수		opt_idx;
 
     opt_idx = findoption((char_u *)"runtimepath");
-    if (opt_idx >= 0)
+    만약 (opt_idx >= 0)
     {
 	options[opt_idx].def_val[VI_DEFAULT] = (char_u *)CLEAN_RUNTIMEPATH;
 	p_rtp = (char_u *)CLEAN_RUNTIMEPATH;
     }
     opt_idx = findoption((char_u *)"packpath");
-    if (opt_idx < 0)
-	return;
+    만약 (opt_idx < 0)
+	반환;
     options[opt_idx].def_val[VI_DEFAULT] = (char_u *)CLEAN_RUNTIMEPATH;
     p_pp = (char_u *)CLEAN_RUNTIMEPATH;
 }
@@ -397,9 +397,9 @@ set_init_clean_rtp(void)
     static void
 set_init_xdg_rtp(void)
 {
-    int		opt_idx;
-    int		has_xdg_env = TRUE;
-    int		should_free_xdg_dir = FALSE;
+    정수		opt_idx;
+    정수		has_xdg_env = TRUE;
+    정수		should_free_xdg_dir = FALSE;
     char_u	*vimrc1 = NULL;
     char_u	*vimrc2 = NULL;
     char_u	*xdg_dir = NULL;
@@ -412,7 +412,7 @@ set_init_xdg_rtp(void)
     vimrc2 = expand_env_save((char_u *)USR_VIMRC_FILE2);
 
     xdg_dir = mch_getenv("XDG_CONFIG_HOME");
-    if (!xdg_dir)
+    만약 (!xdg_dir)
     {
 	xdg_dir = expand_env_save((char_u *)"~/.config");
 	should_free_xdg_dir = TRUE;
@@ -421,27 +421,27 @@ set_init_xdg_rtp(void)
     concat_fnames(xdg_dir, STRLEN(xdg_dir),
 	(char_u *)"vim/vimrc", STRLEN_LITERAL("vim/vimrc"), TRUE, &vimrc_xdg);
 
-    if (file_is_readable(vimrc1) || file_is_readable(vimrc2) ||
+    만약 (file_is_readable(vimrc1) || file_is_readable(vimrc2) ||
 	    !file_is_readable(vimrc_xdg.string))
 	goto theend;
 
     xdg_rtp = has_xdg_env ? (char_u *)XDG_RUNTIMEPATH
 	: (char_u *)XDG_RUNTIMEPATH_FB;
 
-    if ((opt_idx = findoption((char_u *)"runtimepath")) < 0)
+    만약 ((opt_idx = findoption((char_u *)"runtimepath")) < 0)
 	goto theend;
 
     options[opt_idx].def_val[VI_DEFAULT] = xdg_rtp;
     p_rtp = xdg_rtp;
 
-    if ((opt_idx = findoption((char_u *)"packpath")) < 0)
+    만약 ((opt_idx = findoption((char_u *)"packpath")) < 0)
 	goto theend;
 
     options[opt_idx].def_val[VI_DEFAULT] = xdg_rtp;
     p_pp = xdg_rtp;
 
-# if defined(XDG_VDIR) && defined(FEAT_SESSION)
-    if ((opt_idx = findoption((char_u *)"viewdir")) < 0)
+# 만약 defined(XDG_VDIR) && defined(FEAT_SESSION)
+    만약 ((opt_idx = findoption((char_u *)"viewdir")) < 0)
 	goto theend;
 
     options[opt_idx].def_val[VI_DEFAULT] = (char_u *)XDG_VDIR;
@@ -452,7 +452,7 @@ theend:
     vim_free(vimrc1);
     vim_free(vimrc2);
     vim_free(vimrc_xdg.string);
-    if (should_free_xdg_dir)
+    만약 (should_free_xdg_dir)
 	vim_free(xdg_dir);
 }
 #endif
@@ -469,24 +469,24 @@ theend:
     static void
 set_init_expand_env(void)
 {
-    int		opt_idx;
+    정수		opt_idx;
     char_u	*p;
 
-    for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+    위해 (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
     {
-	if ((options[opt_idx].flags & P_GETTEXT)
+	만약 ((options[opt_idx].flags & P_GETTEXT)
 		&& options[opt_idx].var != NULL)
 	    p = (char_u *)_(*(char **)options[opt_idx].var);
-	else
+	아니면
 	    p = option_expand(opt_idx, NULL);
-	if (p != NULL && (p = vim_strsave(p)) != NULL)
+	만약 (p != NULL && (p = vim_strsave(p)) != NULL)
 	{
 	    *(char_u **)options[opt_idx].var = p;
 	    // VIMEXP
 	    // Defaults for all expanded options are currently the same for Vi
 	    // and Vim.  When this changes, add some code here!  Also need to
 	    // split P_DEF_ALLOCED in two.
-	    if (options[opt_idx].flags & P_DEF_ALLOCED)
+	    만약 (options[opt_idx].flags & P_DEF_ALLOCED)
 		vim_free(options[opt_idx].def_val[VI_DEFAULT]);
 	    options[opt_idx].def_val[VI_DEFAULT] = p;
 	    options[opt_idx].flags |= P_DEF_ALLOCED;
@@ -494,7 +494,7 @@ set_init_expand_env(void)
     }
 }
 
-#if defined(MSWIN) && defined(FEAT_GETTEXT)
+#만약 defined(MSWIN) && defined(FEAT_GETTEXT)
 /*
  * Get the display language of Windows and the languages to fall back on, as a
  * colon separated list for gettext, e.g. "ja_JP:en_US".  The list stops after
@@ -509,38 +509,38 @@ get_ui_langs(void)
     WCHAR	*buffer;
     char_u	*langs = NULL;
 
-    if (!GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &num_languages, NULL,
+    만약 (!GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &num_languages, NULL,
 								    &bufsize)
 	    || bufsize == 0)
-	return NULL;
+	반환 NULL;
 
     buffer = ALLOC_MULT(WCHAR, bufsize);
-    if (buffer == NULL)
-	return NULL;
+    만약 (buffer == NULL)
+	반환 NULL;
 
-    if (GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &num_languages, buffer,
+    만약 (GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &num_languages, buffer,
 								    &bufsize))
     {
 	// The list is NUL separated, the result needs the same room.
 	langs = alloc(bufsize);
-	if (langs != NULL)
+	만약 (langs != NULL)
 	{
 	    char_u	*d = langs;
 	    WCHAR	*s = buffer;
 
-	    while (*s != L'\0')
+	    동안 (*s != L'\0')
 	    {
 		bool	english = s[0] == L'e' && s[1] == L'n'
 					&& (s[2] == L'\0' || s[2] == L'-');
 
-		if (d > langs)
+		만약 (d > langs)
 		    *d++ = ':';
 		// Locale names are ASCII, "en-US" becomes "en_US".
-		for ( ; *s != L'\0'; ++s)
+		위해 ( ; *s != L'\0'; ++s)
 		    *d++ = *s == L'-' ? '_' : (char_u)*s;
 		++s;
 
-		if (english)
+		만약 (english)
 		    break;
 	    }
 	    *d = NUL;
@@ -548,7 +548,7 @@ get_ui_langs(void)
     }
     vim_free(buffer);
 
-    return langs;
+    반환 langs;
 }
 #endif
 
@@ -558,24 +558,24 @@ get_ui_langs(void)
     static void
 set_init_lang_env(void)
 {
-#if defined(MSWIN) && defined(FEAT_GETTEXT)
+#만약 defined(MSWIN) && defined(FEAT_GETTEXT)
     // If the language isn't set in the environment, use the display language
     // of Windows.  Not the regional format, which is what the CRT would use
     // for setlocale(LC_ALL, "").
-    if (mch_getenv((char_u *)"LANG") == NULL
+    만약 (mch_getenv((char_u *)"LANG") == NULL
 	    && mch_getenv((char_u *)"LANGUAGE") == NULL
 	    && mch_getenv((char_u *)"LC_ALL") == NULL
 	    && mch_getenv((char_u *)"LC_MESSAGES") == NULL)
     {
 	char_u	*langs = get_ui_langs();
 
-	if (langs != NULL && *langs != NUL)
+	만약 (langs != NULL && *langs != NUL)
 	{
 	    char_u	*colon = vim_strchr(langs, ':');
 
 	    // $LANGUAGE is the list gettext picks from, $LANG the language.
 	    vim_setenv((char_u *)"LANGUAGE", langs);
-	    if (colon != NULL)
+	    만약 (colon != NULL)
 		*colon = NUL;
 	    vim_setenv((char_u *)"LANG", langs);
 	}
@@ -594,26 +594,26 @@ set_init_lang_env(void)
 set_init_default_encoding(void)
 {
     char_u	*p;
-    int		opt_idx;
+    정수		opt_idx;
 
-#if defined(MSWIN) || defined(__MVS__)
+#만약 defined(MSWIN) || defined(__MVS__)
     // MS-Windows has builtin support for conversion to and from Unicode, using
     // "utf-8" for 'encoding' should work best for most users.
     // z/OS built should default to UTF-8 mode as setlocale does not respect utf-8 environment variable locales
     p = vim_strnsave((char_u *)ENC_DFLT, STRLEN_LITERAL(ENC_DFLT));
-#else
+#아니면
     // enc_locale() will try to find the encoding of the current locale.
     // This works best for properly configured systems, old and new.
     p = enc_locale();
 #endif
-    if (p == NULL)
-	return;
+    만약 (p == NULL)
+	반환;
 
     // Try setting 'encoding' and check if the value is valid.
     // If not, go back to the default encoding.
     char_u *save_enc = p_enc;
     p_enc = p;
-    if (STRCMP(p_enc, "gb18030") == 0)
+    만약 (STRCMP(p_enc, "gb18030") == 0)
     {
 	// We don't support "gb18030", but "cp936" is a good substitute
 	// for practical purposes, thus use that.  It's not an alias to
@@ -621,17 +621,17 @@ set_init_default_encoding(void)
 	p_enc = vim_strnsave((char_u *)"cp936", STRLEN_LITERAL("cp936"));
 	vim_free(p);
     }
-    if (mb_init() == NULL)
+    만약 (mb_init() == NULL)
     {
 	opt_idx = findoption((char_u *)"encoding");
-	if (opt_idx >= 0)
+	만약 (opt_idx >= 0)
 	{
 	    options[opt_idx].def_val[VI_DEFAULT] = p_enc;
 	    options[opt_idx].flags |= P_DEF_ALLOCED;
 	}
 
-#if defined(MSWIN) || defined(MACOS_X) || defined(VMS)
-	if (STRCMP(p_enc, "latin1") == 0 || enc_utf8)
+#만약 defined(MSWIN) || defined(MACOS_X) || defined(VMS)
+	만약 (STRCMP(p_enc, "latin1") == 0 || enc_utf8)
 	{
 	    // Adjust the default for 'isprint' and 'iskeyword' to match
 	    // latin1.  Also set the defaults for when 'nocompatible' is
@@ -641,19 +641,19 @@ set_init_default_encoding(void)
 	    set_string_option_direct((char_u *)"isk", -1,
 		    ISK_LATIN1, OPT_FREE, SID_NONE);
 	    opt_idx = findoption((char_u *)"isp");
-	    if (opt_idx >= 0)
+	    만약 (opt_idx >= 0)
 		options[opt_idx].def_val[VIM_DEFAULT] = ISP_LATIN1;
 	    opt_idx = findoption((char_u *)"isk");
-	    if (opt_idx >= 0)
+	    만약 (opt_idx >= 0)
 		options[opt_idx].def_val[VIM_DEFAULT] = ISK_LATIN1;
 	    (void)init_chartab();
 	}
 #endif
 
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#만약 defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
 	// Win32 console: When GetACP() returns a different value from
 	// GetConsoleCP() set 'termencoding'.
-	if (
+	만약 (
 # ifdef VIMDLL
 		(!gui.in_use && !gui.starting) &&
 # endif
@@ -664,15 +664,15 @@ set_init_default_encoding(void)
 
 	    // Win32 console: In ConPTY, GetConsoleCP() returns zero.
 	    // Use an alternative value.
-	    if (GetConsoleCP() == 0)
+	    만약 (GetConsoleCP() == 0)
 		buflen = vim_snprintf(buf, sizeof(buf), "cp%ld", (long)GetACP());
-	    else
+	    아니면
 		buflen = vim_snprintf(buf, sizeof(buf), "cp%ld", (long)GetConsoleCP());
 	    p_tenc = vim_strnsave((char_u *)buf, buflen);
-	    if (p_tenc != NULL)
+	    만약 (p_tenc != NULL)
 	    {
 		opt_idx = findoption((char_u *)"termencoding");
-		if (opt_idx >= 0)
+		만약 (opt_idx >= 0)
 		{
 		    options[opt_idx].def_val[VI_DEFAULT] = p_tenc;
 		    options[opt_idx].flags |= P_DEF_ALLOCED;
@@ -680,16 +680,16 @@ set_init_default_encoding(void)
 		convert_setup(&input_conv, p_tenc, p_enc);
 		convert_setup(&output_conv, p_enc, p_tenc);
 	    }
-	    else
+	    아니면
 		p_tenc = empty_option;
 	}
 #endif
-#if defined(MSWIN)
+#만약 defined(MSWIN)
 	// $HOME may have characters in active code page.
 	init_homedir();
 #endif
     }
-    else
+    아니면
     {
 	vim_free(p_enc);
 	p_enc = save_enc;
@@ -703,7 +703,7 @@ set_init_default_encoding(void)
  * If "clean_arg" is TRUE Vim was started with --clean.
  */
     void
-set_init_1(int clean_arg)
+set_init_1(정수 clean_arg)
 {
 #ifdef FEAT_LANGMAP
     langmap_init();
@@ -713,7 +713,7 @@ set_init_1(int clean_arg)
     p_cp = TRUE;
 
     // Use POSIX compatibility when $VIM_POSIX is set.
-    if (mch_getenv((char_u *)"VIM_POSIX") != NULL)
+    만약 (mch_getenv((char_u *)"VIM_POSIX") != NULL)
     {
 	set_string_default("cpo", (char_u *)CPO_ALL);
 	set_string_default("shm", (char_u *)SHM_POSIX);
@@ -724,7 +724,7 @@ set_init_1(int clean_arg)
     set_init_default_maxmemtot();
     set_init_default_cdpath();
     set_init_default_printencoding();
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#만약 defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
     set_init_default_printexpr();
 #endif
 
@@ -740,12 +740,12 @@ set_init_1(int clean_arg)
 #endif
 
 #ifdef CLEAN_RUNTIMEPATH
-    if (clean_arg)
+    만약 (clean_arg)
 	set_init_clean_rtp();
 #endif
 
 #ifdef FEAT_GUI
-    if (found_reverse_arg)
+    만약 (found_reverse_arg)
 	set_option_value_give_err((char_u *)"bg", 0L, (char_u *)"dark", 0);
 #endif
 
@@ -776,13 +776,13 @@ set_init_1(int clean_arg)
 
     save_file_ff(curbuf);	// Buffer is unchanged
 
-#if defined(FEAT_ARABIC)
+#만약 defined(FEAT_ARABIC)
     // Detect use of mlterm.
     // Mlterm is a terminal emulator akin to xterm that has some special
     // abilities (bidi namely).
     // NOTE: mlterm's author is being asked to 'set' a variable
     //       instead of an environment variable due to inheritance.
-    if (mch_getenv((char_u *)"MLTERM") != NULL)
+    만약 (mch_getenv((char_u *)"MLTERM") != NULL)
 	set_option_value_give_err((char_u *)"tbidi", 1L, NULL, 0);
 #endif
 
@@ -815,81 +815,81 @@ set_fencs_unicode(void)
  */
     static void
 set_option_default(
-    int		opt_idx,
-    int		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
-    int		compatible)	// use Vi default value
+    정수		opt_idx,
+    정수		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
+    정수		compatible)	// use Vi default value
 {
     char_u	*varp;		// pointer to variable for current option
-    int		dvi;		// index in def_val[]
+    정수		dvi;		// index in def_val[]
     long_u	flags;
     long_u	*flagsp;
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    정수		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
 
     varp = get_varp_scope(&(options[opt_idx]), both ? OPT_LOCAL : opt_flags);
     flags = options[opt_idx].flags;
-    if (varp != NULL)	    // skip hidden option, nothing to do for it
+    만약 (varp != NULL)	    // skip hidden option, nothing to do for it
     {
 	dvi = ((flags & P_VI_DEF) || compatible) ? VI_DEFAULT : VIM_DEFAULT;
-	if (flags & P_STRING)
+	만약 (flags & P_STRING)
 	{
 	    // 'fencs' default value depends on 'encoding'
-	    if (options[opt_idx].var == (char_u *)&p_fencs && enc_utf8)
+	    만약 (options[opt_idx].var == (char_u *)&p_fencs && enc_utf8)
 		set_fencs_unicode();
 	    // Use set_string_option_direct() for local options to handle
 	    // freeing and allocating the value.
-	    else if (options[opt_idx].indir != PV_NONE)
+	    아니면 만약 (options[opt_idx].indir != PV_NONE)
 		set_string_option_direct(NULL, opt_idx,
 				 options[opt_idx].def_val[dvi], opt_flags, 0);
-	    else
+	    아니면
 	    {
-		if ((opt_flags & OPT_FREE) && (flags & P_ALLOCED))
+		만약 ((opt_flags & OPT_FREE) && (flags & P_ALLOCED))
 		    free_string_option(*(char_u **)(varp));
 		*(char_u **)varp = options[opt_idx].def_val[dvi];
 		options[opt_idx].flags &= ~P_ALLOCED;
 	    }
 	}
-	else if (flags & P_NUM)
+	아니면 만약 (flags & P_NUM)
 	{
-	    if (options[opt_idx].indir == PV_SCROLL)
+	    만약 (options[opt_idx].indir == PV_SCROLL)
 		win_comp_scroll(curwin);
-	    else
+	    아니면
 	    {
 		long def_val = (long)(long_i)options[opt_idx].def_val[dvi];
 
-		if ((long *)varp == &curwin->w_p_so
+		만약 ((long *)varp == &curwin->w_p_so
 			|| (long *)varp == &curwin->w_p_siso
 			|| (long *)varp == &curwin->w_p_sop)
 		    // 'scrolloff', 'sidescrolloff', and 'scrolloffpad' local values have a
 		    // different default value than the global default.
 		    *(long *)varp = -1;
-		else
+		아니면
 		    *(long *)varp = def_val;
 		// May also set global value for local option.
-		if (both)
+		만약 (both)
 		    *(long *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
 								def_val;
 	    }
 	}
-	else	// P_BOOL
+	아니면	// P_BOOL
 	{
 	    // the cast to long is required for Manx C, long_i is needed for
 	    // MSVC
-	    *(int *)varp = (int)(long)(long_i)options[opt_idx].def_val[dvi];
+	    *(정수 *)varp = (정수)(long)(long_i)options[opt_idx].def_val[dvi];
 #ifdef UNIX
 	    // 'modeline' defaults to off for root
-	    if (options[opt_idx].indir == PV_ML && getuid() == ROOT_UID)
-		*(int *)varp = FALSE;
+	    만약 (options[opt_idx].indir == PV_ML && getuid() == ROOT_UID)
+		*(정수 *)varp = FALSE;
 #endif
 	    // May also set global value for local option.
-	    if (both)
-		*(int *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
-								*(int *)varp;
+	    만약 (both)
+		*(정수 *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
+								*(정수 *)varp;
 	}
 
 	// The default value is not insecure.
 	flagsp = insecure_flag(curwin, opt_idx, opt_flags);
 	*flagsp = *flagsp & ~P_INSECURE;
-	if (both)
+	만약 (both)
 	{
 	    flagsp = insecure_flag(curwin, opt_idx, OPT_LOCAL);
 	    *flagsp = *flagsp & ~P_INSECURE;
@@ -907,17 +907,17 @@ set_option_default(
  */
     static void
 set_options_default(
-    int		opt_flags)	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
+    정수		opt_flags)	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
 {
-    int		i;
+    정수		i;
     win_T	*wp;
     tabpage_T	*tp;
 
-    for (i = 0; !istermoption_idx(i); i++)
-	if (!(options[i].flags & P_NODEFAULT)
+    위해 (i = 0; !istermoption_idx(i); i++)
+	만약 (!(options[i].flags & P_NODEFAULT)
 		&& (opt_flags == 0
 		    || (options[i].var != (char_u *)&p_enc
-#if defined(FEAT_CRYPT)
+#만약 defined(FEAT_CRYPT)
 			&& options[i].var != (char_u *)&p_cm
 			&& options[i].var != (char_u *)&p_key
 #endif
@@ -936,26 +936,26 @@ set_options_default(
  * When "escape" is TRUE escape spaces with a backslash.
  */
     static void
-set_string_default_esc(char *name, char_u *val, int escape)
+set_string_default_esc(char *name, char_u *val, 정수 escape)
 {
     char_u	*p;
-    int		opt_idx;
+    정수		opt_idx;
 
-    if (escape && vim_strchr(val, ' ') != NULL)
+    만약 (escape && vim_strchr(val, ' ') != NULL)
 	p = vim_strsave_escaped(val, (char_u *)" ");
-    else
+    아니면
 	p = vim_strsave(val);
-    if (p == NULL)		// we don't want a NULL
-	return;
+    만약 (p == NULL)		// we don't want a NULL
+	반환;
 
     opt_idx = findoption((char_u *)name);
-    if (opt_idx < 0)
+    만약 (opt_idx < 0)
     {
 	vim_free(p);
-	return;
+	반환;
     }
 
-    if (options[opt_idx].flags & P_DEF_ALLOCED)
+    만약 (options[opt_idx].flags & P_DEF_ALLOCED)
 	vim_free(options[opt_idx].def_val[VI_DEFAULT]);
     options[opt_idx].def_val[VI_DEFAULT] = p;
     options[opt_idx].flags |= P_DEF_ALLOCED;
@@ -974,35 +974,35 @@ set_string_default(char *name, char_u *val)
     static char_u *
 find_dup_item(char_u *origval, char_u *newval, size_t newvallen, long_u flags)
 {
-    int	    bs = 0;
+    정수	    bs = 0;
     char_u  *s;
 
-    if (origval == NULL)
-	return NULL;
+    만약 (origval == NULL)
+	반환 NULL;
 
-    for (s = origval; *s != NUL; ++s)
+    위해 (s = origval; *s != NUL; ++s)
     {
-	if ((!(flags & P_COMMA)
+	만약 ((!(flags & P_COMMA)
 		    || s == origval
 		    || (s[-1] == ',' && !(bs & 1)))
 		&& STRNCMP(s, newval, newvallen) == 0
 		&& (!(flags & P_COMMA)
 		    || s[newvallen] == ','
 		    || s[newvallen] == NUL))
-	    return s;
+	    반환 s;
 	// Count backslashes.  Only a comma with an even number of backslashes
 	// or a single backslash preceded by a comma before it is recognized as
 	// a separator.
-	if ((s > origval + 1
+	만약 ((s > origval + 1
 		    && s[-1] == '\\'
 		    && s[-2] != ',')
 		|| (s == origval + 1
 		    && s[-1] == '\\'))
 	    ++bs;
-	else
+	아니면
 	    bs = 0;
     }
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -1012,35 +1012,35 @@ find_dup_item(char_u *origval, char_u *newval, size_t newvallen, long_u flags)
     void
 set_number_default(char *name, long val)
 {
-    int		opt_idx;
+    정수		opt_idx;
 
     opt_idx = findoption((char_u *)name);
-    if (opt_idx >= 0)
+    만약 (opt_idx >= 0)
 	options[opt_idx].def_val[VI_DEFAULT] = (char_u *)(long_i)val;
 }
 
-#if defined(FEAT_PROP_POPUP)
+#만약 defined(FEAT_PROP_POPUP)
 /*
  * Set all window-local and buffer-local options to the Vim default.
  * local-global options will use the global value.
  * When "do_buffer" is FALSE don't set buffer-local options.
  */
     void
-set_local_options_default(win_T *wp, int do_buffer)
+set_local_options_default(win_T *wp, 정수 do_buffer)
 {
     win_T	*save_curwin = curwin;
-    int		i;
+    정수		i;
 
     curwin = wp;
     curbuf = curwin->w_buffer;
     block_autocmds();
 
-    for (i = 0; !istermoption_idx(i); i++)
+    위해 (i = 0; !istermoption_idx(i); i++)
     {
 	struct vimoption    *p = &(options[i]);
 	char_u		    *varp = get_varp_scope(p, OPT_LOCAL);
 
-	if (p->indir != PV_NONE
+	만약 (p->indir != PV_NONE
 		&& (do_buffer || (p->indir & PV_BUF) == 0)
 		&& !(options[i].flags & P_NODEFAULT)
 		&& !optval_default(p, varp, FALSE))
@@ -1053,33 +1053,33 @@ set_local_options_default(win_T *wp, int do_buffer)
 }
 #endif
 
-#if defined(EXITFREE)
+#만약 defined(EXITFREE)
 /*
  * Free all options.
  */
     void
 free_all_options(void)
 {
-    int		i;
+    정수		i;
 
-    for (i = 0; !istermoption_idx(i); i++)
+    위해 (i = 0; !istermoption_idx(i); i++)
     {
-	if (options[i].indir == PV_NONE)
+	만약 (options[i].indir == PV_NONE)
 	{
 	    // global option: free value and default value.
-	    if ((options[i].flags & P_ALLOCED) && options[i].var != NULL)
+	    만약 ((options[i].flags & P_ALLOCED) && options[i].var != NULL)
 		free_string_option(*(char_u **)options[i].var);
-	    if (options[i].flags & P_DEF_ALLOCED)
+	    만약 (options[i].flags & P_DEF_ALLOCED)
 		free_string_option(options[i].def_val[VI_DEFAULT]);
 	}
-	else if (options[i].var != VAR_WIN
+	아니면 만약 (options[i].var != VAR_WIN
 		&& (options[i].flags & P_STRING))
 	    // buffer-local option: free global value
 	    clear_string_option((char_u **)options[i].var);
     }
     free_operatorfunc_option();
     free_tagfunc_option();
-# if defined(FEAT_EVAL)
+# 만약 defined(FEAT_EVAL)
     free_findfunc_option();
 # endif
 }
@@ -1093,28 +1093,28 @@ free_all_options(void)
     void
 set_init_2(void)
 {
-    int		idx;
+    정수		idx;
 
     // 'scroll' defaults to half the window height. The stored default is zero,
     // which results in the actual value computed from the window height.
     idx = findoption((char_u *)"scroll");
-    if (idx >= 0 && !(options[idx].flags & P_WAS_SET))
+    만약 (idx >= 0 && !(options[idx].flags & P_WAS_SET))
 	set_option_default(idx, OPT_LOCAL, p_cp);
     comp_col();
 
     // 'window' is only for backwards compatibility with Vi.
     // Default is Rows - 1.
-    if (!option_was_set((char_u *)"window"))
+    만약 (!option_was_set((char_u *)"window"))
 	p_window = Rows - 1;
     set_number_default("window", Rows - 1);
 
     // For DOS console the default is always black.
-#if !((defined(MSWIN)) && !defined(FEAT_GUI))
+#만약 !((defined(MSWIN)) && !defined(FEAT_GUI))
     // If 'background' wasn't set by the user, try guessing the value,
     // depending on the terminal name.  Only need to check for terminals
     // with a dark background, that can handle color.
     idx = findoption((char_u *)"bg");
-    if (idx >= 0 && !(options[idx].flags & P_WAS_SET)
+    만약 (idx >= 0 && !(options[idx].flags & P_WAS_SET)
 						 && *term_bg_default() == 'd')
     {
 	set_string_option_direct(NULL, idx, (char_u *)"dark", OPT_FREE, 0);
@@ -1141,57 +1141,57 @@ set_init_2(void)
     void
 set_init_3(void)
 {
-#if defined(UNIX) || defined(MSWIN)
+#만약 defined(UNIX) || defined(MSWIN)
 /*
  * Set 'shellpipe' and 'shellredir', depending on the 'shell' option.
  * This is done after other initializations, where 'shell' might have been
  * set, but only if they have not been set before.
  */
     char_u  *p;
-    int	    idx_srr;
-    int	    do_srr;
+    정수	    idx_srr;
+    정수	    do_srr;
 # ifdef FEAT_QUICKFIX
-    int	    idx_sp;
-    int	    do_sp;
+    정수	    idx_sp;
+    정수	    do_sp;
 # endif
 
     idx_srr = findoption((char_u *)"srr");
-    if (idx_srr < 0)
+    만약 (idx_srr < 0)
 	do_srr = FALSE;
-    else
+    아니면
 	do_srr = !(options[idx_srr].flags & P_WAS_SET);
 # ifdef FEAT_QUICKFIX
     idx_sp = findoption((char_u *)"sp");
-    if (idx_sp < 0)
+    만약 (idx_sp < 0)
 	do_sp = FALSE;
-    else
+    아니면
 	do_sp = !(options[idx_sp].flags & P_WAS_SET);
 # endif
     p = get_isolated_shell_name();
-    if (p != NULL)
+    만약 (p != NULL)
     {
 	// Default for p_sp is "| tee", for p_srr is ">".
 	// For known shells it is changed here to include stderr.
-	if (	   fnamecmp(p, "csh") == 0
+	만약 (	   fnamecmp(p, "csh") == 0
 		|| fnamecmp(p, "tcsh") == 0
-# if defined(MSWIN)	// also check with .exe extension
+# 만약 defined(MSWIN)	// also check with .exe extension
 		|| fnamecmp(p, "csh.exe") == 0
 		|| fnamecmp(p, "tcsh.exe") == 0
 # endif
 	   )
 	{
-# if defined(FEAT_QUICKFIX)
-	    if (do_sp)
+# 만약 defined(FEAT_QUICKFIX)
+	    만약 (do_sp)
 	    {
 #  ifdef MSWIN
 		p_sp = (char_u *)">&";
-#  else
+#  아니면
 		p_sp = (char_u *)"|& tee";
 #  endif
 		options[idx_sp].def_val[VI_DEFAULT] = p_sp;
 	    }
 # endif
-	    if (do_srr)
+	    만약 (do_srr)
 	    {
 		p_srr = (char_u *)">&";
 		options[idx_srr].def_val[VI_DEFAULT] = p_srr;
@@ -1200,27 +1200,27 @@ set_init_3(void)
 # ifdef MSWIN
 	// Windows PowerShell output is UTF-16 with BOM so re-encode to the
 	// current codepage.
-	else if (   fnamecmp(p, "powershell") == 0
+	아니면 만약 (   fnamecmp(p, "powershell") == 0
 		    || fnamecmp(p, "powershell.exe") == 0
 		)
 	{
-#  if defined(FEAT_QUICKFIX)
-		if (do_sp)
+#  만약 defined(FEAT_QUICKFIX)
+		만약 (do_sp)
 		{
 		    p_sp = (char_u *)"2>&1 | Out-File -Encoding default";
 		    options[idx_sp].def_val[VI_DEFAULT] = p_sp;
 		}
 #  endif
-		if (do_srr)
+		만약 (do_srr)
 		{
 		    p_srr = (char_u *)"2>&1 | Out-File -Encoding default";
 		    options[idx_srr].def_val[VI_DEFAULT] = p_srr;
 		}
 	}
 # endif
-	else
+	아니면
 	    // Always use POSIX shell style redirection if we reach this
-	    if (       fnamecmp(p, "sh") == 0
+	    만약 (       fnamecmp(p, "sh") == 0
 		    || fnamecmp(p, "ksh") == 0
 		    || fnamecmp(p, "mksh") == 0
 		    || fnamecmp(p, "pdksh") == 0
@@ -1246,21 +1246,21 @@ set_init_3(void)
 # endif
 		    )
 	    {
-# if defined(FEAT_QUICKFIX)
-		if (do_sp)
+# 만약 defined(FEAT_QUICKFIX)
+		만약 (do_sp)
 		{
 #  ifdef MSWIN
 		    p_sp = (char_u *)">%s 2>&1";
-#  else
-		    if (fnamecmp(p, "pwsh") == 0)
+#  아니면
+		    만약 (fnamecmp(p, "pwsh") == 0)
 			p_sp = (char_u *)">%s 2>&1";
-		    else
+		    아니면
 			p_sp = (char_u *)"2>&1| tee";
 #  endif
 		    options[idx_sp].def_val[VI_DEFAULT] = p_sp;
 		}
 # endif
-		if (do_srr)
+		만약 (do_srr)
 		{
 		    p_srr = (char_u *)">%s 2>&1";
 		    options[idx_srr].def_val[VI_DEFAULT] = p_srr;
@@ -1270,7 +1270,7 @@ set_init_3(void)
     }
 #endif
 
-#if defined(MSWIN)
+#만약 defined(MSWIN)
     /*
      * Set 'shellcmdflag', 'shellxquote', and 'shellquote' depending on the
      * 'shell' option.
@@ -1286,30 +1286,30 @@ set_init_3(void)
      *
      * For Win32 p_sxq is set instead of p_shq to include shell redirection.
      */
-    if (strstr((char *)gettail(p_sh), "powershell") != NULL)
+    만약 (strstr((char *)gettail(p_sh), "powershell") != NULL)
     {
-	int	idx_opt;
+	정수	idx_opt;
 
 	idx_opt = findoption((char_u *)"shcf");
-	if (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_SET))
+	만약 (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_SET))
 	{
 	    p_shcf = (char_u*)"-Command";
 	    options[idx_opt].def_val[VI_DEFAULT] = p_shcf;
 	}
 
 	idx_opt = findoption((char_u *)"sxq");
-	if (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_SET))
+	만약 (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_SET))
 	{
 	    p_sxq = (char_u*)"\"";
 	    options[idx_opt].def_val[VI_DEFAULT] = p_sxq;
 	}
     }
-    else if (strstr((char *)gettail(p_sh), "sh") != NULL)
+    아니면 만약 (strstr((char *)gettail(p_sh), "sh") != NULL)
     {
-	int	idx3;
+	정수	idx3;
 
 	idx3 = findoption((char_u *)"shcf");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	만약 (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
 	{
 	    p_shcf = (char_u *)"-c";
 	    options[idx3].def_val[VI_DEFAULT] = p_shcf;
@@ -1317,15 +1317,15 @@ set_init_3(void)
 
 	// Somehow Win32 requires the quotes around the redirection too
 	idx3 = findoption((char_u *)"sxq");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	만약 (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
 	{
 	    p_sxq = (char_u *)"\"";
 	    options[idx3].def_val[VI_DEFAULT] = p_sxq;
 	}
     }
-    else if (strstr((char *)gettail(p_sh), "cmd.exe") != NULL)
+    아니면 만약 (strstr((char *)gettail(p_sh), "cmd.exe") != NULL)
     {
-	int	idx3;
+	정수	idx3;
 
 	/*
 	 * cmd.exe on Windows will strip the first and last double quote given
@@ -1341,14 +1341,14 @@ set_init_3(void)
 	 * '"path with spaces/cmd" "a&b"'.
 	 */
 	idx3 = findoption((char_u *)"sxq");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	만약 (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
 	{
 	    p_sxq = (char_u *)"(";
 	    options[idx3].def_val[VI_DEFAULT] = p_sxq;
 	}
 
 	idx3 = findoption((char_u *)"shcf");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	만약 (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
 	{
 	    p_shcf = (char_u *)"/c";
 	    options[idx3].def_val[VI_DEFAULT] = p_shcf;
@@ -1356,19 +1356,19 @@ set_init_3(void)
     }
 #endif
 
-    if (BUFEMPTY())
+    만약 (BUFEMPTY())
     {
-	int idx_ffs = findoption((char_u *)"ffs");
+	정수 idx_ffs = findoption((char_u *)"ffs");
 
 	// Apply the first entry of 'fileformats' to the initial buffer.
-	if (idx_ffs >= 0 && (options[idx_ffs].flags & P_WAS_SET))
+	만약 (idx_ffs >= 0 && (options[idx_ffs].flags & P_WAS_SET))
 	    set_fileformat(default_fileformat(), OPT_LOCAL);
     }
 
     set_title_defaults();
 }
 
-#if defined(FEAT_MULTI_LANG)
+#만약 defined(FEAT_MULTI_LANG)
 /*
  * When 'helplang' is still at its default value, set it to "lang".
  * Only the first two characters of "lang" are used.
@@ -1376,35 +1376,35 @@ set_init_3(void)
     void
 set_helplang_default(char_u *lang)
 {
-    int		idx;
+    정수		idx;
     size_t	langlen;
 
-    if (lang == NULL)	// safety check
-	return;
+    만약 (lang == NULL)	// safety check
+	반환;
 
     langlen = STRLEN(lang);
-    if (langlen < 2)	// safety check
-	return;
+    만약 (langlen < 2)	// safety check
+	반환;
 
     idx = findoption((char_u *)"hlg");
-    if (idx < 0 || (options[idx].flags & P_WAS_SET))
-	return;
+    만약 (idx < 0 || (options[idx].flags & P_WAS_SET))
+	반환;
 
-    if (options[idx].flags & P_ALLOCED)
+    만약 (options[idx].flags & P_ALLOCED)
 	free_string_option(p_hlg);
     p_hlg = vim_strnsave(lang, langlen);
-    if (p_hlg == NULL)
+    만약 (p_hlg == NULL)
 	p_hlg = empty_option;
-    else
+    아니면
     {
 	// zh_CN becomes "cn", zh_TW becomes "tw"
-	if (STRNICMP(p_hlg, "zh_", 3) == 0 && langlen >= 5)
+	만약 (STRNICMP(p_hlg, "zh_", 3) == 0 && langlen >= 5)
 	{
 	    p_hlg[0] = TOLOWER_ASC(p_hlg[3]);
 	    p_hlg[1] = TOLOWER_ASC(p_hlg[4]);
 	}
 	// any C like setting, such as C.UTF-8, becomes "en"
-	else if (langlen >= 1 && *p_hlg == 'C')
+	아니면 만약 (langlen >= 1 && *p_hlg == 'C')
 	{
 	    p_hlg[0] = 'e';
 	    p_hlg[1] = 'n';
@@ -1425,34 +1425,34 @@ set_helplang_default(char_u *lang)
     void
 set_title_defaults(void)
 {
-    int	    idx1;
+    정수	    idx1;
     long    val;
 
     // If GUI is (going to be) used, we can always set the window title and
     // icon name.  Saves a bit of time, because the X11 display server does
     // not need to be contacted.
     idx1 = findoption((char_u *)"title");
-    if (idx1 >= 0 && !(options[idx1].flags & P_WAS_SET))
+    만약 (idx1 >= 0 && !(options[idx1].flags & P_WAS_SET))
     {
 #ifdef FEAT_GUI
-	if (gui.starting || gui.in_use)
+	만약 (gui.starting || gui.in_use)
 	    val = TRUE;
-	else
+	아니면
 #endif
 	    val = mch_can_restore_title();
 	options[idx1].def_val[VI_DEFAULT] = (char_u *)(long_i)val;
 	p_title = val;
     }
     idx1 = findoption((char_u *)"icon");
-    if (idx1 < 0 || (options[idx1].flags & P_WAS_SET))
+    만약 (idx1 < 0 || (options[idx1].flags & P_WAS_SET))
     {
-	return;
+	반환;
     }
 
 #ifdef FEAT_GUI
-    if (gui.starting || gui.in_use)
+    만약 (gui.starting || gui.in_use)
 	val = TRUE;
-    else
+    아니면
 #endif
 	val = mch_can_restore_icon();
     options[idx1].def_val[VI_DEFAULT] = (char_u *)(long_i)val;
@@ -1462,19 +1462,19 @@ set_title_defaults(void)
     void
 ex_set(exarg_T *eap)
 {
-    int		flags = 0;
+    정수		flags = 0;
 
-    if (eap->cmdidx == CMD_setlocal)
+    만약 (eap->cmdidx == CMD_setlocal)
 	flags = OPT_LOCAL;
-    else if (eap->cmdidx == CMD_setglobal)
+    아니면 만약 (eap->cmdidx == CMD_setglobal)
 	flags = OPT_GLOBAL;
-#if defined(FEAT_EVAL) && defined(FEAT_BROWSE)
-    if ((cmdmod.cmod_flags & CMOD_BROWSE) && flags == 0)
+#만약 defined(FEAT_EVAL) && defined(FEAT_BROWSE)
+    만약 ((cmdmod.cmod_flags & CMOD_BROWSE) && flags == 0)
 	ex_options(eap);
-    else
+    아니면
 #endif
     {
-	if (eap->forceit)
+	만약 (eap->forceit)
 	    flags |= OPT_ONECOLUMN;
 	(void)do_set(eap->arg, flags);
     }
@@ -1495,22 +1495,22 @@ typedef enum {
     static set_prefix_T
 get_option_prefix(char_u **argp)
 {
-    int		prefix = PREFIX_NONE;
+    정수		prefix = PREFIX_NONE;
     char_u	*arg = *argp;
 
-    if (STRNCMP(arg, "no", 2) == 0 && STRNCMP(arg, "novice", 6) != 0)
+    만약 (STRNCMP(arg, "no", 2) == 0 && STRNCMP(arg, "novice", 6) != 0)
     {
 	prefix = PREFIX_NO;
 	arg += 2;
     }
-    else if (STRNCMP(arg, "inv", 3) == 0)
+    아니면 만약 (STRNCMP(arg, "inv", 3) == 0)
     {
 	prefix = PREFIX_INV;
 	arg += 3;
     }
 
     *argp = arg;
-    return prefix;
+    반환 prefix;
 }
 
 /*
@@ -1521,51 +1521,51 @@ get_option_prefix(char_u **argp)
  * Returns FAIL if an option starting with "<" doesn't end with a ">",
  * otherwise returns OK.
  */
-    static int
-parse_option_name(char_u *arg, int *opt_idxp, int *lenp, int *keyp)
+    static 정수
+parse_option_name(char_u *arg, 정수 *opt_idxp, 정수 *lenp, 정수 *keyp)
 {
-    int	key = 0;
-    int	len;
-    int	opt_idx;
+    정수	key = 0;
+    정수	len;
+    정수	opt_idx;
 
-    if (*arg == '<')
+    만약 (*arg == '<')
     {
 	opt_idx = -1;
 	// look out for <t_>;>
-	if (arg[1] == 't' && arg[2] == '_' && arg[3] && arg[4])
+	만약 (arg[1] == 't' && arg[2] == '_' && arg[3] && arg[4])
 	    len = 5;
-	else
+	아니면
 	{
 	    len = 1;
-	    while (arg[len] != NUL && arg[len] != '>')
+	    동안 (arg[len] != NUL && arg[len] != '>')
 		++len;
 	}
-	if (arg[len] != '>')
-	    return FAIL;
+	만약 (arg[len] != '>')
+	    반환 FAIL;
 
 	arg[len] = NUL;			    // put NUL after name
-	if (arg[1] == 't' && arg[2] == '_') // could be term code
+	만약 (arg[1] == 't' && arg[2] == '_') // could be term code
 	    opt_idx = findoption(arg + 1);
 	arg[len++] = '>';		    // restore '>'
-	if (opt_idx == -1)
+	만약 (opt_idx == -1)
 	    key = find_key_option(arg + 1, TRUE);
     }
-    else
+    아니면
     {
-	int	nextchar;   // next non-white char after option name
+	정수	nextchar;   // next non-white char after option name
 
 	len = 0;
 	// The two characters after "t_" may not be alphanumeric.
-	if (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
+	만약 (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
 	    len = 4;
-	else
-	    while (ASCII_ISALNUM(arg[len]) || arg[len] == '_')
+	아니면
+	    동안 (ASCII_ISALNUM(arg[len]) || arg[len] == '_')
 		++len;
 	nextchar = arg[len];
 	arg[len] = NUL;			    // put NUL after name
 	opt_idx = findoption(arg);
 	arg[len] = nextchar;		    // restore nextchar
-	if (opt_idx == -1)
+	만약 (opt_idx == -1)
 	    key = find_key_option(arg, FALSE);
     }
 
@@ -1573,7 +1573,7 @@ parse_option_name(char_u *arg, int *opt_idxp, int *lenp, int *keyp)
     *lenp = len;
     *opt_idxp = opt_idx;
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -1584,17 +1584,17 @@ get_opt_op(char_u *arg)
 {
     set_op_T op = OP_NONE;
 
-    if (*arg != NUL && *(arg + 1) == '=')
+    만약 (*arg != NUL && *(arg + 1) == '=')
     {
-	if (*arg == '+')
+	만약 (*arg == '+')
 	    op = OP_ADDING;		// "+="
-	else if (*arg == '^')
+	아니면 만약 (*arg == '^')
 	    op = OP_PREPENDING;		// "^="
-	else if (*arg == '-')
+	아니면 만약 (*arg == '-')
 	    op = OP_REMOVING;		// "-="
     }
 
-    return op;
+    반환 op;
 }
 
 // Options that are allowed in a modeline when 'modelinestrict' is on.
@@ -1630,10 +1630,10 @@ static char *modeline_whitelist[] =
     static bool
 is_modeline_whitelisted(char *name)
 {
-    for (int i = 0; modeline_whitelist[i] != NULL; i++)
-	if (STRCMP(name, modeline_whitelist[i]) == 0)
-	    return true;
-    return false;
+    위해 (정수 i = 0; modeline_whitelist[i] != NULL; i++)
+	만약 (STRCMP(name, modeline_whitelist[i]) == 0)
+	    반환 true;
+    반환 false;
 }
 
 /*
@@ -1641,73 +1641,73 @@ is_modeline_whitelisted(char *name)
  * Returns FAIL if the option can be skipped or cannot be changed. Returns OK
  * if it can be changed.
  */
-    static int
+    static 정수
 validate_opt_idx(
-	int opt_idx,
-	int opt_flags,
+	정수 opt_idx,
+	정수 opt_flags,
 	long_u flags,
 	char **errmsg,
 	set_prefix_T prefix)
 {
     // Skip all options that are not window-local (used when showing
     // an already loaded buffer in a window).
-    if ((opt_flags & OPT_WINONLY)
+    만약 ((opt_flags & OPT_WINONLY)
 	    && (opt_idx < 0 || options[opt_idx].var != VAR_WIN))
-	return FAIL;
+	반환 FAIL;
 
     // Skip all options that are window-local (used for :vimgrep).
-    if ((opt_flags & OPT_NOWIN) && opt_idx >= 0
+    만약 ((opt_flags & OPT_NOWIN) && opt_idx >= 0
 	    && options[opt_idx].var == VAR_WIN)
-	return FAIL;
+	반환 FAIL;
 
     // Disallow changing some options from modelines.
-    if (opt_flags & OPT_MODELINE)
+    만약 (opt_flags & OPT_MODELINE)
     {
-	if (flags & (P_SECURE | P_NO_ML))
+	만약 (flags & (P_SECURE | P_NO_ML))
 	{
 	    *errmsg = e_not_allowed_in_modeline;
-	    return FAIL;
+	    반환 FAIL;
 	}
-	if ((flags & P_MLE) && !p_mle)
+	만약 ((flags & P_MLE) && !p_mle)
 	{
 	    *errmsg = e_not_allowed_in_modeline_when_modelineexpr_is_off;
-	    return FAIL;
+	    반환 FAIL;
 	}
 	// When 'modelinestrict' is on, only whitelisted options may be
 	// set from a modeline.  Silently skip others.
-	if (p_mlstr && opt_idx >= 0)
+	만약 (p_mlstr && opt_idx >= 0)
 	{
 	    // special case: allow disabling modeline
-	    if (options[opt_idx].indir == PV_ML && prefix == PREFIX_NO)
-		return OK;
-	    else if (!is_modeline_whitelisted(options[opt_idx].fullname))
-		return FAIL;
+	    만약 (options[opt_idx].indir == PV_ML && prefix == PREFIX_NO)
+		반환 OK;
+	    아니면 만약 (!is_modeline_whitelisted(options[opt_idx].fullname))
+		반환 FAIL;
 	}
 #ifdef FEAT_DIFF
 	// In diff mode some options are overruled.  This avoids that
 	// 'foldmethod' becomes "marker" instead of "diff" and that
 	// "wrap" gets set.
-	if (curwin->w_p_diff
+	만약 (curwin->w_p_diff
 		&& opt_idx >= 0  // shut up coverity warning
 		&& (
 # ifdef FEAT_FOLDING
 		    options[opt_idx].indir == PV_FDM ||
 # endif
 		    options[opt_idx].indir == PV_WRAP))
-	    return FAIL;
+	    반환 FAIL;
 #endif
     }
 
 #ifdef HAVE_SANDBOX
     // Disallow changing some options in the sandbox
-    if (sandbox != 0 && (flags & P_SECURE))
+    만약 (sandbox != 0 && (flags & P_SECURE))
     {
 	*errmsg = e_not_allowed_in_sandbox;
-	return FAIL;
+	반환 FAIL;
     }
 #endif
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -1715,42 +1715,42 @@ validate_opt_idx(
  */
     static char_u *
 stropt_get_default_val(
-    int		opt_idx,
+    정수		opt_idx,
     char_u	*varp,
-    int		flags,
-    int		cp_val)
+    정수		flags,
+    정수		cp_val)
 {
     char_u	*newval;
 
     newval = options[opt_idx].def_val[((flags & P_VI_DEF) || cp_val)
 	? VI_DEFAULT : VIM_DEFAULT];
-    if ((char_u **)varp == &p_bg)
+    만약 ((char_u **)varp == &p_bg)
     {
 	// guess the value of 'background'
 #ifdef FEAT_GUI
-	if (gui.in_use)
+	만약 (gui.in_use)
 	    newval = gui_bg_default();
-	else
+	아니면
 #endif
 	    newval = term_bg_default();
     }
-    else if ((char_u **)varp == &p_fencs && enc_utf8)
+    아니면 만약 ((char_u **)varp == &p_fencs && enc_utf8)
 	newval = fencs_utf8_default;
 
     // expand environment variables and ~ since the default value was
     // already expanded, only required when an environment variable was set
     // later
-    if (newval == NULL)
+    만약 (newval == NULL)
 	newval = empty_option;
-    else
+    아니면
     {
 	char_u *s = option_expand(opt_idx, newval);
-	if (s == NULL)
+	만약 (s == NULL)
 	    s = newval;
 	newval = vim_strsave(s);
     }
 
-    return newval;
+    반환 newval;
 }
 
 /*
@@ -1765,7 +1765,7 @@ opt_backspace_nr2str(
     char_u	**origval_g_p,
     char_u	**oldval_p)
 {
-    int		i = getdigits((char_u **)varp);
+    정수		i = getdigits((char_u **)varp);
 
     switch (i)
     {
@@ -1783,11 +1783,11 @@ opt_backspace_nr2str(
 	    break;
     }
     vim_free(*oldval_p);
-    if (*origval_p == *oldval_p)
+    만약 (*origval_p == *oldval_p)
 	*origval_p = *(char_u **)varp;
-    if (*origval_l_p == *oldval_p)
+    만약 (*origval_l_p == *oldval_p)
 	*origval_l_p = *(char_u **)varp;
-    if (*origval_g_p == *oldval_p)
+    만약 (*origval_g_p == *oldval_p)
 	*origval_g_p = *(char_u **)varp;
     *oldval_p = *(char_u **)varp;
 }
@@ -1803,36 +1803,36 @@ opt_whichwrap_nr2str(char_u **argp, char_u *whichwrap)
     size_t  len = 0;
 
     *whichwrap = NUL;
-    int i = getdigits(argp);
-    if (i & 1)
+    정수 i = getdigits(argp);
+    만약 (i & 1)
     {
 	STRCPY(whichwrap, "b,");
 	len += 2;
     }
-    if (i & 2)
+    만약 (i & 2)
     {
 	STRCPY(whichwrap + len, "s,");
 	len += 2;
     }
-    if (i & 4)
+    만약 (i & 4)
     {
 	STRCPY(whichwrap + len, "h,l,");
 	len += 4;
     }
-    if (i & 8)
+    만약 (i & 8)
     {
 	STRCPY(whichwrap + len, "<,>,");
 	len += 4;
     }
-    if (i & 16)
+    만약 (i & 16)
     {
 	STRCPY(whichwrap + len, "[,],");
 	len += 4;
     }
-    if (*whichwrap != NUL)	// remove trailing ,
+    만약 (*whichwrap != NUL)	// remove trailing ,
 	whichwrap[len - 1] = NUL;
 
-    return whichwrap;
+    반환 whichwrap;
 }
 
 /*
@@ -1845,7 +1845,7 @@ stropt_copy_value(
     char_u	*origval,
     char_u	**argp,
     set_op_T	op,
-    int		flags UNUSED)
+    정수		flags UNUSED)
 {
     char_u	*arg = *argp;
     unsigned	newlen;
@@ -1854,11 +1854,11 @@ stropt_copy_value(
 
     // get a bit too much
     newlen = (unsigned)STRLEN(arg) + 1;
-    if (op != OP_NONE)
+    만약 (op != OP_NONE)
 	newlen += (unsigned)STRLEN(origval) + 1;
     newval = alloc(newlen);
-    if (newval == NULL)  // out of mem, don't change
-	return NULL;
+    만약 (newval == NULL)  // out of mem, don't change
+	반환 NULL;
     s = newval;
 
     // Copy the string, skip over escaped chars.
@@ -1866,11 +1866,11 @@ stropt_copy_value(
     // are not removed, and keep backslash at start, for "\\machine\path",
     // but do remove it for "\\\\machine\\path".
     // The reverse is found in escape_option_str_cmdline().
-    while (*arg != NUL && !VIM_ISWHITE(*arg))
+    동안 (*arg != NUL && !VIM_ISWHITE(*arg))
     {
-	int i;
+	정수 i;
 
-	if (*arg == '\\' && arg[1] != NUL
+	만약 (*arg == '\\' && arg[1] != NUL
 #ifdef BACKSLASH_IN_FILENAME
 		&& !((flags & P_EXPAND)
 		    && vim_isfilec(arg[1])
@@ -1880,20 +1880,20 @@ stropt_copy_value(
 #endif
 	   )
 	    ++arg;	// remove backslash
-	if (has_mbyte && (i = (*mb_ptr2len)(arg)) > 1)
+	만약 (has_mbyte && (i = (*mb_ptr2len)(arg)) > 1)
 	{
 	    // copy multibyte char
 	    mch_memmove(s, arg, (size_t)i);
 	    arg += i;
 	    s += i;
 	}
-	else
+	아니면
 	    *s++ = *arg++;
     }
     *s = NUL;
 
     *argp = arg;
-    return newval;
+    반환 newval;
 }
 
 /*
@@ -1901,27 +1901,27 @@ stropt_copy_value(
  */
     static char_u *
 stropt_expand_envvar(
-    int		opt_idx,
+    정수		opt_idx,
     char_u	*origval,
     char_u	*newval,
     set_op_T	op)
 {
     char_u *s = option_expand(opt_idx, newval);
-    if (s == NULL)
-	return newval;
+    만약 (s == NULL)
+	반환 newval;
 
     vim_free(newval);
     unsigned newlen = (unsigned)STRLEN(s) + 1;
-    if (op != OP_NONE)
+    만약 (op != OP_NONE)
 	newlen += (unsigned)STRLEN(origval) + 1;
 
     newval = alloc(newlen);
-    if (newval == NULL)
-	return NULL;
+    만약 (newval == NULL)
+	반환 NULL;
 
     STRCPY(newval, s);
 
-    return newval;
+    반환 newval;
 }
 
 /*
@@ -1933,16 +1933,16 @@ stropt_concat_with_comma(
     char_u	*origval,
     char_u	*newval,
     set_op_T	op,
-    int		flags)
+    정수		flags)
 {
-    int		len = 0;
+    정수		len = 0;
 
-    int comma = ((flags & P_COMMA) && *origval != NUL && *newval != NUL);
-    if (op == OP_ADDING)
+    정수 comma = ((flags & P_COMMA) && *origval != NUL && *newval != NUL);
+    만약 (op == OP_ADDING)
     {
-	len = (int)STRLEN(origval);
+	len = (정수)STRLEN(origval);
 	// strip a trailing comma, would get 2
-	if (comma && len > 1
+	만약 (comma && len > 1
 		&& (flags & P_ONECOMMA) == P_ONECOMMA
 		&& origval[len - 1] == ','
 		&& origval[len - 2] != '\\')
@@ -1950,12 +1950,12 @@ stropt_concat_with_comma(
 	mch_memmove(newval + len + comma, newval, STRLEN(newval) + 1);
 	mch_memmove(newval, origval, (size_t)len);
     }
-    else
+    아니면
     {
-	len = (int)STRLEN(newval);
+	len = (정수)STRLEN(newval);
 	STRMOVE(newval + len + comma, origval);
     }
-    if (comma)
+    만약 (comma)
 	newval[len] = ',';
 }
 
@@ -1967,25 +1967,25 @@ stropt_concat_with_comma(
 stropt_remove_val(
     char_u	*origval,
     char_u	*newval,
-    int		flags,
+    정수		flags,
     char_u	*strval,
-    int		len)
+    정수		len)
 {
     // Remove newval[] from origval[]. (Note: "len" has been set above
     // and is used here).
     STRCPY(newval, origval);
-    if (*strval)
+    만약 (*strval)
     {
 	// may need to remove a comma
-	if (flags & P_COMMA)
+	만약 (flags & P_COMMA)
 	{
-	    if (strval == origval)
+	    만약 (strval == origval)
 	    {
 		// include comma after string
-		if (strval[len] == ',')
+		만약 (strval[len] == ',')
 		    ++len;
 	    }
-	    else
+	    아니면
 	    {
 		// include comma before string
 		--strval;
@@ -2003,26 +2003,26 @@ stropt_remove_val(
  * Sets "*itemlenp" to the length of the found item (up to ',' or NUL).
  */
     static char_u *
-find_key_item(char_u *src, char_u *key, int keylen, int *itemlenp)
+find_key_item(char_u *src, char_u *key, 정수 keylen, 정수 *itemlenp)
 {
     char_u  *p = src;
 
-    while (*p != NUL)
+    동안 (*p != NUL)
     {
 	// Check if this item starts with the same key
-	if ((p == src || *(p - 1) == ',')
+	만약 ((p == src || *(p - 1) == ',')
 		&& STRNCMP(p, key, keylen) == 0)
 	{
 	    // Find the end of this item
 	    char_u *end = vim_strchr(p, ',');
-	    if (end == NULL)
+	    만약 (end == NULL)
 		end = p + STRLEN(p);
-	    *itemlenp = (int)(end - p);
-	    return p;
+	    *itemlenp = (정수)(end - p);
+	    반환 p;
 	}
 	++p;
     }
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -2030,15 +2030,15 @@ find_key_item(char_u *src, char_u *key, int keylen, int *itemlenp)
  * string "str" in-place.  Handles the comma before or after the item.
  */
     static void
-remove_comma_item(char_u *str, char_u *item, int itemlen)
+remove_comma_item(char_u *str, char_u *item, 정수 itemlen)
 {
-    if (item[itemlen] == ',')
+    만약 (item[itemlen] == ',')
 	// Remove item and trailing comma
 	STRMOVE(item, item + itemlen + 1);
-    else if (item > str && *(item - 1) == ',')
+    아니면 만약 (item > str && *(item - 1) == ',')
 	// Last item: remove leading comma and item
 	STRMOVE(item - 1, item + itemlen);
-    else
+    아니면
 	// Only item
 	*item = NUL;
 }
@@ -2048,21 +2048,21 @@ remove_comma_item(char_u *str, char_u *item, int itemlen)
  * in-place.  If "skip" is not NULL, the item at that position is kept.
  */
     static void
-remove_key_item(char_u *str, char_u *key, int keylen, char_u *skip)
+remove_key_item(char_u *str, char_u *key, 정수 keylen, char_u *skip)
 {
-    int	    itemlen;
+    정수	    itemlen;
     char_u  *found;
 
-    while ((found = find_key_item(str, key, keylen, &itemlen)) != NULL)
+    동안 ((found = find_key_item(str, key, keylen, &itemlen)) != NULL)
     {
-	if (found == skip)
+	만약 (found == skip)
 	{
 	    // Search for the next match after this one.
 	    char_u *next = found + itemlen;
-	    if (*next == ',')
+	    만약 (*next == ',')
 		++next;
 	    found = find_key_item(next, key, keylen, &itemlen);
-	    if (found == NULL)
+	    만약 (found == NULL)
 		break;
 	}
 
@@ -2075,11 +2075,11 @@ remove_key_item(char_u *str, char_u *key, int keylen, char_u *skip)
  * Adds a comma before the item if "str" is not empty.
  */
     static void
-append_item(char_u *str, char_u *item, int item_len)
+append_item(char_u *str, char_u *item, 정수 item_len)
 {
-    int len = (int)STRLEN(str);
+    정수 len = (정수)STRLEN(str);
 
-    if (len > 0)
+    만약 (len > 0)
 	str[len++] = ',';
     mch_memmove(str + len, item, (size_t)item_len);
     str[len + item_len] = NUL;
@@ -2090,14 +2090,14 @@ append_item(char_u *str, char_u *item, int item_len)
  * Adds a comma after the item if "str" is not empty.
  */
     static void
-prepend_item(char_u *str, char_u *item, int item_len)
+prepend_item(char_u *str, char_u *item, 정수 item_len)
 {
-    int len = (int)STRLEN(str);
-    int comma = (len > 0) ? 1 : 0;
+    정수 len = (정수)STRLEN(str);
+    정수 comma = (len > 0) ? 1 : 0;
 
     mch_memmove(str + item_len + comma, str, (size_t)len + 1);
     mch_memmove(str, item, (size_t)item_len);
-    if (comma)
+    만약 (comma)
 	str[item_len] = ',';
 }
 
@@ -2126,7 +2126,7 @@ stropt_handle_keymatch(
     char_u	*origval,
     char_u	*newval,
     set_op_T	op,
-    int		flags UNUSED)
+    정수		flags UNUSED)
 {
     char_u  *p;
     char_u  *item_start;
@@ -2134,13 +2134,13 @@ stropt_handle_keymatch(
     // Check if newval contains any "key:value" item or multiple
     // comma-separated items.  If neither, let the caller use the existing
     // code path.
-    if (vim_strchr(newval, ':') == NULL && vim_strchr(newval, ',') == NULL)
-	return false;
+    만약 (vim_strchr(newval, ':') == NULL && vim_strchr(newval, ',') == NULL)
+	반환 false;
 
     // Work on a copy of newval for iteration.
     char_u *newval_copy = vim_strsave(newval);
-    if (newval_copy == NULL)
-	return false;
+    만약 (newval_copy == NULL)
+	반환 false;
 
     // Build the result in newval.  Start with a copy of origval, then
     // modify it per-item.  newval buffer has room for origval + arg.
@@ -2148,27 +2148,27 @@ stropt_handle_keymatch(
 
     // Process each item individually, modifying newval in-place.
     item_start = newval_copy;
-    for (;;)
+    위해 (;;)
     {
 	p = vim_strchr(item_start, ',');
-	int item_len = (p == NULL)
-			    ? (int)STRLEN(item_start) : (int)(p - item_start);
+	정수 item_len = (p == NULL)
+			    ? (정수)STRLEN(item_start) : (정수)(p - item_start);
 
-	if (item_len > 0)
+	만약 (item_len > 0)
 	{
 	    char_u *colon = vim_strchr(item_start, ':');
-	    if (colon != NULL && colon < item_start + item_len)
+	    만약 (colon != NULL && colon < item_start + item_len)
 	    {
-		int keylen = (int)(colon - item_start) + 1;
+		정수 keylen = (정수)(colon - item_start) + 1;
 
-		if (op == OP_ADDING || op == OP_PREPENDING)
+		만약 (op == OP_ADDING || op == OP_PREPENDING)
 		{
-		    int old_itemlen;
+		    정수 old_itemlen;
 		    char_u *found = find_key_item(newval, item_start,
 						       keylen, &old_itemlen);
-		    if (found != NULL)
+		    만약 (found != NULL)
 		    {
-			if (old_itemlen == item_len
+			만약 (old_itemlen == item_len
 				&& STRNCMP(found, item_start,
 							 item_len) == 0)
 			{
@@ -2177,90 +2177,90 @@ stropt_handle_keymatch(
 			    remove_key_item(newval, item_start,
 							   keylen, found);
 			}
-			else
+			아니면
 			{
 			    // Key match with different value: remove all
 			    // items with the same key, then add.
 			    remove_key_item(newval, item_start,
 							    keylen, NULL);
-			    if (op == OP_PREPENDING)
+			    만약 (op == OP_PREPENDING)
 				prepend_item(newval, item_start, item_len);
-			    else
+			    아니면
 				append_item(newval, item_start, item_len);
 			}
 		    }
-		    else
+		    아니면
 		    {
 			// New item.
-			if (op == OP_PREPENDING)
+			만약 (op == OP_PREPENDING)
 			    prepend_item(newval, item_start, item_len);
-			else
+			아니면
 			    append_item(newval, item_start, item_len);
 		    }
 		}
-		else if (op == OP_REMOVING)
+		아니면 만약 (op == OP_REMOVING)
 		    remove_key_item(newval, item_start, keylen, NULL);
 	    }
-	    else
+	    아니면
 	    {
-		if (op == OP_ADDING || op == OP_PREPENDING)
+		만약 (op == OP_ADDING || op == OP_PREPENDING)
 		{
 		    char_u *found = find_dup_item(newval, item_start,
 							   item_len, P_COMMA);
-		    if (found == NULL)
+		    만약 (found == NULL)
 		    {
 			// New item.
-			if (op == OP_PREPENDING)
+			만약 (op == OP_PREPENDING)
 			    prepend_item(newval, item_start, item_len);
-			else
+			아니면
 			    append_item(newval, item_start, item_len);
 		    }
 		    // else: exact duplicate — do nothing
 		}
-		else if (op == OP_REMOVING)
+		아니면 만약 (op == OP_REMOVING)
 		{
 		    char_u *found = find_dup_item(newval, item_start,
 							   item_len, P_COMMA);
-		    if (found != NULL)
+		    만약 (found != NULL)
 			remove_comma_item(newval, found, item_len);
 		}
 	    }
 	}
 
-	if (p == NULL)
+	만약 (p == NULL)
 	    break;
 	item_start = p + 1;
     }
 
     vim_free(newval_copy);
 
-    return true;
+    반환 true;
 }
 
 /*
  * Remove flags that appear twice in the string option value 'newval'.
  */
     static void
-stropt_remove_dupflags(char_u *newval, int flags)
+stropt_remove_dupflags(char_u *newval, 정수 flags)
 {
     char_u	*s = newval;
 
     // Remove flags that appear twice.
-    while (*s)
+    동안 (*s)
     {
 	// if options have P_FLAGLIST and P_ONECOMMA such as 'whichwrap'
-	if (flags & P_ONECOMMA)
+	만약 (flags & P_ONECOMMA)
 	{
-	    if (*s != ',' && *(s + 1) == ',' && vim_strchr(s + 2, *s) != NULL)
+	    만약 (*s != ',' && *(s + 1) == ',' && vim_strchr(s + 2, *s) != NULL)
 	    {
 		// Remove the duplicated value and the next comma.
 		STRMOVE(s, s + 2);
 		continue;
 	    }
 	}
-	else
+	아니면
 	{
-	    if ((!(flags & P_COMMA) || *s != ',')
+	    만약 ((!(flags & P_COMMA) || *s != ',')
 		    && vim_strchr(s + 1, *s) != NULL)
 	    {
 		STRMOVE(s, s + 1);
@@ -2281,8 +2281,8 @@ stropt_remove_dupflags(char_u *newval, int flags)
  */
     static char_u *
 stropt_get_newval(
-    int		nextchar,
-    int		opt_idx,
+    정수		nextchar,
+    정수		opt_idx,
     char_u	**argp,
     char_u	*varp,
     char_u	**origval_arg,
@@ -2290,8 +2290,8 @@ stropt_get_newval(
     char_u	**origval_g_arg,
     char_u	**oldval_arg,
     set_op_T    *op_arg,
-    int		flags,
-    int		cp_val)
+    정수		flags,
+    정수		cp_val)
 {
     char_u	*arg = *argp;
     char_u	*origval = *origval_arg;
@@ -2304,27 +2304,27 @@ stropt_get_newval(
     char_u	*s = NULL;
     char_u	whichwrap[80];
 
-    if (nextchar == '&')	// set to default val
+    만약 (nextchar == '&')	// set to default val
 	newval = stropt_get_default_val(opt_idx, varp, flags, cp_val);
-    else if (nextchar == '<')	// set to global val
+    아니면 만약 (nextchar == '<')	// set to global val
 	newval = vim_strsave(*(char_u **)get_varp_scope(
 					     &(options[opt_idx]), OPT_GLOBAL));
-    else
+    아니면
     {
 	++arg;	// jump to after the '=' or ':'
 
 	// Set 'keywordprg' to ":help" if an empty
 	// value was passed to :set by the user.
-	if (varp == (char_u *)&p_kp && (*arg == NUL || *arg == ' '))
+	만약 (varp == (char_u *)&p_kp && (*arg == NUL || *arg == ' '))
 	{
 	    save_arg = arg;
 	    arg = (char_u *)":help";
 	}
 	// Convert 'backspace' number to string
-	else if (varp == (char_u *)&p_bs && VIM_ISDIGIT(**(char_u **)varp))
+	아니면 만약 (varp == (char_u *)&p_bs && VIM_ISDIGIT(**(char_u **)varp))
 	    opt_backspace_nr2str(varp, &origval, &origval_l, &origval_g,
 								&oldval);
-	else if (varp == (char_u *)&p_ww && VIM_ISDIGIT(*arg))
+	아니면 만약 (varp == (char_u *)&p_ww && VIM_ISDIGIT(*arg))
 	{
 	    // Convert 'whichwrap' number to string, for backwards
 	    // compatibility with Vim 3.0.
@@ -2334,68 +2334,68 @@ stropt_get_newval(
 	}
 	// Remove '>' before 'dir' and 'bdir', for backwards compatibility with
 	// version 3.0
-	else if (*arg == '>' && (varp == (char_u *)&p_dir
+	아니면 만약 (*arg == '>' && (varp == (char_u *)&p_dir
 		    || varp == (char_u *)&p_bdir))
 	    ++arg;
 
 	// Copy the new string into allocated memory.
 	newval = stropt_copy_value(origval, &arg, op, flags);
-	if (newval == NULL)
+	만약 (newval == NULL)
 	    goto done;
 
 	// Expand environment variables and ~.
 	// Don't do it when adding without inserting a comma.
-	if (op == OP_NONE || (flags & P_COMMA))
+	만약 (op == OP_NONE || (flags & P_COMMA))
 	{
 	    newval = stropt_expand_envvar(opt_idx, origval, newval, op);
-	    if (newval == NULL)
+	    만약 (newval == NULL)
 		goto done;
 	}
 
 	// For P_COMMA|P_COLON options with "key:value" items: process
 	// each item individually by matching on the key part.  If
 	// handled, skip the normal add/remove logic below.
-	if ((flags & P_COMMA) && (flags & P_COLON) && op != OP_NONE
+	만약 ((flags & P_COMMA) && (flags & P_COLON) && op != OP_NONE
 		&& stropt_handle_keymatch(origval, newval, op, flags))
 	    ;  // fully handled
-	else
+	아니면
 	{
 	    // locate newval[] in origval[] when removing it and when
 	    // adding to avoid duplicates
-	    int len = 0;
-	    if (op == OP_REMOVING || (flags & P_NODUP))
+	    정수 len = 0;
+	    만약 (op == OP_REMOVING || (flags & P_NODUP))
 	    {
-		len = (int)STRLEN(newval);
+		len = (정수)STRLEN(newval);
 		s = find_dup_item(origval, newval, len, flags);
 
 		// do not add if already there
-		if ((op == OP_ADDING || op == OP_PREPENDING) && s != NULL)
+		만약 ((op == OP_ADDING || op == OP_PREPENDING) && s != NULL)
 		{
 		    op = OP_NONE;
 		    STRCPY(newval, origval);
 		}
 
 		// if no duplicate, move pointer to end of original value
-		if (s == NULL)
-		    s = origval + (int)STRLEN(origval);
+		만약 (s == NULL)
+		    s = origval + (정수)STRLEN(origval);
 	    }
 
 	    // concatenate the two strings; add a ',' if needed
-	    if (op == OP_ADDING || op == OP_PREPENDING)
+	    만약 (op == OP_ADDING || op == OP_PREPENDING)
 		stropt_concat_with_comma(origval, newval, op, flags);
-	    else if (op == OP_REMOVING)
+	    아니면 만약 (op == OP_REMOVING)
 		// Remove newval[] from origval[]. (Note: "len" has been
 		// set above and is used here).
 		stropt_remove_val(origval, newval, flags, s, len);
 	}
 
-	if (flags & P_FLAGLIST)
+	만약 (flags & P_FLAGLIST)
 	    // Remove flags that appear twice.
 	    stropt_remove_dupflags(newval, flags);
     }
 
 done:
-    if (save_arg != NULL)
+    만약 (save_arg != NULL)
 	arg = save_arg;  // arg was temporarily changed, restore it
     *argp = arg;
     *origval_arg = origval;
@@ -2404,26 +2404,26 @@ done:
     *oldval_arg = oldval;
     *op_arg = op;
 
-    return newval;
+    반환 newval;
 }
 
 /*
  * Part of do_set() for string options.
  * Returns FAIL on failure, do not process further options.
  */
-    static int
+    static 정수
 do_set_option_string(
-	int	    opt_idx,
-	int	    opt_flags,
+	정수	    opt_idx,
+	정수	    opt_flags,
 	char_u	    **argp,
-	int	    nextchar,
+	정수	    nextchar,
 	set_op_T    op_arg,
 	long_u	    flags,
-	int	    cp_val,
+	정수	    cp_val,
 	char_u	    *varp_arg,
 	char	    *errbuf,
 	size_t	    errbuflen,
-	int	    *value_checked,
+	정수	    *value_checked,
 	char	    **errmsg)
 {
     char_u	*arg = *argp;
@@ -2434,7 +2434,7 @@ do_set_option_string(
     char_u	*origval = NULL;
     char_u	*origval_l = NULL;
     char_u	*origval_g = NULL;
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
     char_u	*saved_origval = NULL;
     char_u	*saved_origval_l = NULL;
     char_u	*saved_origval_g = NULL;
@@ -2444,14 +2444,14 @@ do_set_option_string(
     // When using ":set opt=val" for a global option
     // with a local value the local value will be
     // reset, use the global value here.
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
-	    && ((int)options[opt_idx].indir & PV_BOTH))
+    만약 ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
+	    && ((정수)options[opt_idx].indir & PV_BOTH))
 	varp = options[opt_idx].var;
 
     // The old value is kept until we are sure that the new value is valid.
     oldval = *(char_u **)varp;
 
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    만약 ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	origval_l = *(char_u **)get_varp_scope(
 			   &(options[opt_idx]), OPT_LOCAL);
@@ -2460,16 +2460,16 @@ do_set_option_string(
 
 	// A global-local string option might have an empty option as value to
 	// indicate that the global value should be used.
-	if (((int)options[opt_idx].indir & PV_BOTH)
+	만약 (((정수)options[opt_idx].indir & PV_BOTH)
 						  && origval_l == empty_option)
 	    origval_l = origval_g;
     }
 
     // When setting the local value of a global option, the old value may be
     // the global value.
-    if (((int)options[opt_idx].indir & PV_BOTH) && (opt_flags & OPT_LOCAL))
+    만약 (((정수)options[opt_idx].indir & PV_BOTH) && (opt_flags & OPT_LOCAL))
 	origval = *(char_u **)get_varp(&options[opt_idx]);
-    else
+    아니면
 	origval = oldval;
 
     // Get the new value for the option
@@ -2479,11 +2479,11 @@ do_set_option_string(
 
     // Set the new value.
     *(char_u **)(varp) = newval;
-    if (newval == NULL)
+    만약 (newval == NULL)
 	*(char_u **)(varp) = empty_option;
 
-#if defined(FEAT_EVAL)
-    if (!starting
+#만약 defined(FEAT_EVAL)
+    만약 (!starting
 # ifdef FEAT_CRYPT
 	    && options[opt_idx].indir != PV_KEY
 # endif
@@ -2494,22 +2494,22 @@ do_set_option_string(
 	// newval (and varp) may become invalid if the buffer is closed by
 	// autocommands.
 	saved_newval = vim_strsave(newval);
-	if (origval_l != NULL)
+	만약 (origval_l != NULL)
 	    saved_origval_l = vim_strsave(origval_l);
-	if (origval_g != NULL)
+	만약 (origval_g != NULL)
 	    saved_origval_g = vim_strsave(origval_g);
     }
 #endif
 
     {
 	long_u	*p = insecure_flag(curwin, opt_idx, opt_flags);
-	int	secure_saved = secure;
+	정수	secure_saved = secure;
 
 	// When an option is set in the sandbox, from a modeline or in secure
 	// mode, then deal with side effects in secure mode.  Also when the
 	// value was set with the P_INSECURE flag and is not completely
 	// replaced.
-	if ((opt_flags & OPT_MODELINE)
+	만약 ((opt_flags & OPT_MODELINE)
 #ifdef HAVE_SANDBOX
 	      || sandbox != 0
 #endif
@@ -2526,8 +2526,8 @@ do_set_option_string(
 	secure = secure_saved;
     }
 
-#if defined(FEAT_EVAL)
-    if (*errmsg == NULL)
+#만약 defined(FEAT_EVAL)
+    만약 (*errmsg == NULL)
 	trigger_optionset_string(opt_idx, opt_flags, saved_origval,
 			       saved_origval_l, saved_origval_g, saved_newval);
     vim_free(saved_origval);
@@ -2537,7 +2537,7 @@ do_set_option_string(
 #endif
 
     *argp = arg;
-    return *errmsg == NULL ? OK : FAIL;
+    반환 *errmsg == NULL ? OK : FAIL;
 }
 
 /*
@@ -2546,58 +2546,58 @@ do_set_option_string(
  */
     static char *
 do_set_option_bool(
-    int		opt_idx,
-    int		opt_flags,
+    정수		opt_idx,
+    정수		opt_flags,
     set_prefix_T prefix,
     long_u	flags,
     char_u	*varp,
-    int		nextchar,
-    int		afterchar,
-    int		cp_val)
+    정수		nextchar,
+    정수		afterchar,
+    정수		cp_val)
 
 {
     varnumber_T	value;
 
-    if (nextchar == '=' || nextchar == ':')
-	return e_invalid_argument;
-    if (opt_idx < 0 || varp == NULL)
-	return NULL;  // "cannot happen"
+    만약 (nextchar == '=' || nextchar == ':')
+	반환 e_invalid_argument;
+    만약 (opt_idx < 0 || varp == NULL)
+	반환 NULL;  // "cannot happen"
 
     // ":set opt!": invert
     // ":set opt&": reset to default value
     // ":set opt<": reset to global value
-    if (nextchar == '!')
-	value = *(int *)(varp) ^ 1;
-    else if (nextchar == '&')
-	value = (int)(long)(long_i)options[opt_idx].def_val[
+    만약 (nextchar == '!')
+	value = *(정수 *)(varp) ^ 1;
+    아니면 만약 (nextchar == '&')
+	value = (정수)(long)(long_i)options[opt_idx].def_val[
 	    ((flags & P_VI_DEF) || cp_val) ? VI_DEFAULT : VIM_DEFAULT];
-    else if (nextchar == '<')
+    아니면 만약 (nextchar == '<')
     {
 	// For 'autoread' -1 means to use global value.
-	if ((int *)varp == &curbuf->b_p_ar && opt_flags == OPT_LOCAL)
+	만약 ((정수 *)varp == &curbuf->b_p_ar && opt_flags == OPT_LOCAL)
 	    value = -1;
-	else if ((int *)varp == &curbuf->b_p_ac && opt_flags == OPT_LOCAL)
+	아니면 만약 ((정수 *)varp == &curbuf->b_p_ac && opt_flags == OPT_LOCAL)
 	    value = -1;
 #ifdef HAVE_FSYNC
-	else if ((int *)varp == &curbuf->b_p_fs && opt_flags == OPT_LOCAL)
+	아니면 만약 ((정수 *)varp == &curbuf->b_p_fs && opt_flags == OPT_LOCAL)
 	    value = -1;
 #endif
-	else
-	    value = *(int *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
+	아니면
+	    value = *(정수 *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
     }
-    else
+    아니면
     {
 	// ":set invopt": invert
 	// ":set opt" or ":set noopt": set or reset
-	if (nextchar != NUL && !VIM_ISWHITE(afterchar))
-	    return e_trailing_characters;
-	if (prefix == PREFIX_INV)
-	    value = *(int *)(varp) ^ 1;
-	else
+	만약 (nextchar != NUL && !VIM_ISWHITE(afterchar))
+	    반환 e_trailing_characters;
+	만약 (prefix == PREFIX_INV)
+	    value = *(정수 *)(varp) ^ 1;
+	아니면
 	    value = prefix == PREFIX_NO ? 0 : 1;
     }
 
-    return set_bool_option(opt_idx, varp, (int)value, opt_flags);
+    반환 set_bool_option(opt_idx, varp, (정수)value, opt_flags);
 }
 
 /*
@@ -2606,24 +2606,24 @@ do_set_option_bool(
  */
     static char *
 do_set_option_numeric(
-    int		opt_idx,
-    int		opt_flags,
+    정수		opt_idx,
+    정수		opt_flags,
     char_u	**argp,
-    int		nextchar,
+    정수		nextchar,
     set_op_T	op,
     long_u	flags,
-    int		cp_val,
+    정수		cp_val,
     char_u	*varp,
     char	*errbuf,
     size_t	errbuflen)
 {
     char_u		*arg = *argp;
     varnumber_T		value;
-    int			i;
+    정수			i;
     char		*errmsg = NULL;
 
-    if (opt_idx < 0 || varp == NULL)
-	return NULL;  // "cannot happen"
+    만약 (opt_idx < 0 || varp == NULL)
+	반환 NULL;  // "cannot happen"
 		      //
     /*
      * Different ways to set a number option:
@@ -2636,24 +2636,24 @@ do_set_option_numeric(
      * other	    error
      */
     ++arg;
-    if (nextchar == '&')
+    만약 (nextchar == '&')
 	value = (long)(long_i)options[opt_idx].def_val[
 	    ((flags & P_VI_DEF) || cp_val) ? VI_DEFAULT : VIM_DEFAULT];
-    else if (nextchar == '<')
+    아니면 만약 (nextchar == '<')
     {
-	if ((long *)varp == &curbuf->b_p_ul && opt_flags == OPT_LOCAL)
+	만약 ((long *)varp == &curbuf->b_p_ul && opt_flags == OPT_LOCAL)
 	    // for 'undolevels' NO_LOCAL_UNDOLEVEL means using the global value
 	    value = NO_LOCAL_UNDOLEVEL;
-	else if (opt_flags == OPT_LOCAL
+	아니면 만약 (opt_flags == OPT_LOCAL
 		    && ((long *)varp == &curwin->w_p_siso
 		     || (long *)varp == &curwin->w_p_so
 		     || (long *)varp == &curwin->w_p_sop))
 	    // for 'scrolloff'/'sidescrolloff'/'scrolloffpad' -1 means using the global value
 	    value = -1;
-	else
+	아니면
 	    value = *(long *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
     }
-    else if (((long *)varp == &p_wc || (long *)varp == &p_wcm)
+    아니면 만약 (((long *)varp == &p_wc || (long *)varp == &p_wcm)
 	    && (*arg == '<'
 		|| *arg == '^'
 		|| (*arg != NUL
@@ -2661,36 +2661,36 @@ do_set_option_numeric(
 		    && !VIM_ISDIGIT(*arg))))
     {
 	value = string_to_key(arg, FALSE);
-	if (value == 0)
+	만약 (value == 0)
 	{
 	    errmsg = e_invalid_argument;
 	    goto skip;
 	}
     }
-    else if (*arg == '-' || VIM_ISDIGIT(*arg))
+    아니면 만약 (*arg == '-' || VIM_ISDIGIT(*arg))
     {
 	// Allow negative (for 'undolevels'), octal and hex numbers.
 	vim_str2nr(arg, NULL, &i, STR2NR_ALL, &value, NULL, 0, TRUE, NULL);
-	if (i == 0 || (arg[i] != NUL && !VIM_ISWHITE(arg[i])))
+	만약 (i == 0 || (arg[i] != NUL && !VIM_ISWHITE(arg[i])))
 	{
 	    errmsg = e_number_required_after_equal;
 	    goto skip;
 	}
     }
-    else
+    아니면
     {
 	errmsg = e_number_required_after_equal;
 	goto skip;
     }
 
-    if (op == OP_ADDING)
+    만약 (op == OP_ADDING)
 	value = *(long *)varp + value;
-    else if (op == OP_PREPENDING)
+    아니면 만약 (op == OP_PREPENDING)
 	value = *(long *)varp * value;
-    else if (op == OP_REMOVING)
+    아니면 만약 (op == OP_REMOVING)
 	value = *(long *)varp - value;
 
-    if ((long *)varp == &curwin->w_p_sop && value < -1)
+    만약 ((long *)varp == &curwin->w_p_sop && value < -1)
     {
 	errmsg = e_invalid_argument;
 	goto skip;
@@ -2701,40 +2701,40 @@ do_set_option_numeric(
 
 skip:
     *argp = arg;
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
  * Set a key code (t_xx) option
  */
     static char *
-do_set_option_keycode(char_u **argp, char_u *key_name, int nextchar)
+do_set_option_keycode(char_u **argp, char_u *key_name, 정수 nextchar)
 {
     char_u	*arg = *argp;
     char_u	*p;
 
-    if (nextchar == '&')
+    만약 (nextchar == '&')
     {
-	if (add_termcap_entry(key_name, TRUE) == FAIL)
-	    return e_not_found_in_termcap;
+	만약 (add_termcap_entry(key_name, TRUE) == FAIL)
+	    반환 e_not_found_in_termcap;
     }
-    else
+    아니면
     {
 	++arg; // jump to after the '=' or ':'
-	for (p = arg; *p && !VIM_ISWHITE(*p); ++p)
-	    if (*p == '\\' && p[1] != NUL)
+	위해 (p = arg; *p && !VIM_ISWHITE(*p); ++p)
+	    만약 (*p == '\\' && p[1] != NUL)
 		++p;
 	nextchar = *p;
 	*p = NUL;
 	add_termcode(key_name, arg, FALSE);
 	*p = nextchar;
     }
-    if (full_screen)
+    만약 (full_screen)
 	ttest(FALSE);
     redraw_all_later(UPD_CLEAR);
 
     *argp = arg;
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -2742,80 +2742,80 @@ do_set_option_keycode(char_u **argp, char_u *key_name, int nextchar)
  */
     static char *
 do_set_option_value(
-    int		opt_idx,
-    int		opt_flags,
+    정수		opt_idx,
+    정수		opt_flags,
     char_u	**argp,
     set_prefix_T prefix,
     set_op_T	op,
     long_u	flags,
     char_u	*varp,
     char_u	*key_name,
-    int		nextchar,
-    int		afterchar,
-    int		cp_val,
-    int		*stopopteval,
+    정수		nextchar,
+    정수		afterchar,
+    정수		cp_val,
+    정수		*stopopteval,
     char	*errbuf,
     size_t	errbuflen)
 {
-    int		value_checked = FALSE;
+    정수		value_checked = FALSE;
     char	*errmsg = NULL;
     char_u	*arg = *argp;
 
-    if (flags & P_BOOL)
+    만약 (flags & P_BOOL)
     {
 	// boolean option
 	errmsg = do_set_option_bool(opt_idx, opt_flags, prefix, flags, varp,
 						nextchar, afterchar, cp_val);
-	if (errmsg != NULL)
+	만약 (errmsg != NULL)
 	    goto skip;
     }
-    else
+    아니면
     {
 	// numeric or string option
-	if (vim_strchr((char_u *)"=:&<", nextchar) == NULL
+	만약 (vim_strchr((char_u *)"=:&<", nextchar) == NULL
 		|| prefix != PREFIX_NONE)
 	{
 	    errmsg = e_invalid_argument;
 	    goto skip;
 	}
 
-	if (flags & P_NUM)
+	만약 (flags & P_NUM)
 	{
 	    // numeric option
 	    errmsg = do_set_option_numeric(opt_idx, opt_flags, &arg, nextchar,
 						op, flags, cp_val, varp,
 						errbuf, errbuflen);
-	    if (errmsg != NULL)
+	    만약 (errmsg != NULL)
 		goto skip;
 	}
-	else if (opt_idx >= 0)
+	아니면 만약 (opt_idx >= 0)
 	{
 	    // string option
-	    if (do_set_option_string(opt_idx, opt_flags, &arg, nextchar, op,
+	    만약 (do_set_option_string(opt_idx, opt_flags, &arg, nextchar, op,
 					flags, cp_val, varp, errbuf, errbuflen,
 					&value_checked, &errmsg) == FAIL)
 	    {
-		if (errmsg != NULL)
+		만약 (errmsg != NULL)
 		    goto skip;
 		*stopopteval = TRUE;
 		goto skip;
 	    }
 	}
-	else
+	아니면
 	{
 	    // key code option
 	    errmsg = do_set_option_keycode(&arg, key_name, nextchar);
-	    if (errmsg != NULL)
+	    만약 (errmsg != NULL)
 		goto skip;
 	}
     }
 
-    if (opt_idx >= 0)
+    만약 (opt_idx >= 0)
 	did_set_option(opt_idx, opt_flags, op == OP_NONE, value_checked);
 
 skip:
     *argp = arg;
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -2825,45 +2825,45 @@ skip:
  */
     static char *
 do_set_option(
-    int		opt_flags,
+    정수		opt_flags,
     char_u	**argp,
     char_u	*arg_start,
     char_u	**startarg,
-    int		*did_show,
-    int		*stopopteval,
+    정수		*did_show,
+    정수		*stopopteval,
     char	*errbuf,
     size_t	errbuflen)
 {
-    int		opt_idx;
+    정수		opt_idx;
     char_u	*arg;
     set_prefix_T prefix;	// no prefix, "no" prefix or "inv" prefix
     set_op_T	op;
     long_u	flags;		// flags for current option
     char_u	*varp;		// pointer to variable for current option
     char_u	key_name[2];
-    int		nextchar;	// next non-white char after option name
-    int		afterchar;	// character just after option name
+    정수		nextchar;	// next non-white char after option name
+    정수		afterchar;	// character just after option name
     char	*errmsg = NULL;
-    int		key;
-    int		len;
+    정수		key;
+    정수		len;
 
     prefix = get_option_prefix(argp);
     arg = *argp;
 
     // find end of name
     key = 0;
-    if (parse_option_name(arg, &opt_idx, &len, &key) == FAIL)
-	return e_invalid_argument;
+    만약 (parse_option_name(arg, &opt_idx, &len, &key) == FAIL)
+	반환 e_invalid_argument;
 
     // remember character after option name
     afterchar = arg[len];
 
-    if (in_vim9script())
+    만약 (in_vim9script())
     {
 	char_u *p = skipwhite(arg + len);
 
 	// disallow white space before =val, +=val, -=val, ^=val
-	if (p > arg + len && (p[0] == '='
+	만약 (p > arg + len && (p[0] == '='
 		    || (vim_strchr((char_u *)"+-^", p[0]) != NULL
 			&& p[1] == '=')))
 	{
@@ -2873,34 +2873,34 @@ do_set_option(
 	    goto skip;
 	}
     }
-    else
+    아니면
 	// skip white space, allow ":set ai  ?", ":set hlsearch  !"
-	while (VIM_ISWHITE(arg[len]))
+	동안 (VIM_ISWHITE(arg[len]))
 	    ++len;
 
     op = get_opt_op(arg + len);
-    if (op != OP_NONE)
+    만약 (op != OP_NONE)
 	len++;
 
     nextchar = arg[len];
 
-    if (opt_idx == -1 && key == 0)	// found a mismatch: skip
+    만약 (opt_idx == -1 && key == 0)	// found a mismatch: skip
     {
-	if (in_vim9script() && arg > arg_start
+	만약 (in_vim9script() && arg > arg_start
 		&& vim_strchr((char_u *)"!&<", *arg) != NULL)
 	    errmsg = e_no_white_space_allowed_between_option_and;
-	else
+	아니면
 	    errmsg = e_unknown_option;
 	goto skip;
     }
 
-    if (opt_idx >= 0)
+    만약 (opt_idx >= 0)
     {
-	if (options[opt_idx].var == NULL)   // hidden option: skip
+	만약 (options[opt_idx].var == NULL)   // hidden option: skip
 	{
 	    // Only give an error message when requesting the value of
 	    // a hidden option, ignore setting it.
-	    if (vim_strchr((char_u *)"=:!&<", nextchar) == NULL
+	    만약 (vim_strchr((char_u *)"=:!&<", nextchar) == NULL
 		    && (!(options[opt_idx].flags & P_BOOL)
 			|| nextchar == '?'))
 		errmsg = e_option_not_supported;
@@ -2910,16 +2910,16 @@ do_set_option(
 	flags = options[opt_idx].flags;
 	varp = get_varp_scope(&(options[opt_idx]), opt_flags);
     }
-    else
+    아니면
     {
 	flags = P_STRING;
 	varp = NULL;
-	if (key < 0)
+	만약 (key < 0)
 	{
 	    key_name[0] = KEY2TERMCAP0(key);
 	    key_name[1] = KEY2TERMCAP1(key);
 	}
-	else
+	아니면
 	{
 	    key_name[0] = KS_KEY;
 	    key_name[1] = (key & 0xff);
@@ -2927,27 +2927,27 @@ do_set_option(
     }
 
     // Make sure the option value can be changed.
-    if (validate_opt_idx(opt_idx, opt_flags, flags, &errmsg, prefix) == FAIL)
+    만약 (validate_opt_idx(opt_idx, opt_flags, flags, &errmsg, prefix) == FAIL)
 	goto skip;
 
-    int cp_val = p_cp;
-    if (vim_strchr((char_u *)"?=:!&<", nextchar) != NULL)
+    정수 cp_val = p_cp;
+    만약 (vim_strchr((char_u *)"?=:!&<", nextchar) != NULL)
     {
 	arg += len;
-	if (nextchar == '&' && arg[1] == 'v' && arg[2] == 'i')
+	만약 (nextchar == '&' && arg[1] == 'v' && arg[2] == 'i')
 	{
-	    if (arg[3] == 'm')	// "opt&vim": set to Vim default
+	    만약 (arg[3] == 'm')	// "opt&vim": set to Vim default
 	    {
 		cp_val = FALSE;
 		arg += 3;
 	    }
-	    else		// "opt&vi": set to Vi default
+	    아니면		// "opt&vi": set to Vi default
 	    {
 		cp_val = TRUE;
 		arg += 2;
 	    }
 	}
-	if (vim_strchr((char_u *)"?!&<", nextchar) != NULL
+	만약 (vim_strchr((char_u *)"?!&<", nextchar) != NULL
 		&& arg[1] != NUL && !VIM_ISWHITE(arg[1]))
 	{
 	    errmsg = e_trailing_characters;
@@ -2957,55 +2957,55 @@ do_set_option(
 
     // Allow '=' and ':' for historical reasons (MSDOS command.com).
     // Allows only one '=' character per "set" command line. grrr. (jw)
-    if (nextchar == '?'
+    만약 (nextchar == '?'
 	    || (prefix == PREFIX_NONE
 		&& vim_strchr((char_u *)"=:&<", nextchar) == NULL
 		&& !(flags & P_BOOL)))
     {
 	// print value
-	if (*did_show)
+	만약 (*did_show)
 	    msg_putchar('\n');	    // cursor below last one
-	else
+	아니면
 	{
 	    gotocmdline(TRUE);	    // cursor at status line
 	    *did_show = TRUE;	    // remember that we did a line
 	}
-	if (opt_idx >= 0)
+	만약 (opt_idx >= 0)
 	{
 	    showoneopt(&options[opt_idx], opt_flags);
 #ifdef FEAT_EVAL
-	    if (p_verbose > 0)
+	    만약 (p_verbose > 0)
 	    {
 		// Mention where the option was last set.
-		if (varp == options[opt_idx].var)
+		만약 (varp == options[opt_idx].var)
 		    last_set_msg(options[opt_idx].script_ctx);
-		else if ((int)options[opt_idx].indir & PV_WIN)
+		아니면 만약 ((정수)options[opt_idx].indir & PV_WIN)
 		    last_set_msg(curwin->w_p_script_ctx[
-			    (int)options[opt_idx].indir & PV_MASK]);
-		else if ((int)options[opt_idx].indir & PV_BUF)
+			    (정수)options[opt_idx].indir & PV_MASK]);
+		아니면 만약 ((정수)options[opt_idx].indir & PV_BUF)
 		    last_set_msg(curbuf->b_p_script_ctx[
-			    (int)options[opt_idx].indir & PV_MASK]);
+			    (정수)options[opt_idx].indir & PV_MASK]);
 	    }
 #endif
 	}
-	else
+	아니면
 	{
 	    char_u	    *p;
 
 	    p = find_termcode(key_name);
-	    if (p == NULL)
+	    만약 (p == NULL)
 	    {
 		errmsg = e_key_code_not_set;
 		goto skip;
 	    }
-	    else
+	    아니면
 		(void)show_one_termcode(key_name, p, TRUE);
 	}
-	if (nextchar != '?'
+	만약 (nextchar != '?'
 		&& nextchar != NUL && !VIM_ISWHITE(afterchar))
 	    errmsg = e_trailing_characters;
     }
-    else
+    아니면
     {
 	errmsg = do_set_option_value(opt_idx, opt_flags, &arg, prefix, op,
 					flags, varp, key_name, nextchar,
@@ -3015,7 +3015,7 @@ do_set_option(
 
 skip:
     *argp = arg;
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -3034,31 +3034,31 @@ skip:
  *
  * Returns FAIL if an error is detected, OK otherwise.
  */
-    int
+    정수
 do_set(
     char_u	*arg_start,	// option string (may be written to!)
-    int		opt_flags)
+    정수		opt_flags)
 {
     char_u	*arg = arg_start;
-    int		i;
-    int		did_show = FALSE;   // already showed one value
+    정수		i;
+    정수		did_show = FALSE;   // already showed one value
 
-    if (*arg == NUL)
+    만약 (*arg == NUL)
     {
 	showoptions(0, opt_flags);
 	did_show = TRUE;
 	goto theend;
     }
 
-    while (*arg != NUL)		// loop to process all options
+    동안 (*arg != NUL)		// loop to process all options
     {
-	if (STRNCMP(arg, "all", 3) == 0 && !ASCII_ISALPHA(arg[3])
+	만약 (STRNCMP(arg, "all", 3) == 0 && !ASCII_ISALPHA(arg[3])
 						&& !(opt_flags & OPT_MODELINE))
 	{
 	    // ":set all"  show all options.
 	    // ":set all&" set all options to their default value.
 	    arg += 3;
-	    if (*arg == '&')
+	    만약 (*arg == '&')
 	    {
 		++arg;
 		// Only for :set command set global value of local options.
@@ -3067,22 +3067,22 @@ do_set(
 		didset_options2();
 		redraw_all_later(UPD_CLEAR);
 	    }
-	    else
+	    아니면
 	    {
 		showoptions(1, opt_flags);
 		did_show = TRUE;
 	    }
 	}
-	else if (STRNCMP(arg, "termcap", 7) == 0 && !(opt_flags & OPT_MODELINE))
+	아니면 만약 (STRNCMP(arg, "termcap", 7) == 0 && !(opt_flags & OPT_MODELINE))
 	{
 	    showoptions(2, opt_flags);
 	    show_termcodes(opt_flags);
 	    did_show = TRUE;
 	    arg += 7;
 	}
-	else
+	아니면
 	{
-	    int		stopopteval = FALSE;
+	    정수		stopopteval = FALSE;
 	    char	*errmsg = NULL;
 	    char	errbuf[ERR_BUFLEN];
 	    char_u	*startarg = arg;
@@ -3090,27 +3090,27 @@ do_set(
 	    errmsg = do_set_option(opt_flags, &arg, arg_start, &startarg,
 					&did_show, &stopopteval, errbuf,
 					ERR_BUFLEN);
-	    if (stopopteval)
+	    만약 (stopopteval)
 		break;
 
 	    // Advance to next argument.
 	    // - skip until a blank found, taking care of backslashes
 	    // - skip blanks
 	    // - skip one "=val" argument (for hidden options ":set gfn =xx")
-	    for (i = 0; i < 2 ; ++i)
+	    위해 (i = 0; i < 2 ; ++i)
 	    {
-		while (*arg != NUL && !VIM_ISWHITE(*arg))
-		    if (*arg++ == '\\' && *arg != NUL)
+		동안 (*arg != NUL && !VIM_ISWHITE(*arg))
+		    만약 (*arg++ == '\\' && *arg != NUL)
 			++arg;
 		arg = skipwhite(arg);
-		if (*arg != '=')
+		만약 (*arg != '=')
 		    break;
 	    }
 
-	    if (errmsg != NULL)
+	    만약 (errmsg != NULL)
 	    {
 		i = vim_snprintf((char *)IObuff, IOSIZE, "%s", (char_u *)_(errmsg)) + 2;
-		if (i + (arg - startarg) < IOSIZE)
+		만약 (i + (arg - startarg) < IOSIZE)
 		{
 		    // append the argument with the error
 		    STRCPY(IObuff + i - 2, ": ");
@@ -3124,7 +3124,7 @@ do_set(
 		emsg((char *)IObuff);	// show error highlighted
 		--no_wait_return;
 
-		return FAIL;
+		반환 FAIL;
 	    }
 	}
 
@@ -3132,7 +3132,7 @@ do_set(
     }
 
 theend:
-    if (silent_mode && did_show)
+    만약 (silent_mode && did_show)
     {
 	// After displaying option values in silent mode.
 	silent_mode = FALSE;
@@ -3144,7 +3144,7 @@ theend:
 	info_message = FALSE;	// use mch_msg(), not mch_errmsg()
     }
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -3153,15 +3153,15 @@ theend:
  */
     void
 did_set_option(
-    int	    opt_idx,
-    int	    opt_flags,	    // possibly with OPT_MODELINE
-    int	    new_value,	    // value was replaced completely
-    int	    value_checked)  // value was checked to be safe, no need to set the
+    정수	    opt_idx,
+    정수	    opt_flags,	    // possibly with OPT_MODELINE
+    정수	    new_value,	    // value was replaced completely
+    정수	    value_checked)  // value was checked to be safe, no need to set the
 			    // P_INSECURE flag.
 {
     long_u	*flagsp;
     long_u	*flagsp_local = NULL;
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    정수		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
 
     options[opt_idx].flags |= P_WAS_SET;
 
@@ -3169,22 +3169,22 @@ did_set_option(
     // set the P_INSECURE flag.  Otherwise, if a new value is stored reset the
     // flag.
     flagsp = insecure_flag(curwin, opt_idx, opt_flags);
-    if (both)
+    만약 (both)
 	flagsp_local = insecure_flag(curwin, opt_idx, OPT_LOCAL);
-    if (!value_checked && (secure
+    만약 (!value_checked && (secure
 #ifdef HAVE_SANDBOX
 	    || sandbox != 0
 #endif
 	    || (opt_flags & OPT_MODELINE)))
     {
 	*flagsp = *flagsp | P_INSECURE;
-	if (flagsp_local != NULL)
+	만약 (flagsp_local != NULL)
 	    *flagsp_local = *flagsp_local | P_INSECURE;
     }
-    else if (new_value)
+    아니면 만약 (new_value)
     {
 	*flagsp = *flagsp & ~P_INSECURE;
-	if (flagsp_local != NULL)
+	만약 (flagsp_local != NULL)
 	    *flagsp_local = *flagsp_local & ~P_INSECURE;
     }
 }
@@ -3194,21 +3194,21 @@ did_set_option(
  * Used for 'cedit', 'termwinkey', 'wildchar' and 'wildcharm' options.
  * When "multi_byte" is TRUE allow for multi-byte characters.
  */
-    int
-string_to_key(char_u *arg, int multi_byte)
+    정수
+string_to_key(char_u *arg, 정수 multi_byte)
 {
-    if (*arg == '<' && arg[1])
-	return find_key_option(arg + 1, TRUE);
-    if (*arg == '^' && arg[1])
+    만약 (*arg == '<' && arg[1])
+	반환 find_key_option(arg + 1, TRUE);
+    만약 (*arg == '^' && arg[1])
     {
-	int key = Ctrl_chr(arg[1]);
-	if (key == 0)		// ^@ is <Nul>
+	정수 key = Ctrl_chr(arg[1]);
+	만약 (key == 0)		// ^@ is <Nul>
 	    key = K_ZERO;
-	return key;
+	반환 key;
     }
-    if (multi_byte)
-	return PTR2CHAR(arg);
-    return *arg;
+    만약 (multi_byte)
+	반환 PTR2CHAR(arg);
+    반환 *arg;
 }
 
 /*
@@ -3220,7 +3220,7 @@ string_to_key(char_u *arg, int multi_byte)
     void
 did_set_title(void)
 {
-    if (starting != NO_SCREEN
+    만약 (starting != NO_SCREEN
 #ifdef FEAT_GUI
 	    && !gui.starting
 #endif
@@ -3233,24 +3233,24 @@ did_set_title(void)
  */
     void
 set_options_bin(
-    int		oldval,
-    int		newval,
-    int		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
+    정수		oldval,
+    정수		newval,
+    정수		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
 {
     // The option values that are changed when 'bin' changes are
     // copied when 'bin is set and restored when 'bin' is reset.
-    if (newval)
+    만약 (newval)
     {
-	if (!oldval)		// switched on
+	만약 (!oldval)		// switched on
 	{
-	    if (!(opt_flags & OPT_GLOBAL))
+	    만약 (!(opt_flags & OPT_GLOBAL))
 	    {
 		curbuf->b_p_tw_nobin = curbuf->b_p_tw;
 		curbuf->b_p_wm_nobin = curbuf->b_p_wm;
 		curbuf->b_p_ml_nobin = curbuf->b_p_ml;
 		curbuf->b_p_et_nobin = curbuf->b_p_et;
 	    }
-	    if (!(opt_flags & OPT_LOCAL))
+	    만약 (!(opt_flags & OPT_LOCAL))
 	    {
 		p_tw_nobin = p_tw;
 		p_wm_nobin = p_wm;
@@ -3259,14 +3259,14 @@ set_options_bin(
 	    }
 	}
 
-	if (!(opt_flags & OPT_GLOBAL))
+	만약 (!(opt_flags & OPT_GLOBAL))
 	{
 	    curbuf->b_p_tw = 0;	// no automatic line wrap
 	    curbuf->b_p_wm = 0;	// no automatic line wrap
 	    curbuf->b_p_ml = 0;	// no modelines
 	    curbuf->b_p_et = 0;	// no expandtab
 	}
-	if (!(opt_flags & OPT_LOCAL))
+	만약 (!(opt_flags & OPT_LOCAL))
 	{
 	    p_tw = 0;
 	    p_wm = 0;
@@ -3275,16 +3275,16 @@ set_options_bin(
 	    p_bin = TRUE;	// needed when called for the "-b" argument
 	}
     }
-    else if (oldval)		// switched off
+    아니면 만약 (oldval)		// switched off
     {
-	if (!(opt_flags & OPT_GLOBAL))
+	만약 (!(opt_flags & OPT_GLOBAL))
 	{
 	    curbuf->b_p_tw = curbuf->b_p_tw_nobin;
 	    curbuf->b_p_wm = curbuf->b_p_wm_nobin;
 	    curbuf->b_p_ml = curbuf->b_p_ml_nobin;
 	    curbuf->b_p_et = curbuf->b_p_et_nobin;
 	}
-	if (!(opt_flags & OPT_LOCAL))
+	만약 (!(opt_flags & OPT_LOCAL))
 	{
 	    p_tw = p_tw_nobin;
 	    p_wm = p_wm_nobin;
@@ -3292,7 +3292,7 @@ set_options_bin(
 	    p_et = p_et_nobin;
 	}
     }
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
     // Remember where the dependent option were reset
     didset_options_sctx(opt_flags, p_bin_dep_opts);
 #endif
@@ -3305,18 +3305,18 @@ set_options_bin(
  * Return pointer to NameBuff, or NULL when not expanded.
  */
     static char_u *
-option_expand(int opt_idx, char_u *val)
+option_expand(정수 opt_idx, char_u *val)
 {
     // if option doesn't need expansion nothing to do
-    if (!(options[opt_idx].flags & P_EXPAND) || options[opt_idx].var == NULL)
-	return NULL;
+    만약 (!(options[opt_idx].flags & P_EXPAND) || options[opt_idx].var == NULL)
+	반환 NULL;
 
     // If val is longer than MAXPATHL no meaningful expansion can be done,
     // expand_env() would truncate the string.
-    if (val != NULL && STRLEN(val) > MAXPATHL)
-	return NULL;
+    만약 (val != NULL && STRLEN(val) > MAXPATHL)
+	반환 NULL;
 
-    if (val == NULL)
+    만약 (val == NULL)
 	val = *(char_u **)options[opt_idx].var;
 
     /*
@@ -3326,7 +3326,7 @@ option_expand(int opt_idx, char_u *val)
      * For 'spellsuggest' expand after "file:".
      */
     char_u ** var = (char_u **)options[opt_idx].var;
-    int esc = var == &p_tags || var == &p_path;
+    정수 esc = var == &p_tags || var == &p_path;
 
     expand_env_esc(val, NameBuff, MAXPATHL,
 	    esc ? (char_u *)" \t" : NULL, FALSE,
@@ -3334,10 +3334,10 @@ option_expand(int opt_idx, char_u *val)
 	    var == &p_sps ? (char_u *)"file:" :
 #endif
 				  NULL);
-    if (STRCMP(NameBuff, val) == 0)   // they are the same
-	return NULL;
+    만약 (STRCMP(NameBuff, val) == 0)   // they are the same
+	반환 NULL;
 
-    return NameBuff;
+    반환 NameBuff;
 }
 
 /*
@@ -3403,10 +3403,10 @@ didset_options2(void)
     void
 check_options(void)
 {
-    int		opt_idx;
+    정수		opt_idx;
 
-    for (opt_idx = 0; options[opt_idx].fullname != NULL; opt_idx++)
-	if ((options[opt_idx].flags & P_STRING) && options[opt_idx].var != NULL)
+    위해 (opt_idx = 0; options[opt_idx].fullname != NULL; opt_idx++)
+	만약 ((options[opt_idx].flags & P_STRING) && options[opt_idx].var != NULL)
 	    check_string_option((char_u **)get_varp(&(options[opt_idx])));
 }
 
@@ -3414,50 +3414,50 @@ check_options(void)
  * Return the option index found by a pointer into term_strings[].
  * Return -1 if not found.
  */
-    int
+    정수
 get_term_opt_idx(char_u **p)
 {
-    int opt_idx;
+    정수 opt_idx;
 
-    for (opt_idx = 1; options[opt_idx].fullname != NULL; opt_idx++)
-	if (options[opt_idx].var == (char_u *)p)
-	    return opt_idx;
-    return -1; // cannot happen: didn't find it!
+    위해 (opt_idx = 1; options[opt_idx].fullname != NULL; opt_idx++)
+	만약 (options[opt_idx].var == (char_u *)p)
+	    반환 opt_idx;
+    반환 -1; // cannot happen: didn't find it!
 }
 
 /*
  * Mark a terminal option as allocated, found by a pointer into term_strings[].
  * Return the option index or -1 if not found.
  */
-    int
+    정수
 set_term_option_alloced(char_u **p)
 {
-    int		opt_idx = get_term_opt_idx(p);
+    정수		opt_idx = get_term_opt_idx(p);
 
-    if (opt_idx >= 0)
+    만약 (opt_idx >= 0)
 	options[opt_idx].flags |= P_ALLOCED;
-    return opt_idx;
+    반환 opt_idx;
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * Return TRUE when option "opt" was set from a modeline or in secure mode.
  * Return FALSE when it wasn't.
  * Return -1 for an unknown option.
  */
-    int
-was_set_insecurely(win_T *wp, char_u *opt, int opt_flags)
+    정수
+was_set_insecurely(win_T *wp, char_u *opt, 정수 opt_flags)
 {
-    int	    idx = findoption(opt);
+    정수	    idx = findoption(opt);
     long_u  *flagp;
 
-    if (idx >= 0)
+    만약 (idx >= 0)
     {
 	flagp = insecure_flag(wp, idx, opt_flags);
-	return (*flagp & P_INSECURE) != 0;
+	반환 (*flagp & P_INSECURE) != 0;
     }
     internal_error("was_set_insecurely()");
-    return -1;
+    반환 -1;
 }
 
 /*
@@ -3467,46 +3467,46 @@ was_set_insecurely(win_T *wp, char_u *opt, int opt_flags)
  * the option is used.
  */
     static long_u *
-insecure_flag(win_T *wp, int opt_idx, int opt_flags)
+insecure_flag(win_T *wp, 정수 opt_idx, 정수 opt_flags)
 {
-    if (opt_flags & OPT_LOCAL)
-	switch ((int)options[opt_idx].indir)
+    만약 (opt_flags & OPT_LOCAL)
+	switch ((정수)options[opt_idx].indir)
 	{
-	    case PV_WRAP:	return &wp->w_p_wrap_flags;
+	    case PV_WRAP:	반환 &wp->w_p_wrap_flags;
 # ifdef FEAT_STL_OPT
-	    case PV_STL:	return &wp->w_p_stl_flags;
+	    case PV_STL:	반환 &wp->w_p_stl_flags;
 # endif
 # ifdef FEAT_EVAL
 #  ifdef FEAT_FOLDING
-	    case PV_FDE:	return &wp->w_p_fde_flags;
-	    case PV_FDT:	return &wp->w_p_fdt_flags;
+	    case PV_FDE:	반환 &wp->w_p_fde_flags;
+	    case PV_FDT:	반환 &wp->w_p_fdt_flags;
 #  endif
 #  ifdef FEAT_BEVAL
-	    case PV_BEXPR:	return &wp->w_buffer->b_p_bexpr_flags;
+	    case PV_BEXPR:	반환 &wp->w_buffer->b_p_bexpr_flags;
 #  endif
-	    case PV_INDE:	return &wp->w_buffer->b_p_inde_flags;
-	    case PV_FEX:	return &wp->w_buffer->b_p_fex_flags;
+	    case PV_INDE:	반환 &wp->w_buffer->b_p_inde_flags;
+	    case PV_FEX:	반환 &wp->w_buffer->b_p_fex_flags;
 #  ifdef FEAT_FIND_ID
-	    case PV_INEX:	return &wp->w_buffer->b_p_inex_flags;
+	    case PV_INEX:	반환 &wp->w_buffer->b_p_inex_flags;
 #  endif
 #  ifdef FEAT_COMPL_FUNC
-	    case PV_CPT:	return &wp->w_buffer->b_p_cpt_flags;
+	    case PV_CPT:	반환 &wp->w_buffer->b_p_cpt_flags;
 #  endif
 # endif
 	}
-    else
+    아니면
 	// For global value of window-local options, use flags in w_allbuf_opt.
-	switch ((int)options[opt_idx].indir)
+	switch ((정수)options[opt_idx].indir)
 	{
-	    case PV_WRAP:	return &wp->w_allbuf_opt.wo_wrap_flags;
-# if defined(FEAT_EVAL) && defined(FEAT_FOLDING)
-	    case PV_FDE:	return &wp->w_allbuf_opt.wo_fde_flags;
-	    case PV_FDT:	return &wp->w_allbuf_opt.wo_fdt_flags;
+	    case PV_WRAP:	반환 &wp->w_allbuf_opt.wo_wrap_flags;
+# 만약 defined(FEAT_EVAL) && defined(FEAT_FOLDING)
+	    case PV_FDE:	반환 &wp->w_allbuf_opt.wo_fde_flags;
+	    case PV_FDT:	반환 &wp->w_allbuf_opt.wo_fdt_flags;
 # endif
 	}
 
     // Nothing special, return global flags field.
-    return &options[opt_idx].flags;
+    반환 &options[opt_idx].flags;
 }
 #endif
 
@@ -3518,7 +3518,7 @@ redraw_titles(void)
 {
     need_maketitle = TRUE;
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#만약 defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
 }
@@ -3527,53 +3527,53 @@ redraw_titles(void)
  * Return TRUE if "val" is a valid name: only consists of alphanumeric ASCII
  * characters or characters in "allowed".
  */
-    int
+    정수
 valid_name(char_u *val, char *allowed)
 {
     char_u *s;
 
-    for (s = val; *s != NUL; ++s)
-	if (!ASCII_ISALNUM(*s) && vim_strchr((char_u *)allowed, *s) == NULL)
-	    return FALSE;
-    return TRUE;
+    위해 (s = val; *s != NUL; ++s)
+	만약 (!ASCII_ISALNUM(*s) && vim_strchr((char_u *)allowed, *s) == NULL)
+	    반환 FALSE;
+    반환 TRUE;
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * Set the script_ctx for an option, taking care of setting the buffer- or
  * window-local value.
  */
     void
-set_option_sctx_idx(int opt_idx, int opt_flags, sctx_T script_ctx)
+set_option_sctx_idx(정수 opt_idx, 정수 opt_flags, sctx_T script_ctx)
 {
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
-    int		indir = (int)options[opt_idx].indir;
+    정수		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    정수		indir = (정수)options[opt_idx].indir;
     sctx_T	new_script_ctx = script_ctx;
 
     // Modeline already has the line number set.
-    if (!(opt_flags & OPT_MODELINE))
+    만약 (!(opt_flags & OPT_MODELINE))
 	new_script_ctx.sc_lnum += SOURCING_LNUM;
 
     // ":legacy" and ":vim9cmd" change the execution context of an option.
-    if (cmdmod.cmod_flags & CMOD_VIM9CMD)
+    만약 (cmdmod.cmod_flags & CMOD_VIM9CMD)
 	new_script_ctx.sc_version = SCRIPT_VERSION_VIM9;
-    if (cmdmod.cmod_flags & CMOD_LEGACY)
+    만약 (cmdmod.cmod_flags & CMOD_LEGACY)
 	// It is a bit confusing, but "MAX" is actually the legacy Vim script
 	// version before Vim9.
 	new_script_ctx.sc_version = SCRIPT_VERSION_MAX;
 
     // Remember where the option was set.  For local options need to do that
     // in the buffer or window structure.
-    if (both || (opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
+    만약 (both || (opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
 	options[opt_idx].script_ctx = new_script_ctx;
-    if (both || (opt_flags & OPT_LOCAL))
+    만약 (both || (opt_flags & OPT_LOCAL))
     {
-	if (indir & PV_BUF)
+	만약 (indir & PV_BUF)
 	    curbuf->b_p_script_ctx[indir & PV_MASK] = new_script_ctx;
-	else if (indir & PV_WIN)
+	아니면 만약 (indir & PV_WIN)
 	{
 	    curwin->w_p_script_ctx[indir & PV_MASK] = new_script_ctx;
-	    if (both)
+	    만약 (both)
 		// also setting the "all buffers" value
 		curwin->w_allbuf_opt.wo_script_ctx[indir & PV_MASK] =
 								new_script_ctx;
@@ -3588,26 +3588,26 @@ set_option_sctx_idx(int opt_idx, int opt_flags, sctx_T script_ctx)
  * OPT_LOCAL, selecting global or buffer/window context, respectively.
  */
     bool
-is_option_value_vim9(int opt_idx, int opt_flags)
+is_option_value_vim9(정수 opt_idx, 정수 opt_flags)
 {
-    int		indir = (int)options[opt_idx].indir;
+    정수		indir = (정수)options[opt_idx].indir;
     sctx_T	*sctx = NULL;
 
-    if ((opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
+    만약 ((opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
 	sctx = &options[opt_idx].script_ctx;
 
-    if ((opt_flags & OPT_LOCAL) || (indir & (PV_BUF|PV_WIN)))
+    만약 ((opt_flags & OPT_LOCAL) || (indir & (PV_BUF|PV_WIN)))
     {
-	if (indir & PV_BUF)
+	만약 (indir & PV_BUF)
 	    sctx = &curbuf->b_p_script_ctx[indir & PV_MASK];
-	else if (indir & PV_WIN)
+	아니면 만약 (indir & PV_WIN)
 	    sctx = &curwin->w_p_script_ctx[indir & PV_MASK];
     }
 
     // If "sc_sid" is not set, it means the option value was not modified from
     // the default yet.  As we move towards Vim9 all the default values should
     // be valid Vim9.
-    return !SCRIPT_ID_VALID(sctx->sc_sid) ||
+    반환 !SCRIPT_ID_VALID(sctx->sc_sid) ||
 	sctx->sc_version >= SCRIPT_VERSION_VIM9;
 }
 
@@ -3618,12 +3618,12 @@ is_option_value_vim9(int opt_idx, int opt_flags)
     sctx_T *
 get_option_sctx(char *name)
 {
-    int idx = findoption((char_u *)name);
+    정수 idx = findoption((char_u *)name);
 
-    if (idx >= 0)
-	return &options[idx].script_ctx;
+    만약 (idx >= 0)
+	반환 &options[idx].script_ctx;
     siemsg("no such option: %s", name);
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -3632,14 +3632,14 @@ get_option_sctx(char *name)
  * When "name" is NULL use "opt_idx".
  */
     void
-set_term_option_sctx_idx(char *name, int opt_idx)
+set_term_option_sctx_idx(char *name, 정수 opt_idx)
 {
     char_u  buf[5];
-    int	    idx;
+    정수	    idx;
 
-    if (name == NULL)
+    만약 (name == NULL)
 	idx = opt_idx;
-    else
+    아니면
     {
 	buf[0] = 't';
 	buf[1] = '_';
@@ -3648,18 +3648,18 @@ set_term_option_sctx_idx(char *name, int opt_idx)
 	buf[4] = 0;
 	idx = findoption(buf);
     }
-    if (idx >= 0)
+    만약 (idx >= 0)
 	set_option_sctx_idx(idx, OPT_GLOBAL, current_sctx);
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * Apply the OptionSet autocommand.
  */
     static void
 apply_optionset_autocmd(
-	int	opt_idx,
+	정수	opt_idx,
 	long	opt_flags,
 	long	oldval,
 	long	oldval_g,
@@ -3671,29 +3671,29 @@ apply_optionset_autocmd(
     size_t  len;
 
     // Don't do this while starting up, failure or recursively.
-    if (starting || errmsg != NULL || *get_vim_var_str(VV_OPTION_TYPE) != NUL)
-	return;
+    만약 (starting || errmsg != NULL || *get_vim_var_str(VV_OPTION_TYPE) != NUL)
+	반환;
 
     len = vim_snprintf_safelen((char *)buf_new, sizeof(buf_new), "%ld", newval);
-    set_vim_var_string(VV_OPTION_NEW, buf_new, (int)len);
+    set_vim_var_string(VV_OPTION_NEW, buf_new, (정수)len);
     len = vim_snprintf_safelen((char *)buf_type, sizeof(buf_type), "%s",
 				(opt_flags & OPT_LOCAL) ? "local" : "global");
-    set_vim_var_string(VV_OPTION_TYPE, buf_type, (int)len);
+    set_vim_var_string(VV_OPTION_TYPE, buf_type, (정수)len);
 
     buf_oldlen = vim_snprintf_safelen((char *)buf_old, sizeof(buf_old), "%ld", oldval);
-    set_vim_var_string(VV_OPTION_OLD, buf_old, (int)buf_oldlen);
+    set_vim_var_string(VV_OPTION_OLD, buf_old, (정수)buf_oldlen);
 
-    if (opt_flags & OPT_LOCAL)
+    만약 (opt_flags & OPT_LOCAL)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setlocal", STRLEN_LITERAL("setlocal"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (int)buf_oldlen);
+	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (정수)buf_oldlen);
     }
-    if (opt_flags & OPT_GLOBAL)
+    만약 (opt_flags & OPT_GLOBAL)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setglobal", STRLEN_LITERAL("setglobal"));
-	set_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old, (int)buf_oldlen);
+	set_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old, (정수)buf_oldlen);
     }
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    만약 ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	char_u	buf_old_global[12];
 	size_t	buf_old_globallen;
@@ -3702,13 +3702,13 @@ apply_optionset_autocmd(
 	    sizeof(buf_old_global), "%ld", oldval_g);
 
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"set", STRLEN_LITERAL("set"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (int)buf_oldlen);
-	set_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old_global, (int)buf_old_globallen);
+	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (정수)buf_oldlen);
+	set_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old_global, (정수)buf_old_globallen);
     }
-    if (opt_flags & OPT_MODELINE)
+    만약 (opt_flags & OPT_MODELINE)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"modeline", STRLEN_LITERAL("modeline"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (int)buf_oldlen);
+	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (정수)buf_oldlen);
     }
     apply_autocmds(EVENT_OPTIONSET, (char_u *)options[opt_idx].fullname,
 	    NULL, FALSE, NULL);
@@ -3716,7 +3716,7 @@ apply_optionset_autocmd(
 }
 #endif
 
-#if defined(FEAT_ARABIC)
+#만약 defined(FEAT_ARABIC)
 /*
  * Process the updated 'arabic' option value.
  */
@@ -3725,20 +3725,20 @@ did_set_arabic(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (curwin->w_p_arab)
+    만약 (curwin->w_p_arab)
     {
 	// 'arabic' is set, handle various sub-settings.
-	if (!p_tbidi)
+	만약 (!p_tbidi)
 	{
 	    // set rightleft mode
-	    if (!curwin->w_p_rl)
+	    만약 (!curwin->w_p_rl)
 	    {
 		curwin->w_p_rl = TRUE;
 		changed_window_setting();
 	    }
 
 	    // Enable Arabic shaping (major part of what Arabic requires)
-	    if (!p_arshape)
+	    만약 (!p_arshape)
 	    {
 		p_arshape = TRUE;
 		redraw_later_clear();
@@ -3747,7 +3747,7 @@ did_set_arabic(optset_T *args UNUSED)
 
 	// Arabic requires a utf-8 encoding, inform the user if it's not
 	// set.
-	if (STRCMP(p_enc, "utf-8") != 0)
+	만약 (STRCMP(p_enc, "utf-8") != 0)
 	{
 	    static char *w_arabic = N_("W17: Arabic requires UTF-8, do ':set encoding=utf-8'");
 
@@ -3767,13 +3767,13 @@ did_set_arabic(optset_T *args UNUSED)
 								OPT_LOCAL);
 # endif
     }
-    else
+    아니면
     {
 	// 'arabic' is reset, handle various sub-settings.
-	if (!p_tbidi)
+	만약 (!p_tbidi)
 	{
 	    // reset rightleft mode
-	    if (curwin->w_p_rl)
+	    만약 (curwin->w_p_rl)
 	    {
 		curwin->w_p_rl = FALSE;
 		changed_window_setting();
@@ -3793,11 +3793,11 @@ did_set_arabic(optset_T *args UNUSED)
 # endif
     }
 
-    return errmsg;
+    반환 errmsg;
 }
 #endif
 
-#if defined(FEAT_AUTOCHDIR)
+#만약 defined(FEAT_AUTOCHDIR)
 /*
  * Process the updated 'autochdir' option value.
  */
@@ -3806,30 +3806,30 @@ did_set_autochdir(optset_T *args UNUSED)
 {
     // Change directories when the 'acd' option is set now.
     DO_AUTOCHDIR;
-    return NULL;
+    반환 NULL;
 }
 #endif
 
-#if defined(FEAT_BEVAL_GUI)
+#만약 defined(FEAT_BEVAL_GUI)
 /*
  * Process the updated 'ballooneval' option value.
  */
     char *
 did_set_ballooneval(optset_T *args)
 {
-    if (balloonEvalForTerm)
-	return NULL;
+    만약 (balloonEvalForTerm)
+	반환 NULL;
 
-    if (p_beval && !args->os_oldval.boolean)
+    만약 (p_beval && !args->os_oldval.boolean)
 	gui_mch_enable_beval_area(balloonEval);
-    else if (!p_beval && args->os_oldval.boolean)
+    아니면 만약 (!p_beval && args->os_oldval.boolean)
 	gui_mch_disable_beval_area(balloonEval);
 
-    return NULL;
+    반환 NULL;
 }
 #endif
 
-#if defined(FEAT_BEVAL_TERM)
+#만약 defined(FEAT_BEVAL_TERM)
 /*
  * Process the updated 'balloonevalterm' option value.
  */
@@ -3837,7 +3837,7 @@ did_set_ballooneval(optset_T *args)
 did_set_balloonevalterm(optset_T *args UNUSED)
 {
     mch_bevalterm_changed();
-    return NULL;
+    반환 NULL;
 }
 #endif
 
@@ -3851,7 +3851,7 @@ did_set_binary(optset_T *args)
     set_options_bin(args->os_oldval.boolean, curbuf->b_p_bin, args->os_flags);
     redraw_titles();
 
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -3861,10 +3861,10 @@ did_set_binary(optset_T *args)
 did_set_buflisted(optset_T *args)
 {
     // when 'buflisted' changes, trigger autocommands
-    if (args->os_oldval.boolean != curbuf->b_p_bl)
+    만약 (args->os_oldval.boolean != curbuf->b_p_bl)
 	apply_autocmds(curbuf->b_p_bl ? EVENT_BUFADD : EVENT_BUFDELETE,
 						NULL, NULL, TRUE, curbuf);
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -3877,17 +3877,17 @@ did_set_cmdheight(optset_T *args)
     char *errmsg = NULL;
 
     // if p_ch changed value, change the command line height
-    if (p_ch < MIN_CMDHEIGHT)
+    만약 (p_ch < MIN_CMDHEIGHT)
     {
 	errmsg = e_argument_must_be_positive;
 	p_ch = MIN_CMDHEIGHT;
     }
-    if (p_ch > Rows - min_rows() + MIN_CMDHEIGHT)
+    만약 (p_ch > Rows - min_rows() + MIN_CMDHEIGHT)
 	p_ch = Rows - min_rows() + MIN_CMDHEIGHT;
 
     // Only compute the new window layout when startup has been
     // completed. Otherwise the frame sizes may be wrong.
-    if ((p_ch != old_value
+    만약 ((p_ch != old_value
 		|| tabline_height() + topframe->fr_height != Rows - p_ch)
 	    && full_screen
 #ifdef FEAT_GUI
@@ -3896,7 +3896,7 @@ did_set_cmdheight(optset_T *args)
        )
 	command_height();
 
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -3906,10 +3906,10 @@ did_set_cmdheight(optset_T *args)
 did_set_compatible(optset_T *args UNUSED)
 {
     compatible_set();
-    return NULL;
+    반환 NULL;
 }
 
-#if defined(FEAT_CONCEAL)
+#만약 defined(FEAT_CONCEAL)
 /*
  * Process the new 'conceallevel' option value.
  */
@@ -3918,32 +3918,32 @@ did_set_conceallevel(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (curwin->w_p_cole < 0)
+    만약 (curwin->w_p_cole < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	curwin->w_p_cole = 0;
     }
-    else if (curwin->w_p_cole > 3)
+    아니면 만약 (curwin->w_p_cole > 3)
     {
 	errmsg = e_invalid_argument;
 	curwin->w_p_cole = 3;
     }
-    if (curwin->w_allbuf_opt.wo_cole < 0)
+    만약 (curwin->w_allbuf_opt.wo_cole < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	curwin->w_allbuf_opt.wo_cole = 0;
     }
-    else if (curwin->w_allbuf_opt.wo_cole > 3)
+    아니면 만약 (curwin->w_allbuf_opt.wo_cole > 3)
     {
 	errmsg = e_invalid_argument;
 	curwin->w_allbuf_opt.wo_cole = 3;
     }
 
-    return errmsg;
+    반환 errmsg;
 }
 #endif
 
-#if defined(FEAT_DIFF)
+#만약 defined(FEAT_DIFF)
 /*
  * Process the updated 'diff' option value.
  */
@@ -3953,10 +3953,10 @@ did_set_diff(optset_T *args UNUSED)
     // May add or remove the buffer from the list of diff buffers.
     diff_buf_adjust(curwin);
 # ifdef FEAT_FOLDING
-    if (foldmethodIsDiff(curwin))
+    만약 (foldmethodIsDiff(curwin))
 	foldUpdateAll(curwin);
 # endif
-    return NULL;
+    반환 NULL;
 }
 #endif
 
@@ -3969,7 +3969,7 @@ did_set_eof_eol_fixeol_bomb(optset_T *args UNUSED)
 {
     // redraw the window title and tab page text
     redraw_titles();
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -3978,13 +3978,13 @@ did_set_eof_eol_fixeol_bomb(optset_T *args UNUSED)
     char *
 did_set_equalalways(optset_T *args)
 {
-    if (p_ea && !args->os_oldval.boolean)
+    만약 (p_ea && !args->os_oldval.boolean)
 	win_equal(curwin, FALSE, 0);
 
-    return NULL;
+    반환 NULL;
 }
 
-#if defined(FEAT_FOLDING)
+#만약 defined(FEAT_FOLDING)
 /*
  * Process the new 'foldcolumn' option value.
  */
@@ -3993,28 +3993,28 @@ did_set_foldcolumn(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (curwin->w_p_fdc < 0)
+    만약 (curwin->w_p_fdc < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	curwin->w_p_fdc = 0;
     }
-    else if (curwin->w_p_fdc > 12)
+    아니면 만약 (curwin->w_p_fdc > 12)
     {
 	errmsg = e_invalid_argument;
 	curwin->w_p_fdc = 12;
     }
-    if (curwin->w_allbuf_opt.wo_fdc < 0)
+    만약 (curwin->w_allbuf_opt.wo_fdc < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	curwin->w_allbuf_opt.wo_fdc = 0;
     }
-    else if (curwin->w_allbuf_opt.wo_fdc > 12)
+    아니면 만약 (curwin->w_allbuf_opt.wo_fdc > 12)
     {
 	errmsg = e_invalid_argument;
 	curwin->w_allbuf_opt.wo_fdc = 12;
     }
 
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -4023,10 +4023,10 @@ did_set_foldcolumn(optset_T *args UNUSED)
     char *
 did_set_foldlevel(optset_T *args UNUSED)
 {
-    if (curwin->w_p_fdl < 0)
+    만약 (curwin->w_p_fdl < 0)
 	curwin->w_p_fdl = 0;
     newFoldLevel();
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4036,7 +4036,7 @@ did_set_foldlevel(optset_T *args UNUSED)
 did_set_foldminlines(optset_T *args UNUSED)
 {
     foldUpdateAll(curwin);
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4045,13 +4045,13 @@ did_set_foldminlines(optset_T *args UNUSED)
     char *
 did_set_foldnestmax(optset_T *args UNUSED)
 {
-    if (foldmethodIsSyntax(curwin) || foldmethodIsIndent(curwin))
+    만약 (foldmethodIsSyntax(curwin) || foldmethodIsIndent(curwin))
 	foldUpdateAll(curwin);
-    return NULL;
+    반환 NULL;
 }
 #endif
 
-#if defined(FEAT_SEARCH_EXTRA)
+#만약 defined(FEAT_SEARCH_EXTRA)
 /*
  * Process the updated 'hlsearch' option value.
  */
@@ -4060,7 +4060,7 @@ did_set_hlsearch(optset_T *args UNUSED)
 {
     // when 'hlsearch' is set or reset: reset no_hlsearch
     set_no_hlsearch(FALSE);
-    return NULL;
+    반환 NULL;
 }
 #endif
 
@@ -4071,12 +4071,12 @@ did_set_hlsearch(optset_T *args UNUSED)
 did_set_ignorecase(optset_T *args UNUSED)
 {
     // when 'ignorecase' is set or reset and 'hlsearch' is set, redraw
-    if (p_hls)
+    만약 (p_hls)
 	redraw_all_later(UPD_SOME_VALID);
-    return NULL;
+    반환 NULL;
 }
 
-#if defined(HAVE_INPUT_METHOD)
+#만약 defined(HAVE_INPUT_METHOD)
 /*
  * Process the updated 'imdisable' option value.
  */
@@ -4084,13 +4084,13 @@ did_set_ignorecase(optset_T *args UNUSED)
 did_set_imdisable(optset_T *args UNUSED)
 {
     // Only de-activate it here, it will be enabled when changing mode.
-    if (p_imdisable)
+    만약 (p_imdisable)
 	im_set_active(FALSE);
-    else if (State & MODE_INSERT)
+    아니면 만약 (State & MODE_INSERT)
 	// When the option is set from an autocommand, it may need to take
 	// effect right away.
 	im_set_active(curbuf->b_p_iminsert == B_IMODE_IM);
-    return NULL;
+    반환 NULL;
 }
 #endif
 
@@ -4102,20 +4102,20 @@ did_set_iminsert(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (curbuf->b_p_iminsert < 0 || curbuf->b_p_iminsert > B_IMODE_LAST)
+    만약 (curbuf->b_p_iminsert < 0 || curbuf->b_p_iminsert > B_IMODE_LAST)
     {
 	errmsg = e_invalid_argument;
 	curbuf->b_p_iminsert = B_IMODE_NONE;
     }
     p_iminsert = curbuf->b_p_iminsert;
-    if (termcap_active)	// don't do this in the alternate screen
+    만약 (termcap_active)	// don't do this in the alternate screen
 	showmode();
-#if defined(FEAT_KEYMAP)
+#만약 defined(FEAT_KEYMAP)
     // Show/unshow value of 'keymap' in status lines.
     status_redraw_curbuf();
 #endif
 
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -4126,17 +4126,17 @@ did_set_imsearch(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (curbuf->b_p_imsearch < -1 || curbuf->b_p_imsearch > B_IMODE_LAST)
+    만약 (curbuf->b_p_imsearch < -1 || curbuf->b_p_imsearch > B_IMODE_LAST)
     {
 	errmsg = e_invalid_argument;
 	curbuf->b_p_imsearch = B_IMODE_NONE;
     }
     p_imsearch = curbuf->b_p_imsearch;
 
-    return errmsg;
+    반환 errmsg;
 }
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#만약 defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 /*
  * Process the new 'imstyle' option value.
  */
@@ -4145,10 +4145,10 @@ did_set_imstyle(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (p_imst != IM_ON_THE_SPOT && p_imst != IM_OVER_THE_SPOT)
+    만약 (p_imst != IM_ON_THE_SPOT && p_imst != IM_OVER_THE_SPOT)
 	errmsg = e_invalid_argument;
 
-    return errmsg;
+    반환 errmsg;
 }
 #endif
 
@@ -4159,26 +4159,26 @@ did_set_imstyle(optset_T *args UNUSED)
 did_set_insertmode(optset_T *args)
 {
     // when 'insertmode' is set from an autocommand need to do work here
-    if (p_im)
+    만약 (p_im)
     {
-	if ((State & MODE_INSERT) == 0)
+	만약 ((State & MODE_INSERT) == 0)
 	    need_start_insertmode = TRUE;
 	stop_insert_mode = FALSE;
     }
     // only reset if it was set previously
-    else if (args->os_oldval.boolean)
+    아니면 만약 (args->os_oldval.boolean)
     {
 	need_start_insertmode = FALSE;
 	stop_insert_mode = TRUE;
-	if (restart_edit != 0 && mode_displayed)
+	만약 (restart_edit != 0 && mode_displayed)
 	    clear_cmdline = TRUE;	// remove "(insert)"
 	restart_edit = 0;
     }
 
-    return NULL;
+    반환 NULL;
 }
 
-#if defined(FEAT_LANGMAP)
+#만약 defined(FEAT_LANGMAP)
 /*
  * Process the updated 'langnoremap' option value.
  */
@@ -4187,7 +4187,7 @@ did_set_langnoremap(optset_T *args UNUSED)
 {
     // 'langnoremap' -> !'langremap'
     p_lrm = !p_lnr;
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4198,7 +4198,7 @@ did_set_langremap(optset_T *args UNUSED)
 {
     // 'langremap' -> !'langnoremap'
     p_lnr = !p_lrm;
-    return NULL;
+    반환 NULL;
 }
 #endif
 
@@ -4209,10 +4209,10 @@ did_set_langremap(optset_T *args UNUSED)
 did_set_laststatus(optset_T *args UNUSED)
 {
     last_status(FALSE);	// (re)set last window status line
-    return NULL;
+    반환 NULL;
 }
 
-#if defined(FEAT_GUI)
+#만약 defined(FEAT_GUI)
 /*
  * Process the new 'linespace' option value.
  */
@@ -4221,9 +4221,9 @@ did_set_linespace(optset_T *args UNUSED)
 {
     // Recompute gui.char_height and resize the Vim window to keep the
     // same number of lines.
-    if (gui.in_use && gui_mch_adjust_charheight() == OK)
+    만약 (gui.in_use && gui_mch_adjust_charheight() == OK)
 	gui_set_shellsize(FALSE, FALSE, RESIZE_VERT);
-    return NULL;
+    반환 NULL;
 }
 #endif
 
@@ -4235,7 +4235,7 @@ did_set_lisp(optset_T *args UNUSED)
 {
     // When 'lisp' option changes include/exclude '-' in keyword characters.
     (void)buf_init_chartab(curbuf, FALSE);	    // ignore errors
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4244,12 +4244,12 @@ did_set_lisp(optset_T *args UNUSED)
     char *
 did_set_maxcombine(optset_T *args UNUSED)
 {
-    if (p_mco > MAX_MCO)
+    만약 (p_mco > MAX_MCO)
 	p_mco = MAX_MCO;
-    else if (p_mco < 0)
+    아니면 만약 (p_mco < 0)
 	p_mco = 0;
     screenclear();	    // will re-allocate the screen
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4262,16 +4262,16 @@ did_set_modifiable(optset_T *args UNUSED)
 
 #ifdef FEAT_TERMINAL
     // Cannot set 'modifiable' when in Terminal mode.
-    if (curbuf->b_p_ma && (term_in_normal_mode(curbuf) || (bt_terminal(curbuf)
+    만약 (curbuf->b_p_ma && (term_in_normal_mode(curbuf) || (bt_terminal(curbuf)
 		    && curbuf->b_term != NULL && !term_is_finished(curbuf))))
     {
 	curbuf->b_p_ma = FALSE;
-	return e_cannot_make_terminal_with_running_job_modifiable;
+	반환 e_cannot_make_terminal_with_running_job_modifiable;
     }
 #endif
     redraw_titles();
 
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4280,23 +4280,23 @@ did_set_modifiable(optset_T *args UNUSED)
     char *
 did_set_modified(optset_T *args)
 {
-    if (!args->os_newval.boolean)
+    만약 (!args->os_newval.boolean)
 	save_file_ff(curbuf);	// Buffer is unchanged
     redraw_titles();
     curbuf->b_modified_was_set = !!args->os_newval.boolean;
-    return NULL;
+    반환 NULL;
 }
 
-#if defined(FEAT_GUI)
+#만약 defined(FEAT_GUI)
 /*
  * Process the updated 'mousehide' option value.
  */
     char *
 did_set_mousehide(optset_T *args UNUSED)
 {
-    if (!p_mh)
+    만약 (!p_mh)
 	gui_mch_mousehide(FALSE);
-    return NULL;
+    반환 NULL;
 }
 #endif
 
@@ -4306,8 +4306,8 @@ did_set_mousehide(optset_T *args UNUSED)
     char *
 did_set_number_relativenumber(optset_T *args UNUSED)
 {
-#if defined(FEAT_SIGNS) && defined(FEAT_GUI)
-    if (gui.in_use
+#만약 defined(FEAT_SIGNS) && defined(FEAT_GUI)
+    만약 (gui.in_use
 	    && (*curwin->w_p_scl == 'n' && *(curwin->w_p_scl + 1) == 'u')
 	    && curbuf->b_signlist != NULL)
     {
@@ -4317,14 +4317,14 @@ did_set_number_relativenumber(optset_T *args UNUSED)
 	// number column.  If the 'number' option is set and only the
 	// 'relativenumber' option is toggled, then don't refresh the screen
 	// (optimization).
-	if (!(curwin->w_p_nu && ((int *)args->os_varp == &curwin->w_p_rnu)))
+	만약 (!(curwin->w_p_nu && ((정수 *)args->os_varp == &curwin->w_p_rnu)))
 	    redraw_all_later(UPD_CLEAR);
     }
 #endif
-    return NULL;
+    반환 NULL;
 }
 
-#if defined(FEAT_LINEBREAK)
+#만약 defined(FEAT_LINEBREAK)
 /*
  * Process the new 'numberwidth' option value.
  */
@@ -4334,29 +4334,29 @@ did_set_numberwidth(optset_T *args UNUSED)
     char *errmsg = NULL;
 
     // 'numberwidth' must be positive
-    if (curwin->w_p_nuw < 1)
+    만약 (curwin->w_p_nuw < 1)
     {
 	errmsg = e_argument_must_be_positive;
 	curwin->w_p_nuw = 1;
     }
-    else if (curwin->w_p_nuw > 20)
+    아니면 만약 (curwin->w_p_nuw > 20)
     {
 	errmsg = e_invalid_argument;
 	curwin->w_p_nuw = 20;
     }
-    if (curwin->w_allbuf_opt.wo_nuw < 1)
+    만약 (curwin->w_allbuf_opt.wo_nuw < 1)
     {
 	errmsg = e_argument_must_be_positive;
 	curwin->w_allbuf_opt.wo_nuw = 1;
     }
-    else if (curwin->w_allbuf_opt.wo_nuw > 20)
+    아니면 만약 (curwin->w_allbuf_opt.wo_nuw > 20)
     {
 	errmsg = e_invalid_argument;
 	curwin->w_allbuf_opt.wo_nuw = 20;
     }
     curwin->w_nrwidth_line_count = 0; // trigger a redraw
 
-    return errmsg;
+    반환 errmsg;
 }
 #endif
 
@@ -4366,13 +4366,13 @@ did_set_numberwidth(optset_T *args UNUSED)
     char *
 did_set_osctimeoutlen(optset_T *args)
 {
-    if (p_ost < 0)
+    만약 (p_ost < 0)
     {
 	p_ost = args->os_oldval.number;
-	return e_argument_must_be_positive;
+	반환 e_argument_must_be_positive;
     }
 
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4382,21 +4382,21 @@ did_set_osctimeoutlen(optset_T *args)
     char *
 did_set_paste(optset_T *args UNUSED)
 {
-    static int	old_p_paste = FALSE;
-    static int	save_sm = 0;
-    static int	save_sta = 0;
-    static int	save_ru = 0;
+    static 정수	old_p_paste = FALSE;
+    static 정수	save_sm = 0;
+    static 정수	save_sta = 0;
+    static 정수	save_ru = 0;
 #ifdef FEAT_RIGHTLEFT
-    static int	save_ri = 0;
-    static int	save_hkmap = 0;
+    static 정수	save_ri = 0;
+    static 정수	save_hkmap = 0;
 #endif
     buf_T	*buf;
 
-    if (p_paste)
+    만약 (p_paste)
     {
 	// Paste switched from off to on.
 	// Save the current values, so they can be restored later.
-	if (!old_p_paste)
+	만약 (!old_p_paste)
 	{
 	    // save options for each buffer
 	    FOR_ALL_BUFFERS(buf)
@@ -4407,7 +4407,7 @@ did_set_paste(optset_T *args UNUSED)
 		buf->b_p_ai_nopaste = buf->b_p_ai;
 		buf->b_p_et_nopaste = buf->b_p_et;
 #ifdef FEAT_VARTABS
-		if (buf->b_p_vsts_nopaste)
+		만약 (buf->b_p_vsts_nopaste)
 		    vim_free(buf->b_p_vsts_nopaste);
 		buf->b_p_vsts_nopaste =
 			buf->b_p_vsts && buf->b_p_vsts != empty_option
@@ -4430,7 +4430,7 @@ did_set_paste(optset_T *args UNUSED)
 	    p_tw_nopaste = p_tw;
 	    p_wm_nopaste = p_wm;
 #ifdef FEAT_VARTABS
-	    if (p_vsts_nopaste)
+	    만약 (p_vsts_nopaste)
 		vim_free(p_vsts_nopaste);
 	    p_vsts_nopaste = p_vsts && p_vsts != empty_option
 						  ? vim_strsave(p_vsts) : NULL;
@@ -4447,7 +4447,7 @@ did_set_paste(optset_T *args UNUSED)
 	    buf->b_p_ai = 0;	    // no auto-indent
 	    buf->b_p_et = 0;	    // no expandtab
 #ifdef FEAT_VARTABS
-	    if (buf->b_p_vsts)
+	    만약 (buf->b_p_vsts)
 		free_string_option(buf->b_p_vsts);
 	    buf->b_p_vsts = empty_option;
 	    VIM_CLEAR(buf->b_p_vsts_array);
@@ -4457,7 +4457,7 @@ did_set_paste(optset_T *args UNUSED)
 	// set global options
 	p_sm = 0;		    // no showmatch
 	p_sta = 0;		    // no smarttab
-	if (p_ru)
+	만약 (p_ru)
 	    status_redraw_all();    // redraw to remove the ruler
 	p_ru = 0;		    // no ruler
 #ifdef FEAT_RIGHTLEFT
@@ -4471,14 +4471,14 @@ did_set_paste(optset_T *args UNUSED)
 	p_ai = 0;
 	p_et = 0;
 #ifdef FEAT_VARTABS
-	if (p_vsts)
+	만약 (p_vsts)
 	    free_string_option(p_vsts);
 	p_vsts = empty_option;
 #endif
     }
 
     // Paste switched from on to off: Restore saved values.
-    else if (old_p_paste)
+    아니면 만약 (old_p_paste)
     {
 	// restore options for each buffer
 	FOR_ALL_BUFFERS(buf)
@@ -4489,14 +4489,14 @@ did_set_paste(optset_T *args UNUSED)
 	    buf->b_p_ai = buf->b_p_ai_nopaste;
 	    buf->b_p_et = buf->b_p_et_nopaste;
 #ifdef FEAT_VARTABS
-	    if (buf->b_p_vsts)
+	    만약 (buf->b_p_vsts)
 		free_string_option(buf->b_p_vsts);
 	    buf->b_p_vsts = buf->b_p_vsts_nopaste
 			 ? vim_strsave(buf->b_p_vsts_nopaste) : empty_option;
 	    vim_free(buf->b_p_vsts_array);
-	    if (buf->b_p_vsts && buf->b_p_vsts != empty_option)
+	    만약 (buf->b_p_vsts && buf->b_p_vsts != empty_option)
 		(void)tabstop_set(buf->b_p_vsts, &buf->b_p_vsts_array);
-	    else
+	    아니면
 		buf->b_p_vsts_array = NULL;
 #endif
 	}
@@ -4504,7 +4504,7 @@ did_set_paste(optset_T *args UNUSED)
 	// restore global options
 	p_sm = save_sm;
 	p_sta = save_sta;
-	if (p_ru != save_ru)
+	만약 (p_ru != save_ru)
 	    status_redraw_all();    // redraw to draw the ruler
 	p_ru = save_ru;
 #ifdef FEAT_RIGHTLEFT
@@ -4518,7 +4518,7 @@ did_set_paste(optset_T *args UNUSED)
 	p_tw = p_tw_nopaste;
 	p_wm = p_wm_nopaste;
 #ifdef FEAT_VARTABS
-	if (p_vsts)
+	만약 (p_vsts)
 	    free_string_option(p_vsts);
 	p_vsts = p_vsts_nopaste ? vim_strsave(p_vsts_nopaste) : empty_option;
 #endif
@@ -4526,12 +4526,12 @@ did_set_paste(optset_T *args UNUSED)
 
     old_p_paste = p_paste;
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
     // Remember where the dependent options were reset
     didset_options_sctx((OPT_LOCAL | OPT_GLOBAL), p_paste_dep_opts);
 #endif
 
-    return NULL;
+    반환 NULL;
 }
 
 
@@ -4542,24 +4542,24 @@ did_set_paste(optset_T *args UNUSED)
     char *
 did_set_previewwindow(optset_T *args UNUSED)
 {
-    if (!curwin->w_p_pvw)
-	return NULL;
+    만약 (!curwin->w_p_pvw)
+	반환 NULL;
 
     // There can be only one window with 'previewwindow' set.
     win_T	*win;
 
     FOR_ALL_WINDOWS(win)
-	if (win->w_p_pvw && win != curwin)
+	만약 (win->w_p_pvw && win != curwin)
 	{
 	    curwin->w_p_pvw = FALSE;
-	    return e_preview_window_already_exists;
+	    반환 e_preview_window_already_exists;
 	}
 
-    return NULL;
+    반환 NULL;
 }
 #endif
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#만약 defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Process the new 'pyxversion' option value.
  */
@@ -4568,10 +4568,10 @@ did_set_pyxversion(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (p_pyx != 0 && p_pyx != 2 && p_pyx != 3)
+    만약 (p_pyx != 0 && p_pyx != 2 && p_pyx != 3)
 	errmsg = e_invalid_argument;
 
-    return errmsg;
+    반환 errmsg;
 }
 #endif
 
@@ -4582,16 +4582,16 @@ did_set_pyxversion(optset_T *args UNUSED)
 did_set_readonly(optset_T *args)
 {
     // when 'readonly' is reset globally, also reset readonlymode
-    if (!curbuf->b_p_ro && (args->os_flags & OPT_LOCAL) == 0)
+    만약 (!curbuf->b_p_ro && (args->os_flags & OPT_LOCAL) == 0)
 	readonlymode = FALSE;
 
     // when 'readonly' is set may give W10 again
-    if (curbuf->b_p_ro)
+    만약 (curbuf->b_p_ro)
 	curbuf->b_did_warn = false;
 
     redraw_titles();
 
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4602,12 +4602,12 @@ did_set_scrollbind(optset_T *args UNUSED)
 {
     // when 'scrollbind' is set: snapshot the current position to avoid a jump
     // at the end of normal_cmd()
-    if (!curwin->w_p_scb)
-	return NULL;
+    만약 (!curwin->w_p_scb)
+	반환 NULL;
 
     do_check_scrollbind(FALSE);
     curwin->w_scbind_pos = curwin->w_topline;
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4620,32 +4620,32 @@ did_set_maxsearchcount(optset_T *args UNUSED)
 // if you increase this, also increase SEARCH_STAT_BUF_LEN in search.c
 #define MAX_SEARCH_COUNT 9999
 
-    if (p_msc <= 0)
+    만약 (p_msc <= 0)
 	errmsg = e_argument_must_be_positive;
-    else if (p_msc > MAX_SEARCH_COUNT)
+    아니면 만약 (p_msc > MAX_SEARCH_COUNT)
 	errmsg = e_invalid_argument;
 
-    if (errmsg != NULL)
+    만약 (errmsg != NULL)
 	p_msc = 99;
 
-    return errmsg;
+    반환 errmsg;
 #undef MAX_SEARCH_COUNT
 }
 
-#if defined(BACKSLASH_IN_FILENAME)
+#만약 defined(BACKSLASH_IN_FILENAME)
 /*
  * Process the updated 'shellslash' option value.
  */
     char *
 did_set_shellslash(optset_T *args UNUSED)
 {
-    if (p_ssl)
+    만약 (p_ssl)
     {
 	psepc = '/';
 	psepcN = '\\';
 	pseps[0] = '/';
     }
-    else
+    아니면
     {
 	psepc = '\\';
 	psepcN = '/';
@@ -4658,7 +4658,7 @@ did_set_shellslash(optset_T *args UNUSED)
 # ifdef FEAT_EVAL
     scriptnames_slash_adjust();
 # endif
-    return NULL;
+    반환 NULL;
 }
 #endif
 
@@ -4671,28 +4671,28 @@ did_set_shiftwidth_tabstop(optset_T *args)
     long	*pp = (long *)args->os_varp;
     char	*errmsg = NULL;
 
-    if (curbuf->b_p_ts <= 0)
+    만약 (curbuf->b_p_ts <= 0)
     {
 	errmsg = e_argument_must_be_positive;
 	curbuf->b_p_ts = 8;
     }
-    else if (curbuf->b_p_ts > TABSTOP_MAX)
+    아니면 만약 (curbuf->b_p_ts > TABSTOP_MAX)
     {
 	errmsg = e_invalid_argument;
 	curbuf->b_p_ts = 8;
     }
-    if (p_ts <= 0)
+    만약 (p_ts <= 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_ts = 8;
     }
-    else if (p_ts > TABSTOP_MAX)
+    아니면 만약 (p_ts > TABSTOP_MAX)
     {
 	errmsg = e_invalid_argument;
 	p_ts = 8;
     }
 
-    if (curbuf->b_p_sw < 0)
+    만약 (curbuf->b_p_sw < 0)
     {
 	errmsg = e_argument_must_be_positive;
 #ifdef FEAT_VARTABS
@@ -4700,11 +4700,11 @@ did_set_shiftwidth_tabstop(optset_T *args)
 	curbuf->b_p_sw = tabstop_count(curbuf->b_p_vts_array) > 0
 		       ? tabstop_first(curbuf->b_p_vts_array)
 		       : curbuf->b_p_ts;
-#else
+#아니면
 	curbuf->b_p_sw = curbuf->b_p_ts;
 #endif
     }
-    if (p_sw < 0)
+    만약 (p_sw < 0)
     {
 	errmsg = e_argument_must_be_positive;
 #ifdef FEAT_VARTABS
@@ -4712,21 +4712,21 @@ did_set_shiftwidth_tabstop(optset_T *args)
 	p_sw = tabstop_count(curbuf->b_p_vts_array) > 0
 	     ? tabstop_first(curbuf->b_p_vts_array)
 	     : curbuf->b_p_ts;
-#else
+#아니면
 	p_sw = curbuf->b_p_ts;
 #endif
     }
 
 #ifdef FEAT_FOLDING
-    if (foldmethodIsIndent(curwin))
+    만약 (foldmethodIsIndent(curwin))
 	foldUpdateAll(curwin);
 #endif
     // When 'shiftwidth' changes, or it's zero and 'tabstop' changes:
     // parse 'cinoptions'.
-    if (pp == &curbuf->b_p_sw || curbuf->b_p_sw == 0)
+    만약 (pp == &curbuf->b_p_sw || curbuf->b_p_sw == 0)
 	parse_cino(curbuf);
 
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -4736,7 +4736,7 @@ did_set_shiftwidth_tabstop(optset_T *args)
 did_set_showtabline(optset_T *args UNUSED)
 {
     shell_new_rows();	// recompute window positions and heights
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4745,23 +4745,23 @@ did_set_showtabline(optset_T *args UNUSED)
     char *
 did_set_smoothscroll(optset_T *args UNUSED)
 {
-    if (!curwin->w_p_sms)
+    만약 (!curwin->w_p_sms)
 	curwin->w_skipcol = 0;
 
-    return NULL;
+    반환 NULL;
 }
 
-#if defined(FEAT_SPELL)
+#만약 defined(FEAT_SPELL)
 /*
  * Process the updated 'spell' option value.
  */
     char *
 did_set_spell(optset_T *args UNUSED)
 {
-    if (curwin->w_p_spell)
-	return parse_spelllang(curwin);
+    만약 (curwin->w_p_spell)
+	반환 parse_spelllang(curwin);
 
-    return NULL;
+    반환 NULL;
 }
 #endif
 
@@ -4772,22 +4772,22 @@ did_set_spell(optset_T *args UNUSED)
 did_set_swapfile(optset_T *args UNUSED)
 {
     // when 'swf' is set, create swapfile, when reset remove swapfile
-    if (curbuf->b_p_swf && p_uc)
+    만약 (curbuf->b_p_swf && p_uc)
 	ml_open_file(curbuf);		// create the swap file
-    else
+    아니면
 	// no need to reset curbuf->b_may_swap, ml_open_file() will check
 	// buf->b_p_swf
 	mf_close_file(curbuf, TRUE);	// remove the swap file
-    return NULL;
+    반환 NULL;
 }
 
-#if defined(FEAT_TERMGUICOLORS)
+#만약 defined(FEAT_TERMGUICOLORS)
     char *
 did_set_termguicolors(optset_T *args UNUSED)
 {
 # ifdef FEAT_VTP
     // Do not turn on 'tgc' when 24-bit colors are not supported.
-    if (
+    만약 (
 #  ifdef VIMDLL
 	    !gui.in_use && !gui.starting &&
 #  endif
@@ -4795,18 +4795,18 @@ did_set_termguicolors(optset_T *args UNUSED)
     {
 	p_tgc_set = TRUE;
 	p_tgc = 0;
-	return e_24_bit_colors_are_not_supported_on_this_environment;
+	반환 e_24_bit_colors_are_not_supported_on_this_environment;
     }
-    if (is_term_win32())
+    만약 (is_term_win32())
 	swap_tcap();
 # endif
 # ifdef FEAT_GUI
-    if (!gui.in_use && !gui.starting)
+    만약 (!gui.in_use && !gui.starting)
 # endif
 	highlight_gui_started();
 # ifdef FEAT_VTP
     // reset t_Co
-    if (is_term_win32())
+    만약 (is_term_win32())
     {
 	control_console_color_rgb();
 	set_termname(T_NAME);
@@ -4820,19 +4820,19 @@ did_set_termguicolors(optset_T *args UNUSED)
 # endif
     p_tgc_set = TRUE;
 
-    return NULL;
+    반환 NULL;
 }
 #endif
 
     char *
 did_set_termsync(optset_T *args UNUSED)
 {
-    if (!p_tsy)
+    만약 (!p_tsy)
 	term_set_sync_output(TERM_SYNC_OUTPUT_OFF);
-    return NULL;
+    반환 NULL;
 }
 
-#if defined(FEAT_TERMINAL)
+#만약 defined(FEAT_TERMINAL)
 /*
  * Process the updated 'termwinscroll' option value.
  */
@@ -4842,13 +4842,13 @@ did_set_termwinscroll(optset_T *args)
     long	*pp = (long *)args->os_varp;
     char	*errmsg = NULL;
 
-    if (*pp < 1)
+    만약 (*pp < 1)
     {
 	errmsg = e_argument_must_be_positive;
 	*pp = 1;
     }
 
-    return errmsg;
+    반환 errmsg;
 }
 #endif
 
@@ -4864,16 +4864,16 @@ did_set_terse(optset_T *args UNUSED)
     p = vim_strchr(p_shm, SHM_SEARCH);
 
     // insert 's' in p_shm
-    if (p_terse && p == NULL)
+    만약 (p_terse && p == NULL)
     {
 	STRCPY(IObuff, p_shm);
 	STRCAT(IObuff, "s");
 	set_string_option_direct((char_u *)"shm", -1, IObuff, OPT_FREE, 0);
     }
     // remove 's' from p_shm
-    else if (!p_terse && p != NULL)
+    아니면 만약 (!p_terse && p != NULL)
 	STRMOVE(p, p + 1);
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4887,7 +4887,7 @@ did_set_textauto(optset_T *args)
 				p_ta ? (char_u *)DFLT_FFS_VIM : (char_u *)"",
 				OPT_FREE | args->os_flags, 0);
 
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4899,7 +4899,7 @@ did_set_textmode(optset_T *args)
     // when 'textmode' is set or reset also change 'fileformat'
     set_fileformat(curbuf->b_p_tx ? EOL_DOS : EOL_UNIX, args->os_flags);
 
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4910,12 +4910,12 @@ did_set_textwidth(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (curbuf->b_p_tw < 0)
+    만약 (curbuf->b_p_tw < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	curbuf->b_p_tw = 0;
     }
-    if (p_tw < 0)
+    만약 (p_tw < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_tw = 0;
@@ -4930,7 +4930,7 @@ did_set_textwidth(optset_T *args UNUSED)
     }
 #endif
 
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -4941,7 +4941,7 @@ did_set_title_icon(optset_T *args UNUSED)
 {
     // when 'title' changed, may need to change the title; same for 'icon'
     did_set_title();
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -4954,18 +4954,18 @@ did_set_titlelen(optset_T *args)
     char *errmsg = NULL;
 
     // if 'titlelen' has changed, redraw the title
-    if (p_titlelen < 0)
+    만약 (p_titlelen < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_titlelen = 85;
     }
-    if (starting != NO_SCREEN && old_value != p_titlelen)
+    만약 (starting != NO_SCREEN && old_value != p_titlelen)
 	need_maketitle = TRUE;
 
-    return errmsg;
+    반환 errmsg;
 }
 
-#if defined(FEAT_PERSISTENT_UNDO)
+#만약 defined(FEAT_PERSISTENT_UNDO)
 /*
  * Process the updated 'undofile' option value.
  */
@@ -4973,8 +4973,8 @@ did_set_titlelen(optset_T *args)
 did_set_undofile(optset_T *args)
 {
     // Only take action when the option was set.
-    if (!curbuf->b_p_udf && !p_udf)
-	return NULL;
+    만약 (!curbuf->b_p_udf && !p_udf)
+	반환 NULL;
 
     // When reset we do not delete the undo file, the option may be set again
     // without making any changes in between.
@@ -4987,13 +4987,13 @@ did_set_undofile(optset_T *args)
 	// only for the current buffer: Try to read in the undofile,
 	// if one exists, the buffer wasn't changed and the buffer was
 	// loaded
-	if ((curbuf == save_curbuf
+	만약 ((curbuf == save_curbuf
 		    || (args->os_flags & OPT_GLOBAL)
 		    || args->os_flags == 0)
 		&& !curbufIsChanged() && curbuf->b_ml.ml_mfp != NULL)
 	{
 # ifdef FEAT_CRYPT
-	    if (crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
+	    만약 (crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
 		continue;
 # endif
 	    u_compute_hash(hash);
@@ -5002,7 +5002,7 @@ did_set_undofile(optset_T *args)
     }
     curbuf = save_curbuf;
 
-    return NULL;
+    반환 NULL;
 }
 #endif
 
@@ -5040,14 +5040,14 @@ did_set_undolevels(optset_T *args)
 {
     long *pp = (long *)args->os_varp;
 
-    if (pp == &p_ul)			// global 'undolevels'
+    만약 (pp == &p_ul)			// global 'undolevels'
 	update_global_undolevels(args->os_newval.number,
 						       args->os_oldval.number);
-    else if (pp == &curbuf->b_p_ul)	// buffer local 'undolevels'
+    아니면 만약 (pp == &curbuf->b_p_ul)	// buffer local 'undolevels'
 	update_buflocal_undolevels(args->os_newval.number,
 						       args->os_oldval.number);
 
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -5060,15 +5060,15 @@ did_set_updatecount(optset_T *args)
     char *errmsg = NULL;
 
     // when 'updatecount' changes from zero to non-zero, open swap files
-    if (p_uc < 0)
+    만약 (p_uc < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_uc = 100;
     }
-    if (p_uc && !old_value)
+    만약 (p_uc && !old_value)
 	ml_open_files();
 
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -5079,13 +5079,13 @@ did_set_weirdinvert(optset_T *args)
 {
     // When 'weirdinvert' changed, set/reset 't_xs'.
     // Then set 'weirdinvert' according to value of 't_xs'.
-    if (p_wiv && !args->os_oldval.boolean)
+    만약 (p_wiv && !args->os_oldval.boolean)
 	T_XS = (char_u *)"y";
-    else if (!p_wiv && args->os_oldval.boolean)
+    아니면 만약 (!p_wiv && args->os_oldval.boolean)
 	T_XS = empty_option;
     p_wiv = (*T_XS != NUL);
 
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -5097,10 +5097,10 @@ did_set_wildchar(optset_T *args)
     long c = *(long *)args->os_varp;
 
     // Don't allow key values that wouldn't work as wildchar.
-    if (c == Ctrl_C || c == '\n' || c == '\r' || c == K_KENTER)
-	return e_invalid_argument;
+    만약 (c == Ctrl_C || c == '\n' || c == '\r' || c == K_KENTER)
+	반환 e_invalid_argument;
 
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -5109,11 +5109,11 @@ did_set_wildchar(optset_T *args)
     char *
 did_set_window(optset_T *args UNUSED)
 {
-    if (p_window < 1)
+    만약 (p_window < 1)
 	p_window = 1;
-    else if (p_window >= Rows)
+    아니면 만약 (p_window >= Rows)
 	p_window = Rows - 1;
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -5125,32 +5125,32 @@ did_set_winheight_helpheight(optset_T *args)
     long	*pp = (long *)args->os_varp;
     char	*errmsg = NULL;
 
-    if (p_wh < 1)
+    만약 (p_wh < 1)
     {
 	errmsg = e_argument_must_be_positive;
 	p_wh = 1;
     }
-    if (p_wmh > p_wh)
+    만약 (p_wmh > p_wh)
     {
 	errmsg = e_winheight_cannot_be_smaller_than_winminheight;
 	p_wh = p_wmh;
     }
-    if (p_hh < 0)
+    만약 (p_hh < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_hh = 0;
     }
 
     // Change window height NOW
-    if (!ONE_WINDOW)
+    만약 (!ONE_WINDOW)
     {
-	if (pp == &p_wh && curwin->w_height < p_wh)
-	    win_setheight((int)p_wh);
-	if (pp == &p_hh && curbuf->b_help && curwin->w_height < p_hh)
-	    win_setheight((int)p_hh);
+	만약 (pp == &p_wh && curwin->w_height < p_wh)
+	    win_setheight((정수)p_wh);
+	만약 (pp == &p_hh && curbuf->b_help && curwin->w_height < p_hh)
+	    win_setheight((정수)p_hh);
     }
 
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -5161,19 +5161,19 @@ did_set_winminheight(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (p_wmh < 0)
+    만약 (p_wmh < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_wmh = 0;
     }
-    if (p_wmh > p_wh)
+    만약 (p_wmh > p_wh)
     {
 	errmsg = e_winheight_cannot_be_smaller_than_winminheight;
 	p_wmh = p_wh;
     }
     win_setminheight();
 
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -5184,19 +5184,19 @@ did_set_winminwidth(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (p_wmw < 0)
+    만약 (p_wmw < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_wmw = 0;
     }
-    if (p_wmw > p_wiw)
+    만약 (p_wmw > p_wiw)
     {
 	errmsg = e_winwidth_cannot_be_smaller_than_winminwidth;
 	p_wmw = p_wiw;
     }
     win_setminwidth();
 
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -5207,25 +5207,25 @@ did_set_winwidth(optset_T *args UNUSED)
 {
     char *errmsg = NULL;
 
-    if (p_wiw < 1)
+    만약 (p_wiw < 1)
     {
 	errmsg = e_argument_must_be_positive;
 	p_wiw = 1;
     }
-    if (p_wmw > p_wiw)
+    만약 (p_wmw > p_wiw)
     {
 	errmsg = e_winwidth_cannot_be_smaller_than_winminwidth;
 	p_wiw = p_wmw;
     }
 
     // Change window width NOW
-    if (!ONE_WINDOW && curwin->w_width < p_wiw)
-	win_setwidth((int)p_wiw);
+    만약 (!ONE_WINDOW && curwin->w_width < p_wiw)
+	win_setwidth((정수)p_wiw);
 
-    return errmsg;
+    반환 errmsg;
 }
 
-#if defined(FEAT_WAYLAND_CLIPBOARD)
+#만약 defined(FEAT_WAYLAND_CLIPBOARD)
 /*
  * Process the new 'wlsteal' option value.
  */
@@ -5234,24 +5234,24 @@ did_set_wlsteal(optset_T *args UNUSED)
 {
     clip_reset_wayland();
 
-    return NULL;
+    반환 NULL;
 }
 #endif
 
-#if defined(FEAT_WAYLAND)
+#만약 defined(FEAT_WAYLAND)
 /*
  * Process the new 'wltimeoutlen' option value.
  */
     char *
 did_set_wltimeoutlen(optset_T *args)
 {
-    if (p_wtm < 0)
+    만약 (p_wtm < 0)
     {
 	p_wtm = args->os_oldval.number;
-	return e_argument_must_be_positive;
+	반환 e_argument_must_be_positive;
     }
 
-    return NULL;
+    반환 NULL;
 }
 #endif
 
@@ -5262,12 +5262,12 @@ did_set_wltimeoutlen(optset_T *args)
 did_set_wrap(optset_T *args UNUSED)
 {
     // Set w_leftcol or w_skipcol to zero.
-    if (curwin->w_p_wrap)
+    만약 (curwin->w_p_wrap)
 	curwin->w_leftcol = 0;
-    else
+    아니면
 	curwin->w_skipcol = 0;
 
-    return NULL;
+    반환 NULL;
 }
 
 #ifdef FEAT_QUICKFIX
@@ -5278,33 +5278,33 @@ did_set_wrap(optset_T *args UNUSED)
     char *
 did_set_xhistory(optset_T *args)
 {
-    int is_p_chi = (long*)args->os_varp == &p_chi;
-    int err;
+    정수 is_p_chi = (long*)args->os_varp == &p_chi;
+    정수 err;
     long *arg = (is_p_chi) ? &p_chi :(long*)args->os_varp;
 
     // cannot have zero or negative number of quickfix lists in a stack
-    if (*arg < 1)
+    만약 (*arg < 1)
     {
 	*arg = args->os_oldval.number;
-	return e_cannot_have_negative_or_zero_number_of_quickfix;
+	반환 e_cannot_have_negative_or_zero_number_of_quickfix;
     }
 
     // cannot have more than 100 quickfix lists in a stack
-    if (*arg > 100)
+    만약 (*arg > 100)
     {
 	*arg = args->os_oldval.number;
-	return e_cannot_have_more_than_hundred_quickfix;
+	반환 e_cannot_have_more_than_hundred_quickfix;
     }
 
-    if (is_p_chi)
+    만약 (is_p_chi)
 	err = qf_resize_stack(*arg);
-    else
+    아니면
 	err = ll_resize_stack(curwin, *arg);
 
-    if (err == FAIL)
-	return e_failed_resizing_quickfix_stack;
+    만약 (err == FAIL)
+	반환 e_failed_resizing_quickfix_stack;
 
-    return NULL;
+    반환 NULL;
 }
 #endif
 
@@ -5314,35 +5314,35 @@ did_set_xhistory(optset_T *args)
  */
     static char *
 set_bool_option(
-    int		opt_idx,		// index in options[] table
+    정수		opt_idx,		// index in options[] table
     char_u	*varp,			// pointer to the option variable
-    int		value,			// new value
-    int		opt_flags)		// OPT_LOCAL and/or OPT_GLOBAL
+    정수		value,			// new value
+    정수		opt_flags)		// OPT_LOCAL and/or OPT_GLOBAL
 {
-    int		old_value = *(int *)varp;
-#if defined(FEAT_EVAL)
-    int		old_global_value = 0;
+    정수		old_value = *(정수 *)varp;
+#만약 defined(FEAT_EVAL)
+    정수		old_global_value = 0;
 #endif
     char	*errmsg = NULL;
 
     // Disallow changing some options from secure mode
-    if ((secure
+    만약 ((secure
 #ifdef HAVE_SANDBOX
 		|| sandbox != 0
 #endif
 		) && (options[opt_idx].flags & P_SECURE))
-	return e_not_allowed_here;
+	반환 e_not_allowed_here;
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
     // Save the global value before changing anything. This is needed as for
     // a global-only option setting the "local value" in fact sets the global
     // value (since there is only one value).
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
-	old_global_value = *(int *)get_varp_scope(&(options[opt_idx]),
+    만약 ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+	old_global_value = *(정수 *)get_varp_scope(&(options[opt_idx]),
 								   OPT_GLOBAL);
 #endif
 
-    *(int *)varp = value;	    // set the new value
+    *(정수 *)varp = value;	    // set the new value
 #ifdef FEAT_EVAL
     // Remember where the option was set.
     set_option_sctx_idx(opt_idx, opt_flags, current_sctx);
@@ -5353,11 +5353,11 @@ set_bool_option(
 #endif
 
     // May set global value for local option.
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
-	*(int *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = value;
+    만약 ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+	*(정수 *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = value;
 
     // Handle side effects of changing a bool option.
-    if (options[opt_idx].opt_did_set_cb != NULL)
+    만약 (options[opt_idx].opt_did_set_cb != NULL)
     {
 	optset_T args;
 
@@ -5368,15 +5368,15 @@ set_bool_option(
 	args.os_newval.boolean = value;
 	args.os_errbuf = NULL;
 	errmsg = options[opt_idx].opt_did_set_cb(&args);
-	if (errmsg != NULL)
-	    return errmsg;
+	만약 (errmsg != NULL)
+	    반환 errmsg;
     }
 
     // after handling side effects, call autocommand
 
     options[opt_idx].flags |= P_WAS_SET;
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
     apply_optionset_autocmd(opt_idx, opt_flags,
 				(long)(old_value ? TRUE : FALSE),
 				(long)(old_global_value ? TRUE : FALSE),
@@ -5385,15 +5385,15 @@ set_bool_option(
 
     comp_col();			    // in case 'ruler' or 'showcmd' changed
 
-    if (curwin->w_curswant != MAXCOL
+    만약 (curwin->w_curswant != MAXCOL
 		     && (options[opt_idx].flags & (P_CURSWANT | P_RALL)) != 0
 				   && (options[opt_idx].flags & P_HLONLY) == 0)
 	curwin->w_set_curswant = true;
 
-    if ((opt_flags & OPT_NO_REDRAW) == 0)
+    만약 ((opt_flags & OPT_NO_REDRAW) == 0)
 	check_redraw(options[opt_idx].flags);
 
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -5409,9 +5409,9 @@ check_num_option_bounds(
     size_t	errbuflen,
     char	*errmsg)
 {
-    if (Rows < min_rows_for_all_tabpages() && full_screen)
+    만약 (Rows < min_rows_for_all_tabpages() && full_screen)
     {
-	if (errbuf != NULL)
+	만약 (errbuf != NULL)
 	{
 	    vim_snprintf(errbuf, errbuflen,
 		    _(e_need_at_least_nr_lines), min_rows_for_all_tabpages());
@@ -5419,9 +5419,9 @@ check_num_option_bounds(
 	}
 	Rows = min_rows_for_all_tabpages();
     }
-    if (Columns < MIN_COLUMNS && full_screen)
+    만약 (Columns < MIN_COLUMNS && full_screen)
     {
-	if (errbuf != NULL)
+	만약 (errbuf != NULL)
 	{
 	    vim_snprintf(errbuf, errbuflen,
 		    _(e_need_at_least_nr_columns), MIN_COLUMNS);
@@ -5433,114 +5433,114 @@ check_num_option_bounds(
 
     // If the screen (shell) height has been changed, assume it is the
     // physical screenheight.
-    if (old_Rows != Rows || old_Columns != Columns)
+    만약 (old_Rows != Rows || old_Columns != Columns)
     {
 	// Changing the screen size is not allowed while updating the screen.
-	if (updating_screen)
+	만약 (updating_screen)
 	    *pp = old_value;
-	else if (full_screen
+	아니면 만약 (full_screen
 #ifdef FEAT_GUI
 		&& !gui.starting
 #endif
 		)
-	    set_shellsize((int)Columns, (int)Rows, TRUE);
-	else
+	    set_shellsize((정수)Columns, (정수)Rows, TRUE);
+	아니면
 	{
 	    // Postpone the resizing; check the size and cmdline position for
 	    // messages.
 	    check_shellsize();
-	    if (cmdline_row > Rows - p_ch && Rows > p_ch)
+	    만약 (cmdline_row > Rows - p_ch && Rows > p_ch)
 		cmdline_row = Rows - p_ch;
 	}
-	if (p_window >= Rows || !option_was_set((char_u *)"window"))
+	만약 (p_window >= Rows || !option_was_set((char_u *)"window"))
 	    p_window = Rows - 1;
     }
 
-    if (p_tm < 0)
+    만약 (p_tm < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_tm = 0;
     }
-    if ((curwin->w_p_scr <= 0
+    만약 ((curwin->w_p_scr <= 0
 		|| (curwin->w_p_scr > curwin->w_height
 		    && curwin->w_height > 0))
 	    && full_screen)
     {
-	if (pp == &(curwin->w_p_scr))
+	만약 (pp == &(curwin->w_p_scr))
 	{
-	    if (curwin->w_p_scr != 0)
+	    만약 (curwin->w_p_scr != 0)
 		errmsg = e_invalid_scroll_size;
 	    win_comp_scroll(curwin);
 	}
 	// If 'scroll' became invalid because of a side effect silently adjust
 	// it.
-	else if (curwin->w_p_scr <= 0)
+	아니면 만약 (curwin->w_p_scr <= 0)
 	    curwin->w_p_scr = 1;
-	else // curwin->w_p_scr > curwin->w_height
+	아니면 // curwin->w_p_scr > curwin->w_height
 	    curwin->w_p_scr = curwin->w_height;
     }
-    if (p_hi < 0)
+    만약 (p_hi < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_hi = 0;
     }
-    else if (p_hi > 10000)
+    아니면 만약 (p_hi > 10000)
     {
 	errmsg = e_invalid_argument;
 	p_hi = 10000;
     }
-    if (p_re < 0 || p_re > 2)
+    만약 (p_re < 0 || p_re > 2)
     {
 	errmsg = e_invalid_argument;
 	p_re = 0;
     }
-    if (p_report < 0)
+    만약 (p_report < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_report = 1;
     }
-    if ((p_sj < -100 || p_sj >= Rows) && full_screen)
+    만약 ((p_sj < -100 || p_sj >= Rows) && full_screen)
     {
-	if (Rows != old_Rows)	// Rows changed, just adjust p_sj
+	만약 (Rows != old_Rows)	// Rows changed, just adjust p_sj
 	    p_sj = Rows / 2;
-	else
+	아니면
 	{
 	    errmsg = e_invalid_scroll_size;
 	    p_sj = 1;
 	}
     }
-    if (p_so < 0 && full_screen)
+    만약 (p_so < 0 && full_screen)
     {
 	errmsg = e_argument_must_be_positive;
 	p_so = 0;
     }
-    if (p_sop < 0 && full_screen)
+    만약 (p_sop < 0 && full_screen)
     {
 	errmsg = e_invalid_argument;
 	p_sop = 0;
     }
-    if (p_siso < 0 && full_screen)
+    만약 (p_siso < 0 && full_screen)
     {
 	errmsg = e_argument_must_be_positive;
 	p_siso = 0;
     }
-    if (p_cwh < 1)
+    만약 (p_cwh < 1)
     {
 	errmsg = e_argument_must_be_positive;
 	p_cwh = 1;
     }
-    if (p_ut < 0)
+    만약 (p_ut < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_ut = 2000;
     }
-    if (p_ss < 0)
+    만약 (p_ss < 0)
     {
 	errmsg = e_argument_must_be_positive;
 	p_ss = 0;
     }
 
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -5549,17 +5549,17 @@ check_num_option_bounds(
  */
     static char *
 set_num_option(
-    int		opt_idx,		// index in options[] table
+    정수		opt_idx,		// index in options[] table
     char_u	*varp,			// pointer to the option variable
     long	value,			// new value
     char	*errbuf,		// buffer for error messages
     size_t	errbuflen,		// length of "errbuf"
-    int		opt_flags)		// OPT_LOCAL, OPT_GLOBAL,
+    정수		opt_flags)		// OPT_LOCAL, OPT_GLOBAL,
 					// OPT_MODELINE, etc.
 {
     char	*errmsg = NULL;
     long	old_value = *(long *)varp;
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
     long	old_global_value = 0;	// only used when setting a local and
 					// global option
 #endif
@@ -5568,18 +5568,18 @@ set_num_option(
     long	*pp = (long *)varp;
 
     // Disallow changing some options from secure mode.
-    if ((secure
+    만약 ((secure
 #ifdef HAVE_SANDBOX
 		|| sandbox != 0
 #endif
 		) && (options[opt_idx].flags & P_SECURE))
-	return e_not_allowed_here;
+	반환 e_not_allowed_here;
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
     // Save the global value before changing anything. This is needed as for
     // a global-only option setting the "local value" in fact sets the global
     // value (since there is only one value).
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    만약 ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
 	old_global_value = *(long *)get_varp_scope(&(options[opt_idx]),
 								   OPT_GLOBAL);
 #endif
@@ -5594,12 +5594,12 @@ set_num_option(
 #endif
 
     // May set global value for local option.
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    만약 ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
 	*(long *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = value;
 
     // Invoke the option specific callback function to validate and apply the
     // new value.
-    if (options[opt_idx].opt_did_set_cb != NULL)
+    만약 (options[opt_idx].opt_did_set_cb != NULL)
     {
 	optset_T args;
 
@@ -5618,22 +5618,22 @@ set_num_option(
 
     options[opt_idx].flags |= P_WAS_SET;
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
     apply_optionset_autocmd(opt_idx, opt_flags, old_value, old_global_value,
 								value, errmsg);
 #endif
 
     comp_col();			    // in case 'columns' or 'ls' changed
 
-    if (curwin->w_curswant != MAXCOL
+    만약 (curwin->w_curswant != MAXCOL
 		     && (options[opt_idx].flags & (P_CURSWANT | P_RALL)) != 0
 				   && (options[opt_idx].flags & P_HLONLY) == 0)
 	curwin->w_set_curswant = true;
 
-    if ((opt_flags & OPT_NO_REDRAW) == 0)
+    만약 ((opt_flags & OPT_NO_REDRAW) == 0)
 	check_redraw(options[opt_idx].flags);
 
-    return errmsg;
+    반환 errmsg;
 }
 
 /*
@@ -5643,24 +5643,24 @@ set_num_option(
 check_redraw(long_u flags)
 {
     // Careful: P_RCLR and P_RALL are a combination of other P_ flags
-    int		doclear = (flags & P_RCLR) == P_RCLR;
-    int		all = ((flags & P_RALL) == P_RALL || doclear);
+    정수		doclear = (flags & P_RCLR) == P_RCLR;
+    정수		all = ((flags & P_RALL) == P_RALL || doclear);
 
-    if ((flags & P_RSTAT) || all)	// mark all status lines dirty
+    만약 ((flags & P_RSTAT) || all)	// mark all status lines dirty
 	status_redraw_all();
 
-    if ((flags & P_RBUF) || (flags & P_RWIN) || all)
+    만약 ((flags & P_RBUF) || (flags & P_RWIN) || all)
     {
-	if (flags & P_HLONLY)
+	만약 (flags & P_HLONLY)
 	    redraw_later(UPD_NOT_VALID);
-	else
+	아니면
 	    changed_window_setting();
     }
-    if (flags & P_RBUF)
+    만약 (flags & P_RBUF)
 	redraw_curbuf_later(UPD_NOT_VALID);
-    if (doclear)
+    만약 (doclear)
 	redraw_all_later(UPD_CLEAR);
-    else if (all)
+    아니면 만약 (all)
 	redraw_all_later(UPD_NOT_VALID);
 }
 
@@ -5668,37 +5668,37 @@ check_redraw(long_u flags)
  * Find index for option 'arg'.
  * Return -1 if not found.
  */
-    int
+    정수
 findoption(char_u *arg)
 {
-    int		    opt_idx;
+    정수		    opt_idx;
     char	    *s, *p;
     static short    quick_tab[27] = {0, 0};	// quick access table
-    int		    is_term_opt;
+    정수		    is_term_opt;
 
     // For first call: Initialize the quick-access table.
     // It contains the index for the first option that starts with a certain
     // letter.  There are 26 letters, plus the first "t_" option.
-    if (quick_tab[1] == 0)
+    만약 (quick_tab[1] == 0)
     {
 	// Make sure we do not leave any entries uninitialized, even if we have
 	// no options that start with a particular letter.
-	int last_opt_idx;
-	for (last_opt_idx = 0; options[last_opt_idx].fullname != NULL;
+	정수 last_opt_idx;
+	위해 (last_opt_idx = 0; options[last_opt_idx].fullname != NULL;
 		last_opt_idx++)
 	    ;
-	for (int tab_idx = 1; tab_idx < 27; tab_idx++)
+	위해 (정수 tab_idx = 1; tab_idx < 27; tab_idx++)
 	    quick_tab[tab_idx] = last_opt_idx;
 
 	p = options[0].fullname;
-	for (opt_idx = 1; opt_idx < last_opt_idx; opt_idx++)
+	위해 (opt_idx = 1; opt_idx < last_opt_idx; opt_idx++)
 	{
 	    s = options[opt_idx].fullname;
-	    if (s[0] != p[0])
+	    만약 (s[0] != p[0])
 	    {
-		if (s[0] == 't' && s[1] == '_')
+		만약 (s[0] == 't' && s[1] == '_')
 		    quick_tab[26] = opt_idx;
-		else
+		아니면
 		    quick_tab[CharOrdLow(s[0])] = opt_idx;
 	    }
 	    p = s;
@@ -5706,38 +5706,38 @@ findoption(char_u *arg)
     }
 
     // Check for name starting with an illegal character.
-    if (arg[0] < 'a' || arg[0] > 'z')
-	return -1;
+    만약 (arg[0] < 'a' || arg[0] > 'z')
+	반환 -1;
 
     is_term_opt = (arg[0] == 't' && arg[1] == '_');
-    if (is_term_opt)
+    만약 (is_term_opt)
 	opt_idx = quick_tab[26];
-    else
+    아니면
 	opt_idx = quick_tab[CharOrdLow(arg[0])];
-    for (; (s = options[opt_idx].fullname) != NULL && s[0] == arg[0]; opt_idx++)
+    위해 (; (s = options[opt_idx].fullname) != NULL && s[0] == arg[0]; opt_idx++)
     {
-	if (STRCMP(arg, s) == 0)		    // match full name
+	만약 (STRCMP(arg, s) == 0)		    // match full name
 	    break;
     }
-    if (s != NULL && s[0] != arg[0])
+    만약 (s != NULL && s[0] != arg[0])
 	s = NULL;
-    if (s == NULL && !is_term_opt)
+    만약 (s == NULL && !is_term_opt)
     {
 	opt_idx = quick_tab[CharOrdLow(arg[0])];
-	for ( ; options[opt_idx].fullname != NULL; opt_idx++)
+	위해 ( ; options[opt_idx].fullname != NULL; opt_idx++)
 	{
 	    s = options[opt_idx].shortname;
-	    if (s != NULL && STRCMP(arg, s) == 0)   // match short name
+	    만약 (s != NULL && STRCMP(arg, s) == 0)   // match short name
 		break;
 	    s = NULL;
 	}
     }
-    if (s == NULL)
+    만약 (s == NULL)
 	opt_idx = -1;
-    return opt_idx;
+    반환 opt_idx;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_TCL) || defined(FEAT_MZSCHEME) \
+#만약 defined(FEAT_EVAL) || defined(FEAT_TCL) || defined(FEAT_MZSCHEME) \
 	|| defined(FEAT_SPELL)
 /*
  * Get the value for an option.
@@ -5758,94 +5758,94 @@ get_option_value(
     char_u	*name,
     long	*numval,
     char_u	**stringval,	    // NULL when only checking existence
-    int		*flagsp,
-    int		scope)
+    정수		*flagsp,
+    정수		scope)
 {
-    int		opt_idx;
+    정수		opt_idx;
     char_u	*varp;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)		    // option not in the table
+    만약 (opt_idx < 0)		    // option not in the table
     {
-	int key;
+	정수 key;
 
-	if (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
+	만약 (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
 				  && (key = find_key_option(name, FALSE)) != 0)
 	{
 	    char_u key_name[2];
 	    char_u *p;
 
-	    if (flagsp != NULL)
+	    만약 (flagsp != NULL)
 		*flagsp = 0;  // terminal option has no flags
 
 	    // check for a terminal option
-	    if (key < 0)
+	    만약 (key < 0)
 	    {
 		key_name[0] = KEY2TERMCAP0(key);
 		key_name[1] = KEY2TERMCAP1(key);
 	    }
-	    else
+	    아니면
 	    {
 		key_name[0] = KS_KEY;
 		key_name[1] = (key & 0xff);
 	    }
 	    p = find_termcode(key_name);
-	    if (p != NULL)
+	    만약 (p != NULL)
 	    {
-		if (stringval != NULL)
+		만약 (stringval != NULL)
 		    *stringval = vim_strsave(p);
-		return gov_string;
+		반환 gov_string;
 	    }
 	}
-	return gov_unknown;
+	반환 gov_unknown;
     }
 
     varp = get_varp_scope(&(options[opt_idx]), scope);
 
-    if (flagsp != NULL)
+    만약 (flagsp != NULL)
 	// Return the P_xxxx option flags.
 	*flagsp = options[opt_idx].flags;
 
-    if (options[opt_idx].flags & P_STRING)
+    만약 (options[opt_idx].flags & P_STRING)
     {
-	if (varp == NULL)		    // hidden option
-	    return gov_hidden_string;
-	if (stringval != NULL)
+	만약 (varp == NULL)		    // hidden option
+	    반환 gov_hidden_string;
+	만약 (stringval != NULL)
 	{
-	    if ((char_u **)varp == &p_pt)	// 'pastetoggle'
+	    만약 ((char_u **)varp == &p_pt)	// 'pastetoggle'
 		*stringval = str2special_save(*(char_u **)(varp), FALSE,
 									FALSE);
 # ifdef FEAT_CRYPT
 	    // never return the value of the crypt key
-	    else if ((char_u **)varp == &curbuf->b_p_key
+	    아니면 만약 ((char_u **)varp == &curbuf->b_p_key
 						&& **(char_u **)(varp) != NUL)
 		*stringval = vim_strnsave((char_u *)"*****", STRLEN_LITERAL("*****"));
 # endif
-	    else
+	    아니면
 		*stringval = vim_strsave(*(char_u **)(varp));
 	}
-	return gov_string;
+	반환 gov_string;
     }
 
-    if (varp == NULL)		    // hidden option
-	return (options[opt_idx].flags & P_NUM)
+    만약 (varp == NULL)		    // hidden option
+	반환 (options[opt_idx].flags & P_NUM)
 					 ? gov_hidden_number : gov_hidden_bool;
-    if (options[opt_idx].flags & P_NUM)
+    만약 (options[opt_idx].flags & P_NUM)
 	*numval = *(long *)varp;
-    else
+    아니면
     {
 	// Special case: 'modified' is b_changed, but we also want to consider
 	// it set when 'ff' or 'fenc' changed.
-	if ((int *)varp == &curbuf->b_changed)
+	만약 ((정수 *)varp == &curbuf->b_changed)
 	    *numval = curbufIsChanged();
-	else
-	    *numval = (long) *(int *)varp;
+	아니면
+	    *numval = (long) *(정수 *)varp;
     }
-    return (options[opt_idx].flags & P_NUM) ? gov_number : gov_bool;
+    반환 (options[opt_idx].flags & P_NUM) ? gov_number : gov_bool;
 }
 #endif
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#만약 defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Returns the option attributes and its value. Unlike the above function it
  * will return either global value or local value of the option depending on
@@ -5864,91 +5864,91 @@ get_option_value(
  *
  * Possible opt_type values: see SREQ_* in vim.h
  */
-    int
+    정수
 get_option_value_strict(
     char_u	*name,
     long	*numval,
     char_u	**stringval,	    // NULL when only obtaining attributes
-    int		opt_type,
+    정수		opt_type,
     void	*from)
 {
-    int		opt_idx;
+    정수		opt_idx;
     char_u	*varp = NULL;
     struct vimoption *p;
-    int		r = 0;
+    정수		r = 0;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)
-	return 0;
+    만약 (opt_idx < 0)
+	반환 0;
 
     p = &(options[opt_idx]);
 
     // Hidden option
-    if (p->var == NULL)
-	return 0;
+    만약 (p->var == NULL)
+	반환 0;
 
-    if (p->flags & P_BOOL)
+    만약 (p->flags & P_BOOL)
 	r |= SOPT_BOOL;
-    else if (p->flags & P_NUM)
+    아니면 만약 (p->flags & P_NUM)
 	r |= SOPT_NUM;
-    else if (p->flags & P_STRING)
+    아니면 만약 (p->flags & P_STRING)
 	r |= SOPT_STRING;
 
-    if (p->indir == PV_NONE)
+    만약 (p->indir == PV_NONE)
     {
-	if (opt_type == SREQ_GLOBAL)
+	만약 (opt_type == SREQ_GLOBAL)
 	    r |= SOPT_GLOBAL;
-	else
-	    return 0; // Did not request global-only option
+	아니면
+	    반환 0; // Did not request global-only option
     }
-    else
+    아니면
     {
-	if (p->indir & PV_BOTH)
+	만약 (p->indir & PV_BOTH)
 	    r |= SOPT_GLOBAL;
-	else if (opt_type == SREQ_GLOBAL)
-	    return 0; // Requested global option
+	아니면 만약 (opt_type == SREQ_GLOBAL)
+	    반환 0; // Requested global option
 
-	if (p->indir & PV_WIN)
+	만약 (p->indir & PV_WIN)
 	{
-	    if (opt_type == SREQ_BUF)
-		return 0; // Did not request window-local option
-	    else
+	    만약 (opt_type == SREQ_BUF)
+		반환 0; // Did not request window-local option
+	    아니면
 		r |= SOPT_WIN;
 	}
-	else if (p->indir & PV_BUF)
+	아니면 만약 (p->indir & PV_BUF)
 	{
-	    if (opt_type == SREQ_WIN)
-		return 0; // Did not request buffer-local option
-	    else
+	    만약 (opt_type == SREQ_WIN)
+		반환 0; // Did not request buffer-local option
+	    아니면
 		r |= SOPT_BUF;
 	}
     }
 
-    if (stringval == NULL)
-	return r;
+    만약 (stringval == NULL)
+	반환 r;
 
-    if (opt_type == SREQ_GLOBAL)
+    만약 (opt_type == SREQ_GLOBAL)
 	varp = p->var;
-    else
+    아니면
     {
-	if (opt_type == SREQ_BUF)
+	만약 (opt_type == SREQ_BUF)
 	{
 	    // Special case: 'modified' is b_changed, but we also want to
 	    // consider it set when 'ff' or 'fenc' changed.
-	    if (p->indir == PV_MOD)
+	    만약 (p->indir == PV_MOD)
 	    {
 		*numval = bufIsChanged((buf_T *)from);
 		varp = NULL;
 	    }
 # ifdef FEAT_CRYPT
-	    else if (p->indir == PV_KEY)
+	    아니면 만약 (p->indir == PV_KEY)
 	    {
 		// never return the value of the crypt key
 		*stringval = NULL;
 		varp = NULL;
 	    }
 # endif
-	    else
+	    아니면
 	    {
 		buf_T *save_curbuf = curbuf;
 
@@ -5960,7 +5960,7 @@ get_option_value_strict(
 		curwin->w_buffer = curbuf;
 	    }
 	}
-	else if (opt_type == SREQ_WIN)
+	아니면 만약 (opt_type == SREQ_WIN)
 	{
 	    win_T	*save_curwin = curwin;
 
@@ -5970,21 +5970,21 @@ get_option_value_strict(
 	    curwin = save_curwin;
 	    curbuf = curwin->w_buffer;
 	}
-	if (varp == p->var)
-	    return (r | SOPT_UNSET);
+	만약 (varp == p->var)
+	    반환 (r | SOPT_UNSET);
     }
 
-    if (varp != NULL)
+    만약 (varp != NULL)
     {
-	if (p->flags & P_STRING)
+	만약 (p->flags & P_STRING)
 	    *stringval = vim_strsave(*(char_u **)(varp));
-	else if (p->flags & P_NUM)
+	아니면 만약 (p->flags & P_NUM)
 	    *numval = *(long *) varp;
-	else
-	    *numval = *(int *)varp;
+	아니면
+	    *numval = *(정수 *)varp;
     }
 
-    return r;
+    반환 r;
 }
 
 /*
@@ -6000,25 +6000,25 @@ get_option_value_strict(
  * Returns full option name for current option on each call.
  */
     char_u *
-option_iter_next(void **option, int opt_type)
+option_iter_next(void **option, 정수 opt_type)
 {
     struct vimoption	*ret = NULL;
     do
     {
-	if (*option == NULL)
+	만약 (*option == NULL)
 	    *option = (void *) options;
-	else if (((struct vimoption *) (*option))->fullname == NULL)
+	아니면 만약 (((struct vimoption *) (*option))->fullname == NULL)
 	{
 	    *option = NULL;
-	    return NULL;
+	    반환 NULL;
 	}
-	else
+	아니면
 	    *option = (void *) (((struct vimoption *) (*option)) + 1);
 
 	ret = ((struct vimoption *) (*option));
 
 	// Hidden option
-	if (ret->var == NULL)
+	만약 (ret->var == NULL)
 	{
 	    ret = NULL;
 	    continue;
@@ -6027,25 +6027,25 @@ option_iter_next(void **option, int opt_type)
 	switch (opt_type)
 	{
 	    case SREQ_GLOBAL:
-		if (!(ret->indir == PV_NONE || ret->indir & PV_BOTH))
+		만약 (!(ret->indir == PV_NONE || ret->indir & PV_BOTH))
 		    ret = NULL;
 		break;
 	    case SREQ_BUF:
-		if (!(ret->indir & PV_BUF))
+		만약 (!(ret->indir & PV_BUF))
 		    ret = NULL;
 		break;
 	    case SREQ_WIN:
-		if (!(ret->indir & PV_WIN))
+		만약 (!(ret->indir & PV_WIN))
 		    ret = NULL;
 		break;
 	    default:
 		internal_error("option_iter_next()");
-		return NULL;
+		반환 NULL;
 	}
     }
-    while (ret == NULL);
+    동안 (ret == NULL);
 
-    return (char_u *)ret->fullname;
+    반환 (char_u *)ret->fullname;
 }
 #endif
 
@@ -6053,16 +6053,16 @@ option_iter_next(void **option, int opt_type)
  * Return the flags for the option at 'opt_idx'.
  */
     long_u
-get_option_flags(int opt_idx)
+get_option_flags(정수 opt_idx)
 {
-    return options[opt_idx].flags;
+    반환 options[opt_idx].flags;
 }
 
 /*
  * Set a flag for the option at 'opt_idx'.
  */
     void
-set_option_flag(int opt_idx, long_u flag)
+set_option_flag(정수 opt_idx, long_u flag)
 {
     options[opt_idx].flags |= flag;
 }
@@ -6070,48 +6070,48 @@ set_option_flag(int opt_idx, long_u flag)
 /*
  * Returns TRUE if the option at 'opt_idx' is a global option
  */
-    int
-is_global_option(int opt_idx)
+    정수
+is_global_option(정수 opt_idx)
 {
-    return options[opt_idx].indir == PV_NONE;
+    반환 options[opt_idx].indir == PV_NONE;
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' is a global option which also has a
  * local value.
  */
-    int
-is_global_local_option(int opt_idx)
+    정수
+is_global_local_option(정수 opt_idx)
 {
-    return options[opt_idx].indir & PV_BOTH;
+    반환 options[opt_idx].indir & PV_BOTH;
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' is a window-local option
  */
-    int
-is_window_local_option(int opt_idx)
+    정수
+is_window_local_option(정수 opt_idx)
 {
-    return options[opt_idx].var == VAR_WIN;
+    반환 options[opt_idx].var == VAR_WIN;
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' is a hidden option
  */
-    int
-is_hidden_option(int opt_idx)
+    정수
+is_hidden_option(정수 opt_idx)
 {
-    return options[opt_idx].var == NULL;
+    반환 options[opt_idx].var == NULL;
 }
 
-#if defined(FEAT_CRYPT)
+#만약 defined(FEAT_CRYPT)
 /*
  * Returns TRUE if the option at 'opt_idx' is a crypt key option
  */
-    int
-is_crypt_key_option(int opt_idx)
+    정수
+is_crypt_key_option(정수 opt_idx)
 {
-    return options[opt_idx].indir == PV_KEY;
+    반환 options[opt_idx].indir == PV_KEY;
 }
 #endif
 
@@ -6126,90 +6126,90 @@ set_option_value(
     char_u	*name,
     long	number,
     char_u	*string,
-    int		opt_flags)	// OPT_LOCAL or 0 (both)
+    정수		opt_flags)	// OPT_LOCAL or 0 (both)
 {
-    int		opt_idx;
+    정수		opt_idx;
     char_u	*varp;
     long_u	flags;
     static char	errbuf[ERR_BUFLEN];
-    int		errbuflen = ERR_BUFLEN;
+    정수		errbuflen = ERR_BUFLEN;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)
+    만약 (opt_idx < 0)
     {
-	int key;
+	정수 key;
 
-	if (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
+	만약 (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
 		&& (key = find_key_option(name, FALSE)) != 0)
 	{
 	    char_u key_name[2];
 
-	    if (key < 0)
+	    만약 (key < 0)
 	    {
 		key_name[0] = KEY2TERMCAP0(key);
 		key_name[1] = KEY2TERMCAP1(key);
 	    }
-	    else
+	    아니면
 	    {
 		key_name[0] = KS_KEY;
 		key_name[1] = (key & 0xff);
 	    }
 	    add_termcode(key_name, string, FALSE);
-	    if (full_screen)
+	    만약 (full_screen)
 		ttest(FALSE);
 	    redraw_all_later(UPD_CLEAR);
-	    return NULL;
+	    반환 NULL;
 	}
 
 	semsg(_(e_unknown_option_str_2), name);
     }
-    else
+    아니면
     {
 	flags = options[opt_idx].flags;
 #ifdef HAVE_SANDBOX
 	// Disallow changing some options in the sandbox
-	if (sandbox > 0 && (flags & P_SECURE))
+	만약 (sandbox > 0 && (flags & P_SECURE))
 	{
 	    emsg(_(e_not_allowed_in_sandbox));
-	    return NULL;
+	    반환 NULL;
 	}
 #endif
-	if (flags & P_STRING)
-	    return set_string_option(opt_idx, string, opt_flags, errbuf, errbuflen);
+	만약 (flags & P_STRING)
+	    반환 set_string_option(opt_idx, string, opt_flags, errbuf, errbuflen);
 
 	varp = get_varp_scope(&(options[opt_idx]), opt_flags);
-	if (varp != NULL)	// hidden option is not changed
+	만약 (varp != NULL)	// hidden option is not changed
 	{
-	    if (number == 0 && string != NULL)
+	    만약 (number == 0 && string != NULL)
 	    {
-		int idx;
+		정수 idx;
 
 		// Either we are given a string or we are setting option
 		// to zero.
-		for (idx = 0; string[idx] == '0'; ++idx)
+		위해 (idx = 0; string[idx] == '0'; ++idx)
 		    ;
-		if (string[idx] != NUL || idx == 0)
+		만약 (string[idx] != NUL || idx == 0)
 		{
 		    // There's another character after zeros or the string
 		    // is empty.  In both cases, we are trying to set a
 		    // num option using a string.
 		    semsg(_(e_number_required_after_str_equal_str),
 								 name, string);
-		    return NULL;     // do nothing as we hit an error
+		    반환 NULL;     // do nothing as we hit an error
 
 		}
 	    }
-	    if (flags & P_NUM)
+	    만약 (flags & P_NUM)
 	    {
-		return set_num_option(opt_idx, varp, number,
+		반환 set_num_option(opt_idx, varp, number,
 					   errbuf, sizeof(errbuf), opt_flags);
 	    }
-	    else
-		return set_bool_option(opt_idx, varp, (int)number, opt_flags);
+	    아니면
+		반환 set_bool_option(opt_idx, varp, (정수)number, opt_flags);
 	}
 
     }
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -6220,11 +6220,11 @@ set_option_value_give_err(
     char_u	*name,
     long	number,
     char_u	*string,
-    int		opt_flags)	// OPT_LOCAL or 0 (both)
+    정수		opt_flags)	// OPT_LOCAL or 0 (both)
 {
     char *errmsg = set_option_value(name, number, string, opt_flags);
 
-    if (errmsg != NULL)
+    만약 (errmsg != NULL)
 	emsg(_(errmsg));
 }
 
@@ -6235,51 +6235,51 @@ set_option_value_give_err(
     char_u *
 get_term_code(char_u *tname)
 {
-    int	    opt_idx;
+    정수	    opt_idx;
     char_u  *varp;
 
-    if (tname[0] != 't' || tname[1] != '_' ||
+    만약 (tname[0] != 't' || tname[1] != '_' ||
 	    tname[2] == NUL || tname[3] == NUL)
-	return NULL;
-    if ((opt_idx = findoption(tname)) >= 0)
+	반환 NULL;
+    만약 ((opt_idx = findoption(tname)) >= 0)
     {
 	varp = get_varp(&(options[opt_idx]));
-	if (varp != NULL)
+	만약 (varp != NULL)
 	    varp = *(char_u **)(varp);
-	return varp;
+	반환 varp;
     }
-    return find_termcode(tname + 2);
+    반환 find_termcode(tname + 2);
 }
 
     char_u *
 get_highlight_default(void)
 {
-    int i;
+    정수 i;
 
     i = findoption((char_u *)"hl");
-    if (i >= 0)
-	return options[i].def_val[VI_DEFAULT];
-    return (char_u *)NULL;
+    만약 (i >= 0)
+	반환 options[i].def_val[VI_DEFAULT];
+    반환 (char_u *)NULL;
 }
 
     char_u *
 get_encoding_default(void)
 {
-    int i;
+    정수 i;
 
     i = findoption((char_u *)"enc");
-    if (i >= 0)
-	return options[i].def_val[VI_DEFAULT];
-    return (char_u *)NULL;
+    만약 (i >= 0)
+	반환 options[i].def_val[VI_DEFAULT];
+    반환 (char_u *)NULL;
 }
 
-#if defined(FEAT_QUICKFIX)
-    int
+#만약 defined(FEAT_QUICKFIX)
+    정수
 is_option_allocated(char *name)
 {
-    int idx = findoption((char_u *)name);
+    정수 idx = findoption((char_u *)name);
 
-    return idx >= 0 && (options[idx].flags & P_ALLOCED);
+    반환 idx >= 0 && (options[idx].flags & P_ALLOCED);
 }
 #endif
 
@@ -6288,30 +6288,30 @@ is_option_allocated(char *name)
  * When "has_lt" is true there is a '<' before "*arg_arg".
  * Returns 0 when the key is not recognized.
  */
-    static int
-find_key_option(char_u *arg_arg, int has_lt)
+    static 정수
+find_key_option(char_u *arg_arg, 정수 has_lt)
 {
-    int		key = 0;
-    int		modifiers;
+    정수		key = 0;
+    정수		modifiers;
     char_u	*arg = arg_arg;
 
     // Don't use get_special_key_code() for t_xx, we don't want it to call
     // add_termcap_entry().
-    if (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
+    만약 (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
     {
-	if (!has_lt || arg[4] == '>')
+	만약 (!has_lt || arg[4] == '>')
 	    key = TERMCAP2KEY(arg[2], arg[3]);
     }
-    else if (has_lt)
+    아니면 만약 (has_lt)
     {
 	--arg;			    // put arg at the '<'
 	modifiers = 0;
 	key = find_special_key(&arg, &modifiers,
 			    FSK_KEYCODE | FSK_KEEP_X_KEY | FSK_SIMPLIFY, NULL);
-	if (modifiers)		    // can't handle modifiers here
+	만약 (modifiers)		    // can't handle modifiers here
 	    key = 0;
     }
-    return key;
+    반환 key;
 }
 
 /*
@@ -6321,98 +6321,98 @@ find_key_option(char_u *arg_arg, int has_lt)
  */
     static void
 showoptions(
-    int		all,
-    int		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
+    정수		all,
+    정수		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
 {
     struct vimoption	*p;
-    int			col;
-    int			isterm;
+    정수			col;
+    정수			isterm;
     char_u		*varp;
     struct vimoption	**items;
-    int			item_count;
-    int			run;
-    int			row, rows;
-    int			cols;
-    int			i;
-    int			len;
+    정수			item_count;
+    정수			run;
+    정수			row, rows;
+    정수			cols;
+    정수			i;
+    정수			len;
 
 #define INC 20
 #define GAP 3
 
     items = ALLOC_MULT(struct vimoption *, OPTION_COUNT);
-    if (items == NULL)
-	return;
+    만약 (items == NULL)
+	반환;
 
     // Highlight title
-    if (all == 2)
+    만약 (all == 2)
 	msg_puts_title(_("\n--- Terminal codes ---"));
-    else if (opt_flags & OPT_GLOBAL)
+    아니면 만약 (opt_flags & OPT_GLOBAL)
 	msg_puts_title(_("\n--- Global option values ---"));
-    else if (opt_flags & OPT_LOCAL)
+    아니면 만약 (opt_flags & OPT_LOCAL)
 	msg_puts_title(_("\n--- Local option values ---"));
-    else
+    아니면
 	msg_puts_title(_("\n--- Options ---"));
 
     // Do the loop two times:
     // 1. display the short items
     // 2. display the long items (only strings and numbers)
     // When "opt_flags" has OPT_ONECOLUMN do everything in run 2.
-    for (run = 1; run <= 2 && !got_int; ++run)
+    위해 (run = 1; run <= 2 && !got_int; ++run)
     {
 	// collect the items in items[]
 	item_count = 0;
-	for (p = &options[0]; p->fullname != NULL; p++)
+	위해 (p = &options[0]; p->fullname != NULL; p++)
 	{
 	    // apply :filter /pat/
-	    if (message_filtered((char_u *)p->fullname))
+	    만약 (message_filtered((char_u *)p->fullname))
 		continue;
 
 	    varp = NULL;
 	    isterm = istermoption(p);
-	    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) != 0)
+	    만약 ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) != 0)
 	    {
-		if (p->indir != PV_NONE && !isterm)
+		만약 (p->indir != PV_NONE && !isterm)
 		    varp = get_varp_scope(p, opt_flags);
 	    }
-	    else
+	    아니면
 		varp = get_varp(p);
-	    if (varp != NULL
+	    만약 (varp != NULL
 		    && ((all == 2 && isterm)
 			|| (all == 1 && !isterm)
 			|| (all == 0 && !optval_default(p, varp, p_cp))))
 	    {
-		if (opt_flags & OPT_ONECOLUMN)
+		만약 (opt_flags & OPT_ONECOLUMN)
 		    len = Columns;
-		else if (p->flags & P_BOOL)
+		아니면 만약 (p->flags & P_BOOL)
 		    len = 1;		// a toggle option fits always
-		else
+		아니면
 		{
 		    option_value2string(p, opt_flags);
-		    len = (int)STRLEN(p->fullname) + vim_strsize(NameBuff) + 1;
+		    len = (정수)STRLEN(p->fullname) + vim_strsize(NameBuff) + 1;
 		}
-		if ((len <= INC - GAP && run == 1) ||
+		만약 ((len <= INC - GAP && run == 1) ||
 						(len > INC - GAP && run == 2))
 		    items[item_count++] = p;
 	    }
 	}
 
 	// display the items
-	if (run == 1)
+	만약 (run == 1)
 	{
 	    cols = (Columns + GAP - 3) / INC;
-	    if (cols == 0)
+	    만약 (cols == 0)
 		cols = 1;
 	    rows = (item_count + cols - 1) / cols;
 	}
-	else	// run == 2
+	아니면	// run == 2
 	    rows = item_count;
-	for (row = 0; row < rows && !got_int; ++row)
+	위해 (row = 0; row < rows && !got_int; ++row)
 	{
 	    msg_putchar('\n');			// go to next line
-	    if (got_int)			// 'q' typed in more
+	    만약 (got_int)			// 'q' typed in more
 		break;
 	    col = 0;
-	    for (i = row; i < item_count; i += rows)
+	    위해 (i = row; i < item_count; i += rows)
 	    {
 		msg_col = col;			// make columns
 		showoneopt(items[i], opt_flags);
@@ -6428,22 +6428,22 @@ showoptions(
 /*
  * Return TRUE if option "p" has its default value.
  */
-    static int
-optval_default(struct vimoption *p, char_u *varp, int compatible)
+    static 정수
+optval_default(struct vimoption *p, char_u *varp, 정수 compatible)
 {
-    int		dvi;
+    정수		dvi;
 
-    if (varp == NULL)
-	return TRUE;	    // hidden option is always at default
+    만약 (varp == NULL)
+	반환 TRUE;	    // hidden option is always at default
     dvi = ((p->flags & P_VI_DEF) || compatible) ? VI_DEFAULT : VIM_DEFAULT;
-    if (p->flags & P_NUM)
-	return (*(long *)varp == (long)(long_i)p->def_val[dvi]);
-    if (p->flags & P_BOOL)
+    만약 (p->flags & P_NUM)
+	반환 (*(long *)varp == (long)(long_i)p->def_val[dvi]);
+    만약 (p->flags & P_BOOL)
 			// the cast to long is required for Manx C, long_i is
 			// needed for MSVC
-	return (*(int *)varp == (int)(long)(long_i)p->def_val[dvi]);
+	반환 (*(정수 *)varp == (정수)(long)(long_i)p->def_val[dvi]);
     // P_STRING
-    return (STRCMP(*(char_u **)varp, p->def_val[dvi]) == 0);
+    반환 (STRCMP(*(char_u **)varp, p->def_val[dvi]) == 0);
 }
 
 /*
@@ -6453,10 +6453,10 @@ optval_default(struct vimoption *p, char_u *varp, int compatible)
     static void
 showoneopt(
     struct vimoption	*p,
-    int			opt_flags)	// OPT_LOCAL or OPT_GLOBAL
+    정수			opt_flags)	// OPT_LOCAL or OPT_GLOBAL
 {
     char_u	*varp;
-    int		save_silent = silent_mode;
+    정수		save_silent = silent_mode;
 
     silent_mode = FALSE;
     info_message = TRUE;	// use mch_msg(), not mch_errmsg()
@@ -6464,15 +6464,15 @@ showoneopt(
     varp = get_varp_scope(p, opt_flags);
 
     // for 'modified' we also need to check if 'ff' or 'fenc' changed.
-    if ((p->flags & P_BOOL) && ((int *)varp == &curbuf->b_changed
-					? !curbufIsChanged() : !*(int *)varp))
+    만약 ((p->flags & P_BOOL) && ((정수 *)varp == &curbuf->b_changed
+					? !curbufIsChanged() : !*(정수 *)varp))
 	msg_puts("no");
-    else if ((p->flags & P_BOOL) && *(int *)varp < 0)
+    아니면 만약 ((p->flags & P_BOOL) && *(정수 *)varp < 0)
 	msg_puts("--");
-    else
+    아니면
 	msg_puts("  ");
     msg_puts(p->fullname);
-    if (!(p->flags & P_BOOL))
+    만약 (!(p->flags & P_BOOL))
     {
 	msg_putchar('=');
 	// put value string in NameBuff
@@ -6506,16 +6506,16 @@ showoneopt(
  *
  * Return FAIL on error, OK otherwise.
  */
-    int
-makeset(FILE *fd, int opt_flags, int local_only)
+    정수
+makeset(FILE *fd, 정수 opt_flags, 정수 local_only)
 {
     struct vimoption	*p;
     char_u		*varp;			// currently used value
     char_u		*varp_fresh;		// local value
     char_u		*varp_local = NULL;	// fresh value
     char		*cmd;
-    int			round;
-    int			pri;
+    정수			round;
+    정수			pri;
 
     /*
      * The options that don't have a default (terminal name, columns, lines)
@@ -6523,45 +6523,45 @@ makeset(FILE *fd, int opt_flags, int local_only)
      * Do the loop over "options[]" twice: once for options with the
      * P_PRI_MKRC flag and once without.
      */
-    for (pri = 1; pri >= 0; --pri)
+    위해 (pri = 1; pri >= 0; --pri)
     {
-      for (p = &options[0]; !istermoption(p); p++)
-	if (!(p->flags & P_NO_MKRC)
+      위해 (p = &options[0]; !istermoption(p); p++)
+	만약 (!(p->flags & P_NO_MKRC)
 		&& !istermoption(p)
 		&& ((pri == 1) == ((p->flags & P_PRI_MKRC) != 0)))
 	{
 	    // skip global option when only doing locals
-	    if (p->indir == PV_NONE && !(opt_flags & OPT_GLOBAL))
+	    만약 (p->indir == PV_NONE && !(opt_flags & OPT_GLOBAL))
 		continue;
 
 	    // Do not store options like 'bufhidden' and 'syntax' in a vimrc
 	    // file, they are always buffer-specific.
-	    if ((opt_flags & OPT_GLOBAL) && (p->flags & P_NOGLOB))
+	    만약 ((opt_flags & OPT_GLOBAL) && (p->flags & P_NOGLOB))
 		continue;
 
 	    // Global values are only written when not at the default value.
 	    varp = get_varp_scope(p, opt_flags);
-	    if ((opt_flags & OPT_GLOBAL) && optval_default(p, varp, p_cp))
+	    만약 ((opt_flags & OPT_GLOBAL) && optval_default(p, varp, p_cp))
 		continue;
 
-	    if ((opt_flags & OPT_SKIPRTP) && (p->var == (char_u *)&p_rtp
+	    만약 ((opt_flags & OPT_SKIPRTP) && (p->var == (char_u *)&p_rtp
 						 || p->var == (char_u *)&p_pp))
 		continue;
 
 	    round = 2;
-	    if (p->indir != PV_NONE)
+	    만약 (p->indir != PV_NONE)
 	    {
-		if (p->var == VAR_WIN)
+		만약 (p->var == VAR_WIN)
 		{
 		    // skip window-local option when only doing globals
-		    if (!(opt_flags & OPT_LOCAL))
+		    만약 (!(opt_flags & OPT_LOCAL))
 			continue;
 		    // When fresh value of window-local option is not at the
 		    // default, need to write it too.
-		    if (!(opt_flags & OPT_GLOBAL) && !local_only)
+		    만약 (!(opt_flags & OPT_GLOBAL) && !local_only)
 		    {
 			varp_fresh = get_varp_scope(p, OPT_GLOBAL);
-			if (!optval_default(p, varp_fresh, p_cp))
+			만약 (!optval_default(p, varp_fresh, p_cp))
 			{
 			    round = 1;
 			    varp_local = varp;
@@ -6573,38 +6573,38 @@ makeset(FILE *fd, int opt_flags, int local_only)
 
 	    // Round 1: fresh value for window-local options.
 	    // Round 2: other values
-	    for ( ; round <= 2; varp = varp_local, ++round)
+	    위해 ( ; round <= 2; varp = varp_local, ++round)
 	    {
-		if (round == 1 || (opt_flags & OPT_GLOBAL))
+		만약 (round == 1 || (opt_flags & OPT_GLOBAL))
 		    cmd = "set";
-		else
+		아니면
 		    cmd = "setlocal";
 
-		if (p->flags & P_BOOL)
+		만약 (p->flags & P_BOOL)
 		{
-		    if (put_setbool(fd, cmd, p->fullname, *(int *)varp) == FAIL)
-			return FAIL;
+		    만약 (put_setbool(fd, cmd, p->fullname, *(정수 *)varp) == FAIL)
+			반환 FAIL;
 		}
-		else if (p->flags & P_NUM)
+		아니면 만약 (p->flags & P_NUM)
 		{
-		    if (put_setnum(fd, cmd, p->fullname, (long *)varp) == FAIL)
-			return FAIL;
+		    만약 (put_setnum(fd, cmd, p->fullname, (long *)varp) == FAIL)
+			반환 FAIL;
 		}
-		else    // P_STRING
+		아니면    // P_STRING
 		{
-		    int		do_endif = FALSE;
+		    정수		do_endif = FALSE;
 		    bool	legacy;
 
 		    // Ignore those options associated to lambda expressions because
 		    // persistence makes no sense for them.
-		    if ((p->flags & P_FUNC) && *(char_u **)varp != NULL
+		    만약 ((p->flags & P_FUNC) && *(char_u **)varp != NULL
 			    && strstr(*(char **)varp, "<lambda>") != NULL)
 			continue;
 
 #ifdef FEAT_EVAL
 		    legacy = !is_option_value_vim9(p - &options[0],
 			    round == 1 ? opt_flags | OPT_GLOBAL : OPT_LOCAL);
-#else
+#아니면
 		    // I think none of the options that require expression
 		    // evaluation will be present if expression evaluation is
 		    // disabled.  For example, 'includeexpr' is set to NULL if
@@ -6615,39 +6615,39 @@ makeset(FILE *fd, int opt_flags, int local_only)
 
 		    // Don't set 'syntax' and 'filetype' again if the value is
 		    // already right, avoids reloading the syntax file.
-		    if (
-#if defined(FEAT_SYN_HL)
+		    만약 (
+#만약 defined(FEAT_SYN_HL)
 			    p->indir == PV_SYN ||
 #endif
 			    p->indir == PV_FT)
 		    {
-			if (fprintf(fd, "if &%s != '%s'", p->fullname,
+			만약 (fprintf(fd, "if &%s != '%s'", p->fullname,
 						       *(char_u **)(varp)) < 0
 				|| put_eol(fd) < 0)
-			    return FAIL;
+			    반환 FAIL;
 			do_endif = TRUE;
 		    }
-		    if (put_setstring(fd, legacy, cmd, p->fullname,
+		    만약 (put_setstring(fd, legacy, cmd, p->fullname,
 					    (char_u **)varp, p->flags) == FAIL)
-			return FAIL;
-		    if (do_endif)
+			반환 FAIL;
+		    만약 (do_endif)
 		    {
-			if (put_line(fd, "endif") == FAIL)
-			    return FAIL;
+			만약 (put_line(fd, "endif") == FAIL)
+			    반환 FAIL;
 		    }
 		}
 	    }
 	}
     }
-    return OK;
+    반환 OK;
 }
 
-#if defined(FEAT_FOLDING)
+#만약 defined(FEAT_FOLDING)
 /*
  * Generate set commands for the local fold options only.  Used when
  * 'sessionoptions' or 'viewoptions' contains "folds" but not "options".
  */
-    int
+    정수
 makefoldset(FILE *fd)
 {
 # ifdef FEAT_EVAL
@@ -6658,7 +6658,7 @@ makefoldset(FILE *fd)
 			&& fde_script_ctx->sc_version < SCRIPT_VERSION_VIM9;
 # endif
 
-    if (put_setstring(fd, false, "setlocal", "fdm", &curwin->w_p_fdm, 0)
+    만약 (put_setstring(fd, false, "setlocal", "fdm", &curwin->w_p_fdm, 0)
 								       == FAIL
 # ifdef FEAT_EVAL
 	    || put_setstring(fd, fde_is_legacy, "setlocal", "fde",
@@ -6673,13 +6673,13 @@ makefoldset(FILE *fd)
 	    || put_setnum(fd, "setlocal", "fdn", &curwin->w_p_fdn) == FAIL
 	    || put_setbool(fd, "setlocal", "fen", curwin->w_p_fen) == FAIL
 	    )
-	return FAIL;
+	반환 FAIL;
 
-    return OK;
+    반환 OK;
 }
 #endif
 
-    static int
+    static 정수
 put_setstring(
     FILE	*fd,
     bool	legacy,
@@ -6693,84 +6693,84 @@ put_setstring(
     char_u	*part = NULL;
     char_u	*p;
 
-    if (legacy && fprintf(fd, "legacy ") < 0)
-	return FAIL;
-    if (fprintf(fd, "%s %s=", cmd, name) < 0)
-	return FAIL;
-    if (*valuep != NULL)
+    만약 (legacy && fprintf(fd, "legacy ") < 0)
+	반환 FAIL;
+    만약 (fprintf(fd, "%s %s=", cmd, name) < 0)
+	반환 FAIL;
+    만약 (*valuep != NULL)
     {
 	// Output 'pastetoggle' as key names.  For other
 	// options some characters have to be escaped with
 	// CTRL-V or backslash
-	if (valuep == &p_pt)
+	만약 (valuep == &p_pt)
 	{
 	    s = *valuep;
-	    while (*s != NUL)
-		if (put_escstr(fd, str2special(&s, FALSE, FALSE), 2) == FAIL)
-		    return FAIL;
+	    동안 (*s != NUL)
+		만약 (put_escstr(fd, str2special(&s, FALSE, FALSE), 2) == FAIL)
+		    반환 FAIL;
 	}
 	// expand the option value, replace $HOME by ~
-	else if ((flags & P_EXPAND) != 0)
+	아니면 만약 ((flags & P_EXPAND) != 0)
 	{
-	    int  size = (int)STRLEN(*valuep) + 1;
+	    정수  size = (정수)STRLEN(*valuep) + 1;
 
 	    // replace home directory in the whole option value into "buf"
 	    buf = alloc(size);
-	    if (buf == NULL)
+	    만약 (buf == NULL)
 		goto fail;
 	    home_replace(NULL, *valuep, buf, size, FALSE);
 
 	    // If the option value is longer than MAXPATHL, we need to append
 	    // each comma separated part of the option separately, so that it
 	    // can be expanded when read back.
-	    if (size >= MAXPATHL && (flags & P_COMMA) != 0
+	    만약 (size >= MAXPATHL && (flags & P_COMMA) != 0
 					   && vim_strchr(*valuep, ',') != NULL)
 	    {
 		part = alloc(size);
-		if (part == NULL)
+		만약 (part == NULL)
 		    goto fail;
 
 		// write line break to clear the option, e.g. ':set rtp='
-		if (put_eol(fd) == FAIL)
+		만약 (put_eol(fd) == FAIL)
 		    goto fail;
 
 		p = buf;
-		while (*p != NUL)
+		동안 (*p != NUL)
 		{
-		    if (legacy && fprintf(fd, "legacy ") < 0)
-			return FAIL;
+		    만약 (legacy && fprintf(fd, "legacy ") < 0)
+			반환 FAIL;
 		    // for each comma separated option part, append value to
 		    // the option, :set rtp+=value
-		    if (fprintf(fd, "%s %s+=", cmd, name) < 0)
+		    만약 (fprintf(fd, "%s %s+=", cmd, name) < 0)
 			goto fail;
 		    (void)copy_option_part(&p, part, size,  ",");
-		    if (put_escstr(fd, part, 2) == FAIL || put_eol(fd) == FAIL)
+		    만약 (put_escstr(fd, part, 2) == FAIL || put_eol(fd) == FAIL)
 			goto fail;
 		}
 		vim_free(buf);
 		vim_free(part);
-		return OK;
+		반환 OK;
 	    }
-	    if (put_escstr(fd, buf, 2) == FAIL)
+	    만약 (put_escstr(fd, buf, 2) == FAIL)
 	    {
 		vim_free(buf);
-		return FAIL;
+		반환 FAIL;
 	    }
 	    vim_free(buf);
 	}
-	else if (put_escstr(fd, *valuep, 2) == FAIL)
-	    return FAIL;
+	아니면 만약 (put_escstr(fd, *valuep, 2) == FAIL)
+	    반환 FAIL;
     }
-    if (put_eol(fd) < 0)
-	return FAIL;
-    return OK;
+    만약 (put_eol(fd) < 0)
+	반환 FAIL;
+    반환 OK;
 fail:
     vim_free(buf);
     vim_free(part);
-    return FAIL;
+    반환 FAIL;
 }
 
-    static int
+    static 정수
 put_setnum(
     FILE	*fd,
     char	*cmd,
@@ -6779,34 +6779,34 @@ put_setnum(
 {
     long	wc;
 
-    if (fprintf(fd, "%s %s=", cmd, name) < 0)
-	return FAIL;
-    if (wc_use_keyname((char_u *)valuep, &wc))
+    만약 (fprintf(fd, "%s %s=", cmd, name) < 0)
+	반환 FAIL;
+    만약 (wc_use_keyname((char_u *)valuep, &wc))
     {
 	// print 'wildchar' and 'wildcharm' as a key name
-	if (fputs((char *)get_special_key_name((int)wc, 0), fd) < 0)
-	    return FAIL;
+	만약 (fputs((char *)get_special_key_name((정수)wc, 0), fd) < 0)
+	    반환 FAIL;
     }
-    else if (fprintf(fd, "%ld", *valuep) < 0)
-	return FAIL;
-    if (put_eol(fd) < 0)
-	return FAIL;
-    return OK;
+    아니면 만약 (fprintf(fd, "%ld", *valuep) < 0)
+	반환 FAIL;
+    만약 (put_eol(fd) < 0)
+	반환 FAIL;
+    반환 OK;
 }
 
-    static int
+    static 정수
 put_setbool(
     FILE	*fd,
     char	*cmd,
     char	*name,
-    int		value)
+    정수		value)
 {
-    if (value < 0)	// global/local option using global value
-	return OK;
-    if (fprintf(fd, "%s %s%s", cmd, value ? "" : "no", name) < 0
+    만약 (value < 0)	// global/local option using global value
+	반환 OK;
+    만약 (fprintf(fd, "%s %s%s", cmd, value ? "" : "no", name) < 0
 	    || put_eol(fd) < 0)
-	return FAIL;
-    return OK;
+	반환 FAIL;
+    반환 OK;
 }
 
 /*
@@ -6822,10 +6822,10 @@ clear_termoptions(void)
     // screen will be cleared later, so this is OK.
     mch_setmouse(FALSE);	    // switch mouse off
     mch_restore_title(SAVE_RESTORE_BOTH);    // restore window titles
-#if defined(FEAT_XCLIPBOARD) && defined(FEAT_GUI)
+#만약 defined(FEAT_XCLIPBOARD) && defined(FEAT_GUI)
     // When starting the GUI close the display opened for the clipboard.
     // After restoring the title, because that will need the display.
-    if (gui.starting)
+    만약 (gui.starting)
 	clear_xterm_clip();
 #endif
     stoptermcap();			// stop termcap mode
@@ -6838,19 +6838,19 @@ free_termoptions(void)
 {
     struct vimoption   *p;
 
-    for (p = options; p->fullname != NULL; p++)
-	if (istermoption(p))
+    위해 (p = options; p->fullname != NULL; p++)
+	만약 (istermoption(p))
 	{
-	    if (p->flags & P_ALLOCED)
+	    만약 (p->flags & P_ALLOCED)
 		free_string_option(*(char_u **)(p->var));
-	    if (p->flags & P_DEF_ALLOCED)
+	    만약 (p->flags & P_DEF_ALLOCED)
 		free_string_option(p->def_val[VI_DEFAULT]);
 	    *(char_u **)(p->var) = empty_option;
 	    p->def_val[VI_DEFAULT] = empty_option;
 	    p->flags &= ~(P_ALLOCED|P_DEF_ALLOCED);
 #ifdef FEAT_EVAL
 	    // remember where the option was cleared
-	    set_option_sctx_idx((int)(p - options), OPT_GLOBAL, current_sctx);
+	    set_option_sctx_idx((정수)(p - options), OPT_GLOBAL, current_sctx);
 #endif
 	}
     clear_termcodes();
@@ -6866,10 +6866,10 @@ free_one_termoption(char_u *var)
 {
     struct vimoption   *p;
 
-    for (p = &options[0]; p->fullname != NULL; p++)
-	if (p->var == var)
+    위해 (p = &options[0]; p->fullname != NULL; p++)
+	만약 (p->var == var)
 	{
-	    if (p->flags & P_ALLOCED)
+	    만약 (p->flags & P_ALLOCED)
 		free_string_option(*(char_u **)(p->var));
 	    *(char_u **)(p->var) = empty_option;
 	    p->flags &= ~P_ALLOCED;
@@ -6886,17 +6886,17 @@ set_term_defaults(void)
 {
     struct vimoption   *p;
 
-    for (p = &options[0]; p->fullname != NULL; p++)
+    위해 (p = &options[0]; p->fullname != NULL; p++)
     {
-	if (istermoption(p) && p->def_val[VI_DEFAULT] != *(char_u **)(p->var))
+	만약 (istermoption(p) && p->def_val[VI_DEFAULT] != *(char_u **)(p->var))
 	{
-	    if (p->flags & P_DEF_ALLOCED)
+	    만약 (p->flags & P_DEF_ALLOCED)
 	    {
 		free_string_option(p->def_val[VI_DEFAULT]);
 		p->flags &= ~P_DEF_ALLOCED;
 	    }
 	    p->def_val[VI_DEFAULT] = *(char_u **)(p->var);
-	    if (p->flags & P_ALLOCED)
+	    만약 (p->flags & P_ALLOCED)
 	    {
 		p->flags |= P_DEF_ALLOCED;
 		p->flags &= ~P_ALLOCED;	 // don't free the value now
@@ -6908,22 +6908,22 @@ set_term_defaults(void)
 /*
  * return TRUE if 'p' starts with 't_'
  */
-    static int
+    static 정수
 istermoption(struct vimoption *p)
 {
-    return (p->fullname[0] == 't' && p->fullname[1] == '_');
+    반환 (p->fullname[0] == 't' && p->fullname[1] == '_');
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' starts with 't_'
  */
-    static int
-istermoption_idx(int opt_idx)
+    static 정수
+istermoption_idx(정수 opt_idx)
 {
-    return istermoption(&options[opt_idx]);
+    반환 istermoption(&options[opt_idx]);
 }
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#만약 defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Unset local option value, similar to ":set opt<".
  */
@@ -6931,15 +6931,15 @@ istermoption_idx(int opt_idx)
 unset_global_local_option(char_u *name, void *from)
 {
     struct vimoption *p;
-    int		opt_idx;
+    정수		opt_idx;
     buf_T	*buf = (buf_T *)from;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)
-	return;
+    만약 (opt_idx < 0)
+	반환;
     p = &(options[opt_idx]);
 
-    switch ((int)p->indir)
+    switch ((정수)p->indir)
     {
 	// global option with local value: use local value if it's been set
 	case PV_EP:
@@ -7032,12 +7032,12 @@ unset_global_local_option(char_u *name, void *from)
 	    clear_string_option(&buf->b_p_mp);
 	    break;
 # endif
-# if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+# 만약 defined(FEAT_BEVAL) && defined(FEAT_EVAL)
 	case PV_BEXPR:
 	    clear_string_option(&buf->b_p_bexpr);
 	    break;
 # endif
-# if defined(FEAT_CRYPT)
+# 만약 defined(FEAT_CRYPT)
 	case PV_CM:
 	    clear_string_option(&buf->b_p_cm);
 	    break;
@@ -7089,79 +7089,79 @@ unset_global_local_option(char_u *name, void *from)
  * "scope" can be OPT_LOCAL, OPT_GLOBAL or a combination.
  */
     static char_u *
-get_varp_scope(struct vimoption *p, int scope)
+get_varp_scope(struct vimoption *p, 정수 scope)
 {
-    if ((scope & OPT_GLOBAL) && p->indir != PV_NONE)
+    만약 ((scope & OPT_GLOBAL) && p->indir != PV_NONE)
     {
-	if (p->var == VAR_WIN)
-	    return (char_u *)GLOBAL_WO(get_varp(p));
-	return p->var;
+	만약 (p->var == VAR_WIN)
+	    반환 (char_u *)GLOBAL_WO(get_varp(p));
+	반환 p->var;
     }
-    if ((scope & OPT_LOCAL) && ((int)p->indir & PV_BOTH))
+    만약 ((scope & OPT_LOCAL) && ((정수)p->indir & PV_BOTH))
     {
-	switch ((int)p->indir)
+	switch ((정수)p->indir)
 	{
-	    case PV_FP:   return (char_u *)&(curbuf->b_p_fp);
+	    case PV_FP:   반환 (char_u *)&(curbuf->b_p_fp);
 #ifdef HAVE_FSYNC
-	    case PV_FS:	return (char_u *)&(curbuf->b_p_fs);
+	    case PV_FS:	반환 (char_u *)&(curbuf->b_p_fs);
 #endif
 #ifdef FEAT_EVAL
-	    case PV_FFU: return (char_u *)&(curbuf->b_p_ffu);
+	    case PV_FFU: 반환 (char_u *)&(curbuf->b_p_ffu);
 #endif
 #ifdef FEAT_QUICKFIX
-	    case PV_EFM:  return (char_u *)&(curbuf->b_p_efm);
-	    case PV_GEFM: return (char_u *)&(curbuf->b_p_gefm);
-	    case PV_GP:   return (char_u *)&(curbuf->b_p_gp);
-	    case PV_MP:   return (char_u *)&(curbuf->b_p_mp);
+	    case PV_EFM:  반환 (char_u *)&(curbuf->b_p_efm);
+	    case PV_GEFM: 반환 (char_u *)&(curbuf->b_p_gefm);
+	    case PV_GP:   반환 (char_u *)&(curbuf->b_p_gp);
+	    case PV_MP:   반환 (char_u *)&(curbuf->b_p_mp);
 #endif
-	    case PV_EP:   return (char_u *)&(curbuf->b_p_ep);
-	    case PV_KP:   return (char_u *)&(curbuf->b_p_kp);
-	    case PV_PATH: return (char_u *)&(curbuf->b_p_path);
-	    case PV_AC:   return (char_u *)&(curbuf->b_p_ac);
-	    case PV_AR:   return (char_u *)&(curbuf->b_p_ar);
-	    case PV_TAGS: return (char_u *)&(curbuf->b_p_tags);
-	    case PV_TC:   return (char_u *)&(curbuf->b_p_tc);
-	    case PV_SISO: return (char_u *)&(curwin->w_p_siso);
-	    case PV_SO:   return (char_u *)&(curwin->w_p_so);
-	    case PV_SOP:  return (char_u *)&(curwin->w_p_sop);
+	    case PV_EP:   반환 (char_u *)&(curbuf->b_p_ep);
+	    case PV_KP:   반환 (char_u *)&(curbuf->b_p_kp);
+	    case PV_PATH: 반환 (char_u *)&(curbuf->b_p_path);
+	    case PV_AC:   반환 (char_u *)&(curbuf->b_p_ac);
+	    case PV_AR:   반환 (char_u *)&(curbuf->b_p_ar);
+	    case PV_TAGS: 반환 (char_u *)&(curbuf->b_p_tags);
+	    case PV_TC:   반환 (char_u *)&(curbuf->b_p_tc);
+	    case PV_SISO: 반환 (char_u *)&(curwin->w_p_siso);
+	    case PV_SO:   반환 (char_u *)&(curwin->w_p_so);
+	    case PV_SOP:  반환 (char_u *)&(curwin->w_p_sop);
 #ifdef FEAT_FIND_ID
-	    case PV_DEF:  return (char_u *)&(curbuf->b_p_def);
-	    case PV_INC:  return (char_u *)&(curbuf->b_p_inc);
+	    case PV_DEF:  반환 (char_u *)&(curbuf->b_p_def);
+	    case PV_INC:  반환 (char_u *)&(curbuf->b_p_inc);
 #endif
-	    case PV_COT:  return (char_u *)&(curbuf->b_p_cot);
-	    case PV_DICT: return (char_u *)&(curbuf->b_p_dict);
+	    case PV_COT:  반환 (char_u *)&(curbuf->b_p_cot);
+	    case PV_DICT: 반환 (char_u *)&(curbuf->b_p_dict);
 #ifdef FEAT_DIFF
-	    case PV_DIA:  return (char_u *)&(curbuf->b_p_dia);
+	    case PV_DIA:  반환 (char_u *)&(curbuf->b_p_dia);
 #endif
-	    case PV_TSR:  return (char_u *)&(curbuf->b_p_tsr);
+	    case PV_TSR:  반환 (char_u *)&(curbuf->b_p_tsr);
 #ifdef FEAT_COMPL_FUNC
-	    case PV_TSRFU: return (char_u *)&(curbuf->b_p_tsrfu);
+	    case PV_TSRFU: 반환 (char_u *)&(curbuf->b_p_tsrfu);
 #endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
-	    case PV_BEXPR: return (char_u *)&(curbuf->b_p_bexpr);
+#만약 defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+	    case PV_BEXPR: 반환 (char_u *)&(curbuf->b_p_bexpr);
 #endif
-#if defined(FEAT_CRYPT)
-	    case PV_CM:	  return (char_u *)&(curbuf->b_p_cm);
+#만약 defined(FEAT_CRYPT)
+	    case PV_CM:	  반환 (char_u *)&(curbuf->b_p_cm);
 #endif
 #ifdef FEAT_LINEBREAK
-	    case PV_SBR:  return (char_u *)&(curwin->w_p_sbr);
+	    case PV_SBR:  반환 (char_u *)&(curwin->w_p_sbr);
 #endif
 #ifdef FEAT_STL_OPT
-	    case PV_STL:  return (char_u *)&(curwin->w_p_stl);
-	    case PV_STLO: return (char_u *)&(curwin->w_p_stlo);
+	    case PV_STL:  반환 (char_u *)&(curwin->w_p_stl);
+	    case PV_STLO: 반환 (char_u *)&(curwin->w_p_stlo);
 #endif
-	    case PV_UL:   return (char_u *)&(curbuf->b_p_ul);
-	    case PV_LW:   return (char_u *)&(curbuf->b_p_lw);
-	    case PV_BKC:  return (char_u *)&(curbuf->b_p_bkc);
-	    case PV_MENC: return (char_u *)&(curbuf->b_p_menc);
-	    case PV_LCS:  return (char_u *)&(curwin->w_p_lcs);
-	    case PV_FCS:  return (char_u *)&(curwin->w_p_fcs);
-	    case PV_VE:	  return (char_u *)&(curwin->w_p_ve);
+	    case PV_UL:   반환 (char_u *)&(curbuf->b_p_ul);
+	    case PV_LW:   반환 (char_u *)&(curbuf->b_p_lw);
+	    case PV_BKC:  반환 (char_u *)&(curbuf->b_p_bkc);
+	    case PV_MENC: 반환 (char_u *)&(curbuf->b_p_menc);
+	    case PV_LCS:  반환 (char_u *)&(curwin->w_p_lcs);
+	    case PV_FCS:  반환 (char_u *)&(curwin->w_p_fcs);
+	    case PV_VE:	  반환 (char_u *)&(curwin->w_p_ve);
 
 	}
-	return NULL; // "cannot happen"
+	반환 NULL; // "cannot happen"
     }
-    return get_varp(p);
+    반환 get_varp(p);
 }
 
 /*
@@ -7169,9 +7169,9 @@ get_varp_scope(struct vimoption *p, int scope)
  * scope.
  */
     char_u *
-get_option_varp_scope(int opt_idx, int scope)
+get_option_varp_scope(정수 opt_idx, 정수 scope)
 {
-    return get_varp_scope(&(options[opt_idx]), scope);
+    반환 get_varp_scope(&(options[opt_idx]), scope);
 }
 
 /*
@@ -7181,295 +7181,295 @@ get_option_varp_scope(int opt_idx, int scope)
 get_varp(struct vimoption *p)
 {
     // hidden option, always return NULL
-    if (p->var == NULL)
-	return NULL;
+    만약 (p->var == NULL)
+	반환 NULL;
 
-    switch ((int)p->indir)
+    switch ((정수)p->indir)
     {
-	case PV_NONE:	return p->var;
+	case PV_NONE:	반환 p->var;
 
 	// global option with local value: use local value if it's been set
-	case PV_EP:	return *curbuf->b_p_ep != NUL
+	case PV_EP:	반환 *curbuf->b_p_ep != NUL
 				    ? (char_u *)&curbuf->b_p_ep : p->var;
-	case PV_KP:	return *curbuf->b_p_kp != NUL
+	case PV_KP:	반환 *curbuf->b_p_kp != NUL
 				    ? (char_u *)&curbuf->b_p_kp : p->var;
-	case PV_PATH:	return *curbuf->b_p_path != NUL
+	case PV_PATH:	반환 *curbuf->b_p_path != NUL
 				    ? (char_u *)&(curbuf->b_p_path) : p->var;
-	case PV_AC:	return curbuf->b_p_ac >= 0
+	case PV_AC:	반환 curbuf->b_p_ac >= 0
 				    ? (char_u *)&(curbuf->b_p_ac) : p->var;
-	case PV_AR:	return curbuf->b_p_ar >= 0
+	case PV_AR:	반환 curbuf->b_p_ar >= 0
 				    ? (char_u *)&(curbuf->b_p_ar) : p->var;
-	case PV_TAGS:	return *curbuf->b_p_tags != NUL
+	case PV_TAGS:	반환 *curbuf->b_p_tags != NUL
 				    ? (char_u *)&(curbuf->b_p_tags) : p->var;
-	case PV_TC:	return *curbuf->b_p_tc != NUL
+	case PV_TC:	반환 *curbuf->b_p_tc != NUL
 				    ? (char_u *)&(curbuf->b_p_tc) : p->var;
-	case PV_BKC:	return *curbuf->b_p_bkc != NUL
+	case PV_BKC:	반환 *curbuf->b_p_bkc != NUL
 				    ? (char_u *)&(curbuf->b_p_bkc) : p->var;
-	case PV_SISO:	return curwin->w_p_siso >= 0
+	case PV_SISO:	반환 curwin->w_p_siso >= 0
 				    ? (char_u *)&(curwin->w_p_siso) : p->var;
-	case PV_SO:	return curwin->w_p_so >= 0
+	case PV_SO:	반환 curwin->w_p_so >= 0
 				    ? (char_u *)&(curwin->w_p_so) : p->var;
-	case PV_SOP:	return curwin->w_p_sop != -1
+	case PV_SOP:	반환 curwin->w_p_sop != -1
 				    ? (char_u *)&(curwin->w_p_sop) : p->var;
 #ifdef FEAT_FIND_ID
-	case PV_DEF:	return *curbuf->b_p_def != NUL
+	case PV_DEF:	반환 *curbuf->b_p_def != NUL
 				    ? (char_u *)&(curbuf->b_p_def) : p->var;
-	case PV_INC:	return *curbuf->b_p_inc != NUL
+	case PV_INC:	반환 *curbuf->b_p_inc != NUL
 				    ? (char_u *)&(curbuf->b_p_inc) : p->var;
 #endif
-	case PV_COT:	return *curbuf->b_p_cot != NUL
+	case PV_COT:	반환 *curbuf->b_p_cot != NUL
 				    ? (char_u *)&(curbuf->b_p_cot) : p->var;
-	case PV_DICT:	return *curbuf->b_p_dict != NUL
+	case PV_DICT:	반환 *curbuf->b_p_dict != NUL
 				    ? (char_u *)&(curbuf->b_p_dict) : p->var;
 #ifdef FEAT_DIFF
-	case PV_DIA:	return *curbuf->b_p_dia != NUL
+	case PV_DIA:	반환 *curbuf->b_p_dia != NUL
 				    ? (char_u *)&(curbuf->b_p_dia) : p->var;
 #endif
-	case PV_TSR:	return *curbuf->b_p_tsr != NUL
+	case PV_TSR:	반환 *curbuf->b_p_tsr != NUL
 				    ? (char_u *)&(curbuf->b_p_tsr) : p->var;
 #ifdef FEAT_COMPL_FUNC
-	case PV_TSRFU:	return *curbuf->b_p_tsrfu != NUL
+	case PV_TSRFU:	반환 *curbuf->b_p_tsrfu != NUL
 				    ? (char_u *)&(curbuf->b_p_tsrfu) : p->var;
 #endif
-	case PV_FP:	return *curbuf->b_p_fp != NUL
+	case PV_FP:	반환 *curbuf->b_p_fp != NUL
 				    ? (char_u *)&(curbuf->b_p_fp) : p->var;
 #ifdef HAVE_FSYNC
-	case PV_FS:	return curbuf->b_p_fs >= 0
+	case PV_FS:	반환 curbuf->b_p_fs >= 0
 				    ? (char_u *)&(curbuf->b_p_fs) : p->var;
 #endif
 #ifdef FEAT_EVAL
-	case PV_FFU:	return *curbuf->b_p_ffu != NUL
+	case PV_FFU:	반환 *curbuf->b_p_ffu != NUL
 				    ? (char_u *)&(curbuf->b_p_ffu) : p->var;
 #endif
 #ifdef FEAT_QUICKFIX
-	case PV_EFM:	return *curbuf->b_p_efm != NUL
+	case PV_EFM:	반환 *curbuf->b_p_efm != NUL
 				    ? (char_u *)&(curbuf->b_p_efm) : p->var;
-	case PV_GEFM:	return *curbuf->b_p_gefm != NUL
+	case PV_GEFM:	반환 *curbuf->b_p_gefm != NUL
 				    ? (char_u *)&(curbuf->b_p_gefm) : p->var;
-	case PV_GP:	return *curbuf->b_p_gp != NUL
+	case PV_GP:	반환 *curbuf->b_p_gp != NUL
 				    ? (char_u *)&(curbuf->b_p_gp) : p->var;
-	case PV_MP:	return *curbuf->b_p_mp != NUL
+	case PV_MP:	반환 *curbuf->b_p_mp != NUL
 				    ? (char_u *)&(curbuf->b_p_mp) : p->var;
 #endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
-	case PV_BEXPR:	return *curbuf->b_p_bexpr != NUL
+#만약 defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+	case PV_BEXPR:	반환 *curbuf->b_p_bexpr != NUL
 				    ? (char_u *)&(curbuf->b_p_bexpr) : p->var;
 #endif
-#if defined(FEAT_CRYPT)
-	case PV_CM:	return *curbuf->b_p_cm != NUL
+#만약 defined(FEAT_CRYPT)
+	case PV_CM:	반환 *curbuf->b_p_cm != NUL
 				    ? (char_u *)&(curbuf->b_p_cm) : p->var;
 #endif
 #ifdef FEAT_LINEBREAK
-	case PV_SBR:	return *curwin->w_p_sbr != NUL
+	case PV_SBR:	반환 *curwin->w_p_sbr != NUL
 				    ? (char_u *)&(curwin->w_p_sbr) : p->var;
 #endif
 #ifdef FEAT_STL_OPT
-	case PV_STL:	return *curwin->w_p_stl != NUL
+	case PV_STL:	반환 *curwin->w_p_stl != NUL
 				    ? (char_u *)&(curwin->w_p_stl) : p->var;
-	case PV_STLO:	return *curwin->w_p_stlo != NUL
+	case PV_STLO:	반환 *curwin->w_p_stlo != NUL
 				    ? (char_u *)&(curwin->w_p_stlo) : p->var;
 #endif
-	case PV_UL:	return curbuf->b_p_ul != NO_LOCAL_UNDOLEVEL
+	case PV_UL:	반환 curbuf->b_p_ul != NO_LOCAL_UNDOLEVEL
 				    ? (char_u *)&(curbuf->b_p_ul) : p->var;
-	case PV_LW:	return *curbuf->b_p_lw != NUL
+	case PV_LW:	반환 *curbuf->b_p_lw != NUL
 				    ? (char_u *)&(curbuf->b_p_lw) : p->var;
-	case PV_MENC:	return *curbuf->b_p_menc != NUL
+	case PV_MENC:	반환 *curbuf->b_p_menc != NUL
 				    ? (char_u *)&(curbuf->b_p_menc) : p->var;
 #ifdef FEAT_ARABIC
-	case PV_ARAB:	return (char_u *)&(curwin->w_p_arab);
+	case PV_ARAB:	반환 (char_u *)&(curwin->w_p_arab);
 #endif
-	case PV_LIST:	return (char_u *)&(curwin->w_p_list);
-	case PV_LCS:	return *curwin->w_p_lcs != NUL
+	case PV_LIST:	반환 (char_u *)&(curwin->w_p_list);
+	case PV_LCS:	반환 *curwin->w_p_lcs != NUL
 				    ? (char_u *)&(curwin->w_p_lcs) : p->var;
-	case PV_FCS:	return *curwin->w_p_fcs != NUL
+	case PV_FCS:	반환 *curwin->w_p_fcs != NUL
 				    ? (char_u *)&(curwin->w_p_fcs) : p->var;
-	case PV_VE:	return *curwin->w_p_ve != NUL
+	case PV_VE:	반환 *curwin->w_p_ve != NUL
 				    ? (char_u *)&(curwin->w_p_ve) : p->var;
 #ifdef FEAT_SPELL
-	case PV_SPELL:	return (char_u *)&(curwin->w_p_spell);
+	case PV_SPELL:	반환 (char_u *)&(curwin->w_p_spell);
 #endif
 #ifdef FEAT_SYN_HL
-	case PV_CUC:	return (char_u *)&(curwin->w_p_cuc);
-	case PV_CUL:	return (char_u *)&(curwin->w_p_cul);
-	case PV_CULOPT:	return (char_u *)&(curwin->w_p_culopt);
-	case PV_CC:	return (char_u *)&(curwin->w_p_cc);
+	case PV_CUC:	반환 (char_u *)&(curwin->w_p_cuc);
+	case PV_CUL:	반환 (char_u *)&(curwin->w_p_cul);
+	case PV_CULOPT:	반환 (char_u *)&(curwin->w_p_culopt);
+	case PV_CC:	반환 (char_u *)&(curwin->w_p_cc);
 #endif
 #ifdef FEAT_DIFF
-	case PV_DIFF:	return (char_u *)&(curwin->w_p_diff);
+	case PV_DIFF:	반환 (char_u *)&(curwin->w_p_diff);
 #endif
-	case PV_EIW:	return (char_u *)&(curwin->w_p_eiw);
+	case PV_EIW:	반환 (char_u *)&(curwin->w_p_eiw);
 #ifdef FEAT_FOLDING
-	case PV_FDC:	return (char_u *)&(curwin->w_p_fdc);
-	case PV_FEN:	return (char_u *)&(curwin->w_p_fen);
-	case PV_FDI:	return (char_u *)&(curwin->w_p_fdi);
-	case PV_FDL:	return (char_u *)&(curwin->w_p_fdl);
-	case PV_FDM:	return (char_u *)&(curwin->w_p_fdm);
-	case PV_FML:	return (char_u *)&(curwin->w_p_fml);
-	case PV_FDN:	return (char_u *)&(curwin->w_p_fdn);
+	case PV_FDC:	반환 (char_u *)&(curwin->w_p_fdc);
+	case PV_FEN:	반환 (char_u *)&(curwin->w_p_fen);
+	case PV_FDI:	반환 (char_u *)&(curwin->w_p_fdi);
+	case PV_FDL:	반환 (char_u *)&(curwin->w_p_fdl);
+	case PV_FDM:	반환 (char_u *)&(curwin->w_p_fdm);
+	case PV_FML:	반환 (char_u *)&(curwin->w_p_fml);
+	case PV_FDN:	반환 (char_u *)&(curwin->w_p_fdn);
 # ifdef FEAT_EVAL
-	case PV_FDE:	return (char_u *)&(curwin->w_p_fde);
-	case PV_FDT:	return (char_u *)&(curwin->w_p_fdt);
+	case PV_FDE:	반환 (char_u *)&(curwin->w_p_fde);
+	case PV_FDT:	반환 (char_u *)&(curwin->w_p_fdt);
 # endif
-	case PV_FMR:	return (char_u *)&(curwin->w_p_fmr);
+	case PV_FMR:	반환 (char_u *)&(curwin->w_p_fmr);
 #endif
-	case PV_NU:	return (char_u *)&(curwin->w_p_nu);
-	case PV_RNU:	return (char_u *)&(curwin->w_p_rnu);
+	case PV_NU:	반환 (char_u *)&(curwin->w_p_nu);
+	case PV_RNU:	반환 (char_u *)&(curwin->w_p_rnu);
 #ifdef FEAT_LINEBREAK
-	case PV_NUW:	return (char_u *)&(curwin->w_p_nuw);
+	case PV_NUW:	반환 (char_u *)&(curwin->w_p_nuw);
 #endif
-	case PV_WFB:	return (char_u *)&(curwin->w_p_wfb);
-	case PV_WFH:	return (char_u *)&(curwin->w_p_wfh);
-	case PV_WFW:	return (char_u *)&(curwin->w_p_wfw);
-#if defined(FEAT_QUICKFIX)
-	case PV_PVW:	return (char_u *)&(curwin->w_p_pvw);
-	case PV_LHI:	return (char_u *)&(curwin->w_p_lhi);
+	case PV_WFB:	반환 (char_u *)&(curwin->w_p_wfb);
+	case PV_WFH:	반환 (char_u *)&(curwin->w_p_wfh);
+	case PV_WFW:	반환 (char_u *)&(curwin->w_p_wfw);
+#만약 defined(FEAT_QUICKFIX)
+	case PV_PVW:	반환 (char_u *)&(curwin->w_p_pvw);
+	case PV_LHI:	반환 (char_u *)&(curwin->w_p_lhi);
 #endif
 #ifdef FEAT_RIGHTLEFT
-	case PV_RL:	return (char_u *)&(curwin->w_p_rl);
-	case PV_RLC:	return (char_u *)&(curwin->w_p_rlc);
+	case PV_RL:	반환 (char_u *)&(curwin->w_p_rl);
+	case PV_RLC:	반환 (char_u *)&(curwin->w_p_rlc);
 #endif
-	case PV_SCROLL:	return (char_u *)&(curwin->w_p_scr);
-	case PV_SMS:	return (char_u *)&(curwin->w_p_sms);
-	case PV_WRAP:	return (char_u *)&(curwin->w_p_wrap);
+	case PV_SCROLL:	반환 (char_u *)&(curwin->w_p_scr);
+	case PV_SMS:	반환 (char_u *)&(curwin->w_p_sms);
+	case PV_WRAP:	반환 (char_u *)&(curwin->w_p_wrap);
 #ifdef FEAT_LINEBREAK
-	case PV_LBR:	return (char_u *)&(curwin->w_p_lbr);
-	case PV_BRI:	return (char_u *)&(curwin->w_p_bri);
-	case PV_BRIOPT: return (char_u *)&(curwin->w_p_briopt);
+	case PV_LBR:	반환 (char_u *)&(curwin->w_p_lbr);
+	case PV_BRI:	반환 (char_u *)&(curwin->w_p_bri);
+	case PV_BRIOPT: 반환 (char_u *)&(curwin->w_p_briopt);
 #endif
-	case PV_WCR:	return (char_u *)&(curwin->w_p_wcr);
-	case PV_SCBIND: return (char_u *)&(curwin->w_p_scb);
-	case PV_CRBIND: return (char_u *)&(curwin->w_p_crb);
+	case PV_WCR:	반환 (char_u *)&(curwin->w_p_wcr);
+	case PV_SCBIND: 반환 (char_u *)&(curwin->w_p_scb);
+	case PV_CRBIND: 반환 (char_u *)&(curwin->w_p_crb);
 #ifdef FEAT_CONCEAL
-	case PV_COCU:   return (char_u *)&(curwin->w_p_cocu);
-	case PV_COLE:   return (char_u *)&(curwin->w_p_cole);
+	case PV_COCU:   반환 (char_u *)&(curwin->w_p_cocu);
+	case PV_COLE:   반환 (char_u *)&(curwin->w_p_cole);
 #endif
-	case PV_WHL:	return (char_u *)&(curwin->w_p_whl);
+	case PV_WHL:	반환 (char_u *)&(curwin->w_p_whl);
 
 #ifdef FEAT_TERMINAL
-	case PV_TWK:    return (char_u *)&(curwin->w_p_twk);
-	case PV_TWS:    return (char_u *)&(curwin->w_p_tws);
-	case PV_TWSL:	return (char_u *)&(curbuf->b_p_twsl);
+	case PV_TWK:    반환 (char_u *)&(curwin->w_p_twk);
+	case PV_TWS:    반환 (char_u *)&(curwin->w_p_tws);
+	case PV_TWSL:	반환 (char_u *)&(curbuf->b_p_twsl);
 #endif
 
-	case PV_AI:	return (char_u *)&(curbuf->b_p_ai);
-	case PV_BIN:	return (char_u *)&(curbuf->b_p_bin);
-	case PV_BOMB:	return (char_u *)&(curbuf->b_p_bomb);
-	case PV_BH:	return (char_u *)&(curbuf->b_p_bh);
-	case PV_BT:	return (char_u *)&(curbuf->b_p_bt);
-	case PV_BL:	return (char_u *)&(curbuf->b_p_bl);
-	case PV_CI:	return (char_u *)&(curbuf->b_p_ci);
-	case PV_CIN:	return (char_u *)&(curbuf->b_p_cin);
-	case PV_CINK:	return (char_u *)&(curbuf->b_p_cink);
-	case PV_CINO:	return (char_u *)&(curbuf->b_p_cino);
-	case PV_CINSD:	return (char_u *)&(curbuf->b_p_cinsd);
-	case PV_CINW:	return (char_u *)&(curbuf->b_p_cinw);
-	case PV_COM:	return (char_u *)&(curbuf->b_p_com);
-	case PV_CMS:	return (char_u *)&(curbuf->b_p_cms);
-	case PV_CPT:	return (char_u *)&(curbuf->b_p_cpt);
+	case PV_AI:	반환 (char_u *)&(curbuf->b_p_ai);
+	case PV_BIN:	반환 (char_u *)&(curbuf->b_p_bin);
+	case PV_BOMB:	반환 (char_u *)&(curbuf->b_p_bomb);
+	case PV_BH:	반환 (char_u *)&(curbuf->b_p_bh);
+	case PV_BT:	반환 (char_u *)&(curbuf->b_p_bt);
+	case PV_BL:	반환 (char_u *)&(curbuf->b_p_bl);
+	case PV_CI:	반환 (char_u *)&(curbuf->b_p_ci);
+	case PV_CIN:	반환 (char_u *)&(curbuf->b_p_cin);
+	case PV_CINK:	반환 (char_u *)&(curbuf->b_p_cink);
+	case PV_CINO:	반환 (char_u *)&(curbuf->b_p_cino);
+	case PV_CINSD:	반환 (char_u *)&(curbuf->b_p_cinsd);
+	case PV_CINW:	반환 (char_u *)&(curbuf->b_p_cinw);
+	case PV_COM:	반환 (char_u *)&(curbuf->b_p_com);
+	case PV_CMS:	반환 (char_u *)&(curbuf->b_p_cms);
+	case PV_CPT:	반환 (char_u *)&(curbuf->b_p_cpt);
 #ifdef BACKSLASH_IN_FILENAME
-	case PV_CSL:	return (char_u *)&(curbuf->b_p_csl);
+	case PV_CSL:	반환 (char_u *)&(curbuf->b_p_csl);
 #endif
 #ifdef FEAT_COMPL_FUNC
-	case PV_CFU:	return (char_u *)&(curbuf->b_p_cfu);
-	case PV_OFU:	return (char_u *)&(curbuf->b_p_ofu);
+	case PV_CFU:	반환 (char_u *)&(curbuf->b_p_cfu);
+	case PV_OFU:	반환 (char_u *)&(curbuf->b_p_ofu);
 #endif
 #ifdef FEAT_EVAL
-	case PV_TFU:	return (char_u *)&(curbuf->b_p_tfu);
+	case PV_TFU:	반환 (char_u *)&(curbuf->b_p_tfu);
 #endif
-	case PV_EOF:	return (char_u *)&(curbuf->b_p_eof);
-	case PV_EOL:	return (char_u *)&(curbuf->b_p_eol);
-	case PV_FIXEOL:	return (char_u *)&(curbuf->b_p_fixeol);
-	case PV_ET:	return (char_u *)&(curbuf->b_p_et);
-	case PV_FENC:	return (char_u *)&(curbuf->b_p_fenc);
-	case PV_FF:	return (char_u *)&(curbuf->b_p_ff);
-	case PV_FT:	return (char_u *)&(curbuf->b_p_ft);
-	case PV_FO:	return (char_u *)&(curbuf->b_p_fo);
-	case PV_FLP:	return (char_u *)&(curbuf->b_p_flp);
-	case PV_IMI:	return (char_u *)&(curbuf->b_p_iminsert);
-	case PV_IMS:	return (char_u *)&(curbuf->b_p_imsearch);
-	case PV_INF:	return (char_u *)&(curbuf->b_p_inf);
-	case PV_ISK:	return (char_u *)&(curbuf->b_p_isk);
+	case PV_EOF:	반환 (char_u *)&(curbuf->b_p_eof);
+	case PV_EOL:	반환 (char_u *)&(curbuf->b_p_eol);
+	case PV_FIXEOL:	반환 (char_u *)&(curbuf->b_p_fixeol);
+	case PV_ET:	반환 (char_u *)&(curbuf->b_p_et);
+	case PV_FENC:	반환 (char_u *)&(curbuf->b_p_fenc);
+	case PV_FF:	반환 (char_u *)&(curbuf->b_p_ff);
+	case PV_FT:	반환 (char_u *)&(curbuf->b_p_ft);
+	case PV_FO:	반환 (char_u *)&(curbuf->b_p_fo);
+	case PV_FLP:	반환 (char_u *)&(curbuf->b_p_flp);
+	case PV_IMI:	반환 (char_u *)&(curbuf->b_p_iminsert);
+	case PV_IMS:	반환 (char_u *)&(curbuf->b_p_imsearch);
+	case PV_INF:	반환 (char_u *)&(curbuf->b_p_inf);
+	case PV_ISK:	반환 (char_u *)&(curbuf->b_p_isk);
 #ifdef FEAT_FIND_ID
 # ifdef FEAT_EVAL
-	case PV_INEX:	return (char_u *)&(curbuf->b_p_inex);
+	case PV_INEX:	반환 (char_u *)&(curbuf->b_p_inex);
 # endif
 #endif
-#if defined(FEAT_EVAL)
-	case PV_INDE:	return (char_u *)&(curbuf->b_p_inde);
-	case PV_INDK:	return (char_u *)&(curbuf->b_p_indk);
+#만약 defined(FEAT_EVAL)
+	case PV_INDE:	반환 (char_u *)&(curbuf->b_p_inde);
+	case PV_INDK:	반환 (char_u *)&(curbuf->b_p_indk);
 #endif
 #ifdef FEAT_EVAL
-	case PV_FEX:	return (char_u *)&(curbuf->b_p_fex);
+	case PV_FEX:	반환 (char_u *)&(curbuf->b_p_fex);
 #endif
 #ifdef FEAT_CRYPT
-	case PV_KEY:	return (char_u *)&(curbuf->b_p_key);
+	case PV_KEY:	반환 (char_u *)&(curbuf->b_p_key);
 #endif
-	case PV_LISP:	return (char_u *)&(curbuf->b_p_lisp);
-	case PV_LOP:	return (char_u *)&(curbuf->b_p_lop);
-	case PV_ML:	return (char_u *)&(curbuf->b_p_ml);
-	case PV_MPS:	return (char_u *)&(curbuf->b_p_mps);
-	case PV_MA:	return (char_u *)&(curbuf->b_p_ma);
-	case PV_MOD:	return (char_u *)&(curbuf->b_changed);
-	case PV_NF:	return (char_u *)&(curbuf->b_p_nf);
-	case PV_PI:	return (char_u *)&(curbuf->b_p_pi);
-	case PV_QE:	return (char_u *)&(curbuf->b_p_qe);
-	case PV_RO:	return (char_u *)&(curbuf->b_p_ro);
-	case PV_SI:	return (char_u *)&(curbuf->b_p_si);
-	case PV_SN:	return (char_u *)&(curbuf->b_p_sn);
-	case PV_STS:	return (char_u *)&(curbuf->b_p_sts);
-	case PV_SUA:	return (char_u *)&(curbuf->b_p_sua);
-	case PV_SWF:	return (char_u *)&(curbuf->b_p_swf);
+	case PV_LISP:	반환 (char_u *)&(curbuf->b_p_lisp);
+	case PV_LOP:	반환 (char_u *)&(curbuf->b_p_lop);
+	case PV_ML:	반환 (char_u *)&(curbuf->b_p_ml);
+	case PV_MPS:	반환 (char_u *)&(curbuf->b_p_mps);
+	case PV_MA:	반환 (char_u *)&(curbuf->b_p_ma);
+	case PV_MOD:	반환 (char_u *)&(curbuf->b_changed);
+	case PV_NF:	반환 (char_u *)&(curbuf->b_p_nf);
+	case PV_PI:	반환 (char_u *)&(curbuf->b_p_pi);
+	case PV_QE:	반환 (char_u *)&(curbuf->b_p_qe);
+	case PV_RO:	반환 (char_u *)&(curbuf->b_p_ro);
+	case PV_SI:	반환 (char_u *)&(curbuf->b_p_si);
+	case PV_SN:	반환 (char_u *)&(curbuf->b_p_sn);
+	case PV_STS:	반환 (char_u *)&(curbuf->b_p_sts);
+	case PV_SUA:	반환 (char_u *)&(curbuf->b_p_sua);
+	case PV_SWF:	반환 (char_u *)&(curbuf->b_p_swf);
 #ifdef FEAT_SYN_HL
-	case PV_SMC:	return (char_u *)&(curbuf->b_p_smc);
-	case PV_SYN:	return (char_u *)&(curbuf->b_p_syn);
+	case PV_SMC:	반환 (char_u *)&(curbuf->b_p_smc);
+	case PV_SYN:	반환 (char_u *)&(curbuf->b_p_syn);
 #endif
 #ifdef FEAT_SPELL
-	case PV_SPC:	return (char_u *)&(curwin->w_s->b_p_spc);
-	case PV_SPF:	return (char_u *)&(curwin->w_s->b_p_spf);
-	case PV_SPL:	return (char_u *)&(curwin->w_s->b_p_spl);
-	case PV_SPO:	return (char_u *)&(curwin->w_s->b_p_spo);
+	case PV_SPC:	반환 (char_u *)&(curwin->w_s->b_p_spc);
+	case PV_SPF:	반환 (char_u *)&(curwin->w_s->b_p_spf);
+	case PV_SPL:	반환 (char_u *)&(curwin->w_s->b_p_spl);
+	case PV_SPO:	반환 (char_u *)&(curwin->w_s->b_p_spo);
 #endif
-	case PV_SW:	return (char_u *)&(curbuf->b_p_sw);
-	case PV_TS:	return (char_u *)&(curbuf->b_p_ts);
-	case PV_TW:	return (char_u *)&(curbuf->b_p_tw);
-	case PV_TX:	return (char_u *)&(curbuf->b_p_tx);
+	case PV_SW:	반환 (char_u *)&(curbuf->b_p_sw);
+	case PV_TS:	반환 (char_u *)&(curbuf->b_p_ts);
+	case PV_TW:	반환 (char_u *)&(curbuf->b_p_tw);
+	case PV_TX:	반환 (char_u *)&(curbuf->b_p_tx);
 #ifdef FEAT_PERSISTENT_UNDO
-	case PV_UDF:	return (char_u *)&(curbuf->b_p_udf);
+	case PV_UDF:	반환 (char_u *)&(curbuf->b_p_udf);
 #endif
-	case PV_WM:	return (char_u *)&(curbuf->b_p_wm);
+	case PV_WM:	반환 (char_u *)&(curbuf->b_p_wm);
 #ifdef FEAT_KEYMAP
-	case PV_KMAP:	return (char_u *)&(curbuf->b_p_keymap);
+	case PV_KMAP:	반환 (char_u *)&(curbuf->b_p_keymap);
 #endif
 #ifdef FEAT_SIGNS
-	case PV_SCL:	return (char_u *)&(curwin->w_p_scl);
+	case PV_SCL:	반환 (char_u *)&(curwin->w_p_scl);
 #endif
 #ifdef FEAT_VARTABS
-	case PV_VSTS:	return (char_u *)&(curbuf->b_p_vsts);
-	case PV_VTS:	return (char_u *)&(curbuf->b_p_vts);
+	case PV_VSTS:	반환 (char_u *)&(curbuf->b_p_vsts);
+	case PV_VTS:	반환 (char_u *)&(curbuf->b_p_vts);
 #endif
 	default:	iemsg(e_get_varp_error);
     }
     // always return a valid pointer to avoid a crash!
-    return (char_u *)&(curbuf->b_p_wm);
+    반환 (char_u *)&(curbuf->b_p_wm);
 }
 
 /*
  * Return a pointer to the variable for option at 'opt_idx'
  */
     char_u *
-get_option_var(int opt_idx)
+get_option_var(정수 opt_idx)
 {
-    return options[opt_idx].var;
+    반환 options[opt_idx].var;
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * Return the full name of the option at 'opt_idx'
  */
     char_u *
-get_option_fullname(int opt_idx)
+get_option_fullname(정수 opt_idx)
 {
-    return (char_u *)options[opt_idx].fullname;
+    반환 (char_u *)options[opt_idx].fullname;
 }
 
 /*
@@ -7477,19 +7477,19 @@ get_option_fullname(int opt_idx)
  * whether the option is supported in this Vim.
  * Returns FAIL when there is no such option.
  */
-    int
+    정수
 option_info(char_u *name, dict_T *d)
 {
-    int			opt_idx;
+    정수			opt_idx;
     struct vimoption	*p;
-    int			dvi;
+    정수			dvi;
 
     // The "g:" or "l:" scope does not matter for the definition.
-    if ((name[0] == 'g' || name[0] == 'l') && name[1] == ':')
+    만약 ((name[0] == 'g' || name[0] == 'l') && name[1] == ':')
 	name += 2;
     opt_idx = findoption(name);
-    if (opt_idx < 0)
-	return FAIL;
+    만약 (opt_idx < 0)
+	반환 FAIL;
 
     p = &options[opt_idx];
     dict_add_string(d, "name", (char_u *)p->fullname);
@@ -7503,14 +7503,14 @@ option_info(char_u *name, dict_T *d)
 		    ? ((p->indir & PV_WIN) ? "global-window" : "global-buffer")
 		    : ((p->indir & PV_WIN) ? "window" : "buffer")));
     dvi = (p->flags & P_VI_DEF) ? VI_DEFAULT : VIM_DEFAULT;
-    if (p->flags & P_BOOL)
-	dict_add_bool(d, "default", (int)(long_i)p->def_val[dvi]);
-    else if (p->flags & P_NUM)
+    만약 (p->flags & P_BOOL)
+	dict_add_bool(d, "default", (정수)(long_i)p->def_val[dvi]);
+    아니면 만약 (p->flags & P_NUM)
 	dict_add_number(d, "default", (long)(long_i)p->def_val[dvi]);
-    else
+    아니면
 	dict_add_string(d, "default", p->def_val[dvi] == NULL
 					? (char_u *)"" : p->def_val[dvi]);
-    return OK;
+    반환 OK;
 }
 #endif
 
@@ -7518,9 +7518,9 @@ option_info(char_u *name, dict_T *d)
  * Return the did_set callback function for the option at 'opt_idx'
  */
     opt_did_set_cb_T
-get_option_did_set_cb(int opt_idx)
+get_option_did_set_cb(정수 opt_idx)
 {
-    return options[opt_idx].opt_did_set_cb;
+    반환 options[opt_idx].opt_did_set_cb;
 }
 
 /*
@@ -7529,9 +7529,9 @@ get_option_did_set_cb(int opt_idx)
     char_u *
 get_equalprg(void)
 {
-    if (*curbuf->b_p_ep == NUL)
-	return p_ep;
-    return curbuf->b_p_ep;
+    만약 (*curbuf->b_p_ep == NUL)
+	반환 p_ep;
+    반환 curbuf->b_p_ep;
 }
 
 /*
@@ -7541,11 +7541,11 @@ get_equalprg(void)
 get_findfunc(void)
 {
 #ifdef FEAT_EVAL
-    if (*curbuf->b_p_ffu == NUL)
-	return p_ffu;
-    return curbuf->b_p_ffu;
-#else
-    return (char_u *)"";
+    만약 (*curbuf->b_p_ffu == NUL)
+	반환 p_ffu;
+    반환 curbuf->b_p_ffu;
+#아니면
+    반환 (char_u *)"";
 #endif
 }
 
@@ -7574,13 +7574,13 @@ after_copy_winopt(win_T *wp)
 {
     char *errmsg = update_winhighlight(wp, wp->w_p_whl);
 
-    if (errmsg != NULL)
+    만약 (errmsg != NULL)
 	emsg(_(errmsg));
 
     // Set w_leftcol or w_skipcol to zero.
-    if (wp->w_p_wrap)
+    만약 (wp->w_p_wrap)
 	wp->w_leftcol = 0;
-    else
+    아니면
 	wp->w_skipcol = 0;
 #ifdef FEAT_LINEBREAK
     briopt_check(NULL, wp);
@@ -7596,9 +7596,9 @@ after_copy_winopt(win_T *wp)
     static char_u *
 copy_option_val(char_u *val)
 {
-    if (val == empty_option)
-	return empty_option;  // no need to allocate memory
-    return vim_strsave(val);
+    만약 (val == empty_option)
+	반환 empty_option;  // no need to allocate memory
+    반환 vim_strsave(val);
 }
 
 /*
@@ -7834,7 +7834,7 @@ clear_winopt(winopt_T *wop UNUSED)
 
 #ifdef FEAT_EVAL
 // Index into the options table for a buffer-local option enum.
-static int buf_opt_idx[BV_COUNT];
+static 정수 buf_opt_idx[BV_COUNT];
 # define COPY_OPT_SCTX(buf, bv) buf->b_p_script_ctx[bv] = options[buf_opt_idx[bv]].script_ctx
 # define COPY_OPT_INSECURE(flagsfield, bv) \
 	(flagsfield) = (options[buf_opt_idx[bv]].flags & P_INSECURE)
@@ -7845,17 +7845,17 @@ static int buf_opt_idx[BV_COUNT];
     static void
 init_buf_opt_idx(void)
 {
-    static int did_init_buf_opt_idx = FALSE;
-    int i;
+    static 정수 did_init_buf_opt_idx = FALSE;
+    정수 i;
 
-    if (did_init_buf_opt_idx)
-	return;
+    만약 (did_init_buf_opt_idx)
+	반환;
     did_init_buf_opt_idx = TRUE;
-    for (i = 0; !istermoption_idx(i); i++)
-	if (options[i].indir & PV_BUF)
+    위해 (i = 0; !istermoption_idx(i); i++)
+	만약 (options[i].indir & PV_BUF)
 	    buf_opt_idx[options[i].indir & PV_MASK] = i;
 }
-#else
+#아니면
 # define COPY_OPT_SCTX(buf, bv)
 # define COPY_OPT_INSECURE(flagsfield, bv)
 #endif
@@ -7870,16 +7870,16 @@ init_buf_opt_idx(void)
  * BCO_NOHELP	Don't copy the values to a help buffer.
  */
     void
-buf_copy_options(buf_T *buf, int flags)
+buf_copy_options(buf_T *buf, 정수 flags)
 {
-    int		should_copy = TRUE;
+    정수		should_copy = TRUE;
     char_u	*save_p_isk = NULL;	    // init for GCC
-    int		dont_do_help;
-    int		did_isk = FALSE;
+    정수		dont_do_help;
+    정수		did_isk = FALSE;
 
     // Skip this when the option defaults have not been set yet.  Happens when
     // main() allocates the first buffer.
-    if (p_cpo != NULL)
+    만약 (p_cpo != NULL)
     {
 	/*
 	 * Always copy when entering and 'cpo' contains 'S'.
@@ -7893,13 +7893,13 @@ buf_copy_options(buf_T *buf, int flags)
 	 *  X	  no	      no	no	TRUE
 	 * no	  yes	      no	 X	TRUE
 	 */
-	if ((vim_strchr(p_cpo, CPO_BUFOPTGLOB) == NULL || !(flags & BCO_ENTER))
+	만약 ((vim_strchr(p_cpo, CPO_BUFOPTGLOB) == NULL || !(flags & BCO_ENTER))
 		&& (buf->b_p_initialized
 		    || (!(flags & BCO_ENTER)
 			&& vim_strchr(p_cpo, CPO_BUFOPT) != NULL)))
 	    should_copy = FALSE;
 
-	if (should_copy || (flags & BCO_ALWAYS))
+	만약 (should_copy || (flags & BCO_ALWAYS))
 	{
 #ifdef FEAT_EVAL
 	    CLEAR_FIELD(buf->b_p_script_ctx);
@@ -7910,14 +7910,14 @@ buf_copy_options(buf_T *buf, int flags)
 	    // (jumping back to a help file with CTRL-T or CTRL-O)
 	    dont_do_help = ((flags & BCO_NOHELP) && buf->b_help)
 						       || buf->b_p_initialized;
-	    if (dont_do_help)		// don't free b_p_isk
+	    만약 (dont_do_help)		// don't free b_p_isk
 	    {
 		save_p_isk = buf->b_p_isk;
 		buf->b_p_isk = NULL;
 	    }
 	    // Always free the allocated strings.  If not already initialized,
 	    // reset 'readonly' and copy 'fileformat'.
-	    if (!buf->b_p_initialized)
+	    만약 (!buf->b_p_initialized)
 	    {
 		free_buf_options(buf, TRUE);
 		buf->b_p_ro = FALSE;		// don't copy readonly
@@ -7934,12 +7934,12 @@ buf_copy_options(buf_T *buf, int flags)
 		    default:
 			buf->b_p_ff = vim_strsave(p_ff);
 		}
-		if (buf->b_p_ff != NULL)
+		만약 (buf->b_p_ff != NULL)
 		    buf->b_start_ffc = *buf->b_p_ff;
 		buf->b_p_bh = empty_option;
 		buf->b_p_bt = empty_option;
 	    }
-	    else
+	    아니면
 		free_buf_options(buf, FALSE);
 
 	    buf->b_p_ai = p_ai;
@@ -7970,9 +7970,9 @@ buf_copy_options(buf_T *buf, int flags)
 	    buf->b_p_ml_nobin = p_ml_nobin;
 	    buf->b_p_inf = p_inf;
 	    COPY_OPT_SCTX(buf, BV_INF);
-	    if (cmdmod.cmod_flags & CMOD_NOSWAPFILE)
+	    만약 (cmdmod.cmod_flags & CMOD_NOSWAPFILE)
 		buf->b_p_swf = FALSE;
-	    else
+	    아니면
 	    {
 		buf->b_p_swf = p_swf;
 		COPY_OPT_SCTX(buf, BV_SWF);
@@ -8006,9 +8006,9 @@ buf_copy_options(buf_T *buf, int flags)
 #ifdef FEAT_VARTABS
 	    buf->b_p_vsts = vim_strsave(p_vsts);
 	    COPY_OPT_SCTX(buf, BV_VSTS);
-	    if (p_vsts && p_vsts != empty_option)
+	    만약 (p_vsts && p_vsts != empty_option)
 		(void)tabstop_set(p_vsts, &buf->b_p_vsts_array);
-	    else
+	    아니면
 		buf->b_p_vsts_array = NULL;
 	    buf->b_p_vsts_nopaste = p_vsts_nopaste
 				 ? vim_strsave(p_vsts_nopaste) : NULL;
@@ -8071,7 +8071,7 @@ buf_copy_options(buf_T *buf, int flags)
 	    buf->b_s.b_p_spo = vim_strsave(p_spo);
 	    COPY_OPT_SCTX(buf, BV_SPO);
 #endif
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 	    buf->b_p_inde = vim_strsave(p_inde);
 	    COPY_OPT_SCTX(buf, BV_INDE);
 	    COPY_OPT_INSECURE(buf->b_p_inde_flags, BV_INDE);
@@ -8079,7 +8079,7 @@ buf_copy_options(buf_T *buf, int flags)
 	    COPY_OPT_SCTX(buf, BV_INDK);
 #endif
 	    buf->b_p_fp = empty_option;
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 	    buf->b_p_fex = vim_strsave(p_fex);
 	    COPY_OPT_SCTX(buf, BV_FEX);
 	    COPY_OPT_INSECURE(buf->b_p_fex_flags, BV_FEX);
@@ -8123,7 +8123,7 @@ buf_copy_options(buf_T *buf, int flags)
 	    buf->b_p_efm = empty_option;
 #endif
 	    buf->b_p_ep = empty_option;
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 	    buf->b_p_ffu = empty_option;
 #endif
 	    buf->b_p_kp = empty_option;
@@ -8152,10 +8152,10 @@ buf_copy_options(buf_T *buf, int flags)
 #endif
 	    buf->b_p_qe = vim_strsave(p_qe);
 	    COPY_OPT_SCTX(buf, BV_QE);
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+#만약 defined(FEAT_BEVAL) && defined(FEAT_EVAL)
 	    buf->b_p_bexpr = empty_option;
 #endif
-#if defined(FEAT_CRYPT)
+#만약 defined(FEAT_CRYPT)
 	    buf->b_p_cm = empty_option;
 #endif
 #ifdef FEAT_PERSISTENT_UNDO
@@ -8169,17 +8169,17 @@ buf_copy_options(buf_T *buf, int flags)
 	    // when going from a help buffer to a non-help buffer.
 	    // Don't touch these at all when BCO_NOHELP is used and going from
 	    // or to a help buffer.
-	    if (dont_do_help)
+	    만약 (dont_do_help)
 	    {
 		buf->b_p_isk = save_p_isk;
 #ifdef FEAT_VARTABS
-		if (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
+		만약 (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
 		    (void)tabstop_set(p_vts, &buf->b_p_vts_array);
-		else
+		아니면
 		    buf->b_p_vts_array = NULL;
 #endif
 	    }
-	    else
+	    아니면
 	    {
 		buf->b_p_isk = vim_strsave(p_isk);
 		COPY_OPT_SCTX(buf, BV_ISK);
@@ -8189,13 +8189,13 @@ buf_copy_options(buf_T *buf, int flags)
 #ifdef FEAT_VARTABS
 		buf->b_p_vts = vim_strsave(p_vts);
 		COPY_OPT_SCTX(buf, BV_VTS);
-		if (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
+		만약 (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
 		    (void)tabstop_set(p_vts, &buf->b_p_vts_array);
-		else
+		아니면
 		    buf->b_p_vts_array = NULL;
 #endif
 		buf->b_help = false;
-		if (buf->b_p_bt[0] == 'h')
+		만약 (buf->b_p_bt[0] == 'h')
 		    clear_string_option(&buf->b_p_bt);
 		buf->b_p_ma = p_ma;
 		COPY_OPT_SCTX(buf, BV_MA);
@@ -8204,12 +8204,12 @@ buf_copy_options(buf_T *buf, int flags)
 
 	// When the options should be copied (ignoring BCO_ALWAYS), set the
 	// flag that indicates that the options have been initialized.
-	if (should_copy)
+	만약 (should_copy)
 	    buf->b_p_initialized = true;
     }
 
     check_buf_options(buf);	    // make sure we don't have NULLs
-    if (did_isk)
+    만약 (did_isk)
 	(void)buf_init_chartab(buf, FALSE);
 }
 
@@ -8219,12 +8219,12 @@ buf_copy_options(buf_T *buf, int flags)
     void
 reset_modifiable(void)
 {
-    int		opt_idx;
+    정수		opt_idx;
 
     curbuf->b_p_ma = FALSE;
     p_ma = FALSE;
     opt_idx = findoption((char_u *)"ma");
-    if (opt_idx >= 0)
+    만약 (opt_idx >= 0)
 	options[opt_idx].def_val[VI_DEFAULT] = FALSE;
 }
 
@@ -8246,217 +8246,217 @@ set_imsearch_global(void)
     p_imsearch = curbuf->b_p_imsearch;
 }
 
-static int expand_option_idx = -1;
-static int expand_option_start_col = 0;
+static 정수 expand_option_idx = -1;
+static 정수 expand_option_start_col = 0;
 static char_u expand_option_name[5] = {'t', '_', NUL, NUL, NUL};
-static int expand_option_flags = 0;
-static int expand_option_append = FALSE;
+static 정수 expand_option_flags = 0;
+static 정수 expand_option_append = FALSE;
 
     void
 set_context_in_set_cmd(
     expand_T	*xp,
     char_u	*arg,
-    int		opt_flags)	// OPT_GLOBAL and/or OPT_LOCAL
+    정수		opt_flags)	// OPT_GLOBAL and/or OPT_LOCAL
 {
-    int		nextchar;
+    정수		nextchar;
     long_u	flags = 0;	// init for GCC
-    int		opt_idx = 0;	// init for GCC
+    정수		opt_idx = 0;	// init for GCC
     char_u	*p;
     char_u	*s;
-    int		is_term_option = FALSE;
-    int		key;
+    정수		is_term_option = FALSE;
+    정수		key;
     char_u	*argend;
 
     expand_option_flags = opt_flags;
 
     xp->xp_context = EXPAND_SETTINGS;
-    if (*arg == NUL)
+    만약 (*arg == NUL)
     {
 	xp->xp_pattern = arg;
-	return;
+	반환;
     }
     argend = arg + STRLEN(arg);
     p = argend - 1;
-    if (*p == ' ' && *(p - 1) != '\\')
+    만약 (*p == ' ' && *(p - 1) != '\\')
     {
 	xp->xp_pattern = p + 1;
-	return;
+	반환;
     }
-    while (p > arg)
+    동안 (p > arg)
     {
 	s = p;
 	// count number of backslashes before ' ' or ','
-	if (*p == ' ' || *p == ',')
+	만약 (*p == ' ' || *p == ',')
 	{
-	    while (s > arg && *(s - 1) == '\\')
+	    동안 (s > arg && *(s - 1) == '\\')
 		--s;
 	}
 	// break at a space with an even number of backslashes
-	if (*p == ' ' && ((p - s) & 1) == 0)
+	만약 (*p == ' ' && ((p - s) & 1) == 0)
 	{
 	    ++p;
 	    break;
 	}
 	--p;
     }
-    if (STRNCMP(p, "no", 2) == 0 && STRNCMP(p, "novice", 6) != 0)
+    만약 (STRNCMP(p, "no", 2) == 0 && STRNCMP(p, "novice", 6) != 0)
     {
 	xp->xp_context = EXPAND_BOOL_SETTINGS;
 	xp->xp_prefix = XP_PREFIX_NO;
 	p += 2;
     }
-    else if (STRNCMP(p, "inv", 3) == 0)
+    아니면 만약 (STRNCMP(p, "inv", 3) == 0)
     {
 	xp->xp_context = EXPAND_BOOL_SETTINGS;
 	xp->xp_prefix = XP_PREFIX_INV;
 	p += 3;
     }
     xp->xp_pattern = arg = p;
-    if (*arg == '<')
+    만약 (*arg == '<')
     {
-	while (*p != '>')
-	    if (*p++ == NUL)	    // expand terminal option name
-		return;
+	동안 (*p != '>')
+	    만약 (*p++ == NUL)	    // expand terminal option name
+		반환;
 	key = get_special_key_code(arg + 1);
-	if (key == 0)		    // unknown name
+	만약 (key == 0)		    // unknown name
 	{
 	    xp->xp_context = EXPAND_NOTHING;
-	    return;
+	    반환;
 	}
 	nextchar = *++p;
 	is_term_option = TRUE;
 	expand_option_name[2] = KEY2TERMCAP0(key);
 	expand_option_name[3] = KEY2TERMCAP1(key);
     }
-    else
+    아니면
     {
-	if (p[0] == 't' && p[1] == '_')
+	만약 (p[0] == 't' && p[1] == '_')
 	{
 	    p += 2;
-	    if (*p != NUL)
+	    만약 (*p != NUL)
 		++p;
-	    if (*p == NUL)
-		return;		// expand option name
+	    만약 (*p == NUL)
+		반환;		// expand option name
 	    nextchar = *++p;
 	    is_term_option = TRUE;
 	    expand_option_name[2] = p[-2];
 	    expand_option_name[3] = p[-1];
 	}
-	else
+	아니면
 	{
 	    // Allow * wildcard
-	    while (ASCII_ISALNUM(*p) || *p == '_' || *p == '*')
+	    동안 (ASCII_ISALNUM(*p) || *p == '_' || *p == '*')
 		p++;
-	    if (*p == NUL)
-		return;
+	    만약 (*p == NUL)
+		반환;
 	    nextchar = *p;
 	    *p = NUL;
 	    opt_idx = findoption(arg);
 	    *p = nextchar;
-	    if (opt_idx == -1 || options[opt_idx].var == NULL)
+	    만약 (opt_idx == -1 || options[opt_idx].var == NULL)
 	    {
 		xp->xp_context = EXPAND_NOTHING;
-		return;
+		반환;
 	    }
 	    flags = options[opt_idx].flags;
-	    if (flags & P_BOOL)
+	    만약 (flags & P_BOOL)
 	    {
 		xp->xp_context = EXPAND_NOTHING;
-		return;
+		반환;
 	    }
 	}
     }
     // handle "-=" and "+="
     expand_option_append = FALSE;
-    int expand_option_subtract = FALSE;
-    if ((nextchar == '-' || nextchar == '+' || nextchar == '^') && p[1] == '=')
+    정수 expand_option_subtract = FALSE;
+    만약 ((nextchar == '-' || nextchar == '+' || nextchar == '^') && p[1] == '=')
     {
-	if (nextchar == '-')
+	만약 (nextchar == '-')
 	    expand_option_subtract = TRUE;
-	if (nextchar == '+' || nextchar == '^')
+	만약 (nextchar == '+' || nextchar == '^')
 	    expand_option_append = TRUE;
 	++p;
 	nextchar = '=';
     }
-    if ((nextchar != '=' && nextchar != ':')
+    만약 ((nextchar != '=' && nextchar != ':')
 				    || xp->xp_context == EXPAND_BOOL_SETTINGS)
     {
 	xp->xp_context = EXPAND_UNSUCCESSFUL;
-	return;
+	반환;
     }
 
     // Below are for handling expanding a specific option's value after the '='
     // or ':'
 
-    if (is_term_option)
+    만약 (is_term_option)
 	expand_option_idx = -1;
-    else
+    아니면
 	expand_option_idx = opt_idx;
 
-    if (!is_term_option)
+    만약 (!is_term_option)
     {
-	if (options[opt_idx].flags & P_NO_CMD_EXPAND)
+	만약 (options[opt_idx].flags & P_NO_CMD_EXPAND)
 	{
 	    xp->xp_context=EXPAND_UNSUCCESSFUL;
-	    return;
+	    반환;
 	}
     }
 
     xp->xp_pattern = p + 1;
-    expand_option_start_col = (int)(p + 1 - xp->xp_line);
+    expand_option_start_col = (정수)(p + 1 - xp->xp_line);
 
     // Certain options currently have special case handling to reuse the
     // expansion logic with other commands.
 #ifdef FEAT_SYN_HL
-    if (options[opt_idx].var == (char_u *)&p_syn)
+    만약 (options[opt_idx].var == (char_u *)&p_syn)
     {
 	xp->xp_context = EXPAND_OWNSYNTAX;
-	return;
+	반환;
     }
 #endif
-    if (options[opt_idx].var == (char_u *)&p_ft)
+    만약 (options[opt_idx].var == (char_u *)&p_ft)
     {
 	xp->xp_context = EXPAND_FILETYPE;
-	return;
+	반환;
     }
 #ifdef FEAT_KEYMAP
-    if (options[opt_idx].var == (char_u *)&p_keymap)
+    만약 (options[opt_idx].var == (char_u *)&p_keymap)
     {
 	xp->xp_context = EXPAND_KEYMAP;
-	return;
+	반환;
     }
 #endif
 
     // Now pick. If the option has a custom expander, use that. Otherwise, just
     // fill with the existing option value.
-    if (expand_option_subtract)
+    만약 (expand_option_subtract)
     {
 	xp->xp_context = EXPAND_SETTING_SUBTRACT;
-	return;
+	반환;
     }
-    else if (expand_option_idx >= 0 &&
+    아니면 만약 (expand_option_idx >= 0 &&
 	    options[expand_option_idx].opt_expand_cb != NULL)
     {
 	xp->xp_context = EXPAND_STRING_SETTING;
     }
-    else if (*xp->xp_pattern == NUL)
+    아니면 만약 (*xp->xp_pattern == NUL)
     {
 	xp->xp_context = EXPAND_OLD_SETTING;
-	return;
+	반환;
     }
-    else
+    아니면
 	xp->xp_context = EXPAND_NOTHING;
 
-    if (is_term_option || (flags & P_NUM))
-	return;
+    만약 (is_term_option || (flags & P_NUM))
+	반환;
 
     // Only string options below
 
     // Options that have P_EXPAND are considered to all use file/dir expansion.
-    if (flags & P_EXPAND)
+    만약 (flags & P_EXPAND)
     {
 	p = options[opt_idx].var;
-	if (p == (char_u *)&p_bdir
+	만약 (p == (char_u *)&p_bdir
 		|| p == (char_u *)&p_dir
 		|| p == (char_u *)&p_path
 		|| p == (char_u *)&p_pp
@@ -8468,21 +8468,21 @@ set_context_in_set_cmd(
 		)
 	{
 	    xp->xp_context = EXPAND_DIRECTORIES;
-	    if (p == (char_u *)&p_path || p == (char_u *)&p_cdpath)
+	    만약 (p == (char_u *)&p_path || p == (char_u *)&p_cdpath)
 		xp->xp_backslash = XP_BS_THREE;
-	    else
+	    아니면
 		xp->xp_backslash = XP_BS_ONE;
 	}
-	else
+	아니면
 	{
 	    xp->xp_context = EXPAND_FILES;
 	    // for 'tags' need three backslashes for a space
-	    if (p == (char_u *)&p_tags)
+	    만약 (p == (char_u *)&p_tags)
 		xp->xp_backslash = XP_BS_THREE;
-	    else
+	    아니면
 		xp->xp_backslash = XP_BS_ONE;
 	}
-	if (flags & P_COMMA)
+	만약 (flags & P_COMMA)
 	    xp->xp_backslash |= XP_BS_COMMA;
     }
 
@@ -8491,21 +8491,21 @@ set_context_in_set_cmd(
     // pattern, while accounting for backslash-escaped space/commas/colons.
     // Triple-backslashed escaped file names (e.g. 'path') can also be
     // delimited by space.
-    if ((flags & P_EXPAND) || (flags & P_COMMA) || (flags & P_COLON))
+    만약 ((flags & P_EXPAND) || (flags & P_COMMA) || (flags & P_COLON))
     {
-	for (p = argend - 1; p >= xp->xp_pattern; --p)
+	위해 (p = argend - 1; p >= xp->xp_pattern; --p)
 	{
 	    // count number of backslashes before ' ' or ',' or ':'
-	    if (*p == ' ' || *p == ',' ||
+	    만약 (*p == ' ' || *p == ',' ||
 		    (*p == ':' && (flags & P_COLON)))
 	    {
 		s = p;
-		while (s > xp->xp_pattern && *(s - 1) == '\\')
+		동안 (s > xp->xp_pattern && *(s - 1) == '\\')
 		    --s;
-		if ((*p == ' ' && ((xp->xp_backslash & XP_BS_THREE) && (p - s) < 3))
-#if defined(BACKSLASH_IN_FILENAME)
+		만약 ((*p == ' ' && ((xp->xp_backslash & XP_BS_THREE) && (p - s) < 3))
+#만약 defined(BACKSLASH_IN_FILENAME)
 			|| (*p == ',' && (flags & P_COMMA) && (p - s) < 1)
-#else
+#아니면
 			|| (*p == ',' && (flags & P_COMMA) && (p - s) < 2)
 #endif
 			|| (*p == ':' && (flags & P_COLON)))
@@ -8519,21 +8519,21 @@ set_context_in_set_cmd(
 
     // An option that is a list of single-character flags should always start
     // at the end as we don't complete words.
-    if (flags & P_FLAGLIST)
+    만약 (flags & P_FLAGLIST)
 	xp->xp_pattern = argend;
 
     // Some options can either be using file/dir expansions, or custom value
     // expansion depending on what the user typed. Unfortunately we have to
     // manually handle it here to make sure we have the correct xp_context set.
 #ifdef FEAT_SPELL
-    if (options[opt_idx].var == (char_u *)&p_sps)
+    만약 (options[opt_idx].var == (char_u *)&p_sps)
     {
-	if (STRNCMP(xp->xp_pattern, "file:", 5) == 0)
+	만약 (STRNCMP(xp->xp_pattern, "file:", 5) == 0)
 	{
 	    xp->xp_pattern += 5;
-	    return;
+	    반환;
 	}
-	else if (options[expand_option_idx].opt_expand_cb != NULL)
+	아니면 만약 (options[expand_option_idx].opt_expand_cb != NULL)
 	{
 	    xp->xp_context = EXPAND_STRING_SETTING;
 	}
@@ -8557,68 +8557,68 @@ set_context_in_set_cmd(
  * If 'test_only' is FALSE and 'fuzzy' is TRUE and if 'str' fuzzy matches
  * 'fuzzystr', then stores the match details in fuzmatch[idx] and returns TRUE.
  */
-    static int
+    static 정수
 match_str(
 	char_u		*str,
 	regmatch_T	*regmatch,
 	char_u		**matches,
-	int		idx,
-	int		test_only,
-	int		fuzzy,
+	정수		idx,
+	정수		test_only,
+	정수		fuzzy,
 	char_u		*fuzzystr,
 	fuzmatch_str_T  *fuzmatch)
 {
-    if (!fuzzy)
+    만약 (!fuzzy)
     {
-	if (vim_regexec(regmatch, str, (colnr_T)0))
+	만약 (vim_regexec(regmatch, str, (colnr_T)0))
 	{
-	    if (!test_only)
+	    만약 (!test_only)
 		matches[idx] = vim_strsave(str);
-	    return TRUE;
+	    반환 TRUE;
 	}
     }
-    else
+    아니면
     {
-	int score;
+	정수 score;
 
 	score = fuzzy_match_str(str, fuzzystr);
-	if (score != FUZZY_SCORE_NONE)
+	만약 (score != FUZZY_SCORE_NONE)
 	{
-	    if (!test_only)
+	    만약 (!test_only)
 	    {
 		fuzmatch[idx].idx = idx;
 		fuzmatch[idx].str = vim_strsave(str);
 		fuzmatch[idx].score = score;
 	    }
 
-	    return TRUE;
+	    반환 TRUE;
 	}
     }
 
-    return FALSE;
+    반환 FALSE;
 }
 
-    int
+    정수
 ExpandSettings(
     expand_T	*xp,
     regmatch_T	*regmatch,
     char_u	*fuzzystr,
-    int		*numMatches,
+    정수		*numMatches,
     char_u	***matches,
-    int		can_fuzzy)
+    정수		can_fuzzy)
 {
-    int		num_normal = 0;	    // Nr of matching non-term-code settings
-    int		num_term = 0;	    // Nr of matching terminal code settings
-    int		opt_idx;
-    int		match;
-    int		count = 0;
+    정수		num_normal = 0;	    // Nr of matching non-term-code settings
+    정수		num_term = 0;	    // Nr of matching terminal code settings
+    정수		opt_idx;
+    정수		match;
+    정수		count = 0;
     char_u	*str;
-    int		loop;
-    int		is_term_opt;
+    정수		loop;
+    정수		is_term_opt;
     char_u	name_buf[MAX_KEY_NAME_LEN];
     static char *(names[]) = {"all", "termcap"};
-    int		ic = regmatch->rm_ic;	// remember the ignore-case flag
-    int		fuzzy;
+    정수		ic = regmatch->rm_ic;	// remember the ignore-case flag
+    정수		fuzzy;
     fuzmatch_str_T  *fuzmatch = NULL;
 
     fuzzy = can_fuzzy && cmdline_fuzzy_complete(fuzzystr);
@@ -8626,66 +8626,66 @@ ExpandSettings(
     // do this loop twice:
     // loop == 0: count the number of matching options
     // loop == 1: copy the matching options into allocated memory
-    for (loop = 0; loop <= 1; ++loop)
+    위해 (loop = 0; loop <= 1; ++loop)
     {
 	regmatch->rm_ic = ic;
-	if (xp->xp_context != EXPAND_BOOL_SETTINGS)
+	만약 (xp->xp_context != EXPAND_BOOL_SETTINGS)
 	{
-	    for (match = 0; match < (int)ARRAY_LENGTH(names); ++match)
+	    위해 (match = 0; match < (정수)ARRAY_LENGTH(names); ++match)
 	    {
-		if (match_str((char_u *)names[match], regmatch, *matches,
+		만약 (match_str((char_u *)names[match], regmatch, *matches,
 			    count, (loop == 0), fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
+		    만약 (loop == 0)
 			num_normal++;
-		    else
+		    아니면
 			count++;
 		}
 	    }
 	}
-	for (opt_idx = 0; (str = (char_u *)options[opt_idx].fullname) != NULL;
+	위해 (opt_idx = 0; (str = (char_u *)options[opt_idx].fullname) != NULL;
 								    opt_idx++)
 	{
-	    if (options[opt_idx].var == NULL)
+	    만약 (options[opt_idx].var == NULL)
 		continue;
-	    if (xp->xp_context == EXPAND_BOOL_SETTINGS
+	    만약 (xp->xp_context == EXPAND_BOOL_SETTINGS
 		    && !(options[opt_idx].flags & P_BOOL))
 		continue;
 	    is_term_opt = istermoption_idx(opt_idx);
-	    if (is_term_opt && num_normal > 0)
+	    만약 (is_term_opt && num_normal > 0)
 		continue;
 
-	    if (match_str(str, regmatch, *matches, count, (loop == 0),
+	    만약 (match_str(str, regmatch, *matches, count, (loop == 0),
 						fuzzy, fuzzystr, fuzmatch))
 	    {
-		if (loop == 0)
+		만약 (loop == 0)
 		{
-		    if (is_term_opt)
+		    만약 (is_term_opt)
 			num_term++;
-		    else
+		    아니면
 			num_normal++;
 		}
-		else
+		아니면
 		    count++;
 	    }
-	    else if (!fuzzy && options[opt_idx].shortname != NULL
+	    아니면 만약 (!fuzzy && options[opt_idx].shortname != NULL
 			&& vim_regexec(regmatch,
 			     (char_u *)options[opt_idx].shortname, (colnr_T)0))
 	    {
 		// Compare against the abbreviated option name (for regular
 		// expression match). Fuzzy matching (previous if) already
 		// matches against both the expanded and abbreviated names.
-		if (loop == 0)
+		만약 (loop == 0)
 		{
-		    if (is_term_opt)
+		    만약 (is_term_opt)
 			num_term++;
-		    else
+		    아니면
 			num_normal++;
 		}
-		else
+		아니면
 		    (*matches)[count++] = vim_strsave(str);
 	    }
-	    else if (is_term_opt)
+	    아니면 만약 (is_term_opt)
 	    {
 		name_buf[0] = '<';
 		name_buf[1] = 't';
@@ -8695,23 +8695,23 @@ ExpandSettings(
 		name_buf[5] = '>';
 		name_buf[6] = NUL;
 
-		if (match_str(name_buf, regmatch, *matches, count, (loop == 0),
+		만약 (match_str(name_buf, regmatch, *matches, count, (loop == 0),
 			    fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
+		    만약 (loop == 0)
 			num_term++;
-		    else
+		    아니면
 			count++;
 		}
 	    }
 	}
 
 	// Check terminal key codes, these are not in the option table
-	if (xp->xp_context != EXPAND_BOOL_SETTINGS  && num_normal == 0)
+	만약 (xp->xp_context != EXPAND_BOOL_SETTINGS  && num_normal == 0)
 	{
-	    for (opt_idx = 0; (str = get_termcode(opt_idx)) != NULL; opt_idx++)
+	    위해 (opt_idx = 0; (str = get_termcode(opt_idx)) != NULL; opt_idx++)
 	    {
-		if (!SAFE_isprint(str[0]) || !SAFE_isprint(str[1]))
+		만약 (!SAFE_isprint(str[0]) || !SAFE_isprint(str[1]))
 		    continue;
 
 		name_buf[0] = 't';
@@ -8720,15 +8720,15 @@ ExpandSettings(
 		name_buf[3] = str[1];
 		name_buf[4] = NUL;
 
-		if (match_str(name_buf, regmatch, *matches, count,
+		만약 (match_str(name_buf, regmatch, *matches, count,
 				       (loop == 0), fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
+		    만약 (loop == 0)
 			num_term++;
-		    else
+		    아니면
 			count++;
 		}
-		else
+		아니면
 		{
 		    name_buf[0] = '<';
 		    name_buf[1] = 't';
@@ -8738,13 +8738,13 @@ ExpandSettings(
 		    name_buf[5] = '>';
 		    name_buf[6] = NUL;
 
-		    if (match_str(name_buf, regmatch, *matches, count,
+		    만약 (match_str(name_buf, regmatch, *matches, count,
 					    (loop == 0), fuzzy, fuzzystr,
 					    fuzmatch))
 		    {
-			if (loop == 0)
+			만약 (loop == 0)
 			    num_term++;
-			else
+			아니면
 			    count++;
 		    }
 		}
@@ -8752,56 +8752,56 @@ ExpandSettings(
 
 	    // Check special key names.
 	    regmatch->rm_ic = TRUE;		// ignore case here
-	    for (opt_idx = 0; (str = get_key_name(opt_idx)) != NULL; opt_idx++)
+	    위해 (opt_idx = 0; (str = get_key_name(opt_idx)) != NULL; opt_idx++)
 	    {
 		name_buf[0] = '<';
 		STRCPY(name_buf + 1, str);
 		STRCAT(name_buf, ">");
 
-		if (match_str(name_buf, regmatch, *matches, count, (loop == 0),
+		만약 (match_str(name_buf, regmatch, *matches, count, (loop == 0),
 			    fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
+		    만약 (loop == 0)
 			num_term++;
-		    else
+		    아니면
 			count++;
 		}
 	    }
 	}
-	if (loop == 0)
+	만약 (loop == 0)
 	{
-	    if (num_normal > 0)
+	    만약 (num_normal > 0)
 		*numMatches = num_normal;
-	    else if (num_term > 0)
+	    아니면 만약 (num_term > 0)
 		*numMatches = num_term;
-	    else
-		return OK;
-	    if (!fuzzy)
+	    아니면
+		반환 OK;
+	    만약 (!fuzzy)
 	    {
 		*matches = ALLOC_MULT(char_u *, *numMatches);
-		if (*matches == NULL)
+		만약 (*matches == NULL)
 		{
 		    *matches = (char_u **)"";
-		    return FAIL;
+		    반환 FAIL;
 		}
 	    }
-	    else
+	    아니면
 	    {
 		fuzmatch = ALLOC_MULT(fuzmatch_str_T, *numMatches);
-		if (fuzmatch == NULL)
+		만약 (fuzmatch == NULL)
 		{
 		    *matches = (char_u **)"";
-		    return FAIL;
+		    반환 FAIL;
 		}
 	    }
 	}
     }
 
-    if (fuzzy &&
+    만약 (fuzzy &&
 	fuzzymatches_to_strmatches(fuzmatch, matches, count, FALSE) == FAIL)
-	return FAIL;
+	반환 FAIL;
 
-    return OK;
+    반환 OK;
 }
 
 // Escape an option value that can be used on the command-line with :set.
@@ -8814,86 +8814,86 @@ escape_option_str_cmdline(char_u *var)
     // A backslash is required before some characters.  This is the reverse of
     // what happens in do_set().
     buf = vim_strsave_escaped(var, escape_chars);
-    if (buf == NULL)
-	return NULL;
+    만약 (buf == NULL)
+	반환 NULL;
 
 #ifdef BACKSLASH_IN_FILENAME
     // For MS-Windows et al. we don't double backslashes at the start and
     // before a file name character.
     // The reverse is found at stropt_copy_value().
-    for (var = buf; *var != NUL; MB_PTR_ADV(var))
-	if (var[0] == '\\' && var[1] == '\\'
+    위해 (var = buf; *var != NUL; MB_PTR_ADV(var))
+	만약 (var[0] == '\\' && var[1] == '\\'
 		&& expand_option_idx >= 0
 		&& (options[expand_option_idx].flags & P_EXPAND)
 		&& vim_isfilec(var[2])
 		&& (var[2] != '\\' || (var == buf && var[4] != '\\')))
 	    STRMOVE(var, var + 1);
 #endif
-    return buf;
+    반환 buf;
 }
 
 /*
  * Expansion handler for :set= when we just want to fill in with the existing value.
  */
-    int
-ExpandOldSetting(int *numMatches, char_u ***matches)
+    정수
+ExpandOldSetting(정수 *numMatches, char_u ***matches)
 {
     char_u  *var = NULL;	// init for GCC
     char_u  *buf;
 
     *numMatches = 0;
     *matches = ALLOC_MULT(char_u *, 1);
-    if (*matches == NULL)
-	return FAIL;
+    만약 (*matches == NULL)
+	반환 FAIL;
 
     // For a terminal key code expand_option_idx is < 0.
-    if (expand_option_idx < 0)
+    만약 (expand_option_idx < 0)
     {
 	var = find_termcode(expand_option_name + 2);
-	if (var == NULL)
+	만약 (var == NULL)
 	    expand_option_idx = findoption(expand_option_name);
     }
 
-    if (expand_option_idx >= 0)
+    만약 (expand_option_idx >= 0)
     {
 	// put string of option value in NameBuff
 	option_value2string(&options[expand_option_idx], expand_option_flags);
 	var = NameBuff;
     }
-    else if (var == NULL)
+    아니면 만약 (var == NULL)
 	var = (char_u *)"";
 
     buf = escape_option_str_cmdline(var);
-    if (buf == NULL)
+    만약 (buf == NULL)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	반환 FAIL;
     }
 
     (*matches)[0] = buf;
     *numMatches = 1;
-    return OK;
+    반환 OK;
 }
 
 /*
  * Expansion handler for :set=/:set+= when the option has a custom expansion handler.
  */
-    int
+    정수
 ExpandStringSetting(
     expand_T	*xp,
     regmatch_T	*regmatch,
-    int		*numMatches,
+    정수		*numMatches,
     char_u	***matches)
 {
     char_u  *var = NULL;	// init for GCC
     char_u  *buf;
 
-    if (expand_option_idx < 0 ||
+    만약 (expand_option_idx < 0 ||
 	    options[expand_option_idx].opt_expand_cb == NULL)
     {
 	// Not supposed to reach this. This function is only for options with
 	// custom expansion callbacks.
-	return FAIL;
+	반환 FAIL;
     }
 
     optexpand_T args;
@@ -8912,39 +8912,39 @@ ExpandStringSetting(
     option_value2string(&options[expand_option_idx], expand_option_flags);
     var = NameBuff;
     buf = escape_option_str_cmdline(var);
-    if (buf == NULL)
-	return FAIL;
+    만약 (buf == NULL)
+	반환 FAIL;
 
     args.oe_opt_value = buf;
 
-    int num_ret = options[expand_option_idx].opt_expand_cb(&args, numMatches, matches);
+    정수 num_ret = options[expand_option_idx].opt_expand_cb(&args, numMatches, matches);
 
     vim_free(buf);
-    return num_ret;
+    반환 num_ret;
 }
 
 /*
  * Expansion handler for :set-=
  */
-    int
+    정수
 ExpandSettingSubtract(
     expand_T	*xp,
     regmatch_T	*regmatch,
-    int		*numMatches,
+    정수		*numMatches,
     char_u	***matches)
 {
-    if (expand_option_idx < 0)
+    만약 (expand_option_idx < 0)
 	// term option
-	return ExpandOldSetting(numMatches, matches);
+	반환 ExpandOldSetting(numMatches, matches);
 
     char_u *option_val = *(char_u**)get_option_varp_scope(
 	expand_option_idx, expand_option_flags);
 
     long_u option_flags =  options[expand_option_idx].flags;
 
-    if (option_flags & P_NUM)
-	return ExpandOldSetting(numMatches, matches);
-    else if (option_flags & P_COMMA)
+    만약 (option_flags & P_NUM)
+	반환 ExpandOldSetting(numMatches, matches);
+    아니면 만약 (option_flags & P_COMMA)
     {
 	// Split the option by comma, then present each option to the user if
 	// it matches the pattern.
@@ -8957,13 +8957,13 @@ ExpandSettingSubtract(
 	char_u	    *next_val;
 	char_u	    *comma;
 
-	if (*option_val == NUL)
-	    return FAIL;
+	만약 (*option_val == NUL)
+	    반환 FAIL;
 
 	// Make a copy as we need to inject null characters destructively.
 	option_copy = vim_strsave(option_val);
-	if (option_copy == NULL)
-	    return FAIL;
+	만약 (option_copy == NULL)
+	    반환 FAIL;
 	next_val = option_copy;
 
 	ga_init2(&ga, sizeof(char_u *), 10);
@@ -8972,99 +8972,99 @@ ExpandSettingSubtract(
 	{
 	    item = next_val;
 	    comma = vim_strchr(next_val, ',');
-	    while (comma != NULL && comma != next_val && *(comma - 1) == '\\')
+	    동안 (comma != NULL && comma != next_val && *(comma - 1) == '\\')
 	    {
 		// "\," is interpreted as a literal comma rather than option
 		// separator when reading options in copy_option_part(). Skip
 		// it.
 		comma = vim_strchr(comma + 1, ',');
 	    }
-	    if (comma != NULL)
+	    만약 (comma != NULL)
 	    {
 		*comma = NUL; // null-terminate this value, required by later functions
 		next_val = comma + 1;
 	    }
-	    else
+	    아니면
 		next_val = NULL;
 
-	    if (*item == NUL)
+	    만약 (*item == NUL)
 		// empty value, don't add to list
 		continue;
 
-	    if (!vim_regexec(regmatch, item, (colnr_T)0))
+	    만약 (!vim_regexec(regmatch, item, (colnr_T)0))
 		continue;
 
 	    char_u *buf = escape_option_str_cmdline(item);
-	    if (buf == NULL)
+	    만약 (buf == NULL)
 	    {
 		vim_free(option_copy);
 		ga_clear_strings(&ga);
-		return FAIL;
+		반환 FAIL;
 	    }
-	    if (ga_add_string(&ga, buf) != OK)
+	    만약 (ga_add_string(&ga, buf) != OK)
 	    {
 		vim_free(buf);
 		break;
 	    }
-	} while (next_val != NULL);
+	} 동안 (next_val != NULL);
 
 	vim_free(option_copy);
 
 	*matches = ga.ga_data;
 	*numMatches = ga.ga_len;
-	return OK;
+	반환 OK;
     }
-    else if (option_flags & P_FLAGLIST)
+    아니면 만약 (option_flags & P_FLAGLIST)
     {
 	// Only present the flags that are set on the option as the other flags
 	// are not meaningful to do set-= on.
 
-	if (*xp->xp_pattern != NUL)
+	만약 (*xp->xp_pattern != NUL)
 	{
 	    // Don't suggest anything if cmdline is non-empty. Vim's set-=
 	    // behavior requires consecutive strings and it's usually
 	    // unintuitive to users if they try to subtract multiple flags at
 	    // once.
-	    return FAIL;
+	    반환 FAIL;
 	}
 
 	size_t num_flags = STRLEN(option_val);
-	if (num_flags == 0)
-	    return FAIL;
+	만약 (num_flags == 0)
+	    반환 FAIL;
 
 	*matches = ALLOC_MULT(char_u *, num_flags + 1);
-	if (*matches == NULL)
-	    return FAIL;
+	만약 (*matches == NULL)
+	    반환 FAIL;
 
-	int count = 0;
+	정수 count = 0;
 	char_u *p;
 
 	p = vim_strnsave(option_val, num_flags);
-	if (p == NULL)
+	만약 (p == NULL)
 	{
 	    VIM_CLEAR(*matches);
-	    return FAIL;
+	    반환 FAIL;
 	}
 	(*matches)[count++] = p;
 
-	if (num_flags > 1)
+	만약 (num_flags > 1)
 	{
 	    // If more than one flags, split the flags up and expose each
 	    // character as individual choice.
-	    for (char_u *flag = option_val; *flag != NUL; flag++)
+	    위해 (char_u *flag = option_val; *flag != NUL; flag++)
 	    {
 		p = vim_strnsave(flag, 1);
-		if (p == NULL)
+		만약 (p == NULL)
 		    break;
 		(*matches)[count++] = p;
 	    }
 	}
 
 	*numMatches = count;
-	return OK;
+	반환 OK;
     }
 
-    return ExpandOldSetting(numMatches, matches);
+    반환 ExpandOldSetting(numMatches, matches);
 }
 
 /*
@@ -9074,39 +9074,39 @@ ExpandSettingSubtract(
     static void
 option_value2string(
     struct vimoption	*opp,
-    int			scope)	// OPT_GLOBAL and/or OPT_LOCAL
+    정수			scope)	// OPT_GLOBAL and/or OPT_LOCAL
 {
     char_u	*varp;
 
     varp = get_varp_scope(opp, scope);
 
-    if (opp->flags & P_NUM)
+    만약 (opp->flags & P_NUM)
     {
 	long wc = 0;
 
-	if (wc_use_keyname(varp, &wc))
-	    STRCPY(NameBuff, get_special_key_name((int)wc, 0));
-	else if (wc != 0)
-	    STRCPY(NameBuff, transchar((int)wc));
-	else
+	만약 (wc_use_keyname(varp, &wc))
+	    STRCPY(NameBuff, get_special_key_name((정수)wc, 0));
+	아니면 만약 (wc != 0)
+	    STRCPY(NameBuff, transchar((정수)wc));
+	아니면
 	    sprintf((char *)NameBuff, "%ld", *(long *)varp);
     }
-    else    // P_STRING
+    아니면    // P_STRING
     {
 	varp = *(char_u **)(varp);
-	if (varp == NULL)		    // just in case
+	만약 (varp == NULL)		    // just in case
 	    NameBuff[0] = NUL;
 #ifdef FEAT_CRYPT
 	// don't show the actual value of 'key', only that it's set
-	else if (opp->var == (char_u *)&p_key && *varp)
+	아니면 만약 (opp->var == (char_u *)&p_key && *varp)
 	    STRCPY(NameBuff, "*****");
 #endif
-	else if (opp->flags & P_EXPAND)
+	아니면 만약 (opp->flags & P_EXPAND)
 	    home_replace(NULL, varp, NameBuff, MAXPATHL, FALSE);
 	// Translate 'pastetoggle' into special key names
-	else if ((char_u **)opp->var == &p_pt)
+	아니면 만약 ((char_u **)opp->var == &p_pt)
 	    str2specialbuf(p_pt, NameBuff, MAXPATHL);
-	else
+	아니면
 	    vim_strncpy(NameBuff, varp, MAXPATHL - 1);
     }
 }
@@ -9116,26 +9116,26 @@ option_value2string(
  * printed as a keyname.
  * "*wcp" is set to the value of the option if it's 'wildchar' or 'wildcharm'.
  */
-    static int
+    static 정수
 wc_use_keyname(char_u *varp, long *wcp)
 {
-    if (((long *)varp == &p_wc) || ((long *)varp == &p_wcm))
+    만약 (((long *)varp == &p_wc) || ((long *)varp == &p_wcm))
     {
 	*wcp = *(long *)varp;
-	if (IS_SPECIAL(*wcp) || find_special_key_in_table((int)*wcp) >= 0)
-	    return TRUE;
+	만약 (IS_SPECIAL(*wcp) || find_special_key_in_table((정수)*wcp) >= 0)
+	    반환 TRUE;
     }
-    return FALSE;
+    반환 FALSE;
 }
 
 /*
  * Return TRUE if "x" is present in 'shortmess' option, or
  * 'shortmess' contains 'a' and "x" is present in SHM_A.
  */
-    int
-shortmess(int x)
+    정수
+shortmess(정수 x)
 {
-    return p_shm != NULL &&
+    반환 p_shm != NULL &&
 	    (   vim_strchr(p_shm, x) != NULL
 	    || (vim_strchr(p_shm, 'a') != NULL
 		&& vim_strchr((char_u *)SHM_A, x) != NULL));
@@ -9152,28 +9152,28 @@ shortmess(int x)
     void
 vimrc_found(char_u *fname, char_u *envname)
 {
-    int		opt_idx;
-    int		dofree = FALSE;
+    정수		opt_idx;
+    정수		dofree = FALSE;
     char_u	*p;
 
-    if (!option_was_set((char_u *)"cp"))
+    만약 (!option_was_set((char_u *)"cp"))
     {
 	p_cp = FALSE;
-	for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
-	    if (!(options[opt_idx].flags & (P_WAS_SET|P_VI_DEF)))
+	위해 (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+	    만약 (!(options[opt_idx].flags & (P_WAS_SET|P_VI_DEF)))
 		set_option_default(opt_idx, OPT_FREE, FALSE);
 	didset_options();
 	didset_options2();
     }
 
-    if (fname != NULL)
+    만약 (fname != NULL)
     {
 	p = vim_getenv(envname, &dofree);
-	if (p == NULL)
+	만약 (p == NULL)
 	{
 	    // Set $MYVIMRC to the first vimrc file found.
 	    p = FullName_save(fname, FALSE);
-	    if (p != NULL)
+	    만약 (p != NULL)
 	    {
 		vim_setenv(envname, p);
 		vim_free(p);
@@ -9181,7 +9181,7 @@ vimrc_found(char_u *fname, char_u *envname)
 	    // Set $MYVIMDIR
 	    export_myvimdir();
 	}
-	else if (dofree)
+	아니면 만약 (dofree)
 	    vim_free(p);
     }
 }
@@ -9190,17 +9190,17 @@ vimrc_found(char_u *fname, char_u *envname)
  * Set 'compatible' on or off.  Called for "-C" and "-N" command line arg.
  */
     void
-change_compatible(int on)
+change_compatible(정수 on)
 {
-    int	    opt_idx;
+    정수	    opt_idx;
 
-    if (p_cp != on)
+    만약 (p_cp != on)
     {
 	p_cp = on;
 	compatible_set();
     }
     opt_idx = findoption((char_u *)"cp");
-    if (opt_idx >= 0)
+    만약 (opt_idx >= 0)
 	options[opt_idx].flags |= P_WAS_SET;
 }
 
@@ -9208,32 +9208,32 @@ change_compatible(int on)
  * Return TRUE when option "name" has been set.
  * Only works correctly for global options.
  */
-    int
+    정수
 option_was_set(char_u *name)
 {
-    int idx;
+    정수 idx;
 
     idx = findoption(name);
-    if (idx < 0)	// unknown option
-	return FALSE;
-    if (options[idx].flags & P_WAS_SET)
-	return TRUE;
-    return FALSE;
+    만약 (idx < 0)	// unknown option
+	반환 FALSE;
+    만약 (options[idx].flags & P_WAS_SET)
+	반환 TRUE;
+    반환 FALSE;
 }
 
 /*
  * Reset the flag indicating option "name" was set.
  */
-    int
+    정수
 reset_option_was_set(char_u *name)
 {
-    int idx = findoption(name);
+    정수 idx = findoption(name);
 
-    if (idx < 0)
-	return FAIL;
+    만약 (idx < 0)
+	반환 FAIL;
 
     options[idx].flags &= ~P_WAS_SET;
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -9247,10 +9247,10 @@ reset_option_was_set(char_u *name)
     static void
 compatible_set(void)
 {
-    int	    opt_idx;
+    정수	    opt_idx;
 
-    for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
-	if (	   ((options[opt_idx].flags & P_VIM) && p_cp)
+    위해 (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+	만약 (	   ((options[opt_idx].flags & P_VIM) && p_cp)
 		|| (!(options[opt_idx].flags & P_VI_DEF) && !p_cp))
 	    set_option_default(opt_idx, OPT_FREE, p_cp);
     didset_options();
@@ -9260,22 +9260,22 @@ compatible_set(void)
 /*
  * Check if backspacing over something is allowed.
  */
-    int
+    정수
 can_bs(
-    int		what)	    // BS_INDENT, BS_EOL, BS_START or BS_NOSTOP
+    정수		what)	    // BS_INDENT, BS_EOL, BS_START or BS_NOSTOP
 {
 #ifdef FEAT_JOB_CHANNEL
-    if (what == BS_START && bt_prompt(curbuf))
-	return FALSE;
+    만약 (what == BS_START && bt_prompt(curbuf))
+	반환 FALSE;
 #endif
     switch (*p_bs)
     {
-	case '3':       return TRUE;
-	case '2':	return (what != BS_NOSTOP);
-	case '1':	return (what != BS_START);
-	case '0':	return FALSE;
+	case '3':       반환 TRUE;
+	case '2':	반환 (what != BS_NOSTOP);
+	case '1':	반환 (what != BS_START);
+	case '0':	반환 FALSE;
     }
-    return vim_strchr(p_bs, what) != NULL;
+    반환 vim_strchr(p_bs, what) != NULL;
 }
 
 /*
@@ -9285,7 +9285,7 @@ can_bs(
     long
 get_scrolloff_value(void)
 {
-    return curwin->w_p_so < 0 ? p_so : curwin->w_p_so;
+    반환 curwin->w_p_so < 0 ? p_so : curwin->w_p_so;
 }
 
 /*
@@ -9295,7 +9295,7 @@ get_scrolloff_value(void)
     long
 get_scrolloffpad_value(void)
 {
-    return curwin->w_p_sop == -1 ? p_sop : curwin->w_p_sop;
+    반환 curwin->w_p_sop == -1 ? p_sop : curwin->w_p_sop;
 }
 
 /*
@@ -9305,165 +9305,165 @@ get_scrolloffpad_value(void)
     long
 get_sidescrolloff_value(void)
 {
-    return curwin->w_p_siso < 0 ? p_siso : curwin->w_p_siso;
+    반환 curwin->w_p_siso < 0 ? p_siso : curwin->w_p_siso;
 }
 
 /*
  * Get the local or global value of 'backupcopy' flags.
  */
-    unsigned int
+    unsigned 정수
 get_bkc_flags(buf_T *buf)
 {
-    return buf->b_bkc_flags ? buf->b_bkc_flags : bkc_flags;
+    반환 buf->b_bkc_flags ? buf->b_bkc_flags : bkc_flags;
 }
 
-#if defined(FEAT_LINEBREAK)
+#만약 defined(FEAT_LINEBREAK)
 /*
  * Get the local or global value of 'formatlistpat'.
  */
     char_u *
 get_flp_value(buf_T *buf)
 {
-    if (buf->b_p_flp == NULL || *buf->b_p_flp == NUL)
-	return p_flp;
-    return buf->b_p_flp;
+    만약 (buf->b_p_flp == NULL || *buf->b_p_flp == NUL)
+	반환 p_flp;
+    반환 buf->b_p_flp;
 }
 #endif
 
 /*
  * Get the local or global value of 'virtualedit' flags.
  */
-    unsigned int
+    unsigned 정수
 get_ve_flags(void)
 {
-    return (curwin->w_ve_flags ? curwin->w_ve_flags : ve_flags)
+    반환 (curwin->w_ve_flags ? curwin->w_ve_flags : ve_flags)
 	    & ~(VE_NONE | VE_NONEU);
 }
 
-#if defined(FEAT_LINEBREAK)
+#만약 defined(FEAT_LINEBREAK)
 /*
  * Get the local or global value of 'showbreak'.
  */
     char_u *
 get_showbreak_value(win_T *win)
 {
-    if (win->w_p_sbr == NULL || *win->w_p_sbr == NUL)
-	return p_sbr;
-    if (STRCMP(win->w_p_sbr, "NONE") == 0)
-	return empty_option;
-    return win->w_p_sbr;
+    만약 (win->w_p_sbr == NULL || *win->w_p_sbr == NUL)
+	반환 p_sbr;
+    만약 (STRCMP(win->w_p_sbr, "NONE") == 0)
+	반환 empty_option;
+    반환 win->w_p_sbr;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * Get window or buffer local options.
  */
     dict_T *
-get_winbuf_options(int bufopt)
+get_winbuf_options(정수 bufopt)
 {
     dict_T	*d;
-    int		opt_idx;
+    정수		opt_idx;
 
     d = dict_alloc();
-    if (d == NULL)
-	return NULL;
+    만약 (d == NULL)
+	반환 NULL;
 
-    for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+    위해 (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
     {
 	struct vimoption *opt = &options[opt_idx];
 
-	if ((bufopt && (opt->indir & PV_BUF))
+	만약 ((bufopt && (opt->indir & PV_BUF))
 					 || (!bufopt && (opt->indir & PV_WIN)))
 	{
 	    char_u *varp = get_varp(opt);
 
-	    if (varp != NULL)
+	    만약 (varp != NULL)
 	    {
-		if (opt->flags & P_STRING)
+		만약 (opt->flags & P_STRING)
 		    dict_add_string(d, opt->fullname, *(char_u **)varp);
-		else if (opt->flags & P_NUM)
+		아니면 만약 (opt->flags & P_NUM)
 		    dict_add_number(d, opt->fullname, *(long *)varp);
-		else
-		    dict_add_number(d, opt->fullname, *(int *)varp);
+		아니면
+		    dict_add_number(d, opt->fullname, *(정수 *)varp);
 	    }
 	}
     }
 
-    return d;
+    반환 d;
 }
 #endif
 
-#if defined(FEAT_SYN_HL)
+#만약 defined(FEAT_SYN_HL)
 /*
  * This is called when 'culopt' is changed
  */
-    int
+    정수
 fill_culopt_flags(char_u *val, win_T *wp)
 {
     char_u	*p;
     char_u	culopt_flags_new = 0;
 
-    if (val == NULL)
+    만약 (val == NULL)
 	p = wp->w_p_culopt;
-    else
+    아니면
 	p = val;
-    while (*p != NUL)
+    동안 (*p != NUL)
     {
 	// Note: Keep this in sync with p_culopt_values.
-	if (STRNCMP(p, "line", 4) == 0)
+	만약 (STRNCMP(p, "line", 4) == 0)
 	{
 	    p += 4;
 	    culopt_flags_new |= CULOPT_LINE;
 	}
-	else if (STRNCMP(p, "both", 4) == 0)
+	아니면 만약 (STRNCMP(p, "both", 4) == 0)
 	{
 	    p += 4;
 	    culopt_flags_new |= CULOPT_LINE | CULOPT_NBR;
 	}
-	else if (STRNCMP(p, "number", 6) == 0)
+	아니면 만약 (STRNCMP(p, "number", 6) == 0)
 	{
 	    p += 6;
 	    culopt_flags_new |= CULOPT_NBR;
 	}
-	else if (STRNCMP(p, "screenline", 10) == 0)
+	아니면 만약 (STRNCMP(p, "screenline", 10) == 0)
 	{
 	    p += 10;
 	    culopt_flags_new |= CULOPT_SCRLINE;
 	}
 
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	만약 (*p != ',' && *p != NUL)
+	    반환 FAIL;
+	만약 (*p == ',')
 	    ++p;
     }
 
     // Can't have both "line" and "screenline".
-    if ((culopt_flags_new & CULOPT_LINE) && (culopt_flags_new & CULOPT_SCRLINE))
-	return FAIL;
+    만약 ((culopt_flags_new & CULOPT_LINE) && (culopt_flags_new & CULOPT_SCRLINE))
+	반환 FAIL;
     wp->w_p_culopt_flags = culopt_flags_new;
 
-    return OK;
+    반환 OK;
 }
 #endif
 
 /*
  * Get the value of 'magic' adjusted for Vim9 script.
  */
-    int
+    정수
 magic_isset(void)
 {
     switch (magic_overruled)
     {
-	case OPTION_MAGIC_ON:      return TRUE;
-	case OPTION_MAGIC_OFF:     return FALSE;
+	case OPTION_MAGIC_ON:      반환 TRUE;
+	case OPTION_MAGIC_OFF:     반환 FALSE;
 	case OPTION_MAGIC_NOT_SET: break;
     }
 #ifdef FEAT_EVAL
-    if (in_vim9script())
-	return TRUE;
+    만약 (in_vim9script())
+	반환 TRUE;
 #endif
-    return p_magic;
+    반환 p_magic;
 }
 
 /*
@@ -9472,39 +9472,39 @@ magic_isset(void)
  * Returns OK if the option is successfully set to a function, otherwise
  * returns FAIL.
  */
-    int
+    정수
 option_set_callback_func(char_u *optval UNUSED, callback_T *optcb UNUSED)
 {
 #ifdef FEAT_EVAL
     typval_T	*tv;
     callback_T	cb;
-    int		funcname = FALSE;
+    정수		funcname = FALSE;
 
-    if (optval == NULL || *optval == NUL)
+    만약 (optval == NULL || *optval == NUL)
     {
 	free_callback(optcb);
-	return OK;
+	반환 OK;
     }
 
-    if (*optval == '{' || (in_vim9script() && *optval == '(')
+    만약 (*optval == '{' || (in_vim9script() && *optval == '(')
 	    || (STRNCMP(optval, "function(", 9) == 0)
 	    || (STRNCMP(optval, "funcref(", 8) == 0))
 	// Lambda expression or a funcref
 	tv = eval_expr(optval, NULL);
-    else
+    아니면
     {
 	// treat everything else as a function name string
 	tv = alloc_string_tv(vim_strsave(optval));
 	funcname = TRUE;
     }
-    if (tv == NULL)
-	return FAIL;
+    만약 (tv == NULL)
+	반환 FAIL;
 
     cb = get_callback(tv);
-    if (cb.cb_name == NULL || *cb.cb_name == NUL)
+    만약 (cb.cb_name == NULL || *cb.cb_name == NUL)
     {
 	free_tv(tv);
-	return FAIL;
+	반환 FAIL;
     }
 
     free_callback(optcb);
@@ -9512,14 +9512,14 @@ option_set_callback_func(char_u *optval UNUSED, callback_T *optcb UNUSED)
     free_tv(tv);
 
     char_u  *dot = NULL;
-    if (in_vim9script() && funcname
+    만약 (in_vim9script() && funcname
 				&& ((dot = vim_strchr(optval, '.')) != NULL))
     {
-	if (optcb->cb_free_name)
+	만약 (optcb->cb_free_name)
 	    vim_free(optcb->cb_name);
 
 	imported_T *import = find_imported(optval, dot - optval, FALSE);
-	if (import != NULL && SCRIPT_ID_VALID(import->imp_sid)
+	만약 (import != NULL && SCRIPT_ID_VALID(import->imp_sid)
 				&& !(import->imp_flags & IMP_FLAGS_AUTOLOAD))
 	{
 	    char_u	fnamebuf[MAX_FUNC_NAME_LEN];
@@ -9531,7 +9531,7 @@ option_set_callback_func(char_u *optval UNUSED, callback_T *optcb UNUSED)
 	    optcb->cb_name = vim_strsave(fnamebuf);
 	    optcb->cb_free_name = TRUE;
 	}
-	else
+	아니면
 	{
 	    // Imported autoloaded function.  Store the function name as
 	    // "import.funcname".
@@ -9543,13 +9543,13 @@ option_set_callback_func(char_u *optval UNUSED, callback_T *optcb UNUSED)
     // "import#funcname".
     expand_autload_callback(optcb);
 
-    return OK;
-#else
-    return FAIL;
+    반환 OK;
+#아니면
+    반환 FAIL;
 #endif
 }
 
-#if defined(FEAT_TABPANEL)
+#만약 defined(FEAT_TABPANEL)
 /*
  * Process the new 'showtabpanel' option value.
  */
@@ -9557,21 +9557,21 @@ option_set_callback_func(char_u *optval UNUSED, callback_T *optcb UNUSED)
 did_set_showtabpanel(optset_T *args UNUSED)
 {
     shell_new_columns();
-    return NULL;
+    반환 NULL;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
     static void
-didset_options_sctx(int opt_flags, char **buf)
+didset_options_sctx(정수 opt_flags, char **buf)
 {
-	for (int i = 0; ; ++i)
+	위해 (정수 i = 0; ; ++i)
 	{
-	    if (buf[i] == NULL)
+	    만약 (buf[i] == NULL)
 		break;
 
-	    int idx = findoption((char_u *)buf[i]);
-	    if (idx >= 0)
+	    정수 idx = findoption((char_u *)buf[i]);
+	    만약 (idx >= 0)
 		set_option_sctx_idx(idx, opt_flags, current_sctx);
 	}
 }

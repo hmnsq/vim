@@ -40,20 +40,20 @@ static buffheader_T redobuff = {{NULL, 0, {NUL}}, NULL, 0, 0, FALSE};
 static buffheader_T old_redobuff = {{NULL, 0, {NUL}}, NULL, 0, 0, FALSE};
 static buffheader_T recordbuff = {{NULL, 0, {NUL}}, NULL, 0, 0, FALSE};
 
-static int typeahead_char = 0;		// typeahead char that's not flushed
+static 정수 typeahead_char = 0;		// typeahead char that's not flushed
 
 #ifdef FEAT_EVAL
 static char_u typedchars[MAXMAPLEN + 1] = { NUL };  // typed chars before map
-static int typedchars_pos = 0;
+static 정수 typedchars_pos = 0;
 #endif
 
 /*
  * When block_redo is TRUE the redo buffer will not be changed.
  * Used by edit() to repeat insertions.
  */
-static int	block_redo = FALSE;
+static 정수	block_redo = FALSE;
 
-static int	KeyNoremap = 0;	    // remapping flags
+static 정수	KeyNoremap = 0;	    // remapping flags
 
 /*
  * Variables used by vgetorpeek() and flush_buffers().
@@ -87,7 +87,7 @@ static int	KeyNoremap = 0;	    // remapping flags
 // Add extra space to handle large OSC responses in bigger chunks (improve
 // performance)
 # define TYPELEN_INIT	(5 * (MAXMAPLEN + 3) + 2048)
-#else // Tiny version
+#아니면 // Tiny version
 # define TYPELEN_INIT	(5 * (MAXMAPLEN + 3))
 #endif
 static char_u	typebuf_init[TYPELEN_INIT];	// initial typebuf.tb_buf
@@ -97,19 +97,19 @@ static size_t	last_recorded_len = 0;	// number of last recorded chars
 
 #ifdef FEAT_EVAL
 mapblock_T	*last_used_map = NULL;
-int		last_used_sid = -1;
+정수		last_used_sid = -1;
 #endif
 
-static int	read_readbuf(buffheader_T *buf, int advance);
+static 정수	read_readbuf(buffheader_T *buf, 정수 advance);
 static void	init_typebuf(void);
 static void	may_sync_undo(void);
 static void	free_typebuf(void);
 static void	closescript(void);
-static void	updatescript(int c);
-static int	vgetorpeek(int);
-static int	inchar(char_u *buf, int maxlen, long wait_time);
+static void	updatescript(정수 c);
+static 정수	vgetorpeek(정수);
+static 정수	inchar(char_u *buf, 정수 maxlen, long wait_time);
 #ifdef FEAT_EVAL
-static int	do_key_input_pre(int c);
+static 정수	do_key_input_pre(정수 c);
 #endif
 
 /*
@@ -120,7 +120,7 @@ free_buff(buffheader_T *buf)
 {
     buffblock_T	*p, *np;
 
-    for (p = buf->bh_first.b_next; p != NULL; p = np)
+    위해 (p = buf->bh_first.b_next; p != NULL; p = np)
     {
 	np = p->b_next;
 	vim_free(p);
@@ -136,7 +136,7 @@ free_buff(buffheader_T *buf)
     static char_u *
 get_buffcont(
     buffheader_T	*buffer,
-    int			dozero,	    // count == zero is not an error
+    정수			dozero,	    // count == zero is not an error
     size_t		*len)	    // the length of the returned buffer
 {
     long_u	    count = 0;
@@ -147,23 +147,23 @@ get_buffcont(
     size_t	    i = 0;
 
     // compute the total length of the string
-    for (bp = buffer->bh_first.b_next; bp != NULL; bp = bp->b_next)
+    위해 (bp = buffer->bh_first.b_next; bp != NULL; bp = bp->b_next)
 	count += (long_u)bp->b_strlen;
 
-    if ((count > 0 || dozero) && (p = alloc(count + 1)) != NULL)
+    만약 ((count > 0 || dozero) && (p = alloc(count + 1)) != NULL)
     {
 	p2 = p;
-	for (bp = buffer->bh_first.b_next; bp != NULL; bp = bp->b_next)
-	    for (str = bp->b_str; *str; )
+	위해 (bp = buffer->bh_first.b_next; bp != NULL; bp = bp->b_next)
+	    위해 (str = bp->b_str; *str; )
 		*p2++ = *str++;
 	*p2 = NUL;
 	i = (size_t)(p2 - p);
     }
 
-    if (len != NULL)
+    만약 (len != NULL)
 	*len = i;
 
-    return p;
+    반환 p;
 }
 
 /*
@@ -178,8 +178,8 @@ get_recorded(void)
     size_t	len;
 
     p = get_buffcont(&recordbuff, TRUE, &len);
-    if (p == NULL)
-	return NULL;
+    만약 (p == NULL)
+	반환 NULL;
 
     free_buff(&recordbuff);
 
@@ -187,7 +187,7 @@ get_recorded(void)
      * Remove the characters that were added the last time, these must be the
      * (possibly mapped) characters that stopped the recording.
      */
-    if (len >= last_recorded_len)
+    만약 (len >= last_recorded_len)
     {
 	len -= last_recorded_len;
 	p[len] = NUL;
@@ -197,10 +197,10 @@ get_recorded(void)
      * When stopping recording from Insert mode with CTRL-O q, also remove the
      * CTRL-O.
      */
-    if (len > 0 && restart_edit != 0 && p[len - 1] == Ctrl_O)
+    만약 (len > 0 && restart_edit != 0 && p[len - 1] == Ctrl_O)
 	p[len - 1] = NUL;
 
-    return (p);
+    반환 (p);
 }
 
 /*
@@ -213,7 +213,7 @@ get_inserted(void)
     size_t len = 0;
     char_u *str = get_buffcont(&redobuff, FALSE, &len);
     string_T ret = { str, len };
-    return ret;
+    반환 ret;
 }
 
 /*
@@ -226,22 +226,22 @@ add_buff(
     char_u		*s,
     long		slen)	// length of "s" or -1
 {
-    if (slen < 0)
+    만약 (slen < 0)
 	slen = (long)STRLEN(s);
-    if (slen == 0)				// don't add empty strings
-	return;
+    만약 (slen == 0)				// don't add empty strings
+	반환;
 
-    if (buf->bh_first.b_next == NULL)	// first add to list
+    만약 (buf->bh_first.b_next == NULL)	// first add to list
     {
 	buf->bh_curr = &(buf->bh_first);
 	buf->bh_create_newblock = TRUE;
     }
-    else if (buf->bh_curr == NULL)	// buffer has already been read
+    아니면 만약 (buf->bh_curr == NULL)	// buffer has already been read
     {
 	iemsg(e_add_to_internal_buffer_that_was_already_read_from);
-	return;
+	반환;
     }
-    else if (buf->bh_index != 0)
+    아니면 만약 (buf->bh_index != 0)
     {
 	mch_memmove(buf->bh_first.b_next->b_str,
 		    buf->bh_first.b_next->b_str + buf->bh_index,
@@ -251,27 +251,27 @@ add_buff(
     }
     buf->bh_index = 0;
 
-    if (!buf->bh_create_newblock && buf->bh_space >= (int)slen)
+    만약 (!buf->bh_create_newblock && buf->bh_space >= (정수)slen)
     {
 	vim_strncpy(buf->bh_curr->b_str + buf->bh_curr->b_strlen, s, (size_t)slen);
 	buf->bh_curr->b_strlen += slen;
 	buf->bh_space -= slen;
     }
-    else
+    아니면
     {
 	long_u	    len;
 	buffblock_T *p;
 
-	if (slen < MINIMAL_SIZE)
+	만약 (slen < MINIMAL_SIZE)
 	    len = MINIMAL_SIZE;
-	else
+	아니면
 	    len = slen;
 	p = alloc(offsetof(buffblock_T, b_str) + len + 1);
-	if (p == NULL)
-	    return; // no space, just forget it
+	만약 (p == NULL)
+	    반환; // no space, just forget it
 	vim_strncpy(p->b_str, s, (size_t)slen);
 	p->b_strlen = slen;
-	buf->bh_space = (int)(len - slen);
+	buf->bh_space = (정수)(len - slen);
 	buf->bh_create_newblock = FALSE;
 
 	p->b_next = buf->bh_curr->b_next;
@@ -285,12 +285,12 @@ add_buff(
  * Only works when it was just added.
  */
     static void
-delete_buff_tail(buffheader_T *buf, int slen)
+delete_buff_tail(buffheader_T *buf, 정수 slen)
 {
-    if (buf->bh_curr == NULL)
-	return;  // nothing to delete
-    if (buf->bh_curr->b_strlen < (size_t)slen)
-	return;
+    만약 (buf->bh_curr == NULL)
+	반환;  // nothing to delete
+    만약 (buf->bh_curr->b_strlen < (size_t)slen)
+	반환;
 
     buf->bh_curr->b_str[buf->bh_curr->b_strlen - (size_t)slen] = NUL;
     buf->bh_curr->b_strlen -= slen;
@@ -304,7 +304,7 @@ delete_buff_tail(buffheader_T *buf, int slen)
 add_num_buff(buffheader_T *buf, long n)
 {
     char_u	number[32];
-    int		numberlen;
+    정수		numberlen;
 
     numberlen = vim_snprintf((char *)number, sizeof(number), "%ld", n);
     add_buff(buf, number, (long)numberlen);
@@ -315,24 +315,24 @@ add_num_buff(buffheader_T *buf, long n)
  * Translates special keys, NUL, CSI, K_SPECIAL and multibyte characters.
  */
     static void
-add_char_buff(buffheader_T *buf, int c)
+add_char_buff(buffheader_T *buf, 정수 c)
 {
     char_u	bytes[MB_MAXBYTES + 1];
-    int		len;
-    int		i;
+    정수		len;
+    정수		i;
     char_u	temp[4];
     long	templen;
 
-    if (IS_SPECIAL(c))
+    만약 (IS_SPECIAL(c))
 	len = 1;
-    else
+    아니면
 	len = (*mb_char2bytes)(c, bytes);
-    for (i = 0; i < len; ++i)
+    위해 (i = 0; i < len; ++i)
     {
-	if (!IS_SPECIAL(c))
+	만약 (!IS_SPECIAL(c))
 	    c = bytes[i];
 
-	if (IS_SPECIAL(c) || c == K_SPECIAL || c == NUL)
+	만약 (IS_SPECIAL(c) || c == K_SPECIAL || c == NUL)
 	{
 	    // translate special key code into three byte sequence
 	    temp[0] = K_SPECIAL;
@@ -342,17 +342,17 @@ add_char_buff(buffheader_T *buf, int c)
 	    templen = 3;
 	}
 #ifdef FEAT_GUI
-	else if (c == CSI)
+	아니면 만약 (c == CSI)
 	{
 	    // Translate a CSI to a CSI - KS_EXTRA - KE_CSI sequence
 	    temp[0] = CSI;
 	    temp[1] = KS_EXTRA;
-	    temp[2] = (int)KE_CSI;
+	    temp[2] = (정수)KE_CSI;
 	    temp[3] = NUL;
 	    templen = 3;
 	}
 #endif
-	else
+	아니면
 	{
 	    temp[0] = c;
 	    temp[1] = NUL;
@@ -374,39 +374,39 @@ static buffheader_T readbuf2 = {{NULL, 0, {NUL}}, NULL, 0, 0, FALSE};
  * If advance == TRUE go to the next char.
  * No translation is done K_SPECIAL and CSI are escaped.
  */
-    static int
-read_readbuffers(int advance)
+    static 정수
+read_readbuffers(정수 advance)
 {
-    int c;
+    정수 c;
 
     c = read_readbuf(&readbuf1, advance);
-    if (c == NUL)
+    만약 (c == NUL)
 	c = read_readbuf(&readbuf2, advance);
-    return c;
+    반환 c;
 }
 
-    static int
-read_readbuf(buffheader_T *buf, int advance)
+    static 정수
+read_readbuf(buffheader_T *buf, 정수 advance)
 {
     char_u	c;
     buffblock_T	*curr;
 
-    if (buf->bh_first.b_next == NULL)  // buffer is empty
-	return NUL;
+    만약 (buf->bh_first.b_next == NULL)  // buffer is empty
+	반환 NUL;
 
     curr = buf->bh_first.b_next;
     c = curr->b_str[buf->bh_index];
 
-    if (advance)
+    만약 (advance)
     {
-	if (curr->b_str[++buf->bh_index] == NUL)
+	만약 (curr->b_str[++buf->bh_index] == NUL)
 	{
 	    buf->bh_first.b_next = curr->b_next;
 	    vim_free(curr);
 	    buf->bh_index = 0;
 	}
     }
-    return c;
+    반환 c;
 }
 
 /*
@@ -415,12 +415,12 @@ read_readbuf(buffheader_T *buf, int advance)
     static void
 start_stuff(void)
 {
-    if (readbuf1.bh_first.b_next != NULL)
+    만약 (readbuf1.bh_first.b_next != NULL)
     {
 	readbuf1.bh_curr = &(readbuf1.bh_first);
 	readbuf1.bh_create_newblock = TRUE;		// force a new block to be created (see add_buff())
     }
-    if (readbuf2.bh_first.b_next != NULL)
+    만약 (readbuf2.bh_first.b_next != NULL)
     {
 	readbuf2.bh_curr = &(readbuf2.bh_first);
 	readbuf2.bh_create_newblock = TRUE;		// force a new block to be created (see add_buff())
@@ -430,22 +430,22 @@ start_stuff(void)
 /*
  * Return TRUE if the stuff buffer is empty.
  */
-    int
+    정수
 stuff_empty(void)
 {
-    return (readbuf1.bh_first.b_next == NULL
+    반환 (readbuf1.bh_first.b_next == NULL
 	 && readbuf2.bh_first.b_next == NULL);
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * Return TRUE if readbuf1 is empty.  There may still be redo characters in
  * readbuf2.
  */
-    int
+    정수
 readbuf1_empty(void)
 {
-    return (readbuf1.bh_first.b_next == NULL);
+    반환 (readbuf1.bh_first.b_next == NULL);
 }
 #endif
 
@@ -453,7 +453,7 @@ readbuf1_empty(void)
  * Set a typeahead character that won't be flushed.
  */
     void
-typeahead_noflush(int c)
+typeahead_noflush(정수 c)
 {
     typeahead_char = c;
 }
@@ -469,40 +469,40 @@ flush_buffers(flush_buffers_T flush_typeahead)
     init_typebuf();
 
     start_stuff();
-    while (read_readbuffers(TRUE) != NUL)
+    동안 (read_readbuffers(TRUE) != NUL)
 	;
 
-    if (flush_typeahead == FLUSH_MINIMAL)
+    만약 (flush_typeahead == FLUSH_MINIMAL)
     {
 	// remove mapped characters at the start only,
 	// but only when enough space left in typebuf
-	if (typebuf.tb_off + typebuf.tb_maplen >= typebuf.tb_buflen)
+	만약 (typebuf.tb_off + typebuf.tb_maplen >= typebuf.tb_buflen)
 	{
 	    typebuf.tb_off = MAXMAPLEN;
 	    typebuf.tb_len = 0;
 	}
-	else
+	아니면
 	{
 	    typebuf.tb_off += typebuf.tb_maplen;
 	    typebuf.tb_len -= typebuf.tb_maplen;
 	}
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
-	if (typebuf.tb_len == 0)
+#만약 defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+	만약 (typebuf.tb_len == 0)
 	    typebuf_was_filled = FALSE;
 #endif
     }
-    else
+    아니면
     {
 	// remove typeahead
-	if (flush_typeahead == FLUSH_INPUT)
+	만약 (flush_typeahead == FLUSH_INPUT)
 	    // We have to get all characters, because we may delete the first
 	    // part of an escape sequence.  In an xterm we get one char at a
 	    // time and we have to get them all.
-	    while (inchar(typebuf.tb_buf, typebuf.tb_buflen - 1, 10L) != 0)
+	    동안 (inchar(typebuf.tb_buf, typebuf.tb_buflen - 1, 10L) != 0)
 		;
 	typebuf.tb_off = MAXMAPLEN;
 	typebuf.tb_len = 0;
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+#만약 defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
 	// Reset the flag that text received from a client or from feedkeys()
 	// was inserted in the typeahead buffer.
 	typebuf_was_filled = FALSE;
@@ -512,7 +512,7 @@ flush_buffers(flush_buffers_T flush_typeahead)
     typebuf.tb_silent = 0;
     cmd_silent = FALSE;
     typebuf.tb_no_abbr_cnt = 0;
-    if (++typebuf.tb_change_cnt == 0)
+    만약 (++typebuf.tb_change_cnt == 0)
 	typebuf.tb_change_cnt = 1;
 }
 
@@ -523,8 +523,8 @@ flush_buffers(flush_buffers_T flush_typeahead)
     void
 ResetRedobuff(void)
 {
-    if (block_redo)
-	return;
+    만약 (block_redo)
+	반환;
 
     free_buff(&old_redobuff);
     old_redobuff = redobuff;
@@ -538,14 +538,14 @@ ResetRedobuff(void)
     void
 CancelRedo(void)
 {
-    if (block_redo)
-	return;
+    만약 (block_redo)
+	반환;
 
     free_buff(&redobuff);
     redobuff = old_redobuff;
     old_redobuff.bh_first.b_next = NULL;
     start_stuff();
-    while (read_readbuffers(TRUE) != NUL)
+    동안 (read_readbuffers(TRUE) != NUL)
 	;
 }
 
@@ -566,8 +566,8 @@ saveRedobuff(save_redo_T *save_redo)
 
     // Make a copy, so that ":normal ." in a function works.
     s = get_buffcont(&save_redo->sr_redobuff, FALSE, &slen);
-    if (s == NULL)
-	return;
+    만약 (s == NULL)
+	반환;
 
     add_buff(&redobuff, s, (long)slen);
     vim_free(s);
@@ -593,7 +593,7 @@ restoreRedobuff(save_redo_T *save_redo)
     void
 AppendToRedobuff(char_u *s)
 {
-    if (!block_redo)
+    만약 (!block_redo)
 	add_buff(&redobuff, s, -1L);
 }
 
@@ -604,46 +604,46 @@ AppendToRedobuff(char_u *s)
     void
 AppendToRedobuffLit(
     char_u	*str,
-    int		len)	    // length of "str" or -1 for up to the NUL
+    정수		len)	    // length of "str" or -1 for up to the NUL
 {
     char_u	*s = str;
-    int		c;
+    정수		c;
     char_u	*start;
 
-    if (block_redo)
-	return;
+    만약 (block_redo)
+	반환;
 
-    while (len < 0 ? *s != NUL : s - str < len)
+    동안 (len < 0 ? *s != NUL : s - str < len)
     {
 	// Put a string of normal characters in the redo buffer (that's
 	// faster).
 	start = s;
-	while (*s >= ' ' && *s < DEL && (len < 0 || s - str < len))
+	동안 (*s >= ' ' && *s < DEL && (len < 0 || s - str < len))
 	    ++s;
 
 	// Don't put '0' or '^' as last character, just in case a CTRL-D is
 	// typed next.
-	if (*s == NUL && (s[-1] == '0' || s[-1] == '^'))
+	만약 (*s == NUL && (s[-1] == '0' || s[-1] == '^'))
 	    --s;
-	if (s > start)
+	만약 (s > start)
 	    add_buff(&redobuff, start, (long)(s - start));
 
-	if (*s == NUL || (len >= 0 && s - str >= len))
+	만약 (*s == NUL || (len >= 0 && s - str >= len))
 	    break;
 
 	// Handle a special or multibyte character.
-	if (has_mbyte)
+	만약 (has_mbyte)
 	    // Handle composing chars separately.
 	    c = mb_cptr2char_adv(&s);
-	else
+	아니면
 	    c = *s++;
-	if (c < ' ' || c == DEL || (*s == NUL && (c == '0' || c == '^')))
+	만약 (c < ' ' || c == DEL || (*s == NUL && (c == '0' || c == '^')))
 	    add_char_buff(&redobuff, Ctrl_V);
 
 	// CTRL-V '0' must be inserted as CTRL-V 048
-	if (*s == NUL && c == '0')
+	만약 (*s == NUL && c == '0')
 	    add_buff(&redobuff, (char_u *)"048", 3L);
-	else
+	아니면
 	    add_char_buff(&redobuff, c);
     }
 }
@@ -655,18 +655,18 @@ AppendToRedobuffLit(
     void
 AppendToRedobuffSpec(char_u *s)
 {
-    if (block_redo)
-	return;
+    만약 (block_redo)
+	반환;
 
-    while (*s != NUL)
+    동안 (*s != NUL)
     {
-	if (*s == K_SPECIAL && s[1] != NUL && s[2] != NUL)
+	만약 (*s == K_SPECIAL && s[1] != NUL && s[2] != NUL)
 	{
 	    // Insert special key literally.
 	    add_buff(&redobuff, s, 3L);
 	    s += 3;
 	}
-	else
+	아니면
 	    add_char_buff(&redobuff, mb_cptr2char_adv(&s));
     }
 }
@@ -676,9 +676,9 @@ AppendToRedobuffSpec(char_u *s)
  * Translates special keys, NUL, CSI, K_SPECIAL and multibyte characters.
  */
     void
-AppendCharToRedobuff(int c)
+AppendCharToRedobuff(정수 c)
 {
-    if (!block_redo)
+    만약 (!block_redo)
 	add_char_buff(&redobuff, c);
 }
 
@@ -688,7 +688,7 @@ AppendCharToRedobuff(int c)
     void
 AppendNumberToRedobuff(long n)
 {
-    if (!block_redo)
+    만약 (!block_redo)
 	add_num_buff(&redobuff, n);
 }
 
@@ -716,14 +716,14 @@ stuffRedoReadbuff(char_u *s)
 stuffReadbuffLen(char_u *s, long len)
 {
 #ifdef FEAT_EVAL
-    if (add_last_insert == 1) // Only add if this is the first call, for
+    만약 (add_last_insert == 1) // Only add if this is the first call, for
 			      // recursive calls, ignore.
 	ga_concat_len(&last_insert_ga, s, (size_t)len);
 #endif
     add_buff(&readbuf1, s, len);
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * Stuff "s" into the stuff buffer, leaving special key codes unmodified and
  * escaping other K_SPECIAL and CSI bytes.
@@ -732,20 +732,20 @@ stuffReadbuffLen(char_u *s, long len)
     void
 stuffReadbuffSpec(char_u *s)
 {
-    int c;
+    정수 c;
 
-    while (*s != NUL)
+    동안 (*s != NUL)
     {
-	if (*s == K_SPECIAL && s[1] != NUL && s[2] != NUL)
+	만약 (*s == K_SPECIAL && s[1] != NUL && s[2] != NUL)
 	{
 	    // Insert special key literally.
 	    stuffReadbuffLen(s, 3L);
 	    s += 3;
 	}
-	else
+	아니면
 	{
 	    c = mb_cptr2char_adv(&s);
-	    if (c == CAR || c == NL || c == ESC)
+	    만약 (c == CAR || c == NL || c == ESC)
 		c = ' ';
 	    stuffcharReadbuff(c);
 	}
@@ -758,7 +758,7 @@ stuffReadbuffSpec(char_u *s)
  * Translates special keys, NUL, CSI, K_SPECIAL and multibyte characters.
  */
     void
-stuffcharReadbuff(int c)
+stuffcharReadbuff(정수 c)
 {
     add_char_buff(&readbuf1, c);
 }
@@ -777,31 +777,31 @@ stuffnumReadbuff(long n)
  * literally ("literally" TRUE) or interpret is as typed characters.
  */
     void
-stuffescaped(char_u *arg, int literally)
+stuffescaped(char_u *arg, 정수 literally)
 {
-    int		c;
+    정수		c;
     char_u	*start;
 
-    while (*arg != NUL)
+    동안 (*arg != NUL)
     {
 	// Stuff a sequence of normal ASCII characters, that's fast.  Also
 	// stuff K_SPECIAL to get the effect of a special key when "literally"
 	// is TRUE.
 	start = arg;
-	while ((*arg >= ' ' && *arg < DEL)
+	동안 ((*arg >= ' ' && *arg < DEL)
 		|| (*arg == K_SPECIAL && !literally))
 	    ++arg;
-	if (arg > start)
+	만약 (arg > start)
 	    stuffReadbuffLen(start, (long)(arg - start));
 
 	// stuff a single special character
-	if (*arg != NUL)
+	만약 (*arg != NUL)
 	{
-	    if (has_mbyte)
+	    만약 (has_mbyte)
 		c = mb_cptr2char_adv(&arg);
-	    else
+	    아니면
 		c = *arg++;
-	    if (literally && ((c < ' ' && c != TAB) || c == DEL))
+	    만약 (literally && ((c < ' ' && c != TAB) || c == DEL))
 		stuffcharReadbuff(Ctrl_V);
 	    stuffcharReadbuff(c);
 	}
@@ -816,66 +816,66 @@ stuffescaped(char_u *arg, int literally)
  * otherwise.
  * If old is TRUE, use old_redobuff instead of redobuff.
  */
-    static int
-read_redo(int init, int old_redo)
+    static 정수
+read_redo(정수 init, 정수 old_redo)
 {
     static buffblock_T	*bp;
     static char_u	*p;
-    int			c;
-    int			n;
+    정수			c;
+    정수			n;
     char_u		buf[MB_MAXBYTES + 1];
-    int			i;
+    정수			i;
 
-    if (init)
+    만약 (init)
     {
-	if (old_redo)
+	만약 (old_redo)
 	    bp = old_redobuff.bh_first.b_next;
-	else
+	아니면
 	    bp = redobuff.bh_first.b_next;
-	if (bp == NULL)
-	    return FAIL;
+	만약 (bp == NULL)
+	    반환 FAIL;
 	p = bp->b_str;
-	return OK;
+	반환 OK;
     }
-    if ((c = *p) != NUL)
+    만약 ((c = *p) != NUL)
     {
 	// Reverse the conversion done by add_char_buff()
 	// For a multi-byte character get all the bytes and return the
 	// converted character.
-	if (has_mbyte && (c != K_SPECIAL || p[1] == KS_SPECIAL))
+	만약 (has_mbyte && (c != K_SPECIAL || p[1] == KS_SPECIAL))
 	    n = MB_BYTE2LEN_CHECK(c);
-	else
+	아니면
 	    n = 1;
-	for (i = 0; ; ++i)
+	위해 (i = 0; ; ++i)
 	{
-	    if (c == K_SPECIAL) // special key or escaped K_SPECIAL
+	    만약 (c == K_SPECIAL) // special key or escaped K_SPECIAL
 	    {
 		c = TO_SPECIAL(p[1], p[2]);
 		p += 2;
 	    }
 #ifdef FEAT_GUI
-	    if (c == CSI)	// escaped CSI
+	    만약 (c == CSI)	// escaped CSI
 		p += 2;
 #endif
-	    if (*++p == NUL && bp->b_next != NULL)
+	    만약 (*++p == NUL && bp->b_next != NULL)
 	    {
 		bp = bp->b_next;
 		p = bp->b_str;
 	    }
 	    buf[i] = c;
-	    if (i == n - 1)	// last byte of a character
+	    만약 (i == n - 1)	// last byte of a character
 	    {
-		if (n != 1)
+		만약 (n != 1)
 		    c = (*mb_ptr2char)(buf);
 		break;
 	    }
 	    c = *p;
-	    if (c == NUL)	// cannot happen?
+	    만약 (c == NUL)	// cannot happen?
 		break;
 	}
     }
 
-    return c;
+    반환 c;
 }
 
 /*
@@ -884,11 +884,11 @@ read_redo(int init, int old_redo)
  * The escaped K_SPECIAL and CSI are copied without translation.
  */
     static void
-copy_redo(int old_redo)
+copy_redo(정수 old_redo)
 {
-    int	    c;
+    정수	    c;
 
-    while ((c = read_redo(FALSE, old_redo)) != NUL)
+    동안 ((c = read_redo(FALSE, old_redo)) != NUL)
 	add_char_buff(&readbuf2, c);
 }
 
@@ -901,27 +901,27 @@ copy_redo(int old_redo)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-start_redo(long count, int old_redo)
+    정수
+start_redo(long count, 정수 old_redo)
 {
-    int	    c;
+    정수	    c;
 
     // init the pointers; return if nothing to redo
-    if (read_redo(TRUE, old_redo) == FAIL)
-	return FAIL;
+    만약 (read_redo(TRUE, old_redo) == FAIL)
+	반환 FAIL;
 
     c = read_redo(FALSE, old_redo);
 
 #ifdef FEAT_EVAL
-    if (c == K_SID)
+    만약 (c == K_SID)
     {
 	// Copy the <SID>{sid}; sequence
 	add_char_buff(&readbuf2, c);
-	for (;;)
+	위해 (;;)
 	{
 	    c = read_redo(FALSE, old_redo);
 	    add_char_buff(&readbuf2, c);
-	    if (!SAFE_isdigit(c))
+	    만약 (!SAFE_isdigit(c))
 		break;
 	}
 	c = read_redo(FALSE, old_redo);
@@ -929,18 +929,18 @@ start_redo(long count, int old_redo)
 #endif
 
     // copy the buffer name, if present
-    if (c == '"')
+    만약 (c == '"')
     {
 	add_buff(&readbuf2, (char_u *)"\"", 1L);
 	c = read_redo(FALSE, old_redo);
 
 	// if a numbered buffer is used, increment the number
-	if (c >= '1' && c < '9')
+	만약 (c >= '1' && c < '9')
 	    ++c;
 	add_char_buff(&readbuf2, c);
 
 	// the expression register should be re-evaluated
-	if (c == '=')
+	만약 (c == '=')
 	{
 	    add_char_buff(&readbuf2, CAR);
 	    cmd_silent = TRUE;
@@ -949,7 +949,7 @@ start_redo(long count, int old_redo)
 	c = read_redo(FALSE, old_redo);
     }
 
-    if (c == 'v')   // redo Visual
+    만약 (c == 'v')   // redo Visual
     {
 	VIsual = curwin->w_cursor;
 	VIsual_active = TRUE;
@@ -960,9 +960,9 @@ start_redo(long count, int old_redo)
     }
 
     // try to enter the count (in place of a previous count)
-    if (count)
+    만약 (count)
     {
-	while (VIM_ISDIGIT(c))	// skip "old" count
+	동안 (VIM_ISDIGIT(c))	// skip "old" count
 	    c = read_redo(FALSE, old_redo);
 	add_num_buff(&readbuf2, count);
     }
@@ -970,7 +970,7 @@ start_redo(long count, int old_redo)
     // copy the rest from the redo buffer into the stuff buffer
     add_char_buff(&readbuf2, c);
     copy_redo(old_redo);
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -978,21 +978,21 @@ start_redo(long count, int old_redo)
  * the redo buffer into readbuf2.
  * return FAIL for failure, OK otherwise
  */
-    int
+    정수
 start_redo_ins(void)
 {
-    int	    c;
+    정수	    c;
 
-    if (read_redo(TRUE, FALSE) == FAIL)
-	return FAIL;
+    만약 (read_redo(TRUE, FALSE) == FAIL)
+	반환 FAIL;
     start_stuff();
 
     // skip the count and the command character
-    while ((c = read_redo(FALSE, FALSE)) != NUL)
+    동안 ((c = read_redo(FALSE, FALSE)) != NUL)
     {
-	if (vim_strchr((char_u *)"AaIiRrOo", c) != NULL)
+	만약 (vim_strchr((char_u *)"AaIiRrOo", c) != NULL)
 	{
-	    if (c == 'O' || c == 'o')
+	    만약 (c == 'O' || c == 'o')
 		add_buff(&readbuf2, NL_STR, -1L);
 	    break;
 	}
@@ -1001,7 +1001,7 @@ start_redo_ins(void)
     // copy the typed text from the redo buffer into the stuff buffer
     copy_redo(FALSE);
     block_redo = TRUE;
-    return OK;
+    반환 OK;
 }
 
     void
@@ -1018,8 +1018,8 @@ stop_redo_ins(void)
     static void
 init_typebuf(void)
 {
-    if (typebuf.tb_buf != NULL)
-	return;
+    만약 (typebuf.tb_buf != NULL)
+	반환;
 
     typebuf.tb_buf = typebuf_init;
     typebuf.tb_noremap = noremapbuf_init;
@@ -1032,10 +1032,10 @@ init_typebuf(void)
 /*
  * Returns TRUE when keys cannot be remapped.
  */
-    int
+    정수
 noremap_keys(void)
 {
-    return KeyNoremap & (RM_NONE|RM_SCRIPT);
+    반환 KeyNoremap & (RM_NONE|RM_SCRIPT);
 }
 
 /*
@@ -1057,30 +1057,30 @@ noremap_keys(void)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    정수
 ins_typebuf(
     char_u	*str,
-    int		noremap,
-    int		offset,
-    int		nottyped,
-    int		silent)
+    정수		noremap,
+    정수		offset,
+    정수		nottyped,
+    정수		silent)
 {
     char_u	*s1, *s2;
-    int		newlen;
-    int		addlen;
-    int		i;
-    int		newoff;
-    int		val;
-    int		nrm;
+    정수		newlen;
+    정수		addlen;
+    정수		i;
+    정수		newoff;
+    정수		val;
+    정수		nrm;
 
     init_typebuf();
-    if (++typebuf.tb_change_cnt == 0)
+    만약 (++typebuf.tb_change_cnt == 0)
 	typebuf.tb_change_cnt = 1;
     state_no_longer_safe("ins_typebuf()");
 
-    addlen = (int)STRLEN(str);
+    addlen = (정수)STRLEN(str);
 
-    if (offset == 0 && addlen <= typebuf.tb_off)
+    만약 (offset == 0 && addlen <= typebuf.tb_off)
     {
 	/*
 	 * Easy case: there is room in front of typebuf.tb_buf[typebuf.tb_off]
@@ -1088,7 +1088,7 @@ ins_typebuf(
 	typebuf.tb_off -= addlen;
 	mch_memmove(typebuf.tb_buf + typebuf.tb_off, str, (size_t)addlen);
     }
-    else if (typebuf.tb_len == 0 && typebuf.tb_buflen
+    아니면 만약 (typebuf.tb_len == 0 && typebuf.tb_buflen
 					       >= addlen + 3 * (MAXMAPLEN + 4))
     {
 	/*
@@ -1098,9 +1098,9 @@ ins_typebuf(
 	typebuf.tb_off = (typebuf.tb_buflen - addlen - 3 * (MAXMAPLEN + 4)) / 2;
 	mch_memmove(typebuf.tb_buf + typebuf.tb_off, str, (size_t)addlen);
     }
-    else
+    아니면
     {
-	int extra;
+	정수 extra;
 
 	/*
 	 * Need to allocate a new buffer.
@@ -1110,22 +1110,22 @@ ins_typebuf(
 	 */
 	newoff = MAXMAPLEN + 4;
 	extra = addlen + newoff + 4 * (MAXMAPLEN + 4);
-	if (typebuf.tb_len > 2147483647 - extra)
+	만약 (typebuf.tb_len > 2147483647 - extra)
 	{
 	    // string is getting too long for a 32 bit int
 	    emsg(_(e_command_too_complex));    // also calls flush_buffers
 	    setcursor();
-	    return FAIL;
+	    반환 FAIL;
 	}
 	newlen = typebuf.tb_len + extra;
 	s1 = alloc(newlen);
-	if (s1 == NULL)		    // out of memory
-	    return FAIL;
+	만약 (s1 == NULL)		    // out of memory
+	    반환 FAIL;
 	s2 = alloc(newlen);
-	if (s2 == NULL)		    // out of memory
+	만약 (s2 == NULL)		    // out of memory
 	{
 	    vim_free(s1);
-	    return FAIL;
+	    반환 FAIL;
 	}
 	typebuf.tb_buflen = newlen;
 
@@ -1139,7 +1139,7 @@ ins_typebuf(
 	mch_memmove(s1 + newoff + offset + addlen,
 				     typebuf.tb_buf + typebuf.tb_off + offset,
 				       (size_t)(typebuf.tb_len - offset + 1));
-	if (typebuf.tb_buf != typebuf_init)
+	만약 (typebuf.tb_buf != typebuf_init)
 	    vim_free(typebuf.tb_buf);
 	typebuf.tb_buf = s1;
 
@@ -1148,7 +1148,7 @@ ins_typebuf(
 	mch_memmove(s2 + newoff + offset + addlen,
 		   typebuf.tb_noremap + typebuf.tb_off + offset,
 					   (size_t)(typebuf.tb_len - offset));
-	if (typebuf.tb_noremap != noremapbuf_init)
+	만약 (typebuf.tb_noremap != noremapbuf_init)
 	    vim_free(typebuf.tb_noremap);
 	typebuf.tb_noremap = s2;
 
@@ -1157,11 +1157,11 @@ ins_typebuf(
     typebuf.tb_len += addlen;
 
     // If noremap == REMAP_SCRIPT: do remap script-local mappings.
-    if (noremap == REMAP_SCRIPT)
+    만약 (noremap == REMAP_SCRIPT)
 	val = RM_SCRIPT;
-    else if (noremap == REMAP_SKIP)
+    아니면 만약 (noremap == REMAP_SKIP)
 	val = RM_ABBR;
-    else
+    아니면
 	val = RM_NONE;
 
     /*
@@ -1172,30 +1172,30 @@ ins_typebuf(
      * If noremap  > 0: "noremap" characters are not remappable, the rest
      *			mappable
      */
-    if (noremap == REMAP_SKIP)
+    만약 (noremap == REMAP_SKIP)
 	nrm = 1;
-    else if (noremap < 0)
+    아니면 만약 (noremap < 0)
 	nrm = addlen;
-    else
+    아니면
 	nrm = noremap;
-    for (i = 0; i < addlen; ++i)
+    위해 (i = 0; i < addlen; ++i)
 	typebuf.tb_noremap[typebuf.tb_off + i + offset] =
 						  (--nrm >= 0) ? val : RM_YES;
 
     // tb_maplen and tb_silent only remember the length of mapped and/or
     // silent mappings at the start of the buffer, assuming that a mapped
     // sequence doesn't result in typed characters.
-    if (nottyped || typebuf.tb_maplen > offset)
+    만약 (nottyped || typebuf.tb_maplen > offset)
 	typebuf.tb_maplen += addlen;
-    if (silent || typebuf.tb_silent > offset)
+    만약 (silent || typebuf.tb_silent > offset)
     {
 	typebuf.tb_silent += addlen;
 	cmd_silent = TRUE;
     }
-    if (typebuf.tb_no_abbr_cnt && offset == 0)	// and not used for abbrev.s
+    만약 (typebuf.tb_no_abbr_cnt && offset == 0)	// and not used for abbrev.s
 	typebuf.tb_no_abbr_cnt += addlen;
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -1205,15 +1205,15 @@ ins_typebuf(
  * the char.
  * Returns the length of what was inserted.
  */
-    int
-ins_char_typebuf(int c, int modifiers)
+    정수
+ins_char_typebuf(정수 c, 정수 modifiers)
 {
     char_u	buf[MB_MAXBYTES * 3 + 4];
-    int		len = special_to_buf(c, modifiers, TRUE, buf);
+    정수		len = special_to_buf(c, modifiers, TRUE, buf);
 
     buf[len] = NUL;
     (void)ins_typebuf(buf, KeyNoremap, 0, !KeyTyped, cmd_silent);
-    return len;
+    반환 len;
 }
 
 /*
@@ -1225,12 +1225,12 @@ ins_char_typebuf(int c, int modifiers)
  * Or "typebuf.tb_off" may have been changed and we would overwrite characters
  * that was just added.
  */
-    int
+    정수
 typebuf_changed(
-    int		tb_change_cnt)	// old value of typebuf.tb_change_cnt
+    정수		tb_change_cnt)	// old value of typebuf.tb_change_cnt
 {
-    return (tb_change_cnt != 0 && (typebuf.tb_change_cnt != tb_change_cnt
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+    반환 (tb_change_cnt != 0 && (typebuf.tb_change_cnt != tb_change_cnt
+#만약 defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
 	    || typebuf_was_filled
 #endif
 	   ));
@@ -1240,50 +1240,50 @@ typebuf_changed(
  * Return TRUE if there are no characters in the typeahead buffer that have
  * not been typed (result from a mapping or come from ":normal").
  */
-    int
+    정수
 typebuf_typed(void)
 {
-    return typebuf.tb_maplen == 0;
+    반환 typebuf.tb_maplen == 0;
 }
 
 /*
  * Return the number of characters that are mapped (or not typed).
  */
-    int
+    정수
 typebuf_maplen(void)
 {
-    return typebuf.tb_maplen;
+    반환 typebuf.tb_maplen;
 }
 
 /*
  * remove "len" characters from typebuf.tb_buf[typebuf.tb_off + offset]
  */
     void
-del_typebuf(int len, int offset)
+del_typebuf(정수 len, 정수 offset)
 {
-    int	    i;
+    정수	    i;
 
-    if (len == 0)
-	return;		// nothing to do
+    만약 (len == 0)
+	반환;		// nothing to do
 
     typebuf.tb_len -= len;
 
     /*
      * Easy case: Just increase typebuf.tb_off.
      */
-    if (offset == 0 && typebuf.tb_buflen - (typebuf.tb_off + len)
+    만약 (offset == 0 && typebuf.tb_buflen - (typebuf.tb_off + len)
 							 >= 3 * MAXMAPLEN + 3)
 	typebuf.tb_off += len;
     /*
      * Have to move the characters in typebuf.tb_buf[] and typebuf.tb_noremap[]
      */
-    else
+    아니면
     {
 	i = typebuf.tb_off + offset;
 	/*
 	 * Leave some extra room at the end to avoid reallocation.
 	 */
-	if (typebuf.tb_off > MAXMAPLEN)
+	만약 (typebuf.tb_off > MAXMAPLEN)
 	{
 	    mch_memmove(typebuf.tb_buf + MAXMAPLEN,
 			     typebuf.tb_buf + typebuf.tb_off, (size_t)offset);
@@ -1301,34 +1301,34 @@ del_typebuf(int len, int offset)
 					   (size_t)(typebuf.tb_len - offset));
     }
 
-    if (typebuf.tb_maplen > offset)		// adjust tb_maplen
+    만약 (typebuf.tb_maplen > offset)		// adjust tb_maplen
     {
-	if (typebuf.tb_maplen < offset + len)
+	만약 (typebuf.tb_maplen < offset + len)
 	    typebuf.tb_maplen = offset;
-	else
+	아니면
 	    typebuf.tb_maplen -= len;
     }
-    if (typebuf.tb_silent > offset)		// adjust tb_silent
+    만약 (typebuf.tb_silent > offset)		// adjust tb_silent
     {
-	if (typebuf.tb_silent < offset + len)
+	만약 (typebuf.tb_silent < offset + len)
 	    typebuf.tb_silent = offset;
-	else
+	아니면
 	    typebuf.tb_silent -= len;
     }
-    if (typebuf.tb_no_abbr_cnt > offset)	// adjust tb_no_abbr_cnt
+    만약 (typebuf.tb_no_abbr_cnt > offset)	// adjust tb_no_abbr_cnt
     {
-	if (typebuf.tb_no_abbr_cnt < offset + len)
+	만약 (typebuf.tb_no_abbr_cnt < offset + len)
 	    typebuf.tb_no_abbr_cnt = offset;
-	else
+	아니면
 	    typebuf.tb_no_abbr_cnt -= len;
     }
 
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+#만약 defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
     // Reset the flag that text received from a client or from feedkeys()
     // was inserted in the typeahead buffer.
     typebuf_was_filled = FALSE;
 #endif
-    if (++typebuf.tb_change_cnt == 0)
+    만약 (++typebuf.tb_change_cnt == 0)
 	typebuf.tb_change_cnt = 1;
 }
 
@@ -1338,7 +1338,7 @@ del_typebuf(int len, int offset)
 typedef struct
 {
     char_u	buf[MB_MAXBYTES * 3 + 4];
-    int		prev_c;
+    정수		prev_c;
     size_t	buflen;
     unsigned	pending_special;
     unsigned	pending_mbyte;
@@ -1348,17 +1348,17 @@ typedef struct
  * Add a single byte to a recording or 'showcmd'.
  * Return TRUE if a full key has been received, FALSE otherwise.
  */
-    static int
+    static 정수
 gotchars_add_byte(gotchars_state_T *state, char_u byte)
 {
-    int		c = state->buf[state->buflen++] = byte;
-    int		retval = FALSE;
-    int		in_special = state->pending_special > 0;
-    int		in_mbyte = state->pending_mbyte > 0;
+    정수		c = state->buf[state->buflen++] = byte;
+    정수		retval = FALSE;
+    정수		in_special = state->pending_special > 0;
+    정수		in_mbyte = state->pending_mbyte > 0;
 
-    if (in_special)
+    만약 (in_special)
 	state->pending_special--;
-    else if (c == K_SPECIAL
+    아니면 만약 (c == K_SPECIAL
 #ifdef FEAT_GUI
 		|| c == CSI
 #endif
@@ -1367,22 +1367,22 @@ gotchars_add_byte(gotchars_state_T *state, char_u byte)
 	// the bytes and we can decide what to do with it.
 	state->pending_special = 2;
 
-    if (state->pending_special > 0)
+    만약 (state->pending_special > 0)
 	goto ret_false;
 
-    if (in_mbyte)
+    만약 (in_mbyte)
 	state->pending_mbyte--;
-    else
+    아니면
     {
-	if (in_special)
+	만약 (in_special)
 	{
-	    if (state->prev_c == KS_MODIFIER)
+	    만약 (state->prev_c == KS_MODIFIER)
 		// When receiving a modifier, wait for the modified key.
 		goto ret_false;
 	    c = TO_SPECIAL(state->prev_c, c);
 	    // Drop K_FOCUSGAINED, K_FOCUSLOST and K_COMPLETE_DELAY, they are
 	    // not useful in a recording.
-	    if (c == K_FOCUSGAINED || c == K_FOCUSLOST || c == K_COMPLETE_DELAY)
+	    만약 (c == K_FOCUSGAINED || c == K_FOCUSLOST || c == K_COMPLETE_DELAY)
 		state->buflen = 0;
 	}
 	// When receiving a multibyte character, store it until we have all
@@ -1391,13 +1391,13 @@ gotchars_add_byte(gotchars_state_T *state, char_u byte)
 	state->pending_mbyte = MB_BYTE2LEN_CHECK(c) - 1;
     }
 
-    if (state->pending_mbyte > 0)
+    만약 (state->pending_mbyte > 0)
 	goto ret_false;
 
     retval = TRUE;
 ret_false:
     state->prev_c = c;
-    return retval;
+    반환 retval;
 }
 
 /*
@@ -1405,23 +1405,23 @@ ret_false:
  * If recording is on put the character in the record buffer.
  */
     static void
-gotchars(char_u *chars, int len)
+gotchars(char_u *chars, 정수 len)
 {
     char_u		*s = chars;
     size_t		i;
-    int			todo = len;
+    정수			todo = len;
     static gotchars_state_T state;
 
-    while (todo-- > 0)
+    동안 (todo-- > 0)
     {
-	if (!gotchars_add_byte(&state, *s++))
+	만약 (!gotchars_add_byte(&state, *s++))
 	    continue;
 
 	// Handle one byte at a time; no translation to be done.
-	for (i = 0; i < state.buflen; ++i)
+	위해 (i = 0; i < state.buflen; ++i)
 	    updatescript(state.buf[i]);
 
-	if (reg_recording != 0)
+	만약 (reg_recording != 0)
 	{
 	    state.buf[state.buflen] = NUL;
 	    add_buff(&recordbuff, state.buf, (long)state.buflen);
@@ -1460,10 +1460,10 @@ gotchars_ignore(void)
  * Only affects recorded characters.
  */
     void
-ungetchars(int len)
+ungetchars(정수 len)
 {
-    if (reg_recording == 0)
-	return;
+    만약 (reg_recording == 0)
+	반환;
 
     delete_buff_tail(&recordbuff, len);
     last_recorded_len -= len;
@@ -1480,7 +1480,7 @@ ungetchars(int len)
     static void
 may_sync_undo(void)
 {
-    if ((!(State & (MODE_INSERT | MODE_CMDLINE)) || arrow_used)
+    만약 ((!(State & (MODE_INSERT | MODE_CMDLINE)) || arrow_used)
 					       && scriptin[curscript] == NULL)
 	u_sync(FALSE);
 }
@@ -1489,15 +1489,15 @@ may_sync_undo(void)
  * Make "typebuf" empty and allocate new buffers.
  * Returns FAIL when out of memory.
  */
-    static int
+    static 정수
 alloc_typebuf(void)
 {
     typebuf.tb_buf = alloc(TYPELEN_INIT);
     typebuf.tb_noremap = alloc(TYPELEN_INIT);
-    if (typebuf.tb_buf == NULL || typebuf.tb_noremap == NULL)
+    만약 (typebuf.tb_buf == NULL || typebuf.tb_noremap == NULL)
     {
 	free_typebuf();
-	return FAIL;
+	반환 FAIL;
     }
     typebuf.tb_buflen = TYPELEN_INIT;
     typebuf.tb_off = MAXMAPLEN + 4;  // can insert without realloc
@@ -1505,12 +1505,12 @@ alloc_typebuf(void)
     typebuf.tb_maplen = 0;
     typebuf.tb_silent = 0;
     typebuf.tb_no_abbr_cnt = 0;
-    if (++typebuf.tb_change_cnt == 0)
+    만약 (++typebuf.tb_change_cnt == 0)
 	typebuf.tb_change_cnt = 1;
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+#만약 defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
     typebuf_was_filled = FALSE;
 #endif
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -1519,13 +1519,13 @@ alloc_typebuf(void)
     static void
 free_typebuf(void)
 {
-    if (typebuf.tb_buf == typebuf_init)
+    만약 (typebuf.tb_buf == typebuf_init)
 	internal_error("Free typebuf 1");
-    else
+    아니면
 	VIM_CLEAR(typebuf.tb_buf);
-    if (typebuf.tb_noremap == noremapbuf_init)
+    만약 (typebuf.tb_noremap == noremapbuf_init)
 	internal_error("Free typebuf 2");
-    else
+    아니면
 	VIM_CLEAR(typebuf.tb_noremap);
 }
 
@@ -1535,31 +1535,31 @@ free_typebuf(void)
  */
 static typebuf_T saved_typebuf[NSCRIPT];
 
-    int
+    정수
 save_typebuf(void)
 {
     init_typebuf();
     saved_typebuf[curscript] = typebuf;
     // If out of memory: restore typebuf and close file.
-    if (alloc_typebuf() == FAIL)
+    만약 (alloc_typebuf() == FAIL)
     {
 	closescript();
-	return FAIL;
+	반환 FAIL;
     }
-    return OK;
+    반환 OK;
 }
 
-static int old_char = -1;	// character put back by vungetc()
-static int old_mod_mask;	// mod_mask for ungotten character
-static int old_mouse_row;	// mouse_row related to old_char
-static int old_mouse_col;	// mouse_col related to old_char
-static int old_KeyStuffed;	// whether old_char was stuffed
+static 정수 old_char = -1;	// character put back by vungetc()
+static 정수 old_mod_mask;	// mod_mask for ungotten character
+static 정수 old_mouse_row;	// mouse_row related to old_char
+static 정수 old_mouse_col;	// mouse_col related to old_char
+static 정수 old_KeyStuffed;	// whether old_char was stuffed
 
-static int can_get_old_char(void)
+static 정수 can_get_old_char(void)
 {
     // If the old character was not stuffed and characters have been added to
     // the stuff buffer, need to first get the stuffed characters instead.
-    return old_char != -1 && (old_KeyStuffed || stuff_empty());
+    반환 old_char != -1 && (old_KeyStuffed || stuff_empty());
 }
 
 /*
@@ -1570,7 +1570,7 @@ save_typeahead(tasave_T *tp)
 {
     tp->save_typebuf = typebuf;
     tp->typebuf_valid = (alloc_typebuf() == OK);
-    if (!tp->typebuf_valid)
+    만약 (!tp->typebuf_valid)
 	typebuf = tp->save_typebuf;
 
     tp->old_char = old_char;
@@ -1592,9 +1592,9 @@ save_typeahead(tasave_T *tp)
  * When "overwrite" is FALSE input typed later is kept.
  */
     void
-restore_typeahead(tasave_T *tp, int overwrite UNUSED)
+restore_typeahead(tasave_T *tp, 정수 overwrite UNUSED)
 {
-    if (tp->typebuf_valid)
+    만약 (tp->typebuf_valid)
     {
 	free_typebuf();
 	typebuf = tp->save_typebuf;
@@ -1618,38 +1618,38 @@ restore_typeahead(tasave_T *tp, int overwrite UNUSED)
     void
 openscript(
     char_u	*name,
-    int		directly)	// when TRUE execute directly
+    정수		directly)	// when TRUE execute directly
 {
-    if (curscript + 1 == NSCRIPT)
+    만약 (curscript + 1 == NSCRIPT)
     {
 	emsg(_(e_scripts_nested_too_deep));
-	return;
+	반환;
     }
 
     // Disallow sourcing a file in the sandbox, the commands would be executed
     // later, possibly outside of the sandbox.
-    if (check_secure())
-	return;
+    만약 (check_secure())
+	반환;
 
 #ifdef FEAT_EVAL
-    if (ignore_script)
+    만약 (ignore_script)
 	// Not reading from script, also don't open one.  Warning message?
-	return;
+	반환;
 #endif
 
-    if (scriptin[curscript] != NULL)	// already reading script
+    만약 (scriptin[curscript] != NULL)	// already reading script
 	++curscript;
 				// use NameBuff for expanded name
     expand_env(name, NameBuff, MAXPATHL);
-    if ((scriptin[curscript] = mch_fopen((char *)NameBuff, READBIN)) == NULL)
+    만약 ((scriptin[curscript] = mch_fopen((char *)NameBuff, READBIN)) == NULL)
     {
 	semsg(_(e_cant_open_file_str), name);
-	if (curscript)
+	만약 (curscript)
 	    --curscript;
-	return;
+	반환;
     }
-    if (save_typebuf() == FAIL)
-	return;
+    만약 (save_typebuf() == FAIL)
+	반환;
 
     /*
      * Execute the commands from the file right now when using ":source!"
@@ -1657,15 +1657,15 @@ openscript(
      * follows.  This means the display won't be updated.  Don't do this
      * always, "make test" would fail.
      */
-    if (directly)
+    만약 (directly)
     {
 	oparg_T	oa;
-	int	oldcurscript;
-	int	save_State = State;
-	int	save_restart_edit = restart_edit;
-	int	save_insertmode = p_im;
-	int	save_finish_op = finish_op;
-	int	save_msg_scroll = msg_scroll;
+	정수	oldcurscript;
+	정수	save_State = State;
+	정수	save_restart_edit = restart_edit;
+	정수	save_insertmode = p_im;
+	정수	save_finish_op = finish_op;
+	정수	save_msg_scroll = msg_scroll;
 
 	State = MODE_NORMAL;
 	msg_scroll = FALSE;	// no msg scrolling in Normal mode
@@ -1681,7 +1681,7 @@ openscript(
 	    normal_cmd(&oa, FALSE);	// execute one command
 	    (void)vpeekc();		// check for end of file
 	}
-	while (scriptin[oldcurscript] != NULL);
+	동안 (scriptin[oldcurscript] != NULL);
 
 	State = save_State;
 	msg_scroll = save_msg_scroll;
@@ -1702,15 +1702,15 @@ closescript(void)
 
     fclose(scriptin[curscript]);
     scriptin[curscript] = NULL;
-    if (curscript > 0)
+    만약 (curscript > 0)
 	--curscript;
 }
 
-#if defined(EXITFREE)
+#만약 defined(EXITFREE)
     void
 close_all_scripts(void)
 {
-    while (scriptin[0] != NULL)
+    동안 (scriptin[0] != NULL)
 	closescript();
 }
 #endif
@@ -1718,10 +1718,10 @@ close_all_scripts(void)
 /*
  * Return TRUE when reading keys from a script file.
  */
-    int
+    정수
 using_script(void)
 {
-    return scriptin[curscript] != NULL;
+    반환 scriptin[curscript] != NULL;
 }
 
 /*
@@ -1736,7 +1736,7 @@ before_blocking(void)
 
     updatescript(0);
 #ifdef FEAT_EVAL
-    if (may_garbage_collect)
+    만약 (may_garbage_collect)
 	garbage_collect(FALSE);
 #endif
 }
@@ -1749,19 +1749,19 @@ before_blocking(void)
  * characters reaches 'updatecount' and 'updatecount' is non-zero.
  */
     static void
-updatescript(int c)
+updatescript(정수 c)
 {
-    static int	    count = 0;
+    static 정수	    count = 0;
 
-    if (c && scriptout)
+    만약 (c && scriptout)
 	putc(c, scriptout);
-    if (c == 0 || (p_uc > 0 && ++count >= p_uc))
+    만약 (c == 0 || (p_uc > 0 && ++count >= p_uc))
     {
 	ml_sync_all(c == 0, TRUE);
 	count = 0;
     }
 #ifdef FEAT_EVAL
-    if (typedchars_pos < MAXMAPLEN)
+    만약 (typedchars_pos < MAXMAPLEN)
     {
 	typedchars[typedchars_pos] = c;
 	typedchars_pos++;
@@ -1773,21 +1773,21 @@ updatescript(int c)
  * Convert "c_arg" plus "modifiers" to merge the effect of modifyOtherKeys into
  * the character.  Also for when the Kitty key protocol is used.
  */
-    int
-merge_modifyOtherKeys(int c_arg, int *modifiers)
+    정수
+merge_modifyOtherKeys(정수 c_arg, 정수 *modifiers)
 {
-    int c = c_arg;
+    정수 c = c_arg;
 
     // CTRL only uses the lower 5 bits of the character.
-    if (*modifiers & MOD_MASK_CTRL)
+    만약 (*modifiers & MOD_MASK_CTRL)
     {
-	if ((c >= '`' && c <= 0x7f) || (c >= '@' && c <= '_'))
+	만약 ((c >= '`' && c <= 0x7f) || (c >= '@' && c <= '_'))
 	{
 	    c &= 0x1f;
-	    if (c == NUL)
+	    만약 (c == NUL)
 		c = K_ZERO;
 	}
-	else if (c == '6')
+	아니면 만약 (c == '6')
 	    // CTRL-6 is equivalent to CTRL-^
 	    c = 0x1e;
 #ifdef FEAT_GUI_GTK
@@ -1795,27 +1795,27 @@ merge_modifyOtherKeys(int c_arg, int *modifiers)
 	// resemble quite exactly the behaviour of the GTK+ 1.2 GUI on my
 	// machine.  The only difference is BS vs. DEL for CTRL-8 (makes
 	// more sense and is consistent with usual terminal behaviour).
-	else if (c == '2')
+	아니면 만약 (c == '2')
 	    c = NUL;
-	else if (c >= '3' && c <= '7')
+	아니면 만약 (c >= '3' && c <= '7')
 	    c = c ^ 0x28;
-	else if (c == '8')
+	아니면 만약 (c == '8')
 	    c = BS;
-	else if (c == '?')
+	아니면 만약 (c == '?')
 	    c = DEL;
 #endif
-	if (c != c_arg)
+	만약 (c != c_arg)
 	    *modifiers &= ~MOD_MASK_CTRL;
     }
 
     // Alt/Meta sets the 8th bit of the character.
-    if ((*modifiers & (MOD_MASK_META | MOD_MASK_ALT))
+    만약 ((*modifiers & (MOD_MASK_META | MOD_MASK_ALT))
 	    && c >= 0 && c <= 127)
     {
 	// Some terminals (esp. Kitty) do not include Shift in the character.
 	// Apply it here to get consistency across terminals.  Only do ASCII
 	// letters, for other characters it depends on the keyboard layout.
-	if ((*modifiers & MOD_MASK_SHIFT) && c >= 'a' && c <= 'z')
+	만약 ((*modifiers & MOD_MASK_SHIFT) && c >= 'a' && c <= 'z')
 	{
 	    c += 'a' - 'A';
 	    *modifiers &= ~MOD_MASK_SHIFT;
@@ -1824,7 +1824,7 @@ merge_modifyOtherKeys(int c_arg, int *modifiers)
 	*modifiers &= ~(MOD_MASK_META | MOD_MASK_ALT);
     }
 
-    return c;
+    반환 c;
 }
 
 /*
@@ -1836,37 +1836,37 @@ add_byte_to_showcmd(char_u byte)
 {
     static gotchars_state_T state;
     char_u	*ptr;
-    int		modifiers = 0;
-    int		c = NUL;
+    정수		modifiers = 0;
+    정수		c = NUL;
 
-    if (!p_sc || msg_silent != 0)
-	return;
+    만약 (!p_sc || msg_silent != 0)
+	반환;
 
-    if (!gotchars_add_byte(&state, byte))
-	return;
+    만약 (!gotchars_add_byte(&state, byte))
+	반환;
 
     state.buf[state.buflen] = NUL;
     state.buflen = 0;
 
     ptr = state.buf;
-    if (ptr[0] == K_SPECIAL && ptr[1] == KS_MODIFIER && ptr[2] != NUL)
+    만약 (ptr[0] == K_SPECIAL && ptr[1] == KS_MODIFIER && ptr[2] != NUL)
     {
 	modifiers = ptr[2];
 	ptr += 3;
     }
 
-    if (*ptr != NUL)
+    만약 (*ptr != NUL)
     {
 	char_u		*mb_ptr = mb_unescape(&ptr);
 
 	c = mb_ptr != NULL ? (*mb_ptr2char)(mb_ptr) : *ptr++;
-	if (c <= 0x7f)
+	만약 (c <= 0x7f)
 	{
 	    // Merge modifiers into the key to make the result more readable.
-	    int		modifiers_after = modifiers;
-	    int		mod_c = merge_modifyOtherKeys(c, &modifiers_after);
+	    정수		modifiers_after = modifiers;
+	    정수		mod_c = merge_modifyOtherKeys(c, &modifiers_after);
 
-	    if (modifiers_after == 0)
+	    만약 (modifiers_after == 0)
 	    {
 		modifiers = 0;
 		c = mod_c;
@@ -1876,15 +1876,15 @@ add_byte_to_showcmd(char_u byte)
 
     // TODO: is there a more readable and yet compact representation of
     // modifiers and special keys?
-    if (modifiers != 0)
+    만약 (modifiers != 0)
     {
 	add_to_showcmd(K_SPECIAL);
 	add_to_showcmd(KS_MODIFIER);
 	add_to_showcmd(modifiers);
     }
-    if (c != NUL)
+    만약 (c != NUL)
 	add_to_showcmd(c);
-    while (*ptr != NUL)
+    동안 (*ptr != NUL)
 	add_to_showcmd(*ptr++);
 }
 
@@ -1897,18 +1897,18 @@ add_byte_to_showcmd(char_u byte)
  * Collects the bytes of a multibyte character into the whole character.
  * Returns the modifiers in the global "mod_mask".
  */
-    int
+    정수
 vgetc(void)
 {
-    int		c, c2;
-    int		n;
+    정수		c, c2;
+    정수		n;
     char_u	buf[MB_MAXBYTES + 1];
-    int		i;
+    정수		i;
 
 #ifdef FEAT_EVAL
     // Do garbage collection when garbagecollect() was called previously and
     // we are now at the toplevel.
-    if (may_garbage_collect && want_garbage_collect)
+    만약 (may_garbage_collect && want_garbage_collect)
 	garbage_collect(FALSE);
 #endif
 
@@ -1916,7 +1916,7 @@ vgetc(void)
      * If a character was put back with vungetc, it was already processed.
      * Return it directly.
      */
-    if (can_get_old_char())
+    만약 (can_get_old_char())
     {
 	c = old_char;
 	old_char = -1;
@@ -1924,7 +1924,7 @@ vgetc(void)
 	mouse_row = old_mouse_row;
 	mouse_col = old_mouse_col;
     }
-    else
+    아니면
     {
 	// number of characters recorded from the last vgetc() call
 	static size_t	last_vgetc_recorded_len = 0;
@@ -1937,17 +1937,17 @@ vgetc(void)
 	// if peeking records more
 	last_recorded_len -= last_vgetc_recorded_len;
 
-	for (;;)		// this is done twice if there are modifiers
+	위해 (;;)		// this is done twice if there are modifiers
 	{
-	    int did_inc = FALSE;
+	    정수 did_inc = FALSE;
 
 	    // No mapping after modifier has been read, using an input method
 	    // and when a popup window has disabled mapping.
-	    if (mod_mask
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+	    만약 (mod_mask
+#만약 defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 		    || im_is_preediting()
 #endif
-#if defined(FEAT_PROP_POPUP)
+#만약 defined(FEAT_PROP_POPUP)
 		    || popup_no_mapping()
 #endif
 		    )
@@ -1958,20 +1958,20 @@ vgetc(void)
 		did_inc = TRUE;
 	    }
 	    c = vgetorpeek(TRUE);
-	    if (did_inc)
+	    만약 (did_inc)
 	    {
 		--no_mapping;
 		--allow_keys;
 	    }
 
 	    // Get two extra bytes for special keys, handle modifiers.
-	    if (c == K_SPECIAL
+	    만약 (c == K_SPECIAL
 #ifdef FEAT_GUI
 		    || c == CSI
 #endif
 	       )
 	    {
-		int	    save_allow_keys = allow_keys;
+		정수	    save_allow_keys = allow_keys;
 
 		++no_mapping;
 		allow_keys = 0;		// make sure BS is not found
@@ -1979,39 +1979,39 @@ vgetc(void)
 		c = vgetorpeek(TRUE);
 		--no_mapping;
 		allow_keys = save_allow_keys;
-		if (c2 == KS_MODIFIER)
+		만약 (c2 == KS_MODIFIER)
 		{
 		    mod_mask = c;
 		    continue;
 		}
 		c = TO_SPECIAL(c2, c);
 
-		if (allow_osc_key == 0 && c == K_OSC)
+		만약 (allow_osc_key == 0 && c == K_OSC)
 		    continue;
 
 		// K_ESC is used to avoid ambiguity with the single Esc
 		// character that might be the start of an escape sequence.
 		// Convert it back to a single Esc here.
-		if (c == K_ESC)
+		만약 (c == K_ESC)
 		    c = ESC;
 
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+#만약 defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
 		// Handle K_TEAROFF here, the caller of vgetc() doesn't need to
 		// know that a menu was torn off
-		if (
+		만약 (
 # ifdef VIMDLL
 		    gui.in_use &&
 # endif
 		    c == K_TEAROFF)
 		{
 		    char_u	name[200];
-		    int		j;
+		    정수		j;
 
 		    // get menu path, it ends with a <CR>
-		    for (j = 0; (c = vgetorpeek(TRUE)) != '\r'; )
+		    위해 (j = 0; (c = vgetorpeek(TRUE)) != '\r'; )
 		    {
 			name[j] = c;
-			if (j < 199)
+			만약 (j < 199)
 			    ++j;
 		    }
 		    name[j] = NUL;
@@ -2019,11 +2019,11 @@ vgetc(void)
 		    continue;
 		}
 #endif
-#if defined(FEAT_GUI) && defined(FEAT_GUI_GTK) && !defined(USE_GTK4) && defined(FEAT_MENU)
+#만약 defined(FEAT_GUI) && defined(FEAT_GUI_GTK) && !defined(USE_GTK4) && defined(FEAT_MENU)
 		// GTK: <F10> normally selects the menu, but it's passed until
 		// here to allow mapping it.  Intercept and invoke the GTK
 		// behavior if it's not mapped.
-		if (c == K_F10 && gui.menubar != NULL)
+		만약 (c == K_F10 && gui.menubar != NULL)
 		{
 		    gtk_menu_shell_select_first(
 					   GTK_MENU_SHELL(gui.menubar), FALSE);
@@ -2034,7 +2034,7 @@ vgetc(void)
 		// Handle focus event here, so that the caller doesn't need to
 		// know about it.  Return K_IGNORE so that we loop once (needed
 		// if 'lazyredraw' is set).
-		if (c == K_FOCUSGAINED || c == K_FOCUSLOST)
+		만약 (c == K_FOCUSGAINED || c == K_FOCUSLOST)
 		{
 		    ui_focus_change(c == K_FOCUSGAINED);
 		    c = K_IGNORE;
@@ -2042,17 +2042,17 @@ vgetc(void)
 
 		// Translate K_CSI to CSI.  The special key is only used to
 		// avoid it being recognized as the start of a special key.
-		if (c == K_CSI)
+		만약 (c == K_CSI)
 		    c = CSI;
 #endif
 #ifdef FEAT_EVAL
-		if (c == K_SID)
+		만약 (c == K_SID)
 		{
-		    int	    j;
+		    정수	    j;
 
 		    // Handle <SID>{sid};  Do up to 20 digits for safety.
 		    last_used_sid = 0;
-		    for (j = 0; j < 20 && SAFE_isdigit(c = vgetorpeek(TRUE)); ++j)
+		    위해 (j = 0; j < 20 && SAFE_isdigit(c = vgetorpeek(TRUE)); ++j)
 			last_used_sid = last_used_sid * 10 + (c - '0');
 		    last_used_map = NULL;
 		    continue;
@@ -2063,14 +2063,14 @@ vgetc(void)
 	    // For a multi-byte character get all the bytes and return the
 	    // converted character.
 	    // Note: This will loop until enough bytes are received!
-	    if (has_mbyte && (n = MB_BYTE2LEN_CHECK(c)) > 1)
+	    만약 (has_mbyte && (n = MB_BYTE2LEN_CHECK(c)) > 1)
 	    {
 		++no_mapping;
 		buf[0] = c;
-		for (i = 1; i < n; ++i)
+		위해 (i = 1; i < n; ++i)
 		{
 		    buf[i] = vgetorpeek(TRUE);
-		    if (buf[i] == K_SPECIAL
+		    만약 (buf[i] == K_SPECIAL
 #ifdef FEAT_GUI
 			    || (buf[i] == CSI)
 #endif
@@ -2083,7 +2083,7 @@ vgetc(void)
 			// or a K_SPECIAL - KS_EXTRA - KE_CSI, which is CSI
 			// too.
 			c = vgetorpeek(TRUE);
-			if (vgetorpeek(TRUE) == KE_CSI && c == KS_EXTRA)
+			만약 (vgetorpeek(TRUE) == KE_CSI && c == KS_EXTRA)
 			    buf[i] = CSI;
 		    }
 		}
@@ -2091,7 +2091,7 @@ vgetc(void)
 		c = (*mb_ptr2char)(buf);
 	    }
 
-	    if (vgetc_char == 0)
+	    만약 (vgetc_char == 0)
 	    {
 		vgetc_mod_mask = mod_mask;
 		vgetc_char = c;
@@ -2111,7 +2111,7 @@ vgetc(void)
 				// Can be either '.' or a ',',
 				// depending on the type of keypad.
 				c = MapVirtualKey(VK_DECIMAL, 2); break;
-#else
+#아니면
 				c = '.'; break;
 #endif
 		case K_K0:	c = '0'; break;
@@ -2126,31 +2126,31 @@ vgetc(void)
 		case K_K9:	c = '9'; break;
 
 		case K_XHOME:
-		case K_ZHOME:	if (mod_mask == MOD_MASK_SHIFT)
+		case K_ZHOME:	만약 (mod_mask == MOD_MASK_SHIFT)
 				{
 				    c = K_S_HOME;
 				    mod_mask = 0;
 				}
-				else if (mod_mask == MOD_MASK_CTRL)
+				아니면 만약 (mod_mask == MOD_MASK_CTRL)
 				{
 				    c = K_C_HOME;
 				    mod_mask = 0;
 				}
-				else
+				아니면
 				    c = K_HOME;
 				break;
 		case K_XEND:
-		case K_ZEND:	if (mod_mask == MOD_MASK_SHIFT)
+		case K_ZEND:	만약 (mod_mask == MOD_MASK_SHIFT)
 				{
 				    c = K_S_END;
 				    mod_mask = 0;
 				}
-				else if (mod_mask == MOD_MASK_CTRL)
+				아니면 만약 (mod_mask == MOD_MASK_CTRL)
 				{
 				    c = K_C_END;
 				    mod_mask = 0;
 				}
-				else
+				아니면
 				    c = K_END;
 				break;
 
@@ -2176,7 +2176,7 @@ vgetc(void)
 #endif
 
 #ifdef FEAT_BEVAL_TERM
-    if (c != K_MOUSEMOVE && c != K_IGNORE && c != K_CURSORHOLD
+    만약 (c != K_MOUSEMOVE && c != K_IGNORE && c != K_CURSORHOLD
 	    && c != K_COMPLETE_DELAY)
     {
 	// Don't trigger 'balloonexpr' unless only the mouse was moved.
@@ -2187,9 +2187,9 @@ vgetc(void)
 #ifdef FEAT_PROP_POPUP
     // Only filter keys that do not come from ":normal".  Keys from feedkeys()
     // are filtered.
-    if ((!ex_normal_busy || in_feedkeys) && popup_do_filter(c))
+    만약 ((!ex_normal_busy || in_feedkeys) && popup_do_filter(c))
     {
-	if (c == Ctrl_C)
+	만약 (c == Ctrl_C)
 	    got_int = FALSE;  // avoid looping
 	c = K_IGNORE;
     }
@@ -2204,10 +2204,10 @@ vgetc(void)
 
     // Need to process the character before we know it's safe to do something
     // else.
-    if (c != K_IGNORE)
+    만약 (c != K_IGNORE)
 	state_no_longer_safe("key typed");
 
-    return c;
+    반환 c;
 }
 
 #ifdef FEAT_EVAL
@@ -2216,29 +2216,29 @@ vgetc(void)
  * "c" is the character that was typed.
  * Return new input character.
  */
-    static int
-do_key_input_pre(int c)
+    static 정수
+do_key_input_pre(정수 c)
 {
-    int		res = c;
+    정수		res = c;
     char_u	buf[MB_MAXBYTES + 1];
     size_t	buflen;
     char_u	curr_mode[MODE_MAX_LENGTH];
-    int		save_State = State;
+    정수		save_State = State;
     save_v_event_T save_v_event;
     dict_T	*v_event;
 
     // Return quickly when there is nothing to do.
-    if (!has_keyinputpre())
-	return res;
+    만약 (!has_keyinputpre())
+	반환 res;
 
-    if (IS_SPECIAL(c))
+    만약 (IS_SPECIAL(c))
     {
 	buf[0] = K_SPECIAL;
 	buf[1] = KEY2TERMCAP0(c);
 	buf[2] = KEY2TERMCAP1(c);
 	buflen = 3;
     }
-    else
+    아니면
 	buflen = (*mb_char2bytes)(c, buf);
     buf[buflen] = NUL;
 
@@ -2249,13 +2249,13 @@ do_key_input_pre(int c)
 
     // Lock the text to avoid weird things from happening.
     ++textlock;
-    set_vim_var_string(VV_CHAR, buf, (int)buflen);  // set v:char
+    set_vim_var_string(VV_CHAR, buf, (정수)buflen);  // set v:char
 
     v_event = get_v_event(&save_v_event);
     (void)dict_add_bool(v_event, "typed", KeyTyped);
     (void)dict_add_string_len(v_event, "typedchar", typedchars, typedchars_pos);
 
-    if (apply_autocmds(EVENT_KEYINPUTPRE, curr_mode, curr_mode, FALSE, curbuf))
+    만약 (apply_autocmds(EVENT_KEYINPUTPRE, curr_mode, curr_mode, FALSE, curbuf))
     {
 	string_T    v_char;
 
@@ -2263,13 +2263,13 @@ do_key_input_pre(int c)
 	// character.  Only use it when changed, otherwise continue with the
 	// original character.
 	v_char.string = get_vim_var_str(VV_CHAR);
-	if (STRCMP(buf, v_char.string) != 0)
+	만약 (STRCMP(buf, v_char.string) != 0)
 	{
 	    v_char.length = STRLEN(v_char.string);
 	    // Convert special bytes when it is special string.
-	    if (v_char.length >= 3 && v_char.string[0] == K_SPECIAL)
+	    만약 (v_char.length >= 3 && v_char.string[0] == K_SPECIAL)
 		res = TERMCAP2KEY(v_char.string[1], v_char.string[2]);
-	    else if (v_char.length > 0)
+	    아니면 만약 (v_char.length > 0)
 		res = PTR2CHAR(v_char.string);
 	}
     }
@@ -2282,7 +2282,7 @@ do_key_input_pre(int c)
     // Restore the State, it may have been changed.
     State = save_State;
 
-    return res;
+    반환 res;
 }
 #endif
 
@@ -2290,15 +2290,15 @@ do_key_input_pre(int c)
  * Like vgetc(), but never return a NUL when called recursively, get a key
  * directly from the user (ignoring typeahead).
  */
-    int
+    정수
 safe_vgetc(void)
 {
-    int	c;
+    정수	c;
 
     c = vgetc();
-    if (c == NUL)
+    만약 (c == NUL)
 	c = get_keystroke();
-    return c;
+    반환 c;
 }
 
 /*
@@ -2306,34 +2306,34 @@ safe_vgetc(void)
  * Also ignore scrollbar events.
  * Does not handle bracketed paste - do not use the result for commands.
  */
-    static int
+    static 정수
 plain_vgetc_nopaste(void)
 {
-    int c;
+    정수 c;
 
     do
 	c = safe_vgetc();
-    while (c == K_IGNORE
+    동안 (c == K_IGNORE
 	    || c == K_VER_SCROLLBAR || c == K_HOR_SCROLLBAR
 	    || c == K_MOUSEMOVE);
-    return c;
+    반환 c;
 }
 
 /*
  * Like safe_vgetc(), but loop to handle K_IGNORE.
  * Also ignore scrollbar events.
  */
-    int
+    정수
 plain_vgetc(void)
 {
-    int c = plain_vgetc_nopaste();
+    정수 c = plain_vgetc_nopaste();
 
-    if (c == K_PS)
+    만약 (c == K_PS)
 	// Only handle the first pasted character.  Drop the rest, since we
 	// don't know what to do with it.
 	c = bracketed_paste(PASTE_ONE_CHAR, FALSE, NULL);
 
-    return c;
+    반환 c;
 }
 
 /*
@@ -2342,30 +2342,30 @@ plain_vgetc(void)
  * character is not valid!.
  * Returns NUL if no character is available.
  */
-    int
+    정수
 vpeekc(void)
 {
-    if (can_get_old_char())
-	return old_char;
-    return vgetorpeek(FALSE);
+    만약 (can_get_old_char())
+	반환 old_char;
+    반환 vgetorpeek(FALSE);
 }
 
-#if defined(FEAT_TERMRESPONSE) || defined(FEAT_TERMINAL)
+#만약 defined(FEAT_TERMRESPONSE) || defined(FEAT_TERMINAL)
 /*
  * Like vpeekc(), but don't allow mapping.  Do allow checking for terminal
  * codes.
  */
-    int
+    정수
 vpeekc_nomap(void)
 {
-    int		c;
+    정수		c;
 
     ++no_mapping;
     ++allow_keys;
     c = vpeekc();
     --no_mapping;
     --allow_keys;
-    return c;
+    반환 c;
 }
 #endif
 
@@ -2374,84 +2374,84 @@ vpeekc_nomap(void)
  * Trick: when no typeahead found, but there is something in the typeahead
  * buffer, it must be an ESC that is recognized as the start of a key code.
  */
-    int
+    정수
 vpeekc_any(void)
 {
-    int		c;
+    정수		c;
 
     c = vpeekc();
-    if (c == NUL && typebuf.tb_len > 0)
+    만약 (c == NUL && typebuf.tb_len > 0)
 	c = ESC;
-    return c;
+    반환 c;
 }
 
 /*
  * Call vpeekc() without causing anything to be mapped.
  * Return TRUE if a character is available, FALSE otherwise.
  */
-    int
+    정수
 char_avail(void)
 {
-    int	    retval;
+    정수	    retval;
 
 #ifdef FEAT_EVAL
     // When test_override("char_avail", 1) was called pretend there is no
     // typeahead.
-    if (disable_char_avail_for_testing)
-	return FALSE;
+    만약 (disable_char_avail_for_testing)
+	반환 FALSE;
 #endif
     ++no_mapping;
     retval = vpeekc();
     --no_mapping;
-    return (retval != NUL);
+    반환 (retval != NUL);
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * "getchar()" and "getcharstr()" functions
  */
     static void
-getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
+getchar_common(typval_T *argvars, typval_T *rettv, 정수 allow_number)
 {
     varnumber_T		n = 0;
-    int			called_emsg_start = called_emsg;
-    int			error = FALSE;
-    int			simplify = TRUE;
+    정수			called_emsg_start = called_emsg;
+    정수			error = FALSE;
+    정수			simplify = TRUE;
     char_u		cursor_flag = 'm';
 
-    if ((in_vim9script()
+    만약 ((in_vim9script()
 		&& check_for_opt_bool_or_number_arg(argvars, 0) == FAIL)
 	    || (argvars[0].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	반환;
 
-    if (argvars[0].v_type != VAR_UNKNOWN && argvars[1].v_type == VAR_DICT)
+    만약 (argvars[0].v_type != VAR_UNKNOWN && argvars[1].v_type == VAR_DICT)
     {
 	dict_T		*d = argvars[1].vval.v_dict;
 	char_u		*cursor_str;
 
-	if (allow_number)
+	만약 (allow_number)
 	    allow_number = dict_get_bool(d, "number", TRUE);
-	else if (dict_has_key(d, "number"))
+	아니면 만약 (dict_has_key(d, "number"))
 	    semsg(_(e_invalid_argument_str), "number");
 
 	simplify = dict_get_bool(d, "simplify", TRUE);
 
 	cursor_str = dict_get_string(d, "cursor", FALSE);
-	if (cursor_str != NULL)
+	만약 (cursor_str != NULL)
 	{
-	    if (STRCMP(cursor_str, "hide") != 0
+	    만약 (STRCMP(cursor_str, "hide") != 0
 		    && STRCMP(cursor_str, "keep") != 0
 		    && STRCMP(cursor_str, "msg") != 0)
 		semsg(_(e_invalid_value_for_argument_str_str), "cursor",
 								   cursor_str);
-	    else
+	    아니면
 		cursor_flag = cursor_str[0];
 	}
     }
 
-    if (called_emsg != called_emsg_start)
-	return;
+    만약 (called_emsg != called_emsg_start)
+	반환;
 
 # ifdef MESSAGE_QUEUE
     // vpeekc() used to check for messages, but that caused problems, invoking
@@ -2460,35 +2460,35 @@ getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
     parse_queued_messages();
 # endif
 
-    if (cursor_flag == 'h')
+    만약 (cursor_flag == 'h')
 	cursor_sleep();
-    else if (cursor_flag == 'm')
+    아니면 만약 (cursor_flag == 'm')
 	windgoto(msg_row, cmdline_col_off + msg_col);
 
     ++no_mapping;
     ++allow_keys;
     ++allow_osc_key;
-    if (!simplify)
+    만약 (!simplify)
 	++no_reduce_keys;
-    for (;;)
+    위해 (;;)
     {
-	if (argvars[0].v_type == VAR_UNKNOWN
+	만약 (argvars[0].v_type == VAR_UNKNOWN
 		|| (argvars[0].v_type == VAR_NUMBER
 			&& argvars[0].vval.v_number == -1))
 	    // getchar(): blocking wait.
 	    n = plain_vgetc_nopaste();
-	else if (tv_get_bool_chk(&argvars[0], &error))
+	아니면 만약 (tv_get_bool_chk(&argvars[0], &error))
 	    // getchar(1): only check if char avail
 	    n = vpeekc_any();
-	else if (error || vpeekc_any() == NUL)
+	아니면 만약 (error || vpeekc_any() == NUL)
 	    // illegal argument or getchar(0) and no char avail: return zero
 	    n = 0;
-	else
+	아니면
 	    // getchar(0) and char avail() != NUL: get a character.
 	    // Note that vpeekc_any() returns K_SPECIAL for K_IGNORE.
 	    n = safe_vgetc();
 
-	if (n == K_IGNORE || n == K_MOUSEMOVE
+	만약 (n == K_IGNORE || n == K_MOUSEMOVE
 		|| n == K_VER_SCROLLBAR || n == K_HOR_SCROLLBAR)
 	    continue;
 	break;
@@ -2496,10 +2496,10 @@ getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
     --no_mapping;
     --allow_keys;
     --allow_osc_key;
-    if (!simplify)
+    만약 (!simplify)
 	--no_reduce_keys;
 
-    if (cursor_flag == 'h')
+    만약 (cursor_flag == 'h')
 	cursor_unsleep();
 
     set_vim_var_nr(VV_MOUSE_WIN, 0);
@@ -2507,55 +2507,55 @@ getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
     set_vim_var_nr(VV_MOUSE_LNUM, 0);
     set_vim_var_nr(VV_MOUSE_COL, 0);
 
-    if (n != 0 && (!allow_number || IS_SPECIAL(n) || mod_mask != 0))
+    만약 (n != 0 && (!allow_number || IS_SPECIAL(n) || mod_mask != 0))
     {
 	char_u		temp[10];   // modifier: 3, mbyte-char: 6, NUL: 1
-	int		i = 0;
+	정수		i = 0;
 
 	// Turn a special key into three bytes, plus modifier.
-	if (mod_mask != 0)
+	만약 (mod_mask != 0)
 	{
 	    temp[i++] = K_SPECIAL;
 	    temp[i++] = KS_MODIFIER;
 	    temp[i++] = mod_mask;
 	}
-	if (IS_SPECIAL(n))
+	만약 (IS_SPECIAL(n))
 	{
 	    temp[i++] = K_SPECIAL;
 	    temp[i++] = K_SECOND(n);
 	    temp[i++] = K_THIRD(n);
 	}
-	else if (has_mbyte)
+	아니면 만약 (has_mbyte)
 	    i += (*mb_char2bytes)(n, temp + i);
-	else
+	아니면
 	    temp[i++] = n;
 	temp[i] = NUL;
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = vim_strnsave(temp, i);
 
-	if (is_mouse_key(n))
+	만약 (is_mouse_key(n))
 	{
-	    int		row = mouse_row;
-	    int		col = mouse_col;
+	    정수		row = mouse_row;
+	    정수		col = mouse_col;
 	    win_T	*win;
 	    linenr_T	lnum;
 	    win_T	*wp;
-	    int		winnr = 1;
+	    정수		winnr = 1;
 
-	    if (row >= 0 && col >= 0)
+	    만약 (row >= 0 && col >= 0)
 	    {
 		// Find the window at the mouse coordinates and compute the
 		// text position.
 		win = mouse_find_win(&row, &col, FIND_POPUP);
-		if (win == NULL)
-		    return;
+		만약 (win == NULL)
+		    반환;
 		(void)mouse_comp_pos(win, &row, &col, &lnum, NULL);
 # ifdef FEAT_PROP_POPUP
-		if (WIN_IS_POPUP(win))
+		만약 (WIN_IS_POPUP(win))
 		    winnr = 0;
-		else
+		아니면
 # endif
-		    for (wp = firstwin; wp != win && wp != NULL;
+		    위해 (wp = firstwin; wp != win && wp != NULL;
 							       wp = wp->w_next)
 			++winnr;
 		set_vim_var_nr(VV_MOUSE_WIN, winnr);
@@ -2565,9 +2565,9 @@ getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
 	    }
 	}
     }
-    else if (!allow_number)
+    아니면 만약 (!allow_number)
 	rettv->v_type = VAR_STRING;
-    else
+    아니면
 	rettv->vval.v_number = n;
 }
 
@@ -2599,7 +2599,7 @@ f_getcharmod(typval_T *argvars UNUSED, typval_T *rettv)
 }
 #endif // FEAT_EVAL
 
-#if defined(MESSAGE_QUEUE)
+#만약 defined(MESSAGE_QUEUE)
 # define MAX_REPEAT_PARSE 8
 
 /*
@@ -2611,23 +2611,23 @@ f_getcharmod(typval_T *argvars UNUSED, typval_T *rettv)
     void
 parse_queued_messages(void)
 {
-    int	    old_curwin_id;
-    int	    old_curbuf_fnum;
-    int	    i;
-    int	    save_may_garbage_collect = may_garbage_collect;
-    static int entered = 0;
-    int	    was_safe = get_was_safe_state();
+    정수	    old_curwin_id;
+    정수	    old_curbuf_fnum;
+    정수	    i;
+    정수	    save_may_garbage_collect = may_garbage_collect;
+    static 정수 entered = 0;
+    정수	    was_safe = get_was_safe_state();
 
     // Do not handle messages while redrawing, because it may cause buffers to
     // change or be wiped while they are being redrawn.
     // Also bail out when parsing messages was explicitly disabled.
-    if (updating_screen || dont_parse_messages)
-	return;
+    만약 (updating_screen || dont_parse_messages)
+	반환;
 
     // If memory allocation fails during startup we'll exit but curbuf or
     // curwin could be NULL.
-    if (curbuf == NULL || curwin == NULL)
-	return;
+    만약 (curbuf == NULL || curwin == NULL)
+	반환;
 
     old_curbuf_fnum = curbuf->b_fnum;
     old_curwin_id = curwin->w_id;
@@ -2641,10 +2641,10 @@ parse_queued_messages(void)
     may_garbage_collect = FALSE;
 
     // Loop when a job ended, but don't keep looping forever.
-    for (i = 0; i < MAX_REPEAT_PARSE; ++i)
+    위해 (i = 0; i < MAX_REPEAT_PARSE; ++i)
     {
 	// For Win32 mch_breakcheck() does not check for input, do it here.
-# if (defined(MSWIN) || defined(__HAIKU__)) && defined(FEAT_JOB_CHANNEL)
+# 만약 (defined(MSWIN) || defined(__HAIKU__)) && defined(FEAT_JOB_CHANNEL)
 	channel_handle_events(FALSE);
 # endif
 
@@ -2662,14 +2662,14 @@ parse_queued_messages(void)
 	// Process the messages queued on channels.
 	channel_parse_messages();
 # endif
-# if defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
+# 만약 defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
 	// Process the queued clientserver messages.
 	server_parse_messages();
 # endif
 # ifdef FEAT_JOB_CHANNEL
 	// Check if any jobs have ended.  If so, repeat the above to handle
 	// changes, e.g. stdin may have been closed.
-	if (job_check_ended())
+	만약 (job_check_ended())
 	    continue;
 # endif
 # ifdef FEAT_TERMINAL
@@ -2680,11 +2680,11 @@ parse_queued_messages(void)
 	process_cfrunloop();
 # endif
 # ifdef FEAT_SOUND_CANBERRA
-	if (has_sound_callback_in_queue())
+	만약 (has_sound_callback_in_queue())
 	    invoke_sound_callback();
 # endif
 # ifdef SIGUSR1
-	if (got_sigusr1)
+	만약 (got_sigusr1)
 	{
 	    apply_autocmds(EVENT_SIGUSR1, NULL, NULL, FALSE, curbuf);
 	    got_sigusr1 = FALSE;
@@ -2695,14 +2695,14 @@ parse_queued_messages(void)
 
     // When not nested we'll go back to waiting for a typed character.  If it
     // was safe before then this triggers a SafeStateAgain autocommand event.
-    if (entered == 1 && was_safe)
+    만약 (entered == 1 && was_safe)
 	may_trigger_safestateagain();
 
     may_garbage_collect = save_may_garbage_collect;
 
     // If the current window or buffer changed we need to bail out of the
     // waiting loop.  E.g. when a job exit callback closes the terminal window.
-    if (curwin->w_id != old_curwin_id || curbuf->b_fnum != old_curbuf_fnum)
+    만약 (curwin->w_id != old_curwin_id || curbuf->b_fnum != old_curbuf_fnum)
 	ins_char_typebuf(K_IGNORE, 0);
 
     --entered;
@@ -2722,13 +2722,13 @@ typedef enum {
  * in Insert mode completion.  This includes the form with a CTRL modifier.
  * During completion started by complete() keys are mapped as usual.
  */
-    static int
+    static 정수
 at_ins_compl_key(void)
 {
     char_u  *p = typebuf.tb_buf + typebuf.tb_off;
-    int	    c = *p;
+    정수	    c = *p;
 
-    if (typebuf.tb_len > 3
+    만약 (typebuf.tb_len > 3
 	    && (c == K_SPECIAL || c == CSI)  // CSI is used by the GUI
 	    && p[1] == KS_MODIFIER
 	    && (p[2] & MOD_MASK_CTRL)
@@ -2736,7 +2736,7 @@ at_ins_compl_key(void)
 	    // to the CTRL-N/CTRL-P completion keys here.
 	    && !(p[2] & MOD_MASK_SHIFT))
 	c = p[3] & 0x1f;
-    return !ctrl_x_mode_eval()
+    반환 !ctrl_x_mode_eval()
 	    && ((ctrl_x_mode_not_default() && vim_is_ctrl_x_key(c))
 		|| (compl_status_local() && (c == Ctrl_N || c == Ctrl_P)));
 }
@@ -2748,32 +2748,32 @@ at_ins_compl_key(void)
  * + "max_offset"].
  * Return the length of the replaced bytes, 0 if nothing changed, -1 for error.
  */
-    static int
-check_simplify_modifier(int max_offset)
+    static 정수
+check_simplify_modifier(정수 max_offset)
 {
-    int		offset;
+    정수		offset;
     char_u	*tp;
 
-    for (offset = 0; offset < max_offset; ++offset)
+    위해 (offset = 0; offset < max_offset; ++offset)
     {
-	if (offset + 3 >= typebuf.tb_len)
+	만약 (offset + 3 >= typebuf.tb_len)
 	    break;
 	tp = typebuf.tb_buf + typebuf.tb_off + offset;
-	if ((tp[0] == K_SPECIAL || tp[0] == CSI) && tp[1] == KS_MODIFIER)
+	만약 ((tp[0] == K_SPECIAL || tp[0] == CSI) && tp[1] == KS_MODIFIER)
 	{
 	    // A modifier was not used for a mapping, apply it to ASCII keys.
 	    // Shift would already have been applied.
-	    int modifier = tp[2];
-	    int	c = tp[3];
-	    int new_c = merge_modifyOtherKeys(c, &modifier);
+	    정수 modifier = tp[2];
+	    정수	c = tp[3];
+	    정수 new_c = merge_modifyOtherKeys(c, &modifier);
 
-	    if (new_c != c)
+	    만약 (new_c != c)
 	    {
 		char_u	new_string[MB_MAXBYTES];
-		int	len;
-		int	key_offset = offset;
+		정수	len;
+		정수	key_offset = offset;
 
-		if (offset == 0)
+		만약 (offset == 0)
 		{
 		    // At the start: remember the character and mod_mask before
 		    // merging, in some cases, e.g. at the hit-return prompt,
@@ -2781,40 +2781,40 @@ check_simplify_modifier(int max_offset)
 		    vgetc_char = c;
 		    vgetc_mod_mask = tp[2];
 		}
-		if (IS_SPECIAL(new_c))
+		만약 (IS_SPECIAL(new_c))
 		{
 		    new_string[0] = K_SPECIAL;
 		    new_string[1] = K_SECOND(new_c);
 		    new_string[2] = K_THIRD(new_c);
 		    len = 3;
 		}
-		else
+		아니면
 		    len = mb_char2bytes(new_c, new_string);
-		if (modifier == 0)
+		만약 (modifier == 0)
 		{
-		    if (put_string_in_typebuf(offset, 4, new_string, len,
+		    만약 (put_string_in_typebuf(offset, 4, new_string, len,
 							NULL, 0, NULL) == FAIL)
-			return -1;
+			반환 -1;
 		}
-		else
+		아니면
 		{
 		    tp[2] = modifier;
 		    key_offset = offset + 3;
-		    if (put_string_in_typebuf(key_offset, 1, new_string, len,
+		    만약 (put_string_in_typebuf(key_offset, 1, new_string, len,
 							NULL, 0, NULL) == FAIL)
-			return -1;
+			반환 -1;
 		}
 
 		// A mapping for the simplified key can be used for it even
 		// when the key protocol is enabled.
-		for (int i = 0; i < len; ++i)
+		위해 (정수 i = 0; i < len; ++i)
 		    typebuf.tb_noremap[typebuf.tb_off + key_offset + i]
 							    |= RM_SIMPLIFIED;
-		return len;
+		반환 len;
 	    }
 	}
     }
-    return 0;
+    반환 0;
 }
 
 /*
@@ -2822,14 +2822,14 @@ check_simplify_modifier(int max_offset)
  * modifyOtherKeys level 2 is enabled or the kitty keyboard protocol is
  * enabled.
  */
-    int
+    정수
 key_protocol_enabled(void)
 {
     // If xterm has responded to XTQMODKEYS it overrules seenModifyOtherKeys.
-    int using_mok = modify_otherkeys_state != MOKS_INITIAL
+    정수 using_mok = modify_otherkeys_state != MOKS_INITIAL
 			? modify_otherkeys_state == MOKS_ENABLED
 			: seenModifyOtherKeys;
-    return using_mok || kitty_protocol_state == KKPS_ENABLED;
+    반환 using_mok || kitty_protocol_state == KKPS_ENABLED;
 }
 
 /*
@@ -2840,34 +2840,34 @@ key_protocol_enabled(void)
  *   typeahead.
  * - On failure (out of memory) return map_result_fail.
  */
-    static int
+    static 정수
 handle_mapping(
-	    int *keylenp,
-	    int *timedout,
-	    int *mapdepth)
+	    정수 *keylenp,
+	    정수 *timedout,
+	    정수 *mapdepth)
 {
     mapblock_T	*mp = NULL;
     mapblock_T	*mp2;
     mapblock_T	*mp_match;
-    int		mp_match_len = 0;
-    int		max_mlen = 0;
-    int		want_termcode = 0;  // 1 if termcode expected after max_mlen
-    int		tb_c1;
-    int		mlen;
+    정수		mp_match_len = 0;
+    정수		max_mlen = 0;
+    정수		want_termcode = 0;  // 1 if termcode expected after max_mlen
+    정수		tb_c1;
+    정수		mlen;
 #ifdef FEAT_LANGMAP
-    int		nolmaplen;
+    정수		nolmaplen;
 #endif
-    int		keylen = *keylenp;
-    int		i;
-    int		local_State = get_real_state();
-    int		is_plug_map = FALSE;
+    정수		keylen = *keylenp;
+    정수		i;
+    정수		local_State = get_real_state();
+    정수		is_plug_map = FALSE;
     bool	in_osc = in_osc_sequence(); // If we are in an OSC sequence,
 					    // then go straight to
 					    // check_termcode() in order to
 					    // consume chars.
 
     // If typeahead starts with <Plug> then remap, even for a "noremap" mapping.
-    if (!in_osc && typebuf.tb_len >= 3
+    만약 (!in_osc && typebuf.tb_len >= 3
 	    && typebuf.tb_buf[typebuf.tb_off] == K_SPECIAL
 	    && typebuf.tb_buf[typebuf.tb_off + 1] == KS_EXTRA
 	    && typebuf.tb_buf[typebuf.tb_off + 2] == KE_PLUG)
@@ -2889,7 +2889,7 @@ handle_mapping(
      * - currently receiving OSC sequence
      */
     tb_c1 = typebuf.tb_buf[typebuf.tb_off];
-    if (!in_osc && no_mapping == 0 && is_maphash_valid()
+    만약 (!in_osc && no_mapping == 0 && is_maphash_valid()
 	    && (no_zero_mapping == 0 || tb_c1 != '0')
 	    && (typebuf.tb_maplen == 0 || is_plug_map
 		|| (p_remap
@@ -2902,7 +2902,7 @@ handle_mapping(
 	    && !at_ins_compl_key())
     {
 #ifdef FEAT_GUI
-	if (gui.in_use && tb_c1 == CSI && typebuf.tb_len >= 2
+	만약 (gui.in_use && tb_c1 == CSI && typebuf.tb_len >= 2
 		&& typebuf.tb_buf[typebuf.tb_off + 1] == KS_MODIFIER)
 	{
 	    // The GUI code sends CSI KS_MODIFIER {flags}, but mappings expect
@@ -2911,9 +2911,9 @@ handle_mapping(
 	}
 #endif
 #ifdef FEAT_LANGMAP
-	if (tb_c1 == K_SPECIAL)
+	만약 (tb_c1 == K_SPECIAL)
 	    nolmaplen = 2;
-	else
+	아니면
 	{
 	    LANGMAP_ADJUST(tb_c1, (State & (MODE_CMDLINE | MODE_INSERT)) == 0
 					   && get_real_state() != MODE_SELECT);
@@ -2923,7 +2923,7 @@ handle_mapping(
 	// First try buffer-local mappings.
 	mp = get_buf_maphash_list(local_State, tb_c1);
 	mp2 = get_maphash_list(local_State, tb_c1);
-	if (mp == NULL)
+	만약 (mp == NULL)
 	{
 	    // There are no buffer-local mappings.
 	    mp = mp2;
@@ -2939,13 +2939,13 @@ handle_mapping(
 	 */
 	mp_match = NULL;
 	mp_match_len = 0;
-	for ( ; mp != NULL;
+	위해 ( ; mp != NULL;
 	       mp->m_next == NULL ? (mp = mp2, mp2 = NULL) : (mp = mp->m_next))
 	{
 	    // Only consider an entry if the first character matches and it is
 	    // for the current state.
 	    // Skip ":lmap" mappings if keys were mapped.
-	    if (mp->m_keys[0] == tb_c1
+	    만약 (mp->m_keys[0] == tb_c1
 		    && (mp->m_mode & local_State)
 		    && !(mp->m_simplified && key_protocol_enabled()
 			    && typebuf.tb_maplen == 0
@@ -2955,27 +2955,27 @@ handle_mapping(
 						    || typebuf.tb_maplen == 0))
 	    {
 #ifdef FEAT_LANGMAP
-		int	nomap = nolmaplen;
-		int	modifiers = 0;
+		정수	nomap = nolmaplen;
+		정수	modifiers = 0;
 #endif
 		// find the match length of this mapping
-		for (mlen = 1; mlen < typebuf.tb_len; ++mlen)
+		위해 (mlen = 1; mlen < typebuf.tb_len; ++mlen)
 		{
-		    int	c2 = typebuf.tb_buf[typebuf.tb_off + mlen];
+		    정수	c2 = typebuf.tb_buf[typebuf.tb_off + mlen];
 #ifdef FEAT_LANGMAP
-		    if (nomap > 0)
+		    만약 (nomap > 0)
 		    {
-			if (nomap == 2 && c2 == KS_MODIFIER)
+			만약 (nomap == 2 && c2 == KS_MODIFIER)
 			    modifiers = 1;
-			else if (nomap == 1 && modifiers == 1)
+			아니면 만약 (nomap == 1 && modifiers == 1)
 			    modifiers = c2;
 			--nomap;
 		    }
-		    else
+		    아니면
 		    {
-			if (c2 == K_SPECIAL)
+			만약 (c2 == K_SPECIAL)
 			    nomap = 2;
-			else if (merge_modifyOtherKeys(c2, &modifiers) == c2)
+			아니면 만약 (merge_modifyOtherKeys(c2, &modifiers) == c2)
 			    // Only apply 'langmap' if merging modifiers into
 			    // the key will not result in another character,
 			    // so that 'langmap' behaves consistently in
@@ -2984,7 +2984,7 @@ handle_mapping(
 			modifiers = 0;
 		    }
 #endif
-		    if (mp->m_keys[mlen] != c2)
+		    만약 (mp->m_keys[mlen] != c2)
 			break;
 		}
 
@@ -2995,7 +2995,7 @@ handle_mapping(
 		    char_u *p1 = mp->m_keys;
 		    char_u *p2 = mb_unescape(&p1);
 
-		    if (has_mbyte && p2 != NULL
+		    만약 (has_mbyte && p2 != NULL
 					&& MB_BYTE2LEN(tb_c1) > mb_ptr2len(p2))
 			mlen = 0;
 		}
@@ -3004,16 +3004,16 @@ handle_mapping(
 		// - Full match: mlen == keylen
 		// - Partly match: mlen == typebuf.tb_len
 		keylen = mp->m_keylen;
-		if (mlen == keylen || (mlen == typebuf.tb_len
+		만약 (mlen == keylen || (mlen == typebuf.tb_len
 						   && typebuf.tb_len < keylen))
 		{
 		    char_u  *s;
-		    int	    n;
+		    정수	    n;
 
 		    // If only script-local mappings are allowed, check if the
 		    // mapping starts with K_SNR.
 		    s = typebuf.tb_noremap + typebuf.tb_off;
-		    if ((*s & ~RM_SIMPLIFIED) == RM_SCRIPT
+		    만약 ((*s & ~RM_SIMPLIFIED) == RM_SCRIPT
 			    && (mp->m_keys[0] != K_SPECIAL
 				|| mp->m_keys[1] != KS_EXTRA
 				|| mp->m_keys[2] != KE_SNR))
@@ -3021,15 +3021,15 @@ handle_mapping(
 
 		    // If one of the typed keys cannot be remapped, skip the
 		    // entry.
-		    for (n = mlen; --n >= 0; )
-			if (*s++ & (RM_NONE|RM_ABBR))
+		    위해 (n = mlen; --n >= 0; )
+			만약 (*s++ & (RM_NONE|RM_ABBR))
 			    break;
-		    if (!is_plug_map && n >= 0)
+		    만약 (!is_plug_map && n >= 0)
 			continue;
 
-		    if (keylen > typebuf.tb_len)
+		    만약 (keylen > typebuf.tb_len)
 		    {
-			if (!*timedout && !(mp_match != NULL
+			만약 (!*timedout && !(mp_match != NULL
 							&& mp_match->m_nowait))
 			{
 			    // break at a partly match
@@ -3037,14 +3037,14 @@ handle_mapping(
 			    break;
 			}
 		    }
-		    else if (keylen > mp_match_len)
+		    아니면 만약 (keylen > mp_match_len)
 		    {
 			// found a longer match
 			mp_match = mp;
 			mp_match_len = keylen;
 		    }
 		}
-		else
+		아니면
 		{
 		    // No match; may have to check for termcode at next
 		    // character.
@@ -3052,24 +3052,24 @@ handle_mapping(
 		    // If the first character that didn't match is
 		    // K_SPECIAL then check for a termcode.  This isn't perfect
 		    // but should work in most cases.
-		    if (max_mlen < mlen)
+		    만약 (max_mlen < mlen)
 		    {
 			max_mlen = mlen;
 			want_termcode = mp->m_keys[mlen] == K_SPECIAL;
 		    }
-		    else if (max_mlen == mlen && mp->m_keys[mlen] == K_SPECIAL)
+		    아니면 만약 (max_mlen == mlen && mp->m_keys[mlen] == K_SPECIAL)
 			want_termcode = 1;
 
 		    // Check termcode for uppercase character to properly
 		    // process "ESC[27;2;<ascii code>~" control sequences.
-		    if (ASCII_ISUPPER(mp->m_keys[mlen]))
+		    만약 (ASCII_ISUPPER(mp->m_keys[mlen]))
 			want_termcode = 1;
 		}
 	    }
 	}
 
 	// If no partly match found, use the longest full match.
-	if (keylen != KEYLEN_PART_MAP && mp_match != NULL)
+	만약 (keylen != KEYLEN_PART_MAP && mp_match != NULL)
 	{
 	    mp = mp_match;
 	    keylen = mp_match_len;
@@ -3079,23 +3079,23 @@ handle_mapping(
     /*
      * Check for match with 'pastetoggle'
      */
-    if (!in_osc && *p_pt != NUL && mp == NULL &&
+    만약 (!in_osc && *p_pt != NUL && mp == NULL &&
 	    (State & (MODE_INSERT | MODE_NORMAL)))
     {
-	for (mlen = 0; mlen < typebuf.tb_len && p_pt[mlen]; ++mlen)
-	    if (p_pt[mlen] != typebuf.tb_buf[typebuf.tb_off + mlen])
+	위해 (mlen = 0; mlen < typebuf.tb_len && p_pt[mlen]; ++mlen)
+	    만약 (p_pt[mlen] != typebuf.tb_buf[typebuf.tb_off + mlen])
 		    break;
-	if (p_pt[mlen] == NUL)	// match
+	만약 (p_pt[mlen] == NUL)	// match
 	{
 	    // write chars to script file(s)
-	    if (mlen > typebuf.tb_maplen)
+	    만약 (mlen > typebuf.tb_maplen)
 		gotchars(typebuf.tb_buf + typebuf.tb_off + typebuf.tb_maplen,
 						     mlen - typebuf.tb_maplen);
 
 	    del_typebuf(mlen, 0); // remove the chars
 	    set_option_value_give_err((char_u *)"paste",
 						      (long)!p_paste, NULL, 0);
-	    if (!(State & MODE_INSERT))
+	    만약 (!(State & MODE_INSERT))
 	    {
 		msg_col = 0;
 		msg_row = Rows - 1;
@@ -3106,12 +3106,12 @@ handle_mapping(
 	    showmode();
 	    setcursor();
 	    *keylenp = keylen;
-	    return map_result_retry;
+	    반환 map_result_retry;
 	}
 	// Need more chars for partly match.
-	if (mlen == typebuf.tb_len)
+	만약 (mlen == typebuf.tb_len)
 	    keylen = KEYLEN_PART_KEY;
-	else if (max_mlen < mlen)
+	아니면 만약 (max_mlen < mlen)
 	    // no match, may have to check for termcode at next character
 	    max_mlen = mlen + 1;
     }
@@ -3119,11 +3119,11 @@ handle_mapping(
     // May check for a terminal code when there is no mapping or only a partial
     // mapping.  Also check if there is a full mapping with <Esc>, unless timed
     // out, since that is nearly always a partial match with a terminal code.
-    if (in_osc || ((mp == NULL || max_mlen + want_termcode > mp_match_len
+    만약 (in_osc || ((mp == NULL || max_mlen + want_termcode > mp_match_len
 		    || (mp_match_len == 1 && *mp->m_keys == ESC && !*timedout))
 	    && keylen != KEYLEN_PART_MAP))
     {
-	int	save_keylen = keylen;
+	정수	save_keylen = keylen;
 
 	/*
 	 * When no matching mapping found or found a non-matching mapping that
@@ -3134,19 +3134,19 @@ handle_mapping(
 	 * - and not an ESC sequence, not in insert mode or p_ek is on,
 	 * - and when not timed out,
 	 */
-	if (in_osc || no_mapping == 0 || allow_keys != 0)
+	만약 (in_osc || no_mapping == 0 || allow_keys != 0)
 	{
-	    if (in_osc || ((typebuf.tb_maplen == 0
+	    만약 (in_osc || ((typebuf.tb_maplen == 0
 			    || (p_remap && (typebuf.tb_noremap[typebuf.tb_off]
 						& ~RM_SIMPLIFIED) == RM_YES))
 		    && !*timedout))
 		keylen = check_termcode(max_mlen + 1, NULL, 0, NULL);
-	    else
+	    아니면
 		keylen = 0;
 
 	    // If no termcode matched but 'pastetoggle' matched partially
 	    // it's like an incomplete key sequence.
-	    if (keylen == 0 && save_keylen == KEYLEN_PART_KEY && !*timedout)
+	    만약 (keylen == 0 && save_keylen == KEYLEN_PART_KEY && !*timedout)
 		keylen = KEYLEN_PART_KEY;
 
 	    // If no termcode matched, try to include the modifier into the
@@ -3154,70 +3154,70 @@ handle_mapping(
 #ifdef FEAT_TERMINAL
 	    check_no_reduce_keys();  // may update the no_reduce_keys flag
 #endif
-	    if (keylen == 0 && !no_reduce_keys)
+	    만약 (keylen == 0 && !no_reduce_keys)
 	    {
 		keylen = check_simplify_modifier(max_mlen + 1);
-		if (keylen < 0)
+		만약 (keylen < 0)
 		    // ins_typebuf() failed
-		    return map_result_fail;
+		    반환 map_result_fail;
 	    }
 
 	    // When getting a partial match, but the last characters were not
 	    // typed, don't wait for a typed character to complete the
 	    // termcode.  This helps a lot when a ":normal" command ends in an
 	    // ESC.
-	    if (keylen < 0 && typebuf.tb_len == typebuf.tb_maplen)
+	    만약 (keylen < 0 && typebuf.tb_len == typebuf.tb_maplen)
 		keylen = 0;
 	}
-	else
+	아니면
 	    keylen = 0;
-	if (keylen == 0)	// no matching terminal code
+	만약 (keylen == 0)	// no matching terminal code
 	{
 #ifdef AMIGA
 	    // check for window bounds report
-	    if (typebuf.tb_maplen == 0 && (typebuf.tb_buf[
+	    만약 (typebuf.tb_maplen == 0 && (typebuf.tb_buf[
 						typebuf.tb_off] & 0xff) == CSI)
 	    {
 		char_u *s;
 
-		for (s = typebuf.tb_buf + typebuf.tb_off + 1;
+		위해 (s = typebuf.tb_buf + typebuf.tb_off + 1;
 			   s < typebuf.tb_buf + typebuf.tb_off + typebuf.tb_len
 		   && (VIM_ISDIGIT(*s) || *s == ';' || *s == ' ');
 			++s)
 		    ;
-		if (*s == 'r' || *s == '|') // found one
+		만약 (*s == 'r' || *s == '|') // found one
 		{
 		    del_typebuf(
-			  (int)(s + 1 - (typebuf.tb_buf + typebuf.tb_off)), 0);
+			  (정수)(s + 1 - (typebuf.tb_buf + typebuf.tb_off)), 0);
 		    // get size and redraw screen
 		    shell_resized();
 		    *keylenp = keylen;
-		    return map_result_retry;
+		    반환 map_result_retry;
 		}
-		if (*s == NUL)	    // need more characters
+		만약 (*s == NUL)	    // need more characters
 		    keylen = KEYLEN_PART_KEY;
 	    }
-	    if (keylen >= 0)
+	    만약 (keylen >= 0)
 #endif
 		// When there was a matching mapping and no termcode could be
 		// replaced after another one, use that mapping (loop around).
 		// If there was no mapping at all use the character from the
 		// typeahead buffer right here.
-		if (mp == NULL)
+		만약 (mp == NULL)
 		{
 		    *keylenp = keylen;
-		    return map_result_get;    // get character from typeahead
+		    반환 map_result_get;    // get character from typeahead
 		}
 	}
 
-	if (keylen > 0)	    // full matching terminal code
+	만약 (keylen > 0)	    // full matching terminal code
 	{
-#if defined(FEAT_GUI) && defined(FEAT_MENU)
-	    if (typebuf.tb_len >= 2
+#만약 defined(FEAT_GUI) && defined(FEAT_MENU)
+	    만약 (typebuf.tb_len >= 2
 		    && typebuf.tb_buf[typebuf.tb_off] == K_SPECIAL
 			      && typebuf.tb_buf[typebuf.tb_off + 1] == KS_MENU)
 	    {
-		int	idx;
+		정수	idx;
 
 		// Using a menu may cause a break in undo!  It's like using
 		// gotchars(), but without recording or writing to a script
@@ -3225,12 +3225,12 @@ handle_mapping(
 		may_sync_undo();
 		del_typebuf(3, 0);
 		idx = get_menu_index(current_menu, local_State);
-		if (idx != MENU_INDEX_INVALID)
+		만약 (idx != MENU_INDEX_INVALID)
 		{
 		    // In Select mode and a Visual mode menu is used:  Switch
 		    // to Visual mode temporarily.  Append K_SELECT to switch
 		    // back to Select mode.
-		    if (VIsual_active && VIsual_select
+		    만약 (VIsual_active && VIsual_select
 					&& (current_menu->modes & MODE_VISUAL))
 		    {
 			VIsual_select = FALSE;
@@ -3244,38 +3244,38 @@ handle_mapping(
 	    }
 #endif // FEAT_GUI && FEAT_MENU
 	    *keylenp = keylen;
-	    return map_result_retry;	// try mapping again
+	    반환 map_result_retry;	// try mapping again
 	}
 
 	// Partial match: get some more characters.  When a matching mapping
 	// was found use that one.
-	if (mp == NULL || keylen < 0)
+	만약 (mp == NULL || keylen < 0)
 	    keylen = KEYLEN_PART_KEY;
-	else
+	아니면
 	    keylen = mp_match_len;
     }
 
     /*
      * complete match
      */
-    if (keylen >= 0 && keylen <= typebuf.tb_len)
+    만약 (keylen >= 0 && keylen <= typebuf.tb_len)
     {
 	char_u *map_str;
 
 #ifdef FEAT_EVAL
-	int	save_m_expr;
-	int	save_m_noremap;
-	int	save_m_silent;
+	정수	save_m_expr;
+	정수	save_m_noremap;
+	정수	save_m_silent;
 	char_u	*save_m_keys;
 	char_u	*save_alt_m_keys;
-	int	save_alt_m_keylen;
-#else
+	정수	save_alt_m_keylen;
+#아니면
 # define save_m_noremap mp->m_noremap
 # define save_m_silent mp->m_silent
 #endif
 
 	// write chars to script file(s)
-	if (keylen > typebuf.tb_maplen)
+	만약 (keylen > typebuf.tb_maplen)
 	    gotchars(typebuf.tb_buf + typebuf.tb_off + typebuf.tb_maplen,
 						   keylen - typebuf.tb_maplen);
 
@@ -3286,24 +3286,24 @@ handle_mapping(
 	 * Put the replacement string in front of mapstr.
 	 * The depth check catches ":map x y" and ":map y x".
 	 */
-	if (++*mapdepth >= p_mmd)
+	만약 (++*mapdepth >= p_mmd)
 	{
 	    emsg(_(e_recursive_mapping));
-	    if (State & MODE_CMDLINE)
+	    만약 (State & MODE_CMDLINE)
 		redrawcmdline();
-	    else
+	    아니면
 		setcursor();
 	    flush_buffers(FLUSH_MINIMAL);
 	    *mapdepth = 0;	// for next one
 	    *keylenp = keylen;
-	    return map_result_fail;
+	    반환 map_result_fail;
 	}
 
 	/*
 	 * In Select mode and a Visual mode mapping is used: Switch to Visual
 	 * mode temporarily.  Append K_SELECT to switch back to Select mode.
 	 */
-	if (VIsual_active && VIsual_select && (mp->m_mode & MODE_VISUAL))
+	만약 (VIsual_active && VIsual_select && (mp->m_mode & MODE_VISUAL))
 	{
 	    VIsual_select = FALSE;
 	    (void)ins_typebuf(K_SELECT_STRING, REMAP_NONE, 0, TRUE, FALSE);
@@ -3324,13 +3324,13 @@ handle_mapping(
 	 * Handle ":map <expr>": evaluate the {rhs} as an expression.  Also
 	 * save and restore the command line for "normal :".
 	 */
-	if (mp->m_expr)
+	만약 (mp->m_expr)
 	{
-	    int save_vgetc_busy = vgetc_busy;
-	    int save_may_garbage_collect = may_garbage_collect;
-	    int was_screen_col = screen_cur_col;
-	    int was_screen_row = screen_cur_row;
-	    int prev_did_emsg = did_emsg;
+	    정수 save_vgetc_busy = vgetc_busy;
+	    정수 save_may_garbage_collect = may_garbage_collect;
+	    정수 was_screen_col = screen_cur_col;
+	    정수 was_screen_row = screen_cur_row;
+	    정수 prev_did_emsg = did_emsg;
 
 	    vgetc_busy = 0;
 	    may_garbage_collect = FALSE;
@@ -3348,7 +3348,7 @@ handle_mapping(
 
 	    // If an error was displayed and the expression returns an empty
 	    // string, generate a <Nop> to allow for a redraw.
-	    if (prev_did_emsg != did_emsg
+	    만약 (prev_did_emsg != did_emsg
 				       && (map_str == NULL || *map_str == NUL))
 	    {
 		char_u	buf[4];
@@ -3359,11 +3359,11 @@ handle_mapping(
 		buf[2] = KE_IGNORE;
 		buf[3] = NUL;
 		map_str = vim_strnsave(buf, 3);
-		if (State & MODE_CMDLINE)
+		만약 (State & MODE_CMDLINE)
 		{
 		    // redraw the command below the error
 		    msg_didout = TRUE;
-		    if (msg_row < cmdline_row)
+		    만약 (msg_row < cmdline_row)
 			msg_row = cmdline_row;
 		    redrawcmd();
 		}
@@ -3372,7 +3372,7 @@ handle_mapping(
 	    vgetc_busy = save_vgetc_busy;
 	    may_garbage_collect = save_may_garbage_collect;
 	}
-	else
+	아니면
 #endif
 	    map_str = mp->m_str;
 
@@ -3382,19 +3382,19 @@ handle_mapping(
 	 * remap the first character (but do allow abbreviations).
 	 * If m_noremap is set, don't remap the whole 'to' part.
 	 */
-	if (map_str == NULL)
+	만약 (map_str == NULL)
 	    i = FAIL;
-	else
+	아니면
 	{
-	    int noremap;
+	    정수 noremap;
 
 #ifdef FEAT_EVAL
 	    last_used_map = mp;
 	    last_used_sid = -1;
 #endif
-	    if (save_m_noremap != REMAP_YES)
+	    만약 (save_m_noremap != REMAP_YES)
 		noremap = save_m_noremap;
-	    else if (
+	    아니면 만약 (
 #ifdef FEAT_EVAL
 		save_m_expr ?
 		(save_m_keys != NULL
@@ -3408,12 +3408,12 @@ handle_mapping(
 			&& STRNCMP(map_str, mp->m_alt->m_keys,
 					    (size_t)mp->m_alt->m_keylen) == 0))
 		noremap = REMAP_SKIP;
-	    else
+	    아니면
 		noremap = REMAP_YES;
 	    i = ins_typebuf(map_str, noremap,
 					 0, TRUE, cmd_silent || save_m_silent);
 #ifdef FEAT_EVAL
-	    if (save_m_expr)
+	    만약 (save_m_expr)
 		vim_free(map_str);
 #endif
 	}
@@ -3422,13 +3422,13 @@ handle_mapping(
 	vim_free(save_alt_m_keys);
 #endif
 	*keylenp = keylen;
-	if (i == FAIL)
-	    return map_result_fail;
-	return map_result_retry;
+	만약 (i == FAIL)
+	    반환 map_result_fail;
+	반환 map_result_retry;
     }
 
     *keylenp = keylen;
-    return map_result_nomatch;
+    반환 map_result_nomatch;
 }
 
 /*
@@ -3437,7 +3437,7 @@ handle_mapping(
  * Otherwise vgetc() will only get it when the stuff buffer is empty.
  */
     void
-vungetc(int c)
+vungetc(정수 c)
 {
     old_char = c;
     old_mod_mask = mod_mask;
@@ -3451,17 +3451,17 @@ vungetc(int c)
  * yet, so set a flag to clear it later.
  */
     static void
-check_end_reg_executing(int advance)
+check_end_reg_executing(정수 advance)
 {
-    if (reg_executing != 0 && (typebuf.tb_maplen == 0
+    만약 (reg_executing != 0 && (typebuf.tb_maplen == 0
 						|| pending_end_reg_executing))
     {
-	if (advance)
+	만약 (advance)
 	{
 	    reg_executing = 0;
 	    pending_end_reg_executing = FALSE;
 	}
-	else
+	아니면
 	    pending_end_reg_executing = TRUE;
     }
 
@@ -3491,22 +3491,22 @@ check_end_reg_executing(int advance)
  * Only returns one byte (of a multi-byte character).
  * K_SPECIAL and CSI may be escaped, need to get two more bytes then.
  */
-    static int
-vgetorpeek(int advance)
+    static 정수
+vgetorpeek(정수 advance)
 {
-    int		c;
-    int		timedout = FALSE;	// waited for more than 'timeoutlen'
+    정수		c;
+    정수		timedout = FALSE;	// waited for more than 'timeoutlen'
 					// for mapping to complete or
 					// 'ttimeoutlen' for complete key code
-    int		mapdepth = 0;		// check for recursive mapping
-    int		mode_deleted = FALSE;   // set when mode has been deleted
-    int		new_wcol, new_wrow;
+    정수		mapdepth = 0;		// check for recursive mapping
+    정수		mode_deleted = FALSE;   // set when mode has been deleted
+    정수		new_wcol, new_wrow;
 #ifdef FEAT_GUI
-    int		shape_changed = FALSE;  // adjusted cursor shape
+    정수		shape_changed = FALSE;  // adjusted cursor shape
 #endif
-    int		n;
-    int		old_wcol, old_wrow;
-    int		wait_tb_len;
+    정수		n;
+    정수		old_wcol, old_wrow;
+    정수		wait_tb_len;
 
     /*
      * This function doesn't work very well when called recursively.  This may
@@ -3519,12 +3519,12 @@ vgetorpeek(int advance)
      * Using ":normal" can also do this, but it saves the typeahead buffer,
      * thus it should be OK.  But don't get a key from the user then.
      */
-    if (vgetc_busy > 0 && ex_normal_busy == 0)
-	return NUL;
+    만약 (vgetc_busy > 0 && ex_normal_busy == 0)
+	반환 NUL;
 
     ++vgetc_busy;
 
-    if (advance)
+    만약 (advance)
     {
 	KeyStuffed = FALSE;
 	typebuf_was_empty = FALSE;
@@ -3538,27 +3538,27 @@ vgetorpeek(int advance)
 /*
  * get a character: 1. from the stuffbuffer
  */
-	if (typeahead_char != 0)
+	만약 (typeahead_char != 0)
 	{
 	    c = typeahead_char;
-	    if (advance)
+	    만약 (advance)
 		typeahead_char = 0;
 	}
-	else
+	아니면
 	    c = read_readbuffers(advance);
-	if (c != NUL && !got_int)
+	만약 (c != NUL && !got_int)
 	{
-	    if (advance)
+	    만약 (advance)
 	    {
 		// KeyTyped = FALSE;  When the command that stuffed something
 		// was typed, behave like the stuffed command was typed.
 		// needed for CTRL-W CTRL-] to open a fold, for example.
 		KeyStuffed = TRUE;
 	    }
-	    if (typebuf.tb_no_abbr_cnt == 0)
+	    만약 (typebuf.tb_no_abbr_cnt == 0)
 		typebuf.tb_no_abbr_cnt = 1;	// no abbreviations now
 	}
-	else
+	아니면
 	{
 	    /*
 	     * Loop until we either find a matching mapped key, or we
@@ -3566,22 +3566,22 @@ vgetorpeek(int advance)
 	     * If a mapped key sequence is found we go back to the start to
 	     * try re-mapping.
 	     */
-	    for (;;)
+	    위해 (;;)
 	    {
 		long	wait_time;
-		int	keylen = 0;
-		int	showcmd_idx;
+		정수	keylen = 0;
+		정수	showcmd_idx;
 		check_end_reg_executing(advance);
 		/*
 		 * ui_breakcheck() is slow, don't use it too often when
 		 * inside a mapping.  But call it each time for typed
 		 * characters.
 		 */
-		if (typebuf.tb_maplen)
+		만약 (typebuf.tb_maplen)
 		    line_breakcheck();
-		else
+		아니면
 		    ui_breakcheck();		// check for CTRL-C
-		if (got_int)
+		만약 (got_int)
 		{
 		    // flush all input
 		    c = inchar(typebuf.tb_buf, typebuf.tb_buflen - 1, 0L);
@@ -3593,14 +3593,14 @@ vgetorpeek(int advance)
 		     * As a result typing CTRL-C in insert mode will
 		     * really insert a CTRL-C.
 		     */
-		    if ((c || typebuf.tb_maplen)
+		    만약 ((c || typebuf.tb_maplen)
 				     && (State & (MODE_INSERT | MODE_CMDLINE)))
 			c = ESC;
-		    else
+		    아니면
 			c = Ctrl_C;
 		    flush_buffers(FLUSH_INPUT);	// flush all typeahead
 
-		    if (advance)
+		    만약 (advance)
 		    {
 			// Also record this character, it might be needed to
 			// get out of Insert mode.
@@ -3611,7 +3611,7 @@ vgetorpeek(int advance)
 
 		    break;
 		}
-		else if (typebuf.tb_len > 0)
+		아니면 만약 (typebuf.tb_len > 0)
 		{
 		    /*
 		     * Check for a mapping in "typebuf".
@@ -3619,27 +3619,27 @@ vgetorpeek(int advance)
 		    map_result_T result = handle_mapping(
 						&keylen, &timedout, &mapdepth);
 
-		    if (result == map_result_retry)
+		    만약 (result == map_result_retry)
 			// try mapping again
 			continue;
-		    if (result == map_result_fail)
+		    만약 (result == map_result_fail)
 		    {
 			// failed, use the outer loop
 			c = -1;
 			break;
 		    }
-		    if (result == map_result_get)
+		    만약 (result == map_result_get)
 		    {
 /*
  * get a character: 2. from the typeahead buffer
  */
 			c = typebuf.tb_buf[typebuf.tb_off];
-			if (advance)	// remove chars from typebuf
+			만약 (advance)	// remove chars from typebuf
 			{
 			    cmd_silent = (typebuf.tb_silent > 0);
-			    if (typebuf.tb_maplen > 0)
+			    만약 (typebuf.tb_maplen > 0)
 				KeyTyped = FALSE;
-			    else
+			    아니면
 			    {
 				KeyTyped = TRUE;
 				// write char to script file(s)
@@ -3672,7 +3672,7 @@ vgetorpeek(int advance)
 		c = 0;
 		new_wcol = curwin->w_wcol;
 		new_wrow = curwin->w_wrow;
-		if (	   advance
+		만약 (	   advance
 			&& typebuf.tb_len == 1
 			&& typebuf.tb_buf[typebuf.tb_off] == ESC
 			&& !no_mapping
@@ -3688,16 +3688,16 @@ vgetorpeek(int advance)
 		    colnr_T	col = 0;
 		    char_u	*ptr;
 
-		    if (mode_displayed)
+		    만약 (mode_displayed)
 		    {
 			unshowmode(TRUE);
 			mode_deleted = TRUE;
 		    }
 #ifdef FEAT_GUI
 		    // may show a different cursor shape
-		    if (gui.in_use && State != MODE_NORMAL && !cmd_silent)
+		    만약 (gui.in_use && State != MODE_NORMAL && !cmd_silent)
 		    {
-			int	    save_State;
+			정수	    save_State;
 
 			save_State = State;
 			State = MODE_NORMAL;
@@ -3711,15 +3711,15 @@ vgetorpeek(int advance)
 		    old_wrow = curwin->w_wrow;
 
 		    // move cursor left, if possible
-		    if (curwin->w_cursor.col != 0)
+		    만약 (curwin->w_cursor.col != 0)
 		    {
-			if (curwin->w_wcol > 0)
+			만약 (curwin->w_wcol > 0)
 			{
 			    // After auto-indenting and no text is following,
 			    // we are expecting to truncate the trailing
 			    // white-space, so find the last non-white
 			    // character -- webb
-			    if (did_ai && *skipwhite(ml_get_curline()
+			    만약 (did_ai && *skipwhite(ml_get_curline()
 						+ curwin->w_cursor.col) == NUL)
 			    {
 				chartabsize_T cts;
@@ -3728,15 +3728,15 @@ vgetorpeek(int advance)
 				ptr = ml_get_curline();
 				init_chartabsize_arg(&cts, curwin,
 					  curwin->w_cursor.lnum, 0, ptr, ptr);
-				while (cts.cts_ptr < ptr + curwin->w_cursor.col)
+				동안 (cts.cts_ptr < ptr + curwin->w_cursor.col)
 				{
-				    if (!VIM_ISWHITE(*cts.cts_ptr))
+				    만약 (!VIM_ISWHITE(*cts.cts_ptr))
 					curwin->w_wcol = cts.cts_vcol;
 				    cts.cts_vcol += lbr_chartabsize(&cts);
-				    if (has_mbyte)
+				    만약 (has_mbyte)
 					cts.cts_ptr +=
 						   (*mb_ptr2len)(cts.cts_ptr);
-				    else
+				    아니면
 					++cts.cts_ptr;
 				}
 				clear_chartabsize_arg(&cts);
@@ -3747,25 +3747,25 @@ vgetorpeek(int advance)
 				curwin->w_wcol += curwin_col_off();
 				col = 0;	// no correction needed
 			    }
-			    else
+			    아니면
 			    {
 				--curwin->w_wcol;
 				col = curwin->w_cursor.col - 1;
 			    }
 			}
-			else if (curwin->w_p_wrap && curwin->w_wrow)
+			아니면 만약 (curwin->w_p_wrap && curwin->w_wrow)
 			{
 			    --curwin->w_wrow;
 			    curwin->w_wcol = curwin->w_width - 1;
 			    col = curwin->w_cursor.col - 1;
 			}
-			if (has_mbyte && col > 0 && curwin->w_wcol > 0)
+			만약 (has_mbyte && col > 0 && curwin->w_wcol > 0)
 			{
 			    // Correct when the cursor is on the right halve
 			    // of a double-wide character.
 			    ptr = ml_get_curline();
 			    col -= (*mb_head_off)(ptr, ptr + col);
-			    if ((*mb_ptr2cells)(ptr + col) > 1)
+			    만약 ((*mb_ptr2cells)(ptr + col) > 1)
 				--curwin->w_wcol;
 			}
 		    }
@@ -3776,30 +3776,30 @@ vgetorpeek(int advance)
 		    curwin->w_wcol = old_wcol;
 		    curwin->w_wrow = old_wrow;
 		}
-		if (c < 0)
+		만약 (c < 0)
 		    continue;	// end of input script reached
 
 		// Allow mapping for just typed characters. When we get here c
 		// is the number of extra bytes and typebuf.tb_len is 1.
-		for (n = 1; n <= c; ++n)
+		위해 (n = 1; n <= c; ++n)
 		    typebuf.tb_noremap[typebuf.tb_off + n] = RM_YES;
 		typebuf.tb_len += c;
 
 		// buffer full, don't map
-		if (typebuf.tb_len >= typebuf.tb_maplen + MAXMAPLEN)
+		만약 (typebuf.tb_len >= typebuf.tb_maplen + MAXMAPLEN)
 		{
 		    timedout = TRUE;
 		    continue;
 		}
 
-		if (ex_normal_busy > 0)
+		만약 (ex_normal_busy > 0)
 		{
-		    static int tc = 0;
+		    static 정수 tc = 0;
 
 		    // No typeahead left and inside ":normal".  Must return
 		    // something to avoid getting stuck.  When an incomplete
 		    // mapping is present, behave like it timed out.
-		    if (typebuf.tb_len > 0)
+		    만약 (typebuf.tb_len > 0)
 		    {
 			timedout = TRUE;
 			continue;
@@ -3811,24 +3811,24 @@ vgetorpeek(int advance)
 		    // For the cmdline window: Alternate between ESC and
 		    // CTRL-C: ESC for most situations and CTRL-C to close the
 		    // cmdline window.
-		    if (p_im && (State & MODE_INSERT))
+		    만약 (p_im && (State & MODE_INSERT))
 			c = Ctrl_L;
 #ifdef FEAT_TERMINAL
-		    else if (terminal_is_active())
+		    아니면 만약 (terminal_is_active())
 			c = K_CANCEL;
 #endif
-		    else if ((State & MODE_CMDLINE)
+		    아니면 만약 ((State & MODE_CMDLINE)
 					     || (cmdwin_type > 0 && tc == ESC))
 			c = Ctrl_C;
-		    else
+		    아니면
 			c = ESC;
 		    tc = c;
 		    // set a flag to indicate this wasn't a normal char
-		    if (advance)
+		    만약 (advance)
 			typebuf_was_empty = TRUE;
 
 		    // return from main_loop()
-		    if (pending_exmode_active)
+		    만약 (pending_exmode_active)
 			exmode_active = EXMODE_NORMAL;
 
 		    // no chars to block abbreviation for
@@ -3847,7 +3847,7 @@ vgetorpeek(int advance)
 		// changed text so far. Also for when 'lazyredraw' is set and
 		// redrawing was postponed because there was something in the
 		// input buffer (e.g., termresponse).
-		if (((State & MODE_INSERT) != 0 || p_lz)
+		만약 (((State & MODE_INSERT) != 0 || p_lz)
 			&& (State & MODE_CMDLINE) == 0
 			&& advance && must_redraw != 0 && !need_wait_return)
 		{
@@ -3861,15 +3861,15 @@ vgetorpeek(int advance)
 		 * to the user with showcmd.
 		 */
 		showcmd_idx = 0;
-		int showing_partial = FALSE;
-		if (typebuf.tb_len > 0 && advance && !exmode_active)
+		정수 showing_partial = FALSE;
+		만약 (typebuf.tb_len > 0 && advance && !exmode_active)
 		{
-		    if (((State & (MODE_NORMAL | MODE_INSERT))
+		    만약 (((State & (MODE_NORMAL | MODE_INSERT))
 						      || State == MODE_LANGMAP)
 			    && State != MODE_HITRETURN)
 		    {
 			// this looks nice when typing a dead character map
-			if (State & MODE_INSERT
+			만약 (State & MODE_INSERT
 			    && ptr2cells(typebuf.tb_buf + typebuf.tb_off
 						   + typebuf.tb_len - 1) == 1)
 			{
@@ -3884,9 +3884,9 @@ vgetorpeek(int advance)
 			curwin->w_wcol = new_wcol;
 			curwin->w_wrow = new_wrow;
 			push_showcmd();
-			if (typebuf.tb_len > SHOWCMD_COLS)
+			만약 (typebuf.tb_len > SHOWCMD_COLS)
 			    showcmd_idx = typebuf.tb_len - SHOWCMD_COLS;
-			while (showcmd_idx < typebuf.tb_len)
+			동안 (showcmd_idx < typebuf.tb_len)
 			    add_byte_to_showcmd(
 			       typebuf.tb_buf[typebuf.tb_off + showcmd_idx++]);
 			curwin->w_wcol = old_wcol;
@@ -3895,9 +3895,9 @@ vgetorpeek(int advance)
 
 		    // This looks nice when typing a dead character map.
 		    // There is no actual command line for get_number().
-		    if ((State & MODE_CMDLINE)
+		    만약 ((State & MODE_CMDLINE)
 			    && get_cmdline_info()->cmdbuff != NULL
-#if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+#만약 defined(FEAT_CRYPT) || defined(FEAT_EVAL)
 			    && cmdline_star == 0
 #endif
 			    && ptr2cells(typebuf.tb_buf + typebuf.tb_off
@@ -3912,24 +3912,24 @@ vgetorpeek(int advance)
 /*
  * get a character: 3. from the user - get it
  */
-		if (typebuf.tb_len == 0)
+		만약 (typebuf.tb_len == 0)
 		    // timedout may have been set if a mapping with empty RHS
 		    // fully matched while longer mappings timed out.
 		    timedout = FALSE;
 
-		if (advance)
+		만약 (advance)
 		{
-		    if (typebuf.tb_len == 0
+		    만약 (typebuf.tb_len == 0
 			    || !(p_timeout
 				 || (p_ttimeout && keylen == KEYLEN_PART_KEY)))
 			// blocking wait
 			wait_time = -1L;
-		    else if (keylen == KEYLEN_PART_KEY && p_ttm >= 0)
+		    아니면 만약 (keylen == KEYLEN_PART_KEY && p_ttm >= 0)
 			wait_time = p_ttm;
-		    else
+		    아니면
 			wait_time = p_tm;
 		}
-		else
+		아니면
 		    wait_time = 0;
 
 		wait_tb_len = typebuf.tb_len;
@@ -3937,34 +3937,34 @@ vgetorpeek(int advance)
 			typebuf.tb_buflen - typebuf.tb_off - typebuf.tb_len - 1,
 			wait_time);
 
-		if (showcmd_idx != 0)
+		만약 (showcmd_idx != 0)
 		    pop_showcmd();
-		if (showing_partial)
+		만약 (showing_partial)
 		{
-		    if (State & MODE_INSERT)
+		    만약 (State & MODE_INSERT)
 			edit_unputchar();
-		    if ((State & MODE_CMDLINE)
+		    만약 ((State & MODE_CMDLINE)
 					&& get_cmdline_info()->cmdbuff != NULL)
 			unputcmdline();
-		    else
+		    아니면
 			setcursor();	// put cursor back where it belongs
 		}
 
-		if (c < 0)
+		만약 (c < 0)
 		    continue;		// end of input script reached
-		if (c == NUL)		// no character available
+		만약 (c == NUL)		// no character available
 		{
-		    if (!advance)
+		    만약 (!advance)
 			break;
-		    if (wait_tb_len > 0)	// timed out
+		    만약 (wait_tb_len > 0)	// timed out
 		    {
 			timedout = TRUE;
 			continue;
 		    }
 		}
-		else
+		아니면
 		{	    // allow mapping for just typed characters
-		    while (typebuf.tb_buf[typebuf.tb_off
+		    동안 (typebuf.tb_buf[typebuf.tb_off
 						     + typebuf.tb_len] != NUL)
 			typebuf.tb_noremap[typebuf.tb_off
 						 + typebuf.tb_len++] = RM_YES;
@@ -3978,36 +3978,36 @@ vgetorpeek(int advance)
 	}	// if (!character from stuffbuf)
 
 	// if advance is FALSE don't loop on NULs
-    } while ((c < 0 && c != K_CANCEL) || (advance && c == NUL));
+    } 동안 ((c < 0 && c != K_CANCEL) || (advance && c == NUL));
 
     /*
      * The "INSERT" message is taken care of here:
      *	 if we return an ESC to exit insert mode, the message is deleted
      *	 if we don't return an ESC but deleted the message before, redisplay it
      */
-    if (advance && p_smd && msg_silent == 0 && (State & MODE_INSERT))
+    만약 (advance && p_smd && msg_silent == 0 && (State & MODE_INSERT))
     {
-	if (c == ESC && !mode_deleted && !no_mapping && mode_displayed)
+	만약 (c == ESC && !mode_deleted && !no_mapping && mode_displayed)
 	{
-	    if (typebuf.tb_len && !KeyTyped)
+	    만약 (typebuf.tb_len && !KeyTyped)
 		redraw_cmdline = TRUE;	    // delete mode later
-	    else
+	    아니면
 		unshowmode(FALSE);
 	}
-	else if (c != ESC && mode_deleted)
+	아니면 만약 (c != ESC && mode_deleted)
 	{
-	    if (typebuf.tb_len && !KeyTyped)
+	    만약 (typebuf.tb_len && !KeyTyped)
 		redraw_cmdline = TRUE;	    // show mode later
-	    else
+	    아니면
 		showmode();
 	}
     }
 #ifdef FEAT_GUI
     // may unshow different cursor shape
-    if (gui.in_use && shape_changed)
+    만약 (gui.in_use && shape_changed)
 	gui_update_cursor(TRUE, FALSE);
 #endif
-    if (timedout && c == ESC)
+    만약 (timedout && c == ESC)
     {
 	// When recording there will be no timeout.  Add an <Ignore> after the
 	// ESC to avoid that it forms a key code with following characters.
@@ -4016,7 +4016,7 @@ vgetorpeek(int advance)
 
     --vgetc_busy;
 
-    return c;
+    반환 c;
 }
 
 /*
@@ -4042,23 +4042,23 @@ vgetorpeek(int advance)
  *  Return the number of obtained characters.
  *  Return -1 when end of input script reached.
  */
-    static int
+    static 정수
 inchar(
     char_u	*buf,
-    int		maxlen,
+    정수		maxlen,
     long	wait_time)	    // milliseconds
 {
-    int		len = 0;	    // init for GCC
-    int		retesc = FALSE;	    // return ESC with gotint
-    int		script_char;
-    int		tb_change_cnt = typebuf.tb_change_cnt;
+    정수		len = 0;	    // init for GCC
+    정수		retesc = FALSE;	    // return ESC with gotint
+    정수		script_char;
+    정수		tb_change_cnt = typebuf.tb_change_cnt;
 
-    if (wait_time == -1L || wait_time > 100L)  // flush output before waiting
+    만약 (wait_time == -1L || wait_time > 100L)  // flush output before waiting
     {
 	cursor_on();
 	out_flush_cursor(FALSE, FALSE);
-#if defined(FEAT_GUI) && defined(FEAT_MOUSESHAPE)
-	if (gui.in_use && postponed_mouseshape)
+#만약 defined(FEAT_GUI) && defined(FEAT_MOUSESHAPE)
+	만약 (gui.in_use && postponed_mouseshape)
 	    update_mouseshape(-1);
 #endif
     }
@@ -4068,7 +4068,7 @@ inchar(
      * recursive loop may result (write error in swapfile, hit-return, timeout
      * on char wait, flush swapfile, write error....).
      */
-    if (State != MODE_HITRETURN)
+    만약 (State != MODE_HITRETURN)
     {
 	did_outofmem_msg = FALSE;   // display out of memory message (again)
 	did_swapwrite_msg = FALSE;  // display swap file write error again
@@ -4080,7 +4080,7 @@ inchar(
      * If interrupted: Stop reading script files, close them all.
      */
     script_char = -1;
-    while (scriptin[curscript] != NULL && script_char < 0
+    동안 (scriptin[curscript] != NULL && script_char < 0
 #ifdef FEAT_EVAL
 	    && !ignore_script
 #endif
@@ -4090,7 +4090,7 @@ inchar(
 	parse_queued_messages();
 #endif
 
-	if (got_int || (script_char = getc(scriptin[curscript])) < 0)
+	만약 (got_int || (script_char = getc(scriptin[curscript])) < 0)
 	{
 	    // Reached EOF.
 	    // Careful: closescript() frees typebuf.tb_buf[] and buf[] may
@@ -4101,19 +4101,19 @@ inchar(
 	     * back to normal mode.
 	     * Otherwise return -1, because typebuf.tb_buf[] has changed.
 	     */
-	    if (got_int)
+	    만약 (got_int)
 		retesc = TRUE;
-	    else
-		return -1;
+	    아니면
+		반환 -1;
 	}
-	else
+	아니면
 	{
 	    buf[0] = script_char;
 	    len = 1;
 	}
     }
 
-    if (script_char < 0)	// did not get a character from script
+    만약 (script_char < 0)	// did not get a character from script
     {
 	/*
 	 * If we got an interrupt, skip all previously typed characters and
@@ -4123,25 +4123,25 @@ inchar(
 	 * Don't use buf[] here, closescript() may have freed typebuf.tb_buf[]
 	 * and buf may be pointing inside typebuf.tb_buf[].
 	 */
-	if (got_int)
+	만약 (got_int)
 	{
 #define DUM_LEN (MAXMAPLEN * 3 + 3)
 	    char_u	dum[DUM_LEN + 1];
 
-	    for (;;)
+	    위해 (;;)
 	    {
 		len = ui_inchar(dum, DUM_LEN, 0L, 0);
-		if (len == 0 || (len == 1 && dum[0] == Ctrl_C))
+		만약 (len == 0 || (len == 1 && dum[0] == Ctrl_C))
 		    break;
 	    }
-	    return retesc;
+	    반환 retesc;
 	}
 
 	/*
 	 * Always flush the output characters when getting input characters
 	 * from the user and not just peeking.
 	 */
-	if (wait_time == -1L || wait_time > 10L)
+	만약 (wait_time == -1L || wait_time > 10L)
 	    out_flush();
 
 	/*
@@ -4153,16 +4153,16 @@ inchar(
 
     // If the typebuf was changed further down, it is like nothing was added by
     // this call.
-    if (typebuf_changed(tb_change_cnt))
-	return 0;
+    만약 (typebuf_changed(tb_change_cnt))
+	반환 0;
 
     // Note the change in the typeahead buffer, this matters for when
     // vgetorpeek() is called recursively, e.g. using getchar(1) in a timer
     // function.
-    if (len > 0 && ++typebuf.tb_change_cnt == 0)
+    만약 (len > 0 && ++typebuf.tb_change_cnt == 0)
 	typebuf.tb_change_cnt = 1;
 
-    return fix_input_buffer(buf, len);
+    반환 fix_input_buffer(buf, len);
 }
 
 /*
@@ -4170,10 +4170,10 @@ inchar(
  * "buf[]" must have room to triple the number of bytes!
  * Returns the new length.
  */
-    int
-fix_input_buffer(char_u *buf, int len)
+    정수
+fix_input_buffer(char_u *buf, 정수 len)
 {
-    int		i;
+    정수		i;
     char_u	*p = buf;
 
     /*
@@ -4183,12 +4183,12 @@ fix_input_buffer(char_u *buf, int len)
      * Replace K_SPECIAL by K_SPECIAL KS_SPECIAL KE_FILLER
      * Replace       CSI by K_SPECIAL KS_EXTRA   KE_CSI
      */
-    for (i = len; --i >= 0; ++p)
+    위해 (i = len; --i >= 0; ++p)
     {
 #ifdef FEAT_GUI
 	// When the GUI is used any character can come after a CSI, don't
 	// escape it.
-	if (gui.in_use && p[0] == CSI && i >= 2)
+	만약 (gui.in_use && p[0] == CSI && i >= 2)
 	{
 	    p += 2;
 	    i -= 2;
@@ -4196,24 +4196,24 @@ fix_input_buffer(char_u *buf, int len)
 # ifndef MSWIN
 	// When not on MS-Windows and the GUI is not used CSI needs to be
 	// escaped.
-	else if (!gui.in_use && p[0] == CSI)
+	아니면 만약 (!gui.in_use && p[0] == CSI)
 	{
 	    mch_memmove(p + 3, p + 1, (size_t)i);
 	    *p++ = K_SPECIAL;
 	    *p++ = KS_EXTRA;
-	    *p = (int)KE_CSI;
+	    *p = (정수)KE_CSI;
 	    len += 2;
 	}
 # endif
-	else
+	아니면
 #endif
-	if (p[0] == NUL || (p[0] == K_SPECIAL
+	만약 (p[0] == NUL || (p[0] == K_SPECIAL
 		    // timeout may generate K_CURSORHOLD,
 		    // 'autocompletedelay' timeout K_COMPLETE_DELAY
 		    && (i < 2 || p[1] != KS_EXTRA
-			|| (p[2] != (int)KE_CURSORHOLD
-			    && p[2] != (int)KE_COMPLETE_DELAY))
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+			|| (p[2] != (정수)KE_CURSORHOLD
+			    && p[2] != (정수)KE_COMPLETE_DELAY))
+#만약 defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
 		    // Win32 console passes modifiers
 		    && (
 # ifdef VIMDLL
@@ -4232,21 +4232,21 @@ fix_input_buffer(char_u *buf, int len)
 	}
     }
     *p = NUL;		// add trailing NUL
-    return len;
+    반환 len;
 }
 
-#if defined(USE_INPUT_BUF)
+#만약 defined(USE_INPUT_BUF)
 /*
  * Return TRUE when bytes are in the input buffer or in the typeahead buffer.
  * Normally the input buffer would be sufficient, but the server_to_input_buf()
  * or feedkeys() may insert characters in the typeahead buffer while we are
  * waiting for input to arrive.
  */
-    int
+    정수
 input_available(void)
 {
-    return (!vim_is_input_buf_empty()
-# if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+    반환 (!vim_is_input_buf_empty()
+# 만약 defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
 	    || typebuf_was_filled
 # endif
 	    );
@@ -4259,16 +4259,16 @@ input_available(void)
  */
     static char_u *
 getcmdkeycmd(
-	int		promptc UNUSED,
+	정수		promptc UNUSED,
 	void		*cookie UNUSED,
-	int		indent UNUSED,
+	정수		indent UNUSED,
 	getline_opt_T	do_concat UNUSED)
 {
     garray_T	line_ga;
-    int		c1 = -1;
-    int		c2;
-    int		cmod = 0;
-    int		aborted = FALSE;
+    정수		c1 = -1;
+    정수		c2;
+    정수		cmod = 0;
+    정수		aborted = FALSE;
 
     ga_init2(&line_ga, 1, 32);
 
@@ -4276,15 +4276,15 @@ getcmdkeycmd(
     no_mapping++;
 
     got_int = FALSE;
-    while (c1 != NUL && !aborted)
+    동안 (c1 != NUL && !aborted)
     {
-	if (ga_grow(&line_ga, 32) == FAIL)
+	만약 (ga_grow(&line_ga, 32) == FAIL)
 	{
 	    aborted = TRUE;
 	    break;
 	}
 
-	if (vgetorpeek(FALSE) == NUL)
+	만약 (vgetorpeek(FALSE) == NUL)
 	{
 	    // incomplete <Cmd> is an error, because there is not much the user
 	    // could do in this state.
@@ -4297,11 +4297,11 @@ getcmdkeycmd(
 	c1 = vgetorpeek(TRUE);
 
 	// Get two extra bytes for special keys
-	if (c1 == K_SPECIAL)
+	만약 (c1 == K_SPECIAL)
 	{
 	    c1 = vgetorpeek(TRUE);
 	    c2 = vgetorpeek(TRUE);
-	    if (c1 == KS_MODIFIER)
+	    만약 (c1 == KS_MODIFIER)
 	    {
 		cmod = c2;
 		continue;
@@ -4311,48 +4311,48 @@ getcmdkeycmd(
 	    // K_ESC is used to avoid ambiguity with the single Esc character
 	    // that might be the start of an escape sequence.  Convert it back
 	    // to a single Esc here.
-	    if (c1 == K_ESC)
+	    만약 (c1 == K_ESC)
 		c1 = ESC;
 
 #ifdef FEAT_GUI
 	    // Translate K_CSI to CSI.  The special key is only used to
 	    // avoid it being recognized as the start of a special key.
-	    if (c1 == K_CSI)
+	    만약 (c1 == K_CSI)
 		c1 = CSI;
 #endif
 	}
 
-	if (got_int)
+	만약 (got_int)
 	    aborted = TRUE;
-	else if (c1 == '\r' || c1 == '\n')
+	아니면 만약 (c1 == '\r' || c1 == '\n')
 	    c1 = NUL;  // end the line
-	else if (c1 == ESC)
+	아니면 만약 (c1 == ESC)
 	    aborted = TRUE;
-	else if (c1 == K_COMMAND || c1 == K_SCRIPT_COMMAND)
+	아니면 만약 (c1 == K_COMMAND || c1 == K_SCRIPT_COMMAND)
 	{
 	    // give a nicer error message for this special case
 	    emsg(_(e_cmd_mapping_must_end_with_cr_before_second_cmd));
 	    aborted = TRUE;
 	}
-	else if (c1 == K_SNR)
+	아니면 만약 (c1 == K_SNR)
 	{
 	    GA_CONCAT_LITERAL(&line_ga, "<SNR>");
 	}
-	else
+	아니면
 	{
-	    if (cmod != 0)
+	    만약 (cmod != 0)
 	    {
 		ga_append(&line_ga, K_SPECIAL);
 		ga_append(&line_ga, KS_MODIFIER);
 		ga_append(&line_ga, cmod);
 	    }
-	    if (IS_SPECIAL(c1))
+	    만약 (IS_SPECIAL(c1))
 	    {
 		ga_append(&line_ga, K_SPECIAL);
 		ga_append(&line_ga, K_SECOND(c1));
 		ga_append(&line_ga, K_THIRD(c1));
 	    }
-	    else
+	    아니면
 		ga_append(&line_ga, c1);
 	}
 
@@ -4361,13 +4361,13 @@ getcmdkeycmd(
 
     no_mapping--;
 
-    if (aborted)
+    만약 (aborted)
 	ga_clear(&line_ga);
 
-    return (char_u *)line_ga.ga_data;
+    반환 (char_u *)line_ga.ga_data;
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * If there was a mapping we get its SID.  Otherwise, use "last_used_sid", it
  * is set when redo'ing.
@@ -4378,16 +4378,16 @@ getcmdkeycmd(
 may_add_last_used_map_to_redobuff(void)
 {
     char_u  buf[3 + 20];
-    int	    buflen;
-    int	    sid = -1;
+    정수	    buflen;
+    정수	    sid = -1;
 
-    if (last_used_map != NULL)
+    만약 (last_used_map != NULL)
 	sid = last_used_map->m_script_ctx.sc_sid;
-    if (sid < 0)
+    만약 (sid < 0)
 	sid = last_used_sid;
 
-    if (sid < 0)
-	return;
+    만약 (sid < 0)
+	반환;
 
     // <K_SID>{nr};
     buf[0] = K_SPECIAL;
@@ -4400,20 +4400,20 @@ may_add_last_used_map_to_redobuff(void)
 }
 #endif
 
-    int
-do_cmdkey_command(int key UNUSED, int flags)
+    정수
+do_cmdkey_command(정수 key UNUSED, 정수 flags)
 {
-    int	    res;
+    정수	    res;
 #ifdef FEAT_EVAL
     sctx_T  save_current_sctx = {-1, 0, 0, 0};
 
-    if (key == K_SCRIPT_COMMAND
+    만약 (key == K_SCRIPT_COMMAND
 		  && (last_used_map != NULL || SCRIPT_ID_VALID(last_used_sid)))
     {
 	save_current_sctx = current_sctx;
-	if (last_used_map != NULL)
+	만약 (last_used_map != NULL)
 	    current_sctx = last_used_map->m_script_ctx;
-	else
+	아니면
 	{
 	    current_sctx.sc_sid = last_used_sid;
 	    current_sctx.sc_lnum = 0;
@@ -4425,19 +4425,19 @@ do_cmdkey_command(int key UNUSED, int flags)
     res = do_cmdline(NULL, getcmdkeycmd, NULL, flags);
 
 #ifdef FEAT_EVAL
-    if (save_current_sctx.sc_sid >= 0)
+    만약 (save_current_sctx.sc_sid >= 0)
 	current_sctx = save_current_sctx;
 #endif
 
-    return res;
+    반환 res;
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
     void
 reset_last_used_map(mapblock_T *mp)
 {
-    if (last_used_map != mp)
-	return;
+    만약 (last_used_map != mp)
+	반환;
 
     last_used_map = NULL;
     last_used_sid = -1;

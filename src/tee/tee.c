@@ -61,49 +61,49 @@ For a more complete and stable version, consider getting\n\
  * We could use fgets, but I want to be able to handle binary blubber.
  */
 
-int
-myfread(char *buf, int elsize /*ignored*/, int max, FILE *fp)
+정수
+myfread(char *buf, 정수 elsize /*ignored*/, 정수 max, FILE *fp)
 {
-	int	c;
-	int	n = 0;
+	정수	c;
+	정수	n = 0;
 
-	while ((n < max) && ((c = getchar()) != EOF))
+	동안 ((n < max) && ((c = getchar()) != EOF))
 	{
 		*(buf++) = c;
 		n++;
-		if (c == '\n' || c == '\r')
+		만약 (c == '\n' || c == '\r')
 			break;
 	}
-	return n;
+	반환 n;
 }
 
 
-int
-main(int argc, char *argv[])
+정수
+main(정수 argc, char *argv[])
 {
-	int	append = 0;
+	정수	append = 0;
 	size_t	numfiles;
-	int	maxfiles;
+	정수	maxfiles;
 	FILE	**filepointers;
-	int	i;
+	정수	i;
 	char	buf[BUFSIZ];
-	int	n;
-	int	optind = 1;
+	정수	n;
+	정수	optind = 1;
 
-	for (i = 1; i < argc; i++)
+	위해 (i = 1; i < argc; i++)
 	{
-		if (argv[i][0] != '-')
+		만약 (argv[i][0] != '-')
 			break;
-		if (!strcmp(argv[i], "-a"))
+		만약 (!strcmp(argv[i], "-a"))
 			append++;
-		else
+		아니면
 			usage();
 		optind++;
 	}
 
 	numfiles = argc - optind;
 
-	if (numfiles == 0)
+	만약 (numfiles == 0)
 	{
 		fprintf(stderr, "doesn't make much sense using tee without any file name arguments...\n");
 		usage();
@@ -111,24 +111,24 @@ main(int argc, char *argv[])
 	}
 
 	maxfiles = sysconf(_SC_OPEN_MAX);	/* or fill in 10 or so */
-	if (maxfiles < 0)
+	만약 (maxfiles < 0)
 		maxfiles = 10;
-	if (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
+	만약 (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
 	{
 		fprintf(stderr, "Sorry, there is a limit of max %d files.\n", maxfiles - 3);
 		exit(1);
 	}
 	filepointers = calloc(numfiles, sizeof(FILE *));
-	if (filepointers == NULL)
+	만약 (filepointers == NULL)
 	{
 		fprintf(stderr, "Error allocating memory for %ld files\n",
 															   (long)numfiles);
 		exit(1);
 	}
-	for (i = 0; i < numfiles; i++)
+	위해 (i = 0; i < numfiles; i++)
 	{
 		filepointers[i] = fopen(argv[i+optind], append ? "ab" : "wb");
-		if (filepointers[i] == NULL)
+		만약 (filepointers[i] == NULL)
 		{
 			fprintf(stderr, "Can't open \"%s\"\n", argv[i+optind]);
 			exit(1);
@@ -140,13 +140,13 @@ main(int argc, char *argv[])
 	setmode(fileno(stdout),  O_BINARY);
 #endif
 
-	while ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
+	동안 ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
 	{
 		fwrite(buf, sizeof(char), n, stdout);
 		fflush(stdout);
-		for (i = 0; i < numfiles; i++)
+		위해 (i = 0; i < numfiles; i++)
 		{
-			if (filepointers[i] &&
+			만약 (filepointers[i] &&
 			     fwrite(buf, sizeof(char), n, filepointers[i]) != n)
 			{
 				fprintf(stderr, "Error writing to file \"%s\"\n", argv[i+optind]);
@@ -155,9 +155,9 @@ main(int argc, char *argv[])
 			}
 		}
 	}
-	for (i = 0; i < numfiles; i++)
+	위해 (i = 0; i < numfiles; i++)
 	{
-		if (filepointers[i])
+		만약 (filepointers[i])
 			fclose(filepointers[i]);
 	}
 

@@ -46,47 +46,47 @@
 #define WidthValue	0x0004
 #define HeightValue	0x0008
 
-    static int
-vim_parse_geometry(const char *str, unsigned int *width, unsigned int *height)
+    static 정수
+vim_parse_geometry(const char *str, unsigned 정수 *width, unsigned 정수 *height)
 {
-    int mask = NoValue;
+    정수 mask = NoValue;
     char *end;
     long val;
 
-    if (str == NULL || *str == NUL)
-	return mask;
+    만약 (str == NULL || *str == NUL)
+	반환 mask;
 
     // Parse width
-    if (*str != '+' && *str != '-')
+    만약 (*str != '+' && *str != '-')
     {
 	val = strtol(str, &end, 10);
-	if (end != str)
+	만약 (end != str)
 	{
-	    *width = (unsigned int)val;
+	    *width = (unsigned 정수)val;
 	    mask |= WidthValue;
 	    str = end;
 	}
     }
 
     // Parse 'x' or 'X' separator and height
-    if (*str == 'x' || *str == 'X')
+    만약 (*str == 'x' || *str == 'X')
     {
 	str++;
 	val = strtol(str, &end, 10);
-	if (end != str)
+	만약 (end != str)
 	{
-	    *height = (unsigned int)val;
+	    *height = (unsigned 정수)val;
 	    mask |= HeightValue;
 	    str = end;
 	}
     }
 
-    return mask;
+    반환 mask;
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#만약 defined(FEAT_MOUSESHAPE)
 // Last set mouse pointer shape
-static int last_shape = 0;
+static 정수 last_shape = 0;
 #endif
 
 #define DEFAULT_FONT	"Monospace 10"
@@ -99,8 +99,8 @@ static enum {
 } blink_state = BLINK_NONE;
 
 // GTK4 main loop compatibility
-static int gtk4_main_loop_level = 0;
-static int gtk4_main_loop_quit = FALSE;
+static 정수 gtk4_main_loop_level = 0;
+static 정수 gtk4_main_loop_quit = FALSE;
 
 #ifdef USE_GRESOURCE
 # include "auto/gui_gtk_gresources.h"
@@ -174,18 +174,18 @@ const special_keys[] =
     {0, 0, 0}
 };
 
-    static int
-keyval_to_string(unsigned int keyval, char_u *string)
+    static 정수
+keyval_to_string(unsigned 정수 keyval, char_u *string)
 {
-    int		len;
+    정수		len;
     guint32	uc;
 
     uc = gdk_keyval_to_unicode(keyval);
-    if (uc != 0)
+    만약 (uc != 0)
     {
-	len = utf_char2bytes((int)uc, string);
+	len = utf_char2bytes((정수)uc, string);
     }
-    else
+    아니면
     {
 	len = 1;
 	switch (keyval)
@@ -208,26 +208,26 @@ keyval_to_string(unsigned int keyval, char_u *string)
 	}
     }
     string[len] = NUL;
-    return len;
+    반환 len;
 }
 
-    static int
+    static 정수
 modifiers_gdk2vim(guint state)
 {
-    int modifiers = 0;
+    정수 modifiers = 0;
 
-    if (state & GDK_SHIFT_MASK)
+    만약 (state & GDK_SHIFT_MASK)
 	modifiers |= MOD_MASK_SHIFT;
-    if (state & GDK_CONTROL_MASK)
+    만약 (state & GDK_CONTROL_MASK)
 	modifiers |= MOD_MASK_CTRL;
-    if (state & GDK_ALT_MASK)
+    만약 (state & GDK_ALT_MASK)
 	modifiers |= MOD_MASK_ALT;
-    if (state & GDK_META_MASK)
+    만약 (state & GDK_META_MASK)
 	modifiers |= MOD_MASK_META;
-    if (state & GDK_SUPER_MASK)
+    만약 (state & GDK_SUPER_MASK)
 	modifiers |= MOD_MASK_CMD;
 
-    return modifiers;
+    반환 modifiers;
 }
 
 static GtkWidget *vbox;		// the main vertical box
@@ -235,8 +235,8 @@ static GtkWidget *vbox;		// the main vertical box
 // Forward declarations for event callbacks
 static gboolean key_press_event(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
 static void key_release_event(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
-static void button_press_event(GtkGestureClick *gesture, int n_press, double x, double y, gpointer data);
-static void button_release_event(GtkGestureClick *gesture, int n_press, double x, double y, gpointer data);
+static void button_press_event(GtkGestureClick *gesture, 정수 n_press, double x, double y, gpointer data);
+static void button_release_event(GtkGestureClick *gesture, 정수 n_press, double x, double y, gpointer data);
 static void motion_notify_event(GtkEventControllerMotion *controller, double x, double y, gpointer data);
 static void enter_notify_event(GtkEventControllerMotion *controller, double x, double y, gpointer data);
 static gboolean scroll_event(GtkEventControllerScroll *controller, double dx, double dy, gpointer data);
@@ -251,13 +251,13 @@ static void on_select_tab(GtkNotebook *notebook, gpointer *page, gint idx, gpoin
 static void on_tab_reordered(GtkNotebook *notebook, gpointer *page, gint idx, gpointer data);
 static VimMenu *create_tabline_popup_menu(void);
 static void tabline_add_css(void);
-static void tabline_menu_press_event(GtkGestureClick *gesture, int n_press, double x, double y, GtkWidget *popover);
+static void tabline_menu_press_event(GtkGestureClick *gesture, 정수 n_press, double x, double y, GtkWidget *popover);
 #endif
 static void mainwin_destroy_cb(GObject *object, gpointer data);
 static gboolean delete_event_cb(GtkWindow *window, gpointer data);
-static int query_pointer_pos(int *x, int *y, GdkModifierType *state);
+static 정수 query_pointer_pos(정수 *x, 정수 *y, GdkModifierType *state);
 static void mainwin_fullscreened_cb(GObject *obj, GParamSpec *pspec, gpointer user_data);
-static void set_form_size(int width, int height);
+static void set_form_size(정수 width, 정수 height);
 static void drawarea_realize_cb(GtkWidget *widget, gpointer data);
 static void drawarea_unrealize_cb(GtkWidget *widget, gpointer data);
 static void clipboard_changed_cb(GdkClipboard *clipboard, gpointer user_data);
@@ -276,15 +276,15 @@ arg_match(const char *s, const char *name, char **value)
 {
     size_t  len = strlen(name);
 
-    if (strncmp(s, name, len) != 0)
-	return FALSE;
-    if (s[len] == '=')
+    만약 (strncmp(s, name, len) != 0)
+	반환 FALSE;
+    만약 (s[len] == '=')
 	*value = (char *)s + len + 1;
-    else if (s[len] != NUL)
+    아니면 만약 (s[len] != NUL)
 	// Something follows the option name that isn't "=": this is a
 	// different, longer option (e.g. "-fnord" while matching "-fn").
-	return FALSE;
-    return TRUE;
+	반환 FALSE;
+    반환 TRUE;
 }
 
 /*
@@ -293,61 +293,61 @@ arg_match(const char *s, const char *name, char **value)
  * when vim is started, whether or not the GUI has been started.
  */
     void
-gui_mch_prepare(int *argc, char **argv)
+gui_mch_prepare(정수 *argc, char **argv)
 {
     // Don't call gtk_init() here.  It will be called in
     // gui_mch_init_check() after the fork.  Calling it before fork
     // breaks the display connection in the child process, causing gvim
     // to fail to start without --nofork.
 
-    int	i = 0;
+    정수	i = 0;
 
-    while (i < *argc)
+    동안 (i < *argc)
     {
 	char	*s = argv[i];
 	char	*value = NULL;
-	int	has_inline_value = FALSE;
-	int	n_strip;
+	정수	has_inline_value = FALSE;
+	정수	n_strip;
 
-	if (s[0] != '-' && s[0] != '+')
+	만약 (s[0] != '-' && s[0] != '+')
 	{
 	    ++i;
 	    continue;
 	}
 
-	if (strchr(s, '=') != NULL)
+	만약 (strchr(s, '=') != NULL)
 	    has_inline_value = TRUE;
 
 	// If the value was not given inline (no "="), it would come from the
 	// next argv element.  Do not treat that next element as this option's
 	// value if it is "--" (end-of-options marker) or is another option.
-	if (!has_inline_value)
+	만약 (!has_inline_value)
 	{
-	    if (i + 1 < *argc
+	    만약 (i + 1 < *argc
 		    && strcmp(argv[i + 1], "--") != 0
 		    && !((argv[i + 1][0] == '-' || argv[i + 1][0] == '+')
 			&& !vim_isdigit(argv[i + 1][1])))
 		value = argv[i + 1];
-	    else
+	    아니면
 		value = NULL;
 	}
 
-	if (arg_match(s, "-fn", &value) || arg_match(s, "-font", &value))
+	만약 (arg_match(s, "-fn", &value) || arg_match(s, "-font", &value))
 	    font_argument = value;
-	else if (arg_match(s, "-geom", &value)
+	아니면 만약 (arg_match(s, "-geom", &value)
 		|| arg_match(s, "-geometry", &value))
 	{
-	    if (value != NULL)
+	    만약 (value != NULL)
 		gui.geom = vim_strsave((char_u *)value);
 	}
-	else if (arg_match(s, "-bg", &value)
+	아니면 만약 (arg_match(s, "-bg", &value)
 		|| arg_match(s, "-background", &value))
 	    background_argument = value;
-	else if (arg_match(s, "-fg", &value)
+	아니면 만약 (arg_match(s, "-fg", &value)
 		|| arg_match(s, "-foreground", &value))
 	    foreground_argument = value;
 #ifdef FEAT_NETBEANS_INTG
-	else if (strncmp(s, "-nb", 3) == 0)
+	아니면 만약 (strncmp(s, "-nb", 3) == 0)
 	{
 	    gui.dofork = false; // don't fork() when starting GUI
 	    netbeansArg = argv[i];
@@ -355,10 +355,10 @@ gui_mch_prepare(int *argc, char **argv)
 				     // remove the flag.
 	}
 #endif
-	else if (arg_match(s, "--prg-name", &value))
+	아니면 만약 (arg_match(s, "--prg-name", &value))
 	    // GTK4 specific
 	    prgname = value;
-	else
+	아니면
 	{
 	    i++;
 	    continue;
@@ -369,13 +369,13 @@ gui_mch_prepare(int *argc, char **argv)
 	// Move the argument's value as well, but only if it was consumed
 	// from a separate argv element (the "-opt=value" form lives inside
 	// the flag's own element and is stripped along with it already).
-	if (value != NULL && !has_inline_value)
+	만약 (value != NULL && !has_inline_value)
 	    n_strip = 2;
 
-	if (*argc - n_strip >= i)
+	만약 (*argc - n_strip >= i)
 	{
 	    *argc -= n_strip;
-	    if (*argc > i)
+	    만약 (*argc > i)
 		mch_memmove(&argv[i], &argv[i + n_strip],
 			(*argc - i) * sizeof(char *));
 	    argv[*argc] = NULL;
@@ -392,9 +392,9 @@ gui_mch_free_all(void)
 }
 
     static guint
-timeout_add(int time, timeout_cb_type (*callback)(gpointer), int *flagp)
+timeout_add(정수 time, timeout_cb_type (*callback)(gpointer), 정수 *flagp)
 {
-    return g_timeout_add((guint)time, (GSourceFunc)callback, flagp);
+    반환 g_timeout_add((guint)time, (GSourceFunc)callback, flagp);
 }
 
     static void
@@ -411,31 +411,31 @@ static guint blink_timer = 0;
     static timeout_cb_type
 blink_cb(gpointer data UNUSED)
 {
-    if (blink_state == BLINK_ON)
+    만약 (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
 	blink_timer = timeout_add(blink_offtime, blink_cb, NULL);
     }
-    else
+    아니면
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
 	blink_timer = timeout_add(blink_ontime, blink_cb, NULL);
     }
-    return FALSE;
+    반환 FALSE;
 }
 
-    int
+    정수
 gui_mch_is_blinking(void)
 {
-    return blink_state != BLINK_NONE;
+    반환 blink_state != BLINK_NONE;
 }
 
-    int
+    정수
 gui_mch_is_blink_off(void)
 {
-    return blink_state == BLINK_OFF;
+    반환 blink_state == BLINK_OFF;
 }
 
     void
@@ -447,14 +447,14 @@ gui_mch_set_blinking(long waittime, long on, long off)
 }
 
     void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+gui_mch_stop_blink(정수 may_call_gui_update_cursor)
 {
-    if (blink_timer)
+    만약 (blink_timer)
     {
 	timeout_remove(blink_timer);
 	blink_timer = 0;
     }
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    만약 (blink_state == BLINK_OFF && may_call_gui_update_cursor)
 	gui_update_cursor(TRUE, FALSE);
     blink_state = BLINK_NONE;
 }
@@ -462,12 +462,12 @@ gui_mch_stop_blink(int may_call_gui_update_cursor)
     void
 gui_mch_start_blink(void)
 {
-    if (blink_timer)
+    만약 (blink_timer)
     {
 	timeout_remove(blink_timer);
 	blink_timer = 0;
     }
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    만약 (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
     {
 	blink_timer = timeout_add(blink_waittime, blink_cb, NULL);
 	blink_state = BLINK_ON;
@@ -475,13 +475,13 @@ gui_mch_start_blink(void)
     }
 }
 
-    int
-gui_mch_early_init_check(int give_message UNUSED)
+    정수
+gui_mch_early_init_check(정수 give_message UNUSED)
 {
-    return OK;
+    반환 OK;
 }
 
-    int
+    정수
 gui_mch_init_check(void)
 {
     // This defaults to argv[0], but we want it to match the name of the
@@ -493,20 +493,20 @@ gui_mch_init_check(void)
     // Suppress noisy EGL warnings when GL is not available.  Only set
     // this when actually starting the GUI, so non-GUI invocations are
     // not affected.
-    if (g_getenv("EGL_LOG_LEVEL") == NULL)
+    만약 (g_getenv("EGL_LOG_LEVEL") == NULL)
 	setenv("EGL_LOG_LEVEL", "fatal", 0);
 
     // Call gtk_init() here after fork().  Calling it before fork() breaks
     // the display connection in the child process.
     gtk_init();
-    return OK;
+    반환 OK;
 }
 
 /*
  * Initialise the GUI.  Create all the windows, set up all the callbacks etc.
  * Returns OK for success, FAIL when the GUI can't be started.
  */
-    int
+    정수
 gui_mch_init(void)
 {
     // Allocate GdkRGBA color structs.
@@ -704,10 +704,10 @@ gui_mch_init(void)
 	GdkClipboard *primary = gdk_display_get_primary_clipboard(display);
 	GdkClipboard *regular = gdk_display_get_clipboard(display);
 
-	if (primary != NULL)
+	만약 (primary != NULL)
 	    g_signal_connect(primary, "changed",
 		    G_CALLBACK(clipboard_changed_cb), &clip_star);
-	if (regular != NULL)
+	만약 (regular != NULL)
 	    g_signal_connect(regular, "changed",
 		    G_CALLBACK(clipboard_changed_cb), &clip_plus);
     }
@@ -715,20 +715,20 @@ gui_mch_init(void)
     gui.regular_provider = vim_content_provider_new(&clip_plus);
     gui.primary_provider = vim_content_provider_new(&clip_star);
 
-    return OK;
+    반환 OK;
 }
 
     void
 gui_mch_new_colors(void)
 {
-    if (gui.drawarea != NULL && gtk_widget_get_realized(gui.drawarea))
+    만약 (gui.drawarea != NULL && gtk_widget_get_realized(gui.drawarea))
 	gtk_widget_queue_draw(gui.drawarea);
 }
 
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
+    정수
 gui_mch_open(void)
 {
     guicolor_T fg_pixel = INVALCOLOR;
@@ -736,18 +736,18 @@ gui_mch_open(void)
     guint pixel_width;
     guint pixel_height;
 
-    if (gui.geom != NULL)
+    만약 (gui.geom != NULL)
     {
-	int		mask;
-	unsigned int	w, h;
+	정수		mask;
+	unsigned 정수	w, h;
 
 	mask = vim_parse_geometry((char *)gui.geom, &w, &h);
 
-	if (mask & WidthValue)
+	만약 (mask & WidthValue)
 	    Columns = w;
-	if (mask & HeightValue)
+	만약 (mask & HeightValue)
 	{
-	    if (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
+	    만약 (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
 		p_window = h - 1;
 	    Rows = h;
 	}
@@ -755,12 +755,12 @@ gui_mch_open(void)
 
 	VIM_CLEAR(gui.geom);
     }
-    else
+    아니면
     {
 	// Use 80x24 as the default GUI size, unless geometry was specified.
-	if (Columns > 80)
+	만약 (Columns > 80)
 	    Columns = 80;
-	if (Rows > 24)
+	만약 (Rows > 24)
 	    Rows = 24;
     }
 
@@ -770,22 +770,22 @@ gui_mch_open(void)
     pixel_width  += get_menu_tool_width();
     pixel_height += get_menu_tool_height();
 
-    if (foreground_argument != NULL)
+    만약 (foreground_argument != NULL)
 	fg_pixel = gui_get_color((char_u *)foreground_argument);
-    if (fg_pixel == INVALCOLOR)
+    만약 (fg_pixel == INVALCOLOR)
 	fg_pixel = gui_get_color((char_u *)"Black");
 
-    if (background_argument != NULL)
+    만약 (background_argument != NULL)
 	bg_pixel = gui_get_color((char_u *)background_argument);
-    if (bg_pixel == INVALCOLOR)
+    만약 (bg_pixel == INVALCOLOR)
 	bg_pixel = gui_get_color((char_u *)"White");
 
-    if (found_reverse_arg)
+    만약 (found_reverse_arg)
     {
 	gui.def_norm_pixel = bg_pixel;
 	gui.def_back_pixel = fg_pixel;
     }
-    else
+    아니면
     {
 	gui.def_norm_pixel = fg_pixel;
 	gui.def_back_pixel = bg_pixel;
@@ -799,8 +799,8 @@ gui_mch_open(void)
 		     G_CALLBACK(mainwin_destroy_cb), NULL);
     // Resize is handled by GtkForm's size_allocate callback.
 
-    set_form_size((int)pixel_width - get_menu_tool_width(),
-	    (int)pixel_height - get_menu_tool_height());
+    set_form_size((정수)pixel_width - get_menu_tool_width(),
+	    (정수)pixel_height - get_menu_tool_height());
 
     gtk_window_present(GTK_WINDOW(gui.mainwin));
 
@@ -812,13 +812,13 @@ gui_mch_open(void)
     gtk_widget_grab_focus(gui.drawarea);
     gui_focus_change(TRUE);
 
-    return OK;
+    반환 OK;
 }
 
     void
-gui_mch_exit(int rc UNUSED)
+gui_mch_exit(정수 rc UNUSED)
 {
-    if (gui.mainwin != NULL)
+    만약 (gui.mainwin != NULL)
     {
 #ifdef FEAT_GUI_TABLINE
 	// Must unparent popover menu for tabline or we will get warning
@@ -836,7 +836,7 @@ gui_mch_exit(int rc UNUSED)
 
 	    FOR_ALL_MENUS(menu)
 	    {
-		if ((menu->name[0] == ']' || menu_is_popup(menu->name))
+		만약 ((menu->name[0] == ']' || menu_is_popup(menu->name))
 			&& menu->submenu_id != NULL)
 		    gtk_widget_unparent(menu->submenu_id);
 	    }
@@ -846,42 +846,42 @@ gui_mch_exit(int rc UNUSED)
     }
 }
 
-    int
-gui_mch_get_winpos(int *x, int *y)
+    정수
+gui_mch_get_winpos(정수 *x, 정수 *y)
 {
     // GTK4 does not provide a window position API.
     *x = 0;
     *y = 0;
-    return FAIL;
+    반환 FAIL;
 }
 
     void
-gui_mch_set_winpos(int x UNUSED, int y UNUSED)
+gui_mch_set_winpos(정수 x UNUSED, 정수 y UNUSED)
 {
     // GTK4/Wayland: window positioning not available
 }
 
-    int
+    정수
 gui_mch_maximized(void)
 {
-    return gtk_window_is_maximized(GTK_WINDOW(gui.mainwin));
+    반환 gtk_window_is_maximized(GTK_WINDOW(gui.mainwin));
 }
 
     void
 gui_mch_unmaximize(void)
 {
-    if (gui.mainwin != NULL)
+    만약 (gui.mainwin != NULL)
 	gtk_window_unmaximize(GTK_WINDOW(gui.mainwin));
 }
 
     void
-gui_mch_set_fullscreen(int flag)
+gui_mch_set_fullscreen(정수 flag)
 {
-    if (gui.mainwin == NULL)
-	return;
-    if (flag)
+    만약 (gui.mainwin == NULL)
+	반환;
+    만약 (flag)
 	gtk_window_fullscreen(GTK_WINDOW(gui.mainwin));
-    else
+    아니면
 	gtk_window_unfullscreen(GTK_WINDOW(gui.mainwin));
 }
 
@@ -890,7 +890,7 @@ mainwin_fullscreened_cb(GObject *obj,
 	GParamSpec *pspec UNUSED, gpointer user_data UNUSED)
 {
     // Force a redraw of the drawing area when entering fullscreen mode.
-    if (gtk_window_is_fullscreen(GTK_WINDOW(obj)))
+    만약 (gtk_window_is_fullscreen(GTK_WINDOW(obj)))
 	gui_focus_change(TRUE);
 }
 
@@ -909,7 +909,7 @@ mainwin_fullscreened_cb(GObject *obj,
     void
 gui_mch_newfont(void)
 {
-    int w, h;
+    정수 w, h;
 
     // Do not subtract width and height with menubar, toolbar, etc, because
     // those are not part of the shell.
@@ -921,7 +921,7 @@ gui_mch_newfont(void)
     void
 gui_mch_settitle(char_u *title, char_u *icon UNUSED)
 {
-    if (title != NULL && gui.mainwin != NULL)
+    만약 (title != NULL && gui.mainwin != NULL)
 	gtk_window_set_title(GTK_WINDOW(gui.mainwin), (const char *)title);
 }
 
@@ -936,10 +936,10 @@ gui_mch_settitle(char_u *title, char_u *icon UNUSED)
     void
 gui_gtk_init_decor_height(void)
 {
-    int h = gtk_widget_get_height(gui.mainwin);
+    정수 h = gtk_widget_get_height(gui.mainwin);
 
-    if (h == 0)
-	return;
+    만약 (h == 0)
+	반환;
 
     h -= get_menu_tool_height();
     h -= gtk_widget_get_height(gui.formwin);
@@ -952,13 +952,13 @@ gui_gtk_init_decor_height(void)
  * pixels.
  */
     static void
-set_form_size(int width, int height)
+set_form_size(정수 width, 정수 height)
 {
     // Nothing to do when the form widget already has this size: no allocation
     // would follow and the size request below would never be dropped.
-    if (gtk_widget_get_width(gui.formwin) == width
+    만약 (gtk_widget_get_width(gui.formwin) == width
 	    && gtk_widget_get_height(gui.formwin) == height)
-	return;
+	반환;
 
     // Remember the size the form widget is supposed to get. An allocation
     // that arrives before the compositor has answered this request still has
@@ -981,10 +981,10 @@ set_form_size(int width, int height)
 }
 
     void
-gui_mch_set_shellsize(int width, int height,
-	int min_width UNUSED, int min_height UNUSED,
-	int base_width UNUSED, int base_height UNUSED,
-	int direction UNUSED)
+gui_mch_set_shellsize(정수 width, 정수 height,
+	정수 min_width UNUSED, 정수 min_height UNUSED,
+	정수 base_width UNUSED, 정수 base_height UNUSED,
+	정수 direction UNUSED)
 {
     set_form_size(width, height);
 
@@ -992,22 +992,22 @@ gui_mch_set_shellsize(int width, int height,
 }
 
     void
-gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
+gui_mch_get_screen_dimensions(정수 *screen_w, 정수 *screen_h)
 {
     GdkDisplay *display = gtk_widget_get_display(gui.mainwin);
     GdkSurface *surface = gtk_native_get_surface(GTK_NATIVE(gui.mainwin));
 
-    if (surface != NULL)
+    만약 (surface != NULL)
     {
 	GdkMonitor *monitor = gdk_display_get_monitor_at_surface(display,
 		surface);
-	if (monitor != NULL)
+	만약 (monitor != NULL)
 	{
 	    GdkRectangle geom;
 	    gdk_monitor_get_geometry(monitor, &geom);
 	    *screen_w = geom.width;
 	    *screen_h = geom.height;
-	    return;
+	    반환;
 	}
     }
 
@@ -1017,14 +1017,14 @@ gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
 
 #ifdef FEAT_MENU
     void
-gui_mch_enable_menu(int showit)
+gui_mch_enable_menu(정수 showit)
 {
-    if (gui.menubar != NULL)
+    만약 (gui.menubar != NULL)
     {
 	gtk_widget_set_visible(gui.menubar, showit);
 	// Draw area might become blank after this for some reason, queue a
 	// redraw, same for toolbar as well.
-	if (gui.drawarea != NULL)
+	만약 (gui.drawarea != NULL)
 	    gtk_widget_queue_draw(gui.drawarea);
     }
 }
@@ -1032,26 +1032,26 @@ gui_mch_enable_menu(int showit)
 
 #ifdef FEAT_TOOLBAR
     void
-gui_mch_show_toolbar(int showit)
+gui_mch_show_toolbar(정수 showit)
 {
-    if (gui.toolbar != NULL)
+    만약 (gui.toolbar != NULL)
     {
 	gtk_widget_set_visible(gui.toolbar, showit);
-	if (showit)
+	만약 (showit)
 	    vim_toolbar_set_style(VIM_TOOLBAR(gui.toolbar),
 		    toolbar_flags, tbis_flags);
-	if (gui.drawarea != NULL)
+	만약 (gui.drawarea != NULL)
 	    gtk_widget_queue_draw(gui.drawarea);
     }
 }
 #endif
 
     void
-gui_mch_set_dark_theme(int dark)
+gui_mch_set_dark_theme(정수 dark)
 {
     // GTK4: use GtkSettings
     GtkSettings *settings = gtk_settings_get_default();
-    if (settings != NULL)
+    만약 (settings != NULL)
 	g_object_set(settings, "gtk-application-prefer-dark-theme",
 		(gboolean)dark, NULL);
 }
@@ -1062,12 +1062,12 @@ gui_mch_set_dark_theme(int dark)
  * ============================================================
  */
 
-    int
+    정수
 gui_mch_adjust_charheight(void)
 {
     PangoFontMetrics *metrics;
-    int ascent;
-    int descent;
+    정수 ascent;
+    정수 descent;
 
     metrics = pango_context_get_metrics(gui.text_context, gui.norm_font,
 			    pango_context_get_language(gui.text_context));
@@ -1081,7 +1081,7 @@ gui_mch_adjust_charheight(void)
     gui.char_ascent = MAX(gui.char_ascent, 0);
     gui.char_height = MAX(gui.char_height, gui.char_ascent + 1);
 
-    return OK;
+    반환 OK;
 }
 
 typedef struct {
@@ -1101,16 +1101,16 @@ font_dialog_finish_cb(GObject *source, GAsyncResult *res, gpointer data)
     static gboolean
 font_filter(gpointer item, gpointer data UNUSED)
 {
-    if (PANGO_IS_FONT_FAMILY(item))
-	return pango_font_family_is_monospace(PANGO_FONT_FAMILY(item));
-    if (PANGO_IS_FONT_FACE(item))
+    만약 (PANGO_IS_FONT_FAMILY(item))
+	반환 pango_font_family_is_monospace(PANGO_FONT_FAMILY(item));
+    만약 (PANGO_IS_FONT_FACE(item))
     {
 	PangoFontFamily *family = pango_font_face_get_family(
 		PANGO_FONT_FACE(item));
-	if (family != NULL)
-	    return pango_font_family_is_monospace(family);
+	만약 (family != NULL)
+	    반환 pango_font_family_is_monospace(family);
     }
-    return TRUE;
+    반환 TRUE;
 }
 
     char_u *
@@ -1127,32 +1127,32 @@ gui_mch_font_dialog(char_u *oldval)
 	    GTK_FILTER(gtk_custom_filter_new(
 		    (GtkCustomFilterFunc)font_filter, NULL, NULL)));
 
-    if (oldval != NULL && oldval[0] != NUL)
+    만약 (oldval != NULL && oldval[0] != NUL)
     {
 	char_u *oldname;
 
-	if (output_conv.vc_type != CONV_NONE)
+	만약 (output_conv.vc_type != CONV_NONE)
 	    oldname = string_convert(&output_conv, oldval, NULL);
-	else
+	아니면
 	    oldname = oldval;
 
-	if (STRLEN(oldname) > 0 && !vim_isdigit(oldname[STRLEN(oldname) - 1]))
+	만약 (STRLEN(oldname) > 0 && !vim_isdigit(oldname[STRLEN(oldname) - 1]))
 	{
 	    char_u *p = vim_strnsave(oldname, STRLEN(oldname) + 3);
-	    if (p != NULL)
+	    만약 (p != NULL)
 	    {
 		STRCPY(p + STRLEN(p), " 10");
-		if (oldname != oldval)
+		만약 (oldname != oldval)
 		    vim_free(oldname);
 		oldname = p;
 	    }
 	}
 
 	initial = pango_font_description_from_string((const char *)oldname);
-	if (oldname != oldval)
+	만약 (oldname != oldval)
 	    vim_free(oldname);
     }
-    else
+    아니면
 	initial = pango_font_description_from_string(DEFAULT_FONT);
 
     fdd.result = NULL;
@@ -1161,34 +1161,34 @@ gui_mch_font_dialog(char_u *oldval)
     gtk_font_dialog_choose_font(dlg, GTK_WINDOW(gui.mainwin),
 	    initial, NULL, font_dialog_finish_cb, &fdd);
 
-    while (!fdd.done)
+    동안 (!fdd.done)
 	g_main_context_iteration(NULL, TRUE);
 
-    if (fdd.result != NULL)
+    만약 (fdd.result != NULL)
     {
 	char *name = pango_font_description_to_string(fdd.result);
-	if (name != NULL)
+	만약 (name != NULL)
 	{
 	    char_u *p;
 
 	    p = vim_strsave_escaped((char_u *)name, (char_u *)",");
 	    g_free(name);
-	    if (p != NULL && input_conv.vc_type != CONV_NONE)
+	    만약 (p != NULL && input_conv.vc_type != CONV_NONE)
 	    {
 		fontname = string_convert(&input_conv, p, NULL);
 		vim_free(p);
 	    }
-	    else
+	    아니면
 		fontname = p;
 	}
 	pango_font_description_free(fdd.result);
     }
 
-    if (initial != NULL)
+    만약 (initial != NULL)
 	pango_font_description_free(initial);
     g_object_unref(dlg);
 
-    return fontname;
+    반환 fontname;
 }
 
 /*
@@ -1201,21 +1201,21 @@ ascii_glyph_table_init(void)
     char_u	    ascii_chars[2 * 128];
     PangoAttrList   *attr_list;
     GList	    *item_list;
-    int		    i;
+    정수		    i;
 
-    if (gui.ascii_glyphs != NULL)
+    만약 (gui.ascii_glyphs != NULL)
 	pango_glyph_string_free(gui.ascii_glyphs);
-    if (gui.ascii_font != NULL)
+    만약 (gui.ascii_font != NULL)
 	g_object_unref(gui.ascii_font);
 
     gui.ascii_glyphs = NULL;
     gui.ascii_font   = NULL;
 
-    for (i = 0; i < 128; ++i)
+    위해 (i = 0; i < 128; ++i)
     {
-	if (i >= 32 && i < 127)
+	만약 (i >= 32 && i < 127)
 	    ascii_chars[2 * i] = i;
-	else
+	아니면
 	    ascii_chars[2 * i] = '?';
 	ascii_chars[2 * i + 1] = ' ';
     }
@@ -1224,10 +1224,10 @@ ascii_glyph_table_init(void)
     item_list = pango_itemize(gui.text_context, (const char *)ascii_chars,
 			      0, sizeof(ascii_chars), attr_list, NULL);
 
-    if (item_list != NULL && item_list->next == NULL)
+    만약 (item_list != NULL && item_list->next == NULL)
     {
 	PangoItem   *item;
-	int	    width;
+	정수	    width;
 
 	item  = (PangoItem *)item_list->data;
 	width = gui.char_width * PANGO_SCALE;
@@ -1240,9 +1240,9 @@ ascii_glyph_table_init(void)
 	pango_shape((const char *)ascii_chars, sizeof(ascii_chars),
 		    &item->analysis, gui.ascii_glyphs);
 
-	if (gui.ascii_glyphs->num_glyphs == (int)sizeof(ascii_chars))
+	만약 (gui.ascii_glyphs->num_glyphs == (정수)sizeof(ascii_chars))
 	{
-	    for (i = 0; i < gui.ascii_glyphs->num_glyphs; ++i)
+	    위해 (i = 0; i < gui.ascii_glyphs->num_glyphs; ++i)
 	    {
 		PangoGlyphGeometry *geom;
 
@@ -1251,7 +1251,7 @@ ascii_glyph_table_init(void)
 		geom->width = width;
 	    }
 	}
-	else
+	아니면
 	{
 	    pango_glyph_string_free(gui.ascii_glyphs);
 	    gui.ascii_glyphs = NULL;
@@ -1275,14 +1275,14 @@ get_styled_font_variants(void)
     gui.font_can_bold = FALSE;
 
     plain_font = pango_context_load_font(gui.text_context, gui.norm_font);
-    if (plain_font == NULL)
-	return;
+    만약 (plain_font == NULL)
+	반환;
 
     bold_font_desc = pango_font_description_copy_static(gui.norm_font);
     pango_font_description_set_weight(bold_font_desc, PANGO_WEIGHT_BOLD);
 
     bold_font = pango_context_load_font(gui.text_context, bold_font_desc);
-    if (bold_font != NULL)
+    만약 (bold_font != NULL)
     {
 	gui.font_can_bold = (bold_font != plain_font);
 	g_object_unref(bold_font);
@@ -1292,19 +1292,19 @@ get_styled_font_variants(void)
     g_object_unref(plain_font);
 }
 
-    int
-gui_mch_init_font(char_u *font_name, int fontset UNUSED)
+    정수
+gui_mch_init_font(char_u *font_name, 정수 fontset UNUSED)
 {
     PangoFontDescription    *font_desc;
     PangoLayout		    *layout;
-    int			    width;
+    정수			    width;
 
-    if (font_name == NULL)
+    만약 (font_name == NULL)
 	font_name = (char_u *)DEFAULT_FONT;
 
     font_desc = gui_mch_get_font(font_name, FALSE);
-    if (font_desc == NULL)
-	return FAIL;
+    만약 (font_desc == NULL)
+	반환 FAIL;
 
     gui_mch_free_font(gui.norm_font);
     gui.norm_font = font_desc;
@@ -1317,7 +1317,7 @@ gui_mch_init_font(char_u *font_name, int fontset UNUSED)
     g_object_unref(layout);
 
     gui.char_width = (width / 2 + PANGO_SCALE / 2) / PANGO_SCALE;
-    if (gui.char_width <= 0)
+    만약 (gui.char_width <= 0)
 	gui.char_width = 8;
 
     gui_mch_adjust_charheight();
@@ -1331,53 +1331,53 @@ gui_mch_init_font(char_u *font_name, int fontset UNUSED)
     // update the position after we've initialized font. Make sure to not go out
     // of bounds of the screen.
     {
-	int im_row = gui.row < screen_Rows ? gui.row : screen_Rows - 1;
-	int im_col = gui.col < screen_Columns ? gui.col : screen_Columns - 1;
+	정수 im_row = gui.row < screen_Rows ? gui.row : screen_Rows - 1;
+	정수 im_col = gui.col < screen_Columns ? gui.col : screen_Columns - 1;
 	im_set_position(im_row, im_col);
     }
-    return OK;
+    반환 OK;
 }
 
     GuiFont
-gui_mch_get_font(char_u *name, int report_error)
+gui_mch_get_font(char_u *name, 정수 report_error)
 {
     PangoFontDescription *font;
 
-    if (name == NULL)
-	return NULL;
+    만약 (name == NULL)
+	반환 NULL;
 
     font = pango_font_description_from_string((const char *)name);
-    if (font == NULL)
+    만약 (font == NULL)
     {
-	if (report_error)
+	만약 (report_error)
 	    semsg(_(e_unknown_font_str), name);
-	return NULL;
+	반환 NULL;
     }
 
     // Ensure a size is set
-    if (pango_font_description_get_size(font) <= 0)
+    만약 (pango_font_description_get_size(font) <= 0)
 	pango_font_description_set_size(font, 10 * PANGO_SCALE);
 
-    return font;
+    반환 font;
 }
 
     char_u *
 gui_mch_get_fontname(GuiFont font, char_u *name UNUSED)
 {
-    if (font != NOFONT)
+    만약 (font != NOFONT)
     {
 	char *desc = pango_font_description_to_string(font);
 	char_u *ret = vim_strsave((char_u *)desc);
 	g_free(desc);
-	return ret;
+	반환 ret;
     }
-    return NULL;
+    반환 NULL;
 }
 
     void
 gui_mch_free_font(GuiFont font)
 {
-    if (font != NOFONT)
+    만약 (font != NOFONT)
 	pango_font_description_free(font);
 }
 
@@ -1385,17 +1385,17 @@ gui_mch_free_font(GuiFont font)
 gui_mch_expand_font(
     optexpand_T	*args,
     void	*param,
-    int		(*add_match)(char_u *val))
+    정수		(*add_match)(char_u *val))
 {
     PangoFontFamily	**font_families = NULL;
-    int			n_families = 0;
-    int			wide = *(int *)param;
+    정수			n_families = 0;
+    정수			wide = *(정수 *)param;
 
-    if (args->oe_include_orig_val && *args->oe_opt_value == NUL && !wide)
+    만약 (args->oe_include_orig_val && *args->oe_opt_value == NUL && !wide)
     {
 	// If guifont is empty, suggest the default so the user can modify it.
-	if (add_match((char_u *)DEFAULT_FONT) != OK)
-	    return;
+	만약 (add_match((char_u *)DEFAULT_FONT) != OK)
+	    반환;
     }
 
     pango_context_list_families(
@@ -1403,31 +1403,31 @@ gui_mch_expand_font(
 	    &font_families,
 	    &n_families);
 
-    for (int i = 0; i < n_families; i++)
+    위해 (정수 i = 0; i < n_families; i++)
     {
-	if (!wide && !pango_font_family_is_monospace(font_families[i]))
+	만약 (!wide && !pango_font_family_is_monospace(font_families[i]))
 	    continue;
 
 	const char *fam_name = pango_font_family_get_name(font_families[i]);
-	if (input_conv.vc_type != CONV_NONE)
+	만약 (input_conv.vc_type != CONV_NONE)
 	{
 	    char_u *buf = string_convert(&input_conv,
 		    (char_u *)fam_name, NULL);
-	    if (buf != NULL)
+	    만약 (buf != NULL)
 	    {
-		if (add_match(buf) != OK)
+		만약 (add_match(buf) != OK)
 		{
 		    vim_free(buf);
 		    break;
 		}
 		vim_free(buf);
 	    }
-	    else
+	    아니면
 		break;
 	}
-	else
+	아니면
 	{
-	    if (add_match((char_u *)fam_name) != OK)
+	    만약 (add_match((char_u *)fam_name) != OK)
 		break;
 	}
     }
@@ -1444,19 +1444,19 @@ gui_mch_expand_font(
     guicolor_T
 gui_mch_get_color(char_u *name)
 {
-    if (!gui.in_use)
-	return INVALCOLOR;
+    만약 (!gui.in_use)
+	반환 INVALCOLOR;
 
-    if (name != NULL)
-	return gui_get_color_cmn(name);
+    만약 (name != NULL)
+	반환 gui_get_color_cmn(name);
 
-    return INVALCOLOR;
+    반환 INVALCOLOR;
 }
 
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(정수 r, 정수 g, 정수 b)
 {
-    return gui_get_rgb_color_cmn(r, g, b);
+    반환 gui_get_rgb_color_cmn(r, g, b);
 }
 
     static GdkRGBA
@@ -1467,7 +1467,7 @@ color_to_rgba(guicolor_T color)
     rgba.green = ((color & 0xff00) >> 8) / 255.0;
     rgba.blue  = (color & 0xff) / 255.0;
     rgba.alpha = 1.0;
-    return rgba;
+    반환 rgba;
 }
 
     void
@@ -1491,7 +1491,7 @@ gui_mch_set_sp_color(guicolor_T color)
     guicolor_T
 gui_mch_get_rgb(guicolor_T pixel)
 {
-    return pixel;
+    반환 pixel;
 }
 
 /*
@@ -1511,10 +1511,10 @@ gui_gtk4_update_size(void)
     void
 gui_gtk4_add_multisign(
 	cairo_surface_t *surf,
-	int		row,
-	int		col,
-	int		width,
-	int		height)
+	정수		row,
+	정수		col,
+	정수		width,
+	정수		height)
 {
     vim_draw_area_add_multisign(VIM_DRAW_AREA(gui.drawarea), surf, row, col,
 	    width, height);
@@ -1522,11 +1522,11 @@ gui_gtk4_add_multisign(
 #endif
 
     void
-gui_mch_clear_block(int row1, int col1, int row2, int col2)
+gui_mch_clear_block(정수 row1, 정수 col1, 정수 row2, 정수 col2)
 {
     vim_draw_area_clear_block(VIM_DRAW_AREA(gui.drawarea), row1,
 	    col1, row2, col2);
-    if (gui.drawarea != NULL)
+    만약 (gui.drawarea != NULL)
 	gtk_widget_queue_draw(gui.drawarea);
 }
 
@@ -1534,12 +1534,12 @@ gui_mch_clear_block(int row1, int col1, int row2, int col2)
 gui_mch_clear_all(void)
 {
     vim_draw_area_clear(VIM_DRAW_AREA(gui.drawarea));
-    if (gui.drawarea != NULL)
+    만약 (gui.drawarea != NULL)
 	gtk_widget_queue_draw(gui.drawarea);
 }
 
     void
-gui_mch_delete_lines(int row, int num_lines)
+gui_mch_delete_lines(정수 row, 정수 num_lines)
 {
     vim_draw_area_move_block(VIM_DRAW_AREA(gui.drawarea),
 	    row, row + num_lines, gui.scroll_region_bot,
@@ -1552,7 +1552,7 @@ gui_mch_delete_lines(int row, int num_lines)
 }
 
     void
-gui_mch_insert_lines(int row, int num_lines)
+gui_mch_insert_lines(정수 row, 정수 num_lines)
 {
     vim_draw_area_move_block(VIM_DRAW_AREA(gui.drawarea),
 	    row + num_lines, row, gui.scroll_region_bot - num_lines,
@@ -1568,7 +1568,7 @@ gui_mch_insert_lines(int row, int num_lines)
  * See vim_draw_area_set_cursor() for more information
  */
     void
-gui_gtk4_draw_cursor(guicolor_T bg, guicolor_T fg, int w, int h)
+gui_gtk4_draw_cursor(guicolor_T bg, guicolor_T fg, 정수 w, 정수 h)
 {
     gui_mch_set_bg_color(bg);
     gui_mch_set_fg_color(fg);
@@ -1577,17 +1577,17 @@ gui_gtk4_draw_cursor(guicolor_T bg, guicolor_T fg, int w, int h)
 }
 
     void
-gui_mch_flash(int msec)
+gui_mch_flash(정수 msec)
 {
     // Invert the screen, wait, then invert back
-    gui_mch_invert_rectangle(0, 0, (int)Rows - 1, (int)Columns - 1);
+    gui_mch_invert_rectangle(0, 0, (정수)Rows - 1, (정수)Columns - 1);
     gui_mch_flush();
     ui_delay((long)msec, TRUE);
-    gui_mch_invert_rectangle(0, 0, (int)Rows - 1, (int)Columns - 1);
+    gui_mch_invert_rectangle(0, 0, (정수)Rows - 1, (정수)Columns - 1);
 }
 
     void
-gui_mch_invert_rectangle(int r, int c, int nr, int nc)
+gui_mch_invert_rectangle(정수 r, 정수 c, 정수 nr, 정수 nc)
 {
     vim_draw_area_invert_block(VIM_DRAW_AREA(gui.drawarea), r, c, nr, nc);
     gtk_widget_queue_draw(gui.drawarea);
@@ -1605,57 +1605,57 @@ key_press_event(GtkEventControllerKey *controller UNUSED,
 	GdkModifierType state, gpointer data UNUSED)
 {
     char_u	string[32], string2[32];
-    int		len;
-    int		i;
-    int		modifiers;
-    int		key;
+    정수		len;
+    정수		i;
+    정수		modifiers;
+    정수		key;
     char_u	*s, *d;
 
 #ifdef FEAT_XIM
     // Let the input method have a go at the key event.
     // If it consumed the event, we're done.
-    if (xic != NULL)
+    만약 (xic != NULL)
     {
 	GdkEvent *event = gtk_event_controller_get_current_event(
 		GTK_EVENT_CONTROLLER(controller));
-	if (event != NULL && gtk_im_context_filter_keypress(xic, event))
-	    return TRUE;
+	만약 (event != NULL && gtk_im_context_filter_keypress(xic, event))
+	    반환 TRUE;
     }
 #endif
 
 #ifdef FEAT_MENU
-    if (key_sym == GDK_KEY_F10 && gui.menubar != NULL)
+    만약 (key_sym == GDK_KEY_F10 && gui.menubar != NULL)
     {
 	static char_u k10[] = {K_SPECIAL, 'k', ';', 0};
 
-	if (check_map(k10, State, FALSE, TRUE, FALSE, NULL, NULL) == NULL)
+	만약 (check_map(k10, State, FALSE, TRUE, FALSE, NULL, NULL) == NULL)
 	{
 	    show_menubar_popover();
-	    return TRUE;
+	    반환 TRUE;
 	}
     }
 #endif
 
     len = keyval_to_string(key_sym, string2);
 
-    if (len > 1 && input_conv.vc_type != CONV_NONE)
+    만약 (len > 1 && input_conv.vc_type != CONV_NONE)
 	len = convert_input(string2, len, sizeof(string2));
 
     s = string2;
     d = string;
-    for (i = 0; i < len; ++i)
+    위해 (i = 0; i < len; ++i)
     {
 	*d++ = s[i];
-	if (d[-1] == CSI && d + 2 < string + sizeof(string))
+	만약 (d[-1] == CSI && d + 2 < string + sizeof(string))
 	{
 	    *d++ = KS_EXTRA;
-	    *d++ = (int)KE_CSI;
+	    *d++ = (정수)KE_CSI;
 	}
     }
     len = d - string;
 
     // Shift-Tab results in Left_Tab
-    if (key_sym == GDK_KEY_ISO_Left_Tab)
+    만약 (key_sym == GDK_KEY_ISO_Left_Tab)
     {
 	key_sym = GDK_KEY_Tab;
 	state |= GDK_SHIFT_MASK;
@@ -1664,22 +1664,22 @@ key_press_event(GtkEventControllerKey *controller UNUSED,
 #ifdef FEAT_MENU
     // If there is a menu and 'wak' is "yes", or 'wak' is "menu" and the key
     // is a menu shortcut, we ignore everything with the ALT modifier.
-    if ((state & GDK_ALT_MASK)
+    만약 ((state & GDK_ALT_MASK)
 	    && gui.menu_is_active
 	    && (*p_wak == 'y'
 		|| (*p_wak == 'm'
 		    && len == 1
 		    && gui_is_menu_shortcut(string[0]))))
 	// Tell GTK we have not handled the key (so it can handle it).
-	return FALSE;
+	반환 FALSE;
 #endif
 
     // Check for special keys
-    if (len == 0 || len == 1)
+    만약 (len == 0 || len == 1)
     {
-	for (i = 0; special_keys[i].key_sym != 0; i++)
+	위해 (i = 0; special_keys[i].key_sym != 0; i++)
 	{
-	    if (special_keys[i].key_sym == key_sym)
+	    만약 (special_keys[i].key_sym == key_sym)
 	    {
 		string[0] = CSI;
 		string[1] = special_keys[i].code0;
@@ -1690,12 +1690,12 @@ key_press_event(GtkEventControllerKey *controller UNUSED,
 	}
     }
 
-    if (len == 0)
-	return TRUE;
+    만약 (len == 0)
+	반환 TRUE;
 
-    if (len == -3)
+    만약 (len == -3)
 	key = TO_SPECIAL(string[1], string[2]);
-    else
+    아니면
     {
 	string[len] = NUL;
 	key = mb_ptr2char(string);
@@ -1704,23 +1704,23 @@ key_press_event(GtkEventControllerKey *controller UNUSED,
     modifiers = modifiers_gdk2vim(state);
 
     key = simplify_key(key, &modifiers);
-    if (key == CSI)
+    만약 (key == CSI)
 	key = K_CSI;
-    if (IS_SPECIAL(key))
+    만약 (IS_SPECIAL(key))
     {
 	string[0] = CSI;
 	string[1] = K_SECOND(key);
 	string[2] = K_THIRD(key);
 	len = 3;
     }
-    else
+    아니면
     {
 	key = may_adjust_key_for_ctrl(modifiers, key);
 	modifiers = may_remove_shift_modifier(modifiers, key);
 	len = mb_char2bytes(key, string);
     }
 
-    if (modifiers != 0)
+    만약 (modifiers != 0)
     {
 	string2[0] = CSI;
 	string2[1] = KS_MODIFIER;
@@ -1729,8 +1729,8 @@ key_press_event(GtkEventControllerKey *controller UNUSED,
     }
 
     {
-	int int_ch = check_for_interrupt(key, modifiers);
-	if (int_ch != NUL)
+	정수 int_ch = check_for_interrupt(key, modifiers);
+	만약 (int_ch != NUL)
 	{
 	    trash_input_buf();
 	    string[0] = int_ch;
@@ -1740,10 +1740,10 @@ key_press_event(GtkEventControllerKey *controller UNUSED,
 
     add_to_input_buf(string, len);
 
-    if (p_mh)
+    만약 (p_mh)
 	gui_mch_mousehide(TRUE);
 
-    return TRUE;
+    반환 TRUE;
 }
 
     static void
@@ -1753,29 +1753,29 @@ key_release_event(GtkEventControllerKey *controller UNUSED,
 {
 }
 
-static int mouse_timed_out = TRUE;
+static 정수 mouse_timed_out = TRUE;
 static guint mouse_click_timer = 0;
 
     static timeout_cb_type
 mouse_click_timer_cb(gpointer data)
 {
-    *(int *)data = TRUE;
-    return FALSE;
+    *(정수 *)data = TRUE;
+    반환 FALSE;
 }
 
-    static int
+    static 정수
 modifiers_gdk2mouse(guint state)
 {
-    int modifiers = 0;
+    정수 modifiers = 0;
 
-    if (state & GDK_SHIFT_MASK)
+    만약 (state & GDK_SHIFT_MASK)
 	modifiers |= MOUSE_SHIFT;
-    if (state & GDK_CONTROL_MASK)
+    만약 (state & GDK_CONTROL_MASK)
 	modifiers |= MOUSE_CTRL;
-    if (state & GDK_ALT_MASK)
+    만약 (state & GDK_ALT_MASK)
 	modifiers |= MOUSE_ALT;
 
-    return modifiers;
+    반환 modifiers;
 }
 
 // GdkModifierType has no mask covering the mouse buttons only.
@@ -1784,18 +1784,18 @@ modifiers_gdk2mouse(guint state)
 
 // Track which mouse button is currently pressed for drag detection.
 // -1 means no button is pressed (MOUSE_LEFT is 0x00, so can't use 0).
-static int mouse_pressed_button = -1;
+static 정수 mouse_pressed_button = -1;
 
 static guint motion_repeat_timer = 0;
 static gboolean motion_repeat_offset = FALSE;
-static int mouse_press_x = -1, mouse_press_y = -1;
+static 정수 mouse_press_x = -1, mouse_press_y = -1;
 
     static void
-button_press_event(GtkGestureClick *gesture, int n_press UNUSED,
+button_press_event(GtkGestureClick *gesture, 정수 n_press UNUSED,
 	double x, double y, gpointer data UNUSED)
 {
-    int button;
-    int repeated_click = FALSE;
+    정수 button;
+    정수 repeated_click = FALSE;
     int_u vim_modifiers;
     guint btn;
     GdkModifierType state;
@@ -1806,7 +1806,7 @@ button_press_event(GtkGestureClick *gesture, int n_press UNUSED,
     state = gdk_event_get_modifier_state(event);
     btn = gdk_button_event_get_button(event);
 
-    if (!mouse_timed_out && mouse_click_timer)
+    만약 (!mouse_timed_out && mouse_click_timer)
     {
 	timeout_remove(mouse_click_timer);
 	mouse_click_timer = 0;
@@ -1824,22 +1824,22 @@ button_press_event(GtkGestureClick *gesture, int n_press UNUSED,
 	case 3: button = MOUSE_RIGHT; break;
 	case 8: button = MOUSE_X1; break;
 	case 9: button = MOUSE_X2; break;
-	default: return;
+	default: 반환;
     }
 
-    mouse_press_x = (int)x;
-    mouse_press_y = (int)y;
+    mouse_press_x = (정수)x;
+    mouse_press_y = (정수)y;
 
     mouse_pressed_button = button;
     vim_modifiers = modifiers_gdk2mouse(state);
-    gui_send_mouse_event(button, (int)x, (int)y, repeated_click, vim_modifiers);
+    gui_send_mouse_event(button, (정수)x, (정수)y, repeated_click, vim_modifiers);
 }
 
     static void
-button_release_event(GtkGestureClick *gesture, int n_press UNUSED,
+button_release_event(GtkGestureClick *gesture, 정수 n_press UNUSED,
 	double x, double y, gpointer data UNUSED)
 {
-    int vim_modifiers;
+    정수 vim_modifiers;
     GdkModifierType state;
     GdkEvent *event;
 
@@ -1849,14 +1849,14 @@ button_release_event(GtkGestureClick *gesture, int n_press UNUSED,
     vim_modifiers = modifiers_gdk2mouse(state);
 
     // If we are repeating motion events, then stop
-    if (motion_repeat_timer != 0)
+    만약 (motion_repeat_timer != 0)
     {
 	timeout_remove(motion_repeat_timer);
 	motion_repeat_timer = 0;
     }
 
     mouse_pressed_button = -1;
-    gui_send_mouse_event(MOUSE_RELEASE, (int)x, (int)y, FALSE, vim_modifiers);
+    gui_send_mouse_event(MOUSE_RELEASE, (정수)x, (정수)y, FALSE, vim_modifiers);
 }
 
 static double prev_mouse_x = -1.0;
@@ -1867,28 +1867,28 @@ static GdkModifierType cur_state = 0;
     static timeout_cb_type
 mouse_repeat_timer_cb(gpointer data UNUSED)
 {
-    int x, y;
+    정수 x, y;
 
-    if (mouse_pressed_button == -1)
+    만약 (mouse_pressed_button == -1)
     {
 	motion_repeat_timer = 0;
-	return G_SOURCE_REMOVE;
+	반환 G_SOURCE_REMOVE;
     }
 
     // If there already is a mouse click in the input buffer, wait another
     // time (otherwise we would create a backlog of clicks)
-    if (vim_used_in_input_buf() > 10)
-	return G_SOURCE_CONTINUE;
+    만약 (vim_used_in_input_buf() > 10)
+	반환 G_SOURCE_CONTINUE;
 
-    x = (int)prev_mouse_x;
-    y = (int)prev_mouse_y;
+    x = (정수)prev_mouse_x;
+    y = (정수)prev_mouse_y;
 
     // Fake a motion event.
     //
     // Trick: Pretend the mouse moved to the next character on every other
     // event, otherwise drag events will be discarded, because they are still in
     // the same character.
-    if (motion_repeat_offset)
+    만약 (motion_repeat_offset)
 	x += gui.char_width;
     motion_repeat_offset = !motion_repeat_offset;
 
@@ -1896,7 +1896,7 @@ mouse_repeat_timer_cb(gpointer data UNUSED)
 	    modifiers_gdk2mouse(cur_state));
 
     // Always continue, when button is released, then this timer is removed.
-    return G_SOURCE_CONTINUE;
+    반환 G_SOURCE_CONTINUE;
 }
 
     static void
@@ -1909,10 +1909,10 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
     // The button release event may have gone to another widget, e.g. a modal
     // dialog. Forget about the pressed button when no button is down anymore,
     // otherwise moving the mouse would be taken for a drag.
-    if (mouse_pressed_button >= 0 && event != NULL
+    만약 (mouse_pressed_button >= 0 && event != NULL
 	    && !(gdk_event_get_modifier_state(event) & ANY_BUTTON_MASK))
     {
-	if (motion_repeat_timer != 0)
+	만약 (motion_repeat_timer != 0)
 	{
 	    timeout_remove(motion_repeat_timer);
 	    motion_repeat_timer = 0;
@@ -1920,15 +1920,15 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
 	mouse_pressed_button = -1;
     }
 
-    if (mouse_pressed_button >= 0)
+    만약 (mouse_pressed_button >= 0)
     {
 	GdkModifierType state;
-	int		w, h;
+	정수		w, h;
 
-	if (event != NULL)
+	만약 (event != NULL)
 	{
 	    cur_state = state = gdk_event_get_modifier_state(event);
-	    gui_send_mouse_event(MOUSE_DRAG, (int)x, (int)y,
+	    gui_send_mouse_event(MOUSE_DRAG, (정수)x, (정수)y,
 		    FALSE, modifiers_gdk2mouse(state));
 	}
 
@@ -1940,37 +1940,37 @@ motion_notify_event(GtkEventControllerMotion *controller UNUSED,
 	w = gtk_widget_get_width(gui.drawarea);
 	h = gtk_widget_get_height(gui.drawarea);
 
-	if (motion_repeat_timer > 0)
+	만약 (motion_repeat_timer > 0)
 	    timeout_remove(motion_repeat_timer);
 
-	if (x < 0 || y < 0 || x >= w || y >= h)
+	만약 (x < 0 || y < 0 || x >= w || y >= h)
 	{
-	    int	dx, dy;
-	    int offshoot;
-	    int	delay;
+	    정수	dx, dy;
+	    정수 offshoot;
+	    정수	delay;
 
 	    dx = x < 0 ? -x + mouse_press_x : x - mouse_press_x;
 	    dy = y < 0 ? -y + mouse_press_y : y - mouse_press_y;
 
 	    offshoot = dx > dy ? dx : dy;
 
-	    if (offshoot > 127)
+	    만약 (offshoot > 127)
 		delay = 5;
-	    else
+	    아니면
 		delay = (130 * (127 - offshoot)) / 127 + 5;
 
 	    motion_repeat_timer = timeout_add(delay,
 		    mouse_repeat_timer_cb, NULL);
 	}
-	else
+	아니면
 	    motion_repeat_timer = 0;
     }
-    else
-	gui_mouse_moved((int)x, (int)y);
+    아니면
+	gui_mouse_moved((정수)x, (정수)y);
 
     // Only unhide if mouse actually moved. GTK seems to send a motion event
     // when switching tabs, causing the cursor to unhide.
-    if (p_mh && ((prev_mouse_x == -1 || prev_mouse_y == -1)
+    만약 (p_mh && ((prev_mouse_x == -1 || prev_mouse_y == -1)
 		|| (fabs(prev_mouse_x - x) > 0.05
 		    && fabs(prev_mouse_y - y) > 0.05)))
 	gui_mch_mousehide(FALSE);
@@ -1998,45 +1998,45 @@ enter_notify_event(GtkEventControllerMotion *controller UNUSED,
 scroll_event(GtkEventControllerScroll *controller UNUSED,
 	double dx UNUSED, double dy, gpointer data UNUSED)
 {
-    int button;
+    정수 button;
     int_u vim_modifiers;
-    int x, y;
+    정수 x, y;
     GdkModifierType state;
     GdkEvent *event;
 
     event = gtk_event_controller_get_current_event(
 	    GTK_EVENT_CONTROLLER(controller));
-    if (event == NULL)
-	return FALSE;
+    만약 (event == NULL)
+	반환 FALSE;
     state = gdk_event_get_modifier_state(event);
 
-    if (dy < 0)
+    만약 (dy < 0)
 	button = MOUSE_4;	// scroll up
-    else if (dy > 0)
+    아니면 만약 (dy > 0)
 	button = MOUSE_5;	// scroll down
-    else if (dx < 0)
+    아니면 만약 (dx < 0)
 	button = MOUSE_7;	// scroll left
-    else if (dx > 0)
+    아니면 만약 (dx > 0)
 	button = MOUSE_6;	// scroll right
-    else
-	return FALSE;
+    아니면
+	반환 FALSE;
 
     vim_modifiers = modifiers_gdk2mouse(state);
 
     gui_mch_getmouse(&x, &y);
     gui_send_mouse_event(button, x, y, FALSE, vim_modifiers);
 
-    return TRUE;
+    반환 TRUE;
 }
 
     static void
 focus_in_event(GtkEventControllerFocus *controller UNUSED,
 	gpointer data UNUSED)
 {
-    if (gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
+    만약 (gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
     {
 	gui_focus_change(TRUE);
-	if (blink_state == BLINK_NONE)
+	만약 (blink_state == BLINK_NONE)
 	    gui_mch_start_blink();
     }
 }
@@ -2045,15 +2045,15 @@ focus_in_event(GtkEventControllerFocus *controller UNUSED,
 focus_out_event(GtkEventControllerFocus *controller UNUSED,
 	gpointer data UNUSED)
 {
-    if (!gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
+    만약 (!gtk_window_is_active(GTK_WINDOW(gui.mainwin)))
     {
 	gui_focus_change(FALSE);
-	if (blink_state != BLINK_NONE)
+	만약 (blink_state != BLINK_NONE)
 	    gui_mch_stop_blink(TRUE);
     }
 }
 
-#if defined(FEAT_IMAGE)
+#만약 defined(FEAT_IMAGE)
     static void
 scale_factor_cb(GdkSurface  *surface,
 	GParamSpec	    *pspec UNUSED,
@@ -2067,7 +2067,7 @@ scale_factor_cb(GdkSurface  *surface,
     static void
 drawarea_realize_cb(GtkWidget *widget UNUSED, gpointer data UNUSED)
 {
-#if defined(FEAT_IMAGE)
+#만약 defined(FEAT_IMAGE)
     // Use GdkSurface, as that handles fractional scale values.
     GdkSurface *surface = gtk_native_get_surface(
 	    gtk_widget_get_native(gui.drawarea));
@@ -2112,8 +2112,8 @@ typedef struct
 {
     ReadData	rd;
     GdkDrop	*drop;
-    int		x;
-    int		y;
+    정수		x;
+    정수		y;
 } DropReadData;
 #endif
 
@@ -2132,13 +2132,13 @@ read_data_new(ReadDataType type, size_t sz)
     rd->type = type;
     rd->cancel = g_cancellable_new();
 
-    if (type == READ_DATA_CLIP || type == READ_DATA_DROP_DATA)
+    만약 (type == READ_DATA_CLIP || type == READ_DATA_DROP_DATA)
     {
 	rd->arr = g_byte_array_new();
 	rd->buf = g_malloc(READDATA_BUFSIZE);
     }
 
-    return rd;
+    반환 rd;
 }
 
     static void
@@ -2146,12 +2146,12 @@ read_data_free(ReadData *rd)
 {
     g_cancellable_cancel(rd->cancel);
 
-    if (rd->type == READ_DATA_CLIP)
+    만약 (rd->type == READ_DATA_CLIP)
 	g_free(((ClipReadData *)rd)->mime_type);
-    else if (rd->type == READ_DATA_DROP || rd->type == READ_DATA_DROP_DATA)
+    아니면 만약 (rd->type == READ_DATA_DROP || rd->type == READ_DATA_DROP_DATA)
 	g_object_unref(((DropReadData *)rd)->drop);
     g_object_unref(rd->cancel);
-    if (rd->arr != NULL)
+    만약 (rd->arr != NULL)
 	g_byte_array_free(rd->arr, TRUE);
     g_free(rd->buf);
     g_free(rd);
@@ -2173,30 +2173,30 @@ read_data_input_cb(
 {
     ssize_t r = g_input_stream_read_finish(stream, result, NULL);
 
-    if (r == -1)
+    만약 (r == -1)
     {
 	// Error occurred
 	DropReadData *drd = (DropReadData *)rd;
 
-	if (rd->type == READ_DATA_DROP_DATA)
+	만약 (rd->type == READ_DATA_DROP_DATA)
 	    gdk_drop_finish(drd->drop, 0);
     }
-    else if (r == 0)
+    아니면 만약 (r == 0)
     {
 	// EOF, don't need to check for READ_DATA_DROP because that uses GType.
-	if (rd->type == READ_DATA_CLIP)
+	만약 (rd->type == READ_DATA_CLIP)
 	{
 	    ClipReadData    *crd = (ClipReadData *)rd;
 	    long	    len;
 	    char_u	    *actual, *final;
-	    int		    motion_type = MAUTO;
+	    정수		    motion_type = MAUTO;
 	    char_u	    *tofree = NULL;
 
 	    len = (long)rd->arr->len;
 	    actual = final = g_byte_array_free(rd->arr, FALSE);
 	    rd->arr = NULL;
 
-	    if (clip_convert_data(&final, &len, &motion_type,
+	    만약 (clip_convert_data(&final, &len, &motion_type,
 			STRCMP(crd->mime_type, VIM_MIMETYPE_NAME) == 0,
 			STRCMP(crd->mime_type, VIMENC_MIMETYPE_NAME) == 0,
 			&tofree) == OK)
@@ -2205,7 +2205,7 @@ read_data_input_cb(
 	    vim_free(tofree);
 	}
 #ifdef FEAT_DND
-	else if (rd->type == READ_DATA_DROP_DATA)
+	아니면 만약 (rd->type == READ_DATA_DROP_DATA)
 	{
 	    DropReadData    *drd = (DropReadData *)rd;
 	    char_u	    *str;
@@ -2220,14 +2220,14 @@ read_data_input_cb(
 	}
 #endif
     }
-    else
+    아니면
     {
 	// Continue reading
 	g_byte_array_append(rd->arr, (const uint8_t *)rd->buf, r);
 	g_input_stream_read_async(stream, rd->buf, READDATA_BUFSIZE,
 		G_PRIORITY_HIGH,
 		rd->cancel, (GAsyncReadyCallback)read_data_input_cb, rd);
-	return;
+	반환;
     }
 
     read_data_free(rd);
@@ -2246,7 +2246,7 @@ gui_gtk_set_dnd_targets(void)
 
     gdk_content_formats_builder_add_gtype(builder, GDK_TYPE_FILE_LIST);
     gdk_content_formats_builder_add_gtype(builder, G_TYPE_STRING);
-    if (clip_html)
+    만약 (clip_html)
 	gdk_content_formats_builder_add_mime_type(builder, "text/html");
 
     formats = gdk_content_formats_builder_free_to_formats(builder);
@@ -2270,16 +2270,16 @@ drop_read_text(GdkDrop *drop UNUSED, char_u *text)
 	(char_u)KE_DROP
     };
 
-    if (text == NULL || *text == NUL || !query_pointer_pos(NULL, NULL, &state))
-	return;
+    만약 (text == NULL || *text == NUL || !query_pointer_pos(NULL, NULL, &state))
+	반환;
 
     dnd_yank_drag_data((char_u *)text, (long)STRLEN(text));
 
     dropkey[2] = modifiers_gdk2vim(state);
-    if (dropkey[2] != 0)
-	add_to_input_buf(dropkey, (int)sizeof(dropkey));
-    else
-	add_to_input_buf(dropkey + 3, (int)(sizeof(dropkey) - 3));
+    만약 (dropkey[2] != 0)
+	add_to_input_buf(dropkey, (정수)sizeof(dropkey));
+    아니면
+	add_to_input_buf(dropkey + 3, (정수)(sizeof(dropkey) - 3));
 }
 
     static void
@@ -2288,45 +2288,45 @@ drop_read_value_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
     const GValue    *value = gdk_drop_read_value_finish(drop, result, NULL);
     gboolean	    success = FALSE;
 
-    if (value == NULL)
+    만약 (value == NULL)
 	goto exit;
 
-    if (G_VALUE_HOLDS(value, GDK_TYPE_FILE_LIST))
+    만약 (G_VALUE_HOLDS(value, GDK_TYPE_FILE_LIST))
     {
 	GSList	*files = g_value_get_boxed(value);
-	int	nfiles = g_slist_length(files);
+	정수	nfiles = g_slist_length(files);
 	char_u	**fnames;
-	int	i;
+	정수	i;
 
-	if (nfiles <= 0)
+	만약 (nfiles <= 0)
 	    goto exit;
 
 	fnames = ALLOC_MULT(char_u *, nfiles);
-	if (fnames == NULL)
+	만약 (fnames == NULL)
 	    goto exit;
 
 	i = 0;
-	for (GSList *l = files; l != NULL; l = l->next)
+	위해 (GSList *l = files; l != NULL; l = l->next)
 	{
 	    GFile *file = l->data;
 	    char *path = g_file_get_path(file);
-	    if (path != NULL)
+	    만약 (path != NULL)
 		fnames[i++] = vim_strsave((char_u *)path);
 	    g_free(path);
 	}
 	nfiles = i;
 
-	if (nfiles > 0)
+	만약 (nfiles > 0)
 	    gui_handle_drop(drd->x, drd->y, 0, fnames, nfiles);
-	else
+	아니면
 	    vim_free(fnames);
 	success = TRUE;
     }
-    else if (G_VALUE_HOLDS(value, G_TYPE_STRING))
+    아니면 만약 (G_VALUE_HOLDS(value, G_TYPE_STRING))
     {
 	const char *text = g_value_get_string(value);
 
-	if (text == NULL || *text == NUL)
+	만약 (text == NULL || *text == NUL)
 	    goto exit;
 
 	drop_read_text(drop, (char_u *)text);
@@ -2345,11 +2345,11 @@ drop_read_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
     const char	    *m;
 
     in_stream = gdk_drop_read_finish(drop, result, &m, NULL);
-    if (in_stream == NULL || STRCMP(m, "text/html") != 0)
+    만약 (in_stream == NULL || STRCMP(m, "text/html") != 0)
     {
 	read_data_free(&drd->rd);
 	gdk_drop_finish(drop, 0);
-	return;
+	반환;
     }
 
     assert(STRCMP(m, "text/html") == 0);
@@ -2371,7 +2371,7 @@ drop_timeout_cb(void *udata UNUSED)
     g_clear_object(&dnd_cancel);
     dnd_timeout_id = 0;
 
-    return G_SOURCE_REMOVE;
+    반환 G_SOURCE_REMOVE;
 }
 
 /*
@@ -2388,13 +2388,13 @@ drop_cb(
     GdkContentFormats	*formats = gdk_drop_get_formats(drop);
     DropReadData	*drd = NULL;
 
-    if (gdk_content_formats_contain_gtype(formats, GDK_TYPE_FILE_LIST))
+    만약 (gdk_content_formats_contain_gtype(formats, GDK_TYPE_FILE_LIST))
     {
 	drd = (DropReadData *)read_data_new(READ_DATA_DROP, sizeof(*drd));
 	gdk_drop_read_value_async(drop, GDK_TYPE_FILE_LIST, G_PRIORITY_HIGH,
 		drd->rd.cancel, (GAsyncReadyCallback)drop_read_value_cb, drd);
     }
-    else if (clip_html
+    아니면 만약 (clip_html
 	    && gdk_content_formats_contain_mime_type(formats, "text/html"))
     {
 	static const char *m[] = {"text/html", NULL};
@@ -2403,23 +2403,23 @@ drop_cb(
 	gdk_drop_read_async(drop, m, G_PRIORITY_HIGH,
 		drd->rd.cancel, (GAsyncReadyCallback)drop_read_cb, drd);
     }
-    else if (gdk_content_formats_contain_gtype(formats, G_TYPE_STRING))
+    아니면 만약 (gdk_content_formats_contain_gtype(formats, G_TYPE_STRING))
     {
 	drd = (DropReadData *)read_data_new(READ_DATA_DROP, sizeof(*drd));
 	gdk_drop_read_value_async(drop, G_TYPE_STRING, G_PRIORITY_HIGH,
 		drd->rd.cancel, (GAsyncReadyCallback)drop_read_value_cb, drd);
     }
 
-    if (dnd_cancel != NULL)
+    만약 (dnd_cancel != NULL)
 	g_cancellable_cancel(dnd_cancel);
     g_clear_object(&dnd_cancel);
     g_clear_handle_id(&dnd_timeout_id, timeout_remove);
 
-    if (drd != NULL)
+    만약 (drd != NULL)
     {
 	drd->drop = g_object_ref(drop);
-	drd->x = (int)x;
-	drd->y = (int)y;
+	drd->x = (정수)x;
+	drd->y = (정수)y;
 	dnd_cancel = g_object_ref(drd->rd.cancel);
 
 	// Trying to spin the event loop here causes this GTK assertion error:
@@ -2431,9 +2431,9 @@ drop_cb(
 	// Add a 3 second timeout
 	dnd_timeout_id = timeout_add(3000, drop_timeout_cb, NULL);
 
-	return TRUE;
+	반환 TRUE;
     }
-    return FALSE;
+    반환 FALSE;
 }
 #endif
 
@@ -2442,7 +2442,7 @@ mainwin_destroy_cb(GObject *object UNUSED, gpointer data UNUSED)
 {
     gui.mainwin = NULL;
     gui.drawarea = NULL;
-    if (!exiting)
+    만약 (!exiting)
 	gui_shell_closed();
 }
 
@@ -2450,7 +2450,7 @@ mainwin_destroy_cb(GObject *object UNUSED, gpointer data UNUSED)
 delete_event_cb(GtkWindow *window UNUSED, gpointer data UNUSED)
 {
     gui_shell_closed();
-    return TRUE;
+    반환 TRUE;
 }
 
 /*
@@ -2462,18 +2462,18 @@ delete_event_cb(GtkWindow *window UNUSED, gpointer data UNUSED)
     static timeout_cb_type
 input_timer_cb(gpointer data)
 {
-    int *timed_out = (int *)data;
+    정수 *timed_out = (정수 *)data;
 
     *timed_out = TRUE;
-    return FALSE;	// don't call me again
+    반환 FALSE;	// don't call me again
 }
 
     void
 gui_mch_update(void)
 {
-    int cnt = 0;
+    정수 cnt = 0;
 
-    while (g_main_context_pending(NULL) && !vim_is_input_buf_full()
+    동안 (g_main_context_pending(NULL) && !vim_is_input_buf_full()
 								&& ++cnt < 100)
 	g_main_context_iteration(NULL, TRUE);
 }
@@ -2486,33 +2486,33 @@ channel_poll_cb(gpointer data UNUSED)
     // not work, it hangs.  Instead poll for messages.
     channel_handle_events(TRUE);
     parse_queued_messages();
-    return TRUE; // Keep repeating
+    반환 TRUE; // Keep repeating
 }
 #endif
 
-    int
+    정수
 gui_mch_wait_for_chars(long wtime)
 {
-    int		focus;
+    정수		focus;
     guint	timer;
-    static int	timed_out;
-    int		retval = FAIL;
+    static 정수	timed_out;
+    정수		retval = FAIL;
 #ifdef FEAT_JOB_CHANNEL
     guint	channel_timer = 0;
 #endif
 
     timed_out = FALSE;
 
-    if (wtime >= 0)
+    만약 (wtime >= 0)
 	timer = timeout_add(wtime == 0 ? 1L : wtime,
 						   input_timer_cb, &timed_out);
-    else
+    아니면
 	timer = 0;
 
 #ifdef FEAT_JOB_CHANNEL
     // If there is a channel with the keep_open flag we need to poll for input
     // on them.
-    if (channel_any_keep_open())
+    만약 (channel_any_keep_open())
 	channel_timer = timeout_add(20, channel_poll_cb, NULL);
 #endif
 
@@ -2521,11 +2521,11 @@ gui_mch_wait_for_chars(long wtime)
     do
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	만약 (gui.in_focus != focus)
 	{
-	    if (gui.in_focus)
+	    만약 (gui.in_focus)
 		gui_mch_start_blink();
-	    else
+	    아니면
 		gui_mch_stop_blink(TRUE);
 	    focus = gui.in_focus;
 	}
@@ -2536,56 +2536,56 @@ gui_mch_wait_for_chars(long wtime)
 # endif
 	parse_queued_messages();
 # ifdef FEAT_TIMERS
-	if (did_add_timer)
+	만약 (did_add_timer)
 	    goto theend;
 # endif
 #endif
 
-	if (gui.mainwin == NULL)
+	만약 (gui.mainwin == NULL)
 	    goto theend;
 
 	// gtk_main_quit() is a wake-up request; consume it so later
 	// waits resume.
-	if (gtk4_main_loop_quit)
+	만약 (gtk4_main_loop_quit)
 	{
 	    gtk4_main_loop_quit = FALSE;
 	    goto theend;
 	}
 
-	if (!input_available())
+	만약 (!input_available())
 	{
 	    ++gtk4_main_loop_level;
 	    g_main_context_iteration(NULL, TRUE);
 	    --gtk4_main_loop_level;
 	}
 
-	if (input_available())
+	만약 (input_available())
 	{
 	    retval = OK;
 	    goto theend;
 	}
-    } while (wtime < 0 || !timed_out);
+    } 동안 (wtime < 0 || !timed_out);
 
     gui_mch_update();
 
 theend:
-    if (timer != 0 && !timed_out)
+    만약 (timer != 0 && !timed_out)
 	timeout_remove(timer);
 #ifdef FEAT_JOB_CHANNEL
-    if (channel_timer != 0)
+    만약 (channel_timer != 0)
 	timeout_remove(channel_timer);
 #endif
 
-    return retval;
+    반환 retval;
 }
 
     void
 gui_mch_flush(void)
 {
     // Ensure the offscreen surface content gets painted to the widget.
-    if (gui.drawarea != NULL)
+    만약 (gui.drawarea != NULL)
 	gtk_widget_queue_draw(gui.drawarea);
-    if (gui.mainwin != NULL && gtk_widget_get_realized(gui.mainwin))
+    만약 (gui.mainwin != NULL && gtk_widget_get_realized(gui.mainwin))
 	gdk_display_flush(gtk_widget_get_display(gui.mainwin));
 }
 
@@ -2594,10 +2594,10 @@ gui_mch_beep(void)
 {
     GdkDisplay *display;
 
-    if (gui.mainwin != NULL && gtk_widget_get_realized(gui.mainwin))
+    만약 (gui.mainwin != NULL && gtk_widget_get_realized(gui.mainwin))
     {
 	display = gtk_widget_get_display(gui.mainwin);
-	if (display != NULL)
+	만약 (display != NULL)
 	    gdk_display_beep(display);
     }
 }
@@ -2605,9 +2605,9 @@ gui_mch_beep(void)
     void *
 gui_mch_get_display(void)
 {
-    if (gui.mainwin != NULL && gtk_widget_get_display(gui.mainwin))
-	return gtk_widget_get_display(gui.mainwin);
-    return NULL;
+    만약 (gui.mainwin != NULL && gtk_widget_get_display(gui.mainwin))
+	반환 gtk_widget_get_display(gui.mainwin);
+    반환 NULL;
 }
 
     void
@@ -2622,8 +2622,8 @@ gui_mch_set_foreground(void)
     gtk_window_present(GTK_WINDOW(gui.mainwin));
 }
 
-    static int
-query_pointer_pos(int *x, int *y, GdkModifierType *state)
+    static 정수
+query_pointer_pos(정수 *x, 정수 *y, GdkModifierType *state)
 {
     GtkNative	    *native;
     GdkSurface	    *surface;
@@ -2633,46 +2633,46 @@ query_pointer_pos(int *x, int *y, GdkModifierType *state)
     double	     sx, sy, nx, ny;
     graphene_point_t src, dst;
 
-    if (gui.drawarea == NULL)
-	return FALSE;
+    만약 (gui.drawarea == NULL)
+	반환 FALSE;
     native = gtk_widget_get_native(gui.drawarea);
-    if (native == NULL)
-	return FALSE;
+    만약 (native == NULL)
+	반환 FALSE;
     surface = gtk_native_get_surface(native);
-    if (surface == NULL)
-	return FALSE;
+    만약 (surface == NULL)
+	반환 FALSE;
     display = gtk_widget_get_display(gui.drawarea);
-    if (display == NULL)
-	return FALSE;
+    만약 (display == NULL)
+	반환 FALSE;
     seat = gdk_display_get_default_seat(display);
-    if (seat == NULL)
-	return FALSE;
+    만약 (seat == NULL)
+	반환 FALSE;
     pointer = gdk_seat_get_pointer(seat);
-    if (pointer == NULL)
-	return FALSE;
+    만약 (pointer == NULL)
+	반환 FALSE;
 
-    if (!gdk_surface_get_device_position(surface, pointer, &sx, &sy, state))
-	return FALSE;
+    만약 (!gdk_surface_get_device_position(surface, pointer, &sx, &sy, state))
+	반환 FALSE;
 
-    if (x != NULL && y != NULL)
+    만약 (x != NULL && y != NULL)
     {
 	gtk_native_get_surface_transform(native, &nx, &ny);
 	src.x = (float)(sx - nx);
 	src.y = (float)(sy - ny);
-	if (!gtk_widget_compute_point(GTK_WIDGET(native), gui.drawarea,
+	만약 (!gtk_widget_compute_point(GTK_WIDGET(native), gui.drawarea,
 		    &src, &dst))
-	    return FALSE;
+	    반환 FALSE;
 
-	*x = (int)dst.x;
-	*y = (int)dst.y;
+	*x = (정수)dst.x;
+	*y = (정수)dst.y;
     }
-    return TRUE;
+    반환 TRUE;
 }
 
     void
-gui_mch_getmouse(int *x, int *y)
+gui_mch_getmouse(정수 *x, 정수 *y)
 {
-    if (!query_pointer_pos(x, y, NULL))
+    만약 (!query_pointer_pos(x, y, NULL))
     {
 	*x = 0;
 	*y = 0;
@@ -2680,41 +2680,41 @@ gui_mch_getmouse(int *x, int *y)
 }
 
     void
-gui_mch_setmouse(int x UNUSED, int y UNUSED)
+gui_mch_setmouse(정수 x UNUSED, 정수 y UNUSED)
 {
     // GTK4/Wayland: cannot warp pointer
 }
 
     void
-gui_mch_mousehide(int hide)
+gui_mch_mousehide(정수 hide)
 {
-    if (gui.pointer_hidden == hide)
-	return;
+    만약 (gui.pointer_hidden == hide)
+	반환;
 
     gui.pointer_hidden = hide;
-    if (gui.blank_pointer != NULL)
+    만약 (gui.blank_pointer != NULL)
     {
-	if (hide)
+	만약 (hide)
 	    gtk_widget_set_cursor(gui.drawarea, gui.blank_pointer);
-	else
+	아니면
 #ifdef FEAT_MOUSESHAPE
 	    mch_set_mouse_shape(last_shape);
-#else
+#아니면
 	    gtk_widget_set_cursor(gui.drawarea, NULL);
 #endif
     }
 }
 
-    int
+    정수
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    정수 i;
 
-    for (i = 0; special_keys[i].key_sym != 0; i++)
-	if (name[0] == special_keys[i].code0
+    위해 (i = 0; special_keys[i].key_sym != 0; i++)
+	만약 (name[0] == special_keys[i].code0
 		&& name[1] == special_keys[i].code1)
-	    return OK;
-    return FAIL;
+	    반환 OK;
+    반환 FAIL;
 }
 
     void
@@ -2730,28 +2730,28 @@ gui_mch_forked(void)
 gui_gtk4_update_scrollbar_size(void)
 {
     win_T	*wp;
-    int		w = -1, h = -1;
+    정수		w = -1, h = -1;
     GtkWidget	*sbar;
 
     FOR_ALL_WINDOWS(wp)
     {
 	sbar = wp->w_scrollbars[SBAR_LEFT].id;
 
-	if (sbar == NULL || !gtk_widget_get_visible(sbar)
+	만약 (sbar == NULL || !gtk_widget_get_visible(sbar)
 		|| (!gui.which_scrollbars[SBAR_LEFT]
 		    && wp->w_scrollbars[SBAR_RIGHT].id != NULL))
 	    sbar = wp->w_scrollbars[SBAR_RIGHT].id;
 
-	if (sbar != NULL && gtk_widget_get_visible(sbar))
+	만약 (sbar != NULL && gtk_widget_get_visible(sbar))
 	{
 	    GtkRequisition  min, nat;
-	    int		    sw;
+	    정수		    sw;
 
 	    // Use preferred size, since widget may not have its size allocated
 	    // yet.
 	    gtk_widget_get_preferred_size(sbar, &min, &nat);
 	    sw = MAX(min.width, nat.width);
-	    if (sw > 0)
+	    만약 (sw > 0)
 	    {
 		w = sw;
 		break;
@@ -2761,21 +2761,21 @@ gui_gtk4_update_scrollbar_size(void)
     }
 
     sbar = gui.bottom_sbar.id;
-    if (sbar != NULL && gtk_widget_get_visible(sbar))
+    만약 (sbar != NULL && gtk_widget_get_visible(sbar))
     {
 	GtkRequisition min, nat;
-	int		    sh;
+	정수		    sh;
 
 	gtk_widget_get_preferred_size(sbar, &min, &nat);
 	sh = MAX(min.height, nat.height);
 
-	if (sh > 0)
+	만약 (sh > 0)
 	    h = sh;
     }
 
-    if (w != -1)
+    만약 (w != -1)
 	gui.scrollbar_width = w;
-    if (h != -1)
+    만약 (h != -1)
 	gui.scrollbar_height = h;
 }
 
@@ -2787,20 +2787,20 @@ gui_gtk4_update_scrollbar_size(void)
  */
 
     void
-gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
+gui_mch_enable_scrollbar(scrollbar_T *sb, 정수 flag)
 {
-    if (sb->id != NULL)
+    만약 (sb->id != NULL)
     {
 	gboolean was_visible = gtk_widget_get_visible(sb->id);
 
 	gtk_widget_set_visible(sb->id, flag);
 
-	if (!was_visible && flag)
+	만약 (!was_visible && flag)
 	    gui_gtk4_update_scrollbar_size();
     }
 }
 
-#if defined(FEAT_MENU)
+#만약 defined(FEAT_MENU)
 /*
  * ============================================================
  * Menu stubs
@@ -2808,10 +2808,10 @@ gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
  */
 
     void
-gui_mch_menu_grey(vimmenu_T *menu, int grey)
+gui_mch_menu_grey(vimmenu_T *menu, 정수 grey)
 {
-    if (menu->id == NULL)
-	return;
+    만약 (menu->id == NULL)
+	반환;
     gtk_widget_set_sensitive(menu->id, !grey);
     gui_mch_update();
 }
@@ -2820,10 +2820,10 @@ gui_mch_menu_grey(vimmenu_T *menu, int grey)
  * Make menu item hidden or not hidden.
  */
     void
-gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
+gui_mch_menu_hidden(vimmenu_T *menu, 정수 hidden)
 {
-    if (menu->id == NULL)
-	return;
+    만약 (menu->id == NULL)
+	반환;
     gtk_widget_set_visible(menu->id, !hidden);
     gui_mch_update();
 }
@@ -2844,23 +2844,23 @@ gui_mch_draw_menubar(void)
 
 #ifdef FEAT_GUI_TABLINE
     void
-gui_mch_show_tabline(int showit)
+gui_mch_show_tabline(정수 showit)
 {
-    if (gui.tabline == NULL)
-	return;
+    만약 (gui.tabline == NULL)
+	반환;
     gtk_widget_set_visible(gui.tabline, showit);
     gui_mch_update();
 }
 
-    int
+    정수
 gui_mch_showing_tabline(void)
 {
-    return gui.tabline != NULL && gtk_widget_get_visible(gui.tabline);
+    반환 gui.tabline != NULL && gtk_widget_get_visible(gui.tabline);
 }
 
-static int ignore_tabline_evt = FALSE;
+static 정수 ignore_tabline_evt = FALSE;
 // Page hovered over in tab line, zero indicates none
-static int tabpage_hover = 0;
+static 정수 tabpage_hover = 0;
 
     static void
 tabpage_enter_cb(
@@ -2935,9 +2935,9 @@ tabline_add_css(void)
 	"  min-width: 24px; }";
 
     provider = gtk_css_provider_new();
-# if GTK_CHECK_VERSION(4, 12, 0)
+# 만약 GTK_CHECK_VERSION(4, 12, 0)
     gtk_css_provider_load_from_string(provider, css);
-# else
+# 아니면
     gtk_css_provider_load_from_data(provider, css, -1);
 # endif
     gtk_style_context_add_provider_for_display(
@@ -2952,10 +2952,10 @@ tabline_add_css(void)
     static void
 tab_close_clicked_cb(GtkButton *button UNUSED, gpointer data)
 {
-    int idx = gtk_notebook_page_num(GTK_NOTEBOOK(gui.tabline),
+    정수 idx = gtk_notebook_page_num(GTK_NOTEBOOK(gui.tabline),
 							   GTK_WIDGET(data));
 
-    if (idx >= 0)
+    만약 (idx >= 0)
 	send_tabline_menu_event(idx + 1, TABLINE_MENU_CLOSE);
 }
 
@@ -2966,29 +2966,29 @@ gui_mch_update_tabline(void)
     GtkWidget	*event_box;
     GtkWidget	*label;
     tabpage_T	*tp;
-    int		nr = 0;
-    int		tab_num;
-    int		curtabidx = 0;
+    정수		nr = 0;
+    정수		tab_num;
+    정수		curtabidx = 0;
     char_u	*labeltext;
 
-    if (gui.tabline == NULL)
-	return;
+    만약 (gui.tabline == NULL)
+	반환;
 
     ignore_tabline_evt = TRUE;
 
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr)
+    위해 (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr)
     {
 	GtkNotebookPage	    *page_widget;
 	GtkWidget	    *tab_widget;
 	GtkEventController  *mcontroller;
 
-	if (tp == curtab)
+	만약 (tp == curtab)
 	    curtabidx = nr;
 
 	tab_num = nr + 1;
 
 	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr);
-	if (page == NULL)
+	만약 (page == NULL)
 	{
 	    GtkWidget	*spacer;
 	    GtkWidget	*close_button;
@@ -3042,7 +3042,7 @@ gui_mch_update_tabline(void)
 	label = g_object_get_data(G_OBJECT(event_box), "label");
 	get_tabline_label(tp, FALSE);
 	labeltext = CONVERT_TO_UTF8(NameBuff);
-	if (label != NULL && GTK_IS_LABEL(label))
+	만약 (label != NULL && GTK_IS_LABEL(label))
 	    gtk_label_set_text(GTK_LABEL(label), (const char *)labeltext);
 	CONVERT_TO_UTF8_FREE(labeltext);
 
@@ -3052,25 +3052,25 @@ gui_mch_update_tabline(void)
 	CONVERT_TO_UTF8_FREE(labeltext);
     }
 
-    while (gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr) != NULL)
+    동안 (gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr) != NULL)
 	gtk_notebook_remove_page(GTK_NOTEBOOK(gui.tabline), nr);
 
     // With a single tab the tab is not highlighted and has no close button.
-    if (nr == 1)
+    만약 (nr == 1)
 	gtk_widget_add_css_class(gui.tabline, "single-tab");
-    else
+    아니면
 	gtk_widget_remove_css_class(gui.tabline, "single-tab");
 
-    if (gtk_notebook_get_current_page(GTK_NOTEBOOK(gui.tabline)) != curtabidx)
+    만약 (gtk_notebook_get_current_page(GTK_NOTEBOOK(gui.tabline)) != curtabidx)
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(gui.tabline), curtabidx);
 
     ignore_tabline_evt = FALSE;
 }
 
     void
-gui_mch_set_curtab(int nr)
+gui_mch_set_curtab(정수 nr)
 {
-    if (gui.tabline != NULL)
+    만약 (gui.tabline != NULL)
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(gui.tabline), nr - 1);
 }
 
@@ -3084,7 +3084,7 @@ on_select_tab(
 	gint		idx,
 	gpointer	data UNUSED)
 {
-    if (!ignore_tabline_evt)
+    만약 (!ignore_tabline_evt)
 	send_tabline_event(idx + 1);
 }
 
@@ -3098,12 +3098,12 @@ on_tab_reordered(
 	gint		idx,
 	gpointer	data UNUSED)
 {
-    if (ignore_tabline_evt)
-	return;
+    만약 (ignore_tabline_evt)
+	반환;
 
-    if ((tabpage_index(curtab) - 1) < idx)
+    만약 ((tabpage_index(curtab) - 1) < idx)
 	tabpage_move(idx + 1);
-    else
+    아니면
 	tabpage_move(idx);
 }
 
@@ -3113,12 +3113,12 @@ on_tab_reordered(
     static void
 tabline_menu_event_cb(VimMenuItem *item UNUSED, VimMenuItemEvent event, void *udata)
 {
-    if (event == VIM_MENU_ITEM_CLICKED)
+    만약 (event == VIM_MENU_ITEM_CLICKED)
 	send_tabline_menu_event(tabpage_hover, GPOINTER_TO_INT(udata));
 }
 
     static void
-add_tabline_menu_item(VimMenu *menu, const char *name, int resp)
+add_tabline_menu_item(VimMenu *menu, const char *name, 정수 resp)
 {
     VimMenuItem *item = VIM_MENU_ITEM(vim_menu_item_new(name,
 		tabline_menu_event_cb, GINT_TO_POINTER(resp)));
@@ -3138,13 +3138,13 @@ create_tabline_popup_menu(void)
     add_tabline_menu_item(menu, _("New Tab"), TABLINE_MENU_NEW);
     add_tabline_menu_item(menu, _("Open Tab..."), TABLINE_MENU_OPEN);
 
-    return menu;
+    반환 menu;
 }
 
     static void
 tabline_menu_press_event(
 	GtkGestureClick *gesture,
-	int		n_press UNUSED,
+	정수		n_press UNUSED,
 	double		x,
 	double		y,
 	GtkWidget	*popover)
@@ -3152,7 +3152,7 @@ tabline_menu_press_event(
     guint but;
 
     but = gtk_gesture_single_get_current_button(GTK_GESTURE_SINGLE(gesture));
-    if (but == GDK_BUTTON_SECONDARY)
+    만약 (but == GDK_BUTTON_SECONDARY)
     {
 	// Right mouse button pressed, popup menu
 	GdkRectangle rect;
@@ -3164,16 +3164,16 @@ tabline_menu_press_event(
 	gtk_popover_set_pointing_to(GTK_POPOVER(popover), &rect);
 	gtk_popover_popup(GTK_POPOVER(popover));
     }
-    else if (but == GDK_BUTTON_PRIMARY)
+    아니면 만약 (but == GDK_BUTTON_PRIMARY)
     {
-	if (tabpage_hover == 0)
+	만약 (tabpage_hover == 0)
 	    // Click after all tabs moves to next tab page.  When "x" is
 	    // small guess it's the left button.
 	    send_tabline_event(x < 50 ? -1 : 0);
     }
-    else if (but == GDK_BUTTON_MIDDLE)
+    아니면 만약 (but == GDK_BUTTON_MIDDLE)
     {
-	if (tabpage_hover != 0)
+	만약 (tabpage_hover != 0)
 	    // Middle mouse click on tabpage label closes that tab.
 	    send_tabline_menu_event(tabpage_hover, TABLINE_MENU_CLOSE);
     }
@@ -3186,18 +3186,18 @@ tabline_menu_press_event(
  * ============================================================
  */
 
-#if defined(FEAT_SIGN_ICONS)
+#만약 defined(FEAT_SIGN_ICONS)
 # define SIGN_WIDTH  (2 * gui.char_width)
 # define SIGN_HEIGHT (gui.char_height)
 
     void
-gui_mch_drawsign(int row, int col, int typenr)
+gui_mch_drawsign(정수 row, 정수 col, 정수 typenr)
 {
     GdkTexture *sign;
 
     sign = (GdkTexture *)sign_get_image(typenr);
-    if (sign == NULL)
-	return;
+    만약 (sign == NULL)
+	반환;
 
     vim_draw_area_add_sign(VIM_DRAW_AREA(gui.drawarea), sign,
 	    row, col, SIGN_WIDTH, SIGN_HEIGHT);
@@ -3208,26 +3208,26 @@ gui_mch_drawsign(int row, int col, int typenr)
     void *
 gui_mch_register_sign(char_u *signfile)
 {
-    if (signfile[0] != NUL && signfile[0] != '-' && gui.in_use)
+    만약 (signfile[0] != NUL && signfile[0] != '-' && gui.in_use)
     {
 	GError	    *error = NULL;
 	GdkTexture  *sign;
 
 	sign = gdk_texture_new_from_filename((const char *)signfile,
 							    &error);
-	if (sign != NULL)
-	    return sign;
+	만약 (sign != NULL)
+	    반환 sign;
 
 	semsg("E255: %s", error->message);
 	g_error_free(error);
     }
-    return NULL;
+    반환 NULL;
 }
 
     void
 gui_mch_destroy_sign(void *sign)
 {
-    if (sign != NULL)
+    만약 (sign != NULL)
 	g_object_unref(sign);
 }
 #endif
@@ -3245,28 +3245,28 @@ gui_mch_destroy_sign(void *sign)
  * uses the fast cached glyph path.
  * Returns the number of display cells used.
  */
-    int
-gui_gtk_draw_string(int row, int col, char_u *s, int len, int flags)
+    정수
+gui_gtk_draw_string(정수 row, 정수 col, char_u *s, 정수 len, 정수 flags)
 {
-    int cells;
+    정수 cells;
 
     cells = vim_draw_area_draw_string(VIM_DRAW_AREA(gui.drawarea),
 	    row, col, s, len, flags);
 
-    if (gui.drawarea != NULL)
+    만약 (gui.drawarea != NULL)
 	gtk_widget_queue_draw(gui.drawarea);
 
-    return cells;
+    반환 cells;
 }
 
-    int
+    정수
 gui_get_x11_windis(Window *win UNUSED, Display **dis UNUSED)
 {
     // GTK4: not applicable
-    return FAIL;
+    반환 FAIL;
 }
 
-#if defined(FEAT_MENU)
+#만약 defined(FEAT_MENU)
 /*
  * Translate Vim's mnemonic tagging to GTK+ style and convert to UTF-8
  * if necessary.  The caller must vim_free() the returned string.
@@ -3278,41 +3278,41 @@ gui_get_x11_windis(Window *win UNUSED, Display **dis UNUSED)
  *	<Tab>		end of menu label text
  */
     static char_u *
-translate_mnemonic_tag(char_u *name, int use_mnemonic)
+translate_mnemonic_tag(char_u *name, 정수 use_mnemonic)
 {
     char_u  *buf;
     char_u  *psrc;
     char_u  *pdest;
-    int	    n_underscores = 0;
+    정수	    n_underscores = 0;
 
     name = CONVERT_TO_UTF8(name);
-    if (name == NULL)
-	return NULL;
+    만약 (name == NULL)
+	반환 NULL;
 
-    for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
-	if (*psrc == '_')
+    위해 (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	만약 (*psrc == '_')
 	    ++n_underscores;
 
     buf = alloc(psrc - name + n_underscores + 1);
-    if (buf != NULL)
+    만약 (buf != NULL)
     {
 	pdest = buf;
-	for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	위해 (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
 	{
-	    if (*psrc == '_')
+	    만약 (*psrc == '_')
 	    {
 		*pdest++ = '_';
 		*pdest++ = '_';
 	    }
-	    else if (*psrc != '&')
+	    아니면 만약 (*psrc != '&')
 	    {
 		*pdest++ = *psrc;
 	    }
-	    else if (*(psrc + 1) == '&')
+	    아니면 만약 (*(psrc + 1) == '&')
 	    {
 		*pdest++ = *psrc++;
 	    }
-	    else if (use_mnemonic)
+	    아니면 만약 (use_mnemonic)
 	    {
 		*pdest++ = '_';
 	    }
@@ -3321,26 +3321,26 @@ translate_mnemonic_tag(char_u *name, int use_mnemonic)
     }
 
     CONVERT_TO_UTF8_FREE(name);
-    return buf;
+    반환 buf;
 }
 
 /*
  * Enable or disable accelerators for the toplevel menus.
  */
     void
-gui_gtk_set_mnemonics(int enable)
+gui_gtk_set_mnemonics(정수 enable)
 {
     vimmenu_T	*menu;
     char_u	*name;
 
     FOR_ALL_MENUS(menu)
     {
-	if (menu->id == NULL)
+	만약 (menu->id == NULL)
 	    continue;
 
 	name = translate_mnemonic_tag(menu->name, enable);
 	// Don't think the check if necessary but still do it anyways
-	if (VIM_IS_MENU_BAR_ITEM(menu->id))
+	만약 (VIM_IS_MENU_BAR_ITEM(menu->id))
 	    vim_menu_bar_item_set_text(VIM_MENU_BAR_ITEM(menu->id),
 		    (const char *)name);
 	vim_free(name);
@@ -3351,7 +3351,7 @@ gui_gtk_set_mnemonics(int enable)
 popupmenu_closed_cb(GtkWidget *popover, void *udata UNUSED)
 {
     gtk_widget_unparent(popover);
-    if (gui.drawarea != NULL)
+    만약 (gui.drawarea != NULL)
 	gtk_widget_queue_draw(gui.drawarea);
 }
 
@@ -3359,13 +3359,13 @@ popupmenu_closed_cb(GtkWidget *popover, void *udata UNUSED)
  * Open a popup for the given menu at point (x, y).
  */
     static void
-gui_gtk_popup_at(vimmenu_T *menu, int x, int y)
+gui_gtk_popup_at(vimmenu_T *menu, 정수 x, 정수 y)
 {
     GtkWidget	    *popover;
     GdkRectangle    rect;
 
-    if (menu == NULL || menu->submenu_id == NULL)
-	return;
+    만약 (menu == NULL || menu->submenu_id == NULL)
+	반환;
 
     popover = vim_menu_copy(VIM_MENU(menu->submenu_id));
     gtk_widget_set_parent(popover, gui.drawarea);
@@ -3385,18 +3385,18 @@ gui_gtk_popup_at(vimmenu_T *menu, int x, int y)
 }
 
     void
-gui_make_popup(char_u *path_name, int mouse_pos)
+gui_make_popup(char_u *path_name, 정수 mouse_pos)
 {
     vimmenu_T	*menu;
-    int		x, y;
+    정수		x, y;
 
     menu = gui_find_menu(path_name);
-    if (menu == NULL || menu->submenu_id == NULL)
-	return;
+    만약 (menu == NULL || menu->submenu_id == NULL)
+	반환;
 
-    if (mouse_pos)
+    만약 (mouse_pos)
 	gui_mch_getmouse(&x, &y);
-    else
+    아니면
     {
 	x = FILL_X(curwin->w_wincol + curwin->w_wcol + 1) + 1;
 	y = FILL_Y(W_WINROW(curwin) + curwin->w_wrow + 1) + 1;
@@ -3407,13 +3407,13 @@ gui_make_popup(char_u *path_name, int mouse_pos)
 }
 #endif // FEAT_MENU
 
-    int
+    정수
 get_menu_tool_width(void)
 {
-    return 0;
+    반환 0;
 }
 
-    int
+    정수
 get_menu_tool_height(void)
 {
     GtkWidget *widgets[] = {
@@ -3428,20 +3428,20 @@ get_menu_tool_height(void)
 #endif
     };
 
-    int height = 0;
+    정수 height = 0;
 
-    for (int i = 0; i < (int)ARRAY_LENGTH(widgets); i++)
+    위해 (정수 i = 0; i < (정수)ARRAY_LENGTH(widgets); i++)
     {
 	GtkRequisition	min;
 	GtkRequisition	nat;
-	int		h;
+	정수		h;
 
-	if (widgets[i] == NULL || !gtk_widget_get_visible(widgets[i]))
+	만약 (widgets[i] == NULL || !gtk_widget_get_visible(widgets[i]))
 	    continue;
 
 	h = gtk_widget_get_height(widgets[i]);
 
-	if (h == 0)
+	만약 (h == 0)
 	{
 	    // Allocation hasn't been updated yet (widget just became visible).
 	    // Query the preferred height so the caller gets a valid value
@@ -3452,10 +3452,10 @@ get_menu_tool_height(void)
 	    gtk_widget_get_preferred_size(widgets[i], &min, &nat);
 	    height += MAX(min.height, nat.height);
 	}
-	else
+	아니면
 	    height += h;
     }
-    return height;
+    반환 height;
 }
 
 /*
@@ -3466,9 +3466,9 @@ gui_gtk_update_selection_formats(Clipboard_T *cbd)
 {
     // This will call the ref_formats() vfunc of the content provider, see
     // gui_gtk4_cb.c
-    if (cbd == &clip_plus)
+    만약 (cbd == &clip_plus)
 	gdk_content_provider_content_changed(gui.regular_provider);
-    else
+    아니면
 	gdk_content_provider_content_changed(gui.primary_provider);
 }
 
@@ -3481,24 +3481,24 @@ gtk4_get_clipboard(Clipboard_T *cbd, GdkContentProvider **provider)
 {
     GdkDisplay *display;
 
-    if (gui.mainwin == NULL)
-	return NULL;
+    만약 (gui.mainwin == NULL)
+	반환 NULL;
 
     display = gtk_widget_get_display(gui.mainwin);
-    if (display == NULL)
-	return NULL;
+    만약 (display == NULL)
+	반환 NULL;
 
-    if (cbd == &clip_plus)
+    만약 (cbd == &clip_plus)
     {
-	if (provider != NULL)
+	만약 (provider != NULL)
 	    *provider = gui.regular_provider;
-	return gdk_display_get_clipboard(display);
+	반환 gdk_display_get_clipboard(display);
     }
-    else
+    아니면
     {
-	if (provider != NULL)
+	만약 (provider != NULL)
 	    *provider = gui.primary_provider;
-	return gdk_display_get_primary_clipboard(display);
+	반환 gdk_display_get_primary_clipboard(display);
     }
 }
 
@@ -3512,10 +3512,10 @@ clip_read_cb(GdkClipboard *cb, GAsyncResult *result, ClipReadData *crd)
     const char	    *mime_type;
 
     in_stream = gdk_clipboard_read_finish(cb, result, &mime_type, NULL);
-    if (in_stream == NULL)
+    만약 (in_stream == NULL)
     {
 	read_data_free(&crd->rd);
-	return;
+	반환;
     }
 
     // Not sure if we need to copy the string, but do it anyways.
@@ -3544,8 +3544,8 @@ clip_mch_request_selection(Clipboard_T *cbd)
     GCancellable *cancel;
 
     clipboard = gtk4_get_clipboard(cbd, NULL);
-    if (clipboard == NULL)
-	return;
+    만약 (clipboard == NULL)
+	반환;
 
     crd = (ClipReadData *)read_data_new(READ_DATA_CLIP, sizeof(*crd));
     crd->cbd = cbd;
@@ -3563,7 +3563,7 @@ clip_mch_request_selection(Clipboard_T *cbd)
 	// timeout as a safety net. Use the GCancellable as a way to signal if
 	// done (and also use it to cancel if timed out as well).
 	start = time(NULL);
-	while (!g_cancellable_is_cancelled(cancel)
+	동안 (!g_cancellable_is_cancelled(cancel)
 		&& time(NULL) < start + 3)
 	    g_main_context_iteration(NULL, TRUE);
 
@@ -3572,7 +3572,7 @@ clip_mch_request_selection(Clipboard_T *cbd)
     }
 }
 
-static int in_clipboard_set = FALSE;
+static 정수 in_clipboard_set = FALSE;
 
 /*
  * Send the current selection to the clipboard. Do nothing for because we
@@ -3588,31 +3588,31 @@ clipboard_changed_cb(GdkClipboard *clipboard, gpointer user_data)
 {
     Clipboard_T *cbd = (Clipboard_T *)user_data;
 
-    if (in_clipboard_set)
-	return;
-    if (gdk_clipboard_is_local(clipboard))
-	return;
+    만약 (in_clipboard_set)
+	반환;
+    만약 (gdk_clipboard_is_local(clipboard))
+	반환;
     clip_lose_selection(cbd);
 }
 
 /*
  * Own the selection.
  */
-    int
+    정수
 clip_mch_own_selection(Clipboard_T *cbd)
 {
     GdkContentProvider	*cp;
     GdkClipboard	*cb = gtk4_get_clipboard(cbd, &cp);
-    int			ret;
+    정수			ret;
 
-    if (cb == NULL)
-	return FAIL;
+    만약 (cb == NULL)
+	반환 FAIL;
 
     in_clipboard_set = TRUE;
     ret = gdk_clipboard_set_content(cb, cp);
     in_clipboard_set = FALSE;
 
-    return ret ? OK : FAIL;
+    반환 ret ? OK : FAIL;
 }
 
 /*
@@ -3625,12 +3625,12 @@ clip_mch_lose_selection(Clipboard_T *cbd)
     GdkClipboard *clipboard;
 
     clipboard = gtk4_get_clipboard(cbd, NULL);
-    if (clipboard == NULL)
-	return;
+    만약 (clipboard == NULL)
+	반환;
 
     // Only release ownership if we still own it. We don't want to clear the
     // current selection when we aren't actually the source.
-    if (gdk_clipboard_is_local(clipboard))
+    만약 (gdk_clipboard_is_local(clipboard))
 	gdk_clipboard_set_content(clipboard, NULL);
 }
 
@@ -3639,7 +3639,7 @@ clip_mch_lose_selection(Clipboard_T *cbd)
     guint
 gtk_main_level(void)
 {
-    return gtk4_main_loop_level;
+    반환 gtk4_main_loop_level;
 }
 
     void
@@ -3648,7 +3648,7 @@ gtk_main_quit(void)
     gtk4_main_loop_quit = TRUE;
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#만약 defined(FEAT_MOUSESHAPE)
 
 // Table of CSS cursor names corresponding to Vim's mouse shape IDs.
 // Keep in sync with the mshape_names[] table in misc2.c.
@@ -3674,31 +3674,31 @@ static const char *mshape_css_names[] =
 };
 
     void
-mch_set_mouse_shape(int shape)
+mch_set_mouse_shape(정수 shape)
 {
     GdkCursor	*c;
     const char	*css_name = "default";
 
-    if (gui.drawarea == NULL)
-	return;
+    만약 (gui.drawarea == NULL)
+	반환;
 
-    if (shape == MSHAPE_HIDE || gui.pointer_hidden)
+    만약 (shape == MSHAPE_HIDE || gui.pointer_hidden)
 	gtk_widget_set_cursor(gui.drawarea, gui.blank_pointer);
-    else
+    아니면
     {
-	if (shape >= MSHAPE_NUMBERED)
+	만약 (shape >= MSHAPE_NUMBERED)
 	    css_name = "default";
-	else if (shape < (int)ARRAY_LENGTH(mshape_css_names))
+	아니면 만약 (shape < (정수)ARRAY_LENGTH(mshape_css_names))
 	    css_name = mshape_css_names[shape];
-	else
-	    return;
+	아니면
+	    반환;
 
 	// GTK4: gdk_cursor_new_from_name(name, fallback)
 	c = gdk_cursor_new_from_name(css_name, NULL);
 	gtk_widget_set_cursor(gui.drawarea, c);
 	g_object_unref(G_OBJECT(c));
     }
-    if (shape != MSHAPE_HIDE)
+    만약 (shape != MSHAPE_HIDE)
 	last_shape = shape;
 }
 
@@ -3712,8 +3712,8 @@ mch_set_mouse_shape(int shape)
 
 
 
-static int last_text_area_w = 0;
-static int last_text_area_h = 0;
+static 정수 last_text_area_w = 0;
+static 정수 last_text_area_h = 0;
 
 /*
  * ============================================================
@@ -3776,15 +3776,15 @@ create_toolbar_icon(vimmenu_T *menu)
     GtkWidget	*image = NULL;
 
     // Try specified icon file first
-    if (menu->iconfile != NULL)
+    만약 (menu->iconfile != NULL)
     {
 	expand_env(menu->iconfile, buf, MAXPATHL);
-	if (vim_fexists(buf))
+	만약 (vim_fexists(buf))
 	{
 	    GdkTexture *texture = gdk_texture_new_from_filename(
 		    (const char *)buf, NULL);
 
-	    if (texture != NULL)
+	    만약 (texture != NULL)
 	    {
 		image = gtk_image_new_from_paintable(
 			GDK_PAINTABLE(texture));
@@ -3795,18 +3795,18 @@ create_toolbar_icon(vimmenu_T *menu)
     }
 
     // Use themed icon
-    if (image == NULL)
+    만약 (image == NULL)
     {
 	const char *icon_name = "image-missing";
-	int n = (int)ARRAY_LENGTH(toolbar_icon_names);
+	정수 n = (정수)ARRAY_LENGTH(toolbar_icon_names);
 
-	if (menu->iconidx >= 0 && menu->iconidx < n)
+	만약 (menu->iconidx >= 0 && menu->iconidx < n)
 	    icon_name = toolbar_icon_names[menu->iconidx];
 
 	image = gtk_image_new_from_icon_name(icon_name);
     }
 
-    return image;
+    반환 image;
 }
 # endif
 
@@ -3816,26 +3816,26 @@ menu_button_clicked_cb(
 	VimMenuItemEvent    event,
 	vimmenu_T	    *menu)
 {
-    if (event == VIM_MENU_ITEM_CLICKED)
+    만약 (event == VIM_MENU_ITEM_CLICKED)
 	gui_menu_cb(menu);
-    else if (event == VIM_MENU_ITEM_SELECTED)
+    아니면 만약 (event == VIM_MENU_ITEM_SELECTED)
     {
 	// Show tooltip instantly in cmdline message.
 	char_u		*tooltip;
 	static gboolean did_msg = FALSE;
 
-	if (State & MODE_CMDLINE)
-	    return;
+	만약 (State & MODE_CMDLINE)
+	    반환;
 
 	tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-	if (tooltip != NULL && utf_valid_string(tooltip, NULL))
+	만약 (tooltip != NULL && utf_valid_string(tooltip, NULL))
 	{
 	    msg((char *)tooltip);
 	    did_msg = TRUE;
 	    setcursor();
 	    out_flush_cursor(TRUE, FALSE);
 	}
-	else if (did_msg)
+	아니면 만약 (did_msg)
 	{
 	    msg("");
 	    did_msg = FALSE;
@@ -3847,14 +3847,14 @@ menu_button_clicked_cb(
 }
 
     void
-gui_mch_add_menu(vimmenu_T *menu, int idx)
+gui_mch_add_menu(vimmenu_T *menu, 정수 idx)
 {
     vimmenu_T	*parent;
     GtkWidget	*parent_widget;
     gboolean	use_mnemonic;
     char_u	*text;
 
-    if (menu->name[0] == ']' || menu_is_popup(menu->name))
+    만약 (menu->name[0] == ']' || menu_is_popup(menu->name))
     {
 	// Attach the popover to drawarea's parent rather than to drawarea
 	// itself. GtkDrawingArea is a leaf widget whose snapshot does not
@@ -3862,21 +3862,21 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 	// leave the drawing area blank while the popover is open.
 	menu->submenu_id = g_object_ref_sink(vim_menu_new());
 	gtk_widget_set_parent(menu->submenu_id, gui.drawarea);
-	return;
+	반환;
     }
 
     parent = menu->parent;
 
-    if ((parent != NULL && parent->submenu_id == NULL)
+    만약 ((parent != NULL && parent->submenu_id == NULL)
 	    || !menu_is_menubar(menu->name))
-	return;
+	반환;
 
     menu->submenu_id = g_object_ref_sink(vim_menu_new());
 
     use_mnemonic = parent != NULL || p_wak[0] != 'n';
     text = translate_mnemonic_tag(menu->name, use_mnemonic);
 
-    if (parent != NULL)
+    만약 (parent != NULL)
     {
 	parent_widget = parent->submenu_id;
 	menu->id = g_object_ref_sink(vim_menu_item_new(
@@ -3887,7 +3887,7 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 	vim_menu_insert_item(VIM_MENU(parent_widget),
 		VIM_MENU_ITEM(menu->id), idx);
     }
-    else
+    아니면
     {
 	parent_widget = gui.menubar;
 	menu->id = g_object_ref_sink(vim_menu_bar_item_new(
@@ -3901,19 +3901,19 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 }
 
     void
-gui_mch_add_menu_item(vimmenu_T *menu, int idx)
+gui_mch_add_menu_item(vimmenu_T *menu, 정수 idx)
 {
     vimmenu_T	*parent = menu->parent;
 
 # ifdef FEAT_TOOLBAR
-    if (parent != NULL && menu_is_toolbar(parent->name))
+    만약 (parent != NULL && menu_is_toolbar(parent->name))
     {
-	if (menu_is_separator(menu->name))
+	만약 (menu_is_separator(menu->name))
 	{
 	    menu->id =
 		vim_toolbar_insert_separator(VIM_TOOLBAR(gui.toolbar), idx);
 	}
-	else
+	아니면
 	{
 	    GtkWidget	*btn;
 	    GtkWidget	*icon;
@@ -3922,7 +3922,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 
 	    text    = CONVERT_TO_UTF8(menu->dname);
 	    tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-	    if (tooltip != NULL && !utf_valid_string(tooltip, NULL))
+	    만약 (tooltip != NULL && !utf_valid_string(tooltip, NULL))
 		CONVERT_TO_UTF8_FREE(tooltip);
 
 	    icon = create_toolbar_icon(menu);
@@ -3937,20 +3937,20 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    CONVERT_TO_UTF8_FREE(text);
 	    CONVERT_TO_UTF8_FREE(tooltip);
 	}
-	return;
+	반환;
     }
 # endif
 
     // Menu items (non-toolbar)
-    if (parent == NULL || parent->submenu_id == NULL)
-	return;
+    만약 (parent == NULL || parent->submenu_id == NULL)
+	반환;
 
-    if (menu_is_separator(menu->name))
+    만약 (menu_is_separator(menu->name))
     {
 	menu->id = g_object_ref_sink(vim_menu_insert_separator(
 		VIM_MENU(parent->submenu_id), idx));
     }
-    else
+    아니면
     {
 	char_u	    *text;
 	char_u	    *accel_text = NULL;
@@ -3959,14 +3959,14 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	use_mnemonic = p_wak[0] != 'n';
 	text = translate_mnemonic_tag(menu->name, use_mnemonic);
 
-	if (menu->actext != NULL && menu->actext[0] != NUL)
+	만약 (menu->actext != NULL && menu->actext[0] != NUL)
 	    accel_text = CONVERT_TO_UTF8(menu->actext);
 
 	// Add our own reference to the widget
 	menu->id = g_object_ref_sink(vim_menu_item_new((const char *)text,
 		    (VimMenuItemFunc)menu_button_clicked_cb, menu));
 
-	if (accel_text != NULL)
+	만약 (accel_text != NULL)
 	    vim_menu_item_set_accel(VIM_MENU_ITEM(menu->id),
 		    (const char *)accel_text);
 
@@ -3979,7 +3979,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 }
 
     void
-gui_mch_toggle_tearoffs(int enable UNUSED)
+gui_mch_toggle_tearoffs(정수 enable UNUSED)
 {
     // GTK4: tearoff menus don't exist.
 }
@@ -3989,11 +3989,11 @@ gui_mch_menu_set_tip(vimmenu_T *menu)
 {
     char_u *tooltip;
 
-    if (menu->id == NULL)
-	return;
+    만약 (menu->id == NULL)
+	반환;
 
     tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-    if (tooltip != NULL && utf_valid_string(tooltip, NULL))
+    만약 (tooltip != NULL && utf_valid_string(tooltip, NULL))
 	gtk_widget_set_tooltip_text(menu->id, (const char *)tooltip);
     CONVERT_TO_UTF8_FREE(tooltip);
 }
@@ -4002,27 +4002,27 @@ gui_mch_menu_set_tip(vimmenu_T *menu)
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
     // For toolbar buttons and separators, remove from the toolbar box.
-    if (menu->parent != NULL && menu_is_toolbar(menu->parent->name))
+    만약 (menu->parent != NULL && menu_is_toolbar(menu->parent->name))
     {
-	if (menu->id != NULL)
+	만약 (menu->id != NULL)
 	{
 	    vim_toolbar_remove(VIM_TOOLBAR(gui.toolbar), menu->id);
 	    menu->id = NULL;
 	}
-	return;
+	반환;
     }
 
     // For popup menus, unparent the menu as well
-    if (menu->name[0] == ']' || menu_is_popup(menu->name))
+    만약 (menu->name[0] == ']' || menu_is_popup(menu->name))
     {
-	if (menu->submenu_id != NULL)
+	만약 (menu->submenu_id != NULL)
 	    gtk_widget_unparent(menu->submenu_id);
     }
-    else if (menu->parent == NULL && menu->id != NULL)
+    아니면 만약 (menu->parent == NULL && menu->id != NULL)
 	// Remove from menubar, if not NULL.
 	vim_menu_bar_remove(VIM_MENU_BAR(gui.menubar), menu->id);
     // "menu->id" is NULL for window toolbar
-    else if (menu->id != NULL)
+    아니면 만약 (menu->id != NULL)
 	// Remove from parent menu
 	vim_menu_remove(VIM_MENU(menu->parent->submenu_id), menu->id);
 
@@ -4033,7 +4033,7 @@ gui_mch_destroy_menu(vimmenu_T *menu)
     void
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
-    int x, y;
+    정수 x, y;
 
     gui_mch_getmouse(&x, &y);
     gui_gtk_popup_at(menu, x, y);
@@ -4045,15 +4045,15 @@ show_menubar_popover(void)
     GtkWidget	    *menu;
     GdkRectangle    rect;
 
-    if (gui.menubar == NULL || gui.drawarea == NULL)
-	return;
+    만약 (gui.menubar == NULL || gui.drawarea == NULL)
+	반환;
 
-    if (gtk_widget_is_visible(gui.menubar))
+    만약 (gtk_widget_is_visible(gui.menubar))
     {
 	// If menubar is visible, then just show first menu in menubar, like how
 	// GTK traditionally seems to do it?
 	vim_menu_bar_show(VIM_MENU_BAR(gui.menubar), NULL);
-	return;
+	반환;
     }
 
     // Copy and convert the menubar into a menu popover
@@ -4083,10 +4083,10 @@ gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
 {
     GtkAdjustment *adj;
 
-    if (sb->id == NULL)
-	return;
-    if (!GTK_IS_WIDGET(sb->id) || !GTK_IS_SCROLLBAR(sb->id))
-	return;
+    만약 (sb->id == NULL)
+	반환;
+    만약 (!GTK_IS_WIDGET(sb->id) || !GTK_IS_SCROLLBAR(sb->id))
+	반환;
 
     adj = gtk_scrollbar_get_adjustment(GTK_SCROLLBAR(sb->id));
     gtk_adjustment_set_lower(adj, 0.0);
@@ -4098,39 +4098,39 @@ gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
 }
 
     void
-gui_mch_set_scrollbar_pos(scrollbar_T *sb, int x, int y, int w, int h)
+gui_mch_set_scrollbar_pos(scrollbar_T *sb, 정수 x, 정수 y, 정수 w, 정수 h)
 {
-    if (sb->id != NULL)
+    만약 (sb->id != NULL)
 	vim_form_move_resize(VIM_FORM(gui.formwin), sb->id, x, y, w, h);
 }
 
-    int
+    정수
 gui_mch_get_scrollbar_xpadding(void)
 {
-    int formwin_w = gtk_widget_get_width(gui.formwin);
-    int sbar_w = 0;
-    int xpad;
+    정수 formwin_w = gtk_widget_get_width(gui.formwin);
+    정수 sbar_w = 0;
+    정수 xpad;
 
-    if (gui.which_scrollbars[SBAR_LEFT])
+    만약 (gui.which_scrollbars[SBAR_LEFT])
 	sbar_w += gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_RIGHT])
+    만약 (gui.which_scrollbars[SBAR_RIGHT])
 	sbar_w += gui.scrollbar_width;
 
     xpad = formwin_w - last_text_area_w - sbar_w;
-    return (xpad < 0) ? 0 : xpad;
+    반환 (xpad < 0) ? 0 : xpad;
 }
 
-    int
+    정수
 gui_mch_get_scrollbar_ypadding(void)
 {
-    int formwin_h = gtk_widget_get_height(gui.formwin);
-    int ypad;
+    정수 formwin_h = gtk_widget_get_height(gui.formwin);
+    정수 ypad;
 
     ypad = formwin_h - last_text_area_h;
-    if (gui.which_scrollbars[SBAR_BOTTOM])
+    만약 (gui.which_scrollbars[SBAR_BOTTOM])
 	ypad -= gui.scrollbar_height;
 
-    return (ypad < 0) ? 0 : ypad;
+    반환 (ypad < 0) ? 0 : ypad;
 }
 
     static void
@@ -4139,17 +4139,17 @@ adjustment_value_changed(GtkAdjustment *adj, gpointer data UNUSED)
     scrollbar_T *sb = (scrollbar_T *)g_object_get_data(G_OBJECT(adj), "vim-sb");
     long value = (long)gtk_adjustment_get_value(adj);
 
-    if (sb != NULL)
+    만약 (sb != NULL)
 	gui_drag_scrollbar(sb, value, FALSE);
 }
 
     void
-gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
+gui_mch_create_scrollbar(scrollbar_T *sb, 정수 orient)
 {
     GtkAdjustment *adj;
-    if (orient == SBAR_HORIZ)
+    만약 (orient == SBAR_HORIZ)
 	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_HORIZONTAL, NULL);
-    else
+    아니면
 	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, NULL);
 
     gtk_widget_add_css_class(sb->id, "vim-scrollbar");
@@ -4166,7 +4166,7 @@ gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
     void
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
-    if (sb->id != NULL)
+    만약 (sb->id != NULL)
     {
 	vim_form_remove(VIM_FORM(gui.formwin), sb->id);
 	sb->id = NULL;
@@ -4180,12 +4180,12 @@ gui_mch_destroy_scrollbar(scrollbar_T *sb)
  */
 
     void
-gui_mch_set_text_area_pos(int x, int y, int w, int h)
+gui_mch_set_text_area_pos(정수 x, 정수 y, 정수 w, 정수 h)
 {
     // "h" may be negative especially when draw area size is smaller than
     // "gui.char_height".
-    if (w <= 0 || h <= 0)
-	return;
+    만약 (w <= 0 || h <= 0)
+	반환;
     last_text_area_w = w;
     last_text_area_h = h;
 
@@ -4197,29 +4197,29 @@ gui_mch_set_text_area_pos(int x, int y, int w, int h)
  * after all UI elements are positioned and resized.
  */
     void
-gui_gtk4_calculate_bleed(int width, int height)
+gui_gtk4_calculate_bleed(정수 width, 정수 height)
 {
-    int old_right = gui.bleed_right;
-    int old_bot = gui.bleed_bot;
+    정수 old_right = gui.bleed_right;
+    정수 old_bot = gui.bleed_bot;
 
     gui.bleed_right = width - last_text_area_w;
     gui.bleed_bot = height - last_text_area_h;
 
-    if (gui.which_scrollbars[SBAR_LEFT])
+    만약 (gui.which_scrollbars[SBAR_LEFT])
 	gui.bleed_right -= gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_RIGHT])
+    만약 (gui.which_scrollbars[SBAR_RIGHT])
 	gui.bleed_right -= gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_BOTTOM])
+    만약 (gui.which_scrollbars[SBAR_BOTTOM])
 	gui.bleed_bot -= gui.scrollbar_height;
 
     // Not sure if this can happen, but be safe...
-    if (gui.bleed_right < 0)
+    만약 (gui.bleed_right < 0)
 	gui.bleed_right = 0;
-    if (gui.bleed_bot < 0)
+    만약 (gui.bleed_bot < 0)
 	gui.bleed_bot = 0;
 
     // Make sure to update draw area if changed
-    if (old_right != gui.bleed_right || old_bot != gui.bleed_bot)
+    만약 (old_right != gui.bleed_right || old_bot != gui.bleed_bot)
 	gtk_widget_queue_draw(GTK_WIDGET(gui.drawarea));
 }
 
@@ -4265,7 +4265,7 @@ file_dialog_folder_cb(GObject *source, GAsyncResult *res, gpointer data)
 }
 
     char_u *
-gui_mch_browse(int saving,
+gui_mch_browse(정수 saving,
 	char_u *title,
 	char_u *dflt,
 	char_u *ext UNUSED,
@@ -4280,9 +4280,9 @@ gui_mch_browse(int saving,
 
     title = CONVERT_TO_UTF8(title);
 
-    if (initdir == NULL || *initdir == NUL)
+    만약 (initdir == NULL || *initdir == NUL)
 	mch_dirname(dirbuf, MAXPATHL);
-    else if (vim_FullName(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
+    아니면 만약 (vim_FullName(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
 	dirbuf[0] = NUL;
     add_pathsep(dirbuf);
 
@@ -4290,7 +4290,7 @@ gui_mch_browse(int saving,
 
     dlg = gtk_file_dialog_new();
     gtk_file_dialog_set_modal(dlg, TRUE);
-    if (title != NULL)
+    만약 (title != NULL)
 	gtk_file_dialog_set_title(dlg, (const char *)title);
 
     {
@@ -4301,40 +4301,40 @@ gui_mch_browse(int saving,
 
     // Add file filters
     filters = g_list_store_new(GTK_TYPE_FILE_FILTER);
-    if (filter != NULL && *filter != NUL)
+    만약 (filter != NULL && *filter != NUL)
     {
-	int		i = 0;
+	정수		i = 0;
 	char_u		*patt;
 	char_u		*p = filter;
 	GtkFileFilter	*gfilter;
 
 	gfilter = gtk_file_filter_new();
 	patt = alloc(STRLEN(filter));
-	if (patt != NULL)
+	만약 (patt != NULL)
 	{
-	    while (p != NULL && *p != NUL)
+	    동안 (p != NULL && *p != NUL)
 	    {
-		if (*p == '\n' || *p == ';' || *p == '\t')
+		만약 (*p == '\n' || *p == ';' || *p == '\t')
 		{
 		    STRNCPY(patt, filter, i);
 		    patt[i] = '\0';
-		    if (*p == '\t')
+		    만약 (*p == '\t')
 			gtk_file_filter_set_name(gfilter, (gchar *)patt);
-		    else
+		    아니면
 		    {
 			gtk_file_filter_add_pattern(gfilter, (gchar *)patt);
-			if (*p == '\n')
+			만약 (*p == '\n')
 			{
 			    g_list_store_append(filters, gfilter);
 			    g_object_unref(gfilter);
-			    if (*(p + 1) != NUL)
+			    만약 (*(p + 1) != NUL)
 				gfilter = gtk_file_filter_new();
 			}
 		    }
 		    filter = ++p;
 		    i = 0;
 		}
-		else
+		아니면
 		{
 		    p++;
 		    i++;
@@ -4346,26 +4346,26 @@ gui_mch_browse(int saving,
     gtk_file_dialog_set_filters(dlg, G_LIST_MODEL(filters));
     g_object_unref(filters);
 
-    if (saving && dflt != NULL && *dflt != NUL)
+    만약 (saving && dflt != NULL && *dflt != NUL)
 	gtk_file_dialog_set_initial_name(dlg, (const char *)dflt);
 
     fdd.result = NULL;
     fdd.done = FALSE;
 
-    if (saving)
+    만약 (saving)
 	gtk_file_dialog_save(dlg, GTK_WINDOW(gui.mainwin), NULL,
 		file_dialog_save_cb, &fdd);
-    else
+    아니면
 	gtk_file_dialog_open(dlg, GTK_WINDOW(gui.mainwin), NULL,
 		file_dialog_open_cb, &fdd);
 
-    while (!fdd.done)
+    동안 (!fdd.done)
 	g_main_context_iteration(NULL, TRUE);
 
-    if (fdd.result != NULL)
+    만약 (fdd.result != NULL)
     {
 	char *path = g_file_get_path(fdd.result);
-	if (path != NULL)
+	만약 (path != NULL)
 	{
 	    result = vim_strsave((char_u *)path);
 	    g_free(path);
@@ -4376,7 +4376,7 @@ gui_mch_browse(int saving,
     g_object_unref(dlg);
     CONVERT_TO_UTF8_FREE(title);
 
-    return result;
+    반환 result;
 }
 
     char_u *
@@ -4391,10 +4391,10 @@ gui_mch_browsedir(char_u *title, char_u *initdir)
 
     dlg = gtk_file_dialog_new();
     gtk_file_dialog_set_modal(dlg, TRUE);
-    if (title != NULL)
+    만약 (title != NULL)
 	gtk_file_dialog_set_title(dlg, (const char *)title);
 
-    if (initdir != NULL && *initdir != NUL)
+    만약 (initdir != NULL && *initdir != NUL)
     {
 	GFile *dir = g_file_new_for_path((const char *)initdir);
 	gtk_file_dialog_set_initial_folder(dlg, dir);
@@ -4407,13 +4407,13 @@ gui_mch_browsedir(char_u *title, char_u *initdir)
     gtk_file_dialog_select_folder(dlg, GTK_WINDOW(gui.mainwin), NULL,
 	    file_dialog_folder_cb, &fdd);
 
-    while (!fdd.done)
+    동안 (!fdd.done)
 	g_main_context_iteration(NULL, TRUE);
 
-    if (fdd.result != NULL)
+    만약 (fdd.result != NULL)
     {
 	char *path = g_file_get_path(fdd.result);
-	if (path != NULL)
+	만약 (path != NULL)
 	{
 	    result = vim_strsave((char_u *)path);
 	    g_free(path);
@@ -4424,7 +4424,7 @@ gui_mch_browsedir(char_u *title, char_u *initdir)
     g_object_unref(dlg);
     CONVERT_TO_UTF8_FREE(title);
 
-    return result;
+    반환 result;
 }
 
 /*
@@ -4440,41 +4440,41 @@ gui_mch_browsedir(char_u *title, char_u *initdir)
  * *tofree.
  */
     static char **
-split_button_string(char_u *button_string, int *n_buttons, char **tofree)
+split_button_string(char_u *button_string, 정수 *n_buttons, char **tofree)
 {
     char	    **array;
     char_u	    *p;
-    unsigned int    count = 1;
+    unsigned 정수    count = 1;
 
     button_string = (char_u *)g_strdup((const char *)button_string);
 
-    for (p = button_string; *p != NUL; ++p)
-	if (*p == DLG_BUTTON_SEP)
+    위해 (p = button_string; *p != NUL; ++p)
+	만약 (*p == DLG_BUTTON_SEP)
 	    ++count;
 
     array = g_malloc_n(count, sizeof(char *));
     count = 0;
 
-    if (array != NULL)
+    만약 (array != NULL)
     {
 	array[count++] = (char *)button_string;
-	for (p = button_string; *p != NUL; )
+	위해 (p = button_string; *p != NUL; )
 	{
-	    if (*p == DLG_BUTTON_SEP)
+	    만약 (*p == DLG_BUTTON_SEP)
 	    {
 		*p++ = NUL;
 		array[count++] = (char *)p;
 	    }
-	    else if (*p == DLG_HOTKEY_CHAR)
+	    아니면 만약 (*p == DLG_HOTKEY_CHAR)
 		*p++ = '_';
-	    else
+	    아니면
 		MB_PTR_ADV(p);
 	}
     }
 
     *tofree = (char *)button_string;
     *n_buttons = count;
-    return array;
+    반환 array;
 }
 
 /*
@@ -4482,29 +4482,29 @@ split_button_string(char_u *button_string, int *n_buttons, char **tofree)
  * VIM_GENERIC.
  */
     static const char *
-dialog_type_to_icon(int type)
+dialog_type_to_icon(정수 type)
 {
     switch (type)
     {
 	case VIM_ERROR:
-	    return "dialog-error-symbolic";
+	    반환 "dialog-error-symbolic";
 	case VIM_WARNING:
-	    return "dialog-warning-symbolic";
+	    반환 "dialog-warning-symbolic";
 	case VIM_INFO:
-	    return "dialog-information-symbolic";
+	    반환 "dialog-information-symbolic";
 	case VIM_QUESTION:
-	    return "dialog-question-symbolic";
+	    반환 "dialog-question-symbolic";
 	default:
 	    break;
     }
-    return NULL;
+    반환 NULL;
 }
 
 // Data associated with each button in the dialog
 typedef struct
 {
-    int		but_idx;
-    int		*response;
+    정수		but_idx;
+    정수		*response;
     gboolean	*done;
 } DialogButtonState;
 
@@ -4530,33 +4530,33 @@ dialog_key_pressed_cb(
 	GdkModifierType		state,
 	DialogState		*dstate)
 {
-    if (keyval == GDK_KEY_Escape)
+    만약 (keyval == GDK_KEY_Escape)
     {
 	*dstate->done = TRUE;
-	return TRUE;
+	반환 TRUE;
     }
 
-    if (dstate->no_alt && !(state & gtk_accelerator_get_default_mod_mask()))
-	return gtk_widget_mnemonic_activate(dstate->win, FALSE);
-    return FALSE;
+    만약 (dstate->no_alt && !(state & gtk_accelerator_get_default_mod_mask()))
+	반환 gtk_widget_mnemonic_activate(dstate->win, FALSE);
+    반환 FALSE;
 }
 
     static gboolean
 dialog_close_request_cb(GtkWindow *win UNUSED, gboolean *win_closed)
 {
     *win_closed = TRUE;
-    return FALSE;
+    반환 FALSE;
 }
 
-    int
+    정수
 gui_mch_dialog(
-	int	type,
+	정수	type,
 	char_u	*title,
 	char_u	*message,
 	char_u	*buttons,
-	int	def_but,
+	정수	def_but,
 	char_u	*textfield,
-	int	ex_cmd UNUSED)
+	정수	ex_cmd UNUSED)
 {
     GtkWindow		*win = GTK_WINDOW(gtk_window_new());
     GtkWidget		*vertbox;
@@ -4570,13 +4570,13 @@ gui_mch_dialog(
     GtkEventController *key_controller;
     DialogButtonState	*but_states = NULL;
     char		*tofree = NULL;
-    int			response = -1;
+    정수			response = -1;
     gboolean		done = FALSE;
     gboolean		win_closed = FALSE;
     DialogState		state;
 
     utf8_title = CONVERT_TO_UTF8(title);
-    if (utf8_title != NULL)
+    만약 (utf8_title != NULL)
 	gtk_window_set_title(win, (const char *)utf8_title);
     CONVERT_TO_UTF8_FREE(utf8_title);
 
@@ -4602,7 +4602,7 @@ gui_mch_dialog(
 
     // If type is not VIM_GENERIC, add an icon to make the dialog look nicer :)
     icon_name = dialog_type_to_icon(type);
-    if (icon_name != NULL)
+    만약 (icon_name != NULL)
     {
 	icon = gtk_image_new_from_icon_name(icon_name);
 	gtk_image_set_icon_size(GTK_IMAGE(icon), GTK_ICON_SIZE_LARGE);
@@ -4625,16 +4625,16 @@ gui_mch_dialog(
     state.done = &done;
     state.win = GTK_WIDGET(win);
 
-    if (textfield != NULL)
+    만약 (textfield != NULL)
     {
 	// Add text entry so user can enter text
 	char_u *utf8_text = CONVERT_TO_UTF8(textfield);
 
 	entry = gtk_entry_new();
 
-	if (utf8_text != NULL)
+	만약 (utf8_text != NULL)
 	    gtk_editable_set_text(GTK_EDITABLE(entry), (const char *)utf8_text);
-	else
+	아니면
 	    gtk_editable_set_text(GTK_EDITABLE(entry), "");
 	CONVERT_TO_UTF8_FREE(utf8_text);
 
@@ -4644,21 +4644,21 @@ gui_mch_dialog(
 	gtk_box_append(GTK_BOX(vertbox), entry);
 	state.no_alt = FALSE;
     }
-    else
+    아니면
     {
 	GListModel  *controllers;
-	int	    len;
+	정수	    len;
 
 	// Set all shortcut controllers in the window to not require a modifier
 	// for mnemonics.
 	controllers = gtk_widget_observe_controllers(GTK_WIDGET(win));
 	len  = g_list_model_get_n_items(controllers);
-	for (int i = 0; i < len; i++)
+	위해 (정수 i = 0; i < len; i++)
 	{
 	    GtkEventController *controller;
 
 	    controller = g_list_model_get_item(controllers, i);
-	    if (GTK_IS_SHORTCUT_CONTROLLER(controller))
+	    만약 (GTK_IS_SHORTCUT_CONTROLLER(controller))
 		gtk_shortcut_controller_set_mnemonics_modifiers(
 			GTK_SHORTCUT_CONTROLLER(controller), 0);
 	}
@@ -4668,16 +4668,16 @@ gui_mch_dialog(
 	state.no_alt = TRUE;
     }
 
-    if (buttons != NULL)
+    만약 (buttons != NULL)
     {
 	GtkWidget   *but_box;
 	char	    **buttons_arr; // Note that array is allocated, not strings
-	int	    n_buttons;
+	정수	    n_buttons;
 
 	// Check 'v' flag in 'guioptions': vertical button placement.
-	if (vim_strchr(p_go, GO_VERTICAL) != NULL)
+	만약 (vim_strchr(p_go, GO_VERTICAL) != NULL)
 	    but_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 8);
-	else
+	아니면
 	    but_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
 
 	gtk_widget_set_halign(but_box, GTK_ALIGN_CENTER);
@@ -4688,18 +4688,18 @@ gui_mch_dialog(
 
 	but_states = g_malloc_n(n_buttons, sizeof(DialogButtonState));
 
-	for (int i = 0; i < n_buttons; i++)
+	위해 (정수 i = 0; i < n_buttons; i++)
 	{
 	    char_u		*but_label;
 	    GtkWidget		*but;
 	    DialogButtonState	*but_state = but_states + i;
 
 	    but_label = CONVERT_TO_UTF8((char_u *)buttons_arr[i]);
-	    if (but_label == NULL)
+	    만약 (but_label == NULL)
 		continue;
 
 	    but = gtk_button_new_with_mnemonic((char *)but_label);
-	    if (i == def_but - 1)
+	    만약 (i == def_but - 1)
 		gtk_window_set_default_widget(win, but);
 	    gtk_box_append(GTK_BOX(but_box), but);
 	    CONVERT_TO_UTF8_FREE(but_label);
@@ -4716,12 +4716,12 @@ gui_mch_dialog(
 
     gtk_window_present(win);
 
-    while (!done && !win_closed)
+    동안 (!done && !win_closed)
 	g_main_context_iteration(NULL, TRUE);
 
-    if (done)
+    만약 (done)
     {
-	if (textfield != NULL)
+	만약 (textfield != NULL)
 	{
 	    // Get the text the user entered
 	    char_u *text;
@@ -4738,7 +4738,7 @@ gui_mch_dialog(
     g_free(tofree);
 
     // Vim buttons are indexed starting from one.
-    return response == -1 ? 0 : response + 1;
+    반환 response == -1 ? 0 : response + 1;
 }
 
 /*
@@ -4773,7 +4773,7 @@ static SharedFindReplace repl_widgets = {0};
     static void
 find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
 {
-    int			flags;
+    정수			flags;
     char_u		*find_text;
     char_u		*repl_text;
     gboolean		direction_down;
@@ -4781,12 +4781,12 @@ find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
 
     flags = GPOINTER_TO_INT(data);
 
-    if (flags == FRD_FINDNEXT)
+    만약 (flags == FRD_FINDNEXT)
     {
 	repl_text = NULL;
 	sfr = &find_widgets;
     }
-    else
+    아니면
     {
 	repl_text = (char_u *)gtk_editable_get_text(
 		GTK_EDITABLE(repl_widgets.with));
@@ -4797,9 +4797,9 @@ find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
     direction_down = gtk_check_button_get_active(
 	    GTK_CHECK_BUTTON(sfr->down));
 
-    if (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->wword)))
+    만약 (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->wword)))
 	flags |= FRD_WHOLE_WORD;
-    if (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->mcase)))
+    만약 (gtk_check_button_get_active(GTK_CHECK_BUTTON(sfr->mcase)))
 	flags |= FRD_MATCH_CASE;
 
     repl_text = CONVERT_FROM_UTF8(repl_text);
@@ -4823,15 +4823,15 @@ entry_changed_cb(GtkWidget *entry, GtkWidget *dialog)
 
     entry_text = gtk_editable_get_text(GTK_EDITABLE(entry));
 
-    if (!entry_text)
-	return; // Shouldn't happen
+    만약 (!entry_text)
+	반환; // Shouldn't happen
 
     nonempty = (entry_text[0] != '\0');
 
-    if (dialog == find_widgets.dialog)
+    만약 (dialog == find_widgets.dialog)
 	gtk_widget_set_sensitive(find_widgets.find, nonempty);
 
-    if (dialog == repl_widgets.dialog)
+    만약 (dialog == repl_widgets.dialog)
     {
 	gtk_widget_set_sensitive(repl_widgets.find, nonempty);
 	gtk_widget_set_sensitive(repl_widgets.replace, nonempty);
@@ -4849,19 +4849,19 @@ find_key_pressed_cb(
 {
     // If the user is holding one of the key modifiers we will just bail out,
     // thus preserving the possibility of normal focus traversal.
-    if (state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
-	return FALSE;
+    만약 (state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
+	반환 FALSE;
 
     // the Escape key synthesizes a cancellation action
-    if (keyval == GDK_KEY_Escape)
+    만약 (keyval == GDK_KEY_Escape)
     {
 	// Destroy rather than hide the dialog: reusing a hidden toplevel loses
 	// window decorations on Wayland
 	gtk_window_destroy(GTK_WINDOW(frdp->dialog));
-	return TRUE;
+	반환 TRUE;
     }
 
-    return FALSE;
+    반환 FALSE;
 }
 
     static void
@@ -4871,12 +4871,12 @@ entry_activate_cb(GtkWidget *widget UNUSED, void *udata)
 }
 
     static void
-find_replace_dialog_create(char_u *arg, int do_replace)
+find_replace_dialog_create(char_u *arg, 정수 do_replace)
 {
     SharedFindReplace	*frdp;
     char_u		*entry_text;
-    int			wword = FALSE;
-    int			mcase = !p_ic;
+    정수			wword = FALSE;
+    정수			mcase = !p_ic;
     GtkWidget		*vertbox, *grid, *hbox, *tmp, *btn;
     gboolean		sensitive;
     GtkEventController	*key_controller;
@@ -4884,7 +4884,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     frdp = do_replace ? &repl_widgets : &find_widgets;
     entry_text = get_find_dialog_text(arg, &wword, &mcase);
 
-    if (entry_text != NULL && output_conv.vc_type != CONV_NONE)
+    만약 (entry_text != NULL && output_conv.vc_type != CONV_NONE)
     {
 	char_u *old = entry_text;
 	entry_text = string_convert(&output_conv, entry_text, NULL);
@@ -4892,9 +4892,9 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     }
 
     // If the dialog already exists, just raise it.
-    if (frdp->dialog != NULL)
+    만약 (frdp->dialog != NULL)
     {
-	if (entry_text != NULL)
+	만약 (entry_text != NULL)
 	{
 	    gtk_editable_set_text(GTK_EDITABLE(frdp->what),
 		    (char *)entry_text);
@@ -4909,12 +4909,12 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	// For :promptrepl dialog, give it to 'with' entry if 'what' has a
 	// non-empty entry; otherwise, to 'what' entry.
 	gtk_widget_grab_focus(frdp->what);
-	if (do_replace && g_utf8_strlen(
+	만약 (do_replace && g_utf8_strlen(
 		    gtk_editable_get_text(GTK_EDITABLE(frdp->what)), -1) > 0)
 	    gtk_widget_grab_focus(frdp->with);
 
 	vim_free(entry_text);
-	return;
+	반환;
     }
 
     // Create a new dialog window.
@@ -4951,11 +4951,11 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     frdp->what = gtk_entry_new();
     gtk_widget_set_hexpand(frdp->what, TRUE);
     sensitive = (entry_text != NULL && entry_text[0] != NUL);
-    if (entry_text != NULL)
+    만약 (entry_text != NULL)
 	gtk_editable_set_text(GTK_EDITABLE(frdp->what), (char *)entry_text);
     gtk_grid_attach(GTK_GRID(grid), frdp->what, 1, 0, 1, 1);
 
-    if (do_replace)
+    만약 (do_replace)
     {
 	// "Replace with:" label + entry
 	tmp = gtk_label_new(_("Replace with:"));
@@ -4973,7 +4973,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	g_signal_connect(G_OBJECT(frdp->what), "activate",
 		G_CALLBACK(entry_activate_cb), frdp->with);
     }
-    else
+    아니면
 	// Make the entry activation do the search.
 	gtk_entry_set_activates_default(GTK_ENTRY(frdp->what), TRUE);
 
@@ -5030,7 +5030,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    GINT_TO_POINTER(do_replace ? FRD_R_FINDNEXT : FRD_FINDNEXT));
     gtk_box_append(GTK_BOX(hbox), btn);
 
-    if (do_replace)
+    만약 (do_replace)
     {
 	btn = gtk_button_new_with_label(_("Replace"));
 	gtk_widget_set_sensitive(btn, sensitive);
@@ -5054,7 +5054,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 
     gtk_window_present(GTK_WINDOW(frdp->dialog));
     gtk_widget_grab_focus(frdp->what);
-    if (do_replace && entry_text != NULL && entry_text[0] != NUL)
+    만약 (do_replace && entry_text != NULL && entry_text[0] != NUL)
 	gtk_widget_grab_focus(frdp->with);
 
     vim_free(entry_text);
@@ -5063,14 +5063,14 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     void
 gui_mch_find_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
+    만약 (gui.in_use)
 	find_replace_dialog_create(eap->arg, FALSE);
 }
 
     void
 gui_mch_replace_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
+    만약 (gui.in_use)
 	find_replace_dialog_create(eap->arg, TRUE);
 }
 
@@ -5105,7 +5105,7 @@ print_dialog_cb(GtkPrintDialog *dialog, GAsyncResult *result, gboolean *done)
     GError *error = NULL;
     print_setup = gtk_print_dialog_setup_finish(dialog, result, &error);
 
-    if (print_setup == NULL)
+    만약 (print_setup == NULL)
     {
 	semsg(_(e_print_error_str), error->message);
 	g_error_free(error);
@@ -5134,55 +5134,55 @@ gui_gtk4_print_dialog(
     print_dialog = NULL;
     print_setup = NULL;
 
-    if (print_settings == NULL)
+    만약 (print_settings == NULL)
     {
 	option_table_T *opt;
 
 	print_settings = gtk_print_settings_new();
 
 	opt = &printer_opts[OPT_PRINT_DUPLEX];
-	if (opt->present)
+	만약 (opt->present)
 	{
-	    if (STRNICMP(opt->string, "off", 3) == 0)
+	    만약 (STRNICMP(opt->string, "off", 3) == 0)
 		gtk_print_settings_set_duplex(print_settings,
 			GTK_PRINT_DUPLEX_SIMPLEX);
-	    else if (STRNICMP(opt->string, "short", 5) == 0)
+	    아니면 만약 (STRNICMP(opt->string, "short", 5) == 0)
 		gtk_print_settings_set_duplex(print_settings,
 			GTK_PRINT_DUPLEX_VERTICAL);
-	    else
+	    아니면
 		gtk_print_settings_set_duplex(print_settings,
 			GTK_PRINT_DUPLEX_HORIZONTAL);
 	}
 
 	opt = &printer_opts[OPT_PRINT_PORTRAIT];
-	if (opt->present)
+	만약 (opt->present)
 	{
-	    if (*opt->string == 'y')
+	    만약 (*opt->string == 'y')
 		gtk_print_settings_set_orientation(print_settings,
 			GTK_PAGE_ORIENTATION_PORTRAIT);
-	    else
+	    아니면
 		gtk_print_settings_set_orientation(print_settings,
 			GTK_PAGE_ORIENTATION_LANDSCAPE);
 	}
 
 	opt = &printer_opts[OPT_PRINT_PAPER];
-	if (opt->present)
+	만약 (opt->present)
 	{
 	    gtk_print_settings_set_paper_size(print_settings,
 		    gtk_paper_size_new((const char *)opt->string));
 	}
 
 	opt = &printer_opts[OPT_PRINT_COLLATE];
-	if (opt->present)
+	만약 (opt->present)
 	{
-	    if (*opt->string == 'y')
+	    만약 (*opt->string == 'y')
 		gtk_print_settings_set_collate(print_settings, TRUE);
-	    else
+	    아니면
 		gtk_print_settings_set_collate(print_settings, FALSE);
 	}
     }
 
-    if (page_setup == NULL)
+    만약 (page_setup == NULL)
 	page_setup = gtk_page_setup_new();
 
     gtk_print_dialog_set_print_settings(dialog, print_settings);
@@ -5191,16 +5191,16 @@ gui_gtk4_print_dialog(
     gtk_print_dialog_setup(dialog, GTK_WINDOW(gui.mainwin), NULL,
 	    (GAsyncReadyCallback)print_dialog_cb, &done);
 
-    while (!done)
+    동안 (!done)
 	g_main_context_iteration(NULL, TRUE);
 
-    if (print_setup == NULL)
+    만약 (print_setup == NULL)
     {
 	g_object_unref(dialog);
 	g_clear_pointer(&print_setup, gtk_print_setup_unref);
 
 	psettings->user_abort_msg = FALSE;
-	return NULL;
+	반환 NULL;
     }
 
     g_clear_object(&print_settings);
@@ -5222,20 +5222,20 @@ gui_gtk4_print_dialog(
 	    GTK_UNIT_POINTS);
 
     temp  = vim_tempname('p', FALSE);
-    if (temp == NULL)
+    만약 (temp == NULL)
     {
 	emsg(_(e_cant_find_temp_file_for_writing));
 	g_clear_object(&dialog);
 	g_clear_pointer(&print_setup, gtk_print_setup_unref);
 
 	psettings->user_abort_msg = FALSE;
-	return NULL;
+	반환 NULL;
     }
     print_file = g_file_new_for_path((char *)temp);
 
     print_dialog = dialog;
 
-    return temp;
+    반환 temp;
 }
 
     static void
@@ -5258,7 +5258,7 @@ print_file_cb(
     void
 gui_gtk4_print_finish(void)
 {
-    if (print_dialog != NULL)
+    만약 (print_dialog != NULL)
     {
 	gtk_print_dialog_print_file(
 		print_dialog, GTK_WINDOW(gui.mainwin),
@@ -5280,10 +5280,10 @@ typedef struct
 typedef struct
 {
     GskRenderNode   **nodes; // Note that elements may be NULL
-    int		    n_nodes;
+    정수		    n_nodes;
 } image_placement_gdk_T;
 
-    int
+    정수
 image_gui_init(image_T *img)
 {
     image_gdk_T	    *ctx = ALLOC_CLEAR_ONE(image_gdk_T);
@@ -5291,14 +5291,14 @@ image_gui_init(image_T *img)
     size_t	    stride;
     GBytes	    *bytes;
     size_t	    size;
-    int		    w, h;
+    정수		    w, h;
 
-    if (ctx == NULL)
-	return FAIL;
+    만약 (ctx == NULL)
+	반환 FAIL;
 
-    if (img->fmt == IMAGE_FORMAT_RGBA)
+    만약 (img->fmt == IMAGE_FORMAT_RGBA)
 	fmt = GDK_MEMORY_R8G8B8A8;
-    else
+    아니면
 	fmt = GDK_MEMORY_R8G8B8;
 
     image_get_dimensions(img, &w, &h);
@@ -5311,7 +5311,7 @@ image_gui_init(image_T *img)
     g_bytes_unref(bytes);
 
     img->backend_data = ctx;
-    return OK;
+    반환 OK;
 }
 
     void
@@ -5326,12 +5326,12 @@ image_gui_uninit(image_T *img)
     static void
 clear_nodes(image_placement_gdk_T *ctx)
 {
-    if (ctx->nodes == NULL || gui.drawarea == NULL)
-	return;
+    만약 (ctx->nodes == NULL || gui.drawarea == NULL)
+	반환;
 
-    for (int i = 0; i < ctx->n_nodes; i++)
+    위해 (정수 i = 0; i < ctx->n_nodes; i++)
     {
-	if (ctx->nodes[i] == NULL)
+	만약 (ctx->nodes[i] == NULL)
 	    continue;
 	vim_draw_area_remove_external(
 		VIM_DRAW_AREA(gui.drawarea), ctx->nodes[i]);
@@ -5341,16 +5341,16 @@ clear_nodes(image_placement_gdk_T *ctx)
     ctx->n_nodes = 0;
 }
 
-    int
+    정수
 image_placement_gui_init(image_placement_T *place)
 {
     image_placement_gdk_T *ctx = ALLOC_CLEAR_ONE(image_placement_gdk_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    만약 (ctx == NULL)
+	반환 FAIL;
 
     place->backend_data = ctx;
-    return OK;
+    반환 OK;
 }
 
     void
@@ -5369,17 +5369,17 @@ image_placement_gui_draw(image_placement_T *place)
     image_placement_gdk_T   *ctx = place->backend_data;
     image_gdk_T		    *ictx = img->backend_data;
     pixman_box32_t	    *rects;
-    int			    n_rects;
-    int			    iw, ih;
+    정수			    n_rects;
+    정수			    iw, ih;
     GskRenderNode	    *texture_node;
 
     rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (rects == NULL)
-	return;
+    만약 (rects == NULL)
+	반환;
 
     clear_nodes(ctx);
-    if (n_rects == 0)
-	return;
+    만약 (n_rects == 0)
+	반환;
 
     image_get_dimensions(img, &iw, &ih);
     texture_node = gsk_texture_node_new(ictx->texture,
@@ -5389,19 +5389,19 @@ image_placement_gui_draw(image_placement_T *place)
 		+ FILL_Y(place->row_off),
 		PHY2LOG(iw), PHY2LOG(ih)));
 
-    if (texture_node == NULL)
+    만약 (texture_node == NULL)
 	// Not sure if this can happen...
-	return;
+	반환;
 
     ctx->nodes = g_malloc_n(n_rects, sizeof(GskRenderNode *));
     ctx->n_nodes = n_rects;
 
-    for (int i = 0; i < n_rects; i++)
+    위해 (정수 i = 0; i < n_rects; i++)
     {
 	pixman_box32_t	rect = rects[i];
-	int		row, col;
-	int		posx, posy;
-	int		x, y, w, h;
+	정수		row, col;
+	정수		posx, posy;
+	정수		x, y, w, h;
 	GskRenderNode	*node;
 
 	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, false);
@@ -5411,7 +5411,7 @@ image_placement_gui_draw(image_placement_T *place)
 	node = gsk_clip_node_new(texture_node,
 		&GRAPHENE_RECT_INIT(posx, posy, w, h));
 
-	if (node != NULL)
+	만약 (node != NULL)
 	    vim_draw_area_add_external(VIM_DRAW_AREA(gui.drawarea), node);
 
 	ctx->nodes[i] = node;

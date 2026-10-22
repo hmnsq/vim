@@ -13,14 +13,14 @@
 #include "vim.h"
 #include "termlib.pro"
 
-#if !defined(AMIGA) && !defined(VMS)
+#만약 !defined(AMIGA) && !defined(VMS)
 # include <sgtty.h>
 #endif
 
-static int  getent(char *, char *, FILE *, int);
-static int  nextent(char *, FILE *, int);
-static int  _match(char *, char *);
-static char *_addfmt(char *, char *, int);
+static 정수  getent(char *, char *, FILE *, 정수);
+static 정수  nextent(char *, FILE *, 정수);
+static 정수  _match(char *, char *);
+static char *_addfmt(char *, char *, 정수);
 static char *_find(char *, char *);
 
 /*
@@ -56,16 +56,16 @@ short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 #ifndef TERMCAPFILE
 # ifdef AMIGA
 #  define TERMCAPFILE "s:termcap"
-# else
+# 아니면
 #  ifdef VMS
 #   define TERMCAPFILE "VIMRUNTIME:termcap"
-#  else
+#  아니면
 #   define TERMCAPFILE "/etc/termcap"
 #  endif
 # endif
 #endif
 
-    int
+    정수
 tgetent(
     char    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
     char    *term)		// Name of terminal
@@ -75,60 +75,60 @@ tgetent(
     char    *tcap = TERMCAPFILE; // Default termcap file
     char    *tmp;
     FILE    *termcap;
-    int	    retval = 0;
-    int	    len;
+    정수	    retval = 0;
+    정수	    len;
 
-    if ((tmp = (char *)mch_getenv((char_u *)"TERMCAP")) != NULL)
+    만약 ((tmp = (char *)mch_getenv((char_u *)"TERMCAP")) != NULL)
     {
-	if (*tmp == '/')		// TERMCAP = name of termcap file
+	만약 (*tmp == '/')		// TERMCAP = name of termcap file
 	{
 	    tcap = tmp ;
-#if defined(AMIGA)
+#만약 defined(AMIGA)
 	    // Convert /usr/share/lib/termcap to usr:share/lib/termcap
 	    tcap++;
 	    tmp = strchr(tcap, '/');
-	    if (tmp)
+	    만약 (tmp)
 		*tmp = ':';
 #endif
 	}
-	else				// TERMCAP = termcap entry itself
+	아니면				// TERMCAP = termcap entry itself
 	{
-	    int tlen = strlen(term);
+	    정수 tlen = strlen(term);
 
-	    while (*tmp && *tmp != ':')		// Check if TERM matches
+	    동안 (*tmp && *tmp != ':')		// Check if TERM matches
 	    {
 		char *nexttmp;
 
-		while (*tmp == '|')
+		동안 (*tmp == '|')
 		    tmp++;
 		nexttmp  = _find(tmp, ":|");	// Rhialto
-		if (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
+		만약 (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
 		{
 		    vim_strncpy(tbuf, tmp, TBUFSZ - 1);
 		    tent = tbuf;
-		    return 1;
+		    반환 1;
 		}
-		else
+		아니면
 		    tmp = nexttmp;
 	    }
 	}
     }
-    if (!(termcap = mch_fopen(tcap, "r")))
+    만약 (!(termcap = mch_fopen(tcap, "r")))
     {
 	vim_strncpy(tbuf, tcap, TBUFSZ - 1);
-	return -1;
+	반환 -1;
     }
 
     len = 0;
-    while (getent(tbuf + len, term, termcap, TBUFSZ - len))
+    동안 (getent(tbuf + len, term, termcap, TBUFSZ - len))
     {
 	tcptr = tcbuf;				// Rhialto
-	if ((term = tgetstr("tc", &tcptr)))	// extended entry
+	만약 ((term = tgetstr("tc", &tcptr)))	// extended entry
 	{
 	    rewind(termcap);
 	    len = strlen(tbuf);
 	}
-	else
+	아니면
 	{
 	    retval = 1;
 	    tent = tbuf;	// reset it back to the beginning
@@ -136,71 +136,71 @@ tgetent(
 	}
     }
     fclose(termcap);
-    return retval;
+    반환 retval;
 }
 
-    static int
-getent(char *tbuf, char *term, FILE *termcap, int buflen)
+    static 정수
+getent(char *tbuf, char *term, FILE *termcap, 정수 buflen)
 {
     char    *tptr;
-    int	    tlen = strlen(term);
+    정수	    tlen = strlen(term);
 
-    while (nextent(tbuf, termcap, buflen))	// For each possible entry
+    동안 (nextent(tbuf, termcap, buflen))	// For each possible entry
     {
 	tptr = tbuf;
-	while (*tptr && *tptr != ':')		// : terminates name field
+	동안 (*tptr && *tptr != ':')		// : terminates name field
 	{
 	    char    *nexttptr;
 
-	    while (*tptr == '|')		// | separates names
+	    동안 (*tptr == '|')		// | separates names
 		tptr++;
 	    nexttptr = _find(tptr, ":|");	// Rhialto
-	    if (tptr + tlen == nexttptr &&
+	    만약 (tptr + tlen == nexttptr &&
 		_match(tptr, term) == tlen)	// FOUND!
 	    {
 		tent = tbuf;
-		return 1;
+		반환 1;
 	    }
-	    else				// Look for next name
+	    아니면				// Look for next name
 		tptr = nexttptr;
 	}
     }
-    return 0;
+    반환 0;
 }
 
 /*
  * Read 1 entry from TERMCAP file.
  */
-    static int
-nextent(char *tbuf, FILE *termcap, int buflen)
+    static 정수
+nextent(char *tbuf, FILE *termcap, 정수 buflen)
 {
     char *lbuf = tbuf;				// lbuf=line buffer
 				// read lines straight into buffer
 
-    while (lbuf < tbuf+buflen &&		// There's room and
-	  fgets(lbuf, (int)(tbuf+buflen-lbuf), termcap)) // another line
+    동안 (lbuf < tbuf+buflen &&		// There's room and
+	  fgets(lbuf, (정수)(tbuf+buflen-lbuf), termcap)) // another line
     {
-	int llen = strlen(lbuf);
+	정수 llen = strlen(lbuf);
 
-	if (*lbuf == '#')			// eat comments
+	만약 (*lbuf == '#')			// eat comments
 	    continue;
-	if (lbuf[-1] == ':' &&			// and whitespace
+	만약 (lbuf[-1] == ':' &&			// and whitespace
 	    lbuf[0] == '\t' &&
 	    lbuf[1] == ':')
 	{
 	    STRMOVE(lbuf, lbuf + 2);
 	    llen -= 2;
 	}
-	if (lbuf[llen-2] == '\\')		// and continuations
+	만약 (lbuf[llen-2] == '\\')		// and continuations
 	    lbuf += llen-2;
-	else
+	아니면
 	{
 	    lbuf[llen-1]=0;			// no continuation, return
-	    return 1;
+	    반환 1;
 	}
     }
 
-    return 0;					// ran into end of file
+    반환 0;					// ran into end of file
 }
 
 /*
@@ -214,12 +214,12 @@ nextent(char *tbuf, FILE *termcap, int buflen)
  * Returned values: 1 for success, 0 for failure.
  */
 
-    int
+    정수
 tgetflag(char *id)
 {
     char    buf[256], *ptr = buf;
 
-    return tgetstr(id, &ptr) ? 1 : 0;
+    반환 tgetstr(id, &ptr) ? 1 : 0;
 }
 
 /*
@@ -232,16 +232,16 @@ tgetflag(char *id)
  * Returned values: -1 for failure, else numerical value.
  */
 
-    int
+    정수
 tgetnum(char *id)
 {
     char *ptr, buf[256];
     ptr = buf;
 
-    if (tgetstr(id, &ptr))
-	return atoi(buf);
-    else
-	return 0;
+    만약 (tgetstr(id, &ptr))
+	반환 atoi(buf);
+    아니면
+	반환 0;
 }
 
 /*
@@ -274,26 +274,26 @@ tgetnum(char *id)
     char *
 tgetstr(char *id, char **buf)
 {
-    int		len = strlen(id);
+    정수		len = strlen(id);
     char	*tmp=tent;
     char	*hold;
-    int		i;
+    정수		i;
 
     do
     {
 	tmp = _find(tmp, ":");			// For each field
-	while (*tmp == ':')			// skip empty fields
+	동안 (*tmp == ':')			// skip empty fields
 	    tmp++;
-	if (!*tmp)
+	만약 (!*tmp)
 	    break;
 
-	if (_match(id, tmp) == len)
+	만약 (_match(id, tmp) == len)
 	{
 	    tmp += len;				// find '=' '@' or '#'
-	    if (*tmp == '@')			// :xx@: entry for tc
-		return 0;			// deleted entry
+	    만약 (*tmp == '@')			// :xx@: entry for tc
+		반환 0;			// deleted entry
 	    hold= *buf;
-	    while (*++tmp && *tmp != ':')	// not at end of field
+	    동안 (*++tmp && *tmp != ':')	// not at end of field
 		{
 		switch(*tmp)
 		{
@@ -334,7 +334,7 @@ tgetstr(char *id, char **buf)
 		    case '9':
 			**buf = 0;
 			    // get up to three digits
-			for (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
+			위해 (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
 			    **buf = **buf * 8 + *tmp++ - '0';
 			(*buf)++;
 			tmp--;
@@ -352,11 +352,11 @@ tgetstr(char *id, char **buf)
 		}
 	    }
 	    *(*buf)++ = 0;
-	    return hold;
+	    반환 hold;
 	}
-    } while (*tmp);
+    } 동안 (*tmp);
 
-    return 0;
+    반환 0;
 }
 
 /*
@@ -388,8 +388,8 @@ tgetstr(char *id, char **buf)
     char *
 tgoto(
     char    *cm,				// cm string, from termcap
-    int	    col,				// column, x position
-    int	    line)				// line, y position
+    정수	    col,				// column, x position
+    정수	    line)				// line, y position
 {
     char    gx, gy,				// x, y
 	*ptr,					// pointer in 'cm'
@@ -400,19 +400,19 @@ tgoto(
 	c;
     static char buffer[32];
 
-    if (!cm)
-	return "OOPS";				// Kludge, but standard
+    만약 (!cm)
+	반환 "OOPS";				// Kludge, but standard
 
     bufp = buffer;
     ptr = cm;
 
-    while (*ptr)
+    동안 (*ptr)
     {
-	if ((c = *ptr++) != '%')		// normal char
+	만약 ((c = *ptr++) != '%')		// normal char
 	{
 	    *bufp++ = c;
 	}
-	else
+	아니면
 	{				// % escape
 	    switch(c = *ptr++)
 	    {
@@ -431,21 +431,21 @@ tgoto(
 	    case '>':				// %>xy: if >x, add y
 		gx = *ptr++;
 		gy = *ptr++;
-		if (col>gx) col += gy;
-		if (line>gx) line += gy;
+		만약 (col>gx) col += gy;
+		만약 (line>gx) line += gy;
 		break;
 	    case '+':				// %+c: add c
 		line += *ptr++;
 	    case '.':				// print x/y
-		if (line == '\t' ||		// these are
+		만약 (line == '\t' ||		// these are
 		   line == '\n' ||		// chars that
 		   line == '\004' ||		// UNIX hates
 		   line == '\0')
 		{
 		    line++;			// so go to next pos
-		    if (reverse == (line == col))
+		    만약 (reverse == (line == col))
 			addup=1;		// and mark UP
-		    else
+		    아니면
 			addbak=1;		// or BC
 		}
 		*bufp++=line;
@@ -477,40 +477,40 @@ tgoto(
 		col = col-2*(col&15);
 		break;
 	    default:				// Unknown escape
-		return "OOPS";
+		반환 "OOPS";
 	    }
 	}
     }
 
-    if (addup)					// add upline
-	if (UP)
+    만약 (addup)					// add upline
+	만약 (UP)
 	{
 	    ptr=UP;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    동안 (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    만약 (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    동안 (*ptr)
 		*bufp++ = *ptr++;
 	}
 
-    if (addbak)					// add backspace
-	if (BC)
+    만약 (addbak)					// add backspace
+	만약 (BC)
 	{
 	    ptr=BC;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    동안 (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    만약 (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    동안 (*ptr)
 		*bufp++ = *ptr++;
 	}
-	else
+	아니면
 	    *bufp++='\b';
 
     *bufp = 0;
 
-    return(buffer);
+    반환(buffer);
 }
 
 /*
@@ -539,49 +539,49 @@ long _bauds[16]={
     600,    1200,   1800,   2400,
     4800,   9600,   19200,  19200 };
 
-    int
+    정수
 tputs(
     char *cp,				// string to print
-    int affcnt,				// Number of lines affected
-    void (*outc)(unsigned int))		// routine to output 1 character
+    정수 affcnt,				// Number of lines affected
+    void (*outc)(unsigned 정수))		// routine to output 1 character
 {
     long    frac,			// 10^(#digits after decimal point)
 	counter,			// digits
 	atol(const char *);
 
-    if (VIM_ISDIGIT(*cp))
+    만약 (VIM_ISDIGIT(*cp))
     {
 	counter = 0;
 	frac = 1000;
-	while (VIM_ISDIGIT(*cp))
+	동안 (VIM_ISDIGIT(*cp))
 	    counter = counter * 10L + (long)(*cp++ - '0');
-	if (*cp == '.')
-	    while (VIM_ISDIGIT(*++cp))
+	만약 (*cp == '.')
+	    동안 (VIM_ISDIGIT(*++cp))
 	    {
 		counter = counter * 10L + (long)(*cp++ - '0');
 		frac = frac * 10;
 	    }
-	if (*cp!='*')			// multiply by affected lines
+	만약 (*cp!='*')			// multiply by affected lines
 	{
-	    if (affcnt>1) affcnt = 1;
+	    만약 (affcnt>1) affcnt = 1;
 	}
-	else
+	아니면
 	    cp++;
 
 	// Calculate number of characters for padding counter/frac ms delay
-	if (ospeed)
+	만약 (ospeed)
 	    counter = (counter * _bauds[ospeed] * (long)affcnt) / frac;
 
-	while (*cp)			// output string
+	동안 (*cp)			// output string
 	    (*outc)(*cp++);
-	if (ospeed)
-	    while (counter--)		// followed by pad characters
+	만약 (ospeed)
+	    동안 (counter--)		// followed by pad characters
 		(*outc)(PC);
     }
-    else
-	while (*cp)
+    아니면
+	동안 (*cp)
 	    (*outc)(*cp++);
-    return 0;
+    반환 0;
 }
 
 /*
@@ -590,15 +590,15 @@ tputs(
  * Purpose: Utility routines for TERMLIB functions.
  * Returns length of text common to s1 and s2.
  */
-    static int
+    static 정수
 _match(char *s1, char *s2)
 {
-    int i = 0;
+    정수 i = 0;
 
-    while (s1[i] && s1[i] == s2[i])
+    동안 (s1[i] && s1[i] == s2[i])
 	i++;
 
-    return i;
+    반환 i;
 }
 
 /*
@@ -607,28 +607,28 @@ _match(char *s1, char *s2)
     static char *
 _find(char *s, char *set)
 {
-    for (; *s; s++)
+    위해 (; *s; s++)
     {
 	char	*ptr = set;
 
-	while (*ptr && *s != *ptr)
+	동안 (*ptr && *s != *ptr)
 	    ptr++;
 
-	if (*ptr)
-	    return s;
+	만약 (*ptr)
+	    반환 s;
     }
 
-    return s;
+    반환 s;
 }
 
 /*
  * add val to buf according to format fmt
  */
     static char *
-_addfmt(char *buf, char *fmt, int val)
+_addfmt(char *buf, char *fmt, 정수 val)
 {
     sprintf(buf, fmt, val);
-    while (*buf)
+    동안 (*buf)
 	buf++;
-    return buf;
+    반환 buf;
 }

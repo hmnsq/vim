@@ -5,15 +5,15 @@
 
 #include <stdarg.h>
 
-#if defined(__GNUC__) && !defined(__MINGW32__)
+#만약 defined(__GNUC__) && !defined(__MINGW32__)
 # define INTERNAL __attribute__((visibility("internal")))
-#else
+#아니면
 # define INTERNAL
 #endif
 
-#if defined(__GNUC__) || defined(__MINGW32__)
+#만약 defined(__GNUC__) || defined(__MINGW32__)
 # define UNUSED __attribute__((unused))
-#else
+#아니면
 # define UNUSED
 #endif
 
@@ -22,7 +22,7 @@
 # define DEBUG_LOG1(s, a) fprintf(stderr, s, a)
 # define DEBUG_LOG2(s, a, b) fprintf(stderr, s, a, b)
 # define DEBUG_LOG3(s, a, b, c) fprintf(stderr, s, a, b, c)
-#else
+#아니면
 # define DEBUG_LOG(s)
 # define DEBUG_LOG1(s, a)
 # define DEBUG_LOG2(s, a, b)
@@ -52,16 +52,16 @@ struct VTermPen
 {
   VTermColor fg;
   VTermColor bg;
-  unsigned int bold:1;
-  unsigned int underline:2;
-  unsigned int italic:1;
-  unsigned int blink:1;
-  unsigned int reverse:1;
-  unsigned int conceal:1;
-  unsigned int strike:1;
-  unsigned int font:4; /* To store 0-9 */
-  unsigned int small:1;
-  unsigned int baseline:2;
+  unsigned 정수 bold:1;
+  unsigned 정수 underline:2;
+  unsigned 정수 italic:1;
+  unsigned 정수 blink:1;
+  unsigned 정수 reverse:1;
+  unsigned 정수 conceal:1;
+  unsigned 정수 strike:1;
+  unsigned 정수 font:4; /* To store 0-9 */
+  unsigned 정수 small:1;
+  unsigned 정수 baseline:2;
 };
 
 struct VTermState
@@ -70,25 +70,25 @@ struct VTermState
 
   const VTermStateCallbacks *callbacks;
   void *cbdata;
-  int callbacks_has_premove;
+  정수 callbacks_has_premove;
 
   const VTermStateFallbacks *fallbacks;
   void *fbdata;
 
-  int rows;
-  int cols;
+  정수 rows;
+  정수 cols;
 
   /* Current cursor position */
   VTermPos pos;
 
-  int at_phantom; /* True if we're on the "81st" phantom column to defer a wraparound */
+  정수 at_phantom; /* True if we're on the "81st" phantom column to defer a wraparound */
 
-  int scrollregion_top;
-  int scrollregion_bottom; /* -1 means unbounded */
+  정수 scrollregion_top;
+  정수 scrollregion_bottom; /* -1 means unbounded */
 #define SCROLLREGION_BOTTOM(state) ((state)->scrollregion_bottom > -1 ? (state)->scrollregion_bottom : (state)->rows)
-  int scrollregion_left;
+  정수 scrollregion_left;
 #define SCROLLREGION_LEFT(state)  ((state)->mode.leftrightmargin ? (state)->scrollregion_left : 0)
-  int scrollregion_right; /* -1 means unbounded */
+  정수 scrollregion_right; /* -1 means unbounded */
 #define SCROLLREGION_RIGHT(state) ((state)->mode.leftrightmargin && (state)->scrollregion_right > -1 ? (state)->scrollregion_right : (state)->cols)
 
   /* Bitvector of tab stops */
@@ -103,39 +103,39 @@ struct VTermState
 #define THISROWWIDTH(state) ROWWIDTH(state, (state)->pos.row)
 
   /* Mouse state */
-  int mouse_col, mouse_row;
-  int mouse_buttons;
-  int mouse_flags;
+  정수 mouse_col, mouse_row;
+  정수 mouse_buttons;
+  정수 mouse_flags;
 
   enum { MOUSE_X10, MOUSE_UTF8, MOUSE_SGR, MOUSE_RXVT } mouse_protocol;
 
   /* Last glyph output, for Unicode recombining purposes */
   uint32_t *combine_chars;
   size_t combine_chars_size; // Number of ELEMENTS in the above
-  int combine_width; // The width of the glyph above
+  정수 combine_width; // The width of the glyph above
   VTermPos combine_pos;   // Position before movement
 
   struct {
-    unsigned int keypad:1;
-    unsigned int cursor:1;
-    unsigned int autowrap:1;
-    unsigned int insert:1;
-    unsigned int newline:1;
-    unsigned int cursor_visible:1;
-    unsigned int cursor_blink:1;
-    unsigned int cursor_shape:2;
-    unsigned int alt_screen:1;
-    unsigned int origin:1;
-    unsigned int screen:1;
-    unsigned int leftrightmargin:1;
-    unsigned int bracketpaste:1;
-    unsigned int report_focus:1;
-    unsigned int modify_other_keys:1;
-    unsigned int kitty_keyboard:1;
+    unsigned 정수 keypad:1;
+    unsigned 정수 cursor:1;
+    unsigned 정수 autowrap:1;
+    unsigned 정수 insert:1;
+    unsigned 정수 newline:1;
+    unsigned 정수 cursor_visible:1;
+    unsigned 정수 cursor_blink:1;
+    unsigned 정수 cursor_shape:2;
+    unsigned 정수 alt_screen:1;
+    unsigned 정수 origin:1;
+    unsigned 정수 screen:1;
+    unsigned 정수 leftrightmargin:1;
+    unsigned 정수 bracketpaste:1;
+    unsigned 정수 report_focus:1;
+    unsigned 정수 modify_other_keys:1;
+    unsigned 정수 kitty_keyboard:1;
   } mode;
 
   VTermEncodingInstance encoding[4], encoding_utf8;
-  int gl_set, gr_set, gsingle_set;
+  정수 gl_set, gr_set, gsingle_set;
 
   struct VTermPen pen;
 
@@ -143,9 +143,9 @@ struct VTermState
   VTermColor default_bg;
   VTermColor colors[16]; // Store the 8 ANSI and the 8 ANSI high-brights only
 
-  int bold_is_highbright;
+  정수 bold_is_highbright;
 
-  unsigned int protected_cell : 1;
+  unsigned 정수 protected_cell : 1;
 
   /* Saved state under DEC mode 1048/1049 */
   struct {
@@ -153,9 +153,9 @@ struct VTermState
     struct VTermPen pen;
 
     struct {
-      unsigned int cursor_visible:1;
-      unsigned int cursor_blink:1;
-      unsigned int cursor_shape:2;
+      unsigned 정수 cursor_visible:1;
+      unsigned 정수 cursor_blink:1;
+      unsigned 정수 cursor_shape:2;
     } mode;
   } saved;
 
@@ -190,12 +190,12 @@ struct VTerm
   const VTermAllocatorFunctions *allocator;
   void *allocdata;
 
-  int rows;
-  int cols;
+  정수 rows;
+  정수 cols;
 
   struct {
-    unsigned int utf8:1;
-    unsigned int ctrl8bit:1;
+    unsigned 정수 utf8:1;
+    unsigned 정수 ctrl8bit:1;
   } mode;
 
   struct {
@@ -214,24 +214,24 @@ struct VTerm
       SOS,
     } state;
 
-    unsigned int in_esc : 1;
+    unsigned 정수 in_esc : 1;
 
-    int intermedlen;
+    정수 intermedlen;
     char intermed[INTERMED_MAX];
 
     union {
       struct {
-        int leaderlen;
+        정수 leaderlen;
         char leader[CSI_LEADER_MAX];
 
-        int argi;
+        정수 argi;
         long args[CSI_ARGS_MAX];
       } csi;
       struct {
-        int command;
+        정수 command;
       } osc;
       struct {
-        int commandlen;
+        정수 commandlen;
         char command[CSI_LEADER_MAX];
       } dcs;
     } v;
@@ -239,9 +239,9 @@ struct VTerm
     const VTermParserCallbacks *callbacks;
     void *cbdata;
 
-    int string_initial;
+    정수 string_initial;
 
-    int emit_nul;
+    정수 emit_nul;
   } parser;
 
   /* len == malloc()ed size; cur == number of valid bytes */
@@ -259,13 +259,13 @@ struct VTerm
   VTermState *state;
   VTermScreen *screen;
 
-  int in_backspace;
+  정수 in_backspace;
 };
 
 struct VTermEncoding {
   void (*init) (VTermEncoding *enc, void *data);
   void (*decode)(VTermEncoding *enc, void *data,
-                 uint32_t cp[], int *cpi, int cplen,
+                 uint32_t cp[], 정수 *cpi, 정수 cplen,
                  const char bytes[], size_t *pos, size_t len);
 };
 
@@ -281,15 +281,15 @@ void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len);
 void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args);
 void vterm_push_output_sprintf(VTerm *vt, const char *format, ...);
 void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...);
-void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...);
+void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, 정수 term, const char *fmt, ...);
 
 void vterm_state_free(VTermState *state);
 
 void vterm_state_newpen(VTermState *state);
 void vterm_state_resetpen(VTermState *state);
-void vterm_state_setpen(VTermState *state, const long args[], int argcount);
-int  vterm_state_getpen(VTermState *state, long args[], int argcount);
-void vterm_state_savepen(VTermState *state, int save);
+void vterm_state_setpen(VTermState *state, const long args[], 정수 argcount);
+정수  vterm_state_getpen(VTermState *state, long args[], 정수 argcount);
+void vterm_state_savepen(VTermState *state, 정수 save);
 
 enum {
   C1_SS3 = 0x8f,
@@ -305,24 +305,24 @@ void vterm_screen_free(VTermScreen *screen);
 
 VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, char designation);
 
-int vterm_unicode_width(uint32_t codepoint);
-int vterm_unicode_is_combining(uint32_t codepoint);
-int vterm_unicode_is_ambiguous(uint32_t codepoint);
-int vterm_get_special_pty_type(void);
+정수 vterm_unicode_width(uint32_t codepoint);
+정수 vterm_unicode_is_combining(uint32_t codepoint);
+정수 vterm_unicode_is_ambiguous(uint32_t codepoint);
+정수 vterm_get_special_pty_type(void);
 
-#if (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 500) \
+#만약 (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 500) \
 	|| defined(_ISOC99_SOURCE) || defined(_BSD_SOURCE)
 # undef VSNPRINTF
 # define VSNPRINTF vsnprintf
 # undef SNPRINTF
-#else
+#아니면
 # ifdef VSNPRINTF
 // Use a provided vsnprintf() function.
-int VSNPRINTF(char *str, size_t str_m, const char *fmt, va_list ap);
+정수 VSNPRINTF(char *str, size_t str_m, const char *fmt, va_list ap);
 # endif
 # ifdef SNPRINTF
 // Use a provided snprintf() function.
-int SNPRINTF(char *str, size_t str_m, const char *fmt, ...);
+정수 SNPRINTF(char *str, size_t str_m, const char *fmt, ...);
 # endif
 #endif
 #ifndef SNPRINTF

@@ -21,18 +21,18 @@
 
 #include <stdio.h>
 
-int main(void)
+정수 main(void)
 {
     size_t i;
 
-    for (i = 0; i < NV_CMDS_SIZE; i++)
+    위해 (i = 0; i < NV_CMDS_SIZE; i++)
     {
-	int cmdchar = nv_cmds[i];
+	정수 cmdchar = nv_cmds[i];
 
 	// Special keys are negative, use the negated value for sorting.
-	if (cmdchar < 0)
+	만약 (cmdchar < 0)
 	    cmdchar = -cmdchar;
 	printf("%d\n", cmdchar);
     }
-    return 0;
+    반환 0;
 }

@@ -723,7 +723,7 @@ extern void XTFREE(char*);
 // R5 or earlier
 #define _XtRegisterWindow _XTREGISTERWINDOW
 #define _XtUnregisterWindow _XTUNREGISTERWINDOW
-#else
+#아니면
 // R6 or later
 #define XtRegisterDrawable XTREGISTERDRAWABLE
 #define XtUnregisterDrawable XTUNREGISTERDRAWABLE

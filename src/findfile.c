@@ -72,20 +72,20 @@ typedef struct ff_stack
     // files/dirs found in the above directory, matched by the first wildcard
     // of wc_part
     char_u		**ffs_filearray;
-    int			ffs_filearray_size;
-    int			ffs_filearray_cur;   // needed for partly handled dirs
+    정수			ffs_filearray_size;
+    정수			ffs_filearray_cur;   // needed for partly handled dirs
 
     // to store status of partly handled directories
     // 0: we work on this directory for the first time
     // 1: this directory was partly searched in an earlier step
-    int			ffs_stage;
+    정수			ffs_stage;
 
     // How deep are we in the directory tree?
     // Counts backward from value of level parameter to vim_findfile_init
-    int			ffs_level;
+    정수			ffs_level;
 
     // Did we already expand '**' to an empty string?
-    int			ffs_star_star_empty;
+    정수			ffs_star_star_empty;
 } ff_stack_T;
 
 /*
@@ -102,7 +102,7 @@ typedef struct ff_visited
     // for unix use inode etc for comparison (needed because of links), else
     // use filename.
 #ifdef UNIX
-    int			ffv_dev_valid;	// ffv_dev and ffv_ino were set
+    정수			ffv_dev_valid;	// ffv_dev and ffv_ino were set
     dev_t		ffv_dev;	// device number
     ino_t		ffv_ino;	// inode number
 #endif
@@ -171,14 +171,14 @@ typedef struct ff_search_ctx_T
     string_T			ffsc_start_dir;
     string_T			ffsc_fix_path;
     string_T			ffsc_wc_path;
-    int				ffsc_level;
+    정수				ffsc_level;
     string_T			*ffsc_stopdirs_v;
-    int				ffsc_find_what;
-    int				ffsc_tagfile;
+    정수				ffsc_find_what;
+    정수				ffsc_tagfile;
 } ff_search_ctx_T;
 
 // locally needed functions
-static int ff_check_visited(ff_visited_T **, char_u *, size_t, char_u *, size_t);
+static 정수 ff_check_visited(ff_visited_T **, char_u *, size_t, char_u *, size_t);
 static void vim_findfile_free_visited(void *search_ctx_arg);
 static void vim_findfile_free_visited_list(ff_visited_list_hdr_T **list_headp);
 static void ff_free_visited_list(ff_visited_T *vl);
@@ -188,12 +188,12 @@ static void ff_push(ff_search_ctx_T *search_ctx, ff_stack_T *stack_ptr);
 static ff_stack_T *ff_pop(ff_search_ctx_T *search_ctx);
 static void ff_clear(ff_search_ctx_T *search_ctx);
 static void ff_free_stack_element(ff_stack_T *stack_ptr);
-static ff_stack_T *ff_create_stack_element(char_u *, size_t, char_u *, size_t, int, int);
-static int ff_path_in_stoplist(char_u *, int, string_T *);
+static ff_stack_T *ff_create_stack_element(char_u *, size_t, char_u *, size_t, 정수, 정수);
+static 정수 ff_path_in_stoplist(char_u *, 정수, string_T *);
 
 static string_T ff_expand_buffer = {NULL, 0};	    // used for expanding filenames
 
-#if 0
+#만약 0
 /*
  * if someone likes findfirst/findnext, here are the functions
  * NOT TESTED!!
@@ -202,15 +202,15 @@ static string_T ff_expand_buffer = {NULL, 0};	    // used for expanding filename
 static void *ff_fn_search_context = NULL;
 
     char_u *
-vim_findfirst(char_u *path, char_u *filename, int level)
+vim_findfirst(char_u *path, char_u *filename, 정수 level)
 {
     ff_fn_search_context =
 	vim_findfile_init(path, filename, NULL, level, TRUE, FALSE,
 		ff_fn_search_context, rel_fname);
-    if (NULL == ff_fn_search_context)
-	return NULL;
-    else
-	return vim_findnext()
+    만약 (NULL == ff_fn_search_context)
+	반환 NULL;
+    아니면
+	반환 vim_findnext()
 }
 
     char_u *
@@ -218,12 +218,12 @@ vim_findnext(void)
 {
     char_u *ret = vim_findfile(ff_fn_search_context);
 
-    if (NULL == ret)
+    만약 (NULL == ret)
     {
 	vim_findfile_cleanup(ff_fn_search_context);
 	ff_fn_search_context = NULL;
     }
-    return ret;
+    반환 ret;
 }
 #endif
 
@@ -285,26 +285,26 @@ vim_findfile_init(
     char_u	*filename,
     size_t	filenamelen,
     char_u	*stopdirs UNUSED,
-    int		level,
-    int		free_visited,
-    int		find_what,
+    정수		level,
+    정수		free_visited,
+    정수		find_what,
     void	*search_ctx_arg,
-    int		tagfile,	// expanding names of tags files
+    정수		tagfile,	// expanding names of tags files
     char_u	*rel_fname)	// file name to use for "."
 {
     char_u		*wc_part;
     ff_stack_T		*sptr;
     ff_search_ctx_T	*search_ctx;
-    int			add_sep;
+    정수			add_sep;
 
     // If a search context is given by the caller, reuse it, else allocate a
     // new one.
-    if (search_ctx_arg != NULL)
+    만약 (search_ctx_arg != NULL)
 	search_ctx = search_ctx_arg;
-    else
+    아니면
     {
 	search_ctx = ALLOC_CLEAR_ONE(ff_search_ctx_T);
-	if (search_ctx == NULL)
+	만약 (search_ctx == NULL)
 	    goto error_return;
     }
     search_ctx->ffsc_find_what = find_what;
@@ -314,81 +314,81 @@ vim_findfile_init(
     ff_clear(search_ctx);
 
     // clear visited list if wanted
-    if (free_visited == TRUE)
+    만약 (free_visited == TRUE)
 	vim_findfile_free_visited(search_ctx);
-    else
+    아니면
     {
 	// Reuse old visited lists. Get the visited list for the given
 	// filename. If no list for the current filename exists, creates a new
 	// one.
 	search_ctx->ffsc_visited_list = ff_get_visited_list(filename,
 					filenamelen, &search_ctx->ffsc_visited_lists_list);
-	if (search_ctx->ffsc_visited_list == NULL)
+	만약 (search_ctx->ffsc_visited_list == NULL)
 	    goto error_return;
 	search_ctx->ffsc_dir_visited_list = ff_get_visited_list(filename,
 				    filenamelen, &search_ctx->ffsc_dir_visited_lists_list);
-	if (search_ctx->ffsc_dir_visited_list == NULL)
+	만약 (search_ctx->ffsc_dir_visited_list == NULL)
 	    goto error_return;
     }
 
-    if (ff_expand_buffer.string == NULL)
+    만약 (ff_expand_buffer.string == NULL)
     {
 	ff_expand_buffer.length = 0;
 	ff_expand_buffer.string = alloc(MAXPATHL);
-	if (ff_expand_buffer.string == NULL)
+	만약 (ff_expand_buffer.string == NULL)
 	    goto error_return;
     }
 
     // Store information on starting dir now if path is relative.
     // If path is absolute, we do that later.
-    if (path[0] == '.'
+    만약 (path[0] == '.'
 	    && (vim_ispathsep(path[1]) || path[1] == NUL)
 	    && (!tagfile || vim_strchr(p_cpo, CPO_DOTTAG) == NULL)
 	    && rel_fname != NULL)
     {
-	int	len = (int)(gettail(rel_fname) - rel_fname);
+	정수	len = (정수)(gettail(rel_fname) - rel_fname);
 
-	if (!vim_isAbsName(rel_fname) && len + 1 < MAXPATHL)
+	만약 (!vim_isAbsName(rel_fname) && len + 1 < MAXPATHL)
 	{
 	    // Make the start dir an absolute path name.
 	    vim_strncpy(ff_expand_buffer.string, rel_fname, len);
 	    ff_expand_buffer.length = len;
 
 	    search_ctx->ffsc_start_dir.string = FullName_save(ff_expand_buffer.string, FALSE);
-	    if (search_ctx->ffsc_start_dir.string == NULL)
+	    만약 (search_ctx->ffsc_start_dir.string == NULL)
 		goto error_return;
 	    search_ctx->ffsc_start_dir.length = STRLEN(search_ctx->ffsc_start_dir.string);
 	}
-	else
+	아니면
 	{
 	    search_ctx->ffsc_start_dir.length = len;
 	    search_ctx->ffsc_start_dir.string = vim_strnsave(rel_fname,
 		search_ctx->ffsc_start_dir.length);
-	    if (search_ctx->ffsc_start_dir.string == NULL)
+	    만약 (search_ctx->ffsc_start_dir.string == NULL)
 		goto error_return;
 	}
 
-	if (*++path != NUL)
+	만약 (*++path != NUL)
 	    ++path;
     }
-    else if (*path == NUL || !vim_isAbsName(path))
+    아니면 만약 (*path == NUL || !vim_isAbsName(path))
     {
 #ifdef BACKSLASH_IN_FILENAME
 	// "c:dir" needs "c:" to be expanded, otherwise use current dir
-	if (*path != NUL && path[1] == ':')
+	만약 (*path != NUL && path[1] == ':')
 	{
 	    char_u  drive[3];
 
 	    drive[0] = path[0];
 	    drive[1] = ':';
 	    drive[2] = NUL;
-	    if (vim_FullName(drive, ff_expand_buffer.string, MAXPATHL, TRUE) == FAIL)
+	    만약 (vim_FullName(drive, ff_expand_buffer.string, MAXPATHL, TRUE) == FAIL)
 		goto error_return;
 	    path += 2;
 	}
-	else
+	아니면
 #endif
-	if (mch_dirname(ff_expand_buffer.string, MAXPATHL) == FAIL)
+	만약 (mch_dirname(ff_expand_buffer.string, MAXPATHL) == FAIL)
 	    goto error_return;
 
 	ff_expand_buffer.length = STRLEN(ff_expand_buffer.string);
@@ -396,7 +396,7 @@ vim_findfile_init(
 	search_ctx->ffsc_start_dir.length = ff_expand_buffer.length;
 	search_ctx->ffsc_start_dir.string = vim_strnsave(ff_expand_buffer.string,
 	    search_ctx->ffsc_start_dir.length);
-	if (search_ctx->ffsc_start_dir.string == NULL)
+	만약 (search_ctx->ffsc_start_dir.string == NULL)
 	    goto error_return;
     }
 
@@ -409,18 +409,18 @@ vim_findfile_init(
      * is handled as unlimited upward search.  See function
      * ff_path_in_stoplist() for details.
      */
-    if (stopdirs != NULL)
+    만약 (stopdirs != NULL)
     {
 	char_u	*walker = stopdirs;
-	int	dircount;
+	정수	dircount;
 
-	while (*walker == ';')
+	동안 (*walker == ';')
 	    walker++;
 
 	dircount = 1;
 	search_ctx->ffsc_stopdirs_v = ALLOC_ONE(string_T);
 
-	if (search_ctx->ffsc_stopdirs_v != NULL)
+	만약 (search_ctx->ffsc_stopdirs_v != NULL)
 	{
 	    string_T	*tmp;			// for convenience
 
@@ -433,16 +433,16 @@ vim_findfile_init(
 		helper = walker;
 		ptr = vim_realloc(search_ctx->ffsc_stopdirs_v,
 					   (dircount + 1) * sizeof(string_T));
-		if (ptr)
+		만약 (ptr)
 		    search_ctx->ffsc_stopdirs_v = ptr;
-		else
+		아니면
 		    // ignore, keep what we have and continue
 		    break;
 		walker = vim_strchr(walker, ';');
 		len = walker ? (size_t)(walker - helper) : STRLEN(helper);
 		// "" means ascent till top of directory tree.
 
-		if (*helper != NUL && !vim_isAbsName(helper)
+		만약 (*helper != NUL && !vim_isAbsName(helper)
 							 && len + 1 < MAXPATHL)
 		{
 		    // Make the stop dir an absolute path name.
@@ -451,22 +451,22 @@ vim_findfile_init(
 
 		    tmp = &search_ctx->ffsc_stopdirs_v[dircount - 1];
 		    tmp->string = FullName_save(ff_expand_buffer.string, FALSE);
-		    if (tmp->string != NULL)
+		    만약 (tmp->string != NULL)
 			tmp->length = STRLEN(tmp->string);
 		}
-		else
+		아니면
 		{
 		    tmp = &search_ctx->ffsc_stopdirs_v[dircount - 1];
 		    tmp->length = len;
 		    tmp->string = vim_strnsave(helper, tmp->length);
-		    if (tmp->string == NULL)
+		    만약 (tmp->string == NULL)
 			tmp->length = 0;
 		}
-		if (walker)
+		만약 (walker)
 		    walker++;
 		dircount++;
 
-	    } while (walker != NULL);
+	    } 동안 (walker != NULL);
 
 	    tmp = &search_ctx->ffsc_stopdirs_v[dircount - 1];
 	    tmp->string = NULL;
@@ -482,16 +482,16 @@ vim_findfile_init(
      *  -wildcard_stuff (might be NULL)
      */
     wc_part = vim_strchr(path, '*');
-    if (wc_part != NULL)
+    만약 (wc_part != NULL)
     {
-	int	llevel;
+	정수	llevel;
 	char	*errpt;
 
 	// save the fix part of the path
 	search_ctx->ffsc_fix_path.length = (size_t)(wc_part - path);
 	search_ctx->ffsc_fix_path.string = vim_strnsave(path,
 	    search_ctx->ffsc_fix_path.length);
-	if (search_ctx->ffsc_fix_path.string == NULL)
+	만약 (search_ctx->ffsc_fix_path.string == NULL)
 	    goto error_return;
 
 	/*
@@ -504,34 +504,34 @@ vim_findfile_init(
 	 * string.
 	 */
 	ff_expand_buffer.length = 0;
-	while (*wc_part != NUL)
+	동안 (*wc_part != NUL)
 	{
-	    if (ff_expand_buffer.length + 5 >= MAXPATHL)
+	    만약 (ff_expand_buffer.length + 5 >= MAXPATHL)
 	    {
 		emsg(_(e_path_too_long_for_completion));
 		break;
 	    }
-	    if (STRNCMP(wc_part, "**", 2) == 0)
+	    만약 (STRNCMP(wc_part, "**", 2) == 0)
 	    {
 		ff_expand_buffer.string[ff_expand_buffer.length++] = *wc_part++;
 		ff_expand_buffer.string[ff_expand_buffer.length++] = *wc_part++;
 
 		llevel = strtol((char *)wc_part, &errpt, 10);
-		if ((char_u *)errpt != wc_part && llevel > 0 && llevel < 255)
+		만약 ((char_u *)errpt != wc_part && llevel > 0 && llevel < 255)
 		    ff_expand_buffer.string[ff_expand_buffer.length++] = llevel;
-		else if ((char_u *)errpt != wc_part && llevel == 0)
+		아니면 만약 ((char_u *)errpt != wc_part && llevel == 0)
 		    // restrict is 0 -> remove already added '**'
 		    ff_expand_buffer.length -= 2;
-		else
+		아니면
 		    ff_expand_buffer.string[ff_expand_buffer.length++] = FF_MAX_STAR_STAR_EXPAND;
 		wc_part = (char_u *)errpt;
-		if (*wc_part != NUL && !vim_ispathsep(*wc_part))
+		만약 (*wc_part != NUL && !vim_ispathsep(*wc_part))
 		{
 		    semsg(_(e_invalid_path_number_must_be_at_end_of_path_or_be_followed_by_str), PATHSEPSTR);
 		    goto error_return;
 		}
 	    }
-	    else
+	    아니면
 		ff_expand_buffer.string[ff_expand_buffer.length++] = *wc_part++;
 	}
 	ff_expand_buffer.string[ff_expand_buffer.length] = NUL;
@@ -539,33 +539,33 @@ vim_findfile_init(
 	search_ctx->ffsc_wc_path.length = ff_expand_buffer.length;
 	search_ctx->ffsc_wc_path.string = vim_strnsave(ff_expand_buffer.string,
 	    search_ctx->ffsc_wc_path.length);
-	if (search_ctx->ffsc_wc_path.string == NULL)
+	만약 (search_ctx->ffsc_wc_path.string == NULL)
 	    goto error_return;
     }
-    else
+    아니면
     {
 	search_ctx->ffsc_fix_path.length = STRLEN(path);
 	search_ctx->ffsc_fix_path.string = vim_strnsave(path,
 	    search_ctx->ffsc_fix_path.length);
-	if (search_ctx->ffsc_fix_path.string == NULL)
+	만약 (search_ctx->ffsc_fix_path.string == NULL)
 	    goto error_return;
     }
 
-    if (search_ctx->ffsc_start_dir.string == NULL)
+    만약 (search_ctx->ffsc_start_dir.string == NULL)
     {
 	// store the fix part as startdir.
 	// This is needed if the parameter path is fully qualified.
 	search_ctx->ffsc_start_dir.length = search_ctx->ffsc_fix_path.length;
 	search_ctx->ffsc_start_dir.string = vim_strnsave(search_ctx->ffsc_fix_path.string,
 	    search_ctx->ffsc_start_dir.length);
-	if (search_ctx->ffsc_start_dir.string == NULL)
+	만약 (search_ctx->ffsc_start_dir.string == NULL)
 	    goto error_return;
 	search_ctx->ffsc_fix_path.string[0] = NUL;
 	search_ctx->ffsc_fix_path.length = 0;
     }
 
     // create an absolute path
-    if (search_ctx->ffsc_start_dir.length
+    만약 (search_ctx->ffsc_start_dir.length
 	    + search_ctx->ffsc_fix_path.length + 3 >= MAXPATHL)
     {
 	emsg(_(e_path_too_long_for_completion));
@@ -585,7 +585,7 @@ vim_findfile_init(
 	size_t	bufsize = ff_expand_buffer.length + search_ctx->ffsc_fix_path.length + 1;
 	char_u	*buf = alloc(bufsize);
 
-	if (buf == NULL)
+	만약 (buf == NULL)
 	    goto error_return;
 
 	vim_snprintf(
@@ -594,9 +594,9 @@ vim_findfile_init(
 		"%s%s",
 		ff_expand_buffer.string,
 		search_ctx->ffsc_fix_path.string);
-	if (mch_isdir(buf))
+	만약 (mch_isdir(buf))
 	{
-	    if (search_ctx->ffsc_fix_path.length > 0)
+	    만약 (search_ctx->ffsc_fix_path.length > 0)
 	    {
 		add_sep = !after_pathsep(search_ctx->ffsc_fix_path.string,
 		    search_ctx->ffsc_fix_path.string + search_ctx->ffsc_fix_path.length);
@@ -608,16 +608,16 @@ vim_findfile_init(
 			add_sep ? PATHSEPSTR : "");
 	    }
 	}
-	else
+	아니면
 	{
 	    char_u *p = gettail(search_ctx->ffsc_fix_path.string);
-	    int    len = (int)search_ctx->ffsc_fix_path.length;
+	    정수    len = (정수)search_ctx->ffsc_fix_path.length;
 
-	    if (p > search_ctx->ffsc_fix_path.string)
+	    만약 (p > search_ctx->ffsc_fix_path.string)
 	    {
 		// do not add '..' to the path and start upwards searching
-		len = (int)(p - search_ctx->ffsc_fix_path.string) - 1;
-		if ((len >= 2
+		len = (정수)(p - search_ctx->ffsc_fix_path.string) - 1;
+		만약 ((len >= 2
 			&& STRNCMP(search_ctx->ffsc_fix_path.string, "..", 2) == 0)
 			&& (len == 2 || search_ctx->ffsc_fix_path.string[2] == PATHSEP))
 		{
@@ -636,14 +636,14 @@ vim_findfile_init(
 			add_sep ? PATHSEPSTR : "");
 	    }
 
-	    if (search_ctx->ffsc_wc_path.string != NULL)
+	    만약 (search_ctx->ffsc_wc_path.string != NULL)
 	    {
 		size_t	tempsize = (search_ctx->ffsc_fix_path.length - len)
 				+ search_ctx->ffsc_wc_path.length
 				+ 1;
 		char_u	*temp = alloc(tempsize);
 
-		if (temp == NULL)
+		만약 (temp == NULL)
 		{
 		    vim_free(buf);
 		    vim_free(temp);
@@ -670,7 +670,7 @@ vim_findfile_init(
 			level,
 			0);
 
-    if (sptr == NULL)
+    만약 (sptr == NULL)
 	goto error_return;
 
     ff_push(search_ctx, sptr);
@@ -678,10 +678,10 @@ vim_findfile_init(
     search_ctx->ffsc_file_to_search.length = filenamelen;
     search_ctx->ffsc_file_to_search.string = vim_strnsave(filename,
 	search_ctx->ffsc_file_to_search.length);
-    if (search_ctx->ffsc_file_to_search.string == NULL)
+    만약 (search_ctx->ffsc_file_to_search.string == NULL)
 	goto error_return;
 
-    return search_ctx;
+    반환 search_ctx;
 
 error_return:
     /*
@@ -690,7 +690,7 @@ error_return:
      * as we might have already destroyed it.
      */
     vim_findfile_cleanup(search_ctx);
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -702,13 +702,13 @@ vim_findfile_stopdir(char_u *buf)
     char_u	*r_ptr = buf;
     char_u	*r_ptr_end = NULL;	    // points to NUL at end of string "r_ptr"
 
-    while (*r_ptr != NUL && *r_ptr != ';')
+    동안 (*r_ptr != NUL && *r_ptr != ';')
     {
-	if (r_ptr[0] == '\\' && r_ptr[1] == ';')
+	만약 (r_ptr[0] == '\\' && r_ptr[1] == ';')
 	{
 	    // Overwrite the escape char,
 	    // use STRLEN(r_ptr) to move the trailing '\0'.
-	    if (r_ptr_end == NULL)
+	    만약 (r_ptr_end == NULL)
 		r_ptr_end = r_ptr + STRLEN(r_ptr);
 	    mch_memmove(r_ptr, r_ptr + 1,
 		(size_t)(r_ptr_end - (r_ptr + 1)) + 1);	// +1 for NUL
@@ -717,14 +717,14 @@ vim_findfile_stopdir(char_u *buf)
 	}
 	r_ptr++;
     }
-    if (*r_ptr == ';')
+    만약 (*r_ptr == ';')
     {
 	*r_ptr = NUL;
 	r_ptr++;
     }
-    else if (*r_ptr == NUL)
+    아니면 만약 (*r_ptr == NUL)
 	r_ptr = NULL;
-    return r_ptr;
+    반환 r_ptr;
 }
 
 /*
@@ -733,8 +733,8 @@ vim_findfile_stopdir(char_u *buf)
     void
 vim_findfile_cleanup(void *ctx)
 {
-    if (ctx == NULL)
-	return;
+    만약 (ctx == NULL)
+	반환;
 
     vim_findfile_free_visited(ctx);
     ff_clear(ctx);
@@ -762,8 +762,8 @@ vim_findfile(void *search_ctx_arg)
     ff_stack_T	*stackp;
     ff_search_ctx_T *search_ctx;
 
-    if (search_ctx_arg == NULL)
-	return NULL;
+    만약 (search_ctx_arg == NULL)
+	반환 NULL;
 
     search_ctx = (ff_search_ctx_T *)search_ctx_arg;
 
@@ -771,28 +771,28 @@ vim_findfile(void *search_ctx_arg)
      * filepath is used as buffer for various actions and as the storage to
      * return a found filename.
      */
-    if ((file_path.string = alloc(MAXPATHL)) == NULL)
-	return NULL;
+    만약 ((file_path.string = alloc(MAXPATHL)) == NULL)
+	반환 NULL;
 
     // store the end of the start dir -- needed for upward search
-    if (search_ctx->ffsc_start_dir.string != NULL)
+    만약 (search_ctx->ffsc_start_dir.string != NULL)
 	path_end = &search_ctx->ffsc_start_dir.string[
 					    search_ctx->ffsc_start_dir.length];
 
     // upward search loop
-    for (;;)
+    위해 (;;)
     {
 	// downward search loop
-	for (;;)
+	위해 (;;)
 	{
 	    // check if user wants to stop the search
 	    ui_breakcheck();
-	    if (got_int)
+	    만약 (got_int)
 		break;
 
 	    // get directory to work on from stack
 	    stackp = ff_pop(search_ctx);
-	    if (stackp == NULL)
+	    만약 (stackp == NULL)
 		break;
 
 	    /*
@@ -814,7 +814,7 @@ vim_findfile(void *search_ctx_arg)
 	     * This check is only needed for directories we work on for the
 	     * first time (hence stackp->ff_filearray == NULL)
 	     */
-	    if (stackp->ffs_filearray == NULL
+	    만약 (stackp->ffs_filearray == NULL
 		    && ff_check_visited(&search_ctx->ffsc_dir_visited_list
 							  ->ffvl_visited_list,
 			    stackp->ffs_fix_path.string,
@@ -823,7 +823,7 @@ vim_findfile(void *search_ctx_arg)
 			    stackp->ffs_wc_path.length) == FAIL)
 	    {
 #ifdef FF_VERBOSE
-		if (p_verbose >= 5)
+		만약 (p_verbose >= 5)
 		{
 		    verbose_enter_scroll();
 		    smsg("Already Searched: %s (%s)",
@@ -837,7 +837,7 @@ vim_findfile(void *search_ctx_arg)
 		continue;
 	    }
 #ifdef FF_VERBOSE
-	    else if (p_verbose >= 5)
+	    아니면 만약 (p_verbose >= 5)
 	    {
 		verbose_enter_scroll();
 		smsg("Searching: %s (%s)",
@@ -849,7 +849,7 @@ vim_findfile(void *search_ctx_arg)
 #endif
 
 	    // check depth
-	    if (stackp->ffs_level <= 0)
+	    만약 (stackp->ffs_level <= 0)
 	    {
 		ff_free_stack_element(stackp);
 		continue;
@@ -864,7 +864,7 @@ vim_findfile(void *search_ctx_arg)
 	     * and all possible expands are returned in one array. We use this
 	     * to handle the expansion of '**' into an empty string.
 	     */
-	    if (stackp->ffs_filearray == NULL)
+	    만약 (stackp->ffs_filearray == NULL)
 	    {
 		char_u *dirptrs[2];
 
@@ -874,12 +874,12 @@ vim_findfile(void *search_ctx_arg)
 		dirptrs[1] = NULL;
 
 		// if we have a start dir copy it in
-		if (!vim_isAbsName(stackp->ffs_fix_path.string)
+		만약 (!vim_isAbsName(stackp->ffs_fix_path.string)
 						&& search_ctx->ffsc_start_dir.string)
 		{
-		    if (search_ctx->ffsc_start_dir.length + 1 < MAXPATHL)
+		    만약 (search_ctx->ffsc_start_dir.length + 1 < MAXPATHL)
 		    {
-			int add_sep = !after_pathsep(search_ctx->ffsc_start_dir.string,
+			정수 add_sep = !after_pathsep(search_ctx->ffsc_start_dir.string,
 			    search_ctx->ffsc_start_dir.string + search_ctx->ffsc_start_dir.length);
 			file_path.length = vim_snprintf(
 			    (char *)file_path.string,
@@ -888,7 +888,7 @@ vim_findfile(void *search_ctx_arg)
 			    search_ctx->ffsc_start_dir.string,
 			    add_sep ? PATHSEPSTR : "");
 		    }
-		    else
+		    아니면
 		    {
 			ff_free_stack_element(stackp);
 			goto fail;
@@ -896,9 +896,9 @@ vim_findfile(void *search_ctx_arg)
 		}
 
 		// append the fix part of the search path
-		if (file_path.length + stackp->ffs_fix_path.length + 1 < MAXPATHL)
+		만약 (file_path.length + stackp->ffs_fix_path.length + 1 < MAXPATHL)
 		{
-		    int add_sep = !after_pathsep(stackp->ffs_fix_path.string,
+		    정수 add_sep = !after_pathsep(stackp->ffs_fix_path.string,
 			stackp->ffs_fix_path.string + stackp->ffs_fix_path.length);
 		    file_path.length += vim_snprintf(
 			(char *)file_path.string + file_path.length,
@@ -907,7 +907,7 @@ vim_findfile(void *search_ctx_arg)
 			stackp->ffs_fix_path.string,
 			add_sep ? PATHSEPSTR : "");
 		}
-		else
+		아니면
 		{
 		    ff_free_stack_element(stackp);
 		    goto fail;
@@ -915,9 +915,9 @@ vim_findfile(void *search_ctx_arg)
 
 		rest_of_wildcards.string = stackp->ffs_wc_path.string;
 		rest_of_wildcards.length = stackp->ffs_wc_path.length;
-		if (*rest_of_wildcards.string != NUL)
+		만약 (*rest_of_wildcards.string != NUL)
 		{
-		    if (STRNCMP(rest_of_wildcards.string, "**", 2) == 0)
+		    만약 (STRNCMP(rest_of_wildcards.string, "**", 2) == 0)
 		    {
 			char_u	*p;
 
@@ -925,19 +925,19 @@ vim_findfile(void *search_ctx_arg)
 			// The restrict byte is not a character!
 			p = rest_of_wildcards.string + 2;
 
-			if (*p > 0)
+			만약 (*p > 0)
 			{
 			    (*p)--;
-			    if (file_path.length + 1 < MAXPATHL)
+			    만약 (file_path.length + 1 < MAXPATHL)
 				file_path.string[file_path.length++] = '*';
-			    else
+			    아니면
 			    {
 				ff_free_stack_element(stackp);
 				goto fail;
 			    }
 			}
 
-			if (*p == 0)
+			만약 (*p == 0)
 			{
 			    // remove '**<numb> from wildcards
 			    mch_memmove(rest_of_wildcards.string,
@@ -946,13 +946,13 @@ vim_findfile(void *search_ctx_arg)
 			    rest_of_wildcards.length -= 3;
 			    stackp->ffs_wc_path.length = rest_of_wildcards.length;
 			}
-			else
+			아니면
 			{
 			    rest_of_wildcards.string += 3;
 			    rest_of_wildcards.length -= 3;
 			}
 
-			if (stackp->ffs_star_star_empty == 0)
+			만약 (stackp->ffs_star_star_empty == 0)
 			{
 			    // if not done before, expand '**' to empty
 			    stackp->ffs_star_star_empty = 1;
@@ -967,15 +967,15 @@ vim_findfile(void *search_ctx_arg)
 		     * pushing every directory returned from expand_wildcards()
 		     * on the stack again for further search.
 		     */
-		    while (*rest_of_wildcards.string
+		    동안 (*rest_of_wildcards.string
 			    && !vim_ispathsep(*rest_of_wildcards.string))
 		    {
-			if (file_path.length + 1 < MAXPATHL)
+			만약 (file_path.length + 1 < MAXPATHL)
 			{
 			    file_path.string[file_path.length++] = *rest_of_wildcards.string++;
 			    --rest_of_wildcards.length;
 			}
-			else
+			아니면
 			{
 			    ff_free_stack_element(stackp);
 			    goto fail;
@@ -983,7 +983,7 @@ vim_findfile(void *search_ctx_arg)
 		    }
 
 		    file_path.string[file_path.length] = NUL;
-		    if (vim_ispathsep(*rest_of_wildcards.string))
+		    만약 (vim_ispathsep(*rest_of_wildcards.string))
 		    {
 			rest_of_wildcards.string++;
 			rest_of_wildcards.length--;
@@ -994,17 +994,17 @@ vim_findfile(void *search_ctx_arg)
 		 * Expand wildcards like "*" and "$VAR".
 		 * If the path is a URL don't try this.
 		 */
-		if (path_with_url(dirptrs[0]))
+		만약 (path_with_url(dirptrs[0]))
 		{
 		    stackp->ffs_filearray = ALLOC_ONE(char_u *);
-		    if (stackp->ffs_filearray != NULL
+		    만약 (stackp->ffs_filearray != NULL
 			    && (stackp->ffs_filearray[0]
 				= vim_strnsave(dirptrs[0], file_path.length)) != NULL)
 			stackp->ffs_filearray_size = 1;
-		    else
+		    아니면
 			stackp->ffs_filearray_size = 0;
 		}
-		else
+		아니면
 		    // Add EW_NOTWILD because the expanded path may contain
 		    // wildcard characters that are to be taken literally.
 		    // This is a bit of a hack.
@@ -1016,19 +1016,19 @@ vim_findfile(void *search_ctx_arg)
 		stackp->ffs_filearray_cur = 0;
 		stackp->ffs_stage = 0;
 	    }
-	    else
+	    아니면
 	    {
 		rest_of_wildcards.string = &stackp->ffs_wc_path.string[
 							stackp->ffs_wc_path.length];
 		rest_of_wildcards.length = 0;
 	    }
 
-	    if (stackp->ffs_stage == 0)
+	    만약 (stackp->ffs_stage == 0)
 	    {
-		int i;
+		정수 i;
 
 		// this is the first time we work on this directory
-		if (*rest_of_wildcards.string == NUL)
+		만약 (*rest_of_wildcards.string == NUL)
 		{
 		    size_t  len;
 		    char_u  *suf;
@@ -1037,20 +1037,20 @@ vim_findfile(void *search_ctx_arg)
 		     * We don't have further wildcards to expand, so we have to
 		     * check for the final file now.
 		     */
-		    for (i = stackp->ffs_filearray_cur;
+		    위해 (i = stackp->ffs_filearray_cur;
 					  i < stackp->ffs_filearray_size; ++i)
 		    {
-			if (!path_with_url(stackp->ffs_filearray[i])
+			만약 (!path_with_url(stackp->ffs_filearray[i])
 				      && !mch_isdir(stackp->ffs_filearray[i]))
 			    continue;   // not a directory
 
 			// prepare the filename to be checked for existence
 			// below
 			len = STRLEN(stackp->ffs_filearray[i]);
-			if (len + 1 + search_ctx->ffsc_file_to_search.length
+			만약 (len + 1 + search_ctx->ffsc_file_to_search.length
 									< MAXPATHL)
 			{
-			    int	add_sep = !after_pathsep(stackp->ffs_filearray[i],
+			    정수	add_sep = !after_pathsep(stackp->ffs_filearray[i],
 				    stackp->ffs_filearray[i] + len);
 			    file_path.length = vim_snprintf(
 				    (char *)file_path.string,
@@ -1060,7 +1060,7 @@ vim_findfile(void *search_ctx_arg)
 				    add_sep ? PATHSEPSTR : "",
 				    search_ctx->ffsc_file_to_search.string);
 			}
-			else
+			아니면
 			{
 			    ff_free_stack_element(stackp);
 			    goto fail;
@@ -1071,14 +1071,14 @@ vim_findfile(void *search_ctx_arg)
 			 * from 'suffixesadd'.
 			 */
 			len = file_path.length;
-			if (search_ctx->ffsc_tagfile)
+			만약 (search_ctx->ffsc_tagfile)
 			    suf = (char_u *)"";
-			else
+			아니면
 			    suf = curbuf->b_p_sua;
-			for (;;)
+			위해 (;;)
 			{
 			    // if file exists and we didn't already find it
-			    if ((path_with_url(file_path.string)
+			    만약 ((path_with_url(file_path.string)
 				  || (mch_getperm(file_path.string) >= 0
 				      && (search_ctx->ffsc_find_what
 							      == FINDFILE_BOTH
@@ -1096,14 +1096,14 @@ vim_findfile(void *search_ctx_arg)
 			       )
 			    {
 #ifdef FF_VERBOSE
-				if (ff_check_visited(
+				만약 (ff_check_visited(
 					    &search_ctx->ffsc_visited_list
 							   ->ffvl_visited_list,
 					      file_path.string,
 					      file_path.length,
 					      (char_u *)"", 0) == FAIL)
 				{
-				    if (p_verbose >= 5)
+				    만약 (p_verbose >= 5)
 				    {
 					verbose_enter_scroll();
 					smsg("Already: %s", file_path.string);
@@ -1119,10 +1119,10 @@ vim_findfile(void *search_ctx_arg)
 				stackp->ffs_filearray_cur = i + 1;
 				ff_push(search_ctx, stackp);
 
-				if (!path_with_url(file_path.string))
+				만약 (!path_with_url(file_path.string))
 				    file_path.length = simplify_filename(file_path.string);
 
-				if (mch_dirname(ff_expand_buffer.string, MAXPATHL)
+				만약 (mch_dirname(ff_expand_buffer.string, MAXPATHL)
 									== OK)
 				{
 				    char_u  *p;
@@ -1130,7 +1130,7 @@ vim_findfile(void *search_ctx_arg)
 				    ff_expand_buffer.length = STRLEN(ff_expand_buffer.string);
 				    p = shorten_fname(file_path.string,
 							    ff_expand_buffer.string);
-				    if (p != NULL)
+				    만약 (p != NULL)
 				    {
 					mch_memmove(file_path.string, p,
 					    (size_t)((file_path.string + file_path.length) - p) + 1);  // +1 for NUL
@@ -1138,7 +1138,7 @@ vim_findfile(void *search_ctx_arg)
 				    }
 				}
 #ifdef FF_VERBOSE
-				if (p_verbose >= 5)
+				만약 (p_verbose >= 5)
 				{
 				    verbose_enter_scroll();
 				    smsg("HIT: %s", file_path.string);
@@ -1147,28 +1147,28 @@ vim_findfile(void *search_ctx_arg)
 				    verbose_leave_scroll();
 				}
 #endif
-				return file_path.string;
+				반환 file_path.string;
 			    }
 
 			    // Not found or found already, try next suffix.
-			    if (*suf == NUL)
+			    만약 (*suf == NUL)
 				break;
 			    file_path.length = len + copy_option_part(&suf,
 				  file_path.string + len,
-				  (int)(MAXPATHL - len), ",");
+				  (정수)(MAXPATHL - len), ",");
 			}
 		    }
 		}
-		else
+		아니면
 		{
 		    /*
 		     * still wildcards left, push the directories for further
 		     * search
 		     */
-		    for (i = stackp->ffs_filearray_cur;
+		    위해 (i = stackp->ffs_filearray_cur;
 					  i < stackp->ffs_filearray_size; ++i)
 		    {
-			if (!mch_isdir(stackp->ffs_filearray[i]))
+			만약 (!mch_isdir(stackp->ffs_filearray[i]))
 			    continue;	// not a directory
 
 			ff_push(search_ctx,
@@ -1188,17 +1188,17 @@ vim_findfile(void *search_ctx_arg)
 	     * if wildcards contains '**' we have to descent till we reach the
 	     * leaves of the directory tree.
 	     */
-	    if (STRNCMP(stackp->ffs_wc_path.string, "**", 2) == 0)
+	    만약 (STRNCMP(stackp->ffs_wc_path.string, "**", 2) == 0)
 	    {
-		int i;
+		정수 i;
 
-		for (i = stackp->ffs_filearray_cur;
+		위해 (i = stackp->ffs_filearray_cur;
 					  i < stackp->ffs_filearray_size; ++i)
 		{
-		    if (fnamecmp(stackp->ffs_filearray[i],
+		    만약 (fnamecmp(stackp->ffs_filearray[i],
 						   stackp->ffs_fix_path.string) == 0)
 			continue; // don't repush same directory
-		    if (!mch_isdir(stackp->ffs_filearray[i]))
+		    만약 (!mch_isdir(stackp->ffs_filearray[i]))
 			continue;   // not a directory
 		    ff_push(search_ctx,
 			    ff_create_stack_element(
@@ -1216,24 +1216,24 @@ vim_findfile(void *search_ctx_arg)
 
 	// If we reached this, we didn't find anything downwards.
 	// Let's check if we should do an upward search.
-	if (search_ctx->ffsc_start_dir.string
+	만약 (search_ctx->ffsc_start_dir.string
 		&& search_ctx->ffsc_stopdirs_v != NULL && !got_int)
 	{
 	    ff_stack_T  *sptr;
 	    // path_end may point to the NUL or the previous path separator
-	    int plen = (path_end - search_ctx->ffsc_start_dir.string)
+	    정수 plen = (path_end - search_ctx->ffsc_start_dir.string)
 							  + (*path_end != NUL);
 
 	    // is the last starting directory in the stop list?
-	    if (ff_path_in_stoplist(search_ctx->ffsc_start_dir.string,
+	    만약 (ff_path_in_stoplist(search_ctx->ffsc_start_dir.string,
 				    plen, search_ctx->ffsc_stopdirs_v) == TRUE)
 		break;
 
 	    // cut of last dir
-	    while (path_end > search_ctx->ffsc_start_dir.string
+	    동안 (path_end > search_ctx->ffsc_start_dir.string
 						  && vim_ispathsep(*path_end))
 		path_end--;
-	    while (path_end > search_ctx->ffsc_start_dir.string
+	    동안 (path_end > search_ctx->ffsc_start_dir.string
 					      && !vim_ispathsep(path_end[-1]))
 		path_end--;
 	    *path_end = NUL;
@@ -1242,13 +1242,13 @@ vim_findfile(void *search_ctx_arg)
 	    search_ctx->ffsc_start_dir.length = (size_t)(path_end - search_ctx->ffsc_start_dir.string);
 	    path_end--;
 
-	    if (*search_ctx->ffsc_start_dir.string == NUL)
+	    만약 (*search_ctx->ffsc_start_dir.string == NUL)
 		break;
 
-	    if (search_ctx->ffsc_start_dir.length + 1
+	    만약 (search_ctx->ffsc_start_dir.length + 1
 		    + search_ctx->ffsc_fix_path.length < MAXPATHL)
 	    {
-		int add_sep = !after_pathsep(search_ctx->ffsc_start_dir.string,
+		정수 add_sep = !after_pathsep(search_ctx->ffsc_start_dir.string,
 			    search_ctx->ffsc_start_dir.string + search_ctx->ffsc_start_dir.length);
 		file_path.length = vim_snprintf(
 			(char *)file_path.string,
@@ -1258,24 +1258,24 @@ vim_findfile(void *search_ctx_arg)
 			add_sep ? PATHSEPSTR : "",
 			search_ctx->ffsc_fix_path.string);
 	    }
-	    else
+	    아니면
 		goto fail;
 
 	    // create a new stack entry
 	    sptr = ff_create_stack_element(file_path.string, file_path.length,
 		    search_ctx->ffsc_wc_path.string, search_ctx->ffsc_wc_path.length,
 		    search_ctx->ffsc_level, 0);
-	    if (sptr == NULL)
+	    만약 (sptr == NULL)
 		break;
 	    ff_push(search_ctx, sptr);
 	}
-	else
+	아니면
 	    break;
     }
 
 fail:
     vim_free(file_path.string);
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -1287,8 +1287,8 @@ vim_findfile_free_visited(void *search_ctx_arg)
 {
     ff_search_ctx_T *search_ctx;
 
-    if (search_ctx_arg == NULL)
-	return;
+    만약 (search_ctx_arg == NULL)
+	반환;
 
     search_ctx = (ff_search_ctx_T *)search_ctx_arg;
     vim_findfile_free_visited_list(&search_ctx->ffsc_visited_lists_list);
@@ -1300,7 +1300,7 @@ vim_findfile_free_visited_list(ff_visited_list_hdr_T **list_headp)
 {
     ff_visited_list_hdr_T *vp;
 
-    while (*list_headp != NULL)
+    동안 (*list_headp != NULL)
     {
 	vp = (*list_headp)->ffvl_next;
 	ff_free_visited_list((*list_headp)->ffvl_visited_list);
@@ -1317,7 +1317,7 @@ ff_free_visited_list(ff_visited_T *vl)
 {
     ff_visited_T *vp;
 
-    while (vl != NULL)
+    동안 (vl != NULL)
     {
 	vp = vl->ffv_next;
 	vim_free(vl->ffv_wc_path);
@@ -1340,15 +1340,15 @@ ff_get_visited_list(
     ff_visited_list_hdr_T  *retptr = NULL;
 
     // check if a visited list for the given filename exists
-    if (*list_headp != NULL)
+    만약 (*list_headp != NULL)
     {
 	retptr = *list_headp;
-	while (retptr != NULL)
+	동안 (retptr != NULL)
 	{
-	    if (fnamecmp(filename, retptr->ffvl_filename) == 0)
+	    만약 (fnamecmp(filename, retptr->ffvl_filename) == 0)
 	    {
 #ifdef FF_VERBOSE
-		if (p_verbose >= 5)
+		만약 (p_verbose >= 5)
 		{
 		    verbose_enter_scroll();
 		    smsg("ff_get_visited_list: FOUND list for %s",
@@ -1358,14 +1358,14 @@ ff_get_visited_list(
 		    verbose_leave_scroll();
 		}
 #endif
-		return retptr;
+		반환 retptr;
 	    }
 	    retptr = retptr->ffvl_next;
 	}
     }
 
 #ifdef FF_VERBOSE
-    if (p_verbose >= 5)
+    만약 (p_verbose >= 5)
     {
 	verbose_enter_scroll();
 	smsg("ff_get_visited_list: new list for %s", filename);
@@ -1379,20 +1379,20 @@ ff_get_visited_list(
      * if we reach this we didn't find a list and we have to allocate new list
      */
     retptr = ALLOC_ONE(ff_visited_list_hdr_T);
-    if (retptr == NULL)
-	return NULL;
+    만약 (retptr == NULL)
+	반환 NULL;
 
     retptr->ffvl_visited_list = NULL;
     retptr->ffvl_filename = vim_strnsave(filename, filenamelen);
-    if (retptr->ffvl_filename == NULL)
+    만약 (retptr->ffvl_filename == NULL)
     {
 	vim_free(retptr);
-	return NULL;
+	반환 NULL;
     }
     retptr->ffvl_next = *list_headp;
     *list_headp = retptr;
 
-    return retptr;
+    반환 retptr;
 }
 
 /*
@@ -1404,36 +1404,36 @@ ff_get_visited_list(
  *  - the only differences are in the counters behind a '**', so
  *    '**\20' is equal to '**\24'
  */
-    static int
+    static 정수
 ff_wc_equal(char_u *s1, char_u *s2)
 {
-    int		i, j;
-    int		c1 = NUL;
-    int		c2 = NUL;
-    int		prev1 = NUL;
-    int		prev2 = NUL;
+    정수		i, j;
+    정수		c1 = NUL;
+    정수		c2 = NUL;
+    정수		prev1 = NUL;
+    정수		prev2 = NUL;
 
-    if (s1 == s2)
-	return TRUE;
+    만약 (s1 == s2)
+	반환 TRUE;
 
-    if (s1 == NULL || s2 == NULL)
-	return FALSE;
+    만약 (s1 == NULL || s2 == NULL)
+	반환 FALSE;
 
-    for (i = 0, j = 0; s1[i] != NUL && s2[j] != NUL;)
+    위해 (i = 0, j = 0; s1[i] != NUL && s2[j] != NUL;)
     {
 	c1 = PTR2CHAR(s1 + i);
 	c2 = PTR2CHAR(s2 + j);
 
-	if ((p_fic ? MB_TOLOWER(c1) != MB_TOLOWER(c2) : c1 != c2)
+	만약 ((p_fic ? MB_TOLOWER(c1) != MB_TOLOWER(c2) : c1 != c2)
 		&& (prev1 != '*' || prev2 != '*'))
-	    return FALSE;
+	    반환 FALSE;
 	prev2 = prev1;
 	prev1 = c1;
 
 	i += mb_ptr2len(s1 + i);
 	j += mb_ptr2len(s2 + j);
     }
-    return s1[i] == s2[j];
+    반환 s1[i] == s2[j];
 }
 
 /*
@@ -1445,7 +1445,7 @@ ff_wc_equal(char_u *s1, char_u *s2)
  *	 -> return TRUE - Better the file is found several times instead of
  *	    never.
  */
-    static int
+    static 정수
 ff_check_visited(
     ff_visited_T	**visited_list,
     char_u		*fname,
@@ -1456,12 +1456,12 @@ ff_check_visited(
     ff_visited_T	*vp;
 #ifdef UNIX
     stat_T		st;
-    int			url = FALSE;
+    정수			url = FALSE;
 #endif
 
     // For a URL we only compare the name, otherwise we compare the
     // device/inode (unix) or the full path name (not Unix).
-    if (path_with_url(fname))
+    만약 (path_with_url(fname))
     {
 	vim_strncpy(ff_expand_buffer.string, fname, fnamelen);
 	ff_expand_buffer.length = fnamelen;
@@ -1469,24 +1469,24 @@ ff_check_visited(
 	url = TRUE;
 #endif
     }
-    else
+    아니면
     {
 	ff_expand_buffer.string[0] = NUL;
 	ff_expand_buffer.length = 0;
 #ifdef UNIX
-	if (mch_stat((char *)fname, &st) < 0)
-	    return FAIL;
-#else
-	if (vim_FullName(fname, ff_expand_buffer.string, MAXPATHL, TRUE) == FAIL)
-	    return FAIL;
+	만약 (mch_stat((char *)fname, &st) < 0)
+	    반환 FAIL;
+#아니면
+	만약 (vim_FullName(fname, ff_expand_buffer.string, MAXPATHL, TRUE) == FAIL)
+	    반환 FAIL;
 	ff_expand_buffer.length = STRLEN(ff_expand_buffer.string);
 #endif
     }
 
     // check against list of already visited files
-    for (vp = *visited_list; vp != NULL; vp = vp->ffv_next)
+    위해 (vp = *visited_list; vp != NULL; vp = vp->ffv_next)
     {
-	if (
+	만약 (
 #ifdef UNIX
 		!url ? (vp->ffv_dev_valid && vp->ffv_dev == st.st_dev
 						  && vp->ffv_ino == st.st_ino)
@@ -1496,9 +1496,9 @@ ff_check_visited(
 	   )
 	{
 	    // are the wildcard parts equal
-	    if (ff_wc_equal(vp->ffv_wc_path, wc_path) == TRUE)
+	    만약 (ff_wc_equal(vp->ffv_wc_path, wc_path) == TRUE)
 		// already visited
-		return FAIL;
+		반환 FAIL;
 	}
     }
 
@@ -1507,18 +1507,18 @@ ff_check_visited(
      */
     vp = alloc(
 	     offsetof(ff_visited_T, ffv_fname) + ff_expand_buffer.length + 1);
-    if (vp == NULL)
-	return OK;
+    만약 (vp == NULL)
+	반환 OK;
 
 #ifdef UNIX
-    if (!url)
+    만약 (!url)
     {
 	vp->ffv_dev_valid = TRUE;
 	vp->ffv_dev = st.st_dev;
 	vp->ffv_ino = st.st_ino;
 	vp->ffv_fname[0] = NUL;
     }
-    else
+    아니면
     {
 	vp->ffv_dev_valid = FALSE;
 #endif
@@ -1526,15 +1526,15 @@ ff_check_visited(
 #ifdef UNIX
     }
 #endif
-    if (wc_path != NULL)
+    만약 (wc_path != NULL)
 	vp->ffv_wc_path = vim_strnsave(wc_path, wc_pathlen);
-    else
+    아니면
 	vp->ffv_wc_path = NULL;
 
     vp->ffv_next = *visited_list;
     *visited_list = vp;
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -1546,14 +1546,14 @@ ff_create_stack_element(
     size_t	fix_partlen,
     char_u	*wc_part,
     size_t	wc_partlen,
-    int		level,
-    int		star_star_empty)
+    정수		level,
+    정수		star_star_empty)
 {
     ff_stack_T	*new;
 
     new = ALLOC_ONE(ff_stack_T);
-    if (new == NULL)
-	return NULL;
+    만약 (new == NULL)
+	반환 NULL;
 
     new->ffs_prev	   = NULL;
     new->ffs_filearray	   = NULL;
@@ -1564,7 +1564,7 @@ ff_create_stack_element(
     new->ffs_star_star_empty = star_star_empty;
 
     // the following saves NULL pointer checks in vim_findfile
-    if (fix_part == NULL)
+    만약 (fix_part == NULL)
     {
 	fix_part = (char_u *)"";
 	fix_partlen = 0;
@@ -1572,7 +1572,7 @@ ff_create_stack_element(
     new->ffs_fix_path.string = vim_strnsave(fix_part, fix_partlen);
     new->ffs_fix_path.length = fix_partlen;
 
-    if (wc_part == NULL)
+    만약 (wc_part == NULL)
     {
 	wc_part = (char_u *)"";
 	wc_partlen = 0;
@@ -1580,13 +1580,13 @@ ff_create_stack_element(
     new->ffs_wc_path.string = vim_strnsave(wc_part, wc_partlen);
     new->ffs_wc_path.length = wc_partlen;
 
-    if (new->ffs_fix_path.string == NULL || new->ffs_wc_path.string == NULL)
+    만약 (new->ffs_fix_path.string == NULL || new->ffs_wc_path.string == NULL)
     {
 	ff_free_stack_element(new);
 	new = NULL;
     }
 
-    return new;
+    반환 new;
 }
 
 /*
@@ -1597,8 +1597,8 @@ ff_push(ff_search_ctx_T *search_ctx, ff_stack_T *stack_ptr)
 {
     // check for NULL pointer, not to return an error to the user, but
     // to prevent a crash
-    if (stack_ptr == NULL)
-	return;
+    만약 (stack_ptr == NULL)
+	반환;
 
     stack_ptr->ffs_prev = search_ctx->ffsc_stack_ptr;
     search_ctx->ffsc_stack_ptr = stack_ptr;
@@ -1614,10 +1614,10 @@ ff_pop(ff_search_ctx_T *search_ctx)
     ff_stack_T  *sptr;
 
     sptr = search_ctx->ffsc_stack_ptr;
-    if (search_ctx->ffsc_stack_ptr != NULL)
+    만약 (search_ctx->ffsc_stack_ptr != NULL)
 	search_ctx->ffsc_stack_ptr = search_ctx->ffsc_stack_ptr->ffs_prev;
 
-    return sptr;
+    반환 sptr;
 }
 
 /*
@@ -1630,7 +1630,7 @@ ff_free_stack_element(ff_stack_T *stack_ptr)
     VIM_CLEAR_STRING(stack_ptr->ffs_fix_path);
     VIM_CLEAR_STRING(stack_ptr->ffs_wc_path);
 
-    if (stack_ptr->ffs_filearray != NULL)
+    만약 (stack_ptr->ffs_filearray != NULL)
 	FreeWild(stack_ptr->ffs_filearray_size, stack_ptr->ffs_filearray);
 
     vim_free(stack_ptr);
@@ -1645,14 +1645,14 @@ ff_clear(ff_search_ctx_T *search_ctx)
     ff_stack_T   *sptr;
 
     // clear up stack
-    while ((sptr = ff_pop(search_ctx)) != NULL)
+    동안 ((sptr = ff_pop(search_ctx)) != NULL)
 	ff_free_stack_element(sptr);
 
-    if (search_ctx->ffsc_stopdirs_v != NULL)
+    만약 (search_ctx->ffsc_stopdirs_v != NULL)
     {
-	int  i = 0;
+	정수  i = 0;
 
-	while (search_ctx->ffsc_stopdirs_v[i].string != NULL)
+	동안 (search_ctx->ffsc_stopdirs_v[i].string != NULL)
 	{
 	    vim_free(search_ctx->ffsc_stopdirs_v[i].string);
 	    i++;
@@ -1672,29 +1672,29 @@ ff_clear(ff_search_ctx_T *search_ctx)
  * check if the given path is in the stopdirs
  * returns TRUE if yes else FALSE
  */
-    static int
-ff_path_in_stoplist(char_u *path, int path_len, string_T *stopdirs_v)
+    static 정수
+ff_path_in_stoplist(char_u *path, 정수 path_len, string_T *stopdirs_v)
 {
-    int		i = 0;
+    정수		i = 0;
 
     // eat up trailing path separators, except the first
-    while (path_len > 1 && vim_ispathsep(path[path_len - 1]))
+    동안 (path_len > 1 && vim_ispathsep(path[path_len - 1]))
 	path_len--;
 
     // if no path consider it as match
-    if (path_len == 0)
-	return TRUE;
+    만약 (path_len == 0)
+	반환 TRUE;
 
-    for (i = 0; stopdirs_v[i].string != NULL; i++)
+    위해 (i = 0; stopdirs_v[i].string != NULL; i++)
 	// match for parent directory. So '/home' also matches
 	// '/home/rks'. Check for PATHSEP in stopdirs_v[i], else
 	// '/home/r' would also match '/home/rks'
-	if (fnamencmp(stopdirs_v[i].string, path, path_len) == 0
-		&& ((int)stopdirs_v[i].length <= path_len
+	만약 (fnamencmp(stopdirs_v[i].string, path, path_len) == 0
+		&& ((정수)stopdirs_v[i].length <= path_len
 		    || vim_ispathsep(stopdirs_v[i].string[path_len])))
-	    return TRUE;
+	    반환 TRUE;
 
-    return FALSE;
+    반환 FALSE;
 }
 
 /*
@@ -1725,20 +1725,20 @@ ff_path_in_stoplist(char_u *path, int path_len, string_T *stopdirs_v)
     char_u *
 find_file_in_path(
     char_u	*ptr,		// file name
-    int		len,		// length of file name
-    int		options,
-    int		first,		// use count'th matching file name
+    정수		len,		// length of file name
+    정수		options,
+    정수		first,		// use count'th matching file name
     char_u	*rel_fname,	// file name searching relative to
     char_u	**file_to_find,	// in/out: modified copy of file name
     char	**search_ctx)	// in/out: state of the search
 {
-    return find_file_in_path_option(ptr, len, options, first,
+    반환 find_file_in_path_option(ptr, len, options, first,
 	    *curbuf->b_p_path == NUL ? p_path : curbuf->b_p_path,
 	    FINDFILE_BOTH, rel_fname, curbuf->b_p_sua,
 	    file_to_find, search_ctx);
 }
 
-#if defined(EXITFREE)
+#만약 defined(EXITFREE)
     void
 free_findfile(void)
 {
@@ -1760,13 +1760,13 @@ free_findfile(void)
     char_u *
 find_directory_in_path(
     char_u	*ptr,		// file name
-    int		len,		// length of file name
-    int		options,
+    정수		len,		// length of file name
+    정수		options,
     char_u	*rel_fname,	// file name searching relative to
     char_u	**file_to_find,	// in/out: modified copy of file name
     char	**search_ctx)	// in/out: state of the search
 {
-    return find_file_in_path_option(ptr, len, options, TRUE, p_cdpath,
+    반환 find_file_in_path_option(ptr, len, options, TRUE, p_cdpath,
 				       FINDFILE_DIR, rel_fname, (char_u *)"",
 				       file_to_find, search_ctx);
 }
@@ -1774,11 +1774,11 @@ find_directory_in_path(
     char_u *
 find_file_in_path_option(
     char_u	*ptr,		// file name
-    int		len,		// length of file name
-    int		options,
-    int		first,		// use count'th matching file name
+    정수		len,		// length of file name
+    정수		options,
+    정수		first,		// use count'th matching file name
     char_u	*path_option,	// p_path or p_cdpath
-    int		find_what,	// FINDFILE_FILE, _DIR or _BOTH
+    정수		find_what,	// FINDFILE_FILE, _DIR or _BOTH
     char_u	*rel_fname,	// file name we are looking relative to.
     char_u	*suffixes,	// list of suffixes, 'suffixesadd' option
     char_u	**file_to_find,	// in/out: modified copy of file name
@@ -1786,9 +1786,9 @@ find_file_in_path_option(
 {
     ff_search_ctx_T	**search_ctx = (ff_search_ctx_T **)search_ctx_arg;
     static char_u	*dir;
-    static int		did_findfile_init = FALSE;
+    static 정수		did_findfile_init = FALSE;
     char_u		*file_name = NULL;
-    int			rel_to_curdir;
+    정수			rel_to_curdir;
 #ifdef AMIGA
     struct Process	*proc = (struct Process *)FindTask(0L);
     APTR		save_winptr = proc->pr_WindowPtr;
@@ -1798,12 +1798,12 @@ find_file_in_path_option(
 #endif
     static size_t	file_to_findlen = 0;
 
-    if (first == TRUE)
+    만약 (first == TRUE)
     {
 	char_u	save_char;
 
-	if (len == 0)
-	    return NULL;
+	만약 (len == 0)
+	    반환 NULL;
 
 	// copy file name into NameBuff, expanding environment variables
 	save_char = ptr[len];
@@ -1813,17 +1813,17 @@ find_file_in_path_option(
 
 	vim_free(*file_to_find);
 	*file_to_find = vim_strnsave(NameBuff, file_to_findlen);
-	if (*file_to_find == NULL)	// out of memory
+	만약 (*file_to_find == NULL)	// out of memory
 	{
 	    file_name = NULL;
 	    file_to_findlen = 0;
 	    goto theend;
 	}
-	if (options & FNAME_UNESC)
+	만약 (options & FNAME_UNESC)
 	{
 	    // Change all "\ " to " ".
-	    for (ptr = *file_to_find; *ptr != NUL; ++ptr)
-		if (ptr[0] == '\\' && ptr[1] == ' ')
+	    위해 (ptr = *file_to_find; *ptr != NUL; ++ptr)
+		만약 (ptr[0] == '\\' && ptr[1] == ' ')
 		{
 		    mch_memmove(ptr, ptr + 1,
 			(size_t)((*file_to_find + file_to_findlen) - (ptr + 1)) + 1);
@@ -1838,10 +1838,10 @@ find_file_in_path_option(
 			|| ((*file_to_find)[1] == '.'
 			    && ((*file_to_find)[2] == NUL
 				|| vim_ispathsep((*file_to_find)[2])))));
-    if (vim_isAbsName(*file_to_find)
+    만약 (vim_isAbsName(*file_to_find)
 	    // "..", "../path", "." and "./path": don't use the path_option
 	    || rel_to_curdir
-#if defined(MSWIN)
+#만약 defined(MSWIN)
 	    // handle "\tmp" as absolute path
 	    || vim_ispathsep((*file_to_find)[0])
 	    // handle "c:name" as absolute path
@@ -1858,28 +1858,28 @@ find_file_in_path_option(
 	 * If this is not a first call, return NULL.  We already returned a
 	 * filename on the first call.
 	 */
-	if (first == TRUE)
+	만약 (first == TRUE)
 	{
-	    int		l;
-	    int		run;
+	    정수		l;
+	    정수		run;
 	    size_t	rel_fnamelen = 0;
 	    char_u	*suffix;
 
-	    if (path_with_url(*file_to_find))
+	    만약 (path_with_url(*file_to_find))
 	    {
 		file_name = vim_strnsave(*file_to_find, file_to_findlen);
 		goto theend;
 	    }
 
-	    if (rel_fname != NULL)
+	    만약 (rel_fname != NULL)
 		rel_fnamelen = STRLEN(rel_fname);
 
 	    // When FNAME_REL flag given first use the directory of the file.
 	    // Otherwise or when this fails use the current directory.
-	    for (run = 1; run <= 2; ++run)
+	    위해 (run = 1; run <= 2; ++run)
 	    {
-		l = (int)file_to_findlen;
-		if (run == 1
+		l = (정수)file_to_findlen;
+		만약 (run == 1
 			&& rel_to_curdir
 			&& (options & FNAME_REL)
 			&& rel_fname != NULL
@@ -1889,11 +1889,11 @@ find_file_in_path_option(
 			(char *)NameBuff,
 			MAXPATHL,
 			"%.*s%s",
-			(int)(gettail(rel_fname) - rel_fname),
+			(정수)(gettail(rel_fname) - rel_fname),
 			rel_fname,
 			*file_to_find);
 		}
-		else
+		아니면
 		{
 		    STRCPY(NameBuff, *file_to_find);
 		    run = 2;
@@ -1902,9 +1902,9 @@ find_file_in_path_option(
 		// When the file doesn't exist, try adding parts of
 		// 'suffixesadd'.
 		suffix = suffixes;
-		for (;;)
+		위해 (;;)
 		{
-		    if (mch_getperm(NameBuff) >= 0
+		    만약 (mch_getperm(NameBuff) >= 0
 			     && (find_what == FINDFILE_BOTH
 				 || ((find_what == FINDFILE_DIR)
 						    == mch_isdir(NameBuff))))
@@ -1913,21 +1913,21 @@ find_file_in_path_option(
 						  simplify_filename(NameBuff));
 			goto theend;
 		    }
-		    if (*suffix == NUL)
+		    만약 (*suffix == NUL)
 			break;
 		    copy_option_part(&suffix, NameBuff + l, MAXPATHL - l, ",");
 		}
 	    }
 	}
     }
-    else
+    아니면
     {
 	/*
 	 * Loop over all paths in the 'path' or 'cdpath' option.
 	 * When "first" is set, first setup to the start of the option.
 	 * Otherwise continue to find the next match.
 	 */
-	if (first == TRUE)
+	만약 (first == TRUE)
 	{
 	    // vim_findfile_free_visited can handle a possible NULL pointer
 	    vim_findfile_free_visited(*search_ctx);
@@ -1935,22 +1935,22 @@ find_file_in_path_option(
 	    did_findfile_init = FALSE;
 	}
 
-	for (;;)
+	위해 (;;)
 	{
-	    if (did_findfile_init)
+	    만약 (did_findfile_init)
 	    {
 		file_name = vim_findfile(*search_ctx);
-		if (file_name != NULL)
+		만약 (file_name != NULL)
 		    break;
 
 		did_findfile_init = FALSE;
 	    }
-	    else
+	    아니면
 	    {
 		char_u	*buf;
 		char_u  *r_ptr;
 
-		if (dir == NULL || *dir == NUL)
+		만약 (dir == NULL || *dir == NUL)
 		{
 		    // We searched all paths of the option, now we can
 		    // free the search context.
@@ -1959,7 +1959,7 @@ find_file_in_path_option(
 		    break;
 		}
 
-		if ((buf = alloc(MAXPATHL)) == NULL)
+		만약 ((buf = alloc(MAXPATHL)) == NULL)
 		    break;
 
 		// copy next path
@@ -1971,27 +1971,27 @@ find_file_in_path_option(
 		*search_ctx = vim_findfile_init(buf, *file_to_find, file_to_findlen,
 					    r_ptr, 100, FALSE, find_what,
 					   *search_ctx, FALSE, rel_fname);
-		if (*search_ctx != NULL)
+		만약 (*search_ctx != NULL)
 		    did_findfile_init = TRUE;
 		vim_free(buf);
 	    }
 	}
     }
-    if (file_name == NULL && (options & FNAME_MESS))
+    만약 (file_name == NULL && (options & FNAME_MESS))
     {
-	if (first == TRUE)
+	만약 (first == TRUE)
 	{
-	    if (find_what == FINDFILE_DIR)
+	    만약 (find_what == FINDFILE_DIR)
 		semsg(_(e_cant_find_directory_str_in_cdpath), *file_to_find);
-	    else
+	    아니면
 		semsg(_(e_cant_find_file_str_in_path), *file_to_find);
 	}
-	else
+	아니면
 	{
-	    if (find_what == FINDFILE_DIR)
+	    만약 (find_what == FINDFILE_DIR)
 		semsg(_(e_no_more_directory_str_found_in_cdpath),
 								*file_to_find);
-	    else
+	    아니면
 		semsg(_(e_no_more_file_str_found_in_path), *file_to_find);
 	}
     }
@@ -2000,7 +2000,7 @@ theend:
 #ifdef AMIGA
     proc->pr_WindowPtr = save_winptr;
 #endif
-    return file_name;
+    반환 file_name;
 }
 
 /*
@@ -2011,26 +2011,26 @@ theend:
     char_u *
 grab_file_name(long count, linenr_T *file_lnum)
 {
-    int options = FNAME_MESS|FNAME_EXP|FNAME_REL|FNAME_UNESC;
+    정수 options = FNAME_MESS|FNAME_EXP|FNAME_REL|FNAME_UNESC;
 
-    if (VIsual_active)
+    만약 (VIsual_active)
     {
-	int	len;
+	정수	len;
 	char_u	*ptr;
 
-	if (get_visual_text(NULL, &ptr, &len) == FAIL)
-	    return NULL;
+	만약 (get_visual_text(NULL, &ptr, &len) == FAIL)
+	    반환 NULL;
 	// Only recognize ":123" here
-	if (file_lnum != NULL && ptr[len] == ':' && SAFE_isdigit(ptr[len + 1]))
+	만약 (file_lnum != NULL && ptr[len] == ':' && SAFE_isdigit(ptr[len + 1]))
 	{
 	    char_u *p = ptr + len + 1;
 
 	    *file_lnum = getdigits(&p);
 	}
-	return find_file_name_in_path(ptr, len, options,
+	반환 find_file_name_in_path(ptr, len, options,
 						     count, curbuf->b_ffname);
     }
-    return file_name_at_cursor(options | FNAME_HYP, count, file_lnum);
+    반환 file_name_at_cursor(options | FNAME_HYP, count, file_lnum);
 }
 
 /*
@@ -2047,9 +2047,9 @@ grab_file_name(long count, linenr_T *file_lnum)
  * FNAME_INCL	    apply "includeexpr"
  */
     char_u *
-file_name_at_cursor(int options, long count, linenr_T *file_lnum)
+file_name_at_cursor(정수 options, long count, linenr_T *file_lnum)
 {
-    return file_name_in_line(ml_get_curline(),
+    반환 file_name_in_line(ml_get_curline(),
 		      curwin->w_cursor.col, options, count, curbuf->b_ffname,
 		      file_lnum);
 }
@@ -2061,42 +2061,42 @@ file_name_at_cursor(int options, long count, linenr_T *file_lnum)
     char_u *
 file_name_in_line(
     char_u	*line,
-    int		col,
-    int		options,
+    정수		col,
+    정수		options,
     long	count,
     char_u	*rel_fname,	// file we are searching relative to
     linenr_T	*file_lnum)	// line number after the file name
 {
     char_u	*ptr;
-    int		len;
-    int		in_type = TRUE;
-    int		is_url = FALSE;
+    정수		len;
+    정수		in_type = TRUE;
+    정수		is_url = FALSE;
 
     /*
      * search forward for what could be the start of a file name
      */
     ptr = line + col;
-    while (*ptr != NUL && !vim_isfilec(*ptr))
+    동안 (*ptr != NUL && !vim_isfilec(*ptr))
 	MB_PTR_ADV(ptr);
-    if (*ptr == NUL)		// nothing found
+    만약 (*ptr == NUL)		// nothing found
     {
-	if (options & FNAME_MESS)
+	만약 (options & FNAME_MESS)
 	    emsg(_(e_no_file_name_under_cursor));
-	return NULL;
+	반환 NULL;
     }
 
     /*
      * Search backward for first char of the file name.
      * Go one char back to ":" before "//" even when ':' is not in 'isfname'.
      */
-    while (ptr > line)
+    동안 (ptr > line)
     {
-	if (has_mbyte && (len = (*mb_head_off)(line, ptr - 1)) > 0)
+	만약 (has_mbyte && (len = (*mb_head_off)(line, ptr - 1)) > 0)
 	    ptr -= len + 1;
-	else if (vim_isfilec(ptr[-1])
+	아니면 만약 (vim_isfilec(ptr[-1])
 		|| ((options & FNAME_HYP) && path_is_url(ptr - 1)))
 	    --ptr;
-	else
+	아니면
 	    break;
     }
 
@@ -2105,27 +2105,27 @@ file_name_in_line(
      * Also allow "://" when ':' is not in 'isfname'.
      */
     len = 0;
-    while (vim_isfilec(ptr[len]) || (ptr[len] == '\\' && ptr[len + 1] == ' ')
+    동안 (vim_isfilec(ptr[len]) || (ptr[len] == '\\' && ptr[len + 1] == ' ')
 		 || ((options & FNAME_HYP) && path_is_url(ptr + len))
 		 || (is_url && vim_strchr((char_u *)":?&=", ptr[len]) != NULL))
     {
 	// After type:// we also include :, ?, & and = as valid characters, so
 	// that http://google.com:8080?q=this&that=ok works.
-	if ((ptr[len] >= 'A' && ptr[len] <= 'Z')
+	만약 ((ptr[len] >= 'A' && ptr[len] <= 'Z')
 				       || (ptr[len] >= 'a' && ptr[len] <= 'z'))
 	{
-	    if (in_type && path_is_url(ptr + len + 1))
+	    만약 (in_type && path_is_url(ptr + len + 1))
 		is_url = TRUE;
 	}
-	else
+	아니면
 	    in_type = FALSE;
 
-	if (ptr[len] == '\\')
+	만약 (ptr[len] == '\\')
 	    // Skip over the "\" in "\ ".
 	    ++len;
-	if (has_mbyte)
+	만약 (has_mbyte)
 	    len += (*mb_ptr2len)(ptr + len);
-	else
+	아니면
 	    ++len;
     }
 
@@ -2133,11 +2133,11 @@ file_name_in_line(
      * If there is trailing punctuation, remove it.
      * But don't remove "..", could be a directory name.
      */
-    if (len > 2 && vim_strchr((char_u *)".,:;!", ptr[len - 1]) != NULL
+    만약 (len > 2 && vim_strchr((char_u *)".,:;!", ptr[len - 1]) != NULL
 						       && ptr[len - 2] != '.')
 	--len;
 
-    if (file_lnum != NULL)
+    만약 (file_lnum != NULL)
     {
 	char_u	*p;
 	char	*match_text = " line ";		// english
@@ -2147,35 +2147,35 @@ file_name_in_line(
 	// Also accept " line 999" with and without the same translation as
 	// used in last_set_msg().
 	p = ptr + len;
-	if (STRNCMP(p, match_text, match_textlen) == 0)
+	만약 (STRNCMP(p, match_text, match_textlen) == 0)
 	    p += match_textlen;
-	else
+	아니면
 	{
 	    // no match with english, try localized
 	    match_text = _(line_msg);
 	    match_textlen = STRLEN(match_text);
 
-	    if (STRNCMP(p, match_text, match_textlen) == 0)
+	    만약 (STRNCMP(p, match_text, match_textlen) == 0)
 		p += match_textlen;
-	    else
+	    아니면
 		p = skipwhite(p);
 	}
-	if (*p != NUL)
+	만약 (*p != NUL)
 	{
-	    if (!SAFE_isdigit(*p))
+	    만약 (!SAFE_isdigit(*p))
 		++p;		    // skip the separator
 	    p = skipwhite(p);
-	    if (SAFE_isdigit(*p))
-		*file_lnum = (int)getdigits(&p);
+	    만약 (SAFE_isdigit(*p))
+		*file_lnum = (정수)getdigits(&p);
 	}
     }
 
-    return find_file_name_in_path(ptr, len, options, count, rel_fname);
+    반환 find_file_name_in_path(ptr, len, options, count, rel_fname);
 }
 
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
+#만약 defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
     static char_u *
-eval_includeexpr(char_u *ptr, int len)
+eval_includeexpr(char_u *ptr, 정수 len)
 {
     char_u	*res;
     sctx_T	save_sctx = current_sctx;
@@ -2189,7 +2189,7 @@ eval_includeexpr(char_u *ptr, int len)
 
     set_vim_var_string(VV_FNAME, NULL, 0);
     current_sctx = save_sctx;
-    return res;
+    반환 res;
 }
 #endif
 
@@ -2200,33 +2200,33 @@ eval_includeexpr(char_u *ptr, int len)
     char_u *
 find_file_name_in_path(
     char_u	*ptr,
-    int		len,
-    int		options,
+    정수		len,
+    정수		options,
     long	count,
     char_u	*rel_fname)	// file we are searching relative to
 {
     char_u	*file_name;
-    int		c;
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
+    정수		c;
+#만약 defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
     char_u	*tofree = NULL;
 #endif
 
-    if (len == 0)
-	return NULL;
+    만약 (len == 0)
+	반환 NULL;
 
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
-    if ((options & FNAME_INCL) && *curbuf->b_p_inex != NUL)
+#만약 defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
+    만약 ((options & FNAME_INCL) && *curbuf->b_p_inex != NUL)
     {
 	tofree = eval_includeexpr(ptr, len);
-	if (tofree != NULL)
+	만약 (tofree != NULL)
 	{
 	    ptr = tofree;
-	    len = (int)STRLEN(ptr);
+	    len = (정수)STRLEN(ptr);
 	}
     }
 #endif
 
-    if (options & FNAME_EXP)
+    만약 (options & FNAME_EXP)
     {
 	char_u	*file_to_find = NULL;
 	char	*search_ctx = NULL;
@@ -2234,25 +2234,25 @@ find_file_name_in_path(
 	file_name = find_file_in_path(ptr, len, options & ~FNAME_MESS,
 				  TRUE, rel_fname, &file_to_find, &search_ctx);
 
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
+#만약 defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
 	/*
 	 * If the file could not be found in a normal way, try applying
 	 * 'includeexpr' (unless done already).
 	 */
-	if (file_name == NULL
+	만약 (file_name == NULL
 		&& !(options & FNAME_INCL) && *curbuf->b_p_inex != NUL)
 	{
 	    tofree = eval_includeexpr(ptr, len);
-	    if (tofree != NULL)
+	    만약 (tofree != NULL)
 	    {
 		ptr = tofree;
-		len = (int)STRLEN(ptr);
+		len = (정수)STRLEN(ptr);
 		file_name = find_file_in_path(ptr, len, options & ~FNAME_MESS,
 				  TRUE, rel_fname, &file_to_find, &search_ctx);
 	    }
 	}
 #endif
-	if (file_name == NULL && (options & FNAME_MESS))
+	만약 (file_name == NULL && (options & FNAME_MESS))
 	{
 	    c = ptr[len];
 	    ptr[len] = NUL;
@@ -2262,7 +2262,7 @@ find_file_name_in_path(
 
 	// Repeat finding the file "count" times.  This matters when it
 	// appears several times in the path.
-	while (file_name != NULL && --count > 0)
+	동안 (file_name != NULL && --count > 0)
 	{
 	    vim_free(file_name);
 	    file_name = find_file_in_path(ptr, len, options, FALSE, rel_fname,
@@ -2272,14 +2272,14 @@ find_file_name_in_path(
 	vim_free(file_to_find);
 	vim_findfile_cleanup(search_ctx);
     }
-    else
+    아니면
 	file_name = vim_strnsave(ptr, len);
 
-#if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
+#만약 defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
     vim_free(tofree);
 #endif
 
-    return file_name;
+    반환 file_name;
 }
 
 /*
@@ -2293,40 +2293,40 @@ gettail_dir(char_u *fname)
 {
     char_u	*dir_end = fname;
     char_u	*next_dir_end = fname;
-    int		look_for_sep = TRUE;
+    정수		look_for_sep = TRUE;
     char_u	*p;
 
-    for (p = fname; *p != NUL; )
+    위해 (p = fname; *p != NUL; )
     {
-	if (vim_ispathsep(*p))
+	만약 (vim_ispathsep(*p))
 	{
-	    if (look_for_sep)
+	    만약 (look_for_sep)
 	    {
 		next_dir_end = p;
 		look_for_sep = FALSE;
 	    }
 	}
-	else
+	아니면
 	{
-	    if (!look_for_sep)
+	    만약 (!look_for_sep)
 		dir_end = next_dir_end;
 	    look_for_sep = TRUE;
 	}
 	MB_PTR_ADV(p);
     }
-    return dir_end;
+    반환 dir_end;
 }
 
 /*
  * return TRUE if 'c' is a path list separator.
  */
-    int
-vim_ispathlistsep(int c)
+    정수
+vim_ispathlistsep(정수 c)
 {
 #ifdef UNIX
-    return (c == ':');
-#else
-    return (c == ';');	// might not be right for every system...
+    반환 (c == ':');
+#아니면
+    반환 (c == ';');	// might not be right for every system...
 #endif
 }
 
@@ -2334,53 +2334,53 @@ vim_ispathlistsep(int c)
  * Moves "*psep" back to the previous path separator in "path".
  * Returns FAIL is "*psep" ends up at the beginning of "path".
  */
-    static int
+    static 정수
 find_previous_pathsep(char_u *path, char_u **psep)
 {
     // skip the current separator
-    if (*psep > path && vim_ispathsep(**psep))
+    만약 (*psep > path && vim_ispathsep(**psep))
 	--*psep;
 
     // find the previous separator
-    while (*psep > path)
+    동안 (*psep > path)
     {
-	if (vim_ispathsep(**psep))
-	    return OK;
+	만약 (vim_ispathsep(**psep))
+	    반환 OK;
 	MB_PTR_BACK(path, *psep);
     }
 
-    return FAIL;
+    반환 FAIL;
 }
 
 /*
  * Returns TRUE if "maybe_unique" is unique wrt other_paths in "gap".
  * "maybe_unique" is the end portion of "((char_u **)gap->ga_data)[i]".
  */
-    static int
-is_unique(char_u *maybe_unique, garray_T *gap, int i)
+    static 정수
+is_unique(char_u *maybe_unique, garray_T *gap, 정수 i)
 {
-    int	    j;
-    int	    candidate_len = (int)STRLEN(maybe_unique);
-    int	    other_path_len;
+    정수	    j;
+    정수	    candidate_len = (정수)STRLEN(maybe_unique);
+    정수	    other_path_len;
     char_u  **other_paths = (char_u **)gap->ga_data;
     char_u  *rival;
 
-    for (j = 0; j < gap->ga_len; j++)
+    위해 (j = 0; j < gap->ga_len; j++)
     {
-	if (j == i)
+	만약 (j == i)
 	    continue;  // don't compare it with itself
 
-	other_path_len = (int)STRLEN(other_paths[j]);
-	if (other_path_len < candidate_len)
+	other_path_len = (정수)STRLEN(other_paths[j]);
+	만약 (other_path_len < candidate_len)
 	    continue;  // it's different when it's shorter
 
 	rival = other_paths[j] + other_path_len - candidate_len;
-	if (fnamecmp(maybe_unique, rival) == 0
+	만약 (fnamecmp(maybe_unique, rival) == 0
 		&& (rival == other_paths[j] || vim_ispathsep(*(rival - 1))))
-	    return FALSE;  // match
+	    반환 FALSE;  // match
     }
 
-    return TRUE;  // no match found
+    반환 TRUE;  // no match found
 }
 
 /*
@@ -2403,54 +2403,54 @@ expand_path_option(
     char_u	*p;
     size_t	curdirlen = 0;
 
-    if ((buf = alloc(MAXPATHL)) == NULL)
-	return;
+    만약 ((buf = alloc(MAXPATHL)) == NULL)
+	반환;
 
-    while (*path_option != NUL)
+    동안 (*path_option != NUL)
     {
 	buflen = copy_option_part(&path_option, buf, MAXPATHL, " ,");
 
 	// do not expand backticks, could have been set via a modeline
-	if (vim_strchr(buf, '`') != NULL)
+	만약 (vim_strchr(buf, '`') != NULL)
 	    continue;
 
-	if (buf[0] == '.' && (buf[1] == NUL || vim_ispathsep(buf[1])))
+	만약 (buf[0] == '.' && (buf[1] == NUL || vim_ispathsep(buf[1])))
 	{
 	    size_t  plen;
 
 	    // Relative to current buffer:
 	    // "/path/file" + "." -> "/path/"
 	    // "/path/file"  + "./subdir" -> "/path/subdir"
-	    if (curbuf->b_ffname == NULL)
+	    만약 (curbuf->b_ffname == NULL)
 		continue;
 	    p = gettail(curbuf->b_ffname);
 	    plen = (size_t)(p - curbuf->b_ffname);
-	    if (plen + buflen >= MAXPATHL)
+	    만약 (plen + buflen >= MAXPATHL)
 		continue;
-	    if (buf[1] == NUL)
+	    만약 (buf[1] == NUL)
 		buf[plen] = NUL;
-	    else
+	    아니면
 		mch_memmove(buf + plen, buf + 2, (buflen - 2) + 1); // +1 for NUL
 	    mch_memmove(buf, curbuf->b_ffname, plen);
 	    buflen = simplify_filename(buf);
 	}
-	else if (buf[0] == NUL)
+	아니면 만약 (buf[0] == NUL)
 	{
 	    // relative to current directory
 	    STRCPY(buf, curdir);
-	    if (curdirlen == 0)
+	    만약 (curdirlen == 0)
 		curdirlen = STRLEN(curdir);
 	    buflen = curdirlen;
 	}
-	else if (path_with_url(buf))
+	아니면 만약 (path_with_url(buf))
 	    // URL can't be used here
 	    continue;
-	else if (!mch_isFullName(buf))
+	아니면 만약 (!mch_isFullName(buf))
 	{
 	    // Expand relative path to their full path equivalent
-	    if (curdirlen == 0)
+	    만약 (curdirlen == 0)
 		curdirlen = STRLEN(curdir);
-	    if (curdirlen + buflen + 3 > MAXPATHL)
+	    만약 (curdirlen + buflen + 3 > MAXPATHL)
 		continue;
 
 	    mch_memmove(buf + curdirlen + 1, buf, buflen + 1);	    // +1 for NUL
@@ -2459,18 +2459,18 @@ expand_path_option(
 	    buflen = simplify_filename(buf);
 	}
 
-	if (ga_grow(gap, 1) == FAIL)
+	만약 (ga_grow(gap, 1) == FAIL)
 	    break;
 
-#if defined(MSWIN)
+#만약 defined(MSWIN)
 	// Avoid the path ending in a backslash, it fails when a comma is
 	// appended.
-	if (buf[buflen - 1] == '\\')
+	만약 (buf[buflen - 1] == '\\')
 	    buf[buflen - 1] = '/';
 #endif
 
 	p = vim_strnsave(buf, buflen);
-	if (p == NULL)
+	만약 (p == NULL)
 	    break;
 	((char_u **)gap->ga_data)[gap->ga_len++] = p;
     }
@@ -2489,22 +2489,22 @@ expand_path_option(
     static char_u *
 get_path_cutoff(char_u *fname, garray_T *gap)
 {
-    int	    i;
-    int	    maxlen = 0;
+    정수	    i;
+    정수	    maxlen = 0;
     char_u  **path_part = (char_u **)gap->ga_data;
     char_u  *cutoff = NULL;
 
-    for (i = 0; i < gap->ga_len; i++)
+    위해 (i = 0; i < gap->ga_len; i++)
     {
-	int j = 0;
+	정수 j = 0;
 
-	while ((fname[j] == path_part[i][j]
-#if defined(MSWIN)
+	동안 ((fname[j] == path_part[i][j]
+#만약 defined(MSWIN)
 		|| (vim_ispathsep(fname[j]) && vim_ispathsep(path_part[i][j]))
 #endif
 			     ) && fname[j] != NUL && path_part[i][j] != NUL)
 	    j++;
-	if (j > maxlen)
+	만약 (j > maxlen)
 	{
 	    maxlen = j;
 	    cutoff = &fname[j];
@@ -2512,11 +2512,11 @@ get_path_cutoff(char_u *fname, garray_T *gap)
     }
 
     // skip to the file or directory name
-    if (cutoff != NULL)
-	while (vim_ispathsep(*cutoff))
+    만약 (cutoff != NULL)
+	동안 (vim_ispathsep(*cutoff))
 	    MB_PTR_ADV(cutoff);
 
-    return cutoff;
+    반환 cutoff;
 }
 
 /*
@@ -2530,10 +2530,10 @@ uniquefy_paths(
 	char_u *pattern,
 	char_u *path_option)	// p_path or p_cdpath
 {
-    int		i;
-    int		len;
+    정수		i;
+    정수		len;
     char_u	**fnames = (char_u **)gap->ga_data;
-    int		sort_again = FALSE;
+    정수		sort_again = FALSE;
     char_u	*pat;
     char_u      *file_pattern;
     char_u	*curdir;
@@ -2550,43 +2550,43 @@ uniquefy_paths(
      * regex matches anywhere in the path. FIXME: is this valid for all
      * possible patterns?
      */
-    len = (int)STRLEN(pattern);
+    len = (정수)STRLEN(pattern);
     file_pattern = alloc(len + 2);
-    if (file_pattern == NULL)
-	return;
+    만약 (file_pattern == NULL)
+	반환;
     file_pattern[0] = '*';
     STRCPY(file_pattern + 1, pattern);
     pat = file_pat_to_reg_pat(file_pattern, NULL, NULL, FALSE);
     vim_free(file_pattern);
-    if (pat == NULL)
-	return;
+    만약 (pat == NULL)
+	반환;
 
     regmatch.rm_ic = TRUE;		// always ignore case
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
     vim_free(pat);
-    if (regmatch.regprog == NULL)
-	return;
+    만약 (regmatch.regprog == NULL)
+	반환;
 
-    if ((curdir = alloc(MAXPATHL)) == NULL)
+    만약 ((curdir = alloc(MAXPATHL)) == NULL)
 	goto theend;
     mch_dirname(curdir, MAXPATHL);
     expand_path_option(curdir, path_option, &path_ga);
 
     in_curdir = ALLOC_CLEAR_MULT(char_u *, gap->ga_len);
-    if (in_curdir == NULL)
+    만약 (in_curdir == NULL)
 	goto theend;
 
-    for (i = 0; i < gap->ga_len && !got_int; i++)
+    위해 (i = 0; i < gap->ga_len && !got_int; i++)
     {
 	char_u	    *path = fnames[i];
-	int	    is_in_curdir;
+	정수	    is_in_curdir;
 	char_u	    *dir_end = gettail_dir(path);
 	char_u	    *path_cutoff;
 
-	len = (int)STRLEN(path);
+	len = (정수)STRLEN(path);
 	is_in_curdir = fnamencmp(curdir, path, dir_end - path) == 0
 					     && curdir[dir_end - path] == NUL;
-	if (is_in_curdir)
+	만약 (is_in_curdir)
 	    in_curdir[i] = vim_strnsave(path, len);
 
 	// Shorten the filename while maintaining its uniqueness
@@ -2595,7 +2595,7 @@ uniquefy_paths(
 	// Don't assume all files can be reached without path when search
 	// pattern starts with star star slash, so only remove path_cutoff
 	// when possible.
-	if (pattern[0] == '*' && pattern[1] == '*'
+	만약 (pattern[0] == '*' && pattern[1] == '*'
 		&& vim_ispathsep_nocolon(pattern[2])
 		&& path_cutoff != NULL
 		&& vim_regexec(&regmatch, path_cutoff, (colnr_T)0)
@@ -2604,15 +2604,15 @@ uniquefy_paths(
 	    sort_again = TRUE;
 	    mch_memmove(path, path_cutoff, STRLEN(path_cutoff) + 1);
 	}
-	else
+	아니면
 	{
 	    // Here all files can be reached without path, so get shortest
 	    // unique path.  We start at the end of the path.
 	    char_u  *pathsep_p = path + len - 1;
 
-	    while (find_previous_pathsep(path, &pathsep_p))
+	    동안 (find_previous_pathsep(path, &pathsep_p))
 	    {
-		if (vim_regexec(&regmatch, pathsep_p + 1, (colnr_T)0)
+		만약 (vim_regexec(&regmatch, pathsep_p + 1, (colnr_T)0)
 			&& is_unique(pathsep_p + 1, gap, i)
 			&& path_cutoff != NULL && pathsep_p + 1 >= path_cutoff)
 		{
@@ -2624,7 +2624,7 @@ uniquefy_paths(
 	    }
 	}
 
-	if (mch_isFullName(path))
+	만약 (mch_isFullName(path))
 	{
 	    /*
 	     * Last resort: shorten relative to curdir if possible.
@@ -2639,8 +2639,8 @@ uniquefy_paths(
 	     *	    c:\file.txt		  c:\		.\file.txt
 	     */
 	    short_name = shorten_fname(path, curdir);
-	    if (short_name != NULL && short_name > path + 1
-#if defined(MSWIN)
+	    만약 (short_name != NULL && short_name > path + 1
+#만약 defined(MSWIN)
 		    // On windows,
 		    //	    shorten_fname("c:\a\a.txt", "c:\a\b")
 		    // returns "\a\a.txt", which is not really the short
@@ -2656,21 +2656,21 @@ uniquefy_paths(
     }
 
     // Shorten filenames in /in/current/directory/{filename}
-    for (i = 0; i < gap->ga_len && !got_int; i++)
+    위해 (i = 0; i < gap->ga_len && !got_int; i++)
     {
 	size_t	rel_pathsize;
 	char_u	*rel_path;
 	char_u	*path = in_curdir[i];
 
-	if (path == NULL)
+	만약 (path == NULL)
 	    continue;
 
 	// If the {filename} is not unique, change it to ./{filename}.
 	// Else reduce it to {filename}
 	short_name = shorten_fname(path, curdir);
-	if (short_name == NULL)
+	만약 (short_name == NULL)
 	    short_name = path;
-	if (is_unique(short_name, gap, i))
+	만약 (is_unique(short_name, gap, i))
 	{
 	    STRCPY(fnames[i], short_name);
 	    continue;
@@ -2678,7 +2678,7 @@ uniquefy_paths(
 
 	rel_pathsize = 1 + sizeof(PATHSEP) + STRLEN(short_name) + 1;
 	rel_path = alloc(rel_pathsize);
-	if (rel_path == NULL)
+	만약 (rel_path == NULL)
 	    goto theend;
 
 	vim_snprintf((char *)rel_path, rel_pathsize, ".%s%s", PATHSEPSTR, short_name);
@@ -2691,16 +2691,16 @@ uniquefy_paths(
 
 theend:
     vim_free(curdir);
-    if (in_curdir != NULL)
+    만약 (in_curdir != NULL)
     {
-	for (i = 0; i < gap->ga_len; i++)
+	위해 (i = 0; i < gap->ga_len; i++)
 	    vim_free(in_curdir[i]);
 	vim_free(in_curdir);
     }
     ga_clear_strings(&path_ga);
     vim_regfree(regmatch.regprog);
 
-    if (sort_again)
+    만약 (sort_again)
 	remove_duplicates(gap);
 }
 
@@ -2709,44 +2709,44 @@ theend:
  * result in "gap".
  * Returns the total number of matches.
  */
-    int
+    정수
 expand_in_path(
     garray_T	*gap,
     char_u	*pattern,
-    int		flags)		// EW_* flags
+    정수		flags)		// EW_* flags
 {
     char_u	*curdir;
     garray_T	path_ga;
     char_u	*paths = NULL;
-    int		glob_flags = 0;
+    정수		glob_flags = 0;
     char_u	*path_option = *curbuf->b_p_path == NUL ? p_path : curbuf->b_p_path;
 
-    if ((curdir = alloc(MAXPATHL)) == NULL)
-	return 0;
+    만약 ((curdir = alloc(MAXPATHL)) == NULL)
+	반환 0;
     mch_dirname(curdir, MAXPATHL);
 
     ga_init2(&path_ga, sizeof(char_u *), 1);
-    if (flags & EW_CDPATH)
+    만약 (flags & EW_CDPATH)
 	expand_path_option(curdir, p_cdpath, &path_ga);
-    else
+    아니면
 	expand_path_option(curdir, path_option, &path_ga);
     vim_free(curdir);
-    if (path_ga.ga_len == 0)
-	return 0;
+    만약 (path_ga.ga_len == 0)
+	반환 0;
 
     paths = ga_concat_strings(&path_ga, ",");
     ga_clear_strings(&path_ga);
-    if (paths == NULL)
-	return 0;
+    만약 (paths == NULL)
+	반환 0;
 
-    if (flags & EW_ICASE)
+    만약 (flags & EW_ICASE)
 	glob_flags |= WILD_ICASE;
-    if (flags & EW_ADDSLASH)
+    만약 (flags & EW_ADDSLASH)
 	glob_flags |= WILD_ADD_SLASH;
     globpath(paths, pattern, gap, glob_flags, !!(flags & EW_CDPATH));
     vim_free(paths);
 
-    return gap->ga_len;
+    반환 gap->ga_len;
 }
 
 
@@ -2760,30 +2760,30 @@ expand_in_path(
 simplify_filename(char_u *filename)
 {
 #ifndef AMIGA	    // Amiga doesn't have "..", it uses "/"
-    int		components = 0;
+    정수		components = 0;
     char_u	*p, *tail, *start;
     char_u	*p_end;			    // point to NUL at end of string "p"
-    int		stripping_disabled = FALSE;
-    int		relative = TRUE;
+    정수		stripping_disabled = FALSE;
+    정수		relative = TRUE;
 
     p = filename;
 # ifdef BACKSLASH_IN_FILENAME
-    if (p[0] != NUL && p[1] == ':')	    // skip "x:"
+    만약 (p[0] != NUL && p[1] == ':')	    // skip "x:"
 	p += 2;
 # endif
 
-    if (vim_ispathsep(*p))
+    만약 (vim_ispathsep(*p))
     {
 	relative = FALSE;
 	do
 	    ++p;
-	while (vim_ispathsep(*p));
+	동안 (vim_ispathsep(*p));
     }
     start = p;	    // remember start after "c:/" or "/" or "///"
     p_end = p + STRLEN(p);
 # ifdef UNIX
     // Posix says that "//path" is unchanged but "///path" is "/path".
-    if (start > filename + 2)
+    만약 (start > filename + 2)
     {
 	mch_memmove(filename + 1, p, (size_t)(p_end - p) + 1);	    // +1 for NUL
 	p_end -= (size_t)(p - (filename + 1));
@@ -2797,63 +2797,63 @@ simplify_filename(char_u *filename)
 	// or "p" is at the "start" of the (absolute or relative) path name.
 # ifdef VMS
 	// VMS allows device:[path] - don't strip the [ in directory
-	if ((*p == '[' || *p == '<') && p > filename && p[-1] == ':')
+	만약 ((*p == '[' || *p == '<') && p > filename && p[-1] == ':')
 	{
 	    // :[ or :< composition: vms directory component
 	    ++components;
 	    p = getnextcomp(p + 1);
 	}
 	// allow remote calls as host"user passwd"::device:[path]
-	else if (p[0] == ':' && p[1] == ':' && p > filename && p[-1] == '"' )
+	아니면 만약 (p[0] == ':' && p[1] == ':' && p > filename && p[-1] == '"' )
 	{
 	    // ":: composition: vms host/passwd component
 	    ++components;
 	    p = getnextcomp(p + 2);
 	}
-	else
+	아니면
 # endif
-	if (vim_ispathsep(*p))
+	만약 (vim_ispathsep(*p))
 	{
 	    mch_memmove(p, p + 1, (size_t)(p_end - (p + 1)) + 1); // remove duplicate "/"
 	    --p_end;
 	}
-	else if (p[0] == '.' && (vim_ispathsep(p[1]) || p[1] == NUL))
+	아니면 만약 (p[0] == '.' && (vim_ispathsep(p[1]) || p[1] == NUL))
 	{
-	    if (p == start && relative)
+	    만약 (p == start && relative)
 		p += 1 + (p[1] != NUL);	// keep single "." or leading "./"
-	    else
+	    아니면
 	    {
 		// Strip "./" or ".///".  If we are at the end of the file name
 		// and there is no trailing path separator, either strip "/." if
 		// we are after "start", or strip "." if we are at the beginning
 		// of an absolute path name .
 		tail = p + 1;
-		if (p[1] != NUL)
-		    while (vim_ispathsep(*tail))
+		만약 (p[1] != NUL)
+		    동안 (vim_ispathsep(*tail))
 			MB_PTR_ADV(tail);
-		else if (p > start)
+		아니면 만약 (p > start)
 		    --p;		// strip preceding path separator
 
 		mch_memmove(p, tail, (size_t)(p_end - tail) + 1);
 		p_end -= (size_t)(tail - p);
 	    }
 	}
-	else if (p[0] == '.' && p[1] == '.' &&
+	아니면 만약 (p[0] == '.' && p[1] == '.' &&
 	    (vim_ispathsep(p[2]) || p[2] == NUL))
 	{
 	    // Skip to after ".." or "../" or "..///".
 	    tail = p + 2;
-	    while (vim_ispathsep(*tail))
+	    동안 (vim_ispathsep(*tail))
 		MB_PTR_ADV(tail);
 
-	    if (components > 0)		// strip one preceding component
+	    만약 (components > 0)		// strip one preceding component
 	    {
-		int		do_strip = FALSE;
+		정수		do_strip = FALSE;
 		char_u		saved_char;
 		stat_T		st;
 
 		// Don't strip for an erroneous file name.
-		if (!stripping_disabled)
+		만약 (!stripping_disabled)
 		{
 		    // If the preceding component does not exist in the file
 		    // system, we strip it.  On Unix, we don't accept a symbolic
@@ -2861,19 +2861,19 @@ simplify_filename(char_u *filename)
 		    saved_char = p[-1];
 		    p[-1] = NUL;
 # ifdef UNIX
-		    if (mch_lstat((char *)filename, &st) < 0)
-# else
-			if (mch_stat((char *)filename, &st) < 0)
+		    만약 (mch_lstat((char *)filename, &st) < 0)
+# 아니면
+			만약 (mch_stat((char *)filename, &st) < 0)
 # endif
 			    do_strip = TRUE;
 		    p[-1] = saved_char;
 
 		    --p;
 		    // Skip back to after previous '/'.
-		    while (p > start && !after_pathsep(start, p))
+		    동안 (p > start && !after_pathsep(start, p))
 			MB_PTR_BACK(start, p);
 
-		    if (!do_strip)
+		    만약 (!do_strip)
 		    {
 			// If the component exists in the file system, check
 			// that stripping it won't change the meaning of the
@@ -2887,13 +2887,13 @@ simplify_filename(char_u *filename)
 			// components.
 			saved_char = *tail;
 			*tail = NUL;
-			if (mch_stat((char *)filename, &st) >= 0)
+			만약 (mch_stat((char *)filename, &st) >= 0)
 			    do_strip = TRUE;
-			else
+			아니면
 			    stripping_disabled = TRUE;
 			*tail = saved_char;
 # ifdef UNIX
-			if (do_strip)
+			만약 (do_strip)
 			{
 			    stat_T	new_st;
 
@@ -2904,9 +2904,9 @@ simplify_filename(char_u *filename)
 			    // same as the stripped file name.  (The latter
 			    // exists in the file system since it is the
 			    // component's parent directory.)
-			    if (p == start && relative)
+			    만약 (p == start && relative)
 				(void)mch_stat(".", &new_st);
-			    else
+			    아니면
 			    {
 				saved_char = *p;
 				*p = NUL;
@@ -2914,7 +2914,7 @@ simplify_filename(char_u *filename)
 				*p = saved_char;
 			    }
 
-			    if (new_st.st_ino != st.st_ino ||
+			    만약 (new_st.st_ino != st.st_ino ||
 				new_st.st_dev != st.st_dev)
 			    {
 				do_strip = FALSE;
@@ -2927,14 +2927,14 @@ simplify_filename(char_u *filename)
 		    }
 		}
 
-		if (!do_strip)
+		만약 (!do_strip)
 		{
 		    // Skip the ".." or "../" and reset the counter for the
 		    // components that might be stripped later on.
 		    p = tail;
 		    components = 0;
 		}
-		else
+		아니면
 		{
 		    // Strip previous component.  If the result would get empty
 		    // and there is no trailing path separator, leave a single
@@ -2942,14 +2942,14 @@ simplify_filename(char_u *filename)
 		    // there is no trailing path separator and a preceding
 		    // component is left after stripping, strip its trailing
 		    // path separator as well.
-		    if (p == start && relative && tail[-1] == '.')
+		    만약 (p == start && relative && tail[-1] == '.')
 		    {
 			*p++ = '.';
 			*p = NUL;
 		    }
-		    else
+		    아니면
 		    {
-			if (p > start && tail[-1] == '.')
+			만약 (p > start && tail[-1] == '.')
 			    --p;
 
 			mch_memmove(p, tail, (size_t)(p_end - tail) + 1);	// strip previous component
@@ -2959,14 +2959,14 @@ simplify_filename(char_u *filename)
 		    --components;
 		}
 	    }
-	    else if (p == start && !relative)	// leading "/.." or "/../"
+	    아니면 만약 (p == start && !relative)	// leading "/.." or "/../"
 	    {
 		mch_memmove(p, tail, (size_t)(p_end - tail) + 1);		// strip ".." or "../"
 		p_end -= (size_t)(tail - p);
 	    }
-	    else
+	    아니면
 	    {
-		if (p == start + 2 && p[-2] == '.')	// leading "./../"
+		만약 (p == start + 2 && p[-2] == '.')	// leading "./../"
 		{
 		    mch_memmove(p - 2, p, (size_t)(p_end - p) + 1); // strip leading "./"
 		    p_end -= 2;
@@ -2975,21 +2975,21 @@ simplify_filename(char_u *filename)
 		p = tail;		// skip to char after ".." or "../"
 	    }
 	}
-	else
+	아니면
 	{
 	    ++components;		// simple path component
 	    p = getnextcomp(p);
 	}
-    } while (*p != NUL);
+    } 동안 (*p != NUL);
 
-    return (size_t)(p_end - filename);
-#else
+    반환 (size_t)(p_end - filename);
+#아니면
     // Don't touch Amiga filenames
-    return STRLEN(filename);
+    반환 STRLEN(filename);
 #endif // !AMIGA
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * "simplify()" function
  */
@@ -2998,8 +2998,8 @@ f_simplify(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    만약 (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	반환;
 
     p = tv_get_string_strict(&argvars[0]);
     rettv->vval.v_string = vim_strsave(p);

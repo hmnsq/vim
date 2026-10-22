@@ -25,7 +25,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_NETBEANS_INTG)
+#만약 defined(FEAT_NETBEANS_INTG)
 
 #ifndef MSWIN
 # include <netdb.h>
@@ -53,24 +53,24 @@ static long pos2off(buf_T *, pos_T *);
 static pos_T *off2pos(buf_T *, long);
 static pos_T *get_off_or_lnum(buf_T *buf, char_u **argp);
 static long get_buf_size(buf_T *);
-static int netbeans_keystring(char_u *keystr);
+static 정수 netbeans_keystring(char_u *keystr);
 static void special_keys(char_u *args);
 
-static int getConnInfo(char *file, char **host, char **port, char **password);
+static 정수 getConnInfo(char *file, char **host, char **port, char **password);
 
 static void nb_init_graphics(void);
 static void coloncmd(char *cmd, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 static void nb_set_curbuf(buf_T *buf);
 static void nb_parse_cmd(char_u *);
-static int  nb_do_cmd(int, char_u *, int, int, char_u *);
+static 정수  nb_do_cmd(정수, char_u *, 정수, 정수, char_u *);
 static void nb_send(char *buf, char *fun);
 static void nb_free(void);
 
 #define NETBEANS_OPEN (channel_can_write_to(nb_channel))
 static channel_T *nb_channel = NULL;
 
-static int r_cmdno;			// current command number for reply
-static int dosetvisible = FALSE;
+static 정수 r_cmdno;			// current command number for reply
+static 정수 dosetvisible = FALSE;
 
 /*
  * Include the debugging code if wanted.
@@ -79,23 +79,23 @@ static int dosetvisible = FALSE;
 # include "nbdebug.c"
 #endif
 
-static int needupdate = 0;
-static int inAtomic = 0;
+static 정수 needupdate = 0;
+static 정수 inAtomic = 0;
 
 /*
  * Return TRUE if "str" contains only characters from "allowed".
  * Used to validate NetBeans-supplied strings before interpolating them
  * into Ex commands via coloncmd().
  */
-    static int
+    static 정수
 nb_is_safe_string(char_u *str, char_u *allowed)
 {
-    if (str == NULL)
-	return FALSE;
-    for (char_u *p = str; *p != NUL; p++)
-	if (vim_strchr(allowed, *p) == NULL)
-	    return FALSE;
-    return TRUE;
+    만약 (str == NULL)
+	반환 FALSE;
+    위해 (char_u *p = str; *p != NUL; p++)
+	만약 (vim_strchr(allowed, *p) == NULL)
+	    반환 FALSE;
+    반환 TRUE;
 }
 
 /*
@@ -114,10 +114,10 @@ nb_channel_closed(void)
     static void
 netbeans_close(void)
 {
-    if (NETBEANS_OPEN)
+    만약 (NETBEANS_OPEN)
     {
 	netbeans_send_disconnect();
-	if (nb_channel != NULL)
+	만약 (nb_channel != NULL)
 	{
 	    // Close the socket and remove the input handlers.
 	    channel_close(nb_channel, TRUE);
@@ -147,10 +147,10 @@ netbeans_close(void)
 #define NB_DEF_ADDR "3219"
 #define NB_DEF_PASS "changeme"
 
-    static int
-netbeans_connect(char *params, int doabort)
+    static 정수
+netbeans_connect(char *params, 정수 doabort)
 {
-    int		port;
+    정수		port;
     char	buf[32];
     char	*hostname = NULL;
     char	*address = NULL;
@@ -158,78 +158,78 @@ netbeans_connect(char *params, int doabort)
     char	*fname;
     char	*arg = NULL;
 
-    if (*params == '=')
+    만약 (*params == '=')
     {
 	// "=fname": Read info from specified file.
-	if (getConnInfo(params + 1, &hostname, &address, &password) == FAIL)
-	    return FAIL;
+	만약 (getConnInfo(params + 1, &hostname, &address, &password) == FAIL)
+	    반환 FAIL;
     }
-    else
+    아니면
     {
-	if (*params == ':')
+	만약 (*params == ':')
 	    // ":<host>:<addr>:<password>": get info from argument
 	    arg = params + 1;
-	if (arg == NULL && (fname = getenv("__NETBEANS_CONINFO")) != NULL)
+	만약 (arg == NULL && (fname = getenv("__NETBEANS_CONINFO")) != NULL)
 	{
 	    // "": get info from file specified in environment
-	    if (getConnInfo(fname, &hostname, &address, &password) == FAIL)
-		return FAIL;
+	    만약 (getConnInfo(fname, &hostname, &address, &password) == FAIL)
+		반환 FAIL;
 	}
-	else
+	아니면
 	{
-	    if (arg != NULL)
+	    만약 (arg != NULL)
 	    {
 		// ":<host>:<addr>:<password>": get info from argument
 		hostname = arg;
 		address = strchr(hostname, ':');
-		if (address != NULL)
+		만약 (address != NULL)
 		{
 		    *address++ = '\0';
 		    password = strchr(address, ':');
-		    if (password != NULL)
+		    만약 (password != NULL)
 			*password++ = '\0';
 		}
 	    }
 
 	    // Get the missing values from the environment.
-	    if (hostname == NULL || *hostname == '\0')
+	    만약 (hostname == NULL || *hostname == '\0')
 		hostname = getenv("__NETBEANS_HOST");
-	    if (address == NULL)
+	    만약 (address == NULL)
 		address = getenv("__NETBEANS_SOCKET");
-	    if (password == NULL)
+	    만약 (password == NULL)
 		password = getenv("__NETBEANS_VIM_PASSWORD");
 
 	    // Move values to allocated memory.
-	    if (hostname != NULL)
+	    만약 (hostname != NULL)
 		hostname = (char *)vim_strsave((char_u *)hostname);
-	    if (address != NULL)
+	    만약 (address != NULL)
 		address = (char *)vim_strsave((char_u *)address);
-	    if (password != NULL)
+	    만약 (password != NULL)
 		password = (char *)vim_strsave((char_u *)password);
 	}
     }
 
     // Use the default when a value is missing.
-    if (hostname == NULL || *hostname == '\0')
+    만약 (hostname == NULL || *hostname == '\0')
     {
 	vim_free(hostname);
 	hostname = (char *)vim_strsave((char_u *)NB_DEF_HOST);
     }
-    if (address == NULL || *address == '\0')
+    만약 (address == NULL || *address == '\0')
     {
 	vim_free(address);
 	address = (char *)vim_strsave((char_u *)NB_DEF_ADDR);
     }
-    if (password == NULL || *password == '\0')
+    만약 (password == NULL || *password == '\0')
     {
 	vim_free(password);
 	password = (char *)vim_strsave((char_u *)NB_DEF_PASS);
     }
-    if (hostname != NULL && address != NULL && password != NULL)
+    만약 (hostname != NULL && address != NULL && password != NULL)
     {
 	port = atoi(address);
 	nb_channel = channel_open(hostname, port, 3000, nb_channel_closed);
-	if (nb_channel != NULL)
+	만약 (nb_channel != NULL)
 	{
 	    // success
 #ifdef FEAT_BEVAL_GUI
@@ -245,13 +245,13 @@ netbeans_connect(char *params, int doabort)
 	}
     }
 
-    if (nb_channel == NULL && doabort)
+    만약 (nb_channel == NULL && doabort)
 	getout(1);
 
     vim_free(hostname);
     vim_free(address);
     vim_free(password);
-    return NETBEANS_OPEN ? OK : FAIL;
+    반환 NETBEANS_OPEN ? OK : FAIL;
 }
 
 /*
@@ -260,7 +260,7 @@ netbeans_connect(char *params, int doabort)
  * Return FAIL if the file could not be read, OK otherwise (no matter what it
  * contains).
  */
-    static int
+    static 정수
 getConnInfo(char *file, char **host, char **port, char **auth)
 {
     FILE *fp;
@@ -274,41 +274,41 @@ getConnInfo(char *file, char **host, char **port, char **auth)
      * For Unix only accept the file when it's not accessible by others.
      * The open will then fail if we don't own the file.
      */
-    if (mch_stat(file, &st) == 0 && (st.st_mode & 0077) != 0)
+    만약 (mch_stat(file, &st) == 0 && (st.st_mode & 0077) != 0)
     {
 	nbdebug(("Wrong access mode for NetBeans connection info file: \"%s\"\n",
 								       file));
 	semsg(_(e_wrong_access_mode_for_netbeans_connection_info_file_str),
 									file);
-	return FAIL;
+	반환 FAIL;
     }
 #endif
 
     fp = mch_fopen(file, "r");
-    if (fp == NULL)
+    만약 (fp == NULL)
     {
 	nbdebug(("Cannot open NetBeans connection info file\n"));
 	PERROR(e_cannot_open_netbeans_connection_info_file);
-	return FAIL;
+	반환 FAIL;
     }
 
     // Read the file. There should be one of each parameter
-    while ((lp = (char_u *)fgets((char *)buf, BUFSIZ, fp)) != NULL)
+    동안 ((lp = (char_u *)fgets((char *)buf, BUFSIZ, fp)) != NULL)
     {
-	if ((nlp = vim_strchr(lp, '\n')) != NULL)
+	만약 ((nlp = vim_strchr(lp, '\n')) != NULL)
 	    *nlp = 0;	    // strip off the trailing newline
 
-	if (STRNCMP(lp, "host=", 5) == 0)
+	만약 (STRNCMP(lp, "host=", 5) == 0)
 	{
 	    vim_free(*host);
 	    *host = (char *)vim_strsave(&buf[5]);
 	}
-	else if (STRNCMP(lp, "port=", 5) == 0)
+	아니면 만약 (STRNCMP(lp, "port=", 5) == 0)
 	{
 	    vim_free(*port);
 	    *port = (char *)vim_strsave(&buf[5]);
 	}
-	else if (STRNCMP(lp, "auth=", 5) == 0)
+	아니면 만약 (STRNCMP(lp, "auth=", 5) == 0)
 	{
 	    vim_free(*auth);
 	    *auth = (char *)vim_strsave(&buf[5]);
@@ -316,7 +316,7 @@ getConnInfo(char *file, char **host, char **port, char **auth)
     }
     fclose(fp);
 
-    return OK;
+    반환 OK;
 }
 
 
@@ -343,10 +343,10 @@ postpone_keycommand(char_u *keystr)
     keyQ_T *node;
 
     node = ALLOC_ONE(keyQ_T);
-    if (node == NULL)
-	return;  // out of memory, drop the key
+    만약 (node == NULL)
+	반환;  // out of memory, drop the key
 
-    if (keyHead.next == NULL) // initialize circular queue
+    만약 (keyHead.next == NULL) // initialize circular queue
     {
 	keyHead.next = &keyHead;
 	keyHead.prev = &keyHead;
@@ -367,9 +367,9 @@ postpone_keycommand(char_u *keystr)
     static void
 handle_key_queue(void)
 {
-    int postponed = FALSE;
+    정수 postponed = FALSE;
 
-    while (!postponed && keyHead.next && keyHead.next != &keyHead)
+    동안 (!postponed && keyHead.next && keyHead.next != &keyHead)
     {
 	// first, unlink the node
 	keyQ_T *node = keyHead.next;
@@ -378,7 +378,7 @@ handle_key_queue(void)
 
 	// Now, send the keycommand.  This may cause it to be postponed again
 	// and change keyHead.
-	if (node->keystr != NULL)
+	만약 (node->keystr != NULL)
 	    postponed = !netbeans_keystring(node->keystr);
 	vim_free(node->keystr);
 
@@ -397,23 +397,23 @@ netbeans_parse_messages(void)
     readq_T	*node;
     char_u	*buffer;
     char_u	*p;
-    int		own_node;
+    정수		own_node;
 
-    while (nb_channel != NULL)
+    동안 (nb_channel != NULL)
     {
 	node = channel_peek(nb_channel, PART_SOCK);
-	if (node == NULL)
+	만약 (node == NULL)
 	    break;	// nothing to read
 
 	// Locate the end of the first line in the first buffer.
 	p = channel_first_nl(node);
-	if (p == NULL)
+	만약 (p == NULL)
 	{
 	    // Command isn't complete.  If there is no following buffer,
 	    // return (wait for more). If there is another buffer following,
 	    // prepend the text to that buffer and delete this one.
-	    if (channel_collapse(nb_channel, PART_SOCK, TRUE) == FAIL)
-		return;
+	    만약 (channel_collapse(nb_channel, PART_SOCK, TRUE) == FAIL)
+		반환;
 	    continue;
 	}
 
@@ -422,13 +422,13 @@ netbeans_parse_messages(void)
 	// the buffer.  Do this before executing, because new buffers can
 	// be added while busy handling the command.
 	*p++ = NUL;
-	if (*p == NUL)
+	만약 (*p == NUL)
 	{
 	    own_node = TRUE;
 	    buffer = channel_get(nb_channel, PART_SOCK, NULL);
 	    // "node" is now invalid!
 	}
-	else
+	아니면
 	{
 	    own_node = FALSE;
 	    buffer = node->rq_buffer;
@@ -438,12 +438,12 @@ netbeans_parse_messages(void)
 	// NULL if the channel is closed.
 	nb_parse_cmd(buffer);
 
-	if (own_node)
+	만약 (own_node)
 	    // buffer finished, dispose of it
 	    vim_free(buffer);
-	else if (nb_channel != NULL)
+	아니면 만약 (nb_channel != NULL)
 	    // more follows, move it to the start
-	    channel_consume(nb_channel, PART_SOCK, (int)(p - buffer));
+	    channel_consume(nb_channel, PART_SOCK, (정수)(p - buffer));
     }
 }
 
@@ -468,10 +468,10 @@ nb_parse_cmd(char_u *cmd)
 {
     char	*verb;
     char	*q;
-    int		bufno;
-    int		isfunc = -1;
+    정수		bufno;
+    정수		isfunc = -1;
 
-    if (STRCMP(cmd, "DISCONNECT") == 0)
+    만약 (STRCMP(cmd, "DISCONNECT") == 0)
     {
 	// We assume the server knows that we can safely exit!
 	// Disconnect before exiting, Motif hangs in a Select error
@@ -481,7 +481,7 @@ nb_parse_cmd(char_u *cmd)
 	// NOTREACHED
     }
 
-    if (STRCMP(cmd, "DETACH") == 0)
+    만약 (STRCMP(cmd, "DETACH") == 0)
     {
 	buf_T	*buf;
 
@@ -490,28 +490,28 @@ nb_parse_cmd(char_u *cmd)
 
 	// The IDE is breaking the connection.
 	netbeans_close();
-	return;
+	반환;
     }
 
     bufno = strtol((char *)cmd, &verb, 10);
 
-    if (*verb != ':')
+    만약 (*verb != ':')
     {
 	nbdebug(("    missing colon: %s\n", cmd));
 	semsg(_(e_missing_colon_str), cmd);
-	return;
+	반환;
     }
     ++verb; // skip colon
 
-    for (q = verb; *q; q++)
+    위해 (q = verb; *q; q++)
     {
-	if (*q == '!')
+	만약 (*q == '!')
 	{
 	    *q++ = NUL;
 	    isfunc = 0;
 	    break;
 	}
-	else if (*q == '/')
+	아니면 만약 (*q == '/')
 	{
 	    *q++ = NUL;
 	    isfunc = 1;
@@ -519,18 +519,18 @@ nb_parse_cmd(char_u *cmd)
 	}
     }
 
-    if (isfunc < 0)
+    만약 (isfunc < 0)
     {
 	nbdebug(("    missing ! or / in: %s\n", cmd));
 	semsg(_(e_missing_bang_or_slash_in_str), cmd);
-	return;
+	반환;
     }
 
     r_cmdno = strtol(q, &q, 10);
 
     q = (char *)skipwhite((char_u *)q);
 
-    if (nb_do_cmd(bufno, (char_u *)verb, isfunc, r_cmdno, (char_u *)q) == FAIL)
+    만약 (nb_do_cmd(bufno, (char_u *)verb, isfunc, r_cmdno, (char_u *)q) == FAIL)
     {
 #ifdef NBDEBUG
 	/*
@@ -547,13 +547,13 @@ nb_parse_cmd(char_u *cmd)
 struct nbbuf_struct
 {
     buf_T		*bufp;
-    unsigned int	 fireChanges:1;
-    unsigned int	 initDone:1;
-    unsigned int	 insertDone:1;
-    unsigned int	 modified:1;
-    int			 nbbuf_number;
+    unsigned 정수	 fireChanges:1;
+    unsigned 정수	 initDone:1;
+    unsigned 정수	 insertDone:1;
+    unsigned 정수	 modified:1;
+    정수			 nbbuf_number;
     char		*displayname;
-    int			*signmap;
+    정수			*signmap;
     short_u		 signmaplen;
     short_u		 signmapused;
 };
@@ -561,21 +561,21 @@ struct nbbuf_struct
 typedef struct nbbuf_struct nbbuf_T;
 
 static nbbuf_T *buf_list = NULL;
-static int buf_list_size = 0;	// size of buf_list
-static int buf_list_used = 0;	// nr of entries in buf_list actually in use
+static 정수 buf_list_size = 0;	// size of buf_list
+static 정수 buf_list_used = 0;	// nr of entries in buf_list actually in use
 
 static char **globalsignmap = NULL;
-static int globalsignmaplen = 0;
-static int globalsignmapused = 0;
+static 정수 globalsignmaplen = 0;
+static 정수 globalsignmapused = 0;
 
-static int  mapsigntype(nbbuf_T *, int localsigntype);
-static void addsigntype(nbbuf_T *, int localsigntype, char_u *typeName,
+static 정수  mapsigntype(nbbuf_T *, 정수 localsigntype);
+static void addsigntype(nbbuf_T *, 정수 localsigntype, char_u *typeName,
 			char_u *tooltip, char_u *glyphfile,
 			char_u *fg, char_u *bg);
 static void print_read_msg(nbbuf_T *buf);
 static void print_save_msg(nbbuf_T *buf, off_T nchars);
 
-static int curPCtype = -1;
+static 정수 curPCtype = -1;
 
 /*
  * Free netbeans resources.
@@ -585,15 +585,15 @@ nb_free(void)
 {
     keyQ_T *key_node = keyHead.next;
     nbbuf_T buf;
-    int i;
+    정수 i;
 
     // free the netbeans buffer list
-    for (i = 0; i < buf_list_used; i++)
+    위해 (i = 0; i < buf_list_used; i++)
     {
 	buf = buf_list[i];
 	vim_free(buf.displayname);
 	vim_free(buf.signmap);
-	if (buf.bufp != NULL && buf_valid(buf.bufp))
+	만약 (buf.bufp != NULL && buf_valid(buf.bufp))
 	{
 	    buf.bufp->b_netbeans_file = false;
 	    buf.bufp->b_was_netbeans_file = false;
@@ -604,12 +604,12 @@ nb_free(void)
     buf_list_used = 0;
 
     // free the queued key commands
-    while (key_node != NULL && key_node != &keyHead)
+    동안 (key_node != NULL && key_node != &keyHead)
     {
 	keyQ_T *next = key_node->next;
 	vim_free(key_node->keystr);
 	vim_free(key_node);
-	if (next == &keyHead)
+	만약 (next == &keyHead)
 	{
 	    keyHead.next = &keyHead;
 	    keyHead.prev = &keyHead;
@@ -619,31 +619,31 @@ nb_free(void)
     }
 
     // free the queued netbeans commands
-    if (nb_channel != NULL)
+    만약 (nb_channel != NULL)
 	channel_clear(nb_channel);
 }
 
 /*
  * Get the Netbeans buffer number for the specified buffer.
  */
-    static int
+    static 정수
 nb_getbufno(buf_T *bufp)
 {
-    int i;
+    정수 i;
 
-    for (i = 0; i < buf_list_used; i++)
-	if (buf_list[i].bufp == bufp)
-	    return i;
-    return -1;
+    위해 (i = 0; i < buf_list_used; i++)
+	만약 (buf_list[i].bufp == bufp)
+	    반환 i;
+    반환 -1;
 }
 
 /*
  * Is this a NetBeans-owned buffer?
  */
-    int
+    정수
 isNetbeansBuffer(buf_T *bufp)
 {
-    return NETBEANS_OPEN && bufp->b_netbeans_file;
+    반환 NETBEANS_OPEN && bufp->b_netbeans_file;
 }
 
 /*
@@ -655,20 +655,20 @@ isNetbeansBuffer(buf_T *bufp)
  * So this function is for the corner case where Vim thinks a buffer is
  * unmodified but NetBeans thinks it IS modified.
  */
-    int
+    정수
 isNetbeansModified(buf_T *bufp)
 {
-    if (isNetbeansBuffer(bufp))
+    만약 (isNetbeansBuffer(bufp))
     {
-	int bufno = nb_getbufno(bufp);
+	정수 bufno = nb_getbufno(bufp);
 
-	if (bufno > 0)
-	    return buf_list[bufno].modified;
-	else
-	    return FALSE;
+	만약 (bufno > 0)
+	    반환 buf_list[bufno].modified;
+	아니면
+	    반환 FALSE;
     }
-    else
-	return FALSE;
+    아니면
+	반환 FALSE;
 }
 
 /*
@@ -677,23 +677,23 @@ isNetbeansModified(buf_T *bufp)
  * non-buffer related command has been sent.
  */
     static nbbuf_T *
-nb_get_buf(int bufno)
+nb_get_buf(정수 bufno)
 {
     // find or create a buffer with the given number
-    int incr;
+    정수 incr;
 
-    if (bufno <= 0)
-	return NULL;
+    만약 (bufno <= 0)
+	반환 NULL;
 
-    if (!buf_list)
+    만약 (!buf_list)
     {
 	// initialize
 	buf_list = alloc_clear(100 * sizeof(nbbuf_T));
 	buf_list_size = 100;
     }
-    if (bufno >= buf_list_used) // new
+    만약 (bufno >= buf_list_used) // new
     {
-	if (bufno >= buf_list_size) // grow list
+	만약 (bufno >= buf_list_size) // grow list
 	{
 	    nbbuf_T	*t_buf_list = buf_list;
 	    size_t	bufsize;
@@ -701,24 +701,24 @@ nb_get_buf(int bufno)
 	    incr = bufno - buf_list_size + 90;
 	    buf_list_size += incr;
 	    bufsize = buf_list_size * sizeof(nbbuf_T);
-	    if (bufsize == 0 || bufsize / sizeof(nbbuf_T)
+	    만약 (bufsize == 0 || bufsize / sizeof(nbbuf_T)
 						      != (size_t)buf_list_size)
 	    {
 		// list size overflow, bail out
-		return NULL;
+		반환 NULL;
 	    }
 	    buf_list = vim_realloc(buf_list, bufsize);
-	    if (buf_list == NULL)
+	    만약 (buf_list == NULL)
 	    {
 		vim_free(t_buf_list);
 		buf_list_size = 0;
-		return NULL;
+		반환 NULL;
 	    }
 	    vim_memset(buf_list + buf_list_size - incr, 0,
 						      incr * sizeof(nbbuf_T));
 	}
 
-	while (buf_list_used <= bufno)
+	동안 (buf_list_used <= bufno)
 	{
 	    // Default is to fire text changes.
 	    buf_list[buf_list_used].fireChanges = 1;
@@ -726,23 +726,23 @@ nb_get_buf(int bufno)
 	}
     }
 
-    return buf_list + bufno;
+    반환 buf_list + bufno;
 }
 
 /*
  * Return the number of buffers that are modified.
  */
-    static int
+    static 정수
 count_changed_buffers(void)
 {
     buf_T	*bufp;
-    int		n;
+    정수		n;
 
     n = 0;
     FOR_ALL_BUFFERS(bufp)
-	if (bufp->b_changed)
+	만약 (bufp->b_changed)
 	    ++n;
-    return n;
+    반환 n;
 }
 
 /*
@@ -751,17 +751,17 @@ count_changed_buffers(void)
     void
 netbeans_end(void)
 {
-    int i;
+    정수 i;
     static char buf[128];
 
-    if (!NETBEANS_OPEN)
-	return;
+    만약 (!NETBEANS_OPEN)
+	반환;
 
-    for (i = 0; i < buf_list_used; i++)
+    위해 (i = 0; i < buf_list_used; i++)
     {
-	if (!buf_list[i].bufp)
+	만약 (!buf_list[i].bufp)
 	    continue;
-	if (netbeansForcedQuit)
+	만약 (netbeansForcedQuit)
 	{
 	    // mark as unmodified so NetBeans won't put up dialog on "killed"
 	    sprintf(buf, "%d:unmodified=%d\n", i, r_cmdno);
@@ -783,9 +783,9 @@ netbeans_end(void)
     static void
 nb_send(char *buf, char *fun)
 {
-    if (nb_channel != NULL)
+    만약 (nb_channel != NULL)
 	channel_send(nb_channel, PART_SOCK, (char_u *)buf,
-						       (int)STRLEN(buf), fun);
+						       (정수)STRLEN(buf), fun);
 }
 
 /*
@@ -793,15 +793,15 @@ nb_send(char *buf, char *fun)
  * handles a response with no information (except the command number).
  */
     static void
-nb_reply_nil(int cmdno)
+nb_reply_nil(정수 cmdno)
 {
     char reply[32];
 
     nbdebug(("REP %d: <none>\n", cmdno));
 
     // Avoid printing an annoying error message.
-    if (!NETBEANS_OPEN)
-	return;
+    만약 (!NETBEANS_OPEN)
+	반환;
 
     sprintf(reply, "%d\n", cmdno);
     nb_send(reply, "nb_reply_nil");
@@ -813,7 +813,7 @@ nb_reply_nil(int cmdno)
  * "result" must have been quoted already (using nb_quote()).
  */
     static void
-nb_reply_text(int cmdno, char_u *result)
+nb_reply_text(정수 cmdno, char_u *result)
 {
     char_u *reply;
 
@@ -831,7 +831,7 @@ nb_reply_text(int cmdno, char_u *result)
  * Send a response with a number result code.
  */
     static void
-nb_reply_nr(int cmdno, long result)
+nb_reply_nr(정수 cmdno, long result)
 {
     char reply[32];
 
@@ -852,9 +852,9 @@ nb_quote(char_u *txt)
     char_u *p = txt;
     char_u *q = buf;
 
-    if (buf == NULL)
-	return NULL;
-    for (; *p; p++)
+    만약 (buf == NULL)
+	반환 NULL;
+    위해 (; *p; p++)
     {
 	switch (*p)
 	{
@@ -874,7 +874,7 @@ nb_quote(char_u *txt)
     }
     *q = '\0';
 
-    return buf;
+    반환 buf;
 }
 
 
@@ -889,22 +889,22 @@ nb_unquote(char_u *p, char_u **endp)
 {
     char *result = 0;
     char *q;
-    int done = 0;
+    정수 done = 0;
 
     // result is never longer than input
     result = alloc_clear(STRLEN(p) + 1);
-    if (result == NULL)
-	return NULL;
+    만약 (result == NULL)
+	반환 NULL;
 
-    if (*p++ != '"')
+    만약 (*p++ != '"')
     {
 	nbdebug(("nb_unquote called with string that doesn't start with a quote!: %s\n",
 			p));
 	result[0] = NUL;
-	return result;
+	반환 result;
     }
 
-    for (q = result; !done && *p != NUL;)
+    위해 (q = result; !done && *p != NUL;)
     {
 	switch (*p)
 	{
@@ -935,10 +935,10 @@ nb_unquote(char_u *p, char_u **endp)
 	}
     }
 
-    if (endp != NULL)
+    만약 (endp != NULL)
 	*endp = p;
 
-    return result;
+    반환 result;
 }
 
 /*
@@ -949,18 +949,18 @@ nb_unquote(char_u *p, char_u **endp)
 nb_partialremove(linenr_T lnum, colnr_T first, colnr_T last)
 {
     char_u *oldtext, *newtext;
-    int oldlen;
-    int lastbyte = last;
+    정수 oldlen;
+    정수 lastbyte = last;
 
     oldtext = ml_get(lnum);
     oldlen = ml_get_len(lnum);
-    if (first >= (colnr_T)oldlen || oldlen == 0)  // just in case
-	return;
-    if (lastbyte >= oldlen)
+    만약 (first >= (colnr_T)oldlen || oldlen == 0)  // just in case
+	반환;
+    만약 (lastbyte >= oldlen)
 	lastbyte = oldlen - 1;
     newtext = alloc(oldlen - (lastbyte - first));
-    if (newtext == NULL)
-	return;
+    만약 (newtext == NULL)
+	반환;
 
     mch_memmove(newtext, oldtext, first);
     STRMOVE(newtext + first, oldtext + lastbyte + 1);
@@ -975,14 +975,14 @@ nb_partialremove(linenr_T lnum, colnr_T first, colnr_T last)
     static void
 nb_joinlines(linenr_T first, linenr_T other)
 {
-    int len_first, len_other;
+    정수 len_first, len_other;
     char_u *p;
 
     len_first = ml_get_len(first);
     len_other = ml_get_len(other);
     p = alloc(len_first + len_other + 1);
-    if (p == NULL)
-	return;
+    만약 (p == NULL)
+	반환;
 
     mch_memmove(p, ml_get(first), len_first);
     mch_memmove(p + len_first, ml_get(other), len_other + 1);
@@ -998,39 +998,39 @@ nb_joinlines(linenr_T first, linenr_T other)
  * gets a response (it's required) but a command does not.
  * For arguments see comment for nb_parse_cmd().
  */
-    static int
+    static 정수
 nb_do_cmd(
-    int		bufno,
+    정수		bufno,
     char_u	*cmd,
-    int		func,
-    int		cmdno,
+    정수		func,
+    정수		cmdno,
     char_u	*args)	    // points to space before arguments or NUL
 {
-    int		do_update = 0;
+    정수		do_update = 0;
     long	off = 0;
     nbbuf_T	*buf = nb_get_buf(bufno);
-    static int	skip = 0;
-    int		retval = OK;
+    static 정수	skip = 0;
+    정수		retval = OK;
     char	*cp;	    // for when a char pointer is needed
 
     nbdebug(("%s %d: (%d) %s %s\n", (func) ? "FUN" : "CMD", cmdno, bufno, cmd,
 	STRCMP(cmd, "insert") == 0 ? "<text>" : (char *)args));
 
-    if (func)
+    만약 (func)
     {
 // =====================================================================
-	if (streq((char *)cmd, "getModified"))
+	만약 (streq((char *)cmd, "getModified"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 		// Return the number of buffers that are modified.
 		nb_reply_nr(cmdno, (long)count_changed_buffers());
-	    else
+	    아니면
 		// Return whether the buffer is modified.
 		nb_reply_nr(cmdno, (long)(buf->bufp->b_changed
 					   || isNetbeansModified(buf->bufp)));
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "saveAndExit"))
+	아니면 만약 (streq((char *)cmd, "saveAndExit"))
 	{
 	    // Note: this will exit Vim if successful.
 	    coloncmd(":confirm qall");
@@ -1039,7 +1039,7 @@ nb_do_cmd(
 	    nb_reply_nr(cmdno, (long)count_changed_buffers());
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "getCursor"))
+	아니면 만약 (streq((char *)cmd, "getCursor"))
 	{
 	    char_u text[200];
 
@@ -1049,24 +1049,24 @@ nb_do_cmd(
 	    sprintf((char *)text, "%d %ld %d %ld",
 		    nb_getbufno(curbuf),
 		    (long)curwin->w_cursor.lnum,
-		    (int)curwin->w_cursor.col,
+		    (정수)curwin->w_cursor.col,
 		    pos2off(curbuf, &curwin->w_cursor));
 	    nb_reply_text(cmdno, text);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "getAnno"))
+	아니면 만약 (streq((char *)cmd, "getAnno"))
 	{
 	    long linenum = 0;
 #ifdef FEAT_SIGNS
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    Invalid buffer identifier in getAnno\n"));
 		emsg(_(e_invalid_buffer_identifier_in_getanno));
 		retval = FAIL;
 	    }
-	    else
+	    아니면
 	    {
-		int serNum;
+		정수 serNum;
 
 		cp = (char *)args;
 		serNum = strtol(cp, &cp, 10);
@@ -1077,24 +1077,24 @@ nb_do_cmd(
 	    nb_reply_nr(cmdno, linenum);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "getLength"))
+	아니면 만약 (streq((char *)cmd, "getLength"))
 	{
 	    long len = 0;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in getLength\n"));
 		emsg(_(e_invalid_buffer_identifier_in_getlength));
 		retval = FAIL;
 	    }
-	    else
+	    아니면
 	    {
 		len = get_buf_size(buf->bufp);
 	    }
 	    nb_reply_nr(cmdno, len);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "getText"))
+	아니면 만약 (streq((char *)cmd, "getText"))
 	{
 	    long	len;
 	    linenr_T	nlines;
@@ -1103,30 +1103,30 @@ nb_do_cmd(
 	    char_u	*p;
 	    char_u	*line;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in getText\n"));
 		emsg(_(e_invalid_buffer_identifier_in_gettext));
 		retval = FAIL;
 	    }
-	    else
+	    아니면
 	    {
 		len = get_buf_size(buf->bufp);
 		nlines = buf->bufp->b_ml.ml_line_count;
 		text = alloc((len > 0) ? ((len + nlines) * 2) : 4);
-		if (text == NULL)
+		만약 (text == NULL)
 		{
 		    nbdebug(("    nb_do_cmd: getText has null text field\n"));
 		    retval = FAIL;
 		}
-		else
+		아니면
 		{
 		    p = text;
 		    *p++ = '\"';
-		    for (; lno <= nlines ; lno++)
+		    위해 (; lno <= nlines ; lno++)
 		    {
 			line = nb_quote(ml_get_buf(buf->bufp, lno, FALSE));
-			if (line != NULL)
+			만약 (line != NULL)
 			{
 			    STRCPY(p, line);
 			    p += STRLEN(line);
@@ -1139,40 +1139,40 @@ nb_do_cmd(
 		    *p = '\0';
 		}
 	    }
-	    if (text == NULL)
+	    만약 (text == NULL)
 		nb_reply_text(cmdno, (char_u *)"");
-	    else
+	    아니면
 	    {
 		nb_reply_text(cmdno, text);
 		vim_free(text);
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "remove"))
+	아니면 만약 (streq((char *)cmd, "remove"))
 	{
 	    long count;
 	    pos_T first, last;
 	    pos_T *pos;
 	    pos_T *next;
 	    linenr_T del_from_lnum, del_to_lnum;  // lines to be deleted as a whole
-	    int oldFire = netbeansFireChanges;
-	    int oldSuppress = netbeansSuppressNoLines;
-	    int wasChanged;
+	    정수 oldFire = netbeansFireChanges;
+	    정수 oldSuppress = netbeansSuppressNoLines;
+	    정수 wasChanged;
 
-	    if (skip >= SKIP_STOP)
+	    만약 (skip >= SKIP_STOP)
 	    {
 		nbdebug(("    Skipping %s command\n", (char *) cmd));
 		nb_reply_nil(cmdno);
-		return OK;
+		반환 OK;
 	    }
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in remove\n"));
 		emsg(_(e_invalid_buffer_identifier_in_remove));
 		retval = FAIL;
 	    }
-	    else
+	    아니면
 	    {
 		netbeansFireChanges = FALSE;
 		netbeansSuppressNoLines = TRUE;
@@ -1185,25 +1185,25 @@ nb_do_cmd(
 		args = (char_u *)cp;
 		// delete "count" chars, starting at "off"
 		pos = off2pos(buf->bufp, off);
-		if (!pos)
+		만약 (!pos)
 		{
 		    nbdebug(("    !bad position\n"));
 		    nb_reply_text(cmdno, (char_u *)"!bad position");
 		    netbeansFireChanges = oldFire;
 		    netbeansSuppressNoLines = oldSuppress;
-		    return FAIL;
+		    반환 FAIL;
 		}
 		first = *pos;
 		nbdebug(("    FIRST POS: line %ld, col %d\n",
 						      first.lnum, first.col));
 		pos = off2pos(buf->bufp, off+count-1);
-		if (!pos)
+		만약 (!pos)
 		{
 		    nbdebug(("    !bad count\n"));
 		    nb_reply_text(cmdno, (char_u *)"!bad count");
 		    netbeansFireChanges = oldFire;
 		    netbeansSuppressNoLines = oldSuppress;
-		    return FAIL;
+		    반환 FAIL;
 		}
 		last = *pos;
 		nbdebug(("    LAST POS: line %ld, col %d\n",
@@ -1218,16 +1218,16 @@ nb_do_cmd(
 		next = off2pos(buf->bufp, off + count);
 
 		// Remove part of the first line.
-		if (first.col != 0
+		만약 (first.col != 0
 				|| (next != NULL && first.lnum == next->lnum))
 		{
-		    if (first.lnum != last.lnum
+		    만약 (first.lnum != last.lnum
 			    || (next != NULL && first.lnum != next->lnum))
 		    {
 			// remove to the end of the first line
 			nb_partialremove(first.lnum, first.col,
 							     (colnr_T)MAXCOL);
-			if (first.lnum == last.lnum)
+			만약 (first.lnum == last.lnum)
 			{
 			    // Partial line to remove includes the end of
 			    // line.  Join the line with the next one, have
@@ -1236,7 +1236,7 @@ nb_do_cmd(
 			    del_to_lnum = next->lnum;
 			}
 		    }
-		    else
+		    아니면
 		    {
 			// remove within one line
 			nb_partialremove(first.lnum, first.col, last.col);
@@ -1245,17 +1245,17 @@ nb_do_cmd(
 		}
 
 		// Remove part of the last line.
-		if (first.lnum != last.lnum && next != NULL
+		만약 (first.lnum != last.lnum && next != NULL
 			&& next->col != 0 && last.lnum == next->lnum)
 		{
 		    nb_partialremove(last.lnum, 0, last.col);
-		    if (del_from_lnum > first.lnum)
+		    만약 (del_from_lnum > first.lnum)
 		    {
 			// Join end of last line to start of first line; last
 			// line is deleted below.
 			nb_joinlines(first.lnum, last.lnum);
 		    }
-		    else
+		    아니면
 			// First line is deleted as a whole, keep the last
 			// line.
 			--del_to_lnum;
@@ -1264,7 +1264,7 @@ nb_do_cmd(
 		// First is partial line; last line to remove includes
 		// the end of line; join first line to line following last
 		// line; line following last line is deleted below.
-		if (first.lnum != last.lnum && del_from_lnum > first.lnum
+		만약 (first.lnum != last.lnum && del_from_lnum > first.lnum
 			&& next != NULL && last.lnum != next->lnum)
 		{
 		    nb_joinlines(first.lnum, next->lnum);
@@ -1272,21 +1272,21 @@ nb_do_cmd(
 		}
 
 		// Delete whole lines if there are any.
-		if (del_to_lnum >= del_from_lnum)
+		만약 (del_to_lnum >= del_from_lnum)
 		{
-		    int i;
+		    정수 i;
 
 		    // delete signs from the lines being deleted
-		    for (i = del_from_lnum; i <= del_to_lnum; i++)
+		    위해 (i = del_from_lnum; i <= del_to_lnum; i++)
 		    {
-			int id = buf_findsign_id(buf->bufp, (linenr_T)i, NULL);
-			if (id > 0)
+			정수 id = buf_findsign_id(buf->bufp, (linenr_T)i, NULL);
+			만약 (id > 0)
 			{
 			    nbdebug(("    Deleting sign %d on line %d\n",
 								      id, i));
 			    buf_delsign(buf->bufp, 0, id, NULL);
 			}
-			else
+			아니면
 			{
 			    nbdebug(("    No sign on line %d\n", i));
 			}
@@ -1311,15 +1311,15 @@ nb_do_cmd(
 	    nb_reply_nil(cmdno);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "insert"))
+	아니면 만약 (streq((char *)cmd, "insert"))
 	{
 	    char_u	*to_free;
 
-	    if (skip >= SKIP_STOP)
+	    만약 (skip >= SKIP_STOP)
 	    {
 		nbdebug(("    Skipping %s command\n", (char *) cmd));
 		nb_reply_nil(cmdno);
-		return OK;
+		반환 OK;
 	    }
 
 	    // get offset
@@ -1335,20 +1335,20 @@ nb_do_cmd(
 		    buf->bufp->b_ml.ml_line_count, STRLEN(args), off));
 	    */
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in insert\n"));
 		emsg(_(e_invalid_buffer_identifier_in_insert));
 		retval = FAIL;
 	    }
-	    else if (args != NULL)
+	    아니면 만약 (args != NULL)
 	    {
-		int	ff_detected = EOL_UNKNOWN;
-		int	buf_was_empty = (buf->bufp->b_ml.ml_flags & ML_EMPTY);
+		정수	ff_detected = EOL_UNKNOWN;
+		정수	buf_was_empty = (buf->bufp->b_ml.ml_flags & ML_EMPTY);
 		size_t	len = 0;
-		int	added = 0;
-		int	oldFire = netbeansFireChanges;
-		int	old_b_changed;
+		정수	added = 0;
+		정수	oldFire = netbeansFireChanges;
+		정수	old_b_changed;
 		char_u	*nlp;
 		linenr_T lnum;
 		linenr_T lnum_start;
@@ -1364,20 +1364,20 @@ nb_do_cmd(
 		// Convert the specified character offset into a lnum/col
 		// position.
 		pos = off2pos(curbuf, off);
-		if (pos != NULL)
+		만약 (pos != NULL)
 		{
-		    if (pos->lnum <= 0)
+		    만약 (pos->lnum <= 0)
 			lnum_start = 1;
-		    else
+		    아니면
 			lnum_start = pos->lnum;
 		}
-		else
+		아니면
 		{
 		    // If the given position is not found, assume we want
 		    // the end of the file.  See setLocAndSize HACK.
-		    if (buf_was_empty)
+		    만약 (buf_was_empty)
 			lnum_start = 1;	    // above empty line
-		    else
+		    아니면
 			lnum_start = curbuf->b_ml.ml_line_count + 1;
 		}
 
@@ -1387,16 +1387,16 @@ nb_do_cmd(
 
 		// Loop over the "\n" separated lines of the argument.
 		do_update = 1;
-		while (*args != NUL)
+		동안 (*args != NUL)
 		{
 		    nlp = vim_strchr(args, '\n');
-		    if (nlp == NULL)
+		    만약 (nlp == NULL)
 		    {
 			// Incomplete line, probably truncated.  Next "insert"
 			// command should append to this one.
 			len = STRLEN(args);
 		    }
-		    else
+		    아니면
 		    {
 			len = nlp - args;
 
@@ -1404,27 +1404,27 @@ nb_do_cmd(
 			 * We need to detect EOL style, because the commands
 			 * use a character offset.
 			 */
-			if (nlp > args && nlp[-1] == '\r')
+			만약 (nlp > args && nlp[-1] == '\r')
 			{
 			    ff_detected = EOL_DOS;
 			    --len;
 			}
-			else
+			아니면
 			    ff_detected = EOL_UNIX;
 		    }
 		    args[len] = NUL;
 
-		    if (lnum == lnum_start
+		    만약 (lnum == lnum_start
 			    && ((pos != NULL && pos->col > 0)
 				|| (lnum == 1 && buf_was_empty)))
 		    {
 			char_u	*oldline = ml_get(lnum);
 			char_u	*newline;
-			int	col = pos == NULL ? 0 : pos->col;
+			정수	col = pos == NULL ? 0 : pos->col;
 
 			// Insert halfway a line.
 			newline = alloc(ml_get_len(lnum) + len + 1);
-			if (newline != NULL)
+			만약 (newline != NULL)
 			{
 			    mch_memmove(newline, oldline, (size_t)col);
 			    newline[col] = NUL;
@@ -1433,7 +1433,7 @@ nb_do_cmd(
 			    ml_replace(lnum, newline, FALSE);
 			}
 		    }
-		    else
+		    아니면
 		    {
 			// Append a new line.  Not that we always do this,
 			// also when the text doesn't end in a "\n".
@@ -1442,7 +1442,7 @@ nb_do_cmd(
 			++added;
 		    }
 
-		    if (nlp == NULL)
+		    만약 (nlp == NULL)
 			break;
 		    ++lnum;
 		    args = nlp + 1;
@@ -1455,12 +1455,12 @@ nb_do_cmd(
 		 * When starting with an empty buffer set the fileformat.
 		 * This is just guessing...
 		 */
-		if (buf_was_empty)
+		만약 (buf_was_empty)
 		{
-		    if (ff_detected == EOL_UNKNOWN)
-#if defined(MSWIN)
+		    만약 (ff_detected == EOL_UNKNOWN)
+#만약 defined(MSWIN)
 			ff_detected = EOL_DOS;
-#else
+#아니면
 			ff_detected = EOL_UNIX;
 #endif
 		    set_fileformat(ff_detected, OPT_LOCAL);
@@ -1481,24 +1481,24 @@ nb_do_cmd(
 	    vim_free(to_free);
 	    nb_reply_nil(cmdno); // or !error
 	}
-	else
+	아니면
 	{
 	    nbdebug(("UNIMPLEMENTED FUNCTION: %s\n", cmd));
 	    nb_reply_nil(cmdno);
 	    retval = FAIL;
 	}
     }
-    else // Not a function; no reply required.
+    아니면 // Not a function; no reply required.
     {
 // =====================================================================
-	if (streq((char *)cmd, "create"))
+	만약 (streq((char *)cmd, "create"))
 	{
 	    // Create a buffer without a name.
-	    if (buf == NULL)
+	    만약 (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in create\n"));
 		emsg(_(e_invalid_buffer_identifier_in_create));
-		return FAIL;
+		반환 FAIL;
 	    }
 	    VIM_CLEAR(buf->displayname);
 
@@ -1508,19 +1508,19 @@ nb_do_cmd(
 	    buf->bufp = curbuf;
 	    maketitle();
 	    buf->insertDone = FALSE;
-#if defined(FEAT_MENU) && defined(FEAT_GUI)
-	    if (gui.in_use)
+#만약 defined(FEAT_MENU) && defined(FEAT_GUI)
+	    만약 (gui.in_use)
 		gui_update_menus(0);
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "insertDone"))
+	아니면 만약 (streq((char *)cmd, "insertDone"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in insertDone\n"));
 	    }
-	    else
+	    아니면
 	    {
 		buf->bufp->b_start_eol = *args == 'T';
 		buf->insertDone = TRUE;
@@ -1530,46 +1530,46 @@ nb_do_cmd(
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "saveDone"))
+	아니면 만약 (streq((char *)cmd, "saveDone"))
 	{
 	    long savedChars = atol((char *)args);
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 		nbdebug(("    invalid buffer identifier in saveDone\n"));
-	    else
+	    아니면
 		print_save_msg(buf, savedChars);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "startDocumentListen"))
+	아니면 만약 (streq((char *)cmd, "startDocumentListen"))
 	{
-	    if (buf == NULL)
+	    만약 (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in startDocumentListen\n"));
 		emsg(_(e_invalid_buffer_identifier_in_startdocumentlisten));
-		return FAIL;
+		반환 FAIL;
 	    }
 	    buf->fireChanges = 1;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "stopDocumentListen"))
+	아니면 만약 (streq((char *)cmd, "stopDocumentListen"))
 	{
-	    if (buf == NULL)
+	    만약 (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in stopDocumentListen\n"));
 		emsg(_(e_invalid_buffer_identifier_in_stopdocumentlisten));
-		return FAIL;
+		반환 FAIL;
 	    }
 	    buf->fireChanges = 0;
-	    if (buf->bufp != NULL && buf->bufp->b_was_netbeans_file)
+	    만약 (buf->bufp != NULL && buf->bufp->b_was_netbeans_file)
 	    {
-		if (!buf->bufp->b_netbeans_file)
+		만약 (!buf->bufp->b_netbeans_file)
 		{
 		    nbdebug((e_netbeans_connection_lost_for_buffer_nr,
 							   buf->bufp->b_fnum));
 		    semsg(_(e_netbeans_connection_lost_for_buffer_nr),
 							   buf->bufp->b_fnum);
 		}
-		else
+		아니면
 		{
 		    // NetBeans uses stopDocumentListen when it stops editing
 		    // a file.  It then expects the buffer in Vim to
@@ -1581,25 +1581,25 @@ nb_do_cmd(
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setTitle"))
+	아니면 만약 (streq((char *)cmd, "setTitle"))
 	{
-	    if (buf == NULL)
+	    만약 (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in setTitle\n"));
 		emsg(_(e_invalid_buffer_identifier_in_settitle));
-		return FAIL;
+		반환 FAIL;
 	    }
 	    vim_free(buf->displayname);
 	    buf->displayname = nb_unquote(args, NULL);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "initDone"))
+	아니면 만약 (streq((char *)cmd, "initDone"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in initDone\n"));
 		emsg(_(e_invalid_buffer_identifier_in_initdone));
-		return FAIL;
+		반환 FAIL;
 	    }
 	    do_update = 1;
 	    buf->initDone = TRUE;
@@ -1610,37 +1610,37 @@ nb_do_cmd(
 	    handle_key_queue();
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setBufferNumber")
+	아니면 만약 (streq((char *)cmd, "setBufferNumber")
 		|| streq((char *)cmd, "putBufferNumber"))
 	{
 	    char_u	*path;
 	    buf_T	*bufp;
 
-	    if (buf == NULL)
+	    만약 (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in setBufferNumber\n"));
 		emsg(_(e_invalid_buffer_identifier_in_setbuffernumber));
-		return FAIL;
+		반환 FAIL;
 	    }
 	    path = (char_u *)nb_unquote(args, NULL);
-	    if (path == NULL)
-		return FAIL;
+	    만약 (path == NULL)
+		반환 FAIL;
 	    bufp = buflist_findname(path);
 	    vim_free(path);
-	    if (bufp == NULL)
+	    만약 (bufp == NULL)
 	    {
 		nbdebug(("    File %s not found in setBufferNumber\n", args));
 		semsg(_(e_file_str_not_found_in_setbuffernumber), args);
-		return FAIL;
+		반환 FAIL;
 	    }
 	    buf->bufp = bufp;
 	    buf->nbbuf_number = bufp->b_fnum;
 
 	    // "setBufferNumber" has the side effect of jumping to the buffer
 	    // (don't know why!).  Don't do that for "putBufferNumber".
-	    if (*cmd != 'p')
+	    만약 (*cmd != 'p')
 		coloncmd(":buffer %d", bufp->b_fnum);
-	    else
+	    아니면
 	    {
 		buf->initDone = TRUE;
 
@@ -1650,13 +1650,13 @@ nb_do_cmd(
 
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setFullName"))
+	아니면 만약 (streq((char *)cmd, "setFullName"))
 	{
-	    if (buf == NULL)
+	    만약 (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in setFullName\n"));
 		emsg(_(e_invalid_buffer_identifier_in_setfullname));
-		return FAIL;
+		반환 FAIL;
 	    }
 	    vim_free(buf->displayname);
 	    buf->displayname = nb_unquote(args, NULL);
@@ -1667,19 +1667,19 @@ nb_do_cmd(
 	    netbeansReadFile = 1;
 	    buf->bufp = curbuf;
 	    maketitle();
-#if defined(FEAT_MENU) && defined(FEAT_GUI)
-	    if (gui.in_use)
+#만약 defined(FEAT_MENU) && defined(FEAT_GUI)
+	    만약 (gui.in_use)
 		gui_update_menus(0);
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "editFile"))
+	아니면 만약 (streq((char *)cmd, "editFile"))
 	{
-	    if (buf == NULL)
+	    만약 (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in editFile\n"));
 		emsg(_(e_invalid_buffer_identifier_in_editfile));
-		return FAIL;
+		반환 FAIL;
 	    }
 	    // Edit a file: like create + setFullName + read the file.
 	    vim_free(buf->displayname);
@@ -1690,24 +1690,24 @@ nb_do_cmd(
 	    buf->initDone = TRUE;
 	    do_update = 1;
 	    maketitle();
-#if defined(FEAT_MENU) && defined(FEAT_GUI)
-	    if (gui.in_use)
+#만약 defined(FEAT_MENU) && defined(FEAT_GUI)
+	    만약 (gui.in_use)
 		gui_update_menus(0);
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setVisible"))
+	아니면 만약 (streq((char *)cmd, "setVisible"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in setVisible\n"));
 		// This message was commented out, probably because it can
 		// happen when shutting down.
-		if (p_verbose > 0)
+		만약 (p_verbose > 0)
 		    emsg(_(e_invalid_buffer_identifier_in_setvisible));
-		return FAIL;
+		반환 FAIL;
 	    }
-	    if (streq((char *)args, "T") && buf->bufp != curbuf)
+	    만약 (streq((char *)args, "T") && buf->bufp != curbuf)
 	    {
 		exarg_T exarg;
 		CLEAR_FIELD(exarg);
@@ -1721,54 +1721,54 @@ nb_do_cmd(
 
 #ifdef FEAT_GUI
 		// Side effect!!!.
-		if (gui.in_use)
+		만약 (gui.in_use)
 		    gui_mch_set_foreground();
 #endif
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "raise"))
+	아니면 만약 (streq((char *)cmd, "raise"))
 	{
 #ifdef FEAT_GUI
 	    // Bring gvim to the foreground.
-	    if (gui.in_use)
+	    만약 (gui.in_use)
 		gui_mch_set_foreground();
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setModified"))
+	아니면 만약 (streq((char *)cmd, "setModified"))
 	{
-	    int prev_b_changed;
+	    정수 prev_b_changed;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in setModified\n"));
 		// This message was commented out, probably because it can
 		// happen when shutting down.
-		if (p_verbose > 0)
+		만약 (p_verbose > 0)
 		    emsg(_(e_invalid_buffer_identifier_in_setmodified));
-		return FAIL;
+		반환 FAIL;
 	    }
 	    prev_b_changed = buf->bufp->b_changed;
-	    if (streq((char *)args, "T"))
+	    만약 (streq((char *)args, "T"))
 		buf->bufp->b_changed = TRUE;
-	    else
+	    아니면
 	    {
 		stat_T	st;
 
 		// Assume NetBeans stored the file.  Reset the timestamp to
 		// avoid "file changed" warnings.
-		if (buf->bufp->b_ffname != NULL
+		만약 (buf->bufp->b_ffname != NULL
 			&& mch_stat((char *)buf->bufp->b_ffname, &st) >= 0)
 		    buf_store_time(buf->bufp, &st, buf->bufp->b_ffname);
 		buf->bufp->b_changed = FALSE;
 	    }
 	    buf->modified = buf->bufp->b_changed;
-	    if (prev_b_changed != buf->bufp->b_changed)
+	    만약 (prev_b_changed != buf->bufp->b_changed)
 	    {
 		check_status(buf->bufp);
 		redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#만약 defined(FEAT_TABPANEL)
 		redraw_tabpanel = TRUE;
 #endif
 		maketitle();
@@ -1776,35 +1776,35 @@ nb_do_cmd(
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setModtime"))
+	아니면 만약 (streq((char *)cmd, "setModtime"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 		nbdebug(("    invalid buffer identifier in setModtime\n"));
-	    else
+	    아니면
 	    {
 		buf->bufp->b_mtime = atoi((char *)args);
 		buf->bufp->b_mtime_ns = 0;
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setReadOnly"))
+	아니면 만약 (streq((char *)cmd, "setReadOnly"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 		nbdebug(("    invalid buffer identifier in setReadOnly\n"));
-	    else if (streq((char *)args, "T"))
+	    아니면 만약 (streq((char *)args, "T"))
 		buf->bufp->b_p_ro = TRUE;
-	    else
+	    아니면
 		buf->bufp->b_p_ro = FALSE;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setMark"))
+	아니면 만약 (streq((char *)cmd, "setMark"))
 	{
 	    // not yet
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "showBalloon"))
+	아니면 만약 (streq((char *)cmd, "showBalloon"))
 	{
-#if defined(FEAT_BEVAL_GUI)
+#만약 defined(FEAT_BEVAL_GUI)
 	    static char	*text = NULL;
 
 	    /*
@@ -1812,40 +1812,40 @@ nb_do_cmd(
 	     * Ignore 'ballooneval' here.
 	     * The text pointer must remain valid for a while.
 	     */
-	    if (balloonEval != NULL)
+	    만약 (balloonEval != NULL)
 	    {
 		vim_free(text);
 		text = nb_unquote(args, NULL);
-		if (text != NULL)
+		만약 (text != NULL)
 		    gui_mch_post_balloon(balloonEval, (char_u *)text);
 	    }
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setDot"))
+	아니면 만약 (streq((char *)cmd, "setDot"))
 	{
 	    pos_T *pos;
 #ifdef NBDEBUG
 	    char_u *s;
 #endif
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in setDot\n"));
 		emsg(_(e_invalid_buffer_identifier_in_setdot));
-		return FAIL;
+		반환 FAIL;
 	    }
 
 	    nb_set_curbuf(buf->bufp);
 
 	    // Don't want Visual mode now.
-	    if (VIsual_active)
+	    만약 (VIsual_active)
 		end_visual_mode();
 #ifdef NBDEBUG
 	    s = args;
 #endif
 	    pos = get_off_or_lnum(buf->bufp, &args);
-	    if (pos)
+	    만약 (pos)
 	    {
 		curwin->w_cursor = *pos;
 		check_cursor();
@@ -1853,7 +1853,7 @@ nb_do_cmd(
 		foldOpenCursor();
 #endif
 	    }
-	    else
+	    아니면
 	    {
 		nbdebug(("    BAD POSITION in setDot: %s\n", s));
 	    }
@@ -1867,45 +1867,45 @@ nb_do_cmd(
 	    out_flush_cursor(TRUE, FALSE);
 
 	    // Quit a hit-return or more prompt.
-	    if (State == MODE_HITRETURN || State == MODE_ASKMORE)
+	    만약 (State == MODE_HITRETURN || State == MODE_ASKMORE)
 	    {
 #ifdef FEAT_GUI_GTK
-		if (gui.in_use && gtk_main_level() > 0)
+		만약 (gui.in_use && gtk_main_level() > 0)
 		    gtk_main_quit();
 #endif
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "close"))
+	아니면 만약 (streq((char *)cmd, "close"))
 	{
 #ifdef NBDEBUG
 	    char *name = "<NONE>";
 #endif
 
-	    if (buf == NULL)
+	    만약 (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in close\n"));
 		emsg(_(e_invalid_buffer_identifier_in_close));
-		return FAIL;
+		반환 FAIL;
 	    }
 
 #ifdef NBDEBUG
-	    if (buf->displayname != NULL)
+	    만약 (buf->displayname != NULL)
 		name = buf->displayname;
 #endif
-	    if (buf->bufp == NULL)
+	    만약 (buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in close\n"));
 		// This message was commented out, probably because it can
 		// happen when shutting down.
-		if (p_verbose > 0)
+		만약 (p_verbose > 0)
 		    emsg(_(e_invalid_buffer_identifier_in_close));
 	    }
 	    nbdebug(("    CLOSE %d: %s\n", bufno, name));
 #ifdef FEAT_GUI
 	    need_mouse_correct = TRUE;
 #endif
-	    if (buf->bufp != NULL)
+	    만약 (buf->bufp != NULL)
 		do_buffer(DOBUF_WIPE, DOBUF_FIRST, FORWARD,
 						     buf->bufp->b_fnum, TRUE);
 	    buf->bufp = NULL;
@@ -1913,33 +1913,33 @@ nb_do_cmd(
 	    do_update = 1;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setStyle")) // obsolete...
+	아니면 만약 (streq((char *)cmd, "setStyle")) // obsolete...
 	{
 	    nbdebug(("    setStyle is obsolete!\n"));
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setExitDelay"))
+	아니면 만약 (streq((char *)cmd, "setExitDelay"))
 	{
 	    // Only used in version 2.1.
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "defineAnnoType"))
+	아니면 만약 (streq((char *)cmd, "defineAnnoType"))
 	{
 #ifdef FEAT_SIGNS
-	    int typeNum;
+	    정수 typeNum;
 	    char_u *typeName;
 	    char_u *tooltip;
 	    char_u *p;
 	    char_u *glyphFile;
-	    int parse_error = FALSE;
+	    정수 parse_error = FALSE;
 	    char_u *fg;
 	    char_u *bg;
 
-	    if (buf == NULL)
+	    만약 (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in defineAnnoType\n"));
 		emsg(_(e_invalid_buffer_identifier_in_defineannotype));
-		return FAIL;
+		반환 FAIL;
 	    }
 
 	    cp = (char *)args;
@@ -1957,20 +1957,20 @@ nb_do_cmd(
 
 	    args = skipwhite(args + 1);
 	    p = skiptowhite(args);
-	    if (*p != NUL)
+	    만약 (*p != NUL)
 	    {
 		*p = NUL;
 		p = skipwhite(p + 1);
 	    }
 	    fg = vim_strsave(args);
 	    bg = vim_strsave(p);
-	    if (STRLEN(fg) > MAX_COLOR_LENGTH || STRLEN(bg) > MAX_COLOR_LENGTH)
+	    만약 (STRLEN(fg) > MAX_COLOR_LENGTH || STRLEN(bg) > MAX_COLOR_LENGTH)
 	    {
 		emsg(_(e_highlighting_color_name_too_long_in_defineAnnoType));
 		VIM_CLEAR(typeName);
 		parse_error = TRUE;
 	    }
-	    else if (!nb_is_safe_string(typeName, VALID_SIGNNAME_CHARS) ||
+	    아니면 만약 (!nb_is_safe_string(typeName, VALID_SIGNNAME_CHARS) ||
 		    (*fg != NUL && !nb_is_safe_string(fg, VALID_COLOR_CHARS)) ||
 		    (*bg != NUL && !nb_is_safe_string(bg, VALID_COLOR_CHARS)))
 	    {
@@ -1979,7 +1979,7 @@ nb_do_cmd(
 		VIM_CLEAR(typeName);
 		parse_error = TRUE;
 	    }
-	    else if (typeName != NULL && tooltip != NULL && glyphFile != NULL)
+	    아니면 만약 (typeName != NULL && tooltip != NULL && glyphFile != NULL)
 		addsigntype(buf, typeNum, typeName, tooltip, glyphFile, fg, bg);
 
 	    vim_free(typeName);
@@ -1987,25 +1987,25 @@ nb_do_cmd(
 	    vim_free(bg);
 	    vim_free(tooltip);
 	    vim_free(glyphFile);
-	    if (parse_error)
-		return FAIL;
+	    만약 (parse_error)
+		반환 FAIL;
 
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "addAnno"))
+	아니면 만약 (streq((char *)cmd, "addAnno"))
 	{
 #ifdef FEAT_SIGNS
-	    int serNum;
-	    int localTypeNum;
-	    int typeNum;
+	    정수 serNum;
+	    정수 localTypeNum;
+	    정수 typeNum;
 	    pos_T *pos;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in addAnno\n"));
 		emsg(_(e_invalid_buffer_identifier_in_addanno));
-		return FAIL;
+		반환 FAIL;
 	    }
 
 	    do_update = 1;
@@ -2022,37 +2022,37 @@ nb_do_cmd(
 	    pos = get_off_or_lnum(buf->bufp, &args);
 
 	    cp = (char *)args;
-	    vim_ignored = (int)strtol(cp, &cp, 10);
+	    vim_ignored = (정수)strtol(cp, &cp, 10);
 	    args = (char_u *)cp;
 # ifdef NBDEBUG
-	    if (vim_ignored != -1)
+	    만약 (vim_ignored != -1)
 		nbdebug(("    partial line annotation -- Not Yet Implemented!\n"));
 # endif
-	    if (serNum >= GUARDEDOFFSET)
+	    만약 (serNum >= GUARDEDOFFSET)
 	    {
 		nbdebug(("    too many annotations! ignoring...\n"));
-		return FAIL;
+		반환 FAIL;
 	    }
-	    if (pos)
+	    만약 (pos)
 	    {
 		coloncmd(":sign place %d line=%ld name=%d buffer=%d",
 			   serNum, pos->lnum, typeNum, buf->bufp->b_fnum);
-		if (typeNum == curPCtype)
+		만약 (typeNum == curPCtype)
 		    coloncmd(":sign jump %d buffer=%d", serNum,
 						       buf->bufp->b_fnum);
 	    }
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "removeAnno"))
+	아니면 만약 (streq((char *)cmd, "removeAnno"))
 	{
 #ifdef FEAT_SIGNS
-	    int serNum;
+	    정수 serNum;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in removeAnno\n"));
-		return FAIL;
+		반환 FAIL;
 	    }
 	    do_update = 1;
 	    cp = (char *)args;
@@ -2064,34 +2064,34 @@ nb_do_cmd(
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "moveAnnoToFront"))
+	아니면 만약 (streq((char *)cmd, "moveAnnoToFront"))
 	{
 #ifdef FEAT_SIGNS
 	    nbdebug(("    moveAnnoToFront: Not Yet Implemented!\n"));
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "guard") || streq((char *)cmd, "unguard"))
+	아니면 만약 (streq((char *)cmd, "guard") || streq((char *)cmd, "unguard"))
 	{
-	    int len;
+	    정수 len;
 	    pos_T first;
 	    pos_T last;
 	    pos_T *pos;
-	    int un = (cmd[0] == 'u');
-	    static int guardId = GUARDEDOFFSET;
+	    정수 un = (cmd[0] == 'u');
+	    static 정수 guardId = GUARDEDOFFSET;
 
-	    if (skip >= SKIP_STOP)
+	    만약 (skip >= SKIP_STOP)
 	    {
 		nbdebug(("    Skipping %s command\n", (char *) cmd));
-		return OK;
+		반환 OK;
 	    }
 
 	    nb_init_graphics();
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in %s command\n", cmd));
-		return FAIL;
+		반환 FAIL;
 	    }
 	    nb_set_curbuf(buf->bufp);
 	    cp = (char *)args;
@@ -2100,13 +2100,13 @@ nb_do_cmd(
 	    args = (char_u *)cp;
 	    pos = off2pos(buf->bufp, off);
 	    do_update = 1;
-	    if (!pos)
+	    만약 (!pos)
 		nbdebug(("    no such start pos in %s, %ld\n", cmd, off));
-	    else
+	    아니면
 	    {
 		first = *pos;
 		pos = off2pos(buf->bufp, off + len - 1);
-		if (pos != NULL && pos->col == 0)
+		만약 (pos != NULL && pos->col == 0)
 		{
 			/*
 			 * In Java Swing the offset is a position between 2
@@ -2115,10 +2115,10 @@ nb_do_cmd(
 			 */
 			pos = off2pos(buf->bufp, off + len - 2);
 		}
-		if (!pos)
+		만약 (!pos)
 		    nbdebug(("    no such end pos in %s, %ld\n",
 			    cmd, off + len - 1));
-		else
+		아니면
 		{
 		    long lnum;
 		    last = *pos;
@@ -2127,15 +2127,15 @@ nb_do_cmd(
 			     first.lnum, first.col,
 			     last.lnum, last.col));
 #ifdef FEAT_SIGNS
-		    for (lnum = first.lnum; lnum <= last.lnum; lnum++)
+		    위해 (lnum = first.lnum; lnum <= last.lnum; lnum++)
 		    {
-			if (un)
+			만약 (un)
 			{
 			    // never used
 			}
-			else
+			아니면
 			{
-			    if (buf_findsigntype_id(buf->bufp, lnum,
+			    만약 (buf_findsigntype_id(buf->bufp, lnum,
 				GUARDED) == 0)
 			    {
 				coloncmd(
@@ -2151,38 +2151,38 @@ nb_do_cmd(
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "startAtomic"))
+	아니면 만약 (streq((char *)cmd, "startAtomic"))
 	{
 	    inAtomic = 1;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "endAtomic"))
+	아니면 만약 (streq((char *)cmd, "endAtomic"))
 	{
 	    inAtomic = 0;
-	    if (needupdate)
+	    만약 (needupdate)
 	    {
 		do_update = 1;
 		needupdate = 0;
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "save"))
+	아니면 만약 (streq((char *)cmd, "save"))
 	{
 	    /*
 	     * NOTE - This command is obsolete wrt NetBeans. It's left in
 	     * only for historical reasons.
 	     */
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in %s command\n", cmd));
-		return FAIL;
+		반환 FAIL;
 	    }
 
 	    // the following is taken from ex_cmds.c (do_wqall function)
-	    if (bufIsChanged(buf->bufp))
+	    만약 (bufIsChanged(buf->bufp))
 	    {
 		// Only write if the buffer can be written.
-		if (p_write
+		만약 (p_write
 			&& !buf->bufp->b_p_ro
 			&& buf->bufp->b_ffname != NULL
 			&& !bt_dontwrite(buf->bufp))
@@ -2192,47 +2192,47 @@ nb_do_cmd(
 		    set_bufref(&bufref, buf->bufp);
 		    buf_write_all(buf->bufp, FALSE);
 		    // an autocommand may have deleted the buffer
-		    if (!bufref_valid(&bufref))
+		    만약 (!bufref_valid(&bufref))
 			buf->bufp = NULL;
 		}
 	    }
-	    else
+	    아니면
 	    {
 		nbdebug(("    Buffer has no changes!\n"));
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "netbeansBuffer"))
+	아니면 만약 (streq((char *)cmd, "netbeansBuffer"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    만약 (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in %s command\n", cmd));
-		return FAIL;
+		반환 FAIL;
 	    }
-	    if (*args == 'T')
+	    만약 (*args == 'T')
 	    {
 		buf->bufp->b_netbeans_file = true;
 		buf->bufp->b_was_netbeans_file = true;
 	    }
-	    else
+	    아니면
 		buf->bufp->b_netbeans_file = false;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "specialKeys"))
+	아니면 만약 (streq((char *)cmd, "specialKeys"))
 	{
 	    special_keys(args);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "actionMenuItem"))
+	아니면 만약 (streq((char *)cmd, "actionMenuItem"))
 	{
 	    // not used yet
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "version"))
+	아니면 만약 (streq((char *)cmd, "version"))
 	{
 	    // not used yet
 	}
-	else
+	아니면
 	{
 	    nbdebug(("Unrecognised command: %s\n", cmd));
 	}
@@ -2240,7 +2240,7 @@ nb_do_cmd(
 	 * Unrecognized command is ignored.
 	 */
     }
-    if (inAtomic && do_update)
+    만약 (inAtomic && do_update)
     {
 	needupdate = 1;
 	do_update = 0;
@@ -2251,7 +2251,7 @@ nb_do_cmd(
      * and it may no longer be necessary. If it's not needed then needupdate
      * and do_update can also be removed.
      */
-    if (buf != NULL && buf->initDone && do_update)
+    만약 (buf != NULL && buf->initDone && do_update)
     {
 	update_screen(UPD_NOT_VALID);
 	setcursor();
@@ -2259,16 +2259,16 @@ nb_do_cmd(
 	out_flush_cursor(TRUE, FALSE);
 
 	// Quit a hit-return or more prompt.
-	if (State == MODE_HITRETURN || State == MODE_ASKMORE)
+	만약 (State == MODE_HITRETURN || State == MODE_ASKMORE)
 	{
 #ifdef FEAT_GUI_GTK
-	    if (gui.in_use && gtk_main_level() > 0)
+	    만약 (gui.in_use && gtk_main_level() > 0)
 		gtk_main_quit();
 #endif
 	}
     }
 
-    return retval;
+    반환 retval;
 }
 
 
@@ -2280,13 +2280,13 @@ nb_do_cmd(
     static void
 nb_set_curbuf(buf_T *buf)
 {
-    if (curbuf == buf)
-	return;
+    만약 (curbuf == buf)
+	반환;
 
-    if (buf_jump_open_win(buf) != NULL)
-	return;
-    if ((swb_flags & SWB_USETAB) && buf_jump_open_tab(buf) != NULL)
-	return;
+    만약 (buf_jump_open_win(buf) != NULL)
+	반환;
+    만약 ((swb_flags & SWB_USETAB) && buf_jump_open_tab(buf) != NULL)
+	반환;
     set_curbuf(buf, DOBUF_GOTO);
 }
 
@@ -2325,14 +2325,14 @@ special_keys(char_u *args)
     char keybuf[KEYBUFLEN];
     char cmdbuf[256];
 
-    while (tok != NULL)
+    동안 (tok != NULL)
     {
-	int i = 0;
+	정수 i = 0;
 
-	if ((sep = strchr(tok, '-')) != NULL)
+	만약 ((sep = strchr(tok, '-')) != NULL)
 	{
 	    *sep = NUL;
-	    while (*tok && i + 2 < KEYBUFLEN)
+	    동안 (*tok && i + 2 < KEYBUFLEN)
 	    {
 		switch (*tok)
 		{
@@ -2349,20 +2349,20 @@ special_keys(char_u *args)
 	    tok++;
 	}
 
-	if (strlen(tok) + i < KEYBUFLEN)
+	만약 (strlen(tok) + i < KEYBUFLEN)
 	{
 	    // Only allow alphanumeric and function-key name characters.
 	    // Reject anything else to prevent map command injection.
-	    int safe = TRUE;
-	    for (char_u *tp = (char_u *)tok; *tp != NUL; tp++)
+	    정수 safe = TRUE;
+	    위해 (char_u *tp = (char_u *)tok; *tp != NUL; tp++)
 	    {
-		if (!ASCII_ISALNUM(*tp) && *tp != '-')
+		만약 (!ASCII_ISALNUM(*tp) && *tp != '-')
 		{
 		    safe = FALSE;
 		    break;
 		}
 	    }
-	    if (safe)
+	    만약 (safe)
 	    {
 		vim_strncpy((char_u *)&keybuf[i], (char_u *)tok, KEYBUFLEN - i - 1);
 		vim_snprintf(cmdbuf, sizeof(cmdbuf),
@@ -2392,12 +2392,12 @@ ex_nbstart(
     exarg_T	*eap)
 {
 #ifdef FEAT_GUI
-# if !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)  \
+# 만약 !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)  \
 		&& !defined(FEAT_GUI_MSWIN)
-    if (gui.in_use)
+    만약 (gui.in_use)
     {
 	emsg(_(e_netbeans_is_not_supported_with_this_GUI));
-	return;
+	반환;
     }
 # endif
 #endif
@@ -2410,10 +2410,10 @@ ex_nbstart(
     static void
 nb_init_graphics(void)
 {
-    static int did_init = FALSE;
+    static 정수 did_init = FALSE;
 
-    if (did_init)
-	return;
+    만약 (did_init)
+	반환;
 
     coloncmd(":highlight NBGuarded guibg=Cyan guifg=Black"
 	    " ctermbg=LightCyan ctermfg=Black");
@@ -2426,19 +2426,19 @@ nb_init_graphics(void)
  * Convert key to netbeans name.  This uses the global "mod_mask".
  */
     static void
-netbeans_keyname(int key, char *buf)
+netbeans_keyname(정수 key, char *buf)
 {
     char *name = 0;
     char namebuf[2];
-    int ctrl  = 0;
-    int shift = 0;
-    int alt   = 0;
+    정수 ctrl  = 0;
+    정수 shift = 0;
+    정수 alt   = 0;
 
-    if (mod_mask & MOD_MASK_CTRL)
+    만약 (mod_mask & MOD_MASK_CTRL)
 	ctrl = 1;
-    if (mod_mask & MOD_MASK_SHIFT)
+    만약 (mod_mask & MOD_MASK_SHIFT)
 	shift = 1;
-    if (mod_mask & MOD_MASK_ALT)
+    만약 (mod_mask & MOD_MASK_ALT)
 	alt = 1;
 
 
@@ -2469,31 +2469,31 @@ netbeans_keyname(int key, char *buf)
 	case K_F12:		name = "F12";		break;
 	case K_S_F12:	name = "F12";	shift = 1;	break;
 	default:
-			if (key >= ' ' && key <= '~')
+			만약 (key >= ' ' && key <= '~')
 			{
 			    // Allow ASCII characters.
 			    name = namebuf;
 			    namebuf[0] = key;
 			    namebuf[1] = NUL;
 			}
-			else
+			아니면
 			    name = "X";
 			break;
     }
 
     buf[0] = '\0';
-    if (ctrl)
+    만약 (ctrl)
 	strcat(buf, "C");
-    if (shift)
+    만약 (shift)
 	strcat(buf, "S");
-    if (alt)
+    만약 (alt)
 	strcat(buf, "M"); // META
-    if (ctrl || shift || alt)
+    만약 (ctrl || shift || alt)
 	strcat(buf, "-");
     strcat(buf, name);
 }
 
-#if defined(FEAT_BEVAL)
+#만약 defined(FEAT_BEVAL)
 /*
  * Function to be called for balloon evaluation.  Grabs the text under the
  * cursor and sends it to the debugger for evaluation.  The debugger should
@@ -2502,32 +2502,32 @@ netbeans_keyname(int key, char *buf)
     void
 netbeans_beval_cb(
 	BalloonEval	*beval,
-	int		 state UNUSED)
+	정수		 state UNUSED)
 {
     win_T	*wp;
     char_u	*text;
     linenr_T	lnum;
-    int		col;
+    정수		col;
     char	*buf;
     char_u	*p;
 
     // Don't do anything when 'ballooneval' is off, messages scrolled the
     // windows up or we have no connection.
-    if (!can_use_beval() || !NETBEANS_OPEN)
-	return;
+    만약 (!can_use_beval() || !NETBEANS_OPEN)
+	반환;
 
-    if (get_beval_info(beval, TRUE, &wp, &lnum, &text, &col) != OK)
-	return;
+    만약 (get_beval_info(beval, TRUE, &wp, &lnum, &text, &col) != OK)
+	반환;
 
     // Send debugger request.  Only when the text is of reasonable
     // length.
-    if (text != NULL && text[0] != NUL && STRLEN(text) < MAXPATHL)
+    만약 (text != NULL && text[0] != NUL && STRLEN(text) < MAXPATHL)
     {
 	buf = alloc(MAXPATHL * 2 + 25);
-	if (buf != NULL)
+	만약 (buf != NULL)
 	{
 	    p = nb_quote(text);
-	    if (p != NULL)
+	    만약 (p != NULL)
 	    {
 		vim_snprintf(buf, MAXPATHL * 2 + 25,
 			"0:balloonText=%d \"%s\"\n", r_cmdno, p);
@@ -2545,28 +2545,28 @@ netbeans_beval_cb(
 /*
  * Return TRUE when the netbeans connection is active.
  */
-    int
+    정수
 netbeans_active(void)
 {
-    return NETBEANS_OPEN;
+    반환 NETBEANS_OPEN;
 }
 
 /*
  * Tell netbeans that the window was opened, ready for commands.
  */
     void
-netbeans_open(char *params, int doabort)
+netbeans_open(char *params, 정수 doabort)
 {
     char *cmd = "0:startupDone=0\n";
 
-    if (NETBEANS_OPEN)
+    만약 (NETBEANS_OPEN)
     {
 	emsg(_(e_netbeans_already_connected));
-	return;
+	반환;
     }
 
-    if (netbeans_connect(params, doabort) != OK)
-	return;
+    만약 (netbeans_connect(params, doabort) != OK)
+	반환;
 
     nbdebug(("EVT: %s", cmd));
     nb_send(cmd, "netbeans_startup_done");
@@ -2588,7 +2588,7 @@ netbeans_send_disconnect(void)
 {
     char buf[128];
 
-    if (NETBEANS_OPEN)
+    만약 (NETBEANS_OPEN)
     {
 	sprintf(buf, "0:disconnect=%d\n", r_cmdno);
 	nbdebug(("EVT: %s", buf));
@@ -2596,37 +2596,37 @@ netbeans_send_disconnect(void)
     }
 }
 
-#if defined(FEAT_EVAL)
-    int
-set_ref_in_nb_channel(int copyID)
+#만약 defined(FEAT_EVAL)
+    정수
+set_ref_in_nb_channel(정수 copyID)
 {
-    int abort = FALSE;
+    정수 abort = FALSE;
     typval_T tv;
 
-    if (nb_channel == NULL)
-	return FALSE;
+    만약 (nb_channel == NULL)
+	반환 FALSE;
 
     tv.v_type = VAR_CHANNEL;
     tv.vval.v_channel = nb_channel;
     abort = set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
-    return abort;
+    반환 abort;
 }
 #endif
 
-#if defined(FEAT_GUI_X11) || defined(FEAT_GUI_MSWIN)
+#만약 defined(FEAT_GUI_X11) || defined(FEAT_GUI_MSWIN)
 /*
  * Tell netbeans that the window was moved or resized.
  */
     void
-netbeans_frame_moved(int new_x, int new_y)
+netbeans_frame_moved(정수 new_x, 정수 new_y)
 {
     char buf[128];
 
-    if (!NETBEANS_OPEN)
-	return;
+    만약 (!NETBEANS_OPEN)
+	반환;
 
     sprintf(buf, "0:geometry=%d %d %d %d %d\n",
-		    r_cmdno, (int)Columns, (int)Rows, new_x, new_y);
+		    r_cmdno, (정수)Columns, (정수)Rows, new_x, new_y);
     // nbdebug(("EVT: %s", buf)); happens too many times during a move
     nb_send(buf, "netbeans_frame_moved");
 }
@@ -2638,21 +2638,21 @@ netbeans_frame_moved(int new_x, int new_y)
     void
 netbeans_file_activated(buf_T *bufp)
 {
-    int bufno = nb_getbufno(bufp);
+    정수 bufno = nb_getbufno(bufp);
     nbbuf_T *bp = nb_get_buf(bufno);
     char    buffer[2*MAXPATHL];
     char_u  *q;
 
-    if (!NETBEANS_OPEN || !bufp->b_netbeans_file || dosetvisible)
-	return;
+    만약 (!NETBEANS_OPEN || !bufp->b_netbeans_file || dosetvisible)
+	반환;
 
     q = nb_quote(bufp->b_ffname);
-    if (q == NULL)
-	return;
-    if (bp == NULL)
+    만약 (q == NULL)
+	반환;
+    만약 (bp == NULL)
     {
 	vim_free(q);
-	return;
+	반환;
     }
 
     vim_snprintf(buffer, sizeof(buffer),  "%d:fileOpened=%d \"%s\" %s %s\n",
@@ -2674,21 +2674,21 @@ netbeans_file_activated(buf_T *bufp)
     void
 netbeans_file_opened(buf_T *bufp)
 {
-    int bufno = nb_getbufno(bufp);
+    정수 bufno = nb_getbufno(bufp);
     char    buffer[2*MAXPATHL];
     char_u  *q;
     nbbuf_T *bp = nb_get_buf(nb_getbufno(bufp));
-    int	    bnum;
+    정수	    bnum;
 
-    if (!NETBEANS_OPEN)
-	return;
+    만약 (!NETBEANS_OPEN)
+	반환;
 
     q = nb_quote(bufp->b_ffname);
-    if (q == NULL)
-	return;
-    if (bp != NULL)
+    만약 (q == NULL)
+	반환;
+    만약 (bp != NULL)
 	bnum = bufno;
-    else
+    아니면
 	bnum = 0;
 
     vim_snprintf(buffer, sizeof(buffer), "%d:fileOpened=%d \"%s\" %s %s\n",
@@ -2702,7 +2702,7 @@ netbeans_file_opened(buf_T *bufp)
     nbdebug(("EVT: %s", buffer));
 
     nb_send(buffer, "netbeans_file_opened");
-    if (p_acd && vim_chdirfile(bufp->b_ffname, "auto") == OK)
+    만약 (p_acd && vim_chdirfile(bufp->b_ffname, "auto") == OK)
     {
 	last_chdir_reason = "netbeans";
 	shorten_fnames(TRUE);
@@ -2715,12 +2715,12 @@ netbeans_file_opened(buf_T *bufp)
     void
 netbeans_file_killed(buf_T *bufp)
 {
-    int		bufno = nb_getbufno(bufp);
+    정수		bufno = nb_getbufno(bufp);
     nbbuf_T	*nbbuf = nb_get_buf(bufno);
     char	buffer[2*MAXPATHL];
 
-    if (!NETBEANS_OPEN || bufno == -1)
-	return;
+    만약 (!NETBEANS_OPEN || bufno == -1)
+	반환;
 
     nbdebug(("netbeans_file_killed:\n"));
     nbdebug(("    Killing bufno: %d", bufno));
@@ -2731,7 +2731,7 @@ netbeans_file_killed(buf_T *bufp)
 
     nb_send(buffer, "netbeans_file_killed");
 
-    if (nbbuf != NULL)
+    만약 (nbbuf != NULL)
 	nbbuf->bufp = NULL;
 }
 
@@ -2741,24 +2741,24 @@ netbeans_file_killed(buf_T *bufp)
  * Otherwise store the buffer number in "*bufnop".
  */
     static nbbuf_T *
-nb_bufp2nbbuf_fire(buf_T *bufp, int *bufnop)
+nb_bufp2nbbuf_fire(buf_T *bufp, 정수 *bufnop)
 {
-    int		bufno;
+    정수		bufno;
     nbbuf_T	*nbbuf;
 
-    if (!NETBEANS_OPEN || !netbeansFireChanges)
-	return NULL;		// changes are not reported at all
+    만약 (!NETBEANS_OPEN || !netbeansFireChanges)
+	반환 NULL;		// changes are not reported at all
 
     bufno = nb_getbufno(bufp);
-    if (bufno <= 0)
-	return NULL;		// file is not known to NetBeans
+    만약 (bufno <= 0)
+	반환 NULL;		// file is not known to NetBeans
 
     nbbuf = nb_get_buf(bufno);
-    if (nbbuf != NULL && !nbbuf->fireChanges)
-	return NULL;		// changes in this buffer are not reported
+    만약 (nbbuf != NULL && !nbbuf->fireChanges)
+	반환 NULL;		// changes in this buffer are not reported
 
     *bufnop = bufno;
-    return nbbuf;
+    반환 nbbuf;
 }
 
 /*
@@ -2770,25 +2770,25 @@ netbeans_inserted(
     linenr_T	linenr,
     colnr_T	col,
     char_u	*txt,
-    int		newlen)
+    정수		newlen)
 {
     char_u	*buf;
-    int		bufno;
+    정수		bufno;
     nbbuf_T	*nbbuf;
     pos_T	pos;
     long	off;
     char_u	*p;
     char_u	*newtxt;
 
-    if (!NETBEANS_OPEN)
-	return;
+    만약 (!NETBEANS_OPEN)
+	반환;
 
     nbbuf = nb_bufp2nbbuf_fire(bufp, &bufno);
-    if (nbbuf == NULL)
-	return;
+    만약 (nbbuf == NULL)
+	반환;
 
     // Don't mark as modified for initial read
-    if (nbbuf->insertDone)
+    만약 (nbbuf->insertDone)
 	nbbuf->modified = 1;
 
     // send the "insert" EVT
@@ -2801,7 +2801,7 @@ netbeans_inserted(
     off = pos2off(bufp, &pos);
 
     p = nb_quote(newtxt);
-    if (p != NULL)
+    만약 (p != NULL)
     {
 	buf = alloc(128 + 2*newlen);
 	sprintf((char *)buf, "%d:insert=%d %ld \"%s\"\n",
@@ -2825,22 +2825,22 @@ netbeans_removed(
     long	len)
 {
     char_u	buf[128];
-    int		bufno;
+    정수		bufno;
     nbbuf_T	*nbbuf;
     pos_T	pos;
     long	off;
 
-    if (!NETBEANS_OPEN)
-	return;
+    만약 (!NETBEANS_OPEN)
+	반환;
 
     nbbuf = nb_bufp2nbbuf_fire(bufp, &bufno);
-    if (nbbuf == NULL)
-	return;
+    만약 (nbbuf == NULL)
+	반환;
 
-    if (len < 0)
+    만약 (len < 0)
     {
 	nbdebug(("Negative len %ld in netbeans_removed()!\n", len));
-	return;
+	반환;
     }
 
     nbbuf->modified = 1;
@@ -2870,20 +2870,20 @@ netbeans_unmodified(buf_T *bufp UNUSED)
  * to decide what to do (if anything) with this event.
  */
     void
-netbeans_button_release(int button)
+netbeans_button_release(정수 button)
 {
     char	buf[128];
-    int		bufno;
+    정수		bufno;
 
-    if (!NETBEANS_OPEN)
-	return;
+    만약 (!NETBEANS_OPEN)
+	반환;
 
     bufno = nb_getbufno(curbuf);
 
-    if (bufno < 0 || curwin == NULL || curwin->w_buffer != curbuf)
-	return;
+    만약 (bufno < 0 || curwin == NULL || curwin->w_buffer != curbuf)
+	반환;
 
-    int col = mouse_col - curwin->w_wincol
+    정수 col = mouse_col - curwin->w_wincol
 	- ((curwin->w_p_nu || curwin->w_p_rnu) ? 9 : 1);
     long off = pos2off(curbuf, &curwin->w_cursor);
 
@@ -2905,13 +2905,13 @@ netbeans_button_release(int button)
  * Return TRUE when the key was sent, FALSE when the command has been
  * postponed.
  */
-    int
-netbeans_keycommand(int key)
+    정수
+netbeans_keycommand(정수 key)
 {
     char	keyName[60];
 
     netbeans_keyname(key, keyName);
-    return netbeans_keystring((char_u *)keyName);
+    반환 netbeans_keystring((char_u *)keyName);
 }
 
 
@@ -2921,35 +2921,35 @@ netbeans_keycommand(int key)
  * Return TRUE when the key was sent, FALSE when the command has been
  * postponed.
  */
-    static int
+    static 정수
 netbeans_keystring(char_u *keyName)
 {
     char	buf[2*MAXPATHL];
-    int		bufno = nb_getbufno(curbuf);
+    정수		bufno = nb_getbufno(curbuf);
     long	off;
     char_u	*q;
 
-    if (!NETBEANS_OPEN)
-	return TRUE;
+    만약 (!NETBEANS_OPEN)
+	반환 TRUE;
 
-    if (bufno == -1)
+    만약 (bufno == -1)
     {
 	nbdebug(("got keycommand for non-NetBeans buffer, opening...\n"));
 	q = curbuf->b_ffname == NULL ? (char_u *)""
 						 : nb_quote(curbuf->b_ffname);
-	if (q == NULL)
-	    return TRUE;
+	만약 (q == NULL)
+	    반환 TRUE;
 	vim_snprintf(buf, sizeof(buf), "0:fileOpened=%d \"%s\" %s %s\n", 0,
 		q,
 		"T",  // open in NetBeans
 		"F"); // modified
-	if (curbuf->b_ffname != NULL)
+	만약 (curbuf->b_ffname != NULL)
 	    vim_free(q);
 	nbdebug(("EVT: %s", buf));
 	nb_send(buf, "netbeans_keycommand");
 
 	postpone_keycommand(keyName);
-	return FALSE;
+	반환 FALSE;
     }
 
     // sync the cursor position
@@ -2974,7 +2974,7 @@ netbeans_keystring(char_u *keyName)
 		off, (long)curwin->w_cursor.lnum, (long)curwin->w_cursor.col);
     nbdebug(("EVT: %s", buf));
     nb_send(buf, "netbeans_keycommand");
-    return TRUE;
+    반환 TRUE;
 }
 
 
@@ -2985,15 +2985,15 @@ netbeans_keystring(char_u *keyName)
 netbeans_save_buffer(buf_T *bufp)
 {
     char_u	buf[64];
-    int		bufno;
+    정수		bufno;
     nbbuf_T	*nbbuf;
 
-    if (!NETBEANS_OPEN)
-	return;
+    만약 (!NETBEANS_OPEN)
+	반환;
 
     nbbuf = nb_bufp2nbbuf_fire(bufp, &bufno);
-    if (nbbuf == NULL)
-	return;
+    만약 (nbbuf == NULL)
+	반환;
 
     nbbuf->modified = 0;
 
@@ -3010,18 +3010,18 @@ netbeans_save_buffer(buf_T *bufp)
 netbeans_deleted_all_lines(buf_T *bufp)
 {
     char_u	buf[64];
-    int		bufno;
+    정수		bufno;
     nbbuf_T	*nbbuf;
 
-    if (!NETBEANS_OPEN)
-	return;
+    만약 (!NETBEANS_OPEN)
+	반환;
 
     nbbuf = nb_bufp2nbbuf_fire(bufp, &bufno);
-    if (nbbuf == NULL)
-	return;
+    만약 (nbbuf == NULL)
+	반환;
 
     // Don't mark as modified for initial read
-    if (nbbuf->insertDone)
+    만약 (nbbuf->insertDone)
 	nbbuf->modified = 1;
 
     sprintf((char *)buf, "%d:remove=%d 0 -1\n", bufno, r_cmdno);
@@ -3035,43 +3035,43 @@ netbeans_deleted_all_lines(buf_T *bufp)
  * u_savecommon(), these are the line above the change and the line below the
  * change.
  */
-    int
+    정수
 netbeans_is_guarded(linenr_T top, linenr_T bot)
 {
     sign_entry_T	*p;
-    int			lnum;
+    정수			lnum;
 
-    if (!NETBEANS_OPEN)
-	return FALSE;
+    만약 (!NETBEANS_OPEN)
+	반환 FALSE;
 
     FOR_ALL_SIGNS_IN_BUF(curbuf, p)
-	if (p->se_id >= GUARDEDOFFSET)
-	    for (lnum = top + 1; lnum < bot; lnum++)
-		if (lnum == p->se_lnum)
-		    return TRUE;
+	만약 (p->se_id >= GUARDEDOFFSET)
+	    위해 (lnum = top + 1; lnum < bot; lnum++)
+		만약 (lnum == p->se_lnum)
+		    반환 TRUE;
 
-    return FALSE;
+    반환 FALSE;
 }
 
-#if defined(FEAT_GUI_X11)
+#만약 defined(FEAT_GUI_X11)
 /*
  * We have multiple signs to draw at the same location. Draw the
  * multi-sign indicator instead. This is the Motif version.
  */
     void
-netbeans_draw_multisign_indicator(int row)
+netbeans_draw_multisign_indicator(정수 row)
 {
-    int i;
-    int y;
-    int x;
+    정수 i;
+    정수 y;
+    정수 x;
 
-    if (!NETBEANS_OPEN)
-	return;
+    만약 (!NETBEANS_OPEN)
+	반환;
 
     x = 0;
     y = row * gui.char_height + 2;
 
-    for (i = 0; i < gui.char_height - 3; i++)
+    위해 (i = 0; i < gui.char_height - 3; i++)
 	XDrawPoint(gui.dpy, gui.wid, gui.text_gc, x+2, y++);
 
     XDrawPoint(gui.dpy, gui.wid, gui.text_gc, x+0, y);
@@ -3084,42 +3084,42 @@ netbeans_draw_multisign_indicator(int row)
 }
 #endif // FEAT_GUI_X11
 
-#if defined(FEAT_GUI_GTK) && !defined(PROTO)
+#만약 defined(FEAT_GUI_GTK) && !defined(PROTO)
 /*
  * We have multiple signs to draw at the same location. Draw the
  * multi-sign indicator instead. This is the GTK/Gnome version.
  */
     void
-netbeans_draw_multisign_indicator(int row)
+netbeans_draw_multisign_indicator(정수 row)
 {
-    int i;
-    int y;
-    int x;
-# if GTK_CHECK_VERSION(3,0,0)
+    정수 i;
+    정수 y;
+    정수 x;
+# 만약 GTK_CHECK_VERSION(3,0,0)
     cairo_t *cr = NULL;
-# else
+# 아니면
     GdkDrawable *drawable = gui.drawarea->window;
 # endif
 # ifdef USE_GTK4
     cairo_surface_t *surf;
 # endif
 
-    if (!NETBEANS_OPEN)
-	return;
+    만약 (!NETBEANS_OPEN)
+	반환;
 
     x = 0;
 # ifdef USE_GTK4
     y = 2;
-# else
+# 아니면
     y = row * gui.char_height + 2;
 # endif
 
-# if GTK_CHECK_VERSION(3,0,0)
+# 만약 GTK_CHECK_VERSION(3,0,0)
 #  ifdef USE_GTK4
     surf = cairo_image_surface_create(
 	    CAIRO_FORMAT_ARGB32, 5, gui.char_height);
     cr = cairo_create(surf);
-#  else
+#  아니면
     cr = cairo_create(gui.surface);
 #  endif
     cairo_set_source_rgba(cr,
@@ -3127,14 +3127,14 @@ netbeans_draw_multisign_indicator(int row)
 	    gui.fgcolor->alpha);
 # endif
 
-    for (i = 0; i < gui.char_height - 3; i++)
-# if GTK_CHECK_VERSION(3,0,0)
+    위해 (i = 0; i < gui.char_height - 3; i++)
+# 만약 GTK_CHECK_VERSION(3,0,0)
 	cairo_rectangle(cr, x+2, y++, 1, 1);
-# else
+# 아니면
     gdk_draw_point(drawable, gui.text_gc, x+2, y++);
 # endif
 
-# if GTK_CHECK_VERSION(3,0,0)
+# 만약 GTK_CHECK_VERSION(3,0,0)
     cairo_rectangle(cr, x+0, y, 1, 1);
     cairo_rectangle(cr, x+2, y, 1, 1);
     cairo_rectangle(cr, x+4, y++, 1, 1);
@@ -3142,7 +3142,7 @@ netbeans_draw_multisign_indicator(int row)
     cairo_rectangle(cr, x+2, y, 1, 1);
     cairo_rectangle(cr, x+3, y++, 1, 1);
     cairo_rectangle(cr, x+2, y, 1, 1);
-# else
+# 아니면
     gdk_draw_point(drawable, gui.text_gc, x+0, y);
     gdk_draw_point(drawable, gui.text_gc, x+2, y);
     gdk_draw_point(drawable, gui.text_gc, x+4, y++);
@@ -3157,7 +3157,7 @@ netbeans_draw_multisign_indicator(int row)
     gui_gtk4_add_multisign(surf, row, 0, 5, gui.char_height);
 # endif
 
-# if GTK_CHECK_VERSION(3,0,0)
+# 만약 GTK_CHECK_VERSION(3,0,0)
     cairo_destroy(cr);
 # endif
 # ifdef USE_GTK4
@@ -3175,23 +3175,23 @@ netbeans_gutter_click(linenr_T lnum)
 {
     sign_entry_T	*p;
 
-    if (!NETBEANS_OPEN)
-	return;
+    만약 (!NETBEANS_OPEN)
+	반환;
 
     FOR_ALL_SIGNS_IN_BUF(curbuf, p)
     {
-	if (p->se_lnum == lnum && p->se_next && p->se_next->se_lnum == lnum)
+	만약 (p->se_lnum == lnum && p->se_next && p->se_next->se_lnum == lnum)
 	{
 	    sign_entry_T *tail;
 
 	    // remove "p" from list, reinsert it at the tail of the sublist
-	    if (p->se_prev)
+	    만약 (p->se_prev)
 		p->se_prev->se_next = p->se_next;
-	    else
+	    아니면
 		curbuf->b_signlist = p->se_next;
 	    p->se_next->se_prev = p->se_prev;
 	    // now find end of sublist and insert p
-	    for (tail = p->se_next;
+	    위해 (tail = p->se_next;
 		  tail->se_next && tail->se_next->se_lnum == lnum
 				       && tail->se_next->se_id < GUARDEDOFFSET;
 		  tail = tail->se_next)
@@ -3199,7 +3199,7 @@ netbeans_gutter_click(linenr_T lnum)
 	    // tail now points to last entry with same lnum (except
 	    // that "guarded" annotations are always last)
 	    p->se_next = tail->se_next;
-	    if (tail->se_next)
+	    만약 (tail->se_next)
 		tail->se_next->se_prev = p;
 	    p->se_prev = tail;
 	    tail->se_next = p;
@@ -3227,88 +3227,88 @@ netbeans_gutter_click(linenr_T lnum)
     static void
 addsigntype(
     nbbuf_T	*buf,
-    int		typeNum,
+    정수		typeNum,
     char_u	*typeName,
     char_u	*tooltip UNUSED,
     char_u	*glyphFile,
     char_u	*fg,
     char_u	*bg)
 {
-    int i, j;
-    int use_fg = (*fg && STRCMP(fg, "none") != 0);
-    int use_bg = (*bg && STRCMP(bg, "none") != 0);
+    정수 i, j;
+    정수 use_fg = (*fg && STRCMP(fg, "none") != 0);
+    정수 use_bg = (*bg && STRCMP(bg, "none") != 0);
 
-    for (i = 0; i < globalsignmapused; i++)
-	if (STRCMP(typeName, globalsignmap[i]) == 0)
+    위해 (i = 0; i < globalsignmapused; i++)
+	만약 (STRCMP(typeName, globalsignmap[i]) == 0)
 	    break;
 
-    if (i == globalsignmapused) // not found; add it to global map
+    만약 (i == globalsignmapused) // not found; add it to global map
     {
 	nbdebug(("DEFINEANNOTYPE(%d,%s,%s,%s,%s,%s)\n",
 			    typeNum, typeName, tooltip, glyphFile, fg, bg));
-	if (use_fg || use_bg)
+	만약 (use_fg || use_bg)
 	{
 	    char fgbuf[2 * (8 + MAX_COLOR_LENGTH) + 1];
 	    char bgbuf[2 * (8 + MAX_COLOR_LENGTH) + 1];
 	    char *ptr;
-	    int value;
+	    정수 value;
 
 	    value = strtol((char *)fg, &ptr, 10);
-	    if (ptr != (char *)fg)
+	    만약 (ptr != (char *)fg)
 		sprintf(fgbuf, "guifg=#%06x", value & 0xFFFFFF);
-	    else
+	    아니면
 		sprintf(fgbuf, "guifg=%s ctermfg=%s", fg, fg);
 
 	    value = strtol((char *)bg, &ptr, 10);
-	    if (ptr != (char *)bg)
+	    만약 (ptr != (char *)bg)
 		sprintf(bgbuf, "guibg=#%06x", value & 0xFFFFFF);
-	    else
+	    아니면
 		sprintf(bgbuf, "guibg=%s ctermbg=%s", bg, bg);
 
 	    coloncmd(":highlight NB_%s %s %s", typeName, (use_fg) ? fgbuf : "",
 		     (use_bg) ? bgbuf : "");
-	    if (*glyphFile == NUL)
+	    만약 (*glyphFile == NUL)
 		// no glyph, line highlighting only
 		coloncmd(":sign define %d linehl=NB_%s", i + 1, typeName);
-	    else if (vim_strsize(glyphFile) <= 2)
+	    아니면 만약 (vim_strsize(glyphFile) <= 2)
 		// one- or two-character glyph name, use as text glyph with
 		// texthl
 		coloncmd(":sign define %d text=%s texthl=NB_%s", i + 1,
 							 glyphFile, typeName);
-	    else
+	    아니면
 		// glyph, line highlighting
 		coloncmd(":sign define %d icon=%s linehl=NB_%s", i + 1,
 							 glyphFile, typeName);
 	}
-	else
+	아니면
 	    // glyph, no line highlighting
 	    coloncmd(":sign define %d icon=%s", i + 1, glyphFile);
 
-	if (STRCMP(typeName,"CurrentPC") == 0)
+	만약 (STRCMP(typeName,"CurrentPC") == 0)
 	    curPCtype = typeNum;
 
-	if (globalsignmapused == globalsignmaplen)
+	만약 (globalsignmapused == globalsignmaplen)
 	{
-	    if (globalsignmaplen == 0) // first allocation
+	    만약 (globalsignmaplen == 0) // first allocation
 	    {
 		globalsignmaplen = 20;
 		globalsignmap = ALLOC_CLEAR_MULT(char *, globalsignmaplen);
 	    }
-	    else    // grow it
+	    아니면    // grow it
 	    {
-		int incr;
-		int oldlen = globalsignmaplen;
+		정수 incr;
+		정수 oldlen = globalsignmaplen;
 		char **t_globalsignmap = globalsignmap;
 
 		globalsignmaplen *= 2;
 		incr = globalsignmaplen - oldlen;
 		globalsignmap = vim_realloc(globalsignmap,
 					   globalsignmaplen * sizeof(char *));
-		if (globalsignmap == NULL)
+		만약 (globalsignmap == NULL)
 		{
 		    vim_free(t_globalsignmap);
 		    globalsignmaplen = 0;
-		    return;
+		    반환;
 		}
 		vim_memset(globalsignmap + oldlen, 0, incr * sizeof(char *));
 	    }
@@ -3319,35 +3319,35 @@ addsigntype(
     }
 
     // check local map; should *not* be found!
-    for (j = 0; j < buf->signmapused; j++)
-	if (buf->signmap[j] == i + 1)
-	    return;
+    위해 (j = 0; j < buf->signmapused; j++)
+	만약 (buf->signmap[j] == i + 1)
+	    반환;
 
     // add to local map
-    if (buf->signmapused == buf->signmaplen)
+    만약 (buf->signmapused == buf->signmaplen)
     {
-	if (buf->signmaplen == 0) // first allocation
+	만약 (buf->signmaplen == 0) // first allocation
 	{
 	    buf->signmaplen = 5;
-	    buf->signmap = ALLOC_CLEAR_MULT(int, buf->signmaplen);
+	    buf->signmap = ALLOC_CLEAR_MULT(정수, buf->signmaplen);
 	}
-	else    // grow it
+	아니면    // grow it
 	{
-	    int incr;
-	    int oldlen = buf->signmaplen;
-	    int *t_signmap = buf->signmap;
+	    정수 incr;
+	    정수 oldlen = buf->signmaplen;
+	    정수 *t_signmap = buf->signmap;
 
 	    buf->signmaplen *= 2;
 	    incr = buf->signmaplen - oldlen;
 	    buf->signmap = vim_realloc(buf->signmap,
-					       buf->signmaplen * sizeof(int));
-	    if (buf->signmap == NULL)
+					       buf->signmaplen * sizeof(정수));
+	    만약 (buf->signmap == NULL)
 	    {
 		vim_free(t_signmap);
 		buf->signmaplen = 0;
-		return;
+		반환;
 	    }
-	    vim_memset(buf->signmap + oldlen, 0, incr * sizeof(int));
+	    vim_memset(buf->signmap + oldlen, 0, incr * sizeof(정수));
 	}
     }
 
@@ -3359,13 +3359,13 @@ addsigntype(
 /*
  * See if we have the requested sign type in the buffer.
  */
-    static int
-mapsigntype(nbbuf_T *buf, int localsigntype)
+    static 정수
+mapsigntype(nbbuf_T *buf, 정수 localsigntype)
 {
-    if (--localsigntype >= 0 && localsigntype < buf->signmapused)
-	return buf->signmap[localsigntype];
+    만약 (--localsigntype >= 0 && localsigntype < buf->signmapused)
+	반환 buf->signmap[localsigntype];
 
-    return 0;
+    반환 0;
 }
 
 
@@ -3377,33 +3377,33 @@ get_buf_size(buf_T *bufp)
 {
     linenr_T	lnum;
     long	char_count = 0;
-    int		eol_size;
+    정수		eol_size;
     long	last_check = 100000L;
 
-    if (bufp->b_ml.ml_flags & ML_EMPTY)
-	return 0;
+    만약 (bufp->b_ml.ml_flags & ML_EMPTY)
+	반환 0;
 
-    if (get_fileformat(bufp) == EOL_DOS)
+    만약 (get_fileformat(bufp) == EOL_DOS)
 	eol_size = 2;
-    else
+    아니면
 	eol_size = 1;
-    for (lnum = 1; lnum <= bufp->b_ml.ml_line_count; ++lnum)
+    위해 (lnum = 1; lnum <= bufp->b_ml.ml_line_count; ++lnum)
     {
 	char_count += ml_get_buf_len(bufp, lnum) + eol_size;
 	// Check for a CTRL-C every 100000 characters
-	if (char_count > last_check)
+	만약 (char_count > last_check)
 	{
 	    ui_breakcheck();
-	    if (got_int)
-		return char_count;
+	    만약 (got_int)
+		반환 char_count;
 	    last_check = char_count + 100000L;
 	}
     }
     // Correction for when last line doesn't have an EOL.
-    if (!bufp->b_p_eol && (bufp->b_p_bin || !bufp->b_p_fixeol))
+    만약 (!bufp->b_p_eol && (bufp->b_p_bin || !bufp->b_p_fixeol))
 	char_count -= eol_size;
 
-    return char_count;
+    반환 char_count;
 }
 
 /*
@@ -3419,15 +3419,15 @@ off2pos(buf_T *buf, long offset)
     pos.col = 0;
     pos.coladd = 0;
 
-    if (!(buf->b_ml.ml_flags & ML_EMPTY))
+    만약 (!(buf->b_ml.ml_flags & ML_EMPTY))
     {
-	if ((lnum = ml_find_line_or_offset(buf, (linenr_T)0, &offset)) < 0)
-	    return NULL;
+	만약 ((lnum = ml_find_line_or_offset(buf, (linenr_T)0, &offset)) < 0)
+	    반환 NULL;
 	pos.lnum = lnum;
 	pos.col = offset;
     }
 
-    return &pos;
+    반환 &pos;
 }
 
 /*
@@ -3444,15 +3444,15 @@ get_off_or_lnum(buf_T *buf, char_u **argp)
     long		off;
 
     off = strtol((char *)*argp, (char **)argp, 10);
-    if (**argp == '/')
+    만약 (**argp == '/')
     {
 	mypos.lnum = (linenr_T)off;
 	++*argp;
 	mypos.col = strtol((char *)*argp, (char **)argp, 10);
 	mypos.coladd = 0;
-	return &mypos;
+	반환 &mypos;
     }
-    return off2pos(buf, off);
+    반환 off2pos(buf, off);
 }
 
 
@@ -3464,14 +3464,14 @@ pos2off(buf_T *buf, pos_T *pos)
 {
     long	 offset = 0;
 
-    if (buf->b_ml.ml_flags & ML_EMPTY)
-	return 0;
+    만약 (buf->b_ml.ml_flags & ML_EMPTY)
+	반환 0;
 
-    if ((offset = ml_find_line_or_offset(buf, pos->lnum, 0)) < 0)
-	return 0;
+    만약 ((offset = ml_find_line_or_offset(buf, pos->lnum, 0)) < 0)
+	반환 0;
     offset += pos->col;
 
-    return offset;
+    반환 offset;
 }
 
 
@@ -3483,19 +3483,19 @@ pos2off(buf_T *buf, pos_T *pos)
     static void
 print_read_msg(nbbuf_T *buf)
 {
-    int	    lnum = buf->bufp->b_ml.ml_line_count;
+    정수	    lnum = buf->bufp->b_ml.ml_line_count;
     off_T   nchars = buf->bufp->b_orig_size;
     char_u  c;
 
     msg_add_fname(buf->bufp, buf->bufp->b_ffname);
     c = FALSE;
 
-    if (buf->bufp->b_p_ro)
+    만약 (buf->bufp->b_p_ro)
     {
 	STRCAT(IObuff, shortmess(SHM_RO) ? _("[RO]") : _("[readonly]"));
 	c = TRUE;
     }
-    if (!buf->bufp->b_start_eol)
+    만약 (!buf->bufp->b_start_eol)
     {
 	STRCAT(IObuff, shortmess(SHM_LAST) ? _("[noeol]")
 					       : _("[Incomplete last line]"));
@@ -3522,7 +3522,7 @@ print_save_msg(nbbuf_T *buf, off_T nchars)
     char_u	c;
     char_u	*p;
 
-    if (nchars >= 0)
+    만약 (nchars >= 0)
     {
 	// put fname in IObuff with quotes
 	msg_add_fname(buf->bufp, buf->bufp->b_ffname);
@@ -3534,7 +3534,7 @@ print_save_msg(nbbuf_T *buf, off_T nchars)
 	VIM_CLEAR(keep_msg);
 	msg_scrolled_ign = TRUE;
 	p = (char_u *)msg_trunc_attr((char *)IObuff, FALSE, 0);
-	if ((msg_scrolled && !need_wait_return) || !buf->initDone)
+	만약 ((msg_scrolled && !need_wait_return) || !buf->initDone)
 	{
 	    // Need to repeat the message after redrawing when:
 	    // - When reading from stdin (the screen will be cleared next).
@@ -3547,7 +3547,7 @@ print_save_msg(nbbuf_T *buf, off_T nchars)
 	msg_scrolled_ign = FALSE;
 	// add_to_input_buf((char_u *)"\f", 1);
     }
-    else
+    아니면
     {
 	char msgbuf[IOSIZE];
 

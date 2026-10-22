@@ -13,7 +13,7 @@
 
 #include "vim.h"
 
-static int	did_add_space = FALSE;	// auto_format() added an extra space
+static 정수	did_add_space = FALSE;	// auto_format() added an extra space
 					// under the cursor
 
 #define WHITECHAR(cc) (VIM_ISWHITE(cc) && (!enc_utf8 || !utf_iscomposing(utf_ptr2char(ml_get_cursor() + 1))))
@@ -22,12 +22,12 @@ static int	did_add_space = FALSE;	// auto_format() added an extra space
  * Return TRUE if format option 'x' is in effect.
  * Take care of no formatting when 'paste' is set.
  */
-    int
-has_format_option(int x)
+    정수
+has_format_option(정수 x)
 {
-    if (p_paste)
-	return FALSE;
-    return (vim_strchr(curbuf->b_p_fo, x) != NULL);
+    만약 (p_paste)
+	반환 FALSE;
+    반환 (vim_strchr(curbuf->b_p_fo, x) != NULL);
 }
 
 /*
@@ -38,28 +38,28 @@ has_format_option(int x)
  */
     void
 internal_format(
-    int		textwidth,
-    int		second_indent,
-    int		flags,
-    int		format_only,
-    int		c) // character to be inserted (can be NUL)
+    정수		textwidth,
+    정수		second_indent,
+    정수		flags,
+    정수		format_only,
+    정수		c) // character to be inserted (can be NUL)
 {
-    int		cc;
-    int		skip_pos;
-    int		save_char = NUL;
-    int		haveto_redraw = FALSE;
-    int		fo_ins_blank = has_format_option(FO_INS_BLANK);
-    int		fo_multibyte = has_format_option(FO_MBYTE_BREAK);
-    int		fo_rigor_tw  = has_format_option(FO_RIGOROUS_TW);
-    int		fo_white_par = has_format_option(FO_WHITE_PAR);
-    int		first_line = TRUE;
+    정수		cc;
+    정수		skip_pos;
+    정수		save_char = NUL;
+    정수		haveto_redraw = FALSE;
+    정수		fo_ins_blank = has_format_option(FO_INS_BLANK);
+    정수		fo_multibyte = has_format_option(FO_MBYTE_BREAK);
+    정수		fo_rigor_tw  = has_format_option(FO_RIGOROUS_TW);
+    정수		fo_white_par = has_format_option(FO_WHITE_PAR);
+    정수		first_line = TRUE;
     colnr_T	leader_len;
-    int		no_leader = FALSE;
-    int		do_comments = (flags & INSCHAR_DO_COM);
-    int		safe_tw = trim_to_int(8 * (vimlong_T)textwidth);
+    정수		no_leader = FALSE;
+    정수		do_comments = (flags & INSCHAR_DO_COM);
+    정수		safe_tw = trim_to_int(8 * (vimlong_T)textwidth);
 #ifdef FEAT_LINEBREAK
-    int		has_lbr = curwin->w_p_lbr;
-    int		has_bri = curwin->w_p_bri;
+    정수		has_lbr = curwin->w_p_lbr;
+    정수		has_bri = curwin->w_p_bri;
 
     // make sure win_lbr_chartabsize() counts correctly
     curwin->w_p_lbr = FALSE;
@@ -68,10 +68,10 @@ internal_format(
 
     // When 'ai' is off we don't want a space under the cursor to be
     // deleted.  Replace it with an 'x' temporarily.
-    if (!curbuf->b_p_ai && !(State & VREPLACE_FLAG))
+    만약 (!curbuf->b_p_ai && !(State & VREPLACE_FLAG))
     {
 	cc = gchar_cursor();
-	if (VIM_ISWHITE(cc))
+	만약 (VIM_ISWHITE(cc))
 	{
 	    save_char = cc;
 	    pchar_cursor('x');
@@ -79,75 +79,75 @@ internal_format(
     }
 
     // Repeat breaking lines, until the current line is not too long.
-    while (!got_int)
+    동안 (!got_int)
     {
-	int	startcol;		// Cursor column at entry
-	int	wantcol;		// column at textwidth border
-	int	foundcol;		// column for start of spaces
-	int	end_foundcol = 0;	// column for start of word
+	정수	startcol;		// Cursor column at entry
+	정수	wantcol;		// column at textwidth border
+	정수	foundcol;		// column for start of spaces
+	정수	end_foundcol = 0;	// column for start of word
 	colnr_T	len;
 	colnr_T	virtcol;
-	int	orig_col = 0;
+	정수	orig_col = 0;
 	char_u	*saved_text = NULL;
 	colnr_T	col;
 	colnr_T	end_col;
-	int	wcc;			// counter for whitespace chars
-	int	did_do_comment = FALSE;
-	int	first_pass;
+	정수	wcc;			// counter for whitespace chars
+	정수	did_do_comment = FALSE;
+	정수	first_pass;
 
 	// Cursor is currently at the end of line. No need to format
 	// if line length is less than textwidth (8 * textwidth for
 	// utf safety)
-	if (curwin->w_cursor.col < safe_tw)
+	만약 (curwin->w_cursor.col < safe_tw)
 	{
 	    virtcol = get_nolist_virtcol()
 		+ char2cells(c != NUL ? c : gchar_cursor());
-	    if (virtcol <= (colnr_T)textwidth)
+	    만약 (virtcol <= (colnr_T)textwidth)
 		break;
 	}
 
-	if (no_leader)
+	만약 (no_leader)
 	    do_comments = FALSE;
-	else if (!(flags & INSCHAR_FORMAT)
+	아니면 만약 (!(flags & INSCHAR_FORMAT)
 				       && has_format_option(FO_WRAP_COMS))
 	    do_comments = TRUE;
 
 	// Don't break until after the comment leader
-	if (do_comments)
+	만약 (do_comments)
 	{
 	    char_u *line = ml_get_curline();
 
 	    leader_len = get_leader_len(line, NULL, FALSE, TRUE);
-	    if (leader_len == 0 && curbuf->b_p_cin)
+	    만약 (leader_len == 0 && curbuf->b_p_cin)
 	    {
-		int		comment_start;
+		정수		comment_start;
 
 		// Check for a line comment after code.
 		comment_start = check_linecomment(line);
-		if (comment_start != MAXCOL)
+		만약 (comment_start != MAXCOL)
 		{
 		    leader_len = get_leader_len(
 				      line + comment_start, NULL, FALSE, TRUE);
-		    if (leader_len != 0)
+		    만약 (leader_len != 0)
 			leader_len += comment_start;
 		}
 	    }
 	}
-	else
+	아니면
 	    leader_len = 0;
 
 	// If the line doesn't start with a comment leader, then don't
 	// start one in a following broken line.  Avoids that a %word
 	// moved to the start of the next line causes all following lines
 	// to start with %.
-	if (leader_len == 0)
+	만약 (leader_len == 0)
 	    no_leader = TRUE;
-	if (!(flags & INSCHAR_FORMAT)
+	만약 (!(flags & INSCHAR_FORMAT)
 		&& leader_len == 0
 		&& !has_format_option(FO_WRAP))
 
 	    break;
-	if ((startcol = curwin->w_cursor.col) == 0)
+	만약 ((startcol = curwin->w_cursor.col) == 0)
 	    break;
 
 	// find column of textwidth border
@@ -167,59 +167,59 @@ internal_format(
 
 	// Find position to break at.
 	// Stop at first entered white when 'formatoptions' has 'v'
-	while ((!fo_ins_blank && !has_format_option(FO_INS_VI))
+	동안 ((!fo_ins_blank && !has_format_option(FO_INS_VI))
 		    || (flags & INSCHAR_FORMAT)
 		    || curwin->w_cursor.lnum != Insstart.lnum
 		    || curwin->w_cursor.col >= Insstart.col)
 	{
-	    if (first_pass && c != NUL)
+	    만약 (first_pass && c != NUL)
 	    {
 		cc = c;
 		first_pass = FALSE;
 	    }
-	    else
+	    아니면
 		cc = gchar_cursor();
-	    if (WHITECHAR(cc))
+	    만약 (WHITECHAR(cc))
 	    {
 		// remember position of blank just before text
 		end_col = curwin->w_cursor.col;
 
 		// find start of sequence of blanks
 		wcc = 0;
-		while (curwin->w_cursor.col > 0 && WHITECHAR(cc))
+		동안 (curwin->w_cursor.col > 0 && WHITECHAR(cc))
 		{
 		    dec_cursor();
 		    cc = gchar_cursor();
 
 		    // Increment count of how many whitespace chars in this
 		    // group; we only need to know if it's more than one.
-		    if (wcc < 2)
+		    만약 (wcc < 2)
 			wcc++;
 		}
-		if (curwin->w_cursor.col == 0 && WHITECHAR(cc))
+		만약 (curwin->w_cursor.col == 0 && WHITECHAR(cc))
 		    break;		// only spaces in front of text
 
 		// Don't break after a period when 'formatoptions' has 'p' and
 		// there are less than two spaces.
-		if (has_format_option(FO_PERIOD_ABBR) && cc == '.' && wcc < 2)
+		만약 (has_format_option(FO_PERIOD_ABBR) && cc == '.' && wcc < 2)
 		    continue;
 
 		// Don't break until after the comment leader
-		if (curwin->w_cursor.col < leader_len)
+		만약 (curwin->w_cursor.col < leader_len)
 		    break;
-		if (has_format_option(FO_ONE_LETTER))
+		만약 (has_format_option(FO_ONE_LETTER))
 		{
 		    // do not break after one-letter words
-		    if (curwin->w_cursor.col == 0)
+		    만약 (curwin->w_cursor.col == 0)
 			break;	// one-letter word at begin
 		    // do not break "#a b" when 'tw' is 2
-		    if (curwin->w_cursor.col <= leader_len)
+		    만약 (curwin->w_cursor.col <= leader_len)
 			break;
 		    col = curwin->w_cursor.col;
 		    dec_cursor();
 		    cc = gchar_cursor();
 
-		    if (WHITECHAR(cc))
+		    만약 (WHITECHAR(cc))
 			continue;	// one-letter, continue
 		    curwin->w_cursor.col = col;
 		}
@@ -228,20 +228,20 @@ internal_format(
 
 		end_foundcol = end_col + 1;
 		foundcol = curwin->w_cursor.col;
-		if (curwin->w_cursor.col <= (colnr_T)wantcol)
+		만약 (curwin->w_cursor.col <= (colnr_T)wantcol)
 		    break;
 	    }
-	    else if ((cc >= 0x100 || !utf_allow_break_before(cc))
+	    아니면 만약 ((cc >= 0x100 || !utf_allow_break_before(cc))
 							       && fo_multibyte)
 	    {
-		int ncc;
-		int allow_break;
+		정수 ncc;
+		정수 allow_break;
 
 		// Break after or before a multi-byte character.
-		if (curwin->w_cursor.col != startcol)
+		만약 (curwin->w_cursor.col != startcol)
 		{
 		    // Don't break until after the comment leader
-		    if (curwin->w_cursor.col < leader_len)
+		    만약 (curwin->w_cursor.col < leader_len)
 			break;
 		    col = curwin->w_cursor.col;
 		    inc_cursor();
@@ -252,17 +252,17 @@ internal_format(
 			|| enc_dbcs;
 
 		    // If we have already checked this position, skip!
-		    if (curwin->w_cursor.col != skip_pos && allow_break)
+		    만약 (curwin->w_cursor.col != skip_pos && allow_break)
 		    {
 			foundcol = curwin->w_cursor.col;
 			end_foundcol = foundcol;
-			if (curwin->w_cursor.col <= (colnr_T)wantcol)
+			만약 (curwin->w_cursor.col <= (colnr_T)wantcol)
 			    break;
 		    }
 		    curwin->w_cursor.col = col;
 		}
 
-		if (curwin->w_cursor.col == 0)
+		만약 (curwin->w_cursor.col == 0)
 		    break;
 
 		ncc = cc;
@@ -271,10 +271,10 @@ internal_format(
 		dec_cursor();
 		cc = gchar_cursor();
 
-		if (WHITECHAR(cc))
+		만약 (WHITECHAR(cc))
 		    continue;		// break with space
 		// Don't break until after the comment leader.
-		if (curwin->w_cursor.col < leader_len)
+		만약 (curwin->w_cursor.col < leader_len)
 		    break;
 
 		curwin->w_cursor.col = col;
@@ -285,22 +285,22 @@ internal_format(
 		    || enc_dbcs;
 
 		// Must handle this to respect line break prohibition.
-		if (allow_break)
+		만약 (allow_break)
 		{
 		    foundcol = curwin->w_cursor.col;
 		    end_foundcol = foundcol;
 		}
-		if (curwin->w_cursor.col <= (colnr_T)wantcol)
+		만약 (curwin->w_cursor.col <= (colnr_T)wantcol)
 		{
-		    int ncc_allow_break =
+		    정수 ncc_allow_break =
 			 (enc_utf8 && utf_allow_break_before(ncc)) || enc_dbcs;
 
-		    if (allow_break)
+		    만약 (allow_break)
 			break;
-		    if (!ncc_allow_break && !fo_rigor_tw)
+		    만약 (!ncc_allow_break && !fo_rigor_tw)
 		    {
 			// Enable at most 1 punct hang outside of textwidth.
-			if (curwin->w_cursor.col == startcol)
+			만약 (curwin->w_cursor.col == startcol)
 			{
 			    // We are inserting a non-breakable char, postpone
 			    // line break check to next insert.
@@ -322,7 +322,7 @@ internal_format(
 				(enc_utf8 && utf_allow_break(cc, ncc))
 				|| enc_dbcs;
 
-			if (allow_break)
+			만약 (allow_break)
 			{
 			    // Break only when we are not at end of line.
 			    end_foundcol = foundcol =
@@ -333,12 +333,12 @@ internal_format(
 		    }
 		}
 	    }
-	    if (curwin->w_cursor.col == 0)
+	    만약 (curwin->w_cursor.col == 0)
 		break;
 	    dec_cursor();
 	}
 
-	if (foundcol == 0)		// no spaces, cannot break line
+	만약 (foundcol == 0)		// no spaces, cannot break line
 	{
 	    curwin->w_cursor.col = startcol;
 	    break;
@@ -350,39 +350,39 @@ internal_format(
 	// Offset between cursor position and line break is used by replace
 	// stack functions.  MODE_VREPLACE does not use this, and backspaces
 	// over the text instead.
-	if (State & VREPLACE_FLAG)
+	만약 (State & VREPLACE_FLAG)
 	    orig_col = startcol;	// Will start backspacing from here
-	else
+	아니면
 	    replace_offset = startcol - end_foundcol;
 
 	// adjust startcol for spaces that will be deleted and
 	// characters that will remain on top line
 	curwin->w_cursor.col = foundcol;
-	while ((cc = gchar_cursor(), WHITECHAR(cc))
+	동안 ((cc = gchar_cursor(), WHITECHAR(cc))
 		    && (!fo_white_par || curwin->w_cursor.col < startcol))
 	    inc_cursor();
 	startcol -= curwin->w_cursor.col;
-	if (startcol < 0)
+	만약 (startcol < 0)
 	    startcol = 0;
 
-	if (State & VREPLACE_FLAG)
+	만약 (State & VREPLACE_FLAG)
 	{
 	    // In MODE_VREPLACE state, we will backspace over the text to be
 	    // wrapped, so save a copy now to put on the next line.
 	    saved_text = vim_strnsave(ml_get_cursor(), ml_get_cursor_len());
 	    curwin->w_cursor.col = orig_col;
-	    if (saved_text == NULL)
+	    만약 (saved_text == NULL)
 		break;	// Can't do it, out of memory
 	    saved_text[startcol] = NUL;
 
 	    // Backspace over characters that will move to the next line
-	    if (!fo_white_par)
+	    만약 (!fo_white_par)
 		backspace_until_column(foundcol);
 	}
-	else
+	아니면
 	{
 	    // put cursor after pos. to break line
-	    if (!fo_white_par)
+	    만약 (!fo_white_par)
 		curwin->w_cursor.col = foundcol;
 	}
 
@@ -395,37 +395,37 @@ internal_format(
 		+ ((flags & INSCHAR_COM_LIST) ? OPENLINE_COM_LIST : 0)
 		, ((flags & INSCHAR_COM_LIST) ? second_indent : old_indent),
 		&did_do_comment);
-	if (!(flags & INSCHAR_COM_LIST))
+	만약 (!(flags & INSCHAR_COM_LIST))
 	    old_indent = 0;
 
 	// If a comment leader was inserted, may also do this on a following
 	// line.
-	if (did_do_comment)
+	만약 (did_do_comment)
 	    no_leader = FALSE;
 
 	replace_offset = 0;
-	if (first_line)
+	만약 (first_line)
 	{
-	    if (!(flags & INSCHAR_COM_LIST))
+	    만약 (!(flags & INSCHAR_COM_LIST))
 	    {
 		// This section is for auto-wrap of numeric lists.  When not
 		// in insert mode (i.e. format_lines()), the INSCHAR_COM_LIST
 		// flag will be set and open_line() will handle it (as seen
 		// above).  The code here (and in get_number_indent()) will
 		// recognize comments if needed...
-		if (second_indent < 0 && has_format_option(FO_Q_NUMBER))
+		만약 (second_indent < 0 && has_format_option(FO_Q_NUMBER))
 		    second_indent =
 				 get_number_indent(curwin->w_cursor.lnum - 1);
-		if (second_indent >= 0)
+		만약 (second_indent >= 0)
 		{
-		    if (State & VREPLACE_FLAG)
+		    만약 (State & VREPLACE_FLAG)
 			change_indent(INDENT_SET, second_indent,
 							    FALSE, NUL, TRUE);
-		    else
-			if (leader_len > 0 && second_indent - leader_len > 0)
+		    아니면
+			만약 (leader_len > 0 && second_indent - leader_len > 0)
 		    {
-			int i;
-			int padding = second_indent - leader_len;
+			정수 i;
+			정수 padding = second_indent - leader_len;
 
 			// We started at the first_line of a numbered list
 			// that has a comment.  the open_line() function has
@@ -433,10 +433,10 @@ internal_format(
 			// the cursor at the end of the split line.  Now we
 			// add the additional whitespace needed after the
 			// comment leader for the numbered list.
-			for (i = 0; i < padding; i++)
+			위해 (i = 0; i < padding; i++)
 			    ins_str((char_u *)" ", 1);
 		    }
-		    else
+		    아니면
 		    {
 			(void)set_indent(second_indent, SIN_CHANGED);
 		    }
@@ -445,20 +445,20 @@ internal_format(
 	    first_line = FALSE;
 	}
 
-	if (State & VREPLACE_FLAG)
+	만약 (State & VREPLACE_FLAG)
 	{
 	    // In MODE_VREPLACE state we have backspaced over the text to be
 	    // moved, now we re-insert it into the new line.
 	    ins_bytes(saved_text);
 	    vim_free(saved_text);
 	}
-	else
+	아니면
 	{
 	    // Check if cursor is not past the NUL off the line, cindent
 	    // may have added or removed indent.
 	    curwin->w_cursor.col += startcol;
 	    len = ml_get_curline_len();
-	    if (curwin->w_cursor.col > len)
+	    만약 (curwin->w_cursor.col > len)
 		curwin->w_cursor.col = len;
 	}
 
@@ -472,14 +472,14 @@ internal_format(
 	line_breakcheck();
     }
 
-    if (save_char != NUL)		// put back space after cursor
+    만약 (save_char != NUL)		// put back space after cursor
 	pchar_cursor(save_char);
 
 #ifdef FEAT_LINEBREAK
     curwin->w_p_lbr = has_lbr;
     curwin->w_p_bri = has_bri;
 #endif
-    if (!format_only && haveto_redraw)
+    만약 (!format_only && haveto_redraw)
     {
 	update_topline();
 	redraw_curbuf_later(UPD_VALID);
@@ -494,31 +494,31 @@ internal_format(
  * previous line.  A new paragraph starts after a blank line, or when the
  * comment leader changes -- webb.
  */
-    static int
+    static 정수
 fmt_check_par(
     linenr_T	lnum,
-    int		*leader_len,
+    정수		*leader_len,
     char_u	**leader_flags,
-    int		do_comments)
+    정수		do_comments)
 {
     char_u	*flags = NULL;	    // init for GCC
     char_u	*ptr;
 
     ptr = ml_get(lnum);
-    if (do_comments)
+    만약 (do_comments)
 	*leader_len = get_leader_len(ptr, leader_flags, FALSE, TRUE);
-    else
+    아니면
 	*leader_len = 0;
 
-    if (*leader_len > 0)
+    만약 (*leader_len > 0)
     {
 	// Search for 'e' flag in comment leader flags.
 	flags = *leader_flags;
-	while (*flags && *flags != ':' && *flags != COM_END)
+	동안 (*flags && *flags != ':' && *flags != COM_END)
 	    ++flags;
     }
 
-    return (*skipwhite(ptr + *leader_len) == NUL
+    반환 (*skipwhite(ptr + *leader_len) == NUL
 	    || (*leader_len > 0 && *flags == COM_END)
 	    || startPS(lnum, NUL, FALSE));
 }
@@ -526,16 +526,16 @@ fmt_check_par(
 /*
  * Return TRUE if line "lnum" ends in a white character.
  */
-    static int
+    static 정수
 ends_in_white(linenr_T lnum)
 {
     char_u	*s = ml_get(lnum);
     size_t	l;
 
-    if (*s == NUL)
-	return FALSE;
+    만약 (*s == NUL)
+	반환 FALSE;
     l = ml_get_len(lnum) - 1;
-    return VIM_ISWHITE(s[l]);
+    반환 VIM_ISWHITE(s[l]);
 }
 
 /*
@@ -543,46 +543,46 @@ ends_in_white(linenr_T lnum)
  * the first line.  White-space is ignored.  Note that the whole of
  * 'leader1' must match 'leader2_len' characters from 'leader2' -- webb
  */
-    static int
+    static 정수
 same_leader(
     linenr_T lnum,
-    int	    leader1_len,
+    정수	    leader1_len,
     char_u  *leader1_flags,
-    int	    leader2_len,
+    정수	    leader2_len,
     char_u  *leader2_flags)
 {
-    int	    idx1 = 0, idx2 = 0;
+    정수	    idx1 = 0, idx2 = 0;
     char_u  *line1;
 
-    if (leader1_len == 0)
-	return (leader2_len == 0);
+    만약 (leader1_len == 0)
+	반환 (leader2_len == 0);
 
     // If first leader has 'f' flag, the lines can be joined only if the
     // second line does not have a leader.
     // If first leader has 'e' flag, the lines can never be joined.
     // If first leader has 's' flag, the lines can only be joined if there is
     // some text after it and the second line has the 'm' flag.
-    if (leader1_flags != NULL)
+    만약 (leader1_flags != NULL)
     {
 	char_u	*p;
 
-	for (p = leader1_flags; *p && *p != ':'; ++p)
+	위해 (p = leader1_flags; *p && *p != ':'; ++p)
 	{
-	    if (*p == COM_FIRST)
-		return (leader2_len == 0);
-	    if (*p == COM_END)
-		return FALSE;
-	    if (*p == COM_START)
+	    만약 (*p == COM_FIRST)
+		반환 (leader2_len == 0);
+	    만약 (*p == COM_END)
+		반환 FALSE;
+	    만약 (*p == COM_START)
 	    {
-		int line_len = ml_get_len(lnum);
-		if (line_len <= leader1_len)
-		    return FALSE;
-		if (leader2_flags == NULL || leader2_len == 0)
-		    return FALSE;
-		for (p = leader2_flags; *p && *p != ':'; ++p)
-		    if (*p == COM_MIDDLE)
-			return TRUE;
-		return FALSE;
+		정수 line_len = ml_get_len(lnum);
+		만약 (line_len <= leader1_len)
+		    반환 FALSE;
+		만약 (leader2_flags == NULL || leader2_len == 0)
+		    반환 FALSE;
+		위해 (p = leader2_flags; *p && *p != ':'; ++p)
+		    만약 (*p == COM_MIDDLE)
+			반환 TRUE;
+		반환 FALSE;
 	    }
 	}
     }
@@ -590,68 +590,68 @@ same_leader(
     // Get current line and next line, compare the leaders.
     // The first line has to be saved, only one line can be locked at a time.
     line1 = vim_strnsave(ml_get(lnum), ml_get_len(lnum));
-    if (line1 != NULL)
+    만약 (line1 != NULL)
     {
 	char_u  *line2;
 
-	for (idx1 = 0; VIM_ISWHITE(line1[idx1]); ++idx1)
+	위해 (idx1 = 0; VIM_ISWHITE(line1[idx1]); ++idx1)
 	    ;
 	line2 = ml_get(lnum + 1);
-	for (idx2 = 0; idx2 < leader2_len; ++idx2)
+	위해 (idx2 = 0; idx2 < leader2_len; ++idx2)
 	{
-	    if (!VIM_ISWHITE(line2[idx2]))
+	    만약 (!VIM_ISWHITE(line2[idx2]))
 	    {
-		if (line1[idx1++] != line2[idx2])
+		만약 (line1[idx1++] != line2[idx2])
 		    break;
 	    }
-	    else
-		while (VIM_ISWHITE(line1[idx1]))
+	    아니면
+		동안 (VIM_ISWHITE(line1[idx1]))
 		    ++idx1;
 	}
 	vim_free(line1);
     }
-    return (idx2 == leader2_len && idx1 == leader1_len);
+    반환 (idx2 == leader2_len && idx1 == leader1_len);
 }
 
 /*
  * Return TRUE when a paragraph starts in line "lnum".  Return FALSE when the
  * previous line is in the same paragraph.  Used for auto-formatting.
  */
-    static int
+    static 정수
 paragraph_start(linenr_T lnum)
 {
     char_u	*p;
-    int		leader_len = 0;		// leader len of current line
+    정수		leader_len = 0;		// leader len of current line
     char_u	*leader_flags = NULL;	// flags for leader of current line
-    int		next_leader_len;	// leader len of next line
+    정수		next_leader_len;	// leader len of next line
     char_u	*next_leader_flags;	// flags for leader of next line
-    int		do_comments;		// format comments
+    정수		do_comments;		// format comments
 
-    if (lnum <= 1)
-	return TRUE;		// start of the file
+    만약 (lnum <= 1)
+	반환 TRUE;		// start of the file
 
     p = ml_get(lnum - 1);
-    if (*p == NUL)
-	return TRUE;		// after empty line
+    만약 (*p == NUL)
+	반환 TRUE;		// after empty line
 
     do_comments = has_format_option(FO_Q_COMS);
-    if (fmt_check_par(lnum - 1, &leader_len, &leader_flags, do_comments))
-	return TRUE;		// after non-paragraph line
+    만약 (fmt_check_par(lnum - 1, &leader_len, &leader_flags, do_comments))
+	반환 TRUE;		// after non-paragraph line
 
-    if (fmt_check_par(lnum, &next_leader_len, &next_leader_flags, do_comments))
-	return TRUE;		// "lnum" is not a paragraph line
+    만약 (fmt_check_par(lnum, &next_leader_len, &next_leader_flags, do_comments))
+	반환 TRUE;		// "lnum" is not a paragraph line
 
-    if (has_format_option(FO_WHITE_PAR) && !ends_in_white(lnum - 1))
-	return TRUE;		// missing trailing space in previous line.
+    만약 (has_format_option(FO_WHITE_PAR) && !ends_in_white(lnum - 1))
+	반환 TRUE;		// missing trailing space in previous line.
 
-    if (has_format_option(FO_Q_NUMBER) && (get_number_indent(lnum) > 0))
-	return TRUE;		// numbered item starts in "lnum".
+    만약 (has_format_option(FO_Q_NUMBER) && (get_number_indent(lnum) > 0))
+	반환 TRUE;		// numbered item starts in "lnum".
 
-    if (!same_leader(lnum - 1, leader_len, leader_flags,
+    만약 (!same_leader(lnum - 1, leader_len, leader_flags,
 					  next_leader_len, next_leader_flags))
-	return TRUE;		// change of comment leader.
+	반환 TRUE;		// change of comment leader.
 
-    return FALSE;
+    반환 FALSE;
 }
 
 /*
@@ -663,15 +663,15 @@ paragraph_start(linenr_T lnum)
  */
     void
 auto_format(
-    int		trailblank,	// when TRUE also format with trailing blank
-    int		prev_line)	// may start in previous line
+    정수		trailblank,	// when TRUE also format with trailing blank
+    정수		prev_line)	// may start in previous line
 {
     pos_T	pos;
     char_u	*old;
-    int		wasatend;
+    정수		wasatend;
 
-    if (!has_format_option(FO_AUTO))
-	return;
+    만약 (!has_format_option(FO_AUTO))
+	반환;
 
     pos = curwin->w_cursor;
     old = ml_get_curline();
@@ -685,20 +685,20 @@ auto_format(
     // Otherwise the line would be broken and when typing another non-white
     // next they are not joined back together.
     wasatend = (pos.col == ml_get_curline_len());
-    if (*old != NUL && !trailblank && wasatend)
+    만약 (*old != NUL && !trailblank && wasatend)
     {
-	int cc;
+	정수 cc;
 
 	dec_cursor();
 	cc = gchar_cursor();
-	if (!WHITECHAR(cc) && curwin->w_cursor.col > 0
+	만약 (!WHITECHAR(cc) && curwin->w_cursor.col > 0
 					  && has_format_option(FO_ONE_LETTER))
 	    dec_cursor();
 	cc = gchar_cursor();
-	if (WHITECHAR(cc))
+	만약 (WHITECHAR(cc))
 	{
 	    curwin->w_cursor = pos;
-	    return;
+	    반환;
 	}
 	curwin->w_cursor = pos;
     }
@@ -710,31 +710,31 @@ auto_format(
     // will be inserted adjacent to the space, keeping it protected from
     // being consumed at a line break.  auto_format() will then reformat
     // properly on the next keystroke.
-    if (*old != NUL && !trailblank && !wasatend && pos.col > 0
+    만약 (*old != NUL && !trailblank && !wasatend && pos.col > 0
 	    && (State & MODE_INSERT))
     {
 	char_u *line = ml_get_curline();
-	if (WHITECHAR(line[pos.col - 1]))
+	만약 (WHITECHAR(line[pos.col - 1]))
 	{
 	    curwin->w_cursor = pos;
-	    return;
+	    반환;
 	}
     }
 
     // With the 'c' flag in 'formatoptions' and 't' missing: only format
     // comments.
-    if (has_format_option(FO_WRAP_COMS) && !has_format_option(FO_WRAP)
+    만약 (has_format_option(FO_WRAP_COMS) && !has_format_option(FO_WRAP)
 				&& get_leader_len(old, NULL, FALSE, TRUE) == 0)
-	return;
+	반환;
 
     // May start formatting in a previous line, so that after "x" a word is
     // moved to the previous line if it fits there now.  Only when this is not
     // the start of a paragraph.
-    if (prev_line && !paragraph_start(curwin->w_cursor.lnum))
+    만약 (prev_line && !paragraph_start(curwin->w_cursor.lnum))
     {
 	--curwin->w_cursor.lnum;
-	if (u_save_cursor() == FAIL)
-	    return;
+	만약 (u_save_cursor() == FAIL)
+	    반환;
     }
 
     // Do the formatting and restore the cursor position.  "saved_cursor" will
@@ -744,35 +744,35 @@ auto_format(
     curwin->w_cursor = saved_cursor;
     saved_cursor.lnum = 0;
 
-    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+    만약 (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
     {
 	// "cannot happen"
 	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
 	coladvance((colnr_T)MAXCOL);
     }
-    else
+    아니면
 	check_cursor_col();
 
     // Insert mode: If the cursor is now after the end of the line while it
     // previously wasn't, the line was broken.  Because of the rule above we
     // need to add a space when 'w' is in 'formatoptions' to keep a paragraph
     // formatted.
-    if (!wasatend && has_format_option(FO_WHITE_PAR))
+    만약 (!wasatend && has_format_option(FO_WHITE_PAR))
     {
 	char_u	*new = ml_get_curline();
 	colnr_T	len = ml_get_curline_len();
-	if (curwin->w_cursor.col == len)
+	만약 (curwin->w_cursor.col == len)
 	{
 	    char_u *pnew = vim_strnsave(new, len + 2);
-	    if (pnew == NULL)
-		return;
+	    만약 (pnew == NULL)
+		반환;
 	    pnew[len] = ' ';
 	    pnew[len + 1] = NUL;
 	    ml_replace(curwin->w_cursor.lnum, pnew, FALSE);
 	    // remove the space later
 	    did_add_space = TRUE;
 	}
-	else
+	아니면
 	    // may remove added space
 	    check_auto_format(FALSE);
     }
@@ -787,27 +787,27 @@ auto_format(
  */
     void
 check_auto_format(
-    int		end_insert)	    // TRUE when ending Insert mode
+    정수		end_insert)	    // TRUE when ending Insert mode
 {
-    int		c = ' ';
-    int		cc;
+    정수		c = ' ';
+    정수		cc;
 
-    if (!did_add_space)
-	return;
+    만약 (!did_add_space)
+	반환;
 
     cc = gchar_cursor();
-    if (!WHITECHAR(cc))
+    만약 (!WHITECHAR(cc))
 	// Somehow the space was removed already.
 	did_add_space = FALSE;
-    else
+    아니면
     {
-	if (!end_insert)
+	만약 (!end_insert)
 	{
 	    inc_cursor();
 	    c = gchar_cursor();
 	    dec_cursor();
 	}
-	if (c != NUL)
+	만약 (c != NUL)
 	{
 	    // The space is no longer at the end of the line, delete it.
 	    del_char(FALSE);
@@ -823,39 +823,39 @@ check_auto_format(
  *	if invalid value, use 0.
  *	Set default to window width (maximum 79) for "gq" operator.
  */
-    int
+    정수
 comp_textwidth(
-    int		ff)	// force formatting (for "gq" command)
+    정수		ff)	// force formatting (for "gq" command)
 {
-    int		textwidth;
+    정수		textwidth;
 
     textwidth = curbuf->b_p_tw;
-    if (textwidth == 0 && curbuf->b_p_wm)
+    만약 (textwidth == 0 && curbuf->b_p_wm)
     {
 	// The width is the window width minus 'wrapmargin' minus all the
 	// things that add to the margin.
 	textwidth = curwin->w_width - curbuf->b_p_wm;
-	if (curbuf == cmdwin_buf)
+	만약 (curbuf == cmdwin_buf)
 	    textwidth -= 1;
 #ifdef FEAT_FOLDING
 	textwidth -= curwin->w_p_fdc;
 #endif
 #ifdef FEAT_SIGNS
-	if (signcolumn_on(curwin))
+	만약 (signcolumn_on(curwin))
 	    textwidth -= 1;
 #endif
-	if (curwin->w_p_nu || curwin->w_p_rnu)
+	만약 (curwin->w_p_nu || curwin->w_p_rnu)
 	    textwidth -= 8;
     }
-    if (textwidth < 0)
+    만약 (textwidth < 0)
 	textwidth = 0;
-    if (ff && textwidth == 0)
+    만약 (ff && textwidth == 0)
     {
 	textwidth = curwin->w_width - 1;
-	if (textwidth > 79)
+	만약 (textwidth > 79)
 	    textwidth = 79;
     }
-    return textwidth;
+    반환 textwidth;
 }
 
 /*
@@ -864,7 +864,7 @@ comp_textwidth(
     void
 op_format(
     oparg_T	*oap,
-    int		keep_cursor)		// keep cursor on same text char
+    정수		keep_cursor)		// keep cursor on same text char
 {
     long	old_line_count = curbuf->b_ml.ml_line_count;
 
@@ -872,22 +872,22 @@ op_format(
     // can put it back there.
     curwin->w_cursor = oap->cursor_start;
 
-    if (u_save((linenr_T)(oap->start.lnum - 1),
+    만약 (u_save((linenr_T)(oap->start.lnum - 1),
 				       (linenr_T)(oap->end.lnum + 1)) == FAIL)
-	return;
+	반환;
     curwin->w_cursor = oap->start;
 
-    if (oap->is_VIsual)
+    만약 (oap->is_VIsual)
 	// When there is no change: need to remove the Visual selection
 	redraw_curbuf_later(UPD_INVERTED);
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    만약 ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	// Set '[ mark at the start of the formatted area
 	curbuf->b_op_start = oap->start;
 
     // For "gw" remember the cursor position and put it back below (adjusted
     // for joined and split lines).
-    if (keep_cursor)
+    만약 (keep_cursor)
 	saved_cursor = oap->cursor_start;
 
     format_lines(oap->line_count, keep_cursor);
@@ -895,17 +895,17 @@ op_format(
     // Leave the cursor at the first non-blank of the last formatted line.
     // If the cursor was moved one line back (e.g. with "Q}") go to the next
     // line, so "." will do the next lines.
-    if (oap->end_adjusted && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+    만약 (oap->end_adjusted && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
 	++curwin->w_cursor.lnum;
     beginline(BL_WHITE | BL_FIX);
     old_line_count = curbuf->b_ml.ml_line_count - old_line_count;
     msgmore(old_line_count);
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    만약 ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	// put '] mark on the end of the formatted area
 	curbuf->b_op_end = curwin->w_cursor;
 
-    if (keep_cursor)
+    만약 (keep_cursor)
     {
 	curwin->w_cursor = saved_cursor;
 	saved_cursor.lnum = 0;
@@ -914,51 +914,51 @@ op_format(
 	check_cursor();
     }
 
-    if (oap->is_VIsual)
+    만약 (oap->is_VIsual)
     {
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_old_cursor_lnum != 0)
+	    만약 (wp->w_old_cursor_lnum != 0)
 	    {
 		// When lines have been inserted or deleted, adjust the end of
 		// the Visual area to be redrawn.
-		if (wp->w_old_cursor_lnum > wp->w_old_visual_lnum)
+		만약 (wp->w_old_cursor_lnum > wp->w_old_visual_lnum)
 		    wp->w_old_cursor_lnum += old_line_count;
-		else
+		아니면
 		    wp->w_old_visual_lnum += old_line_count;
 	    }
 	}
     }
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * Implementation of the format operator 'gq' for when using 'formatexpr'.
  */
     void
 op_formatexpr(oparg_T *oap)
 {
-    if (oap->is_VIsual)
+    만약 (oap->is_VIsual)
 	// When there is no change: need to remove the Visual selection
 	redraw_curbuf_later(UPD_INVERTED);
 
-    if (fex_format(oap->start.lnum, oap->line_count, NUL) != 0)
+    만약 (fex_format(oap->start.lnum, oap->line_count, NUL) != 0)
 	// As documented: when 'formatexpr' returns non-zero fall back to
 	// internal formatting.
 	op_format(oap, FALSE);
 }
 
-    int
+    정수
 fex_format(
     linenr_T	lnum,
     long	count,
-    int		c)	// character to be inserted
+    정수		c)	// character to be inserted
 {
-    int		use_sandbox = was_set_insecurely(curwin,
+    정수		use_sandbox = was_set_insecurely(curwin,
 					    (char_u *)"formatexpr", OPT_LOCAL);
-    int		r;
+    정수		r;
     char_u	*fex;
     sctx_T	save_sctx = current_sctx;
 
@@ -970,22 +970,22 @@ fex_format(
 
     // Make a copy, the option could be changed while calling it.
     fex = vim_strsave(curbuf->b_p_fex);
-    if (fex == NULL)
-	return 0;
+    만약 (fex == NULL)
+	반환 0;
     current_sctx = curbuf->b_p_script_ctx[BV_FEX];
 
     // Evaluate the function.
-    if (use_sandbox)
+    만약 (use_sandbox)
 	++sandbox;
-    r = (int)eval_to_number(fex, TRUE);
-    if (use_sandbox)
+    r = (정수)eval_to_number(fex, TRUE);
+    만약 (use_sandbox)
 	--sandbox;
 
     set_vim_var_string(VV_CHAR, NULL, -1);
     vim_free(fex);
     current_sctx = save_sctx;
 
-    return r;
+    반환 r;
 }
 #endif
 
@@ -998,33 +998,33 @@ fex_format(
     void
 format_lines(
     linenr_T	line_count,
-    int		avoid_fex)		// don't use 'formatexpr'
+    정수		avoid_fex)		// don't use 'formatexpr'
 {
-    int		max_len;
-    int		is_not_par;		// current line not part of parag.
-    int		next_is_not_par;	// next line not part of paragraph
-    int		is_end_par;		// at end of paragraph
-    int		prev_is_end_par = FALSE;// prev. line not part of parag.
-    int		next_is_start_par = FALSE;
-    int		leader_len = 0;		// leader len of current line
-    int		next_leader_len;	// leader len of next line
+    정수		max_len;
+    정수		is_not_par;		// current line not part of parag.
+    정수		next_is_not_par;	// next line not part of paragraph
+    정수		is_end_par;		// at end of paragraph
+    정수		prev_is_end_par = FALSE;// prev. line not part of parag.
+    정수		next_is_start_par = FALSE;
+    정수		leader_len = 0;		// leader len of current line
+    정수		next_leader_len;	// leader len of next line
     char_u	*leader_flags = NULL;	// flags for leader of current line
     char_u	*next_leader_flags = NULL; // flags for leader of next line
-    int		do_comments;		// format comments
-    int		do_comments_list = 0;	// format comments with 'n' or '2'
-    int		advance = TRUE;
-    int		second_indent = -1;	// indent for second line (comment
+    정수		do_comments;		// format comments
+    정수		do_comments_list = 0;	// format comments with 'n' or '2'
+    정수		advance = TRUE;
+    정수		second_indent = -1;	// indent for second line (comment
 					// aware)
-    int		do_second_indent;
-    int		do_number_indent;
-    int		do_trail_white;
-    int		first_par_line = TRUE;
-    int		smd_save;
+    정수		do_second_indent;
+    정수		do_number_indent;
+    정수		do_trail_white;
+    정수		first_par_line = TRUE;
+    정수		smd_save;
     long	count;
-    int		need_set_indent = TRUE;	// set indent of next paragraph
+    정수		need_set_indent = TRUE;	// set indent of next paragraph
     linenr_T	first_line = curwin->w_cursor.lnum;
-    int		force_format = FALSE;
-    int		old_State = State;
+    정수		force_format = FALSE;
+    정수		old_State = State;
 
     // length of a line to force formatting: 3 * 'tw'
     max_len = comp_textwidth(TRUE) * 3;
@@ -1036,22 +1036,22 @@ format_lines(
     do_trail_white = has_format_option(FO_WHITE_PAR);
 
     // Get info about the previous and current line.
-    if (curwin->w_cursor.lnum > 1)
+    만약 (curwin->w_cursor.lnum > 1)
 	is_not_par = fmt_check_par(curwin->w_cursor.lnum - 1
 				, &leader_len, &leader_flags, do_comments);
-    else
+    아니면
 	is_not_par = TRUE;
     next_is_not_par = fmt_check_par(curwin->w_cursor.lnum
 			  , &next_leader_len, &next_leader_flags, do_comments);
     is_end_par = (is_not_par || next_is_not_par);
-    if (!is_end_par && do_trail_white)
+    만약 (!is_end_par && do_trail_white)
 	is_end_par = !ends_in_white(curwin->w_cursor.lnum - 1);
 
     curwin->w_cursor.lnum--;
-    for (count = line_count; count != 0 && !got_int; --count)
+    위해 (count = line_count; count != 0 && !got_int; --count)
     {
 	// Advance to next paragraph.
-	if (advance)
+	만약 (advance)
 	{
 	    curwin->w_cursor.lnum++;
 	    prev_is_end_par = is_end_par;
@@ -1061,63 +1061,63 @@ format_lines(
 	}
 
 	// The last line to be formatted.
-	if (count == 1 || curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
+	만약 (count == 1 || curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
 	{
 	    next_is_not_par = TRUE;
 	    next_leader_len = 0;
 	    next_leader_flags = NULL;
 	}
-	else
+	아니면
 	{
 	    next_is_not_par = fmt_check_par(curwin->w_cursor.lnum + 1
 			  , &next_leader_len, &next_leader_flags, do_comments);
-	    if (do_number_indent)
+	    만약 (do_number_indent)
 		next_is_start_par =
 			   (get_number_indent(curwin->w_cursor.lnum + 1) > 0);
 	}
 	advance = TRUE;
 	is_end_par = (is_not_par || next_is_not_par || next_is_start_par);
-	if (!is_end_par && do_trail_white)
+	만약 (!is_end_par && do_trail_white)
 	    is_end_par = !ends_in_white(curwin->w_cursor.lnum);
 
 	// Skip lines that are not in a paragraph.
-	if (is_not_par)
+	만약 (is_not_par)
 	{
-	    if (line_count < 0)
+	    만약 (line_count < 0)
 		break;
 	}
-	else
+	아니면
 	{
 	    // For the first line of a paragraph, check indent of second line.
 	    // Don't do this for comments and empty lines.
-	    if (first_par_line
+	    만약 (first_par_line
 		    && (do_second_indent || do_number_indent)
 		    && prev_is_end_par
 		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
 	    {
-		if (do_second_indent && !LINEEMPTY(curwin->w_cursor.lnum + 1))
+		만약 (do_second_indent && !LINEEMPTY(curwin->w_cursor.lnum + 1))
 		{
-		    if (leader_len == 0 && next_leader_len == 0)
+		    만약 (leader_len == 0 && next_leader_len == 0)
 		    {
 			// no comment found
 			second_indent =
 				   get_indent_lnum(curwin->w_cursor.lnum + 1);
 		    }
-		    else
+		    아니면
 		    {
 			second_indent = next_leader_len;
 			do_comments_list = 1;
 		    }
 		}
-		else if (do_number_indent)
+		아니면 만약 (do_number_indent)
 		{
-		    if (leader_len == 0 && next_leader_len == 0)
+		    만약 (leader_len == 0 && next_leader_len == 0)
 		    {
 			// no comment found
 			second_indent =
 				     get_number_indent(curwin->w_cursor.lnum);
 		    }
-		    else
+		    아니면
 		    {
 			// get_number_indent() is now "comment aware"...
 			second_indent =
@@ -1128,7 +1128,7 @@ format_lines(
 	    }
 
 	    // When the comment leader changes, it's the end of the paragraph.
-	    if (curwin->w_cursor.lnum >= curbuf->b_ml.ml_line_count
+	    만약 (curwin->w_cursor.lnum >= curbuf->b_ml.ml_line_count
 		    || !same_leader(curwin->w_cursor.lnum,
 					leader_len, leader_flags,
 					   next_leader_len, next_leader_flags))
@@ -1136,7 +1136,7 @@ format_lines(
 		// Special case: If the next line starts with a line comment
 		// and this line has a line comment after some text, the
 		// paragraph doesn't really end.
-		if (next_leader_flags == NULL
+		만약 (next_leader_flags == NULL
 			|| STRNCMP(next_leader_flags, "://", 3) != 0
 			|| check_linecomment(ml_get_curline()) == MAXCOL)
 		is_end_par = TRUE;
@@ -1144,23 +1144,23 @@ format_lines(
 
 	    // If we have got to the end of a paragraph, or the line is
 	    // getting long, format it.
-	    if (is_end_par || force_format)
+	    만약 (is_end_par || force_format)
 	    {
-		if (need_set_indent)
+		만약 (need_set_indent)
 		{
-		    int		indent = 0; // amount of indent needed
+		    정수		indent = 0; // amount of indent needed
 
 		    // Replace indent in first line of a paragraph with minimal
 		    // number of tabs and spaces, according to current options.
 		    // For the very first formatted line keep the current
 		    // indent.
-		    if (curwin->w_cursor.lnum == first_line)
+		    만약 (curwin->w_cursor.lnum == first_line)
 			indent = get_indent();
-		    else if (curbuf->b_p_lisp)
+		    아니면 만약 (curbuf->b_p_lisp)
 			indent = get_lisp_indent();
-		    else
+		    아니면
 		    {
-			if (cindent_on())
+			만약 (cindent_on())
 			{
 			    indent =
 #ifdef FEAT_EVAL
@@ -1168,7 +1168,7 @@ format_lines(
 #endif
 				 get_c_indent();
 			}
-			else
+			아니면
 			    indent = get_indent();
 		    }
 		    (void)set_indent(indent, SIN_CHANGED);
@@ -1177,7 +1177,7 @@ format_lines(
 		// put cursor on last non-space
 		State = MODE_NORMAL;	// don't go past end-of-line
 		coladvance((colnr_T)MAXCOL);
-		while (curwin->w_cursor.col && vim_isspace(gchar_cursor()))
+		동안 (curwin->w_cursor.col && vim_isspace(gchar_cursor()))
 		    dec_cursor();
 
 		// do the formatting, without 'showmode'
@@ -1205,11 +1205,11 @@ format_lines(
 		second_indent = -1;
 		// at end of par.: need to set indent of next par.
 		need_set_indent = is_end_par;
-		if (is_end_par)
+		만약 (is_end_par)
 		{
 		    // When called with a negative line count, break at the
 		    // end of the paragraph.
-		    if (line_count < 0)
+		    만약 (line_count < 0)
 			break;
 		    first_par_line = TRUE;
 		}
@@ -1218,24 +1218,24 @@ format_lines(
 
 	    // When still in same paragraph, join the lines together.  But
 	    // first delete the leader from the second line.
-	    if (!is_end_par)
+	    만약 (!is_end_par)
 	    {
 		advance = FALSE;
 		curwin->w_cursor.lnum++;
 		curwin->w_cursor.col = 0;
-		if (line_count < 0 && u_save_cursor() == FAIL)
+		만약 (line_count < 0 && u_save_cursor() == FAIL)
 		    break;
-		if (next_leader_len > 0)
+		만약 (next_leader_len > 0)
 		{
 		    (void)del_bytes((long)next_leader_len, FALSE, FALSE);
 		    mark_col_adjust(curwin->w_cursor.lnum, (colnr_T)0, 0L,
 						    (long)-next_leader_len, 0);
 		}
-		else if (second_indent > 0)  // the "leader" for FO_Q_SECOND
+		아니면 만약 (second_indent > 0)  // the "leader" for FO_Q_SECOND
 		{
-		    int indent = getwhitecols_curline();
+		    정수 indent = getwhitecols_curline();
 
-		    if (indent > 0)
+		    만약 (indent > 0)
 		    {
 			(void)del_bytes(indent, FALSE, FALSE);
 			mark_col_adjust(curwin->w_cursor.lnum,
@@ -1243,16 +1243,16 @@ format_lines(
 		    }
 		}
 		curwin->w_cursor.lnum--;
-		if (do_join(2, TRUE, FALSE, FALSE, FALSE) == FAIL)
+		만약 (do_join(2, TRUE, FALSE, FALSE, FALSE) == FAIL)
 		{
 		    beep_flush();
 		    break;
 		}
 		first_par_line = FALSE;
 		// If the line is getting long, format it next time
-		if (ml_get_curline_len() > max_len)
+		만약 (ml_get_curline_len() > max_len)
 		    force_format = TRUE;
-		else
+		아니면
 		    force_format = FALSE;
 	    }
 	}

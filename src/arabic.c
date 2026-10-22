@@ -30,7 +30,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_ARABIC)
+#만약 defined(FEAT_ARABIC)
 
 // Unicode values for Arabic characters.
 #define a_HAMZA				0x0621
@@ -168,33 +168,33 @@ static struct achar {
  * Returns NULL if not found.
  */
     static struct achar *
-find_achar(int c)
+find_achar(정수 c)
 {
-    int h, m, l;
+    정수 h, m, l;
 
     // using binary search to find c
     h = ARRAY_LENGTH(achars);
     l = 0;
-    while (l < h)
+    동안 (l < h)
     {
 	m = (h + l) / 2;
-	if (achars[m].c == (unsigned)c)
-	    return &achars[m];
-	if ((unsigned)c < achars[m].c)
+	만약 (achars[m].c == (unsigned)c)
+	    반환 &achars[m];
+	만약 ((unsigned)c < achars[m].c)
 	    h = m;
-	else
+	아니면
 	    l = m + 1;
     }
-    return NULL;
+    반환 NULL;
 }
 
 /*
  * Change shape - from Combination (2 char) to an Isolated
  */
-    static int
-chg_c_laa2i(int hid_c)
+    static 정수
+chg_c_laa2i(정수 hid_c)
 {
-    int tempc;
+    정수 tempc;
 
     switch (hid_c)
     {
@@ -214,16 +214,16 @@ chg_c_laa2i(int hid_c)
 	    tempc = 0;
     }
 
-    return tempc;
+    반환 tempc;
 }
 
 /*
  * Change shape - from Combination-Isolated to Final
  */
-    static int
-chg_c_laa2f(int hid_c)
+    static 정수
+chg_c_laa2f(정수 hid_c)
 {
-    int tempc;
+    정수 tempc;
 
     switch (hid_c)
     {
@@ -243,77 +243,77 @@ chg_c_laa2f(int hid_c)
 	    tempc = 0;
     }
 
-    return tempc;
+    반환 tempc;
 }
 
 /*
  * Returns whether it is possible to join the given letters
  */
-    static int
-can_join(int c1, int c2)
+    static 정수
+can_join(정수 c1, 정수 c2)
 {
     struct achar *a1 = find_achar(c1);
     struct achar *a2 = find_achar(c2);
 
-    return a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
+    반환 a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
 }
 
 /*
  * Check whether we are dealing with a character that could be regarded as an
  * Arabic combining character, need to check the character before this.
  */
-    int
-arabic_maycombine(int two)
+    정수
+arabic_maycombine(정수 two)
 {
-    if (p_arshape && !p_tbidi)
-	return (two == a_ALEF_MADDA
+    만약 (p_arshape && !p_tbidi)
+	반환 (two == a_ALEF_MADDA
 		    || two == a_ALEF_HAMZA_ABOVE
 		    || two == a_ALEF_HAMZA_BELOW
 		    || two == a_ALEF);
-    return FALSE;
+    반환 FALSE;
 }
 
 /*
  * Check whether we are dealing with Arabic combining characters.
  * Note: these are NOT really composing characters!
  */
-    int
+    정수
 arabic_combine(
-    int		one,	    // first character
-    int		two)	    // character just after "one"
+    정수		one,	    // first character
+    정수		two)	    // character just after "one"
 {
-    if (one == a_LAM)
-	return arabic_maycombine(two);
-    return FALSE;
+    만약 (one == a_LAM)
+	반환 arabic_maycombine(two);
+    반환 FALSE;
 }
 
 /*
  * A_is_iso returns true if 'c' is an Arabic ISO-8859-6 character
  *		(alphabet/number/punctuation)
  */
-    static int
-A_is_iso(int c)
+    static 정수
+A_is_iso(정수 c)
 {
-    return find_achar(c) != NULL;
+    반환 find_achar(c) != NULL;
 }
 
 /*
  * A_is_ok returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  */
-    static int
-A_is_ok(int c)
+    static 정수
+A_is_ok(정수 c)
 {
-    return (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
+    반환 (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
 }
 
 /*
  * A_is_valid returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  *		with some exceptions/exclusions
  */
-    static int
-A_is_valid(int c)
+    static 정수
+A_is_valid(정수 c)
 {
-    return (A_is_ok(c) && c != a_HAMZA);
+    반환 (A_is_ok(c) && c != a_HAMZA);
 }
 
 /*
@@ -325,63 +325,63 @@ A_is_valid(int c)
  *		     (not shaped)
  * in:     "next_c"  is the next character (not shaped).
  */
-    int
+    정수
 arabic_shape(
-    int		c,
-    int		*ccp,
-    int		*c1p,
-    int		prev_c,
-    int		prev_c1,
-    int		next_c)
+    정수		c,
+    정수		*ccp,
+    정수		*c1p,
+    정수		prev_c,
+    정수		prev_c1,
+    정수		next_c)
 {
-    int		curr_c;
-    int		curr_laa;
-    int		prev_laa;
+    정수		curr_c;
+    정수		curr_laa;
+    정수		prev_laa;
 
     // Deal only with Arabic characters, pass back all others
-    if (!A_is_ok(c))
-	return c;
+    만약 (!A_is_ok(c))
+	반환 c;
 
     curr_laa = arabic_combine(c, *c1p);
     prev_laa = arabic_combine(prev_c, prev_c1);
 
-    if (curr_laa)
+    만약 (curr_laa)
     {
-	if (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
+	만약 (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
 	    curr_c = chg_c_laa2f(*c1p);
-	else
+	아니면
 	    curr_c = chg_c_laa2i(*c1p);
 
 	// Remove the composing character
 	*c1p = 0;
     }
-    else
+    아니면
     {
 	struct achar *curr_a = find_achar(c);
-	int backward_combine = !prev_laa && can_join(prev_c, c);
-	int forward_combine = can_join(c, next_c);
+	정수 backward_combine = !prev_laa && can_join(prev_c, c);
+	정수 forward_combine = can_join(c, next_c);
 
-	if (backward_combine)
+	만약 (backward_combine)
 	{
-	    if (forward_combine)
+	    만약 (forward_combine)
 		curr_c = curr_a->medial;
-	    else
+	    아니면
 		curr_c = curr_a->final;
 	}
-	else
+	아니면
 	{
-	    if (forward_combine)
+	    만약 (forward_combine)
 		curr_c = curr_a->initial;
-	    else
+	    아니면
 		curr_c = curr_a->isolated;
 	}
     }
 
     // Character missing from the table means using original character.
-    if (curr_c == NUL)
+    만약 (curr_c == NUL)
 	curr_c = c;
 
-    if (curr_c != c && ccp != NULL)
+    만약 (curr_c != c && ccp != NULL)
     {
 	char_u buf[MB_MAXBYTES + 1];
 
@@ -391,6 +391,6 @@ arabic_shape(
     }
 
     // Return the shaped character
-    return curr_c;
+    반환 curr_c;
 }
 #endif // FEAT_ARABIC

@@ -36,16 +36,16 @@
  * definition.  This function use these variables.  But we want function to
  * use dll_* variables.
  */
-# if RUBY_VERSION >= 24
+# 만약 RUBY_VERSION >= 24
 #  define USE_RUBY_INTEGER
 # endif
 
 # define rb_cFalseClass		(*dll_rb_cFalseClass)
 # define rb_cFixnum		(*dll_rb_cFixnum)
-# if defined(USE_RUBY_INTEGER)
+# 만약 defined(USE_RUBY_INTEGER)
 #  define rb_cInteger		(*dll_rb_cInteger)
 # endif
-# if RUBY_VERSION >= 20
+# 만약 RUBY_VERSION >= 20
 #  define rb_cFloat		(*dll_rb_cFloat)
 # endif
 # define rb_cNilClass		(*dll_rb_cNilClass)
@@ -66,39 +66,39 @@
 # define rb_num2long	rb_num2long_stub
 # define rb_int2big	rb_int2big_stub
 
-# if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+# 만약 RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
 // Ruby 1.9 defines a number of static functions which use rb_fix2int and
 // rb_num2int if VIM_SIZEOF_INT < VIM_SIZEOF_LONG (64bit)
 #  define rb_fix2int	rb_fix2int_stub
 #  define rb_num2int	rb_num2int_stub
 # endif
 
-# if RUBY_VERSION >= 20
+# 만약 RUBY_VERSION >= 20
 // USE_TYPEDDATA is not defined yet. We just check for 2.0.
 #  define rb_check_typeddata		rb_check_typeddata_stub
 # endif
 
-# if RUBY_VERSION == 21
+# 만약 RUBY_VERSION == 21
 // Ruby 2.1 adds new GC called RGenGC and RARRAY_PTR uses
 // rb_gc_writebarrier_unprotect_promoted if USE_RGENGC
 #  define rb_gc_writebarrier_unprotect_promoted	rb_gc_writebarrier_unprotect_promoted_stub
 # endif
 
-# if RUBY_VERSION >= 22
+# 만약 RUBY_VERSION >= 22
 #  define rb_gc_writebarrier_unprotect	rb_gc_writebarrier_unprotect_stub
 # endif
 
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
+# 만약 RUBY_VERSION >= 26 && RUBY_VERSION <= 32
 #  define rb_ary_detransient	rb_ary_detransient_stub
 # endif
 
-# if RUBY_VERSION >= 30
+# 만약 RUBY_VERSION >= 30
 #  define rb_check_type			rb_check_type_stub
 #  define rb_num2uint			rb_num2uint_stub
 #  define ruby_malloc_size_overflow	ruby_malloc_size_overflow_stub
 # endif
 
-# if RUBY_VERSION >= 31
+# 만약 RUBY_VERSION >= 31
 #  define rb_debug_rstring_null_ptr	rb_debug_rstring_null_ptr_stub
 #  define rb_unexpected_type		rb_unexpected_type_stub
 # endif
@@ -112,19 +112,19 @@
 # undef SIZEOF_TIME_T
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
+#만약 defined(__GNUC__) || defined(__clang__)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 
-#if defined(__clang__) && (__clang_major__ >= 21)
+#만약 defined(__clang__) && (__clang_major__ >= 21)
 # pragma GCC diagnostic ignored "-Wdefault-const-init-field-unsafe"
 #endif
 
 #include <ruby.h>
 #include <ruby/encoding.h>
 
-#if defined(__GNUC__) || defined(__clang__)
+#만약 defined(__GNUC__) || defined(__clang__)
 # pragma GCC diagnostic pop
 #endif
 
@@ -138,7 +138,7 @@
 #undef _
 
 // T_DATA defined both by Ruby and Mac header files, hack around it...
-#if defined(MACOS_X)
+#만약 defined(MACOS_X)
 # define __OPENTRANSPORT__
 # define __OPENTRANSPORTPROTOCOL__
 # define __OPENTRANSPORTPROVIDERS__
@@ -150,7 +150,7 @@
  * The old Data_XXX macro family was deprecated on Ruby 2.2.
  * Use TypedData_XXX if available.
  */
-#if defined(TypedData_Wrap_Struct) && (RUBY_VERSION >= 20)
+#만약 defined(TypedData_Wrap_Struct) && (RUBY_VERSION >= 20)
 # define USE_TYPEDDATA	1
 #endif
 
@@ -201,7 +201,7 @@
 #  define symbol_from_dll GetProcAddress
 #  define close_dll FreeLibrary
 #  define load_dll_error GetWin32Error
-# else
+# 아니면
 #  include <dlfcn.h>
 #  define HINSTANCE void*
 #  define RUBY_PROC void*
@@ -212,7 +212,7 @@
 # endif
 #endif
 
-static int ruby_initialized = 0;
+static 정수 ruby_initialized = 0;
 static void *ruby_stack_start;
 static VALUE objtbl;
 
@@ -222,23 +222,23 @@ static VALUE cVimWindow;
 static VALUE eDeletedBufferError;
 static VALUE eDeletedWindowError;
 
-static int ensure_ruby_initialized(void);
-static void error_print(int);
+static 정수 ensure_ruby_initialized(void);
+static void error_print(정수);
 static void ruby_io_init(void);
 static void ruby_vim_init(void);
-static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
+static 정수 ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 
-#if defined(__ia64) && !defined(ruby_init_stack)
+#만약 defined(__ia64) && !defined(ruby_init_stack)
 # define ruby_init_stack(addr) ruby_init_stack((addr), rb_ia64_bsp())
 #endif
 
-#if defined(DYNAMIC_RUBY)
+#만약 defined(DYNAMIC_RUBY)
 
 /*
  * Wrapper defines
  */
 // Ruby 2.7 actually expands the following symbols as macro.
-# if RUBY_VERSION >= 27
+# 만약 RUBY_VERSION >= 27
 #  undef rb_define_global_function
 #  undef rb_define_method
 #  undef rb_define_module_function
@@ -248,17 +248,17 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 # define rb_assoc_new			dll_rb_assoc_new
 # define rb_cObject			(*dll_rb_cObject)
 # define rb_class_new_instance		dll_rb_class_new_instance
-# if RUBY_VERSION < 30
+# 만약 RUBY_VERSION < 30
 #  define rb_check_type			dll_rb_check_type
 # endif
 # define rb_class_path			dll_rb_class_path
 # ifdef USE_TYPEDDATA
-#  if RUBY_VERSION >= 23
+#  만약 RUBY_VERSION >= 23
 #   define rb_data_typed_object_wrap	dll_rb_data_typed_object_wrap
-#  else
+#  아니면
 #   define rb_data_typed_object_alloc	dll_rb_data_typed_object_alloc
 #  endif
-# else
+# 아니면
 #  define rb_data_object_alloc		dll_rb_data_object_alloc
 # endif
 # define rb_define_class_under		dll_rb_define_class_under
@@ -276,9 +276,9 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 # define rb_eRuntimeError		(*dll_rb_eRuntimeError)
 # define rb_eStandardError		(*dll_rb_eStandardError)
 # define rb_eval_string_protect		dll_rb_eval_string_protect
-# if RUBY_VERSION >= 21
+# 만약 RUBY_VERSION >= 21
 #  define rb_funcallv			dll_rb_funcallv
-# else
+# 아니면
 #  define rb_funcall2			dll_rb_funcall2
 # endif
 # define rb_global_variable		dll_rb_global_variable
@@ -293,8 +293,8 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 # undef rb_intern
 # define rb_intern			dll_rb_intern
 
-# if VIM_SIZEOF_INT < VIM_SIZEOF_LONG // 64 bits only
-#  if RUBY_VERSION < 30
+# 만약 VIM_SIZEOF_INT < VIM_SIZEOF_LONG // 64 bits only
+#  만약 RUBY_VERSION < 30
 #   define rb_num2uint			dll_rb_num2uint
 #  endif
 # endif
@@ -303,7 +303,7 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 # define rb_lastline_set			dll_rb_lastline_set
 # define rb_protect			dll_rb_protect
 # define rb_load			dll_rb_load
-# if RUBY_VERSION < 20
+# 만약 RUBY_VERSION < 20
 #  define rb_num2ulong			dll_rb_num2ulong
 # endif
 # define rb_obj_alloc			dll_rb_obj_alloc
@@ -321,7 +321,7 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 // __builtin_constant_p extension.
 #  undef rb_str_new_cstr
 #  define rb_str_new_cstr		dll_rb_str_new_cstr
-# else
+# 아니면
 #  define rb_str_new2			dll_rb_str_new2
 # endif
 # define rb_string_value		dll_rb_string_value
@@ -338,7 +338,7 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 #  define rb_ia64_bsp			dll_rb_ia64_bsp
 #  undef ruby_init_stack
 #  define ruby_init_stack(addr)	dll_ruby_init_stack((addr), rb_ia64_bsp())
-# else
+# 아니면
 #  define ruby_init_stack		dll_ruby_init_stack
 # endif
 # define rb_errinfo			dll_rb_errinfo
@@ -364,10 +364,10 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 static VALUE (*dll_rb_assoc_new) (VALUE, VALUE);
 VALUE *dll_rb_cFalseClass;
 VALUE *dll_rb_cFixnum;
-# if defined(USE_RUBY_INTEGER)
+# 만약 defined(USE_RUBY_INTEGER)
 VALUE *dll_rb_cInteger;
 # endif
-# if RUBY_VERSION >= 20
+# 만약 RUBY_VERSION >= 20
 VALUE *dll_rb_cFloat;
 # endif
 VALUE *dll_rb_cNilClass;
@@ -375,31 +375,31 @@ static VALUE *dll_rb_cObject;
 VALUE *dll_rb_cString;
 VALUE *dll_rb_cSymbol;
 VALUE *dll_rb_cTrueClass;
-static VALUE (*dll_rb_class_new_instance) (int,VALUE*,VALUE);
-static void (*dll_rb_check_type) (VALUE,int);
+static VALUE (*dll_rb_class_new_instance) (정수,VALUE*,VALUE);
+static void (*dll_rb_check_type) (VALUE,정수);
 # ifdef USE_TYPEDDATA
 static void *(*dll_rb_check_typeddata) (VALUE,const rb_data_type_t *);
 # endif
 static VALUE (*dll_rb_class_path) (VALUE);
 # ifdef USE_TYPEDDATA
-#  if RUBY_VERSION >= 23
+#  만약 RUBY_VERSION >= 23
 static VALUE (*dll_rb_data_typed_object_wrap) (VALUE, void*, const rb_data_type_t *);
-#  else
+#  아니면
 static VALUE (*dll_rb_data_typed_object_alloc) (VALUE, void*, const rb_data_type_t *);
 #  endif
-# else
+# 아니면
 static VALUE (*dll_rb_data_object_alloc) (VALUE, void*, RUBY_DATA_FUNC, RUBY_DATA_FUNC);
 # endif
-# if RUBY_VERSION >= 31
+# 만약 RUBY_VERSION >= 31
 static void (*dll_rb_debug_rstring_null_ptr) (const char*);
 # endif
 static VALUE (*dll_rb_define_class_under) (VALUE, const char*, VALUE);
 static void (*dll_rb_define_const) (VALUE,const char*,VALUE);
-static void (*dll_rb_define_global_function) (const char*,VALUE(*)(int,VALUE*,VALUE),int);
-static void (*dll_rb_define_method) (VALUE,const char*,VALUE(*)(ANYARGS),int);
+static void (*dll_rb_define_global_function) (const char*,VALUE(*)(정수,VALUE*,VALUE),정수);
+static void (*dll_rb_define_method) (VALUE,const char*,VALUE(*)(ANYARGS),정수);
 static VALUE (*dll_rb_define_module) (const char*);
-static void (*dll_rb_define_module_function) (VALUE,const char*,VALUE(*)(VALUE,VALUE),int);
-static void (*dll_rb_define_singleton_method) (VALUE,const char*,VALUE(*)(ANYARGS),int);
+static void (*dll_rb_define_module_function) (VALUE,const char*,VALUE(*)(VALUE,VALUE),정수);
+static void (*dll_rb_define_singleton_method) (VALUE,const char*,VALUE(*)(ANYARGS),정수);
 static void (*dll_rb_define_virtual_variable) (const char*,VALUE(*)(ID,VALUE*),void(*)());
 static VALUE *dll_rb_stdout;
 static VALUE *dll_rb_stderr;
@@ -407,20 +407,20 @@ static VALUE *dll_rb_eArgError;
 static VALUE *dll_rb_eIndexError;
 static VALUE *dll_rb_eRuntimeError;
 static VALUE *dll_rb_eStandardError;
-static VALUE (*dll_rb_eval_string_protect) (const char*, int*);
-# if RUBY_VERSION >= 21
-static VALUE (*dll_rb_funcallv) (VALUE, ID, int, const VALUE*);
-# else
-static VALUE (*dll_rb_funcall2) (VALUE, ID, int, const VALUE*);
+static VALUE (*dll_rb_eval_string_protect) (const char*, 정수*);
+# 만약 RUBY_VERSION >= 21
+static VALUE (*dll_rb_funcallv) (VALUE, ID, 정수, const VALUE*);
+# 아니면
+static VALUE (*dll_rb_funcall2) (VALUE, ID, 정수, const VALUE*);
 # endif
 static void (*dll_rb_global_variable) (VALUE*);
 static VALUE (*dll_rb_hash_aset) (VALUE, VALUE, VALUE);
-static VALUE (*dll_rb_hash_foreach) (VALUE, int (*)(VALUE, VALUE, VALUE), VALUE);
+static VALUE (*dll_rb_hash_foreach) (VALUE, 정수 (*)(VALUE, VALUE, VALUE), VALUE);
 static VALUE (*dll_rb_hash_new) (void);
 static VALUE (*dll_rb_inspect) (VALUE);
 static VALUE (*dll_rb_int2inum) (long);
 static ID (*dll_rb_intern) (const char*);
-# if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+# 만약 RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
 static long (*dll_rb_fix2int) (VALUE);
 static long (*dll_rb_num2int) (VALUE);
 static unsigned long (*dll_rb_num2uint) (VALUE);
@@ -428,8 +428,8 @@ static unsigned long (*dll_rb_num2uint) (VALUE);
 static double (*dll_rb_num2dbl) (VALUE);
 static VALUE (*dll_rb_lastline_get) (void);
 static void (*dll_rb_lastline_set) (VALUE);
-static VALUE (*dll_rb_protect) (VALUE (*)(VALUE), VALUE, int*);
-static void (*dll_rb_load) (VALUE, int);
+static VALUE (*dll_rb_protect) (VALUE (*)(VALUE), VALUE, 정수*);
+static void (*dll_rb_load) (VALUE, 정수);
 static long (*dll_rb_num2long) (VALUE);
 static unsigned long (*dll_rb_num2ulong) (VALUE);
 static VALUE (*dll_rb_obj_alloc) (VALUE);
@@ -443,21 +443,21 @@ static VALUE (*dll_rb_str_new) (const char*, long);
 # ifdef need_rb_str_new_cstr
 // Ruby may #define rb_str_new2 to use rb_str_new_cstr.
 static VALUE (*dll_rb_str_new_cstr) (const char*);
-# else
+# 아니면
 static VALUE (*dll_rb_str_new2) (const char*);
 # endif
 static VALUE (*dll_rb_errinfo) (void);
 static void (*dll_ruby_init) (void);
 static void (*dll_ruby_init_loadpath) (void);
 # ifdef MSWIN
-static void (*dll_ruby_sysinit) (int*, char***);
-static int (*dll_rb_w32_snprintf)(char*, size_t, const char*, ...);
+static void (*dll_ruby_sysinit) (정수*, char***);
+static 정수 (*dll_rb_w32_snprintf)(char*, size_t, const char*, ...);
 # endif
-# if RUBY_VERSION >= 31
+# 만약 RUBY_VERSION >= 31
 #  ifdef _MSC_VER
-static void (*dll_rb_unexpected_type) (VALUE, int);
-#  else
-NORETURN(static void (*dll_rb_unexpected_type) (VALUE, int));
+static void (*dll_rb_unexpected_type) (VALUE, 정수);
+#  아니면
+NORETURN(static void (*dll_rb_unexpected_type) (VALUE, 정수));
 #  endif
 # endif
 static char * (*dll_rb_string_value_ptr) (volatile VALUE*);
@@ -465,104 +465,104 @@ static VALUE (*dll_rb_float_new) (double);
 static VALUE (*dll_rb_ary_new) (void);
 static VALUE (*dll_rb_ary_new4) (long n, const VALUE *elts);
 static VALUE (*dll_rb_ary_push) (VALUE, VALUE);
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
+# 만약 RUBY_VERSION >= 26 && RUBY_VERSION <= 32
 static void (*dll_rb_ary_detransient) (VALUE);
 # endif
 # ifdef __ia64
 static void * (*dll_rb_ia64_bsp) (void);
 static void (*dll_ruby_init_stack)(VALUE*, void*);
-# else
+# 아니면
 static void (*dll_ruby_init_stack)(VALUE*);
 # endif
 static VALUE (*dll_rb_int2big)(SIGNED_VALUE);
 
 static void (*dll_ruby_script) (const char*);
-static int (*dll_rb_enc_find_index) (const char*);
+static 정수 (*dll_rb_enc_find_index) (const char*);
 static rb_encoding* (*dll_rb_enc_find) (const char*);
 static VALUE (*dll_rb_enc_str_new) (const char*, long, rb_encoding*);
 static VALUE (*dll_rb_sprintf) (const char*, ...);
 static VALUE (*dll_rb_require) (const char*);
-static void* (*dll_ruby_options)(int, char**);
+static void* (*dll_ruby_options)(정수, char**);
 
-# if defined(USE_RGENGC) && USE_RGENGC
-#  if RUBY_VERSION == 21
+# 만약 defined(USE_RGENGC) && USE_RGENGC
+#  만약 RUBY_VERSION == 21
 static void (*dll_rb_gc_writebarrier_unprotect_promoted)(VALUE);
-#  else
+#  아니면
 static void (*dll_rb_gc_writebarrier_unprotect)(VALUE obj);
 #  endif
 # endif
 
-# if RUBY_VERSION >= 30
+# 만약 RUBY_VERSION >= 30
 #  ifdef _MSC_VER
 static void (*dll_ruby_malloc_size_overflow)(size_t, size_t);
-#  else
+#  아니면
 NORETURN(static void (*dll_ruby_malloc_size_overflow)(size_t, size_t));
 #  endif
 # endif
 
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
+# 만약 RUBY_VERSION >= 26 && RUBY_VERSION <= 32
 void rb_ary_detransient_stub(VALUE x);
 # endif
 
 // Do not generate a prototype here, VALUE isn't always defined.
 # ifndef PROTO
-#  if RUBY_VERSION >= 22
+#  만약 RUBY_VERSION >= 22
     long
 rb_num2long_stub(VALUE x)
-#  else
+#  아니면
     SIGNED_VALUE
 rb_num2long_stub(VALUE x)
 #  endif
 {
-    return dll_rb_num2long(x);
+    반환 dll_rb_num2long(x);
 }
-#  if RUBY_VERSION >= 26
+#  만약 RUBY_VERSION >= 26
     VALUE
 rb_int2big_stub(intptr_t x)
-#  else
+#  아니면
     VALUE
 rb_int2big_stub(SIGNED_VALUE x)
 #  endif
 {
-    return dll_rb_int2big(x);
+    반환 dll_rb_int2big(x);
 }
-#  if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+#  만약 RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
     long
 rb_fix2int_stub(VALUE x)
 {
-    return dll_rb_fix2int(x);
+    반환 dll_rb_fix2int(x);
 }
     long
 rb_num2int_stub(VALUE x)
 {
-    return dll_rb_num2int(x);
+    반환 dll_rb_num2int(x);
 }
 #  endif
-#  if RUBY_VERSION >= 20
+#  만약 RUBY_VERSION >= 20
     VALUE
 rb_float_new_in_heap(double d)
 {
-    return dll_rb_float_new(d);
+    반환 dll_rb_float_new(d);
 }
-#   if RUBY_VERSION >= 22
+#   만약 RUBY_VERSION >= 22
     unsigned long
 rb_num2ulong(VALUE x)
-#   else
+#   아니면
     VALUE
 rb_num2ulong(VALUE x)
 #   endif
 {
-    return (long)RSHIFT((SIGNED_VALUE)(x),1);
+    반환 (long)RSHIFT((SIGNED_VALUE)(x),1);
 }
 #  endif
-#  if defined(USE_RGENGC) && USE_RGENGC
-#   if RUBY_VERSION == 21
+#  만약 defined(USE_RGENGC) && USE_RGENGC
+#   만약 RUBY_VERSION == 21
     void
 rb_gc_writebarrier_unprotect_promoted_stub(VALUE obj)
 {
     dll_rb_gc_writebarrier_unprotect_promoted(obj);
 }
-#   else
+#   아니면
     void
 rb_gc_writebarrier_unprotect_stub(VALUE obj)
 {
@@ -570,23 +570,23 @@ rb_gc_writebarrier_unprotect_stub(VALUE obj)
 }
 #   endif
 #  endif
-#  if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
+#  만약 RUBY_VERSION >= 26 && RUBY_VERSION <= 32
     void
 rb_ary_detransient_stub(VALUE x)
 {
     dll_rb_ary_detransient(x);
 }
 #  endif
-#  if RUBY_VERSION >= 30
+#  만약 RUBY_VERSION >= 30
     void
-rb_check_type_stub(VALUE obj, int t)
+rb_check_type_stub(VALUE obj, 정수 t)
 {
     dll_rb_check_type(obj, t);
 }
     unsigned long
 rb_num2uint_stub(VALUE x)
 {
-    return dll_rb_num2uint(x);
+    반환 dll_rb_num2uint(x);
 }
     void
 ruby_malloc_size_overflow_stub(size_t x, size_t y)
@@ -594,14 +594,14 @@ ruby_malloc_size_overflow_stub(size_t x, size_t y)
     dll_ruby_malloc_size_overflow(x, y);
 }
 #  endif
-#  if RUBY_VERSION >= 31
+#  만약 RUBY_VERSION >= 31
     void
 rb_debug_rstring_null_ptr_stub(const char *func)
 {
     dll_rb_debug_rstring_null_ptr(func);
 }
     void
-rb_unexpected_type_stub(VALUE self, int t)
+rb_unexpected_type_stub(VALUE self, 정수 t)
 {
     dll_rb_unexpected_type(self, t);
 }
@@ -609,7 +609,7 @@ rb_unexpected_type_stub(VALUE self, int t)
 #  ifdef USE_TYPEDDATA
 void *rb_check_typeddata_stub(VALUE obj, const rb_data_type_t *data_type)
 {
-    return dll_rb_check_typeddata(obj, data_type);
+    반환 dll_rb_check_typeddata(obj, data_type);
 }
 #  endif
 # endif // ifndef PROTO
@@ -627,12 +627,12 @@ static struct
 {
     {"rb_assoc_new", (RUBY_PROC*)&dll_rb_assoc_new},
     {"rb_cFalseClass", (RUBY_PROC*)&dll_rb_cFalseClass},
-# if defined(USE_RUBY_INTEGER)
+# 만약 defined(USE_RUBY_INTEGER)
     {"rb_cInteger", (RUBY_PROC*)&dll_rb_cInteger},
-# else
+# 아니면
     {"rb_cFixnum", (RUBY_PROC*)&dll_rb_cFixnum},
 # endif
-# if RUBY_VERSION >= 20
+# 만약 RUBY_VERSION >= 20
     {"rb_cFloat", (RUBY_PROC*)&dll_rb_cFloat},
 # endif
     {"rb_cNilClass", (RUBY_PROC*)&dll_rb_cNilClass},
@@ -647,15 +647,15 @@ static struct
 # endif
     {"rb_class_path", (RUBY_PROC*)&dll_rb_class_path},
 # ifdef USE_TYPEDDATA
-#  if RUBY_VERSION >= 23
+#  만약 RUBY_VERSION >= 23
     {"rb_data_typed_object_wrap", (RUBY_PROC*)&dll_rb_data_typed_object_wrap},
-#  else
+#  아니면
     {"rb_data_typed_object_alloc", (RUBY_PROC*)&dll_rb_data_typed_object_alloc},
 #  endif
-# else
+# 아니면
     {"rb_data_object_alloc", (RUBY_PROC*)&dll_rb_data_object_alloc},
 # endif
-# if RUBY_VERSION >= 31
+# 만약 RUBY_VERSION >= 31
     {"rb_debug_rstring_null_ptr", (RUBY_PROC*)&dll_rb_debug_rstring_null_ptr},
 # endif
     {"rb_define_class_under", (RUBY_PROC*)&dll_rb_define_class_under},
@@ -673,9 +673,9 @@ static struct
     {"rb_eRuntimeError", (RUBY_PROC*)&dll_rb_eRuntimeError},
     {"rb_eStandardError", (RUBY_PROC*)&dll_rb_eStandardError},
     {"rb_eval_string_protect", (RUBY_PROC*)&dll_rb_eval_string_protect},
-# if RUBY_VERSION >= 21
+# 만약 RUBY_VERSION >= 21
     {"rb_funcallv", (RUBY_PROC*)&dll_rb_funcallv},
-# else
+# 아니면
     {"rb_funcall2", (RUBY_PROC*)&dll_rb_funcall2},
 # endif
     {"rb_global_variable", (RUBY_PROC*)&dll_rb_global_variable},
@@ -685,7 +685,7 @@ static struct
     {"rb_inspect", (RUBY_PROC*)&dll_rb_inspect},
     {"rb_int2inum", (RUBY_PROC*)&dll_rb_int2inum},
     {"rb_intern", (RUBY_PROC*)&dll_rb_intern},
-# if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
+# 만약 RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
     {"rb_fix2int", (RUBY_PROC*)&dll_rb_fix2int},
     {"rb_num2int", (RUBY_PROC*)&dll_rb_num2int},
     {"rb_num2uint", (RUBY_PROC*)&dll_rb_num2uint},
@@ -707,7 +707,7 @@ static struct
     {"rb_str_new", (RUBY_PROC*)&dll_rb_str_new},
 # ifdef need_rb_str_new_cstr
     {"rb_str_new_cstr", (RUBY_PROC*)&dll_rb_str_new_cstr},
-# else
+# 아니면
     {"rb_str_new2", (RUBY_PROC*)&dll_rb_str_new2},
 # endif
     {"rb_errinfo", (RUBY_PROC*)&dll_rb_errinfo},
@@ -717,23 +717,23 @@ static struct
     {"ruby_sysinit", (RUBY_PROC*)&dll_ruby_sysinit},
     {"rb_w32_snprintf", (RUBY_PROC*)&dll_rb_w32_snprintf},
 # endif
-# if RUBY_VERSION >= 31
+# 만약 RUBY_VERSION >= 31
     {"rb_unexpected_type", (RUBY_PROC*)&dll_rb_unexpected_type},
 # endif
     {"rb_string_value_ptr", (RUBY_PROC*)&dll_rb_string_value_ptr},
-# if RUBY_VERSION >= 20
+# 만약 RUBY_VERSION >= 20
     {"rb_float_new_in_heap", (RUBY_PROC*)&dll_rb_float_new},
-# else
+# 아니면
     {"rb_float_new", (RUBY_PROC*)&dll_rb_float_new},
 # endif
     {"rb_ary_new", (RUBY_PROC*)&dll_rb_ary_new},
 # ifdef RB_ARY_NEW4_MACRO
     {"rb_ary_new_from_values", (RUBY_PROC*)&dll_rb_ary_new4},
-# else
+# 아니면
     {"rb_ary_new4", (RUBY_PROC*)&dll_rb_ary_new4},
 # endif
     {"rb_ary_push", (RUBY_PROC*)&dll_rb_ary_push},
-# if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
+# 만약 RUBY_VERSION >= 26 && RUBY_VERSION <= 32
     {"rb_ary_detransient", (RUBY_PROC*)&dll_rb_ary_detransient},
 # endif
     {"rb_int2big", (RUBY_PROC*)&dll_rb_int2big},
@@ -748,14 +748,14 @@ static struct
     {"rb_ia64_bsp", (RUBY_PROC*)&dll_rb_ia64_bsp},
 # endif
     {"ruby_init_stack", (RUBY_PROC*)&dll_ruby_init_stack},
-# if defined(USE_RGENGC) && USE_RGENGC
-#  if RUBY_VERSION == 21
+# 만약 defined(USE_RGENGC) && USE_RGENGC
+#  만약 RUBY_VERSION == 21
     {"rb_gc_writebarrier_unprotect_promoted", (RUBY_PROC*)&dll_rb_gc_writebarrier_unprotect_promoted},
-#  else
+#  아니면
     {"rb_gc_writebarrier_unprotect", (RUBY_PROC*)&dll_rb_gc_writebarrier_unprotect},
 #  endif
 # endif
-# if RUBY_VERSION >= 30
+# 만약 RUBY_VERSION >= 30
     {"ruby_malloc_size_overflow", (RUBY_PROC*)&dll_ruby_malloc_size_overflow},
 # endif
     {"", NULL},
@@ -766,44 +766,44 @@ static struct
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-ruby_runtime_link_init(char *libname, int verbose)
+    static 정수
+ruby_runtime_link_init(char *libname, 정수 verbose)
 {
-    int i;
+    정수 i;
 
-    if (hinstRuby)
-	return OK;
+    만약 (hinstRuby)
+	반환 OK;
     hinstRuby = load_dll(libname);
-    if (!hinstRuby)
+    만약 (!hinstRuby)
     {
-	if (verbose)
+	만약 (verbose)
 	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	반환 FAIL;
     }
 
-    for (i = 0; ruby_funcname_table[i].ptr; ++i)
+    위해 (i = 0; ruby_funcname_table[i].ptr; ++i)
     {
-	if (!(*ruby_funcname_table[i].ptr = symbol_from_dll(hinstRuby,
+	만약 (!(*ruby_funcname_table[i].ptr = symbol_from_dll(hinstRuby,
 			ruby_funcname_table[i].name)))
 	{
 	    close_dll(hinstRuby);
 	    hinstRuby = NULL;
-	    if (verbose)
+	    만약 (verbose)
 		semsg(_(e_could_not_load_library_function_str), ruby_funcname_table[i].name);
-	    return FAIL;
+	    반환 FAIL;
 	}
     }
-    return OK;
+    반환 OK;
 }
 
 /*
  * If ruby is enabled (there is installed ruby on Windows system) return TRUE,
  * else FALSE.
  */
-    int
-ruby_enabled(int verbose)
+    정수
+ruby_enabled(정수 verbose)
 {
-    return ruby_runtime_link_init((char *)p_rubydll, verbose) == OK;
+    반환 ruby_runtime_link_init((char *)p_rubydll, verbose) == OK;
 }
 #endif // defined(DYNAMIC_RUBY)
 
@@ -815,17 +815,17 @@ ruby_end(void)
     void
 ex_ruby(exarg_T *eap)
 {
-    int state;
+    정수 state;
     char *script = NULL;
 
     script = (char *)script_get(eap, eap->arg);
-    if (!eap->skip && ensure_ruby_initialized())
+    만약 (!eap->skip && ensure_ruby_initialized())
     {
-	if (script == NULL)
+	만약 (script == NULL)
 	    rb_eval_string_protect((char *)eap->arg, &state);
-	else
+	아니면
 	    rb_eval_string_protect(script, &state);
-	if (state)
+	만약 (state)
 	    error_print(state);
     }
     vim_free(script);
@@ -843,72 +843,72 @@ vim_str2rb_enc_str(const char *s)
     char_u *sval;
     rb_encoding *enc;
 
-    if (get_option_value((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
+    만약 (get_option_value((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
     {
 	enc = rb_enc_find((char *)sval);
 	vim_free(sval);
-	if (enc)
-	    return rb_enc_str_new(s, (long)strlen(s), enc);
+	만약 (enc)
+	    반환 rb_enc_str_new(s, (long)strlen(s), enc);
     }
-    return rb_str_new2(s);
+    반환 rb_str_new2(s);
 }
 
     static VALUE
-eval_enc_string_protect(const char *str, int *state)
+eval_enc_string_protect(const char *str, 정수 *state)
 {
     long lval;
     char_u *sval;
     rb_encoding *enc;
     VALUE v;
 
-    if (get_option_value((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
+    만약 (get_option_value((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
     {
 	enc = rb_enc_find((char *)sval);
 	vim_free(sval);
-	if (enc)
+	만약 (enc)
 	{
 	    v = rb_sprintf("#-*- coding:%s -*-\n%s", rb_enc_name(enc), str);
-	    return rb_eval_string_protect(StringValuePtr(v), state);
+	    반환 rb_eval_string_protect(StringValuePtr(v), state);
 	}
     }
-    return rb_eval_string_protect(str, state);
+    반환 rb_eval_string_protect(str, state);
 }
 
     void
 ex_rubydo(exarg_T *eap)
 {
-    int state;
+    정수 state;
     linenr_T i;
     buf_T   *was_curbuf = curbuf;
 
-    if (!ensure_ruby_initialized())
-	return;
+    만약 (!ensure_ruby_initialized())
+	반환;
 
-    if (u_save(eap->line1 - 1, eap->line2 + 1) != OK)
-	return;
-    for (i = eap->line1; i <= eap->line2; i++)
+    만약 (u_save(eap->line1 - 1, eap->line2 + 1) != OK)
+	반환;
+    위해 (i = eap->line1; i <= eap->line2; i++)
     {
 	VALUE line;
 
-	if (i > curbuf->b_ml.ml_line_count)
+	만약 (i > curbuf->b_ml.ml_line_count)
 	    break;
 	line = vim_str2rb_enc_str((char *)ml_get(i));
 	rb_lastline_set(line);
 	eval_enc_string_protect((char *) eap->arg, &state);
-	if (state)
+	만약 (state)
 	{
 	    error_print(state);
 	    break;
 	}
-	if (was_curbuf != curbuf || i > curbuf->b_ml.ml_line_count)
+	만약 (was_curbuf != curbuf || i > curbuf->b_ml.ml_line_count)
 	    break;
 	line = rb_lastline_get();
-	if (!NIL_P(line))
+	만약 (!NIL_P(line))
 	{
-	    if (TYPE(line) != T_STRING)
+	    만약 (TYPE(line) != T_STRING)
 	    {
 		emsg(_(e_dollar_must_be_an_instance_of_string));
-		return;
+		반환;
 	    }
 	    ml_replace(i, (char_u *) StringValuePtr(line), 1);
 	    changed();
@@ -925,28 +925,28 @@ ex_rubydo(exarg_T *eap)
 rb_load_wrap(VALUE file_to_load)
 {
     rb_load(file_to_load, 0);
-    return Qnil;
+    반환 Qnil;
 }
 
     void
 ex_rubyfile(exarg_T *eap)
 {
-    int state;
+    정수 state;
 
-    if (!ensure_ruby_initialized())
-	return;
+    만약 (!ensure_ruby_initialized())
+	반환;
 
     VALUE file_to_load = rb_str_new2((const char *)eap->arg);
     rb_protect(rb_load_wrap, file_to_load, &state);
-    if (state)
+    만약 (state)
 	error_print(state);
 }
 
     void
 ruby_buffer_free(buf_T *buf)
 {
-    if (buf->b_ruby_ref == NULL)
-	return;
+    만약 (buf->b_ruby_ref == NULL)
+	반환;
 
     rb_hash_aset(objtbl, rb_obj_id((VALUE) buf->b_ruby_ref), Qnil);
     RDATA(buf->b_ruby_ref)->data = NULL;
@@ -955,26 +955,26 @@ ruby_buffer_free(buf_T *buf)
     void
 ruby_window_free(win_T *win)
 {
-    if (win->w_ruby_ref == NULL)
-	return;
+    만약 (win->w_ruby_ref == NULL)
+	반환;
 
     rb_hash_aset(objtbl, rb_obj_id((VALUE) win->w_ruby_ref), Qnil);
     RDATA(win->w_ruby_ref)->data = NULL;
 }
 
-    static int
+    static 정수
 ensure_ruby_initialized(void)
 {
-    if (ruby_initialized)
-	return ruby_initialized;
+    만약 (ruby_initialized)
+	반환 ruby_initialized;
 
 #ifdef DYNAMIC_RUBY
-    if (ruby_enabled(TRUE))
+    만약 (ruby_enabled(TRUE))
 #endif
     {
 #ifdef MSWIN
 	// suggested by Ariya Mizutani
-	int argc = 1;
+	정수 argc = 1;
 	char *argv[] = {"gvim.exe"};
 	char **argvp = argv;
 	ruby_sysinit(&argc, &argvp);
@@ -984,7 +984,7 @@ ensure_ruby_initialized(void)
 	    ruby_init();
 	}
 	{
-	    int dummy_argc = 2;
+	    정수 dummy_argc = 2;
 	    char *dummy_argv[] = {"vim-ruby", "-e_=0"};
 	    ruby_options(dummy_argc, dummy_argv);
 	}
@@ -994,24 +994,24 @@ ensure_ruby_initialized(void)
 	ruby_initialized = 1;
     }
 #ifdef DYNAMIC_RUBY
-    else
+    아니면
     {
 	emsg(_(e_sorry_this_command_is_disabled_the_ruby_library_could_not_be_loaded));
-	return 0;
+	반환 0;
     }
 #endif
 
-    return ruby_initialized;
+    반환 ruby_initialized;
 }
 
     static void
-error_print(int state)
+error_print(정수 state)
 {
     VALUE error;
     VALUE eclass;
     VALUE einfo;
     VALUE bt;
-    int attr;
+    정수 attr;
     char buff[BUFSIZ];
     long i;
 
@@ -1047,11 +1047,11 @@ error_print(int state)
 	    error = rb_errinfo();
 	    eclass = CLASS_OF(error);
 	    einfo = rb_obj_as_string(error);
-	    if (eclass == rb_eRuntimeError && RSTRING_LEN(einfo) == 0)
+	    만약 (eclass == rb_eRuntimeError && RSTRING_LEN(einfo) == 0)
 	    {
 		emsg(_(e_unhandled_exception));
 	    }
-	    else
+	    아니면
 	    {
 		VALUE epath;
 		char *p;
@@ -1060,18 +1060,18 @@ error_print(int state)
 		vim_snprintf(buff, BUFSIZ, "%s: %s",
 			 RSTRING_PTR(epath), RSTRING_PTR(einfo));
 		p = strchr(buff, '\n');
-		if (p) *p = '\0';
+		만약 (p) *p = '\0';
 		emsg(buff);
 	    }
 
 	    attr = syn_name2attr((char_u *)"Error");
-#if RUBY_VERSION >= 21
+#만약 RUBY_VERSION >= 21
 	    bt = rb_funcallv(error, rb_intern("backtrace"), 0, 0);
-	    for (i = 0; i < RARRAY_LEN(bt); i++)
+	    위해 (i = 0; i < RARRAY_LEN(bt); i++)
 		msg_attr(RSTRING_PTR(RARRAY_AREF(bt, i)), attr);
-#else
+#아니면
 	    bt = rb_funcall2(error, rb_intern("backtrace"), 0, 0);
-	    for (i = 0; i < RARRAY_LEN(bt); i++)
+	    위해 (i = 0; i < RARRAY_LEN(bt); i++)
 		msg_attr(RSTRING_PTR(RARRAY_PTR(bt)[i]), attr);
 #endif
 	    break;
@@ -1088,20 +1088,20 @@ vim_message(VALUE self UNUSED, VALUE str)
     char *buff, *p;
 
     str = rb_obj_as_string(str);
-    if (RSTRING_LEN(str) > 0)
+    만약 (RSTRING_LEN(str) > 0)
     {
 	// Only do this when the string isn't empty, alloc(0) causes trouble.
 	buff = ALLOCA_N(char, RSTRING_LEN(str) + 1);
 	strcpy(buff, RSTRING_PTR(str));
 	p = strchr(buff, '\n');
-	if (p) *p = '\0';
+	만약 (p) *p = '\0';
 	msg(buff);
     }
-    else
+    아니면
     {
 	msg("");
     }
-    return Qnil;
+    반환 Qnil;
 }
 
     static VALUE
@@ -1109,14 +1109,14 @@ vim_set_option(VALUE self UNUSED, VALUE str)
 {
     do_set((char_u *)StringValuePtr(str), 0);
     update_screen(UPD_NOT_VALID);
-    return Qnil;
+    반환 Qnil;
 }
 
     static VALUE
 vim_command(VALUE self UNUSED, VALUE str)
 {
     do_cmdline_cmd((char_u *)StringValuePtr(str));
-    return Qnil;
+    반환 Qnil;
 }
 
 #ifdef FEAT_EVAL
@@ -1125,37 +1125,37 @@ vim_to_ruby(typval_T *tv)
 {
     VALUE result = Qnil;
 
-    if (tv->v_type == VAR_STRING)
+    만약 (tv->v_type == VAR_STRING)
     {
 	result = rb_str_new2(tv->vval.v_string == NULL
 					  ? "" : (char *)(tv->vval.v_string));
     }
-    else if (tv->v_type == VAR_NUMBER)
+    아니면 만약 (tv->v_type == VAR_NUMBER)
     {
 	result = INT2NUM(tv->vval.v_number);
     }
-    else if (tv->v_type == VAR_FLOAT)
+    아니면 만약 (tv->v_type == VAR_FLOAT)
     {
 	result = rb_float_new(tv->vval.v_float);
     }
-    else if (tv->v_type == VAR_LIST)
+    아니면 만약 (tv->v_type == VAR_LIST)
     {
 	list_T      *list = tv->vval.v_list;
 	listitem_T  *curr;
 
 	result = rb_ary_new();
 
-	if (list != NULL)
+	만약 (list != NULL)
 	{
 	    FOR_ALL_LIST_ITEMS(list, curr)
 		rb_ary_push(result, vim_to_ruby(&curr->li_tv));
 	}
     }
-    else if (tv->v_type == VAR_DICT)
+    아니면 만약 (tv->v_type == VAR_DICT)
     {
 	result = rb_hash_new();
 
-	if (tv->vval.v_dict != NULL)
+	만약 (tv->vval.v_dict != NULL)
 	{
 	    hashtab_T   *ht = &tv->vval.v_dict->dv_hashtab;
 	    long_u      todo = ht->ht_used;
@@ -1164,7 +1164,7 @@ vim_to_ruby(typval_T *tv)
 
 	    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		만약 (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
 
@@ -1175,21 +1175,21 @@ vim_to_ruby(typval_T *tv)
 	    }
 	}
     }
-    else if (tv->v_type == VAR_BOOL || tv->v_type == VAR_SPECIAL)
+    아니면 만약 (tv->v_type == VAR_BOOL || tv->v_type == VAR_SPECIAL)
     {
-	if (tv->vval.v_number == VVAL_TRUE)
+	만약 (tv->vval.v_number == VVAL_TRUE)
 	    result = Qtrue;
-	else if (tv->vval.v_number == VVAL_FALSE)
+	아니면 만약 (tv->vval.v_number == VVAL_FALSE)
 	    result = Qfalse;
     }
-    else if (tv->v_type == VAR_BLOB)
+    아니면 만약 (tv->v_type == VAR_BLOB)
     {
 	result = rb_str_new(tv->vval.v_blob->bv_ga.ga_data,
 		tv->vval.v_blob->bv_ga.ga_len);
     }
     // else return Qnil;
 
-    return result;
+    반환 result;
 }
 #endif
 
@@ -1201,15 +1201,15 @@ vim_evaluate(VALUE self UNUSED, VALUE str)
     VALUE       result;
 
     tv = eval_expr((char_u *)StringValuePtr(str), NULL);
-    if (tv == NULL)
-	return Qnil;
+    만약 (tv == NULL)
+	반환 Qnil;
     result = vim_to_ruby(tv);
 
     free_tv(tv);
 
-    return result;
-#else
-    return Qnil;
+    반환 result;
+#아니면
+    반환 Qnil;
 #endif
 }
 
@@ -1219,9 +1219,9 @@ static size_t buffer_dsize(const void *buf);
 static const rb_data_type_t buffer_type = {
     "vim_buffer",
     {0, 0, buffer_dsize,
-# if RUBY_VERSION >= 27
+# 만약 RUBY_VERSION >= 27
 	0, {0}
-# else
+# 아니면
 	{0, 0}
 # endif
     },
@@ -1234,27 +1234,27 @@ static const rb_data_type_t buffer_type = {
     static size_t
 buffer_dsize(const void *buf UNUSED)
 {
-    return sizeof(buf_T);
+    반환 sizeof(buf_T);
 }
 #endif
 
     static VALUE
 buffer_new(buf_T *buf)
 {
-    if (buf->b_ruby_ref)
+    만약 (buf->b_ruby_ref)
     {
-	return (VALUE) buf->b_ruby_ref;
+	반환 (VALUE) buf->b_ruby_ref;
     }
-    else
+    아니면
     {
 #ifdef USE_TYPEDDATA
 	VALUE obj = TypedData_Wrap_Struct(cBuffer, &buffer_type, buf);
-#else
+#아니면
 	VALUE obj = Data_Wrap_Struct(cBuffer, 0, 0, buf);
 #endif
 	buf->b_ruby_ref = (void *) obj;
 	rb_hash_aset(objtbl, rb_obj_id(obj), obj);
-	return obj;
+	반환 obj;
     }
 }
 
@@ -1265,12 +1265,12 @@ get_buf(VALUE obj)
 
 #ifdef USE_TYPEDDATA
     TypedData_Get_Struct(obj, buf_T, &buffer_type, buf);
-#else
+#아니면
     Data_Get_Struct(obj, buf_T, buf);
 #endif
-    if (buf == NULL)
+    만약 (buf == NULL)
 	rb_raise(eDeletedBufferError, "attempt to refer to deleted buffer");
-    return buf;
+    반환 buf;
 }
 
     static VALUE
@@ -1278,63 +1278,63 @@ vim_blob(VALUE self UNUSED, VALUE str)
 {
     VALUE result = rb_str_new("0z", 2);
     char    buf[4];
-    int	i;
-    for (i = 0; i < RSTRING_LEN(str); i++)
+    정수	i;
+    위해 (i = 0; i < RSTRING_LEN(str); i++)
     {
 	sprintf(buf, "%02X", (unsigned char)(RSTRING_PTR(str)[i]));
 	rb_str_concat(result, rb_str_new2(buf));
     }
-    return result;
+    반환 result;
 }
 
     static VALUE
 buffer_s_current(VALUE self UNUSED)
 {
-    return buffer_new(curbuf);
+    반환 buffer_new(curbuf);
 }
 
     static VALUE
 buffer_s_current_getter(ID id UNUSED, VALUE *x UNUSED)
 {
-    return buffer_new(curbuf);
+    반환 buffer_new(curbuf);
 }
 
     static VALUE
 buffer_s_count(VALUE self UNUSED)
 {
     buf_T *b;
-    int n = 0;
+    정수 n = 0;
 
     FOR_ALL_BUFFERS(b)
     {
 	//  Deleted buffers should not be counted
 	//    SegPhault - 01/07/05
-	if (b->b_p_bl)
+	만약 (b->b_p_bl)
 	    n++;
     }
 
-    return INT2NUM(n);
+    반환 INT2NUM(n);
 }
 
     static VALUE
 buffer_s_aref(VALUE self UNUSED, VALUE num)
 {
     buf_T *b;
-    int n = NUM2INT(num);
+    정수 n = NUM2INT(num);
 
     FOR_ALL_BUFFERS(b)
     {
 	//  Deleted buffers should not be counted
 	//    SegPhault - 01/07/05
-	if (!b->b_p_bl)
+	만약 (!b->b_p_bl)
 	    continue;
 
-	if (n == 0)
-	    return buffer_new(b);
+	만약 (n == 0)
+	    반환 buffer_new(b);
 
 	n--;
     }
-    return Qnil;
+    반환 Qnil;
 }
 
     static VALUE
@@ -1342,7 +1342,7 @@ buffer_name(VALUE self)
 {
     buf_T *buf = get_buf(self);
 
-    return buf->b_ffname ? rb_str_new2((char *)buf->b_ffname) : Qnil;
+    반환 buf->b_ffname ? rb_str_new2((char *)buf->b_ffname) : Qnil;
 }
 
     static VALUE
@@ -1350,7 +1350,7 @@ buffer_number(VALUE self)
 {
     buf_T *buf = get_buf(self);
 
-    return INT2NUM(buf->b_fnum);
+    반환 INT2NUM(buf->b_fnum);
 }
 
     static VALUE
@@ -1358,15 +1358,15 @@ buffer_count(VALUE self)
 {
     buf_T *buf = get_buf(self);
 
-    return INT2NUM(buf->b_ml.ml_line_count);
+    반환 INT2NUM(buf->b_ml.ml_line_count);
 }
 
     static VALUE
 get_buffer_line(buf_T *buf, linenr_T n)
 {
-    if (n <= 0 || n > buf->b_ml.ml_line_count)
+    만약 (n <= 0 || n > buf->b_ml.ml_line_count)
 	rb_raise(rb_eIndexError, "line number %ld out of range", (long)n);
-    return vim_str2rb_enc_str((char *)ml_get_buf(buf, n, FALSE));
+    반환 vim_str2rb_enc_str((char *)ml_get_buf(buf, n, FALSE));
 }
 
     static VALUE
@@ -1374,9 +1374,9 @@ buffer_aref(VALUE self, VALUE num)
 {
     buf_T *buf = get_buf(self);
 
-    if (buf != NULL)
-	return get_buffer_line(buf, (linenr_T)NUM2LONG(num));
-    return Qnil; // For stop warning
+    만약 (buf != NULL)
+	반환 get_buffer_line(buf, (linenr_T)NUM2LONG(num));
+    반환 Qnil; // For stop warning
 }
 
     static VALUE
@@ -1385,14 +1385,14 @@ set_buffer_line(buf_T *buf, linenr_T n, VALUE str)
     char	*line = StringValuePtr(str);
     aco_save_T	aco;
 
-    if (n > 0 && n <= buf->b_ml.ml_line_count && line != NULL)
+    만약 (n > 0 && n <= buf->b_ml.ml_line_count && line != NULL)
     {
 	// Set curwin/curbuf for "buf" and save some things.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	만약 (curbuf == buf)
 	{
 	    // Only when it worked to set "curbuf".
-	    if (u_savesub(n) == OK)
+	    만약 (u_savesub(n) == OK)
 	    {
 		ml_replace(n, (char_u *)line, TRUE);
 		changed();
@@ -1408,11 +1408,11 @@ set_buffer_line(buf_T *buf, linenr_T n, VALUE str)
 
 	update_curbuf(UPD_NOT_VALID);
     }
-    else
+    아니면
     {
 	rb_raise(rb_eIndexError, "line number %ld out of range", (long)n);
     }
-    return str;
+    반환 str;
 }
 
     static VALUE
@@ -1420,9 +1420,9 @@ buffer_aset(VALUE self, VALUE num, VALUE str)
 {
     buf_T *buf = get_buf(self);
 
-    if (buf != NULL)
-	return set_buffer_line(buf, (linenr_T)NUM2LONG(num), str);
-    return str;
+    만약 (buf != NULL)
+	반환 set_buffer_line(buf, (linenr_T)NUM2LONG(num), str);
+    반환 str;
 }
 
     static VALUE
@@ -1432,14 +1432,14 @@ buffer_delete(VALUE self, VALUE num)
     long	n = NUM2LONG(num);
     aco_save_T	aco;
 
-    if (n > 0 && n <= buf->b_ml.ml_line_count)
+    만약 (n > 0 && n <= buf->b_ml.ml_line_count)
     {
 	// Set curwin/curbuf for "buf" and save some things.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	만약 (curbuf == buf)
 	{
 	    // Only when it worked to set "curbuf".
-	    if (u_savedel(n, 1) == OK)
+	    만약 (u_savedel(n, 1) == OK)
 	    {
 		ml_delete(n);
 
@@ -1457,11 +1457,11 @@ buffer_delete(VALUE self, VALUE num)
 
 	update_curbuf(UPD_NOT_VALID);
     }
-    else
+    아니면
     {
 	rb_raise(rb_eIndexError, "line number %ld out of range", n);
     }
-    return Qnil;
+    반환 Qnil;
 }
 
     static VALUE
@@ -1472,18 +1472,18 @@ buffer_append(VALUE self, VALUE num, VALUE str)
     long	n = NUM2LONG(num);
     aco_save_T	aco;
 
-    if (line == NULL)
+    만약 (line == NULL)
     {
 	rb_raise(rb_eIndexError, "NULL line");
     }
-    else if (n >= 0 && n <= buf->b_ml.ml_line_count)
+    아니면 만약 (n >= 0 && n <= buf->b_ml.ml_line_count)
     {
 	// set curwin/curbuf for "buf" and save some things
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	만약 (curbuf == buf)
 	{
 	    // Only when it worked to set "curbuf".
-	    if (u_inssub(n + 1) == OK)
+	    만약 (u_inssub(n + 1) == OK)
 	    {
 		ml_append(n, (char_u *) line, (colnr_T) 0, FALSE);
 
@@ -1501,11 +1501,11 @@ buffer_append(VALUE self, VALUE num, VALUE str)
 
 	update_curbuf(UPD_NOT_VALID);
     }
-    else
+    아니면
     {
 	rb_raise(rb_eIndexError, "line number %ld out of range", n);
     }
-    return str;
+    반환 str;
 }
 
 #ifdef USE_TYPEDDATA
@@ -1514,9 +1514,9 @@ static size_t window_dsize(const void *buf);
 static const rb_data_type_t window_type = {
     "vim_window",
     {0, 0, window_dsize,
-# if RUBY_VERSION >= 27
+# 만약 RUBY_VERSION >= 27
 	0, {0}
-# else
+# 아니면
 	{0, 0}
 # endif
     },
@@ -1529,27 +1529,27 @@ static const rb_data_type_t window_type = {
     static size_t
 window_dsize(const void *win UNUSED)
 {
-    return sizeof(win_T);
+    반환 sizeof(win_T);
 }
 #endif
 
     static VALUE
 window_new(win_T *win)
 {
-    if (win->w_ruby_ref)
+    만약 (win->w_ruby_ref)
     {
-	return (VALUE) win->w_ruby_ref;
+	반환 (VALUE) win->w_ruby_ref;
     }
-    else
+    아니면
     {
 #ifdef USE_TYPEDDATA
 	VALUE obj = TypedData_Wrap_Struct(cVimWindow, &window_type, win);
-#else
+#아니면
 	VALUE obj = Data_Wrap_Struct(cVimWindow, 0, 0, win);
 #endif
 	win->w_ruby_ref = (void *) obj;
 	rb_hash_aset(objtbl, rb_obj_id(obj), obj);
-	return obj;
+	반환 obj;
     }
 }
 
@@ -1560,24 +1560,24 @@ get_win(VALUE obj)
 
 #ifdef USE_TYPEDDATA
     TypedData_Get_Struct(obj, win_T, &window_type, win);
-#else
+#아니면
     Data_Get_Struct(obj, win_T, win);
 #endif
-    if (win == NULL)
+    만약 (win == NULL)
 	rb_raise(eDeletedWindowError, "attempt to refer to deleted window");
-    return win;
+    반환 win;
 }
 
     static VALUE
 window_s_current(VALUE self UNUSED)
 {
-    return window_new(curwin);
+    반환 window_new(curwin);
 }
 
     static VALUE
 window_s_current_getter(ID id UNUSED, VALUE *x UNUSED)
 {
-    return window_new(curwin);
+    반환 window_new(curwin);
 }
 
 /*
@@ -1587,42 +1587,42 @@ window_s_current_getter(ID id UNUSED, VALUE *x UNUSED)
     static VALUE
 line_s_current(VALUE self UNUSED)
 {
-    return get_buffer_line(curbuf, curwin->w_cursor.lnum);
+    반환 get_buffer_line(curbuf, curwin->w_cursor.lnum);
 }
 
     static VALUE
 set_current_line(VALUE self UNUSED, VALUE str)
 {
-    return set_buffer_line(curbuf, curwin->w_cursor.lnum, str);
+    반환 set_buffer_line(curbuf, curwin->w_cursor.lnum, str);
 }
 
     static VALUE
 current_line_number(VALUE self UNUSED)
 {
-    return INT2FIX((int)curwin->w_cursor.lnum);
+    반환 INT2FIX((정수)curwin->w_cursor.lnum);
 }
 
     static VALUE
 window_s_count(VALUE self UNUSED)
 {
     win_T	*w;
-    int n = 0;
+    정수 n = 0;
 
     FOR_ALL_WINDOWS(w)
 	n++;
-    return INT2NUM(n);
+    반환 INT2NUM(n);
 }
 
     static VALUE
 window_s_aref(VALUE self UNUSED, VALUE num)
 {
     win_T *w;
-    int n = NUM2INT(num);
+    정수 n = NUM2INT(num);
 
-    for (w = firstwin; w != NULL; w = w->w_next, --n)
-	if (n == 0)
-	    return window_new(w);
-    return Qnil;
+    위해 (w = firstwin; w != NULL; w = w->w_next, --n)
+	만약 (n == 0)
+	    반환 window_new(w);
+    반환 Qnil;
 }
 
     static VALUE
@@ -1630,7 +1630,7 @@ window_buffer(VALUE self)
 {
     win_T *win = get_win(self);
 
-    return buffer_new(win->w_buffer);
+    반환 buffer_new(win->w_buffer);
 }
 
     static VALUE
@@ -1638,7 +1638,7 @@ window_height(VALUE self)
 {
     win_T *win = get_win(self);
 
-    return INT2NUM(win->w_height);
+    반환 INT2NUM(win->w_height);
 }
 
     static VALUE
@@ -1650,13 +1650,13 @@ window_set_height(VALUE self, VALUE height)
     curwin = win;
     win_setheight(NUM2INT(height));
     curwin = savewin;
-    return height;
+    반환 height;
 }
 
     static VALUE
 window_width(VALUE self UNUSED)
 {
-    return INT2NUM(get_win(self)->w_width);
+    반환 INT2NUM(get_win(self)->w_width);
 }
 
     static VALUE
@@ -1668,7 +1668,7 @@ window_set_width(VALUE self UNUSED, VALUE width)
     curwin = win;
     win_setwidth(NUM2INT(width));
     curwin = savewin;
-    return width;
+    반환 width;
 }
 
     static VALUE
@@ -1676,7 +1676,7 @@ window_cursor(VALUE self)
 {
     win_T *win = get_win(self);
 
-    return rb_assoc_new(INT2NUM(win->w_cursor.lnum), INT2NUM(win->w_cursor.col));
+    반환 rb_assoc_new(INT2NUM(win->w_cursor.lnum), INT2NUM(win->w_cursor.col));
 }
 
     static VALUE
@@ -1686,7 +1686,7 @@ window_set_cursor(VALUE self, VALUE pos)
     win_T *win = get_win(self);
 
     Check_Type(pos, T_ARRAY);
-    if (RARRAY_LEN(pos) != 2)
+    만약 (RARRAY_LEN(pos) != 2)
 	rb_raise(rb_eArgError, "array length must be 2");
     lnum = RARRAY_PTR(pos)[0];
     col = RARRAY_PTR(pos)[1];
@@ -1695,34 +1695,34 @@ window_set_cursor(VALUE self, VALUE pos)
     win->w_set_curswant = true;
     check_cursor();		    // put cursor on an existing line
     update_screen(UPD_NOT_VALID);
-    return Qnil;
+    반환 Qnil;
 }
 
     static VALUE
 f_nop(VALUE self UNUSED)
 {
-    return Qnil;
+    반환 Qnil;
 }
 
     static VALUE
-f_p(int argc, VALUE *argv, VALUE self UNUSED)
+f_p(정수 argc, VALUE *argv, VALUE self UNUSED)
 {
-    int i;
+    정수 i;
     VALUE str = rb_str_new("", 0);
     VALUE ret = Qnil;
 
-    for (i = 0; i < argc; i++)
+    위해 (i = 0; i < argc; i++)
     {
-	if (i > 0) rb_str_cat(str, ", ", 2);
+	만약 (i > 0) rb_str_cat(str, ", ", 2);
 	rb_str_concat(str, rb_inspect(argv[i]));
     }
     msg(RSTRING_PTR(str));
 
-    if (argc == 1)
+    만약 (argc == 1)
 	ret = argv[0];
-    else if (argc > 1)
+    아니면 만약 (argc > 1)
 	ret = rb_ary_new4(argc, argv);
-    return ret;
+    반환 ret;
 }
 
     static void
@@ -1814,23 +1814,23 @@ vim_ruby_init(void *stack_start)
     ruby_stack_start = stack_start;
 }
 
-    static int
+    static 정수
 convert_hash2dict(VALUE key, VALUE val, VALUE arg)
 {
     dict_T *d = (dict_T *)arg;
     dictitem_T *di;
 
     di = dictitem_alloc((char_u *)RSTRING_PTR(rb_obj_as_string(key)));
-    if (di == NULL || ruby_convert_to_vim_value(val, &di->di_tv) != OK
+    만약 (di == NULL || ruby_convert_to_vim_value(val, &di->di_tv) != OK
 						     || dict_add(d, di) != OK)
     {
 	d->dv_hashtab.ht_flags |= HTFLAGS_ERROR;
-	return ST_STOP;
+	반환 ST_STOP;
     }
-    return ST_CONTINUE;
+    반환 ST_CONTINUE;
 }
 
-    static int
+    static 정수
 ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
 {
     switch (TYPE(val))
@@ -1875,16 +1875,16 @@ ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
 		typval_T v;
 
 		l = list_alloc();
-		if (l == NULL)
-		    return FAIL;
+		만약 (l == NULL)
+		    반환 FAIL;
 
-		for (i = 0; i < RARRAY_LEN(val); ++i)
+		위해 (i = 0; i < RARRAY_LEN(val); ++i)
 		{
-		    if (ruby_convert_to_vim_value((VALUE)RARRAY_PTR(val)[i],
+		    만약 (ruby_convert_to_vim_value((VALUE)RARRAY_PTR(val)[i],
 									&v) != OK)
 		    {
 			list_unref(l);
-			return FAIL;
+			반환 FAIL;
 		    }
 		    list_append_tv(l, &v);
 		    clear_tv(&v);
@@ -1900,14 +1900,14 @@ ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
 		dict_T *d;
 
 		d = dict_alloc();
-		if (d == NULL)
-		    return FAIL;
+		만약 (d == NULL)
+		    반환 FAIL;
 
 		rb_hash_foreach(val, convert_hash2dict, (VALUE)d);
-		if (d->dv_hashtab.ht_flags & HTFLAGS_ERROR)
+		만약 (d->dv_hashtab.ht_flags & HTFLAGS_ERROR)
 		{
 		    dict_unref(d);
-		    return FAIL;
+		    반환 FAIL;
 		}
 
 		rettv->v_type = VAR_DICT;
@@ -1916,26 +1916,26 @@ ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
 	    }
 	    break;
     }
-    return OK;
+    반환 OK;
 }
 
     void
 do_rubyeval(char_u *str, typval_T *rettv)
 {
-    int retval = FAIL;
+    정수 retval = FAIL;
 
-    if (ensure_ruby_initialized())
+    만약 (ensure_ruby_initialized())
     {
-	int state;
+	정수 state;
 	VALUE obj;
 
 	obj = rb_eval_string_protect((const char *)str, &state);
-	if (state)
+	만약 (state)
 	    error_print(state);
-	else
+	아니면
 	    retval = ruby_convert_to_vim_value(obj, rettv);
     }
-    if (retval == FAIL)
+    만약 (retval == FAIL)
     {
 	rettv->v_type = VAR_NUMBER;
 	rettv->vval.v_number = 0;

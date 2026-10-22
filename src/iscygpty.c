@@ -36,7 +36,7 @@
 
 #ifdef USE_FILEEXTD
 // VC 7.1 or earlier doesn't support SAL.
-# if !defined(_MSC_VER) || (_MSC_VER < 1400)
+# 만약 !defined(_MSC_VER) || (_MSC_VER < 1400)
 #  define __out
 #  define __in
 #  define __in_opt
@@ -45,12 +45,12 @@
 // defunct link: microsoft.com/en-us/download/details.aspx?id=22599
 // Needed for WinXP.
 # include <fileextd.h>
-#else // USE_FILEEXTD
+#아니면 // USE_FILEEXTD
 // VC 8 or earlier.
-# if defined(_MSC_VER) && (_MSC_VER < 1500)
+# 만약 defined(_MSC_VER) && (_MSC_VER < 1500)
 #  ifdef ENABLE_STUB_IMPL
 #   define STUB_IMPL
-#  else
+#  아니면
 #   error "Win32 FileID API Library is required for VC2005 or earlier."
 #  endif
 # endif
@@ -58,7 +58,7 @@
 
 #ifdef __MINGW32__
 # define UNUSED __attribute__((unused))
-#else
+#아니면
 # define UNUSED
 #endif
 
@@ -80,27 +80,27 @@ static BOOL WINAPI stub_GetFileInformationByHandleEx(
 		LPVOID						lpFileInformation UNUSED,
 		DWORD						dwBufferSize UNUSED)
 {
-	return FALSE;
+	반환 FALSE;
 }
 # endif
 
 static void setup_fileid_api(void)
 {
-	if (pGetFileInformationByHandleEx != NULL) {
-		return;
+	만약 (pGetFileInformationByHandleEx != NULL) {
+		반환;
 	}
 	pGetFileInformationByHandleEx = (pfnGetFileInformationByHandleEx)
 		GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
 				"GetFileInformationByHandleEx");
-	if (pGetFileInformationByHandleEx == NULL) {
+	만약 (pGetFileInformationByHandleEx == NULL) {
 # ifdef USE_FILEEXTD
 		pGetFileInformationByHandleEx = GetFileInformationByHandleEx;
-# else
+# 아니면
 		pGetFileInformationByHandleEx = stub_GetFileInformationByHandleEx;
 # endif
 	}
 }
-#else
+#아니면
 # define pGetFileInformationByHandleEx	GetFileInformationByHandleEx
 # define setup_fileid_api()
 #endif
@@ -110,79 +110,79 @@ static void setup_fileid_api(void)
 	(wcsncmp((s), (prefix), sizeof(prefix) / sizeof(WCHAR) - 1) == 0)
 
 // Check if the fd is a cygwin/msys's pty.
-int is_cygpty(int fd)
+정수 is_cygpty(정수 fd)
 {
 #ifdef STUB_IMPL
-	return 0;
-#else
+	반환 0;
+#아니면
 	HANDLE h;
-	const int size = sizeof(FILE_NAME_INFO) + sizeof(WCHAR) * (MAX_PATH - 1);
+	const 정수 size = sizeof(FILE_NAME_INFO) + sizeof(WCHAR) * (MAX_PATH - 1);
 	FILE_NAME_INFO *nameinfo;
 	WCHAR *p = NULL;
 
 	setup_fileid_api();
 
 	h = (HANDLE) _get_osfhandle(fd);
-	if (h == INVALID_HANDLE_VALUE) {
-		return 0;
+	만약 (h == INVALID_HANDLE_VALUE) {
+		반환 0;
 	}
 	// Cygwin/msys's pty is a pipe.
-	if (GetFileType(h) != FILE_TYPE_PIPE) {
-		return 0;
+	만약 (GetFileType(h) != FILE_TYPE_PIPE) {
+		반환 0;
 	}
 	nameinfo = malloc(size + sizeof(WCHAR));
-	if (nameinfo == NULL) {
-		return 0;
+	만약 (nameinfo == NULL) {
+		반환 0;
 	}
 	// Check the name of the pipe:
 	// "\\{cygwin,msys}-XXXXXXXXXXXXXXXX-ptyN-{from,to}-master"
-	if (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
+	만약 (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
 		nameinfo->FileName[nameinfo->FileNameLength / sizeof(WCHAR)] = L'\0';
 		p = nameinfo->FileName;
-		if (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
+		만약 (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
 			p += 8;
-		} else if (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
+		} 아니면 만약 (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
 			p += 6;
-		} else {
+		} 아니면 {
 			p = NULL;
 		}
-		if (p != NULL) {
+		만약 (p != NULL) {
 			// Skip 16-digit hexadecimal.
-			while (*p && iswascii(*p) && isxdigit(*p))
+			동안 (*p && iswascii(*p) && isxdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-pty")) {
+			만약 (is_wprefix(p, L"-pty")) {
 				p += 4;
-			} else {
+			} 아니면 {
 				p = NULL;
 			}
 		}
-		if (p != NULL) {
+		만약 (p != NULL) {
 			// Skip pty number.
-			while (*p && iswascii(*p) && isdigit(*p))
+			동안 (*p && iswascii(*p) && isdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-from-master")) {
+			만약 (is_wprefix(p, L"-from-master")) {
 				//p += 12;
-			} else if (is_wprefix(p, L"-to-master")) {
+			} 아니면 만약 (is_wprefix(p, L"-to-master")) {
 				//p += 10;
-			} else {
+			} 아니면 {
 				p = NULL;
 			}
 		}
 	}
 	free(nameinfo);
-	return (p != NULL);
+	반환 (p != NULL);
 #endif // STUB_IMPL
 }
 
 // Check if at least one cygwin/msys pty is used.
-int is_cygpty_used(void)
+정수 is_cygpty_used(void)
 {
-	int fd, ret = 0;
+	정수 fd, ret = 0;
 
-	for (fd = 0; fd < 3; fd++) {
+	위해 (fd = 0; fd < 3; fd++) {
 		ret |= is_cygpty(fd);
 	}
-	return ret;
+	반환 ret;
 }
 
 #endif // _WIN32

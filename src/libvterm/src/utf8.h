@@ -2,31 +2,31 @@
  *
  * http://www.leonerd.org.uk/code/libtermkey/
  */
-unsigned int utf8_seqlen(long codepoint);
+unsigned 정수 utf8_seqlen(long codepoint);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE unsigned int utf8_seqlen(long codepoint)
+#만약 defined(DEFINE_INLINES) || USE_INLINE
+INLINE unsigned 정수 utf8_seqlen(long codepoint)
 {
-  if(codepoint < 0x0000080) return 1;
-  if(codepoint < 0x0000800) return 2;
-  if(codepoint < 0x0010000) return 3;
-  if(codepoint < 0x0200000) return 4;
-  if(codepoint < 0x4000000) return 5;
-  return 6;
+  만약(codepoint < 0x0000080) 반환 1;
+  만약(codepoint < 0x0000800) 반환 2;
+  만약(codepoint < 0x0010000) 반환 3;
+  만약(codepoint < 0x0200000) 반환 4;
+  만약(codepoint < 0x4000000) 반환 5;
+  반환 6;
 }
 #endif
 
 /* Does NOT NUL-terminate the buffer */
-int fill_utf8(long codepoint, char *str);
+정수 fill_utf8(long codepoint, char *str);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int fill_utf8(long codepoint, char *str)
+#만약 defined(DEFINE_INLINES) || USE_INLINE
+INLINE 정수 fill_utf8(long codepoint, char *str)
 {
-  int nbytes = utf8_seqlen(codepoint);
+  정수 nbytes = utf8_seqlen(codepoint);
 
   // This is easier done backwards
-  int b = nbytes;
-  while(b > 1) {
+  정수 b = nbytes;
+  동안(b > 1) {
     b--;
     str[b] = 0x80 | (codepoint & 0x3f);
     codepoint >>= 6;
@@ -41,7 +41,7 @@ INLINE int fill_utf8(long codepoint, char *str)
     case 6: str[0] = 0xfc | (codepoint & 0x01); break;
   }
 
-  return nbytes;
+  반환 nbytes;
 }
 #endif
 /* end copy */

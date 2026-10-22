@@ -13,17 +13,17 @@
 
 #include "vim.h"
 
-static int	quitmore = 0;
-static int	ex_pressedreturn = FALSE;
+static 정수	quitmore = 0;
+static 정수	ex_pressedreturn = FALSE;
 #ifndef FEAT_PRINTER
 # define ex_hardcopy	ex_ni
 #endif
 
 #ifdef FEAT_EVAL
-static char_u	*do_one_cmd(char_u **, int, cstack_T *, char_u *(*fgetline)(int, void *, int, getline_opt_T), void *cookie);
-#else
-static char_u	*do_one_cmd(char_u **, int, char_u *(*fgetline)(int, void *, int, getline_opt_T), void *cookie);
-static int	if_level = 0;		// depth in :if
+static char_u	*do_one_cmd(char_u **, 정수, cstack_T *, char_u *(*fgetline)(정수, void *, 정수, getline_opt_T), void *cookie);
+#아니면
+static char_u	*do_one_cmd(char_u **, 정수, char_u *(*fgetline)(정수, void *, 정수, getline_opt_T), void *cookie);
+static 정수	if_level = 0;		// depth in :if
 #endif
 static void	append_command(char_u *cmd);
 
@@ -43,7 +43,7 @@ static void	ex_bprevious(exarg_T *eap);
 static void	ex_brewind(exarg_T *eap);
 static void	ex_blast(exarg_T *eap);
 static char_u	*getargcmd(char_u **);
-static int	getargopt(exarg_T *eap);
+static 정수	getargopt(exarg_T *eap);
 #ifndef FEAT_QUICKFIX
 # define ex_make		ex_ni
 # define ex_cbuffer		ex_ni
@@ -61,14 +61,14 @@ static int	getargopt(exarg_T *eap);
 # define ex_cwindow		ex_ni
 # define ex_cbottom		ex_ni
 #endif
-#if !defined(FEAT_QUICKFIX) || !defined(FEAT_EVAL)
+#만약 !defined(FEAT_QUICKFIX) || !defined(FEAT_EVAL)
 # define ex_cexpr		ex_ni
 #endif
 
 static linenr_T default_address(exarg_T *eap);
 static void address_default_all(exarg_T *eap);
 static void	get_flags(exarg_T *eap);
-#if !defined(FEAT_PERL) \
+#만약 !defined(FEAT_PERL) \
 	|| !defined(FEAT_PYTHON) || !defined(FEAT_PYTHON3) \
 	|| !defined(FEAT_TCL) \
 	|| !defined(FEAT_RUBY) \
@@ -88,7 +88,7 @@ static void	ex_colorscheme(exarg_T *eap);
 static void	ex_cquit(exarg_T *eap);
 static void	ex_quit_all(exarg_T *eap);
 static void	ex_close(exarg_T *eap);
-static void	ex_win_close(int forceit, win_T *win, tabpage_T *tp);
+static void	ex_win_close(정수 forceit, win_T *win, tabpage_T *tp);
 static void	ex_only(exarg_T *eap);
 static void	ex_resize(exarg_T *eap);
 static void	ex_stag(exarg_T *eap);
@@ -97,14 +97,14 @@ static void	ex_tabonly(exarg_T *eap);
 static void	ex_tabnext(exarg_T *eap);
 static void	ex_tabmove(exarg_T *eap);
 static void	ex_tabs(exarg_T *eap);
-#if defined(FEAT_QUICKFIX)
+#만약 defined(FEAT_QUICKFIX)
 static void	ex_pclose(exarg_T *eap);
 static void	ex_ptag(exarg_T *eap);
 static void	ex_pedit(exarg_T *eap);
 static void	ex_pbuffer(exarg_T *eap);
 static void	prepare_preview_window(void);
 static void	back_to_current_window(win_T *curwin_save);
-#else
+#아니면
 # define ex_pclose		ex_ni
 # define ex_ptag		ex_ni
 # define ex_pedit		ex_ni
@@ -115,7 +115,7 @@ static void	ex_exit(exarg_T *eap);
 static void	ex_print(exarg_T *eap);
 #ifdef FEAT_BYTEOFF
 static void	ex_goto(exarg_T *eap);
-#else
+#아니면
 # define ex_goto		ex_ni
 #endif
 static void	ex_shell(exarg_T *eap);
@@ -130,25 +130,25 @@ static void	ex_edit(exarg_T *eap);
 # define ex_gui			ex_nogui
 static void	ex_nogui(exarg_T *eap);
 #endif
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+#만약 defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
 static void	ex_tearoff(exarg_T *eap);
-#else
+#아니면
 # define ex_tearoff		ex_ni
 #endif
-#if (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
+#만약 (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_TERM_POPUP_MENU)) && defined(FEAT_MENU)
 static void	ex_popup(exarg_T *eap);
-#else
+#아니면
 # define ex_popup		ex_ni
 #endif
 #ifndef FEAT_GUI_MSWIN
 # define ex_simalt		ex_ni
 #endif
-#if !defined(FEAT_GUI_MSWIN) && !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF)
+#만약 !defined(FEAT_GUI_MSWIN) && !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF)
 # define gui_mch_find_dialog	ex_ni
 # define gui_mch_replace_dialog ex_ni
 #endif
-#if !defined(FEAT_GUI_GTK)
+#만약 !defined(FEAT_GUI_GTK)
 # define ex_helpfind		ex_ni
 #endif
 #ifndef FEAT_CSCOPE
@@ -160,7 +160,7 @@ static void	ex_popup(exarg_T *eap);
 # define ex_syntax		ex_ni
 # define ex_ownsyntax		ex_ni
 #endif
-#if !defined(FEAT_SYN_HL) || !defined(FEAT_PROFILE)
+#만약 !defined(FEAT_SYN_HL) || !defined(FEAT_PROFILE)
 # define ex_syntime		ex_ni
 #endif
 #ifndef FEAT_SPELL
@@ -197,7 +197,7 @@ static void	ex_popup(exarg_T *eap);
 # define ex_py3do		ex_ni
 # define ex_py3file		ex_ni
 #endif
-#if !defined(FEAT_PYTHON) && !defined(FEAT_PYTHON3)
+#만약 !defined(FEAT_PYTHON) && !defined(FEAT_PYTHON3)
 # define ex_pyx			ex_script_ni
 # define ex_pyxdo		ex_ni
 # define ex_pyxfile		ex_ni
@@ -223,9 +223,9 @@ static void	ex_equal(exarg_T *eap);
 static void	ex_sleep(exarg_T *eap);
 static void	ex_winsize(exarg_T *eap);
 static void	ex_wincmd(exarg_T *eap);
-#if defined(FEAT_GUI) || defined(UNIX) || defined(VMS) || defined(MSWIN)
+#만약 defined(FEAT_GUI) || defined(UNIX) || defined(VMS) || defined(MSWIN)
 static void	ex_winpos(exarg_T *eap);
-#else
+#아니면
 # define ex_winpos	    ex_ni
 #endif
 static void	ex_operators(exarg_T *eap);
@@ -254,13 +254,13 @@ static void	ex_stopinsert(exarg_T *eap);
 #ifdef FEAT_FIND_ID
 static void	ex_checkpath(exarg_T *eap);
 static void	ex_findpat(exarg_T *eap);
-#else
+#아니면
 # define ex_findpat		ex_ni
 # define ex_checkpath		ex_ni
 #endif
-#if defined(FEAT_FIND_ID) && defined(FEAT_QUICKFIX)
+#만약 defined(FEAT_FIND_ID) && defined(FEAT_QUICKFIX)
 static void	ex_psearch(exarg_T *eap);
-#else
+#아니면
 # define ex_psearch		ex_ni
 #endif
 static void	ex_tag(exarg_T *eap);
@@ -333,25 +333,25 @@ static void	ex_setfiletype(exarg_T *eap);
 static void	ex_digraphs(exarg_T *eap);
 #ifdef FEAT_SEARCH_EXTRA
 static void	ex_nohlsearch(exarg_T *eap);
-#else
+#아니면
 # define ex_nohlsearch		ex_ni
 # define ex_match		ex_ni
 #endif
 #ifdef FEAT_CRYPT
 static void	ex_X(exarg_T *eap);
-#else
+#아니면
 # define ex_X			ex_ni
 #endif
 #ifdef FEAT_FOLDING
 static void	ex_fold(exarg_T *eap);
 static void	ex_foldopen(exarg_T *eap);
 static void	ex_folddo(exarg_T *eap);
-#else
+#아니면
 # define ex_fold		ex_ni
 # define ex_foldopen		ex_ni
 # define ex_folddo		ex_ni
 #endif
-#if !(defined(HAVE_LOCALE_H) || defined(X_LOCALE))
+#만약 !(defined(HAVE_LOCALE_H) || defined(X_LOCALE))
 # define ex_language		ex_ni
 #endif
 #ifndef FEAT_SIGNS
@@ -369,16 +369,16 @@ static void	ex_folddo(exarg_T *eap);
 #ifndef FEAT_TERMINAL
 # define ex_terminal		ex_ni
 #endif
-#if !defined(FEAT_X11) || !defined(FEAT_XCLIPBOARD)
+#만약 !defined(FEAT_X11) || !defined(FEAT_XCLIPBOARD)
 # define ex_xrestore		ex_ni
 #endif
-#if !defined(FEAT_WAYLAND)
+#만약 !defined(FEAT_WAYLAND)
 # define ex_wlrestore		ex_ni
 #endif
-#if !defined(HAVE_CLIPMETHOD)
+#만약 !defined(HAVE_CLIPMETHOD)
 # define ex_clipreset		ex_ni
 #endif
-#if !defined(FEAT_PROP_POPUP)
+#만약 !defined(FEAT_PROP_POPUP)
 # define ex_popupclear		ex_ni
 #endif
 
@@ -408,30 +408,30 @@ typedef struct
 struct loop_cookie
 {
     garray_T	*lines_gap;		// growarray with line info
-    int		current_line;		// last read line from growarray
-    int		repeating;		// TRUE when looping a second time
+    정수		current_line;		// last read line from growarray
+    정수		repeating;		// TRUE when looping a second time
     // When "repeating" is FALSE use "getline" and "cookie" to get lines
-    char_u	*(*lc_getline)(int, void *, int, getline_opt_T);
+    char_u	*(*lc_getline)(정수, void *, 정수, getline_opt_T);
     void	*cookie;
 };
 
-static char_u	*get_loop_line(int c, void *cookie, int indent, getline_opt_T options);
-static int	store_loop_line(garray_T *gap, char_u *line);
+static char_u	*get_loop_line(정수 c, void *cookie, 정수 indent, getline_opt_T options);
+static 정수	store_loop_line(garray_T *gap, char_u *line);
 static void	free_cmdlines(garray_T *gap);
 
 // Struct to save a few things while debugging.  Used in do_cmdline() only.
 struct dbg_stuff
 {
-    int		trylevel;
-    int		force_abort;
+    정수		trylevel;
+    정수		force_abort;
     except_T	*caught_stack;
     char_u	*vv_exception;
     char_u	*vv_throwpoint;
-    int		did_emsg;
-    int		got_int;
-    int		did_throw;
-    int		need_rethrow;
-    int		check_cstack;
+    정수		did_emsg;
+    정수		got_int;
+    정수		did_throw;
+    정수		need_rethrow;
+    정수		check_cstack;
     except_T	*current_exception;
 };
 
@@ -478,33 +478,33 @@ restore_dbg_stuff(struct dbg_stuff *dsp)
  * ffname is a full path to where a buffer lives on-disk or would live on-disk.
  *
  */
-    static int
-is_other_file(int fnum, char_u *ffname)
+    static 정수
+is_other_file(정수 fnum, char_u *ffname)
 {
-    if (fnum != 0)
+    만약 (fnum != 0)
     {
-	if (fnum == curbuf->b_fnum)
-	    return FALSE;
+	만약 (fnum == curbuf->b_fnum)
+	    반환 FALSE;
 
-	return TRUE;
+	반환 TRUE;
     }
 
-    if (ffname == NULL)
-	return TRUE;
+    만약 (ffname == NULL)
+	반환 TRUE;
 
-    if (*ffname == NUL)
-	return FALSE;
+    만약 (*ffname == NUL)
+	반환 FALSE;
 
     // TODO: Need a reliable way to know whether a buffer is meant to live
     // on-disk !curbuf->b_dev_valid is not always available (example: missing
     // on Windows)
-    if (curbuf->b_sfname != NULL
+    만약 (curbuf->b_sfname != NULL
 	    && *curbuf->b_sfname != NUL)
 	// This occurs with unsaved buffers. In which case `ffname` actually
 	// corresponds to curbuf->b_sfname
-	return fnamecmp(ffname, curbuf->b_sfname) != 0;
+	반환 fnamecmp(ffname, curbuf->b_sfname) != 0;
 
-    return otherfile(ffname);
+    반환 otherfile(ffname);
 }
 
 /*
@@ -513,24 +513,24 @@ is_other_file(int fnum, char_u *ffname)
  */
     void
 do_exmode(
-    int		improved)	    // TRUE for "improved Ex" mode
+    정수		improved)	    // TRUE for "improved Ex" mode
 {
-    int		save_msg_scroll;
-    int		prev_msg_row;
+    정수		save_msg_scroll;
+    정수		prev_msg_row;
     linenr_T	prev_line;
     varnumber_T	changedtick;
 
-    if (improved)
+    만약 (improved)
 	exmode_active = EXMODE_VIM;
-    else
+    아니면
 	exmode_active = EXMODE_NORMAL;
     State = MODE_NORMAL;
     may_trigger_modechanged();
 
     // When using ":global /pat/ visual" and then "Q" we return to continue
     // the :global command.
-    if (global_busy)
-	return;
+    만약 (global_busy)
+	반환;
 
     save_msg_scroll = msg_scroll;
     ++RedrawingDisabled;	    // don't redisplay the window
@@ -541,10 +541,10 @@ do_exmode(
 #endif
 
     msg(_("Entering Ex mode.  Type \"visual\" to go to Normal mode."));
-    while (exmode_active)
+    동안 (exmode_active)
     {
 	// Check for a ":normal" command and no more characters left.
-	if (ex_normal_busy > 0 && typebuf.tb_len == 0)
+	만약 (ex_normal_busy > 0 && typebuf.tb_len == 0)
 	{
 	    exmode_active = FALSE;
 	    break;
@@ -556,28 +556,28 @@ do_exmode(
 	changedtick = CHANGEDTICK(curbuf);
 	prev_msg_row = msg_row;
 	prev_line = curwin->w_cursor.lnum;
-	if (improved)
+	만약 (improved)
 	{
 	    cmdline_row = msg_row;
 	    do_cmdline(NULL, getexline, NULL, 0);
 	}
-	else
+	아니면
 	    do_cmdline(NULL, getexmodeline, NULL, DOCMD_NOWAIT);
 	lines_left = Rows - 1;
 
-	if ((prev_line != curwin->w_cursor.lnum
+	만약 ((prev_line != curwin->w_cursor.lnum
 		   || changedtick != CHANGEDTICK(curbuf)) && !ex_no_reprint)
 	{
-	    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+	    만약 (curbuf->b_ml.ml_flags & ML_EMPTY)
 		emsg(_(e_empty_buffer));
-	    else
+	    아니면
 	    {
-		if (ex_pressedreturn)
+		만약 (ex_pressedreturn)
 		{
 		    // go up one line, to overwrite the ":<CR>" line, so the
 		    // output doesn't contain empty lines.
 		    msg_row = prev_msg_row;
-		    if (prev_msg_row == Rows - 1)
+		    만약 (prev_msg_row == Rows - 1)
 			msg_row--;
 		}
 		msg_col = 0;
@@ -585,11 +585,11 @@ do_exmode(
 		msg_clr_eos();
 	    }
 	}
-	else if (ex_pressedreturn && !ex_no_reprint)	// must be at EOF
+	아니면 만약 (ex_pressedreturn && !ex_no_reprint)	// must be at EOF
 	{
-	    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+	    만약 (curbuf->b_ml.ml_flags & ML_EMPTY)
 		emsg(_(e_empty_buffer));
-	    else
+	    아니면
 		emsg(_(e_at_end_of_file));
 	}
     }
@@ -597,7 +597,7 @@ do_exmode(
 #ifdef FEAT_GUI
     --hold_gui_events;
 #endif
-    if (RedrawingDisabled > 0)
+    만약 (RedrawingDisabled > 0)
 	--RedrawingDisabled;
     --no_wait_return;
     update_screen(UPD_CLEAR);
@@ -615,11 +615,11 @@ msg_verbose_cmd(linenr_T lnum, char_u *cmd)
     ++no_wait_return;
     verbose_enter_scroll();
 
-    if (lnum == 0)
+    만약 (lnum == 0)
 	smsg(_("Executing: %s"), cmd);
-    else
+    아니면
 	smsg(_("line %ld: %s"), (long)lnum, cmd);
-    if (msg_silent == 0)
+    만약 (msg_silent == 0)
 	msg_puts("\n");   // don't overwrite this
 
     verbose_leave_scroll();
@@ -629,10 +629,10 @@ msg_verbose_cmd(linenr_T lnum, char_u *cmd)
 /*
  * Execute a simple command line.  Used for translated commands like "*".
  */
-    int
+    정수
 do_cmdline_cmd(char_u *cmd)
 {
-    return do_cmdline(cmd, NULL, NULL,
+    반환 do_cmdline(cmd, NULL, NULL,
 				   DOCMD_VERBOSE|DOCMD_NOWAIT|DOCMD_KEYTYPED);
 }
 
@@ -640,10 +640,10 @@ do_cmdline_cmd(char_u *cmd)
  * Execute the "+cmd" argument of "edit +cmd fname" and the like.
  * This allows for using a range without ":" in Vim9 script.
  */
-    static int
+    static 정수
 do_cmd_argument(char_u *cmd)
 {
-    return do_cmdline(cmd, NULL, NULL,
+    반환 do_cmdline(cmd, NULL, NULL,
 		      DOCMD_VERBOSE|DOCMD_NOWAIT|DOCMD_KEYTYPED|DOCMD_RANGEOK);
 }
 
@@ -666,45 +666,45 @@ do_cmd_argument(char_u *cmd)
  *
  * return FAIL if cmdline could not be executed, OK otherwise
  */
-    int
+    정수
 do_cmdline(
     char_u	*cmdline,
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T),
+    char_u	*(*fgetline)(정수, void *, 정수, getline_opt_T),
     void	*cookie,		// argument for fgetline()
-    int		flags)
+    정수		flags)
 {
     char_u	*next_cmdline;		// next cmd to execute
     char_u	*cmdline_copy = NULL;	// copy of cmd line
-    int		used_getline = FALSE;	// used "fgetline" to obtain command
-    static int	recursive = 0;		// recursive depth
-    int		msg_didout_before_start = 0;
-    int		count = 0;		// line number count
-    int		did_inc_RedrawingDisabled = FALSE;
-    int		retval = OK;
+    정수		used_getline = FALSE;	// used "fgetline" to obtain command
+    static 정수	recursive = 0;		// recursive depth
+    정수		msg_didout_before_start = 0;
+    정수		count = 0;		// line number count
+    정수		did_inc_RedrawingDisabled = FALSE;
+    정수		retval = OK;
 #ifdef FEAT_EVAL
     cstack_T	cstack;			// conditional stack
     garray_T	lines_ga;		// keep lines for ":while"/":for"
-    int		current_line = 0;	// active line in lines_ga
-    int		current_line_before = 0;
+    정수		current_line = 0;	// active line in lines_ga
+    정수		current_line_before = 0;
     char_u	*fname = NULL;		// function or script name
     linenr_T	*breakpoint = NULL;	// ptr to breakpoint field in cookie
-    int		*dbg_tick = NULL;	// ptr to dbg_tick field in cookie
+    정수		*dbg_tick = NULL;	// ptr to dbg_tick field in cookie
     struct dbg_stuff debug_saved;	// saved things for debug mode
-    int		initial_trylevel;
+    정수		initial_trylevel;
     msglist_T	**saved_msg_list = NULL;
     msglist_T	*private_msg_list = NULL;
 
     // "fgetline" and "cookie" passed to do_one_cmd()
-    char_u	*(*cmd_getline)(int, void *, int, getline_opt_T);
+    char_u	*(*cmd_getline)(정수, void *, 정수, getline_opt_T);
     void	*cmd_cookie;
     struct loop_cookie cmd_loop_cookie;
     void	*real_cookie;
-    int		getline_is_func;
-#else
+    정수		getline_is_func;
+#아니면
 # define cmd_getline fgetline
 # define cmd_cookie cookie
 #endif
-    static int	call_depth = 0;		// recursiveness
+    static 정수	call_depth = 0;		// recursiveness
 #ifdef FEAT_EVAL
     // For every pair of do_cmdline()/do_one_cmd() calls, use an extra memory
     // location for storing error messages to be converted to an exception.
@@ -719,7 +719,7 @@ do_cmdline(
     // It's possible to create an endless loop with ":execute", catch that
     // here.  The value of 200 allows nested function calls, ":source", etc.
     // Allow 200 or 'maxfuncdepth', whatever is larger.
-    if (call_depth >= 200
+    만약 (call_depth >= 200
 #ifdef FEAT_EVAL
 	    && call_depth >= p_mfd
 #endif
@@ -732,7 +732,7 @@ do_cmdline(
 	do_errthrow((cstack_T *)NULL, (char_u *)NULL);
 	msg_list = saved_msg_list;
 #endif
-	return FAIL;
+	반환 FAIL;
     }
     ++call_depth;
 
@@ -745,18 +745,18 @@ do_cmdline(
 
     // Inside a function use a higher nesting level.
     getline_is_func = getline_equal(fgetline, cookie, get_func_line);
-    if (getline_is_func && ex_nesting_level == func_level(real_cookie))
+    만약 (getline_is_func && ex_nesting_level == func_level(real_cookie))
 	++ex_nesting_level;
 
     // Get the function or script name and the address where the next breakpoint
     // line and the debug tick for a function or script are stored.
-    if (getline_is_func)
+    만약 (getline_is_func)
     {
 	fname = func_name(real_cookie);
 	breakpoint = func_breakpoint(real_cookie);
 	dbg_tick = func_dbg_tick(real_cookie);
     }
-    else if (getline_equal(fgetline, cookie, getsourceline))
+    아니면 만약 (getline_equal(fgetline, cookie, getsourceline))
     {
 	fname = SOURCING_NAME;
 	breakpoint = source_breakpoint(real_cookie);
@@ -766,7 +766,7 @@ do_cmdline(
     /*
      * Initialize "force_abort"  and "suppress_errthrow" at the top level.
      */
-    if (!recursive)
+    만약 (!recursive)
     {
 	force_abort = FALSE;
 	suppress_errthrow = FALSE;
@@ -777,9 +777,9 @@ do_cmdline(
      * exception handling (used when debugging).  Otherwise clear it to avoid
      * a bogus compiler warning when the optimizer uses inline functions...
      */
-    if (flags & DOCMD_EXCRESET)
+    만약 (flags & DOCMD_EXCRESET)
 	save_dbg_stuff(&debug_saved);
-    else
+    아니면
 	CLEAR_FIELD(debug_saved);
 
     initial_trylevel = trylevel;
@@ -803,7 +803,7 @@ do_cmdline(
      * KeyTyped is only set when calling vgetc().  Reset it here when not
      * calling vgetc() (sourced command lines).
      */
-    if (!(flags & DOCMD_KEYTYPED)
+    만약 (!(flags & DOCMD_KEYTYPED)
 			       && !getline_equal(fgetline, cookie, getexline))
 	KeyTyped = FALSE;
 
@@ -821,7 +821,7 @@ do_cmdline(
 #endif
 
 	// stop skipping cmds for an error msg after all endif/while/for
-	if (next_cmdline == NULL
+	만약 (next_cmdline == NULL
 #ifdef FEAT_EVAL
 		&& !force_abort
 		&& cstack.cs_idx < 0
@@ -843,7 +843,7 @@ do_cmdline(
 
 #ifdef FEAT_EVAL
 	// 1. If repeating, get a previous line from lines_ga.
-	if (cstack.cs_looplevel > 0 && current_line < lines_ga.ga_len)
+	만약 (cstack.cs_looplevel > 0 && current_line < lines_ga.ga_len)
 	{
 	    // Each '|' separated command is stored separately in lines_ga, to
 	    // be able to jump to it.  Don't use next_cmdline now.
@@ -851,33 +851,33 @@ do_cmdline(
 
 	    // Check if a function has returned or, unless it has an unclosed
 	    // try conditional, aborted.
-	    if (getline_is_func)
+	    만약 (getline_is_func)
 	    {
 # ifdef FEAT_PROFILE
-		if (do_profiling == PROF_YES)
+		만약 (do_profiling == PROF_YES)
 		    func_line_end(real_cookie);
 # endif
-		if (func_has_ended(real_cookie))
+		만약 (func_has_ended(real_cookie))
 		{
 		    retval = FAIL;
 		    break;
 		}
 	    }
 # ifdef FEAT_PROFILE
-	    else if (do_profiling == PROF_YES
+	    아니면 만약 (do_profiling == PROF_YES
 			    && getline_equal(fgetline, cookie, getsourceline))
 		script_line_end();
 # endif
 
 	    // Check if a sourced file hit a ":finish" command.
-	    if (source_finished(fgetline, cookie))
+	    만약 (source_finished(fgetline, cookie))
 	    {
 		retval = FAIL;
 		break;
 	    }
 
 	    // If breakpoints have been added/deleted need to check for it.
-	    if (breakpoint != NULL && dbg_tick != NULL
+	    만약 (breakpoint != NULL && dbg_tick != NULL
 						   && *dbg_tick != debug_tick)
 	    {
 		*breakpoint = dbg_find_breakpoint(
@@ -890,7 +890,7 @@ do_cmdline(
 	    SOURCING_LNUM = ((wcmd_T *)(lines_ga.ga_data))[current_line].lnum;
 
 	    // Did we encounter a breakpoint?
-	    if (breakpoint != NULL && *breakpoint != 0
+	    만약 (breakpoint != NULL && *breakpoint != 0
 					      && *breakpoint <= SOURCING_LNUM)
 	    {
 		dbg_breakpoint(fname, SOURCING_LNUM);
@@ -901,11 +901,11 @@ do_cmdline(
 		*dbg_tick = debug_tick;
 	    }
 # ifdef FEAT_PROFILE
-	    if (do_profiling == PROF_YES)
+	    만약 (do_profiling == PROF_YES)
 	    {
-		if (getline_is_func)
+		만약 (getline_is_func)
 		    func_line_start(real_cookie, SOURCING_LNUM);
-		else if (getline_equal(fgetline, cookie, getsourceline))
+		아니면 만약 (getline_equal(fgetline, cookie, getsourceline))
 		    script_line_start();
 	    }
 # endif
@@ -913,18 +913,18 @@ do_cmdline(
 #endif
 
 	// 2. If no line given, get an allocated line with fgetline().
-	if (next_cmdline == NULL)
+	만약 (next_cmdline == NULL)
 	{
 	    /*
 	     * Need to set msg_didout for the first line after an ":if",
 	     * otherwise the ":if" will be overwritten.
 	     */
-	    if (count == 1 && getline_equal(fgetline, cookie, getexline))
+	    만약 (count == 1 && getline_equal(fgetline, cookie, getexline))
 		msg_didout = TRUE;
-	    if (fgetline == NULL || (next_cmdline = fgetline(':', cookie,
+	    만약 (fgetline == NULL || (next_cmdline = fgetline(':', cookie,
 #ifdef FEAT_EVAL
 		    cstack.cs_idx < 0 ? 0 : (cstack.cs_idx + 1) * 2
-#else
+#아니면
 		    0
 #endif
 		    , in_vim9script() ? GETLINE_CONCAT_CONTBAR
@@ -933,7 +933,7 @@ do_cmdline(
 		// Don't call wait_return() for aborted command line.  The NULL
 		// returned for the end of a sourced file or executed function
 		// doesn't do this.
-		if (KeyTyped && !(flags & DOCMD_REPEAT))
+		만약 (KeyTyped && !(flags & DOCMD_REPEAT))
 		    need_wait_return = FALSE;
 		retval = FAIL;
 		break;
@@ -943,21 +943,21 @@ do_cmdline(
 	    /*
 	     * Keep the first typed line.  Clear it when more lines are typed.
 	     */
-	    if (flags & DOCMD_KEEPLINE)
+	    만약 (flags & DOCMD_KEEPLINE)
 	    {
 		vim_free(repeat_cmdline);
-		if (count == 0)
+		만약 (count == 0)
 		    repeat_cmdline = vim_strsave(next_cmdline);
-		else
+		아니면
 		    repeat_cmdline = NULL;
 	    }
 	}
 
 	// 3. Make a copy of the command so we can mess with it.
-	else if (cmdline_copy == NULL)
+	아니면 만약 (cmdline_copy == NULL)
 	{
 	    next_cmdline = vim_strsave(next_cmdline);
-	    if (next_cmdline == NULL)
+	    만약 (next_cmdline == NULL)
 	    {
 		emsg(_(e_out_of_memory));
 		retval = FAIL;
@@ -981,7 +981,7 @@ do_cmdline(
 	 * possible to define a function inside a while/for loop and handles
 	 * line continuation.
 	 */
-	if ((cstack.cs_looplevel > 0 || has_loop_cmd(next_cmdline)))
+	만약 ((cstack.cs_looplevel > 0 || has_loop_cmd(next_cmdline)))
 	{
 	    cmd_getline = get_loop_line;
 	    cmd_cookie = (void *)&cmd_loop_cookie;
@@ -992,7 +992,7 @@ do_cmdline(
 	    cmd_loop_cookie.repeating = (current_line < lines_ga.ga_len);
 
 	    // Save the current line when encountering it the first time.
-	    if (current_line == lines_ga.ga_len
+	    만약 (current_line == lines_ga.ga_len
 		    && store_loop_line(&lines_ga, next_cmdline) == FAIL)
 	    {
 		retval = FAIL;
@@ -1000,7 +1000,7 @@ do_cmdline(
 	    }
 	    current_line_before = current_line;
 	}
-	else
+	아니면
 	{
 	    cmd_getline = fgetline;
 	    cmd_cookie = cookie;
@@ -1009,7 +1009,7 @@ do_cmdline(
 	did_endif = FALSE;
 #endif
 
-	if (count++ == 0)
+	만약 (count++ == 0)
 	{
 	    /*
 	     * All output from the commands is put below each other, without
@@ -1017,7 +1017,7 @@ do_cmdline(
 	     * from a script or when being called recursive (e.g. for ":e
 	     * +command file").
 	     */
-	    if (!(flags & DOCMD_NOWAIT) && !recursive)
+	    만약 (!(flags & DOCMD_NOWAIT) && !recursive)
 	    {
 		msg_didout_before_start = msg_didout;
 		msg_didany = FALSE; // no output yet
@@ -1029,7 +1029,7 @@ do_cmdline(
 	    }
 	}
 
-	if ((p_verbose >= 15 && SOURCING_NAME != NULL) || p_verbose >= 16)
+	만약 ((p_verbose >= 15 && SOURCING_NAME != NULL) || p_verbose >= 16)
 	    msg_verbose_cmd(SOURCING_LNUM, cmdline_copy);
 
 	/*
@@ -1046,13 +1046,13 @@ do_cmdline(
 	--recursive;
 
 #ifdef FEAT_EVAL
-	if (cmd_cookie == (void *)&cmd_loop_cookie)
+	만약 (cmd_cookie == (void *)&cmd_loop_cookie)
 	    // Use "current_line" from "cmd_loop_cookie", it may have been
 	    // incremented when defining a function.
 	    current_line = cmd_loop_cookie.current_line;
 #endif
 
-	if (next_cmdline == NULL)
+	만약 (next_cmdline == NULL)
 	{
 	    VIM_CLEAR(cmdline_copy);
 
@@ -1060,7 +1060,7 @@ do_cmdline(
 	     * If the command was typed, remember it for the ':' register.
 	     * Do this AFTER executing the command to make :@: work.
 	     */
-	    if (getline_equal(fgetline, cookie, getexline)
+	    만약 (getline_equal(fgetline, cookie, getexline)
 						  && new_last_cmdline != NULL)
 	    {
 		vim_free(last_cmdline);
@@ -1068,7 +1068,7 @@ do_cmdline(
 		new_last_cmdline = NULL;
 	    }
 	}
-	else
+	아니면
 	{
 	    // need to copy the command after the '|' to cmdline_copy, for the
 	    // next do_one_cmd()
@@ -1079,7 +1079,7 @@ do_cmdline(
 
 #ifdef FEAT_EVAL
 	// reset did_emsg for a function that is not aborted by an error
-	if (did_emsg && !force_abort
+	만약 (did_emsg && !force_abort
 		&& getline_equal(fgetline, cookie, get_func_line)
 					      && !func_has_abort(real_cookie))
 	{
@@ -1087,7 +1087,7 @@ do_cmdline(
 	    did_emsg = FALSE;
 	}
 
-	if (cstack.cs_looplevel > 0)
+	만약 (cstack.cs_looplevel > 0)
 	{
 	    ++current_line;
 
@@ -1097,7 +1097,7 @@ do_cmdline(
 	     * ":for".
 	     * If we were not executing commands, decrement cs_looplevel.
 	     */
-	    if (cstack.cs_lflags & (CSL_HAD_CONT | CSL_HAD_ENDLOOP))
+	    만약 (cstack.cs_lflags & (CSL_HAD_CONT | CSL_HAD_ENDLOOP))
 	    {
 		cstack.cs_lflags &= ~(CSL_HAD_CONT | CSL_HAD_ENDLOOP);
 
@@ -1105,7 +1105,7 @@ do_cmdline(
 		// not to use a cs_line[] from an entry that isn't a ":while"
 		// or ":for": It would make "current_line" invalid and can
 		// cause a crash.
-		if (!did_emsg && !got_int && !did_throw
+		만약 (!did_emsg && !got_int && !did_throw
 			&& cstack.cs_idx >= 0
 			&& (cstack.cs_flags[cstack.cs_idx]
 						      & (CSF_WHILE | CSF_FOR))
@@ -1119,7 +1119,7 @@ do_cmdline(
 
 		    // Check for the next breakpoint at or after the ":while"
 		    // or ":for".
-		    if (breakpoint != NULL && lines_ga.ga_len > current_line)
+		    만약 (breakpoint != NULL && lines_ga.ga_len > current_line)
 		    {
 			*breakpoint = dbg_find_breakpoint(
 			       getline_equal(fgetline, cookie, getsourceline),
@@ -1128,10 +1128,10 @@ do_cmdline(
 			*dbg_tick = debug_tick;
 		    }
 		}
-		else
+		아니면
 		{
 		    // can only get here with ":endwhile" or ":endfor"
-		    if (cstack.cs_idx >= 0)
+		    만약 (cstack.cs_idx >= 0)
 			rewind_conditionals(&cstack, cstack.cs_idx - 1,
 				   CSF_WHILE | CSF_FOR, &cstack.cs_looplevel);
 		}
@@ -1140,7 +1140,7 @@ do_cmdline(
 	    /*
 	     * For a ":while" or ":for" we need to remember the line number.
 	     */
-	    else if (cstack.cs_lflags & CSL_HAD_LOOP)
+	    아니면 만약 (cstack.cs_lflags & CSL_HAD_LOOP)
 	    {
 		cstack.cs_lflags &= ~CSL_HAD_LOOP;
 		cstack.cs_line[cstack.cs_idx] = current_line_before;
@@ -1148,7 +1148,7 @@ do_cmdline(
 	}
 
 	// Check for the next breakpoint after a watchexpression
-	if (breakpoint != NULL && has_watchexpr())
+	만약 (breakpoint != NULL && has_watchexpr())
 	{
 	    *breakpoint = dbg_find_breakpoint(FALSE, fname, SOURCING_LNUM);
 	    *dbg_tick = debug_tick;
@@ -1157,9 +1157,9 @@ do_cmdline(
 	/*
 	 * When not inside any ":while" loop, clear remembered lines.
 	 */
-	if (cstack.cs_looplevel == 0)
+	만약 (cstack.cs_looplevel == 0)
 	{
-	    if (lines_ga.ga_len > 0)
+	    만약 (lines_ga.ga_len > 0)
 	    {
 		SOURCING_LNUM =
 		       ((wcmd_T *)lines_ga.ga_data)[lines_ga.ga_len - 1].lnum;
@@ -1175,7 +1175,7 @@ do_cmdline(
 	 * This includes the case where a missing ":endif", ":endwhile" or
 	 * ":endfor" was detected by the ":finally" itself.
 	 */
-	if (cstack.cs_lflags & CSL_HAD_FINA)
+	만약 (cstack.cs_lflags & CSL_HAD_FINA)
 	{
 	    cstack.cs_lflags &= ~CSL_HAD_FINA;
 	    report_make_pending(cstack.cs_pending[cstack.cs_idx]
@@ -1196,7 +1196,7 @@ do_cmdline(
 	 * force_abort to get the non-EH compatible abortion behavior for
 	 * the rest of the script.
 	 */
-	if (trylevel == 0 && !did_emsg && !got_int && !did_throw)
+	만약 (trylevel == 0 && !did_emsg && !got_int && !did_throw)
 	    force_abort = FALSE;
 
 	// Convert an interrupt to an exception if appropriate.
@@ -1213,7 +1213,7 @@ do_cmdline(
      * - there is a command after '|', inside a :if, :while, :for or :try, or
      *   looping for ":source" command or function call.
      */
-    while (!((got_int
+    동안 (!((got_int
 #ifdef FEAT_EVAL
 		    || (did_emsg && (force_abort || in_vim9script()))
 		    || did_throw
@@ -1245,7 +1245,7 @@ do_cmdline(
     free_cmdlines(&lines_ga);
     ga_clear(&lines_ga);
 
-    if (cstack.cs_idx >= 0)
+    만약 (cstack.cs_idx >= 0)
     {
 	/*
 	 * If a sourced file or executed function ran to its end, report the
@@ -1253,20 +1253,20 @@ do_cmdline(
 	 * In Vim9 script do not give a second error, executing aborts after
 	 * the first one.
 	 */
-	if (!got_int && !did_throw && !aborting()
+	만약 (!got_int && !did_throw && !aborting()
 		&& !(did_emsg && in_vim9script())
 		&& ((getline_equal(fgetline, cookie, getsourceline)
 			&& !source_finished(fgetline, cookie))
 		    || (getline_equal(fgetline, cookie, get_func_line)
 					    && !func_has_ended(real_cookie))))
 	{
-	    if (cstack.cs_flags[cstack.cs_idx] & CSF_TRY)
+	    만약 (cstack.cs_flags[cstack.cs_idx] & CSF_TRY)
 		emsg(_(e_missing_endtry));
-	    else if (cstack.cs_flags[cstack.cs_idx] & CSF_WHILE)
+	    아니면 만약 (cstack.cs_flags[cstack.cs_idx] & CSF_WHILE)
 		emsg(_(e_missing_endwhile));
-	    else if (cstack.cs_flags[cstack.cs_idx] & CSF_FOR)
+	    아니면 만약 (cstack.cs_flags[cstack.cs_idx] & CSF_FOR)
 		emsg(_(e_missing_endfor));
-	    else
+	    아니면
 		emsg(_(e_missing_endif));
 	}
 
@@ -1279,14 +1279,14 @@ do_cmdline(
 	 */
 	do
 	{
-	    int idx = cleanup_conditionals(&cstack, 0, TRUE);
+	    정수 idx = cleanup_conditionals(&cstack, 0, TRUE);
 
-	    if (idx >= 0)
+	    만약 (idx >= 0)
 		--idx;	    // remove try block not in its finally clause
 	    rewind_conditionals(&cstack, idx, CSF_WHILE | CSF_FOR,
 							&cstack.cs_looplevel);
 	}
-	while (cstack.cs_idx >= 0);
+	동안 (cstack.cs_idx >= 0);
 	trylevel = initial_trylevel;
     }
 
@@ -1296,10 +1296,10 @@ do_cmdline(
     do_errthrow(&cstack, getline_equal(fgetline, cookie, get_func_line)
 				  ? (char_u *)"endfunction" : (char_u *)NULL);
 
-    if (trylevel == 0)
+    만약 (trylevel == 0)
     {
 	// Just in case did_throw got set but current_exception wasn't.
-	if (current_exception == NULL)
+	만약 (current_exception == NULL)
 	    did_throw = FALSE;
 
 	/*
@@ -1308,7 +1308,7 @@ do_cmdline(
 	 * of interrupts or errors to exceptions, and ensure that no more
 	 * commands are executed.
 	 */
-	if (did_throw)
+	만약 (did_throw)
 	    handle_did_throw();
 
 	/*
@@ -1318,7 +1318,7 @@ do_cmdline(
 	 * when force_abort is set and did_emsg unset in case of an interrupt
 	 * from a finally clause after an error.
 	 */
-	else if (got_int || (did_emsg && force_abort))
+	아니면 만약 (got_int || (did_emsg && force_abort))
 	    suppress_errthrow = TRUE;
     }
 
@@ -1330,26 +1330,26 @@ do_cmdline(
      * will have to be checked for finally clauses to be executed due to the
      * ":return" or ":finish".  This is done in do_one_cmd().
      */
-    if (did_throw)
+    만약 (did_throw)
 	need_rethrow = TRUE;
-    if ((getline_equal(fgetline, cookie, getsourceline)
+    만약 ((getline_equal(fgetline, cookie, getsourceline)
 		&& ex_nesting_level > source_level(real_cookie))
 	    || (getline_equal(fgetline, cookie, get_func_line)
 		&& ex_nesting_level > func_level(real_cookie) + 1))
     {
-	if (!did_throw)
+	만약 (!did_throw)
 	    check_cstack = TRUE;
     }
-    else
+    아니면
     {
 	// When leaving a function, reduce nesting level.
-	if (getline_equal(fgetline, cookie, get_func_line))
+	만약 (getline_equal(fgetline, cookie, get_func_line))
 	    --ex_nesting_level;
 	/*
 	 * Go to debug mode when returning from a function in which we are
 	 * single-stepping.
 	 */
-	if ((getline_equal(fgetline, cookie, getsourceline)
+	만약 ((getline_equal(fgetline, cookie, getsourceline)
 		    || getline_equal(fgetline, cookie, get_func_line))
 		&& ex_nesting_level + 1 <= debug_break_level)
 	    do_debug(getline_equal(fgetline, cookie, getsourceline)
@@ -1361,17 +1361,17 @@ do_cmdline(
      * Restore the exception environment (done after returning from the
      * debugger).
      */
-    if (flags & DOCMD_EXCRESET)
+    만약 (flags & DOCMD_EXCRESET)
 	restore_dbg_stuff(&debug_saved);
 
     msg_list = saved_msg_list;
 
     // Cleanup if "cs_emsg_silent_list" remains.
-    if (cstack.cs_emsg_silent_list != NULL)
+    만약 (cstack.cs_emsg_silent_list != NULL)
     {
 	eslist_T *elem, *temp;
 
-	for (elem = cstack.cs_emsg_silent_list; elem != NULL; elem = temp)
+	위해 (elem = cstack.cs_emsg_silent_list; elem != NULL; elem = temp)
 	{
 	    temp = elem->next;
 	    vim_free(elem);
@@ -1384,9 +1384,9 @@ do_cmdline(
      * hit return before redrawing the screen. With the ":global" command we do
      * this only once after the command is finished.
      */
-    if (did_inc_RedrawingDisabled)
+    만약 (did_inc_RedrawingDisabled)
     {
-	if (RedrawingDisabled > 0)
+	만약 (RedrawingDisabled > 0)
 	    --RedrawingDisabled;
 	--no_wait_return;
 	msg_scroll = FALSE;
@@ -1395,7 +1395,7 @@ do_cmdline(
 	 * When just finished an ":if"-":else" which was typed, no need to
 	 * wait for hit-return.  Also for an error situation.
 	 */
-	if (retval == FAIL
+	만약 (retval == FAIL
 #ifdef FEAT_EVAL
 		|| (did_endif && KeyTyped && !did_emsg)
 #endif
@@ -1404,7 +1404,7 @@ do_cmdline(
 	    need_wait_return = FALSE;
 	    msg_didany = FALSE;		// don't wait when restarting edit
 	}
-	else if (need_wait_return)
+	아니면 만약 (need_wait_return)
 	{
 	    /*
 	     * The msg_start() above clears msg_didout. The wait_return() we do
@@ -1418,7 +1418,7 @@ do_cmdline(
 
 #ifdef FEAT_EVAL
     did_endif = FALSE;  // in case do_cmdline used recursively
-#else
+#아니면
     /*
      * Reset if_level, in case a sourced script file contains more ":if" than
      * ":endif" (could be ":if x | foo | endif").
@@ -1427,10 +1427,10 @@ do_cmdline(
 #endif
 
     --call_depth;
-    return retval;
+    반환 retval;
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * Handle when "did_throw" is set after executing commands.
  */
@@ -1471,18 +1471,18 @@ handle_did_throw(void)
     discard_current_exception();	// uses IObuff if 'verbose'
 
     // If "silent!" is active the uncaught exception is not fatal.
-    if (emsg_silent == 0)
+    만약 (emsg_silent == 0)
     {
 	suppress_errthrow = TRUE;
 	force_abort = TRUE;
     }
 
-    if (messages != NULL)
+    만약 (messages != NULL)
     {
 	do
 	{
 	    msglist_T	*next = messages->next;
-	    int		save_compiling = estack_compiling;
+	    정수		save_compiling = estack_compiling;
 
 	    estack_compiling = messages->msg_compiling;
 	    emsg(messages->msg);
@@ -1492,9 +1492,9 @@ handle_did_throw(void)
 	    messages = next;
 	    estack_compiling = save_compiling;
 	}
-	while (messages != NULL);
+	동안 (messages != NULL);
     }
-    else if (p != NULL)
+    아니면 만약 (p != NULL)
     {
 	emsg(p);
 	vim_free(p);
@@ -1508,47 +1508,47 @@ handle_did_throw(void)
  * Obtain a line when inside a ":while" or ":for" loop.
  */
     static char_u *
-get_loop_line(int c, void *cookie, int indent, getline_opt_T options)
+get_loop_line(정수 c, void *cookie, 정수 indent, getline_opt_T options)
 {
     struct loop_cookie	*cp = (struct loop_cookie *)cookie;
     wcmd_T		*wp;
     char_u		*line;
 
-    if (cp->current_line + 1 >= cp->lines_gap->ga_len)
+    만약 (cp->current_line + 1 >= cp->lines_gap->ga_len)
     {
-	if (cp->repeating)
-	    return NULL;	// trying to read past ":endwhile"/":endfor"
+	만약 (cp->repeating)
+	    반환 NULL;	// trying to read past ":endwhile"/":endfor"
 
 	// First time inside the ":while"/":for": get line normally.
-	if (cp->lc_getline == NULL)
+	만약 (cp->lc_getline == NULL)
 	    line = getcmdline(c, 0L, indent, 0);
-	else
+	아니면
 	    line = cp->lc_getline(c, cp->cookie, indent, options);
-	if (line != NULL && store_loop_line(cp->lines_gap, line) == OK)
+	만약 (line != NULL && store_loop_line(cp->lines_gap, line) == OK)
 	    ++cp->current_line;
 
-	return line;
+	반환 line;
     }
 
     KeyTyped = FALSE;
     ++cp->current_line;
     wp = (wcmd_T *)(cp->lines_gap->ga_data) + cp->current_line;
     SOURCING_LNUM = wp->lnum;
-    return vim_strsave(wp->line);
+    반환 vim_strsave(wp->line);
 }
 
 /*
  * Store a line in "gap" so that a ":while" loop can execute it again.
  */
-    static int
+    static 정수
 store_loop_line(garray_T *gap, char_u *line)
 {
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
+    만약 (ga_grow(gap, 1) == FAIL)
+	반환 FAIL;
     ((wcmd_T *)(gap->ga_data))[gap->ga_len].line = vim_strsave(line);
     ((wcmd_T *)(gap->ga_data))[gap->ga_len].lnum = SOURCING_LNUM;
     ++gap->ga_len;
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -1557,7 +1557,7 @@ store_loop_line(garray_T *gap, char_u *line)
     static void
 free_cmdlines(garray_T *gap)
 {
-    while (gap->ga_len > 0)
+    동안 (gap->ga_len > 0)
     {
 	vim_free(((wcmd_T *)(gap->ga_data))[gap->ga_len - 1].line);
 	--gap->ga_len;
@@ -1569,14 +1569,14 @@ free_cmdlines(garray_T *gap)
  * If "fgetline" is get_loop_line(), return TRUE if the getline it uses equals
  * "func".  * Otherwise return TRUE when "fgetline" equals "func".
  */
-    int
+    정수
 getline_equal(
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T),
+    char_u	*(*fgetline)(정수, void *, 정수, getline_opt_T),
     void	*cookie UNUSED,		// argument for fgetline()
-    char_u	*(*func)(int, void *, int, getline_opt_T))
+    char_u	*(*func)(정수, void *, 정수, getline_opt_T))
 {
 #ifdef FEAT_EVAL
-    char_u		*(*gp)(int, void *, int, getline_opt_T);
+    char_u		*(*gp)(정수, void *, 정수, getline_opt_T);
     struct loop_cookie *cp;
 
     // When "fgetline" is "get_loop_line()" use the "cookie" to find the
@@ -1584,14 +1584,14 @@ getline_equal(
     // nested several levels.
     gp = fgetline;
     cp = (struct loop_cookie *)cookie;
-    while (gp == get_loop_line)
+    동안 (gp == get_loop_line)
     {
 	gp = cp->lc_getline;
 	cp = cp->cookie;
     }
-    return gp == func;
-#else
-    return fgetline == func;
+    반환 gp == func;
+#아니면
+    반환 fgetline == func;
 #endif
 }
 
@@ -1601,11 +1601,11 @@ getline_equal(
  */
     void *
 getline_cookie(
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T) UNUSED,
+    char_u	*(*fgetline)(정수, void *, 정수, getline_opt_T) UNUSED,
     void	*cookie)		// argument for fgetline()
 {
 #ifdef FEAT_EVAL
-    char_u		*(*gp)(int, void *, int, getline_opt_T);
+    char_u		*(*gp)(정수, void *, 정수, getline_opt_T);
     struct loop_cookie  *cp;
 
     // When "fgetline" is "get_loop_line()" use the "cookie" to find the
@@ -1613,27 +1613,27 @@ getline_cookie(
     // several levels.
     gp = fgetline;
     cp = (struct loop_cookie *)cookie;
-    while (gp == get_loop_line)
+    동안 (gp == get_loop_line)
     {
 	gp = cp->lc_getline;
 	cp = cp->cookie;
     }
-    return cp;
-#else
-    return cookie;
+    반환 cp;
+#아니면
+    반환 cookie;
 #endif
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * Get the next line source line without advancing.
  */
     char_u *
 getline_peek(
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T) UNUSED,
+    char_u	*(*fgetline)(정수, void *, 정수, getline_opt_T) UNUSED,
     void	*cookie)		// argument for fgetline()
 {
-    char_u		*(*gp)(int, void *, int, getline_opt_T);
+    char_u		*(*gp)(정수, void *, 정수, getline_opt_T);
     struct loop_cookie  *cp;
     wcmd_T		*wp;
 
@@ -1642,20 +1642,20 @@ getline_peek(
     // several levels.
     gp = fgetline;
     cp = (struct loop_cookie *)cookie;
-    while (gp == get_loop_line)
+    동안 (gp == get_loop_line)
     {
-	if (cp->current_line + 1 < cp->lines_gap->ga_len)
+	만약 (cp->current_line + 1 < cp->lines_gap->ga_len)
 	{
 	    // executing lines a second time, use the stored copy
 	    wp = (wcmd_T *)(cp->lines_gap->ga_data) + cp->current_line + 1;
-	    return wp->line;
+	    반환 wp->line;
 	}
 	gp = cp->lc_getline;
 	cp = cp->cookie;
     }
-    if (gp == getsourceline)
-	return source_nextline(cp);
-    return NULL;
+    만약 (gp == getsourceline)
+	반환 source_nextline(cp);
+    반환 NULL;
 }
 #endif
 
@@ -1665,85 +1665,85 @@ getline_peek(
  * ":bwipeout", etc.
  * Returns the buffer number.
  */
-    static int
-compute_buffer_local_count(int addr_type, int lnum, int offset)
+    static 정수
+compute_buffer_local_count(정수 addr_type, 정수 lnum, 정수 offset)
 {
     buf_T   *buf;
     buf_T   *nextbuf;
-    int     count = offset;
+    정수     count = offset;
 
     buf = firstbuf;
-    while (buf->b_next != NULL && buf->b_fnum < lnum)
+    동안 (buf->b_next != NULL && buf->b_fnum < lnum)
 	buf = buf->b_next;
-    while (count != 0)
+    동안 (count != 0)
     {
 	count += (offset < 0) ? 1 : -1;
 	nextbuf = (offset < 0) ? buf->b_prev : buf->b_next;
-	if (nextbuf == NULL)
+	만약 (nextbuf == NULL)
 	    break;
 	buf = nextbuf;
-	if (addr_type == ADDR_LOADED_BUFFERS)
+	만약 (addr_type == ADDR_LOADED_BUFFERS)
 	    // skip over unloaded buffers
-	    while (buf->b_ml.ml_mfp == NULL)
+	    동안 (buf->b_ml.ml_mfp == NULL)
 	    {
 		nextbuf = (offset < 0) ? buf->b_prev : buf->b_next;
-		if (nextbuf == NULL)
+		만약 (nextbuf == NULL)
 		    break;
 		buf = nextbuf;
 	    }
     }
     // we might have gone too far, last buffer is not loadedd
-    if (addr_type == ADDR_LOADED_BUFFERS)
-	while (buf->b_ml.ml_mfp == NULL)
+    만약 (addr_type == ADDR_LOADED_BUFFERS)
+	동안 (buf->b_ml.ml_mfp == NULL)
 	{
 	    nextbuf = (offset >= 0) ? buf->b_prev : buf->b_next;
-	    if (nextbuf == NULL)
+	    만약 (nextbuf == NULL)
 		break;
 	    buf = nextbuf;
 	}
-    return buf->b_fnum;
+    반환 buf->b_fnum;
 }
 
 /*
  * Return the window number of "win".
  * When "win" is NULL return the number of windows.
  */
-    static int
+    static 정수
 current_win_nr(win_T *win)
 {
     win_T	*wp;
-    int		nr = 0;
+    정수		nr = 0;
 
     FOR_ALL_WINDOWS(wp)
     {
 	++nr;
-	if (wp == win)
+	만약 (wp == win)
 	    break;
     }
-    return nr;
+    반환 nr;
 }
 
-    static int
+    static 정수
 current_tab_nr(tabpage_T *tab)
 {
     tabpage_T	*tp;
-    int		nr = 0;
+    정수		nr = 0;
 
     FOR_ALL_TABPAGES(tp)
     {
 	++nr;
-	if (tp == tab)
+	만약 (tp == tab)
 	    break;
     }
-    return nr;
+    반환 nr;
 }
 
-    static int
-comment_start(char_u *p, int starts_with_colon UNUSED)
+    static 정수
+comment_start(char_u *p, 정수 starts_with_colon UNUSED)
 {
-    if (in_vim9script())
-	return p[0] == '#' && !starts_with_colon;
-    return *p == '"';
+    만약 (in_vim9script())
+	반환 p[0] == '#' && !starts_with_colon;
+    반환 *p == '"';
 }
 
 #define CURRENT_WIN_NR current_win_nr(curwin)
@@ -1772,11 +1772,11 @@ comment_start(char_u *p, int starts_with_colon UNUSED)
     static char_u *
 do_one_cmd(
     char_u	**cmdlinep,
-    int		flags,
+    정수		flags,
 #ifdef FEAT_EVAL
     cstack_T	*cstack,
 #endif
-    char_u	*(*fgetline)(int, void *, int, getline_opt_T),
+    char_u	*(*fgetline)(정수, void *, 정수, getline_opt_T),
     void	*cookie)		// argument for fgetline()
 {
     char_u	*p;
@@ -1786,17 +1786,17 @@ do_one_cmd(
     char_u	*after_modifier = NULL;
     exarg_T	ea;			// Ex command arguments
     cmdmod_T	save_cmdmod;
-    int		save_reg_executing = reg_executing;
-    int		save_pending_end_reg_executing = pending_end_reg_executing;
-    int		ni;			// set when Not Implemented
+    정수		save_reg_executing = reg_executing;
+    정수		save_pending_end_reg_executing = pending_end_reg_executing;
+    정수		ni;			// set when Not Implemented
     char_u	*cmd;
-    int		starts_with_colon = FALSE;
-    int		may_have_range;
+    정수		starts_with_colon = FALSE;
+    정수		may_have_range;
 #ifdef FEAT_EVAL
-    int		did_set_expr_line = FALSE;
+    정수		did_set_expr_line = FALSE;
 #endif
-    int		sourcing = flags & DOCMD_VERBOSE;
-    int		did_append_cmd = FALSE;
+    정수		sourcing = flags & DOCMD_VERBOSE;
+    정수		did_append_cmd = FALSE;
 
     CLEAR_FIELD(ea);
     ea.line1 = 1;
@@ -1806,7 +1806,7 @@ do_one_cmd(
 #endif
 
     // When the last file has not been edited :q has to be typed twice.
-    if (quitmore
+    만약 (quitmore
 #ifdef FEAT_EVAL
 	    // avoid that a function call in 'statusline' does this
 	    && !getline_equal(fgetline, cookie, get_func_line)
@@ -1822,7 +1822,7 @@ do_one_cmd(
     save_cmdmod = cmdmod;
 
     // "#!anything" is handled like a comment.
-    if ((*cmdlinep)[0] == '#' && (*cmdlinep)[1] == '!')
+    만약 ((*cmdlinep)[0] == '#' && (*cmdlinep)[1] == '!')
 	goto doend;
 
 /*
@@ -1838,7 +1838,7 @@ do_one_cmd(
     ea.cstack = cstack;
     starts_with_colon = *skipwhite(ea.cmd) == ':';
 #endif
-    if (parse_command_modifiers(&ea, &errormsg, &cmdmod, FALSE) == FAIL)
+    만약 (parse_command_modifiers(&ea, &errormsg, &cmdmod, FALSE) == FAIL)
 	goto doend;
     apply_cmdmod(&cmdmod);
     after_modifier = ea.cmd;
@@ -1846,7 +1846,7 @@ do_one_cmd(
 #ifdef FEAT_EVAL
     ea.skip = did_emsg || got_int || did_throw || (cstack->cs_idx >= 0
 			 && !(cstack->cs_flags[cstack->cs_idx] & CSF_ACTIVE));
-#else
+#아니면
     ea.skip = (if_level > 0);
 #endif
 
@@ -1859,21 +1859,21 @@ do_one_cmd(
 
     // In Vim9 script a colon is required before the range.  This may also be
     // after command modifiers.
-    int vim9script = in_vim9script();
-    if (vim9script && (flags & DOCMD_RANGEOK) == 0)
+    정수 vim9script = in_vim9script();
+    만약 (vim9script && (flags & DOCMD_RANGEOK) == 0)
     {
 	may_have_range = FALSE;
-	for (p = ea.cmd; p >= *cmdlinep; --p)
+	위해 (p = ea.cmd; p >= *cmdlinep; --p)
 	{
-	    if (*p == ':')
+	    만약 (*p == ':')
 		may_have_range = TRUE;
-	    if (p < ea.cmd && !VIM_ISWHITE(*p))
+	    만약 (p < ea.cmd && !VIM_ISWHITE(*p))
 		break;
 	}
     }
-    else
+    아니면
 	may_have_range = TRUE;
-    if (may_have_range)
+    만약 (may_have_range)
 	ea.cmd = skip_range(ea.cmd, TRUE, NULL);
 
 #ifdef FEAT_EVAL
@@ -1881,66 +1881,66 @@ do_one_cmd(
     // ":export var Name: type"
     // ":export def Name(..."
     // etc.
-    if (vim9script && checkforcmd_noparen(&ea.cmd, "export", 6))
+    만약 (vim9script && checkforcmd_noparen(&ea.cmd, "export", 6))
 	is_export = TRUE;
 #endif
 
-    if (vim9script && !may_have_range)
+    만약 (vim9script && !may_have_range)
     {
-	if (ea.cmd == cmd + 1 && *cmd == '$')
+	만약 (ea.cmd == cmd + 1 && *cmd == '$')
 	    // should be "$VAR = val"
 	    --ea.cmd;
 #ifdef FEAT_EVAL
 	p = find_ex_command(&ea, NULL, lookup_scriptitem, NULL);
-#else
+#아니면
 	p = find_ex_command(&ea, NULL, NULL, NULL);
 #endif
-	if (ea.cmdidx == CMD_SIZE)
+	만약 (ea.cmdidx == CMD_SIZE)
 	{
 	    char_u *ar = skip_range(ea.cmd, TRUE, NULL);
 
 	    // If a ':' before the range is missing, give a clearer error
 	    // message.
-	    if (ar > ea.cmd && !ea.skip)
+	    만약 (ar > ea.cmd && !ea.skip)
 	    {
 		semsg(_(e_colon_required_before_range_str), ea.cmd);
 		goto doend;
 	    }
 	}
     }
-    else
+    아니면
 	p = find_ex_command(&ea, NULL, NULL, NULL);
 
 #ifdef FEAT_EVAL
 # ifdef FEAT_PROFILE
     // Count this line for profiling if skip is TRUE.
-    if (do_profiling == PROF_YES
+    만약 (do_profiling == PROF_YES
 	    && (!ea.skip || cstack->cs_idx == 0 || (cstack->cs_idx > 0
 		     && (cstack->cs_flags[cstack->cs_idx - 1] & CSF_ACTIVE))))
     {
-	int skip = did_emsg || got_int || did_throw;
+	정수 skip = did_emsg || got_int || did_throw;
 
-	if (ea.cmdidx == CMD_catch)
+	만약 (ea.cmdidx == CMD_catch)
 	    skip = !skip && !(cstack->cs_idx >= 0
 			  && (cstack->cs_flags[cstack->cs_idx] & CSF_THROWN)
 			  && !(cstack->cs_flags[cstack->cs_idx] & CSF_CAUGHT));
-	else if (ea.cmdidx == CMD_else || ea.cmdidx == CMD_elseif)
+	아니면 만약 (ea.cmdidx == CMD_else || ea.cmdidx == CMD_elseif)
 	    skip = skip || !(cstack->cs_idx >= 0
 			  && !(cstack->cs_flags[cstack->cs_idx]
 						  & (CSF_ACTIVE | CSF_TRUE)));
-	else if (ea.cmdidx == CMD_finally)
+	아니면 만약 (ea.cmdidx == CMD_finally)
 	    skip = FALSE;
-	else if (ea.cmdidx != CMD_endif
+	아니면 만약 (ea.cmdidx != CMD_endif
 		&& ea.cmdidx != CMD_endfor
 		&& ea.cmdidx != CMD_endtry
 		&& ea.cmdidx != CMD_endwhile)
 	    skip = ea.skip;
 
-	if (!skip)
+	만약 (!skip)
 	{
-	    if (getline_equal(fgetline, cookie, get_func_line))
+	    만약 (getline_equal(fgetline, cookie, get_func_line))
 		func_line_exec(getline_cookie(fgetline, cookie));
-	    else if (getline_equal(fgetline, cookie, getsourceline))
+	    아니면 만약 (getline_equal(fgetline, cookie, getsourceline))
 		script_line_exec();
 	}
     }
@@ -1953,7 +1953,7 @@ do_one_cmd(
     // May go to debug mode.  If this happens and the ">quit" debug command is
     // used, throw an interrupt exception and skip the next command.
     dbg_check_breakpoint(&ea);
-    if (!ea.skip && got_int)
+    만약 (!ea.skip && got_int)
     {
 	ea.skip = TRUE;
 	(void)do_intthrow(cstack);
@@ -1978,26 +1978,26 @@ do_one_cmd(
  */
 
     // ea.addr_type for user commands is set by find_ucmd
-    if (!IS_USER_CMDIDX(ea.cmdidx))
+    만약 (!IS_USER_CMDIDX(ea.cmdidx))
     {
-	if (ea.cmdidx != CMD_SIZE)
-	    ea.addr_type = cmdnames[(int)ea.cmdidx].cmd_addr_type;
-	else
+	만약 (ea.cmdidx != CMD_SIZE)
+	    ea.addr_type = cmdnames[(정수)ea.cmdidx].cmd_addr_type;
+	아니면
 	    ea.addr_type = ADDR_LINES;
 
 	// :wincmd range depends on the argument.
-	if (ea.cmdidx == CMD_wincmd && p != NULL)
+	만약 (ea.cmdidx == CMD_wincmd && p != NULL)
 	    get_wincmd_addr_type(skipwhite(p), &ea);
 #ifdef FEAT_QUICKFIX
 	// :.cc in quickfix window uses line number
-	if ((ea.cmdidx == CMD_cc || ea.cmdidx == CMD_ll) && bt_quickfix(curbuf))
+	만약 ((ea.cmdidx == CMD_cc || ea.cmdidx == CMD_ll) && bt_quickfix(curbuf))
 	    ea.addr_type = ADDR_OTHER;
 #endif
     }
 
-    if (!may_have_range)
+    만약 (!may_have_range)
 	ea.line1 = ea.line2 = default_address(&ea);
-    else if (parse_cmd_address(&ea, &errormsg, FALSE) == FAIL)
+    아니면 만약 (parse_cmd_address(&ea, &errormsg, FALSE) == FAIL)
 	goto doend;
 
 /*
@@ -2008,14 +2008,14 @@ do_one_cmd(
      * Skip ':' and any white space
      */
     ea.cmd = skipwhite(ea.cmd);
-    while (*ea.cmd == ':')
+    동안 (*ea.cmd == ':')
 	ea.cmd = skipwhite(ea.cmd + 1);
 
     /*
      * If we got a line, but no command, then go to the line.
      * If we find a '|' or '\n' we set ea.nextcmd.
      */
-    if (*ea.cmd == NUL || comment_start(ea.cmd, starts_with_colon)
+    만약 (*ea.cmd == NUL || comment_start(ea.cmd, starts_with_colon)
 			       || (ea.nextcmd = check_nextcmd(ea.cmd)) != NULL)
     {
 	/*
@@ -2024,7 +2024,7 @@ do_one_cmd(
 	 * ":3|..."	prints line 3  (not in Vim9 script)
 	 * ":|"		prints current line  (not in Vim9 script)
 	 */
-	if (ea.skip)	    // skip this if inside :if
+	만약 (ea.skip)	    // skip this if inside :if
 	    goto doend;
 	errormsg = ex_range_without_command(&ea);
 	goto doend;
@@ -2032,14 +2032,14 @@ do_one_cmd(
 
     // If this looks like an undefined user command and there are CmdUndefined
     // autocommands defined, trigger the matching autocommands.
-    if (p != NULL && ea.cmdidx == CMD_SIZE && !ea.skip
+    만약 (p != NULL && ea.cmdidx == CMD_SIZE && !ea.skip
 	    && ASCII_ISUPPER(*ea.cmd)
 	    && has_cmdundefined())
     {
-	int ret;
+	정수 ret;
 
 	p = ea.cmd;
-	while (ASCII_ISALNUM(*p))
+	동안 (ASCII_ISALNUM(*p))
 	    ++p;
 	p = vim_strnsave(ea.cmd, p - ea.cmd);
 	ret = apply_autocmds(EVENT_CMDUNDEFINED, p, p, TRUE, NULL);
@@ -2053,32 +2053,32 @@ do_one_cmd(
 		) ? find_ex_command(&ea, NULL, NULL, NULL) : ea.cmd;
     }
 
-    if (p == NULL)
+    만약 (p == NULL)
     {
-	if (!ea.skip)
+	만약 (!ea.skip)
 	    errormsg = _(e_ambiguous_use_of_user_defined_command);
 	goto doend;
     }
     // Check for wrong commands.
-    if (*p == '!' && ea.cmd[1] == 0151 && ea.cmd[0] == 78
+    만약 (*p == '!' && ea.cmd[1] == 0151 && ea.cmd[0] == 78
 	    && !IS_USER_CMDIDX(ea.cmdidx))
     {
 	errormsg = uc_fun_cmd();
 	goto doend;
     }
 
-    if (ea.cmdidx == CMD_SIZE)
+    만약 (ea.cmdidx == CMD_SIZE)
     {
-	if (!ea.skip)
+	만약 (!ea.skip)
 	{
 	    STRCPY(IObuff, _(e_not_an_editor_command));
-	    if (!sourcing)
+	    만약 (!sourcing)
 	    {
 		// If the modifier was parsed OK the error must be in the
 		// following command
-		if (after_modifier != NULL)
+		만약 (after_modifier != NULL)
 		    append_command(after_modifier);
-		else
+		아니면
 		    append_command(*cmdlinep);
 		did_append_cmd = TRUE;
 	    }
@@ -2100,11 +2100,11 @@ do_one_cmd(
      * When the expression evaluation is disabled, recognize the ":if" and
      * ":endif" commands and ignore everything in between it.
      */
-    if (ea.cmdidx == CMD_if)
+    만약 (ea.cmdidx == CMD_if)
 	++if_level;
-    if (if_level)
+    만약 (if_level)
     {
-	if (ea.cmdidx == CMD_endif)
+	만약 (ea.cmdidx == CMD_endif)
 	    --if_level;
 	goto doend;
     }
@@ -2112,52 +2112,52 @@ do_one_cmd(
 #endif
 
     // forced commands
-    if (*p == '!' && ea.cmdidx != CMD_substitute
+    만약 (*p == '!' && ea.cmdidx != CMD_substitute
 	    && ea.cmdidx != CMD_smagic && ea.cmdidx != CMD_snomagic)
     {
 	++p;
 	ea.forceit = TRUE;
     }
-    else
+    아니면
 	ea.forceit = FALSE;
 
 /*
  * 6. Parse arguments.  Then check for errors.
  */
-    if (!IS_USER_CMDIDX(ea.cmdidx))
-	ea.argt = (long)cmdnames[(int)ea.cmdidx].cmd_argt;
+    만약 (!IS_USER_CMDIDX(ea.cmdidx))
+	ea.argt = (long)cmdnames[(정수)ea.cmdidx].cmd_argt;
 
-    if (!ea.skip)
+    만약 (!ea.skip)
     {
 #ifdef HAVE_SANDBOX
-	if (sandbox != 0 && !(ea.argt & EX_SBOXOK))
+	만약 (sandbox != 0 && !(ea.argt & EX_SBOXOK))
 	{
 	    // Command not allowed in sandbox.
 	    errormsg = _(e_not_allowed_in_sandbox);
 	    goto doend;
 	}
 #endif
-	if (restricted != 0 && (ea.argt & EX_RESTRICT))
+	만약 (restricted != 0 && (ea.argt & EX_RESTRICT))
 	{
 	    errormsg = _(e_command_not_allowed_in_rvim);
 	    goto doend;
 	}
-	if (!curbuf->b_p_ma && (ea.argt & EX_MODIFY))
+	만약 (!curbuf->b_p_ma && (ea.argt & EX_MODIFY))
 	{
 	    // Command not allowed in non-'modifiable' buffer
 	    errormsg = _(e_cannot_make_changes_modifiable_is_off);
 	    goto doend;
 	}
 
-	if (!IS_USER_CMDIDX(ea.cmdidx))
+	만약 (!IS_USER_CMDIDX(ea.cmdidx))
 	{
-	    if (cmdwin_type != 0 && !(ea.argt & EX_CMDWIN))
+	    만약 (cmdwin_type != 0 && !(ea.argt & EX_CMDWIN))
 	    {
 		// Command not allowed in the command line window
 		errormsg = _(e_invalid_in_cmdline_window);
 		goto doend;
 	    }
-	    if (text_locked() && !(ea.argt & EX_LOCK_OK))
+	    만약 (text_locked() && !(ea.argt & EX_LOCK_OK))
 	    {
 		// Command not allowed when text is locked
 		errormsg = _(get_text_locked_msg());
@@ -2169,7 +2169,7 @@ do_one_cmd(
 	// Do allow ":checktime" (it is postponed).
 	// Do allow ":edit" (check for an argument later).
 	// Do allow ":file" with no arguments (check for an argument later).
-	if (!(ea.argt & (EX_CMDWIN | EX_LOCK_OK))
+	만약 (!(ea.argt & (EX_CMDWIN | EX_LOCK_OK))
 		&& ea.cmdidx != CMD_checktime
 		&& ea.cmdidx != CMD_edit
 		&& ea.cmdidx != CMD_file
@@ -2177,14 +2177,14 @@ do_one_cmd(
 		&& curbuf_locked())
 	    goto doend;
 
-	if (!ni && !(ea.argt & EX_RANGE) && ea.addr_count > 0)
+	만약 (!ni && !(ea.argt & EX_RANGE) && ea.addr_count > 0)
 	{
 	    errormsg = _(e_no_range_allowed);
 	    goto doend;
 	}
     }
 
-    if (!ni && !(ea.argt & EX_BANG) && ea.forceit)
+    만약 (!ni && !(ea.argt & EX_BANG) && ea.forceit)
     {
 	errormsg = _(e_no_bang_allowed);
 	goto doend;
@@ -2194,23 +2194,23 @@ do_one_cmd(
      * Don't complain about the range if it is not used
      * (could happen if line_count is accidentally set to 0).
      */
-    if (!ea.skip && !ni && (ea.argt & EX_RANGE))
+    만약 (!ea.skip && !ni && (ea.argt & EX_RANGE))
     {
 	/*
 	 * If the range is backwards, ask for confirmation and, if given, swap
 	 * ea.line1 & ea.line2 so it's forwards again.
 	 * When global command is busy, don't ask, will fail below.
 	 */
-	if (!global_busy && ea.line1 > ea.line2)
+	만약 (!global_busy && ea.line1 > ea.line2)
 	{
-	    if (msg_silent == 0)
+	    만약 (msg_silent == 0)
 	    {
-		if (sourcing || exmode_active)
+		만약 (sourcing || exmode_active)
 		{
 		    errormsg = _(e_backwards_range_given);
 		    goto doend;
 		}
-		if (ask_yesno((char_u *)
+		만약 (ask_yesno((char_u *)
 			_("Backwards range given, OK to swap"), FALSE) != 'y')
 		    goto doend;
 	    }
@@ -2218,18 +2218,18 @@ do_one_cmd(
 	    ea.line1 = ea.line2;
 	    ea.line2 = lnum;
 	}
-	if ((errormsg = invalid_range(&ea)) != NULL)
+	만약 ((errormsg = invalid_range(&ea)) != NULL)
 	    goto doend;
     }
 
-    if ((ea.addr_type == ADDR_OTHER) && ea.addr_count == 0)
+    만약 ((ea.addr_type == ADDR_OTHER) && ea.addr_count == 0)
 	// default is 1, not cursor
 	ea.line2 = 1;
 
     correct_range(&ea);
 
 #ifdef FEAT_FOLDING
-    if (((ea.argt & EX_WHOLEFOLD) || ea.addr_count >= 2) && !global_busy
+    만약 (((ea.argt & EX_WHOLEFOLD) || ea.addr_count >= 2) && !global_busy
 	    && ea.addr_type == ADDR_LINES)
     {
 	// Put the first line at the start of a closed fold, put the last line
@@ -2245,7 +2245,7 @@ do_one_cmd(
      * option here, so things like % get expanded.
      */
     p = replace_makeprg(&ea, p, cmdlinep);
-    if (p == NULL)
+    만약 (p == NULL)
 	goto doend;
 #endif
 
@@ -2253,32 +2253,32 @@ do_one_cmd(
      * Skip to start of argument.
      * Don't do this for the ":!" command, because ":!! -l" needs the space.
      */
-    if (ea.cmdidx == CMD_bang)
+    만약 (ea.cmdidx == CMD_bang)
 	ea.arg = p;
-    else
+    아니면
 	ea.arg = skipwhite(p);
 
     // ":file" cannot be run with an argument when "curbuf_lock" is set
-    if (ea.cmdidx == CMD_file && *ea.arg != NUL && curbuf_locked())
+    만약 (ea.cmdidx == CMD_file && *ea.arg != NUL && curbuf_locked())
 	goto doend;
 
     /*
      * Check for "++opt=val" argument.
      * Must be first, allow ":w ++enc=utf8 !cmd"
      */
-    if (ea.argt & EX_ARGOPT)
-	while (ea.arg[0] == '+' && ea.arg[1] == '+')
-	    if (getargopt(&ea) == FAIL && !ni)
+    만약 (ea.argt & EX_ARGOPT)
+	동안 (ea.arg[0] == '+' && ea.arg[1] == '+')
+	    만약 (getargopt(&ea) == FAIL && !ni)
 	    {
 		errormsg = _(e_invalid_argument);
 		goto doend;
 	    }
 
-    if (ea.cmdidx == CMD_write || ea.cmdidx == CMD_update)
+    만약 (ea.cmdidx == CMD_write || ea.cmdidx == CMD_update)
     {
-	if (*ea.arg == '>')			// append
+	만약 (*ea.arg == '>')			// append
 	{
-	    if (*++ea.arg != '>')		// typed wrong
+	    만약 (*++ea.arg != '>')		// typed wrong
 	    {
 		errormsg = _(e_use_w_or_w_gt_gt);
 		goto doend;
@@ -2286,31 +2286,31 @@ do_one_cmd(
 	    ea.arg = skipwhite(ea.arg + 1);
 	    ea.append = TRUE;
 	}
-	else if (*ea.arg == '!' && ea.cmdidx == CMD_write)  // :w !filter
+	아니면 만약 (*ea.arg == '!' && ea.cmdidx == CMD_write)  // :w !filter
 	{
 	    ++ea.arg;
 	    ea.usefilter = TRUE;
 	}
     }
 
-    if (ea.cmdidx == CMD_read)
+    만약 (ea.cmdidx == CMD_read)
     {
-	if (ea.forceit)
+	만약 (ea.forceit)
 	{
 	    ea.usefilter = TRUE;		// :r! filter if ea.forceit
 	    ea.forceit = FALSE;
 	}
-	else if (*ea.arg == '!')		// :r !filter
+	아니면 만약 (*ea.arg == '!')		// :r !filter
 	{
 	    ++ea.arg;
 	    ea.usefilter = TRUE;
 	}
     }
 
-    if (ea.cmdidx == CMD_lshift || ea.cmdidx == CMD_rshift)
+    만약 (ea.cmdidx == CMD_lshift || ea.cmdidx == CMD_rshift)
     {
 	ea.amount = 1;
-	while (*ea.arg == *ea.cmd)		// count number of '>' or '<'
+	동안 (*ea.arg == *ea.cmd)		// count number of '>' or '<'
 	{
 	    ++ea.arg;
 	    ++ea.amount;
@@ -2322,7 +2322,7 @@ do_one_cmd(
      * Check for "+command" argument, before checking for next command.
      * Don't do this for ":read !cmd" and ":write !cmd".
      */
-    if ((ea.argt & EX_CMDARG) && !ea.usefilter)
+    만약 ((ea.argt & EX_CMDARG) && !ea.usefilter)
 	ea.do_ecmd_cmd = getargcmd(&ea.arg);
 
     /*
@@ -2334,11 +2334,11 @@ do_one_cmd(
      * Also do this inside a { - } block after :command and :autocmd.
      * Any others?
      */
-    if ((ea.argt & EX_TRLBAR) && !ea.usefilter)
+    만약 ((ea.argt & EX_TRLBAR) && !ea.usefilter)
     {
 	separate_nextcmd(&ea, FALSE);
     }
-    else if (ea.cmdidx == CMD_bang
+    아니면 만약 (ea.cmdidx == CMD_bang
 	    || ea.cmdidx == CMD_terminal
 	    || ea.cmdidx == CMD_global
 	    || ea.cmdidx == CMD_vglobal
@@ -2348,12 +2348,12 @@ do_one_cmd(
 #endif
 	    )
     {
-	for (p = ea.arg; *p; ++p)
+	위해 (p = ea.arg; *p; ++p)
 	{
 	    // Remove one backslash before a newline
-	    if (*p == '\\' && p[1] == '\n')
+	    만약 (*p == '\\' && p[1] == '\n')
 		STRMOVE(p, p + 1);
-	    else if (*p == '\n' && !(ea.argt & EX_EXPR_ARG))
+	    아니면 만약 (*p == '\n' && !(ea.argt & EX_EXPR_ARG))
 	    {
 		ea.nextcmd = p + 1;
 		*p = NUL;
@@ -2362,33 +2362,33 @@ do_one_cmd(
 	}
     }
 
-    if ((ea.argt & EX_DFLALL) && ea.addr_count == 0)
+    만약 ((ea.argt & EX_DFLALL) && ea.addr_count == 0)
 	address_default_all(&ea);
 
     // accept numbered register only when no count allowed (:put)
-    if (       (ea.argt & EX_REGSTR)
+    만약 (       (ea.argt & EX_REGSTR)
 	    && *ea.arg != NUL
 	       // Do not allow register = for user commands
 	    && (!IS_USER_CMDIDX(ea.cmdidx) || *ea.arg != '=')
 	    && !((ea.argt & EX_COUNT) && VIM_ISDIGIT(*ea.arg)))
     {
-#if !defined(FEAT_CLIPBOARD) && !defined(FEAT_CLIPBOARD_PROVIDER)
+#만약 !defined(FEAT_CLIPBOARD) && !defined(FEAT_CLIPBOARD_PROVIDER)
 	// check these explicitly for a more specific error message
-	if (*ea.arg == '*' || *ea.arg == '+')
+	만약 (*ea.arg == '*' || *ea.arg == '+')
 	{
 	    errormsg = _(e_invalid_register_name);
 	    goto doend;
 	}
 #endif
-	if (valid_yank_reg(*ea.arg, (!IS_USER_CMDIDX(ea.cmdidx)
+	만약 (valid_yank_reg(*ea.arg, (!IS_USER_CMDIDX(ea.cmdidx)
 			    && ea.cmdidx != CMD_put && ea.cmdidx != CMD_iput)))
 	{
 	    ea.regname = *ea.arg++;
 #ifdef FEAT_EVAL
 	    // for '=' register: accept the rest of the line as an expression
-	    if (ea.arg[-1] == '=' && ea.arg[0] != NUL)
+	    만약 (ea.arg[-1] == '=' && ea.arg[0] != NUL)
 	    {
-		if (!ea.skip)
+		만약 (!ea.skip)
 		{
 		    set_expr_line(vim_strsave(ea.arg), &ea);
 		    did_set_expr_line = TRUE;
@@ -2404,35 +2404,35 @@ do_one_cmd(
      * Check for a count.  When accepting a EX_BUFNAME, don't use "123foo" as a
      * count, it's a buffer name.
      */
-    if ((ea.argt & EX_COUNT) && VIM_ISDIGIT(*ea.arg)
+    만약 ((ea.argt & EX_COUNT) && VIM_ISDIGIT(*ea.arg)
 	    && (!(ea.argt & EX_BUFNAME) || *(p = skipdigits(ea.arg + 1)) == NUL
 							  || VIM_ISWHITE(*p)))
     {
 	n = getdigits_quoted(&ea.arg);
 	ea.arg = skipwhite(ea.arg);
-	if (n <= 0 && !ni && (ea.argt & EX_ZEROR) == 0)
+	만약 (n <= 0 && !ni && (ea.argt & EX_ZEROR) == 0)
 	{
 	    errormsg = _(e_positive_count_required);
 	    goto doend;
 	}
-	if (ea.addr_type != ADDR_LINES)	// e.g. :buffer 2, :sleep 3
+	만약 (ea.addr_type != ADDR_LINES)	// e.g. :buffer 2, :sleep 3
 	{
 	    ea.line2 = n;
-	    if (ea.addr_count == 0)
+	    만약 (ea.addr_count == 0)
 		ea.addr_count = 1;
 	}
-	else
+	아니면
 	{
 	    ea.line1 = ea.line2;
-	    if (ea.line2 >= LONG_MAX - (n - 1))
+	    만약 (ea.line2 >= LONG_MAX - (n - 1))
 		ea.line2 = LONG_MAX;  // avoid overflow
-	    else
+	    아니면
 		ea.line2 += n - 1;
 	    ++ea.addr_count;
 	    /*
 	     * Be vi compatible: no error message for out of range.
 	     */
-	    if (ea.line2 > curbuf->b_ml.ml_line_count)
+	    만약 (ea.line2 > curbuf->b_ml.ml_line_count)
 		ea.line2 = curbuf->b_ml.ml_line_count;
 	}
     }
@@ -2440,9 +2440,9 @@ do_one_cmd(
     /*
      * Check for flags: 'l', 'p' and '#'.
      */
-    if (ea.argt & EX_FLAGS)
+    만약 (ea.argt & EX_FLAGS)
 	get_flags(&ea);
-    if (!ni && !(ea.argt & EX_EXTRA) && *ea.arg != NUL
+    만약 (!ni && !(ea.argt & EX_EXTRA) && *ea.arg != NUL
 	    && *ea.arg != '"' && (*ea.arg != '|' || (ea.argt & EX_TRLBAR) == 0))
     {
 	// no arguments allowed but there is something
@@ -2450,7 +2450,7 @@ do_one_cmd(
 	goto doend;
     }
 
-    if (!ni && (ea.argt & EX_NEEDARG) && *ea.arg == NUL)
+    만약 (!ni && (ea.argt & EX_NEEDARG) && *ea.arg == NUL)
     {
 	errormsg = _(e_argument_required);
 	goto doend;
@@ -2463,7 +2463,7 @@ do_one_cmd(
      * Also make an exception for commands that handle a trailing command
      * themselves.
      */
-    if (ea.skip)
+    만약 (ea.skip)
     {
 	switch (ea.cmdidx)
 	{
@@ -2572,12 +2572,12 @@ do_one_cmd(
     }
 #endif
 
-    if ((ea.argt & EX_XFILE)
+    만약 ((ea.argt & EX_XFILE)
 	    && expand_filename(&ea, cmdlinep, &errormsg) == FAIL)
 	goto doend;
 
 #ifdef FEAT_EVAL
-    if (is_export && (ea.argt & EX_EXPORT) == 0)
+    만약 (is_export && (ea.argt & EX_EXPORT) == 0)
     {
 	emsg(_(e_invalid_command_after_export));
 	goto doend;
@@ -2588,7 +2588,7 @@ do_one_cmd(
      * Accept buffer name.  Cannot be used at the same time with a buffer
      * number.  Don't do this for a user command.
      */
-    if ((ea.argt & EX_BUFNAME) && *ea.arg != NUL && ea.addr_count == 0
+    만약 ((ea.argt & EX_BUFNAME) && *ea.arg != NUL && ea.addr_count == 0
 	    && !IS_USER_CMDIDX(ea.cmdidx))
     {
 	/*
@@ -2596,18 +2596,18 @@ do_one_cmd(
 	 * by spaces: find next space (skipping over escaped characters).
 	 * The others take one argument: ignore trailing spaces.
 	 */
-	if (ea.cmdidx == CMD_bdelete || ea.cmdidx == CMD_bwipeout
+	만약 (ea.cmdidx == CMD_bdelete || ea.cmdidx == CMD_bwipeout
 						  || ea.cmdidx == CMD_bunload)
 	    p = skiptowhite_esc(ea.arg);
-	else
+	아니면
 	{
 	    p = ea.arg + STRLEN(ea.arg);
-	    while (p > ea.arg && VIM_ISWHITE(p[-1]))
+	    동안 (p > ea.arg && VIM_ISWHITE(p[-1]))
 		--p;
 	}
 	ea.line2 = buflist_findpat(ea.arg, p, (ea.argt & EX_BUFUNL) != 0,
 								FALSE, FALSE);
-	if (ea.line2 < 0)	    // failed
+	만약 (ea.line2 < 0)	    // failed
 	    goto doend;
 	ea.addr_count = 1;
 	ea.arg = skipwhite(p);
@@ -2615,10 +2615,10 @@ do_one_cmd(
 
     // The :try command saves the emsg_silent flag, reset it here when
     // ":silent! try" was used, it should only apply to :try itself.
-    if (ea.cmdidx == CMD_try && cmdmod.cmod_did_esilent > 0)
+    만약 (ea.cmdidx == CMD_try && cmdmod.cmod_did_esilent > 0)
     {
 	emsg_silent -= cmdmod.cmod_did_esilent;
-	if (emsg_silent < 0)
+	만약 (emsg_silent < 0)
 	    emsg_silent = 0;
 	cmdmod.cmod_did_esilent = 0;
     }
@@ -2627,36 +2627,36 @@ do_one_cmd(
  * 7. Execute the command.
  */
 
-    if (IS_USER_CMDIDX(ea.cmdidx))
+    만약 (IS_USER_CMDIDX(ea.cmdidx))
     {
 	/*
 	 * Execute a user-defined command.
 	 */
 	do_ucmd(&ea);
     }
-    else
+    아니면
     {
 	/*
 	 * Call the function to execute the builtin command.
 	 */
 	(cmdnames[ea.cmdidx].cmd_func)(&ea);
-	if (ea.errmsg != NULL)
+	만약 (ea.errmsg != NULL)
 	    errormsg = ea.errmsg;
     }
 
 #ifdef FEAT_EVAL
     // A command will reset "is_export" when exporting an item.  If it is still
     // set something went wrong or the command was never executed.
-    if (!ea.skip && is_export)
+    만약 (!ea.skip && is_export)
     {
-	if (errormsg == NULL)
+	만약 (errormsg == NULL)
 	    errormsg = _(e_export_with_invalid_argument);
 	is_export = FALSE;
     }
 
     // Set flag that any command was executed, used by ex_vim9script().
     // Not if this was a command that wasn't executed or :endif.
-    if (sourcing_a_script(&ea)
+    만약 (sourcing_a_script(&ea)
 	    && current_sctx.sc_sid > 0
 	    && ea.cmdidx != CMD_endif
 	    && (cstack->cs_idx < 0
@@ -2670,13 +2670,13 @@ do_one_cmd(
      * exception, or reanimate a returned function or finished script file and
      * return or finish it again.
      */
-    if (need_rethrow)
+    만약 (need_rethrow)
 	do_throw(cstack);
-    else if (check_cstack)
+    아니면 만약 (check_cstack)
     {
-	if (source_finished(fgetline, cookie))
+	만약 (source_finished(fgetline, cookie))
 	    do_finish(&ea, TRUE);
-	else if (getline_equal(fgetline, cookie, get_func_line)
+	아니면 만약 (getline_equal(fgetline, cookie, get_func_line)
 						   && current_func_returned())
 	    do_return(&ea, TRUE, FALSE, NULL);
     }
@@ -2684,17 +2684,17 @@ do_one_cmd(
 #endif
 
 doend:
-    if (curwin->w_cursor.lnum == 0)	// can happen with zero line number
+    만약 (curwin->w_cursor.lnum == 0)	// can happen with zero line number
     {
 	curwin->w_cursor.lnum = 1;
 	curwin->w_cursor.col = 0;
     }
 
-    if (errormsg != NULL && *errormsg != NUL && !did_emsg)
+    만약 (errormsg != NULL && *errormsg != NUL && !did_emsg)
     {
-	if ((sourcing || !KeyTyped) && !did_append_cmd)
+	만약 ((sourcing || !KeyTyped) && !did_append_cmd)
 	{
-	    if (errormsg != (char *)IObuff)
+	    만약 (errormsg != (char *)IObuff)
 	    {
 		STRCPY(IObuff, errormsg);
 		errormsg = (char *)IObuff;
@@ -2706,9 +2706,9 @@ doend:
 #ifdef FEAT_EVAL
     do_errthrow(cstack,
 	    (ea.cmdidx != CMD_SIZE && !IS_USER_CMDIDX(ea.cmdidx))
-			? cmdnames[(int)ea.cmdidx].cmd_name : (char_u *)NULL);
+			? cmdnames[(정수)ea.cmdidx].cmd_name : (char_u *)NULL);
 
-    if (did_set_expr_line)
+    만약 (did_set_expr_line)
 	set_expr_line(NULL, NULL);
     is_export = FALSE;
 #endif
@@ -2718,7 +2718,7 @@ doend:
     reg_executing = save_reg_executing;
     pending_end_reg_executing = save_pending_end_reg_executing;
 
-    if (ea.nextcmd && *ea.nextcmd == NUL)	// not really a next command
+    만약 (ea.nextcmd && *ea.nextcmd == NUL)	// not really a next command
 	ea.nextcmd = NULL;
 
 #ifdef FEAT_EVAL
@@ -2726,7 +2726,7 @@ doend:
     vim_free(ea.cmdline_tofree);
 #endif
 
-    return ea.nextcmd;
+    반환 ea.nextcmd;
 }
 
 static char ex_error_buf[MSG_BUF_LEN];
@@ -2740,7 +2740,7 @@ static char ex_error_buf[MSG_BUF_LEN];
 ex_errmsg(char *msg, char_u *arg)
 {
     vim_snprintf(ex_error_buf, MSG_BUF_LEN, _(msg), arg);
-    return ex_error_buf;
+    반환 ex_error_buf;
 }
 
 /*
@@ -2758,7 +2758,7 @@ ex_range_without_command(exarg_T *eap)
 {
     char *errormsg = NULL;
 
-    if ((*eap->cmd == '|' ||
+    만약 ((*eap->cmd == '|' ||
 		(exmode_active && eap->cmd != (char_u *)exmode_plus + 1))
 #ifdef FEAT_EVAL
 	    && !in_vim9script()
@@ -2767,36 +2767,36 @@ ex_range_without_command(exarg_T *eap)
     {
 	eap->cmdidx = CMD_print;
 	eap->argt = EX_RANGE+EX_COUNT+EX_TRLBAR;
-	if ((errormsg = invalid_range(eap)) == NULL)
+	만약 ((errormsg = invalid_range(eap)) == NULL)
 	{
 	    correct_range(eap);
 	    ex_print(eap);
 	}
     }
-    else if (eap->addr_count != 0)
+    아니면 만약 (eap->addr_count != 0)
     {
-	if (eap->line2 > curbuf->b_ml.ml_line_count)
+	만약 (eap->line2 > curbuf->b_ml.ml_line_count)
 	{
 	    // With '-' in 'cpoptions' a line number past the file is an
 	    // error, otherwise put it at the end of the file.
-	    if (vim_strchr(p_cpo, CPO_MINUS) != NULL)
+	    만약 (vim_strchr(p_cpo, CPO_MINUS) != NULL)
 		eap->line2 = -1;
-	    else
+	    아니면
 		eap->line2 = curbuf->b_ml.ml_line_count;
 	}
 
-	if (eap->line2 < 0)
+	만약 (eap->line2 < 0)
 	    errormsg = _(e_invalid_range);
-	else
+	아니면
 	{
-	    if (eap->line2 == 0)
+	    만약 (eap->line2 == 0)
 		curwin->w_cursor.lnum = 1;
-	    else
+	    아니면
 		curwin->w_cursor.lnum = eap->line2;
 	    beginline(BL_SOL | BL_FIX);
 	}
     }
-    return errormsg;
+    반환 errormsg;
 }
 
 /*
@@ -2804,51 +2804,51 @@ ex_range_without_command(exarg_T *eap)
  * If there is a match advance "pp" to the argument and return TRUE.
  * If "noparen" is TRUE do not recognize the command followed by "(" or ".".
  */
-    static int
+    static 정수
 checkforcmd_opt(
     char_u	**pp,		// start of command
     char	*cmd,		// name of command
-    int		len,		// required length
-    int		noparen)
+    정수		len,		// required length
+    정수		noparen)
 {
-    int		i;
+    정수		i;
 
-    for (i = 0; cmd[i] != NUL; ++i)
-	if (((char_u *)cmd)[i] != (*pp)[i])
+    위해 (i = 0; cmd[i] != NUL; ++i)
+	만약 (((char_u *)cmd)[i] != (*pp)[i])
 	    break;
-    if (i >= len && !ASCII_ISALPHA((*pp)[i]) && (*pp)[i] != '_'
+    만약 (i >= len && !ASCII_ISALPHA((*pp)[i]) && (*pp)[i] != '_'
 			 && (!noparen || ((*pp)[i] != '(' && (*pp)[i] != '.')))
     {
 	*pp = skipwhite(*pp + i);
-	return TRUE;
+	반환 TRUE;
     }
-    return FALSE;
+    반환 FALSE;
 }
 
 /*
  * Check for an Ex command with optional tail.
  * If there is a match advance "pp" to the argument and return TRUE.
  */
-    int
+    정수
 checkforcmd(
     char_u	**pp,		// start of command
     char	*cmd,		// name of command
-    int		len)		// required length
+    정수		len)		// required length
 {
-    return checkforcmd_opt(pp, cmd, len, FALSE);
+    반환 checkforcmd_opt(pp, cmd, len, FALSE);
 }
 
 /*
  * Check for an Ex command with optional tail, not followed by "(" or ".".
  * If there is a match advance "pp" to the argument and return TRUE.
  */
-    int
+    정수
 checkforcmd_noparen(
     char_u	**pp,		// start of command
     char	*cmd,		// name of command
-    int		len)		// required length
+    정수		len)		// required length
 {
-    return checkforcmd_opt(pp, cmd, len, TRUE);
+    반환 checkforcmd_opt(pp, cmd, len, TRUE);
 }
 
 /*
@@ -2862,16 +2862,16 @@ find_ucmd_repl(char_u *arg)
     char_u	*p = arg;
 
     // Skip over the attributes.
-    while (*p == '-')
+    동안 (*p == '-')
 	p = skipwhite(skiptowhite(p));
 
     // Skip over the command name.
-    if (!ASCII_ISALPHA(*p))
-	return NULL;
-    while (ASCII_ISALNUM(*p))
+    만약 (!ASCII_ISALPHA(*p))
+	반환 NULL;
+    동안 (ASCII_ISALNUM(*p))
 	++p;
 
-    return *p == NUL ? NULL : skipwhite(p);
+    반환 *p == NUL ? NULL : skipwhite(p);
 }
 
 /*
@@ -2885,30 +2885,30 @@ find_cmd_block_start(char_u *line)
 {
     char_u	*p = skipwhite(line);
 
-    for (;;)
+    위해 (;;)
     {
 	char_u	*arg = p;
 
-	if (*p == '{' && ends_excmd2(p, skipwhite(p + 1)))
-	    return p;
+	만약 (*p == '{' && ends_excmd2(p, skipwhite(p + 1)))
+	    반환 p;
 
-	if (checkforcmd_noparen(&arg, "autocmd", 2))
+	만약 (checkforcmd_noparen(&arg, "autocmd", 2))
 	{
-	    if (*arg == '!')
+	    만약 (*arg == '!')
 		arg = skipwhite(arg + 1);
 	    p = au_find_cmd_arg(arg);
 	}
-	else if (checkforcmd_noparen(&arg, "command", 3))
+	아니면 만약 (checkforcmd_noparen(&arg, "command", 3))
 	{
-	    if (*arg == '!')
+	    만약 (*arg == '!')
 		arg = skipwhite(arg + 1);
 	    p = find_ucmd_repl(arg);
 	}
-	else
-	    return NULL;
+	아니면
+	    반환 NULL;
 
-	if (p == NULL)
-	    return NULL;
+	만약 (p == NULL)
+	    반환 NULL;
 	p = skipwhite(p);
     }
 }
@@ -2930,24 +2930,24 @@ find_cmd_block_start(char_u *line)
  * Return FAIL when the command is not to be executed.
  * May set "errormsg" to an error message.
  */
-    int
+    정수
 parse_command_modifiers(
 	exarg_T	    *eap,
 	char	    **errormsg,
 	cmdmod_T    *cmod,
-	int	    skip_only)
+	정수	    skip_only)
 {
     char_u  *orig_cmd = eap->cmd;
     char_u  *cmd_start = NULL;
-    int	    use_plus_cmd = FALSE;
-    int	    starts_with_colon = FALSE;
-    int	    vim9script = in_vim9script();
-    int	    has_visual_range = FALSE;
+    정수	    use_plus_cmd = FALSE;
+    정수	    starts_with_colon = FALSE;
+    정수	    vim9script = in_vim9script();
+    정수	    has_visual_range = FALSE;
 
     CLEAR_POINTER(cmod);
     cmod->cmod_flags = sticky_cmdmod_flags;
 
-    if (STRNCMP(eap->cmd, "'<,'>", 5) == 0)
+    만약 (STRNCMP(eap->cmd, "'<,'>", 5) == 0)
     {
 	// The automatically inserted Visual area range is skipped, so that
 	// typing ":cmdmod cmd" in Visual mode works without having to move the
@@ -2959,62 +2959,62 @@ parse_command_modifiers(
     }
 
     // Repeat until no more command modifiers are found.
-    for (;;)
+    위해 (;;)
     {
 	char_u  *p;
 
-	while (*eap->cmd == ' ' || *eap->cmd == '\t' || *eap->cmd == ':')
+	동안 (*eap->cmd == ' ' || *eap->cmd == '\t' || *eap->cmd == ':')
 	{
-	    if (*eap->cmd == ':')
+	    만약 (*eap->cmd == ':')
 		starts_with_colon = TRUE;
 	    ++eap->cmd;
 	}
 
 	// in ex mode, an empty command (after modifiers) works like :+
-	if (*eap->cmd == NUL && exmode_active
+	만약 (*eap->cmd == NUL && exmode_active
 		   && (getline_equal(eap->ea_getline, eap->cookie, getexmodeline)
 		       || getline_equal(eap->ea_getline, eap->cookie, getexline))
 			&& curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
 	{
 	    use_plus_cmd = TRUE;
-	    if (!skip_only)
+	    만약 (!skip_only)
 		ex_pressedreturn = TRUE;
 	    break;  // no modifiers following
 	}
 
 	// ignore comment and empty lines
-	if (comment_start(eap->cmd, starts_with_colon))
+	만약 (comment_start(eap->cmd, starts_with_colon))
 	{
 	    // a comment ends at a NL
 	    eap->nextcmd = vim_strchr(eap->cmd, '\n');
-	    if (eap->nextcmd != NULL)
+	    만약 (eap->nextcmd != NULL)
 		++eap->nextcmd;
-	    if (vim9script)
+	    만약 (vim9script)
 	    {
-		if (has_cmdmod(cmod, FALSE))
+		만약 (has_cmdmod(cmod, FALSE))
 		    *errormsg = _(e_command_modifier_without_command);
 #ifdef FEAT_EVAL
-		if (eap->cmd[0] == '#' && eap->cmd[1] == '{'
+		만약 (eap->cmd[0] == '#' && eap->cmd[1] == '{'
 							 && eap->cmd[2] != '{')
 		    *errormsg = _(e_cannot_use_hash_curly_to_start_comment);
 #endif
 	    }
-	    return FAIL;
+	    반환 FAIL;
 	}
-	if (*eap->cmd == '\n')
+	만약 (*eap->cmd == '\n')
 	{
 	    eap->nextcmd = eap->cmd + 1;
-	    return FAIL;
+	    반환 FAIL;
 	}
-	if (*eap->cmd == NUL)
+	만약 (*eap->cmd == NUL)
 	{
-	    if (!skip_only)
+	    만약 (!skip_only)
 	    {
 		ex_pressedreturn = TRUE;
-		if (vim9script && has_cmdmod(cmod, FALSE))
+		만약 (vim9script && has_cmdmod(cmod, FALSE))
 		    *errormsg = _(e_command_modifier_without_command);
 	    }
-	    return FAIL;
+	    반환 FAIL;
 	}
 
 	p = skip_range(eap->cmd, TRUE, NULL);
@@ -3027,14 +3027,14 @@ parse_command_modifiers(
 	//   verbose[expr] = 2
 	// But not:
 	//   verbose [a, b] = list
-	if (vim9script)
+	만약 (vim9script)
 	{
 	    char_u *s, *n;
 
-	    for (s = eap->cmd; ASCII_ISALPHA(*s); ++s)
+	    위해 (s = eap->cmd; ASCII_ISALPHA(*s); ++s)
 		;
 	    n = skipwhite(s);
-	    if (*n == '.' || *n == '=' || (*n != NUL && n[1] == '=')
+	    만약 (*n == '.' || *n == '=' || (*n != NUL && n[1] == '=')
 		    || *s == '[')
 		break;
 	}
@@ -3042,51 +3042,51 @@ parse_command_modifiers(
 	switch (*p)
 	{
 	    // When adding an entry, also modify cmdmod_info_tab[].
-	    case 'a':	if (!checkforcmd_noparen(&eap->cmd, "aboveleft", 3))
+	    case 'a':	만약 (!checkforcmd_noparen(&eap->cmd, "aboveleft", 3))
 			    break;
 			cmod->cmod_split |= WSP_ABOVE;
 			continue;
 
-	    case 'b':	if (checkforcmd_noparen(&eap->cmd, "belowright", 3))
+	    case 'b':	만약 (checkforcmd_noparen(&eap->cmd, "belowright", 3))
 			{
 			    cmod->cmod_split |= WSP_BELOW;
 			    continue;
 			}
-			if (checkforcmd_opt(&eap->cmd, "browse", 3, TRUE))
+			만약 (checkforcmd_opt(&eap->cmd, "browse", 3, TRUE))
 			{
 #ifdef FEAT_BROWSE_CMD
 			    cmod->cmod_flags |= CMOD_BROWSE;
 #endif
 			    continue;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "botright", 2))
+			만약 (!checkforcmd_noparen(&eap->cmd, "botright", 2))
 			    break;
 			cmod->cmod_split |= WSP_BOT;
 			continue;
 
-	    case 'c':	if (!checkforcmd_opt(&eap->cmd, "confirm", 4, TRUE))
+	    case 'c':	만약 (!checkforcmd_opt(&eap->cmd, "confirm", 4, TRUE))
 			    break;
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#만약 defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
 			cmod->cmod_flags |= CMOD_CONFIRM;
 #endif
 			continue;
 
-	    case 'k':	if (checkforcmd_noparen(&eap->cmd, "keepmarks", 3))
+	    case 'k':	만약 (checkforcmd_noparen(&eap->cmd, "keepmarks", 3))
 			{
 			    cmod->cmod_flags |= CMOD_KEEPMARKS;
 			    continue;
 			}
-			if (checkforcmd_noparen(&eap->cmd, "keepalt", 5))
+			만약 (checkforcmd_noparen(&eap->cmd, "keepalt", 5))
 			{
 			    cmod->cmod_flags |= CMOD_KEEPALT;
 			    continue;
 			}
-			if (checkforcmd_noparen(&eap->cmd, "keeppatterns", 5))
+			만약 (checkforcmd_noparen(&eap->cmd, "keeppatterns", 5))
 			{
 			    cmod->cmod_flags |= CMOD_KEEPPATTERNS;
 			    continue;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "keepjumps", 5))
+			만약 (!checkforcmd_noparen(&eap->cmd, "keepjumps", 5))
 			    break;
 			cmod->cmod_flags |= CMOD_KEEPJUMPS;
 			continue;
@@ -3095,9 +3095,9 @@ parse_command_modifiers(
 			{
 			    char_u  *reg_pat;
 			    char_u  *nulp = NULL;
-			    int	    c = 0;
+			    정수	    c = 0;
 
-			    if (!checkforcmd_noparen(&p, "filter", 4)
+			    만약 (!checkforcmd_noparen(&p, "filter", 4)
 				    || *p == NUL
 				    || (ends_excmd(*p)
 #ifdef FEAT_EVAL
@@ -3107,65 +3107,65 @@ parse_command_modifiers(
 #endif
 				     ))
 				break;
-			    if (*p == '!')
+			    만약 (*p == '!')
 			    {
 				cmod->cmod_filter_force = TRUE;
 				p = skipwhite(p + 1);
-				if (*p == NUL || ends_excmd(*p))
+				만약 (*p == NUL || ends_excmd(*p))
 				    break;
 			    }
 #ifdef FEAT_EVAL
 			    // Avoid that "filter(arg)" is recognized.
-			    if (vim9script && !VIM_ISWHITE(p[-1]))
+			    만약 (vim9script && !VIM_ISWHITE(p[-1]))
 				break;
 #endif
-			    if (skip_only)
+			    만약 (skip_only)
 				p = skip_vimgrep_pat(p, NULL, NULL);
-			    else
+			    아니면
 				// NOTE: This puts a NUL after the pattern.
 				p = skip_vimgrep_pat_ext(p, &reg_pat, NULL,
 								    &nulp, &c);
-			    if (p == NULL || *p == NUL)
+			    만약 (p == NULL || *p == NUL)
 				break;
-			    if (!skip_only)
+			    만약 (!skip_only)
 			    {
 				cmod->cmod_filter_regmatch.regprog =
 						vim_regcomp(reg_pat, RE_MAGIC);
-				if (cmod->cmod_filter_regmatch.regprog == NULL)
+				만약 (cmod->cmod_filter_regmatch.regprog == NULL)
 				    break;
 				// restore the character overwritten by NUL
-				if (nulp != NULL)
+				만약 (nulp != NULL)
 				    *nulp = c;
 			    }
 			    eap->cmd = p;
 			    continue;
 			}
 
-	    case 'h':	if (checkforcmd_noparen(&eap->cmd, "horizontal", 3))
+	    case 'h':	만약 (checkforcmd_noparen(&eap->cmd, "horizontal", 3))
 			{
 			    cmod->cmod_split |= WSP_HOR;
 			    continue;
 			}
 			// ":hide" and ":hide | cmd" are not modifiers
-			if (p != eap->cmd || !checkforcmd_noparen(&p, "hide", 3)
+			만약 (p != eap->cmd || !checkforcmd_noparen(&p, "hide", 3)
 					       || *p == NUL || ends_excmd(*p))
 			    break;
 			eap->cmd = p;
 			cmod->cmod_flags |= CMOD_HIDE;
 			continue;
 
-	    case 'l':	if (checkforcmd_noparen(&eap->cmd, "lockmarks", 3))
+	    case 'l':	만약 (checkforcmd_noparen(&eap->cmd, "lockmarks", 3))
 			{
 			    cmod->cmod_flags |= CMOD_LOCKMARKS;
 			    continue;
 			}
-			if (checkforcmd_noparen(&eap->cmd, "legacy", 3))
+			만약 (checkforcmd_noparen(&eap->cmd, "legacy", 3))
 			{
-			    if (ends_excmd2(p, eap->cmd))
+			    만약 (ends_excmd2(p, eap->cmd))
 			    {
 				*errormsg =
 				      _(e_legacy_must_be_followed_by_command);
-				return FAIL;
+				반환 FAIL;
 			    }
 			    // Make sure we do not have both legacy and Vim9
 			    // flags set at the same time.
@@ -3174,35 +3174,35 @@ parse_command_modifiers(
 			    continue;
 			}
 
-			if (!checkforcmd_noparen(&eap->cmd, "leftabove", 5))
+			만약 (!checkforcmd_noparen(&eap->cmd, "leftabove", 5))
 			    break;
 			cmod->cmod_split |= WSP_ABOVE;
 			continue;
 
-	    case 'n':	if (checkforcmd_noparen(&eap->cmd, "noautocmd", 3))
+	    case 'n':	만약 (checkforcmd_noparen(&eap->cmd, "noautocmd", 3))
 			{
 			    cmod->cmod_flags |= CMOD_NOAUTOCMD;
 			    continue;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "noswapfile", 3))
+			만약 (!checkforcmd_noparen(&eap->cmd, "noswapfile", 3))
 			    break;
 			cmod->cmod_flags |= CMOD_NOSWAPFILE;
 			continue;
 
-	    case 'r':	if (!checkforcmd_noparen(&eap->cmd, "rightbelow", 6))
+	    case 'r':	만약 (!checkforcmd_noparen(&eap->cmd, "rightbelow", 6))
 			    break;
 			cmod->cmod_split |= WSP_BELOW;
 			continue;
 
-	    case 's':	if (checkforcmd_noparen(&eap->cmd, "sandbox", 3))
+	    case 's':	만약 (checkforcmd_noparen(&eap->cmd, "sandbox", 3))
 			{
 			    cmod->cmod_flags |= CMOD_SANDBOX;
 			    continue;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "silent", 3))
+			만약 (!checkforcmd_noparen(&eap->cmd, "silent", 3))
 			    break;
 			cmod->cmod_flags |= CMOD_SILENT;
-			if (*eap->cmd == '!' && !VIM_ISWHITE(eap->cmd[-1]))
+			만약 (*eap->cmd == '!' && !VIM_ISWHITE(eap->cmd[-1]))
 			{
 			    // ":silent!", but not "silent !cmd"
 			    eap->cmd = skipwhite(eap->cmd + 1);
@@ -3210,21 +3210,21 @@ parse_command_modifiers(
 			}
 			continue;
 
-	    case 't':	if (checkforcmd_noparen(&p, "tab", 3))
+	    case 't':	만약 (checkforcmd_noparen(&p, "tab", 3))
 			{
-			    if (!skip_only)
+			    만약 (!skip_only)
 			    {
 				long tabnr = get_address(eap, &eap->cmd,
 						    ADDR_TABS, eap->skip,
 						    skip_only, FALSE, 1);
-				if (tabnr == MAXLNUM)
+				만약 (tabnr == MAXLNUM)
 				    cmod->cmod_tab = tabpage_index(curtab) + 1;
-				else
+				아니면
 				{
-				    if (tabnr < 0 || tabnr > LAST_TAB_NR)
+				    만약 (tabnr < 0 || tabnr > LAST_TAB_NR)
 				    {
 					*errormsg = _(e_invalid_range);
-					return FAIL;
+					반환 FAIL;
 				    }
 				    cmod->cmod_tab = tabnr + 1;
 				}
@@ -3232,28 +3232,28 @@ parse_command_modifiers(
 			    eap->cmd = p;
 			    continue;
 			}
-			if (!checkforcmd_noparen(&eap->cmd, "topleft", 2))
+			만약 (!checkforcmd_noparen(&eap->cmd, "topleft", 2))
 			    break;
 			cmod->cmod_split |= WSP_TOP;
 			continue;
 
-	    case 'u':	if (!checkforcmd_noparen(&eap->cmd, "unsilent", 3))
+	    case 'u':	만약 (!checkforcmd_noparen(&eap->cmd, "unsilent", 3))
 			    break;
 			cmod->cmod_flags |= CMOD_UNSILENT;
 			continue;
 
-	    case 'v':	if (checkforcmd_noparen(&eap->cmd, "vertical", 4))
+	    case 'v':	만약 (checkforcmd_noparen(&eap->cmd, "vertical", 4))
 			{
 			    cmod->cmod_split |= WSP_VERT;
 			    continue;
 			}
-			if (checkforcmd_noparen(&eap->cmd, "vim9cmd", 4))
+			만약 (checkforcmd_noparen(&eap->cmd, "vim9cmd", 4))
 			{
-			    if (ends_excmd2(p, eap->cmd))
+			    만약 (ends_excmd2(p, eap->cmd))
 			    {
 				*errormsg =
 				      _(e_vim9cmd_must_be_followed_by_command);
-				return FAIL;
+				반환 FAIL;
 			    }
 			    // Make sure we do not have both legacy and Vim9
 			    // flags set at the same time.
@@ -3261,14 +3261,14 @@ parse_command_modifiers(
 			    cmod->cmod_flags |= CMOD_VIM9CMD;
 			    continue;
 			}
-			if (!checkforcmd_noparen(&p, "verbose", 4))
+			만약 (!checkforcmd_noparen(&p, "verbose", 4))
 			    break;
-			if (vim_isdigit(*eap->cmd))
+			만약 (vim_isdigit(*eap->cmd))
 			{
 			    // zero means not set, one is verbose == 0, etc.
 			    cmod->cmod_verbose = atoi((char *)eap->cmd) + 1;
 			}
-			else
+			아니면
 			    cmod->cmod_verbose = 2;  // default: verbose == 1
 			eap->cmd = p;
 			continue;
@@ -3276,15 +3276,15 @@ parse_command_modifiers(
 	break;
     }
 
-    if (has_visual_range)
+    만약 (has_visual_range)
     {
-	if (eap->cmd > cmd_start)
+	만약 (eap->cmd > cmd_start)
 	{
 	    // Move the '<,'> range to after the modifiers and insert a colon.
 	    // Since the modifiers have been parsed put the colon on top of the
 	    // space: "'<,'>mod cmd" -> "mod:'<,'>cmd
 	    // Put eap->cmd after the colon.
-	    if (use_plus_cmd)
+	    만약 (use_plus_cmd)
 	    {
 		size_t len = STRLEN(cmd_start);
 
@@ -3295,34 +3295,34 @@ parse_command_modifiers(
 		mch_memmove(orig_cmd, cmd_start, len);
 		STRCPY(orig_cmd + len, " *+");
 	    }
-	    else
+	    아니면
 	    {
 		mch_memmove(cmd_start - 5, cmd_start, eap->cmd - cmd_start);
 		eap->cmd -= 5;
 		mch_memmove(eap->cmd - 1, ":'<,'>", 6);
 	    }
 	}
-	else
+	아니면
 	    // No modifiers, move the pointer back.
 	    // Special case: change empty command to "+".
-	    if (use_plus_cmd)
+	    만약 (use_plus_cmd)
 		eap->cmd = (char_u *)"'<,'>+";
-	    else
+	    아니면
 		eap->cmd = orig_cmd;
     }
-    else if (use_plus_cmd)
+    아니면 만약 (use_plus_cmd)
 	eap->cmd = (char_u *)exmode_plus;
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Return TRUE if "cmod" has anything set.
  */
-    int
-has_cmdmod(cmdmod_T *cmod, int ignore_silent)
+    정수
+has_cmdmod(cmdmod_T *cmod, 정수 ignore_silent)
 {
-    return (cmod->cmod_flags != 0 && (!ignore_silent
+    반환 (cmod->cmod_flags != 0 && (!ignore_silent
 		|| (cmod->cmod_flags
 		      & ~(CMOD_SILENT | CMOD_ERRSILENT | CMOD_UNSILENT)) != 0))
 	    || cmod->cmod_split != 0
@@ -3331,19 +3331,19 @@ has_cmdmod(cmdmod_T *cmod, int ignore_silent)
 	    || cmod->cmod_filter_regmatch.regprog != NULL;
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * If Vim9 script and "cmdmod" has anything set give an error and return TRUE.
  */
-    int
-cmdmod_error(int ignore_silent)
+    정수
+cmdmod_error(정수 ignore_silent)
 {
-    if (in_vim9script() && has_cmdmod(&cmdmod, ignore_silent))
+    만약 (in_vim9script() && has_cmdmod(&cmdmod, ignore_silent))
     {
 	emsg(_(e_misplaced_command_modifier));
-	return TRUE;
+	반환 TRUE;
     }
-    return FALSE;
+    반환 FALSE;
 }
 #endif
 
@@ -3355,37 +3355,37 @@ cmdmod_error(int ignore_silent)
 apply_cmdmod(cmdmod_T *cmod)
 {
 #ifdef HAVE_SANDBOX
-    if ((cmod->cmod_flags & CMOD_SANDBOX) && !cmod->cmod_did_sandbox)
+    만약 ((cmod->cmod_flags & CMOD_SANDBOX) && !cmod->cmod_did_sandbox)
     {
 	++sandbox;
 	cmod->cmod_did_sandbox = TRUE;
     }
 #endif
-    if (cmod->cmod_verbose > 0)
+    만약 (cmod->cmod_verbose > 0)
     {
-	if (cmod->cmod_verbose_save == 0)
+	만약 (cmod->cmod_verbose_save == 0)
 	    cmod->cmod_verbose_save = p_verbose + 1;
 	p_verbose = cmod->cmod_verbose - 1;
     }
 
-    if ((cmod->cmod_flags & (CMOD_SILENT | CMOD_UNSILENT))
+    만약 ((cmod->cmod_flags & (CMOD_SILENT | CMOD_UNSILENT))
 	    && cmod->cmod_save_msg_silent == 0)
     {
 	cmod->cmod_save_msg_silent = msg_silent + 1;
 	cmod->cmod_save_msg_scroll = msg_scroll;
     }
-    if (cmod->cmod_flags & CMOD_SILENT)
+    만약 (cmod->cmod_flags & CMOD_SILENT)
 	++msg_silent;
-    if (cmod->cmod_flags & CMOD_UNSILENT)
+    만약 (cmod->cmod_flags & CMOD_UNSILENT)
 	msg_silent = 0;
 
-    if (cmod->cmod_flags & CMOD_ERRSILENT)
+    만약 (cmod->cmod_flags & CMOD_ERRSILENT)
     {
 	++emsg_silent;
 	++cmod->cmod_did_esilent;
     }
 
-    if ((cmod->cmod_flags & CMOD_NOAUTOCMD) && cmod->cmod_save_ei == NULL)
+    만약 ((cmod->cmod_flags & CMOD_NOAUTOCMD) && cmod->cmod_save_ei == NULL)
     {
 	// Set 'eventignore' to "all".
 	// First save the existing option value for restoring it later.
@@ -3401,21 +3401,21 @@ apply_cmdmod(cmdmod_T *cmod)
     void
 undo_cmdmod(cmdmod_T *cmod)
 {
-    if (cmod->cmod_verbose_save > 0)
+    만약 (cmod->cmod_verbose_save > 0)
     {
 	p_verbose = cmod->cmod_verbose_save - 1;
 	cmod->cmod_verbose_save = 0;
     }
 
 #ifdef HAVE_SANDBOX
-    if (cmod->cmod_did_sandbox)
+    만약 (cmod->cmod_did_sandbox)
     {
 	--sandbox;
 	cmod->cmod_did_sandbox = FALSE;
     }
 #endif
 
-    if (cmod->cmod_save_ei != NULL)
+    만약 (cmod->cmod_save_ei != NULL)
     {
 	// Restore 'eventignore' to the value before ":noautocmd".
 	set_string_option_direct((char_u *)"ei", -1, cmod->cmod_save_ei,
@@ -3426,14 +3426,14 @@ undo_cmdmod(cmdmod_T *cmod)
 
     vim_regfree(cmod->cmod_filter_regmatch.regprog);
 
-    if (cmod->cmod_save_msg_silent > 0)
+    만약 (cmod->cmod_save_msg_silent > 0)
     {
 	// messages could be enabled for a serious error, need to check if the
 	// counters don't become negative
-	if (!did_emsg || msg_silent > cmod->cmod_save_msg_silent - 1)
+	만약 (!did_emsg || msg_silent > cmod->cmod_save_msg_silent - 1)
 	    msg_silent = cmod->cmod_save_msg_silent - 1;
 	emsg_silent -= cmod->cmod_did_esilent;
-	if (emsg_silent < 0)
+	만약 (emsg_silent < 0)
 	    emsg_silent = 0;
 	// Restore msg_scroll, it's set by file I/O commands, even when no
 	// message is actually displayed.
@@ -3441,7 +3441,7 @@ undo_cmdmod(cmdmod_T *cmod)
 
 	// "silent reg" or "silent echo x" inside "redir" leaves msg_col
 	// somewhere in the line.  Put it back in the first column.
-	if (redirecting())
+	만약 (redirecting())
 	    msg_col = 0;
 
 	cmod->cmod_save_msg_silent = 0;
@@ -3454,27 +3454,27 @@ undo_cmdmod(cmdmod_T *cmod)
  * May set the last search pattern, unless "silent" is TRUE.
  * Return FAIL and set "errormsg" or return OK.
  */
-    int
-parse_cmd_address(exarg_T *eap, char **errormsg, int silent)
+    정수
+parse_cmd_address(exarg_T *eap, char **errormsg, 정수 silent)
 {
-    int		address_count = 1;
+    정수		address_count = 1;
     linenr_T	lnum;
-    int		need_check_cursor = FALSE;
-    int		ret = FAIL;
+    정수		need_check_cursor = FALSE;
+    정수		ret = FAIL;
 
     // Repeat for all ',' or ';' separated addresses.
-    for (;;)
+    위해 (;;)
     {
 	eap->line1 = eap->line2;
 	eap->line2 = default_address(eap);
 	eap->cmd = skipwhite(eap->cmd);
 	lnum = get_address(eap, &eap->cmd, eap->addr_type, eap->skip, silent,
 					eap->addr_count == 0, address_count++);
-	if (eap->cmd == NULL)	// error detected
+	만약 (eap->cmd == NULL)	// error detected
 	    goto theend;
-	if (lnum == MAXLNUM)
+	만약 (lnum == MAXLNUM)
 	{
-	    if (*eap->cmd == '%')   // '%' - all lines
+	    만약 (*eap->cmd == '%')   // '%' - all lines
 	    {
 		++eap->cmd;
 		switch (eap->addr_type)
@@ -3488,12 +3488,12 @@ parse_cmd_address(exarg_T *eap, char **errormsg, int silent)
 			{
 			    buf_T	*buf = firstbuf;
 
-			    while (buf->b_next != NULL
+			    동안 (buf->b_next != NULL
 						  && buf->b_ml.ml_mfp == NULL)
 				buf = buf->b_next;
 			    eap->line1 = buf->b_fnum;
 			    buf = lastbuf;
-			    while (buf->b_prev != NULL
+			    동안 (buf->b_prev != NULL
 						  && buf->b_ml.ml_mfp == NULL)
 				buf = buf->b_prev;
 			    eap->line2 = buf->b_fnum;
@@ -3505,13 +3505,13 @@ parse_cmd_address(exarg_T *eap, char **errormsg, int silent)
 			break;
 		    case ADDR_WINDOWS:
 		    case ADDR_TABS:
-			if (IS_USER_CMDIDX(eap->cmdidx))
+			만약 (IS_USER_CMDIDX(eap->cmdidx))
 			{
 			    eap->line1 = 1;
 			    eap->line2 = eap->addr_type == ADDR_WINDOWS
 						  ? LAST_WIN_NR : LAST_TAB_NR;
 			}
-			else
+			아니면
 			{
 			    // there is no Vim command which uses '%' and
 			    // ADDR_WINDOWS or ADDR_TABS
@@ -3525,9 +3525,9 @@ parse_cmd_address(exarg_T *eap, char **errormsg, int silent)
 			*errormsg = _(e_invalid_range);
 			goto theend;
 		    case ADDR_ARGUMENTS:
-			if (ARGCOUNT == 0)
+			만약 (ARGCOUNT == 0)
 			    eap->line1 = eap->line2 = 0;
-			else
+			아니면
 			{
 			    eap->line1 = 1;
 			    eap->line2 = ARGCOUNT;
@@ -3537,7 +3537,7 @@ parse_cmd_address(exarg_T *eap, char **errormsg, int silent)
 #ifdef FEAT_QUICKFIX
 			eap->line1 = 1;
 			eap->line2 = qf_get_valid_size(eap);
-			if (eap->line2 == 0)
+			만약 (eap->line2 == 0)
 			    eap->line2 = 1;
 #endif
 			break;
@@ -3547,39 +3547,39 @@ parse_cmd_address(exarg_T *eap, char **errormsg, int silent)
 		}
 		++eap->addr_count;
 	    }
-	    else if (*eap->cmd == '*' && vim_strchr(p_cpo, CPO_STAR) == NULL)
+	    아니면 만약 (*eap->cmd == '*' && vim_strchr(p_cpo, CPO_STAR) == NULL)
 	    {
 		pos_T	    *fp;
 
 		// '*' - visual area
-		if (eap->addr_type != ADDR_LINES)
+		만약 (eap->addr_type != ADDR_LINES)
 		{
 		    *errormsg = _(e_invalid_range);
 		    goto theend;
 		}
 
 		++eap->cmd;
-		if (!eap->skip)
+		만약 (!eap->skip)
 		{
 		    fp = getmark('<', FALSE);
-		    if (check_mark(fp) == FAIL)
+		    만약 (check_mark(fp) == FAIL)
 			goto theend;
 		    eap->line1 = fp->lnum;
 		    fp = getmark('>', FALSE);
-		    if (check_mark(fp) == FAIL)
+		    만약 (check_mark(fp) == FAIL)
 			goto theend;
 		    eap->line2 = fp->lnum;
 		    ++eap->addr_count;
 		}
 	    }
 	}
-	else
+	아니면
 	    eap->line2 = lnum;
 	eap->addr_count++;
 
-	if (*eap->cmd == ';')
+	만약 (*eap->cmd == ';')
 	{
-	    if (!eap->skip)
+	    만약 (!eap->skip)
 	    {
 		curwin->w_cursor.lnum = eap->line2;
 
@@ -3587,32 +3587,32 @@ parse_cmd_address(exarg_T *eap, char **errormsg, int silent)
 		// accept zero as address, so 0;/PATTERN/ works correctly
 		// (where zero usually means to use the first line).
 		// Check the cursor position before returning.
-		if (eap->line2 > 0)
+		만약 (eap->line2 > 0)
 		    check_cursor();
-		else
+		아니면
 		    check_cursor_col();
 		need_check_cursor = TRUE;
 	    }
 	}
-	else if (*eap->cmd != ',')
+	아니면 만약 (*eap->cmd != ',')
 	    break;
 	++eap->cmd;
     }
 
     // One address given: set start and end lines.
-    if (eap->addr_count == 1)
+    만약 (eap->addr_count == 1)
     {
 	eap->line1 = eap->line2;
 	// ... but only implicit: really no address given
-	if (lnum == MAXLNUM)
+	만약 (lnum == MAXLNUM)
 	    eap->addr_count = 0;
     }
     ret = OK;
 
 theend:
-    if (need_check_cursor)
+    만약 (need_check_cursor)
 	check_cursor();
-    return ret;
+    반환 ret;
 }
 
 /*
@@ -3627,7 +3627,7 @@ append_command(char_u *cmd)
     char_u  *s = cmd;
     char_u  *d;
 
-    if (len > IOSIZE - 100)
+    만약 (len > IOSIZE - 100)
     {
 	// Not enough space, truncate and put in "...".
 	d = IObuff + IOSIZE - 100;
@@ -3636,23 +3636,23 @@ append_command(char_u *cmd)
     }
     STRCAT(IObuff, ": ");
     d = IObuff + STRLEN(IObuff);
-    while (*s != NUL && d - IObuff + 5 < IOSIZE)
+    동안 (*s != NUL && d - IObuff + 5 < IOSIZE)
     {
-	if (enc_utf8 ? (s[0] == 0xc2 && s[1] == 0xa0) : *s == 0xa0)
+	만약 (enc_utf8 ? (s[0] == 0xc2 && s[1] == 0xa0) : *s == 0xa0)
 	{
 	    s += enc_utf8 ? 2 : 1;
 	    STRCPY(d, "<a0>");
 	    d += 4;
 	}
-	else if (d - IObuff + (*mb_ptr2len)(s) + 1 >= IOSIZE)
+	아니면 만약 (d - IObuff + (*mb_ptr2len)(s) + 1 >= IOSIZE)
 	    break;
-	else
+	아니면
 	    MB_COPY_CHAR(s, d);
     }
     *d = NUL;
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * If "start" points "&opt", "&l:opt", "&g:opt" or "$ENV" return a pointer to
  * the name.  Otherwise just return "start".
@@ -3662,16 +3662,16 @@ skip_option_env_lead(char_u *start)
 {
     char_u *name = start;
 
-    if (*start == '&')
+    만약 (*start == '&')
     {
-	if ((start[1] == 'l' || start[1] == 'g') && start[2] == ':')
+	만약 ((start[1] == 'l' || start[1] == 'g') && start[2] == ':')
 	    name += 3;
-	else
+	아니면
 	    name += 1;
     }
-    else if (*start == '$')
+    아니면 만약 (*start == '$')
 	name += 1;
-    return name;
+    반환 name;
 }
 #endif
 
@@ -3685,18 +3685,18 @@ skip_option_env_lead(char_u *start)
  *	    but :sre[wind] is another command, as are :scr[iptnames],
  *	    :scs[cope], :sim[alt], :sig[ns] and :sil[ent].
  */
-    static int
+    static 정수
 one_letter_cmd(char_u *p, cmdidx_T *idx)
 {
-    if (in_vim9script())
-	return FALSE;
-    if (p[0] == 'k'
+    만약 (in_vim9script())
+	반환 FALSE;
+    만약 (p[0] == 'k'
 	    && (p[1] != 'e' || (p[1] == 'e' && p[2] != 'e')))
     {
 	*idx = CMD_k;
-	return TRUE;
+	반환 TRUE;
     }
-    if (p[0] == 's'
+    만약 (p[0] == 's'
 	    && ((p[1] == 'c' && (p[2] == NUL || (p[2] != 's' && p[2] != 'r'
 			&& (p[3] == NUL || (p[3] != 'i' && p[4] != 'p')))))
 		|| p[1] == 'g'
@@ -3705,22 +3705,22 @@ one_letter_cmd(char_u *p, cmdidx_T *idx)
 		|| (p[1] == 'r' && p[2] != 'e')))
     {
 	*idx = CMD_substitute;
-	return TRUE;
+	반환 TRUE;
     }
-    return FALSE;
+    반환 FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 /*
  * Return TRUE if "cmd" starts with "123->", a number followed by a method
  * call.
  */
-    int
+    정수
 number_method(char_u *cmd)
 {
     char_u *p = skipdigits(cmd);
 
-    return p > cmd && (p = skipwhite(p))[0] == '-' && p[1] == '>';
+    반환 p > cmd && (p = skipwhite(p))[0] == '-' && p[1] == '>';
 }
 #endif
 
@@ -3739,76 +3739,76 @@ number_method(char_u *cmd)
     char_u *
 find_ex_command(
 	exarg_T *eap,
-	int	*full UNUSED,
-	int	(*lookup)(char_u *, size_t, int cmd, cctx_T *) UNUSED,
+	정수	*full UNUSED,
+	정수	(*lookup)(char_u *, size_t, 정수 cmd, cctx_T *) UNUSED,
 	cctx_T	*cctx UNUSED)
 {
-    int		len;
+    정수		len;
     char_u	*p;
-    int		i;
+    정수		i;
 #ifndef FEAT_EVAL
-    int		vim9 = FALSE;
-#else
-    int		vim9 = in_vim9script();
+    정수		vim9 = FALSE;
+#아니면
+    정수		vim9 = in_vim9script();
 
     /*
      * Recognize a Vim9 script function/method call and assignment:
      * "lvar = value", "lvar(arg)", "[1, 2 3]->Func()"
      */
     p = eap->cmd;
-    if (lookup != NULL)
+    만약 (lookup != NULL)
     {
 	char_u *pskip = skip_option_env_lead(eap->cmd);
 
-	if (vim_strchr((char_u *)"{('[\"@&$", *p) != NULL
+	만약 (vim_strchr((char_u *)"{('[\"@&$", *p) != NULL
 	       || ((p = to_name_const_end(pskip)) > eap->cmd && *p != NUL)
 	       || (p[0] == '0' && p[1] == 'z'))
 	{
-	    int	    oplen;
-	    int	    heredoc;
+	    정수	    oplen;
+	    정수	    heredoc;
 	    char_u  *swp;
 
-	    if (*eap->cmd == '&'
+	    만약 (*eap->cmd == '&'
 		    || (eap->cmd[0] == '$'
 				  && eap->cmd[1] != '\'' && eap->cmd[1] != '"')
 		    || (eap->cmd[0] == '@'
 					&& (valid_yank_reg(eap->cmd[1], FALSE)
 						       || eap->cmd[1] == '@')))
 	    {
-		if (*eap->cmd == '&')
+		만약 (*eap->cmd == '&')
 		{
 		    p = eap->cmd + 1;
-		    if (STRNCMP("l:", p, 2) == 0 || STRNCMP("g:", p, 2) == 0)
+		    만약 (STRNCMP("l:", p, 2) == 0 || STRNCMP("g:", p, 2) == 0)
 			p += 2;
 		    p = to_name_end(p, FALSE);
 		}
-		else if (*eap->cmd == '$')
+		아니면 만약 (*eap->cmd == '$')
 		    p = to_name_end(eap->cmd + 1, FALSE);
-		else
+		아니면
 		    p = eap->cmd + 2;
-		if (ends_excmd(*skipwhite(p)))
+		만약 (ends_excmd(*skipwhite(p)))
 		{
 		    // "&option <NL>", "$ENV <NL>" and "@r <NL>" are the start
 		    // of an expression.
 		    eap->cmdidx = CMD_eval;
-		    return eap->cmd;
+		    반환 eap->cmd;
 		}
 		// "&option" can be followed by "->" or "=", check below
 	    }
 
-	    if (vim9 && *p == '<')
+	    만약 (vim9 && *p == '<')
 	    {
 		// generic function type args
-		if (skip_generic_func_type_args(&p) == FAIL)
+		만약 (skip_generic_func_type_args(&p) == FAIL)
 		{
 		    eap->cmdidx = CMD_SIZE;
-		    return p;
+		    반환 p;
 		}
 	    }
 
 	    swp = skipwhite(p);
 
-	    if (
+	    만약 (
 		// "(..." is an expression.
 		// "funcname(" is always a function call.
 		*p == '('
@@ -3832,17 +3832,17 @@ find_ex_command(
 			    // "varname->func()" is an expression.
 			: (*swp == '-' && swp[1] == '>')))
 	    {
-		if (*eap->cmd == '{' && ends_excmd(*skipwhite(eap->cmd + 1)))
+		만약 (*eap->cmd == '{' && ends_excmd(*skipwhite(eap->cmd + 1)))
 		{
 		    // "{" by itself is the start of a block.
 		    eap->cmdidx = CMD_block;
-		    return eap->cmd + 1;
+		    반환 eap->cmd + 1;
 		}
 		eap->cmdidx = CMD_eval;
-		return eap->cmd;
+		반환 eap->cmd;
 	    }
 
-	    if ((p != eap->cmd && (
+	    만약 ((p != eap->cmd && (
 			    // "varname[]" is an expression.
 			    *p == '['
 			    // "varname.key" is an expression.
@@ -3862,16 +3862,16 @@ find_ex_command(
 		//	etc.
 		eap->cmdidx = CMD_eval;
 		++emsg_off;
-		if (skip_expr(&after, NULL) == OK)
+		만약 (skip_expr(&after, NULL) == OK)
 		{
 		    after = skipwhite(after);
-		    if (*after == '=' || (*after != NUL && after[1] == '=')
+		    만약 (*after == '=' || (*after != NUL && after[1] == '=')
 					 || (after[0] == '.' && after[1] == '.'
 							   && after[2] == '='))
 			eap->cmdidx = CMD_var;
 		}
 		--emsg_off;
-		return eap->cmd;
+		반환 eap->cmd;
 	    }
 
 	    // "[...]->Method()" is a list expression, but "[a, b] = Func()" is
@@ -3881,38 +3881,38 @@ find_ex_command(
 	    // follows.
 	    // If "[...]" has a line break "p" still points at the "[" and it
 	    // can't be an assignment.
-	    if (*eap->cmd == '[')
+	    만약 (*eap->cmd == '[')
 	    {
 		char_u	    *eq;
 
 		p = to_name_const_end(eap->cmd);
-		if (p == eap->cmd && *p == '[')
+		만약 (p == eap->cmd && *p == '[')
 		{
-		    int count = 0;
-		    int	semicolon = FALSE;
+		    정수 count = 0;
+		    정수	semicolon = FALSE;
 
 		    p = skip_var_list(eap->cmd, TRUE, &count, &semicolon, TRUE);
 		}
 		eq = p;
-		if (eq != NULL)
+		만약 (eq != NULL)
 		{
 		    eq = skipwhite(eq);
-		    if (vim_strchr((char_u *)"+-*/%.", *eq) != NULL)
+		    만약 (vim_strchr((char_u *)"+-*/%.", *eq) != NULL)
 		    {
-			if (eq[0] == '.' && eq[1] == '.')
+			만약 (eq[0] == '.' && eq[1] == '.')
 			    ++eq;
 			++eq;
 		    }
 		}
-		if (p == NULL || p == eap->cmd || *eq != '=')
+		만약 (p == NULL || p == eap->cmd || *eq != '=')
 		{
 		    eap->cmdidx = CMD_eval;
-		    return eap->cmd;
+		    반환 eap->cmd;
 		}
-		if (p > eap->cmd && *eq == '=')
+		만약 (p > eap->cmd && *eq == '=')
 		{
 		    eap->cmdidx = CMD_var;
-		    return eap->cmd;
+		    반환 eap->cmd;
 		}
 	    }
 
@@ -3924,9 +3924,9 @@ find_ex_command(
 	    // (variable declaration might have been skipped).
 	    // Not "redir => var" (when skipping).
 	    oplen = assignment_len(skipwhite(p), &heredoc);
-	    if (oplen > 0)
+	    만약 (oplen > 0)
 	    {
-		if (((p - eap->cmd) > 2 && eap->cmd[1] == ':')
+		만약 (((p - eap->cmd) > 2 && eap->cmd[1] == ':')
 			|| *eap->cmd == '&'
 			|| *eap->cmd == '$'
 			|| *eap->cmd == '@'
@@ -3935,51 +3935,51 @@ find_ex_command(
 			|| lookup(eap->cmd, p - eap->cmd, TRUE, cctx) == OK)
 		{
 		    eap->cmdidx = CMD_var;
-		    return eap->cmd;
+		    반환 eap->cmd;
 		}
 	    }
 
 	    // Recognize trying to use a type for a w:, b:, t: or g: variable:
 	    // "w:varname: number = 123".
-	    if (eap->cmd[1] == ':' && *p == ':')
+	    만약 (eap->cmd[1] == ':' && *p == ':')
 	    {
 		eap->cmdidx = CMD_var;
-		return eap->cmd;
+		반환 eap->cmd;
 	    }
 	}
 
 	// 1234->func() is a method call
-	if (number_method(eap->cmd))
+	만약 (number_method(eap->cmd))
 	{
 	    eap->cmdidx = CMD_eval;
-	    return eap->cmd;
+	    반환 eap->cmd;
 	}
 
 	// "g:", "s:" and "l:" are always assumed to be a variable, thus start
 	// an expression.  A global/substitute/list command needs to use a
 	// longer name.
-	if (vim_strchr((char_u *)"gsl", *p) != NULL && p[1] == ':')
+	만약 (vim_strchr((char_u *)"gsl", *p) != NULL && p[1] == ':')
 	{
 	    eap->cmdidx = CMD_eval;
-	    return eap->cmd;
+	    반환 eap->cmd;
 	}
 
 	// If it is an ID it might be a variable with an operator on the next
 	// line, if the variable exists it can't be an Ex command.
-	if (p > eap->cmd && ends_excmd(*skipwhite(p))
+	만약 (p > eap->cmd && ends_excmd(*skipwhite(p))
 		&& (lookup(eap->cmd, p - eap->cmd, TRUE, cctx) == OK
 		    || (ASCII_ISALPHA(eap->cmd[0]) && eap->cmd[1] == ':')))
 	{
 	    eap->cmdidx = CMD_eval;
-	    return eap->cmd;
+	    반환 eap->cmd;
 	}
 
 	// Check for "++nr" and "--nr".
-	if (p == eap->cmd && p[0] != NUL && p[0] == p[1]
+	만약 (p == eap->cmd && p[0] != NUL && p[0] == p[1]
 						   && (*p == '+' || *p == '-'))
 	{
 	    eap->cmdidx = *p == '+' ? CMD_increment : CMD_decrement;
-	    return eap->cmd + 2;
+	    반환 eap->cmd + 2;
 	}
     }
 #endif
@@ -3988,59 +3988,59 @@ find_ex_command(
      * Isolate the command and search for it in the command table.
      */
     p = eap->cmd;
-    if (one_letter_cmd(p, &eap->cmdidx))
+    만약 (one_letter_cmd(p, &eap->cmdidx))
     {
 	++p;
-	if (full != NULL)
+	만약 (full != NULL)
 	    *full = TRUE;
     }
-    else
+    아니면
     {
-	while (ASCII_ISALPHA(*p))
+	동안 (ASCII_ISALPHA(*p))
 	    ++p;
 	// for python 3.x support ":py3", ":python3", ":py3file", etc.
-	if (eap->cmd[0] == 'p' && eap->cmd[1] == 'y')
+	만약 (eap->cmd[0] == 'p' && eap->cmd[1] == 'y')
 	{
-	    while (ASCII_ISALNUM(*p))
+	    동안 (ASCII_ISALNUM(*p))
 		++p;
 	}
-	else if (*p == '9' && STRNCMP("vim9", eap->cmd, 4) == 0)
+	아니면 만약 (*p == '9' && STRNCMP("vim9", eap->cmd, 4) == 0)
 	{
 	    // include "9" for "vim9*" commands; "vim9cmd" and "vim9script".
 	    ++p;
-	    while (ASCII_ISALPHA(*p))
+	    동안 (ASCII_ISALPHA(*p))
 		++p;
 	}
 
 	// check for non-alpha command
-	if (p == eap->cmd && vim_strchr((char_u *)"@*!=><&~#}", *p) != NULL)
+	만약 (p == eap->cmd && vim_strchr((char_u *)"@*!=><&~#}", *p) != NULL)
 	    ++p;
-	len = (int)(p - eap->cmd);
+	len = (정수)(p - eap->cmd);
 	// The "d" command can directly be followed by 'l' or 'p' flag, when
 	// not in Vim9 script.
-	if (!vim9 && *eap->cmd == 'd' && (p[-1] == 'l' || p[-1] == 'p'))
+	만약 (!vim9 && *eap->cmd == 'd' && (p[-1] == 'l' || p[-1] == 'p'))
 	{
 	    // Check for ":dl", ":dell", etc. to ":deletel": that's
 	    // :delete with the 'l' flag.  Same for 'p'.
-	    for (i = 0; i < len; ++i)
-		if (eap->cmd[i] != ((char_u *)"delete")[i])
+	    위해 (i = 0; i < len; ++i)
+		만약 (eap->cmd[i] != ((char_u *)"delete")[i])
 		    break;
-	    if (i == len - 1)
+	    만약 (i == len - 1)
 	    {
 		--len;
-		if (p[-1] == 'l')
+		만약 (p[-1] == 'l')
 		    eap->flags |= EXFLAG_LIST;
-		else
+		아니면
 		    eap->flags |= EXFLAG_PRINT;
 	    }
 	}
 
-	if (ASCII_ISLOWER(eap->cmd[0]))
+	만약 (ASCII_ISLOWER(eap->cmd[0]))
 	{
-	    int c1 = eap->cmd[0];
-	    int c2 = len == 1 ? NUL : eap->cmd[1];
+	    정수 c1 = eap->cmd[0];
+	    정수 c2 = len == 1 ? NUL : eap->cmd[1];
 
-	    if (command_count != (int)CMD_SIZE)
+	    만약 (command_count != (정수)CMD_SIZE)
 	    {
 		iemsg(e_command_table_needs_to_be_updated_run_make_cmdidxs);
 		getout(1);
@@ -4049,21 +4049,21 @@ find_ex_command(
 	    // Use a precomputed index for fast look-up in cmdnames[]
 	    // taking into account the first 2 letters of eap->cmd.
 	    eap->cmdidx = cmdidxs1[CharOrdLow(c1)];
-	    if (ASCII_ISLOWER(c2))
+	    만약 (ASCII_ISLOWER(c2))
 		eap->cmdidx += cmdidxs2[CharOrdLow(c1)][CharOrdLow(c2)];
 	}
-	else if (ASCII_ISUPPER(eap->cmd[0]))
+	아니면 만약 (ASCII_ISUPPER(eap->cmd[0]))
 	    eap->cmdidx = CMD_Next;
-	else
+	아니면
 	    eap->cmdidx = CMD_bang;
 
-	for ( ; (int)eap->cmdidx < (int)CMD_SIZE;
-			       eap->cmdidx = (cmdidx_T)((int)eap->cmdidx + 1))
-	    if (STRNCMP(cmdnames[(int)eap->cmdidx].cmd_name, (char *)eap->cmd,
+	위해 ( ; (정수)eap->cmdidx < (정수)CMD_SIZE;
+			       eap->cmdidx = (cmdidx_T)((정수)eap->cmdidx + 1))
+	    만약 (STRNCMP(cmdnames[(정수)eap->cmdidx].cmd_name, (char *)eap->cmd,
 							    (size_t)len) == 0)
 	    {
 #ifdef FEAT_EVAL
-		if (full != NULL && cmdnames[eap->cmdidx].cmd_name[len] == NUL)
+		만약 (full != NULL && cmdnames[eap->cmdidx].cmd_name[len] == NUL)
 		    *full = TRUE;
 #endif
 		break;
@@ -4071,12 +4071,12 @@ find_ex_command(
 
 	// :Print and :mode are not supported in Vim9 script.
 	// Some commands cannot be shortened in Vim9 script.
-	if (vim9 && eap->cmdidx != CMD_SIZE)
+	만약 (vim9 && eap->cmdidx != CMD_SIZE)
 	{
-	    if (eap->cmdidx == CMD_mode || eap->cmdidx == CMD_Print)
+	    만약 (eap->cmdidx == CMD_mode || eap->cmdidx == CMD_Print)
 		eap->cmdidx = CMD_SIZE;
-	    else if ((cmdnames[eap->cmdidx].cmd_argt & EX_WHOLE)
-			  && len < (int)cmdnames[eap->cmdidx].cmd_namelen)
+	    아니면 만약 ((cmdnames[eap->cmdidx].cmd_argt & EX_WHOLE)
+			  && len < (정수)cmdnames[eap->cmdidx].cmd_namelen)
 	    {
 		semsg(_(e_command_cannot_be_shortened_str), eap->cmd);
 		eap->cmdidx = CMD_SIZE;
@@ -4085,36 +4085,36 @@ find_ex_command(
 
 	// Do not recognize ":*" as the star command unless '*' is in
 	// 'cpoptions'.
-	if (eap->cmdidx == CMD_star && vim_strchr(p_cpo, CPO_STAR) == NULL)
+	만약 (eap->cmdidx == CMD_star && vim_strchr(p_cpo, CPO_STAR) == NULL)
 	    p = eap->cmd;
 
 	// Look for a user defined command as a last resort.  Let ":Print" be
 	// overruled by a user defined command.
-	if ((eap->cmdidx == CMD_SIZE || eap->cmdidx == CMD_Print)
+	만약 ((eap->cmdidx == CMD_SIZE || eap->cmdidx == CMD_Print)
 		&& *eap->cmd >= 'A' && *eap->cmd <= 'Z')
 	{
 	    // User defined commands may contain digits.
-	    while (ASCII_ISALNUM(*p))
+	    동안 (ASCII_ISALNUM(*p))
 		++p;
 	    p = find_ucmd(eap, p, full, NULL, NULL);
 	}
-	if (p == NULL || p == eap->cmd)
+	만약 (p == NULL || p == eap->cmd)
 	    eap->cmdidx = CMD_SIZE;
     }
 
     // ":fina" means ":finally" in legacy script, for backwards compatibility.
-    if (eap->cmdidx == CMD_final && p - eap->cmd == 4 && !vim9)
+    만약 (eap->cmdidx == CMD_final && p - eap->cmd == 4 && !vim9)
 	eap->cmdidx = CMD_finally;
 
      // Force ":ho" to be unresolved.  Without this, find_ex_command()
      // matches it to CMD_horizontal (the only "ho*" entry), which makes
      // fullcommand("ho") return "horizontal" even though ":ho" cannot be
      // used as the modifier (cmdmods[] requires 3 chars, "hor").
-    if (eap->cmdidx == CMD_horizontal && p - eap->cmd == 2)
+    만약 (eap->cmdidx == CMD_horizontal && p - eap->cmd == 2)
 	eap->cmdidx = CMD_SIZE;
 
 #ifdef FEAT_EVAL
-    if (eap->cmdidx < CMD_SIZE
+    만약 (eap->cmdidx < CMD_SIZE
 	    && vim9
 	    && !IS_WHITE_NL_OR_NUL(*p) && *p != '!' && *p != '|'
 	    && (eap->cmdidx < 0 ||
@@ -4123,7 +4123,7 @@ find_ex_command(
 	// A name that goes on with an underscore is not this command with an
 	// argument: "ch_log" is not ":change".  Leave it to be reported as an
 	// invalid command.
-	if (*p != '_')
+	만약 (*p != '_')
 	{
 	    char_u *cmd = vim_strnsave(eap->cmd, p - eap->cmd);
 
@@ -4135,15 +4135,15 @@ find_ex_command(
     }
 #endif
 
-    return p;
+    반환 p;
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 typedef struct
 {
     char	*name;
-    int		minlen;
-    int		has_count;  // :123verbose  :3tab
+    정수		minlen;
+    정수		has_count;  // :123verbose  :3tab
 } cmdmod_info_T;
 
 static cmdmod_info_T cmdmod_info_tab[] = {
@@ -4179,28 +4179,28 @@ static cmdmod_info_T cmdmod_info_tab[] = {
  * Return length of a command modifier (including optional count).
  * Return zero when it's not a modifier.
  */
-    int
+    정수
 modifier_len(char_u *cmd)
 {
-    int		i, j;
+    정수		i, j;
     char_u	*p = cmd;
 
-    if (VIM_ISDIGIT(*cmd))
+    만약 (VIM_ISDIGIT(*cmd))
 	p = skipwhite(skipdigits(cmd + 1));
-    for (i = 0; i < (int)ARRAY_LENGTH(cmdmod_info_tab); ++i)
+    위해 (i = 0; i < (정수)ARRAY_LENGTH(cmdmod_info_tab); ++i)
     {
 	// cmdmod_info_tab[] is sorted by name: once the first letter is past
 	// the command's first letter no later entry can match.
-	if (cmdmod_info_tab[i].name[0] > *p)
+	만약 (cmdmod_info_tab[i].name[0] > *p)
 	    break;
-	for (j = 0; p[j] != NUL; ++j)
-	    if (p[j] != cmdmod_info_tab[i].name[j])
+	위해 (j = 0; p[j] != NUL; ++j)
+	    만약 (p[j] != cmdmod_info_tab[i].name[j])
 		break;
-	if (!ASCII_ISALPHA(p[j]) && j >= cmdmod_info_tab[i].minlen
+	만약 (!ASCII_ISALPHA(p[j]) && j >= cmdmod_info_tab[i].minlen
 					&& (p == cmd || cmdmod_info_tab[i].has_count))
-	    return j + (int)(p - cmd);
+	    반환 j + (정수)(p - cmd);
     }
-    return 0;
+    반환 0;
 }
 
 /*
@@ -4208,23 +4208,23 @@ modifier_len(char_u *cmd)
  * Return 2 if there is an exact match.
  * Return 3 if there is an ambiguous match.
  */
-    int
+    정수
 cmd_exists(char_u *name)
 {
     exarg_T	ea;
-    int		full = FALSE;
-    int		i;
-    int		j;
+    정수		full = FALSE;
+    정수		i;
+    정수		j;
     char_u	*p;
 
     // Check command modifiers.
-    for (i = 0; i < (int)ARRAY_LENGTH(cmdmod_info_tab); ++i)
+    위해 (i = 0; i < (정수)ARRAY_LENGTH(cmdmod_info_tab); ++i)
     {
-	for (j = 0; name[j] != NUL; ++j)
-	    if (name[j] != cmdmod_info_tab[i].name[j])
+	위해 (j = 0; name[j] != NUL; ++j)
+	    만약 (name[j] != cmdmod_info_tab[i].name[j])
 		break;
-	if (name[j] == NUL && j >= cmdmod_info_tab[i].minlen)
-	    return (cmdmod_info_tab[i].name[j] == NUL ? 2 : 1);
+	만약 (name[j] == NUL && j >= cmdmod_info_tab[i].minlen)
+	    반환 (cmdmod_info_tab[i].name[j] == NUL ? 2 : 1);
     }
 
     // Check built-in commands and user defined commands.
@@ -4233,13 +4233,13 @@ cmd_exists(char_u *name)
     ea.cmdidx = (cmdidx_T)0;
     ea.flags = 0;
     p = find_ex_command(&ea, &full, NULL, NULL);
-    if (p == NULL)
-	return 3;
-    if (vim_isdigit(*name) && ea.cmdidx != CMD_match)
-	return 0;
-    if (*skipwhite(p) != NUL)
-	return 0;	// trailing garbage
-    return (ea.cmdidx == CMD_SIZE ? 0 : (full ? 2 : 1));
+    만약 (p == NULL)
+	반환 3;
+    만약 (vim_isdigit(*name) && ea.cmdidx != CMD_match)
+	반환 0;
+    만약 (*skipwhite(p) != NUL)
+	반환 0;	// trailing garbage
+    반환 (ea.cmdidx == CMD_SIZE ? 0 : (full ? 2 : 1));
 }
 
 /*
@@ -4257,27 +4257,27 @@ ex_command_attrs(dict_T *d, long_u argt, cmd_addr_T addr_type, long def)
     };
     char	*nargs;
 
-    if (!(argt & EX_EXTRA))
+    만약 (!(argt & EX_EXTRA))
 	nargs = "0";
-    else if (!(argt & EX_NOSPC))
+    아니면 만약 (!(argt & EX_NOSPC))
 	nargs = (argt & EX_NEEDARG) ? "+" : "*";
-    else if (!(argt & EX_NEEDARG))
+    아니면 만약 (!(argt & EX_NEEDARG))
 	nargs = "?";
-    else
+    아니면
 	nargs = (argt & EX_ARGSPACE) ? "_" : "1";
     dict_add_string(d, "nargs", (char_u *)nargs);
 
-    if (!(argt & EX_RANGE))
+    만약 (!(argt & EX_RANGE))
 	dict_add_bool(d, "range", FALSE);
-    else if (argt & EX_DFLALL)
+    아니면 만약 (argt & EX_DFLALL)
 	dict_add_string(d, "range", (char_u *)"%");
-    else if (def >= 0 && !(argt & EX_COUNT))
+    아니면 만약 (def >= 0 && !(argt & EX_COUNT))
 	dict_add_number(d, "range", def);
-    else
+    아니면
 	dict_add_string(d, "range", (char_u *)".");
-    if (!(argt & EX_COUNT))
+    만약 (!(argt & EX_COUNT))
 	dict_add_bool(d, "count", FALSE);
-    else
+    아니면
 	dict_add_number(d, "count", def < 0 ? 0 : def);
     dict_add_bool(d, "bang", (argt & EX_BANG) != 0);
     dict_add_bool(d, "bar", (argt & EX_TRLBAR) != 0);
@@ -4292,29 +4292,29 @@ ex_command_attrs(dict_T *d, long_u argt, cmd_addr_T addr_type, long def)
  * Returns FAIL when there is no such command or the abbreviation is
  * ambiguous.
  */
-    int
-ex_command_info(char_u *name, int vim9, dict_T *d)
+    정수
+ex_command_info(char_u *name, 정수 vim9, dict_T *d)
 {
     exarg_T	ea;
     char_u	*p;
-    int		i;
-    int		j;
-    int		save_cmod_flags = cmdmod.cmod_flags;
-    int		ret = OK;
+    정수		i;
+    정수		j;
+    정수		save_cmod_flags = cmdmod.cmod_flags;
+    정수		ret = OK;
 
-    if (vim9 != -1)
+    만약 (vim9 != -1)
     {
 	cmdmod.cmod_flags &= ~(CMOD_VIM9CMD | CMOD_LEGACY);
 	cmdmod.cmod_flags |= vim9 ? CMOD_VIM9CMD : CMOD_LEGACY;
     }
 
     // An abbreviation of a command modifier, like ":bo" for ":botright".
-    for (i = 0; i < (int)ARRAY_LENGTH(cmdmod_info_tab); ++i)
+    위해 (i = 0; i < (정수)ARRAY_LENGTH(cmdmod_info_tab); ++i)
     {
-	for (j = 0; name[j] != NUL; ++j)
-	    if (name[j] != cmdmod_info_tab[i].name[j])
+	위해 (j = 0; name[j] != NUL; ++j)
+	    만약 (name[j] != cmdmod_info_tab[i].name[j])
 		break;
-	if (name[j] == NUL && j >= cmdmod_info_tab[i].minlen)
+	만약 (name[j] == NUL && j >= cmdmod_info_tab[i].minlen)
 	{
 	    name = (char_u *)cmdmod_info_tab[i].name;
 	    break;
@@ -4329,20 +4329,20 @@ ex_command_info(char_u *name, int vim9, dict_T *d)
     // Don't complain about using "en" or ":let" in Vim9 script.
     ++emsg_silent;
     p = find_ex_command(&ea, NULL, NULL, NULL);
-    if (p == NULL || ea.cmdidx == CMD_SIZE
+    만약 (p == NULL || ea.cmdidx == CMD_SIZE
 	    || (vim_isdigit(*name) && ea.cmdidx != CMD_match)
 	    || *skipwhite(p) != NUL
 	    || not_in_vim9(&ea, true) == FAIL)
 	ret = FAIL;
     --emsg_silent;
 
-    if (ret == FAIL)
+    만약 (ret == FAIL)
 	;
-    else if (IS_USER_CMDIDX(ea.cmdidx))
+    아니면 만약 (IS_USER_CMDIDX(ea.cmdidx))
 	ret = user_command_info(ea.useridx, ea.cmdidx, d);
-    else
+    아니면
     {
-	int	notimpl = cmdnames[ea.cmdidx].cmd_func == ex_ni
+	정수	notimpl = cmdnames[ea.cmdidx].cmd_func == ex_ni
 # ifdef HAVE_EX_SCRIPT_NI
 			    || cmdnames[ea.cmdidx].cmd_func == ex_script_ni
 # endif
@@ -4357,7 +4357,7 @@ ex_command_info(char_u *name, int vim9, dict_T *d)
 				       cmdnames[ea.cmdidx].cmd_addr_type, -1);
     }
     cmdmod.cmod_flags = save_cmod_flags;
-    return ret;
+    반환 ret;
 }
 
 /*
@@ -4369,29 +4369,29 @@ f_fullcommand(typval_T *argvars, typval_T *rettv)
     exarg_T	ea;
     char_u	*name;
     char_u	*p;
-    int		vim9script = in_vim9script();
-    int		save_cmod_flags = cmdmod.cmod_flags;
+    정수		vim9script = in_vim9script();
+    정수		save_cmod_flags = cmdmod.cmod_flags;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script()
+    만약 (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	반환;
 
     name = tv_get_string(&argvars[0]);
-    if (name == NULL)
-	return;
+    만약 (name == NULL)
+	반환;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    만약 (argvars[1].v_type != VAR_UNKNOWN)
     {
 	vim9script = tv_get_bool(&argvars[1]);
 	cmdmod.cmod_flags &= ~(CMOD_VIM9CMD | CMOD_LEGACY);
 	cmdmod.cmod_flags |= vim9script ? CMOD_VIM9CMD : CMOD_LEGACY;
     }
 
-    while (*name == ':')
+    동안 (*name == ':')
 	name++;
     name = skip_range(name, TRUE, NULL);
 
@@ -4401,10 +4401,10 @@ f_fullcommand(typval_T *argvars, typval_T *rettv)
     ++emsg_silent;  // don't complain about using "en" in Vim9 script
     p = find_ex_command(&ea, NULL, NULL, NULL);
     --emsg_silent;
-    if (p == NULL || ea.cmdidx == CMD_SIZE)
+    만약 (p == NULL || ea.cmdidx == CMD_SIZE)
 	goto theend;
 
-    if (vim9script && not_in_vim9(&ea, true) == FAIL)
+    만약 (vim9script && not_in_vim9(&ea, true) == FAIL)
 	goto theend;
 
     rettv->vval.v_string = vim_strsave(IS_USER_CMDIDX(ea.cmdidx)
@@ -4416,23 +4416,23 @@ theend:
 #endif
 
     cmdidx_T
-excmd_get_cmdidx(char_u *cmd, int len)
+excmd_get_cmdidx(char_u *cmd, 정수 len)
 {
     cmdidx_T idx;
 
-    if (!one_letter_cmd(cmd, &idx))
-	for (idx = (cmdidx_T)0; (int)idx < (int)CMD_SIZE;
-		idx = (cmdidx_T)((int)idx + 1))
-	    if (STRNCMP(cmdnames[(int)idx].cmd_name, cmd, (size_t)len) == 0)
+    만약 (!one_letter_cmd(cmd, &idx))
+	위해 (idx = (cmdidx_T)0; (정수)idx < (정수)CMD_SIZE;
+		idx = (cmdidx_T)((정수)idx + 1))
+	    만약 (STRNCMP(cmdnames[(정수)idx].cmd_name, cmd, (size_t)len) == 0)
 		break;
 
-    return idx;
+    반환 idx;
 }
 
     long
 excmd_get_argt(cmdidx_T idx)
 {
-    return (long)cmdnames[(int)idx].cmd_argt;
+    반환 (long)cmdnames[(정수)idx].cmd_argt;
 }
 
 /*
@@ -4447,67 +4447,67 @@ excmd_get_argt(cmdidx_T idx)
     char_u *
 skip_range(
     char_u	*cmd_start,
-    int		skip_star,	// skip "*" used for Visual range
-    int		*ctx)		// pointer to xp_context or NULL
+    정수		skip_star,	// skip "*" used for Visual range
+    정수		*ctx)		// pointer to xp_context or NULL
 {
     char_u	*cmd = cmd_start;
     unsigned	delim;
 
-    while (vim_strchr((char_u *)" \t0123456789.$%'/?-+,;\\", *cmd) != NULL)
+    동안 (vim_strchr((char_u *)" \t0123456789.$%'/?-+,;\\", *cmd) != NULL)
     {
-	if (*cmd == '\\')
+	만약 (*cmd == '\\')
 	{
-	    if (cmd[1] == '?' || cmd[1] == '/' || cmd[1] == '&')
+	    만약 (cmd[1] == '?' || cmd[1] == '/' || cmd[1] == '&')
 		++cmd;
-	    else
+	    아니면
 		break;
 	}
-	else if (*cmd == '\'')
+	아니면 만약 (*cmd == '\'')
 	{
 	    char_u *p = cmd;
 
 	    // a quote is only valid at the start or after a separator
-	    while (p > cmd_start)
+	    동안 (p > cmd_start)
 	    {
 		--p;
-		if (!VIM_ISWHITE(*p))
+		만약 (!VIM_ISWHITE(*p))
 		    break;
 	    }
-	    if (cmd > cmd_start && !VIM_ISWHITE(*p) && *p != ',' && *p != ';')
+	    만약 (cmd > cmd_start && !VIM_ISWHITE(*p) && *p != ',' && *p != ';')
 		break;
-	    if (*++cmd == NUL && ctx != NULL)
+	    만약 (*++cmd == NUL && ctx != NULL)
 		*ctx = EXPAND_NOTHING;
 	}
-	else if (*cmd == '/' || *cmd == '?')
+	아니면 만약 (*cmd == '/' || *cmd == '?')
 	{
 	    delim = *cmd++;
-	    while (*cmd != NUL && *cmd != delim)
-		if (*cmd++ == '\\' && *cmd != NUL)
+	    동안 (*cmd != NUL && *cmd != delim)
+		만약 (*cmd++ == '\\' && *cmd != NUL)
 		    ++cmd;
-	    if (*cmd == NUL && ctx != NULL)
+	    만약 (*cmd == NUL && ctx != NULL)
 		*ctx = EXPAND_NOTHING;
 	}
-	if (*cmd != NUL)
+	만약 (*cmd != NUL)
 	    ++cmd;
     }
 
     // Skip ":" and white space.
-    while (*cmd == ':')
+    동안 (*cmd == ':')
 	cmd = skipwhite(cmd + 1);
 
     // Skip "*" used for Visual range.
-    if (skip_star && *cmd == '*' && vim_strchr(p_cpo, CPO_STAR) == NULL)
+    만약 (skip_star && *cmd == '*' && vim_strchr(p_cpo, CPO_STAR) == NULL)
 	cmd = skipwhite(cmd + 1);
 
-    return cmd;
+    반환 cmd;
 }
 
     static void
 addr_error(cmd_addr_T addr_type)
 {
-    if (addr_type == ADDR_NONE)
+    만약 (addr_type == ADDR_NONE)
 	emsg(_(e_no_range_allowed));
-    else
+    아니면
 	emsg(_(e_invalid_range));
 }
 
@@ -4525,9 +4525,9 @@ default_address(exarg_T *eap)
 	case ADDR_OTHER:
 	    // Default is the cursor line number.  Avoid using an invalid
 	    // line number though.
-	    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+	    만약 (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
 		lnum = curbuf->b_ml.ml_line_count;
-	    else
+	    아니면
 		lnum = curwin->w_cursor.lnum;
 	    break;
 	case ADDR_WINDOWS:
@@ -4535,7 +4535,7 @@ default_address(exarg_T *eap)
 	    break;
 	case ADDR_ARGUMENTS:
 	    lnum = curwin->w_arg_idx + 1;
-	    if (lnum > ARGCOUNT)
+	    만약 (lnum > ARGCOUNT)
 		lnum = ARGCOUNT;
 	    break;
 	case ADDR_LOADED_BUFFERS:
@@ -4563,7 +4563,7 @@ default_address(exarg_T *eap)
 	    // Will give an error later if a range is found.
 	    break;
     }
-    return lnum;
+    반환 lnum;
 }
 
 /*
@@ -4580,13 +4580,13 @@ get_address(
     exarg_T	*eap UNUSED,
     char_u	**ptr,
     cmd_addr_T	addr_type,
-    int		skip,		// only skip the address, don't use it
-    int		silent,		// no errors or side effects
-    int		to_other_file,  // flag: may jump to other file
-    int		address_count UNUSED) // 1 for first address, >1 after comma
+    정수		skip,		// only skip the address, don't use it
+    정수		silent,		// no errors or side effects
+    정수		to_other_file,  // flag: may jump to other file
+    정수		address_count UNUSED) // 1 for first address, >1 after comma
 {
-    int		c;
-    int		i;
+    정수		c;
+    정수		i;
     long	n;
     char_u	*cmd;
     pos_T	pos;
@@ -4657,9 +4657,9 @@ get_address(
 			break;
 		    case ADDR_LOADED_BUFFERS:
 			buf = lastbuf;
-			while (buf->b_ml.ml_mfp == NULL)
+			동안 (buf->b_ml.ml_mfp == NULL)
 			{
-			    if (buf->b_prev == NULL)
+			    만약 (buf->b_prev == NULL)
 				break;
 			    buf = buf->b_prev;
 			}
@@ -4681,14 +4681,14 @@ get_address(
 		    case ADDR_QUICKFIX:
 #ifdef FEAT_QUICKFIX
 			lnum = qf_get_size(eap);
-			if (lnum == 0)
+			만약 (lnum == 0)
 			    lnum = 1;
 #endif
 			break;
 		    case ADDR_QUICKFIX_VALID:
 #ifdef FEAT_QUICKFIX
 			lnum = qf_get_valid_size(eap);
-			if (lnum == 0)
+			만약 (lnum == 0)
 			    lnum = 1;
 #endif
 			break;
@@ -4696,31 +4696,31 @@ get_address(
 		break;
 
 	    case '\'':			    // ''' - mark
-		if (*++cmd == NUL)
+		만약 (*++cmd == NUL)
 		{
 		    cmd = NULL;
 		    goto error;
 		}
-		if (addr_type != ADDR_LINES)
+		만약 (addr_type != ADDR_LINES)
 		{
 		    addr_error(addr_type);
 		    cmd = NULL;
 		    goto error;
 		}
-		if (skip)
+		만약 (skip)
 		    ++cmd;
-		else
+		아니면
 		{
 		    // Only accept a mark in another file when it is
 		    // used by itself: ":'M".
 		    fp = getmark(*cmd, to_other_file && cmd[1] == NUL);
 		    ++cmd;
-		    if (fp == (pos_T *)-1)
+		    만약 (fp == (pos_T *)-1)
 			// Jumped to another file.
 			lnum = curwin->w_cursor.lnum;
-		    else
+		    아니면
 		    {
-			if (check_mark(fp) == FAIL)
+			만약 (check_mark(fp) == FAIL)
 			{
 			    cmd = NULL;
 			    goto error;
@@ -4733,27 +4733,27 @@ get_address(
 	    case '/':
 	    case '?':			// '/' or '?' - search
 		c = *cmd++;
-		if (addr_type != ADDR_LINES)
+		만약 (addr_type != ADDR_LINES)
 		{
 		    addr_error(addr_type);
 		    cmd = NULL;
 		    goto error;
 		}
-		if (skip)	// skip "/pat/"
+		만약 (skip)	// skip "/pat/"
 		{
 		    cmd = skip_regexp(cmd, c, magic_isset());
-		    if (*cmd == c)
+		    만약 (*cmd == c)
 			++cmd;
 		}
-		else
+		아니면
 		{
-		    int flags;
+		    정수 flags;
 
 		    pos = curwin->w_cursor; // save curwin->w_cursor
 
 		    // When '/' or '?' follows another address, start from
 		    // there.
-		    if (lnum > 0 && lnum != MAXLNUM)
+		    만약 (lnum > 0 && lnum != MAXLNUM)
 			curwin->w_cursor.lnum =
 				lnum > curbuf->b_ml.ml_line_count
 					   ? curbuf->b_ml.ml_line_count : lnum;
@@ -4764,13 +4764,13 @@ get_address(
 		    // This makes sure we never match in the current
 		    // line, and can match anywhere in the
 		    // next/previous line.
-		    if (c == '/' && curwin->w_cursor.lnum > 0)
+		    만약 (c == '/' && curwin->w_cursor.lnum > 0)
 			curwin->w_cursor.col = MAXCOL;
-		    else
+		    아니면
 			curwin->w_cursor.col = 0;
 		    searchcmdlen = 0;
 		    flags = silent ? SEARCH_KEEP : SEARCH_HIS | SEARCH_MSG;
-		    if (!do_search(NULL, c, c, cmd, STRLEN(cmd), 1L, flags, NULL))
+		    만약 (!do_search(NULL, c, c, cmd, STRLEN(cmd), 1L, flags, NULL))
 		    {
 			curwin->w_cursor = pos;
 			cmd = NULL;
@@ -4785,48 +4785,48 @@ get_address(
 
 	    case '\\':		    // "\?", "\/" or "\&", repeat search
 		++cmd;
-		if (addr_type != ADDR_LINES)
+		만약 (addr_type != ADDR_LINES)
 		{
 		    addr_error(addr_type);
 		    cmd = NULL;
 		    goto error;
 		}
-		if (*cmd == '&')
+		만약 (*cmd == '&')
 		    i = RE_SUBST;
-		else if (*cmd == '?' || *cmd == '/')
+		아니면 만약 (*cmd == '?' || *cmd == '/')
 		    i = RE_SEARCH;
-		else
+		아니면
 		{
 		    emsg(_(e_backslash_should_be_followed_by));
 		    cmd = NULL;
 		    goto error;
 		}
 
-		if (!skip)
+		만약 (!skip)
 		{
 		    /*
 		     * When search follows another address, start from
 		     * there.
 		     */
-		    if (lnum != MAXLNUM)
+		    만약 (lnum != MAXLNUM)
 			pos.lnum = lnum;
-		    else
+		    아니면
 			pos.lnum = curwin->w_cursor.lnum;
 
 		    /*
 		     * Start the search just like for the above
 		     * do_search().
 		     */
-		    if (*cmd != '?')
+		    만약 (*cmd != '?')
 			pos.col = MAXCOL;
-		    else
+		    아니면
 			pos.col = 0;
 		    pos.coladd = 0;
-		    if (searchit(curwin, curbuf, &pos, NULL,
+		    만약 (searchit(curwin, curbuf, &pos, NULL,
 				*cmd == '?' ? BACKWARD : FORWARD,
 				(char_u *)"", 0, 1L, SEARCH_MSG, i, NULL) != FAIL)
 			lnum = pos.lnum;
-		    else
+		    아니면
 		    {
 			cmd = NULL;
 			goto error;
@@ -4836,17 +4836,17 @@ get_address(
 		break;
 
 	    default:
-		if (VIM_ISDIGIT(*cmd))	// absolute line number
+		만약 (VIM_ISDIGIT(*cmd))	// absolute line number
 		    lnum = getdigits(&cmd);
 	}
 
-	for (;;)
+	위해 (;;)
 	{
 	    cmd = skipwhite(cmd);
-	    if (*cmd != '-' && *cmd != '+' && !VIM_ISDIGIT(*cmd))
+	    만약 (*cmd != '-' && *cmd != '+' && !VIM_ISDIGIT(*cmd))
 		break;
 
-	    if (lnum == MAXLNUM)
+	    만약 (lnum == MAXLNUM)
 	    {
 		switch (addr_type)
 		{
@@ -4888,17 +4888,17 @@ get_address(
 		}
 	    }
 
-	    if (VIM_ISDIGIT(*cmd))
+	    만약 (VIM_ISDIGIT(*cmd))
 		i = '+';		// "number" is same as "+number"
-	    else
+	    아니면
 		i = *cmd++;
-	    if (!VIM_ISDIGIT(*cmd))	// '+' is '+1'
+	    만약 (!VIM_ISDIGIT(*cmd))	// '+' is '+1'
 		n = 1;
-	    else
+	    아니면
 	    {
 		// "number", "+number" or "-number"
 		n = getdigits(&cmd);
-		if (n == MAXLNUM)
+		만약 (n == MAXLNUM)
 		{
 		    emsg(_(e_line_number_out_of_range));
 		    cmd = NULL;
@@ -4906,30 +4906,30 @@ get_address(
 		}
 	    }
 
-	    if (addr_type == ADDR_TABS_RELATIVE)
+	    만약 (addr_type == ADDR_TABS_RELATIVE)
 	    {
 		emsg(_(e_invalid_range));
 		cmd = NULL;
 		goto error;
 	    }
-	    else if (addr_type == ADDR_LOADED_BUFFERS
+	    아니면 만약 (addr_type == ADDR_LOADED_BUFFERS
 		    || addr_type == ADDR_BUFFERS)
 		lnum = compute_buffer_local_count(
 				    addr_type, lnum, (i == '-') ? -1 * n : n);
-	    else
+	    아니면
 	    {
 #ifdef FEAT_FOLDING
 		// Relative line addressing: need to adjust for lines in a
 		// closed fold after the first address.
-		if (addr_type == ADDR_LINES && (i == '-' || i == '+')
+		만약 (addr_type == ADDR_LINES && (i == '-' || i == '+')
 							 && address_count >= 2)
 		    (void)hasFolding(lnum, NULL, &lnum);
 #endif
-		if (i == '-')
+		만약 (i == '-')
 		    lnum -= n;
-		else
+		아니면
 		{
-		    if (lnum >= 0 && n >= LONG_MAX - lnum)
+		    만약 (lnum >= 0 && n >= LONG_MAX - lnum)
 		    {
 			emsg(_(e_line_number_out_of_range));
 			cmd = NULL;
@@ -4939,11 +4939,11 @@ get_address(
 		}
 	    }
 	}
-    } while (*cmd == '/' || *cmd == '?');
+    } 동안 (*cmd == '/' || *cmd == '?');
 
 error:
     *ptr = cmd;
-    return lnum;
+    반환 lnum;
 }
 
 /*
@@ -4964,11 +4964,11 @@ address_default_all(exarg_T *eap)
 	    {
 		buf_T *buf = firstbuf;
 
-		while (buf->b_next != NULL && buf->b_ml.ml_mfp == NULL)
+		동안 (buf->b_next != NULL && buf->b_ml.ml_mfp == NULL)
 		    buf = buf->b_next;
 		eap->line1 = buf->b_fnum;
 		buf = lastbuf;
-		while (buf->b_prev != NULL && buf->b_ml.ml_mfp == NULL)
+		동안 (buf->b_prev != NULL && buf->b_ml.ml_mfp == NULL)
 		    buf = buf->b_prev;
 		eap->line2 = buf->b_fnum;
 	    }
@@ -4987,15 +4987,15 @@ address_default_all(exarg_T *eap)
 	    eap->line2 = 1;
 	    break;
 	case ADDR_ARGUMENTS:
-	    if (ARGCOUNT == 0)
+	    만약 (ARGCOUNT == 0)
 		eap->line1 = eap->line2 = 0;
-	    else
+	    아니면
 		eap->line2 = ARGCOUNT;
 	    break;
 	case ADDR_QUICKFIX_VALID:
 #ifdef FEAT_QUICKFIX
 	    eap->line2 = qf_get_valid_size(eap);
-	    if (eap->line2 == 0)
+	    만약 (eap->line2 == 0)
 		eap->line2 = 1;
 #endif
 	    break;
@@ -5014,13 +5014,13 @@ address_default_all(exarg_T *eap)
     static void
 get_flags(exarg_T *eap)
 {
-    while (vim_strchr((char_u *)"lp#", *eap->arg) != NULL)
+    동안 (vim_strchr((char_u *)"lp#", *eap->arg) != NULL)
     {
-	if (*eap->arg == 'l')
+	만약 (*eap->arg == 'l')
 	    eap->flags |= EXFLAG_LIST;
-	else if (*eap->arg == 'p')
+	아니면 만약 (*eap->arg == 'p')
 	    eap->flags |= EXFLAG_PRINT;
-	else
+	아니면
 	    eap->flags |= EXFLAG_NR;
 	eap->arg = skipwhite(eap->arg + 1);
     }
@@ -5032,7 +5032,7 @@ get_flags(exarg_T *eap)
     void
 ex_ni(exarg_T *eap)
 {
-    if (!eap->skip)
+    만약 (!eap->skip)
 	eap->errmsg =
 		_(e_sorry_command_is_not_available_in_this_version);
 }
@@ -5045,9 +5045,9 @@ ex_ni(exarg_T *eap)
     static void
 ex_script_ni(exarg_T *eap)
 {
-    if (!eap->skip)
+    만약 (!eap->skip)
 	ex_ni(eap);
-    else
+    아니면
 	vim_free(script_get(eap, eap->arg));
 }
 #endif
@@ -5061,62 +5061,62 @@ invalid_range(exarg_T *eap)
 {
     buf_T	*buf;
 
-    if (       eap->line1 < 0
+    만약 (       eap->line1 < 0
 	    || eap->line2 < 0
 	    || eap->line1 > eap->line2)
-	return _(e_invalid_range);
+	반환 _(e_invalid_range);
 
-    if (eap->argt & EX_RANGE)
+    만약 (eap->argt & EX_RANGE)
     {
 	switch (eap->addr_type)
 	{
 	    case ADDR_LINES:
-		if (eap->line2 > curbuf->b_ml.ml_line_count
+		만약 (eap->line2 > curbuf->b_ml.ml_line_count
 #ifdef FEAT_DIFF
 			    + (eap->cmdidx == CMD_diffget ||
 				eap->cmdidx == CMD_diffput)
 #endif
 		   )
-		    return _(e_invalid_range);
+		    반환 _(e_invalid_range);
 		break;
 	    case ADDR_ARGUMENTS:
 		// add 1 if ARGCOUNT is 0
-		if (eap->line2 > ARGCOUNT + (!ARGCOUNT))
-		    return _(e_invalid_range);
+		만약 (eap->line2 > ARGCOUNT + (!ARGCOUNT))
+		    반환 _(e_invalid_range);
 		break;
 	    case ADDR_BUFFERS:
 		// Only a boundary check, not whether the buffers actually
 		// exist.
-		if (eap->line1 < 1 || eap->line2 > get_highest_fnum())
-		    return _(e_invalid_range);
+		만약 (eap->line1 < 1 || eap->line2 > get_highest_fnum())
+		    반환 _(e_invalid_range);
 		break;
 	    case ADDR_LOADED_BUFFERS:
 		buf = firstbuf;
-		while (buf->b_ml.ml_mfp == NULL)
+		동안 (buf->b_ml.ml_mfp == NULL)
 		{
-		    if (buf->b_next == NULL)
-			return _(e_invalid_range);
+		    만약 (buf->b_next == NULL)
+			반환 _(e_invalid_range);
 		    buf = buf->b_next;
 		}
-		if (eap->line1 < buf->b_fnum)
-		    return _(e_invalid_range);
+		만약 (eap->line1 < buf->b_fnum)
+		    반환 _(e_invalid_range);
 		buf = lastbuf;
-		while (buf->b_ml.ml_mfp == NULL)
+		동안 (buf->b_ml.ml_mfp == NULL)
 		{
-		    if (buf->b_prev == NULL)
-			return _(e_invalid_range);
+		    만약 (buf->b_prev == NULL)
+			반환 _(e_invalid_range);
 		    buf = buf->b_prev;
 		}
-		if (eap->line2 > buf->b_fnum)
-		    return _(e_invalid_range);
+		만약 (eap->line2 > buf->b_fnum)
+		    반환 _(e_invalid_range);
 		break;
 	    case ADDR_WINDOWS:
-		if (eap->line2 > LAST_WIN_NR)
-		    return _(e_invalid_range);
+		만약 (eap->line2 > LAST_WIN_NR)
+		    반환 _(e_invalid_range);
 		break;
 	    case ADDR_TABS:
-		if (eap->line2 > LAST_TAB_NR)
-		    return _(e_invalid_range);
+		만약 (eap->line2 > LAST_TAB_NR)
+		    반환 _(e_invalid_range);
 		break;
 	    case ADDR_TABS_RELATIVE:
 	    case ADDR_OTHER:
@@ -5125,19 +5125,19 @@ invalid_range(exarg_T *eap)
 	    case ADDR_QUICKFIX:
 #ifdef FEAT_QUICKFIX
 		// No error for value that is too big, will use the last entry.
-		if (eap->line2 <= 0)
+		만약 (eap->line2 <= 0)
 		{
-		    if (eap->addr_count == 0)
-			return _(e_no_errors);
-		    return _(e_invalid_range);
+		    만약 (eap->addr_count == 0)
+			반환 _(e_no_errors);
+		    반환 _(e_invalid_range);
 		}
 #endif
 		break;
 	    case ADDR_QUICKFIX_VALID:
 #ifdef FEAT_QUICKFIX
-		if ((eap->line2 != 1 && eap->line2 > qf_get_valid_size(eap))
+		만약 ((eap->line2 != 1 && eap->line2 > qf_get_valid_size(eap))
 			|| eap->line2 < 0)
-		    return _(e_invalid_range);
+		    반환 _(e_invalid_range);
 #endif
 		break;
 	    case ADDR_UNSIGNED:
@@ -5146,7 +5146,7 @@ invalid_range(exarg_T *eap)
 		break;
 	}
     }
-    return NULL;
+    반환 NULL;
 }
 
 /*
@@ -5155,11 +5155,11 @@ invalid_range(exarg_T *eap)
     static void
 correct_range(exarg_T *eap)
 {
-    if (!(eap->argt & EX_ZEROR))	    // zero in range not allowed
+    만약 (!(eap->argt & EX_ZEROR))	    // zero in range not allowed
     {
-	if (eap->line1 == 0)
+	만약 (eap->line1 == 0)
 	    eap->line1 = 1;
-	if (eap->line2 == 0)
+	만약 (eap->line2 == 0)
 	    eap->line2 = 1;
     }
 }
@@ -5174,16 +5174,16 @@ skip_grep_pat(exarg_T *eap)
 {
     char_u	*p = eap->arg;
 
-    if (*p != NUL && (eap->cmdidx == CMD_vimgrep || eap->cmdidx == CMD_lvimgrep
+    만약 (*p != NUL && (eap->cmdidx == CMD_vimgrep || eap->cmdidx == CMD_lvimgrep
 		|| eap->cmdidx == CMD_vimgrepadd
 		|| eap->cmdidx == CMD_lvimgrepadd
 		|| grep_internal(eap->cmdidx)))
     {
 	p = skip_vimgrep_pat(p, NULL, NULL);
-	if (p == NULL)
+	만약 (p == NULL)
 	    p = eap->arg;
     }
-    return p;
+    반환 p;
 }
 
 /*
@@ -5197,50 +5197,50 @@ replace_makeprg(exarg_T *eap, char_u *p, char_u **cmdlinep)
     char_u	*program;
     char_u	*pos;
     char_u	*ptr;
-    int		len;
-    int		i;
+    정수		len;
+    정수		i;
 
     /*
      * Don't do it when ":vimgrep" is used for ":grep".
      */
-    if ((eap->cmdidx == CMD_make || eap->cmdidx == CMD_lmake
+    만약 ((eap->cmdidx == CMD_make || eap->cmdidx == CMD_lmake
 		     || eap->cmdidx == CMD_grep || eap->cmdidx == CMD_lgrep
 		     || eap->cmdidx == CMD_grepadd
 		     || eap->cmdidx == CMD_lgrepadd)
 	    && !grep_internal(eap->cmdidx))
     {
-	if (eap->cmdidx == CMD_grep || eap->cmdidx == CMD_lgrep
+	만약 (eap->cmdidx == CMD_grep || eap->cmdidx == CMD_lgrep
 	    || eap->cmdidx == CMD_grepadd || eap->cmdidx == CMD_lgrepadd)
 	{
-	    if (*curbuf->b_p_gp == NUL)
+	    만약 (*curbuf->b_p_gp == NUL)
 		program = p_gp;
-	    else
+	    아니면
 		program = curbuf->b_p_gp;
 	}
-	else
+	아니면
 	{
-	    if (*curbuf->b_p_mp == NUL)
+	    만약 (*curbuf->b_p_mp == NUL)
 		program = p_mp;
-	    else
+	    아니면
 		program = curbuf->b_p_mp;
 	}
 
 	p = skipwhite(p);
 
-	if ((pos = (char_u *)strstr((char *)program, "$*")) != NULL)
+	만약 ((pos = (char_u *)strstr((char *)program, "$*")) != NULL)
 	{
 	    // replace $* by given arguments
 	    i = 1;
-	    while ((pos = (char_u *)strstr((char *)pos + 2, "$*")) != NULL)
+	    동안 ((pos = (char_u *)strstr((char *)pos + 2, "$*")) != NULL)
 		++i;
-	    len = (int)STRLEN(p);
+	    len = (정수)STRLEN(p);
 	    new_cmdline = alloc(STRLEN(program) + (size_t)i * (len - 2) + 1);
-	    if (new_cmdline == NULL)
-		return NULL;			// out of memory
+	    만약 (new_cmdline == NULL)
+		반환 NULL;			// out of memory
 	    ptr = new_cmdline;
-	    while ((pos = (char_u *)strstr((char *)program, "$*")) != NULL)
+	    동안 ((pos = (char_u *)strstr((char *)program, "$*")) != NULL)
 	    {
-		i = (int)(pos - program);
+		i = (정수)(pos - program);
 		STRNCPY(ptr, program, i);
 		STRCPY(ptr += i, p);
 		ptr += len;
@@ -5248,13 +5248,13 @@ replace_makeprg(exarg_T *eap, char_u *p, char_u **cmdlinep)
 	    }
 	    STRCPY(ptr, program);
 	}
-	else
+	아니면
 	{
 	    size_t program_len = STRLEN(program);
 
 	    new_cmdline = alloc(program_len + STRLEN(p) + 2);
-	    if (new_cmdline == NULL)
-		return NULL;			// out of memory
+	    만약 (new_cmdline == NULL)
+		반환 NULL;			// out of memory
 	    STRCPY(new_cmdline, program);
 	    STRCPY(new_cmdline + program_len, " ");
 	    STRCPY(new_cmdline + program_len + 1, p);
@@ -5266,7 +5266,7 @@ replace_makeprg(exarg_T *eap, char_u *p, char_u **cmdlinep)
 	*cmdlinep = new_cmdline;
 	p = new_cmdline;
     }
-    return p;
+    반환 p;
 }
 #endif
 
@@ -5275,23 +5275,23 @@ replace_makeprg(exarg_T *eap, char_u *p, char_u **cmdlinep)
  * When an error is detected, "errormsgp" is set to a non-NULL pointer.
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    정수
 expand_filename(
     exarg_T	*eap,
     char_u	**cmdlinep,
     char	**errormsgp)
 {
-    int		has_wildcards;	// need to expand wildcards
+    정수		has_wildcards;	// need to expand wildcards
     char_u	*repl;
     size_t	srclen;
     char_u	*p;
-    int		n;
-    int		escaped;
+    정수		n;
+    정수		escaped;
 
 #ifdef FEAT_QUICKFIX
     // Skip a regexp pattern for ":vimgrep[add] pat file..."
     p = skip_grep_pat(eap);
-#else
+#아니면
     p = eap->arg;
 #endif
 
@@ -5301,15 +5301,15 @@ expand_filename(
      * (it will be expanded anyway if there is a wildcard before replacing).
      */
     has_wildcards = mch_has_wildcard(p);
-    while (*p != NUL)
+    동안 (*p != NUL)
     {
 #ifdef FEAT_EVAL
 	// Skip over `=expr`, wildcards in it are not expanded.
-	if (p[0] == '`' && p[1] == '=')
+	만약 (p[0] == '`' && p[1] == '=')
 	{
 	    p += 2;
 	    (void)skip_expr(&p, NULL);
-	    if (*p == '`')
+	    만약 (*p == '`')
 		++p;
 	    continue;
 	}
@@ -5318,7 +5318,7 @@ expand_filename(
 	 * Quick check if this cannot be the start of a special string.
 	 * Also removes backslash before '%', '#' and '<'.
 	 */
-	if (vim_strchr((char_u *)"%#<", *p) == NULL)
+	만약 (vim_strchr((char_u *)"%#<", *p) == NULL)
 	{
 	    ++p;
 	    continue;
@@ -5329,9 +5329,9 @@ expand_filename(
 	 */
 	repl = eval_vars(p, eap->arg, &srclen, &(eap->do_ecmd_lnum),
 						    errormsgp, &escaped, TRUE);
-	if (*errormsgp != NULL)		// error detected
-	    return FAIL;
-	if (repl == NULL)		// no match found
+	만약 (*errormsgp != NULL)		// error detected
+	    반환 FAIL;
+	만약 (repl == NULL)		// no match found
 	{
 	    p += srclen;
 	    continue;
@@ -5339,7 +5339,7 @@ expand_filename(
 
 	// Wildcards won't be expanded below, the replacement is taken
 	// literally.  But do expand "~/file", "~user/file" and "$HOME/file".
-	if (vim_strchr(repl, '$') != NULL || vim_strchr(repl, '~') != NULL)
+	만약 (vim_strchr(repl, '$') != NULL || vim_strchr(repl, '~') != NULL)
 	{
 	    char_u *l = repl;
 
@@ -5353,7 +5353,7 @@ expand_filename(
 	// - shell commands (may have to use quotes instead).
 	// - non-unix systems when there is a single argument (spaces don't
 	//   separate arguments then).
-	if (!eap->usefilter
+	만약 (!eap->usefilter
 		&& !escaped
 		&& eap->cmdidx != CMD_bang
 		&& eap->cmdidx != CMD_grep
@@ -5375,15 +5375,15 @@ expand_filename(
 	    // remove it later.
 	    static char_u *nobslash = (char_u *)" \t\"|";
 # define ESCAPE_CHARS nobslash
-#else
+#아니면
 # define ESCAPE_CHARS escape_chars
 #endif
 
-	    for (l = repl; *l; ++l)
-		if (vim_strchr(ESCAPE_CHARS, *l) != NULL)
+	    위해 (l = repl; *l; ++l)
+		만약 (vim_strchr(ESCAPE_CHARS, *l) != NULL)
 		{
 		    l = vim_strsave_escaped(repl, ESCAPE_CHARS);
-		    if (l != NULL)
+		    만약 (l != NULL)
 		    {
 			vim_free(repl);
 			repl = l;
@@ -5393,14 +5393,14 @@ expand_filename(
 	}
 
 	// For a shell command a '!' must be escaped.
-	if ((eap->usefilter || eap->cmdidx == CMD_bang
+	만약 ((eap->usefilter || eap->cmdidx == CMD_bang
 						|| eap->cmdidx == CMD_terminal)
 			    && vim_strpbrk(repl, (char_u *)"!") != NULL)
 	{
 	    char_u	*l;
 
 	    l = vim_strsave_escaped(repl, (char_u *)"!");
-	    if (l != NULL)
+	    만약 (l != NULL)
 	    {
 		vim_free(repl);
 		repl = l;
@@ -5409,39 +5409,39 @@ expand_filename(
 
 	p = repl_cmdline(eap, p, srclen, repl, cmdlinep);
 	vim_free(repl);
-	if (p == NULL)
-	    return FAIL;
+	만약 (p == NULL)
+	    반환 FAIL;
     }
 
     /*
      * One file argument: Expand wildcards.
      * Don't do this with ":r !command" or ":w !command".
      */
-    if ((eap->argt & EX_NOSPC) && !eap->usefilter)
+    만약 ((eap->argt & EX_NOSPC) && !eap->usefilter)
     {
 	/*
 	 * May do this twice:
 	 * 1. Replace environment variables.
 	 * 2. Replace any other wildcards, remove backslashes.
 	 */
-	for (n = 1; n <= 2; ++n)
+	위해 (n = 1; n <= 2; ++n)
 	{
-	    if (n == 2)
+	    만약 (n == 2)
 	    {
 		/*
 		 * Halve the number of backslashes (this is Vi compatible).
 		 * For Unix and OS/2, when wildcards are expanded, this is
 		 * done by ExpandOne() below.
 		 */
-#if defined(UNIX)
-		if (!has_wildcards)
+#만약 defined(UNIX)
+		만약 (!has_wildcards)
 #endif
 		    backslash_halve(eap->arg);
 	    }
 
-	    if (has_wildcards)
+	    만약 (has_wildcards)
 	    {
-		if (n == 1)
+		만약 (n == 1)
 		{
 		    /*
 		     * First loop: May expand environment variables.  This
@@ -5450,7 +5450,7 @@ expand_filename(
 		     * After expanding environment variables, check again
 		     * if there are still wildcards present.
 		     */
-		    if (vim_strchr(eap->arg, '$') != NULL
+		    만약 (vim_strchr(eap->arg, '$') != NULL
 			    || vim_strchr(eap->arg, '~') != NULL)
 		    {
 			expand_env_esc(eap->arg, NameBuff, MAXPATHL,
@@ -5459,35 +5459,35 @@ expand_filename(
 			has_wildcards = mch_has_wildcard(NameBuff);
 			p = NameBuff;
 		    }
-		    else
+		    아니면
 			p = NULL;
 		}
-		else // n == 2
+		아니면 // n == 2
 		{
 		    expand_T	xpc;
-		    int		options = WILD_LIST_NOTFOUND
+		    정수		options = WILD_LIST_NOTFOUND
 					       | WILD_NOERROR | WILD_ADD_SLASH;
 
 		    ExpandInit(&xpc);
 		    xpc.xp_context = EXPAND_FILES;
-		    if (p_wic)
+		    만약 (p_wic)
 			options += WILD_ICASE;
 		    p = ExpandOne(&xpc, eap->arg, NULL,
 						   options, WILD_EXPAND_FREE);
-		    if (p == NULL)
-			return FAIL;
+		    만약 (p == NULL)
+			반환 FAIL;
 		}
-		if (p != NULL)
+		만약 (p != NULL)
 		{
 		    (void)repl_cmdline(eap, eap->arg, STRLEN(eap->arg),
 								 p, cmdlinep);
-		    if (n == 2)	// p came from ExpandOne()
+		    만약 (n == 2)	// p came from ExpandOne()
 			vim_free(p);
 		}
 	    }
 	}
     }
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -5520,10 +5520,10 @@ repl_cmdline(
     repllen = STRLEN(repl);
     taillen = STRLEN(src + srclen);
     i = (src - *cmdlinep) + repllen + taillen + 3;
-    if (eap->nextcmd != NULL)
+    만약 (eap->nextcmd != NULL)
 	i += STRLEN(eap->nextcmd);	// add space for next command
-    if ((new_cmdline = alloc(i)) == NULL)
-	return NULL;			// out of memory!
+    만약 ((new_cmdline = alloc(i)) == NULL)
+	반환 NULL;			// out of memory!
 
     /*
      * Copy the stuff before the expanded part.
@@ -5539,7 +5539,7 @@ repl_cmdline(
     STRCPY(new_cmdline + new_cmdlinelen, src + srclen);
     src = new_cmdline + new_cmdlinelen;	// remember where to continue
 
-    if (eap->nextcmd != NULL)		// append next command
+    만약 (eap->nextcmd != NULL)		// append next command
     {
 	new_cmdlinelen += taillen + 1;
 	STRCPY(new_cmdline + new_cmdlinelen, eap->nextcmd);
@@ -5547,12 +5547,12 @@ repl_cmdline(
     }
     eap->cmd = new_cmdline + (eap->cmd - *cmdlinep);
     eap->arg = new_cmdline + (eap->arg - *cmdlinep);
-    if (eap->do_ecmd_cmd != NULL && eap->do_ecmd_cmd != dollar_command)
+    만약 (eap->do_ecmd_cmd != NULL && eap->do_ecmd_cmd != dollar_command)
 	eap->do_ecmd_cmd = new_cmdline + (eap->do_ecmd_cmd - *cmdlinep);
     vim_free(*cmdlinep);
     *cmdlinep = new_cmdline;
 
-    return src;
+    반환 src;
 }
 
 /*
@@ -5560,37 +5560,37 @@ repl_cmdline(
  * If "keep_backslash" is TRUE do not remove any backslash.
  */
     void
-separate_nextcmd(exarg_T *eap, int keep_backslash)
+separate_nextcmd(exarg_T *eap, 정수 keep_backslash)
 {
-    int		vim9script = in_vim9script();
+    정수		vim9script = in_vim9script();
     char_u	*p;
 
 #ifdef FEAT_QUICKFIX
     p = skip_grep_pat(eap);
-#else
+#아니면
     p = eap->arg;
 #endif
 
-    for ( ; *p; MB_PTR_ADV(p))
+    위해 ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == Ctrl_V)
+	만약 (*p == Ctrl_V)
 	{
-	    if ((eap->argt & (EX_CTRLV | EX_XFILE)) || keep_backslash)
+	    만약 ((eap->argt & (EX_CTRLV | EX_XFILE)) || keep_backslash)
 		++p;		// skip CTRL-V and next char
-	    else
+	    아니면
 				// remove CTRL-V and skip next char
 		STRMOVE(p, p + 1);
-	    if (*p == NUL)		// stop at NUL after CTRL-V
+	    만약 (*p == NUL)		// stop at NUL after CTRL-V
 		break;
 	}
 
 #ifdef FEAT_EVAL
 	// Skip over `=expr` when wildcards are expanded.
-	else if (p[0] == '`' && p[1] == '=' && (eap->argt & EX_XFILE))
+	아니면 만약 (p[0] == '`' && p[1] == '=' && (eap->argt & EX_XFILE))
 	{
 	    p += 2;
 	    (void)skip_expr(&p, NULL);
-	    if (*p == NUL)		// stop at NUL after CTRL-V
+	    만약 (*p == NUL)		// stop at NUL after CTRL-V
 		break;
 	}
 #endif
@@ -5598,7 +5598,7 @@ separate_nextcmd(exarg_T *eap, int keep_backslash)
 	// Check for '"'/'#': start of comment or '|': next command
 	// :@" and :*" do not start a comment!
 	// :redir @" doesn't either.
-	else if ((*p == '"'
+	아니면 만약 ((*p == '"'
 		    && !vim9script
 		    && !(eap->argt & EX_NOTRLCOM)
 		    && ((eap->cmdidx != CMD_at && eap->cmdidx != CMD_star)
@@ -5619,16 +5619,16 @@ separate_nextcmd(exarg_T *eap, int keep_backslash)
 	     * We remove the '\' before the '|', unless EX_CTRLV is used
 	     * AND 'b' is present in 'cpoptions'.
 	     */
-	    if ((vim_strchr(p_cpo, CPO_BAR) == NULL
+	    만약 ((vim_strchr(p_cpo, CPO_BAR) == NULL
 			      || !(eap->argt & EX_CTRLV)) && *(p - 1) == '\\')
 	    {
-		if (!keep_backslash)
+		만약 (!keep_backslash)
 		{
 		    STRMOVE(p - 1, p);	// remove the '\'
 		    --p;
 		}
 	    }
-	    else
+	    아니면
 	    {
 		set_nextcmd(eap, p);
 		*p = NUL;
@@ -5637,7 +5637,7 @@ separate_nextcmd(exarg_T *eap, int keep_backslash)
 	}
     }
 
-    if (!(eap->argt & EX_NOTRLCOM))	// remove trailing spaces
+    만약 (!(eap->argt & EX_NOTRLCOM))	// remove trailing spaces
 	del_trailing_spaces(eap->arg);
 }
 
@@ -5650,23 +5650,23 @@ getargcmd(char_u **argp)
     char_u *arg = *argp;
     char_u *command = NULL;
 
-    if (*arg == '+')	    // +[command]
+    만약 (*arg == '+')	    // +[command]
     {
 	++arg;
-	if (vim_isspace(*arg) || *arg == NUL)
+	만약 (vim_isspace(*arg) || *arg == NUL)
 	    command = dollar_command;
-	else
+	아니면
 	{
 	    command = arg;
 	    arg = skip_cmd_arg(command, TRUE);
-	    if (*arg != NUL)
+	    만약 (*arg != NUL)
 		*arg++ = NUL;		// terminate command with NUL
 	}
 
 	arg = skipwhite(arg);	// skip over spaces
 	*argp = arg;
     }
-    return command;
+    반환 command;
 }
 
 /*
@@ -5675,41 +5675,41 @@ getargcmd(char_u **argp)
     char_u *
 skip_cmd_arg(
     char_u *p,
-    int	   rembs)	// TRUE to halve the number of backslashes
+    정수	   rembs)	// TRUE to halve the number of backslashes
 {
-    while (*p && !vim_isspace(*p))
+    동안 (*p && !vim_isspace(*p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	만약 (*p == '\\' && p[1] != NUL)
 	{
-	    if (rembs)
+	    만약 (rembs)
 		STRMOVE(p, p + 1);
-	    else
+	    아니면
 		++p;
 	}
 	MB_PTR_ADV(p);
     }
-    return p;
+    반환 p;
 }
 
-    int
+    정수
 get_bad_opt(char_u *p, exarg_T *eap)
 {
-    if (STRICMP(p, "keep") == 0)
+    만약 (STRICMP(p, "keep") == 0)
 	eap->bad_char = BAD_KEEP;
-    else if (STRICMP(p, "drop") == 0)
+    아니면 만약 (STRICMP(p, "drop") == 0)
 	eap->bad_char = BAD_DROP;
-    else if (MB_BYTE2LEN(*p) == 1 && p[1] == NUL)
+    아니면 만약 (MB_BYTE2LEN(*p) == 1 && p[1] == NUL)
 	eap->bad_char = *p;
-    else
-	return FAIL;
-    return OK;
+    아니면
+	반환 FAIL;
+    반환 OK;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of bad= names.
  */
     static char_u *
-get_bad_name(expand_T *xp UNUSED, int idx)
+get_bad_name(expand_T *xp UNUSED, 정수 idx)
 {
     // Note: Keep this in sync with getargopt.
     static char *(p_bad_values[]) =
@@ -5719,111 +5719,111 @@ get_bad_name(expand_T *xp UNUSED, int idx)
 	"drop",
     };
 
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(p_bad_values))
-	return NULL;
+    만약 (idx < 0 || idx >= (정수)ARRAY_LENGTH(p_bad_values))
+	반환 NULL;
 
-    return (char_u*)p_bad_values[idx];
+    반환 (char_u*)p_bad_values[idx];
 }
 
 /*
  * Get "++opt=arg" argument.
  * Return FAIL or OK.
  */
-    static int
+    static 정수
 getargopt(exarg_T *eap)
 {
     char_u	*arg = eap->arg + 2;
-    int		*pp = NULL;
-    int		bad_char_idx;
+    정수		*pp = NULL;
+    정수		bad_char_idx;
     char_u	*p;
 
     // Note: Keep this in sync with get_argopt_name.
 
     // ":edit ++[no]bin[ary] file"
-    if (STRNCMP(arg, "bin", 3) == 0 || STRNCMP(arg, "nobin", 5) == 0)
+    만약 (STRNCMP(arg, "bin", 3) == 0 || STRNCMP(arg, "nobin", 5) == 0)
     {
-	if (*arg == 'n')
+	만약 (*arg == 'n')
 	{
 	    arg += 2;
 	    eap->force_bin = FORCE_NOBIN;
 	}
-	else
+	아니면
 	    eap->force_bin = FORCE_BIN;
-	if (!checkforcmd(&arg, "binary", 3))
-	    return FAIL;
+	만약 (!checkforcmd(&arg, "binary", 3))
+	    반환 FAIL;
 	eap->arg = skipwhite(arg);
-	return OK;
+	반환 OK;
     }
 
     // ":read ++edit file"
-    if (STRNCMP(arg, "edit", 4) == 0)
+    만약 (STRNCMP(arg, "edit", 4) == 0)
     {
 	eap->read_edit = TRUE;
 	eap->arg = skipwhite(arg + 4);
-	return OK;
+	반환 OK;
     }
 
-    if (STRNCMP(arg, "ff", 2) == 0)
+    만약 (STRNCMP(arg, "ff", 2) == 0)
     {
 	arg += 2;
 	pp = &eap->force_ff;
     }
-    else if (STRNCMP(arg, "fileformat", 10) == 0)
+    아니면 만약 (STRNCMP(arg, "fileformat", 10) == 0)
     {
 	arg += 10;
 	pp = &eap->force_ff;
     }
-    else if (STRNCMP(arg, "enc", 3) == 0)
+    아니면 만약 (STRNCMP(arg, "enc", 3) == 0)
     {
-	if (STRNCMP(arg, "encoding", 8) == 0)
+	만약 (STRNCMP(arg, "encoding", 8) == 0)
 	    arg += 8;
-	else
+	아니면
 	    arg += 3;
 	pp = &eap->force_enc;
     }
-    else if (STRNCMP(arg, "bad", 3) == 0)
+    아니면 만약 (STRNCMP(arg, "bad", 3) == 0)
     {
 	arg += 3;
 	pp = &bad_char_idx;
     }
 
-    if (pp == NULL || *arg != '=')
-	return FAIL;
+    만약 (pp == NULL || *arg != '=')
+	반환 FAIL;
 
     ++arg;
-    *pp = (int)(arg - eap->cmd);
+    *pp = (정수)(arg - eap->cmd);
     arg = skip_cmd_arg(arg, FALSE);
     eap->arg = skipwhite(arg);
     *arg = NUL;
 
-    if (pp == &eap->force_ff)
+    만약 (pp == &eap->force_ff)
     {
-	if (check_ff_value(eap->cmd + eap->force_ff) == FAIL)
-	    return FAIL;
+	만약 (check_ff_value(eap->cmd + eap->force_ff) == FAIL)
+	    반환 FAIL;
 	eap->force_ff = eap->cmd[eap->force_ff];
     }
-    else if (pp == &eap->force_enc)
+    아니면 만약 (pp == &eap->force_enc)
     {
 	// Make 'fileencoding' lower case.
-	for (p = eap->cmd + eap->force_enc; *p != NUL; ++p)
+	위해 (p = eap->cmd + eap->force_enc; *p != NUL; ++p)
 	    *p = TOLOWER_ASC(*p);
     }
-    else
+    아니면
     {
 	// Check ++bad= argument.  Must be a single-byte character, "keep" or
 	// "drop".
-	if (get_bad_opt(eap->cmd + bad_char_idx, eap) == FAIL)
-	    return FAIL;
+	만약 (get_bad_opt(eap->cmd + bad_char_idx, eap) == FAIL)
+	    반환 FAIL;
     }
 
-    return OK;
+    반환 OK;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of ++opt names.
  */
     static char_u *
-get_argopt_name(expand_T *xp UNUSED, int idx)
+get_argopt_name(expand_T *xp UNUSED, 정수 idx)
 {
     // Note: Keep this in sync with getargopt.
     static char *(p_opt_values[]) =
@@ -5836,47 +5836,47 @@ get_argopt_name(expand_T *xp UNUSED, int idx)
 	"edit",
     };
 
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(p_opt_values))
-	return NULL;
+    만약 (idx < 0 || idx >= (정수)ARRAY_LENGTH(p_opt_values))
+	반환 NULL;
 
-    return (char_u*)p_opt_values[idx];
+    반환 (char_u*)p_opt_values[idx];
 }
 
 /*
  * Command-line expansion for ++opt=name.
  */
-    int
+    정수
 expand_argopt(
 	char_u	    *pat,
 	expand_T    *xp,
 	regmatch_T  *rmp,
 	char_u	    ***matches,
-	int	    *numMatches)
+	정수	    *numMatches)
 {
-    if (xp->xp_pattern > xp->xp_line && *(xp->xp_pattern-1) == '=')
+    만약 (xp->xp_pattern > xp->xp_line && *(xp->xp_pattern-1) == '=')
     {
-	char_u *(*cb)(expand_T *, int) = NULL;
+	char_u *(*cb)(expand_T *, 정수) = NULL;
 
 	char_u *name_end = xp->xp_pattern - 1;
-	if (name_end - xp->xp_line >= 2
+	만약 (name_end - xp->xp_line >= 2
 		&& STRNCMP(name_end - 2, "ff", 2) == 0)
 	    cb = get_fileformat_name;
-	else if (name_end - xp->xp_line >= 10
+	아니면 만약 (name_end - xp->xp_line >= 10
 		&& STRNCMP(name_end - 10, "fileformat", 10) == 0)
 	    cb = get_fileformat_name;
-	else if (name_end - xp->xp_line >= 3
+	아니면 만약 (name_end - xp->xp_line >= 3
 		&& STRNCMP(name_end - 3, "enc", 3) == 0)
 	    cb = get_encoding_name;
-	else if (name_end - xp->xp_line >= 8
+	아니면 만약 (name_end - xp->xp_line >= 8
 		&& STRNCMP(name_end - 8, "encoding", 8) == 0)
 	    cb = get_encoding_name;
-	else if (name_end - xp->xp_line >= 3
+	아니면 만약 (name_end - xp->xp_line >= 3
 		&& STRNCMP(name_end - 3, "bad", 3) == 0)
 	    cb = get_bad_name;
 
-	if (cb != NULL)
+	만약 (cb != NULL)
 	{
-	    return ExpandGeneric(
+	    반환 ExpandGeneric(
 		    pat,
 		    xp,
 		    rmp,
@@ -5885,23 +5885,23 @@ expand_argopt(
 		    cb,
 		    FALSE);
 	}
-	return FAIL;
+	반환 FAIL;
     }
 
     // Special handling of "ff" which acts as a short form of
     // "fileformat", as "ff" is not a substring of it.
-    if (xp->xp_pattern_len == 2
+    만약 (xp->xp_pattern_len == 2
 	    && STRNCMP(xp->xp_pattern, "ff", xp->xp_pattern_len) == 0)
     {
 	*matches = ALLOC_MULT(char_u *, 1);
-	if (*matches == NULL)
-	    return FAIL;
+	만약 (*matches == NULL)
+	    반환 FAIL;
 	*numMatches = 1;
 	(*matches)[0] = vim_strsave((char_u*)"fileformat=");
-	return OK;
+	반환 OK;
     }
 
-    return ExpandGeneric(
+    반환 ExpandGeneric(
 	    pat,
 	    xp,
 	    rmp,
@@ -5914,25 +5914,25 @@ expand_argopt(
     static void
 ex_autocmd(exarg_T *eap)
 {
-    if (eap->skip)
+    만약 (eap->skip)
     {
 	skip_cmd_block(eap);
-	return;
+	반환;
     }
 
     /*
      * Disallow autocommands from .exrc and .vimrc in current
      * directory for security reasons.
      */
-    if (secure)
+    만약 (secure)
     {
 	secure = 2;
 	eap->errmsg =
 	      _(e_command_not_allowed_from_vimrc_in_current_dir_or_tag_search);
     }
-    else if (eap->cmdidx == CMD_autocmd)
+    아니면 만약 (eap->cmdidx == CMD_autocmd)
 	do_autocmd(eap, eap->arg, eap->forceit);
-    else
+    아니면
 	do_augroup(eap->arg, eap->forceit);
 }
 
@@ -5943,12 +5943,12 @@ ex_autocmd(exarg_T *eap)
 ex_doautocmd(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
-    int		call_do_modelines = check_nomodeline(&arg);
-    int		did_aucmd;
+    정수		call_do_modelines = check_nomodeline(&arg);
+    정수		did_aucmd;
 
     (void)do_doautocmd(arg, TRUE, &did_aucmd);
     // Only when there is no <nomodeline>.
-    if (call_do_modelines && did_aucmd)
+    만약 (call_do_modelines && did_aucmd)
 	do_modelines(0);
 }
 
@@ -5960,13 +5960,13 @@ ex_doautocmd(exarg_T *eap)
     static void
 ex_bunload(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    만약 (ERROR_IF_ANY_POPUP_WINDOW)
+	반환;
     eap->errmsg = do_bufdel(
 	    eap->cmdidx == CMD_bdelete ? DOBUF_DEL
 		: eap->cmdidx == CMD_bwipeout ? DOBUF_WIPE
 		: DOBUF_UNLOAD, eap->arg,
-	    eap->addr_count, (int)eap->line1, (int)eap->line2, eap->forceit);
+	    eap->addr_count, (정수)eap->line1, (정수)eap->line2, eap->forceit);
 }
 
 /*
@@ -5976,8 +5976,8 @@ ex_bunload(exarg_T *eap)
     static void
 ex_buffer(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    만약 (ERROR_IF_ANY_POPUP_WINDOW)
+	반환;
     do_exbuffer(eap);
 }
 
@@ -5987,15 +5987,15 @@ ex_buffer(exarg_T *eap)
     static void
 do_exbuffer(exarg_T *eap)
 {
-    if (*eap->arg)
+    만약 (*eap->arg)
 	eap->errmsg = ex_errmsg(e_trailing_characters_str, eap->arg);
-    else
+    아니면
     {
-	if (eap->addr_count == 0)	// default is current buffer
+	만약 (eap->addr_count == 0)	// default is current buffer
 	    goto_buffer(eap, DOBUF_CURRENT, FORWARD, 0);
-	else
-	    goto_buffer(eap, DOBUF_FIRST, FORWARD, (int)eap->line2);
-	if (eap->do_ecmd_cmd != NULL)
+	아니면
+	    goto_buffer(eap, DOBUF_FIRST, FORWARD, (정수)eap->line2);
+	만약 (eap->do_ecmd_cmd != NULL)
 	    do_cmd_argument(eap->do_ecmd_cmd);
     }
 }
@@ -6007,8 +6007,8 @@ do_exbuffer(exarg_T *eap)
     static void
 ex_bmodified(exarg_T *eap)
 {
-    goto_buffer(eap, DOBUF_MOD, FORWARD, (int)eap->line2);
-    if (eap->do_ecmd_cmd != NULL)
+    goto_buffer(eap, DOBUF_MOD, FORWARD, (정수)eap->line2);
+    만약 (eap->do_ecmd_cmd != NULL)
 	do_cmd_argument(eap->do_ecmd_cmd);
 }
 
@@ -6019,11 +6019,11 @@ ex_bmodified(exarg_T *eap)
     static void
 ex_bnext(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    만약 (ERROR_IF_ANY_POPUP_WINDOW)
+	반환;
 
-    goto_buffer(eap, DOBUF_CURRENT, FORWARD, (int)eap->line2);
-    if (eap->do_ecmd_cmd != NULL)
+    goto_buffer(eap, DOBUF_CURRENT, FORWARD, (정수)eap->line2);
+    만약 (eap->do_ecmd_cmd != NULL)
 	do_cmd_argument(eap->do_ecmd_cmd);
 }
 
@@ -6036,11 +6036,11 @@ ex_bnext(exarg_T *eap)
     static void
 ex_bprevious(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    만약 (ERROR_IF_ANY_POPUP_WINDOW)
+	반환;
 
-    goto_buffer(eap, DOBUF_CURRENT, BACKWARD, (int)eap->line2);
-    if (eap->do_ecmd_cmd != NULL)
+    goto_buffer(eap, DOBUF_CURRENT, BACKWARD, (정수)eap->line2);
+    만약 (eap->do_ecmd_cmd != NULL)
 	do_cmd_argument(eap->do_ecmd_cmd);
 }
 
@@ -6053,11 +6053,11 @@ ex_bprevious(exarg_T *eap)
     static void
 ex_brewind(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    만약 (ERROR_IF_ANY_POPUP_WINDOW)
+	반환;
 
     goto_buffer(eap, DOBUF_FIRST, FORWARD, 0);
-    if (eap->do_ecmd_cmd != NULL)
+    만약 (eap->do_ecmd_cmd != NULL)
 	do_cmd_argument(eap->do_ecmd_cmd);
 }
 
@@ -6068,11 +6068,11 @@ ex_brewind(exarg_T *eap)
     static void
 ex_blast(exarg_T *eap)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    만약 (ERROR_IF_ANY_POPUP_WINDOW)
+	반환;
 
     goto_buffer(eap, DOBUF_LAST, BACKWARD, 0);
-    if (eap->do_ecmd_cmd != NULL)
+    만약 (eap->do_ecmd_cmd != NULL)
 	do_cmd_argument(eap->do_ecmd_cmd);
 }
 
@@ -6080,35 +6080,35 @@ ex_blast(exarg_T *eap)
  * Check if "c" ends an Ex command.
  * In Vim9 script does not check for white space before #.
  */
-    int
-ends_excmd(int c)
+    정수
+ends_excmd(정수 c)
 {
-    int comment_char = '"';
+    정수 comment_char = '"';
 
-    if (in_vim9script())
+    만약 (in_vim9script())
 	comment_char = '#';
-    return (c == NUL || c == '|' || c == comment_char || c == '\n');
+    반환 (c == NUL || c == '|' || c == comment_char || c == '\n');
 }
 
 /*
  * Like ends_excmd() but checks that a # in Vim9 script either has "cmd" equal
  * to "cmd_start" or has a white space character before it.
  */
-    int
+    정수
 ends_excmd2(char_u *cmd_start UNUSED, char_u *cmd)
 {
-    int c = *cmd;
+    정수 c = *cmd;
 
-    if (c == NUL || c == '|' || c == '\n')
-	return TRUE;
-    if (in_vim9script())
+    만약 (c == NUL || c == '|' || c == '\n')
+	반환 TRUE;
+    만약 (in_vim9script())
 	//  # starts a comment, #{ might be a mistake, #{{ can start a fold
-	return c == '#' && (cmd[1] != '{' || cmd[2] == '{')
+	반환 c == '#' && (cmd[1] != '{' || cmd[2] == '{')
 				 && (cmd == cmd_start || VIM_ISWHITE(cmd[-1]));
-    return c == '"';
+    반환 c == '"';
 }
 
-#if defined(FEAT_SYN_HL) || defined(FEAT_SEARCH_EXTRA) || defined(FEAT_EVAL)
+#만약 defined(FEAT_SYN_HL) || defined(FEAT_SEARCH_EXTRA) || defined(FEAT_EVAL)
 /*
  * Return the next command, after the first '|' or '\n'.
  * Return NULL if not found.
@@ -6116,13 +6116,13 @@ ends_excmd2(char_u *cmd_start UNUSED, char_u *cmd)
     char_u *
 find_nextcmd(char_u *p)
 {
-    while (*p != '|' && *p != '\n')
+    동안 (*p != '|' && *p != '\n')
     {
-	if (*p == NUL)
-	    return NULL;
+	만약 (*p == NUL)
+	    반환 NULL;
 	++p;
     }
-    return (p + 1);
+    반환 (p + 1);
 }
 #endif
 
@@ -6135,10 +6135,10 @@ check_nextcmd(char_u *p)
 {
     char_u *s = skipwhite(p);
 
-    if (*s == '|' || *s == '\n')
-	return (s + 1);
-    else
-	return NULL;
+    만약 (*s == '|' || *s == '\n')
+	반환 (s + 1);
+    아니면
+	반환 NULL;
 }
 
 /*
@@ -6149,18 +6149,18 @@ set_nextcmd(exarg_T *eap, char_u *arg)
 {
     char_u *p = skipwhite(arg);
 
-    if (in_vim9script() && *p == '#')
+    만약 (in_vim9script() && *p == '#')
     {
 	char_u *nl = vim_strchr(p, NL);
-	if (nl != NULL)
+	만약 (nl != NULL)
 	    p = nl;
     }
 
     p = check_nextcmd(p);
 
-    if (eap->nextcmd == NULL)
+    만약 (eap->nextcmd == NULL)
 	eap->nextcmd = p;
-    else if (p != NULL)
+    아니면 만약 (p != NULL)
 	// cannot use "| command" inside a  {} block
 	semsg(_(e_cannot_use_bar_to_separate_commands_here_str), arg);
 }
@@ -6173,20 +6173,20 @@ set_nextcmd(exarg_T *eap, char_u *arg)
  *    return FAIL and give error message if 'message' TRUE
  * return OK otherwise
  */
-    static int
+    static 정수
 check_more(
-    int message,	    // when FALSE check only, no messages
-    int forceit)
+    정수 message,	    // when FALSE check only, no messages
+    정수 forceit)
 {
-    int	    n = ARGCOUNT - curwin->w_arg_idx - 1;
+    정수	    n = ARGCOUNT - curwin->w_arg_idx - 1;
 
-    if (!forceit && only_one_window()
+    만약 (!forceit && only_one_window()
 	    && ARGCOUNT > 1 && !arg_had_last && n > 0 && quitmore == 0)
     {
-	if (message)
+	만약 (message)
 	{
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
+#만약 defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    만약 ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
 						    && curbuf->b_fname != NULL)
 	    {
 		char_u	buff[DIALOG_MSG_SIZE];
@@ -6194,67 +6194,67 @@ check_more(
 		vim_snprintf((char *)buff, DIALOG_MSG_SIZE,
 			NGETTEXT("%d more file to edit.  Quit anyway?",
 			    "%d more files to edit.  Quit anyway?", n), n);
-		if (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 1) == VIM_YES)
-		    return OK;
-		return FAIL;
+		만약 (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 1) == VIM_YES)
+		    반환 OK;
+		반환 FAIL;
 	    }
 #endif
 	    semsg(NGETTEXT(e_nr_more_file_to_edit,
 			   e_nr_more_files_to_edit , n), n);
 	    quitmore = 2;	    // next try to quit is allowed
 	}
-	return FAIL;
+	반환 FAIL;
     }
-    return OK;
+    반환 OK;
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of command names.
  */
     char_u *
-get_command_name(expand_T *xp UNUSED, int idx)
+get_command_name(expand_T *xp UNUSED, 정수 idx)
 {
-    if (idx >= (int)CMD_SIZE)
-	return expand_user_command_name(idx);
+    만약 (idx >= (정수)CMD_SIZE)
+	반환 expand_user_command_name(idx);
     // the following are no real commands
-    if (STRNCMP(cmdnames[idx].cmd_name, "{", 1) == 0 ||
+    만약 (STRNCMP(cmdnames[idx].cmd_name, "{", 1) == 0 ||
 	STRNCMP(cmdnames[idx].cmd_name, "}", 1) == 0)
-	return (char_u *)"";
-    return cmdnames[idx].cmd_name;
+	반환 (char_u *)"";
+    반환 cmdnames[idx].cmd_name;
 }
 
     static void
 ex_colorscheme(exarg_T *eap)
 {
-    if (*eap->arg == NUL)
+    만약 (*eap->arg == NUL)
     {
 #ifdef FEAT_EVAL
 	char_u *expr = vim_strsave((char_u *)"g:colors_name");
 	char_u *p = NULL;
 
-	if (expr != NULL)
+	만약 (expr != NULL)
 	{
 	    ++emsg_off;
 	    p = eval_to_string(expr, FALSE, FALSE);
 	    --emsg_off;
 	    vim_free(expr);
 	}
-	if (p != NULL)
+	만약 (p != NULL)
 	{
 	    msg((char *)p);
 	    vim_free(p);
 	}
-	else
+	아니면
 	    msg("default");
-#else
+#아니면
 	msg(_("unknown"));
 #endif
     }
-    else if (load_colors(eap->arg) == FAIL)
+    아니면 만약 (load_colors(eap->arg) == FAIL)
 	semsg(_(e_cannot_find_color_scheme_str), eap->arg);
 
 #ifdef FEAT_VTP
-    else if (has_vtp_working())
+    아니면 만약 (has_vtp_working())
     {
 	// background color change requires clear + redraw
 	update_screen(UPD_CLEAR);
@@ -6266,7 +6266,7 @@ ex_colorscheme(exarg_T *eap)
     static void
 ex_highlight(exarg_T *eap)
 {
-    if (*eap->arg == NUL && eap->cmd[2] == '!')
+    만약 (*eap->arg == NUL && eap->cmd[2] == '!')
 	msg(_("Greetings, Vim user!"));
     do_highlight(eap->arg, eap->forceit, FALSE);
 }
@@ -6277,37 +6277,37 @@ ex_highlight(exarg_T *eap)
  * (because of an error).  May need to restore the terminal mode.
  */
     void
-not_exiting(int save_exiting)
+not_exiting(정수 save_exiting)
 {
     exiting = save_exiting;
     settmode(TMODE_RAW);
 }
 
-    int
-before_quit_autocmds(win_T *wp, int quit_all, int forceit)
+    정수
+before_quit_autocmds(win_T *wp, 정수 quit_all, 정수 forceit)
 {
     apply_autocmds(EVENT_QUITPRE, NULL, NULL, FALSE, wp->w_buffer);
 
     // Bail out when autocommands closed the window.
     // Refuse to quit when the buffer in the last window is being closed (can
     // only happen in autocommands).
-    if (!win_valid(wp)
+    만약 (!win_valid(wp)
 	    || curbuf_locked()
 	    || (wp->w_buffer->b_nwindows == 1 && wp->w_buffer->b_locked > 0))
-	return TRUE;
+	반환 TRUE;
 
-    if (quit_all || (check_more(FALSE, forceit) == OK && only_one_window()))
+    만약 (quit_all || (check_more(FALSE, forceit) == OK && only_one_window()))
     {
 	apply_autocmds(EVENT_EXITPRE, NULL, NULL, FALSE, curbuf);
 	// Refuse to quit when locked or when the window was closed or the
 	// buffer in the last window is being closed (can only happen in
 	// autocommands).
-	if (!win_valid(wp) || curbuf_locked()
+	만약 (!win_valid(wp) || curbuf_locked()
 			  || (curbuf->b_nwindows == 1 && curbuf->b_locked > 0))
-	    return TRUE;
+	    반환 TRUE;
     }
 
-    return FALSE;
+    반환 FALSE;
 }
 
 /*
@@ -6320,47 +6320,47 @@ ex_quit(exarg_T *eap)
 {
     win_T	*wp;
 
-    if (cmdwin_type != 0)
+    만약 (cmdwin_type != 0)
     {
 	cmdwin_result = Ctrl_C;
-	return;
+	반환;
     }
     // Don't quit while editing the command line.
-    if (text_locked())
+    만약 (text_locked())
     {
 	text_locked_msg();
-	return;
+	반환;
     }
-    if (eap->addr_count > 0)
+    만약 (eap->addr_count > 0)
     {
-	int	wnr = eap->line2;
+	정수	wnr = eap->line2;
 
-	for (wp = firstwin; wp->w_next != NULL; wp = wp->w_next)
-	    if (--wnr <= 0)
+	위해 (wp = firstwin; wp->w_next != NULL; wp = wp->w_next)
+	    만약 (--wnr <= 0)
 		break;
     }
-    else
+    아니면
 	wp = curwin;
 
     // Refuse to quit when locked.
-    if (curbuf_locked())
-	return;
+    만약 (curbuf_locked())
+	반환;
 
     // Trigger QuitPre and maybe ExitPre
-    if (before_quit_autocmds(wp, FALSE, eap->forceit))
-	return;
+    만약 (before_quit_autocmds(wp, FALSE, eap->forceit))
+	반환;
 
 #ifdef FEAT_NETBEANS_INTG
     netbeansForcedQuit = eap->forceit;
 #endif
 
-    int save_exiting = exiting;
+    정수 save_exiting = exiting;
     /*
      * If there is only one relevant window we will exit.
      */
-    if (check_more(FALSE, eap->forceit) == OK && only_one_window())
+    만약 (check_more(FALSE, eap->forceit) == OK && only_one_window())
 	exiting = TRUE;
-    if ((!buf_hide(wp->w_buffer)
+    만약 ((!buf_hide(wp->w_buffer)
 		&& check_changed(wp->w_buffer, (p_awa ? CCGD_AW : 0)
 				       | (eap->forceit ? CCGD_FORCEIT : 0)
 				       | CCGD_EXCMD))
@@ -6369,7 +6369,7 @@ ex_quit(exarg_T *eap)
     {
 	not_exiting(save_exiting);
     }
-    else
+    아니면
     {
 	// quit last window
 	// Note: only_one_window() returns true, even so a help window is
@@ -6377,7 +6377,7 @@ ex_quit(exarg_T *eap)
 	// specified. Example:
 	// :h|wincmd w|1q     - don't quit
 	// :h|wincmd w|q      - quit
-	if (only_one_window() && (ONE_WINDOW || eap->addr_count == 0))
+	만약 (only_one_window() && (ONE_WINDOW || eap->addr_count == 0))
 	    getout(0);
 	not_exiting(save_exiting);
 #ifdef FEAT_GUI
@@ -6395,36 +6395,36 @@ ex_quit(exarg_T *eap)
 ex_cquit(exarg_T *eap UNUSED)
 {
     // this does not always pass on the exit code to the Manx compiler. why?
-    getout(eap->addr_count > 0 ? (int)eap->line2 : EXIT_FAILURE);
+    getout(eap->addr_count > 0 ? (정수)eap->line2 : EXIT_FAILURE);
 }
 
 /*
  * Do preparations for "qall" and "wqall".
  * Returns FAIL when quitting should be aborted.
  */
-    int
+    정수
 before_quit_all(exarg_T *eap)
 {
-    if (cmdwin_type != 0)
+    만약 (cmdwin_type != 0)
     {
-	if (eap->forceit)
+	만약 (eap->forceit)
 	    cmdwin_result = K_XF1;	// ex_window() takes care of this
-	else
+	아니면
 	    cmdwin_result = K_XF2;
-	return FAIL;
+	반환 FAIL;
     }
 
     // Don't quit while editing the command line.
-    if (text_locked())
+    만약 (text_locked())
     {
 	text_locked_msg();
-	return FAIL;
+	반환 FAIL;
     }
 
-    if (before_quit_autocmds(curwin, TRUE, eap->forceit))
-	return FAIL;
+    만약 (before_quit_autocmds(curwin, TRUE, eap->forceit))
+	반환 FAIL;
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -6433,11 +6433,11 @@ before_quit_all(exarg_T *eap)
     static void
 ex_quit_all(exarg_T *eap)
 {
-    if (before_quit_all(eap) == FAIL)
-	return;
-    int save_exiting = exiting;
+    만약 (before_quit_all(eap) == FAIL)
+	반환;
+    정수 save_exiting = exiting;
     exiting = TRUE;
-    if (eap->forceit || !check_changed_any(FALSE, FALSE))
+    만약 (eap->forceit || !check_changed_any(FALSE, FALSE))
 	getout(0);
     not_exiting(save_exiting);
 }
@@ -6449,23 +6449,23 @@ ex_quit_all(exarg_T *eap)
 ex_close(exarg_T *eap)
 {
     win_T	*win;
-    int		winnr = 0;
-    if (cmdwin_type != 0)
+    정수		winnr = 0;
+    만약 (cmdwin_type != 0)
 	cmdwin_result = Ctrl_C;
-    else
-	if (!text_locked() && !curbuf_locked())
+    아니면
+	만약 (!text_locked() && !curbuf_locked())
 	{
-	    if (eap->addr_count == 0)
+	    만약 (eap->addr_count == 0)
 		ex_win_close(eap->forceit, curwin, NULL);
-	    else
+	    아니면
 	    {
 		FOR_ALL_WINDOWS(win)
 		{
 		    winnr++;
-		    if (winnr == eap->line2)
+		    만약 (winnr == eap->line2)
 			break;
 		}
-		if (win == NULL)
+		만약 (win == NULL)
 		    win = lastwin;
 		ex_win_close(eap->forceit, win, NULL);
 	    }
@@ -6483,10 +6483,10 @@ ex_pclose(exarg_T *eap)
 
     // First close any normal window.
     FOR_ALL_WINDOWS(win)
-	if (win->w_p_pvw)
+	만약 (win->w_p_pvw)
 	{
 	    ex_win_close(eap->forceit, win, NULL);
-	    return;
+	    반환;
 	}
 # ifdef FEAT_PROP_POPUP
     // Also when 'previewpopup' is empty, it might have been cleared.
@@ -6501,55 +6501,55 @@ ex_pclose(exarg_T *eap)
  */
     static void
 ex_win_close(
-    int		forceit,
+    정수		forceit,
     win_T	*win,
     tabpage_T	*tp)		// NULL or the tab page "win" is in
 {
-    int		need_hide;
+    정수		need_hide;
     buf_T	*buf = win->w_buffer;
 
     // Never close the autocommand window.
-    if (is_aucmd_win(win))
+    만약 (is_aucmd_win(win))
     {
 	emsg(_(e_cannot_close_autocmd_or_popup_window));
-	return;
+	반환;
     }
-    if (window_layout_locked(CMD_close))
-	return;
+    만약 (window_layout_locked(CMD_close))
+	반환;
 
     need_hide = (bufIsChanged(buf) && buf->b_nwindows <= 1);
-    if (need_hide && !buf_hide(buf) && !forceit)
+    만약 (need_hide && !buf_hide(buf) && !forceit)
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#만약 defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	만약 ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	{
 # ifdef FEAT_TERMINAL
-	    if (term_job_running(buf->b_term))
+	    만약 (term_job_running(buf->b_term))
 	    {
-		if (term_confirm_stop(buf) == FAIL)
-		    return;
+		만약 (term_confirm_stop(buf) == FAIL)
+		    반환;
 		// Manually kill the terminal here because this command will
 		// hide it otherwise.
 		free_terminal(buf);
 		need_hide = FALSE;
 	    }
-	    else
+	    아니면
 # endif
 	    {
 		bufref_T bufref;
 
 		set_bufref(&bufref, buf);
 		dialog_changed(buf, FALSE);
-		if (bufref_valid(&bufref) && bufIsChanged(buf))
-		    return;
+		만약 (bufref_valid(&bufref) && bufIsChanged(buf))
+		    반환;
 		need_hide = FALSE;
 	    }
 	}
-	else
+	아니면
 #endif
 	{
 	    no_write_message();
-	    return;
+	    반환;
 	}
     }
 
@@ -6558,9 +6558,9 @@ ex_win_close(
 #endif
 
     // free buffer when not hiding it or when it's a scratch buffer
-    if (tp == NULL)
+    만약 (tp == NULL)
 	win_close(win, !need_hide && !buf_hide(buf));
-    else
+    아니면
 	win_close_othertab(win, !need_hide && !buf_hide(buf), tp);
 }
 
@@ -6569,25 +6569,25 @@ ex_win_close(
  * Returns a tabpage number.
  * When an error is encountered then eap->errmsg is set.
  */
-    static int
+    static 정수
 get_tabpage_arg(exarg_T *eap)
 {
-    int tab_number;
-    int unaccept_arg0 = (eap->cmdidx == CMD_tabmove) ? 0 : 1;
+    정수 tab_number;
+    정수 unaccept_arg0 = (eap->cmdidx == CMD_tabmove) ? 0 : 1;
 
-    if (eap->arg && *eap->arg != NUL)
+    만약 (eap->arg && *eap->arg != NUL)
     {
 	char_u *p = eap->arg;
 	char_u *p_save;
-	int    relative = 0; // argument +N/-N means: go to N places to the
+	정수    relative = 0; // argument +N/-N means: go to N places to the
 			     // right/left relative to the current position.
 
-	if (*p == '-')
+	만약 (*p == '-')
 	{
 	    relative = -1;
 	    p++;
 	}
-	else if (*p == '+')
+	아니면 만약 (*p == '+')
 	{
 	    relative = 1;
 	    p++;
@@ -6596,21 +6596,21 @@ get_tabpage_arg(exarg_T *eap)
 	p_save = p;
 	tab_number = getdigits(&p);
 
-	if (relative == 0)
+	만약 (relative == 0)
 	{
-	    if (STRCMP(p, "$") == 0)
+	    만약 (STRCMP(p, "$") == 0)
 		tab_number = LAST_TAB_NR;
-	    else if (STRCMP(p, "#") == 0)
-		if (valid_tabpage(lastused_tabpage))
+	    아니면 만약 (STRCMP(p, "#") == 0)
+		만약 (valid_tabpage(lastused_tabpage))
 		    tab_number = tabpage_index(lastused_tabpage);
-		else
+		아니면
 		{
 		    eap->errmsg = ex_errmsg(e_invalid_value_for_argument_str,
 								     eap->arg);
 		    tab_number = 0;
 		    goto theend;
 		}
-	    else if (p == p_save || *p_save == '-' || *p != NUL
+	    아니면 만약 (p == p_save || *p_save == '-' || *p != NUL
 		    || tab_number > LAST_TAB_NR)
 	    {
 		// No numbers as argument.
@@ -6618,11 +6618,11 @@ get_tabpage_arg(exarg_T *eap)
 		goto theend;
 	    }
 	}
-	else
+	아니면
 	{
-	    if (*p_save == NUL)
+	    만약 (*p_save == NUL)
 		tab_number = 1;
-	    else if (p == p_save || *p_save == '-' || *p != NUL
+	    아니면 만약 (p == p_save || *p_save == '-' || *p != NUL
 		    || tab_number == 0)
 	    {
 		// No numbers as argument.
@@ -6630,45 +6630,45 @@ get_tabpage_arg(exarg_T *eap)
 		goto theend;
 	    }
 	    tab_number = tab_number * relative + tabpage_index(curtab);
-	    if (!unaccept_arg0 && relative == -1)
+	    만약 (!unaccept_arg0 && relative == -1)
 		--tab_number;
 	}
-	if (tab_number < unaccept_arg0 || tab_number > LAST_TAB_NR)
+	만약 (tab_number < unaccept_arg0 || tab_number > LAST_TAB_NR)
 	    eap->errmsg = ex_errmsg(e_invalid_argument_str, eap->arg);
     }
-    else if (eap->addr_count > 0)
+    아니면 만약 (eap->addr_count > 0)
     {
-	if (unaccept_arg0 && eap->line2 == 0)
+	만약 (unaccept_arg0 && eap->line2 == 0)
 	{
 	    eap->errmsg = _(e_invalid_range);
 	    tab_number = 0;
 	}
-	else
+	아니면
 	{
 	    tab_number = eap->line2;
-	    if (!unaccept_arg0)
+	    만약 (!unaccept_arg0)
 	    {
 		char_u *cmdp = eap->cmd;
 
-		while (--cmdp > *eap->cmdlinep
+		동안 (--cmdp > *eap->cmdlinep
 			&& (VIM_ISWHITE(*cmdp) || VIM_ISDIGIT(*cmdp)))
 		    ;
-		if (*cmdp == '-')
+		만약 (*cmdp == '-')
 		{
 		    --tab_number;
-		    if (tab_number < unaccept_arg0)
+		    만약 (tab_number < unaccept_arg0)
 			eap->errmsg = _(e_invalid_range);
 		}
 	    }
 	}
     }
-    else
+    아니면
     {
 	switch (eap->cmdidx)
 	{
 	case CMD_tabnext:
 	    tab_number = tabpage_index(curtab) + 1;
-	    if (tab_number > LAST_TAB_NR)
+	    만약 (tab_number > LAST_TAB_NR)
 		tab_number = 1;
 	    break;
 	case CMD_tabmove:
@@ -6680,7 +6680,7 @@ get_tabpage_arg(exarg_T *eap)
     }
 
 theend:
-    return tab_number;
+    반환 tab_number;
 }
 
 /*
@@ -6691,39 +6691,39 @@ theend:
 ex_tabclose(exarg_T *eap)
 {
     tabpage_T	*tp;
-    int		tab_number;
+    정수		tab_number;
 
-    if (cmdwin_type != 0)
+    만약 (cmdwin_type != 0)
     {
 	cmdwin_result = K_IGNORE;
-	return;
+	반환;
     }
 
-    if (first_tabpage->tp_next == NULL)
+    만약 (first_tabpage->tp_next == NULL)
     {
 	emsg(_(e_cannot_close_last_tab_page));
-	return;
+	반환;
     }
 
-    if (window_layout_locked(CMD_tabclose))
-	return;
+    만약 (window_layout_locked(CMD_tabclose))
+	반환;
 
     tab_number = get_tabpage_arg(eap);
-    if (eap->errmsg != NULL)
-	return;
+    만약 (eap->errmsg != NULL)
+	반환;
 
     tp = find_tabpage(tab_number);
-    if (tp == NULL)
+    만약 (tp == NULL)
     {
 	beep_flush();
-	return;
+	반환;
     }
-    if (tp != curtab)
+    만약 (tp != curtab)
     {
 	tabpage_close_other(tp, eap->forceit);
-	return;
+	반환;
     }
-    else if (!text_locked() && !curbuf_locked())
+    아니면 만약 (!text_locked() && !curbuf_locked())
 	tabpage_close(eap->forceit);
 }
 
@@ -6734,44 +6734,44 @@ ex_tabclose(exarg_T *eap)
 ex_tabonly(exarg_T *eap)
 {
     tabpage_T	*tp;
-    int		done;
-    int		tab_number;
+    정수		done;
+    정수		tab_number;
 
-    if (cmdwin_type != 0)
+    만약 (cmdwin_type != 0)
     {
 	cmdwin_result = K_IGNORE;
-	return;
+	반환;
     }
 
-    if (first_tabpage->tp_next == NULL)
+    만약 (first_tabpage->tp_next == NULL)
     {
 	msg(_("Already only one tab page"));
-	return;
+	반환;
     }
 
-    if (window_layout_locked(CMD_tabonly))
-	return;
+    만약 (window_layout_locked(CMD_tabonly))
+	반환;
 
     tab_number = get_tabpage_arg(eap);
-    if (eap->errmsg != NULL)
-	return;
+    만약 (eap->errmsg != NULL)
+	반환;
 
     goto_tabpage(tab_number);
     // Repeat this up to a 1000 times, because autocommands may
     // mess up the lists.
-    for (done = 0; done < 1000; ++done)
+    위해 (done = 0; done < 1000; ++done)
     {
 	FOR_ALL_TABPAGES(tp)
-	    if (tp->tp_topframe != topframe)
+	    만약 (tp->tp_topframe != topframe)
 	    {
 		tabpage_close_other(tp, eap->forceit);
 		// if we failed to close it quit
-		if (valid_tabpage(tp))
+		만약 (valid_tabpage(tp))
 		    done = 1000;
 		// start over, "tp" is now invalid
 		break;
 	    }
-	if (first_tabpage->tp_next == NULL)
+	만약 (first_tabpage->tp_next == NULL)
 	    break;
     }
 }
@@ -6780,10 +6780,10 @@ ex_tabonly(exarg_T *eap)
  * Close the current tab page.
  */
     void
-tabpage_close(int forceit)
+tabpage_close(정수 forceit)
 {
-    if (window_layout_locked(CMD_tabclose))
-	return;
+    만약 (window_layout_locked(CMD_tabclose))
+	반환;
 
     trigger_tabclosedpre(curtab);
     curtab->tp_did_tabclosedpre = TRUE;
@@ -6791,11 +6791,11 @@ tabpage_close(int forceit)
 
     // First close all the windows but the current one.  If that worked then
     // close the last window in this tab, that will close it.
-    if (!ONE_WINDOW)
+    만약 (!ONE_WINDOW)
 	close_others(TRUE, forceit);
-    if (ONE_WINDOW)
+    만약 (ONE_WINDOW)
 	ex_win_close(forceit, curwin, NULL);
-    if (curtab == save_curtab)
+    만약 (curtab == save_curtab)
 	// When closing the tab page failed, reset tp_did_tabclosedpre so that
 	// TabClosedPre behaves consistently on next :close vs :tabclose.
 	curtab->tp_did_tabclosedpre = FALSE;
@@ -6811,40 +6811,40 @@ tabpage_close(int forceit)
  * last-but-one tab page.
  */
     void
-tabpage_close_other(tabpage_T *tp, int forceit)
+tabpage_close_other(tabpage_T *tp, 정수 forceit)
 {
-    int		done = 0;
+    정수		done = 0;
     win_T	*wp;
 
-    if (window_layout_locked(CMD_SIZE))
-	return;
+    만약 (window_layout_locked(CMD_SIZE))
+	반환;
 
     trigger_tabclosedpre(tp);
     tp->tp_did_tabclosedpre = TRUE;
 
     // Limit to 1000 windows, autocommands may add a window while we close
     // one.  OK, so I'm paranoid...
-    while (++done < 1000)
+    동안 (++done < 1000)
     {
 	wp = tp->tp_firstwin;
 	ex_win_close(forceit, wp, tp);
 
 	// Autocommands may delete the tab page under our fingers.
-	if (!valid_tabpage(tp))
+	만약 (!valid_tabpage(tp))
 	    break;
 	// We may fail to close a window with a modified buffer.
-	if (tp->tp_firstwin == wp)
+	만약 (tp->tp_firstwin == wp)
 	{
 	    done = 1000;
 	    break;
 	}
     }
-    if (done >= 1000)
+    만약 (done >= 1000)
     {
 	// When closing the tab page failed, reset tp_did_tabclosedpre so that
 	// TabClosedPre behaves consistently on next :close vs :tabclose.
 	tp->tp_did_tabclosedpre = FALSE;
-	return;
+	반환;
     }
 
     apply_autocmds(EVENT_TABCLOSED, NULL, NULL, FALSE, curbuf);
@@ -6856,20 +6856,20 @@ tabpage_close_other(tabpage_T *tp, int forceit)
     static void
 ex_only(exarg_T *eap)
 {
-    if (window_layout_locked(CMD_only))
-	return;
+    만약 (window_layout_locked(CMD_only))
+	반환;
 #ifdef FEAT_GUI
     need_mouse_correct = TRUE;
 #endif
-    if (eap->addr_count > 0)
+    만약 (eap->addr_count > 0)
     {
 	win_T   *wp;
-	int	wnr = eap->line2;
-	for (wp = firstwin; --wnr > 0; )
+	정수	wnr = eap->line2;
+	위해 (wp = firstwin; --wnr > 0; )
 	{
-	    if (wp->w_next == NULL)
+	    만약 (wp->w_next == NULL)
 		break;
-	    else
+	    아니면
 		wp = wp->w_next;
 	}
 	win_goto(wp);
@@ -6881,28 +6881,28 @@ ex_only(exarg_T *eap)
 ex_hide(exarg_T *eap UNUSED)
 {
     // ":hide" or ":hide | cmd": hide current window
-    if (eap->skip)
-	return;
+    만약 (eap->skip)
+	반환;
 
-    if (window_layout_locked(CMD_hide))
-	return;
+    만약 (window_layout_locked(CMD_hide))
+	반환;
 #ifdef FEAT_GUI
     need_mouse_correct = TRUE;
 #endif
-    if (eap->addr_count == 0)
+    만약 (eap->addr_count == 0)
 	win_close(curwin, FALSE);	// don't free buffer
-    else
+    아니면
     {
-	int	winnr = 0;
+	정수	winnr = 0;
 	win_T	*win;
 
 	FOR_ALL_WINDOWS(win)
 	{
 	    winnr++;
-	    if (winnr == eap->line2)
+	    만약 (winnr == eap->line2)
 		break;
 	}
-	if (win == NULL)
+	만약 (win == NULL)
 	    win = lastwin;
 	win_close(win, FALSE);
     }
@@ -6917,13 +6917,13 @@ ex_stop(exarg_T *eap)
     /*
      * Disallow suspending for "rvim".
      */
-    if (check_restricted())
-	return;
+    만약 (check_restricted())
+	반환;
 
-    if (!eap->forceit)
+    만약 (!eap->forceit)
 	autowrite_all();
     apply_autocmds(EVENT_VIMSUSPEND, NULL, NULL, FALSE, NULL);
-    windgoto((int)Rows - 1, cmdline_col_off);
+    windgoto((정수)Rows - 1, cmdline_col_off);
     out_char('\n');
     out_flush();
     stoptermcap();
@@ -6946,41 +6946,41 @@ ex_stop(exarg_T *eap)
 ex_exit(exarg_T *eap)
 {
 #ifdef FEAT_EVAL
-    if (not_in_vim9(eap, false) == FAIL)
-	return;
+    만약 (not_in_vim9(eap, false) == FAIL)
+	반환;
 #endif
-    if (cmdwin_type != 0)
+    만약 (cmdwin_type != 0)
     {
 	cmdwin_result = Ctrl_C;
-	return;
+	반환;
     }
     // Don't quit while editing the command line.
-    if (text_locked())
+    만약 (text_locked())
     {
 	text_locked_msg();
-	return;
+	반환;
     }
 
-    int save_exiting = exiting;
+    정수 save_exiting = exiting;
     /*
      * we plan to exit if there is only one relevant window
      */
-    if (check_more(FALSE, eap->forceit) == OK && only_one_window())
+    만약 (check_more(FALSE, eap->forceit) == OK && only_one_window())
 	exiting = TRUE;
 
     // Write the buffer for ":wq" or when it was changed.
     // Trigger QuitPre and ExitPre.
     // Check if we can exit now, after autocommands have changed things.
-    if (((eap->cmdidx == CMD_wq || curbufIsChanged()) && do_write(eap) == FAIL)
+    만약 (((eap->cmdidx == CMD_wq || curbufIsChanged()) && do_write(eap) == FAIL)
 	    || before_quit_autocmds(curwin, FALSE, eap->forceit)
 	    || check_more(TRUE, eap->forceit) == FAIL
 	    || (only_one_window() && check_changed_any(eap->forceit, FALSE)))
     {
 	not_exiting(save_exiting);
     }
-    else
+    아니면
     {
-	if (only_one_window())	    // quit last window, exit Vim
+	만약 (only_one_window())	    // quit last window, exit Vim
 	    getout(0);
 	not_exiting(save_exiting);
 #ifdef FEAT_GUI
@@ -6997,17 +6997,17 @@ ex_exit(exarg_T *eap)
     static void
 ex_print(exarg_T *eap)
 {
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    만약 (curbuf->b_ml.ml_flags & ML_EMPTY)
 	emsg(_(e_empty_buffer));
-    else
+    아니면
     {
-	for ( ;!got_int; ui_breakcheck())
+	위해 ( ;!got_int; ui_breakcheck())
 	{
 	    print_line(eap->line1,
 		    (eap->cmdidx == CMD_number || eap->cmdidx == CMD_pound
 						 || (eap->flags & EXFLAG_NR)),
 		    eap->cmdidx == CMD_list || (eap->flags & EXFLAG_LIST));
-	    if (++eap->line1 > eap->line2)
+	    만약 (++eap->line1 > eap->line2)
 		break;
 	    out_flush();	    // show one line at a time
 	}
@@ -7037,12 +7037,12 @@ ex_shell(exarg_T *eap UNUSED)
     do_shell(NULL, 0);
 }
 
-#if defined(HAVE_DROP_FILE)
+#만약 defined(HAVE_DROP_FILE)
 
-static int drop_busy = FALSE;
-static int drop_filec;
+static 정수 drop_busy = FALSE;
+static 정수 drop_filec;
 static char_u **drop_filev = NULL;
-static int drop_split;
+static 정수 drop_split;
 static void (*drop_callback)(void *);
 static void *drop_cookie;
 
@@ -7050,7 +7050,7 @@ static void *drop_cookie;
 handle_drop_internal(void)
 {
     exarg_T	ea;
-    int		save_msg_scroll = msg_scroll;
+    정수		save_msg_scroll = msg_scroll;
 
     // Setting the argument list may cause screen updates and being called
     // recursively.  Avoid that by setting drop_busy.
@@ -7060,16 +7060,16 @@ handle_drop_internal(void)
     // to split the current window or data could be lost.
     // We don't need to check if the 'hidden' option is set, as in this
     // case the buffer won't be lost.
-    if (!buf_hide(curbuf) && !drop_split)
+    만약 (!buf_hide(curbuf) && !drop_split)
     {
 	++emsg_off;
 	drop_split = check_changed(curbuf, CCGD_AW);
 	--emsg_off;
     }
-    if (drop_split)
+    만약 (drop_split)
     {
-	if (win_split(0, 0) == FAIL)
-	    return;
+	만약 (win_split(0, 0) == FAIL)
+	    반환;
 	RESET_BINDING(curwin);
 
 	// When splitting the window, create a new alist.  Otherwise the
@@ -7100,7 +7100,7 @@ handle_drop_internal(void)
     // msg_scroll being set by displaying a message is irrelevant.
     msg_scroll = save_msg_scroll;
 
-    if (drop_callback != NULL)
+    만약 (drop_callback != NULL)
 	drop_callback(drop_cookie);
 
     drop_filev = NULL;
@@ -7120,24 +7120,24 @@ handle_drop_internal(void)
  */
     void
 handle_drop(
-    int		filec,		// the number of files dropped
+    정수		filec,		// the number of files dropped
     char_u	**filev,	// the list of files dropped
-    int		split,		// force splitting the window
+    정수		split,		// force splitting the window
     void	(*callback)(void *), // to be called after setting the argument
 				     // list
     void	*cookie)	// argument for "callback" (allocated)
 {
     // Cannot handle recursive drops, finish the pending one.
-    if (drop_busy)
+    만약 (drop_busy)
     {
 	FreeWild(filec, filev);
 	vim_free(cookie);
-	return;
+	반환;
     }
 
     // When calling handle_drop() more than once in a row we only use the last
     // one.
-    if (drop_filev != NULL)
+    만약 (drop_filev != NULL)
     {
 	FreeWild(drop_filec, drop_filev);
 	vim_free(drop_cookie);
@@ -7155,8 +7155,8 @@ handle_drop(
     // - updating the screen
     // As it may change buffers and window structures that are in use and cause
     // freed memory to be used.
-    if (text_locked() || curbuf_locked() || updating_screen)
-	return;
+    만약 (text_locked() || curbuf_locked() || updating_screen)
+	반환;
 
     handle_drop_internal();
 }
@@ -7168,7 +7168,7 @@ handle_drop(
     void
 handle_any_postponed_drop(void)
 {
-    if (!drop_busy && drop_filev != NULL
+    만약 (!drop_busy && drop_filev != NULL
 	     && !text_locked() && !curbuf_locked() && !updating_screen)
 	handle_drop_internal();
 }
@@ -7192,7 +7192,7 @@ ex_recover(exarg_T *eap)
 {
     // Set recoverymode right away to avoid the ATTENTION prompt.
     recoverymode = TRUE;
-    if (!check_changed(curbuf, (p_awa ? CCGD_AW : 0)
+    만약 (!check_changed(curbuf, (p_awa ? CCGD_AW : 0)
 			     | CCGD_MULTWIN
 			     | (eap->forceit ? CCGD_FORCEIT : 0)
 			     | CCGD_EXCMD)
@@ -7213,7 +7213,7 @@ ex_wrongmodifier(exarg_T *eap)
     eap->errmsg = ex_errmsg(e_invalid_command_str, eap->cmd);
 }
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 
 // callback function for 'findfunc'
 static callback_T ffu_cb;
@@ -7221,19 +7221,19 @@ static callback_T ffu_cb;
     static callback_T *
 get_findfunc_callback(void)
 {
-    return *curbuf->b_p_ffu != NUL ? &curbuf->b_ffu_cb : &ffu_cb;
+    반환 *curbuf->b_p_ffu != NUL ? &curbuf->b_ffu_cb : &ffu_cb;
 }
 
 /*
  * Call 'findfunc' to obtain a list of file names.
  */
     static list_T *
-call_findfunc(char_u *pat, int cmdcomplete)
+call_findfunc(char_u *pat, 정수 cmdcomplete)
 {
     typval_T	args[3];
     callback_T	*cb;
     typval_T	rettv;
-    int		retval;
+    정수		retval;
     sctx_T	saved_sctx = current_sctx;
     sctx_T	*ctx;
 
@@ -7249,7 +7249,7 @@ call_findfunc(char_u *pat, int cmdcomplete)
     ++textlock;
 
     ctx = get_option_sctx("findfunc");
-    if (ctx != NULL)
+    만약 (ctx != NULL)
 	current_sctx = *ctx;
 
     cb = get_findfunc_callback();
@@ -7261,17 +7261,17 @@ call_findfunc(char_u *pat, int cmdcomplete)
 
     list_T *retlist = NULL;
 
-    if (retval == OK)
+    만약 (retval == OK)
     {
-	if (rettv.v_type == VAR_LIST)
+	만약 (rettv.v_type == VAR_LIST)
 	    retlist = list_copy(rettv.vval.v_list, FALSE, FALSE, get_copyID());
-	else
+	아니면
 	    emsg(_(e_invalid_return_type_from_findfunc));
 
 	clear_tv(&rettv);
     }
 
-    return retlist;
+    반환 retlist;
 }
 
 /*
@@ -7279,31 +7279,31 @@ call_findfunc(char_u *pat, int cmdcomplete)
  * Used for expanding the :find, :sfind and :tabfind command argument.
  * Returns OK on success and FAIL otherwise.
  */
-    int
-expand_findfunc(expand_T *xp, char_u *pat, char_u ***files, int *numMatches)
+    정수
+expand_findfunc(expand_T *xp, char_u *pat, char_u ***files, 정수 *numMatches)
 {
     list_T	*l;
-    int		len;
+    정수		len;
 
     *numMatches = 0;
     *files = NULL;
 
     l = call_findfunc(pat, VVAL_TRUE);
 
-    if (l == NULL)
-	return FAIL;
+    만약 (l == NULL)
+	반환 FAIL;
 
     len = list_len(l);
-    if (len == 0)	    // empty List
+    만약 (len == 0)	    // empty List
     {
 	list_free(l);
-	return FAIL;
+	반환 FAIL;
     }
 
     expand_process_user_list(l, files, numMatches, xp);
     list_free(l);
 
-    return OK;
+    반환 OK;
 }
 
 /*
@@ -7311,12 +7311,12 @@ expand_findfunc(expand_T *xp, char_u *pat, char_u ***files, int *numMatches)
  * the n'th matching file.
  */
     static char_u *
-findfunc_find_file(char_u *findarg, int findarg_len, int count)
+findfunc_find_file(char_u *findarg, 정수 findarg_len, 정수 count)
 {
     list_T	*fname_list;
     char_u	*ret_fname = NULL;
     char_u	cc;
-    int		fname_count;
+    정수		fname_count;
 
     cc = findarg[findarg_len];
     findarg[findarg_len] = NUL;
@@ -7324,34 +7324,34 @@ findfunc_find_file(char_u *findarg, int findarg_len, int count)
     fname_list = call_findfunc(findarg, VVAL_FALSE);
     fname_count = list_len(fname_list);
 
-    if (fname_count == 0)
+    만약 (fname_count == 0)
 	semsg(_(e_cant_find_file_str_in_path), findarg);
-    else
+    아니면
     {
-	if (count > fname_count)
+	만약 (count > fname_count)
 	    semsg(_(e_no_more_file_str_found_in_path), findarg);
-	else
+	아니면
 	{
 	    listitem_T *li = list_find(fname_list, count - 1);
 
-	    if (li != NULL)
+	    만약 (li != NULL)
 	    {
 		typval_T *tv = &li->li_tv;
 
-		if (tv->v_type == VAR_STRING && tv->vval.v_string != NULL)
+		만약 (tv->v_type == VAR_STRING && tv->vval.v_string != NULL)
 		    ret_fname = vim_strsave(tv->vval.v_string);
-		else if (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
+		아니면 만약 (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
 		    ret_fname = dict_get_string(tv->vval.v_dict, "word", TRUE);
 	    }
 	}
     }
 
-    if (fname_list != NULL)
+    만약 (fname_list != NULL)
 	list_free(fname_list);
 
     findarg[findarg_len] = cc;
 
-    return ret_fname;
+    반환 ret_fname;
 }
 
 /*
@@ -7361,37 +7361,37 @@ findfunc_find_file(char_u *findarg, int findarg_len, int count)
     char *
 did_set_findfunc(optset_T *args UNUSED)
 {
-    int	retval;
+    정수	retval;
 
-    if (args->os_flags & OPT_LOCAL)
+    만약 (args->os_flags & OPT_LOCAL)
 	// buffer-local option set
 	retval = option_set_callback_func(curbuf->b_p_ffu, &curbuf->b_ffu_cb);
-    else
+    아니면
     {
 	// global option set
 	retval = option_set_callback_func(p_ffu, &ffu_cb);
 	// when using :set, free the local callback
-	if (!(args->os_flags & OPT_GLOBAL))
+	만약 (!(args->os_flags & OPT_GLOBAL))
 	    free_callback(&curbuf->b_ffu_cb);
     }
 
-    if (retval == FAIL)
-	return e_invalid_argument;
+    만약 (retval == FAIL)
+	반환 e_invalid_argument;
 
     // If the option value starts with <SID> or s:, then replace that with
     // the script identifier.
     char_u	**varp = (char_u **)args->os_varp;
     char_u	*name = get_scriptlocal_funcname(*varp);
-    if (name != NULL)
+    만약 (name != NULL)
     {
 	free_string_option(*varp);
 	*varp = name;
     }
 
-    return NULL;
+    반환 NULL;
 }
 
-# if defined(EXITFREE)
+# 만약 defined(EXITFREE)
     void
 free_findfunc_option(void)
 {
@@ -7403,12 +7403,12 @@ free_findfunc_option(void)
  * Mark the global 'findfunc' callback with "copyID" so that it is not
  * garbage collected.
  */
-    int
-set_ref_in_findfunc(int copyID UNUSED)
+    정수
+set_ref_in_findfunc(정수 copyID UNUSED)
 {
-    int abort = FALSE;
+    정수 abort = FALSE;
     abort = set_ref_in_callback(&ffu_cb, copyID);
-    return abort;
+    반환 abort;
 }
 #endif
 
@@ -7432,14 +7432,14 @@ ex_splitview(exarg_T *eap)
     char_u	*fname = NULL;
 #ifdef FEAT_BROWSE
     char_u	dot_path[] = ".";
-    int		save_cmod_flags = cmdmod.cmod_flags;
+    정수		save_cmod_flags = cmdmod.cmod_flags;
 #endif
-    int		use_tab = eap->cmdidx == CMD_tabedit
+    정수		use_tab = eap->cmdidx == CMD_tabedit
 		       || eap->cmdidx == CMD_tabfind
 		       || eap->cmdidx == CMD_tabnew;
 
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    만약 (ERROR_IF_ANY_POPUP_WINDOW)
+	반환;
 
 #ifdef FEAT_GUI
     need_mouse_correct = TRUE;
@@ -7448,45 +7448,45 @@ ex_splitview(exarg_T *eap)
 #ifdef FEAT_QUICKFIX
     // A ":split" in the quickfix window works like ":new".  Don't want two
     // quickfix windows.  But it's OK when doing ":tab split".
-    if (bt_quickfix(curbuf) && cmdmod.cmod_tab == 0)
+    만약 (bt_quickfix(curbuf) && cmdmod.cmod_tab == 0)
     {
-	if (eap->cmdidx == CMD_split)
+	만약 (eap->cmdidx == CMD_split)
 	    eap->cmdidx = CMD_new;
-	if (eap->cmdidx == CMD_vsplit)
+	만약 (eap->cmdidx == CMD_vsplit)
 	    eap->cmdidx = CMD_vnew;
     }
 #endif
 
-    if (eap->cmdidx == CMD_sfind || eap->cmdidx == CMD_tabfind)
+    만약 (eap->cmdidx == CMD_sfind || eap->cmdidx == CMD_tabfind)
     {
 	char_u	*file_to_find = NULL;
 	char	*search_ctx = NULL;
 
-	if (*get_findfunc() != NUL)
+	만약 (*get_findfunc() != NUL)
 	{
 #ifdef FEAT_EVAL
-	    fname = findfunc_find_file(eap->arg, (int)STRLEN(eap->arg),
+	    fname = findfunc_find_file(eap->arg, (정수)STRLEN(eap->arg),
 				       eap->addr_count > 0 ? eap->line2 : 1);
 #endif
 	}
-	else
+	아니면
 	{
-	    fname = find_file_in_path(eap->arg, (int)STRLEN(eap->arg),
+	    fname = find_file_in_path(eap->arg, (정수)STRLEN(eap->arg),
 					      FNAME_MESS, TRUE, curbuf->b_ffname,
 					      &file_to_find, &search_ctx);
 	    vim_free(file_to_find);
 	    vim_findfile_cleanup(search_ctx);
 	}
-	if (fname == NULL)
+	만약 (fname == NULL)
 	    goto theend;
 	eap->arg = fname;
     }
 #ifdef FEAT_BROWSE
-    else if ((cmdmod.cmod_flags & CMOD_BROWSE)
+    아니면 만약 ((cmdmod.cmod_flags & CMOD_BROWSE)
 	    && eap->cmdidx != CMD_vnew
 	    && eap->cmdidx != CMD_new)
     {
-	if (
+	만약 (
 # ifdef FEAT_GUI
 	    !gui.in_use &&
 # endif
@@ -7494,16 +7494,16 @@ ex_splitview(exarg_T *eap)
 	{
 	    // No browsing supported but we do have the file explorer:
 	    // Edit the directory.
-	    if (*eap->arg == NUL || !mch_isdir(eap->arg))
+	    만약 (*eap->arg == NUL || !mch_isdir(eap->arg))
 		eap->arg = dot_path;
 	}
-	else
+	아니면
 	{
 	    fname = do_browse(0, (char_u *)(use_tab
 			? _("Edit File in new tab page")
 			: _("Edit File in new window")),
 					  eap->arg, NULL, NULL, NULL, curbuf);
-	    if (fname == NULL)
+	    만약 (fname == NULL)
 		goto theend;
 	    eap->arg = fname;
 	}
@@ -7514,30 +7514,30 @@ ex_splitview(exarg_T *eap)
     /*
      * Either open new tab page or split the window.
      */
-    if (use_tab)
+    만약 (use_tab)
     {
-	if (win_new_tabpage(cmdmod.cmod_tab != 0 ? cmdmod.cmod_tab
+	만약 (win_new_tabpage(cmdmod.cmod_tab != 0 ? cmdmod.cmod_tab
 			 : eap->addr_count == 0 ? 0
-					       : (int)eap->line2 + 1) != FAIL)
+					       : (정수)eap->line2 + 1) != FAIL)
 	{
 	    do_exedit(eap, old_curwin);
 
 	    // set the alternate buffer for the window we came from
-	    if (curwin != old_curwin
+	    만약 (curwin != old_curwin
 		    && win_valid(old_curwin)
 		    && old_curwin->w_buffer != curbuf
 		    && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 		old_curwin->w_alt_fnum = curbuf->b_fnum;
 	}
     }
-    else if (win_split(eap->addr_count > 0 ? (int)eap->line2 : 0,
+    아니면 만약 (win_split(eap->addr_count > 0 ? (정수)eap->line2 : 0,
 				     *eap->cmd == 'v' ? WSP_VERT : 0) != FAIL)
     {
 	// Reset 'scrollbind' when editing another file, but keep it when
 	// doing ":split" without arguments.
-	if (*eap->arg != NUL)
+	만약 (*eap->arg != NUL)
 	    RESET_BINDING(curwin);
-	else
+	아니면
 	    do_check_scrollbind(FALSE);
 	do_exedit(eap, old_curwin);
     }
@@ -7571,10 +7571,10 @@ tabpage_new(void)
     static void
 ex_tabnext(exarg_T *eap)
 {
-    int tab_number;
+    정수 tab_number;
 
-    if (ERROR_IF_POPUP_WINDOW)
-	return;
+    만약 (ERROR_IF_POPUP_WINDOW)
+	반환;
     switch (eap->cmdidx)
     {
 	case CMD_tabfirst:
@@ -7586,31 +7586,31 @@ ex_tabnext(exarg_T *eap)
 	    break;
 	case CMD_tabprevious:
 	case CMD_tabNext:
-	    if (eap->arg && *eap->arg != NUL)
+	    만약 (eap->arg && *eap->arg != NUL)
 	    {
 		char_u *p = eap->arg;
 		char_u *p_save = p;
 
 		tab_number = getdigits(&p);
-		if (p == p_save || *p_save == '-' || *p != NUL
+		만약 (p == p_save || *p_save == '-' || *p != NUL
 			    || tab_number == 0)
 		{
 		    // No numbers as argument.
 		    eap->errmsg = ex_errmsg(e_invalid_argument_str, eap->arg);
-		    return;
+		    반환;
 		}
 	    }
-	    else
+	    아니면
 	    {
-		if (eap->addr_count == 0)
+		만약 (eap->addr_count == 0)
 		    tab_number = 1;
-		else
+		아니면
 		{
 		    tab_number = eap->line2;
-		    if (tab_number < 1)
+		    만약 (tab_number < 1)
 		    {
 			eap->errmsg = _(e_invalid_range);
-			return;
+			반환;
 		    }
 		}
 	    }
@@ -7618,7 +7618,7 @@ ex_tabnext(exarg_T *eap)
 	    break;
 	default: // CMD_tabnext
 	    tab_number = get_tabpage_arg(eap);
-	    if (eap->errmsg == NULL)
+	    만약 (eap->errmsg == NULL)
 		goto_tabpage(tab_number);
 	    break;
     }
@@ -7630,10 +7630,10 @@ ex_tabnext(exarg_T *eap)
     static void
 ex_tabmove(exarg_T *eap)
 {
-    int tab_number;
+    정수 tab_number;
 
     tab_number = get_tabpage_arg(eap);
-    if (eap->errmsg == NULL)
+    만약 (eap->errmsg == NULL)
 	tabpage_move(tab_number);
 }
 
@@ -7645,11 +7645,11 @@ ex_tabs(exarg_T *eap UNUSED)
 {
     tabpage_T	*tp;
     win_T	*wp;
-    int		tabcount = 1;
+    정수		tabcount = 1;
 
     msg_start();
     msg_scroll = TRUE;
-    for (tp = first_tabpage; tp != NULL && !got_int; tp = tp->tp_next)
+    위해 (tp = first_tabpage; tp != NULL && !got_int; tp = tp->tp_next)
     {
 	msg_putchar('\n');
 	vim_snprintf((char *)IObuff, IOSIZE, _("Tab page %d"), tabcount++);
@@ -7657,20 +7657,20 @@ ex_tabs(exarg_T *eap UNUSED)
 	out_flush();	    // output one line at a time
 	ui_breakcheck();
 
-	if (tp  == curtab)
+	만약 (tp  == curtab)
 	    wp = firstwin;
-	else
+	아니면
 	    wp = tp->tp_firstwin;
-	for ( ; wp != NULL && !got_int; wp = wp->w_next)
+	위해 ( ; wp != NULL && !got_int; wp = wp->w_next)
 	{
 	    msg_putchar('\n');
 	    msg_putchar(wp == curwin ? '>' : ' ');
 	    msg_putchar(' ');
 	    msg_putchar(bufIsChanged(wp->w_buffer) ? '+' : ' ');
 	    msg_putchar(' ');
-	    if (buf_spname(wp->w_buffer) != NULL)
+	    만약 (buf_spname(wp->w_buffer) != NULL)
 		vim_strncpy(IObuff, buf_spname(wp->w_buffer), IOSIZE - 1);
-	    else
+	    아니면
 		home_replace(wp->w_buffer, wp->w_buffer->b_fname,
 							IObuff, IOSIZE, TRUE);
 	    msg_outtrans(IObuff);
@@ -7687,9 +7687,9 @@ ex_tabs(exarg_T *eap UNUSED)
     static void
 ex_mode(exarg_T *eap)
 {
-    if (*eap->arg == NUL)
+    만약 (*eap->arg == NUL)
 	shell_resized();
-    else
+    아니면
 	emsg(_(e_screen_mode_setting_not_supported));
 }
 
@@ -7700,13 +7700,13 @@ ex_mode(exarg_T *eap)
     static void
 ex_resize(exarg_T *eap)
 {
-    int		n;
+    정수		n;
     win_T	*wp = curwin;
 
-    if (eap->addr_count > 0)
+    만약 (eap->addr_count > 0)
     {
 	n = eap->line2;
-	for (wp = firstwin; wp->w_next != NULL && --n > 0; wp = wp->w_next)
+	위해 (wp = firstwin; wp->w_next != NULL && --n > 0; wp = wp->w_next)
 	    ;
     }
 
@@ -7714,19 +7714,19 @@ ex_resize(exarg_T *eap)
     need_mouse_correct = TRUE;
 #endif
     n = atol((char *)eap->arg);
-    if (cmdmod.cmod_split & WSP_VERT)
+    만약 (cmdmod.cmod_split & WSP_VERT)
     {
-	if (*eap->arg == '-' || *eap->arg == '+')
+	만약 (*eap->arg == '-' || *eap->arg == '+')
 	    n += wp->w_width;
-	else if (n == 0 && eap->arg[0] == NUL)	// default is very wide
+	아니면 만약 (n == 0 && eap->arg[0] == NUL)	// default is very wide
 	    n = 9999;
 	win_setwidth_win(n, wp);
     }
-    else
+    아니면
     {
-	if (*eap->arg == '-' || *eap->arg == '+')
+	만약 (*eap->arg == '-' || *eap->arg == '+')
 	    n += wp->w_height;
-	else if (n == 0 && eap->arg[0] == NUL)	// default is very high
+	아니면 만약 (n == 0 && eap->arg[0] == NUL)	// default is very high
 	    n = 9999;
 	win_setheight_win(n, wp);
     }
@@ -7738,31 +7738,31 @@ ex_resize(exarg_T *eap)
     static void
 ex_find(exarg_T *eap)
 {
-    if (!check_can_set_curbuf_forceit(eap->forceit))
-	return;
+    만약 (!check_can_set_curbuf_forceit(eap->forceit))
+	반환;
 
     char_u	*fname = NULL;
-    int		count;
+    정수		count;
     char_u	*file_to_find = NULL;
     char	*search_ctx = NULL;
 
-    if (*get_findfunc() != NUL)
+    만약 (*get_findfunc() != NUL)
     {
 #ifdef FEAT_EVAL
-	fname = findfunc_find_file(eap->arg, (int)STRLEN(eap->arg),
+	fname = findfunc_find_file(eap->arg, (정수)STRLEN(eap->arg),
 					eap->addr_count > 0 ? eap->line2 : 1);
 #endif
     }
-    else
+    아니면
     {
-	fname = find_file_in_path(eap->arg, (int)STRLEN(eap->arg), FNAME_MESS,
+	fname = find_file_in_path(eap->arg, (정수)STRLEN(eap->arg), FNAME_MESS,
 			       TRUE, curbuf->b_ffname, &file_to_find, &search_ctx);
-	if (eap->addr_count > 0)
+	만약 (eap->addr_count > 0)
 	{
 	    // Repeat finding the file "count" times.  This matters when it appears
 	    // several times in the path.
 	    count = eap->line2;
-	    while (fname != NULL && --count > 0)
+	    동안 (fname != NULL && --count > 0)
 	    {
 		vim_free(fname);
 		fname = find_file_in_path(NULL, 0, FNAME_MESS,
@@ -7773,8 +7773,8 @@ ex_find(exarg_T *eap)
 	vim_findfile_cleanup(search_ctx);
     }
 
-    if (fname == NULL)
-	return;
+    만약 (fname == NULL)
+	반환;
 
     eap->arg = fname;
     do_exedit(eap, NULL);
@@ -7791,28 +7791,28 @@ ex_open(exarg_T *eap)
     char_u	*p;
 
 #ifdef FEAT_EVAL
-    if (not_in_vim9(eap, false) == FAIL)
-	return;
+    만약 (not_in_vim9(eap, false) == FAIL)
+	반환;
 #endif
     curwin->w_cursor.lnum = eap->line2;
     beginline(BL_SOL | BL_FIX);
-    if (*eap->arg == '/')
+    만약 (*eap->arg == '/')
     {
 	// ":open /pattern/": put cursor in column found with pattern
 	++eap->arg;
 	p = skip_regexp(eap->arg, '/', magic_isset());
 	*p = NUL;
 	regmatch.regprog = vim_regcomp(eap->arg, magic_isset() ? RE_MAGIC : 0);
-	if (regmatch.regprog != NULL)
+	만약 (regmatch.regprog != NULL)
 	{
 	    // make a copy of the line, when searching for a mark it might be
 	    // flushed
 	    char_u *line = vim_strsave(ml_get_curline());
 
 	    regmatch.rm_ic = p_ic;
-	    if (vim_regexec(&regmatch, line, (colnr_T)0))
+	    만약 (vim_regexec(&regmatch, line, (colnr_T)0))
 		curwin->w_cursor.col = (colnr_T)(regmatch.startp[0] - line);
-	    else
+	    아니면
 		emsg(_(e_no_match));
 	    vim_regfree(regmatch.regprog);
 	    vim_free(line);
@@ -7835,13 +7835,13 @@ ex_edit(exarg_T *eap)
     char_u *ffname = eap->cmdidx == CMD_enew ? NULL : eap->arg;
 
     // Exclude commands which keep the window's current buffer
-    if (
+    만약 (
 	    eap->cmdidx != CMD_badd
 	    && eap->cmdidx != CMD_balt
 	    // All other commands must obey 'winfixbuf' / ! rules
 	    && (is_other_file(0, ffname) && !check_can_set_curbuf_forceit(eap->forceit))
     )
-	return;
+	반환;
 
     do_exedit(eap, NULL);
 }
@@ -7854,43 +7854,43 @@ do_exedit(
     exarg_T	*eap,
     win_T	*old_curwin)	    // curwin before doing a split or NULL
 {
-    int		n;
-    int		need_hide;
-    int		exmode_was = exmode_active;
+    정수		n;
+    정수		need_hide;
+    정수		exmode_was = exmode_active;
 
-    if ((eap->cmdidx != CMD_pedit && ERROR_IF_POPUP_WINDOW)
+    만약 ((eap->cmdidx != CMD_pedit && ERROR_IF_POPUP_WINDOW)
 						 || ERROR_IF_TERM_POPUP_WINDOW)
-	return;
+	반환;
     /*
      * ":vi" command ends Ex mode.
      */
-    if (exmode_active && (eap->cmdidx == CMD_visual
+    만약 (exmode_active && (eap->cmdidx == CMD_visual
 						|| eap->cmdidx == CMD_view))
     {
 	exmode_active = FALSE;
 	ex_pressedreturn = FALSE;
-	if (*eap->arg == NUL)
+	만약 (*eap->arg == NUL)
 	{
 	    // Special case:  ":global/pat/visual\NLvi-commands"
-	    if (global_busy)
+	    만약 (global_busy)
 	    {
-		if (eap->nextcmd != NULL)
+		만약 (eap->nextcmd != NULL)
 		{
 		    stuffReadbuff(eap->nextcmd);
 		    eap->nextcmd = NULL;
 		}
 
-		if (exmode_was != EXMODE_VIM)
+		만약 (exmode_was != EXMODE_VIM)
 		    settmode(TMODE_RAW);
-		int save_RedrawingDisabled = RedrawingDisabled;
+		정수 save_RedrawingDisabled = RedrawingDisabled;
 		RedrawingDisabled = 0;
-		int save_nwr = no_wait_return;
+		정수 save_nwr = no_wait_return;
 		no_wait_return = 0;
 		need_wait_return = FALSE;
-		int save_ms = msg_scroll;
+		정수 save_ms = msg_scroll;
 		msg_scroll = 0;
 #ifdef FEAT_GUI
-		int save_he = hold_gui_events;
+		정수 save_he = hold_gui_events;
 		hold_gui_events = 0;
 #endif
 		set_must_redraw(UPD_CLEAR);
@@ -7906,11 +7906,11 @@ do_exedit(
 		hold_gui_events = save_he;
 #endif
 	    }
-	    return;
+	    반환;
 	}
     }
 
-    if ((eap->cmdidx == CMD_new
+    만약 ((eap->cmdidx == CMD_new
 		|| eap->cmdidx == CMD_tabnew
 		|| eap->cmdidx == CMD_tabedit
 		|| eap->cmdidx == CMD_vnew) && *eap->arg == NUL)
@@ -7921,7 +7921,7 @@ do_exedit(
 		      ECMD_HIDE + (eap->forceit ? ECMD_FORCEIT : 0),
 		      old_curwin == NULL ? curwin : NULL);
     }
-    else if ((eap->cmdidx != CMD_split && eap->cmdidx != CMD_vsplit)
+    아니면 만약 ((eap->cmdidx != CMD_split && eap->cmdidx != CMD_vsplit)
 	    || *eap->arg != NUL
 #ifdef FEAT_BROWSE
 	    || (cmdmod.cmod_flags & CMOD_BROWSE)
@@ -7931,18 +7931,18 @@ do_exedit(
 	// Can't edit another file when "textlock" or "curbuf_lock" is set.
 	// Only ":edit" or ":script" can bring us here, others are stopped
 	// earlier.
-	if (*eap->arg != NUL && text_or_buf_locked())
-	    return;
+	만약 (*eap->arg != NUL && text_or_buf_locked())
+	    반환;
 
 	n = readonlymode;
-	if (eap->cmdidx == CMD_view || eap->cmdidx == CMD_sview)
+	만약 (eap->cmdidx == CMD_view || eap->cmdidx == CMD_sview)
 	    readonlymode = TRUE;
-	else if (eap->cmdidx == CMD_enew)
+	아니면 만약 (eap->cmdidx == CMD_enew)
 	    readonlymode = FALSE;   // 'readonly' doesn't make sense in an
 				    // empty buffer
-	if (eap->cmdidx != CMD_balt && eap->cmdidx != CMD_badd)
+	만약 (eap->cmdidx != CMD_balt && eap->cmdidx != CMD_badd)
 	    setpcmark();
-	if (do_ecmd(0, (eap->cmdidx == CMD_enew ? NULL : eap->arg),
+	만약 (do_ecmd(0, (eap->cmdidx == CMD_enew ? NULL : eap->arg),
 		    NULL, eap,
 		    // ":edit" goes to first line if Vi compatible
 		    (*eap->arg == NUL && eap->do_ecmd_lnum == 0
@@ -7957,12 +7957,12 @@ do_exedit(
 		    , old_curwin == NULL ? curwin : NULL) == FAIL)
 	{
 	    // Editing the file failed.  If the window was split, close it.
-	    if (old_curwin != NULL)
+	    만약 (old_curwin != NULL)
 	    {
 		need_hide = (curbufIsChanged() && curbuf->b_nwindows <= 1);
-		if (!need_hide || buf_hide(curbuf))
+		만약 (!need_hide || buf_hide(curbuf))
 		{
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 		    cleanup_T   cs;
 
 		    // Reset the error/interrupt/exception state here so that
@@ -7974,7 +7974,7 @@ do_exedit(
 #endif
 		    win_close(curwin, !need_hide && !buf_hide(curbuf));
 
-#if defined(FEAT_EVAL)
+#만약 defined(FEAT_EVAL)
 		    // Restore the error/interrupt/exception state if not
 		    // discarded by a new aborting error, interrupt, or
 		    // uncaught exception.
@@ -7983,7 +7983,7 @@ do_exedit(
 		}
 	    }
 	}
-	else if (readonlymode && curbuf->b_nwindows == 1)
+	아니면 만약 (readonlymode && curbuf->b_nwindows == 1)
 	{
 	    // When editing an already visited buffer, 'readonly' won't be set
 	    // but the previous value is kept.  With ":view" and ":sview" we
@@ -7993,13 +7993,13 @@ do_exedit(
 	}
 	readonlymode = n;
     }
-    else
+    아니면
     {
-	if (eap->do_ecmd_cmd != NULL)
+	만약 (eap->do_ecmd_cmd != NULL)
 	    do_cmd_argument(eap->do_ecmd_cmd);
 	n = curwin->w_arg_idx_invalid;
 	check_arg_idx(curwin);
-	if (n != curwin->w_arg_idx_invalid)
+	만약 (n != curwin->w_arg_idx_invalid)
 	    maketitle();
     }
 
@@ -8007,7 +8007,7 @@ do_exedit(
      * if ":split file" worked, set alternate file name in old window to new
      * file
      */
-    if (old_curwin != NULL
+    만약 (old_curwin != NULL
 	    && *eap->arg != NUL
 	    && curwin != old_curwin
 	    && win_valid(old_curwin)
@@ -8029,7 +8029,7 @@ ex_nogui(exarg_T *eap)
 }
 #endif
 
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+#만약 defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
     static void
 ex_tearoff(exarg_T *eap)
 {
@@ -8037,16 +8037,16 @@ ex_tearoff(exarg_T *eap)
 }
 #endif
 
-#if (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
+#만약 (defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_TERM_POPUP_MENU)) && defined(FEAT_MENU)
     static void
 ex_popup(exarg_T *eap)
 {
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
-    if (gui.in_use)
+# 만약 defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+    만약 (gui.in_use)
 	gui_make_popup(eap->arg, eap->forceit);
 #  ifdef FEAT_TERM_POPUP_MENU
-    else
+    아니면
 #  endif
 # endif
 # ifdef FEAT_TERM_POPUP_MENU
@@ -8058,9 +8058,9 @@ ex_popup(exarg_T *eap)
     static void
 ex_swapname(exarg_T *eap UNUSED)
 {
-    if (curbuf->b_ml.ml_mfp == NULL || curbuf->b_ml.ml_mfp->mf_fname == NULL)
+    만약 (curbuf->b_ml.ml_mfp == NULL || curbuf->b_ml.ml_mfp->mf_fname == NULL)
 	msg(_("No swap file"));
-    else
+    아니면
 	msg((char *)curbuf->b_ml.ml_mfp->mf_fname);
 }
 
@@ -8084,22 +8084,22 @@ ex_syncbind(exarg_T *eap UNUSED)
     /*
      * determine max topline
      */
-    if (curwin->w_p_scb)
+    만약 (curwin->w_p_scb)
     {
 	topline = curwin->w_topline;
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_p_scb && wp->w_buffer)
+	    만약 (wp->w_p_scb && wp->w_buffer)
 	    {
 		y = wp->w_buffer->b_ml.ml_line_count - get_scrolloff_value();
-		if (topline > y)
+		만약 (topline > y)
 		    topline = y;
 	    }
 	}
-	if (topline < 1)
+	만약 (topline < 1)
 	    topline = 1;
     }
-    else
+    아니면
     {
 	topline = 1;
     }
@@ -8110,13 +8110,13 @@ ex_syncbind(exarg_T *eap UNUSED)
      */
     FOR_ALL_WINDOWS(curwin)
     {
-	if (curwin->w_p_scb)
+	만약 (curwin->w_p_scb)
 	{
 	    curbuf = curwin->w_buffer;
 	    y = topline - curwin->w_topline;
-	    if (y > 0)
+	    만약 (y > 0)
 		scrollup(y, TRUE);
-	    else
+	    아니면
 		scrolldown(-y, TRUE);
 	    curwin->w_scbind_pos = topline;
 	    redraw_later(UPD_VALID);
@@ -8126,11 +8126,11 @@ ex_syncbind(exarg_T *eap UNUSED)
     }
     curwin = save_curwin;
     curbuf = save_curbuf;
-    if (curwin->w_p_scb)
+    만약 (curwin->w_p_scb)
     {
 	did_syncbind = TRUE;
 	checkpcmark();
-	if (old_linenr != curwin->w_cursor.lnum)
+	만약 (old_linenr != curwin->w_cursor.lnum)
 	{
 	    char_u ctrl_o[2];
 
@@ -8145,73 +8145,73 @@ ex_syncbind(exarg_T *eap UNUSED)
     static void
 ex_read(exarg_T *eap)
 {
-    int		i;
-    int		empty = (curbuf->b_ml.ml_flags & ML_EMPTY);
+    정수		i;
+    정수		empty = (curbuf->b_ml.ml_flags & ML_EMPTY);
     linenr_T	lnum;
 
-    if (eap->usefilter)			// :r!cmd
+    만약 (eap->usefilter)			// :r!cmd
     {
 	do_bang(1, eap, FALSE, FALSE, TRUE);
-	return;
+	반환;
     }
 
-    if (u_save(eap->line2, (linenr_T)(eap->line2 + 1)) == FAIL)
-	return;
+    만약 (u_save(eap->line2, (linenr_T)(eap->line2 + 1)) == FAIL)
+	반환;
 
 #ifdef FEAT_BROWSE
-    if (cmdmod.cmod_flags & CMOD_BROWSE)
+    만약 (cmdmod.cmod_flags & CMOD_BROWSE)
     {
 	char_u *browseFile;
 
 	browseFile = do_browse(0, (char_u *)_("Append File"), eap->arg,
 		NULL, NULL, NULL, curbuf);
-	if (browseFile != NULL)
+	만약 (browseFile != NULL)
 	{
 	    i = readfile(browseFile, NULL,
 		    eap->line2, (linenr_T)0, (linenr_T)MAXLNUM, eap, 0);
 	    vim_free(browseFile);
 	}
-	else
+	아니면
 	    i = OK;
     }
-    else
+    아니면
 #endif
-	if (*eap->arg == NUL)
+	만약 (*eap->arg == NUL)
 	{
-	    if (check_fname() == FAIL)	// check for no file name
-		return;
+	    만약 (check_fname() == FAIL)	// check for no file name
+		반환;
 	    i = readfile(curbuf->b_ffname, curbuf->b_fname,
 		    eap->line2, (linenr_T)0, (linenr_T)MAXLNUM, eap, 0);
 	}
-	else
+	아니면
 	{
-	    if (vim_strchr(p_cpo, CPO_ALTREAD) != NULL)
+	    만약 (vim_strchr(p_cpo, CPO_ALTREAD) != NULL)
 		(void)setaltfname(eap->arg, eap->arg, (linenr_T)1);
 	    i = readfile(eap->arg, NULL,
 		    eap->line2, (linenr_T)0, (linenr_T)MAXLNUM, eap, 0);
 
 	}
-    if (i != OK)
+    만약 (i != OK)
     {
-#if defined(FEAT_EVAL)
-	if (!aborting())
+#만약 defined(FEAT_EVAL)
+	만약 (!aborting())
 #endif
 	    semsg(_(e_cant_open_file_str), eap->arg);
     }
-    else
+    아니면
     {
-	if (empty && exmode_active)
+	만약 (empty && exmode_active)
 	{
 	    // Delete the empty line that remains.  Historically ex does
 	    // this but vi doesn't.
-	    if (eap->line2 == 0)
+	    만약 (eap->line2 == 0)
 		lnum = curbuf->b_ml.ml_line_count;
-	    else
+	    아니면
 		lnum = 1;
-	    if (*ml_get(lnum) == NUL && u_savedel(lnum, 1L) == OK)
+	    만약 (*ml_get(lnum) == NUL && u_savedel(lnum, 1L) == OK)
 	    {
 		ml_delete(lnum);
-		if (curwin->w_cursor.lnum > 1
+		만약 (curwin->w_cursor.lnum > 1
 			&& curwin->w_cursor.lnum >= lnum)
 		    --curwin->w_cursor.lnum;
 		deleted_lines_mark(lnum, 1L);
@@ -8223,7 +8223,7 @@ ex_read(exarg_T *eap)
 
 static char_u	*prev_dir = NULL;
 
-#if defined(EXITFREE)
+#만약 defined(EXITFREE)
     void
 free_cd_dir(void)
 {
@@ -8238,11 +8238,11 @@ free_cd_dir(void)
     static char_u *
 get_prevdir(cdscope_T scope)
 {
-    if (scope == CDSCOPE_WINDOW)
-	return curwin->w_prevdir;
-    else if (scope == CDSCOPE_TABPAGE)
-	return curtab->tp_prevdir;
-    return prev_dir;
+    만약 (scope == CDSCOPE_WINDOW)
+	반환 curwin->w_prevdir;
+    아니면 만약 (scope == CDSCOPE_TABPAGE)
+	반환 curtab->tp_prevdir;
+    반환 prev_dir;
 }
 
 /*
@@ -8253,29 +8253,29 @@ get_prevdir(cdscope_T scope)
     void
 post_chdir(cdscope_T scope)
 {
-    if (scope != CDSCOPE_WINDOW)
+    만약 (scope != CDSCOPE_WINDOW)
 	// Clear tab local directory for both :cd and :tcd
 	VIM_CLEAR(curtab->tp_localdir);
     VIM_CLEAR(curwin->w_localdir);
-    if (scope != CDSCOPE_GLOBAL)
+    만약 (scope != CDSCOPE_GLOBAL)
     {
 	char_u	*pdir = get_prevdir(scope);
 
 	// If still in the global directory, need to remember current
 	// directory as the global directory.
-	if (globaldir == NULL && pdir != NULL)
+	만약 (globaldir == NULL && pdir != NULL)
 	    globaldir = vim_strsave(pdir);
 
 	// Remember this local directory for the window.
-	if (mch_dirname(NameBuff, MAXPATHL) == OK)
+	만약 (mch_dirname(NameBuff, MAXPATHL) == OK)
 	{
-	    if (scope == CDSCOPE_TABPAGE)
+	    만약 (scope == CDSCOPE_TABPAGE)
 		curtab->tp_localdir = vim_strsave(NameBuff);
-	    else
+	    아니면
 		curwin->w_localdir = vim_strsave(NameBuff);
 	}
     }
-    else
+    아니면
     {
 	// We are now in the global directory, no need to remember its name.
 	VIM_CLEAR(globaldir);
@@ -8313,51 +8313,51 @@ trigger_DirChangedPre(char_u *acmd_fname, char_u *new_dir)
  * Otherwise: changes the global directory
  * Returns TRUE if the directory is successfully changed.
  */
-    int
+    정수
 changedir_func(
 	char_u		*new_dir,
-	int		forceit,
+	정수		forceit,
 	cdscope_T	scope)
 {
     char_u	*pdir = NULL;
-    int		dir_differs;
+    정수		dir_differs;
     char_u	*acmd_fname = NULL;
     char_u	**pp;
     char_u	*tofree;
 
-    if (new_dir == NULL || allbuf_locked())
-	return FALSE;
+    만약 (new_dir == NULL || allbuf_locked())
+	반환 FALSE;
 
-    if (vim_strchr(p_cpo, CPO_CHDIR) != NULL && curbufIsChanged() && !forceit)
+    만약 (vim_strchr(p_cpo, CPO_CHDIR) != NULL && curbufIsChanged() && !forceit)
     {
 	emsg(_(e_cannot_change_directory_buffer_is_modified_add_bang_to_override));
-	return FALSE;
+	반환 FALSE;
     }
 
     // ":cd -": Change to previous directory
-    if (STRCMP(new_dir, "-") == 0)
+    만약 (STRCMP(new_dir, "-") == 0)
     {
 	pdir = get_prevdir(scope);
-	if (pdir == NULL)
+	만약 (pdir == NULL)
 	{
 	    emsg(_(e_no_previous_directory));
-	    return FALSE;
+	    반환 FALSE;
 	}
 	new_dir = pdir;
     }
 
     // Save current directory for next ":cd -"
-    if (mch_dirname(NameBuff, MAXPATHL) == OK)
+    만약 (mch_dirname(NameBuff, MAXPATHL) == OK)
 	pdir = vim_strsave(NameBuff);
-    else
+    아니면
 	pdir = NULL;
 
     // For UNIX ":cd" means: go to home directory.
     // On other systems too if 'cdhome' is set.
-#if defined(UNIX) || defined(VMS)
-    if (*new_dir == NUL)
-#else
-    if (*new_dir == NUL && p_cdh)
+#만약 defined(UNIX) || defined(VMS)
+    만약 (*new_dir == NUL)
+#아니면
+    만약 (*new_dir == NUL && p_cdh)
 #endif
     {
 	// use NameBuff for home directory name
@@ -8365,50 +8365,50 @@ changedir_func(
 	char_u	*p;
 
 	p = mch_getenv((char_u *)"SYS$LOGIN");
-	if (p == NULL || *p == NUL)	// empty is the same as not set
+	만약 (p == NULL || *p == NUL)	// empty is the same as not set
 	    NameBuff[0] = NUL;
-	else
+	아니면
 	    vim_strncpy(NameBuff, p, MAXPATHL - 1);
-#else
+#아니면
 	expand_env((char_u *)"$HOME", NameBuff, MAXPATHL);
 #endif
 	new_dir = NameBuff;
     }
     dir_differs = pdir == NULL
 			    || pathcmp((char *)pdir, (char *)new_dir, -1) != 0;
-    if (dir_differs)
+    만약 (dir_differs)
     {
-	if (scope == CDSCOPE_WINDOW)
+	만약 (scope == CDSCOPE_WINDOW)
 	    acmd_fname = (char_u *)"window";
-	else if (scope == CDSCOPE_TABPAGE)
+	아니면 만약 (scope == CDSCOPE_TABPAGE)
 	    acmd_fname = (char_u *)"tabpage";
-	else
+	아니면
 	    acmd_fname = (char_u *)"global";
 	trigger_DirChangedPre(acmd_fname, new_dir);
 
-	if (vim_chdir(new_dir))
+	만약 (vim_chdir(new_dir))
 	{
 	    emsg(_(e_command_failed));
 	    vim_free(pdir);
-	    return FALSE;
+	    반환 FALSE;
 	}
     }
 
-    if (scope == CDSCOPE_WINDOW)
+    만약 (scope == CDSCOPE_WINDOW)
 	pp = &curwin->w_prevdir;
-    else if (scope == CDSCOPE_TABPAGE)
+    아니면 만약 (scope == CDSCOPE_TABPAGE)
 	pp = &curtab->tp_prevdir;
-    else
+    아니면
 	pp = &prev_dir;
     tofree = *pp;  // new_dir may use this
     *pp = pdir;
 
     post_chdir(scope);
 
-    if (dir_differs)
+    만약 (dir_differs)
 	apply_autocmds(EVENT_DIRCHANGED, acmd_fname, new_dir, FALSE, curbuf);
     vim_free(tofree);
-    return TRUE;
+    반환 TRUE;
 }
 
 /*
@@ -8420,26 +8420,26 @@ ex_cd(exarg_T *eap)
     char_u	*new_dir;
 
     new_dir = eap->arg;
-#if !defined(UNIX) && !defined(VMS)
+#만약 !defined(UNIX) && !defined(VMS)
     // for non-UNIX ":cd" means: print current directory unless 'cdhome' is set
-    if (*new_dir == NUL && !p_cdh)
+    만약 (*new_dir == NUL && !p_cdh)
     {
 	ex_pwd(NULL);
-	return;
+	반환;
     }
 #endif
 
     cdscope_T	scope = CDSCOPE_GLOBAL;
 
-    if (eap->cmdidx == CMD_lcd || eap->cmdidx == CMD_lchdir)
+    만약 (eap->cmdidx == CMD_lcd || eap->cmdidx == CMD_lchdir)
 	scope = CDSCOPE_WINDOW;
-    else if (eap->cmdidx == CMD_tcd || eap->cmdidx == CMD_tchdir)
+    아니면 만약 (eap->cmdidx == CMD_tcd || eap->cmdidx == CMD_tchdir)
 	scope = CDSCOPE_TABPAGE;
 
-    if (changedir_func(new_dir, eap->forceit, scope))
+    만약 (changedir_func(new_dir, eap->forceit, scope))
     {
 	// Echo the new current directory if the command was typed.
-	if (KeyTyped || p_verbose >= 5)
+	만약 (KeyTyped || p_verbose >= 5)
 	    ex_pwd(eap);
     }
 }
@@ -8450,27 +8450,27 @@ ex_cd(exarg_T *eap)
     static void
 ex_pwd(exarg_T *eap UNUSED)
 {
-    if (mch_dirname(NameBuff, MAXPATHL) == OK)
+    만약 (mch_dirname(NameBuff, MAXPATHL) == OK)
     {
 #ifdef BACKSLASH_IN_FILENAME
 	slash_adjust(NameBuff);
 #endif
-	if (p_verbose > 0)
+	만약 (p_verbose > 0)
 	{
 	    char *context = "global";
 
-	    if (last_chdir_reason != NULL)
+	    만약 (last_chdir_reason != NULL)
 		context = last_chdir_reason;
-	    else if (curwin->w_localdir != NULL)
+	    아니면 만약 (curwin->w_localdir != NULL)
 		context = "window";
-	    else if (curtab->tp_localdir != NULL)
+	    아니면 만약 (curtab->tp_localdir != NULL)
 		context = "tabpage";
 	    smsg("[%s] %s", context, (char *)NameBuff);
 	}
-	else
+	아니면
 	    msg((char *)NameBuff);
     }
-    else
+    아니면
 	emsg(_(e_directory_unknown));
 }
 
@@ -8487,13 +8487,13 @@ ex_equal(exarg_T *eap)
     static void
 ex_sleep(exarg_T *eap)
 {
-    int		n;
+    정수		n;
     long	len;
 
-    if (cursor_valid())
+    만약 (cursor_valid())
     {
 	n = W_WINROW(curwin) + curwin->w_wrow - msg_scrolled;
-	if (n >= 0)
+	만약 (n >= 0)
 	    windgoto(n, curwin->w_wincol + curwin->w_wcol);
     }
 
@@ -8502,7 +8502,7 @@ ex_sleep(exarg_T *eap)
     {
 	case 'm': break;
 	case NUL: len *= 1000L; break;
-	default: semsg(_(e_invalid_argument_str), eap->arg); return;
+	default: semsg(_(e_invalid_argument_str), eap->arg); 반환;
     }
 
     // Hide the cursor if invoked with !
@@ -8514,7 +8514,7 @@ ex_sleep(exarg_T *eap)
  * Hide the cursor if "hide_cursor" is TRUE.
  */
     void
-do_sleep(long msec, int hide_cursor)
+do_sleep(long msec, 정수 hide_cursor)
 {
     long	done = 0;
     long	wait_now;
@@ -8526,37 +8526,37 @@ do_sleep(long msec, int hide_cursor)
     ELAPSED_INIT(start_tv);
 #endif
 
-    if (hide_cursor)
+    만약 (hide_cursor)
 	cursor_sleep();
-    else
+    아니면
 	cursor_on();
 
     out_flush_cursor(FALSE, FALSE);
-    while (!got_int && done < msec)
+    동안 (!got_int && done < msec)
     {
 	wait_now = msec - done > 1000L ? 1000L : msec - done;
 #ifdef FEAT_TIMERS
 	{
 	    long    due_time = check_due_timer();
 
-	    if (due_time > 0 && due_time < wait_now)
+	    만약 (due_time > 0 && due_time < wait_now)
 		wait_now = due_time;
 	}
 #endif
 #ifdef FEAT_JOB_CHANNEL
-	if (has_any_channel() && wait_now > 20L)
+	만약 (has_any_channel() && wait_now > 20L)
 	    wait_now = 20L;
 #endif
 #ifdef FEAT_SOUND
-	if (has_any_sound_callback() && wait_now > 20L)
+	만약 (has_any_sound_callback() && wait_now > 20L)
 	    wait_now = 20L;
 #endif
 	ui_delay(wait_now, TRUE);
 
 #ifdef FEAT_JOB_CHANNEL
-	if (has_any_channel())
+	만약 (has_any_channel())
 	    ui_breakcheck_force(TRUE);
-	else
+	아니면
 #endif
 	    ui_breakcheck();
 #ifdef MESSAGE_QUEUE
@@ -8569,7 +8569,7 @@ do_sleep(long msec, int hide_cursor)
 #ifdef ELAPSED_FUNC
 	// actual time passed
 	done = ELAPSED_FUNC(start_tv);
-#else
+#아니면
 	// guesstimate time passed (will actually be more)
 	done += wait_now;
 #endif
@@ -8577,10 +8577,10 @@ do_sleep(long msec, int hide_cursor)
 
     // If CTRL-C was typed to interrupt the sleep, drop the CTRL-C from the
     // input buffer, otherwise a following call to input() fails.
-    if (got_int)
+    만약 (got_int)
 	(void)vpeekc();
 
-    if (hide_cursor)
+    만약 (hide_cursor)
 	cursor_unsleep();
 }
 
@@ -8590,55 +8590,55 @@ do_sleep(long msec, int hide_cursor)
     static void
 ex_winsize(exarg_T *eap)
 {
-    int		w, h;
+    정수		w, h;
     char_u	*arg = eap->arg;
     char_u	*p;
 
-    if (!SAFE_isdigit(*arg))
+    만약 (!SAFE_isdigit(*arg))
     {
 	semsg(_(e_invalid_argument_str), arg);
-	return;
+	반환;
     }
     w = getdigits(&arg);
     arg = skipwhite(arg);
     p = arg;
     h = getdigits(&arg);
-    if (*p != NUL && *arg == NUL)
+    만약 (*p != NUL && *arg == NUL)
 	set_shellsize(w, h, TRUE);
-    else
+    아니면
 	emsg(_(e_winsize_requires_two_number_arguments));
 }
 
     static void
 ex_wincmd(exarg_T *eap)
 {
-    int		xchar = NUL;
+    정수		xchar = NUL;
     char_u	*p;
 
-    if (*eap->arg == 'g' || *eap->arg == Ctrl_G)
+    만약 (*eap->arg == 'g' || *eap->arg == Ctrl_G)
     {
 	// CTRL-W g and CTRL-W CTRL-G  have an extra command character
-	if (eap->arg[1] == NUL)
+	만약 (eap->arg[1] == NUL)
 	{
 	    emsg(_(e_invalid_argument));
-	    return;
+	    반환;
 	}
 	xchar = eap->arg[1];
 	p = eap->arg + 2;
     }
-    else
+    아니면
 	p = eap->arg + 1;
 
     set_nextcmd(eap, p);
     p = skipwhite(p);
-    if (*p != NUL && *p != (
+    만약 (*p != NUL && *p != (
 #ifdef FEAT_EVAL
 	    in_vim9script() ? '#' :
 #endif
 		'"')
 	    && eap->nextcmd == NULL)
 	emsg(_(e_invalid_argument));
-    else if (!eap->skip)
+    아니면 만약 (!eap->skip)
     {
 	// Pass flags on for ":vertical wincmd ]".
 	postponed_split_flags = cmdmod.cmod_split;
@@ -8649,65 +8649,65 @@ ex_wincmd(exarg_T *eap)
     }
 }
 
-#if defined(FEAT_GUI) || defined(UNIX) || defined(VMS) || defined(MSWIN)
+#만약 defined(FEAT_GUI) || defined(UNIX) || defined(VMS) || defined(MSWIN)
 /*
  * ":winpos".
  */
     static void
 ex_winpos(exarg_T *eap)
 {
-    int		x, y;
+    정수		x, y;
     char_u	*arg = eap->arg;
     char_u	*p;
 
-    if (*arg == NUL)
+    만약 (*arg == NUL)
     {
-# if defined(FEAT_GUI) || defined(MSWIN)
+# 만약 defined(FEAT_GUI) || defined(MSWIN)
 #  ifdef VIMDLL
-	if (gui.in_use ? gui_mch_get_winpos(&x, &y) != FAIL :
+	만약 (gui.in_use ? gui_mch_get_winpos(&x, &y) != FAIL :
 		mch_get_winpos(&x, &y) != FAIL)
 #  elif defined(FEAT_GUI)
-	if (gui.in_use && gui_mch_get_winpos(&x, &y) != FAIL)
-#  else
-	if (mch_get_winpos(&x, &y) != FAIL)
+	만약 (gui.in_use && gui_mch_get_winpos(&x, &y) != FAIL)
+#  아니면
+	만약 (mch_get_winpos(&x, &y) != FAIL)
 #  endif
 	{
 	    sprintf((char *)IObuff, _("Window position: X %d, Y %d"), x, y);
 	    msg((char *)IObuff);
 	}
-	else
+	아니면
 # endif
 	    emsg(_(e_obtaining_window_position_not_implemented_for_this_platform));
     }
-    else
+    아니면
     {
 	x = getdigits(&arg);
 	arg = skipwhite(arg);
 	p = arg;
 	y = getdigits(&arg);
-	if (*p == NUL || *arg != NUL)
+	만약 (*p == NUL || *arg != NUL)
 	{
 	    emsg(_(e_winpos_requires_two_number_arguments));
-	    return;
+	    반환;
 	}
 # ifdef FEAT_GUI
-	if (gui.in_use)
+	만약 (gui.in_use)
 	    gui_mch_set_winpos(x, y);
-	else if (gui.starting)
+	아니면 만약 (gui.starting)
 	{
 	    // Remember the coordinates for when the window is opened.
 	    gui_win_x = x;
 	    gui_win_y = y;
 	}
-#  if defined(HAVE_TGETENT) || defined(VIMDLL)
-	else
+#  만약 defined(HAVE_TGETENT) || defined(VIMDLL)
+	아니면
 #  endif
 # endif
-# if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+# 만약 defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
 	    mch_set_winpos(x, y);
 # endif
 # ifdef HAVE_TGETENT
-	if (*T_CWP)
+	만약 (*T_CWP)
 	    term_set_winpos(x, y);
 # endif
     }
@@ -8729,14 +8729,14 @@ ex_operators(exarg_T *eap)
     oa.line_count = eap->line2 - eap->line1 + 1;
     oa.motion_type = MLINE;
     virtual_op = FALSE;
-    if (eap->cmdidx != CMD_yank)	// position cursor for undo
+    만약 (eap->cmdidx != CMD_yank)	// position cursor for undo
     {
 	setpcmark();
 	curwin->w_cursor.lnum = eap->line1;
 	beginline(BL_SOL | BL_FIX);
     }
 
-    if (VIsual_active)
+    만약 (VIsual_active)
 	end_visual_mode();
 
     switch (eap->cmdidx)
@@ -8752,15 +8752,15 @@ ex_operators(exarg_T *eap)
 	    break;
 
 	default:    // CMD_rshift or CMD_lshift
-	    if (
+	    만약 (
 #ifdef FEAT_RIGHTLEFT
 		(eap->cmdidx == CMD_rshift) ^ curwin->w_p_rl
-#else
+#아니면
 		eap->cmdidx == CMD_rshift
 #endif
 						)
 		oa.op_type = OP_RSHIFT;
-	    else
+	    아니면
 		oa.op_type = OP_LSHIFT;
 	    op_shift(&oa, FALSE, eap->amount);
 	    break;
@@ -8776,7 +8776,7 @@ ex_operators(exarg_T *eap)
 ex_put(exarg_T *eap)
 {
     // ":0put" works like ":1put!".
-    if (eap->line2 == 0)
+    만약 (eap->line2 == 0)
     {
 	eap->line2 = 1;
 	eap->forceit = TRUE;
@@ -8794,7 +8794,7 @@ ex_put(exarg_T *eap)
 ex_iput(exarg_T *eap)
 {
     // ":0iput" works like ":1iput!".
-    if (eap->line2 == 0)
+    만약 (eap->line2 == 0)
     {
 	eap->line2 = 1;
 	eap->forceit = TRUE;
@@ -8815,32 +8815,32 @@ ex_copymove(exarg_T *eap)
     long	n;
 
 #ifdef FEAT_EVAL
-    if (not_in_vim9(eap, false) == FAIL)
-	return;
+    만약 (not_in_vim9(eap, false) == FAIL)
+	반환;
 #endif
     n = get_address(eap, &eap->arg, eap->addr_type, FALSE, FALSE, FALSE, 1);
-    if (eap->arg == NULL)	    // error detected
+    만약 (eap->arg == NULL)	    // error detected
     {
 	eap->nextcmd = NULL;
-	return;
+	반환;
     }
     get_flags(eap);
 
     /*
      * move or copy lines from 'eap->line1'-'eap->line2' to below line 'n'
      */
-    if (n == MAXLNUM || n < 0 || n > curbuf->b_ml.ml_line_count)
+    만약 (n == MAXLNUM || n < 0 || n > curbuf->b_ml.ml_line_count)
     {
 	emsg(_(e_invalid_range));
-	return;
+	반환;
     }
 
-    if (eap->cmdidx == CMD_move)
+    만약 (eap->cmdidx == CMD_move)
     {
-	if (do_move(eap->line1, eap->line2, n) == FAIL)
-	    return;
+	만약 (do_move(eap->line1, eap->line2, n) == FAIL)
+	    반환;
     }
-    else
+    아니면
 	ex_copy(eap->line1, eap->line2, n);
     u_clearline();
     beginline(BL_SOL | BL_FIX);
@@ -8853,7 +8853,7 @@ ex_copymove(exarg_T *eap)
     void
 ex_may_print(exarg_T *eap)
 {
-    if (eap->flags != 0)
+    만약 (eap->flags != 0)
     {
 	print_line(curwin->w_cursor.lnum, (eap->flags & EXFLAG_NR),
 						  (eap->flags & EXFLAG_LIST));
@@ -8882,14 +8882,14 @@ ex_submagic(exarg_T *eap)
 ex_join(exarg_T *eap)
 {
     curwin->w_cursor.lnum = eap->line1;
-    if (eap->line1 == eap->line2)
+    만약 (eap->line1 == eap->line2)
     {
-	if (eap->addr_count >= 2)   // :2,2join does nothing
-	    return;
-	if (eap->line2 == curbuf->b_ml.ml_line_count)
+	만약 (eap->addr_count >= 2)   // :2,2join does nothing
+	    반환;
+	만약 (eap->line2 == curbuf->b_ml.ml_line_count)
 	{
 	    beep_flush();
-	    return;
+	    반환;
 	}
 	++eap->line2;
     }
@@ -8904,8 +8904,8 @@ ex_join(exarg_T *eap)
     static void
 ex_at(exarg_T *eap)
 {
-    int		c;
-    int		prev_len = typebuf.tb_len;
+    정수		c;
+    정수		prev_len = typebuf.tb_len;
 
     curwin->w_cursor.lnum = eap->line2;
     check_cursor_col();
@@ -8916,17 +8916,17 @@ ex_at(exarg_T *eap)
 
     // get the register name.  No name means to use the previous one
     c = *eap->arg;
-    if (c == NUL || (c == '*' && *eap->cmd == '*'))
+    만약 (c == NUL || (c == '*' && *eap->cmd == '*'))
 	c = '@';
     // Put the register in the typeahead buffer with the "silent" flag.
-    if (do_execreg(c, TRUE, vim_strchr(p_cpo, CPO_EXECBUF) != NULL, TRUE)
+    만약 (do_execreg(c, TRUE, vim_strchr(p_cpo, CPO_EXECBUF) != NULL, TRUE)
 								      == FAIL)
     {
 	beep_flush();
-	return;
+	반환;
     }
 
-    int	save_efr = exec_from_reg;
+    정수	save_efr = exec_from_reg;
 
     exec_from_reg = TRUE;
 
@@ -8935,7 +8935,7 @@ ex_at(exarg_T *eap)
      * Continue until the stuff buffer is empty and all added characters
      * have been consumed.
      */
-    while (!stuff_empty() || typebuf.tb_len > prev_len)
+    동안 (!stuff_empty() || typebuf.tb_len > prev_len)
 	(void)do_cmdline(NULL, getexline, NULL, DOCMD_NOWAIT|DOCMD_VERBOSE);
 
     exec_from_reg = save_efr;
@@ -8956,9 +8956,9 @@ ex_bang(exarg_T *eap)
     static void
 ex_undo(exarg_T *eap)
 {
-    if (eap->addr_count == 1)	    // :undo 123
+    만약 (eap->addr_count == 1)	    // :undo 123
 	undo_time(eap->line2, FALSE, FALSE, TRUE);
-    else
+    아니면
 	u_undo(1);
 }
 
@@ -8998,13 +8998,13 @@ ex_redo(exarg_T *eap UNUSED)
 ex_later(exarg_T *eap)
 {
     long	count = 0;
-    int		sec = FALSE;
-    int		file = FALSE;
+    정수		sec = FALSE;
+    정수		file = FALSE;
     char_u	*p = eap->arg;
 
-    if (*p == NUL)
+    만약 (*p == NUL)
 	count = 1;
-    else if (SAFE_isdigit(*p))
+    아니면 만약 (SAFE_isdigit(*p))
     {
 	count = getdigits(&p);
 	switch (*p)
@@ -9017,9 +9017,9 @@ ex_later(exarg_T *eap)
 	}
     }
 
-    if (*p != NUL)
+    만약 (*p != NUL)
 	semsg(_(e_invalid_argument_str), eap->arg);
-    else
+    아니면
 	undo_time(eap->cmdidx == CMD_earlier ? -count : count,
 							    sec, file, FALSE);
 }
@@ -9035,26 +9035,26 @@ ex_redir(exarg_T *eap)
     char_u	*arg = eap->arg;
 
 #ifdef FEAT_EVAL
-    if (redir_execute)
+    만약 (redir_execute)
     {
 	emsg(_(e_cannot_use_redir_inside_execute));
-	return;
+	반환;
     }
 #endif
 
-    if (STRICMP(eap->arg, "END") == 0)
+    만약 (STRICMP(eap->arg, "END") == 0)
 	close_redir();
-    else
+    아니면
     {
-	if (*arg == '>')
+	만약 (*arg == '>')
 	{
 	    ++arg;
-	    if (*arg == '>')
+	    만약 (*arg == '>')
 	    {
 		++arg;
 		mode = "a";
 	    }
-	    else
+	    아니면
 		mode = "w";
 	    arg = skipwhite(arg);
 
@@ -9062,10 +9062,10 @@ ex_redir(exarg_T *eap)
 
 	    // Expand environment variables and "~/".
 	    fname = expand_env_save(arg);
-	    if (fname == NULL)
-		return;
+	    만약 (fname == NULL)
+		반환;
 #ifdef FEAT_BROWSE
-	    if (cmdmod.cmod_flags & CMOD_BROWSE)
+	    만약 (cmdmod.cmod_flags & CMOD_BROWSE)
 	    {
 		char_u	*browseFile;
 
@@ -9073,8 +9073,8 @@ ex_redir(exarg_T *eap)
 			(char_u *)_("Save Redirection"),
 			fname, NULL, NULL,
 			(char_u *)_(BROWSE_FILTER_ALL_FILES), curbuf);
-		if (browseFile == NULL)
-		    return;		// operation cancelled
+		만약 (browseFile == NULL)
+		    반환;		// operation cancelled
 		vim_free(fname);
 		fname = browseFile;
 		eap->forceit = TRUE;	// since dialog already asked
@@ -9085,12 +9085,12 @@ ex_redir(exarg_T *eap)
 	    vim_free(fname);
 	}
 #ifdef FEAT_EVAL
-	else if (*arg == '@')
+	아니면 만약 (*arg == '@')
 	{
 	    // redirect to a register a-z (resp. A-Z for appending)
 	    close_redir();
 	    ++arg;
-	    if (ASCII_ISALPHA(*arg)
+	    만약 (ASCII_ISALPHA(*arg)
 # ifdef HAVE_CLIPMETHOD
 		    || (clipmethod == CLIPMETHOD_PROVIDER
 			&& (*arg == '*' || *arg == '+'))
@@ -9102,55 +9102,55 @@ ex_redir(exarg_T *eap)
 		    || *arg == '"')
 	    {
 		redir_reg = *arg++;
-		if (*arg == '>' && arg[1] == '>')  // append
+		만약 (*arg == '>' && arg[1] == '>')  // append
 		    arg += 2;
-		else
+		아니면
 		{
 		    // Can use both "@a" and "@a>".
-		    if (*arg == '>')
+		    만약 (*arg == '>')
 			arg++;
 		    // Make register empty when not using @A-@Z and the
 		    // command is valid.
-		    if (*arg == NUL && !SAFE_isupper(redir_reg))
+		    만약 (*arg == NUL && !SAFE_isupper(redir_reg))
 			write_reg_contents(redir_reg, (char_u *)"", -1, FALSE);
 		}
 	    }
-	    if (*arg != NUL)
+	    만약 (*arg != NUL)
 	    {
 		redir_reg = 0;
 		semsg(_(e_invalid_argument_str), eap->arg);
 	    }
 	}
-	else if (*arg == '=' && arg[1] == '>')
+	아니면 만약 (*arg == '=' && arg[1] == '>')
 	{
-	    int append;
+	    정수 append;
 
 	    // redirect to a variable
 	    close_redir();
 	    arg += 2;
 
-	    if (*arg == '>')
+	    만약 (*arg == '>')
 	    {
 		++arg;
 		append = TRUE;
 	    }
-	    else
+	    아니면
 		append = FALSE;
 
-	    if (var_redir_start(skipwhite(arg), append) == OK)
+	    만약 (var_redir_start(skipwhite(arg), append) == OK)
 		redir_vname = 1;
 	}
 #endif
 
 	// TODO: redirect to a buffer
 
-	else
+	아니면
 	    semsg(_(e_invalid_argument_str), eap->arg);
     }
 
     // Make sure redirection is not off.  Can happen for cmdline completion
     // that indirectly invokes a command to catch its output.
-    if (redir_fd != NULL
+    만약 (redir_fd != NULL
 #ifdef FEAT_EVAL
 			  || redir_reg || redir_vname
 #endif
@@ -9171,24 +9171,24 @@ ex_redraw(exarg_T *eap)
  * ":redraw": force redraw, with clear if "clear" is TRUE.
  */
     void
-redraw_cmd(int clear)
+redraw_cmd(정수 clear)
 {
-    int save_RedrawingDisabled = RedrawingDisabled;
+    정수 save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    int save_p_lz = p_lz;
+    정수 save_p_lz = p_lz;
     p_lz = FALSE;
 
     validate_cursor();
     update_topline();
     update_screen(clear ? UPD_CLEAR : VIsual_active ? UPD_INVERTED : 0);
-    if ((State & MODE_CMDLINE) == 0)
+    만약 ((State & MODE_CMDLINE) == 0)
 	setcursor(); // put cursor back where it belongs
-    if (need_maketitle)
+    만약 (need_maketitle)
 	maketitle();
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+#만약 defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-    if (!gui.in_use)
+    만약 (!gui.in_use)
 # endif
 	resize_console_buf();
 #endif
@@ -9206,7 +9206,7 @@ redraw_cmd(int clear)
     need_wait_return = FALSE;
 
     // When invoked from a callback or autocmd the command line may be active.
-    if (State & MODE_CMDLINE)
+    만약 (State & MODE_CMDLINE)
 	redrawcmdline();
 
     out_flush();
@@ -9218,23 +9218,23 @@ redraw_cmd(int clear)
     static void
 ex_redrawstatus(exarg_T *eap UNUSED)
 {
-    if (eap->forceit)
+    만약 (eap->forceit)
 	status_redraw_all();
-    else
+    아니면
 	status_redraw_curbuf();
     redraw_vseps = TRUE;
-    if (msg_scrolled && (State & MODE_CMDLINE))
-	return;  // redraw later
+    만약 (msg_scrolled && (State & MODE_CMDLINE))
+	반환;  // redraw later
 
-    int save_RedrawingDisabled = RedrawingDisabled;
+    정수 save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    int save_p_lz = p_lz;
+    정수 save_p_lz = p_lz;
     p_lz = FALSE;
 
-    if (State & MODE_CMDLINE)
+    만약 (State & MODE_CMDLINE)
 	redraw_statuslines();
-    else
+    아니면
 	update_screen(VIsual_active ? UPD_INVERTED : 0);
     RedrawingDisabled = save_RedrawingDisabled;
     p_lz = save_p_lz;
@@ -9247,10 +9247,10 @@ ex_redrawstatus(exarg_T *eap UNUSED)
     static void
 ex_redrawtabline(exarg_T *eap UNUSED)
 {
-    int save_RedrawingDisabled = RedrawingDisabled;
+    정수 save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    int save_p_lz = p_lz;
+    정수 save_p_lz = p_lz;
     p_lz = FALSE;
 
     draw_tabline();
@@ -9266,15 +9266,15 @@ ex_redrawtabline(exarg_T *eap UNUSED)
     static void
 ex_redrawtabpanel(exarg_T *eap UNUSED)
 {
-    int save_RedrawingDisabled = RedrawingDisabled;
+    정수 save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    int save_p_lz = p_lz;
+    정수 save_p_lz = p_lz;
     p_lz = FALSE;
 
-#if defined(FEAT_TABPANEL)
+#만약 defined(FEAT_TABPANEL)
     draw_tabpanel();
-#else
+#아니면
     emsg(_(e_cannot_not_support_redrawtabpanel));
 #endif
 
@@ -9286,14 +9286,14 @@ ex_redrawtabpanel(exarg_T *eap UNUSED)
     static void
 close_redir(void)
 {
-    if (redir_fd != NULL)
+    만약 (redir_fd != NULL)
     {
 	fclose(redir_fd);
 	redir_fd = NULL;
     }
 #ifdef FEAT_EVAL
     redir_reg = 0;
-    if (redir_vname)
+    만약 (redir_vname)
     {
 	var_redir_stop();
 	redir_vname = 0;
@@ -9301,16 +9301,16 @@ close_redir(void)
 #endif
 }
 
-#if defined(FEAT_SESSION) || defined(FEAT_EVAL)
-    int
-vim_mkdir_emsg(char_u *name, int prot UNUSED)
+#만약 defined(FEAT_SESSION) || defined(FEAT_EVAL)
+    정수
+vim_mkdir_emsg(char_u *name, 정수 prot UNUSED)
 {
-    if (vim_mkdir(name, prot) != 0)
+    만약 (vim_mkdir(name, prot) != 0)
     {
 	semsg(_(e_cannot_create_directory_str), name);
-	return FAIL;
+	반환 FAIL;
     }
-    return OK;
+    반환 OK;
 }
 #endif
 
@@ -9321,29 +9321,29 @@ vim_mkdir_emsg(char_u *name, int prot UNUSED)
     FILE *
 open_exfile(
     char_u	*fname,
-    int		forceit,
+    정수		forceit,
     char	*mode)	    // "w" for create new file or "a" for append
 {
     FILE	*fd;
 
 #ifdef UNIX
     // with Unix it is possible to open a directory
-    if (mch_isdir(fname))
+    만약 (mch_isdir(fname))
     {
 	semsg(_(e_str_is_directory), fname);
-	return NULL;
+	반환 NULL;
     }
 #endif
-    if (!forceit && *mode != 'a' && vim_fexists(fname))
+    만약 (!forceit && *mode != 'a' && vim_fexists(fname))
     {
 	semsg(_(e_str_exists_add_bang_to_override), fname);
-	return NULL;
+	반환 NULL;
     }
 
-    if ((fd = mch_fopen((char *)fname, mode)) == NULL)
+    만약 ((fd = mch_fopen((char *)fname, mode)) == NULL)
 	semsg(_(e_cannot_open_str_for_writing_2), fname);
 
-    return fd;
+    반환 fd;
 }
 
 /*
@@ -9355,25 +9355,25 @@ ex_mark(exarg_T *eap)
     pos_T	pos;
 
 #ifdef FEAT_EVAL
-    if (not_in_vim9(eap, false) == FAIL)
-	return;
+    만약 (not_in_vim9(eap, false) == FAIL)
+	반환;
 #endif
-    if (*eap->arg == NUL)		// No argument?
+    만약 (*eap->arg == NUL)		// No argument?
     {
 	emsg(_(e_argument_required));
-	return;
+	반환;
     }
 
-    if (eap->arg[1] != NUL)	// more than one character?
+    만약 (eap->arg[1] != NUL)	// more than one character?
     {
 	semsg(_(e_trailing_characters_str), eap->arg);
-	return;
+	반환;
     }
 
     pos = curwin->w_cursor;		// save curwin->w_cursor
     curwin->w_cursor.lnum = eap->line2;
     beginline(BL_WHITE | BL_FIX);
-    if (setmark(*eap->arg) == FAIL)	// set mark
+    만약 (setmark(*eap->arg) == FAIL)	// set mark
 	emsg(_(e_argument_must_be_letter_or_forward_backward_quote));
     curwin->w_cursor = pos;		// restore curwin->w_cursor
 }
@@ -9386,7 +9386,7 @@ update_topline_cursor(void)
 {
     check_cursor();		// put cursor on valid line
     update_topline();
-    if (!curwin->w_p_wrap)
+    만약 (!curwin->w_p_wrap)
 	validate_cursor();
     update_curswant();
 }
@@ -9395,7 +9395,7 @@ update_topline_cursor(void)
  * Save the current State and go to Normal mode.
  * Return TRUE if the typeahead could be saved.
  */
-    int
+    정수
 save_current_state(save_state_T *sst)
 {
     sst->save_msg_scroll = msg_scroll;
@@ -9421,7 +9421,7 @@ save_current_state(save_state_T *sst)
      * ends with half a command.
      */
     save_typeahead(&sst->tabuf);
-    return sst->tabuf.typebuf_valid;
+    반환 sst->tabuf.typebuf_valid;
 }
 
     void
@@ -9456,18 +9456,18 @@ ex_normal(exarg_T *eap)
 {
     save_state_T save_state;
     char_u	*arg = NULL;
-    int		l;
+    정수		l;
     char_u	*p;
 
-    if (ex_normal_lock > 0)
+    만약 (ex_normal_lock > 0)
     {
 	emsg(_(e_not_allowed_here));
-	return;
+	반환;
     }
-    if (ex_normal_busy >= p_mmd)
+    만약 (ex_normal_busy >= p_mmd)
     {
 	emsg(_(e_recursive_use_of_normal_too_deep));
-	return;
+	반환;
     }
 
     /*
@@ -9475,54 +9475,54 @@ ex_normal(exarg_T *eap)
      * this for the K_SPECIAL leading byte, otherwise special keys will not
      * work.
      */
-    if (has_mbyte)
+    만약 (has_mbyte)
     {
-	int	len = 0;
+	정수	len = 0;
 
 	// Count the number of characters to be escaped.
-	for (p = eap->arg; *p != NUL; ++p)
+	위해 (p = eap->arg; *p != NUL; ++p)
 	{
 #ifdef FEAT_GUI
-	    if (*p == CSI)  // leadbyte CSI
+	    만약 (*p == CSI)  // leadbyte CSI
 		len += 2;
 #endif
-	    for (l = (*mb_ptr2len)(p) - 1; l > 0; --l)
-		if (*++p == K_SPECIAL	  // trailbyte K_SPECIAL or CSI
+	    위해 (l = (*mb_ptr2len)(p) - 1; l > 0; --l)
+		만약 (*++p == K_SPECIAL	  // trailbyte K_SPECIAL or CSI
 #ifdef FEAT_GUI
 			|| *p == CSI
 #endif
 			)
 		    len += 2;
 	}
-	if (len > 0)
+	만약 (len > 0)
 	{
 	    arg = alloc(STRLEN(eap->arg) + len + 1);
-	    if (arg != NULL)
+	    만약 (arg != NULL)
 	    {
 		len = 0;
-		for (p = eap->arg; *p != NUL; ++p)
+		위해 (p = eap->arg; *p != NUL; ++p)
 		{
 		    arg[len++] = *p;
 #ifdef FEAT_GUI
-		    if (*p == CSI)
+		    만약 (*p == CSI)
 		    {
 			arg[len++] = KS_EXTRA;
-			arg[len++] = (int)KE_CSI;
+			arg[len++] = (정수)KE_CSI;
 		    }
 #endif
-		    for (l = (*mb_ptr2len)(p) - 1; l > 0; --l)
+		    위해 (l = (*mb_ptr2len)(p) - 1; l > 0; --l)
 		    {
 			arg[len++] = *++p;
-			if (*p == K_SPECIAL)
+			만약 (*p == K_SPECIAL)
 			{
 			    arg[len++] = KS_SPECIAL;
 			    arg[len++] = KE_FILLER;
 			}
 #ifdef FEAT_GUI
-			else if (*p == CSI)
+			아니면 만약 (*p == CSI)
 			{
 			    arg[len++] = KS_EXTRA;
-			    arg[len++] = (int)KE_CSI;
+			    arg[len++] = (정수)KE_CSI;
 			}
 #endif
 		    }
@@ -9533,7 +9533,7 @@ ex_normal(exarg_T *eap)
     }
 
     ++ex_normal_busy;
-    if (save_current_state(&save_state))
+    만약 (save_current_state(&save_state))
     {
 	/*
 	 * Repeat the :normal command for each line in the range.  When no
@@ -9542,7 +9542,7 @@ ex_normal(exarg_T *eap)
 	 */
 	do
 	{
-	    if (eap->addr_count != 0)
+	    만약 (eap->addr_count != 0)
 	    {
 		curwin->w_cursor.lnum = eap->line1++;
 		curwin->w_cursor.col = 0;
@@ -9553,7 +9553,7 @@ ex_normal(exarg_T *eap)
 		     ? arg
 		     : eap->arg, eap->forceit ? REMAP_NONE : REMAP_YES, FALSE);
 	}
-	while (eap->addr_count > 0 && eap->line1 <= eap->line2 && !got_int);
+	동안 (eap->addr_count > 0 && eap->line1 <= eap->line2 && !got_int);
     }
 
     // Might not return to the main loop when in an event handler.
@@ -9577,43 +9577,43 @@ ex_startinsert(exarg_T *eap)
 {
 #ifdef FEAT_TERMINAL
     // Ignore this when running in an active terminal.
-    if (term_job_running(curbuf->b_term))
-	return;
+    만약 (term_job_running(curbuf->b_term))
+	반환;
 #endif
-    if (!curbuf->b_p_ma && !p_im)
+    만약 (!curbuf->b_p_ma && !p_im)
     {
 	// Only give this error when 'insertmode' is off.
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-	return;
+	반환;
     }
-    if (eap->forceit)
+    만약 (eap->forceit)
     {
 	// cursor line can be zero on startup
-	if (!curwin->w_cursor.lnum)
+	만약 (!curwin->w_cursor.lnum)
 	    curwin->w_cursor.lnum = 1;
 	set_cursor_for_append_to_line();
     }
 
     // Ignore the command when already in Insert mode.  Inserting an
     // expression register that invokes a function can do this.
-    if (State & MODE_INSERT)
-	return;
+    만약 (State & MODE_INSERT)
+	반환;
 
-    if (eap->cmdidx == CMD_startinsert)
+    만약 (eap->cmdidx == CMD_startinsert)
 	restart_edit = 'a';
-    else if (eap->cmdidx == CMD_startreplace)
+    아니면 만약 (eap->cmdidx == CMD_startreplace)
 	restart_edit = 'R';
-    else
+    아니면
 	restart_edit = 'V';
 
-    if (!eap->forceit)
+    만약 (!eap->forceit)
     {
-	if (eap->cmdidx == CMD_startinsert)
+	만약 (eap->cmdidx == CMD_startinsert)
 	    restart_edit = 'i';
 	curwin->w_curswant = 0;	    // avoid MAXCOL
     }
 
-    if (VIsual_active)
+    만약 (VIsual_active)
 	showmode();
 }
 
@@ -9625,10 +9625,10 @@ ex_stopinsert(exarg_T *eap UNUSED)
 {
     restart_edit = 0;
     stop_insert_mode = TRUE;
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+#만약 defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
     // when called from remote_expr in insert mode, make sure insert mode is
     // ended by adding K_NOP to the typeahead buffer
-    if (vgetc_busy)
+    만약 (vgetc_busy)
 	ins_char_typebuf(K_NOP, 0);
 #endif
     clearmode();
@@ -9639,7 +9639,7 @@ ex_stopinsert(exarg_T *eap UNUSED)
  * "remap" can be REMAP_NONE or REMAP_YES.
  */
     void
-exec_normal_cmd(char_u *cmd, int remap, int silent)
+exec_normal_cmd(char_u *cmd, 정수 remap, 정수 silent)
 {
     // Stuff the argument into the typeahead buffer.
     ins_typebuf(cmd, remap, 0, TRUE, silent);
@@ -9651,33 +9651,33 @@ exec_normal_cmd(char_u *cmd, int remap, int silent)
  * When "use_vpeekc" is TRUE use vpeekc() to check for available chars.
  */
     void
-exec_normal(int was_typed, int use_vpeekc, int may_use_terminal_loop UNUSED)
+exec_normal(정수 was_typed, 정수 use_vpeekc, 정수 may_use_terminal_loop UNUSED)
 {
     oparg_T	oa;
-    int		c;
+    정수		c;
 
     // When calling vpeekc() from feedkeys() it will return Ctrl_C when there
     // is nothing to get, so also check for Ctrl_C.
     clear_oparg(&oa);
     finish_op = FALSE;
-    while ((!stuff_empty()
+    동안 ((!stuff_empty()
 		|| ((was_typed || !typebuf_typed()) && typebuf.tb_len > 0)
 		|| (use_vpeekc && (c = vpeekc()) != NUL && c != Ctrl_C))
 	    && !got_int)
     {
 	update_topline_cursor();
 #ifdef FEAT_TERMINAL
-	if (may_use_terminal_loop && term_use_loop()
+	만약 (may_use_terminal_loop && term_use_loop()
 		&& oa.op_type == OP_NOP && oa.regname == NUL
 		&& !VIsual_active)
 	{
 	    // If terminal_loop() returns OK we got a key that is handled
 	    // in Normal model.  With FAIL we first need to position the
 	    // cursor and the screen needs to be redrawn.
-	    if (terminal_loop(TRUE) == OK)
+	    만약 (terminal_loop(TRUE) == OK)
 		normal_cmd(&oa, TRUE);
 	}
-	else
+	아니면
 #endif
 	    // execute a Normal mode cmd
 	    normal_cmd(&oa, TRUE);
@@ -9693,7 +9693,7 @@ ex_checkpath(exarg_T *eap)
 	    (linenr_T)1, (linenr_T)MAXLNUM, eap->forceit, FALSE);
 }
 
-# if defined(FEAT_QUICKFIX)
+# 만약 defined(FEAT_QUICKFIX)
 /*
  * ":psearch"
  */
@@ -9709,17 +9709,17 @@ ex_psearch(exarg_T *eap)
     static void
 ex_findpat(exarg_T *eap)
 {
-    int		whole = TRUE;
+    정수		whole = TRUE;
     long	n;
     char_u	*p;
-    int		action;
+    정수		action;
 
     switch (cmdnames[eap->cmdidx].cmd_name[2])
     {
 	case 'e':	// ":psearch", ":isearch" and ":dsearch"
-		if (cmdnames[eap->cmdidx].cmd_name[0] == 'p')
+		만약 (cmdnames[eap->cmdidx].cmd_name[0] == 'p')
 		    action = ACTION_GOTO;
-		else
+		아니면
 		    action = ACTION_SHOW;
 		break;
 	case 'i':	// ":ilist" and ":dlist"
@@ -9734,30 +9734,30 @@ ex_findpat(exarg_T *eap)
     }
 
     n = 1;
-    if (vim_isdigit(*eap->arg))	// get count
+    만약 (vim_isdigit(*eap->arg))	// get count
     {
 	n = getdigits(&eap->arg);
 	eap->arg = skipwhite(eap->arg);
     }
-    if (*eap->arg == '/')   // Match regexp, not just whole words
+    만약 (*eap->arg == '/')   // Match regexp, not just whole words
     {
 	whole = FALSE;
 	++eap->arg;
 	p = skip_regexp(eap->arg, '/', magic_isset());
-	if (*p)
+	만약 (*p)
 	{
 	    *p++ = NUL;
 	    p = skipwhite(p);
 
 	    // Check for trailing illegal characters
-	    if (!ends_excmd2(eap->arg, p))
+	    만약 (!ends_excmd2(eap->arg, p))
 		eap->errmsg = ex_errmsg(e_trailing_characters_str, p);
-	    else
+	    아니면
 		set_nextcmd(eap, p);
 	}
     }
-    if (!eap->skip)
-	find_pattern_in_path(eap->arg, 0, (int)STRLEN(eap->arg),
+    만약 (!eap->skip)
+	find_pattern_in_path(eap->arg, 0, (정수)STRLEN(eap->arg),
 		whole, !eap->forceit,
 		*eap->cmd == 'd' ? FIND_DEFINE : FIND_ANY, n, action,
 		eap->line1, eap->line2, eap->forceit, FALSE);
@@ -9809,8 +9809,8 @@ ex_pbuffer(exarg_T *eap)
     static void
 prepare_preview_window(void)
 {
-    if (ERROR_IF_ANY_POPUP_WINDOW)
-	return;
+    만약 (ERROR_IF_ANY_POPUP_WINDOW)
+	반환;
 
     // Open the preview window or popup and make it the current window.
     g_do_tagpreview = p_pvh;
@@ -9820,7 +9820,7 @@ prepare_preview_window(void)
     static void
 back_to_current_window(win_T *curwin_save)
 {
-    if (curwin != curwin_save && win_valid(curwin_save))
+    만약 (curwin != curwin_save && win_valid(curwin_save))
     {
 	// Return cursor to where we were
 	validate_cursor();
@@ -9828,7 +9828,7 @@ back_to_current_window(win_T *curwin_save)
 	win_enter(curwin_save, TRUE);
     }
 # ifdef FEAT_PROP_POPUP
-    else if (WIN_IS_POPUP(curwin))
+    아니면 만약 (WIN_IS_POPUP(curwin))
     {
 	// can't keep focus in popup window
 	win_enter(firstwin, TRUE);
@@ -9864,7 +9864,7 @@ ex_tag(exarg_T *eap)
     static void
 ex_tag_cmd(exarg_T *eap, char_u *name)
 {
-    int		cmd;
+    정수		cmd;
 
     switch (name[1])
     {
@@ -9887,27 +9887,27 @@ ex_tag_cmd(exarg_T *eap, char_u *name)
 		  break;
 	default:			// ":tag"
 #ifdef FEAT_CSCOPE
-		  if (p_cst && *eap->arg != NUL)
+		  만약 (p_cst && *eap->arg != NUL)
 		  {
 		      ex_cstag(eap);
-		      return;
+		      반환;
 		  }
 #endif
 		  cmd = DT_TAG;
 		  break;
     }
 
-    if (name[0] == 'l')
+    만약 (name[0] == 'l')
     {
 #ifndef FEAT_QUICKFIX
 	ex_ni(eap);
-	return;
-#else
+	반환;
+#아니면
 	cmd = DT_LTAG;
 #endif
     }
 
-    do_tag(eap->arg, cmd, eap->addr_count > 0 ? (int)eap->line2 : 1,
+    do_tag(eap->arg, cmd, eap->addr_count > 0 ? (정수)eap->line2 : 1,
 							  eap->forceit, TRUE);
 }
 
@@ -9937,7 +9937,7 @@ enum {
  * If found return one of the SPEC_ values and set "*usedlen" to the length of
  * the variable.  Otherwise return -1 and "*usedlen" is unchanged.
  */
-    int
+    정수
 find_cmdline_var(char_u *src, size_t *usedlen)
 {
     // must be sorted by the 'value' field because it is used by bsearch()!
@@ -9966,11 +9966,11 @@ find_cmdline_var(char_u *src, size_t *usedlen)
     {
     case '%':
 	*usedlen = 1;
-	return SPEC_PERC;
+	반환 SPEC_PERC;
 
     case '#':
 	*usedlen = 1;
-	return SPEC_HASH;
+	반환 SPEC_HASH;
 
     case '<':
 	target.key = 0;
@@ -9980,17 +9980,17 @@ find_cmdline_var(char_u *src, size_t *usedlen)
 	entry = (keyvalue_T *)bsearch(&target, &spec_str_tab,
 		ARRAY_LENGTH(spec_str_tab), sizeof(spec_str_tab[0]),
 		cmp_keyvalue_value_n);
-	if (entry == NULL)
-	    return -1;
+	만약 (entry == NULL)
+	    반환 -1;
 
 	*usedlen = entry->value.length + 1;
-	return entry->key;
+	반환 entry->key;
 
     default:
 	break;
     }
 
-    return -1;
+    반환 -1;
 }
 
 /*
@@ -10024,61 +10024,61 @@ eval_vars(
     size_t	*usedlen,	// characters after src that are used
     linenr_T	*lnump,		// line number for :e command, or NULL
     char	**errormsg,	// pointer to error message
-    int		*escaped,	// return value has escaped white space (can
+    정수		*escaped,	// return value has escaped white space (can
 				// be NULL)
-    int		empty_is_error)	// empty result is considered an error
+    정수		empty_is_error)	// empty result is considered an error
 {
-    int		i;
+    정수		i;
     char_u	*s;
     char_u	*result = (char_u *)"";
     char_u	*resultbuf = NULL;
     size_t	resultlen;
     buf_T	*buf;
-    int		valid = VALID_HEAD + VALID_PATH;    // assume valid result
-    int		spec_idx;
-    int		tilde_file = FALSE;
-    int		skip_mod = FALSE;
+    정수		valid = VALID_HEAD + VALID_PATH;    // assume valid result
+    정수		spec_idx;
+    정수		tilde_file = FALSE;
+    정수		skip_mod = FALSE;
     char_u	strbuf[30];
 
     *errormsg = NULL;
-    if (escaped != NULL)
+    만약 (escaped != NULL)
 	*escaped = FALSE;
 
     /*
      * Check if there is something to do.
      */
     spec_idx = find_cmdline_var(src, usedlen);
-    if (spec_idx < 0)	// no match
+    만약 (spec_idx < 0)	// no match
     {
 	*usedlen = 1;
-	return NULL;
+	반환 NULL;
     }
 
     /*
      * Skip when preceded with a backslash "\%" and "\#".
      * Note: In "\\%" the % is also not recognized!
      */
-    if (src > srcstart && src[-1] == '\\')
+    만약 (src > srcstart && src[-1] == '\\')
     {
 	*usedlen = 0;
 	STRMOVE(src - 1, src);	// remove backslash
-	return NULL;
+	반환 NULL;
     }
 
     /*
      * word or WORD under cursor
      */
-    if (spec_idx == SPEC_CWORD || spec_idx == SPEC_CCWORD
+    만약 (spec_idx == SPEC_CWORD || spec_idx == SPEC_CCWORD
 						     || spec_idx == SPEC_CEXPR)
     {
 	resultlen = find_ident_under_cursor(&result,
 		spec_idx == SPEC_CWORD ? (FIND_IDENT | FIND_STRING)
 	      : spec_idx == SPEC_CEXPR ? (FIND_IDENT | FIND_STRING | FIND_EVAL)
 	      : FIND_STRING);
-	if (resultlen == 0)
+	만약 (resultlen == 0)
 	{
 	    *errormsg = "";
-	    return NULL;
+	    반환 NULL;
 	}
     }
 
@@ -10089,7 +10089,7 @@ eval_vars(
      *	    File name for autocommand
      *	and following modifiers
      */
-    else
+    아니면
     {
 	size_t off = 0;
 
@@ -10097,16 +10097,16 @@ eval_vars(
 	{
 	case SPEC_PERC:
 #ifdef FEAT_EVAL
-		if (!in_vim9script() || src[1] != '%')
+		만약 (!in_vim9script() || src[1] != '%')
 #endif
 		{
 		    // '%': current file
-		    if (curbuf->b_fname == NULL)
+		    만약 (curbuf->b_fname == NULL)
 		    {
 			result = (char_u *)"";
 			valid = 0;	    // Must have ":p:h" to be valid
 		    }
-		    else
+		    아니면
 		    {
 			result = curbuf->b_fname;
 			tilde_file = STRCMP(result, "~") == 0;
@@ -10119,65 +10119,65 @@ eval_vars(
 #endif
 		// FALLTHROUGH
 	case SPEC_HASH:		// '#' or "#99": alternate file
-		if (off == 0 ? src[1] == '#' : src[2] == '%')
+		만약 (off == 0 ? src[1] == '#' : src[2] == '%')
 		{
 		    // "##" or "%%%": the argument list
 		    result = arg_all();
 		    resultbuf = result;
 		    *usedlen = off + 2;
-		    if (escaped != NULL)
+		    만약 (escaped != NULL)
 			*escaped = TRUE;
 		    skip_mod = TRUE;
 		    break;
 		}
 		s = src + off + 1;
-		if (*s == '<')		// "#<99" uses v:oldfiles
+		만약 (*s == '<')		// "#<99" uses v:oldfiles
 		    ++s;
-		i = (int)getdigits(&s);
-		if (s == src + off + 2 && src[off + 1] == '-')
+		i = (정수)getdigits(&s);
+		만약 (s == src + off + 2 && src[off + 1] == '-')
 		    // just a minus sign, don't skip over it
 		    s--;
-		*usedlen = (int)(s - src); // length of what we expand
+		*usedlen = (정수)(s - src); // length of what we expand
 
-		if (src[off + 1] == '<' && i != 0)
+		만약 (src[off + 1] == '<' && i != 0)
 		{
-		    if (*usedlen < off + 2)
+		    만약 (*usedlen < off + 2)
 		    {
 			// Should we give an error message for #<text?
 			*usedlen = off + 1;
-			return NULL;
+			반환 NULL;
 		    }
 #ifdef FEAT_EVAL
 		    result = list_find_str(get_vim_var_list(VV_OLDFILES),
 								     (long)i);
-		    if (result == NULL)
+		    만약 (result == NULL)
 		    {
 			*errormsg = "";
-			return NULL;
+			반환 NULL;
 		    }
-#else
+#아니면
 		    *errormsg = _(e_hashsmall_is_not_available_without_the_eval_feature);
-		    return NULL;
+		    반환 NULL;
 #endif
 		}
-		else
+		아니면
 		{
-		    if (i == 0 && src[off + 1] == '<' && *usedlen > off + 1)
+		    만약 (i == 0 && src[off + 1] == '<' && *usedlen > off + 1)
 			*usedlen = off + 1;
 		    buf = buflist_findnr(i);
-		    if (buf == NULL)
+		    만약 (buf == NULL)
 		    {
 			*errormsg = _(e_no_alternate_file_name_to_substitute_for_hash);
-			return NULL;
+			반환 NULL;
 		    }
-		    if (lnump != NULL)
+		    만약 (lnump != NULL)
 			*lnump = ECMD_LAST;
-		    if (buf->b_fname == NULL)
+		    만약 (buf->b_fname == NULL)
 		    {
 			result = (char_u *)"";
 			valid = 0;	    // Must have ":p:h" to be valid
 		    }
-		    else
+		    아니면
 		    {
 			result = buf->b_fname;
 			tilde_file = STRCMP(result, "~") == 0;
@@ -10187,17 +10187,17 @@ eval_vars(
 
 	case SPEC_CFILE:	// file name under cursor
 		result = file_name_at_cursor(FNAME_MESS|FNAME_HYP, 1L, NULL);
-		if (result == NULL)
+		만약 (result == NULL)
 		{
 		    *errormsg = "";
-		    return NULL;
+		    반환 NULL;
 		}
 		resultbuf = result;	    // remember allocated string
 		break;
 
 	case SPEC_AFILE:	// file name for autocommand
 		result = autocmd_fname;
-		if (result != NULL && !autocmd_fname_full)
+		만약 (result != NULL && !autocmd_fname_full)
 		{
 		    // Still need to turn the fname into a full path.  It is
 		    // postponed to avoid a delay when <afile> is not used.
@@ -10206,19 +10206,19 @@ eval_vars(
 		    vim_free(autocmd_fname);
 		    autocmd_fname = result;
 		}
-		if (result == NULL)
+		만약 (result == NULL)
 		{
 		    *errormsg = _(e_no_autocommand_file_name_to_substitute_for_afile);
-		    return NULL;
+		    반환 NULL;
 		}
 		result = shorten_fname1(result);
 		break;
 
 	case SPEC_ABUF:		// buffer number for autocommand
-		if (autocmd_bufnr <= 0)
+		만약 (autocmd_bufnr <= 0)
 		{
 		    *errormsg = _(e_no_autocommand_buffer_number_to_substitute_for_abuf);
-		    return NULL;
+		    반환 NULL;
 		}
 		sprintf((char *)strbuf, "%d", autocmd_bufnr);
 		result = strbuf;
@@ -10226,46 +10226,46 @@ eval_vars(
 
 	case SPEC_AMATCH:	// match name for autocommand
 		result = autocmd_match;
-		if (result == NULL)
+		만약 (result == NULL)
 		{
 		    *errormsg = _(e_no_autocommand_match_name_to_substitute_for_amatch);
-		    return NULL;
+		    반환 NULL;
 		}
 		break;
 
 	case SPEC_SFILE:	// file name for ":so" command
 		result = estack_sfile(ESTACK_SFILE);
-		if (result == NULL)
+		만약 (result == NULL)
 		{
 		    *errormsg = _(e_no_source_file_name_to_substitute_for_sfile);
-		    return NULL;
+		    반환 NULL;
 		}
 		resultbuf = result;	    // remember allocated string
 		break;
 	case SPEC_STACK:	// call stack
 		result = estack_sfile(ESTACK_STACK);
-		if (result == NULL)
+		만약 (result == NULL)
 		{
 		    *errormsg = _(e_no_call_stack_to_substitute_for_stack);
-		    return NULL;
+		    반환 NULL;
 		}
 		resultbuf = result;	    // remember allocated string
 		break;
 	case SPEC_SCRIPT:	// script file name
 		result = estack_sfile(ESTACK_SCRIPT);
-		if (result == NULL)
+		만약 (result == NULL)
 		{
 		    *errormsg = _(e_no_script_file_name_to_substitute_for_script);
-		    return NULL;
+		    반환 NULL;
 		}
 		resultbuf = result;	    // remember allocated string
 		break;
 
 	case SPEC_SLNUM:	// line in file for ":so" command
-		if (SOURCING_NAME == NULL || SOURCING_LNUM == 0)
+		만약 (SOURCING_NAME == NULL || SOURCING_LNUM == 0)
 		{
 		    *errormsg = _(e_no_line_number_to_use_for_slnum);
-		    return NULL;
+		    반환 NULL;
 		}
 		sprintf((char *)strbuf, "%ld", SOURCING_LNUM);
 		result = strbuf;
@@ -10273,10 +10273,10 @@ eval_vars(
 
 #ifdef FEAT_EVAL
 	case SPEC_SFLNUM:	// line in script file
-		if (current_sctx.sc_lnum + SOURCING_LNUM == 0)
+		만약 (current_sctx.sc_lnum + SOURCING_LNUM == 0)
 		{
 		    *errormsg = _(e_no_line_number_to_use_for_sflnum);
-		    return NULL;
+		    반환 NULL;
 		}
 		sprintf((char *)strbuf, "%ld",
 				 (long)(current_sctx.sc_lnum + SOURCING_LNUM));
@@ -10284,10 +10284,10 @@ eval_vars(
 		break;
 
 	case SPEC_SID:
-		if (current_sctx.sc_sid <= 0)
+		만약 (current_sctx.sc_sid <= 0)
 		{
 		    *errormsg = _(e_using_sid_not_in_script_context);
-		    return NULL;
+		    반환 NULL;
 		}
 		sprintf((char *)strbuf, "<SNR>%d_", current_sctx.sc_sid);
 		result = strbuf;
@@ -10300,18 +10300,18 @@ eval_vars(
 		sprintf((char *)strbuf, PRINTF_HEX_LONG_U,
 							(long_u)clientWindow);
 		result = strbuf;
-# else
+# 아니면
 #  ifdef FEAT_SOCKETSERVER
-		if (clientserver_method == CLIENTSERVER_METHOD_SOCKET)
+		만약 (clientserver_method == CLIENTSERVER_METHOD_SOCKET)
 		{
-		    if (client_socket == NULL)
+		    만약 (client_socket == NULL)
 			result = (char_u *)"";
-		    else
+		    아니면
 			result = client_socket;
 		}
 #  endif
 #  ifdef FEAT_X11
-		if (clientserver_method == CLIENTSERVER_METHOD_X11)
+		만약 (clientserver_method == CLIENTSERVER_METHOD_X11)
 		{
 		    sprintf((char *)strbuf, PRINTF_HEX_LONG_U,
 							(long_u)clientWindow);
@@ -10324,39 +10324,39 @@ eval_vars(
 	}
 
 	resultlen = STRLEN(result);	// length of new string
-	if (src[*usedlen] == '<')	// remove the file name extension
+	만약 (src[*usedlen] == '<')	// remove the file name extension
 	{
 	    ++*usedlen;
-	    if ((s = vim_strrchr(result, '.')) != NULL && s >= gettail(result))
+	    만약 ((s = vim_strrchr(result, '.')) != NULL && s >= gettail(result))
 		resultlen = s - result;
 	}
-	else if (!skip_mod)
+	아니면 만약 (!skip_mod)
 	{
 	    valid |= modify_fname(src, tilde_file, usedlen, &result, &resultbuf,
 								  &resultlen);
-	    if (result == NULL)
+	    만약 (result == NULL)
 	    {
 		*errormsg = "";
-		return NULL;
+		반환 NULL;
 	    }
 	}
     }
 
-    if (resultlen == 0 || valid != VALID_HEAD + VALID_PATH)
+    만약 (resultlen == 0 || valid != VALID_HEAD + VALID_PATH)
     {
-	if (empty_is_error)
+	만약 (empty_is_error)
 	{
-	    if (valid != VALID_HEAD + VALID_PATH)
+	    만약 (valid != VALID_HEAD + VALID_PATH)
 		*errormsg = _(e_empty_file_name_for_percent_or_hash_only_works_with_ph);
-	    else
+	    아니면
 		*errormsg = _(e_evaluates_to_an_empty_string);
 	}
 	result = NULL;
     }
-    else
+    아니면
 	result = vim_strnsave(result, resultlen);
     vim_free(resultbuf);
-    return result;
+    반환 result;
 }
 
 /*
@@ -10379,25 +10379,25 @@ expand_sfile(char_u *arg)
 
     resultlen = STRLEN(arg);
     result = vim_strnsave(arg, resultlen);
-    if (result == NULL)
-	return NULL;
+    만약 (result == NULL)
+	반환 NULL;
 
-    for (p = result; *p; )
+    위해 (p = result; *p; )
     {
-	if (STRNCMP(p, "<sfile>", 7) != 0)
+	만약 (STRNCMP(p, "<sfile>", 7) != 0)
 	    ++p;
-	else
+	아니면
 	{
 	    // replace "<sfile>" with the sourced file name, and do ":" stuff
 	    repl = eval_vars(p, result, &srclen, NULL, &errormsg, NULL, TRUE);
-	    if (errormsg != NULL)
+	    만약 (errormsg != NULL)
 	    {
-		if (*errormsg)
+		만약 (*errormsg)
 		    emsg(errormsg);
 		vim_free(result);
-		return NULL;
+		반환 NULL;
 	    }
-	    if (repl == NULL)		// no match (cannot happen)
+	    만약 (repl == NULL)		// no match (cannot happen)
 	    {
 		p += srclen;
 		continue;
@@ -10405,11 +10405,11 @@ expand_sfile(char_u *arg)
 	    repllen = STRLEN(repl);
 	    resultlen += repllen - srclen;
 	    newres = alloc(resultlen + 1);
-	    if (newres == NULL)
+	    만약 (newres == NULL)
 	    {
 		vim_free(repl);
 		vim_free(result);
-		return NULL;
+		반환 NULL;
 	    }
 	    len = p - result;
 	    mch_memmove(newres, result, len);
@@ -10423,10 +10423,10 @@ expand_sfile(char_u *arg)
 	}
     }
 
-    return result;
+    반환 result;
 }
 
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#만약 defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
 /*
  * Make a dialog message in "buff[DIALOG_MSG_SIZE]".
  * "format" must contain "%s".
@@ -10434,7 +10434,7 @@ expand_sfile(char_u *arg)
     void
 dialog_msg(char_u *buff, char *format, char_u *fname)
 {
-    if (fname == NULL)
+    만약 (fname == NULL)
 	fname = (char_u *)_("Untitled");
     vim_snprintf((char *)buff, DIALOG_MSG_SIZE, format, fname);
 }
@@ -10446,7 +10446,7 @@ dialog_msg(char_u *buff, char *format, char_u *fname)
     static void
 ex_behave(exarg_T *eap)
 {
-    if (STRCMP(eap->arg, "mswin") == 0)
+    만약 (STRCMP(eap->arg, "mswin") == 0)
     {
 	set_option_value_give_err((char_u *)"selection",
 						 0L, (char_u *)"exclusive", 0);
@@ -10457,7 +10457,7 @@ ex_behave(exarg_T *eap)
 	set_option_value_give_err((char_u *)"keymodel",
 					  0L, (char_u *)"startsel,stopsel", 0);
     }
-    else if (STRCMP(eap->arg, "xterm") == 0)
+    아니면 만약 (STRCMP(eap->arg, "xterm") == 0)
     {
 	set_option_value_give_err((char_u *)"selection",
 						 0L, (char_u *)"inclusive", 0);
@@ -10466,13 +10466,13 @@ ex_behave(exarg_T *eap)
 						    0L, (char_u *)"extend", 0);
 	set_option_value_give_err((char_u *)"keymodel", 0L, (char_u *)"", 0);
     }
-    else
+    아니면
 	semsg(_(e_invalid_argument_str), eap->arg);
 }
 
-static int filetype_detect = FALSE;
-static int filetype_plugin = FALSE;
-static int filetype_indent = FALSE;
+static 정수 filetype_detect = FALSE;
+static 정수 filetype_plugin = FALSE;
+static 정수 filetype_indent = FALSE;
 
 /*
  * ":filetype [plugin] [indent] {on,off,detect}"
@@ -10487,29 +10487,29 @@ static int filetype_indent = FALSE;
 ex_filetype(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
-    int		plugin = FALSE;
-    int		indent = FALSE;
+    정수		plugin = FALSE;
+    정수		indent = FALSE;
 
-    if (*eap->arg == NUL)
+    만약 (*eap->arg == NUL)
     {
 	// Print current status.
 	smsg("filetype detection:%s  plugin:%s  indent:%s",
 		filetype_detect ? "ON" : "OFF",
 		filetype_plugin ? (filetype_detect ? "ON" : "(on)") : "OFF",
 		filetype_indent ? (filetype_detect ? "ON" : "(on)") : "OFF");
-	return;
+	반환;
     }
 
     // Accept "plugin" and "indent" in any order.
-    for (;;)
+    위해 (;;)
     {
-	if (STRNCMP(arg, "plugin", 6) == 0)
+	만약 (STRNCMP(arg, "plugin", 6) == 0)
 	{
 	    plugin = TRUE;
 	    arg = skipwhite(arg + 6);
 	    continue;
 	}
-	if (STRNCMP(arg, "indent", 6) == 0)
+	만약 (STRNCMP(arg, "indent", 6) == 0)
 	{
 	    indent = TRUE;
 	    arg = skipwhite(arg + 6);
@@ -10517,51 +10517,51 @@ ex_filetype(exarg_T *eap)
 	}
 	break;
     }
-    if (STRCMP(arg, "on") == 0 || STRCMP(arg, "detect") == 0)
+    만약 (STRCMP(arg, "on") == 0 || STRCMP(arg, "detect") == 0)
     {
-	if (*arg == 'o' || !filetype_detect)
+	만약 (*arg == 'o' || !filetype_detect)
 	{
 	    source_runtime((char_u *)FILETYPE_FILE, DIP_ALL);
 	    filetype_detect = TRUE;
-	    if (plugin)
+	    만약 (plugin)
 	    {
 		source_runtime((char_u *)FTPLUGIN_FILE, DIP_ALL);
 		filetype_plugin = TRUE;
 	    }
-	    if (indent)
+	    만약 (indent)
 	    {
 		source_runtime((char_u *)INDENT_FILE, DIP_ALL);
 		filetype_indent = TRUE;
 	    }
 	}
-	if (*arg == 'd')
+	만약 (*arg == 'd')
 	{
 	    (void)do_doautocmd((char_u *)"filetypedetect BufRead", TRUE, NULL);
 	    do_modelines(0);
 	}
     }
-    else if (STRCMP(arg, "off") == 0)
+    아니면 만약 (STRCMP(arg, "off") == 0)
     {
-	if (plugin || indent)
+	만약 (plugin || indent)
 	{
-	    if (plugin)
+	    만약 (plugin)
 	    {
 		source_runtime((char_u *)FTPLUGOF_FILE, DIP_ALL);
 		filetype_plugin = FALSE;
 	    }
-	    if (indent)
+	    만약 (indent)
 	    {
 		source_runtime((char_u *)INDOFF_FILE, DIP_ALL);
 		filetype_indent = FALSE;
 	    }
 	}
-	else
+	아니면
 	{
 	    source_runtime((char_u *)FTOFF_FILE, DIP_ALL);
 	    filetype_detect = FALSE;
 	}
     }
-    else
+    아니면
 	semsg(_(e_invalid_argument_str), arg);
 }
 
@@ -10571,15 +10571,15 @@ ex_filetype(exarg_T *eap)
     static void
 ex_setfiletype(exarg_T *eap)
 {
-    if (curbuf->b_did_filetype)
-	return;
+    만약 (curbuf->b_did_filetype)
+	반환;
 
     char_u *arg = eap->arg;
-    if (STRNCMP(arg, "FALLBACK ", 9) == 0)
+    만약 (STRNCMP(arg, "FALLBACK ", 9) == 0)
 	arg += 9;
 
     set_option_value_give_err((char_u *)"filetype", 0L, arg, OPT_LOCAL);
-    if (arg != eap->arg)
+    만약 (arg != eap->arg)
 	curbuf->b_did_filetype = false;
 }
 
@@ -10587,18 +10587,18 @@ ex_setfiletype(exarg_T *eap)
 ex_digraphs(exarg_T *eap UNUSED)
 {
 #ifdef FEAT_DIGRAPHS
-    if (*eap->arg != NUL)
+    만약 (*eap->arg != NUL)
 	putdigraph(eap->arg);
-    else
+    아니면
 	listdigraphs(eap->forceit);
-#else
+#아니면
     emsg(_(e_no_digraphs_version));
 #endif
 }
 
-#if defined(FEAT_SEARCH_EXTRA)
+#만약 defined(FEAT_SEARCH_EXTRA)
     void
-set_no_hlsearch(int flag)
+set_no_hlsearch(정수 flag)
 {
     no_hlsearch = flag;
 # ifdef FEAT_EVAL
@@ -10633,7 +10633,7 @@ ex_X(exarg_T *eap UNUSED)
     static void
 ex_fold(exarg_T *eap)
 {
-    if (foldManualAllowed(TRUE))
+    만약 (foldManualAllowed(TRUE))
 	foldCreate(eap->line1, eap->line2);
 }
 
@@ -10657,8 +10657,8 @@ ex_folddo(exarg_T *eap)
 # endif
 
     // First set the marks for all lines closed/open.
-    for (lnum = eap->line1; lnum <= eap->line2; ++lnum)
-	if (hasFolding(lnum, NULL, NULL) == (eap->cmdidx == CMD_folddoclosed))
+    위해 (lnum = eap->line1; lnum <= eap->line2; ++lnum)
+	만약 (hasFolding(lnum, NULL, NULL) == (eap->cmdidx == CMD_folddoclosed))
 	    ml_setmarked(lnum);
 
     // Execute the command on the marked lines.
@@ -10673,28 +10673,28 @@ ex_folddo(exarg_T *eap)
 }
 #endif
 
-#if defined(FEAT_QUICKFIX)
+#만약 defined(FEAT_QUICKFIX)
 /*
  * Returns TRUE if the supplied Ex cmdidx is for a location list command
  * instead of a quickfix command.
  */
-    int
-is_loclist_cmd(int cmdidx)
+    정수
+is_loclist_cmd(정수 cmdidx)
 {
-    if (cmdidx < 0 || cmdidx >= CMD_SIZE)
-	return FALSE;
-    return cmdnames[cmdidx].cmd_name[0] == 'l';
+    만약 (cmdidx < 0 || cmdidx >= CMD_SIZE)
+	반환 FALSE;
+    반환 cmdnames[cmdidx].cmd_name[0] == 'l';
 }
 #endif
 
-    int
+    정수
 get_pressedreturn(void)
 {
-    return ex_pressedreturn;
+    반환 ex_pressedreturn;
 }
 
     void
-set_pressedreturn(int val)
+set_pressedreturn(정수 val)
 {
     ex_pressedreturn = val;
 }
