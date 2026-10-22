@@ -87,25 +87,25 @@
  */
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if _MSC_VER >= 1400
+#എങ്കിൽ _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
 #endif
-#if !defined(CYGWIN) && defined(__CYGWIN__)
+#എങ്കിൽ !defined(CYGWIN) && defined(__CYGWIN__)
 # define CYGWIN
 #endif
 
-#if (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
+#എങ്കിൽ (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
 # define _XOPEN_SOURCE 700   /* for fdopen() */
 #endif
 
-#include <stdio.h>
+#അന്തര്ഭാവ <stdio.h>
 #ifdef VAXC
 # include <file.h>
-#else
+#അല്ലെങ്കിൽ
 # include <fcntl.h>
 #endif
-#if defined(WIN32) || defined(CYGWIN)
+#എങ്കിൽ defined(WIN32) || defined(CYGWIN)
 # include <io.h>	/* for setmode() */
 #endif
 #ifdef WIN32
@@ -114,11 +114,11 @@
 #ifdef UNIX
 # include <unistd.h>
 #endif
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <limits.h>
-#if __MWERKS__ && !defined(BEBOX)
+#അന്തര്ഭാവ <stdlib.h>
+#അന്തര്ഭാവ <string.h>
+#അന്തര്ഭാവ <ctype.h>
+#അന്തര്ഭാവ <limits.h>
+#എങ്കിൽ __MWERKS__ && !defined(BEBOX)
 # include <unix.h>	/* for fdopen() on MAC */
 #endif
 
@@ -127,7 +127,7 @@
  *  in some GNU installations (e.g. SunOS 4.1.x).
  *  Darren Hiebert <darren@hmi.com> (sparc-sun-sunos4.1.3_U1/2.7.2.2)
  */
-#if defined(__GNUC__) && defined(__STDC__)
+#എങ്കിൽ defined(__GNUC__) && defined(__STDC__)
 # ifndef __USE_FIXED_PROTOTYPES__
 #  define __USE_FIXED_PROTOTYPES__
 # endif
@@ -141,42 +141,42 @@
  * FILE is defined on OS 4.x, not on 5.x (Solaris).
  * if __SVR4 is defined (some Solaris versions), don't include this.
  */
-# if defined(sun) && defined(FILE) && !defined(__SVR4) && defined(__STDC__)
+# എങ്കിൽ defined(sun) && defined(FILE) && !defined(__SVR4) && defined(__STDC__)
 #  define __P(a) a
 /* excerpt from my sun_stdlib.h */
-extern int fprintf __P((FILE *, char *, ...));
-extern int fputs   __P((char *, FILE *));
-extern int _flsbuf __P((unsigned char, FILE *));
-extern int _filbuf __P((FILE *));
-extern int fflush  __P((FILE *));
-extern int fclose  __P((FILE *));
-extern int fseek   __P((FILE *, long, int));
-extern int rewind  __P((FILE *));
+ബാഹ്യ പൂർണ്ണസംഖ്യ fprintf __P((FILE *, അക്ഷരം *, ...));
+ബാഹ്യ പൂർണ്ണസംഖ്യ fputs   __P((അക്ഷരം *, FILE *));
+ബാഹ്യ പൂർണ്ണസംഖ്യ _flsbuf __P((unsigned അക്ഷരം, FILE *));
+ബാഹ്യ പൂർണ്ണസംഖ്യ _filbuf __P((FILE *));
+ബാഹ്യ പൂർണ്ണസംഖ്യ fflush  __P((FILE *));
+ബാഹ്യ പൂർണ്ണസംഖ്യ fclose  __P((FILE *));
+ബാഹ്യ പൂർണ്ണസംഖ്യ fseek   __P((FILE *, long, പൂർണ്ണസംഖ്യ));
+ബാഹ്യ പൂർണ്ണസംഖ്യ rewind  __P((FILE *));
 
-extern void perror __P((char *));
+ബാഹ്യ ശൂന്യം perror __P((അക്ഷരം *));
 # endif
 #endif
 
-char version[] = "xxd 2026-06-16 by Juergen Weigert et al.";
+അക്ഷരം version[] = "xxd 2026-06-16 by Juergen Weigert et al.";
 #ifdef WIN32
-char osver[] = " (Win32)";
-#else
-char osver[] = "";
+അക്ഷരം osver[] = " (Win32)";
+#അല്ലെങ്കിൽ
+അക്ഷരം osver[] = "";
 #endif
 
-#if defined(WIN32)
+#എങ്കിൽ defined(WIN32)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "wt")
-# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
-# define BIN_ASSIGN(fp, yes) setmode(fileno(fp), (yes) ? O_BINARY : O_TEXT)
+# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_ദ്വിമാന) : O_CREAT)
+# define BIN_ASSIGN(fp, yes) setmode(fileno(fp), (yes) ? O_ദ്വിമാന : O_TEXT)
 # define PATH_SEP '\\'
-#elif defined(CYGWIN)
+#അല്ലെങ്കിലെങ്കിൽ defined(CYGWIN)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "w")
-# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
-# define BIN_ASSIGN(fp, yes) ((yes) ? (void) setmode(fileno(fp), O_BINARY) : (void) (fp))
+# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_ദ്വിമാന) : O_CREAT)
+# define BIN_ASSIGN(fp, yes) ((yes) ? (ശൂന്യം) setmode(fileno(fp), O_ദ്വിമാന) : (ശൂന്യം) (fp))
 # define PATH_SEP '/'
-#else
+#അല്ലെങ്കിൽ
 # ifdef VMS
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
@@ -184,7 +184,7 @@ char osver[] = "";
 #  define BIN_ASSIGN(fp, dummy) fp
 #  define PATH_SEP ']'
 #  define FILE_SEP '.'
-# else
+# അല്ലെങ്കിൽ
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
 #  define BIN_CREAT(dummy) O_CREAT
@@ -194,22 +194,22 @@ char osver[] = "";
 #endif
 
 /* open has only to arguments on the Mac */
-#if __MWERKS__
+#എങ്കിൽ __MWERKS__
 # define OPEN(name, mode, umask) open(name, mode)
-#else
+#അല്ലെങ്കിൽ
 # define OPEN(name, mode, umask) open(name, mode, umask)
 #endif
 
 #ifdef AMIGA
 # define STRNCMP(s1, s2, l) strncmp(s1, s2, (size_t)l)
-#else
+#അല്ലെങ്കിൽ
 # define STRNCMP(s1, s2, l) strncmp(s1, s2, l)
 #endif
 
 #ifndef __P
-# if defined(__STDC__) || defined(WIN32)
+# എങ്കിൽ defined(__STDC__) || defined(WIN32)
 #  define __P(a) a
-# else
+# അല്ലെങ്കിൽ
 #  define __P(a) ()
 # endif
 #endif
@@ -242,7 +242,7 @@ char osver[] = "";
     + COLS         /* ASCII dump */ \
     + 2)           /* "\n\0" */
 
-char hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
+അക്ഷരം hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
 
 /* the different hextypes known by this program: */
 #define HEX_NORMAL         0x00 /* no flags set */
@@ -251,7 +251,7 @@ char hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
 #define HEX_BITS           0x04 /* not hex a dump, but bits: 01111001 */
 #define HEX_LITTLEENDIAN   0x08
 
-#define CONDITIONAL_CAPITALIZE(c) (capitalize ? toupper((unsigned char)(c)) : (c))
+#define CONDITIONAL_CAPITALIZE(c) (capitalize ? toupper((unsigned അക്ഷരം)(c)) : (c))
 
 #define COLOR_PROLOGUE(color) \
 l_colored[c++] = '\033'; \
@@ -273,10 +273,10 @@ l_colored[c++] = 'm';
 #define COLOR_BLUE '4'
 #define COLOR_WHITE '7'
 
-static char *pname;
+സ്ഥിതം അക്ഷരം *pname;
 
-  static void
-exit_with_usage(void)
+  സ്ഥിതം ശൂന്യം
+exit_with_usage(ശൂന്യം)
 {
   fprintf(stderr, "Usage:\n       %s [options] [infile [outfile]]\n", pname);
   fprintf(stderr, "    or\n       %s -r [-s [-]offset] [-c cols] [-ps] [infile [outfile]]\n", pname);
@@ -301,7 +301,7 @@ exit_with_usage(void)
   fprintf(stderr, "    -s %sseek  start at <seek> bytes abs. %sinfile offset.\n",
 #ifdef TRY_SEEK
 	  "[+][-]", "(or +: rel.) ");
-#else
+#അല്ലെങ്കിൽ
 	  "", "");
 #endif
   fprintf(stderr, "    -u          use upper case hex letters.\n"
@@ -310,53 +310,53 @@ exit_with_usage(void)
   exit(1);
 }
 
-  static void
-perror_exit(int ret)
+  സ്ഥിതം ശൂന്യം
+perror_exit(പൂർണ്ണസംഖ്യ ret)
 {
   fprintf(stderr, "%s: ", pname);
-  perror(NULL);
+  perror(ശൂന്യ);
   exit(ret);
 }
 
-  static void
-error_exit(int ret, char *msg)
+  സ്ഥിതം ശൂന്യം
+error_exit(പൂർണ്ണസംഖ്യ ret, അക്ഷരം *സന്ദേശം)
 {
-  fprintf(stderr, "%s: %s\n", pname, msg);
+  fprintf(stderr, "%s: %s\n", pname, സന്ദേശം);
   exit(ret);
 }
 
-  static int
+  സ്ഥിതം പൂർണ്ണസംഖ്യ
 getc_or_die(FILE *fpi)
 {
-  int c = getc(fpi);
-  if (c == EOF && ferror(fpi))
+  പൂർണ്ണസംഖ്യ c = getc(fpi);
+  എങ്കിൽ (c == EOF && ferror(fpi))
     perror_exit(2);
-  return c;
+  തിരികെ c;
 }
 
-  static void
-putc_or_die(int c, FILE *fpo)
+  സ്ഥിതം ശൂന്യം
+putc_or_die(പൂർണ്ണസംഖ്യ c, FILE *fpo)
 {
-  if (putc(c, fpo) == EOF)
+  എങ്കിൽ (putc(c, fpo) == EOF)
     perror_exit(3);
 }
 
-  static void
-fputs_or_die(char *s, FILE *fpo)
+  സ്ഥിതം ശൂന്യം
+fputs_or_die(അക്ഷരം *s, FILE *fpo)
 {
-  if (fputs(s, fpo) == EOF)
+  എങ്കിൽ (fputs(s, fpo) == EOF)
     perror_exit(3);
 }
 
 /* Use a macro to allow for different arguments. */
-#define FPRINTF_OR_DIE(args) if (fprintf args < 0) perror_exit(3)
+#define FPRINTF_OR_DIE(args) എങ്കിൽ (fprintf args < 0) perror_exit(3)
 
-  static void
+  സ്ഥിതം ശൂന്യം
 fclose_or_die(FILE *fpi, FILE *fpo)
 {
-  if (fclose(fpo) != 0)
+  എങ്കിൽ (fclose(fpo) != 0)
     perror_exit(3);
-  if (fclose(fpi) != 0)
+  എങ്കിൽ (fclose(fpi) != 0)
     perror_exit(2);
 }
 
@@ -364,10 +364,10 @@ fclose_or_die(FILE *fpi, FILE *fpo)
  * If "c" is a hex digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_hex_digit(int c)
+  സ്ഥിതം പൂർണ്ണസംഖ്യ
+parse_hex_digit(പൂർണ്ണസംഖ്യ c)
 {
-  return (c >= '0' && c <= '9') ? c - '0'
+  തിരികെ (c >= '0' && c <= '9') ? c - '0'
 	: (c >= 'a' && c <= 'f') ? c - 'a' + 10
 	: (c >= 'A' && c <= 'F') ? c - 'A' + 10
 	: -1;
@@ -377,10 +377,10 @@ parse_hex_digit(int c)
  * If "c" is a bin digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_bin_digit(int c)
+  സ്ഥിതം പൂർണ്ണസംഖ്യ
+parse_bin_digit(പൂർണ്ണസംഖ്യ c)
 {
-  return (c >= '0' && c <= '1') ? c - '0'
+  തിരികെ (c >= '0' && c <= '1') ? c - '0'
 	: -1;
 }
 
@@ -389,12 +389,12 @@ parse_bin_digit(int c)
  * Return the '\n' or EOF character.
  * When an error is encountered exit with an error message.
  */
-  static int
-skip_to_eol(FILE *fpi, int c)
+  സ്ഥിതം പൂർണ്ണസംഖ്യ
+skip_to_eol(FILE *fpi, പൂർണ്ണസംഖ്യ c)
 {
-  while (c != '\n' && c != EOF)
+  ആകുമ്പോൾ (c != '\n' && c != EOF)
     c = getc_or_die(fpi);
-  return c;
+  തിരികെ c;
 }
 
 /*
@@ -404,169 +404,169 @@ skip_to_eol(FILE *fpi, int c)
  *
  * The name is historic and came from 'undo type opt h'.
  */
-  static int
+  സ്ഥിതം പൂർണ്ണസംഖ്യ
 huntype(
   FILE *fpi,
   FILE *fpo,
-  int cols,
-  int hextype,
+  പൂർണ്ണസംഖ്യ cols,
+  പൂർണ്ണസംഖ്യ hextype,
   long base_off)
 {
-  int c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = cols, bt = 0, b = 0, bcnt = 0;
+  പൂർണ്ണസംഖ്യ c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = cols, bt = 0, b = 0, bcnt = 0;
   long have_off = 0, want_off = 0;
 
   rewind(fpi);
 
-  while ((c = getc(fpi)) != EOF)
+  ആകുമ്പോൾ ((c = getc(fpi)) != EOF)
     {
-      if (c == '\r')	/* Doze style input file? */
-	continue;
+      എങ്കിൽ (c == '\r')	/* Doze style input file? */
+	തുടരുക;
 
       /* Allow multiple spaces.  This doesn't work when there is normal text
        * after the hex codes in the last line that looks like hex, thus only
        * use it for PostScript format. */
-      if (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
-	continue;
+      എങ്കിൽ (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
+	തുടരുക;
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      എങ്കിൽ (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
 	{
 	  n3 = n2;
 	  n2 = n1;
 
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
-	    continue;
+	  എങ്കിൽ (n1 == -1 && ign_garb)
+	    തുടരുക;
 	}
-      else /* HEX_BITS */
+      അല്ലെങ്കിൽ /* HEX_BITS */
 	{
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
-	    continue;
+	  എങ്കിൽ (n1 == -1 && ign_garb)
+	    തുടരുക;
 
 	  bt = parse_bin_digit(c);
-	  if (bt != -1)
+	  എങ്കിൽ (bt != -1)
 	    {
 	      /* shift via unsigned to avoid signed overflow on bad input */
-	      b = (int)(((unsigned)b << 1) | (unsigned)bt);
+	      b = (പൂർണ്ണസംഖ്യ)(((unsigned)b << 1) | (unsigned)bt);
 	      ++bcnt;
 	    }
 	}
 
       ign_garb = 0;
 
-      if ((hextype != HEX_POSTSCRIPT) && (p >= cols))
+      എങ്കിൽ ((hextype != HEX_POSTSCRIPT) && (p >= cols))
 	{
-	  if (hextype == HEX_NORMAL)
+	  എങ്കിൽ (hextype == HEX_NORMAL)
 	    {
-	      if (n1 < 0)
+	      എങ്കിൽ (n1 < 0)
 		{
 		  p = 0;
-		  continue;
+		  തുടരുക;
 		}
 	      want_off = (long)(((unsigned long)want_off << 4) | (unsigned)n1);
 	    }
-	  else /* HEX_BITS */
+	  അല്ലെങ്കിൽ /* HEX_BITS */
 	    {
-	      if (n1 < 0)
+	      എങ്കിൽ (n1 < 0)
 		{
 		  p = 0;
 		  bcnt = 0;
-		  continue;
+		  തുടരുക;
 		}
 	      want_off = (long)(((unsigned long)want_off << 4) | (unsigned)n1);
 	    }
-	  continue;
+	  തുടരുക;
 	}
 
-      if (base_off + want_off != have_off)
+      എങ്കിൽ (base_off + want_off != have_off)
 	{
-	  if (fflush(fpo) != 0)
+	  എങ്കിൽ (fflush(fpo) != 0)
 	    perror_exit(3);
 #ifdef TRY_SEEK
-	  if (fseek(fpo, base_off + want_off - have_off, SEEK_CUR) >= 0)
+	  എങ്കിൽ (fseek(fpo, base_off + want_off - have_off, SEEK_CUR) >= 0)
 	    have_off = base_off + want_off;
 #endif
-	  if (base_off + want_off < have_off)
+	  എങ്കിൽ (base_off + want_off < have_off)
 	    error_exit(5, "Sorry, cannot seek backwards.");
-	  for (; have_off < base_off + want_off; have_off++)
+	  വേണ്ടി (; have_off < base_off + want_off; have_off++)
 	    putc_or_die(0, fpo);
 	}
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      എങ്കിൽ (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
 	{
-	  if (n2 >= 0 && n1 >= 0)
+	  എങ്കിൽ (n2 >= 0 && n1 >= 0)
 	    {
 	      putc_or_die((n2 << 4) | n1, fpo);
 	      have_off++;
 	      want_off++;
 	      n1 = -1;
-	      if (!hextype && (++p >= cols))
+	      എങ്കിൽ (!hextype && (++p >= cols))
 	      /* skip the rest of the line as garbage */
 	      c = skip_to_eol(fpi, c);
 	    }
-	  else if (n1 < 0 && n2 < 0 && n3 < 0)
+	  അല്ലെങ്കിൽ എങ്കിൽ (n1 < 0 && n2 < 0 && n3 < 0)
 	    /* already stumbled into garbage, skip line, wait and see */
 	    c = skip_to_eol(fpi, c);
 	}
-      else /* HEX_BITS */
+      അല്ലെങ്കിൽ /* HEX_BITS */
 	{
-	  if (bcnt == 8)
+	  എങ്കിൽ (bcnt == 8)
 	    {
 	      putc_or_die(b, fpo);
 	      have_off++;
 	      want_off++;
 	      b = 0;
 	      bcnt = 0;
-	      if (++p >= cols)
+	      എങ്കിൽ (++p >= cols)
 		/* skip the rest of the line as garbage */
 		 c = skip_to_eol(fpi, c);
 	    }
 	}
 
-      if (c == '\n')
+      എങ്കിൽ (c == '\n')
 	{
-	  if (hextype == HEX_NORMAL || hextype == HEX_BITS)
+	  എങ്കിൽ (hextype == HEX_NORMAL || hextype == HEX_BITS)
 	    want_off = 0;
 	  p = cols;
 	  ign_garb = 1;
 	}
     }
-  if (fflush(fpo) != 0)
+  എങ്കിൽ (fflush(fpo) != 0)
     perror_exit(3);
 #ifdef TRY_SEEK
   fseek(fpo, 0L, SEEK_END);
 #endif
   fclose_or_die(fpi, fpo);
-  return 0;
+  തിരികെ 0;
 }
 
 
 /*
  * Print line l with given colors.
  */
-  static void
-print_colored_line(FILE *fp, char *l, char *colors)
+  സ്ഥിതം ശൂന്യം
+print_colored_വരി(FILE *fp, അക്ഷരം *l, അക്ഷരം *colors)
 {
-  static char l_colored[LLEN+1];
+  സ്ഥിതം അക്ഷരം l_colored[LLEN+1];
 
-  if (colors)
+  എങ്കിൽ (colors)
     {
-      int c = 0;
-      if (colors[0])
+      പൂർണ്ണസംഖ്യ c = 0;
+      എങ്കിൽ (colors[0])
 	{
 	  COLOR_PROLOGUE(colors[0])
 	}
       l_colored[c++] = l[0];
-      int i;
-      for (i = 1; l[i]; i++)
+      പൂർണ്ണസംഖ്യ i;
+      വേണ്ടി (i = 1; l[i]; i++)
 	{
-	  if (colors[i] != colors[i-1])
+	  എങ്കിൽ (colors[i] != colors[i-1])
 	    {
-	      if (colors[i-1])
+	      എങ്കിൽ (colors[i-1])
 		{
 		  COLOR_EPILOGUE
 		}
-	      if (colors[i])
+	      എങ്കിൽ (colors[i])
 		{
 		  COLOR_PROLOGUE(colors[i])
 		}
@@ -574,7 +574,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 	  l_colored[c++] = l[i];
 	}
 
-      if (colors[i])
+      എങ്കിൽ (colors[i])
 	{
 	  COLOR_EPILOGUE
 	}
@@ -582,7 +582,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 
       fputs_or_die(l_colored, fp);
     }
-  else
+  അല്ലെങ്കിൽ
     fputs_or_die(l, fp);
 }
 
@@ -598,47 +598,47 @@ print_colored_line(FILE *fp, char *l, char *colors)
  *
  * If nz is always positive, lines are never suppressed.
  */
-  static void
-xxdline(FILE *fp, char *l, char *colors, int nz)
+  സ്ഥിതം ശൂന്യം
+xxdline(FILE *fp, അക്ഷരം *l, അക്ഷരം *colors, പൂർണ്ണസംഖ്യ nz)
 {
-  static char z[LLEN_NO_COLOR+1];
-  static char z_colors[LLEN_NO_COLOR+1];
-  static signed char zero_seen = 0;
+  സ്ഥിതം അക്ഷരം z[LLEN_NO_COLOR+1];
+  സ്ഥിതം അക്ഷരം z_colors[LLEN_NO_COLOR+1];
+  സ്ഥിതം signed അക്ഷരം zero_seen = 0;
 
-  if (!nz && zero_seen == 1)
+  എങ്കിൽ (!nz && zero_seen == 1)
     {
       strcpy(z, l);
-      if (colors)
+      എങ്കിൽ (colors)
 	  memcpy(z_colors, colors, strlen(z));
     }
 
-  if (nz || !zero_seen++)
+  എങ്കിൽ (nz || !zero_seen++)
     {
-      if (nz)
+      എങ്കിൽ (nz)
 	{
-	  if (nz < 0)
+	  എങ്കിൽ (nz < 0)
 	    zero_seen--;
-	  if (zero_seen == 2)
-	    print_colored_line(fp, z, z_colors);
-	  if (zero_seen > 2)
+	  എങ്കിൽ (zero_seen == 2)
+	    print_colored_വരി(fp, z, z_colors);
+	  എങ്കിൽ (zero_seen > 2)
 	    fputs_or_die("*\n", fp);
 	}
-      if (nz >= 0 || zero_seen > 0)
-	print_colored_line(fp, l, colors);
+      എങ്കിൽ (nz >= 0 || zero_seen > 0)
+	print_colored_വരി(fp, l, colors);
 
-      if (nz)
+      എങ്കിൽ (nz)
 	zero_seen = 0;
     }
 
   /* If zero_seen > 3, then its exact value doesn't matter, so long as it
    * remains >3 and incrementing it will not cause overflow. */
-  if (zero_seen >= 0x7F)
+  എങ്കിൽ (zero_seen >= 0x7F)
     zero_seen = 4;
 }
 
 /* This is an EBCDIC to ASCII conversion table */
 /* from a proposed BTL standard April 16, 1979 */
-static unsigned char etoa64[] =
+സ്ഥിതം unsigned അക്ഷരം etoa64[] =
 {
     0040,0240,0241,0242,0243,0244,0245,0246,
     0247,0250,0325,0056,0074,0050,0053,0174,
@@ -666,329 +666,329 @@ static unsigned char etoa64[] =
     0070,0071,0372,0373,0374,0375,0376,0377
 };
 
-  static char
-get_color_char (int e, int ebcdic)
+  സ്ഥിതം അക്ഷരം
+get_color_char (പൂർണ്ണസംഖ്യ e, പൂർണ്ണസംഖ്യ ebcdic)
 {
-  if (ebcdic)
+  എങ്കിൽ (ebcdic)
     {
-      if ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
+      എങ്കിൽ ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
 	  (e >= 107 && e <= 111) || (e >= 121 && e <= 127) ||
 	  (e >= 129 && e <= 137) || (e >= 145 && e <= 154) ||
 	  (e >= 162 && e <= 169) || (e >= 192 && e <= 201) ||
 	  (e >= 208 && e <= 217) || (e >= 226 && e <= 233) ||
 	  (e >= 240 && e <= 249) || (e == 189) || (e == 64) ||
 	  (e == 173) || (e == 224) )
-	return COLOR_GREEN;
+	തിരികെ COLOR_GREEN;
 
-      else if (e == 37 || e == 13 || e == 5)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      അല്ലെങ്കിൽ എങ്കിൽ (e == 37 || e == 13 || e == 5)
+	തിരികെ COLOR_YELLOW;
+      അല്ലെങ്കിൽ എങ്കിൽ (e == 0)
+	തിരികെ COLOR_WHITE;
+      അല്ലെങ്കിൽ എങ്കിൽ (e == 255)
+	തിരികെ COLOR_BLUE;
+      അല്ലെങ്കിൽ
+	തിരികെ COLOR_RED;
     }
-  else  /* ASCII */
+  അല്ലെങ്കിൽ  /* ASCII */
     {
-#if defined(__MVS__) && __CHARSET_LIB == 0
-      if (e >= 64)
-	return COLOR_GREEN;
-#else
-      if (e > 31 && e < 127)
-	return COLOR_GREEN;
+#എങ്കിൽ defined(__MVS__) && __CHARSET_LIB == 0
+      എങ്കിൽ (e >= 64)
+	തിരികെ COLOR_GREEN;
+#അല്ലെങ്കിൽ
+      എങ്കിൽ (e > 31 && e < 127)
+	തിരികെ COLOR_GREEN;
 #endif
 
-      else if (e == 9 || e == 10 || e == 13)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      അല്ലെങ്കിൽ എങ്കിൽ (e == 9 || e == 10 || e == 13)
+	തിരികെ COLOR_YELLOW;
+      അല്ലെങ്കിൽ എങ്കിൽ (e == 0)
+	തിരികെ COLOR_WHITE;
+      അല്ലെങ്കിൽ എങ്കിൽ (e == 255)
+	തിരികെ COLOR_BLUE;
+      അല്ലെങ്കിൽ
+	തിരികെ COLOR_RED;
     }
-    return 0;
+    തിരികെ 0;
 }
 
-  static int
-enable_color(void)
+  സ്ഥിതം പൂർണ്ണസംഖ്യ
+enable_color(ശൂന്യം)
 {
 #ifdef WIN32
   DWORD   mode;
   HANDLE  out;
 
-  if (!isatty(1))
-    return 0;
+  എങ്കിൽ (!isatty(1))
+    തിരികെ 0;
 
   out = GetStdHandle(STD_OUTPUT_HANDLE);
   GetConsoleMode(out, &mode);
   mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  return (int)SetConsoleMode(out, mode);
-#elif defined(UNIX)
-  char *term;
+  തിരികെ (പൂർണ്ണസംഖ്യ)SetConsoleMode(out, mode);
+#അല്ലെങ്കിലെങ്കിൽ defined(UNIX)
+  അക്ഷരം *term;
 
-  if (!isatty(STDOUT_FILENO))
-    return 0;
+  എങ്കിൽ (!isatty(STDOUT_FILENO))
+    തിരികെ 0;
 
   term = getenv("TERM");
-  if (term == NULL || *term == '\0' || !strcmp(term, "dumb"))
-    return 0;
+  എങ്കിൽ (term == ശൂന്യ || *term == '\0' || !strcmp(term, "dumb"))
+    തിരികെ 0;
 
-  return 1;
-#else
-  return 0;
+  തിരികെ 1;
+#അല്ലെങ്കിൽ
+  തിരികെ 0;
 #endif
 }
 
-  int
-main(int argc, char *argv[])
+  പൂർണ്ണസംഖ്യ
+പ്രധാന(പൂർണ്ണസംഖ്യ argc, അക്ഷരം *argv[])
 {
   FILE *fp, *fpo;
-  int c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
-  int cols = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_NORMAL;
-  int capitalize = 0, decimal_offset = 0;
-  int ebcdic = 0;
-  int termination = 0;
-  int octspergrp = -1;	/* number of octets grouped in output */
-  int grplen;		/* total chars per octet group excluding colors */
+  പൂർണ്ണസംഖ്യ c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
+  പൂർണ്ണസംഖ്യ cols = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_NORMAL;
+  പൂർണ്ണസംഖ്യ capitalize = 0, decimal_offset = 0;
+  പൂർണ്ണസംഖ്യ ebcdic = 0;
+  പൂർണ്ണസംഖ്യ termination = 0;
+  പൂർണ്ണസംഖ്യ octspergrp = -1;	/* number of octets grouped in output */
+  പൂർണ്ണസംഖ്യ grplen;		/* total chars per octet group excluding colors */
   long length = -1, n = 0, seekoff = 0;
   unsigned long displayoff = 0;
-  static char l[LLEN_NO_COLOR+1];  /* static because it may be too big for stack */
-  static char colors[LLEN_NO_COLOR+1]; /* color array */
-  char *pp;
-  char *varname = NULL;
-  int addrlen = 9;
-  int color = 0;
-  int color_forced = 0;	/* set when -R always is used */
-  char *no_color;
-  char cur_color = 0;
+  സ്ഥിതം അക്ഷരം l[LLEN_NO_COLOR+1];  /* static because it may be too big for stack */
+  സ്ഥിതം അക്ഷരം colors[LLEN_NO_COLOR+1]; /* color array */
+  അക്ഷരം *pp;
+  അക്ഷരം *varname = ശൂന്യ;
+  പൂർണ്ണസംഖ്യ addrlen = 9;
+  പൂർണ്ണസംഖ്യ color = 0;
+  പൂർണ്ണസംഖ്യ color_forced = 0;	/* set when -R always is used */
+  അക്ഷരം *no_color;
+  അക്ഷരം cur_color = 0;
 
   no_color = getenv("NO_COLOR");
-  if (no_color == NULL || no_color[0] == '\0')
+  എങ്കിൽ (no_color == ശൂന്യ || no_color[0] == '\0')
     color = enable_color();
 
 #ifdef AMIGA
   /* This program doesn't work when started from the Workbench */
-  if (argc == 0)
+  എങ്കിൽ (argc == 0)
     exit(1);
 #endif
 
   pname = argv[0];
-  for (pp = pname; *pp; )
-    if (*pp++ == PATH_SEP)
+  വേണ്ടി (pp = pname; *pp; )
+    എങ്കിൽ (*pp++ == PATH_SEP)
       pname = pp;
 #ifdef FILE_SEP
-  for (pp = pname; *pp; pp++)
-    if (*pp == FILE_SEP)
+  വേണ്ടി (pp = pname; *pp; pp++)
+    എങ്കിൽ (*pp == FILE_SEP)
       {
 	*pp = '\0';
-	break;
+	നിർത്തുക;
       }
 #endif
 
-  while (argc >= 2)
+  ആകുമ്പോൾ (argc >= 2)
     {
       pp = argv[1] + (!STRNCMP(argv[1], "--", 2) && argv[1][2]);
-	   if (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
-      else if (!STRNCMP(pp, "-b", 2)) hextype |= HEX_BITS;
-      else if (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
-      else if (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
-      else if (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
-      else if (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
-      else if (!STRNCMP(pp, "-C", 2)) capitalize = 1;
-      else if (!STRNCMP(pp, "-d", 2)) decimal_offset = 1;
-      else if (!STRNCMP(pp, "-r", 2)) revert++;
-      else if (!STRNCMP(pp, "-E", 2)) ebcdic++;
-      else if (!STRNCMP(pp, "-t", 2)) termination++;
-      else if (!STRNCMP(pp, "-v", 2))
+	   എങ്കിൽ (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-b", 2)) hextype |= HEX_BITS;
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-C", 2)) capitalize = 1;
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-d", 2)) decimal_offset = 1;
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-r", 2)) revert++;
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-E", 2)) ebcdic++;
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-t", 2)) termination++;
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-v", 2))
 	{
 	  fprintf(stderr, "%s%s\n", version, osver);
 	  exit(0);
 	}
-      else if (!STRNCMP(pp, "-c", 2))
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-c", 2))
 	{
-	  if (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
+	  എങ്കിൽ (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
 	    capitalize = 1;
-	  else if (pp[2] && STRNCMP("ols", pp + 2, 3))
+	  അല്ലെങ്കിൽ എങ്കിൽ (pp[2] && STRNCMP("ols", pp + 2, 3))
 	    {
 	      colsgiven = 1;
-	      cols = (int)strtol(pp + 2, NULL, 0);
+	      cols = (പൂർണ്ണസംഖ്യ)strtol(pp + 2, ശൂന്യ, 0);
 	    }
-	  else
+	  അല്ലെങ്കിൽ
 	    {
-	      if (!argv[2])
+	      എങ്കിൽ (!argv[2])
 		exit_with_usage();
 	      colsgiven = 1;
-	      cols = (int)strtol(argv[2], NULL, 0);
+	      cols = (പൂർണ്ണസംഖ്യ)strtol(argv[2], ശൂന്യ, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-g", 2))
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-g", 2))
 	{
-	  if (pp[2] && STRNCMP("roup", pp + 2, 4))
-	    octspergrp = (int)strtol(pp + 2, NULL, 0);
-	  else
+	  എങ്കിൽ (pp[2] && STRNCMP("roup", pp + 2, 4))
+	    octspergrp = (പൂർണ്ണസംഖ്യ)strtol(pp + 2, ശൂന്യ, 0);
+	  അല്ലെങ്കിൽ
 	    {
-	      if (!argv[2])
+	      എങ്കിൽ (!argv[2])
 		exit_with_usage();
-	      octspergrp = (int)strtol(argv[2], NULL, 0);
+	      octspergrp = (പൂർണ്ണസംഖ്യ)strtol(argv[2], ശൂന്യ, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-o", 2))
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-o", 2))
 	{
-	  int reloffset = 0;
-	  int negoffset = 0;
-	  if (pp[2] && STRNCMP("ffset", pp + 2, 5))
-	    displayoff = strtoul(pp + 2, NULL, 0);
-	  else
+	  പൂർണ്ണസംഖ്യ reloffset = 0;
+	  പൂർണ്ണസംഖ്യ negoffset = 0;
+	  എങ്കിൽ (pp[2] && STRNCMP("ffset", pp + 2, 5))
+	    displayoff = strtoul(pp + 2, ശൂന്യ, 0);
+	  അല്ലെങ്കിൽ
 	    {
-	      if (!argv[2])
+	      എങ്കിൽ (!argv[2])
 		exit_with_usage();
 
-	      if (argv[2][0] == '+')
+	      എങ്കിൽ (argv[2][0] == '+')
 	       reloffset++;
-	     if (argv[2][reloffset] == '-')
+	     എങ്കിൽ (argv[2][reloffset] == '-')
 	       negoffset++;
 
-	     if (negoffset)
-	       displayoff = ULONG_MAX - strtoul(argv[2] + reloffset+negoffset, NULL, 0) + 1;
-	     else
-	       displayoff = strtoul(argv[2] + reloffset+negoffset, NULL, 0);
+	     എങ്കിൽ (negoffset)
+	       displayoff = ULONG_MAX - strtoul(argv[2] + reloffset+negoffset, ശൂന്യ, 0) + 1;
+	     അല്ലെങ്കിൽ
+	       displayoff = strtoul(argv[2] + reloffset+negoffset, ശൂന്യ, 0);
 
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-s", 2))
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-s", 2))
 	{
 	  relseek = 0;
 	  negseek = 0;
-	  if (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
+	  എങ്കിൽ (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
 	    {
 #ifdef TRY_SEEK
-	      if (pp[2] == '+')
+	      എങ്കിൽ (pp[2] == '+')
 		relseek++;
-	      if (pp[2+relseek] == '-')
+	      എങ്കിൽ (pp[2+relseek] == '-')
 		negseek++;
 #endif
-	      seekoff = strtol(pp + 2+relseek+negseek, (char **)NULL, 0);
+	      seekoff = strtol(pp + 2+relseek+negseek, (അക്ഷരം **)ശൂന്യ, 0);
 	    }
-	  else
+	  അല്ലെങ്കിൽ
 	    {
-	      if (!argv[2])
+	      എങ്കിൽ (!argv[2])
 		exit_with_usage();
 #ifdef TRY_SEEK
-	      if (argv[2][0] == '+')
+	      എങ്കിൽ (argv[2][0] == '+')
 		relseek++;
-	      if (argv[2][relseek] == '-')
+	      എങ്കിൽ (argv[2][relseek] == '-')
 		negseek++;
 #endif
-	      seekoff = strtol(argv[2] + relseek+negseek, (char **)NULL, 0);
+	      seekoff = strtol(argv[2] + relseek+negseek, (അക്ഷരം **)ശൂന്യ, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-l", 2))
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-l", 2))
 	{
-	  if (pp[2] && STRNCMP("en", pp + 2, 2))
-	    length = strtol(pp + 2, (char **)NULL, 0);
-	  else
+	  എങ്കിൽ (pp[2] && STRNCMP("en", pp + 2, 2))
+	    length = strtol(pp + 2, (അക്ഷരം **)ശൂന്യ, 0);
+	  അല്ലെങ്കിൽ
 	    {
-	      if (!argv[2])
+	      എങ്കിൽ (!argv[2])
 		exit_with_usage();
-	      length = strtol(argv[2], (char **)NULL, 0);
+	      length = strtol(argv[2], (അക്ഷരം **)ശൂന്യ, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-n", 2))
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-n", 2))
 	{
-	  if (pp[2] && STRNCMP("ame", pp + 2, 3))
+	  എങ്കിൽ (pp[2] && STRNCMP("ame", pp + 2, 3))
 	    varname = pp + 2;
-	  else
+	  അല്ലെങ്കിൽ
 	    {
-	      if (!argv[2])
+	      എങ്കിൽ (!argv[2])
 		exit_with_usage();
 	      varname = argv[2];
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-R", 2))
+      അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pp, "-R", 2))
 	{
-	  char *pw = pp + 2;
-	  if (!pw[0])
+	  അക്ഷരം *pw = pp + 2;
+	  എങ്കിൽ (!pw[0])
 	    {
 	      pw = argv[2];
 	      argv++;
 	      argc--;
 	    }
-	  if (!pw)
+	  എങ്കിൽ (!pw)
 	    exit_with_usage();
-	  if (!STRNCMP(pw, "always", 6))
+	  എങ്കിൽ (!STRNCMP(pw, "always", 6))
 	    {
-	      (void)enable_color();
+	      (ശൂന്യം)enable_color();
 	      color = 1;
 	      color_forced = 1;
 	    }
-	  else if (!STRNCMP(pw, "never", 5))
+	  അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pw, "never", 5))
 	    color = 0;
-	  else if (!STRNCMP(pw, "auto", 4))
+	  അല്ലെങ്കിൽ എങ്കിൽ (!STRNCMP(pw, "auto", 4))
 	    color = enable_color();
-	  else
+	  അല്ലെങ്കിൽ
 	    exit_with_usage();
 	}
-      else if (!strcmp(argv[1], "--"))	/* end of options */
+      അല്ലെങ്കിൽ എങ്കിൽ (!strcmp(argv[1], "--"))	/* end of options */
 	{
 	  argv++;
 	  argc--;
-	  break;
+	  നിർത്തുക;
 	}
-      else if (pp[0] == '-' && pp[1])	/* unknown option */
+      അല്ലെങ്കിൽ എങ്കിൽ (pp[0] == '-' && pp[1])	/* unknown option */
 	exit_with_usage();
-      else
-	break;				/* not an option */
+      അല്ലെങ്കിൽ
+	നിർത്തുക;				/* not an option */
 
       argv++;				/* advance to next argument */
       argc--;
     }
 
-  if (hextype != (HEX_CINCLUDE | HEX_BITS))
+  എങ്കിൽ (hextype != (HEX_CINCLUDE | HEX_BITS))
     {
 	/* Allow at most one bit to be set in hextype */
-	if (hextype & (hextype - 1))
+	എങ്കിൽ (hextype & (hextype - 1))
 	    error_exit(1, "only one of -b, -e, -u, -p, -i can be used");
     }
 
-  if (!colsgiven || (!cols && hextype != HEX_POSTSCRIPT))
-    switch (hextype)
+  എങ്കിൽ (!colsgiven || (!cols && hextype != HEX_POSTSCRIPT))
+    തിരഞ്ഞെടുപ്പ് (hextype)
       {
-      case HEX_POSTSCRIPT:	cols = 30; break;
-      case HEX_CINCLUDE:	cols = 12; break;
-      case HEX_CINCLUDE | HEX_BITS:
-      case HEX_BITS:		cols = 6; break;
-      case HEX_NORMAL:
-      case HEX_LITTLEENDIAN:
-      default:			cols = 16; break;
+      അവസ്ഥ HEX_POSTSCRIPT:	cols = 30; നിർത്തുക;
+      അവസ്ഥ HEX_CINCLUDE:	cols = 12; നിർത്തുക;
+      അവസ്ഥ HEX_CINCLUDE | HEX_BITS:
+      അവസ്ഥ HEX_BITS:		cols = 6; നിർത്തുക;
+      അവസ്ഥ HEX_NORMAL:
+      അവസ്ഥ HEX_LITTLEENDIAN:
+      സ്ഥിരസ്ഥിതി:			cols = 16; നിർത്തുക;
       }
 
-  if (octspergrp < 0)
-    switch (hextype)
+  എങ്കിൽ (octspergrp < 0)
+    തിരഞ്ഞെടുപ്പ് (hextype)
       {
-      case HEX_CINCLUDE | HEX_BITS:
-      case HEX_BITS:		octspergrp = 1; break;
-      case HEX_NORMAL:		octspergrp = 2; break;
-      case HEX_LITTLEENDIAN:	octspergrp = 4; break;
-      case HEX_POSTSCRIPT:
-      case HEX_CINCLUDE:
-      default:			octspergrp = 0; break;
+      അവസ്ഥ HEX_CINCLUDE | HEX_BITS:
+      അവസ്ഥ HEX_BITS:		octspergrp = 1; നിർത്തുക;
+      അവസ്ഥ HEX_NORMAL:		octspergrp = 2; നിർത്തുക;
+      അവസ്ഥ HEX_LITTLEENDIAN:	octspergrp = 4; നിർത്തുക;
+      അവസ്ഥ HEX_POSTSCRIPT:
+      അവസ്ഥ HEX_CINCLUDE:
+      സ്ഥിരസ്ഥിതി:			octspergrp = 0; നിർത്തുക;
       }
 
-  if ((hextype == HEX_POSTSCRIPT && cols < 0) ||
+  എങ്കിൽ ((hextype == HEX_POSTSCRIPT && cols < 0) ||
       (hextype != HEX_POSTSCRIPT && cols < 1) ||
       ((hextype == HEX_NORMAL || hextype == HEX_BITS || hextype == HEX_LITTLEENDIAN)
 							    && (cols > COLS)))
@@ -997,193 +997,193 @@ main(int argc, char *argv[])
       exit(1);
     }
 
-  if (octspergrp < 1 || octspergrp > cols)
+  എങ്കിൽ (octspergrp < 1 || octspergrp > cols)
     octspergrp = cols;
-  else if (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
+  അല്ലെങ്കിൽ എങ്കിൽ (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
     error_exit(1, "number of octets per group must be a power of 2 with -e.");
 
-  if (argc > 3)
+  എങ്കിൽ (argc > 3)
     exit_with_usage();
 
-  if (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
+  എങ്കിൽ (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
     BIN_ASSIGN(fp = stdin, !revert);
-  else
+  അല്ലെങ്കിൽ
     {
-      if ((fp = fopen(argv[1], BIN_READ(!revert))) == NULL)
+      എങ്കിൽ ((fp = fopen(argv[1], BIN_READ(!revert))) == ശൂന്യ)
 	{
 	  fprintf(stderr,"%s: ", pname);
 	  perror(argv[1]);
-	  return 2;
+	  തിരികെ 2;
 	}
     }
 
-  if (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
+  എങ്കിൽ (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
     BIN_ASSIGN(fpo = stdout, revert);
-  else
+  അല്ലെങ്കിൽ
     {
-      int fd;
-      int mode = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
+      പൂർണ്ണസംഖ്യ fd;
+      പൂർണ്ണസംഖ്യ mode = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
 
-      if (((fd = OPEN(argv[2], mode | BIN_CREAT(revert), 0666)) < 0) ||
-	  (fpo = fdopen(fd, BIN_WRITE(revert))) == NULL)
+      എങ്കിൽ (((fd = OPEN(argv[2], mode | BIN_CREAT(revert), 0666)) < 0) ||
+	  (fpo = fdopen(fd, BIN_WRITE(revert))) == ശൂന്യ)
 	{
 	  fprintf(stderr, "%s: ", pname);
 	  perror(argv[2]);
-	  return 3;
+	  തിരികെ 3;
 	}
       rewind(fpo);
 
       /* Disable auto color when writing to a file. */
-      if (!color_forced)
+      എങ്കിൽ (!color_forced)
 	color = 0;
     }
 
-  if (revert)
-    switch (hextype)
+  എങ്കിൽ (revert)
+    തിരഞ്ഞെടുപ്പ് (hextype)
       {
-      case HEX_NORMAL:
-      case HEX_POSTSCRIPT:
-      case HEX_BITS:
-	return huntype(fp, fpo, cols, hextype,
+      അവസ്ഥ HEX_NORMAL:
+      അവസ്ഥ HEX_POSTSCRIPT:
+      അവസ്ഥ HEX_BITS:
+	തിരികെ huntype(fp, fpo, cols, hextype,
 	  negseek ? -seekoff : seekoff);
-	break;
-      default:
+	നിർത്തുക;
+      സ്ഥിരസ്ഥിതി:
 	error_exit(-1, "Sorry, cannot revert this type of hexdump");
       }
 
-  if (seekoff || negseek || !relseek)
+  എങ്കിൽ (seekoff || negseek || !relseek)
     {
 #ifdef TRY_SEEK
-      if (relseek)
+      എങ്കിൽ (relseek)
 	e = fseek(fp, negseek ? -seekoff : seekoff, SEEK_CUR);
-      else
+      അല്ലെങ്കിൽ
 	e = fseek(fp, negseek ? -seekoff : seekoff,
 						negseek ? SEEK_END : SEEK_SET);
-      if (e < 0 && negseek)
+      എങ്കിൽ (e < 0 && negseek)
 	error_exit(4, "Sorry, cannot seek.");
-      if (e >= 0)
+      എങ്കിൽ (e >= 0)
 	seekoff = ftell(fp);
-      else
+      അല്ലെങ്കിൽ
 #endif
 	{
 	  long s = seekoff;
 
-	  while (s--)
-	    if (getc_or_die(fp) == EOF)
+	  ആകുമ്പോൾ (s--)
+	    എങ്കിൽ (getc_or_die(fp) == EOF)
 	    {
 	      error_exit(4, "Sorry, cannot seek.");
 	    }
 	}
     }
 
-  if (hextype & HEX_CINCLUDE)
+  എങ്കിൽ (hextype & HEX_CINCLUDE)
     {
       /* A user-set variable name overrides fp == stdin */
-      if (varname == NULL && fp != stdin)
+      എങ്കിൽ (varname == ശൂന്യ && fp != stdin)
 	varname = argv[1];
 
-      if (varname != NULL)
+      എങ്കിൽ (varname != ശൂന്യ)
 	{
-	  FPRINTF_OR_DIE((fpo, "unsigned char %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
-	  for (e = 0; (c = varname[e]) != 0; e++)
-	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
+	  FPRINTF_OR_DIE((fpo, "unsigned char %s", isdigit((unsigned അക്ഷരം)varname[0]) ? "__" : ""));
+	  വേണ്ടി (e = 0; (c = varname[e]) != 0; e++)
+	    putc_or_die(isalnum((unsigned അക്ഷരം)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  fputs_or_die("[] = {\n", fpo);
 	}
 
       p = 0;
-      while ((length < 0 || p < length) && (((c = getc_or_die(fp)) != EOF) || termination))
+      ആകുമ്പോൾ ((length < 0 || p < length) && (((c = getc_or_die(fp)) != EOF) || termination))
 	{
-	  if (c == EOF)
+	  എങ്കിൽ (c == EOF)
 	    {
 	      c = 0;
 	      termination = -1;
 	    }
-	  if (hextype & HEX_BITS)
+	  എങ്കിൽ (hextype & HEX_BITS)
 	    {
-	      if (p == 0)
+	      എങ്കിൽ (p == 0)
 		fputs_or_die("  ", fpo);
-	      else if (p % cols == 0)
+	      അല്ലെങ്കിൽ എങ്കിൽ (p % cols == 0)
 		fputs_or_die(",\n  ", fpo);
-	      else
+	      അല്ലെങ്കിൽ
 		fputs_or_die(", ", fpo);
 
 	      FPRINTF_OR_DIE((fpo, "0b"));
-	      for (int j = 7; j >= 0; j--)
+	      വേണ്ടി (പൂർണ്ണസംഖ്യ j = 7; j >= 0; j--)
 		putc_or_die((c & (1 << j)) ? '1' : '0', fpo);
 	      p++;
 	    }
-	  else
+	  അല്ലെങ്കിൽ
 	    {
 	      FPRINTF_OR_DIE((fpo, (hexx == hexxa) ? "%s0x%02x" : "%s0X%02X",
 		(p % cols) ? ", " : (!p ? "  " : ",\n  "), c));
 	      p++;
 	    }
-	  if (termination == -1)
+	  എങ്കിൽ (termination == -1)
 	    {
 	      --p;
-	      break ;
+	      നിർത്തുക ;
 	    }
 	}
 
-      if (p)
+      എങ്കിൽ (p)
 	fputs_or_die("\n", fpo);
 
-      if (varname != NULL)
+      എങ്കിൽ (varname != ശൂന്യ)
 	{
 	  fputs_or_die("};\n", fpo);
-	  FPRINTF_OR_DIE((fpo, "unsigned int %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
-	  for (e = 0; (c = varname[e]) != 0; e++)
-	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
+	  FPRINTF_OR_DIE((fpo, "unsigned int %s", isdigit((unsigned അക്ഷരം)varname[0]) ? "__" : ""));
+	  വേണ്ടി (e = 0; (c = varname[e]) != 0; e++)
+	    putc_or_die(isalnum((unsigned അക്ഷരം)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  FPRINTF_OR_DIE((fpo, "_%s = %d;\n", capitalize ? "LEN" : "len", p));
 	}
 
       fclose_or_die(fp, fpo);
-      return 0;
+      തിരികെ 0;
     }
 
-  if (hextype == HEX_POSTSCRIPT)
+  എങ്കിൽ (hextype == HEX_POSTSCRIPT)
     {
       p = cols;
-      while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+      ആകുമ്പോൾ ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
 	{
 	  putc_or_die(hexx[(e >> 4) & 0xf], fpo);
 	  putc_or_die(hexx[e & 0xf], fpo);
 	  n++;
-	  if (cols > 0 && !--p)
+	  എങ്കിൽ (cols > 0 && !--p)
 	    {
 	      putc_or_die('\n', fpo);
 	      p = cols;
 	    }
 	}
-      if (cols == 0 || p < cols)
+      എങ്കിൽ (cols == 0 || p < cols)
 	putc_or_die('\n', fpo);
       fclose_or_die(fp, fpo);
-      return 0;
+      തിരികെ 0;
     }
 
   /* hextype: HEX_NORMAL or HEX_BITS or HEX_LITTLEENDIAN */
 
-  if (hextype != HEX_BITS)
+  എങ്കിൽ (hextype != HEX_BITS)
     {
       grplen = octspergrp + octspergrp + 1;	/* chars per octet group */
     }
-  else	/* hextype == HEX_BITS */
+  അല്ലെങ്കിൽ	/* hextype == HEX_BITS */
     grplen = 8 * octspergrp + 1;
 
-  while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+  ആകുമ്പോൾ ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
     {
-      if (p == 0)
+      എങ്കിൽ (p == 0)
 	{
 	  addrlen = sprintf(l, decimal_offset ? "%08lu:" : "%08lx:",
 				  ((unsigned long)(n + seekoff + displayoff)));
-	  for (c = addrlen; c < LLEN_NO_COLOR; l[c++] = ' ')
+	  വേണ്ടി (c = addrlen; c < LLEN_NO_COLOR; l[c++] = ' ')
 	    ;
 	}
       x = hextype == HEX_LITTLEENDIAN ? p ^ (octspergrp-1) : p;
       c = addrlen + 1 + (grplen * x) / octspergrp;
-      if (hextype == HEX_NORMAL || hextype == HEX_LITTLEENDIAN)
+      എങ്കിൽ (hextype == HEX_NORMAL || hextype == HEX_LITTLEENDIAN)
 	{
-	  if (color)
+	  എങ്കിൽ (color)
 	    {
 	      cur_color = get_color_char(e, ebcdic);
 	      colors[c] = cur_color;
@@ -1193,71 +1193,71 @@ main(int argc, char *argv[])
 	  l[c]   = hexx[(e >> 4) & 0xf];
 	  l[++c] = hexx[e & 0xf];
 	}
-      else /* hextype == HEX_BITS */
+      അല്ലെങ്കിൽ /* hextype == HEX_BITS */
 	{
-	  if (color)
+	  എങ്കിൽ (color)
 	    cur_color = get_color_char(e, ebcdic);
 
-	  for (i = 7; i >= 0; i--)
+	  വേണ്ടി (i = 7; i >= 0; i--)
 	    {
-	      if (color)
+	      എങ്കിൽ (color)
 		colors[c] = cur_color;
 	      l[c++] = (e & (1 << i)) ? '1' : '0';
 	    }
 	}
-      if (e)
+      എങ്കിൽ (e)
 	nonzero++;
       /* When changing this update definition of LLEN and LLEN_NO_COLOR above. */
-      if (hextype == HEX_LITTLEENDIAN)
+      എങ്കിൽ (hextype == HEX_LITTLEENDIAN)
 	/* last group will be fully used, round up */
 	c = grplen * ((cols + octspergrp - 1) / octspergrp);
-      else
+      അല്ലെങ്കിൽ
 	c = (grplen * cols - 1) / octspergrp;
 
 
-      if (ebcdic)
+      എങ്കിൽ (ebcdic)
 	e = (e < 64) ? '.' : etoa64[e-64];
 
-      if (hextype == HEX_LITTLEENDIAN)
+      എങ്കിൽ (hextype == HEX_LITTLEENDIAN)
 	c -= 1;
 
       c += addrlen + 3 + p;
-      if (color)
+      എങ്കിൽ (color)
 	  colors[c] = cur_color;
       l[c++] =
-#if defined(__MVS__) && __CHARSET_LIB == 0
+#എങ്കിൽ defined(__MVS__) && __CHARSET_LIB == 0
 	  (e >= 64)
-#else
+#അല്ലെങ്കിൽ
 	  (e > 31 && e < 127)
 #endif
 	  ? e : '.';
       n++;
-      if (++p == cols)
+      എങ്കിൽ (++p == cols)
 	{
 	  l[c++] = '\n';
 	  l[c] = '\0';
 
-	  xxdline(fpo, l, color ? colors : NULL, autoskip ? nonzero : 1);
+	  xxdline(fpo, l, color ? colors : ശൂന്യ, autoskip ? nonzero : 1);
 	  memset(colors, 0, c);
 	  nonzero = 0;
 	  p = 0;
 	}
     }
-  if (p)
+  എങ്കിൽ (p)
     {
       l[c++] = '\n';
       l[c] = '\0';
-      if (color)
+      എങ്കിൽ (color)
 	{
 	  x = p;
-	  if (hextype == HEX_LITTLEENDIAN)
+	  എങ്കിൽ (hextype == HEX_LITTLEENDIAN)
 	    {
-	      int fill = octspergrp - (p % octspergrp);
-	      if (fill == octspergrp) fill = 0;
+	      പൂർണ്ണസംഖ്യ fill = octspergrp - (p % octspergrp);
+	      എങ്കിൽ (fill == octspergrp) fill = 0;
 
 	      c = addrlen + 1 + (grplen * (x - (octspergrp-fill))) / octspergrp;
 
-	      for (i = 0; i < fill;i++)
+	      വേണ്ടി (i = 0; i < fill;i++)
 		{
 		  colors[c] = COLOR_RED;
 		  l[c++] = ' '; /* empty space */
@@ -1266,13 +1266,13 @@ main(int argc, char *argv[])
 		}
 	    }
 
-	  if (hextype != HEX_BITS)
+	  എങ്കിൽ (hextype != HEX_BITS)
 	    {
 	      c = addrlen + 1 + (grplen * x) / octspergrp;
 	      c += cols - p;
 	      c += (cols - p) / octspergrp;
 
-	      for (i = cols - p; i > 0;i--)
+	      വേണ്ടി (i = cols - p; i > 0;i--)
 		{
 		  colors[c] = COLOR_RED;
 		  l[c++] = ' '; /* empty space */
@@ -1280,14 +1280,14 @@ main(int argc, char *argv[])
 	    }
 	  xxdline(fpo, l, colors, 1);
 	}
-      else
-	xxdline(fpo, l, NULL, 1);
+      അല്ലെങ്കിൽ
+	xxdline(fpo, l, ശൂന്യ, 1);
     }
-  else if (autoskip)
-    xxdline(fpo, l, color ? colors : NULL, -1);	/* last chance to flush out suppressed lines */
+  അല്ലെങ്കിൽ എങ്കിൽ (autoskip)
+    xxdline(fpo, l, color ? colors : ശൂന്യ, -1);	/* last chance to flush out suppressed lines */
 
   fclose_or_die(fp, fpo);
-  return 0;
+  തിരികെ 0;
 }
 
 /* vi:set ts=8 sw=4 sts=2 cino+={2 cino+=n-2 : */

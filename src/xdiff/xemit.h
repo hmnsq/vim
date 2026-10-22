@@ -20,16 +20,16 @@
  *
  */
 
-#if !defined(XEMIT_H)
+#എങ്കിൽ !defined(XEMIT_H)
 #define XEMIT_H
 
 
-typedef int (*emit_func_t)(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
-			   xdemitconf_t const *xecfg);
+തരനിർവചനം പൂർണ്ണസംഖ്യ (*emit_func_t)(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
+			   xdemitconf_t സ്ഥിരം *xecfg);
 
-xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t const *xecfg);
-int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
-		  xdemitconf_t const *xecfg);
+xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t സ്ഥിരം *xecfg);
+പൂർണ്ണസംഖ്യ xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
+		  xdemitconf_t സ്ഥിരം *xecfg);
 
 
 

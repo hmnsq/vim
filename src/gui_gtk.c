@@ -31,7 +31,7 @@
  * "Let's give this some time to mature."
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
 #ifdef FEAT_GUI_GTK
 # include "gui_gtk_f.h"
@@ -63,60 +63,60 @@
 # ifdef bind_textdomain_codeset
 #  undef bind_textdomain_codeset
 # endif
-# if defined(FEAT_GETTEXT) && !defined(ENABLE_NLS)
+# എങ്കിൽ defined(FEAT_GETTEXT) && !defined(ENABLE_NLS)
 #  define ENABLE_NLS	// so the texts in the dialog boxes are translated
 # endif
 # include <gnome.h>
 #endif
 
 #ifdef FEAT_GUI_GTK
-# if GTK_CHECK_VERSION(3,0,0)
+# എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
 #  include <gdk/gdkkeysyms-compat.h>
-# else
+# അല്ലെങ്കിൽ
 #  include <gdk/gdkkeysyms.h>
 # endif
 # include <gdk/gdk.h>
 # ifdef MSWIN
 #  include <gdk/gdkwin32.h>
-# else
+# അല്ലെങ്കിൽ
 #  include <gdk/gdkx.h>
 # endif
 
 # include <gtk/gtk.h>
-#else
+#അല്ലെങ്കിൽ
 // define these items to be able to generate prototypes without GTK
-typedef int GtkWidget;
-# define gpointer int
-# define guint8 int
-# define GdkPixmap int
-# define GdkBitmap int
-# define GtkIconFactory int
-# define GtkToolbar int
-# define GtkAdjustment int
-# define gboolean int
-# define GdkEventKey int
-# define CancelData int
+തരനിർവചനം പൂർണ്ണസംഖ്യ GtkWidget;
+# define gpointer പൂർണ്ണസംഖ്യ
+# define guint8 പൂർണ്ണസംഖ്യ
+# define GdkPixmap പൂർണ്ണസംഖ്യ
+# define GdkBitmap പൂർണ്ണസംഖ്യ
+# define GtkIconFactory പൂർണ്ണസംഖ്യ
+# define GtkToolbar പൂർണ്ണസംഖ്യ
+# define GtkAdjustment പൂർണ്ണസംഖ്യ
+# define gboolean പൂർണ്ണസംഖ്യ
+# define Gdk_Event_താക്കോൽ പൂർണ്ണസംഖ്യ
+# define CancelData പൂർണ്ണസംഖ്യ
 #endif
 
-static void entry_activate_cb(GtkWidget *widget, gpointer data);
-static void entry_changed_cb(GtkWidget *entry, GtkWidget *dialog);
-static void find_replace_cb(GtkWidget *widget, gpointer data);
-#if defined(FEAT_BROWSE)
-static void recent_func_log_func(
-	const gchar *log_domain,
+സ്ഥിതം ശൂന്യം entry_activate_cb(GtkWidget *widget, gpointer data);
+സ്ഥിതം ശൂന്യം entry_changed_cb(GtkWidget *entry, GtkWidget *dialog);
+സ്ഥിതം ശൂന്യം find_replace_cb(GtkWidget *widget, gpointer data);
+#എങ്കിൽ defined(FEAT_BROWSE)
+സ്ഥിതം ശൂന്യം recent_func_log_func(
+	സ്ഥിരം gchar *log_domain,
 	GLogLevelFlags log_level,
-	const gchar *message,
+	സ്ഥിരം gchar *message,
 	gpointer user_data);
 #endif
 
-#if defined(FEAT_TOOLBAR)
+#എങ്കിൽ defined(FEAT_TOOLBAR)
 /*
  * Table from BuiltIn## icon indices to GTK+ stock IDs.  Order must exactly
  * match toolbar_names[] in menu.c!  All stock icons including the "vim-*"
  * ones can be overridden in your gtkrc file.
  */
-# if GTK_CHECK_VERSION(3,10,0)
-static const char * const menu_themed_names[] =
+# എങ്കിൽ GTK_CHECK_VERSION(3,10,0)
+സ്ഥിതം സ്ഥിരം അക്ഷരം * സ്ഥിരം menu_themed_names[] =
 {
     /* 00 */ "document-new",		// sub. GTK_STOCK_NEW
     /* 01 */ "document-open",		// sub. GTK_STOCK_OPEN
@@ -129,14 +129,14 @@ static const char * const menu_themed_names[] =
     /* 08 */ "document-print",		// sub. GTK_STOCK_PRINT
     /* 09 */ "help-browser",		// sub. GTK_STOCK_HELP
     /* 10 */ "edit-find",		// sub. GTK_STOCK_FIND
-#  if GTK_CHECK_VERSION(3,14,0)
+#  എങ്കിൽ GTK_CHECK_VERSION(3,14,0)
     // Use the file names in gui_gtk_res.xml, cutting off the extension.
     // Similar changes follow.
     /* 11 */ "stock_vim_save_all",
     /* 12 */ "stock_vim_session_save",
     /* 13 */ "stock_vim_session_new",
     /* 14 */ "stock_vim_session_load",
-#  else
+#  അല്ലെങ്കിൽ
     /* 11 */ "vim-save-all",
     /* 12 */ "vim-session-save",
     /* 13 */ "vim-session-new",
@@ -145,12 +145,12 @@ static const char * const menu_themed_names[] =
     /* 15 */ "system-run",		// sub. GTK_STOCK_EXECUTE
     /* 16 */ "edit-find-replace",	// sub. GTK_STOCK_FIND_AND_REPLACE
     /* 17 */ "window-close",		// sub. GTK_STOCK_CLOSE, FIXME: fuzzy
-#  if GTK_CHECK_VERSION(3,14,0)
+#  എങ്കിൽ GTK_CHECK_VERSION(3,14,0)
     /* 18 */ "stock_vim_window_maximize",
     /* 19 */ "stock_vim_window_minimize",
     /* 20 */ "stock_vim_window_split",
     /* 21 */ "stock_vim_shell",
-#  else
+#  അല്ലെങ്കിൽ
     /* 18 */ "vim-window-maximize",
     /* 19 */ "vim-window-minimize",
     /* 20 */ "vim-window-split",
@@ -158,19 +158,19 @@ static const char * const menu_themed_names[] =
 #  endif
     /* 22 */ "go-previous",		// sub. GTK_STOCK_GO_BACK
     /* 23 */ "go-next",			// sub. GTK_STOCK_GO_FORWARD
-#  if GTK_CHECK_VERSION(3,14,0)
+#  എങ്കിൽ GTK_CHECK_VERSION(3,14,0)
     /* 24 */ "stock_vim_find_help",
-#  else
+#  അല്ലെങ്കിൽ
     /* 24 */ "vim-find-help",
 #  endif
     /* 25 */ "gtk-convert",		// sub. GTK_STOCK_CONVERT
     /* 26 */ "go-jump",			// sub. GTK_STOCK_JUMP_TO
-#  if GTK_CHECK_VERSION(3,14,0)
+#  എങ്കിൽ GTK_CHECK_VERSION(3,14,0)
     /* 27 */ "stock_vim_build_tags",
     /* 28 */ "stock_vim_window_split_vertical",
     /* 29 */ "stock_vim_window_maximize_width",
     /* 30 */ "stock_vim_window_minimize_width",
-#  else
+#  അല്ലെങ്കിൽ
     /* 27 */ "vim-build-tags",
     /* 28 */ "vim-window-split-vertical",
     /* 29 */ "vim-window-maximize-width",
@@ -178,8 +178,8 @@ static const char * const menu_themed_names[] =
 #  endif
     /* 31 */ "application-exit",	// GTK_STOCK_QUIT
 };
-# else // !GTK_CHECK_VERSION(3,10,0)
-static const char * const menu_stock_ids[] =
+# അല്ലെങ്കിൽ // !GTK_CHECK_VERSION(3,10,0)
+സ്ഥിതം സ്ഥിരം അക്ഷരം * സ്ഥിരം menu_stock_ids[] =
 {
     /* 00 */ GTK_STOCK_NEW,
     /* 01 */ GTK_STOCK_OPEN,
@@ -217,13 +217,13 @@ static const char * const menu_stock_ids[] =
 # endif // !GTK_CHECK_VERSION(3,10,0)
 
 # ifdef USE_GRESOURCE
-#  if !GTK_CHECK_VERSION(3,10,0)
-typedef struct IconNames {
-    const char *icon_name;
-    const char *file_name;
+#  എങ്കിൽ !GTK_CHECK_VERSION(3,10,0)
+തരനിർവചനം ഘടന IconNames {
+    സ്ഥിരം അക്ഷരം *icon_name;
+    സ്ഥിരം അക്ഷരം *file_name;
 } IconNames;
 
-static IconNames stock_vim_icons[] = {
+സ്ഥിതം IconNames stock_vim_icons[] = {
     { "vim-build-tags", "stock_vim_build_tags.png" },
     { "vim-find-help", "stock_vim_find_help.png" },
     { "vim-save-all", "stock_vim_save_all.png" },
@@ -237,22 +237,22 @@ static IconNames stock_vim_icons[] = {
     { "vim-window-minimize-width", "stock_vim_window_minimize_width.png" },
     { "vim-window-split", "stock_vim_window_split.png" },
     { "vim-window-split-vertical", "stock_vim_window_split_vertical.png" },
-    { NULL, NULL }
+    { ശൂന്യ, ശൂന്യ }
 };
 #  endif
 # endif // USE_G_RESOURCE
 
 # ifndef USE_GRESOURCE
-    static void
+    സ്ഥിതം ശൂന്യം
 add_stock_icon(GtkIconFactory	*factory,
-	       const char	*stock_id,
-	       const guint8	*inline_data,
-	       int		data_length)
+	       സ്ഥിരം അക്ഷരം	*stock_id,
+	       സ്ഥിരം guint8	*inline_data,
+	       പൂർണ്ണസംഖ്യ		data_length)
 {
     GdkPixbuf	*pixbuf;
     GtkIconSet	*icon_set;
 
-    pixbuf = gdk_pixbuf_new_from_inline(data_length, inline_data, FALSE, NULL);
+    pixbuf = gdk_pixbuf_new_from_inline(data_length, inline_data, FALSE, ശൂന്യ);
     icon_set = gtk_icon_set_new_from_pixbuf(pixbuf);
 
     gtk_icon_factory_add(factory, stock_id, icon_set);
@@ -262,82 +262,82 @@ add_stock_icon(GtkIconFactory	*factory,
 }
 # endif
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 lookup_menu_iconfile(char_u *iconfile, char_u *dest)
 {
     expand_env(iconfile, dest, MAXPATHL);
 
-    if (mch_isFullName(dest))
+    എങ്കിൽ (mch_isFullName(dest))
     {
-	return vim_fexists(dest);
+	തിരികെ vim_fexists(dest);
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	static const char   suffixes[][4] = {"png", "xpm", "bmp"};
+	സ്ഥിതം സ്ഥിരം അക്ഷരം   suffixes[][4] = {"png", "xpm", "bmp"};
 	char_u		    buf[MAXPATHL];
-	unsigned int	    i;
+	unsigned പൂർണ്ണസംഖ്യ	    i;
 
-	for (i = 0; i < G_N_ELEMENTS(suffixes); ++i)
-	    if (gui_find_bitmap(dest, buf, (char *)suffixes[i]) == OK)
+	വേണ്ടി (i = 0; i < G_N_ELEMENTS(suffixes); ++i)
+	    എങ്കിൽ (gui_find_bitmap(dest, buf, (അക്ഷരം *)suffixes[i]) == OK)
 	    {
 		STRCPY(dest, buf);
-		return TRUE;
+		തിരികെ TRUE;
 	    }
 
-	return FALSE;
+	തിരികെ FALSE;
     }
 }
 
-    static GtkWidget *
+    സ്ഥിതം GtkWidget *
 load_menu_iconfile(char_u *name, GtkIconSize icon_size)
 {
-    GtkWidget	    *image = NULL;
-# if GTK_CHECK_VERSION(3,10,0)
-    int		     pixel_size = -1;
+    GtkWidget	    *image = ശൂന്യ;
+# എങ്കിൽ GTK_CHECK_VERSION(3,10,0)
+    പൂർണ്ണസംഖ്യ		     pixel_size = -1;
 
-    switch (icon_size)
+    തിരഞ്ഞെടുപ്പ് (icon_size)
     {
-	case GTK_ICON_SIZE_MENU:
+	അവസ്ഥ GTK_ICON_SIZE_MENU:
 	    pixel_size = 16;
-	    break;
-	case GTK_ICON_SIZE_SMALL_TOOLBAR:
+	    നിർത്തുക;
+	അവസ്ഥ GTK_ICON_SIZE_SMALL_TOOLBAR:
 	    pixel_size = 16;
-	    break;
-	case GTK_ICON_SIZE_LARGE_TOOLBAR:
+	    നിർത്തുക;
+	അവസ്ഥ GTK_ICON_SIZE_LARGE_TOOLBAR:
 	    pixel_size = 24;
-	    break;
-	case GTK_ICON_SIZE_BUTTON:
+	    നിർത്തുക;
+	അവസ്ഥ GTK_ICON_SIZE_BUTTON:
 	    pixel_size = 16;
-	    break;
-	case GTK_ICON_SIZE_DND:
+	    നിർത്തുക;
+	അവസ്ഥ GTK_ICON_SIZE_DND:
 	    pixel_size = 32;
-	    break;
-	case GTK_ICON_SIZE_DIALOG:
+	    നിർത്തുക;
+	അവസ്ഥ GTK_ICON_SIZE_DIALOG:
 	    pixel_size = 48;
-	    break;
-	case GTK_ICON_SIZE_INVALID:
+	    നിർത്തുക;
+	അവസ്ഥ GTK_ICON_SIZE_INVALID:
 	    // FALLTHROUGH
-	default:
+	സ്ഥിരസ്ഥിതി:
 	    pixel_size = 0;
-	    break;
+	    നിർത്തുക;
     }
 
-    if (pixel_size > 0 || pixel_size == -1)
+    എങ്കിൽ (pixel_size > 0 || pixel_size == -1)
     {
-	GdkPixbuf * const pixbuf
-	    = gdk_pixbuf_new_from_file_at_scale((const char *)name,
-		pixel_size, pixel_size, TRUE, NULL);
-	if (pixbuf != NULL)
+	GdkPixbuf * സ്ഥിരം pixbuf
+	    = gdk_pixbuf_new_from_file_at_scale((സ്ഥിരം അക്ഷരം *)name,
+		pixel_size, pixel_size, TRUE, ശൂന്യ);
+	എങ്കിൽ (pixbuf != ശൂന്യ)
 	{
 	    image = gtk_image_new_from_pixbuf(pixbuf);
 	    g_object_unref(pixbuf);
 	}
     }
-    if (image == NULL)
+    എങ്കിൽ (image == ശൂന്യ)
 	image = gtk_image_new_from_icon_name("image-missing", icon_size);
 
-    return image;
-# else // !GTK_CHECK_VERSION(3,10,0)
+    തിരികെ image;
+# അല്ലെങ്കിൽ // !GTK_CHECK_VERSION(3,10,0)
     GtkIconSet	    *icon_set;
     GtkIconSource   *icon_source;
 
@@ -349,7 +349,7 @@ load_menu_iconfile(char_u *name, GtkIconSize icon_size)
     icon_set = gtk_icon_set_new();
     icon_source = gtk_icon_source_new();
 
-    gtk_icon_source_set_filename(icon_source, (const char *)name);
+    gtk_icon_source_set_filename(icon_source, (സ്ഥിരം അക്ഷരം *)name);
     gtk_icon_set_add_source(icon_set, icon_source);
 
     image = gtk_image_new_from_icon_set(icon_set, icon_size);
@@ -357,55 +357,55 @@ load_menu_iconfile(char_u *name, GtkIconSize icon_size)
     gtk_icon_source_free(icon_source);
     gtk_icon_set_unref(icon_set);
 
-    return image;
+    തിരികെ image;
 # endif // !GTK_CHECK_VERSION(3,10,0)
 }
 
-    static GtkWidget *
+    സ്ഥിതം GtkWidget *
 create_menu_icon(vimmenu_T *menu, GtkIconSize icon_size)
 {
-    GtkWidget	*image = NULL;
+    GtkWidget	*image = ശൂന്യ;
     char_u	buf[MAXPATHL];
 
     // First use a specified "icon=" argument.
-    if (menu->iconfile != NULL && lookup_menu_iconfile(menu->iconfile, buf))
+    എങ്കിൽ (menu->iconfile != ശൂന്യ && lookup_menu_iconfile(menu->iconfile, buf))
 	image = load_menu_iconfile(buf, icon_size);
 
     // If not found and not builtin specified try using the menu name.
-    if (image == NULL && !menu->icon_builtin
+    എങ്കിൽ (image == ശൂന്യ && !menu->icon_builtin
 				     && lookup_menu_iconfile(menu->name, buf))
 	image = load_menu_iconfile(buf, icon_size);
 
     // Still not found?  Then use a builtin icon, a blank one as fallback.
-    if (image == NULL)
+    എങ്കിൽ (image == ശൂന്യ)
     {
-# if GTK_CHECK_VERSION(3,10,0)
-	const char *icon_name = NULL;
-	const int   n_names = G_N_ELEMENTS(menu_themed_names);
+# എങ്കിൽ GTK_CHECK_VERSION(3,10,0)
+	സ്ഥിരം അക്ഷരം *icon_name = ശൂന്യ;
+	സ്ഥിരം പൂർണ്ണസംഖ്യ   n_names = G_N_ELEMENTS(menu_themed_names);
 
-	if (menu->iconidx >= 0 && menu->iconidx < n_names)
+	എങ്കിൽ (menu->iconidx >= 0 && menu->iconidx < n_names)
 	    icon_name = menu_themed_names[menu->iconidx];
-	if (icon_name == NULL)
+	എങ്കിൽ (icon_name == ശൂന്യ)
 	    icon_name = "image-missing";
 
 	image = gtk_image_new_from_icon_name(icon_name, icon_size);
-# else
-	const char  *stock_id;
-	const int   n_ids = G_N_ELEMENTS(menu_stock_ids);
+# അല്ലെങ്കിൽ
+	സ്ഥിരം അക്ഷരം  *stock_id;
+	സ്ഥിരം പൂർണ്ണസംഖ്യ   n_ids = G_N_ELEMENTS(menu_stock_ids);
 
-	if (menu->iconidx >= 0 && menu->iconidx < n_ids)
+	എങ്കിൽ (menu->iconidx >= 0 && menu->iconidx < n_ids)
 	    stock_id = menu_stock_ids[menu->iconidx];
-	else
+	അല്ലെങ്കിൽ
 	    stock_id = GTK_STOCK_MISSING_IMAGE;
 
 	image = gtk_image_new_from_stock(stock_id, icon_size);
 # endif
     }
 
-    return image;
+    തിരികെ image;
 }
 
-    static gint
+    സ്ഥിതം gint
 toolbar_button_focus_in_event(GtkWidget *widget UNUSED,
 			      GdkEventFocus *event UNUSED,
 			      gpointer data UNUSED)
@@ -413,24 +413,24 @@ toolbar_button_focus_in_event(GtkWidget *widget UNUSED,
     // When we're in a GtkPlug, we don't have window focus events, only widget
     // focus.  To emulate stand-alone gvim, if a button gets focus (e.g.,
     // <Tab> into GtkPlug) immediately pass it to mainwin.
-    if (gtk_socket_id != 0)
+    എങ്കിൽ (gtk_socket_id != 0)
 	gtk_widget_grab_focus(gui.drawarea);
 
-    return TRUE;
+    തിരികെ TRUE;
 }
 #endif // FEAT_TOOLBAR
 
-#if defined(FEAT_TOOLBAR)
+#എങ്കിൽ defined(FEAT_TOOLBAR)
 
-    void
-gui_gtk_register_stock_icons(void)
+    ശൂന്യം
+gui_gtk_register_stock_icons(ശൂന്യം)
 {
 # ifndef USE_GRESOURCE
 #  include "../pixmaps/stock_icons.h"
     GtkIconFactory *factory;
 
     factory = gtk_icon_factory_new();
-#  define ADD_ICON(Name, Data) add_stock_icon(factory, Name, Data, (int)sizeof(Data))
+#  define ADD_ICON(Name, Data) add_stock_icon(factory, Name, Data, (പൂർണ്ണസംഖ്യ)വലുപ്പം(Data))
 
     ADD_ICON("vim-build-tags",		  stock_vim_build_tags);
     ADD_ICON("vim-find-help",		  stock_vim_find_help);
@@ -450,33 +450,33 @@ gui_gtk_register_stock_icons(void)
 
     gtk_icon_factory_add_default(factory);
     g_object_unref(factory);
-# else // defined(USE_GRESOURCE)
-    const char * const path_prefix = "/org/vim/gui/icon";
-#  if GTK_CHECK_VERSION(3,14,0)
-    GdkScreen    *screen = NULL;
-    GtkIconTheme *icon_theme = NULL;
+# അല്ലെങ്കിൽ // defined(USE_GRESOURCE)
+    സ്ഥിരം അക്ഷരം * സ്ഥിരം path_prefix = "/org/vim/gui/icon";
+#  എങ്കിൽ GTK_CHECK_VERSION(3,14,0)
+    GdkScreen    *screen = ശൂന്യ;
+    GtkIconTheme *icon_theme = ശൂന്യ;
 
-    if (GTK_IS_WIDGET(gui.mainwin))
+    എങ്കിൽ (GTK_IS_WIDGET(gui.mainwin))
 	screen = gtk_widget_get_screen(gui.mainwin);
-    else
+    അല്ലെങ്കിൽ
 	screen = gdk_screen_get_default();
     icon_theme = gtk_icon_theme_get_for_screen(screen);
     gtk_icon_theme_add_resource_path(icon_theme, path_prefix);
 #  elif GTK_CHECK_VERSION(3,0,0)
     IconNames *names;
 
-    for (names = stock_vim_icons; names->icon_name != NULL; names++)
+    വേണ്ടി (names = stock_vim_icons; names->icon_name != ശൂന്യ; names++)
     {
-	char path[MAXPATHL];
+	അക്ഷരം path[MAXPATHL];
 
 	vim_snprintf(path, MAXPATHL, "%s/%s", path_prefix, names->file_name);
-	GdkPixbuf *pixbuf = NULL;
-	pixbuf = gdk_pixbuf_new_from_resource(path, NULL);
-	if (pixbuf != NULL)
+	GdkPixbuf *pixbuf = ശൂന്യ;
+	pixbuf = gdk_pixbuf_new_from_resource(path, ശൂന്യ);
+	എങ്കിൽ (pixbuf != ശൂന്യ)
 	{
-	    const gint size = MAX(gdk_pixbuf_get_width(pixbuf),
+	    സ്ഥിരം gint size = MAX(gdk_pixbuf_get_width(pixbuf),
 				  gdk_pixbuf_get_height(pixbuf));
-	    if (size > 16)
+	    എങ്കിൽ (size > 16)
 	    {
 		// An icon theme is supposed to provide fixed-size
 		// image files for each size, e.g., 16, 22, 24, ...
@@ -494,27 +494,27 @@ gui_gtk_register_stock_icons(void)
 		pixbuf = gdk_pixbuf_scale_simple(src,
 						 16, 16,
 						 GDK_INTERP_BILINEAR);
-		if (pixbuf == NULL)
+		എങ്കിൽ (pixbuf == ശൂന്യ)
 		    pixbuf = src;
-		else
+		അല്ലെങ്കിൽ
 		    g_object_unref(src);
 	    }
 	    gtk_icon_theme_add_builtin_icon(names->icon_name, size, pixbuf);
 	    g_object_unref(pixbuf);
 	}
     }
-#  else // !GTK_CHECK_VERSION(3,0.0)
-    GtkIconFactory * const factory = gtk_icon_factory_new();
+#  അല്ലെങ്കിൽ // !GTK_CHECK_VERSION(3,0.0)
+    GtkIconFactory * സ്ഥിരം factory = gtk_icon_factory_new();
     IconNames *names;
 
-    for (names = stock_vim_icons; names->icon_name != NULL; names++)
+    വേണ്ടി (names = stock_vim_icons; names->icon_name != ശൂന്യ; names++)
     {
-	char path[MAXPATHL];
+	അക്ഷരം path[MAXPATHL];
 	GdkPixbuf *pixbuf;
 
 	vim_snprintf(path, MAXPATHL, "%s/%s", path_prefix, names->file_name);
-	pixbuf = gdk_pixbuf_new_from_resource(path, NULL);
-	if (pixbuf != NULL)
+	pixbuf = gdk_pixbuf_new_from_resource(path, ശൂന്യ);
+	എങ്കിൽ (pixbuf != ശൂന്യ)
 	{
 	    GtkIconSet *icon_set = gtk_icon_set_new_from_pixbuf(pixbuf);
 	    gtk_icon_factory_add(factory, names->icon_name, icon_set);
@@ -531,7 +531,7 @@ gui_gtk_register_stock_icons(void)
 
 #endif // FEAT_TOOLBAR
 
-#if defined(FEAT_MENU)
+#എങ്കിൽ defined(FEAT_MENU)
 
 /*
  * Translate Vim's mnemonic tagging to GTK+ style and convert to UTF-8
@@ -543,42 +543,42 @@ gui_gtk_register_stock_icons(void)
  *	&	_	stripped if use_mnemonic == FALSE
  *	<Tab>		end of menu label text
  */
-    static char_u *
-translate_mnemonic_tag(char_u *name, int use_mnemonic)
+    സ്ഥിതം char_u *
+translate_mnemonic_tag(char_u *name, പൂർണ്ണസംഖ്യ use_mnemonic)
 {
     char_u  *buf;
     char_u  *psrc;
     char_u  *pdest;
-    int	    n_underscores = 0;
+    പൂർണ്ണസംഖ്യ	    n_underscores = 0;
 
     name = CONVERT_TO_UTF8(name);
-    if (name == NULL)
-	return NULL;
+    എങ്കിൽ (name == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
-    for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
-	if (*psrc == '_')
+    വേണ്ടി (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	എങ്കിൽ (*psrc == '_')
 	    ++n_underscores;
 
     buf = alloc(psrc - name + n_underscores + 1);
-    if (buf != NULL)
+    എങ്കിൽ (buf != ശൂന്യ)
     {
 	pdest = buf;
-	for (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
+	വേണ്ടി (psrc = name; *psrc != NUL && *psrc != TAB; ++psrc)
 	{
-	    if (*psrc == '_')
+	    എങ്കിൽ (*psrc == '_')
 	    {
 		*pdest++ = '_';
 		*pdest++ = '_';
 	    }
-	    else if (*psrc != '&')
+	    അല്ലെങ്കിൽ എങ്കിൽ (*psrc != '&')
 	    {
 		*pdest++ = *psrc;
 	    }
-	    else if (*(psrc + 1) == '&')
+	    അല്ലെങ്കിൽ എങ്കിൽ (*(psrc + 1) == '&')
 	    {
 		*pdest++ = *psrc++;
 	    }
-	    else if (use_mnemonic)
+	    അല്ലെങ്കിൽ എങ്കിൽ (use_mnemonic)
 	    {
 		*pdest++ = '_';
 	    }
@@ -587,41 +587,41 @@ translate_mnemonic_tag(char_u *name, int use_mnemonic)
     }
 
     CONVERT_TO_UTF8_FREE(name);
-    return buf;
+    തിരികെ buf;
 }
 
-    static void
+    സ്ഥിതം ശൂന്യം
 menu_item_new(vimmenu_T *menu, GtkWidget *parent_widget)
 {
     GtkWidget	*box;
     char_u	*text;
-    int		use_mnemonic;
+    പൂർണ്ണസംഖ്യ		use_mnemonic;
 
     // It would be neat to have image menu items, but that would require major
     // changes to Vim's menu system.  Not to mention that all the translations
     // had to be updated.
     menu->id = gtk_menu_item_new();
-# if GTK_CHECK_VERSION(3,2,0)
+# എങ്കിൽ GTK_CHECK_VERSION(3,2,0)
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 20);
     gtk_box_set_homogeneous(GTK_BOX(box), FALSE);
-# else
+# അല്ലെങ്കിൽ
     box = gtk_hbox_new(FALSE, 20);
 # endif
 
     use_mnemonic = (p_wak[0] != 'n' || !GTK_IS_MENU_BAR(parent_widget));
     text = translate_mnemonic_tag(menu->name, use_mnemonic);
 
-    menu->label = gtk_label_new_with_mnemonic((const char *)text);
+    menu->label = gtk_label_new_with_mnemonic((സ്ഥിരം അക്ഷരം *)text);
     vim_free(text);
 
     gtk_box_pack_start(GTK_BOX(box), menu->label, FALSE, FALSE, 0);
 
-    if (menu->actext != NULL && menu->actext[0] != NUL)
+    എങ്കിൽ (menu->actext != ശൂന്യ && menu->actext[0] != NUL)
     {
 	text = CONVERT_TO_UTF8(menu->actext);
 
 	gtk_box_pack_end(GTK_BOX(box),
-			 gtk_label_new((const char *)text),
+			 gtk_label_new((സ്ഥിരം അക്ഷരം *)text),
 			 FALSE, FALSE, 0);
 
 	CONVERT_TO_UTF8_FREE(text);
@@ -631,203 +631,203 @@ menu_item_new(vimmenu_T *menu, GtkWidget *parent_widget)
     gtk_widget_show_all(menu->id);
 }
 
-    void
-gui_mch_add_menu(vimmenu_T *menu, int idx)
+    ശൂന്യം
+gui_mch_add_menu(vimmenu_T *menu, പൂർണ്ണസംഖ്യ idx)
 {
     vimmenu_T	*parent;
     GtkWidget	*parent_widget;
 
-    if (menu->name[0] == ']' || menu_is_popup(menu->name))
+    എങ്കിൽ (menu->name[0] == ']' || menu_is_popup(menu->name))
     {
 	menu->submenu_id = gtk_menu_new();
-	return;
+	തിരികെ;
     }
 
     parent = menu->parent;
 
-    if ((parent != NULL && parent->submenu_id == NULL)
+    എങ്കിൽ ((parent != ശൂന്യ && parent->submenu_id == ശൂന്യ)
 	    || !menu_is_menubar(menu->name))
-	return;
+	തിരികെ;
 
-    parent_widget = (parent != NULL) ? parent->submenu_id : gui.menubar;
+    parent_widget = (parent != ശൂന്യ) ? parent->submenu_id : gui.menubar;
     menu_item_new(menu, parent_widget);
 
-# if !GTK_CHECK_VERSION(3,4,0)
+# എങ്കിൽ !GTK_CHECK_VERSION(3,4,0)
     // since the tearoff should always appear first, increment idx
-    if (parent != NULL && !menu_is_popup(parent->name))
+    എങ്കിൽ (parent != ശൂന്യ && !menu_is_popup(parent->name))
 	++idx;
 # endif
 
-    gtk_menu_shell_insert(GTK_MENU_SHELL(parent_widget), menu->id, idx);
+    gtk_menu_shell_തിരുകുക(GTK_MENU_SHELL(parent_widget), menu->id, idx);
 
     menu->submenu_id = gtk_menu_new();
 
     gtk_menu_set_accel_group(GTK_MENU(menu->submenu_id), gui.accel_group);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu->id), menu->submenu_id);
 
-# if !GTK_CHECK_VERSION(3,4,0)
+# എങ്കിൽ !GTK_CHECK_VERSION(3,4,0)
     menu->tearoff_handle = gtk_tearoff_menu_item_new();
-    if (vim_strchr(p_go, GO_TEAROFF) != NULL)
+    എങ്കിൽ (vim_strchr(p_go, GO_TEAROFF) != ശൂന്യ)
 	gtk_widget_show(menu->tearoff_handle);
-#  if GTK_CHECK_VERSION(3,0,0)
+#  എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
     gtk_menu_shell_prepend(GTK_MENU_SHELL(menu->submenu_id),
 	    menu->tearoff_handle);
-#  else
+#  അല്ലെങ്കിൽ
     gtk_menu_prepend(GTK_MENU(menu->submenu_id), menu->tearoff_handle);
 #  endif
 # endif
 }
 
-    static void
+    സ്ഥിതം ശൂന്യം
 menu_item_activate(GtkWidget *widget UNUSED, gpointer data)
 {
     gui_menu_cb((vimmenu_T *)data);
 }
 
-    static void
+    സ്ഥിതം ശൂന്യം
 menu_item_select(GtkWidget *widget UNUSED, gpointer data)
 {
     vimmenu_T	*menu;
     char_u	*tooltip;
-    static int	did_msg = FALSE;
+    സ്ഥിതം പൂർണ്ണസംഖ്യ	did_സന്ദേശം = FALSE;
 
-    if (State & MODE_CMDLINE)
-	return;
+    എങ്കിൽ (State & MODE_CMDLINE)
+	തിരികെ;
     menu = (vimmenu_T *)data;
     tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-    if (tooltip != NULL && utf_valid_string(tooltip, NULL))
+    എങ്കിൽ (tooltip != ശൂന്യ && utf_valid_string(tooltip, ശൂന്യ))
     {
-	msg((char *)tooltip);
-	did_msg = TRUE;
+	സന്ദേശം((അക്ഷരം *)tooltip);
+	did_സന്ദേശം = TRUE;
 	setcursor();
 	out_flush_cursor(TRUE, FALSE);
     }
-    else if (did_msg)
+    അല്ലെങ്കിൽ എങ്കിൽ (did_സന്ദേശം)
     {
-	msg("");
-	did_msg = FALSE;
+	സന്ദേശം("");
+	did_സന്ദേശം = FALSE;
 	setcursor();
 	out_flush_cursor(TRUE, FALSE);
     }
     CONVERT_TO_UTF8_FREE(tooltip);
 }
 
-    void
-gui_mch_add_menu_item(vimmenu_T *menu, int idx)
+    ശൂന്യം
+gui_mch_add_menu_item(vimmenu_T *menu, പൂർണ്ണസംഖ്യ idx)
 {
     vimmenu_T *parent;
 
     parent = menu->parent;
 
 # ifdef FEAT_TOOLBAR
-    if (menu_is_toolbar(parent->name))
+    എങ്കിൽ (menu_is_toolbar(parent->name))
     {
 	GtkToolbar *toolbar;
 
 	toolbar = GTK_TOOLBAR(gui.toolbar);
-	menu->submenu_id = NULL;
+	menu->submenu_id = ശൂന്യ;
 
-	if (menu_is_separator(menu->name))
+	എങ്കിൽ (menu_is_separator(menu->name))
 	{
-#  if GTK_CHECK_VERSION(3,0,0)
+#  എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
 	    GtkToolItem *item = gtk_separator_tool_item_new();
 	    gtk_separator_tool_item_set_draw(GTK_SEPARATOR_TOOL_ITEM(item),
 		    TRUE);
 	    gtk_tool_item_set_expand(GTK_TOOL_ITEM(item), FALSE);
 	    gtk_widget_show(GTK_WIDGET(item));
 
-	    gtk_toolbar_insert(toolbar, item, idx);
-#  else
-	    gtk_toolbar_insert_space(toolbar, idx);
+	    gtk_toolbar_തിരുകുക(toolbar, item, idx);
+#  അല്ലെങ്കിൽ
+	    gtk_toolbar_തിരുകുക_space(toolbar, idx);
 #  endif
-	    menu->id = NULL;
+	    menu->id = ശൂന്യ;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    char_u *text;
 	    char_u *tooltip;
 
 	    text    = CONVERT_TO_UTF8(menu->dname);
 	    tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-	    if (tooltip != NULL && !utf_valid_string(tooltip, NULL))
+	    എങ്കിൽ (tooltip != ശൂന്യ && !utf_valid_string(tooltip, ശൂന്യ))
 		// Invalid text, can happen when 'encoding' is changed.  Avoid
 		// a nasty GTK error message, skip the tooltip.
 		CONVERT_TO_UTF8_FREE(tooltip);
 
-#  if GTK_CHECK_VERSION(3,0,0)
+#  എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
 	    {
 		GtkWidget *icon;
 		GtkToolItem *item;
 
 		icon = create_menu_icon(menu,
 			gtk_toolbar_get_icon_size(toolbar));
-		item = gtk_tool_button_new(icon, (const gchar *)text);
-		gtk_tool_item_set_tooltip_text(item, (const gchar *)tooltip);
+		item = gtk_tool_button_new(icon, (സ്ഥിരം gchar *)text);
+		gtk_tool_item_set_tooltip_text(item, (സ്ഥിരം gchar *)tooltip);
 		g_signal_connect(G_OBJECT(item), "clicked",
 			G_CALLBACK(&menu_item_activate), menu);
 		gtk_widget_show_all(GTK_WIDGET(item));
 
-		gtk_toolbar_insert(toolbar, item, idx);
+		gtk_toolbar_തിരുകുക(toolbar, item, idx);
 
 		menu->id = GTK_WIDGET(item);
 	    }
-#  else
-	    menu->id = gtk_toolbar_insert_item(
+#  അല്ലെങ്കിൽ
+	    menu->id = gtk_toolbar_തിരുകുക_item(
 		    toolbar,
-		    (const char *)text,
-		    (const char *)tooltip,
-		    NULL,
+		    (സ്ഥിരം അക്ഷരം *)text,
+		    (സ്ഥിരം അക്ഷരം *)tooltip,
+		    ശൂന്യ,
 		    create_menu_icon(menu, gtk_toolbar_get_icon_size(toolbar)),
 		    G_CALLBACK(&menu_item_activate),
 		    menu,
 		    idx);
 #  endif
 
-	    if (gtk_socket_id != 0)
+	    എങ്കിൽ (gtk_socket_id != 0)
 		g_signal_connect(G_OBJECT(menu->id), "focus-in-event",
-			G_CALLBACK(toolbar_button_focus_in_event), NULL);
+			G_CALLBACK(toolbar_button_focus_in_event), ശൂന്യ);
 
 	    CONVERT_TO_UTF8_FREE(text);
 	    CONVERT_TO_UTF8_FREE(tooltip);
 	}
     }
-    else
+    അല്ലെങ്കിൽ
 # endif // FEAT_TOOLBAR
     {
 	// No parent, must be a non-menubar menu
-	if (parent == NULL || parent->submenu_id == NULL)
-	    return;
+	എങ്കിൽ (parent == ശൂന്യ || parent->submenu_id == ശൂന്യ)
+	    തിരികെ;
 
-# if !GTK_CHECK_VERSION(3,4,0)
+# എങ്കിൽ !GTK_CHECK_VERSION(3,4,0)
 	// Make place for the possible tearoff handle item.  Not in the popup
 	// menu, it doesn't have a tearoff item.
-	if (!menu_is_popup(parent->name))
+	എങ്കിൽ (!menu_is_popup(parent->name))
 	    ++idx;
 # endif
 
-	if (menu_is_separator(menu->name))
+	എങ്കിൽ (menu_is_separator(menu->name))
 	{
 	    // Separator: Just add it
-# if GTK_CHECK_VERSION(3,0,0)
+# എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
 	    menu->id = gtk_separator_menu_item_new();
-# else
+# അല്ലെങ്കിൽ
 	    menu->id = gtk_menu_item_new();
 	    gtk_widget_set_sensitive(menu->id, FALSE);
 # endif
 	    gtk_widget_show(menu->id);
-	    gtk_menu_shell_insert(GTK_MENU_SHELL(parent->submenu_id),
+	    gtk_menu_shell_തിരുകുക(GTK_MENU_SHELL(parent->submenu_id),
 		    menu->id, idx);
 
-	    return;
+	    തിരികെ;
 	}
 
 	// Add textual menu item.
 	menu_item_new(menu, parent->submenu_id);
 	gtk_widget_show(menu->id);
-	gtk_menu_shell_insert(GTK_MENU_SHELL(parent->submenu_id),
+	gtk_menu_shell_തിരുകുക(GTK_MENU_SHELL(parent->submenu_id),
 		menu->id, idx);
 
-	if (menu->id != NULL)
+	എങ്കിൽ (menu->id != ശൂന്യ)
 	{
 	    g_signal_connect(G_OBJECT(menu->id), "activate",
 			     G_CALLBACK(menu_item_activate), menu);
@@ -839,47 +839,47 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 #endif // FEAT_MENU
 
 
-    void
-gui_mch_set_text_area_pos(int x, int y, int w, int h)
+    ശൂന്യം
+gui_mch_set_text_area_pos(പൂർണ്ണസംഖ്യ x, പൂർണ്ണസംഖ്യ y, പൂർണ്ണസംഖ്യ w, പൂർണ്ണസംഖ്യ h)
 {
     gui_gtk_form_move_resize(GTK_FORM(gui.formwin), gui.drawarea, x, y, w, h);
 }
 
 
-#if defined(FEAT_MENU)
+#എങ്കിൽ defined(FEAT_MENU)
 /*
  * Enable or disable accelerators for the toplevel menus.
  */
-    void
-gui_gtk_set_mnemonics(int enable)
+    ശൂന്യം
+gui_gtk_set_mnemonics(പൂർണ്ണസംഖ്യ enable)
 {
     vimmenu_T	*menu;
     char_u	*name;
 
     FOR_ALL_MENUS(menu)
     {
-	if (menu->id == NULL)
-	    continue;
+	എങ്കിൽ (menu->id == ശൂന്യ)
+	    തുടരുക;
 
 	name = translate_mnemonic_tag(menu->name, enable);
 	gtk_label_set_text_with_mnemonic(GTK_LABEL(menu->label),
-					 (const char *)name);
+					 (സ്ഥിരം അക്ഷരം *)name);
 	vim_free(name);
     }
 }
 
-# if !GTK_CHECK_VERSION(3,4,0)
-    static void
-recurse_tearoffs(vimmenu_T *menu, int val)
+# എങ്കിൽ !GTK_CHECK_VERSION(3,4,0)
+    സ്ഥിതം ശൂന്യം
+recurse_tearoffs(vimmenu_T *menu, പൂർണ്ണസംഖ്യ val)
 {
-    for (; menu != NULL; menu = menu->next)
+    വേണ്ടി (; menu != ശൂന്യ; menu = menu->next)
     {
-	if (menu->submenu_id != NULL && menu->tearoff_handle != NULL
+	എങ്കിൽ (menu->submenu_id != ശൂന്യ && menu->tearoff_handle != ശൂന്യ
 		&& menu->name[0] != ']' && !menu_is_popup(menu->name))
 	{
-	    if (val)
+	    എങ്കിൽ (val)
 		gtk_widget_show(menu->tearoff_handle);
-	    else
+	    അല്ലെങ്കിൽ
 		gtk_widget_hide(menu->tearoff_handle);
 	}
 	recurse_tearoffs(menu->children, val);
@@ -887,116 +887,116 @@ recurse_tearoffs(vimmenu_T *menu, int val)
 }
 # endif
 
-# if GTK_CHECK_VERSION(3,4,0)
-    void
-gui_mch_toggle_tearoffs(int enable UNUSED)
+# എങ്കിൽ GTK_CHECK_VERSION(3,4,0)
+    ശൂന്യം
+gui_mch_toggle_tearoffs(പൂർണ്ണസംഖ്യ enable UNUSED)
 {
     // Do nothing
 }
-# else
-    void
-gui_mch_toggle_tearoffs(int enable)
+# അല്ലെങ്കിൽ
+    ശൂന്യം
+gui_mch_toggle_tearoffs(പൂർണ്ണസംഖ്യ enable)
 {
-    recurse_tearoffs(root_menu, enable);
+    recurse_tearoffs(വേര്_menu, enable);
 }
 # endif
 #endif // FEAT_MENU
 
-#if defined(FEAT_TOOLBAR)
-    static int
+#എങ്കിൽ defined(FEAT_TOOLBAR)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 get_menu_position(vimmenu_T *menu)
 {
-    vimmenu_T	*node;
-    int		idx = 0;
+    vimmenu_T	*കണ്ണി;
+    പൂർണ്ണസംഖ്യ		idx = 0;
 
-    for (node = menu->parent->children; node != menu; node = node->next)
+    വേണ്ടി (കണ്ണി = menu->parent->children; കണ്ണി != menu; കണ്ണി = കണ്ണി->next)
     {
-	g_return_val_if_fail(node != NULL, -1);
+	g_return_val_if_fail(കണ്ണി != ശൂന്യ, -1);
 	++idx;
     }
 
-    return idx;
+    തിരികെ idx;
 }
 #endif // FEAT_TOOLBAR
 
 
-#if defined(FEAT_TOOLBAR)
-    void
+#എങ്കിൽ defined(FEAT_TOOLBAR)
+    ശൂന്യം
 gui_mch_menu_set_tip(vimmenu_T *menu)
 {
-    if (menu->id == NULL || menu->parent == NULL || gui.toolbar == NULL)
-	return;
+    എങ്കിൽ (menu->id == ശൂന്യ || menu->parent == ശൂന്യ || gui.toolbar == ശൂന്യ)
+	തിരികെ;
 
     char_u *tooltip;
 
     tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
-    if (tooltip != NULL && utf_valid_string(tooltip, NULL))
-# if GTK_CHECK_VERSION(3,0,0)
+    എങ്കിൽ (tooltip != ശൂന്യ && utf_valid_string(tooltip, ശൂന്യ))
+# എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
 	// Only set the tooltip when it's valid utf-8.
-	gtk_widget_set_tooltip_text(menu->id, (const gchar *)tooltip);
-# else
+	gtk_widget_set_tooltip_text(menu->id, (സ്ഥിരം gchar *)tooltip);
+# അല്ലെങ്കിൽ
     // Only set the tooltip when it's valid utf-8.
     gtk_tooltips_set_tip(GTK_TOOLBAR(gui.toolbar)->tooltips,
-	    menu->id, (const char *)tooltip, NULL);
+	    menu->id, (സ്ഥിരം അക്ഷരം *)tooltip, ശൂന്യ);
 # endif
     CONVERT_TO_UTF8_FREE(tooltip);
 }
 #endif // FEAT_TOOLBAR
 
 
-#if defined(FEAT_MENU)
+#എങ്കിൽ defined(FEAT_MENU)
 /*
  * Destroy the machine specific menu widget.
  */
-    void
+    ശൂന്യം
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
     // Don't let gtk_container_remove automatically destroy menu->id.
-    if (menu->id != NULL)
+    എങ്കിൽ (menu->id != ശൂന്യ)
 	g_object_ref(menu->id);
 
     // Workaround for a spurious gtk warning in Ubuntu: "Trying to remove
     // a child that doesn't believe we're its parent."
     // Remove widget from gui.menubar before destroying it.
-    if (menu->id != NULL && gui.menubar != NULL
+    എങ്കിൽ (menu->id != ശൂന്യ && gui.menubar != ശൂന്യ
 			    && gtk_widget_get_parent(menu->id) == gui.menubar)
 	gtk_container_remove(GTK_CONTAINER(gui.menubar), menu->id);
 
 # ifdef FEAT_TOOLBAR
-    if (menu->parent != NULL && menu_is_toolbar(menu->parent->name))
+    എങ്കിൽ (menu->parent != ശൂന്യ && menu_is_toolbar(menu->parent->name))
     {
-	if (menu_is_separator(menu->name))
-#  if GTK_CHECK_VERSION(3,0,0)
+	എങ്കിൽ (menu_is_separator(menu->name))
+#  എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
 	{
-	    GtkToolItem *item = NULL;
+	    GtkToolItem *item = ശൂന്യ;
 
 	    item = gtk_toolbar_get_nth_item(GTK_TOOLBAR(gui.toolbar),
 					    get_menu_position(menu));
-	    if (item != NULL)
+	    എങ്കിൽ (item != ശൂന്യ)
 		gtk_container_remove(GTK_CONTAINER(gui.toolbar),
 				     GTK_WIDGET(item));
 	}
-#  else
+#  അല്ലെങ്കിൽ
 	    gtk_toolbar_remove_space(GTK_TOOLBAR(gui.toolbar),
 				     get_menu_position(menu));
 #  endif
-	else if (menu->id != NULL)
+	അല്ലെങ്കിൽ എങ്കിൽ (menu->id != ശൂന്യ)
 	    gtk_widget_destroy(menu->id);
     }
-    else
+    അല്ലെങ്കിൽ
 # endif // FEAT_TOOLBAR
     {
-	if (menu->submenu_id != NULL)
+	എങ്കിൽ (menu->submenu_id != ശൂന്യ)
 	    gtk_widget_destroy(menu->submenu_id);
 
-	if (menu->id != NULL)
+	എങ്കിൽ (menu->id != ശൂന്യ)
 	    gtk_widget_destroy(menu->id);
     }
 
-    if (menu->id != NULL)
+    എങ്കിൽ (menu->id != ശൂന്യ)
 	g_object_unref(menu->id);
-    menu->submenu_id = NULL;
-    menu->id = NULL;
+    menu->submenu_id = ശൂന്യ;
+    menu->id = ശൂന്യ;
 }
 #endif // FEAT_MENU
 
@@ -1004,11 +1004,11 @@ gui_mch_destroy_menu(vimmenu_T *menu)
 /*
  * Scrollbar stuff.
  */
-    void
+    ശൂന്യം
 gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
 {
-    if (sb->id == NULL)
-	return;
+    എങ്കിൽ (sb->id == ശൂന്യ)
+	തിരികെ;
 
     GtkAdjustment *adjustment;
 
@@ -1018,7 +1018,7 @@ gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
     adjustment = gtk_range_get_adjustment(GTK_RANGE(sb->id));
 
     gtk_adjustment_set_lower(adjustment, 0.0);
-    gtk_adjustment_set_value(adjustment, val);
+    gtk_adjustment_set_മൂല്യം(adjustment, val);
     gtk_adjustment_set_upper(adjustment, max + 1);
     gtk_adjustment_set_page_size(adjustment, size);
     gtk_adjustment_set_page_increment(adjustment,
@@ -1029,7 +1029,7 @@ gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
 
     --hold_gui_events;
 
-#if !GTK_CHECK_VERSION(3,18,0)
+#എങ്കിൽ !GTK_CHECK_VERSION(3,18,0)
     gtk_adjustment_changed(adjustment);
 #endif
 
@@ -1037,63 +1037,63 @@ gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
 	    (gulong)sb->handler_id);
 }
 
-    void
-gui_mch_set_scrollbar_pos(scrollbar_T *sb, int x, int y, int w, int h)
+    ശൂന്യം
+gui_mch_set_scrollbar_pos(scrollbar_T *sb, പൂർണ്ണസംഖ്യ x, പൂർണ്ണസംഖ്യ y, പൂർണ്ണസംഖ്യ w, പൂർണ്ണസംഖ്യ h)
 {
-    if (sb->id != NULL)
+    എങ്കിൽ (sb->id != ശൂന്യ)
 	gui_gtk_form_move_resize(GTK_FORM(gui.formwin), sb->id, x, y, w, h);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    പൂർണ്ണസംഖ്യ
+gui_mch_get_scrollbar_xpadding(ശൂന്യം)
 {
-    int xpad;
-#if GTK_CHECK_VERSION(3,0,0)
+    പൂർണ്ണസംഖ്യ xpad;
+#എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
     xpad = gtk_widget_get_allocated_width(gui.formwin)
 	  - gtk_widget_get_allocated_width(gui.drawarea) - gui.scrollbar_width;
-#else
+#അല്ലെങ്കിൽ
     xpad = gui.formwin->allocation.width - gui.drawarea->allocation.width
 							 - gui.scrollbar_width;
 #endif
-    if (gui.which_scrollbars[SBAR_LEFT] && gui.which_scrollbars[SBAR_RIGHT])
+    എങ്കിൽ (gui.which_scrollbars[SBAR_ഇടത്] && gui.which_scrollbars[SBAR_വലത്])
 	xpad -= gui.scrollbar_width;
 
-    return (xpad < 0) ? 0 : xpad;
+    തിരികെ (xpad < 0) ? 0 : xpad;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    പൂർണ്ണസംഖ്യ
+gui_mch_get_scrollbar_ypadding(ശൂന്യം)
 {
-    int ypad;
-#if GTK_CHECK_VERSION(3,0,0)
+    പൂർണ്ണസംഖ്യ ypad;
+#എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
     ypad = gtk_widget_get_allocated_height(gui.formwin)
 	- gtk_widget_get_allocated_height(gui.drawarea) - gui.scrollbar_height;
-#else
+#അല്ലെങ്കിൽ
     ypad = gui.formwin->allocation.height - gui.drawarea->allocation.height
 							- gui.scrollbar_height;
 #endif
-    return (ypad < 0) ? 0 : ypad;
+    തിരികെ (ypad < 0) ? 0 : ypad;
 }
 
 /*
  * Take action upon scrollbar dragging.
  */
-    static void
-adjustment_value_changed(GtkAdjustment *adjustment, gpointer data)
+    സ്ഥിതം ശൂന്യം
+adjustment_മൂല്യം_changed(GtkAdjustment *adjustment, gpointer data)
 {
     scrollbar_T	*sb;
-    long	value;
-    int		dragging = FALSE;
+    long	മൂല്യം;
+    പൂർണ്ണസംഖ്യ		dragging = FALSE;
 
 #ifdef FEAT_XIM
     // cancel any preediting
-    if (im_is_preediting())
+    എങ്കിൽ (im_is_preediting())
 	xim_reset();
 #endif
 
     sb = gui_find_scrollbar((long)data);
-    value = gtk_adjustment_get_value(adjustment);
-#if !GTK_CHECK_VERSION(3,0,0)
+    മൂല്യം = gtk_adjustment_get_മൂല്യം(adjustment);
+#എങ്കിൽ !GTK_CHECK_VERSION(3,0,0)
     /*
      * The dragging argument must be right for the scrollbar to work with
      * closed folds.  This isn't documented, hopefully this will keep on
@@ -1103,62 +1103,62 @@ adjustment_value_changed(GtkAdjustment *adjustment, gpointer data)
      * HACK: Get the mouse pointer position, if it appears to be on an arrow
      * button set "dragging" to FALSE.  This assumes square buttons!
      */
-    if (sb != NULL)
+    എങ്കിൽ (sb != ശൂന്യ)
     {
 	dragging = TRUE;
 
-	if (sb->wp != NULL && GDK_IS_DRAWABLE(sb->id->window))
+	എങ്കിൽ (sb->wp != ശൂന്യ && GDK_IS_DRAWABLE(sb->id->window))
 	{
-	    int			x;
-	    int			y;
+	    പൂർണ്ണസംഖ്യ			x;
+	    പൂർണ്ണസംഖ്യ			y;
 	    GdkModifierType	state;
-	    int			width;
-	    int			height;
+	    പൂർണ്ണസംഖ്യ			width;
+	    പൂർണ്ണസംഖ്യ			height;
 
 	    // vertical scrollbar: need to set "dragging" properly in case
 	    // there are closed folds.
 	    gdk_window_get_pointer(sb->id->window, &x, &y, &state);
 	    gdk_window_get_size(sb->id->window, &width, &height);
-	    if (x >= 0 && x < width && y >= 0 && y < height)
+	    എങ്കിൽ (x >= 0 && x < width && y >= 0 && y < height)
 	    {
-		if (y < width)
+		എങ്കിൽ (y < width)
 		{
 		    // up arrow: move one (closed fold) line up
 		    dragging = FALSE;
-		    value = sb->wp->w_topline - 2;
+		    മൂല്യം = sb->wp->w_topline - 2;
 		}
-		else if (y > height - width)
+		അല്ലെങ്കിൽ എങ്കിൽ (y > height - width)
 		{
 		    // down arrow: move one (closed fold) line down
 		    dragging = FALSE;
-		    value = sb->wp->w_topline;
+		    മൂല്യം = sb->wp->w_topline;
 		}
 	    }
 	}
     }
 #endif // !GTK_CHECK_VERSION(3,0,0)
-    gui_drag_scrollbar(sb, value, dragging);
+    gui_drag_scrollbar(sb, മൂല്യം, dragging);
 }
 
 // SBAR_VERT or SBAR_HORIZ
-    void
-gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
+    ശൂന്യം
+gui_mch_create_scrollbar(scrollbar_T *sb, പൂർണ്ണസംഖ്യ orient)
 {
-    if (orient == SBAR_HORIZ)
-#if GTK_CHECK_VERSION(3,2,0)
-	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_HORIZONTAL, NULL);
-#else
-	sb->id = gtk_hscrollbar_new(NULL);
+    എങ്കിൽ (orient == SBAR_HORIZ)
+#എങ്കിൽ GTK_CHECK_VERSION(3,2,0)
+	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_HORIZONTAL, ശൂന്യ);
+#അല്ലെങ്കിൽ
+	sb->id = gtk_hscrollbar_new(ശൂന്യ);
 #endif
-    else if (orient == SBAR_VERT)
-#if GTK_CHECK_VERSION(3,2,0)
-	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, NULL);
-#else
-	sb->id = gtk_vscrollbar_new(NULL);
+    അല്ലെങ്കിൽ എങ്കിൽ (orient == SBAR_VERT)
+#എങ്കിൽ GTK_CHECK_VERSION(3,2,0)
+	sb->id = gtk_scrollbar_new(GTK_ORIENTATION_VERTICAL, ശൂന്യ);
+#അല്ലെങ്കിൽ
+	sb->id = gtk_vscrollbar_new(ശൂന്യ);
 #endif
 
-    if (sb->id == NULL)
-	return;
+    എങ്കിൽ (sb->id == ശൂന്യ)
+	തിരികെ;
 
     GtkAdjustment *adjustment;
 
@@ -1169,23 +1169,23 @@ gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
 
     sb->handler_id = g_signal_connect(
 	    G_OBJECT(adjustment), "value-changed",
-	    G_CALLBACK(adjustment_value_changed),
+	    G_CALLBACK(adjustment_മൂല്യം_changed),
 	    GINT_TO_POINTER(sb->ident));
     gui_mch_update();
 }
 
-    void
+    ശൂന്യം
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
-    if (sb->id != NULL)
+    എങ്കിൽ (sb->id != ശൂന്യ)
     {
 	gtk_widget_destroy(sb->id);
-	sb->id = NULL;
+	sb->id = ശൂന്യ;
     }
     gui_mch_update();
 }
 
-#if defined(FEAT_BROWSE)
+#എങ്കിൽ defined(FEAT_BROWSE)
 /*
  * Implementation of the file selector related stuff
  */
@@ -1201,28 +1201,28 @@ gui_mch_destroy_scrollbar(scrollbar_T *sb)
  * filter			file name filter
  */
     char_u *
-gui_mch_browse(int saving,
+gui_mch_browse(പൂർണ്ണസംഖ്യ saving,
 	       char_u *title,
 	       char_u *dflt,
 	       char_u *ext UNUSED,
 	       char_u *initdir,
 	       char_u *filter)
 {
-# if GTK_CHECK_VERSION(3,20,0)
+# എങ്കിൽ GTK_CHECK_VERSION(3,20,0)
     GtkFileChooserNative	*fc;
-# else
+# അല്ലെങ്കിൽ
     GtkWidget			*fc;
 # endif
     char_u		dirbuf[MAXPATHL];
     guint		log_handler;
-    const gchar		*domain = "Gtk";
+    സ്ഥിരം gchar		*domain = "Gtk";
 
     title = CONVERT_TO_UTF8(title);
 
     // GTK has a bug, it only works with an absolute path.
-    if (initdir == NULL || *initdir == NUL)
+    എങ്കിൽ (initdir == ശൂന്യ || *initdir == NUL)
 	mch_dirname(dirbuf, MAXPATHL);
-    else if (vim_FullName(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
+    അല്ലെങ്കിൽ എങ്കിൽ (vim_FullName(initdir, dirbuf, MAXPATHL - 2, FALSE) == FAIL)
 	dirbuf[0] = NUL;
     // Always need a trailing slash for a directory.
     add_pathsep(dirbuf);
@@ -1233,68 +1233,68 @@ gui_mch_browse(int saving,
     // Hack: The GTK file dialog warns when it can't access a new file, this
     // makes it shut up. http://bugzilla.gnome.org/show_bug.cgi?id=664587
     log_handler = g_log_set_handler(domain, G_LOG_LEVEL_WARNING,
-						  recent_func_log_func, NULL);
+						  recent_func_log_func, ശൂന്യ);
 
     // We create the dialog each time, so that the button text can be "Open"
     // or "Save" according to the action.
-# if GTK_CHECK_VERSION(3,20,0)
+# എങ്കിൽ GTK_CHECK_VERSION(3,20,0)
     fc = gtk_file_chooser_native_new(
-# else
+# അല്ലെങ്കിൽ
     fc = gtk_file_chooser_dialog_new(
 # endif
-	    (const gchar *)title,
+	    (സ്ഥിരം gchar *)title,
 	    GTK_WINDOW(gui.mainwin),
 	    saving ? GTK_FILE_CHOOSER_ACTION_SAVE
 					   : GTK_FILE_CHOOSER_ACTION_OPEN,
-# if GTK_CHECK_VERSION(3,20,0)
+# എങ്കിൽ GTK_CHECK_VERSION(3,20,0)
 	    saving ? _("_Save") : _("_Open"), _("_Cancel"));
-# else
-#  if GTK_CHECK_VERSION(3,10,0)
+# അല്ലെങ്കിൽ
+#  എങ്കിൽ GTK_CHECK_VERSION(3,10,0)
 	    _("_Cancel"), GTK_RESPONSE_CANCEL,
 	    saving ? _("_Save") : _("_Open"), GTK_RESPONSE_ACCEPT,
-#  else
+#  അല്ലെങ്കിൽ
 	    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 	    saving ? GTK_STOCK_SAVE : GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
 #  endif
-	    NULL);
+	    ശൂന്യ);
 # endif
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(fc),
-						       (const gchar *)dirbuf);
+						       (സ്ഥിരം gchar *)dirbuf);
 
-    if (filter != NULL && *filter != NUL)
+    എങ്കിൽ (filter != ശൂന്യ && *filter != NUL)
     {
-	int     i = 0;
+	പൂർണ്ണസംഖ്യ     i = 0;
 	char_u  *patt;
 	char_u  *p = filter;
 	GtkFileFilter	*gfilter;
 
 	gfilter = gtk_file_filter_new();
 	patt = alloc(STRLEN(filter));
-	if (patt != NULL)
+	എങ്കിൽ (patt != ശൂന്യ)
 	{
-	    while (p != NULL && *p != NUL)
+	    ആകുമ്പോൾ (p != ശൂന്യ && *p != NUL)
 	    {
-		if (*p == '\n' || *p == ';' || *p == '\t')
+		എങ്കിൽ (*p == '\n' || *p == ';' || *p == '\t')
 		{
 		    STRNCPY(patt, filter, i);
 		    patt[i] = '\0';
-		    if (*p == '\t')
+		    എങ്കിൽ (*p == '\t')
 			gtk_file_filter_set_name(gfilter, (gchar *)patt);
-		    else
+		    അല്ലെങ്കിൽ
 		    {
 			gtk_file_filter_add_pattern(gfilter, (gchar *)patt);
-			if (*p == '\n')
+			എങ്കിൽ (*p == '\n')
 			{
 			    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(fc),
 				    gfilter);
-			    if (*(p + 1) != NUL)
+			    എങ്കിൽ (*(p + 1) != NUL)
 				gfilter = gtk_file_filter_new();
 			}
 		    }
 		    filter = ++p;
 		    i = 0;
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
 		    p++;
 		    i++;
@@ -1303,36 +1303,36 @@ gui_mch_browse(int saving,
 	}
 	vim_free(patt);
     }
-    if (saving && dflt != NULL && *dflt != NUL)
-	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(fc), (char *)dflt);
+    എങ്കിൽ (saving && dflt != ശൂന്യ && *dflt != NUL)
+	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(fc), (അക്ഷരം *)dflt);
 
-    gui.browse_fname = NULL;
-# if GTK_CHECK_VERSION(3,20,0)
-    if (gtk_native_dialog_run(GTK_NATIVE_DIALOG(fc)) == GTK_RESPONSE_ACCEPT)
-# else
-    if (gtk_dialog_run(GTK_DIALOG(fc)) == GTK_RESPONSE_ACCEPT)
+    gui.browse_fname = ശൂന്യ;
+# എങ്കിൽ GTK_CHECK_VERSION(3,20,0)
+    എങ്കിൽ (gtk_native_dialog_run(GTK_NATIVE_DIALOG(fc)) == GTK_RESPONSE_ACCEPT)
+# അല്ലെങ്കിൽ
+    എങ്കിൽ (gtk_dialog_run(GTK_DIALOG(fc)) == GTK_RESPONSE_ACCEPT)
 # endif
     {
-	char *filename;
+	അക്ഷരം *filename;
 
 	filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(fc));
 	gui.browse_fname = (char_u *)g_strdup(filename);
 	g_free(filename);
     }
-# if GTK_CHECK_VERSION(3,20,0)
+# എങ്കിൽ GTK_CHECK_VERSION(3,20,0)
     g_object_unref(fc);
-# else
+# അല്ലെങ്കിൽ
     gtk_widget_destroy(GTK_WIDGET(fc));
 # endif
 
     g_log_remove_handler(domain, log_handler);
 
     CONVERT_TO_UTF8_FREE(title);
-    if (gui.browse_fname == NULL)
-	return NULL;
+    എങ്കിൽ (gui.browse_fname == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
     // shorten the file name if possible
-    return vim_strsave(shorten_fname1(gui.browse_fname));
+    തിരികെ vim_strsave(shorten_fname1(gui.browse_fname));
 }
 
 /*
@@ -1347,26 +1347,26 @@ gui_mch_browsedir(
 	       char_u *title,
 	       char_u *initdir)
 {
-# if defined(GTK_FILE_CHOOSER)	    // Only in GTK 2.4 and later.
+# എങ്കിൽ defined(GTK_FILE_CHOOSER)	    // Only in GTK 2.4 and later.
     char_u		dirbuf[MAXPATHL];
     char_u		*p;
     GtkWidget		*dirdlg;	    // file selection dialog
-    char_u		*dirname = NULL;
+    char_u		*dirname = ശൂന്യ;
 
     title = CONVERT_TO_UTF8(title);
 
     dirdlg = gtk_file_chooser_dialog_new(
-	    (const gchar *)title,
+	    (സ്ഥിരം gchar *)title,
 	    GTK_WINDOW(gui.mainwin),
 	    GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-#  if GTK_CHECK_VERSION(3,10,0)
+#  എങ്കിൽ GTK_CHECK_VERSION(3,10,0)
 	    _("_Cancel"), GTK_RESPONSE_CANCEL,
 	    _("_OK"), GTK_RESPONSE_ACCEPT,
-#  else
+#  അല്ലെങ്കിൽ
 	    GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 	    GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
 #  endif
-	    NULL);
+	    ശൂന്യ);
 
     CONVERT_TO_UTF8_FREE(title);
 
@@ -1374,7 +1374,7 @@ gui_mch_browsedir(
     gui_mch_mousehide(FALSE);
 
     // GTK appears to insist on an absolute path.
-    if (initdir == NULL || *initdir == NUL
+    എങ്കിൽ (initdir == ശൂന്യ || *initdir == NUL
 	       || vim_FullName(initdir, dirbuf, MAXPATHL - 10, FALSE) == FAIL)
 	mch_dirname(dirbuf, MAXPATHL - 10);
 
@@ -1383,44 +1383,44 @@ gui_mch_browsedir(
     add_pathsep(dirbuf);
     STRCAT(dirbuf, "@zd(*&1|");
     gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dirdlg),
-						      (const gchar *)dirbuf);
+						      (സ്ഥിരം gchar *)dirbuf);
 
     // Run the dialog.
-    if (gtk_dialog_run(GTK_DIALOG(dirdlg)) == GTK_RESPONSE_ACCEPT)
+    എങ്കിൽ (gtk_dialog_run(GTK_DIALOG(dirdlg)) == GTK_RESPONSE_ACCEPT)
 	dirname = (char_u *)gtk_file_chooser_get_filename(
 						    GTK_FILE_CHOOSER(dirdlg));
     gtk_widget_destroy(dirdlg);
-    if (dirname == NULL)
-	return NULL;
+    എങ്കിൽ (dirname == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
     // shorten the file name if possible
     p = vim_strsave(shorten_fname1(dirname));
     g_free(dirname);
-    return p;
+    തിരികെ p;
 
-# else // !defined(GTK_FILE_CHOOSER)
+# അല്ലെങ്കിൽ // !defined(GTK_FILE_CHOOSER)
     // For GTK 2.2 and earlier: fall back to ordinary file selector.
-    return gui_mch_browse(0, title, NULL, NULL, initdir, NULL);
+    തിരികെ gui_mch_browse(0, title, ശൂന്യ, ശൂന്യ, initdir, ശൂന്യ);
 # endif // !defined(GTK_FILE_CHOOSER)
 }
 
 
 #endif	// FEAT_BROWSE
 
-#if defined(FEAT_GUI_DIALOG)
+#എങ്കിൽ defined(FEAT_GUI_DIALOG)
 
-    static GtkWidget *
-create_message_dialog(int type, char_u *title, char_u *message)
+    സ്ഥിതം GtkWidget *
+create_message_dialog(പൂർണ്ണസംഖ്യ type, char_u *title, char_u *message)
 {
     GtkWidget	    *dialog;
     GtkMessageType  message_type;
 
-    switch (type)
+    തിരഞ്ഞെടുപ്പ് (type)
     {
-	case VIM_ERROR:	    message_type = GTK_MESSAGE_ERROR;	 break;
-	case VIM_WARNING:   message_type = GTK_MESSAGE_WARNING;	 break;
-	case VIM_QUESTION:  message_type = GTK_MESSAGE_QUESTION; break;
-	default:	    message_type = GTK_MESSAGE_INFO;	 break;
+	അവസ്ഥ VIM_ERROR:	    message_type = GTK_MESSAGE_ERROR;	 നിർത്തുക;
+	അവസ്ഥ VIM_WARNING:   message_type = GTK_MESSAGE_WARNING;	 നിർത്തുക;
+	അവസ്ഥ VIM_QUESTION:  message_type = GTK_MESSAGE_QUESTION; നിർത്തുക;
+	സ്ഥിരസ്ഥിതി:	    message_type = GTK_MESSAGE_INFO;	 നിർത്തുക;
     }
 
     message = CONVERT_TO_UTF8(message);
@@ -1428,21 +1428,21 @@ create_message_dialog(int type, char_u *title, char_u *message)
 				     GTK_DIALOG_DESTROY_WITH_PARENT,
 				     message_type,
 				     GTK_BUTTONS_NONE,
-				     "%s", (const char *)message);
+				     "%s", (സ്ഥിരം അക്ഷരം *)message);
     CONVERT_TO_UTF8_FREE(message);
 
-    if (title != NULL)
+    എങ്കിൽ (title != ശൂന്യ)
     {
 	title = CONVERT_TO_UTF8(title);
-	gtk_window_set_title(GTK_WINDOW(dialog), (const char *)title);
+	gtk_window_set_title(GTK_WINDOW(dialog), (സ്ഥിരം അക്ഷരം *)title);
 	CONVERT_TO_UTF8_FREE(title);
     }
-    else if (type == VIM_GENERIC)
+    അല്ലെങ്കിൽ എങ്കിൽ (type == VIM_GENERIC)
     {
 	gtk_window_set_title(GTK_WINDOW(dialog), "VIM");
     }
 
-    return dialog;
+    തിരികെ dialog;
 }
 
 /*
@@ -1451,64 +1451,64 @@ create_message_dialog(int type, char_u *title, char_u *message)
  * '&' with '_'.  button_string must point to allocated memory!
  * Return an allocated array of pointers into button_string.
  */
-    static char **
-split_button_string(char_u *button_string, int *n_buttons)
+    സ്ഥിതം അക്ഷരം **
+split_button_string(char_u *button_string, പൂർണ്ണസംഖ്യ *n_buttons)
 {
-    char	    **array;
+    അക്ഷരം	    **array;
     char_u	    *p;
-    unsigned int    count = 1;
+    unsigned പൂർണ്ണസംഖ്യ    എണ്ണം = 1;
 
-    for (p = button_string; *p != NUL; ++p)
-	if (*p == DLG_BUTTON_SEP)
-	    ++count;
+    വേണ്ടി (p = button_string; *p != NUL; ++p)
+	എങ്കിൽ (*p == DLG_BUTTON_SEP)
+	    ++എണ്ണം;
 
-    array = ALLOC_MULT(char *, count + 1);
-    count = 0;
+    array = ALLOC_MULT(അക്ഷരം *, എണ്ണം + 1);
+    എണ്ണം = 0;
 
-    if (array != NULL)
+    എങ്കിൽ (array != ശൂന്യ)
     {
-	array[count++] = (char *)button_string;
-	for (p = button_string; *p != NUL; )
+	array[എണ്ണം++] = (അക്ഷരം *)button_string;
+	വേണ്ടി (p = button_string; *p != NUL; )
 	{
-	    if (*p == DLG_BUTTON_SEP)
+	    എങ്കിൽ (*p == DLG_BUTTON_SEP)
 	    {
 		*p++ = NUL;
-		array[count++] = (char *)p;
+		array[എണ്ണം++] = (അക്ഷരം *)p;
 	    }
-	    else if (*p == DLG_HOTKEY_CHAR)
+	    അല്ലെങ്കിൽ എങ്കിൽ (*p == DLG_HOTKEY_CHAR)
 		*p++ = '_';
-	    else
+	    അല്ലെങ്കിൽ
 		MB_PTR_ADV(p);
 	}
-	array[count] = NULL; // currently not relied upon, but doesn't hurt
+	array[എണ്ണം] = ശൂന്യ; // currently not relied upon, but doesn't hurt
     }
 
-    *n_buttons = count;
-    return array;
+    *n_buttons = എണ്ണം;
+    തിരികെ array;
 }
 
-# if !GTK_CHECK_VERSION(3,10,0)
-    static char **
-split_button_translation(const char *message)
+# എങ്കിൽ !GTK_CHECK_VERSION(3,10,0)
+    സ്ഥിതം അക്ഷരം **
+split_button_translation(സ്ഥിരം അക്ഷരം *message)
 {
-    char    **buttons = NULL;
+    അക്ഷരം    **buttons = ശൂന്യ;
     char_u  *str;
-    int	    n_buttons = 0;
-    int	    n_expected = 1;
+    പൂർണ്ണസംഖ്യ	    n_buttons = 0;
+    പൂർണ്ണസംഖ്യ	    n_expected = 1;
 
-    for (str = (char_u *)message; *str != NUL; ++str)
-	if (*str == DLG_BUTTON_SEP)
+    വേണ്ടി (str = (char_u *)message; *str != NUL; ++str)
+	എങ്കിൽ (*str == DLG_BUTTON_SEP)
 	    ++n_expected;
 
     str = (char_u *)_(message);
-    if (str != NULL)
+    എങ്കിൽ (str != ശൂന്യ)
     {
-	if (output_conv.vc_type != CONV_NONE)
-	    str = string_convert(&output_conv, str, NULL);
-	else
+	എങ്കിൽ (output_conv.vc_type != CONV_NONE)
+	    str = string_convert(&output_conv, str, ശൂന്യ);
+	അല്ലെങ്കിൽ
 	    str = vim_strsave(str);
 
-	if (str != NULL)
+	എങ്കിൽ (str != ശൂന്യ)
 	    buttons = split_button_string(str, &n_buttons);
     }
     /*
@@ -1516,63 +1516,63 @@ split_button_translation(const char *message)
      * if the translation is broken, thus fall back to the untranslated
      * buttons string in case of emergency.
      */
-    if (buttons == NULL || n_buttons != n_expected)
+    എങ്കിൽ (buttons == ശൂന്യ || n_buttons != n_expected)
     {
 	vim_free(buttons);
 	vim_free(str);
-	buttons = NULL;
+	buttons = ശൂന്യ;
 	str = vim_strsave((char_u *)message);
 
-	if (str != NULL)
+	എങ്കിൽ (str != ശൂന്യ)
 	    buttons = split_button_string(str, &n_buttons);
-	if (buttons == NULL)
+	എങ്കിൽ (buttons == ശൂന്യ)
 	    vim_free(str);
     }
 
-    return buttons;
+    തിരികെ buttons;
 }
 
-    static int
-button_equal(const char *a, const char *b)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+button_equal(സ്ഥിരം അക്ഷരം *a, സ്ഥിരം അക്ഷരം *b)
 {
-    while (*a != '\0' && *b != '\0')
+    ആകുമ്പോൾ (*a != '\0' && *b != '\0')
     {
-	if (*a == '_' && *++a == '\0')
-	    break;
-	if (*b == '_' && *++b == '\0')
-	    break;
+	എങ്കിൽ (*a == '_' && *++a == '\0')
+	    നിർത്തുക;
+	എങ്കിൽ (*b == '_' && *++b == '\0')
+	    നിർത്തുക;
 
-	if (g_unichar_tolower(g_utf8_get_char(a))
+	എങ്കിൽ (g_unichar_tolower(g_utf8_get_char(a))
 		!= g_unichar_tolower(g_utf8_get_char(b)))
-	    return FALSE;
+	    തിരികെ FALSE;
 
 	a = g_utf8_next_char(a);
 	b = g_utf8_next_char(b);
     }
 
-    return (*a == '\0' && *b == '\0');
+    തിരികെ (*a == '\0' && *b == '\0');
 }
 # endif
 
-    static void
+    സ്ഥിതം ശൂന്യം
 dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
 {
-# if !GTK_CHECK_VERSION(3,10,0)
-    char    **ok;
-    char    **ync;  // "yes no cancel"
+# എങ്കിൽ !GTK_CHECK_VERSION(3,10,0)
+    അക്ഷരം    **ok;
+    അക്ഷരം    **ync;  // "yes no cancel"
 # endif
-    char    **buttons;
-    int	    n_buttons = 0;
-    int	    idx;
+    അക്ഷരം    **buttons;
+    പൂർണ്ണസംഖ്യ	    n_buttons = 0;
+    പൂർണ്ണസംഖ്യ	    idx;
 
     button_string = vim_strsave(button_string); // must be writable
-    if (button_string == NULL)
-	return;
+    എങ്കിൽ (button_string == ശൂന്യ)
+	തിരികെ;
 
     // Check 'v' flag in 'guioptions': vertical button placement.
-    if (vim_strchr(p_go, GO_VERTICAL) != NULL)
+    എങ്കിൽ (vim_strchr(p_go, GO_VERTICAL) != ശൂന്യ)
     {
-# if !GTK_CHECK_VERSION(3,0,0)
+# എങ്കിൽ !GTK_CHECK_VERSION(3,0,0)
 	GtkWidget	*vbutton_box;
 
 	vbutton_box = gtk_vbutton_box_new();
@@ -1589,7 +1589,7 @@ dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
      * this way has the compelling advantage that translations need not to
      * be touched at all.  See below what 'ok' and 'ync' are used for.
      */
-# if !GTK_CHECK_VERSION(3,10,0)
+# എങ്കിൽ !GTK_CHECK_VERSION(3,10,0)
     ok	    = split_button_translation(N_("&Ok"));
     ync     = split_button_translation(N_("&Yes\n&No\n&Cancel"));
 # endif
@@ -1601,9 +1601,9 @@ dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
      * Well, apparently somebody changed his mind: with GTK 2.2.4 it works the
      * other way around...
      */
-    for (idx = 1; idx <= n_buttons; ++idx)
+    വേണ്ടി (idx = 1; idx <= n_buttons; ++idx)
     {
-	char	*label;
+	അക്ഷരം	*label;
 	char_u	*label8;
 
 	label = buttons[idx - 1];
@@ -1616,28 +1616,28 @@ dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
 	 * since anyone can create their own dialogs using Vim functions.
 	 * Thus we have to check for those too.
 	 */
-# if !GTK_CHECK_VERSION(3,10,0)
-	if (ok != NULL && ync != NULL) // almost impossible to fail
+# എങ്കിൽ !GTK_CHECK_VERSION(3,10,0)
+	എങ്കിൽ (ok != ശൂന്യ && ync != ശൂന്യ) // almost impossible to fail
 	{
-	    if	    (button_equal(label, ok[0]))    label = GTK_STOCK_OK;
-	    else if (button_equal(label, ync[0]))   label = GTK_STOCK_YES;
-	    else if (button_equal(label, ync[1]))   label = GTK_STOCK_NO;
-	    else if (button_equal(label, ync[2]))   label = GTK_STOCK_CANCEL;
-	    else if (button_equal(label, "Ok"))     label = GTK_STOCK_OK;
-	    else if (button_equal(label, "Yes"))    label = GTK_STOCK_YES;
-	    else if (button_equal(label, "No"))     label = GTK_STOCK_NO;
-	    else if (button_equal(label, "Cancel")) label = GTK_STOCK_CANCEL;
+	    എങ്കിൽ	    (button_equal(label, ok[0]))    label = GTK_STOCK_OK;
+	    അല്ലെങ്കിൽ എങ്കിൽ (button_equal(label, ync[0]))   label = GTK_STOCK_YES;
+	    അല്ലെങ്കിൽ എങ്കിൽ (button_equal(label, ync[1]))   label = GTK_STOCK_NO;
+	    അല്ലെങ്കിൽ എങ്കിൽ (button_equal(label, ync[2]))   label = GTK_STOCK_CANCEL;
+	    അല്ലെങ്കിൽ എങ്കിൽ (button_equal(label, "Ok"))     label = GTK_STOCK_OK;
+	    അല്ലെങ്കിൽ എങ്കിൽ (button_equal(label, "Yes"))    label = GTK_STOCK_YES;
+	    അല്ലെങ്കിൽ എങ്കിൽ (button_equal(label, "No"))     label = GTK_STOCK_NO;
+	    അല്ലെങ്കിൽ എങ്കിൽ (button_equal(label, "Cancel")) label = GTK_STOCK_CANCEL;
 	}
 # endif
 	label8 = CONVERT_TO_UTF8((char_u *)label);
-	gtk_dialog_add_button(dialog, (const gchar *)label8, idx);
+	gtk_dialog_add_button(dialog, (സ്ഥിരം gchar *)label8, idx);
 	CONVERT_TO_UTF8_FREE(label8);
     }
 
-# if !GTK_CHECK_VERSION(3,10,0)
-    if (ok != NULL)
+# എങ്കിൽ !GTK_CHECK_VERSION(3,10,0)
+    എങ്കിൽ (ok != ശൂന്യ)
 	vim_free(*ok);
-    if (ync != NULL)
+    എങ്കിൽ (ync != ശൂന്യ)
 	vim_free(*ync);
     vim_free(ok);
     vim_free(ync);
@@ -1652,56 +1652,56 @@ dialog_add_buttons(GtkDialog *dialog, char_u *button_string)
  * GUI used to work this way, and I consider the impact on UI consistency
  * low enough to justify implementing this as a special Vim feature.
  */
-typedef struct _DialogInfo
+തരനിർവചനം ഘടന _DialogInfo
 {
-    int		ignore_enter;	    // no default button, ignore "Enter"
-    int		noalt;		    // accept accelerators without Alt
+    പൂർണ്ണസംഖ്യ		ignore_enter;	    // no default button, ignore "Enter"
+    പൂർണ്ണസംഖ്യ		noalt;		    // accept accelerators without Alt
     GtkDialog	*dialog;	    // Widget of the dialog
 } DialogInfo;
 
-    static gboolean
-dialog_key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer data)
+    സ്ഥിതം gboolean
+dialog_താക്കോൽ_press_event_cb(GtkWidget *widget, Gdk_Event_താക്കോൽ *event, gpointer data)
 {
     DialogInfo *di = (DialogInfo *)data;
 
     // Ignore hitting Enter (or Space) when there is no default button.
-    if (di->ignore_enter && (event->keyval == GDK_Return
+    എങ്കിൽ (di->ignore_enter && (event->keyval == GDK_Return
 						     || event->keyval == ' '))
-	return TRUE;
-    else    // A different key was pressed, return to normal behavior
+	തിരികെ TRUE;
+    അല്ലെങ്കിൽ    // A different key was pressed, return to normal behavior
 	di->ignore_enter = FALSE;
 
     // Close the dialog when hitting "Esc".
-    if (event->keyval == GDK_Escape)
+    എങ്കിൽ (event->keyval == GDK_Escape)
     {
 	gtk_dialog_response(di->dialog, GTK_RESPONSE_REJECT);
-	return TRUE;
+	തിരികെ TRUE;
     }
 
-    if (di->noalt
+    എങ്കിൽ (di->noalt
 	      && (event->state & gtk_accelerator_get_default_mod_mask()) == 0)
     {
-	return gtk_window_mnemonic_activate(
+	തിരികെ gtk_window_mnemonic_activate(
 		   GTK_WINDOW(widget), event->keyval,
 		   gtk_window_get_mnemonic_modifier(GTK_WINDOW(widget)));
     }
 
-    return FALSE; // continue emission
+    തിരികെ FALSE; // continue emission
 }
 
-    int
-gui_mch_dialog(int	type,	    // type of dialog
+    പൂർണ്ണസംഖ്യ
+gui_mch_dialog(പൂർണ്ണസംഖ്യ	type,	    // type of dialog
 	       char_u	*title,	    // title of dialog
 	       char_u	*message,   // message text
 	       char_u	*buttons,   // names of buttons
-	       int	def_but,    // default button
+	       പൂർണ്ണസംഖ്യ	def_but,    // default button
 	       char_u	*textfield, // text for textfield or NULL
-	       int	ex_cmd UNUSED)
+	       പൂർണ്ണസംഖ്യ	ex_cmd UNUSED)
 {
     GtkWidget	*dialog;
-    GtkWidget	*entry = NULL;
+    GtkWidget	*entry = ശൂന്യ;
     char_u	*text;
-    int		response;
+    പൂർണ്ണസംഖ്യ		response;
     DialogInfo  dialoginfo;
 
     ++gui.dialogs_active;
@@ -1710,7 +1710,7 @@ gui_mch_dialog(int	type,	    // type of dialog
     dialoginfo.dialog = GTK_DIALOG(dialog);
     dialog_add_buttons(GTK_DIALOG(dialog), buttons);
 
-    if (textfield != NULL)
+    എങ്കിൽ (textfield != ശൂന്യ)
     {
 	GtkWidget *alignment;
 
@@ -1721,51 +1721,51 @@ gui_mch_dialog(int	type,	    // type of dialog
 	gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
 
 	text = CONVERT_TO_UTF8(textfield);
-	gtk_entry_set_text(GTK_ENTRY(entry), (const char *)text);
+	gtk_entry_set_text(GTK_ENTRY(entry), (സ്ഥിരം അക്ഷരം *)text);
 	CONVERT_TO_UTF8_FREE(text);
 
-# if GTK_CHECK_VERSION(3,14,0)
+# എങ്കിൽ GTK_CHECK_VERSION(3,14,0)
 	gtk_widget_set_halign(GTK_WIDGET(entry), GTK_ALIGN_CENTER);
 	gtk_widget_set_valign(GTK_WIDGET(entry), GTK_ALIGN_CENTER);
 	gtk_widget_set_hexpand(GTK_WIDGET(entry), TRUE);
 	gtk_widget_set_vexpand(GTK_WIDGET(entry), TRUE);
 
 	alignment = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-# else
-	alignment = gtk_alignment_new((float)0.5, (float)0.5,
-						      (float)1.0, (float)1.0);
+# അല്ലെങ്കിൽ
+	alignment = gtk_alignment_new((ദശാംശം)0.5, (ദശാംശം)0.5,
+						      (ദശാംശം)1.0, (ദശാംശം)1.0);
 # endif
 	gtk_container_add(GTK_CONTAINER(alignment), entry);
 	gtk_container_set_border_width(GTK_CONTAINER(alignment), 5);
 	gtk_widget_show(alignment);
 
-# if GTK_CHECK_VERSION(3,0,0)
+# എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
 	{
-	    GtkWidget * const vbox
+	    GtkWidget * സ്ഥിരം vbox
 		= gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 	    gtk_box_pack_start(GTK_BOX(vbox),
 		    alignment, TRUE, FALSE, 0);
 	}
-# else
+# അല്ലെങ്കിൽ
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
 			   alignment, TRUE, FALSE, 0);
 # endif
 	dialoginfo.noalt = FALSE;
     }
-    else
+    അല്ലെങ്കിൽ
 	dialoginfo.noalt = TRUE;
 
     // Allow activation of mnemonic accelerators without pressing <Alt> when
     // there is no textfield.  Handle pressing Esc.
     g_signal_connect(G_OBJECT(dialog), "key-press-event",
-			 G_CALLBACK(&dialog_key_press_event_cb), &dialoginfo);
+			 G_CALLBACK(&dialog_താക്കോൽ_press_event_cb), &dialoginfo);
 
-    if (def_but > 0)
+    എങ്കിൽ (def_but > 0)
     {
 	gtk_dialog_set_default_response(GTK_DIALOG(dialog), def_but);
 	dialoginfo.ignore_enter = FALSE;
     }
-    else
+    അല്ലെങ്കിൽ
 	// No default button, ignore pressing Enter.
 	dialoginfo.ignore_enter = TRUE;
 
@@ -1775,11 +1775,11 @@ gui_mch_dialog(int	type,	    // type of dialog
     response = gtk_dialog_run(GTK_DIALOG(dialog));
 
     // GTK_RESPONSE_NONE means the dialog was programmatically destroyed.
-    if (response != GTK_RESPONSE_NONE)
+    എങ്കിൽ (response != GTK_RESPONSE_NONE)
     {
-	if (response == GTK_RESPONSE_ACCEPT)	    // Enter pressed
+	എങ്കിൽ (response == GTK_RESPONSE_ACCEPT)	    // Enter pressed
 	    response = def_but;
-	if (textfield != NULL)
+	എങ്കിൽ (textfield != ശൂന്യ)
 	{
 	    text = (char_u *)gtk_entry_get_text(GTK_ENTRY(entry));
 	    text = CONVERT_FROM_UTF8(text);
@@ -1791,27 +1791,27 @@ gui_mch_dialog(int	type,	    // type of dialog
 	gtk_widget_destroy(dialog);
     }
 
-    if (gui.dialogs_active > 0)
+    എങ്കിൽ (gui.dialogs_active > 0)
 	--gui.dialogs_active;
-    return response > 0 ? response : 0;
+    തിരികെ response > 0 ? response : 0;
 }
 
 #endif // FEAT_GUI_DIALOG
 
 
-#if defined(FEAT_MENU)
+#എങ്കിൽ defined(FEAT_MENU)
 
-    void
+    ശൂന്യം
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
-# if defined(FEAT_XIM)
+# എങ്കിൽ defined(FEAT_XIM)
     /*
      * Append a submenu for selecting an input method.	This is
      * currently the only way to switch input methods at runtime.
      */
-#  if !GTK_CHECK_VERSION(3,10,0)
-    if (xic != NULL && g_object_get_data(G_OBJECT(menu->submenu_id),
-					 "vim-has-im-menu") == NULL)
+#  എങ്കിൽ !GTK_CHECK_VERSION(3,10,0)
+    എങ്കിൽ (xic != ശൂന്യ && g_object_get_data(G_OBJECT(menu->submenu_id),
+					 "vim-has-im-menu") == ശൂന്യ)
     {
 	GtkWidget   *menuitem;
 	GtkWidget   *submenu;
@@ -1823,7 +1823,7 @@ gui_mch_show_popupmenu(vimmenu_T *menu)
 
 	name = (char_u *)_("Input _Methods");
 	name = CONVERT_TO_UTF8(name);
-	menuitem = gtk_menu_item_new_with_mnemonic((const char *)name);
+	menuitem = gtk_menu_item_new_with_mnemonic((സ്ഥിരം അക്ഷരം *)name);
 	CONVERT_TO_UTF8_FREE(name);
 	gtk_widget_show(menuitem);
 
@@ -1839,7 +1839,7 @@ gui_mch_show_popupmenu(vimmenu_T *menu)
 #  endif
 # endif // FEAT_XIM
 
-# if GTK_CHECK_VERSION(3,22,2)
+# എങ്കിൽ GTK_CHECK_VERSION(3,22,2)
     {
 	GdkEventButton trigger;
 
@@ -1853,27 +1853,27 @@ gui_mch_show_popupmenu(vimmenu_T *menu)
 	trigger.time       = gui.event_time;
 	trigger.x	   = 0.0;
 	trigger.y	   = 0.0;
-	trigger.axes       = NULL;
+	trigger.axes       = ശൂന്യ;
 	trigger.state      = 0;
 	trigger.button     = 3;
-	trigger.device     = NULL;
-	trigger.x_root     = 0.0;
-	trigger.y_root     = 0.0;
+	trigger.device     = ശൂന്യ;
+	trigger.x_വേര്     = 0.0;
+	trigger.y_വേര്     = 0.0;
 
 	gtk_menu_popup_at_pointer(GTK_MENU(menu->submenu_id),
 				  (GdkEvent *)&trigger);
     }
-# else
+# അല്ലെങ്കിൽ
     gtk_menu_popup(GTK_MENU(menu->submenu_id),
-		   NULL, NULL,
-		   (GtkMenuPositionFunc)NULL, NULL,
+		   ശൂന്യ, ശൂന്യ,
+		   (GtkMenuPositionFunc)ശൂന്യ, ശൂന്യ,
 		   3U, gui.event_time);
 # endif
 }
 
 // Ugly global variable to pass "mouse_pos" flag from gui_make_popup() to
 // popup_menu_position_func().
-static int popup_mouse_pos;
+സ്ഥിതം പൂർണ്ണസംഖ്യ popup_mouse_pos;
 
 /*
  * Menu position callback; used by gui_make_popup() to place the menu
@@ -1882,24 +1882,24 @@ static int popup_mouse_pos;
  * Note: The push_in output argument seems to affect scrolling of huge
  * menus that don't fit on the screen.	Leave it at the default for now.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 popup_menu_position_func(GtkMenu *menu UNUSED,
 			 gint *x, gint *y,
-			 gboolean *push_in UNUSED,
+			 gboolean *തള്ളുക_in UNUSED,
 			 gpointer user_data UNUSED)
 {
     gdk_window_get_origin(gtk_widget_get_window(gui.drawarea), x, y);
 
-    if (popup_mouse_pos)
+    എങ്കിൽ (popup_mouse_pos)
     {
-	int	mx, my;
+	പൂർണ്ണസംഖ്യ	mx, my;
 
 	gui_mch_getmouse(&mx, &my);
 	*x += mx;
 	*y += my;
     }
-    else if (curwin != NULL && gui.drawarea != NULL &&
-	     gtk_widget_get_window(gui.drawarea) != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (curwin != ശൂന്യ && gui.drawarea != ശൂന്യ &&
+	     gtk_widget_get_window(gui.drawarea) != ശൂന്യ)
     {
 	// Find the cursor position in the current window
 	*x += FILL_X(curwin->w_wincol + curwin->w_wcol + 1) + 1;
@@ -1907,19 +1907,19 @@ popup_menu_position_func(GtkMenu *menu UNUSED,
     }
 }
 
-    void
-gui_make_popup(char_u *path_name, int mouse_pos)
+    ശൂന്യം
+gui_make_popup(char_u *path_name, പൂർണ്ണസംഖ്യ mouse_pos)
 {
     vimmenu_T *menu;
 
     popup_mouse_pos = mouse_pos;
 
     menu = gui_find_menu(path_name);
-    if (menu == NULL || menu->submenu_id == NULL)
-	return;
+    എങ്കിൽ (menu == ശൂന്യ || menu->submenu_id == ശൂന്യ)
+	തിരികെ;
 
-# if GTK_CHECK_VERSION(3,22,2)
-    GdkWindow * const win = gtk_widget_get_window(gui.drawarea);
+# എങ്കിൽ GTK_CHECK_VERSION(3,22,2)
+    GdkWindow * സ്ഥിരം win = gtk_widget_get_window(gui.drawarea);
     GdkEventButton trigger;
 
     // A pseudo event to have gtk_menu_popup_at_*() functions work. Since
@@ -1933,23 +1933,23 @@ gui_make_popup(char_u *path_name, int mouse_pos)
     trigger.time       = GDK_CURRENT_TIME;
     trigger.x	   = 0.0;
     trigger.y	   = 0.0;
-    trigger.axes       = NULL;
+    trigger.axes       = ശൂന്യ;
     trigger.state      = 0;
     trigger.button     = 0;
-    trigger.device     = NULL;
-    trigger.x_root     = 0.0;
-    trigger.y_root     = 0.0;
+    trigger.device     = ശൂന്യ;
+    trigger.x_വേര്     = 0.0;
+    trigger.y_വേര്     = 0.0;
 
-    if (mouse_pos)
+    എങ്കിൽ (mouse_pos)
 	gtk_menu_popup_at_pointer(GTK_MENU(menu->submenu_id),
 		(GdkEvent *)&trigger);
-    else
+    അല്ലെങ്കിൽ
     {
 	gint origin_x, origin_y;
 	GdkRectangle rect = { 0, 0, 0, 0 };
 
 	gdk_window_get_origin(win, &origin_x, &origin_y);
-	popup_menu_position_func(NULL, &rect.x, &rect.y, NULL, NULL);
+	popup_menu_position_func(ശൂന്യ, &rect.x, &rect.y, ശൂന്യ, ശൂന്യ);
 
 	rect.x -= origin_x;
 	rect.y -= origin_y;
@@ -1961,10 +1961,10 @@ gui_make_popup(char_u *path_name, int mouse_pos)
 		GDK_GRAVITY_NORTH_WEST,
 		(GdkEvent *)&trigger);
     }
-# else
+# അല്ലെങ്കിൽ
     gtk_menu_popup(GTK_MENU(menu->submenu_id),
-	    NULL, NULL,
-	    &popup_menu_position_func, NULL,
+	    ശൂന്യ, ശൂന്യ,
+	    &popup_menu_position_func, ശൂന്യ,
 	    0U, (guint32)GDK_CURRENT_TIME);
 # endif
 }
@@ -1976,7 +1976,7 @@ gui_make_popup(char_u *path_name, int mouse_pos)
  * We don't create it twice.
  */
 
-typedef struct _SharedFindReplace
+തരനിർവചനം ഘടന _SharedFindReplace
 {
     GtkWidget *dialog;	// the main dialog widget
     GtkWidget *wword;	// 'Whole word only' check button
@@ -1990,41 +1990,41 @@ typedef struct _SharedFindReplace
     GtkWidget *all;	// 'Replace All' action button
 } SharedFindReplace;
 
-static SharedFindReplace find_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-static SharedFindReplace repl_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+സ്ഥിതം SharedFindReplace find_widgets = {ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ};
+സ്ഥിതം SharedFindReplace repl_widgets = {ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ};
 
-    static int
-find_key_press_event(
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+find_താക്കോൽ_press_event(
 		GtkWidget	*widget UNUSED,
-		GdkEventKey	*event,
+		Gdk_Event_താക്കോൽ	*event,
 		SharedFindReplace *frdp)
 {
     // If the user is holding one of the key modifiers we will just bail out,
     // thus preserving the possibility of normal focus traversal.
-    if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
-	return FALSE;
+    എങ്കിൽ (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
+	തിരികെ FALSE;
 
     // the Escape key synthesizes a cancellation action
-    if (event->keyval == GDK_Escape)
+    എങ്കിൽ (event->keyval == GDK_Escape)
     {
 	gtk_widget_hide(frdp->dialog);
 
-	return TRUE;
+	തിരികെ TRUE;
     }
 
     // It would be delightful if it where possible to do search history
     // operations on the K_UP and K_DOWN keys here.
 
-    return FALSE;
+    തിരികെ FALSE;
 }
 
-    static GtkWidget *
-#if GTK_CHECK_VERSION(3,10,0)
-create_image_button(const char *stock_id UNUSED,
-		    const char *label)
-#else
-create_image_button(const char *stock_id,
-		    const char *label)
+    സ്ഥിതം GtkWidget *
+#എങ്കിൽ GTK_CHECK_VERSION(3,10,0)
+create_image_button(സ്ഥിരം അക്ഷരം *stock_id UNUSED,
+		    സ്ഥിരം അക്ഷരം *label)
+#അല്ലെങ്കിൽ
+create_image_button(സ്ഥിരം അക്ഷരം *stock_id,
+		    സ്ഥിരം അക്ഷരം *label)
 #endif
 {
     char_u	*text;
@@ -2034,34 +2034,34 @@ create_image_button(const char *stock_id,
 
     text = CONVERT_TO_UTF8((char_u *)label);
 
-#if GTK_CHECK_VERSION(3,2,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,2,0)
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 3);
     gtk_box_set_homogeneous(GTK_BOX(box), FALSE);
-#else
+#അല്ലെങ്കിൽ
     box = gtk_hbox_new(FALSE, 3);
 #endif
-#if !GTK_CHECK_VERSION(3,10,0)
-    if (stock_id != NULL)
+#എങ്കിൽ !GTK_CHECK_VERSION(3,10,0)
+    എങ്കിൽ (stock_id != ശൂന്യ)
 	gtk_box_pack_start(GTK_BOX(box),
 			   gtk_image_new_from_stock(stock_id, GTK_ICON_SIZE_BUTTON),
 			   FALSE, FALSE, 0);
 #endif
     gtk_box_pack_start(GTK_BOX(box),
-		       gtk_label_new((const char *)text),
+		       gtk_label_new((സ്ഥിരം അക്ഷരം *)text),
 		       FALSE, FALSE, 0);
 
     CONVERT_TO_UTF8_FREE(text);
 
-#if GTK_CHECK_VERSION(3,14,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,14,0)
     gtk_widget_set_halign(GTK_WIDGET(box), GTK_ALIGN_CENTER);
     gtk_widget_set_valign(GTK_WIDGET(box), GTK_ALIGN_CENTER);
     gtk_widget_set_hexpand(GTK_WIDGET(box), TRUE);
     gtk_widget_set_vexpand(GTK_WIDGET(box), TRUE);
 
     alignment = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-#else
-    alignment = gtk_alignment_new((float)0.5, (float)0.5,
-						      (float)0.0, (float)0.0);
+#അല്ലെങ്കിൽ
+    alignment = gtk_alignment_new((ദശാംശം)0.5, (ദശാംശം)0.5,
+						      (ദശാംശം)0.0, (ദശാംശം)0.0);
 #endif
     gtk_container_add(GTK_CONTAINER(alignment), box);
     gtk_widget_show_all(alignment);
@@ -2069,7 +2069,7 @@ create_image_button(const char *stock_id,
     button = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(button), alignment);
 
-    return button;
+    തിരികെ button;
 }
 
 /*
@@ -2077,49 +2077,49 @@ create_image_button(const char *stock_id,
  * I'd really like to keep it at that.	In other words: don't spread
  * this nasty hack all over the code.  Think twice.
  */
-    static const char *
-convert_localized_message(char_u **buffer, const char *message)
+    സ്ഥിതം സ്ഥിരം അക്ഷരം *
+convert_localized_message(char_u **buffer, സ്ഥിരം അക്ഷരം *message)
 {
-    if (output_conv.vc_type == CONV_NONE)
-	return message;
+    എങ്കിൽ (output_conv.vc_type == CONV_NONE)
+	തിരികെ message;
 
     vim_free(*buffer);
-    *buffer = string_convert(&output_conv, (char_u *)message, NULL);
+    *buffer = string_convert(&output_conv, (char_u *)message, ശൂന്യ);
 
-    return (const char *)*buffer;
+    തിരികെ (സ്ഥിരം അക്ഷരം *)*buffer;
 }
 
 /*
  * Returns the number of characters in GtkEntry.
  */
-    static unsigned long
+    സ്ഥിതം unsigned long
 entry_get_text_length(GtkEntry *entry)
 {
-    g_return_val_if_fail(entry != NULL, 0);
+    g_return_val_if_fail(entry != ശൂന്യ, 0);
     g_return_val_if_fail(GTK_IS_ENTRY(entry) == TRUE, 0);
 
-#if GTK_CHECK_VERSION(2,18,0)
+#എങ്കിൽ GTK_CHECK_VERSION(2,18,0)
     // 2.18 introduced a new object GtkEntryBuffer to handle text data for
     // GtkEntry instead of letting each instance of the latter have its own
     // storage for that.  The code below is almost identical to the
     // implementation of gtk_entry_get_text_length() for the versions >= 2.18.
-    return gtk_entry_buffer_get_length(gtk_entry_get_buffer(entry));
-#elif GTK_CHECK_VERSION(2,14,0)
+    തിരികെ gtk_entry_buffer_get_length(gtk_entry_get_buffer(entry));
+#അല്ലെങ്കിലെങ്കിൽ GTK_CHECK_VERSION(2,14,0)
     // 2.14 introduced a new function to avoid memory management bugs which can
     // happen when gtk_entry_get_text() is used without due care and attention.
-    return gtk_entry_get_text_length(entry);
-#else
+    തിരികെ gtk_entry_get_text_length(entry);
+#അല്ലെങ്കിൽ
     // gtk_entry_get_text() returns the pointer to the storage allocated
     // internally by the widget.  Accordingly, use the one with great care:
     // Don't free it nor modify the contents it points to; call the function
     // every time you need the pointer since its value may have been changed
     // by the widget.
-    return g_utf8_strlen(gtk_entry_get_text(entry), -1);
+    തിരികെ g_utf8_strlen(gtk_entry_get_text(entry), -1);
 #endif
 }
 
-    static void
-find_replace_dialog_create(char_u *arg, int do_replace)
+    സ്ഥിതം ശൂന്യം
+find_replace_dialog_create(char_u *arg, പൂർണ്ണസംഖ്യ do_replace)
 {
     GtkWidget	*hbox;		// main top down box
     GtkWidget	*actionarea;
@@ -2129,9 +2129,9 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     gboolean	sensitive;
     SharedFindReplace *frdp;
     char_u	*entry_text;
-    int		wword = FALSE;
-    int		mcase = !p_ic;
-    char_u	*conv_buffer = NULL;
+    പൂർണ്ണസംഖ്യ		wword = FALSE;
+    പൂർണ്ണസംഖ്യ		mcase = !p_ic;
+    char_u	*conv_buffer = ശൂന്യ;
 #define CONV(message) convert_localized_message(&conv_buffer, (message))
 
     frdp = (do_replace) ? (&repl_widgets) : (&find_widgets);
@@ -2139,21 +2139,21 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     // Get the search string to use.
     entry_text = get_find_dialog_text(arg, &wword, &mcase);
 
-    if (entry_text != NULL && output_conv.vc_type != CONV_NONE)
+    എങ്കിൽ (entry_text != ശൂന്യ && output_conv.vc_type != CONV_NONE)
     {
 	char_u *old_text = entry_text;
-	entry_text = string_convert(&output_conv, entry_text, NULL);
+	entry_text = string_convert(&output_conv, entry_text, ശൂന്യ);
 	vim_free(old_text);
     }
 
     /*
      * If the dialog already exists, just raise it.
      */
-    if (frdp->dialog)
+    എങ്കിൽ (frdp->dialog)
     {
-	if (entry_text != NULL)
+	എങ്കിൽ (entry_text != ശൂന്യ)
 	{
-	    gtk_entry_set_text(GTK_ENTRY(frdp->what), (char *)entry_text);
+	    gtk_entry_set_text(GTK_ENTRY(frdp->what), (അക്ഷരം *)entry_text);
 	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(frdp->wword),
 							     (gboolean)wword);
 	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(frdp->mcase),
@@ -2165,134 +2165,134 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	// For :promptrepl dialog, give it to 'with' entry if 'what' has a
 	// non-empty entry; otherwise, to 'what' entry.
 	gtk_widget_grab_focus(frdp->what);
-	if (do_replace && entry_get_text_length(GTK_ENTRY(frdp->what)) > 0)
+	എങ്കിൽ (do_replace && entry_get_text_length(GTK_ENTRY(frdp->what)) > 0)
 	    gtk_widget_grab_focus(frdp->with);
 
 	vim_free(entry_text);
-	return;
+	തിരികെ;
     }
 
     frdp->dialog = gtk_dialog_new();
-#if GTK_CHECK_VERSION(3,0,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
     // Nothing equivalent to gtk_dialog_set_has_separator() in GTK+ 3.
-#else
+#അല്ലെങ്കിൽ
     gtk_dialog_set_has_separator(GTK_DIALOG(frdp->dialog), FALSE);
 #endif
     gtk_window_set_transient_for(GTK_WINDOW(frdp->dialog), GTK_WINDOW(gui.mainwin));
     gtk_window_set_destroy_with_parent(GTK_WINDOW(frdp->dialog), TRUE);
 
-    if (do_replace)
+    എങ്കിൽ (do_replace)
     {
 	gtk_window_set_title(GTK_WINDOW(frdp->dialog),
 			     CONV(_("VIM - Search and Replace...")));
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	gtk_window_set_title(GTK_WINDOW(frdp->dialog),
 			     CONV(_("VIM - Search...")));
     }
 
-#if GTK_CHECK_VERSION(3,2,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,2,0)
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
-#else
+#അല്ലെങ്കിൽ
     hbox = gtk_hbox_new(FALSE, 0);
 #endif
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 10);
-#if GTK_CHECK_VERSION(3,0,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
     {
-	GtkWidget * const dialog_vbox
+	GtkWidget * സ്ഥിരം dialog_vbox
 	    = gtk_dialog_get_content_area(GTK_DIALOG(frdp->dialog));
 	gtk_container_add(GTK_CONTAINER(dialog_vbox), hbox);
     }
-#else
+#അല്ലെങ്കിൽ
     gtk_container_add(GTK_CONTAINER(GTK_DIALOG(frdp->dialog)->vbox), hbox);
 #endif
 
-    if (do_replace)
-#if GTK_CHECK_VERSION(3,4,0)
+    എങ്കിൽ (do_replace)
+#എങ്കിൽ GTK_CHECK_VERSION(3,4,0)
 	table = gtk_grid_new();
-#else
+#അല്ലെങ്കിൽ
 	table = gtk_table_new(1024, 4, FALSE);
 #endif
-    else
-#if GTK_CHECK_VERSION(3,4,0)
+    അല്ലെങ്കിൽ
+#എങ്കിൽ GTK_CHECK_VERSION(3,4,0)
 	table = gtk_grid_new();
-#else
+#അല്ലെങ്കിൽ
 	table = gtk_table_new(1024, 3, FALSE);
 #endif
     gtk_box_pack_start(GTK_BOX(hbox), table, TRUE, TRUE, 0);
     gtk_container_set_border_width(GTK_CONTAINER(table), 4);
 
     tmp = gtk_label_new(CONV(_("Find what:")));
-#if GTK_CHECK_VERSION(3,16,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,16,0)
     gtk_label_set_xalign(GTK_LABEL(tmp), 0.0);
     gtk_label_set_yalign(GTK_LABEL(tmp), 0.5);
-#elif GTK_CHECK_VERSION(3,14,0)
+#അല്ലെങ്കിലെങ്കിൽ GTK_CHECK_VERSION(3,14,0)
     {
-	GValue align_val = G_VALUE_INIT;
+	GValue align_val = G_മൂല്യം_INIT;
 
-	g_value_init(&align_val, G_TYPE_FLOAT);
+	g_മൂല്യം_init(&align_val, G_TYPE_FLOAT);
 
-	g_value_set_float(&align_val, 0.0);
+	g_മൂല്യം_set_float(&align_val, 0.0);
 	g_object_set_property(G_OBJECT(tmp), "xalign", &align_val);
 
-	g_value_set_float(&align_val, 0.5);
+	g_മൂല്യം_set_float(&align_val, 0.5);
 	g_object_set_property(G_OBJECT(tmp), "yalign", &align_val);
 
-	g_value_unset(&align_val);
+	g_മൂല്യം_unset(&align_val);
     }
-#else
+#അല്ലെങ്കിൽ
     gtk_misc_set_alignment(GTK_MISC(tmp), (gfloat)0.0, (gfloat)0.5);
 #endif
-#if GTK_CHECK_VERSION(3,4,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,4,0)
     gtk_grid_attach(GTK_GRID(table), tmp, 0, 0, 2, 1);
-#else
+#അല്ലെങ്കിൽ
     gtk_table_attach(GTK_TABLE(table), tmp, 0, 1, 0, 1,
 		     GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
     frdp->what = gtk_entry_new();
-    sensitive = (entry_text != NULL && entry_text[0] != NUL);
-    if (entry_text != NULL)
-	gtk_entry_set_text(GTK_ENTRY(frdp->what), (char *)entry_text);
+    sensitive = (entry_text != ശൂന്യ && entry_text[0] != NUL);
+    എങ്കിൽ (entry_text != ശൂന്യ)
+	gtk_entry_set_text(GTK_ENTRY(frdp->what), (അക്ഷരം *)entry_text);
     g_signal_connect(G_OBJECT(frdp->what), "changed",
 		     G_CALLBACK(entry_changed_cb), frdp->dialog);
     g_signal_connect_after(G_OBJECT(frdp->what), "key-press-event",
-			   G_CALLBACK(find_key_press_event),
+			   G_CALLBACK(find_താക്കോൽ_press_event),
 			   (gpointer) frdp);
-#if GTK_CHECK_VERSION(3,4,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,4,0)
     gtk_grid_attach(GTK_GRID(table), frdp->what, 2, 0, 5, 1);
-#else
+#അല്ലെങ്കിൽ
     gtk_table_attach(GTK_TABLE(table), frdp->what, 1, 1024, 0, 1,
 		     GTK_EXPAND | GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
 
-    if (do_replace)
+    എങ്കിൽ (do_replace)
     {
 	tmp = gtk_label_new(CONV(_("Replace with:")));
-#if GTK_CHECK_VERSION(3,16,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,16,0)
 	gtk_label_set_xalign(GTK_LABEL(tmp), 0.0);
 	gtk_label_set_yalign(GTK_LABEL(tmp), 0.5);
-#elif GTK_CHECK_VERSION(3,14,0)
+#അല്ലെങ്കിലെങ്കിൽ GTK_CHECK_VERSION(3,14,0)
 	{
-	    GValue align_val = G_VALUE_INIT;
+	    GValue align_val = G_മൂല്യം_INIT;
 
-	    g_value_init(&align_val, G_TYPE_FLOAT);
+	    g_മൂല്യം_init(&align_val, G_TYPE_FLOAT);
 
-	    g_value_set_float(&align_val, 0.0);
+	    g_മൂല്യം_set_float(&align_val, 0.0);
 	    g_object_set_property(G_OBJECT(tmp), "xalign", &align_val);
 
-	    g_value_set_float(&align_val, 0.5);
+	    g_മൂല്യം_set_float(&align_val, 0.5);
 	    g_object_set_property(G_OBJECT(tmp), "yalign", &align_val);
 
-	    g_value_unset(&align_val);
+	    g_മൂല്യം_unset(&align_val);
 	}
-#else
+#അല്ലെങ്കിൽ
 	gtk_misc_set_alignment(GTK_MISC(tmp), (gfloat)0.0, (gfloat)0.5);
 #endif
-#if GTK_CHECK_VERSION(3,4,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), tmp, 0, 1, 2, 1);
-#else
+#അല്ലെങ്കിൽ
 	gtk_table_attach(GTK_TABLE(table), tmp, 0, 1, 1, 2,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
@@ -2301,11 +2301,11 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 			 G_CALLBACK(find_replace_cb),
 			 GINT_TO_POINTER(FRD_R_FINDNEXT));
 	g_signal_connect_after(G_OBJECT(frdp->with), "key-press-event",
-			       G_CALLBACK(find_key_press_event),
+			       G_CALLBACK(find_താക്കോൽ_press_event),
 			       (gpointer) frdp);
-#if GTK_CHECK_VERSION(3,4,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), frdp->with, 2, 1, 5, 1);
-#else
+#അല്ലെങ്കിൽ
 	gtk_table_attach(GTK_TABLE(table), frdp->with, 1, 1024, 1, 2,
 			 GTK_EXPAND | GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
@@ -2317,7 +2317,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	g_signal_connect(G_OBJECT(frdp->what), "activate",
 			 G_CALLBACK(entry_activate_cb), frdp->with);
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	/*
 	 * Make the entry activation do the search.
@@ -2331,17 +2331,17 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     frdp->wword = gtk_check_button_new_with_label(CONV(_("Match whole word only")));
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(frdp->wword),
 							(gboolean)wword);
-    if (do_replace)
-#if GTK_CHECK_VERSION(3,4,0)
+    എങ്കിൽ (do_replace)
+#എങ്കിൽ GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), frdp->wword, 0, 2, 5, 1);
-#else
+#അല്ലെങ്കിൽ
 	gtk_table_attach(GTK_TABLE(table), frdp->wword, 0, 1023, 2, 3,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
-    else
-#if GTK_CHECK_VERSION(3,4,0)
+    അല്ലെങ്കിൽ
+#എങ്കിൽ GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), frdp->wword, 0, 3, 5, 1);
-#else
+#അല്ലെങ്കിൽ
 	gtk_table_attach(GTK_TABLE(table), frdp->wword, 0, 1023, 1, 2,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
@@ -2350,47 +2350,47 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     frdp->mcase = gtk_check_button_new_with_label(CONV(_("Match case")));
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(frdp->mcase),
 							     (gboolean)mcase);
-    if (do_replace)
-#if GTK_CHECK_VERSION(3,4,0)
+    എങ്കിൽ (do_replace)
+#എങ്കിൽ GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), frdp->mcase, 0, 3, 5, 1);
-#else
+#അല്ലെങ്കിൽ
 	gtk_table_attach(GTK_TABLE(table), frdp->mcase, 0, 1023, 3, 4,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
-    else
-#if GTK_CHECK_VERSION(3,4,0)
+    അല്ലെങ്കിൽ
+#എങ്കിൽ GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), frdp->mcase, 0, 4, 5, 1);
-#else
+#അല്ലെങ്കിൽ
 	gtk_table_attach(GTK_TABLE(table), frdp->mcase, 0, 1023, 2, 3,
 			 GTK_FILL, GTK_EXPAND, 2, 2);
 #endif
 
     tmp = gtk_frame_new(CONV(_("Direction")));
-    if (do_replace)
-#if GTK_CHECK_VERSION(3,4,0)
+    എങ്കിൽ (do_replace)
+#എങ്കിൽ GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), tmp, 5, 2, 2, 4);
-#else
+#അല്ലെങ്കിൽ
 	gtk_table_attach(GTK_TABLE(table), tmp, 1023, 1024, 2, 4,
 			 GTK_FILL, GTK_FILL, 2, 2);
 #endif
-    else
-#if GTK_CHECK_VERSION(3,4,0)
+    അല്ലെങ്കിൽ
+#എങ്കിൽ GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), tmp, 5, 2, 1, 3);
-#else
+#അല്ലെങ്കിൽ
 	gtk_table_attach(GTK_TABLE(table), tmp, 1023, 1024, 1, 3,
 			 GTK_FILL, GTK_FILL, 2, 2);
 #endif
-#if GTK_CHECK_VERSION(3,2,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,2,0)
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_box_set_homogeneous(GTK_BOX(vbox), FALSE);
-#else
+#അല്ലെങ്കിൽ
     vbox = gtk_vbox_new(FALSE, 0);
 #endif
     gtk_container_set_border_width(GTK_CONTAINER(vbox), 0);
     gtk_container_add(GTK_CONTAINER(tmp), vbox);
 
     // 'Up' and 'Down' buttons
-    frdp->up = gtk_radio_button_new_with_label(NULL, CONV(_("Up")));
+    frdp->up = gtk_radio_button_new_with_label(ശൂന്യ, CONV(_("Up")));
     gtk_box_pack_start(GTK_BOX(vbox), frdp->up, TRUE, TRUE, 0);
     frdp->down = gtk_radio_button_new_with_label(
 			gtk_radio_button_get_group(GTK_RADIO_BUTTON(frdp->up)),
@@ -2400,18 +2400,18 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     gtk_box_pack_start(GTK_BOX(vbox), frdp->down, TRUE, TRUE, 0);
 
     // vbox to hold the action buttons
-#if GTK_CHECK_VERSION(3,2,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,2,0)
     actionarea = gtk_button_box_new(GTK_ORIENTATION_VERTICAL);
-#else
+#അല്ലെങ്കിൽ
     actionarea = gtk_vbutton_box_new();
 #endif
     gtk_container_set_border_width(GTK_CONTAINER(actionarea), 2);
     gtk_box_pack_end(GTK_BOX(hbox), actionarea, FALSE, FALSE, 0);
 
     // 'Find Next' button
-#if GTK_CHECK_VERSION(3,10,0)
-    frdp->find = create_image_button(NULL, _("Find Next"));
-#else
+#എങ്കിൽ GTK_CHECK_VERSION(3,10,0)
+    frdp->find = create_image_button(ശൂന്യ, _("Find Next"));
+#അല്ലെങ്കിൽ
     frdp->find = create_image_button(GTK_STOCK_FIND, _("Find Next"));
 #endif
     gtk_widget_set_sensitive(frdp->find, sensitive);
@@ -2425,12 +2425,12 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     gtk_box_pack_start(GTK_BOX(actionarea), frdp->find, FALSE, FALSE, 0);
     gtk_widget_grab_default(frdp->find);
 
-    if (do_replace)
+    എങ്കിൽ (do_replace)
     {
 	// 'Replace' button
-#if GTK_CHECK_VERSION(3,10,0)
-	frdp->replace = create_image_button(NULL, _("Replace"));
-#else
+#എങ്കിൽ GTK_CHECK_VERSION(3,10,0)
+	frdp->replace = create_image_button(ശൂന്യ, _("Replace"));
+#അല്ലെങ്കിൽ
 	frdp->replace = create_image_button(GTK_STOCK_CONVERT, _("Replace"));
 #endif
 	gtk_widget_set_sensitive(frdp->replace, sensitive);
@@ -2441,9 +2441,9 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 			 GINT_TO_POINTER(FRD_REPLACE));
 
 	// 'Replace All' button
-#if GTK_CHECK_VERSION(3,10,0)
-	frdp->all = create_image_button(NULL, _("Replace All"));
-#else
+#എങ്കിൽ GTK_CHECK_VERSION(3,10,0)
+	frdp->all = create_image_button(ശൂന്യ, _("Replace All"));
+#അല്ലെങ്കിൽ
 	frdp->all = create_image_button(GTK_STOCK_CONVERT, _("Replace All"));
 #endif
 	gtk_widget_set_sensitive(frdp->all, sensitive);
@@ -2455,9 +2455,9 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     }
 
     // 'Cancel' button
-#if GTK_CHECK_VERSION(3,10,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,10,0)
     tmp = gtk_button_new_with_mnemonic(_("_Close"));
-#else
+#അല്ലെങ്കിൽ
     tmp = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
 #endif
     gtk_widget_set_can_default(tmp, TRUE);
@@ -2469,19 +2469,19 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 			     "delete-event", G_CALLBACK(gtk_widget_hide_on_delete),
 			     G_OBJECT(frdp->dialog));
 
-#if GTK_CHECK_VERSION(3,2,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,2,0)
     tmp = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
-#else
+#അല്ലെങ്കിൽ
     tmp = gtk_vseparator_new();
 #endif
     gtk_box_pack_end(GTK_BOX(hbox), tmp, FALSE, FALSE, 10);
 
     // Suppress automatic show of the unused action area
-#if GTK_CHECK_VERSION(3,0,0)
-# if !GTK_CHECK_VERSION(3,12,0)
+#എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
+# എങ്കിൽ !GTK_CHECK_VERSION(3,12,0)
     gtk_widget_hide(gtk_dialog_get_action_area(GTK_DIALOG(frdp->dialog)));
 # endif
-#else
+#അല്ലെങ്കിൽ
     gtk_widget_hide(GTK_DIALOG(frdp->dialog)->action_area);
 #endif
     gtk_widget_show_all(hbox);
@@ -2492,41 +2492,41 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 #undef CONV
 }
 
-    void
+    ശൂന്യം
 gui_mch_find_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
+    എങ്കിൽ (gui.in_use)
 	find_replace_dialog_create(eap->arg, FALSE);
 }
 
-    void
+    ശൂന്യം
 gui_mch_replace_dialog(exarg_T *eap)
 {
-    if (gui.in_use)
+    എങ്കിൽ (gui.in_use)
 	find_replace_dialog_create(eap->arg, TRUE);
 }
 
 /*
  * Callback for actions of the find and replace dialogs
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
 {
-    int			flags;
+    പൂർണ്ണസംഖ്യ			flags;
     char_u		*find_text;
     char_u		*repl_text;
     gboolean		direction_down;
     SharedFindReplace	*sfr;
 
-    flags = (int)(long)data;	    // avoid a lint warning here
+    flags = (പൂർണ്ണസംഖ്യ)(long)data;	    // avoid a lint warning here
 
     // Get the search/replace strings from the dialog
-    if (flags == FRD_FINDNEXT)
+    എങ്കിൽ (flags == FRD_FINDNEXT)
     {
-	repl_text = NULL;
+	repl_text = ശൂന്യ;
 	sfr = &find_widgets;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	repl_text = (char_u *)gtk_entry_get_text(GTK_ENTRY(repl_widgets.with));
 	sfr = &repl_widgets;
@@ -2535,9 +2535,9 @@ find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
     find_text = (char_u *)gtk_entry_get_text(GTK_ENTRY(sfr->what));
     direction_down = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sfr->down));
 
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sfr->wword)))
+    എങ്കിൽ (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sfr->wword)))
 	flags |= FRD_WHOLE_WORD;
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sfr->mcase)))
+    എങ്കിൽ (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sfr->mcase)))
 	flags |= FRD_MATCH_CASE;
 
     repl_text = CONVERT_FROM_UTF8(repl_text);
@@ -2550,7 +2550,7 @@ find_replace_cb(GtkWidget *widget UNUSED, gpointer data)
 /*
  * our usual callback function
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 entry_activate_cb(GtkWidget *widget UNUSED, gpointer data)
 {
     gtk_widget_grab_focus(GTK_WIDGET(data));
@@ -2565,23 +2565,23 @@ entry_activate_cb(GtkWidget *widget UNUSED, gpointer data)
  * particularly evil incarnation of braindeadness, whatever; I'd much rather
  * see it extinguished from this planet.  Thanks for listening.  Sorry.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 entry_changed_cb(GtkWidget * entry, GtkWidget * dialog)
 {
-    const gchar	*entry_text;
+    സ്ഥിരം gchar	*entry_text;
     gboolean	nonempty;
 
     entry_text = gtk_entry_get_text(GTK_ENTRY(entry));
 
-    if (!entry_text)
-	return;			// shouldn't happen
+    എങ്കിൽ (!entry_text)
+	തിരികെ;			// shouldn't happen
 
     nonempty = (entry_text[0] != '\0');
 
-    if (dialog == find_widgets.dialog)
+    എങ്കിൽ (dialog == find_widgets.dialog)
 	gtk_widget_set_sensitive(find_widgets.find, nonempty);
 
-    if (dialog == repl_widgets.dialog)
+    എങ്കിൽ (dialog == repl_widgets.dialog)
     {
 	gtk_widget_set_sensitive(repl_widgets.find, nonempty);
 	gtk_widget_set_sensitive(repl_widgets.replace, nonempty);
@@ -2592,7 +2592,7 @@ entry_changed_cb(GtkWidget * entry, GtkWidget * dialog)
 /*
  * ":helpfind"
  */
-    void
+    ശൂന്യം
 ex_helpfind(exarg_T *eap UNUSED)
 {
     // This will fail when menus are not loaded.  Well, it's only for
@@ -2600,11 +2600,11 @@ ex_helpfind(exarg_T *eap UNUSED)
     do_cmdline_cmd((char_u *)"emenu ToolBar.FindHelp");
 }
 
-#if defined(FEAT_BROWSE)
-    static void
-recent_func_log_func(const gchar *log_domain UNUSED,
+#എങ്കിൽ defined(FEAT_BROWSE)
+    സ്ഥിതം ശൂന്യം
+recent_func_log_func(സ്ഥിരം gchar *log_domain UNUSED,
 		     GLogLevelFlags log_level UNUSED,
-		     const gchar *message UNUSED,
+		     സ്ഥിരം gchar *message UNUSED,
 		     gpointer user_data UNUSED)
 {
     // We just want to suppress the warnings.
@@ -2612,11 +2612,11 @@ recent_func_log_func(const gchar *log_domain UNUSED,
 }
 #endif
 
-    void
-gui_mch_set_fullscreen(int flag)
+    ശൂന്യം
+gui_mch_set_fullscreen(പൂർണ്ണസംഖ്യ flag)
 {
-    if (flag)
+    എങ്കിൽ (flag)
 	gtk_window_fullscreen(GTK_WINDOW(gui.mainwin));
-    else
+    അല്ലെങ്കിൽ
 	gtk_window_unfullscreen(GTK_WINDOW(gui.mainwin));
 }

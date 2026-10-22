@@ -1,159 +1,159 @@
-#include "vterm.h"
-#include "../src/vterm_internal.h" // We pull in some internal bits too
+#അന്തര്ഭാവ "vterm.h"
+#അന്തര്ഭാവ "../src/vterm_internal.h" // We pull in some internal bits too
 
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
+#അന്തര്ഭാവ <assert.h>
+#അന്തര്ഭാവ <stdio.h>
+#അന്തര്ഭാവ <string.h>
 
 #define streq(a,b) (!strcmp(a,b))
 #define strstartswith(a,b) (!strncmp(a,b,strlen(b)))
 
-static size_t inplace_hex2bytes(char *s)
+സ്ഥിതം size_t inplace_hex2bytes(അക്ഷരം *s)
 {
-  char *inpos = s, *outpos = s;
+  അക്ഷരം *inpos = s, *outpos = s;
 
-  while(*inpos) {
-    unsigned int ch;
-    if(sscanf(inpos, "%2x", &ch) < 1)
-      break;
+  ആകുമ്പോൾ(*inpos) {
+    unsigned പൂർണ്ണസംഖ്യ ch;
+    എങ്കിൽ(sscanf(inpos, "%2x", &ch) < 1)
+      നിർത്തുക;
     *outpos = ch;
     outpos += 1; inpos += 2;
   }
 
-  return outpos - s;
+  തിരികെ outpos - s;
 }
 
-static VTermModifier strpe_modifiers(char **strp)
+സ്ഥിതം VTermModifier strpe_modifiers(അക്ഷരം **strp)
 {
   VTermModifier state = 0;
 
-  while((*strp)[0]) {
-    switch(((*strp)++)[0]) {
-      case 'S': state |= VTERM_MOD_SHIFT; break;
-      case 'C': state |= VTERM_MOD_CTRL;  break;
-      case 'A': state |= VTERM_MOD_ALT;   break;
-      default: return state;
+  ആകുമ്പോൾ((*strp)[0]) {
+    തിരഞ്ഞെടുപ്പ്(((*strp)++)[0]) {
+      അവസ്ഥ 'S': state |= VTERM_MOD_SHIFT; നിർത്തുക;
+      അവസ്ഥ 'C': state |= VTERM_MOD_CTRL;  നിർത്തുക;
+      അവസ്ഥ 'A': state |= VTERM_MOD_ALT;   നിർത്തുക;
+      സ്ഥിരസ്ഥിതി: തിരികെ state;
     }
   }
 
-  return state;
+  തിരികെ state;
 }
 
-static VTermKey strp_key(char *str)
+സ്ഥിതം VTerm_താക്കോൽ strp_താക്കോൽ(അക്ഷരം *str)
 {
-  static struct {
-    char *name;
-    VTermKey key;
-  } keys[] = {
-    { "Up",    VTERM_KEY_UP },
-    { "Tab",   VTERM_KEY_TAB },
-    { "Enter", VTERM_KEY_ENTER },
-    { "KP0",   VTERM_KEY_KP_0 },
-    { "F1",    VTERM_KEY_FUNCTION(1) },
-    { NULL,    VTERM_KEY_NONE },
+  സ്ഥിതം ഘടന {
+    അക്ഷരം *name;
+    VTerm_താക്കോൽ താക്കോൽ;
+  } താക്കോലുകൾ[] = {
+    { "Up",    VTERM_താക്കോൽ_UP },
+    { "Tab",   VTERM_താക്കോൽ_TAB },
+    { "Enter", VTERM_താക്കോൽ_ENTER },
+    { "KP0",   VTERM_താക്കോൽ_KP_0 },
+    { "F1",    VTERM_താക്കോൽ_FUNCTION(1) },
+    { ശൂന്യ,    VTERM_താക്കോൽ_NONE },
   };
-  int i;
+  പൂർണ്ണസംഖ്യ i;
 
-  for(i = 0; keys[i].name; i++) {
-    if(streq(str, keys[i].name))
-      return keys[i].key;
+  വേണ്ടി(i = 0; താക്കോലുകൾ[i].name; i++) {
+    എങ്കിൽ(streq(str, താക്കോലുകൾ[i].name))
+      തിരികെ താക്കോലുകൾ[i].താക്കോൽ;
   }
 
-  return VTERM_KEY_NONE;
+  തിരികെ VTERM_താക്കോൽ_NONE;
 }
 
-static void print_color(const VTermColor *col)
+സ്ഥിതം ശൂന്യം print_color(സ്ഥിരം VTermColor *col)
 {
-  if (VTERM_COLOR_IS_RGB(col)) {
+  എങ്കിൽ (VTERM_COLOR_IS_RGB(col)) {
     printf("rgb(%d,%d,%d", col->red, col->green, col->blue);
   }
-  else if (VTERM_COLOR_IS_INDEXED(col)) {
+  അല്ലെങ്കിൽ എങ്കിൽ (VTERM_COLOR_IS_INDEXED(col)) {
     printf("idx(%d", col->index);
   }
-  else {
+  അല്ലെങ്കിൽ {
     printf("invalid(%d", col->type);
   }
-  if (VTERM_COLOR_IS_DEFAULT_FG(col)) {
+  എങ്കിൽ (VTERM_COLOR_IS_DEFAULT_FG(col)) {
     printf(",is_default_fg");
   }
-  if (VTERM_COLOR_IS_DEFAULT_BG(col)) {
+  എങ്കിൽ (VTERM_COLOR_IS_DEFAULT_BG(col)) {
     printf(",is_default_bg");
   }
   printf(")");
 }
 
-static VTermColor strpe_color(char **strp)
+സ്ഥിതം VTermColor strpe_color(അക്ഷരം **strp)
 {
   uint8_t r, g, b, idx;
-  int len = 0;
+  പൂർണ്ണസംഖ്യ len = 0;
   VTermColor col;
 
-  if(sscanf(*strp, "rgb(%hhu,%hhu,%hhu)%n", &r, &g, &b, &len) == 3 && len > 0) {
+  എങ്കിൽ(sscanf(*strp, "rgb(%hhu,%hhu,%hhu)%n", &r, &g, &b, &len) == 3 && len > 0) {
     *strp += len;
     vterm_color_rgb(&col, r, g, b);
   }
-  else if(sscanf(*strp, "idx(%hhu)%n", &idx, &len) == 1 && len > 0) {
+  അല്ലെങ്കിൽ എങ്കിൽ(sscanf(*strp, "idx(%hhu)%n", &idx, &len) == 1 && len > 0) {
     *strp += len;
     vterm_color_indexed(&col, idx);
   }
-  else
+  അല്ലെങ്കിൽ
     vterm_color_rgb(&col, 127, 127, 127);
 
-  return col;
+  തിരികെ col;
 }
 
-static VTerm *vt;
-static VTermState *state;
-static VTermScreen *screen;
+സ്ഥിതം VTerm *vt;
+സ്ഥിതം VTermState *state;
+സ്ഥിതം VTermScreen *screen;
 
-static VTermEncodingInstance encoding;
+സ്ഥിതം VTermEncodingInstance encoding;
 
-static void term_output(const char *s, size_t len, void *user UNUSED)
+സ്ഥിതം ശൂന്യം term_output(സ്ഥിരം അക്ഷരം *s, size_t len, ശൂന്യം *user UNUSED)
 {
   size_t i;
 
   printf("output ");
-  for(i = 0; i < len; i++)
-    printf("%x%s", (unsigned char)s[i], i < len-1 ? "," : "\n");
+  വേണ്ടി(i = 0; i < len; i++)
+    printf("%x%s", (unsigned അക്ഷരം)s[i], i < len-1 ? "," : "\n");
 }
 
-static void printhex(const char *s, size_t len)
+സ്ഥിതം ശൂന്യം printhex(സ്ഥിരം അക്ഷരം *s, size_t len)
 {
-  while(len--)
+  ആകുമ്പോൾ(len--)
     printf("%02x", (uint8_t)(s++)[0]);
 }
 
-static int parser_text(const char bytes[], size_t len, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ parser_text(സ്ഥിരം അക്ഷരം bytes[], size_t len, ശൂന്യം *user UNUSED)
 {
   size_t i;
 
   printf("text ");
-  for(i = 0; i < len; i++) {
-    unsigned char b = bytes[i];
-    if(b < 0x20 || b == 0x7f || (b >= 0x80 && b < 0xa0))
-      break;
+  വേണ്ടി(i = 0; i < len; i++) {
+    unsigned അക്ഷരം b = bytes[i];
+    എങ്കിൽ(b < 0x20 || b == 0x7f || (b >= 0x80 && b < 0xa0))
+      നിർത്തുക;
     printf(i ? ",%x" : "%x", b);
   }
   printf("\n");
 
-  return i;
+  തിരികെ i;
 }
 
-static int parser_control(unsigned char control, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ parser_control(unsigned അക്ഷരം control, ശൂന്യം *user UNUSED)
 {
   printf("control %02x\n", control);
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int parser_escape(const char bytes[], size_t len, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ parser_escape(സ്ഥിരം അക്ഷരം bytes[], size_t len, ശൂന്യം *user UNUSED)
 {
-  if(bytes[0] >= 0x20 && bytes[0] < 0x30) {
-    if(len < 2)
-      return -1;
+  എങ്കിൽ(bytes[0] >= 0x20 && bytes[0] < 0x30) {
+    എങ്കിൽ(len < 2)
+      തിരികെ -1;
     len = 2;
   }
-  else {
+  അല്ലെങ്കിൽ {
     len = 1;
   }
 
@@ -161,135 +161,135 @@ static int parser_escape(const char bytes[], size_t len, void *user UNUSED)
   printhex(bytes, len);
   printf("\n");
 
-  return len;
+  തിരികെ len;
 }
 
-static int parser_csi(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ parser_csi(സ്ഥിരം അക്ഷരം *leader, സ്ഥിരം long args[], പൂർണ്ണസംഖ്യ argcount, സ്ഥിരം അക്ഷരം *intermed, അക്ഷരം command, ശൂന്യം *user UNUSED)
 {
-  int i;
+  പൂർണ്ണസംഖ്യ i;
   printf("csi %02x", command);
 
-  if(leader && leader[0]) {
+  എങ്കിൽ(leader && leader[0]) {
     printf(" L=");
-    for(i = 0; leader[i]; i++)
+    വേണ്ടി(i = 0; leader[i]; i++)
       printf("%02x", leader[i]);
   }
 
-  for(i = 0; i < argcount; i++) {
-    char sep = i ? ',' : ' ';
+  വേണ്ടി(i = 0; i < argcount; i++) {
+    അക്ഷരം sep = i ? ',' : ' ';
 
-    if(args[i] == CSI_ARG_MISSING)
+    എങ്കിൽ(args[i] == CSI_ARG_MISSING)
       printf("%c*", sep);
-    else
+    അല്ലെങ്കിൽ
       printf("%c%ld%s", sep, CSI_ARG(args[i]), CSI_ARG_HAS_MORE(args[i]) ? "+" : "");
   }
 
-  if(intermed && intermed[0]) {
+  എങ്കിൽ(intermed && intermed[0]) {
     printf(" I=");
-    for(i = 0; intermed[i]; i++)
+    വേണ്ടി(i = 0; intermed[i]; i++)
       printf("%02x", intermed[i]);
   }
 
   printf("\n");
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int parser_osc(int command, VTermStringFragment frag, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ parser_osc(പൂർണ്ണസംഖ്യ command, VTermStringFragment frag, ശൂന്യം *user UNUSED)
 {
 
   printf("osc ");
 
-  if(frag.initial) {
-    if(command == -1)
+  എങ്കിൽ(frag.initial) {
+    എങ്കിൽ(command == -1)
       printf("[");
-    else
+    അല്ലെങ്കിൽ
       printf("[%d;", command);
   }
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  എങ്കിൽ(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int parser_dcs(const char *command, size_t commandlen, VTermStringFragment frag, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ parser_dcs(സ്ഥിരം അക്ഷരം *command, size_t commandlen, VTermStringFragment frag, ശൂന്യം *user UNUSED)
 {
   printf("dcs ");
 
-  if(frag.initial) {
+  എങ്കിൽ(frag.initial) {
     size_t i;
     printf("[");
-    for(i = 0; i < commandlen; i++)
+    വേണ്ടി(i = 0; i < commandlen; i++)
       printf("%02x", command[i]);
   }
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  എങ്കിൽ(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int parser_apc(VTermStringFragment frag, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ parser_apc(VTermStringFragment frag, ശൂന്യം *user UNUSED)
 {
   printf("apc ");
 
-  if(frag.initial)
+  എങ്കിൽ(frag.initial)
     printf("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  എങ്കിൽ(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int parser_pm(VTermStringFragment frag, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ parser_pm(VTermStringFragment frag, ശൂന്യം *user UNUSED)
 {
   printf("pm ");
 
-  if(frag.initial)
+  എങ്കിൽ(frag.initial)
     printf("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  എങ്കിൽ(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int parser_sos(VTermStringFragment frag, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ parser_sos(VTermStringFragment frag, ശൂന്യം *user UNUSED)
 {
   printf("sos ");
 
-  if(frag.initial)
+  എങ്കിൽ(frag.initial)
     printf("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  എങ്കിൽ(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  തിരികെ 1;
 }
 
-static VTermParserCallbacks parser_cbs = {
+സ്ഥിതം VTermParserCallbacks parser_cbs = {
   parser_text, // text
   parser_control, // control
   parser_escape, // escape
@@ -299,10 +299,10 @@ static VTermParserCallbacks parser_cbs = {
   parser_apc, // apc
   parser_pm, // pm
   parser_sos, // sos
-  NULL // resize
+  ശൂന്യ // resize
 };
 
-static VTermStateFallbacks fallbacks = {
+സ്ഥിതം VTermStateFallbacks fallbacks = {
   parser_control, // control
   parser_csi, // csi
   parser_osc, // osc
@@ -314,198 +314,198 @@ static VTermStateFallbacks fallbacks = {
 
 /* These callbacks are shared by State and Screen */
 
-static int want_movecursor = 0;
-static VTermPos state_pos;
-static int movecursor(VTermPos pos, VTermPos oldpos UNUSED, int visible UNUSED, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ want_movecursor = 0;
+സ്ഥിതം VTermPos state_pos;
+സ്ഥിതം പൂർണ്ണസംഖ്യ movecursor(VTermPos pos, VTermPos oldpos UNUSED, പൂർണ്ണസംഖ്യ visible UNUSED, ശൂന്യം *user UNUSED)
 {
   state_pos = pos;
 
-  if(want_movecursor)
+  എങ്കിൽ(want_movecursor)
     printf("movecursor %d,%d\n", pos.row, pos.col);
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int want_premove = 0;
-static int premove(VTermRect rect, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ want_premove = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ premove(VTermRect rect, ശൂന്യം *user UNUSED)
 {
-  if(!want_premove)
-    return 0;
+  എങ്കിൽ(!want_premove)
+    തിരികെ 0;
 
   printf("premove %d..%d,%d..%d\n",
       rect.start_row, rect.end_row, rect.start_col, rect.end_col);
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int want_scrollrect = 0;
-static int scrollrect(VTermRect rect, int downward, int rightward, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ want_scrollrect = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ scrollrect(VTermRect rect, പൂർണ്ണസംഖ്യ downward, പൂർണ്ണസംഖ്യ rightward, ശൂന്യം *user UNUSED)
 {
-  if(!want_scrollrect)
-    return 0;
+  എങ്കിൽ(!want_scrollrect)
+    തിരികെ 0;
 
   printf("scrollrect %d..%d,%d..%d => %+d,%+d\n",
       rect.start_row, rect.end_row, rect.start_col, rect.end_col,
       downward, rightward);
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int want_moverect = 0;
-static int moverect(VTermRect dest, VTermRect src, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ want_moverect = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ moverect(VTermRect dest, VTermRect src, ശൂന്യം *user UNUSED)
 {
-  if(!want_moverect)
-    return 0;
+  എങ്കിൽ(!want_moverect)
+    തിരികെ 0;
 
   printf("moverect %d..%d,%d..%d -> %d..%d,%d..%d\n",
       src.start_row,  src.end_row,  src.start_col,  src.end_col,
       dest.start_row, dest.end_row, dest.start_col, dest.end_col);
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int want_settermprop = 0;
-static int settermprop(VTermProp prop, VTermValue *val, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ want_settermprop = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ settermprop(VTermProp prop, VTerm_മൂല്യം *val, ശൂന്യം *user UNUSED)
 {
-  VTermValueType type;
-  if(!want_settermprop)
-    return 1;
+  VTerm_മൂല്യം_Type type;
+  എങ്കിൽ(!want_settermprop)
+    തിരികെ 1;
 
   type = vterm_get_prop_type(prop);
-  switch(type) {
-  case VTERM_VALUETYPE_BOOL:
+  തിരഞ്ഞെടുപ്പ്(type) {
+  അവസ്ഥ VTERM_VALUETYPE_BOOL:
     printf("settermprop %d %s\n", prop, val->boolean ? "true" : "false");
-    return 1;
-  case VTERM_VALUETYPE_INT:
-    printf("settermprop %d %d\n", prop, val->number);
-    return 1;
-  case VTERM_VALUETYPE_STRING:
+    തിരികെ 1;
+  അവസ്ഥ VTERM_VALUETYPE_INT:
+    printf("settermprop %d %d\n", prop, val->സംഖ്യ);
+    തിരികെ 1;
+  അവസ്ഥ VTERM_VALUETYPE_STRING:
     printf("settermprop %d %s\"%.*s\"%s\n", prop,
         val->string.initial ? "[" : "", val->string.len, val->string.str, val->string.final ? "]" : "");
-    return 1;
-  case VTERM_VALUETYPE_COLOR:
+    തിരികെ 1;
+  അവസ്ഥ VTERM_VALUETYPE_COLOR:
     printf("settermprop %d ", prop);
     print_color(&val->color);
     printf("\n");
-    return 1;
+    തിരികെ 1;
 
-  case VTERM_N_VALUETYPES:
-    return 0;
+  അവസ്ഥ VTERM_N_VALUETYPES:
+    തിരികെ 0;
   }
 
-  return 0;
+  തിരികെ 0;
 }
 
 // These callbacks are for State
 
-static int want_state_putglyph = 0;
-static int state_putglyph(VTermGlyphInfo *info, VTermPos pos, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ want_state_putglyph = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ state_putglyph(VTermGlyphInfo *info, VTermPos pos, ശൂന്യം *user UNUSED)
 {
-  int i;
-  if(!want_state_putglyph)
-    return 1;
+  പൂർണ്ണസംഖ്യ i;
+  എങ്കിൽ(!want_state_putglyph)
+    തിരികെ 1;
 
   printf("putglyph ");
-  for(i = 0; i < VTERM_MAX_CHARS_PER_CELL && info->chars[i]; i++)
+  വേണ്ടി(i = 0; i < VTERM_MAX_CHARS_PER_CELL && info->chars[i]; i++)
     printf(i ? ",%x" : "%x", info->chars[i]);
   printf(" %d %d,%d", info->width, pos.row, pos.col);
-  if(info->protected_cell)
+  എങ്കിൽ(info->protected_cell)
     printf(" prot");
-  if(info->dwl)
+  എങ്കിൽ(info->dwl)
     printf(" dwl");
-  if(info->dhl)
+  എങ്കിൽ(info->dhl)
     printf(" dhl-%s", info->dhl == 1 ? "top" : info->dhl == 2 ? "bottom" : "?" );
   printf("\n");
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int want_state_erase = 0;
-static int state_erase(VTermRect rect, int selective, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ want_state_erase = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ state_erase(VTermRect rect, പൂർണ്ണസംഖ്യ selective, ശൂന്യം *user UNUSED)
 {
-  if(!want_state_erase)
-    return 1;
+  എങ്കിൽ(!want_state_erase)
+    തിരികെ 1;
 
   printf("erase %d..%d,%d..%d%s\n",
       rect.start_row, rect.end_row, rect.start_col, rect.end_col,
       selective ? " selective" : "");
 
-  return 1;
+  തിരികെ 1;
 }
 
-static struct {
-  int bold;
-  int underline;
-  int italic;
-  int blink;
-  int reverse;
-  int conceal;
-  int strike;
-  int font;
-  int small;
-  int baseline;
+സ്ഥിതം ഘടന {
+  പൂർണ്ണസംഖ്യ bold;
+  പൂർണ്ണസംഖ്യ underline;
+  പൂർണ്ണസംഖ്യ italic;
+  പൂർണ്ണസംഖ്യ blink;
+  പൂർണ്ണസംഖ്യ reverse;
+  പൂർണ്ണസംഖ്യ conceal;
+  പൂർണ്ണസംഖ്യ strike;
+  പൂർണ്ണസംഖ്യ font;
+  പൂർണ്ണസംഖ്യ small;
+  പൂർണ്ണസംഖ്യ baseline;
   VTermColor foreground;
   VTermColor background;
 } state_pen;
-static int state_setpenattr(VTermAttr attr, VTermValue *val, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ state_setpenattr(VTermAttr attr, VTerm_മൂല്യം *val, ശൂന്യം *user UNUSED)
 {
-  switch(attr) {
-  case VTERM_ATTR_BOLD:
+  തിരഞ്ഞെടുപ്പ്(attr) {
+  അവസ്ഥ VTERM_ATTR_BOLD:
     state_pen.bold = val->boolean;
-    break;
-  case VTERM_ATTR_UNDERLINE:
-    state_pen.underline = val->number;
-    break;
-  case VTERM_ATTR_ITALIC:
+    നിർത്തുക;
+  അവസ്ഥ VTERM_ATTR_UNDERLINE:
+    state_pen.underline = val->സംഖ്യ;
+    നിർത്തുക;
+  അവസ്ഥ VTERM_ATTR_ITALIC:
     state_pen.italic = val->boolean;
-    break;
-  case VTERM_ATTR_BLINK:
+    നിർത്തുക;
+  അവസ്ഥ VTERM_ATTR_BLINK:
     state_pen.blink = val->boolean;
-    break;
-  case VTERM_ATTR_REVERSE:
+    നിർത്തുക;
+  അവസ്ഥ VTERM_ATTR_REVERSE:
     state_pen.reverse = val->boolean;
-    break;
-  case VTERM_ATTR_CONCEAL:
+    നിർത്തുക;
+  അവസ്ഥ VTERM_ATTR_CONCEAL:
     state_pen.conceal = val->boolean;
-    break;
-  case VTERM_ATTR_STRIKE:
+    നിർത്തുക;
+  അവസ്ഥ VTERM_ATTR_STRIKE:
     state_pen.strike = val->boolean;
-    break;
-  case VTERM_ATTR_FONT:
-    state_pen.font = val->number;
-    break;
-  case VTERM_ATTR_SMALL:
+    നിർത്തുക;
+  അവസ്ഥ VTERM_ATTR_FONT:
+    state_pen.font = val->സംഖ്യ;
+    നിർത്തുക;
+  അവസ്ഥ VTERM_ATTR_SMALL:
     state_pen.small = val->boolean;
-    break;
-  case VTERM_ATTR_BASELINE:
-    state_pen.baseline = val->number;
-    break;
-  case VTERM_ATTR_FOREGROUND:
+    നിർത്തുക;
+  അവസ്ഥ VTERM_ATTR_BASELINE:
+    state_pen.baseline = val->സംഖ്യ;
+    നിർത്തുക;
+  അവസ്ഥ VTERM_ATTR_FOREGROUND:
     state_pen.foreground = val->color;
-    break;
-  case VTERM_ATTR_BACKGROUND:
+    നിർത്തുക;
+  അവസ്ഥ VTERM_ATTR_BACKGROUND:
     state_pen.background = val->color;
-    break;
+    നിർത്തുക;
 
-  case VTERM_N_ATTRS:
-    return 0;
+  അവസ്ഥ VTERM_N_ATTRS:
+    തിരികെ 0;
   }
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int state_setlineinfo(int row UNUSED, const VTermLineInfo *newinfo UNUSED, const VTermLineInfo *oldinfo UNUSED, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ state_setlineinfo(പൂർണ്ണസംഖ്യ row UNUSED, സ്ഥിരം VTerm_വരി_Info *newinfo UNUSED, സ്ഥിരം VTerm_വരി_Info *oldinfo UNUSED, ശൂന്യം *user UNUSED)
 {
-  return 1;
+  തിരികെ 1;
 }
 
-static int want_state_scrollback = 0;
-static int state_sb_clear(void *user UNUSED) {
-  if(!want_state_scrollback)
-    return 1;
+സ്ഥിതം പൂർണ്ണസംഖ്യ want_state_scrollback = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ state_sb_clear(ശൂന്യം *user UNUSED) {
+  എങ്കിൽ(!want_state_scrollback)
+    തിരികെ 1;
 
   printf("sb_clear\n");
-  return 0;
+  തിരികെ 0;
 }
 
 VTermStateCallbacks state_cbs = {
@@ -514,34 +514,34 @@ VTermStateCallbacks state_cbs = {
   scrollrect, // scrollrect
   moverect, // moverect
   state_erase, // erase
-  NULL, // initpen
+  ശൂന്യ, // initpen
   state_setpenattr, // setpenattr
   settermprop, // settermprop
-  NULL, // bell
-  NULL, // resize
+  ശൂന്യ, // bell
+  ശൂന്യ, // resize
   state_setlineinfo, // setlineinfo
   state_sb_clear, // sb_clear
   premove, // premove
 };
 
-static int selection_set(VTermSelectionMask mask, VTermStringFragment frag, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ selection_set(VTermSelectionMask mask, VTermStringFragment frag, ശൂന്യം *user UNUSED)
 {
   printf("selection-set mask=%04X ", mask);
-  if(frag.initial)
+  എങ്കിൽ(frag.initial)
     printf("[");
   printhex(frag.str, frag.len);
-  if(frag.final)
+  എങ്കിൽ(frag.final)
     printf("]");
   printf("\n");
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int selection_query(VTermSelectionMask mask, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ selection_query(VTermSelectionMask mask, ശൂന്യം *user UNUSED)
 {
   printf("selection-query mask=%04X\n", mask);
 
-  return 1;
+  തിരികെ 1;
 }
 
 VTermSelectionCallbacks selection_cbs = {
@@ -549,43 +549,43 @@ VTermSelectionCallbacks selection_cbs = {
   .query = selection_query,
 };
 
-static int want_screen_damage = 0;
-static int want_screen_damage_cells = 0;
-static int screen_damage(VTermRect rect, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ want_screen_damage = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ want_screen_damage_cells = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ screen_damage(VTermRect rect, ശൂന്യം *user UNUSED)
 {
-  if(!want_screen_damage)
-    return 1;
+  എങ്കിൽ(!want_screen_damage)
+    തിരികെ 1;
 
   printf("damage %d..%d,%d..%d",
       rect.start_row, rect.end_row, rect.start_col, rect.end_col);
 
-  if(want_screen_damage_cells) {
-    int equals = FALSE;
-    int row;
-    int col;
+  എങ്കിൽ(want_screen_damage_cells) {
+    പൂർണ്ണസംഖ്യ equals = FALSE;
+    പൂർണ്ണസംഖ്യ row;
+    പൂർണ്ണസംഖ്യ col;
 
-    for(row = rect.start_row; row < rect.end_row; row++) {
-      int eol = rect.end_col;
-      while(eol > rect.start_col) {
+    വേണ്ടി(row = rect.start_row; row < rect.end_row; row++) {
+      പൂർണ്ണസംഖ്യ eol = rect.end_col;
+      ആകുമ്പോൾ(eol > rect.start_col) {
         VTermScreenCell cell;
 	VTermPos pos;
 	pos.row = row;
 	pos.col = eol-1;
         vterm_screen_get_cell(screen, pos, &cell);
-        if(cell.chars[0])
-          break;
+        എങ്കിൽ(cell.chars[0])
+          നിർത്തുക;
 
         eol--;
       }
 
-      if(eol == rect.start_col)
-        break;
+      എങ്കിൽ(eol == rect.start_col)
+        നിർത്തുക;
 
-      if(!equals)
+      എങ്കിൽ(!equals)
         printf(" ="), equals = TRUE;
 
       printf(" %d<", row);
-      for(col = rect.start_col; col < eol; col++) {
+      വേണ്ടി(col = rect.start_col; col < eol; col++) {
         VTermScreenCell cell;
 	VTermPos pos;
 	pos.row = row;
@@ -599,58 +599,58 @@ static int screen_damage(VTermRect rect, void *user UNUSED)
 
   printf("\n");
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int want_screen_scrollback = 0;
-static int screen_sb_pushline4(int cols, const VTermScreenCell *cells, int continuation, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ want_screen_scrollback = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ screen_sb_pushline4(പൂർണ്ണസംഖ്യ cols, സ്ഥിരം VTermScreenCell *cells, പൂർണ്ണസംഖ്യ continuation, ശൂന്യം *user UNUSED)
 {
-  int eol;
-  int c;
+  പൂർണ്ണസംഖ്യ eol;
+  പൂർണ്ണസംഖ്യ c;
 
-  if(!want_screen_scrollback)
-    return 1;
+  എങ്കിൽ(!want_screen_scrollback)
+    തിരികെ 1;
 
   eol = cols;
-  while(eol && !cells[eol-1].chars[0])
+  ആകുമ്പോൾ(eol && !cells[eol-1].chars[0])
     eol--;
 
   printf("sb_pushline %d%s =", cols, continuation ? " cont" : "");
-  for(c = 0; c < eol; c++)
+  വേണ്ടി(c = 0; c < eol; c++)
     printf(" %02X", cells[c].chars[0]);
   printf("\n");
 
-  return 1;
+  തിരികെ 1;
 }
 
-static int screen_sb_popline(int cols, VTermScreenCell *cells, void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ screen_sb_popline(പൂർണ്ണസംഖ്യ cols, VTermScreenCell *cells, ശൂന്യം *user UNUSED)
 {
-  int col;
+  പൂർണ്ണസംഖ്യ col;
 
-  if(!want_screen_scrollback)
-    return 0;
+  എങ്കിൽ(!want_screen_scrollback)
+    തിരികെ 0;
 
   // All lines of scrollback contain "ABCDE"
-  for(col = 0; col < cols; col++) {
-    if(col < 5)
+  വേണ്ടി(col = 0; col < cols; col++) {
+    എങ്കിൽ(col < 5)
       cells[col].chars[0] = 'A' + col;
-    else
+    അല്ലെങ്കിൽ
       cells[col].chars[0] = 0;
 
     cells[col].width = 1;
   }
 
   printf("sb_popline %d\n", cols);
-  return 1;
+  തിരികെ 1;
 }
 
-static int screen_sb_clear(void *user UNUSED)
+സ്ഥിതം പൂർണ്ണസംഖ്യ screen_sb_clear(ശൂന്യം *user UNUSED)
 {
-  if(!want_screen_scrollback)
-    return 1;
+  എങ്കിൽ(!want_screen_scrollback)
+    തിരികെ 1;
 
   printf("sb_clear\n");
-  return 0;
+  തിരികെ 0;
 }
 
 VTermScreenCallbacks screen_cbs = {
@@ -658,213 +658,213 @@ VTermScreenCallbacks screen_cbs = {
   moverect, // moverect
   movecursor, // movecursor
   settermprop, // settermprop
-  NULL, // bell
-  NULL, // resize
-  NULL, // sb_pushline
+  ശൂന്യ, // bell
+  ശൂന്യ, // resize
+  ശൂന്യ, // sb_pushline
   screen_sb_popline, // sb_popline
   screen_sb_clear, // sb_clear
   screen_sb_pushline4, // sb_pushline4
 };
 
-int main(int argc UNUSED, char **argv UNUSED)
+പൂർണ്ണസംഖ്യ പ്രധാന(പൂർണ്ണസംഖ്യ argc UNUSED, അക്ഷരം **argv UNUSED)
 {
-  char line[1024] = {0};
-  int flag;
+  അക്ഷരം വരി[1024] = {0};
+  പൂർണ്ണസംഖ്യ flag;
 
-  int err;
+  പൂർണ്ണസംഖ്യ err;
 
-  setvbuf(stdout, NULL, _IONBF, 0);
+  setvbuf(stdout, ശൂന്യ, _IONBF, 0);
 
-  while(fgets(line, sizeof line, stdin)) {
-    char *nl;
+  ആകുമ്പോൾ(fgets(വരി, വലുപ്പം വരി, stdin)) {
+    അക്ഷരം *nl;
     size_t outlen;
     err = 0;
 
-    if((nl = strchr(line, '\n')))
+    എങ്കിൽ((nl = strchr(വരി, '\n')))
       *nl = '\0';
 
-    if(streq(line, "INIT")) {
-      if(!vt)
+    എങ്കിൽ(streq(വരി, "INIT")) {
+      എങ്കിൽ(!vt)
         vt = vterm_new(25, 80);
 
       // Somehow this makes tests fail
       // vterm_output_set_callback(vt, term_output, NULL);
     }
 
-    else if(streq(line, "WANTPARSER")) {
-      assert(vt);
-      vterm_parser_set_callbacks(vt, &parser_cbs, NULL);
+    അല്ലെങ്കിൽ എങ്കിൽ(streq(വരി, "WANTPARSER")) {
+      പ്രതിജ്ഞാ(vt);
+      vterm_parser_set_callbacks(vt, &parser_cbs, ശൂന്യ);
     }
 
-    else if(strstartswith(line, "WANTSTATE") && (line[9] == '\0' || line[9] == ' ')) {
-      int i = 9;
-      int sense = 1;
-      assert(vt);
-      if(!state) {
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "WANTSTATE") && (വരി[9] == '\0' || വരി[9] == ' ')) {
+      പൂർണ്ണസംഖ്യ i = 9;
+      പൂർണ്ണസംഖ്യ sense = 1;
+      പ്രതിജ്ഞാ(vt);
+      എങ്കിൽ(!state) {
         state = vterm_obtain_state(vt);
-        vterm_state_set_callbacks(state, &state_cbs, NULL);
+        vterm_state_set_callbacks(state, &state_cbs, ശൂന്യ);
         vterm_state_callbacks_has_premove(state);
         /* In some tests we want to check the behaviour of overflowing the
          * buffer, so make it nicely small
          */
-        vterm_state_set_selection_callbacks(state, &selection_cbs, NULL, NULL, 16);
+        vterm_state_set_selection_callbacks(state, &selection_cbs, ശൂന്യ, ശൂന്യ, 16);
         vterm_state_set_bold_highbright(state, 1);
         vterm_state_reset(state, 1);
       }
 
-      while(line[i] == ' ')
+      ആകുമ്പോൾ(വരി[i] == ' ')
         i++;
-      for( ; line[i]; i++)
-        switch(line[i]) {
-        case '+':
+      വേണ്ടി( ; വരി[i]; i++)
+        തിരഞ്ഞെടുപ്പ്(വരി[i]) {
+        അവസ്ഥ '+':
           sense = 1;
-          break;
-        case '-':
+          നിർത്തുക;
+        അവസ്ഥ '-':
           sense = 0;
-          break;
-        case 'g':
+          നിർത്തുക;
+        അവസ്ഥ 'g':
           want_state_putglyph = sense;
-          break;
-        case 's':
+          നിർത്തുക;
+        അവസ്ഥ 's':
           want_scrollrect = sense;
-          break;
-        case 'P':
+          നിർത്തുക;
+        അവസ്ഥ 'P':
           want_premove = sense;
-          break;
-        case 'm':
+          നിർത്തുക;
+        അവസ്ഥ 'm':
           want_moverect = sense;
-          break;
-        case 'e':
+          നിർത്തുക;
+        അവസ്ഥ 'e':
           want_state_erase = sense;
-          break;
-        case 'p':
+          നിർത്തുക;
+        അവസ്ഥ 'p':
           want_settermprop = sense;
-          break;
-        case 'f':
-          vterm_state_set_unrecognised_fallbacks(state, sense ? &fallbacks : NULL, NULL);
-          break;
-        case 'b':
+          നിർത്തുക;
+        അവസ്ഥ 'f':
+          vterm_state_set_unrecognised_fallbacks(state, sense ? &fallbacks : ശൂന്യ, ശൂന്യ);
+          നിർത്തുക;
+        അവസ്ഥ 'b':
           want_state_scrollback = sense;
-          break;
-        default:
-          fprintf(stderr, "Unrecognised WANTSTATE flag '%c'\n", line[i]);
+          നിർത്തുക;
+        സ്ഥിരസ്ഥിതി:
+          fprintf(stderr, "Unrecognised WANTSTATE flag '%c'\n", വരി[i]);
         }
     }
 
-    else if(strstartswith(line, "WANTSCREEN") && (line[10] == '\0' || line[10] == ' ')) {
-      int i = 10;
-      int sense = 1;
-      assert(vt);
-      if(!screen)
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "WANTSCREEN") && (വരി[10] == '\0' || വരി[10] == ' ')) {
+      പൂർണ്ണസംഖ്യ i = 10;
+      പൂർണ്ണസംഖ്യ sense = 1;
+      പ്രതിജ്ഞാ(vt);
+      എങ്കിൽ(!screen)
         screen = vterm_obtain_screen(vt);
-      vterm_screen_set_callbacks(screen, &screen_cbs, NULL);
+      vterm_screen_set_callbacks(screen, &screen_cbs, ശൂന്യ);
       vterm_screen_callbacks_has_pushline4(screen);
 
-      while(line[i] == ' ')
+      ആകുമ്പോൾ(വരി[i] == ' ')
         i++;
-      for( ; line[i]; i++)
-        switch(line[i]) {
-        case '-':
+      വേണ്ടി( ; വരി[i]; i++)
+        തിരഞ്ഞെടുപ്പ്(വരി[i]) {
+        അവസ്ഥ '-':
           sense = 0;
-          break;
-        case 'a':
+          നിർത്തുക;
+        അവസ്ഥ 'a':
           vterm_screen_enable_altscreen(screen, 1);
-          break;
-        case 'd':
+          നിർത്തുക;
+        അവസ്ഥ 'd':
           want_screen_damage = sense;
-          break;
-        case 'D':
+          നിർത്തുക;
+        അവസ്ഥ 'D':
           want_screen_damage = sense;
           want_screen_damage_cells = sense;
-          break;
-        case 'm':
+          നിർത്തുക;
+        അവസ്ഥ 'm':
           want_moverect = sense;
-          break;
-        case 'c':
+          നിർത്തുക;
+        അവസ്ഥ 'c':
           want_movecursor = sense;
-          break;
-        case 'p':
+          നിർത്തുക;
+        അവസ്ഥ 'p':
           want_settermprop = 1;
-          break;
-        case 'b':
+          നിർത്തുക;
+        അവസ്ഥ 'b':
           want_screen_scrollback = sense;
-          break;
-        case 'r':
+          നിർത്തുക;
+        അവസ്ഥ 'r':
           vterm_screen_enable_reflow(screen, sense);
-          break;
-        default:
-          fprintf(stderr, "Unrecognised WANTSCREEN flag '%c'\n", line[i]);
+          നിർത്തുക;
+        സ്ഥിരസ്ഥിതി:
+          fprintf(stderr, "Unrecognised WANTSCREEN flag '%c'\n", വരി[i]);
         }
     }
 
-    else if(sscanf(line, "UTF8 %d", &flag)) {
+    അല്ലെങ്കിൽ എങ്കിൽ(sscanf(വരി, "UTF8 %d", &flag)) {
       vterm_set_utf8(vt, flag);
     }
 
-    else if(streq(line, "RESET")) {
-      if(state) {
+    അല്ലെങ്കിൽ എങ്കിൽ(streq(വരി, "RESET")) {
+      എങ്കിൽ(state) {
         vterm_state_reset(state, 1);
         vterm_state_get_cursorpos(state, &state_pos);
       }
-      if(screen) {
+      എങ്കിൽ(screen) {
         vterm_screen_reset(screen, 1);
       }
     }
 
-    else if(strstartswith(line, "RESIZE ")) {
-      int rows, cols;
-      char *linep = line + 7;
-      while(linep[0] == ' ')
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "RESIZE ")) {
+      പൂർണ്ണസംഖ്യ rows, cols;
+      അക്ഷരം *linep = വരി + 7;
+      ആകുമ്പോൾ(linep[0] == ' ')
         linep++;
       sscanf(linep, "%d, %d", &rows, &cols);
       vterm_set_size(vt, rows, cols);
     }
 
-    else if(strstartswith(line, "PUSH ")) {
-      char *bytes = line + 5;
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "PUSH ")) {
+      അക്ഷരം *bytes = വരി + 5;
       size_t len = inplace_hex2bytes(bytes);
-      assert(len);
+      പ്രതിജ്ഞാ(len);
 
-      size_t written = vterm_input_write(vt, bytes, len);
-      if(written < len)
+      size_t written = vterm_നിവേശം_write(vt, bytes, len);
+      എങ്കിൽ(written < len)
         fprintf(stderr, "! short write\n");
     }
 
-    else if(streq(line, "WANTENCODING")) {
+    അല്ലെങ്കിൽ എങ്കിൽ(streq(വരി, "WANTENCODING")) {
       // This isn't really external API but it's hard to get this out any
       // other way
       encoding.enc = vterm_lookup_encoding(ENC_UTF8, 'u');
-      if(encoding.enc->init)
+      എങ്കിൽ(encoding.enc->init)
         (*encoding.enc->init)(encoding.enc, encoding.data);
     }
 
-    else if(strstartswith(line, "ENCIN ")) {
-      char *bytes = line + 6;
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "ENCIN ")) {
+      അക്ഷരം *bytes = വരി + 6;
       size_t len = inplace_hex2bytes(bytes);
-      assert(len);
+      പ്രതിജ്ഞാ(len);
 
       uint32_t cp[1024];
-      int cpi = 0;
+      പൂർണ്ണസംഖ്യ cpi = 0;
       size_t pos = 0;
 
       (*encoding.enc->decode)(encoding.enc, encoding.data,
           cp, &cpi, len, bytes, &pos, len);
 
-      if(cpi > 0) {
-	int i;
+      എങ്കിൽ(cpi > 0) {
+	പൂർണ്ണസംഖ്യ i;
         printf("encout ");
-        for(i = 0; i < cpi; i++) {
+        വേണ്ടി(i = 0; i < cpi; i++) {
           printf(i ? ",%x" : "%x", cp[i]);
         }
         printf("\n");
       }
     }
 
-    else if(strstartswith(line, "INCHAR ")) {
-      char *linep = line + 7;
-      unsigned int c = 0;
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "INCHAR ")) {
+      അക്ഷരം *linep = വരി + 7;
+      unsigned പൂർണ്ണസംഖ്യ c = 0;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      ആകുമ്പോൾ(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
       sscanf(linep, " %x", &c);
@@ -872,360 +872,360 @@ int main(int argc UNUSED, char **argv UNUSED)
       vterm_keyboard_unichar(vt, c, mod);
     }
 
-    else if(strstartswith(line, "INKEY ")) {
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "INKEY ")) {
       VTermModifier mod;
-      VTermKey key;
-      char *linep = line + 6;
-      while(linep[0] == ' ')
+      VTerm_താക്കോൽ താക്കോൽ;
+      അക്ഷരം *linep = വരി + 6;
+      ആകുമ്പോൾ(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
-      while(linep[0] == ' ')
+      ആകുമ്പോൾ(linep[0] == ' ')
         linep++;
-      key = strp_key(linep);
+      താക്കോൽ = strp_താക്കോൽ(linep);
 
-      vterm_keyboard_key(vt, key, mod);
+      vterm_keyboard_താക്കോൽ(vt, താക്കോൽ, mod);
     }
 
-    else if(strstartswith(line, "PASTE ")) {
-      char *linep = line + 6;
-      if(streq(linep, "START"))
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "PASTE ")) {
+      അക്ഷരം *linep = വരി + 6;
+      എങ്കിൽ(streq(linep, "START"))
         vterm_keyboard_start_paste(vt);
-      else if(streq(linep, "END"))
+      അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "END"))
         vterm_keyboard_end_paste(vt);
-      else
-        goto abort_line;
+      അല്ലെങ്കിൽ
+        പോകുക abort_വരി;
     }
 
-    else if(strstartswith(line, "FOCUS ")) {
-      assert(state);
-      char *linep = line + 6;
-      if(streq(linep, "IN"))
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "FOCUS ")) {
+      പ്രതിജ്ഞാ(state);
+      അക്ഷരം *linep = വരി + 6;
+      എങ്കിൽ(streq(linep, "IN"))
         vterm_state_focus_in(state);
-      else if(streq(linep, "OUT"))
+      അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "OUT"))
         vterm_state_focus_out(state);
-      else
-        goto abort_line;
+      അല്ലെങ്കിൽ
+        പോകുക abort_വരി;
     }
 
-    else if(strstartswith(line, "MOUSEMOVE ")) {
-      char *linep = line + 10;
-      int row, col, len;
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "MOUSEMOVE ")) {
+      അക്ഷരം *linep = വരി + 10;
+      പൂർണ്ണസംഖ്യ row, col, len;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      ആകുമ്പോൾ(linep[0] == ' ')
         linep++;
       sscanf(linep, "%d,%d%n", &row, &col, &len);
       linep += len;
-      while(linep[0] == ' ')
+      ആകുമ്പോൾ(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
       vterm_mouse_move(vt, row, col, mod);
     }
 
-    else if(strstartswith(line, "MOUSEBTN ")) {
-      char *linep = line + 9;
-      char press;
-      int button, len;
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "MOUSEBTN ")) {
+      അക്ഷരം *linep = വരി + 9;
+      അക്ഷരം press;
+      പൂർണ്ണസംഖ്യ button, len;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      ആകുമ്പോൾ(linep[0] == ' ')
         linep++;
       sscanf(linep, "%c %d%n", &press, &button, &len);
       linep += len;
-      while(linep[0] == ' ')
+      ആകുമ്പോൾ(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
       vterm_mouse_button(vt, button, (press == 'd' || press == 'D'), mod);
     }
 
-    else if(strstartswith(line, "SELECTION ")) {
-      char *linep = line + 10;
-      unsigned int mask;
-      int len;
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "SELECTION ")) {
+      അക്ഷരം *linep = വരി + 10;
+      unsigned പൂർണ്ണസംഖ്യ mask;
+      പൂർണ്ണസംഖ്യ len;
       VTermStringFragment frag = { 0 };
       sscanf(linep, "%x%n", &mask, &len);
       linep += len;
-      while(linep[0] == ' ')
+      ആകുമ്പോൾ(linep[0] == ' ')
         linep++;
-      if(linep[0] == '[') {
+      എങ്കിൽ(linep[0] == '[') {
         frag.initial = TRUE;
         linep++;
-        while(linep[0] == ' ')
+        ആകുമ്പോൾ(linep[0] == ' ')
           linep++;
       }
       frag.len = inplace_hex2bytes(linep);
       frag.str = linep;
-      assert(frag.len);
+      പ്രതിജ്ഞാ(frag.len);
 
       linep += frag.len * 2;
-      while(linep[0] == ' ')
+      ആകുമ്പോൾ(linep[0] == ' ')
         linep++;
-      if(linep[0] == ']') {
+      എങ്കിൽ(linep[0] == ']') {
         frag.final = TRUE;
       }
       vterm_state_send_selection(state, mask, frag);
     }
 
-    else if(strstartswith(line, "DAMAGEMERGE ")) {
-      assert(screen);
-      char *linep = line + 12;
-      while(linep[0] == ' ')
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "DAMAGEMERGE ")) {
+      പ്രതിജ്ഞാ(screen);
+      അക്ഷരം *linep = വരി + 12;
+      ആകുമ്പോൾ(linep[0] == ' ')
         linep++;
-      if(streq(linep, "CELL"))
+      എങ്കിൽ(streq(linep, "CELL"))
         vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_CELL);
-      else if(streq(linep, "ROW"))
+      അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "ROW"))
         vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_ROW);
-      else if(streq(linep, "SCREEN"))
+      അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "SCREEN"))
         vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCREEN);
-      else if(streq(linep, "SCROLL"))
+      അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "SCROLL"))
         vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCROLL);
     }
 
-    else if(strstartswith(line, "DAMAGEFLUSH")) {
-      assert(screen);
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "DAMAGEFLUSH")) {
+      പ്രതിജ്ഞാ(screen);
       vterm_screen_flush_damage(screen);
     }
 
-    else if(strstartswith(line, "SETDEFAULTCOL ")) {
-      assert(screen);
-      char *linep = line + 14;
-      while(linep[0] == ' ')
+    അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "SETDEFAULTCOL ")) {
+      പ്രതിജ്ഞാ(screen);
+      അക്ഷരം *linep = വരി + 14;
+      ആകുമ്പോൾ(linep[0] == ' ')
         linep++;
       VTermColor fg = strpe_color(&linep);
-      if(linep[0]) {
-        while(linep[0] == ' ')
+      എങ്കിൽ(linep[0]) {
+        ആകുമ്പോൾ(linep[0] == ' ')
           linep++;
         VTermColor bg = strpe_color(&linep);
 
         vterm_screen_set_default_colors(screen, &fg, &bg);
       }
-      else
-        vterm_screen_set_default_colors(screen, &fg, NULL);
+      അല്ലെങ്കിൽ
+        vterm_screen_set_default_colors(screen, &fg, ശൂന്യ);
     }
 
-    else if(line[0] == '?') {
-      if(streq(line, "?cursor")) {
-        assert(state);
+    അല്ലെങ്കിൽ എങ്കിൽ(വരി[0] == '?') {
+      എങ്കിൽ(streq(വരി, "?cursor")) {
+        പ്രതിജ്ഞാ(state);
         VTermPos pos;
         vterm_state_get_cursorpos(state, &pos);
-        if(pos.row != state_pos.row)
+        എങ്കിൽ(pos.row != state_pos.row)
           printf("! row mismatch: state=%d,%d event=%d,%d\n",
               pos.row, pos.col, state_pos.row, state_pos.col);
-        else if(pos.col != state_pos.col)
+        അല്ലെങ്കിൽ എങ്കിൽ(pos.col != state_pos.col)
           printf("! col mismatch: state=%d,%d event=%d,%d\n",
               pos.row, pos.col, state_pos.row, state_pos.col);
-        else
+        അല്ലെങ്കിൽ
           printf("%d,%d\n", state_pos.row, state_pos.col);
       }
-      else if(strstartswith(line, "?pen ")) {
-        assert(state);
-        VTermValue val;
-        char *linep = line + 5;
-        while(linep[0] == ' ')
+      അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "?pen ")) {
+        പ്രതിജ്ഞാ(state);
+        VTerm_മൂല്യം val;
+        അക്ഷരം *linep = വരി + 5;
+        ആകുമ്പോൾ(linep[0] == ' ')
           linep++;
 
 #define BOOLSTR(v) ((v) ? "on" : "off")
 
-        if(streq(linep, "bold")) {
+        എങ്കിൽ(streq(linep, "bold")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BOLD, &val);
-          if(val.boolean != state_pen.bold)
+          എങ്കിൽ(val.boolean != state_pen.bold)
             printf("! pen bold mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.bold));
-          else
+          അല്ലെങ്കിൽ
             printf("%s\n", BOOLSTR(state_pen.bold));
         }
-        else if(streq(linep, "underline")) {
+        അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "underline")) {
           vterm_state_get_penattr(state, VTERM_ATTR_UNDERLINE, &val);
-          if(val.boolean != state_pen.underline)
+          എങ്കിൽ(val.boolean != state_pen.underline)
             printf("! pen underline mismatch; state=%d, event=%d\n",
                 val.boolean, state_pen.underline);
-          else
+          അല്ലെങ്കിൽ
             printf("%d\n", state_pen.underline);
         }
-        else if(streq(linep, "italic")) {
+        അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "italic")) {
           vterm_state_get_penattr(state, VTERM_ATTR_ITALIC, &val);
-          if(val.boolean != state_pen.italic)
+          എങ്കിൽ(val.boolean != state_pen.italic)
             printf("! pen italic mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.italic));
-          else
+          അല്ലെങ്കിൽ
             printf("%s\n", BOOLSTR(state_pen.italic));
         }
-        else if(streq(linep, "blink")) {
+        അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "blink")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BLINK, &val);
-          if(val.boolean != state_pen.blink)
+          എങ്കിൽ(val.boolean != state_pen.blink)
             printf("! pen blink mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.blink));
-          else
+          അല്ലെങ്കിൽ
             printf("%s\n", BOOLSTR(state_pen.blink));
         }
-        else if(streq(linep, "reverse")) {
+        അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "reverse")) {
           vterm_state_get_penattr(state, VTERM_ATTR_REVERSE, &val);
-          if(val.boolean != state_pen.reverse)
+          എങ്കിൽ(val.boolean != state_pen.reverse)
             printf("! pen reverse mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.reverse));
-          else
+          അല്ലെങ്കിൽ
             printf("%s\n", BOOLSTR(state_pen.reverse));
         }
-        else if(streq(linep, "font")) {
+        അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "font")) {
           vterm_state_get_penattr(state, VTERM_ATTR_FONT, &val);
-          if(val.boolean != state_pen.font)
+          എങ്കിൽ(val.boolean != state_pen.font)
             printf("! pen font mismatch; state=%d, event=%d\n",
                 val.boolean, state_pen.font);
-          else
+          അല്ലെങ്കിൽ
             printf("%d\n", state_pen.font);
         }
-        else if(streq(linep, "small")) {
+        അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "small")) {
           vterm_state_get_penattr(state, VTERM_ATTR_SMALL, &val);
-          if(val.boolean != state_pen.small)
+          എങ്കിൽ(val.boolean != state_pen.small)
             printf("! pen small mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.small));
-          else
+          അല്ലെങ്കിൽ
             printf("%s\n", BOOLSTR(state_pen.small));
         }
-        else if(streq(linep, "baseline")) {
+        അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "baseline")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BASELINE, &val);
-          if(val.number != state_pen.baseline)
+          എങ്കിൽ(val.സംഖ്യ != state_pen.baseline)
             printf("! pen baseline mismatch: state=%d, event=%d\n",
-                val.number, state_pen.baseline);
-          else
+                val.സംഖ്യ, state_pen.baseline);
+          അല്ലെങ്കിൽ
             printf("%s\n", state_pen.baseline == VTERM_BASELINE_RAISE ? "raise"
                          : state_pen.baseline == VTERM_BASELINE_LOWER ? "lower"
                          : "normal");
         }
-        else if(streq(linep, "foreground")) {
+        അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "foreground")) {
           print_color(&state_pen.foreground);
           printf("\n");
         }
-        else if(streq(linep, "background")) {
+        അല്ലെങ്കിൽ എങ്കിൽ(streq(linep, "background")) {
           print_color(&state_pen.background);
           printf("\n");
         }
-        else
+        അല്ലെങ്കിൽ
           printf("?\n");
       }
-      else if(strstartswith(line, "?lineinfo ")) {
-        assert(state);
-        char *linep = line + 10;
-        int row;
-        const VTermLineInfo *info;
-        while(linep[0] == ' ')
+      അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "?lineinfo ")) {
+        പ്രതിജ്ഞാ(state);
+        അക്ഷരം *linep = വരി + 10;
+        പൂർണ്ണസംഖ്യ row;
+        സ്ഥിരം VTerm_വരി_Info *info;
+        ആകുമ്പോൾ(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d", &row) < 1) {
+        എങ്കിൽ(sscanf(linep, "%d", &row) < 1) {
           printf("! lineinfo unrecognised input\n");
-          goto abort_line;
+          പോകുക abort_വരി;
         }
         info = vterm_state_get_lineinfo(state, row);
-        if(info->doublewidth)
+        എങ്കിൽ(info->doublewidth)
           printf("dwl ");
-        if(info->doubleheight)
+        എങ്കിൽ(info->doubleheight)
           printf("dhl ");
-        if(info->continuation)
+        എങ്കിൽ(info->continuation)
           printf("cont ");
         printf("\n");
       }
-      else if(strstartswith(line, "?screen_chars ")) {
-        assert(screen);
-        char *linep = line + 13;
+      അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "?screen_chars ")) {
+        പ്രതിജ്ഞാ(screen);
+        അക്ഷരം *linep = വരി + 13;
         VTermRect rect;
         size_t len;
-        while(linep[0] == ' ')
+        ആകുമ്പോൾ(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) == 4)
+        എങ്കിൽ(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) == 4)
           ; // fine
-        else if(sscanf(linep, "%d", &rect.start_row) == 1) {
+        അല്ലെങ്കിൽ എങ്കിൽ(sscanf(linep, "%d", &rect.start_row) == 1) {
           rect.end_row = rect.start_row + 1;
           rect.start_col = 0;
-          vterm_get_size(vt, NULL, &rect.end_col);
+          vterm_get_size(vt, ശൂന്യ, &rect.end_col);
         }
-        else {
+        അല്ലെങ്കിൽ {
           printf("! screen_chars unrecognised input\n");
-          goto abort_line;
+          പോകുക abort_വരി;
         }
-        len = vterm_screen_get_chars(screen, NULL, 0, rect);
-        if(len == (size_t)-1)
+        len = vterm_screen_get_chars(screen, ശൂന്യ, 0, rect);
+        എങ്കിൽ(len == (size_t)-1)
           printf("! screen_chars error\n");
-        else if(len == 0)
+        അല്ലെങ്കിൽ എങ്കിൽ(len == 0)
           printf("\n");
-        else {
-          uint32_t *chars = malloc(sizeof(uint32_t) * len);
+        അല്ലെങ്കിൽ {
+          uint32_t *chars = malloc(വലുപ്പം(uint32_t) * len);
           size_t i;
           vterm_screen_get_chars(screen, chars, len, rect);
-          for(i = 0; i < len; i++) {
+          വേണ്ടി(i = 0; i < len; i++) {
             printf("0x%02x%s", chars[i], i < len-1 ? "," : "\n");
           }
-          free(chars);
+          സ്വതന്ത്രം(chars);
         }
       }
-      else if(strstartswith(line, "?screen_text ")) {
-        assert(screen);
-        char *linep = line + 12;
+      അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "?screen_text ")) {
+        പ്രതിജ്ഞാ(screen);
+        അക്ഷരം *linep = വരി + 12;
         VTermRect rect;
         size_t len;
-        while(linep[0] == ' ')
+        ആകുമ്പോൾ(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) < 4) {
+        എങ്കിൽ(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) < 4) {
           printf("! screen_text unrecognised input\n");
-          goto abort_line;
+          പോകുക abort_വരി;
         }
-        len = vterm_screen_get_text(screen, NULL, 0, rect);
-        if(len == (size_t)-1)
+        len = vterm_screen_get_text(screen, ശൂന്യ, 0, rect);
+        എങ്കിൽ(len == (size_t)-1)
           printf("! screen_text error\n");
-        else if(len == 0)
+        അല്ലെങ്കിൽ എങ്കിൽ(len == 0)
           printf("\n");
-        else {
+        അല്ലെങ്കിൽ {
           // Put an overwrite guard at both ends of the buffer
-          unsigned char *buffer = malloc(len + 4);
-          unsigned char *text = buffer + 2;
+          unsigned അക്ഷരം *buffer = malloc(len + 4);
+          unsigned അക്ഷരം *text = buffer + 2;
           text[-2] = 0x55; text[-1] = 0xAA;
           text[len] = 0x55; text[len+1] = 0xAA;
 
-          vterm_screen_get_text(screen, (char *)text, len, rect);
+          vterm_screen_get_text(screen, (അക്ഷരം *)text, len, rect);
 
-          if(text[-2] != 0x55 || text[-1] != 0xAA)
+          എങ്കിൽ(text[-2] != 0x55 || text[-1] != 0xAA)
             printf("! screen_get_text buffer overrun left [%02x,%02x]\n", text[-2], text[-1]);
-          else if(text[len] != 0x55 || text[len+1] != 0xAA)
+          അല്ലെങ്കിൽ എങ്കിൽ(text[len] != 0x55 || text[len+1] != 0xAA)
             printf("! screen_get_text buffer overrun right [%02x,%02x]\n", text[len], text[len+1]);
-          else
+          അല്ലെങ്കിൽ
 	  {
 	    size_t i;
-            for(i = 0; i < len; i++) {
+            വേണ്ടി(i = 0; i < len; i++) {
               printf("0x%02x%s", text[i], i < len-1 ? "," : "\n");
             }
 	  }
 
-          free(buffer);
+          സ്വതന്ത്രം(buffer);
         }
       }
-      else if(strstartswith(line, "?screen_cell ")) {
-        assert(screen);
-        char *linep = line + 12;
-	int i;
+      അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "?screen_cell ")) {
+        പ്രതിജ്ഞാ(screen);
+        അക്ഷരം *linep = വരി + 12;
+	പൂർണ്ണസംഖ്യ i;
         VTermPos pos;
         VTermScreenCell cell;
-        while(linep[0] == ' ')
+        ആകുമ്പോൾ(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
+        എങ്കിൽ(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
           printf("! screen_cell unrecognised input\n");
-          goto abort_line;
+          പോകുക abort_വരി;
         }
-        if(!vterm_screen_get_cell(screen, pos, &cell))
-          goto abort_line;
+        എങ്കിൽ(!vterm_screen_get_cell(screen, pos, &cell))
+          പോകുക abort_വരി;
         printf("{");
-        for(i = 0; i < VTERM_MAX_CHARS_PER_CELL && cell.chars[i]; i++) {
+        വേണ്ടി(i = 0; i < VTERM_MAX_CHARS_PER_CELL && cell.chars[i]; i++) {
           printf("%s0x%x", i ? "," : "", cell.chars[i]);
         }
         printf("} width=%d attrs={", cell.width);
-        if(cell.attrs.bold)      printf("B");
-        if(cell.attrs.underline) printf("U%d", cell.attrs.underline);
-        if(cell.attrs.italic)    printf("I");
-        if(cell.attrs.blink)     printf("K");
-        if(cell.attrs.reverse)   printf("R");
-        if(cell.attrs.font)      printf("F%d", cell.attrs.font);
-        if(cell.attrs.small)     printf("S");
-        if(cell.attrs.baseline)  printf(
+        എങ്കിൽ(cell.attrs.bold)      printf("B");
+        എങ്കിൽ(cell.attrs.underline) printf("U%d", cell.attrs.underline);
+        എങ്കിൽ(cell.attrs.italic)    printf("I");
+        എങ്കിൽ(cell.attrs.blink)     printf("K");
+        എങ്കിൽ(cell.attrs.reverse)   printf("R");
+        എങ്കിൽ(cell.attrs.font)      printf("F%d", cell.attrs.font);
+        എങ്കിൽ(cell.attrs.small)     printf("S");
+        എങ്കിൽ(cell.attrs.baseline)  printf(
             cell.attrs.baseline == VTERM_BASELINE_RAISE ? "^" :
                                                           "_");
         printf("} ");
-        if(cell.attrs.dwl)       printf("dwl ");
-        if(cell.attrs.dhl)       printf("dhl-%s ", cell.attrs.dhl == 2 ? "bottom" : "top");
+        എങ്കിൽ(cell.attrs.dwl)       printf("dwl ");
+        എങ്കിൽ(cell.attrs.dhl)       printf("dhl-%s ", cell.attrs.dhl == 2 ? "bottom" : "top");
         printf("fg=");
         vterm_screen_convert_color_to_rgb(screen, &cell.fg);
         print_color(&cell.fg);
@@ -1234,53 +1234,53 @@ int main(int argc UNUSED, char **argv UNUSED)
         print_color(&cell.bg);
         printf("\n");
       }
-      else if(strstartswith(line, "?screen_eol ")) {
-        assert(screen);
+      അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "?screen_eol ")) {
+        പ്രതിജ്ഞാ(screen);
         VTermPos pos;
-        char *linep = line + 12;
-        while(linep[0] == ' ')
+        അക്ഷരം *linep = വരി + 12;
+        ആകുമ്പോൾ(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
+        എങ്കിൽ(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
           printf("! screen_eol unrecognised input\n");
-          goto abort_line;
+          പോകുക abort_വരി;
         }
         printf("%d\n", vterm_screen_is_eol(screen, pos));
       }
-      else if(strstartswith(line, "?screen_attrs_extent ")) {
-        assert(screen);
+      അല്ലെങ്കിൽ എങ്കിൽ(strstartswith(വരി, "?screen_attrs_extent ")) {
+        പ്രതിജ്ഞാ(screen);
         VTermPos pos;
         VTermRect rect;
-        char *linep = line + 21;
-        while(linep[0] == ' ')
+        അക്ഷരം *linep = വരി + 21;
+        ആകുമ്പോൾ(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
+        എങ്കിൽ(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
           printf("! screen_attrs_extent unrecognised input\n");
-          goto abort_line;
+          പോകുക abort_വരി;
         }
 	rect.start_col = 0;
 	rect.end_col   = -1;
-        if(!vterm_screen_get_attrs_extent(screen, &rect, pos, ~0)) {
+        എങ്കിൽ(!vterm_screen_get_attrs_extent(screen, &rect, pos, ~0)) {
           printf("! screen_attrs_extent failed\n");
-          goto abort_line;
+          പോകുക abort_വരി;
         }
         printf("%d,%d-%d,%d\n", rect.start_row, rect.start_col, rect.end_row, rect.end_col);
       }
-      else
+      അല്ലെങ്കിൽ
         printf("?\n");
 
-      memset(line, 0, sizeof line);
-      continue;
+      memset(വരി, 0, വലുപ്പം വരി);
+      തുടരുക;
     }
 
-    else
-      abort_line: err = 1;
+    അല്ലെങ്കിൽ
+      abort_വരി: err = 1;
 
     outlen = vterm_output_get_buffer_current(vt);
-    if(outlen > 0) {
-      char outbuff[1024];
+    എങ്കിൽ(outlen > 0) {
+      അക്ഷരം outbuff[1024];
       vterm_output_read(vt, outbuff, outlen);
 
-      term_output(outbuff, outlen, NULL);
+      term_output(outbuff, outlen, ശൂന്യ);
     }
 
     printf(err ? "?\n" : "DONE\n");
@@ -1288,5 +1288,5 @@ int main(int argc UNUSED, char **argv UNUSED)
 
   vterm_free(vt);
 
-  return 0;
+  തിരികെ 0;
 }

@@ -11,28 +11,28 @@
  * gc.c: Garbage Collection
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 
 /*
  * When recursively copying lists and dicts we need to remember which ones we
  * have done to avoid endless recursiveness.  This unique ID is used for that.
  * The last bit is used for previous_funccal, ignored when comparing.
  */
-static int current_copyID = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ current_copyID = 0;
 
-static int free_unref_items(int copyID);
+സ്ഥിതം പൂർണ്ണസംഖ്യ free_unref_ഇനങ്ങൾ(പൂർണ്ണസംഖ്യ copyID);
 
 /*
  * Return the next (unique) copy ID.
  * Used for serializing nested structures.
  */
-    int
-get_copyID(void)
+    പൂർണ്ണസംഖ്യ
+get_copyID(ശൂന്യം)
 {
     current_copyID += COPYID_INC;
-    return current_copyID;
+    തിരികെ current_copyID;
 }
 
 /*
@@ -60,17 +60,17 @@ get_copyID(void)
  * When "testing" is TRUE this is called from test_garbagecollect_now().
  * Return TRUE if some memory was freed.
  */
-    int
-garbage_collect(int testing)
+    പൂർണ്ണസംഖ്യ
+garbage_collect(പൂർണ്ണസംഖ്യ testing)
 {
-    int		copyID;
-    int		abort = FALSE;
+    പൂർണ്ണസംഖ്യ		copyID;
+    പൂർണ്ണസംഖ്യ		abort = FALSE;
     buf_T	*buf;
     win_T	*wp;
-    int		did_free = FALSE;
+    പൂർണ്ണസംഖ്യ		did_free = FALSE;
     tabpage_T	*tp;
 
-    if (!testing)
+    എങ്കിൽ (!testing)
     {
 	// Only do this once.
 	want_garbage_collect = FALSE;
@@ -79,24 +79,24 @@ garbage_collect(int testing)
     }
 
     // The execution stack can grow big, limit the size.
-    if (exestack.ga_maxlen - exestack.ga_len > 500)
+    എങ്കിൽ (exestack.ga_maxlen - exestack.ga_len > 500)
     {
 	size_t	new_len;
 	char_u	*pp;
-	int	n;
+	പൂർണ്ണസംഖ്യ	n;
 
 	// Keep 150% of the current size, with a minimum of the growth size.
 	n = exestack.ga_len / 2;
-	if (n < exestack.ga_growsize)
+	എങ്കിൽ (n < exestack.ga_growsize)
 	    n = exestack.ga_growsize;
 
 	// Don't make it bigger though.
-	if (exestack.ga_len + n < exestack.ga_maxlen)
+	എങ്കിൽ (exestack.ga_len + n < exestack.ga_maxlen)
 	{
 	    new_len = (size_t)exestack.ga_itemsize * (exestack.ga_len + n);
 	    pp = vim_realloc(exestack.ga_data, new_len);
-	    if (pp == NULL)
-		return FAIL;
+	    എങ്കിൽ (pp == ശൂന്യ)
+		തിരികെ FAIL;
 	    exestack.ga_maxlen = exestack.ga_len + n;
 	    exestack.ga_data = pp;
 	}
@@ -123,38 +123,38 @@ garbage_collect(int testing)
     FOR_ALL_BUFFERS(buf)
     {
 	abort = abort || set_ref_in_item(&buf->b_bufvar.di_tv, copyID,
-							NULL, NULL, NULL);
+							ശൂന്യ, ശൂന്യ, ശൂന്യ);
 	abort = abort || set_ref_in_list(buf->b_recorded_changes, copyID);
     }
 
     // window-local variables
     FOR_ALL_TAB_WINDOWS(tp, wp)
 	abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
-							NULL, NULL, NULL);
+							ശൂന്യ, ശൂന്യ, ശൂന്യ);
     // window-local variables in autocmd windows
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < AUCMD_WIN_എണ്ണം; ++i)
+	എങ്കിൽ (aucmd_win[i].auc_win != ശൂന്യ)
 	    abort = abort || set_ref_in_item(
-		    &aucmd_win[i].auc_win->w_winvar.di_tv, copyID, NULL, NULL, NULL);
+		    &aucmd_win[i].auc_win->w_winvar.di_tv, copyID, ശൂന്യ, ശൂന്യ, ശൂന്യ);
 #ifdef FEAT_PROP_POPUP
     FOR_ALL_POPUPWINS(wp)
 	abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
-								  NULL, NULL, NULL);
+								  ശൂന്യ, ശൂന്യ, ശൂന്യ);
     FOR_ALL_TABPAGES(tp)
 	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
 		abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
-								  NULL, NULL, NULL);
+								  ശൂന്യ, ശൂന്യ, ശൂന്യ);
 #endif
 
     // tabpage-local variables
     FOR_ALL_TABPAGES(tp)
 	abort = abort || set_ref_in_item(&tp->tp_winvar.di_tv, copyID,
-								  NULL, NULL, NULL);
+								  ശൂന്യ, ശൂന്യ, ശൂന്യ);
     // global variables
     abort = abort || garbage_collect_globvars(copyID);
 
     // function-local variables
-    abort = abort || set_ref_in_call_stack(copyID);
+    abort = abort || set_ref_in_call_അട്ടി(copyID);
 
     // named functions (matters for closures)
     abort = abort || set_ref_in_functions(copyID);
@@ -230,12 +230,12 @@ garbage_collect(int testing)
 
     abort = abort || set_ref_in_classes(copyID);
 
-    if (!abort)
+    എങ്കിൽ (!abort)
     {
 	/*
 	 * 2. Free lists and dictionaries that are not referenced.
 	 */
-	did_free = free_unref_items(copyID);
+	did_free = free_unref_ഇനങ്ങൾ(copyID);
 
 	/*
 	 * 3. Check if any funccal can be freed now.
@@ -243,26 +243,26 @@ garbage_collect(int testing)
 	 */
 	free_unref_funccal(copyID, testing);
     }
-    else if (p_verbose > 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (p_verbose > 0)
     {
-	verb_msg(_("Not enough memory to set references, garbage collection aborted!"));
+	verb_സന്ദേശം(_("Not enough memory to set references, garbage collection aborted!"));
     }
 
-    return did_free;
+    തിരികെ did_free;
 }
 
 /*
  * Free lists, dictionaries, channels and jobs that are no longer referenced.
  */
-    static int
-free_unref_items(int copyID)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+free_unref_ഇനങ്ങൾ(പൂർണ്ണസംഖ്യ copyID)
 {
-    int		did_free = FALSE;
+    പൂർണ്ണസംഖ്യ		did_free = FALSE;
 
     // Let all "free" functions know that we are here.  This means no
     // dictionaries, lists, channels or jobs are to be freed, because we will
     // do that here.
-    in_free_unref_items = TRUE;
+    in_free_unref_ഇനങ്ങൾ = TRUE;
 
     /*
      * PASS 1: free the contents of the items.  We don't free the items
@@ -297,10 +297,10 @@ free_unref_items(int copyID)
     /*
      * PASS 2: free the items themselves.
      */
-    object_free_items(copyID);
-    dict_free_items(copyID);
-    list_free_items(copyID);
-    tuple_free_items(copyID);
+    object_free_ഇനങ്ങൾ(copyID);
+    dict_free_ഇനങ്ങൾ(copyID);
+    list_free_ഇനങ്ങൾ(copyID);
+    tuple_free_ഇനങ്ങൾ(copyID);
 
 #ifdef FEAT_JOB_CHANNEL
     // Go through the list of jobs and free items without the copyID. This
@@ -312,9 +312,9 @@ free_unref_items(int copyID)
     free_unused_channels(copyID, COPYID_MASK);
 #endif
 
-    in_free_unref_items = FALSE;
+    in_free_unref_ഇനങ്ങൾ = FALSE;
 
-    return did_free;
+    തിരികെ did_free;
 }
 
 /*
@@ -323,66 +323,66 @@ free_unref_items(int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 set_ref_in_ht(
     hashtab_T		*ht,
-    int			copyID,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    പൂർണ്ണസംഖ്യ			copyID,
+    list_അട്ടി_T	**list_അട്ടി,
+    tuple_അട്ടി_T	**tuple_അട്ടി)
 {
-    int		todo;
-    int		abort = FALSE;
+    പൂർണ്ണസംഖ്യ		todo;
+    പൂർണ്ണസംഖ്യ		abort = FALSE;
     hashitem_T	*hi;
     hashtab_T	*cur_ht;
-    ht_stack_T	*ht_stack = NULL;
-    ht_stack_T	*tempitem;
+    ht_അട്ടി_T	*ht_അട്ടി = ശൂന്യ;
+    ht_അട്ടി_T	*tempitem;
 
     cur_ht = ht;
-    for (;;)
+    വേണ്ടി (;;)
     {
-	if (!abort)
+	എങ്കിൽ (!abort)
 	{
 	    // Mark each item in the hashtab.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    todo = (int)cur_ht->ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(cur_ht, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+	    todo = (പൂർണ്ണസംഖ്യ)cur_ht->ht_used;
+	    FOR_ALL_HASHTAB_ഇനങ്ങൾ(cur_ht, hi, todo)
+		എങ്കിൽ (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
 		    abort = abort
 			|| set_ref_in_item(&HI2DI(hi)->di_tv, copyID,
-				       &ht_stack, list_stack, tuple_stack);
+				       &ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
 		}
 	}
 
-	if (ht_stack == NULL)
-	    break;
+	എങ്കിൽ (ht_അട്ടി == ശൂന്യ)
+	    നിർത്തുക;
 
 	// take an item from the stack
-	cur_ht = ht_stack->ht;
-	tempitem = ht_stack;
-	ht_stack = ht_stack->prev;
-	free(tempitem);
+	cur_ht = ht_അട്ടി->ht;
+	tempitem = ht_അട്ടി;
+	ht_അട്ടി = ht_അട്ടി->prev;
+	സ്വതന്ത്രം(tempitem);
     }
 
-    return abort;
+    തിരികെ abort;
 }
 
-#if defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#എങ്കിൽ defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Mark a dict and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_dict(dict_T *d, int copyID)
+    പൂർണ്ണസംഖ്യ
+set_ref_in_dict(dict_T *d, പൂർണ്ണസംഖ്യ copyID)
 {
-    if (d != NULL && d->dv_copyID != copyID)
+    എങ്കിൽ (d != ശൂന്യ && d->dv_copyID != copyID)
     {
 	d->dv_copyID = copyID;
-	return set_ref_in_ht(&d->dv_hashtab, copyID, NULL, NULL);
+	തിരികെ set_ref_in_ht(&d->dv_hashtab, copyID, ശൂന്യ, ശൂന്യ);
     }
-    return FALSE;
+    തിരികെ FALSE;
 }
 #endif
 
@@ -390,15 +390,15 @@ set_ref_in_dict(dict_T *d, int copyID)
  * Mark a list and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_list(list_T *ll, int copyID)
+    പൂർണ്ണസംഖ്യ
+set_ref_in_list(list_T *ll, പൂർണ്ണസംഖ്യ copyID)
 {
-    if (ll != NULL && ll->lv_copyID != copyID)
+    എങ്കിൽ (ll != ശൂന്യ && ll->lv_copyID != copyID)
     {
 	ll->lv_copyID = copyID;
-	return set_ref_in_list_items(ll, copyID, NULL, NULL);
+	തിരികെ set_ref_in_list_ഇനങ്ങൾ(ll, copyID, ശൂന്യ, ശൂന്യ);
     }
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
@@ -407,55 +407,55 @@ set_ref_in_list(list_T *ll, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_list_items(
+    പൂർണ്ണസംഖ്യ
+set_ref_in_list_ഇനങ്ങൾ(
     list_T		*l,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    tuple_stack_T	**tuple_stack)
+    പൂർണ്ണസംഖ്യ			copyID,
+    ht_അട്ടി_T		**ht_അട്ടി,
+    tuple_അട്ടി_T	**tuple_അട്ടി)
 {
     listitem_T	 *li;
-    int		 abort = FALSE;
+    പൂർണ്ണസംഖ്യ		 abort = FALSE;
     list_T	 *cur_l;
-    list_stack_T *list_stack = NULL;
-    list_stack_T *tempitem;
+    list_അട്ടി_T *list_അട്ടി = ശൂന്യ;
+    list_അട്ടി_T *tempitem;
 
     cur_l = l;
-    for (;;)
+    വേണ്ടി (;;)
     {
-	if (!abort && cur_l->lv_first != &range_list_item)
+	എങ്കിൽ (!abort && cur_l->lv_first != &range_list_item)
 	    // Mark each item in the list.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    for (li = cur_l->lv_first; !abort && li != NULL; li = li->li_next)
+	    വേണ്ടി (li = cur_l->lv_first; !abort && li != ശൂന്യ; li = li->li_next)
 		abort = abort || set_ref_in_item(&li->li_tv, copyID,
-				       ht_stack, &list_stack, tuple_stack);
-	if (list_stack == NULL)
-	    break;
+				       ht_അട്ടി, &list_അട്ടി, tuple_അട്ടി);
+	എങ്കിൽ (list_അട്ടി == ശൂന്യ)
+	    നിർത്തുക;
 
 	// take an item from the stack
-	cur_l = list_stack->list;
-	tempitem = list_stack;
-	list_stack = list_stack->prev;
-	free(tempitem);
+	cur_l = list_അട്ടി->list;
+	tempitem = list_അട്ടി;
+	list_അട്ടി = list_അട്ടി->prev;
+	സ്വതന്ത്രം(tempitem);
     }
 
-    return abort;
+    തിരികെ abort;
 }
 
 /*
  * Mark a tuple and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_tuple(tuple_T *tuple, int copyID)
+    പൂർണ്ണസംഖ്യ
+set_ref_in_tuple(tuple_T *tuple, പൂർണ്ണസംഖ്യ copyID)
 {
-    if (tuple != NULL && tuple->tv_copyID != copyID)
+    എങ്കിൽ (tuple != ശൂന്യ && tuple->tv_copyID != copyID)
     {
 	tuple->tv_copyID = copyID;
-	return set_ref_in_tuple_items(tuple, copyID, NULL, NULL);
+	തിരികെ set_ref_in_tuple_ഇനങ്ങൾ(tuple, copyID, ശൂന്യ, ശൂന്യ);
     }
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
@@ -464,198 +464,198 @@ set_ref_in_tuple(tuple_T *tuple, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_tuple_items(
+    പൂർണ്ണസംഖ്യ
+set_ref_in_tuple_ഇനങ്ങൾ(
     tuple_T		*tuple,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack)
+    പൂർണ്ണസംഖ്യ			copyID,
+    ht_അട്ടി_T		**ht_അട്ടി,
+    list_അട്ടി_T	**list_അട്ടി)
 {
-    int			abort = FALSE;
+    പൂർണ്ണസംഖ്യ			abort = FALSE;
     tuple_T		*cur_t;
-    tuple_stack_T	*tuple_stack = NULL;
-    tuple_stack_T	*tempitem;
+    tuple_അട്ടി_T	*tuple_അട്ടി = ശൂന്യ;
+    tuple_അട്ടി_T	*tempitem;
 
     cur_t = tuple;
-    for (;;)
+    വേണ്ടി (;;)
     {
 	// Mark each item in the tuple.  If the item contains a hashtab
 	// it is added to ht_stack, if it contains a list it is added to
 	// list_stack.
-	for (int i = 0; i < cur_t->tv_items.ga_len; i++)
+	വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < cur_t->tv_ഇനങ്ങൾ.ga_len; i++)
 	{
-	    typval_T *tv = ((typval_T *)cur_t->tv_items.ga_data) + i;
+	    typval_T *tv = ((typval_T *)cur_t->tv_ഇനങ്ങൾ.ga_data) + i;
 	    abort = abort
 		|| set_ref_in_item(tv, copyID,
-			ht_stack, list_stack, &tuple_stack);
+			ht_അട്ടി, list_അട്ടി, &tuple_അട്ടി);
 	}
-	if (tuple_stack == NULL)
-	    break;
+	എങ്കിൽ (tuple_അട്ടി == ശൂന്യ)
+	    നിർത്തുക;
 
 	// take an item from the stack
-	cur_t = tuple_stack->tuple;
-	tempitem = tuple_stack;
-	tuple_stack = tuple_stack->prev;
-	free(tempitem);
+	cur_t = tuple_അട്ടി->tuple;
+	tempitem = tuple_അട്ടി;
+	tuple_അട്ടി = tuple_അട്ടി->prev;
+	സ്വതന്ത്രം(tempitem);
     }
 
-    return abort;
+    തിരികെ abort;
 }
 
 /*
  * Mark the partial in callback 'cb' with "copyID".
  */
-    int
-set_ref_in_callback(callback_T *cb, int copyID)
+    പൂർണ്ണസംഖ്യ
+set_ref_in_callback(callback_T *cb, പൂർണ്ണസംഖ്യ copyID)
 {
     typval_T tv;
 
-    if (cb->cb_name == NULL || *cb->cb_name == NUL || cb->cb_partial == NULL)
-	return FALSE;
+    എങ്കിൽ (cb->cb_name == ശൂന്യ || *cb->cb_name == NUL || cb->cb_partial == ശൂന്യ)
+	തിരികെ FALSE;
 
     tv.v_type = VAR_PARTIAL;
     tv.vval.v_partial = cb->cb_partial;
-    return set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+    തിരികെ set_ref_in_item(&tv, copyID, ശൂന്യ, ശൂന്യ, ശൂന്യ);
 }
 
 /*
  * Mark the dict "dd" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 set_ref_in_item_dict(
     dict_T		*dd,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    പൂർണ്ണസംഖ്യ			copyID,
+    ht_അട്ടി_T		**ht_അട്ടി,
+    list_അട്ടി_T	**list_അട്ടി,
+    tuple_അട്ടി_T	**tuple_അട്ടി)
 {
-    if (dd == NULL || dd->dv_copyID == copyID)
-	return FALSE;
+    എങ്കിൽ (dd == ശൂന്യ || dd->dv_copyID == copyID)
+	തിരികെ FALSE;
 
     // Didn't see this dict yet.
     dd->dv_copyID = copyID;
-    if (ht_stack == NULL)
-	return set_ref_in_ht(&dd->dv_hashtab, copyID, list_stack, tuple_stack);
+    എങ്കിൽ (ht_അട്ടി == ശൂന്യ)
+	തിരികെ set_ref_in_ht(&dd->dv_hashtab, copyID, list_അട്ടി, tuple_അട്ടി);
 
-    ht_stack_T *newitem = ALLOC_ONE(ht_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    ht_അട്ടി_T *newitem = ALLOC_ONE(ht_അട്ടി_T);
+    എങ്കിൽ (newitem == ശൂന്യ)
+	തിരികെ TRUE;
 
     newitem->ht = &dd->dv_hashtab;
-    newitem->prev = *ht_stack;
-    *ht_stack = newitem;
+    newitem->prev = *ht_അട്ടി;
+    *ht_അട്ടി = newitem;
 
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
  * Mark the list "ll" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 set_ref_in_item_list(
     list_T		*ll,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    പൂർണ്ണസംഖ്യ			copyID,
+    ht_അട്ടി_T		**ht_അട്ടി,
+    list_അട്ടി_T	**list_അട്ടി,
+    tuple_അട്ടി_T	**tuple_അട്ടി)
 {
-    if (ll == NULL || ll->lv_copyID == copyID)
-	return FALSE;
+    എങ്കിൽ (ll == ശൂന്യ || ll->lv_copyID == copyID)
+	തിരികെ FALSE;
 
     // Didn't see this list yet.
     ll->lv_copyID = copyID;
-    if (list_stack == NULL)
-	return set_ref_in_list_items(ll, copyID, ht_stack, tuple_stack);
+    എങ്കിൽ (list_അട്ടി == ശൂന്യ)
+	തിരികെ set_ref_in_list_ഇനങ്ങൾ(ll, copyID, ht_അട്ടി, tuple_അട്ടി);
 
-    list_stack_T *newitem = ALLOC_ONE(list_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    list_അട്ടി_T *newitem = ALLOC_ONE(list_അട്ടി_T);
+    എങ്കിൽ (newitem == ശൂന്യ)
+	തിരികെ TRUE;
 
     newitem->list = ll;
-    newitem->prev = *list_stack;
-    *list_stack = newitem;
+    newitem->prev = *list_അട്ടി;
+    *list_അട്ടി = newitem;
 
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
  * Mark the tuple "tt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 set_ref_in_item_tuple(
     tuple_T		*tt,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    പൂർണ്ണസംഖ്യ			copyID,
+    ht_അട്ടി_T		**ht_അട്ടി,
+    list_അട്ടി_T	**list_അട്ടി,
+    tuple_അട്ടി_T	**tuple_അട്ടി)
 {
-    if (tt == NULL || tt->tv_copyID == copyID)
-	return FALSE;
+    എങ്കിൽ (tt == ശൂന്യ || tt->tv_copyID == copyID)
+	തിരികെ FALSE;
 
     // Didn't see this tuple yet.
     tt->tv_copyID = copyID;
-    if (tuple_stack == NULL)
-	return set_ref_in_tuple_items(tt, copyID, ht_stack, list_stack);
+    എങ്കിൽ (tuple_അട്ടി == ശൂന്യ)
+	തിരികെ set_ref_in_tuple_ഇനങ്ങൾ(tt, copyID, ht_അട്ടി, list_അട്ടി);
 
-    tuple_stack_T *newitem = ALLOC_ONE(tuple_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    tuple_അട്ടി_T *newitem = ALLOC_ONE(tuple_അട്ടി_T);
+    എങ്കിൽ (newitem == ശൂന്യ)
+	തിരികെ TRUE;
 
     newitem->tuple = tt;
-    newitem->prev = *tuple_stack;
-    *tuple_stack = newitem;
+    newitem->prev = *tuple_അട്ടി;
+    *tuple_അട്ടി = newitem;
 
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
  * Mark the partial "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 set_ref_in_item_partial(
     partial_T		*pt,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    പൂർണ്ണസംഖ്യ			copyID,
+    ht_അട്ടി_T		**ht_അട്ടി,
+    list_അട്ടി_T	**list_അട്ടി,
+    tuple_അട്ടി_T	**tuple_അട്ടി)
 {
-    if (pt == NULL || pt->pt_copyID == copyID)
-	return FALSE;
+    എങ്കിൽ (pt == ശൂന്യ || pt->pt_copyID == copyID)
+	തിരികെ FALSE;
 
     // Didn't see this partial yet.
     pt->pt_copyID = copyID;
 
-    int abort = set_ref_in_func(pt->pt_name, pt->pt_func, copyID);
+    പൂർണ്ണസംഖ്യ abort = set_ref_in_func(pt->pt_name, pt->pt_func, copyID);
 
-    if (pt->pt_dict != NULL)
+    എങ്കിൽ (pt->pt_dict != ശൂന്യ)
     {
 	typval_T dtv;
 
 	dtv.v_type = VAR_DICT;
 	dtv.vval.v_dict = pt->pt_dict;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
     }
 
-    if (pt->pt_obj != NULL)
+    എങ്കിൽ (pt->pt_obj != ശൂന്യ)
     {
 	typval_T objtv;
 
 	objtv.v_type = VAR_OBJECT;
 	objtv.vval.v_object = pt->pt_obj;
-	set_ref_in_item(&objtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&objtv, copyID, ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
     }
 
-    for (int i = 0; i < pt->pt_argc; ++i)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < pt->pt_argc; ++i)
 	abort = abort || set_ref_in_item(&pt->pt_argv[i], copyID,
-		ht_stack, list_stack, tuple_stack);
+		ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
     // pt_funcstack is handled in set_ref_in_funcstacks()
     // pt_loopvars is handled in set_ref_in_loopvars()
 
-    return abort;
+    തിരികെ abort;
 }
 
 #ifdef FEAT_JOB_CHANNEL
@@ -663,88 +663,88 @@ set_ref_in_item_partial(
  * Mark the job "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 set_ref_in_item_job(
     job_T		*job,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    പൂർണ്ണസംഖ്യ			copyID,
+    ht_അട്ടി_T		**ht_അട്ടി,
+    list_അട്ടി_T	**list_അട്ടി,
+    tuple_അട്ടി_T	**tuple_അട്ടി)
 {
     typval_T    dtv;
 
-    if (job == NULL || job->jv_copyID == copyID)
-	return FALSE;
+    എങ്കിൽ (job == ശൂന്യ || job->jv_copyID == copyID)
+	തിരികെ FALSE;
 
     job->jv_copyID = copyID;
-    if (job->jv_channel != NULL)
+    എങ്കിൽ (job->jv_channel != ശൂന്യ)
     {
 	dtv.v_type = VAR_CHANNEL;
 	dtv.vval.v_channel = job->jv_channel;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
     }
-    if (job->jv_exit_cb.cb_partial != NULL)
+    എങ്കിൽ (job->jv_exit_cb.cb_partial != ശൂന്യ)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = job->jv_exit_cb.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
     }
 
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
  * Mark the channel "ch" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 set_ref_in_item_channel(
     channel_T		*ch,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    പൂർണ്ണസംഖ്യ			copyID,
+    ht_അട്ടി_T		**ht_അട്ടി,
+    list_അട്ടി_T	**list_അട്ടി,
+    tuple_അട്ടി_T	**tuple_അട്ടി)
 {
     typval_T    dtv;
 
-    if (ch == NULL || ch->ch_copyID == copyID)
-	return FALSE;
+    എങ്കിൽ (ch == ശൂന്യ || ch->ch_copyID == copyID)
+	തിരികെ FALSE;
 
     ch->ch_copyID = copyID;
-    for (ch_part_T part = PART_SOCK; part < PART_COUNT; ++part)
+    വേണ്ടി (ch_part_T part = PART_SOCK; part < PART_എണ്ണം; ++part)
     {
-	for (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
-		jq != NULL; jq = jq->jq_next)
-	    set_ref_in_item(jq->jq_value, copyID, ht_stack, list_stack, tuple_stack);
-	for (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != NULL;
+	വേണ്ടി (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
+		jq != ശൂന്യ; jq = jq->jq_next)
+	    set_ref_in_item(jq->jq_മൂല്യം, copyID, ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
+	വേണ്ടി (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != ശൂന്യ;
 		cq = cq->cq_next)
-	    if (cq->cq_callback.cb_partial != NULL)
+	    എങ്കിൽ (cq->cq_callback.cb_partial != ശൂന്യ)
 	    {
 		dtv.v_type = VAR_PARTIAL;
 		dtv.vval.v_partial = cq->cq_callback.cb_partial;
-		set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+		set_ref_in_item(&dtv, copyID, ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
 	    }
-	if (ch->ch_part[part].ch_callback.cb_partial != NULL)
+	എങ്കിൽ (ch->ch_part[part].ch_callback.cb_partial != ശൂന്യ)
 	{
 	    dtv.v_type = VAR_PARTIAL;
 	    dtv.vval.v_partial = ch->ch_part[part].ch_callback.cb_partial;
-	    set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	    set_ref_in_item(&dtv, copyID, ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
 	}
     }
-    if (ch->ch_callback.cb_partial != NULL)
+    എങ്കിൽ (ch->ch_callback.cb_partial != ശൂന്യ)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_callback.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
     }
-    if (ch->ch_close_cb.cb_partial != NULL)
+    എങ്കിൽ (ch->ch_close_cb.cb_partial != ശൂന്യ)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_close_cb.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
     }
 
-    return FALSE;
+    തിരികെ FALSE;
 }
 #endif
 
@@ -752,68 +752,68 @@ set_ref_in_item_channel(
  * Mark the class "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    int
+    പൂർണ്ണസംഖ്യ
 set_ref_in_item_class(
     class_T		*cl,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    പൂർണ്ണസംഖ്യ			copyID,
+    ht_അട്ടി_T		**ht_അട്ടി,
+    list_അട്ടി_T	**list_അട്ടി,
+    tuple_അട്ടി_T	**tuple_അട്ടി)
 {
-    int abort = FALSE;
+    പൂർണ്ണസംഖ്യ abort = FALSE;
 
-    if (cl == NULL || cl->class_copyID == copyID)
-	return FALSE;
+    എങ്കിൽ (cl == ശൂന്യ || cl->class_copyID == copyID)
+	തിരികെ FALSE;
 
     cl->class_copyID = copyID;
-    if (cl->class_members_tv != NULL)
+    എങ്കിൽ (cl->class_members_tv != ശൂന്യ)
     {
 	// The "class_members_tv" table is allocated only for regular classes
 	// and not for interfaces.
-	for (int i = 0; !abort && i < cl->class_class_member_count; ++i)
+	വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; !abort && i < cl->class_class_member_എണ്ണം; ++i)
 	    abort = abort || set_ref_in_item(
 		    &cl->class_members_tv[i],
-		    copyID, ht_stack, list_stack, tuple_stack);
+		    copyID, ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
     }
 
-    for (int i = 0; !abort && i < cl->class_class_function_count; ++i)
-	abort = abort || set_ref_in_func(NULL,
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; !abort && i < cl->class_class_function_എണ്ണം; ++i)
+	abort = abort || set_ref_in_func(ശൂന്യ,
 		cl->class_class_functions[i], copyID);
 
-    for (int i = 0; !abort && i < cl->class_obj_method_count; ++i)
-	abort = abort || set_ref_in_func(NULL,
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; !abort && i < cl->class_obj_method_എണ്ണം; ++i)
+	abort = abort || set_ref_in_func(ശൂന്യ,
 		cl->class_obj_methods[i], copyID);
 
-    return abort;
+    തിരികെ abort;
 }
 
 /*
  * Mark the object "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 set_ref_in_item_object(
     object_T		*obj,
-    int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    പൂർണ്ണസംഖ്യ			copyID,
+    ht_അട്ടി_T		**ht_അട്ടി,
+    list_അട്ടി_T	**list_അട്ടി,
+    tuple_അട്ടി_T	**tuple_അട്ടി)
 {
-    int abort = FALSE;
+    പൂർണ്ണസംഖ്യ abort = FALSE;
 
-    if (obj == NULL || obj->obj_copyID == copyID)
-	return FALSE;
+    എങ്കിൽ (obj == ശൂന്യ || obj->obj_copyID == copyID)
+	തിരികെ FALSE;
 
     obj->obj_copyID = copyID;
 
     // The typval_T array is right after the object_T.
     typval_T *mtv = (typval_T *)(obj + 1);
-    for (int i = 0; !abort
-	    && i < obj->obj_class->class_obj_member_count; ++i)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; !abort
+	    && i < obj->obj_class->class_obj_member_എണ്ണം; ++i)
 	abort = abort || set_ref_in_item(mtv + i, copyID,
-		ht_stack, list_stack, tuple_stack);
+		ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
 
-    return abort;
+    തിരികെ abort;
 }
 
 /*
@@ -824,79 +824,79 @@ set_ref_in_item_object(
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 set_ref_in_item(
     typval_T	    *tv,
-    int		    copyID,
-    ht_stack_T	    **ht_stack,
-    list_stack_T    **list_stack,
-    tuple_stack_T   **tuple_stack)
+    പൂർണ്ണസംഖ്യ		    copyID,
+    ht_അട്ടി_T	    **ht_അട്ടി,
+    list_അട്ടി_T    **list_അട്ടി,
+    tuple_അട്ടി_T   **tuple_അട്ടി)
 {
-    int		abort = FALSE;
+    പൂർണ്ണസംഖ്യ		abort = FALSE;
 
-    switch (tv->v_type)
+    തിരഞ്ഞെടുപ്പ് (tv->v_type)
     {
-	case VAR_DICT:
-	    return set_ref_in_item_dict(tv->vval.v_dict, copyID,
-					 ht_stack, list_stack, tuple_stack);
+	അവസ്ഥ VAR_DICT:
+	    തിരികെ set_ref_in_item_dict(tv->vval.v_dict, copyID,
+					 ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
 
-	case VAR_LIST:
-	    return set_ref_in_item_list(tv->vval.v_list, copyID,
-					 ht_stack, list_stack, tuple_stack);
+	അവസ്ഥ VAR_LIST:
+	    തിരികെ set_ref_in_item_list(tv->vval.v_list, copyID,
+					 ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
 
-	case VAR_TUPLE:
-	    return set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
-					 ht_stack, list_stack, tuple_stack);
-	case VAR_FUNC:
+	അവസ്ഥ VAR_TUPLE:
+	    തിരികെ set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
+					 ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
+	അവസ്ഥ VAR_FUNC:
 	{
-	    abort = set_ref_in_func(tv->vval.v_string, NULL, copyID);
-	    break;
+	    abort = set_ref_in_func(tv->vval.v_string, ശൂന്യ, copyID);
+	    നിർത്തുക;
 	}
 
-	case VAR_PARTIAL:
-	    return set_ref_in_item_partial(tv->vval.v_partial, copyID,
-					ht_stack, list_stack, tuple_stack);
+	അവസ്ഥ VAR_PARTIAL:
+	    തിരികെ set_ref_in_item_partial(tv->vval.v_partial, copyID,
+					ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
 
-	case VAR_JOB:
+	അവസ്ഥ VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_job(tv->vval.v_job, copyID,
-					ht_stack, list_stack, tuple_stack);
-#else
-	    break;
+	    തിരികെ set_ref_in_item_job(tv->vval.v_job, copyID,
+					ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
+#അല്ലെങ്കിൽ
+	    നിർത്തുക;
 #endif
 
-	case VAR_CHANNEL:
+	അവസ്ഥ VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_channel(tv->vval.v_channel, copyID,
-					ht_stack, list_stack, tuple_stack);
-#else
-	    break;
+	    തിരികെ set_ref_in_item_channel(tv->vval.v_channel, copyID,
+					ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
+#അല്ലെങ്കിൽ
+	    നിർത്തുക;
 #endif
 
-	case VAR_CLASS:
-	    return set_ref_in_item_class(tv->vval.v_class, copyID,
-					ht_stack, list_stack, tuple_stack);
+	അവസ്ഥ VAR_CLASS:
+	    തിരികെ set_ref_in_item_class(tv->vval.v_class, copyID,
+					ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
 
-	case VAR_OBJECT:
-	    return set_ref_in_item_object(tv->vval.v_object, copyID,
-					ht_stack, list_stack, tuple_stack);
+	അവസ്ഥ VAR_OBJECT:
+	    തിരികെ set_ref_in_item_object(tv->vval.v_object, copyID,
+					ht_അട്ടി, list_അട്ടി, tuple_അട്ടി);
 
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-	case VAR_STRING:
-	case VAR_BLOB:
-	case VAR_TYPEALIAS:
-	case VAR_INSTR:
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_ANY:
+	അവസ്ഥ VAR_VOID:
+	അവസ്ഥ VAR_BOOL:
+	അവസ്ഥ VAR_SPECIAL:
+	അവസ്ഥ VAR_സംഖ്യ:
+	അവസ്ഥ VAR_FLOAT:
+	അവസ്ഥ VAR_STRING:
+	അവസ്ഥ VAR_BLOB:
+	അവസ്ഥ VAR_TYPEALIAS:
+	അവസ്ഥ VAR_INSTR:
 	    // Types that do not contain any other item
-	    break;
+	    നിർത്തുക;
     }
 
-    return abort;
+    തിരികെ abort;
 }
 
 #endif

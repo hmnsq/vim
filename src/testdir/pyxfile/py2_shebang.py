@@ -1,4 +1,4 @@
 #!/usr/bin/python2
 
-import sys
+ഇറക്കുമതി sys
 print(sys.version)

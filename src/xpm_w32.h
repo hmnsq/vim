@@ -3,5 +3,5 @@
  */
 
 #ifndef XPM_W32__H
-int LoadXpmImage(char *filename, HBITMAP *hImage, HBITMAP *hShape);
+പൂർണ്ണസംഖ്യ LoadXpmImage(അക്ഷരം *filename, HBITMAP *hImage, HBITMAP *hShape);
 #endif

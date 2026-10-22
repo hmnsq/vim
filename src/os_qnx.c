@@ -12,34 +12,34 @@
  * os_qnx.c
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
 
-#if defined(FEAT_GUI_PHOTON)
-int is_photon_available;
+#എങ്കിൽ defined(FEAT_GUI_PHOTON)
+പൂർണ്ണസംഖ്യ is_photon_available;
 #endif
 
-void qnx_init(void)
+ശൂന്യം qnx_init(ശൂന്യം)
 {
-#if defined(FEAT_GUI_PHOTON)
+#എങ്കിൽ defined(FEAT_GUI_PHOTON)
     PhChannelParms_t parms;
 
     CLEAR_FIELD(parms);
     parms.flags = Ph_DYNAMIC_BUFFER;
 
-    is_photon_available = (PhAttach(NULL, &parms) != NULL) ? TRUE : FALSE;
+    is_photon_available = (PhAttach(ശൂന്യ, &parms) != ശൂന്യ) ? TRUE : FALSE;
 #endif
 }
 
-#if defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
+#എങ്കിൽ defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
 
 # define CLIP_TYPE_VIM "VIMTYPE"
 # define CLIP_TYPE_TEXT "TEXT"
 
 // Turn on the clipboard for a console vim when photon is running
-void qnx_clip_init(void)
+ശൂന്യം qnx_clip_init(ശൂന്യം)
 {
-    if (is_photon_available == TRUE && !gui.in_use)
+    എങ്കിൽ (is_photon_available == TRUE && !gui.in_use)
 	clip_init(TRUE);
 }
 
@@ -47,106 +47,106 @@ void qnx_clip_init(void)
 // Clipboard
 
 // No support for owning the clipboard
-int
+പൂർണ്ണസംഖ്യ
 clip_mch_own_selection(Clipboard_T *cbd)
 {
-    return FALSE;
+    തിരികെ FALSE;
 }
 
-void
+ശൂന്യം
 clip_mch_lose_selection(Clipboard_T *cbd)
 {
 }
 
-void
+ശൂന്യം
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    int		    type = MLINE, clip_length = 0, is_type_set = FALSE;
-    void	    *cbdata;
+    പൂർണ്ണസംഖ്യ		    type = MLINE, clip_length = 0, is_type_set = FALSE;
+    ശൂന്യം	    *cbdata;
     PhClipHeader    *clip_header;
-    char_u	    *clip_text = NULL;
+    char_u	    *clip_text = ശൂന്യ;
 
-    cbdata = PhClipboardPasteStart(PhInputGroup(NULL));
-    if (cbdata == NULL)
-	return;
+    cbdata = PhClipboardPasteStart(Ph_നിവേശം_Group(ശൂന്യ));
+    എങ്കിൽ (cbdata == ശൂന്യ)
+	തിരികെ;
 
     // Look for the vim specific clip first
     clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_VIM);
-    if (clip_header != NULL && clip_header->data != NULL)
+    എങ്കിൽ (clip_header != ശൂന്യ && clip_header->data != ശൂന്യ)
     {
-	switch(*(char *) clip_header->data)
+	തിരഞ്ഞെടുപ്പ്(*(അക്ഷരം *) clip_header->data)
 	{
-	    default: // fallthrough to line type
-	    case 'L': type = MLINE; break;
-	    case 'C': type = MCHAR; break;
-	    case 'B': type = MBLOCK; break;
+	    സ്ഥിരസ്ഥിതി: // fallthrough to line type
+	    അവസ്ഥ 'L': type = MLINE; നിർത്തുക;
+	    അവസ്ഥ 'C': type = MCHAR; നിർത്തുക;
+	    അവസ്ഥ 'B': type = MBLOCK; നിർത്തുക;
 	}
 	is_type_set = TRUE;
     }
 
     // Try for just normal text
     clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_TEXT);
-    if (clip_header != NULL)
+    എങ്കിൽ (clip_header != ശൂന്യ)
     {
 	clip_text = clip_header->data;
 	clip_length  = clip_header->length - 1;
 
-	if (clip_text != NULL && is_type_set == FALSE)
+	എങ്കിൽ (clip_text != ശൂന്യ && is_type_set == FALSE)
 	    type = MAUTO;
     }
 
-    if ((clip_text != NULL) && (clip_length > 0))
+    എങ്കിൽ ((clip_text != ശൂന്യ) && (clip_length > 0))
 	clip_yank_selection(type, clip_text, clip_length, cbd);
 
     PhClipboardPasteFinish(cbdata);
 }
 
-void
+ശൂന്യം
 clip_mch_set_selection(Clipboard_T *cbd)
 {
-    int type;
+    പൂർണ്ണസംഖ്യ type;
     long_u  len;
-    char_u *text_clip, vim_clip[2], *str = NULL;
+    char_u *text_clip, vim_clip[2], *str = ശൂന്യ;
     PhClipHeader clip_header[2];
 
     // Prevent recursion from clip_get_selection()
-    if (cbd->owned == TRUE)
-	return;
+    എങ്കിൽ (cbd->owned == TRUE)
+	തിരികെ;
 
     cbd->owned = TRUE;
     clip_get_selection(cbd);
     cbd->owned = FALSE;
 
     type = clip_convert_selection(&str, &len, cbd);
-    if (type >= 0)
+    എങ്കിൽ (type >= 0)
     {
 	text_clip = alloc(len + 1); // Normal text
 
-	if (text_clip && vim_clip)
+	എങ്കിൽ (text_clip && vim_clip)
 	{
 	    CLEAR_FIELD(clip_header);
 
 	    STRNCPY(clip_header[0].type, CLIP_TYPE_VIM, 8);
-	    clip_header[0].length = sizeof(vim_clip);
+	    clip_header[0].length = വലുപ്പം(vim_clip);
 	    clip_header[0].data   = vim_clip;
 
 	    STRNCPY(clip_header[1].type, CLIP_TYPE_TEXT, 8);
 	    clip_header[1].length = len + 1;
 	    clip_header[1].data   = text_clip;
 
-	    switch(type)
+	    തിരഞ്ഞെടുപ്പ്(type)
 	    {
-		default: // fallthrough to MLINE
-		case MLINE:	*vim_clip = 'L'; break;
-		case MCHAR:	*vim_clip = 'C'; break;
-		case MBLOCK:	*vim_clip = 'B'; break;
+		സ്ഥിരസ്ഥിതി: // fallthrough to MLINE
+		അവസ്ഥ MLINE:	*vim_clip = 'L'; നിർത്തുക;
+		അവസ്ഥ MCHAR:	*vim_clip = 'C'; നിർത്തുക;
+		അവസ്ഥ MBLOCK:	*vim_clip = 'B'; നിർത്തുക;
 	    }
 
 	    vim_strncpy(text_clip, str, len);
 
 	    vim_clip[ 1 ] = NUL;
 
-	    PhClipboardCopy(PhInputGroup(NULL), 2, clip_header);
+	    PhClipboardCopy(Ph_നിവേശം_Group(ശൂന്യ), 2, clip_header);
 	}
 	vim_free(text_clip);
     }

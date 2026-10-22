@@ -12,54 +12,54 @@
  * async debugging.
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 
 // Log file opened with ch_logfile().
-static FILE *log_fd = NULL;
-static char_u *log_name = NULL;
+സ്ഥിതം FILE *log_fd = ശൂന്യ;
+സ്ഥിതം char_u *log_name = ശൂന്യ;
 #ifdef FEAT_RELTIME
-static proftime_T log_start;
+സ്ഥിതം proftime_T log_start;
 #endif
 
-    void
+    ശൂന്യം
 ch_logfile(char_u *fname, char_u *opt)
 {
-    FILE	*file = NULL;
-    char	*mode = "a";
+    FILE	*file = ശൂന്യ;
+    അക്ഷരം	*mode = "a";
 
-    if (log_fd != NULL)
+    എങ്കിൽ (log_fd != ശൂന്യ)
     {
-	if (*fname != NUL)
-	    ch_log(NULL, "closing this logfile, opening %s", fname);
-	else
-	    ch_log(NULL, "closing logfile %s", log_name);
+	എങ്കിൽ (*fname != NUL)
+	    ch_log(ശൂന്യ, "closing this logfile, opening %s", fname);
+	അല്ലെങ്കിൽ
+	    ch_log(ശൂന്യ, "closing logfile %s", log_name);
 	fclose(log_fd);
     }
 
     // The "a" flag overrules the "w" flag.
-    if (vim_strchr(opt, 'a') == NULL && vim_strchr(opt, 'w') != NULL)
+    എങ്കിൽ (vim_strchr(opt, 'a') == ശൂന്യ && vim_strchr(opt, 'w') != ശൂന്യ)
 	mode = "w";
-    ch_log_output = vim_strchr(opt, 'o') != NULL ? LOG_ALWAYS : FALSE;
+    ch_log_output = vim_strchr(opt, 'o') != ശൂന്യ ? LOG_ALWAYS : FALSE;
 
-    if (*fname != NUL)
+    എങ്കിൽ (*fname != NUL)
     {
-	file = fopen((char *)fname, mode);
-	if (file == NULL)
+	file = fopen((അക്ഷരം *)fname, mode);
+	എങ്കിൽ (file == ശൂന്യ)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    return;
+	    തിരികെ;
 	}
 	vim_free(log_name);
 	log_name = vim_strsave(fname);
     }
     log_fd = file;
 
-    if (log_fd != NULL)
+    എങ്കിൽ (log_fd != ശൂന്യ)
     {
 	fprintf(log_fd, "==== start log session %s ====\n",
-						 get_ctime(time(NULL), FALSE));
+						 get_ctime(time(ശൂന്യ), FALSE));
 	// flush now, if fork/exec follows it could be written twice
 	fflush(log_fd);
 #ifdef FEAT_RELTIME
@@ -68,90 +68,90 @@ ch_logfile(char_u *fname, char_u *opt)
     }
 }
 
-    int
-ch_log_active(void)
+    പൂർണ്ണസംഖ്യ
+ch_log_active(ശൂന്യം)
 {
-    return log_fd != NULL;
+    തിരികെ log_fd != ശൂന്യ;
 }
 
-    static void
-ch_log_lead(const char *what, channel_T *ch UNUSED, ch_part_T part UNUSED)
+    സ്ഥിതം ശൂന്യം
+ch_log_lead(സ്ഥിരം അക്ഷരം *what, channel_T *ch UNUSED, ch_part_T part UNUSED)
 {
-    if (log_fd == NULL)
-	return;
+    എങ്കിൽ (log_fd == ശൂന്യ)
+	തിരികെ;
 
 #ifdef FEAT_RELTIME
     proftime_T log_now;
 
     profile_start(&log_now);
     profile_sub(&log_now, &log_start);
-    fprintf(log_fd, "%s ", profile_msg(&log_now));
+    fprintf(log_fd, "%s ", profile_സന്ദേശം(&log_now));
 #endif
 #ifdef FEAT_JOB_CHANNEL
-    if (ch != NULL)
+    എങ്കിൽ (ch != ശൂന്യ)
     {
-	if (part < PART_COUNT)
+	എങ്കിൽ (part < PART_എണ്ണം)
 	    fprintf(log_fd, "%son %d(%s): ", what, ch->ch_id, ch_part_names[part]);
-	else
+	അല്ലെങ്കിൽ
 	    fprintf(log_fd, "%son %d: ", what, ch->ch_id);
     }
-    else
+    അല്ലെങ്കിൽ
 #endif
 	fprintf(log_fd, "%s: ", what);
 }
 
 #ifndef PROTO  // prototype is in proto.h
-    void
-ch_log(channel_T *ch, const char *fmt, ...)
+    ശൂന്യം
+ch_log(channel_T *ch, സ്ഥിരം അക്ഷരം *fmt, ...)
 {
-    if (log_fd == NULL)
-	return;
+    എങ്കിൽ (log_fd == ശൂന്യ)
+	തിരികെ;
 
     va_list ap;
 
-    ch_log_lead("", ch, PART_COUNT);
+    ch_log_lead("", ch, PART_എണ്ണം);
     va_start(ap, fmt);
     vfprintf(log_fd, fmt, ap);
     va_end(ap);
     fputc('\n', log_fd);
     fflush(log_fd);
-    did_repeated_msg = 0;
+    did_repeated_സന്ദേശം = 0;
 }
 
-    void
-ch_error(channel_T *ch, const char *fmt, ...)
+    ശൂന്യം
+ch_error(channel_T *ch, സ്ഥിരം അക്ഷരം *fmt, ...)
 {
-    if (log_fd == NULL)
-	return;
+    എങ്കിൽ (log_fd == ശൂന്യ)
+	തിരികെ;
 
     va_list ap;
 
-    ch_log_lead("ERR ", ch, PART_COUNT);
+    ch_log_lead("ERR ", ch, PART_എണ്ണം);
     va_start(ap, fmt);
     vfprintf(log_fd, fmt, ap);
     va_end(ap);
     fputc('\n', log_fd);
     fflush(log_fd);
-    did_repeated_msg = 0;
+    did_repeated_സന്ദേശം = 0;
 }
 #endif
 
-#if defined(FEAT_JOB_CHANNEL)
+#എങ്കിൽ defined(FEAT_JOB_CHANNEL)
 /*
  * Log a message "buf[len]" for channel "ch" part "part".
  * Only to be called when ch_log_active() returns TRUE.
  */
-    void
+    ശൂന്യം
 ch_log_literal(
-	char	    *lead,
+	അക്ഷരം	    *lead,
 	channel_T   *ch,
 	ch_part_T   part,
 	char_u	    *buf,
-	int	    len)
+	പൂർണ്ണസംഖ്യ	    len)
 {
     ch_log_lead(lead, ch, part);
     fprintf(log_fd, "'");
-    vim_ignored = (int)fwrite(buf, len, 1, log_fd);
+    vim_ignored = (പൂർണ്ണസംഖ്യ)fwrite(buf, len, 1, log_fd);
     fprintf(log_fd, "'\n");
     fflush(log_fd);
 }
@@ -160,32 +160,32 @@ ch_log_literal(
 /*
  * "ch_log()" function
  */
-    void
+    ശൂന്യം
 f_ch_log(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    char_u	*msg;
-    channel_T	*channel = NULL;
+    char_u	*സന്ദേശം;
+    channel_T	*channel = ശൂന്യ;
 
-    if (in_vim9script()
+    എങ്കിൽ (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_chan_or_job_arg(argvars, 1) == FAIL))
-	return;
+	തിരികെ;
 
-    msg = tv_get_string(&argvars[0]);
-#if defined(FEAT_JOB_CHANNEL)
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    സന്ദേശം = tv_get_string(&argvars[0]);
+#എങ്കിൽ defined(FEAT_JOB_CHANNEL)
+    എങ്കിൽ (argvars[1].v_type != VAR_UNKNOWN)
 	channel = get_channel_arg(&argvars[1], FALSE, FALSE, 0);
 #endif
 
     // Prepend "ch_log()" to make it easier to find these entries in the
     // logfile.
-    ch_log(channel, "ch_log(): %s", msg);
+    ch_log(channel, "ch_log(): %s", സന്ദേശം);
 }
 
 /*
  * "ch_logfile()" function
  */
-    void
+    ശൂന്യം
 f_ch_logfile(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u *fname;
@@ -193,16 +193,16 @@ f_ch_logfile(typval_T *argvars, typval_T *rettv UNUSED)
     char_u buf[NUMBUFLEN];
 
     // Don't open a file in restricted mode.
-    if (check_restricted() || check_secure())
-	return;
+    എങ്കിൽ (check_restricted() || check_secure())
+	തിരികെ;
 
-    if (in_vim9script()
+    എങ്കിൽ (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	തിരികെ;
 
     fname = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type == VAR_STRING)
+    എങ്കിൽ (argvars[1].v_type == VAR_STRING)
 	opt = tv_get_string_buf(&argvars[1], buf);
     ch_logfile(fname, opt);
 }

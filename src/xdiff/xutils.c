@@ -20,7 +20,7 @@
  *
  */
 
-#include "xinclude.h"
+#അന്തര്ഭാവ "xinclude.h"
 
 
 long xdl_bogosqrt(long n) {
@@ -29,155 +29,155 @@ long xdl_bogosqrt(long n) {
 	/*
 	 * Classical integer square root approximation using shifts.
 	 */
-	for (i = 1; n > 0; n >>= 2)
+	വേണ്ടി (i = 1; n > 0; n >>= 2)
 		i <<= 1;
 
-	return i;
+	തിരികെ i;
 }
 
 
-int xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
+പൂർണ്ണസംഖ്യ xdl_emit_diffrec(അക്ഷരം സ്ഥിരം *rec, long size, അക്ഷരം സ്ഥിരം *pre, long psize,
 		     xdemitcb_t *ecb) {
-	int i = 2;
+	പൂർണ്ണസംഖ്യ i = 2;
 	mmbuffer_t mb[3];
 
-	mb[0].ptr = (char *) pre;
+	mb[0].ptr = (അക്ഷരം *) pre;
 	mb[0].size = psize;
-	mb[1].ptr = (char *) rec;
+	mb[1].ptr = (അക്ഷരം *) rec;
 	mb[1].size = size;
-	if (size > 0 && rec[size - 1] != '\n') {
-		mb[2].ptr = (char *) "\n\\ No newline at end of file\n";
+	എങ്കിൽ (size > 0 && rec[size - 1] != '\n') {
+		mb[2].ptr = (അക്ഷരം *) "\n\\ No newline at end of file\n";
 		mb[2].size = (long)strlen(mb[2].ptr);
 		i++;
 	}
-	if (ecb->out_line(ecb->priv, mb, i) < 0) {
+	എങ്കിൽ (ecb->out_വരി(ecb->priv, mb, i) < 0) {
 
-		return -1;
+		തിരികെ -1;
 	}
 
-	return 0;
+	തിരികെ 0;
 }
 
-void *xdl_mmfile_first(mmfile_t *mmf, long *size)
+ശൂന്യം *xdl_mmfile_first(mmfile_t *mmf, long *size)
 {
 	*size = mmf->size;
-	return mmf->ptr;
+	തിരികെ mmf->ptr;
 }
 
 
 long xdl_mmfile_size(mmfile_t *mmf)
 {
-	return mmf->size;
+	തിരികെ mmf->size;
 }
 
 
-int xdl_cha_init(chastore_t *cha, long isize, long icount) {
+പൂർണ്ണസംഖ്യ xdl_cha_init(chastore_t *cha, long isize, long icount) {
 
-	cha->head = cha->tail = NULL;
+	cha->head = cha->tail = ശൂന്യ;
 	cha->isize = isize;
 	cha->nsize = icount * isize;
-	cha->ancur = cha->sncur = NULL;
+	cha->ancur = cha->sncur = ശൂന്യ;
 	cha->scurr = 0;
 
-	return 0;
+	തിരികെ 0;
 }
 
 
-void xdl_cha_free(chastore_t *cha) {
+ശൂന്യം xdl_cha_free(chastore_t *cha) {
 	chanode_t *cur, *tmp;
 
-	for (cur = cha->head; (tmp = cur) != NULL;) {
+	വേണ്ടി (cur = cha->head; (tmp = cur) != ശൂന്യ;) {
 		cur = cur->next;
 		xdl_free(tmp);
 	}
 }
 
 
-void *xdl_cha_alloc(chastore_t *cha) {
+ശൂന്യം *xdl_cha_alloc(chastore_t *cha) {
 	chanode_t *ancur;
-	void *data;
+	ശൂന്യം *data;
 
-	if (!(ancur = cha->ancur) || ancur->icurr == cha->nsize) {
-		if (!(ancur = (chanode_t *) xdl_malloc(sizeof(chanode_t) + cha->nsize))) {
+	എങ്കിൽ (!(ancur = cha->ancur) || ancur->icurr == cha->nsize) {
+		എങ്കിൽ (!(ancur = (chanode_t *) xdl_malloc(വലുപ്പം(chanode_t) + cha->nsize))) {
 
-			return NULL;
+			തിരികെ ശൂന്യ;
 		}
 		ancur->icurr = 0;
-		ancur->next = NULL;
-		if (cha->tail)
+		ancur->next = ശൂന്യ;
+		എങ്കിൽ (cha->tail)
 			cha->tail->next = ancur;
-		if (!cha->head)
+		എങ്കിൽ (!cha->head)
 			cha->head = ancur;
 		cha->tail = ancur;
 		cha->ancur = ancur;
 	}
 
-	data = (char *) ancur + sizeof(chanode_t) + ancur->icurr;
+	data = (അക്ഷരം *) ancur + വലുപ്പം(chanode_t) + ancur->icurr;
 	ancur->icurr += cha->isize;
 
-	return data;
+	തിരികെ data;
 }
 
-long xdl_guess_lines(mmfile_t *mf, long sample) {
+long xdl_guess_വരികൾ(mmfile_t *mf, long sample) {
 	long nl = 0, size, tsize = 0;
-	char const *data, *cur, *top;
+	അക്ഷരം സ്ഥിരം *data, *cur, *മുകൾ;
 
-	if ((cur = data = xdl_mmfile_first(mf, &size))) {
-		for (top = data + size; nl < sample && cur < top; ) {
+	എങ്കിൽ ((cur = data = xdl_mmfile_first(mf, &size))) {
+		വേണ്ടി (മുകൾ = data + size; nl < sample && cur < മുകൾ; ) {
 			nl++;
-			if (!(cur = memchr(cur, '\n', top - cur)))
-				cur = top;
-			else
+			എങ്കിൽ (!(cur = memchr(cur, '\n', മുകൾ - cur)))
+				cur = മുകൾ;
+			അല്ലെങ്കിൽ
 				cur++;
 		}
 		tsize += (long) (cur - data);
 	}
 
-	if (nl && tsize)
+	എങ്കിൽ (nl && tsize)
 		nl = xdl_mmfile_size(mf) / (tsize / nl);
 
-	return nl + 1;
+	തിരികെ nl + 1;
 }
 
-int xdl_blankline(const char *line, long size, long flags)
+പൂർണ്ണസംഖ്യ xdl_blankline(സ്ഥിരം അക്ഷരം *വരി, long size, long flags)
 {
 	long i;
 
-	if (!(flags & XDF_WHITESPACE_FLAGS))
-		return (size <= 1);
+	എങ്കിൽ (!(flags & XDF_WHITESPACE_FLAGS))
+		തിരികെ (size <= 1);
 
-	for (i = 0; i < size && XDL_ISSPACE(line[i]); i++)
+	വേണ്ടി (i = 0; i < size && XDL_ISSPACE(വരി[i]); i++)
 		;
 
-	return (i == size);
+	തിരികെ (i == size);
 }
 
 /*
  * Have we eaten everything on the line, except for an optional
  * CR at the very end?
  */
-static int ends_with_optional_cr(const char *l, long s, long i)
+സ്ഥിതം പൂർണ്ണസംഖ്യ ends_with_optional_cr(സ്ഥിരം അക്ഷരം *l, long s, long i)
 {
-	int complete = s && l[s-1] == '\n';
+	പൂർണ്ണസംഖ്യ complete = s && l[s-1] == '\n';
 
-	if (complete)
+	എങ്കിൽ (complete)
 		s--;
-	if (s == i)
-		return 1;
+	എങ്കിൽ (s == i)
+		തിരികെ 1;
 	/* do not ignore CR at the end of an incomplete line */
-	if (complete && s == i + 1 && l[i] == '\r')
-		return 1;
-	return 0;
+	എങ്കിൽ (complete && s == i + 1 && l[i] == '\r')
+		തിരികെ 1;
+	തിരികെ 0;
 }
 
-int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags)
+പൂർണ്ണസംഖ്യ xdl_recmatch(സ്ഥിരം അക്ഷരം *l1, long s1, സ്ഥിരം അക്ഷരം *l2, long s2, long flags)
 {
-	int i1, i2;
+	പൂർണ്ണസംഖ്യ i1, i2;
 
-	if (s1 == s2 && !memcmp(l1, l2, s1))
-		return 1;
-	if (!(flags & XDF_WHITESPACE_FLAGS))
-		return 0;
+	എങ്കിൽ (s1 == s2 && !memcmp(l1, l2, s1))
+		തിരികെ 1;
+	എങ്കിൽ (!(flags & XDF_WHITESPACE_FLAGS))
+		തിരികെ 0;
 
 	i1 = 0;
 	i2 = 0;
@@ -190,42 +190,42 @@ int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags)
 	 * Each flavor of ignoring needs different logic to skip whitespaces
 	 * while we have both sides to compare.
 	 */
-	if (flags & XDF_IGNORE_WHITESPACE) {
-		goto skip_ws;
-		while (i1 < s1 && i2 < s2) {
-			if (l1[i1++] != l2[i2++])
-				return 0;
+	എങ്കിൽ (flags & XDF_IGNORE_WHITESPACE) {
+		പോകുക skip_ws;
+		ആകുമ്പോൾ (i1 < s1 && i2 < s2) {
+			എങ്കിൽ (l1[i1++] != l2[i2++])
+				തിരികെ 0;
 		skip_ws:
-			while (i1 < s1 && XDL_ISSPACE(l1[i1]))
+			ആകുമ്പോൾ (i1 < s1 && XDL_ISSPACE(l1[i1]))
 				i1++;
-			while (i2 < s2 && XDL_ISSPACE(l2[i2]))
+			ആകുമ്പോൾ (i2 < s2 && XDL_ISSPACE(l2[i2]))
 				i2++;
 		}
-	} else if (flags & XDF_IGNORE_WHITESPACE_CHANGE) {
-		while (i1 < s1 && i2 < s2) {
-			if (XDL_ISSPACE(l1[i1]) && XDL_ISSPACE(l2[i2])) {
+	} അല്ലെങ്കിൽ എങ്കിൽ (flags & XDF_IGNORE_WHITESPACE_CHANGE) {
+		ആകുമ്പോൾ (i1 < s1 && i2 < s2) {
+			എങ്കിൽ (XDL_ISSPACE(l1[i1]) && XDL_ISSPACE(l2[i2])) {
 				/* Skip matching spaces and try again */
-				while (i1 < s1 && XDL_ISSPACE(l1[i1]))
+				ആകുമ്പോൾ (i1 < s1 && XDL_ISSPACE(l1[i1]))
 					i1++;
-				while (i2 < s2 && XDL_ISSPACE(l2[i2]))
+				ആകുമ്പോൾ (i2 < s2 && XDL_ISSPACE(l2[i2]))
 					i2++;
-				continue;
+				തുടരുക;
 			}
-			if (l1[i1++] != l2[i2++])
-				return 0;
+			എങ്കിൽ (l1[i1++] != l2[i2++])
+				തിരികെ 0;
 		}
-	} else if (flags & XDF_IGNORE_WHITESPACE_AT_EOL) {
-		while (i1 < s1 && i2 < s2 && l1[i1] == l2[i2]) {
+	} അല്ലെങ്കിൽ എങ്കിൽ (flags & XDF_IGNORE_WHITESPACE_AT_EOL) {
+		ആകുമ്പോൾ (i1 < s1 && i2 < s2 && l1[i1] == l2[i2]) {
 			i1++;
 			i2++;
 		}
-	} else if (flags & XDF_IGNORE_CR_AT_EOL) {
+	} അല്ലെങ്കിൽ എങ്കിൽ (flags & XDF_IGNORE_CR_AT_EOL) {
 		/* Find the first difference and see how the line ends */
-		while (i1 < s1 && i2 < s2 && l1[i1] == l2[i2]) {
+		ആകുമ്പോൾ (i1 < s1 && i2 < s2 && l1[i1] == l2[i2]) {
 			i1++;
 			i2++;
 		}
-		return (ends_with_optional_cr(l1, s1, i1) &&
+		തിരികെ (ends_with_optional_cr(l1, s1, i1) &&
 			ends_with_optional_cr(l2, s2, i2));
 	}
 
@@ -235,63 +235,63 @@ int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags)
 	 * ignore-whitespace-at-eol case may break out of the loop
 	 * while there still are characters remaining on both lines.
 	 */
-	if (i1 < s1) {
-		while (i1 < s1 && XDL_ISSPACE(l1[i1]))
+	എങ്കിൽ (i1 < s1) {
+		ആകുമ്പോൾ (i1 < s1 && XDL_ISSPACE(l1[i1]))
 			i1++;
-		if (s1 != i1)
-			return 0;
+		എങ്കിൽ (s1 != i1)
+			തിരികെ 0;
 	}
-	if (i2 < s2) {
-		while (i2 < s2 && XDL_ISSPACE(l2[i2]))
+	എങ്കിൽ (i2 < s2) {
+		ആകുമ്പോൾ (i2 < s2 && XDL_ISSPACE(l2[i2]))
 			i2++;
-		return (s2 == i2);
+		തിരികെ (s2 == i2);
 	}
-	return 1;
+	തിരികെ 1;
 }
 
-unsigned long xdl_hash_record_with_whitespace(char const **data,
-		char const *top, long flags) {
+unsigned long xdl_hash_record_with_whitespace(അക്ഷരം സ്ഥിരം **data,
+		അക്ഷരം സ്ഥിരം *മുകൾ, long flags) {
 	unsigned long ha = 5381;
-	char const *ptr = *data;
-	int cr_at_eol_only = (flags & XDF_WHITESPACE_FLAGS) == XDF_IGNORE_CR_AT_EOL;
+	അക്ഷരം സ്ഥിരം *ptr = *data;
+	പൂർണ്ണസംഖ്യ cr_at_eol_only = (flags & XDF_WHITESPACE_FLAGS) == XDF_IGNORE_CR_AT_EOL;
 
-	for (; ptr < top && *ptr != '\n'; ptr++) {
-		if (cr_at_eol_only) {
+	വേണ്ടി (; ptr < മുകൾ && *ptr != '\n'; ptr++) {
+		എങ്കിൽ (cr_at_eol_only) {
 			/* do not ignore CR at the end of an incomplete line */
-			if (*ptr == '\r' &&
-			    (ptr + 1 < top && ptr[1] == '\n'))
-				continue;
+			എങ്കിൽ (*ptr == '\r' &&
+			    (ptr + 1 < മുകൾ && ptr[1] == '\n'))
+				തുടരുക;
 		}
-		else if (XDL_ISSPACE(*ptr)) {
-			const char *ptr2 = ptr;
-			int at_eol;
-			while (ptr + 1 < top && XDL_ISSPACE(ptr[1])
+		അല്ലെങ്കിൽ എങ്കിൽ (XDL_ISSPACE(*ptr)) {
+			സ്ഥിരം അക്ഷരം *ptr2 = ptr;
+			പൂർണ്ണസംഖ്യ at_eol;
+			ആകുമ്പോൾ (ptr + 1 < മുകൾ && XDL_ISSPACE(ptr[1])
 					&& ptr[1] != '\n')
 				ptr++;
-			at_eol = (top <= ptr + 1 || ptr[1] == '\n');
-			if (flags & XDF_IGNORE_WHITESPACE)
+			at_eol = (മുകൾ <= ptr + 1 || ptr[1] == '\n');
+			എങ്കിൽ (flags & XDF_IGNORE_WHITESPACE)
 				; /* already handled */
-			else if (flags & XDF_IGNORE_WHITESPACE_CHANGE
+			അല്ലെങ്കിൽ എങ്കിൽ (flags & XDF_IGNORE_WHITESPACE_CHANGE
 				 && !at_eol) {
 				ha += (ha << 5);
 				ha ^= (unsigned long) ' ';
 			}
-			else if (flags & XDF_IGNORE_WHITESPACE_AT_EOL
+			അല്ലെങ്കിൽ എങ്കിൽ (flags & XDF_IGNORE_WHITESPACE_AT_EOL
 				 && !at_eol) {
-				while (ptr2 != ptr + 1) {
+				ആകുമ്പോൾ (ptr2 != ptr + 1) {
 					ha += (ha << 5);
 					ha ^= (unsigned long) *ptr2;
 					ptr2++;
 				}
 			}
-			continue;
+			തുടരുക;
 		}
 		ha += (ha << 5);
 		ha ^= (unsigned long) *ptr;
 	}
-	*data = ptr < top ? ptr + 1: ptr;
+	*data = ptr < മുകൾ ? ptr + 1: ptr;
 
-	return ha;
+	തിരികെ ha;
 }
 
 /*
@@ -300,36 +300,36 @@ unsigned long xdl_hash_record_with_whitespace(char const **data,
  */
 #ifdef __GNUC__
 #define REASSOC_FENCE(x, y) __asm__("" : "+r"(x), "+r"(y))
-#else
+#അല്ലെങ്കിൽ
 #define REASSOC_FENCE(x, y)
 #endif
 
-unsigned long xdl_hash_record_verbatim(char const **data, char const *top) {
+unsigned long xdl_hash_record_verbatim(അക്ഷരം സ്ഥിരം **data, അക്ഷരം സ്ഥിരം *മുകൾ) {
 	unsigned long ha = 5381, c0, c1;
-	char const *ptr = *data;
-#if 0
+	അക്ഷരം സ്ഥിരം *ptr = *data;
+#എങ്കിൽ 0
 	/*
 	 * The baseline form of the optimized loop below. This is the djb2
 	 * hash (the above function uses a variant with XOR instead of ADD).
 	 */
-	for (; ptr < top && *ptr != '\n'; ptr++) {
+	വേണ്ടി (; ptr < മുകൾ && *ptr != '\n'; ptr++) {
 		ha += (ha << 5);
 		ha += (unsigned long) *ptr;
 	}
-	*data = ptr < top ? ptr + 1: ptr;
-#else
+	*data = ptr < മുകൾ ? ptr + 1: ptr;
+#അല്ലെങ്കിൽ
 	/* Process two characters per iteration. */
-	if (top - ptr >= 2) do {
-		if ((c0 = ptr[0]) == '\n') {
+	എങ്കിൽ (മുകൾ - ptr >= 2) ചെയ്യുക {
+		എങ്കിൽ ((c0 = ptr[0]) == '\n') {
 			*data = ptr + 1;
-			return ha;
+			തിരികെ ha;
 		}
-		if ((c1 = ptr[1]) == '\n') {
+		എങ്കിൽ ((c1 = ptr[1]) == '\n') {
 			*data = ptr + 2;
 			c0 += ha;
 			REASSOC_FENCE(c0, ha);
 			ha = ha * 32 + c0;
-			return ha;
+			തിരികെ ha;
 		}
 		/*
 		 * Combine characters C0 and C1 into the hash HA. We have
@@ -347,84 +347,84 @@ unsigned long xdl_hash_record_verbatim(char const **data, char const *top) {
 		ha += c1;
 
 		ptr += 2;
-	} while (ptr < top - 1);
-	*data = top;
-	if (ptr < top && (c0 = ptr[0]) != '\n') {
+	} ആകുമ്പോൾ (ptr < മുകൾ - 1);
+	*data = മുകൾ;
+	എങ്കിൽ (ptr < മുകൾ && (c0 = ptr[0]) != '\n') {
 		c0 += ha;
 		REASSOC_FENCE(c0, ha);
 		ha = ha * 32 + c0;
 	}
 #endif
-	return ha;
+	തിരികെ ha;
 }
 
-unsigned int xdl_hashbits(unsigned int size) {
-	unsigned int val = 1, bits = 0;
+unsigned പൂർണ്ണസംഖ്യ xdl_hashbits(unsigned പൂർണ്ണസംഖ്യ size) {
+	unsigned പൂർണ്ണസംഖ്യ val = 1, bits = 0;
 
-	for (; val < size && bits < CHAR_BIT * sizeof(unsigned int); val <<= 1, bits++);
-	return bits ? bits: 1;
+	വേണ്ടി (; val < size && bits < CHAR_BIT * വലുപ്പം(unsigned പൂർണ്ണസംഖ്യ); val <<= 1, bits++);
+	തിരികെ bits ? bits: 1;
 }
 
 
-int xdl_num_out(char *out, long val) {
-	char *ptr, *str = out;
-	char buf[32];
+പൂർണ്ണസംഖ്യ xdl_അക്കം_out(അക്ഷരം *out, long val) {
+	അക്ഷരം *ptr, *str = out;
+	അക്ഷരം buf[32];
 
-	ptr = buf + sizeof(buf) - 1;
+	ptr = buf + വലുപ്പം(buf) - 1;
 	*ptr = '\0';
-	if (val < 0) {
+	എങ്കിൽ (val < 0) {
 		*--ptr = '-';
 		val = -val;
 	}
-	for (; val && ptr > buf; val /= 10)
+	വേണ്ടി (; val && ptr > buf; val /= 10)
 		*--ptr = "0123456789"[val % 10];
-	if (*ptr)
-		for (; *ptr; ptr++, str++)
+	എങ്കിൽ (*ptr)
+		വേണ്ടി (; *ptr; ptr++, str++)
 			*str = *ptr;
-	else
+	അല്ലെങ്കിൽ
 		*str++ = '0';
 	*str = '\0';
 
-	return str - out;
+	തിരികെ str - out;
 }
 
-static int xdl_format_hunk_hdr(long s1, long c1, long s2, long c2,
-			       const char *func, long funclen,
+സ്ഥിതം പൂർണ്ണസംഖ്യ xdl_format_hunk_hdr(long s1, long c1, long s2, long c2,
+			       സ്ഥിരം അക്ഷരം *func, long funclen,
 			       xdemitcb_t *ecb) {
-	int nb = 0;
+	പൂർണ്ണസംഖ്യ nb = 0;
 	mmbuffer_t mb;
-	char buf[128];
+	അക്ഷരം buf[128];
 
 	memcpy(buf, "@@ -", 4);
 	nb += 4;
 
-	nb += xdl_num_out(buf + nb, c1 ? s1: s1 - 1);
+	nb += xdl_അക്കം_out(buf + nb, c1 ? s1: s1 - 1);
 
-	if (c1 != 1) {
+	എങ്കിൽ (c1 != 1) {
 		memcpy(buf + nb, ",", 1);
 		nb += 1;
 
-		nb += xdl_num_out(buf + nb, c1);
+		nb += xdl_അക്കം_out(buf + nb, c1);
 	}
 
 	memcpy(buf + nb, " +", 2);
 	nb += 2;
 
-	nb += xdl_num_out(buf + nb, c2 ? s2: s2 - 1);
+	nb += xdl_അക്കം_out(buf + nb, c2 ? s2: s2 - 1);
 
-	if (c2 != 1) {
+	എങ്കിൽ (c2 != 1) {
 		memcpy(buf + nb, ",", 1);
 		nb += 1;
 
-		nb += xdl_num_out(buf + nb, c2);
+		nb += xdl_അക്കം_out(buf + nb, c2);
 	}
 
 	memcpy(buf + nb, " @@", 3);
 	nb += 3;
-	if (func && funclen) {
+	എങ്കിൽ (func && funclen) {
 		buf[nb++] = ' ';
-		if ((size_t)funclen > sizeof(buf) - nb - 1)
-			funclen = sizeof(buf) - nb - 1;
+		എങ്കിൽ ((size_t)funclen > വലുപ്പം(buf) - nb - 1)
+			funclen = വലുപ്പം(buf) - nb - 1;
 		memcpy(buf + nb, func, funclen);
 		nb += funclen;
 	}
@@ -432,26 +432,26 @@ static int xdl_format_hunk_hdr(long s1, long c1, long s2, long c2,
 
 	mb.ptr = buf;
 	mb.size = nb;
-	if (ecb->out_line(ecb->priv, &mb, 1) < 0)
-		return -1;
-	return 0;
+	എങ്കിൽ (ecb->out_വരി(ecb->priv, &mb, 1) < 0)
+		തിരികെ -1;
+	തിരികെ 0;
 }
 
-int xdl_emit_hunk_hdr(long s1, long c1, long s2, long c2,
-		      const char *func, long funclen,
+പൂർണ്ണസംഖ്യ xdl_emit_hunk_hdr(long s1, long c1, long s2, long c2,
+		      സ്ഥിരം അക്ഷരം *func, long funclen,
 		      xdemitcb_t *ecb) {
-	if (!ecb->out_hunk)
-		return xdl_format_hunk_hdr(s1, c1, s2, c2, func, funclen, ecb);
-	if (ecb->out_hunk(ecb->priv,
+	എങ്കിൽ (!ecb->out_hunk)
+		തിരികെ xdl_format_hunk_hdr(s1, c1, s2, c2, func, funclen, ecb);
+	എങ്കിൽ (ecb->out_hunk(ecb->priv,
 			  c1 ? s1 : s1 - 1, c1,
 			  c2 ? s2 : s2 - 1, c2,
 			  func, funclen) < 0)
-		return -1;
-	return 0;
+		തിരികെ -1;
+	തിരികെ 0;
 }
 
-int xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t const *xpp,
-		int line1, int count1, int line2, int count2)
+പൂർണ്ണസംഖ്യ xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t സ്ഥിരം *xpp,
+		പൂർണ്ണസംഖ്യ line1, പൂർണ്ണസംഖ്യ count1, പൂർണ്ണസംഖ്യ line2, പൂർണ്ണസംഖ്യ count2)
 {
 	/*
 	 * This probably does not work outside Git, since
@@ -464,36 +464,36 @@ int xdl_fall_back_diff(xdfenv_t *diff_env, xpparam_t const *xpp,
 	mmfile_t subfile1, subfile2;
 	xdfenv_t env;
 
-	subfile1.ptr = (char *)diff_env->xdf1.recs[line1 - 1].ptr;
+	subfile1.ptr = (അക്ഷരം *)diff_env->xdf1.recs[line1 - 1].ptr;
 	subfile1.size = diff_env->xdf1.recs[line1 + count1 - 2].ptr +
 		diff_env->xdf1.recs[line1 + count1 - 2].size - subfile1.ptr;
-	subfile2.ptr = (char *)diff_env->xdf2.recs[line2 - 1].ptr;
+	subfile2.ptr = (അക്ഷരം *)diff_env->xdf2.recs[line2 - 1].ptr;
 	subfile2.size = diff_env->xdf2.recs[line2 + count2 - 2].ptr +
 		diff_env->xdf2.recs[line2 + count2 - 2].size - subfile2.ptr;
-	if (xdl_do_diff(&subfile1, &subfile2, xpp, &env) < 0)
-		return -1;
+	എങ്കിൽ (xdl_do_diff(&subfile1, &subfile2, xpp, &env) < 0)
+		തിരികെ -1;
 
 	memcpy(diff_env->xdf1.changed + line1 - 1, env.xdf1.changed, count1);
 	memcpy(diff_env->xdf2.changed + line2 - 1, env.xdf2.changed, count2);
 
 	xdl_free_env(&env);
 
-	return 0;
+	തിരികെ 0;
 }
 
-void* xdl_alloc_grow_helper(void *p, long nr, long *alloc, size_t size)
+ശൂന്യം* xdl_alloc_grow_helper(ശൂന്യം *p, long nr, long *alloc, size_t size)
 {
-	void *tmp = NULL;
+	ശൂന്യം *tmp = ശൂന്യ;
 	size_t n = ((LONG_MAX - 16) / 2 >= *alloc) ? 2 * *alloc + 16 : LONG_MAX;
-	if ((size_t)nr > n)
+	എങ്കിൽ ((size_t)nr > n)
 		n = nr;
-	if (SIZE_MAX / size >= n)
+	എങ്കിൽ (SIZE_MAX / size >= n)
 		tmp = xdl_realloc(p, n * size);
-	if (tmp) {
+	എങ്കിൽ (tmp) {
 		*alloc = (long)n;
-	} else {
+	} അല്ലെങ്കിൽ {
 		xdl_free(p);
 		*alloc = 0;
 	}
-	return tmp;
+	തിരികെ tmp;
 }

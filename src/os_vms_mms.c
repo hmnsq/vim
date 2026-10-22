@@ -1,68 +1,68 @@
-#include	<stdio.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<unixio.h>
-#include	"vim.h"
-int main(int argc, char *argv[])
+#അന്തര്ഭാവ	<stdio.h>
+#അന്തര്ഭാവ	<stdlib.h>
+#അന്തര്ഭാവ	<string.h>
+#അന്തര്ഭാവ	<unixio.h>
+#അന്തര്ഭാവ	"vim.h"
+പൂർണ്ണസംഖ്യ പ്രധാന(പൂർണ്ണസംഖ്യ argc, അക്ഷരം *argv[])
 {
     FILE	*fpi, *fpo;
-    char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    അക്ഷരം	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
+    പൂർണ്ണസംഖ്യ		err = 0, err_വരി = 0;
 
     mms = "mms";
     argc--;
     argv++;
-    while (argc-- > 0)
+    ആകുമ്പോൾ (argc-- > 0)
     {
 	argp = *argv++;
-	if (*argp == '-')
+	എങ്കിൽ (*argp == '-')
 	{
-	    switch (*++argp)
+	    തിരഞ്ഞെടുപ്പ് (*++argp)
 	    {
-		case 'm':
+		അവസ്ഥ 'm':
 		    mms = ++argp;
-		    break;
-		case 'e':
-		    if (!*(error_file = ++argp))
+		    നിർത്തുക;
+		അവസ്ഥ 'e':
+		    എങ്കിൽ (!*(error_file = ++argp))
 		    {
 			error_file = *argv++;
 			argc--;
 		    }
-		    break;
-		default:
-		    break;
+		    നിർത്തുക;
+		സ്ഥിരസ്ഥിതി:
+		    നിർത്തുക;
 	    }
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    if (*target)
+	    എങ്കിൽ (*target)
 		strcat(target, " ");
 	    strcat(target, argp);
 	}
     }
-    vim_snprintf(cmd, sizeof(cmd), "%s/output=tmp:errors.vim_tmp %s",
+    vim_snprintf(cmd, വലുപ്പം(cmd), "%s/output=tmp:errors.vim_tmp %s",
 								 mms, target);
     system(cmd);
     fpi = fopen("tmp:errors.vim_tmp", "r");
     fpo = fopen(error_file, "w");
-    while (fgets(buf, BUFSIZ, fpi))
+    ആകുമ്പോൾ (fgets(buf, BUFSIZ, fpi))
     {
-	if (!memcmp(buf, "%CC-", 4))
+	എങ്കിൽ (!memcmp(buf, "%CC-", 4))
 	{
-	    err_line++;
+	    err_വരി++;
 	    buf[strlen(buf)-1] = '\0';
 	    err++;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    if (err_line)
+	    എങ്കിൽ (err_വരി)
 	    {
-		if (strstr(buf, _("At line")))
+		എങ്കിൽ (strstr(buf, _("At line")))
 		{
-		    err_line = 0;
+		    err_വരി = 0;
 		    fprintf(fpo, "@");
 		}
-		else
+		അല്ലെങ്കിൽ
 		    buf[strlen(buf)-1] = '\0';
 	    }
 	}
@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
     }
     fclose(fpi);
     fclose(fpo);
-    while (!delete("tmp:errors.vim_tmp"))
+    ആകുമ്പോൾ (!delete("tmp:errors.vim_tmp"))
 	/*nop*/;
     exit(err ? 44 : 1);
-    return(0);
+    തിരികെ(0);
 }

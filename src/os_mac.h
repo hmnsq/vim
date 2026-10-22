@@ -14,7 +14,7 @@
 // can access the internal structures.
 // (Until fully Carbon compliant)
 // TODO: Can we remove this? (Dany)
-#if 0
+#എങ്കിൽ 0
 # define OPAQUE_TOOLBOX_STRUCTS 0
 #endif
 
@@ -26,7 +26,7 @@
 /*
  * Unix interface
  */
-#if defined(__APPLE_CC__) // for Project Builder and ...
+#എങ്കിൽ defined(__APPLE_CC__) // for Project Builder and ...
 # include <unistd.h>
 // Get stat.h or something similar. Comment: How come some OS get in vim.h
 # include <sys/stat.h>
@@ -39,24 +39,24 @@
 // OK defined to 0 in MacOS X 10.2 curses!  Remove it, we define it to be 1.
 # undef OK
 #endif
-#include <signal.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <dirent.h>
+#അന്തര്ഭാവ <signal.h>
+#അന്തര്ഭാവ <errno.h>
+#അന്തര്ഭാവ <stdio.h>
+#അന്തര്ഭാവ <stdlib.h>
+#അന്തര്ഭാവ <time.h>
+#അന്തര്ഭാവ <dirent.h>
 
 /*
  * Mach interface
  */
-#include <mach/task.h>
+#അന്തര്ഭാവ <mach/task.h>
 
 /*
  * MacOS specific #define
  */
 
 // This will go away when CMD_KEY fully tested
-#define USE_CMD_KEY
+#define USE_CMD_താക്കോൽ
 // On MacOS X use the / not the :
 // TODO: Should file such as ~/.vimrc reside instead in
 //       ~/Library/Vim or ~/Library/Preferences/org.vim.vim/ ? (Dany)
@@ -77,7 +77,7 @@
 
 #define USE_FNAME_CASE		// make ":e os_Mac.c" open the file in its
 				// original case, as "os_mac.c"
-#define BINARY_FILE_IO
+#define ദ്വിമാന_FILE_IO
 #define EOL_DEFAULT EOL_MAC
 #define HAVE_AVAIL_MEM
 
@@ -90,7 +90,7 @@
 # define HAVE_ST_MODE		// have stat.st_mode
 # define HAVE_MATH_H
 
-# if defined(__DATE__) && defined(__TIME__)
+# എങ്കിൽ defined(__DATE__) && defined(__TIME__)
 #  define HAVE_DATE_TIME
 # endif
 # define HAVE_STRFTIME
@@ -196,12 +196,12 @@
 
 /**************/
 #define mch_rename(src, dst) rename(src, dst)
-#define mch_remove(x) unlink((char *)(x))
+#define mch_remove(x) unlink((അക്ഷരം *)(x))
 #ifndef mch_getenv
-# if defined(__APPLE_CC__)
-#  define mch_getenv(name)  ((char_u *)getenv((char *)(name)))
+# എങ്കിൽ defined(__APPLE_CC__)
+#  define mch_getenv(name)  ((char_u *)getenv((അക്ഷരം *)(name)))
 #  define mch_setenv(name, val, x) setenv(name, val, x)
-# else
+# അല്ലെങ്കിൽ
   // vim_getenv() is in pty.c
 #  define USE_VIMPTY_GETENV
 #  define mch_getenv(x) vimpty_getenv(x)
@@ -224,10 +224,10 @@
 // of ./configure for console MacOS X.
 
 #ifndef SIGPROTOARG
-# define SIGPROTOARG	(int)
+# define SIGPROTOARG	(പൂർണ്ണസംഖ്യ)
 #endif
 #ifndef SIGDEFARG
-# define SIGDEFARG(s)	(s) int s UNUSED;
+# define SIGDEFARG(s)	(s) പൂർണ്ണസംഖ്യ s UNUSED;
 #endif
 #ifndef SIGDUMMYARG
 # define SIGDUMMYARG	0
@@ -245,7 +245,7 @@
 # define HAVE_RENAME
 #endif
 
-#if !defined(HAVE_CONFIG_H)
+#എങ്കിൽ !defined(HAVE_CONFIG_H)
 # define HAVE_PUTENV
 #endif
 
@@ -256,9 +256,9 @@
 
 # include <dispatch/dispatch.h>
 
-# if !defined(MAC_OS_X_VERSION_10_12) \
+# എങ്കിൽ !defined(MAC_OS_X_VERSION_10_12) \
 	|| (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12)
-typedef int clockid_t;
+തരനിർവചനം പൂർണ്ണസംഖ്യ clockid_t;
 # endif
 # ifndef CLOCK_REALTIME
 #  define CLOCK_REALTIME 0
@@ -267,35 +267,35 @@ typedef int clockid_t;
 #  define CLOCK_MONOTONIC 1
 # endif
 
-struct itimerspec
+ഘടന itimerspec
 {
-    struct timespec it_interval;  // timer period
-    struct timespec it_value;	  // initial expiration
+    ഘടന timespec it_interval;  // timer period
+    ഘടന timespec it_value;	  // initial expiration
 };
 
-struct sigevent;
+ഘടന sigevent;
 
-struct macos_timer
+ഘടന macos_timer
 {
     dispatch_queue_t tim_queue;
     dispatch_source_t tim_timer;
-    void (*tim_func)(union sigval);
-    void *tim_arg;
+    ശൂന്യം (*tim_func)(സംഘം sigval);
+    ശൂന്യം *tim_arg;
 };
 
-typedef struct macos_timer *timer_t;
+തരനിർവചനം ഘടന macos_timer *timer_t;
 
-extern int timer_create(
+ബാഹ്യ പൂർണ്ണസംഖ്യ timer_create(
     clockid_t clockid,
-    struct sigevent *sevp,
+    ഘടന sigevent *sevp,
     timer_t *timerid);
 
-extern int timer_delete(timer_t timerid);
+ബാഹ്യ പൂർണ്ണസംഖ്യ timer_delete(timer_t timerid);
 
-extern int timer_settime(
-    timer_t timerid, int flags,
-    const struct itimerspec *new_value,
-    struct itimerspec *unused);
+ബാഹ്യ പൂർണ്ണസംഖ്യ timer_settime(
+    timer_t timerid, പൂർണ്ണസംഖ്യ flags,
+    സ്ഥിരം ഘടന itimerspec *new_മൂല്യം_2,
+    ഘടന itimerspec *unused);
 
 #endif // FEAT_RELTIME
 

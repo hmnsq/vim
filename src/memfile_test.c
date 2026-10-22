@@ -13,121 +13,121 @@
  */
 
 #undef NDEBUG
-#include <assert.h>
+#അന്തര്ഭാവ <assert.h>
 
 // Must include main.c because it contains much more than just main()
 #define NO_VIM_MAIN
-#include "main.c"
+#അന്തര്ഭാവ "main.c"
 
 // This file has to be included because the tested functions are static
-#include "memfile.c"
+#അന്തര്ഭാവ "memfile.c"
 
-#define index_to_key(i) ((i) ^ 15167)
-#define TEST_COUNT 50000
+#define index_to_താക്കോൽ(i) ((i) ^ 15167)
+#define TEST_എണ്ണം 50000
 
 /*
  * Test mf_hash_*() functions.
  */
-    static void
-test_mf_hash(void)
+    സ്ഥിതം ശൂന്യം
+test_mf_hash(ശൂന്യം)
 {
     mf_hashtab_T   ht;
     mf_hashitem_T  *item;
-    blocknr_T      key;
+    blocknr_T      താക്കോൽ;
     long_u	   i;
-    long_u	   num_buckets;
+    long_u	   അക്കം_buckets;
 
     mf_hash_init(&ht);
 
     // insert some items and check invariants
-    for (i = 0; i < TEST_COUNT; i++)
+    വേണ്ടി (i = 0; i < TEST_എണ്ണം; i++)
     {
-	assert(ht.mht_count == i);
+	പ്രതിജ്ഞാ(ht.mht_എണ്ണം == i);
 
 	// check that number of buckets is a power of 2
-	num_buckets = ht.mht_mask + 1;
-	assert(num_buckets > 0 && (num_buckets & (num_buckets - 1)) == 0);
+	അക്കം_buckets = ht.mht_mask + 1;
+	പ്രതിജ്ഞാ(അക്കം_buckets > 0 && (അക്കം_buckets & (അക്കം_buckets - 1)) == 0);
 
 	// check load factor
-	assert(ht.mht_count <= (num_buckets << MHT_LOG_LOAD_FACTOR));
+	പ്രതിജ്ഞാ(ht.mht_എണ്ണം <= (അക്കം_buckets << MHT_LOG_LOAD_FACTOR));
 
-	if (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
+	എങ്കിൽ (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
 	{
 	    // first expansion shouldn't have occurred yet
-	    assert(num_buckets == MHT_INIT_SIZE);
-	    assert(ht.mht_buckets == ht.mht_small_buckets);
+	    പ്രതിജ്ഞാ(അക്കം_buckets == MHT_INIT_SIZE);
+	    പ്രതിജ്ഞാ(ht.mht_buckets == ht.mht_small_buckets);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    assert(num_buckets > MHT_INIT_SIZE);
-	    assert(ht.mht_buckets != ht.mht_small_buckets);
+	    പ്രതിജ്ഞാ(അക്കം_buckets > MHT_INIT_SIZE);
+	    പ്രതിജ്ഞാ(ht.mht_buckets != ht.mht_small_buckets);
 	}
 
-	key = index_to_key(i);
-	assert(mf_hash_find(&ht, key) == NULL);
+	താക്കോൽ = index_to_താക്കോൽ(i);
+	പ്രതിജ്ഞാ(mf_hash_find(&ht, താക്കോൽ) == ശൂന്യ);
 
 	// allocate and add new item
 	item = LALLOC_CLEAR_ONE(mf_hashitem_T);
-	assert(item != NULL);
-	item->mhi_key = key;
+	പ്രതിജ്ഞാ(item != ശൂന്യ);
+	item->mhi_താക്കോൽ = താക്കോൽ;
 	mf_hash_add_item(&ht, item);
 
-	assert(mf_hash_find(&ht, key) == item);
+	പ്രതിജ്ഞാ(mf_hash_find(&ht, താക്കോൽ) == item);
 
-	if (ht.mht_mask + 1 != num_buckets)
+	എങ്കിൽ (ht.mht_mask + 1 != അക്കം_buckets)
 	{
 	    // hash table was expanded
-	    assert(ht.mht_mask + 1 == num_buckets * MHT_GROWTH_FACTOR);
-	    assert(i + 1 == (num_buckets << MHT_LOG_LOAD_FACTOR));
+	    പ്രതിജ്ഞാ(ht.mht_mask + 1 == അക്കം_buckets * MHT_GROWTH_FACTOR);
+	    പ്രതിജ്ഞാ(i + 1 == (അക്കം_buckets << MHT_LOG_LOAD_FACTOR));
 	}
     }
 
     // check presence of inserted items
-    for (i = 0; i < TEST_COUNT; i++)
+    വേണ്ടി (i = 0; i < TEST_എണ്ണം; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
-	assert(item != NULL);
-	assert(item->mhi_key == key);
+	താക്കോൽ = index_to_താക്കോൽ(i);
+	item = mf_hash_find(&ht, താക്കോൽ);
+	പ്രതിജ്ഞാ(item != ശൂന്യ);
+	പ്രതിജ്ഞാ(item->mhi_താക്കോൽ == താക്കോൽ);
     }
 
     // delete some items
-    for (i = 0; i < TEST_COUNT; i++)
+    വേണ്ടി (i = 0; i < TEST_എണ്ണം; i++)
     {
-	if (i % 100 < 70)
+	എങ്കിൽ (i % 100 < 70)
 	{
-	    key = index_to_key(i);
-	    item = mf_hash_find(&ht, key);
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    താക്കോൽ = index_to_താക്കോൽ(i);
+	    item = mf_hash_find(&ht, താക്കോൽ);
+	    പ്രതിജ്ഞാ(item != ശൂന്യ);
+	    പ്രതിജ്ഞാ(item->mhi_താക്കോൽ == താക്കോൽ);
 
 	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    പ്രതിജ്ഞാ(mf_hash_find(&ht, താക്കോൽ) == ശൂന്യ);
 
 	    mf_hash_add_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == item);
+	    പ്രതിജ്ഞാ(mf_hash_find(&ht, താക്കോൽ) == item);
 
 	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    പ്രതിജ്ഞാ(mf_hash_find(&ht, താക്കോൽ) == ശൂന്യ);
 
 	    vim_free(item);
 	}
     }
 
     // check again
-    for (i = 0; i < TEST_COUNT; i++)
+    വേണ്ടി (i = 0; i < TEST_എണ്ണം; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
+	താക്കോൽ = index_to_താക്കോൽ(i);
+	item = mf_hash_find(&ht, താക്കോൽ);
 
-	if (i % 100 < 70)
+	എങ്കിൽ (i % 100 < 70)
 	{
-	    assert(item == NULL);
+	    പ്രതിജ്ഞാ(item == ശൂന്യ);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    പ്രതിജ്ഞാ(item != ശൂന്യ);
+	    പ്രതിജ്ഞാ(item->mhi_താക്കോൽ == താക്കോൽ);
 	}
     }
 
@@ -135,9 +135,9 @@ test_mf_hash(void)
     mf_hash_free_all(&ht);
 }
 
-    int
-main(void)
+    പൂർണ്ണസംഖ്യ
+പ്രധാന(ശൂന്യം)
 {
     test_mf_hash();
-    return 0;
+    തിരികെ 0;
 }

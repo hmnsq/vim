@@ -1,7 +1,7 @@
 #ifndef __VTERM_INPUT_H__
 #define __VTERM_INPUT_H__
 
-typedef enum {
+തരനിർവചനം എണ്ണൽ {
   VTERM_MOD_NONE  = 0x00,
   VTERM_MOD_SHIFT = 0x01,
   VTERM_MOD_ALT   = 0x02,
@@ -11,54 +11,54 @@ typedef enum {
 } VTermModifier;
 
 // The order here must match keycodes[] in src/keyboard.c!
-typedef enum {
-  VTERM_KEY_NONE,
+തരനിർവചനം എണ്ണൽ {
+  VTERM_താക്കോൽ_NONE,
 
-  VTERM_KEY_ENTER,
-  VTERM_KEY_TAB,
-  VTERM_KEY_BACKSPACE,
-  VTERM_KEY_ESCAPE,
+  VTERM_താക്കോൽ_ENTER,
+  VTERM_താക്കോൽ_TAB,
+  VTERM_താക്കോൽ_BACKSPACE,
+  VTERM_താക്കോൽ_ESCAPE,
 
-  VTERM_KEY_UP,
-  VTERM_KEY_DOWN,
-  VTERM_KEY_LEFT,
-  VTERM_KEY_RIGHT,
+  VTERM_താക്കോൽ_UP,
+  VTERM_താക്കോൽ_DOWN,
+  VTERM_താക്കോൽ_ഇടത്,
+  VTERM_താക്കോൽ_വലത്,
 
-  VTERM_KEY_INS,
-  VTERM_KEY_DEL,
-  VTERM_KEY_HOME,
-  VTERM_KEY_END,
-  VTERM_KEY_PAGEUP,
-  VTERM_KEY_PAGEDOWN,
+  VTERM_താക്കോൽ_INS,
+  VTERM_താക്കോൽ_DEL,
+  VTERM_താക്കോൽ_HOME,
+  VTERM_താക്കോൽ_END,
+  VTERM_താക്കോൽ_PAGEUP,
+  VTERM_താക്കോൽ_PAGEDOWN,
 
   // F1 is VTERM_KEY_FUNCTION(1), F2 VTERM_KEY_FUNCTION(2), etc.
-  VTERM_KEY_FUNCTION_0   = 256,
-  VTERM_KEY_FUNCTION_MAX = VTERM_KEY_FUNCTION_0 + 255,
+  VTERM_താക്കോൽ_FUNCTION_0   = 256,
+  VTERM_താക്കോൽ_FUNCTION_MAX = VTERM_താക്കോൽ_FUNCTION_0 + 255,
 
   // keypad keys
-  VTERM_KEY_KP_0,
-  VTERM_KEY_KP_1,
-  VTERM_KEY_KP_2,
-  VTERM_KEY_KP_3,
-  VTERM_KEY_KP_4,
-  VTERM_KEY_KP_5,
-  VTERM_KEY_KP_6,
-  VTERM_KEY_KP_7,
-  VTERM_KEY_KP_8,
-  VTERM_KEY_KP_9,
-  VTERM_KEY_KP_MULT,
-  VTERM_KEY_KP_PLUS,
-  VTERM_KEY_KP_COMMA,
-  VTERM_KEY_KP_MINUS,
-  VTERM_KEY_KP_PERIOD,
-  VTERM_KEY_KP_DIVIDE,
-  VTERM_KEY_KP_ENTER,
-  VTERM_KEY_KP_EQUAL,
+  VTERM_താക്കോൽ_KP_0,
+  VTERM_താക്കോൽ_KP_1,
+  VTERM_താക്കോൽ_KP_2,
+  VTERM_താക്കോൽ_KP_3,
+  VTERM_താക്കോൽ_KP_4,
+  VTERM_താക്കോൽ_KP_5,
+  VTERM_താക്കോൽ_KP_6,
+  VTERM_താക്കോൽ_KP_7,
+  VTERM_താക്കോൽ_KP_8,
+  VTERM_താക്കോൽ_KP_9,
+  VTERM_താക്കോൽ_KP_MULT,
+  VTERM_താക്കോൽ_KP_PLUS,
+  VTERM_താക്കോൽ_KP_COMMA,
+  VTERM_താക്കോൽ_KP_MINUS,
+  VTERM_താക്കോൽ_KP_PERIOD,
+  VTERM_താക്കോൽ_KP_DIVIDE,
+  VTERM_താക്കോൽ_KP_ENTER,
+  VTERM_താക്കോൽ_KP_EQUAL,
 
-  VTERM_KEY_MAX, // Must be last
-  VTERM_N_KEYS = VTERM_KEY_MAX
-} VTermKey;
+  VTERM_താക്കോൽ_MAX, // Must be last
+  VTERM_N_താക്കോലുകൾ = VTERM_താക്കോൽ_MAX
+} VTerm_താക്കോൽ;
 
-#define VTERM_KEY_FUNCTION(n) (VTERM_KEY_FUNCTION_0+(n))
+#define VTERM_താക്കോൽ_FUNCTION(n) (VTERM_താക്കോൽ_FUNCTION_0+(n))
 
 #endif

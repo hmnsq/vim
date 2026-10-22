@@ -1,1 +1,1 @@
-raise NotImplementedError
+ഉയർത്തുക NotImplementedError

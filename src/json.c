@@ -14,27 +14,27 @@
  */
 #define USING_FLOAT_STUFF
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 
-static int json_encode_item(garray_T *gap, typval_T *val, int copyID, int options);
+സ്ഥിതം പൂർണ്ണസംഖ്യ json_encode_item(garray_T *gap, typval_T *val, പൂർണ്ണസംഖ്യ copyID, പൂർണ്ണസംഖ്യ options);
 
 /*
  * Encode "val" into a JSON format string.
  * The result is added to "gap"
  * Returns FAIL on failure and makes gap->ga_data empty.
  */
-    static int
-json_encode_gap(garray_T *gap, typval_T *val, int options)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+json_encode_gap(garray_T *gap, typval_T *val, പൂർണ്ണസംഖ്യ options)
 {
-    if (json_encode_item(gap, val, get_copyID(), options) == FAIL)
+    എങ്കിൽ (json_encode_item(gap, val, get_copyID(), options) == FAIL)
     {
 	ga_clear(gap);
 	gap->ga_data = vim_strsave((char_u *)"");
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -44,49 +44,49 @@ json_encode_gap(garray_T *gap, typval_T *val, int options)
  * "options" can contain JSON_JS, JSON_NO_NONE and JSON_NL.
  */
     char_u *
-json_encode(typval_T *val, int options)
+json_encode(typval_T *val, പൂർണ്ണസംഖ്യ options)
 {
     garray_T ga;
 
     // Store bytes in the growarray.
     ga_init2(&ga, 1, 4000);
     json_encode_gap(&ga, val, options);
-    if (options & JSON_NL)
+    എങ്കിൽ (options & JSON_NL)
 	ga_append(&ga, NL);
     ga_append(&ga, NUL);
-    return ga.ga_data;
+    തിരികെ ga.ga_data;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#എങ്കിൽ defined(FEAT_JOB_CHANNEL)
 /*
  * Encode ["nr", "val"] into a JSON format string in allocated memory.
  * "options" can contain JSON_JS, JSON_NO_NONE and JSON_NL.
  * Returns NULL when out of memory.
  */
     char_u *
-json_encode_nr_expr(int nr, typval_T *val, int options)
+json_encode_nr_വ്യഞ്ജകം(പൂർണ്ണസംഖ്യ nr, typval_T *val, പൂർണ്ണസംഖ്യ options)
 {
     typval_T	listtv;
     typval_T	nrtv;
     garray_T	ga;
 
-    nrtv.v_type = VAR_NUMBER;
-    nrtv.vval.v_number = nr;
-    if (rettv_list_alloc(&listtv) == FAIL)
-	return NULL;
-    if (list_append_tv(listtv.vval.v_list, &nrtv) == FAIL
+    nrtv.v_type = VAR_സംഖ്യ;
+    nrtv.vval.v_സംഖ്യ = nr;
+    എങ്കിൽ (rettv_list_alloc(&listtv) == FAIL)
+	തിരികെ ശൂന്യ;
+    എങ്കിൽ (list_append_tv(listtv.vval.v_list, &nrtv) == FAIL
 	    || list_append_tv(listtv.vval.v_list, val) == FAIL)
     {
 	list_unref(listtv.vval.v_list);
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 
     ga_init2(&ga, 1, 4000);
-    if (json_encode_gap(&ga, &listtv, options) == OK && (options & JSON_NL))
+    എങ്കിൽ (json_encode_gap(&ga, &listtv, options) == OK && (options & JSON_NL))
 	ga_append(&ga, '\n');
     list_unref(listtv.vval.v_list);
     ga_append(&ga, NUL);
-    return ga.ga_data;
+    തിരികെ ga.ga_data;
 }
 
 /*
@@ -94,33 +94,33 @@ json_encode_nr_expr(int nr, typval_T *val, int options)
  * Returns NULL when out of memory.
  */
     char_u *
-json_encode_lsp_msg(typval_T *val)
+json_encode_lsp_സന്ദേശം(typval_T *val)
 {
     garray_T	ga;
     garray_T	lspga;
     size_t	IObufflen;
 
     ga_init2(&ga, 1, 4000);
-    if (json_encode_gap(&ga, val, 0) == FAIL)
-	return NULL;
+    എങ്കിൽ (json_encode_gap(&ga, val, 0) == FAIL)
+	തിരികെ ശൂന്യ;
     ga_append(&ga, NUL);
 
     ga_init2(&lspga, 1, 4000);
     // Header according to LSP specification.
-    IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
+    IObufflen = vim_snprintf_safelen((അക്ഷരം *)IObuff, IOSIZE,
 	    "Content-Length: %u\r\n\r\n",
 	    ga.ga_len - 1);
     ga_concat_len(&lspga, IObuff, IObufflen);
     ga_concat_len(&lspga, ga.ga_data, ga.ga_len);
     ga_clear(&ga);
-    return lspga.ga_data;
+    തിരികെ lspga.ga_data;
 }
 #endif
 
 /*
  * Lookup table to quickly know if the given ASCII character must be escaped.
  */
-static const char ascii_needs_escape[128] = {
+സ്ഥിതം സ്ഥിരം അക്ഷരം ascii_needs_escape[128] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x0.
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x1.
     0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x2.
@@ -134,75 +134,75 @@ static const char ascii_needs_escape[128] = {
 /*
  * Encode the utf-8 encoded string "str" into "gap".
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 write_string(garray_T *gap, char_u *str)
 {
     char_u	*res = str;
     char_u	numbuf[NUMBUFLEN];
     char_u	*from;
-#if defined(USE_ICONV)
+#എങ്കിൽ defined(USE_ICONV)
     vimconv_T   conv;
-    char_u	*converted = NULL;
+    char_u	*converted = ശൂന്യ;
 #endif
-    int		c;
+    പൂർണ്ണസംഖ്യ		c;
 
-    if (res == NULL)
+    എങ്കിൽ (res == ശൂന്യ)
     {
 	GA_CONCAT_LITERAL(gap, "\"\"");
-	return;
+	തിരികെ;
     }
 
-#if defined(USE_ICONV)
-    if (!enc_utf8)
+#എങ്കിൽ defined(USE_ICONV)
+    എങ്കിൽ (!enc_utf8)
     {
 	// Convert the text from 'encoding' to utf-8, because a JSON string is
 	// always utf-8.
 	conv.vc_type = CONV_NONE;
 	convert_setup(&conv, p_enc, (char_u*)"utf-8");
-	if (conv.vc_type != CONV_NONE)
-	    converted = res = string_convert(&conv, res, NULL);
-	convert_setup(&conv, NULL, NULL);
+	എങ്കിൽ (conv.vc_type != CONV_NONE)
+	    converted = res = string_convert(&conv, res, ശൂന്യ);
+	convert_setup(&conv, ശൂന്യ, ശൂന്യ);
     }
 #endif
     ga_append(gap, '"');
     // Pre-grow for the common case: input length + quotes + some escapes.
-    ga_grow(gap, (int)STRLEN(res) + 2);
+    ga_grow(gap, (പൂർണ്ണസംഖ്യ)STRLEN(res) + 2);
     // `from` is the beginning of a sequence of bytes we can directly copy from
     // the input string, avoiding the overhead associated to decoding/encoding
     // them.
     from = res;
-    while ((c = *res) != NUL)
+    ആകുമ്പോൾ ((c = *res) != NUL)
     {
 	// always use utf-8 encoding, ignore 'encoding'
-	if (c < 0x80)
+	എങ്കിൽ (c < 0x80)
 	{
-	    if (!ascii_needs_escape[c])
+	    എങ്കിൽ (!ascii_needs_escape[c])
 	    {
 		res += 1;
-		continue;
+		തുടരുക;
 	    }
 
-	    if (res != from)
+	    എങ്കിൽ (res != from)
 		ga_concat_len(gap, from, res - from);
 	    from = res + 1;
 
-	    switch (c)
+	    തിരഞ്ഞെടുപ്പ് (c)
 	    {
-		case 0x08:
-		    GA_CONCAT_LITERAL(gap, "\\b"); break;
-		case 0x09:
-		    GA_CONCAT_LITERAL(gap, "\\t"); break;
-		case 0x0a:
-		    GA_CONCAT_LITERAL(gap, "\\n"); break;
-		case 0x0c:
-		    GA_CONCAT_LITERAL(gap, "\\f"); break;
-		case 0x0d:
-		    GA_CONCAT_LITERAL(gap, "\\r"); break;
-		case 0x22: // "
-		    GA_CONCAT_LITERAL(gap, "\\\""); break;
-		case 0x5c: // backslash
-		    GA_CONCAT_LITERAL(gap, "\\\\"); break;
-		default:
+		അവസ്ഥ 0x08:
+		    GA_CONCAT_LITERAL(gap, "\\b"); നിർത്തുക;
+		അവസ്ഥ 0x09:
+		    GA_CONCAT_LITERAL(gap, "\\t"); നിർത്തുക;
+		അവസ്ഥ 0x0a:
+		    GA_CONCAT_LITERAL(gap, "\\n"); നിർത്തുക;
+		അവസ്ഥ 0x0c:
+		    GA_CONCAT_LITERAL(gap, "\\f"); നിർത്തുക;
+		അവസ്ഥ 0x0d:
+		    GA_CONCAT_LITERAL(gap, "\\r"); നിർത്തുക;
+		അവസ്ഥ 0x22: // "
+		    GA_CONCAT_LITERAL(gap, "\\\""); നിർത്തുക;
+		അവസ്ഥ 0x5c: // backslash
+		    GA_CONCAT_LITERAL(gap, "\\\\"); നിർത്തുക;
+		സ്ഥിരസ്ഥിതി:
 		{
 		    char_u escaped[] = "\\u0000";
 
@@ -215,20 +215,20 @@ write_string(garray_T *gap, char_u *str)
 
 	    res += 1;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    int	    l = utf_ptr2len(res);
+	    പൂർണ്ണസംഖ്യ	    l = utf_ptr2len(res);
 	    size_t  numbuflen;
 
-	    if (l > 1)
+	    എങ്കിൽ (l > 1)
 	    {
 		res += l;
-		continue;
+		തുടരുക;
 	    }
 
 	    // Invalid utf-8 sequence, replace it with the Unicode replacement
 	    // character U+FFFD.
-	    if (res != from)
+	    എങ്കിൽ (res != from)
 		ga_concat_len(gap, from, res - from);
 	    from = res + 1;
 
@@ -240,11 +240,11 @@ write_string(garray_T *gap, char_u *str)
 	}
     }
 
-    if (res != from)
+    എങ്കിൽ (res != from)
 	ga_concat_len(gap, from, res - from);
 
     ga_append(gap, '"');
-#if defined(USE_ICONV)
+#എങ്കിൽ defined(USE_ICONV)
     vim_free(converted);
 #endif
 }
@@ -254,42 +254,42 @@ write_string(garray_T *gap, char_u *str)
  * That is when it starts with a letter and only contains letters, digits and
  * underscore.
  */
-    static int
-is_simple_key(char_u *key)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+is_simple_താക്കോൽ(char_u *താക്കോൽ)
 {
     char_u *p;
 
-    if (!ASCII_ISALPHA(*key))
-	return FALSE;
-    for (p = key + 1; *p != NUL; ++p)
-	if (!ASCII_ISALPHA(*p) && *p != '_' && !vim_isdigit(*p))
-	    return FALSE;
-    return TRUE;
+    എങ്കിൽ (!ASCII_ISALPHA(*താക്കോൽ))
+	തിരികെ FALSE;
+    വേണ്ടി (p = താക്കോൽ + 1; *p != NUL; ++p)
+	എങ്കിൽ (!ASCII_ISALPHA(*p) && *p != '_' && !vim_isdigit(*p))
+	    തിരികെ FALSE;
+    തിരികെ TRUE;
 }
 
-typedef enum {
+തരനിർവചനം എണ്ണൽ {
     ENC_LIST,
     ENC_TUPLE,
     ENC_DICT,
 } json_enc_type_T;
 
-typedef struct {
+തരനിർവചനം ഘടന {
     json_enc_type_T je_type;
-    int		    je_options;	    // options when this container was entered
-    union {
-	struct {
+    പൂർണ്ണസംഖ്യ		    je_options;	    // options when this container was entered
+    സംഘം {
+	ഘടന {
 	    list_T	*list;
 	    listitem_T	*li;	    // current item
 	} l;
-	struct {
+	ഘടന {
 	    tuple_T	*tuple;
-	    int		idx;	    // current index
-	    int		len;
+	    പൂർണ്ണസംഖ്യ		idx;	    // current index
+	    പൂർണ്ണസംഖ്യ		len;
 	} t;
-	struct {
+	ഘടന {
 	    dict_T	*dict;
 	    hashitem_T	*hi;	    // current entry
-	    int		todo;	    // remaining entries
+	    പൂർണ്ണസംഖ്യ		todo;	    // remaining entries
 	} d;
     } je_u;
 } json_enc_frame_T;
@@ -299,8 +299,8 @@ typedef struct {
  * Uses an explicit stack to avoid deep recursion on nested structures.
  * Return FAIL or OK.
  */
-    static int
-json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+json_encode_item(garray_T *gap, typval_T *val, പൂർണ്ണസംഖ്യ copyID, പൂർണ്ണസംഖ്യ options)
 {
     char_u		numbuf[NUMBUFLEN];
     char_u		*res;
@@ -308,417 +308,417 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
     list_T		*l;
     tuple_T		*tuple;
     dict_T		*d;
-    int			i;
-    garray_T		stack;
+    പൂർണ്ണസംഖ്യ			i;
+    garray_T		അട്ടി;
     typval_T		*cur_val;
     json_enc_frame_T	*frame;
 
-    ga_init2(&stack, sizeof(json_enc_frame_T), 100);
+    ga_init2(&അട്ടി, വലുപ്പം(json_enc_frame_T), 100);
     cur_val = val;
 
-    for (;;)
+    വേണ്ടി (;;)
     {
-    switch (cur_val->v_type)
+    തിരഞ്ഞെടുപ്പ് (cur_val->v_type)
     {
-	case VAR_BOOL:
-	    switch ((long)cur_val->vval.v_number)
+	അവസ്ഥ VAR_BOOL:
+	    തിരഞ്ഞെടുപ്പ് ((long)cur_val->vval.v_സംഖ്യ)
 	    {
-		case VVAL_FALSE: GA_CONCAT_LITERAL(gap, "false"); break;
-		case VVAL_TRUE: GA_CONCAT_LITERAL(gap, "true"); break;
+		അവസ്ഥ VVAL_FALSE: GA_CONCAT_LITERAL(gap, "false"); നിർത്തുക;
+		അവസ്ഥ VVAL_TRUE: GA_CONCAT_LITERAL(gap, "true"); നിർത്തുക;
 	    }
-	    break;
+	    നിർത്തുക;
 
-	case VAR_SPECIAL:
-	    switch ((long)cur_val->vval.v_number)
+	അവസ്ഥ VAR_SPECIAL:
+	    തിരഞ്ഞെടുപ്പ് ((long)cur_val->vval.v_സംഖ്യ)
 	    {
-		case VVAL_NONE: if ((options & JSON_JS) != 0
+		അവസ്ഥ VVAL_NONE: എങ്കിൽ ((options & JSON_JS) != 0
 					     && (options & JSON_NO_NONE) == 0)
 				    // empty item
-				    break;
+				    നിർത്തുക;
 				// FALLTHROUGH
-		case VVAL_NULL: GA_CONCAT_LITERAL(gap, "null"); break;
+		അവസ്ഥ VVAL_NULL: GA_CONCAT_LITERAL(gap, "null"); നിർത്തുക;
 	    }
-	    break;
+	    നിർത്തുക;
 
-	case VAR_NUMBER:
+	അവസ്ഥ VAR_സംഖ്യ:
 	    {
 		size_t  numbuflen;
 
-		numbuflen = vim_snprintf_safelen((char *)numbuf, sizeof(numbuf),
-		    "%lld", (varnumber_T)cur_val->vval.v_number);
+		numbuflen = vim_snprintf_safelen((അക്ഷരം *)numbuf, വലുപ്പം(numbuf),
+		    "%lld", (varnumber_T)cur_val->vval.v_സംഖ്യ);
 		ga_concat_len(gap, numbuf, numbuflen);
 	    }
-	    break;
+	    നിർത്തുക;
 
-	case VAR_STRING:
+	അവസ്ഥ VAR_STRING:
 	    res = cur_val->vval.v_string;
 	    write_string(gap, res);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
+	അവസ്ഥ VAR_FUNC:
+	അവസ്ഥ VAR_PARTIAL:
+	അവസ്ഥ VAR_JOB:
+	അവസ്ഥ VAR_CHANNEL:
+	അവസ്ഥ VAR_INSTR:
+	അവസ്ഥ VAR_CLASS:
+	അവസ്ഥ VAR_OBJECT:
+	അവസ്ഥ VAR_TYPEALIAS:
 	    semsg(_(e_cannot_json_encode_str), vartype_name(cur_val->v_type));
-	    goto theend;
+	    പോകുക theend;
 
-	case VAR_BLOB:
+	അവസ്ഥ VAR_BLOB:
 	    b = cur_val->vval.v_blob;
-	    if (b == NULL || b->bv_ga.ga_len == 0)
+	    എങ്കിൽ (b == ശൂന്യ || b->bv_ga.ga_len == 0)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		int	blen = b->bv_ga.ga_len;
+		പൂർണ്ണസംഖ്യ	blen = b->bv_ga.ga_len;
 		char_u	*src;
 		char_u	*dst;
 
 		// Worst case: '[' + ']' + per-byte 3 digits + comma = 2 + 4*blen
-		if (ga_grow(gap, 2 + 4 * blen) == FAIL)
-		    goto theend;
+		എങ്കിൽ (ga_grow(gap, 2 + 4 * blen) == FAIL)
+		    പോകുക theend;
 		src = (char_u *)b->bv_ga.ga_data;
 		dst = (char_u *)gap->ga_data + gap->ga_len;
 		*dst++ = '[';
-		for (i = 0; i < blen; i++)
+		വേണ്ടി (i = 0; i < blen; i++)
 		{
-		    int	    byte = src[i];
+		    പൂർണ്ണസംഖ്യ	    byte = src[i];
 
-		    if (i > 0)
+		    എങ്കിൽ (i > 0)
 			*dst++ = ',';
-		    if (byte >= 100)
+		    എങ്കിൽ (byte >= 100)
 		    {
 			*dst++ = '0' + byte / 100;
 			*dst++ = '0' + (byte / 10) % 10;
 			*dst++ = '0' + byte % 10;
 		    }
-		    else if (byte >= 10)
+		    അല്ലെങ്കിൽ എങ്കിൽ (byte >= 10)
 		    {
 			*dst++ = '0' + byte / 10;
 			*dst++ = '0' + byte % 10;
 		    }
-		    else
+		    അല്ലെങ്കിൽ
 			*dst++ = '0' + byte;
 		}
 		*dst++ = ']';
-		gap->ga_len = (int)(dst - (char_u *)gap->ga_data);
+		gap->ga_len = (പൂർണ്ണസംഖ്യ)(dst - (char_u *)gap->ga_data);
 	    }
-	    break;
+	    നിർത്തുക;
 
-	case VAR_LIST:
+	അവസ്ഥ VAR_LIST:
 	    l = cur_val->vval.v_list;
-	    if (l == NULL)
+	    എങ്കിൽ (l == ശൂന്യ)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		if (l->lv_copyID == copyID)
+		എങ്കിൽ (l->lv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "[]");
-		else
+		അല്ലെങ്കിൽ
 		{
 		    l->lv_copyID = copyID;
 		    ga_append(gap, '[');
 		    CHECK_LIST_MATERIALIZE(l);
-		    if (l->lv_first != NULL)
+		    എങ്കിൽ (l->lv_first != ശൂന്യ)
 		    {
-			if (stack.ga_len >= p_mfd)
+			എങ്കിൽ (അട്ടി.ga_len >= p_mfd)
 			{
 			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-			    goto theend;
+			    പോകുക theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
-			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
+			എങ്കിൽ (ga_grow(&അട്ടി, 1) == FAIL)
+			    പോകുക theend;
+			frame = ((json_enc_frame_T *)അട്ടി.ga_data)
+							    + അട്ടി.ga_len;
 			frame->je_type = ENC_LIST;
 			frame->je_options = options;
 			frame->je_u.l.list = l;
 			frame->je_u.l.li = l->lv_first;
-			++stack.ga_len;
+			++അട്ടി.ga_len;
 			options = options & JSON_JS;
 			cur_val = &l->lv_first->li_tv;
-			continue;
+			തുടരുക;
 		    }
 		    ga_append(gap, ']');
 		    l->lv_copyID = 0;
 		}
 	    }
-	    break;
+	    നിർത്തുക;
 
-	case VAR_TUPLE:
+	അവസ്ഥ VAR_TUPLE:
 	    tuple = cur_val->vval.v_tuple;
-	    if (tuple == NULL)
+	    എങ്കിൽ (tuple == ശൂന്യ)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		if (tuple->tv_copyID == copyID)
+		എങ്കിൽ (tuple->tv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "[]");
-		else
+		അല്ലെങ്കിൽ
 		{
-		    int		len = TUPLE_LEN(tuple);
+		    പൂർണ്ണസംഖ്യ		len = TUPLE_LEN(tuple);
 
-		    if (len > 0)
+		    എങ്കിൽ (len > 0)
 		    {
 			tuple->tv_copyID = copyID;
 			ga_append(gap, '[');
-			if (stack.ga_len >= p_mfd)
+			എങ്കിൽ (അട്ടി.ga_len >= p_mfd)
 			{
 			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-			    goto theend;
+			    പോകുക theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
-			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
+			എങ്കിൽ (ga_grow(&അട്ടി, 1) == FAIL)
+			    പോകുക theend;
+			frame = ((json_enc_frame_T *)അട്ടി.ga_data)
+							    + അട്ടി.ga_len;
 			frame->je_type = ENC_TUPLE;
 			frame->je_options = options;
 			frame->je_u.t.tuple = tuple;
 			frame->je_u.t.idx = 0;
 			frame->je_u.t.len = len;
-			++stack.ga_len;
+			++അട്ടി.ga_len;
 			options = options & JSON_JS;
 			cur_val = TUPLE_ITEM(tuple, 0);
-			continue;
+			തുടരുക;
 		    }
-		    else
+		    അല്ലെങ്കിൽ
 			GA_CONCAT_LITERAL(gap, "[]");
 		}
 	    }
-	    break;
+	    നിർത്തുക;
 
-	case VAR_DICT:
+	അവസ്ഥ VAR_DICT:
 	    d = cur_val->vval.v_dict;
-	    if (d == NULL)
+	    എങ്കിൽ (d == ശൂന്യ)
 		GA_CONCAT_LITERAL(gap, "{}");
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		if (d->dv_copyID == copyID)
+		എങ്കിൽ (d->dv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "{}");
-		else
+		അല്ലെങ്കിൽ
 		{
-		    int		todo = (int)d->dv_hashtab.ht_used;
+		    പൂർണ്ണസംഖ്യ		todo = (പൂർണ്ണസംഖ്യ)d->dv_hashtab.ht_used;
 		    hashitem_T	*hi;
 
-		    if (todo > 0)
+		    എങ്കിൽ (todo > 0)
 		    {
 			d->dv_copyID = copyID;
 			ga_append(gap, '{');
 
 			// Find first non-empty hash entry
-			for (hi = d->dv_hashtab.ht_array;
+			വേണ്ടി (hi = d->dv_hashtab.ht_array;
 						  HASHITEM_EMPTY(hi); ++hi)
 			    ;
 			--todo;
 
 			// Write first key
-			if ((options & JSON_JS)
-						 && is_simple_key(hi->hi_key))
-			    ga_concat(gap, hi->hi_key);
-			else
-			    write_string(gap, hi->hi_key);
+			എങ്കിൽ ((options & JSON_JS)
+						 && is_simple_താക്കോൽ(hi->hi_താക്കോൽ))
+			    ga_concat(gap, hi->hi_താക്കോൽ);
+			അല്ലെങ്കിൽ
+			    write_string(gap, hi->hi_താക്കോൽ);
 			ga_append(gap, ':');
 
-			if (stack.ga_len >= p_mfd)
+			എങ്കിൽ (അട്ടി.ga_len >= p_mfd)
 			{
 			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-			    goto theend;
+			    പോകുക theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
-			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
+			എങ്കിൽ (ga_grow(&അട്ടി, 1) == FAIL)
+			    പോകുക theend;
+			frame = ((json_enc_frame_T *)അട്ടി.ga_data)
+							    + അട്ടി.ga_len;
 			frame->je_type = ENC_DICT;
 			frame->je_options = options;
 			frame->je_u.d.dict = d;
 			frame->je_u.d.hi = hi;
 			frame->je_u.d.todo = todo;
-			++stack.ga_len;
+			++അട്ടി.ga_len;
 			options = options | JSON_NO_NONE;
 			cur_val = &dict_lookup(hi)->di_tv;
-			continue;
+			തുടരുക;
 		    }
-		    else
+		    അല്ലെങ്കിൽ
 			GA_CONCAT_LITERAL(gap, "{}");
 		}
 	    }
-	    break;
+	    നിർത്തുക;
 
-	case VAR_FLOAT:
-#if defined(HAVE_MATH_H)
-	    if (isnan(cur_val->vval.v_float))
+	അവസ്ഥ VAR_FLOAT:
+#എങ്കിൽ defined(HAVE_MATH_H)
+	    എങ്കിൽ (isnan(cur_val->vval.v_float))
 		GA_CONCAT_LITERAL(gap, "NaN");
-	    else if (isinf(cur_val->vval.v_float))
+	    അല്ലെങ്കിൽ എങ്കിൽ (isinf(cur_val->vval.v_float))
 	    {
-		if (cur_val->vval.v_float < 0.0)
+		എങ്കിൽ (cur_val->vval.v_float < 0.0)
 		    GA_CONCAT_LITERAL(gap, "-Infinity");
-		else
+		അല്ലെങ്കിൽ
 		    GA_CONCAT_LITERAL(gap, "Infinity");
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 #endif
 	    {
 		size_t	numbuflen;
 
-		numbuflen = vim_snprintf_safelen((char *)numbuf, sizeof(numbuf),
+		numbuflen = vim_snprintf_safelen((അക്ഷരം *)numbuf, വലുപ്പം(numbuf),
 		    "%g", cur_val->vval.v_float);
 		ga_concat_len(gap, numbuf, numbuflen);
 	    }
-	    break;
+	    നിർത്തുക;
 
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_ANY:
+	അവസ്ഥ VAR_VOID:
 	    internal_error_no_abort("json_encode_item()");
-	    goto theend;
+	    പോകുക theend;
     }
 
 	// Process the completed item by advancing containers or
 	// returning when the stack is empty.
-	for (;;)
+	വേണ്ടി (;;)
 	{
-	    int		advance = FALSE;
+	    പൂർണ്ണസംഖ്യ		advance = FALSE;
 
-	    if (stack.ga_len == 0)
+	    എങ്കിൽ (അട്ടി.ga_len == 0)
 	    {
-		ga_clear(&stack);
-		return OK;
+		ga_clear(&അട്ടി);
+		തിരികെ OK;
 	    }
 
-	    frame = ((json_enc_frame_T *)stack.ga_data)
-							+ stack.ga_len - 1;
-	    switch (frame->je_type)
+	    frame = ((json_enc_frame_T *)അട്ടി.ga_data)
+							+ അട്ടി.ga_len - 1;
+	    തിരഞ്ഞെടുപ്പ് (frame->je_type)
 	    {
-		case ENC_LIST:
+		അവസ്ഥ ENC_LIST:
 		{
 		    listitem_T	*li = frame->je_u.l.li;
 
 		    // JSON_JS: add trailing comma if last item is v:none
-		    if ((frame->je_options & JSON_JS)
-			    && li->li_next == NULL
+		    എങ്കിൽ ((frame->je_options & JSON_JS)
+			    && li->li_next == ശൂന്യ
 			    && li->li_tv.v_type == VAR_SPECIAL
-			    && li->li_tv.vval.v_number == VVAL_NONE)
+			    && li->li_tv.vval.v_സംഖ്യ == VVAL_NONE)
 			ga_append(gap, ',');
 
 		    li = li->li_next;
 		    frame->je_u.l.li = li;
-		    if (li != NULL && !got_int)
+		    എങ്കിൽ (li != ശൂന്യ && !got_int)
 		    {
 			ga_append(gap, ',');
 			options = frame->je_options & JSON_JS;
 			cur_val = &li->li_tv;
 			advance = TRUE;
-			break;
+			നിർത്തുക;
 		    }
 		    ga_append(gap, ']');
 		    frame->je_u.l.list->lv_copyID = 0;
-		    --stack.ga_len;
-		    break;
+		    --അട്ടി.ga_len;
+		    നിർത്തുക;
 		}
 
-		case ENC_TUPLE:
+		അവസ്ഥ ENC_TUPLE:
 		{
-		    int	    idx = frame->je_u.t.idx;
-		    int	    len = frame->je_u.t.len;
+		    പൂർണ്ണസംഖ്യ	    idx = frame->je_u.t.idx;
+		    പൂർണ്ണസംഖ്യ	    len = frame->je_u.t.len;
 
 		    // JSON_JS: add trailing comma if last item is v:none
-		    if ((frame->je_options & JSON_JS) && idx == len - 1)
+		    എങ്കിൽ ((frame->je_options & JSON_JS) && idx == len - 1)
 		    {
 			typval_T *t_item =
 				    TUPLE_ITEM(frame->je_u.t.tuple, idx);
 
-			if (t_item->v_type == VAR_SPECIAL
-				&& t_item->vval.v_number == VVAL_NONE)
+			എങ്കിൽ (t_item->v_type == VAR_SPECIAL
+				&& t_item->vval.v_സംഖ്യ == VVAL_NONE)
 			    ga_append(gap, ',');
 		    }
 
 		    ++idx;
 		    frame->je_u.t.idx = idx;
-		    if (idx < len && !got_int)
+		    എങ്കിൽ (idx < len && !got_int)
 		    {
 			ga_append(gap, ',');
 			options = frame->je_options & JSON_JS;
 			cur_val = TUPLE_ITEM(frame->je_u.t.tuple, idx);
 			advance = TRUE;
-			break;
+			നിർത്തുക;
 		    }
 		    ga_append(gap, ']');
 		    frame->je_u.t.tuple->tv_copyID = 0;
-		    --stack.ga_len;
-		    break;
+		    --അട്ടി.ga_len;
+		    നിർത്തുക;
 		}
 
-		case ENC_DICT:
+		അവസ്ഥ ENC_DICT:
 		{
 		    hashitem_T	*hi = frame->je_u.d.hi;
-		    int		todo = frame->je_u.d.todo;
+		    പൂർണ്ണസംഖ്യ		todo = frame->je_u.d.todo;
 
-		    if (todo > 0 && !got_int)
+		    എങ്കിൽ (todo > 0 && !got_int)
 		    {
 			// Advance to next non-empty entry
-			for (++hi; HASHITEM_EMPTY(hi); ++hi)
+			വേണ്ടി (++hi; HASHITEM_EMPTY(hi); ++hi)
 			    ;
 			--todo;
 			frame->je_u.d.hi = hi;
 			frame->je_u.d.todo = todo;
 
 			ga_append(gap, ',');
-			if ((frame->je_options & JSON_JS)
-				&& is_simple_key(hi->hi_key))
-			    ga_concat(gap, hi->hi_key);
-			else
-			    write_string(gap, hi->hi_key);
+			എങ്കിൽ ((frame->je_options & JSON_JS)
+				&& is_simple_താക്കോൽ(hi->hi_താക്കോൽ))
+			    ga_concat(gap, hi->hi_താക്കോൽ);
+			അല്ലെങ്കിൽ
+			    write_string(gap, hi->hi_താക്കോൽ);
 			ga_append(gap, ':');
 
 			options = frame->je_options | JSON_NO_NONE;
 			cur_val = &dict_lookup(hi)->di_tv;
 			advance = TRUE;
-			break;
+			നിർത്തുക;
 		    }
 		    ga_append(gap, '}');
 		    frame->je_u.d.dict->dv_copyID = 0;
-		    --stack.ga_len;
-		    break;
+		    --അട്ടി.ga_len;
+		    നിർത്തുക;
 		}
 	    }
-	    if (advance)
-		break;
+	    എങ്കിൽ (advance)
+		നിർത്തുക;
 	}
     }
 
 theend:
     // Clean up copyIDs for remaining frames on error/failure
-    for (i = 0; i < stack.ga_len; i++)
+    വേണ്ടി (i = 0; i < അട്ടി.ga_len; i++)
     {
-	frame = ((json_enc_frame_T *)stack.ga_data) + i;
-	switch (frame->je_type)
+	frame = ((json_enc_frame_T *)അട്ടി.ga_data) + i;
+	തിരഞ്ഞെടുപ്പ് (frame->je_type)
 	{
-	    case ENC_LIST:
+	    അവസ്ഥ ENC_LIST:
 		frame->je_u.l.list->lv_copyID = 0;
-		break;
-	    case ENC_TUPLE:
+		നിർത്തുക;
+	    അവസ്ഥ ENC_TUPLE:
 		frame->je_u.t.tuple->tv_copyID = 0;
-		break;
-	    case ENC_DICT:
+		നിർത്തുക;
+	    അവസ്ഥ ENC_DICT:
 		frame->je_u.d.dict->dv_copyID = 0;
-		break;
+		നിർത്തുക;
 	}
     }
-    ga_clear(&stack);
-    return FAIL;
+    ga_clear(&അട്ടി);
+    തിരികെ FAIL;
 }
 
 /*
  * When "reader" has less than NUMBUFLEN bytes available, call the fill
  * callback to get more.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 fill_numbuflen(js_read_T *reader)
 {
-    if (reader->js_fill != NULL && (int)(reader->js_end - reader->js_buf)
+    എങ്കിൽ (reader->js_fill != ശൂന്യ && (പൂർണ്ണസംഖ്യ)(reader->js_end - reader->js_buf)
 						- reader->js_used < NUMBUFLEN)
     {
-	if (reader->js_fill(reader))
+	എങ്കിൽ (reader->js_fill(reader))
 	    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
     }
 }
@@ -728,79 +728,79 @@ fill_numbuflen(js_read_T *reader)
  * space.
  * Also tops up readahead when needed.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 json_skip_white(js_read_T *reader)
 {
-    int c;
+    പൂർണ്ണസംഖ്യ c;
 
-    for (;;)
+    വേണ്ടി (;;)
     {
 	c = reader->js_buf[reader->js_used];
-	if (reader->js_fill != NULL && c == NUL)
+	എങ്കിൽ (reader->js_fill != ശൂന്യ && c == NUL)
 	{
-	    if (reader->js_fill(reader))
+	    എങ്കിൽ (reader->js_fill(reader))
 	    {
 		reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
-		continue;
+		തുടരുക;
 	    }
 	}
-	if (c == NUL || c > ' ')
-	    break;
+	എങ്കിൽ (c == NUL || c > ' ')
+	    നിർത്തുക;
 	++reader->js_used;
     }
     fill_numbuflen(reader);
 }
 
-    static int
-json_decode_string(js_read_T *reader, typval_T *res, int quote)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+json_decode_string(js_read_T *reader, typval_T *res, പൂർണ്ണസംഖ്യ quote)
 {
     garray_T    ga;
-    int		len;
+    പൂർണ്ണസംഖ്യ		len;
     char_u	*p;
-    int		c;
+    പൂർണ്ണസംഖ്യ		c;
     varnumber_T	nr;
 
-    if (res != NULL)
+    എങ്കിൽ (res != ശൂന്യ)
 	ga_init2(&ga, 1, 200);
 
     p = reader->js_buf + reader->js_used + 1; // skip over " or '
-    while (*p != quote)
+    ആകുമ്പോൾ (*p != quote)
     {
 	// The JSON is always expected to be utf-8, thus use utf functions
 	// here. The string is converted below if needed.
-	if (*p == NUL || p[1] == NUL || utf_ptr2len(p) < utf_byte2len(*p))
+	എങ്കിൽ (*p == NUL || p[1] == NUL || utf_ptr2len(p) < utf_byte2len(*p))
 	{
 	    // Not enough bytes to make a character or end of the string. Get
 	    // more if possible.
-	    if (reader->js_fill == NULL)
-		break;
-	    len = (int)(reader->js_end - p);
-	    reader->js_used = (int)(p - reader->js_buf);
-	    if (!reader->js_fill(reader))
-		break; // didn't get more
+	    എങ്കിൽ (reader->js_fill == ശൂന്യ)
+		നിർത്തുക;
+	    len = (പൂർണ്ണസംഖ്യ)(reader->js_end - p);
+	    reader->js_used = (പൂർണ്ണസംഖ്യ)(p - reader->js_buf);
+	    എങ്കിൽ (!reader->js_fill(reader))
+		നിർത്തുക; // didn't get more
 	    p = reader->js_buf + reader->js_used;
 	    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
-	    continue;
+	    തുടരുക;
 	}
 
-	if (*p == '\\')
+	എങ്കിൽ (*p == '\\')
 	{
 	    c = -1;
-	    switch (p[1])
+	    തിരഞ്ഞെടുപ്പ് (p[1])
 	    {
-		case '\\': c = '\\'; break;
-		case '"': c = '"'; break;
-		case 'b': c = BS; break;
-		case 't': c = TAB; break;
-		case 'n': c = NL; break;
-		case 'f': c = FF; break;
-		case 'r': c = CAR; break;
-		case 'u':
-		    if (reader->js_fill != NULL
-				     && (int)(reader->js_end - p) < NUMBUFLEN)
+		അവസ്ഥ '\\': c = '\\'; നിർത്തുക;
+		അവസ്ഥ '"': c = '"'; നിർത്തുക;
+		അവസ്ഥ 'b': c = BS; നിർത്തുക;
+		അവസ്ഥ 't': c = TAB; നിർത്തുക;
+		അവസ്ഥ 'n': c = NL; നിർത്തുക;
+		അവസ്ഥ 'f': c = FF; നിർത്തുക;
+		അവസ്ഥ 'r': c = CAR; നിർത്തുക;
+		അവസ്ഥ 'u':
+		    എങ്കിൽ (reader->js_fill != ശൂന്യ
+				     && (പൂർണ്ണസംഖ്യ)(reader->js_end - p) < NUMBUFLEN)
 		    {
-			reader->js_used = (int)(p - reader->js_buf);
-			if (reader->js_fill(reader))
+			reader->js_used = (പൂർണ്ണസംഖ്യ)(p - reader->js_buf);
+			എങ്കിൽ (reader->js_fill(reader))
 			{
 			    p = reader->js_buf + reader->js_used;
 			    reader->js_end = reader->js_buf
@@ -809,32 +809,32 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 		    }
 		    nr = 0;
 		    len = 0;
-		    vim_str2nr(p + 2, NULL, &len,
-			     STR2NR_HEX + STR2NR_FORCE, &nr, NULL, 4, TRUE, NULL);
-		    if (len == 0)
+		    vim_str2nr(p + 2, ശൂന്യ, &len,
+			     STR2NR_HEX + STR2NR_FORCE, &nr, ശൂന്യ, 4, TRUE, ശൂന്യ);
+		    എങ്കിൽ (len == 0)
 		    {
-			if (res != NULL)
+			എങ്കിൽ (res != ശൂന്യ)
 			    ga_clear(&ga);
-			return FAIL;
+			തിരികെ FAIL;
 		    }
 		    p += len + 2;
-		    if (0xd800 <= nr && nr <= 0xdbff
-			    && (int)(reader->js_end - p) >= 6
+		    എങ്കിൽ (0xd800 <= nr && nr <= 0xdbff
+			    && (പൂർണ്ണസംഖ്യ)(reader->js_end - p) >= 6
 			    && *p == '\\' && *(p+1) == 'u')
 		    {
 			varnumber_T	nr2 = 0;
 
 			// decode surrogate pair: \ud812\u3456
 			len = 0;
-			vim_str2nr(p + 2, NULL, &len, STR2NR_HEX + STR2NR_FORCE,
-						    &nr2, NULL, 4, TRUE, NULL);
-			if (len == 0)
+			vim_str2nr(p + 2, ശൂന്യ, &len, STR2NR_HEX + STR2NR_FORCE,
+						    &nr2, ശൂന്യ, 4, TRUE, ശൂന്യ);
+			എങ്കിൽ (len == 0)
 			{
-			    if (res != NULL)
+			    എങ്കിൽ (res != ശൂന്യ)
 				ga_clear(&ga);
-			    return FAIL;
+			    തിരികെ FAIL;
 			}
-			if (0xdc00 <= nr2 && nr2 <= 0xdfff)
+			എങ്കിൽ (0xdc00 <= nr2 && nr2 <= 0xdfff)
 			{
 			    p += len + 2;
 			    nr = (((nr - 0xd800) << 10) |
@@ -842,101 +842,101 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 			}
 		    }
 		    // Lone surrogate is invalid.
-		    if (0xd800 <= nr && nr <= 0xdfff)
+		    എങ്കിൽ (0xd800 <= nr && nr <= 0xdfff)
 		    {
-			if (res != NULL)
+			എങ്കിൽ (res != ശൂന്യ)
 			    ga_clear(&ga);
-			return FAIL;
+			തിരികെ FAIL;
 		    }
-		    if (res != NULL)
+		    എങ്കിൽ (res != ശൂന്യ)
 		    {
 			char_u	buf[NUMBUFLEN];
 			size_t	buflen;
 
-			buflen = utf_char2bytes((int)nr, buf);
+			buflen = utf_char2bytes((പൂർണ്ണസംഖ്യ)nr, buf);
 			buf[buflen] = NUL;
 			ga_concat_len(&ga, buf, buflen);
 		    }
-		    break;
-		default:
+		    നിർത്തുക;
+		സ്ഥിരസ്ഥിതി:
 		    // not a special char, skip over backslash
 		    ++p;
-		    continue;
+		    തുടരുക;
 	    }
-	    if (c > 0)
+	    എങ്കിൽ (c > 0)
 	    {
 		p += 2;
-		if (res != NULL)
+		എങ്കിൽ (res != ശൂന്യ)
 		    ga_append(&ga, c);
 	    }
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    len = utf_ptr2len(p);
-	    if (res != NULL)
+	    എങ്കിൽ (res != ശൂന്യ)
 	    {
-		if (ga_grow(&ga, len) == FAIL)
+		എങ്കിൽ (ga_grow(&ga, len) == FAIL)
 		{
 		    ga_clear(&ga);
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
-		mch_memmove((char *)ga.ga_data + ga.ga_len, p, (size_t)len);
+		mch_memmove((അക്ഷരം *)ga.ga_data + ga.ga_len, p, (size_t)len);
 		ga.ga_len += len;
 	    }
 	    p += len;
 	}
     }
 
-    reader->js_used = (int)(p - reader->js_buf);
-    if (*p == quote)
+    reader->js_used = (പൂർണ്ണസംഖ്യ)(p - reader->js_buf);
+    എങ്കിൽ (*p == quote)
     {
 	++reader->js_used;
-	if (res != NULL)
+	എങ്കിൽ (res != ശൂന്യ)
 	{
 	    ga_append(&ga, NUL);
 	    res->v_type = VAR_STRING;
-#if defined(USE_ICONV)
-	    if (!enc_utf8)
+#എങ്കിൽ defined(USE_ICONV)
+	    എങ്കിൽ (!enc_utf8)
 	    {
 		vimconv_T   conv;
 
 		// Convert the utf-8 string to 'encoding'.
 		conv.vc_type = CONV_NONE;
 		convert_setup(&conv, (char_u*)"utf-8", p_enc);
-		if (conv.vc_type != CONV_NONE)
+		എങ്കിൽ (conv.vc_type != CONV_NONE)
 		{
 		    res->vval.v_string =
-				      string_convert(&conv, ga.ga_data, NULL);
+				      string_convert(&conv, ga.ga_data, ശൂന്യ);
 		    vim_free(ga.ga_data);
 		}
-		convert_setup(&conv, NULL, NULL);
+		convert_setup(&conv, ശൂന്യ, ശൂന്യ);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 #endif
 		res->vval.v_string = ga.ga_data;
 	}
-	return OK;
+	തിരികെ OK;
     }
-    if (res != NULL)
+    എങ്കിൽ (res != ശൂന്യ)
     {
 	res->v_type = VAR_SPECIAL;
-	res->vval.v_number = VVAL_NONE;
+	res->vval.v_സംഖ്യ = VVAL_NONE;
 	ga_clear(&ga);
     }
-    return MAYBE;
+    തിരികെ MAYBE;
 }
 
-typedef enum {
+തരനിർവചനം എണ്ണൽ {
     JSON_ARRAY,		// parsing items in an array
-    JSON_OBJECT_KEY,	// parsing key of an object
+    JSON_OBJECT_താക്കോൽ,	// parsing key of an object
     JSON_OBJECT		// parsing item in an object, after the key
 } json_decode_T;
 
-typedef struct {
+തരനിർവചനം ഘടന {
     json_decode_T jd_type;
     typval_T	  jd_tv;	// the list or dict
-    typval_T	  jd_key_tv;
-    char_u	  *jd_key;
+    typval_T	  jd_താക്കോൽ_tv;
+    char_u	  *jd_താക്കോൽ;
 } json_dec_item_T;
 
 /*
@@ -946,502 +946,502 @@ typedef struct {
  * Return FAIL for a decoding error (and give an error).
  * Return MAYBE for an incomplete message.
  */
-    static int
-json_decode_item(js_read_T *reader, typval_T *res, int options)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+json_decode_item(js_read_T *reader, typval_T *res, പൂർണ്ണസംഖ്യ options)
 {
     char_u	*p;
-    int		i;
-    int		len;
-    int		retval;
-    garray_T	stack;
+    പൂർണ്ണസംഖ്യ		i;
+    പൂർണ്ണസംഖ്യ		len;
+    പൂർണ്ണസംഖ്യ		retval;
+    garray_T	അട്ടി;
     typval_T	item;
     typval_T	*cur_item;
-    json_dec_item_T *top_item;
-    char_u	key_buf[NUMBUFLEN];
+    json_dec_item_T *മുകൾ_item;
+    char_u	താക്കോൽ_buf[NUMBUFLEN];
 
-    ga_init2(&stack, sizeof(json_dec_item_T), 100);
+    ga_init2(&അട്ടി, വലുപ്പം(json_dec_item_T), 100);
     cur_item = res;
     init_tv(&item);
-    if (res != NULL)
+    എങ്കിൽ (res != ശൂന്യ)
 	init_tv(res);
 
     fill_numbuflen(reader);
     p = reader->js_buf + reader->js_used;
-    for (;;)
+    വേണ്ടി (;;)
     {
-	top_item = NULL;
-	if (stack.ga_len > 0)
+	മുകൾ_item = ശൂന്യ;
+	എങ്കിൽ (അട്ടി.ga_len > 0)
 	{
-	    top_item = ((json_dec_item_T *)stack.ga_data) + stack.ga_len - 1;
+	    മുകൾ_item = ((json_dec_item_T *)അട്ടി.ga_data) + അട്ടി.ga_len - 1;
 	    json_skip_white(reader);
 	    p = reader->js_buf + reader->js_used;
-	    if (*p == NUL)
+	    എങ്കിൽ (*p == NUL)
 	    {
 		retval = MAYBE;
-		goto theend;
+		പോകുക theend;
 	    }
-	    if (top_item->jd_type == JSON_OBJECT_KEY
-					    || top_item->jd_type == JSON_ARRAY)
+	    എങ്കിൽ (മുകൾ_item->jd_type == JSON_OBJECT_താക്കോൽ
+					    || മുകൾ_item->jd_type == JSON_ARRAY)
 	    {
 		// Check for end of object or array.
-		if (*p == (top_item->jd_type == JSON_ARRAY ? ']' : '}'))
+		എങ്കിൽ (*p == (മുകൾ_item->jd_type == JSON_ARRAY ? ']' : '}'))
 		{
 		    ++reader->js_used; // consume the ']' or '}'
-		    --stack.ga_len;
-		    if (stack.ga_len == 0)
+		    --അട്ടി.ga_len;
+		    എങ്കിൽ (അട്ടി.ga_len == 0)
 		    {
 			retval = OK;
-			goto theend;
+			പോകുക theend;
 		    }
-		    if (cur_item != NULL)
-			cur_item = &top_item->jd_tv;
-		    goto item_end;
+		    എങ്കിൽ (cur_item != ശൂന്യ)
+			cur_item = &മുകൾ_item->jd_tv;
+		    പോകുക item_end;
 		}
 	    }
 	}
 
-	if (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
+	എങ്കിൽ (മുകൾ_item != ശൂന്യ && മുകൾ_item->jd_type == JSON_OBJECT_താക്കോൽ
 		&& (options & JSON_JS)
 		&& reader->js_buf[reader->js_used] != '"'
 		&& reader->js_buf[reader->js_used] != '\''
 		&& reader->js_buf[reader->js_used] != '['
 		&& reader->js_buf[reader->js_used] != '{')
 	{
-	    char_u *key;
+	    char_u *താക്കോൽ;
 
 	    // accept an object key that is not in quotes
-	    key = p = reader->js_buf + reader->js_used;
-	    while (*p != NUL && *p != ':' && *p > ' ')
+	    താക്കോൽ = p = reader->js_buf + reader->js_used;
+	    ആകുമ്പോൾ (*p != NUL && *p != ':' && *p > ' ')
 		++p;
-	    if (cur_item != NULL)
+	    എങ്കിൽ (cur_item != ശൂന്യ)
 	    {
 		cur_item->v_type = VAR_STRING;
-		cur_item->vval.v_string = vim_strnsave(key, p - key);
-		top_item->jd_key = cur_item->vval.v_string;
+		cur_item->vval.v_string = vim_strnsave(താക്കോൽ, p - താക്കോൽ);
+		മുകൾ_item->jd_താക്കോൽ = cur_item->vval.v_string;
 	    }
-	    reader->js_used += (int)(p - key);
+	    reader->js_used += (പൂർണ്ണസംഖ്യ)(p - താക്കോൽ);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    switch (*p)
+	    തിരഞ്ഞെടുപ്പ് (*p)
 	    {
-		case '[': // start of array
-		    if (top_item && top_item->jd_type == JSON_OBJECT_KEY)
+		അവസ്ഥ '[': // start of array
+		    എങ്കിൽ (മുകൾ_item && മുകൾ_item->jd_type == JSON_OBJECT_താക്കോൽ)
 		    {
 			retval = FAIL;
-			break;
+			നിർത്തുക;
 		    }
-		    if (stack.ga_len >= p_mfd)
+		    എങ്കിൽ (അട്ടി.ga_len >= p_mfd)
 		    {
 			emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			retval = FAIL;
-			break;
+			നിർത്തുക;
 		    }
-		    if (ga_grow(&stack, 1) == FAIL)
+		    എങ്കിൽ (ga_grow(&അട്ടി, 1) == FAIL)
 		    {
 			retval = FAIL;
-			break;
+			നിർത്തുക;
 		    }
-		    if (cur_item != NULL && rettv_list_alloc(cur_item) == FAIL)
+		    എങ്കിൽ (cur_item != ശൂന്യ && rettv_list_alloc(cur_item) == FAIL)
 		    {
 			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_item->vval.v_സംഖ്യ = VVAL_NONE;
 			retval = FAIL;
-			break;
+			നിർത്തുക;
 		    }
 
 		    ++reader->js_used; // consume the '['
-		    top_item = ((json_dec_item_T *)stack.ga_data)
-								+ stack.ga_len;
-		    top_item->jd_type = JSON_ARRAY;
-		    ++stack.ga_len;
-		    if (cur_item != NULL)
+		    മുകൾ_item = ((json_dec_item_T *)അട്ടി.ga_data)
+								+ അട്ടി.ga_len;
+		    മുകൾ_item->jd_type = JSON_ARRAY;
+		    ++അട്ടി.ga_len;
+		    എങ്കിൽ (cur_item != ശൂന്യ)
 		    {
-			top_item->jd_tv = *cur_item;
+			മുകൾ_item->jd_tv = *cur_item;
 			cur_item = &item;
 		    }
-		    continue;
+		    തുടരുക;
 
-		case '{': // start of object
-		    if (top_item && top_item->jd_type == JSON_OBJECT_KEY)
+		അവസ്ഥ '{': // start of object
+		    എങ്കിൽ (മുകൾ_item && മുകൾ_item->jd_type == JSON_OBJECT_താക്കോൽ)
 		    {
 			retval = FAIL;
-			break;
+			നിർത്തുക;
 		    }
-		    if (stack.ga_len >= p_mfd)
+		    എങ്കിൽ (അട്ടി.ga_len >= p_mfd)
 		    {
 			emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			retval = FAIL;
-			break;
+			നിർത്തുക;
 		    }
-		    if (ga_grow(&stack, 1) == FAIL)
+		    എങ്കിൽ (ga_grow(&അട്ടി, 1) == FAIL)
 		    {
 			retval = FAIL;
-			break;
+			നിർത്തുക;
 		    }
-		    if (cur_item != NULL && rettv_dict_alloc(cur_item) == FAIL)
+		    എങ്കിൽ (cur_item != ശൂന്യ && rettv_dict_alloc(cur_item) == FAIL)
 		    {
 			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_item->vval.v_സംഖ്യ = VVAL_NONE;
 			retval = FAIL;
-			break;
+			നിർത്തുക;
 		    }
 
 		    ++reader->js_used; // consume the '{'
-		    top_item = ((json_dec_item_T *)stack.ga_data)
-								+ stack.ga_len;
-		    top_item->jd_type = JSON_OBJECT_KEY;
-		    ++stack.ga_len;
-		    if (cur_item != NULL)
+		    മുകൾ_item = ((json_dec_item_T *)അട്ടി.ga_data)
+								+ അട്ടി.ga_len;
+		    മുകൾ_item->jd_type = JSON_OBJECT_താക്കോൽ;
+		    ++അട്ടി.ga_len;
+		    എങ്കിൽ (cur_item != ശൂന്യ)
 		    {
-			top_item->jd_tv = *cur_item;
-			cur_item = &top_item->jd_key_tv;
+			മുകൾ_item->jd_tv = *cur_item;
+			cur_item = &മുകൾ_item->jd_താക്കോൽ_tv;
 		    }
-		    continue;
+		    തുടരുക;
 
-		case '"': // string
+		അവസ്ഥ '"': // string
 		    retval = json_decode_string(reader, cur_item, *p);
-		    break;
+		    നിർത്തുക;
 
-		case '\'':
-		    if (options & JSON_JS)
+		അവസ്ഥ '\'':
+		    എങ്കിൽ (options & JSON_JS)
 			retval = json_decode_string(reader, cur_item, *p);
-		    else
+		    അല്ലെങ്കിൽ
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    break;
+		    നിർത്തുക;
 
-		case ',': // comma: empty item
-		    if ((options & JSON_JS) == 0)
+		അവസ്ഥ ',': // comma: empty item
+		    എങ്കിൽ ((options & JSON_JS) == 0)
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
-			break;
+			നിർത്തുക;
 		    }
 		    // FALLTHROUGH
-		case NUL: // empty
-		    if (cur_item != NULL)
+		അവസ്ഥ NUL: // empty
+		    എങ്കിൽ (cur_item != ശൂന്യ)
 		    {
 			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_item->vval.v_സംഖ്യ = VVAL_NONE;
 		    }
 		    retval = OK;
-		    break;
+		    നിർത്തുക;
 
-		default:
-		    if (VIM_ISDIGIT(*p) || (*p == '-'
+		സ്ഥിരസ്ഥിതി:
+		    എങ്കിൽ (VIM_ISDIGIT(*p) || (*p == '-'
 					&& (VIM_ISDIGIT(p[1]) || p[1] == NUL)))
 		    {
 			char_u  *sp = p;
 
-			if (*sp == '-')
+			എങ്കിൽ (*sp == '-')
 			{
 			    ++sp;
-			    if (*sp == NUL)
+			    എങ്കിൽ (*sp == NUL)
 			    {
 				retval = MAYBE;
-				break;
+				നിർത്തുക;
 			    }
-			    if (!VIM_ISDIGIT(*sp))
+			    എങ്കിൽ (!VIM_ISDIGIT(*sp))
 			    {
 				semsg(_(e_json_decode_error_at_str), p);
 				retval = FAIL;
-				break;
+				നിർത്തുക;
 			    }
 			}
 			sp = skipdigits(sp);
-			if (*sp == '.' || *sp == 'e' || *sp == 'E')
+			എങ്കിൽ (*sp == '.' || *sp == 'e' || *sp == 'E')
 			{
-			    if (cur_item == NULL)
+			    എങ്കിൽ (cur_item == ശൂന്യ)
 			    {
 				float_T f;
 
 				len = string2float(p, &f, FALSE);
 			    }
-			    else
+			    അല്ലെങ്കിൽ
 			    {
 				cur_item->v_type = VAR_FLOAT;
 				len = string2float(p, &cur_item->vval.v_float,
 									FALSE);
 			    }
 			}
-			else
+			അല്ലെങ്കിൽ
 			{
 			    varnumber_T nr;
 
 			    vim_str2nr(reader->js_buf + reader->js_used,
-				    NULL, &len, 0, // what
-				    &nr, NULL, 0, TRUE, NULL);
-			    if (len == 0)
+				    ശൂന്യ, &len, 0, // what
+				    &nr, ശൂന്യ, 0, TRUE, ശൂന്യ);
+			    എങ്കിൽ (len == 0)
 			    {
 				semsg(_(e_json_decode_error_at_str), p);
 				retval = FAIL;
-				goto theend;
+				പോകുക theend;
 			    }
-			    if (cur_item != NULL)
+			    എങ്കിൽ (cur_item != ശൂന്യ)
 			    {
-				cur_item->v_type = VAR_NUMBER;
-				cur_item->vval.v_number = nr;
+				cur_item->v_type = VAR_സംഖ്യ;
+				cur_item->vval.v_സംഖ്യ = nr;
 			    }
 			}
 			reader->js_used += len;
 			retval = OK;
-			break;
+			നിർത്തുക;
 		    }
 		    // In strinct JSON mode, keywords must be lowercase.
 		    // In JS mode, keywords are case-insensitive.
 #define MATCH_KW(p, kw, len) \
     ((options & JSON_JS) \
-     ? STRNICMP((char *)(p), (kw), (len)) == 0 \
-     : STRNCMP((char *)(p), (kw), (len)) == 0)
-		    if (MATCH_KW(p, "false", 5))
+     ? STRNICMP((അക്ഷരം *)(p), (kw), (len)) == 0 \
+     : STRNCMP((അക്ഷരം *)(p), (kw), (len)) == 0)
+		    എങ്കിൽ (MATCH_KW(p, "false", 5))
 		    {
 			reader->js_used += 5;
-			if (cur_item != NULL)
+			എങ്കിൽ (cur_item != ശൂന്യ)
 			{
 			    cur_item->v_type = VAR_BOOL;
-			    cur_item->vval.v_number = VVAL_FALSE;
+			    cur_item->vval.v_സംഖ്യ = VVAL_FALSE;
 			}
 			retval = OK;
-			break;
+			നിർത്തുക;
 		    }
-		    if (MATCH_KW(p, "true", 4))
+		    എങ്കിൽ (MATCH_KW(p, "true", 4))
 		    {
 			reader->js_used += 4;
-			if (cur_item != NULL)
+			എങ്കിൽ (cur_item != ശൂന്യ)
 			{
 			    cur_item->v_type = VAR_BOOL;
-			    cur_item->vval.v_number = VVAL_TRUE;
+			    cur_item->vval.v_സംഖ്യ = VVAL_TRUE;
 			}
 			retval = OK;
-			break;
+			നിർത്തുക;
 		    }
-		    if (MATCH_KW(p, "null", 4))
+		    എങ്കിൽ (MATCH_KW(p, "null", 4))
 		    {
 			reader->js_used += 4;
-			if (cur_item != NULL)
+			എങ്കിൽ (cur_item != ശൂന്യ)
 			{
 			    cur_item->v_type = VAR_SPECIAL;
-			    cur_item->vval.v_number = VVAL_NULL;
+			    cur_item->vval.v_സംഖ്യ = VVAL_NULL;
 			}
 			retval = OK;
-			break;
+			നിർത്തുക;
 		    }
-		    if (MATCH_KW(p, "NaN", 3))
+		    എങ്കിൽ (MATCH_KW(p, "NaN", 3))
 		    {
 			reader->js_used += 3;
-			if (cur_item != NULL)
+			എങ്കിൽ (cur_item != ശൂന്യ)
 			{
 			    cur_item->v_type = VAR_FLOAT;
 			    cur_item->vval.v_float = NAN;
 			}
 			retval = OK;
-			break;
+			നിർത്തുക;
 		    }
-		    if (MATCH_KW(p, "-Infinity", 9))
+		    എങ്കിൽ (MATCH_KW(p, "-Infinity", 9))
 		    {
 			reader->js_used += 9;
-			if (cur_item != NULL)
+			എങ്കിൽ (cur_item != ശൂന്യ)
 			{
 			    cur_item->v_type = VAR_FLOAT;
 			    cur_item->vval.v_float = -INFINITY;
 			}
 			retval = OK;
-			break;
+			നിർത്തുക;
 		    }
-		    if (MATCH_KW(p, "Infinity", 8))
+		    എങ്കിൽ (MATCH_KW(p, "Infinity", 8))
 		    {
 			reader->js_used += 8;
-			if (cur_item != NULL)
+			എങ്കിൽ (cur_item != ശൂന്യ)
 			{
 			    cur_item->v_type = VAR_FLOAT;
 			    cur_item->vval.v_float = INFINITY;
 			}
 			retval = OK;
-			break;
+			നിർത്തുക;
 		    }
 #undef MATCH_KW
 		    // check for truncated name
-		    len = (int)(reader->js_end
+		    len = (പൂർണ്ണസംഖ്യ)(reader->js_end
 					 - (reader->js_buf + reader->js_used));
-		    if (
-			    (len < 5 && STRNICMP((char *)p, "false", len) == 0)
+		    എങ്കിൽ (
+			    (len < 5 && STRNICMP((അക്ഷരം *)p, "false", len) == 0)
 			    || (len < 9
-				 && STRNICMP((char *)p, "-Infinity", len) == 0)
+				 && STRNICMP((അക്ഷരം *)p, "-Infinity", len) == 0)
 			    || (len < 8
-				  && STRNICMP((char *)p, "Infinity", len) == 0)
-			    || (len < 3 && STRNICMP((char *)p, "NaN", len) == 0)
+				  && STRNICMP((അക്ഷരം *)p, "Infinity", len) == 0)
+			    || (len < 3 && STRNICMP((അക്ഷരം *)p, "NaN", len) == 0)
 			    || (len < 4
-				  && (STRNICMP((char *)p, "true", len) == 0
-				    || STRNICMP((char *)p, "null", len) == 0)))
+				  && (STRNICMP((അക്ഷരം *)p, "true", len) == 0
+				    || STRNICMP((അക്ഷരം *)p, "null", len) == 0)))
 
 			retval = MAYBE;
-		    else
+		    അല്ലെങ്കിൽ
 			retval = FAIL;
-		    break;
+		    നിർത്തുക;
 	    }
 
 	    // We are finished when retval is FAIL or MAYBE and when at the
 	    // toplevel.
-	    if (retval == FAIL)
-		break;
-	    if (retval == MAYBE || stack.ga_len == 0)
-		goto theend;
+	    എങ്കിൽ (retval == FAIL)
+		നിർത്തുക;
+	    എങ്കിൽ (retval == MAYBE || അട്ടി.ga_len == 0)
+		പോകുക theend;
 
-	    if (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
-		    && cur_item != NULL)
+	    എങ്കിൽ (മുകൾ_item != ശൂന്യ && മുകൾ_item->jd_type == JSON_OBJECT_താക്കോൽ
+		    && cur_item != ശൂന്യ)
 	    {
-		if (cur_item->v_type == VAR_FLOAT)
+		എങ്കിൽ (cur_item->v_type == VAR_FLOAT)
 		{
 		    // cannot use a float as a key
 		    emsg(_(e_using_float_as_string));
 		    retval = FAIL;
-		    goto theend;
+		    പോകുക theend;
 		}
-		top_item->jd_key = tv_get_string_buf_chk(cur_item, key_buf);
-		if (top_item->jd_key == NULL)
+		മുകൾ_item->jd_താക്കോൽ = tv_get_string_buf_chk(cur_item, താക്കോൽ_buf);
+		എങ്കിൽ (മുകൾ_item->jd_താക്കോൽ == ശൂന്യ)
 		{
 		    emsg(_(e_invalid_argument));
 		    retval = FAIL;
-		    goto theend;
+		    പോകുക theend;
 		}
 	    }
 	}
 
 item_end:
-	top_item = ((json_dec_item_T *)stack.ga_data) + stack.ga_len - 1;
-	switch (top_item->jd_type)
+	മുകൾ_item = ((json_dec_item_T *)അട്ടി.ga_data) + അട്ടി.ga_len - 1;
+	തിരഞ്ഞെടുപ്പ് (മുകൾ_item->jd_type)
 	{
-	    case JSON_ARRAY:
-		if (res != NULL)
+	    അവസ്ഥ JSON_ARRAY:
+		എങ്കിൽ (res != ശൂന്യ)
 		{
 		    listitem_T	*li = listitem_alloc();
 
-		    if (li == NULL)
+		    എങ്കിൽ (li == ശൂന്യ)
 		    {
 			clear_tv(cur_item);
 			retval = FAIL;
-			goto theend;
+			പോകുക theend;
 		    }
 		    li->li_tv = *cur_item;
-		    list_append(top_item->jd_tv.vval.v_list, li);
+		    list_append(മുകൾ_item->jd_tv.vval.v_list, li);
 		}
-		if (cur_item != NULL)
+		എങ്കിൽ (cur_item != ശൂന്യ)
 		    cur_item = &item;
 
 		json_skip_white(reader);
 		p = reader->js_buf + reader->js_used;
-		if (*p == ',')
+		എങ്കിൽ (*p == ',')
 		    ++reader->js_used;
-		else if (*p != ']')
+		അല്ലെങ്കിൽ എങ്കിൽ (*p != ']')
 		{
-		    if (*p == NUL)
+		    എങ്കിൽ (*p == NUL)
 			retval = MAYBE;
-		    else
+		    അല്ലെങ്കിൽ
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    goto theend;
+		    പോകുക theend;
 		}
-		break;
+		നിർത്തുക;
 
-	    case JSON_OBJECT_KEY:
+	    അവസ്ഥ JSON_OBJECT_താക്കോൽ:
 		json_skip_white(reader);
 		p = reader->js_buf + reader->js_used;
-		if (*p != ':')
+		എങ്കിൽ (*p != ':')
 		{
-		    if (cur_item != NULL)
+		    എങ്കിൽ (cur_item != ശൂന്യ)
 			clear_tv(cur_item);
-		    if (*p == NUL)
+		    എങ്കിൽ (*p == NUL)
 			retval = MAYBE;
-		    else
+		    അല്ലെങ്കിൽ
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    goto theend;
+		    പോകുക theend;
 		}
 		++reader->js_used;
 		json_skip_white(reader);
-		top_item->jd_type = JSON_OBJECT;
-		if (cur_item != NULL)
+		മുകൾ_item->jd_type = JSON_OBJECT;
+		എങ്കിൽ (cur_item != ശൂന്യ)
 		    cur_item = &item;
-		break;
+		നിർത്തുക;
 
-	    case JSON_OBJECT:
-		if (cur_item != NULL
-			&& dict_has_key(top_item->jd_tv.vval.v_dict,
-						(char *)top_item->jd_key))
+	    അവസ്ഥ JSON_OBJECT:
+		എങ്കിൽ (cur_item != ശൂന്യ
+			&& dict_has_താക്കോൽ(മുകൾ_item->jd_tv.vval.v_dict,
+						(അക്ഷരം *)മുകൾ_item->jd_താക്കോൽ))
 		{
-		    semsg(_(e_duplicate_key_in_json_str), top_item->jd_key);
+		    semsg(_(e_duplicate_താക്കോൽ_in_json_str), മുകൾ_item->jd_താക്കോൽ);
 		    clear_tv(cur_item);
 		    retval = FAIL;
-		    goto theend;
+		    പോകുക theend;
 		}
 
-		if (cur_item != NULL)
+		എങ്കിൽ (cur_item != ശൂന്യ)
 		{
-		    dictitem_T *di = dictitem_alloc(top_item->jd_key);
+		    dictitem_T *di = dictitem_alloc(മുകൾ_item->jd_താക്കോൽ);
 
-		    clear_tv(&top_item->jd_key_tv);
-		    if (di == NULL)
+		    clear_tv(&മുകൾ_item->jd_താക്കോൽ_tv);
+		    എങ്കിൽ (di == ശൂന്യ)
 		    {
 			clear_tv(cur_item);
 			retval = FAIL;
-			goto theend;
+			പോകുക theend;
 		    }
 		    di->di_tv = *cur_item;
 		    di->di_tv.v_lock = 0;
-		    if (dict_add(top_item->jd_tv.vval.v_dict, di) == FAIL)
+		    എങ്കിൽ (dict_add(മുകൾ_item->jd_tv.vval.v_dict, di) == FAIL)
 		    {
 			dictitem_free(di);
 			retval = FAIL;
-			goto theend;
+			പോകുക theend;
 		    }
 		}
 
 		json_skip_white(reader);
 		p = reader->js_buf + reader->js_used;
-		if (*p == ',')
+		എങ്കിൽ (*p == ',')
 		    ++reader->js_used;
-		else if (*p != '}')
+		അല്ലെങ്കിൽ എങ്കിൽ (*p != '}')
 		{
-		    if (*p == NUL)
+		    എങ്കിൽ (*p == NUL)
 			retval = MAYBE;
-		    else
+		    അല്ലെങ്കിൽ
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    goto theend;
+		    പോകുക theend;
 		}
-		top_item->jd_type = JSON_OBJECT_KEY;
-		if (cur_item != NULL)
-		    cur_item = &top_item->jd_key_tv;
-		break;
+		മുകൾ_item->jd_type = JSON_OBJECT_താക്കോൽ;
+		എങ്കിൽ (cur_item != ശൂന്യ)
+		    cur_item = &മുകൾ_item->jd_താക്കോൽ_tv;
+		നിർത്തുക;
 	}
     }
 
     // Get here when parsing failed.
-    if (res != NULL)
+    എങ്കിൽ (res != ശൂന്യ)
     {
 	clear_tv(res);
 	res->v_type = VAR_SPECIAL;
-	res->vval.v_number = VVAL_NONE;
+	res->vval.v_സംഖ്യ = VVAL_NONE;
     }
     // "p" may dangle into a buffer freed by a js_fill() refill in
     // json_decode_string(); report the position from the current reader.
     semsg(_(e_json_decode_error_at_str), reader->js_buf + reader->js_used);
 
 theend:
-    for (i = 0; i < stack.ga_len; i++)
-	clear_tv(&(((json_dec_item_T *)stack.ga_data) + i)->jd_key_tv);
-    ga_clear(&stack);
+    വേണ്ടി (i = 0; i < അട്ടി.ga_len; i++)
+	clear_tv(&(((json_dec_item_T *)അട്ടി.ga_data) + i)->jd_താക്കോൽ_tv);
+    ga_clear(&അട്ടി);
 
-    return retval;
+    തിരികെ retval;
 }
 
 /*
@@ -1449,31 +1449,31 @@ theend:
  * "options" can be JSON_JS or zero;
  * Return FAIL if not the whole message was consumed.
  */
-    static int
-json_decode_all(js_read_T *reader, typval_T *res, int options)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+json_decode_all(js_read_T *reader, typval_T *res, പൂർണ്ണസംഖ്യ options)
 {
-    int ret;
+    പൂർണ്ണസംഖ്യ ret;
 
     // We find the end once, to avoid calling strlen() many times.
     reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
     json_skip_white(reader);
     ret = json_decode_item(reader, res, options);
-    if (ret != OK)
+    എങ്കിൽ (ret != OK)
     {
-	if (ret == MAYBE)
+	എങ്കിൽ (ret == MAYBE)
 	    semsg(_(e_json_decode_error_at_str), reader->js_buf);
-	return FAIL;
+	തിരികെ FAIL;
     }
     json_skip_white(reader);
-    if (reader->js_buf[reader->js_used] != NUL)
+    എങ്കിൽ (reader->js_buf[reader->js_used] != NUL)
     {
 	semsg(_(e_trailing_characters_str), reader->js_buf + reader->js_used);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#എങ്കിൽ defined(FEAT_JOB_CHANNEL)
 /*
  * Decode the JSON from "reader" and store the result in "res".
  * "options" can be JSON_JS or zero;
@@ -1481,10 +1481,10 @@ json_decode_all(js_read_T *reader, typval_T *res, int options)
  * Return MAYBE for an incomplete message.
  * Consumes the message anyway.
  */
-    int
-json_decode(js_read_T *reader, typval_T *res, int options)
+    പൂർണ്ണസംഖ്യ
+json_decode(js_read_T *reader, typval_T *res, പൂർണ്ണസംഖ്യ options)
 {
-    int ret;
+    പൂർണ്ണസംഖ്യ ret;
 
     // We find the end once, to avoid calling strlen() many times.
     reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
@@ -1492,7 +1492,7 @@ json_decode(js_read_T *reader, typval_T *res, int options)
     ret = json_decode_item(reader, res, options);
     json_skip_white(reader);
 
-    return ret;
+    തിരികെ ret;
 }
 #endif
 
@@ -1506,42 +1506,42 @@ json_decode(js_read_T *reader, typval_T *res, int options)
  * string.  A number might be truncated without knowing.
  * Does not advance the reader.
  */
-    int
-json_find_end(js_read_T *reader, int options)
+    പൂർണ്ണസംഖ്യ
+json_find_end(js_read_T *reader, പൂർണ്ണസംഖ്യ options)
 {
-    int used_save = reader->js_used;
-    int ret;
+    പൂർണ്ണസംഖ്യ used_save = reader->js_used;
+    പൂർണ്ണസംഖ്യ ret;
 
     // We find the end once, to avoid calling strlen() many times.
     reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
     json_skip_white(reader);
-    ret = json_decode_item(reader, NULL, options);
+    ret = json_decode_item(reader, ശൂന്യ, options);
     reader->js_used = used_save;
-    return ret;
+    തിരികെ ret;
 }
 
 /*
  * "js_decode()" function
  */
-    void
+    ശൂന്യം
 f_js_decode(typval_T *argvars, typval_T *rettv)
 {
     js_read_T	reader;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
     reader.js_buf = tv_get_string(&argvars[0]);
-    reader.js_fill = NULL;
+    reader.js_fill = ശൂന്യ;
     reader.js_used = 0;
-    if (json_decode_all(&reader, rettv, JSON_JS) != OK)
+    എങ്കിൽ (json_decode_all(&reader, rettv, JSON_JS) != OK)
 	emsg(_(e_invalid_argument));
 }
 
 /*
  * "js_encode()" function
  */
-    void
+    ശൂന്യം
 f_js_encode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
@@ -1551,16 +1551,16 @@ f_js_encode(typval_T *argvars, typval_T *rettv)
 /*
  * "json_decode()" function
  */
-    void
+    ശൂന്യം
 f_json_decode(typval_T *argvars, typval_T *rettv)
 {
     js_read_T	reader;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
     reader.js_buf = tv_get_string(&argvars[0]);
-    reader.js_fill = NULL;
+    reader.js_fill = ശൂന്യ;
     reader.js_used = 0;
     json_decode_all(&reader, rettv, 0);
 }
@@ -1568,7 +1568,7 @@ f_json_decode(typval_T *argvars, typval_T *rettv)
 /*
  * "json_encode()" function
  */
-    void
+    ശൂന്യം
 f_json_encode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;

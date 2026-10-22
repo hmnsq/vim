@@ -32,7 +32,7 @@
  * file is opened.
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
 /*
  * Some systems have the page size in statfs.f_bsize, some in stat.st_blksize
@@ -41,7 +41,7 @@
 # define STATFS stat
 # define F_BSIZE st_blksize
 # define fstatfs(fd, buf, len, nul) mch_fstat((fd), (buf))
-#else
+#അല്ലെങ്കിൽ
 # ifdef HAVE_SYS_STATFS_H
 #  include <sys/statfs.h>
 #  define STATFS statfs
@@ -54,7 +54,7 @@
  */
 #ifdef AMIGA
 # ifdef FEAT_ARP
-extern int dos2;			// this is in os_amiga.c
+ബാഹ്യ പൂർണ്ണസംഖ്യ dos2;			// this is in os_amiga.c
 # endif
 # ifdef SASC
 #  include <ios1.h>			// for chkufb()
@@ -63,30 +63,30 @@ extern int dos2;			// this is in os_amiga.c
 
 #define MEMFILE_PAGE_SIZE 4096		// default page size
 
-static long_u	total_mem_used = 0;	// total memory used for memfiles
+സ്ഥിതം long_u	total_mem_used = 0;	// total memory used for memfiles
 
-static void mf_ins_hash(memfile_T *, bhdr_T *);
-static void mf_rem_hash(memfile_T *, bhdr_T *);
-static bhdr_T *mf_find_hash(memfile_T *, blocknr_T);
-static void mf_ins_used(memfile_T *, bhdr_T *);
-static void mf_rem_used(memfile_T *, bhdr_T *);
-static bhdr_T *mf_release(memfile_T *, int);
-static bhdr_T *mf_alloc_bhdr(memfile_T *, int);
-static void mf_free_bhdr(bhdr_T *);
-static void mf_ins_free(memfile_T *, bhdr_T *);
-static bhdr_T *mf_rem_free(memfile_T *);
-static int  mf_read(memfile_T *, bhdr_T *);
-static int  mf_write(memfile_T *, bhdr_T *);
-static int  mf_write_block(memfile_T *mfp, bhdr_T *hp, off_T offset, unsigned size);
-static int  mf_trans_add(memfile_T *, bhdr_T *);
-static void mf_do_open(memfile_T *, char_u *, int);
-static void mf_hash_init(mf_hashtab_T *);
-static void mf_hash_free(mf_hashtab_T *);
-static void mf_hash_free_all(mf_hashtab_T *);
-static mf_hashitem_T *mf_hash_find(mf_hashtab_T *, blocknr_T);
-static void mf_hash_add_item(mf_hashtab_T *, mf_hashitem_T *);
-static void mf_hash_rem_item(mf_hashtab_T *, mf_hashitem_T *);
-static int mf_hash_grow(mf_hashtab_T *);
+സ്ഥിതം ശൂന്യം mf_ins_hash(memfile_T *, bhdr_T *);
+സ്ഥിതം ശൂന്യം mf_rem_hash(memfile_T *, bhdr_T *);
+സ്ഥിതം bhdr_T *mf_find_hash(memfile_T *, blocknr_T);
+സ്ഥിതം ശൂന്യം mf_ins_used(memfile_T *, bhdr_T *);
+സ്ഥിതം ശൂന്യം mf_rem_used(memfile_T *, bhdr_T *);
+സ്ഥിതം bhdr_T *mf_release(memfile_T *, പൂർണ്ണസംഖ്യ);
+സ്ഥിതം bhdr_T *mf_alloc_bhdr(memfile_T *, പൂർണ്ണസംഖ്യ);
+സ്ഥിതം ശൂന്യം mf_free_bhdr(bhdr_T *);
+സ്ഥിതം ശൂന്യം mf_ins_free(memfile_T *, bhdr_T *);
+സ്ഥിതം bhdr_T *mf_rem_free(memfile_T *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ  mf_read(memfile_T *, bhdr_T *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ  mf_write(memfile_T *, bhdr_T *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ  mf_write_block(memfile_T *mfp, bhdr_T *hp, off_T offset, unsigned size);
+സ്ഥിതം പൂർണ്ണസംഖ്യ  mf_trans_add(memfile_T *, bhdr_T *);
+സ്ഥിതം ശൂന്യം mf_do_open(memfile_T *, char_u *, പൂർണ്ണസംഖ്യ);
+സ്ഥിതം ശൂന്യം mf_hash_init(mf_hashtab_T *);
+സ്ഥിതം ശൂന്യം mf_hash_free(mf_hashtab_T *);
+സ്ഥിതം ശൂന്യം mf_hash_free_all(mf_hashtab_T *);
+സ്ഥിതം mf_hashitem_T *mf_hash_find(mf_hashtab_T *, blocknr_T);
+സ്ഥിതം ശൂന്യം mf_hash_add_item(mf_hashtab_T *, mf_hashitem_T *);
+സ്ഥിതം ശൂന്യം mf_hash_rem_item(mf_hashtab_T *, mf_hashitem_T *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ mf_hash_grow(mf_hashtab_T *);
 
 /*
  * The functions for using a memfile:
@@ -117,46 +117,46 @@ static int mf_hash_grow(mf_hashtab_T *);
  * return value: identifier for this memory block file.
  */
     memfile_T *
-mf_open(char_u *fname, int flags)
+mf_open(char_u *fname, പൂർണ്ണസംഖ്യ flags)
 {
     memfile_T		*mfp;
     off_T		size;
-#if defined(STATFS) && defined(UNIX) && !defined(__QNX__) && !defined(__minix)
+#എങ്കിൽ defined(STATFS) && defined(UNIX) && !defined(__QNX__) && !defined(__minix)
 # define USE_FSTATFS
-    struct STATFS	stf;
+    ഘടന STATFS	stf;
 #endif
 
-    if ((mfp = ALLOC_ONE(memfile_T)) == NULL)
-	return NULL;
+    എങ്കിൽ ((mfp = ALLOC_ONE(memfile_T)) == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
-    if (fname == NULL)	    // no file for this memfile, use memory only
+    എങ്കിൽ (fname == ശൂന്യ)	    // no file for this memfile, use memory only
     {
-	mfp->mf_fname = NULL;
-	mfp->mf_ffname = NULL;
+	mfp->mf_fname = ശൂന്യ;
+	mfp->mf_ffname = ശൂന്യ;
 	mfp->mf_fd = -1;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	mf_do_open(mfp, fname, flags);	// try to open the file
 
 	// if the file cannot be opened, return here
-	if (mfp->mf_fd < 0)
+	എങ്കിൽ (mfp->mf_fd < 0)
 	{
 	    vim_free(mfp);
-	    return NULL;
+	    തിരികെ ശൂന്യ;
 	}
     }
 
-    mfp->mf_free_first = NULL;		// free list is empty
-    mfp->mf_used_first = NULL;		// used list is empty
-    mfp->mf_used_last = NULL;
+    mfp->mf_free_first = ശൂന്യ;		// free list is empty
+    mfp->mf_used_first = ശൂന്യ;		// used list is empty
+    mfp->mf_used_last = ശൂന്യ;
     mfp->mf_dirty = MF_DIRTY_NO;
-    mfp->mf_used_count = 0;
+    mfp->mf_used_എണ്ണം = 0;
     mf_hash_init(&mfp->mf_hash);
     mf_hash_init(&mfp->mf_trans);
     mfp->mf_page_size = MEMFILE_PAGE_SIZE;
 #ifdef FEAT_CRYPT
-    mfp->mf_old_key = NULL;
+    mfp->mf_old_താക്കോൽ = ശൂന്യ;
 #endif
 
 #ifdef USE_FSTATFS
@@ -167,22 +167,22 @@ mf_open(char_u *fname, int flags)
      * in ml_recover().  The size used here may be wrong, therefore
      * mf_blocknr_max must be rounded up.
      */
-    if (mfp->mf_fd >= 0
-	    && fstatfs(mfp->mf_fd, &stf, sizeof(struct statfs), 0) == 0
+    എങ്കിൽ (mfp->mf_fd >= 0
+	    && fstatfs(mfp->mf_fd, &stf, വലുപ്പം(ഘടന statfs), 0) == 0
 	    && stf.F_BSIZE >= MIN_SWAP_PAGE_SIZE
 	    && stf.F_BSIZE <= MAX_SWAP_PAGE_SIZE)
 	mfp->mf_page_size = stf.F_BSIZE;
 #endif
 
-    if (mfp->mf_fd < 0 || (flags & (O_TRUNC|O_EXCL))
+    എങ്കിൽ (mfp->mf_fd < 0 || (flags & (O_TRUNC|O_EXCL))
 		  || (size = vim_lseek(mfp->mf_fd, (off_T)0L, SEEK_END)) <= 0)
 	mfp->mf_blocknr_max = 0;	// no file or empty file
-    else
+    അല്ലെങ്കിൽ
 	mfp->mf_blocknr_max = (blocknr_T)((size + mfp->mf_page_size - 1)
 							 / mfp->mf_page_size);
     mfp->mf_blocknr_min = -1;
-    mfp->mf_neg_count = 0;
-    mfp->mf_infile_count = mfp->mf_blocknr_max;
+    mfp->mf_neg_എണ്ണം = 0;
+    mfp->mf_infile_എണ്ണം = mfp->mf_blocknr_max;
 
     /*
      * Compute maximum number of pages ('maxmem' is in Kbyte):
@@ -190,20 +190,20 @@ mf_open(char_u *fname, int flags)
      * Avoid overflow by first reducing page size as much as possible.
      */
     {
-	int	    shift = 10;
+	പൂർണ്ണസംഖ്യ	    shift = 10;
 	unsigned    page_size = mfp->mf_page_size;
 
-	while (shift > 0 && (page_size & 1) == 0)
+	ആകുമ്പോൾ (shift > 0 && (page_size & 1) == 0)
 	{
 	    page_size = page_size >> 1;
 	    --shift;
 	}
-	mfp->mf_used_count_max = (p_mm << shift) / page_size;
-	if (mfp->mf_used_count_max < 10)
-	    mfp->mf_used_count_max = 10;
+	mfp->mf_used_എണ്ണം_max = (p_mm << shift) / page_size;
+	എങ്കിൽ (mfp->mf_used_എണ്ണം_max < 10)
+	    mfp->mf_used_എണ്ണം_max = 10;
     }
 
-    return mfp;
+    തിരികെ mfp;
 }
 
 /*
@@ -216,43 +216,43 @@ mf_open(char_u *fname, int flags)
  *
  * return value: FAIL if file could not be opened, OK otherwise
  */
-    int
+    പൂർണ്ണസംഖ്യ
 mf_open_file(memfile_T *mfp, char_u *fname)
 {
     mf_do_open(mfp, fname, O_RDWR|O_CREAT|O_EXCL); // try to open the file
 
-    if (mfp->mf_fd < 0)
-	return FAIL;
+    എങ്കിൽ (mfp->mf_fd < 0)
+	തിരികെ FAIL;
 
     mfp->mf_dirty = MF_DIRTY_YES;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Close a memory file and delete the associated file if 'del_file' is TRUE.
  */
-    void
-mf_close(memfile_T *mfp, int del_file)
+    ശൂന്യം
+mf_close(memfile_T *mfp, പൂർണ്ണസംഖ്യ del_file)
 {
     bhdr_T	*hp, *nextp;
 
-    if (mfp == NULL)		    // safety check
-	return;
-    if (mfp->mf_fd >= 0)
+    എങ്കിൽ (mfp == ശൂന്യ)		    // safety check
+	തിരികെ;
+    എങ്കിൽ (mfp->mf_fd >= 0)
     {
-	if (close(mfp->mf_fd) < 0)
+	എങ്കിൽ (close(mfp->mf_fd) < 0)
 	    emsg(_(e_close_error_on_swap_file));
     }
-    if (del_file && mfp->mf_fname != NULL)
+    എങ്കിൽ (del_file && mfp->mf_fname != ശൂന്യ)
 	mch_remove(mfp->mf_fname);
 					    // free entries in used list
-    for (hp = mfp->mf_used_first; hp != NULL; hp = nextp)
+    വേണ്ടി (hp = mfp->mf_used_first; hp != ശൂന്യ; hp = nextp)
     {
-	total_mem_used -= (long_u)hp->bh_page_count * mfp->mf_page_size;
+	total_mem_used -= (long_u)hp->bh_page_എണ്ണം * mfp->mf_page_size;
 	nextp = hp->bh_next;
 	mf_free_bhdr(hp);
     }
-    while (mfp->mf_free_first != NULL)	    // free entries in free list
+    ആകുമ്പോൾ (mfp->mf_free_first != ശൂന്യ)	    // free entries in free list
 	vim_free(mf_rem_free(mfp));
     mf_hash_free(&mfp->mf_hash);
     mf_hash_free_all(&mfp->mf_trans);	    // free hashtable and its items
@@ -264,33 +264,33 @@ mf_close(memfile_T *mfp, int del_file)
 /*
  * Close the swap file for a memfile.  Used when 'swapfile' is reset.
  */
-    void
+    ശൂന്യം
 mf_close_file(
     buf_T	*buf,
-    int		getlines)	// get all lines into memory?
+    പൂർണ്ണസംഖ്യ		getlines)	// get all lines into memory?
 {
     memfile_T	*mfp;
     linenr_T	lnum;
 
     mfp = buf->b_ml.ml_mfp;
-    if (mfp == NULL || mfp->mf_fd < 0)		// nothing to close
-	return;
+    എങ്കിൽ (mfp == ശൂന്യ || mfp->mf_fd < 0)		// nothing to close
+	തിരികെ;
 
-    if (getlines)
+    എങ്കിൽ (getlines)
     {
 	// get all blocks in memory by accessing all lines (clumsy!)
 	mf_dont_release = TRUE;
-	for (lnum = 1; lnum <= buf->b_ml.ml_line_count; ++lnum)
-	    (void)ml_get_buf(buf, lnum, FALSE);
+	വേണ്ടി (lnum = 1; lnum <= buf->b_ml.ml_വരി_എണ്ണം; ++lnum)
+	    (ശൂന്യം)ml_get_buf(buf, lnum, FALSE);
 	mf_dont_release = FALSE;
 	// TODO: should check if all blocks are really in core
     }
 
-    if (close(mfp->mf_fd) < 0)			// close the file
+    എങ്കിൽ (close(mfp->mf_fd) < 0)			// close the file
 	emsg(_(e_close_error_on_swap_file));
     mfp->mf_fd = -1;
 
-    if (mfp->mf_fname != NULL)
+    എങ്കിൽ (mfp->mf_fname != ശൂന്യ)
     {
 	mch_remove(mfp->mf_fname);		// delete the swap file
 	VIM_CLEAR(mfp->mf_fname);
@@ -302,7 +302,7 @@ mf_close_file(
  * Set new size for a memfile.  Used when block 0 of a swapfile has been read
  * and the size it indicates differs from what was guessed.
  */
-    void
+    ശൂന്യം
 mf_new_page_size(memfile_T *mfp, unsigned new_size)
 {
     // Correct the memory used for block 0 to the new size, because it will be
@@ -317,7 +317,7 @@ mf_new_page_size(memfile_T *mfp, unsigned new_size)
  *   negative: TRUE if negative block number desired (data block)
  */
     bhdr_T *
-mf_new(memfile_T *mfp, int negative, int page_count)
+mf_new(memfile_T *mfp, പൂർണ്ണസംഖ്യ negative, പൂർണ്ണസംഖ്യ page_എണ്ണം)
 {
     bhdr_T	*hp;	// new bhdr_T
     bhdr_T	*freep;	// first block in free list
@@ -327,7 +327,7 @@ mf_new(memfile_T *mfp, int negative, int page_count)
      * If we reached the maximum size for the used memory blocks, release one
      * If a bhdr_T is returned, use it and adjust the page_count if necessary.
      */
-    hp = mf_release(mfp, page_count);
+    hp = mf_release(mfp, page_എണ്ണം);
 
 /*
  * Decide on the number to use:
@@ -336,7 +336,7 @@ mf_new(memfile_T *mfp, int negative, int page_count)
  * a positive number.
  */
     freep = mfp->mf_free_first;
-    if (!negative && freep != NULL && freep->bh_page_count >= page_count)
+    എങ്കിൽ (!negative && freep != ശൂന്യ && freep->bh_page_എണ്ണം >= page_എണ്ണം)
     {
 	/*
 	 * If the block in the free list has more pages, take only the number
@@ -348,46 +348,46 @@ mf_new(memfile_T *mfp, int negative, int page_count)
 	 * If the number of pages matches and mf_release() returned a bhdr_T,
 	 * just use the number and free the bhdr_T from the free list
 	 */
-	if (freep->bh_page_count > page_count)
+	എങ്കിൽ (freep->bh_page_എണ്ണം > page_എണ്ണം)
 	{
-	    if (hp == NULL && (hp = mf_alloc_bhdr(mfp, page_count)) == NULL)
-		return NULL;
+	    എങ്കിൽ (hp == ശൂന്യ && (hp = mf_alloc_bhdr(mfp, page_എണ്ണം)) == ശൂന്യ)
+		തിരികെ ശൂന്യ;
 	    hp->bh_bnum = freep->bh_bnum;
-	    freep->bh_bnum += page_count;
-	    freep->bh_page_count -= page_count;
+	    freep->bh_bnum += page_എണ്ണം;
+	    freep->bh_page_എണ്ണം -= page_എണ്ണം;
 	}
-	else if (hp == NULL)	    // need to allocate memory for this block
+	അല്ലെങ്കിൽ എങ്കിൽ (hp == ശൂന്യ)	    // need to allocate memory for this block
 	{
-	    if ((p = alloc((size_t)mfp->mf_page_size * page_count)) == NULL)
-		return NULL;
+	    എങ്കിൽ ((p = alloc((size_t)mfp->mf_page_size * page_എണ്ണം)) == ശൂന്യ)
+		തിരികെ ശൂന്യ;
 	    hp = mf_rem_free(mfp);
 	    hp->bh_data = p;
 	}
-	else		    // use the number, remove entry from free list
+	അല്ലെങ്കിൽ		    // use the number, remove entry from free list
 	{
 	    freep = mf_rem_free(mfp);
 	    hp->bh_bnum = freep->bh_bnum;
 	    vim_free(freep);
 	}
     }
-    else	// get a new number
+    അല്ലെങ്കിൽ	// get a new number
     {
-	if (hp == NULL && (hp = mf_alloc_bhdr(mfp, page_count)) == NULL)
-	    return NULL;
-	if (negative)
+	എങ്കിൽ (hp == ശൂന്യ && (hp = mf_alloc_bhdr(mfp, page_എണ്ണം)) == ശൂന്യ)
+	    തിരികെ ശൂന്യ;
+	എങ്കിൽ (negative)
 	{
 	    hp->bh_bnum = mfp->mf_blocknr_min--;
-	    mfp->mf_neg_count++;
+	    mfp->mf_neg_എണ്ണം++;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    hp->bh_bnum = mfp->mf_blocknr_max;
-	    mfp->mf_blocknr_max += page_count;
+	    mfp->mf_blocknr_max += page_എണ്ണം;
 	}
     }
     hp->bh_flags = BH_LOCKED | BH_DIRTY;	// new block is always dirty
     mfp->mf_dirty = MF_DIRTY_YES;
-    hp->bh_page_count = page_count;
+    hp->bh_page_എണ്ണം = page_എണ്ണം;
     mf_ins_used(mfp, hp);
     mf_ins_hash(mfp, hp);
 
@@ -395,10 +395,10 @@ mf_new(memfile_T *mfp, int negative, int page_count)
      * Init the data to all zero, to avoid reading uninitialized data.
      * This also avoids that the passwd file ends up in the swap file!
      */
-    (void)vim_memset((char *)(hp->bh_data), 0,
-				      (size_t)mfp->mf_page_size * page_count);
+    (ശൂന്യം)vim_memset((അക്ഷരം *)(hp->bh_data), 0,
+				      (size_t)mfp->mf_page_size * page_എണ്ണം);
 
-    return hp;
+    തിരികെ hp;
 }
 
 /*
@@ -407,21 +407,21 @@ mf_new(memfile_T *mfp, int negative, int page_count)
  * Note: The caller should first check a negative nr with mf_trans_del()
  */
     bhdr_T *
-mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
+mf_get(memfile_T *mfp, blocknr_T nr, പൂർണ്ണസംഖ്യ page_എണ്ണം)
 {
     bhdr_T    *hp;
 						// doesn't exist
-    if (nr >= mfp->mf_blocknr_max || nr <= mfp->mf_blocknr_min)
-	return NULL;
+    എങ്കിൽ (nr >= mfp->mf_blocknr_max || nr <= mfp->mf_blocknr_min)
+	തിരികെ ശൂന്യ;
 
     /*
      * see if it is in the cache
      */
     hp = mf_find_hash(mfp, nr);
-    if (hp == NULL)	// not in the hash list
+    എങ്കിൽ (hp == ശൂന്യ)	// not in the hash list
     {
-	if (nr < 0 || nr >= mfp->mf_infile_count)   // can't be in the file
-	    return NULL;
+	എങ്കിൽ (nr < 0 || nr >= mfp->mf_infile_എണ്ണം)   // can't be in the file
+	    തിരികെ ശൂന്യ;
 
 	// could check here if the block is in the free list
 
@@ -430,22 +430,22 @@ mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
 	 * If so, use that block.
 	 * If not, allocate a new block.
 	 */
-	hp = mf_release(mfp, page_count);
-	if (hp == NULL && page_count > 0)
-	    hp = mf_alloc_bhdr(mfp, page_count);
-	if (hp == NULL)
-	    return NULL;
+	hp = mf_release(mfp, page_എണ്ണം);
+	എങ്കിൽ (hp == ശൂന്യ && page_എണ്ണം > 0)
+	    hp = mf_alloc_bhdr(mfp, page_എണ്ണം);
+	എങ്കിൽ (hp == ശൂന്യ)
+	    തിരികെ ശൂന്യ;
 
 	hp->bh_bnum = nr;
 	hp->bh_flags = 0;
-	hp->bh_page_count = page_count;
-	if (mf_read(mfp, hp) == FAIL)	    // cannot read the block!
+	hp->bh_page_എണ്ണം = page_എണ്ണം;
+	എങ്കിൽ (mf_read(mfp, hp) == FAIL)	    // cannot read the block!
 	{
 	    mf_free_bhdr(hp);
-	    return NULL;
+	    തിരികെ ശൂന്യ;
 	}
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	mf_rem_used(mfp, hp);	// remove from list, insert in front below
 	mf_rem_hash(mfp, hp);
@@ -455,7 +455,7 @@ mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
     mf_ins_used(mfp, hp);	// put in front of used list
     mf_ins_hash(mfp, hp);	// put in front of hash list
 
-    return hp;
+    തിരികെ hp;
 }
 
 /*
@@ -466,46 +466,46 @@ mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
  *
  *  no return value, function cannot fail
  */
-    void
+    ശൂന്യം
 mf_put(
     memfile_T	*mfp,
     bhdr_T	*hp,
-    int		dirty,
-    int		infile)
+    പൂർണ്ണസംഖ്യ		dirty,
+    പൂർണ്ണസംഖ്യ		infile)
 {
-    int		flags;
+    പൂർണ്ണസംഖ്യ		flags;
 
     flags = hp->bh_flags;
 
-    if ((flags & BH_LOCKED) == 0)
+    എങ്കിൽ ((flags & BH_LOCKED) == 0)
 	iemsg(e_block_was_not_locked);
     flags &= ~BH_LOCKED;
-    if (dirty)
+    എങ്കിൽ (dirty)
     {
 	flags |= BH_DIRTY;
-	if (mfp->mf_dirty != MF_DIRTY_YES_NOSYNC)
+	എങ്കിൽ (mfp->mf_dirty != MF_DIRTY_YES_NOSYNC)
 	    mfp->mf_dirty = MF_DIRTY_YES;
     }
     hp->bh_flags = flags;
-    if (infile)
+    എങ്കിൽ (infile)
 	mf_trans_add(mfp, hp);	    // may translate negative in positive nr
 }
 
 /*
  * block *hp is no longer in used, may put it in the free list of memfile *mfp
  */
-    void
+    ശൂന്യം
 mf_free(memfile_T *mfp, bhdr_T *hp)
 {
     vim_free(hp->bh_data);	// free the memory
     mf_rem_hash(mfp, hp);	// get *hp out of the hash list
     mf_rem_used(mfp, hp);	// get *hp out of the used list
-    if (hp->bh_bnum < 0)
+    എങ്കിൽ (hp->bh_bnum < 0)
     {
 	vim_free(hp);		// don't want negative numbers in free list
-	mfp->mf_neg_count--;
+	mfp->mf_neg_എണ്ണം--;
     }
-    else
+    അല്ലെങ്കിൽ
 	mf_ins_free(mfp, hp);	// put *hp in the free list
 }
 
@@ -522,18 +522,18 @@ mf_free(memfile_T *mfp, bhdr_T *hp)
  *
  * Return FAIL for failure, OK otherwise
  */
-    int
-mf_sync(memfile_T *mfp, int flags)
+    പൂർണ്ണസംഖ്യ
+mf_sync(memfile_T *mfp, പൂർണ്ണസംഖ്യ flags)
 {
-    int		status;
+    പൂർണ്ണസംഖ്യ		status;
     bhdr_T	*hp;
-    int		got_int_save = got_int;
+    പൂർണ്ണസംഖ്യ		got_int_save = got_int;
 
-    if (mfp->mf_fd < 0)
+    എങ്കിൽ (mfp->mf_fd < 0)
     {
 	// there is no file, nothing to do
 	mfp->mf_dirty = MF_DIRTY_NO;
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     // Only a CTRL-C while writing will break us here, not one typed
@@ -547,108 +547,108 @@ mf_sync(memfile_T *mfp, int flags)
      * fails then we give up.
      */
     status = OK;
-    for (hp = mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
-	if (((flags & MFS_ALL) || hp->bh_bnum >= 0)
+    വേണ്ടി (hp = mfp->mf_used_last; hp != ശൂന്യ; hp = hp->bh_prev)
+	എങ്കിൽ (((flags & MFS_ALL) || hp->bh_bnum >= 0)
 		&& (hp->bh_flags & BH_DIRTY)
 		&& (status == OK || (hp->bh_bnum >= 0
-		    && hp->bh_bnum < mfp->mf_infile_count)))
+		    && hp->bh_bnum < mfp->mf_infile_എണ്ണം)))
 	{
-	    if ((flags & MFS_ZERO) && hp->bh_bnum != 0)
-		continue;
-	    if (mf_write(mfp, hp) == FAIL)
+	    എങ്കിൽ ((flags & MFS_ZERO) && hp->bh_bnum != 0)
+		തുടരുക;
+	    എങ്കിൽ (mf_write(mfp, hp) == FAIL)
 	    {
-		if (status == FAIL)	// double error: quit syncing
-		    break;
+		എങ്കിൽ (status == FAIL)	// double error: quit syncing
+		    നിർത്തുക;
 		status = FAIL;
 	    }
-	    if (flags & MFS_STOP)
+	    എങ്കിൽ (flags & MFS_STOP)
 	    {
 		// Stop when char available now.
-		if (ui_char_avail())
-		    break;
+		എങ്കിൽ (ui_char_avail())
+		    നിർത്തുക;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		ui_breakcheck();
-	    if (got_int)
-		break;
+	    എങ്കിൽ (got_int)
+		നിർത്തുക;
 	}
 
     /*
      * If the whole list is flushed, the memfile is not dirty anymore.
      * In case of an error this flag is also set, to avoid trying all the time.
      */
-    if (hp == NULL || status == FAIL)
+    എങ്കിൽ (hp == ശൂന്യ || status == FAIL)
 	mfp->mf_dirty = MF_DIRTY_NO;
 
-    if ((flags & MFS_FLUSH) && *p_sws != NUL)
+    എങ്കിൽ ((flags & MFS_FLUSH) && *p_sws != NUL)
     {
-#if defined(UNIX)
+#എങ്കിൽ defined(UNIX)
 # ifdef HAVE_FSYNC
 	/*
 	 * most Unixes have the very useful fsync() function, just what we need.
 	 */
-	if (STRCMP(p_sws, "fsync") == 0)
+	എങ്കിൽ (STRCMP(p_sws, "fsync") == 0)
 	{
-	    if (vim_fsync(mfp->mf_fd))
+	    എങ്കിൽ (vim_fsync(mfp->mf_fd))
 		status = FAIL;
 	}
-	else
+	അല്ലെങ്കിൽ
 # endif
 # ifdef HAVE_SYNC
 	    sync();
-# else
-	    fflush(NULL);
+# അല്ലെങ്കിൽ
+	    fflush(ശൂന്യ);
 # endif
 #endif
 #ifdef VMS
-	if (STRCMP(p_sws, "fsync") == 0)
+	എങ്കിൽ (STRCMP(p_sws, "fsync") == 0)
 	{
-	    if (vim_fsync(mfp->mf_fd))
+	    എങ്കിൽ (vim_fsync(mfp->mf_fd))
 		status = FAIL;
 	}
 #endif
 #ifdef MSWIN
-	if (_commit(mfp->mf_fd))
+	എങ്കിൽ (_commit(mfp->mf_fd))
 	    status = FAIL;
 #endif
 #ifdef AMIGA
-# if defined(__AROS__) || defined(__amigaos4__)
-	if (vim_fsync(mfp->mf_fd) != 0)
+# എങ്കിൽ defined(__AROS__) || defined(__amigaos4__)
+	എങ്കിൽ (vim_fsync(mfp->mf_fd) != 0)
 	    status = FAIL;
-# else
+# അല്ലെങ്കിൽ
 	/*
 	 * Flush() only exists for AmigaDos 2.0.
 	 * For 1.3 it should be done with close() + open(), but then the risk
 	 * is that the open() may fail and lose the file....
 	 */
 #  ifdef FEAT_ARP
-	if (dos2)
+	എങ്കിൽ (dos2)
 #  endif
 #  ifdef SASC
 	{
-	    struct UFB *fp = chkufb(mfp->mf_fd);
+	    ഘടന UFB *fp = chkufb(mfp->mf_fd);
 
-	    if (fp != NULL)
+	    എങ്കിൽ (fp != ശൂന്യ)
 		Flush(fp->ufbfh);
 	}
-#  else
-#   if defined(_DCC) || defined(__GNUC__) || defined(__MORPHOS__)
+#  അല്ലെങ്കിൽ
+#   എങ്കിൽ defined(_DCC) || defined(__GNUC__) || defined(__MORPHOS__)
 	{
-#    if defined(__GNUC__) && !defined(__MORPHOS__) && defined(__libnix__)
+#    എങ്കിൽ defined(__GNUC__) && !defined(__MORPHOS__) && defined(__libnix__)
 	    // Have function (in libnix at least),
 	    // but ain't got no prototype anywhere.
-	    extern unsigned long fdtofh(int filedescriptor);
+	    ബാഹ്യ unsigned long fdtofh(പൂർണ്ണസംഖ്യ filedescriptor);
 #    endif
-#    if !defined(__libnix__)
-	    fflush(NULL);
-#    else
+#    എങ്കിൽ !defined(__libnix__)
+	    fflush(ശൂന്യ);
+#    അല്ലെങ്കിൽ
 	    BPTR fh = (BPTR)fdtofh(mfp->mf_fd);
 
-	    if (fh != 0)
+	    എങ്കിൽ (fh != 0)
 		Flush(fh);
 #    endif
 	}
-#   else // assume Manx
+#   അല്ലെങ്കിൽ // assume Manx
 	    Flush(_devtab[mfp->mf_fd].fd);
 #   endif
 #  endif
@@ -658,7 +658,7 @@ mf_sync(memfile_T *mfp, int flags)
 
     got_int |= got_int_save;
 
-    return status;
+    തിരികെ status;
 }
 
 /*
@@ -666,13 +666,13 @@ mf_sync(memfile_T *mfp, int flags)
  * the dirty flag.  These are blocks that need to be written to a newly
  * created swapfile.
  */
-    void
+    ശൂന്യം
 mf_set_dirty(memfile_T *mfp)
 {
     bhdr_T	*hp;
 
-    for (hp = mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
-	if (hp->bh_bnum > 0)
+    വേണ്ടി (hp = mfp->mf_used_last; hp != ശൂന്യ; hp = hp->bh_prev)
+	എങ്കിൽ (hp->bh_bnum > 0)
 	    hp->bh_flags |= BH_DIRTY;
     mfp->mf_dirty = MF_DIRTY_YES;
 }
@@ -680,7 +680,7 @@ mf_set_dirty(memfile_T *mfp)
 /*
  * insert block *hp in front of hashlist of memfile *mfp
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 mf_ins_hash(memfile_T *mfp, bhdr_T *hp)
 {
     mf_hash_add_item(&mfp->mf_hash, (mf_hashitem_T *)hp);
@@ -689,7 +689,7 @@ mf_ins_hash(memfile_T *mfp, bhdr_T *hp)
 /*
  * remove block *hp from hashlist of memfile list *mfp
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 mf_rem_hash(memfile_T *mfp, bhdr_T *hp)
 {
     mf_hash_rem_item(&mfp->mf_hash, (mf_hashitem_T *)hp);
@@ -698,45 +698,45 @@ mf_rem_hash(memfile_T *mfp, bhdr_T *hp)
 /*
  * look in hash lists of memfile *mfp for block header with number 'nr'
  */
-    static bhdr_T *
+    സ്ഥിതം bhdr_T *
 mf_find_hash(memfile_T *mfp, blocknr_T nr)
 {
-    return (bhdr_T *)mf_hash_find(&mfp->mf_hash, nr);
+    തിരികെ (bhdr_T *)mf_hash_find(&mfp->mf_hash, nr);
 }
 
 /*
  * insert block *hp in front of used list of memfile *mfp
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 mf_ins_used(memfile_T *mfp, bhdr_T *hp)
 {
     hp->bh_next = mfp->mf_used_first;
     mfp->mf_used_first = hp;
-    hp->bh_prev = NULL;
-    if (hp->bh_next == NULL)	    // list was empty, adjust last pointer
+    hp->bh_prev = ശൂന്യ;
+    എങ്കിൽ (hp->bh_next == ശൂന്യ)	    // list was empty, adjust last pointer
 	mfp->mf_used_last = hp;
-    else
+    അല്ലെങ്കിൽ
 	hp->bh_next->bh_prev = hp;
-    mfp->mf_used_count += hp->bh_page_count;
-    total_mem_used += (long_u)hp->bh_page_count * mfp->mf_page_size;
+    mfp->mf_used_എണ്ണം += hp->bh_page_എണ്ണം;
+    total_mem_used += (long_u)hp->bh_page_എണ്ണം * mfp->mf_page_size;
 }
 
 /*
  * remove block *hp from used list of memfile *mfp
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 mf_rem_used(memfile_T *mfp, bhdr_T *hp)
 {
-    if (hp->bh_next == NULL)	    // last block in used list
+    എങ്കിൽ (hp->bh_next == ശൂന്യ)	    // last block in used list
 	mfp->mf_used_last = hp->bh_prev;
-    else
+    അല്ലെങ്കിൽ
 	hp->bh_next->bh_prev = hp->bh_prev;
-    if (hp->bh_prev == NULL)	    // first block in used list
+    എങ്കിൽ (hp->bh_prev == ശൂന്യ)	    // first block in used list
 	mfp->mf_used_first = hp->bh_next;
-    else
+    അല്ലെങ്കിൽ
 	hp->bh_prev->bh_next = hp->bh_next;
-    mfp->mf_used_count -= hp->bh_page_count;
-    total_mem_used -= (long_u)hp->bh_page_count * mfp->mf_page_size;
+    mfp->mf_used_എണ്ണം -= hp->bh_page_എണ്ണം;
+    total_mem_used -= (long_u)hp->bh_page_എണ്ണം * mfp->mf_page_size;
 }
 
 /*
@@ -748,35 +748,35 @@ mf_rem_used(memfile_T *mfp, bhdr_T *hp)
  *
  * Returns NULL if no block is released.
  */
-    static bhdr_T *
-mf_release(memfile_T *mfp, int page_count)
+    സ്ഥിതം bhdr_T *
+mf_release(memfile_T *mfp, പൂർണ്ണസംഖ്യ page_എണ്ണം)
 {
     bhdr_T	*hp;
-    int		need_release;
+    പൂർണ്ണസംഖ്യ		need_release;
     buf_T	*buf;
 
     // don't release while in mf_close_file()
-    if (mf_dont_release)
-	return NULL;
+    എങ്കിൽ (mf_dont_release)
+	തിരികെ ശൂന്യ;
 
     /*
      * Need to release a block if the number of blocks for this memfile is
      * higher than the maximum or total memory used is over 'maxmemtot'
      */
-    need_release = ((mfp->mf_used_count >= mfp->mf_used_count_max)
+    need_release = ((mfp->mf_used_എണ്ണം >= mfp->mf_used_എണ്ണം_max)
 				  || (total_mem_used >> 10) >= (long_u)p_mmt);
 
     /*
      * Try to create a swap file if the amount of memory used is getting too
      * high.
      */
-    if (mfp->mf_fd < 0 && need_release && p_uc)
+    എങ്കിൽ (mfp->mf_fd < 0 && need_release && p_uc)
     {
 	// find for which buffer this memfile is
 	FOR_ALL_BUFFERS(buf)
-	    if (buf->b_ml.ml_mfp == mfp)
-		break;
-	if (buf != NULL && buf->b_may_swap)
+	    എങ്കിൽ (buf->b_ml.ml_mfp == mfp)
+		നിർത്തുക;
+	എങ്കിൽ (buf != ശൂന്യ && buf->b_may_swap)
 	    ml_open_file(buf);
     }
 
@@ -788,21 +788,21 @@ mf_release(memfile_T *mfp, int page_count)
      *	  and
      *	total memory used is not up to 'maxmemtot'
      */
-    if (mfp->mf_fd < 0 || !need_release)
-	return NULL;
+    എങ്കിൽ (mfp->mf_fd < 0 || !need_release)
+	തിരികെ ശൂന്യ;
 
-    for (hp = mfp->mf_used_last; hp != NULL; hp = hp->bh_prev)
-	if (!(hp->bh_flags & BH_LOCKED))
-	    break;
-    if (hp == NULL)	// not a single one that can be released
-	return NULL;
+    വേണ്ടി (hp = mfp->mf_used_last; hp != ശൂന്യ; hp = hp->bh_prev)
+	എങ്കിൽ (!(hp->bh_flags & BH_LOCKED))
+	    നിർത്തുക;
+    എങ്കിൽ (hp == ശൂന്യ)	// not a single one that can be released
+	തിരികെ ശൂന്യ;
 
     /*
      * If the block is dirty, write it.
      * If the write fails we don't free it.
      */
-    if ((hp->bh_flags & BH_DIRTY) && mf_write(mfp, hp) == FAIL)
-	return NULL;
+    എങ്കിൽ ((hp->bh_flags & BH_DIRTY) && mf_write(mfp, hp) == FAIL)
+	തിരികെ ശൂന്യ;
 
     mf_rem_used(mfp, hp);
     mf_rem_hash(mfp, hp);
@@ -811,19 +811,19 @@ mf_release(memfile_T *mfp, int page_count)
      * If a bhdr_T is returned, make sure that the page_count of bh_data is
      * right
      */
-    if (hp->bh_page_count != page_count)
+    എങ്കിൽ (hp->bh_page_എണ്ണം != page_എണ്ണം)
     {
 	VIM_CLEAR(hp->bh_data);
-	if (page_count > 0)
-	    hp->bh_data = alloc((size_t)mfp->mf_page_size * page_count);
-	if (hp->bh_data == NULL)
+	എങ്കിൽ (page_എണ്ണം > 0)
+	    hp->bh_data = alloc((size_t)mfp->mf_page_size * page_എണ്ണം);
+	എങ്കിൽ (hp->bh_data == ശൂന്യ)
 	{
 	    vim_free(hp);
-	    return NULL;
+	    തിരികെ ശൂന്യ;
 	}
-	hp->bh_page_count = page_count;
+	hp->bh_page_എണ്ണം = page_എണ്ണം;
     }
-    return hp;
+    തിരികെ hp;
 }
 
 /*
@@ -832,29 +832,29 @@ mf_release(memfile_T *mfp, int page_count)
  *
  * return TRUE if any memory was released
  */
-    int
-mf_release_all(void)
+    പൂർണ്ണസംഖ്യ
+mf_release_all(ശൂന്യം)
 {
     buf_T	*buf;
     memfile_T	*mfp;
     bhdr_T	*hp;
-    int		retval = FALSE;
+    പൂർണ്ണസംഖ്യ		retval = FALSE;
 
     FOR_ALL_BUFFERS(buf)
     {
 	mfp = buf->b_ml.ml_mfp;
-	if (mfp != NULL)
+	എങ്കിൽ (mfp != ശൂന്യ)
 	{
 	    // If no swap file yet, may open one
-	    if (mfp->mf_fd < 0 && buf->b_may_swap)
+	    എങ്കിൽ (mfp->mf_fd < 0 && buf->b_may_swap)
 		ml_open_file(buf);
 
 	    // only if there is a swapfile
-	    if (mfp->mf_fd >= 0)
+	    എങ്കിൽ (mfp->mf_fd >= 0)
 	    {
-		for (hp = mfp->mf_used_last; hp != NULL; )
+		വേണ്ടി (hp = mfp->mf_used_last; hp != ശൂന്യ; )
 		{
-		    if (!(hp->bh_flags & BH_LOCKED)
+		    എങ്കിൽ (!(hp->bh_flags & BH_LOCKED)
 			    && (!(hp->bh_flags & BH_DIRTY)
 				|| mf_write(mfp, hp) != FAIL))
 		    {
@@ -864,39 +864,39 @@ mf_release_all(void)
 			hp = mfp->mf_used_last;	// re-start, list was changed
 			retval = TRUE;
 		    }
-		    else
+		    അല്ലെങ്കിൽ
 			hp = hp->bh_prev;
 		}
 	    }
 	}
     }
-    return retval;
+    തിരികെ retval;
 }
 
 /*
  * Allocate a block header and a block of memory for it.
  */
-    static bhdr_T *
-mf_alloc_bhdr(memfile_T *mfp, int page_count)
+    സ്ഥിതം bhdr_T *
+mf_alloc_bhdr(memfile_T *mfp, പൂർണ്ണസംഖ്യ page_എണ്ണം)
 {
     bhdr_T	*hp;
 
-    if ((hp = ALLOC_ONE(bhdr_T)) == NULL)
-	return NULL;
+    എങ്കിൽ ((hp = ALLOC_ONE(bhdr_T)) == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
-    if ((hp->bh_data = alloc((size_t)mfp->mf_page_size * page_count)) == NULL)
+    എങ്കിൽ ((hp->bh_data = alloc((size_t)mfp->mf_page_size * page_എണ്ണം)) == ശൂന്യ)
     {
 	vim_free(hp);	    // not enough memory
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
-    hp->bh_page_count = page_count;
-    return hp;
+    hp->bh_page_എണ്ണം = page_എണ്ണം;
+    തിരികെ hp;
 }
 
 /*
  * Free a block header and the block of memory for it.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 mf_free_bhdr(bhdr_T *hp)
 {
     vim_free(hp->bh_data);
@@ -906,7 +906,7 @@ mf_free_bhdr(bhdr_T *hp)
 /*
  * Insert entry *hp in the free list.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 mf_ins_free(memfile_T *mfp, bhdr_T *hp)
 {
     hp->bh_next = mfp->mf_free_first;
@@ -917,14 +917,14 @@ mf_ins_free(memfile_T *mfp, bhdr_T *hp)
  * remove the first entry from the free list and return a pointer to it
  * Note: caller must check that mfp->mf_free_first is not NULL!
  */
-    static bhdr_T *
+    സ്ഥിതം bhdr_T *
 mf_rem_free(memfile_T *mfp)
 {
     bhdr_T	*hp;
 
     hp = mfp->mf_free_first;
     mfp->mf_free_first = hp->bh_next;
-    return hp;
+    തിരികെ hp;
 }
 
 /*
@@ -932,38 +932,38 @@ mf_rem_free(memfile_T *mfp)
  *
  * Return FAIL for failure, OK otherwise
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 mf_read(memfile_T *mfp, bhdr_T *hp)
 {
     off_T	offset;
     unsigned	page_size;
     unsigned	size;
 
-    if (mfp->mf_fd < 0)	    // there is no file, can't read
-	return FAIL;
+    എങ്കിൽ (mfp->mf_fd < 0)	    // there is no file, can't read
+	തിരികെ FAIL;
 
     page_size = mfp->mf_page_size;
     offset = (off_T)page_size * hp->bh_bnum;
-    size = page_size * hp->bh_page_count;
-    if (vim_lseek(mfp->mf_fd, offset, SEEK_SET) != offset)
+    size = page_size * hp->bh_page_എണ്ണം;
+    എങ്കിൽ (vim_lseek(mfp->mf_fd, offset, SEEK_SET) != offset)
     {
 	PERROR(_(e_seek_error_in_swap_file_read));
-	return FAIL;
+	തിരികെ FAIL;
     }
-    if ((unsigned)read_eintr(mfp->mf_fd, hp->bh_data, size) != size)
+    എങ്കിൽ ((unsigned)read_eintr(mfp->mf_fd, hp->bh_data, size) != size)
     {
 	PERROR(_(e_read_error_in_swap_file));
-	return FAIL;
+	തിരികെ FAIL;
     }
 
 #ifdef FEAT_CRYPT
     // Decrypt if 'key' is set and this is a data block. And when changing the
     // key.
-    if (*mfp->mf_buffer->b_p_key != NUL || mfp->mf_old_key != NULL)
+    എങ്കിൽ (*mfp->mf_buffer->b_p_താക്കോൽ != NUL || mfp->mf_old_താക്കോൽ != ശൂന്യ)
 	ml_decrypt_data(mfp, hp->bh_data, offset, size);
 #endif
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -971,23 +971,23 @@ mf_read(memfile_T *mfp, bhdr_T *hp)
  *
  * Return FAIL for failure, OK otherwise
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 mf_write(memfile_T *mfp, bhdr_T *hp)
 {
     off_T	offset;	    // offset in the file
     blocknr_T	nr;	    // block nr which is being written
     bhdr_T	*hp2;
     unsigned	page_size;  // number of bytes in a page
-    unsigned	page_count; // number of pages written
+    unsigned	page_എണ്ണം; // number of pages written
     unsigned	size;	    // number of bytes written
 
-    if (mfp->mf_fd < 0 && !mfp->mf_reopen)
+    എങ്കിൽ (mfp->mf_fd < 0 && !mfp->mf_reopen)
 	// there is no file and there was no file, can't write
-	return FAIL;
+	തിരികെ FAIL;
 
-    if (hp->bh_bnum < 0)	// must assign file block number
-	if (mf_trans_add(mfp, hp) == FAIL)
-	    return FAIL;
+    എങ്കിൽ (hp->bh_bnum < 0)	// must assign file block number
+	എങ്കിൽ (mf_trans_add(mfp, hp) == FAIL)
+	    തിരികെ FAIL;
 
     page_size = mfp->mf_page_size;
 
@@ -997,73 +997,73 @@ mf_write(memfile_T *mfp, bhdr_T *hp)
      * If block 'mf_infile_count' is not in the hash list, it has been
      * freed. Fill the space in the file with data from the current block.
      */
-    for (;;)
+    വേണ്ടി (;;)
     {
-	int attempt;
+	പൂർണ്ണസംഖ്യ attempt;
 
 	nr = hp->bh_bnum;
-	if (nr > mfp->mf_infile_count)		// beyond end of file
+	എങ്കിൽ (nr > mfp->mf_infile_എണ്ണം)		// beyond end of file
 	{
-	    nr = mfp->mf_infile_count;
+	    nr = mfp->mf_infile_എണ്ണം;
 	    hp2 = mf_find_hash(mfp, nr);	// NULL caught below
 	}
-	else
+	അല്ലെങ്കിൽ
 	    hp2 = hp;
 
 	offset = (off_T)page_size * nr;
-	if (hp2 == NULL)	    // freed block, fill with dummy data
-	    page_count = 1;
-	else
-	    page_count = hp2->bh_page_count;
-	size = page_size * page_count;
+	എങ്കിൽ (hp2 == ശൂന്യ)	    // freed block, fill with dummy data
+	    page_എണ്ണം = 1;
+	അല്ലെങ്കിൽ
+	    page_എണ്ണം = hp2->bh_page_എണ്ണം;
+	size = page_size * page_എണ്ണം;
 
-	for (attempt = 1; attempt <= 2; ++attempt)
+	വേണ്ടി (attempt = 1; attempt <= 2; ++attempt)
 	{
-	    if (mfp->mf_fd >= 0)
+	    എങ്കിൽ (mfp->mf_fd >= 0)
 	    {
-		if (vim_lseek(mfp->mf_fd, offset, SEEK_SET) != offset)
+		എങ്കിൽ (vim_lseek(mfp->mf_fd, offset, SEEK_SET) != offset)
 		{
 		    PERROR(_(e_seek_error_in_swap_file_write));
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
-		if (mf_write_block(mfp,
-				   hp2 == NULL ? hp : hp2, offset, size) == OK)
-		    break;
+		എങ്കിൽ (mf_write_block(mfp,
+				   hp2 == ശൂന്യ ? hp : hp2, offset, size) == OK)
+		    നിർത്തുക;
 	    }
 
-	    if (attempt == 1)
+	    എങ്കിൽ (attempt == 1)
 	    {
 		// If the swap file is on a network drive, and the network
 		// gets disconnected and then re-connected, we can maybe fix it
 		// by closing and then re-opening the file.
-		if (mfp->mf_fd >= 0)
+		എങ്കിൽ (mfp->mf_fd >= 0)
 		    close(mfp->mf_fd);
-		mfp->mf_fd = mch_open_rw((char *)mfp->mf_fname, mfp->mf_flags);
+		mfp->mf_fd = mch_open_rw((അക്ഷരം *)mfp->mf_fname, mfp->mf_flags);
 		mfp->mf_reopen = (mfp->mf_fd < 0);
 	    }
-	    if (attempt == 2 || mfp->mf_fd < 0)
+	    എങ്കിൽ (attempt == 2 || mfp->mf_fd < 0)
 	    {
 		// Avoid repeating the error message, this mostly happens when
 		// the disk is full. We give the message again only after a
 		// successful write or when hitting a key. We keep on trying,
 		// in case some space becomes available.
-		if (!did_swapwrite_msg)
+		എങ്കിൽ (!did_swapwrite_സന്ദേശം)
 		    emsg(_(e_write_error_in_swap_file));
-		did_swapwrite_msg = TRUE;
-		return FAIL;
+		did_swapwrite_സന്ദേശം = TRUE;
+		തിരികെ FAIL;
 	    }
 	}
 
-	did_swapwrite_msg = FALSE;
-	if (hp2 != NULL)		    // written a non-dummy block
+	did_swapwrite_സന്ദേശം = FALSE;
+	എങ്കിൽ (hp2 != ശൂന്യ)		    // written a non-dummy block
 	    hp2->bh_flags &= ~BH_DIRTY;
 					    // appended to the file
-	if (nr + (blocknr_T)page_count > mfp->mf_infile_count)
-	    mfp->mf_infile_count = nr + page_count;
-	if (nr == hp->bh_bnum)		    // written the desired block
-	    break;
+	എങ്കിൽ (nr + (blocknr_T)page_എണ്ണം > mfp->mf_infile_എണ്ണം)
+	    mfp->mf_infile_എണ്ണം = nr + page_എണ്ണം;
+	എങ്കിൽ (nr == hp->bh_bnum)		    // written the desired block
+	    നിർത്തുക;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1071,7 +1071,7 @@ mf_write(memfile_T *mfp, bhdr_T *hp)
  * Takes care of encryption.
  * Return FAIL or OK.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 mf_write_block(
     memfile_T	*mfp,
     bhdr_T	*hp,
@@ -1079,27 +1079,27 @@ mf_write_block(
     unsigned	size)
 {
     char_u	*data = hp->bh_data;
-    int		result = OK;
+    പൂർണ്ണസംഖ്യ		result = OK;
 
 #ifdef FEAT_CRYPT
     // Encrypt if 'key' is set and this is a data block.
-    if (*mfp->mf_buffer->b_p_key != NUL)
+    എങ്കിൽ (*mfp->mf_buffer->b_p_താക്കോൽ != NUL)
     {
 	data = ml_encrypt_data(mfp, data, offset, size);
-	if (data == NULL)
-	    return FAIL;
+	എങ്കിൽ (data == ശൂന്യ)
+	    തിരികെ FAIL;
     }
 #endif
 
-    if ((unsigned)write_eintr(mfp->mf_fd, data, size) != size)
+    എങ്കിൽ ((unsigned)write_eintr(mfp->mf_fd, data, size) != size)
 	result = FAIL;
 
 #ifdef FEAT_CRYPT
-    if (data != hp->bh_data)
+    എങ്കിൽ (data != hp->bh_data)
 	vim_free(data);
 #endif
 
-    return result;
+    തിരികെ result;
 }
 
 /*
@@ -1107,19 +1107,19 @@ mf_write_block(
  *
  * Return FAIL for failure, OK otherwise
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 mf_trans_add(memfile_T *mfp, bhdr_T *hp)
 {
     bhdr_T	*freep;
     blocknr_T	new_bnum;
     NR_TRANS	*np;
-    int		page_count;
+    പൂർണ്ണസംഖ്യ		page_എണ്ണം;
 
-    if (hp->bh_bnum >= 0)		    // it's already positive
-	return OK;
+    എങ്കിൽ (hp->bh_bnum >= 0)		    // it's already positive
+	തിരികെ OK;
 
-    if ((np = ALLOC_ONE(NR_TRANS)) == NULL)
-	return FAIL;
+    എങ്കിൽ ((np = ALLOC_ONE(NR_TRANS)) == ശൂന്യ)
+	തിരികെ FAIL;
 
 /*
  * Get a new number for the block.
@@ -1127,29 +1127,29 @@ mf_trans_add(memfile_T *mfp, bhdr_T *hp)
  * Otherwise use mf_blocknr_max.
  */
     freep = mfp->mf_free_first;
-    page_count = hp->bh_page_count;
-    if (freep != NULL && freep->bh_page_count >= page_count)
+    page_എണ്ണം = hp->bh_page_എണ്ണം;
+    എങ്കിൽ (freep != ശൂന്യ && freep->bh_page_എണ്ണം >= page_എണ്ണം)
     {
 	new_bnum = freep->bh_bnum;
 	/*
 	 * If the page count of the free block was larger, reduce it.
 	 * If the page count matches, remove the block from the free list
 	 */
-	if (freep->bh_page_count > page_count)
+	എങ്കിൽ (freep->bh_page_എണ്ണം > page_എണ്ണം)
 	{
-	    freep->bh_bnum += page_count;
-	    freep->bh_page_count -= page_count;
+	    freep->bh_bnum += page_എണ്ണം;
+	    freep->bh_page_എണ്ണം -= page_എണ്ണം;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    freep = mf_rem_free(mfp);
 	    vim_free(freep);
 	}
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	new_bnum = mfp->mf_blocknr_max;
-	mfp->mf_blocknr_max += page_count;
+	mfp->mf_blocknr_max += page_എണ്ണം;
     }
 
     np->nt_old_bnum = hp->bh_bnum;	    // adjust number
@@ -1162,7 +1162,7 @@ mf_trans_add(memfile_T *mfp, bhdr_T *hp)
     // Insert "np" into "mf_trans" hashtable with key "np->nt_old_bnum"
     mf_hash_add_item(&mfp->mf_trans, (mf_hashitem_T *)np);
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1178,10 +1178,10 @@ mf_trans_del(memfile_T *mfp, blocknr_T old_nr)
 
     np = (NR_TRANS *)mf_hash_find(&mfp->mf_trans, old_nr);
 
-    if (np == NULL)		// not found
-	return old_nr;
+    എങ്കിൽ (np == ശൂന്യ)		// not found
+	തിരികെ old_nr;
 
-    mfp->mf_neg_count--;
+    mfp->mf_neg_എണ്ണം--;
     new_bnum = np->nt_new_bnum;
 
     // remove entry from the trans list
@@ -1189,7 +1189,7 @@ mf_trans_del(memfile_T *mfp, blocknr_T old_nr)
 
     vim_free(np);
 
-    return new_bnum;
+    തിരികെ new_bnum;
 }
 
 /*
@@ -1197,7 +1197,7 @@ mf_trans_del(memfile_T *mfp, blocknr_T old_nr)
  * Only called when creating or renaming the swapfile.	Either way it's a new
  * name so we must work out the full path name.
  */
-    void
+    ശൂന്യം
 mf_set_ffname(memfile_T *mfp)
 {
     mfp->mf_ffname = FullName_save(mfp->mf_fname, FALSE);
@@ -1207,24 +1207,24 @@ mf_set_ffname(memfile_T *mfp)
  * Make the name of the file used for the memfile a full path.
  * Used before doing a :cd
  */
-    void
+    ശൂന്യം
 mf_fullname(memfile_T *mfp)
 {
-    if (mfp == NULL || mfp->mf_fname == NULL || mfp->mf_ffname == NULL)
-	return;
+    എങ്കിൽ (mfp == ശൂന്യ || mfp->mf_fname == ശൂന്യ || mfp->mf_ffname == ശൂന്യ)
+	തിരികെ;
 
     vim_free(mfp->mf_fname);
     mfp->mf_fname = mfp->mf_ffname;
-    mfp->mf_ffname = NULL;
+    mfp->mf_ffname = ശൂന്യ;
 }
 
 /*
  * return TRUE if there are any translations pending for 'mfp'
  */
-    int
+    പൂർണ്ണസംഖ്യ
 mf_need_trans(memfile_T *mfp)
 {
-    return (mfp->mf_fname != NULL && mfp->mf_neg_count > 0);
+    തിരികെ (mfp->mf_fname != ശൂന്യ && mfp->mf_neg_എണ്ണം > 0);
 }
 
 /*
@@ -1232,11 +1232,11 @@ mf_need_trans(memfile_T *mfp)
  * The "fname" must be in allocated memory, and is consumed (also when an
  * error occurs).
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 mf_do_open(
     memfile_T	*mfp,
     char_u	*fname,
-    int		flags)		// flags for open()
+    പൂർണ്ണസംഖ്യ		flags)		// flags for open()
 {
 #ifdef HAVE_LSTAT
     stat_T	sb;
@@ -1250,7 +1250,7 @@ mf_do_open(
      * fname cannot be NameBuff, because it must have been allocated.
      */
     mf_set_ffname(mfp);
-#if defined(MSWIN)
+#എങ്കിൽ defined(MSWIN)
     /*
      * A ":!cd e:xxx" may change the directory without us knowing, use the
      * full pathname always.  Careful: This frees fname!
@@ -1263,12 +1263,12 @@ mf_do_open(
      * Extra security check: When creating a swap file it really shouldn't
      * exist yet.  If there is a symbolic link, this is most likely an attack.
      */
-    if ((flags & O_CREAT) && mch_lstat((char *)mfp->mf_fname, &sb) >= 0)
+    എങ്കിൽ ((flags & O_CREAT) && mch_lstat((അക്ഷരം *)mfp->mf_fname, &sb) >= 0)
     {
 	mfp->mf_fd = -1;
 	emsg(_(e_swap_file_already_exists_symlink_attack));
     }
-    else
+    അല്ലെങ്കിൽ
 #endif
     {
 	/*
@@ -1282,25 +1282,25 @@ mf_do_open(
 	flags |= O_NOINHERIT;
 #endif
 	mfp->mf_flags = flags;
-	mfp->mf_fd = mch_open_rw((char *)mfp->mf_fname, flags);
+	mfp->mf_fd = mch_open_rw((അക്ഷരം *)mfp->mf_fname, flags);
     }
 
     /*
      * If the file cannot be opened, use memory only
      */
-    if (mfp->mf_fd < 0)
+    എങ്കിൽ (mfp->mf_fd < 0)
     {
 	VIM_CLEAR(mfp->mf_fname);
 	VIM_CLEAR(mfp->mf_ffname);
     }
-    else
+    അല്ലെങ്കിൽ
     {
 #ifdef HAVE_FD_CLOEXEC
-	int fdflags = fcntl(mfp->mf_fd, F_GETFD);
-	if (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
-	    (void)fcntl(mfp->mf_fd, F_SETFD, fdflags | FD_CLOEXEC);
+	പൂർണ്ണസംഖ്യ fdflags = fcntl(mfp->mf_fd, F_GETFD);
+	എങ്കിൽ (fdflags >= 0 && (fdflags & FD_CLOEXEC) == 0)
+	    (ശൂന്യം)fcntl(mfp->mf_fd, F_SETFD, fdflags | FD_CLOEXEC);
 #endif
-#if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+#എങ്കിൽ defined(HAVE_SELINUX) || defined(HAVE_SMACK)
 	mch_copy_sec(fname, mfp->mf_fname);
 #endif
 	mch_hide(mfp->mf_fname);    // try setting the 'hidden' flag
@@ -1322,7 +1322,7 @@ mf_do_open(
 /*
  * Initialize an empty hash table.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 mf_hash_init(mf_hashtab_T *mht)
 {
     CLEAR_POINTER(mht);
@@ -1334,25 +1334,25 @@ mf_hash_init(mf_hashtab_T *mht)
  * Free the array of a hash table.  Does not free the items it contains!
  * The hash table must not be used again without another mf_hash_init() call.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 mf_hash_free(mf_hashtab_T *mht)
 {
-    if (mht->mht_buckets != mht->mht_small_buckets)
+    എങ്കിൽ (mht->mht_buckets != mht->mht_small_buckets)
 	vim_free(mht->mht_buckets);
 }
 
 /*
  * Free the array of a hash table and all the items it contains.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 mf_hash_free_all(mf_hashtab_T *mht)
 {
     long_u	    idx;
     mf_hashitem_T   *mhi;
     mf_hashitem_T   *next;
 
-    for (idx = 0; idx <= mht->mht_mask; idx++)
-	for (mhi = mht->mht_buckets[idx]; mhi != NULL; mhi = next)
+    വേണ്ടി (idx = 0; idx <= mht->mht_mask; idx++)
+	വേണ്ടി (mhi = mht->mht_buckets[idx]; mhi != ശൂന്യ; mhi = next)
 	{
 	    next = mhi->mhi_next;
 	    vim_free(mhi);
@@ -1365,44 +1365,44 @@ mf_hash_free_all(mf_hashtab_T *mht)
  * Find "key" in hashtable "mht".
  * Returns a pointer to a mf_hashitem_T or NULL if the item was not found.
  */
-    static mf_hashitem_T *
-mf_hash_find(mf_hashtab_T *mht, blocknr_T key)
+    സ്ഥിതം mf_hashitem_T *
+mf_hash_find(mf_hashtab_T *mht, blocknr_T താക്കോൽ)
 {
     mf_hashitem_T   *mhi;
 
-    mhi = mht->mht_buckets[key & mht->mht_mask];
-    while (mhi != NULL && mhi->mhi_key != key)
+    mhi = mht->mht_buckets[താക്കോൽ & mht->mht_mask];
+    ആകുമ്പോൾ (mhi != ശൂന്യ && mhi->mhi_താക്കോൽ != താക്കോൽ)
 	mhi = mhi->mhi_next;
 
-    return mhi;
+    തിരികെ mhi;
 }
 
 /*
  * Add item "mhi" to hashtable "mht".
  * "mhi" must not be NULL.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 mf_hash_add_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
 {
     long_u	    idx;
 
-    idx = mhi->mhi_key & mht->mht_mask;
+    idx = mhi->mhi_താക്കോൽ & mht->mht_mask;
     mhi->mhi_next = mht->mht_buckets[idx];
-    mhi->mhi_prev = NULL;
-    if (mhi->mhi_next != NULL)
+    mhi->mhi_prev = ശൂന്യ;
+    എങ്കിൽ (mhi->mhi_next != ശൂന്യ)
 	mhi->mhi_next->mhi_prev = mhi;
     mht->mht_buckets[idx] = mhi;
 
-    mht->mht_count++;
+    mht->mht_എണ്ണം++;
 
     /*
      * Grow hashtable when we have more thank 2^MHT_LOG_LOAD_FACTOR
      * items per bucket on average
      */
-    if (mht->mht_fixed == 0
-	&& (mht->mht_count >> MHT_LOG_LOAD_FACTOR) > mht->mht_mask)
+    എങ്കിൽ (mht->mht_fixed == 0
+	&& (mht->mht_എണ്ണം >> MHT_LOG_LOAD_FACTOR) > mht->mht_mask)
     {
-	if (mf_hash_grow(mht) == FAIL)
+	എങ്കിൽ (mf_hash_grow(mht) == FAIL)
 	{
 	    // stop trying to grow after first failure to allocate memory
 	    mht->mht_fixed = 1;
@@ -1414,18 +1414,18 @@ mf_hash_add_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
  * Remove item "mhi" from hashtable "mht".
  * "mhi" must not be NULL and must have been inserted into "mht".
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 mf_hash_rem_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
 {
-    if (mhi->mhi_prev == NULL)
-	mht->mht_buckets[mhi->mhi_key & mht->mht_mask] = mhi->mhi_next;
-    else
+    എങ്കിൽ (mhi->mhi_prev == ശൂന്യ)
+	mht->mht_buckets[mhi->mhi_താക്കോൽ & mht->mht_mask] = mhi->mhi_next;
+    അല്ലെങ്കിൽ
 	mhi->mhi_prev->mhi_next = mhi->mhi_next;
 
-    if (mhi->mhi_next != NULL)
+    എങ്കിൽ (mhi->mhi_next != ശൂന്യ)
 	mhi->mhi_next->mhi_prev = mhi->mhi_prev;
 
-    mht->mht_count--;
+    mht->mht_എണ്ണം--;
 
     // We could shrink the table here, but it typically takes little memory,
     // so why bother?
@@ -1436,26 +1436,26 @@ mf_hash_rem_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
  * rehash items.
  * Returns FAIL when out of memory.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 mf_hash_grow(mf_hashtab_T *mht)
 {
     long_u	    i, j;
-    int		    shift;
+    പൂർണ്ണസംഖ്യ		    shift;
     mf_hashitem_T   *mhi;
     mf_hashitem_T   *tails[MHT_GROWTH_FACTOR];
     mf_hashitem_T   **buckets;
     size_t	    size;
 
-    size = (mht->mht_mask + 1) * MHT_GROWTH_FACTOR * sizeof(void *);
+    size = (mht->mht_mask + 1) * MHT_GROWTH_FACTOR * വലുപ്പം(ശൂന്യം *);
     buckets = lalloc_clear(size, FALSE);
-    if (buckets == NULL)
-	return FAIL;
+    എങ്കിൽ (buckets == ശൂന്യ)
+	തിരികെ FAIL;
 
     shift = 0;
-    while ((mht->mht_mask >> shift) != 0)
+    ആകുമ്പോൾ ((mht->mht_mask >> shift) != 0)
 	shift++;
 
-    for (i = 0; i <= mht->mht_mask; i++)
+    വേണ്ടി (i = 0; i <= mht->mht_mask; i++)
     {
 	/*
 	 * Traverse the items in the i-th original bucket and move them into
@@ -1470,16 +1470,16 @@ mf_hash_grow(mf_hashtab_T *mht)
 
 	CLEAR_FIELD(tails);
 
-	for (mhi = mht->mht_buckets[i]; mhi != NULL; mhi = mhi->mhi_next)
+	വേണ്ടി (mhi = mht->mht_buckets[i]; mhi != ശൂന്യ; mhi = mhi->mhi_next)
 	{
-	    j = (mhi->mhi_key >> shift) & (MHT_GROWTH_FACTOR - 1);
-	    if (tails[j] == NULL)
+	    j = (mhi->mhi_താക്കോൽ >> shift) & (MHT_GROWTH_FACTOR - 1);
+	    എങ്കിൽ (tails[j] == ശൂന്യ)
 	    {
 		buckets[i + (j << shift)] = mhi;
 		tails[j] = mhi;
-		mhi->mhi_prev = NULL;
+		mhi->mhi_prev = ശൂന്യ;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		tails[j]->mhi_next = mhi;
 		mhi->mhi_prev = tails[j];
@@ -1487,16 +1487,16 @@ mf_hash_grow(mf_hashtab_T *mht)
 	    }
 	}
 
-	for (j = 0; j < MHT_GROWTH_FACTOR; j++)
-	    if (tails[j] != NULL)
-		tails[j]->mhi_next = NULL;
+	വേണ്ടി (j = 0; j < MHT_GROWTH_FACTOR; j++)
+	    എങ്കിൽ (tails[j] != ശൂന്യ)
+		tails[j]->mhi_next = ശൂന്യ;
     }
 
-    if (mht->mht_buckets != mht->mht_small_buckets)
+    എങ്കിൽ (mht->mht_buckets != mht->mht_small_buckets)
 	vim_free(mht->mht_buckets);
 
     mht->mht_buckets = buckets;
     mht->mht_mask = (mht->mht_mask + 1) * MHT_GROWTH_FACTOR - 1;
 
-    return OK;
+    തിരികെ OK;
 }

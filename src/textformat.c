@@ -11,9 +11,9 @@
  * textformat.c: text formatting functions
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-static int	did_add_space = FALSE;	// auto_format() added an extra space
+സ്ഥിതം പൂർണ്ണസംഖ്യ	did_add_space = FALSE;	// auto_format() added an extra space
 					// under the cursor
 
 #define WHITECHAR(cc) (VIM_ISWHITE(cc) && (!enc_utf8 || !utf_iscomposing(utf_ptr2char(ml_get_cursor() + 1))))
@@ -22,12 +22,12 @@ static int	did_add_space = FALSE;	// auto_format() added an extra space
  * Return TRUE if format option 'x' is in effect.
  * Take care of no formatting when 'paste' is set.
  */
-    int
-has_format_option(int x)
+    പൂർണ്ണസംഖ്യ
+has_format_option(പൂർണ്ണസംഖ്യ x)
 {
-    if (p_paste)
-	return FALSE;
-    return (vim_strchr(curbuf->b_p_fo, x) != NULL);
+    എങ്കിൽ (p_paste)
+	തിരികെ FALSE;
+    തിരികെ (vim_strchr(curbuf->b_p_fo, x) != ശൂന്യ);
 }
 
 /*
@@ -36,30 +36,30 @@ has_format_option(int x)
  * If the INSCHAR_COM_LIST flag is present, then the value of second_indent
  * will be the comment leader length sent to open_line().
  */
-    void
+    ശൂന്യം
 internal_format(
-    int		textwidth,
-    int		second_indent,
-    int		flags,
-    int		format_only,
-    int		c) // character to be inserted (can be NUL)
+    പൂർണ്ണസംഖ്യ		textwidth,
+    പൂർണ്ണസംഖ്യ		second_indent,
+    പൂർണ്ണസംഖ്യ		flags,
+    പൂർണ്ണസംഖ്യ		format_only,
+    പൂർണ്ണസംഖ്യ		c) // character to be inserted (can be NUL)
 {
-    int		cc;
-    int		skip_pos;
-    int		save_char = NUL;
-    int		haveto_redraw = FALSE;
-    int		fo_ins_blank = has_format_option(FO_INS_BLANK);
-    int		fo_multibyte = has_format_option(FO_MBYTE_BREAK);
-    int		fo_rigor_tw  = has_format_option(FO_RIGOROUS_TW);
-    int		fo_white_par = has_format_option(FO_WHITE_PAR);
-    int		first_line = TRUE;
+    പൂർണ്ണസംഖ്യ		cc;
+    പൂർണ്ണസംഖ്യ		skip_pos;
+    പൂർണ്ണസംഖ്യ		save_char = NUL;
+    പൂർണ്ണസംഖ്യ		haveto_redraw = FALSE;
+    പൂർണ്ണസംഖ്യ		fo_ins_blank = has_format_option(FO_INS_BLANK);
+    പൂർണ്ണസംഖ്യ		fo_multibyte = has_format_option(FO_MBYTE_BREAK);
+    പൂർണ്ണസംഖ്യ		fo_rigor_tw  = has_format_option(FO_RIGOROUS_TW);
+    പൂർണ്ണസംഖ്യ		fo_white_par = has_format_option(FO_WHITE_PAR);
+    പൂർണ്ണസംഖ്യ		first_വരി = TRUE;
     colnr_T	leader_len;
-    int		no_leader = FALSE;
-    int		do_comments = (flags & INSCHAR_DO_COM);
-    int		safe_tw = trim_to_int(8 * (vimlong_T)textwidth);
+    പൂർണ്ണസംഖ്യ		no_leader = FALSE;
+    പൂർണ്ണസംഖ്യ		do_comments = (flags & INSCHAR_DO_COM);
+    പൂർണ്ണസംഖ്യ		safe_tw = trim_to_int(8 * (vimlong_T)textwidth);
 #ifdef FEAT_LINEBREAK
-    int		has_lbr = curwin->w_p_lbr;
-    int		has_bri = curwin->w_p_bri;
+    പൂർണ്ണസംഖ്യ		has_lbr = curwin->w_p_lbr;
+    പൂർണ്ണസംഖ്യ		has_bri = curwin->w_p_bri;
 
     // make sure win_lbr_chartabsize() counts correctly
     curwin->w_p_lbr = FALSE;
@@ -68,10 +68,10 @@ internal_format(
 
     // When 'ai' is off we don't want a space under the cursor to be
     // deleted.  Replace it with an 'x' temporarily.
-    if (!curbuf->b_p_ai && !(State & VREPLACE_FLAG))
+    എങ്കിൽ (!curbuf->b_p_ai && !(State & VREPLACE_FLAG))
     {
 	cc = gchar_cursor();
-	if (VIM_ISWHITE(cc))
+	എങ്കിൽ (VIM_ISWHITE(cc))
 	{
 	    save_char = cc;
 	    pchar_cursor('x');
@@ -79,76 +79,76 @@ internal_format(
     }
 
     // Repeat breaking lines, until the current line is not too long.
-    while (!got_int)
+    ആകുമ്പോൾ (!got_int)
     {
-	int	startcol;		// Cursor column at entry
-	int	wantcol;		// column at textwidth border
-	int	foundcol;		// column for start of spaces
-	int	end_foundcol = 0;	// column for start of word
+	പൂർണ്ണസംഖ്യ	startcol;		// Cursor column at entry
+	പൂർണ്ണസംഖ്യ	wantcol;		// column at textwidth border
+	പൂർണ്ണസംഖ്യ	foundcol;		// column for start of spaces
+	പൂർണ്ണസംഖ്യ	end_foundcol = 0;	// column for start of word
 	colnr_T	len;
 	colnr_T	virtcol;
-	int	orig_col = 0;
-	char_u	*saved_text = NULL;
+	പൂർണ്ണസംഖ്യ	orig_col = 0;
+	char_u	*saved_text = ശൂന്യ;
 	colnr_T	col;
 	colnr_T	end_col;
-	int	wcc;			// counter for whitespace chars
-	int	did_do_comment = FALSE;
-	int	first_pass;
+	പൂർണ്ണസംഖ്യ	wcc;			// counter for whitespace chars
+	പൂർണ്ണസംഖ്യ	did_do_comment = FALSE;
+	പൂർണ്ണസംഖ്യ	first_pass;
 
 	// Cursor is currently at the end of line. No need to format
 	// if line length is less than textwidth (8 * textwidth for
 	// utf safety)
-	if (curwin->w_cursor.col < safe_tw)
+	എങ്കിൽ (curwin->w_cursor.col < safe_tw)
 	{
 	    virtcol = get_nolist_virtcol()
 		+ char2cells(c != NUL ? c : gchar_cursor());
-	    if (virtcol <= (colnr_T)textwidth)
-		break;
+	    എങ്കിൽ (virtcol <= (colnr_T)textwidth)
+		നിർത്തുക;
 	}
 
-	if (no_leader)
+	എങ്കിൽ (no_leader)
 	    do_comments = FALSE;
-	else if (!(flags & INSCHAR_FORMAT)
+	അല്ലെങ്കിൽ എങ്കിൽ (!(flags & INSCHAR_FORMAT)
 				       && has_format_option(FO_WRAP_COMS))
 	    do_comments = TRUE;
 
 	// Don't break until after the comment leader
-	if (do_comments)
+	എങ്കിൽ (do_comments)
 	{
-	    char_u *line = ml_get_curline();
+	    char_u *വരി = ml_get_curline();
 
-	    leader_len = get_leader_len(line, NULL, FALSE, TRUE);
-	    if (leader_len == 0 && curbuf->b_p_cin)
+	    leader_len = get_leader_len(വരി, ശൂന്യ, FALSE, TRUE);
+	    എങ്കിൽ (leader_len == 0 && curbuf->b_p_cin)
 	    {
-		int		comment_start;
+		പൂർണ്ണസംഖ്യ		comment_start;
 
 		// Check for a line comment after code.
-		comment_start = check_linecomment(line);
-		if (comment_start != MAXCOL)
+		comment_start = check_linecomment(വരി);
+		എങ്കിൽ (comment_start != MAXCOL)
 		{
 		    leader_len = get_leader_len(
-				      line + comment_start, NULL, FALSE, TRUE);
-		    if (leader_len != 0)
+				      വരി + comment_start, ശൂന്യ, FALSE, TRUE);
+		    എങ്കിൽ (leader_len != 0)
 			leader_len += comment_start;
 		}
 	    }
 	}
-	else
+	അല്ലെങ്കിൽ
 	    leader_len = 0;
 
 	// If the line doesn't start with a comment leader, then don't
 	// start one in a following broken line.  Avoids that a %word
 	// moved to the start of the next line causes all following lines
 	// to start with %.
-	if (leader_len == 0)
+	എങ്കിൽ (leader_len == 0)
 	    no_leader = TRUE;
-	if (!(flags & INSCHAR_FORMAT)
+	എങ്കിൽ (!(flags & INSCHAR_FORMAT)
 		&& leader_len == 0
 		&& !has_format_option(FO_WRAP))
 
-	    break;
-	if ((startcol = curwin->w_cursor.col) == 0)
-	    break;
+	    നിർത്തുക;
+	എങ്കിൽ ((startcol = curwin->w_cursor.col) == 0)
+	    നിർത്തുക;
 
 	// find column of textwidth border
 	coladvance((colnr_T)textwidth);
@@ -167,60 +167,60 @@ internal_format(
 
 	// Find position to break at.
 	// Stop at first entered white when 'formatoptions' has 'v'
-	while ((!fo_ins_blank && !has_format_option(FO_INS_VI))
+	ആകുമ്പോൾ ((!fo_ins_blank && !has_format_option(FO_INS_VI))
 		    || (flags & INSCHAR_FORMAT)
 		    || curwin->w_cursor.lnum != Insstart.lnum
 		    || curwin->w_cursor.col >= Insstart.col)
 	{
-	    if (first_pass && c != NUL)
+	    എങ്കിൽ (first_pass && c != NUL)
 	    {
 		cc = c;
 		first_pass = FALSE;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		cc = gchar_cursor();
-	    if (WHITECHAR(cc))
+	    എങ്കിൽ (WHITECHAR(cc))
 	    {
 		// remember position of blank just before text
 		end_col = curwin->w_cursor.col;
 
 		// find start of sequence of blanks
 		wcc = 0;
-		while (curwin->w_cursor.col > 0 && WHITECHAR(cc))
+		ആകുമ്പോൾ (curwin->w_cursor.col > 0 && WHITECHAR(cc))
 		{
 		    dec_cursor();
 		    cc = gchar_cursor();
 
 		    // Increment count of how many whitespace chars in this
 		    // group; we only need to know if it's more than one.
-		    if (wcc < 2)
+		    എങ്കിൽ (wcc < 2)
 			wcc++;
 		}
-		if (curwin->w_cursor.col == 0 && WHITECHAR(cc))
-		    break;		// only spaces in front of text
+		എങ്കിൽ (curwin->w_cursor.col == 0 && WHITECHAR(cc))
+		    നിർത്തുക;		// only spaces in front of text
 
 		// Don't break after a period when 'formatoptions' has 'p' and
 		// there are less than two spaces.
-		if (has_format_option(FO_PERIOD_ABBR) && cc == '.' && wcc < 2)
-		    continue;
+		എങ്കിൽ (has_format_option(FO_PERIOD_ABBR) && cc == '.' && wcc < 2)
+		    തുടരുക;
 
 		// Don't break until after the comment leader
-		if (curwin->w_cursor.col < leader_len)
-		    break;
-		if (has_format_option(FO_ONE_LETTER))
+		എങ്കിൽ (curwin->w_cursor.col < leader_len)
+		    നിർത്തുക;
+		എങ്കിൽ (has_format_option(FO_ONE_LETTER))
 		{
 		    // do not break after one-letter words
-		    if (curwin->w_cursor.col == 0)
-			break;	// one-letter word at begin
+		    എങ്കിൽ (curwin->w_cursor.col == 0)
+			നിർത്തുക;	// one-letter word at begin
 		    // do not break "#a b" when 'tw' is 2
-		    if (curwin->w_cursor.col <= leader_len)
-			break;
+		    എങ്കിൽ (curwin->w_cursor.col <= leader_len)
+			നിർത്തുക;
 		    col = curwin->w_cursor.col;
 		    dec_cursor();
 		    cc = gchar_cursor();
 
-		    if (WHITECHAR(cc))
-			continue;	// one-letter, continue
+		    എങ്കിൽ (WHITECHAR(cc))
+			തുടരുക;	// one-letter, continue
 		    curwin->w_cursor.col = col;
 		}
 
@@ -228,21 +228,21 @@ internal_format(
 
 		end_foundcol = end_col + 1;
 		foundcol = curwin->w_cursor.col;
-		if (curwin->w_cursor.col <= (colnr_T)wantcol)
-		    break;
+		എങ്കിൽ (curwin->w_cursor.col <= (colnr_T)wantcol)
+		    നിർത്തുക;
 	    }
-	    else if ((cc >= 0x100 || !utf_allow_break_before(cc))
+	    അല്ലെങ്കിൽ എങ്കിൽ ((cc >= 0x100 || !utf_allow_break_before(cc))
 							       && fo_multibyte)
 	    {
-		int ncc;
-		int allow_break;
+		പൂർണ്ണസംഖ്യ ncc;
+		പൂർണ്ണസംഖ്യ allow_break;
 
 		// Break after or before a multi-byte character.
-		if (curwin->w_cursor.col != startcol)
+		എങ്കിൽ (curwin->w_cursor.col != startcol)
 		{
 		    // Don't break until after the comment leader
-		    if (curwin->w_cursor.col < leader_len)
-			break;
+		    എങ്കിൽ (curwin->w_cursor.col < leader_len)
+			നിർത്തുക;
 		    col = curwin->w_cursor.col;
 		    inc_cursor();
 		    ncc = gchar_cursor();
@@ -252,18 +252,18 @@ internal_format(
 			|| enc_dbcs;
 
 		    // If we have already checked this position, skip!
-		    if (curwin->w_cursor.col != skip_pos && allow_break)
+		    എങ്കിൽ (curwin->w_cursor.col != skip_pos && allow_break)
 		    {
 			foundcol = curwin->w_cursor.col;
 			end_foundcol = foundcol;
-			if (curwin->w_cursor.col <= (colnr_T)wantcol)
-			    break;
+			എങ്കിൽ (curwin->w_cursor.col <= (colnr_T)wantcol)
+			    നിർത്തുക;
 		    }
 		    curwin->w_cursor.col = col;
 		}
 
-		if (curwin->w_cursor.col == 0)
-		    break;
+		എങ്കിൽ (curwin->w_cursor.col == 0)
+		    നിർത്തുക;
 
 		ncc = cc;
 		col = curwin->w_cursor.col;
@@ -271,11 +271,11 @@ internal_format(
 		dec_cursor();
 		cc = gchar_cursor();
 
-		if (WHITECHAR(cc))
-		    continue;		// break with space
+		എങ്കിൽ (WHITECHAR(cc))
+		    തുടരുക;		// break with space
 		// Don't break until after the comment leader.
-		if (curwin->w_cursor.col < leader_len)
-		    break;
+		എങ്കിൽ (curwin->w_cursor.col < leader_len)
+		    നിർത്തുക;
 
 		curwin->w_cursor.col = col;
 		skip_pos = curwin->w_cursor.col;
@@ -285,27 +285,27 @@ internal_format(
 		    || enc_dbcs;
 
 		// Must handle this to respect line break prohibition.
-		if (allow_break)
+		എങ്കിൽ (allow_break)
 		{
 		    foundcol = curwin->w_cursor.col;
 		    end_foundcol = foundcol;
 		}
-		if (curwin->w_cursor.col <= (colnr_T)wantcol)
+		എങ്കിൽ (curwin->w_cursor.col <= (colnr_T)wantcol)
 		{
-		    int ncc_allow_break =
+		    പൂർണ്ണസംഖ്യ ncc_allow_break =
 			 (enc_utf8 && utf_allow_break_before(ncc)) || enc_dbcs;
 
-		    if (allow_break)
-			break;
-		    if (!ncc_allow_break && !fo_rigor_tw)
+		    എങ്കിൽ (allow_break)
+			നിർത്തുക;
+		    എങ്കിൽ (!ncc_allow_break && !fo_rigor_tw)
 		    {
 			// Enable at most 1 punct hang outside of textwidth.
-			if (curwin->w_cursor.col == startcol)
+			എങ്കിൽ (curwin->w_cursor.col == startcol)
 			{
 			    // We are inserting a non-breakable char, postpone
 			    // line break check to next insert.
 			    end_foundcol = foundcol = 0;
-			    break;
+			    നിർത്തുക;
 			}
 
 			// Neither cc nor ncc is NUL if we are here, so
@@ -322,26 +322,26 @@ internal_format(
 				(enc_utf8 && utf_allow_break(cc, ncc))
 				|| enc_dbcs;
 
-			if (allow_break)
+			എങ്കിൽ (allow_break)
 			{
 			    // Break only when we are not at end of line.
 			    end_foundcol = foundcol =
 				      ncc == NUL? 0 : curwin->w_cursor.col;
-			    break;
+			    നിർത്തുക;
 			}
 			curwin->w_cursor.col = col;
 		    }
 		}
 	    }
-	    if (curwin->w_cursor.col == 0)
-		break;
+	    എങ്കിൽ (curwin->w_cursor.col == 0)
+		നിർത്തുക;
 	    dec_cursor();
 	}
 
-	if (foundcol == 0)		// no spaces, cannot break line
+	എങ്കിൽ (foundcol == 0)		// no spaces, cannot break line
 	{
 	    curwin->w_cursor.col = startcol;
-	    break;
+	    നിർത്തുക;
 	}
 
 	// Going to break the line, remove any "$" now.
@@ -350,82 +350,82 @@ internal_format(
 	// Offset between cursor position and line break is used by replace
 	// stack functions.  MODE_VREPLACE does not use this, and backspaces
 	// over the text instead.
-	if (State & VREPLACE_FLAG)
+	എങ്കിൽ (State & VREPLACE_FLAG)
 	    orig_col = startcol;	// Will start backspacing from here
-	else
+	അല്ലെങ്കിൽ
 	    replace_offset = startcol - end_foundcol;
 
 	// adjust startcol for spaces that will be deleted and
 	// characters that will remain on top line
 	curwin->w_cursor.col = foundcol;
-	while ((cc = gchar_cursor(), WHITECHAR(cc))
+	ആകുമ്പോൾ ((cc = gchar_cursor(), WHITECHAR(cc))
 		    && (!fo_white_par || curwin->w_cursor.col < startcol))
 	    inc_cursor();
 	startcol -= curwin->w_cursor.col;
-	if (startcol < 0)
+	എങ്കിൽ (startcol < 0)
 	    startcol = 0;
 
-	if (State & VREPLACE_FLAG)
+	എങ്കിൽ (State & VREPLACE_FLAG)
 	{
 	    // In MODE_VREPLACE state, we will backspace over the text to be
 	    // wrapped, so save a copy now to put on the next line.
 	    saved_text = vim_strnsave(ml_get_cursor(), ml_get_cursor_len());
 	    curwin->w_cursor.col = orig_col;
-	    if (saved_text == NULL)
-		break;	// Can't do it, out of memory
+	    എങ്കിൽ (saved_text == ശൂന്യ)
+		നിർത്തുക;	// Can't do it, out of memory
 	    saved_text[startcol] = NUL;
 
 	    // Backspace over characters that will move to the next line
-	    if (!fo_white_par)
+	    എങ്കിൽ (!fo_white_par)
 		backspace_until_column(foundcol);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // put cursor after pos. to break line
-	    if (!fo_white_par)
+	    എങ്കിൽ (!fo_white_par)
 		curwin->w_cursor.col = foundcol;
 	}
 
 	// Split the line just before the margin.
 	// Only insert/delete lines, but don't really redraw the window.
-	open_line(FORWARD, OPENLINE_DELSPACES + OPENLINE_MARKFIX
+	open_വരി(FORWARD, OPENLINE_DELSPACES + OPENLINE_MARKFIX
 		+ (fo_white_par ? OPENLINE_KEEPTRAIL : 0)
 		+ (do_comments ? OPENLINE_DO_COM : 0)
 		+ OPENLINE_FORMAT
 		+ ((flags & INSCHAR_COM_LIST) ? OPENLINE_COM_LIST : 0)
 		, ((flags & INSCHAR_COM_LIST) ? second_indent : old_indent),
 		&did_do_comment);
-	if (!(flags & INSCHAR_COM_LIST))
+	എങ്കിൽ (!(flags & INSCHAR_COM_LIST))
 	    old_indent = 0;
 
 	// If a comment leader was inserted, may also do this on a following
 	// line.
-	if (did_do_comment)
+	എങ്കിൽ (did_do_comment)
 	    no_leader = FALSE;
 
 	replace_offset = 0;
-	if (first_line)
+	എങ്കിൽ (first_വരി)
 	{
-	    if (!(flags & INSCHAR_COM_LIST))
+	    എങ്കിൽ (!(flags & INSCHAR_COM_LIST))
 	    {
 		// This section is for auto-wrap of numeric lists.  When not
 		// in insert mode (i.e. format_lines()), the INSCHAR_COM_LIST
 		// flag will be set and open_line() will handle it (as seen
 		// above).  The code here (and in get_number_indent()) will
 		// recognize comments if needed...
-		if (second_indent < 0 && has_format_option(FO_Q_NUMBER))
+		എങ്കിൽ (second_indent < 0 && has_format_option(FO_Q_സംഖ്യ))
 		    second_indent =
-				 get_number_indent(curwin->w_cursor.lnum - 1);
-		if (second_indent >= 0)
+				 get_സംഖ്യ_indent(curwin->w_cursor.lnum - 1);
+		എങ്കിൽ (second_indent >= 0)
 		{
-		    if (State & VREPLACE_FLAG)
+		    എങ്കിൽ (State & VREPLACE_FLAG)
 			change_indent(INDENT_SET, second_indent,
 							    FALSE, NUL, TRUE);
-		    else
-			if (leader_len > 0 && second_indent - leader_len > 0)
+		    അല്ലെങ്കിൽ
+			എങ്കിൽ (leader_len > 0 && second_indent - leader_len > 0)
 		    {
-			int i;
-			int padding = second_indent - leader_len;
+			പൂർണ്ണസംഖ്യ i;
+			പൂർണ്ണസംഖ്യ padding = second_indent - leader_len;
 
 			// We started at the first_line of a numbered list
 			// that has a comment.  the open_line() function has
@@ -433,32 +433,32 @@ internal_format(
 			// the cursor at the end of the split line.  Now we
 			// add the additional whitespace needed after the
 			// comment leader for the numbered list.
-			for (i = 0; i < padding; i++)
+			വേണ്ടി (i = 0; i < padding; i++)
 			    ins_str((char_u *)" ", 1);
 		    }
-		    else
+		    അല്ലെങ്കിൽ
 		    {
-			(void)set_indent(second_indent, SIN_CHANGED);
+			(ശൂന്യം)set_indent(second_indent, SIN_CHANGED);
 		    }
 		}
 	    }
-	    first_line = FALSE;
+	    first_വരി = FALSE;
 	}
 
-	if (State & VREPLACE_FLAG)
+	എങ്കിൽ (State & VREPLACE_FLAG)
 	{
 	    // In MODE_VREPLACE state we have backspaced over the text to be
 	    // moved, now we re-insert it into the new line.
 	    ins_bytes(saved_text);
 	    vim_free(saved_text);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // Check if cursor is not past the NUL off the line, cindent
 	    // may have added or removed indent.
 	    curwin->w_cursor.col += startcol;
 	    len = ml_get_curline_len();
-	    if (curwin->w_cursor.col > len)
+	    എങ്കിൽ (curwin->w_cursor.col > len)
 		curwin->w_cursor.col = len;
 	}
 
@@ -469,17 +469,17 @@ internal_format(
 	did_si = FALSE;
 	can_si = FALSE;
 	can_si_back = FALSE;
-	line_breakcheck();
+	വരി_breakcheck();
     }
 
-    if (save_char != NUL)		// put back space after cursor
+    എങ്കിൽ (save_char != NUL)		// put back space after cursor
 	pchar_cursor(save_char);
 
 #ifdef FEAT_LINEBREAK
     curwin->w_p_lbr = has_lbr;
     curwin->w_p_bri = has_bri;
 #endif
-    if (!format_only && haveto_redraw)
+    എങ്കിൽ (!format_only && haveto_redraw)
     {
 	update_topline();
 	redraw_curbuf_later(UPD_VALID);
@@ -494,31 +494,31 @@ internal_format(
  * previous line.  A new paragraph starts after a blank line, or when the
  * comment leader changes -- webb.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 fmt_check_par(
     linenr_T	lnum,
-    int		*leader_len,
+    പൂർണ്ണസംഖ്യ		*leader_len,
     char_u	**leader_flags,
-    int		do_comments)
+    പൂർണ്ണസംഖ്യ		do_comments)
 {
-    char_u	*flags = NULL;	    // init for GCC
+    char_u	*flags = ശൂന്യ;	    // init for GCC
     char_u	*ptr;
 
     ptr = ml_get(lnum);
-    if (do_comments)
+    എങ്കിൽ (do_comments)
 	*leader_len = get_leader_len(ptr, leader_flags, FALSE, TRUE);
-    else
+    അല്ലെങ്കിൽ
 	*leader_len = 0;
 
-    if (*leader_len > 0)
+    എങ്കിൽ (*leader_len > 0)
     {
 	// Search for 'e' flag in comment leader flags.
 	flags = *leader_flags;
-	while (*flags && *flags != ':' && *flags != COM_END)
+	ആകുമ്പോൾ (*flags && *flags != ':' && *flags != COM_END)
 	    ++flags;
     }
 
-    return (*skipwhite(ptr + *leader_len) == NUL
+    തിരികെ (*skipwhite(ptr + *leader_len) == NUL
 	    || (*leader_len > 0 && *flags == COM_END)
 	    || startPS(lnum, NUL, FALSE));
 }
@@ -526,16 +526,16 @@ fmt_check_par(
 /*
  * Return TRUE if line "lnum" ends in a white character.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 ends_in_white(linenr_T lnum)
 {
     char_u	*s = ml_get(lnum);
     size_t	l;
 
-    if (*s == NUL)
-	return FALSE;
+    എങ്കിൽ (*s == NUL)
+	തിരികെ FALSE;
     l = ml_get_len(lnum) - 1;
-    return VIM_ISWHITE(s[l]);
+    തിരികെ VIM_ISWHITE(s[l]);
 }
 
 /*
@@ -543,46 +543,46 @@ ends_in_white(linenr_T lnum)
  * the first line.  White-space is ignored.  Note that the whole of
  * 'leader1' must match 'leader2_len' characters from 'leader2' -- webb
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 same_leader(
     linenr_T lnum,
-    int	    leader1_len,
+    പൂർണ്ണസംഖ്യ	    leader1_len,
     char_u  *leader1_flags,
-    int	    leader2_len,
+    പൂർണ്ണസംഖ്യ	    leader2_len,
     char_u  *leader2_flags)
 {
-    int	    idx1 = 0, idx2 = 0;
+    പൂർണ്ണസംഖ്യ	    idx1 = 0, idx2 = 0;
     char_u  *line1;
 
-    if (leader1_len == 0)
-	return (leader2_len == 0);
+    എങ്കിൽ (leader1_len == 0)
+	തിരികെ (leader2_len == 0);
 
     // If first leader has 'f' flag, the lines can be joined only if the
     // second line does not have a leader.
     // If first leader has 'e' flag, the lines can never be joined.
     // If first leader has 's' flag, the lines can only be joined if there is
     // some text after it and the second line has the 'm' flag.
-    if (leader1_flags != NULL)
+    എങ്കിൽ (leader1_flags != ശൂന്യ)
     {
 	char_u	*p;
 
-	for (p = leader1_flags; *p && *p != ':'; ++p)
+	വേണ്ടി (p = leader1_flags; *p && *p != ':'; ++p)
 	{
-	    if (*p == COM_FIRST)
-		return (leader2_len == 0);
-	    if (*p == COM_END)
-		return FALSE;
-	    if (*p == COM_START)
+	    എങ്കിൽ (*p == COM_FIRST)
+		തിരികെ (leader2_len == 0);
+	    എങ്കിൽ (*p == COM_END)
+		തിരികെ FALSE;
+	    എങ്കിൽ (*p == COM_START)
 	    {
-		int line_len = ml_get_len(lnum);
-		if (line_len <= leader1_len)
-		    return FALSE;
-		if (leader2_flags == NULL || leader2_len == 0)
-		    return FALSE;
-		for (p = leader2_flags; *p && *p != ':'; ++p)
-		    if (*p == COM_MIDDLE)
-			return TRUE;
-		return FALSE;
+		പൂർണ്ണസംഖ്യ വരി_len = ml_get_len(lnum);
+		എങ്കിൽ (വരി_len <= leader1_len)
+		    തിരികെ FALSE;
+		എങ്കിൽ (leader2_flags == ശൂന്യ || leader2_len == 0)
+		    തിരികെ FALSE;
+		വേണ്ടി (p = leader2_flags; *p && *p != ':'; ++p)
+		    എങ്കിൽ (*p == COM_നടുവ്)
+			തിരികെ TRUE;
+		തിരികെ FALSE;
 	    }
 	}
     }
@@ -590,68 +590,68 @@ same_leader(
     // Get current line and next line, compare the leaders.
     // The first line has to be saved, only one line can be locked at a time.
     line1 = vim_strnsave(ml_get(lnum), ml_get_len(lnum));
-    if (line1 != NULL)
+    എങ്കിൽ (line1 != ശൂന്യ)
     {
 	char_u  *line2;
 
-	for (idx1 = 0; VIM_ISWHITE(line1[idx1]); ++idx1)
+	വേണ്ടി (idx1 = 0; VIM_ISWHITE(line1[idx1]); ++idx1)
 	    ;
 	line2 = ml_get(lnum + 1);
-	for (idx2 = 0; idx2 < leader2_len; ++idx2)
+	വേണ്ടി (idx2 = 0; idx2 < leader2_len; ++idx2)
 	{
-	    if (!VIM_ISWHITE(line2[idx2]))
+	    എങ്കിൽ (!VIM_ISWHITE(line2[idx2]))
 	    {
-		if (line1[idx1++] != line2[idx2])
-		    break;
+		എങ്കിൽ (line1[idx1++] != line2[idx2])
+		    നിർത്തുക;
 	    }
-	    else
-		while (VIM_ISWHITE(line1[idx1]))
+	    അല്ലെങ്കിൽ
+		ആകുമ്പോൾ (VIM_ISWHITE(line1[idx1]))
 		    ++idx1;
 	}
 	vim_free(line1);
     }
-    return (idx2 == leader2_len && idx1 == leader1_len);
+    തിരികെ (idx2 == leader2_len && idx1 == leader1_len);
 }
 
 /*
  * Return TRUE when a paragraph starts in line "lnum".  Return FALSE when the
  * previous line is in the same paragraph.  Used for auto-formatting.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 paragraph_start(linenr_T lnum)
 {
     char_u	*p;
-    int		leader_len = 0;		// leader len of current line
-    char_u	*leader_flags = NULL;	// flags for leader of current line
-    int		next_leader_len;	// leader len of next line
+    പൂർണ്ണസംഖ്യ		leader_len = 0;		// leader len of current line
+    char_u	*leader_flags = ശൂന്യ;	// flags for leader of current line
+    പൂർണ്ണസംഖ്യ		next_leader_len;	// leader len of next line
     char_u	*next_leader_flags;	// flags for leader of next line
-    int		do_comments;		// format comments
+    പൂർണ്ണസംഖ്യ		do_comments;		// format comments
 
-    if (lnum <= 1)
-	return TRUE;		// start of the file
+    എങ്കിൽ (lnum <= 1)
+	തിരികെ TRUE;		// start of the file
 
     p = ml_get(lnum - 1);
-    if (*p == NUL)
-	return TRUE;		// after empty line
+    എങ്കിൽ (*p == NUL)
+	തിരികെ TRUE;		// after empty line
 
     do_comments = has_format_option(FO_Q_COMS);
-    if (fmt_check_par(lnum - 1, &leader_len, &leader_flags, do_comments))
-	return TRUE;		// after non-paragraph line
+    എങ്കിൽ (fmt_check_par(lnum - 1, &leader_len, &leader_flags, do_comments))
+	തിരികെ TRUE;		// after non-paragraph line
 
-    if (fmt_check_par(lnum, &next_leader_len, &next_leader_flags, do_comments))
-	return TRUE;		// "lnum" is not a paragraph line
+    എങ്കിൽ (fmt_check_par(lnum, &next_leader_len, &next_leader_flags, do_comments))
+	തിരികെ TRUE;		// "lnum" is not a paragraph line
 
-    if (has_format_option(FO_WHITE_PAR) && !ends_in_white(lnum - 1))
-	return TRUE;		// missing trailing space in previous line.
+    എങ്കിൽ (has_format_option(FO_WHITE_PAR) && !ends_in_white(lnum - 1))
+	തിരികെ TRUE;		// missing trailing space in previous line.
 
-    if (has_format_option(FO_Q_NUMBER) && (get_number_indent(lnum) > 0))
-	return TRUE;		// numbered item starts in "lnum".
+    എങ്കിൽ (has_format_option(FO_Q_സംഖ്യ) && (get_സംഖ്യ_indent(lnum) > 0))
+	തിരികെ TRUE;		// numbered item starts in "lnum".
 
-    if (!same_leader(lnum - 1, leader_len, leader_flags,
+    എങ്കിൽ (!same_leader(lnum - 1, leader_len, leader_flags,
 					  next_leader_len, next_leader_flags))
-	return TRUE;		// change of comment leader.
+	തിരികെ TRUE;		// change of comment leader.
 
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
@@ -661,17 +661,17 @@ paragraph_start(linenr_T lnum)
  * The caller must have saved the cursor line for undo, following ones will be
  * saved here.
  */
-    void
+    ശൂന്യം
 auto_format(
-    int		trailblank,	// when TRUE also format with trailing blank
-    int		prev_line)	// may start in previous line
+    പൂർണ്ണസംഖ്യ		trailblank,	// when TRUE also format with trailing blank
+    പൂർണ്ണസംഖ്യ		prev_വരി)	// may start in previous line
 {
     pos_T	pos;
     char_u	*old;
-    int		wasatend;
+    പൂർണ്ണസംഖ്യ		wasatend;
 
-    if (!has_format_option(FO_AUTO))
-	return;
+    എങ്കിൽ (!has_format_option(FO_AUTO))
+	തിരികെ;
 
     pos = curwin->w_cursor;
     old = ml_get_curline();
@@ -685,20 +685,20 @@ auto_format(
     // Otherwise the line would be broken and when typing another non-white
     // next they are not joined back together.
     wasatend = (pos.col == ml_get_curline_len());
-    if (*old != NUL && !trailblank && wasatend)
+    എങ്കിൽ (*old != NUL && !trailblank && wasatend)
     {
-	int cc;
+	പൂർണ്ണസംഖ്യ cc;
 
 	dec_cursor();
 	cc = gchar_cursor();
-	if (!WHITECHAR(cc) && curwin->w_cursor.col > 0
+	എങ്കിൽ (!WHITECHAR(cc) && curwin->w_cursor.col > 0
 					  && has_format_option(FO_ONE_LETTER))
 	    dec_cursor();
 	cc = gchar_cursor();
-	if (WHITECHAR(cc))
+	എങ്കിൽ (WHITECHAR(cc))
 	{
 	    curwin->w_cursor = pos;
-	    return;
+	    തിരികെ;
 	}
 	curwin->w_cursor = pos;
     }
@@ -710,69 +710,69 @@ auto_format(
     // will be inserted adjacent to the space, keeping it protected from
     // being consumed at a line break.  auto_format() will then reformat
     // properly on the next keystroke.
-    if (*old != NUL && !trailblank && !wasatend && pos.col > 0
-	    && (State & MODE_INSERT))
+    എങ്കിൽ (*old != NUL && !trailblank && !wasatend && pos.col > 0
+	    && (State & MODE_തിരുകുക))
     {
-	char_u *line = ml_get_curline();
-	if (WHITECHAR(line[pos.col - 1]))
+	char_u *വരി = ml_get_curline();
+	എങ്കിൽ (WHITECHAR(വരി[pos.col - 1]))
 	{
 	    curwin->w_cursor = pos;
-	    return;
+	    തിരികെ;
 	}
     }
 
     // With the 'c' flag in 'formatoptions' and 't' missing: only format
     // comments.
-    if (has_format_option(FO_WRAP_COMS) && !has_format_option(FO_WRAP)
-				&& get_leader_len(old, NULL, FALSE, TRUE) == 0)
-	return;
+    എങ്കിൽ (has_format_option(FO_WRAP_COMS) && !has_format_option(FO_WRAP)
+				&& get_leader_len(old, ശൂന്യ, FALSE, TRUE) == 0)
+	തിരികെ;
 
     // May start formatting in a previous line, so that after "x" a word is
     // moved to the previous line if it fits there now.  Only when this is not
     // the start of a paragraph.
-    if (prev_line && !paragraph_start(curwin->w_cursor.lnum))
+    എങ്കിൽ (prev_വരി && !paragraph_start(curwin->w_cursor.lnum))
     {
 	--curwin->w_cursor.lnum;
-	if (u_save_cursor() == FAIL)
-	    return;
+	എങ്കിൽ (u_save_cursor() == FAIL)
+	    തിരികെ;
     }
 
     // Do the formatting and restore the cursor position.  "saved_cursor" will
     // be adjusted for the text formatting.
     saved_cursor = pos;
-    format_lines((linenr_T)-1, FALSE);
+    format_വരികൾ((linenr_T)-1, FALSE);
     curwin->w_cursor = saved_cursor;
     saved_cursor.lnum = 0;
 
-    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+    എങ്കിൽ (curwin->w_cursor.lnum > curbuf->b_ml.ml_വരി_എണ്ണം)
     {
 	// "cannot happen"
-	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	curwin->w_cursor.lnum = curbuf->b_ml.ml_വരി_എണ്ണം;
 	coladvance((colnr_T)MAXCOL);
     }
-    else
+    അല്ലെങ്കിൽ
 	check_cursor_col();
 
     // Insert mode: If the cursor is now after the end of the line while it
     // previously wasn't, the line was broken.  Because of the rule above we
     // need to add a space when 'w' is in 'formatoptions' to keep a paragraph
     // formatted.
-    if (!wasatend && has_format_option(FO_WHITE_PAR))
+    എങ്കിൽ (!wasatend && has_format_option(FO_WHITE_PAR))
     {
 	char_u	*new = ml_get_curline();
 	colnr_T	len = ml_get_curline_len();
-	if (curwin->w_cursor.col == len)
+	എങ്കിൽ (curwin->w_cursor.col == len)
 	{
 	    char_u *pnew = vim_strnsave(new, len + 2);
-	    if (pnew == NULL)
-		return;
+	    എങ്കിൽ (pnew == ശൂന്യ)
+		തിരികെ;
 	    pnew[len] = ' ';
 	    pnew[len + 1] = NUL;
 	    ml_replace(curwin->w_cursor.lnum, pnew, FALSE);
 	    // remove the space later
 	    did_add_space = TRUE;
 	}
-	else
+	അല്ലെങ്കിൽ
 	    // may remove added space
 	    check_auto_format(FALSE);
     }
@@ -785,29 +785,29 @@ auto_format(
  * delete it now.  The space must be under the cursor, just after the insert
  * position.
  */
-    void
+    ശൂന്യം
 check_auto_format(
-    int		end_insert)	    // TRUE when ending Insert mode
+    പൂർണ്ണസംഖ്യ		end_തിരുകുക)	    // TRUE when ending Insert mode
 {
-    int		c = ' ';
-    int		cc;
+    പൂർണ്ണസംഖ്യ		c = ' ';
+    പൂർണ്ണസംഖ്യ		cc;
 
-    if (!did_add_space)
-	return;
+    എങ്കിൽ (!did_add_space)
+	തിരികെ;
 
     cc = gchar_cursor();
-    if (!WHITECHAR(cc))
+    എങ്കിൽ (!WHITECHAR(cc))
 	// Somehow the space was removed already.
 	did_add_space = FALSE;
-    else
+    അല്ലെങ്കിൽ
     {
-	if (!end_insert)
+	എങ്കിൽ (!end_തിരുകുക)
 	{
 	    inc_cursor();
 	    c = gchar_cursor();
 	    dec_cursor();
 	}
-	if (c != NUL)
+	എങ്കിൽ (c != NUL)
 	{
 	    // The space is no longer at the end of the line, delete it.
 	    del_char(FALSE);
@@ -823,89 +823,89 @@ check_auto_format(
  *	if invalid value, use 0.
  *	Set default to window width (maximum 79) for "gq" operator.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 comp_textwidth(
-    int		ff)	// force formatting (for "gq" command)
+    പൂർണ്ണസംഖ്യ		ff)	// force formatting (for "gq" command)
 {
-    int		textwidth;
+    പൂർണ്ണസംഖ്യ		textwidth;
 
     textwidth = curbuf->b_p_tw;
-    if (textwidth == 0 && curbuf->b_p_wm)
+    എങ്കിൽ (textwidth == 0 && curbuf->b_p_wm)
     {
 	// The width is the window width minus 'wrapmargin' minus all the
 	// things that add to the margin.
 	textwidth = curwin->w_width - curbuf->b_p_wm;
-	if (curbuf == cmdwin_buf)
+	എങ്കിൽ (curbuf == cmdwin_buf)
 	    textwidth -= 1;
 #ifdef FEAT_FOLDING
 	textwidth -= curwin->w_p_fdc;
 #endif
 #ifdef FEAT_SIGNS
-	if (signcolumn_on(curwin))
+	എങ്കിൽ (signcolumn_on(curwin))
 	    textwidth -= 1;
 #endif
-	if (curwin->w_p_nu || curwin->w_p_rnu)
+	എങ്കിൽ (curwin->w_p_nu || curwin->w_p_rnu)
 	    textwidth -= 8;
     }
-    if (textwidth < 0)
+    എങ്കിൽ (textwidth < 0)
 	textwidth = 0;
-    if (ff && textwidth == 0)
+    എങ്കിൽ (ff && textwidth == 0)
     {
 	textwidth = curwin->w_width - 1;
-	if (textwidth > 79)
+	എങ്കിൽ (textwidth > 79)
 	    textwidth = 79;
     }
-    return textwidth;
+    തിരികെ textwidth;
 }
 
 /*
  * Implementation of the format operator 'gq'.
  */
-    void
+    ശൂന്യം
 op_format(
     oparg_T	*oap,
-    int		keep_cursor)		// keep cursor on same text char
+    പൂർണ്ണസംഖ്യ		keep_cursor)		// keep cursor on same text char
 {
-    long	old_line_count = curbuf->b_ml.ml_line_count;
+    long	old_വരി_എണ്ണം = curbuf->b_ml.ml_വരി_എണ്ണം;
 
     // Place the cursor where the "gq" or "gw" command was given, so that "u"
     // can put it back there.
     curwin->w_cursor = oap->cursor_start;
 
-    if (u_save((linenr_T)(oap->start.lnum - 1),
+    എങ്കിൽ (u_save((linenr_T)(oap->start.lnum - 1),
 				       (linenr_T)(oap->end.lnum + 1)) == FAIL)
-	return;
+	തിരികെ;
     curwin->w_cursor = oap->start;
 
-    if (oap->is_VIsual)
+    എങ്കിൽ (oap->is_VIsual)
 	// When there is no change: need to remove the Visual selection
 	redraw_curbuf_later(UPD_INVERTED);
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    എങ്കിൽ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	// Set '[ mark at the start of the formatted area
 	curbuf->b_op_start = oap->start;
 
     // For "gw" remember the cursor position and put it back below (adjusted
     // for joined and split lines).
-    if (keep_cursor)
+    എങ്കിൽ (keep_cursor)
 	saved_cursor = oap->cursor_start;
 
-    format_lines(oap->line_count, keep_cursor);
+    format_വരികൾ(oap->വരി_എണ്ണം, keep_cursor);
 
     // Leave the cursor at the first non-blank of the last formatted line.
     // If the cursor was moved one line back (e.g. with "Q}") go to the next
     // line, so "." will do the next lines.
-    if (oap->end_adjusted && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+    എങ്കിൽ (oap->end_adjusted && curwin->w_cursor.lnum < curbuf->b_ml.ml_വരി_എണ്ണം)
 	++curwin->w_cursor.lnum;
     beginline(BL_WHITE | BL_FIX);
-    old_line_count = curbuf->b_ml.ml_line_count - old_line_count;
-    msgmore(old_line_count);
+    old_വരി_എണ്ണം = curbuf->b_ml.ml_വരി_എണ്ണം - old_വരി_എണ്ണം;
+    msgmore(old_വരി_എണ്ണം);
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    എങ്കിൽ ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	// put '] mark on the end of the formatted area
 	curbuf->b_op_end = curwin->w_cursor;
 
-    if (keep_cursor)
+    എങ്കിൽ (keep_cursor)
     {
 	curwin->w_cursor = saved_cursor;
 	saved_cursor.lnum = 0;
@@ -914,78 +914,78 @@ op_format(
 	check_cursor();
     }
 
-    if (oap->is_VIsual)
+    എങ്കിൽ (oap->is_VIsual)
     {
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_old_cursor_lnum != 0)
+	    എങ്കിൽ (wp->w_old_cursor_lnum != 0)
 	    {
 		// When lines have been inserted or deleted, adjust the end of
 		// the Visual area to be redrawn.
-		if (wp->w_old_cursor_lnum > wp->w_old_visual_lnum)
-		    wp->w_old_cursor_lnum += old_line_count;
-		else
-		    wp->w_old_visual_lnum += old_line_count;
+		എങ്കിൽ (wp->w_old_cursor_lnum > wp->w_old_visual_lnum)
+		    wp->w_old_cursor_lnum += old_വരി_എണ്ണം;
+		അല്ലെങ്കിൽ
+		    wp->w_old_visual_lnum += old_വരി_എണ്ണം;
 	    }
 	}
     }
 }
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 /*
  * Implementation of the format operator 'gq' for when using 'formatexpr'.
  */
-    void
+    ശൂന്യം
 op_formatexpr(oparg_T *oap)
 {
-    if (oap->is_VIsual)
+    എങ്കിൽ (oap->is_VIsual)
 	// When there is no change: need to remove the Visual selection
 	redraw_curbuf_later(UPD_INVERTED);
 
-    if (fex_format(oap->start.lnum, oap->line_count, NUL) != 0)
+    എങ്കിൽ (fex_format(oap->start.lnum, oap->വരി_എണ്ണം, NUL) != 0)
 	// As documented: when 'formatexpr' returns non-zero fall back to
 	// internal formatting.
 	op_format(oap, FALSE);
 }
 
-    int
+    പൂർണ്ണസംഖ്യ
 fex_format(
     linenr_T	lnum,
-    long	count,
-    int		c)	// character to be inserted
+    long	എണ്ണം,
+    പൂർണ്ണസംഖ്യ		c)	// character to be inserted
 {
-    int		use_sandbox = was_set_insecurely(curwin,
+    പൂർണ്ണസംഖ്യ		use_sandbox = was_set_insecurely(curwin,
 					    (char_u *)"formatexpr", OPT_LOCAL);
-    int		r;
+    പൂർണ്ണസംഖ്യ		r;
     char_u	*fex;
     sctx_T	save_sctx = current_sctx;
 
     // Set v:lnum to the first line number and v:count to the number of lines.
     // Set v:char to the character to be inserted (can be NUL).
     set_vim_var_nr(VV_LNUM, lnum);
-    set_vim_var_nr(VV_COUNT, count);
+    set_vim_var_nr(VV_എണ്ണം, എണ്ണം);
     set_vim_var_char(c);
 
     // Make a copy, the option could be changed while calling it.
     fex = vim_strsave(curbuf->b_p_fex);
-    if (fex == NULL)
-	return 0;
+    എങ്കിൽ (fex == ശൂന്യ)
+	തിരികെ 0;
     current_sctx = curbuf->b_p_script_ctx[BV_FEX];
 
     // Evaluate the function.
-    if (use_sandbox)
+    എങ്കിൽ (use_sandbox)
 	++sandbox;
-    r = (int)eval_to_number(fex, TRUE);
-    if (use_sandbox)
+    r = (പൂർണ്ണസംഖ്യ)eval_to_സംഖ്യ(fex, TRUE);
+    എങ്കിൽ (use_sandbox)
 	--sandbox;
 
-    set_vim_var_string(VV_CHAR, NULL, -1);
+    set_vim_var_string(VV_CHAR, ശൂന്യ, -1);
     vim_free(fex);
     current_sctx = save_sctx;
 
-    return r;
+    തിരികെ r;
 }
 #endif
 
@@ -995,36 +995,36 @@ fex_format(
  * Lines after the cursor line are saved for undo, caller must have saved the
  * first line.
  */
-    void
-format_lines(
-    linenr_T	line_count,
-    int		avoid_fex)		// don't use 'formatexpr'
+    ശൂന്യം
+format_വരികൾ(
+    linenr_T	വരി_എണ്ണം,
+    പൂർണ്ണസംഖ്യ		avoid_fex)		// don't use 'formatexpr'
 {
-    int		max_len;
-    int		is_not_par;		// current line not part of parag.
-    int		next_is_not_par;	// next line not part of paragraph
-    int		is_end_par;		// at end of paragraph
-    int		prev_is_end_par = FALSE;// prev. line not part of parag.
-    int		next_is_start_par = FALSE;
-    int		leader_len = 0;		// leader len of current line
-    int		next_leader_len;	// leader len of next line
-    char_u	*leader_flags = NULL;	// flags for leader of current line
-    char_u	*next_leader_flags = NULL; // flags for leader of next line
-    int		do_comments;		// format comments
-    int		do_comments_list = 0;	// format comments with 'n' or '2'
-    int		advance = TRUE;
-    int		second_indent = -1;	// indent for second line (comment
+    പൂർണ്ണസംഖ്യ		max_len;
+    പൂർണ്ണസംഖ്യ		is_not_par;		// current line not part of parag.
+    പൂർണ്ണസംഖ്യ		next_is_not_par;	// next line not part of paragraph
+    പൂർണ്ണസംഖ്യ		is_end_par;		// at end of paragraph
+    പൂർണ്ണസംഖ്യ		prev_is_end_par = FALSE;// prev. line not part of parag.
+    പൂർണ്ണസംഖ്യ		next_is_start_par = FALSE;
+    പൂർണ്ണസംഖ്യ		leader_len = 0;		// leader len of current line
+    പൂർണ്ണസംഖ്യ		next_leader_len;	// leader len of next line
+    char_u	*leader_flags = ശൂന്യ;	// flags for leader of current line
+    char_u	*next_leader_flags = ശൂന്യ; // flags for leader of next line
+    പൂർണ്ണസംഖ്യ		do_comments;		// format comments
+    പൂർണ്ണസംഖ്യ		do_comments_list = 0;	// format comments with 'n' or '2'
+    പൂർണ്ണസംഖ്യ		advance = TRUE;
+    പൂർണ്ണസംഖ്യ		second_indent = -1;	// indent for second line (comment
 					// aware)
-    int		do_second_indent;
-    int		do_number_indent;
-    int		do_trail_white;
-    int		first_par_line = TRUE;
-    int		smd_save;
-    long	count;
-    int		need_set_indent = TRUE;	// set indent of next paragraph
-    linenr_T	first_line = curwin->w_cursor.lnum;
-    int		force_format = FALSE;
-    int		old_State = State;
+    പൂർണ്ണസംഖ്യ		do_second_indent;
+    പൂർണ്ണസംഖ്യ		do_സംഖ്യ_indent;
+    പൂർണ്ണസംഖ്യ		do_trail_white;
+    പൂർണ്ണസംഖ്യ		first_par_വരി = TRUE;
+    പൂർണ്ണസംഖ്യ		smd_save;
+    long	എണ്ണം;
+    പൂർണ്ണസംഖ്യ		need_set_indent = TRUE;	// set indent of next paragraph
+    linenr_T	first_വരി = curwin->w_cursor.lnum;
+    പൂർണ്ണസംഖ്യ		force_format = FALSE;
+    പൂർണ്ണസംഖ്യ		old_State = State;
 
     // length of a line to force formatting: 3 * 'tw'
     max_len = comp_textwidth(TRUE) * 3;
@@ -1032,26 +1032,26 @@ format_lines(
     // check for 'q', '2', 'n' and 'w' in 'formatoptions'
     do_comments = has_format_option(FO_Q_COMS);
     do_second_indent = has_format_option(FO_Q_SECOND);
-    do_number_indent = has_format_option(FO_Q_NUMBER);
+    do_സംഖ്യ_indent = has_format_option(FO_Q_സംഖ്യ);
     do_trail_white = has_format_option(FO_WHITE_PAR);
 
     // Get info about the previous and current line.
-    if (curwin->w_cursor.lnum > 1)
+    എങ്കിൽ (curwin->w_cursor.lnum > 1)
 	is_not_par = fmt_check_par(curwin->w_cursor.lnum - 1
 				, &leader_len, &leader_flags, do_comments);
-    else
+    അല്ലെങ്കിൽ
 	is_not_par = TRUE;
     next_is_not_par = fmt_check_par(curwin->w_cursor.lnum
 			  , &next_leader_len, &next_leader_flags, do_comments);
     is_end_par = (is_not_par || next_is_not_par);
-    if (!is_end_par && do_trail_white)
+    എങ്കിൽ (!is_end_par && do_trail_white)
 	is_end_par = !ends_in_white(curwin->w_cursor.lnum - 1);
 
     curwin->w_cursor.lnum--;
-    for (count = line_count; count != 0 && !got_int; --count)
+    വേണ്ടി (എണ്ണം = വരി_എണ്ണം; എണ്ണം != 0 && !got_int; --എണ്ണം)
     {
 	// Advance to next paragraph.
-	if (advance)
+	എങ്കിൽ (advance)
 	{
 	    curwin->w_cursor.lnum++;
 	    prev_is_end_par = is_end_par;
@@ -1061,74 +1061,74 @@ format_lines(
 	}
 
 	// The last line to be formatted.
-	if (count == 1 || curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
+	എങ്കിൽ (എണ്ണം == 1 || curwin->w_cursor.lnum == curbuf->b_ml.ml_വരി_എണ്ണം)
 	{
 	    next_is_not_par = TRUE;
 	    next_leader_len = 0;
-	    next_leader_flags = NULL;
+	    next_leader_flags = ശൂന്യ;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    next_is_not_par = fmt_check_par(curwin->w_cursor.lnum + 1
 			  , &next_leader_len, &next_leader_flags, do_comments);
-	    if (do_number_indent)
+	    എങ്കിൽ (do_സംഖ്യ_indent)
 		next_is_start_par =
-			   (get_number_indent(curwin->w_cursor.lnum + 1) > 0);
+			   (get_സംഖ്യ_indent(curwin->w_cursor.lnum + 1) > 0);
 	}
 	advance = TRUE;
 	is_end_par = (is_not_par || next_is_not_par || next_is_start_par);
-	if (!is_end_par && do_trail_white)
+	എങ്കിൽ (!is_end_par && do_trail_white)
 	    is_end_par = !ends_in_white(curwin->w_cursor.lnum);
 
 	// Skip lines that are not in a paragraph.
-	if (is_not_par)
+	എങ്കിൽ (is_not_par)
 	{
-	    if (line_count < 0)
-		break;
+	    എങ്കിൽ (വരി_എണ്ണം < 0)
+		നിർത്തുക;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // For the first line of a paragraph, check indent of second line.
 	    // Don't do this for comments and empty lines.
-	    if (first_par_line
-		    && (do_second_indent || do_number_indent)
+	    എങ്കിൽ (first_par_വരി
+		    && (do_second_indent || do_സംഖ്യ_indent)
 		    && prev_is_end_par
-		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_വരി_എണ്ണം)
 	    {
-		if (do_second_indent && !LINEEMPTY(curwin->w_cursor.lnum + 1))
+		എങ്കിൽ (do_second_indent && !LINEEMPTY(curwin->w_cursor.lnum + 1))
 		{
-		    if (leader_len == 0 && next_leader_len == 0)
+		    എങ്കിൽ (leader_len == 0 && next_leader_len == 0)
 		    {
 			// no comment found
 			second_indent =
 				   get_indent_lnum(curwin->w_cursor.lnum + 1);
 		    }
-		    else
+		    അല്ലെങ്കിൽ
 		    {
 			second_indent = next_leader_len;
 			do_comments_list = 1;
 		    }
 		}
-		else if (do_number_indent)
+		അല്ലെങ്കിൽ എങ്കിൽ (do_സംഖ്യ_indent)
 		{
-		    if (leader_len == 0 && next_leader_len == 0)
+		    എങ്കിൽ (leader_len == 0 && next_leader_len == 0)
 		    {
 			// no comment found
 			second_indent =
-				     get_number_indent(curwin->w_cursor.lnum);
+				     get_സംഖ്യ_indent(curwin->w_cursor.lnum);
 		    }
-		    else
+		    അല്ലെങ്കിൽ
 		    {
 			// get_number_indent() is now "comment aware"...
 			second_indent =
-				     get_number_indent(curwin->w_cursor.lnum);
+				     get_സംഖ്യ_indent(curwin->w_cursor.lnum);
 			do_comments_list = 1;
 		    }
 		}
 	    }
 
 	    // When the comment leader changes, it's the end of the paragraph.
-	    if (curwin->w_cursor.lnum >= curbuf->b_ml.ml_line_count
+	    എങ്കിൽ (curwin->w_cursor.lnum >= curbuf->b_ml.ml_വരി_എണ്ണം
 		    || !same_leader(curwin->w_cursor.lnum,
 					leader_len, leader_flags,
 					   next_leader_len, next_leader_flags))
@@ -1136,7 +1136,7 @@ format_lines(
 		// Special case: If the next line starts with a line comment
 		// and this line has a line comment after some text, the
 		// paragraph doesn't really end.
-		if (next_leader_flags == NULL
+		എങ്കിൽ (next_leader_flags == ശൂന്യ
 			|| STRNCMP(next_leader_flags, "://", 3) != 0
 			|| check_linecomment(ml_get_curline()) == MAXCOL)
 		is_end_par = TRUE;
@@ -1144,44 +1144,44 @@ format_lines(
 
 	    // If we have got to the end of a paragraph, or the line is
 	    // getting long, format it.
-	    if (is_end_par || force_format)
+	    എങ്കിൽ (is_end_par || force_format)
 	    {
-		if (need_set_indent)
+		എങ്കിൽ (need_set_indent)
 		{
-		    int		indent = 0; // amount of indent needed
+		    പൂർണ്ണസംഖ്യ		indent = 0; // amount of indent needed
 
 		    // Replace indent in first line of a paragraph with minimal
 		    // number of tabs and spaces, according to current options.
 		    // For the very first formatted line keep the current
 		    // indent.
-		    if (curwin->w_cursor.lnum == first_line)
+		    എങ്കിൽ (curwin->w_cursor.lnum == first_വരി)
 			indent = get_indent();
-		    else if (curbuf->b_p_lisp)
+		    അല്ലെങ്കിൽ എങ്കിൽ (curbuf->b_p_lisp)
 			indent = get_lisp_indent();
-		    else
+		    അല്ലെങ്കിൽ
 		    {
-			if (cindent_on())
+			എങ്കിൽ (cindent_on())
 			{
 			    indent =
 #ifdef FEAT_EVAL
-				 *curbuf->b_p_inde != NUL ? get_expr_indent() :
+				 *curbuf->b_p_inde != NUL ? get_വ്യഞ്ജകം_indent() :
 #endif
 				 get_c_indent();
 			}
-			else
+			അല്ലെങ്കിൽ
 			    indent = get_indent();
 		    }
-		    (void)set_indent(indent, SIN_CHANGED);
+		    (ശൂന്യം)set_indent(indent, SIN_CHANGED);
 		}
 
 		// put cursor on last non-space
 		State = MODE_NORMAL;	// don't go past end-of-line
 		coladvance((colnr_T)MAXCOL);
-		while (curwin->w_cursor.col && vim_isspace(gchar_cursor()))
+		ആകുമ്പോൾ (curwin->w_cursor.col && vim_isspace(gchar_cursor()))
 		    dec_cursor();
 
 		// do the formatting, without 'showmode'
-		State = MODE_INSERT;	// for open_line()
+		State = MODE_തിരുകുക;	// for open_line()
 		smd_save = p_smd;
 		p_smd = FALSE;
 
@@ -1205,57 +1205,57 @@ format_lines(
 		second_indent = -1;
 		// at end of par.: need to set indent of next par.
 		need_set_indent = is_end_par;
-		if (is_end_par)
+		എങ്കിൽ (is_end_par)
 		{
 		    // When called with a negative line count, break at the
 		    // end of the paragraph.
-		    if (line_count < 0)
-			break;
-		    first_par_line = TRUE;
+		    എങ്കിൽ (വരി_എണ്ണം < 0)
+			നിർത്തുക;
+		    first_par_വരി = TRUE;
 		}
 		force_format = FALSE;
 	    }
 
 	    // When still in same paragraph, join the lines together.  But
 	    // first delete the leader from the second line.
-	    if (!is_end_par)
+	    എങ്കിൽ (!is_end_par)
 	    {
 		advance = FALSE;
 		curwin->w_cursor.lnum++;
 		curwin->w_cursor.col = 0;
-		if (line_count < 0 && u_save_cursor() == FAIL)
-		    break;
-		if (next_leader_len > 0)
+		എങ്കിൽ (വരി_എണ്ണം < 0 && u_save_cursor() == FAIL)
+		    നിർത്തുക;
+		എങ്കിൽ (next_leader_len > 0)
 		{
-		    (void)del_bytes((long)next_leader_len, FALSE, FALSE);
+		    (ശൂന്യം)del_bytes((long)next_leader_len, FALSE, FALSE);
 		    mark_col_adjust(curwin->w_cursor.lnum, (colnr_T)0, 0L,
 						    (long)-next_leader_len, 0);
 		}
-		else if (second_indent > 0)  // the "leader" for FO_Q_SECOND
+		അല്ലെങ്കിൽ എങ്കിൽ (second_indent > 0)  // the "leader" for FO_Q_SECOND
 		{
-		    int indent = getwhitecols_curline();
+		    പൂർണ്ണസംഖ്യ indent = getwhitecols_curline();
 
-		    if (indent > 0)
+		    എങ്കിൽ (indent > 0)
 		    {
-			(void)del_bytes(indent, FALSE, FALSE);
+			(ശൂന്യം)del_bytes(indent, FALSE, FALSE);
 			mark_col_adjust(curwin->w_cursor.lnum,
 					     (colnr_T)0, 0L, (long)-indent, 0);
 		    }
 		}
 		curwin->w_cursor.lnum--;
-		if (do_join(2, TRUE, FALSE, FALSE, FALSE) == FAIL)
+		എങ്കിൽ (do_join(2, TRUE, FALSE, FALSE, FALSE) == FAIL)
 		{
 		    beep_flush();
-		    break;
+		    നിർത്തുക;
 		}
-		first_par_line = FALSE;
+		first_par_വരി = FALSE;
 		// If the line is getting long, format it next time
-		if (ml_get_curline_len() > max_len)
+		എങ്കിൽ (ml_get_curline_len() > max_len)
 		    force_format = TRUE;
-		else
+		അല്ലെങ്കിൽ
 		    force_format = FALSE;
 	    }
 	}
-	line_breakcheck();
+	വരി_breakcheck();
     }
 }

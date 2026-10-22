@@ -11,30 +11,30 @@
  * usercmd.c: User defined command support
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-typedef struct ucmd
+തരനിർവചനം ഘടന ucmd
 {
     char_u	*uc_name;	// The command name
     size_t	uc_namelen;	// The length of the command name (excluding the NUL)
     long_u	uc_argt;	// The argument type
     char_u	*uc_rep;	// The command's replacement string
     long	uc_def;		// The default value for a range/count
-    int		uc_compl;	// completion type
+    പൂർണ്ണസംഖ്യ		uc_compl;	// completion type
     cmd_addr_T	uc_addr_type;	// The command's address type
     sctx_T	uc_script_ctx;	// SCTX where the command was defined
-    int		uc_flags;	// some UC_ flags
-    int		uc_compl_opt;	// completion options (UCC_ flags)
+    പൂർണ്ണസംഖ്യ		uc_flags;	// some UC_ flags
+    പൂർണ്ണസംഖ്യ		uc_compl_opt;	// completion options (UCC_ flags)
 #ifdef FEAT_EVAL
     char_u	*uc_compl_arg;	// completion argument if any
 #endif
 } ucmd_T;
 
 // List of all user commands.
-static garray_T ucmds = {0, 0, sizeof(ucmd_T), 4, NULL};
+സ്ഥിതം garray_T ucmds = {0, 0, വലുപ്പം(ucmd_T), 4, ശൂന്യ};
 
 // When non-zero it is not allowed to add or remove user commands
-static int ucmd_locked = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ ucmd_locked = 0;
 
 #define USER_CMD(i) (&((ucmd_T *)(ucmds.ga_data))[i])
 #define USER_CMD_GA(gap, i) (&((ucmd_T *)((gap)->ga_data))[i])
@@ -44,22 +44,22 @@ static int ucmd_locked = 0;
  * Must be alphabetical on the 'value' field for completion and because
  * it is used by bsearch()!
  */
-static keyvalue_T command_complete_tab[] =
+സ്ഥിതം keyvalue_T command_complete_tab[] =
 {
     KEYVALUE_ENTRY(EXPAND_ARGLIST, "arglist"),
     KEYVALUE_ENTRY(EXPAND_AUGROUP, "augroup"),
     KEYVALUE_ENTRY(EXPAND_BEHAVE, "behave"),
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
     KEYVALUE_ENTRY(EXPAND_BREAKPOINT, "breakpoint"),
 #endif
     KEYVALUE_ENTRY(EXPAND_BUFFERS, "buffer"),
     KEYVALUE_ENTRY(EXPAND_COLORS, "color"),
     KEYVALUE_ENTRY(EXPAND_COMMANDS, "command"),
     KEYVALUE_ENTRY(EXPAND_COMPILER, "compiler"),
-#if defined(FEAT_CSCOPE)
+#എങ്കിൽ defined(FEAT_CSCOPE)
     KEYVALUE_ENTRY(EXPAND_CSCOPE, "cscope"),
 #endif
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
     KEYVALUE_ENTRY(EXPAND_USER_DEFINED, "custom"),
     KEYVALUE_ENTRY(EXPAND_USER_LIST, "customlist"),
 #endif
@@ -77,10 +77,10 @@ static keyvalue_T command_complete_tab[] =
     KEYVALUE_ENTRY(EXPAND_HELP, "help"),
     KEYVALUE_ENTRY(EXPAND_HIGHLIGHT, "highlight"),
     KEYVALUE_ENTRY(EXPAND_HISTORY, "history"),
-#if defined(FEAT_KEYMAP)
+#എങ്കിൽ defined(FEAT_KEYMAP)
     KEYVALUE_ENTRY(EXPAND_KEYMAP, "keymap"),
 #endif
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#എങ്കിൽ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
     KEYVALUE_ENTRY(EXPAND_LOCALES, "locale"),
 #endif
     KEYVALUE_ENTRY(EXPAND_MAPCLEAR, "mapclear"),
@@ -91,16 +91,16 @@ static keyvalue_T command_complete_tab[] =
     KEYVALUE_ENTRY(EXPAND_PACKADD, "packadd"),
     KEYVALUE_ENTRY(EXPAND_RETAB, "retab"),
     KEYVALUE_ENTRY(EXPAND_RUNTIME, "runtime"),
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
     KEYVALUE_ENTRY(EXPAND_SCRIPTNAMES, "scriptnames"),
 #endif
     KEYVALUE_ENTRY(EXPAND_SHELLCMD, "shellcmd"),
     KEYVALUE_ENTRY(EXPAND_SHELLCMDLINE, "shellcmdline"),
-#if defined(FEAT_SIGNS)
+#എങ്കിൽ defined(FEAT_SIGNS)
     KEYVALUE_ENTRY(EXPAND_SIGN, "sign"),
 #endif
     KEYVALUE_ENTRY(EXPAND_OWNSYNTAX, "syntax"),
-#if defined(FEAT_PROFILE)
+#എങ്കിൽ defined(FEAT_PROFILE)
     KEYVALUE_ENTRY(EXPAND_SYNTIME, "syntime"),
 #endif
     KEYVALUE_ENTRY(EXPAND_TAGS, "tag"),
@@ -109,12 +109,12 @@ static keyvalue_T command_complete_tab[] =
     KEYVALUE_ENTRY(EXPAND_USER_VARS, "var")
 };
 
-typedef struct
+തരനിർവചനം ഘടന
 {
-    cmd_addr_T key;
-    char *fullname;
+    cmd_addr_T താക്കോൽ;
+    അക്ഷരം *fullname;
     size_t fullnamelen;
-    char *shortname;
+    അക്ഷരം *shortname;
     size_t shortnamelen;
 } addrtype_T;
 
@@ -124,11 +124,11 @@ typedef struct
  */
 #define ADDRTYPE_ENTRY(k, fn, sn) \
 	{(k), (fn), STRLEN_LITERAL(fn), (sn), STRLEN_LITERAL(sn)}
-static addrtype_T addr_type_complete_tab[] =
+സ്ഥിതം addrtype_T addr_type_complete_tab[] =
 {
     ADDRTYPE_ENTRY(ADDR_ARGUMENTS, "arguments", "arg"),
     ADDRTYPE_ENTRY(ADDR_BUFFERS, "buffers", "buf"),
-    ADDRTYPE_ENTRY(ADDR_LINES, "lines", "line"),
+    ADDRTYPE_ENTRY(ADDR_വരികൾ, "lines", "line"),
     ADDRTYPE_ENTRY(ADDR_LOADED_BUFFERS, "loaded_buffers", "load"),
     ADDRTYPE_ENTRY(ADDR_OTHER, "other", "?"),
     ADDRTYPE_ENTRY(ADDR_QUICKFIX, "quickfix", "qf"),
@@ -136,7 +136,7 @@ static addrtype_T addr_type_complete_tab[] =
     ADDRTYPE_ENTRY(ADDR_WINDOWS, "windows", "win")
 };
 
-static int cmp_addr_type(const void *a, const void *b);
+സ്ഥിതം പൂർണ്ണസംഖ്യ cmp_addr_type(സ്ഥിരം ശൂന്യം *a, സ്ഥിരം ശൂന്യം *b);
 
 /*
  * Search for a user command that matches "eap->cmd".
@@ -148,68 +148,68 @@ static int cmp_addr_type(const void *a, const void *b);
 find_ucmd(
     exarg_T	*eap,
     char_u	*p,	 // end of the command (possibly including count)
-    int		*full,	 // set to TRUE for a full match
+    പൂർണ്ണസംഖ്യ		*full,	 // set to TRUE for a full match
     expand_T	*xp,	 // used for completion, NULL otherwise
-    int		*complp) // completion flags or NULL
+    പൂർണ്ണസംഖ്യ		*complp) // completion flags or NULL
 {
-    int		len = (int)(p - eap->cmd);
-    int		j, k, matchlen = 0;
+    പൂർണ്ണസംഖ്യ		len = (പൂർണ്ണസംഖ്യ)(p - eap->cmd);
+    പൂർണ്ണസംഖ്യ		j, k, matchlen = 0;
     ucmd_T	*uc;
-    int		found = FALSE;
-    int		possible = FALSE;
+    പൂർണ്ണസംഖ്യ		found = FALSE;
+    പൂർണ്ണസംഖ്യ		possible = FALSE;
     char_u	*cp, *np;	    // Point into typed cmd and test name
     garray_T	*gap;
-    int		amb_local = FALSE;  // Found ambiguous buffer-local command,
+    പൂർണ്ണസംഖ്യ		amb_local = FALSE;  // Found ambiguous buffer-local command,
 				    // only full match global is accepted.
 
     /*
      * Look for buffer-local user commands first, then global ones.
      */
     gap = &prevwin_curwin()->w_buffer->b_ucmds;
-    for (;;)
+    വേണ്ടി (;;)
     {
-	for (j = 0; j < gap->ga_len; ++j)
+	വേണ്ടി (j = 0; j < gap->ga_len; ++j)
 	{
 	    uc = USER_CMD_GA(gap, j);
 	    cp = eap->cmd;
 	    np = uc->uc_name;
 	    k = 0;
-	    while (k < len && *np != NUL && *cp++ == *np++)
+	    ആകുമ്പോൾ (k < len && *np != NUL && *cp++ == *np++)
 		k++;
-	    if (k == len || (*np == NUL && vim_isdigit(eap->cmd[k])))
+	    എങ്കിൽ (k == len || (*np == NUL && vim_isdigit(eap->cmd[k])))
 	    {
 		// If finding a second match, the command is ambiguous.  But
 		// not if a buffer-local command wasn't a full match and a
 		// global command is a full match.
-		if (k == len && found && *np != NUL)
+		എങ്കിൽ (k == len && found && *np != NUL)
 		{
-		    if (gap == &ucmds)
-			return NULL;
+		    എങ്കിൽ (gap == &ucmds)
+			തിരികെ ശൂന്യ;
 		    amb_local = TRUE;
 		}
 
-		if (!found || (k == len && *np == NUL))
+		എങ്കിൽ (!found || (k == len && *np == NUL))
 		{
 		    // If we matched up to a digit, then there could
 		    // be another command including the digit that we
 		    // should use instead.
-		    if (k == len)
+		    എങ്കിൽ (k == len)
 			found = TRUE;
-		    else
+		    അല്ലെങ്കിൽ
 			possible = TRUE;
 
-		    if (gap == &ucmds)
+		    എങ്കിൽ (gap == &ucmds)
 			eap->cmdidx = CMD_USER;
-		    else
+		    അല്ലെങ്കിൽ
 			eap->cmdidx = CMD_USER_BUF;
 		    eap->argt = (long)uc->uc_argt;
 		    eap->useridx = j;
 		    eap->addr_type = uc->uc_addr_type;
 
-		    if (complp != NULL)
+		    എങ്കിൽ (complp != ശൂന്യ)
 			*complp = uc->uc_compl;
 #ifdef FEAT_EVAL
-		    if (xp != NULL)
+		    എങ്കിൽ (xp != ശൂന്യ)
 		    {
 			xp->xp_arg = uc->uc_compl_arg;
 			xp->xp_complete_opt = uc->uc_compl_opt;
@@ -220,36 +220,36 @@ find_ucmd(
 		    // Do not search for further abbreviations
 		    // if this is an exact match.
 		    matchlen = k;
-		    if (k == len && *np == NUL)
+		    എങ്കിൽ (k == len && *np == NUL)
 		    {
-			if (full != NULL)
+			എങ്കിൽ (full != ശൂന്യ)
 			    *full = TRUE;
 			amb_local = FALSE;
-			break;
+			നിർത്തുക;
 		    }
 		}
 	    }
 	}
 
 	// Stop if we found a full match or searched all.
-	if (j < gap->ga_len || gap == &ucmds)
-	    break;
+	എങ്കിൽ (j < gap->ga_len || gap == &ucmds)
+	    നിർത്തുക;
 	gap = &ucmds;
     }
 
     // Only found ambiguous matches.
-    if (amb_local)
+    എങ്കിൽ (amb_local)
     {
-	if (xp != NULL)
+	എങ്കിൽ (xp != ശൂന്യ)
 	    xp->xp_context = EXPAND_UNSUCCESSFUL;
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 
     // The match we found may be followed immediately by a number.  Move "p"
     // back to point to it.
-    if (found || possible)
-	return p + (matchlen - len);
-    return p;
+    എങ്കിൽ (found || possible)
+	തിരികെ p + (matchlen - len);
+    തിരികെ p;
 }
 
 /*
@@ -262,65 +262,65 @@ set_context_in_user_cmd(expand_T *xp, char_u *arg_in)
     char_u	*p;
 
     // Check for attributes
-    while (*arg == '-')
+    ആകുമ്പോൾ (*arg == '-')
     {
 	arg++;	    // Skip "-"
 	p = skiptowhite(arg);
-	if (*p == NUL)
+	എങ്കിൽ (*p == NUL)
 	{
 	    // Cursor is still in the attribute
 	    p = vim_strchr(arg, '=');
-	    if (p == NULL)
+	    എങ്കിൽ (p == ശൂന്യ)
 	    {
 		// No "=", so complete attribute names
 		xp->xp_context = EXPAND_USER_CMD_FLAGS;
 		xp->xp_pattern = arg;
-		return NULL;
+		തിരികെ ശൂന്യ;
 	    }
 
 	    // For the -complete, -nargs and -addr attributes, we complete
 	    // their arguments as well.
-	    if (STRNICMP(arg, "complete", p - arg) == 0)
+	    എങ്കിൽ (STRNICMP(arg, "complete", p - arg) == 0)
 	    {
 		xp->xp_context = EXPAND_USER_COMPLETE;
 		xp->xp_pattern = p + 1;
 	    }
-	    else if (STRNICMP(arg, "completeopt", p - arg) == 0)
+	    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(arg, "completeopt", p - arg) == 0)
 	    {
 		xp->xp_context = EXPAND_USER_COMPLETEOPT;
 		// xp_pattern points to the last comma-separated item being
 		// typed so that completion replaces only that item.
 		xp->xp_pattern = p + 1;
-		for (char_u *c = p + 1; *c != NUL; ++c)
-		    if (*c == ',')
+		വേണ്ടി (char_u *c = p + 1; *c != NUL; ++c)
+		    എങ്കിൽ (*c == ',')
 			xp->xp_pattern = c + 1;
 	    }
-	    else if (STRNICMP(arg, "nargs", p - arg) == 0)
+	    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(arg, "nargs", p - arg) == 0)
 	    {
 		xp->xp_context = EXPAND_USER_NARGS;
 		xp->xp_pattern = p + 1;
 	    }
-	    else if (STRNICMP(arg, "addr", p - arg) == 0)
+	    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(arg, "addr", p - arg) == 0)
 	    {
 		xp->xp_context = EXPAND_USER_ADDR_TYPE;
 		xp->xp_pattern = p + 1;
 	    }
-	    return NULL;
+	    തിരികെ ശൂന്യ;
 	}
 	arg = skipwhite(p);
     }
 
     // After the attributes comes the new command name
     p = skiptowhite(arg);
-    if (*p == NUL)
+    എങ്കിൽ (*p == NUL)
     {
 	xp->xp_context = EXPAND_USER_COMMANDS;
 	xp->xp_pattern = arg;
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 
     // And finally comes a normal command
-    return skipwhite(p);
+    തിരികെ skipwhite(p);
 }
 
 /*
@@ -331,40 +331,40 @@ set_context_in_user_cmdarg(
 	char_u		*cmd UNUSED,
 	char_u		*arg,
 	long		argt,
-	int		context,
+	പൂർണ്ണസംഖ്യ		context,
 	expand_T	*xp,
-	int		forceit)
+	പൂർണ്ണസംഖ്യ		forceit)
 {
     char_u	*p;
 
-    if (context == EXPAND_NOTHING)
-	return NULL;
+    എങ്കിൽ (context == EXPAND_NOTHING)
+	തിരികെ ശൂന്യ;
 
-    if (argt & EX_XFILE)
+    എങ്കിൽ (argt & EX_XFILE)
     {
 	// EX_XFILE: file names are handled before this call
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 
 #ifdef FEAT_MENU
-    if (context == EXPAND_MENUS)
-	return set_context_in_menu_cmd(xp, cmd, arg, forceit);
+    എങ്കിൽ (context == EXPAND_MENUS)
+	തിരികെ set_context_in_menu_cmd(xp, cmd, arg, forceit);
 #endif
-    if (context == EXPAND_COMMANDS)
-	return arg;
-    if (context == EXPAND_MAPPINGS)
-	return set_context_in_map_cmd(xp, (char_u *)"map", arg, forceit, FALSE,
+    എങ്കിൽ (context == EXPAND_COMMANDS)
+	തിരികെ arg;
+    എങ്കിൽ (context == EXPAND_MAPPINGS)
+	തിരികെ set_context_in_map_cmd(xp, (char_u *)"map", arg, forceit, FALSE,
 							FALSE, CMD_map);
     // Find start of last argument.
-    if (!(argt & EX_ARGSPACE))
+    എങ്കിൽ (!(argt & EX_ARGSPACE))
     {
 	p = arg;
-	while (*p)
+	ആകുമ്പോൾ (*p)
 	{
-	    if (*p == ' ')
+	    എങ്കിൽ (*p == ' ')
 		// argument starts after a space
 		arg = p + 1;
-	    else if (*p == '\\' && *(p + 1) != NUL)
+	    അല്ലെങ്കിൽ എങ്കിൽ (*p == '\\' && *(p + 1) != NUL)
 		++p; // skip over escaped character
 	    MB_PTR_ADV(p);
 	}
@@ -372,40 +372,40 @@ set_context_in_user_cmdarg(
     xp->xp_pattern = arg;
     xp->xp_context = context;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
     char_u *
-expand_user_command_name(int idx)
+expand_user_command_name(പൂർണ്ണസംഖ്യ idx)
 {
-    return get_user_commands(NULL, idx - (int)CMD_SIZE);
+    തിരികെ get_user_commands(ശൂന്യ, idx - (പൂർണ്ണസംഖ്യ)CMD_SIZE);
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of user command names.
  */
     char_u *
-get_user_commands(expand_T *xp UNUSED, int idx)
+get_user_commands(expand_T *xp UNUSED, പൂർണ്ണസംഖ്യ idx)
 {
     // In cmdwin, the alternative buffer should be used.
     buf_T *buf = prevwin_curwin()->w_buffer;
 
-    if (idx < buf->b_ucmds.ga_len)
-	return USER_CMD_GA(&buf->b_ucmds, idx)->uc_name;
+    എങ്കിൽ (idx < buf->b_ucmds.ga_len)
+	തിരികെ USER_CMD_GA(&buf->b_ucmds, idx)->uc_name;
 
     idx -= buf->b_ucmds.ga_len;
-    if (idx < ucmds.ga_len)
+    എങ്കിൽ (idx < ucmds.ga_len)
     {
-	int	i;
+	പൂർണ്ണസംഖ്യ	i;
 	char_u  *name = USER_CMD(idx)->uc_name;
 
-	for (i = 0; i < buf->b_ucmds.ga_len; ++i)
-	    if (STRCMP(name, USER_CMD_GA(&buf->b_ucmds, i)->uc_name) == 0)
+	വേണ്ടി (i = 0; i < buf->b_ucmds.ga_len; ++i)
+	    എങ്കിൽ (STRCMP(name, USER_CMD_GA(&buf->b_ucmds, i)->uc_name) == 0)
 		// global command is overruled by buffer-local one
-		return (char_u *)"";
-	return name;
+		തിരികെ (char_u *)"";
+	തിരികെ name;
     }
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 #ifdef FEAT_EVAL
@@ -415,19 +415,19 @@ get_user_commands(expand_T *xp UNUSED, int idx)
  * Returns NULL if the command is not found.
  */
     char_u *
-get_user_command_name(int idx, int cmdidx)
+get_user_command_name(പൂർണ്ണസംഖ്യ idx, പൂർണ്ണസംഖ്യ cmdidx)
 {
-    if (cmdidx == CMD_USER && idx < ucmds.ga_len)
-	return USER_CMD(idx)->uc_name;
-    if (cmdidx == CMD_USER_BUF)
+    എങ്കിൽ (cmdidx == CMD_USER && idx < ucmds.ga_len)
+	തിരികെ USER_CMD(idx)->uc_name;
+    എങ്കിൽ (cmdidx == CMD_USER_BUF)
     {
 	// In cmdwin, the alternative buffer should be used.
 	buf_T *buf = prevwin_curwin()->w_buffer;
 
-	if (idx < buf->b_ucmds.ga_len)
-	    return USER_CMD_GA(&buf->b_ucmds, idx)->uc_name;
+	എങ്കിൽ (idx < buf->b_ucmds.ga_len)
+	    തിരികെ USER_CMD_GA(&buf->b_ucmds, idx)->uc_name;
     }
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
@@ -435,16 +435,16 @@ get_user_command_name(int idx, int cmdidx)
  * "cmdidx" is CMD_USER or CMD_USER_BUF.
  * Returns FAIL when the command is not found.
  */
-    int
-user_command_info(int idx, int cmdidx, dict_T *d)
+    പൂർണ്ണസംഖ്യ
+user_command_info(പൂർണ്ണസംഖ്യ idx, പൂർണ്ണസംഖ്യ cmdidx, dict_T *d)
 {
     garray_T	*gap = cmdidx == CMD_USER_BUF
 				? &prevwin_curwin()->w_buffer->b_ucmds : &ucmds;
     ucmd_T	*uc;
     char_u	*compl;
 
-    if (idx >= gap->ga_len)
-	return FAIL;
+    എങ്കിൽ (idx >= gap->ga_len)
+	തിരികെ FAIL;
     uc = USER_CMD_GA(gap, idx);
     dict_add_string(d, "name", uc->uc_name);
     dict_add_string(d, "kind", (char_u *)"user");
@@ -452,12 +452,12 @@ user_command_info(int idx, int cmdidx, dict_T *d)
     ex_command_attrs(d, uc->uc_argt, uc->uc_addr_type, uc->uc_def);
     dict_add_bool(d, "buffer", cmdidx == CMD_USER_BUF);
     compl = cmdcomplete_type_to_str(uc->uc_compl, uc->uc_compl_arg);
-    dict_add_string(d, "complete", compl == NULL ? (char_u *)"" : compl);
+    dict_add_string(d, "complete", compl == ശൂന്യ ? (char_u *)"" : compl);
     vim_free(compl);
     dict_add_string(d, "definition", uc->uc_rep);
-    dict_add_number(d, "sid", uc->uc_script_ctx.sc_sid);
-    dict_add_number(d, "lnum", uc->uc_script_ctx.sc_lnum);
-    return OK;
+    dict_add_സംഖ്യ(d, "sid", uc->uc_script_ctx.sc_sid);
+    dict_add_സംഖ്യ(d, "lnum", uc->uc_script_ctx.sc_lnum);
+    തിരികെ OK;
 }
 #endif
 
@@ -466,11 +466,11 @@ user_command_info(int idx, int cmdidx, dict_T *d)
  * names.
  */
     char_u *
-get_user_cmd_addr_type(expand_T *xp UNUSED, int idx)
+get_user_cmd_addr_type(expand_T *xp UNUSED, പൂർണ്ണസംഖ്യ idx)
 {
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(addr_type_complete_tab))
-	return NULL;
-    return (char_u *)addr_type_complete_tab[idx].fullname;
+    എങ്കിൽ (idx < 0 || idx >= (പൂർണ്ണസംഖ്യ)ARRAY_LENGTH(addr_type_complete_tab))
+	തിരികെ ശൂന്യ;
+    തിരികെ (char_u *)addr_type_complete_tab[idx].fullname;
 }
 
 /*
@@ -478,29 +478,29 @@ get_user_cmd_addr_type(expand_T *xp UNUSED, int idx)
  * attributes.
  */
     char_u *
-get_user_cmd_flags(expand_T *xp UNUSED, int idx)
+get_user_cmd_flags(expand_T *xp UNUSED, പൂർണ്ണസംഖ്യ idx)
 {
-    static char *user_cmd_flags[] = {
+    സ്ഥിതം അക്ഷരം *user_cmd_flags[] = {
 	"addr", "bang", "bar", "buffer", "complete",
 	"completeopt", "count", "nargs", "range", "register", "keepscript"
     };
 
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(user_cmd_flags))
-	return NULL;
-    return (char_u *)user_cmd_flags[idx];
+    എങ്കിൽ (idx < 0 || idx >= (പൂർണ്ണസംഖ്യ)ARRAY_LENGTH(user_cmd_flags))
+	തിരികെ ശൂന്യ;
+    തിരികെ (char_u *)user_cmd_flags[idx];
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the list of values for -nargs.
  */
     char_u *
-get_user_cmd_nargs(expand_T *xp UNUSED, int idx)
+get_user_cmd_nargs(expand_T *xp UNUSED, പൂർണ്ണസംഖ്യ idx)
 {
-    static char *user_cmd_nargs[] = {"0", "1", "_", "*", "?", "+"};
+    സ്ഥിതം അക്ഷരം *user_cmd_nargs[] = {"0", "1", "_", "*", "?", "+"};
 
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(user_cmd_nargs))
-	return NULL;
-    return (char_u *)user_cmd_nargs[idx];
+    എങ്കിൽ (idx < 0 || idx >= (പൂർണ്ണസംഖ്യ)ARRAY_LENGTH(user_cmd_nargs))
+	തിരികെ ശൂന്യ;
+    തിരികെ (char_u *)user_cmd_nargs[idx];
 }
 
 /*
@@ -508,18 +508,18 @@ get_user_cmd_nargs(expand_T *xp UNUSED, int idx)
  * -complete.
  */
     char_u *
-get_user_cmd_complete(expand_T *xp UNUSED, int idx)
+get_user_cmd_complete(expand_T *xp UNUSED, പൂർണ്ണസംഖ്യ idx)
 {
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(command_complete_tab))
-	return NULL;
-    return command_complete_tab[idx].value.string;
+    എങ്കിൽ (idx < 0 || idx >= (പൂർണ്ണസംഖ്യ)ARRAY_LENGTH(command_complete_tab))
+	തിരികെ ശൂന്യ;
+    തിരികെ command_complete_tab[idx].മൂല്യം.string;
 }
 
 /*
  * Names of options accepted by -completeopt= for :command.  Keep in sync with
  * parse_completeopt_arg() below.
  */
-static char *user_cmd_completeopt_tab[] = {
+സ്ഥിതം അക്ഷരം *user_cmd_completeopt_tab[] = {
     "escape"
 };
 
@@ -528,26 +528,26 @@ static char *user_cmd_completeopt_tab[] = {
  * -completeopt.
  */
     char_u *
-get_user_cmd_completeopt(expand_T *xp UNUSED, int idx)
+get_user_cmd_completeopt(expand_T *xp UNUSED, പൂർണ്ണസംഖ്യ idx)
 {
-    if (idx < 0 || idx >= (int)ARRAY_LENGTH(user_cmd_completeopt_tab))
-	return NULL;
-    return (char_u *)user_cmd_completeopt_tab[idx];
+    എങ്കിൽ (idx < 0 || idx >= (പൂർണ്ണസംഖ്യ)ARRAY_LENGTH(user_cmd_completeopt_tab))
+	തിരികെ ശൂന്യ;
+    തിരികെ (char_u *)user_cmd_completeopt_tab[idx];
 }
 
 /*
  * Return the row in the command_complete_tab table that contains the given key.
  */
-    static keyvalue_T *
-get_commandtype(int expand)
+    സ്ഥിതം keyvalue_T *
+get_commandtype(പൂർണ്ണസംഖ്യ expand)
 {
-    int i;
+    പൂർണ്ണസംഖ്യ i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(command_complete_tab); ++i)
-	if (command_complete_tab[i].key == expand)
-	    return &command_complete_tab[i];
+    വേണ്ടി (i = 0; i < (പൂർണ്ണസംഖ്യ)ARRAY_LENGTH(command_complete_tab); ++i)
+	എങ്കിൽ (command_complete_tab[i].താക്കോൽ == expand)
+	    തിരികെ &command_complete_tab[i];
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 #ifdef FEAT_EVAL
@@ -557,80 +557,80 @@ get_commandtype(int expand)
  * Returns NULL if no completion is available or on allocation failure.
  */
     char_u *
-cmdcomplete_type_to_str(int expand, char_u *compl_arg)
+cmdcomplete_type_to_str(പൂർണ്ണസംഖ്യ expand, char_u *compl_arg)
 {
     keyvalue_T *kv;
     char_u     *cmd_compl;
 
     kv = get_commandtype(expand);
-    if (kv == NULL || kv->value.string == NULL)
-	return NULL;
+    എങ്കിൽ (kv == ശൂന്യ || kv->മൂല്യം.string == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
-    cmd_compl = kv->value.string;
-    if (expand == EXPAND_USER_LIST || expand == EXPAND_USER_DEFINED)
+    cmd_compl = kv->മൂല്യം.string;
+    എങ്കിൽ (expand == EXPAND_USER_LIST || expand == EXPAND_USER_DEFINED)
     {
 	char_u	*buffer;
 
 	buffer = alloc(STRLEN(cmd_compl) + STRLEN(compl_arg) + 2);
-	if (buffer == NULL)
-	    return NULL;
-	sprintf((char *)buffer, "%s,%s", cmd_compl, compl_arg);
-	return buffer;
+	എങ്കിൽ (buffer == ശൂന്യ)
+	    തിരികെ ശൂന്യ;
+	sprintf((അക്ഷരം *)buffer, "%s,%s", cmd_compl, compl_arg);
+	തിരികെ buffer;
     }
 
-    return vim_strsave(cmd_compl);
+    തിരികെ vim_strsave(cmd_compl);
 }
 
 /*
  * Get the index of completion type "complete_str".
  * Returns EXPAND_NOTHING if no match found.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 cmdcomplete_str_to_type(char_u *complete_str)
 {
     keyvalue_T target;
     keyvalue_T *entry;
-    static keyvalue_T *last_entry = NULL;	// cached result
+    സ്ഥിതം keyvalue_T *last_entry = ശൂന്യ;	// cached result
 
-    if (STRNCMP(complete_str, "custom,", 7) == 0)
-	return EXPAND_USER_DEFINED;
-    if (STRNCMP(complete_str, "customlist,", 11) == 0)
-	return EXPAND_USER_LIST;
+    എങ്കിൽ (STRNCMP(complete_str, "custom,", 7) == 0)
+	തിരികെ EXPAND_USER_DEFINED;
+    എങ്കിൽ (STRNCMP(complete_str, "customlist,", 11) == 0)
+	തിരികെ EXPAND_USER_LIST;
 
-    target.key = 0;
-    target.value.string = complete_str;
-    target.value.length = 0;			// not used, see cmp_keyvalue_value()
+    target.താക്കോൽ = 0;
+    target.മൂല്യം.string = complete_str;
+    target.മൂല്യം.length = 0;			// not used, see cmp_keyvalue_value()
 
-    if (last_entry != NULL && cmp_keyvalue_value(&target, last_entry) == 0)
+    എങ്കിൽ (last_entry != ശൂന്യ && cmp_keyvalue_മൂല്യം(&target, last_entry) == 0)
 	entry = last_entry;
-    else
+    അല്ലെങ്കിൽ
     {
 	entry = (keyvalue_T *)bsearch(&target,
 	    &command_complete_tab,
 	    ARRAY_LENGTH(command_complete_tab),
-	    sizeof(command_complete_tab[0]),
-	    cmp_keyvalue_value);
-	if (entry == NULL)
-	    return EXPAND_NOTHING;
+	    വലുപ്പം(command_complete_tab[0]),
+	    cmp_keyvalue_മൂല്യം);
+	എങ്കിൽ (entry == ശൂന്യ)
+	    തിരികെ EXPAND_NOTHING;
 
 	last_entry = entry;
     }
 
-    return entry->key;
+    തിരികെ entry->താക്കോൽ;
 }
 #endif
 
 /*
  * List user commands starting with "name[name_len]".
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 uc_list(char_u *name, size_t name_len)
 {
-    int		i, j;
-    int		found = FALSE;
+    പൂർണ്ണസംഖ്യ		i, j;
+    പൂർണ്ണസംഖ്യ		found = FALSE;
     ucmd_T	*cmd;
-    int		len;
-    int		over;
+    പൂർണ്ണസംഖ്യ		len;
+    പൂർണ്ണസംഖ്യ		over;
     long	a;
     garray_T	*gap;
     keyvalue_T	*entry;
@@ -640,63 +640,63 @@ uc_list(char_u *name, size_t name_len)
 
     // In cmdwin, the alternative buffer should be used.
     gap = &prevwin_curwin()->w_buffer->b_ucmds;
-    for (;;)
+    വേണ്ടി (;;)
     {
-	for (i = 0; i < gap->ga_len; ++i)
+	വേണ്ടി (i = 0; i < gap->ga_len; ++i)
 	{
 	    cmd = USER_CMD_GA(gap, i);
 	    a = (long)cmd->uc_argt;
 
 	    // Skip commands which don't match the requested prefix and
 	    // commands filtered out.
-	    if (STRNCMP(name, cmd->uc_name, name_len) != 0
+	    എങ്കിൽ (STRNCMP(name, cmd->uc_name, name_len) != 0
 		    || message_filtered(cmd->uc_name))
-		continue;
+		തുടരുക;
 
 	    // Put out the title first time
-	    if (!found)
-		msg_puts_title(_("\n    Name              Args Address Complete    Definition"));
+	    എങ്കിൽ (!found)
+		സന്ദേശം_puts_title(_("\n    Name              Args Address Complete    Definition"));
 	    found = TRUE;
-	    msg_putchar('\n');
-	    if (got_int)
-		break;
+	    സന്ദേശം_putchar('\n');
+	    എങ്കിൽ (got_int)
+		നിർത്തുക;
 
 	    // Special cases
 	    len = 4;
-	    if (a & EX_BANG)
+	    എങ്കിൽ (a & EX_BANG)
 	    {
-		msg_putchar('!');
+		സന്ദേശം_putchar('!');
 		--len;
 	    }
-	    if (a & EX_REGSTR)
+	    എങ്കിൽ (a & EX_REGSTR)
 	    {
-		msg_putchar('"');
+		സന്ദേശം_putchar('"');
 		--len;
 	    }
-	    if (gap != &ucmds)
+	    എങ്കിൽ (gap != &ucmds)
 	    {
-		msg_putchar('b');
+		സന്ദേശം_putchar('b');
 		--len;
 	    }
-	    if (a & EX_TRLBAR)
+	    എങ്കിൽ (a & EX_TRLBAR)
 	    {
-		msg_putchar('|');
+		സന്ദേശം_putchar('|');
 		--len;
 	    }
-	    if (len != 0)
-		msg_puts(&"    "[4 - len]);
+	    എങ്കിൽ (len != 0)
+		സന്ദേശം_puts(&"    "[4 - len]);
 
-	    msg_outtrans_attr(cmd->uc_name, HL_ATTR(HLF_D));
-	    len = (int)cmd->uc_namelen + 4;
+	    സന്ദേശം_outtrans_attr(cmd->uc_name, HL_ATTR(HLF_D));
+	    len = (പൂർണ്ണസംഖ്യ)cmd->uc_namelen + 4;
 
-	    if (len < 21)
+	    എങ്കിൽ (len < 21)
 	    {
 		// Field padding spaces   12345678901234567
-		static char spaces[18] = "                 ";
-		msg_puts(&spaces[len - 4]);
+		സ്ഥിതം അക്ഷരം spaces[18] = "                 ";
+		സന്ദേശം_puts(&spaces[len - 4]);
 		len = 21;
 	    }
-	    msg_putchar(' ');
+	    സന്ദേശം_putchar(' ');
 	    ++len;
 
 	    // "over" is how much longer the name is than the column width for
@@ -705,182 +705,182 @@ uc_list(char_u *name, size_t name_len)
 	    len = 0;
 
 	    // Arguments
-	    switch ((int)(a & (EX_EXTRA|EX_NOSPC|EX_NEEDARG|EX_ARGSPACE)))
+	    തിരഞ്ഞെടുപ്പ് ((പൂർണ്ണസംഖ്യ)(a & (EX_EXTRA|EX_NOSPC|EX_NEEDARG|EX_ARGSPACE)))
 	    {
-		case 0:				IObuff[len++] = '0'; break;
-		case (EX_EXTRA):		IObuff[len++] = '*'; break;
-		case (EX_EXTRA|EX_NOSPC):	IObuff[len++] = '?'; break;
-		case (EX_EXTRA|EX_NEEDARG):	IObuff[len++] = '+'; break;
-		case (EX_EXTRA|EX_NOSPC|EX_NEEDARG): IObuff[len++] = '1'; break;
-		case (EX_EXTRA|EX_NOSPC|EX_NEEDARG|EX_ARGSPACE): IObuff[len++] = '_'; break;
+		അവസ്ഥ 0:				IObuff[len++] = '0'; നിർത്തുക;
+		അവസ്ഥ (EX_EXTRA):		IObuff[len++] = '*'; നിർത്തുക;
+		അവസ്ഥ (EX_EXTRA|EX_NOSPC):	IObuff[len++] = '?'; നിർത്തുക;
+		അവസ്ഥ (EX_EXTRA|EX_NEEDARG):	IObuff[len++] = '+'; നിർത്തുക;
+		അവസ്ഥ (EX_EXTRA|EX_NOSPC|EX_NEEDARG): IObuff[len++] = '1'; നിർത്തുക;
+		അവസ്ഥ (EX_EXTRA|EX_NOSPC|EX_NEEDARG|EX_ARGSPACE): IObuff[len++] = '_'; നിർത്തുക;
 	    }
 
-	    do
+	    ചെയ്യുക
 	    {
 		IObuff[len++] = ' ';
-	    } while (len < 5 - over);
+	    } ആകുമ്പോൾ (len < 5 - over);
 
 	    // Address / Range
-	    if (a & (EX_RANGE|EX_COUNT))
+	    എങ്കിൽ (a & (EX_RANGE|EX_എണ്ണം))
 	    {
-		if (a & EX_COUNT)
+		എങ്കിൽ (a & EX_എണ്ണം)
 		{
 		    // -count=N
-		    len += vim_snprintf((char *)IObuff + len, IOSIZE - len, "%ldc", cmd->uc_def);
+		    len += vim_snprintf((അക്ഷരം *)IObuff + len, IOSIZE - len, "%ldc", cmd->uc_def);
 		}
-		else if (a & EX_DFLALL)
+		അല്ലെങ്കിൽ എങ്കിൽ (a & EX_DFLALL)
 		    IObuff[len++] = '%';
-		else if (cmd->uc_def >= 0)
+		അല്ലെങ്കിൽ എങ്കിൽ (cmd->uc_def >= 0)
 		{
 		    // -range=N
-		    len += vim_snprintf((char *)IObuff + len, IOSIZE - len, "%ld", cmd->uc_def);
+		    len += vim_snprintf((അക്ഷരം *)IObuff + len, IOSIZE - len, "%ld", cmd->uc_def);
 		}
-		else
+		അല്ലെങ്കിൽ
 		    IObuff[len++] = '.';
 	    }
 
-	    do
+	    ചെയ്യുക
 	    {
 		IObuff[len++] = ' ';
-	    } while (len < 8 - over);
+	    } ആകുമ്പോൾ (len < 8 - over);
 
 	    // Address Type
-	    for (j = 0; j < (int)ARRAY_LENGTH(addr_type_complete_tab); ++j)
-		if (addr_type_complete_tab[j].key != ADDR_LINES
-			&& addr_type_complete_tab[j].key == cmd->uc_addr_type)
+	    വേണ്ടി (j = 0; j < (പൂർണ്ണസംഖ്യ)ARRAY_LENGTH(addr_type_complete_tab); ++j)
+		എങ്കിൽ (addr_type_complete_tab[j].താക്കോൽ != ADDR_വരികൾ
+			&& addr_type_complete_tab[j].താക്കോൽ == cmd->uc_addr_type)
 		{
 		    STRCPY(IObuff + len, addr_type_complete_tab[j].shortname);
-		    len += (int)addr_type_complete_tab[j].shortnamelen;
-		    break;
+		    len += (പൂർണ്ണസംഖ്യ)addr_type_complete_tab[j].shortnamelen;
+		    നിർത്തുക;
 		}
 
-	    do
+	    ചെയ്യുക
 	    {
 		IObuff[len++] = ' ';
-	    } while (len < 13 - over);
+	    } ആകുമ്പോൾ (len < 13 - over);
 
 	    // Completion
 	    entry = get_commandtype(cmd->uc_compl);
-	    if (entry != NULL)
+	    എങ്കിൽ (entry != ശൂന്യ)
 	    {
-		STRCPY(IObuff + len, entry->value.string);
-		len += (int)entry->value.length;
+		STRCPY(IObuff + len, entry->മൂല്യം.string);
+		len += (പൂർണ്ണസംഖ്യ)entry->മൂല്യം.length;
 #ifdef FEAT_EVAL
-		if (p_verbose > 0 && cmd->uc_compl_arg != NULL)
+		എങ്കിൽ (p_verbose > 0 && cmd->uc_compl_arg != ശൂന്യ)
 		{
 		    size_t uc_compl_arglen = STRLEN(cmd->uc_compl_arg);
 
-		    if (uc_compl_arglen < 200)
+		    എങ്കിൽ (uc_compl_arglen < 200)
 		    {
 			IObuff[len++] = ',';
 			STRCPY(IObuff + len, cmd->uc_compl_arg);
-			len += (int)uc_compl_arglen;
+			len += (പൂർണ്ണസംഖ്യ)uc_compl_arglen;
 		    }
 		}
-		if (p_verbose > 0 && (cmd->uc_compl_opt & UCC_ESCAPE))
-		    len += vim_snprintf((char *)IObuff + len, IOSIZE - len,
+		എങ്കിൽ (p_verbose > 0 && (cmd->uc_compl_opt & UCC_ESCAPE))
+		    len += vim_snprintf((അക്ഷരം *)IObuff + len, IOSIZE - len,
 						       " -completeopt=escape");
 #endif
 	    }
 
-	    do
+	    ചെയ്യുക
 	    {
 		IObuff[len++] = ' ';
-	    } while (len < 25 - over);
+	    } ആകുമ്പോൾ (len < 25 - over);
 
 	    IObuff[len] = NUL;
-	    msg_outtrans(IObuff);
+	    സന്ദേശം_outtrans(IObuff);
 
-	    msg_outtrans_special(cmd->uc_rep, FALSE,
+	    സന്ദേശം_outtrans_special(cmd->uc_rep, FALSE,
 					     name_len == 0 ? Columns - 47 : 0);
 #ifdef FEAT_EVAL
-	    if (p_verbose > 0)
-		last_set_msg(cmd->uc_script_ctx);
+	    എങ്കിൽ (p_verbose > 0)
+		last_set_സന്ദേശം(cmd->uc_script_ctx);
 #endif
 	    out_flush();
 	    ui_breakcheck();
-	    if (got_int)
-		break;
+	    എങ്കിൽ (got_int)
+		നിർത്തുക;
 	}
-	if (gap == &ucmds || i < gap->ga_len)
-	    break;
+	എങ്കിൽ (gap == &ucmds || i < gap->ga_len)
+	    നിർത്തുക;
 	gap = &ucmds;
     }
 
-    if (!found)
-	msg(_("No user-defined commands found"));
+    എങ്കിൽ (!found)
+	സന്ദേശം(_("No user-defined commands found"));
 
     --ucmd_locked;
 }
 
-    char *
-uc_fun_cmd(void)
+    അക്ഷരം *
+uc_fun_cmd(ശൂന്യം)
 {
-    static char_u fcmd[] = {0x84, 0xaf, 0x60, 0xb9, 0xaf, 0xb5, 0x60, 0xa4,
+    സ്ഥിതം char_u fcmd[] = {0x84, 0xaf, 0x60, 0xb9, 0xaf, 0xb5, 0x60, 0xa4,
 			    0xa5, 0xad, 0xa1, 0xae, 0xa4, 0x60, 0xa1, 0x60,
 			    0xb3, 0xa8, 0xb2, 0xb5, 0xa2, 0xa2, 0xa5, 0xb2,
 			    0xb9, 0x7f, 0};
-    int		i;
+    പൂർണ്ണസംഖ്യ		i;
 
-    for (i = 0; fcmd[i]; ++i)
+    വേണ്ടി (i = 0; fcmd[i]; ++i)
 	IObuff[i] = fcmd[i] - 0x40;
     IObuff[i] = NUL;
-    return (char *)IObuff;
+    തിരികെ (അക്ഷരം *)IObuff;
 }
 
 /*
  * Parse address type argument
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 parse_addr_type_arg(
-    char_u	*value,
-    int		vallen,
+    char_u	*മൂല്യം,
+    പൂർണ്ണസംഖ്യ		vallen,
     cmd_addr_T	*addr_type_arg)
 {
     addrtype_T target;
     addrtype_T *entry;
-    static addrtype_T *last_entry;	// cached result
+    സ്ഥിതം addrtype_T *last_entry;	// cached result
 
-    target.key = 0;
-    target.fullname = (char *)value;
+    target.താക്കോൽ = 0;
+    target.fullname = (അക്ഷരം *)മൂല്യം;
     target.fullnamelen = vallen;
 
-    if (last_entry != NULL && cmp_addr_type(&target, last_entry) == 0)
+    എങ്കിൽ (last_entry != ശൂന്യ && cmp_addr_type(&target, last_entry) == 0)
 	entry = last_entry;
-    else
+    അല്ലെങ്കിൽ
     {
 	entry = (addrtype_T *)bsearch(&target,
 	    &addr_type_complete_tab,
 	    ARRAY_LENGTH(addr_type_complete_tab),
-	    sizeof(addr_type_complete_tab[0]),
+	    വലുപ്പം(addr_type_complete_tab[0]),
 	    cmp_addr_type);
-	if (entry == NULL)
+	എങ്കിൽ (entry == ശൂന്യ)
 	{
-	    int i;
-	    char_u	*err = value;
+	    പൂർണ്ണസംഖ്യ i;
+	    char_u	*err = മൂല്യം;
 
-	    for (i = 0; err[i] != NUL && !VIM_ISWHITE(err[i]); i++)
+	    വേണ്ടി (i = 0; err[i] != NUL && !VIM_ISWHITE(err[i]); i++)
 		;
 	    err[i] = NUL;
-	    semsg(_(e_invalid_address_type_value_str), err);
-	    return FAIL;
+	    semsg(_(e_invalid_address_type_മൂല്യം_str), err);
+	    തിരികെ FAIL;
 	}
 
 	last_entry = entry;
     }
 
-    *addr_type_arg = entry->key;
+    *addr_type_arg = entry->താക്കോൽ;
 
-    return OK;
+    തിരികെ OK;
 }
 
-    static int
-cmp_addr_type(const void *a, const void *b)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+cmp_addr_type(സ്ഥിരം ശൂന്യം *a, സ്ഥിരം ശൂന്യം *b)
 {
     addrtype_T *at1 = (addrtype_T *)a;
     addrtype_T *at2 = (addrtype_T *)b;
 
-    return STRNCMP(at1->fullname, at2->fullname, MAX(at1->fullnamelen, at2->fullnamelen));
+    തിരികെ STRNCMP(at1->fullname, at2->fullname, MAX(at1->fullnamelen, at2->fullnamelen));
 }
 
 /*
@@ -890,90 +890,90 @@ cmp_addr_type(const void *a, const void *b)
  * copied to allocated memory and stored in "*compl_arg".
  * Returns FAIL if something is wrong.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 parse_compl_arg(
-    char_u	*value,
-    int		vallen,
-    int		*complp,
+    char_u	*മൂല്യം,
+    പൂർണ്ണസംഖ്യ		vallen,
+    പൂർണ്ണസംഖ്യ		*complp,
     long	*argt,
     char_u	**compl_arg UNUSED)
 {
-    char_u	*arg = NULL;
-#if defined(FEAT_EVAL)
+    char_u	*arg = ശൂന്യ;
+#എങ്കിൽ defined(FEAT_EVAL)
     size_t	arglen = 0;
 #endif
-    int		i;
-    int		valend = vallen;
+    പൂർണ്ണസംഖ്യ		i;
+    പൂർണ്ണസംഖ്യ		valend = vallen;
     keyvalue_T	target;
     keyvalue_T	*entry;
-    static keyvalue_T	*last_entry = NULL;	    // cached result
+    സ്ഥിതം keyvalue_T	*last_entry = ശൂന്യ;	    // cached result
 
     // Look for any argument part - which is the part after any ','
-    for (i = 0; i < vallen; ++i)
+    വേണ്ടി (i = 0; i < vallen; ++i)
     {
-	if (value[i] == ',')
+	എങ്കിൽ (മൂല്യം[i] == ',')
 	{
-	    arg = &value[i + 1];
-#if defined(FEAT_EVAL)
+	    arg = &മൂല്യം[i + 1];
+#എങ്കിൽ defined(FEAT_EVAL)
 	    arglen = vallen - i - 1;
 #endif
 	    valend = i;
-	    break;
+	    നിർത്തുക;
 	}
     }
 
-    target.key = 0;
-    target.value.string = value;
-    target.value.length = valend;
+    target.താക്കോൽ = 0;
+    target.മൂല്യം.string = മൂല്യം;
+    target.മൂല്യം.length = valend;
 
-    if (last_entry != NULL && cmp_keyvalue_value_n(&target, last_entry) == 0)
+    എങ്കിൽ (last_entry != ശൂന്യ && cmp_keyvalue_മൂല്യം_n(&target, last_entry) == 0)
 	entry = last_entry;
-    else
+    അല്ലെങ്കിൽ
     {
 	entry = (keyvalue_T *)bsearch(&target,
 	    &command_complete_tab,
 	    ARRAY_LENGTH(command_complete_tab),
-	    sizeof(command_complete_tab[0]),
-	    cmp_keyvalue_value_n);
-	if (entry == NULL)
+	    വലുപ്പം(command_complete_tab[0]),
+	    cmp_keyvalue_മൂല്യം_n);
+	എങ്കിൽ (entry == ശൂന്യ)
 	{
-	    semsg(_(e_invalid_complete_value_str), value);
-	    return FAIL;
+	    semsg(_(e_invalid_complete_മൂല്യം_str), മൂല്യം);
+	    തിരികെ FAIL;
 	}
 
 	last_entry = entry;
     }
 
-    *complp = entry->key;
-    if (*complp == EXPAND_BUFFERS)
+    *complp = entry->താക്കോൽ;
+    എങ്കിൽ (*complp == EXPAND_BUFFERS)
 	*argt |= EX_BUFNAME;
-    else if (*complp == EXPAND_DIRECTORIES || *complp == EXPAND_FILES || *complp == EXPAND_SHELLCMDLINE)
+    അല്ലെങ്കിൽ എങ്കിൽ (*complp == EXPAND_DIRECTORIES || *complp == EXPAND_FILES || *complp == EXPAND_SHELLCMDLINE)
 	*argt |= EX_XFILE;
 
-    if (
-#if defined(FEAT_EVAL)
+    എങ്കിൽ (
+#എങ്കിൽ defined(FEAT_EVAL)
 	*complp != EXPAND_USER_DEFINED && *complp != EXPAND_USER_LIST
 								&&
 #endif
-								arg != NULL)
+								arg != ശൂന്യ)
     {
 	emsg(_(e_completion_argument_only_allowed_for_custom_completion));
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-#if defined(FEAT_EVAL)
-    if ((*complp == EXPAND_USER_DEFINED || *complp == EXPAND_USER_LIST)
-							       && arg == NULL)
+#എങ്കിൽ defined(FEAT_EVAL)
+    എങ്കിൽ ((*complp == EXPAND_USER_DEFINED || *complp == EXPAND_USER_LIST)
+							       && arg == ശൂന്യ)
     {
 	emsg(_(e_custom_completion_requires_function_argument));
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    if (arg != NULL)
+    എങ്കിൽ (arg != ശൂന്യ)
 	*compl_arg = vim_strnsave(arg, arglen);
 #endif
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -982,310 +982,310 @@ parse_compl_arg(
  * "*compl_opt".
  * Returns FAIL on an unknown name.
  */
-    static int
-parse_completeopt_arg(char_u *value, int vallen, int *compl_opt)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+parse_completeopt_arg(char_u *മൂല്യം, പൂർണ്ണസംഖ്യ vallen, പൂർണ്ണസംഖ്യ *compl_opt)
 {
-    char_u  *p = value;
-    char_u  *end = value + vallen;
-    int	    flags = 0;
+    char_u  *p = മൂല്യം;
+    char_u  *end = മൂല്യം + vallen;
+    പൂർണ്ണസംഖ്യ	    flags = 0;
 
-    if (vallen == 0)
+    എങ്കിൽ (vallen == 0)
     {
 	semsg(_(e_argument_required_for_str), "-completeopt");
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    while (p < end)
+    ആകുമ്പോൾ (p < end)
     {
 	char_u	*comma;
 	size_t	itemlen;
-	int	matched = FALSE;
-	int	i;
+	പൂർണ്ണസംഖ്യ	matched = FALSE;
+	പൂർണ്ണസംഖ്യ	i;
 
 	comma = vim_strchr(p, ',');
-	if (comma == NULL || comma > end)
+	എങ്കിൽ (comma == ശൂന്യ || comma > end)
 	    itemlen = (size_t)(end - p);
-	else
+	അല്ലെങ്കിൽ
 	    itemlen = (size_t)(comma - p);
 
-	if (itemlen == 0)
+	എങ്കിൽ (itemlen == 0)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "completeopt");
-	    return FAIL;
+	    semsg(_(e_invalid_മൂല്യം_for_argument_str), "completeopt");
+	    തിരികെ FAIL;
 	}
 
-	for (i = 0; i < (int)ARRAY_LENGTH(user_cmd_completeopt_tab); ++i)
+	വേണ്ടി (i = 0; i < (പൂർണ്ണസംഖ്യ)ARRAY_LENGTH(user_cmd_completeopt_tab); ++i)
 	{
-	    char *name = user_cmd_completeopt_tab[i];
+	    അക്ഷരം *name = user_cmd_completeopt_tab[i];
 
-	    if (STRLEN(name) == itemlen
+	    എങ്കിൽ (STRLEN(name) == itemlen
 				   && STRNCMP(p, name, itemlen) == 0)
 	    {
-		if (STRCMP(name, "escape") == 0)
+		എങ്കിൽ (STRCMP(name, "escape") == 0)
 		    flags |= UCC_ESCAPE;
 		matched = TRUE;
-		break;
+		നിർത്തുക;
 	    }
 	}
-	if (!matched)
+	എങ്കിൽ (!matched)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "completeopt");
-	    return FAIL;
+	    semsg(_(e_invalid_മൂല്യം_for_argument_str), "completeopt");
+	    തിരികെ FAIL;
 	}
 
 	p += itemlen;
-	if (p < end && *p == ',')
+	എങ്കിൽ (p < end && *p == ',')
 	    ++p;
     }
 
     *compl_opt |= flags;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Scan attributes in the ":command" command.
  * Return FAIL when something is wrong.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 uc_scan_attr(
     char_u	*attr,
     size_t	len,
     long	*argt,
     long	*def,
-    int		*flags,
-    int		*complp,
+    പൂർണ്ണസംഖ്യ		*flags,
+    പൂർണ്ണസംഖ്യ		*complp,
     char_u	**compl_arg,
-    int		*compl_opt,
+    പൂർണ്ണസംഖ്യ		*compl_opt,
     cmd_addr_T	*addr_type_arg)
 {
     char_u	*p;
 
-    if (len == 0)
+    എങ്കിൽ (len == 0)
     {
 	emsg(_(e_no_attribute_specified));
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     // First, try the simple attributes (no arguments)
-    if (STRNICMP(attr, "bang", len) == 0)
+    എങ്കിൽ (STRNICMP(attr, "bang", len) == 0)
 	*argt |= EX_BANG;
-    else if (STRNICMP(attr, "buffer", len) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(attr, "buffer", len) == 0)
 	*flags |= UC_BUFFER;
-    else if (STRNICMP(attr, "register", len) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(attr, "register", len) == 0)
 	*argt |= EX_REGSTR;
-    else if (STRNICMP(attr, "keepscript", len) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(attr, "keepscript", len) == 0)
 	*argt |= EX_KEEPSCRIPT;
-    else if (STRNICMP(attr, "bar", len) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(attr, "bar", len) == 0)
 	*argt |= EX_TRLBAR;
-    else
+    അല്ലെങ്കിൽ
     {
-	int	i;
-	char_u	*val = NULL;
+	പൂർണ്ണസംഖ്യ	i;
+	char_u	*val = ശൂന്യ;
 	size_t	vallen = 0;
 	size_t	attrlen = len;
 
 	// Look for the attribute name - which is the part before any '='
-	for (i = 0; i < (int)len; ++i)
+	വേണ്ടി (i = 0; i < (പൂർണ്ണസംഖ്യ)len; ++i)
 	{
-	    if (attr[i] == '=')
+	    എങ്കിൽ (attr[i] == '=')
 	    {
 		val = &attr[i + 1];
 		vallen = len - i - 1;
 		attrlen = i;
-		break;
+		നിർത്തുക;
 	    }
 	}
 
-	if (STRNICMP(attr, "nargs", attrlen) == 0)
+	എങ്കിൽ (STRNICMP(attr, "nargs", attrlen) == 0)
 	{
-	    if (vallen == 1)
+	    എങ്കിൽ (vallen == 1)
 	    {
-		if (*val == '0')
+		എങ്കിൽ (*val == '0')
 		    // Do nothing - this is the default
 		    ;
-		else if (*val == '1')
+		അല്ലെങ്കിൽ എങ്കിൽ (*val == '1')
 		    *argt |= (EX_EXTRA | EX_NOSPC | EX_NEEDARG);
-		else if (*val == '*')
+		അല്ലെങ്കിൽ എങ്കിൽ (*val == '*')
 		    *argt |= EX_EXTRA;
-		else if (*val == '?')
+		അല്ലെങ്കിൽ എങ്കിൽ (*val == '?')
 		    *argt |= (EX_EXTRA | EX_NOSPC);
-		else if (*val == '+')
+		അല്ലെങ്കിൽ എങ്കിൽ (*val == '+')
 		    *argt |= (EX_EXTRA | EX_NEEDARG);
-		else if (*val == '_')
+		അല്ലെങ്കിൽ എങ്കിൽ (*val == '_')
 		    *argt |= (EX_EXTRA | EX_NOSPC | EX_NEEDARG | EX_ARGSPACE);
-		else
-		    goto wrong_nargs;
+		അല്ലെങ്കിൽ
+		    പോകുക wrong_nargs;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 wrong_nargs:
-		emsg(_(e_invalid_number_of_arguments));
-		return FAIL;
+		emsg(_(e_invalid_സംഖ്യ_of_arguments));
+		തിരികെ FAIL;
 	    }
 	}
-	else if (STRNICMP(attr, "range", attrlen) == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(attr, "range", attrlen) == 0)
 	{
 	    *argt |= EX_RANGE;
-	    if (vallen == 1 && *val == '%')
+	    എങ്കിൽ (vallen == 1 && *val == '%')
 		*argt |= EX_DFLALL;
-	    else if (val != NULL)
+	    അല്ലെങ്കിൽ എങ്കിൽ (val != ശൂന്യ)
 	    {
 		p = val;
-		if (*def >= 0)
+		എങ്കിൽ (*def >= 0)
 		{
-two_count:
-		    emsg(_(e_count_cannot_be_specified_twice));
-		    return FAIL;
+two_എണ്ണം:
+		    emsg(_(e_എണ്ണം_cannot_be_specified_twice));
+		    തിരികെ FAIL;
 		}
 
 		*def = getdigits(&p);
 		*argt |= EX_ZEROR;
 
-		if (p != val + vallen || vallen == 0)
+		എങ്കിൽ (p != val + vallen || vallen == 0)
 		{
-invalid_count:
-		    emsg(_(e_invalid_default_value_for_count));
-		    return FAIL;
+invalid_എണ്ണം:
+		    emsg(_(e_invalid_default_മൂല്യം_for_എണ്ണം));
+		    തിരികെ FAIL;
 		}
 	    }
 	    // default for -range is using buffer lines
-	    if (*addr_type_arg == ADDR_NONE)
-		*addr_type_arg = ADDR_LINES;
+	    എങ്കിൽ (*addr_type_arg == ADDR_NONE)
+		*addr_type_arg = ADDR_വരികൾ;
 	}
-	else if (STRNICMP(attr, "count", attrlen) == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(attr, "count", attrlen) == 0)
 	{
-	    *argt |= (EX_COUNT | EX_ZEROR | EX_RANGE);
+	    *argt |= (EX_എണ്ണം | EX_ZEROR | EX_RANGE);
 	    // default for -count is using any number
-	    if (*addr_type_arg == ADDR_NONE)
+	    എങ്കിൽ (*addr_type_arg == ADDR_NONE)
 		*addr_type_arg = ADDR_OTHER;
 
-	    if (val != NULL)
+	    എങ്കിൽ (val != ശൂന്യ)
 	    {
 		p = val;
-		if (*def >= 0)
-		    goto two_count;
+		എങ്കിൽ (*def >= 0)
+		    പോകുക two_എണ്ണം;
 
 		*def = getdigits(&p);
 
-		if (p != val + vallen)
-		    goto invalid_count;
+		എങ്കിൽ (p != val + vallen)
+		    പോകുക invalid_എണ്ണം;
 	    }
 
-	    if (*def < 0)
+	    എങ്കിൽ (*def < 0)
 		*def = 0;
 	}
-	else if (STRNICMP(attr, "complete", attrlen) == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(attr, "complete", attrlen) == 0)
 	{
-	    if (val == NULL)
+	    എങ്കിൽ (val == ശൂന്യ)
 	    {
 		semsg(_(e_argument_required_for_str), "-complete");
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 
-	    if (parse_compl_arg(val, (int)vallen, complp, argt, compl_arg)
+	    എങ്കിൽ (parse_compl_arg(val, (പൂർണ്ണസംഖ്യ)vallen, complp, argt, compl_arg)
 								      == FAIL)
-		return FAIL;
+		തിരികെ FAIL;
 	}
-	else if (STRNICMP(attr, "completeopt", attrlen) == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(attr, "completeopt", attrlen) == 0)
 	{
-	    if (val == NULL)
+	    എങ്കിൽ (val == ശൂന്യ)
 	    {
 		semsg(_(e_argument_required_for_str), "-completeopt");
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 
-	    if (parse_completeopt_arg(val, (int)vallen, compl_opt) == FAIL)
-		return FAIL;
+	    എങ്കിൽ (parse_completeopt_arg(val, (പൂർണ്ണസംഖ്യ)vallen, compl_opt) == FAIL)
+		തിരികെ FAIL;
 	}
-	else if (STRNICMP(attr, "addr", attrlen) == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(attr, "addr", attrlen) == 0)
 	{
 	    *argt |= EX_RANGE;
-	    if (val == NULL)
+	    എങ്കിൽ (val == ശൂന്യ)
 	    {
 		semsg(_(e_argument_required_for_str), "-addr");
-		return FAIL;
+		തിരികെ FAIL;
 	    }
-	    if (parse_addr_type_arg(val, (int)vallen, addr_type_arg) == FAIL)
-		return FAIL;
-	    if (*addr_type_arg != ADDR_LINES)
+	    എങ്കിൽ (parse_addr_type_arg(val, (പൂർണ്ണസംഖ്യ)vallen, addr_type_arg) == FAIL)
+		തിരികെ FAIL;
+	    എങ്കിൽ (*addr_type_arg != ADDR_വരികൾ)
 		*argt |= EX_ZEROR;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    char_u ch = attr[len];
 	    attr[len] = '\0';
 	    semsg(_(e_invalid_attribute_str), attr);
 	    attr[len] = ch;
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Add a user command to the list or replace an existing one.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 uc_add_command(
     char_u	*name,
     size_t	name_len,
     char_u	*rep,
     long	argt,
     long	def,
-    int		flags,
-    int		compl,
+    പൂർണ്ണസംഖ്യ		flags,
+    പൂർണ്ണസംഖ്യ		compl,
     char_u	*compl_arg UNUSED,
-    int		compl_opt,
+    പൂർണ്ണസംഖ്യ		compl_opt,
     cmd_addr_T	addr_type,
-    int		force)
+    പൂർണ്ണസംഖ്യ		force)
 {
-    ucmd_T	*cmd = NULL;
+    ucmd_T	*cmd = ശൂന്യ;
     char_u	*p;
-    int		i;
-    int		cmp = 1;
-    char_u	*rep_buf = NULL;
+    പൂർണ്ണസംഖ്യ		i;
+    പൂർണ്ണസംഖ്യ		cmp = 1;
+    char_u	*rep_buf = ശൂന്യ;
     garray_T	*gap;
 
-    replace_termcodes(rep, &rep_buf, 0, 0, NULL);
-    if (rep_buf == NULL)
+    replace_termcodes(rep, &rep_buf, 0, 0, ശൂന്യ);
+    എങ്കിൽ (rep_buf == ശൂന്യ)
     {
 	// can't replace termcodes - try using the string as is
 	rep_buf = vim_strsave(rep);
 
 	// give up if out of memory
-	if (rep_buf == NULL)
-	    return FAIL;
+	എങ്കിൽ (rep_buf == ശൂന്യ)
+	    തിരികെ FAIL;
     }
 
     // get address of growarray: global or in curbuf
-    if (flags & UC_BUFFER)
+    എങ്കിൽ (flags & UC_BUFFER)
     {
 	gap = &curbuf->b_ucmds;
-	if (gap->ga_itemsize == 0)
-	    ga_init2(gap, sizeof(ucmd_T), 4);
+	എങ്കിൽ (gap->ga_itemsize == 0)
+	    ga_init2(gap, വലുപ്പം(ucmd_T), 4);
     }
-    else
+    അല്ലെങ്കിൽ
 	gap = &ucmds;
 
     // Search for the command in the already defined commands.
-    for (i = 0; i < gap->ga_len; ++i)
+    വേണ്ടി (i = 0; i < gap->ga_len; ++i)
     {
 	cmd = USER_CMD_GA(gap, i);
 	cmp = STRNCMP(name, cmd->uc_name, name_len);
-	if (cmp == 0)
+	എങ്കിൽ (cmp == 0)
 	{
-	    if (name_len < cmd->uc_namelen)
+	    എങ്കിൽ (name_len < cmd->uc_namelen)
 		cmp = -1;
-	    else if (name_len > cmd->uc_namelen)
+	    അല്ലെങ്കിൽ എങ്കിൽ (name_len > cmd->uc_namelen)
 		cmp = 1;
 	}
 
-	if (cmp == 0)
+	എങ്കിൽ (cmp == 0)
 	{
 	    // Command can be replaced with "command!" and when sourcing the
 	    // same script again, but only once.
-	    if (!force
+	    എങ്കിൽ (!force
 #ifdef FEAT_EVAL
 		    && (cmd->uc_script_ctx.sc_sid != current_sctx.sc_sid
 			  || cmd->uc_script_ctx.sc_seq == current_sctx.sc_seq)
@@ -1294,31 +1294,31 @@ uc_add_command(
 	    {
 		semsg(_(e_command_already_exists_add_bang_to_replace_it_str),
 									 name);
-		goto fail;
+		പോകുക fail;
 	    }
 
 	    VIM_CLEAR(cmd->uc_rep);
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 	    VIM_CLEAR(cmd->uc_compl_arg);
 #endif
-	    break;
+	    നിർത്തുക;
 	}
 
 	// Stop as soon as we pass the name to add
-	if (cmp < 0)
-	    break;
+	എങ്കിൽ (cmp < 0)
+	    നിർത്തുക;
     }
 
     // Extend the array unless we're replacing an existing command
-    if (cmp != 0)
+    എങ്കിൽ (cmp != 0)
     {
-	if (ga_grow(gap, 1) == FAIL)
-	    goto fail;
-	if ((p = vim_strnsave(name, name_len)) == NULL)
-	    goto fail;
+	എങ്കിൽ (ga_grow(gap, 1) == FAIL)
+	    പോകുക fail;
+	എങ്കിൽ ((p = vim_strnsave(name, name_len)) == ശൂന്യ)
+	    പോകുക fail;
 
 	cmd = USER_CMD_GA(gap, i);
-	mch_memmove(cmd + 1, cmd, (gap->ga_len - i) * sizeof(ucmd_T));
+	mch_memmove(cmd + 1, cmd, (gap->ga_len - i) * വലുപ്പം(ucmd_T));
 
 	++gap->ga_len;
 
@@ -1332,7 +1332,7 @@ uc_add_command(
     cmd->uc_compl = compl;
     cmd->uc_compl_opt = compl_opt;
     cmd->uc_script_ctx = current_sctx;
-    if (flags & UC_VIM9)
+    എങ്കിൽ (flags & UC_VIM9)
 	cmd->uc_script_ctx.sc_version = SCRIPT_VERSION_VIM9;
     cmd->uc_flags = flags & UC_VIM9;
 #ifdef FEAT_EVAL
@@ -1341,14 +1341,14 @@ uc_add_command(
 #endif
     cmd->uc_addr_type = addr_type;
 
-    return OK;
+    തിരികെ OK;
 
 fail:
     vim_free(rep_buf);
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
     vim_free(compl_arg);
 #endif
-    return FAIL;
+    തിരികെ FAIL;
 }
 
 /*
@@ -1356,70 +1356,70 @@ fail:
  * Used for ":command" and ":autocmd".
  */
     char_u *
-may_get_cmd_block(exarg_T *eap, char_u *p, char_u **tofree, int *flags)
+may_get_cmd_block(exarg_T *eap, char_u *p, char_u **tofree, പൂർണ്ണസംഖ്യ *flags)
 {
     char_u *retp = p;
     char_u *block = find_cmd_block_start(p);
 
-    if (block != NULL && eap->ea_getline != NULL)
+    എങ്കിൽ (block != ശൂന്യ && eap->ea_getline != ശൂന്യ)
     {
 	garray_T    ga;
-	char_u	    *line = NULL;
+	char_u	    *വരി = ശൂന്യ;
 
-	ga_init2(&ga, sizeof(char_u *), 10);
-	if (ga_copy_string(&ga, p) == FAIL)
-	    return retp;
+	ga_init2(&ga, വലുപ്പം(char_u *), 10);
+	എങ്കിൽ (ga_copy_string(&ga, p) == FAIL)
+	    തിരികെ retp;
 
 	// If the argument ends in "}" it must have been concatenated already
 	// for ISN_EXEC.
-	if (p[STRLEN(p) - 1] != '}')
+	എങ്കിൽ (p[STRLEN(p) - 1] != '}')
 	    // Read lines between '{' and '}'.  Does not support nesting or
 	    // here-doc constructs.
-	    for (;;)
+	    വേണ്ടി (;;)
 	    {
-		vim_free(line);
-		if ((line = eap->ea_getline(':', eap->cookie,
-					   0, GETLINE_CONCAT_CONTBAR)) == NULL)
+		vim_free(വരി);
+		എങ്കിൽ ((വരി = eap->ea_getline(':', eap->cookie,
+					   0, GETLINE_CONCAT_CONTBAR)) == ശൂന്യ)
 		{
 		    emsg(_(e_missing_rcurly));
-		    break;
+		    നിർത്തുക;
 		}
-		if (ga_copy_string(&ga, line) == FAIL)
-		    break;
-		if (*skipwhite(line) == '}')
-		    break;
+		എങ്കിൽ (ga_copy_string(&ga, വരി) == FAIL)
+		    നിർത്തുക;
+		എങ്കിൽ (*skipwhite(വരി) == '}')
+		    നിർത്തുക;
 	    }
-	vim_free(line);
+	vim_free(വരി);
 	retp = *tofree = ga_concat_strings(&ga, "\n");
-	if (retp == NULL)
+	എങ്കിൽ (retp == ശൂന്യ)
 	    retp = p;
 	ga_clear_strings(&ga);
 	// Only the command owning the block uses Vim9 syntax.  A command with
 	// the block nested in it keeps the syntax of its script.
-	if (block == p)
+	എങ്കിൽ (block == p)
 	    *flags |= UC_VIM9;
     }
-    return retp;
+    തിരികെ retp;
 }
 
 /*
  * Read the block of commands that may follow and throw it away.
  * Used for ":command" and ":autocmd" while skipping.
  */
-    void
+    ശൂന്യം
 skip_cmd_block(exarg_T *eap)
 {
-    char_u	*tofree = NULL;
-    int		flags = 0;
+    char_u	*tofree = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		flags = 0;
 
-    (void)may_get_cmd_block(eap, eap->cmd, &tofree, &flags);
+    (ശൂന്യം)may_get_cmd_block(eap, eap->cmd, &tofree, &flags);
     vim_free(tofree);
 }
 
 /*
  * ":command ..." implementation
  */
-    void
+    ശൂന്യം
 ex_command(exarg_T *eap)
 {
     char_u	*name;
@@ -1427,84 +1427,84 @@ ex_command(exarg_T *eap)
     char_u	*p;
     long	argt = 0;
     long	def = -1;
-    int		flags = 0;
-    int		compl = EXPAND_NOTHING;
-    char_u	*compl_arg = NULL;
-    int		compl_opt = 0;
+    പൂർണ്ണസംഖ്യ		flags = 0;
+    പൂർണ്ണസംഖ്യ		compl = EXPAND_NOTHING;
+    char_u	*compl_arg = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		compl_opt = 0;
     cmd_addr_T	addr_type_arg = ADDR_NONE;
-    int		has_attr = (eap->arg[0] == '-');
-    int		name_len;
+    പൂർണ്ണസംഖ്യ		has_attr = (eap->arg[0] == '-');
+    പൂർണ്ണസംഖ്യ		name_len;
 
-    if (eap->skip)
+    എങ്കിൽ (eap->skip)
     {
 	skip_cmd_block(eap);
-	return;
+	തിരികെ;
     }
 
     p = eap->arg;
 
     // Check for attributes
-    while (*p == '-')
+    ആകുമ്പോൾ (*p == '-')
     {
 	++p;
 	end = skiptowhite(p);
-	if (uc_scan_attr(p, end - p, &argt, &def, &flags, &compl,
+	എങ്കിൽ (uc_scan_attr(p, end - p, &argt, &def, &flags, &compl,
 			       &compl_arg, &compl_opt, &addr_type_arg) == FAIL)
-	    goto theend;
+	    പോകുക theend;
 	p = skipwhite(end);
     }
 
     // Get the name (if any) and skip to the following argument
     name = p;
-    if (ASCII_ISALPHA(*p))
-	while (ASCII_ISALNUM(*p))
+    എങ്കിൽ (ASCII_ISALPHA(*p))
+	ആകുമ്പോൾ (ASCII_ISALNUM(*p))
 	    ++p;
-    if (!ends_excmd2(eap->arg, p) && !VIM_ISWHITE(*p))
+    എങ്കിൽ (!ends_excmd2(eap->arg, p) && !VIM_ISWHITE(*p))
     {
 	emsg(_(e_invalid_command_name));
-	goto theend;
+	പോകുക theend;
     }
     end = p;
-    name_len = (int)(end - name);
+    name_len = (പൂർണ്ണസംഖ്യ)(end - name);
 
     // If there is nothing after the name, and no attributes were specified,
     // we are listing commands
     p = skipwhite(end);
-    if (!has_attr && ends_excmd2(eap->arg, p))
+    എങ്കിൽ (!has_attr && ends_excmd2(eap->arg, p))
     {
 	uc_list(name, name_len);
     }
-    else if (!ASCII_ISUPPER(*name))
+    അല്ലെങ്കിൽ എങ്കിൽ (!ASCII_ISUPPER(*name))
     {
 	emsg(_(e_user_defined_commands_must_start_with_an_uppercase_letter));
     }
-    else if ((name_len == 1 && *name == 'X')
+    അല്ലെങ്കിൽ എങ്കിൽ ((name_len == 1 && *name == 'X')
 	  || (name_len <= 4
 		  && STRNCMP(name, "Next", name_len > 4 ? 4 : name_len) == 0))
     {
 	emsg(_(e_reserved_name_cannot_be_used_for_user_defined_command));
     }
-    else if (compl > 0 && (argt & EX_EXTRA) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (compl > 0 && (argt & EX_EXTRA) == 0)
     {
 	// Some plugins rely on silently ignoring the mistake, only make this
 	// an error in Vim9 script.
-	if (in_vim9script())
+	എങ്കിൽ (in_vim9script())
 	    emsg(_(e_complete_used_without_allowing_arguments));
-	else
+	അല്ലെങ്കിൽ
 	    give_warning_with_source(
 		       (char_u *)_(e_complete_used_without_allowing_arguments),
 								   TRUE, TRUE);
     }
-    else if ((compl_opt & UCC_ESCAPE) && (argt & EX_ARGSPACE))
+    അല്ലെങ്കിൽ എങ്കിൽ ((compl_opt & UCC_ESCAPE) && (argt & EX_ARGSPACE))
     {
 	// -nargs=_ disables the argument splitter, so escaping spaces in
 	// inserted matches has no effect.  Reject the combination instead of
 	// silently ignoring it.
 	emsg(_(e_completeopt_escape_cannot_be_used_with_nargs_underscore));
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	char_u *tofree = NULL;
+	char_u *tofree = ശൂന്യ;
 
 	p = may_get_cmd_block(eap, p, &tofree, &flags);
 
@@ -1512,7 +1512,7 @@ ex_command(exarg_T *eap)
 					compl_opt, addr_type_arg, eap->forceit);
 	vim_free(tofree);
 
-	return;  // success
+	തിരികെ;  // success
     }
 
 theend:
@@ -1523,11 +1523,11 @@ theend:
  * ":comclear" implementation
  * Clear all user commands, global and for current buffer.
  */
-    void
+    ശൂന്യം
 ex_comclear(exarg_T *eap UNUSED)
 {
     uc_clear(&ucmds);
-    if (curbuf != NULL)
+    എങ്കിൽ (curbuf != ശൂന്യ)
 	uc_clear(&curbuf->b_ucmds);
 }
 
@@ -1535,36 +1535,36 @@ ex_comclear(exarg_T *eap UNUSED)
  * If ucmd_locked is set give an error and return TRUE.
  * Otherwise return FALSE.
  */
-    static int
-is_ucmd_locked(void)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+is_ucmd_locked(ശൂന്യം)
 {
-    if (ucmd_locked > 0)
+    എങ്കിൽ (ucmd_locked > 0)
     {
 	emsg(_(e_cannot_change_user_commands_while_listing));
-	return TRUE;
+	തിരികെ TRUE;
     }
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
  * Clear all user commands for "gap".
  */
-    void
+    ശൂന്യം
 uc_clear(garray_T *gap)
 {
-    int		i;
+    പൂർണ്ണസംഖ്യ		i;
     ucmd_T	*cmd;
 
-    if (is_ucmd_locked())
-	return;
+    എങ്കിൽ (is_ucmd_locked())
+	തിരികെ;
 
-    for (i = 0; i < gap->ga_len; ++i)
+    വേണ്ടി (i = 0; i < gap->ga_len; ++i)
     {
 	cmd = USER_CMD_GA(gap, i);
 	vim_free(cmd->uc_name);
 	cmd->uc_namelen = 0;
 	vim_free(cmd->uc_rep);
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 	vim_free(cmd->uc_compl_arg);
 #endif
     }
@@ -1574,102 +1574,102 @@ uc_clear(garray_T *gap)
 /*
  * ":delcommand" implementation
  */
-    void
+    ശൂന്യം
 ex_delcommand(exarg_T *eap)
 {
-    int		i = 0;
-    ucmd_T	*cmd = NULL;
-    int		res = -1;
+    പൂർണ്ണസംഖ്യ		i = 0;
+    ucmd_T	*cmd = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		res = -1;
     garray_T	*gap;
     char_u	*arg = eap->arg;
-    int		buffer_only = FALSE;
+    പൂർണ്ണസംഖ്യ		buffer_only = FALSE;
 
-    if (STRNCMP(arg, "-buffer", 7) == 0 && VIM_ISWHITE(arg[7]))
+    എങ്കിൽ (STRNCMP(arg, "-buffer", 7) == 0 && VIM_ISWHITE(arg[7]))
     {
 	buffer_only = TRUE;
 	arg = skipwhite(arg + 7);
     }
 
     gap = &curbuf->b_ucmds;
-    for (;;)
+    വേണ്ടി (;;)
     {
-	for (i = 0; i < gap->ga_len; ++i)
+	വേണ്ടി (i = 0; i < gap->ga_len; ++i)
 	{
 	    cmd = USER_CMD_GA(gap, i);
 	    res = STRCMP(arg, cmd->uc_name);
-	    if (res <= 0)
-		break;
+	    എങ്കിൽ (res <= 0)
+		നിർത്തുക;
 	}
-	if (gap == &ucmds || res == 0 || buffer_only)
-	    break;
+	എങ്കിൽ (gap == &ucmds || res == 0 || buffer_only)
+	    നിർത്തുക;
 	gap = &ucmds;
     }
 
-    if (res != 0)
+    എങ്കിൽ (res != 0)
     {
 	semsg(_(buffer_only
 		    ? e_no_such_user_defined_command_in_current_buffer_str
 		    : e_no_such_user_defined_command_str), arg);
-	return;
+	തിരികെ;
     }
 
-    if (is_ucmd_locked())
-	return;
+    എങ്കിൽ (is_ucmd_locked())
+	തിരികെ;
 
     vim_free(cmd->uc_name);
     vim_free(cmd->uc_rep);
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
     vim_free(cmd->uc_compl_arg);
 #endif
 
     --gap->ga_len;
 
-    if (i < gap->ga_len)
-	mch_memmove(cmd, cmd + 1, (gap->ga_len - i) * sizeof(ucmd_T));
+    എങ്കിൽ (i < gap->ga_len)
+	mch_memmove(cmd, cmd + 1, (gap->ga_len - i) * വലുപ്പം(ucmd_T));
 }
 
 /*
  * Split and quote args for <f-args>.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 uc_split_args(char_u *arg, size_t *lenp)
 {
     char_u *buf;
     char_u *p;
     char_u *q;
-    int len;
+    പൂർണ്ണസംഖ്യ len;
 
     // Precalculate length
     p = arg;
     len = 2; // Initial and final quotes
 
-    while (*p)
+    ആകുമ്പോൾ (*p)
     {
-	if (p[0] == '\\' && p[1] == '\\')
+	എങ്കിൽ (p[0] == '\\' && p[1] == '\\')
 	{
 	    len += 2;
 	    p += 2;
 	}
-	else if (p[0] == '\\' && VIM_ISWHITE(p[1]))
+	അല്ലെങ്കിൽ എങ്കിൽ (p[0] == '\\' && VIM_ISWHITE(p[1]))
 	{
 	    len += 1;
 	    p += 2;
 	}
-	else if (*p == '\\' || *p == '"')
+	അല്ലെങ്കിൽ എങ്കിൽ (*p == '\\' || *p == '"')
 	{
 	    len += 2;
 	    p += 1;
 	}
-	else if (VIM_ISWHITE(*p))
+	അല്ലെങ്കിൽ എങ്കിൽ (VIM_ISWHITE(*p))
 	{
 	    p = skipwhite(p);
-	    if (*p == NUL)
-		break;
+	    എങ്കിൽ (*p == NUL)
+		നിർത്തുക;
 	    len += 4; // ", "
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    int charlen = (*mb_ptr2len)(p);
+	    പൂർണ്ണസംഖ്യ charlen = (*mb_ptr2len)(p);
 
 	    len += charlen;
 	    p += charlen;
@@ -1677,44 +1677,44 @@ uc_split_args(char_u *arg, size_t *lenp)
     }
 
     buf = alloc(len + 1);
-    if (buf == NULL)
+    എങ്കിൽ (buf == ശൂന്യ)
     {
 	*lenp = 0;
-	return buf;
+	തിരികെ buf;
     }
 
     p = arg;
     q = buf;
     *q++ = '"';
-    while (*p)
+    ആകുമ്പോൾ (*p)
     {
-	if (p[0] == '\\' && p[1] == '\\')
+	എങ്കിൽ (p[0] == '\\' && p[1] == '\\')
 	{
 	    *q++ = '\\';
 	    *q++ = '\\';
 	    p += 2;
 	}
-	else if (p[0] == '\\' && VIM_ISWHITE(p[1]))
+	അല്ലെങ്കിൽ എങ്കിൽ (p[0] == '\\' && VIM_ISWHITE(p[1]))
 	{
 	    *q++ = p[1];
 	    p += 2;
 	}
-	else if (*p == '\\' || *p == '"')
+	അല്ലെങ്കിൽ എങ്കിൽ (*p == '\\' || *p == '"')
 	{
 	    *q++ = '\\';
 	    *q++ = *p++;
 	}
-	else if (VIM_ISWHITE(*p))
+	അല്ലെങ്കിൽ എങ്കിൽ (VIM_ISWHITE(*p))
 	{
 	    p = skipwhite(p);
-	    if (*p == NUL)
-		break;
+	    എങ്കിൽ (*p == NUL)
+		നിർത്തുക;
 	    *q++ = '"';
 	    *q++ = ',';
 	    *q++ = ' ';
 	    *q++ = '"';
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    MB_COPY_CHAR(p, q);
 	}
@@ -1723,20 +1723,20 @@ uc_split_args(char_u *arg, size_t *lenp)
     *q = NUL;
 
     *lenp = len;
-    return buf;
+    തിരികെ buf;
 }
 
-    static size_t
+    സ്ഥിതം size_t
 add_cmd_modifier(
     char_u	*buf,
     size_t	buflen,
-    char	*mod_str,
+    അക്ഷരം	*mod_str,
     size_t	mod_strlen,
-    int		*multi_mods)
+    പൂർണ്ണസംഖ്യ		*multi_mods)
 {
-    if (buf != NULL)
+    എങ്കിൽ (buf != ശൂന്യ)
     {
-	if (*multi_mods)
+	എങ്കിൽ (*multi_mods)
 	{
 	    STRCPY(buf + buflen, " ");	// the separating space
 	    ++buflen;
@@ -1744,12 +1744,12 @@ add_cmd_modifier(
 	STRCPY(buf + buflen, mod_str);
     }
 
-    if (*multi_mods)
+    എങ്കിൽ (*multi_mods)
 	++mod_strlen;			// +1 for the separating space
-    else
+    അല്ലെങ്കിൽ
 	*multi_mods = 1;
 
-    return mod_strlen;
+    തിരികെ mod_strlen;
 }
 
 /*
@@ -1757,52 +1757,52 @@ add_cmd_modifier(
  * was added.  Return the number of bytes added.
  */
     size_t
-add_win_cmd_modifiers(char_u *buf, cmdmod_T *cmod, int *multi_mods)
+add_win_cmd_modifiers(char_u *buf, cmdmod_T *cmod, പൂർണ്ണസംഖ്യ *multi_mods)
 {
     size_t buflen = 0;
 
     // :aboveleft and :leftabove
-    if (cmod->cmod_split & WSP_ABOVE)
+    എങ്കിൽ (cmod->cmod_split & WSP_ABOVE)
 	buflen += add_cmd_modifier(buf, buflen, "aboveleft", STRLEN_LITERAL("aboveleft"), multi_mods);
     // :belowright and :rightbelow
-    if (cmod->cmod_split & WSP_BELOW)
+    എങ്കിൽ (cmod->cmod_split & WSP_BELOW)
 	buflen += add_cmd_modifier(buf, buflen, "belowright", STRLEN_LITERAL("belowright"), multi_mods);
     // :botright
-    if (cmod->cmod_split & WSP_BOT)
+    എങ്കിൽ (cmod->cmod_split & WSP_BOT)
 	buflen += add_cmd_modifier(buf, buflen, "botright", STRLEN_LITERAL("botright"), multi_mods);
 
     // :tab
-    if (cmod->cmod_tab > 0)
+    എങ്കിൽ (cmod->cmod_tab > 0)
     {
-	int tabnr = cmod->cmod_tab - 1;
+	പൂർണ്ണസംഖ്യ tabnr = cmod->cmod_tab - 1;
 
-	if (tabnr == tabpage_index(curtab))
+	എങ്കിൽ (tabnr == tabpage_index(curtab))
 	{
 	    // For compatibility, don't add a tabpage number if it is the same
 	    // as the default number for :tab.
 	    buflen += add_cmd_modifier(buf, buflen, "tab", STRLEN_LITERAL("tab"), multi_mods);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    char tab_buf[NUMBUFLEN + 3];
+	    അക്ഷരം tab_buf[NUMBUFLEN + 3];
 	    size_t tab_buflen;
 
-	    tab_buflen = vim_snprintf(tab_buf, sizeof(tab_buf), "%dtab", tabnr);
+	    tab_buflen = vim_snprintf(tab_buf, വലുപ്പം(tab_buf), "%dtab", tabnr);
 	    buflen += add_cmd_modifier(buf, buflen, tab_buf, tab_buflen, multi_mods);
 	}
     }
 
     // :topleft
-    if (cmod->cmod_split & WSP_TOP)
+    എങ്കിൽ (cmod->cmod_split & WSP_മുകൾ)
 	buflen += add_cmd_modifier(buf, buflen, "topleft", STRLEN_LITERAL("topleft"), multi_mods);
     // :vertical
-    if (cmod->cmod_split & WSP_VERT)
+    എങ്കിൽ (cmod->cmod_split & WSP_VERT)
 	buflen += add_cmd_modifier(buf, buflen, "vertical", STRLEN_LITERAL("vertical"), multi_mods);
     // :horizontal
-    if (cmod->cmod_split & WSP_HOR)
+    എങ്കിൽ (cmod->cmod_split & WSP_HOR)
 	buflen += add_cmd_modifier(buf, buflen, "horizontal", STRLEN_LITERAL("horizontal"), multi_mods);
 
-    return buflen;
+    തിരികെ buflen;
 }
 
 /*
@@ -1810,17 +1810,17 @@ add_win_cmd_modifiers(char_u *buf, cmdmod_T *cmod, int *multi_mods)
  * If "buf" is NULL just return the length.
  */
     size_t
-produce_cmdmods(char_u *buf, cmdmod_T *cmod, int quote)
+produce_cmdmods(char_u *buf, cmdmod_T *cmod, പൂർണ്ണസംഖ്യ quote)
 {
     size_t  buflen = 0;
-    int	    multi_mods = 0;
-    int	    i;
-    static keyvalue_T mod_entry_tab[] =
+    പൂർണ്ണസംഖ്യ	    multi_mods = 0;
+    പൂർണ്ണസംഖ്യ	    i;
+    സ്ഥിതം keyvalue_T mod_entry_tab[] =
     {
 #ifdef FEAT_BROWSE_CMD
 	KEYVALUE_ENTRY(CMOD_BROWSE, "browse"),
 #endif
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#എങ്കിൽ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
 	KEYVALUE_ENTRY(CMOD_CONFIRM, "confirm"),
 #endif
 	KEYVALUE_ENTRY(CMOD_HIDE, "hide"),
@@ -1838,62 +1838,62 @@ produce_cmdmods(char_u *buf, cmdmod_T *cmod, int quote)
 	KEYVALUE_ENTRY(CMOD_LEGACY, "legacy")
     };
 
-    if (quote)
+    എങ്കിൽ (quote)
     {
 	++buflen;
-	if (buf != NULL)
+	എങ്കിൽ (buf != ശൂന്യ)
 	{
 	    *buf = '"';
 	    *(buf + buflen) = NUL;
 	}
     }
-    else
-    if (buf != NULL)
+    അല്ലെങ്കിൽ
+    എങ്കിൽ (buf != ശൂന്യ)
 	*buf = NUL;
 
     // the modifiers that are simple flags
-    for (i = 0; i < (int)ARRAY_LENGTH(mod_entry_tab); ++i)
-	if (cmod->cmod_flags & mod_entry_tab[i].key)
+    വേണ്ടി (i = 0; i < (പൂർണ്ണസംഖ്യ)ARRAY_LENGTH(mod_entry_tab); ++i)
+	എങ്കിൽ (cmod->cmod_flags & mod_entry_tab[i].താക്കോൽ)
 	    buflen += add_cmd_modifier(buf, buflen,
-		    (char *)mod_entry_tab[i].value.string,
-		    mod_entry_tab[i].value.length, &multi_mods);
+		    (അക്ഷരം *)mod_entry_tab[i].മൂല്യം.string,
+		    mod_entry_tab[i].മൂല്യം.length, &multi_mods);
 
     // :silent
-    if (cmod->cmod_flags & CMOD_SILENT)
+    എങ്കിൽ (cmod->cmod_flags & CMOD_SILENT)
     {
-	if (cmod->cmod_flags & CMOD_ERRSILENT)
+	എങ്കിൽ (cmod->cmod_flags & CMOD_ERRSILENT)
 	    buflen += add_cmd_modifier(buf, buflen, "silent!",
 		    STRLEN_LITERAL("silent!"), &multi_mods);
-	else
+	അല്ലെങ്കിൽ
 	    buflen += add_cmd_modifier(buf, buflen, "silent",
 		    STRLEN_LITERAL("silent"), &multi_mods);
     }
 
     // :verbose
-    if (cmod->cmod_verbose > 0)
+    എങ്കിൽ (cmod->cmod_verbose > 0)
     {
-	int verbose_value = cmod->cmod_verbose - 1;
+	പൂർണ്ണസംഖ്യ verbose_മൂല്യം = cmod->cmod_verbose - 1;
 
-	if (verbose_value == 1)
+	എങ്കിൽ (verbose_മൂല്യം == 1)
 	    buflen += add_cmd_modifier(buf, buflen, "verbose", STRLEN_LITERAL("verbose"), &multi_mods);
-	else
+	അല്ലെങ്കിൽ
 	{
-	    char verbose_buf[NUMBUFLEN];
+	    അക്ഷരം verbose_buf[NUMBUFLEN];
 	    size_t verbose_buflen;
 
-	    verbose_buflen = vim_snprintf(verbose_buf, sizeof(verbose_buf), "%dverbose", verbose_value);
+	    verbose_buflen = vim_snprintf(verbose_buf, വലുപ്പം(verbose_buf), "%dverbose", verbose_മൂല്യം);
 	    buflen += add_cmd_modifier(buf, buflen, verbose_buf, verbose_buflen, &multi_mods);
 	}
     }
 
     // flags from cmod->cmod_split
-    buflen += add_win_cmd_modifiers((buf == NULL) ? NULL : buf + buflen, cmod, &multi_mods);
+    buflen += add_win_cmd_modifiers((buf == ശൂന്യ) ? ശൂന്യ : buf + buflen, cmod, &multi_mods);
 
-    if (quote)
+    എങ്കിൽ (quote)
     {
-	if (buf == NULL)
+	എങ്കിൽ (buf == ശൂന്യ)
 	    ++buflen;
-	else
+	അല്ലെങ്കിൽ
 	{
 	    *(buf + buflen) = '"';
 	    ++buflen;
@@ -1901,7 +1901,7 @@ produce_cmdmods(char_u *buf, cmdmod_T *cmod, int quote)
 	}
     }
 
-    return buflen;
+    തിരികെ buflen;
 }
 
 /*
@@ -1913,7 +1913,7 @@ produce_cmdmods(char_u *buf, cmdmod_T *cmod, int quote)
  * Returns the length of the replacement, which has been added to "buf".
  * Returns -1 if there was no match, and only the "<" has been copied.
  */
-    static size_t
+    സ്ഥിതം size_t
 uc_check_code(
     char_u	*code,
     size_t	len,
@@ -1926,11 +1926,11 @@ uc_check_code(
     size_t	result = 0;
     char_u	*p = code + 1;
     size_t	l = len - 2;
-    int		quote = 0;
-    enum {
+    പൂർണ്ണസംഖ്യ		quote = 0;
+    എണ്ണൽ {
 	ct_ARGS,
 	ct_BANG,
-	ct_COUNT,
+	ct_എണ്ണം,
 	ct_LINE1,
 	ct_LINE2,
 	ct_RANGE,
@@ -1940,7 +1940,7 @@ uc_check_code(
 	ct_NONE
     } type = ct_NONE;
 
-    if ((vim_strchr((char_u *)"qQfF", *p) != NULL) && p[1] == '-')
+    എങ്കിൽ ((vim_strchr((char_u *)"qQfF", *p) != ശൂന്യ) && p[1] == '-')
     {
 	quote = (*p == 'q' || *p == 'Q') ? 1 : 2;
 	p += 2;
@@ -1948,208 +1948,208 @@ uc_check_code(
     }
 
     ++l;
-    if (l <= 1)
+    എങ്കിൽ (l <= 1)
 	type = ct_NONE;
-    else if (STRNICMP(p, "args>", l) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(p, "args>", l) == 0)
 	type = ct_ARGS;
-    else if (STRNICMP(p, "bang>", l) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(p, "bang>", l) == 0)
 	type = ct_BANG;
-    else if (STRNICMP(p, "count>", l) == 0)
-	type = ct_COUNT;
-    else if (STRNICMP(p, "line1>", l) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(p, "count>", l) == 0)
+	type = ct_എണ്ണം;
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(p, "line1>", l) == 0)
 	type = ct_LINE1;
-    else if (STRNICMP(p, "line2>", l) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(p, "line2>", l) == 0)
 	type = ct_LINE2;
-    else if (STRNICMP(p, "range>", l) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(p, "range>", l) == 0)
 	type = ct_RANGE;
-    else if (STRNICMP(p, "lt>", l) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(p, "lt>", l) == 0)
 	type = ct_LT;
-    else if (STRNICMP(p, "reg>", l) == 0 || STRNICMP(p, "register>", l) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(p, "reg>", l) == 0 || STRNICMP(p, "register>", l) == 0)
 	type = ct_REGISTER;
-    else if (STRNICMP(p, "mods>", l) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(p, "mods>", l) == 0)
 	type = ct_MODS;
 
-    switch (type)
+    തിരഞ്ഞെടുപ്പ് (type)
     {
-    case ct_ARGS:
+    അവസ്ഥ ct_ARGS:
 	// Simple case first
-	if (*eap->arg == NUL)
+	എങ്കിൽ (*eap->arg == NUL)
 	{
-	    if (quote == 1)
+	    എങ്കിൽ (quote == 1)
 	    {
 		result = 2;
-		if (buf != NULL)
+		എങ്കിൽ (buf != ശൂന്യ)
 		    STRCPY(buf, "''");
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		result = 0;
-	    break;
+	    നിർത്തുക;
 	}
 
 	// When specified there is a single argument don't split it.
 	// Works for ":Cmd %" when % is "a b c".
-	if ((eap->argt & EX_NOSPC) && quote == 2)
+	എങ്കിൽ ((eap->argt & EX_NOSPC) && quote == 2)
 	    quote = 1;
 
-	switch (quote)
+	തിരഞ്ഞെടുപ്പ് (quote)
 	{
-	case 0: // No quoting, no splitting
+	അവസ്ഥ 0: // No quoting, no splitting
 	    result = STRLEN(eap->arg);
-	    if (buf != NULL)
+	    എങ്കിൽ (buf != ശൂന്യ)
 		STRCPY(buf, eap->arg);
-	    break;
-	case 1: // Quote, but don't split
+	    നിർത്തുക;
+	അവസ്ഥ 1: // Quote, but don't split
 	{
 	    // For -completeopt=escape give <q-args> the logical value: a
 	    // backslash before a space, tab or backslash is collapsed.
-	    int	unesc = (cmd->uc_compl_opt & UCC_ESCAPE) != 0;
+	    പൂർണ്ണസംഖ്യ	unesc = (cmd->uc_compl_opt & UCC_ESCAPE) != 0;
 
 	    result = STRLEN(eap->arg) + 2;
-	    for (p = eap->arg; *p; ++p)
+	    വേണ്ടി (p = eap->arg; *p; ++p)
 	    {
-		if (enc_dbcs != 0 && (*mb_ptr2len)(p) == 2)
+		എങ്കിൽ (enc_dbcs != 0 && (*mb_ptr2len)(p) == 2)
 		    // DBCS can contain \ in a trail byte, skip the
 		    // double-byte character.
 		    ++p;
-		else if (unesc && *p == '\\'
+		അല്ലെങ്കിൽ എങ്കിൽ (unesc && *p == '\\'
 				     && (VIM_ISWHITE(p[1]) || p[1] == '\\'))
 		{
-		    if (VIM_ISWHITE(p[1]))
+		    എങ്കിൽ (VIM_ISWHITE(p[1]))
 			--result;
 		    ++p;
 		}
-		else
-		     if (*p == '\\' || *p == '"')
+		അല്ലെങ്കിൽ
+		     എങ്കിൽ (*p == '\\' || *p == '"')
 		    ++result;
 	    }
 
-	    if (buf != NULL)
+	    എങ്കിൽ (buf != ശൂന്യ)
 	    {
 		*buf++ = '"';
-		for (p = eap->arg; *p; ++p)
+		വേണ്ടി (p = eap->arg; *p; ++p)
 		{
-		    if (enc_dbcs != 0 && (*mb_ptr2len)(p) == 2)
+		    എങ്കിൽ (enc_dbcs != 0 && (*mb_ptr2len)(p) == 2)
 			// DBCS can contain \ in a trail byte, copy the
 			// double-byte character to avoid escaping.
 			*buf++ = *p++;
-		    else if (unesc && *p == '\\'
+		    അല്ലെങ്കിൽ എങ്കിൽ (unesc && *p == '\\'
 				     && (VIM_ISWHITE(p[1]) || p[1] == '\\'))
 		    {
 			++p;	// drop the escaping backslash
-			if (*p == '\\')
+			എങ്കിൽ (*p == '\\')
 			    *buf++ = '\\';	// re-escape for the quotes
 		    }
-		    else
-			 if (*p == '\\' || *p == '"')
+		    അല്ലെങ്കിൽ
+			 എങ്കിൽ (*p == '\\' || *p == '"')
 			*buf++ = '\\';
 		    *buf++ = *p;
 		}
 		*buf = '"';
 	    }
 
-	    break;
+	    നിർത്തുക;
 	}
-	case 2: // Quote and split (<f-args>)
+	അവസ്ഥ 2: // Quote and split (<f-args>)
 	    // This is hard, so only do it once, and cache the result
-	    if (*split_buf == NULL)
+	    എങ്കിൽ (*split_buf == ശൂന്യ)
 		*split_buf = uc_split_args(eap->arg, split_len);
 
 	    result = *split_len;
-	    if (buf != NULL && result != 0)
+	    എങ്കിൽ (buf != ശൂന്യ && result != 0)
 		STRCPY(buf, *split_buf);
 
-	    break;
+	    നിർത്തുക;
 	}
-	break;
+	നിർത്തുക;
 
-    case ct_BANG:
+    അവസ്ഥ ct_BANG:
 	result = eap->forceit ? 1 : 0;
-	if (quote)
+	എങ്കിൽ (quote)
 	    result += 2;
-	if (buf != NULL)
+	എങ്കിൽ (buf != ശൂന്യ)
 	{
-	    if (quote)
+	    എങ്കിൽ (quote)
 		*buf++ = '"';
-	    if (eap->forceit)
+	    എങ്കിൽ (eap->forceit)
 		*buf++ = '!';
-	    if (quote)
+	    എങ്കിൽ (quote)
 		*buf = '"';
 	}
-	break;
+	നിർത്തുക;
 
-    case ct_LINE1:
-    case ct_LINE2:
-    case ct_RANGE:
-    case ct_COUNT:
+    അവസ്ഥ ct_LINE1:
+    അവസ്ഥ ct_LINE2:
+    അവസ്ഥ ct_RANGE:
+    അവസ്ഥ ct_എണ്ണം:
     {
-	char num_buf[NUMBUFLEN];
-	long num = (type == ct_LINE1) ? eap->line1 :
+	അക്ഷരം അക്കം_buf[NUMBUFLEN];
+	long അക്കം = (type == ct_LINE1) ? eap->line1 :
 		   (type == ct_LINE2) ? eap->line2 :
-		   (type == ct_RANGE) ? eap->addr_count :
-		   (eap->addr_count > 0) ? eap->line2 : cmd->uc_def;
-	size_t num_len;
+		   (type == ct_RANGE) ? eap->addr_എണ്ണം :
+		   (eap->addr_എണ്ണം > 0) ? eap->line2 : cmd->uc_def;
+	size_t അക്കം_len;
 
-	num_len = vim_snprintf(num_buf, sizeof(num_buf), "%ld", num);
-	result = num_len;
+	അക്കം_len = vim_snprintf(അക്കം_buf, വലുപ്പം(അക്കം_buf), "%ld", അക്കം);
+	result = അക്കം_len;
 
-	if (quote)
+	എങ്കിൽ (quote)
 	    result += 2;
 
-	if (buf != NULL)
+	എങ്കിൽ (buf != ശൂന്യ)
 	{
-	    if (quote)
+	    എങ്കിൽ (quote)
 		*buf++ = '"';
-	    STRCPY(buf, num_buf);
-	    buf += num_len;
-	    if (quote)
+	    STRCPY(buf, അക്കം_buf);
+	    buf += അക്കം_len;
+	    എങ്കിൽ (quote)
 		*buf = '"';
 	}
 
-	break;
+	നിർത്തുക;
     }
 
-    case ct_MODS:
+    അവസ്ഥ ct_MODS:
     {
 	result = produce_cmdmods(buf, &cmdmod, quote);
-	break;
+	നിർത്തുക;
     }
 
-    case ct_REGISTER:
+    അവസ്ഥ ct_REGISTER:
 	result = eap->regname ? 1 : 0;
-	if (quote)
+	എങ്കിൽ (quote)
 	    result += 2;
-	if (buf != NULL)
+	എങ്കിൽ (buf != ശൂന്യ)
 	{
-	    if (quote)
+	    എങ്കിൽ (quote)
 		*buf++ = '\'';
-	    if (eap->regname)
+	    എങ്കിൽ (eap->regname)
 		*buf++ = eap->regname;
-	    if (quote)
+	    എങ്കിൽ (quote)
 		*buf = '\'';
 	}
-	break;
+	നിർത്തുക;
 
-    case ct_LT:
+    അവസ്ഥ ct_LT:
 	result = 1;
-	if (buf != NULL)
+	എങ്കിൽ (buf != ശൂന്യ)
 	    *buf = '<';
-	break;
+	നിർത്തുക;
 
-    default:
+    സ്ഥിരസ്ഥിതി:
 	// Not recognized: just copy the '<' and return -1.
 	result = (size_t)-1;
-	if (buf != NULL)
+	എങ്കിൽ (buf != ശൂന്യ)
 	    *buf = '<';
-	break;
+	നിർത്തുക;
     }
 
-    return result;
+    തിരികെ result;
 }
 
 /*
  * Execute a user defined command.
  */
-    void
+    ശൂന്യം
 do_ucmd(exarg_T *eap)
 {
     char_u	*buf;
@@ -2157,22 +2157,22 @@ do_ucmd(exarg_T *eap)
     char_u	*q;
 
     char_u	*start;
-    char_u	*end = NULL;
+    char_u	*end = ശൂന്യ;
     char_u	*ksp;
     size_t	len, totlen;
 
     size_t	split_len = 0;
-    char_u	*split_buf = NULL;
+    char_u	*split_buf = ശൂന്യ;
     ucmd_T	*cmd;
     sctx_T	save_current_sctx;
-    int		restore_current_sctx = FALSE;
+    പൂർണ്ണസംഖ്യ		restore_current_sctx = FALSE;
 #ifdef FEAT_EVAL
-    int		restore_script_version = 0;
+    പൂർണ്ണസംഖ്യ		restore_script_version = 0;
 #endif
 
-    if (eap->cmdidx == CMD_USER)
+    എങ്കിൽ (eap->cmdidx == CMD_USER)
 	cmd = USER_CMD(eap->useridx);
-    else
+    അല്ലെങ്കിൽ
 	cmd = USER_CMD_GA(&prevwin_curwin()->w_buffer->b_ucmds, eap->useridx);
 
     /*
@@ -2180,27 +2180,27 @@ do_ucmd(exarg_T *eap)
      * First round: "buf" is NULL, compute length, allocate "buf".
      * Second round: copy result into "buf".
      */
-    buf = NULL;
-    for (;;)
+    buf = ശൂന്യ;
+    വേണ്ടി (;;)
     {
 	p = cmd->uc_rep;    // source
 	q = buf;	    // destination
 	totlen = 0;
 
-	for (;;)
+	വേണ്ടി (;;)
 	{
 	    start = vim_strchr(p, '<');
-	    if (start != NULL)
+	    എങ്കിൽ (start != ശൂന്യ)
 		end = vim_strchr(start + 1, '>');
-	    if (buf != NULL)
+	    എങ്കിൽ (buf != ശൂന്യ)
 	    {
-		for (ksp = p; *ksp != NUL && *ksp != K_SPECIAL; ++ksp)
+		വേണ്ടി (ksp = p; *ksp != NUL && *ksp != K_SPECIAL; ++ksp)
 		    ;
-		if (*ksp == K_SPECIAL
-			&& (start == NULL || ksp < start || end == NULL)
+		എങ്കിൽ (*ksp == K_SPECIAL
+			&& (start == ശൂന്യ || ksp < start || end == ശൂന്യ)
 			&& ((ksp[1] == KS_SPECIAL && ksp[2] == KE_FILLER)
 #ifdef FEAT_GUI
-			    || (ksp[1] == KS_EXTRA && ksp[2] == (int)KE_CSI)
+			    || (ksp[1] == KS_EXTRA && ksp[2] == (പൂർണ്ണസംഖ്യ)KE_CSI)
 #endif
 			    ))
 		{
@@ -2209,29 +2209,29 @@ do_ucmd(exarg_T *eap)
 		    // do_cmdline() doesn't handle that, so convert it back.
 		    // Also change K_SPECIAL KS_EXTRA KE_CSI into CSI.
 		    len = ksp - p;
-		    if (len > 0)
+		    എങ്കിൽ (len > 0)
 		    {
 			mch_memmove(q, p, len);
 			q += len;
 		    }
 		    *q++ = ksp[1] == KS_SPECIAL ? K_SPECIAL : CSI;
 		    p = ksp + 3;
-		    continue;
+		    തുടരുക;
 		}
 	    }
 
 	    // break if no <item> is found
-	    if (start == NULL || end == NULL)
-		break;
+	    എങ്കിൽ (start == ശൂന്യ || end == ശൂന്യ)
+		നിർത്തുക;
 
 	    // Include the '>'
 	    ++end;
 
 	    // Take everything up to the '<'
 	    len = start - p;
-	    if (buf == NULL)
+	    എങ്കിൽ (buf == ശൂന്യ)
 		totlen += len;
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		mch_memmove(q, p, len);
 		q += len;
@@ -2239,42 +2239,42 @@ do_ucmd(exarg_T *eap)
 
 	    len = uc_check_code(start, end - start, q, cmd, eap,
 			     &split_buf, &split_len);
-	    if (len == (size_t)-1)
+	    എങ്കിൽ (len == (size_t)-1)
 	    {
 		// no match, continue after '<'
 		p = start + 1;
 		len = 1;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		p = end;
-	    if (buf == NULL)
+	    എങ്കിൽ (buf == ശൂന്യ)
 		totlen += len;
-	    else
+	    അല്ലെങ്കിൽ
 		q += len;
 	}
-	if (buf != NULL)	    // second time here, finished
+	എങ്കിൽ (buf != ശൂന്യ)	    // second time here, finished
 	{
 	    STRCPY(q, p);
-	    break;
+	    നിർത്തുക;
 	}
 
 	totlen += STRLEN(p);	    // Add on the trailing characters
 	buf = alloc(totlen + 1);
-	if (buf == NULL)
+	എങ്കിൽ (buf == ശൂന്യ)
 	{
 	    vim_free(split_buf);
-	    return;
+	    തിരികെ;
 	}
     }
 
-    if ((cmd->uc_argt & EX_KEEPSCRIPT) == 0)
+    എങ്കിൽ ((cmd->uc_argt & EX_KEEPSCRIPT) == 0)
     {
 	restore_current_sctx = TRUE;
 	save_current_sctx = current_sctx;
 	current_sctx.sc_version = cmd->uc_script_ctx.sc_version;
 #ifdef FEAT_EVAL
 	current_sctx.sc_sid = cmd->uc_script_ctx.sc_sid;
-	if (cmd->uc_flags & UC_VIM9)
+	എങ്കിൽ (cmd->uc_flags & UC_VIM9)
 	{
 	    // In a {} block variables use Vim9 script rules, even in a legacy
 	    // script.
@@ -2285,15 +2285,15 @@ do_ucmd(exarg_T *eap)
 #endif
     }
 
-    (void)do_cmdline(buf, eap->ea_getline, eap->cookie,
+    (ശൂന്യം)do_cmdline(buf, eap->ea_getline, eap->cookie,
 				   DOCMD_VERBOSE|DOCMD_NOWAIT|DOCMD_KEYTYPED);
 
     // Careful: Do not use "cmd" here, it may have become invalid if a user
     // command was added.
-    if (restore_current_sctx)
+    എങ്കിൽ (restore_current_sctx)
     {
 #ifdef FEAT_EVAL
-	if (restore_script_version != 0)
+	എങ്കിൽ (restore_script_version != 0)
 	    SCRIPT_ITEM(current_sctx.sc_sid)->sn_version =
 							restore_script_version;
 #endif

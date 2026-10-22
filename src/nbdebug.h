@@ -15,7 +15,7 @@
 
 # ifndef ASSERT
 #  define ASSERT(c) \
-    if (!(c)) \
+    എങ്കിൽ (!(c)) \
     { \
 	fprintf(stderr, "Assertion failed: line %d, file %s\n", \
 		__LINE__, __FILE__); \
@@ -32,26 +32,26 @@
 # define NB_PRINT		0x00000008
 # define NB_DEBUG_ALL		0xffffffff
 
-# define NBDLEVEL(flags)	(nb_debug != NULL && (nb_dlevel & (flags)))
+# define NBDLEVEL(flags)	(nb_debug != ശൂന്യ && (nb_dlevel & (flags)))
 
 # define NBDEBUG_TRACE	1
 
-typedef enum {
+തരനിർവചനം എണ്ണൽ {
 		WT_ENV = 1,		// look for env var if set
 		WT_WAIT,		// look for ~/.gvimwait if set
 		WT_STOP			// look for ~/.gvimstop if set
 } WtWait;
 
 
-void		 nbdbg(char *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+ശൂന്യം		 nbdbg(അക്ഷരം *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-void nbdebug_wait(u_int wait_flags, char *wait_var, u_int wait_secs);
-void nbdebug_log_init(char *log_var, char *level_var);
+ശൂന്യം nbdebug_wait(u_int wait_flags, അക്ഷരം *wait_var, u_int wait_secs);
+ശൂന്യം nbdebug_log_init(അക്ഷരം *log_var, അക്ഷരം *level_var);
 
-extern FILE	*nb_debug;
-extern u_int	 nb_dlevel;		// nb_debug verbosity level
+ബാഹ്യ FILE	*nb_debug;
+ബാഹ്യ u_int	 nb_dlevel;		// nb_debug verbosity level
 
-#else		// not NBDEBUG
+#അല്ലെങ്കിൽ		// not NBDEBUG
 
 # ifndef ASSERT
 #  define ASSERT(c)
@@ -62,9 +62,9 @@ extern u_int	 nb_dlevel;		// nb_debug verbosity level
  * the variable number of arguments.
  */
 
-void
+ശൂന്യം
 nbdbg(
-	char		*fmt,
+	അക്ഷരം		*fmt,
 	...)
 {
 }

@@ -12,9 +12,9 @@
  */
 #define USING_FLOAT_STUFF
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 
 #ifdef VMS
 # include <float.h>
@@ -22,53 +22,53 @@
 
 #define NAMESPACE_CHAR	(char_u *)"abglstvw"
 
-static int eval0_simple_funccal(char_u *arg, typval_T *rettv, exarg_T *eap, evalarg_T *evalarg);
-static int eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval4(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval5(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval6(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
-static int eval7(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int want_string);
-static int eval8(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int want_string);
-static int eval9(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int want_string);
-static int eval9_leader(typval_T *rettv, int numeric_only, char_u *start_leader, char_u **end_leaderp);
+സ്ഥിതം പൂർണ്ണസംഖ്യ eval0_simple_funccal(char_u *arg, typval_T *rettv, exarg_T *eap, evalarg_T *evalarg);
+സ്ഥിതം പൂർണ്ണസംഖ്യ eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+സ്ഥിതം പൂർണ്ണസംഖ്യ eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+സ്ഥിതം പൂർണ്ണസംഖ്യ eval4(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+സ്ഥിതം പൂർണ്ണസംഖ്യ eval5(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+സ്ഥിതം പൂർണ്ണസംഖ്യ eval6(char_u **arg, typval_T *rettv, evalarg_T *evalarg);
+സ്ഥിതം പൂർണ്ണസംഖ്യ eval7(char_u **arg, typval_T *rettv, evalarg_T *evalarg, പൂർണ്ണസംഖ്യ want_string);
+സ്ഥിതം പൂർണ്ണസംഖ്യ eval8(char_u **arg, typval_T *rettv, evalarg_T *evalarg, പൂർണ്ണസംഖ്യ want_string);
+സ്ഥിതം പൂർണ്ണസംഖ്യ eval9(char_u **arg, typval_T *rettv, evalarg_T *evalarg, പൂർണ്ണസംഖ്യ want_string);
+സ്ഥിതം പൂർണ്ണസംഖ്യ eval9_leader(typval_T *rettv, പൂർണ്ണസംഖ്യ numeric_only, char_u *start_leader, char_u **end_leaderp);
 
-static char_u *make_expanded_name(char_u *in_start, char_u *expr_start, char_u *expr_end, char_u *in_end);
+സ്ഥിതം char_u *make_expanded_name(char_u *in_start, char_u *വ്യഞ്ജകം_start, char_u *വ്യഞ്ജകം_end, char_u *in_end);
 
 /*
  * Return "n1" divided by "n2", taking care of dividing by zero.
  * If "failed" is not NULL set it to TRUE when dividing by zero fails.
  */
 	varnumber_T
-num_divide(varnumber_T n1, varnumber_T n2, int *failed)
+അക്കം_divide(varnumber_T n1, varnumber_T n2, പൂർണ്ണസംഖ്യ *failed)
 {
     varnumber_T	result;
 
-    if (n2 == 0)
+    എങ്കിൽ (n2 == 0)
     {
-	if (in_vim9script())
+	എങ്കിൽ (in_vim9script())
 	{
 	    emsg(_(e_divide_by_zero));
-	    if (failed != NULL)
+	    എങ്കിൽ (failed != ശൂന്യ)
 		*failed = TRUE;
 	}
-	if (n1 == 0)
+	എങ്കിൽ (n1 == 0)
 	    result = VARNUM_MIN; // similar to NaN
-	else if (n1 < 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (n1 < 0)
 	    result = -VARNUM_MAX;
-	else
+	അല്ലെങ്കിൽ
 	    result = VARNUM_MAX;
     }
-    else if (n1 == VARNUM_MIN && n2 == -1)
+    അല്ലെങ്കിൽ എങ്കിൽ (n1 == VARNUM_MIN && n2 == -1)
     {
 	// specific case: trying to do VARNUM_MIN / -1 results in a positive
 	// number that doesn't fit in varnumber_T and causes an FPE
 	result = VARNUM_MAX;
     }
-    else
+    അല്ലെങ്കിൽ
 	result = n1 / n2;
 
-    return result;
+    തിരികെ result;
 }
 
 /*
@@ -76,30 +76,30 @@ num_divide(varnumber_T n1, varnumber_T n2, int *failed)
  * If "failed" is not NULL set it to TRUE when dividing by zero fails.
  */
 	varnumber_T
-num_modulus(varnumber_T n1, varnumber_T n2, int *failed)
+അക്കം_modulus(varnumber_T n1, varnumber_T n2, പൂർണ്ണസംഖ്യ *failed)
 {
-    if (n2 == 0 && in_vim9script())
+    എങ്കിൽ (n2 == 0 && in_vim9script())
     {
 	emsg(_(e_divide_by_zero));
-	if (failed != NULL)
+	എങ്കിൽ (failed != ശൂന്യ)
 	    *failed = TRUE;
     }
-    return (n2 == 0) ? 0 : (n1 % n2);
+    തിരികെ (n2 == 0) ? 0 : (n1 % n2);
 }
 
 /*
  * Initialize the global and v: variables.
  */
-    void
-eval_init(void)
+    ശൂന്യം
+eval_init(ശൂന്യം)
 {
     evalvars_init();
     func_init();
 }
 
-#if defined(EXITFREE)
-    void
-eval_clear(void)
+#എങ്കിൽ defined(EXITFREE)
+    ശൂന്യം
+eval_clear(ശൂന്യം)
 {
     evalvars_clear();
     free_scriptnames();  // must come after evalvars_clear().
@@ -109,24 +109,24 @@ eval_clear(void)
     free_autoload_scriptnames();
 
     // unreferenced lists, tuples and dicts
-    (void)garbage_collect(FALSE);
+    (ശൂന്യം)garbage_collect(FALSE);
 
     // functions not garbage collected
     free_all_functions();
 }
 #endif
 
-    void
-fill_evalarg_from_eap(evalarg_T *evalarg, exarg_T *eap, int skip)
+    ശൂന്യം
+fill_evalarg_from_eap(evalarg_T *evalarg, exarg_T *eap, പൂർണ്ണസംഖ്യ skip)
 {
     init_evalarg(evalarg);
     evalarg->eval_flags = skip ? 0 : EVAL_EVALUATE;
 
-    if (eap == NULL)
-	return;
+    എങ്കിൽ (eap == ശൂന്യ)
+	തിരികെ;
 
     evalarg->eval_cstack = eap->cstack;
-    if (sourcing_a_script(eap) || eap->ea_getline == get_list_line)
+    എങ്കിൽ (sourcing_a_script(eap) || eap->ea_getline == get_list_വരി)
     {
 	evalarg->eval_getline = eap->ea_getline;
 	evalarg->eval_cookie = eap->cookie;
@@ -139,87 +139,87 @@ fill_evalarg_from_eap(evalarg_T *evalarg, exarg_T *eap, int skip)
  * Sets "error" to TRUE if there was an error.
  * Return TRUE or FALSE.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 eval_to_bool(
     char_u	*arg,
-    int		*error,
+    പൂർണ്ണസംഖ്യ		*error,
     exarg_T	*eap,
-    int		skip,	    // only parse, don't execute
-    int		use_simple_function)
+    പൂർണ്ണസംഖ്യ		skip,	    // only parse, don't execute
+    പൂർണ്ണസംഖ്യ		use_simple_function)
 {
     typval_T	tv;
     varnumber_T	retval = FALSE;
     evalarg_T	evalarg;
-    int		r;
+    പൂർണ്ണസംഖ്യ		r;
 
     fill_evalarg_from_eap(&evalarg, eap, skip);
 
-    if (skip)
+    എങ്കിൽ (skip)
 	++emsg_skip;
-    if (use_simple_function)
+    എങ്കിൽ (use_simple_function)
 	r = eval0_simple_funccal(arg, &tv, eap, &evalarg);
-    else
+    അല്ലെങ്കിൽ
 	r = eval0(arg, &tv, eap, &evalarg);
-    if (r == FAIL)
+    എങ്കിൽ (r == FAIL)
 	*error = TRUE;
-    else
+    അല്ലെങ്കിൽ
     {
 	*error = FALSE;
-	if (!skip)
+	എങ്കിൽ (!skip)
 	{
-	    if (in_vim9script())
+	    എങ്കിൽ (in_vim9script())
 		retval = tv_get_bool_chk(&tv, error);
-	    else
-		retval = (tv_get_number_chk(&tv, error) != 0);
+	    അല്ലെങ്കിൽ
+		retval = (tv_get_സംഖ്യ_chk(&tv, error) != 0);
 	    clear_tv(&tv);
 	}
     }
-    if (skip)
+    എങ്കിൽ (skip)
 	--emsg_skip;
     clear_evalarg(&evalarg, eap);
 
-    return (int)retval;
+    തിരികെ (പൂർണ്ണസംഖ്യ)retval;
 }
 
 /*
  * Call eval1() and give an error message if not done at a lower level.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval1_emsg(char_u **arg, typval_T *rettv, exarg_T *eap)
 {
     char_u	*start = *arg;
-    int		ret;
-    int		did_emsg_before = did_emsg;
-    int		called_emsg_before = called_emsg;
+    പൂർണ്ണസംഖ്യ		ret;
+    പൂർണ്ണസംഖ്യ		did_emsg_before = did_emsg;
+    പൂർണ്ണസംഖ്യ		called_emsg_before = called_emsg;
     evalarg_T	evalarg;
 
-    fill_evalarg_from_eap(&evalarg, eap, eap != NULL && eap->skip);
+    fill_evalarg_from_eap(&evalarg, eap, eap != ശൂന്യ && eap->skip);
 
     ret = eval1(arg, rettv, &evalarg);
-    if (ret == FAIL)
+    എങ്കിൽ (ret == FAIL)
     {
 	// Report the invalid expression unless the expression evaluation has
 	// been cancelled due to an aborting error, an interrupt, or an
 	// exception, or we already gave a more specific error.
 	// Also check called_emsg for when using assert_fails().
-	if (!aborting() && did_emsg == did_emsg_before
+	എങ്കിൽ (!aborting() && did_emsg == did_emsg_before
 					  && called_emsg == called_emsg_before)
 	    semsg(_(e_invalid_expression_str), start);
     }
     clear_evalarg(&evalarg, eap);
-    return ret;
+    തിരികെ ret;
 }
 
 /*
  * Return whether a typval is a valid expression to pass to eval_expr_typval()
  * or eval_expr_to_bool().  An empty string returns FALSE;
  */
-    int
-eval_expr_valid_arg(typval_T *tv)
+    പൂർണ്ണസംഖ്യ
+eval_വ്യഞ്ജകം_valid_arg(typval_T *tv)
 {
-    return tv->v_type != VAR_UNKNOWN
+    തിരികെ tv->v_type != VAR_UNKNOWN
 	    && (tv->v_type != VAR_STRING
-		  || (tv->vval.v_string != NULL && *tv->vval.v_string != NUL));
+		  || (tv->vval.v_string != ശൂന്യ && *tv->vval.v_string != NUL));
 }
 
 /*
@@ -228,19 +228,19 @@ eval_expr_valid_arg(typval_T *tv)
  * When returning non-NULL remove_funccal() must be called later.
  */
     funccall_T *
-eval_expr_get_funccal(typval_T *expr, typval_T *rettv)
+eval_വ്യഞ്ജകം_get_funccal(typval_T *വ്യഞ്ജകം, typval_T *rettv)
 {
-    if (expr->v_type != VAR_PARTIAL)
-	return NULL;
+    എങ്കിൽ (വ്യഞ്ജകം->v_type != VAR_PARTIAL)
+	തിരികെ ശൂന്യ;
 
-    partial_T *partial = expr->vval.v_partial;
-    if (partial == NULL)
-	return NULL;
-    if (partial->pt_func == NULL
+    partial_T *partial = വ്യഞ്ജകം->vval.v_partial;
+    എങ്കിൽ (partial == ശൂന്യ)
+	തിരികെ ശൂന്യ;
+    എങ്കിൽ (partial->pt_func == ശൂന്യ
 	    || partial->pt_func->uf_def_status == UF_NOT_COMPILED)
-	return NULL;
+	തിരികെ ശൂന്യ;
 
-    return create_funccal(partial->pt_func, rettv);
+    തിരികെ create_funccal(partial->pt_func, rettv);
 }
 
 /*
@@ -249,55 +249,55 @@ eval_expr_get_funccal(typval_T *expr, typval_T *rettv)
  * "fc_arg" is from eval_expr_get_funccal() or NULL;
  * Return the result in "rettv" and OK or FAIL.
  */
-    static int
-eval_expr_partial(
-    typval_T	*expr,
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+eval_വ്യഞ്ജകം_partial(
+    typval_T	*വ്യഞ്ജകം,
     typval_T	*argv,
-    int		argc,
+    പൂർണ്ണസംഖ്യ		argc,
     funccall_T	*fc_arg,
     typval_T	*rettv)
 {
-    partial_T	*partial = expr->vval.v_partial;
+    partial_T	*partial = വ്യഞ്ജകം->vval.v_partial;
 
-    if (partial == NULL)
-	return FAIL;
+    എങ്കിൽ (partial == ശൂന്യ)
+	തിരികെ FAIL;
 
-    if (partial->pt_func != NULL
+    എങ്കിൽ (partial->pt_func != ശൂന്യ
 			&& partial->pt_func->uf_def_status != UF_NOT_COMPILED)
     {
-	funccall_T	*fc = fc_arg != NULL ? fc_arg
+	funccall_T	*fc = fc_arg != ശൂന്യ ? fc_arg
 				: create_funccal(partial->pt_func, rettv);
-	int		r;
+	പൂർണ്ണസംഖ്യ		r;
 
-	if (fc == NULL)
-	    return FAIL;
+	എങ്കിൽ (fc == ശൂന്യ)
+	    തിരികെ FAIL;
 
 	// Shortcut to call a compiled function with minimal overhead.
-	if (partial->pt_obj != NULL)
+	എങ്കിൽ (partial->pt_obj != ശൂന്യ)
 	    partial->pt_obj->obj_refcount++;
 	r = call_def_function(partial->pt_func, argc, argv, DEF_USE_PT_ARGV,
 					partial, partial->pt_obj, fc, rettv);
-	if (fc_arg == NULL)
+	എങ്കിൽ (fc_arg == ശൂന്യ)
 	    remove_funccal();
-	if (r == FAIL)
-	    return FAIL;
+	എങ്കിൽ (r == FAIL)
+	    തിരികെ FAIL;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	char_u		*s = partial_name(partial);
 	funcexe_T	funcexe;
 
-	if (s == NULL || *s == NUL)
-	    return FAIL;
+	എങ്കിൽ (s == ശൂന്യ || *s == NUL)
+	    തിരികെ FAIL;
 
 	CLEAR_FIELD(funcexe);
 	funcexe.fe_evaluate = TRUE;
 	funcexe.fe_partial = partial;
-	if (call_func(s, -1, rettv, argc, argv, &funcexe) == FAIL)
-	    return FAIL;
+	എങ്കിൽ (call_func(s, -1, rettv, argc, argv, &funcexe) == FAIL)
+	    തിരികെ FAIL;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -305,60 +305,60 @@ eval_expr_partial(
  * Pass arguments "argv[argc]".
  * Return the result in "rettv" and OK or FAIL.
  */
-    static int
-eval_expr_func(
-    typval_T	*expr,
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+eval_വ്യഞ്ജകം_func(
+    typval_T	*വ്യഞ്ജകം,
     typval_T	*argv,
-    int		argc,
+    പൂർണ്ണസംഖ്യ		argc,
     typval_T	*rettv)
 {
     funcexe_T	funcexe;
     char_u	buf[NUMBUFLEN];
     char_u	*s;
 
-    if (expr->v_type == VAR_FUNC)
-	s = expr->vval.v_string;
-    else
-	s = tv_get_string_buf_chk_strict(expr, buf, in_vim9script());
-    if (s == NULL || *s == NUL)
-	return FAIL;
+    എങ്കിൽ (വ്യഞ്ജകം->v_type == VAR_FUNC)
+	s = വ്യഞ്ജകം->vval.v_string;
+    അല്ലെങ്കിൽ
+	s = tv_get_string_buf_chk_strict(വ്യഞ്ജകം, buf, in_vim9script());
+    എങ്കിൽ (s == ശൂന്യ || *s == NUL)
+	തിരികെ FAIL;
 
     CLEAR_FIELD(funcexe);
     funcexe.fe_evaluate = TRUE;
-    if (call_func(s, -1, rettv, argc, argv, &funcexe) == FAIL)
-	return FAIL;
+    എങ്കിൽ (call_func(s, -1, rettv, argc, argv, &funcexe) == FAIL)
+	തിരികെ FAIL;
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Evaluate an expression, which is a string.
  * Return the result in "rettv" and OK or FAIL.
  */
-    static int
-eval_expr_string(
-    typval_T	*expr,
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+eval_വ്യഞ്ജകം_string(
+    typval_T	*വ്യഞ്ജകം,
     typval_T	*rettv)
 {
     char_u	*s;
     char_u	buf[NUMBUFLEN];
 
-    s = tv_get_string_buf_chk_strict(expr, buf, in_vim9script());
-    if (s == NULL)
-	return FAIL;
+    s = tv_get_string_buf_chk_strict(വ്യഞ്ജകം, buf, in_vim9script());
+    എങ്കിൽ (s == ശൂന്യ)
+	തിരികെ FAIL;
 
     s = skipwhite(s);
-    if (eval1_emsg(&s, rettv, NULL) == FAIL)
-	return FAIL;
+    എങ്കിൽ (eval1_emsg(&s, rettv, ശൂന്യ) == FAIL)
+	തിരികെ FAIL;
 
-    if (*skipwhite(s) != NUL)  // check for trailing chars after expr
+    എങ്കിൽ (*skipwhite(s) != NUL)  // check for trailing chars after expr
     {
 	clear_tv(rettv);
 	semsg(_(e_invalid_expression_str), s);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -368,43 +368,43 @@ eval_expr_string(
  * "fc_arg" is from eval_expr_get_funccal() or NULL;
  * Return the result in "rettv" and OK or FAIL.
  */
-    int
-eval_expr_typval(
-	typval_T    *expr,
-	int	    want_func,
+    പൂർണ്ണസംഖ്യ
+eval_വ്യഞ്ജകം_typval(
+	typval_T    *വ്യഞ്ജകം,
+	പൂർണ്ണസംഖ്യ	    want_func,
 	typval_T    *argv,
-	int	    argc,
+	പൂർണ്ണസംഖ്യ	    argc,
 	funccall_T  *fc_arg,
 	typval_T    *rettv)
 {
-    if (expr->v_type == VAR_PARTIAL)
-	return eval_expr_partial(expr, argv, argc, fc_arg, rettv);
-    if (expr->v_type == VAR_INSTR)
-	return exe_typval_instr(expr, rettv);
-    if (expr->v_type == VAR_FUNC || want_func)
-	return eval_expr_func(expr, argv, argc, rettv);
+    എങ്കിൽ (വ്യഞ്ജകം->v_type == VAR_PARTIAL)
+	തിരികെ eval_വ്യഞ്ജകം_partial(വ്യഞ്ജകം, argv, argc, fc_arg, rettv);
+    എങ്കിൽ (വ്യഞ്ജകം->v_type == VAR_INSTR)
+	തിരികെ exe_typval_instr(വ്യഞ്ജകം, rettv);
+    എങ്കിൽ (വ്യഞ്ജകം->v_type == VAR_FUNC || want_func)
+	തിരികെ eval_വ്യഞ്ജകം_func(വ്യഞ്ജകം, argv, argc, rettv);
 
-    return eval_expr_string(expr, rettv);
+    തിരികെ eval_വ്യഞ്ജകം_string(വ്യഞ്ജകം, rettv);
 }
 
 /*
  * Like eval_to_bool() but using a typval_T instead of a string.
  * Works for string, funcref and partial.
  */
-    int
-eval_expr_to_bool(typval_T *expr, int *error)
+    പൂർണ്ണസംഖ്യ
+eval_വ്യഞ്ജകം_to_bool(typval_T *വ്യഞ്ജകം, പൂർണ്ണസംഖ്യ *error)
 {
     typval_T	rettv;
-    int		res;
+    പൂർണ്ണസംഖ്യ		res;
 
-    if (eval_expr_typval(expr, FALSE, NULL, 0, NULL, &rettv) == FAIL)
+    എങ്കിൽ (eval_വ്യഞ്ജകം_typval(വ്യഞ്ജകം, FALSE, ശൂന്യ, 0, ശൂന്യ, &rettv) == FAIL)
     {
 	*error = TRUE;
-	return FALSE;
+	തിരികെ FALSE;
     }
     res = (tv_get_bool_chk(&rettv, error) != 0);
     clear_tv(&rettv);
-    return res;
+    തിരികെ res;
 }
 
 /*
@@ -416,71 +416,71 @@ eval_expr_to_bool(typval_T *expr, int *error)
 eval_to_string_skip(
     char_u	*arg,
     exarg_T	*eap,
-    int		skip)	    // only parse, don't execute
+    പൂർണ്ണസംഖ്യ		skip)	    // only parse, don't execute
 {
     typval_T	tv;
     char_u	*retval;
     evalarg_T	evalarg;
 
     fill_evalarg_from_eap(&evalarg, eap, skip);
-    if (skip)
+    എങ്കിൽ (skip)
 	++emsg_skip;
-    if (eval0(arg, &tv, eap, &evalarg) == FAIL || skip)
-	retval = NULL;
-    else
+    എങ്കിൽ (eval0(arg, &tv, eap, &evalarg) == FAIL || skip)
+	retval = ശൂന്യ;
+    അല്ലെങ്കിൽ
     {
 	retval = vim_strsave(tv_get_string(&tv));
 	clear_tv(&tv);
     }
-    if (skip)
+    എങ്കിൽ (skip)
 	--emsg_skip;
     clear_evalarg(&evalarg, eap);
 
-    return retval;
+    തിരികെ retval;
 }
 
 /*
  * Initialize "evalarg" for use.
  */
-    void
+    ശൂന്യം
 init_evalarg(evalarg_T *evalarg)
 {
     CLEAR_POINTER(evalarg);
-    ga_init2(&evalarg->eval_tofree_ga, sizeof(char_u *), 20);
+    ga_init2(&evalarg->eval_tofree_ga, വലുപ്പം(char_u *), 20);
 }
 
 /*
  * If "evalarg->eval_tofree" is not NULL free it later.
  * Caller is expected to overwrite "evalarg->eval_tofree" next.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 free_eval_tofree_later(evalarg_T *evalarg)
 {
-    if (evalarg->eval_tofree == NULL)
-	return;
+    എങ്കിൽ (evalarg->eval_tofree == ശൂന്യ)
+	തിരികെ;
 
-    if (ga_grow(&evalarg->eval_tofree_ga, 1) == OK)
+    എങ്കിൽ (ga_grow(&evalarg->eval_tofree_ga, 1) == OK)
 	((char_u **)evalarg->eval_tofree_ga.ga_data)
 	    [evalarg->eval_tofree_ga.ga_len++]
 	    = evalarg->eval_tofree;
-    else
+    അല്ലെങ്കിൽ
 	vim_free(evalarg->eval_tofree);
 }
 
 /*
  * After using "evalarg" filled from "eap": free the memory.
  */
-    void
+    ശൂന്യം
 clear_evalarg(evalarg_T *evalarg, exarg_T *eap)
 {
-    if (evalarg == NULL)
-	return;
+    എങ്കിൽ (evalarg == ശൂന്യ)
+	തിരികെ;
 
     garray_T *etga = &evalarg->eval_tofree_ga;
 
-    if (evalarg->eval_tofree != NULL || evalarg->eval_using_cmdline)
+    എങ്കിൽ (evalarg->eval_tofree != ശൂന്യ || evalarg->eval_using_cmdline)
     {
-	if (eap != NULL)
+	എങ്കിൽ (eap != ശൂന്യ)
 	{
 	    // We may need to keep the original command line, e.g. for
 	    // ":let" it has the variable names.  But we may also need
@@ -488,7 +488,7 @@ clear_evalarg(evalarg_T *evalarg, exarg_T *eap)
 	    vim_free(eap->cmdline_tofree);
 	    eap->cmdline_tofree = *eap->cmdlinep;
 
-	    if (evalarg->eval_using_cmdline && etga->ga_len > 0)
+	    എങ്കിൽ (evalarg->eval_using_cmdline && etga->ga_len > 0)
 	    {
 		// "nextcmd" points into the last line in eval_tofree_ga,
 		// need to keep it around.
@@ -496,12 +496,12 @@ clear_evalarg(evalarg_T *evalarg, exarg_T *eap)
 		*eap->cmdlinep = ((char_u **)etga->ga_data)[etga->ga_len];
 		vim_free(evalarg->eval_tofree);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		*eap->cmdlinep = evalarg->eval_tofree;
 	}
-	else
+	അല്ലെങ്കിൽ
 	    vim_free(evalarg->eval_tofree);
-	evalarg->eval_tofree = NULL;
+	evalarg->eval_tofree = ശൂന്യ;
     }
 
     ga_clear_strings(etga);
@@ -512,13 +512,13 @@ clear_evalarg(evalarg_T *evalarg, exarg_T *eap)
  * Skip over an expression at "*pp".
  * Return FAIL for an error, OK otherwise.
  */
-    int
-skip_expr(char_u **pp, evalarg_T *evalarg)
+    പൂർണ്ണസംഖ്യ
+skip_വ്യഞ്ജകം(char_u **pp, evalarg_T *evalarg)
 {
     typval_T	rettv;
 
     *pp = skipwhite(*pp);
-    return eval1(pp, &rettv, evalarg);
+    തിരികെ eval1(pp, &rettv, evalarg);
 }
 
 /*
@@ -530,52 +530,52 @@ skip_expr(char_u **pp, evalarg_T *evalarg)
  * Also when the expression is copied to allocated memory.
  * Return FAIL for an error, OK otherwise.
  */
-    int
-skip_expr_concatenate(
+    പൂർണ്ണസംഖ്യ
+skip_വ്യഞ്ജകം_concatenate(
 	char_u	    **arg,
 	char_u	    **start,
 	char_u	    **end,
 	evalarg_T   *evalarg)
 {
     typval_T	rettv;
-    int		res;
-    int		vim9script = in_vim9script();
-    garray_T    *gap = evalarg == NULL ? NULL : &evalarg->eval_ga;
-    garray_T    *freegap = evalarg == NULL ? NULL : &evalarg->eval_freega;
-    int		save_flags = evalarg == NULL ? 0 : evalarg->eval_flags;
-    int		evaluate = evalarg == NULL
+    പൂർണ്ണസംഖ്യ		res;
+    പൂർണ്ണസംഖ്യ		vim9script = in_vim9script();
+    garray_T    *gap = evalarg == ശൂന്യ ? ശൂന്യ : &evalarg->eval_ga;
+    garray_T    *freegap = evalarg == ശൂന്യ ? ശൂന്യ : &evalarg->eval_freega;
+    പൂർണ്ണസംഖ്യ		save_flags = evalarg == ശൂന്യ ? 0 : evalarg->eval_flags;
+    പൂർണ്ണസംഖ്യ		evaluate = evalarg == ശൂന്യ
 			       ? FALSE : (evalarg->eval_flags & EVAL_EVALUATE);
 
-    if (vim9script && evaluate
-	       && (evalarg->eval_cookie != NULL || evalarg->eval_cctx != NULL))
+    എങ്കിൽ (vim9script && evaluate
+	       && (evalarg->eval_cookie != ശൂന്യ || evalarg->eval_cctx != ശൂന്യ))
     {
-	ga_init2(gap, sizeof(char_u *), 10);
+	ga_init2(gap, വലുപ്പം(char_u *), 10);
 	// leave room for "start"
-	if (ga_grow(gap, 1) == OK)
+	എങ്കിൽ (ga_grow(gap, 1) == OK)
 	    ++gap->ga_len;
-	ga_init2(freegap, sizeof(char_u *), 10);
+	ga_init2(freegap, വലുപ്പം(char_u *), 10);
     }
     *start = *arg;
 
     // Don't evaluate the expression.
-    if (evalarg != NULL)
+    എങ്കിൽ (evalarg != ശൂന്യ)
 	evalarg->eval_flags &= ~EVAL_EVALUATE;
     *arg = skipwhite(*arg);
     res = eval1(arg, &rettv, evalarg);
     *end = *arg;
-    if (evalarg != NULL)
+    എങ്കിൽ (evalarg != ശൂന്യ)
 	evalarg->eval_flags = save_flags;
 
-    if (vim9script && evaluate
-	    && (evalarg->eval_cookie != NULL || evalarg->eval_cctx != NULL))
+    എങ്കിൽ (vim9script && evaluate
+	    && (evalarg->eval_cookie != ശൂന്യ || evalarg->eval_cctx != ശൂന്യ))
     {
-	if (evalarg->eval_ga.ga_len == 1)
+	എങ്കിൽ (evalarg->eval_ga.ga_len == 1)
 	{
 	    // just the one line, no need to concatenate
 	    ga_clear(gap);
 	    gap->ga_itemsize = 0;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    char_u	    *p;
 	    size_t	    endoff = STRLEN(*arg);
@@ -585,20 +585,20 @@ skip_expr_concatenate(
 	    p = ga_concat_strings(gap, " ");
 
 	    // free the lines only when using getsourceline()
-	    if (evalarg->eval_cookie != NULL)
+	    എങ്കിൽ (evalarg->eval_cookie != ശൂന്യ)
 	    {
 		// Do not free the first line, the caller can still use it.
-		*((char_u **)gap->ga_data) = NULL;
+		*((char_u **)gap->ga_data) = ശൂന്യ;
 		// Do not free the last line, "arg" points into it, free it
 		// later.  Also free "eval_tofree" later if needed.
 		free_eval_tofree_later(evalarg);
 		evalarg->eval_tofree =
 				    ((char_u **)gap->ga_data)[gap->ga_len - 1];
-		((char_u **)gap->ga_data)[gap->ga_len - 1] = NULL;
+		((char_u **)gap->ga_data)[gap->ga_len - 1] = ശൂന്യ;
 		ga_clear_strings(gap);
 		ga_clear(freegap);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		ga_clear(gap);
 
@@ -607,8 +607,8 @@ skip_expr_concatenate(
 	    }
 
 	    gap->ga_itemsize = 0;
-	    if (p == NULL)
-		return FAIL;
+	    എങ്കിൽ (p == ശൂന്യ)
+		തിരികെ FAIL;
 	    *start = p;
 	    vim_free(evalarg->eval_tofree_lambda);
 	    evalarg->eval_tofree_lambda = p;
@@ -617,7 +617,7 @@ skip_expr_concatenate(
 	}
     }
 
-    return res;
+    തിരികെ res;
 }
 
 /*
@@ -626,42 +626,42 @@ skip_expr_concatenate(
  * Returns an allocated string (NULL when out of memory).
  */
     char_u *
-typval2string(typval_T *tv, int join_list)
+typval2string(typval_T *tv, പൂർണ്ണസംഖ്യ join_list)
 {
     garray_T	ga;
-    char_u	*retval = NULL;
+    char_u	*retval = ശൂന്യ;
 
-    if (join_list && (tv->v_type == VAR_LIST || tv->v_type == VAR_TUPLE))
+    എങ്കിൽ (join_list && (tv->v_type == VAR_LIST || tv->v_type == VAR_TUPLE))
     {
-	if (tv->v_type == VAR_LIST)
+	എങ്കിൽ (tv->v_type == VAR_LIST)
 	{
-	    ga_init2(&ga, sizeof(char), 80);
-	    if (tv->vval.v_list != NULL)
+	    ga_init2(&ga, വലുപ്പം(അക്ഷരം), 80);
+	    എങ്കിൽ (tv->vval.v_list != ശൂന്യ)
 	    {
 		list_join(&ga, tv->vval.v_list, (char_u *)"\n", TRUE, FALSE,
 									0);
-		if (tv->vval.v_list->lv_len > 0)
+		എങ്കിൽ (tv->vval.v_list->lv_len > 0)
 		    ga_append(&ga, NL);
 	    }
 	    ga_append(&ga, NUL);
 	    retval = (char_u *)ga.ga_data;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // tuple
-	    ga_init2(&ga, sizeof(char), 80);
-	    if (tv->vval.v_tuple != NULL)
+	    ga_init2(&ga, വലുപ്പം(അക്ഷരം), 80);
+	    എങ്കിൽ (tv->vval.v_tuple != ശൂന്യ)
 	    {
 		tuple_join(&ga, tv->vval.v_tuple, (char_u *)"\n", TRUE, FALSE,
 									0);
-		if (TUPLE_LEN(tv->vval.v_tuple) > 0)
+		എങ്കിൽ (TUPLE_LEN(tv->vval.v_tuple) > 0)
 		    ga_append(&ga, NL);
 	    }
 	    ga_append(&ga, NUL);
 	    retval = (char_u *)ga.ga_data;
 	}
     }
-    else if (tv->v_type == VAR_LIST
+    അല്ലെങ്കിൽ എങ്കിൽ (tv->v_type == VAR_LIST
 	    || tv->v_type == VAR_TUPLE
 	    || tv->v_type == VAR_DICT)
     {
@@ -670,12 +670,12 @@ typval2string(typval_T *tv, int join_list)
 
 	retval = tv2string(tv, &tofree, numbuf, 0);
 	// Make a copy if we have a value but it's not in allocated memory.
-	if (retval != NULL && tofree == NULL)
+	എങ്കിൽ (retval != ശൂന്യ && tofree == ശൂന്യ)
 	    retval = vim_strsave(retval);
     }
-    else
+    അല്ലെങ്കിൽ
 	retval = vim_strsave(tv_get_string(tv));
-    return retval;
+    തിരികെ retval;
 }
 
 /*
@@ -688,39 +688,39 @@ typval2string(typval_T *tv, int join_list)
     char_u *
 eval_to_string_eap(
     char_u	*arg,
-    int		join_list,
+    പൂർണ്ണസംഖ്യ		join_list,
     exarg_T	*eap,
-    int		use_simple_function)
+    പൂർണ്ണസംഖ്യ		use_simple_function)
 {
     typval_T	tv;
     char_u	*retval;
     evalarg_T	evalarg;
-    int		r;
+    പൂർണ്ണസംഖ്യ		r;
 
-    fill_evalarg_from_eap(&evalarg, eap, eap != NULL && eap->skip);
-    if (use_simple_function)
-	r = eval0_simple_funccal(arg, &tv, NULL, &evalarg);
-    else
-	r = eval0(arg, &tv, NULL, &evalarg);
-    if (r == FAIL)
-	retval = NULL;
-    else
+    fill_evalarg_from_eap(&evalarg, eap, eap != ശൂന്യ && eap->skip);
+    എങ്കിൽ (use_simple_function)
+	r = eval0_simple_funccal(arg, &tv, ശൂന്യ, &evalarg);
+    അല്ലെങ്കിൽ
+	r = eval0(arg, &tv, ശൂന്യ, &evalarg);
+    എങ്കിൽ (r == FAIL)
+	retval = ശൂന്യ;
+    അല്ലെങ്കിൽ
     {
 	retval = typval2string(&tv, join_list);
 	clear_tv(&tv);
     }
-    clear_evalarg(&evalarg, NULL);
+    clear_evalarg(&evalarg, ശൂന്യ);
 
-    return retval;
+    തിരികെ retval;
 }
 
     char_u *
 eval_to_string(
     char_u	*arg,
-    int		join_list,
-    int		use_simple_function)
+    പൂർണ്ണസംഖ്യ		join_list,
+    പൂർണ്ണസംഖ്യ		use_simple_function)
 {
-    return eval_to_string_eap(arg, join_list, NULL, use_simple_function);
+    തിരികെ eval_to_string_eap(arg, join_list, ശൂന്യ, use_simple_function);
 }
 
 /*
@@ -731,30 +731,30 @@ eval_to_string(
     char_u *
 eval_to_string_safe(
     char_u	*arg,
-    int		use_sandbox,
-    int		keep_script_version,
-    int		use_simple_function)
+    പൂർണ്ണസംഖ്യ		use_sandbox,
+    പൂർണ്ണസംഖ്യ		keep_script_version,
+    പൂർണ്ണസംഖ്യ		use_simple_function)
 {
     char_u	*retval;
     funccal_entry_T funccal_entry;
-    int		save_sc_version = current_sctx.sc_version;
-    int		save_garbage = may_garbage_collect;
+    പൂർണ്ണസംഖ്യ		save_sc_version = current_sctx.sc_version;
+    പൂർണ്ണസംഖ്യ		save_garbage = may_garbage_collect;
 
-    if (!keep_script_version)
+    എങ്കിൽ (!keep_script_version)
 	current_sctx.sc_version = 1;
     save_funccal(&funccal_entry);
-    if (use_sandbox)
+    എങ്കിൽ (use_sandbox)
 	++sandbox;
     ++textlock;
     may_garbage_collect = FALSE;
     retval = eval_to_string(arg, FALSE, use_simple_function);
-    if (use_sandbox)
+    എങ്കിൽ (use_sandbox)
 	--sandbox;
     --textlock;
     may_garbage_collect = save_garbage;
     restore_funccal();
     current_sctx.sc_version = save_sc_version;
-    return retval;
+    തിരികെ retval;
 }
 
 /*
@@ -763,29 +763,29 @@ eval_to_string_safe(
  * Returns -1 for an error.
  */
     varnumber_T
-eval_to_number(char_u *expr, int use_simple_function)
+eval_to_സംഖ്യ(char_u *വ്യഞ്ജകം, പൂർണ്ണസംഖ്യ use_simple_function)
 {
     typval_T	rettv;
     varnumber_T	retval;
-    char_u	*p = skipwhite(expr);
-    int		r = NOTDONE;
+    char_u	*p = skipwhite(വ്യഞ്ജകം);
+    പൂർണ്ണസംഖ്യ		r = NOTDONE;
 
     ++emsg_off;
 
-    if (use_simple_function)
-	r = may_call_simple_func(expr, &rettv);
-    if (r == NOTDONE)
+    എങ്കിൽ (use_simple_function)
+	r = may_call_simple_func(വ്യഞ്ജകം, &rettv);
+    എങ്കിൽ (r == NOTDONE)
 	r = eval1(&p, &rettv, &EVALARG_EVALUATE);
-    if (r == FAIL)
+    എങ്കിൽ (r == FAIL)
 	retval = -1;
-    else
+    അല്ലെങ്കിൽ
     {
-	retval = tv_get_number_chk(&rettv, NULL);
+	retval = tv_get_സംഖ്യ_chk(&rettv, ശൂന്യ);
 	clear_tv(&rettv);
     }
     --emsg_off;
 
-    return retval;
+    തിരികെ retval;
 }
 
 /*
@@ -794,35 +794,35 @@ eval_to_number(char_u *expr, int use_simple_function)
  * Returns NULL when there is an error.
  */
     typval_T *
-eval_expr(char_u *arg, exarg_T *eap)
+eval_വ്യഞ്ജകം(char_u *arg, exarg_T *eap)
 {
-    return eval_expr_ext(arg, eap, FALSE);
+    തിരികെ eval_വ്യഞ്ജകം_ext(arg, eap, FALSE);
 }
 
     typval_T *
-eval_expr_ext(char_u *arg, exarg_T *eap, int use_simple_function)
+eval_വ്യഞ്ജകം_ext(char_u *arg, exarg_T *eap, പൂർണ്ണസംഖ്യ use_simple_function)
 {
     typval_T	*tv;
     evalarg_T	evalarg;
 
-    fill_evalarg_from_eap(&evalarg, eap, eap != NULL && eap->skip);
+    fill_evalarg_from_eap(&evalarg, eap, eap != ശൂന്യ && eap->skip);
 
     tv = ALLOC_ONE(typval_T);
-    if (tv != NULL)
+    എങ്കിൽ (tv != ശൂന്യ)
     {
-	int	r = NOTDONE;
+	പൂർണ്ണസംഖ്യ	r = NOTDONE;
 
-	if (use_simple_function)
+	എങ്കിൽ (use_simple_function)
 	    r = eval0_simple_funccal(arg, tv, eap, &evalarg);
-	if (r == NOTDONE)
+	എങ്കിൽ (r == NOTDONE)
 	    r = eval0(arg, tv, eap, &evalarg);
 
-	if (r == FAIL)
+	എങ്കിൽ (r == FAIL)
 	    VIM_CLEAR(tv);
     }
 
     clear_evalarg(&evalarg, eap);
-    return tv;
+    തിരികെ tv;
 }
 
 /*
@@ -832,78 +832,78 @@ eval_expr_ext(char_u *arg, exarg_T *eap, int use_simple_function)
  * If "verbose" is FALSE no errors are given.
  * Return NULL for any failure.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 deref_function_name(
 	    char_u	**arg,
 	    char_u	**tofree,
 	    evalarg_T	*evalarg,
-	    int		verbose)
+	    പൂർണ്ണസംഖ്യ		verbose)
 {
     typval_T	ref;
     char_u	*name = *arg;
-    int		save_flags = 0;
-    int		evaluate = evalarg != NULL
+    പൂർണ്ണസംഖ്യ		save_flags = 0;
+    പൂർണ്ണസംഖ്യ		evaluate = evalarg != ശൂന്യ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
 
     ref.v_type = VAR_UNKNOWN;
-    if (evalarg != NULL)
+    എങ്കിൽ (evalarg != ശൂന്യ)
     {
 	// need to evaluate this to get an import, like in "a.Func"
 	save_flags = evalarg->eval_flags;
 	evalarg->eval_flags |= EVAL_EVALUATE;
     }
-    if (eval9(arg, &ref, evalarg, FALSE) == FAIL)
+    എങ്കിൽ (eval9(arg, &ref, evalarg, FALSE) == FAIL)
     {
 	dictitem_T	*v;
 
 	// If <SID>VarName was used it would not be found, try another way.
-	v = find_var_also_in_script(name, NULL, FALSE);
-	if (v == NULL)
+	v = find_var_also_in_script(name, ശൂന്യ, FALSE);
+	എങ്കിൽ (v == ശൂന്യ)
 	{
-	    name = NULL;
-	    goto theend;
+	    name = ശൂന്യ;
+	    പോകുക theend;
 	}
 	copy_tv(&v->di_tv, &ref);
     }
-    if (*skipwhite(*arg) != NUL)
+    എങ്കിൽ (*skipwhite(*arg) != NUL)
     {
-	if (verbose)
+	എങ്കിൽ (verbose)
 	    semsg(_(e_trailing_characters_str), *arg);
-	name = NULL;
+	name = ശൂന്യ;
     }
-    else if (ref.v_type == VAR_FUNC && ref.vval.v_string != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (ref.v_type == VAR_FUNC && ref.vval.v_string != ശൂന്യ)
     {
 	name = ref.vval.v_string;
-	ref.vval.v_string = NULL;
+	ref.vval.v_string = ശൂന്യ;
 	*tofree = name;
     }
-    else if (ref.v_type == VAR_PARTIAL && ref.vval.v_partial != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (ref.v_type == VAR_PARTIAL && ref.vval.v_partial != ശൂന്യ)
     {
-	if (ref.vval.v_partial->pt_argc > 0
-		|| ref.vval.v_partial->pt_dict != NULL)
+	എങ്കിൽ (ref.vval.v_partial->pt_argc > 0
+		|| ref.vval.v_partial->pt_dict != ശൂന്യ)
 	{
-	    if (verbose)
+	    എങ്കിൽ (verbose)
 		emsg(_(e_cannot_use_partial_here));
-	    name = NULL;
+	    name = ശൂന്യ;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    name = vim_strsave(partial_name(ref.vval.v_partial));
 	    *tofree = name;
 	}
     }
-    else if (evaluate)
+    അല്ലെങ്കിൽ എങ്കിൽ (evaluate)
     {
-	if (verbose)
+	എങ്കിൽ (verbose)
 	    semsg(_(e_not_callable_type_str), name);
-	name = NULL;
+	name = ശൂന്യ;
     }
 
 theend:
     clear_tv(&ref);
-    if (evalarg != NULL)
+    എങ്കിൽ (evalarg != ശൂന്യ)
 	evalarg->eval_flags = save_flags;
-    return name;
+    തിരികെ name;
 }
 
 /*
@@ -912,19 +912,19 @@ theend:
  * should have type VAR_UNKNOWN.
  * Returns OK or FAIL.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 call_vim_function(
     char_u      *func,
-    int		argc,
+    പൂർണ്ണസംഖ്യ		argc,
     typval_T	*argv,
     typval_T	*rettv)
 {
-    int		ret;
+    പൂർണ്ണസംഖ്യ		ret;
     funcexe_T	funcexe;
     char_u	*arg;
     char_u	*name;
-    char_u	*tofree = NULL;
-    int		ignore_errors;
+    char_u	*tofree = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		ignore_errors;
 
     rettv->v_type = VAR_UNKNOWN;		// clear_tv() uses this
     CLEAR_FIELD(funcexe);
@@ -936,23 +936,23 @@ call_vim_function(
     // ignore errors for an undefined name.  But we do want errors when an
     // autoload script has errors.  Guess that when there is a dot in the name
     // showing errors is the right choice.
-    ignore_errors = vim_strchr(func, '.') == NULL;
+    ignore_errors = vim_strchr(func, '.') == ശൂന്യ;
     arg = func;
-    if (ignore_errors)
+    എങ്കിൽ (ignore_errors)
 	++emsg_off;
     name = deref_function_name(&arg, &tofree, &EVALARG_EVALUATE, FALSE);
-    if (ignore_errors)
+    എങ്കിൽ (ignore_errors)
 	--emsg_off;
-    if (name == NULL)
+    എങ്കിൽ (name == ശൂന്യ)
 	name = func;
 
     ret = call_func(name, -1, rettv, argc, argv, &funcexe);
 
-    if (ret == FAIL)
+    എങ്കിൽ (ret == FAIL)
 	clear_tv(rettv);
     vim_free(tofree);
 
-    return ret;
+    തിരികെ ret;
 }
 
 /*
@@ -961,21 +961,21 @@ call_vim_function(
  * should have type VAR_UNKNOWN.
  * Returns NULL when calling the function fails.
  */
-    void *
+    ശൂന്യം *
 call_func_retstr(
     char_u      *func,
-    int		argc,
+    പൂർണ്ണസംഖ്യ		argc,
     typval_T	*argv)
 {
     typval_T	rettv;
     char_u	*retval;
 
-    if (call_vim_function(func, argc, argv, &rettv) == FAIL)
-	return NULL;
+    എങ്കിൽ (call_vim_function(func, argc, argv, &rettv) == FAIL)
+	തിരികെ ശൂന്യ;
 
     retval = vim_strsave(tv_get_string(&rettv));
     clear_tv(&rettv);
-    return retval;
+    തിരികെ retval;
 }
 
 /*
@@ -984,120 +984,120 @@ call_func_retstr(
  * Returns NULL when there is something wrong.
  * Gives an error when the returned value is not a list.
  */
-    void *
+    ശൂന്യം *
 call_func_retlist(
     char_u      *func,
-    int		argc,
+    പൂർണ്ണസംഖ്യ		argc,
     typval_T	*argv)
 {
     typval_T	rettv;
 
-    if (call_vim_function(func, argc, argv, &rettv) == FAIL)
-	return NULL;
+    എങ്കിൽ (call_vim_function(func, argc, argv, &rettv) == FAIL)
+	തിരികെ ശൂന്യ;
 
-    if (rettv.v_type != VAR_LIST)
+    എങ്കിൽ (rettv.v_type != VAR_LIST)
     {
 	semsg(_(e_custom_list_completion_function_does_not_return_list_but_str),
 		vartype_name(rettv.v_type));
 	clear_tv(&rettv);
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 
-    return rettv.vval.v_list;
+    തിരികെ rettv.vval.v_list;
 }
 
-#if defined(FEAT_FOLDING)
+#എങ്കിൽ defined(FEAT_FOLDING)
 /*
  * Evaluate "arg", which is 'foldexpr'.
  * Note: caller must set "curwin" to match "arg".
  * Returns the foldlevel, and any character preceding it in "*cp".  Doesn't
  * give error messages.
  */
-    int
-eval_foldexpr(win_T *wp, int *cp)
+    പൂർണ്ണസംഖ്യ
+eval_foldexpr(win_T *wp, പൂർണ്ണസംഖ്യ *cp)
 {
     char_u	*arg;
     typval_T	tv;
     varnumber_T	retval;
     char_u	*s;
     sctx_T	saved_sctx = current_sctx;
-    int		use_sandbox = was_set_insecurely(wp, (char_u *)"foldexpr",
+    പൂർണ്ണസംഖ്യ		use_sandbox = was_set_insecurely(wp, (char_u *)"foldexpr",
 								    OPT_LOCAL);
 
     arg = skipwhite(wp->w_p_fde);
     current_sctx = wp->w_p_script_ctx[WV_FDE];
 
     ++emsg_off;
-    if (use_sandbox)
+    എങ്കിൽ (use_sandbox)
 	++sandbox;
     ++textlock;
     *cp = NUL;
 
     // Evaluate the expression.  If the expression is "FuncName()" call the
     // function directly.
-    if (eval0_simple_funccal(arg, &tv, NULL, &EVALARG_EVALUATE) == FAIL)
+    എങ്കിൽ (eval0_simple_funccal(arg, &tv, ശൂന്യ, &EVALARG_EVALUATE) == FAIL)
 	retval = 0;
-    else
+    അല്ലെങ്കിൽ
     {
 	// If the result is a number, just return the number.
-	if (tv.v_type == VAR_NUMBER)
-	    retval = tv.vval.v_number;
-	else if (tv.v_type != VAR_STRING || tv.vval.v_string == NULL)
+	എങ്കിൽ (tv.v_type == VAR_സംഖ്യ)
+	    retval = tv.vval.v_സംഖ്യ;
+	അല്ലെങ്കിൽ എങ്കിൽ (tv.v_type != VAR_STRING || tv.vval.v_string == ശൂന്യ)
 	    retval = 0;
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // If the result is a string, check if there is a non-digit before
 	    // the number.
 	    s = tv.vval.v_string;
-	    if (*s != NUL && !VIM_ISDIGIT(*s) && *s != '-')
+	    എങ്കിൽ (*s != NUL && !VIM_ISDIGIT(*s) && *s != '-')
 		*cp = *s++;
-	    retval = atol((char *)s);
+	    retval = atol((അക്ഷരം *)s);
 	}
 	clear_tv(&tv);
     }
     --emsg_off;
-    if (use_sandbox)
+    എങ്കിൽ (use_sandbox)
 	--sandbox;
     --textlock;
-    clear_evalarg(&EVALARG_EVALUATE, NULL);
+    clear_evalarg(&EVALARG_EVALUATE, ശൂന്യ);
     current_sctx = saved_sctx;
 
-    return (int)retval;
+    തിരികെ (പൂർണ്ണസംഖ്യ)retval;
 }
 #endif
 
 #ifdef LOG_LOCKVAR
-typedef struct flag_string_S
+തരനിർവചനം ഘടന flag_string_S
 {
-    int	    flag;
-    char    *str;
+    പൂർണ്ണസംഖ്യ	    flag;
+    അക്ഷരം    *str;
 } flag_string_T;
 
-    static char *
-flags_tostring(int flags, flag_string_T *_fstring, char *buf, size_t n)
+    സ്ഥിതം അക്ഷരം *
+flags_tostring(പൂർണ്ണസംഖ്യ flags, flag_string_T *_fstring, അക്ഷരം *buf, size_t n)
 {
-    char *p = buf;
+    അക്ഷരം *p = buf;
     *p = NUL;
-    for (flag_string_T *fstring = _fstring; fstring->flag; ++fstring)
+    വേണ്ടി (flag_string_T *fstring = _fstring; fstring->flag; ++fstring)
     {
-	if ((fstring->flag & flags) != 0)
+	എങ്കിൽ ((fstring->flag & flags) != 0)
 	{
 	    size_t len = STRLEN(fstring->str);
-	    if (n > p - buf + len + 7)
+	    എങ്കിൽ (n > p - buf + len + 7)
 	    {
 		STRCAT(p, fstring->str);
 		p += len;
 		STRCAT(p, " ");
 		++p;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		STRCAT(buf, "...");
-		break;
+		നിർത്തുക;
 	    }
 	}
     }
-    return buf;
+    തിരികെ buf;
 }
 
 flag_string_T glv_flag_strings[] = {
@@ -1108,7 +1108,7 @@ flag_string_T glv_flag_strings[] = {
     { GLV_COMPILING,		"COMPILING" },
     { GLV_ASSIGN_WITH_OP,	"ASSIGN_WITH_OP" },
     { GLV_PREFER_FUNC,		"PREFER_FUNC" },
-    { 0,			NULL }
+    { 0,			ശൂന്യ }
 };
 #endif
 
@@ -1130,25 +1130,25 @@ flag_string_T glv_flag_strings[] = {
  *	compile_lock_unlock - pushes object on stack (which becomes lval_root)
  *	execute_instructions: ISN_LOCKUNLOCK - sets lval_root from stack.
  */
-    static void
-fill_lval_from_lval_root(lval_T *lp, lval_root_T *lr)
+    സ്ഥിതം ശൂന്യം
+fill_lval_from_lval_വേര്(lval_T *lp, lval_വേര്_T *lr)
 {
 #ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR: fill_lval_from_lval_root(): name %s, tv %p",
-						lp->ll_name, (void*)lr->lr_tv);
+    ch_log(ശൂന്യ, "LKVAR: fill_lval_from_lval_root(): name %s, tv %p",
+						lp->ll_name, (ശൂന്യം*)lr->lr_tv);
 #endif
-    if (lr->lr_tv == NULL)
-	return;
-    if (!lr->lr_is_arg && lr->lr_tv->v_type == VAR_CLASS)
+    എങ്കിൽ (lr->lr_tv == ശൂന്യ)
+	തിരികെ;
+    എങ്കിൽ (!lr->lr_is_arg && lr->lr_tv->v_type == VAR_CLASS)
     {
-	if (lr->lr_tv->vval.v_class != NULL)
+	എങ്കിൽ (lr->lr_tv->vval.v_class != ശൂന്യ)
 	{
 	    // Special special case. Look for a bare class variable reference.
 	    class_T	*cl = lr->lr_tv->vval.v_class;
-	    int		m_idx;
+	    പൂർണ്ണസംഖ്യ		m_idx;
 	    ocmember_T	*m = class_member_lookup(cl, lp->ll_name,
 					lp->ll_name_end - lp->ll_name, &m_idx);
-	    if (m != NULL)
+	    എങ്കിൽ (m != ശൂന്യ)
 	    {
 		// Assuming "inside class" since bare reference.
 		lp->ll_class = lr->lr_tv->vval.v_class;
@@ -1156,73 +1156,73 @@ fill_lval_from_lval_root(lval_T *lp, lval_root_T *lr)
 		lp->ll_valtype = m->ocm_type;
 		lp->ll_tv = &lp->ll_class->class_members_tv[m_idx];
 #ifdef LOG_LOCKVAR
-		ch_log(NULL, "LKVAR:    ... class member %s.%s",
+		ch_log(ശൂന്യ, "LKVAR:    ... class member %s.%s",
 					lp->ll_class->class_name.string, lp->ll_name);
 #endif
-		return;
+		തിരികെ;
 	    }
 	}
     }
 
 #ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR:    ... type: %s", vartype_name(lr->lr_tv->v_type));
+    ch_log(ശൂന്യ, "LKVAR:    ... type: %s", vartype_name(lr->lr_tv->v_type));
 #endif
     lp->ll_tv = lr->lr_tv;
-    lp->ll_is_root = TRUE;
+    lp->ll_is_വേര് = TRUE;
 }
 
 /*
  * Check if the class has permission to access the member.
  * Returns OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 get_lval_check_access(
     class_T	*cl_exec,   // executing class, NULL if :def or script level
     class_T	*cl,	    // class which contains the member
     ocmember_T	*om,	    // member being accessed
     char_u	*p,	    // char after member name
-    int		flags)	    // GLV flags to check if writing to lval
+    പൂർണ്ണസംഖ്യ		flags)	    // GLV flags to check if writing to lval
 {
 #ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR: get_lval_check_access(), cl_exec %p, cl %p, %c",
-						(void*)cl_exec, (void*)cl, *p);
+    ch_log(ശൂന്യ, "LKVAR: get_lval_check_access(), cl_exec %p, cl %p, %c",
+						(ശൂന്യം*)cl_exec, (ശൂന്യം*)cl, *p);
 #endif
-    if (cl_exec != NULL && cl_exec == cl)
-	return OK;
+    എങ്കിൽ (cl_exec != ശൂന്യ && cl_exec == cl)
+	തിരികെ OK;
 
-    char *msg = NULL;
-    switch (om->ocm_access)
+    അക്ഷരം *സന്ദേശം = ശൂന്യ;
+    തിരഞ്ഞെടുപ്പ് (om->ocm_access)
     {
-	case VIM_ACCESS_PRIVATE:
-	    msg = e_cannot_access_protected_variable_str;
-	    break;
-	case VIM_ACCESS_READ:
+	അവസ്ഥ VIM_ACCESS_PRIVATE:
+	    സന്ദേശം = e_cannot_access_protected_variable_str;
+	    നിർത്തുക;
+	അവസ്ഥ VIM_ACCESS_READ:
 	    // If [idx] or .key following, read only OK.
-	    if (*p == '[' || *p == '.')
-		break;
-	    if ((flags & GLV_READ_ONLY) == 0)
+	    എങ്കിൽ (*p == '[' || *p == '.')
+		നിർത്തുക;
+	    എങ്കിൽ ((flags & GLV_READ_ONLY) == 0)
 	    {
-		if (IS_ENUM(cl))
+		എങ്കിൽ (IS_ENUM(cl))
 		{
-		    if (om->ocm_type->tt_type == VAR_OBJECT)
+		    എങ്കിൽ (om->ocm_type->tt_type == VAR_OBJECT)
 			semsg(_(e_enumvalue_str_cannot_be_modified),
 				cl->class_name.string, om->ocm_name.string);
-		    else
-			msg = e_variable_is_not_writable_str;
+		    അല്ലെങ്കിൽ
+			സന്ദേശം = e_variable_is_not_writable_str;
 		}
-		else
-		    msg = e_variable_is_not_writable_str;
+		അല്ലെങ്കിൽ
+		    സന്ദേശം = e_variable_is_not_writable_str;
 	    }
-	    break;
-	case VIM_ACCESS_ALL:
-	    break;
+	    നിർത്തുക;
+	അവസ്ഥ VIM_ACCESS_ALL:
+	    നിർത്തുക;
     }
-    if (msg != NULL)
+    എങ്കിൽ (സന്ദേശം != ശൂന്യ)
     {
-	emsg_var_cl_define(msg, om->ocm_name.string, 0, cl);
-	return FAIL;
+	emsg_var_cl_define(സന്ദേശം, om->ocm_name.string, 0, cl);
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1236,57 +1236,57 @@ get_lval_check_access(
  * Returns NULL if the variable is not exported or typval is not found or the
  * rhs type doesn't match the lhs type or the variable is not writable.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 get_lval_imported(
     lval_T	*lp,
     scid_T	imp_sid,
     char_u	*p,
     dictitem_T	**dip,
-    int		fne_flags)
+    പൂർണ്ണസംഖ്യ		fne_flags)
 {
     ufunc_T	*ufunc;
-    type_T	*type = NULL;
-    int		cc;
-    int		rc = FAIL;
+    type_T	*type = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		cc;
+    പൂർണ്ണസംഖ്യ		rc = FAIL;
 
     p = skipwhite(p);
 
     import_check_sourced_sid(&imp_sid);
     lp->ll_sid = imp_sid;
     lp->ll_name = p;
-    p = find_name_end(lp->ll_name, NULL, NULL, fne_flags);
+    p = find_name_end(lp->ll_name, ശൂന്യ, ശൂന്യ, fne_flags);
     lp->ll_name_end = p;
 
     // check the item is exported
     cc = *p;
     *p = NUL;
-    if (find_exported(imp_sid, lp->ll_name, &ufunc, &type, NULL, NULL,
+    എങ്കിൽ (find_exported(imp_sid, lp->ll_name, &ufunc, &type, ശൂന്യ, ശൂന്യ,
 								TRUE) == -1)
-	goto failed;
+	പോകുക failed;
 
     // Get the typval for the exported item
     hashtab_T *ht = &SCRIPT_VARS(imp_sid);
-    if (ht == NULL)
-	goto failed;
+    എങ്കിൽ (ht == ശൂന്യ)
+	പോകുക failed;
 
     dictitem_T *di = find_var_in_ht(ht, 0, lp->ll_name, TRUE);
-    if (di == NULL)
+    എങ്കിൽ (di == ശൂന്യ)
 	// script is autoloaded.  So variable will be found later
-	goto success;
+	പോകുക success;
 
     *dip = di;
 
     // Check whether the variable is writable.
     svar_T *sv = find_typval_in_script(&di->di_tv, imp_sid, FALSE);
-    if (sv != NULL && sv->sv_const != 0)
+    എങ്കിൽ (sv != ശൂന്യ && sv->sv_const != 0)
     {
 	semsg(_(e_cannot_change_readonly_variable_str), lp->ll_name);
-	goto failed;
+	പോകുക failed;
     }
 
     // check whether variable is locked
-    if (value_check_lock(di->di_tv.v_lock, lp->ll_name, FALSE))
-	goto failed;
+    എങ്കിൽ (മൂല്യം_check_lock(di->di_tv.v_lock, lp->ll_name, FALSE))
+	പോകുക failed;
 
     lp->ll_tv = &di->di_tv;
     lp->ll_valtype = type;
@@ -1296,10 +1296,10 @@ success:
 
 failed:
     *p = cc;
-    return rc == OK ? p : NULL;
+    തിരികെ rc == OK ? p : ശൂന്യ;
 }
 
-typedef enum {
+തരനിർവചനം എണ്ണൽ {
     GLV_FAIL,
     GLV_OK,
     GLV_STOP
@@ -1322,112 +1322,112 @@ typedef enum {
  * failure.  Returns GLV_STOP to stop processing the characters following
  * 'key_end'.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 get_lval_dict_item(
     lval_T	*lp,
     char_u	*name,
-    char_u	*key,
-    int		len,
-    char_u	**key_end,
+    char_u	*താക്കോൽ,
+    പൂർണ്ണസംഖ്യ		len,
+    char_u	**താക്കോൽ_end,
     typval_T	*var1,
-    int		flags,
-    int		unlet,
+    പൂർണ്ണസംഖ്യ		flags,
+    പൂർണ്ണസംഖ്യ		unlet,
     typval_T	*rettv)
 {
-    int		quiet = flags & GLV_QUIET;
-    char_u	*p = *key_end;
+    പൂർണ്ണസംഖ്യ		quiet = flags & GLV_QUIET;
+    char_u	*p = *താക്കോൽ_end;
 
-    if (len == -1)
+    എങ്കിൽ (len == -1)
     {
 	// "[key]": get key from "var1"
-	key = tv_get_string_chk(var1);	// is number or string
-	if (key == NULL)
-	    return GLV_FAIL;
+	താക്കോൽ = tv_get_string_chk(var1);	// is number or string
+	എങ്കിൽ (താക്കോൽ == ശൂന്യ)
+	    തിരികെ GLV_FAIL;
     }
-    lp->ll_list = NULL;
-    lp->ll_list = NULL;
-    lp->ll_blob = NULL;
-    lp->ll_object = NULL;
-    lp->ll_class = NULL;
-    lp->ll_tuple = NULL;
+    lp->ll_list = ശൂന്യ;
+    lp->ll_list = ശൂന്യ;
+    lp->ll_blob = ശൂന്യ;
+    lp->ll_object = ശൂന്യ;
+    lp->ll_class = ശൂന്യ;
+    lp->ll_tuple = ശൂന്യ;
 
     // a NULL dict is equivalent with an empty dict
-    if (lp->ll_tv->vval.v_dict == NULL)
+    എങ്കിൽ (lp->ll_tv->vval.v_dict == ശൂന്യ)
     {
 	lp->ll_tv->vval.v_dict = dict_alloc();
-	if (lp->ll_tv->vval.v_dict == NULL)
-	    return GLV_FAIL;
+	എങ്കിൽ (lp->ll_tv->vval.v_dict == ശൂന്യ)
+	    തിരികെ GLV_FAIL;
 	++lp->ll_tv->vval.v_dict->dv_refcount;
     }
     lp->ll_dict = lp->ll_tv->vval.v_dict;
 
-    lp->ll_di = dict_find(lp->ll_dict, key, len);
+    lp->ll_di = dict_find(lp->ll_dict, താക്കോൽ, len);
 
     // When assigning to a scope dictionary check that a function and
     // variable name is valid (only variable name unless it is l: or
     // g: dictionary). Disallow overwriting a builtin function.
-    if (rettv != NULL && lp->ll_dict->dv_scope != 0)
+    എങ്കിൽ (rettv != ശൂന്യ && lp->ll_dict->dv_scope != 0)
     {
-	int prevval;
+	പൂർണ്ണസംഖ്യ prevval;
 
-	if (len != -1)
+	എങ്കിൽ (len != -1)
 	{
-	    prevval = key[len];
-	    key[len] = NUL;
+	    prevval = താക്കോൽ[len];
+	    താക്കോൽ[len] = NUL;
 	}
-	else
+	അല്ലെങ്കിൽ
 	    prevval = 0; // avoid compiler warning
-	int wrong = (lp->ll_dict->dv_scope == VAR_DEF_SCOPE
+	പൂർണ്ണസംഖ്യ wrong = (lp->ll_dict->dv_scope == VAR_DEF_SCOPE
 		&& (rettv->v_type == VAR_FUNC
 		    || rettv->v_type == VAR_PARTIAL)
-		&& var_wrong_func_name(key, lp->ll_di == NULL))
-	    || !valid_varname(key, -1, TRUE);
-	if (len != -1)
-	    key[len] = prevval;
-	if (wrong)
-	    return GLV_FAIL;
+		&& var_wrong_func_name(താക്കോൽ, lp->ll_di == ശൂന്യ))
+	    || !valid_varname(താക്കോൽ, -1, TRUE);
+	എങ്കിൽ (len != -1)
+	    താക്കോൽ[len] = prevval;
+	എങ്കിൽ (wrong)
+	    തിരികെ GLV_FAIL;
     }
 
-    if (lp->ll_valtype != NULL)
+    എങ്കിൽ (lp->ll_valtype != ശൂന്യ)
 	// use the type of the member
 	lp->ll_valtype = lp->ll_valtype->tt_member;
 
-    if (lp->ll_di == NULL)
+    എങ്കിൽ (lp->ll_di == ശൂന്യ)
     {
 	// Can't add "v:" or "a:" variable.
-	if (lp->ll_dict == get_vimvar_dict()
+	എങ്കിൽ (lp->ll_dict == get_vimvar_dict()
 		|| &lp->ll_dict->dv_hashtab == get_funccal_args_ht())
 	{
 	    semsg(_(e_illegal_variable_name_str), name);
-	    return GLV_FAIL;
+	    തിരികെ GLV_FAIL;
 	}
 
 	// Key does not exist in dict: may need to add it.
-	if (*p == '[' || *p == '.' || unlet)
+	എങ്കിൽ (*p == '[' || *p == '.' || unlet)
 	{
-	    if (!quiet)
-		semsg(_(e_key_not_present_in_dictionary_str), key);
-	    return GLV_FAIL;
+	    എങ്കിൽ (!quiet)
+		semsg(_(e_താക്കോൽ_not_present_in_dictionary_str), താക്കോൽ);
+	    തിരികെ GLV_FAIL;
 	}
-	if (len == -1)
-	    lp->ll_newkey = vim_strsave(key);
-	else
-	    lp->ll_newkey = vim_strnsave(key, len);
-	if (lp->ll_newkey == NULL)
-	    p = NULL;
+	എങ്കിൽ (len == -1)
+	    lp->ll_newkey = vim_strsave(താക്കോൽ);
+	അല്ലെങ്കിൽ
+	    lp->ll_newkey = vim_strnsave(താക്കോൽ, len);
+	എങ്കിൽ (lp->ll_newkey == ശൂന്യ)
+	    p = ശൂന്യ;
 
-	*key_end = p;
-	return GLV_STOP;
+	*താക്കോൽ_end = p;
+	തിരികെ GLV_STOP;
     }
     // existing variable, need to check if it can be changed
-    else if ((flags & GLV_READ_ONLY) == 0
+    അല്ലെങ്കിൽ എങ്കിൽ ((flags & GLV_READ_ONLY) == 0
 	    && (var_check_ro(lp->ll_di->di_flags, name, FALSE)
 		|| var_check_lock(lp->ll_di->di_flags, name, FALSE)))
-	return GLV_FAIL;
+	തിരികെ GLV_FAIL;
 
     lp->ll_tv = &lp->ll_di->di_tv;
 
-    return GLV_OK;
+    തിരികെ GLV_OK;
 }
 
 /*
@@ -1441,47 +1441,47 @@ get_lval_dict_item(
  *
  * The blob is returned in 'lp'.  Returns OK on success and FAIL on failure.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 get_lval_blob(
     lval_T	*lp,
     typval_T	*var1,
     typval_T	*var2,
-    int		empty1,
-    int		quiet)
+    പൂർണ്ണസംഖ്യ		empty1,
+    പൂർണ്ണസംഖ്യ		quiet)
 {
     long	bloblen = blob_len(lp->ll_tv->vval.v_blob);
 
-    lp->ll_list = NULL;
-    lp->ll_dict = NULL;
-    lp->ll_object = NULL;
-    lp->ll_class = NULL;
-    lp->ll_tuple = NULL;
+    lp->ll_list = ശൂന്യ;
+    lp->ll_dict = ശൂന്യ;
+    lp->ll_object = ശൂന്യ;
+    lp->ll_class = ശൂന്യ;
+    lp->ll_tuple = ശൂന്യ;
 
     // Get the number and item for the only or first index of a List or Tuple.
-    if (empty1)
+    എങ്കിൽ (empty1)
 	lp->ll_n1 = 0;
-    else
+    അല്ലെങ്കിൽ
 	// is number or string
-	lp->ll_n1 = (long)tv_get_number(var1);
+	lp->ll_n1 = (long)tv_get_സംഖ്യ(var1);
 
-    if (check_blob_index(bloblen, lp->ll_n1, quiet) == FAIL)
-	return FAIL;
-    if (lp->ll_range && !lp->ll_empty2)
+    എങ്കിൽ (check_blob_index(bloblen, lp->ll_n1, quiet) == FAIL)
+	തിരികെ FAIL;
+    എങ്കിൽ (lp->ll_range && !lp->ll_empty2)
     {
-	lp->ll_n2 = (long)tv_get_number(var2);
-	if (check_blob_range(bloblen, lp->ll_n1, lp->ll_n2, quiet) == FAIL)
-	    return FAIL;
+	lp->ll_n2 = (long)tv_get_സംഖ്യ(var2);
+	എങ്കിൽ (check_blob_range(bloblen, lp->ll_n1, lp->ll_n2, quiet) == FAIL)
+	    തിരികെ FAIL;
     }
 
-    if (!lp->ll_range)
+    എങ്കിൽ (!lp->ll_range)
 	// Indexing a single byte in a blob.  So the rhs type is a
 	// number.
-	lp->ll_valtype = &t_number;
+	lp->ll_valtype = &t_സംഖ്യ;
 
     lp->ll_blob = lp->ll_tv->vval.v_blob;
-    lp->ll_tv = NULL;
+    lp->ll_tv = ശൂന്യ;
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1495,40 +1495,40 @@ get_lval_blob(
  *
  * The List is returned in 'lp'.  Returns OK on success and FAIL on failure.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 get_lval_list(
     lval_T	*lp,
     typval_T	*var1,
     typval_T	*var2,
-    int		empty1,
-    int		flags,
-    int		quiet)
+    പൂർണ്ണസംഖ്യ		empty1,
+    പൂർണ്ണസംഖ്യ		flags,
+    പൂർണ്ണസംഖ്യ		quiet)
 {
     /*
      * Get the number and item for the only or first index of the List.
      */
-    if (empty1)
+    എങ്കിൽ (empty1)
 	lp->ll_n1 = 0;
-    else
+    അല്ലെങ്കിൽ
 	// is number or string
-	lp->ll_n1 = (long)tv_get_number(var1);
+	lp->ll_n1 = (long)tv_get_സംഖ്യ(var1);
 
-    lp->ll_dict = NULL;
-    lp->ll_object = NULL;
-    lp->ll_class = NULL;
-    lp->ll_tuple = NULL;
+    lp->ll_dict = ശൂന്യ;
+    lp->ll_object = ശൂന്യ;
+    lp->ll_class = ശൂന്യ;
+    lp->ll_tuple = ശൂന്യ;
     lp->ll_list = lp->ll_tv->vval.v_list;
     lp->ll_li = check_range_index_one(lp->ll_list, &lp->ll_n1,
 				(flags & GLV_ASSIGN_WITH_OP) == 0, quiet);
-    if (lp->ll_li == NULL)
-	return FAIL;
+    എങ്കിൽ (lp->ll_li == ശൂന്യ)
+	തിരികെ FAIL;
 
-    if (lp->ll_valtype != NULL && !lp->ll_range)
+    എങ്കിൽ (lp->ll_valtype != ശൂന്യ && !lp->ll_range)
     {
 	// use the type of the member
-	if (lp->ll_valtype->tt_member != NULL)
+	എങ്കിൽ (lp->ll_valtype->tt_member != ശൂന്യ)
 	    lp->ll_valtype = lp->ll_valtype->tt_member;
-	else
+	അല്ലെങ്കിൽ
 	    // If the LHS member type is not known (VAR_ANY), then get it from
 	    // the list item (after indexing)
 	    lp->ll_valtype = typval2type(&lp->ll_li->li_tv, get_copyID(),
@@ -1542,18 +1542,18 @@ get_lval_list(
      * When no index given: "lp->ll_empty2" is TRUE.
      * Otherwise "lp->ll_n2" is set to the second index.
      */
-    if (lp->ll_range && !lp->ll_empty2)
+    എങ്കിൽ (lp->ll_range && !lp->ll_empty2)
     {
-	lp->ll_n2 = (long)tv_get_number(var2);
+	lp->ll_n2 = (long)tv_get_സംഖ്യ(var2);
 	// is number or string
-	if (check_range_index_two(lp->ll_list,
+	എങ്കിൽ (check_range_index_two(lp->ll_list,
 			&lp->ll_n1, lp->ll_li, &lp->ll_n2, quiet) == FAIL)
-	    return FAIL;
+	    തിരികെ FAIL;
     }
 
     lp->ll_tv = &lp->ll_li->li_tv;
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1567,51 +1567,51 @@ get_lval_list(
  * The typval is returned in 'lp'.  Returns GLV_OK on success and GLV_FAIL on
  * failure.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 get_lval_tuple(
     lval_T	*lp,
     typval_T	*idx,
-    int		quiet)
+    പൂർണ്ണസംഖ്യ		quiet)
 {
     // is number or string
-    lp->ll_n1 = (long)tv_get_number(idx);
+    lp->ll_n1 = (long)tv_get_സംഖ്യ(idx);
 
-    lp->ll_list = NULL;
-    lp->ll_dict = NULL;
-    lp->ll_blob = NULL;
-    lp->ll_object = NULL;
-    lp->ll_class = NULL;
+    lp->ll_list = ശൂന്യ;
+    lp->ll_dict = ശൂന്യ;
+    lp->ll_blob = ശൂന്യ;
+    lp->ll_object = ശൂന്യ;
+    lp->ll_class = ശൂന്യ;
 
     lp->ll_tuple = lp->ll_tv->vval.v_tuple;
     lp->ll_tv = tuple_find(lp->ll_tuple, lp->ll_n1);
-    if (lp->ll_tv == NULL)
+    എങ്കിൽ (lp->ll_tv == ശൂന്യ)
     {
-	if (!quiet)
+	എങ്കിൽ (!quiet)
 	    semsg(_(e_tuple_index_out_of_range_nr), lp->ll_n1);
-	return GLV_FAIL;
+	തിരികെ GLV_FAIL;
     }
 
     // use the type of the member
-    if (lp->ll_valtype != NULL)
+    എങ്കിൽ (lp->ll_valtype != ശൂന്യ)
     {
-	if (lp->ll_valtype != NULL
+	എങ്കിൽ (lp->ll_valtype != ശൂന്യ
 		&& lp->ll_valtype->tt_type == VAR_TUPLE
 		&& lp->ll_valtype->tt_argcount == 1)
 	{
 	    // a variadic tuple or a single item tuple
-	    if (lp->ll_valtype->tt_flags & TTFLAG_VARARGS)
+	    എങ്കിൽ (lp->ll_valtype->tt_flags & TTFLAG_VARARGS)
 		lp->ll_valtype = lp->ll_valtype->tt_args[0]->tt_member;
-	    else
+	    അല്ലെങ്കിൽ
 		lp->ll_valtype = lp->ll_valtype->tt_args[0];
 	}
-	else
+	അല്ലെങ്കിൽ
 	    // If the LHS member type is not known (VAR_ANY), then get it from
 	    // the tuple item (after indexing)
 	    lp->ll_valtype = typval2type(lp->ll_tv, get_copyID(),
 					&lp->ll_type_list, TVTT_DO_MEMBER);
     }
 
-    return GLV_OK;
+    തിരികെ GLV_OK;
 }
 
 /*
@@ -1622,39 +1622,39 @@ get_lval_tuple(
  * The method index, method function pointer and method type are returned in
  * "lp".
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 get_lval_oc_method(
     lval_T	*lp,
     class_T	*cl,
-    char_u	*key,
-    char_u	**key_end,
+    char_u	*താക്കോൽ,
+    char_u	**താക്കോൽ_end,
     vartype_T	v_type)
 {
     // Look for a method with this name.
     // round 1: class functions (skipped for an object)
     // round 2: object methods
-    for (int round = v_type == VAR_OBJECT ? 2 : 1; round <= 2; ++round)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ round = v_type == VAR_OBJECT ? 2 : 1; round <= 2; ++round)
     {
-	int	m_idx;
+	പൂർണ്ണസംഖ്യ	m_idx;
 	ufunc_T	*fp;
 
 	fp = method_lookup(cl, round == 1 ? VAR_CLASS : VAR_OBJECT,
-						key, *key_end - key, &m_idx);
+						താക്കോൽ, *താക്കോൽ_end - താക്കോൽ, &m_idx);
 	lp->ll_oi = m_idx;
 
 	// process generic method (if present)
-	if (fp && (fp = eval_generic_func(fp, key, key_end)) == NULL)
-	    return FAIL;
+	എങ്കിൽ (fp && (fp = eval_generic_func(fp, താക്കോൽ, താക്കോൽ_end)) == ശൂന്യ)
+	    തിരികെ FAIL;
 
-	if (fp != NULL)
+	എങ്കിൽ (fp != ശൂന്യ)
 	{
 	    lp->ll_ufunc = fp;
 	    lp->ll_valtype = fp->uf_func_type;
-	    break;
+	    നിർത്തുക;
 	}
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1666,42 +1666,42 @@ get_lval_oc_method(
  * The variable index, typval and type are returned in "lp".  Returns FAIL if
  * the variable is not writable.  Otherwise returns OK.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 get_lval_oc_variable(
     lval_T	*lp,
     class_T	*cl,
-    char_u	*key,
-    char_u	*key_end,
+    char_u	*താക്കോൽ,
+    char_u	*താക്കോൽ_end,
     vartype_T	v_type,
     class_T	*cl_exec,
-    int		flags)
+    പൂർണ്ണസംഖ്യ		flags)
 {
-    int		m_idx;
+    പൂർണ്ണസംഖ്യ		m_idx;
     ocmember_T	*om;
 
-    om = member_lookup(cl, v_type, key, key_end - key, &m_idx);
+    om = member_lookup(cl, v_type, താക്കോൽ, താക്കോൽ_end - താക്കോൽ, &m_idx);
     lp->ll_oi = m_idx;
-    if (om == NULL)
-	return OK;
+    എങ്കിൽ (om == ശൂന്യ)
+	തിരികെ OK;
 
     // Check variable is accessible
-    if (get_lval_check_access(cl_exec, cl, om, key_end, flags) == FAIL)
-	return FAIL;
+    എങ്കിൽ (get_lval_check_access(cl_exec, cl, om, താക്കോൽ_end, flags) == FAIL)
+	തിരികെ FAIL;
 
     // When lhs is used to modify the variable, check it is not a read-only
     // variable.
-    if ((flags & GLV_READ_ONLY) == 0 && (*key_end != '.' && *key_end != '[')
+    എങ്കിൽ ((flags & GLV_READ_ONLY) == 0 && (*താക്കോൽ_end != '.' && *താക്കോൽ_end != '[')
 	    && oc_var_check_ro(cl, om))
-	return FAIL;
+	തിരികെ FAIL;
 
     lp->ll_valtype = om->ocm_type;
 
-    if (v_type == VAR_OBJECT)
+    എങ്കിൽ (v_type == VAR_OBJECT)
 	lp->ll_tv = ((typval_T *)(lp->ll_tv->vval.v_object + 1)) + m_idx;
-    else
+    അല്ലെങ്കിൽ
 	lp->ll_tv = &cl->class_members_tv[m_idx];
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1716,64 +1716,64 @@ get_lval_oc_variable(
  * The Class or Object is returned in 'lp'.  Returns OK on success and FAIL on
  * failure.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 get_lval_class_or_obj(
     lval_T	*lp,
-    char_u	*key,
-    char_u	**key_end,
+    char_u	*താക്കോൽ,
+    char_u	**താക്കോൽ_end,
     vartype_T	v_type,
     class_T	*cl_exec,
-    int		flags,
-    int		quiet)
+    പൂർണ്ണസംഖ്യ		flags,
+    പൂർണ്ണസംഖ്യ		quiet)
 {
-    lp->ll_dict = NULL;
-    lp->ll_list = NULL;
-    lp->ll_tuple = NULL;
+    lp->ll_dict = ശൂന്യ;
+    lp->ll_list = ശൂന്യ;
+    lp->ll_tuple = ശൂന്യ;
 
     class_T *cl;
-    if (v_type == VAR_OBJECT)
+    എങ്കിൽ (v_type == VAR_OBJECT)
     {
-	if (lp->ll_tv->vval.v_object == NULL)
+	എങ്കിൽ (lp->ll_tv->vval.v_object == ശൂന്യ)
 	{
-	    if (!quiet)
+	    എങ്കിൽ (!quiet)
 		emsg(_(e_using_null_object));
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	cl = lp->ll_tv->vval.v_object->obj_class;
 	lp->ll_object = lp->ll_tv->vval.v_object;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	cl = lp->ll_tv->vval.v_class;
-	lp->ll_object = NULL;
+	lp->ll_object = ശൂന്യ;
     }
     lp->ll_class = cl;
 
-    if (cl == NULL)
+    എങ്കിൽ (cl == ശൂന്യ)
 	// TODO: what if class is NULL?
-	return OK;
+	തിരികെ OK;
 
-    lp->ll_valtype = NULL;
+    lp->ll_valtype = ശൂന്യ;
 
-    if (flags & GLV_PREFER_FUNC)
-	if (get_lval_oc_method(lp, cl, key, key_end, v_type) == FAIL)
-	    return FAIL;
+    എങ്കിൽ (flags & GLV_PREFER_FUNC)
+	എങ്കിൽ (get_lval_oc_method(lp, cl, താക്കോൽ, താക്കോൽ_end, v_type) == FAIL)
+	    തിരികെ FAIL;
 
     // Look for object/class member variable
-    if (lp->ll_valtype == NULL)
+    എങ്കിൽ (lp->ll_valtype == ശൂന്യ)
     {
-	if (get_lval_oc_variable(lp, cl, key, *key_end, v_type, cl_exec, flags)
+	എങ്കിൽ (get_lval_oc_variable(lp, cl, താക്കോൽ, *താക്കോൽ_end, v_type, cl_exec, flags)
 								== FAIL)
-	    return FAIL;
+	    തിരികെ FAIL;
     }
 
-    if (lp->ll_valtype == NULL)
+    എങ്കിൽ (lp->ll_valtype == ശൂന്യ)
     {
-	member_not_found_msg(cl, v_type, key, *key_end - key);
-	return FAIL;
+	member_not_found_സന്ദേശം(cl, v_type, താക്കോൽ, *താക്കോൽ_end - താക്കോൽ);
+	തിരികെ FAIL;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1781,18 +1781,18 @@ get_lval_class_or_obj(
  * "v_type".  Only Dict, Class and Object types support a dot after the name.
  * Returns TRUE if dot is allowed after the name.
  */
-    static int
-dot_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+dot_allowed_after_type(char_u *name, vartype_T v_type, പൂർണ്ണസംഖ്യ quiet)
 {
-    if (v_type != VAR_DICT && v_type != VAR_OBJECT && v_type != VAR_CLASS)
+    എങ്കിൽ (v_type != VAR_DICT && v_type != VAR_OBJECT && v_type != VAR_CLASS)
     {
-	if (!quiet)
+	എങ്കിൽ (!quiet)
 	    semsg(_(e_dot_not_allowed_after_str_str),
 		    vartype_name(v_type), name);
-	return FALSE;
+	തിരികെ FALSE;
     }
 
-    return TRUE;
+    തിരികെ TRUE;
 }
 
 /*
@@ -1800,18 +1800,18 @@ dot_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
  * type "v_type".  Only Dict, List, Tuple and Blob types support a bracket
  * after the variable name.  Returns TRUE if bracket is allowed after the name.
  */
-    static int
-bracket_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+bracket_allowed_after_type(char_u *name, vartype_T v_type, പൂർണ്ണസംഖ്യ quiet)
 {
-    if (v_type == VAR_CLASS || v_type == VAR_OBJECT)
+    എങ്കിൽ (v_type == VAR_CLASS || v_type == VAR_OBJECT)
     {
-	if (!quiet)
+	എങ്കിൽ (!quiet)
 	    semsg(_(e_index_not_allowed_after_str_str),
 		    vartype_name(v_type), name);
-	return FALSE;
+	തിരികെ FALSE;
     }
 
-    return TRUE;
+    തിരികെ TRUE;
 }
 
 /*
@@ -1819,23 +1819,23 @@ bracket_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
  * index.  Only Dict, List, Tuple, Blob, Object and Class types support
  * indexing.  Returns TRUE if indexing is allowed after the name.
  */
-    static int
-index_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+index_allowed_after_type(char_u *name, vartype_T v_type, പൂർണ്ണസംഖ്യ quiet)
 {
-    if (v_type != VAR_LIST
+    എങ്കിൽ (v_type != VAR_LIST
 	    && v_type != VAR_TUPLE
 	    && v_type != VAR_DICT
 	    && v_type != VAR_BLOB
 	    && v_type != VAR_OBJECT
 	    && v_type != VAR_CLASS)
     {
-	if (!quiet)
+	എങ്കിൽ (!quiet)
 	    semsg(_(e_index_not_allowed_after_str_str),
 		    vartype_name(v_type), name);
-	return FALSE;
+	തിരികെ FALSE;
     }
 
-    return TRUE;
+    തിരികെ TRUE;
 }
 
 /*
@@ -1848,7 +1848,7 @@ index_allowed_after_type(char_u *name, vartype_T v_type, int quiet)
  * Returns a pointer to the character after the subscript on success or NULL on
  * failure.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 get_lval_subscript(
     lval_T	*lp,
     char_u	*p,
@@ -1856,17 +1856,17 @@ get_lval_subscript(
     typval_T	*rettv,
     hashtab_T	*ht,
     dictitem_T	*v,
-    int		unlet,
-    int		flags,	    // GLV_ values
+    പൂർണ്ണസംഖ്യ		unlet,
+    പൂർണ്ണസംഖ്യ		flags,	    // GLV_ values
     class_T	*cl_exec)
 {
-    int		quiet = flags & GLV_QUIET;
-    char_u	*key = NULL;
-    int		len;
+    പൂർണ്ണസംഖ്യ		quiet = flags & GLV_QUIET;
+    char_u	*താക്കോൽ = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		len;
     typval_T	var1;
     typval_T	var2;
-    int		empty1 = FALSE;
-    int		rc = FAIL;
+    പൂർണ്ണസംഖ്യ		empty1 = FALSE;
+    പൂർണ്ണസംഖ്യ		rc = FAIL;
 
     /*
      * Loop until no more [idx] or .key is following.
@@ -1874,183 +1874,183 @@ get_lval_subscript(
     var1.v_type = VAR_UNKNOWN;
     var2.v_type = VAR_UNKNOWN;
 
-    while (*p == '[' || (*p == '.' && p[1] != '=' && p[1] != '.'))
+    ആകുമ്പോൾ (*p == '[' || (*p == '.' && p[1] != '=' && p[1] != '.'))
     {
 	vartype_T v_type = lp->ll_tv->v_type;
 
-	if (*p == '.' && !dot_allowed_after_type(name, v_type, quiet))
-	    goto done;
+	എങ്കിൽ (*p == '.' && !dot_allowed_after_type(name, v_type, quiet))
+	    പോകുക done;
 
-	if (*p == '[' && !bracket_allowed_after_type(name, v_type, quiet))
-	    goto done;
+	എങ്കിൽ (*p == '[' && !bracket_allowed_after_type(name, v_type, quiet))
+	    പോകുക done;
 
-	if (!index_allowed_after_type(name, v_type, quiet))
-	    goto done;
+	എങ്കിൽ (!index_allowed_after_type(name, v_type, quiet))
+	    പോകുക done;
 
 	// A NULL list/blob works like an empty list/blob, allocate one now.
-	int r = OK;
-	if (v_type == VAR_LIST && lp->ll_tv->vval.v_list == NULL)
+	പൂർണ്ണസംഖ്യ r = OK;
+	എങ്കിൽ (v_type == VAR_LIST && lp->ll_tv->vval.v_list == ശൂന്യ)
 	    r = rettv_list_alloc(lp->ll_tv);
-	else if (v_type == VAR_BLOB && lp->ll_tv->vval.v_blob == NULL)
+	അല്ലെങ്കിൽ എങ്കിൽ (v_type == VAR_BLOB && lp->ll_tv->vval.v_blob == ശൂന്യ)
 	    r = rettv_blob_alloc(lp->ll_tv);
-	if (r == FAIL)
-	    goto done;
+	എങ്കിൽ (r == FAIL)
+	    പോകുക done;
 
-	if (lp->ll_range)
+	എങ്കിൽ (lp->ll_range)
 	{
-	    if (!quiet)
+	    എങ്കിൽ (!quiet)
 		emsg(_(e_slice_must_come_last));
-	    goto done;
+	    പോകുക done;
 	}
 #ifdef LOG_LOCKVAR
-	ch_log(NULL, "LKVAR: get_lval() loop: p: %s, type: %s", p,
+	ch_log(ശൂന്യ, "LKVAR: get_lval() loop: p: %s, type: %s", p,
 		vartype_name(v_type));
 #endif
 
-	if (current_script_is_vim9() && lp->ll_valtype == NULL
-		&& v != NULL
+	എങ്കിൽ (current_script_is_vim9() && lp->ll_valtype == ശൂന്യ
+		&& v != ശൂന്യ
 		&& lp->ll_tv == &v->di_tv
-		&& ht != NULL && ht == get_script_local_ht())
+		&& ht != ശൂന്യ && ht == get_script_local_ht())
 	{
 	    svar_T  *sv = find_typval_in_script(lp->ll_tv, 0, TRUE);
 
 	    // Vim9 script local variable: get the type
-	    if (sv != NULL)
+	    എങ്കിൽ (sv != ശൂന്യ)
 	    {
 		lp->ll_valtype = sv->sv_type;
 #ifdef LOG_LOCKVAR
-		ch_log(NULL, "LKVAR:    ... loop: vim9 assign type: %s",
+		ch_log(ശൂന്യ, "LKVAR:    ... loop: vim9 assign type: %s",
 			vartype_name(lp->ll_valtype->tt_type));
 #endif
 	    }
 	}
 
 	len = -1;
-	if (*p == '.')
+	എങ്കിൽ (*p == '.')
 	{
-	    key = p + 1;
+	    താക്കോൽ = p + 1;
 
-	    for (len = 0; ASCII_ISALNUM(key[len]) || key[len] == '_'; ++len)
+	    വേണ്ടി (len = 0; ASCII_ISALNUM(താക്കോൽ[len]) || താക്കോൽ[len] == '_'; ++len)
 		;
-	    if (len == 0)
+	    എങ്കിൽ (len == 0)
 	    {
-		if (!quiet)
-		    emsg(_(e_cannot_use_empty_key_for_dictionary));
-		goto done;
+		എങ്കിൽ (!quiet)
+		    emsg(_(e_cannot_use_empty_താക്കോൽ_for_dictionary));
+		പോകുക done;
 	    }
-	    p = key + len;
+	    p = താക്കോൽ + len;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // Get the index [expr] or the first index [expr: ].
 	    p = skipwhite(p + 1);
-	    if (*p == ':')
+	    എങ്കിൽ (*p == ':')
 		empty1 = TRUE;
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		empty1 = FALSE;
-		if (eval1(&p, &var1, &EVALARG_EVALUATE) == FAIL)  // recursive!
-		    goto done;
-		if (tv_get_string_chk(&var1) == NULL)
+		എങ്കിൽ (eval1(&p, &var1, &EVALARG_EVALUATE) == FAIL)  // recursive!
+		    പോകുക done;
+		എങ്കിൽ (tv_get_string_chk(&var1) == ശൂന്യ)
 		    // not a number or string
-		    goto done;
+		    പോകുക done;
 		p = skipwhite(p);
 	    }
 
 	    // Optionally get the second index [ :expr].
-	    if (*p == ':')
+	    എങ്കിൽ (*p == ':')
 	    {
-		if (v_type == VAR_DICT)
+		എങ്കിൽ (v_type == VAR_DICT)
 		{
-		    if (!quiet)
+		    എങ്കിൽ (!quiet)
 			emsg(_(e_cannot_slice_dictionary));
-		    goto done;
+		    പോകുക done;
 		}
-		if (v_type == VAR_TUPLE)
+		എങ്കിൽ (v_type == VAR_TUPLE)
 		{
-		    if (!quiet)
+		    എങ്കിൽ (!quiet)
 			emsg(_(e_cannot_slice_tuple));
-		    goto done;
+		    പോകുക done;
 		}
-		if (rettv != NULL
+		എങ്കിൽ (rettv != ശൂന്യ
 			&& !(rettv->v_type == VAR_LIST
-			    && rettv->vval.v_list != NULL)
+			    && rettv->vval.v_list != ശൂന്യ)
 			&& !(rettv->v_type == VAR_BLOB
-			    && rettv->vval.v_blob != NULL))
+			    && rettv->vval.v_blob != ശൂന്യ))
 		{
-		    if (!quiet)
-			emsg(_(e_slice_requires_list_or_blob_value));
-		    goto done;
+		    എങ്കിൽ (!quiet)
+			emsg(_(e_slice_requires_list_or_blob_മൂല്യം));
+		    പോകുക done;
 		}
 		p = skipwhite(p + 1);
-		if (*p == ']')
+		എങ്കിൽ (*p == ']')
 		    lp->ll_empty2 = TRUE;
-		else
+		അല്ലെങ്കിൽ
 		{
 		    lp->ll_empty2 = FALSE;
 		    // recursive!
-		    if (eval1(&p, &var2, &EVALARG_EVALUATE) == FAIL)
-			goto done;
-		    if (tv_get_string_chk(&var2) == NULL)
+		    എങ്കിൽ (eval1(&p, &var2, &EVALARG_EVALUATE) == FAIL)
+			പോകുക done;
+		    എങ്കിൽ (tv_get_string_chk(&var2) == ശൂന്യ)
 			// not a number or string
-			goto done;
+			പോകുക done;
 		}
 		lp->ll_range = TRUE;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		lp->ll_range = FALSE;
 
-	    if (*p != ']')
+	    എങ്കിൽ (*p != ']')
 	    {
-		if (!quiet)
+		എങ്കിൽ (!quiet)
 		    emsg(_(e_missing_closing_square_brace));
-		goto done;
+		പോകുക done;
 	    }
 
 	    // Skip to past ']'.
 	    ++p;
 	}
 #ifdef LOG_LOCKVAR
-	if (len == -1)
-	    ch_log(NULL, "LKVAR:    ... loop: p: %s, '[' key: %s", p,
-		    empty1 ? ":" : (char*)tv_get_string(&var1));
-	else
-	    ch_log(NULL, "LKVAR:    ... loop: p: %s, '.' key: %s", p, key);
+	എങ്കിൽ (len == -1)
+	    ch_log(ശൂന്യ, "LKVAR:    ... loop: p: %s, '[' key: %s", p,
+		    empty1 ? ":" : (അക്ഷരം*)tv_get_string(&var1));
+	അല്ലെങ്കിൽ
+	    ch_log(ശൂന്യ, "LKVAR:    ... loop: p: %s, '.' key: %s", p, താക്കോൽ);
 #endif
 
-	if (v_type == VAR_DICT)
+	എങ്കിൽ (v_type == VAR_DICT)
 	{
 	    glv_status_T glv_status;
 
-	    glv_status = get_lval_dict_item(lp, name, key, len, &p, &var1,
+	    glv_status = get_lval_dict_item(lp, name, താക്കോൽ, len, &p, &var1,
 							flags, unlet, rettv);
-	    if (glv_status == GLV_FAIL)
-		goto done;
-	    if (glv_status == GLV_STOP)
-		break;
+	    എങ്കിൽ (glv_status == GLV_FAIL)
+		പോകുക done;
+	    എങ്കിൽ (glv_status == GLV_STOP)
+		നിർത്തുക;
 	}
-	else if (v_type == VAR_BLOB)
+	അല്ലെങ്കിൽ എങ്കിൽ (v_type == VAR_BLOB)
 	{
-	    if (get_lval_blob(lp, &var1, &var2, empty1, quiet) == FAIL)
-		goto done;
+	    എങ്കിൽ (get_lval_blob(lp, &var1, &var2, empty1, quiet) == FAIL)
+		പോകുക done;
 
-	    break;
+	    നിർത്തുക;
 	}
-	else if (v_type == VAR_LIST)
+	അല്ലെങ്കിൽ എങ്കിൽ (v_type == VAR_LIST)
 	{
-	    if (get_lval_list(lp, &var1, &var2, empty1, flags, quiet) == FAIL)
-		goto done;
+	    എങ്കിൽ (get_lval_list(lp, &var1, &var2, empty1, flags, quiet) == FAIL)
+		പോകുക done;
 	}
-	else if (v_type == VAR_TUPLE)
+	അല്ലെങ്കിൽ എങ്കിൽ (v_type == VAR_TUPLE)
 	{
-	    if (get_lval_tuple(lp, &var1, quiet) == FAIL)
-		goto done;
+	    എങ്കിൽ (get_lval_tuple(lp, &var1, quiet) == FAIL)
+		പോകുക done;
 	}
-	else  // v_type == VAR_CLASS || v_type == VAR_OBJECT
+	അല്ലെങ്കിൽ  // v_type == VAR_CLASS || v_type == VAR_OBJECT
 	{
-	    if (get_lval_class_or_obj(lp, key, &p, v_type, cl_exec, flags,
+	    എങ്കിൽ (get_lval_class_or_obj(lp, താക്കോൽ, &p, v_type, cl_exec, flags,
 							quiet) == FAIL)
-		goto done;
+		പോകുക done;
 	}
 
 	clear_tv(&var1);
@@ -2059,11 +2059,11 @@ get_lval_subscript(
 	var2.v_type = VAR_UNKNOWN;
     }
 
-    if (lp->ll_tuple != NULL && (flags & GLV_READ_ONLY) == 0)
+    എങ്കിൽ (lp->ll_tuple != ശൂന്യ && (flags & GLV_READ_ONLY) == 0)
     {
-	if (!quiet)
+	എങ്കിൽ (!quiet)
 	    emsg(_(e_tuple_is_immutable));
-	goto done;
+	പോകുക done;
     }
 
     rc = OK;
@@ -2071,7 +2071,7 @@ get_lval_subscript(
 done:
     clear_tv(&var1);
     clear_tv(&var2);
-    return rc == OK ? p : NULL;
+    തിരികെ rc == OK ? p : ശൂന്യ;
 }
 
 /*
@@ -2098,236 +2098,236 @@ get_lval(
     char_u	*name,
     typval_T	*rettv,
     lval_T	*lp,
-    int		unlet,
-    int		skip,
-    int		flags,	    // GLV_ values
-    int		fne_flags)  // flags for find_name_end()
+    പൂർണ്ണസംഖ്യ		unlet,
+    പൂർണ്ണസംഖ്യ		skip,
+    പൂർണ്ണസംഖ്യ		flags,	    // GLV_ values
+    പൂർണ്ണസംഖ്യ		fne_flags)  // flags for find_name_end()
 {
     char_u	*p;
-    char_u	*expr_start, *expr_end;
-    int		cc;
-    dictitem_T	*v = NULL;
-    hashtab_T	*ht = NULL;
-    int		quiet = flags & GLV_QUIET;
-    int		writing = 0;
-    int		vim9script = in_vim9script();
-    class_T	*cl_exec = NULL;    // class that is executing, or NULL.
+    char_u	*വ്യഞ്ജകം_start, *വ്യഞ്ജകം_end;
+    പൂർണ്ണസംഖ്യ		cc;
+    dictitem_T	*v = ശൂന്യ;
+    hashtab_T	*ht = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		quiet = flags & GLV_QUIET;
+    പൂർണ്ണസംഖ്യ		writing = 0;
+    പൂർണ്ണസംഖ്യ		vim9script = in_vim9script();
+    class_T	*cl_exec = ശൂന്യ;    // class that is executing, or NULL.
 
 #ifdef LOG_LOCKVAR
-    if (lval_root == NULL)
-	ch_log(NULL, "LKVAR: get_lval(): name: %s, lval_root (nil)", name);
-    else
-	ch_log(NULL, "LKVAR: get_lval(): name: %s, lr_tv %p lr_is_arg %d",
-			name, (void*)lval_root->lr_tv, lval_root->lr_is_arg);
-    char buf[80];
-    ch_log(NULL, "LKVAR:    ...: GLV flags: %s",
-		    flags_tostring(flags, glv_flag_strings, buf, sizeof(buf)));
+    എങ്കിൽ (lval_വേര് == ശൂന്യ)
+	ch_log(ശൂന്യ, "LKVAR: get_lval(): name: %s, lval_root (nil)", name);
+    അല്ലെങ്കിൽ
+	ch_log(ശൂന്യ, "LKVAR: get_lval(): name: %s, lr_tv %p lr_is_arg %d",
+			name, (ശൂന്യം*)lval_വേര്->lr_tv, lval_വേര്->lr_is_arg);
+    അക്ഷരം buf[80];
+    ch_log(ശൂന്യ, "LKVAR:    ...: GLV flags: %s",
+		    flags_tostring(flags, glv_flag_strings, buf, വലുപ്പം(buf)));
 #endif
 
     // Clear everything in "lp".
     CLEAR_POINTER(lp);
-    ga_init2(&lp->ll_type_list, sizeof(type_T *), 10);
+    ga_init2(&lp->ll_type_list, വലുപ്പം(type_T *), 10);
 
-    if (skip || (flags & GLV_COMPILING))
+    എങ്കിൽ (skip || (flags & GLV_COMPILING))
     {
 	// When skipping or compiling just find the end of the name.
 	lp->ll_name = name;
-	lp->ll_name_end = find_name_end(name, NULL, NULL,
+	lp->ll_name_end = find_name_end(name, ശൂന്യ, ശൂന്യ,
 						      FNE_INCL_BR | fne_flags);
-	return lp->ll_name_end;
+	തിരികെ lp->ll_name_end;
     }
 
     // Cannot use "s:var" at the Vim9 script level.  "s: type" is OK.
-    if (vim9script && at_script_level()
+    എങ്കിൽ (vim9script && at_script_level()
 		  && name[0] == 's' && name[1] == ':' && !VIM_ISWHITE(name[2]))
     {
 	semsg(_(e_cannot_use_s_colon_in_vim9_script_str), name);
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 
     // Find the end of the name.
-    p = find_name_end(name, &expr_start, &expr_end, fne_flags);
+    p = find_name_end(name, &വ്യഞ്ജകം_start, &വ്യഞ്ജകം_end, fne_flags);
     lp->ll_name_end = p;
-    if (expr_start != NULL)
+    എങ്കിൽ (വ്യഞ്ജകം_start != ശൂന്യ)
     {
 	// Don't expand the name when we already know there is an error.
-	if (unlet && !VIM_ISWHITE(*p) && !ends_excmd(*p)
+	എങ്കിൽ (unlet && !VIM_ISWHITE(*p) && !ends_excmd(*p)
 						    && *p != '[' && *p != '.')
 	{
 	    semsg(_(e_trailing_characters_str), p);
-	    return NULL;
+	    തിരികെ ശൂന്യ;
 	}
 
-	lp->ll_exp_name = make_expanded_name(name, expr_start, expr_end, p);
-	if (lp->ll_exp_name == NULL)
+	lp->ll_exp_name = make_expanded_name(name, വ്യഞ്ജകം_start, വ്യഞ്ജകം_end, p);
+	എങ്കിൽ (lp->ll_exp_name == ശൂന്യ)
 	{
 	    // Report an invalid expression in braces, unless the
 	    // expression evaluation has been cancelled due to an
 	    // aborting error, an interrupt, or an exception.
-	    if (!aborting() && !quiet)
+	    എങ്കിൽ (!aborting() && !quiet)
 	    {
 		emsg_severe = TRUE;
 		semsg(_(e_invalid_argument_str), name);
-		return NULL;
+		തിരികെ ശൂന്യ;
 	    }
 	}
 	lp->ll_name = lp->ll_exp_name;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	lp->ll_name = name;
 
-	if (vim9script)
+	എങ്കിൽ (vim9script)
 	{
 	    // "a: type" is declaring variable "a" with a type, not "a:".
 	    // However, "g:[key]" is indexing a dictionary.
-	    if (p == name + 2 && p[-1] == ':' && *p != '[')
+	    എങ്കിൽ (p == name + 2 && p[-1] == ':' && *p != '[')
 	    {
 		--p;
 		lp->ll_name_end = p;
 	    }
-	    if (*skipwhite(p) == ':')
+	    എങ്കിൽ (*skipwhite(p) == ':')
 	    {
 		char_u	    *tp = skipwhite(p + 1);
 
-		if (is_scoped_variable(name))
+		എങ്കിൽ (is_scoped_variable(name))
 		{
 		    semsg(_(e_cannot_use_type_with_this_variable_str), name);
-		    return NULL;
+		    തിരികെ ശൂന്യ;
 		}
-		if (VIM_ISWHITE(*p))
+		എങ്കിൽ (VIM_ISWHITE(*p))
 		{
 		    semsg(_(e_no_white_space_allowed_before_colon_str), p);
-		    return NULL;
+		    തിരികെ ശൂന്യ;
 		}
-		if (tp == p + 1 && !quiet)
+		എങ്കിൽ (tp == p + 1 && !quiet)
 		{
 		    semsg(_(e_white_space_required_after_str_str), ":", p);
-		    return NULL;
+		    തിരികെ ശൂന്യ;
 		}
-		if (!SCRIPT_ID_VALID(current_sctx.sc_sid))
+		എങ്കിൽ (!SCRIPT_ID_VALID(current_sctx.sc_sid))
 		{
 		    semsg(_(e_using_type_not_in_script_context_str), p);
-		    return NULL;
+		    തിരികെ ശൂന്യ;
 		}
-		if (vim9script && (flags & GLV_NO_DECL) &&
+		എങ്കിൽ (vim9script && (flags & GLV_NO_DECL) &&
 			!(flags & GLV_FOR_LOOP))
 		{
 		    // Using a type and not in a "var" declaration.
 		    semsg(_(e_trailing_characters_str), p);
-		    return NULL;
+		    തിരികെ ശൂന്യ;
 		}
 
 
 		// parse the type after the name
 		lp->ll_type = parse_type(&tp,
 			       &SCRIPT_ITEM(current_sctx.sc_sid)->sn_type_list,
-			       NULL, NULL, !quiet);
-		if (!quiet && (lp->ll_type == NULL
+			       ശൂന്യ, ശൂന്യ, !quiet);
+		എങ്കിൽ (!quiet && (lp->ll_type == ശൂന്യ
 			    || !valid_declaration_type(lp->ll_type)))
-		    return NULL;
+		    തിരികെ ശൂന്യ;
 		lp->ll_name_end = tp;
 	    }
 	    // TODO: check inside class?
 	}
     }
-    if (lp->ll_name == NULL)
-	return p;
+    എങ്കിൽ (lp->ll_name == ശൂന്യ)
+	തിരികെ p;
 
-    if (*p == '.')
+    എങ്കിൽ (*p == '.')
     {
 	// In legacy script, when a local variable and import exists with this name,
 	// prioritize local variable over imports to avoid conflicts.
-	int var_exists = FALSE;
-	if (!vim9script)
+	പൂർണ്ണസംഖ്യ var_exists = FALSE;
+	എങ്കിൽ (!vim9script)
 	{
 	    cc = *p;
 	    *p = NUL;
 	    hashtab_T *local_ht = get_funccal_local_ht();
-	    if (local_ht != NULL)
+	    എങ്കിൽ (local_ht != ശൂന്യ)
 	    {
 		hashitem_T *hi = hash_find(local_ht, lp->ll_name);
-		if (!HASHITEM_EMPTY(hi))
+		എങ്കിൽ (!HASHITEM_EMPTY(hi))
 		    var_exists = TRUE;
 	    }
 	    *p = cc;
 	}
 
-	if (!var_exists)
+	എങ്കിൽ (!var_exists)
 	{
 	    imported_T *import = find_imported(lp->ll_name, p - lp->ll_name, TRUE);
-	    if (import != NULL)
+	    എങ്കിൽ (import != ശൂന്യ)
 	    {
 		p++;	// skip '.'
 		p = get_lval_imported(lp, import->imp_sid, p, &v, fne_flags);
-		if (p == NULL)
-		    return NULL;
+		എങ്കിൽ (p == ശൂന്യ)
+		    തിരികെ ശൂന്യ;
 	    }
 	}
     }
 
     // Without [idx] or .key we are done.
-    if (*p != '[' && *p != '.')
+    എങ്കിൽ (*p != '[' && *p != '.')
     {
-	if (lval_root != NULL)
-	    fill_lval_from_lval_root(lp, lval_root);
-	return p;
+	എങ്കിൽ (lval_വേര് != ശൂന്യ)
+	    fill_lval_from_lval_വേര്(lp, lval_വേര്);
+	തിരികെ p;
     }
 
-    if (vim9script && lval_root != NULL)
-	cl_exec = lval_root->lr_cl_exec;
-    if (vim9script && lval_root != NULL && lval_root->lr_tv != NULL)
+    എങ്കിൽ (vim9script && lval_വേര് != ശൂന്യ)
+	cl_exec = lval_വേര്->lr_cl_exec;
+    എങ്കിൽ (vim9script && lval_വേര് != ശൂന്യ && lval_വേര്->lr_tv != ശൂന്യ)
     {
 	// using local variable
-	lp->ll_tv = lval_root->lr_tv;
-	v = NULL;
+	lp->ll_tv = lval_വേര്->lr_tv;
+	v = ശൂന്യ;
     }
-    else if (lp->ll_tv == NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (lp->ll_tv == ശൂന്യ)
     {
 	cc = *p;
 	*p = NUL;
 	// When we would write to the variable pass &ht and prevent autoload.
 	writing = !(flags & GLV_READ_ONLY);
-	v = find_var(lp->ll_name, writing ? &ht : NULL,
+	v = find_var(lp->ll_name, writing ? &ht : ശൂന്യ,
 					 (flags & GLV_NO_AUTOLOAD) || writing);
-	if (v == NULL && !quiet)
+	എങ്കിൽ (v == ശൂന്യ && !quiet)
 	    semsg(_(e_undefined_variable_str), lp->ll_name);
 	*p = cc;
-	if (v == NULL)
-	    return NULL;
+	എങ്കിൽ (v == ശൂന്യ)
+	    തിരികെ ശൂന്യ;
 	lp->ll_tv = &v->di_tv;
     }
 
-    if (vim9script && (flags & GLV_NO_DECL) == 0)
+    എങ്കിൽ (vim9script && (flags & GLV_NO_DECL) == 0)
     {
-	if (!quiet)
+	എങ്കിൽ (!quiet)
 	    semsg(_(e_variable_already_declared_str), lp->ll_name);
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 
     // If the next character is a "." or a "[", then process the subitem.
     p = get_lval_subscript(lp, p, name, rettv, ht, v, unlet, flags, cl_exec);
-    if (p == NULL)
-	return NULL;
+    എങ്കിൽ (p == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
-    if (vim9script && lp->ll_valtype != NULL && rettv != NULL)
+    എങ്കിൽ (vim9script && lp->ll_valtype != ശൂന്യ && rettv != ശൂന്യ)
     {
 	where_T	    where = WHERE_INIT;
 
 	// In a Vim9 script, do type check and make sure the variable is
 	// writable.
-	if (check_typval_type(lp->ll_valtype, rettv, where) == FAIL)
-	    return NULL;
+	എങ്കിൽ (check_typval_type(lp->ll_valtype, rettv, where) == FAIL)
+	    തിരികെ ശൂന്യ;
     }
 
     lp->ll_name_end = p;
-    return p;
+    തിരികെ p;
 }
 
 /*
  * Clear lval "lp" that was filled by get_lval().
  */
-    void
+    ശൂന്യം
 clear_lval(lval_T *lp)
 {
     vim_free(lp->ll_exp_name);
@@ -2341,199 +2341,199 @@ clear_lval(lval_T *lp)
  * "op" is NULL, "+" for "+=", "-" for "-=", "*" for "*=", "/" for "/=",
  * "%" for "%=", "." for ".=" or "=" for "=".
  */
-    void
+    ശൂന്യം
 set_var_lval(
     lval_T	*lp,
     char_u	*endp,
     typval_T	*rettv,
-    int		copy,
-    int		flags,	    // ASSIGN_CONST, ASSIGN_NO_DECL
+    പൂർണ്ണസംഖ്യ		copy,
+    പൂർണ്ണസംഖ്യ		flags,	    // ASSIGN_CONST, ASSIGN_NO_DECL
     char_u	*op,
-    int		var_idx)    // index for "let [a, b] = list"
+    പൂർണ്ണസംഖ്യ		var_idx)    // index for "let [a, b] = list"
 {
-    int		cc;
+    പൂർണ്ണസംഖ്യ		cc;
     dictitem_T	*di;
 
-    if (lp->ll_tv == NULL)
+    എങ്കിൽ (lp->ll_tv == ശൂന്യ)
     {
 	cc = *endp;
 	*endp = NUL;
-	if (in_vim9script() && check_reserved_name(lp->ll_name, FALSE) == FAIL)
-	    return;
+	എങ്കിൽ (in_vim9script() && check_reserved_name(lp->ll_name, FALSE) == FAIL)
+	    തിരികെ;
 
-	if (lp->ll_blob != NULL)
+	എങ്കിൽ (lp->ll_blob != ശൂന്യ)
 	{
-	    int	    error = FALSE;
+	    പൂർണ്ണസംഖ്യ	    error = FALSE;
 
-	    if (op != NULL && *op != '=')
+	    എങ്കിൽ (op != ശൂന്യ && *op != '=')
 	    {
 		semsg(_(e_wrong_variable_type_for_str_equal), op);
-		return;
+		തിരികെ;
 	    }
-	    if (value_check_lock(lp->ll_blob->bv_lock, lp->ll_name, FALSE))
-		return;
+	    എങ്കിൽ (മൂല്യം_check_lock(lp->ll_blob->bv_lock, lp->ll_name, FALSE))
+		തിരികെ;
 
-	    if (lp->ll_range && rettv->v_type == VAR_BLOB)
+	    എങ്കിൽ (lp->ll_range && rettv->v_type == VAR_BLOB)
 	    {
-		if (lp->ll_empty2)
+		എങ്കിൽ (lp->ll_empty2)
 		    lp->ll_n2 = blob_len(lp->ll_blob) - 1;
 
-		if (blob_set_range(lp->ll_blob, lp->ll_n1, lp->ll_n2,
+		എങ്കിൽ (blob_set_range(lp->ll_blob, lp->ll_n1, lp->ll_n2,
 								rettv) == FAIL)
-		    return;
+		    തിരികെ;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		varnumber_T	val = tv_get_number_chk(rettv, &error);
-		if (!error)
+		varnumber_T	val = tv_get_സംഖ്യ_chk(rettv, &error);
+		എങ്കിൽ (!error)
 		{
-		    if (val < 0 || val > 255)
-			semsg(_(e_invalid_value_for_blob_nr), val);
-		    else
+		    എങ്കിൽ (val < 0 || val > 255)
+			semsg(_(e_invalid_മൂല്യം_for_blob_nr), val);
+		    അല്ലെങ്കിൽ
 			blob_set_append(lp->ll_blob, lp->ll_n1, val);
 		}
 	    }
 	}
-	else if (op != NULL && *op != '=')
+	അല്ലെങ്കിൽ എങ്കിൽ (op != ശൂന്യ && *op != '=')
 	{
 	    typval_T tv;
 
-	    if ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
+	    എങ്കിൽ ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
 					     && (flags & ASSIGN_FOR_LOOP) == 0)
 	    {
 		emsg(_(e_cannot_modify_existing_variable));
 		*endp = cc;
-		return;
+		തിരികെ;
 	    }
 
 	    // handle +=, -=, *=, /=, %= and .=
-	    di = NULL;
-	    if (eval_variable(lp->ll_name, (int)STRLEN(lp->ll_name),
+	    di = ശൂന്യ;
+	    എങ്കിൽ (eval_variable(lp->ll_name, (പൂർണ്ണസംഖ്യ)STRLEN(lp->ll_name),
 				 lp->ll_sid, &tv, &di, EVAL_VAR_VERBOSE) == OK)
 	    {
-		if (di != NULL && check_typval_is_value(&di->di_tv) == FAIL)
+		എങ്കിൽ (di != ശൂന്യ && check_typval_is_മൂല്യം(&di->di_tv) == FAIL)
 		{
 		    clear_tv(&tv);
-		    return;
+		    തിരികെ;
 		}
 
 		// In Vim9 script a String v: variable only takes a String.
-		if (in_vim9script() && STRNCMP(lp->ll_name, "v:", 2) == 0
+		എങ്കിൽ (in_vim9script() && STRNCMP(lp->ll_name, "v:", 2) == 0
 			&& tv.v_type == VAR_STRING)
 		{
 		    where_T	where = WHERE_INIT;
 
-		    if (check_typval_type(&t_string, rettv, where) == FAIL)
+		    എങ്കിൽ (check_typval_type(&t_string, rettv, where) == FAIL)
 		    {
 			clear_tv(&tv);
 			*endp = cc;
-			return;
+			തിരികെ;
 		    }
 		}
 
-		if ((di == NULL
+		എങ്കിൽ ((di == ശൂന്യ
 			 || (!var_check_ro(di->di_flags, lp->ll_name, FALSE)
 			   && !tv_check_lock(&di->di_tv, lp->ll_name, FALSE)))
 			&& tv_op(&tv, rettv, op) == OK)
-		    set_var_const(lp->ll_name, lp->ll_sid, NULL, &tv, FALSE,
+		    set_var_const(lp->ll_name, lp->ll_sid, ശൂന്യ, &tv, FALSE,
 				ASSIGN_NO_DECL | ASSIGN_COMPOUND_OP, 0);
 		clear_tv(&tv);
 	    }
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    if (lp->ll_type != NULL && check_typval_arg_type(lp->ll_type, rettv,
-							      NULL, 0) == FAIL)
-		return;
+	    എങ്കിൽ (lp->ll_type != ശൂന്യ && check_typval_arg_type(lp->ll_type, rettv,
+							      ശൂന്യ, 0) == FAIL)
+		തിരികെ;
 	    set_var_const(lp->ll_name, lp->ll_sid, lp->ll_type, rettv, copy,
 							       flags, var_idx);
 	}
 	*endp = cc;
     }
-    else if (value_check_lock(lp->ll_newkey == NULL
+    അല്ലെങ്കിൽ എങ്കിൽ (മൂല്യം_check_lock(lp->ll_newkey == ശൂന്യ
 		? lp->ll_tv->v_lock
 		: lp->ll_tv->vval.v_dict->dv_lock, lp->ll_name, FALSE))
 	;
-    else if (lp->ll_range)
+    അല്ലെങ്കിൽ എങ്കിൽ (lp->ll_range)
     {
-	if ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
+	എങ്കിൽ ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
 					     && (flags & ASSIGN_FOR_LOOP) == 0)
 	{
 	    emsg(_(e_cannot_lock_range));
-	    return;
+	    തിരികെ;
 	}
 
-	(void)list_assign_range(lp->ll_list, rettv->vval.v_list,
+	(ശൂന്യം)list_assign_range(lp->ll_list, rettv->vval.v_list,
 			 lp->ll_n1, lp->ll_n2, lp->ll_empty2, op, lp->ll_name);
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	/*
 	 * Assign to a List, Dictionary or Object item.
 	 */
-	if ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
+	എങ്കിൽ ((flags & (ASSIGN_CONST | ASSIGN_FINAL))
 					     && (flags & ASSIGN_FOR_LOOP) == 0)
 	{
 	    emsg(_(e_cannot_lock_list_or_dict));
-	    return;
+	    തിരികെ;
 	}
 
-	if (lp->ll_valtype != NULL
+	എങ്കിൽ (lp->ll_valtype != ശൂന്യ
 		    && check_typval_arg_type(lp->ll_valtype, rettv,
-							      NULL, 0) == FAIL)
+							      ശൂന്യ, 0) == FAIL)
 	{
-	    lp->ll_name_end = NULL;
-	    return;
+	    lp->ll_name_end = ശൂന്യ;
+	    തിരികെ;
 	}
 
 	// If the lval is a List and the type of the list is not yet set,
 	// then set the item type from the declared type of the variable.
-	if (in_vim9script() && rettv->v_type == VAR_LIST
-				&& rettv->vval.v_list != NULL
-				&& rettv->vval.v_list->lv_type == NULL)
+	എങ്കിൽ (in_vim9script() && rettv->v_type == VAR_LIST
+				&& rettv->vval.v_list != ശൂന്യ
+				&& rettv->vval.v_list->lv_type == ശൂന്യ)
 	{
-	    if (lp->ll_tv->v_type == VAR_LIST
-		    && lp->ll_tv->vval.v_list != NULL
-		    && lp->ll_tv->vval.v_list->lv_type != NULL)
+	    എങ്കിൽ (lp->ll_tv->v_type == VAR_LIST
+		    && lp->ll_tv->vval.v_list != ശൂന്യ
+		    && lp->ll_tv->vval.v_list->lv_type != ശൂന്യ)
 		set_tv_type(rettv, lp->ll_tv->vval.v_list->lv_type);
 	}
 
-	if (lp->ll_newkey != NULL)
+	എങ്കിൽ (lp->ll_newkey != ശൂന്യ)
 	{
-	    if (op != NULL && *op != '=')
+	    എങ്കിൽ (op != ശൂന്യ && *op != '=')
 	    {
-		semsg(_(e_key_not_present_in_dictionary_str), lp->ll_newkey);
-		return;
+		semsg(_(e_താക്കോൽ_not_present_in_dictionary_str), lp->ll_newkey);
+		തിരികെ;
 	    }
-	    if (dict_wrong_func_name(lp->ll_tv->vval.v_dict, rettv,
+	    എങ്കിൽ (dict_wrong_func_name(lp->ll_tv->vval.v_dict, rettv,
 								lp->ll_newkey))
-		return;
+		തിരികെ;
 
 	    // Need to add an item to the Dictionary.
 	    di = dictitem_alloc(lp->ll_newkey);
-	    if (di == NULL)
-		return;
-	    if (dict_add(lp->ll_tv->vval.v_dict, di) == FAIL)
+	    എങ്കിൽ (di == ശൂന്യ)
+		തിരികെ;
+	    എങ്കിൽ (dict_add(lp->ll_tv->vval.v_dict, di) == FAIL)
 	    {
 		vim_free(di);
-		return;
+		തിരികെ;
 	    }
 	    lp->ll_tv = &di->di_tv;
 	}
-	else if (op != NULL && *op != '=')
+	അല്ലെങ്കിൽ എങ്കിൽ (op != ശൂന്യ && *op != '=')
 	{
 	    tv_op(lp->ll_tv, rettv, op);
-	    return;
+	    തിരികെ;
 	}
-	else
+	അല്ലെങ്കിൽ
 	    clear_tv(lp->ll_tv);
 
 	/*
 	 * Assign the value to the variable or list item.
 	 */
-	if (copy)
+	എങ്കിൽ (copy)
 	    copy_tv(rettv, lp->ll_tv);
-	else
+	അല്ലെങ്കിൽ
 	{
 	    *lp->ll_tv = *rettv;
 	    lp->ll_tv->v_lock = 0;
@@ -2546,63 +2546,63 @@ set_var_lval(
  * Handle "blob1 += blob2".
  * Returns OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 tv_op_blob(typval_T *tv1, typval_T *tv2, char_u *op)
 {
-    if (*op != '+' || tv2->v_type != VAR_BLOB)
-	return FAIL;
+    എങ്കിൽ (*op != '+' || tv2->v_type != VAR_BLOB)
+	തിരികെ FAIL;
 
     // Blob += Blob
-    if (tv2->vval.v_blob == NULL)
-	return OK;
+    എങ്കിൽ (tv2->vval.v_blob == ശൂന്യ)
+	തിരികെ OK;
 
-    if (tv1->vval.v_blob == NULL)
+    എങ്കിൽ (tv1->vval.v_blob == ശൂന്യ)
     {
 	tv1->vval.v_blob = tv2->vval.v_blob;
 	++tv1->vval.v_blob->bv_refcount;
-	return OK;
+	തിരികെ OK;
     }
 
     blob_T	*b1 = tv1->vval.v_blob;
     blob_T	*b2 = tv2->vval.v_blob;
-    int		len = blob_len(b2);
+    പൂർണ്ണസംഖ്യ		len = blob_len(b2);
 
-    if (len > 0 && ga_grow(&b1->bv_ga, len) == OK)
+    എങ്കിൽ (len > 0 && ga_grow(&b1->bv_ga, len) == OK)
     {
 	mch_memmove((char_u *)b1->bv_ga.ga_data + b1->bv_ga.ga_len,
 		    (char_u *)b2->bv_ga.ga_data, (size_t)len);
 	b1->bv_ga.ga_len += len;
     }
-    else
-	for (int i = 0; i < len; i++)
-	    (void)ga_append(&b1->bv_ga, blob_get(b2, i));
+    അല്ലെങ്കിൽ
+	വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < len; i++)
+	    (ശൂന്യം)ga_append(&b1->bv_ga, blob_get(b2, i));
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Handle "list1 += list2".
  * Returns OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 tv_op_list(typval_T *tv1, typval_T *tv2, char_u *op)
 {
-    if (*op != '+' || tv2->v_type != VAR_LIST)
-	return FAIL;
+    എങ്കിൽ (*op != '+' || tv2->v_type != VAR_LIST)
+	തിരികെ FAIL;
 
     // List += List
-    if (tv2->vval.v_list == NULL)
-	return OK;
+    എങ്കിൽ (tv2->vval.v_list == ശൂന്യ)
+	തിരികെ OK;
 
-    if (tv1->vval.v_list == NULL)
+    എങ്കിൽ (tv1->vval.v_list == ശൂന്യ)
     {
 	tv1->vval.v_list = tv2->vval.v_list;
 	++tv1->vval.v_list->lv_refcount;
     }
-    else
-	list_extend(tv1->vval.v_list, tv2->vval.v_list, NULL);
+    അല്ലെങ്കിൽ
+	list_extend(tv1->vval.v_list, tv2->vval.v_list, ശൂന്യ);
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -2611,88 +2611,88 @@ tv_op_list(typval_T *tv1, typval_T *tv2, char_u *op)
  *
  * Returns OK or FAIL.
  */
-    static int
-tv_op_number(typval_T *tv1, typval_T *tv2, char_u *op)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+tv_op_സംഖ്യ(typval_T *tv1, typval_T *tv2, char_u *op)
 {
     varnumber_T	n;
-    int		failed = FALSE;
+    പൂർണ്ണസംഖ്യ		failed = FALSE;
 
-    n = tv_get_number(tv1);
-    if (tv2->v_type == VAR_FLOAT)
+    n = tv_get_സംഖ്യ(tv1);
+    എങ്കിൽ (tv2->v_type == VAR_FLOAT)
     {
 	float_T f = n;
 
-	if (*op == '%')
-	    return FAIL;
-	switch (*op)
+	എങ്കിൽ (*op == '%')
+	    തിരികെ FAIL;
+	തിരഞ്ഞെടുപ്പ് (*op)
 	{
-	    case '+': f += tv2->vval.v_float; break;
-	    case '-': f -= tv2->vval.v_float; break;
-	    case '*': f *= tv2->vval.v_float; break;
-	    case '/': f /= tv2->vval.v_float; break;
+	    അവസ്ഥ '+': f += tv2->vval.v_float; നിർത്തുക;
+	    അവസ്ഥ '-': f -= tv2->vval.v_float; നിർത്തുക;
+	    അവസ്ഥ '*': f *= tv2->vval.v_float; നിർത്തുക;
+	    അവസ്ഥ '/': f /= tv2->vval.v_float; നിർത്തുക;
 	}
 	clear_tv(tv1);
 	tv1->v_type = VAR_FLOAT;
 	tv1->vval.v_float = f;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	switch (*op)
+	തിരഞ്ഞെടുപ്പ് (*op)
 	{
-	    case '+': n += tv_get_number(tv2); break;
-	    case '-': n -= tv_get_number(tv2); break;
-	    case '*': n *= tv_get_number(tv2); break;
-	    case '/': n = num_divide(n, tv_get_number(tv2), &failed); break;
-	    case '%': n = num_modulus(n, tv_get_number(tv2), &failed); break;
+	    അവസ്ഥ '+': n += tv_get_സംഖ്യ(tv2); നിർത്തുക;
+	    അവസ്ഥ '-': n -= tv_get_സംഖ്യ(tv2); നിർത്തുക;
+	    അവസ്ഥ '*': n *= tv_get_സംഖ്യ(tv2); നിർത്തുക;
+	    അവസ്ഥ '/': n = അക്കം_divide(n, tv_get_സംഖ്യ(tv2), &failed); നിർത്തുക;
+	    അവസ്ഥ '%': n = അക്കം_modulus(n, tv_get_സംഖ്യ(tv2), &failed); നിർത്തുക;
 	}
 	clear_tv(tv1);
-	tv1->v_type = VAR_NUMBER;
-	tv1->vval.v_number = n;
+	tv1->v_type = VAR_സംഖ്യ;
+	tv1->vval.v_സംഖ്യ = n;
     }
 
-    return failed ? FAIL : OK;
+    തിരികെ failed ? FAIL : OK;
 }
 
 /*
  * Append string "s2" to the string in "tv1".
  * Returns OK if "tv1" was grown in place, FAIL otherwise.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 grow_string_tv(typval_T *tv1, char_u *s2)
 {
-    if (tv1->v_type != VAR_STRING || tv1->vval.v_string == NULL)
-	return FAIL;
+    എങ്കിൽ (tv1->v_type != VAR_STRING || tv1->vval.v_string == ശൂന്യ)
+	തിരികെ FAIL;
 
     size_t len1 = STRLEN(tv1->vval.v_string);
     size_t len2 = STRLEN(s2);
     char_u *p = vim_realloc(tv1->vval.v_string, len1 + len2 + 1);
 
-    if (p == NULL)
-	return FAIL;
+    എങ്കിൽ (p == ശൂന്യ)
+	തിരികെ FAIL;
 
     mch_memmove(p + len1, s2, len2 + 1);
     tv1->vval.v_string = p;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Handle "str1 .= str2"
  * Returns OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 tv_op_string(typval_T *tv1, typval_T *tv2, char_u *op UNUSED)
 {
     char_u	numbuf[NUMBUFLEN];
     char_u	*s;
     char_u	*s2;
 
-    if (tv2->v_type == VAR_FLOAT)
-	return FAIL;
+    എങ്കിൽ (tv2->v_type == VAR_FLOAT)
+	തിരികെ FAIL;
 
     // str .= str
     s2 = tv_get_string_buf(tv2, numbuf);
-    if (grow_string_tv(tv1, s2) == OK)
-	return OK;
+    എങ്കിൽ (grow_string_tv(tv1, s2) == OK)
+	തിരികെ OK;
 
     s = tv_get_string(tv1);
     s = concat_str(s, s2);
@@ -2700,7 +2700,7 @@ tv_op_string(typval_T *tv1, typval_T *tv2, char_u *op UNUSED)
     tv1->v_type = VAR_STRING;
     tv1->vval.v_string = s;
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -2708,46 +2708,46 @@ tv_op_string(typval_T *tv1, typval_T *tv2, char_u *op UNUSED)
  * and "tv1 .= tv2"
  * Returns OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 tv_op_nr_or_string(typval_T *tv1, typval_T *tv2, char_u *op)
 {
-    if (tv2->v_type == VAR_LIST)
-	return FAIL;
+    എങ്കിൽ (tv2->v_type == VAR_LIST)
+	തിരികെ FAIL;
 
-    if (vim_strchr((char_u *)"+-*/%", *op) != NULL)
-	return tv_op_number(tv1, tv2, op);
+    എങ്കിൽ (vim_strchr((char_u *)"+-*/%", *op) != ശൂന്യ)
+	തിരികെ tv_op_സംഖ്യ(tv1, tv2, op);
 
-    return tv_op_string(tv1, tv2, op);
+    തിരികെ tv_op_string(tv1, tv2, op);
 }
 
 /*
  * Handle "f1 += f2", "f1 -= f2", "f1 *= f2", "f1 /= f2".
  * Returns OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 tv_op_float(typval_T *tv1, typval_T *tv2, char_u *op)
 {
     float_T f;
 
-    if (*op == '%' || *op == '.'
+    എങ്കിൽ (*op == '%' || *op == '.'
 	    || (tv2->v_type != VAR_FLOAT
-		&& tv2->v_type != VAR_NUMBER
+		&& tv2->v_type != VAR_സംഖ്യ
 		&& tv2->v_type != VAR_STRING))
-	return FAIL;
+	തിരികെ FAIL;
 
-    if (tv2->v_type == VAR_FLOAT)
+    എങ്കിൽ (tv2->v_type == VAR_FLOAT)
 	f = tv2->vval.v_float;
-    else
-	f = tv_get_number(tv2);
-    switch (*op)
+    അല്ലെങ്കിൽ
+	f = tv_get_സംഖ്യ(tv2);
+    തിരഞ്ഞെടുപ്പ് (*op)
     {
-	case '+': tv1->vval.v_float += f; break;
-	case '-': tv1->vval.v_float -= f; break;
-	case '*': tv1->vval.v_float *= f; break;
-	case '/': tv1->vval.v_float /= f; break;
+	അവസ്ഥ '+': tv1->vval.v_float += f; നിർത്തുക;
+	അവസ്ഥ '-': tv1->vval.v_float -= f; നിർത്തുക;
+	അവസ്ഥ '*': tv1->vval.v_float *= f; നിർത്തുക;
+	അവസ്ഥ '/': tv1->vval.v_float /= f; നിർത്തുക;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -2755,61 +2755,61 @@ tv_op_float(typval_T *tv1, typval_T *tv2, char_u *op)
  * and "tv1 .= tv2"
  * Returns OK or FAIL.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 tv_op(typval_T *tv1, typval_T *tv2, char_u *op)
 {
     // Can't do anything with a Funcref or Dict on the right.
     // v:true and friends only work with "..=".
-    if (tv2->v_type == VAR_FUNC || tv2->v_type == VAR_DICT
+    എങ്കിൽ (tv2->v_type == VAR_FUNC || tv2->v_type == VAR_DICT
 		|| ((tv2->v_type == VAR_BOOL || tv2->v_type == VAR_SPECIAL)
 							&& *op != '.'))
     {
 	semsg(_(e_wrong_variable_type_for_str_equal), op);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    int retval = FAIL;
-    switch (tv1->v_type)
+    പൂർണ്ണസംഖ്യ retval = FAIL;
+    തിരഞ്ഞെടുപ്പ് (tv1->v_type)
     {
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_DICT:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_OBJECT:
-	case VAR_CLASS:
-	case VAR_TYPEALIAS:
-	case VAR_TUPLE:
-	    break;
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_ANY:
+	അവസ്ഥ VAR_VOID:
+	അവസ്ഥ VAR_DICT:
+	അവസ്ഥ VAR_FUNC:
+	അവസ്ഥ VAR_PARTIAL:
+	അവസ്ഥ VAR_BOOL:
+	അവസ്ഥ VAR_SPECIAL:
+	അവസ്ഥ VAR_JOB:
+	അവസ്ഥ VAR_CHANNEL:
+	അവസ്ഥ VAR_INSTR:
+	അവസ്ഥ VAR_OBJECT:
+	അവസ്ഥ VAR_CLASS:
+	അവസ്ഥ VAR_TYPEALIAS:
+	അവസ്ഥ VAR_TUPLE:
+	    നിർത്തുക;
 
-	case VAR_BLOB:
+	അവസ്ഥ VAR_BLOB:
 	    retval = tv_op_blob(tv1, tv2, op);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_LIST:
+	അവസ്ഥ VAR_LIST:
 	    retval = tv_op_list(tv1, tv2, op);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_NUMBER:
-	case VAR_STRING:
+	അവസ്ഥ VAR_സംഖ്യ:
+	അവസ്ഥ VAR_STRING:
 	    retval = tv_op_nr_or_string(tv1, tv2, op);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_FLOAT:
+	അവസ്ഥ VAR_FLOAT:
 	    retval = tv_op_float(tv1, tv2, op);
-	    break;
+	    നിർത്തുക;
     }
 
-    if (retval != OK)
+    എങ്കിൽ (retval != OK)
 	semsg(_(e_wrong_variable_type_for_str_equal), op);
 
-    return retval;
+    തിരികെ retval;
 }
 
 /*
@@ -2818,60 +2818,60 @@ tv_op(typval_T *tv1, typval_T *tv2, char_u *op)
  * Set "*errp" to TRUE for an error, FALSE otherwise;
  * Return a pointer that holds the info.  Null when there is an error.
  */
-    void *
-eval_for_line(
+    ശൂന്യം *
+eval_for_വരി(
     char_u	*arg,
-    int		*errp,
+    പൂർണ്ണസംഖ്യ		*errp,
     exarg_T	*eap,
     evalarg_T	*evalarg)
 {
     forinfo_T	*fi;
     char_u	*var_list_end;
-    char_u	*expr;
+    char_u	*വ്യഞ്ജകം;
     typval_T	tv;
     list_T	*l;
     tuple_T	*tuple;
-    int		skip = !(evalarg->eval_flags & EVAL_EVALUATE);
+    പൂർണ്ണസംഖ്യ		skip = !(evalarg->eval_flags & EVAL_EVALUATE);
 
     *errp = TRUE;	// default: there is an error
 
     fi = ALLOC_CLEAR_ONE(forinfo_T);
-    if (fi == NULL)
-	return NULL;
+    എങ്കിൽ (fi == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
     var_list_end = skip_var_list(arg, TRUE, &fi->fi_varcount,
 						     &fi->fi_semicolon, FALSE);
-    if (var_list_end == NULL)
-	return fi;
+    എങ്കിൽ (var_list_end == ശൂന്യ)
+	തിരികെ fi;
 
-    expr = skipwhite_and_linebreak(var_list_end, evalarg);
-    if (expr[0] != 'i' || expr[1] != 'n'
-				  || !(expr[2] == NUL || VIM_ISWHITE(expr[2])))
+    വ്യഞ്ജകം = skipwhite_and_linebreak(var_list_end, evalarg);
+    എങ്കിൽ (വ്യഞ്ജകം[0] != 'i' || വ്യഞ്ജകം[1] != 'n'
+				  || !(വ്യഞ്ജകം[2] == NUL || VIM_ISWHITE(വ്യഞ്ജകം[2])))
     {
-	if (in_vim9script() && *expr == ':' && expr != var_list_end)
-	    semsg(_(e_no_white_space_allowed_before_colon_str), expr);
-	else
+	എങ്കിൽ (in_vim9script() && *വ്യഞ്ജകം == ':' && വ്യഞ്ജകം != var_list_end)
+	    semsg(_(e_no_white_space_allowed_before_colon_str), വ്യഞ്ജകം);
+	അല്ലെങ്കിൽ
 	    emsg(_(e_missing_in_after_for));
-	return fi;
+	തിരികെ fi;
     }
 
-    if (skip)
+    എങ്കിൽ (skip)
 	++emsg_skip;
-    expr = skipwhite_and_linebreak(expr + 2, evalarg);
-    if (eval0(expr, &tv, eap, evalarg) == OK)
+    വ്യഞ്ജകം = skipwhite_and_linebreak(വ്യഞ്ജകം + 2, evalarg);
+    എങ്കിൽ (eval0(വ്യഞ്ജകം, &tv, eap, evalarg) == OK)
     {
 	*errp = FALSE;
-	if (!skip)
+	എങ്കിൽ (!skip)
 	{
-	    if (tv.v_type == VAR_LIST)
+	    എങ്കിൽ (tv.v_type == VAR_LIST)
 	    {
 		l = tv.vval.v_list;
-		if (l == NULL)
+		എങ്കിൽ (l == ശൂന്യ)
 		{
 		    // a null list is like an empty list: do nothing
 		    clear_tv(&tv);
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
 		    // Need a real list here.
 		    CHECK_LIST_MATERIALIZE(l);
@@ -2883,15 +2883,15 @@ eval_for_line(
 		    fi->fi_lw.lw_item = l->lv_first;
 		}
 	    }
-	    else if (tv.v_type == VAR_TUPLE)
+	    അല്ലെങ്കിൽ എങ്കിൽ (tv.v_type == VAR_TUPLE)
 	    {
 		tuple = tv.vval.v_tuple;
-		if (tuple == NULL)
+		എങ്കിൽ (tuple == ശൂന്യ)
 		{
 		    // a null tuple is like an empty tuple: do nothing
 		    clear_tv(&tv);
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
 		    // No need to increment the refcount, it's already set for
 		    // the tuple being used in "tv".
@@ -2899,10 +2899,10 @@ eval_for_line(
 		    fi->fi_tuple_idx = 0;
 		}
 	    }
-	    else if (tv.v_type == VAR_BLOB)
+	    അല്ലെങ്കിൽ എങ്കിൽ (tv.v_type == VAR_BLOB)
 	    {
 		fi->fi_bi = 0;
-		if (tv.vval.v_blob != NULL)
+		എങ്കിൽ (tv.vval.v_blob != ശൂന്യ)
 		{
 		    // Make a copy, so that the iteration still works when the
 		    // blob is changed.
@@ -2910,39 +2910,39 @@ eval_for_line(
 		}
 		clear_tv(&tv);
 	    }
-	    else if (tv.v_type == VAR_STRING)
+	    അല്ലെങ്കിൽ എങ്കിൽ (tv.v_type == VAR_STRING)
 	    {
 		fi->fi_byte_idx = 0;
 		fi->fi_string = tv.vval.v_string;
-		tv.vval.v_string = NULL;
-		if (fi->fi_string == NULL)
+		tv.vval.v_string = ശൂന്യ;
+		എങ്കിൽ (fi->fi_string == ശൂന്യ)
 		    fi->fi_string = vim_strsave((char_u *)"");
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		emsg(_(e_string_list_tuple_or_blob_required));
 		clear_tv(&tv);
 	    }
 	}
     }
-    if (skip)
+    എങ്കിൽ (skip)
 	--emsg_skip;
-    fi->fi_break_count = evalarg->eval_break_count;
+    fi->fi_break_എണ്ണം = evalarg->eval_break_എണ്ണം;
 
-    return fi;
+    തിരികെ fi;
 }
 
 /*
  * Used when looping over a :for line, skip the "in expr" part.
  */
-    void
-skip_for_lines(void *fi_void, evalarg_T *evalarg)
+    ശൂന്യം
+skip_for_വരികൾ(ശൂന്യം *fi_void, evalarg_T *evalarg)
 {
     forinfo_T	*fi = (forinfo_T *)fi_void;
-    int		i;
+    പൂർണ്ണസംഖ്യ		i;
 
-    for (i = 0; i < fi->fi_break_count; ++i)
-	eval_next_line(NULL, evalarg);
+    വേണ്ടി (i = 0; i < fi->fi_break_എണ്ണം; ++i)
+	eval_next_വരി(ശൂന്യ, evalarg);
 }
 
 /*
@@ -2951,12 +2951,12 @@ skip_for_lines(void *fi_void, evalarg_T *evalarg)
  * Return TRUE when a valid item was found, FALSE when at end of list or
  * something wrong.
  */
-    int
-next_for_item(void *fi_void, char_u *arg)
+    പൂർണ്ണസംഖ്യ
+next_for_item(ശൂന്യം *fi_void, char_u *arg)
 {
     forinfo_T	*fi = (forinfo_T *)fi_void;
-    int		result;
-    int		flag = ASSIGN_FOR_LOOP | (in_vim9script()
+    പൂർണ്ണസംഖ്യ		result;
+    പൂർണ്ണസംഖ്യ		flag = ASSIGN_FOR_LOOP | (in_vim9script()
 			 ? (ASSIGN_FINAL
 			     // first round: error if variable exists
 			     | (fi->fi_bi == 0 ? 0 : ASSIGN_DECL)
@@ -2964,220 +2964,220 @@ next_for_item(void *fi_void, char_u *arg)
 			     | ASSIGN_UPDATE_BLOCK_ID)
 			 : 0);
     listitem_T	*item;
-    int		skip_assign = in_vim9script() && arg[0] == '_'
+    പൂർണ്ണസംഖ്യ		skip_assign = in_vim9script() && arg[0] == '_'
 						      && !eval_isnamec(arg[1]);
 
-    if (fi->fi_blob != NULL)
+    എങ്കിൽ (fi->fi_blob != ശൂന്യ)
     {
 	typval_T	tv;
 
-	if (fi->fi_bi >= blob_len(fi->fi_blob))
-	    return FALSE;
-	tv.v_type = VAR_NUMBER;
+	എങ്കിൽ (fi->fi_bi >= blob_len(fi->fi_blob))
+	    തിരികെ FALSE;
+	tv.v_type = VAR_സംഖ്യ;
 	tv.v_lock = VAR_FIXED;
-	tv.vval.v_number = blob_get(fi->fi_blob, fi->fi_bi);
+	tv.vval.v_സംഖ്യ = blob_get(fi->fi_blob, fi->fi_bi);
 	++fi->fi_bi;
-	if (skip_assign)
-	    return TRUE;
-	return ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
-					    fi->fi_varcount, flag, NULL) == OK;
+	എങ്കിൽ (skip_assign)
+	    തിരികെ TRUE;
+	തിരികെ ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
+					    fi->fi_varcount, flag, ശൂന്യ) == OK;
     }
 
-    if (fi->fi_string != NULL)
+    എങ്കിൽ (fi->fi_string != ശൂന്യ)
     {
 	typval_T	tv;
-	int		len;
+	പൂർണ്ണസംഖ്യ		len;
 
 	len = mb_ptr2len(fi->fi_string + fi->fi_byte_idx);
-	if (len == 0)
-	    return FALSE;
+	എങ്കിൽ (len == 0)
+	    തിരികെ FALSE;
 	tv.v_type = VAR_STRING;
 	tv.v_lock = VAR_FIXED;
 	tv.vval.v_string = vim_strnsave(fi->fi_string + fi->fi_byte_idx, len);
 	fi->fi_byte_idx += len;
 	++fi->fi_bi;
-	if (skip_assign)
+	എങ്കിൽ (skip_assign)
 	    result = TRUE;
-	else
+	അല്ലെങ്കിൽ
 	    result = ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
-					    fi->fi_varcount, flag, NULL) == OK;
+					    fi->fi_varcount, flag, ശൂന്യ) == OK;
 	vim_free(tv.vval.v_string);
-	return result;
+	തിരികെ result;
     }
 
-    if (fi->fi_tuple != NULL)
+    എങ്കിൽ (fi->fi_tuple != ശൂന്യ)
     {
 	typval_T	tv;
 
-	if (fi->fi_tuple_idx >= TUPLE_LEN(fi->fi_tuple))
-	    return FALSE;
+	എങ്കിൽ (fi->fi_tuple_idx >= TUPLE_LEN(fi->fi_tuple))
+	    തിരികെ FALSE;
 
 	copy_tv(TUPLE_ITEM(fi->fi_tuple, fi->fi_tuple_idx), &tv);
 	++fi->fi_tuple_idx;
 	++fi->fi_bi;
-	if (skip_assign)
+	എങ്കിൽ (skip_assign)
 	    result = TRUE;
-	else
+	അല്ലെങ്കിൽ
 	    result = ex_let_vars(arg, &tv, TRUE, fi->fi_semicolon,
-					    fi->fi_varcount, flag, NULL) == OK;
+					    fi->fi_varcount, flag, ശൂന്യ) == OK;
 	clear_tv(&tv);
-	return result;
+	തിരികെ result;
     }
 
     item = fi->fi_lw.lw_item;
-    if (item == NULL)
+    എങ്കിൽ (item == ശൂന്യ)
 	result = FALSE;
-    else
+    അല്ലെങ്കിൽ
     {
 	fi->fi_lw.lw_item = item->li_next;
 	++fi->fi_bi;
-	if (skip_assign)
+	എങ്കിൽ (skip_assign)
 	    result = TRUE;
-	else
+	അല്ലെങ്കിൽ
 	    result = (ex_let_vars(arg, &item->li_tv, TRUE, fi->fi_semicolon,
-					   fi->fi_varcount, flag, NULL) == OK);
+					   fi->fi_varcount, flag, ശൂന്യ) == OK);
     }
-    return result;
+    തിരികെ result;
 }
 
 /*
  * Free the structure used to store info used by ":for".
  */
-    void
-free_for_info(void *fi_void)
+    ശൂന്യം
+free_for_info(ശൂന്യം *fi_void)
 {
     forinfo_T    *fi = (forinfo_T *)fi_void;
 
-    if (fi == NULL)
-	return;
-    if (fi->fi_list != NULL)
+    എങ്കിൽ (fi == ശൂന്യ)
+	തിരികെ;
+    എങ്കിൽ (fi->fi_list != ശൂന്യ)
     {
 	list_rem_watch(fi->fi_list, &fi->fi_lw);
 	list_unref(fi->fi_list);
     }
-    else if (fi->fi_blob != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (fi->fi_blob != ശൂന്യ)
 	blob_unref(fi->fi_blob);
-    else if (fi->fi_tuple != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (fi->fi_tuple != ശൂന്യ)
 	tuple_unref(fi->fi_tuple);
-    else
+    അല്ലെങ്കിൽ
 	vim_free(fi->fi_string);
     vim_free(fi);
 }
 
-    void
+    ശൂന്യം
 set_context_for_expression(
     expand_T	*xp,
     char_u	*arg,
     cmdidx_T	cmdidx)
 {
-    int		has_expr = cmdidx != CMD_let && cmdidx != CMD_var;
-    int		c;
+    പൂർണ്ണസംഖ്യ		has_വ്യഞ്ജകം = cmdidx != CMD_let && cmdidx != CMD_var;
+    പൂർണ്ണസംഖ്യ		c;
     char_u	*p;
 
-    if (cmdidx == CMD_let || cmdidx == CMD_var
+    എങ്കിൽ (cmdidx == CMD_let || cmdidx == CMD_var
 				 || cmdidx == CMD_const || cmdidx == CMD_final)
     {
 	xp->xp_context = EXPAND_USER_VARS;
-	if (vim_strpbrk(arg, (char_u *)"\"'+-*/%.=!?~|&$([<>,#") == NULL)
+	എങ്കിൽ (vim_strpbrk(arg, (char_u *)"\"'+-*/%.=!?~|&$([<>,#") == ശൂന്യ)
 	{
 	    // ":let var1 var2 ...": find last space.
-	    for (p = arg + STRLEN(arg); p >= arg; )
+	    വേണ്ടി (p = arg + STRLEN(arg); p >= arg; )
 	    {
 		xp->xp_pattern = p;
 		MB_PTR_BACK(arg, p);
-		if (VIM_ISWHITE(*p))
-		    break;
+		എങ്കിൽ (VIM_ISWHITE(*p))
+		    നിർത്തുക;
 	    }
-	    return;
+	    തിരികെ;
 	}
     }
-    else
+    അല്ലെങ്കിൽ
 	xp->xp_context = cmdidx == CMD_call ? EXPAND_FUNCTIONS
 							  : EXPAND_EXPRESSION;
-    while ((xp->xp_pattern = vim_strpbrk(arg,
-				  (char_u *)"\"'+-*/%.=!?~|&$([<>,#")) != NULL)
+    ആകുമ്പോൾ ((xp->xp_pattern = vim_strpbrk(arg,
+				  (char_u *)"\"'+-*/%.=!?~|&$([<>,#")) != ശൂന്യ)
     {
 	c = *xp->xp_pattern;
-	if (c == '&')
+	എങ്കിൽ (c == '&')
 	{
 	    c = xp->xp_pattern[1];
-	    if (c == '&')
+	    എങ്കിൽ (c == '&')
 	    {
 		++xp->xp_pattern;
-		xp->xp_context = has_expr ? EXPAND_EXPRESSION : EXPAND_NOTHING;
+		xp->xp_context = has_വ്യഞ്ജകം ? EXPAND_EXPRESSION : EXPAND_NOTHING;
 	    }
-	    else if (c != ' ')
+	    അല്ലെങ്കിൽ എങ്കിൽ (c != ' ')
 	    {
 		xp->xp_context = EXPAND_SETTINGS;
-		if ((c == 'l' || c == 'g') && xp->xp_pattern[2] == ':')
+		എങ്കിൽ ((c == 'l' || c == 'g') && xp->xp_pattern[2] == ':')
 		    xp->xp_pattern += 2;
 
 	    }
 	}
-	else if (c == '$')
+	അല്ലെങ്കിൽ എങ്കിൽ (c == '$')
 	{
 	    // environment variable
 	    xp->xp_context = EXPAND_ENV_VARS;
 	}
-	else if (c == '=')
+	അല്ലെങ്കിൽ എങ്കിൽ (c == '=')
 	{
-	    has_expr = TRUE;
+	    has_വ്യഞ്ജകം = TRUE;
 	    xp->xp_context = EXPAND_EXPRESSION;
 	}
-	else if (c == '#'
+	അല്ലെങ്കിൽ എങ്കിൽ (c == '#'
 		&& xp->xp_context == EXPAND_EXPRESSION)
 	{
 	    // Autoload function/variable contains '#'.
-	    break;
+	    നിർത്തുക;
 	}
-	else if ((c == '<' || c == '#')
+	അല്ലെങ്കിൽ എങ്കിൽ ((c == '<' || c == '#')
 		&& xp->xp_context == EXPAND_FUNCTIONS
-		&& vim_strchr(xp->xp_pattern, '(') == NULL)
+		&& vim_strchr(xp->xp_pattern, '(') == ശൂന്യ)
 	{
 	    // Function name can start with "<SNR>" and contain '#'.
-	    break;
+	    നിർത്തുക;
 	}
-	else if (has_expr)
+	അല്ലെങ്കിൽ എങ്കിൽ (has_വ്യഞ്ജകം)
 	{
-	    if (c == '"')	    // string
+	    എങ്കിൽ (c == '"')	    // string
 	    {
-		while ((c = *++xp->xp_pattern) != NUL && c != '"')
-		    if (c == '\\' && xp->xp_pattern[1] != NUL)
+		ആകുമ്പോൾ ((c = *++xp->xp_pattern) != NUL && c != '"')
+		    എങ്കിൽ (c == '\\' && xp->xp_pattern[1] != NUL)
 			++xp->xp_pattern;
 		xp->xp_context = EXPAND_NOTHING;
 	    }
-	    else if (c == '\'')	    // literal string
+	    അല്ലെങ്കിൽ എങ്കിൽ (c == '\'')	    // literal string
 	    {
 		// Trick: '' is like stopping and starting a literal string.
-		while ((c = *++xp->xp_pattern) != NUL && c != '\'')
+		ആകുമ്പോൾ ((c = *++xp->xp_pattern) != NUL && c != '\'')
 		    /* skip */ ;
 		xp->xp_context = EXPAND_NOTHING;
 	    }
-	    else if (c == '|')
+	    അല്ലെങ്കിൽ എങ്കിൽ (c == '|')
 	    {
-		if (xp->xp_pattern[1] == '|')
+		എങ്കിൽ (xp->xp_pattern[1] == '|')
 		{
 		    ++xp->xp_pattern;
 		    xp->xp_context = EXPAND_EXPRESSION;
 		}
-		else
+		അല്ലെങ്കിൽ
 		    xp->xp_context = EXPAND_COMMANDS;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		xp->xp_context = EXPAND_EXPRESSION;
 	}
-	else
+	അല്ലെങ്കിൽ
 	    // Doesn't look like something valid, expand as an expression
 	    // anyway.
 	    xp->xp_context = EXPAND_EXPRESSION;
 	arg = xp->xp_pattern;
-	if (*arg != NUL)
-	    while ((c = *++arg) != NUL && (c == ' ' || c == '\t'))
+	എങ്കിൽ (*arg != NUL)
+	    ആകുമ്പോൾ ((c = *++arg) != NUL && (c == ' ' || c == '\t'))
 		/* skip */ ;
     }
 
     // ":exe one two" completes "two"
-    if ((cmdidx == CMD_execute
+    എങ്കിൽ ((cmdidx == CMD_execute
 		|| cmdidx == CMD_echo
 		|| cmdidx == CMD_echon
 		|| cmdidx == CMD_echomsg
@@ -3186,12 +3186,12 @@ set_context_for_expression(
 		|| cmdidx == CMD_echowindow)
 	    && xp->xp_context == EXPAND_EXPRESSION)
     {
-	for (;;)
+	വേണ്ടി (;;)
 	{
 	    char_u *n = skiptowhite(arg);
 
-	    if (n == arg || IS_WHITE_OR_NUL(*skipwhite(n)))
-		break;
+	    എങ്കിൽ (n == arg || IS_WHITE_OR_NUL(*skipwhite(n)))
+		നിർത്തുക;
 	    arg = skipwhite(n);
 	}
     }
@@ -3219,20 +3219,20 @@ set_context_for_expression(
  * eval_prog_pat and eval_prog_enc are non-NULL whenever eval_prog_cache is
  * non-NULL.
  */
-static regprog_T    *eval_prog_cache = NULL;
-static char_u	    *eval_prog_pat = NULL;	// pattern it was compiled for
-static char_u	    *eval_prog_enc = NULL;	// 'encoding' when compiled
-static long	    eval_prog_re;		// 'regexpengine' when compiled
+സ്ഥിതം regprog_T    *eval_prog_cache = ശൂന്യ;
+സ്ഥിതം char_u	    *eval_prog_pat = ശൂന്യ;	// pattern it was compiled for
+സ്ഥിതം char_u	    *eval_prog_enc = ശൂന്യ;	// 'encoding' when compiled
+സ്ഥിതം long	    eval_prog_re;		// 'regexpengine' when compiled
 // State sampled by eval_regcomp() for the eval_regfree() call that gives the
 // program back: user code run in between, e.g. an object's string() method
 // invoked by match() on a list, can change these options, and then the
 // program must not be cached under the changed values.  eval_compile_enc is
 // only ever compared against p_enc, never dereferenced.
-static long	    eval_compile_re;
-static char_u	    *eval_compile_enc;
-static int	    eval_prog_busy = 0;	// programs eval_regcomp() handed out
+സ്ഥിതം long	    eval_compile_re;
+സ്ഥിതം char_u	    *eval_compile_enc;
+സ്ഥിതം പൂർണ്ണസംഖ്യ	    eval_prog_busy = 0;	// programs eval_regcomp() handed out
 					// that were not given back yet
-static int	    eval_prog_reentered = FALSE;  // eval_regcomp() ran while
+സ്ഥിതം പൂർണ്ണസംഖ്യ	    eval_prog_reentered = FALSE;  // eval_regcomp() ran while
 						  // a program was handed out
 
 /*
@@ -3245,20 +3245,20 @@ static int	    eval_prog_reentered = FALSE;  // eval_regcomp() ran while
  * intentionally over-approximate, e.g. a literal "~" or "%." also matches;
  * such a pattern is compiled every time, which is never wrong.
  */
-    static bool
+    സ്ഥിതം bool
 eval_prog_volatile(char_u *pat)
 {
     char_u *p;
 
-    if (STRNCMP(pat, "\\%#=", 4) == 0)
-	return true;
-    for (p = pat; *p != NUL; ++p)
-	if (*p == '~'
+    എങ്കിൽ (STRNCMP(pat, "\\%#=", 4) == 0)
+	തിരികെ true;
+    വേണ്ടി (p = pat; *p != NUL; ++p)
+	എങ്കിൽ (*p == '~'
 		|| (p[0] == '[' && (p[1] == ':' || p[1] == '=' || p[1] == '.'))
 		|| (p[0] == '%' && (p[1] == '.'
 			|| ((p[1] == '<' || p[1] == '>') && p[2] == '.'))))
-	    return true;
-    return false;
+	    തിരികെ true;
+    തിരികെ false;
 }
 
 /*
@@ -3275,12 +3275,12 @@ eval_regcomp(char_u *pat)
     // did not change while the caller was using the program.
     eval_compile_re = p_re;
     eval_compile_enc = p_enc;
-    if (eval_prog_busy > 0)
+    എങ്കിൽ (eval_prog_busy > 0)
 	// The samples above no longer describe the program already handed
 	// out: its eval_regfree() must drop it instead of caching it.
 	eval_prog_reentered = TRUE;
 
-    if (eval_prog_cache != NULL
+    എങ്കിൽ (eval_prog_cache != ശൂന്യ
 	    && *p_cpo == NUL
 	    && eval_prog_cache->re_flags == RE_MAGIC + RE_STRING
 	    && eval_prog_re == p_re
@@ -3290,13 +3290,13 @@ eval_regcomp(char_u *pat)
 	prog = eval_prog_cache;
 	// The caller now owns the program, eval_regfree() adopts the
 	// program the caller ends up with.
-	eval_prog_cache = NULL;
+	eval_prog_cache = ശൂന്യ;
     }
-    else
+    അല്ലെങ്കിൽ
 	prog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
-    if (prog != NULL)
+    എങ്കിൽ (prog != ശൂന്യ)
 	++eval_prog_busy;	// paired with the eval_regfree() call
-    return prog;
+    തിരികെ prog;
 }
 
 /*
@@ -3304,25 +3304,25 @@ eval_regcomp(char_u *pat)
  * keeping it in the cache for the next use.  "pat" must be the same string
  * the program was compiled for and must still be valid.
  */
-    void
+    ശൂന്യം
 eval_regfree(char_u *pat, regprog_T *prog)
 {
-    int	    reentered = eval_prog_reentered;
+    പൂർണ്ണസംഖ്യ	    reentered = eval_prog_reentered;
 
-    if (eval_prog_busy > 0 && --eval_prog_busy == 0)
+    എങ്കിൽ (eval_prog_busy > 0 && --eval_prog_busy == 0)
 	eval_prog_reentered = FALSE;
-    if (prog == NULL)
-	return;
-    if (reentered || *p_cpo != NUL
+    എങ്കിൽ (prog == ശൂന്യ)
+	തിരികെ;
+    എങ്കിൽ (reentered || *p_cpo != NUL
 	    || eval_compile_re != p_re || eval_compile_enc != p_enc)
     {
 	// 'cpoptions' is not empty, an option in the cache key changed, or
 	// another program was handed out while the caller was using this
 	// one: the samples may not describe this program, do not cache it.
 	vim_regfree(prog);
-	return;
+	തിരികെ;
     }
-    if (eval_prog_pat == NULL || STRCMP(eval_prog_pat, pat) != 0
+    എങ്കിൽ (eval_prog_pat == ശൂന്യ || STRCMP(eval_prog_pat, pat) != 0
 	    || STRCMP(eval_prog_enc, p_enc) != 0)
     {
 	char_u	*pat_copy;
@@ -3330,20 +3330,20 @@ eval_regfree(char_u *pat, regprog_T *prog)
 
 	// A cached pattern is known not to be volatile, thus the scan is
 	// only needed when installing a new key.
-	if (eval_prog_volatile(pat))
+	എങ്കിൽ (eval_prog_volatile(pat))
 	{
 	    // compiling depends on state the cache key does not cover
 	    vim_regfree(prog);
-	    return;
+	    തിരികെ;
 	}
 	pat_copy = vim_strsave(pat);
 	enc_copy = vim_strsave(p_enc);
-	if (pat_copy == NULL || enc_copy == NULL)
+	എങ്കിൽ (pat_copy == ശൂന്യ || enc_copy == ശൂന്യ)
 	{
 	    vim_free(pat_copy);
 	    vim_free(enc_copy);
 	    vim_regfree(prog);
-	    return;
+	    തിരികെ;
 	}
 	vim_free(eval_prog_pat);
 	vim_free(eval_prog_enc);
@@ -3358,12 +3358,12 @@ eval_regfree(char_u *pat, regprog_T *prog)
     eval_prog_re = eval_compile_re;
 }
 
-#if defined(EXITFREE)
-    void
-free_eval_regcomp_cache(void)
+#എങ്കിൽ defined(EXITFREE)
+    ശൂന്യം
+free_eval_regcomp_cache(ശൂന്യം)
 {
     vim_regfree(eval_prog_cache);
-    eval_prog_cache = NULL;
+    eval_prog_cache = ശൂന്യ;
     VIM_CLEAR(eval_prog_pat);
     VIM_CLEAR(eval_prog_enc);
     eval_prog_busy = 0;
@@ -3375,10 +3375,10 @@ free_eval_regcomp_cache(void)
  * Return TRUE if "pat" matches "text".
  * Does not use 'cpo' and always uses 'magic'.
  */
-    int
-pattern_match(char_u *pat, char_u *text, int ic)
+    പൂർണ്ണസംഖ്യ
+pattern_match(char_u *pat, char_u *text, പൂർണ്ണസംഖ്യ ic)
 {
-    int		matches = FALSE;
+    പൂർണ്ണസംഖ്യ		matches = FALSE;
     char_u	*save_cpo;
     regmatch_T	regmatch;
 
@@ -3386,14 +3386,14 @@ pattern_match(char_u *pat, char_u *text, int ic)
     save_cpo = p_cpo;
     p_cpo = empty_option;
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog != NULL)
+    എങ്കിൽ (regmatch.regprog != ശൂന്യ)
     {
 	regmatch.rm_ic = ic;
 	matches = vim_regexec_nl(&regmatch, text, (colnr_T)0);
 	eval_regfree(pat, regmatch.regprog);
     }
     p_cpo = save_cpo;
-    return matches;
+    തിരികെ matches;
 }
 
 /*
@@ -3401,38 +3401,38 @@ pattern_match(char_u *pat, char_u *text, int ic)
  * "expr->name(arg)".
  * Returns OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval_func(
 	char_u	    **arg,	// points to "(", will be advanced
 	evalarg_T   *evalarg,
 	char_u	    *name,
-	int	    name_len,
+	പൂർണ്ണസംഖ്യ	    name_len,
 	typval_T    *rettv,
-	int	    flags,
+	പൂർണ്ണസംഖ്യ	    flags,
 	typval_T    *basetv)	// "expr" for "expr->name(arg)"
 {
-    int		evaluate = flags & EVAL_EVALUATE;
+    പൂർണ്ണസംഖ്യ		evaluate = flags & EVAL_EVALUATE;
     char_u	*s = name;
-    int		len = name_len;
+    പൂർണ്ണസംഖ്യ		len = name_len;
     partial_T	*partial;
-    int		ret = OK;
-    type_T	*type = NULL;
-    int		found_var = FALSE;
+    പൂർണ്ണസംഖ്യ		ret = OK;
+    type_T	*type = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		found_var = FALSE;
 
-    if (!evaluate)
+    എങ്കിൽ (!evaluate)
 	check_vars(s, len);
 
     // If "s" is the name of a variable of type VAR_FUNC
     // use its contents.
     s = deref_func_name(s, &len, &partial,
-		 in_vim9script() ? &type : NULL, !evaluate, FALSE, &found_var);
+		 in_vim9script() ? &type : ശൂന്യ, !evaluate, FALSE, &found_var);
 
     // Need to make a copy, in case evaluating the arguments makes
     // the name invalid.
     s = vim_strsave(s);
-    if (s == NULL || (evaluate && *s == NUL))
+    എങ്കിൽ (s == ശൂന്യ || (evaluate && *s == NUL))
 	ret = FAIL;
-    else
+    അല്ലെങ്കിൽ
     {
 	funcexe_T funcexe;
 
@@ -3442,16 +3442,16 @@ eval_func(
 	funcexe.fe_lastline = curwin->w_cursor.lnum;
 	funcexe.fe_evaluate = evaluate;
 	funcexe.fe_partial = partial;
-	if (partial != NULL)
+	എങ്കിൽ (partial != ശൂന്യ)
 	{
 	    funcexe.fe_object = partial->pt_obj;
-	    if (funcexe.fe_object != NULL)
+	    എങ്കിൽ (funcexe.fe_object != ശൂന്യ)
 		++funcexe.fe_object->obj_refcount;
 	}
 	funcexe.fe_basetv = basetv;
 	funcexe.fe_check_type = type;
 	funcexe.fe_found_var = found_var;
-	if (evalarg != NULL)
+	എങ്കിൽ (evalarg != ശൂന്യ)
 	    funcexe.fe_cctx = evalarg->eval_cctx;
 	ret = get_func_tv(s, len, rettv, arg, evalarg, &funcexe);
     }
@@ -3460,51 +3460,51 @@ eval_func(
     // If evaluate is FALSE rettv->v_type was not set in
     // get_func_tv, but it's needed in handle_subscript() to parse
     // what follows. So set it here.
-    if (rettv->v_type == VAR_UNKNOWN && !evaluate && **arg == '(')
+    എങ്കിൽ (rettv->v_type == VAR_UNKNOWN && !evaluate && **arg == '(')
     {
-	rettv->vval.v_string = NULL;
+	rettv->vval.v_string = ശൂന്യ;
 	rettv->v_type = VAR_FUNC;
     }
 
     // Stop the expression evaluation when immediately
     // aborting on error, or when an interrupt occurred or
     // an exception was thrown but not caught.
-    if (evaluate && aborting())
+    എങ്കിൽ (evaluate && aborting())
     {
-	if (ret == OK)
+	എങ്കിൽ (ret == OK)
 	    clear_tv(rettv);
 	ret = FAIL;
     }
-    return ret;
+    തിരികെ ret;
 }
 
 /*
  * After a NL, skip over empty lines and comment-only lines.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 newline_skip_comments(char_u *arg)
 {
     char_u *p = arg + 1;
 
-    for (;;)
+    വേണ്ടി (;;)
     {
 	p = skipwhite(p);
 
-	if (*p == NUL)
-	    break;
-	if (vim9_comment_start(p))
+	എങ്കിൽ (*p == NUL)
+	    നിർത്തുക;
+	എങ്കിൽ (vim9_comment_start(p))
 	{
 	    char_u *nl = vim_strchr(p, NL);
 
-	    if (nl == NULL)
-		break;
+	    എങ്കിൽ (nl == ശൂന്യ)
+		നിർത്തുക;
 	    p = nl;
 	}
-	if (*p != NL)
-	    break;
+	എങ്കിൽ (*p != NL)
+	    നിർത്തുക;
 	++p;  // skip another NL
     }
-    return p;
+    തിരികെ p;
 }
 
 /*
@@ -3512,24 +3512,24 @@ newline_skip_comments(char_u *arg)
  * lines.
  * Only called for Vim9 script.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 getline_peek_skip_comments(evalarg_T *evalarg)
 {
-    for (;;)
+    വേണ്ടി (;;)
     {
 	char_u *next = getline_peek(evalarg->eval_getline,
 							 evalarg->eval_cookie);
 	char_u *p;
 
-	if (next == NULL)
-	    break;
+	എങ്കിൽ (next == ശൂന്യ)
+	    നിർത്തുക;
 	p = skipwhite(next);
-	if (*p != NUL && !vim9_comment_start(p))
-	    return next;
-	if (eval_next_line(NULL, evalarg) == NULL)
-	    break;
+	എങ്കിൽ (*p != NUL && !vim9_comment_start(p))
+	    തിരികെ next;
+	എങ്കിൽ (eval_next_വരി(ശൂന്യ, evalarg) == ശൂന്യ)
+	    നിർത്തുക;
     }
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
@@ -3541,34 +3541,34 @@ getline_peek_skip_comments(evalarg_T *evalarg)
  * "arg" must point somewhere inside a line, not at the start.
  */
     char_u *
-eval_next_non_blank(char_u *arg, evalarg_T *evalarg, int *getnext)
+eval_next_non_blank(char_u *arg, evalarg_T *evalarg, പൂർണ്ണസംഖ്യ *getnext)
 {
     char_u *p = skipwhite(arg);
 
     *getnext = FALSE;
-    if (in_vim9script()
-	    && evalarg != NULL
-	    && (evalarg->eval_cookie != NULL || evalarg->eval_cctx != NULL
+    എങ്കിൽ (in_vim9script()
+	    && evalarg != ശൂന്യ
+	    && (evalarg->eval_cookie != ശൂന്യ || evalarg->eval_cctx != ശൂന്യ
 								   || *p == NL)
 	    && (*p == NUL || *p == NL
 			     || (vim9_comment_start(p) && VIM_ISWHITE(p[-1]))))
     {
 	char_u *next;
 
-	if (*p == NL)
+	എങ്കിൽ (*p == NL)
 	    next = newline_skip_comments(p);
-	else if (evalarg->eval_cookie != NULL)
+	അല്ലെങ്കിൽ എങ്കിൽ (evalarg->eval_cookie != ശൂന്യ)
 	    next = getline_peek_skip_comments(evalarg);
-	else
-	    next = peek_next_line_from_context(evalarg->eval_cctx);
+	അല്ലെങ്കിൽ
+	    next = peek_next_വരി_from_context(evalarg->eval_cctx);
 
-	if (next != NULL)
+	എങ്കിൽ (next != ശൂന്യ)
 	{
 	    *getnext = *p != NL;
-	    return skipwhite(next);
+	    തിരികെ skipwhite(next);
 	}
     }
-    return p;
+    തിരികെ p;
 }
 
 /*
@@ -3579,49 +3579,49 @@ eval_next_non_blank(char_u *arg, evalarg_T *evalarg, int *getnext)
  * "arg".
  */
     char_u *
-eval_next_line(char_u *arg, evalarg_T *evalarg)
+eval_next_വരി(char_u *arg, evalarg_T *evalarg)
 {
     garray_T	*gap = &evalarg->eval_ga;
-    char_u	*line;
+    char_u	*വരി;
 
-    if (arg != NULL)
+    എങ്കിൽ (arg != ശൂന്യ)
     {
-	if (*arg == NL)
-	    return newline_skip_comments(arg);
+	എങ്കിൽ (*arg == NL)
+	    തിരികെ newline_skip_comments(arg);
 	// Truncate before a trailing comment, so that concatenating the lines
 	// won't turn the rest into a comment.
-	if (*skipwhite(arg) == '#')
+	എങ്കിൽ (*skipwhite(arg) == '#')
 	    *arg = NUL;
     }
 
-    if (evalarg->eval_cookie != NULL)
-	line = evalarg->eval_getline(0, evalarg->eval_cookie, 0,
+    എങ്കിൽ (evalarg->eval_cookie != ശൂന്യ)
+	വരി = evalarg->eval_getline(0, evalarg->eval_cookie, 0,
 							   GETLINE_CONCAT_ALL);
-    else
-	line = next_line_from_context(evalarg->eval_cctx, TRUE);
-    if (line == NULL)
-	return NULL;
+    അല്ലെങ്കിൽ
+	വരി = next_വരി_from_context(evalarg->eval_cctx, TRUE);
+    എങ്കിൽ (വരി == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
-    ++evalarg->eval_break_count;
-    if (gap->ga_itemsize > 0 && ga_grow(gap, 1) == OK)
+    ++evalarg->eval_break_എണ്ണം;
+    എങ്കിൽ (gap->ga_itemsize > 0 && ga_grow(gap, 1) == OK)
     {
-	char_u *p = skipwhite(line);
+	char_u *p = skipwhite(വരി);
 
 	// Going to concatenate the lines after parsing.  For an empty or
 	// comment line use an empty string.
-	if (*p == NUL || vim9_comment_start(p))
+	എങ്കിൽ (*p == NUL || vim9_comment_start(p))
 	{
-	    vim_free(line);
-	    line = vim_strsave((char_u *)"");
+	    vim_free(വരി);
+	    വരി = vim_strsave((char_u *)"");
 	}
 
-	((char_u **)gap->ga_data)[gap->ga_len] = line;
+	((char_u **)gap->ga_data)[gap->ga_len] = വരി;
 	++gap->ga_len;
     }
-    else if (evalarg->eval_cookie != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (evalarg->eval_cookie != ശൂന്യ)
     {
 	free_eval_tofree_later(evalarg);
-	evalarg->eval_tofree = line;
+	evalarg->eval_tofree = വരി;
     }
 
     // Advanced to the next line, "arg" no longer points into the previous
@@ -3629,9 +3629,9 @@ eval_next_line(char_u *arg, evalarg_T *evalarg)
     // If "arg" is NULL, then the return value is discarded.  In that case,
     // "arg" still points to the previous line.  So don't reset
     // "eval_using_cmdline".
-    if (arg != NULL)
+    എങ്കിൽ (arg != ശൂന്യ)
 	evalarg->eval_using_cmdline = FALSE;
-    return skipwhite(line);
+    തിരികെ skipwhite(വരി);
 }
 
 /*
@@ -3640,15 +3640,15 @@ eval_next_line(char_u *arg, evalarg_T *evalarg)
     char_u *
 skipwhite_and_linebreak(char_u *arg, evalarg_T *evalarg)
 {
-    int	    getnext;
+    പൂർണ്ണസംഖ്യ	    getnext;
     char_u  *p = skipwhite_and_nl(arg);
 
-    if (evalarg == NULL)
-	return skipwhite(arg);
+    എങ്കിൽ (evalarg == ശൂന്യ)
+	തിരികെ skipwhite(arg);
     eval_next_non_blank(p, evalarg, &getnext);
-    if (getnext)
-	return eval_next_line(arg, evalarg);
-    return p;
+    എങ്കിൽ (getnext)
+	തിരികെ eval_next_വരി(arg, evalarg);
+    തിരികെ p;
 }
 
 /*
@@ -3665,62 +3665,62 @@ skipwhite_and_linebreak(char_u *arg, evalarg_T *evalarg)
  * "evalarg" can be NULL, EVALARG_EVALUATE or a pointer.
  * Return OK or FAIL.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 eval0(
     char_u	*arg,
     typval_T	*rettv,
     exarg_T	*eap,
     evalarg_T	*evalarg)
 {
-    return eval0_retarg(arg, rettv, eap, evalarg, NULL);
+    തിരികെ eval0_retarg(arg, rettv, eap, evalarg, ശൂന്യ);
 }
 
 /*
  * If "arg" is a simple function call without arguments then call it and return
  * the result.  Otherwise return NOTDONE.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 may_call_simple_func(
     char_u	*arg,
     typval_T	*rettv)
 {
-    char_u  *parens = (char_u *)strstr((char *)arg, "()");
-    int	    r = NOTDONE;
+    char_u  *parens = (char_u *)strstr((അക്ഷരം *)arg, "()");
+    പൂർണ്ണസംഖ്യ	    r = NOTDONE;
 
     // If the expression is "FuncName()" then we can skip a lot of overhead.
-    if (parens != NULL && *skipwhite(parens + 2) == NUL)
+    എങ്കിൽ (parens != ശൂന്യ && *skipwhite(parens + 2) == NUL)
     {
 	char_u *p = STRNCMP(arg, "<SNR>", 5) == 0 ? skipdigits(arg + 5) : arg;
 
-	if (to_name_end(p, TRUE) == parens)
+	എങ്കിൽ (to_name_end(p, TRUE) == parens)
 	    r = call_simple_func(arg, (size_t)(parens - arg), rettv);
     }
-    return r;
+    തിരികെ r;
 }
 
 /*
  * Handle zero level expression with optimization for a simple function call.
  * Same arguments and return value as eval0().
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval0_simple_funccal(
     char_u	*arg,
     typval_T	*rettv,
     exarg_T	*eap,
     evalarg_T	*evalarg)
 {
-    int	    r = may_call_simple_func(arg, rettv);
+    പൂർണ്ണസംഖ്യ	    r = may_call_simple_func(arg, rettv);
 
-    if (r == NOTDONE)
-	r = eval0_retarg(arg, rettv, eap, evalarg, NULL);
-    return r;
+    എങ്കിൽ (r == NOTDONE)
+	r = eval0_retarg(arg, rettv, eap, evalarg, ശൂന്യ);
+    തിരികെ r;
 }
 
 /*
  * Like eval0() but when "retarg" is not NULL store the pointer to after the
  * expression and don't check what comes after the expression.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 eval0_retarg(
     char_u	*arg,
     typval_T	*rettv,
@@ -3728,45 +3728,45 @@ eval0_retarg(
     evalarg_T	*evalarg,
     char_u	**retarg)
 {
-    int		ret;
+    പൂർണ്ണസംഖ്യ		ret;
     char_u	*p;
-    char_u	*expr_end;
-    int		did_emsg_before = did_emsg;
-    int		called_emsg_before = called_emsg;
-    int		check_for_end = retarg == NULL;
-    int		end_error = FALSE;
+    char_u	*വ്യഞ്ജകം_end;
+    പൂർണ്ണസംഖ്യ		did_emsg_before = did_emsg;
+    പൂർണ്ണസംഖ്യ		called_emsg_before = called_emsg;
+    പൂർണ്ണസംഖ്യ		check_for_end = retarg == ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		end_error = FALSE;
 
     p = skipwhite(arg);
     ret = eval1(&p, rettv, evalarg);
 
-    if (ret != FAIL)
+    എങ്കിൽ (ret != FAIL)
     {
-	expr_end = p;
+	വ്യഞ്ജകം_end = p;
 	p = skipwhite(p);
 
 	// In Vim9 script a command block is not split at NL characters for
 	// commands using an expression argument.  Skip over a '#' comment to
 	// check for a following NL.  Require white space before the '#'.
-	if (in_vim9script() && p > expr_end && retarg == NULL)
-	    while (*p == '#')
+	എങ്കിൽ (in_vim9script() && p > വ്യഞ്ജകം_end && retarg == ശൂന്യ)
+	    ആകുമ്പോൾ (*p == '#')
 	    {
 		char_u *nl = vim_strchr(p, NL);
 
-		if (nl == NULL)
-		    break;
+		എങ്കിൽ (nl == ശൂന്യ)
+		    നിർത്തുക;
 		p = skipwhite(nl + 1);
-		if (eap != NULL && *p != NUL)
+		എങ്കിൽ (eap != ശൂന്യ && *p != NUL)
 		    eap->nextcmd = p;
 		check_for_end = FALSE;
 	    }
 
-	if (check_for_end)
+	എങ്കിൽ (check_for_end)
 	    end_error = !ends_excmd2(arg, p);
     }
 
-    if (ret == FAIL || end_error)
+    എങ്കിൽ (ret == FAIL || end_error)
     {
-	if (ret != FAIL)
+	എങ്കിൽ (ret != FAIL)
 	    clear_tv(rettv);
 	/*
 	 * Report the invalid expression unless the expression evaluation has
@@ -3774,35 +3774,35 @@ eval0_retarg(
 	 * exception, or we already gave a more specific error.
 	 * Also check called_emsg for when using assert_fails().
 	 */
-	if (!aborting()
+	എങ്കിൽ (!aborting()
 		&& did_emsg == did_emsg_before
 		&& called_emsg == called_emsg_before
 		&& (!in_vim9script() || !vim9_bad_comment(p)))
 	{
-	    if (end_error)
+	    എങ്കിൽ (end_error)
 		semsg(_(e_trailing_characters_str), p);
-	    else
+	    അല്ലെങ്കിൽ
 		semsg(_(e_invalid_expression_str), arg);
 	}
 
-	if (eap != NULL && p != NULL)
+	എങ്കിൽ (eap != ശൂന്യ && p != ശൂന്യ)
 	{
 	    // Some of the expression may not have been consumed.
 	    // Only execute a next command if it cannot be a "||" operator.
 	    // The next command may be "catch".
 	    char_u *nextcmd = check_nextcmd(p);
-	    if (nextcmd != NULL && *nextcmd != '|')
+	    എങ്കിൽ (nextcmd != ശൂന്യ && *nextcmd != '|')
 		eap->nextcmd = nextcmd;
 	}
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    if (retarg != NULL)
+    എങ്കിൽ (retarg != ശൂന്യ)
 	*retarg = p;
-    else if (check_for_end && eap != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (check_for_end && eap != ശൂന്യ)
 	set_nextcmd(eap, p);
 
-    return ret;
+    തിരികെ ret;
 }
 
 /*
@@ -3815,33 +3815,33 @@ eval0_retarg(
  *
  * Return OK or FAIL.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 eval1(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     char_u  *p;
-    int	    getnext;
+    പൂർണ്ണസംഖ്യ	    getnext;
 
     CLEAR_POINTER(rettv);
 
     /*
      * Get the first variable.
      */
-    if (eval2(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    എങ്കിൽ (eval2(arg, rettv, evalarg) == FAIL)
+	തിരികെ FAIL;
 
     p = eval_next_non_blank(*arg, evalarg, &getnext);
-    if (*p == '?')
+    എങ്കിൽ (*p == '?')
     {
-	int		op_falsy = p[1] == '?';
-	int		result;
+	പൂർണ്ണസംഖ്യ		op_falsy = p[1] == '?';
+	പൂർണ്ണസംഖ്യ		result;
 	typval_T	var2;
 	evalarg_T	*evalarg_used = evalarg;
 	evalarg_T	local_evalarg;
-	int		orig_flags;
-	int		evaluate;
-	int		vim9script = in_vim9script();
+	പൂർണ്ണസംഖ്യ		orig_flags;
+	പൂർണ്ണസംഖ്യ		evaluate;
+	പൂർണ്ണസംഖ്യ		vim9script = in_vim9script();
 
-	if (evalarg == NULL)
+	എങ്കിൽ (evalarg == ശൂന്യ)
 	{
 	    init_evalarg(&local_evalarg);
 	    evalarg_used = &local_evalarg;
@@ -3849,90 +3849,90 @@ eval1(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	orig_flags = evalarg_used->eval_flags;
 	evaluate = evalarg_used->eval_flags & EVAL_EVALUATE;
 
-	if (getnext)
-	    *arg = eval_next_line(*arg, evalarg_used);
-	else
+	എങ്കിൽ (getnext)
+	    *arg = eval_next_വരി(*arg, evalarg_used);
+	അല്ലെങ്കിൽ
 	{
-	    if (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
+	    എങ്കിൽ (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
 	    {
 		error_white_both(p, op_falsy ? 2 : 1);
 		clear_tv(rettv);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	    *arg = p;
 	}
 
 	result = FALSE;
-	if (evaluate)
+	എങ്കിൽ (evaluate)
 	{
-	    int		error = FALSE;
+	    പൂർണ്ണസംഖ്യ		error = FALSE;
 
-	    if (op_falsy)
+	    എങ്കിൽ (op_falsy)
 	    {
 		// Is this typeval supported with the falsy operator?
-		if (check_typval_is_value(rettv) == FAIL)
+		എങ്കിൽ (check_typval_is_മൂല്യം(rettv) == FAIL)
 		{
 		    clear_tv(rettv);
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
 		result = tv2bool(rettv);
 	    }
-	    else if (vim9script)
+	    അല്ലെങ്കിൽ എങ്കിൽ (vim9script)
 		result = tv_get_bool_chk(rettv, &error);
-	    else if (tv_get_number_chk(rettv, &error) != 0)
+	    അല്ലെങ്കിൽ എങ്കിൽ (tv_get_സംഖ്യ_chk(rettv, &error) != 0)
 		result = TRUE;
-	    if (error || !op_falsy || !result)
+	    എങ്കിൽ (error || !op_falsy || !result)
 		clear_tv(rettv);
-	    if (error)
-		return FAIL;
+	    എങ്കിൽ (error)
+		തിരികെ FAIL;
 	}
 
 	/*
 	 * Get the second variable.  Recursive!
 	 */
-	if (op_falsy)
+	എങ്കിൽ (op_falsy)
 	    ++*arg;
-	if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[1]))
+	എങ്കിൽ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[1]))
 	{
 	    error_white_both(*arg - (op_falsy ? 1 : 0), op_falsy ? 2 : 1);
 	    clear_tv(rettv);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg_used);
 	evalarg_used->eval_flags = (op_falsy ? !result : result)
 				  ? orig_flags : (orig_flags & ~EVAL_EVALUATE);
-	if (eval1(arg, &var2, evalarg_used) == FAIL)
+	എങ്കിൽ (eval1(arg, &var2, evalarg_used) == FAIL)
 	{
 	    evalarg_used->eval_flags = orig_flags;
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
-	if (!op_falsy || !result)
+	എങ്കിൽ (!op_falsy || !result)
 	    *rettv = var2;
 
-	if (!op_falsy)
+	എങ്കിൽ (!op_falsy)
 	{
 	    /*
 	     * Check for the ":".
 	     */
 	    p = eval_next_non_blank(*arg, evalarg_used, &getnext);
-	    if (*p != ':')
+	    എങ്കിൽ (*p != ':')
 	    {
 		emsg(_(e_missing_colon_after_questionmark));
-		if (evaluate && result)
+		എങ്കിൽ (evaluate && result)
 		    clear_tv(rettv);
 		evalarg_used->eval_flags = orig_flags;
-		return FAIL;
+		തിരികെ FAIL;
 	    }
-	    if (getnext)
-		*arg = eval_next_line(*arg, evalarg_used);
-	    else
+	    എങ്കിൽ (getnext)
+		*arg = eval_next_വരി(*arg, evalarg_used);
+	    അല്ലെങ്കിൽ
 	    {
-		if (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
+		എങ്കിൽ (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
 		{
 		    error_white_both(p, 1);
 		    clear_tv(rettv);
 		    evalarg_used->eval_flags = orig_flags;
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
 		*arg = p;
 	    }
@@ -3940,34 +3940,34 @@ eval1(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	    /*
 	     * Get the third variable.  Recursive!
 	     */
-	    if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[1]))
+	    എങ്കിൽ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[1]))
 	    {
 		error_white_both(*arg, 1);
 		clear_tv(rettv);
 		evalarg_used->eval_flags = orig_flags;
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	    *arg = skipwhite_and_linebreak(*arg + 1, evalarg_used);
 	    evalarg_used->eval_flags = !result ? orig_flags
 					       : (orig_flags & ~EVAL_EVALUATE);
-	    if (eval1(arg, &var2, evalarg_used) == FAIL)
+	    എങ്കിൽ (eval1(arg, &var2, evalarg_used) == FAIL)
 	    {
-		if (evaluate && result)
+		എങ്കിൽ (evaluate && result)
 		    clear_tv(rettv);
 		evalarg_used->eval_flags = orig_flags;
-		return FAIL;
+		തിരികെ FAIL;
 	    }
-	    if (evaluate && !result)
+	    എങ്കിൽ (evaluate && !result)
 		*rettv = var2;
 	}
 
-	if (evalarg == NULL)
-	    clear_evalarg(&local_evalarg, NULL);
-	else
+	എങ്കിൽ (evalarg == ശൂന്യ)
+	    clear_evalarg(&local_evalarg, ശൂന്യ);
+	അല്ലെങ്കിൽ
 	    evalarg->eval_flags = orig_flags;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -3979,65 +3979,65 @@ eval1(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
  *
  * Return OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     char_u	*p;
-    int		getnext;
+    പൂർണ്ണസംഖ്യ		getnext;
 
     /*
      * Get the first expression.
      */
-    if (eval3(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    എങ്കിൽ (eval3(arg, rettv, evalarg) == FAIL)
+	തിരികെ FAIL;
 
     /*
      * Handle the  "||" operator.
      */
     p = eval_next_non_blank(*arg, evalarg, &getnext);
-    if (p[0] == '|' && p[1] == '|')
+    എങ്കിൽ (p[0] == '|' && p[1] == '|')
     {
 	evalarg_T   *evalarg_used = evalarg;
 	evalarg_T   local_evalarg;
-	int	    evaluate;
-	int	    orig_flags;
+	പൂർണ്ണസംഖ്യ	    evaluate;
+	പൂർണ്ണസംഖ്യ	    orig_flags;
 	long	    result = FALSE;
 	typval_T    var2;
-	int	    error = FALSE;
-	int	    vim9script = in_vim9script();
+	പൂർണ്ണസംഖ്യ	    error = FALSE;
+	പൂർണ്ണസംഖ്യ	    vim9script = in_vim9script();
 
-	if (evalarg == NULL)
+	എങ്കിൽ (evalarg == ശൂന്യ)
 	{
 	    init_evalarg(&local_evalarg);
 	    evalarg_used = &local_evalarg;
 	}
 	orig_flags = evalarg_used->eval_flags;
 	evaluate = orig_flags & EVAL_EVALUATE;
-	if (evaluate)
+	എങ്കിൽ (evaluate)
 	{
-	    if (vim9script)
+	    എങ്കിൽ (vim9script)
 		result = tv_get_bool_chk(rettv, &error);
-	    else if (tv_get_number_chk(rettv, &error) != 0)
+	    അല്ലെങ്കിൽ എങ്കിൽ (tv_get_സംഖ്യ_chk(rettv, &error) != 0)
 		result = TRUE;
 	    clear_tv(rettv);
-	    if (error)
-		return FAIL;
+	    എങ്കിൽ (error)
+		തിരികെ FAIL;
 	}
 
 	/*
 	 * Repeat until there is no following "||".
 	 */
-	while (p[0] == '|' && p[1] == '|')
+	ആകുമ്പോൾ (p[0] == '|' && p[1] == '|')
 	{
-	    if (getnext)
-		*arg = eval_next_line(*arg, evalarg_used);
-	    else
+	    എങ്കിൽ (getnext)
+		*arg = eval_next_വരി(*arg, evalarg_used);
+	    അല്ലെങ്കിൽ
 	    {
-		if (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
+		എങ്കിൽ (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
 		{
 		    error_white_both(p, 2);
 		    clear_tv(rettv);
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
 		*arg = p;
 	    }
@@ -4045,55 +4045,55 @@ eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	    /*
 	     * Get the second variable.
 	     */
-	    if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[2]))
+	    എങ്കിൽ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[2]))
 	    {
 		error_white_both(*arg, 2);
 		clear_tv(rettv);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	    *arg = skipwhite_and_linebreak(*arg + 2, evalarg_used);
 	    evalarg_used->eval_flags = !result ? orig_flags
 					       : (orig_flags & ~EVAL_EVALUATE);
-	    if (eval3(arg, &var2, evalarg_used) == FAIL)
-		return FAIL;
+	    എങ്കിൽ (eval3(arg, &var2, evalarg_used) == FAIL)
+		തിരികെ FAIL;
 
 	    /*
 	     * Compute the result.
 	     */
-	    if (evaluate && !result)
+	    എങ്കിൽ (evaluate && !result)
 	    {
-		if (vim9script)
+		എങ്കിൽ (vim9script)
 		    result = tv_get_bool_chk(&var2, &error);
-		else if (tv_get_number_chk(&var2, &error) != 0)
+		അല്ലെങ്കിൽ എങ്കിൽ (tv_get_സംഖ്യ_chk(&var2, &error) != 0)
 		    result = TRUE;
 		clear_tv(&var2);
-		if (error)
-		    return FAIL;
+		എങ്കിൽ (error)
+		    തിരികെ FAIL;
 	    }
-	    if (evaluate)
+	    എങ്കിൽ (evaluate)
 	    {
-		if (vim9script)
+		എങ്കിൽ (vim9script)
 		{
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = result ? VVAL_TRUE : VVAL_FALSE;
+		    rettv->vval.v_സംഖ്യ = result ? VVAL_TRUE : VVAL_FALSE;
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
-		    rettv->v_type = VAR_NUMBER;
-		    rettv->vval.v_number = result;
+		    rettv->v_type = VAR_സംഖ്യ;
+		    rettv->vval.v_സംഖ്യ = result;
 		}
 	    }
 
 	    p = eval_next_non_blank(*arg, evalarg_used, &getnext);
 	}
 
-	if (evalarg == NULL)
-	    clear_evalarg(&local_evalarg, NULL);
-	else
+	എങ്കിൽ (evalarg == ശൂന്യ)
+	    clear_evalarg(&local_evalarg, ശൂന്യ);
+	അല്ലെങ്കിൽ
 	    evalarg->eval_flags = orig_flags;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -4105,65 +4105,65 @@ eval2(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
  *
  * Return OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     char_u	*p;
-    int		getnext;
+    പൂർണ്ണസംഖ്യ		getnext;
 
     /*
      * Get the first expression.
      */
-    if (eval4(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    എങ്കിൽ (eval4(arg, rettv, evalarg) == FAIL)
+	തിരികെ FAIL;
 
     /*
      * Handle the "&&" operator.
      */
     p = eval_next_non_blank(*arg, evalarg, &getnext);
-    if (p[0] == '&' && p[1] == '&')
+    എങ്കിൽ (p[0] == '&' && p[1] == '&')
     {
 	evalarg_T   *evalarg_used = evalarg;
 	evalarg_T   local_evalarg;
-	int	    orig_flags;
-	int	    evaluate;
+	പൂർണ്ണസംഖ്യ	    orig_flags;
+	പൂർണ്ണസംഖ്യ	    evaluate;
 	long	    result = TRUE;
 	typval_T    var2;
-	int	    error = FALSE;
-	int	    vim9script = in_vim9script();
+	പൂർണ്ണസംഖ്യ	    error = FALSE;
+	പൂർണ്ണസംഖ്യ	    vim9script = in_vim9script();
 
-	if (evalarg == NULL)
+	എങ്കിൽ (evalarg == ശൂന്യ)
 	{
 	    init_evalarg(&local_evalarg);
 	    evalarg_used = &local_evalarg;
 	}
 	orig_flags = evalarg_used->eval_flags;
 	evaluate = orig_flags & EVAL_EVALUATE;
-	if (evaluate)
+	എങ്കിൽ (evaluate)
 	{
-	    if (vim9script)
+	    എങ്കിൽ (vim9script)
 		result = tv_get_bool_chk(rettv, &error);
-	    else if (tv_get_number_chk(rettv, &error) == 0)
+	    അല്ലെങ്കിൽ എങ്കിൽ (tv_get_സംഖ്യ_chk(rettv, &error) == 0)
 		result = FALSE;
 	    clear_tv(rettv);
-	    if (error)
-		return FAIL;
+	    എങ്കിൽ (error)
+		തിരികെ FAIL;
 	}
 
 	/*
 	 * Repeat until there is no following "&&".
 	 */
-	while (p[0] == '&' && p[1] == '&')
+	ആകുമ്പോൾ (p[0] == '&' && p[1] == '&')
 	{
-	    if (getnext)
-		*arg = eval_next_line(*arg, evalarg_used);
-	    else
+	    എങ്കിൽ (getnext)
+		*arg = eval_next_വരി(*arg, evalarg_used);
+	    അല്ലെങ്കിൽ
 	    {
-		if (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
+		എങ്കിൽ (evaluate && vim9script && !VIM_ISWHITE(p[-1]))
 		{
 		    error_white_both(p, 2);
 		    clear_tv(rettv);
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
 		*arg = p;
 	    }
@@ -4171,56 +4171,56 @@ eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	    /*
 	     * Get the second variable.
 	     */
-	    if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[2]))
+	    എങ്കിൽ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[2]))
 	    {
 		error_white_both(*arg, 2);
 		clear_tv(rettv);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	    *arg = skipwhite_and_linebreak(*arg + 2, evalarg_used);
 	    evalarg_used->eval_flags = result ? orig_flags
 					      : (orig_flags & ~EVAL_EVALUATE);
 	    CLEAR_FIELD(var2);
-	    if (eval4(arg, &var2, evalarg_used) == FAIL)
-		return FAIL;
+	    എങ്കിൽ (eval4(arg, &var2, evalarg_used) == FAIL)
+		തിരികെ FAIL;
 
 	    /*
 	     * Compute the result.
 	     */
-	    if (evaluate && result)
+	    എങ്കിൽ (evaluate && result)
 	    {
-		if (vim9script)
+		എങ്കിൽ (vim9script)
 		    result = tv_get_bool_chk(&var2, &error);
-		else if (tv_get_number_chk(&var2, &error) == 0)
+		അല്ലെങ്കിൽ എങ്കിൽ (tv_get_സംഖ്യ_chk(&var2, &error) == 0)
 		    result = FALSE;
 		clear_tv(&var2);
-		if (error)
-		    return FAIL;
+		എങ്കിൽ (error)
+		    തിരികെ FAIL;
 	    }
-	    if (evaluate)
+	    എങ്കിൽ (evaluate)
 	    {
-		if (vim9script)
+		എങ്കിൽ (vim9script)
 		{
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = result ? VVAL_TRUE : VVAL_FALSE;
+		    rettv->vval.v_സംഖ്യ = result ? VVAL_TRUE : VVAL_FALSE;
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
-		    rettv->v_type = VAR_NUMBER;
-		    rettv->vval.v_number = result;
+		    rettv->v_type = VAR_സംഖ്യ;
+		    rettv->vval.v_സംഖ്യ = result;
 		}
 	    }
 
 	    p = eval_next_non_blank(*arg, evalarg_used, &getnext);
 	}
 
-	if (evalarg == NULL)
-	    clear_evalarg(&local_evalarg, NULL);
-	else
+	എങ്കിൽ (evalarg == ശൂന്യ)
+	    clear_evalarg(&local_evalarg, ശൂന്യ);
+	അല്ലെങ്കിൽ
 	    evalarg->eval_flags = orig_flags;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -4241,20 +4241,20 @@ eval3(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
  *
  * Return OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval4(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     char_u	*p;
-    int		getnext;
-    exprtype_T	type = EXPR_UNKNOWN;
-    int		len = 2;
-    int		type_is = FALSE;
+    പൂർണ്ണസംഖ്യ		getnext;
+    exprtype_T	type = വ്യഞ്ജകം_UNKNOWN;
+    പൂർണ്ണസംഖ്യ		len = 2;
+    പൂർണ്ണസംഖ്യ		type_is = FALSE;
 
     /*
      * Get the first expression.
      */
-    if (eval5(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    എങ്കിൽ (eval5(arg, rettv, evalarg) == FAIL)
+	തിരികെ FAIL;
 
     p = eval_next_non_blank(*arg, evalarg, &getnext);
 
@@ -4263,90 +4263,90 @@ eval4(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
     /*
      * If there is a comparative operator, use it.
      */
-    if (type != EXPR_UNKNOWN)
+    എങ്കിൽ (type != വ്യഞ്ജകം_UNKNOWN)
     {
 	typval_T    var2;
-	int	    ic;
-	int	    vim9script = in_vim9script();
-	int	    evaluate = evalarg == NULL
+	പൂർണ്ണസംഖ്യ	    ic;
+	പൂർണ്ണസംഖ്യ	    vim9script = in_vim9script();
+	പൂർണ്ണസംഖ്യ	    evaluate = evalarg == ശൂന്യ
 				   ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
 	long	    comp_lnum = SOURCING_LNUM;
 
-	if (getnext)
+	എങ്കിൽ (getnext)
 	{
-	    *arg = eval_next_line(*arg, evalarg);
+	    *arg = eval_next_വരി(*arg, evalarg);
 	    p = *arg;
 	}
-	else if (evaluate && vim9script && !VIM_ISWHITE(**arg))
+	അല്ലെങ്കിൽ എങ്കിൽ (evaluate && vim9script && !VIM_ISWHITE(**arg))
 	{
 	    error_white_both(*arg, len);
 	    clear_tv(rettv);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 
-	if (vim9script && type_is && (p[len] == '?' || p[len] == '#'))
+	എങ്കിൽ (vim9script && type_is && (p[len] == '?' || p[len] == '#'))
 	{
 	    semsg(_(e_invalid_expression_str), p);
 	    clear_tv(rettv);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 
 	// extra question mark appended: ignore case
-	if (p[len] == '?')
+	എങ്കിൽ (p[len] == '?')
 	{
 	    ic = TRUE;
 	    ++len;
 	}
 	// extra '#' appended: match case
-	else if (p[len] == '#')
+	അല്ലെങ്കിൽ എങ്കിൽ (p[len] == '#')
 	{
 	    ic = FALSE;
 	    ++len;
 	}
 	// nothing appended: use 'ignorecase' if not in Vim script
-	else
+	അല്ലെങ്കിൽ
 	    ic = vim9script ? FALSE : p_ic;
 
 	/*
 	 * Get the second variable.
 	 */
-	if (evaluate && vim9script && !IS_WHITE_OR_NUL(p[len]))
+	എങ്കിൽ (evaluate && vim9script && !IS_WHITE_OR_NUL(p[len]))
 	{
 	    error_white_both(p, len);
 	    clear_tv(rettv);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	*arg = skipwhite_and_linebreak(p + len, evalarg);
-	if (eval5(arg, &var2, evalarg) == FAIL)
+	എങ്കിൽ (eval5(arg, &var2, evalarg) == FAIL)
 	{
 	    clear_tv(rettv);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
-	if (evaluate)
+	എങ്കിൽ (evaluate)
 	{
-	    int ret;
+	    പൂർണ്ണസംഖ്യ ret;
 
 	    // use the line of the comparison for messages
 	    SOURCING_LNUM = comp_lnum;
-	    if (vim9script && check_compare_types(type, rettv, &var2) == FAIL)
+	    എങ്കിൽ (vim9script && check_compare_types(type, rettv, &var2) == FAIL)
 	    {
 		ret = FAIL;
 		clear_tv(rettv);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		ret = typval_compare(rettv, &var2, type, ic);
 	    clear_tv(&var2);
-	    return ret;
+	    തിരികെ ret;
 	}
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Make a copy of blob "tv1" and append blob "tv2".
  */
-    void
+    ശൂന്യം
 eval_addblob(typval_T *tv1, typval_T *tv2)
 {
     blob_T  *b1 = tv1->vval.v_blob;
@@ -4355,23 +4355,23 @@ eval_addblob(typval_T *tv1, typval_T *tv2)
     long    len1, len2;
     long    totallen;
 
-    if (b == NULL)
-	return;
+    എങ്കിൽ (b == ശൂന്യ)
+	തിരികെ;
 
     len1 = blob_len(b1);
     len2 = blob_len(b2);
     totallen = len1 + len2;
 
-    if (totallen > 0 && totallen <= INT_MAX
-				    && ga_grow(&b->bv_ga, (int)totallen) == OK)
+    എങ്കിൽ (totallen > 0 && totallen <= INT_MAX
+				    && ga_grow(&b->bv_ga, (പൂർണ്ണസംഖ്യ)totallen) == OK)
     {
-	if (len1 > 0)
+	എങ്കിൽ (len1 > 0)
 	    mch_memmove((char_u *)b->bv_ga.ga_data,
 		    (char_u *)b1->bv_ga.ga_data, (size_t)len1);
-	if (len2 > 0)
+	എങ്കിൽ (len2 > 0)
 	    mch_memmove((char_u *)b->bv_ga.ga_data + len1,
 		    (char_u *)b2->bv_ga.ga_data, (size_t)len2);
-	b->bv_ga.ga_len = (int)totallen;
+	b->bv_ga.ga_len = (പൂർണ്ണസംഖ്യ)totallen;
     }
 
     clear_tv(tv1);
@@ -4381,51 +4381,51 @@ eval_addblob(typval_T *tv1, typval_T *tv2)
 /*
  * Make a copy of list "tv1" and append list "tv2".
  */
-    int
+    പൂർണ്ണസംഖ്യ
 eval_addlist(typval_T *tv1, typval_T *tv2)
 {
     typval_T var3;
 
     // concatenate Lists
-    if (list_concat(tv1->vval.v_list, tv2->vval.v_list, &var3) == FAIL)
+    എങ്കിൽ (list_concat(tv1->vval.v_list, tv2->vval.v_list, &var3) == FAIL)
     {
 	clear_tv(tv1);
 	clear_tv(tv2);
-	return FAIL;
+	തിരികെ FAIL;
     }
     clear_tv(tv1);
     *tv1 = var3;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Make a copy of tuple "tv1" and append tuple "tv2".
  */
-    int
+    പൂർണ്ണസംഖ്യ
 eval_addtuple(typval_T *tv1, typval_T *tv2)
 {
-    int		vim9script = in_vim9script();
+    പൂർണ്ണസംഖ്യ		vim9script = in_vim9script();
     typval_T	var3;
 
-    if (vim9script && tv1->vval.v_tuple != NULL && tv2->vval.v_tuple != NULL
-	    && tv1->vval.v_tuple->tv_type != NULL
-	    && tv2->vval.v_tuple->tv_type != NULL)
+    എങ്കിൽ (vim9script && tv1->vval.v_tuple != ശൂന്യ && tv2->vval.v_tuple != ശൂന്യ
+	    && tv1->vval.v_tuple->tv_type != ശൂന്യ
+	    && tv2->vval.v_tuple->tv_type != ശൂന്യ)
     {
-	if (!check_tuples_addable(tv1->vval.v_tuple->tv_type,
+	എങ്കിൽ (!check_tuples_addable(tv1->vval.v_tuple->tv_type,
 						tv2->vval.v_tuple->tv_type))
-	    return FAIL;
+	    തിരികെ FAIL;
     }
 
     // concatenate tuples
-    if (tuple_concat(tv1->vval.v_tuple, tv2->vval.v_tuple, &var3) == FAIL)
+    എങ്കിൽ (tuple_concat(tv1->vval.v_tuple, tv2->vval.v_tuple, &var3) == FAIL)
     {
 	clear_tv(tv1);
 	clear_tv(tv2);
-	return FAIL;
+	തിരികെ FAIL;
     }
     clear_tv(tv1);
     *tv1 = var3;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -4434,32 +4434,32 @@ eval_addtuple(typval_T *tv1, typval_T *tv2)
  *
  * Return OK or FAIL.
  */
-    static int
-eval_shift_number(typval_T *tv1, typval_T *tv2, int shift_type)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+eval_shift_സംഖ്യ(typval_T *tv1, typval_T *tv2, പൂർണ്ണസംഖ്യ shift_type)
 {
-    if (tv2->v_type != VAR_NUMBER || tv2->vval.v_number < 0)
+    എങ്കിൽ (tv2->v_type != VAR_സംഖ്യ || tv2->vval.v_സംഖ്യ < 0)
     {
 	// right operand should be a positive number
-	if (tv2->v_type != VAR_NUMBER)
-	    emsg(_(e_bitshift_ops_must_be_number));
-	else
+	എങ്കിൽ (tv2->v_type != VAR_സംഖ്യ)
+	    emsg(_(e_bitshift_ops_must_be_സംഖ്യ));
+	അല്ലെങ്കിൽ
 	    emsg(_(e_bitshift_ops_must_be_positive));
 	clear_tv(tv1);
 	clear_tv(tv2);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    if (tv2->vval.v_number > MAX_LSHIFT_BITS)
+    എങ്കിൽ (tv2->vval.v_സംഖ്യ > MAX_LSHIFT_BITS)
 	// shifting more bits than we have always results in zero
-	tv1->vval.v_number = 0;
-    else if (shift_type == EXPR_LSHIFT)
-	tv1->vval.v_number =
-	    (uvarnumber_T)tv1->vval.v_number << tv2->vval.v_number;
-    else
-	tv1->vval.v_number =
-	    (uvarnumber_T)tv1->vval.v_number >> tv2->vval.v_number;
+	tv1->vval.v_സംഖ്യ = 0;
+    അല്ലെങ്കിൽ എങ്കിൽ (shift_type == വ്യഞ്ജകം_LSHIFT)
+	tv1->vval.v_സംഖ്യ =
+	    (uvarnumber_T)tv1->vval.v_സംഖ്യ << tv2->vval.v_സംഖ്യ;
+    അല്ലെങ്കിൽ
+	tv1->vval.v_സംഖ്യ =
+	    (uvarnumber_T)tv1->vval.v_സംഖ്യ >> tv2->vval.v_സംഖ്യ;
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -4472,150 +4472,150 @@ eval_shift_number(typval_T *tv1, typval_T *tv2, int shift_type)
  *
  * Return OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval5(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     /*
      * Get the first expression.
      */
-    if (eval6(arg, rettv, evalarg) == FAIL)
-	return FAIL;
+    എങ്കിൽ (eval6(arg, rettv, evalarg) == FAIL)
+	തിരികെ FAIL;
 
     /*
      * Repeat computing, until no '<<' or '>>' is following.
      */
-    for (;;)
+    വേണ്ടി (;;)
     {
 	char_u		*p;
-	int		getnext;
+	പൂർണ്ണസംഖ്യ		getnext;
 	exprtype_T	exprtype;
-	int		evaluate;
+	പൂർണ്ണസംഖ്യ		evaluate;
 	typval_T	var2;
-	int		vim9script;
+	പൂർണ്ണസംഖ്യ		vim9script;
 
 	p = eval_next_non_blank(*arg, evalarg, &getnext);
-	if (p[0] == '<' && p[1] == '<')
-	    exprtype = EXPR_LSHIFT;
-	else if (p[0] == '>' && p[1] == '>')
-	    exprtype = EXPR_RSHIFT;
-	else
-	    return OK;
+	എങ്കിൽ (p[0] == '<' && p[1] == '<')
+	    exprtype = വ്യഞ്ജകം_LSHIFT;
+	അല്ലെങ്കിൽ എങ്കിൽ (p[0] == '>' && p[1] == '>')
+	    exprtype = വ്യഞ്ജകം_RSHIFT;
+	അല്ലെങ്കിൽ
+	    തിരികെ OK;
 
 	// Handle a bitwise left or right shift operator
-	evaluate = evalarg == NULL ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
-	if (evaluate && rettv->v_type != VAR_NUMBER)
+	evaluate = evalarg == ശൂന്യ ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
+	എങ്കിൽ (evaluate && rettv->v_type != VAR_സംഖ്യ)
 	{
 	    // left operand should be a number
-	    emsg(_(e_bitshift_ops_must_be_number));
+	    emsg(_(e_bitshift_ops_must_be_സംഖ്യ));
 	    clear_tv(rettv);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 
 	vim9script = in_vim9script();
-	if (getnext)
+	എങ്കിൽ (getnext)
 	{
-	    *arg = eval_next_line(*arg, evalarg);
+	    *arg = eval_next_വരി(*arg, evalarg);
 	    p = *arg;
 	}
-	else if (evaluate && vim9script && !VIM_ISWHITE(**arg))
+	അല്ലെങ്കിൽ എങ്കിൽ (evaluate && vim9script && !VIM_ISWHITE(**arg))
 	{
 	    error_white_both(*arg, 2);
 	    clear_tv(rettv);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 
 	/*
 	 * Get the second variable.
 	 */
-	if (evaluate && vim9script && !IS_WHITE_OR_NUL(p[2]))
+	എങ്കിൽ (evaluate && vim9script && !IS_WHITE_OR_NUL(p[2]))
 	{
 	    error_white_both(p, 2);
 	    clear_tv(rettv);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	*arg = skipwhite_and_linebreak(p + 2, evalarg);
-	if (eval6(arg, &var2, evalarg) == FAIL)
+	എങ്കിൽ (eval6(arg, &var2, evalarg) == FAIL)
 	{
 	    clear_tv(rettv);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 
-	if (evaluate)
+	എങ്കിൽ (evaluate)
 	{
-	    if (eval_shift_number(rettv, &var2, exprtype) == FAIL)
-		return FAIL;
+	    എങ്കിൽ (eval_shift_സംഖ്യ(rettv, &var2, exprtype) == FAIL)
+		തിരികെ FAIL;
 	}
 
 	clear_tv(&var2);
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Concatenate strings "tv1" and "tv2" and store the result in "tv1".
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval_concat_str(typval_T *tv1, typval_T *tv2)
 {
     char_u	buf1[NUMBUFLEN], buf2[NUMBUFLEN];
     char_u	*s1 = tv_get_string_buf(tv1, buf1);
-    char_u	*s2 = NULL;
+    char_u	*s2 = ശൂന്യ;
     char_u	*p;
-    int		vim9script = in_vim9script();
+    പൂർണ്ണസംഖ്യ		vim9script = in_vim9script();
 
-    if (vim9script && (tv2->v_type == VAR_VOID
+    എങ്കിൽ (vim9script && (tv2->v_type == VAR_VOID
 		|| tv2->v_type == VAR_CHANNEL
 		|| tv2->v_type == VAR_JOB))
-	semsg(_(e_using_invalid_value_as_string_str),
+	semsg(_(e_using_invalid_മൂല്യം_as_string_str),
 		vartype_name(tv2->v_type));
-    else if (vim9script && tv2->v_type == VAR_FLOAT)
+    അല്ലെങ്കിൽ എങ്കിൽ (vim9script && tv2->v_type == VAR_FLOAT)
     {
-	vim_snprintf((char *)buf2, NUMBUFLEN, "%g",
+	vim_snprintf((അക്ഷരം *)buf2, NUMBUFLEN, "%g",
 		tv2->vval.v_float);
 	s2 = buf2;
     }
-    else
+    അല്ലെങ്കിൽ
 	s2 = tv_get_string_buf_chk(tv2, buf2);
-    if (s2 == NULL)		// type error ?
+    എങ്കിൽ (s2 == ശൂന്യ)		// type error ?
     {
 	clear_tv(tv1);
 	clear_tv(tv2);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     // When possible, grow the existing string in place to avoid alloc/free.
-    if (grow_string_tv(tv1, s2) == OK)
-	return OK;
+    എങ്കിൽ (grow_string_tv(tv1, s2) == OK)
+	തിരികെ OK;
 
     p = concat_str(s1, s2);
     clear_tv(tv1);
     tv1->v_type = VAR_STRING;
     tv1->vval.v_string = p;
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Add or subtract numbers "tv1" and "tv2" and store the result in "tv1".
  * The numbers can be whole numbers or floats.
  */
-    static int
-eval_addsub_number(typval_T *tv1, typval_T *tv2, int op)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+eval_addsub_സംഖ്യ(typval_T *tv1, typval_T *tv2, പൂർണ്ണസംഖ്യ op)
 {
-    int		error = FALSE;
+    പൂർണ്ണസംഖ്യ		error = FALSE;
     varnumber_T	n1, n2;
     float_T	f1 = 0, f2 = 0;
 
-    if (tv1->v_type == VAR_FLOAT)
+    എങ്കിൽ (tv1->v_type == VAR_FLOAT)
     {
 	f1 = tv1->vval.v_float;
 	n1 = 0;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	n1 = tv_get_number_chk(tv1, &error);
-	if (error)
+	n1 = tv_get_സംഖ്യ_chk(tv1, &error);
+	എങ്കിൽ (error)
 	{
 	    // This can only happen for "list + non-list" or
 	    // "blob + non-blob".  For "non-list + ..." or
@@ -4623,51 +4623,51 @@ eval_addsub_number(typval_T *tv1, typval_T *tv2, int op)
 	    // 2nd operand.
 	    clear_tv(tv1);
 	    clear_tv(tv2);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
-	if (tv2->v_type == VAR_FLOAT)
+	എങ്കിൽ (tv2->v_type == VAR_FLOAT)
 	    f1 = n1;
     }
-    if (tv2->v_type == VAR_FLOAT)
+    എങ്കിൽ (tv2->v_type == VAR_FLOAT)
     {
 	f2 = tv2->vval.v_float;
 	n2 = 0;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	n2 = tv_get_number_chk(tv2, &error);
-	if (error)
+	n2 = tv_get_സംഖ്യ_chk(tv2, &error);
+	എങ്കിൽ (error)
 	{
 	    clear_tv(tv1);
 	    clear_tv(tv2);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
-	if (tv1->v_type == VAR_FLOAT)
+	എങ്കിൽ (tv1->v_type == VAR_FLOAT)
 	    f2 = n2;
     }
     clear_tv(tv1);
 
     // If there is a float on either side the result is a float.
-    if (tv1->v_type == VAR_FLOAT || tv2->v_type == VAR_FLOAT)
+    എങ്കിൽ (tv1->v_type == VAR_FLOAT || tv2->v_type == VAR_FLOAT)
     {
-	if (op == '+')
+	എങ്കിൽ (op == '+')
 	    f1 = f1 + f2;
-	else
+	അല്ലെങ്കിൽ
 	    f1 = f1 - f2;
 	tv1->v_type = VAR_FLOAT;
 	tv1->vval.v_float = f1;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	if (op == '+')
+	എങ്കിൽ (op == '+')
 	    n1 = n1 + n2;
-	else
+	അല്ലെങ്കിൽ
 	    n1 = n1 - n2;
-	tv1->v_type = VAR_NUMBER;
-	tv1->vval.v_number = n1;
+	tv1->v_type = VAR_സംഖ്യ;
+	tv1->vval.v_സംഖ്യ = n1;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -4682,28 +4682,28 @@ eval_addsub_number(typval_T *tv1, typval_T *tv2, int op)
  *
  * Return OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval6(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 {
     /*
      * Get the first expression.
      */
-    if (eval7(arg, rettv, evalarg, FALSE) == FAIL)
-	return FAIL;
+    എങ്കിൽ (eval7(arg, rettv, evalarg, FALSE) == FAIL)
+	തിരികെ FAIL;
 
     /*
      * Repeat computing, until no '+', '-' or '.' is following.
      */
-    for (;;)
+    വേണ്ടി (;;)
     {
-	int	    evaluate;
-	int	    getnext;
+	പൂർണ്ണസംഖ്യ	    evaluate;
+	പൂർണ്ണസംഖ്യ	    getnext;
 	char_u	    *p;
-	int	    op;
-	int	    oplen;
-	int	    concat;
+	പൂർണ്ണസംഖ്യ	    op;
+	പൂർണ്ണസംഖ്യ	    oplen;
+	പൂർണ്ണസംഖ്യ	    concat;
 	typval_T    var2;
-	int	    vim9script = in_vim9script();
+	പൂർണ്ണസംഖ്യ	    vim9script = in_vim9script();
 	long	    op_lnum = SOURCING_LNUM;
 
 	// "." is only string concatenation when scriptversion is 1
@@ -4712,33 +4712,33 @@ eval6(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	p = eval_next_non_blank(*arg, evalarg, &getnext);
 	op = *p;
 	concat = op == '.' && (*(p + 1) == '.' || in_old_script(2));
-	if ((op != '+' && op != '-' && !concat) || p[1] == '='
+	എങ്കിൽ ((op != '+' && op != '-' && !concat) || p[1] == '='
 					       || (p[1] == '.' && p[2] == '='))
-	    break;
-	if (getnext && (op == '+' || op == '-') && p[0] == p[1])
-	    break;
+	    നിർത്തുക;
+	എങ്കിൽ (getnext && (op == '+' || op == '-') && p[0] == p[1])
+	    നിർത്തുക;
 
-	evaluate = evalarg == NULL ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
+	evaluate = evalarg == ശൂന്യ ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
 	oplen = (concat && p[1] == '.') ? 2 : 1;
-	if (getnext)
-	    *arg = eval_next_line(*arg, evalarg);
-	else
+	എങ്കിൽ (getnext)
+	    *arg = eval_next_വരി(*arg, evalarg);
+	അല്ലെങ്കിൽ
 	{
-	    if (evaluate && vim9script && !VIM_ISWHITE(**arg))
+	    എങ്കിൽ (evaluate && vim9script && !VIM_ISWHITE(**arg))
 	    {
 		error_white_both(*arg, oplen);
 		clear_tv(rettv);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	    *arg = p;
 	}
-	if ((op != '+' || (rettv->v_type != VAR_LIST
+	എങ്കിൽ ((op != '+' || (rettv->v_type != VAR_LIST
 						&& rettv->v_type != VAR_TUPLE
 						&& rettv->v_type != VAR_BLOB))
 		&& (op == '.' || rettv->v_type != VAR_FLOAT)
 		&& evaluate)
 	{
-	    int		error = FALSE;
+	    പൂർണ്ണസംഖ്യ		error = FALSE;
 
 	    // For "list + ...", an illegal use of the first operand as
 	    // a number cannot be determined before evaluating the 2nd
@@ -4747,102 +4747,102 @@ eval6(char_u **arg, typval_T *rettv, evalarg_T *evalarg)
 	    // we know that the first operand needs to be a string or number
 	    // without evaluating the 2nd operand.  So check before to avoid
 	    // side effects after an error.
-	    if (op != '.')
-		tv_get_number_chk(rettv, &error);
-	    if ((op == '.' && tv_get_string_chk(rettv) == NULL) || error)
+	    എങ്കിൽ (op != '.')
+		tv_get_സംഖ്യ_chk(rettv, &error);
+	    എങ്കിൽ ((op == '.' && tv_get_string_chk(rettv) == ശൂന്യ) || error)
 	    {
 		clear_tv(rettv);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	}
 
 	/*
 	 * Get the second variable.
 	 */
-	if (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[oplen]))
+	എങ്കിൽ (evaluate && vim9script && !IS_WHITE_OR_NUL((*arg)[oplen]))
 	{
 	    error_white_both(*arg, oplen);
 	    clear_tv(rettv);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	*arg = skipwhite_and_linebreak(*arg + oplen, evalarg);
-	if (eval7(arg, &var2, evalarg, !vim9script && op == '.') == FAIL)
+	എങ്കിൽ (eval7(arg, &var2, evalarg, !vim9script && op == '.') == FAIL)
 	{
 	    clear_tv(rettv);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 
-	if (evaluate)
+	എങ്കിൽ (evaluate)
 	{
 	    /*
 	     * Compute the result.
 	     */
 	    // use the line of the operation for messages
 	    SOURCING_LNUM = op_lnum;
-	    if (op == '.')
+	    എങ്കിൽ (op == '.')
 	    {
-		if (eval_concat_str(rettv, &var2) == FAIL)
-		    return FAIL;
+		എങ്കിൽ (eval_concat_str(rettv, &var2) == FAIL)
+		    തിരികെ FAIL;
 	    }
-	    else if (op == '+' && rettv->v_type == VAR_BLOB
+	    അല്ലെങ്കിൽ എങ്കിൽ (op == '+' && rettv->v_type == VAR_BLOB
 						   && var2.v_type == VAR_BLOB)
 		eval_addblob(rettv, &var2);
-	    else if (op == '+' && rettv->v_type == VAR_LIST
+	    അല്ലെങ്കിൽ എങ്കിൽ (op == '+' && rettv->v_type == VAR_LIST
 						   && var2.v_type == VAR_LIST)
 	    {
-		if (eval_addlist(rettv, &var2) == FAIL)
-		    return FAIL;
+		എങ്കിൽ (eval_addlist(rettv, &var2) == FAIL)
+		    തിരികെ FAIL;
 	    }
-	    else if (op == '+' && rettv->v_type == VAR_TUPLE
+	    അല്ലെങ്കിൽ എങ്കിൽ (op == '+' && rettv->v_type == VAR_TUPLE
 					   && var2.v_type == VAR_TUPLE)
 	    {
-		if (eval_addtuple(rettv, &var2) == FAIL)
-		    return FAIL;
+		എങ്കിൽ (eval_addtuple(rettv, &var2) == FAIL)
+		    തിരികെ FAIL;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		if (eval_addsub_number(rettv, &var2, op) == FAIL)
-		    return FAIL;
+		എങ്കിൽ (eval_addsub_സംഖ്യ(rettv, &var2, op) == FAIL)
+		    തിരികെ FAIL;
 	    }
 	    clear_tv(&var2);
 	}
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Multiply or divide or compute the modulo of numbers "tv1" and "tv2" and
  * store the result in "tv1".  The numbers can be whole numbers or floats.
  */
-    static int
-eval_multdiv_number(typval_T *tv1, typval_T *tv2, int op)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+eval_multdiv_സംഖ്യ(typval_T *tv1, typval_T *tv2, പൂർണ്ണസംഖ്യ op)
 {
     varnumber_T	n1, n2;
     float_T	f1, f2;
-    int		error;
-    int		use_float = FALSE;
+    പൂർണ്ണസംഖ്യ		error;
+    പൂർണ്ണസംഖ്യ		use_float = FALSE;
 
     f1 = 0;
     f2 = 0;
     error = FALSE;
-    if (tv1->v_type == VAR_FLOAT)
+    എങ്കിൽ (tv1->v_type == VAR_FLOAT)
     {
 	f1 = tv1->vval.v_float;
 	use_float = TRUE;
 	n1 = 0;
     }
-    else
-	n1 = tv_get_number_chk(tv1, &error);
+    അല്ലെങ്കിൽ
+	n1 = tv_get_സംഖ്യ_chk(tv1, &error);
     clear_tv(tv1);
-    if (error)
+    എങ്കിൽ (error)
     {
 	clear_tv(tv2);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    if (tv2->v_type == VAR_FLOAT)
+    എങ്കിൽ (tv2->v_type == VAR_FLOAT)
     {
-	if (!use_float)
+	എങ്കിൽ (!use_float)
 	{
 	    f1 = n1;
 	    use_float = TRUE;
@@ -4850,13 +4850,13 @@ eval_multdiv_number(typval_T *tv1, typval_T *tv2, int op)
 	f2 = tv2->vval.v_float;
 	n2 = 0;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	n2 = tv_get_number_chk(tv2, &error);
+	n2 = tv_get_സംഖ്യ_chk(tv2, &error);
 	clear_tv(tv2);
-	if (error)
-	    return FAIL;
-	if (use_float)
+	എങ്കിൽ (error)
+	    തിരികെ FAIL;
+	എങ്കിൽ (use_float)
 	    f2 = n2;
     }
 
@@ -4864,57 +4864,57 @@ eval_multdiv_number(typval_T *tv1, typval_T *tv2, int op)
      * Compute the result.
      * When either side is a float the result is a float.
      */
-    if (use_float)
+    എങ്കിൽ (use_float)
     {
-	if (op == '*')
+	എങ്കിൽ (op == '*')
 	    f1 = f1 * f2;
-	else if (op == '/')
+	അല്ലെങ്കിൽ എങ്കിൽ (op == '/')
 	{
 #ifdef VMS
 	    // VMS crashes on divide by zero, work around it
-	    if (f2 == 0.0)
+	    എങ്കിൽ (f2 == 0.0)
 	    {
-		if (f1 == 0)
+		എങ്കിൽ (f1 == 0)
 		    f1 = -1 * __F_FLT_MAX - 1L;   // similar to NaN
-		else if (f1 < 0)
+		അല്ലെങ്കിൽ എങ്കിൽ (f1 < 0)
 		    f1 = -1 * __F_FLT_MAX;
-		else
+		അല്ലെങ്കിൽ
 		    f1 = __F_FLT_MAX;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		f1 = f1 / f2;
-#else
+#അല്ലെങ്കിൽ
 	    // We rely on the floating point library to handle divide
 	    // by zero to result in "inf" and not a crash.
 	    f1 = f1 / f2;
 #endif
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    emsg(_(e_cannot_use_percent_with_float));
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	tv1->v_type = VAR_FLOAT;
 	tv1->vval.v_float = f1;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	int	    failed = FALSE;
+	പൂർണ്ണസംഖ്യ	    failed = FALSE;
 
-	if (op == '*')
+	എങ്കിൽ (op == '*')
 	    n1 = n1 * n2;
-	else if (op == '/')
-	    n1 = num_divide(n1, n2, &failed);
-	else
-	    n1 = num_modulus(n1, n2, &failed);
-	if (failed)
-	    return FAIL;
+	അല്ലെങ്കിൽ എങ്കിൽ (op == '/')
+	    n1 = അക്കം_divide(n1, n2, &failed);
+	അല്ലെങ്കിൽ
+	    n1 = അക്കം_modulus(n1, n2, &failed);
+	എങ്കിൽ (failed)
+	    തിരികെ FAIL;
 
-	tv1->v_type = VAR_NUMBER;
-	tv1->vval.v_number = n1;
+	tv1->v_type = VAR_സംഖ്യ;
+	tv1->vval.v_സംഖ്യ = n1;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -4928,46 +4928,46 @@ eval_multdiv_number(typval_T *tv1, typval_T *tv2, int op)
  *
  * Return OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval7(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		want_string)  // after "." operator
+    പൂർണ്ണസംഖ്യ		want_string)  // after "." operator
 {
     /*
      * Get the first expression.
      */
-    if (eval8(arg, rettv, evalarg, want_string) == FAIL)
-	return FAIL;
+    എങ്കിൽ (eval8(arg, rettv, evalarg, want_string) == FAIL)
+	തിരികെ FAIL;
 
     /*
      * Repeat computing, until no '*', '/' or '%' is following.
      */
-    for (;;)
+    വേണ്ടി (;;)
     {
-	int	    evaluate;
-	int	    getnext;
+	പൂർണ്ണസംഖ്യ	    evaluate;
+	പൂർണ്ണസംഖ്യ	    getnext;
 	typval_T    var2;
 	char_u	    *p;
-	int	    op;
+	പൂർണ്ണസംഖ്യ	    op;
 
 	// "*=", "/=" and "%=" are assignments
 	p = eval_next_non_blank(*arg, evalarg, &getnext);
 	op = *p;
-	if ((op != '*' && op != '/' && op != '%') || p[1] == '=')
-	    break;
+	എങ്കിൽ ((op != '*' && op != '/' && op != '%') || p[1] == '=')
+	    നിർത്തുക;
 
-	evaluate = evalarg == NULL ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
-	if (getnext)
-	    *arg = eval_next_line(*arg, evalarg);
-	else
+	evaluate = evalarg == ശൂന്യ ? 0 : (evalarg->eval_flags & EVAL_EVALUATE);
+	എങ്കിൽ (getnext)
+	    *arg = eval_next_വരി(*arg, evalarg);
+	അല്ലെങ്കിൽ
 	{
-	    if (evaluate && in_vim9script() && !VIM_ISWHITE(**arg))
+	    എങ്കിൽ (evaluate && in_vim9script() && !VIM_ISWHITE(**arg))
 	    {
 		error_white_both(*arg, 1);
 		clear_tv(rettv);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	    *arg = p;
 	}
@@ -4975,23 +4975,23 @@ eval7(
 	/*
 	 * Get the second variable.
 	 */
-	if (evaluate && in_vim9script() && !IS_WHITE_OR_NUL((*arg)[1]))
+	എങ്കിൽ (evaluate && in_vim9script() && !IS_WHITE_OR_NUL((*arg)[1]))
 	{
 	    error_white_both(*arg, 1);
 	    clear_tv(rettv);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-	if (eval8(arg, &var2, evalarg, FALSE) == FAIL)
-	    return FAIL;
+	എങ്കിൽ (eval8(arg, &var2, evalarg, FALSE) == FAIL)
+	    തിരികെ FAIL;
 
-	if (evaluate)
+	എങ്കിൽ (evaluate)
 	    // Compute the result.
-	    if (eval_multdiv_number(rettv, &var2, op) == FAIL)
-		return FAIL;
+	    എങ്കിൽ (eval_multdiv_സംഖ്യ(rettv, &var2, op) == FAIL)
+		തിരികെ FAIL;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -5001,47 +5001,47 @@ eval7(
  * "arg" is advanced to just after the recognized expression.
  * Return OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval8(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		want_string)	// after "." operator
+    പൂർണ്ണസംഖ്യ		want_string)	// after "." operator
 {
-    type_T	*want_type = NULL;
+    type_T	*want_type = ശൂന്യ;
     garray_T	type_list;	    // list of pointers to allocated types
-    int		res;
-    int		evaluate = evalarg == NULL ? 0
+    പൂർണ്ണസംഖ്യ		res;
+    പൂർണ്ണസംഖ്യ		evaluate = evalarg == ശൂന്യ ? 0
 				       : (evalarg->eval_flags & EVAL_EVALUATE);
 
     // Recognize <type> in Vim9 script only.
-    if (in_vim9script() && **arg == '<' && eval_isnamec1((*arg)[1])
+    എങ്കിൽ (in_vim9script() && **arg == '<' && eval_isnamec1((*arg)[1])
 					     && STRNCMP(*arg, "<SNR>", 5) != 0)
     {
 	++*arg;
-	ga_init2(&type_list, sizeof(type_T *), 10);
-	if (!evaluate)
+	ga_init2(&type_list, വലുപ്പം(type_T *), 10);
+	എങ്കിൽ (!evaluate)
 	    // Only skip over the type, it may use a type variable that is only
 	    // known when the expression is compiled, e.g. in a lambda.
 	    *arg = skip_type(*arg, FALSE);
-	else
+	അല്ലെങ്കിൽ
 	{
-	    want_type = parse_type(arg, &type_list, NULL, NULL, TRUE);
-	    if (want_type == NULL)
+	    want_type = parse_type(arg, &type_list, ശൂന്യ, ശൂന്യ, TRUE);
+	    എങ്കിൽ (want_type == ശൂന്യ)
 	    {
 		clear_type_list(&type_list);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	}
 
-	if (**arg != '>')
+	എങ്കിൽ (**arg != '>')
 	{
-	    if (*skipwhite(*arg) == '>')
+	    എങ്കിൽ (*skipwhite(*arg) == '>')
 		semsg(_(e_no_white_space_allowed_before_str_str), ">", *arg);
-	    else
+	    അല്ലെങ്കിൽ
 		emsg(_(e_missing_gt));
 	    clear_type_list(&type_list);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	++*arg;
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
@@ -5049,27 +5049,27 @@ eval8(
 
     res = eval9(arg, rettv, evalarg, want_string);
 
-    if (want_type != NULL)
+    എങ്കിൽ (want_type != ശൂന്യ)
     {
-	if (evaluate && res == OK)
+	എങ്കിൽ (evaluate && res == OK)
 	{
 	    type_T *actual = typval2type(rettv, get_copyID(), &type_list,
 							       TVTT_DO_MEMBER);
 
-	    if (!equal_type(want_type, actual, 0))
+	    എങ്കിൽ (!equal_type(want_type, actual, 0))
 	    {
-		if (want_type->tt_type == VAR_BOOL
+		എങ്കിൽ (want_type->tt_type == VAR_BOOL
 					&& actual->tt_type != VAR_BOOL
 					&& (actual->tt_flags & TTFLAG_BOOL_OK))
 		{
-		    int n = tv2bool(rettv);
+		    പൂർണ്ണസംഖ്യ n = tv2bool(rettv);
 
 		    // can use "0" and "1" for boolean in some places
 		    clear_tv(rettv);
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = n ? VVAL_TRUE : VVAL_FALSE;
+		    rettv->vval.v_സംഖ്യ = n ? VVAL_TRUE : VVAL_FALSE;
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
 		    where_T where = WHERE_INIT;
 
@@ -5080,239 +5080,239 @@ eval8(
 	clear_type_list(&type_list);
     }
 
-    return res;
+    തിരികെ res;
 }
 
-    int
-eval_leader(char_u **arg, int vim9)
+    പൂർണ്ണസംഖ്യ
+eval_leader(char_u **arg, പൂർണ്ണസംഖ്യ vim9)
 {
     char_u	*s = *arg;
     char_u	*p = *arg;
 
-    while (*p == '!' || *p == '-' || *p == '+')
+    ആകുമ്പോൾ (*p == '!' || *p == '-' || *p == '+')
     {
 	char_u *n = skipwhite(p + 1);
 
 	// ++, --, -+ and +- are not accepted in Vim9 script
-	if (vim9 && (*p == '-' || *p == '+') && (*n == '-' || *n == '+'))
+	എങ്കിൽ (vim9 && (*p == '-' || *p == '+') && (*n == '-' || *n == '+'))
 	{
 	    semsg(_(e_invalid_expression_str), s);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	p = n;
     }
     *arg = p;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Check for a predefined value "true", "false" and "null.*".
  * Return OK when recognized.
  */
-    int
-handle_predefined(char_u *s, int len, typval_T *rettv)
+    പൂർണ്ണസംഖ്യ
+handle_predefined(char_u *s, പൂർണ്ണസംഖ്യ len, typval_T *rettv)
 {
-    switch (len)
+    തിരഞ്ഞെടുപ്പ് (len)
     {
-	case 4: if (STRNCMP(s, "true", 4) == 0)
+	അവസ്ഥ 4: എങ്കിൽ (STRNCMP(s, "true", 4) == 0)
 		{
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = VVAL_TRUE;
-		    return OK;
+		    rettv->vval.v_സംഖ്യ = VVAL_TRUE;
+		    തിരികെ OK;
 		}
-		if (STRNCMP(s, "null", 4) == 0)
+		എങ്കിൽ (STRNCMP(s, "null", 4) == 0)
 		{
 		    rettv->v_type = VAR_SPECIAL;
-		    rettv->vval.v_number = VVAL_NULL;
-		    return OK;
+		    rettv->vval.v_സംഖ്യ = VVAL_NULL;
+		    തിരികെ OK;
 		}
-		break;
-	case 5: if (STRNCMP(s, "false", 5) == 0)
+		നിർത്തുക;
+	അവസ്ഥ 5: എങ്കിൽ (STRNCMP(s, "false", 5) == 0)
 		{
 		    rettv->v_type = VAR_BOOL;
-		    rettv->vval.v_number = VVAL_FALSE;
-		    return OK;
+		    rettv->vval.v_സംഖ്യ = VVAL_FALSE;
+		    തിരികെ OK;
 		}
-		break;
-	case 8: if (STRNCMP(s, "null_job", 8) == 0)
+		നിർത്തുക;
+	അവസ്ഥ 8: എങ്കിൽ (STRNCMP(s, "null_job", 8) == 0)
 		{
 #ifdef FEAT_JOB_CHANNEL
 		    rettv->v_type = VAR_JOB;
-		    rettv->vval.v_job = NULL;
-#else
+		    rettv->vval.v_job = ശൂന്യ;
+#അല്ലെങ്കിൽ
 		    rettv->v_type = VAR_SPECIAL;
-		    rettv->vval.v_number = VVAL_NULL;
+		    rettv->vval.v_സംഖ്യ = VVAL_NULL;
 #endif
-		    return OK;
+		    തിരികെ OK;
 		}
-		break;
-	case 9:
-		if (STRNCMP(s, "null_", 5) != 0)
-		    break;
+		നിർത്തുക;
+	അവസ്ഥ 9:
+		എങ്കിൽ (STRNCMP(s, "null_", 5) != 0)
+		    നിർത്തുക;
 		// null_list
-		if (STRNCMP(s + 5, "list", 4) == 0)
+		എങ്കിൽ (STRNCMP(s + 5, "list", 4) == 0)
 		{
 		    rettv->v_type = VAR_LIST;
-		    rettv->vval.v_list = NULL;
-		    return OK;
+		    rettv->vval.v_list = ശൂന്യ;
+		    തിരികെ OK;
 		}
 		// null_dict
-		if (STRNCMP(s + 5, "dict", 4) == 0)
+		എങ്കിൽ (STRNCMP(s + 5, "dict", 4) == 0)
 		{
 		    rettv->v_type = VAR_DICT;
-		    rettv->vval.v_dict = NULL;
-		    return OK;
+		    rettv->vval.v_dict = ശൂന്യ;
+		    തിരികെ OK;
 		}
 		// null_blob
-		if (STRNCMP(s + 5, "blob", 4) == 0)
+		എങ്കിൽ (STRNCMP(s + 5, "blob", 4) == 0)
 		{
 		    rettv->v_type = VAR_BLOB;
-		    rettv->vval.v_blob = NULL;
-		    return OK;
+		    rettv->vval.v_blob = ശൂന്യ;
+		    തിരികെ OK;
 		}
-		break;
-	case 10:
-		if (STRNCMP(s, "null_", 5) != 0)
-		    break;
+		നിർത്തുക;
+	അവസ്ഥ 10:
+		എങ്കിൽ (STRNCMP(s, "null_", 5) != 0)
+		    നിർത്തുക;
 		// null_class
-		if (STRNCMP(s + 5, "class", 5) == 0)
+		എങ്കിൽ (STRNCMP(s + 5, "class", 5) == 0)
 		{
 		    rettv->v_type = VAR_CLASS;
-		    rettv->vval.v_class = NULL;
-		    return OK;
+		    rettv->vval.v_class = ശൂന്യ;
+		    തിരികെ OK;
 		}
-		if (STRNCMP(s + 5, "tuple", 5) == 0)
+		എങ്കിൽ (STRNCMP(s + 5, "tuple", 5) == 0)
 		{
 		    rettv->v_type = VAR_TUPLE;
-		    rettv->vval.v_tuple = NULL;
-		    return OK;
+		    rettv->vval.v_tuple = ശൂന്യ;
+		    തിരികെ OK;
 		}
-		break;
-	case 11: if (STRNCMP(s, "null_string", 11) == 0)
+		നിർത്തുക;
+	അവസ്ഥ 11: എങ്കിൽ (STRNCMP(s, "null_string", 11) == 0)
 		{
 		    rettv->v_type = VAR_STRING;
-		    rettv->vval.v_string = NULL;
-		    return OK;
+		    rettv->vval.v_string = ശൂന്യ;
+		    തിരികെ OK;
 		}
-		if (STRNCMP(s, "null_object", 11) == 0)
+		എങ്കിൽ (STRNCMP(s, "null_object", 11) == 0)
 		{
 		    rettv->v_type = VAR_OBJECT;
-		    rettv->vval.v_object = NULL;
-		    return OK;
+		    rettv->vval.v_object = ശൂന്യ;
+		    തിരികെ OK;
 		}
-		break;
-	case 12:
-		if (STRNCMP(s, "null_channel", 12) == 0)
+		നിർത്തുക;
+	അവസ്ഥ 12:
+		എങ്കിൽ (STRNCMP(s, "null_channel", 12) == 0)
 		{
 #ifdef FEAT_JOB_CHANNEL
 		    rettv->v_type = VAR_CHANNEL;
-		    rettv->vval.v_channel = NULL;
-#else
+		    rettv->vval.v_channel = ശൂന്യ;
+#അല്ലെങ്കിൽ
 		    rettv->v_type = VAR_SPECIAL;
-		    rettv->vval.v_number = VVAL_NULL;
+		    rettv->vval.v_സംഖ്യ = VVAL_NULL;
 #endif
-		    return OK;
+		    തിരികെ OK;
 		}
-		if (STRNCMP(s, "null_partial", 12) == 0)
+		എങ്കിൽ (STRNCMP(s, "null_partial", 12) == 0)
 		{
 		    rettv->v_type = VAR_PARTIAL;
-		    rettv->vval.v_partial = NULL;
-		    return OK;
+		    rettv->vval.v_partial = ശൂന്യ;
+		    തിരികെ OK;
 		}
-		break;
-	case 13: if (STRNCMP(s, "null_function", 13) == 0)
+		നിർത്തുക;
+	അവസ്ഥ 13: എങ്കിൽ (STRNCMP(s, "null_function", 13) == 0)
 		{
 		    rettv->v_type = VAR_FUNC;
-		    rettv->vval.v_string = NULL;
-		    return OK;
+		    rettv->vval.v_string = ശൂന്യ;
+		    തിരികെ OK;
 		}
-		break;
+		നിർത്തുക;
     }
-    return FAIL;
+    തിരികെ FAIL;
 }
 
 /*
  * Handle register contents: @r.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 eval9_reg_contents(
     char_u	**arg,
     typval_T	*rettv,
-    int		evaluate)
+    പൂർണ്ണസംഖ്യ		evaluate)
 {
-    int		vim9script = in_vim9script();
+    പൂർണ്ണസംഖ്യ		vim9script = in_vim9script();
 
     ++*arg;	// skip '@'
-    if (evaluate)
+    എങ്കിൽ (evaluate)
     {
-	if (vim9script && IS_WHITE_OR_NUL(**arg))
+	എങ്കിൽ (vim9script && IS_WHITE_OR_NUL(**arg))
 	    semsg(_(e_syntax_error_at_str), *arg);
-	else if (vim9script && !valid_yank_reg(**arg, FALSE))
+	അല്ലെങ്കിൽ എങ്കിൽ (vim9script && !valid_yank_reg(**arg, FALSE))
 	    emsg_invreg(**arg);
-	else
+	അല്ലെങ്കിൽ
 	{
 	    rettv->v_type = VAR_STRING;
 	    rettv->vval.v_string = get_reg_contents(**arg,
-		    GREG_EXPR_SRC);
+		    GREG_വ്യഞ്ജകം_SRC);
 	}
     }
-    if (**arg != NUL)
+    എങ്കിൽ (**arg != NUL)
 	++*arg;
 }
 
 /*
  * Handle a nested expression: (expression) or lambda: (arg) => expr
  */
-    static int
-eval9_nested_expr(
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+eval9_nested_വ്യഞ്ജകം(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		evaluate)
+    പൂർണ്ണസംഖ്യ		evaluate)
 {
-    int		ret = NOTDONE;
-    int		vim9script = in_vim9script();
+    പൂർണ്ണസംഖ്യ		ret = NOTDONE;
+    പൂർണ്ണസംഖ്യ		vim9script = in_vim9script();
 
-    if (vim9script)
+    എങ്കിൽ (vim9script)
     {
-	ret = get_lambda_tv(arg, rettv, TRUE, evalarg, NULL);
-	if (ret == OK && evaluate)
+	ret = get_lambda_tv(arg, rettv, TRUE, evalarg, ശൂന്യ);
+	എങ്കിൽ (ret == OK && evaluate)
 	{
 	    ufunc_T *ufunc = rettv->vval.v_partial->pt_func;
 
 	    // Compile it here to get the return type.  The return
 	    // type is optional, when it's missing use t_unknown.
 	    // This is recognized in compile_return().
-	    if (ufunc->uf_ret_type->tt_type == VAR_VOID)
+	    എങ്കിൽ (ufunc->uf_ret_type->tt_type == VAR_VOID)
 		ufunc->uf_ret_type = &t_unknown;
-	    if (compile_def_function(ufunc, FALSE,
-				get_compile_type(ufunc), NULL) == FAIL)
+	    എങ്കിൽ (compile_def_function(ufunc, FALSE,
+				get_compile_type(ufunc), ശൂന്യ) == FAIL)
 	    {
 		clear_tv(rettv);
 		ret = FAIL;
 	    }
 	}
     }
-    if (ret == NOTDONE)
+    എങ്കിൽ (ret == NOTDONE)
     {
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-	if (**arg == ')')
+	എങ്കിൽ (**arg == ')')
 	    // empty tuple
 	    ret = eval_tuple(arg, rettv, evalarg, TRUE);
-	else
+	അല്ലെങ്കിൽ
 	{
 	    ret = eval1(arg, rettv, evalarg);	// recursive!
-	    if (ret != OK)
-		return ret;
+	    എങ്കിൽ (ret != OK)
+		തിരികെ ret;
 
 	    *arg = skipwhite_and_linebreak(*arg, evalarg);
 
-	    if (**arg == ',')
+	    എങ്കിൽ (**arg == ',')
 		// tuple
 		ret = eval_tuple(arg, rettv, evalarg, TRUE);
-	    else if (**arg == ')')
+	    അല്ലെങ്കിൽ എങ്കിൽ (**arg == ')')
 		++*arg;
-	    else if (ret == OK)
+	    അല്ലെങ്കിൽ എങ്കിൽ (ret == OK)
 	    {
 		emsg(_(e_missing_closing_paren));
 		clear_tv(rettv);
@@ -5321,90 +5321,90 @@ eval9_nested_expr(
 	}
     }
 
-    return ret;
+    തിരികെ ret;
 }
 
 /*
 * Handle be a variable or function name.
 * Can also be a curly-braces kind of name: {expr}.
 */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval9_var_func_name(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		evaluate,
+    പൂർണ്ണസംഖ്യ		evaluate,
     char_u	**name_start)
 {
     char_u	*s;
-    int		len;
+    പൂർണ്ണസംഖ്യ		len;
     char_u	*alias;
-    int		ret = OK;
-    int		vim9script = in_vim9script();
+    പൂർണ്ണസംഖ്യ		ret = OK;
+    പൂർണ്ണസംഖ്യ		vim9script = in_vim9script();
 
     s = *arg;
     len = get_name_len(arg, &alias, evaluate, TRUE);
-    if (alias != NULL)
+    എങ്കിൽ (alias != ശൂന്യ)
 	s = alias;
 
-    if (len <= 0)
+    എങ്കിൽ (len <= 0)
 	ret = FAIL;
-    else
+    അല്ലെങ്കിൽ
     {
-	int	flags = evalarg == NULL ? 0 : evalarg->eval_flags;
+	പൂർണ്ണസംഖ്യ	flags = evalarg == ശൂന്യ ? 0 : evalarg->eval_flags;
 
-	if (evaluate && vim9script && len == 1 && *s == '_')
+	എങ്കിൽ (evaluate && vim9script && len == 1 && *s == '_')
 	{
 	    emsg(_(e_cannot_use_underscore_here));
 	    ret = FAIL;
 	}
-	else if (evaluate && vim9script && len > 2
+	അല്ലെങ്കിൽ എങ്കിൽ (evaluate && vim9script && len > 2
 						&& s[0] == 's' && s[1] == ':')
 	{
 	    semsg(_(e_cannot_use_s_colon_in_vim9_script_str), s);
 	    ret = FAIL;
 	}
-	else if ((vim9script ? **arg : *skipwhite(*arg)) == '('
+	അല്ലെങ്കിൽ എങ്കിൽ ((vim9script ? **arg : *skipwhite(*arg)) == '('
 				|| (vim9script && generic_func_call(arg)))
 	{
 	    // "name(..."  recursive!
 	    *arg = skipwhite(*arg);
-	    ret = eval_func(arg, evalarg, s, len, rettv, flags, NULL);
+	    ret = eval_func(arg, evalarg, s, len, rettv, flags, ശൂന്യ);
 	}
-	else if (evaluate)
+	അല്ലെങ്കിൽ എങ്കിൽ (evaluate)
 	{
 	    // get the value of "true", "false", etc. or a variable
 	    ret = FAIL;
-	    if (vim9script)
+	    എങ്കിൽ (vim9script)
 		ret = handle_predefined(s, len, rettv);
-	    if (ret == FAIL)
+	    എങ്കിൽ (ret == FAIL)
 	    {
 		*name_start = s;
-		ret = eval_variable(s, len, 0, rettv, NULL,
+		ret = eval_variable(s, len, 0, rettv, ശൂന്യ,
 					EVAL_VAR_VERBOSE + EVAL_VAR_IMPORT);
 
 		// skip the generic function arguments (if present)
 		// they are already processed by eval_variable
-		if (ret == OK && vim9script && **arg == '<'
+		എങ്കിൽ (ret == OK && vim9script && **arg == '<'
 						&& rettv->v_type == VAR_FUNC)
 		    ret = skip_generic_func_type_args(arg);
 	    }
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // skip the name
 	    check_vars(s, len);
 
 	    // Skip the type arguments of a generic function, its name starts
 	    // with an uppercase letter.
-	    if (vim9script && **arg == '<' && ASCII_ISUPPER(*s))
+	    എങ്കിൽ (vim9script && **arg == '<' && ASCII_ISUPPER(*s))
 		skip_generic_func_type_args(arg);
 	    ret = OK;
 	}
     }
     vim_free(alias);
 
-    return ret;
+    തിരികെ ret;
 }
 
 /*
@@ -5438,20 +5438,20 @@ eval9_var_func_name(
  *
  * Return OK or FAIL.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval9(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		want_string)	// after "." operator
+    പൂർണ്ണസംഖ്യ		want_string)	// after "." operator
 {
-    int		evaluate = evalarg != NULL
+    പൂർണ്ണസംഖ്യ		evaluate = evalarg != ശൂന്യ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
-    char_u	*name_start = NULL;
+    char_u	*name_start = ശൂന്യ;
     char_u	*start_leader, *end_leader;
-    int		ret = OK;
-    static int	recurse = 0;
-    int		vim9script = in_vim9script();
+    പൂർണ്ണസംഖ്യ		ret = OK;
+    സ്ഥിതം പൂർണ്ണസംഖ്യ	recurse = 0;
+    പൂർണ്ണസംഖ്യ		vim9script = in_vim9script();
 
     /*
      * Initialise variable so that clear_tv() can't mistake this for a
@@ -5463,127 +5463,127 @@ eval9(
      * Skip '!', '-' and '+' characters.  They are handled later.
      */
     start_leader = *arg;
-    if (eval_leader(arg, vim9script) == FAIL)
-	return FAIL;
+    എങ്കിൽ (eval_leader(arg, vim9script) == FAIL)
+	തിരികെ FAIL;
     end_leader = *arg;
 
-    if (**arg == '.' && (!SAFE_isdigit(*(*arg + 1)) || in_old_script(2)))
+    എങ്കിൽ (**arg == '.' && (!SAFE_isdigit(*(*arg + 1)) || in_old_script(2)))
     {
 	semsg(_(e_invalid_expression_str), *arg);
 	++*arg;
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     // Limit recursion to 1000 levels.  At least at 10000 we run out of stack
     // and crash.  With MSVC the stack is smaller.
-    if (recurse ==
+    എങ്കിൽ (recurse ==
 #ifdef _MSC_VER
 		    300
-#else
+#അല്ലെങ്കിൽ
 		    1000
 #endif
 		    )
     {
 	semsg(_(e_expression_too_recursive_str), *arg);
-	return FAIL;
+	തിരികെ FAIL;
     }
     ++recurse;
 
-    switch (**arg)
+    തിരഞ്ഞെടുപ്പ് (**arg)
     {
     /*
      * Number constant.
      */
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-    case '.':	ret = eval_number(arg, rettv, evaluate, want_string);
+    അവസ്ഥ '0':
+    അവസ്ഥ '1':
+    അവസ്ഥ '2':
+    അവസ്ഥ '3':
+    അവസ്ഥ '4':
+    അവസ്ഥ '5':
+    അവസ്ഥ '6':
+    അവസ്ഥ '7':
+    അവസ്ഥ '8':
+    അവസ്ഥ '9':
+    അവസ്ഥ '.':	ret = eval_സംഖ്യ(arg, rettv, evaluate, want_string);
 
 		// Apply prefixed "-" and "+" now.  Matters especially when
 		// "->" follows.
-		if (ret == OK && evaluate && end_leader > start_leader
+		എങ്കിൽ (ret == OK && evaluate && end_leader > start_leader
 						  && rettv->v_type != VAR_BLOB)
 		    ret = eval9_leader(rettv, TRUE, start_leader, &end_leader);
-		break;
+		നിർത്തുക;
 
     /*
      * String constant: "string".
      */
-    case '"':	ret = eval_string(arg, rettv, evaluate, FALSE);
-		break;
+    അവസ്ഥ '"':	ret = eval_string(arg, rettv, evaluate, FALSE);
+		നിർത്തുക;
 
     /*
      * Literal string constant: 'str''ing'.
      */
-    case '\'':	ret = eval_lit_string(arg, rettv, evaluate, FALSE);
-		break;
+    അവസ്ഥ '\'':	ret = eval_lit_string(arg, rettv, evaluate, FALSE);
+		നിർത്തുക;
 
     /*
      * List: [expr, expr]
      */
-    case '[':	ret = eval_list(arg, rettv, evalarg, TRUE);
-		break;
+    അവസ്ഥ '[':	ret = eval_list(arg, rettv, evalarg, TRUE);
+		നിർത്തുക;
 
     /*
      * Literal Dictionary: #{key: val, key: val}
      */
-    case '#':	ret = eval_lit_dict(arg, rettv, evalarg);
-		break;
+    അവസ്ഥ '#':	ret = eval_lit_dict(arg, rettv, evalarg);
+		നിർത്തുക;
 
     /*
      * Lambda: {arg, arg -> expr}
      * Dictionary: {'key': val, 'key': val}
      */
-    case '{':	if (vim9script)
+    അവസ്ഥ '{':	എങ്കിൽ (vim9script)
 		    ret = NOTDONE;
-		else
-		    ret = get_lambda_tv(arg, rettv, vim9script, evalarg, NULL);
-		if (ret == NOTDONE)
+		അല്ലെങ്കിൽ
+		    ret = get_lambda_tv(arg, rettv, vim9script, evalarg, ശൂന്യ);
+		എങ്കിൽ (ret == NOTDONE)
 		    ret = eval_dict(arg, rettv, evalarg, FALSE);
-		break;
+		നിർത്തുക;
 
     /*
      * Option value: &name
      */
-    case '&':	ret = eval_option(arg, rettv, evaluate);
-		break;
+    അവസ്ഥ '&':	ret = eval_option(arg, rettv, evaluate);
+		നിർത്തുക;
 
     /*
      * Environment variable: $VAR.
      * Interpolated string: $"string" or $'string'.
      */
-    case '$':	if ((*arg)[1] == '"' || (*arg)[1] == '\'')
+    അവസ്ഥ '$':	എങ്കിൽ ((*arg)[1] == '"' || (*arg)[1] == '\'')
 		    ret = eval_interp_string(arg, rettv, evaluate);
-		else
+		അല്ലെങ്കിൽ
 		    ret = eval_env_var(arg, rettv, evaluate);
-		break;
+		നിർത്തുക;
 
     /*
      * Register contents: @r.
      */
-    case '@':	eval9_reg_contents(arg, rettv, evaluate);
-		break;
+    അവസ്ഥ '@':	eval9_reg_contents(arg, rettv, evaluate);
+		നിർത്തുക;
 
     /*
      * nested expression: (expression).
      * or lambda: (arg) => expr
      * or tuple
      */
-    case '(':	ret = eval9_nested_expr(arg, rettv, evalarg, evaluate);
-		break;
+    അവസ്ഥ '(':	ret = eval9_nested_വ്യഞ്ജകം(arg, rettv, evalarg, evaluate);
+		നിർത്തുക;
 
-    default:	ret = NOTDONE;
-		break;
+    സ്ഥിരസ്ഥിതി:	ret = NOTDONE;
+		നിർത്തുക;
     }
 
-    if (ret == NOTDONE)
+    എങ്കിൽ (ret == NOTDONE)
     {
 	/*
 	 * Must be a variable or function name.
@@ -5594,17 +5594,17 @@ eval9(
 
     // Handle following '[', '(' and '.' for expr[expr], expr.name,
     // expr(expr), expr->name(expr)
-    if (ret == OK)
+    എങ്കിൽ (ret == OK)
 	ret = handle_subscript(arg, name_start, rettv, evalarg, evaluate);
 
     /*
      * Apply logical NOT and unary '-', from right to left, ignore '+'.
      */
-    if (ret == OK && evaluate && end_leader > start_leader)
+    എങ്കിൽ (ret == OK && evaluate && end_leader > start_leader)
 	ret = eval9_leader(rettv, FALSE, start_leader, &end_leader);
 
     --recurse;
-    return ret;
+    തിരികെ ret;
 }
 
 /*
@@ -5612,141 +5612,141 @@ eval9(
  * When "numeric_only" is TRUE only handle "+" and "-".
  * Adjusts "end_leaderp" until it is at "start_leader".
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval9_leader(
 	typval_T    *rettv,
-	int	    numeric_only,
+	പൂർണ്ണസംഖ്യ	    numeric_only,
 	char_u	    *start_leader,
 	char_u	    **end_leaderp)
 {
     char_u	*end_leader = *end_leaderp;
-    int		ret = OK;
-    int		error = FALSE;
+    പൂർണ്ണസംഖ്യ		ret = OK;
+    പൂർണ്ണസംഖ്യ		error = FALSE;
     varnumber_T val = 0;
     vartype_T	type = rettv->v_type;
-    int		vim9script = in_vim9script();
+    പൂർണ്ണസംഖ്യ		vim9script = in_vim9script();
     float_T	    f = 0.0;
 
-    if (rettv->v_type == VAR_FLOAT)
+    എങ്കിൽ (rettv->v_type == VAR_FLOAT)
 	f = rettv->vval.v_float;
-    else
+    അല്ലെങ്കിൽ
     {
-	while (VIM_ISWHITE(end_leader[-1]))
+	ആകുമ്പോൾ (VIM_ISWHITE(end_leader[-1]))
 	    --end_leader;
-	if (vim9script && end_leader[-1] == '!')
+	എങ്കിൽ (vim9script && end_leader[-1] == '!')
 	{
 	    // Is this typeval supported with the ! operator?
-	    if (check_typval_is_value(rettv) == FAIL)
+	    എങ്കിൽ (check_typval_is_മൂല്യം(rettv) == FAIL)
 	    {
 		clear_tv(rettv);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	    val = tv2bool(rettv);
 	}
-	else
-	    val = tv_get_number_chk(rettv, &error);
+	അല്ലെങ്കിൽ
+	    val = tv_get_സംഖ്യ_chk(rettv, &error);
     }
-    if (error)
+    എങ്കിൽ (error)
     {
 	clear_tv(rettv);
 	ret = FAIL;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	while (end_leader > start_leader)
+	ആകുമ്പോൾ (end_leader > start_leader)
 	{
 	    --end_leader;
-	    if (*end_leader == '!')
+	    എങ്കിൽ (*end_leader == '!')
 	    {
-		if (numeric_only)
+		എങ്കിൽ (numeric_only)
 		{
 		    ++end_leader;
-		    break;
+		    നിർത്തുക;
 		}
-		if (rettv->v_type == VAR_FLOAT)
+		എങ്കിൽ (rettv->v_type == VAR_FLOAT)
 		{
 		    rettv->v_type = VAR_BOOL;
 		    val = f == 0.0 ? VVAL_TRUE : VVAL_FALSE;
 		    type = VAR_BOOL;
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
 		    val = !val;
 		    type = VAR_BOOL;
 		}
 	    }
-	    else if (*end_leader == '-')
+	    അല്ലെങ്കിൽ എങ്കിൽ (*end_leader == '-')
 	    {
-		if (rettv->v_type == VAR_FLOAT)
+		എങ്കിൽ (rettv->v_type == VAR_FLOAT)
 		    f = -f;
-		else
+		അല്ലെങ്കിൽ
 		{
 		    val = -val;
-		    type = VAR_NUMBER;
+		    type = VAR_സംഖ്യ;
 		}
 	    }
 	}
-	if (rettv->v_type == VAR_FLOAT)
+	എങ്കിൽ (rettv->v_type == VAR_FLOAT)
 	{
 	    clear_tv(rettv);
 	    rettv->vval.v_float = f;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    clear_tv(rettv);
-	    if (vim9script)
+	    എങ്കിൽ (vim9script)
 		rettv->v_type = type;
-	    else
-		rettv->v_type = VAR_NUMBER;
-	    rettv->vval.v_number = val;
+	    അല്ലെങ്കിൽ
+		rettv->v_type = VAR_സംഖ്യ;
+	    rettv->vval.v_സംഖ്യ = val;
 	}
     }
     *end_leaderp = end_leader;
-    return ret;
+    തിരികെ ret;
 }
 
 /*
  * Call the function referred to in "rettv".
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 call_func_rettv(
 	char_u	    **arg,
 	evalarg_T   *evalarg,
 	typval_T    *rettv,
-	int	    evaluate,
+	പൂർണ്ണസംഖ്യ	    evaluate,
 	dict_T	    *selfdict,
 	typval_T    *basetv)
 {
-    partial_T	*pt = NULL;
+    partial_T	*pt = ശൂന്യ;
     funcexe_T	funcexe;
     typval_T	functv;
     char_u	*s;
-    int		ret;
+    പൂർണ്ണസംഖ്യ		ret;
 
     // need to copy the funcref so that we can clear rettv
-    if (evaluate)
+    എങ്കിൽ (evaluate)
     {
 	functv = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
 	// Invoke the function.  Recursive!
-	if (functv.v_type == VAR_PARTIAL)
+	എങ്കിൽ (functv.v_type == VAR_PARTIAL)
 	{
 	    pt = functv.vval.v_partial;
 	    s = partial_name(pt);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    s = functv.vval.v_string;
-	    if (s == NULL || *s == NUL)
+	    എങ്കിൽ (s == ശൂന്യ || *s == NUL)
 	    {
 		emsg(_(e_empty_function_name));
 		ret = FAIL;
-		goto theend;
+		പോകുക theend;
 	    }
 	}
     }
-    else
+    അല്ലെങ്കിൽ
 	s = (char_u *)"";
 
     CLEAR_FIELD(funcexe);
@@ -5754,25 +5754,25 @@ call_func_rettv(
     funcexe.fe_lastline = curwin->w_cursor.lnum;
     funcexe.fe_evaluate = evaluate;
     funcexe.fe_partial = pt;
-    if (pt != NULL)
+    എങ്കിൽ (pt != ശൂന്യ)
     {
 	funcexe.fe_object = pt->pt_obj;
-	if (funcexe.fe_object != NULL)
+	എങ്കിൽ (funcexe.fe_object != ശൂന്യ)
 	    ++funcexe.fe_object->obj_refcount;
     }
     funcexe.fe_selfdict = selfdict;
     funcexe.fe_basetv = basetv;
-    if (evalarg != NULL)
+    എങ്കിൽ (evalarg != ശൂന്യ)
 	funcexe.fe_cctx = evalarg->eval_cctx;
     ret = get_func_tv(s, -1, rettv, arg, evalarg, &funcexe);
 
 theend:
     // Clear the funcref afterwards, so that deleting it while
     // evaluating the arguments is possible (see test55).
-    if (evaluate)
+    എങ്കിൽ (evaluate)
 	clear_tv(&functv);
 
-    return ret;
+    തിരികെ ret;
 }
 
 /*
@@ -5780,68 +5780,68 @@ theend:
  * "*arg" points to "method".
  * Returns FAIL or OK. "*arg" is advanced to after the ')'.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval_lambda(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose)	// give error messages
+    പൂർണ്ണസംഖ്യ		verbose)	// give error messages
 {
-    int		evaluate = evalarg != NULL
+    പൂർണ്ണസംഖ്യ		evaluate = evalarg != ശൂന്യ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
     typval_T	base = *rettv;
-    int		ret;
+    പൂർണ്ണസംഖ്യ		ret;
 
     rettv->v_type = VAR_UNKNOWN;
 
-    if (**arg == '{')
+    എങ്കിൽ (**arg == '{')
     {
 	// ->{lambda}()
-	ret = get_lambda_tv(arg, rettv, FALSE, evalarg, NULL);
+	ret = get_lambda_tv(arg, rettv, FALSE, evalarg, ശൂന്യ);
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	// ->(lambda)()
 	++*arg;
 	ret = eval1(arg, rettv, evalarg);
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg != ')')
+	എങ്കിൽ (**arg != ')')
 	{
 	    emsg(_(e_missing_closing_paren));
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
-	if (rettv->v_type != VAR_STRING && rettv->v_type != VAR_FUNC
+	എങ്കിൽ (rettv->v_type != VAR_STRING && rettv->v_type != VAR_FUNC
 					       && rettv->v_type != VAR_PARTIAL)
 	{
-	    emsg(_(e_string_or_function_required_for_arrow_parens_expr));
-	    return FAIL;
+	    emsg(_(e_string_or_function_required_for_arrow_parens_വ്യഞ്ജകം));
+	    തിരികെ FAIL;
 	}
 	++*arg;
     }
-    if (ret != OK)
-	return FAIL;
+    എങ്കിൽ (ret != OK)
+	തിരികെ FAIL;
 
-    if (**arg != '(')
+    എങ്കിൽ (**arg != '(')
     {
-	if (verbose)
+	എങ്കിൽ (verbose)
 	{
-	    if (*skipwhite(*arg) == '(')
+	    എങ്കിൽ (*skipwhite(*arg) == '(')
 		emsg(_(e_no_white_space_allowed_before_parenthesis));
-	    else
+	    അല്ലെങ്കിൽ
 		semsg(_(e_missing_parenthesis_str), "lambda");
 	}
 	clear_tv(rettv);
 	ret = FAIL;
     }
-    else
-	ret = call_func_rettv(arg, evalarg, rettv, evaluate, NULL, &base);
+    അല്ലെങ്കിൽ
+	ret = call_func_rettv(arg, evalarg, rettv, evaluate, ശൂന്യ, &base);
 
     // Clear the funcref afterwards, so that deleting it while
     // evaluating the arguments is possible (see test55).
-    if (evaluate)
+    എങ്കിൽ (evaluate)
 	clear_tv(&base);
 
-    return ret;
+    തിരികെ ret;
 }
 
 /*
@@ -5849,36 +5849,36 @@ eval_lambda(
  * "*arg" points to "method".
  * Returns FAIL or OK. "*arg" is advanced to after the ')'.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval_method(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose)	// give error messages
+    പൂർണ്ണസംഖ്യ		verbose)	// give error messages
 {
     char_u	*name;
     long	len;
     char_u	*alias;
-    char_u	*tofree = NULL;
+    char_u	*tofree = ശൂന്യ;
     typval_T	base = *rettv;
-    int		ret = OK;
-    int		evaluate = evalarg != NULL
+    പൂർണ്ണസംഖ്യ		ret = OK;
+    പൂർണ്ണസംഖ്യ		evaluate = evalarg != ശൂന്യ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
 
     rettv->v_type = VAR_UNKNOWN;
 
     name = *arg;
     len = get_name_len(arg, &alias, evaluate, evaluate);
-    if (alias != NULL)
+    എങ്കിൽ (alias != ശൂന്യ)
 	name = alias;
 
-    if (len <= 0)
+    എങ്കിൽ (len <= 0)
     {
-	if (verbose)
+	എങ്കിൽ (verbose)
 	    emsg(_(e_missing_name_after_method));
 	ret = FAIL;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	char_u *paren;
 
@@ -5887,55 +5887,55 @@ eval_method(
 	// Does not handle anything where "(" is part of the expression.
 	*arg = skipwhite(*arg);
 
-	if (**arg != '(' && alias == NULL
-				    && (paren = vim_strchr(*arg, '(')) != NULL)
+	എങ്കിൽ (**arg != '(' && alias == ശൂന്യ
+				    && (paren = vim_strchr(*arg, '(')) != ശൂന്യ)
 	{
 	    *arg = name;
 
 	    // Truncate the name at the "(".  Avoid trying to get another line
 	    // by making "getline" NULL.
 	    *paren = NUL;
-	    char_u	*(*getline)(int, void *, int, getline_opt_T) = NULL;
-	    if (evalarg != NULL)
+	    char_u	*(*getline)(പൂർണ്ണസംഖ്യ, ശൂന്യം *, പൂർണ്ണസംഖ്യ, getline_opt_T) = ശൂന്യ;
+	    എങ്കിൽ (evalarg != ശൂന്യ)
 	    {
 		getline = evalarg->eval_getline;
-		evalarg->eval_getline = NULL;
+		evalarg->eval_getline = ശൂന്യ;
 	    }
 
 	    char_u *deref = deref_function_name(arg, &tofree, evalarg, verbose);
-	    if (deref == NULL)
+	    എങ്കിൽ (deref == ശൂന്യ)
 	    {
 		*arg = name + len;
 		ret = FAIL;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		name = deref;
 		len = (long)STRLEN(name);
 	    }
 
 	    *paren = '(';
-	    if (getline != NULL)
+	    എങ്കിൽ (getline != ശൂന്യ)
 		evalarg->eval_getline = getline;
 	}
 
-	if (ret == OK)
+	എങ്കിൽ (ret == OK)
 	{
 	    *arg = skipwhite(*arg);
 
-	    if (**arg != '(')
+	    എങ്കിൽ (**arg != '(')
 	    {
-		if (verbose)
+		എങ്കിൽ (verbose)
 		    semsg(_(e_missing_parenthesis_str), name);
 		ret = FAIL;
 	    }
-	    else if (VIM_ISWHITE((*arg)[-1]))
+	    അല്ലെങ്കിൽ എങ്കിൽ (VIM_ISWHITE((*arg)[-1]))
 	    {
-		if (verbose)
+		എങ്കിൽ (verbose)
 		    emsg(_(e_no_white_space_allowed_before_parenthesis));
 		ret = FAIL;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		ret = eval_func(arg, evalarg, name, len, rettv,
 					  evaluate ? EVAL_EVALUATE : 0, &base);
 	}
@@ -5943,14 +5943,14 @@ eval_method(
 
     // Clear the funcref afterwards, so that deleting it while
     // evaluating the arguments is possible (see test55).
-    if (evaluate)
+    എങ്കിൽ (evaluate)
 	clear_tv(&base);
     vim_free(tofree);
 
-    if (alias != NULL)
+    എങ്കിൽ (alias != ശൂന്യ)
 	vim_free(alias);
 
-    return ret;
+    തിരികെ ret;
 }
 
 /*
@@ -5958,49 +5958,49 @@ eval_method(
  * "*arg" points to the '[' or '.'.
  * Returns FAIL or OK. "*arg" is advanced to after the ']'.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 eval_index(
     char_u	**arg,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose)	// give error messages
+    പൂർണ്ണസംഖ്യ		verbose)	// give error messages
 {
-    int		evaluate = evalarg != NULL
+    പൂർണ്ണസംഖ്യ		evaluate = evalarg != ശൂന്യ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
-    int		empty1 = FALSE, empty2 = FALSE;
+    പൂർണ്ണസംഖ്യ		empty1 = FALSE, empty2 = FALSE;
     typval_T	var1, var2;
-    int		range = FALSE;
-    char_u	*key = NULL;
-    int		keylen = -1;
-    int		vim9script = in_vim9script();
+    പൂർണ്ണസംഖ്യ		range = FALSE;
+    char_u	*താക്കോൽ = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		keylen = -1;
+    പൂർണ്ണസംഖ്യ		vim9script = in_vim9script();
 
-    if (check_can_index(rettv, evaluate, verbose) == FAIL)
-	return FAIL;
+    എങ്കിൽ (check_can_index(rettv, evaluate, verbose) == FAIL)
+	തിരികെ FAIL;
 
     init_tv(&var1);
     init_tv(&var2);
-    if (**arg == '.')
+    എങ്കിൽ (**arg == '.')
     {
 	/*
 	 * dict.name
 	 */
-	key = *arg + 1;
-	for (keylen = 0; eval_isdictc(key[keylen]); ++keylen)
+	താക്കോൽ = *arg + 1;
+	വേണ്ടി (keylen = 0; eval_isdictc(താക്കോൽ[keylen]); ++keylen)
 	    ;
-	if (keylen == 0)
-	    return FAIL;
-	if (vim9script && key[keylen] == '<')
+	എങ്കിൽ (keylen == 0)
+	    തിരികെ FAIL;
+	എങ്കിൽ (vim9script && താക്കോൽ[keylen] == '<')
 	{
 	    // skip generic type arguments
-	    char_u	*p = &key[keylen];
+	    char_u	*p = &താക്കോൽ[keylen];
 
-	    if (skip_generic_func_type_args(&p) == FAIL)
-		return FAIL;
-	    keylen = p - key;
+	    എങ്കിൽ (skip_generic_func_type_args(&p) == FAIL)
+		തിരികെ FAIL;
+	    keylen = p - താക്കോൽ;
 	}
-	*arg = key + keylen;
+	*arg = താക്കോൽ + keylen;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	/*
 	 * something[idx]
@@ -6008,39 +6008,39 @@ eval_index(
 	 * Get the (first) variable from inside the [].
 	 */
 	*arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-	if (**arg == ':')
+	എങ്കിൽ (**arg == ':')
 	    empty1 = TRUE;
-	else if (eval1(arg, &var1, evalarg) == FAIL)	// recursive!
-	    return FAIL;
-	else if (vim9script && **arg == ':')
+	അല്ലെങ്കിൽ എങ്കിൽ (eval1(arg, &var1, evalarg) == FAIL)	// recursive!
+	    തിരികെ FAIL;
+	അല്ലെങ്കിൽ എങ്കിൽ (vim9script && **arg == ':')
 	{
 	    semsg(_(e_white_space_required_before_and_after_str_at_str),
 								    ":", *arg);
 	    clear_tv(&var1);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
-	else if (evaluate)
+	അല്ലെങ്കിൽ എങ്കിൽ (evaluate)
 	{
-	    int error = FALSE;
+	    പൂർണ്ണസംഖ്യ error = FALSE;
 
 	    // allow for indexing with float
-	    if (vim9script && rettv->v_type == VAR_DICT
+	    എങ്കിൽ (vim9script && rettv->v_type == VAR_DICT
 						   && var1.v_type == VAR_FLOAT)
 	    {
 		var1.vval.v_string = typval_tostring(&var1, TRUE);
 		var1.v_type = VAR_STRING;
 	    }
 
-	    if (vim9script && (rettv->v_type == VAR_LIST
+	    എങ്കിൽ (vim9script && (rettv->v_type == VAR_LIST
 						|| rettv->v_type == VAR_TUPLE))
-		tv_get_number_chk(&var1, &error);
-	    else
-		error = tv_get_string_chk(&var1) == NULL;
-	    if (error)
+		tv_get_സംഖ്യ_chk(&var1, &error);
+	    അല്ലെങ്കിൽ
+		error = tv_get_string_chk(&var1) == ശൂന്യ;
+	    എങ്കിൽ (error)
 	    {
 		// not a number or string
 		clear_tv(&var1);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	}
 
@@ -6048,119 +6048,119 @@ eval_index(
 	 * Get the second variable from inside the [:].
 	 */
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == ':')
+	എങ്കിൽ (**arg == ':')
 	{
 	    range = TRUE;
 	    ++*arg;
-	    if (vim9script && !IS_WHITE_OR_NUL(**arg) && **arg != ']')
+	    എങ്കിൽ (vim9script && !IS_WHITE_OR_NUL(**arg) && **arg != ']')
 	    {
 		semsg(_(e_white_space_required_before_and_after_str_at_str),
 								":", *arg - 1);
-		if (!empty1)
+		എങ്കിൽ (!empty1)
 		    clear_tv(&var1);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	    *arg = skipwhite_and_linebreak(*arg, evalarg);
-	    if (**arg == ']')
+	    എങ്കിൽ (**arg == ']')
 		empty2 = TRUE;
-	    else if (eval1(arg, &var2, evalarg) == FAIL)	// recursive!
+	    അല്ലെങ്കിൽ എങ്കിൽ (eval1(arg, &var2, evalarg) == FAIL)	// recursive!
 	    {
-		if (!empty1)
+		എങ്കിൽ (!empty1)
 		    clear_tv(&var1);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
-	    else if (evaluate && tv_get_string_chk(&var2) == NULL)
+	    അല്ലെങ്കിൽ എങ്കിൽ (evaluate && tv_get_string_chk(&var2) == ശൂന്യ)
 	    {
 		// not a number or string
-		if (!empty1)
+		എങ്കിൽ (!empty1)
 		    clear_tv(&var1);
 		clear_tv(&var2);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	}
 
 	// Check for the ']'.
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg != ']')
+	എങ്കിൽ (**arg != ']')
 	{
-	    if (verbose)
+	    എങ്കിൽ (verbose)
 		emsg(_(e_missing_closing_square_brace));
 	    clear_tv(&var1);
-	    if (range)
+	    എങ്കിൽ (range)
 		clear_tv(&var2);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	*arg = *arg + 1;	// skip over the ']'
     }
 
-    if (evaluate)
+    എങ്കിൽ (evaluate)
     {
-	int res = eval_index_inner(rettv, range,
-		empty1 ? NULL : &var1, empty2 ? NULL : &var2, FALSE,
-		key, keylen, verbose);
+	പൂർണ്ണസംഖ്യ res = eval_index_inner(rettv, range,
+		empty1 ? ശൂന്യ : &var1, empty2 ? ശൂന്യ : &var2, FALSE,
+		താക്കോൽ, keylen, verbose);
 
-	if (!empty1)
+	എങ്കിൽ (!empty1)
 	    clear_tv(&var1);
-	if (range)
+	എങ്കിൽ (range)
 	    clear_tv(&var2);
-	return res;
+	തിരികെ res;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Check if "rettv" can have an [index] or [sli:ce]
  */
-    int
-check_can_index(typval_T *rettv, int evaluate, int verbose)
+    പൂർണ്ണസംഖ്യ
+check_can_index(typval_T *rettv, പൂർണ്ണസംഖ്യ evaluate, പൂർണ്ണസംഖ്യ verbose)
 {
-    switch (rettv->v_type)
+    തിരഞ്ഞെടുപ്പ് (rettv->v_type)
     {
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	    if (verbose)
+	അവസ്ഥ VAR_FUNC:
+	അവസ്ഥ VAR_PARTIAL:
+	    എങ്കിൽ (verbose)
 		emsg(_(e_cannot_index_a_funcref));
-	    return FAIL;
-	case VAR_FLOAT:
-	    if (verbose)
+	    തിരികെ FAIL;
+	അവസ്ഥ VAR_FLOAT:
+	    എങ്കിൽ (verbose)
 		emsg(_(e_using_float_as_string));
-	    return FAIL;
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_OBJECT:
-	    if (verbose)
+	    തിരികെ FAIL;
+	അവസ്ഥ VAR_BOOL:
+	അവസ്ഥ VAR_SPECIAL:
+	അവസ്ഥ VAR_JOB:
+	അവസ്ഥ VAR_CHANNEL:
+	അവസ്ഥ VAR_INSTR:
+	അവസ്ഥ VAR_OBJECT:
+	    എങ്കിൽ (verbose)
 		emsg(_(e_cannot_index_special_variable));
-	    return FAIL;
-	case VAR_CLASS:
-	case VAR_TYPEALIAS:
-	    if (verbose)
-		check_typval_is_value(rettv);
-	    return FAIL;
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	    if (evaluate)
+	    തിരികെ FAIL;
+	അവസ്ഥ VAR_CLASS:
+	അവസ്ഥ VAR_TYPEALIAS:
+	    എങ്കിൽ (verbose)
+		check_typval_is_മൂല്യം(rettv);
+	    തിരികെ FAIL;
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_ANY:
+	അവസ്ഥ VAR_VOID:
+	    എങ്കിൽ (evaluate)
 	    {
 		emsg(_(e_cannot_index_special_variable));
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	    // FALLTHROUGH
 
-	case VAR_STRING:
-	case VAR_LIST:
-	case VAR_TUPLE:
-	case VAR_DICT:
-	case VAR_BLOB:
-	    break;
-	case VAR_NUMBER:
-	    if (in_vim9script())
-		emsg(_(e_cannot_index_number));
-	    break;
+	അവസ്ഥ VAR_STRING:
+	അവസ്ഥ VAR_LIST:
+	അവസ്ഥ VAR_TUPLE:
+	അവസ്ഥ VAR_DICT:
+	അവസ്ഥ VAR_BLOB:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_സംഖ്യ:
+	    എങ്കിൽ (in_vim9script())
+		emsg(_(e_cannot_index_സംഖ്യ));
+	    നിർത്തുക;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -6171,161 +6171,161 @@ check_can_index(typval_T *rettv, int evaluate, int verbose)
  * index for string.
  * Alternatively, "key" is not NULL, then key[keylen] is the dict index.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 eval_index_inner(
 	typval_T    *rettv,
-	int	    is_range,
+	പൂർണ്ണസംഖ്യ	    is_range,
 	typval_T    *var1,
 	typval_T    *var2,
-	int	    exclusive,
-	char_u	    *key,
-	int	    keylen,
-	int	    verbose)
+	പൂർണ്ണസംഖ്യ	    exclusive,
+	char_u	    *താക്കോൽ,
+	പൂർണ്ണസംഖ്യ	    keylen,
+	പൂർണ്ണസംഖ്യ	    verbose)
 {
     varnumber_T	    n1, n2 = 0;
     long	    len;
 
     n1 = 0;
-    if (var1 != NULL && rettv->v_type != VAR_DICT)
-	n1 = tv_get_number(var1);
+    എങ്കിൽ (var1 != ശൂന്യ && rettv->v_type != VAR_DICT)
+	n1 = tv_get_സംഖ്യ(var1);
 
-    if (is_range)
+    എങ്കിൽ (is_range)
     {
-	if (rettv->v_type == VAR_DICT)
+	എങ്കിൽ (rettv->v_type == VAR_DICT)
 	{
-	    if (verbose)
+	    എങ്കിൽ (verbose)
 		emsg(_(e_cannot_slice_dictionary));
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
-	if (var2 != NULL)
-	    n2 = tv_get_number(var2);
-	else
+	എങ്കിൽ (var2 != ശൂന്യ)
+	    n2 = tv_get_സംഖ്യ(var2);
+	അല്ലെങ്കിൽ
 	    n2 = VARNUM_MAX;
     }
 
-    switch (rettv->v_type)
+    തിരഞ്ഞെടുപ്പ് (rettv->v_type)
     {
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_FLOAT:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
-	    break; // not evaluating, skipping over subscript
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_ANY:
+	അവസ്ഥ VAR_VOID:
+	അവസ്ഥ VAR_FUNC:
+	അവസ്ഥ VAR_PARTIAL:
+	അവസ്ഥ VAR_FLOAT:
+	അവസ്ഥ VAR_BOOL:
+	അവസ്ഥ VAR_SPECIAL:
+	അവസ്ഥ VAR_JOB:
+	അവസ്ഥ VAR_CHANNEL:
+	അവസ്ഥ VAR_INSTR:
+	അവസ്ഥ VAR_CLASS:
+	അവസ്ഥ VAR_OBJECT:
+	അവസ്ഥ VAR_TYPEALIAS:
+	    നിർത്തുക; // not evaluating, skipping over subscript
 
-	case VAR_NUMBER:
-	case VAR_STRING:
+	അവസ്ഥ VAR_സംഖ്യ:
+	അവസ്ഥ VAR_STRING:
 	    {
 		char_u	*s = tv_get_string(rettv);
 
 		len = (long)STRLEN(s);
-		if (in_vim9script() || exclusive)
+		എങ്കിൽ (in_vim9script() || exclusive)
 		{
-		    if (is_range)
+		    എങ്കിൽ (is_range)
 			s = string_slice(s, n1, n2, exclusive);
-		    else
+		    അല്ലെങ്കിൽ
 			s = char_from_string(s, n1);
 		}
-		else if (is_range)
+		അല്ലെങ്കിൽ എങ്കിൽ (is_range)
 		{
 		    // The resulting variable is a substring.  If the indexes
 		    // are out of range the result is empty.
-		    if (n1 < 0)
+		    എങ്കിൽ (n1 < 0)
 		    {
 			n1 = len + n1;
-			if (n1 < 0)
+			എങ്കിൽ (n1 < 0)
 			    n1 = 0;
 		    }
-		    if (n2 < 0)
+		    എങ്കിൽ (n2 < 0)
 			n2 = len + n2;
-		    else if (n2 >= len)
+		    അല്ലെങ്കിൽ എങ്കിൽ (n2 >= len)
 			n2 = len;
-		    if (n1 >= len || n2 < 0 || n1 > n2)
-			s = NULL;
-		    else
+		    എങ്കിൽ (n1 >= len || n2 < 0 || n1 > n2)
+			s = ശൂന്യ;
+		    അല്ലെങ്കിൽ
 			s = vim_strnsave(s + n1, n2 - n1 + 1);
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
 		    // The resulting variable is a string of a single
 		    // character.  If the index is too big or negative the
 		    // result is empty.
-		    if (n1 >= len || n1 < 0)
-			s = NULL;
-		    else
+		    എങ്കിൽ (n1 >= len || n1 < 0)
+			s = ശൂന്യ;
+		    അല്ലെങ്കിൽ
 			s = vim_strnsave(s + n1, 1);
 		}
 		clear_tv(rettv);
 		rettv->v_type = VAR_STRING;
 		rettv->vval.v_string = s;
 	    }
-	    break;
+	    നിർത്തുക;
 
-	case VAR_BLOB:
+	അവസ്ഥ VAR_BLOB:
 	    blob_slice_or_index(rettv->vval.v_blob, is_range, n1, n2,
 							     exclusive, rettv);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_LIST:
-	    if (var1 == NULL)
+	അവസ്ഥ VAR_LIST:
+	    എങ്കിൽ (var1 == ശൂന്യ)
 		n1 = 0;
-	    if (var2 == NULL)
+	    എങ്കിൽ (var2 == ശൂന്യ)
 		n2 = VARNUM_MAX;
-	    if (list_slice_or_index(rettv->vval.v_list,
+	    എങ്കിൽ (list_slice_or_index(rettv->vval.v_list,
 			  is_range, n1, n2, exclusive, rettv, verbose) == FAIL)
-		return FAIL;
-	    break;
+		തിരികെ FAIL;
+	    നിർത്തുക;
 
-	case VAR_TUPLE:
-	    if (var1 == NULL)
+	അവസ്ഥ VAR_TUPLE:
+	    എങ്കിൽ (var1 == ശൂന്യ)
 		n1 = 0;
-	    if (var2 == NULL)
+	    എങ്കിൽ (var2 == ശൂന്യ)
 		n2 = VARNUM_MAX;
-	    if (tuple_slice_or_index(rettv->vval.v_tuple,
+	    എങ്കിൽ (tuple_slice_or_index(rettv->vval.v_tuple,
 			  is_range, n1, n2, exclusive, rettv, verbose) == FAIL)
-		return FAIL;
-	    break;
+		തിരികെ FAIL;
+	    നിർത്തുക;
 
-	case VAR_DICT:
+	അവസ്ഥ VAR_DICT:
 	    {
 		dictitem_T	*item;
 		typval_T	tmp;
 
-		if (key == NULL)
+		എങ്കിൽ (താക്കോൽ == ശൂന്യ)
 		{
-		    key = tv_get_string_chk(var1);
-		    if (key == NULL)
-			return FAIL;
+		    താക്കോൽ = tv_get_string_chk(var1);
+		    എങ്കിൽ (താക്കോൽ == ശൂന്യ)
+			തിരികെ FAIL;
 		}
 
-		item = dict_find(rettv->vval.v_dict, key, keylen);
+		item = dict_find(rettv->vval.v_dict, താക്കോൽ, keylen);
 
-		if (item == NULL)
+		എങ്കിൽ (item == ശൂന്യ)
 		{
-		    if (verbose)
+		    എങ്കിൽ (verbose)
 		    {
-			if (keylen > 0)
-			    key[keylen] = NUL;
-			semsg(_(e_key_not_present_in_dictionary_str), key);
+			എങ്കിൽ (keylen > 0)
+			    താക്കോൽ[keylen] = NUL;
+			semsg(_(e_താക്കോൽ_not_present_in_dictionary_str), താക്കോൽ);
 		    }
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
 
 		copy_tv(&item->di_tv, &tmp);
 		clear_tv(rettv);
 		*rettv = tmp;
 	    }
-	    break;
+	    നിർത്തുക;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -6334,33 +6334,33 @@ eval_index_inner(
     char_u *
 partial_name(partial_T *pt)
 {
-    if (pt != NULL)
+    എങ്കിൽ (pt != ശൂന്യ)
     {
-	if (pt->pt_name != NULL)
-	    return pt->pt_name;
-	if (pt->pt_func != NULL)
-	    return pt->pt_func->uf_name;
+	എങ്കിൽ (pt->pt_name != ശൂന്യ)
+	    തിരികെ pt->pt_name;
+	എങ്കിൽ (pt->pt_func != ശൂന്യ)
+	    തിരികെ pt->pt_func->uf_name;
     }
-    return (char_u *)"";
+    തിരികെ (char_u *)"";
 }
 
-    static void
+    സ്ഥിതം ശൂന്യം
 partial_free(partial_T *pt)
 {
-    int i;
+    പൂർണ്ണസംഖ്യ i;
 
-    for (i = 0; i < pt->pt_argc; ++i)
+    വേണ്ടി (i = 0; i < pt->pt_argc; ++i)
 	clear_tv(&pt->pt_argv[i]);
     vim_free(pt->pt_argv);
     dict_unref(pt->pt_dict);
-    if (pt->pt_name != NULL)
+    എങ്കിൽ (pt->pt_name != ശൂന്യ)
     {
 	func_unref(pt->pt_name);
 	vim_free(pt->pt_name);
     }
-    else
+    അല്ലെങ്കിൽ
 	func_ptr_unref(pt->pt_func);
-    if (pt->pt_obj != NULL)
+    എങ്കിൽ (pt->pt_obj != ശൂന്യ)
 	object_unref(pt->pt_obj);
 
     // "out_up" is no longer used, decrement refcount on partial that owns it.
@@ -6371,14 +6371,14 @@ partial_free(partial_T *pt)
 
     // Decrease the reference count for the context of a closure.  If down
     // to the minimum it may be time to free it.
-    if (pt->pt_funcstack != NULL)
+    എങ്കിൽ (pt->pt_funcstack != ശൂന്യ)
     {
 	--pt->pt_funcstack->fs_refcount;
 	funcstack_check_refcount(pt->pt_funcstack);
     }
     // Similarly for loop variables.
-    for (i = 0; i < MAX_LOOP_DEPTH; ++i)
-	if (pt->pt_loopvars[i] != NULL)
+    വേണ്ടി (i = 0; i < MAX_LOOP_DEPTH; ++i)
+	എങ്കിൽ (pt->pt_loopvars[i] != ശൂന്യ)
 	{
 	    --pt->pt_loopvars[i]->lvs_refcount;
 	    loopvars_check_refcount(pt->pt_loopvars[i]);
@@ -6391,34 +6391,34 @@ partial_free(partial_T *pt)
  * Unreference a closure: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    ശൂന്യം
 partial_unref(partial_T *pt)
 {
-    if (pt == NULL)
-	return;
+    എങ്കിൽ (pt == ശൂന്യ)
+	തിരികെ;
 
-    int	done = FALSE;
+    പൂർണ്ണസംഖ്യ	done = FALSE;
 
-    if (--pt->pt_refcount <= 0)
+    എങ്കിൽ (--pt->pt_refcount <= 0)
 	partial_free(pt);
 
     // If the reference count goes down to one, the funcstack may be the
     // only reference and can be freed if no other partials reference it.
-    else if (pt->pt_refcount == 1)
+    അല്ലെങ്കിൽ എങ്കിൽ (pt->pt_refcount == 1)
     {
 	// careful: if the funcstack is freed it may contain this partial
 	// and it gets freed as well
-	if (pt->pt_funcstack != NULL)
+	എങ്കിൽ (pt->pt_funcstack != ശൂന്യ)
 	    done = funcstack_check_refcount(pt->pt_funcstack);
 
-	if (!done)
+	എങ്കിൽ (!done)
 	{
-	    int	depth;
+	    പൂർണ്ണസംഖ്യ	depth;
 
-	    for (depth = 0; depth < MAX_LOOP_DEPTH; ++depth)
-		if (pt->pt_loopvars[depth] != NULL
+	    വേണ്ടി (depth = 0; depth < MAX_LOOP_DEPTH; ++depth)
+		എങ്കിൽ (pt->pt_loopvars[depth] != ശൂന്യ
 			&& loopvars_check_refcount(pt->pt_loopvars[depth]))
-		    break;
+		    നിർത്തുക;
 	}
     }
 }
@@ -6430,29 +6430,29 @@ partial_unref(partial_T *pt)
  * strings as "string()", otherwise does not put quotes around strings.
  * May return NULL.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 string_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		echo_style,
-    int		composite_val)
+    പൂർണ്ണസംഖ്യ		echo_style,
+    പൂർണ്ണസംഖ്യ		composite_val)
 {
-    char_u	*r = NULL;
+    char_u	*r = ശൂന്യ;
 
-    if (echo_style && !composite_val)
+    എങ്കിൽ (echo_style && !composite_val)
     {
-	*tofree = NULL;
+	*tofree = ശൂന്യ;
 	r = tv->vval.v_string;
-	if (r == NULL)
+	എങ്കിൽ (r == ശൂന്യ)
 	    r = (char_u *)"";
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	*tofree = string_quote(tv->vval.v_string, FALSE);
 	r = *tofree;
     }
 
-    return r;
+    തിരികെ r;
 }
 
 /*
@@ -6462,38 +6462,38 @@ string_tv2string(
  * "function()", otherwise does not put quotes around function name.
  * May return NULL.
  */
-    static char_u *
-func_tv2string(typval_T *tv, char_u **tofree, int echo_style)
+    സ്ഥിതം char_u *
+func_tv2string(typval_T *tv, char_u **tofree, പൂർണ്ണസംഖ്യ echo_style)
 {
-    char_u	*r = NULL;
+    char_u	*r = ശൂന്യ;
     char_u	buf[MAX_FUNC_NAME_LEN];
 
-    if (echo_style)
+    എങ്കിൽ (echo_style)
     {
-	*tofree = NULL;
+	*tofree = ശൂന്യ;
 
-	if (tv->vval.v_string == NULL)
+	എങ്കിൽ (tv->vval.v_string == ശൂന്യ)
 	    r = (char_u *)"function()";
-	else
+	അല്ലെങ്കിൽ
 	{
 	    r = make_ufunc_name_readable(tv->vval.v_string, buf,
 							MAX_FUNC_NAME_LEN);
-	    if (r == buf)
+	    എങ്കിൽ (r == buf)
 		r = *tofree = vim_strsave(buf);
 	}
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	char_u *s = NULL;
+	char_u *s = ശൂന്യ;
 
-	if (tv->vval.v_string != NULL)
+	എങ്കിൽ (tv->vval.v_string != ശൂന്യ)
 	    s = make_ufunc_name_readable(tv->vval.v_string, buf,
 							MAX_FUNC_NAME_LEN);
 
 	r = *tofree = string_quote(s, TRUE);
     }
 
-    return r;
+    തിരികെ r;
 }
 
 /*
@@ -6503,28 +6503,28 @@ func_tv2string(typval_T *tv, char_u **tofree, int echo_style)
  * "function()", otherwise does not put quotes around function name.
  * May return NULL.
  */
-    static char_u *
-method_tv2string(typval_T *tv, char_u **tofree, int echo_style)
+    സ്ഥിതം char_u *
+method_tv2string(typval_T *tv, char_u **tofree, പൂർണ്ണസംഖ്യ echo_style)
 {
     char_u	buf[MAX_FUNC_NAME_LEN];
     partial_T	*pt = tv->vval.v_partial;
 
-    size_t len = vim_snprintf((char *)buf, sizeof(buf), "<SNR>%d_%s.%s",
+    size_t len = vim_snprintf((അക്ഷരം *)buf, വലുപ്പം(buf), "<SNR>%d_%s.%s",
 			   pt->pt_func->uf_script_ctx.sc_sid,
 			   pt->pt_func->uf_class->class_name.string,
 			   pt->pt_func->uf_name);
-    if (len >= sizeof(buf))
+    എങ്കിൽ (len >= വലുപ്പം(buf))
     {
-	if (echo_style)
+	എങ്കിൽ (echo_style)
 	{
-	    *tofree = NULL;
-	    return (char_u *)"function()";
+	    *tofree = ശൂന്യ;
+	    തിരികെ (char_u *)"function()";
 	}
-	else
-	    return *tofree = string_quote((char_u*)"", TRUE);
+	അല്ലെങ്കിൽ
+	    തിരികെ *tofree = string_quote((char_u*)"", TRUE);
     }
 
-    return *tofree = echo_style ? vim_strsave(buf) : string_quote(buf, TRUE);
+    തിരികെ *tofree = echo_style ? vim_strsave(buf) : string_quote(buf, TRUE);
 }
 
 /*
@@ -6532,51 +6532,51 @@ method_tv2string(typval_T *tv, char_u **tofree, int echo_style)
  * If the memory is allocated "tofree" is set to it, otherwise NULL.
  * "numbuf" is used for a number.  May return NULL.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 partial_tv2string(
     typval_T	*tv,
     char_u	**tofree,
     char_u	*numbuf,
-    int		copyID)
+    പൂർണ്ണസംഖ്യ		copyID)
 {
-    char_u	*r = NULL;
+    char_u	*r = ശൂന്യ;
     partial_T	*pt;
     char_u	*fname;
     garray_T	ga;
-    int		i;
+    പൂർണ്ണസംഖ്യ		i;
     char_u	*tf;
 
     pt = tv->vval.v_partial;
-    fname = string_quote(pt == NULL ? NULL : partial_name(pt), FALSE);
+    fname = string_quote(pt == ശൂന്യ ? ശൂന്യ : partial_name(pt), FALSE);
 
     ga_init2(&ga, 1, 100);
     GA_CONCAT_LITERAL(&ga, "function(");
-    if (fname != NULL)
+    എങ്കിൽ (fname != ശൂന്യ)
     {
 	// When using uf_name prepend "g:" for a global function.
-	if (pt != NULL && pt->pt_name == NULL && fname[0] == '\''
+	എങ്കിൽ (pt != ശൂന്യ && pt->pt_name == ശൂന്യ && fname[0] == '\''
 						&& vim_isupper(fname[1]))
 	{
 	    GA_CONCAT_LITERAL(&ga, "'g:");
 	    ga_concat(&ga, fname + 1);
 	}
-	else
+	അല്ലെങ്കിൽ
 	    ga_concat(&ga, fname);
 	vim_free(fname);
     }
-    if (pt != NULL && pt->pt_argc > 0)
+    എങ്കിൽ (pt != ശൂന്യ && pt->pt_argc > 0)
     {
 	GA_CONCAT_LITERAL(&ga, ", [");
-	for (i = 0; i < pt->pt_argc; ++i)
+	വേണ്ടി (i = 0; i < pt->pt_argc; ++i)
 	{
-	    if (i > 0)
+	    എങ്കിൽ (i > 0)
 		GA_CONCAT_LITERAL(&ga, ", ");
 	    ga_concat(&ga, tv2string(&pt->pt_argv[i], &tf, numbuf, copyID));
 	    vim_free(tf);
 	}
 	GA_CONCAT_LITERAL(&ga, "]");
     }
-    if (pt != NULL && pt->pt_dict != NULL)
+    എങ്കിൽ (pt != ശൂന്യ && pt->pt_dict != ശൂന്യ)
     {
 	typval_T dtv;
 
@@ -6593,7 +6593,7 @@ partial_tv2string(
     *tofree = ga.ga_data;
     r = *tofree;
 
-    return r;
+    തിരികെ r;
 }
 
 /*
@@ -6603,41 +6603,41 @@ partial_tv2string(
  * "restore_copyID" is FALSE, repeated items in lists are replaced with "...".
  * May return NULL.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 list_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		copyID,
-    int		restore_copyID)
+    പൂർണ്ണസംഖ്യ		copyID,
+    പൂർണ്ണസംഖ്യ		restore_copyID)
 {
-    char_u	*r = NULL;
+    char_u	*r = ശൂന്യ;
 
-    if (tv->vval.v_list == NULL)
+    എങ്കിൽ (tv->vval.v_list == ശൂന്യ)
     {
 	// NULL list is equivalent to empty list.
-	*tofree = NULL;
+	*tofree = ശൂന്യ;
 	r = (char_u *)"[]";
     }
-    else if (copyID != 0 && tv->vval.v_list->lv_copyID == copyID
+    അല്ലെങ്കിൽ എങ്കിൽ (copyID != 0 && tv->vval.v_list->lv_copyID == copyID
 	    && tv->vval.v_list->lv_len > 0)
     {
-	*tofree = NULL;
+	*tofree = ശൂന്യ;
 	r = (char_u *)"[...]";
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	int old_copyID;
-	if (restore_copyID)
+	പൂർണ്ണസംഖ്യ old_copyID;
+	എങ്കിൽ (restore_copyID)
 	    old_copyID = tv->vval.v_list->lv_copyID;
 
 	tv->vval.v_list->lv_copyID = copyID;
 	*tofree = list2string(tv, copyID, restore_copyID);
-	if (restore_copyID)
+	എങ്കിൽ (restore_copyID)
 	    tv->vval.v_list->lv_copyID = old_copyID;
 	r = *tofree;
     }
 
-    return r;
+    തിരികെ r;
 }
 
 /*
@@ -6647,42 +6647,42 @@ list_tv2string(
  * "restore_copyID" is FALSE, repeated items in tuples are replaced with "...".
  * May return NULL.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 tuple_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		copyID,
-    int		restore_copyID)
+    പൂർണ്ണസംഖ്യ		copyID,
+    പൂർണ്ണസംഖ്യ		restore_copyID)
 {
     tuple_T	*tuple = tv->vval.v_tuple;
-    char_u	*r = NULL;
+    char_u	*r = ശൂന്യ;
 
-    if (tuple == NULL)
+    എങ്കിൽ (tuple == ശൂന്യ)
     {
 	// NULL tuple is equivalent to an empty tuple.
-	*tofree = NULL;
+	*tofree = ശൂന്യ;
 	r = (char_u *)"()";
     }
-    else if (copyID != 0 && tuple->tv_copyID == copyID
-					&& tuple->tv_items.ga_len > 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (copyID != 0 && tuple->tv_copyID == copyID
+					&& tuple->tv_ഇനങ്ങൾ.ga_len > 0)
     {
-	*tofree = NULL;
+	*tofree = ശൂന്യ;
 	r = (char_u *)"(...)";
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	int old_copyID;
-	if (restore_copyID)
+	പൂർണ്ണസംഖ്യ old_copyID;
+	എങ്കിൽ (restore_copyID)
 	    old_copyID = tuple->tv_copyID;
 
 	tuple->tv_copyID = copyID;
 	*tofree = tuple2string(tv, copyID, restore_copyID);
-	if (restore_copyID)
+	എങ്കിൽ (restore_copyID)
 	    tuple->tv_copyID = old_copyID;
 	r = *tofree;
     }
 
-    return r;
+    തിരികെ r;
 }
 
 /*
@@ -6692,41 +6692,41 @@ tuple_tv2string(
  * When "restore_copyID" is FALSE, repeated items in the dictionary are
  * replaced with "...".  May return NULL.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 dict_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		copyID,
-    int		restore_copyID)
+    പൂർണ്ണസംഖ്യ		copyID,
+    പൂർണ്ണസംഖ്യ		restore_copyID)
 {
-    char_u	*r = NULL;
+    char_u	*r = ശൂന്യ;
 
-    if (tv->vval.v_dict == NULL)
+    എങ്കിൽ (tv->vval.v_dict == ശൂന്യ)
     {
 	// NULL dict is equivalent to empty dict.
-	*tofree = NULL;
+	*tofree = ശൂന്യ;
 	r = (char_u *)"{}";
     }
-    else if (copyID != 0 && tv->vval.v_dict->dv_copyID == copyID
+    അല്ലെങ്കിൽ എങ്കിൽ (copyID != 0 && tv->vval.v_dict->dv_copyID == copyID
 	    && tv->vval.v_dict->dv_hashtab.ht_used != 0)
     {
-	*tofree = NULL;
+	*tofree = ശൂന്യ;
 	r = (char_u *)"{...}";
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	int old_copyID;
-	if (restore_copyID)
+	പൂർണ്ണസംഖ്യ old_copyID;
+	എങ്കിൽ (restore_copyID)
 	    old_copyID = tv->vval.v_dict->dv_copyID;
 
 	tv->vval.v_dict->dv_copyID = copyID;
 	*tofree = dict2string(tv, copyID, restore_copyID);
-	if (restore_copyID)
+	എങ്കിൽ (restore_copyID)
 	    tv->vval.v_dict->dv_copyID = old_copyID;
 	r = *tofree;
     }
 
-    return r;
+    തിരികെ r;
 }
 
 /*
@@ -6737,31 +6737,31 @@ dict_tv2string(
  * otherwise does not put quotes around strings.
  * May return NULL.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 jobchan_tv2string(
     typval_T	*tv UNUSED,
     char_u	**tofree UNUSED,
     char_u	*numbuf UNUSED,
-    int		composite_val UNUSED)
+    പൂർണ്ണസംഖ്യ		composite_val UNUSED)
 {
-    char_u	*r = NULL;
+    char_u	*r = ശൂന്യ;
 
 #ifdef FEAT_JOB_CHANNEL
-    *tofree = NULL;
+    *tofree = ശൂന്യ;
 
-    if (tv->v_type == VAR_JOB)
+    എങ്കിൽ (tv->v_type == VAR_JOB)
 	r = job_to_string_buf(tv, numbuf);
-    else
+    അല്ലെങ്കിൽ
 	r = channel_to_string_buf(tv, numbuf);
 
-    if (composite_val)
+    എങ്കിൽ (composite_val)
     {
 	*tofree = string_quote(r, FALSE);
 	r = *tofree;
     }
 #endif
 
-    return r;
+    തിരികെ r;
 }
 
 /*
@@ -6769,31 +6769,31 @@ jobchan_tv2string(
  * If the memory is allocated "tofree" is set to it, otherwise NULL.
  * May return NULL.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 class_tv2string(typval_T *tv, char_u **tofree)
 {
-    char_u	*r = NULL;
+    char_u	*r = ശൂന്യ;
     size_t	rsize;
     class_T	*cl = tv->vval.v_class;
     string_T	class_name = {(char_u *)"[unknown]", 9};
     string_T	s = {(char_u *)"class", 5};
 
-    if (cl != NULL)
+    എങ്കിൽ (cl != ശൂന്യ)
     {
 	class_name.string = cl->class_name.string;
 	class_name.length = cl->class_name.length;
-	if (IS_INTERFACE(cl))
+	എങ്കിൽ (IS_INTERFACE(cl))
 	    STR_LITERAL_SET(s, "interface");
-	else if (IS_ENUM(cl))
+	അല്ലെങ്കിൽ എങ്കിൽ (IS_ENUM(cl))
 	    STR_LITERAL_SET(s, "enum");
     }
 
     rsize = s.length + 1 + class_name.length + 1;
     r = *tofree = alloc(rsize);
-    if (r != NULL)
-	vim_snprintf((char *)r, rsize, "%s %s", s.string, (char *)class_name.string);
+    എങ്കിൽ (r != ശൂന്യ)
+	vim_snprintf((അക്ഷരം *)r, rsize, "%s %s", s.string, (അക്ഷരം *)class_name.string);
 
-    return r;
+    തിരികെ r;
 }
 
 /*
@@ -6803,49 +6803,49 @@ class_tv2string(typval_T *tv, char_u **tofree)
  * When "restore_copyID" is FALSE, repeated items in the object are
  * replaced with "...".  May return NULL.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 object_tv2string(
     typval_T	*tv,
     char_u	**tofree,
-    int		copyID,
-    int		restore_copyID,
+    പൂർണ്ണസംഖ്യ		copyID,
+    പൂർണ്ണസംഖ്യ		restore_copyID,
     char_u	*numbuf,
-    int		echo_style,
-    int		composite_val)
+    പൂർണ്ണസംഖ്യ		echo_style,
+    പൂർണ്ണസംഖ്യ		composite_val)
 {
-    char_u	*r = NULL;
+    char_u	*r = ശൂന്യ;
 
     object_T	*obj = tv->vval.v_object;
-    if (obj == NULL || obj->obj_class == NULL)
+    എങ്കിൽ (obj == ശൂന്യ || obj->obj_class == ശൂന്യ)
     {
-	*tofree = NULL;
+	*tofree = ശൂന്യ;
 	r = (char_u *)"object of [unknown]";
     }
-    else if (copyID != 0 && obj->obj_copyID == copyID
-	    && obj->obj_class->class_obj_member_count != 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (copyID != 0 && obj->obj_copyID == copyID
+	    && obj->obj_class->class_obj_member_എണ്ണം != 0)
     {
 	size_t n = 25 + obj->obj_class->class_name.length;
 	r = alloc(n);
-	if (r != NULL)
-	    (void)vim_snprintf((char *)r, n, "object of %s {...}",
+	എങ്കിൽ (r != ശൂന്യ)
+	    (ശൂന്യം)vim_snprintf((അക്ഷരം *)r, n, "object of %s {...}",
 						obj->obj_class->class_name.string);
 	*tofree = r;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	int old_copyID;
-	if (restore_copyID)
+	പൂർണ്ണസംഖ്യ old_copyID;
+	എങ്കിൽ (restore_copyID)
 	    old_copyID = obj->obj_copyID;
 
 	obj->obj_copyID = copyID;
 	*tofree = object2string(obj, numbuf, copyID, echo_style,
 				restore_copyID, composite_val);
-	if (restore_copyID)
+	എങ്കിൽ (restore_copyID)
 	    obj->obj_copyID = old_copyID;
 	r = *tofree;
     }
 
-    return r;
+    തിരികെ r;
 }
 
 /*
@@ -6865,17 +6865,17 @@ echo_string_core(
     typval_T	*tv,
     char_u	**tofree,
     char_u	*numbuf,
-    int		copyID,
-    int		echo_style,
-    int		restore_copyID,
-    int		composite_val)
+    പൂർണ്ണസംഖ്യ		copyID,
+    പൂർണ്ണസംഖ്യ		echo_style,
+    പൂർണ്ണസംഖ്യ		restore_copyID,
+    പൂർണ്ണസംഖ്യ		composite_val)
 {
-    static int	recurse = 0;
-    char_u	*r = NULL;
+    സ്ഥിതം പൂർണ്ണസംഖ്യ	recurse = 0;
+    char_u	*r = ശൂന്യ;
 
-    if (recurse >= DICT_MAXNEST)
+    എങ്കിൽ (recurse >= DICT_MAXNEST)
     {
-	if (!did_echo_string_emsg)
+	എങ്കിൽ (!did_echo_string_emsg)
 	{
 	    // Only give this message once for a recursive call to avoid
 	    // flooding the user with errors.  And stop iterating over lists
@@ -6883,95 +6883,95 @@ echo_string_core(
 	    did_echo_string_emsg = TRUE;
 	    emsg(_(e_variable_nested_too_deep_for_displaying));
 	}
-	*tofree = NULL;
-	return (char_u *)"{E724}";
+	*tofree = ശൂന്യ;
+	തിരികെ (char_u *)"{E724}";
     }
     ++recurse;
 
-    switch (tv->v_type)
+    തിരഞ്ഞെടുപ്പ് (tv->v_type)
     {
-	case VAR_STRING:
+	അവസ്ഥ VAR_STRING:
 	    r = string_tv2string(tv, tofree, echo_style, composite_val);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_FUNC:
+	അവസ്ഥ VAR_FUNC:
 	    r = func_tv2string(tv, tofree, echo_style);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_PARTIAL:
-	    if (tv->vval.v_partial == NULL
-		    || tv->vval.v_partial->pt_obj == NULL)
+	അവസ്ഥ VAR_PARTIAL:
+	    എങ്കിൽ (tv->vval.v_partial == ശൂന്യ
+		    || tv->vval.v_partial->pt_obj == ശൂന്യ)
 		r = partial_tv2string(tv, tofree, numbuf, copyID);
-	    else
+	    അല്ലെങ്കിൽ
 		r = method_tv2string(tv, tofree, echo_style);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_BLOB:
+	അവസ്ഥ VAR_BLOB:
 	    r = blob2string(tv->vval.v_blob, tofree, numbuf);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_LIST:
+	അവസ്ഥ VAR_LIST:
 	    r = list_tv2string(tv, tofree, copyID, restore_copyID);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_TUPLE:
+	അവസ്ഥ VAR_TUPLE:
 	    r = tuple_tv2string(tv, tofree, copyID, restore_copyID);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_DICT:
+	അവസ്ഥ VAR_DICT:
 	    r = dict_tv2string(tv, tofree, copyID, restore_copyID);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_NUMBER:
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	    *tofree = NULL;
+	അവസ്ഥ VAR_സംഖ്യ:
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_ANY:
+	അവസ്ഥ VAR_VOID:
+	    *tofree = ശൂന്യ;
 	    r = tv_get_string_buf(tv, numbuf);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_JOB:
-	case VAR_CHANNEL:
+	അവസ്ഥ VAR_JOB:
+	അവസ്ഥ VAR_CHANNEL:
 	    r = jobchan_tv2string(tv, tofree, numbuf, composite_val);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_INSTR:
-	    *tofree = NULL;
+	അവസ്ഥ VAR_INSTR:
+	    *tofree = ശൂന്യ;
 	    r = (char_u *)"instructions";
-	    break;
+	    നിർത്തുക;
 
-	case VAR_CLASS:
+	അവസ്ഥ VAR_CLASS:
 	    r = class_tv2string(tv, tofree);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_OBJECT:
+	അവസ്ഥ VAR_OBJECT:
 	    r = object_tv2string(tv, tofree, copyID, restore_copyID,
 					 numbuf, echo_style, composite_val);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_FLOAT:
-	    *tofree = NULL;
-	    vim_snprintf((char *)numbuf, NUMBUFLEN, "%g", tv->vval.v_float);
+	അവസ്ഥ VAR_FLOAT:
+	    *tofree = ശൂന്യ;
+	    vim_snprintf((അക്ഷരം *)numbuf, NUMBUFLEN, "%g", tv->vval.v_float);
 	    r = numbuf;
-	    break;
+	    നിർത്തുക;
 
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	    *tofree = NULL;
-	    r = (char_u *)get_var_special_name(tv->vval.v_number);
-	    break;
+	അവസ്ഥ VAR_BOOL:
+	അവസ്ഥ VAR_SPECIAL:
+	    *tofree = ശൂന്യ;
+	    r = (char_u *)get_var_special_name(tv->vval.v_സംഖ്യ);
+	    നിർത്തുക;
 
-	case VAR_TYPEALIAS:
+	അവസ്ഥ VAR_TYPEALIAS:
 	    *tofree = vim_strsave(tv->vval.v_typealias->ta_name);
 	    r = *tofree;
-	    if (r == NULL)
+	    എങ്കിൽ (r == ശൂന്യ)
 		r = (char_u *)"";
-	    break;
+	    നിർത്തുക;
     }
 
-    if (--recurse == 0)
+    എങ്കിൽ (--recurse == 0)
 	did_echo_string_emsg = FALSE;
-    return r;
+    തിരികെ r;
 }
 
 /*
@@ -6987,9 +6987,9 @@ echo_string(
     typval_T	*tv,
     char_u	**tofree,
     char_u	*numbuf,
-    int		copyID)
+    പൂർണ്ണസംഖ്യ		copyID)
 {
-    return echo_string_core(tv, tofree, numbuf, copyID, TRUE, FALSE, FALSE);
+    തിരികെ echo_string_core(tv, tofree, numbuf, copyID, TRUE, FALSE, FALSE);
 }
 
 /*
@@ -6997,38 +6997,38 @@ echo_string(
  * character index.  Works only for loaded buffers. Returns -1 on failure.
  * The index of the first byte and the first character is zero.
  */
-    int
-buf_byteidx_to_charidx(buf_T *buf, int lnum, int byteidx)
+    പൂർണ്ണസംഖ്യ
+buf_byteidx_to_charidx(buf_T *buf, പൂർണ്ണസംഖ്യ lnum, പൂർണ്ണസംഖ്യ byteidx)
 {
     char_u	*str;
     char_u	*t;
-    int		count;
+    പൂർണ്ണസംഖ്യ		എണ്ണം;
 
-    if (buf == NULL || buf->b_ml.ml_mfp == NULL)
-	return -1;
+    എങ്കിൽ (buf == ശൂന്യ || buf->b_ml.ml_mfp == ശൂന്യ)
+	തിരികെ -1;
 
-    if (lnum > buf->b_ml.ml_line_count)
-	lnum = buf->b_ml.ml_line_count;
+    എങ്കിൽ (lnum > buf->b_ml.ml_വരി_എണ്ണം)
+	lnum = buf->b_ml.ml_വരി_എണ്ണം;
 
     str = ml_get_buf(buf, lnum, FALSE);
-    if (str == NULL)
-	return -1;
+    എങ്കിൽ (str == ശൂന്യ)
+	തിരികെ -1;
 
-    if (*str == NUL)
-	return 0;
+    എങ്കിൽ (*str == NUL)
+	തിരികെ 0;
 
     // count the number of characters
     t = str;
-    for (count = 0; *t != NUL && t <= str + byteidx; count++)
+    വേണ്ടി (എണ്ണം = 0; *t != NUL && t <= str + byteidx; എണ്ണം++)
 	t += mb_ptr2len(t);
 
     // In insert mode, when the cursor is at the end of a non-empty line,
     // byteidx points to the NUL character immediately past the end of the
     // string. In this case, add one to the character count.
-    if (*t == NUL && byteidx != 0 && t == str + byteidx)
-	count++;
+    എങ്കിൽ (*t == NUL && byteidx != 0 && t == str + byteidx)
+	എണ്ണം++;
 
-    return count - 1;
+    തിരികെ എണ്ണം - 1;
 }
 
 /*
@@ -7036,28 +7036,28 @@ buf_byteidx_to_charidx(buf_T *buf, int lnum, int byteidx)
  * byte index.  Works only for loaded buffers. Returns -1 on failure.
  * The index of the first byte and the first character is zero.
  */
-    int
-buf_charidx_to_byteidx(buf_T *buf, int lnum, int charidx)
+    പൂർണ്ണസംഖ്യ
+buf_charidx_to_byteidx(buf_T *buf, പൂർണ്ണസംഖ്യ lnum, പൂർണ്ണസംഖ്യ charidx)
 {
     char_u	*str;
     char_u	*t;
 
-    if (buf == NULL || buf->b_ml.ml_mfp == NULL)
-	return -1;
+    എങ്കിൽ (buf == ശൂന്യ || buf->b_ml.ml_mfp == ശൂന്യ)
+	തിരികെ -1;
 
-    if (lnum > buf->b_ml.ml_line_count)
-	lnum = buf->b_ml.ml_line_count;
+    എങ്കിൽ (lnum > buf->b_ml.ml_വരി_എണ്ണം)
+	lnum = buf->b_ml.ml_വരി_എണ്ണം;
 
     str = ml_get_buf(buf, lnum, FALSE);
-    if (str == NULL)
-	return -1;
+    എങ്കിൽ (str == ശൂന്യ)
+	തിരികെ -1;
 
     // Convert the character offset to a byte offset
     t = str;
-    while (*t != NUL && --charidx > 0)
+    ആകുമ്പോൾ (*t != NUL && --charidx > 0)
 	t += mb_ptr2len(t);
 
-    return t - str;
+    തിരികെ t - str;
 }
 
 /*
@@ -7067,123 +7067,123 @@ buf_charidx_to_byteidx(buf_T *buf, int lnum, int charidx)
     pos_T *
 var2fpos(
     typval_T	*varp,
-    int		dollar_lnum,	// TRUE when $ is last line
-    int		*fnum,		// set to fnum for '0, 'A, etc.
-    int		charcol)	// return character column
+    പൂർണ്ണസംഖ്യ		dollar_lnum,	// TRUE when $ is last line
+    പൂർണ്ണസംഖ്യ		*fnum,		// set to fnum for '0, 'A, etc.
+    പൂർണ്ണസംഖ്യ		charcol)	// return character column
 {
     char_u		*name;
-    static pos_T	pos;
+    സ്ഥിതം pos_T	pos;
     pos_T		*pp;
-    int			error = FALSE;
+    പൂർണ്ണസംഖ്യ			error = FALSE;
 
     // Argument can be [lnum, col, coladd].
-    if (varp->v_type == VAR_LIST)
+    എങ്കിൽ (varp->v_type == VAR_LIST)
     {
 	list_T		*l;
-	int		len;
+	പൂർണ്ണസംഖ്യ		len;
 	listitem_T	*li;
 
 	l = varp->vval.v_list;
-	if (l == NULL)
-	    return NULL;
+	എങ്കിൽ (l == ശൂന്യ)
+	    തിരികെ ശൂന്യ;
 
 	// Get the line number
 	pos.lnum = list_find_nr(l, 0L, &error);
-	if (error || pos.lnum <= 0 || pos.lnum > curbuf->b_ml.ml_line_count)
-	    return NULL;	// invalid line number
-	if (charcol)
+	എങ്കിൽ (error || pos.lnum <= 0 || pos.lnum > curbuf->b_ml.ml_വരി_എണ്ണം)
+	    തിരികെ ശൂന്യ;	// invalid line number
+	എങ്കിൽ (charcol)
 	    len = (long)mb_charlen(ml_get(pos.lnum));
-	else
+	അല്ലെങ്കിൽ
 	    len = (long)ml_get_len(pos.lnum);
 
 	// Get the column number
 	// We accept "$" for the column number: last column.
 	li = list_find(l, 1L);
-	if (li != NULL && li->li_tv.v_type == VAR_STRING
-		&& li->li_tv.vval.v_string != NULL
+	എങ്കിൽ (li != ശൂന്യ && li->li_tv.v_type == VAR_STRING
+		&& li->li_tv.vval.v_string != ശൂന്യ
 		&& STRCMP(li->li_tv.vval.v_string, "$") == 0)
 	{
 	    pos.col = len + 1;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    pos.col = list_find_nr(l, 1L, &error);
-	    if (error)
-		return NULL;
+	    എങ്കിൽ (error)
+		തിരികെ ശൂന്യ;
 	}
 
 	// Accept a position up to the NUL after the line.
-	if (pos.col == 0 || (int)pos.col > len + 1)
-	    return NULL;	// invalid column number
+	എങ്കിൽ (pos.col == 0 || (പൂർണ്ണസംഖ്യ)pos.col > len + 1)
+	    തിരികെ ശൂന്യ;	// invalid column number
 	--pos.col;
 
 	// Get the virtual offset.  Defaults to zero.
 	pos.coladd = list_find_nr(l, 2L, &error);
-	if (error)
+	എങ്കിൽ (error)
 	    pos.coladd = 0;
 
-	return &pos;
+	തിരികെ &pos;
     }
 
-    if (in_vim9script() && check_for_string_arg(varp, 0) == FAIL)
-	return NULL;
+    എങ്കിൽ (in_vim9script() && check_for_string_arg(varp, 0) == FAIL)
+	തിരികെ ശൂന്യ;
 
     name = tv_get_string_chk(varp);
-    if (name == NULL)
-	return NULL;
+    എങ്കിൽ (name == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
     error = TRUE;
     pos.lnum = 0;
-    if (name[0] == '.')
+    എങ്കിൽ (name[0] == '.')
     {
-	if (!in_vim9script() || name[1] == NUL)
+	എങ്കിൽ (!in_vim9script() || name[1] == NUL)
 	{
 	    error = FALSE;
 	    // cursor
 	    pos = curwin->w_cursor;
 	}
     }
-    else if (name[0] == 'v' && name[1] == NUL)
+    അല്ലെങ്കിൽ എങ്കിൽ (name[0] == 'v' && name[1] == NUL)
     {
 	// Visual start
-	if (VIsual_active)
+	എങ്കിൽ (VIsual_active)
 	    pos = VIsual;
-	else
+	അല്ലെങ്കിൽ
 	    pos = curwin->w_cursor;
     }
-    else if (name[0] == '\'')
+    അല്ലെങ്കിൽ എങ്കിൽ (name[0] == '\'')
     {
-	if (!in_vim9script() || (name[1] != NUL && name[2] == NUL))
+	എങ്കിൽ (!in_vim9script() || (name[1] != NUL && name[2] == NUL))
 	{
 	    error = FALSE;
 	    // mark
 	    pp = getmark_buf_fnum(curbuf, name[1], FALSE, fnum);
-	    if (pp == NULL || pp == (pos_T *)-1 || pp->lnum <= 0)
-		return NULL;
+	    എങ്കിൽ (pp == ശൂന്യ || pp == (pos_T *)-1 || pp->lnum <= 0)
+		തിരികെ ശൂന്യ;
 	    pos = *pp;
 	}
     }
-    if (pos.lnum != 0)
+    എങ്കിൽ (pos.lnum != 0)
     {
-	if (charcol)
+	എങ്കിൽ (charcol)
 	    pos.col = buf_byteidx_to_charidx(curbuf, pos.lnum, pos.col);
-	return &pos;
+	തിരികെ &pos;
     }
 
     pos.coladd = 0;
 
-    if (name[0] == 'w' && dollar_lnum)
+    എങ്കിൽ (name[0] == 'w' && dollar_lnum)
     {
 	// the "w_valid" flags are not reset when moving the cursor, but they
 	// do matter for update_topline() and validate_botline().
 	check_cursor_moved(curwin);
 
 	pos.col = 0;
-	if (name[1] == '0')		// "w0": first visible line
+	എങ്കിൽ (name[1] == '0')		// "w0": first visible line
 	{
 #ifdef FEAT_TERMINAL
-	    if (bt_terminal(curwin->w_buffer)
-				    && curwin->w_buffer->b_term != NULL
+	    എങ്കിൽ (bt_terminal(curwin->w_buffer)
+				    && curwin->w_buffer->b_term != ശൂന്യ
 				    && !term_in_normal_mode(curwin->w_buffer))
 		may_move_terminal_to_buffer(curwin->w_buffer->b_term, TRUE);
 #endif
@@ -7191,42 +7191,42 @@ var2fpos(
 	    // In silent Ex mode topline is zero, but that's not a valid line
 	    // number; use one instead.
 	    pos.lnum = curwin->w_topline > 0 ? curwin->w_topline : 1;
-	    return &pos;
+	    തിരികെ &pos;
 	}
-	else if (name[1] == '$')	// "w$": last visible line
+	അല്ലെങ്കിൽ എങ്കിൽ (name[1] == '$')	// "w$": last visible line
 	{
 #ifdef FEAT_TERMINAL
-	    if (bt_terminal(curwin->w_buffer)
-				    && curwin->w_buffer->b_term != NULL
+	    എങ്കിൽ (bt_terminal(curwin->w_buffer)
+				    && curwin->w_buffer->b_term != ശൂന്യ
 				    && !term_in_normal_mode(curwin->w_buffer))
 		may_move_terminal_to_buffer(curwin->w_buffer->b_term, TRUE);
 #endif
 	    validate_botline();
 	    // In silent Ex mode botline is zero, return zero then.
 	    pos.lnum = curwin->w_botline > 0 ? curwin->w_botline - 1 : 0;
-	    return &pos;
+	    തിരികെ &pos;
 	}
     }
-    else if (name[0] == '$')		// last column or line
+    അല്ലെങ്കിൽ എങ്കിൽ (name[0] == '$')		// last column or line
     {
-	if (dollar_lnum)
+	എങ്കിൽ (dollar_lnum)
 	{
-	    pos.lnum = curbuf->b_ml.ml_line_count;
+	    pos.lnum = curbuf->b_ml.ml_വരി_എണ്ണം;
 	    pos.col = 0;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    pos.lnum = curwin->w_cursor.lnum;
-	    if (charcol)
+	    എങ്കിൽ (charcol)
 		pos.col = (colnr_T)mb_charlen(ml_get_curline());
-	    else
+	    അല്ലെങ്കിൽ
 		pos.col = ml_get_curline_len();
 	}
-	return &pos;
+	തിരികെ &pos;
     }
-    if (in_vim9script() && error)
-	semsg(_(e_invalid_value_for_line_number_str), name);
-    return NULL;
+    എങ്കിൽ (in_vim9script() && error)
+	semsg(_(e_invalid_മൂല്യം_for_വരി_സംഖ്യ_str), name);
+    തിരികെ ശൂന്യ;
 }
 
 /*
@@ -7239,13 +7239,13 @@ var2fpos(
  * Return FAIL when conversion is not possible, doesn't check the position for
  * validity.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 list2fpos(
     typval_T	*arg,
     pos_T	*posp,
-    int		*fnump,
+    പൂർണ്ണസംഖ്യ		*fnump,
     colnr_T	*curswantp,
-    int		charcol)
+    പൂർണ്ണസംഖ്യ		charcol)
 {
     list_T	*l = arg->vval.v_list;
     long	i = 0;
@@ -7253,56 +7253,56 @@ list2fpos(
 
     // List must be: [fnum, lnum, col, coladd, curswant], where "fnum" is only
     // there when "fnump" isn't NULL; "coladd" and "curswant" are optional.
-    if (arg->v_type != VAR_LIST
-	    || l == NULL
-	    || l->lv_len < (fnump == NULL ? 2 : 3)
-	    || l->lv_len > (fnump == NULL ? 4 : 5))
-	return FAIL;
+    എങ്കിൽ (arg->v_type != VAR_LIST
+	    || l == ശൂന്യ
+	    || l->lv_len < (fnump == ശൂന്യ ? 2 : 3)
+	    || l->lv_len > (fnump == ശൂന്യ ? 4 : 5))
+	തിരികെ FAIL;
 
-    if (fnump != NULL)
+    എങ്കിൽ (fnump != ശൂന്യ)
     {
-	n = list_find_nr(l, i++, NULL);	// fnum
-	if (n < 0)
-	    return FAIL;
-	if (n == 0)
+	n = list_find_nr(l, i++, ശൂന്യ);	// fnum
+	എങ്കിൽ (n < 0)
+	    തിരികെ FAIL;
+	എങ്കിൽ (n == 0)
 	    n = curbuf->b_fnum;		// current buffer
 	*fnump = n;
     }
 
-    n = list_find_nr(l, i++, NULL);	// lnum
-    if (n < 0)
-	return FAIL;
+    n = list_find_nr(l, i++, ശൂന്യ);	// lnum
+    എങ്കിൽ (n < 0)
+	തിരികെ FAIL;
     posp->lnum = n;
 
-    n = list_find_nr(l, i++, NULL);	// col
-    if (n < 0)
-	return FAIL;
+    n = list_find_nr(l, i++, ശൂന്യ);	// col
+    എങ്കിൽ (n < 0)
+	തിരികെ FAIL;
     // If character position is specified, then convert to byte position
     // If the line number is zero use the cursor line.
-    if (charcol)
+    എങ്കിൽ (charcol)
     {
 	buf_T	*buf;
 
 	// Get the text for the specified line in a loaded buffer
-	buf = buflist_findnr(fnump == NULL ? curbuf->b_fnum : *fnump);
-	if (buf == NULL || buf->b_ml.ml_mfp == NULL)
-	    return FAIL;
+	buf = buflist_findnr(fnump == ശൂന്യ ? curbuf->b_fnum : *fnump);
+	എങ്കിൽ (buf == ശൂന്യ || buf->b_ml.ml_mfp == ശൂന്യ)
+	    തിരികെ FAIL;
 
 	n = buf_charidx_to_byteidx(buf,
 		  posp->lnum == 0 ? curwin->w_cursor.lnum : posp->lnum, n) + 1;
     }
     posp->col = n;
 
-    n = list_find_nr(l, i, NULL);	// off
-    if (n < 0)
+    n = list_find_nr(l, i, ശൂന്യ);	// off
+    എങ്കിൽ (n < 0)
 	posp->coladd = 0;
-    else
+    അല്ലെങ്കിൽ
 	posp->coladd = n;
 
-    if (curswantp != NULL)
-	*curswantp = list_find_nr(l, i + 1, NULL);  // curswant
+    എങ്കിൽ (curswantp != ശൂന്യ)
+	*curswantp = list_find_nr(l, i + 1, ശൂന്യ);  // curswant
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -7310,20 +7310,20 @@ list2fpos(
  * Advance "arg" to the first character after the name.
  * Return 0 for error.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 get_env_len(char_u **arg)
 {
     char_u	*p;
-    int		len;
+    പൂർണ്ണസംഖ്യ		len;
 
-    for (p = *arg; vim_isIDc(*p); ++p)
+    വേണ്ടി (p = *arg; vim_isIDc(*p); ++p)
 	;
-    if (p == *arg)	    // no name found
-	return 0;
+    എങ്കിൽ (p == *arg)	    // no name found
+	തിരികെ 0;
 
-    len = (int)(p - *arg);
+    len = (പൂർണ്ണസംഖ്യ)(p - *arg);
     *arg = p;
-    return len;
+    തിരികെ len;
 }
 
 /*
@@ -7331,32 +7331,32 @@ get_env_len(char_u **arg)
  * "arg" is advanced to after the name.
  * Return 0 if something is wrong.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 get_id_len(char_u **arg)
 {
     char_u	*p;
-    int		len;
+    പൂർണ്ണസംഖ്യ		len;
 
     // Find the end of the name.
-    for (p = *arg; eval_isnamec(*p); ++p)
+    വേണ്ടി (p = *arg; eval_isnamec(*p); ++p)
     {
-	if (*p == ':')
+	എങ്കിൽ (*p == ':')
 	{
 	    // "s:" is start of "s:var", but "n:" is not and can be used in
 	    // slice "[n:]".  Also "xx:" is not a namespace.
-	    len = (int)(p - *arg);
-	    if ((len == 1 && vim_strchr(NAMESPACE_CHAR, **arg) == NULL)
+	    len = (പൂർണ്ണസംഖ്യ)(p - *arg);
+	    എങ്കിൽ ((len == 1 && vim_strchr(NAMESPACE_CHAR, **arg) == ശൂന്യ)
 		    || len > 1)
-		break;
+		നിർത്തുക;
 	}
     }
-    if (p == *arg)	    // no name found
-	return 0;
+    എങ്കിൽ (p == *arg)	    // no name found
+	തിരികെ 0;
 
-    len = (int)(p - *arg);
+    len = (പൂർണ്ണസംഖ്യ)(p - *arg);
     *arg = p;
 
-    return len;
+    തിരികെ len;
 }
 
 /*
@@ -7368,29 +7368,29 @@ get_id_len(char_u **arg)
  * If the name contains 'magic' {}'s, expand them and return the
  * expanded name in an allocated string via 'alias' - caller must free.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 get_name_len(
     char_u	**arg,
     char_u	**alias,
-    int		evaluate,
-    int		verbose)
+    പൂർണ്ണസംഖ്യ		evaluate,
+    പൂർണ്ണസംഖ്യ		verbose)
 {
-    int		len;
+    പൂർണ്ണസംഖ്യ		len;
     char_u	*p;
-    char_u	*expr_start;
-    char_u	*expr_end;
+    char_u	*വ്യഞ്ജകം_start;
+    char_u	*വ്യഞ്ജകം_end;
 
-    *alias = NULL;  // default to no alias
+    *alias = ശൂന്യ;  // default to no alias
 
-    if ((*arg)[0] == K_SPECIAL && (*arg)[1] == KS_EXTRA
-						  && (*arg)[2] == (int)KE_SNR)
+    എങ്കിൽ ((*arg)[0] == K_SPECIAL && (*arg)[1] == KS_EXTRA
+						  && (*arg)[2] == (പൂർണ്ണസംഖ്യ)KE_SNR)
     {
 	// hard coded <SNR>, already translated
 	*arg += 3;
-	return get_id_len(arg) + 3;
+	തിരികെ get_id_len(arg) + 3;
     }
     len = eval_fname_script(*arg);
-    if (len > 0)
+    എങ്കിൽ (len > 0)
     {
 	// literal "<SID>", "s:" or "<SNR>"
 	*arg += len;
@@ -7399,38 +7399,38 @@ get_name_len(
     /*
      * Find the end of the name; check for {} construction.
      */
-    p = find_name_end(*arg, &expr_start, &expr_end,
+    p = find_name_end(*arg, &വ്യഞ്ജകം_start, &വ്യഞ്ജകം_end,
 					       len > 0 ? 0 : FNE_CHECK_START);
-    if (expr_start != NULL)
+    എങ്കിൽ (വ്യഞ്ജകം_start != ശൂന്യ)
     {
 	char_u	*temp_string;
 
-	if (!evaluate)
+	എങ്കിൽ (!evaluate)
 	{
-	    len += (int)(p - *arg);
+	    len += (പൂർണ്ണസംഖ്യ)(p - *arg);
 	    *arg = skipwhite(p);
-	    return len;
+	    തിരികെ len;
 	}
 
 	/*
 	 * Include any <SID> etc in the expanded string:
 	 * Thus the -len here.
 	 */
-	temp_string = make_expanded_name(*arg - len, expr_start, expr_end, p);
-	if (temp_string == NULL)
-	    return -1;
+	temp_string = make_expanded_name(*arg - len, വ്യഞ്ജകം_start, വ്യഞ്ജകം_end, p);
+	എങ്കിൽ (temp_string == ശൂന്യ)
+	    തിരികെ -1;
 	*alias = temp_string;
 	*arg = skipwhite(p);
-	return (int)STRLEN(temp_string);
+	തിരികെ (പൂർണ്ണസംഖ്യ)STRLEN(temp_string);
     }
 
     len += get_id_len(arg);
     // Only give an error when there is something, otherwise it will be
     // reported at a higher level.
-    if (len == 0 && verbose && **arg != NUL)
+    എങ്കിൽ (len == 0 && verbose && **arg != NUL)
 	semsg(_(e_invalid_expression_str), *arg);
 
-    return len;
+    തിരികെ len;
 }
 
 /*
@@ -7444,28 +7444,28 @@ get_name_len(
     char_u *
 find_name_end(
     char_u	*arg,
-    char_u	**expr_start,
-    char_u	**expr_end,
-    int		flags)
+    char_u	**വ്യഞ്ജകം_start,
+    char_u	**വ്യഞ്ജകം_end,
+    പൂർണ്ണസംഖ്യ		flags)
 {
-    int		mb_nest = 0;
-    int		br_nest = 0;
+    പൂർണ്ണസംഖ്യ		mb_nest = 0;
+    പൂർണ്ണസംഖ്യ		br_nest = 0;
     char_u	*p;
-    int		len;
-    int		allow_curly = !in_vim9script();
+    പൂർണ്ണസംഖ്യ		len;
+    പൂർണ്ണസംഖ്യ		allow_curly = !in_vim9script();
 
-    if (expr_start != NULL)
+    എങ്കിൽ (വ്യഞ്ജകം_start != ശൂന്യ)
     {
-	*expr_start = NULL;
-	*expr_end = NULL;
+	*വ്യഞ്ജകം_start = ശൂന്യ;
+	*വ്യഞ്ജകം_end = ശൂന്യ;
     }
 
     // Quick check for valid starting character.
-    if ((flags & FNE_CHECK_START) && !eval_isnamec1(*arg)
+    എങ്കിൽ ((flags & FNE_CHECK_START) && !eval_isnamec1(*arg)
 					      && (*arg != '{' || !allow_curly))
-	return arg;
+	തിരികെ arg;
 
-    for (p = arg; *p != NUL
+    വേണ്ടി (p = arg; *p != NUL
 		    && (eval_isnamec(*p)
 			|| (*p == '{' && allow_curly)
 			|| ((flags & FNE_INCL_BR) && (*p == '['
@@ -7473,59 +7473,59 @@ find_name_end(
 			|| mb_nest != 0
 			|| br_nest != 0); MB_PTR_ADV(p))
     {
-	if (*p == '\'')
+	എങ്കിൽ (*p == '\'')
 	{
 	    // skip over 'string' to avoid counting [ and ] inside it.
-	    for (p = p + 1; *p != NUL && *p != '\''; MB_PTR_ADV(p))
+	    വേണ്ടി (p = p + 1; *p != NUL && *p != '\''; MB_PTR_ADV(p))
 		;
-	    if (*p == NUL)
-		break;
+	    എങ്കിൽ (*p == NUL)
+		നിർത്തുക;
 	}
-	else if (*p == '"')
+	അല്ലെങ്കിൽ എങ്കിൽ (*p == '"')
 	{
 	    // skip over "str\"ing" to avoid counting [ and ] inside it.
-	    for (p = p + 1; *p != NUL && *p != '"'; MB_PTR_ADV(p))
-		if (*p == '\\' && p[1] != NUL)
+	    വേണ്ടി (p = p + 1; *p != NUL && *p != '"'; MB_PTR_ADV(p))
+		എങ്കിൽ (*p == '\\' && p[1] != NUL)
 		    ++p;
-	    if (*p == NUL)
-		break;
+	    എങ്കിൽ (*p == NUL)
+		നിർത്തുക;
 	}
-	else if (br_nest == 0 && mb_nest == 0 && *p == ':')
+	അല്ലെങ്കിൽ എങ്കിൽ (br_nest == 0 && mb_nest == 0 && *p == ':')
 	{
 	    // "s:" is start of "s:var", but "n:" is not and can be used in
 	    // slice "[n:]".  Also "xx:" is not a namespace. But {ns}: is.
-	    len = (int)(p - arg);
-	    if ((len == 1 && vim_strchr(NAMESPACE_CHAR, *arg) == NULL)
+	    len = (പൂർണ്ണസംഖ്യ)(p - arg);
+	    എങ്കിൽ ((len == 1 && vim_strchr(NAMESPACE_CHAR, *arg) == ശൂന്യ)
 		    || (len > 1 && p[-1] != '}'))
-		break;
+		നിർത്തുക;
 	}
 
-	if (mb_nest == 0)
+	എങ്കിൽ (mb_nest == 0)
 	{
-	    if (*p == '[')
+	    എങ്കിൽ (*p == '[')
 		++br_nest;
-	    else if (*p == ']')
+	    അല്ലെങ്കിൽ എങ്കിൽ (*p == ']')
 		--br_nest;
 	}
 
-	if (br_nest == 0 && allow_curly)
+	എങ്കിൽ (br_nest == 0 && allow_curly)
 	{
-	    if (*p == '{')
+	    എങ്കിൽ (*p == '{')
 	    {
 		mb_nest++;
-		if (expr_start != NULL && *expr_start == NULL)
-		    *expr_start = p;
+		എങ്കിൽ (വ്യഞ്ജകം_start != ശൂന്യ && *വ്യഞ്ജകം_start == ശൂന്യ)
+		    *വ്യഞ്ജകം_start = p;
 	    }
-	    else if (*p == '}')
+	    അല്ലെങ്കിൽ എങ്കിൽ (*p == '}')
 	    {
 		mb_nest--;
-		if (expr_start != NULL && mb_nest == 0 && *expr_end == NULL)
-		    *expr_end = p;
+		എങ്കിൽ (വ്യഞ്ജകം_start != ശൂന്യ && mb_nest == 0 && *വ്യഞ്ജകം_end == ശൂന്യ)
+		    *വ്യഞ്ജകം_end = p;
 	    }
 	}
     }
 
-    return p;
+    തിരികെ p;
 }
 
 /*
@@ -7541,101 +7541,101 @@ find_name_end(
  * Returns a new allocated string, which the caller must free.
  * Returns NULL for failure.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 make_expanded_name(
     char_u	*in_start,
-    char_u	*expr_start,
-    char_u	*expr_end,
+    char_u	*വ്യഞ്ജകം_start,
+    char_u	*വ്യഞ്ജകം_end,
     char_u	*in_end)
 {
     char_u	c1;
-    char_u	*retval = NULL;
+    char_u	*retval = ശൂന്യ;
     char_u	*temp_result;
 
-    if (expr_end == NULL || in_end == NULL)
-	return NULL;
-    *expr_start	= NUL;
-    *expr_end = NUL;
+    എങ്കിൽ (വ്യഞ്ജകം_end == ശൂന്യ || in_end == ശൂന്യ)
+	തിരികെ ശൂന്യ;
+    *വ്യഞ്ജകം_start	= NUL;
+    *വ്യഞ്ജകം_end = NUL;
     c1 = *in_end;
     *in_end = NUL;
 
-    temp_result = eval_to_string(expr_start + 1, FALSE, FALSE);
-    if (temp_result != NULL)
+    temp_result = eval_to_string(വ്യഞ്ജകം_start + 1, FALSE, FALSE);
+    എങ്കിൽ (temp_result != ശൂന്യ)
     {
-	size_t	retvalsize = (size_t)(expr_start - in_start)
+	size_t	retvalsize = (size_t)(വ്യഞ്ജകം_start - in_start)
 				+ STRLEN(temp_result)
-				+ (size_t)(in_end - expr_end) + 1;
+				+ (size_t)(in_end - വ്യഞ്ജകം_end) + 1;
 
 	retval = alloc(retvalsize);
-	if (retval != NULL)
-	    vim_snprintf((char *)retval, retvalsize, "%s%s%s",
-				in_start, temp_result, expr_end + 1);
+	എങ്കിൽ (retval != ശൂന്യ)
+	    vim_snprintf((അക്ഷരം *)retval, retvalsize, "%s%s%s",
+				in_start, temp_result, വ്യഞ്ജകം_end + 1);
     }
     vim_free(temp_result);
 
     *in_end = c1;		// put char back for error messages
-    *expr_start = '{';
-    *expr_end = '}';
+    *വ്യഞ്ജകം_start = '{';
+    *വ്യഞ്ജകം_end = '}';
 
-    if (retval != NULL)
+    എങ്കിൽ (retval != ശൂന്യ)
     {
-	temp_result = find_name_end(retval, &expr_start, &expr_end, 0);
-	if (expr_start != NULL)
+	temp_result = find_name_end(retval, &വ്യഞ്ജകം_start, &വ്യഞ്ജകം_end, 0);
+	എങ്കിൽ (വ്യഞ്ജകം_start != ശൂന്യ)
 	{
 	    // Further expansion!
-	    temp_result = make_expanded_name(retval, expr_start,
-						       expr_end, temp_result);
+	    temp_result = make_expanded_name(retval, വ്യഞ്ജകം_start,
+						       വ്യഞ്ജകം_end, temp_result);
 	    vim_free(retval);
 	    retval = temp_result;
 	}
     }
 
-    return retval;
+    തിരികെ retval;
 }
 
 /*
  * Return TRUE if character "c" can be used in a variable or function name.
  * Does not include '{' or '}' for magic braces.
  */
-    int
-eval_isnamec(int c)
+    പൂർണ്ണസംഖ്യ
+eval_isnamec(പൂർണ്ണസംഖ്യ c)
 {
-    return ASCII_ISALNUM(c) || c == '_' || c == ':' || c == AUTOLOAD_CHAR;
+    തിരികെ ASCII_ISALNUM(c) || c == '_' || c == ':' || c == AUTOLOAD_CHAR;
 }
 
 /*
  * Return TRUE if character "c" can be used as the first character in a
  * variable or function name (excluding '{' and '}').
  */
-    int
-eval_isnamec1(int c)
+    പൂർണ്ണസംഖ്യ
+eval_isnamec1(പൂർണ്ണസംഖ്യ c)
 {
-    return ASCII_ISALPHA(c) || c == '_';
+    തിരികെ ASCII_ISALPHA(c) || c == '_';
 }
 
 /*
  * Return TRUE if character "c" can be used as the first character of a
  * dictionary key.
  */
-    int
-eval_isdictc(int c)
+    പൂർണ്ണസംഖ്യ
+eval_isdictc(പൂർണ്ണസംഖ്യ c)
 {
-    return ASCII_ISALNUM(c) || c == '_';
+    തിരികെ ASCII_ISALNUM(c) || c == '_';
 }
 
 /*
  * Return true when "p" points to "->" followed by a method name or a lambda.
  * Only called for Vim9 script.
  */
-    static bool
+    സ്ഥിതം bool
 method_call_follows(char_u *p)
 {
-    if (p[0] != '-' || p[1] != '>')
-	return false;
+    എങ്കിൽ (p[0] != '-' || p[1] != '>')
+	തിരികെ false;
 
     char_u	*after = skipwhite(p + 2);
 
-    return ASCII_ISALPHA(*after) || *after == '(';
+    തിരികെ ASCII_ISALPHA(*after) || *after == '(';
 }
 
 /*
@@ -7648,177 +7648,177 @@ method_call_follows(char_u *p)
  * Can all be combined in any order: dict.func(expr)[idx]['func'](expr)->len()
  * "name_start" points to a variable before the subscript or is NULL.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 handle_subscript(
     char_u	**arg,
     char_u	*name_start,
     typval_T	*rettv,
     evalarg_T	*evalarg,
-    int		verbose)	// give error messages
+    പൂർണ്ണസംഖ്യ		verbose)	// give error messages
 {
-    int		evaluate = evalarg != NULL
+    പൂർണ്ണസംഖ്യ		evaluate = evalarg != ശൂന്യ
 				      && (evalarg->eval_flags & EVAL_EVALUATE);
-    int		ret = OK;
-    dict_T	*selfdict = NULL;
-    int		check_white = TRUE;
-    int		getnext;
+    പൂർണ്ണസംഖ്യ		ret = OK;
+    dict_T	*selfdict = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		check_white = TRUE;
+    പൂർണ്ണസംഖ്യ		getnext;
     char_u	*p;
 
-    while (ret == OK)
+    ആകുമ്പോൾ (ret == OK)
     {
 	// When at the end of the line and ".name" or a method call follows in
 	// the next line then consume the line break.
 	p = eval_next_non_blank(*arg, evalarg, &getnext);
-	if (getnext
+	എങ്കിൽ (getnext
 	    && ((*p == '.'
 		    && ((rettv->v_type == VAR_DICT && eval_isdictc(p[1]))
 			|| rettv->v_type == VAR_CLASS
 			|| rettv->v_type == VAR_OBJECT))
 		|| method_call_follows(p)))
 	{
-	    *arg = eval_next_line(*arg, evalarg);
+	    *arg = eval_next_വരി(*arg, evalarg);
 	    p = *arg;
 	    check_white = FALSE;
 	}
 
-	if (rettv->v_type == VAR_ANY)
+	എങ്കിൽ (rettv->v_type == VAR_ANY)
 	{
 	    char_u	*exp_name;
-	    int		cc;
-	    int		idx;
+	    പൂർണ്ണസംഖ്യ		cc;
+	    പൂർണ്ണസംഖ്യ		idx;
 	    ufunc_T	*ufunc;
 	    type_T	*type;
 
 	    // Found script from "import {name} as name", script item name must
 	    // follow.  "rettv->vval.v_number" has the script ID.
-	    if (**arg != '.')
+	    എങ്കിൽ (**arg != '.')
 	    {
-		if (verbose)
+		എങ്കിൽ (verbose)
 		    semsg(_(e_expected_dot_after_name_str),
-					name_start != NULL ? name_start: *arg);
+					name_start != ശൂന്യ ? name_start: *arg);
 		ret = FAIL;
-		break;
+		നിർത്തുക;
 	    }
 	    ++*arg;
-	    if (IS_WHITE_OR_NUL(**arg))
+	    എങ്കിൽ (IS_WHITE_OR_NUL(**arg))
 	    {
-		if (verbose)
+		എങ്കിൽ (verbose)
 		    emsg(_(e_no_white_space_allowed_after_dot));
 		ret = FAIL;
-		break;
+		നിർത്തുക;
 	    }
 
 	    // isolate the name
 	    exp_name = *arg;
-	    while (eval_isnamec(**arg))
+	    ആകുമ്പോൾ (eval_isnamec(**arg))
 		++*arg;
 	    cc = **arg;
 	    **arg = NUL;
 
-	    idx = find_exported(rettv->vval.v_number, exp_name, &ufunc, &type,
-		       evalarg == NULL ? NULL : evalarg->eval_cctx,
-		       evalarg == NULL ? NULL : evalarg->eval_cstack, verbose);
+	    idx = find_exported(rettv->vval.v_സംഖ്യ, exp_name, &ufunc, &type,
+		       evalarg == ശൂന്യ ? ശൂന്യ : evalarg->eval_cctx,
+		       evalarg == ശൂന്യ ? ശൂന്യ : evalarg->eval_cstack, verbose);
 	    **arg = cc;
 
-	    if (idx < 0 && ufunc == NULL)
+	    എങ്കിൽ (idx < 0 && ufunc == ശൂന്യ)
 	    {
 		ret = FAIL;
-		break;
+		നിർത്തുക;
 	    }
-	    if (idx >= 0)
+	    എങ്കിൽ (idx >= 0)
 	    {
-		scriptitem_T    *si = SCRIPT_ITEM(rettv->vval.v_number);
+		scriptitem_T    *si = SCRIPT_ITEM(rettv->vval.v_സംഖ്യ);
 		svar_T		*sv = ((svar_T *)si->sn_var_vals.ga_data) + idx;
 
 		copy_tv(sv->sv_tv, rettv);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		rettv->v_type = VAR_FUNC;
-		if (**arg == '<')
+		എങ്കിൽ (**arg == '<')
 		{
 		    char_u *s = get_generic_func_name(ufunc, arg);
-		    if (s != NULL)
+		    എങ്കിൽ (s != ശൂന്യ)
 			rettv->vval.v_string = s;
-		    else
+		    അല്ലെങ്കിൽ
 			ret = FAIL;
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
 		    rettv->vval.v_string =
 			vim_strnsave(ufunc->uf_name, ufunc->uf_namelen);
 		}
 	    }
-	    continue;
+	    തുടരുക;
 	}
 
-	if ((**arg == '(' && (!evaluate || rettv->v_type == VAR_FUNC
+	എങ്കിൽ ((**arg == '(' && (!evaluate || rettv->v_type == VAR_FUNC
 			    || rettv->v_type == VAR_PARTIAL))
 		    && (!check_white || !VIM_ISWHITE(*(*arg - 1))))
 	{
 	    ret = call_func_rettv(arg, evalarg, rettv, evaluate,
-							       selfdict, NULL);
+							       selfdict, ശൂന്യ);
 
 	    // Stop the expression evaluation when immediately aborting on
 	    // error, or when an interrupt occurred or an exception was thrown
 	    // but not caught.
-	    if (aborting())
+	    എങ്കിൽ (aborting())
 	    {
-		if (ret == OK)
+		എങ്കിൽ (ret == OK)
 		    clear_tv(rettv);
 		ret = FAIL;
 	    }
 	    dict_unref(selfdict);
-	    selfdict = NULL;
+	    selfdict = ശൂന്യ;
 	}
-	else if (p[0] == '-' && p[1] == '>')
+	അല്ലെങ്കിൽ എങ്കിൽ (p[0] == '-' && p[1] == '>')
 	{
-	    if (in_vim9script())
+	    എങ്കിൽ (in_vim9script())
 		*arg = skipwhite(p + 2);
-	    else
+	    അല്ലെങ്കിൽ
 		*arg = p + 2;
-	    if (ret == OK && evaluate && rettv->v_type == VAR_VOID)
+	    എങ്കിൽ (ret == OK && evaluate && rettv->v_type == VAR_VOID)
 	    {
-		if (verbose)
-		    emsg(_(e_cannot_use_void_value));
+		എങ്കിൽ (verbose)
+		    emsg(_(e_cannot_use_void_മൂല്യം));
 		ret = FAIL;
 	    }
-	    else if (VIM_ISWHITE(**arg))
+	    അല്ലെങ്കിൽ എങ്കിൽ (VIM_ISWHITE(**arg))
 	    {
 		emsg(_(e_no_white_space_allowed_before_parenthesis));
 		ret = FAIL;
 	    }
-	    else if ((**arg == '{' && !in_vim9script()) || **arg == '(')
+	    അല്ലെങ്കിൽ എങ്കിൽ ((**arg == '{' && !in_vim9script()) || **arg == '(')
 		// expr->{lambda}() or expr->(lambda)()
 		ret = eval_lambda(arg, rettv, evalarg, verbose);
-	    else
+	    അല്ലെങ്കിൽ
 		// expr->name()
 		ret = eval_method(arg, rettv, evalarg, verbose);
 	}
 	// "." is ".name" lookup when we found a dict or when evaluating and
 	// scriptversion is at least 2, where string concatenation is "..".
-	else if (**arg == '['
+	അല്ലെങ്കിൽ എങ്കിൽ (**arg == '['
 		|| (**arg == '.' && (rettv->v_type == VAR_DICT
 			|| (!evaluate
 			    && (*arg)[1] != '.'
 			    && !in_old_script(2)))))
 	{
 	    dict_unref(selfdict);
-	    if (rettv->v_type == VAR_DICT)
+	    എങ്കിൽ (rettv->v_type == VAR_DICT)
 	    {
 		selfdict = rettv->vval.v_dict;
-		if (selfdict != NULL)
+		എങ്കിൽ (selfdict != ശൂന്യ)
 		    ++selfdict->dv_refcount;
 	    }
-	    else
-		selfdict = NULL;
-	    if (eval_index(arg, rettv, evalarg, verbose) == FAIL)
+	    അല്ലെങ്കിൽ
+		selfdict = ശൂന്യ;
+	    എങ്കിൽ (eval_index(arg, rettv, evalarg, verbose) == FAIL)
 	    {
 		clear_tv(rettv);
 		ret = FAIL;
 	    }
 	}
-	else if (**arg == '.' && (rettv->v_type == VAR_CLASS
+	അല്ലെങ്കിൽ എങ്കിൽ (**arg == '.' && (rettv->v_type == VAR_CLASS
 					       || rettv->v_type == VAR_OBJECT))
 	{
 	    // class member: SomeClass.varname
@@ -7826,28 +7826,28 @@ handle_subscript(
 	    // class constructor: SomeClass.new()
 	    // object member: someObject.varname
 	    // object method: someObject.SomeMethod()
-	    if (class_object_index(arg, rettv, evalarg, verbose) == FAIL)
+	    എങ്കിൽ (class_object_index(arg, rettv, evalarg, verbose) == FAIL)
 	    {
 		clear_tv(rettv);
 		ret = FAIL;
 	    }
 	}
-	else
-	    break;
+	അല്ലെങ്കിൽ
+	    നിർത്തുക;
     }
 
     // Turn "dict.Func" into a partial for "Func" bound to "dict".
     // Don't do this when "Func" is already a partial that was bound
     // explicitly (pt_auto is FALSE).
-    if (selfdict != NULL
+    എങ്കിൽ (selfdict != ശൂന്യ
 	    && (rettv->v_type == VAR_FUNC
 		|| (rettv->v_type == VAR_PARTIAL
 		    && (rettv->vval.v_partial->pt_auto
-			|| rettv->vval.v_partial->pt_dict == NULL))))
+			|| rettv->vval.v_partial->pt_dict == ശൂന്യ))))
 	selfdict = make_partial(selfdict, rettv);
 
     dict_unref(selfdict);
-    return ret;
+    തിരികെ ret;
 }
 
 /*
@@ -7858,168 +7858,168 @@ handle_subscript(
  * reference to an already copied list/dict can be used.
  * Returns FAIL or OK.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 item_copy(
     typval_T	*from,
     typval_T	*to,
-    int		deep,
-    int		top,
-    int		copyID)
+    പൂർണ്ണസംഖ്യ		deep,
+    പൂർണ്ണസംഖ്യ		മുകൾ,
+    പൂർണ്ണസംഖ്യ		copyID)
 {
-    static int	recurse = 0;
-    int		ret = OK;
+    സ്ഥിതം പൂർണ്ണസംഖ്യ	recurse = 0;
+    പൂർണ്ണസംഖ്യ		ret = OK;
 
-    if (recurse >= DICT_MAXNEST)
+    എങ്കിൽ (recurse >= DICT_MAXNEST)
     {
 	emsg(_(e_variable_nested_too_deep_for_making_copy));
-	return FAIL;
+	തിരികെ FAIL;
     }
     ++recurse;
 
-    switch (from->v_type)
+    തിരഞ്ഞെടുപ്പ് (from->v_type)
     {
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-	case VAR_STRING:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
+	അവസ്ഥ VAR_സംഖ്യ:
+	അവസ്ഥ VAR_FLOAT:
+	അവസ്ഥ VAR_STRING:
+	അവസ്ഥ VAR_FUNC:
+	അവസ്ഥ VAR_PARTIAL:
+	അവസ്ഥ VAR_BOOL:
+	അവസ്ഥ VAR_SPECIAL:
+	അവസ്ഥ VAR_JOB:
+	അവസ്ഥ VAR_CHANNEL:
+	അവസ്ഥ VAR_INSTR:
+	അവസ്ഥ VAR_CLASS:
+	അവസ്ഥ VAR_OBJECT:
+	അവസ്ഥ VAR_TYPEALIAS:
 	    copy_tv(from, to);
-	    break;
-	case VAR_LIST:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_LIST:
 	    to->v_type = VAR_LIST;
 	    to->v_lock = 0;
-	    if (from->vval.v_list == NULL)
-		to->vval.v_list = NULL;
-	    else if (copyID != 0 && from->vval.v_list->lv_copyID == copyID)
+	    എങ്കിൽ (from->vval.v_list == ശൂന്യ)
+		to->vval.v_list = ശൂന്യ;
+	    അല്ലെങ്കിൽ എങ്കിൽ (copyID != 0 && from->vval.v_list->lv_copyID == copyID)
 	    {
 		// use the copy made earlier
 		to->vval.v_list = from->vval.v_list->lv_copylist;
 		++to->vval.v_list->lv_refcount;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		to->vval.v_list = list_copy(from->vval.v_list,
-							    deep, top, copyID);
-		if (to->vval.v_list == NULL)
+							    deep, മുകൾ, copyID);
+		എങ്കിൽ (to->vval.v_list == ശൂന്യ)
 		    ret = FAIL;
 	    }
-	    break;
-	case VAR_TUPLE:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_TUPLE:
 	    to->v_type = VAR_TUPLE;
 	    to->v_lock = 0;
-	    if (from->vval.v_tuple == NULL)
-		to->vval.v_tuple = NULL;
-	    else if (copyID != 0 && from->vval.v_tuple->tv_copyID == copyID)
+	    എങ്കിൽ (from->vval.v_tuple == ശൂന്യ)
+		to->vval.v_tuple = ശൂന്യ;
+	    അല്ലെങ്കിൽ എങ്കിൽ (copyID != 0 && from->vval.v_tuple->tv_copyID == copyID)
 	    {
 		// use the copy made earlier
 		to->vval.v_tuple = from->vval.v_tuple->tv_copytuple;
 		++to->vval.v_tuple->tv_refcount;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		to->vval.v_tuple = tuple_copy(from->vval.v_tuple,
-							    deep, top, copyID);
-		if (to->vval.v_tuple == NULL)
+							    deep, മുകൾ, copyID);
+		എങ്കിൽ (to->vval.v_tuple == ശൂന്യ)
 		    ret = FAIL;
 	    }
-	    break;
-	case VAR_BLOB:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_BLOB:
 	    to->v_type = VAR_BLOB;
 	    to->v_lock = 0;
-	    if (from->vval.v_blob == NULL)
-		to->vval.v_blob = NULL;
-	    else
+	    എങ്കിൽ (from->vval.v_blob == ശൂന്യ)
+		to->vval.v_blob = ശൂന്യ;
+	    അല്ലെങ്കിൽ
 	    {
 		to->vval.v_blob = blob_copy(from->vval.v_blob);
-		if (to->vval.v_blob == NULL)
+		എങ്കിൽ (to->vval.v_blob == ശൂന്യ)
 		    ret = FAIL;
 	    }
-	    break;
-	case VAR_DICT:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_DICT:
 	    to->v_type = VAR_DICT;
 	    to->v_lock = 0;
-	    if (from->vval.v_dict == NULL)
-		to->vval.v_dict = NULL;
-	    else if (copyID != 0 && from->vval.v_dict->dv_copyID == copyID)
+	    എങ്കിൽ (from->vval.v_dict == ശൂന്യ)
+		to->vval.v_dict = ശൂന്യ;
+	    അല്ലെങ്കിൽ എങ്കിൽ (copyID != 0 && from->vval.v_dict->dv_copyID == copyID)
 	    {
 		// use the copy made earlier
 		to->vval.v_dict = from->vval.v_dict->dv_copydict;
 		++to->vval.v_dict->dv_refcount;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		to->vval.v_dict = dict_copy(from->vval.v_dict,
-							    deep, top, copyID);
-		if (to->vval.v_dict == NULL)
+							    deep, മുകൾ, copyID);
+		എങ്കിൽ (to->vval.v_dict == ശൂന്യ)
 		    ret = FAIL;
 	    }
-	    break;
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_ANY:
+	അവസ്ഥ VAR_VOID:
 	    internal_error_no_abort("item_copy(UNKNOWN)");
 	    ret = FAIL;
     }
     --recurse;
-    return ret;
+    തിരികെ ret;
 }
 
-    void
-echo_one(typval_T *rettv, int with_space, int *atstart, int *needclr)
+    ശൂന്യം
+echo_one(typval_T *rettv, പൂർണ്ണസംഖ്യ with_space, പൂർണ്ണസംഖ്യ *atstart, പൂർണ്ണസംഖ്യ *needclr)
 {
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     char_u	*p = echo_string(rettv, &tofree, numbuf, get_copyID());
 
-    if (*atstart)
+    എങ്കിൽ (*atstart)
     {
 	*atstart = FALSE;
 	// Call msg_start() after eval1(), evaluating the expression
 	// may cause a message to appear.
-	if (with_space)
+	എങ്കിൽ (with_space)
 	{
 	    // Mark the saved text as finishing the line, so that what
 	    // follows is displayed on a new line when scrolling back
 	    // at the more prompt.
-	    msg_sb_eol();
-	    msg_start();
+	    സന്ദേശം_sb_eol();
+	    സന്ദേശം_start();
 	}
     }
-    else if (with_space)
-	msg_puts_attr(" ", echo_attr);
+    അല്ലെങ്കിൽ എങ്കിൽ (with_space)
+	സന്ദേശം_puts_attr(" ", echo_attr);
 
-    if (p != NULL)
-	for ( ; *p != NUL && !got_int; ++p)
+    എങ്കിൽ (p != ശൂന്യ)
+	വേണ്ടി ( ; *p != NUL && !got_int; ++p)
 	{
-	    if (*p == '\n' || *p == '\r' || *p == TAB)
+	    എങ്കിൽ (*p == '\n' || *p == '\r' || *p == TAB)
 	    {
-		if (*p != TAB && *needclr)
+		എങ്കിൽ (*p != TAB && *needclr)
 		{
 		    // remove any text still there from the command
-		    msg_clr_eos();
+		    സന്ദേശം_clr_eos();
 		    *needclr = FALSE;
 		}
-		msg_putchar_attr(*p, echo_attr);
+		സന്ദേശം_putchar_attr(*p, echo_attr);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		if (has_mbyte)
+		എങ്കിൽ (has_mbyte)
 		{
-		    int i = (*mb_ptr2len)(p);
+		    പൂർണ്ണസംഖ്യ i = (*mb_ptr2len)(p);
 
-		    (void)msg_outtrans_len_attr(p, i, echo_attr);
+		    (ശൂന്യം)സന്ദേശം_outtrans_len_attr(p, i, echo_attr);
 		    p += i - 1;
 		}
-		else
-		    (void)msg_outtrans_len_attr(p, 1, echo_attr);
+		അല്ലെങ്കിൽ
+		    (ശൂന്യം)സന്ദേശം_outtrans_len_attr(p, 1, echo_attr);
 	    }
 	}
     vim_free(tofree);
@@ -8030,50 +8030,50 @@ echo_one(typval_T *rettv, int with_space, int *atstart, int *needclr)
  *			newline at the end.
  * ":echon expr1 ..."	print each argument plain.
  */
-    void
+    ശൂന്യം
 ex_echo(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
     typval_T	rettv;
     char_u	*arg_start;
-    int		needclr = TRUE;
-    int		atstart = TRUE;
-    int		did_emsg_before = did_emsg;
-    int		called_emsg_before = called_emsg;
+    പൂർണ്ണസംഖ്യ		needclr = TRUE;
+    പൂർണ്ണസംഖ്യ		atstart = TRUE;
+    പൂർണ്ണസംഖ്യ		did_emsg_before = did_emsg;
+    പൂർണ്ണസംഖ്യ		called_emsg_before = called_emsg;
     evalarg_T	evalarg;
 
     fill_evalarg_from_eap(&evalarg, eap, eap->skip);
 
-    if (eap->skip)
+    എങ്കിൽ (eap->skip)
 	++emsg_skip;
-    while ((!ends_excmd2(eap->cmd, arg) || *arg == '"') && !got_int)
+    ആകുമ്പോൾ ((!ends_excmd2(eap->cmd, arg) || *arg == '"') && !got_int)
     {
 	// If eval1() causes an error message the text from the command may
 	// still need to be cleared. E.g., "echo 22,44".
 	need_clr_eos = needclr;
 
 	arg_start = arg;
-	if (eval1(&arg, &rettv, &evalarg) == FAIL)
+	എങ്കിൽ (eval1(&arg, &rettv, &evalarg) == FAIL)
 	{
 	    /*
 	     * Report the invalid expression unless the expression evaluation
 	     * has been cancelled due to an aborting error, an interrupt, or an
 	     * exception.
 	     */
-	    if (!aborting() && did_emsg == did_emsg_before
+	    എങ്കിൽ (!aborting() && did_emsg == did_emsg_before
 					  && called_emsg == called_emsg_before)
 		semsg(_(e_invalid_expression_str), arg_start);
 	    need_clr_eos = FALSE;
-	    break;
+	    നിർത്തുക;
 	}
 	need_clr_eos = FALSE;
 
-	if (!eap->skip)
+	എങ്കിൽ (!eap->skip)
 	{
-	    if (rettv.v_type == VAR_VOID)
+	    എങ്കിൽ (rettv.v_type == VAR_VOID)
 	    {
-		semsg(_(e_expression_does_not_result_in_value_str), arg_start);
-		break;
+		semsg(_(e_expression_does_not_result_in_മൂല്യം_str), arg_start);
+		നിർത്തുക;
 	    }
 	    echo_one(&rettv, eap->cmdidx == CMD_echo, &atstart, &needclr);
 	}
@@ -8084,22 +8084,22 @@ ex_echo(exarg_T *eap)
     set_nextcmd(eap, arg);
     clear_evalarg(&evalarg, eap);
 
-    if (eap->skip)
+    എങ്കിൽ (eap->skip)
 	--emsg_skip;
-    else
+    അല്ലെങ്കിൽ
     {
 	// remove text that may still be there from the command
-	if (needclr)
-	    msg_clr_eos();
-	if (eap->cmdidx == CMD_echo)
-	    msg_end();
+	എങ്കിൽ (needclr)
+	    സന്ദേശം_clr_eos();
+	എങ്കിൽ (eap->cmdidx == CMD_echo)
+	    സന്ദേശം_end();
     }
 }
 
 /*
  * ":echohl {name}".
  */
-    void
+    ശൂന്യം
 ex_echohl(exarg_T *eap)
 {
     echo_attr = syn_name2attr(eap->arg);
@@ -8108,10 +8108,10 @@ ex_echohl(exarg_T *eap)
 /*
  * Returns the :echo attribute
  */
-    int
-get_echo_attr(void)
+    പൂർണ്ണസംഖ്യ
+get_echo_attr(ശൂന്യം)
 {
-    return echo_attr;
+    തിരികെ echo_attr;
 }
 
 /*
@@ -8123,58 +8123,58 @@ get_echo_attr(void)
  * Each gets spaces around each argument and a newline at the end for
  * echo commands
  */
-    void
+    ശൂന്യം
 ex_execute(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
     typval_T	rettv;
-    int		ret = OK;
+    പൂർണ്ണസംഖ്യ		ret = OK;
     char_u	*p;
     garray_T	ga;
-    int		len;
+    പൂർണ്ണസംഖ്യ		len;
     long	start_lnum = SOURCING_LNUM;
 
     ga_init2(&ga, 1, 80);
 
-    if (eap->skip)
+    എങ്കിൽ (eap->skip)
 	++emsg_skip;
-    while (!ends_excmd2(eap->cmd, arg) || *arg == '"')
+    ആകുമ്പോൾ (!ends_excmd2(eap->cmd, arg) || *arg == '"')
     {
 	ret = eval1_emsg(&arg, &rettv, eap);
-	if (ret == FAIL)
-	    break;
+	എങ്കിൽ (ret == FAIL)
+	    നിർത്തുക;
 
-	if (!eap->skip)
+	എങ്കിൽ (!eap->skip)
 	{
 	    char_u   buf[NUMBUFLEN];
 
-	    if (eap->cmdidx == CMD_execute)
+	    എങ്കിൽ (eap->cmdidx == CMD_execute)
 	    {
-		if (rettv.v_type == VAR_CHANNEL || rettv.v_type == VAR_JOB)
+		എങ്കിൽ (rettv.v_type == VAR_CHANNEL || rettv.v_type == VAR_JOB)
 		{
-		    semsg(_(e_using_invalid_value_as_string_str),
+		    semsg(_(e_using_invalid_മൂല്യം_as_string_str),
 						  vartype_name(rettv.v_type));
-		    p = NULL;
+		    p = ശൂന്യ;
 		}
-		else
+		അല്ലെങ്കിൽ
 		    p = tv_get_string_buf(&rettv, buf);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		p = tv_stringify(&rettv, buf);
-	    if (p == NULL)
+	    എങ്കിൽ (p == ശൂന്യ)
 	    {
 		clear_tv(&rettv);
 		ret = FAIL;
-		break;
+		നിർത്തുക;
 	    }
-	    len = (int)STRLEN(p);
-	    if (ga_grow(&ga, len + 2) == FAIL)
+	    len = (പൂർണ്ണസംഖ്യ)STRLEN(p);
+	    എങ്കിൽ (ga_grow(&ga, len + 2) == FAIL)
 	    {
 		clear_tv(&rettv);
 		ret = FAIL;
-		break;
+		നിർത്തുക;
 	    }
-	    if (ga.ga_len)
+	    എങ്കിൽ (ga.ga_len)
 		((char_u *)(ga.ga_data))[ga.ga_len++] = ' ';
 	    STRCPY((char_u *)(ga.ga_data) + ga.ga_len, p);
 	    ga.ga_len += len;
@@ -8184,53 +8184,53 @@ ex_execute(exarg_T *eap)
 	arg = skipwhite(arg);
     }
 
-    if (ret != FAIL && ga.ga_data != NULL)
+    എങ്കിൽ (ret != FAIL && ga.ga_data != ശൂന്യ)
     {
 	// use the first line of continuation lines for messages
 	SOURCING_LNUM = start_lnum;
 
-	if (eap->cmdidx == CMD_echomsg
+	എങ്കിൽ (eap->cmdidx == CMD_echomsg
 		|| eap->cmdidx == CMD_echowindow
 		|| eap->cmdidx == CMD_echoerr)
 	{
 	    // Mark the already saved text as finishing the line, so that what
 	    // follows is displayed on a new line when scrolling back at the
 	    // more prompt.
-	    msg_sb_eol();
+	    സന്ദേശം_sb_eol();
 	}
 
-	if (eap->cmdidx == CMD_echomsg)
+	എങ്കിൽ (eap->cmdidx == CMD_echomsg)
 	{
-	    msg_attr(ga.ga_data, echo_attr);
+	    സന്ദേശം_attr(ga.ga_data, echo_attr);
 	    out_flush();
 	}
-	else if (eap->cmdidx == CMD_echowindow)
+	അല്ലെങ്കിൽ എങ്കിൽ (eap->cmdidx == CMD_echowindow)
 	{
 #ifdef HAS_MESSAGE_WINDOW
-	    start_echowindow(eap->addr_count > 0 ? eap->line2 : 0);
+	    start_echowindow(eap->addr_എണ്ണം > 0 ? eap->line2 : 0);
 #endif
-	    msg_attr(ga.ga_data, echo_attr);
+	    സന്ദേശം_attr(ga.ga_data, echo_attr);
 #ifdef HAS_MESSAGE_WINDOW
 	    end_echowindow();
 #endif
 	}
-	else if (eap->cmdidx == CMD_echoconsole)
+	അല്ലെങ്കിൽ എങ്കിൽ (eap->cmdidx == CMD_echoconsole)
 	{
-	    ui_write(ga.ga_data, (int)STRLEN(ga.ga_data), TRUE);
+	    ui_write(ga.ga_data, (പൂർണ്ണസംഖ്യ)STRLEN(ga.ga_data), TRUE);
 	    ui_write((char_u *)"\r\n", 2, TRUE);
 	}
-	else if (eap->cmdidx == CMD_echoerr)
+	അല്ലെങ്കിൽ എങ്കിൽ (eap->cmdidx == CMD_echoerr)
 	{
-	    int		save_did_emsg = did_emsg;
+	    പൂർണ്ണസംഖ്യ		save_did_emsg = did_emsg;
 
 	    // We don't want to abort following commands, restore did_emsg.
 	    emsg(ga.ga_data);
-	    if (!force_abort)
+	    എങ്കിൽ (!force_abort)
 		did_emsg = save_did_emsg;
 	}
-	else if (eap->cmdidx == CMD_execute)
+	അല്ലെങ്കിൽ എങ്കിൽ (eap->cmdidx == CMD_execute)
 	{
-	    int save_sticky_cmdmod_flags = sticky_cmdmod_flags;
+	    പൂർണ്ണസംഖ്യ save_sticky_cmdmod_flags = sticky_cmdmod_flags;
 
 	    // "legacy exe cmd" and "vim9cmd exe cmd" applies to "cmd".
 	    sticky_cmdmod_flags = cmdmod.cmod_flags
@@ -8243,7 +8243,7 @@ ex_execute(exarg_T *eap)
 
     ga_clear(&ga);
 
-    if (eap->skip)
+    എങ്കിൽ (eap->skip)
 	--emsg_skip;
     set_nextcmd(eap, arg);
 }
@@ -8255,59 +8255,59 @@ ex_execute(exarg_T *eap)
  * after the option name.
  */
     char_u *
-find_option_end(char_u **arg, int *scope)
+find_option_end(char_u **arg, പൂർണ്ണസംഖ്യ *scope)
 {
     char_u	*p = *arg;
 
     ++p;
-    if (*p == 'g' && p[1] == ':')
+    എങ്കിൽ (*p == 'g' && p[1] == ':')
     {
 	*scope = OPT_GLOBAL;
 	p += 2;
     }
-    else if (*p == 'l' && p[1] == ':')
+    അല്ലെങ്കിൽ എങ്കിൽ (*p == 'l' && p[1] == ':')
     {
 	*scope = OPT_LOCAL;
 	p += 2;
     }
-    else
+    അല്ലെങ്കിൽ
 	*scope = 0;
 
-    if (!ASCII_ISALPHA(*p))
-	return NULL;
+    എങ്കിൽ (!ASCII_ISALPHA(*p))
+	തിരികെ ശൂന്യ;
     *arg = p;
 
-    if (p[0] == 't' && p[1] == '_' && p[2] != NUL && p[3] != NUL)
+    എങ്കിൽ (p[0] == 't' && p[1] == '_' && p[2] != NUL && p[3] != NUL)
 	p += 4;	    // termcap option
-    else
-	while (ASCII_ISALPHA(*p))
+    അല്ലെങ്കിൽ
+	ആകുമ്പോൾ (ASCII_ISALPHA(*p))
 	    ++p;
-    return p;
+    തിരികെ p;
 }
 
 /*
  * Display script name where an item was last set.
  * Should only be invoked when 'verbose' is non-zero.
  */
-    void
-last_set_msg(sctx_T script_ctx)
+    ശൂന്യം
+last_set_സന്ദേശം(sctx_T script_ctx)
 {
     char_u *p;
 
-    if (script_ctx.sc_sid == 0)
-	return;
+    എങ്കിൽ (script_ctx.sc_sid == 0)
+	തിരികെ;
 
-    p = home_replace_save(NULL, get_scriptname(script_ctx.sc_sid));
-    if (p == NULL)
-	return;
+    p = home_replace_save(ശൂന്യ, get_scriptname(script_ctx.sc_sid));
+    എങ്കിൽ (p == ശൂന്യ)
+	തിരികെ;
 
     verbose_enter();
-    msg_puts(_("\n\tLast set from "));
-    msg_puts((char *)p);
-    if (script_ctx.sc_lnum > 0)
+    സന്ദേശം_puts(_("\n\tLast set from "));
+    സന്ദേശം_puts((അക്ഷരം *)p);
+    എങ്കിൽ (script_ctx.sc_lnum > 0)
     {
-	msg_puts(_(line_msg));
-	msg_outnum((long)script_ctx.sc_lnum);
+	സന്ദേശം_puts(_(വരി_സന്ദേശം));
+	സന്ദേശം_outnum((long)script_ctx.sc_lnum);
     }
     verbose_leave();
     vim_free(p);
@@ -8327,7 +8327,7 @@ do_string_sub(
     size_t	len,
     char_u	*pat,
     char_u	*sub,
-    typval_T	*expr,
+    typval_T	*വ്യഞ്ജകം,
     char_u	*flags,
     size_t	*ret_len)		// length of returned buffer
 {
@@ -8344,21 +8344,21 @@ do_string_sub(
 
     regmatch.rm_ic = p_ic;
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
-    if (regmatch.regprog != NULL)
+    എങ്കിൽ (regmatch.regprog != ശൂന്യ)
     {
 	char_u	*tail = str;
 	char_u	*end = str + len;
-	int	do_all = (flags[0] == 'g');
-	int	sublen;
-	int	i;
-	char_u	*zero_width = NULL;
+	പൂർണ്ണസംഖ്യ	do_all = (flags[0] == 'g');
+	പൂർണ്ണസംഖ്യ	sublen;
+	പൂർണ്ണസംഖ്യ	i;
+	char_u	*zero_width = ശൂന്യ;
 
-	while (vim_regexec_nl(&regmatch, str, (colnr_T)(tail - str)))
+	ആകുമ്പോൾ (vim_regexec_nl(&regmatch, str, (colnr_T)(tail - str)))
 	{
 	    // Skip empty match except for first match.
-	    if (regmatch.startp[0] == regmatch.endp[0])
+	    എങ്കിൽ (regmatch.startp[0] == regmatch.endp[0])
 	    {
-		if (zero_width == regmatch.startp[0])
+		എങ്കിൽ (zero_width == regmatch.startp[0])
 		{
 		    // avoid getting stuck on a match with an empty string
 		    i = mb_ptr2len(tail);
@@ -8366,7 +8366,7 @@ do_string_sub(
 								   (size_t)i);
 		    ga.ga_len += i;
 		    tail += i;
-		    continue;
+		    തുടരുക;
 		}
 		zero_width = regmatch.startp[0];
 	    }
@@ -8378,64 +8378,64 @@ do_string_sub(
 	     * - The substituted text.
 	     * - The text after the match.
 	     */
-	    sublen = vim_regsub(&regmatch, sub, expr, tail, 0, REGSUB_MAGIC);
-	    if (sublen <= 0)
+	    sublen = vim_regsub(&regmatch, sub, വ്യഞ്ജകം, tail, 0, REGSUB_MAGIC);
+	    എങ്കിൽ (sublen <= 0)
 	    {
 		ga_clear(&ga);
-		break;
+		നിർത്തുക;
 	    }
-	    if (ga_grow(&ga, (int)((end - tail) + sublen -
+	    എങ്കിൽ (ga_grow(&ga, (പൂർണ്ണസംഖ്യ)((end - tail) + sublen -
 			    (regmatch.endp[0] - regmatch.startp[0]))) == FAIL)
 	    {
 		ga_clear(&ga);
-		break;
+		നിർത്തുക;
 	    }
 
 	    // copy the text up to where the match is
-	    i = (int)(regmatch.startp[0] - tail);
+	    i = (പൂർണ്ണസംഖ്യ)(regmatch.startp[0] - tail);
 	    mch_memmove((char_u *)ga.ga_data + ga.ga_len, tail, (size_t)i);
 	    // add the substituted text
-	    (void)vim_regsub(&regmatch, sub, expr,
+	    (ശൂന്യം)vim_regsub(&regmatch, sub, വ്യഞ്ജകം,
 				  (char_u *)ga.ga_data + ga.ga_len + i, sublen,
 				  REGSUB_COPY | REGSUB_MAGIC);
 	    ga.ga_len += i + sublen - 1;
 	    tail = regmatch.endp[0];
-	    if (*tail == NUL)
-		break;
-	    if (!do_all)
-		break;
+	    എങ്കിൽ (*tail == NUL)
+		നിർത്തുക;
+	    എങ്കിൽ (!do_all)
+		നിർത്തുക;
 	}
 
-	if (ga.ga_data != NULL)
+	എങ്കിൽ (ga.ga_data != ശൂന്യ)
 	{
-	    STRCPY((char *)ga.ga_data + ga.ga_len, tail);
-	    ga.ga_len += (int)(end - tail);
+	    STRCPY((അക്ഷരം *)ga.ga_data + ga.ga_len, tail);
+	    ga.ga_len += (പൂർണ്ണസംഖ്യ)(end - tail);
 	}
 
 	vim_regfree(regmatch.regprog);
     }
 
-    if (ga.ga_data != NULL)
+    എങ്കിൽ (ga.ga_data != ശൂന്യ)
     {
 	str = (char_u *)ga.ga_data;
 	len = (size_t)ga.ga_len;
     }
     ret = vim_strnsave(str, len);
     ga_clear(&ga);
-    if (p_cpo == empty_option)
+    എങ്കിൽ (p_cpo == empty_option)
 	p_cpo = save_cpo;
-    else
+    അല്ലെങ്കിൽ
     {
 	// Darn, evaluating {sub} expression or {expr} changed the value.
 	// If it's still empty it was changed and restored, need to restore in
 	// the complicated way.
-	if (*p_cpo == NUL)
-	    set_option_value_give_err((char_u *)"cpo", 0L, save_cpo, 0);
+	എങ്കിൽ (*p_cpo == NUL)
+	    set_option_മൂല്യം_give_err((char_u *)"cpo", 0L, save_cpo, 0);
 	free_string_option(save_cpo);
     }
 
-    if (ret_len != NULL)
+    എങ്കിൽ (ret_len != ശൂന്യ)
 	*ret_len = len;
 
-    return ret;
+    തിരികെ ret;
 }

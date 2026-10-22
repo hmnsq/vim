@@ -10,7 +10,7 @@
  * socketserver.c: Socketserver clientserver functionality
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
 #ifdef FEAT_SOCKETSERVER
 
@@ -43,74 +43,74 @@
  * used to find the specific ss_reply_T, and a single string is popped from the
  * array.
  */
-typedef struct
+തരനിർവചനം ഘടന
 {
     char_u *sender; // Includes "type:" prefix if any
     garray_T strings;
 } ss_reply_T;
 
-static channel_T    *server_channel = NULL;
-static char_u	    *server_address = NULL; // Includes "type:" prefix if any
-static bool	    server_is_unix = false;
-static char_u	    *server_addr_cwd = NULL; // CWD when server was started, used
+സ്ഥിതം channel_T    *server_channel = ശൂന്യ;
+സ്ഥിതം char_u	    *server_address = ശൂന്യ; // Includes "type:" prefix if any
+സ്ഥിതം bool	    server_is_unix = false;
+സ്ഥിതം char_u	    *server_addr_cwd = ശൂന്യ; // CWD when server was started, used
 					  // to handle relative file paths.
-static garray_T	    server_replies;
+സ്ഥിതം garray_T	    server_replies;
 
-static channel_T    *client_channels = NULL;
-static int	    client_channel_count = 0;
+സ്ഥിതം channel_T    *client_channels = ശൂന്യ;
+സ്ഥിതം പൂർണ്ണസംഖ്യ	    client_channel_എണ്ണം = 0;
 
 # define FOR_ALL_CLIENTS(ch) \
-    for (ch = client_channels; ch != NULL; ch = ch->ch_ss_next)
+    വേണ്ടി (ch = client_channels; ch != ശൂന്യ; ch = ch->ch_ss_next)
 
-static void socketserver_cleanup(void);
-static char_u *socketserver_create_path(char_u *name, bool quiet);
-static char_u *socketserver_get_path(char_u *name, bool new, bool quiet, bool ignore, bool *fatal);
-static void socketserver_accept(channel_T *channel);
-static void socketserver_close(channel_T *channel);
-static ss_reply_T *socketserver_add_reply(char_u *sender);
+സ്ഥിതം ശൂന്യം socketserver_cleanup(ശൂന്യം);
+സ്ഥിതം char_u *socketserver_create_path(char_u *name, bool quiet);
+സ്ഥിതം char_u *socketserver_get_path(char_u *name, bool new, bool quiet, bool ignore, bool *fatal);
+സ്ഥിതം ശൂന്യം socketserver_accept(channel_T *channel);
+സ്ഥിതം ശൂന്യം socketserver_close(channel_T *channel);
+സ്ഥിതം ss_reply_T *socketserver_add_reply(char_u *sender);
 
 /*
  * Start the socketserver using the given name. Returns OK on success and FAIL
  * on failure.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 socketserver_start(char_u *name, bool quiet)
 {
-    char_u	*address = NULL;
-    int		port;
+    char_u	*address = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		port;
     bool	is_unix = false;
     channel_T	*channel;
     char_u	*buf;
     char_u	dirbuf[MAXPATHL];
 
-    if (server_channel != NULL)
-	return OK;
+    എങ്കിൽ (server_channel != ശൂന്യ)
+	തിരികെ OK;
 
-    if (STRNICMP(name, "channel:", 8) == 0)
+    എങ്കിൽ (STRNICMP(name, "channel:", 8) == 0)
     {
-	if (channel_parse_socketserver_address(name + 8, &port, &address, quiet)
+	എങ്കിൽ (channel_parse_socketserver_address(name + 8, &port, &address, quiet)
 		== FAIL)
-	    return FAIL;
-	if (address != NULL)
+	    തിരികെ FAIL;
+	എങ്കിൽ (address != ശൂന്യ)
 	    is_unix = true;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	address = socketserver_create_path(name, quiet);
-	if (address == NULL)
-	    return FAIL;
+	എങ്കിൽ (address == ശൂന്യ)
+	    തിരികെ FAIL;
 	is_unix = true;
     }
 
-    if (is_unix)
-	channel = channel_listen_unix((char *)address, NULL, false);
-    else
-	channel = channel_listen(port, NULL);
+    എങ്കിൽ (is_unix)
+	channel = channel_listen_unix((അക്ഷരം *)address, ശൂന്യ, false);
+    അല്ലെങ്കിൽ
+	channel = channel_listen(port, ശൂന്യ);
 
-    if (channel == NULL)
+    എങ്കിൽ (channel == ശൂന്യ)
     {
 	vim_free(address);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     channel->ch_socketserver = true;
@@ -122,12 +122,12 @@ socketserver_start(char_u *name, bool quiet)
 
     VIM_CLEAR(serverName);
 
-    if (STRNICMP(name, "channel:", 8) == 0)
+    എങ്കിൽ (STRNICMP(name, "channel:", 8) == 0)
 	buf = vim_strsave(name);
-    else
+    അല്ലെങ്കിൽ
     {
 	buf = alloc(MAXPATHL + 1);
-	if (buf != NULL)
+	എങ്കിൽ (buf != ശൂന്യ)
 	{
 	    buf[0] = NUL;
 	    mch_FullName(address, buf, MAXPATHL, false);
@@ -135,7 +135,7 @@ socketserver_start(char_u *name, bool quiet)
     }
     vim_free(address);
 
-    if (buf != NULL)
+    എങ്കിൽ (buf != ശൂന്യ)
     {
 	server_address = vim_strsave(buf);
 	serverName = buf;
@@ -143,77 +143,77 @@ socketserver_start(char_u *name, bool quiet)
     }
 
     vim_free(server_addr_cwd);
-    if (mch_dirname(dirbuf, sizeof(dirbuf)) == OK)
+    എങ്കിൽ (mch_dirname(dirbuf, വലുപ്പം(dirbuf)) == OK)
 	server_addr_cwd = vim_strsave(dirbuf);
-    else
-	server_addr_cwd = NULL;
+    അല്ലെങ്കിൽ
+	server_addr_cwd = ശൂന്യ;
 
-    ga_init2(&server_replies, sizeof(ss_reply_T), 2);
+    ga_init2(&server_replies, വലുപ്പം(ss_reply_T), 2);
 
-    ch_log(NULL, "socketserver: started server at %s", name);
+    ch_log(ശൂന്യ, "socketserver: started server at %s", name);
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Stop running the socketserver if it is. Note that this does not stop Vim from
  * becoming a client.
  */
-    void
-socketserver_stop(void)
+    ശൂന്യം
+socketserver_stop(ശൂന്യം)
 {
-    if (server_channel == NULL)
-	return;
+    എങ്കിൽ (server_channel == ശൂന്യ)
+	തിരികെ;
 
     channel_close(server_channel, false);
     channel_clear(server_channel);
 
     socketserver_cleanup();
 
-    ch_log(NULL, "socketserver: shutting down server");
+    ch_log(ശൂന്യ, "socketserver: shutting down server");
 }
 
 /*
  * Cleanup server stuff. Do not close client channels, as those are not part of
  * the actual server.
  */
-    static void
-socketserver_cleanup(void)
+    സ്ഥിതം ശൂന്യം
+socketserver_cleanup(ശൂന്യം)
 {
 # ifdef UNIX
-    if (server_is_unix && server_address != NULL)
+    എങ്കിൽ (server_is_unix && server_address != ശൂന്യ)
     {
 	char_u *path = server_address;
 	char_u dirbuf[MAXPATHL];
 
-	if (STRNICMP(path, "channel:unix:", 13) == 0)
+	എങ്കിൽ (STRNICMP(path, "channel:unix:", 13) == 0)
 	    path += 13;
-	else if (STRNICMP(path, "name:", 5) == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(path, "name:", 5) == 0)
 	    path += 5;
 
-	if (*path == '/')
+	എങ്കിൽ (*path == '/')
 	    mch_remove(path);
 	// Go to the directory where the server was started. This is to handle
 	// when Vim changes directories and the servername is a relative path.
-	else if (server_addr_cwd != NULL
-		&& mch_dirname(dirbuf, sizeof(dirbuf)) == OK)
+	അല്ലെങ്കിൽ എങ്കിൽ (server_addr_cwd != ശൂന്യ
+		&& mch_dirname(dirbuf, വലുപ്പം(dirbuf)) == OK)
 	{
-	    if (mch_chdir((char *)server_addr_cwd) == 0)
+	    എങ്കിൽ (mch_chdir((അക്ഷരം *)server_addr_cwd) == 0)
 	    {
 		mch_remove(path);
-		if (mch_chdir((char *)dirbuf) < 0)
+		എങ്കിൽ (mch_chdir((അക്ഷരം *)dirbuf) < 0)
 		    emsg(_(e_cannot_go_back_to_previous_directory));
 	    }
 	}
     }
 # endif
 
-    server_channel = NULL;
+    server_channel = ശൂന്യ;
     VIM_CLEAR(server_address);
     VIM_CLEAR(server_addr_cwd);
 
     // Free all replies
-    for (int i = 0; i < server_replies.ga_len; i++)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < server_replies.ga_len; i++)
     {
 	ss_reply_T *reply = (ss_reply_T *)server_replies.ga_data + i;
 
@@ -230,63 +230,63 @@ socketserver_cleanup(void)
  * and NULL on failure.
  */
     list_T *
-socketserver_list(void)
+socketserver_list(ശൂന്യം)
 {
     list_T *list = list_alloc();
 
-    if (list == NULL)
-	return NULL;
+    എങ്കിൽ (list == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
 # ifdef MSWIN
     // Only support addresses on Windows
-    return list;
-# else
+    തിരികെ list;
+# അല്ലെങ്കിൽ
     string_T	    buf;
     string_T	    path;
     DIR		    *dirp;
-    struct dirent   *dp;
-    const char_u    *known_dirs[] = {
+    ഘടന dirent   *dp;
+    സ്ഥിരം char_u    *known_dirs[] = {
 	mch_getenv("XDG_RUNTIME_DIR"),
 	mch_getenv("TMPDIR"),
 	(char_u *)"/tmp"
     };
 
-    if ((buf.string = alloc(MAXPATHL)) == NULL)
-	return NULL;
-    if ((path.string = alloc(MAXPATHL)) == NULL)
+    എങ്കിൽ ((buf.string = alloc(MAXPATHL)) == ശൂന്യ)
+	തിരികെ ശൂന്യ;
+    എങ്കിൽ ((path.string = alloc(MAXPATHL)) == ശൂന്യ)
     {
 	vim_free(buf.string);
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
     buf.length = 0;
     path.length = 0;
 
-    for (size_t i = 0 ; i < ARRAY_LENGTH(known_dirs); i++)
+    വേണ്ടി (size_t i = 0 ; i < ARRAY_LENGTH(known_dirs); i++)
     {
-	const char_u *dir = known_dirs[i];
+	സ്ഥിരം char_u *dir = known_dirs[i];
 
-	if (dir == NULL)
-	    continue;
+	എങ്കിൽ (dir == ശൂന്യ)
+	    തുടരുക;
 
-	if (STRCMP(dir, "/tmp") == 0 ||
-		(known_dirs[1] != NULL && STRCMP(dir, known_dirs[1]) == 0))
-	    path.length = vim_snprintf_safelen((char *)path.string, MAXPATHL,
-		    "%s/vim-%lu", dir, (unsigned long int)getuid());
-	else
-	    path.length = vim_snprintf_safelen((char *)path.string, MAXPATHL,
+	എങ്കിൽ (STRCMP(dir, "/tmp") == 0 ||
+		(known_dirs[1] != ശൂന്യ && STRCMP(dir, known_dirs[1]) == 0))
+	    path.length = vim_snprintf_safelen((അക്ഷരം *)path.string, MAXPATHL,
+		    "%s/vim-%lu", dir, (unsigned long പൂർണ്ണസംഖ്യ)getuid());
+	അല്ലെങ്കിൽ
+	    path.length = vim_snprintf_safelen((അക്ഷരം *)path.string, MAXPATHL,
 		    "%s/vim", dir);
 
-	dirp = opendir((char *)path.string);
-	if (dirp == NULL)
-	    continue;
+	dirp = opendir((അക്ഷരം *)path.string);
+	എങ്കിൽ (dirp == ശൂന്യ)
+	    തുടരുക;
 
 	// Loop through directory
-	while ((dp = readdir(dirp)) != NULL)
+	ആകുമ്പോൾ ((dp = readdir(dirp)) != ശൂന്യ)
 	{
-	    if (STRCMP(dp->d_name, ".") == 0 || STRCMP(dp->d_name, "..") == 0)
-		continue;
+	    എങ്കിൽ (STRCMP(dp->d_name, ".") == 0 || STRCMP(dp->d_name, "..") == 0)
+		തുടരുക;
 
-	    buf.length = vim_snprintf_safelen((char *)buf.string, MAXPATHL,
+	    buf.length = vim_snprintf_safelen((അക്ഷരം *)buf.string, MAXPATHL,
 		    "%s/%s", path.string, dp->d_name);
 
 	    list_append_string(list, (char_u *)dp->d_name,
@@ -295,13 +295,13 @@ socketserver_list(void)
 
 	closedir(dirp);
 
-	break;
+	നിർത്തുക;
     }
 
     vim_free(path.string);
     vim_free(buf.string);
 
-    return list;
+    തിരികെ list;
 # endif
 }
 
@@ -311,61 +311,61 @@ socketserver_list(void)
  * an incrementing number to the path until we find a socket filename that can
  * be used. Returns alloced string or NULL on failure.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 socketserver_create_path(char_u *name, bool quiet)
 {
 # ifdef MSWIN
     // Only support channel addresses on Windows
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
-    else
+    എങ്കിൽ (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	തിരികെ vim_strsave(name + 8);
+    അല്ലെങ്കിൽ
     {
-	if (!quiet)
+	എങ്കിൽ (!quiet)
 	    semsg(_(e_invalid_argument_str), name);
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
-# else
-    char_u  *buf = NULL;
-    int	    buflen = STRLEN(name) + NUMBUFLEN;
-    char_u  *path = NULL;
+# അല്ലെങ്കിൽ
+    char_u  *buf = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ	    buflen = STRLEN(name) + NUMBUFLEN;
+    char_u  *path = ശൂന്യ;
     bool    fatal = false;
 
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
-    if (STRNICMP(name, "name:", 5) == 0)
+    എങ്കിൽ (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	തിരികെ vim_strsave(name + 8);
+    എങ്കിൽ (STRNICMP(name, "name:", 5) == 0)
 	name += 5;
 
-    for (int i = 0; i < 1000; i++)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < 1000; i++)
     {
-	if (buf != NULL)
+	എങ്കിൽ (buf != ശൂന്യ)
 	{
-	    vim_snprintf((char *)buf, buflen, "%s%d", name, i);
+	    vim_snprintf((അക്ഷരം *)buf, buflen, "%s%d", name, i);
 	    path = socketserver_get_path(buf, true, quiet, true, &fatal);
 	}
-	else
+	അല്ലെങ്കിൽ
 	    path = socketserver_get_path(name, true, quiet, true, &fatal);
 
-	if (fatal)
-	    break;
+	എങ്കിൽ (fatal)
+	    നിർത്തുക;
 
-	if (path == NULL)
+	എങ്കിൽ (path == ശൂന്യ)
 	{
-	    if (buf == NULL)
+	    എങ്കിൽ (buf == ശൂന്യ)
 	    {
 		buf = alloc(buflen);
-		if (buf == NULL)
+		എങ്കിൽ (buf == ശൂന്യ)
 		{
 		    semsg(_(e_out_of_memory_allocating_nr_bytes), buflen);
-		    return NULL;
+		    തിരികെ ശൂന്യ;
 		}
 	    }
-	    continue;
+	    തുടരുക;
 	}
-	break;
+	നിർത്തുക;
     }
     vim_free(buf);
 
-    return path;
+    തിരികെ path;
 # endif
 }
 
@@ -386,7 +386,7 @@ socketserver_create_path(char_u *name, bool quiet)
  *
  * Returns path on success and NULL on failure.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 socketserver_get_path(
 	char_u *name,
 	bool new UNUSED,
@@ -396,107 +396,107 @@ socketserver_get_path(
 {
 # ifdef MSWIN
     // Only support channel addresses on Windows
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
-    else
+    എങ്കിൽ (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	തിരികെ vim_strsave(name + 8);
+    അല്ലെങ്കിൽ
     {
-	if (!quiet)
+	എങ്കിൽ (!quiet)
 	    semsg(_(e_invalid_argument_str), name);
-	if (fatal != NULL)
+	എങ്കിൽ (fatal != ശൂന്യ)
 	    *fatal = true;
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
-# else
+# അല്ലെങ്കിൽ
     char_u	    *buf;
     bool	    res = false;
     channel_T	    *channel;
-    const char_u    *known_dirs[] = {
+    സ്ഥിരം char_u    *known_dirs[] = {
 	mch_getenv("XDG_RUNTIME_DIR"),
 	mch_getenv("TMPDIR"),
 	(char_u *)"/tmp"
     };
 
-    if (name == NULL)
+    എങ്കിൽ (name == ശൂന്യ)
     {
-	if (fatal != NULL)
+	എങ്കിൽ (fatal != ശൂന്യ)
 	    *fatal = true;
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 
     // Ignore if name is a path
-    if (name[0] == '/' || STRNCMP(name, "./", 2) == 0 ||
+    എങ്കിൽ (name[0] == '/' || STRNCMP(name, "./", 2) == 0 ||
 	    STRNCMP(name, "../", 3) == 0)
-	return vim_strsave(name);
+	തിരികെ vim_strsave(name);
 
-    if (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
-	return vim_strsave(name + 8);
+    എങ്കിൽ (STRNICMP(name, "channel:", 8) == 0 && STRLEN(name) > 8)
+	തിരികെ vim_strsave(name + 8);
 
-    if (STRNICMP(name, "name:", 5) == 0)
+    എങ്കിൽ (STRNICMP(name, "name:", 5) == 0)
 	name += 5;
 
-    if (vim_strchr(name, '/') != NULL)
+    എങ്കിൽ (vim_strchr(name, '/') != ശൂന്യ)
     {
-	if (!quiet)
+	എങ്കിൽ (!quiet)
 	    semsg(_(e_socket_name_no_slashes), name);
-	if (fatal != NULL)
+	എങ്കിൽ (fatal != ശൂന്യ)
 	    *fatal = true;
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 
     buf = alloc(MAXPATHL);
 
-    if (buf == NULL)
+    എങ്കിൽ (buf == ശൂന്യ)
     {
-	if (fatal != NULL)
+	എങ്കിൽ (fatal != ശൂന്യ)
 	    *fatal = true;
 	semsg(_(e_out_of_memory_allocating_nr_bytes), MAXPATHL);
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 
-    for (size_t i = 0; i < ARRAY_LENGTH(known_dirs); i++)
+    വേണ്ടി (size_t i = 0; i < ARRAY_LENGTH(known_dirs); i++)
     {
-	const char_u	*dir = known_dirs[i];
+	സ്ഥിരം char_u	*dir = known_dirs[i];
 	bool		got = false;
 
-	if (dir == NULL)
-	    continue;
-	else if (STRCMP(dir, "/tmp") == 0 ||
-		(known_dirs[1] != NULL && STRCMP(dir, known_dirs[1]) == 0))
+	എങ്കിൽ (dir == ശൂന്യ)
+	    തുടരുക;
+	അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(dir, "/tmp") == 0 ||
+		(known_dirs[1] != ശൂന്യ && STRCMP(dir, known_dirs[1]) == 0))
 	{
 	    // "/tmp" or $TMPDIR, must suffix dir with uid
-	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim-%lu", dir,
-		    (unsigned long int)getuid());
-	    if (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
-		continue;
+	    vim_snprintf((അക്ഷരം *)buf, MAXPATHL, "%s/vim-%lu", dir,
+		    (unsigned long പൂർണ്ണസംഖ്യ)getuid());
+	    എങ്കിൽ (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
+		തുടരുക;
 
-	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim-%lu/%s", dir,
-		    (unsigned long int)getuid(), name);
+	    vim_snprintf((അക്ഷരം *)buf, MAXPATHL, "%s/vim-%lu/%s", dir,
+		    (unsigned long പൂർണ്ണസംഖ്യ)getuid(), name);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim", dir);
-	    if (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
-		continue;
+	    vim_snprintf((അക്ഷരം *)buf, MAXPATHL, "%s/vim", dir);
+	    എങ്കിൽ (vim_mkdir(buf, 0700) == -1 && errno != EEXIST)
+		തുടരുക;
 
-	    vim_snprintf((char *)buf, MAXPATHL, "%s/vim/%s", dir, name);
+	    vim_snprintf((അക്ഷരം *)buf, MAXPATHL, "%s/vim/%s", dir, name);
 	}
 
 	// If looking for a new socket path, and "buf" currently exists, check
 	// if it is a dead socket, if it is then remove it.
-	if (new)
+	എങ്കിൽ (new)
 	{
 	    emsg_silent++;
 	    emsg_off++;
-	    channel = channel_open_unix((char *)buf, NULL);
+	    channel = channel_open_unix((അക്ഷരം *)buf, ശൂന്യ);
 	    emsg_off--;
 	    emsg_silent--;
 
-	    if (channel != NULL)
+	    എങ്കിൽ (channel != ശൂന്യ)
 	    {
 		channel_close(channel, false);
 		channel_clear(channel);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		mch_remove(buf);
 		got = true;
@@ -504,63 +504,63 @@ socketserver_get_path(
 	}
 
 	res = true;
-	if (got || (!new && mch_access((char *)buf, F_OK) == 0))
+	എങ്കിൽ (got || (!new && mch_access((അക്ഷരം *)buf, F_OK) == 0))
 	{
-	    if (server_address != NULL && STRCMP(buf, server_address) == 0)
+	    എങ്കിൽ (server_address != ശൂന്യ && STRCMP(buf, server_address) == 0)
 		// Can't connect to itself
-		break;
-	    return buf;
+		നിർത്തുക;
+	    തിരികെ buf;
 	}
-	break;
+	നിർത്തുക;
     }
 
-    if (!quiet)
+    എങ്കിൽ (!quiet)
     {
-	if (!res)
+	എങ്കിൽ (!res)
 	    semsg(_("Failed creating socket directory: %s"), strerror(errno));
-	else if (!ignore)
+	അല്ലെങ്കിൽ എങ്കിൽ (!ignore)
 	    semsg(_(e_invalid_server_id_used_str), name);
     }
-    if (!res && fatal != NULL)
+    എങ്കിൽ (!res && fatal != ശൂന്യ)
 	*fatal = true;
 
     vim_free(buf);
-    return NULL;
+    തിരികെ ശൂന്യ;
 # endif
 }
 
 /*
  * Callback for when client channel is closed
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 socketserver_client_close(channel_T *channel)
 {
-    if (channel == client_channels)
+    എങ്കിൽ (channel == client_channels)
 	client_channels = channel->ch_ss_next;
-    if (channel->ch_ss_prev != NULL)
+    എങ്കിൽ (channel->ch_ss_prev != ശൂന്യ)
 	channel->ch_ss_prev->ch_ss_next = channel->ch_ss_next;
-    if (channel->ch_ss_next != NULL)
+    എങ്കിൽ (channel->ch_ss_next != ശൂന്യ)
 	channel->ch_ss_next->ch_ss_prev = channel->ch_ss_prev;
-    if (client_channel_count > 0)
-	--client_channel_count;
+    എങ്കിൽ (client_channel_എണ്ണം > 0)
+	--client_channel_എണ്ണം;
 
-    ch_log(NULL, "socketserver: client channel closed");
+    ch_log(ശൂന്യ, "socketserver: client channel closed");
 }
 
 /*
  * Callback for when server channel accepted new client.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 socketserver_accept(channel_T *channel)
 {
-    if (client_channel_count >= MAX_CLIENT_CHANNELS)
+    എങ്കിൽ (client_channel_എണ്ണം >= MAX_CLIENT_CHANNELS)
     {
 	// Too many client connections: refuse this one instead of letting the
 	// channel's file descriptor overflow the select()/poll() sets.
-	ch_log(NULL, "socketserver: too many clients, refusing connection");
+	ch_log(ശൂന്യ, "socketserver: too many clients, refusing connection");
 	channel_close(channel, FALSE);
 	channel_unref(channel);
-	return;
+	തിരികെ;
     }
 
     channel->ch_socketserver = true;
@@ -568,43 +568,43 @@ socketserver_accept(channel_T *channel)
 
     // Append the client, so that commands are processed in the order the
     // clients were accepted, not reversed.
-    channel->ch_ss_next = NULL;
-    if (client_channels == NULL)
+    channel->ch_ss_next = ശൂന്യ;
+    എങ്കിൽ (client_channels == ശൂന്യ)
     {
-	channel->ch_ss_prev = NULL;
+	channel->ch_ss_prev = ശൂന്യ;
 	client_channels = channel;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	channel_T *last = client_channels;
 
-	while (last->ch_ss_next != NULL)
+	ആകുമ്പോൾ (last->ch_ss_next != ശൂന്യ)
 	    last = last->ch_ss_next;
 	last->ch_ss_next = channel;
 	channel->ch_ss_prev = last;
     }
-    ++client_channel_count;
+    ++client_channel_എണ്ണം;
 
     // We will read the command from the client later in the input loop.
-    ch_log(NULL, "socketserver: accepted new client");
+    ch_log(ശൂന്യ, "socketserver: accepted new client");
 }
 
 /*
  * Callback for when server channel is closed
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 socketserver_close(channel_T *channel UNUSED)
 {
     socketserver_cleanup();
 
-    ch_log(NULL, "socketserver: server channel closed");
+    ch_log(ശൂന്യ, "socketserver: server channel closed");
 }
 
 /*
  * Mark references to socketserver channels
  */
-    int
-set_ref_in_socketserver_channel(int copyID)
+    പൂർണ്ണസംഖ്യ
+set_ref_in_socketserver_channel(പൂർണ്ണസംഖ്യ copyID)
 {
     bool	abort = false;
     channel_T	*channel;
@@ -612,18 +612,18 @@ set_ref_in_socketserver_channel(int copyID)
 
     tv.v_type = VAR_CHANNEL;
     tv.vval.v_channel = server_channel;
-    abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+    abort = abort || set_ref_in_item(&tv, copyID, ശൂന്യ, ശൂന്യ, ശൂന്യ);
 
     FOR_ALL_CLIENTS(channel)
     {
-	if (abort)
-	    break;
+	എങ്കിൽ (abort)
+	    നിർത്തുക;
 
 	tv.v_type = VAR_CHANNEL;
 	tv.vval.v_channel = channel;
-	abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	abort = abort || set_ref_in_item(&tv, copyID, ശൂന്യ, ശൂന്യ, ശൂന്യ);
     }
-    return abort;
+    തിരികെ abort;
 }
 
 /*
@@ -631,56 +631,56 @@ set_ref_in_socketserver_channel(int copyID)
  * adds version header to "msg", if "ver" is true. Returns OK on success and
  * FAIL on failure.
  */
-    static int
-socketserver_send_message(channel_T *ch, dict_T *msg, char *func, bool ver)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+socketserver_send_message(channel_T *ch, dict_T *സന്ദേശം, അക്ഷരം *func, bool ver)
 {
     typval_T	tv;
     char_u	*buf;
-    int		ret;
+    പൂർണ്ണസംഖ്യ		ret;
 
-    if (ver)
-	dict_add_number(msg, "version", PROTOCOL_VER);
+    എങ്കിൽ (ver)
+	dict_add_സംഖ്യ(സന്ദേശം, "version", PROTOCOL_VER);
 
     tv.v_type = VAR_DICT;
-    tv.vval.v_dict = msg;
+    tv.vval.v_dict = സന്ദേശം;
     buf = json_encode(&tv, JSON_NL);
 
-    if (buf != NULL)
+    എങ്കിൽ (buf != ശൂന്യ)
     {
 	emsg_silent++;
-	ret = channel_send(ch, PART_SOCK, buf, (int)STRLEN(buf), func);
+	ret = channel_send(ch, PART_SOCK, buf, (പൂർണ്ണസംഖ്യ)STRLEN(buf), func);
 	emsg_silent--;
     }
-    else
-	return FAIL;
+    അല്ലെങ്കിൽ
+	തിരികെ FAIL;
     vim_free(buf);
-    return ret;
+    തിരികെ ret;
 }
 
 /*
  * Execute the JSON message represented by "dict".
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 socketserver_exec(channel_T *channel, dict_T *message)
 {
     dictitem_T	*di;
     char_u	*type;
-    char_u	*str = NULL;
-    char_u	*sender = NULL;
+    char_u	*str = ശൂന്യ;
+    char_u	*sender = ശൂന്യ;
     char_u	idbuf[11 + NUMBUFLEN];
 
     di = dict_find(message, (char_u *)"type", -1);
-    if (di == NULL || di->di_tv.v_type != VAR_STRING)
-	return;
-    else
+    എങ്കിൽ (di == ശൂന്യ || di->di_tv.v_type != VAR_STRING)
+	തിരികെ;
+    അല്ലെങ്കിൽ
 	type = di->di_tv.vval.v_string;
 
     di = dict_find(message, (char_u *)"str", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_STRING)
+    എങ്കിൽ (di != ശൂന്യ && di->di_tv.v_type == VAR_STRING)
 	str = di->di_tv.vval.v_string;
 
     di = dict_find(message, (char_u *)"sender", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_STRING)
+    എങ്കിൽ (di != ശൂന്യ && di->di_tv.v_type == VAR_STRING)
     {
 	sender = di->di_tv.vval.v_string;
 
@@ -690,11 +690,11 @@ socketserver_exec(channel_T *channel, dict_T *message)
     }
 
     di = dict_find(message, (char_u *)"wait", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_BOOL && di->di_tv.vval.v_number)
+    എങ്കിൽ (di != ശൂന്യ && di->di_tv.v_type == VAR_BOOL && di->di_tv.vval.v_സംഖ്യ)
     {
 	// Client is not a server, but still wants a response later. Save the
 	// ID of the channel connection that we will use to send back a response,
-	vim_snprintf((char *)idbuf, sizeof(idbuf), "remotewait:%d",
+	vim_snprintf((അക്ഷരം *)idbuf, വലുപ്പം(idbuf), "remotewait:%d",
 		channel->ch_id);
 
 	sender = idbuf;
@@ -702,137 +702,137 @@ socketserver_exec(channel_T *channel, dict_T *message)
 	client_socket = vim_strsave(sender);
     }
 
-    ch_log(NULL, "socketserver_exec(): result: %s",
-	    str == NULL ? (char_u *)"(null)" : str);
+    ch_log(ശൂന്യ, "socketserver_exec(): result: %s",
+	    str == ശൂന്യ ? (char_u *)"(null)" : str);
 
-    if (STRCMP(type, "expr") == 0 && str != NULL)
+    എങ്കിൽ (STRCMP(type, "expr") == 0 && str != ശൂന്യ)
     {
 	// Evaluate expression and send back reply
 	dict_T	    *dict;
 	char_u	    *result;
-	int	    code;
+	പൂർണ്ണസംഖ്യ	    code;
 
 	dict = dict_alloc();
-	if (dict == NULL)
-	    return;
+	എങ്കിൽ (dict == ശൂന്യ)
+	    തിരികെ;
 
-	result = eval_client_expr_to_string(str);
-	code = result == NULL ? -1 : 0;
+	result = eval_client_വ്യഞ്ജകം_to_string(str);
+	code = result == ശൂന്യ ? -1 : 0;
 
 	dict_add_string(dict, "type", (char_u *)"reply");
-	if (result != NULL)
+	എങ്കിൽ (result != ശൂന്യ)
 	{
 	    dict_add_string(dict, "str", result);
 	    vim_free(result);
 	}
-	else
+	അല്ലെങ്കിൽ
 	    // Error occurred, return error message
 	    dict_add_string(dict, "str",
 		    (char_u *)_(e_invalid_expression_received));
 
-	dict_add_number(dict, "code", code);
+	dict_add_സംഖ്യ(dict, "code", code);
 
 	socketserver_send_message(channel, dict, "socketserver_exec", true);
 	dict_unref(dict);
     }
-    else if (STRCMP(type, "keystrokes") == 0 && str != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(type, "keystrokes") == 0 && str != ശൂന്യ)
     {
 	// Execute keystrokes
-	server_to_input_buf(str);
+	server_to_നിവേശം_buf(str);
     }
-    else if (STRCMP(type, "notify") == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(type, "notify") == 0)
     {
 	// Notification, execute autocommands and save the reply for later use
-	if (sender != NULL && str != NULL)
+	എങ്കിൽ (sender != ശൂന്യ && str != ശൂന്യ)
 	{
 	    ss_reply_T *reply;
 
 	    reply = socketserver_add_reply(sender);
 
-	    if (reply != NULL)
+	    എങ്കിൽ (reply != ശൂന്യ)
 		ga_copy_string(&reply->strings, str);
 
 	    apply_autocmds(EVENT_REMOTEREPLY, sender, str, TRUE, curbuf);
 	}
     }
-    else if (STRCMP(type, "ver") == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(type, "ver") == 0)
     {
 	// A message we sent previously had the wrong version. Emit an error
 	// message to alert the user.
 	emsg(_(e_socket_server_version_mismatch));
     }
-    else
-	ch_error(NULL, "socketserver: unknown command type '%s'", type);
+    അല്ലെങ്കിൽ
+	ch_error(ശൂന്യ, "socketserver: unknown command type '%s'", type);
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 socketserver_get_message(channel_T *channel, typval_T **tv)
 {
     jsonq_T *head = &channel->ch_part[PART_SOCK].ch_json_head;
-    jsonq_T *json_msg = head->jq_next;
-    int	    ver;
+    jsonq_T *json_സന്ദേശം = head->jq_next;
+    പൂർണ്ണസംഖ്യ	    ver;
 
-    if (json_msg == NULL)
+    എങ്കിൽ (json_സന്ദേശം == ശൂന്യ)
     {
 	// Check the readahead buffer
 	channel_parse_json(channel, PART_SOCK, true);
-	json_msg = head->jq_next;
+	json_സന്ദേശം = head->jq_next;
     }
-    if (json_msg == NULL)
-	return FAIL;
-    *tv = json_msg->jq_value;
-    remove_json_node(head, json_msg);
+    എങ്കിൽ (json_സന്ദേശം == ശൂന്യ)
+	തിരികെ FAIL;
+    *tv = json_സന്ദേശം->jq_മൂല്യം;
+    remove_json_കണ്ണി(head, json_സന്ദേശം);
 
-    if ((*tv)->v_type != VAR_DICT)
+    എങ്കിൽ ((*tv)->v_type != VAR_DICT)
     {
-	ch_error(NULL, "socketserver: message is not a JSON object");
+	ch_error(ശൂന്യ, "socketserver: message is not a JSON object");
 	free_tv(*tv);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    ver = dict_get_number((*tv)->vval.v_dict, "version");
+    ver = dict_get_സംഖ്യ((*tv)->vval.v_dict, "version");
 
-    if (ver != 0 && ver != PROTOCOL_VER)
+    എങ്കിൽ (ver != 0 && ver != PROTOCOL_VER)
     {
 	dict_T *dict;
 
-	ch_error(NULL, "socketserver: message has different version %d", ver);
+	ch_error(ശൂന്യ, "socketserver: message has different version %d", ver);
 	free_tv(*tv);
 
 	// Send back a special error
 	dict = dict_alloc();
-	if (dict != NULL)
+	എങ്കിൽ (dict != ശൂന്യ)
 	{
 	    dict_add_string(dict, "type", (char_u *)"ver");
 	    socketserver_send_message(channel, dict,
 		    "socketserver_get_message", false);
 	    dict_unref(dict);
 	}
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Parse any commands in the queue and execute them.
  */
-    void
-socketserver_parse_messages(void)
+    ശൂന്യം
+socketserver_parse_messages(ശൂന്യം)
 {
     typval_T	*tv;
 
-    for (channel_T *ch = client_channels; ch != NULL;)
+    വേണ്ടി (channel_T *ch = client_channels; ch != ശൂന്യ;)
     {
 	// Make sure to save next channel in case "ch" is freed. Not sure if
 	// this can actually happen but be safe.
 	channel_T *next = ch->ch_ss_next;
 
 	// Get the JSON message if there is any from the queue for this channel.
-	if (socketserver_get_message(ch, &tv) == FAIL)
+	എങ്കിൽ (socketserver_get_message(ch, &tv) == FAIL)
 	{
 	    ch = next;
-	    continue;
+	    തുടരുക;
 	}
 
 	socketserver_exec(ch, tv->vval.v_dict);
@@ -850,19 +850,19 @@ socketserver_parse_messages(void)
  *
  * Return OK on success and FAIL on failure or timeout.
  */
-    static int
-socketserver_wait(channel_T *channel, int timeout)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+socketserver_wait(channel_T *channel, പൂർണ്ണസംഖ്യ timeout)
 {
-    while (true)
+    ആകുമ്പോൾ (true)
     {
-	int		ret;
+	പൂർണ്ണസംഖ്യ		ret;
 	channel_T	*ch;
 # ifdef HAVE_SELECT
 	fd_set		rfds;
-	struct timeval  tv;
-	int		maxfd = -1;
+	ഘടന timeval  tv;
+	പൂർണ്ണസംഖ്യ		maxfd = -1;
 
-	if (timeout != -1)
+	എങ്കിൽ (timeout != -1)
 	{
 	    tv.tv_sec = timeout / 1000;
 	    tv.tv_usec = (timeout % 1000) * 1000;
@@ -870,95 +870,95 @@ socketserver_wait(channel_T *channel, int timeout)
 
 	FD_ZERO(&rfds);
 
-	if (channel != NULL)
+	എങ്കിൽ (channel != ശൂന്യ)
 	{
-	    if (channel->CH_SOCK_FD == INVALID_FD)
+	    എങ്കിൽ (channel->CH_SOCK_FD == INVALID_FD)
 		// Shouldn't happen
-		return FAIL;
+		തിരികെ FAIL;
 
 	    maxfd = channel->CH_SOCK_FD;
 	    FD_SET(channel->CH_SOCK_FD, &rfds);
 	}
-	if (server_channel != NULL && server_channel->CH_SOCK_FD != INVALID_FD)
+	എങ്കിൽ (server_channel != ശൂന്യ && server_channel->CH_SOCK_FD != INVALID_FD)
 	{
 	    FD_SET(server_channel->CH_SOCK_FD, &rfds);
-	    if (server_channel->CH_SOCK_FD > maxfd)
+	    എങ്കിൽ (server_channel->CH_SOCK_FD > maxfd)
 		maxfd = server_channel->CH_SOCK_FD;
 	}
 
 	FOR_ALL_CLIENTS(ch)
 	{
-	    if (ch->CH_SOCK_FD != INVALID_FD
+	    എങ്കിൽ (ch->CH_SOCK_FD != INVALID_FD
 #  ifdef FD_SETSIZE
-		    && (int)ch->CH_SOCK_FD < FD_SETSIZE
+		    && (പൂർണ്ണസംഖ്യ)ch->CH_SOCK_FD < FD_SETSIZE
 #  endif
 		    )
 	    {
 		FD_SET(ch->CH_SOCK_FD, &rfds);
-		if (maxfd < (int)ch->CH_SOCK_FD)
-		    maxfd = (int)ch->CH_SOCK_FD;
+		എങ്കിൽ (maxfd < (പൂർണ്ണസംഖ്യ)ch->CH_SOCK_FD)
+		    maxfd = (പൂർണ്ണസംഖ്യ)ch->CH_SOCK_FD;
 	    }
 	}
 
-	if (maxfd == -1)
-	    return FAIL;
+	എങ്കിൽ (maxfd == -1)
+	    തിരികെ FAIL;
 
-	ret = select(maxfd + 1, &rfds, NULL, NULL, timeout == -1 ? NULL : &tv);
+	ret = select(maxfd + 1, &rfds, ശൂന്യ, ശൂന്യ, timeout == -1 ? ശൂന്യ : &tv);
 
 #  ifdef EINTR
-	if (ret == -1 && errno == EINTR)
+	എങ്കിൽ (ret == -1 && errno == EINTR)
 	{
-	    if (got_int)
-		break;
-	    continue;
+	    എങ്കിൽ (got_int)
+		നിർത്തുക;
+	    തുടരുക;
 	}
 #  endif
 
-	if (ret > 0)
+	എങ്കിൽ (ret > 0)
 	{
-	    if (server_channel != NULL
+	    എങ്കിൽ (server_channel != ശൂന്യ
 		    && server_channel->CH_SOCK_FD != INVALID_FD
 		    && FD_ISSET(server_channel->CH_SOCK_FD, &rfds))
 		channel_check(server_channel, PART_SOCK);
 
 	    FOR_ALL_CLIENTS(ch)
-		if (ch->CH_SOCK_FD != INVALID_FD
+		എങ്കിൽ (ch->CH_SOCK_FD != INVALID_FD
 #  ifdef FD_SETSIZE
-			&& (int)ch->CH_SOCK_FD < FD_SETSIZE
+			&& (പൂർണ്ണസംഖ്യ)ch->CH_SOCK_FD < FD_SETSIZE
 #  endif
 			&& FD_ISSET(ch->CH_SOCK_FD, &rfds))
 		    channel_check(ch, PART_SOCK);
 
 	    socketserver_parse_messages();
 
-	    if (channel == NULL)
-		return OK;
+	    എങ്കിൽ (channel == ശൂന്യ)
+		തിരികെ OK;
 
-	    if (channel->CH_SOCK_FD != INVALID_FD
+	    എങ്കിൽ (channel->CH_SOCK_FD != INVALID_FD
 		    && FD_ISSET(channel->CH_SOCK_FD, &rfds))
 	    {
 		channel_check(channel, PART_SOCK);
-		return OK;
+		തിരികെ OK;
 	    }
-	    continue;
+	    തുടരുക;
 	}
-# else
-	struct pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
-	int		nfd = 0;
-	int		channel_idx = -1;
-	int		server_idx = -1;
+# അല്ലെങ്കിൽ
+	ഘടന pollfd   fds[MAX_OPEN_CHANNELS + 1 + MAX_CLIENT_CHANNELS];
+	പൂർണ്ണസംഖ്യ		nfd = 0;
+	പൂർണ്ണസംഖ്യ		channel_idx = -1;
+	പൂർണ്ണസംഖ്യ		server_idx = -1;
 
-	if (channel != NULL)
+	എങ്കിൽ (channel != ശൂന്യ)
 	{
-	    if (channel->CH_SOCK_FD == INVALID_FD)
+	    എങ്കിൽ (channel->CH_SOCK_FD == INVALID_FD)
 		// Shouldn't happen
-		return FAIL;
+		തിരികെ FAIL;
 
 	    channel_idx = nfd;
 	    fds[nfd].fd = channel->CH_SOCK_FD;
 	    fds[nfd++].events = POLLIN;
 	}
-	if (server_channel != NULL && server_channel->CH_SOCK_FD != INVALID_FD)
+	എങ്കിൽ (server_channel != ശൂന്യ && server_channel->CH_SOCK_FD != INVALID_FD)
 	{
 	    server_idx = nfd;
 	    fds[nfd].fd = server_channel->CH_SOCK_FD;
@@ -966,7 +966,7 @@ socketserver_wait(channel_T *channel, int timeout)
 	}
 
 	FOR_ALL_CLIENTS(ch)
-	    if (ch->CH_SOCK_FD != INVALID_FD)
+	    എങ്കിൽ (ch->CH_SOCK_FD != INVALID_FD)
 	    {
 		fds[nfd].fd = ch->CH_SOCK_FD;
 		fds[nfd].events = POLLIN;
@@ -977,44 +977,44 @@ socketserver_wait(channel_T *channel, int timeout)
 	ret = poll(fds, nfd, timeout);
 
 #  ifdef EINTR
-	if (ret == -1 && errno == EINTR)
+	എങ്കിൽ (ret == -1 && errno == EINTR)
 	{
-	    if (got_int)
-		break;
-	    continue;
+	    എങ്കിൽ (got_int)
+		നിർത്തുക;
+	    തുടരുക;
 	}
 #  endif
 
-	if (ret > 0)
+	എങ്കിൽ (ret > 0)
 	{
-	    if (server_channel != NULL
+	    എങ്കിൽ (server_channel != ശൂന്യ
 		    && server_channel->CH_SOCK_FD != INVALID_FD
 		    && fds[server_idx].revents & POLLIN)
 		channel_check(server_channel, PART_SOCK);
 
 	    FOR_ALL_CLIENTS(ch)
-		if (ch->CH_SOCK_FD != INVALID_FD
+		എങ്കിൽ (ch->CH_SOCK_FD != INVALID_FD
 			&& fds[ch->ch_part[PART_SOCK].ch_poll_idx]
 			.revents & POLLIN)
 		    channel_check(ch, PART_SOCK);
 
 	    socketserver_parse_messages();
 
-	    if (channel == NULL)
-		return OK;
+	    എങ്കിൽ (channel == ശൂന്യ)
+		തിരികെ OK;
 
-	    if (channel->CH_SOCK_FD != INVALID_FD
+	    എങ്കിൽ (channel->CH_SOCK_FD != INVALID_FD
 		    && fds[channel_idx].revents & POLLIN)
 	    {
 		channel_check(channel, PART_SOCK);
-		return OK;
+		തിരികെ OK;
 	    }
-	    continue;
+	    തുടരുക;
 	}
 # endif
-	break;
+	നിർത്തുക;
     }
-    return FAIL;
+    തിരികെ FAIL;
 }
 
 /*
@@ -1023,54 +1023,54 @@ socketserver_wait(channel_T *channel, int timeout)
  * true. Returns NULL on
  * failure.
  */
-    static channel_T *
+    സ്ഥിതം channel_T *
 socketserver_get_channel(char_u *name, bool quiet, bool *wait)
 {
-    char_u	*address = NULL;
-    int		port;
+    char_u	*address = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		port;
     bool	is_unix = false;
     channel_T	*channel;
 
-    if (STRNICMP(name, "channel:", 8) == 0)
+    എങ്കിൽ (STRNICMP(name, "channel:", 8) == 0)
     {
-	if (channel_parse_socketserver_address(name + 8, &port, &address, true)
+	എങ്കിൽ (channel_parse_socketserver_address(name + 8, &port, &address, true)
 		== FAIL)
-	    return NULL;
-	if (address != NULL)
+	    തിരികെ ശൂന്യ;
+	എങ്കിൽ (address != ശൂന്യ)
 	    is_unix = true;
     }
-    else if (STRNICMP(name, "remotewait:", 11) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNICMP(name, "remotewait:", 11) == 0)
     {
 	// Channel ID name, find channel with that ID.
-	int id;
+	പൂർണ്ണസംഖ്യ id;
 
-	if (name[11] == NUL)
-	    return NULL;
-	id = strtol((char *)name + 11, NULL, 10);
-	if (wait != NULL)
+	എങ്കിൽ (name[11] == NUL)
+	    തിരികെ ശൂന്യ;
+	id = strtol((അക്ഷരം *)name + 11, ശൂന്യ, 10);
+	എങ്കിൽ (wait != ശൂന്യ)
 	    *wait = true;
 
-	return channel_find(id);
+	തിരികെ channel_find(id);
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	address = socketserver_get_path(name, false, quiet, false, NULL);
-	if (address == NULL)
-	    return NULL;
+	address = socketserver_get_path(name, false, quiet, false, ശൂന്യ);
+	എങ്കിൽ (address == ശൂന്യ)
+	    തിരികെ ശൂന്യ;
 	is_unix = true;
     }
 
-    if (is_unix)
-	channel = channel_open_unix((char *)address, NULL);
-    else
-	channel =  channel_open("localhost", port, 1000, NULL);
+    എങ്കിൽ (is_unix)
+	channel = channel_open_unix((അക്ഷരം *)address, ശൂന്യ);
+    അല്ലെങ്കിൽ
+	channel =  channel_open("localhost", port, 1000, ശൂന്യ);
 
-    if (channel == NULL && !quiet)
+    എങ്കിൽ (channel == ശൂന്യ && !quiet)
 	semsg(_(e_socket_server_failed_connecting), name);
 
     vim_free(address);
 
-    return channel;
+    തിരികെ channel;
 }
 
 /*
@@ -1079,41 +1079,41 @@ socketserver_get_channel(char_u *name, bool quiet, bool *wait)
  * be closed immediately, this is used for --remote-wait. Returns 0 for OK, -1
  * on error.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 socketserver_send(
 	char_u *name,
 	char_u *str,
 	char_u **result,
-	bool is_expr,
-	int timeout,
+	bool is_വ്യഞ്ജകം,
+	പൂർണ്ണസംഖ്യ timeout,
 	bool silent,
 	channel_T **ch)
 {
-    int		rcode = -1;
+    പൂർണ്ണസംഖ്യ		rcode = -1;
     channel_T	*channel;
     dict_T	*dict;
     dictitem_T	*di;
-    typval_T	*resp_tv = NULL;
+    typval_T	*resp_tv = ശൂന്യ;
 
-    if (*name == NUL)
+    എങ്കിൽ (*name == NUL)
     {
 	semsg(_(e_unable_to_send_to_str), name);
-	return -1;
+	തിരികെ -1;
     }
 
     // Execute locally if target is ourselves
-    if (serverName != NULL && STRICMP(name, serverName) == 0)
-	return sendToLocalVim(str, is_expr, result);
+    എങ്കിൽ (serverName != ശൂന്യ && STRICMP(name, serverName) == 0)
+	തിരികെ sendToLocalVim(str, is_വ്യഞ്ജകം, result);
 
-    channel = socketserver_get_channel(name, silent, NULL);
-    if (channel == NULL)
-	return -1;
+    channel = socketserver_get_channel(name, silent, ശൂന്യ);
+    എങ്കിൽ (channel == ശൂന്യ)
+	തിരികെ -1;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	goto exit;
+    എങ്കിൽ (dict == ശൂന്യ)
+	പോകുക exit;
 
-    dict_add_string(dict, "type", (char_u *)(is_expr ? "expr" : "keystrokes"));
+    dict_add_string(dict, "type", (char_u *)(is_വ്യഞ്ജകം ? "expr" : "keystrokes"));
     dict_add_string(dict, "str", str);
 
     // Tell server who we are so it can save our socket path internally for
@@ -1123,164 +1123,164 @@ socketserver_send(
     // case, we add "wait" to the JSON message set to true, so that the server
     // will create an internal address for our connection to it.  This is
     // only used for --remote-wait, not exposed to user.
-    if (server_address != NULL)
+    എങ്കിൽ (server_address != ശൂന്യ)
 	dict_add_string(dict, "sender", server_address);
-    else if (ch != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (ch != ശൂന്യ)
 	dict_add_bool(dict, "wait", true);
 
-    if (socketserver_send_message(channel, dict, "socketserver_send", true)
+    എങ്കിൽ (socketserver_send_message(channel, dict, "socketserver_send", true)
 	    == FAIL)
     {
 	semsg(_(e_unable_to_send_to_str), name);
 	dict_unref(dict);
-	goto exit;
+	പോകുക exit;
     }
     dict_unref(dict);
 
-    if (!is_expr)
+    എങ്കിൽ (!is_വ്യഞ്ജകം)
     {
 	// Exit, we aren't waiting for a response
 	rcode = 0;
 
-	if (ch != NULL)
+	എങ്കിൽ (ch != ശൂന്യ)
 	{
 	    *ch = channel;
 
 	    channel->ch_ss_next = client_channels;
-	    channel->ch_ss_prev = NULL;
+	    channel->ch_ss_prev = ശൂന്യ;
 	    channel->ch_ss_close_cb = socketserver_client_close;
 	    client_channels = channel;
 
-	    return rcode;
+	    തിരികെ rcode;
 	}
-	goto exit;
+	പോകുക exit;
     }
 
-    if (timeout == 0)
+    എങ്കിൽ (timeout == 0)
 	timeout = 1000;
 
     // To handle recursive calls, we must handle any socketserver channels as
     // well.
-    while (socketserver_wait(channel, timeout) == OK)
-	if (socketserver_get_message(channel, &resp_tv) == OK)
-	    break;
+    ആകുമ്പോൾ (socketserver_wait(channel, timeout) == OK)
+	എങ്കിൽ (socketserver_get_message(channel, &resp_tv) == OK)
+	    നിർത്തുക;
 
-    if (resp_tv == NULL)
+    എങ്കിൽ (resp_tv == ശൂന്യ)
     {
 	// Channel closed, don't make this an error, because this may be the
 	// result of the expression (e.g. --remote-expr 'execute("qa!")')
 	rcode = 0;
-	goto exit;
+	പോകുക exit;
     }
 
     dict = resp_tv->vval.v_dict;
 
     di = dict_find(dict, (char_u *)"type", -1);
-    if (di == NULL || di->di_tv.v_type != VAR_STRING ||
+    എങ്കിൽ (di == ശൂന്യ || di->di_tv.v_type != VAR_STRING ||
 	    (STRCMP(di->di_tv.vval.v_string, "reply") != 0
 	     && STRCMP(di->di_tv.vval.v_string, "ver") != 0))
     {
-	ch_error(NULL, "socketserver: unknown reply type");
+	ch_error(ശൂന്യ, "socketserver: unknown reply type");
 	free_tv(resp_tv);
-	goto exit;
+	പോകുക exit;
     }
 
-    if (STRCMP(di->di_tv.vval.v_string, "ver") == 0)
+    എങ്കിൽ (STRCMP(di->di_tv.vval.v_string, "ver") == 0)
     {
 	emsg(_(e_socket_server_version_mismatch));
 	free_tv(resp_tv);
-	goto exit;
+	പോകുക exit;
     }
 
-    if (result != NULL)
+    എങ്കിൽ (result != ശൂന്യ)
     {
 	di = dict_find(dict, (char_u *)"str", -1);
-	if (di != NULL && di->di_tv.v_type == VAR_STRING)
+	എങ്കിൽ (di != ശൂന്യ && di->di_tv.v_type == VAR_STRING)
 	    *result = vim_strsave(di->di_tv.vval.v_string);
-	else
+	അല്ലെങ്കിൽ
 	{
 	    free_tv(resp_tv);
-	    goto exit;
+	    പോകുക exit;
 	}
     }
 
     di = dict_find(dict, (char_u *)"code", -1);
-    if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
-	rcode = di->di_tv.vval.v_number;
+    എങ്കിൽ (di != ശൂന്യ && di->di_tv.v_type == VAR_സംഖ്യ)
+	rcode = di->di_tv.vval.v_സംഖ്യ;
 
     free_tv(resp_tv);
 
 exit:
     channel_close(channel, false);
     channel_clear(channel);
-    return rcode;
+    തിരികെ rcode;
 }
 
-   static ss_reply_T *
-socketserver_get_reply(char_u *sender, int *index)
+   സ്ഥിതം ss_reply_T *
+socketserver_get_reply(char_u *sender, പൂർണ്ണസംഖ്യ *index)
 {
-    for (int i = 0; i < server_replies.ga_len; i++)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < server_replies.ga_len; i++)
     {
 	ss_reply_T *reply = ((ss_reply_T *)server_replies.ga_data) + i;
 
-	if (STRCMP(reply->sender, sender) == 0)
+	എങ്കിൽ (STRCMP(reply->sender, sender) == 0)
 	{
-	    if (index != NULL)
+	    എങ്കിൽ (index != ശൂന്യ)
 		*index = i;
-	    return reply;
+	    തിരികെ reply;
 	}
     }
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * Add reply to list of replies. Returns a pointer to the ss_reply_T that was
  * initialized or was found.
  */
-    static ss_reply_T *
+    സ്ഥിതം ss_reply_T *
 socketserver_add_reply(char_u *sender)
 {
     ss_reply_T *reply;
 
-    if (server_replies.ga_growsize == 0)
-	ga_init2(&server_replies, sizeof(ss_reply_T), 1);
+    എങ്കിൽ (server_replies.ga_growsize == 0)
+	ga_init2(&server_replies, വലുപ്പം(ss_reply_T), 1);
 
-    reply = socketserver_get_reply(sender, NULL);
+    reply = socketserver_get_reply(sender, ശൂന്യ);
 
-    if (reply == NULL && ga_grow(&server_replies, 1) == OK)
+    എങ്കിൽ (reply == ശൂന്യ && ga_grow(&server_replies, 1) == OK)
     {
 	reply = ((ss_reply_T *)server_replies.ga_data) + server_replies.ga_len++;
 
 	reply->sender = vim_strsave(sender);
 
-	if (reply->sender == NULL)
-	    return NULL;
+	എങ്കിൽ (reply->sender == ശൂന്യ)
+	    തിരികെ ശൂന്യ;
 
-	ga_init2(&reply->strings, sizeof(char_u *), 5);
+	ga_init2(&reply->strings, വലുപ്പം(char_u *), 5);
     }
 
-    return reply;
+    തിരികെ reply;
 }
 
-    static void
+    സ്ഥിതം ശൂന്യം
 socketserver_remove_reply(char_u *sender)
 {
-    int index;
+    പൂർണ്ണസംഖ്യ index;
     ss_reply_T *reply = socketserver_get_reply(sender, &index);
 
-    if (reply != NULL)
+    എങ്കിൽ (reply != ശൂന്യ)
     {
 	ss_reply_T  *arr = server_replies.ga_data;
-	int	    len	 = server_replies.ga_len;
+	പൂർണ്ണസംഖ്യ	    len	 = server_replies.ga_len;
 
 	// Free strings
 	vim_free(reply->sender);
 	ga_clear_strings(&reply->strings);
 
 	// Move all elements after the removed reply forward by one
-	if (len > 1)
+	എങ്കിൽ (len > 1)
 	    mch_memmove(arr + index, arr + index + 1,
-		    sizeof(ss_reply_T) * (len - index - 1));
+		    വലുപ്പം(ss_reply_T) * (len - index - 1));
 	server_replies.ga_len--;
     }
 }
@@ -1289,40 +1289,40 @@ socketserver_remove_reply(char_u *sender)
  * Send a string to "client" as a reply (notification). Returns OK on success
  * and FAIL on failure.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 socketserver_send_reply(char_u *client, char_u *str)
 {
     dict_T	*dict;
     channel_T	*channel;
-    int		ret = OK;
+    പൂർണ്ണസംഖ്യ		ret = OK;
     bool	wait = false;
 
-    if (*client == NUL)
+    എങ്കിൽ (*client == NUL)
     {
 	semsg(_(e_invalid_server_id_used_str), client);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    if (server_channel == NULL || server_address == NULL)
+    എങ്കിൽ (server_channel == ശൂന്യ || server_address == ശൂന്യ)
     {
 	emsg(_(e_socket_server_not_online));
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     channel = socketserver_get_channel(client, false, &wait);
-    if (channel == NULL)
-	return FAIL;
+    എങ്കിൽ (channel == ശൂന്യ)
+	തിരികെ FAIL;
 
     dict = dict_alloc();
-    if (dict == NULL)
+    എങ്കിൽ (dict == ശൂന്യ)
     {
 	ret = FAIL;
-	goto exit;
+	പോകുക exit;
     }
 
     dict_add_string(dict, "type", (char_u *)"notify");
     dict_add_string(dict, "str", str);
-    if (server_address != NULL)
+    എങ്കിൽ (server_address != ശൂന്യ)
 	dict_add_string(dict, "sender", server_address);
 
     ret = socketserver_send_message(channel, dict,
@@ -1332,76 +1332,76 @@ socketserver_send_reply(char_u *client, char_u *str)
 exit:
     // Don't want to close the channel if client is referenced by channel ID.
     // This allows --remote-wait to work with multiple files.
-    if (!wait)
+    എങ്കിൽ (!wait)
     {
 	channel_close(channel, false);
 	channel_clear(channel);
     }
 
-    return ret;
+    തിരികെ ret;
 }
 
 /*
  * Wait for reply from "client" and place result in "str". Returns OK on success
  * and FAIL on failure. Timeout is in milliseconds
  */
-    int
+    പൂർണ്ണസംഖ്യ
 socketserver_read_reply(
 	char_u *client,
 	char_u **str,
-	int timeout,
+	പൂർണ്ണസംഖ്യ timeout,
 	bool remotewait)
 {
-    ss_reply_T	*reply = NULL;
+    ss_reply_T	*reply = ശൂന്യ;
     char_u	*actual;
 
-    if (*client == NUL)
+    എങ്കിൽ (*client == NUL)
     {
 	semsg(_(e_invalid_server_id_used_str), client);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    if (!remotewait && (server_channel == NULL || server_address == NULL))
+    എങ്കിൽ (!remotewait && (server_channel == ശൂന്യ || server_address == ശൂന്യ))
     {
 	emsg(_(e_socket_server_not_online));
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    actual = socketserver_get_path(client, false, false, false, NULL);
-    if (actual == NULL)
-	return FAIL;
+    actual = socketserver_get_path(client, false, false, false, ശൂന്യ);
+    എങ്കിൽ (actual == ശൂന്യ)
+	തിരികെ FAIL;
 
-    while (true)
+    ആകുമ്പോൾ (true)
     {
-	reply = socketserver_get_reply(actual, NULL);
-	if (reply != NULL)
-	    break;
-	if (socketserver_wait(NULL, timeout) == FAIL)
-	    break;
+	reply = socketserver_get_reply(actual, ശൂന്യ);
+	എങ്കിൽ (reply != ശൂന്യ)
+	    നിർത്തുക;
+	എങ്കിൽ (socketserver_wait(ശൂന്യ, timeout) == FAIL)
+	    നിർത്തുക;
     }
 
-    if (reply == NULL || reply->strings.ga_len == 0)
+    എങ്കിൽ (reply == ശൂന്യ || reply->strings.ga_len == 0)
     {
 	vim_free(actual);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     // Consume the string
     *str = ((char_u **)reply->strings.ga_data)[0];
 
-    if (reply->strings.ga_len > 1)
+    എങ്കിൽ (reply->strings.ga_len > 1)
 	mch_memmove((char_u **)reply->strings.ga_data,
 		((char_u **)reply->strings.ga_data) + 1,
-		sizeof(char_u *) * (reply->strings.ga_len - 1));
+		വലുപ്പം(char_u *) * (reply->strings.ga_len - 1));
     reply->strings.ga_len--;
 
-    if (reply->strings.ga_len < 1)
+    എങ്കിൽ (reply->strings.ga_len < 1)
 	// Last string removed, remove the reply
 	socketserver_remove_reply(actual);
 
     vim_free(actual);
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1410,38 +1410,38 @@ socketserver_read_reply(
  * Returns 0 if otherwise and -1 on
  * error.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 socketserver_peek_reply(char_u *sender, char_u **str)
 {
     ss_reply_T	*reply;
     char_u	*actual;
 
-    if (*sender == NUL)
+    എങ്കിൽ (*sender == NUL)
     {
 	semsg(_(e_invalid_server_id_used_str), sender);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    if (server_channel == NULL || server_address == NULL)
+    എങ്കിൽ (server_channel == ശൂന്യ || server_address == ശൂന്യ)
     {
 	emsg(_(e_socket_server_not_online));
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    actual = socketserver_get_path(sender, false, false, false, NULL);
-    if (actual == NULL)
-	return FAIL;
+    actual = socketserver_get_path(sender, false, false, false, ശൂന്യ);
+    എങ്കിൽ (actual == ശൂന്യ)
+	തിരികെ FAIL;
 
-    reply = socketserver_get_reply(actual, NULL);
+    reply = socketserver_get_reply(actual, ശൂന്യ);
     vim_free(actual);
 
-    if (reply != NULL && reply->strings.ga_len > 0)
+    എങ്കിൽ (reply != ശൂന്യ && reply->strings.ga_len > 0)
     {
-	if (str != NULL)
+	എങ്കിൽ (str != ശൂന്യ)
 	    *str = ((char_u **)reply->strings.ga_data)[0];
-	return 1;
+	തിരികെ 1;
     }
-    return 0;
+    തിരികെ 0;
 }
 
 #endif // FEAT_SOCKETSERVER

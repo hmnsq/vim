@@ -10,71 +10,71 @@
 /*
  * popupmenu.c: Popup menu (PUM)
  */
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-static pumitem_T *pum_array = NULL;	// items of displayed pum
-static int pum_size;			// nr of items in "pum_array"
-static int pum_selected;		// index of selected item or -1
-static int pum_first = 0;		// index of top item
+സ്ഥിതം pumitem_T *pum_array = ശൂന്യ;	// items of displayed pum
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_size;			// nr of items in "pum_array"
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_selected;		// index of selected item or -1
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_first = 0;		// index of top item
 
-static int call_update_screen = FALSE;
-static int pum_in_cmdline = FALSE;
+സ്ഥിതം പൂർണ്ണസംഖ്യ call_update_screen = FALSE;
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_in_cmdline = FALSE;
 
-static int pum_height;			// nr of displayed pum items
-static int pum_width;			// width of displayed pum items
-static int pum_base_width;		// width of pum items base
-static int pum_kind_width;		// width of pum items kind column
-static int pum_extra_width;		// width of extra stuff
-static int pum_scrollbar;		// TRUE when scrollbar present
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_height;			// nr of displayed pum items
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_width;			// width of displayed pum items
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_base_width;		// width of pum items base
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_kind_width;		// width of pum items kind column
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_extra_width;		// width of extra stuff
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_scrollbar;		// TRUE when scrollbar present
 #ifdef FEAT_RIGHTLEFT
-static int pum_rl;			// TRUE when pum is drawn 'rightleft'
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_rl;			// TRUE when pum is drawn 'rightleft'
 #endif
 
-static int pum_row;			// top row of pum
-static int pum_col;			// left column of pum
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_row;			// top row of pum
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_col;			// left column of pum
 
-static win_T *pum_window = NULL;
-static int pum_win_row;
-static int pum_win_height;
-static int pum_win_col;
-static int pum_win_wcol;
-static int pum_win_width;
+സ്ഥിതം win_T *pum_window = ശൂന്യ;
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_win_row;
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_win_height;
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_win_col;
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_win_wcol;
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_win_width;
 
 // Some parts are not updated when a popup menu is visible.  Setting this flag
 // makes pum_visible() return FALSE even when there is a popup menu.
-static int pum_pretend_not_visible = FALSE;
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_pretend_not_visible = FALSE;
 
 // Border support
-static int pum_border = 0;
-static int pum_margin = 0;	// margin of 1 cell on left and right
-static int pum_shadow = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_border = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_margin = 0;	// margin of 1 cell on left and right
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_shadow = 0;
 
 #ifdef FEAT_IMAGE_POPUP
-static image_placement_T *pum_imagep = NULL;
+സ്ഥിതം image_placement_T *pum_imagep = ശൂന്യ;
 #endif
 
 // Border characters
-static struct {
-    int top;
-    int right;
-    int bottom;
-    int left;
-    int top_left;
-    int top_right;
-    int bottom_right;
-    int bottom_left;
+സ്ഥിതം ഘടന {
+    പൂർണ്ണസംഖ്യ മുകൾ;
+    പൂർണ്ണസംഖ്യ വലത്;
+    പൂർണ്ണസംഖ്യ bottom;
+    പൂർണ്ണസംഖ്യ ഇടത്;
+    പൂർണ്ണസംഖ്യ മുകൾ_ഇടത്;
+    പൂർണ്ണസംഖ്യ മുകൾ_വലത്;
+    പൂർണ്ണസംഖ്യ bottom_വലത്;
+    പൂർണ്ണസംഖ്യ bottom_ഇടത്;
 } pum_border_chars;
 
-static int pum_set_selected(int n, int repeat);
-static void pum_draw_border(void);
-static void pum_draw_shadow(void);
-static void compute_margins(int *right_margin, int *left_margin, int *left_padding);
+സ്ഥിതം പൂർണ്ണസംഖ്യ pum_set_selected(പൂർണ്ണസംഖ്യ n, പൂർണ്ണസംഖ്യ repeat);
+സ്ഥിതം ശൂന്യം pum_draw_border(ശൂന്യം);
+സ്ഥിതം ശൂന്യം pum_draw_shadow(ശൂന്യം);
+സ്ഥിതം ശൂന്യം compute_margins(പൂർണ്ണസംഖ്യ *വലത്_margin, പൂർണ്ണസംഖ്യ *ഇടത്_margin, പൂർണ്ണസംഖ്യ *ഇടത്_padding);
 
 #define PUM_DEF_HEIGHT 10
 
 #define DEFINE_PUM_SETTER(feature) \
-	void \
-    pum_set_##feature(int enable) \
+	ശൂന്യം \
+    pum_set_##feature(പൂർണ്ണസംഖ്യ enable) \
     { \
 	pum_##feature = enable ? 1 : 0; \
     }
@@ -83,33 +83,33 @@ DEFINE_PUM_SETTER(border)
 DEFINE_PUM_SETTER(shadow)
 DEFINE_PUM_SETTER(margin)
 
-    static void
-pum_compute_size(void)
+    സ്ഥിതം ശൂന്യം
+pum_compute_size(ശൂന്യം)
 {
-    int	w;
+    പൂർണ്ണസംഖ്യ	w;
 
     // Compute the width of the widest match and the widest extra.
     pum_base_width = 0;
     pum_kind_width = 0;
     pum_extra_width = 0;
-    for (int i = 0; i < pum_size; ++i)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < pum_size; ++i)
     {
-	if (pum_array[i].pum_text != NULL)
+	എങ്കിൽ (pum_array[i].pum_text != ശൂന്യ)
 	{
 	    w = vim_strsize(pum_array[i].pum_text);
-	    if (pum_base_width < w)
+	    എങ്കിൽ (pum_base_width < w)
 		pum_base_width = w;
 	}
-	if (pum_array[i].pum_kind != NULL)
+	എങ്കിൽ (pum_array[i].pum_kind != ശൂന്യ)
 	{
 	    w = vim_strsize(pum_array[i].pum_kind) + 1;
-	    if (pum_kind_width < w)
+	    എങ്കിൽ (pum_kind_width < w)
 		pum_kind_width = w;
 	}
-	if (pum_array[i].pum_extra != NULL)
+	എങ്കിൽ (pum_array[i].pum_extra != ശൂന്യ)
 	{
 	    w = vim_strsize(pum_array[i].pum_extra) + 1;
-	    if (pum_extra_width < w)
+	    എങ്കിൽ (pum_extra_width < w)
 		pum_extra_width = w;
 	}
     }
@@ -119,74 +119,74 @@ pum_compute_size(void)
  * Calculate vertical placement for popup menu.
  * Sets pum_row and pum_height based on available space.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 pum_compute_vertical_placement(
-	int size,
-	int above_row,
-	int below_row)
+	പൂർണ്ണസംഖ്യ size,
+	പൂർണ്ണസംഖ്യ above_row,
+	പൂർണ്ണസംഖ്യ below_row)
 {
-    int context_lines;
-    int cline_visible_offset;
-    int extra_height = 2 * pum_border + pum_shadow;
-    int extra_offset = pum_border + pum_shadow;
+    പൂർണ്ണസംഖ്യ context_വരികൾ;
+    പൂർണ്ണസംഖ്യ cline_visible_offset;
+    പൂർണ്ണസംഖ്യ extra_height = 2 * pum_border + pum_shadow;
+    പൂർണ്ണസംഖ്യ extra_offset = pum_border + pum_shadow;
 
     pum_height = MIN(size, PUM_DEF_HEIGHT);
-    if (p_ph > 0 && pum_height > p_ph)
+    എങ്കിൽ (p_ph > 0 && pum_height > p_ph)
 	pum_height = p_ph;
 
     // Put the pum below "pum_win_row" if possible.  If there are few lines
     // decide on where there is more room.
-    if (pum_win_row + 2 >= below_row - pum_height - extra_height
+    എങ്കിൽ (pum_win_row + 2 >= below_row - pum_height - extra_height
 	    && pum_win_row - above_row > (below_row - above_row) / 2)
     {
 	// pum above "pum_win_row"
-	if (State & MODE_CMDLINE)
+	എങ്കിൽ (State & MODE_CMDLINE)
 	    // for cmdline pum, no need for context lines
-	    context_lines = 0;
-	else
+	    context_വരികൾ = 0;
+	അല്ലെങ്കിൽ
 	    // Leave two lines of context if possible
-	    context_lines = MIN(2, curwin->w_wrow - curwin->w_cline_row);
+	    context_വരികൾ = MIN(2, curwin->w_wrow - curwin->w_cline_row);
 
-	if (pum_win_row >= size + context_lines + extra_height)
+	എങ്കിൽ (pum_win_row >= size + context_വരികൾ + extra_height)
 	{
-	    pum_row = pum_win_row - size - context_lines - extra_offset;
+	    pum_row = pum_win_row - size - context_വരികൾ - extra_offset;
 	    pum_height = size;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    pum_row = pum_border;
-	    pum_height = pum_win_row - context_lines - extra_height;
+	    pum_height = pum_win_row - context_വരികൾ - extra_height;
 	}
-	if (p_ph > 0 && pum_height > p_ph)
+	എങ്കിൽ (p_ph > 0 && pum_height > p_ph)
 	{
 	    pum_row += pum_height - p_ph;
 	    pum_height = p_ph;
 	}
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	// pum below "pum_win_row"
-	if (State & MODE_CMDLINE)
+	എങ്കിൽ (State & MODE_CMDLINE)
 	    // for cmdline pum, no need for context lines
-	    context_lines = 0;
-	else
+	    context_വരികൾ = 0;
+	അല്ലെങ്കിൽ
 	{
 	    // Leave three lines of context if possible
 	    validate_cheight();
 	    cline_visible_offset = curwin->w_cline_row +
 		curwin->w_cline_height - curwin->w_wrow;
-	    context_lines = MIN(3, cline_visible_offset);
+	    context_വരികൾ = MIN(3, cline_visible_offset);
 	}
 
-	pum_row = pum_win_row + context_lines + pum_border;
+	pum_row = pum_win_row + context_വരികൾ + pum_border;
 	pum_height = MIN(below_row - pum_row - extra_offset, size);
-	if (p_ph > 0 && pum_height > p_ph)
+	എങ്കിൽ (p_ph > 0 && pum_height > p_ph)
 	    pum_height = p_ph;
     }
 
-#if defined(FEAT_QUICKFIX)
+#എങ്കിൽ defined(FEAT_QUICKFIX)
     // If there is a preview window above avoid drawing over it.
-    if (above_row > 0 && pum_row < above_row && pum_height > above_row)
+    എങ്കിൽ (above_row > 0 && pum_row < above_row && pum_height > above_row)
     {
 	pum_row = above_row;
 	pum_height = pum_win_row - above_row;
@@ -198,48 +198,48 @@ pum_compute_vertical_placement(
  * Try to set 'pum_width' so that it fits within available_width.
  * Returns TRUE if pum_width was successfully set, FALSE otherwise.
  */
-    static int
-set_pum_width_aligned_with_cursor(int width, int available_width)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+set_pum_width_aligned_with_cursor(പൂർണ്ണസംഖ്യ width, പൂർണ്ണസംഖ്യ available_width)
 {
-    int end_padding = TRUE;
+    പൂർണ്ണസംഖ്യ end_padding = TRUE;
 
-    if (width < p_pw)
+    എങ്കിൽ (width < p_pw)
     {
 	width = p_pw;
 	end_padding = FALSE;
     }
-    if (p_pmw > 0 && width >= p_pmw)
+    എങ്കിൽ (p_pmw > 0 && width >= p_pmw)
     {
 	width = p_pmw;
 	end_padding = FALSE;
     }
 
     pum_width = width + (end_padding && width >= p_pw ? 1 : 0);
-    return available_width >= pum_width;
+    തിരികെ available_width >= pum_width;
 }
 
 /*
  * Calculate horizontal placement for popup menu. Sets pum_col and pum_width
  * based on cursor position and available space.
  */
-    static void
-pum_compute_horizontal_placement(int cursor_col)
+    സ്ഥിതം ശൂന്യം
+pum_compute_horizontal_placement(പൂർണ്ണസംഖ്യ cursor_col)
 {
-    int desired_width = pum_base_width + pum_kind_width + pum_extra_width;
-    int available_width;
-    int col_offset;
-    int trailing_overhead = pum_scrollbar + pum_border
+    പൂർണ്ണസംഖ്യ desired_width = pum_base_width + pum_kind_width + pum_extra_width;
+    പൂർണ്ണസംഖ്യ available_width;
+    പൂർണ്ണസംഖ്യ col_offset;
+    പൂർണ്ണസംഖ്യ trailing_overhead = pum_scrollbar + pum_border
 	+ (pum_margin && pum_border ? 1 : 0) + (pum_shadow ? 2 : 0);
 
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    എങ്കിൽ (pum_rl)
     {
 	col_offset = pum_border && (cursor_col >= Columns - 2)
 	    ? (3 - Columns + cursor_col) : 0;
 	available_width = cursor_col + 1;
 	pum_col = cursor_col - col_offset;
     }
-    else
+    അല്ലെങ്കിൽ
 #endif
     {
 	col_offset = pum_border && (cursor_col <= 1) ? (2 - cursor_col) : 0;
@@ -250,35 +250,35 @@ pum_compute_horizontal_placement(int cursor_col)
     available_width -= trailing_overhead + col_offset;
 
     // Case 1: Align pum with "cursor_col"
-    if (set_pum_width_aligned_with_cursor(desired_width, available_width))
-	return;
+    എങ്കിൽ (set_pum_width_aligned_with_cursor(desired_width, available_width))
+	തിരികെ;
     // Show the pum truncated, provided it is at least as wide as 'pum_width'
-    if (available_width > p_pw)
+    എങ്കിൽ (available_width > p_pw)
     {
 	pum_width = available_width;
-	return;
+	തിരികെ;
     }
 
     // Case 2: Truncated pum is no longer aligned with "cursor_col"
     available_width = Columns - trailing_overhead - col_offset;
 
-    if (available_width > p_pw)
+    എങ്കിൽ (available_width > p_pw)
     {
 	pum_width = p_pw;  // Truncate beyond 'pum_width'
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	എങ്കിൽ (pum_rl)
 	    pum_col = pum_width + trailing_overhead;
-	else
+	അല്ലെങ്കിൽ
 #endif
 	    pum_col = Columns - pum_width - trailing_overhead;
-	return;
+	തിരികെ;
     }
 
     // Case 3: Not enough room anywhere, use what we have
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    എങ്കിൽ (pum_rl)
 	pum_col = Columns - 1 - col_offset;
-    else
+    അല്ലെങ്കിൽ
 #endif
 	pum_col = col_offset;
     pum_width = Columns - trailing_overhead;
@@ -290,20 +290,20 @@ pum_compute_horizontal_placement(int cursor_col)
  * When possible the leftmost character is aligned with cursor column.
  * The menu appears above the screen line "row" or at "row" + "height" - 1.
  */
-    void
+    ശൂന്യം
 pum_display(
 	pumitem_T   *array,
-	int	    size,
-	int	    selected,   // index of initially selected item, -1 if
+	പൂർണ്ണസംഖ്യ	    size,
+	പൂർണ്ണസംഖ്യ	    selected,   // index of initially selected item, -1 if
 				// out of range
-	int	    pum_wcol)   // screen column to align the menu to, or -1
+	പൂർണ്ണസംഖ്യ	    pum_wcol)   // screen column to align the menu to, or -1
 				// to use the cursor column
 {
-    int	    cursor_col;
-    int	    above_row;
-    int	    below_row;
-    int	    redo_count = 0;
-#if defined(FEAT_QUICKFIX)
+    പൂർണ്ണസംഖ്യ	    cursor_col;
+    പൂർണ്ണസംഖ്യ	    above_row;
+    പൂർണ്ണസംഖ്യ	    below_row;
+    പൂർണ്ണസംഖ്യ	    redo_എണ്ണം = 0;
+#എങ്കിൽ defined(FEAT_QUICKFIX)
     win_T   *pvwin;
 #endif
 
@@ -311,7 +311,7 @@ pum_display(
     pum_rl = (State & MODE_CMDLINE) == 0 && curwin->w_p_rl;
 #endif
 
-    do
+    ചെയ്യുക
     {
 	above_row = 0;
 	below_row = cmdline_row;
@@ -320,30 +320,30 @@ pum_display(
 	// when 'cuc' is on.
 	pum_array = (pumitem_T *)1;
 	validate_cursor_col();
-	pum_array = NULL;
+	pum_array = ശൂന്യ;
 
 	// Remember the essential parts of the window position and size, so we
 	// can decide when to reposition the popup menu.
 	pum_window = curwin;
-	if (State & MODE_CMDLINE)
+	എങ്കിൽ (State & MODE_CMDLINE)
 	    // cmdline completion popup menu
 	    pum_win_row = cmdline_row;
-	else
+	അല്ലെങ്കിൽ
 	    pum_win_row = curwin->w_wrow + W_WINROW(curwin);
 	pum_win_height = curwin->w_height;
 	pum_win_col = curwin->w_wincol;
 	pum_win_wcol = pum_wcol >= 0 ? pum_wcol : curwin->w_wcol;
 	pum_win_width = curwin->w_width;
 
-#if defined(FEAT_QUICKFIX)
+#എങ്കിൽ defined(FEAT_QUICKFIX)
 	FOR_ALL_WINDOWS(pvwin)
-	    if (pvwin->w_p_pvw)
-		break;
-	if (pvwin != NULL)
+	    എങ്കിൽ (pvwin->w_p_pvw)
+		നിർത്തുക;
+	എങ്കിൽ (pvwin != ശൂന്യ)
 	{
-	    if (W_WINROW(pvwin) < W_WINROW(curwin))
+	    എങ്കിൽ (W_WINROW(pvwin) < W_WINROW(curwin))
 		above_row = W_WINROW(pvwin) + pvwin->w_height;
-	    else if (W_WINROW(pvwin) > W_WINROW(curwin) + curwin->w_height)
+	    അല്ലെങ്കിൽ എങ്കിൽ (W_WINROW(pvwin) > W_WINROW(curwin) + curwin->w_height)
 		below_row = W_WINROW(pvwin);
 	}
 #endif
@@ -352,40 +352,40 @@ pum_display(
 	pum_compute_vertical_placement(size, above_row, below_row);
 
 	// don't display when we only have room for one line
-	if (pum_height < 1 || (pum_height == 1 && size > 1))
-	    return;
+	എങ്കിൽ (pum_height < 1 || (pum_height == 1 && size > 1))
+	    തിരികെ;
 
 	pum_array = array;
 	pum_size = size;
 	pum_compute_size();
 
 	// Calculate cursor column
-	if (State & MODE_CMDLINE)
+	എങ്കിൽ (State & MODE_CMDLINE)
 	    // cmdline completion popup menu
 	    cursor_col = cmdline_compl_startcol();
-	else
+	അല്ലെങ്കിൽ
 	{
-	    int wcol = pum_wcol >= 0 ? pum_wcol : curwin->w_wcol;
+	    പൂർണ്ണസംഖ്യ wcol = pum_wcol >= 0 ? pum_wcol : curwin->w_wcol;
 	    // w_wcol includes virtual text "above".
-	    if (curwin->w_width > 0)
+	    എങ്കിൽ (curwin->w_width > 0)
 		wcol %= curwin->w_width;
-	    else
+	    അല്ലെങ്കിൽ
 		wcol = 0;
 #ifdef FEAT_CONCEAL
 	    // w_wcol does not account for text concealed before the cursor;
 	    // shift by the offset win_line() recorded for the cursor line so the
 	    // menu lines up with the visible text.
-	    if (curwin->w_p_cole > 0 && conceal_cursor_line(curwin))
+	    എങ്കിൽ (curwin->w_p_cole > 0 && conceal_cursor_വരി(curwin))
 	    {
 		wcol -= curwin->w_wcol_conceal_off;
-		if (wcol < 0)
+		എങ്കിൽ (wcol < 0)
 		    wcol = 0;
 	    }
 #endif
 #ifdef FEAT_RIGHTLEFT
-	    if (pum_rl)
+	    എങ്കിൽ (pum_rl)
 		cursor_col = curwin->w_wincol + curwin->w_width - wcol - 1;
-	    else
+	    അല്ലെങ്കിൽ
 #endif
 		cursor_col = curwin->w_wincol + wcol;
 	}
@@ -399,7 +399,7 @@ pum_display(
 	// Set selected item and redraw.  If the window size changed need to
 	// redo the positioning.  Limit this to two times, when there is not
 	// much room the window size will keep changing.
-    } while (pum_set_selected(selected, redo_count) && ++redo_count <= 2);
+    } ആകുമ്പോൾ (pum_set_selected(selected, redo_എണ്ണം) && ++redo_എണ്ണം <= 2);
 
     pum_redraw();
 }
@@ -408,8 +408,8 @@ pum_display(
  * Set a flag that when pum_redraw() is called it first calls update_screen().
  * This will avoid clearing and redrawing the popup menu, prevent flicker.
  */
-    void
-pum_call_update_screen(void)
+    ശൂന്യം
+pum_call_update_screen(ശൂന്യം)
 {
     call_update_screen = TRUE;
 
@@ -424,122 +424,122 @@ pum_call_update_screen(void)
  * Return TRUE if we are going to redraw the popup menu and the screen position
  * "row"/"col" is under the popup menu.
  */
-    int
-pum_under_menu(int row, int col, int only_redrawing)
+    പൂർണ്ണസംഖ്യ
+pum_under_menu(പൂർണ്ണസംഖ്യ row, പൂർണ്ണസംഖ്യ col, പൂർണ്ണസംഖ്യ only_redrawing)
 {
-    int	extra_left = pum_border + (pum_margin && pum_border ? 1 : 0);
-    int	extra_right = pum_border + (pum_margin && pum_border ? 1 : 0)
+    പൂർണ്ണസംഖ്യ	extra_ഇടത് = pum_border + (pum_margin && pum_border ? 1 : 0);
+    പൂർണ്ണസംഖ്യ	extra_വലത് = pum_border + (pum_margin && pum_border ? 1 : 0)
 						+ (pum_shadow ? 2 : 0);
-    int	extra_above = pum_border;
-    int	extra_below = pum_border + (pum_shadow ? 1 : 0);
-    int	top = pum_row - extra_above;
-    int	bot = pum_row + pum_height + extra_below;
-    int	left = pum_col - 1 - extra_left;
-    int	right = pum_col + pum_width + pum_scrollbar + extra_right;
+    പൂർണ്ണസംഖ്യ	extra_above = pum_border;
+    പൂർണ്ണസംഖ്യ	extra_below = pum_border + (pum_shadow ? 1 : 0);
+    പൂർണ്ണസംഖ്യ	മുകൾ = pum_row - extra_above;
+    പൂർണ്ണസംഖ്യ	bot = pum_row + pum_height + extra_below;
+    പൂർണ്ണസംഖ്യ	ഇടത് = pum_col - 1 - extra_ഇടത്;
+    പൂർണ്ണസംഖ്യ	വലത് = pum_col + pum_width + pum_scrollbar + extra_വലത്;
 
-    if (!((!only_redrawing || pum_will_redraw)
-	    && row >= top && row < bot && col >= left && col < right))
-	return FALSE;
+    എങ്കിൽ (!((!only_redrawing || pum_will_redraw)
+	    && row >= മുകൾ && row < bot && col >= ഇടത് && col < വലത്))
+	തിരികെ FALSE;
 
-    if (pum_shadow)
+    എങ്കിൽ (pum_shadow)
     {
 	// The shadow recolors the cells underneath.  When the menu will be
 	// redrawn, leave the shadow cells unprotected so the window refreshes
 	// them first, clearing stale content left by a larger menu.
-	if (only_redrawing)
+	എങ്കിൽ (only_redrawing)
 	{
-	    if (col >= right - 2 || row == bot - 1)
-		return FALSE;
+	    എങ്കിൽ (col >= വലത് - 2 || row == bot - 1)
+		തിരികെ FALSE;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // Menu stays as-is: exclude only the corner cells the shadow never
 	    // draws.
-	    int	    right_margin, left_margin, left_padding;
+	    പൂർണ്ണസംഖ്യ	    വലത്_margin, ഇടത്_margin, ഇടത്_padding;
 
-	    compute_margins(&right_margin, &left_margin, &left_padding);
-	    if (row == top && col >= right - 2)
-		return FALSE;
-	    if (row == bot - 1 && col < pum_col + 2 - left_padding - pum_border
-		    - left_margin)
-		return FALSE;
+	    compute_margins(&വലത്_margin, &ഇടത്_margin, &ഇടത്_padding);
+	    എങ്കിൽ (row == മുകൾ && col >= വലത് - 2)
+		തിരികെ FALSE;
+	    എങ്കിൽ (row == bot - 1 && col < pum_col + 2 - ഇടത്_padding - pum_border
+		    - ഇടത്_margin)
+		തിരികെ FALSE;
 	}
     }
-    return TRUE;
+    തിരികെ TRUE;
 }
 
 /*
  * Computes attributes of text on the popup menu.
  * Returns attributes for every cell, or NULL if all attributes are the same.
  */
-    static int *
-pum_compute_text_attrs(char_u *text, hlf_T hlf, int user_hlattr)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ *
+pum_compute_text_attrs(char_u *text, hlf_T hlf, പൂർണ്ണസംഖ്യ user_hlattr)
 {
-    int		i;
+    പൂർണ്ണസംഖ്യ		i;
     size_t	leader_len;
-    int		char_cells;
-    int		new_attr;
+    പൂർണ്ണസംഖ്യ		char_cells;
+    പൂർണ്ണസംഖ്യ		new_attr;
     char_u	*ptr = text;
-    int		cell_idx = 0;
-    garray_T	*ga = NULL;
-    int		*attrs = NULL;
-    char_u	*leader = NULL;
-    int		in_fuzzy;
-    int		matched_len = -1;
+    പൂർണ്ണസംഖ്യ		cell_idx = 0;
+    garray_T	*ga = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		*attrs = ശൂന്യ;
+    char_u	*leader = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		in_fuzzy;
+    പൂർണ്ണസംഖ്യ		matched_len = -1;
     int_u	char_pos = 0;
-    int		is_select = FALSE;
+    പൂർണ്ണസംഖ്യ		is_select = FALSE;
 
-    if (*text == NUL || (hlf != HLF_PSI && hlf != HLF_PNI)
+    എങ്കിൽ (*text == NUL || (hlf != HLF_PSI && hlf != HLF_PNI)
 	    || (highlight_attr[HLF_PMSI] == highlight_attr[HLF_PSI]
 		&& highlight_attr[HLF_PMNI] == highlight_attr[HLF_PNI]))
-	return NULL;
+	തിരികെ ശൂന്യ;
 
     is_select = hlf == HLF_PSI;
     leader = (State & MODE_CMDLINE) ? cmdline_compl_pattern()
 							  : ins_compl_leader();
-    if (leader == NULL || *leader == NUL)
-	return NULL;
+    എങ്കിൽ (leader == ശൂന്യ || *leader == NUL)
+	തിരികെ ശൂന്യ;
 
-    attrs = ALLOC_MULT(int, vim_strsize(text));
-    if (attrs == NULL)
-	return NULL;
+    attrs = ALLOC_MULT(പൂർണ്ണസംഖ്യ, vim_strsize(text));
+    എങ്കിൽ (attrs == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
     in_fuzzy = (State & MODE_CMDLINE) ? cmdline_compl_is_fuzzy()
 					  : (get_cot_flags() & COT_FUZZY) != 0;
     leader_len = STRLEN(leader);
 
-    if (in_fuzzy)
+    എങ്കിൽ (in_fuzzy)
     {
 	ga = fuzzy_match_str_with_pos(text, leader);
-	if (!ga)
+	എങ്കിൽ (!ga)
 	{
 	    vim_free(attrs);
-	    return NULL;
+	    തിരികെ ശൂന്യ;
 	}
     }
 
-    while (*ptr != NUL)
+    ആകുമ്പോൾ (*ptr != NUL)
     {
 	new_attr = highlight_attr[hlf];
 
-	if (ga != NULL)
+	എങ്കിൽ (ga != ശൂന്യ)
 	{
 	    // Handle fuzzy matching
-	    for (i = 0; i < ga->ga_len; i++)
+	    വേണ്ടി (i = 0; i < ga->ga_len; i++)
 	    {
-		if (char_pos == ((int_u *)ga->ga_data)[i])
+		എങ്കിൽ (char_pos == ((int_u *)ga->ga_data)[i])
 		{
 		    new_attr = highlight_attr[is_select ? HLF_PMSI : HLF_PMNI];
 		    new_attr = hl_combine_attr(highlight_attr[hlf], new_attr);
-		    break;
+		    നിർത്തുക;
 		}
 	    }
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    if (matched_len < 0 && MB_STRNICMP(ptr, leader, leader_len) == 0)
-		matched_len = (int)leader_len;
-	    if (matched_len > 0)
+	    എങ്കിൽ (matched_len < 0 && MB_STRNICMP(ptr, leader, leader_len) == 0)
+		matched_len = (പൂർണ്ണസംഖ്യ)leader_len;
+	    എങ്കിൽ (matched_len > 0)
 	    {
 		new_attr = highlight_attr[is_select ? HLF_PMSI : HLF_PMNI];
 		new_attr = hl_combine_attr(highlight_attr[hlf], new_attr);
@@ -548,11 +548,11 @@ pum_compute_text_attrs(char_u *text, hlf_T hlf, int user_hlattr)
 	}
 
 	new_attr = hl_combine_attr(highlight_attr[HLF_PNI], new_attr);
-	if (user_hlattr > 0)
+	എങ്കിൽ (user_hlattr > 0)
 	    new_attr = hl_combine_attr(new_attr, user_hlattr);
 
 	char_cells = mb_ptr2cells(ptr);
-	for (i = 0; i < char_cells; i++)
+	വേണ്ടി (i = 0; i < char_cells; i++)
 	    attrs[cell_idx + i] = new_attr;
 	cell_idx += char_cells;
 
@@ -560,39 +560,39 @@ pum_compute_text_attrs(char_u *text, hlf_T hlf, int user_hlattr)
 	char_pos++;
     }
 
-    if (ga != NULL)
+    എങ്കിൽ (ga != ശൂന്യ)
     {
 	ga_clear(ga);
 	vim_free(ga);
     }
-    return attrs;
+    തിരികെ attrs;
 }
 
 /*
  * Displays text on the popup menu with specific attributes.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 pum_screen_puts_with_attrs(
-    int		row,
-    int		col,
-    int		cells UNUSED,
+    പൂർണ്ണസംഖ്യ		row,
+    പൂർണ്ണസംഖ്യ		col,
+    പൂർണ്ണസംഖ്യ		cells UNUSED,
     char_u	*text,
-    int		textlen,
-    int		*attrs)
+    പൂർണ്ണസംഖ്യ		textlen,
+    പൂർണ്ണസംഖ്യ		*attrs)
 {
-    int		col_start = col;
+    പൂർണ്ണസംഖ്യ		col_start = col;
     char_u	*ptr = text;
-    int		char_len;
-    int		attr;
+    പൂർണ്ണസംഖ്യ		char_len;
+    പൂർണ്ണസംഖ്യ		attr;
 
     // Render text with proper attributes
-    while (*ptr != NUL && ptr < text + textlen)
+    ആകുമ്പോൾ (*ptr != NUL && ptr < text + textlen)
     {
 	char_len = mb_ptr2len(ptr);
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	എങ്കിൽ (pum_rl)
 	    attr = attrs[col_start + cells - col - 1];
-	else
+	അല്ലെങ്കിൽ
 #endif
 	    attr = attrs[col - col_start];
 	screen_puts_len(ptr, char_len, row, col, attr);
@@ -601,27 +601,27 @@ pum_screen_puts_with_attrs(
     }
 }
 
-    static inline char_u *
-pum_get_item(int index, int type)
+    സ്ഥിതം വരിയിൽ char_u *
+pum_get_item(പൂർണ്ണസംഖ്യ index, പൂർണ്ണസംഖ്യ type)
 {
-    switch(type)
+    തിരഞ്ഞെടുപ്പ്(type)
     {
-	case CPT_ABBR: return pum_array[index].pum_text;
-	case CPT_KIND: return pum_array[index].pum_kind;
-	case CPT_MENU: return pum_array[index].pum_extra;
+	അവസ്ഥ CPT_ABBR: തിരികെ pum_array[index].pum_text;
+	അവസ്ഥ CPT_KIND: തിരികെ pum_array[index].pum_kind;
+	അവസ്ഥ CPT_MENU: തിരികെ pum_array[index].pum_extra;
     }
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    static inline int
-pum_user_attr_combine(int idx, int type, int attr)
+    സ്ഥിതം വരിയിൽ പൂർണ്ണസംഖ്യ
+pum_user_attr_combine(പൂർണ്ണസംഖ്യ idx, പൂർണ്ണസംഖ്യ type, പൂർണ്ണസംഖ്യ attr)
 {
-    int user_attr[] = {
+    പൂർണ്ണസംഖ്യ user_attr[] = {
 	pum_array[idx].pum_user_abbr_hlattr,
 	pum_array[idx].pum_user_kind_hlattr,
     };
 
-    return user_attr[type] > 0 ? hl_combine_attr(attr, user_attr[type]) : attr;
+    തിരികെ user_attr[type] > 0 ? hl_combine_attr(attr, user_attr[type]) : attr;
 }
 
 #ifdef FEAT_RIGHTLEFT
@@ -629,37 +629,37 @@ pum_user_attr_combine(int idx, int type, int attr)
  * Display RTL text with proper attributes in the popup menu.
  * Returns the adjusted column position after drawing.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 pum_display_rtl_text(
-	int	row,
-	int     col,
+	പൂർണ്ണസംഖ്യ	row,
+	പൂർണ്ണസംഖ്യ     col,
 	char_u  *st,
-	int     attr,
-	int     *attrs,
-	int     width,
-	int     width_limit,
-	int     totwidth,
-	int     next_isempty,
-	int	selected)
+	പൂർണ്ണസംഖ്യ     attr,
+	പൂർണ്ണസംഖ്യ     *attrs,
+	പൂർണ്ണസംഖ്യ     width,
+	പൂർണ്ണസംഖ്യ     width_limit,
+	പൂർണ്ണസംഖ്യ     totwidth,
+	പൂർണ്ണസംഖ്യ     next_isempty,
+	പൂർണ്ണസംഖ്യ	selected)
 {
-    char_u  *rt = NULL;
-    int     cells = 0;
-    int     over_cell = 0;
-    int     truncated = FALSE;
-    int     pad = next_isempty ? 0 : 2;
-    int     remaining = 0;
-    int	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
-    int	    truncrl = curwin->w_fill_chars.truncrl != NUL
+    char_u  *rt = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ     cells = 0;
+    പൂർണ്ണസംഖ്യ     over_cell = 0;
+    പൂർണ്ണസംഖ്യ     truncated = FALSE;
+    പൂർണ്ണസംഖ്യ     pad = next_isempty ? 0 : 2;
+    പൂർണ്ണസംഖ്യ     remaining = 0;
+    പൂർണ്ണസംഖ്യ	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
+    പൂർണ്ണസംഖ്യ	    truncrl = curwin->w_fill_chars.truncrl != NUL
 					? curwin->w_fill_chars.truncrl : '<';
 
-    if (st == NULL)
-	return col;
+    എങ്കിൽ (st == ശൂന്യ)
+	തിരികെ col;
 
     rt = reverse_text(st);
-    if (rt == NULL)
+    എങ്കിൽ (rt == ശൂന്യ)
     {
 	VIM_CLEAR(st);
-	return col;
+	തിരികെ col;
     }
 
     char_u *rt_start = rt;
@@ -667,15 +667,15 @@ pum_display_rtl_text(
     truncated = width_limit - totwidth < cells + pad;
 
     // only draw the text that fits
-    if (cells > width_limit)
+    എങ്കിൽ (cells > width_limit)
     {
-	do
+	ചെയ്യുക
 	{
 	    cells -= has_mbyte ? (*mb_ptr2cells)(rt) : 1;
 	    MB_PTR_ADV(rt);
-	} while (cells > width_limit);
+	} ആകുമ്പോൾ (cells > width_limit);
 
-	if (cells < width_limit)
+	എങ്കിൽ (cells < width_limit)
 	{
 	    // Most left character requires 2-cells
 	    // but only 1 cell is available on screen.
@@ -685,23 +685,23 @@ pum_display_rtl_text(
 	}
     }
 
-    if (truncated)
+    എങ്കിൽ (truncated)
     {
 	char_u  *orig_rt = rt;
-	int     size = 0;
+	പൂർണ്ണസംഖ്യ     size = 0;
 
 	remaining = width_limit - totwidth - 1;
 	cells = mb_string2cells(rt, -1);
-	if (cells > remaining)
+	എങ്കിൽ (cells > remaining)
 	{
-	    while (cells > remaining)
+	    ആകുമ്പോൾ (cells > remaining)
 	    {
 		MB_PTR_ADV(orig_rt);
 		cells -= has_mbyte ? (*mb_ptr2cells)(orig_rt) : 1;
 	    }
 	}
-	size = (int)STRLEN(orig_rt);
-	if (cells < remaining)
+	size = (പൂർണ്ണസംഖ്യ)STRLEN(orig_rt);
+	എങ്കിൽ (cells < remaining)
 	    over_cell = remaining - cells;
 
 	cells = mb_string2cells(orig_rt, size);
@@ -710,20 +710,20 @@ pum_display_rtl_text(
 
 	screen_putchar(truncrl, row, col - width + 1, trunc_attr);
 
-	if (over_cell > 0)
+	എങ്കിൽ (over_cell > 0)
 	    screen_fill(row, row + 1, col - width + 2,
 		    col - width + 2 + over_cell, ' ', ' ', attr);
     }
 
-    if (attrs == NULL)
-	screen_puts_len(rt, (int)STRLEN(rt), row, col - cells + 1, attr);
-    else
+    എങ്കിൽ (attrs == ശൂന്യ)
+	screen_puts_len(rt, (പൂർണ്ണസംഖ്യ)STRLEN(rt), row, col - cells + 1, attr);
+    അല്ലെങ്കിൽ
 	pum_screen_puts_with_attrs(row, col - cells + 1, cells, rt,
-		(int)STRLEN(rt), attrs);
+		(പൂർണ്ണസംഖ്യ)STRLEN(rt), attrs);
 
     vim_free(rt_start);
     VIM_CLEAR(st);
-    return col - width;
+    തിരികെ col - width;
 }
 #endif
 
@@ -731,58 +731,58 @@ pum_display_rtl_text(
  * Display LTR text with proper attributes in the popup menu.
  * Returns the adjusted column position after drawing.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 pum_display_ltr_text(
-	int     row,
-	int     col,
+	പൂർണ്ണസംഖ്യ     row,
+	പൂർണ്ണസംഖ്യ     col,
 	char_u  *st,
-	int     attr,
-	int     *attrs,
-	int     width,        // width already calculated in outer loop
-	int     width_limit,
-	int     totwidth,
-	int     next_isempty,
-	int	selected)
+	പൂർണ്ണസംഖ്യ     attr,
+	പൂർണ്ണസംഖ്യ     *attrs,
+	പൂർണ്ണസംഖ്യ     width,        // width already calculated in outer loop
+	പൂർണ്ണസംഖ്യ     width_limit,
+	പൂർണ്ണസംഖ്യ     totwidth,
+	പൂർണ്ണസംഖ്യ     next_isempty,
+	പൂർണ്ണസംഖ്യ	selected)
 {
-    int     size = 0;
-    int     cells = 0;
-    char_u  *st_end = NULL;
-    int     over_cell = 0;
-    int     pad = next_isempty ? 0 : 2;
-    int     truncated = FALSE;
-    int     remaining = 0;
-    int	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
-    int	    trunc = curwin->w_fill_chars.trunc != NUL
+    പൂർണ്ണസംഖ്യ     size = 0;
+    പൂർണ്ണസംഖ്യ     cells = 0;
+    char_u  *st_end = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ     over_cell = 0;
+    പൂർണ്ണസംഖ്യ     pad = next_isempty ? 0 : 2;
+    പൂർണ്ണസംഖ്യ     truncated = FALSE;
+    പൂർണ്ണസംഖ്യ     remaining = 0;
+    പൂർണ്ണസംഖ്യ	    trunc_attr = highlight_attr[selected ? HLF_PSI : HLF_PNI];
+    പൂർണ്ണസംഖ്യ	    trunc = curwin->w_fill_chars.trunc != NUL
 					    ? curwin->w_fill_chars.trunc : '>';
 
-    if (st == NULL)
-	return col;
+    എങ്കിൽ (st == ശൂന്യ)
+	തിരികെ col;
 
-    size = (int)STRLEN(st);
+    size = (പൂർണ്ണസംഖ്യ)STRLEN(st);
     cells = (*mb_string2cells)(st, size);
     truncated = width_limit - totwidth < cells + pad;
 
     // only draw the text that fits
-    while (size > 0 && col + cells > width_limit + pum_col)
+    ആകുമ്പോൾ (size > 0 && col + cells > width_limit + pum_col)
     {
 	--size;
-	if (has_mbyte)
+	എങ്കിൽ (has_mbyte)
 	{
 	    size -= (*mb_head_off)(st, st + size);
 	    cells -= (*mb_ptr2cells)(st + size);
 	}
-	else
+	അല്ലെങ്കിൽ
 	    --cells;
     }
 
     // truncated
-    if (truncated)
+    എങ്കിൽ (truncated)
     {
 	remaining = width_limit - totwidth - 1;
-	if (cells > remaining)
+	എങ്കിൽ (cells > remaining)
 	{
 	    st_end = st + size;
-	    while (st_end > st && cells > remaining)
+	    ആകുമ്പോൾ (st_end > st && cells > remaining)
 	    {
 		MB_PTR_BACK(st, st_end);
 		cells -= has_mbyte ? (*mb_ptr2cells)(st_end) : 1;
@@ -790,20 +790,20 @@ pum_display_ltr_text(
 	    size = st_end - st;
 	}
 
-	if (cells < remaining)
+	എങ്കിൽ (cells < remaining)
 	    over_cell = remaining - cells;
 	cells = mb_string2cells(st, size);
 	width = cells + over_cell + 1;
     }
 
-    if (attrs == NULL)
+    എങ്കിൽ (attrs == ശൂന്യ)
 	screen_puts_len(st, size, row, col, attr);
-    else
+    അല്ലെങ്കിൽ
 	pum_screen_puts_with_attrs(row, col, cells, st, size, attrs);
 
-    if (truncated)
+    എങ്കിൽ (truncated)
     {
-	if (over_cell > 0)
+	എങ്കിൽ (over_cell > 0)
 	    screen_fill(row, row + 1, col + cells,
 		    col + cells + over_cell, ' ', ' ', attr);
 
@@ -811,7 +811,7 @@ pum_display_ltr_text(
     }
 
     VIM_CLEAR(st);
-    return col + width;
+    തിരികെ col + width;
 }
 
 
@@ -819,133 +819,133 @@ pum_display_ltr_text(
  * Process and display a single popup menu item (text/kind/extra).
  * Returns the new column position after drawing.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 pum_process_item(
-	int     row,
-	int     col,
-	int     idx,
-	int     j,         // Current position in order array
-	int     *order,    // Order array
+	പൂർണ്ണസംഖ്യ     row,
+	പൂർണ്ണസംഖ്യ     col,
+	പൂർണ്ണസംഖ്യ     idx,
+	പൂർണ്ണസംഖ്യ     j,         // Current position in order array
+	പൂർണ്ണസംഖ്യ     *order,    // Order array
 	hlf_T   hlf,
-	int     attr,
-	int     *totwidth_ptr,
-	int     next_isempty)
+	പൂർണ്ണസംഖ്യ     attr,
+	പൂർണ്ണസംഖ്യ     *totwidth_ptr,
+	പൂർണ്ണസംഖ്യ     next_isempty)
 {
-    int     item_type = order[j];
-    char_u  *s = NULL;
+    പൂർണ്ണസംഖ്യ     item_type = order[j];
+    char_u  *s = ശൂന്യ;
     char_u  *p = pum_get_item(idx, item_type);
-    int     width = 0;  // item width
-    int     w;		// char width
-    int	    selected = idx == pum_selected;
+    പൂർണ്ണസംഖ്യ     width = 0;  // item width
+    പൂർണ്ണസംഖ്യ     w;		// char width
+    പൂർണ്ണസംഖ്യ	    selected = idx == pum_selected;
 
-    for ( ; ; MB_PTR_ADV(p))
+    വേണ്ടി ( ; ; MB_PTR_ADV(p))
     {
-	if (s == NULL)
+	എങ്കിൽ (s == ശൂന്യ)
 	    s = p;
 	w = ptr2cells(p);
-	if (*p != NUL && *p != TAB && *totwidth_ptr + w <= pum_width)
+	എങ്കിൽ (*p != NUL && *p != TAB && *totwidth_ptr + w <= pum_width)
 	{
 	    width += w;
-	    continue;
+	    തുടരുക;
 	}
 
 	// Display the text that fits or comes before a Tab.
 	// First convert it to printable characters.
 	char_u  *st;
-	int     *attrs = NULL;
-	int     saved = *p;
+	പൂർണ്ണസംഖ്യ     *attrs = ശൂന്യ;
+	പൂർണ്ണസംഖ്യ     saved = *p;
 
-	if (saved != NUL)
+	എങ്കിൽ (saved != NUL)
 	    *p = NUL;
 	st = transstr(s);
-	if (saved != NUL)
+	എങ്കിൽ (saved != NUL)
 	    *p = saved;
 
-	if (item_type == CPT_ABBR)
+	എങ്കിൽ (item_type == CPT_ABBR)
 	    attrs = pum_compute_text_attrs(st, hlf,
 		      pum_array[idx].pum_user_abbr_hlattr);
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	എങ്കിൽ (pum_rl)
 	    col = pum_display_rtl_text(row, col, st, attr, attrs,
 		    width, pum_width, *totwidth_ptr, next_isempty, selected);
-	else
+	അല്ലെങ്കിൽ
 #endif
 	    col = pum_display_ltr_text(row, col, st, attr, attrs,
 		    width, pum_width, *totwidth_ptr, next_isempty, selected);
 
-	if (attrs != NULL)
+	എങ്കിൽ (attrs != ശൂന്യ)
 	    VIM_CLEAR(attrs);
 
-	if (*p != TAB)
-	    break;
+	എങ്കിൽ (*p != TAB)
+	    നിർത്തുക;
 
 	// Display two spaces for a Tab.
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	എങ്കിൽ (pum_rl)
 	{
 	    screen_puts_len((char_u *)"  ", 2, row, col - 1, attr);
 	    col -= 2;
 	}
-	else
+	അല്ലെങ്കിൽ
 #endif
 	{
 	    screen_puts_len((char_u *)"  ", 2, row, col, attr);
 	    col += 2;
 	}
 	*totwidth_ptr += 2;
-	s = NULL;  // start text at next char
+	s = ശൂന്യ;  // start text at next char
 	width = 0;
     }
 
-    return col;
+    തിരികെ col;
 }
 
 /*
  * Draw the scrollbar for the popup menu.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 pum_draw_scrollbar(
-	int	row,
-	int	i,
-	int	thumb_pos,
-	int	thumb_height)
+	പൂർണ്ണസംഖ്യ	row,
+	പൂർണ്ണസംഖ്യ	i,
+	പൂർണ്ണസംഖ്യ	thumb_pos,
+	പൂർണ്ണസംഖ്യ	thumb_height)
 {
-    if (pum_scrollbar <= 0)
-	return;
+    എങ്കിൽ (pum_scrollbar <= 0)
+	തിരികെ;
 
-    int attr = (i >= thumb_pos && i < thumb_pos + thumb_height) ?
+    പൂർണ്ണസംഖ്യ attr = (i >= thumb_pos && i < thumb_pos + thumb_height) ?
 			highlight_attr[HLF_PST] : highlight_attr[HLF_PSB];
 
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    എങ്കിൽ (pum_rl)
 	screen_putchar(' ', row, pum_col - pum_width, attr);
-    else
+    അല്ലെങ്കിൽ
 #endif
 	screen_putchar(' ', row, pum_col + pum_width, attr);
 }
 
-    static inline void
-pum_align_order(int *order)
+    സ്ഥിതം വരിയിൽ ശൂന്യം
+pum_align_order(പൂർണ്ണസംഖ്യ *order)
 {
-    int is_default = cia_flags == 0;
+    പൂർണ്ണസംഖ്യ is_default = cia_flags == 0;
     order[0] = is_default ? CPT_ABBR : cia_flags / 100;
     order[1] = is_default ? CPT_KIND : (cia_flags / 10) % 10;
     order[2] = is_default ? CPT_MENU : cia_flags % 10;
 }
 
-static void pum_free_bg(void);
+സ്ഥിതം ശൂന്യം pum_free_bg(ശൂന്യം);
 
 /*
  * Called when the pum opacity value has changed.
  * Invalidates cached background and triggers redraw if pum is visible.
  */
-    void
-pum_opacity_changed(void)
+    ശൂന്യം
+pum_opacity_changed(ശൂന്യം)
 {
     // Invalidate cached background so it gets re-saved.
     pum_free_bg();
 
-    if (pum_visible())
+    എങ്കിൽ (pum_visible())
     {
 	// Force full screen clear so ScreenAttrs doesn't retain
 	// stale blended values from the previous pumopacity.
@@ -955,16 +955,16 @@ pum_opacity_changed(void)
     }
 }
 
-    static void
-pum_free_bg(void)
+    സ്ഥിതം ശൂന്യം
+pum_free_bg(ശൂന്യം)
 {
-    int k;
+    പൂർണ്ണസംഖ്യ k;
     VIM_CLEAR(pum_bg_attrs);
-    VIM_CLEAR(pum_bg_lines);
-    VIM_CLEAR(pum_bg_linesUC);
-    for (k = 0; k < MAX_MCO; ++k)
-	VIM_CLEAR(pum_bg_linesC[k]);
-    pum_bg_top = 0;
+    VIM_CLEAR(pum_bg_വരികൾ);
+    VIM_CLEAR(pum_bg_വരികൾ_UC);
+    വേണ്ടി (k = 0; k < MAX_MCO; ++k)
+	VIM_CLEAR(pum_bg_വരികൾ_C[k]);
+    pum_bg_മുകൾ = 0;
     pum_bg_bot = 0;
     pum_bg_cols = 0;
 }
@@ -972,35 +972,35 @@ pum_free_bg(void)
 /*
  * Redraw the popup menu, using "pum_first" and "pum_selected".
  */
-    void
-pum_redraw(void)
+    ശൂന്യം
+pum_redraw(ശൂന്യം)
 {
-    int		row = pum_row;
-    int		col;
+    പൂർണ്ണസംഖ്യ		row = pum_row;
+    പൂർണ്ണസംഖ്യ		col;
     hlf_T	*hlfs; // array used for highlights
     hlf_T	hlf;
-    int		attr;
-    int		i, j;
-    int		idx;
-    char_u	*p = NULL;
-    int		totwidth;
-    int		thumb_pos = 0;
-    int		thumb_height = 1;
-    int		item_type;
-    int		order[3];
-    int		next_isempty = FALSE;
-    int		n;
-    int		items_width_array[3] = { pum_base_width, pum_kind_width,
+    പൂർണ്ണസംഖ്യ		attr;
+    പൂർണ്ണസംഖ്യ		i, j;
+    പൂർണ്ണസംഖ്യ		idx;
+    char_u	*p = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		totwidth;
+    പൂർണ്ണസംഖ്യ		thumb_pos = 0;
+    പൂർണ്ണസംഖ്യ		thumb_height = 1;
+    പൂർണ്ണസംഖ്യ		item_type;
+    പൂർണ്ണസംഖ്യ		order[3];
+    പൂർണ്ണസംഖ്യ		next_isempty = FALSE;
+    പൂർണ്ണസംഖ്യ		n;
+    പൂർണ്ണസംഖ്യ		ഇനങ്ങൾ_width_array[3] = { pum_base_width, pum_kind_width,
 							    pum_extra_width };
-    int		basic_width;  // first item width
-    int		last_isabbr = FALSE;
-    int		orig_attr = -1;
-    int		scroll_range = pum_size - pum_height;
+    പൂർണ്ണസംഖ്യ		basic_width;  // first item width
+    പൂർണ്ണസംഖ്യ		last_isabbr = FALSE;
+    പൂർണ്ണസംഖ്യ		orig_attr = -1;
+    പൂർണ്ണസംഖ്യ		scroll_range = pum_size - pum_height;
     bool	override_success;
-    int		opacity_active = (p_po > 0 && p_po < 100);
+    പൂർണ്ണസംഖ്യ		opacity_active = (p_po > 0 && p_po < 100);
 
     // Use current window for highlight overrides when using 'winhighlight'
-    override_success = push_highlight_overrides(curwin->w_hl, curwin->w_hl_len);
+    override_success = തള്ളുക_highlight_overrides(curwin->w_hl, curwin->w_hl_len);
 
     // Batch the underlying screen update and the pum drawing into a single
     // synchronized output frame to avoid flicker.
@@ -1008,11 +1008,11 @@ pum_redraw(void)
 
 #ifdef FEAT_IMAGE_POPUP
     // Create a image placement so that other images are clipped correctly
-    if (pum_imagep == NULL)
+    എങ്കിൽ (pum_imagep == ശൂന്യ)
 	// Make pom always be on top of any image placement with same zindex.
-	pum_imagep = image_placement_new(NULL, UINT_MAX,
+	pum_imagep = image_placement_new(ശൂന്യ, UINT_MAX,
 		IMAGE_PLACEMENT_USE_PUM, true);
-    if (pum_imagep != NULL)
+    എങ്കിൽ (pum_imagep != ശൂന്യ)
     {
 	image_placement_set_zindex(pum_imagep, POPUPMENU_ZINDEX);
 	image_placement_set_position(pum_imagep, pum_row, pum_col);
@@ -1034,17 +1034,17 @@ pum_redraw(void)
     hlfsNorm[2] = HLF_PNX;
     hlfsSel[2] = HLF_PSX;
 
-    if (call_update_screen)
+    എങ്കിൽ (call_update_screen)
     {
 	call_update_screen = FALSE;
 	// Invalidate cached background if screen size changed (e.g.
 	// after window resize).
-	if (opacity_active && pum_bg_lines != NULL
+	എങ്കിൽ (opacity_active && pum_bg_വരികൾ != ശൂന്യ
 		&& (pum_bg_cols != screen_Columns
 		    || pum_bg_bot > screen_Rows))
 	    pum_free_bg();
 
-	if (opacity_active && pum_bg_lines != NULL)
+	എങ്കിൽ (opacity_active && pum_bg_വരികൾ != ശൂന്യ)
 	{
 	    // Already have saved background; skip update_screen to avoid
 	    // flickering.  Just do a normal pum_will_redraw update.
@@ -1052,7 +1052,7 @@ pum_redraw(void)
 	    update_screen(0);
 	    pum_will_redraw = FALSE;
 	}
-	else if (opacity_active)
+	അല്ലെങ്കിൽ എങ്കിൽ (opacity_active)
 	{
 	    // For opacity: draw background including the area under the
 	    // pum, then save it.
@@ -1061,66 +1061,66 @@ pum_redraw(void)
 	    pum_pretend_not_visible = FALSE;
 
 	    // Save background to static buffers.
-	    if (ScreenLines != NULL && ScreenAttrs != NULL)
+	    എങ്കിൽ (Screen_വരികൾ != ശൂന്യ && ScreenAttrs != ശൂന്യ)
 	    {
-		int	save_top, save_bot, save_ncells, k;
+		പൂർണ്ണസംഖ്യ	save_മുകൾ, save_bot, save_ncells, k;
 
 		pum_free_bg();
-		save_top = pum_row - pum_border;
+		save_മുകൾ = pum_row - pum_border;
 		save_bot = pum_row + pum_height + pum_border
 					    + (pum_shadow ? 1 : 0) + 1;
-		if (save_top < 0)
-		    save_top = 0;
-		if (save_bot > screen_Rows)
+		എങ്കിൽ (save_മുകൾ < 0)
+		    save_മുകൾ = 0;
+		എങ്കിൽ (save_bot > screen_Rows)
 		    save_bot = screen_Rows;
-		pum_bg_top = save_top;
+		pum_bg_മുകൾ = save_മുകൾ;
 		pum_bg_bot = save_bot;
 		pum_bg_cols = screen_Columns;
-		if (save_top < save_bot)
+		എങ്കിൽ (save_മുകൾ < save_bot)
 		{
-		    save_ncells = (save_bot - save_top) * screen_Columns;
+		    save_ncells = (save_bot - save_മുകൾ) * screen_Columns;
 		    pum_bg_attrs = LALLOC_MULT(sattr_T, save_ncells);
-		    pum_bg_lines = LALLOC_MULT(schar_T, save_ncells);
-		    if (enc_utf8)
+		    pum_bg_വരികൾ = LALLOC_MULT(schar_T, save_ncells);
+		    എങ്കിൽ (enc_utf8)
 		    {
-			pum_bg_linesUC = LALLOC_MULT(u8char_T, save_ncells);
-			for (k = 0; k < MAX_MCO; ++k)
-			    pum_bg_linesC[k] = LALLOC_MULT(u8char_T,
+			pum_bg_വരികൾ_UC = LALLOC_MULT(u8char_T, save_ncells);
+			വേണ്ടി (k = 0; k < MAX_MCO; ++k)
+			    pum_bg_വരികൾ_C[k] = LALLOC_MULT(u8char_T,
 							    save_ncells);
 		    }
-		    if (pum_bg_attrs != NULL && pum_bg_lines != NULL)
+		    എങ്കിൽ (pum_bg_attrs != ശൂന്യ && pum_bg_വരികൾ != ശൂന്യ)
 		    {
-			for (int r = save_top; r < save_bot; ++r)
+			വേണ്ടി (പൂർണ്ണസംഖ്യ r = save_മുകൾ; r < save_bot; ++r)
 			{
-			    int soff = (r - save_top) * screen_Columns;
-			    int loff = LineOffset[r];
+			    പൂർണ്ണസംഖ്യ soff = (r - save_മുകൾ) * screen_Columns;
+			    പൂർണ്ണസംഖ്യ loff = വരി_Offset[r];
 
 			    mch_memmove(pum_bg_attrs + soff,
 				    ScreenAttrs + loff,
-				    screen_Columns * sizeof(sattr_T));
-			    mch_memmove(pum_bg_lines + soff,
-				    ScreenLines + loff,
-				    screen_Columns * sizeof(schar_T));
-			    if (enc_utf8 && pum_bg_linesUC != NULL
-						&& ScreenLinesUC != NULL)
+				    screen_Columns * വലുപ്പം(sattr_T));
+			    mch_memmove(pum_bg_വരികൾ + soff,
+				    Screen_വരികൾ + loff,
+				    screen_Columns * വലുപ്പം(schar_T));
+			    എങ്കിൽ (enc_utf8 && pum_bg_വരികൾ_UC != ശൂന്യ
+						&& Screen_വരികൾ_UC != ശൂന്യ)
 			    {
-				mch_memmove(pum_bg_linesUC + soff,
-					ScreenLinesUC + loff,
-					screen_Columns * sizeof(u8char_T));
-				for (k = 0; k < MAX_MCO; ++k)
-				    if (pum_bg_linesC[k] != NULL
-						    && ScreenLinesC[k] != NULL)
-					mch_memmove(pum_bg_linesC[k] + soff,
-						ScreenLinesC[k] + loff,
+				mch_memmove(pum_bg_വരികൾ_UC + soff,
+					Screen_വരികൾ_UC + loff,
+					screen_Columns * വലുപ്പം(u8char_T));
+				വേണ്ടി (k = 0; k < MAX_MCO; ++k)
+				    എങ്കിൽ (pum_bg_വരികൾ_C[k] != ശൂന്യ
+						    && Screen_വരികൾ_C[k] != ശൂന്യ)
+					mch_memmove(pum_bg_വരികൾ_C[k] + soff,
+						Screen_വരികൾ_C[k] + loff,
 						screen_Columns
-						    * sizeof(u8char_T));
+						    * വലുപ്പം(u8char_T));
 			    }
 			}
 		    }
 		}
 	    }
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // Do not redraw in pum_may_redraw() and don't draw in the area
 	    // where the popup menu will be.
@@ -1133,10 +1133,10 @@ pum_redraw(void)
     // never display more than we have
     pum_first = MIN(pum_first, scroll_range);
 
-    if (pum_scrollbar)
+    എങ്കിൽ (pum_scrollbar)
     {
 	thumb_height = pum_height * pum_height / pum_size;
-	if (thumb_height == 0)
+	എങ്കിൽ (thumb_height == 0)
 	    thumb_height = 1;
 	thumb_pos = (pum_first * (pum_height - thumb_height)
 			    + scroll_range / 2) / scroll_range;
@@ -1150,17 +1150,17 @@ pum_redraw(void)
 
     // Draw border and shadow first if enabled, before setting blend
     // so that border/shadow characters are drawn without opacity.
-    if (pum_border)
+    എങ്കിൽ (pum_border)
 	pum_draw_border();
-    if (pum_shadow)
+    എങ്കിൽ (pum_shadow)
 	pum_draw_shadow();
 
     // Set blend for screen_puts_len / screen_fill to use.
     // Only the pum content area should be blended, not border/shadow.
-    if (opacity_active)
-	screen_pum_blend = 100 - (int)p_po;
+    എങ്കിൽ (opacity_active)
+	screen_pum_blend = 100 - (പൂർണ്ണസംഖ്യ)p_po;
 
-    for (i = 0; i < pum_height; ++i)
+    വേണ്ടി (i = 0; i < pum_height; ++i)
     {
 	idx = i + pum_first;
 	hlfs = (idx == pum_selected) ? hlfsSel : hlfsNorm;
@@ -1169,15 +1169,15 @@ pum_redraw(void)
 
 	// prepend a space if there is room
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	എങ്കിൽ (pum_rl)
 	{
-	    if (pum_col < curwin->w_wincol + curwin->w_width - 1
+	    എങ്കിൽ (pum_col < curwin->w_wincol + curwin->w_width - 1
 							    - pum_border)
 		screen_putchar(' ', row, pum_col + 1, attr);
 	}
-	else
+	അല്ലെങ്കിൽ
 #endif
-	    if (pum_col > pum_border)
+	    എങ്കിൽ (pum_col > pum_border)
 		screen_putchar(' ', row, pum_col - 1, attr);
 
 	// Display each entry, use two spaces for a Tab.
@@ -1185,47 +1185,47 @@ pum_redraw(void)
 	col = pum_col;
 	totwidth = 0;
 	pum_align_order(order);
-	basic_width = items_width_array[order[0]];
+	basic_width = ഇനങ്ങൾ_width_array[order[0]];
 	last_isabbr = order[2] == CPT_ABBR;
-	for (j = 0; j < 3; ++j)
+	വേണ്ടി (j = 0; j < 3; ++j)
 	{
 	    item_type = order[j];
 	    hlf = hlfs[item_type];
 	    attr = highlight_attr[hlf];
 	    orig_attr = attr;
-	    if (item_type < 2)  // try combine attr with user custom
+	    എങ്കിൽ (item_type < 2)  // try combine attr with user custom
 		attr = pum_user_attr_combine(idx, item_type, attr);
 	    p = pum_get_item(idx, item_type);
 
-	    if (j + 1 < 3)
-		next_isempty = pum_get_item(idx, order[j + 1]) == NULL;
-	    else
+	    എങ്കിൽ (j + 1 < 3)
+		next_isempty = pum_get_item(idx, order[j + 1]) == ശൂന്യ;
+	    അല്ലെങ്കിൽ
 		next_isempty = TRUE;
 
-	    if (p != NULL)
+	    എങ്കിൽ (p != ശൂന്യ)
 		// Process and display the item
 		col = pum_process_item(row, col, idx, j, order, hlf, attr,
 						    &totwidth, next_isempty);
 
-	    if (j > 0)
-		n = items_width_array[order[1]] + (last_isabbr ? 0 : 1);
-	    else
+	    എങ്കിൽ (j > 0)
+		n = ഇനങ്ങൾ_width_array[order[1]] + (last_isabbr ? 0 : 1);
+	    അല്ലെങ്കിൽ
 		n = order[j] == CPT_ABBR ? 1 : 0;
 
 	    // Stop when there is nothing more to display.
-	    if (j == 2
+	    എങ്കിൽ (j == 2
 		    || (next_isempty && (j == 1 || (j == 0
-				&& pum_get_item(idx, order[j + 2]) == NULL)))
+				&& pum_get_item(idx, order[j + 2]) == ശൂന്യ)))
 		    || basic_width + n >= pum_width)
-		break;
+		നിർത്തുക;
 #ifdef FEAT_RIGHTLEFT
-	    if (pum_rl)
+	    എങ്കിൽ (pum_rl)
 	    {
 		screen_fill(row, row + 1, pum_col - basic_width - n + 1,
 						col + 1, ' ', ' ', orig_attr);
 		col = pum_col - basic_width - n;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 #endif
 	    {
 		screen_fill(row, row + 1, col, pum_col + basic_width + n,
@@ -1236,10 +1236,10 @@ pum_redraw(void)
 	}
 
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	എങ്കിൽ (pum_rl)
 	    screen_fill(row, row + 1, pum_col - pum_width + 1, col + 1,
 							    ' ', ' ', orig_attr);
-	else
+	അല്ലെങ്കിൽ
 #endif
 	    screen_fill(row, row + 1, col, pum_col + pum_width, ' ', ' ',
 								orig_attr);
@@ -1254,73 +1254,73 @@ pum_redraw(void)
     screen_zindex = 0;
 #endif
 
-    if (override_success)
-	pop_highlight_overrides();
+    എങ്കിൽ (override_success)
+	എടുക്കുക_highlight_overrides();
 
     term_set_sync_output(TERM_SYNC_OUTPUT_DISABLE);
 }
 
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#എങ്കിൽ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
 /*
  * Position the info popup relative to the popup menu item.
  */
-    void
+    ശൂന്യം
 pum_position_info_popup(win_T *wp)
 {
-    int col = pum_col + pum_width + pum_scrollbar + 1;
-    int row = pum_row;
-    int botpos = POPPOS_BOTLEFT;
-    int	used_maxwidth_opt = FALSE;
-    int	right_margin, left_margin, dummy;
-    int left_extra_width, right_extra_width;
+    പൂർണ്ണസംഖ്യ col = pum_col + pum_width + pum_scrollbar + 1;
+    പൂർണ്ണസംഖ്യ row = pum_row;
+    പൂർണ്ണസംഖ്യ botpos = POPPOS_BOTLEFT;
+    പൂർണ്ണസംഖ്യ	used_maxwidth_opt = FALSE;
+    പൂർണ്ണസംഖ്യ	വലത്_margin, ഇടത്_margin, dummy;
+    പൂർണ്ണസംഖ്യ ഇടത്_extra_width, വലത്_extra_width;
 
-    (void)compute_margins(&right_margin, &left_margin, &dummy);
+    (ശൂന്യം)compute_margins(&വലത്_margin, &ഇടത്_margin, &dummy);
 
-    left_extra_width = pum_border + left_margin;
-    right_extra_width = pum_border + right_margin + (pum_shadow ? 2 : 0);
-    col += right_extra_width;
+    ഇടത്_extra_width = pum_border + ഇടത്_margin;
+    വലത്_extra_width = pum_border + വലത്_margin + (pum_shadow ? 2 : 0);
+    col += വലത്_extra_width;
 
     wp->w_popup_pos = POPPOS_TOPLEFT;
-    if (Columns - col < 20 && Columns - col < pum_col)
+    എങ്കിൽ (Columns - col < 20 && Columns - col < pum_col)
     {
-	col = pum_col - 1 - left_extra_width;
+	col = pum_col - 1 - ഇടത്_extra_width;
 	wp->w_popup_pos = POPPOS_TOPRIGHT;
 	botpos = POPPOS_BOTRIGHT;
-	wp->w_maxwidth = pum_col - 1 - left_extra_width;
+	wp->w_maxwidth = pum_col - 1 - ഇടത്_extra_width;
     }
-    else
+    അല്ലെങ്കിൽ
 	wp->w_maxwidth = Columns - col + 1;
     wp->w_maxwidth -= popup_extra_width(wp);
-    if (wp->w_maxwidth_opt > 0 && wp->w_maxwidth > wp->w_maxwidth_opt)
+    എങ്കിൽ (wp->w_maxwidth_opt > 0 && wp->w_maxwidth > wp->w_maxwidth_opt)
     {
 	// option value overrules computed value
 	wp->w_maxwidth = wp->w_maxwidth_opt;
 	used_maxwidth_opt = TRUE;
     }
 
-    row -= popup_top_extra(wp);
-    if (wp->w_popup_flags & POPF_INFO_MENU)
+    row -= popup_മുകൾ_extra(wp);
+    എങ്കിൽ (wp->w_popup_flags & POPF_INFO_MENU)
     {
-	if (pum_row < pum_win_row)
+	എങ്കിൽ (pum_row < pum_win_row)
 	{
 	    // menu above cursor line, align with bottom
 	    row += pum_height;
 	    wp->w_popup_pos = botpos;
 	}
-	else
+	അല്ലെങ്കിൽ
 	    // menu below cursor line, align with top
 	    row += 1;
     }
-    else
+    അല്ലെങ്കിൽ
 	// align with the selected item
 	row += pum_selected - pum_first + 1;
 
     wp->w_popup_flags &= ~POPF_HIDDEN;
-    if (wp->w_maxwidth < 10 && !used_maxwidth_opt)
+    എങ്കിൽ (wp->w_maxwidth < 10 && !used_maxwidth_opt)
 	// The popup is not going to fit or will overlap with the cursor
 	// position, hide the popup.
 	wp->w_popup_flags |= POPF_HIDDEN;
-    else
+    അല്ലെങ്കിൽ
 	popup_set_wantpos_rowcol(wp, row, col);
 }
 #endif
@@ -1335,63 +1335,63 @@ pum_position_info_popup(win_T *wp)
  * Returns TRUE when the window was resized and the location of the popup menu
  * must be recomputed.
  */
-    static int
-pum_set_selected(int n, int repeat UNUSED)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+pum_set_selected(പൂർണ്ണസംഖ്യ n, പൂർണ്ണസംഖ്യ repeat UNUSED)
 {
-    int	    resized = FALSE;
-    int	    context = pum_height / 2;
-    int	    scroll_offset;
+    പൂർണ്ണസംഖ്യ	    resized = FALSE;
+    പൂർണ്ണസംഖ്യ	    context = pum_height / 2;
+    പൂർണ്ണസംഖ്യ	    scroll_offset;
 #ifdef FEAT_QUICKFIX
-    int	    prev_selected = pum_selected;
+    പൂർണ്ണസംഖ്യ	    prev_selected = pum_selected;
     unsigned	cur_cot_flags = get_cot_flags();
 #endif
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-    int	    has_info = FALSE;
+#എങ്കിൽ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+    പൂർണ്ണസംഖ്യ	    has_info = FALSE;
 #endif
 
     pum_selected = n;
     scroll_offset = pum_selected - pum_height;
 
-    if (pum_selected >= 0 && pum_selected < pum_size)
+    എങ്കിൽ (pum_selected >= 0 && pum_selected < pum_size)
     {
-	if (pum_first > pum_selected - 4)
+	എങ്കിൽ (pum_first > pum_selected - 4)
 	{
 	    // scroll down; when we did a jump it's probably a PageUp then
 	    // scroll a whole page
-	    if (pum_first > pum_selected - 2)
+	    എങ്കിൽ (pum_first > pum_selected - 2)
 	    {
 		pum_first -= pum_height - 2;
-		if (pum_first < 0)
+		എങ്കിൽ (pum_first < 0)
 		    pum_first = 0;
-		else if (pum_first > pum_selected)
+		അല്ലെങ്കിൽ എങ്കിൽ (pum_first > pum_selected)
 		    pum_first = pum_selected;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		pum_first = pum_selected;
 	}
-	else if (pum_first < scroll_offset + 5)
+	അല്ലെങ്കിൽ എങ്കിൽ (pum_first < scroll_offset + 5)
 	{
 	    // scroll up; when we did a jump it's probably a PageDown then
 	    // scroll a whole page
-	    if (pum_first < scroll_offset + 3)
+	    എങ്കിൽ (pum_first < scroll_offset + 3)
 		pum_first = MAX(pum_first + pum_height - 2, scroll_offset + 1);
-	    else
+	    അല്ലെങ്കിൽ
 		pum_first = scroll_offset + 1;
 	}
 
 	// Give a few lines of context when possible.
 	context = MIN(context, 3);
-	if (pum_height > 2)
+	എങ്കിൽ (pum_height > 2)
 	{
-	    if (pum_first > pum_selected - context)
+	    എങ്കിൽ (pum_first > pum_selected - context)
 		pum_first = MAX(pum_selected - context, 0);  // scroll down
-	    else if (pum_first < pum_selected + context - pum_height + 1)
+	    അല്ലെങ്കിൽ എങ്കിൽ (pum_first < pum_selected + context - pum_height + 1)
 		pum_first = pum_selected + context - pum_height + 1;  // up
 	}
 	// adjust for the number of lines displayed
 	pum_first = MIN(pum_first, pum_size - pum_height);
 
-#if defined(FEAT_QUICKFIX)
+#എങ്കിൽ defined(FEAT_QUICKFIX)
 	/*
 	 * Show extra info in the preview window if there is something and
 	 * 'completeopt' contains "preview" or "popup" or "popuphidden".
@@ -1400,7 +1400,7 @@ pum_set_selected(int n, int repeat UNUSED)
 	 * Skip this for command-window when 'completeopt' contains "preview".
 	 * NOTE: Be very careful not to sync undo!
 	 */
-	if (pum_array[pum_selected].pum_info != NULL
+	എങ്കിൽ (pum_array[pum_selected].pum_info != ശൂന്യ
 		&& Rows > 10
 		&& repeat <= 1
 		&& (cur_cot_flags & COT_ANY_PREVIEW)
@@ -1410,18 +1410,18 @@ pum_set_selected(int n, int repeat UNUSED)
 	    tabpage_T   *curtab_save = curtab;
 # ifdef FEAT_PROP_POPUP
 	    use_popup_T	use_popup;
-# else
+# അല്ലെങ്കിൽ
 #  define use_popup USEPOPUP_NONE
 # endif
 # ifdef FEAT_PROP_POPUP
 	    has_info = TRUE;
-	    if (cur_cot_flags & COT_POPUPHIDDEN)
+	    എങ്കിൽ (cur_cot_flags & COT_POPUPHIDDEN)
 		use_popup = USEPOPUP_HIDDEN;
-	    else if (cur_cot_flags & COT_POPUP)
+	    അല്ലെങ്കിൽ എങ്കിൽ (cur_cot_flags & COT_POPUP)
 		use_popup = USEPOPUP_NORMAL;
-	    else
+	    അല്ലെങ്കിൽ
 		use_popup = USEPOPUP_NONE;
-	    if (use_popup != USEPOPUP_NONE)
+	    എങ്കിൽ (use_popup != USEPOPUP_NONE)
 		// don't use WinEnter or WinLeave autocommands for the info
 		// popup
 		block_autocmds();
@@ -1429,7 +1429,7 @@ pum_set_selected(int n, int repeat UNUSED)
 	    // Open a preview window and set "curwin" to it.
 	    // 3 lines by default, prefer 'previewheight' if set and smaller.
 	    g_do_tagpreview = 3;
-	    if (p_pvh > 0 && p_pvh < g_do_tagpreview)
+	    എങ്കിൽ (p_pvh > 0 && p_pvh < g_do_tagpreview)
 		g_do_tagpreview = p_pvh;
 	    ++RedrawingDisabled;
 	    // Prevent undo sync here, if an autocommand syncs undo weird
@@ -1437,117 +1437,117 @@ pum_set_selected(int n, int repeat UNUSED)
 	    ++no_u_sync;
 	    resized = prepare_tagpreview(FALSE, FALSE, use_popup);
 	    --no_u_sync;
-	    if (RedrawingDisabled > 0)
+	    എങ്കിൽ (RedrawingDisabled > 0)
 		--RedrawingDisabled;
 	    g_do_tagpreview = 0;
 
-	    if (curwin->w_p_pvw
+	    എങ്കിൽ (curwin->w_p_pvw
 # ifdef FEAT_PROP_POPUP
 		    || (curwin->w_popup_flags & POPF_INFO)
 # endif
 		    )
 	    {
-		int	res = OK;
+		പൂർണ്ണസംഖ്യ	res = OK;
 
-		if (!resized
+		എങ്കിൽ (!resized
 			&& curbuf->b_nwindows == 1
-			&& curbuf->b_fname == NULL
+			&& curbuf->b_fname == ശൂന്യ
 			&& bt_nofile(curbuf)
 			&& curbuf->b_p_bh[0] == 'w')
 		{
 		    // Already a "wipeout" buffer, make it empty.
-		    while (!BUFEMPTY())
+		    ആകുമ്പോൾ (!BUFEMPTY())
 			ml_delete((linenr_T)1);
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
 		    // Don't want to sync undo in the current buffer.
 		    ++no_u_sync;
-		    res = do_ecmd(0, NULL, NULL, NULL, ECMD_ONE, 0, NULL);
+		    res = do_ecmd(0, ശൂന്യ, ശൂന്യ, ശൂന്യ, ECMD_ONE, 0, ശൂന്യ);
 		    --no_u_sync;
-		    if (res == OK)
+		    എങ്കിൽ (res == OK)
 		    {
 			// Edit a new, empty buffer. Set options for a "wipeout"
 			// buffer.
-			set_option_value_give_err((char_u *)"swf",
-							  0L, NULL, OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bl",
-							  0L, NULL, OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bt",
+			set_option_മൂല്യം_give_err((char_u *)"swf",
+							  0L, ശൂന്യ, OPT_LOCAL);
+			set_option_മൂല്യം_give_err((char_u *)"bl",
+							  0L, ശൂന്യ, OPT_LOCAL);
+			set_option_മൂല്യം_give_err((char_u *)"bt",
 					    0L, (char_u *)"nofile", OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bh",
+			set_option_മൂല്യം_give_err((char_u *)"bh",
 					      0L, (char_u *)"wipe", OPT_LOCAL);
-			set_option_value_give_err((char_u *)"diff",
-							  0L, NULL, OPT_LOCAL);
+			set_option_മൂല്യം_give_err((char_u *)"diff",
+							  0L, ശൂന്യ, OPT_LOCAL);
 		    }
 		}
-		if (res == OK)
+		എങ്കിൽ (res == OK)
 		{
 		    char_u	*p, *e;
 		    linenr_T	lnum = 0;
 
-		    for (p = pum_array[pum_selected].pum_info; *p != NUL; )
+		    വേണ്ടി (p = pum_array[pum_selected].pum_info; *p != NUL; )
 		    {
 			e = vim_strchr(p, '\n');
-			if (e == NULL)
+			എങ്കിൽ (e == ശൂന്യ)
 			{
 			    ml_append(lnum++, p, 0, FALSE);
-			    break;
+			    നിർത്തുക;
 			}
 			*e = NUL;
-			ml_append(lnum++, p, (int)(e - p + 1), FALSE);
+			ml_append(lnum++, p, (പൂർണ്ണസംഖ്യ)(e - p + 1), FALSE);
 			*e = '\n';
 			p = e + 1;
 		    }
 		    // delete the empty last line
-		    ml_delete(curbuf->b_ml.ml_line_count);
+		    ml_delete(curbuf->b_ml.ml_വരി_എണ്ണം);
 
 		    // Increase the height of the preview window to show the
 		    // text, but no more than 'previewheight' lines.
-		    if (repeat == 0 && use_popup == USEPOPUP_NONE)
+		    എങ്കിൽ (repeat == 0 && use_popup == USEPOPUP_NONE)
 		    {
 			lnum = MIN(lnum, p_pvh);
-			if (curwin->w_height < lnum)
+			എങ്കിൽ (curwin->w_height < lnum)
 			{
-			    win_setheight((int)lnum);
+			    win_setheight((പൂർണ്ണസംഖ്യ)lnum);
 			    resized = TRUE;
 			}
 		    }
 
 		    curbuf->b_changed = 0;
 		    curbuf->b_p_ma = FALSE;
-		    if (pum_selected != prev_selected)
+		    എങ്കിൽ (pum_selected != prev_selected)
 		    {
 # ifdef FEAT_PROP_POPUP
 			curwin->w_firstline = 0;
 # endif
 			curwin->w_topline = 1;
 		    }
-		    else if (curwin->w_topline > curbuf->b_ml.ml_line_count)
-			curwin->w_topline = curbuf->b_ml.ml_line_count;
+		    അല്ലെങ്കിൽ എങ്കിൽ (curwin->w_topline > curbuf->b_ml.ml_വരി_എണ്ണം)
+			curwin->w_topline = curbuf->b_ml.ml_വരി_എണ്ണം;
 		    curwin->w_cursor.lnum = curwin->w_topline;
 		    curwin->w_cursor.col = 0;
 # ifdef FEAT_PROP_POPUP
-		    if (use_popup != USEPOPUP_NONE)
+		    എങ്കിൽ (use_popup != USEPOPUP_NONE)
 		    {
 			pum_position_info_popup(curwin);
-			if (win_valid(curwin_save))
+			എങ്കിൽ (win_valid(curwin_save))
 			    redraw_win_later(curwin_save, UPD_SOME_VALID);
 		    }
 # endif
-		    if ((curwin != curwin_save && win_valid(curwin_save))
+		    എങ്കിൽ ((curwin != curwin_save && win_valid(curwin_save))
 			    || (curtab != curtab_save
 						&& valid_tabpage(curtab_save)))
 		    {
-			int save_redr_status;
+			പൂർണ്ണസംഖ്യ save_redr_status;
 
-			if (curtab != curtab_save && valid_tabpage(curtab_save))
+			എങ്കിൽ (curtab != curtab_save && valid_tabpage(curtab_save))
 			    goto_tabpage_tp(curtab_save, FALSE, FALSE);
 
 			// When the first completion is done and the preview
 			// window is not resized, skip the preview window's
 			// status line redrawing.
-			if (ins_compl_active() && !resized)
+			എങ്കിൽ (ins_compl_active() && !resized)
 			    curwin->w_redr_status = false;
 
 			// Return cursor to where we were
@@ -1558,7 +1558,7 @@ pum_set_selected(int n, int repeat UNUSED)
 			// update the view on the buffer.  Only go back to
 			// the window when needed, otherwise it will always be
 			// redrawn.
-			if (resized && win_valid(curwin_save))
+			എങ്കിൽ (resized && win_valid(curwin_save))
 			{
 			    ++no_u_sync;
 			    win_enter(curwin_save, TRUE);
@@ -1584,7 +1584,7 @@ pum_set_selected(int n, int repeat UNUSED)
 			pum_will_redraw = FALSE;
 			curwin_save->w_redr_status = save_redr_status;
 
-			if (!resized && win_valid(curwin_save))
+			എങ്കിൽ (!resized && win_valid(curwin_save))
 			{
 # ifdef FEAT_PROP_POPUP
 			    win_T *wp = curwin;
@@ -1593,7 +1593,7 @@ pum_set_selected(int n, int repeat UNUSED)
 			    win_enter(curwin_save, TRUE);
 			    --no_u_sync;
 # ifdef FEAT_PROP_POPUP
-			    if (use_popup == USEPOPUP_HIDDEN && win_valid(wp))
+			    എങ്കിൽ (use_popup == USEPOPUP_HIDDEN && win_valid(wp))
 				popup_hide(wp);
 # endif
 			}
@@ -1609,54 +1609,54 @@ pum_set_selected(int n, int repeat UNUSED)
 		    }
 		}
 	    }
-# if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-	    if (WIN_IS_POPUP(curwin))
+# എങ്കിൽ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+	    എങ്കിൽ (WIN_IS_POPUP(curwin))
 		// can't keep focus in a popup window
 		win_enter(firstwin, TRUE);
 # endif
 # ifdef FEAT_PROP_POPUP
-	    if (use_popup != USEPOPUP_NONE)
+	    എങ്കിൽ (use_popup != USEPOPUP_NONE)
 		unblock_autocmds();
 # endif
 	}
 #endif
     }
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-    if (!has_info)
+#എങ്കിൽ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+    എങ്കിൽ (!has_info)
 	// hide any popup info window
 	popup_hide_info();
 #endif
 
-    return resized;
+    തിരികെ resized;
 }
 
 /*
  * Undisplay the popup menu (later).
  */
-    void
-pum_undisplay(void)
+    ശൂന്യം
+pum_undisplay(ശൂന്യം)
 {
 #ifdef FEAT_IMAGE_POPUP
-    if (pum_imagep != NULL)
+    എങ്കിൽ (pum_imagep != ശൂന്യ)
     {
 	image_placement_free(pum_imagep);
-	pum_imagep = NULL;
+	pum_imagep = ശൂന്യ;
     }
 #endif
     pum_free_bg();
-    pum_array = NULL;
+    pum_array = ശൂന്യ;
     redraw_all_later(UPD_NOT_VALID);
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#എങ്കിൽ defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
-    if (pum_in_cmdline)
+    എങ്കിൽ (pum_in_cmdline)
     {
 	clear_cmdline = TRUE;
 	pum_in_cmdline = FALSE;
     }
     status_redraw_all();
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#എങ്കിൽ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
     // hide any popup info window
     popup_hide_info();
 #endif
@@ -1666,8 +1666,8 @@ pum_undisplay(void)
  * Clear the popup menu.  Currently only resets the offset to the first
  * displayed item.
  */
-    void
-pum_clear(void)
+    ശൂന്യം
+pum_clear(ശൂന്യം)
 {
     pum_first = 0;
 }
@@ -1677,23 +1677,23 @@ pum_clear(void)
  * that could overwrite it.  Overruled when "pum_pretend_not_visible" is set,
  * used to redraw the status lines.
  */
-    int
-pum_visible(void)
+    പൂർണ്ണസംഖ്യ
+pum_visible(ശൂന്യം)
 {
-    return !pum_pretend_not_visible && pum_array != NULL;
+    തിരികെ !pum_pretend_not_visible && pum_array != ശൂന്യ;
 }
 
 /*
  * Return TRUE if the popup can be redrawn in the same position.
  */
-    static int
-pum_in_same_position(void)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+pum_in_same_position(ശൂന്യം)
 {
-    int	    row = (State & MODE_CMDLINE)
+    പൂർണ്ണസംഖ്യ	    row = (State & MODE_CMDLINE)
 			? cmdline_row
 			: curwin->w_wrow + W_WINROW(curwin);
 
-    return pum_window != curwin
+    തിരികെ pum_window != curwin
 	    || (pum_win_row == row
 		&& pum_win_height == curwin->w_height
 		&& pum_win_col == curwin->w_wincol
@@ -1704,33 +1704,33 @@ pum_in_same_position(void)
  * Return TRUE when pum_may_redraw() will call pum_redraw().
  * This means that the pum area should not be overwritten to avoid flicker.
  */
-    int
-pum_redraw_in_same_position(void)
+    പൂർണ്ണസംഖ്യ
+pum_redraw_in_same_position(ശൂന്യം)
 {
-    if (!pum_visible() || pum_will_redraw)
-	return FALSE;  // nothing to do
+    എങ്കിൽ (!pum_visible() || pum_will_redraw)
+	തിരികെ FALSE;  // nothing to do
 
-    return pum_in_same_position();
+    തിരികെ pum_in_same_position();
 }
 
 /*
  * Reposition the popup menu to adjust for window layout changes.
  */
-    void
-pum_may_redraw(void)
+    ശൂന്യം
+pum_may_redraw(ശൂന്യം)
 {
     pumitem_T	*array = pum_array;
-    int		len = pum_size;
-    int		selected = pum_selected;
+    പൂർണ്ണസംഖ്യ		len = pum_size;
+    പൂർണ്ണസംഖ്യ		selected = pum_selected;
 
-    if (!pum_visible() || pum_will_redraw)
-	return;  // nothing to do
+    എങ്കിൽ (!pum_visible() || pum_will_redraw)
+	തിരികെ;  // nothing to do
 
-    if (pum_in_same_position())
+    എങ്കിൽ (pum_in_same_position())
     {
 	pum_redraw();  // Redraw window in same position
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	// Window layout changed, recompute the position.
 	// Use the remembered w_wcol value, the cursor may have moved when a
@@ -1744,57 +1744,57 @@ pum_may_redraw(void)
  * Return the height of the popup menu, the number of entries visible.
  * Only valid when pum_visible() returns TRUE!
  */
-    int
-pum_get_height(void)
+    പൂർണ്ണസംഖ്യ
+pum_get_height(ശൂന്യം)
 {
-    return pum_height;
+    തിരികെ pum_height;
 }
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 /*
  * Add size information about the pum to "dict".
  */
-    void
+    ശൂന്യം
 pum_set_event_info(dict_T *dict)
 {
-    if (!pum_visible())
-	return;
-    (void)dict_add_number(dict, "height", pum_height);
-    (void)dict_add_number(dict, "width", pum_width);
-    (void)dict_add_number(dict, "row", pum_row);
-    (void)dict_add_number(dict, "col", pum_col);
-    (void)dict_add_number(dict, "size", pum_size);
-    (void)dict_add_bool(dict, "scrollbar",
+    എങ്കിൽ (!pum_visible())
+	തിരികെ;
+    (ശൂന്യം)dict_add_സംഖ്യ(dict, "height", pum_height);
+    (ശൂന്യം)dict_add_സംഖ്യ(dict, "width", pum_width);
+    (ശൂന്യം)dict_add_സംഖ്യ(dict, "row", pum_row);
+    (ശൂന്യം)dict_add_സംഖ്യ(dict, "col", pum_col);
+    (ശൂന്യം)dict_add_സംഖ്യ(dict, "size", pum_size);
+    (ശൂന്യം)dict_add_bool(dict, "scrollbar",
 				       pum_scrollbar ? VVAL_TRUE : VVAL_FALSE);
 }
 #endif
 
-#if defined(FEAT_BEVAL_TERM) || defined(FEAT_TERM_POPUP_MENU)
-    static void
-pum_position_at_mouse(int min_width)
+#എങ്കിൽ defined(FEAT_BEVAL_TERM) || defined(FEAT_TERM_POPUP_MENU)
+    സ്ഥിതം ശൂന്യം
+pum_position_at_mouse(പൂർണ്ണസംഖ്യ min_width)
 {
-    int extra_height = pum_border * 2 + pum_shadow;
-    int extra_offset = pum_border + pum_shadow;
-    int trailing_overhead = 0;
-    int col_offset = 0;
-    int available_width;
+    പൂർണ്ണസംഖ്യ extra_height = pum_border * 2 + pum_shadow;
+    പൂർണ്ണസംഖ്യ extra_offset = pum_border + pum_shadow;
+    പൂർണ്ണസംഖ്യ trailing_overhead = 0;
+    പൂർണ്ണസംഖ്യ col_offset = 0;
+    പൂർണ്ണസംഖ്യ available_width;
 
-    if (Rows - mouse_row - extra_height > pum_size
+    എങ്കിൽ (Rows - mouse_row - extra_height > pum_size
 	    || Rows - mouse_row > mouse_row)
     {
 	// Enough space below the mouse row,
 	// or there is more space below the mouse row than above.
 	pum_row = mouse_row + 1 + pum_border;
-	if (pum_height > Rows - pum_row - extra_height)
+	എങ്കിൽ (pum_height > Rows - pum_row - extra_height)
 	    pum_height = Rows - pum_row - extra_height;
-	if (pum_row + pum_height + extra_offset >= cmdline_row)
+	എങ്കിൽ (pum_row + pum_height + extra_offset >= cmdline_row)
 	    pum_in_cmdline = TRUE;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	// Show above the mouse row, reduce height if it does not fit.
 	pum_row = mouse_row - pum_size - extra_offset;
-	if (pum_row < pum_border)
+	എങ്കിൽ (pum_row < pum_border)
 	{
 	    pum_height += pum_row - pum_border;
 	    pum_row = pum_border;
@@ -1805,27 +1805,27 @@ pum_position_at_mouse(int min_width)
 	+ (pum_margin && pum_border ? 1 : 0) + (pum_shadow ? 2 : 0);
 
 # ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    എങ്കിൽ (pum_rl)
     {
 	col_offset = (mouse_col == Columns - 1) && pum_border;
 	available_width = mouse_col + 1 - trailing_overhead - col_offset;
-	if (available_width >= pum_base_width || available_width > min_width)
+	എങ്കിൽ (available_width >= pum_base_width || available_width > min_width)
 	    // Enough space to show at mouse column.
 	    pum_col = mouse_col - col_offset;
-	else
+	അല്ലെങ്കിൽ
 	    // Not enough space, left align with window.
 	    pum_col = MIN(pum_base_width, min_width) - 1 + trailing_overhead;
 	pum_width = pum_col + 1 - trailing_overhead;
     }
-    else
+    അല്ലെങ്കിൽ
 # endif
     {
 	col_offset = (mouse_col == 0) && pum_border;
 	available_width = Columns - mouse_col - trailing_overhead - col_offset;
-	if (available_width >= pum_base_width || available_width > min_width)
+	എങ്കിൽ (available_width >= pum_base_width || available_width > min_width)
 	    // Enough space to show at mouse column.
 	    pum_col = mouse_col + col_offset;
-	else
+	അല്ലെങ്കിൽ
 	    // Not enough space, right align with window.
 	    pum_col = Columns - MIN(pum_base_width, min_width)
 		- trailing_overhead;
@@ -1834,23 +1834,23 @@ pum_position_at_mouse(int min_width)
 
     pum_width = MIN(pum_width, pum_base_width + 1);
     // Do not redraw at cursor position.
-    pum_window = NULL;
+    pum_window = ശൂന്യ;
 }
 
 #endif
 
-#if defined(FEAT_BEVAL_TERM)
-static pumitem_T *balloon_array = NULL;
-static int balloon_arraysize;
+#എങ്കിൽ defined(FEAT_BEVAL_TERM)
+സ്ഥിതം pumitem_T *balloon_array = ശൂന്യ;
+സ്ഥിതം പൂർണ്ണസംഖ്യ balloon_arraysize;
 
 # define BALLOON_MIN_WIDTH 50
 # define BALLOON_MIN_HEIGHT 10
 
-typedef struct {
+തരനിർവചനം ഘടന {
     char_u	*start;
-    int		bytelen;
-    int		cells;
-    int		indent;
+    പൂർണ്ണസംഖ്യ		bytelen;
+    പൂർണ്ണസംഖ്യ		cells;
+    പൂർണ്ണസംഖ്യ		indent;
 } balpart_T;
 
 /*
@@ -1859,154 +1859,154 @@ typedef struct {
  * strings and make a struct look good.
  * Resulting array is stored in "array" and returns the size of the array.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 split_message(char_u *mesg, pumitem_T **array)
 {
     garray_T	ga;
     char_u	*p;
     balpart_T	*item;
-    int		quoted = FALSE;
-    int		height;
-    int		line;
-    int		item_idx;
-    int		indent = 0;
-    int		max_cells = 0;
-    int		max_height = Rows / 2 - 1;
-    int		long_item_count = 0;
-    int		split_long_items = FALSE;
+    പൂർണ്ണസംഖ്യ		quoted = FALSE;
+    പൂർണ്ണസംഖ്യ		height;
+    പൂർണ്ണസംഖ്യ		വരി;
+    പൂർണ്ണസംഖ്യ		item_idx;
+    പൂർണ്ണസംഖ്യ		indent = 0;
+    പൂർണ്ണസംഖ്യ		max_cells = 0;
+    പൂർണ്ണസംഖ്യ		max_height = Rows / 2 - 1;
+    പൂർണ്ണസംഖ്യ		long_item_എണ്ണം = 0;
+    പൂർണ്ണസംഖ്യ		split_long_ഇനങ്ങൾ = FALSE;
 
-    ga_init2(&ga, sizeof(balpart_T), 20);
+    ga_init2(&ga, വലുപ്പം(balpart_T), 20);
     p = mesg;
 
-    while (*p != NUL)
+    ആകുമ്പോൾ (*p != NUL)
     {
-	if (ga_grow(&ga, 1) == FAIL)
-	    goto failed;
+	എങ്കിൽ (ga_grow(&ga, 1) == FAIL)
+	    പോകുക failed;
 	item = ((balpart_T *)ga.ga_data) + ga.ga_len;
 	item->start = p;
 	item->indent = indent;
 	item->cells = indent * 2;
 	++ga.ga_len;
-	while (*p != NUL)
+	ആകുമ്പോൾ (*p != NUL)
 	{
-	    if (*p == '"')
+	    എങ്കിൽ (*p == '"')
 		quoted = !quoted;
-	    else if (*p == '\n')
-		break;
-	    else if (*p == '\\' && p[1] != NUL)
+	    അല്ലെങ്കിൽ എങ്കിൽ (*p == '\n')
+		നിർത്തുക;
+	    അല്ലെങ്കിൽ എങ്കിൽ (*p == '\\' && p[1] != NUL)
 		++p;
-	    else if (!quoted)
+	    അല്ലെങ്കിൽ എങ്കിൽ (!quoted)
 	    {
-		if ((*p == ',' && p[1] == ' ') || *p == '{' || *p == '}')
+		എങ്കിൽ ((*p == ',' && p[1] == ' ') || *p == '{' || *p == '}')
 		{
 		    // Looks like a good point to break.
-		    if (*p == '{')
+		    എങ്കിൽ (*p == '{')
 			++indent;
-		    else if (*p == '}' && indent > 0)
+		    അല്ലെങ്കിൽ എങ്കിൽ (*p == '}' && indent > 0)
 			--indent;
 		    ++item->cells;
 		    p = skipwhite(p + 1);
-		    break;
+		    നിർത്തുക;
 		}
 	    }
 	    item->cells += ptr2cells(p);
 	    p += mb_ptr2len(p);
 	}
 	item->bytelen = p - item->start;
-	if (*p == '\n')
+	എങ്കിൽ (*p == '\n')
 	    ++p;
-	if (item->cells > max_cells)
+	എങ്കിൽ (item->cells > max_cells)
 	    max_cells = item->cells;
-	long_item_count += (item->cells - 1) / BALLOON_MIN_WIDTH;
+	long_item_എണ്ണം += (item->cells - 1) / BALLOON_MIN_WIDTH;
     }
 
     height = 2 + ga.ga_len;
 
     // If there are long items and the height is below the limit: split lines
-    if (long_item_count > 0 && height + long_item_count <= max_height)
+    എങ്കിൽ (long_item_എണ്ണം > 0 && height + long_item_എണ്ണം <= max_height)
     {
-	split_long_items = TRUE;
-	height += long_item_count;
+	split_long_ഇനങ്ങൾ = TRUE;
+	height += long_item_എണ്ണം;
     }
 
     // Limit to half the window height, it has to fit above or below the mouse
     // position.
-    if (height > max_height)
+    എങ്കിൽ (height > max_height)
 	height = max_height;
     *array = ALLOC_CLEAR_MULT(pumitem_T, height);
-    if (*array == NULL)
-	goto failed;
+    എങ്കിൽ (*array == ശൂന്യ)
+	പോകുക failed;
 
     // Add an empty line above and below, looks better.
     (*array)->pum_text = vim_strsave((char_u *)"");
     (*array + height - 1)->pum_text = vim_strsave((char_u *)"");
 
-    for (line = 1, item_idx = 0; line < height - 1; ++item_idx)
+    വേണ്ടി (വരി = 1, item_idx = 0; വരി < height - 1; ++item_idx)
     {
-	int	skip;
-	int	thislen;
-	int	copylen;
-	int	ind;
-	int	cells;
+	പൂർണ്ണസംഖ്യ	skip;
+	പൂർണ്ണസംഖ്യ	thislen;
+	പൂർണ്ണസംഖ്യ	copylen;
+	പൂർണ്ണസംഖ്യ	ind;
+	പൂർണ്ണസംഖ്യ	cells;
 
 	item = ((balpart_T *)ga.ga_data) + item_idx;
-	if (item->bytelen == 0)
-	    (*array)[line++].pum_text = vim_strsave((char_u *)"");
-	else
-	    for (skip = 0; skip < item->bytelen; skip += thislen)
+	എങ്കിൽ (item->bytelen == 0)
+	    (*array)[വരി++].pum_text = vim_strsave((char_u *)"");
+	അല്ലെങ്കിൽ
+	    വേണ്ടി (skip = 0; skip < item->bytelen; skip += thislen)
 	    {
-		if (split_long_items && item->cells >= BALLOON_MIN_WIDTH)
+		എങ്കിൽ (split_long_ഇനങ്ങൾ && item->cells >= BALLOON_MIN_WIDTH)
 		{
 		    cells = item->indent * 2;
-		    for (p = item->start + skip;
+		    വേണ്ടി (p = item->start + skip;
 			    p < item->start + item->bytelen;
 							    p += mb_ptr2len(p))
-			if ((cells += ptr2cells(p)) > BALLOON_MIN_WIDTH)
-			    break;
+			എങ്കിൽ ((cells += ptr2cells(p)) > BALLOON_MIN_WIDTH)
+			    നിർത്തുക;
 		    thislen = p - (item->start + skip);
 		}
-		else
+		അല്ലെങ്കിൽ
 		    thislen = item->bytelen;
 
 		// put indent at the start
 		p = alloc(thislen + item->indent * 2 + 1);
-		if (p == NULL)
+		എങ്കിൽ (p == ശൂന്യ)
 		{
-		    for (line = 0; line <= height - 1; ++line)
-			vim_free((*array)[line].pum_text);
+		    വേണ്ടി (വരി = 0; വരി <= height - 1; ++വരി)
+			vim_free((*array)[വരി].pum_text);
 		    vim_free(*array);
-		    goto failed;
+		    പോകുക failed;
 		}
-		for (ind = 0; ind < item->indent * 2; ++ind)
+		വേണ്ടി (ind = 0; ind < item->indent * 2; ++ind)
 		    p[ind] = ' ';
 
 		// exclude spaces at the end of the string
-		for (copylen = thislen; copylen > 0; --copylen)
-		    if (item->start[skip + copylen - 1] != ' ')
-			break;
+		വേണ്ടി (copylen = thislen; copylen > 0; --copylen)
+		    എങ്കിൽ (item->start[skip + copylen - 1] != ' ')
+			നിർത്തുക;
 
 		vim_strncpy(p + ind, item->start + skip, copylen);
-		(*array)[line].pum_text = p;
+		(*array)[വരി].pum_text = p;
 		item->indent = 0;  // wrapped line has no indent
-		++line;
+		++വരി;
 	    }
     }
     ga_clear(&ga);
-    return height;
+    തിരികെ height;
 
 failed:
     ga_clear(&ga);
-    return 0;
+    തിരികെ 0;
 }
 
-    void
-ui_remove_balloon(void)
+    ശൂന്യം
+ui_remove_balloon(ശൂന്യം)
 {
-    if (balloon_array == NULL)
-	return;
+    എങ്കിൽ (balloon_array == ശൂന്യ)
+	തിരികെ;
 
     pum_undisplay();
-    while (balloon_arraysize > 0)
+    ആകുമ്പോൾ (balloon_arraysize > 0)
 	vim_free(balloon_array[--balloon_arraysize].pum_text);
     VIM_CLEAR(balloon_array);
 }
@@ -2014,39 +2014,39 @@ ui_remove_balloon(void)
 /*
  * Terminal version of a balloon, uses the popup menu code.
  */
-    void
+    ശൂന്യം
 ui_post_balloon(char_u *mesg, list_T *list)
 {
     ui_remove_balloon();
 
-    if (mesg == NULL && list == NULL)
+    എങ്കിൽ (mesg == ശൂന്യ && list == ശൂന്യ)
     {
 	pum_undisplay();
-	return;
+	തിരികെ;
     }
-    if (list != NULL)
+    എങ്കിൽ (list != ശൂന്യ)
     {
 	listitem_T  *li;
-	int	    idx;
+	പൂർണ്ണസംഖ്യ	    idx;
 
 	balloon_arraysize = list->lv_len;
 	balloon_array = ALLOC_CLEAR_MULT(pumitem_T, list->lv_len);
-	if (balloon_array == NULL)
-	    return;
+	എങ്കിൽ (balloon_array == ശൂന്യ)
+	    തിരികെ;
 	CHECK_LIST_MATERIALIZE(list);
-	for (idx = 0, li = list->lv_first; li != NULL; li = li->li_next, ++idx)
+	വേണ്ടി (idx = 0, li = list->lv_first; li != ശൂന്യ; li = li->li_next, ++idx)
 	{
 	    char_u *text = tv_get_string_chk(&li->li_tv);
 
 	    balloon_array[idx].pum_text = vim_strsave(
-					   text == NULL ? (char_u *)"" : text);
+					   text == ശൂന്യ ? (char_u *)"" : text);
 	}
     }
-    else
+    അല്ലെങ്കിൽ
 	balloon_arraysize = split_message(mesg, &balloon_array);
 
-    if (balloon_arraysize <= 0)
-	return;
+    എങ്കിൽ (balloon_arraysize <= 0)
+	തിരികെ;
 
     pum_array = balloon_array;
     pum_size = balloon_arraysize;
@@ -2066,8 +2066,8 @@ ui_post_balloon(char_u *mesg, list_T *list)
 /*
  * Called when the mouse moved, may remove any displayed balloon.
  */
-    void
-ui_may_remove_balloon(void)
+    ശൂന്യം
+ui_may_remove_balloon(ശൂന്യം)
 {
     // For now: remove the balloon whenever the mouse moves to another screen
     // cell.
@@ -2075,37 +2075,37 @@ ui_may_remove_balloon(void)
 }
 #endif
 
-#if defined(FEAT_TERM_POPUP_MENU)
+#എങ്കിൽ defined(FEAT_TERM_POPUP_MENU)
 /*
  * Select the pum entry at the mouse position.
  */
-    static void
-pum_select_mouse_pos(void)
+    സ്ഥിതം ശൂന്യം
+pum_select_mouse_pos(ശൂന്യം)
 {
-    int idx = mouse_row - pum_row;
+    പൂർണ്ണസംഖ്യ idx = mouse_row - pum_row;
 
-    if (idx < 0 || idx >= pum_height)
+    എങ്കിൽ (idx < 0 || idx >= pum_height)
 	pum_selected = -1;
-    else if (*pum_array[idx].pum_text != NUL)
+    അല്ലെങ്കിൽ എങ്കിൽ (*pum_array[idx].pum_text != NUL)
 	pum_selected = idx;
 }
 
 /*
  * Execute the currently selected popup menu item.
  */
-    static void
-pum_execute_menu(vimmenu_T *menu, int mode)
+    സ്ഥിതം ശൂന്യം
+pum_execute_menu(vimmenu_T *menu, പൂർണ്ണസംഖ്യ mode)
 {
     vimmenu_T   *mp;
-    int		idx = 0;
+    പൂർണ്ണസംഖ്യ		idx = 0;
     exarg_T	ea;
 
     FOR_ALL_CHILD_MENUS(menu, mp)
-	if ((mp->modes & mp->enabled & mode) && idx++ == pum_selected)
+	എങ്കിൽ ((mp->modes & mp->enabled & mode) && idx++ == pum_selected)
 	{
 	    CLEAR_FIELD(ea);
 	    execute_menu(&ea, mp, -1);
-	    break;
+	    നിർത്തുക;
 	}
 }
 
@@ -2113,51 +2113,51 @@ pum_execute_menu(vimmenu_T *menu, int mode)
  * Open the terminal version of the popup menu and don't return until it is
  * closed.
  */
-    void
+    ശൂന്യം
 pum_show_popupmenu(vimmenu_T *menu)
 {
     vimmenu_T   *mp;
-    int		idx = 0;
+    പൂർണ്ണസംഖ്യ		idx = 0;
     pumitem_T	*array;
 # ifdef FEAT_BEVAL_TERM
-    int		save_bevalterm = p_bevalterm;
+    പൂർണ്ണസംഖ്യ		save_bevalterm = p_bevalterm;
 # endif
-    int		mode;
+    പൂർണ്ണസംഖ്യ		mode;
 
     pum_undisplay();
     pum_size = 0;
     mode = get_menu_mode_flag();
 
     FOR_ALL_CHILD_MENUS(menu, mp)
-	if (menu_is_separator(mp->dname)
+	എങ്കിൽ (menu_is_separator(mp->dname)
 		|| (mp->modes & mp->enabled & mode))
 	    ++pum_size;
 
     // When there are only Terminal mode menus, using "popup Edit" results in
     // pum_size being zero.
-    if (pum_size <= 0)
+    എങ്കിൽ (pum_size <= 0)
     {
 	emsg(_(e_menu_only_exists_in_another_mode));
-	return;
+	തിരികെ;
     }
 
     array = ALLOC_CLEAR_MULT(pumitem_T, pum_size);
-    if (array == NULL)
-	return;
+    എങ്കിൽ (array == ശൂന്യ)
+	തിരികെ;
 
     FOR_ALL_CHILD_MENUS(menu, mp)
     {
-	char_u *s = NULL;
+	char_u *s = ശൂന്യ;
 
 	// Make a copy of the text, the menu may be redefined in a callback.
-	if (menu_is_separator(mp->dname))
+	എങ്കിൽ (menu_is_separator(mp->dname))
 	    s = (char_u *)"";
-	else if (mp->modes & mp->enabled & mode)
+	അല്ലെങ്കിൽ എങ്കിൽ (mp->modes & mp->enabled & mode)
 	    s = mp->dname;
-	if (s != NULL)
+	എങ്കിൽ (s != ശൂന്യ)
 	{
 	    s = vim_strsave(s);
-	    if (s != NULL)
+	    എങ്കിൽ (s != ശൂന്യ)
 		array[idx++].pum_text = s;
 	}
     }
@@ -2178,9 +2178,9 @@ pum_show_popupmenu(vimmenu_T *menu)
     mch_setmouse(TRUE);
 # endif
 
-    for (;;)
+    വേണ്ടി (;;)
     {
-	int	c;
+	പൂർണ്ണസംഖ്യ	c;
 
 	pum_redraw();
 	setcursor_mayforce(TRUE);
@@ -2190,61 +2190,61 @@ pum_show_popupmenu(vimmenu_T *menu)
 
 	// Bail out when typing Esc, CTRL-C or some callback or <expr> mapping
 	// closed the popup menu.
-	if (c == ESC || c == Ctrl_C || pum_array == NULL)
-	    break;
-	else if (c == CAR || c == NL)
+	എങ്കിൽ (c == ESC || c == Ctrl_C || pum_array == ശൂന്യ)
+	    നിർത്തുക;
+	അല്ലെങ്കിൽ എങ്കിൽ (c == CAR || c == NL)
 	{
 	    // enter: select current item, if any, and close
 	    pum_execute_menu(menu, mode);
-	    break;
+	    നിർത്തുക;
 	}
-	else if (c == 'k' || c == K_UP || c == K_MOUSEUP)
+	അല്ലെങ്കിൽ എങ്കിൽ (c == 'k' || c == K_UP || c == K_MOUSEUP)
 	{
 	    // cursor up: select previous item
-	    while (pum_selected > 0)
+	    ആകുമ്പോൾ (pum_selected > 0)
 	    {
 		--pum_selected;
-		if (*array[pum_selected].pum_text != NUL)
-		    break;
+		എങ്കിൽ (*array[pum_selected].pum_text != NUL)
+		    നിർത്തുക;
 	    }
 	}
-	else if (c == 'j' || c == K_DOWN || c == K_MOUSEDOWN)
+	അല്ലെങ്കിൽ എങ്കിൽ (c == 'j' || c == K_DOWN || c == K_MOUSEDOWN)
 	{
 	    // cursor down: select next item
-	    while (pum_selected < pum_size - 1)
+	    ആകുമ്പോൾ (pum_selected < pum_size - 1)
 	    {
 		++pum_selected;
-		if (*array[pum_selected].pum_text != NUL)
-		    break;
+		എങ്കിൽ (*array[pum_selected].pum_text != NUL)
+		    നിർത്തുക;
 	    }
 	}
-	else if (c == K_RIGHTMOUSE)
+	അല്ലെങ്കിൽ എങ്കിൽ (c == K_RIGHTMOUSE)
 	{
 	    // Right mouse down: reposition the menu.
 	    vungetc(c);
-	    break;
+	    നിർത്തുക;
 	}
-	else if (c == K_LEFTDRAG || c == K_RIGHTDRAG || c == K_MOUSEMOVE)
+	അല്ലെങ്കിൽ എങ്കിൽ (c == K_LEFTDRAG || c == K_RIGHTDRAG || c == K_MOUSEMOVE)
 	{
 	    // mouse moved: select item in the mouse row
 	    pum_select_mouse_pos();
 	}
-	else if (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM || c == K_RIGHTRELEASE)
+	അല്ലെങ്കിൽ എങ്കിൽ (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM || c == K_RIGHTRELEASE)
 	{
 	    // left mouse click: select clicked item, if any, and close;
 	    // right mouse release: select clicked item, close if any
 	    pum_select_mouse_pos();
-	    if (pum_selected >= 0)
+	    എങ്കിൽ (pum_selected >= 0)
 	    {
 		pum_execute_menu(menu, mode);
-		break;
+		നിർത്തുക;
 	    }
-	    if (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM)
-		break;
+	    എങ്കിൽ (c == K_LEFTMOUSE || c == K_LEFTMOUSE_NM)
+		നിർത്തുക;
 	}
     }
 
-    for (idx = 0; idx < pum_size; ++idx)
+    വേണ്ടി (idx = 0; idx < pum_size; ++idx)
 	vim_free(array[idx].pum_text);
     vim_free(array);
     pum_undisplay();
@@ -2254,12 +2254,12 @@ pum_show_popupmenu(vimmenu_T *menu)
 # endif
 }
 
-    void
-pum_make_popup(char_u *path_name, int use_mouse_pos)
+    ശൂന്യം
+pum_make_popup(char_u *path_name, പൂർണ്ണസംഖ്യ use_mouse_pos)
 {
     vimmenu_T *menu;
 
-    if (!use_mouse_pos)
+    എങ്കിൽ (!use_mouse_pos)
     {
 	// Hack: set mouse position at the cursor so that the menu pops up
 	// around there.
@@ -2272,185 +2272,185 @@ pum_make_popup(char_u *path_name, int use_mouse_pos)
     }
 
     menu = gui_find_menu(path_name);
-    if (menu != NULL)
+    എങ്കിൽ (menu != ശൂന്യ)
 	pum_show_popupmenu(menu);
 }
 #endif
 
-    static int
-is_singlewidth(int c)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+is_singlewidth(പൂർണ്ണസംഖ്യ c)
 {
-    if (c >= 0 && c < 0x80)
-	return TRUE;
-    if (utf_char2cells(c) == 1)
-	return TRUE;
-    return FALSE;
+    എങ്കിൽ (c >= 0 && c < 0x80)
+	തിരികെ TRUE;
+    എങ്കിൽ (utf_char2cells(c) == 1)
+	തിരികെ TRUE;
+    തിരികെ FALSE;
 }
 
 /*
  * Set border characters for popup menu.
  */
-    void
+    ശൂന്യം
 pum_set_border_chars(
-	int top,
-	int right,
-	int bottom,
-	int left,
-	int top_left,
-	int top_right,
-	int bottom_right,
-	int bottom_left)
+	പൂർണ്ണസംഖ്യ മുകൾ,
+	പൂർണ്ണസംഖ്യ വലത്,
+	പൂർണ്ണസംഖ്യ bottom,
+	പൂർണ്ണസംഖ്യ ഇടത്,
+	പൂർണ്ണസംഖ്യ മുകൾ_ഇടത്,
+	പൂർണ്ണസംഖ്യ മുകൾ_വലത്,
+	പൂർണ്ണസംഖ്യ bottom_വലത്,
+	പൂർണ്ണസംഖ്യ bottom_ഇടത്)
 {
-    if (!is_singlewidth(top) || !is_singlewidth(right)
-	    || !is_singlewidth(bottom) || !is_singlewidth(left)
-	    || !is_singlewidth(top_left) || !is_singlewidth(top_right)
-	    || !is_singlewidth(bottom_right) || !is_singlewidth(bottom_left))
-	return;
-    pum_border_chars.top = top;
-    pum_border_chars.right = right;
+    എങ്കിൽ (!is_singlewidth(മുകൾ) || !is_singlewidth(വലത്)
+	    || !is_singlewidth(bottom) || !is_singlewidth(ഇടത്)
+	    || !is_singlewidth(മുകൾ_ഇടത്) || !is_singlewidth(മുകൾ_വലത്)
+	    || !is_singlewidth(bottom_വലത്) || !is_singlewidth(bottom_ഇടത്))
+	തിരികെ;
+    pum_border_chars.മുകൾ = മുകൾ;
+    pum_border_chars.വലത് = വലത്;
     pum_border_chars.bottom = bottom;
-    pum_border_chars.left = left;
-    pum_border_chars.top_left = top_left;
-    pum_border_chars.top_right = top_right;
-    pum_border_chars.bottom_right = bottom_right;
-    pum_border_chars.bottom_left = bottom_left;
+    pum_border_chars.ഇടത് = ഇടത്;
+    pum_border_chars.മുകൾ_ഇടത് = മുകൾ_ഇടത്;
+    pum_border_chars.മുകൾ_വലത് = മുകൾ_വലത്;
+    pum_border_chars.bottom_വലത് = bottom_വലത്;
+    pum_border_chars.bottom_ഇടത് = bottom_ഇടത്;
     pum_border = 1;
 }
 
 /*
  * Compute margins for the popup menu.
  */
-    static void
-compute_margins(int *right_margin, int *left_margin, int *left_padding)
+    സ്ഥിതം ശൂന്യം
+compute_margins(പൂർണ്ണസംഖ്യ *വലത്_margin, പൂർണ്ണസംഖ്യ *ഇടത്_margin, പൂർണ്ണസംഖ്യ *ഇടത്_padding)
 {
-    *right_margin = pum_margin && pum_border;
+    *വലത്_margin = pum_margin && pum_border;
 
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    എങ്കിൽ (pum_rl)
     {
-	*left_padding = (pum_col < Columns - 1 - pum_border);
-	*left_margin = *right_margin && (pum_col < Columns - 3);
-	return;
+	*ഇടത്_padding = (pum_col < Columns - 1 - pum_border);
+	*ഇടത്_margin = *വലത്_margin && (pum_col < Columns - 3);
+	തിരികെ;
     }
 #endif
-    *left_padding = (pum_col > pum_border);
-    *left_margin = *right_margin && (pum_col > 2);
+    *ഇടത്_padding = (pum_col > pum_border);
+    *ഇടത്_margin = *വലത്_margin && (pum_col > 2);
 }
 
 /*
  * Draw the border around the popup menu
  */
-    static void
-pum_draw_border(void)
+    സ്ഥിതം ശൂന്യം
+pum_draw_border(ശൂന്യം)
 {
-    int	top_row = pum_row - 1;
-    int	bottom_row = pum_row + pum_height;
-    int	col;
-    int	attr = highlight_attr[HLF_PMB];
-    int	right_margin, left_margin, left_padding;
-    int	inner_width;
+    പൂർണ്ണസംഖ്യ	മുകൾ_row = pum_row - 1;
+    പൂർണ്ണസംഖ്യ	bottom_row = pum_row + pum_height;
+    പൂർണ്ണസംഖ്യ	col;
+    പൂർണ്ണസംഖ്യ	attr = highlight_attr[HLF_PMB];
+    പൂർണ്ണസംഖ്യ	വലത്_margin, ഇടത്_margin, ഇടത്_padding;
+    പൂർണ്ണസംഖ്യ	inner_width;
 
-    if (!pum_border)
-	return;
+    എങ്കിൽ (!pum_border)
+	തിരികെ;
 
-    (void)compute_margins(&right_margin, &left_margin, &left_padding);
+    (ശൂന്യം)compute_margins(&വലത്_margin, &ഇടത്_margin, &ഇടത്_padding);
 
-    inner_width = pum_width + pum_scrollbar + left_padding;
+    inner_width = pum_width + pum_scrollbar + ഇടത്_padding;
 
     // Draw border left to right or right to left (for RTL)
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
-	col = pum_col + left_padding + 1;
-    else
+    എങ്കിൽ (pum_rl)
+	col = pum_col + ഇടത്_padding + 1;
+    അല്ലെങ്കിൽ
 #endif
-	col = pum_col - left_padding - 1;
+	col = pum_col - ഇടത്_padding - 1;
 
     // left corners (right corners for RTL)
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    എങ്കിൽ (pum_rl)
     {
-	screen_putchar(pum_border_chars.top_right, top_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', top_row, col + 1, attr);
-	screen_putchar(pum_border_chars.bottom_right, bottom_row, col, attr);
-	if (left_margin)
+	screen_putchar(pum_border_chars.മുകൾ_വലത്, മുകൾ_row, col, attr);
+	എങ്കിൽ (ഇടത്_margin)
+	    screen_putchar(' ', മുകൾ_row, col + 1, attr);
+	screen_putchar(pum_border_chars.bottom_വലത്, bottom_row, col, attr);
+	എങ്കിൽ (ഇടത്_margin)
 	    screen_putchar(' ', bottom_row, col + 1, attr);
     }
-    else
+    അല്ലെങ്കിൽ
 #endif
     {
-	screen_putchar(pum_border_chars.top_left, top_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', top_row, col - 1, attr);
-	screen_putchar(pum_border_chars.bottom_left, bottom_row, col, attr);
-	if (left_margin)
+	screen_putchar(pum_border_chars.മുകൾ_ഇടത്, മുകൾ_row, col, attr);
+	എങ്കിൽ (ഇടത്_margin)
+	    screen_putchar(' ', മുകൾ_row, col - 1, attr);
+	screen_putchar(pum_border_chars.bottom_ഇടത്, bottom_row, col, attr);
+	എങ്കിൽ (ഇടത്_margin)
 	    screen_putchar(' ', bottom_row, col - 1, attr);
     }
 
     // Top horizontal lines
-    for (int i = 0; i < inner_width; i++)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < inner_width; i++)
     {
-	int cur_col;
+	പൂർണ്ണസംഖ്യ cur_col;
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	എങ്കിൽ (pum_rl)
 	    cur_col = col - 1 - i;
-	else
+	അല്ലെങ്കിൽ
 #endif
 	    cur_col = col + 1 + i;
-	screen_putchar(pum_border_chars.top, top_row, cur_col, attr);
+	screen_putchar(pum_border_chars.മുകൾ, മുകൾ_row, cur_col, attr);
 	screen_putchar(pum_border_chars.bottom, bottom_row, cur_col, attr);
     }
 
     // right corners (left corners for RTL)
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    എങ്കിൽ (pum_rl)
     {
-	screen_putchar(pum_border_chars.top_left, top_row,
+	screen_putchar(pum_border_chars.മുകൾ_ഇടത്, മുകൾ_row,
 		col - inner_width - 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', top_row, col - inner_width - 2, attr);
-	screen_putchar(pum_border_chars.bottom_left, bottom_row,
+	എങ്കിൽ (വലത്_margin)
+	    screen_putchar(' ', മുകൾ_row, col - inner_width - 2, attr);
+	screen_putchar(pum_border_chars.bottom_ഇടത്, bottom_row,
 		col - inner_width - 1, attr);
-	if (right_margin)
+	എങ്കിൽ (വലത്_margin)
 	    screen_putchar(' ', bottom_row, col - inner_width - 2, attr);
     }
-    else
+    അല്ലെങ്കിൽ
 #endif
     {
-	screen_putchar(pum_border_chars.top_right, top_row,
+	screen_putchar(pum_border_chars.മുകൾ_വലത്, മുകൾ_row,
 		col + inner_width + 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', top_row, col + inner_width + 2, attr);
-	screen_putchar(pum_border_chars.bottom_right, bottom_row,
+	എങ്കിൽ (വലത്_margin)
+	    screen_putchar(' ', മുകൾ_row, col + inner_width + 2, attr);
+	screen_putchar(pum_border_chars.bottom_വലത്, bottom_row,
 		col + inner_width + 1, attr);
-	if (right_margin)
+	എങ്കിൽ (വലത്_margin)
 	    screen_putchar(' ', bottom_row, col + inner_width + 2, attr);
     }
 
     // Draw side borders
-    for (int i = 0; i < pum_height; i++)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < pum_height; i++)
     {
-	int row = pum_row + i;
+	പൂർണ്ണസംഖ്യ row = pum_row + i;
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	എങ്കിൽ (pum_rl)
 	{
-	    screen_putchar(pum_border_chars.left, row, col, attr);
-	    if (left_margin)
+	    screen_putchar(pum_border_chars.ഇടത്, row, col, attr);
+	    എങ്കിൽ (ഇടത്_margin)
 		screen_putchar(' ', row, col + 1, attr);
-	    screen_putchar(pum_border_chars.right, row,
+	    screen_putchar(pum_border_chars.വലത്, row,
 		    col - inner_width - 1, attr);
-	    if (right_margin)
+	    എങ്കിൽ (വലത്_margin)
 		screen_putchar(' ', row, col - inner_width - 2, attr);
 	}
-	else
+	അല്ലെങ്കിൽ
 #endif
 	{
-	    screen_putchar(pum_border_chars.left, row, col, attr);
-	    if (left_margin)
+	    screen_putchar(pum_border_chars.ഇടത്, row, col, attr);
+	    എങ്കിൽ (ഇടത്_margin)
 		screen_putchar(' ', row, col - 1, attr);
-	    screen_putchar(pum_border_chars.right, row,
+	    screen_putchar(pum_border_chars.വലത്, row,
 		    col + inner_width + 1, attr);
-	    if (right_margin)
+	    എങ്കിൽ (വലത്_margin)
 		screen_putchar(' ', row, col + inner_width + 2, attr);
 	}
     }
@@ -2460,12 +2460,12 @@ pum_draw_border(void)
  * Get the underlying character and redraw with shadow highlight.
  * Preserve bold, italic, underline, and reverse text underneath the shadow.
  */
-    void
-put_shadow_char(int row, int col)
+    ശൂന്യം
+put_shadow_char(പൂർണ്ണസംഖ്യ row, പൂർണ്ണസംഖ്യ col)
 {
     char_u  buf[MB_MAXBYTES + 1];
-    int	    shadow_attr = highlight_attr[HLF_PMS];
-    int	    char_attr, new_attr;
+    പൂർണ്ണസംഖ്യ	    shadow_attr = highlight_attr[HLF_PMS];
+    പൂർണ്ണസംഖ്യ	    char_attr, new_attr;
 
     screen_getbytes(row, col, buf, &char_attr);
     new_attr = hl_combine_attr(char_attr, shadow_attr);
@@ -2475,35 +2475,35 @@ put_shadow_char(int row, int col)
 /*
  * Draw the shadow
  */
-    static void
-pum_draw_shadow(void)
+    സ്ഥിതം ശൂന്യം
+pum_draw_shadow(ശൂന്യം)
 {
-    int	row, col, next_col;
-    int	width, offset;
-    int	inner_width;
-    int	right_margin, left_margin, left_padding;
+    പൂർണ്ണസംഖ്യ	row, col, next_col;
+    പൂർണ്ണസംഖ്യ	width, offset;
+    പൂർണ്ണസംഖ്യ	inner_width;
+    പൂർണ്ണസംഖ്യ	വലത്_margin, ഇടത്_margin, ഇടത്_padding;
 
-    if (!pum_shadow)
-	return;
+    എങ്കിൽ (!pum_shadow)
+	തിരികെ;
 
-    (void)compute_margins(&right_margin, &left_margin, &left_padding);
-    inner_width = pum_width + pum_scrollbar + pum_border + right_margin;
+    (ശൂന്യം)compute_margins(&വലത്_margin, &ഇടത്_margin, &ഇടത്_padding);
+    inner_width = pum_width + pum_scrollbar + pum_border + വലത്_margin;
 
     // Draw right side shadow (left for RTL)
 #ifdef FEAT_RIGHTLEFT
-    if (pum_rl)
+    എങ്കിൽ (pum_rl)
     {
 	col = pum_col - inner_width;
 	next_col = col - 1;
     }
-    else
+    അല്ലെങ്കിൽ
 #endif
     {
 	col = pum_col + inner_width;
 	next_col = col + 1;
     }
 
-    for (int i = 0; i < pum_height + pum_border; i++)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < pum_height + pum_border; i++)
     {
 	row = pum_row + 1 + i - pum_border;
 	put_shadow_char(row, col);
@@ -2512,15 +2512,15 @@ pum_draw_shadow(void)
 
     // Bottom shadow
     row = pum_row + pum_height + pum_border;
-    width = inner_width + left_padding + pum_border + left_margin;
-    offset = 2 - left_padding - pum_border - left_margin;
+    width = inner_width + ഇടത്_padding + pum_border + ഇടത്_margin;
+    offset = 2 - ഇടത്_padding - pum_border - ഇടത്_margin;
 
-    for (int i = 0; i < width; i++)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < width; i++)
     {
 #ifdef FEAT_RIGHTLEFT
-	if (pum_rl)
+	എങ്കിൽ (pum_rl)
 	    col = pum_col - offset - i;
-	else
+	അല്ലെങ്കിൽ
 #endif
 	    col = pum_col + offset + i;
 	put_shadow_char(row, col);

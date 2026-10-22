@@ -11,197 +11,197 @@
  * optionstr.c: Functions related to string options
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-static char_u shm_buf[SHM_LEN];
-static int set_shm_recursive = 0;
+സ്ഥിതം char_u shm_buf[SHM_LEN];
+സ്ഥിതം പൂർണ്ണസംഖ്യ set_shm_recursive = 0;
 
-static char *(p_ambw_values[]) = {"single", "double", NULL};
-static char *(p_bg_values[]) = {"light", "dark", NULL};
-static char *(p_bkc_values[]) = {"yes", "auto", "no", "breaksymlink", "breakhardlink", NULL};
-static char *(p_bo_values[]) = {"all", "backspace", "cursor", "complete",
+സ്ഥിതം അക്ഷരം *(p_ambw_മൂല്യങ്ങൾ[]) = {"single", "double", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_bg_മൂല്യങ്ങൾ[]) = {"light", "dark", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_bkc_മൂല്യങ്ങൾ[]) = {"yes", "auto", "no", "breaksymlink", "breakhardlink", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_bo_മൂല്യങ്ങൾ[]) = {"all", "backspace", "cursor", "complete",
 				 "copy", "ctrlg", "error", "esc", "ex",
 				 "hangul", "insertmode", "lang", "mess",
 				 "showmatch", "operator", "register", "shell",
-				 "spell", "term", "wildmode", NULL};
-#if defined(FEAT_LINEBREAK)
+				 "spell", "term", "wildmode", ശൂന്യ};
+#എങ്കിൽ defined(FEAT_LINEBREAK)
 // Note: Keep this in sync with briopt_check()
-static char *(p_briopt_values[]) = {"shift:", "min:", "sbr", "list:", "column:", NULL};
+സ്ഥിതം അക്ഷരം *(p_briopt_മൂല്യങ്ങൾ[]) = {"shift:", "min:", "sbr", "list:", "column:", ശൂന്യ};
 #endif
-#if defined(FEAT_TABPANEL)
+#എങ്കിൽ defined(FEAT_TABPANEL)
 // Note: Keep this in sync with tabpanelopt_changed()
-static char *(p_tplo_values[]) = {"align:", "columns:", "scrollbar", "vert", NULL};
-static char *(p_tplo_align_values[]) = {"left", "right", NULL};
+സ്ഥിതം അക്ഷരം *(p_tplo_മൂല്യങ്ങൾ[]) = {"align:", "columns:", "scrollbar", "vert", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_tplo_align_മൂല്യങ്ങൾ[]) = {"left", "right", ശൂന്യ};
 #endif
-#if defined(FEAT_DIFF)
+#എങ്കിൽ defined(FEAT_DIFF)
 // Note: Keep this in sync with diffopt_changed()
-static char *(p_dip_values[]) = {"filler", "anchor", "context:", "iblank", "icase", "iwhite", "iwhiteall", "iwhiteeol", "horizontal", "vertical", "closeoff", "hiddenoff", "foldcolumn:", "followwrap", "internal", "indent-heuristic", "algorithm:", "inline:", "linematch:", NULL};
-static char *(p_dip_algorithm_values[]) = {"myers", "minimal", "patience", "histogram", NULL};
-static char *(p_dip_inline_values[]) = {"none", "simple", "char", "word", NULL};
+സ്ഥിതം അക്ഷരം *(p_dip_മൂല്യങ്ങൾ[]) = {"filler", "anchor", "context:", "iblank", "icase", "iwhite", "iwhiteall", "iwhiteeol", "horizontal", "vertical", "closeoff", "hiddenoff", "foldcolumn:", "followwrap", "internal", "indent-heuristic", "algorithm:", "inline:", "linematch:", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_dip_algorithm_മൂല്യങ്ങൾ[]) = {"myers", "minimal", "patience", "histogram", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_dip_inline_മൂല്യങ്ങൾ[]) = {"none", "simple", "char", "word", ശൂന്യ};
 #endif
-static char *(p_nf_values[]) = {"bin", "octal", "hex", "alpha", "unsigned", "blank", NULL};
-static char *(p_ff_values[]) = {FF_UNIX, FF_DOS, FF_MAC, NULL};
+സ്ഥിതം അക്ഷരം *(p_nf_മൂല്യങ്ങൾ[]) = {"bin", "octal", "hex", "alpha", "unsigned", "blank", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_ff_മൂല്യങ്ങൾ[]) = {FF_UNIX, FF_DOS, FF_MAC, ശൂന്യ};
 #ifdef HAVE_CLIPMETHOD
 // Note: Keep this in sync with did_set_clipboard()
-static char *(p_cb_values[]) = {"unnamed", "unnamedplus",
+സ്ഥിതം അക്ഷരം *(p_cb_മൂല്യങ്ങൾ[]) = {"unnamed", "unnamedplus",
 # ifdef FEAT_CLIPBOARD
     "autoselect", "autoselectplus", "autoselectml", "html", "exclude:",
 # endif
-    NULL};
+    ശൂന്യ};
 #endif
 #ifdef FEAT_CRYPT
-static char *(p_cm_values[]) = {"zip", "blowfish", "blowfish2",
+സ്ഥിതം അക്ഷരം *(p_cm_മൂല്യങ്ങൾ[]) = {"zip", "blowfish", "blowfish2",
 # ifdef FEAT_SODIUM
     "xchacha20", "xchacha20v2",
 # endif
-    NULL};
+    ശൂന്യ};
 #endif
-static char *(p_cmp_values[]) = {"internal", "keepascii", NULL};
+സ്ഥിതം അക്ഷരം *(p_cmp_മൂല്യങ്ങൾ[]) = {"internal", "keepascii", ശൂന്യ};
 #ifdef FEAT_SYN_HL
 // Note: Keep this in sync with fill_culopt_flags()
-static char *(p_culopt_values[]) = {"line", "screenline", "number", "both", NULL};
+സ്ഥിതം അക്ഷരം *(p_culopt_മൂല്യങ്ങൾ[]) = {"line", "screenline", "number", "both", ശൂന്യ};
 #endif
-static char *(p_dy_values[]) = {"lastline", "truncate", "uhex", NULL};
-static char *(p_jop_values[]) = {"stack", NULL};
+സ്ഥിതം അക്ഷരം *(p_dy_മൂല്യങ്ങൾ[]) = {"lastline", "truncate", "uhex", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_jop_മൂല്യങ്ങൾ[]) = {"stack", ശൂന്യ};
 #ifdef FEAT_FOLDING
-static char *(p_fdo_values[]) = {"all", "block", "hor", "mark", "percent",
+സ്ഥിതം അക്ഷരം *(p_fdo_മൂല്യങ്ങൾ[]) = {"all", "block", "hor", "mark", "percent",
 				 "quickfix", "search", "tag", "insert",
-				 "undo", "jump", NULL};
+				 "undo", "jump", ശൂന്യ};
 #endif
 // Note: Keep this in sync with match_keyprotocol()
-static char *(p_kpc_protocol_values[]) = {"none", "mok2", "kitty", NULL};
+സ്ഥിതം അക്ഷരം *(p_kpc_protocol_മൂല്യങ്ങൾ[]) = {"none", "mok2", "kitty", ശൂന്യ};
 #ifdef FEAT_IMAGE
 // Note: Keep this in sync with match_imageprotocol()
-static char *(p_ipc_protocol_values[]) = {"none", "kitty", "sixel", NULL};
+സ്ഥിതം അക്ഷരം *(p_ipc_protocol_മൂല്യങ്ങൾ[]) = {"none", "kitty", "sixel", ശൂന്യ};
 #endif
 #ifdef FEAT_PROP_POPUP
 // Note: Keep this in sync with parse_popup_option()
-static char *(p_popup_cpp_option_values[]) = {"align:", "border:",
+സ്ഥിതം അക്ഷരം *(p_popup_cpp_option_മൂല്യങ്ങൾ[]) = {"align:", "border:",
     "borderhighlight:", "close:", "height:", "highlight:", "opacity:",
-    "resize:", "shadow:", "width:", NULL};
-static char *(p_popup_pvp_option_values[]) = {"border:",
+    "resize:", "shadow:", "width:", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_popup_pvp_option_മൂല്യങ്ങൾ[]) = {"border:",
     "borderhighlight:", "close:", "height:", "highlight:", "opacity:",
-    "resize:", "shadow:", "width:", NULL};
-static char *(p_popup_option_on_off_values[]) = {"on", "off", NULL};
-static char *(p_popup_cpp_border_values[]) = {"single", "double", "round",
-    "ascii", "on", "off", "custom:", NULL};
-static char *(p_popup_pvp_border_values[]) = {"single", "double", "round",
-    "ascii", "on", "off", "custom:", NULL};
-static char *(p_popup_option_align_values[]) = {"item", "menu", NULL};
+    "resize:", "shadow:", "width:", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_popup_option_on_off_മൂല്യങ്ങൾ[]) = {"on", "off", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_popup_cpp_border_മൂല്യങ്ങൾ[]) = {"single", "double", "round",
+    "ascii", "on", "off", "custom:", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_popup_pvp_border_മൂല്യങ്ങൾ[]) = {"single", "double", "round",
+    "ascii", "on", "off", "custom:", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_popup_option_align_മൂല്യങ്ങൾ[]) = {"item", "menu", ശൂന്യ};
 #endif
-#if defined(FEAT_SPELL)
+#എങ്കിൽ defined(FEAT_SPELL)
 // Note: Keep this in sync with spell_check_sps()
-static char *(p_sps_values[]) = {"best", "fast", "double", "expr:", "file:", "timeout:", NULL};
+സ്ഥിതം അക്ഷരം *(p_sps_മൂല്യങ്ങൾ[]) = {"best", "fast", "double", "expr:", "file:", "timeout:", ശൂന്യ};
 #endif
 #ifdef FEAT_SESSION
 // Also used for 'viewoptions'!  Keep in sync with SSOP_ flags.
-static char *(p_ssop_values[]) = {"buffers", "winpos", "resize", "winsize",
+സ്ഥിതം അക്ഷരം *(p_ssop_മൂല്യങ്ങൾ[]) = {"buffers", "winpos", "resize", "winsize",
     "localoptions", "options", "help", "blank", "globals", "slash", "unix",
     "sesdir", "curdir", "folds", "cursor", "tabpages", "terminal", "skiprtp",
-    NULL};
+    ശൂന്യ};
 #endif
-#if defined(FEAT_STL_OPT)
-static char *(p_stlo_values[]) = {"fixedheight", "maxheight:", NULL};
+#എങ്കിൽ defined(FEAT_STL_OPT)
+സ്ഥിതം അക്ഷരം *(p_stlo_മൂല്യങ്ങൾ[]) = {"fixedheight", "maxheight:", ശൂന്യ};
 #endif
 // Keep in sync with SWB_ flags in option.h
-static char *(p_swb_values[]) = {"useopen", "usetab", "split", "newtab", "vsplit", "uselast", NULL};
-static char *(p_spk_values[]) = {"cursor", "screen", "topline", NULL};
-static char *(p_tc_values[]) = {"followic", "ignore", "match", "followscs", "smart", NULL};
+സ്ഥിതം അക്ഷരം *(p_swb_മൂല്യങ്ങൾ[]) = {"useopen", "usetab", "split", "newtab", "vsplit", "uselast", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_spk_മൂല്യങ്ങൾ[]) = {"cursor", "screen", "topline", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_tc_മൂല്യങ്ങൾ[]) = {"followic", "ignore", "match", "followscs", "smart", ശൂന്യ};
 // Keep in sync with TCL_ flags in option.h
-static char *(p_tcl_values[]) = {"left", "uselast", NULL};
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
-static char *(p_toolbar_values[]) = {"text", "icons", "tooltips", "horiz", NULL};
+സ്ഥിതം അക്ഷരം *(p_tcl_മൂല്യങ്ങൾ[]) = {"left", "uselast", ശൂന്യ};
+#എങ്കിൽ defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+സ്ഥിതം അക്ഷരം *(p_toolbar_മൂല്യങ്ങൾ[]) = {"text", "icons", "tooltips", "horiz", ശൂന്യ};
 #endif
-#if defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
-static char *(p_tbis_values[]) = {"tiny", "small", "medium", "large", "huge", "giant", NULL};
+#എങ്കിൽ defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
+സ്ഥിതം അക്ഷരം *(p_tbis_മൂല്യങ്ങൾ[]) = {"tiny", "small", "medium", "large", "huge", "giant", ശൂന്യ};
 #endif
-#if defined(UNIX) || defined(VMS)
-static char *(p_ttym_values[]) = {"xterm", "xterm2", "dec", "netterm", "jsbterm", "pterm", "urxvt", "sgr", NULL};
+#എങ്കിൽ defined(UNIX) || defined(VMS)
+സ്ഥിതം അക്ഷരം *(p_ttym_മൂല്യങ്ങൾ[]) = {"xterm", "xterm2", "dec", "netterm", "jsbterm", "pterm", "urxvt", "sgr", ശൂന്യ};
 #endif
-static char *(p_ve_values[]) = {"block", "insert", "all", "onemore", "none", "NONE", NULL};
+സ്ഥിതം അക്ഷരം *(p_ve_മൂല്യങ്ങൾ[]) = {"block", "insert", "all", "onemore", "none", "NONE", ശൂന്യ};
 // Note: Keep this in sync with check_opt_wim()
-static char *(p_wim_values[]) = {"full", "longest", "list", "lastused", "noselect", "noinsert", NULL};
-static char *(p_wop_values[]) = {"fuzzy", "tagfile", "pum", "exacttext", NULL};
+സ്ഥിതം അക്ഷരം *(p_wim_മൂല്യങ്ങൾ[]) = {"full", "longest", "list", "lastused", "noselect", "noinsert", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_wop_മൂല്യങ്ങൾ[]) = {"fuzzy", "tagfile", "pum", "exacttext", ശൂന്യ};
 #ifdef FEAT_WAK
-static char *(p_wak_values[]) = {"yes", "menu", "no", NULL};
+സ്ഥിതം അക്ഷരം *(p_wak_മൂല്യങ്ങൾ[]) = {"yes", "menu", "no", ശൂന്യ};
 #endif
-static char *(p_mousem_values[]) = {"extend", "popup", "popup_setpos", "mac", NULL};
-static char *(p_sel_values[]) = {"inclusive", "exclusive", "old", NULL};
-static char *(p_slm_values[]) = {"mouse", "key", "cmd", NULL};
-static char *(p_km_values[]) = {"startsel", "stopsel", NULL};
+സ്ഥിതം അക്ഷരം *(p_mousem_മൂല്യങ്ങൾ[]) = {"extend", "popup", "popup_setpos", "mac", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_sel_മൂല്യങ്ങൾ[]) = {"inclusive", "exclusive", "old", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_slm_മൂല്യങ്ങൾ[]) = {"mouse", "key", "cmd", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_km_മൂല്യങ്ങൾ[]) = {"startsel", "stopsel", ശൂന്യ};
 #ifdef FEAT_BROWSE
-static char *(p_bsdir_values[]) = {"current", "last", "buffer", NULL};
+സ്ഥിതം അക്ഷരം *(p_bsdir_മൂല്യങ്ങൾ[]) = {"current", "last", "buffer", ശൂന്യ};
 #endif
-static char *(p_scbopt_values[]) = {"ver", "hor", "jump", NULL};
-static char *(p_debug_values[]) = {"msg", "throw", "beep", NULL};
-static char *(p_ead_values[]) = {"both", "ver", "hor", NULL};
-static char *(p_buftype_values[]) = {"nofile", "nowrite", "quickfix", "help", "terminal", "acwrite", "prompt", "popup", NULL};
-static char *(p_bufhidden_values[]) = {"hide", "unload", "delete", "wipe", NULL};
-static char *(p_bs_values[]) = {"indent", "eol", "start", "nostop", NULL};
+സ്ഥിതം അക്ഷരം *(p_scbopt_മൂല്യങ്ങൾ[]) = {"ver", "hor", "jump", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_debug_മൂല്യങ്ങൾ[]) = {"msg", "throw", "beep", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_ead_മൂല്യങ്ങൾ[]) = {"both", "ver", "hor", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_buftype_മൂല്യങ്ങൾ[]) = {"nofile", "nowrite", "quickfix", "help", "terminal", "acwrite", "prompt", "popup", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_bufhidden_മൂല്യങ്ങൾ[]) = {"hide", "unload", "delete", "wipe", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_bs_മൂല്യങ്ങൾ[]) = {"indent", "eol", "start", "nostop", ശൂന്യ};
 #ifdef FEAT_FOLDING
-static char *(p_fdm_values[]) = {"manual", "expr", "marker", "indent", "syntax",
+സ്ഥിതം അക്ഷരം *(p_fdm_മൂല്യങ്ങൾ[]) = {"manual", "expr", "marker", "indent", "syntax",
 # ifdef FEAT_DIFF
 				"diff",
 # endif
-				NULL};
-static char *(p_fcl_values[]) = {"all", NULL};
+				ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_fcl_മൂല്യങ്ങൾ[]) = {"all", ശൂന്യ};
 #endif
-static char *(p_cfc_values[]) = {"keyword", "files", "whole_line", NULL};
-static char *(p_cot_values[]) = {"menu", "menuone", "longest", "preview", "popup", "popuphidden", "noinsert", "noselect", "fuzzy", "nosort", "preinsert", "nearest", NULL};
+സ്ഥിതം അക്ഷരം *(p_cfc_മൂല്യങ്ങൾ[]) = {"keyword", "files", "whole_line", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_cot_മൂല്യങ്ങൾ[]) = {"menu", "menuone", "longest", "preview", "popup", "popuphidden", "noinsert", "noselect", "fuzzy", "nosort", "preinsert", "nearest", ശൂന്യ};
 #ifdef BACKSLASH_IN_FILENAME
-static char *(p_csl_values[]) = {"slash", "backslash", NULL};
+സ്ഥിതം അക്ഷരം *(p_csl_മൂല്യങ്ങൾ[]) = {"slash", "backslash", ശൂന്യ};
 #endif
 #ifdef FEAT_SIGNS
-static char *(p_scl_values[]) = {"yes", "no", "auto", "number", NULL};
+സ്ഥിതം അക്ഷരം *(p_scl_മൂല്യങ്ങൾ[]) = {"yes", "no", "auto", "number", ശൂന്യ};
 #endif
 #ifdef UNIX
-static char *(p_trz_values[]) = {"inband", "sigwinch", "", NULL};
+സ്ഥിതം അക്ഷരം *(p_trz_മൂല്യങ്ങൾ[]) = {"inband", "sigwinch", "", ശൂന്യ};
 #endif
-#if defined(MSWIN) && defined(FEAT_TERMINAL)
-static char *(p_twt_values[]) = {"winpty", "conpty", "", NULL};
+#എങ്കിൽ defined(MSWIN) && defined(FEAT_TERMINAL)
+സ്ഥിതം അക്ഷരം *(p_twt_മൂല്യങ്ങൾ[]) = {"winpty", "conpty", "", ശൂന്യ};
 #endif
-static char *(p_sloc_values[]) = {"last", "statusline", "tabline", NULL};
-static char *(p_sws_values[]) = {"fsync", "sync", NULL};
+സ്ഥിതം അക്ഷരം *(p_sloc_മൂല്യങ്ങൾ[]) = {"last", "statusline", "tabline", ശൂന്യ};
+സ്ഥിതം അക്ഷരം *(p_sws_മൂല്യങ്ങൾ[]) = {"fsync", "sync", ശൂന്യ};
 
-static int check_opt_strings(char_u *val, char **values, int list);
-static int opt_strings_flags(char_u *val, char **values, unsigned *flagp, int list);
+സ്ഥിതം പൂർണ്ണസംഖ്യ check_opt_strings(char_u *val, അക്ഷരം **മൂല്യങ്ങൾ, പൂർണ്ണസംഖ്യ list);
+സ്ഥിതം പൂർണ്ണസംഖ്യ opt_strings_flags(char_u *val, അക്ഷരം **മൂല്യങ്ങൾ, unsigned *flagp, പൂർണ്ണസംഖ്യ list);
 
 /*
  * After setting various option values: recompute variables that depend on
  * option values.
  */
-    void
-didset_string_options(void)
+    ശൂന്യം
+didset_string_options(ശൂന്യം)
 {
-    (void)opt_strings_flags(p_cmp, p_cmp_values, &cmp_flags, TRUE);
-    (void)opt_strings_flags(p_bkc, p_bkc_values, &bkc_flags, TRUE);
-    (void)opt_strings_flags(p_bo, p_bo_values, &bo_flags, TRUE);
-    (void)opt_strings_flags(p_cot, p_cot_values, &cot_flags, TRUE);
+    (ശൂന്യം)opt_strings_flags(p_cmp, p_cmp_മൂല്യങ്ങൾ, &cmp_flags, TRUE);
+    (ശൂന്യം)opt_strings_flags(p_bkc, p_bkc_മൂല്യങ്ങൾ, &bkc_flags, TRUE);
+    (ശൂന്യം)opt_strings_flags(p_bo, p_bo_മൂല്യങ്ങൾ, &bo_flags, TRUE);
+    (ശൂന്യം)opt_strings_flags(p_cot, p_cot_മൂല്യങ്ങൾ, &cot_flags, TRUE);
 #ifdef FEAT_SESSION
-    (void)opt_strings_flags(p_ssop, p_ssop_values, &ssop_flags, TRUE);
-    (void)opt_strings_flags(p_vop, p_ssop_values, &vop_flags, TRUE);
+    (ശൂന്യം)opt_strings_flags(p_ssop, p_ssop_മൂല്യങ്ങൾ, &ssop_flags, TRUE);
+    (ശൂന്യം)opt_strings_flags(p_vop, p_ssop_മൂല്യങ്ങൾ, &vop_flags, TRUE);
 #endif
 #ifdef FEAT_FOLDING
-    (void)opt_strings_flags(p_fdo, p_fdo_values, &fdo_flags, TRUE);
+    (ശൂന്യം)opt_strings_flags(p_fdo, p_fdo_മൂല്യങ്ങൾ, &fdo_flags, TRUE);
 #endif
-    (void)opt_strings_flags(p_dy, p_dy_values, &dy_flags, TRUE);
-    (void)opt_strings_flags(p_jop, p_jop_values, &jop_flags, TRUE);
-    (void)opt_strings_flags(p_tc, p_tc_values, &tc_flags, FALSE);
-    (void)opt_strings_flags(p_ve, p_ve_values, &ve_flags, TRUE);
-#if defined(UNIX) || defined(VMS)
-    (void)opt_strings_flags(p_ttym, p_ttym_values, &ttym_flags, FALSE);
+    (ശൂന്യം)opt_strings_flags(p_dy, p_dy_മൂല്യങ്ങൾ, &dy_flags, TRUE);
+    (ശൂന്യം)opt_strings_flags(p_jop, p_jop_മൂല്യങ്ങൾ, &jop_flags, TRUE);
+    (ശൂന്യം)opt_strings_flags(p_tc, p_tc_മൂല്യങ്ങൾ, &tc_flags, FALSE);
+    (ശൂന്യം)opt_strings_flags(p_ve, p_ve_മൂല്യങ്ങൾ, &ve_flags, TRUE);
+#എങ്കിൽ defined(UNIX) || defined(VMS)
+    (ശൂന്യം)opt_strings_flags(p_ttym, p_ttym_മൂല്യങ്ങൾ, &ttym_flags, FALSE);
 #endif
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
-    (void)opt_strings_flags(p_toolbar, p_toolbar_values, &toolbar_flags, TRUE);
+#എങ്കിൽ defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+    (ശൂന്യം)opt_strings_flags(p_toolbar, p_toolbar_മൂല്യങ്ങൾ, &toolbar_flags, TRUE);
 #endif
-#if defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
-    (void)opt_strings_flags(p_tbis, p_tbis_values, &tbis_flags, FALSE);
+#എങ്കിൽ defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
+    (ശൂന്യം)opt_strings_flags(p_tbis, p_tbis_മൂല്യങ്ങൾ, &tbis_flags, FALSE);
 #endif
-    (void)opt_strings_flags(p_swb, p_swb_values, &swb_flags, TRUE);
-    (void)opt_strings_flags(p_tcl, p_tcl_values, &tcl_flags, TRUE);
+    (ശൂന്യം)opt_strings_flags(p_swb, p_swb_മൂല്യങ്ങൾ, &swb_flags, TRUE);
+    (ശൂന്യം)opt_strings_flags(p_tcl, p_tcl_മൂല്യങ്ങൾ, &tcl_flags, TRUE);
 }
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 /*
  * Trigger the OptionSet autocommand.
  * "opt_idx"	is the index of the option being set.
@@ -213,81 +213,81 @@ didset_string_options(void)
  *		are set)
  * "newval"	the new value
  */
-    void
+    ശൂന്യം
 trigger_optionset_string(
-	int	opt_idx,
-	int	opt_flags,
+	പൂർണ്ണസംഖ്യ	opt_idx,
+	പൂർണ്ണസംഖ്യ	opt_flags,
 	char_u  *oldval,
 	char_u  *oldval_l,
 	char_u  *oldval_g,
 	char_u  *newval)
 {
     // Don't do this recursively.
-    if (oldval == NULL || newval == NULL
+    എങ്കിൽ (oldval == ശൂന്യ || newval == ശൂന്യ
 				    || *get_vim_var_str(VV_OPTION_TYPE) != NUL)
-	return;
+	തിരികെ;
 
     char_u buf_type[7];
     size_t buf_typelen;
     size_t oldvallen;
 
     oldvallen = STRLEN(oldval);
-    set_vim_var_string(VV_OPTION_OLD, oldval, (int)oldvallen);
+    set_vim_var_string(VV_OPTION_OLD, oldval, (പൂർണ്ണസംഖ്യ)oldvallen);
     set_vim_var_string(VV_OPTION_NEW, newval, -1);
-    buf_typelen = vim_snprintf_safelen((char *)buf_type, sizeof(buf_type),
+    buf_typelen = vim_snprintf_safelen((അക്ഷരം *)buf_type, വലുപ്പം(buf_type),
 	"%s", (opt_flags & OPT_LOCAL) ? "local" : "global");
-    set_vim_var_string(VV_OPTION_TYPE, buf_type, (int)buf_typelen);
-    if (opt_flags & OPT_LOCAL)
+    set_vim_var_string(VV_OPTION_TYPE, buf_type, (പൂർണ്ണസംഖ്യ)buf_typelen);
+    എങ്കിൽ (opt_flags & OPT_LOCAL)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setlocal", STRLEN_LITERAL("setlocal"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, oldval, (int)oldvallen);
+	set_vim_var_string(VV_OPTION_OLDLOCAL, oldval, (പൂർണ്ണസംഖ്യ)oldvallen);
     }
-    if (opt_flags & OPT_GLOBAL)
+    എങ്കിൽ (opt_flags & OPT_GLOBAL)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setglobal", STRLEN_LITERAL("setglobal"));
-	set_vim_var_string(VV_OPTION_OLDGLOBAL, oldval, (int)oldvallen);
+	set_vim_var_string(VV_OPTION_OLDGLOBAL, oldval, (പൂർണ്ണസംഖ്യ)oldvallen);
     }
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    എങ്കിൽ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"set", STRLEN_LITERAL("set"));
 	set_vim_var_string(VV_OPTION_OLDLOCAL, oldval_l, -1);
 	set_vim_var_string(VV_OPTION_OLDGLOBAL, oldval_g, -1);
     }
-    if (opt_flags & OPT_MODELINE)
+    എങ്കിൽ (opt_flags & OPT_MODELINE)
     {
 	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"modeline", STRLEN_LITERAL("modeline"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, oldval, (int)oldvallen);
+	set_vim_var_string(VV_OPTION_OLDLOCAL, oldval, (പൂർണ്ണസംഖ്യ)oldvallen);
     }
     apply_autocmds(EVENT_OPTIONSET,
-	    get_option_fullname(opt_idx), NULL, FALSE,
-	    NULL);
+	    get_option_fullname(opt_idx), ശൂന്യ, FALSE,
+	    ശൂന്യ);
     reset_v_option_vars();
 }
 #endif
 
-    static char *
-illegal_char(char *errbuf, size_t errbuflen, int c)
+    സ്ഥിതം അക്ഷരം *
+illegal_char(അക്ഷരം *errbuf, size_t errbuflen, പൂർണ്ണസംഖ്യ c)
 {
-    if (errbuf == NULL)
-	return "";
+    എങ്കിൽ (errbuf == ശൂന്യ)
+	തിരികെ "";
     vim_snprintf(errbuf, errbuflen, _(e_illegal_character_str),
-		    (char *)transchar(c));
-    return errbuf;
+		    (അക്ഷരം *)transchar(c));
+    തിരികെ errbuf;
 }
 
-    static char *
-illegal_char_after_chr(char *errbuf, size_t errbuflen, int c)
+    സ്ഥിതം അക്ഷരം *
+illegal_char_after_chr(അക്ഷരം *errbuf, size_t errbuflen, പൂർണ്ണസംഖ്യ c)
 {
-    if (errbuf == NULL)
-	return "";
+    എങ്കിൽ (errbuf == ശൂന്യ)
+	തിരികെ "";
     vim_snprintf(errbuf, errbuflen, _(e_illegal_character_after_chr), c);
-    return errbuf;
+    തിരികെ errbuf;
 }
 
 /*
  * Check string options in a buffer for NULL value.
  */
-    void
+    ശൂന്യം
 check_buf_options(buf_T *buf)
 {
     check_string_option(&buf->b_p_bh);
@@ -301,22 +301,22 @@ check_buf_options(buf_T *buf)
     check_string_option(&buf->b_p_inex);
 # endif
 #endif
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
     check_string_option(&buf->b_p_inde);
     check_string_option(&buf->b_p_indk);
 #endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_BEVAL) && defined(FEAT_EVAL)
     check_string_option(&buf->b_p_bexpr);
 #endif
-#if defined(FEAT_CRYPT)
+#എങ്കിൽ defined(FEAT_CRYPT)
     check_string_option(&buf->b_p_cm);
 #endif
     check_string_option(&buf->b_p_fp);
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
     check_string_option(&buf->b_p_fex);
 #endif
 #ifdef FEAT_CRYPT
-    check_string_option(&buf->b_p_key);
+    check_string_option(&buf->b_p_താക്കോൽ);
 #endif
     check_string_option(&buf->b_p_kp);
     check_string_option(&buf->b_p_mps);
@@ -390,46 +390,46 @@ check_buf_options(buf_T *buf)
  * check_options().
  * Does NOT check for P_ALLOCED flag!
  */
-    void
+    ശൂന്യം
 free_string_option(char_u *p)
 {
-    if (p != empty_option)
+    എങ്കിൽ (p != empty_option)
 	vim_free(p);
 }
 
-    void
+    ശൂന്യം
 clear_string_option(char_u **pp)
 {
-    if (*pp != empty_option)
+    എങ്കിൽ (*pp != empty_option)
 	vim_free(*pp);
     *pp = empty_option;
 }
 
-    void
+    ശൂന്യം
 check_string_option(char_u **pp)
 {
-    if (*pp == NULL)
+    എങ്കിൽ (*pp == ശൂന്യ)
 	*pp = empty_option;
 }
 
 /*
  * Set global value for string option when it's a local option.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 set_string_option_global(
-    int		opt_idx,	// option index
+    പൂർണ്ണസംഖ്യ		opt_idx,	// option index
     char_u	**varp)		// pointer to option variable
 {
     char_u	**p, *s;
 
     // the global value is always allocated
-    if (is_window_local_option(opt_idx))
+    എങ്കിൽ (is_window_local_option(opt_idx))
 	p = (char_u **)GLOBAL_WO(varp);
-    else
+    അല്ലെങ്കിൽ
 	p = (char_u **)get_option_var(opt_idx);
-    if (!is_global_option(opt_idx)
+    എങ്കിൽ (!is_global_option(opt_idx)
 	    && p != varp
-	    && (s = vim_strsave(*varp)) != NULL)
+	    && (s = vim_strsave(*varp)) != ശൂന്യ)
     {
 	free_string_option(*p);
 	*p = s;
@@ -444,64 +444,64 @@ set_string_option_global(
  * "set_sid" is SID_NONE don't set the scriptID.  Otherwise set the scriptID to
  * "set_sid".
  */
-    void
+    ശൂന്യം
 set_string_option_direct(
     char_u	*name,
-    int		opt_idx,
+    പൂർണ്ണസംഖ്യ		opt_idx,
     char_u	*val,
-    int		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
-    int		set_sid UNUSED)
+    പൂർണ്ണസംഖ്യ		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
+    പൂർണ്ണസംഖ്യ		set_sid UNUSED)
 {
     char_u	*s;
     char_u	**varp;
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
-    int		idx = opt_idx;
+    പൂർണ്ണസംഖ്യ		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    പൂർണ്ണസംഖ്യ		idx = opt_idx;
 
-    if (idx == -1)		// use name
+    എങ്കിൽ (idx == -1)		// use name
     {
 	idx = findoption(name);
-	if (idx < 0)	// not found (should not happen)
+	എങ്കിൽ (idx < 0)	// not found (should not happen)
 	{
 	    semsg(_(e_internal_error_str), "set_string_option_direct()");
 	    siemsg("For option %s", name);
-	    return;
+	    തിരികെ;
 	}
     }
 
-    if (is_hidden_option(idx))		// can't set hidden option
-	return;
+    എങ്കിൽ (is_hidden_option(idx))		// can't set hidden option
+	തിരികെ;
 
     s = vim_strsave(val);
-    if (s == NULL)
-	return;
+    എങ്കിൽ (s == ശൂന്യ)
+	തിരികെ;
 
     varp = (char_u **)get_option_varp_scope(idx,
 	    both ? OPT_LOCAL : opt_flags);
-    if ((opt_flags & OPT_FREE) && (get_option_flags(idx) & P_ALLOCED))
+    എങ്കിൽ ((opt_flags & OPT_FREE) && (get_option_flags(idx) & P_ALLOCED))
 	free_string_option(*varp);
     *varp = s;
 
     // For buffer/window local option may also set the global value.
-    if (both)
+    എങ്കിൽ (both)
 	set_string_option_global(idx, varp);
 
     set_option_flag(idx, P_ALLOCED);
 
     // When setting both values of a global option with a local value,
     // make the local value empty, so that the global value is used.
-    if (is_global_local_option(idx) && both)
+    എങ്കിൽ (is_global_local_option(idx) && both)
     {
 	free_string_option(*varp);
 	*varp = empty_option;
     }
 #ifdef FEAT_EVAL
-    if (set_sid != SID_NONE)
+    എങ്കിൽ (set_sid != SID_NONE)
     {
 	sctx_T script_ctx;
 
-	if (set_sid == 0)
+	എങ്കിൽ (set_sid == 0)
 	    script_ctx = current_sctx;
-	else
+	അല്ലെങ്കിൽ
 	{
 	    script_ctx.sc_sid = set_sid;
 	    script_ctx.sc_seq = 0;
@@ -517,14 +517,14 @@ set_string_option_direct(
  * Like set_string_option_direct(), but for a window-local option in "wp".
  * Blocks autocommands to avoid the old curwin becoming invalid.
  */
-    void
+    ശൂന്യം
 set_string_option_direct_in_win(
 	win_T		*wp,
 	char_u		*name,
-	int		opt_idx,
+	പൂർണ്ണസംഖ്യ		opt_idx,
 	char_u		*val,
-	int		opt_flags,
-	int		set_sid)
+	പൂർണ്ണസംഖ്യ		opt_flags,
+	പൂർണ്ണസംഖ്യ		set_sid)
 {
     win_T	*save_curwin = curwin;
 
@@ -537,19 +537,19 @@ set_string_option_direct_in_win(
     unblock_autocmds();
 }
 
-#if defined(FEAT_PROP_POPUP)
+#എങ്കിൽ defined(FEAT_PROP_POPUP)
 /*
  * Like set_string_option_direct(), but for a buffer-local option in "buf".
  * Blocks autocommands to avoid the old curbuf becoming invalid.
  */
-    void
+    ശൂന്യം
 set_string_option_direct_in_buf(
 	buf_T		*buf,
 	char_u		*name,
-	int		opt_idx,
+	പൂർണ്ണസംഖ്യ		opt_idx,
 	char_u		*val,
-	int		opt_flags,
-	int		set_sid)
+	പൂർണ്ണസംഖ്യ		opt_flags,
+	പൂർണ്ണസംഖ്യ		set_sid)
 {
     buf_T	*save_curbuf = curbuf;
 
@@ -568,34 +568,34 @@ set_string_option_direct_in_buf(
  *
  * Returns NULL on success or an untranslated error message on error.
  */
-    char *
+    അക്ഷരം *
 set_string_option(
-    int		opt_idx,
-    char_u	*value,
-    int		opt_flags,	// OPT_LOCAL and/or OPT_GLOBAL
-    char	*errbuf,
+    പൂർണ്ണസംഖ്യ		opt_idx,
+    char_u	*മൂല്യം,
+    പൂർണ്ണസംഖ്യ		opt_flags,	// OPT_LOCAL and/or OPT_GLOBAL
+    അക്ഷരം	*errbuf,
     size_t	errbuflen)
 {
     char_u	*s;
     char_u	**varp;
     char_u	*oldval;
-#if defined(FEAT_EVAL)
-    char_u	*oldval_l = NULL;
-    char_u	*oldval_g = NULL;
-    char_u	*saved_oldval = NULL;
-    char_u	*saved_oldval_l = NULL;
-    char_u	*saved_oldval_g = NULL;
-    char_u	*saved_newval = NULL;
+#എങ്കിൽ defined(FEAT_EVAL)
+    char_u	*oldval_l = ശൂന്യ;
+    char_u	*oldval_g = ശൂന്യ;
+    char_u	*saved_oldval = ശൂന്യ;
+    char_u	*saved_oldval_l = ശൂന്യ;
+    char_u	*saved_oldval_g = ശൂന്യ;
+    char_u	*saved_newval = ശൂന്യ;
 #endif
-    char	*errmsg = NULL;
-    int		value_checked = FALSE;
+    അക്ഷരം	*errmsg = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		മൂല്യം_checked = FALSE;
 
-    if (is_hidden_option(opt_idx))	// don't set hidden option
-	return NULL;
+    എങ്കിൽ (is_hidden_option(opt_idx))	// don't set hidden option
+	തിരികെ ശൂന്യ;
 
-    s = vim_strsave(value == NULL ? (char_u *)"" : value);
-    if (s == NULL)
-	return NULL;
+    s = vim_strsave(മൂല്യം == ശൂന്യ ? (char_u *)"" : മൂല്യം);
+    എങ്കിൽ (s == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
     varp = (char_u **)get_option_varp_scope(opt_idx,
 	    (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
@@ -603,8 +603,8 @@ set_string_option(
 		? OPT_GLOBAL : OPT_LOCAL)
 	    : opt_flags);
     oldval = *varp;
-#if defined(FEAT_EVAL)
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+#എങ്കിൽ defined(FEAT_EVAL)
+    എങ്കിൽ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	oldval_l = *(char_u **)get_option_varp_scope(opt_idx, OPT_LOCAL);
 	oldval_g = *(char_u **)get_option_varp_scope(opt_idx, OPT_GLOBAL);
@@ -612,28 +612,28 @@ set_string_option(
 #endif
     *varp = s;
 
-#if defined(FEAT_EVAL)
-    if (!starting
+#എങ്കിൽ defined(FEAT_EVAL)
+    എങ്കിൽ (!starting
 # ifdef FEAT_CRYPT
-	    && !is_crypt_key_option(opt_idx)
+	    && !is_crypt_താക്കോൽ_option(opt_idx)
 # endif
        )
     {
-	if (oldval_l != NULL)
+	എങ്കിൽ (oldval_l != ശൂന്യ)
 	    saved_oldval_l = vim_strsave(oldval_l);
-	if (oldval_g != NULL)
+	എങ്കിൽ (oldval_g != ശൂന്യ)
 	    saved_oldval_g = vim_strsave(oldval_g);
 	saved_oldval = vim_strsave(oldval);
 	saved_newval = vim_strsave(s);
     }
 #endif
-    if ((errmsg = did_set_string_option(opt_idx, varp, oldval, value, errbuf,
-		    errbuflen, opt_flags, OP_NONE, &value_checked)) == NULL)
-	did_set_option(opt_idx, opt_flags, TRUE, value_checked);
+    എങ്കിൽ ((errmsg = did_set_string_option(opt_idx, varp, oldval, മൂല്യം, errbuf,
+		    errbuflen, opt_flags, OP_NONE, &മൂല്യം_checked)) == ശൂന്യ)
+	did_set_option(opt_idx, opt_flags, TRUE, മൂല്യം_checked);
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
     // call autocommand after handling side effects
-    if (errmsg == NULL)
+    എങ്കിൽ (errmsg == ശൂന്യ)
 	trigger_optionset_string(opt_idx, opt_flags,
 		saved_oldval, saved_oldval_l,
 		saved_oldval_g, saved_newval);
@@ -642,17 +642,17 @@ set_string_option(
     vim_free(saved_oldval_g);
     vim_free(saved_newval);
 #endif
-    return errmsg;
+    തിരികെ errmsg;
 }
 
 /*
  * Return TRUE if "val" is a valid 'filetype' name.
  * Also used for 'syntax' and 'keymap'.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 valid_filetype(char_u *val)
 {
-    return valid_name(val, ".-_");
+    തിരികെ valid_name(val, ".-_");
 }
 
 #ifdef FEAT_STL_OPT
@@ -660,123 +660,123 @@ valid_filetype(char_u *val)
  * Check validity of options with the 'statusline' format.
  * Return an untranslated error message or NULL.
  */
-    static char *
+    സ്ഥിതം അക്ഷരം *
 check_stl_option(char_u *s)
 {
-    int		groupdepth = 0;
-    static char errbuf[ERR_BUFLEN];
-    int		errbuflen = ERR_BUFLEN;
+    പൂർണ്ണസംഖ്യ		groupdepth = 0;
+    സ്ഥിതം അക്ഷരം errbuf[ERR_BUFLEN];
+    പൂർണ്ണസംഖ്യ		errbuflen = ERR_BUFLEN;
 
-    while (*s)
+    ആകുമ്പോൾ (*s)
     {
 	// Check for valid keys after % sequences
-	while (*s && *s != '%')
+	ആകുമ്പോൾ (*s && *s != '%')
 	    s++;
-	if (!*s)
-	    break;
+	എങ്കിൽ (!*s)
+	    നിർത്തുക;
 	s++;
-	if (*s == STL_CLICKFUNC)
+	എങ്കിൽ (*s == STL_CLICKFUNC)
 	{
-	    if (s[1] == ']')
+	    എങ്കിൽ (s[1] == ']')
 	    {
 		// %[] - end click region
 		s += 2;
-		continue;
+		തുടരുക;
 	    }
-	    if (ASCII_ISALPHA(s[1]) || s[1] == '_')
+	    എങ്കിൽ (ASCII_ISALPHA(s[1]) || s[1] == '_')
 	    {
 		// %[FuncName] - start click region
 		char_u *rb = vim_strchr(s + 2, ']');
-		if (rb != NULL)
+		എങ്കിൽ (rb != ശൂന്യ)
 		{
 		    s = rb + 1;
-		    continue;
+		    തുടരുക;
 		}
 	    }
 	    // Bare %[ is invalid
-	    return illegal_char(errbuf, errbuflen, *s);
+	    തിരികെ illegal_char(errbuf, errbuflen, *s);
 	}
-	if (*s == STL_LINEBREAK)
+	എങ്കിൽ (*s == STL_LINEBREAK)
 	{
 	    // Plain %@ - line break
 	    s++;
-	    continue;
+	    തുടരുക;
 	}
-	if (*s == '%' || *s == STL_TRUNCMARK || *s == STL_SEPARATE)
+	എങ്കിൽ (*s == '%' || *s == STL_TRUNCMARK || *s == STL_SEPARATE)
 	{
 	    s++;
-	    continue;
+	    തുടരുക;
 	}
-	if (*s == ')')
+	എങ്കിൽ (*s == ')')
 	{
 	    s++;
-	    if (--groupdepth < 0)
-		break;
-	    continue;
+	    എങ്കിൽ (--groupdepth < 0)
+		നിർത്തുക;
+	    തുടരുക;
 	}
-	if (*s == '-')
+	എങ്കിൽ (*s == '-')
 	    s++;
-	while (VIM_ISDIGIT(*s))
+	ആകുമ്പോൾ (VIM_ISDIGIT(*s))
 	    s++;
-	if (*s == STL_USER_HL)
-	    continue;
-	if (*s == STL_CLICKFUNC)
+	എങ്കിൽ (*s == STL_USER_HL)
+	    തുടരുക;
+	എങ്കിൽ (*s == STL_CLICKFUNC)
 	{
 	    // %N[FuncName] or %N[]
-	    if (s[1] == ']')
+	    എങ്കിൽ (s[1] == ']')
 	    {
 		s += 2;
-		continue;
+		തുടരുക;
 	    }
-	    if (ASCII_ISALPHA(s[1]) || s[1] == '_')
+	    എങ്കിൽ (ASCII_ISALPHA(s[1]) || s[1] == '_')
 	    {
 		char_u *rb = vim_strchr(s + 2, ']');
-		if (rb != NULL)
+		എങ്കിൽ (rb != ശൂന്യ)
 		{
 		    s = rb + 1;
-		    continue;
+		    തുടരുക;
 		}
 	    }
 	    // Bare %N[ is invalid
-	    return illegal_char(errbuf, errbuflen, *s);
+	    തിരികെ illegal_char(errbuf, errbuflen, *s);
 	}
-	if (*s == STL_LINEBREAK)
+	എങ്കിൽ (*s == STL_LINEBREAK)
 	{
 	    // %N@ - line break
 	    s++;
-	    continue;
+	    തുടരുക;
 	}
-	if (*s == '.')
+	എങ്കിൽ (*s == '.')
 	{
 	    s++;
-	    while (*s && VIM_ISDIGIT(*s))
+	    ആകുമ്പോൾ (*s && VIM_ISDIGIT(*s))
 		s++;
 	}
-	if (*s == '(')
+	എങ്കിൽ (*s == '(')
 	{
 	    groupdepth++;
-	    continue;
+	    തുടരുക;
 	}
-	if (vim_strchr(STL_ALL, *s) == NULL)
+	എങ്കിൽ (vim_strchr(STL_ALL, *s) == ശൂന്യ)
 	{
-	    return illegal_char(errbuf, errbuflen, *s);
+	    തിരികെ illegal_char(errbuf, errbuflen, *s);
 	}
-	if (*s == '{')
+	എങ്കിൽ (*s == '{')
 	{
-	    int reevaluate = (*++s == '%');
+	    പൂർണ്ണസംഖ്യ reevaluate = (*++s == '%');
 
-	    if (reevaluate && *++s == '}')
+	    എങ്കിൽ (reevaluate && *++s == '}')
 		// "}" is not allowed immediately after "%{%"
-		return illegal_char(errbuf, errbuflen, '}');
-	    while ((*s != '}' || (reevaluate && s[-1] != '%')) && *s)
+		തിരികെ illegal_char(errbuf, errbuflen, '}');
+	    ആകുമ്പോൾ ((*s != '}' || (reevaluate && s[-1] != '%')) && *s)
 		s++;
-	    if (*s != '}')
-		return e_unclosed_expression_sequence;
+	    എങ്കിൽ (*s != '}')
+		തിരികെ e_unclosed_expression_sequence;
 	}
     }
-    if (groupdepth != 0)
-	return e_unbalanced_groups;
-    return NULL;
+    എങ്കിൽ (groupdepth != 0)
+	തിരികെ e_unbalanced_groups;
+    തിരികെ ശൂന്യ;
 }
 #endif
 
@@ -785,161 +785,161 @@ check_stl_option(char_u *s)
  * path separator (slash and/or backslash), wildcards and characters that are
  * often illegal in a file name. Be more permissive if "secure" is off.
  */
-    static int
-check_illegal_path_names(int opt_idx, char_u **varp)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+check_illegal_path_names(പൂർണ്ണസംഖ്യ opt_idx, char_u **varp)
 {
-    return (((get_option_flags(opt_idx) & P_NFNAME)
+    തിരികെ (((get_option_flags(opt_idx) & P_NFNAME)
 		&& vim_strpbrk(*varp, (char_u *)(secure
-			? "/\\*?[|;&<>\r\n" : "/\\*?[<>\r\n")) != NULL)
+			? "/\\*?[|;&<>\r\n" : "/\\*?[<>\r\n")) != ശൂന്യ)
 	    || ((get_option_flags(opt_idx) & P_NDNAME)
-		&& vim_strpbrk(*varp, (char_u *)"*?[|;&<>\r\n") != NULL));
+		&& vim_strpbrk(*varp, (char_u *)"*?[|;&<>\r\n") != ശൂന്യ));
 }
 
 /*
  * An option that accepts a list of flags is changed.
  * e.g. 'viewoptions', 'switchbuf', 'casemap', etc.
  */
-    static char *
-did_set_opt_flags(char_u *val, char **values, unsigned *flagp, int list)
+    സ്ഥിതം അക്ഷരം *
+did_set_opt_flags(char_u *val, അക്ഷരം **മൂല്യങ്ങൾ, unsigned *flagp, പൂർണ്ണസംഖ്യ list)
 {
-    if (opt_strings_flags(val, values, flagp, list) == FAIL)
-	return e_invalid_argument;
+    എങ്കിൽ (opt_strings_flags(val, മൂല്യങ്ങൾ, flagp, list) == FAIL)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * An option that accepts a list of string values is changed.
  * e.g. 'nrformats', 'scrollopt', 'wildoptions', etc.
  */
-    static char *
-did_set_opt_strings(char_u *val, char **values, int list)
+    സ്ഥിതം അക്ഷരം *
+did_set_opt_strings(char_u *val, അക്ഷരം **മൂല്യങ്ങൾ, പൂർണ്ണസംഖ്യ list)
 {
-    return did_set_opt_flags(val, values, NULL, list);
+    തിരികെ did_set_opt_flags(val, മൂല്യങ്ങൾ, ശൂന്യ, list);
 }
 
 /*
  * An option which is a list of flags is set.  Valid values are in 'flags'.
  */
-    static char *
+    സ്ഥിതം അക്ഷരം *
 did_set_option_listflag(
 	char_u *val,
 	char_u *flags,
-	char *errbuf,
+	അക്ഷരം *errbuf,
 	size_t errbuflen)
 {
     char_u	*s;
 
-    for (s = val; *s; ++s)
-	if (vim_strchr(flags, *s) == NULL)
-	    return illegal_char(errbuf, errbuflen, *s);
+    വേണ്ടി (s = val; *s; ++s)
+	എങ്കിൽ (vim_strchr(flags, *s) == ശൂന്യ)
+	    തിരികെ illegal_char(errbuf, errbuflen, *s);
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * Expand an option that accepts a list of fixed string values with known
  * number of items.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 expand_set_opt_string(
 	optexpand_T *args,
-	char **values,
-	size_t numValues,
-	int *numMatches,
+	അക്ഷരം **മൂല്യങ്ങൾ,
+	size_t അക്കം_മൂല്യങ്ങൾ,
+	പൂർണ്ണസംഖ്യ *അക്കം_Matches,
 	char_u ***matches)
 {
     char_u	*p;
     regmatch_T	*regmatch = args->oe_regmatch;
-    int		include_orig_val = args->oe_include_orig_val;
-    char_u	*option_val = args->oe_opt_value;
+    പൂർണ്ണസംഖ്യ		include_orig_val = args->oe_include_orig_val;
+    char_u	*option_val = args->oe_opt_മൂല്യം;
 
     // Assume numValues is small since they are fixed enums, so just allocate
     // upfront instead of needing two passes to calculate output size.
-    *matches = ALLOC_MULT(char_u *, numValues + 1);
-    if (*matches == NULL)
-	return FAIL;
+    *matches = ALLOC_MULT(char_u *, അക്കം_മൂല്യങ്ങൾ + 1);
+    എങ്കിൽ (*matches == ശൂന്യ)
+	തിരികെ FAIL;
 
-    int count = 0;
+    പൂർണ്ണസംഖ്യ എണ്ണം = 0;
 
-    if (include_orig_val && *option_val != NUL)
+    എങ്കിൽ (include_orig_val && *option_val != NUL)
     {
 	p = vim_strsave(option_val);
-	if (p == NULL)
+	എങ്കിൽ (p == ശൂന്യ)
 	{
 	    VIM_CLEAR(*matches);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
-	(*matches)[count++] = p;
+	(*matches)[എണ്ണം++] = p;
     }
 
-    for (char **val = values; *val != NULL; val++)
+    വേണ്ടി (അക്ഷരം **val = മൂല്യങ്ങൾ; *val != ശൂന്യ; val++)
     {
-	if (include_orig_val && *option_val != NUL)
+	എങ്കിൽ (include_orig_val && *option_val != NUL)
 	{
-	    if (STRCMP((char_u*)*val, option_val) == 0)
-		continue;
+	    എങ്കിൽ (STRCMP((char_u*)*val, option_val) == 0)
+		തുടരുക;
 	}
-	if (vim_regexec(regmatch, (char_u*)(*val), (colnr_T)0))
+	എങ്കിൽ (vim_regexec(regmatch, (char_u*)(*val), (colnr_T)0))
 	{
 	    p = vim_strsave((char_u*)*val);
-	    if (p == NULL)
+	    എങ്കിൽ (p == ശൂന്യ)
 	    {
-		if (count == 0)
+		എങ്കിൽ (എണ്ണം == 0)
 		{
 		    VIM_CLEAR(*matches);
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
-		else
-		    break;
+		അല്ലെങ്കിൽ
+		    നിർത്തുക;
 	    }
-	    (*matches)[count++] = p;
+	    (*matches)[എണ്ണം++] = p;
 	}
     }
-    if (count == 0)
+    എങ്കിൽ (എണ്ണം == 0)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    *numMatches = count;
-    return OK;
+    *അക്കം_Matches = എണ്ണം;
+    തിരികെ OK;
 }
 
-static char_u *set_opt_callback_orig_option = NULL;
-static char_u *((*set_opt_callback_func)(expand_T *, int));
+സ്ഥിതം char_u *set_opt_callback_orig_option = ശൂന്യ;
+സ്ഥിതം char_u *((*set_opt_callback_func)(expand_T *, പൂർണ്ണസംഖ്യ));
 
 /*
  * Callback used by expand_set_opt_generic to also include the original value
  * as the first item.
  */
-    static char_u *
-expand_set_opt_generic_cb(expand_T *xp, int idx)
+    സ്ഥിതം char_u *
+expand_set_opt_generic_cb(expand_T *xp, പൂർണ്ണസംഖ്യ idx)
 {
-    if (idx == 0)
+    എങ്കിൽ (idx == 0)
     {
-	if (set_opt_callback_orig_option != NULL)
-	    return set_opt_callback_orig_option;
-	else
-	    return (char_u *)""; // empty strings are ignored
+	എങ്കിൽ (set_opt_callback_orig_option != ശൂന്യ)
+	    തിരികെ set_opt_callback_orig_option;
+	അല്ലെങ്കിൽ
+	    തിരികെ (char_u *)""; // empty strings are ignored
     }
-    return set_opt_callback_func(xp, idx - 1);
+    തിരികെ set_opt_callback_func(xp, idx - 1);
 }
 
 /*
  * Expand an option with a callback that iterates through a list of possible
  * names using an index.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 expand_set_opt_generic(
 	optexpand_T *args,
-	char_u *((*func)(expand_T *, int)),
-	int *numMatches,
+	char_u *((*func)(expand_T *, പൂർണ്ണസംഖ്യ)),
+	പൂർണ്ണസംഖ്യ *അക്കം_Matches,
 	char_u ***matches)
 {
-    int ret;
+    പൂർണ്ണസംഖ്യ ret;
 
     set_opt_callback_orig_option = args->oe_include_orig_val ?
-	args->oe_opt_value : NULL;
+	args->oe_opt_മൂല്യം : ശൂന്യ;
     set_opt_callback_func = func;
 
     ret = ExpandGeneric(
@@ -947,18 +947,18 @@ expand_set_opt_generic(
 	    args->oe_xp,
 	    args->oe_regmatch,
 	    matches,
-	    numMatches,
+	    അക്കം_Matches,
 	    expand_set_opt_generic_cb,
 	    FALSE);
 
-    set_opt_callback_orig_option = NULL;
-    set_opt_callback_func = NULL;
-    return ret;
+    set_opt_callback_orig_option = ശൂന്യ;
+    set_opt_callback_func = ശൂന്യ;
+    തിരികെ ret;
 }
 
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
-static garray_T *expand_cb_ga;
-static optexpand_T *expand_cb_args;
+#എങ്കിൽ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+സ്ഥിതം garray_T *expand_cb_ga;
+സ്ഥിതം optexpand_T *expand_cb_args;
 
 /*
  * Callback provided to a function in expand_set_opt_callback. Will perform
@@ -967,7 +967,7 @@ static optexpand_T *expand_cb_args;
  * Returns OK usually. Returns FAIL if it failed to allocate memory, and the
  * caller should terminate the enumeration.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 expand_set_opt_callback_cb(char_u *val)
 {
     regmatch_T	*regmatch = expand_cb_args->oe_regmatch;
@@ -975,27 +975,27 @@ expand_set_opt_callback_cb(char_u *val)
     garray_T	*ga = expand_cb_ga;
     char_u	*str;
 
-    if (val == NULL || *val == NUL)
-	return OK;
+    എങ്കിൽ (val == ശൂന്യ || *val == NUL)
+	തിരികെ OK;
 
-    if (xp->xp_pattern[0] != NUL &&
+    എങ്കിൽ (xp->xp_pattern[0] != NUL &&
 	    !vim_regexec(regmatch, val, (colnr_T)0))
-	return OK;
+	തിരികെ OK;
 
     str = vim_strsave_escaped(val, (char_u *)" \t\\");
 
-    if (str == NULL)
-	return FAIL;
+    എങ്കിൽ (str == ശൂന്യ)
+	തിരികെ FAIL;
 
-    if (ga_grow(ga, 1) == FAIL)
+    എങ്കിൽ (ga_grow(ga, 1) == FAIL)
     {
 	vim_free(str);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     ((char_u **)ga->ga_data)[ga->ga_len] = str;
     ++ga->ga_len;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1006,29 +1006,29 @@ expand_set_opt_callback_cb(char_u *val)
  * "func" is the enumerator function that will generate the list of options.
  * "func_params" is a single parameter that will be passed to func.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 expand_set_opt_callback(
 	optexpand_T *args,
-	void (*func)(optexpand_T *, void* params, int (*cb)(char_u *val)),
-	void *func_params,
-	int *numMatches,
+	ശൂന്യം (*func)(optexpand_T *, ശൂന്യം* params, പൂർണ്ണസംഖ്യ (*cb)(char_u *val)),
+	ശൂന്യം *func_params,
+	പൂർണ്ണസംഖ്യ *അക്കം_Matches,
 	char_u ***matches)
 {
     garray_T	ga;
-    int		include_orig_val = args->oe_include_orig_val;
-    char_u	*option_val = args->oe_opt_value;
+    പൂർണ്ണസംഖ്യ		include_orig_val = args->oe_include_orig_val;
+    char_u	*option_val = args->oe_opt_മൂല്യം;
 
-    ga_init2(&ga, sizeof(char *), 30);
+    ga_init2(&ga, വലുപ്പം(അക്ഷരം *), 30);
 
-    if (include_orig_val && *option_val != NUL)
+    എങ്കിൽ (include_orig_val && *option_val != NUL)
     {
 	char_u *p = vim_strsave(option_val);
-	if (p == NULL)
-	    return FAIL;
-	if (ga_grow(&ga, 1) == FAIL)
+	എങ്കിൽ (p == ശൂന്യ)
+	    തിരികെ FAIL;
+	എങ്കിൽ (ga_grow(&ga, 1) == FAIL)
 	{
 	    vim_free(p);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	((char_u **)ga.ga_data)[ga.ga_len] = p;
 	++ga.ga_len;
@@ -1039,158 +1039,158 @@ expand_set_opt_callback(
 
     func(args, func_params, expand_set_opt_callback_cb);
 
-    expand_cb_ga = NULL;
-    expand_cb_args = NULL;
+    expand_cb_ga = ശൂന്യ;
+    expand_cb_args = ശൂന്യ;
 
     *matches = ga.ga_data;
-    *numMatches = ga.ga_len;
-    return OK;
+    *അക്കം_Matches = ga.ga_len;
+    തിരികെ OK;
 }
 #endif
 
 /*
  * Expand an option which is a list of flags.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 expand_set_opt_listflag(
 	optexpand_T *args,
 	char_u *flags,
-	int *numMatches,
+	പൂർണ്ണസംഖ്യ *അക്കം_Matches,
 	char_u ***matches)
 {
     char_u  *p;
-    char_u  *option_val = args->oe_opt_value;
+    char_u  *option_val = args->oe_opt_മൂല്യം;
     char_u  *cmdline_val = args->oe_set_arg;
-    int	    append = args->oe_append;
-    int	    include_orig_val = args->oe_include_orig_val && (*option_val != NUL);
+    പൂർണ്ണസംഖ്യ	    append = args->oe_append;
+    പൂർണ്ണസംഖ്യ	    include_orig_val = args->oe_include_orig_val && (*option_val != NUL);
 
-    size_t num_flags = STRLEN(flags);
+    size_t അക്കം_flags = STRLEN(flags);
 
     // Assume we only have small number of flags, so just allocate max size.
-    *matches = ALLOC_MULT(char_u *, num_flags + 1);
-    if (*matches == NULL)
-	return FAIL;
+    *matches = ALLOC_MULT(char_u *, അക്കം_flags + 1);
+    എങ്കിൽ (*matches == ശൂന്യ)
+	തിരികെ FAIL;
 
-    int count = 0;
+    പൂർണ്ണസംഖ്യ എണ്ണം = 0;
 
-    if (include_orig_val)
+    എങ്കിൽ (include_orig_val)
     {
 	p = vim_strsave(option_val);
-	if (p == NULL)
+	എങ്കിൽ (p == ശൂന്യ)
 	{
 	    VIM_CLEAR(*matches);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
-	(*matches)[count++] = p;
+	(*matches)[എണ്ണം++] = p;
     }
 
-    for (char_u *flag = flags; *flag != NUL; flag++)
+    വേണ്ടി (char_u *flag = flags; *flag != NUL; flag++)
     {
-	if (append && vim_strchr(option_val, *flag) != NULL)
-	    continue;
+	എങ്കിൽ (append && vim_strchr(option_val, *flag) != ശൂന്യ)
+	    തുടരുക;
 
-	if (vim_strchr(cmdline_val, *flag) == NULL)
+	എങ്കിൽ (vim_strchr(cmdline_val, *flag) == ശൂന്യ)
 	{
-	    if (include_orig_val
+	    എങ്കിൽ (include_orig_val
 		    && option_val[1] == NUL
 		    && *flag == option_val[0])
 	    {
 		// This value is already used as the first choice as it's the
 		// existing flag. Just skip it to avoid duplicate.
-		continue;
+		തുടരുക;
 	    }
 	    p = vim_strnsave(flag, 1);
-	    if (p == NULL)
+	    എങ്കിൽ (p == ശൂന്യ)
 	    {
-		if (count == 0)
+		എങ്കിൽ (എണ്ണം == 0)
 		{
 		    VIM_CLEAR(*matches);
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
-		else
-		    break;
+		അല്ലെങ്കിൽ
+		    നിർത്തുക;
 	    }
-	    (*matches)[count++] = p;
+	    (*matches)[എണ്ണം++] = p;
 	}
     }
 
-    if (count == 0)
+    എങ്കിൽ (എണ്ണം == 0)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    *numMatches = count;
-    return OK;
+    *അക്കം_Matches = എണ്ണം;
+    തിരികെ OK;
 }
 
 /*
  * The 'ambiwidth' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_ambiwidth(optset_T *args UNUSED)
 {
-    if (check_opt_strings(p_ambw, p_ambw_values, FALSE) != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (check_opt_strings(p_ambw, p_ambw_മൂല്യങ്ങൾ, FALSE) != OK)
+	തിരികെ e_invalid_argument;
 
-    return check_chars_options();
+    തിരികെ check_chars_options();
 }
 
 // "name" must be a string literal, the length is computed at compile time.
-#define completing_value_for_subopt(args, name) \
-	  completing_value_for_subopt_len(args, name, (int)STRLEN_LITERAL(name))
+#define completing_മൂല്യം_for_subopt(args, name) \
+	  completing_മൂല്യം_for_subopt_len(args, name, (പൂർണ്ണസംഖ്യ)STRLEN_LITERAL(name))
 
 /*
  * Return true when completing the value of the sub-option "name" with length
  * "len", e.g. the value after "close:" in 'completepopup'.
  */
-    static bool
-completing_value_for_subopt_len(optexpand_T *args, char *name, int len)
+    സ്ഥിതം bool
+completing_മൂല്യം_for_subopt_len(optexpand_T *args, അക്ഷരം *name, പൂർണ്ണസംഖ്യ len)
 {
     char_u  *colon = args->oe_xp->xp_pattern - 1;
-    int	    off = (int)(colon - args->oe_set_arg);
+    പൂർണ്ണസംഖ്യ	    off = (പൂർണ്ണസംഖ്യ)(colon - args->oe_set_arg);
 
-    if (off < len)
-	return false;
+    എങ്കിൽ (off < len)
+	തിരികെ false;
     // The name must follow a comma when it does not start the option value.
-    if (off > len && *(colon - len - 1) != ',')
-	return false;
+    എങ്കിൽ (off > len && *(colon - len - 1) != ',')
+	തിരികെ false;
 
-    return STRNCMP(colon - len, name, len) == 0;
+    തിരികെ STRNCMP(colon - len, name, len) == 0;
 }
 
-    int
-expand_set_ambiwidth(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_ambiwidth(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_ambw_values,
-	    ARRAY_LENGTH(p_ambw_values) - 1,
-	    numMatches,
+	    p_ambw_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_ambw_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'background' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_background(optset_T *args)
 {
-    if (check_opt_strings(p_bg, p_bg_values, FALSE) == FAIL)
-	return e_invalid_argument;
+    എങ്കിൽ (check_opt_strings(p_bg, p_bg_മൂല്യങ്ങൾ, FALSE) == FAIL)
+	തിരികെ e_invalid_argument;
 
-    if (args->os_oldval.string != NULL && args->os_oldval.string[0] == *p_bg)
+    എങ്കിൽ (args->os_oldval.string != ശൂന്യ && args->os_oldval.string[0] == *p_bg)
 	// Value was not changed
-	return NULL;
+	തിരികെ ശൂന്യ;
 
 #ifdef FEAT_EVAL
-    int dark = (*p_bg == 'd');
+    പൂർണ്ണസംഖ്യ dark = (*p_bg == 'd');
 #endif
 
     init_highlight(FALSE, FALSE);
 
 #ifdef FEAT_EVAL
-    if (dark != (*p_bg == 'd')
-	    && get_var_value((char_u *)"g:colors_name") != NULL)
+    എങ്കിൽ (dark != (*p_bg == 'd')
+	    && get_var_മൂല്യം((char_u *)"g:colors_name") != ശൂന്യ)
     {
 	// The color scheme must have set 'background' back to another
 	// value, that's not what we want here.  Disable the color
@@ -1206,208 +1206,208 @@ did_set_background(optset_T *args)
     term_update_colors_all();
 #endif
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_background(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_background(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_bg_values,
-	    ARRAY_LENGTH(p_bg_values) - 1,
-	    numMatches,
+	    p_bg_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_bg_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'backspace' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_backspace(optset_T *args UNUSED)
 {
-    if (VIM_ISDIGIT(*p_bs))
+    എങ്കിൽ (VIM_ISDIGIT(*p_bs))
     {
-	if (*p_bs > '3' || p_bs[1] != NUL)
-	    return e_invalid_argument;
+	എങ്കിൽ (*p_bs > '3' || p_bs[1] != NUL)
+	    തിരികെ e_invalid_argument;
     }
-    else if (check_opt_strings(p_bs, p_bs_values, TRUE) != OK)
-	return e_invalid_argument;
+    അല്ലെങ്കിൽ എങ്കിൽ (check_opt_strings(p_bs, p_bs_മൂല്യങ്ങൾ, TRUE) != OK)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_backspace(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_backspace(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_bs_values,
-	    ARRAY_LENGTH(p_bs_values) - 1,
-	    numMatches,
+	    p_bs_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_bs_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'backupcopy' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_backupcopy(optset_T *args)
 {
     char_u		*bkc = p_bkc;
-    unsigned int	*flags = &bkc_flags;
-    char		*errmsg = NULL;
+    unsigned പൂർണ്ണസംഖ്യ	*flags = &bkc_flags;
+    അക്ഷരം		*errmsg = ശൂന്യ;
 
-    if (args->os_flags & OPT_LOCAL)
+    എങ്കിൽ (args->os_flags & OPT_LOCAL)
     {
 	bkc = curbuf->b_p_bkc;
 	flags = &curbuf->b_bkc_flags;
     }
-    else if (!(args->os_flags & OPT_GLOBAL))
+    അല്ലെങ്കിൽ എങ്കിൽ (!(args->os_flags & OPT_GLOBAL))
 	// When using :set, clear the local flags.
 	curbuf->b_bkc_flags = 0;
 
-    if ((args->os_flags & OPT_LOCAL) && *bkc == NUL)
+    എങ്കിൽ ((args->os_flags & OPT_LOCAL) && *bkc == NUL)
 	// make the local value empty: use the global value
 	*flags = 0;
-    else
+    അല്ലെങ്കിൽ
     {
-	if (opt_strings_flags(bkc, p_bkc_values, flags, TRUE) != OK)
+	എങ്കിൽ (opt_strings_flags(bkc, p_bkc_മൂല്യങ്ങൾ, flags, TRUE) != OK)
 	    errmsg = e_invalid_argument;
-	if ((((int)*flags & BKC_AUTO) != 0)
-		+ (((int)*flags & BKC_YES) != 0)
-		+ (((int)*flags & BKC_NO) != 0) != 1)
+	എങ്കിൽ ((((പൂർണ്ണസംഖ്യ)*flags & BKC_AUTO) != 0)
+		+ (((പൂർണ്ണസംഖ്യ)*flags & BKC_YES) != 0)
+		+ (((പൂർണ്ണസംഖ്യ)*flags & BKC_NO) != 0) != 1)
 	{
 	    // Must have exactly one of "auto", "yes"  and "no".
-	    (void)opt_strings_flags(args->os_oldval.string, p_bkc_values,
+	    (ശൂന്യം)opt_strings_flags(args->os_oldval.string, p_bkc_മൂല്യങ്ങൾ,
 								  flags, TRUE);
 	    errmsg = e_invalid_argument;
 	}
     }
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 
-    int
-expand_set_backupcopy(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_backupcopy(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_bkc_values,
-	    ARRAY_LENGTH(p_bkc_values) - 1,
-	    numMatches,
+	    p_bkc_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_bkc_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'backupext' or the 'patchmode' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_backupext_or_patchmode(optset_T *args UNUSED)
 {
-    if (STRCMP(*p_bex == '.' ? p_bex + 1 : p_bex,
+    എങ്കിൽ (STRCMP(*p_bex == '.' ? p_bex + 1 : p_bex,
 		*p_pm == '.' ? p_pm + 1 : p_pm) == 0)
-	return e_backupext_and_patchmode_are_equal;
+	തിരികെ e_backupext_and_patchmode_are_equal;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'belloff' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_belloff(optset_T *args UNUSED)
 {
-    return did_set_opt_flags(p_bo, p_bo_values, &bo_flags, TRUE);
+    തിരികെ did_set_opt_flags(p_bo, p_bo_മൂല്യങ്ങൾ, &bo_flags, TRUE);
 }
 
-    int
-expand_set_belloff(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_belloff(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_bo_values,
-	    ARRAY_LENGTH(p_bo_values) - 1,
-	    numMatches,
+	    p_bo_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_bo_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
-#if defined(FEAT_LINEBREAK)
+#എങ്കിൽ defined(FEAT_LINEBREAK)
 /*
  * The 'breakat' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_breakat(optset_T *args UNUSED)
 {
     char_u	*p;
-    int		i;
+    പൂർണ്ണസംഖ്യ		i;
 
-    for (i = 0; i < 256; i++)
+    വേണ്ടി (i = 0; i < 256; i++)
 	breakat_flags[i] = FALSE;
 
-    if (p_breakat != NULL)
-	for (p = p_breakat; *p; p++)
+    എങ്കിൽ (p_breakat != ശൂന്യ)
+	വേണ്ടി (p = p_breakat; *p; p++)
 	    breakat_flags[*p] = TRUE;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'breakindentopt' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_breakindentopt(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (briopt_check(*varp, varp == &curwin->w_p_briopt ? curwin : NULL)
+    എങ്കിൽ (briopt_check(*varp, varp == &curwin->w_p_briopt ? curwin : ശൂന്യ)
 								      == FAIL)
-	return e_invalid_argument;
+	തിരികെ e_invalid_argument;
 
     // list setting requires a redraw
-    if (varp == &curwin->w_p_briopt && curwin->w_briopt_list)
+    എങ്കിൽ (varp == &curwin->w_p_briopt && curwin->w_briopt_list)
 	redraw_all_later(UPD_NOT_VALID);
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
+    പൂർണ്ണസംഖ്യ
 expand_set_breakindentopt(
     optexpand_T		*args,
-    int			*numMatches,
+    പൂർണ്ണസംഖ്യ			*അക്കം_Matches,
     char_u		***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_briopt_values,
-	    ARRAY_LENGTH(p_briopt_values) - 1,
-	    numMatches,
+	    p_briopt_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_briopt_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
 
-#if defined(FEAT_BROWSE)
+#എങ്കിൽ defined(FEAT_BROWSE)
 /*
  * The 'browsedir' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_browsedir(optset_T *args UNUSED)
 {
-    if (check_opt_strings(p_bsdir, p_bsdir_values, FALSE) != OK
+    എങ്കിൽ (check_opt_strings(p_bsdir, p_bsdir_മൂല്യങ്ങൾ, FALSE) != OK
 	    && !mch_isdir(p_bsdir))
-	return e_invalid_argument;
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_browsedir(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_browsedir(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_bsdir_values,
-	    ARRAY_LENGTH(p_bsdir_values) - 1,
-	    numMatches,
+	    p_bsdir_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_bsdir_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
@@ -1415,33 +1415,33 @@ expand_set_browsedir(optexpand_T *args, int *numMatches, char_u ***matches)
 /*
  * The 'bufhidden' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_bufhidden(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(curbuf->b_p_bh, p_bufhidden_values, FALSE);
+    തിരികെ did_set_opt_strings(curbuf->b_p_bh, p_bufhidden_മൂല്യങ്ങൾ, FALSE);
 }
 
-    int
-expand_set_bufhidden(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_bufhidden(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_bufhidden_values,
-	    ARRAY_LENGTH(p_bufhidden_values) - 1,
-	    numMatches,
+	    p_bufhidden_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_bufhidden_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'buftype' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_buftype(optset_T *args UNUSED)
 {
-    if (check_opt_strings(curbuf->b_p_bt, p_buftype_values, FALSE) != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (check_opt_strings(curbuf->b_p_bt, p_buftype_മൂല്യങ്ങൾ, FALSE) != OK)
+	തിരികെ e_invalid_argument;
 
-    if (curwin->w_status_height)
+    എങ്കിൽ (curwin->w_status_height)
     {
 	curwin->w_redr_status = true;
 	redraw_later(UPD_VALID);
@@ -1449,150 +1449,150 @@ did_set_buftype(optset_T *args UNUSED)
     curbuf->b_help = (curbuf->b_p_bt[0] == 'h');
     redraw_titles();
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_buftype(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_buftype(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_buftype_values,
-	    ARRAY_LENGTH(p_buftype_values) - 1,
-	    numMatches,
+	    p_buftype_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_buftype_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'casemap' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_casemap(optset_T *args UNUSED)
 {
-    return did_set_opt_flags(p_cmp, p_cmp_values, &cmp_flags, TRUE);
+    തിരികെ did_set_opt_flags(p_cmp, p_cmp_മൂല്യങ്ങൾ, &cmp_flags, TRUE);
 }
 
-    int
-expand_set_casemap(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_casemap(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_cmp_values,
-	    ARRAY_LENGTH(p_cmp_values) - 1,
-	    numMatches,
+	    p_cmp_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_cmp_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
-#if defined(HAVE_CLIPMETHOD)
-    int
-expand_set_clipboard(optexpand_T *args, int *numMatches, char_u ***matches)
+#എങ്കിൽ defined(HAVE_CLIPMETHOD)
+    പൂർണ്ണസംഖ്യ
+expand_set_clipboard(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_cb_values,
-	    ARRAY_LENGTH(p_cb_values) - 1,
-	    numMatches,
+	    p_cb_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_cb_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
 
 #ifdef HAVE_CLIPMETHOD
-    char *
+    അക്ഷരം *
 did_set_clipmethod(optset_T *args UNUSED)
 {
-    return choose_clipmethod();
+    തിരികെ choose_clipmethod();
 }
 
-    int
-expand_set_clipmethod(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_clipmethod(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
     // We want to expand using the predefined clipmethod values + clipboard
     // provider names.
-    int		result;
-    char	**values;
-    int		count, pos = 0, start = 0;
+    പൂർണ്ണസംഖ്യ		result;
+    അക്ഷരം	**മൂല്യങ്ങൾ;
+    പൂർണ്ണസംഖ്യ		എണ്ണം, pos = 0, start = 0;
 # ifdef FEAT_EVAL
     dict_T	*providers = get_vim_var_dict(VV_CLIPPROVIDERS);
-# else
-    dict_T	*providers = NULL;
+# അല്ലെങ്കിൽ
+    dict_T	*providers = ശൂന്യ;
 # endif
-    hashtab_T	*ht = providers == NULL ? NULL : &providers->dv_hashtab;
+    hashtab_T	*ht = providers == ശൂന്യ ? ശൂന്യ : &providers->dv_hashtab;
 
-    count = (ht == NULL ? 0 : ht->ht_used);
+    എണ്ണം = (ht == ശൂന്യ ? 0 : ht->ht_used);
 # ifdef FEAT_WAYLAND_CLIPBOARD
-    count++;
+    എണ്ണം++;
     start++;
 # endif
 # ifdef FEAT_XCLIPBOARD
-    count++;
+    എണ്ണം++;
     start++;
 # endif
-    values = ALLOC_MULT(char *, count + 1); // Add NULL terminator too
+    മൂല്യങ്ങൾ = ALLOC_MULT(അക്ഷരം *, എണ്ണം + 1); // Add NULL terminator too
 
-    if (values == NULL)
-	return FAIL;
+    എങ്കിൽ (മൂല്യങ്ങൾ == ശൂന്യ)
+	തിരികെ FAIL;
 
 # ifdef FEAT_WAYLAND_CLIPBOARD
-    values[pos++] = "wayland";
+    മൂല്യങ്ങൾ[pos++] = "wayland";
 # endif
 # ifdef FEAT_XCLIPBOARD
-    values[pos++] = "x11";
+    മൂല്യങ്ങൾ[pos++] = "x11";
 # endif
 
-    if (ht != NULL)
-	for (long_u i = 0; i < ht->ht_mask + 1; i++)
+    എങ്കിൽ (ht != ശൂന്യ)
+	വേണ്ടി (long_u i = 0; i < ht->ht_mask + 1; i++)
 	{
 	    hashitem_T	*hi = ht->ht_array + i;
 
-	    if (!HASHITEM_EMPTY(hi))
-		values[pos++] = (char *)vim_strsave(hi->hi_key);
+	    എങ്കിൽ (!HASHITEM_EMPTY(hi))
+		മൂല്യങ്ങൾ[pos++] = (അക്ഷരം *)vim_strsave(hi->hi_താക്കോൽ);
 	}
-    values[pos++] = NULL;
+    മൂല്യങ്ങൾ[pos++] = ശൂന്യ;
 
     result = expand_set_opt_string(
 	    args,
-	    values,
-	    count,
-	    numMatches,
+	    മൂല്യങ്ങൾ,
+	    എണ്ണം,
+	    അക്കം_Matches,
 	    matches);
 
-    for (int i = start; i < count; i++)
-	vim_free(values[i]);
-    vim_free(values);
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = start; i < എണ്ണം; i++)
+	vim_free(മൂല്യങ്ങൾ[i]);
+    vim_free(മൂല്യങ്ങൾ);
 
-    return result;
+    തിരികെ result;
 }
 #endif
 
 /*
  * The global 'listchars' or 'fillchars' option is changed.
  */
-    static char *
-did_set_global_listfillchars(char_u *val, int opt_lcs, int opt_flags,
-						char *errbuf, size_t errbuflen)
+    സ്ഥിതം അക്ഷരം *
+did_set_global_listfillchars(char_u *val, പൂർണ്ണസംഖ്യ opt_lcs, പൂർണ്ണസംഖ്യ opt_flags,
+						അക്ഷരം *errbuf, size_t errbuflen)
 {
-    char	*errmsg = NULL;
+    അക്ഷരം	*errmsg = ശൂന്യ;
     char_u	**local_ptr = opt_lcs ? &curwin->w_p_lcs : &curwin->w_p_fcs;
 
     // only apply the global value to "curwin" when it does not have a
     // local value
-    if (opt_lcs)
+    എങ്കിൽ (opt_lcs)
 	errmsg = set_listchars_option(curwin, val,
 		**local_ptr == NUL || !(opt_flags & OPT_GLOBAL),
 							    errbuf, errbuflen);
-    else
+    അല്ലെങ്കിൽ
 	errmsg = set_fillchars_option(curwin, val,
 		**local_ptr == NUL || !(opt_flags & OPT_GLOBAL),
 							    errbuf, errbuflen);
-    if (errmsg != NULL)
-	return errmsg;
+    എങ്കിൽ (errmsg != ശൂന്യ)
+	തിരികെ errmsg;
 
     tabpage_T	*tp;
     win_T	*wp;
 
     // If the current window is set to use the global
     // 'listchars'/'fillchars' value, clear the window-local value.
-    if (!(opt_flags & OPT_GLOBAL))
+    എങ്കിൽ (!(opt_flags & OPT_GLOBAL))
 	clear_string_option(local_ptr);
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
@@ -1600,144 +1600,144 @@ did_set_global_listfillchars(char_u *val, int opt_lcs, int opt_flags,
 	// again, it was changed when setting the global value.
 	// If no error was returned above, we don't expect an error
 	// here, so ignore the return value.
-	if (opt_lcs)
+	എങ്കിൽ (opt_lcs)
 	{
-	    if (*wp->w_p_lcs == NUL)
-		(void)set_listchars_option(wp, wp->w_p_lcs, TRUE, NULL, 0);
+	    എങ്കിൽ (*wp->w_p_lcs == NUL)
+		(ശൂന്യം)set_listchars_option(wp, wp->w_p_lcs, TRUE, ശൂന്യ, 0);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    if (*wp->w_p_fcs == NUL)
-		(void)set_fillchars_option(wp, wp->w_p_fcs, TRUE, NULL, 0);
+	    എങ്കിൽ (*wp->w_p_fcs == NUL)
+		(ശൂന്യം)set_fillchars_option(wp, wp->w_p_fcs, TRUE, ശൂന്യ, 0);
 	}
     }
 
     redraw_all_later(UPD_NOT_VALID);
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'fillchars' option or the 'listchars' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_chars_option(optset_T *args)
 {
     char_u **varp = (char_u **)args->os_varp;
-    char *errmsg = NULL;
+    അക്ഷരം *errmsg = ശൂന്യ;
 
-    if (   varp == &p_lcs		// global 'listchars'
+    എങ്കിൽ (   varp == &p_lcs		// global 'listchars'
 	|| varp == &p_fcs)		// global 'fillchars'
 	errmsg = did_set_global_listfillchars(*varp, varp == &p_lcs,
 			  args->os_flags, args->os_errbuf, args->os_errbuflen);
-    else if (varp == &curwin->w_p_lcs)	// local 'listchars'
+    അല്ലെങ്കിൽ എങ്കിൽ (varp == &curwin->w_p_lcs)	// local 'listchars'
 	errmsg = set_listchars_option(curwin, *varp, TRUE,
 					  args->os_errbuf, args->os_errbuflen);
-    else if (varp == &curwin->w_p_fcs)	// local 'fillchars'
+    അല്ലെങ്കിൽ എങ്കിൽ (varp == &curwin->w_p_fcs)	// local 'fillchars'
 	errmsg = set_fillchars_option(curwin, *varp, TRUE,
 					  args->os_errbuf, args->os_errbuflen);
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 
 /*
  * Expand 'fillchars' or 'listchars' option value.
  */
-    int
-expand_set_chars_option(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_chars_option(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
     char_u **varp = (char_u **)args->oe_varp;
-    int is_lcs = (varp == &p_lcs || varp == &curwin->w_p_lcs);
-    return expand_set_opt_generic(
+    പൂർണ്ണസംഖ്യ is_lcs = (varp == &p_lcs || varp == &curwin->w_p_lcs);
+    തിരികെ expand_set_opt_generic(
 	    args,
 	    is_lcs ? get_listchars_name : get_fillchars_name,
-	    numMatches,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'cinoptions' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_cinoptions(optset_T *args UNUSED)
 {
     // TODO: recognize errors
     parse_cino(curbuf);
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-#if defined(FEAT_SYN_HL)
+#എങ്കിൽ defined(FEAT_SYN_HL)
 /*
  * The 'colorcolumn' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_colorcolumn(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    return check_colorcolumn(*varp, varp == &curwin->w_p_cc ? curwin : NULL);
+    തിരികെ check_colorcolumn(*varp, varp == &curwin->w_p_cc ? curwin : ശൂന്യ);
 }
 #endif
 
 /*
  * The 'comments' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_comments(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
     char_u	*s;
-    char	*errmsg = NULL;
+    അക്ഷരം	*errmsg = ശൂന്യ;
 
-    for (s = *varp; *s; )
+    വേണ്ടി (s = *varp; *s; )
     {
-	while (*s && *s != ':')
+	ആകുമ്പോൾ (*s && *s != ':')
 	{
-	    if (vim_strchr((char_u *)COM_ALL, *s) == NULL
+	    എങ്കിൽ (vim_strchr((char_u *)COM_ALL, *s) == ശൂന്യ
 		    && !VIM_ISDIGIT(*s) && *s != '-')
 	    {
 		errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, *s);
-		break;
+		നിർത്തുക;
 	    }
 	    ++s;
 	}
-	if (*s++ == NUL)
+	എങ്കിൽ (*s++ == NUL)
 	    errmsg = e_missing_colon;
-	else if (*s == ',' || *s == NUL)
+	അല്ലെങ്കിൽ എങ്കിൽ (*s == ',' || *s == NUL)
 	    errmsg = e_zero_length_string;
-	if (errmsg != NULL)
-	    break;
-	while (*s && *s != ',')
+	എങ്കിൽ (errmsg != ശൂന്യ)
+	    നിർത്തുക;
+	ആകുമ്പോൾ (*s && *s != ',')
 	{
-	    if (*s == '\\' && s[1] != NUL)
+	    എങ്കിൽ (*s == '\\' && s[1] != NUL)
 		++s;
 	    ++s;
 	}
 	s = skip_to_option_part(s);
     }
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 
 /*
  * The 'commentstring' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_commentstring(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (**varp != NUL && strstr((char *)*varp, "%s") == NULL)
-	return e_commentstring_must_be_empty_or_contain_str;
+    എങ്കിൽ (**varp != NUL && strstr((അക്ഷരം *)*varp, "%s") == ശൂന്യ)
+	തിരികെ e_commentstring_must_be_empty_or_contain_str;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * Check if value for 'complete' is valid when 'complete' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_complete(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
@@ -1745,23 +1745,23 @@ did_set_complete(optset_T *args)
     char_u	buffer[LSIZE];
     char_u	*buf_ptr;
     char_u	char_before = NUL;
-    int		escape;
+    പൂർണ്ണസംഖ്യ		escape;
 
-    for (p = *varp; *p; )
+    വേണ്ടി (p = *varp; *p; )
     {
 	vim_memset(buffer, 0, LSIZE);
 	buf_ptr = buffer;
 	escape = 0;
 
 	// Extract substring while handling escaped commas
-	while (*p && (*p != ',' || escape) && buf_ptr < (buffer + LSIZE - 1))
+	ആകുമ്പോൾ (*p && (*p != ',' || escape) && buf_ptr < (buffer + LSIZE - 1))
 	{
-	    if (*p == '\\' && *(p + 1) == ',')
+	    എങ്കിൽ (*p == '\\' && *(p + 1) == ',')
 	    {
 		escape = 1;  // Mark escape mode
 		p++;         // Skip '\'
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		escape = 0;
 		*buf_ptr++ = *p;
@@ -1770,304 +1770,304 @@ did_set_complete(optset_T *args)
 	}
 	*buf_ptr = NUL;
 
-	if (vim_strchr((char_u *)".wbuksid]tUFo", *buffer) == NULL)
-	    return illegal_char(args->os_errbuf, args->os_errbuflen, *buffer);
+	എങ്കിൽ (vim_strchr((char_u *)".wbuksid]tUFo", *buffer) == ശൂന്യ)
+	    തിരികെ illegal_char(args->os_errbuf, args->os_errbuflen, *buffer);
 
-	if (vim_strchr((char_u *)"ksF", *buffer) == NULL && *(buffer + 1) != NUL
+	എങ്കിൽ (vim_strchr((char_u *)"ksF", *buffer) == ശൂന്യ && *(buffer + 1) != NUL
 		&& *(buffer + 1) != '^')
 	    char_before = *buffer;
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // Test for a number after '^'
-	    if ((t = vim_strchr(buffer, '^')) != NULL)
+	    എങ്കിൽ ((t = vim_strchr(buffer, '^')) != ശൂന്യ)
 	    {
 		*t++ = NUL;
-		if (!*t)
+		എങ്കിൽ (!*t)
 		    char_before = '^';
-		else
+		അല്ലെങ്കിൽ
 		{
-		    for (; *t; t++)
+		    വേണ്ടി (; *t; t++)
 		    {
-			if (!vim_isdigit(*t))
+			എങ്കിൽ (!vim_isdigit(*t))
 			{
 			    char_before = '^';
-			    break;
+			    നിർത്തുക;
 			}
 		    }
 		}
 	    }
 	}
-	if (char_before != NUL)
-	    return illegal_char_after_chr(args->os_errbuf, args->os_errbuflen,
+	എങ്കിൽ (char_before != NUL)
+	    തിരികെ illegal_char_after_chr(args->os_errbuf, args->os_errbuflen,
 		    char_before);
 	// Skip comma and spaces
-	while (*p == ',' || *p == ' ')
+	ആകുമ്പോൾ (*p == ',' || *p == ' ')
 	    p++;
     }
 
 #ifdef FEAT_COMPL_FUNC
-    if (set_cpt_callbacks(args) != OK)
-	return illegal_char_after_chr(args->os_errbuf, args->os_errbuflen,
+    എങ്കിൽ (set_cpt_callbacks(args) != OK)
+	തിരികെ illegal_char_after_chr(args->os_errbuf, args->os_errbuflen,
 		'F');
 #endif
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_complete(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_complete(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    static char *(p_cpt_values[]) = {
+    സ്ഥിതം അക്ഷരം *(p_cpt_മൂല്യങ്ങൾ[]) = {
 	".", "w", "b", "u", "k", "kspell", "s", "i", "d", "]", "t", "U", "F", "o",
-	NULL};
-    return expand_set_opt_string(
+	ശൂന്യ};
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_cpt_values,
-	    ARRAY_LENGTH(p_cpt_values) - 1,
-	    numMatches,
+	    p_cpt_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_cpt_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'completeopt' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_completeopt(optset_T *args UNUSED)
 {
     char_u	*cot = p_cot;
     unsigned	*flags = &cot_flags;
 
-    if (args->os_flags & OPT_LOCAL)
+    എങ്കിൽ (args->os_flags & OPT_LOCAL)
     {
 	cot = curbuf->b_p_cot;
 	flags = &curbuf->b_cot_flags;
     }
-    else if (!(args->os_flags & OPT_GLOBAL))
+    അല്ലെങ്കിൽ എങ്കിൽ (!(args->os_flags & OPT_GLOBAL))
 	// When using :set, clear the local flags.
 	curbuf->b_cot_flags = 0;
 
-    if (opt_strings_flags(cot, p_cot_values, flags, TRUE) != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (opt_strings_flags(cot, p_cot_മൂല്യങ്ങൾ, flags, TRUE) != OK)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_completeopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_completeopt(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_cot_values,
-	    ARRAY_LENGTH(p_cot_values) - 1,
-	    numMatches,
+	    p_cot_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_cot_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'completefuzzycollect' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_completefuzzycollect(optset_T *args UNUSED)
 {
-    if (opt_strings_flags(p_cfc, p_cfc_values, &cfc_flags, TRUE) != OK)
-	return e_invalid_argument;
-    return NULL;
+    എങ്കിൽ (opt_strings_flags(p_cfc, p_cfc_മൂല്യങ്ങൾ, &cfc_flags, TRUE) != OK)
+	തിരികെ e_invalid_argument;
+    തിരികെ ശൂന്യ;
 }
 
-    int
+    പൂർണ്ണസംഖ്യ
 expand_set_completefuzzycollect(
 	optexpand_T *args,
-	int *numMatches,
+	പൂർണ്ണസംഖ്യ *അക്കം_Matches,
 	char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_cfc_values,
-	    ARRAY_LENGTH(p_cfc_values) - 1,
-	    numMatches,
+	    p_cfc_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_cfc_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'completeitemalign' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_completeitemalign(optset_T *args UNUSED)
 {
     char_u	*p = p_cia;
     unsigned	new_cia_flags = 0;
-    int		seen[3] = { FALSE, FALSE, FALSE };
-    int		count = 0;
+    പൂർണ്ണസംഖ്യ		seen[3] = { FALSE, FALSE, FALSE };
+    പൂർണ്ണസംഖ്യ		എണ്ണം = 0;
     char_u	buf[10];
 
-    while (*p)
+    ആകുമ്പോൾ (*p)
     {
-	copy_option_part(&p, buf, sizeof(buf), ",");
-	if (count >= 3)
-	    return e_invalid_argument;
+	copy_option_part(&p, buf, വലുപ്പം(buf), ",");
+	എങ്കിൽ (എണ്ണം >= 3)
+	    തിരികെ e_invalid_argument;
 
-	if (STRCMP(buf, "abbr") == 0)
+	എങ്കിൽ (STRCMP(buf, "abbr") == 0)
 	{
-	    if (seen[CPT_ABBR])
-		return e_invalid_argument;
+	    എങ്കിൽ (seen[CPT_ABBR])
+		തിരികെ e_invalid_argument;
 	    new_cia_flags = new_cia_flags * 10 + CPT_ABBR;
 	    seen[CPT_ABBR] = TRUE;
-	    count++;
+	    എണ്ണം++;
 	}
-	else if (STRCMP(buf, "kind") == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(buf, "kind") == 0)
 	{
-	    if (seen[CPT_KIND])
-		return e_invalid_argument;
+	    എങ്കിൽ (seen[CPT_KIND])
+		തിരികെ e_invalid_argument;
 	    new_cia_flags = new_cia_flags * 10 + CPT_KIND;
 	    seen[CPT_KIND] = TRUE;
-	    count++;
+	    എണ്ണം++;
 	}
-	else if (STRCMP(buf, "menu") == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(buf, "menu") == 0)
 	{
-	    if (seen[CPT_MENU])
-		return e_invalid_argument;
+	    എങ്കിൽ (seen[CPT_MENU])
+		തിരികെ e_invalid_argument;
 	    new_cia_flags = new_cia_flags * 10 + CPT_MENU;
 	    seen[CPT_MENU] = TRUE;
-	    count++;
+	    എണ്ണം++;
 	}
-	else
-	    return e_invalid_argument;
+	അല്ലെങ്കിൽ
+	    തിരികെ e_invalid_argument;
     }
-    if (new_cia_flags == 0 || count != 3)
-	return e_invalid_argument;
+    എങ്കിൽ (new_cia_flags == 0 || എണ്ണം != 3)
+	തിരികെ e_invalid_argument;
 
     cia_flags = new_cia_flags;
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#എങ്കിൽ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
 /*
  * The 'completepopup' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_completepopup(optset_T *args UNUSED)
 {
-    if (parse_completepopup(NULL) == FAIL)
-	return e_invalid_argument;
+    എങ്കിൽ (parse_completepopup(ശൂന്യ) == FAIL)
+	തിരികെ e_invalid_argument;
 
     popup_close_info();
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 #endif
 
-#if defined(BACKSLASH_IN_FILENAME)
+#എങ്കിൽ defined(BACKSLASH_IN_FILENAME)
 /*
  * The 'completeslash' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_completeslash(optset_T *args UNUSED)
 {
-    if (check_opt_strings(p_csl, p_csl_values, FALSE) != OK
-	    || check_opt_strings(curbuf->b_p_csl, p_csl_values, FALSE) != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (check_opt_strings(p_csl, p_csl_മൂല്യങ്ങൾ, FALSE) != OK
+	    || check_opt_strings(curbuf->b_p_csl, p_csl_മൂല്യങ്ങൾ, FALSE) != OK)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_completeslash(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_completeslash(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_csl_values,
-	    ARRAY_LENGTH(p_csl_values) - 1,
-	    numMatches,
+	    p_csl_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_csl_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
 
-#if defined(FEAT_CONCEAL)
+#എങ്കിൽ defined(FEAT_CONCEAL)
 /*
  * The 'concealcursor' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_concealcursor(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)COCU_ALL, args->os_errbuf,
+    തിരികെ did_set_option_listflag(*varp, (char_u *)COCU_ALL, args->os_errbuf,
 		    args->os_errbuflen);
 }
 
-    int
-expand_set_concealcursor(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_concealcursor(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)COCU_ALL, numMatches, matches);
+    തിരികെ expand_set_opt_listflag(args, (char_u*)COCU_ALL, അക്കം_Matches, matches);
 }
 #endif
 
 /*
  * The 'cpoptions' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_cpoptions(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)CPO_ALL, args->os_errbuf,
+    തിരികെ did_set_option_listflag(*varp, (char_u *)CPO_ALL, args->os_errbuf,
 		    args->os_errbuflen);
 }
 
-    int
-expand_set_cpoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_cpoptions(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)CPO_ALL, numMatches, matches);
+    തിരികെ expand_set_opt_listflag(args, (char_u*)CPO_ALL, അക്കം_Matches, matches);
 }
 
-#if defined(FEAT_CRYPT)
+#എങ്കിൽ defined(FEAT_CRYPT)
 /*
  * The 'cryptkey' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_cryptkey(optset_T *args)
 {
     // Make sure the ":set" command doesn't show the new value in the
     // history.
-    remove_key_from_history();
+    remove_താക്കോൽ_from_history();
 
-    if (args->os_op != OP_NONE)
+    എങ്കിൽ (args->os_op != OP_NONE)
 	// Don't allow set+=/-=/^= as they can allow for substring guessing
-	return e_invalid_argument;
+	തിരികെ e_invalid_argument;
 
-    if (STRCMP(curbuf->b_p_key, args->os_oldval.string) != 0)
+    എങ്കിൽ (STRCMP(curbuf->b_p_താക്കോൽ, args->os_oldval.string) != 0)
     {
 	// Need to update the swapfile.
-	ml_set_crypt_key(curbuf, args->os_oldval.string,
+	ml_set_crypt_താക്കോൽ(curbuf, args->os_oldval.string,
 		*curbuf->b_p_cm == NUL ? p_cm : curbuf->b_p_cm);
 	changed_internal();
     }
 # ifdef FEAT_SODIUM
-    if (crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
-	crypt_sodium_lock_key(args->os_newval.string);
+    എങ്കിൽ (crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
+	crypt_sodium_lock_താക്കോൽ(args->os_newval.string);
 # endif
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'cryptmethod' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_cryptmethod(optset_T *args)
 {
     char_u  *p;
     char_u  *s;
 
-    if (args->os_flags & OPT_LOCAL)
+    എങ്കിൽ (args->os_flags & OPT_LOCAL)
 	p = curbuf->b_p_cm;
-    else
+    അല്ലെങ്കിൽ
 	p = p_cm;
-    if (check_opt_strings(p, p_cm_values, TRUE) != OK)
-	return e_invalid_argument;
-    else if (crypt_self_test() == FAIL)
-	return e_invalid_argument;
+    എങ്കിൽ (check_opt_strings(p, p_cm_മൂല്യങ്ങൾ, TRUE) != OK)
+	തിരികെ e_invalid_argument;
+    അല്ലെങ്കിൽ എങ്കിൽ (crypt_self_test() == FAIL)
+	തിരികെ e_invalid_argument;
 
     // When setting the global value to empty, make it "zip".
-    if (*p_cm == NUL)
+    എങ്കിൽ (*p_cm == NUL)
     {
 	free_string_option(p_cm);
 	p_cm = vim_strsave((char_u *)"zip");
@@ -2075,7 +2075,7 @@ did_set_cryptmethod(optset_T *args)
     // When using ":set cm=name" the local value is going to be empty.
     // Do that here, otherwise the crypt functions will still use the
     // local value.
-    if ((args->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    എങ്കിൽ ((args->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	free_string_option(curbuf->b_p_cm);
 	curbuf->b_p_cm = empty_option;
@@ -2084,97 +2084,97 @@ did_set_cryptmethod(optset_T *args)
     // Need to update the swapfile when the effective method changed.
     // Set "s" to the effective old value, "p" to the effective new
     // method and compare.
-    if ((args->os_flags & OPT_LOCAL) && *args->os_oldval.string == NUL)
+    എങ്കിൽ ((args->os_flags & OPT_LOCAL) && *args->os_oldval.string == NUL)
 	s = p_cm;  // was previously using the global value
-    else
+    അല്ലെങ്കിൽ
 	s = args->os_oldval.string;
-    if (*curbuf->b_p_cm == NUL)
+    എങ്കിൽ (*curbuf->b_p_cm == NUL)
 	p = p_cm;  // is now using the global value
-    else
+    അല്ലെങ്കിൽ
 	p = curbuf->b_p_cm;
-    if (STRCMP(s, p) != 0)
-	ml_set_crypt_key(curbuf, curbuf->b_p_key, s);
+    എങ്കിൽ (STRCMP(s, p) != 0)
+	ml_set_crypt_താക്കോൽ(curbuf, curbuf->b_p_താക്കോൽ, s);
 
     // If the global value changes need to update the swapfile for all
     // buffers using that value.
-    if ((args->os_flags & OPT_GLOBAL)
+    എങ്കിൽ ((args->os_flags & OPT_GLOBAL)
 	    && STRCMP(p_cm, args->os_oldval.string) != 0)
     {
 	buf_T	*buf;
 
 	FOR_ALL_BUFFERS(buf)
-	    if (buf != curbuf && *buf->b_p_cm == NUL)
-		ml_set_crypt_key(buf, buf->b_p_key, args->os_oldval.string);
+	    എങ്കിൽ (buf != curbuf && *buf->b_p_cm == NUL)
+		ml_set_crypt_താക്കോൽ(buf, buf->b_p_താക്കോൽ, args->os_oldval.string);
     }
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_cryptmethod(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_cryptmethod(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_cm_values,
-	    ARRAY_LENGTH(p_cm_values) - 1,
-	    numMatches,
+	    p_cm_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_cm_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
 
-#if defined(FEAT_CSCOPE) && defined(FEAT_QUICKFIX)
+#എങ്കിൽ defined(FEAT_CSCOPE) && defined(FEAT_QUICKFIX)
 /*
  * The 'cscopequickfix' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_cscopequickfix(optset_T *args UNUSED)
 {
     char_u	*p;
 
-    if (p_csqf == NULL)
-	return NULL;
+    എങ്കിൽ (p_csqf == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
     p = p_csqf;
-    while (*p != NUL)
+    ആകുമ്പോൾ (*p != NUL)
     {
-	if (vim_strchr((char_u *)CSQF_CMDS, *p) == NULL
+	എങ്കിൽ (vim_strchr((char_u *)CSQF_CMDS, *p) == ശൂന്യ
 		|| p[1] == NUL
-		|| vim_strchr((char_u *)CSQF_FLAGS, p[1]) == NULL
+		|| vim_strchr((char_u *)CSQF_FLAGS, p[1]) == ശൂന്യ
 		|| (p[2] != NUL && p[2] != ','))
-	    return e_invalid_argument;
-	else if (p[2] == NUL)
-	    break;
-	else
+	    തിരികെ e_invalid_argument;
+	അല്ലെങ്കിൽ എങ്കിൽ (p[2] == NUL)
+	    നിർത്തുക;
+	അല്ലെങ്കിൽ
 	    p += 3;
     }
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 #endif
 
-#if defined(FEAT_SYN_HL)
+#എങ്കിൽ defined(FEAT_SYN_HL)
 /*
  * The 'cursorlineopt' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_cursorlineopt(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
     // This could be changed to use opt_strings_flags() instead.
-    if (**varp == NUL || fill_culopt_flags(*varp, curwin) != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (**varp == NUL || fill_culopt_flags(*varp, curwin) != OK)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_cursorlineopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_cursorlineopt(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_culopt_values,
-	    ARRAY_LENGTH(p_culopt_values) - 1,
-	    numMatches,
+	    p_culopt_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_culopt_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
@@ -2182,81 +2182,81 @@ expand_set_cursorlineopt(optexpand_T *args, int *numMatches, char_u ***matches)
 /*
  * The 'debug' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_debug(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_debug, p_debug_values, TRUE);
+    തിരികെ did_set_opt_strings(p_debug, p_debug_മൂല്യങ്ങൾ, TRUE);
 }
 
-    int
-expand_set_debug(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_debug(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_debug_values,
-	    ARRAY_LENGTH(p_debug_values) - 1,
-	    numMatches,
+	    p_debug_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_debug_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
-#if defined(FEAT_DIFF)
+#എങ്കിൽ defined(FEAT_DIFF)
 /*
  * The 'diffanchors' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_diffanchors(optset_T *args)
 {
-    if (diffanchors_changed(args->os_flags & OPT_LOCAL) == FAIL)
-	return e_invalid_argument;
+    എങ്കിൽ (diffanchors_changed(args->os_flags & OPT_LOCAL) == FAIL)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'diffopt' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_diffopt(optset_T *args UNUSED)
 {
-    if (diffopt_changed() == FAIL)
-	return e_invalid_argument;
+    എങ്കിൽ (diffopt_changed() == FAIL)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_diffopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_diffopt(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
     expand_T *xp = args->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    എങ്കിൽ (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
-	if (completing_value_for_subopt(args, "algorithm"))
+	എങ്കിൽ (completing_മൂല്യം_for_subopt(args, "algorithm"))
 	{
-	    return expand_set_opt_string(
+	    തിരികെ expand_set_opt_string(
 		    args,
-		    p_dip_algorithm_values,
-		    ARRAY_LENGTH(p_dip_algorithm_values) - 1,
-		    numMatches,
+		    p_dip_algorithm_മൂല്യങ്ങൾ,
+		    ARRAY_LENGTH(p_dip_algorithm_മൂല്യങ്ങൾ) - 1,
+		    അക്കം_Matches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "inline"))
+	എങ്കിൽ (completing_മൂല്യം_for_subopt(args, "inline"))
 	{
-	    return expand_set_opt_string(
+	    തിരികെ expand_set_opt_string(
 		    args,
-		    p_dip_inline_values,
-		    ARRAY_LENGTH(p_dip_inline_values) - 1,
-		    numMatches,
+		    p_dip_inline_മൂല്യങ്ങൾ,
+		    ARRAY_LENGTH(p_dip_inline_മൂല്യങ്ങൾ) - 1,
+		    അക്കം_Matches,
 		    matches);
 	}
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_dip_values,
-	    ARRAY_LENGTH(p_dip_values) - 1,
-	    numMatches,
+	    p_dip_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_dip_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
@@ -2264,44 +2264,44 @@ expand_set_diffopt(optexpand_T *args, int *numMatches, char_u ***matches)
 /*
  * The 'display' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_display(optset_T *args UNUSED)
 {
-    if (opt_strings_flags(p_dy, p_dy_values, &dy_flags, TRUE) != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (opt_strings_flags(p_dy, p_dy_മൂല്യങ്ങൾ, &dy_flags, TRUE) != OK)
+	തിരികെ e_invalid_argument;
 
-    (void)init_chartab();
-    return NULL;
+    (ശൂന്യം)init_chartab();
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_display(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_display(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_dy_values,
-	    ARRAY_LENGTH(p_dy_values) - 1,
-	    numMatches,
+	    p_dy_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_dy_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'eadirection' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_eadirection(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_ead, p_ead_values, FALSE);
+    തിരികെ did_set_opt_strings(p_ead, p_ead_മൂല്യങ്ങൾ, FALSE);
 }
 
-    int
-expand_set_eadirection(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_eadirection(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_ead_values,
-	    ARRAY_LENGTH(p_ead_values) - 1,
-	    numMatches,
+	    p_ead_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_ead_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
@@ -2309,27 +2309,27 @@ expand_set_eadirection(optexpand_T *args, int *numMatches, char_u ***matches)
  * One of the 'encoding', 'fileencoding', 'termencoding' or 'makeencoding'
  * options is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_encoding(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
     char_u	**gvarp;
-    char	*errmsg = NULL;
+    അക്ഷരം	*errmsg = ശൂന്യ;
     char_u	*p;
 
     // Get the global option to compare with, otherwise we would have to check
     // two values for all local options.
     gvarp = (char_u **)get_option_varp_scope(args->os_idx, OPT_GLOBAL);
 
-    if (gvarp == &p_fenc)
+    എങ്കിൽ (gvarp == &p_fenc)
     {
-	if (!curbuf->b_p_ma && args->os_flags != OPT_GLOBAL)
+	എങ്കിൽ (!curbuf->b_p_ma && args->os_flags != OPT_GLOBAL)
 	    errmsg = e_cannot_make_changes_modifiable_is_off;
-	else if (vim_strchr(*varp, ',') != NULL)
+	അല്ലെങ്കിൽ എങ്കിൽ (vim_strchr(*varp, ',') != ശൂന്യ)
 	    // No comma allowed in 'fileencoding'; catches confusing it
 	    // with 'fileencodings'.
 	    errmsg = e_invalid_argument;
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // May show a "+" in the title now.
 	    redraw_titles();
@@ -2337,46 +2337,46 @@ did_set_encoding(optset_T *args)
 	    ml_setflags(curbuf);
 	}
     }
-    if (errmsg == NULL)
+    എങ്കിൽ (errmsg == ശൂന്യ)
     {
 	// canonize the value, so that STRCMP() can be used on it
 	p = enc_canonize(*varp);
-	if (p != NULL)
+	എങ്കിൽ (p != ശൂന്യ)
 	{
 	    vim_free(*varp);
 	    *varp = p;
 	}
-	if (varp == &p_enc)
+	എങ്കിൽ (varp == &p_enc)
 	{
 	    errmsg = mb_init();
 	    redraw_titles();
 	}
     }
 
-#if defined(FEAT_GUI_GTK)
-    if (errmsg == NULL && varp == &p_tenc && gui.in_use)
+#എങ്കിൽ defined(FEAT_GUI_GTK)
+    എങ്കിൽ (errmsg == ശൂന്യ && varp == &p_tenc && gui.in_use)
     {
 	// GTK uses only a single encoding, and that is UTF-8.
-	if (STRCMP(p_tenc, "utf-8") != 0)
+	എങ്കിൽ (STRCMP(p_tenc, "utf-8") != 0)
 	    errmsg = e_cannot_be_changed_in_gtk_GUI;
     }
 #endif
 
-    if (errmsg == NULL)
+    എങ്കിൽ (errmsg == ശൂന്യ)
     {
 #ifdef FEAT_KEYMAP
 	// When 'keymap' is used and 'encoding' changes, reload the keymap
 	// (with another encoding).
-	if (varp == &p_enc && *curbuf->b_p_keymap != NUL)
-	    (void)keymap_init();
+	എങ്കിൽ (varp == &p_enc && *curbuf->b_p_keymap != NUL)
+	    (ശൂന്യം)keymap_init();
 #endif
 
 	// When 'termencoding' is not empty and 'encoding' changes or when
 	// 'termencoding' changes, need to setup for keyboard input and
 	// display output conversion.
-	if (((varp == &p_enc && *p_tenc != NUL) || varp == &p_tenc))
+	എങ്കിൽ (((varp == &p_enc && *p_tenc != NUL) || varp == &p_tenc))
 	{
-	    if (convert_setup(&input_conv, p_tenc, p_enc) == FAIL
+	    എങ്കിൽ (convert_setup(&നിവേശം_conv, p_tenc, p_enc) == FAIL
 		    || convert_setup(&output_conv, p_enc, p_tenc) == FAIL)
 	    {
 		semsg(_(e_cannot_convert_between_str_and_str),
@@ -2385,9 +2385,9 @@ did_set_encoding(optset_T *args)
 	    }
 	}
 
-#if defined(MSWIN)
+#എങ്കിൽ defined(MSWIN)
 	// $HOME, $VIM and $VIMRUNTIME may have characters in active code page.
-	if (varp == &p_enc)
+	എങ്കിൽ (varp == &p_enc)
 	{
 	    init_homedir();
 	    init_vimdir();
@@ -2395,33 +2395,33 @@ did_set_encoding(optset_T *args)
 #endif
     }
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 
-    int
-expand_set_encoding(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_encoding(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_generic(
+    തിരികെ expand_set_opt_generic(
 	    args,
 	    get_encoding_name,
-	    numMatches,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'eventignore(win)' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_eventignore(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
     char_u	*oldval = args->os_oldval.string;
 
-    if (check_ei(*varp) == FAIL)
-	return e_invalid_argument;
+    എങ്കിൽ (check_ei(*varp) == FAIL)
+	തിരികെ e_invalid_argument;
 
-    if (oldval == NULL || STRCMP(oldval, *varp) == 0)
-	return NULL;
+    എങ്കിൽ (oldval == ശൂന്യ || STRCMP(oldval, *varp) == 0)
+	തിരികെ ശൂന്യ;
 
     // Deal with the events that are triggered by comparing against a stored
     // state, with the old value in effect: what happened while an event was
@@ -2429,93 +2429,93 @@ did_set_eventignore(optset_T *args)
     // happened before must still be reported.
     // Use a copy, the caller owns "oldval" and autocommands may free it.
     char_u	*save_ei = vim_strsave(oldval);
-    if (save_ei != NULL)
+    എങ്കിൽ (save_ei != ശൂന്യ)
     {
 	char_u	*newval = *varp;
-	win_T	*wp = is_window_local_option(args->os_idx) ? curwin : NULL;
+	win_T	*wp = is_window_local_option(args->os_idx) ? curwin : ശൂന്യ;
 
 	*varp = save_ei;
 	// "varp" points into "wp" for 'eventignorewin'.
-	if (wp != NULL)
+	എങ്കിൽ (wp != ശൂന്യ)
 	    ++wp->w_locked;
 	may_trigger_deferred_events();
-	if (wp != NULL)
+	എങ്കിൽ (wp != ശൂന്യ)
 	    --wp->w_locked;
 
 	free_string_option(*varp);
 	*varp = newval;
     }
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-static int expand_eiw = FALSE;
+സ്ഥിതം പൂർണ്ണസംഖ്യ expand_eiw = FALSE;
 
-    static char_u *
-get_eventignore_name(expand_T *xp, int idx)
+    സ്ഥിതം char_u *
+get_eventignore_name(expand_T *xp, പൂർണ്ണസംഖ്യ idx)
 {
-    int subtract = *xp->xp_pattern == '-';
+    പൂർണ്ണസംഖ്യ subtract = *xp->xp_pattern == '-';
     // 'eventignore(win)' allows special keyword "all" in addition to
     // all event names.
-    if (!subtract && idx == 0)
-	return (char_u *)"all";
+    എങ്കിൽ (!subtract && idx == 0)
+	തിരികെ (char_u *)"all";
 
     char_u *name = get_event_name_no_group(xp, idx - 1 + subtract, expand_eiw);
-    if (name == NULL)
-	return NULL;
+    എങ്കിൽ (name == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
-    sprintf((char *)IObuff, "%s%s", subtract ? "-" : "", name);
-    return IObuff;
+    sprintf((അക്ഷരം *)IObuff, "%s%s", subtract ? "-" : "", name);
+    തിരികെ IObuff;
 }
 
-    int
-expand_set_eventignore(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_eventignore(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
     expand_eiw = args->oe_varp != (char_u *)&p_ei;
-    return expand_set_opt_generic(
+    തിരികെ expand_set_opt_generic(
 	    args,
 	    get_eventignore_name,
-	    numMatches,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'fileformat' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_fileformat(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (!curbuf->b_p_ma && !(args->os_flags & OPT_GLOBAL))
-	return e_cannot_make_changes_modifiable_is_off;
-    else if (check_opt_strings(*varp, p_ff_values, FALSE) != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (!curbuf->b_p_ma && !(args->os_flags & OPT_GLOBAL))
+	തിരികെ e_cannot_make_changes_modifiable_is_off;
+    അല്ലെങ്കിൽ എങ്കിൽ (check_opt_strings(*varp, p_ff_മൂല്യങ്ങൾ, FALSE) != OK)
+	തിരികെ e_invalid_argument;
 
     // may also change 'textmode'
-    if (get_fileformat(curbuf) == EOL_DOS)
+    എങ്കിൽ (get_fileformat(curbuf) == EOL_DOS)
 	curbuf->b_p_tx = TRUE;
-    else
+    അല്ലെങ്കിൽ
 	curbuf->b_p_tx = FALSE;
     redraw_titles();
     // update flag in swap file
     ml_setflags(curbuf);
     // Redraw needed when switching to/from "mac": a CR in the text
     // will be displayed differently.
-    if (get_fileformat(curbuf) == EOL_MAC || *args->os_oldval.string == 'm')
+    എങ്കിൽ (get_fileformat(curbuf) == EOL_MAC || *args->os_oldval.string == 'm')
 	redraw_curbuf_later(UPD_NOT_VALID);
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_fileformat(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_fileformat(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_ff_values,
-	    ARRAY_LENGTH(p_ff_values) - 1,
-	    numMatches,
+	    p_ff_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_ff_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
@@ -2524,165 +2524,165 @@ expand_set_fileformat(optexpand_T *args, int *numMatches, char_u ***matches)
  * fileformat options.
  */
     char_u *
-get_fileformat_name(expand_T *xp UNUSED, int idx)
+get_fileformat_name(expand_T *xp UNUSED, പൂർണ്ണസംഖ്യ idx)
 {
-    if (idx >= (int)ARRAY_LENGTH(p_ff_values))
-	return NULL;
+    എങ്കിൽ (idx >= (പൂർണ്ണസംഖ്യ)ARRAY_LENGTH(p_ff_മൂല്യങ്ങൾ))
+	തിരികെ ശൂന്യ;
 
-    return (char_u*)p_ff_values[idx];
+    തിരികെ (char_u*)p_ff_മൂല്യങ്ങൾ[idx];
 }
 
 /*
  * The 'fileformats' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_fileformats(optset_T *args UNUSED)
 {
-    if (check_opt_strings(p_ffs, p_ff_values, TRUE) != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (check_opt_strings(p_ffs, p_ff_മൂല്യങ്ങൾ, TRUE) != OK)
+	തിരികെ e_invalid_argument;
 
     // also change 'textauto'
-    if (*p_ffs == NUL)
+    എങ്കിൽ (*p_ffs == NUL)
 	p_ta = FALSE;
-    else
+    അല്ലെങ്കിൽ
 	p_ta = TRUE;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'filetype' or the 'syntax' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_filetype_or_syntax(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (!valid_filetype(*varp))
-	return e_invalid_argument;
+    എങ്കിൽ (!valid_filetype(*varp))
+	തിരികെ e_invalid_argument;
 
-    args->os_value_changed = STRCMP(args->os_oldval.string, *varp) != 0;
+    args->os_മൂല്യം_changed = STRCMP(args->os_oldval.string, *varp) != 0;
 
     // Since we check the value, there is no need to set P_INSECURE,
     // even when the value comes from a modeline.
-    args->os_value_checked = TRUE;
+    args->os_മൂല്യം_checked = TRUE;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-#if defined(FEAT_FOLDING)
+#എങ്കിൽ defined(FEAT_FOLDING)
 /*
  * The 'foldclose' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_foldclose(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_fcl, p_fcl_values, TRUE);
+    തിരികെ did_set_opt_strings(p_fcl, p_fcl_മൂല്യങ്ങൾ, TRUE);
 }
 
-    int
-expand_set_foldclose(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_foldclose(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_fcl_values,
-	    ARRAY_LENGTH(p_fcl_values) - 1,
-	    numMatches,
+	    p_fcl_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_fcl_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
 
-#if defined(FEAT_EVAL) && defined(FEAT_FOLDING)
+#എങ്കിൽ defined(FEAT_EVAL) && defined(FEAT_FOLDING)
 /*
  * The 'foldexpr' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_foldexpr(optset_T *args)
 {
-    (void)did_set_optexpr(args);
-    if (foldmethodIsExpr(curwin))
+    (ശൂന്യം)did_set_optexpr(args);
+    എങ്കിൽ (foldmethod_Is_വ്യഞ്ജകം(curwin))
 	foldUpdateAll(curwin);
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 #endif
 
-#if defined(FEAT_FOLDING)
+#എങ്കിൽ defined(FEAT_FOLDING)
 /*
  * The 'foldignore' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_foldignore(optset_T *args UNUSED)
 {
-    if (foldmethodIsIndent(curwin))
+    എങ്കിൽ (foldmethodIsIndent(curwin))
 	foldUpdateAll(curwin);
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'foldmarker' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_foldmarker(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
     char_u	*p;
 
     p = vim_strchr(*varp, ',');
-    if (p == NULL)
-	return e_comma_required;
-    else if (p == *varp || p[1] == NUL)
-	return e_invalid_argument;
-    else if (foldmethodIsMarker(curwin))
+    എങ്കിൽ (p == ശൂന്യ)
+	തിരികെ e_comma_required;
+    അല്ലെങ്കിൽ എങ്കിൽ (p == *varp || p[1] == NUL)
+	തിരികെ e_invalid_argument;
+    അല്ലെങ്കിൽ എങ്കിൽ (foldmethodIsMarker(curwin))
 	foldUpdateAll(curwin);
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'foldmethod' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_foldmethod(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (check_opt_strings(*varp, p_fdm_values, FALSE) != OK || **varp == NUL)
-	return e_invalid_argument;
+    എങ്കിൽ (check_opt_strings(*varp, p_fdm_മൂല്യങ്ങൾ, FALSE) != OK || **varp == NUL)
+	തിരികെ e_invalid_argument;
 
     foldUpdateAll(curwin);
-    if (foldmethodIsDiff(curwin))
+    എങ്കിൽ (foldmethodIsDiff(curwin))
 	newFoldLevel();
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_foldmethod(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_foldmethod(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_fdm_values,
-	    ARRAY_LENGTH(p_fdm_values) - 1,
-	    numMatches,
+	    p_fdm_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_fdm_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'foldopen' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_foldopen(optset_T *args UNUSED)
 {
-    return did_set_opt_flags(p_fdo, p_fdo_values, &fdo_flags, TRUE);
+    തിരികെ did_set_opt_flags(p_fdo, p_fdo_മൂല്യങ്ങൾ, &fdo_flags, TRUE);
 }
 
-    int
-expand_set_foldopen(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_foldopen(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_fdo_values,
-	    ARRAY_LENGTH(p_fdo_values) - 1,
-	    numMatches,
+	    p_fdo_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_fdo_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
@@ -2690,314 +2690,314 @@ expand_set_foldopen(optexpand_T *args, int *numMatches, char_u ***matches)
 /*
  * The 'formatoptions' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_formatoptions(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)FO_ALL, args->os_errbuf,
+    തിരികെ did_set_option_listflag(*varp, (char_u *)FO_ALL, args->os_errbuf,
 		    args->os_errbuflen);
 }
 
-    int
-expand_set_formatoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_formatoptions(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)FO_ALL, numMatches, matches);
+    തിരികെ expand_set_opt_listflag(args, (char_u*)FO_ALL, അക്കം_Matches, matches);
 }
 
-#if defined(CURSOR_SHAPE)
+#എങ്കിൽ defined(CURSOR_SHAPE)
 /*
  * The 'guicursor' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_guicursor(optset_T *args UNUSED)
 {
-    return parse_shape_opt(SHAPE_CURSOR);
+    തിരികെ parse_shape_opt(SHAPE_CURSOR);
 }
 #endif
 
-#if defined(FEAT_GUI)
+#എങ്കിൽ defined(FEAT_GUI)
 /*
  * The 'guifont' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_guifont(optset_T *args UNUSED)
 {
     char_u	*p;
-    char	*errmsg = NULL;
+    അക്ഷരം	*errmsg = ശൂന്യ;
 
-    if (gui.in_use)
+    എങ്കിൽ (gui.in_use)
     {
 	p = p_guifont;
-# if defined(FEAT_GUI_GTK)
+# എങ്കിൽ defined(FEAT_GUI_GTK)
 	// Put up a font dialog and let the user select a new value.
 	// If this is cancelled go back to the old value but don't
 	// give an error message.
-	if (STRCMP(p, "*") == 0)
+	എങ്കിൽ (STRCMP(p, "*") == 0)
 	{
 	    p = gui_mch_font_dialog(args->os_oldval.string);
 	    free_string_option(p_guifont);
-	    p_guifont = (p != NULL) ? p : vim_strsave(args->os_oldval.string);
+	    p_guifont = (p != ശൂന്യ) ? p : vim_strsave(args->os_oldval.string);
 	}
 # endif
-	if (p != NULL && gui_init_font(p_guifont, FALSE) != OK)
+	എങ്കിൽ (p != ശൂന്യ && gui_init_font(p_guifont, FALSE) != OK)
 	{
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_PHOTON)
-	    if (STRCMP(p_guifont, "*") == 0)
+# എങ്കിൽ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_PHOTON)
+	    എങ്കിൽ (STRCMP(p_guifont, "*") == 0)
 	    {
 		// Dialog was cancelled: Keep the old value without giving
 		// an error message.
 		free_string_option(p_guifont);
 		p_guifont = vim_strsave(args->os_oldval.string);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 # endif
 		errmsg = e_invalid_fonts;
 	}
     }
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 
 /*
  * Expand the 'guifont' option. Only when GUI is being used. Each platform has
  * specific behaviors.
  */
-    int
-expand_set_guifont(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_guifont(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    if (!gui.in_use)
-	return FAIL;
+    എങ്കിൽ (!gui.in_use)
+	തിരികെ FAIL;
 
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
+# എങ്കിൽ defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
     char_u **varp = (char_u **)args->oe_varp;
-    int wide = (varp == &p_guifontwide);
+    പൂർണ്ണസംഖ്യ wide = (varp == &p_guifontwide);
 
-    return expand_set_opt_callback(
-	    args, gui_mch_expand_font, &wide, numMatches, matches);
-# else
-    return FAIL;
+    തിരികെ expand_set_opt_callback(
+	    args, gui_mch_expand_font, &wide, അക്കം_Matches, matches);
+# അല്ലെങ്കിൽ
+    തിരികെ FAIL;
 # endif
 }
 
-# if defined(FEAT_XFONTSET)
+# എങ്കിൽ defined(FEAT_XFONTSET)
 /*
  * The 'guifontset' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_guifontset(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    അക്ഷരം *errmsg = ശൂന്യ;
 
-    if (STRCMP(p_guifontset, "*") == 0)
+    എങ്കിൽ (STRCMP(p_guifontset, "*") == 0)
 	errmsg = e_cant_select_fontset;
-    else if (gui.in_use && gui_init_font(p_guifontset, TRUE) != OK)
+    അല്ലെങ്കിൽ എങ്കിൽ (gui.in_use && gui_init_font(p_guifontset, TRUE) != OK)
 	errmsg = e_invalid_fontset;
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 # endif
 
 /*
  * The 'guifontwide' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_guifontwide(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    അക്ഷരം *errmsg = ശൂന്യ;
 
-    if (STRCMP(p_guifontwide, "*") == 0)
+    എങ്കിൽ (STRCMP(p_guifontwide, "*") == 0)
 	errmsg = e_cant_select_wide_font;
-    else if (gui_get_wide_font() == FAIL)
+    അല്ലെങ്കിൽ എങ്കിൽ (gui_get_wide_font() == FAIL)
 	errmsg = e_invalid_wide_font;
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 #endif
 
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+#എങ്കിൽ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 /*
  * The 'guiligatures' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_guiligatures(optset_T *args UNUSED)
 {
     gui_set_ligatures();
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 #endif
 
-#if defined(FEAT_GUI)
+#എങ്കിൽ defined(FEAT_GUI)
 /*
  * The 'guioptions' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_guioptions(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
-    char *errmsg;
+    അക്ഷരം *errmsg;
 
     errmsg = did_set_option_listflag(*varp, (char_u *)GO_ALL, args->os_errbuf,
 		    args->os_errbuflen);
-    if (errmsg != NULL)
-	return errmsg;
+    എങ്കിൽ (errmsg != ശൂന്യ)
+	തിരികെ errmsg;
 
     gui_init_which_components(args->os_oldval.string);
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_guioptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_guioptions(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)GO_ALL, numMatches, matches);
+    തിരികെ expand_set_opt_listflag(args, (char_u*)GO_ALL, അക്കം_Matches, matches);
 }
 #endif
 
-#if defined(FEAT_GUI_TABLINE)
+#എങ്കിൽ defined(FEAT_GUI_TABLINE)
 /*
  * The 'guitablabel' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_guitablabel(optset_T *args UNUSED)
 {
     redraw_tabline = TRUE;
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 #endif
 
 /*
  * The 'helpfile' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_helpfile(optset_T *args UNUSED)
 {
     // May compute new values for $VIM and $VIMRUNTIME
-    if (didset_vim)
+    എങ്കിൽ (didset_vim)
 	vim_unsetenv_ext((char_u *)"VIM");
-    if (didset_vimruntime)
+    എങ്കിൽ (didset_vimruntime)
 	vim_unsetenv_ext((char_u *)"VIMRUNTIME");
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-#if defined(FEAT_MULTI_LANG)
+#എങ്കിൽ defined(FEAT_MULTI_LANG)
 /*
  * The 'helplang' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_helplang(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    അക്ഷരം *errmsg = ശൂന്യ;
 
     // Check for "", "ab", "ab,cd", etc.
-    for (char_u *s = p_hlg; *s != NUL; s += 3)
+    വേണ്ടി (char_u *s = p_hlg; *s != NUL; s += 3)
     {
-	if (s[1] == NUL || ((s[2] != ',' || s[3] == NUL) && s[2] != NUL))
+	എങ്കിൽ (s[1] == NUL || ((s[2] != ',' || s[3] == NUL) && s[2] != NUL))
 	{
 	    errmsg = e_invalid_argument;
-	    break;
+	    നിർത്തുക;
 	}
-	if (s[2] == NUL)
-	    break;
+	എങ്കിൽ (s[2] == NUL)
+	    നിർത്തുക;
     }
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 #endif
 
 /*
  * The 'highlight' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_highlight(optset_T *args UNUSED)
 {
-    if (highlight_changed() == FAIL)
-	return e_invalid_argument;	// invalid flags
+    എങ്കിൽ (highlight_changed() == FAIL)
+	തിരികെ e_invalid_argument;	// invalid flags
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 expand_hl_occasions(
 	optexpand_T *args,
-	int *numMatches,
+	പൂർണ്ണസംഖ്യ *അക്കം_Matches,
 	char_u ***matches,
 	char_u prefix)
 {
     char_u	    *p;
-    static char_u   hl_flags[HLF_COUNT] = HL_FLAGS;
+    സ്ഥിതം char_u   hl_flags[HLF_എണ്ണം] = HL_FLAGS;
     size_t	    i;
-    int		    count = 0;
+    പൂർണ്ണസംഖ്യ		    എണ്ണം = 0;
 
-    *matches = ALLOC_MULT(char_u *, HLF_COUNT + 1);
-    if (*matches == NULL)
-	return FAIL;
+    *matches = ALLOC_MULT(char_u *, HLF_എണ്ണം + 1);
+    എങ്കിൽ (*matches == ശൂന്യ)
+	തിരികെ FAIL;
 
     // We still want to return the full option if it's requested.
-    if (args->oe_include_orig_val)
+    എങ്കിൽ (args->oe_include_orig_val)
     {
-	p = vim_strsave(args->oe_opt_value);
-	if (p == NULL)
+	p = vim_strsave(args->oe_opt_മൂല്യം);
+	എങ്കിൽ (p == ശൂന്യ)
 	{
 	    VIM_CLEAR(*matches);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
-	(*matches)[count++] = p;
+	(*matches)[എണ്ണം++] = p;
     }
 
-    for (i = 0; i < HLF_COUNT; i++)
+    വേണ്ടി (i = 0; i < HLF_എണ്ണം; i++)
     {
 	p = alloc((prefix == NUL ? 1 : 2) + 1);
-	if (p == NULL)
+	എങ്കിൽ (p == ശൂന്യ)
 	{
-	    if (count == 0)
+	    എങ്കിൽ (എണ്ണം == 0)
 	    {
 		VIM_CLEAR(*matches);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
-	    else
-		break;
+	    അല്ലെങ്കിൽ
+		നിർത്തുക;
 	}
-	if (prefix == NUL)
-	    sprintf((char *)p, "%c", hl_flags[i]);
-	else
-	    sprintf((char *)p, "%c%c", prefix, hl_flags[i]);
-	(*matches)[count++] = p;
+	എങ്കിൽ (prefix == NUL)
+	    sprintf((അക്ഷരം *)p, "%c", hl_flags[i]);
+	അല്ലെങ്കിൽ
+	    sprintf((അക്ഷരം *)p, "%c%c", prefix, hl_flags[i]);
+	(*matches)[എണ്ണം++] = p;
     }
 
-    if (count == 0)
+    എങ്കിൽ (എണ്ണം == 0)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    *numMatches = count;
-    return OK;
+    *അക്കം_Matches = എണ്ണം;
+    തിരികെ OK;
 }
 
 /*
  * Expand 'highlight' option.
  */
-    int
-expand_set_highlight(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_highlight(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
     char_u	    *p;
     expand_T	    *xp = args->oe_xp;
     size_t	    i;
-    int		    count = 0;
+    പൂർണ്ണസംഖ്യ		    എണ്ണം = 0;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    എങ്കിൽ (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
 	// Right after a ':', meaning we just return all highlight names.
-	return expand_set_opt_generic(
+	തിരികെ expand_set_opt_generic(
 		args,
 		get_highlight_name,
-		numMatches,
+		അക്കം_Matches,
 		matches);
     }
 
-    if (*xp->xp_pattern == NUL)
+    എങ്കിൽ (*xp->xp_pattern == NUL)
 	// At beginning of a comma-separated list. Return the specific list of
 	// supported occasions.
-	return expand_hl_occasions(args, numMatches, matches, NUL);
+	തിരികെ expand_hl_occasions(args, അക്കം_Matches, matches, NUL);
 
     // We are after the initial character (which indicates the occasion). We
     // already made sure we are not matching after a ':' above, so now we want
@@ -3006,97 +3006,97 @@ expand_set_highlight(optexpand_T *args, int *numMatches, char_u ***matches)
     // the returned match.
 
     // Note: Keep this in sync with highlight_changed()
-    static char_u p_hl_mode_values[] =
+    സ്ഥിതം char_u p_hl_mode_മൂല്യങ്ങൾ[] =
 	{':', 'b', 'i', '-', 'n', 'r', 's', 'u', 'c', '2', 'd', '=', 't'};
-    size_t num_hl_modes = ARRAY_LENGTH(p_hl_mode_values);
+    size_t അക്കം_hl_modes = ARRAY_LENGTH(p_hl_mode_മൂല്യങ്ങൾ);
 
-    *matches = ALLOC_MULT(char_u *, num_hl_modes);
-    if (*matches == NULL)
-	return FAIL;
+    *matches = ALLOC_MULT(char_u *, അക്കം_hl_modes);
+    എങ്കിൽ (*matches == ശൂന്യ)
+	തിരികെ FAIL;
 
-    int pattern_len = xp->xp_pattern_len;
+    പൂർണ്ണസംഖ്യ pattern_len = xp->xp_pattern_len;
 
-    for (i = 0; i < num_hl_modes; i++)
+    വേണ്ടി (i = 0; i < അക്കം_hl_modes; i++)
     {
 	// Don't allow duplicates as these are unique flags
-	char_u *dup = vim_strchr(xp->xp_pattern + 1, p_hl_mode_values[i]);
-	if (dup != NULL && (int)(dup - xp->xp_pattern) < pattern_len)
-	    continue;
+	char_u *dup = vim_strchr(xp->xp_pattern + 1, p_hl_mode_മൂല്യങ്ങൾ[i]);
+	എങ്കിൽ (dup != ശൂന്യ && (പൂർണ്ണസംഖ്യ)(dup - xp->xp_pattern) < pattern_len)
+	    തുടരുക;
 
 	// ':' only works by itself, not with other flags.
-	if (pattern_len > 1 && p_hl_mode_values[i] == ':')
-	    continue;
+	എങ്കിൽ (pattern_len > 1 && p_hl_mode_മൂല്യങ്ങൾ[i] == ':')
+	    തുടരുക;
 
 	p = vim_strnsave(xp->xp_pattern, pattern_len + 1);
-	if (p == NULL)
+	എങ്കിൽ (p == ശൂന്യ)
 	{
-	    if (i == 0)
+	    എങ്കിൽ (i == 0)
 	    {
 		VIM_CLEAR(*matches);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
-	    else
-		break;
+	    അല്ലെങ്കിൽ
+		നിർത്തുക;
 	}
-	p[pattern_len] = p_hl_mode_values[i];
+	p[pattern_len] = p_hl_mode_മൂല്യങ്ങൾ[i];
 	p[pattern_len + 1] = NUL;
-	(*matches)[count++] = p;
+	(*matches)[എണ്ണം++] = p;
     }
-    if (count == 0)
+    എങ്കിൽ (എണ്ണം == 0)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    *numMatches = count;
+    *അക്കം_Matches = എണ്ണം;
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * The 'titlestring' or the 'iconstring' option is changed.
  */
-    static char *
-parse_titleiconstring(optset_T *args UNUSED, int flagval UNUSED)
+    സ്ഥിതം അക്ഷരം *
+parse_titleiconstring(optset_T *args UNUSED, പൂർണ്ണസംഖ്യ flagval UNUSED)
 {
 #ifdef FEAT_STL_OPT
     char_u	**varp = (char_u **)args->os_varp;
 
     // NULL => statusline syntax
-    if (vim_strchr(*varp, '%') && check_stl_option(*varp) == NULL)
+    എങ്കിൽ (vim_strchr(*varp, '%') && check_stl_option(*varp) == ശൂന്യ)
 	stl_syntax |= flagval;
-    else
+    അല്ലെങ്കിൽ
 	stl_syntax &= ~flagval;
 #endif
     did_set_title();
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'iconstring' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_iconstring(optset_T *args)
 {
-    int flagval = 0;
+    പൂർണ്ണസംഖ്യ flagval = 0;
 
 #ifdef FEAT_STL_OPT
     flagval = STL_IN_ICON;
 #endif
 
-    return parse_titleiconstring(args, flagval);
+    തിരികെ parse_titleiconstring(args, flagval);
 }
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#എങ്കിൽ defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 /*
  * The 'imactivatekey' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_imactivatekey(optset_T *args UNUSED)
 {
-    if (!im_xim_isvalid_imactivate())
-	return e_invalid_argument;
-    return NULL;
+    എങ്കിൽ (!im_xim_isvalid_imactivate())
+	തിരികെ e_invalid_argument;
+    തിരികെ ശൂന്യ;
 }
 #endif
 
@@ -3104,113 +3104,113 @@ did_set_imactivatekey(optset_T *args UNUSED)
 /*
  * The 'imageprotocol' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_imageprotocol(optset_T *args UNUSED)
 {
-    if (update_image_backend() == FAIL)
-	return e_invalid_argument;
-    return NULL;
+    എങ്കിൽ (update_image_backend() == FAIL)
+	തിരികെ e_invalid_argument;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_imageprotocol(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_imageprotocol(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
     expand_T *xp = args->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    എങ്കിൽ (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
 	// 'imageprotocol' only has well-defined terms for completion for the
 	// protocol part after the colon.
-	return expand_set_opt_string(
+	തിരികെ expand_set_opt_string(
 		args,
-		p_ipc_protocol_values,
-		ARRAY_LENGTH(p_ipc_protocol_values) - 1,
-		numMatches,
+		p_ipc_protocol_മൂല്യങ്ങൾ,
+		ARRAY_LENGTH(p_ipc_protocol_മൂല്യങ്ങൾ) - 1,
+		അക്കം_Matches,
 		matches);
     }
     // Use expand_set_opt_string instead of returning FAIL so that we can
     // include the original value if args->oe_include_orig_val is set.
-    static char *(empty[]) = {NULL};
-    return expand_set_opt_string(args, empty, 0, numMatches, matches);
+    സ്ഥിതം അക്ഷരം *(empty[]) = {ശൂന്യ};
+    തിരികെ expand_set_opt_string(args, empty, 0, അക്കം_Matches, matches);
 }
 #endif
 
 /*
  * The 'iskeyword' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_iskeyword(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (varp == &p_isk)		// only check for global-value
+    എങ്കിൽ (varp == &p_isk)		// only check for global-value
     {
-	if (check_isopt(*varp) == FAIL)
-	    return e_invalid_argument;
+	എങ്കിൽ (check_isopt(*varp) == FAIL)
+	    തിരികെ e_invalid_argument;
     }
-    else			// fallthrough for local-value
-	return did_set_isopt(args);
+    അല്ലെങ്കിൽ			// fallthrough for local-value
+	തിരികെ did_set_isopt(args);
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'isident' or the 'iskeyword' or the 'isprint' or the 'isfname' option is
  * changed.
  */
-    char *
+    അക്ഷരം *
 did_set_isopt(optset_T *args)
 {
     // 'isident', 'iskeyword', 'isprint' or 'isfname' option: refill g_chartab[]
     // If the new option is invalid, use old value.
     // 'lisp' option: refill g_chartab[] for '-' char.
-    if (init_chartab() == FAIL)
+    എങ്കിൽ (init_chartab() == FAIL)
     {
 	args->os_restore_chartab = TRUE;// need to restore the chartab.
-	return e_invalid_argument;	// error in value
+	തിരികെ e_invalid_argument;	// error in value
     }
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'jumpoptions' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_jumpoptions(optset_T *args UNUSED)
 {
-    if (opt_strings_flags(p_jop, p_jop_values, &jop_flags, TRUE) != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (opt_strings_flags(p_jop, p_jop_മൂല്യങ്ങൾ, &jop_flags, TRUE) != OK)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_jumpoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_jumpoptions(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_jop_values,
-	    ARRAY_LENGTH(p_jop_values) - 1,
-	    numMatches,
+	    p_jop_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_jop_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
-#if defined(FEAT_KEYMAP)
+#എങ്കിൽ defined(FEAT_KEYMAP)
 /*
  * The 'keymap' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_keymap(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
-    char *errmsg = NULL;
+    അക്ഷരം *errmsg = ശൂന്യ;
 
-    if (!valid_filetype(*varp))
+    എങ്കിൽ (!valid_filetype(*varp))
 	errmsg = e_invalid_argument;
-    else
+    അല്ലെങ്കിൽ
     {
-	int	    secure_save = secure;
+	പൂർണ്ണസംഖ്യ	    secure_save = secure;
 
 	// Reset the secure flag, since the value of 'keymap' has
 	// been checked to be safe.
@@ -3223,27 +3223,27 @@ did_set_keymap(optset_T *args)
 
 	// Since we check the value, there is no need to set P_INSECURE,
 	// even when the value comes from a modeline.
-	args->os_value_checked = TRUE;
+	args->os_മൂല്യം_checked = TRUE;
     }
 
-    if (errmsg == NULL)
+    എങ്കിൽ (errmsg == ശൂന്യ)
     {
-	if (*curbuf->b_p_keymap != NUL)
+	എങ്കിൽ (*curbuf->b_p_keymap != NUL)
 	{
 	    // Installed a new keymap, switch on using it.
 	    curbuf->b_p_iminsert = B_IMODE_LMAP;
-	    if (curbuf->b_p_imsearch != B_IMODE_USE_INSERT)
+	    എങ്കിൽ (curbuf->b_p_imsearch != B_IMODE_USE_തിരുകുക)
 		curbuf->b_p_imsearch = B_IMODE_LMAP;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // Cleared the keymap, may reset 'iminsert' and 'imsearch'.
-	    if (curbuf->b_p_iminsert == B_IMODE_LMAP)
+	    എങ്കിൽ (curbuf->b_p_iminsert == B_IMODE_LMAP)
 		curbuf->b_p_iminsert = B_IMODE_NONE;
-	    if (curbuf->b_p_imsearch == B_IMODE_LMAP)
-		curbuf->b_p_imsearch = B_IMODE_USE_INSERT;
+	    എങ്കിൽ (curbuf->b_p_imsearch == B_IMODE_LMAP)
+		curbuf->b_p_imsearch = B_IMODE_USE_തിരുകുക;
 	}
-	if ((args->os_flags & OPT_LOCAL) == 0)
+	എങ്കിൽ ((args->os_flags & OPT_LOCAL) == 0)
 	{
 	    set_iminsert_global();
 	    set_imsearch_global();
@@ -3251,283 +3251,283 @@ did_set_keymap(optset_T *args)
 	status_redraw_curbuf();
     }
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 #endif
 
 /*
  * The 'keymodel' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_keymodel(optset_T *args UNUSED)
 {
-    if (check_opt_strings(p_km, p_km_values, TRUE) != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (check_opt_strings(p_km, p_km_മൂല്യങ്ങൾ, TRUE) != OK)
+	തിരികെ e_invalid_argument;
 
-    km_stopsel = (vim_strchr(p_km, 'o') != NULL);
-    km_startsel = (vim_strchr(p_km, 'a') != NULL);
-    return NULL;
+    km_stopsel = (vim_strchr(p_km, 'o') != ശൂന്യ);
+    km_startsel = (vim_strchr(p_km, 'a') != ശൂന്യ);
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_keymodel(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_keymodel(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_km_values,
-	    ARRAY_LENGTH(p_km_values) - 1,
-	    numMatches,
+	    p_km_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_km_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'keyprotocol' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_keyprotocol(optset_T *args UNUSED)
 {
     char_u *term = T_NAME;
     keyprot_T kpc = match_keyprotocol(term);
-    if (kpc == KEYPROTOCOL_FAIL)
-	return e_invalid_argument;
+    എങ്കിൽ (kpc == KEYPROTOCOL_FAIL)
+	തിരികെ e_invalid_argument;
 
     apply_keyprotocol(term, kpc);
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_keyprotocol(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_keyprotocol(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
     expand_T *xp = args->oe_xp;
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    എങ്കിൽ (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
 	// 'keyprotocol' only has well-defined terms for completion for the
 	// protocol part after the colon.
-	return expand_set_opt_string(
+	തിരികെ expand_set_opt_string(
 		args,
-		p_kpc_protocol_values,
-		ARRAY_LENGTH(p_kpc_protocol_values) - 1,
-		numMatches,
+		p_kpc_protocol_മൂല്യങ്ങൾ,
+		ARRAY_LENGTH(p_kpc_protocol_മൂല്യങ്ങൾ) - 1,
+		അക്കം_Matches,
 		matches);
     }
     // Use expand_set_opt_string instead of returning FAIL so that we can
     // include the original value if args->oe_include_orig_val is set.
-    static char *(empty[]) = {NULL};
-    return expand_set_opt_string(args, empty, 0, numMatches, matches);
+    സ്ഥിതം അക്ഷരം *(empty[]) = {ശൂന്യ};
+    തിരികെ expand_set_opt_string(args, empty, 0, അക്കം_Matches, matches);
 }
 
 /*
  * The 'lispoptions' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_lispoptions(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (**varp != NUL
+    എങ്കിൽ (**varp != NUL
 	    && STRCMP(*varp, "expr:0") != 0
 	    && STRCMP(*varp, "expr:1") != 0)
-	return e_invalid_argument;
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_lispoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_lispoptions(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    static char *(p_lop_values[]) = {"expr:0", "expr:1", NULL};
-    return expand_set_opt_string(
+    സ്ഥിതം അക്ഷരം *(p_lop_മൂല്യങ്ങൾ[]) = {"expr:0", "expr:1", ശൂന്യ};
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_lop_values,
-	    ARRAY_LENGTH(p_lop_values) - 1,
-	    numMatches,
+	    p_lop_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_lop_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'matchpairs' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_matchpairs(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
     char_u	*p;
 
-    if (has_mbyte)
+    എങ്കിൽ (has_mbyte)
     {
-	for (p = *varp; *p != NUL; ++p)
+	വേണ്ടി (p = *varp; *p != NUL; ++p)
 	{
-	    int x2 = -1;
-	    int x3 = -1;
+	    പൂർണ്ണസംഖ്യ x2 = -1;
+	    പൂർണ്ണസംഖ്യ x3 = -1;
 
 	    p += mb_ptr2len(p);
-	    if (*p != NUL)
+	    എങ്കിൽ (*p != NUL)
 		x2 = *p++;
-	    if (*p != NUL)
+	    എങ്കിൽ (*p != NUL)
 	    {
 		x3 = mb_ptr2char(p);
 		p += mb_ptr2len(p);
 	    }
-	    if (x2 != ':' || x3 == -1 || (*p != NUL && *p != ','))
-		return e_invalid_argument;
-	    if (*p == NUL)
-		break;
+	    എങ്കിൽ (x2 != ':' || x3 == -1 || (*p != NUL && *p != ','))
+		തിരികെ e_invalid_argument;
+	    എങ്കിൽ (*p == NUL)
+		നിർത്തുക;
 	}
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	// Check for "x:y,x:y"
-	for (p = *varp; *p != NUL; p += 4)
+	വേണ്ടി (p = *varp; *p != NUL; p += 4)
 	{
-	    if (p[1] != ':' || p[2] == NUL || (p[3] != NUL && p[3] != ','))
-		return e_invalid_argument;
-	    if (p[3] == NUL)
-		break;
+	    എങ്കിൽ (p[1] != ':' || p[2] == NUL || (p[3] != NUL && p[3] != ','))
+		തിരികെ e_invalid_argument;
+	    എങ്കിൽ (p[3] == NUL)
+		നിർത്തുക;
 	}
     }
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * Process the updated 'messagesopt' option value.
  */
-    char *
+    അക്ഷരം *
 did_set_messagesopt(optset_T *args UNUSED)
 {
-    if (messagesopt_changed() == FAIL)
-	return e_invalid_argument;
+    എങ്കിൽ (messagesopt_changed() == FAIL)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_messagesopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_messagesopt(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    static char *(p_mopt_values[]) = {"hit-enter", "wait:", "history:", NULL};
-    return expand_set_opt_string(
+    സ്ഥിതം അക്ഷരം *(p_mopt_മൂല്യങ്ങൾ[]) = {"hit-enter", "wait:", "history:", ശൂന്യ};
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_mopt_values,
-	    ARRAY_LENGTH(p_mopt_values) - 1,
-	    numMatches,
+	    p_mopt_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_mopt_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
-#if defined(FEAT_SPELL)
+#എങ്കിൽ defined(FEAT_SPELL)
 /*
  * The 'mkspellmem' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_mkspellmem(optset_T *args UNUSED)
 {
-    if (spell_check_msm() != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (spell_check_msm() != OK)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 #endif
 
 /*
  * The 'mouse' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_mouse(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
-    char	*retval;
+    അക്ഷരം	*retval;
 
     retval = did_set_option_listflag(*varp, (char_u *)MOUSE_ALL, args->os_errbuf,
 		    args->os_errbuflen);
-    if (retval == NULL)
+    എങ്കിൽ (retval == ശൂന്യ)
     {
 	redraw_tabline = TRUE;
-	if (tabline_height() > 0)
+	എങ്കിൽ (tabline_height() > 0)
 	    update_screen(UPD_VALID);
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+#എങ്കിൽ defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
 	popup_close_info(); // Close info popup to apply new properties
 #endif
     }
-    return retval;
+    തിരികെ retval;
 }
 
-    int
-expand_set_mouse(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_mouse(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)MOUSE_ALL, numMatches, matches);
+    തിരികെ expand_set_opt_listflag(args, (char_u*)MOUSE_ALL, അക്കം_Matches, matches);
 }
 
 /*
  * The 'mousemodel' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_mousemodel(optset_T *args UNUSED)
 {
-    if (check_opt_strings(p_mousem, p_mousem_values, FALSE) != OK)
-	return e_invalid_argument;
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU) && (XmVersion <= 1002)
-    else if (*p_mousem != *args->os_oldval.string)
+    എങ്കിൽ (check_opt_strings(p_mousem, p_mousem_മൂല്യങ്ങൾ, FALSE) != OK)
+	തിരികെ e_invalid_argument;
+#എങ്കിൽ defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU) && (XmVersion <= 1002)
+    അല്ലെങ്കിൽ എങ്കിൽ (*p_mousem != *args->os_oldval.string)
 	// Changed from "extend" to "popup" or "popup_setpos" or vv: need
 	// to create or delete the popup menus.
-	gui_motif_update_mousemodel(root_menu);
+	gui_motif_update_mousemodel(വേര്_menu);
 #endif
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_mousemodel(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_mousemodel(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_mousem_values,
-	    ARRAY_LENGTH(p_mousem_values) - 1,
-	    numMatches,
+	    p_mousem_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_mousem_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
-#if defined(FEAT_MOUSESHAPE)
-    char *
+#എങ്കിൽ defined(FEAT_MOUSESHAPE)
+    അക്ഷരം *
 did_set_mouseshape(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    അക്ഷരം *errmsg = ശൂന്യ;
 
     errmsg = parse_shape_opt(SHAPE_MOUSE);
     update_mouseshape(-1);
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 #endif
 
 /*
  * The 'nrformats' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_nrformats(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    return did_set_opt_strings(*varp, p_nf_values, TRUE);
+    തിരികെ did_set_opt_strings(*varp, p_nf_മൂല്യങ്ങൾ, TRUE);
 }
 
-    int
-expand_set_nrformats(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_nrformats(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_nf_values,
-	    ARRAY_LENGTH(p_nf_values) - 1,
-	    numMatches,
+	    p_nf_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_nf_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 /*
  * One of the '*expr' options is changed: 'balloonexpr', 'diffexpr',
  * 'foldexpr', 'foldtext', 'formatexpr', 'includeexpr', 'indentexpr',
  * 'patchexpr', 'printexpr' and 'charconvert'.
  */
-    char *
+    അക്ഷരം *
 did_set_optexpr(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
@@ -3535,346 +3535,346 @@ did_set_optexpr(optset_T *args)
     // If the option value starts with <SID> or s:, then replace that with
     // the script identifier.
     char_u *name = get_scriptlocal_funcname(*varp);
-    if (name != NULL)
+    എങ്കിൽ (name != ശൂന്യ)
     {
 	free_string_option(*varp);
 	*varp = name;
     }
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 #endif
 
 /*
  * The 'pastetoggle' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_pastetoggle(optset_T *args UNUSED)
 {
     char_u	*p;
 
     // translate key codes like in a mapping
-    if (*p_pt)
+    എങ്കിൽ (*p_pt)
     {
-	(void)replace_termcodes(p_pt, &p, 0,
-		REPTERM_FROM_PART | REPTERM_DO_LT, NULL);
-	if (p != NULL)
+	(ശൂന്യം)replace_termcodes(p_pt, &p, 0,
+		REPTERM_FROM_PART | REPTERM_DO_LT, ശൂന്യ);
+	എങ്കിൽ (p != ശൂന്യ)
 	{
 	    free_string_option(p_pt);
 	    p_pt = p;
 	}
     }
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-#if defined(FEAT_PROP_POPUP)
+#എങ്കിൽ defined(FEAT_PROP_POPUP)
 /*
  * The 'previewpopup' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_previewpopup(optset_T *args UNUSED)
 {
-    if (parse_previewpopup(NULL) == FAIL)
-	return e_invalid_argument;
+    എങ്കിൽ (parse_previewpopup(ശൂന്യ) == FAIL)
+	തിരികെ e_invalid_argument;
 
-# if defined(FEAT_QUICKFIX)
+# എങ്കിൽ defined(FEAT_QUICKFIX)
     popup_close_info();
 # endif
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    static int
-expand_set_popupoption(optexpand_T *args, int *numMatches, char_u ***matches,
-	int previewpopup)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+expand_set_popupoption(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches,
+	പൂർണ്ണസംഖ്യ previewpopup)
 {
     expand_T *xp = args->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    എങ്കിൽ (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
-	if (completing_value_for_subopt(args, "close")
-		|| completing_value_for_subopt(args, "resize")
-		|| completing_value_for_subopt(args, "shadow"))
+	എങ്കിൽ (completing_മൂല്യം_for_subopt(args, "close")
+		|| completing_മൂല്യം_for_subopt(args, "resize")
+		|| completing_മൂല്യം_for_subopt(args, "shadow"))
 	{
-	    return expand_set_opt_string(
+	    തിരികെ expand_set_opt_string(
 		    args,
-		    p_popup_option_on_off_values,
-		    ARRAY_LENGTH(p_popup_option_on_off_values) - 1,
-		    numMatches,
+		    p_popup_option_on_off_മൂല്യങ്ങൾ,
+		    ARRAY_LENGTH(p_popup_option_on_off_മൂല്യങ്ങൾ) - 1,
+		    അക്കം_Matches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "border"))
+	എങ്കിൽ (completing_മൂല്യം_for_subopt(args, "border"))
 	{
-	    return expand_set_opt_string(
+	    തിരികെ expand_set_opt_string(
 		    args,
-		    previewpopup ? p_popup_pvp_border_values
-			: p_popup_cpp_border_values,
-		    (previewpopup ? ARRAY_LENGTH(p_popup_pvp_border_values) - 1
-			: ARRAY_LENGTH(p_popup_cpp_border_values)) - 1,
-		    numMatches,
+		    previewpopup ? p_popup_pvp_border_മൂല്യങ്ങൾ
+			: p_popup_cpp_border_മൂല്യങ്ങൾ,
+		    (previewpopup ? ARRAY_LENGTH(p_popup_pvp_border_മൂല്യങ്ങൾ) - 1
+			: ARRAY_LENGTH(p_popup_cpp_border_മൂല്യങ്ങൾ)) - 1,
+		    അക്കം_Matches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "align"))
+	എങ്കിൽ (completing_മൂല്യം_for_subopt(args, "align"))
 	{
-	    return expand_set_opt_string(
+	    തിരികെ expand_set_opt_string(
 		    args,
-		    p_popup_option_align_values,
-		    ARRAY_LENGTH(p_popup_option_align_values) - 1,
-		    numMatches,
+		    p_popup_option_align_മൂല്യങ്ങൾ,
+		    ARRAY_LENGTH(p_popup_option_align_മൂല്യങ്ങൾ) - 1,
+		    അക്കം_Matches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "highlight")
-		|| completing_value_for_subopt(args, "borderhighlight"))
+	എങ്കിൽ (completing_മൂല്യം_for_subopt(args, "highlight")
+		|| completing_മൂല്യം_for_subopt(args, "borderhighlight"))
 	{
 	    // Return the list of all highlight names
-	    return expand_set_opt_generic(
+	    തിരികെ expand_set_opt_generic(
 		    args,
 		    get_highlight_name,
-		    numMatches,
+		    അക്കം_Matches,
 		    matches);
 	}
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    previewpopup ? p_popup_pvp_option_values
-		: p_popup_cpp_option_values,
-	    previewpopup ? ARRAY_LENGTH(p_popup_pvp_option_values) - 1
-		: ARRAY_LENGTH(p_popup_cpp_option_values) - 1,
-	    numMatches,
+	    previewpopup ? p_popup_pvp_option_മൂല്യങ്ങൾ
+		: p_popup_cpp_option_മൂല്യങ്ങൾ,
+	    previewpopup ? ARRAY_LENGTH(p_popup_pvp_option_മൂല്യങ്ങൾ) - 1
+		: ARRAY_LENGTH(p_popup_cpp_option_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
-    int
-expand_set_previewpopup(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_previewpopup(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_popupoption(args, numMatches, matches, TRUE);
+    തിരികെ expand_set_popupoption(args, അക്കം_Matches, matches, TRUE);
 }
 
-    int
-expand_set_completepopup(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_completepopup(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_popupoption(args, numMatches, matches, FALSE);
+    തിരികെ expand_set_popupoption(args, അക്കം_Matches, matches, FALSE);
 }
 #endif
 
-#if defined(FEAT_POSTSCRIPT)
+#എങ്കിൽ defined(FEAT_POSTSCRIPT)
 /*
  * The 'printencoding' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_printencoding(optset_T *args UNUSED)
 {
     char_u	*s, *p;
 
     // Canonize 'printencoding' if VIM standard one
     p = enc_canonize(p_penc);
-    if (p != NULL)
+    എങ്കിൽ (p != ശൂന്യ)
     {
 	vim_free(p_penc);
 	p_penc = p;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	// Ensure lower case and '-' for '_'
-	for (s = p_penc; *s != NUL; s++)
+	വേണ്ടി (s = p_penc; *s != NUL; s++)
 	{
-	    if (*s == '_')
+	    എങ്കിൽ (*s == '_')
 		*s = '-';
-	    else
+	    അല്ലെങ്കിൽ
 		*s = TOLOWER_ASC(*s);
 	}
     }
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 #endif
 
-#if defined(FEAT_PRINTER)
+#എങ്കിൽ defined(FEAT_PRINTER)
 
-    static char_u *
-get_printoptions_names(expand_T *xp UNUSED, int idx)
+    സ്ഥിതം char_u *
+get_printoptions_names(expand_T *xp UNUSED, പൂർണ്ണസംഖ്യ idx)
 {
-    if (idx >= (int)ARRAY_LENGTH(printer_opts))
-	return NULL;
-    return (char_u*)printer_opts[idx].name;
+    എങ്കിൽ (idx >= (പൂർണ്ണസംഖ്യ)ARRAY_LENGTH(printer_opts))
+	തിരികെ ശൂന്യ;
+    തിരികെ (char_u*)printer_opts[idx].name;
 }
 
 /*
  * Expand 'printoptions' option
  */
-    int
-expand_set_printoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_printoptions(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_generic(
+    തിരികെ expand_set_opt_generic(
 	    args,
 	    get_printoptions_names,
-	    numMatches,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
 
-#if defined(FEAT_STL_OPT)
+#എങ്കിൽ defined(FEAT_STL_OPT)
 /*
  * The 'statusline' or the 'tabline' or the 'rulerformat' option is changed.
  * "rulerformat" is TRUE if the 'rulerformat' option is changed.
  */
-    static char *
-parse_statustabline_rulerformat(optset_T *args, int rulerformat)
+    സ്ഥിതം അക്ഷരം *
+parse_statustabline_rulerformat(optset_T *args, പൂർണ്ണസംഖ്യ rulerformat)
 {
     char_u	**varp = (char_u **)args->os_varp;
     char_u	*s;
-    char	*errmsg = NULL;
-    int		wid;
+    അക്ഷരം	*errmsg = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		wid;
 
-    if (rulerformat)	// reset ru_wid first
+    എങ്കിൽ (rulerformat)	// reset ru_wid first
 	ru_wid = 0;
     s = *varp;
-    if (rulerformat && *s == '%')
+    എങ്കിൽ (rulerformat && *s == '%')
     {
 	// set ru_wid if 'ruf' starts with "%99("
-	if (*++s == '-')	// ignore a '-'
+	എങ്കിൽ (*++s == '-')	// ignore a '-'
 	    s++;
 	wid = getdigits(&s);
-	if (wid && *s == '(' && (errmsg = check_stl_option(p_ruf)) == NULL)
+	എങ്കിൽ (wid && *s == '(' && (errmsg = check_stl_option(p_ruf)) == ശൂന്യ)
 	    ru_wid = wid;
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // Validate the flags in 'rulerformat' only if it doesn't point to
 	    // a custom function ("%!" flag).
-	    if ((*varp)[1] != '!')
+	    എങ്കിൽ ((*varp)[1] != '!')
 		errmsg = check_stl_option(p_ruf);
 	}
     }
     // check 'statusline' or 'tabline' only if it doesn't start with "%!"
-    else if (rulerformat || s[0] != '%' || s[1] != '!')
+    അല്ലെങ്കിൽ എങ്കിൽ (rulerformat || s[0] != '%' || s[1] != '!')
 	errmsg = check_stl_option(s);
-    if (rulerformat && errmsg == NULL)
+    എങ്കിൽ (rulerformat && errmsg == ശൂന്യ)
 	comp_col();
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 #endif
 
-#if defined(FEAT_RENDER_OPTIONS)
+#എങ്കിൽ defined(FEAT_RENDER_OPTIONS)
 /*
  * The 'renderoptions' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_renderoptions(optset_T *args UNUSED)
 {
-    if (!gui_mch_set_rendering_options(p_rop))
-	return e_invalid_argument;
+    എങ്കിൽ (!gui_mch_set_rendering_options(p_rop))
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 #endif
 
-#if defined(FEAT_RIGHTLEFT)
+#എങ്കിൽ defined(FEAT_RIGHTLEFT)
 /*
  * The 'rightleftcmd' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_rightleftcmd(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
     // Currently only "search" is a supported value.
-    if (**varp != NUL && STRCMP(*varp, "search") != 0)
-	return e_invalid_argument;
+    എങ്കിൽ (**varp != NUL && STRCMP(*varp, "search") != 0)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_rightleftcmd(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_rightleftcmd(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    static char *(p_rlc_values[]) = {"search", NULL};
-    return expand_set_opt_string(
+    സ്ഥിതം അക്ഷരം *(p_rlc_മൂല്യങ്ങൾ[]) = {"search", ശൂന്യ};
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_rlc_values,
-	    ARRAY_LENGTH(p_rlc_values) - 1,
-	    numMatches,
+	    p_rlc_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_rlc_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
 
 #define PUM_BORDER_CLEAR()   \
-    do {                     \
+    ചെയ്യുക {                     \
 	pum_set_border(FALSE); \
 	pum_set_shadow(FALSE); \
 	pum_set_margin(FALSE); \
-    } while (0)
+    } ആകുമ്പോൾ (0)
 
 /*
  * Parse a border value from a pumopt "border:" token.
  * Returns OK on success, FAIL on error.
  */
-    static int
-parse_pumopt_border(char_u *val, int len)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+parse_pumopt_border(char_u *val, പൂർണ്ണസംഖ്യ len)
 {
     // Use box-drawing characters only when 'encoding' is "utf-8" and
     // 'ambiwidth' is "single".
-    int	    can_use_box_chars = (enc_utf8 && *p_ambw == 's');
+    പൂർണ്ണസംഖ്യ	    can_use_box_chars = (enc_utf8 && *p_ambw == 's');
     char_u  *token;
 
     token = vim_strnsave(val, len);
-    if (token == NULL)
-	return FAIL;
+    എങ്കിൽ (token == ശൂന്യ)
+	തിരികെ FAIL;
 
-    if (can_use_box_chars && STRCMP(token, "single") == 0)
+    എങ്കിൽ (can_use_box_chars && STRCMP(token, "single") == 0)
 	pum_set_border_chars(0x2500, 0x2502, 0x2500, 0x2502, // ─ │ ─ │
 		0x250c, 0x2510, 0x2518, 0x2514); // ┌ ┐ ┘ └
-    else if (can_use_box_chars && STRCMP(token, "double") == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (can_use_box_chars && STRCMP(token, "double") == 0)
 	pum_set_border_chars(0x2550, 0x2551, 0x2550, 0x2551, // ═ ║ ═ ║
 		0x2554, 0x2557, 0x255D, 0x255A); // ╔ ╗ ╝  ╚
-    else if (can_use_box_chars && STRCMP(token, "round") == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (can_use_box_chars && STRCMP(token, "round") == 0)
 	pum_set_border_chars(0x2500, 0x2502, 0x2500, 0x2502, // ─ │ ─ │
 		0x256d, 0x256e, 0x256f, 0x2570); // ╭ ╮ ╯ ╰
-    else if (STRCMP(token, "ascii") == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(token, "ascii") == 0)
 	pum_set_border_chars('-', '|', '-', '|', '+', '+', '+', '+');
-    else if (STRNCMP(token, "custom:", 7) == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRNCMP(token, "custom:", 7) == 0)
     {
 	char_u	*q = token + 7;
-	int	out[8];
+	പൂർണ്ണസംഖ്യ	out[8];
 
-	for (int i = 0; i < 8; i++)
+	വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < 8; i++)
 	{
-	    if (*q == NUL || *q == ',')
+	    എങ്കിൽ (*q == NUL || *q == ',')
 	    {
 		vim_free(token);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	    out[i] = mb_ptr2char(q);
 	    mb_ptr2char_adv(&q);
-	    if (i < 7)
+	    എങ്കിൽ (i < 7)
 	    {
-		if (*q != ';')
+		എങ്കിൽ (*q != ';')
 		{
 		    vim_free(token);
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
 		q++;
 	    }
 	}
-	if (*q != NUL && *q != ',')
+	എങ്കിൽ (*q != NUL && *q != ',')
 	{
 	    vim_free(token);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	pum_set_border_chars(out[0], out[1], out[2], out[3], out[4], out[5],
 		out[6], out[7]);
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	vim_free(token);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     vim_free(token);
     pum_set_border(TRUE);
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -3888,13 +3888,13 @@ parse_pumopt_border(char_u *val, int len)
  *   shadow
  *   margin (requires border)
  */
-    char *
+    അക്ഷരം *
 did_set_pumopt(optset_T *args)
 {
     char_u  **varp = (char_u **)args->os_varp;
     char_u  *p;
-    int	    have_border = FALSE;
-    int	    have_margin = FALSE;
+    പൂർണ്ണസംഖ്യ	    have_border = FALSE;
+    പൂർണ്ണസംഖ്യ	    have_margin = FALSE;
 
     // Reset to defaults.
     PUM_BORDER_CLEAR();
@@ -3903,78 +3903,78 @@ did_set_pumopt(optset_T *args)
     p_pmw = 0;
     p_po = 100;
 
-    if (*varp == NULL || **varp == NUL)
-	return NULL;
+    എങ്കിൽ (*varp == ശൂന്യ || **varp == NUL)
+	തിരികെ ശൂന്യ;
 
-    for (p = *varp; p != NULL && *p != NUL; )
+    വേണ്ടി (p = *varp; p != ശൂന്യ && *p != NUL; )
     {
 	char_u *comma = vim_strchr(p, ',');
-	int len;
+	പൂർണ്ണസംഖ്യ len;
 
-	if (comma != NULL)
-	    len = (int)(comma - p);
-	else
-	    len = (int)STRLEN(p);
+	എങ്കിൽ (comma != ശൂന്യ)
+	    len = (പൂർണ്ണസംഖ്യ)(comma - p);
+	അല്ലെങ്കിൽ
+	    len = (പൂർണ്ണസംഖ്യ)STRLEN(p);
 
-	if (STRNCMP(p, "border:", 7) == 0)
+	എങ്കിൽ (STRNCMP(p, "border:", 7) == 0)
 	{
-	    if (have_border)
-		goto error;
+	    എങ്കിൽ (have_border)
+		പോകുക error;
 	    have_border = TRUE;
-	    if (parse_pumopt_border(p + 7, len - 7) == FAIL)
-		goto error;
+	    എങ്കിൽ (parse_pumopt_border(p + 7, len - 7) == FAIL)
+		പോകുക error;
 	}
-	else if (STRNCMP(p, "height:", 7) == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRNCMP(p, "height:", 7) == 0)
 	{
-	    long n = atol((char *)p + 7);
-	    if (n < 0)
-		goto error;
+	    long n = atol((അക്ഷരം *)p + 7);
+	    എങ്കിൽ (n < 0)
+		പോകുക error;
 	    p_ph = n;
 	}
-	else if (STRNCMP(p, "width:", 6) == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRNCMP(p, "width:", 6) == 0)
 	{
-	    long n = atol((char *)p + 6);
-	    if (n < 0)
-		goto error;
+	    long n = atol((അക്ഷരം *)p + 6);
+	    എങ്കിൽ (n < 0)
+		പോകുക error;
 	    p_pw = n;
 	}
-	else if (STRNCMP(p, "maxwidth:", 9) == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRNCMP(p, "maxwidth:", 9) == 0)
 	{
-	    long n = atol((char *)p + 9);
-	    if (n < 0)
-		goto error;
+	    long n = atol((അക്ഷരം *)p + 9);
+	    എങ്കിൽ (n < 0)
+		പോകുക error;
 	    p_pmw = n;
 	}
-	else if (STRNCMP(p, "opacity:", 8) == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRNCMP(p, "opacity:", 8) == 0)
 	{
-	    long n = atol((char *)p + 8);
-	    if (n < 0 || n > 100)
-		goto error;
+	    long n = atol((അക്ഷരം *)p + 8);
+	    എങ്കിൽ (n < 0 || n > 100)
+		പോകുക error;
 	    p_po = n;
 	}
-	else if (len == 6 && STRNCMP(p, "shadow", 6) == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (len == 6 && STRNCMP(p, "shadow", 6) == 0)
 	    pum_set_shadow(TRUE);
-	else if (len == 6 && STRNCMP(p, "margin", 6) == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (len == 6 && STRNCMP(p, "margin", 6) == 0)
 	{
 	    have_margin = TRUE;
 	    pum_set_margin(TRUE);
 	}
-	else
-	    goto error;
+	അല്ലെങ്കിൽ
+	    പോകുക error;
 
-	if (comma != NULL)
+	എങ്കിൽ (comma != ശൂന്യ)
 	    p = comma + 1;
-	else
-	    break;
+	അല്ലെങ്കിൽ
+	    നിർത്തുക;
     }
 
-    if (have_margin && !have_border)
-	goto error;
+    എങ്കിൽ (have_margin && !have_border)
+	പോകുക error;
 
     // Invalidate cached background for opacity changes.
     pum_opacity_changed();
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 
 error:
     PUM_BORDER_CLEAR();
@@ -3982,39 +3982,39 @@ error:
     p_pw = 15;
     p_pmw = 0;
     p_po = 100;
-    return e_invalid_argument;
+    തിരികെ e_invalid_argument;
 }
 
-    static char_u *
-get_pum_border_style(expand_T *xp UNUSED, int idx)
+    സ്ഥിതം char_u *
+get_pum_border_style(expand_T *xp UNUSED, പൂർണ്ണസംഖ്യ idx)
 {
-    static char *styles[] = {"ascii", "custom:", "single", "double", "round"};
-    return idx < ((enc_utf8 && *p_ambw == 's') ? (int)ARRAY_LENGTH(styles) : 2)
-	    ? (char_u *)styles[idx] : NULL;
+    സ്ഥിതം അക്ഷരം *styles[] = {"ascii", "custom:", "single", "double", "round"};
+    തിരികെ idx < ((enc_utf8 && *p_ambw == 's') ? (പൂർണ്ണസംഖ്യ)ARRAY_LENGTH(styles) : 2)
+	    ? (char_u *)styles[idx] : ശൂന്യ;
 }
 
-    int
-expand_set_pumopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_pumopt(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
     expand_T *xp = args->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    എങ്കിൽ (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
-	if (completing_value_for_subopt(args, "border"))
+	എങ്കിൽ (completing_മൂല്യം_for_subopt(args, "border"))
 	{
-	    return expand_set_opt_generic(
-		    args, get_pum_border_style, numMatches, matches);
+	    തിരികെ expand_set_opt_generic(
+		    args, get_pum_border_style, അക്കം_Matches, matches);
 	}
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    static char *(p_pumopt_values[]) = {"border:", "height:", "width:",
-	"maxwidth:", "opacity:", "shadow", "margin", NULL};
-    return expand_set_opt_string(
+    സ്ഥിതം അക്ഷരം *(p_pumopt_മൂല്യങ്ങൾ[]) = {"border:", "height:", "width:",
+	"maxwidth:", "opacity:", "shadow", "margin", ശൂന്യ};
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_pumopt_values,
-	    ARRAY_LENGTH(p_pumopt_values) - 1,
-	    numMatches,
+	    p_pumopt_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_pumopt_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
@@ -4025,125 +4025,125 @@ expand_set_pumopt(optexpand_T *args, int *numMatches, char_u ***matches)
  *   - "margin" may appear, but only together with exactly one border style.
  *   - "shadow" is independent and can be combined freely.
  */
-    char *
+    അക്ഷരം *
 did_set_pumborder(optset_T *args)
 {
     char_u  **varp = (char_u **)args->os_varp;
     char_u  *p;
-    int	    len;
-    int	    have_border = FALSE;
-    int	    have_margin = FALSE;
+    പൂർണ്ണസംഖ്യ	    len;
+    പൂർണ്ണസംഖ്യ	    have_border = FALSE;
+    പൂർണ്ണസംഖ്യ	    have_margin = FALSE;
 
     PUM_BORDER_CLEAR();
 
-    if (*varp == NULL || **varp == NUL)
-	return NULL;
+    എങ്കിൽ (*varp == ശൂന്യ || **varp == NUL)
+	തിരികെ ശൂന്യ;
 
-    for (p = *varp; p != NULL && *p != NUL; )
+    വേണ്ടി (p = *varp; p != ശൂന്യ && *p != NUL; )
     {
 	char_u *comma = vim_strchr(p, ',');
-	if (comma != NULL)
-	    len = (int)(comma - p);
-	else
-	    len = (int)STRLEN(p);
+	എങ്കിൽ (comma != ശൂന്യ)
+	    len = (പൂർണ്ണസംഖ്യ)(comma - p);
+	അല്ലെങ്കിൽ
+	    len = (പൂർണ്ണസംഖ്യ)STRLEN(p);
 
-	if (STRNCMP(p, "shadow", len) == 0 && len == 6)
+	എങ്കിൽ (STRNCMP(p, "shadow", len) == 0 && len == 6)
 	    pum_set_shadow(TRUE);
-	else if (STRNCMP(p, "margin", len) == 0 && len == 6)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRNCMP(p, "margin", len) == 0 && len == 6)
 	{
 	    have_margin = TRUE;
 	    pum_set_margin(TRUE);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    if (have_border)
-		goto error;
+	    എങ്കിൽ (have_border)
+		പോകുക error;
 	    have_border = TRUE;
-	    if (parse_pumopt_border(p, len) == FAIL)
-		goto error;
+	    എങ്കിൽ (parse_pumopt_border(p, len) == FAIL)
+		പോകുക error;
 	}
 
-	if (comma != NULL)
+	എങ്കിൽ (comma != ശൂന്യ)
 	    p = comma + 1;
-	else
-	    break;
+	അല്ലെങ്കിൽ
+	    നിർത്തുക;
     }
 
-    if (have_margin && !have_border)
-	goto error;
+    എങ്കിൽ (have_margin && !have_border)
+	പോകുക error;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 
 error:
     PUM_BORDER_CLEAR();
     pum_set_border_chars(0, 0, 0, 0, 0, 0, 0, 0);
-    return e_invalid_argument;
+    തിരികെ e_invalid_argument;
 }
 
-    static char_u *
-get_pumborder_token(expand_T *xp, int idx)
+    സ്ഥിതം char_u *
+get_pumborder_token(expand_T *xp, പൂർണ്ണസംഖ്യ idx)
 {
-    return idx == 0 ? (char_u *)"margin"
+    തിരികെ idx == 0 ? (char_u *)"margin"
 	 : idx == 1 ? (char_u *)"shadow"
 	 : get_pum_border_style(xp, idx - 2);
 }
 
-    int
-expand_set_pumborder(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_pumborder(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_generic(
-	    args, get_pumborder_token, numMatches, matches);
+    തിരികെ expand_set_opt_generic(
+	    args, get_pumborder_token, അക്കം_Matches, matches);
 }
 
-#if defined(FEAT_STL_OPT)
+#എങ്കിൽ defined(FEAT_STL_OPT)
 
 /*
  * The 'rulerformat' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_rulerformat(optset_T *args)
 {
-    return parse_statustabline_rulerformat(args, TRUE);
+    തിരികെ parse_statustabline_rulerformat(args, TRUE);
 }
 #endif
 
-#if defined(FEAT_TABPANEL)
+#എങ്കിൽ defined(FEAT_TABPANEL)
 /*
  * Process the new 'tabpanelopt' option value.
  */
-    char *
+    അക്ഷരം *
 did_set_tabpanelopt(optset_T *args UNUSED)
 {
-    if (tabpanelopt_changed() == FAIL)
-	return e_invalid_argument;
+    എങ്കിൽ (tabpanelopt_changed() == FAIL)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_tabpanelopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_tabpanelopt(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
     expand_T *xp = args->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    എങ്കിൽ (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
-	if (completing_value_for_subopt(args, "align"))
+	എങ്കിൽ (completing_മൂല്യം_for_subopt(args, "align"))
 	{
-	    return expand_set_opt_string(
+	    തിരികെ expand_set_opt_string(
 		    args,
-		    p_tplo_align_values,
-		    ARRAY_LENGTH(p_tplo_align_values) - 1,
-		    numMatches,
+		    p_tplo_align_മൂല്യങ്ങൾ,
+		    ARRAY_LENGTH(p_tplo_align_മൂല്യങ്ങൾ) - 1,
+		    അക്കം_Matches,
 		    matches);
 	}
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_tplo_values,
-	    ARRAY_LENGTH(p_tplo_values) - 1,
-	    numMatches,
+	    p_tplo_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_tplo_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
@@ -4151,27 +4151,27 @@ expand_set_tabpanelopt(optexpand_T *args, int *numMatches, char_u ***matches)
 /*
  * The 'scrollopt' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_scrollopt(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_sbo, p_scbopt_values, TRUE);
+    തിരികെ did_set_opt_strings(p_sbo, p_scbopt_മൂല്യങ്ങൾ, TRUE);
 }
 
-    int
-expand_set_scrollopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_scrollopt(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_scbopt_values,
-	    ARRAY_LENGTH(p_scbopt_values) - 1,
-	    numMatches,
+	    p_scbopt_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_scbopt_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'wlseat' option is changed
  */
-    char *
+    അക്ഷരം *
 did_set_wlseat(optset_T *args UNUSED)
 {
 #ifdef FEAT_WAYLAND_CLIPBOARD
@@ -4180,83 +4180,83 @@ did_set_wlseat(optset_T *args UNUSED)
     clip_reset_wayland();
 #endif
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'selection' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_selection(optset_T *args UNUSED)
 {
-    if (*p_sel == NUL || check_opt_strings(p_sel, p_sel_values, FALSE) != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (*p_sel == NUL || check_opt_strings(p_sel, p_sel_മൂല്യങ്ങൾ, FALSE) != OK)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_selection(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_selection(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_sel_values,
-	    ARRAY_LENGTH(p_sel_values) - 1,
-	    numMatches,
+	    p_sel_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_sel_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'selectmode' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_selectmode(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_slm, p_slm_values, TRUE);
+    തിരികെ did_set_opt_strings(p_slm, p_slm_മൂല്യങ്ങൾ, TRUE);
 }
 
-    int
-expand_set_selectmode(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_selectmode(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_slm_values,
-	    ARRAY_LENGTH(p_slm_values) - 1,
-	    numMatches,
+	    p_slm_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_slm_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
-#if defined(FEAT_SESSION)
+#എങ്കിൽ defined(FEAT_SESSION)
 /*
  * The 'sessionoptions' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_sessionoptions(optset_T *args)
 {
-    if (opt_strings_flags(p_ssop, p_ssop_values, &ssop_flags, TRUE) != OK)
-	return e_invalid_argument;
-    if ((ssop_flags & SSOP_CURDIR) && (ssop_flags & SSOP_SESDIR))
+    എങ്കിൽ (opt_strings_flags(p_ssop, p_ssop_മൂല്യങ്ങൾ, &ssop_flags, TRUE) != OK)
+	തിരികെ e_invalid_argument;
+    എങ്കിൽ ((ssop_flags & SSOP_CURDIR) && (ssop_flags & SSOP_SESDIR))
     {
 	// Don't allow both "sesdir" and "curdir".
-	(void)opt_strings_flags(args->os_oldval.string, p_ssop_values,
+	(ശൂന്യം)opt_strings_flags(args->os_oldval.string, p_ssop_മൂല്യങ്ങൾ,
 							&ssop_flags, TRUE);
-	return e_invalid_argument;
+	തിരികെ e_invalid_argument;
     }
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
+    പൂർണ്ണസംഖ്യ
 expand_set_sessionoptions(
     optexpand_T		*args,
-    int			*numMatches,
+    പൂർണ്ണസംഖ്യ			*അക്കം_Matches,
     char_u		***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_ssop_values,
-	    ARRAY_LENGTH(p_ssop_values) - 1,
-	    numMatches,
+	    p_ssop_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_ssop_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
@@ -4264,235 +4264,235 @@ expand_set_sessionoptions(
 /*
  * Validate 'shellpipe'/'shellredir' option.
  */
-    char *
+    അക്ഷരം *
 did_set_shellpipe_redir(optset_T *args)
 {
     char_u	*p;
     bool	seen = false;
 
-    for (p = args->os_newval.string; *p != NUL; ++p)
+    വേണ്ടി (p = args->os_newval.string; *p != NUL; ++p)
     {
-	if (*p != '%')
-	    continue;
+	എങ്കിൽ (*p != '%')
+	    തുടരുക;
 
-	if (p[1] == NUL)
-	    return e_invalid_format_string_single_percent_s;
+	എങ്കിൽ (p[1] == NUL)
+	    തിരികെ e_invalid_format_string_single_percent_s;
 
-	if (p[1] == '%')
+	എങ്കിൽ (p[1] == '%')
 	{
 	    ++p;    // skip second %
-	    continue;
+	    തുടരുക;
 	}
 
-	if (p[1] == 's')
+	എങ്കിൽ (p[1] == 's')
 	{
-	    if (seen)
-		return e_invalid_format_string_single_percent_s;
+	    എങ്കിൽ (seen)
+		തിരികെ e_invalid_format_string_single_percent_s;
 
 	    seen = true;
 	    ++p;    // consume 's'
-	    continue;
+	    തുടരുക;
 	}
-	return e_invalid_format_string_single_percent_s;
+	തിരികെ e_invalid_format_string_single_percent_s;
     }
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'shortmess' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_shortmess(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)SHM_ALL, args->os_errbuf,
+    തിരികെ did_set_option_listflag(*varp, (char_u *)SHM_ALL, args->os_errbuf,
 		    args->os_errbuflen);
 }
 
-    int
-expand_set_shortmess(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_shortmess(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)SHM_ALL, numMatches, matches);
+    തിരികെ expand_set_opt_listflag(args, (char_u*)SHM_ALL, അക്കം_Matches, matches);
 }
 
-#if defined(FEAT_LINEBREAK)
+#എങ്കിൽ defined(FEAT_LINEBREAK)
 /*
  * The 'showbreak' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_showbreak(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
     char_u	*s;
 
-    for (s = *varp; *s; )
+    വേണ്ടി (s = *varp; *s; )
     {
-	if (ptr2cells(s) != 1)
-	    return e_showbreak_contains_unprintable_or_wide_character;
+	എങ്കിൽ (ptr2cells(s) != 1)
+	    തിരികെ e_showbreak_contains_unprintable_or_wide_character;
 	MB_PTR_ADV(s);
     }
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 #endif
 
 /*
  * The 'showcmdloc' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_showcmdloc(optset_T *args UNUSED)
 {
-    char	*errmsg = did_set_opt_strings(p_sloc, p_sloc_values, FALSE);
+    അക്ഷരം	*errmsg = did_set_opt_strings(p_sloc, p_sloc_മൂല്യങ്ങൾ, FALSE);
 
-    if (errmsg == NULL)
+    എങ്കിൽ (errmsg == ശൂന്യ)
 	comp_col();
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 
-    int
-expand_set_showcmdloc(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_showcmdloc(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_sloc_values,
-	    ARRAY_LENGTH(p_sloc_values) - 1,
-	    numMatches,
+	    p_sloc_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_sloc_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
-#if defined(FEAT_SIGNS)
+#എങ്കിൽ defined(FEAT_SIGNS)
 /*
  * The 'signcolumn' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_signcolumn(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-# if defined(FEAT_LINEBREAK)
-    if (check_opt_strings(*varp, p_scl_values, FALSE) != OK)
-	return e_invalid_argument;
+# എങ്കിൽ defined(FEAT_LINEBREAK)
+    എങ്കിൽ (check_opt_strings(*varp, p_scl_മൂല്യങ്ങൾ, FALSE) != OK)
+	തിരികെ e_invalid_argument;
     // When changing the 'signcolumn' to or from 'number', recompute the
     // width of the number column if 'number' or 'relativenumber' is set.
-    if (((*args->os_oldval.string == 'n' && args->os_oldval.string[1] == 'u')
+    എങ്കിൽ (((*args->os_oldval.string == 'n' && args->os_oldval.string[1] == 'u')
 		|| (*curwin->w_p_scl == 'n' && *(curwin->w_p_scl + 1) =='u'))
 	    && (curwin->w_p_nu || curwin->w_p_rnu))
-	curwin->w_nrwidth_line_count = 0;
+	curwin->w_nrwidth_വരി_എണ്ണം = 0;
 # endif
 
-# if defined(FEAT_GUI)
+# എങ്കിൽ defined(FEAT_GUI)
     // In the GUI, when sign icons are used, a full screen clear is needed
     // to properly redraw the sign icons.
-    if (gui.in_use && curbuf->b_signlist != NULL)
+    എങ്കിൽ (gui.in_use && curbuf->b_signlist != ശൂന്യ)
 	redraw_all_later(UPD_CLEAR);
 # endif
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_signcolumn(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_signcolumn(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_scl_values,
-	    ARRAY_LENGTH(p_scl_values) - 1,
-	    numMatches,
+	    p_scl_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_scl_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
 
-#if defined(FEAT_SPELL)
+#എങ്കിൽ defined(FEAT_SPELL)
 /*
  * The 'spellcapcheck' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_spellcapcheck(optset_T *args UNUSED)
 {
     // compile the regexp program.
-    return compile_cap_prog(curwin->w_s);
+    തിരികെ compile_cap_prog(curwin->w_s);
 }
 
 /*
  * The 'spellfile' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_spellfile(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (!valid_spellfile(*varp))
-	return e_invalid_argument;
+    എങ്കിൽ (!valid_spellfile(*varp))
+	തിരികെ e_invalid_argument;
 
     // If there is a window for this buffer in which 'spell' is set load the
     // wordlists.
-    return did_set_spell_option();
+    തിരികെ did_set_spell_option();
 }
 
 /*
  * The 'spell' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_spelllang(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (!valid_spelllang(*varp))
-	return e_invalid_argument;
+    എങ്കിൽ (!valid_spelllang(*varp))
+	തിരികെ e_invalid_argument;
 
     // If there is a window for this buffer in which 'spell' is set load the
     // wordlists.
-    return did_set_spell_option();
+    തിരികെ did_set_spell_option();
 }
 
 /*
  * The 'spelloptions' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_spelloptions(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (**varp != NUL && STRCMP(*varp, "camel") != 0)
-	return e_invalid_argument;
+    എങ്കിൽ (**varp != NUL && STRCMP(*varp, "camel") != 0)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_spelloptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_spelloptions(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    static char *(p_spo_values[]) = {"camel", NULL};
-    return expand_set_opt_string(
+    സ്ഥിതം അക്ഷരം *(p_spo_മൂല്യങ്ങൾ[]) = {"camel", ശൂന്യ};
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_spo_values,
-	    ARRAY_LENGTH(p_spo_values) - 1,
-	    numMatches,
+	    p_spo_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_spo_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'spellsuggest' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_spellsuggest(optset_T *args UNUSED)
 {
-    if (spell_check_sps() != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (spell_check_sps() != OK)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_spellsuggest(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_spellsuggest(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_sps_values,
-	    ARRAY_LENGTH(p_sps_values) - 1,
-	    numMatches,
+	    p_sps_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_sps_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
@@ -4500,7 +4500,7 @@ expand_set_spellsuggest(optexpand_T *args, int *numMatches, char_u ***matches)
 /*
  * The 'splitkeep' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_splitkeep(optset_T *args UNUSED)
 {
     win_T	*wp;
@@ -4510,99 +4510,99 @@ did_set_splitkeep(optset_T *args UNUSED)
 	wp->w_prev_height = wp->w_height;
 	wp->w_prev_winrow = wp->w_winrow;
     }
-    return did_set_opt_strings(p_spk, p_spk_values, FALSE);
+    തിരികെ did_set_opt_strings(p_spk, p_spk_മൂല്യങ്ങൾ, FALSE);
 }
 
-    int
-expand_set_splitkeep(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_splitkeep(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_spk_values,
-	    ARRAY_LENGTH(p_spk_values) - 1,
-	    numMatches,
+	    p_spk_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_spk_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
-#if defined(FEAT_STL_OPT)
+#എങ്കിൽ defined(FEAT_STL_OPT)
 /*
  * The 'statusline' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_statusline(optset_T *args)
 {
     char_u  **varp = (char_u **)args->os_varp;
-    char    *ret = parse_statustabline_rulerformat(args, FALSE);
+    അക്ഷരം    *ret = parse_statustabline_rulerformat(args, FALSE);
 
-    if (ret != NULL)
-	return ret;
-    update_stl_rendered_height(varp == &curwin->w_p_stl ? curwin : NULL);
+    എങ്കിൽ (ret != ശൂന്യ)
+	തിരികെ ret;
+    update_stl_rendered_height(varp == &curwin->w_p_stl ? curwin : ശൂന്യ);
     frame_change_statusline_height();
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * Rewrite the 'statuslineopt' string: replace the last "maxheight:N" with
  * actual_stlh and remove earlier duplicates.  Keyword order is preserved.
  */
-    static void
-update_stlo_maxheight(char_u **varp, int actual_stlh)
+    സ്ഥിതം ശൂന്യം
+update_stlo_maxheight(char_u **varp, പൂർണ്ണസംഖ്യ actual_stlh)
 {
-    const char_u    *src = *varp;
-    const char_u    *last_mh = NULL;
-    const char_u    *p;
+    സ്ഥിരം char_u    *src = *varp;
+    സ്ഥിരം char_u    *last_mh = ശൂന്യ;
+    സ്ഥിരം char_u    *p;
 
     // Find the last "maxheight:" token.
     p = src;
-    while (*p != NUL)
+    ആകുമ്പോൾ (*p != NUL)
     {
-	if (STRNCMP(p, "maxheight:", 10) == 0)
+	എങ്കിൽ (STRNCMP(p, "maxheight:", 10) == 0)
 	    last_mh = p;
-	while (*p != ',' && *p != NUL)
+	ആകുമ്പോൾ (*p != ',' && *p != NUL)
 	    ++p;
-	if (*p == ',')
+	എങ്കിൽ (*p == ',')
 	    ++p;
     }
 
-    if (last_mh == NULL)
-	return;
+    എങ്കിൽ (last_mh == ശൂന്യ)
+	തിരികെ;
 
     size_t	bufsize = STRLEN(src) + NUMBUFLEN + 1;
     char_u	*buf = alloc(bufsize);
-    if (buf == NULL)
-	return;
+    എങ്കിൽ (buf == ശൂന്യ)
+	തിരികെ;
 
-    int		len = 0;
+    പൂർണ്ണസംഖ്യ		len = 0;
     bool	need_comma = false;
 
     p = src;
-    while (*p != NUL)
+    ആകുമ്പോൾ (*p != NUL)
     {
-	const	char_u	*tok = p;
-	int	tok_len;
+	സ്ഥിരം	char_u	*tok = p;
+	പൂർണ്ണസംഖ്യ	tok_len;
 
-	while (*p != ',' && *p != NUL)
+	ആകുമ്പോൾ (*p != ',' && *p != NUL)
 	    ++p;
-	tok_len = (int)(p - tok);
-	if (*p == ',')
+	tok_len = (പൂർണ്ണസംഖ്യ)(p - tok);
+	എങ്കിൽ (*p == ',')
 	    ++p;
 
-	if (STRNCMP(tok, "maxheight:", 10) == 0)
+	എങ്കിൽ (STRNCMP(tok, "maxheight:", 10) == 0)
 	{
-	    if (tok == last_mh)
+	    എങ്കിൽ (tok == last_mh)
 	    {
 		// Replace the last occurrence with the actual value.
-		if (need_comma)
+		എങ്കിൽ (need_comma)
 		    buf[len++] = ',';
-		len += vim_snprintf((char *)buf + len,
+		len += vim_snprintf((അക്ഷരം *)buf + len,
 			bufsize - len, "maxheight:%d", actual_stlh);
 		need_comma = true;
 	    }
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    if (need_comma)
+	    എങ്കിൽ (need_comma)
 		buf[len++] = ',';
 	    mch_memmove(buf + len, tok, tok_len);
 	    len += tok_len;
@@ -4617,48 +4617,48 @@ update_stlo_maxheight(char_u **varp, int actual_stlh)
 /*
  * The 'statuslineopt' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_statuslineopt(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
-    win_T       *wp = varp == &curwin->w_p_stlo ? curwin : NULL;
+    win_T       *wp = varp == &curwin->w_p_stlo ? curwin : ശൂന്യ;
 
-    if (statuslineopt_changed(*varp, wp) == FAIL)
-	return e_invalid_argument;
+    എങ്കിൽ (statuslineopt_changed(*varp, wp) == FAIL)
+	തിരികെ e_invalid_argument;
 
     // Sync stl_rendered_height with the current statusline.
     update_stl_rendered_height(wp);
 
     // Update the maxheight value to the actual value set.
     // Note: Must be changed if p_stlo_values are changed.
-    if (*varp != empty_option)
+    എങ്കിൽ (*varp != empty_option)
     {
-	int actual_stlh;
+	പൂർണ്ണസംഖ്യ actual_stlh;
 
-	if (wp != NULL)
+	എങ്കിൽ (wp != ശൂന്യ)
 	{
 	    frame_change_statusline_height();
 	    actual_stlh = MIN(wp->w_p_stlo_mh,
 		    wp->w_height + wp->w_status_height - p_wmh);
 	}
-	else
+	അല്ലെങ്കിൽ
 	    actual_stlh = frame_change_statusline_height();
 
 	// Only re-serialize when the window actually has a status line shown.
-	if (actual_stlh > 0)
+	എങ്കിൽ (actual_stlh > 0)
 	{
 	    update_stlo_maxheight(varp, actual_stlh);
 	    // Update the parsed maxheight member directly.
-	    if (wp != NULL)
+	    എങ്കിൽ (wp != ശൂന്യ)
 		wp->w_p_stlo_mh = actual_stlh;
-	    else
+	    അല്ലെങ്കിൽ
 		set_stlo_mh(actual_stlh);
 	}
     }
-    else
+    അല്ലെങ്കിൽ
 	frame_change_statusline_height();
 
-    if ((args->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    എങ്കിൽ ((args->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	// :set clears the local values.
 	clear_string_option(&curwin->w_p_stlo);
@@ -4666,17 +4666,17 @@ did_set_statuslineopt(optset_T *args)
 	curwin->w_p_stlo_mh = -1;
     }
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_statuslineopt(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_statuslineopt(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_stlo_values,
-	    ARRAY_LENGTH(p_stlo_values) - 1,
-	    numMatches,
+	    p_stlo_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_stlo_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
@@ -4684,167 +4684,167 @@ expand_set_statuslineopt(optexpand_T *args, int *numMatches, char_u ***matches)
 /*
  * The 'swapsync' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_swapsync(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_sws, p_sws_values, FALSE);
+    തിരികെ did_set_opt_strings(p_sws, p_sws_മൂല്യങ്ങൾ, FALSE);
 }
 
-    int
-expand_set_swapsync(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_swapsync(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_sws_values,
-	    ARRAY_LENGTH(p_sws_values) - 1,
-	    numMatches,
+	    p_sws_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_sws_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'switchbuf' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_switchbuf(optset_T *args UNUSED)
 {
-    return did_set_opt_flags(p_swb, p_swb_values, &swb_flags, TRUE);
+    തിരികെ did_set_opt_flags(p_swb, p_swb_മൂല്യങ്ങൾ, &swb_flags, TRUE);
 }
 
-    int
-expand_set_switchbuf(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_switchbuf(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_swb_values,
-	    ARRAY_LENGTH(p_swb_values) - 1,
-	    numMatches,
+	    p_swb_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_swb_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'tabclose' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_tabclose(optset_T *args UNUSED)
 {
-    return did_set_opt_flags(p_tcl, p_tcl_values, &tcl_flags, TRUE);
+    തിരികെ did_set_opt_flags(p_tcl, p_tcl_മൂല്യങ്ങൾ, &tcl_flags, TRUE);
 }
 
-    int
-expand_set_tabclose(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_tabclose(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_tcl_values,
-	    ARRAY_LENGTH(p_tcl_values) - 1,
-	    numMatches,
+	    p_tcl_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_tcl_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
-#if defined(FEAT_STL_OPT)
+#എങ്കിൽ defined(FEAT_STL_OPT)
 /*
  * The 'tabline' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_tabline(optset_T *args)
 {
-    return parse_statustabline_rulerformat(args, FALSE);
+    തിരികെ parse_statustabline_rulerformat(args, FALSE);
 }
 #endif
 
 /*
  * The 'tagcase' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_tagcase(optset_T *args)
 {
-    unsigned int	*flags;
+    unsigned പൂർണ്ണസംഖ്യ	*flags;
     char_u		*p;
 
-    if (args->os_flags & OPT_LOCAL)
+    എങ്കിൽ (args->os_flags & OPT_LOCAL)
     {
 	p = curbuf->b_p_tc;
 	flags = &curbuf->b_tc_flags;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	p = p_tc;
 	flags = &tc_flags;
     }
 
-    if ((args->os_flags & OPT_LOCAL) && *p == NUL)
+    എങ്കിൽ ((args->os_flags & OPT_LOCAL) && *p == NUL)
 	// make the local value empty: use the global value
 	*flags = 0;
-    else if (*p == NUL
-	    || opt_strings_flags(p, p_tc_values, flags, FALSE) != OK)
-	return e_invalid_argument;
+    അല്ലെങ്കിൽ എങ്കിൽ (*p == NUL
+	    || opt_strings_flags(p, p_tc_മൂല്യങ്ങൾ, flags, FALSE) != OK)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_tagcase(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_tagcase(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_tc_values,
-	    ARRAY_LENGTH(p_tc_values) - 1,
-	    numMatches,
+	    p_tc_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_tc_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'term' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_term(optset_T *args UNUSED)
 {
-    if (T_NAME[0] == NUL)
-	return e_cannot_set_term_to_empty_string;
+    എങ്കിൽ (T_NAME[0] == NUL)
+	തിരികെ e_cannot_set_term_to_empty_string;
 #ifdef FEAT_GUI
-    if (gui.in_use)
-	return e_cannot_change_term_in_GUI;
-    if (term_is_gui(T_NAME))
-	return e_use_gui_to_start_GUI;
+    എങ്കിൽ (gui.in_use)
+	തിരികെ e_cannot_change_term_in_GUI;
+    എങ്കിൽ (term_is_gui(T_NAME))
+	തിരികെ e_use_gui_to_start_GUI;
 #endif
-    if (set_termname(T_NAME) == FAIL)
-	return e_not_found_in_termcap;
+    എങ്കിൽ (set_termname(T_NAME) == FAIL)
+	തിരികെ e_not_found_in_termcap;
 
     // Screen colors may have changed.
     redraw_later_clear();
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * Some terminal option (t_xxx) is changed
  */
-    char *
+    അക്ഷരം *
 did_set_term_option(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if (!full_screen)
-	return NULL;
+    എങ്കിൽ (!full_screen)
+	തിരികെ ശൂന്യ;
 
     // ":set t_Co=0" and ":set t_Co=1" do ":set t_Co="
-    if (varp == &T_CCO)
+    എങ്കിൽ (varp == &T_CCO)
     {
-	int colors = atoi((char *)T_CCO);
+	പൂർണ്ണസംഖ്യ colors = atoi((അക്ഷരം *)T_CCO);
 
 	// Only reinitialize colors if t_Co value has really changed to
 	// avoid expensive reload of colorscheme if t_Co is set to the
 	// same value multiple times.
-	if (colors != t_colors)
+	എങ്കിൽ (colors != t_colors)
 	{
 	    t_colors = colors;
-	    if (t_colors <= 1)
+	    എങ്കിൽ (t_colors <= 1)
 	    {
 		vim_free(T_CCO);
 		T_CCO = empty_option;
 	    }
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
-	    if (is_term_win32())
+#എങ്കിൽ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+	    എങ്കിൽ (is_term_win32())
 	    {
 		swap_tcap();
 		args->os_did_swaptcap = TRUE;
@@ -4855,36 +4855,36 @@ did_set_term_option(optset_T *args)
 	}
     }
     ttest(FALSE);
-    if (varp == &T_ME)
+    എങ്കിൽ (varp == &T_ME)
     {
 	out_str(T_ME);
 	redraw_later(UPD_CLEAR);
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+#എങ്കിൽ defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 	// Since t_me has been set, this probably means that the user
 	// wants to use this as default colors.  Need to reset default
 	// background/foreground colors.
 # ifdef VIMDLL
-	if (!gui.in_use && !gui.starting)
+	എങ്കിൽ (!gui.in_use && !gui.starting)
 # endif
 	    mch_set_normal_colors();
 #endif
     }
-    if (varp == &T_BE && termcap_active)
+    എങ്കിൽ (varp == &T_BE && termcap_active)
     {
 	MAY_WANT_TO_LOG_THIS;
 
-	if (*T_BE == NUL)
+	എങ്കിൽ (*T_BE == NUL)
 	    // When clearing t_BE we assume the user no longer wants
 	    // bracketed paste, thus disable it by writing t_BD.
 	    out_str(T_BD);
-	else
+	അല്ലെങ്കിൽ
 	    out_str(T_BE);
     }
 
-    if (varp == &T_BSU || varp == &T_ESU)
+    എങ്കിൽ (varp == &T_BSU || varp == &T_ESU)
 	term_set_sync_output(TERM_SYNC_OUTPUT_OFF);
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 
@@ -4892,84 +4892,84 @@ did_set_term_option(optset_T *args)
 /*
  * The 'termresize' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_termresize(optset_T *args UNUSED)
 {
     // If empty or "inband", then attempt to enable in-band resize events.
-    if (*p_trz == NUL || STRCMP(p_trz, "inband") == 0)
+    എങ്കിൽ (*p_trz == NUL || STRCMP(p_trz, "inband") == 0)
 	term_set_win_resize(true);
-    else if (STRCMP(p_trz, "sigwinch") == 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(p_trz, "sigwinch") == 0)
 	term_set_win_resize(false);
-    else
-	return e_invalid_argument;
+    അല്ലെങ്കിൽ
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_termresize(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_termresize(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_trz_values,
-	    ARRAY_LENGTH(p_trz_values) - 1,
-	    numMatches,
+	    p_trz_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_trz_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
 
-#if defined(FEAT_TERMINAL)
+#എങ്കിൽ defined(FEAT_TERMINAL)
 /*
  * The 'termwinkey' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_termwinkey(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
-    if ((*varp)[0] != NUL && string_to_key(*varp, TRUE) == 0)
-	return e_invalid_argument;
+    എങ്കിൽ ((*varp)[0] != NUL && string_to_താക്കോൽ(*varp, TRUE) == 0)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'termwinsize' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_termwinsize(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
     char_u	*p;
 
-    if ((*varp)[0] == NUL)
-	return NULL;
+    എങ്കിൽ ((*varp)[0] == NUL)
+	തിരികെ ശൂന്യ;
 
     p = skipdigits(*varp);
-    if (p == *varp || (*p != 'x' && *p != '*') || *skipdigits(p + 1) != NUL)
-	return e_invalid_argument;
+    എങ്കിൽ (p == *varp || (*p != 'x' && *p != '*') || *skipdigits(p + 1) != NUL)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-# if defined(MSWIN)
+# എങ്കിൽ defined(MSWIN)
 /*
  * The 'termwintype' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_termwintype(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_twt, p_twt_values, FALSE);
+    തിരികെ did_set_opt_strings(p_twt, p_twt_മൂല്യങ്ങൾ, FALSE);
 }
 
-    int
-expand_set_termwintype(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_termwintype(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_twt_values,
-	    ARRAY_LENGTH(p_twt_values) - 1,
-	    numMatches,
+	    p_twt_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_twt_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 # endif
@@ -4978,304 +4978,304 @@ expand_set_termwintype(optexpand_T *args, int *numMatches, char_u ***matches)
 /*
  * The 'titlestring' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_titlestring(optset_T *args)
 {
-    int flagval = 0;
+    പൂർണ്ണസംഖ്യ flagval = 0;
 
 #ifdef FEAT_STL_OPT
     flagval = STL_IN_TITLE;
 #endif
-    return parse_titleiconstring(args, flagval);
+    തിരികെ parse_titleiconstring(args, flagval);
 }
 
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+#എങ്കിൽ defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
 /*
  * The 'toolbar' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_toolbar(optset_T *args UNUSED)
 {
-    if (opt_strings_flags(p_toolbar, p_toolbar_values, &toolbar_flags,
+    എങ്കിൽ (opt_strings_flags(p_toolbar, p_toolbar_മൂല്യങ്ങൾ, &toolbar_flags,
 								TRUE) != OK)
-	return e_invalid_argument;
+	തിരികെ e_invalid_argument;
 
     out_flush();
     gui_mch_show_toolbar((toolbar_flags &
 		(TOOLBAR_TEXT | TOOLBAR_ICONS)) != 0);
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_toolbar(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_toolbar(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_toolbar_values,
-	    ARRAY_LENGTH(p_toolbar_values) - 1,
-	    numMatches,
+	    p_toolbar_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_toolbar_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
 
-#if defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
+#എങ്കിൽ defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
 /*
  * The 'toolbariconsize' option is changed.  GTK+ 2 only.
  */
-    char *
+    അക്ഷരം *
 did_set_toolbariconsize(optset_T *args UNUSED)
 {
-    if (opt_strings_flags(p_tbis, p_tbis_values, &tbis_flags, FALSE) != OK)
-	return e_invalid_argument;
+    എങ്കിൽ (opt_strings_flags(p_tbis, p_tbis_മൂല്യങ്ങൾ, &tbis_flags, FALSE) != OK)
+	തിരികെ e_invalid_argument;
 
     out_flush();
     gui_mch_show_toolbar((toolbar_flags &
 		(TOOLBAR_TEXT | TOOLBAR_ICONS)) != 0);
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
+    പൂർണ്ണസംഖ്യ
 expand_set_toolbariconsize(
     optexpand_T	*args,
-    int		*numMatches,
+    പൂർണ്ണസംഖ്യ		*അക്കം_Matches,
     char_u	***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_tbis_values,
-	    ARRAY_LENGTH(p_tbis_values) - 1,
-	    numMatches,
+	    p_tbis_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_tbis_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
 
-#if defined(UNIX) || defined(VMS)
+#എങ്കിൽ defined(UNIX) || defined(VMS)
 /*
  * The 'ttymouse' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_ttymouse(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    അക്ഷരം *errmsg = ശൂന്യ;
 
     // Switch the mouse off before changing the escape sequences used for
     // that.
     mch_setmouse(FALSE);
-    if (opt_strings_flags(p_ttym, p_ttym_values, &ttym_flags, FALSE) != OK)
+    എങ്കിൽ (opt_strings_flags(p_ttym, p_ttym_മൂല്യങ്ങൾ, &ttym_flags, FALSE) != OK)
 	errmsg = e_invalid_argument;
-    else
+    അല്ലെങ്കിൽ
 	check_mouse_termcode();
-    if (termcap_active)
+    എങ്കിൽ (termcap_active)
 	setmouse();		// may switch it on again
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 
-    int
-expand_set_ttymouse(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_ttymouse(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_ttym_values,
-	    ARRAY_LENGTH(p_ttym_values) - 1,
-	    numMatches,
+	    p_ttym_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_ttym_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
 
-#if defined(FEAT_VARTABS)
+#എങ്കിൽ defined(FEAT_VARTABS)
 /*
  * The 'varsofttabstop' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_varsofttabstop(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
     char_u *cp;
 
-    if (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
+    എങ്കിൽ (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
 	VIM_CLEAR(curbuf->b_p_vsts_array);
-    else
+    അല്ലെങ്കിൽ
     {
-	for (cp = *varp; *cp; ++cp)
+	വേണ്ടി (cp = *varp; *cp; ++cp)
 	{
-	    if (vim_isdigit(*cp))
-		continue;
-	    if (*cp == ',' && cp > *varp && *(cp-1) != ',')
-		continue;
-	    return e_invalid_argument;
+	    എങ്കിൽ (vim_isdigit(*cp))
+		തുടരുക;
+	    എങ്കിൽ (*cp == ',' && cp > *varp && *(cp-1) != ',')
+		തുടരുക;
+	    തിരികെ e_invalid_argument;
 	}
 
-	int *oldarray = curbuf->b_p_vsts_array;
-	if (tabstop_set(*varp, &(curbuf->b_p_vsts_array)) == OK)
+	പൂർണ്ണസംഖ്യ *oldarray = curbuf->b_p_vsts_array;
+	എങ്കിൽ (tabstop_set(*varp, &(curbuf->b_p_vsts_array)) == OK)
 	{
-	    if (oldarray)
+	    എങ്കിൽ (oldarray)
 		vim_free(oldarray);
 	}
-	else
-	    return e_invalid_argument;
+	അല്ലെങ്കിൽ
+	    തിരികെ e_invalid_argument;
     }
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'vartabstop' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_vartabstop(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
     char_u *cp;
 
-    if (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
+    എങ്കിൽ (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
 	VIM_CLEAR(curbuf->b_p_vts_array);
-    else
+    അല്ലെങ്കിൽ
     {
-	for (cp = *varp; *cp; ++cp)
+	വേണ്ടി (cp = *varp; *cp; ++cp)
 	{
-	    if (vim_isdigit(*cp))
-		continue;
-	    if (*cp == ',' && cp > *varp && *(cp-1) != ',')
-		continue;
-	    return e_invalid_argument;
+	    എങ്കിൽ (vim_isdigit(*cp))
+		തുടരുക;
+	    എങ്കിൽ (*cp == ',' && cp > *varp && *(cp-1) != ',')
+		തുടരുക;
+	    തിരികെ e_invalid_argument;
 	}
 
-	int *oldarray = curbuf->b_p_vts_array;
+	പൂർണ്ണസംഖ്യ *oldarray = curbuf->b_p_vts_array;
 
-	if (tabstop_set(*varp, &(curbuf->b_p_vts_array)) == OK)
+	എങ്കിൽ (tabstop_set(*varp, &(curbuf->b_p_vts_array)) == OK)
 	{
 	    vim_free(oldarray);
 # ifdef FEAT_FOLDING
-	    if (foldmethodIsIndent(curwin))
+	    എങ്കിൽ (foldmethodIsIndent(curwin))
 		foldUpdateAll(curwin);
 # endif
 	}
-	else
-	    return e_invalid_argument;
+	അല്ലെങ്കിൽ
+	    തിരികെ e_invalid_argument;
     }
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 #endif
 
 /*
  * The 'verbosefile' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_verbosefile(optset_T *args UNUSED)
 {
     verbose_stop();
-    if (*p_vfile != NUL && verbose_open() == FAIL)
-	return e_invalid_argument;
+    എങ്കിൽ (*p_vfile != NUL && verbose_open() == FAIL)
+	തിരികെ e_invalid_argument;
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-#if defined(FEAT_SESSION)
+#എങ്കിൽ defined(FEAT_SESSION)
 /*
  * The 'viewoptions' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_viewoptions(optset_T *args UNUSED)
 {
-    return did_set_opt_flags(p_vop, p_ssop_values, &vop_flags, TRUE);
+    തിരികെ did_set_opt_flags(p_vop, p_ssop_മൂല്യങ്ങൾ, &vop_flags, TRUE);
 }
 #endif
 
-#if defined(FEAT_VIMINFO)
+#എങ്കിൽ defined(FEAT_VIMINFO)
 /*
  * The 'viminfo' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_viminfo(optset_T *args)
 {
     char_u	*s;
-    char	*errmsg = NULL;
+    അക്ഷരം	*errmsg = ശൂന്യ;
 
-    for (s = p_viminfo; *s;)
+    വേണ്ടി (s = p_viminfo; *s;)
     {
 	// Check it's a valid character
-	if (vim_strchr((char_u *)"!\"%'/:<@cfhnrs", *s) == NULL)
+	എങ്കിൽ (vim_strchr((char_u *)"!\"%'/:<@cfhnrs", *s) == ശൂന്യ)
 	{
 	    errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, *s);
-	    break;
+	    നിർത്തുക;
 	}
-	if (*s == 'n')	// name is always last one
-	    break;
-	else if (*s == 'r') // skip until next ','
+	എങ്കിൽ (*s == 'n')	// name is always last one
+	    നിർത്തുക;
+	അല്ലെങ്കിൽ എങ്കിൽ (*s == 'r') // skip until next ','
 	{
-	    while (*++s && *s != ',')
+	    ആകുമ്പോൾ (*++s && *s != ',')
 		;
 	}
-	else if (*s == '%')
+	അല്ലെങ്കിൽ എങ്കിൽ (*s == '%')
 	{
 	    // optional number
-	    while (vim_isdigit(*++s))
+	    ആകുമ്പോൾ (vim_isdigit(*++s))
 		;
 	}
-	else if (*s == '!' || *s == 'h' || *s == 'c')
+	അല്ലെങ്കിൽ എങ്കിൽ (*s == '!' || *s == 'h' || *s == 'c')
 	    ++s;		// no extra chars
-	else		// must have a number
+	അല്ലെങ്കിൽ		// must have a number
 	{
-	    while (vim_isdigit(*++s))
+	    ആകുമ്പോൾ (vim_isdigit(*++s))
 		;
 
-	    if (!VIM_ISDIGIT(*(s - 1)))
+	    എങ്കിൽ (!VIM_ISDIGIT(*(s - 1)))
 	    {
-		if (args->os_errbuf != NULL)
+		എങ്കിൽ (args->os_errbuf != ശൂന്യ)
 		{
 		    vim_snprintf(args->os_errbuf, args->os_errbuflen,
-			    _(e_missing_number_after_angle_str_angle),
+			    _(e_missing_സംഖ്യ_after_angle_str_angle),
 			    transchar_byte(*(s - 1)));
 		    errmsg = args->os_errbuf;
 		}
-		else
+		അല്ലെങ്കിൽ
 		    errmsg = "";
-		break;
+		നിർത്തുക;
 	    }
 	}
-	if (*s == ',')
+	എങ്കിൽ (*s == ',')
 	    ++s;
-	else if (*s)
+	അല്ലെങ്കിൽ എങ്കിൽ (*s)
 	{
-	    if (args->os_errbuf != NULL)
+	    എങ്കിൽ (args->os_errbuf != ശൂന്യ)
 		errmsg = e_missing_comma;
-	    else
+	    അല്ലെങ്കിൽ
 		errmsg = "";
-	    break;
+	    നിർത്തുക;
 	}
     }
-    if (*p_viminfo && errmsg == NULL && get_viminfo_parameter('\'') < 0)
-	errmsg = e_must_specify_a_value;
+    എങ്കിൽ (*p_viminfo && errmsg == ശൂന്യ && get_viminfo_parameter('\'') < 0)
+	errmsg = e_must_specify_a_മൂല്യം;
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 #endif
 
 /*
  * The 'virtualedit' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_virtualedit(optset_T *args)
 {
     char_u		*ve = p_ve;
-    unsigned int	*flags = &ve_flags;
+    unsigned പൂർണ്ണസംഖ്യ	*flags = &ve_flags;
 
-    if (args->os_flags & OPT_LOCAL)
+    എങ്കിൽ (args->os_flags & OPT_LOCAL)
     {
 	ve = curwin->w_p_ve;
 	flags = &curwin->w_ve_flags;
     }
 
-    if ((args->os_flags & OPT_LOCAL) && *ve == NUL)
+    എങ്കിൽ ((args->os_flags & OPT_LOCAL) && *ve == NUL)
 	// make the local value empty: use the global value
 	*flags = 0;
-    else
+    അല്ലെങ്കിൽ
     {
-	if (opt_strings_flags(ve, p_ve_values, flags, TRUE) != OK)
-	    return e_invalid_argument;
-	else if (STRCMP(ve, args->os_oldval.string) != 0)
+	എങ്കിൽ (opt_strings_flags(ve, p_ve_മൂല്യങ്ങൾ, flags, TRUE) != OK)
+	    തിരികെ e_invalid_argument;
+	അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(ve, args->os_oldval.string) != 0)
 	{
 	    // Recompute cursor position in case the new 've' setting
 	    // changes something.
@@ -5284,113 +5284,113 @@ did_set_virtualedit(optset_T *args)
 	}
     }
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_virtualedit(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_virtualedit(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_ve_values,
-	    ARRAY_LENGTH(p_ve_values) - 1,
-	    numMatches,
+	    p_ve_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_ve_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'whichwrap' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_whichwrap(optset_T *args)
 {
     char_u	**varp = (char_u **)args->os_varp;
 
     // Add ',' to the list flags because 'whichwrap' is a flag
     // list that is comma-separated.
-    return did_set_option_listflag(*varp, (char_u *)(WW_ALL ","),
+    തിരികെ did_set_option_listflag(*varp, (char_u *)(WW_ALL ","),
 		    args->os_errbuf, args->os_errbuflen);
 }
 
-    int
-expand_set_whichwrap(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_whichwrap(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)WW_ALL, numMatches, matches);
+    തിരികെ expand_set_opt_listflag(args, (char_u*)WW_ALL, അക്കം_Matches, matches);
 }
 
 /*
  * The 'wildmode' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_wildmode(optset_T *args UNUSED)
 {
-    if (check_opt_wim() == FAIL)
-	return e_invalid_argument;
-    return NULL;
+    എങ്കിൽ (check_opt_wim() == FAIL)
+	തിരികെ e_invalid_argument;
+    തിരികെ ശൂന്യ;
 }
 
-    int
-expand_set_wildmode(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_wildmode(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_wim_values,
-	    ARRAY_LENGTH(p_wim_values) - 1,
-	    numMatches,
+	    p_wim_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_wim_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
 /*
  * The 'wildoptions' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_wildoptions(optset_T *args UNUSED)
 {
-    return did_set_opt_strings(p_wop, p_wop_values, TRUE);
+    തിരികെ did_set_opt_strings(p_wop, p_wop_മൂല്യങ്ങൾ, TRUE);
 }
 
-    int
-expand_set_wildoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_wildoptions(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_wop_values,
-	    ARRAY_LENGTH(p_wop_values) - 1,
-	    numMatches,
+	    p_wop_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_wop_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 
-#if defined(FEAT_WAK)
+#എങ്കിൽ defined(FEAT_WAK)
 /*
  * The 'winaltkeys' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_winaltkeys(optset_T *args UNUSED)
 {
-    char *errmsg = NULL;
+    അക്ഷരം *errmsg = ശൂന്യ;
 
-    if (*p_wak == NUL || check_opt_strings(p_wak, p_wak_values, FALSE) != OK)
+    എങ്കിൽ (*p_wak == NUL || check_opt_strings(p_wak, p_wak_മൂല്യങ്ങൾ, FALSE) != OK)
 	errmsg = e_invalid_argument;
 # ifdef FEAT_MENU
-#  if defined(FEAT_GUI_MOTIF)
-    else if (gui.in_use)
+#  എങ്കിൽ defined(FEAT_GUI_MOTIF)
+    അല്ലെങ്കിൽ എങ്കിൽ (gui.in_use)
 	gui_motif_set_mnemonics(p_wak[0] == 'y' || p_wak[0] == 'm');
 #  elif defined(FEAT_GUI_GTK)
-    else if (gui.in_use)
+    അല്ലെങ്കിൽ എങ്കിൽ (gui.in_use)
 	gui_gtk_set_mnemonics(p_wak[0] == 'y' || p_wak[0] == 'm');
 #  endif
 # endif
-    return errmsg;
+    തിരികെ errmsg;
 }
 
-    int
-expand_set_winaltkeys(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_winaltkeys(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_string(
+    തിരികെ expand_set_opt_string(
 	    args,
-	    p_wak_values,
-	    ARRAY_LENGTH(p_wak_values) - 1,
-	    numMatches,
+	    p_wak_മൂല്യങ്ങൾ,
+	    ARRAY_LENGTH(p_wak_മൂല്യങ്ങൾ) - 1,
+	    അക്കം_Matches,
 	    matches);
 }
 #endif
@@ -5398,58 +5398,58 @@ expand_set_winaltkeys(optexpand_T *args, int *numMatches, char_u ***matches)
 /*
  * The 'wincolor' option is changed.
  */
-    char *
+    അക്ഷരം *
 did_set_wincolor(optset_T *args UNUSED)
 {
     update_wincolor(curwin, args->os_newval.string);
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * The 'winhighlight' option is changed
  */
-    char *
+    അക്ഷരം *
 did_set_winhighlight(optset_T *args)
 {
-    return update_winhighlight(curwin, args->os_newval.string);
+    തിരികെ update_winhighlight(curwin, args->os_newval.string);
 }
 
 /*
  * Expand 'winhighlight' option.
  */
-    int
-expand_set_winhighlight(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_winhighlight(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
     expand_T	    *xp = args->oe_xp;
 
-    if ((xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    എങ്കിൽ ((xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
 	    || xp->xp_pattern == args->oe_set_arg || *(xp->xp_pattern-1) == ',')
     {
 	// After a ':' or after a ',', or at the start, so expand highlight
 	// group name.
 
 	// If starts with !, then expand 'highlight' occasions.
-	if (*xp->xp_pattern == '!')
-	    return expand_hl_occasions(args, numMatches, matches, '!');
-	else
-	    return expand_set_opt_generic(
+	എങ്കിൽ (*xp->xp_pattern == '!')
+	    തിരികെ expand_hl_occasions(args, അക്കം_Matches, matches, '!');
+	അല്ലെങ്കിൽ
+	    തിരികെ expand_set_opt_generic(
 		    args,
 		    get_highlight_name,
-		    numMatches,
+		    അക്കം_Matches,
 		    matches);
     }
 
     VIM_CLEAR(*matches);
-    return FAIL;
+    തിരികെ FAIL;
 }
 
-    int
-expand_set_wincolor(optexpand_T *args, int *numMatches, char_u ***matches)
+    പൂർണ്ണസംഖ്യ
+expand_set_wincolor(optexpand_T *args, പൂർണ്ണസംഖ്യ *അക്കം_Matches, char_u ***matches)
 {
-    return expand_set_opt_generic(
+    തിരികെ expand_set_opt_generic(
 	    args,
 	    get_highlight_name,
-	    numMatches,
+	    അക്കം_Matches,
 	    matches);
 }
 
@@ -5457,16 +5457,16 @@ expand_set_wincolor(optexpand_T *args, int *numMatches, char_u ***matches)
 /*
  * When the 'syntax' option is set, load the syntax of that name.
  */
-    static void
-do_syntax_autocmd(int value_changed)
+    സ്ഥിതം ശൂന്യം
+do_syntax_autocmd(പൂർണ്ണസംഖ്യ മൂല്യം_changed)
 {
-    static int syn_recursive = 0;
+    സ്ഥിതം പൂർണ്ണസംഖ്യ syn_recursive = 0;
 
     ++syn_recursive;
     // Only pass TRUE for "force" when the value changed or not used
     // recursively, to avoid endless recurrence.
     apply_autocmds(EVENT_SYNTAX, curbuf->b_p_syn, curbuf->b_fname,
-	    value_changed || syn_recursive == 1, curbuf);
+	    മൂല്യം_changed || syn_recursive == 1, curbuf);
     curbuf->b_flags |= BF_SYN_SET;
     --syn_recursive;
 }
@@ -5475,16 +5475,16 @@ do_syntax_autocmd(int value_changed)
 /*
  * When the 'filetype' option is set, trigger the FileType autocommand.
  */
-    static void
-do_filetype_autocmd(char_u **varp, int opt_flags, int value_changed)
+    സ്ഥിതം ശൂന്യം
+do_filetype_autocmd(char_u **varp, പൂർണ്ണസംഖ്യ opt_flags, പൂർണ്ണസംഖ്യ മൂല്യം_changed)
 {
     // Skip this when called from a modeline and the filetype was already set
     // to this value.
-    if ((opt_flags & OPT_MODELINE) && !value_changed)
-	return;
+    എങ്കിൽ ((opt_flags & OPT_MODELINE) && !മൂല്യം_changed)
+	തിരികെ;
 
-    static int  ft_recursive = 0;
-    int	    secure_save = secure;
+    സ്ഥിതം പൂർണ്ണസംഖ്യ  ft_recursive = 0;
+    പൂർണ്ണസംഖ്യ	    secure_save = secure;
 
     // Reset the secure flag, since the value of 'filetype' has
     // been checked to be safe.
@@ -5495,11 +5495,11 @@ do_filetype_autocmd(char_u **varp, int opt_flags, int value_changed)
     // Only pass TRUE for "force" when the value changed or not
     // used recursively, to avoid endless recurrence.
     apply_autocmds(EVENT_FILETYPE, curbuf->b_p_ft, curbuf->b_fname,
-	    value_changed || ft_recursive == 1, curbuf);
+	    മൂല്യം_changed || ft_recursive == 1, curbuf);
     --ft_recursive;
     // Just in case the old "curbuf" is now invalid.
-    if (varp != &(curbuf->b_p_ft))
-	varp = NULL;
+    എങ്കിൽ (varp != &(curbuf->b_p_ft))
+	varp = ശൂന്യ;
 
     secure = secure_save;
 }
@@ -5509,26 +5509,26 @@ do_filetype_autocmd(char_u **varp, int opt_flags, int value_changed)
  * When the 'spelllang' option is set, source the spell/LANG.vim file in
  * 'runtimepath'.
  */
-    static void
-do_spelllang_source(void)
+    സ്ഥിതം ശൂന്യം
+do_spelllang_source(ശൂന്യം)
 {
     char_u	fname[200];
     char_u	*p;
     char_u	*q = curwin->w_s->b_p_spl;
 
     // Skip the first name if it is "cjk".
-    if (STRNCMP(q, "cjk,", 4) == 0)
+    എങ്കിൽ (STRNCMP(q, "cjk,", 4) == 0)
 	q += 4;
 
     // They could set 'spellcapcheck' depending on the language.  Use the first
     // name in 'spelllang' up to '_region' or '.encoding'.
-    for (p = q; *p != NUL; ++p)
-	if (!ASCII_ISALNUM(*p) && *p != '-')
-	    break;
-    if (p > q)
+    വേണ്ടി (p = q; *p != NUL; ++p)
+	എങ്കിൽ (!ASCII_ISALNUM(*p) && *p != '-')
+	    നിർത്തുക;
+    എങ്കിൽ (p > q)
     {
-	vim_snprintf((char *)fname, 200, "spell/%.*s.vim",
-		(int)(p - q), q);
+	vim_snprintf((അക്ഷരം *)fname, 200, "spell/%.*s.vim",
+		(പൂർണ്ണസംഖ്യ)(p - q), q);
 	source_runtime(fname, DIP_ALL);
     }
 }
@@ -5539,20 +5539,20 @@ do_spelllang_source(void)
  * The new value must be allocated.
  * Returns NULL for success, or an untranslated error message for an error.
  */
-    char *
+    അക്ഷരം *
 did_set_string_option(
-    int		opt_idx,		// index in options[] table
+    പൂർണ്ണസംഖ്യ		opt_idx,		// index in options[] table
     char_u	**varp,			// pointer to the option variable
     char_u	*oldval,		// previous value of the option
-    char_u	*value,			// new value of the option
-    char	*errbuf,		// buffer for errors, or NULL
+    char_u	*മൂല്യം,			// new value of the option
+    അക്ഷരം	*errbuf,		// buffer for errors, or NULL
     size_t	errbuflen,		// length of error buffer
-    int		opt_flags,		// OPT_LOCAL and/or OPT_GLOBAL
+    പൂർണ്ണസംഖ്യ		opt_flags,		// OPT_LOCAL and/or OPT_GLOBAL
     set_op_T    op,			// OP_ADDING/OP_PREPENDING/OP_REMOVING
-    int		*value_checked)		// value was checked to be safe, no
+    പൂർണ്ണസംഖ്യ		*മൂല്യം_checked)		// value was checked to be safe, no
 					// need to set P_INSECURE
 {
-    char	*errmsg = NULL;
+    അക്ഷരം	*errmsg = ശൂന്യ;
     long_u	free_oldval = (get_option_flags(opt_idx) & P_ALLOCED);
     opt_did_set_cb_T did_set_cb = get_option_did_set_cb(opt_idx);
     optset_T	args;
@@ -5560,10 +5560,10 @@ did_set_string_option(
     // 'ttytype' is an alias for 'term'.  Both 'term' and 'ttytype' point to
     // T_NAME.  If 'term' or 'ttytype' is modified, then use the index for the
     // 'term' option.  Only set the P_ALLOCED flag on 'term'.
-    if (varp == &T_NAME)
+    എങ്കിൽ (varp == &T_NAME)
     {
 	opt_idx = findoption((char_u *)"term");
-	if (opt_idx >= 0)
+	എങ്കിൽ (opt_idx >= 0)
 	{
 	    free_oldval = (get_option_flags(opt_idx) & P_ALLOCED);
 	    did_set_cb = get_option_did_set_cb(opt_idx);
@@ -5573,23 +5573,23 @@ did_set_string_option(
     CLEAR_FIELD(args);
 
     // Disallow changing some options from secure mode
-    if ((secure
+    എങ്കിൽ ((secure
 #ifdef HAVE_SANDBOX
 		|| sandbox != 0
 #endif
 		) && (get_option_flags(opt_idx) & P_SECURE))
 	errmsg = e_not_allowed_here;
     // Check for a "normal" directory or file name in some options.
-    else if (check_illegal_path_names(opt_idx, varp))
+    അല്ലെങ്കിൽ എങ്കിൽ (check_illegal_path_names(opt_idx, varp))
 	errmsg = e_invalid_argument;
-    else if (did_set_cb != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (did_set_cb != ശൂന്യ)
     {
 	args.os_varp = (char_u *)varp;
 	args.os_idx = opt_idx;
 	args.os_flags = opt_flags;
 	args.os_op = op;
 	args.os_oldval.string = oldval;
-	args.os_newval.string = value;
+	args.os_newval.string = മൂല്യം;
 	args.os_errbuf = errbuf;
 	args.os_errbuflen = errbuflen;
 	// Invoke the option specific callback function to validate and apply
@@ -5598,21 +5598,21 @@ did_set_string_option(
 
 	// The 'keymap', 'filetype' and 'syntax' option callback functions
 	// may change the os_value_checked field.
-	*value_checked = args.os_value_checked;
+	*മൂല്യം_checked = args.os_മൂല്യം_checked;
     }
 
     // If an error is detected, restore the previous value.
-    if (errmsg != NULL)
+    എങ്കിൽ (errmsg != ശൂന്യ)
     {
 	free_string_option(*varp);
 	*varp = oldval;
 	// When resetting some values, need to act on it.
-	if (args.os_restore_chartab)
-	    (void)init_chartab();
-	if (varp == &p_hl)
-	    (void)highlight_changed();
+	എങ്കിൽ (args.os_restore_chartab)
+	    (ശൂന്യം)init_chartab();
+	എങ്കിൽ (varp == &p_hl)
+	    (ശൂന്യം)highlight_changed();
     }
-    else
+    അല്ലെങ്കിൽ
     {
 #ifdef FEAT_EVAL
 	// Remember where the option was set.
@@ -5621,11 +5621,11 @@ did_set_string_option(
 	// Free string options that are in allocated memory.
 	// Use "free_oldval", because recursiveness may change the flags under
 	// our fingers (esp. init_highlight()).
-	if (free_oldval)
+	എങ്കിൽ (free_oldval)
 	    free_string_option(oldval);
 	set_option_flag(opt_idx, P_ALLOCED);
 
-	if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
+	എങ്കിൽ ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
 		&& is_global_local_option(opt_idx))
 	{
 	    // global option with local value set to use global value; free
@@ -5636,58 +5636,58 @@ did_set_string_option(
 	}
 
 	// May set global value for local option.
-	else if (!(opt_flags & OPT_LOCAL) && opt_flags != OPT_GLOBAL)
+	അല്ലെങ്കിൽ എങ്കിൽ (!(opt_flags & OPT_LOCAL) && opt_flags != OPT_GLOBAL)
 	    set_string_option_global(opt_idx, varp);
 
 	// Trigger the autocommand only after setting the flags.
 #ifdef FEAT_SYN_HL
-	if (varp == &(curbuf->b_p_syn))
-	    do_syntax_autocmd(args.os_value_changed);
+	എങ്കിൽ (varp == &(curbuf->b_p_syn))
+	    do_syntax_autocmd(args.os_മൂല്യം_changed);
 #endif
-	else if (varp == &(curbuf->b_p_ft))
-	    do_filetype_autocmd(varp, opt_flags, args.os_value_changed);
+	അല്ലെങ്കിൽ എങ്കിൽ (varp == &(curbuf->b_p_ft))
+	    do_filetype_autocmd(varp, opt_flags, args.os_മൂല്യം_changed);
 #ifdef FEAT_SPELL
-	if (varp == &(curwin->w_s->b_p_spl))
+	എങ്കിൽ (varp == &(curwin->w_s->b_p_spl))
 	    do_spelllang_source();
 #endif
     }
 
-    if (varp == &p_mouse)
+    എങ്കിൽ (varp == &p_mouse)
     {
-	if (*p_mouse == NUL)
+	എങ്കിൽ (*p_mouse == NUL)
 	    mch_setmouse(FALSE);    // switch mouse off
-	else
+	അല്ലെങ്കിൽ
 	    setmouse();		    // in case 'mouse' changed
     }
 
-    if (varp == &p_rtp)
+    എങ്കിൽ (varp == &p_rtp)
     {
 	export_myvimdir();
-#if defined(FEAT_LUA)
+#എങ്കിൽ defined(FEAT_LUA)
 	update_package_paths_in_lua();
 #endif
     }
 
-#if defined(FEAT_LINEBREAK)
+#എങ്കിൽ defined(FEAT_LINEBREAK)
     // Changing Formatlistpattern when briopt includes the list setting:
     // redraw
-    if ((varp == &p_flp || varp == &(curbuf->b_p_flp))
+    എങ്കിൽ ((varp == &p_flp || varp == &(curbuf->b_p_flp))
 	    && curwin->w_briopt_list)
 	redraw_all_later(UPD_NOT_VALID);
 #endif
 
-    if (curwin->w_curswant != MAXCOL
+    എങ്കിൽ (curwin->w_curswant != MAXCOL
 		   && (get_option_flags(opt_idx) & (P_CURSWANT | P_RALL)) != 0
 				&& (get_option_flags(opt_idx) & P_HLONLY) == 0)
 	curwin->w_set_curswant = true;
 
-    if ((opt_flags & OPT_NO_REDRAW) == 0)
+    എങ്കിൽ ((opt_flags & OPT_NO_REDRAW) == 0)
     {
 #ifdef FEAT_GUI
 	// set when changing an option that only requires a redraw in the GUI
-	int	redraw_gui_only = FALSE;
+	പൂർണ്ണസംഖ്യ	redraw_gui_only = FALSE;
 
-	if (varp == &p_go			// 'guioptions'
+	എങ്കിൽ (varp == &p_go			// 'guioptions'
 		|| varp == &p_guifont		// 'guifont'
 # ifdef FEAT_GUI_TABLINE
 		|| varp == &p_gtl		// 'guitablabel'
@@ -5697,27 +5697,27 @@ did_set_string_option(
 		|| varp == &p_guifontset	// 'guifontset'
 # endif
 		|| varp == &p_guifontwide	// 'guifontwide'
-# if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+# എങ്കിൽ defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 		|| varp == &p_guiligatures	// 'guiligatures'
 # endif
 	    )
 	    redraw_gui_only = TRUE;
 
 	// check redraw when it's not a GUI option or the GUI is active.
-	if (!redraw_gui_only || gui.in_use)
+	എങ്കിൽ (!redraw_gui_only || gui.in_use)
 #endif
 	    check_redraw(get_option_flags(opt_idx));
     }
 
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
-    if (args.os_did_swaptcap)
+#എങ്കിൽ defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+    എങ്കിൽ (args.os_did_swaptcap)
     {
 	set_termname((char_u *)"win32");
 	init_highlight(TRUE, FALSE);
     }
 #endif
 
-    return errmsg;
+    തിരികെ errmsg;
 }
 
 /*
@@ -5726,13 +5726,13 @@ did_set_string_option(
  * Return OK for correct value, FAIL otherwise.
  * Empty is always OK.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 check_opt_strings(
     char_u	*val,
-    char	**values,
-    int		list)	    // when TRUE: accept a list of values
+    അക്ഷരം	**മൂല്യങ്ങൾ,
+    പൂർണ്ണസംഖ്യ		list)	    // when TRUE: accept a list of values
 {
-    return opt_strings_flags(val, values, NULL, list);
+    തിരികെ opt_strings_flags(val, മൂല്യങ്ങൾ, ശൂന്യ, list);
 }
 
 /*
@@ -5742,47 +5742,47 @@ check_opt_strings(
  * Return OK for correct value, FAIL otherwise.
  * Empty is always OK.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 opt_strings_flags(
     char_u	*val,		// new value
-    char	**values,	// array of valid string values
+    അക്ഷരം	**മൂല്യങ്ങൾ,	// array of valid string values
     unsigned	*flagp,
-    int		list)		// when TRUE: accept a list of values
+    പൂർണ്ണസംഖ്യ		list)		// when TRUE: accept a list of values
 {
-    int		i;
-    int		len;
+    പൂർണ്ണസംഖ്യ		i;
+    പൂർണ്ണസംഖ്യ		len;
     unsigned	new_flags = 0;
 
-    while (*val)
+    ആകുമ്പോൾ (*val)
     {
-	for (i = 0; ; ++i)
+	വേണ്ടി (i = 0; ; ++i)
 	{
-	    if (values[i] == NULL)	// val not found in values[]
-		return FAIL;
+	    എങ്കിൽ (മൂല്യങ്ങൾ[i] == ശൂന്യ)	// val not found in values[]
+		തിരികെ FAIL;
 
-	    len = (int)STRLEN(values[i]);
-	    if (STRNCMP(values[i], val, len) == 0
+	    len = (പൂർണ്ണസംഖ്യ)STRLEN(മൂല്യങ്ങൾ[i]);
+	    എങ്കിൽ (STRNCMP(മൂല്യങ്ങൾ[i], val, len) == 0
 		    && ((list && val[len] == ',') || val[len] == NUL))
 	    {
 		val += len + (val[len] == ',');
 		new_flags |= (1 << i);
-		break;		// check next item in val list
+		നിർത്തുക;		// check next item in val list
 	    }
 	}
     }
-    if (flagp != NULL)
+    എങ്കിൽ (flagp != ശൂന്യ)
 	*flagp = new_flags;
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * return OK if "p" is a valid fileformat name, FAIL otherwise.
  */
-    int
-check_ff_value(char_u *p)
+    പൂർണ്ണസംഖ്യ
+check_ff_മൂല്യം(char_u *p)
 {
-    return check_opt_strings(p, p_ff_values, FALSE);
+    തിരികെ check_opt_strings(p, p_ff_മൂല്യങ്ങൾ, FALSE);
 }
 
 /*
@@ -5792,31 +5792,31 @@ check_ff_value(char_u *p)
  * Caller must make sure to first call save_clear_shm_value() and then
  * restore_shm_value() exactly the same number of times.
  */
-    void
-save_clear_shm_value(void)
+    ശൂന്യം
+save_clear_shm_മൂല്യം(ശൂന്യം)
 {
-    if (STRLEN(p_shm) >= SHM_LEN)
+    എങ്കിൽ (STRLEN(p_shm) >= SHM_LEN)
     {
 	iemsg(e_internal_error_shortmess_too_long);
-	return;
+	തിരികെ;
     }
 
-    if (++set_shm_recursive == 1)
+    എങ്കിൽ (++set_shm_recursive == 1)
     {
 	STRCPY(shm_buf, p_shm);
-	set_option_value_give_err((char_u *)"shm", 0L, (char_u *)"", 0);
+	set_option_മൂല്യം_give_err((char_u *)"shm", 0L, (char_u *)"", 0);
     }
 }
 
 /*
  * Restore the shortmess Flags set from the save_clear_shm_value() function.
  */
-    void
-restore_shm_value(void)
+    ശൂന്യം
+restore_shm_മൂല്യം(ശൂന്യം)
 {
-    if (--set_shm_recursive == 0)
+    എങ്കിൽ (--set_shm_recursive == 0)
     {
-	set_option_value_give_err((char_u *)"shm", 0L, shm_buf, 0);
+	set_option_മൂല്യം_give_err((char_u *)"shm", 0L, shm_buf, 0);
 	vim_memset(shm_buf, 0, SHM_LEN);
     }
 }
@@ -5824,35 +5824,35 @@ restore_shm_value(void)
 /*
  * Export the environment variable $MYVIMDIR to the first item in runtimepath
  */
-    void
-export_myvimdir(void)
+    ശൂന്യം
+export_myvimdir(ശൂന്യം)
 {
-    int		dofree = FALSE;
+    പൂർണ്ണസംഖ്യ		dofree = FALSE;
     char_u	*p;
     char_u	*q = p_rtp;
     string_T	buf;
 
     buf.string = alloc(MAXPATHL);
-    if (buf.string == NULL)
-	return;
+    എങ്കിൽ (buf.string == ശൂന്യ)
+	തിരികെ;
 
     buf.length = (size_t)copy_option_part(&q, buf.string, MAXPATHL, ",");
 
     p = vim_getenv((char_u *)"MYVIMDIR", &dofree);
 
-    if (p == NULL || STRCMP(p, buf.string) != 0)
+    എങ്കിൽ (p == ശൂന്യ || STRCMP(p, buf.string) != 0)
     {
-	if (*buf.string != NUL && !after_pathsep(buf.string, buf.string + buf.length))
+	എങ്കിൽ (*buf.string != NUL && !after_pathsep(buf.string, buf.string + buf.length))
 	    STRCPY(buf.string + buf.length, PATHSEPSTR);
 #ifdef MSWIN
 	// normalize path separators
-	for (q = buf.string; *q != NUL; q++)
-	    if (*q == '/')
+	വേണ്ടി (q = buf.string; *q != NUL; q++)
+	    എങ്കിൽ (*q == '/')
 		*q = '\\';
 #endif
 	vim_setenv((char_u *)"MYVIMDIR", buf.string);
     }
-    if (dofree)
+    എങ്കിൽ (dofree)
 	vim_free(p);
     vim_free(buf.string);
 }

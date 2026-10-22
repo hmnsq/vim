@@ -1,2 +1,2 @@
-import before_2
+ഇറക്കുമതി before_2
 dir = "after"

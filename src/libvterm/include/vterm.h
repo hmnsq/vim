@@ -5,21 +5,21 @@
 #define __VTERM_H__
 
 #ifdef __cplusplus
-extern "C" {
+ബാഹ്യ "C" {
 #endif
 
-#include <stdlib.h>
+#അന്തര്ഭാവ <stdlib.h>
 
-#include "vterm_keycodes.h"
+#അന്തര്ഭാവ "vterm_keycodes.h"
 
 // VIM: use TRUE and FALSE instead of true and false
 #define TRUE 1
 #define FALSE 0
 
 // VIM: from stdint.h
-typedef unsigned char		uint8_t;
-typedef unsigned short		uint16_t;
-typedef unsigned int		uint32_t;
+തരനിർവചനം unsigned അക്ഷരം		uint8_t;
+തരനിർവചനം unsigned short		uint16_t;
+തരനിർവചനം unsigned പൂർണ്ണസംഖ്യ		uint32_t;
 
 // VIM: define max screen cols and rows
 #define VTERM_MAX_COLS 1000
@@ -37,14 +37,14 @@ typedef unsigned int		uint32_t;
  * you do */
 #define VTERM_MAX_CHARS_PER_CELL 6
 
-typedef struct VTerm VTerm;
-typedef struct VTermState VTermState;
-typedef struct VTermScreen VTermScreen;
+തരനിർവചനം ഘടന VTerm VTerm;
+തരനിർവചനം ഘടന VTermState VTermState;
+തരനിർവചനം ഘടന VTermScreen VTermScreen;
 
 // Specifies a screen point.
-typedef struct {
-  int row;
-  int col;
+തരനിർവചനം ഘടന {
+  പൂർണ്ണസംഖ്യ row;
+  പൂർണ്ണസംഖ്യ col;
 } VTermPos;
 
 /* some small utility functions; we can just keep these static here */
@@ -55,30 +55,30 @@ typedef struct {
  * Return  0  if "a" and "b" are equal
  * Return > 0 if "a" is after "b".
  */
-int vterm_pos_cmp(VTermPos a, VTermPos b);
+പൂർണ്ണസംഖ്യ vterm_pos_cmp(VTermPos a, VTermPos b);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int vterm_pos_cmp(VTermPos a, VTermPos b)
+#എങ്കിൽ defined(DEFINE_INLINES) || USE_INLINE
+INLINE പൂർണ്ണസംഖ്യ vterm_pos_cmp(VTermPos a, VTermPos b)
 {
-  return (a.row == b.row) ? a.col - b.col : a.row - b.row;
+  തിരികെ (a.row == b.row) ? a.col - b.col : a.row - b.row;
 }
 #endif
 
 // Specifies a rectangular screen area.
-typedef struct {
-  int start_row;
-  int end_row;
-  int start_col;
-  int end_col;
+തരനിർവചനം ഘടന {
+  പൂർണ്ണസംഖ്യ start_row;
+  പൂർണ്ണസംഖ്യ end_row;
+  പൂർണ്ണസംഖ്യ start_col;
+  പൂർണ്ണസംഖ്യ end_col;
 } VTermRect;
 
 /* true if the rect contains the point */
-int vterm_rect_contains(VTermRect r, VTermPos p);
+പൂർണ്ണസംഖ്യ vterm_rect_contains(VTermRect r, VTermPos p);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int vterm_rect_contains(VTermRect r, VTermPos p)
+#എങ്കിൽ defined(DEFINE_INLINES) || USE_INLINE
+INLINE പൂർണ്ണസംഖ്യ vterm_rect_contains(VTermRect r, VTermPos p)
 {
-  return p.row >= r.start_row && p.row < r.end_row &&
+  തിരികെ p.row >= r.start_row && p.row < r.end_row &&
          p.col >= r.start_col && p.col < r.end_col;
 }
 #endif
@@ -86,10 +86,10 @@ INLINE int vterm_rect_contains(VTermRect r, VTermPos p)
 /* move a rect */
 // Move "rect" "row_delta" down and "col_delta" right.
 // Does not check boundaries.
-void vterm_rect_move(VTermRect *rect, int row_delta, int col_delta);
+ശൂന്യം vterm_rect_move(VTermRect *rect, പൂർണ്ണസംഖ്യ row_delta, പൂർണ്ണസംഖ്യ col_delta);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE void vterm_rect_move(VTermRect *rect, int row_delta, int col_delta)
+#എങ്കിൽ defined(DEFINE_INLINES) || USE_INLINE
+INLINE ശൂന്യം vterm_rect_move(VTermRect *rect, പൂർണ്ണസംഖ്യ row_delta, പൂർണ്ണസംഖ്യ col_delta)
 {
   rect->start_row += row_delta; rect->end_row += row_delta;
   rect->start_col += col_delta; rect->end_col += col_delta;
@@ -99,7 +99,7 @@ INLINE void vterm_rect_move(VTermRect *rect, int row_delta, int col_delta)
 /**
  * Bit-field describing the value of VTermColor.type
  */
-typedef enum {
+തരനിർവചനം എണ്ണൽ {
   /**
    * If the lower bit of `type` is not set, the colour is 24-bit RGB.
    */
@@ -179,7 +179,7 @@ typedef enum {
 #define VTERM_COLOR_IS_INVALID(col) (!!((col)->type & VTERM_COLOR_INVALID))
 
 // VIM: this was a union, but that doesn't always work.
-typedef struct {
+തരനിർവചനം ഘടന {
   /**
    * Tag indicating which member is actually valid.
    * Please use the `VTERM_COLOR_IS_*` test macros to check whether a
@@ -195,20 +195,20 @@ typedef struct {
 /**
  * Constructs a new VTermColor instance representing the given RGB values.
  */
-void vterm_color_rgb(VTermColor *col, uint8_t red, uint8_t green, uint8_t blue);
+ശൂന്യം vterm_color_rgb(VTermColor *col, uint8_t red, uint8_t green, uint8_t blue);
 
 /**
  * Construct a new VTermColor instance representing an indexed color with the
  * given index.
  */
-void vterm_color_indexed(VTermColor *col, uint8_t idx);
+ശൂന്യം vterm_color_indexed(VTermColor *col, uint8_t idx);
 
 /**
  * Compares two colours. Returns true if the colors are equal, false otherwise.
  */
-int vterm_color_is_equal(const VTermColor *a, const VTermColor *b);
+പൂർണ്ണസംഖ്യ vterm_color_is_equal(സ്ഥിരം VTermColor *a, സ്ഥിരം VTermColor *b);
 
-typedef enum {
+തരനിർവചനം എണ്ണൽ {
   /* VTERM_VALUETYPE_NONE = 0 */
   VTERM_VALUETYPE_BOOL = 1,
   VTERM_VALUETYPE_INT,
@@ -216,23 +216,23 @@ typedef enum {
   VTERM_VALUETYPE_COLOR,
 
   VTERM_N_VALUETYPES
-} VTermValueType;
+} VTerm_മൂല്യം_Type;
 
-typedef struct {
-  const char *str;
+തരനിർവചനം ഘടന {
+  സ്ഥിരം അക്ഷരം *str;
   size_t      len : 30;
-  unsigned int  initial : 1;
-  unsigned int  final : 1;
+  unsigned പൂർണ്ണസംഖ്യ  initial : 1;
+  unsigned പൂർണ്ണസംഖ്യ  final : 1;
 } VTermStringFragment;
 
-typedef union {
-  int boolean;
-  int number;
+തരനിർവചനം സംഘം {
+  പൂർണ്ണസംഖ്യ boolean;
+  പൂർണ്ണസംഖ്യ സംഖ്യ;
   VTermStringFragment string;
   VTermColor color;
-} VTermValue;
+} VTerm_മൂല്യം;
 
-typedef enum {
+തരനിർവചനം എണ്ണൽ {
   /* VTERM_ATTR_NONE = 0 */
   VTERM_ATTR_BOLD = 1,   // bool:   1, 22
   VTERM_ATTR_UNDERLINE,  // number: 4, 21, 24
@@ -250,7 +250,7 @@ typedef enum {
   VTERM_N_ATTRS
 } VTermAttr;
 
-typedef enum {
+തരനിർവചനം എണ്ണൽ {
   /* VTERM_PROP_NONE = 0 */
   VTERM_PROP_CURSORVISIBLE = 1, // bool
   VTERM_PROP_CURSORBLINK,       // bool
@@ -258,23 +258,23 @@ typedef enum {
   VTERM_PROP_TITLE,             // string
   VTERM_PROP_ICONNAME,          // string
   VTERM_PROP_REVERSE,           // bool
-  VTERM_PROP_CURSORSHAPE,       // number
-  VTERM_PROP_MOUSE,             // number
+  VTERM_PROP_CURSORSHAPE,       //സംഖ്യ
+  VTERM_PROP_MOUSE,             //സംഖ്യ
   VTERM_PROP_FOCUSREPORT,       // bool
   VTERM_PROP_CURSORCOLOR,       // VIM - string
 
   VTERM_N_PROPS
 } VTermProp;
 
-enum {
+എണ്ണൽ {
   VTERM_PROP_CURSORSHAPE_BLOCK = 1,
   VTERM_PROP_CURSORSHAPE_UNDERLINE,
-  VTERM_PROP_CURSORSHAPE_BAR_LEFT,
+  VTERM_PROP_CURSORSHAPE_BAR_ഇടത്,
 
   VTERM_N_PROP_CURSORSHAPES
 };
 
-enum {
+എണ്ണൽ {
   VTERM_PROP_MOUSE_NONE = 0,
   VTERM_PROP_MOUSE_CLICK,
   VTERM_PROP_MOUSE_DRAG,
@@ -283,7 +283,7 @@ enum {
   VTERM_N_PROP_MOUSES
 };
 
-typedef enum {
+തരനിർവചനം എണ്ണൽ {
   VTERM_SELECTION_CLIPBOARD = (1<<0),
   VTERM_SELECTION_PRIMARY   = (1<<1),
   VTERM_SELECTION_SECONDARY = (1<<2),
@@ -291,100 +291,100 @@ typedef enum {
   VTERM_SELECTION_CUT0      = (1<<4), /* also CUT1 .. CUT7 by bitshifting */
 } VTermSelectionMask;
 
-typedef struct {
-  const uint32_t *chars;
-  int             width;
-  unsigned int    protected_cell:1;  /* DECSCA-protected against DECSEL/DECSED */
-  unsigned int    dwl:1;             /* DECDWL or DECDHL double-width line */
-  unsigned int    dhl:2;             /* DECDHL double-height line (1=top 2=bottom) */
+തരനിർവചനം ഘടന {
+  സ്ഥിരം uint32_t *chars;
+  പൂർണ്ണസംഖ്യ             width;
+  unsigned പൂർണ്ണസംഖ്യ    protected_cell:1;  /* DECSCA-protected against DECSEL/DECSED */
+  unsigned പൂർണ്ണസംഖ്യ    dwl:1;             /* DECDWL or DECDHL double-width line */
+  unsigned പൂർണ്ണസംഖ്യ    dhl:2;             /* DECDHL double-height line (1=top 2=bottom) */
 } VTermGlyphInfo;
 
-typedef struct {
-  unsigned int    doublewidth:1;     /* DECDWL or DECDHL line */
-  unsigned int    doubleheight:2;    /* DECDHL line (1=top 2=bottom) */
-  unsigned int    continuation:1;    /* Line is a flow continuation of the previous */
-} VTermLineInfo;
+തരനിർവചനം ഘടന {
+  unsigned പൂർണ്ണസംഖ്യ    doublewidth:1;     /* DECDWL or DECDHL line */
+  unsigned പൂർണ്ണസംഖ്യ    doubleheight:2;    /* DECDHL line (1=top 2=bottom) */
+  unsigned പൂർണ്ണസംഖ്യ    continuation:1;    /* Line is a flow continuation of the previous */
+} VTerm_വരി_Info;
 
 /* Copies of VTermState fields that the 'resize' callback might have reason to
  * edit. 'resize' callback gets total control of these fields and may
  * free-and-reallocate them if required. They will be copied back from the
  * struct after the callback has returned.
  */
-typedef struct {
+തരനിർവചനം ഘടന {
   VTermPos pos;                /* current cursor position */
-  VTermLineInfo *lineinfos[2]; /* [1] may be NULL */
+  VTerm_വരി_Info *lineinfos[2]; /* [1] may be NULL */
 } VTermStateFields;
 
-typedef struct {
+തരനിർവചനം ഘടന {
   /* libvterm relies on this memory to be zeroed out before it is returned
    * by the allocator. */
-  void *(*malloc)(size_t size, void *allocdata);
-  void  (*free)(void *ptr, void *allocdata);
+  ശൂന്യം *(*malloc)(size_t size, ശൂന്യം *allocdata);
+  ശൂന്യം  (*സ്വതന്ത്രം)(ശൂന്യം *ptr, ശൂന്യം *allocdata);
 } VTermAllocatorFunctions;
 
-void vterm_check_version(int major, int minor);
+ശൂന്യം vterm_check_version(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor);
 
-struct VTermBuilder {
-  int ver; /* currently unused but reserved for some sort of ABI version flag */
+ഘടന VTermBuilder {
+  പൂർണ്ണസംഖ്യ ver; /* currently unused but reserved for some sort of ABI version flag */
 
-  int rows, cols;
+  പൂർണ്ണസംഖ്യ rows, cols;
 
-  const VTermAllocatorFunctions *allocator;
-  void *allocdata;
+  സ്ഥിരം VTermAllocatorFunctions *allocator;
+  ശൂന്യം *allocdata;
 
   /* Override default sizes for various structures */
   size_t outbuffer_len;  /* default: 4096 */
   size_t tmpbuffer_len;  /* default: 4096 */
 };
 
-VTerm *vterm_build(const struct VTermBuilder *builder);
+VTerm *vterm_build(സ്ഥിരം ഘടന VTermBuilder *builder);
 
 /* A convenient shortcut for default cases */
 // Allocate and initialize a new terminal with default allocators.
-VTerm *vterm_new(int rows, int cols);
+VTerm *vterm_new(പൂർണ്ണസംഖ്യ rows, പൂർണ്ണസംഖ്യ cols);
 /* These shortcuts are generally discouraged in favour of just using vterm_build() */
 
 // Allocate and initialize a new terminal with specified allocators.
-VTerm *vterm_new_with_allocator(int rows, int cols, VTermAllocatorFunctions *funcs, void *allocdata);
+VTerm *vterm_new_with_allocator(പൂർണ്ണസംഖ്യ rows, പൂർണ്ണസംഖ്യ cols, VTermAllocatorFunctions *funcs, ശൂന്യം *allocdata);
 
 // Free and cleanup a terminal and all its data.
-void   vterm_free(VTerm* vt);
+ശൂന്യം   vterm_free(VTerm* vt);
 
 // Get the current size of the terminal and store in "rowsp" and "colsp".
-void vterm_get_size(const VTerm *vt, int *rowsp, int *colsp);
+ശൂന്യം vterm_get_size(സ്ഥിരം VTerm *vt, പൂർണ്ണസംഖ്യ *rowsp, പൂർണ്ണസംഖ്യ *colsp);
 
-void vterm_set_size(VTerm *vt, int rows, int cols);
+ശൂന്യം vterm_set_size(VTerm *vt, പൂർണ്ണസംഖ്യ rows, പൂർണ്ണസംഖ്യ cols);
 
-int  vterm_get_utf8(const VTerm *vt);
-void vterm_set_utf8(VTerm *vt, int is_utf8);
+പൂർണ്ണസംഖ്യ  vterm_get_utf8(സ്ഥിരം VTerm *vt);
+ശൂന്യം vterm_set_utf8(VTerm *vt, പൂർണ്ണസംഖ്യ is_utf8);
 
-size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len);
+size_t vterm_നിവേശം_write(VTerm *vt, സ്ഥിരം അക്ഷരം *bytes, size_t len);
 
 /* Setting output callback will override the buffer logic */
-typedef void VTermOutputCallback(const char *s, size_t len, void *user);
-void vterm_output_set_callback(VTerm *vt, VTermOutputCallback *func, void *user);
+തരനിർവചനം ശൂന്യം VTermOutputCallback(സ്ഥിരം അക്ഷരം *s, size_t len, ശൂന്യം *user);
+ശൂന്യം vterm_output_set_callback(VTerm *vt, VTermOutputCallback *func, ശൂന്യം *user);
 
 /* These buffer functions only work if output callback is NOT set
  * These are deprecated and will be removed in a later version */
-size_t vterm_output_get_buffer_size(const VTerm *vt);
-size_t vterm_output_get_buffer_current(const VTerm *vt);
-size_t vterm_output_get_buffer_remaining(const VTerm *vt);
+size_t vterm_output_get_buffer_size(സ്ഥിരം VTerm *vt);
+size_t vterm_output_get_buffer_current(സ്ഥിരം VTerm *vt);
+size_t vterm_output_get_buffer_remaining(സ്ഥിരം VTerm *vt);
 
 /* This too */
-size_t vterm_output_read(VTerm *vt, char *buffer, size_t len);
+size_t vterm_output_read(VTerm *vt, അക്ഷരം *buffer, size_t len);
 
-int vterm_is_modify_other_keys(VTerm *vt);
-int vterm_is_kitty_keyboard(VTerm *vt);
-void vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod);
-void vterm_keyboard_key(VTerm *vt, VTermKey key, VTermModifier mod);
+പൂർണ്ണസംഖ്യ vterm_is_modify_other_താക്കോലുകൾ(VTerm *vt);
+പൂർണ്ണസംഖ്യ vterm_is_kitty_keyboard(VTerm *vt);
+ശൂന്യം vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod);
+ശൂന്യം vterm_keyboard_താക്കോൽ(VTerm *vt, VTerm_താക്കോൽ താക്കോൽ, VTermModifier mod);
 
-void vterm_keyboard_start_paste(VTerm *vt);
-void vterm_keyboard_end_paste(VTerm *vt);
+ശൂന്യം vterm_keyboard_start_paste(VTerm *vt);
+ശൂന്യം vterm_keyboard_end_paste(VTerm *vt);
 
-void vterm_mouse_move(VTerm *vt, int row, int col, VTermModifier mod);
+ശൂന്യം vterm_mouse_move(VTerm *vt, പൂർണ്ണസംഖ്യ row, പൂർണ്ണസംഖ്യ col, VTermModifier mod);
 // "button" is 1 for left, 2 for middle, 3 for right.
 // Button 4 is scroll wheel down, button 5 is scroll wheel up.
-void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod);
+ശൂന്യം vterm_mouse_button(VTerm *vt, പൂർണ്ണസംഖ്യ button, പൂർണ്ണസംഖ്യ pressed, VTermModifier mod);
 
 // ------------
 // Parser layer
@@ -410,107 +410,107 @@ void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod);
 
 #define CSI_ARG_IS_MISSING(a) (CSI_ARG(a) == CSI_ARG_MISSING)
 #define CSI_ARG_OR(a,def)     (CSI_ARG(a) == CSI_ARG_MISSING ? (def) : CSI_ARG(a))
-#define CSI_ARG_COUNT(a)      (CSI_ARG(a) == CSI_ARG_MISSING || CSI_ARG(a) == 0 ? 1 : CSI_ARG(a))
+#define CSI_ARG_എണ്ണം(a)      (CSI_ARG(a) == CSI_ARG_MISSING || CSI_ARG(a) == 0 ? 1 : CSI_ARG(a))
 
-typedef struct {
-  int (*text)(const char *bytes, size_t len, void *user);
-  int (*control)(unsigned char control, void *user);
-  int (*escape)(const char *bytes, size_t len, void *user);
-  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
-  int (*osc)(int command, VTermStringFragment frag, void *user);
-  int (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
-  int (*apc)(VTermStringFragment frag, void *user);
-  int (*pm)(VTermStringFragment frag, void *user);
-  int (*sos)(VTermStringFragment frag, void *user);
-  int (*resize)(int rows, int cols, void *user);
+തരനിർവചനം ഘടന {
+  പൂർണ്ണസംഖ്യ (*text)(സ്ഥിരം അക്ഷരം *bytes, size_t len, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*control)(unsigned അക്ഷരം control, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*escape)(സ്ഥിരം അക്ഷരം *bytes, size_t len, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*csi)(സ്ഥിരം അക്ഷരം *leader, സ്ഥിരം long args[], പൂർണ്ണസംഖ്യ argcount, സ്ഥിരം അക്ഷരം *intermed, അക്ഷരം command, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*osc)(പൂർണ്ണസംഖ്യ command, VTermStringFragment frag, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*dcs)(സ്ഥിരം അക്ഷരം *command, size_t commandlen, VTermStringFragment frag, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*apc)(VTermStringFragment frag, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*pm)(VTermStringFragment frag, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*sos)(VTermStringFragment frag, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*resize)(പൂർണ്ണസംഖ്യ rows, പൂർണ്ണസംഖ്യ cols, ശൂന്യം *user);
 } VTermParserCallbacks;
 
-void  vterm_parser_set_callbacks(VTerm *vt, const VTermParserCallbacks *callbacks, void *user);
-void *vterm_parser_get_cbdata(VTerm *vt);
+ശൂന്യം  vterm_parser_set_callbacks(VTerm *vt, സ്ഥിരം VTermParserCallbacks *callbacks, ശൂന്യം *user);
+ശൂന്യം *vterm_parser_get_cbdata(VTerm *vt);
 
 /* Normally NUL, CAN, SUB and DEL are ignored. Setting this true causes them
  * to be emitted by the 'control' callback
  */
-void vterm_parser_set_emit_nul(VTerm *vt, int emit);
+ശൂന്യം vterm_parser_set_emit_nul(VTerm *vt, പൂർണ്ണസംഖ്യ emit);
 
 // -----------
 // State layer
 // -----------
 
-typedef struct {
-  int (*putglyph)(VTermGlyphInfo *info, VTermPos pos, void *user);
-  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
-  int (*scrollrect)(VTermRect rect, int downward, int rightward, void *user);
-  int (*moverect)(VTermRect dest, VTermRect src, void *user);
-  int (*erase)(VTermRect rect, int selective, void *user);
-  int (*initpen)(void *user);
-  int (*setpenattr)(VTermAttr attr, VTermValue *val, void *user);
+തരനിർവചനം ഘടന {
+  പൂർണ്ണസംഖ്യ (*putglyph)(VTermGlyphInfo *info, VTermPos pos, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*movecursor)(VTermPos pos, VTermPos oldpos, പൂർണ്ണസംഖ്യ visible, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*scrollrect)(VTermRect rect, പൂർണ്ണസംഖ്യ downward, പൂർണ്ണസംഖ്യ rightward, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*moverect)(VTermRect dest, VTermRect src, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*erase)(VTermRect rect, പൂർണ്ണസംഖ്യ selective, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*initpen)(ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*setpenattr)(VTermAttr attr, VTerm_മൂല്യം *val, ശൂന്യം *user);
   // Callback for setting various properties.  Must return 1 if the property
   // was accepted, 0 otherwise.
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
-  int (*bell)(void *user);
-  int (*resize)(int rows, int cols, VTermStateFields *fields, void *user);
-  int (*setlineinfo)(int row, const VTermLineInfo *newinfo, const VTermLineInfo *oldinfo, void *user);
-  int (*sb_clear)(void *user);
+  പൂർണ്ണസംഖ്യ (*settermprop)(VTermProp prop, VTerm_മൂല്യം *val, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*bell)(ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*resize)(പൂർണ്ണസംഖ്യ rows, പൂർണ്ണസംഖ്യ cols, VTermStateFields *fields, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*setlineinfo)(പൂർണ്ണസംഖ്യ row, സ്ഥിരം VTerm_വരി_Info *newinfo, സ്ഥിരം VTerm_വരി_Info *oldinfo, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*sb_clear)(ശൂന്യം *user);
   // ABI-compat only enabled if vterm_state_callbacks_has_premove() is invoked
-  int (*premove)(VTermRect dest, void *user);
+  പൂർണ്ണസംഖ്യ (*premove)(VTermRect dest, ശൂന്യം *user);
 } VTermStateCallbacks;
 
 // VIM: added
-typedef struct {
+തരനിർവചനം ഘടന {
   VTermPos pos;
-  int	   buttons;
-#define MOUSE_BUTTON_LEFT 0x01
-#define MOUSE_BUTTON_MIDDLE 0x02
-#define MOUSE_BUTTON_RIGHT 0x04
-  int      flags;
+  പൂർണ്ണസംഖ്യ	   buttons;
+#define MOUSE_BUTTON_ഇടത് 0x01
+#define MOUSE_BUTTON_നടുവ് 0x02
+#define MOUSE_BUTTON_വലത് 0x04
+  പൂർണ്ണസംഖ്യ      flags;
 #define MOUSE_WANT_CLICK 0x01
 #define MOUSE_WANT_DRAG  0x02
 #define MOUSE_WANT_MOVE  0x04
   // useful to add protocol?
 } VTermMouseState;
 
-typedef struct {
-  int (*control)(unsigned char control, void *user);
-  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
-  int (*osc)(int command, VTermStringFragment frag, void *user);
-  int (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
-  int (*apc)(VTermStringFragment frag, void *user);
-  int (*pm)(VTermStringFragment frag, void *user);
-  int (*sos)(VTermStringFragment frag, void *user);
+തരനിർവചനം ഘടന {
+  പൂർണ്ണസംഖ്യ (*control)(unsigned അക്ഷരം control, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*csi)(സ്ഥിരം അക്ഷരം *leader, സ്ഥിരം long args[], പൂർണ്ണസംഖ്യ argcount, സ്ഥിരം അക്ഷരം *intermed, അക്ഷരം command, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*osc)(പൂർണ്ണസംഖ്യ command, VTermStringFragment frag, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*dcs)(സ്ഥിരം അക്ഷരം *command, size_t commandlen, VTermStringFragment frag, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*apc)(VTermStringFragment frag, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*pm)(VTermStringFragment frag, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*sos)(VTermStringFragment frag, ശൂന്യം *user);
 } VTermStateFallbacks;
 
-typedef struct {
-  int (*set)(VTermSelectionMask mask, VTermStringFragment frag, void *user);
-  int (*query)(VTermSelectionMask mask, void *user);
+തരനിർവചനം ഘടന {
+  പൂർണ്ണസംഖ്യ (*set)(VTermSelectionMask mask, VTermStringFragment frag, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*query)(VTermSelectionMask mask, ശൂന്യം *user);
 } VTermSelectionCallbacks;
 
 VTermState *vterm_obtain_state(VTerm *vt);
 
-void  vterm_state_set_callbacks(VTermState *state, const VTermStateCallbacks *callbacks, void *user);
-void *vterm_state_get_cbdata(VTermState *state);
+ശൂന്യം  vterm_state_set_callbacks(VTermState *state, സ്ഥിരം VTermStateCallbacks *callbacks, ശൂന്യം *user);
+ശൂന്യം *vterm_state_get_cbdata(VTermState *state);
 
-void vterm_state_callbacks_has_premove(VTermState *state);
+ശൂന്യം vterm_state_callbacks_has_premove(VTermState *state);
 
-void  vterm_state_set_unrecognised_fallbacks(VTermState *state, const VTermStateFallbacks *fallbacks, void *user);
-void *vterm_state_get_unrecognised_fbdata(VTermState *state);
+ശൂന്യം  vterm_state_set_unrecognised_fallbacks(VTermState *state, സ്ഥിരം VTermStateFallbacks *fallbacks, ശൂന്യം *user);
+ശൂന്യം *vterm_state_get_unrecognised_fbdata(VTermState *state);
 
 // Initialize the state.
-void vterm_state_reset(VTermState *state, int hard);
+ശൂന്യം vterm_state_reset(VTermState *state, പൂർണ്ണസംഖ്യ hard);
 
-void vterm_state_get_cursorpos(const VTermState *state, VTermPos *cursorpos);
+ശൂന്യം vterm_state_get_cursorpos(സ്ഥിരം VTermState *state, VTermPos *cursorpos);
 // VIM: added
-void vterm_state_get_mousestate(const VTermState *state, VTermMouseState *mousestate);
-void vterm_state_get_default_colors(const VTermState *state, VTermColor *default_fg, VTermColor *default_bg);
-void vterm_state_get_palette_color(const VTermState *state, int index, VTermColor *col);
-void vterm_state_set_default_colors(VTermState *state, const VTermColor *default_fg, const VTermColor *default_bg);
-void vterm_state_set_palette_color(VTermState *state, int index, const VTermColor *col);
-void vterm_state_set_bold_highbright(VTermState *state, int bold_is_highbright);
-int  vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val);
-int  vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val);
-void vterm_state_focus_in(VTermState *state);
-void vterm_state_focus_out(VTermState *state);
-const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row);
+ശൂന്യം vterm_state_get_mousestate(സ്ഥിരം VTermState *state, VTermMouseState *mousestate);
+ശൂന്യം vterm_state_get_default_colors(സ്ഥിരം VTermState *state, VTermColor *default_fg, VTermColor *default_bg);
+ശൂന്യം vterm_state_get_palette_color(സ്ഥിരം VTermState *state, പൂർണ്ണസംഖ്യ index, VTermColor *col);
+ശൂന്യം vterm_state_set_default_colors(VTermState *state, സ്ഥിരം VTermColor *default_fg, സ്ഥിരം VTermColor *default_bg);
+ശൂന്യം vterm_state_set_palette_color(VTermState *state, പൂർണ്ണസംഖ്യ index, സ്ഥിരം VTermColor *col);
+ശൂന്യം vterm_state_set_bold_highbright(VTermState *state, പൂർണ്ണസംഖ്യ bold_is_highbright);
+പൂർണ്ണസംഖ്യ  vterm_state_get_penattr(സ്ഥിരം VTermState *state, VTermAttr attr, VTerm_മൂല്യം *val);
+പൂർണ്ണസംഖ്യ  vterm_state_set_termprop(VTermState *state, VTermProp prop, VTerm_മൂല്യം *val);
+ശൂന്യം vterm_state_focus_in(VTermState *state);
+ശൂന്യം vterm_state_focus_out(VTermState *state);
+സ്ഥിരം VTerm_വരി_Info *vterm_state_get_lineinfo(സ്ഥിരം VTermState *state, പൂർണ്ണസംഖ്യ row);
 
 /**
  * Makes sure that the given color `col` is indeed an RGB colour. After this
@@ -522,68 +522,68 @@ const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row);
  * @param col is a pointer at the VTermColor instance that should be converted
  * to an RGB colour.
  */
-void vterm_state_convert_color_to_rgb(const VTermState *state, VTermColor *col);
+ശൂന്യം vterm_state_convert_color_to_rgb(സ്ഥിരം VTermState *state, VTermColor *col);
 
-void vterm_state_set_selection_callbacks(VTermState *state, const VTermSelectionCallbacks *callbacks, void *user,
-    char *buffer, size_t buflen);
+ശൂന്യം vterm_state_set_selection_callbacks(VTermState *state, സ്ഥിരം VTermSelectionCallbacks *callbacks, ശൂന്യം *user,
+    അക്ഷരം *buffer, size_t buflen);
 
-void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTermStringFragment frag);
+ശൂന്യം vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTermStringFragment frag);
 
 // ------------
 // Screen layer
 // ------------
 
-typedef struct {
-    unsigned int bold      : 1;
-    unsigned int underline : 2;
-    unsigned int italic    : 1;
-    unsigned int blink     : 1;
-    unsigned int reverse   : 1;
-    unsigned int conceal   : 1;
-    unsigned int strike    : 1;
-    unsigned int font      : 4; /* 0 to 9 */
-    unsigned int dwl       : 1; /* On a DECDWL or DECDHL line */
-    unsigned int dhl       : 2; /* On a DECDHL line (1=top 2=bottom) */
-    unsigned int small     : 1;
-    unsigned int baseline  : 2;
+തരനിർവചനം ഘടന {
+    unsigned പൂർണ്ണസംഖ്യ bold      : 1;
+    unsigned പൂർണ്ണസംഖ്യ underline : 2;
+    unsigned പൂർണ്ണസംഖ്യ italic    : 1;
+    unsigned പൂർണ്ണസംഖ്യ blink     : 1;
+    unsigned പൂർണ്ണസംഖ്യ reverse   : 1;
+    unsigned പൂർണ്ണസംഖ്യ conceal   : 1;
+    unsigned പൂർണ്ണസംഖ്യ strike    : 1;
+    unsigned പൂർണ്ണസംഖ്യ font      : 4; /* 0 to 9 */
+    unsigned പൂർണ്ണസംഖ്യ dwl       : 1; /* On a DECDWL or DECDHL line */
+    unsigned പൂർണ്ണസംഖ്യ dhl       : 2; /* On a DECDHL line (1=top 2=bottom) */
+    unsigned പൂർണ്ണസംഖ്യ small     : 1;
+    unsigned പൂർണ്ണസംഖ്യ baseline  : 2;
 } VTermScreenCellAttrs;
 
-enum {
+എണ്ണൽ {
   VTERM_UNDERLINE_OFF,
   VTERM_UNDERLINE_SINGLE,
   VTERM_UNDERLINE_DOUBLE,
   VTERM_UNDERLINE_CURLY,
 };
 
-enum {
+എണ്ണൽ {
   VTERM_BASELINE_NORMAL,
   VTERM_BASELINE_RAISE,
   VTERM_BASELINE_LOWER,
 };
 
-typedef struct {
+തരനിർവചനം ഘടന {
   uint32_t chars[VTERM_MAX_CHARS_PER_CELL];
-  char     width;
+  അക്ഷരം     width;
   VTermScreenCellAttrs attrs;
   VTermColor fg, bg;
 } VTermScreenCell;
 
 // All fields are optional, NULL when not used.
-typedef struct {
-  int (*damage)(VTermRect rect, void *user);
-  int (*moverect)(VTermRect dest, VTermRect src, void *user);
-  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
-  int (*bell)(void *user);
-  int (*resize)(int rows, int cols, void *user);
+തരനിർവചനം ഘടന {
+  പൂർണ്ണസംഖ്യ (*damage)(VTermRect rect, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*moverect)(VTermRect dest, VTermRect src, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*movecursor)(VTermPos pos, VTermPos oldpos, പൂർണ്ണസംഖ്യ visible, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*settermprop)(VTermProp prop, VTerm_മൂല്യം *val, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*bell)(ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*resize)(പൂർണ്ണസംഖ്യ rows, പൂർണ്ണസംഖ്യ cols, ശൂന്യം *user);
   // A line was pushed off the top of the window.
   // "cells[cols]" contains the cells of that line.
   // Return value is unused.
-  int (*sb_pushline)(int cols, const VTermScreenCell *cells, void *user);
-  int (*sb_popline)(int cols, VTermScreenCell *cells, void *user);
-  int (*sb_clear)(void* user);
+  പൂർണ്ണസംഖ്യ (*sb_pushline)(പൂർണ്ണസംഖ്യ cols, സ്ഥിരം VTermScreenCell *cells, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*sb_popline)(പൂർണ്ണസംഖ്യ cols, VTermScreenCell *cells, ശൂന്യം *user);
+  പൂർണ്ണസംഖ്യ (*sb_clear)(ശൂന്യം* user);
   /* ABI-compat this is only used if vterm_screen_callbacks_has_pushline4() is called */
-  int (*sb_pushline4)(int cols, const VTermScreenCell *cells, int continuation, void *user);
+  പൂർണ്ണസംഖ്യ (*sb_pushline4)(പൂർണ്ണസംഖ്യ cols, സ്ഥിരം VTermScreenCell *cells, പൂർണ്ണസംഖ്യ continuation, ശൂന്യം *user);
 } VTermScreenCallbacks;
 
 // Return the screen of the vterm.
@@ -593,15 +593,15 @@ VTermScreen *vterm_obtain_screen(VTerm *vt);
  * Install screen callbacks.  These are invoked when the screen contents is
  * changed.  "user" is passed into to the callback.
  */
-void  vterm_screen_set_callbacks(VTermScreen *screen, const VTermScreenCallbacks *callbacks, void *user);
-void *vterm_screen_get_cbdata(VTermScreen *screen);
+ശൂന്യം  vterm_screen_set_callbacks(VTermScreen *screen, സ്ഥിരം VTermScreenCallbacks *callbacks, ശൂന്യം *user);
+ശൂന്യം *vterm_screen_get_cbdata(VTermScreen *screen);
 
-void vterm_screen_callbacks_has_pushline4(VTermScreen *screen);
+ശൂന്യം vterm_screen_callbacks_has_pushline4(VTermScreen *screen);
 
-void  vterm_screen_set_unrecognised_fallbacks(VTermScreen *screen, const VTermStateFallbacks *fallbacks, void *user);
-void *vterm_screen_get_unrecognised_fbdata(VTermScreen *screen);
+ശൂന്യം  vterm_screen_set_unrecognised_fallbacks(VTermScreen *screen, സ്ഥിരം VTermStateFallbacks *fallbacks, ശൂന്യം *user);
+ശൂന്യം *vterm_screen_get_unrecognised_fbdata(VTermScreen *screen);
 
-void vterm_screen_enable_reflow(VTermScreen *screen, int reflow);
+ശൂന്യം vterm_screen_enable_reflow(VTermScreen *screen, പൂർണ്ണസംഖ്യ reflow);
 
 // Back-compat alias for the brief time it was in 0.3-RC1
 #define vterm_screen_set_reflow  vterm_screen_enable_reflow
@@ -609,9 +609,9 @@ void vterm_screen_enable_reflow(VTermScreen *screen, int reflow);
 // Enable support for using the alternate screen if "altscreen" is non-zero.
 // Before that switching to the alternate screen won't work.
 // Calling with "altscreen" zero has no effect.
-void vterm_screen_enable_altscreen(VTermScreen *screen, int altscreen);
+ശൂന്യം vterm_screen_enable_altscreen(VTermScreen *screen, പൂർണ്ണസംഖ്യ altscreen);
 
-typedef enum {
+തരനിർവചനം എണ്ണൽ {
   VTERM_DAMAGE_CELL,    /* every cell */
   VTERM_DAMAGE_ROW,     /* entire rows */
   VTERM_DAMAGE_SCREEN,  /* entire screen */
@@ -621,21 +621,21 @@ typedef enum {
 } VTermDamageSize;
 
 // Invoke the relevant callbacks to update the screen.
-void vterm_screen_flush_damage(VTermScreen *screen);
+ശൂന്യം vterm_screen_flush_damage(VTermScreen *screen);
 
-void vterm_screen_set_damage_merge(VTermScreen *screen, VTermDamageSize size);
+ശൂന്യം vterm_screen_set_damage_merge(VTermScreen *screen, VTermDamageSize size);
 
 /*
  * Reset the screen.  Also invokes vterm_state_reset().
  * Must be called before the terminal can be used.
  */
-void   vterm_screen_reset(VTermScreen *screen, int hard);
+ശൂന്യം   vterm_screen_reset(VTermScreen *screen, പൂർണ്ണസംഖ്യ hard);
 
 /* Neither of these functions NUL-terminate the buffer */
-size_t vterm_screen_get_chars(const VTermScreen *screen, uint32_t *chars, size_t len, const VTermRect rect);
-size_t vterm_screen_get_text(const VTermScreen *screen, char *str, size_t len, const VTermRect rect);
+size_t vterm_screen_get_chars(സ്ഥിരം VTermScreen *screen, uint32_t *chars, size_t len, സ്ഥിരം VTermRect rect);
+size_t vterm_screen_get_text(സ്ഥിരം VTermScreen *screen, അക്ഷരം *str, size_t len, സ്ഥിരം VTermRect rect);
 
-typedef enum {
+തരനിർവചനം എണ്ണൽ {
   VTERM_ATTR_BOLD_MASK       = 1 << 0,
   VTERM_ATTR_UNDERLINE_MASK  = 1 << 1,
   VTERM_ATTR_ITALIC_MASK     = 1 << 2,
@@ -652,42 +652,42 @@ typedef enum {
   VTERM_ALL_ATTRS_MASK = (1 << 12) - 1
 } VTermAttrMask;
 
-int vterm_screen_get_attrs_extent(const VTermScreen *screen, VTermRect *extent, VTermPos pos, VTermAttrMask attrs);
+പൂർണ്ണസംഖ്യ vterm_screen_get_attrs_extent(സ്ഥിരം VTermScreen *screen, VTermRect *extent, VTermPos pos, VTermAttrMask attrs);
 
-int vterm_screen_get_cell(const VTermScreen *screen, VTermPos pos, VTermScreenCell *cell);
+പൂർണ്ണസംഖ്യ vterm_screen_get_cell(സ്ഥിരം VTermScreen *screen, VTermPos pos, VTermScreenCell *cell);
 
-int vterm_screen_is_eol(const VTermScreen *screen, VTermPos pos);
+പൂർണ്ണസംഖ്യ vterm_screen_is_eol(സ്ഥിരം VTermScreen *screen, VTermPos pos);
 
 /**
  * Same as vterm_state_convert_color_to_rgb(), but takes a `screen` instead of a `state`
  * instance.
  */
-void vterm_screen_convert_color_to_rgb(const VTermScreen *screen, VTermColor *col);
+ശൂന്യം vterm_screen_convert_color_to_rgb(സ്ഥിരം VTermScreen *screen, VTermColor *col);
 
 /**
  * Similar to vterm_state_set_default_colors(), but also resets colours in the
  * screen buffer(s)
  */
-void vterm_screen_set_default_colors(VTermScreen *screen, const VTermColor *default_fg, const VTermColor *default_bg);
+ശൂന്യം vterm_screen_set_default_colors(VTermScreen *screen, സ്ഥിരം VTermColor *default_fg, സ്ഥിരം VTermColor *default_bg);
 
 // ---------
 // Utilities
 // ---------
 
-VTermValueType vterm_get_attr_type(VTermAttr attr);
-VTermValueType vterm_get_prop_type(VTermProp prop);
+VTerm_മൂല്യം_Type vterm_get_attr_type(VTermAttr attr);
+VTerm_മൂല്യം_Type vterm_get_prop_type(VTermProp prop);
 
-void vterm_scroll_rect(VTermRect rect,
-                       int downward,
-                       int rightward,
-                       int (*moverect)(VTermRect src, VTermRect dest, void *user),
-                       int (*eraserect)(VTermRect rect, int selective, void *user),
-                       void *user);
+ശൂന്യം vterm_scroll_rect(VTermRect rect,
+                       പൂർണ്ണസംഖ്യ downward,
+                       പൂർണ്ണസംഖ്യ rightward,
+                       പൂർണ്ണസംഖ്യ (*moverect)(VTermRect src, VTermRect dest, ശൂന്യം *user),
+                       പൂർണ്ണസംഖ്യ (*eraserect)(VTermRect rect, പൂർണ്ണസംഖ്യ selective, ശൂന്യം *user),
+                       ശൂന്യം *user);
 
-void vterm_copy_cells(VTermRect dest,
+ശൂന്യം vterm_copy_cells(VTermRect dest,
                       VTermRect src,
-                      void (*copycell)(VTermPos dest, VTermPos src, void *user),
-                      void *user);
+                      ശൂന്യം (*copycell)(VTermPos dest, VTermPos src, ശൂന്യം *user),
+                      ശൂന്യം *user);
 
 #ifdef __cplusplus
 }

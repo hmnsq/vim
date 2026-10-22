@@ -10,26 +10,26 @@
 
 // TERMLIB: Terminal independent database.
 
-#include "vim.h"
-#include "termlib.pro"
+#അന്തര്ഭാവ "vim.h"
+#അന്തര്ഭാവ "termlib.pro"
 
-#if !defined(AMIGA) && !defined(VMS)
+#എങ്കിൽ !defined(AMIGA) && !defined(VMS)
 # include <sgtty.h>
 #endif
 
-static int  getent(char *, char *, FILE *, int);
-static int  nextent(char *, FILE *, int);
-static int  _match(char *, char *);
-static char *_addfmt(char *, char *, int);
-static char *_find(char *, char *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ  getent(അക്ഷരം *, അക്ഷരം *, FILE *, പൂർണ്ണസംഖ്യ);
+സ്ഥിതം പൂർണ്ണസംഖ്യ  nextent(അക്ഷരം *, FILE *, പൂർണ്ണസംഖ്യ);
+സ്ഥിതം പൂർണ്ണസംഖ്യ  _match(അക്ഷരം *, അക്ഷരം *);
+സ്ഥിതം അക്ഷരം *_addfmt(അക്ഷരം *, അക്ഷരം *, പൂർണ്ണസംഖ്യ);
+സ്ഥിതം അക്ഷരം *_find(അക്ഷരം *, അക്ഷരം *);
 
 /*
  * Global variables for termlib
  */
 
-char	*tent;		      // Pointer to terminal entry, set by tgetent
-char	PC = 0;		      // Pad character, default NULL
-char	*UP = 0, *BC = 0;     // Pointers to UP and BC strings from database
+അക്ഷരം	*tent;		      // Pointer to terminal entry, set by tgetent
+അക്ഷരം	PC = 0;		      // Pad character, default NULL
+അക്ഷരം	*UP = 0, *BC = 0;     // Pointers to UP and BC strings from database
 short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 
 /*
@@ -56,151 +56,151 @@ short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 #ifndef TERMCAPFILE
 # ifdef AMIGA
 #  define TERMCAPFILE "s:termcap"
-# else
+# അല്ലെങ്കിൽ
 #  ifdef VMS
 #   define TERMCAPFILE "VIMRUNTIME:termcap"
-#  else
+#  അല്ലെങ്കിൽ
 #   define TERMCAPFILE "/etc/termcap"
 #  endif
 # endif
 #endif
 
-    int
+    പൂർണ്ണസംഖ്യ
 tgetent(
-    char    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
-    char    *term)		// Name of terminal
+    അക്ഷരം    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
+    അക്ഷരം    *term)		// Name of terminal
 {
-    char    tcbuf[32];		// Temp buffer to handle
-    char    *tcptr = tcbuf;	// extended entries
-    char    *tcap = TERMCAPFILE; // Default termcap file
-    char    *tmp;
+    അക്ഷരം    tcbuf[32];		// Temp buffer to handle
+    അക്ഷരം    *tcptr = tcbuf;	// extended entries
+    അക്ഷരം    *tcap = TERMCAPFILE; // Default termcap file
+    അക്ഷരം    *tmp;
     FILE    *termcap;
-    int	    retval = 0;
-    int	    len;
+    പൂർണ്ണസംഖ്യ	    retval = 0;
+    പൂർണ്ണസംഖ്യ	    len;
 
-    if ((tmp = (char *)mch_getenv((char_u *)"TERMCAP")) != NULL)
+    എങ്കിൽ ((tmp = (അക്ഷരം *)mch_getenv((char_u *)"TERMCAP")) != ശൂന്യ)
     {
-	if (*tmp == '/')		// TERMCAP = name of termcap file
+	എങ്കിൽ (*tmp == '/')		// TERMCAP = name of termcap file
 	{
 	    tcap = tmp ;
-#if defined(AMIGA)
+#എങ്കിൽ defined(AMIGA)
 	    // Convert /usr/share/lib/termcap to usr:share/lib/termcap
 	    tcap++;
 	    tmp = strchr(tcap, '/');
-	    if (tmp)
+	    എങ്കിൽ (tmp)
 		*tmp = ':';
 #endif
 	}
-	else				// TERMCAP = termcap entry itself
+	അല്ലെങ്കിൽ				// TERMCAP = termcap entry itself
 	{
-	    int tlen = strlen(term);
+	    പൂർണ്ണസംഖ്യ tlen = strlen(term);
 
-	    while (*tmp && *tmp != ':')		// Check if TERM matches
+	    ആകുമ്പോൾ (*tmp && *tmp != ':')		// Check if TERM matches
 	    {
-		char *nexttmp;
+		അക്ഷരം *nexttmp;
 
-		while (*tmp == '|')
+		ആകുമ്പോൾ (*tmp == '|')
 		    tmp++;
 		nexttmp  = _find(tmp, ":|");	// Rhialto
-		if (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
+		എങ്കിൽ (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
 		{
 		    vim_strncpy(tbuf, tmp, TBUFSZ - 1);
 		    tent = tbuf;
-		    return 1;
+		    തിരികെ 1;
 		}
-		else
+		അല്ലെങ്കിൽ
 		    tmp = nexttmp;
 	    }
 	}
     }
-    if (!(termcap = mch_fopen(tcap, "r")))
+    എങ്കിൽ (!(termcap = mch_fopen(tcap, "r")))
     {
 	vim_strncpy(tbuf, tcap, TBUFSZ - 1);
-	return -1;
+	തിരികെ -1;
     }
 
     len = 0;
-    while (getent(tbuf + len, term, termcap, TBUFSZ - len))
+    ആകുമ്പോൾ (getent(tbuf + len, term, termcap, TBUFSZ - len))
     {
 	tcptr = tcbuf;				// Rhialto
-	if ((term = tgetstr("tc", &tcptr)))	// extended entry
+	എങ്കിൽ ((term = tgetstr("tc", &tcptr)))	// extended entry
 	{
 	    rewind(termcap);
 	    len = strlen(tbuf);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    retval = 1;
 	    tent = tbuf;	// reset it back to the beginning
-	    break;
+	    നിർത്തുക;
 	}
     }
     fclose(termcap);
-    return retval;
+    തിരികെ retval;
 }
 
-    static int
-getent(char *tbuf, char *term, FILE *termcap, int buflen)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+getent(അക്ഷരം *tbuf, അക്ഷരം *term, FILE *termcap, പൂർണ്ണസംഖ്യ buflen)
 {
-    char    *tptr;
-    int	    tlen = strlen(term);
+    അക്ഷരം    *tptr;
+    പൂർണ്ണസംഖ്യ	    tlen = strlen(term);
 
-    while (nextent(tbuf, termcap, buflen))	// For each possible entry
+    ആകുമ്പോൾ (nextent(tbuf, termcap, buflen))	// For each possible entry
     {
 	tptr = tbuf;
-	while (*tptr && *tptr != ':')		// : terminates name field
+	ആകുമ്പോൾ (*tptr && *tptr != ':')		// : terminates name field
 	{
-	    char    *nexttptr;
+	    അക്ഷരം    *nexttptr;
 
-	    while (*tptr == '|')		// | separates names
+	    ആകുമ്പോൾ (*tptr == '|')		// | separates names
 		tptr++;
 	    nexttptr = _find(tptr, ":|");	// Rhialto
-	    if (tptr + tlen == nexttptr &&
+	    എങ്കിൽ (tptr + tlen == nexttptr &&
 		_match(tptr, term) == tlen)	// FOUND!
 	    {
 		tent = tbuf;
-		return 1;
+		തിരികെ 1;
 	    }
-	    else				// Look for next name
+	    അല്ലെങ്കിൽ				// Look for next name
 		tptr = nexttptr;
 	}
     }
-    return 0;
+    തിരികെ 0;
 }
 
 /*
  * Read 1 entry from TERMCAP file.
  */
-    static int
-nextent(char *tbuf, FILE *termcap, int buflen)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+nextent(അക്ഷരം *tbuf, FILE *termcap, പൂർണ്ണസംഖ്യ buflen)
 {
-    char *lbuf = tbuf;				// lbuf=line buffer
+    അക്ഷരം *lbuf = tbuf;				// lbuf=line buffer
 				// read lines straight into buffer
 
-    while (lbuf < tbuf+buflen &&		// There's room and
-	  fgets(lbuf, (int)(tbuf+buflen-lbuf), termcap)) // another line
+    ആകുമ്പോൾ (lbuf < tbuf+buflen &&		// There's room and
+	  fgets(lbuf, (പൂർണ്ണസംഖ്യ)(tbuf+buflen-lbuf), termcap)) // another line
     {
-	int llen = strlen(lbuf);
+	പൂർണ്ണസംഖ്യ llen = strlen(lbuf);
 
-	if (*lbuf == '#')			// eat comments
-	    continue;
-	if (lbuf[-1] == ':' &&			// and whitespace
+	എങ്കിൽ (*lbuf == '#')			// eat comments
+	    തുടരുക;
+	എങ്കിൽ (lbuf[-1] == ':' &&			// and whitespace
 	    lbuf[0] == '\t' &&
 	    lbuf[1] == ':')
 	{
 	    STRMOVE(lbuf, lbuf + 2);
 	    llen -= 2;
 	}
-	if (lbuf[llen-2] == '\\')		// and continuations
+	എങ്കിൽ (lbuf[llen-2] == '\\')		// and continuations
 	    lbuf += llen-2;
-	else
+	അല്ലെങ്കിൽ
 	{
 	    lbuf[llen-1]=0;			// no continuation, return
-	    return 1;
+	    തിരികെ 1;
 	}
     }
 
-    return 0;					// ran into end of file
+    തിരികെ 0;					// ran into end of file
 }
 
 /*
@@ -214,12 +214,12 @@ nextent(char *tbuf, FILE *termcap, int buflen)
  * Returned values: 1 for success, 0 for failure.
  */
 
-    int
-tgetflag(char *id)
+    പൂർണ്ണസംഖ്യ
+tgetflag(അക്ഷരം *id)
 {
-    char    buf[256], *ptr = buf;
+    അക്ഷരം    buf[256], *ptr = buf;
 
-    return tgetstr(id, &ptr) ? 1 : 0;
+    തിരികെ tgetstr(id, &ptr) ? 1 : 0;
 }
 
 /*
@@ -232,16 +232,16 @@ tgetflag(char *id)
  * Returned values: -1 for failure, else numerical value.
  */
 
-    int
-tgetnum(char *id)
+    പൂർണ്ണസംഖ്യ
+tgetnum(അക്ഷരം *id)
 {
-    char *ptr, buf[256];
+    അക്ഷരം *ptr, buf[256];
     ptr = buf;
 
-    if (tgetstr(id, &ptr))
-	return atoi(buf);
-    else
-	return 0;
+    എങ്കിൽ (tgetstr(id, &ptr))
+	തിരികെ atoi(buf);
+    അല്ലെങ്കിൽ
+	തിരികെ 0;
 }
 
 /*
@@ -271,92 +271,92 @@ tgetnum(char *id)
  *
  */
 
-    char *
-tgetstr(char *id, char **buf)
+    അക്ഷരം *
+tgetstr(അക്ഷരം *id, അക്ഷരം **buf)
 {
-    int		len = strlen(id);
-    char	*tmp=tent;
-    char	*hold;
-    int		i;
+    പൂർണ്ണസംഖ്യ		len = strlen(id);
+    അക്ഷരം	*tmp=tent;
+    അക്ഷരം	*hold;
+    പൂർണ്ണസംഖ്യ		i;
 
-    do
+    ചെയ്യുക
     {
 	tmp = _find(tmp, ":");			// For each field
-	while (*tmp == ':')			// skip empty fields
+	ആകുമ്പോൾ (*tmp == ':')			// skip empty fields
 	    tmp++;
-	if (!*tmp)
-	    break;
+	എങ്കിൽ (!*tmp)
+	    നിർത്തുക;
 
-	if (_match(id, tmp) == len)
+	എങ്കിൽ (_match(id, tmp) == len)
 	{
 	    tmp += len;				// find '=' '@' or '#'
-	    if (*tmp == '@')			// :xx@: entry for tc
-		return 0;			// deleted entry
+	    എങ്കിൽ (*tmp == '@')			// :xx@: entry for tc
+		തിരികെ 0;			// deleted entry
 	    hold= *buf;
-	    while (*++tmp && *tmp != ':')	// not at end of field
+	    ആകുമ്പോൾ (*++tmp && *tmp != ':')	// not at end of field
 		{
-		switch(*tmp)
+		തിരഞ്ഞെടുപ്പ്(*tmp)
 		{
-		case '\\':			// Expand escapes here
-		    switch(*++tmp)
+		അവസ്ഥ '\\':			// Expand escapes here
+		    തിരഞ്ഞെടുപ്പ്(*++tmp)
 		    {
-		    case 0:			// ignore backslashes
+		    അവസ്ഥ 0:			// ignore backslashes
 			tmp--;			// at end of entry
-			break;			// shouldn't happen
-		    case 'e':
-		    case 'E':			// ESC
+			നിർത്തുക;			// shouldn't happen
+		    അവസ്ഥ 'e':
+		    അവസ്ഥ 'E':			// ESC
 			*(*buf)++ = ESC;
-			break;
-		    case 'n':			// \n
+			നിർത്തുക;
+		    അവസ്ഥ 'n':			// \n
 			*(*buf)++ = '\n';
-			break;
-		    case 'r':			// \r
+			നിർത്തുക;
+		    അവസ്ഥ 'r':			// \r
 			*(*buf)++ = '\r';
-			break;
-		    case 't':			// \t
+			നിർത്തുക;
+		    അവസ്ഥ 't':			// \t
 			*(*buf)++ = '\t';
-			break;
-		    case 'b':			// \b
+			നിർത്തുക;
+		    അവസ്ഥ 'b':			// \b
 			*(*buf)++ = '\b';
-			break;
-		    case 'f':			// \f
+			നിർത്തുക;
+		    അവസ്ഥ 'f':			// \f
 			*(*buf)++ = '\f';
-			break;
-		    case '0':			// \nnn
-		    case '1':
-		    case '2':
-		    case '3':
-		    case '4':
-		    case '5':
-		    case '6':
-		    case '7':
-		    case '8':
-		    case '9':
+			നിർത്തുക;
+		    അവസ്ഥ '0':			// \nnn
+		    അവസ്ഥ '1':
+		    അവസ്ഥ '2':
+		    അവസ്ഥ '3':
+		    അവസ്ഥ '4':
+		    അവസ്ഥ '5':
+		    അവസ്ഥ '6':
+		    അവസ്ഥ '7':
+		    അവസ്ഥ '8':
+		    അവസ്ഥ '9':
 			**buf = 0;
 			    // get up to three digits
-			for (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
+			വേണ്ടി (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
 			    **buf = **buf * 8 + *tmp++ - '0';
 			(*buf)++;
 			tmp--;
-			break;
-		    default:			// \x, for all other x
+			നിർത്തുക;
+		    സ്ഥിരസ്ഥിതി:			// \x, for all other x
 			*(*buf)++= *tmp;
 		    }
-		    break;
-		case '^':			// control characters
+		    നിർത്തുക;
+		അവസ്ഥ '^':			// control characters
 		    ++tmp;
 		    *(*buf)++ = Ctrl_chr(*tmp);
-		    break;
-		default:
+		    നിർത്തുക;
+		സ്ഥിരസ്ഥിതി:
 		    *(*buf)++ = *tmp;
 		}
 	    }
 	    *(*buf)++ = 0;
-	    return hold;
+	    തിരികെ hold;
 	}
-    } while (*tmp);
+    } ആകുമ്പോൾ (*tmp);
 
-    return 0;
+    തിരികെ 0;
 }
 
 /*
@@ -385,132 +385,132 @@ tgetstr(char *id, char **buf)
  *	%D	 reverse coding (x-2*(x%16)), no output.
  */
 
-    char *
+    അക്ഷരം *
 tgoto(
-    char    *cm,				// cm string, from termcap
-    int	    col,				// column, x position
-    int	    line)				// line, y position
+    അക്ഷരം    *cm,				// cm string, from termcap
+    പൂർണ്ണസംഖ്യ	    col,				// column, x position
+    പൂർണ്ണസംഖ്യ	    വരി)				// line, y position
 {
-    char    gx, gy,				// x, y
+    അക്ഷരം    gx, gy,				// x, y
 	*ptr,					// pointer in 'cm'
 	reverse = 0,				// reverse flag
 	*bufp,					// pointer in returned string
 	addup = 0,				// add upline
 	addbak = 0,				// add backup
 	c;
-    static char buffer[32];
+    സ്ഥിതം അക്ഷരം buffer[32];
 
-    if (!cm)
-	return "OOPS";				// Kludge, but standard
+    എങ്കിൽ (!cm)
+	തിരികെ "OOPS";				// Kludge, but standard
 
     bufp = buffer;
     ptr = cm;
 
-    while (*ptr)
+    ആകുമ്പോൾ (*ptr)
     {
-	if ((c = *ptr++) != '%')		// normal char
+	എങ്കിൽ ((c = *ptr++) != '%')		// normal char
 	{
 	    *bufp++ = c;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{				// % escape
-	    switch(c = *ptr++)
+	    തിരഞ്ഞെടുപ്പ്(c = *ptr++)
 	    {
-	    case 'd':				// decimal
-		bufp = _addfmt(bufp, "%d", line);
-		line = col;
-		break;
-	    case '2':				// 2 digit decimal
-		bufp = _addfmt(bufp, "%02d", line);
-		line = col;
-		break;
-	    case '3':				// 3 digit decimal
-		bufp = _addfmt(bufp, "%03d", line);
-		line = col;
-		break;
-	    case '>':				// %>xy: if >x, add y
+	    അവസ്ഥ 'd':				// decimal
+		bufp = _addfmt(bufp, "%d", വരി);
+		വരി = col;
+		നിർത്തുക;
+	    അവസ്ഥ '2':				// 2 digit decimal
+		bufp = _addfmt(bufp, "%02d", വരി);
+		വരി = col;
+		നിർത്തുക;
+	    അവസ്ഥ '3':				// 3 digit decimal
+		bufp = _addfmt(bufp, "%03d", വരി);
+		വരി = col;
+		നിർത്തുക;
+	    അവസ്ഥ '>':				// %>xy: if >x, add y
 		gx = *ptr++;
 		gy = *ptr++;
-		if (col>gx) col += gy;
-		if (line>gx) line += gy;
-		break;
-	    case '+':				// %+c: add c
-		line += *ptr++;
-	    case '.':				// print x/y
-		if (line == '\t' ||		// these are
-		   line == '\n' ||		// chars that
-		   line == '\004' ||		// UNIX hates
-		   line == '\0')
+		എങ്കിൽ (col>gx) col += gy;
+		എങ്കിൽ (വരി>gx) വരി += gy;
+		നിർത്തുക;
+	    അവസ്ഥ '+':				// %+c: add c
+		വരി += *ptr++;
+	    അവസ്ഥ '.':				// print x/y
+		എങ്കിൽ (വരി == '\t' ||		// these are
+		   വരി == '\n' ||		// chars that
+		   വരി == '\004' ||		// UNIX hates
+		   വരി == '\0')
 		{
-		    line++;			// so go to next pos
-		    if (reverse == (line == col))
+		    വരി++;			// so go to next pos
+		    എങ്കിൽ (reverse == (വരി == col))
 			addup=1;		// and mark UP
-		    else
+		    അല്ലെങ്കിൽ
 			addbak=1;		// or BC
 		}
-		*bufp++=line;
-		line = col;
-		break;
-	    case 'r':				// r: reverse
-		gx = line;
-		line = col;
+		*bufp++=വരി;
+		വരി = col;
+		നിർത്തുക;
+	    അവസ്ഥ 'r':				// r: reverse
+		gx = വരി;
+		വരി = col;
 		col = gx;
 		reverse = 1;
-		break;
-	    case 'i':			// increment (1-origin screen)
+		നിർത്തുക;
+	    അവസ്ഥ 'i':			// increment (1-origin screen)
 		col++;
-		line++;
-		break;
-	    case '%':				// %%=% literally
+		വരി++;
+		നിർത്തുക;
+	    അവസ്ഥ '%':				// %%=% literally
 		*bufp++='%';
-		break;
-	    case 'n':				// magic DM2500 code
-		line ^= 0140;
+		നിർത്തുക;
+	    അവസ്ഥ 'n':				// magic DM2500 code
+		വരി ^= 0140;
 		col ^= 0140;
-		break;
-	    case 'B':				// bcd encoding
-		line = line/10<<4+line%10;
+		നിർത്തുക;
+	    അവസ്ഥ 'B':				// bcd encoding
+		വരി = വരി/10<<4+വരി%10;
 		col = col/10<<4+col%10;
-		break;
-	    case 'D':				// magic Delta Data code
-		line = line-2*(line&15);
+		നിർത്തുക;
+	    അവസ്ഥ 'D':				// magic Delta Data code
+		വരി = വരി-2*(വരി&15);
 		col = col-2*(col&15);
-		break;
-	    default:				// Unknown escape
-		return "OOPS";
+		നിർത്തുക;
+	    സ്ഥിരസ്ഥിതി:				// Unknown escape
+		തിരികെ "OOPS";
 	    }
 	}
     }
 
-    if (addup)					// add upline
-	if (UP)
+    എങ്കിൽ (addup)					// add upline
+	എങ്കിൽ (UP)
 	{
 	    ptr=UP;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    ആകുമ്പോൾ (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    എങ്കിൽ (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    ആകുമ്പോൾ (*ptr)
 		*bufp++ = *ptr++;
 	}
 
-    if (addbak)					// add backspace
-	if (BC)
+    എങ്കിൽ (addbak)					// add backspace
+	എങ്കിൽ (BC)
 	{
 	    ptr=BC;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    ആകുമ്പോൾ (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    എങ്കിൽ (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    ആകുമ്പോൾ (*ptr)
 		*bufp++ = *ptr++;
 	}
-	else
+	അല്ലെങ്കിൽ
 	    *bufp++='\b';
 
     *bufp = 0;
 
-    return(buffer);
+    തിരികെ(buffer);
 }
 
 /*
@@ -539,49 +539,49 @@ long _bauds[16]={
     600,    1200,   1800,   2400,
     4800,   9600,   19200,  19200 };
 
-    int
+    പൂർണ്ണസംഖ്യ
 tputs(
-    char *cp,				// string to print
-    int affcnt,				// Number of lines affected
-    void (*outc)(unsigned int))		// routine to output 1 character
+    അക്ഷരം *cp,				// string to print
+    പൂർണ്ണസംഖ്യ affcnt,				// Number of lines affected
+    ശൂന്യം (*outc)(unsigned പൂർണ്ണസംഖ്യ))		// routine to output 1 character
 {
     long    frac,			// 10^(#digits after decimal point)
 	counter,			// digits
-	atol(const char *);
+	atol(സ്ഥിരം അക്ഷരം *);
 
-    if (VIM_ISDIGIT(*cp))
+    എങ്കിൽ (VIM_ISDIGIT(*cp))
     {
 	counter = 0;
 	frac = 1000;
-	while (VIM_ISDIGIT(*cp))
+	ആകുമ്പോൾ (VIM_ISDIGIT(*cp))
 	    counter = counter * 10L + (long)(*cp++ - '0');
-	if (*cp == '.')
-	    while (VIM_ISDIGIT(*++cp))
+	എങ്കിൽ (*cp == '.')
+	    ആകുമ്പോൾ (VIM_ISDIGIT(*++cp))
 	    {
 		counter = counter * 10L + (long)(*cp++ - '0');
 		frac = frac * 10;
 	    }
-	if (*cp!='*')			// multiply by affected lines
+	എങ്കിൽ (*cp!='*')			// multiply by affected lines
 	{
-	    if (affcnt>1) affcnt = 1;
+	    എങ്കിൽ (affcnt>1) affcnt = 1;
 	}
-	else
+	അല്ലെങ്കിൽ
 	    cp++;
 
 	// Calculate number of characters for padding counter/frac ms delay
-	if (ospeed)
+	എങ്കിൽ (ospeed)
 	    counter = (counter * _bauds[ospeed] * (long)affcnt) / frac;
 
-	while (*cp)			// output string
+	ആകുമ്പോൾ (*cp)			// output string
 	    (*outc)(*cp++);
-	if (ospeed)
-	    while (counter--)		// followed by pad characters
+	എങ്കിൽ (ospeed)
+	    ആകുമ്പോൾ (counter--)		// followed by pad characters
 		(*outc)(PC);
     }
-    else
-	while (*cp)
+    അല്ലെങ്കിൽ
+	ആകുമ്പോൾ (*cp)
 	    (*outc)(*cp++);
-    return 0;
+    തിരികെ 0;
 }
 
 /*
@@ -590,45 +590,45 @@ tputs(
  * Purpose: Utility routines for TERMLIB functions.
  * Returns length of text common to s1 and s2.
  */
-    static int
-_match(char *s1, char *s2)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+_match(അക്ഷരം *s1, അക്ഷരം *s2)
 {
-    int i = 0;
+    പൂർണ്ണസംഖ്യ i = 0;
 
-    while (s1[i] && s1[i] == s2[i])
+    ആകുമ്പോൾ (s1[i] && s1[i] == s2[i])
 	i++;
 
-    return i;
+    തിരികെ i;
 }
 
 /*
  * finds next c in s that's a member of set, returns pointer
  */
-    static char *
-_find(char *s, char *set)
+    സ്ഥിതം അക്ഷരം *
+_find(അക്ഷരം *s, അക്ഷരം *set)
 {
-    for (; *s; s++)
+    വേണ്ടി (; *s; s++)
     {
-	char	*ptr = set;
+	അക്ഷരം	*ptr = set;
 
-	while (*ptr && *s != *ptr)
+	ആകുമ്പോൾ (*ptr && *s != *ptr)
 	    ptr++;
 
-	if (*ptr)
-	    return s;
+	എങ്കിൽ (*ptr)
+	    തിരികെ s;
     }
 
-    return s;
+    തിരികെ s;
 }
 
 /*
  * add val to buf according to format fmt
  */
-    static char *
-_addfmt(char *buf, char *fmt, int val)
+    സ്ഥിതം അക്ഷരം *
+_addfmt(അക്ഷരം *buf, അക്ഷരം *fmt, പൂർണ്ണസംഖ്യ val)
 {
     sprintf(buf, fmt, val);
-    while (*buf)
+    ആകുമ്പോൾ (*buf)
 	buf++;
-    return buf;
+    തിരികെ buf;
 }

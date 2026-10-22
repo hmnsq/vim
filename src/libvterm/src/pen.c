@@ -1,16 +1,16 @@
-#include "vterm_internal.h"
+#അന്തര്ഭാവ "vterm_internal.h"
 
-#include <stdio.h>
+#അന്തര്ഭാവ <stdio.h>
 
 /**
  * Structure used to store RGB triples without the additional metadata stored in
  * VTermColor.
  */
-typedef struct {
+തരനിർവചനം ഘടന {
   uint8_t red, green, blue;
 } VTermRGB;
 
-static const VTermRGB ansi_colors[] = {
+സ്ഥിതം സ്ഥിരം VTermRGB ansi_colors[] = {
   /* R    G    B */
   {   0,   0,   0 }, // black
   { 224,   0,   0 }, // red
@@ -32,17 +32,17 @@ static const VTermRGB ansi_colors[] = {
   { 255, 255, 255 }, // white for real
 };
 
-static int ramp6[] = {
+സ്ഥിതം പൂർണ്ണസംഖ്യ ramp6[] = {
   0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF,
 };
 
 // Use 0x81 instead of 0x80 to be able to distinguish from ansi black
-static int ramp24[] = {
+സ്ഥിതം പൂർണ്ണസംഖ്യ ramp24[] = {
   0x08, 0x12, 0x1C, 0x26, 0x30, 0x3A, 0x44, 0x4E, 0x58, 0x62, 0x6C, 0x76,
   0x81, 0x8A, 0x94, 0x9E, 0xA8, 0xB2, 0xBC, 0xC6, 0xD0, 0xDA, 0xE4, 0xEE,
 };
 
-static void lookup_default_colour_ansi(long idx, VTermColor *col)
+സ്ഥിതം ശൂന്യം lookup_default_colour_ansi(long idx, VTermColor *col)
 {
   // VIM: store both RGB color and index
   vterm_color_rgb(
@@ -52,23 +52,23 @@ static void lookup_default_colour_ansi(long idx, VTermColor *col)
   col->type = VTERM_COLOR_INDEXED;
 }
 
-static int lookup_colour_ansi(const VTermState *state, long index, VTermColor *col)
+സ്ഥിതം പൂർണ്ണസംഖ്യ lookup_colour_ansi(സ്ഥിരം VTermState *state, long index, VTermColor *col)
 {
-  if(index >= 0 && index < 16) {
+  എങ്കിൽ(index >= 0 && index < 16) {
     *col = state->colors[index];
-    return TRUE;
+    തിരികെ TRUE;
   }
 
-  return FALSE;
+  തിരികെ FALSE;
 }
 
-static int lookup_colour_palette(const VTermState *state, long index, VTermColor *col)
+സ്ഥിതം പൂർണ്ണസംഖ്യ lookup_colour_palette(സ്ഥിരം VTermState *state, long index, VTermColor *col)
 {
-  if(index >= 0 && index < 16) {
+  എങ്കിൽ(index >= 0 && index < 16) {
     // Normal 8 colours or high intensity - parse as palette 0
-    return lookup_colour_ansi(state, index, col);
+    തിരികെ lookup_colour_ansi(state, index, col);
   }
-  else if(index >= 16 && index < 232) {
+  അല്ലെങ്കിൽ എങ്കിൽ(index >= 16 && index < 232) {
     // 216-colour cube
     index -= 16;
 
@@ -76,82 +76,82 @@ static int lookup_colour_palette(const VTermState *state, long index, VTermColor
                          ramp6[index/6   % 6],
                          ramp6[index     % 6]);
 
-    return TRUE;
+    തിരികെ TRUE;
   }
-  else if(index >= 232 && index < 256) {
+  അല്ലെങ്കിൽ എങ്കിൽ(index >= 232 && index < 256) {
     // 24 greyscales
     index -= 232;
 
     vterm_color_rgb(col, ramp24[index], ramp24[index], ramp24[index]);
 
-    return TRUE;
+    തിരികെ TRUE;
   }
 
-  return FALSE;
+  തിരികെ FALSE;
 }
 
-static int lookup_colour(const VTermState *state, int palette, const long args[], int argcount, VTermColor *col)
+സ്ഥിതം പൂർണ്ണസംഖ്യ lookup_colour(സ്ഥിരം VTermState *state, പൂർണ്ണസംഖ്യ palette, സ്ഥിരം long args[], പൂർണ്ണസംഖ്യ argcount, VTermColor *col)
 {
-  switch(palette) {
-  case 2: // RGB mode - 3 args contain colour values directly
-    if(argcount < 3)
-      return argcount;
+  തിരഞ്ഞെടുപ്പ്(palette) {
+  അവസ്ഥ 2: // RGB mode - 3 args contain colour values directly
+    എങ്കിൽ(argcount < 3)
+      തിരികെ argcount;
 
     vterm_color_rgb(col, (uint8_t)CSI_ARG(args[0]), (uint8_t)CSI_ARG(args[1]), (uint8_t)CSI_ARG(args[2]));
 
-    return 3;
+    തിരികെ 3;
 
-  case 5: // XTerm 256-colour mode
-    if (!argcount || CSI_ARG_IS_MISSING(args[0])) {
-      return argcount ? 1 : 0;
+  അവസ്ഥ 5: // XTerm 256-colour mode
+    എങ്കിൽ (!argcount || CSI_ARG_IS_MISSING(args[0])) {
+      തിരികെ argcount ? 1 : 0;
     }
 
     lookup_colour_palette(state, args[0], col);
-    return 1;
+    തിരികെ 1;
 
-  default:
+  സ്ഥിരസ്ഥിതി:
     DEBUG_LOG1("Unrecognised colour palette %d\n", palette);
-    return 0;
+    തിരികെ 0;
   }
 }
 
 // Some conveniences
 
-static void setpenattr(VTermState *state, VTermAttr attr, VTermValueType type UNUSED, VTermValue *val)
+സ്ഥിതം ശൂന്യം setpenattr(VTermState *state, VTermAttr attr, VTerm_മൂല്യം_Type type UNUSED, VTerm_മൂല്യം *val)
 {
 #ifdef DEBUG
-  if(type != vterm_get_attr_type(attr)) {
+  എങ്കിൽ(type != vterm_get_attr_type(attr)) {
     DEBUG_LOG3("Cannot set attr %d as it has type %d, not type %d\n",
         attr, vterm_get_attr_type(attr), type);
-    return;
+    തിരികെ;
   }
 #endif
-  if(state->callbacks && state->callbacks->setpenattr)
+  എങ്കിൽ(state->callbacks && state->callbacks->setpenattr)
     (*state->callbacks->setpenattr)(attr, val, state->cbdata);
 }
 
-static void setpenattr_bool(VTermState *state, VTermAttr attr, int boolean)
+സ്ഥിതം ശൂന്യം setpenattr_bool(VTermState *state, VTermAttr attr, പൂർണ്ണസംഖ്യ boolean)
 {
-  VTermValue val;
+  VTerm_മൂല്യം val;
   val.boolean = boolean;
   setpenattr(state, attr, VTERM_VALUETYPE_BOOL, &val);
 }
 
-static void setpenattr_int(VTermState *state, VTermAttr attr, int number)
+സ്ഥിതം ശൂന്യം setpenattr_int(VTermState *state, VTermAttr attr, പൂർണ്ണസംഖ്യ സംഖ്യ)
 {
-  VTermValue val;
-  val.number = number;
+  VTerm_മൂല്യം val;
+  val.സംഖ്യ = സംഖ്യ;
   setpenattr(state, attr, VTERM_VALUETYPE_INT, &val);
 }
 
-static void setpenattr_col(VTermState *state, VTermAttr attr, VTermColor color)
+സ്ഥിതം ശൂന്യം setpenattr_col(VTermState *state, VTermAttr attr, VTermColor color)
 {
-  VTermValue val;
+  VTerm_മൂല്യം val;
   val.color = color;
   setpenattr(state, attr, VTERM_VALUETYPE_COLOR, &val);
 }
 
-static void set_pen_col_ansi(VTermState *state, VTermAttr attr, long col)
+സ്ഥിതം ശൂന്യം set_pen_col_ansi(VTermState *state, VTermAttr attr, long col)
 {
   VTermColor *colp = (attr == VTERM_ATTR_BACKGROUND) ? &state->pen.bg : &state->pen.fg;
 
@@ -160,18 +160,18 @@ static void set_pen_col_ansi(VTermState *state, VTermAttr attr, long col)
   setpenattr_col(state, attr, *colp);
 }
 
-INTERNAL void vterm_state_newpen(VTermState *state)
+INTERNAL ശൂന്യം vterm_state_newpen(VTermState *state)
 {
   // 90% grey so that pure white is brighter
   vterm_color_rgb(&state->default_fg, 240, 240, 240);
   vterm_color_rgb(&state->default_bg, 0, 0, 0);
   vterm_state_set_default_colors(state, &state->default_fg, &state->default_bg);
 
-  for(int col = 0; col < 16; col++)
+  വേണ്ടി(പൂർണ്ണസംഖ്യ col = 0; col < 16; col++)
     lookup_default_colour_ansi(col, &state->colors[col]);
 }
 
-INTERNAL void vterm_state_resetpen(VTermState *state)
+INTERNAL ശൂന്യം vterm_state_resetpen(VTermState *state)
 {
   state->pen.bold = 0;      setpenattr_bool(state, VTERM_ATTR_BOLD, 0);
   state->pen.underline = 0; setpenattr_int (state, VTERM_ATTR_UNDERLINE, 0);
@@ -188,12 +188,12 @@ INTERNAL void vterm_state_resetpen(VTermState *state)
   state->pen.bg = state->default_bg;  setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->default_bg);
 }
 
-INTERNAL void vterm_state_savepen(VTermState *state, int save)
+INTERNAL ശൂന്യം vterm_state_savepen(VTermState *state, പൂർണ്ണസംഖ്യ save)
 {
-  if(save) {
+  എങ്കിൽ(save) {
     state->saved.pen = state->pen;
   }
-  else {
+  അല്ലെങ്കിൽ {
     state->pen = state->saved.pen;
 
     setpenattr_bool(state, VTERM_ATTR_BOLD,      state->pen.bold);
@@ -212,7 +212,7 @@ INTERNAL void vterm_state_savepen(VTermState *state, int save)
   }
 }
 
-void vterm_color_rgb(VTermColor *col, uint8_t red, uint8_t green, uint8_t blue)
+ശൂന്യം vterm_color_rgb(VTermColor *col, uint8_t red, uint8_t green, uint8_t blue)
 {
   col->type = VTERM_COLOR_RGB;
   col->red   = red;
@@ -220,239 +220,239 @@ void vterm_color_rgb(VTermColor *col, uint8_t red, uint8_t green, uint8_t blue)
   col->blue  = blue;
 }
 
-void vterm_color_indexed(VTermColor *col, uint8_t idx)
+ശൂന്യം vterm_color_indexed(VTermColor *col, uint8_t idx)
 {
   col->type = VTERM_COLOR_INDEXED;
   col->index = idx;
 }
 
-int vterm_color_is_equal(const VTermColor *a, const VTermColor *b)
+പൂർണ്ണസംഖ്യ vterm_color_is_equal(സ്ഥിരം VTermColor *a, സ്ഥിരം VTermColor *b)
 {
   /* First make sure that the two colours are of the same type (RGB/Indexed) */
-  if (a->type != b->type) {
-    return FALSE;
+  എങ്കിൽ (a->type != b->type) {
+    തിരികെ FALSE;
   }
 
   /* Depending on the type inspect the corresponding members */
-  if (VTERM_COLOR_IS_INDEXED(a)) {
-    return a->index == b->index;
+  എങ്കിൽ (VTERM_COLOR_IS_INDEXED(a)) {
+    തിരികെ a->index == b->index;
   }
-  else if (VTERM_COLOR_IS_RGB(a)) {
-    return    (a->red   == b->red)
+  അല്ലെങ്കിൽ എങ്കിൽ (VTERM_COLOR_IS_RGB(a)) {
+    തിരികെ    (a->red   == b->red)
            && (a->green == b->green)
            && (a->blue  == b->blue);
   }
 
-  return 0;
+  തിരികെ 0;
 }
 
-void vterm_state_get_default_colors(const VTermState *state, VTermColor *default_fg, VTermColor *default_bg)
+ശൂന്യം vterm_state_get_default_colors(സ്ഥിരം VTermState *state, VTermColor *default_fg, VTermColor *default_bg)
 {
   *default_fg = state->default_fg;
   *default_bg = state->default_bg;
 }
 
-void vterm_state_get_palette_color(const VTermState *state, int index, VTermColor *col)
+ശൂന്യം vterm_state_get_palette_color(സ്ഥിരം VTermState *state, പൂർണ്ണസംഖ്യ index, VTermColor *col)
 {
   lookup_colour_palette(state, index, col);
 }
 
-void vterm_state_set_default_colors(VTermState *state, const VTermColor *default_fg, const VTermColor *default_bg)
+ശൂന്യം vterm_state_set_default_colors(VTermState *state, സ്ഥിരം VTermColor *default_fg, സ്ഥിരം VTermColor *default_bg)
 {
-  if(default_fg) {
+  എങ്കിൽ(default_fg) {
     state->default_fg = *default_fg;
     state->default_fg.type = (state->default_fg.type & ~VTERM_COLOR_DEFAULT_MASK)
                            | VTERM_COLOR_DEFAULT_FG;
   }
 
-  if(default_bg) {
+  എങ്കിൽ(default_bg) {
     state->default_bg = *default_bg;
     state->default_bg.type = (state->default_bg.type & ~VTERM_COLOR_DEFAULT_MASK)
                            | VTERM_COLOR_DEFAULT_BG;
   }
 }
 
-void vterm_state_set_palette_color(VTermState *state, int index, const VTermColor *col)
+ശൂന്യം vterm_state_set_palette_color(VTermState *state, പൂർണ്ണസംഖ്യ index, സ്ഥിരം VTermColor *col)
 {
-  if(index >= 0 && index < 16)
+  എങ്കിൽ(index >= 0 && index < 16)
     state->colors[index] = *col;
 }
 
-void vterm_state_convert_color_to_rgb(const VTermState *state, VTermColor *col)
+ശൂന്യം vterm_state_convert_color_to_rgb(സ്ഥിരം VTermState *state, VTermColor *col)
 {
-  if (VTERM_COLOR_IS_INDEXED(col)) { /* Convert indexed colors to RGB */
+  എങ്കിൽ (VTERM_COLOR_IS_INDEXED(col)) { /* Convert indexed colors to RGB */
     lookup_colour_palette(state, col->index, col);
   }
   col->type &= VTERM_COLOR_TYPE_MASK; /* Reset any metadata but the type */
 }
 
-void vterm_state_set_bold_highbright(VTermState *state, int bold_is_highbright)
+ശൂന്യം vterm_state_set_bold_highbright(VTermState *state, പൂർണ്ണസംഖ്യ bold_is_highbright)
 {
   state->bold_is_highbright = bold_is_highbright;
 }
 
-INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argcount)
+INTERNAL ശൂന്യം vterm_state_setpen(VTermState *state, സ്ഥിരം long args[], പൂർണ്ണസംഖ്യ argcount)
 {
   // SGR - ECMA-48 8.3.117
 
-  int argi = 0;
-  int value;
+  പൂർണ്ണസംഖ്യ argi = 0;
+  പൂർണ്ണസംഖ്യ മൂല്യം;
 
-  while(argi < argcount) {
+  ആകുമ്പോൾ(argi < argcount) {
     // This logic is easier to do 'done' backwards; set it true, and make it
     // false again in the 'default' case
-    int done = 1;
+    പൂർണ്ണസംഖ്യ done = 1;
 
     long arg;
-    switch(arg = CSI_ARG(args[argi])) {
-    case CSI_ARG_MISSING:
-    case 0: // Reset
+    തിരഞ്ഞെടുപ്പ്(arg = CSI_ARG(args[argi])) {
+    അവസ്ഥ CSI_ARG_MISSING:
+    അവസ്ഥ 0: // Reset
       vterm_state_resetpen(state);
-      break;
+      നിർത്തുക;
 
-    case 1: { // Bold on
-      const VTermColor *fg = &state->pen.fg;
+    അവസ്ഥ 1: { // Bold on
+      സ്ഥിരം VTermColor *fg = &state->pen.fg;
       state->pen.bold = 1;
       setpenattr_bool(state, VTERM_ATTR_BOLD, 1);
-      if(!VTERM_COLOR_IS_DEFAULT_FG(fg) && VTERM_COLOR_IS_INDEXED(fg) && fg->index < 8 && state->bold_is_highbright)
+      എങ്കിൽ(!VTERM_COLOR_IS_DEFAULT_FG(fg) && VTERM_COLOR_IS_INDEXED(fg) && fg->index < 8 && state->bold_is_highbright)
         set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, fg->index + (state->pen.bold ? 8 : 0));
-      break;
+      നിർത്തുക;
     }
 
-    case 3: // Italic on
+    അവസ്ഥ 3: // Italic on
       state->pen.italic = 1;
       setpenattr_bool(state, VTERM_ATTR_ITALIC, 1);
-      break;
+      നിർത്തുക;
 
-    case 4: // Underline
+    അവസ്ഥ 4: // Underline
       state->pen.underline = VTERM_UNDERLINE_SINGLE;
-      if(CSI_ARG_HAS_MORE(args[argi])) {
+      എങ്കിൽ(CSI_ARG_HAS_MORE(args[argi])) {
         argi++;
-        switch(CSI_ARG(args[argi])) {
-          case 0:
+        തിരഞ്ഞെടുപ്പ്(CSI_ARG(args[argi])) {
+          അവസ്ഥ 0:
             state->pen.underline = 0;
-            break;
-          case 1:
+            നിർത്തുക;
+          അവസ്ഥ 1:
             state->pen.underline = VTERM_UNDERLINE_SINGLE;
-            break;
-          case 2:
+            നിർത്തുക;
+          അവസ്ഥ 2:
             state->pen.underline = VTERM_UNDERLINE_DOUBLE;
-            break;
-          case 3:
+            നിർത്തുക;
+          അവസ്ഥ 3:
             state->pen.underline = VTERM_UNDERLINE_CURLY;
-            break;
+            നിർത്തുക;
         }
       }
       setpenattr_int(state, VTERM_ATTR_UNDERLINE, state->pen.underline);
-      break;
+      നിർത്തുക;
 
-    case 5: // Blink
+    അവസ്ഥ 5: // Blink
       state->pen.blink = 1;
       setpenattr_bool(state, VTERM_ATTR_BLINK, 1);
-      break;
+      നിർത്തുക;
 
-    case 7: // Reverse on
+    അവസ്ഥ 7: // Reverse on
       state->pen.reverse = 1;
       setpenattr_bool(state, VTERM_ATTR_REVERSE, 1);
-      break;
+      നിർത്തുക;
 
-    case 8: // Conceal on
+    അവസ്ഥ 8: // Conceal on
       state->pen.conceal = 1;
       setpenattr_bool(state, VTERM_ATTR_CONCEAL, 1);
-      break;
+      നിർത്തുക;
 
-    case 9: // Strikethrough on
+    അവസ്ഥ 9: // Strikethrough on
       state->pen.strike = 1;
       setpenattr_bool(state, VTERM_ATTR_STRIKE, 1);
-      break;
+      നിർത്തുക;
 
-    case 10: case 11: case 12: case 13: case 14:
-    case 15: case 16: case 17: case 18: case 19: // Select font
+    അവസ്ഥ 10: അവസ്ഥ 11: അവസ്ഥ 12: അവസ്ഥ 13: അവസ്ഥ 14:
+    അവസ്ഥ 15: അവസ്ഥ 16: അവസ്ഥ 17: അവസ്ഥ 18: അവസ്ഥ 19: // Select font
       state->pen.font = CSI_ARG(args[argi]) - 10;
       setpenattr_int(state, VTERM_ATTR_FONT, state->pen.font);
-      break;
+      നിർത്തുക;
 
-    case 21: // Underline double
+    അവസ്ഥ 21: // Underline double
       state->pen.underline = VTERM_UNDERLINE_DOUBLE;
       setpenattr_int(state, VTERM_ATTR_UNDERLINE, state->pen.underline);
-      break;
+      നിർത്തുക;
 
-    case 22: // Bold off
+    അവസ്ഥ 22: // Bold off
       state->pen.bold = 0;
       setpenattr_bool(state, VTERM_ATTR_BOLD, 0);
-      break;
+      നിർത്തുക;
 
-    case 23: // Italic and Gothic (currently unsupported) off
+    അവസ്ഥ 23: // Italic and Gothic (currently unsupported) off
       state->pen.italic = 0;
       setpenattr_bool(state, VTERM_ATTR_ITALIC, 0);
-      break;
+      നിർത്തുക;
 
-    case 24: // Underline off
+    അവസ്ഥ 24: // Underline off
       state->pen.underline = 0;
       setpenattr_int(state, VTERM_ATTR_UNDERLINE, 0);
-      break;
+      നിർത്തുക;
 
-    case 25: // Blink off
+    അവസ്ഥ 25: // Blink off
       state->pen.blink = 0;
       setpenattr_bool(state, VTERM_ATTR_BLINK, 0);
-      break;
+      നിർത്തുക;
 
-    case 27: // Reverse off
+    അവസ്ഥ 27: // Reverse off
       state->pen.reverse = 0;
       setpenattr_bool(state, VTERM_ATTR_REVERSE, 0);
-      break;
+      നിർത്തുക;
 
-    case 28: // Conceal off (Reveal)
+    അവസ്ഥ 28: // Conceal off (Reveal)
       state->pen.conceal = 0;
       setpenattr_bool(state, VTERM_ATTR_CONCEAL, 0);
-      break;
+      നിർത്തുക;
 
-    case 29: // Strikethrough off
+    അവസ്ഥ 29: // Strikethrough off
       state->pen.strike = 0;
       setpenattr_bool(state, VTERM_ATTR_STRIKE, 0);
-      break;
+      നിർത്തുക;
 
-    case 30: case 31: case 32: case 33:
-    case 34: case 35: case 36: case 37: // Foreground colour palette
-      value = CSI_ARG(args[argi]) - 30;
-      if(state->pen.bold && state->bold_is_highbright)
-        value += 8;
-      set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, value);
-      break;
+    അവസ്ഥ 30: അവസ്ഥ 31: അവസ്ഥ 32: അവസ്ഥ 33:
+    അവസ്ഥ 34: അവസ്ഥ 35: അവസ്ഥ 36: അവസ്ഥ 37: // Foreground colour palette
+      മൂല്യം = CSI_ARG(args[argi]) - 30;
+      എങ്കിൽ(state->pen.bold && state->bold_is_highbright)
+        മൂല്യം += 8;
+      set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, മൂല്യം);
+      നിർത്തുക;
 
-    case 38: // Foreground colour alternative palette
-      if(argcount - argi < 1)
-        return;
+    അവസ്ഥ 38: // Foreground colour alternative palette
+      എങ്കിൽ(argcount - argi < 1)
+        തിരികെ;
       argi += 1 + lookup_colour(state, CSI_ARG(args[argi+1]), args+argi+2, argcount-argi-2, &state->pen.fg);
       setpenattr_col(state, VTERM_ATTR_FOREGROUND, state->pen.fg);
-      break;
+      നിർത്തുക;
 
-    case 39: // Foreground colour default
+    അവസ്ഥ 39: // Foreground colour default
       state->pen.fg = state->default_fg;
       setpenattr_col(state, VTERM_ATTR_FOREGROUND, state->pen.fg);
-      break;
+      നിർത്തുക;
 
-    case 40: case 41: case 42: case 43:
-    case 44: case 45: case 46: case 47: // Background colour palette
-      value = CSI_ARG(args[argi]) - 40;
-      set_pen_col_ansi(state, VTERM_ATTR_BACKGROUND, value);
-      break;
+    അവസ്ഥ 40: അവസ്ഥ 41: അവസ്ഥ 42: അവസ്ഥ 43:
+    അവസ്ഥ 44: അവസ്ഥ 45: അവസ്ഥ 46: അവസ്ഥ 47: // Background colour palette
+      മൂല്യം = CSI_ARG(args[argi]) - 40;
+      set_pen_col_ansi(state, VTERM_ATTR_BACKGROUND, മൂല്യം);
+      നിർത്തുക;
 
-    case 48: // Background colour alternative palette
-      if(argcount - argi < 1)
-        return;
+    അവസ്ഥ 48: // Background colour alternative palette
+      എങ്കിൽ(argcount - argi < 1)
+        തിരികെ;
       argi += 1 + lookup_colour(state, CSI_ARG(args[argi+1]), args+argi+2, argcount-argi-2, &state->pen.bg);
       setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->pen.bg);
-      break;
+      നിർത്തുക;
 
-    case 49: // Default background
+    അവസ്ഥ 49: // Default background
       state->pen.bg = state->default_bg;
       setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->pen.bg);
-      break;
+      നിർത്തുക;
 
-    case 73: // Superscript
-    case 74: // Subscript
-    case 75: // Superscript/subscript off
+    അവസ്ഥ 73: // Superscript
+    അവസ്ഥ 74: // Subscript
+    അവസ്ഥ 75: // Superscript/subscript off
       state->pen.small = (arg != 75);
       state->pen.baseline =
         (arg == 73) ? VTERM_BASELINE_RAISE :
@@ -460,169 +460,169 @@ INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argco
                       VTERM_BASELINE_NORMAL;
       setpenattr_bool(state, VTERM_ATTR_SMALL,    state->pen.small);
       setpenattr_int (state, VTERM_ATTR_BASELINE, state->pen.baseline);
-      break;
+      നിർത്തുക;
 
-    case 90: case 91: case 92: case 93:
-    case 94: case 95: case 96: case 97: // Foreground colour high-intensity palette
-      value = CSI_ARG(args[argi]) - 90 + 8;
-      set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, value);
-      break;
+    അവസ്ഥ 90: അവസ്ഥ 91: അവസ്ഥ 92: അവസ്ഥ 93:
+    അവസ്ഥ 94: അവസ്ഥ 95: അവസ്ഥ 96: അവസ്ഥ 97: // Foreground colour high-intensity palette
+      മൂല്യം = CSI_ARG(args[argi]) - 90 + 8;
+      set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, മൂല്യം);
+      നിർത്തുക;
 
-    case 100: case 101: case 102: case 103:
-    case 104: case 105: case 106: case 107: // Background colour high-intensity palette
-      value = CSI_ARG(args[argi]) - 100 + 8;
-      set_pen_col_ansi(state, VTERM_ATTR_BACKGROUND, value);
-      break;
+    അവസ്ഥ 100: അവസ്ഥ 101: അവസ്ഥ 102: അവസ്ഥ 103:
+    അവസ്ഥ 104: അവസ്ഥ 105: അവസ്ഥ 106: അവസ്ഥ 107: // Background colour high-intensity palette
+      മൂല്യം = CSI_ARG(args[argi]) - 100 + 8;
+      set_pen_col_ansi(state, VTERM_ATTR_BACKGROUND, മൂല്യം);
+      നിർത്തുക;
 
-    default:
+    സ്ഥിരസ്ഥിതി:
       done = 0;
-      break;
+      നിർത്തുക;
     }
 
-    if(!done)
+    എങ്കിൽ(!done)
     {
       DEBUG_LOG1("libvterm: Unhandled CSI SGR %ld\n", arg);
     }
 
-    while(CSI_ARG_HAS_MORE(args[argi++]))
+    ആകുമ്പോൾ(CSI_ARG_HAS_MORE(args[argi++]))
       ;
   }
 }
 
-static int vterm_state_getpen_color(const VTermColor *col, int argi, long args[], int fg)
+സ്ഥിതം പൂർണ്ണസംഖ്യ vterm_state_getpen_color(സ്ഥിരം VTermColor *col, പൂർണ്ണസംഖ്യ argi, long args[], പൂർണ്ണസംഖ്യ fg)
 {
     /* Do nothing if the given color is the default color */
-    if (( fg && VTERM_COLOR_IS_DEFAULT_FG(col)) ||
+    എങ്കിൽ (( fg && VTERM_COLOR_IS_DEFAULT_FG(col)) ||
         (!fg && VTERM_COLOR_IS_DEFAULT_BG(col))) {
-        return argi;
+        തിരികെ argi;
     }
 
     /* Decide whether to send an indexed color or an RGB color */
-    if (VTERM_COLOR_IS_INDEXED(col)) {
-        const uint8_t idx = col->index;
-        if (idx < 8) {
+    എങ്കിൽ (VTERM_COLOR_IS_INDEXED(col)) {
+        സ്ഥിരം uint8_t idx = col->index;
+        എങ്കിൽ (idx < 8) {
             args[argi++] = (idx + (fg ? 30 : 40));
         }
-        else if (idx < 16) {
+        അല്ലെങ്കിൽ എങ്കിൽ (idx < 16) {
             args[argi++] = (idx - 8 + (fg ? 90 : 100));
         }
-        else {
+        അല്ലെങ്കിൽ {
             args[argi++] = CSI_ARG_FLAG_MORE | (fg ? 38 : 48);
             args[argi++] = CSI_ARG_FLAG_MORE | 5;
             args[argi++] = idx;
         }
     }
-    else if (VTERM_COLOR_IS_RGB(col)) {
+    അല്ലെങ്കിൽ എങ്കിൽ (VTERM_COLOR_IS_RGB(col)) {
         args[argi++] = CSI_ARG_FLAG_MORE | (fg ? 38 : 48);
         args[argi++] = CSI_ARG_FLAG_MORE | 2;
         args[argi++] = CSI_ARG_FLAG_MORE | col->red;
         args[argi++] = CSI_ARG_FLAG_MORE | col->green;
         args[argi++] = col->blue;
     }
-    return argi;
+    തിരികെ argi;
 }
 
-INTERNAL int vterm_state_getpen(VTermState *state, long args[], int argcount UNUSED)
+INTERNAL പൂർണ്ണസംഖ്യ vterm_state_getpen(VTermState *state, long args[], പൂർണ്ണസംഖ്യ argcount UNUSED)
 {
-  int argi = 0;
+  പൂർണ്ണസംഖ്യ argi = 0;
 
-  if(state->pen.bold)
+  എങ്കിൽ(state->pen.bold)
     args[argi++] = 1;
 
-  if(state->pen.italic)
+  എങ്കിൽ(state->pen.italic)
     args[argi++] = 3;
 
-  if(state->pen.underline == VTERM_UNDERLINE_SINGLE)
+  എങ്കിൽ(state->pen.underline == VTERM_UNDERLINE_SINGLE)
     args[argi++] = 4;
-  if(state->pen.underline == VTERM_UNDERLINE_CURLY)
+  എങ്കിൽ(state->pen.underline == VTERM_UNDERLINE_CURLY)
     args[argi++] = 4 | CSI_ARG_FLAG_MORE, args[argi++] = 3;
 
-  if(state->pen.blink)
+  എങ്കിൽ(state->pen.blink)
     args[argi++] = 5;
 
-  if(state->pen.reverse)
+  എങ്കിൽ(state->pen.reverse)
     args[argi++] = 7;
 
-  if(state->pen.conceal)
+  എങ്കിൽ(state->pen.conceal)
     args[argi++] = 8;
 
-  if(state->pen.strike)
+  എങ്കിൽ(state->pen.strike)
     args[argi++] = 9;
 
-  if(state->pen.font)
+  എങ്കിൽ(state->pen.font)
     args[argi++] = 10 + state->pen.font;
 
-  if(state->pen.underline == VTERM_UNDERLINE_DOUBLE)
+  എങ്കിൽ(state->pen.underline == VTERM_UNDERLINE_DOUBLE)
     args[argi++] = 21;
 
   argi = vterm_state_getpen_color(&state->pen.fg, argi, args, TRUE);
 
   argi = vterm_state_getpen_color(&state->pen.bg, argi, args, FALSE);
 
-  if(state->pen.small) {
-    if(state->pen.baseline == VTERM_BASELINE_RAISE)
+  എങ്കിൽ(state->pen.small) {
+    എങ്കിൽ(state->pen.baseline == VTERM_BASELINE_RAISE)
       args[argi++] = 73;
-    else if(state->pen.baseline == VTERM_BASELINE_LOWER)
+    അല്ലെങ്കിൽ എങ്കിൽ(state->pen.baseline == VTERM_BASELINE_LOWER)
       args[argi++] = 74;
   }
 
-  return argi;
+  തിരികെ argi;
 }
 
-int vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val)
+പൂർണ്ണസംഖ്യ vterm_state_get_penattr(സ്ഥിരം VTermState *state, VTermAttr attr, VTerm_മൂല്യം *val)
 {
-  switch(attr) {
-  case VTERM_ATTR_BOLD:
+  തിരഞ്ഞെടുപ്പ്(attr) {
+  അവസ്ഥ VTERM_ATTR_BOLD:
     val->boolean = state->pen.bold;
-    return 1;
+    തിരികെ 1;
 
-  case VTERM_ATTR_UNDERLINE:
-    val->number = state->pen.underline;
-    return 1;
+  അവസ്ഥ VTERM_ATTR_UNDERLINE:
+    val->സംഖ്യ = state->pen.underline;
+    തിരികെ 1;
 
-  case VTERM_ATTR_ITALIC:
+  അവസ്ഥ VTERM_ATTR_ITALIC:
     val->boolean = state->pen.italic;
-    return 1;
+    തിരികെ 1;
 
-  case VTERM_ATTR_BLINK:
+  അവസ്ഥ VTERM_ATTR_BLINK:
     val->boolean = state->pen.blink;
-    return 1;
+    തിരികെ 1;
 
-  case VTERM_ATTR_REVERSE:
+  അവസ്ഥ VTERM_ATTR_REVERSE:
     val->boolean = state->pen.reverse;
-    return 1;
+    തിരികെ 1;
 
-  case VTERM_ATTR_CONCEAL:
+  അവസ്ഥ VTERM_ATTR_CONCEAL:
     val->boolean = state->pen.conceal;
-    return 1;
+    തിരികെ 1;
 
-  case VTERM_ATTR_STRIKE:
+  അവസ്ഥ VTERM_ATTR_STRIKE:
     val->boolean = state->pen.strike;
-    return 1;
+    തിരികെ 1;
 
-  case VTERM_ATTR_FONT:
-    val->number = state->pen.font;
-    return 1;
+  അവസ്ഥ VTERM_ATTR_FONT:
+    val->സംഖ്യ = state->pen.font;
+    തിരികെ 1;
 
-  case VTERM_ATTR_FOREGROUND:
+  അവസ്ഥ VTERM_ATTR_FOREGROUND:
     val->color = state->pen.fg;
-    return 1;
+    തിരികെ 1;
 
-  case VTERM_ATTR_BACKGROUND:
+  അവസ്ഥ VTERM_ATTR_BACKGROUND:
     val->color = state->pen.bg;
-    return 1;
+    തിരികെ 1;
 
-  case VTERM_ATTR_SMALL:
+  അവസ്ഥ VTERM_ATTR_SMALL:
     val->boolean = state->pen.small;
-    return 1;
+    തിരികെ 1;
 
-  case VTERM_ATTR_BASELINE:
-    val->number = state->pen.baseline;
-    return 1;
+  അവസ്ഥ VTERM_ATTR_BASELINE:
+    val->സംഖ്യ = state->pen.baseline;
+    തിരികെ 1;
 
-  case VTERM_N_ATTRS:
-    return 0;
+  അവസ്ഥ VTERM_N_ATTRS:
+    തിരികെ 0;
   }
 
-  return 0;
+  തിരികെ 0;
 }

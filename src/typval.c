@@ -11,18 +11,18 @@
  * typval.c: functions that deal with a typval
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 
 /*
  * Allocate memory for a variable type-value, and make it empty (0 or NULL
  * value).
  */
     typval_T *
-alloc_tv(void)
+alloc_tv(ശൂന്യം)
 {
-    return ALLOC_CLEAR_ONE(typval_T);
+    തിരികെ ALLOC_CLEAR_ONE(typval_T);
 }
 
 /*
@@ -36,78 +36,78 @@ alloc_string_tv(char_u *s)
     typval_T	*rettv;
 
     rettv = alloc_tv();
-    if (rettv != NULL)
+    എങ്കിൽ (rettv != ശൂന്യ)
     {
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = s;
     }
-    else
+    അല്ലെങ്കിൽ
 	vim_free(s);
-    return rettv;
+    തിരികെ rettv;
 }
 
 /*
  * Free the memory for a variable type-value.
  */
-    void
+    ശൂന്യം
 free_tv(typval_T *varp)
 {
-    if (varp == NULL)
-	return;
+    എങ്കിൽ (varp == ശൂന്യ)
+	തിരികെ;
 
-    switch (varp->v_type)
+    തിരഞ്ഞെടുപ്പ് (varp->v_type)
     {
-	case VAR_FUNC:
+	അവസ്ഥ VAR_FUNC:
 	    func_unref(varp->vval.v_string);
 	    // FALLTHROUGH
-	case VAR_STRING:
+	അവസ്ഥ VAR_STRING:
 	    vim_free(varp->vval.v_string);
-	    break;
-	case VAR_PARTIAL:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_PARTIAL:
 	    partial_unref(varp->vval.v_partial);
-	    break;
-	case VAR_BLOB:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_BLOB:
 	    blob_unref(varp->vval.v_blob);
-	    break;
-	case VAR_LIST:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_LIST:
 	    list_unref(varp->vval.v_list);
-	    break;
-	case VAR_TUPLE:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_TUPLE:
 	    tuple_unref(varp->vval.v_tuple);
-	    break;
-	case VAR_DICT:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_DICT:
 	    dict_unref(varp->vval.v_dict);
-	    break;
-	case VAR_JOB:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
 	    job_unref(varp->vval.v_job);
-	    break;
+	    നിർത്തുക;
 #endif
-	case VAR_CHANNEL:
+	അവസ്ഥ VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
 	    channel_unref(varp->vval.v_channel);
-	    break;
+	    നിർത്തുക;
 #endif
-	case VAR_CLASS:
+	അവസ്ഥ VAR_CLASS:
 	    class_unref(varp->vval.v_class);
-	    break;
-	case VAR_OBJECT:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_OBJECT:
 	    object_unref(varp->vval.v_object);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_TYPEALIAS:
+	അവസ്ഥ VAR_TYPEALIAS:
 	    typealias_unref(varp->vval.v_typealias);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-	case VAR_ANY:
-	case VAR_UNKNOWN:
-	case VAR_VOID:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	case VAR_INSTR:
-	    break;
+	അവസ്ഥ VAR_സംഖ്യ:
+	അവസ്ഥ VAR_FLOAT:
+	അവസ്ഥ VAR_ANY:
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_VOID:
+	അവസ്ഥ VAR_BOOL:
+	അവസ്ഥ VAR_SPECIAL:
+	അവസ്ഥ VAR_INSTR:
+	    നിർത്തുക;
     }
     vim_free(varp);
 }
@@ -115,79 +115,79 @@ free_tv(typval_T *varp)
 /*
  * Free the memory for a variable value and set the value to NULL or 0.
  */
-    void
+    ശൂന്യം
 clear_tv(typval_T *varp)
 {
-    if (varp == NULL)
-	return;
+    എങ്കിൽ (varp == ശൂന്യ)
+	തിരികെ;
 
-    switch (varp->v_type)
+    തിരഞ്ഞെടുപ്പ് (varp->v_type)
     {
-	case VAR_FUNC:
+	അവസ്ഥ VAR_FUNC:
 	    func_unref(varp->vval.v_string);
 	    // FALLTHROUGH
-	case VAR_STRING:
+	അവസ്ഥ VAR_STRING:
 	    VIM_CLEAR(varp->vval.v_string);
-	    break;
-	case VAR_PARTIAL:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_PARTIAL:
 	    partial_unref(varp->vval.v_partial);
-	    varp->vval.v_partial = NULL;
-	    break;
-	case VAR_BLOB:
+	    varp->vval.v_partial = ശൂന്യ;
+	    നിർത്തുക;
+	അവസ്ഥ VAR_BLOB:
 	    blob_unref(varp->vval.v_blob);
-	    varp->vval.v_blob = NULL;
-	    break;
-	case VAR_LIST:
+	    varp->vval.v_blob = ശൂന്യ;
+	    നിർത്തുക;
+	അവസ്ഥ VAR_LIST:
 	    list_unref(varp->vval.v_list);
-	    varp->vval.v_list = NULL;
-	    break;
-	case VAR_TUPLE:
+	    varp->vval.v_list = ശൂന്യ;
+	    നിർത്തുക;
+	അവസ്ഥ VAR_TUPLE:
 	    tuple_unref(varp->vval.v_tuple);
-	    varp->vval.v_tuple = NULL;
-	    break;
-	case VAR_DICT:
+	    varp->vval.v_tuple = ശൂന്യ;
+	    നിർത്തുക;
+	അവസ്ഥ VAR_DICT:
 	    dict_unref(varp->vval.v_dict);
-	    varp->vval.v_dict = NULL;
-	    break;
-	case VAR_NUMBER:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	    varp->vval.v_number = 0;
-	    break;
-	case VAR_FLOAT:
+	    varp->vval.v_dict = ശൂന്യ;
+	    നിർത്തുക;
+	അവസ്ഥ VAR_സംഖ്യ:
+	അവസ്ഥ VAR_BOOL:
+	അവസ്ഥ VAR_SPECIAL:
+	    varp->vval.v_സംഖ്യ = 0;
+	    നിർത്തുക;
+	അവസ്ഥ VAR_FLOAT:
 	    varp->vval.v_float = 0.0;
-	    break;
-	case VAR_JOB:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
 	    job_unref(varp->vval.v_job);
-	    varp->vval.v_job = NULL;
+	    varp->vval.v_job = ശൂന്യ;
 #endif
-	    break;
-	case VAR_CHANNEL:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
 	    channel_unref(varp->vval.v_channel);
-	    varp->vval.v_channel = NULL;
+	    varp->vval.v_channel = ശൂന്യ;
 #endif
-	    break;
-	case VAR_INSTR:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_INSTR:
 	    VIM_CLEAR(varp->vval.v_instr);
-	    break;
-	case VAR_CLASS:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_CLASS:
 	    class_unref(varp->vval.v_class);
-	    varp->vval.v_class = NULL;
-	    break;
-	case VAR_OBJECT:
+	    varp->vval.v_class = ശൂന്യ;
+	    നിർത്തുക;
+	അവസ്ഥ VAR_OBJECT:
 	    object_unref(varp->vval.v_object);
-	    varp->vval.v_object = NULL;
-	    break;
-	case VAR_TYPEALIAS:
+	    varp->vval.v_object = ശൂന്യ;
+	    നിർത്തുക;
+	അവസ്ഥ VAR_TYPEALIAS:
 	    typealias_unref(varp->vval.v_typealias);
-	    varp->vval.v_typealias = NULL;
-	    break;
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	    break;
+	    varp->vval.v_typealias = ശൂന്യ;
+	    നിർത്തുക;
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_ANY:
+	അവസ്ഥ VAR_VOID:
+	    നിർത്തുക;
     }
     varp->v_lock = 0;
 }
@@ -195,114 +195,114 @@ clear_tv(typval_T *varp)
 /*
  * Set the value of a variable to NULL without freeing items.
  */
-    void
+    ശൂന്യം
 init_tv(typval_T *varp)
 {
-    if (varp != NULL)
+    എങ്കിൽ (varp != ശൂന്യ)
 	CLEAR_POINTER(varp);
 }
 
-    static varnumber_T
-tv_get_bool_or_number_chk(
+    സ്ഥിതം varnumber_T
+tv_get_bool_or_സംഖ്യ_chk(
 	typval_T    *varp,
-	int	    *denote,
-	int	    want_bool,
-	int	    vim9_string_error) // in Vim9 using a string is an error
+	പൂർണ്ണസംഖ്യ	    *denote,
+	പൂർണ്ണസംഖ്യ	    want_bool,
+	പൂർണ്ണസംഖ്യ	    vim9_string_error) // in Vim9 using a string is an error
 {
     varnumber_T	n = 0L;
 
-    switch (varp->v_type)
+    തിരഞ്ഞെടുപ്പ് (varp->v_type)
     {
-	case VAR_NUMBER:
-	    if (in_vim9script() && want_bool && varp->vval.v_number != 0
-						   && varp->vval.v_number != 1)
+	അവസ്ഥ VAR_സംഖ്യ:
+	    എങ്കിൽ (in_vim9script() && want_bool && varp->vval.v_സംഖ്യ != 0
+						   && varp->vval.v_സംഖ്യ != 1)
 	    {
-		semsg(_(e_using_number_as_bool_nr), varp->vval.v_number);
-		break;
+		semsg(_(e_using_സംഖ്യ_as_bool_nr), varp->vval.v_സംഖ്യ);
+		നിർത്തുക;
 	    }
-	    return varp->vval.v_number;
-	case VAR_FLOAT:
-	    emsg(_(e_using_float_as_number));
-	    break;
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	    emsg(_(e_using_funcref_as_number));
-	    break;
-	case VAR_STRING:
-	    if (vim9_string_error && in_vim9script())
+	    തിരികെ varp->vval.v_സംഖ്യ;
+	അവസ്ഥ VAR_FLOAT:
+	    emsg(_(e_using_float_as_സംഖ്യ));
+	    നിർത്തുക;
+	അവസ്ഥ VAR_FUNC:
+	അവസ്ഥ VAR_PARTIAL:
+	    emsg(_(e_using_funcref_as_സംഖ്യ));
+	    നിർത്തുക;
+	അവസ്ഥ VAR_STRING:
+	    എങ്കിൽ (vim9_string_error && in_vim9script())
 	    {
 		emsg_using_string_as(varp, !want_bool);
-		break;
+		നിർത്തുക;
 	    }
-	    if (varp->vval.v_string != NULL)
-		vim_str2nr(varp->vval.v_string, NULL, NULL,
-					 STR2NR_ALL, &n, NULL, 0, FALSE, NULL);
-	    return n;
-	case VAR_LIST:
-	    emsg(_(e_using_list_as_number));
-	    break;
-	case VAR_TUPLE:
-	    emsg(_(e_using_tuple_as_number));
-	    break;
-	case VAR_DICT:
-	    emsg(_(e_using_dictionary_as_number));
-	    break;
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	    if (!want_bool && in_vim9script())
+	    എങ്കിൽ (varp->vval.v_string != ശൂന്യ)
+		vim_str2nr(varp->vval.v_string, ശൂന്യ, ശൂന്യ,
+					 STR2NR_ALL, &n, ശൂന്യ, 0, FALSE, ശൂന്യ);
+	    തിരികെ n;
+	അവസ്ഥ VAR_LIST:
+	    emsg(_(e_using_list_as_സംഖ്യ));
+	    നിർത്തുക;
+	അവസ്ഥ VAR_TUPLE:
+	    emsg(_(e_using_tuple_as_സംഖ്യ));
+	    നിർത്തുക;
+	അവസ്ഥ VAR_DICT:
+	    emsg(_(e_using_dictionary_as_സംഖ്യ));
+	    നിർത്തുക;
+	അവസ്ഥ VAR_BOOL:
+	അവസ്ഥ VAR_SPECIAL:
+	    എങ്കിൽ (!want_bool && in_vim9script())
 	    {
-		if (varp->v_type == VAR_BOOL)
-		    emsg(_(e_using_bool_as_number));
-		else
-		    emsg(_(e_using_special_as_number));
-		break;
+		എങ്കിൽ (varp->v_type == VAR_BOOL)
+		    emsg(_(e_using_bool_as_സംഖ്യ));
+		അല്ലെങ്കിൽ
+		    emsg(_(e_using_special_as_സംഖ്യ));
+		നിർത്തുക;
 	    }
-	    return varp->vval.v_number == VVAL_TRUE ? 1 : 0;
-	case VAR_JOB:
+	    തിരികെ varp->vval.v_സംഖ്യ == VVAL_TRUE ? 1 : 0;
+	അവസ്ഥ VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    emsg(_(e_using_job_as_number));
-	    break;
+	    emsg(_(e_using_job_as_സംഖ്യ));
+	    നിർത്തുക;
 #endif
-	case VAR_CHANNEL:
+	അവസ്ഥ VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    emsg(_(e_using_channel_as_number));
-	    break;
+	    emsg(_(e_using_channel_as_സംഖ്യ));
+	    നിർത്തുക;
 #endif
-	case VAR_BLOB:
-	    emsg(_(e_using_blob_as_number));
-	    break;
-	case VAR_CLASS:
-	case VAR_TYPEALIAS:
-	    check_typval_is_value(varp);
-	    break;
-	case VAR_OBJECT:
+	അവസ്ഥ VAR_BLOB:
+	    emsg(_(e_using_blob_as_സംഖ്യ));
+	    നിർത്തുക;
+	അവസ്ഥ VAR_CLASS:
+	അവസ്ഥ VAR_TYPEALIAS:
+	    check_typval_is_മൂല്യം(varp);
+	    നിർത്തുക;
+	അവസ്ഥ VAR_OBJECT:
 	    {
-		if (varp->vval.v_object == NULL)
+		എങ്കിൽ (varp->vval.v_object == ശൂന്യ)
 		    emsg(_(e_using_object_as_string));
-		else
+		അല്ലെങ്കിൽ
 		{
 		    class_T *cl = varp->vval.v_object->obj_class;
-		    if (cl != NULL && IS_ENUM(cl))
-			semsg(_(e_using_enum_str_as_number), cl->class_name.string);
-		    else
-			emsg(_(e_using_object_as_number));
+		    എങ്കിൽ (cl != ശൂന്യ && IS_ENUM(cl))
+			semsg(_(e_using_enum_str_as_സംഖ്യ), cl->class_name.string);
+		    അല്ലെങ്കിൽ
+			emsg(_(e_using_object_as_സംഖ്യ));
 		}
 	    }
-	    break;
-	case VAR_VOID:
-	    emsg(_(e_cannot_use_void_value));
-	    break;
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_INSTR:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_VOID:
+	    emsg(_(e_cannot_use_void_മൂല്യം));
+	    നിർത്തുക;
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_ANY:
+	അവസ്ഥ VAR_INSTR:
 	    internal_error_no_abort("tv_get_number(UNKNOWN)");
-	    break;
+	    നിർത്തുക;
     }
-    if (denote == NULL)		// useful for values that must be unsigned
+    എങ്കിൽ (denote == ശൂന്യ)		// useful for values that must be unsigned
 	n = -1;
-    else
+    അല്ലെങ്കിൽ
 	*denote = TRUE;
-    return n;
+    തിരികെ n;
 }
 
 /*
@@ -314,11 +314,11 @@ tv_get_bool_or_number_chk(
  * is not NULL or returns -1 otherwise.
  */
     varnumber_T
-tv_get_number(typval_T *varp)
+tv_get_സംഖ്യ(typval_T *varp)
 {
-    int		error = FALSE;
+    പൂർണ്ണസംഖ്യ		error = FALSE;
 
-    return tv_get_number_chk(varp, &error);	// return 0L on error
+    തിരികെ tv_get_സംഖ്യ_chk(varp, &error);	// return 0L on error
 }
 
 /*
@@ -326,17 +326,17 @@ tv_get_number(typval_T *varp)
  * number without giving an error.
  */
     varnumber_T
-tv_to_number(typval_T *varp)
+tv_to_സംഖ്യ(typval_T *varp)
 {
-    int		error = FALSE;
+    പൂർണ്ണസംഖ്യ		error = FALSE;
 
-    return tv_get_bool_or_number_chk(varp, &error, FALSE, FALSE);
+    തിരികെ tv_get_bool_or_സംഖ്യ_chk(varp, &error, FALSE, FALSE);
 }
 
     varnumber_T
-tv_get_number_chk(typval_T *varp, int *denote)
+tv_get_സംഖ്യ_chk(typval_T *varp, പൂർണ്ണസംഖ്യ *denote)
 {
-    return tv_get_bool_or_number_chk(varp, denote, FALSE, TRUE);
+    തിരികെ tv_get_bool_or_സംഖ്യ_chk(varp, denote, FALSE, TRUE);
 }
 
 /*
@@ -346,7 +346,7 @@ tv_get_number_chk(typval_T *varp, int *denote)
     varnumber_T
 tv_get_bool(typval_T *varp)
 {
-    return tv_get_bool_or_number_chk(varp, NULL, TRUE, TRUE);
+    തിരികെ tv_get_bool_or_സംഖ്യ_chk(varp, ശൂന്യ, TRUE, TRUE);
 }
 
 /*
@@ -354,419 +354,419 @@ tv_get_bool(typval_T *varp)
  * but in Vim9 script accepts Number and Bool.
  */
     varnumber_T
-tv_get_bool_chk(typval_T *varp, int *denote)
+tv_get_bool_chk(typval_T *varp, പൂർണ്ണസംഖ്യ *denote)
 {
-    return tv_get_bool_or_number_chk(varp, denote, TRUE, TRUE);
+    തിരികെ tv_get_bool_or_സംഖ്യ_chk(varp, denote, TRUE, TRUE);
 }
 
-    static float_T
-tv_get_float_chk(typval_T *varp, int *error)
+    സ്ഥിതം float_T
+tv_get_float_chk(typval_T *varp, പൂർണ്ണസംഖ്യ *error)
 {
-    switch (varp->v_type)
+    തിരഞ്ഞെടുപ്പ് (varp->v_type)
     {
-	case VAR_NUMBER:
-	    return (float_T)(varp->vval.v_number);
-	case VAR_FLOAT:
-	    return varp->vval.v_float;
-	case VAR_FUNC:
-	case VAR_PARTIAL:
+	അവസ്ഥ VAR_സംഖ്യ:
+	    തിരികെ (float_T)(varp->vval.v_സംഖ്യ);
+	അവസ്ഥ VAR_FLOAT:
+	    തിരികെ varp->vval.v_float;
+	അവസ്ഥ VAR_FUNC:
+	അവസ്ഥ VAR_PARTIAL:
 	    emsg(_(e_using_funcref_as_float));
-	    break;
-	case VAR_STRING:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_STRING:
 	    emsg(_(e_using_string_as_float));
-	    break;
-	case VAR_LIST:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_LIST:
 	    emsg(_(e_using_list_as_float));
-	    break;
-	case VAR_TUPLE:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_TUPLE:
 	    emsg(_(e_using_tuple_as_float));
-	    break;
-	case VAR_DICT:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_DICT:
 	    emsg(_(e_using_dictionary_as_float));
-	    break;
-	case VAR_BOOL:
-	    emsg(_(e_using_boolean_value_as_float));
-	    break;
-	case VAR_SPECIAL:
-	    emsg(_(e_using_special_value_as_float));
-	    break;
-	case VAR_JOB:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_BOOL:
+	    emsg(_(e_using_boolean_മൂല്യം_as_float));
+	    നിർത്തുക;
+	അവസ്ഥ VAR_SPECIAL:
+	    emsg(_(e_using_special_മൂല്യം_as_float));
+	    നിർത്തുക;
+	അവസ്ഥ VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
 	    emsg(_(e_using_job_as_float));
-	    break;
+	    നിർത്തുക;
 #endif
-	case VAR_CHANNEL:
+	അവസ്ഥ VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
 	    emsg(_(e_using_channel_as_float));
-	    break;
+	    നിർത്തുക;
 #endif
-	case VAR_BLOB:
+	അവസ്ഥ VAR_BLOB:
 	    emsg(_(e_using_blob_as_float));
-	    break;
-	case VAR_CLASS:
-	case VAR_TYPEALIAS:
-	    check_typval_is_value(varp);
-	    break;
-	case VAR_OBJECT:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_CLASS:
+	അവസ്ഥ VAR_TYPEALIAS:
+	    check_typval_is_മൂല്യം(varp);
+	    നിർത്തുക;
+	അവസ്ഥ VAR_OBJECT:
 	    emsg(_(e_using_object_as_float));
-	    break;
-	case VAR_VOID:
-	    emsg(_(e_cannot_use_void_value));
-	    break;
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_INSTR:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_VOID:
+	    emsg(_(e_cannot_use_void_മൂല്യം));
+	    നിർത്തുക;
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_ANY:
+	അവസ്ഥ VAR_INSTR:
 	    internal_error_no_abort("tv_get_float(UNKNOWN)");
-	    break;
+	    നിർത്തുക;
     }
-    if (error != NULL)
+    എങ്കിൽ (error != ശൂന്യ)
 	*error = TRUE;
-    return 0;
+    തിരികെ 0;
 }
 
     float_T
 tv_get_float(typval_T *varp)
 {
-    return tv_get_float_chk(varp, NULL);
+    തിരികെ tv_get_float_chk(varp, ശൂന്യ);
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is unknown
  */
-    int
-check_for_unknown_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_unknown_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_UNKNOWN)
+    എങ്കിൽ (args[idx].v_type != VAR_UNKNOWN)
     {
 	semsg(_(e_too_many_arguments), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string.
  */
-    int
-check_for_string_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_string_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_STRING)
+    എങ്കിൽ (args[idx].v_type != VAR_STRING)
     {
 	semsg(_(e_string_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a non-empty string.
  */
-    int
-check_for_nonempty_string_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_nonempty_string_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (check_for_string_arg(args, idx) == FAIL)
-	return FAIL;
-    if (args[idx].vval.v_string == NULL || *args[idx].vval.v_string == NUL)
+    എങ്കിൽ (check_for_string_arg(args, idx) == FAIL)
+	തിരികെ FAIL;
+    എങ്കിൽ (args[idx].vval.v_string == ശൂന്യ || *args[idx].vval.v_string == NUL)
     {
 	semsg(_(e_non_empty_string_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Check for an optional string argument at 'idx'
  */
-    int
-check_for_opt_string_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_string_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    തിരികെ (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_string_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a number.
  */
-    int
-check_for_number_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_സംഖ്യ_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_NUMBER)
+    എങ്കിൽ (args[idx].v_type != VAR_സംഖ്യ)
     {
-	semsg(_(e_number_required_for_argument_nr), idx + 1);
-	return FAIL;
+	semsg(_(e_സംഖ്യ_required_for_argument_nr), idx + 1);
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Check for an optional number argument at 'idx'
  */
-    int
-check_for_opt_number_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_സംഖ്യ_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
-	    || check_for_number_arg(args, idx) != FAIL) ? OK : FAIL;
+    തിരികെ (args[idx].v_type == VAR_UNKNOWN
+	    || check_for_സംഖ്യ_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a float or a number.
  */
-    int
-check_for_float_or_nr_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_float_or_nr_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_FLOAT && args[idx].v_type != VAR_NUMBER)
+    എങ്കിൽ (args[idx].v_type != VAR_FLOAT && args[idx].v_type != VAR_സംഖ്യ)
     {
-	semsg(_(e_float_or_number_required_for_argument_nr), idx + 1);
-	return FAIL;
+	semsg(_(e_float_or_സംഖ്യ_required_for_argument_nr), idx + 1);
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a bool.
  */
-    int
-check_for_bool_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_bool_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_BOOL
-	    && !(args[idx].v_type == VAR_NUMBER
-		&& (args[idx].vval.v_number == 0
-		    || args[idx].vval.v_number == 1)))
+    എങ്കിൽ (args[idx].v_type != VAR_BOOL
+	    && !(args[idx].v_type == VAR_സംഖ്യ
+		&& (args[idx].vval.v_സംഖ്യ == 0
+		    || args[idx].vval.v_സംഖ്യ == 1)))
     {
 	semsg(_(e_bool_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a bool or a number.
  */
-    static int
-check_for_bool_or_number_arg(typval_T *args, int idx)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+check_for_bool_or_സംഖ്യ_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_BOOL && args[idx].v_type != VAR_NUMBER)
+    എങ്കിൽ (args[idx].v_type != VAR_BOOL && args[idx].v_type != VAR_സംഖ്യ)
     {
-	semsg(_(e_bool_or_number_required_for_argument_nr), idx + 1);
-	return FAIL;
+	semsg(_(e_bool_or_സംഖ്യ_required_for_argument_nr), idx + 1);
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Check for an optional bool argument at 'idx'.
  * Return FAIL if the type is wrong.
  */
-    int
-check_for_opt_bool_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_bool_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type == VAR_UNKNOWN)
-	return OK;
-    return check_for_bool_arg(args, idx);
+    എങ്കിൽ (args[idx].v_type == VAR_UNKNOWN)
+	തിരികെ OK;
+    തിരികെ check_for_bool_arg(args, idx);
 }
 
 /*
  * Check for an optional bool or number argument at 'idx'.
  * Return FAIL if the type is wrong.
  */
-    int
-check_for_opt_bool_or_number_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_bool_or_സംഖ്യ_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type == VAR_UNKNOWN)
-	return OK;
-    return check_for_bool_or_number_arg(args, idx);
+    എങ്കിൽ (args[idx].v_type == VAR_UNKNOWN)
+	തിരികെ OK;
+    തിരികെ check_for_bool_or_സംഖ്യ_arg(args, idx);
 }
 
 /*
  * Check for an optional bool or dict argument at 'idx'.
  * Return FAIL if the type is wrong.
  */
-    int
-check_for_opt_bool_or_dict_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_bool_or_dict_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type == VAR_UNKNOWN || args[idx].v_type == VAR_DICT)
-	return OK;
-    return check_for_bool_arg(args, idx);
+    എങ്കിൽ (args[idx].v_type == VAR_UNKNOWN || args[idx].v_type == VAR_DICT)
+	തിരികെ OK;
+    തിരികെ check_for_bool_arg(args, idx);
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a blob.
  */
-    int
-check_for_blob_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_blob_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_BLOB)
+    എങ്കിൽ (args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_blob_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list.
  */
-    int
-check_for_list_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_list_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_LIST)
+    എങ്കിൽ (args[idx].v_type != VAR_LIST)
     {
 	semsg(_(e_list_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a non-NULL list.
  */
-    int
-check_for_nonnull_list_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_nonnull_list_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (check_for_list_arg(args, idx) == FAIL)
-	return FAIL;
+    എങ്കിൽ (check_for_list_arg(args, idx) == FAIL)
+	തിരികെ FAIL;
 
-    if (args[idx].vval.v_list == NULL)
+    എങ്കിൽ (args[idx].vval.v_list == ശൂന്യ)
     {
 	semsg(_(e_non_null_list_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Check for an optional list argument at 'idx'
  */
-    int
-check_for_opt_list_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_list_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    തിരികെ (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_list_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a tuple.
  */
-    int
-check_for_tuple_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_tuple_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_TUPLE)
+    എങ്കിൽ (args[idx].v_type != VAR_TUPLE)
     {
 	semsg(_(e_tuple_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a dict.
  */
-    int
-check_for_dict_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_dict_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_DICT)
+    എങ്കിൽ (args[idx].v_type != VAR_DICT)
     {
 	semsg(_(e_dict_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a non-NULL dict.
  */
-    int
-check_for_nonnull_dict_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_nonnull_dict_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (check_for_dict_arg(args, idx) == FAIL)
-	return FAIL;
+    എങ്കിൽ (check_for_dict_arg(args, idx) == FAIL)
+	തിരികെ FAIL;
 
-    if (args[idx].vval.v_dict == NULL)
+    എങ്കിൽ (args[idx].vval.v_dict == ശൂന്യ)
     {
 	semsg(_(e_non_null_dict_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Check for an optional dict argument at 'idx'
  */
-    int
-check_for_opt_dict_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_dict_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    തിരികെ (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_dict_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Check for an optional non-NULL dict argument at 'idx'
  */
-    int
-check_for_opt_nonnull_dict_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_nonnull_dict_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    തിരികെ (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_nonnull_dict_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#എങ്കിൽ defined(FEAT_JOB_CHANNEL)
 /*
  * Give an error and return FAIL unless "args[idx]" is a channel or a job.
  */
-    int
-check_for_chan_or_job_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_chan_or_job_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_CHANNEL && args[idx].v_type != VAR_JOB)
+    എങ്കിൽ (args[idx].v_type != VAR_CHANNEL && args[idx].v_type != VAR_JOB)
     {
 	semsg(_(e_chan_or_job_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is an optional channel or a
  * job.
  */
-    int
-check_for_opt_chan_or_job_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_chan_or_job_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    തിരികെ (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_chan_or_job_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a job.
  */
-    int
-check_for_job_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_job_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_JOB)
+    എങ്കിൽ (args[idx].v_type != VAR_JOB)
     {
 	semsg(_(e_job_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Check for an optional job argument at 'idx'.
  */
-    int
-check_for_opt_job_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_job_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    തിരികെ (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_job_arg(args, idx) != FAIL) ? OK : FAIL;
 }
-#else
+#അല്ലെങ്കിൽ
 /*
  * Give an error and return FAIL unless "args[idx]" is an optional channel or a
  * job.  Used without the +channel feature, thus only VAR_UNKNOWN is accepted.
  */
-    int
-check_for_opt_chan_or_job_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_chan_or_job_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return args[idx].v_type == VAR_UNKNOWN ? OK : FAIL;
+    തിരികെ args[idx].v_type == VAR_UNKNOWN ? OK : FAIL;
 }
 #endif
 
@@ -774,44 +774,44 @@ check_for_opt_chan_or_job_arg(typval_T *args, int idx)
  * Give an error and return FAIL unless "args[idx]" is a string or
  * a number.
  */
-    int
-check_for_string_or_number_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_string_or_സംഖ്യ_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_NUMBER)
+    എങ്കിൽ (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_സംഖ്യ)
     {
-	semsg(_(e_string_or_number_required_for_argument_nr), idx + 1);
-	return FAIL;
+	semsg(_(e_string_or_സംഖ്യ_required_for_argument_nr), idx + 1);
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Check for an optional string or number argument at 'idx'.
  */
-    int
-check_for_opt_string_or_number_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_string_or_സംഖ്യ_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
-	    || check_for_string_or_number_arg(args, idx) != FAIL) ? OK : FAIL;
+    തിരികെ (args[idx].v_type == VAR_UNKNOWN
+	    || check_for_string_or_സംഖ്യ_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a buffer number.
  * Buffer number can be a number or a string.
  */
-    int
-check_for_buffer_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_buffer_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return check_for_string_or_number_arg(args, idx);
+    തിരികെ check_for_string_or_സംഖ്യ_arg(args, idx);
 }
 
 /*
  * Check for an optional buffer argument at 'idx'
  */
-    int
-check_for_opt_buffer_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_buffer_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    തിരികെ (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_buffer_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
@@ -819,118 +819,118 @@ check_for_opt_buffer_arg(typval_T *args, int idx)
  * Give an error and return FAIL unless "args[idx]" is a line number.
  * Line number can be a number or a string.
  */
-    int
-check_for_lnum_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_lnum_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return check_for_string_or_number_arg(args, idx);
+    തിരികെ check_for_string_or_സംഖ്യ_arg(args, idx);
 }
 
 /*
  * Check for an optional line number argument at 'idx'
  */
-    int
-check_for_opt_lnum_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_lnum_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    തിരികെ (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_lnum_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string or a blob.
  */
-    int
-check_for_string_or_blob_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_string_or_blob_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_BLOB)
+    എങ്കിൽ (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_string_or_blob_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string or a list.
  */
-    int
-check_for_string_or_list_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_string_or_list_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_LIST)
+    എങ്കിൽ (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_LIST)
     {
 	semsg(_(e_string_or_list_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string, a list, a
  * tuple or a blob.
  */
-    int
-check_for_string_or_list_or_tuple_or_blob_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_string_or_list_or_tuple_or_blob_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_STRING
+    എങ്കിൽ (args[idx].v_type != VAR_STRING
 	    && args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_TUPLE
 	    && args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_string_list_tuple_or_blob_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Check for an optional string or list argument at 'idx'
  */
-    int
-check_for_opt_string_or_list_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_string_or_list_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    തിരികെ (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_string_or_list_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string or a dict.
  */
-    int
-check_for_string_or_dict_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_string_or_dict_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_DICT)
+    എങ്കിൽ (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_DICT)
     {
 	semsg(_(e_string_or_dict_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string or a number
  * or a list.
  */
-    int
-check_for_string_or_number_or_list_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_string_or_സംഖ്യ_or_list_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_STRING
-	    && args[idx].v_type != VAR_NUMBER
+    എങ്കിൽ (args[idx].v_type != VAR_STRING
+	    && args[idx].v_type != VAR_സംഖ്യ
 	    && args[idx].v_type != VAR_LIST)
     {
-	semsg(_(e_string_number_or_list_required_for_argument_nr), idx + 1);
-	return FAIL;
+	semsg(_(e_string_സംഖ്യ_or_list_required_for_argument_nr), idx + 1);
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is an optional string
  * or number or a list
  */
-    int
-check_for_opt_string_or_number_or_list_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_string_or_സംഖ്യ_or_list_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
-	    || check_for_string_or_number_or_list_arg(args, idx)
+    തിരികെ (args[idx].v_type == VAR_UNKNOWN
+	    || check_for_string_or_സംഖ്യ_or_list_arg(args, idx)
 							!= FAIL) ? OK : FAIL;
 }
 
@@ -938,193 +938,193 @@ check_for_opt_string_or_number_or_list_arg(typval_T *args, int idx)
  * Give an error and return FAIL unless "args[idx]" is a string, a number, a
  * list, a tuple or a blob.
  */
-    int
-check_for_repeat_func_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_repeat_func_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_STRING
-	    && args[idx].v_type != VAR_NUMBER
+    എങ്കിൽ (args[idx].v_type != VAR_STRING
+	    && args[idx].v_type != VAR_സംഖ്യ
 	    && args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_TUPLE
 	    && args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_repeatable_type_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string, a list, a
  * tuple or a dict.
  */
-    int
-check_for_string_list_tuple_or_dict_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_string_list_tuple_or_dict_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_STRING
+    എങ്കിൽ (args[idx].v_type != VAR_STRING
 	    && args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_TUPLE
 	    && args[idx].v_type != VAR_DICT)
     {
 	semsg(_(e_string_list_tuple_or_dict_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string
  * or a function reference.
  */
-    int
-check_for_string_or_func_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_string_or_func_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_PARTIAL
+    എങ്കിൽ (args[idx].v_type != VAR_PARTIAL
 	    && args[idx].v_type != VAR_FUNC
 	    && args[idx].v_type != VAR_STRING)
     {
 	semsg(_(e_string_or_function_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list or a blob.
  */
-    int
-check_for_list_or_blob_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_list_or_blob_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_LIST && args[idx].v_type != VAR_BLOB)
+    എങ്കിൽ (args[idx].v_type != VAR_LIST && args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_list_or_blob_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list or a tuple.
  */
-    int
-check_for_list_or_tuple_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_list_or_tuple_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_LIST && args[idx].v_type != VAR_TUPLE)
+    എങ്കിൽ (args[idx].v_type != VAR_LIST && args[idx].v_type != VAR_TUPLE)
     {
 	semsg(_(e_list_or_tuple_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list, a tuple or a
  * blob.
  */
-    int
-check_for_list_or_tuple_or_blob_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_list_or_tuple_or_blob_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_LIST
+    എങ്കിൽ (args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_TUPLE
 	    && args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_list_or_tuple_or_blob_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list, a tuple or a
  * dict
  */
-    int
-check_for_list_or_tuple_or_dict_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_list_or_tuple_or_dict_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_LIST
+    എങ്കിൽ (args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_TUPLE
 	    && args[idx].v_type != VAR_DICT)
     {
 	semsg(_(e_list_or_tuple_or_dict_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list or dict or a
  * blob.
  */
-    int
-check_for_list_or_dict_or_blob_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_list_or_dict_or_blob_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_LIST
+    എങ്കിൽ (args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_DICT
 	    && args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_list_dict_or_blob_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list, a tuple, a dict,
  * a blob or a string.
  */
-    int
-check_for_list_tuple_dict_blob_or_string_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_list_tuple_dict_blob_or_string_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_LIST
+    എങ്കിൽ (args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_TUPLE
 	    && args[idx].v_type != VAR_DICT
 	    && args[idx].v_type != VAR_BLOB
 	    && args[idx].v_type != VAR_STRING)
     {
 	semsg(_(e_list_tuple_dict_blob_or_string_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is an optional buffer
  * number or a dict.
  */
-    int
-check_for_opt_buffer_or_dict_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_opt_buffer_or_dict_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_UNKNOWN
+    എങ്കിൽ (args[idx].v_type != VAR_UNKNOWN
 	    && args[idx].v_type != VAR_STRING
-	    && args[idx].v_type != VAR_NUMBER
+	    && args[idx].v_type != VAR_സംഖ്യ
 	    && args[idx].v_type != VAR_DICT)
     {
 	semsg(_(e_string_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is an object.
  */
-    int
-check_for_object_arg(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_object_arg(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    if (args[idx].v_type != VAR_OBJECT)
+    എങ്കിൽ (args[idx].v_type != VAR_OBJECT)
     {
 	semsg(_(e_object_required_for_argument_nr), idx + 1);
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Returns TRUE if "tv" is a type alias for a class
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 tv_class_alias(typval_T *tv)
 {
-    return tv->v_type == VAR_TYPEALIAS &&
+    തിരികെ tv->v_type == VAR_TYPEALIAS &&
 			tv->vval.v_typealias->ta_type->tt_type == VAR_OBJECT;
 }
 
@@ -1132,18 +1132,18 @@ tv_class_alias(typval_T *tv)
  * Give an error and return FAIL unless "args[idx]" is a class
  * or class typealias.
  */
-    int
-check_for_class_or_typealias_args(typval_T *args, int idx)
+    പൂർണ്ണസംഖ്യ
+check_for_class_or_typealias_args(typval_T *args, പൂർണ്ണസംഖ്യ idx)
 {
-    for (int i = idx; args[i].v_type != VAR_UNKNOWN; ++i)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = idx; args[i].v_type != VAR_UNKNOWN; ++i)
     {
-	if (args[i].v_type != VAR_CLASS && !tv_class_alias(&args[idx]))
+	എങ്കിൽ (args[i].v_type != VAR_CLASS && !tv_class_alias(&args[idx]))
 	{
 	    semsg(_(e_class_or_typealias_required_for_argument_nr), i + 1);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1159,9 +1159,9 @@ check_for_class_or_typealias_args(typval_T *args, int idx)
     char_u *
 tv_get_string(typval_T *varp)
 {
-    static char_u   mybuf[NUMBUFLEN];
+    സ്ഥിതം char_u   mybuf[NUMBUFLEN];
 
-    return tv_get_string_buf(varp, mybuf);
+    തിരികെ tv_get_string_buf(varp, mybuf);
 }
 
 /*
@@ -1170,11 +1170,11 @@ tv_get_string(typval_T *varp)
     char_u *
 tv_get_string_strict(typval_T *varp)
 {
-    static char_u   mybuf[NUMBUFLEN];
+    സ്ഥിതം char_u   mybuf[NUMBUFLEN];
     char_u	    *res =  tv_get_string_buf_chk_strict(
 						 varp, mybuf, in_vim9script());
 
-    return res != NULL ? res : (char_u *)"";
+    തിരികെ res != ശൂന്യ ? res : (char_u *)"";
 }
 
     char_u *
@@ -1182,7 +1182,7 @@ tv_get_string_buf(typval_T *varp, char_u *buf)
 {
     char_u	*res = tv_get_string_buf_chk(varp, buf);
 
-    return res != NULL ? res : (char_u *)"";
+    തിരികെ res != ശൂന്യ ? res : (char_u *)"";
 }
 
 /*
@@ -1191,112 +1191,112 @@ tv_get_string_buf(typval_T *varp, char_u *buf)
     char_u *
 tv_get_string_chk(typval_T *varp)
 {
-    static char_u   mybuf[NUMBUFLEN];
+    സ്ഥിതം char_u   mybuf[NUMBUFLEN];
 
-    return tv_get_string_buf_chk(varp, mybuf);
+    തിരികെ tv_get_string_buf_chk(varp, mybuf);
 }
 
     char_u *
 tv_get_string_buf_chk(typval_T *varp, char_u *buf)
 {
-    return tv_get_string_buf_chk_strict(varp, buf, FALSE);
+    തിരികെ tv_get_string_buf_chk_strict(varp, buf, FALSE);
 }
 
     char_u *
-tv_get_string_buf_chk_strict(typval_T *varp, char_u *buf, int strict)
+tv_get_string_buf_chk_strict(typval_T *varp, char_u *buf, പൂർണ്ണസംഖ്യ strict)
 {
-    switch (varp->v_type)
+    തിരഞ്ഞെടുപ്പ് (varp->v_type)
     {
-	case VAR_NUMBER:
-	    if (strict)
+	അവസ്ഥ VAR_സംഖ്യ:
+	    എങ്കിൽ (strict)
 	    {
-		emsg(_(e_using_number_as_string));
-		break;
+		emsg(_(e_using_സംഖ്യ_as_string));
+		നിർത്തുക;
 	    }
-	    vim_snprintf((char *)buf, NUMBUFLEN, "%lld",
-					    (varnumber_T)varp->vval.v_number);
-	    return buf;
-	case VAR_FUNC:
-	case VAR_PARTIAL:
+	    vim_snprintf((അക്ഷരം *)buf, NUMBUFLEN, "%lld",
+					    (varnumber_T)varp->vval.v_സംഖ്യ);
+	    തിരികെ buf;
+	അവസ്ഥ VAR_FUNC:
+	അവസ്ഥ VAR_PARTIAL:
 	    emsg(_(e_using_funcref_as_string));
-	    break;
-	case VAR_LIST:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_LIST:
 	    emsg(_(e_using_list_as_string));
-	    break;
-	case VAR_TUPLE:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_TUPLE:
 	    emsg(_(e_using_tuple_as_string));
-	    break;
-	case VAR_DICT:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_DICT:
 	    emsg(_(e_using_dictionary_as_string));
-	    break;
-	case VAR_FLOAT:
-	    if (strict)
+	    നിർത്തുക;
+	അവസ്ഥ VAR_FLOAT:
+	    എങ്കിൽ (strict)
 	    {
 		emsg(_(e_using_float_as_string));
-		break;
+		നിർത്തുക;
 	    }
-	    vim_snprintf((char *)buf, NUMBUFLEN, "%g", varp->vval.v_float);
-	    return buf;
-	case VAR_STRING:
-	    if (varp->vval.v_string != NULL)
-		return varp->vval.v_string;
-	    return (char_u *)"";
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	    STRCPY(buf, get_var_special_name(varp->vval.v_number));
-	    return buf;
-	case VAR_BLOB:
+	    vim_snprintf((അക്ഷരം *)buf, NUMBUFLEN, "%g", varp->vval.v_float);
+	    തിരികെ buf;
+	അവസ്ഥ VAR_STRING:
+	    എങ്കിൽ (varp->vval.v_string != ശൂന്യ)
+		തിരികെ varp->vval.v_string;
+	    തിരികെ (char_u *)"";
+	അവസ്ഥ VAR_BOOL:
+	അവസ്ഥ VAR_SPECIAL:
+	    STRCPY(buf, get_var_special_name(varp->vval.v_സംഖ്യ));
+	    തിരികെ buf;
+	അവസ്ഥ VAR_BLOB:
 	    emsg(_(e_using_blob_as_string));
-	    break;
-	case VAR_CLASS:
-	case VAR_TYPEALIAS:
-	    check_typval_is_value(varp);
-	    break;
-	case VAR_OBJECT:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_CLASS:
+	അവസ്ഥ VAR_TYPEALIAS:
+	    check_typval_is_മൂല്യം(varp);
+	    നിർത്തുക;
+	അവസ്ഥ VAR_OBJECT:
 	    {
-		if (varp->vval.v_object == NULL)
+		എങ്കിൽ (varp->vval.v_object == ശൂന്യ)
 		    emsg(_(e_using_object_as_string));
-		else
+		അല്ലെങ്കിൽ
 		{
 		    class_T *cl = varp->vval.v_object->obj_class;
-		    if (cl != NULL && IS_ENUM(cl))
+		    എങ്കിൽ (cl != ശൂന്യ && IS_ENUM(cl))
 			semsg(_(e_using_enum_str_as_string), cl->class_name.string);
-		    else
+		    അല്ലെങ്കിൽ
 			emsg(_(e_using_object_as_string));
 		}
 	    }
-	    break;
-	case VAR_JOB:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    if (in_vim9script())
+	    എങ്കിൽ (in_vim9script())
 	    {
-		semsg(_(e_using_invalid_value_as_string_str), "job");
-		break;
+		semsg(_(e_using_invalid_മൂല്യം_as_string_str), "job");
+		നിർത്തുക;
 	    }
-	    return job_to_string_buf(varp, buf);
+	    തിരികെ job_to_string_buf(varp, buf);
 #endif
-	    break;
-	case VAR_CHANNEL:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    if (in_vim9script())
+	    എങ്കിൽ (in_vim9script())
 	    {
-		semsg(_(e_using_invalid_value_as_string_str), "channel");
-		break;
+		semsg(_(e_using_invalid_മൂല്യം_as_string_str), "channel");
+		നിർത്തുക;
 	    }
-	    return channel_to_string_buf(varp, buf);
+	    തിരികെ channel_to_string_buf(varp, buf);
 #endif
-	    break;
-	case VAR_VOID:
-	    emsg(_(e_cannot_use_void_value));
-	    break;
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_INSTR:
-	    semsg(_(e_using_invalid_value_as_string_str),
+	    നിർത്തുക;
+	അവസ്ഥ VAR_VOID:
+	    emsg(_(e_cannot_use_void_മൂല്യം));
+	    നിർത്തുക;
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_ANY:
+	അവസ്ഥ VAR_INSTR:
+	    semsg(_(e_using_invalid_മൂല്യം_as_string_str),
 						  vartype_name(varp->v_type));
-	    break;
+	    നിർത്തുക;
     }
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
@@ -1306,7 +1306,7 @@ tv_get_string_buf_chk_strict(typval_T *varp, char_u *buf, int strict)
     char_u *
 tv_stringify(typval_T *varp, char_u *buf)
 {
-    if (varp->v_type == VAR_LIST
+    എങ്കിൽ (varp->v_type == VAR_LIST
 	    || varp->v_type == VAR_DICT
 	    || varp->v_type == VAR_BLOB
 	    || varp->v_type == VAR_FUNC
@@ -1320,9 +1320,9 @@ tv_stringify(typval_T *varp, char_u *buf)
 	tv_get_string_buf(&tmp, buf);
 	clear_tv(varp);
 	*varp = tmp;
-	return tmp.vval.v_string;
+	തിരികെ tmp.vval.v_string;
     }
-    return tv_get_string_buf(varp, buf);
+    തിരികെ tv_get_string_buf(varp, buf);
 }
 
 /*
@@ -1330,34 +1330,34 @@ tv_stringify(typval_T *varp, char_u *buf)
  * Also give an error message, using "name" or _("name") when use_gettext is
  * TRUE.
  */
-    int
-tv_check_lock(typval_T *tv, char_u *name, int use_gettext)
+    പൂർണ്ണസംഖ്യ
+tv_check_lock(typval_T *tv, char_u *name, പൂർണ്ണസംഖ്യ use_gettext)
 {
-    int	lock = 0;
+    പൂർണ്ണസംഖ്യ	lock = 0;
 
-    switch (tv->v_type)
+    തിരഞ്ഞെടുപ്പ് (tv->v_type)
     {
-	case VAR_BLOB:
-	    if (tv->vval.v_blob != NULL)
+	അവസ്ഥ VAR_BLOB:
+	    എങ്കിൽ (tv->vval.v_blob != ശൂന്യ)
 		lock = tv->vval.v_blob->bv_lock;
-	    break;
-	case VAR_LIST:
-	    if (tv->vval.v_list != NULL)
+	    നിർത്തുക;
+	അവസ്ഥ VAR_LIST:
+	    എങ്കിൽ (tv->vval.v_list != ശൂന്യ)
 		lock = tv->vval.v_list->lv_lock;
-	    break;
-	case VAR_TUPLE:
-	    if (tv->vval.v_tuple != NULL)
+	    നിർത്തുക;
+	അവസ്ഥ VAR_TUPLE:
+	    എങ്കിൽ (tv->vval.v_tuple != ശൂന്യ)
 		lock = tv->vval.v_tuple->tv_lock;
-	    break;
-	case VAR_DICT:
-	    if (tv->vval.v_dict != NULL)
+	    നിർത്തുക;
+	അവസ്ഥ VAR_DICT:
+	    എങ്കിൽ (tv->vval.v_dict != ശൂന്യ)
 		lock = tv->vval.v_dict->dv_lock;
-	    break;
-	default:
-	    break;
+	    നിർത്തുക;
+	സ്ഥിരസ്ഥിതി:
+	    നിർത്തുക;
     }
-    return value_check_lock(tv->v_lock, name, use_gettext)
-		   || (lock != 0 && value_check_lock(lock, name, use_gettext));
+    തിരികെ മൂല്യം_check_lock(tv->v_lock, name, use_gettext)
+		   || (lock != 0 && മൂല്യം_check_lock(lock, name, use_gettext));
 }
 
 /*
@@ -1367,336 +1367,336 @@ tv_check_lock(typval_T *tv, char_u *name, int use_gettext)
  * It is OK for "from" and "to" to point to the same item.  This is used to
  * make a copy later.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 copy_tv(typval_T *from, typval_T *to)
 {
-    int		ret = OK;
+    പൂർണ്ണസംഖ്യ		ret = OK;
 
     to->v_type = from->v_type;
     to->v_lock = 0;
-    switch (from->v_type)
+    തിരഞ്ഞെടുപ്പ് (from->v_type)
     {
-	case VAR_NUMBER:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	    to->vval.v_number = from->vval.v_number;
-	    break;
-	case VAR_FLOAT:
+	അവസ്ഥ VAR_സംഖ്യ:
+	അവസ്ഥ VAR_BOOL:
+	അവസ്ഥ VAR_SPECIAL:
+	    to->vval.v_സംഖ്യ = from->vval.v_സംഖ്യ;
+	    നിർത്തുക;
+	അവസ്ഥ VAR_FLOAT:
 	    to->vval.v_float = from->vval.v_float;
-	    break;
-	case VAR_JOB:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
 	    to->vval.v_job = from->vval.v_job;
-	    if (to->vval.v_job != NULL)
+	    എങ്കിൽ (to->vval.v_job != ശൂന്യ)
 		++to->vval.v_job->jv_refcount;
-	    break;
+	    നിർത്തുക;
 #endif
-	case VAR_CHANNEL:
+	അവസ്ഥ VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
 	    to->vval.v_channel = from->vval.v_channel;
-	    if (to->vval.v_channel != NULL)
+	    എങ്കിൽ (to->vval.v_channel != ശൂന്യ)
 		++to->vval.v_channel->ch_refcount;
-	    break;
+	    നിർത്തുക;
 #endif
-	case VAR_INSTR:
+	അവസ്ഥ VAR_INSTR:
 	    to->vval.v_instr = from->vval.v_instr;
-	    break;
+	    നിർത്തുക;
 
-	case VAR_CLASS:
+	അവസ്ഥ VAR_CLASS:
 	    copy_class(from, to);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_OBJECT:
+	അവസ്ഥ VAR_OBJECT:
 	    copy_object(from, to);
-	    break;
+	    നിർത്തുക;
 
-	case VAR_STRING:
-	case VAR_FUNC:
-	    if (from->vval.v_string == NULL)
-		to->vval.v_string = NULL;
-	    else
+	അവസ്ഥ VAR_STRING:
+	അവസ്ഥ VAR_FUNC:
+	    എങ്കിൽ (from->vval.v_string == ശൂന്യ)
+		to->vval.v_string = ശൂന്യ;
+	    അല്ലെങ്കിൽ
 	    {
 		to->vval.v_string = vim_strsave(from->vval.v_string);
-		if (from->v_type == VAR_FUNC)
+		എങ്കിൽ (from->v_type == VAR_FUNC)
 		    func_ref(to->vval.v_string);
 	    }
-	    break;
-	case VAR_PARTIAL:
-	    if (from->vval.v_partial == NULL)
-		to->vval.v_partial = NULL;
-	    else
+	    നിർത്തുക;
+	അവസ്ഥ VAR_PARTIAL:
+	    എങ്കിൽ (from->vval.v_partial == ശൂന്യ)
+		to->vval.v_partial = ശൂന്യ;
+	    അല്ലെങ്കിൽ
 	    {
 		to->vval.v_partial = from->vval.v_partial;
 		++to->vval.v_partial->pt_refcount;
 	    }
-	    break;
-	case VAR_BLOB:
-	    if (from->vval.v_blob == NULL)
-		to->vval.v_blob = NULL;
-	    else
+	    നിർത്തുക;
+	അവസ്ഥ VAR_BLOB:
+	    എങ്കിൽ (from->vval.v_blob == ശൂന്യ)
+		to->vval.v_blob = ശൂന്യ;
+	    അല്ലെങ്കിൽ
 	    {
 		to->vval.v_blob = from->vval.v_blob;
 		++to->vval.v_blob->bv_refcount;
 	    }
-	    break;
-	case VAR_LIST:
-	    if (from->vval.v_list == NULL)
-		to->vval.v_list = NULL;
-	    else
+	    നിർത്തുക;
+	അവസ്ഥ VAR_LIST:
+	    എങ്കിൽ (from->vval.v_list == ശൂന്യ)
+		to->vval.v_list = ശൂന്യ;
+	    അല്ലെങ്കിൽ
 	    {
 		to->vval.v_list = from->vval.v_list;
 		++to->vval.v_list->lv_refcount;
 	    }
-	    break;
-	case VAR_TUPLE:
-	    if (from->vval.v_tuple == NULL)
-		to->vval.v_tuple = NULL;
-	    else
+	    നിർത്തുക;
+	അവസ്ഥ VAR_TUPLE:
+	    എങ്കിൽ (from->vval.v_tuple == ശൂന്യ)
+		to->vval.v_tuple = ശൂന്യ;
+	    അല്ലെങ്കിൽ
 	    {
 		to->vval.v_tuple = from->vval.v_tuple;
 		++to->vval.v_tuple->tv_refcount;
 	    }
-	    break;
-	case VAR_DICT:
-	    if (from->vval.v_dict == NULL)
-		to->vval.v_dict = NULL;
-	    else
+	    നിർത്തുക;
+	അവസ്ഥ VAR_DICT:
+	    എങ്കിൽ (from->vval.v_dict == ശൂന്യ)
+		to->vval.v_dict = ശൂന്യ;
+	    അല്ലെങ്കിൽ
 	    {
 		to->vval.v_dict = from->vval.v_dict;
 		++to->vval.v_dict->dv_refcount;
 	    }
-	    break;
-	case VAR_TYPEALIAS:
-	    if (from->vval.v_typealias == NULL)
-		to->vval.v_typealias = NULL;
-	    else
+	    നിർത്തുക;
+	അവസ്ഥ VAR_TYPEALIAS:
+	    എങ്കിൽ (from->vval.v_typealias == ശൂന്യ)
+		to->vval.v_typealias = ശൂന്യ;
+	    അല്ലെങ്കിൽ
 	    {
 		to->vval.v_typealias = from->vval.v_typealias;
 		++to->vval.v_typealias->ta_refcount;
 	    }
-	    break;
-	case VAR_VOID:
-	    emsg(_(e_cannot_use_void_value));
+	    നിർത്തുക;
+	അവസ്ഥ VAR_VOID:
+	    emsg(_(e_cannot_use_void_മൂല്യം));
 	    ret = FAIL;
-	    break;
-	case VAR_UNKNOWN:
-	case VAR_ANY:
+	    നിർത്തുക;
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_ANY:
 	    internal_error_no_abort("copy_tv(UNKNOWN)");
 	    ret = FAIL;
-	    break;
+	    നിർത്തുക;
     }
 
-    return ret;
+    തിരികെ ret;
 }
 
 /*
  * Compare "tv1" and "tv2".
  */
-    int
+    പൂർണ്ണസംഖ്യ
 typval_compare2(
     typval_T	*tv1,	// first operand
     typval_T	*tv2,	// second operand
     exprtype_T	type,	// operator
-    int		ic,	// ignore case
-    int		*res)	// comparison result
+    പൂർണ്ണസംഖ്യ		ic,	// ignore case
+    പൂർണ്ണസംഖ്യ		*res)	// comparison result
 {
     varnumber_T	n1, n2;
-    int		type_is = type == EXPR_IS || type == EXPR_ISNOT;
+    പൂർണ്ണസംഖ്യ		type_is = type == വ്യഞ്ജകം_IS || type == വ്യഞ്ജകം_ISNOT;
 
-    if (check_typval_is_value(tv1) == FAIL
-	|| check_typval_is_value(tv2) == FAIL)
-	return FAIL;
-    else if (type_is && tv1->v_type != tv2->v_type)
+    എങ്കിൽ (check_typval_is_മൂല്യം(tv1) == FAIL
+	|| check_typval_is_മൂല്യം(tv2) == FAIL)
+	തിരികെ FAIL;
+    അല്ലെങ്കിൽ എങ്കിൽ (type_is && tv1->v_type != tv2->v_type)
     {
 	// For "is" a different type always means FALSE, for "isnot"
 	// it means TRUE.
-	*res = (type == EXPR_ISNOT);
+	*res = (type == വ്യഞ്ജകം_ISNOT);
     }
-    else if (((tv1->v_type == VAR_SPECIAL && tv1->vval.v_number == VVAL_NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (((tv1->v_type == VAR_SPECIAL && tv1->vval.v_സംഖ്യ == VVAL_NULL)
 		|| (tv2->v_type == VAR_SPECIAL
-					   && tv2->vval.v_number == VVAL_NULL))
+					   && tv2->vval.v_സംഖ്യ == VVAL_NULL))
 	    && tv1->v_type != tv2->v_type
-	    && (type == EXPR_EQUAL || type == EXPR_NEQUAL))
+	    && (type == വ്യഞ്ജകം_EQUAL || type == വ്യഞ്ജകം_NEQUAL))
     {
 	n1 = typval_compare_null(tv1, tv2);
-	if (n1 == MAYBE)
-	    return FAIL;
-	if (type == EXPR_NEQUAL)
+	എങ്കിൽ (n1 == MAYBE)
+	    തിരികെ FAIL;
+	എങ്കിൽ (type == വ്യഞ്ജകം_NEQUAL)
 	    n1 = !n1;
 	*res = n1;
     }
-    else if (tv1->v_type == VAR_BLOB || tv2->v_type == VAR_BLOB)
+    അല്ലെങ്കിൽ എങ്കിൽ (tv1->v_type == VAR_BLOB || tv2->v_type == VAR_BLOB)
     {
-	if (typval_compare_blob(tv1, tv2, type, res) == FAIL)
-	    return FAIL;
+	എങ്കിൽ (typval_compare_blob(tv1, tv2, type, res) == FAIL)
+	    തിരികെ FAIL;
     }
-    else if (tv1->v_type == VAR_LIST || tv2->v_type == VAR_LIST)
+    അല്ലെങ്കിൽ എങ്കിൽ (tv1->v_type == VAR_LIST || tv2->v_type == VAR_LIST)
     {
-	if (typval_compare_list(tv1, tv2, type, ic, res) == FAIL)
-	    return FAIL;
+	എങ്കിൽ (typval_compare_list(tv1, tv2, type, ic, res) == FAIL)
+	    തിരികെ FAIL;
     }
-    else if (tv1->v_type == VAR_TUPLE || tv2->v_type == VAR_TUPLE)
+    അല്ലെങ്കിൽ എങ്കിൽ (tv1->v_type == VAR_TUPLE || tv2->v_type == VAR_TUPLE)
     {
-	if (typval_compare_tuple(tv1, tv2, type, ic, res) == FAIL)
-	    return FAIL;
+	എങ്കിൽ (typval_compare_tuple(tv1, tv2, type, ic, res) == FAIL)
+	    തിരികെ FAIL;
     }
-    else if (tv1->v_type == VAR_OBJECT || tv2->v_type == VAR_OBJECT)
+    അല്ലെങ്കിൽ എങ്കിൽ (tv1->v_type == VAR_OBJECT || tv2->v_type == VAR_OBJECT)
     {
-	if (typval_compare_object(tv1, tv2, type, ic, res) == FAIL)
-	    return FAIL;
+	എങ്കിൽ (typval_compare_object(tv1, tv2, type, ic, res) == FAIL)
+	    തിരികെ FAIL;
     }
-    else if (tv1->v_type == VAR_DICT || tv2->v_type == VAR_DICT)
+    അല്ലെങ്കിൽ എങ്കിൽ (tv1->v_type == VAR_DICT || tv2->v_type == VAR_DICT)
     {
-	if (typval_compare_dict(tv1, tv2, type, ic, res) == FAIL)
-	    return FAIL;
+	എങ്കിൽ (typval_compare_dict(tv1, tv2, type, ic, res) == FAIL)
+	    തിരികെ FAIL;
     }
-    else if (tv1->v_type == VAR_FUNC || tv2->v_type == VAR_FUNC
+    അല്ലെങ്കിൽ എങ്കിൽ (tv1->v_type == VAR_FUNC || tv2->v_type == VAR_FUNC
 	|| tv1->v_type == VAR_PARTIAL || tv2->v_type == VAR_PARTIAL)
     {
-	if (typval_compare_func(tv1, tv2, type, ic, res) == FAIL)
-	    return FAIL;
+	എങ്കിൽ (typval_compare_func(tv1, tv2, type, ic, res) == FAIL)
+	    തിരികെ FAIL;
     }
 
     // If one of the two variables is a float, compare as a float.
     // When using "=~" or "!~", always compare as string.
-    else if ((tv1->v_type == VAR_FLOAT || tv2->v_type == VAR_FLOAT)
-	    && type != EXPR_MATCH && type != EXPR_NOMATCH)
+    അല്ലെങ്കിൽ എങ്കിൽ ((tv1->v_type == VAR_FLOAT || tv2->v_type == VAR_FLOAT)
+	    && type != വ്യഞ്ജകം_MATCH && type != വ്യഞ്ജകം_NOMATCH)
     {
 	float_T f1, f2;
-	int	error = FALSE;
+	പൂർണ്ണസംഖ്യ	error = FALSE;
 
 	f1 = tv_get_float_chk(tv1, &error);
-	if (!error)
+	എങ്കിൽ (!error)
 	    f2 = tv_get_float_chk(tv2, &error);
-	if (error)
-	    return FAIL;
+	എങ്കിൽ (error)
+	    തിരികെ FAIL;
 	n1 = FALSE;
-	switch (type)
+	തിരഞ്ഞെടുപ്പ് (type)
 	{
-	    case EXPR_IS:
-	    case EXPR_EQUAL:    n1 = (f1 == f2); break;
-	    case EXPR_ISNOT:
-	    case EXPR_NEQUAL:   n1 = (f1 != f2); break;
-	    case EXPR_GREATER:  n1 = (f1 > f2); break;
-	    case EXPR_GEQUAL:   n1 = (f1 >= f2); break;
-	    case EXPR_SMALLER:  n1 = (f1 < f2); break;
-	    case EXPR_SEQUAL:   n1 = (f1 <= f2); break;
-	    case EXPR_UNKNOWN:
-	    case EXPR_MATCH:
-	    default:  break;  // avoid gcc warning
+	    അവസ്ഥ വ്യഞ്ജകം_IS:
+	    അവസ്ഥ വ്യഞ്ജകം_EQUAL:    n1 = (f1 == f2); നിർത്തുക;
+	    അവസ്ഥ വ്യഞ്ജകം_ISNOT:
+	    അവസ്ഥ വ്യഞ്ജകം_NEQUAL:   n1 = (f1 != f2); നിർത്തുക;
+	    അവസ്ഥ വ്യഞ്ജകം_GREATER:  n1 = (f1 > f2); നിർത്തുക;
+	    അവസ്ഥ വ്യഞ്ജകം_GEQUAL:   n1 = (f1 >= f2); നിർത്തുക;
+	    അവസ്ഥ വ്യഞ്ജകം_SMALLER:  n1 = (f1 < f2); നിർത്തുക;
+	    അവസ്ഥ വ്യഞ്ജകം_SEQUAL:   n1 = (f1 <= f2); നിർത്തുക;
+	    അവസ്ഥ വ്യഞ്ജകം_UNKNOWN:
+	    അവസ്ഥ വ്യഞ്ജകം_MATCH:
+	    സ്ഥിരസ്ഥിതി:  നിർത്തുക;  // avoid gcc warning
 	}
 	*res = n1;
     }
 
     // If one of the two variables is a number, compare as a number.
     // When using "=~" or "!~", always compare as string.
-    else if ((tv1->v_type == VAR_NUMBER || tv2->v_type == VAR_NUMBER)
-	    && type != EXPR_MATCH && type != EXPR_NOMATCH)
+    അല്ലെങ്കിൽ എങ്കിൽ ((tv1->v_type == VAR_സംഖ്യ || tv2->v_type == VAR_സംഖ്യ)
+	    && type != വ്യഞ്ജകം_MATCH && type != വ്യഞ്ജകം_NOMATCH)
     {
-	int error = FALSE;
+	പൂർണ്ണസംഖ്യ error = FALSE;
 
-	n1 = tv_get_number_chk(tv1, &error);
-	if (!error)
-	    n2 = tv_get_number_chk(tv2, &error);
-	if (error)
-	    return FAIL;
-	switch (type)
+	n1 = tv_get_സംഖ്യ_chk(tv1, &error);
+	എങ്കിൽ (!error)
+	    n2 = tv_get_സംഖ്യ_chk(tv2, &error);
+	എങ്കിൽ (error)
+	    തിരികെ FAIL;
+	തിരഞ്ഞെടുപ്പ് (type)
 	{
-	    case EXPR_IS:
-	    case EXPR_EQUAL:    n1 = (n1 == n2); break;
-	    case EXPR_ISNOT:
-	    case EXPR_NEQUAL:   n1 = (n1 != n2); break;
-	    case EXPR_GREATER:  n1 = (n1 > n2); break;
-	    case EXPR_GEQUAL:   n1 = (n1 >= n2); break;
-	    case EXPR_SMALLER:  n1 = (n1 < n2); break;
-	    case EXPR_SEQUAL:   n1 = (n1 <= n2); break;
-	    case EXPR_UNKNOWN:
-	    case EXPR_MATCH:
-	    default:  break;  // avoid gcc warning
+	    അവസ്ഥ വ്യഞ്ജകം_IS:
+	    അവസ്ഥ വ്യഞ്ജകം_EQUAL:    n1 = (n1 == n2); നിർത്തുക;
+	    അവസ്ഥ വ്യഞ്ജകം_ISNOT:
+	    അവസ്ഥ വ്യഞ്ജകം_NEQUAL:   n1 = (n1 != n2); നിർത്തുക;
+	    അവസ്ഥ വ്യഞ്ജകം_GREATER:  n1 = (n1 > n2); നിർത്തുക;
+	    അവസ്ഥ വ്യഞ്ജകം_GEQUAL:   n1 = (n1 >= n2); നിർത്തുക;
+	    അവസ്ഥ വ്യഞ്ജകം_SMALLER:  n1 = (n1 < n2); നിർത്തുക;
+	    അവസ്ഥ വ്യഞ്ജകം_SEQUAL:   n1 = (n1 <= n2); നിർത്തുക;
+	    അവസ്ഥ വ്യഞ്ജകം_UNKNOWN:
+	    അവസ്ഥ വ്യഞ്ജകം_MATCH:
+	    സ്ഥിരസ്ഥിതി:  നിർത്തുക;  // avoid gcc warning
 	}
 	*res = n1;
     }
-    else if (in_vim9script() && (tv1->v_type == VAR_BOOL
+    അല്ലെങ്കിൽ എങ്കിൽ (in_vim9script() && (tv1->v_type == VAR_BOOL
 				    || tv2->v_type == VAR_BOOL
 				    || (tv1->v_type == VAR_SPECIAL
 					      && tv2->v_type == VAR_SPECIAL)))
     {
-	if (tv1->v_type != tv2->v_type)
+	എങ്കിൽ (tv1->v_type != tv2->v_type)
 	{
 	    semsg(_(e_cannot_compare_str_with_str),
 		       vartype_name(tv1->v_type), vartype_name(tv2->v_type));
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
-	n1 = tv1->vval.v_number;
-	n2 = tv2->vval.v_number;
-	switch (type)
+	n1 = tv1->vval.v_സംഖ്യ;
+	n2 = tv2->vval.v_സംഖ്യ;
+	തിരഞ്ഞെടുപ്പ് (type)
 	{
-	    case EXPR_IS:
-	    case EXPR_EQUAL:    n1 = (n1 == n2); break;
-	    case EXPR_ISNOT:
-	    case EXPR_NEQUAL:   n1 = (n1 != n2); break;
-	    default:
+	    അവസ്ഥ വ്യഞ്ജകം_IS:
+	    അവസ്ഥ വ്യഞ്ജകം_EQUAL:    n1 = (n1 == n2); നിർത്തുക;
+	    അവസ്ഥ വ്യഞ്ജകം_ISNOT:
+	    അവസ്ഥ വ്യഞ്ജകം_NEQUAL:   n1 = (n1 != n2); നിർത്തുക;
+	    സ്ഥിരസ്ഥിതി:
 		semsg(_(e_invalid_operation_for_str),
 						   vartype_name(tv1->v_type));
-		return FAIL;
+		തിരികെ FAIL;
 	}
 	*res = n1;
     }
 #ifdef FEAT_JOB_CHANNEL
-    else if (tv1->v_type == tv2->v_type
+    അല്ലെങ്കിൽ എങ്കിൽ (tv1->v_type == tv2->v_type
 	    && (tv1->v_type == VAR_CHANNEL || tv1->v_type == VAR_JOB)
-	    && (type == EXPR_NEQUAL || type == EXPR_EQUAL))
+	    && (type == വ്യഞ്ജകം_NEQUAL || type == വ്യഞ്ജകം_EQUAL))
     {
-	if (tv1->v_type == VAR_CHANNEL)
+	എങ്കിൽ (tv1->v_type == VAR_CHANNEL)
 	    n1 = tv1->vval.v_channel == tv2->vval.v_channel;
-	else
+	അല്ലെങ്കിൽ
 	    n1 = tv1->vval.v_job == tv2->vval.v_job;
-	if (type == EXPR_NEQUAL)
+	എങ്കിൽ (type == വ്യഞ്ജകം_NEQUAL)
 	    n1 = !n1;
 	*res = n1;
     }
 #endif
-    else
+    അല്ലെങ്കിൽ
     {
-	if (typval_compare_string(tv1, tv2, type, ic, res) == FAIL)
-	    return FAIL;
+	എങ്കിൽ (typval_compare_string(tv1, tv2, type, ic, res) == FAIL)
+	    തിരികെ FAIL;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Compare "tv1" and "tv2".
  * Put the result in "tv1".  Caller should clear "tv2".
  */
-    int
+    പൂർണ്ണസംഖ്യ
 typval_compare(
     typval_T	*tv1,	// first operand
     typval_T	*tv2,	// second operand
     exprtype_T	type,   // operator
-    int		ic)     // ignore case
+    പൂർണ്ണസംഖ്യ		ic)     // ignore case
 {
-    int res;
+    പൂർണ്ണസംഖ്യ res;
 
-    if (typval_compare2(tv1, tv2, type, ic, &res) == FAIL)
+    എങ്കിൽ (typval_compare2(tv1, tv2, type, ic, &res) == FAIL)
     {
 	clear_tv(tv1);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     clear_tv(tv1);
-    if (in_vim9script())
+    എങ്കിൽ (in_vim9script())
     {
 	tv1->v_type = VAR_BOOL;
-	tv1->vval.v_number = res ? VVAL_TRUE : VVAL_FALSE;
+	tv1->vval.v_സംഖ്യ = res ? VVAL_TRUE : VVAL_FALSE;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	tv1->v_type = VAR_NUMBER;
-	tv1->vval.v_number = res;
+	tv1->v_type = VAR_സംഖ്യ;
+	tv1->vval.v_സംഖ്യ = res;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1704,40 +1704,40 @@ typval_compare(
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 typval_compare_list(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    ic,
-	int	    *res)
+	പൂർണ്ണസംഖ്യ	    ic,
+	പൂർണ്ണസംഖ്യ	    *res)
 {
-    int	    val = 0;
+    പൂർണ്ണസംഖ്യ	    val = 0;
 
-    if (type == EXPR_IS || type == EXPR_ISNOT)
+    എങ്കിൽ (type == വ്യഞ്ജകം_IS || type == വ്യഞ്ജകം_ISNOT)
     {
 	val = (tv1->v_type == tv2->v_type
 				      && tv1->vval.v_list == tv2->vval.v_list);
-	if (type == EXPR_ISNOT)
+	എങ്കിൽ (type == വ്യഞ്ജകം_ISNOT)
 	    val = !val;
     }
-    else if (tv1->v_type != tv2->v_type
-	    || (type != EXPR_EQUAL && type != EXPR_NEQUAL))
+    അല്ലെങ്കിൽ എങ്കിൽ (tv1->v_type != tv2->v_type
+	    || (type != വ്യഞ്ജകം_EQUAL && type != വ്യഞ്ജകം_NEQUAL))
     {
-	if (tv1->v_type != tv2->v_type)
+	എങ്കിൽ (tv1->v_type != tv2->v_type)
 	    emsg(_(e_can_only_compare_list_with_list));
-	else
+	അല്ലെങ്കിൽ
 	    emsg(_(e_invalid_operation_for_list));
-	return FAIL;
+	തിരികെ FAIL;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	val = list_equal(tv1->vval.v_list, tv2->vval.v_list, ic);
-	if (type == EXPR_NEQUAL)
+	എങ്കിൽ (type == വ്യഞ്ജകം_NEQUAL)
 	    val = !val;
     }
     *res = val;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1745,85 +1745,85 @@ typval_compare_list(
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 typval_compare_tuple(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    ic,
-	int	    *res)
+	പൂർണ്ണസംഖ്യ	    ic,
+	പൂർണ്ണസംഖ്യ	    *res)
 {
-    int	    val = 0;
+    പൂർണ്ണസംഖ്യ	    val = 0;
 
-    if (type == EXPR_IS || type == EXPR_ISNOT)
+    എങ്കിൽ (type == വ്യഞ്ജകം_IS || type == വ്യഞ്ജകം_ISNOT)
     {
 	val = (tv1->v_type == tv2->v_type
 			      && tv1->vval.v_tuple == tv2->vval.v_tuple);
-	if (type == EXPR_ISNOT)
+	എങ്കിൽ (type == വ്യഞ്ജകം_ISNOT)
 	    val = !val;
     }
-    else if (tv1->v_type != tv2->v_type
-	    || (type != EXPR_EQUAL && type != EXPR_NEQUAL))
+    അല്ലെങ്കിൽ എങ്കിൽ (tv1->v_type != tv2->v_type
+	    || (type != വ്യഞ്ജകം_EQUAL && type != വ്യഞ്ജകം_NEQUAL))
     {
-	if (tv1->v_type != tv2->v_type)
+	എങ്കിൽ (tv1->v_type != tv2->v_type)
 	    emsg(_(e_can_only_compare_tuple_with_tuple));
-	else
+	അല്ലെങ്കിൽ
 	    emsg(_(e_invalid_operation_for_tuple));
-	return FAIL;
+	തിരികെ FAIL;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	val = tuple_equal(tv1->vval.v_tuple, tv2->vval.v_tuple, ic);
-	if (type == EXPR_NEQUAL)
+	എങ്കിൽ (type == വ്യഞ്ജകം_NEQUAL)
 	    val = !val;
     }
     *res = val;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Compare v:null with another type.  Return TRUE if the value is NULL.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 typval_compare_null(typval_T *tv1, typval_T *tv2)
 {
-    if ((tv1->v_type == VAR_SPECIAL && tv1->vval.v_number == VVAL_NULL)
-	    || (tv2->v_type == VAR_SPECIAL && tv2->vval.v_number == VVAL_NULL))
+    എങ്കിൽ ((tv1->v_type == VAR_SPECIAL && tv1->vval.v_സംഖ്യ == VVAL_NULL)
+	    || (tv2->v_type == VAR_SPECIAL && tv2->vval.v_സംഖ്യ == VVAL_NULL))
     {
 	typval_T	*tv = tv1->v_type == VAR_SPECIAL ? tv2 : tv1;
 
-	switch (tv->v_type)
+	തിരഞ്ഞെടുപ്പ് (tv->v_type)
 	{
-	    case VAR_BLOB: return tv->vval.v_blob == NULL;
+	    അവസ്ഥ VAR_BLOB: തിരികെ tv->vval.v_blob == ശൂന്യ;
 #ifdef FEAT_JOB_CHANNEL
-	    case VAR_CHANNEL: return tv->vval.v_channel == NULL;
+	    അവസ്ഥ VAR_CHANNEL: തിരികെ tv->vval.v_channel == ശൂന്യ;
 #endif
 	    // TODO: null_class handling
 	    // case VAR_CLASS: return tv->vval.v_class == NULL;
-	    case VAR_DICT: return tv->vval.v_dict == NULL;
-	    case VAR_FUNC: return tv->vval.v_string == NULL;
+	    അവസ്ഥ VAR_DICT: തിരികെ tv->vval.v_dict == ശൂന്യ;
+	    അവസ്ഥ VAR_FUNC: തിരികെ tv->vval.v_string == ശൂന്യ;
 #ifdef FEAT_JOB_CHANNEL
-	    case VAR_JOB: return tv->vval.v_job == NULL;
+	    അവസ്ഥ VAR_JOB: തിരികെ tv->vval.v_job == ശൂന്യ;
 #endif
-	    case VAR_LIST: return tv->vval.v_list == NULL;
-	    case VAR_TUPLE: return tv->vval.v_tuple == NULL;
-	    case VAR_OBJECT: return tv->vval.v_object == NULL;
-	    case VAR_PARTIAL: return tv->vval.v_partial == NULL;
-	    case VAR_STRING: return tv->vval.v_string == NULL;
+	    അവസ്ഥ VAR_LIST: തിരികെ tv->vval.v_list == ശൂന്യ;
+	    അവസ്ഥ VAR_TUPLE: തിരികെ tv->vval.v_tuple == ശൂന്യ;
+	    അവസ്ഥ VAR_OBJECT: തിരികെ tv->vval.v_object == ശൂന്യ;
+	    അവസ്ഥ VAR_PARTIAL: തിരികെ tv->vval.v_partial == ശൂന്യ;
+	    അവസ്ഥ VAR_STRING: തിരികെ tv->vval.v_string == ശൂന്യ;
 
-	    case VAR_NUMBER: if (!in_vim9script())
-				 return tv->vval.v_number == 0;
-			     break;
-	    case VAR_FLOAT: if (!in_vim9script())
-				 return tv->vval.v_float == 0.0;
-			     break;
-	    case VAR_TYPEALIAS: return tv->vval.v_typealias == NULL;
-	    default: break;
+	    അവസ്ഥ VAR_സംഖ്യ: എങ്കിൽ (!in_vim9script())
+				 തിരികെ tv->vval.v_സംഖ്യ == 0;
+			     നിർത്തുക;
+	    അവസ്ഥ VAR_FLOAT: എങ്കിൽ (!in_vim9script())
+				 തിരികെ tv->vval.v_float == 0.0;
+			     നിർത്തുക;
+	    അവസ്ഥ VAR_TYPEALIAS: തിരികെ tv->vval.v_typealias == ശൂന്യ;
+	    സ്ഥിരസ്ഥിതി: നിർത്തുക;
 	}
     }
     // although comparing null with number, float or bool is not very useful
     // we won't give an error
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
@@ -1831,39 +1831,39 @@ typval_compare_null(typval_T *tv1, typval_T *tv2)
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 typval_compare_blob(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    *res)
+	പൂർണ്ണസംഖ്യ	    *res)
 {
-    int	    val = 0;
+    പൂർണ്ണസംഖ്യ	    val = 0;
 
-    if (type == EXPR_IS || type == EXPR_ISNOT)
+    എങ്കിൽ (type == വ്യഞ്ജകം_IS || type == വ്യഞ്ജകം_ISNOT)
     {
 	val = (tv1->v_type == tv2->v_type
 			&& tv1->vval.v_blob == tv2->vval.v_blob);
-	if (type == EXPR_ISNOT)
+	എങ്കിൽ (type == വ്യഞ്ജകം_ISNOT)
 	    val = !val;
     }
-    else if (tv1->v_type != tv2->v_type
-	    || (type != EXPR_EQUAL && type != EXPR_NEQUAL))
+    അല്ലെങ്കിൽ എങ്കിൽ (tv1->v_type != tv2->v_type
+	    || (type != വ്യഞ്ജകം_EQUAL && type != വ്യഞ്ജകം_NEQUAL))
     {
-	if (tv1->v_type != tv2->v_type)
+	എങ്കിൽ (tv1->v_type != tv2->v_type)
 	    emsg(_(e_can_only_compare_blob_with_blob));
-	else
+	അല്ലെങ്കിൽ
 	    emsg(_(e_invalid_operation_for_blob));
-	return FAIL;
+	തിരികെ FAIL;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	val = blob_equal(tv1->vval.v_blob, tv2->vval.v_blob);
-	if (type == EXPR_NEQUAL)
+	എങ്കിൽ (type == വ്യഞ്ജകം_NEQUAL)
 	    val = !val;
     }
     *res = val;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1871,42 +1871,42 @@ typval_compare_blob(
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 typval_compare_object(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    ic,
-	int	    *res)
+	പൂർണ്ണസംഖ്യ	    ic,
+	പൂർണ്ണസംഖ്യ	    *res)
 {
-    int res_match = type == EXPR_EQUAL || type == EXPR_IS ? TRUE : FALSE;
+    പൂർണ്ണസംഖ്യ res_match = type == വ്യഞ്ജകം_EQUAL || type == വ്യഞ്ജകം_IS ? TRUE : FALSE;
 
-    if (tv1->vval.v_object == NULL && tv2->vval.v_object == NULL)
+    എങ്കിൽ (tv1->vval.v_object == ശൂന്യ && tv2->vval.v_object == ശൂന്യ)
     {
 	*res = res_match;
-	return OK;
+	തിരികെ OK;
     }
-    if (tv1->vval.v_object == NULL || tv2->vval.v_object == NULL)
+    എങ്കിൽ (tv1->vval.v_object == ശൂന്യ || tv2->vval.v_object == ശൂന്യ)
     {
 	*res = !res_match;
-	return OK;
+	തിരികെ OK;
     }
 
     object_T *obj1 = tv1->vval.v_object;
     object_T *obj2 = tv2->vval.v_object;
-    if (type == EXPR_IS || type == EXPR_ISNOT)
+    എങ്കിൽ (type == വ്യഞ്ജകം_IS || type == വ്യഞ്ജകം_ISNOT)
     {
 	*res = obj1 == obj2 ? res_match : !res_match;
-	return OK;
+	തിരികെ OK;
     }
-    else if (tv1->v_type != tv2->v_type)
+    അല്ലെങ്കിൽ എങ്കിൽ (tv1->v_type != tv2->v_type)
     {
 	emsg(_(e_can_only_compare_object_with_object));
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     *res = object_equal(obj1, obj2, ic) ? res_match : !res_match;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1914,40 +1914,40 @@ typval_compare_object(
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 typval_compare_dict(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    ic,
-	int	    *res)
+	പൂർണ്ണസംഖ്യ	    ic,
+	പൂർണ്ണസംഖ്യ	    *res)
 {
-    int	    val;
+    പൂർണ്ണസംഖ്യ	    val;
 
-    if (type == EXPR_IS || type == EXPR_ISNOT)
+    എങ്കിൽ (type == വ്യഞ്ജകം_IS || type == വ്യഞ്ജകം_ISNOT)
     {
 	val = (tv1->v_type == tv2->v_type
 			&& tv1->vval.v_dict == tv2->vval.v_dict);
-	if (type == EXPR_ISNOT)
+	എങ്കിൽ (type == വ്യഞ്ജകം_ISNOT)
 	    val = !val;
     }
-    else if (tv1->v_type != tv2->v_type
-		|| (type != EXPR_EQUAL && type != EXPR_NEQUAL))
+    അല്ലെങ്കിൽ എങ്കിൽ (tv1->v_type != tv2->v_type
+		|| (type != വ്യഞ്ജകം_EQUAL && type != വ്യഞ്ജകം_NEQUAL))
     {
-	if (tv1->v_type != tv2->v_type)
+	എങ്കിൽ (tv1->v_type != tv2->v_type)
 	    emsg(_(e_can_only_compare_dictionary_with_dictionary));
-	else
+	അല്ലെങ്കിൽ
 	    emsg(_(e_invalid_operation_for_dictionary));
-	return FAIL;
+	തിരികെ FAIL;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	val = dict_equal(tv1->vval.v_dict, tv2->vval.v_dict, ic);
-	if (type == EXPR_NEQUAL)
+	എങ്കിൽ (type == വ്യഞ്ജകം_NEQUAL)
 	    val = !val;
     }
     *res = val;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1955,44 +1955,44 @@ typval_compare_dict(
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 typval_compare_func(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    ic,
-	int	    *res)
+	പൂർണ്ണസംഖ്യ	    ic,
+	പൂർണ്ണസംഖ്യ	    *res)
 {
-    int	    val = 0;
+    പൂർണ്ണസംഖ്യ	    val = 0;
 
-    if (type != EXPR_EQUAL && type != EXPR_NEQUAL
-	    && type != EXPR_IS && type != EXPR_ISNOT)
+    എങ്കിൽ (type != വ്യഞ്ജകം_EQUAL && type != വ്യഞ്ജകം_NEQUAL
+	    && type != വ്യഞ്ജകം_IS && type != വ്യഞ്ജകം_ISNOT)
     {
 	emsg(_(e_invalid_operation_for_funcrefs));
-	return FAIL;
+	തിരികെ FAIL;
     }
-    if ((tv1->v_type == VAR_PARTIAL && tv1->vval.v_partial == NULL)
-	    || (tv2->v_type == VAR_PARTIAL && tv2->vval.v_partial == NULL))
+    എങ്കിൽ ((tv1->v_type == VAR_PARTIAL && tv1->vval.v_partial == ശൂന്യ)
+	    || (tv2->v_type == VAR_PARTIAL && tv2->vval.v_partial == ശൂന്യ))
 	// When both partials are NULL, then they are equal.
 	// Otherwise they are not equal.
 	val = (tv1->vval.v_partial == tv2->vval.v_partial);
-    else if (type == EXPR_IS || type == EXPR_ISNOT)
+    അല്ലെങ്കിൽ എങ്കിൽ (type == വ്യഞ്ജകം_IS || type == വ്യഞ്ജകം_ISNOT)
     {
-	if (tv1->v_type == VAR_FUNC && tv2->v_type == VAR_FUNC)
+	എങ്കിൽ (tv1->v_type == VAR_FUNC && tv2->v_type == VAR_FUNC)
 	    // strings are considered the same if their value is
 	    // the same
 	    val = tv_equal(tv1, tv2, ic);
-	else if (tv1->v_type == VAR_PARTIAL && tv2->v_type == VAR_PARTIAL)
+	അല്ലെങ്കിൽ എങ്കിൽ (tv1->v_type == VAR_PARTIAL && tv2->v_type == VAR_PARTIAL)
 	    val = (tv1->vval.v_partial == tv2->vval.v_partial);
-	else
+	അല്ലെങ്കിൽ
 	    val = FALSE;
     }
-    else
+    അല്ലെങ്കിൽ
 	val = tv_equal(tv1, tv2, ic);
-    if (type == EXPR_NEQUAL || type == EXPR_ISNOT)
+    എങ്കിൽ (type == വ്യഞ്ജകം_NEQUAL || type == വ്യഞ്ജകം_ISNOT)
 	val = !val;
     *res = val;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -2000,67 +2000,67 @@ typval_compare_func(
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 typval_compare_string(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    ic,
-	int	    *res)
+	പൂർണ്ണസംഖ്യ	    ic,
+	പൂർണ്ണസംഖ്യ	    *res)
 {
-    int		i = 0;
-    int		val = FALSE;
+    പൂർണ്ണസംഖ്യ		i = 0;
+    പൂർണ്ണസംഖ്യ		val = FALSE;
     char_u	*s1, *s2;
     char_u	buf1[NUMBUFLEN], buf2[NUMBUFLEN];
 
-    if (in_vim9script()
+    എങ്കിൽ (in_vim9script()
 	  && ((tv1->v_type != VAR_STRING && tv1->v_type != VAR_SPECIAL)
 	   || (tv2->v_type != VAR_STRING && tv2->v_type != VAR_SPECIAL)))
     {
 	semsg(_(e_cannot_compare_str_with_str),
 		   vartype_name(tv1->v_type), vartype_name(tv2->v_type));
-	return FAIL;
+	തിരികെ FAIL;
     }
     s1 = tv_get_string_buf(tv1, buf1);
     s2 = tv_get_string_buf(tv2, buf2);
-    if (type != EXPR_MATCH && type != EXPR_NOMATCH)
+    എങ്കിൽ (type != വ്യഞ്ജകം_MATCH && type != വ്യഞ്ജകം_NOMATCH)
 	i = ic ? MB_STRICMP(s1, s2) : STRCMP(s1, s2);
-    switch (type)
+    തിരഞ്ഞെടുപ്പ് (type)
     {
-	case EXPR_IS:	    if (in_vim9script())
+	അവസ്ഥ വ്യഞ്ജകം_IS:	    എങ്കിൽ (in_vim9script())
 			    {
 				// Really check it is the same string, not just
 				// the same value.
 				val = tv1->vval.v_string == tv2->vval.v_string;
-				break;
+				നിർത്തുക;
 			    }
 			    // FALLTHROUGH
-	case EXPR_EQUAL:    val = (i == 0); break;
-	case EXPR_ISNOT:    if (in_vim9script())
+	അവസ്ഥ വ്യഞ്ജകം_EQUAL:    val = (i == 0); നിർത്തുക;
+	അവസ്ഥ വ്യഞ്ജകം_ISNOT:    എങ്കിൽ (in_vim9script())
 			    {
 				// Really check it is not the same string, not
 				// just a different value.
 				val = tv1->vval.v_string != tv2->vval.v_string;
-				break;
+				നിർത്തുക;
 			    }
 			    // FALLTHROUGH
-	case EXPR_NEQUAL:   val = (i != 0); break;
-	case EXPR_GREATER:  val = (i > 0); break;
-	case EXPR_GEQUAL:   val = (i >= 0); break;
-	case EXPR_SMALLER:  val = (i < 0); break;
-	case EXPR_SEQUAL:   val = (i <= 0); break;
+	അവസ്ഥ വ്യഞ്ജകം_NEQUAL:   val = (i != 0); നിർത്തുക;
+	അവസ്ഥ വ്യഞ്ജകം_GREATER:  val = (i > 0); നിർത്തുക;
+	അവസ്ഥ വ്യഞ്ജകം_GEQUAL:   val = (i >= 0); നിർത്തുക;
+	അവസ്ഥ വ്യഞ്ജകം_SMALLER:  val = (i < 0); നിർത്തുക;
+	അവസ്ഥ വ്യഞ്ജകം_SEQUAL:   val = (i <= 0); നിർത്തുക;
 
-	case EXPR_MATCH:
-	case EXPR_NOMATCH:
+	അവസ്ഥ വ്യഞ്ജകം_MATCH:
+	അവസ്ഥ വ്യഞ്ജകം_NOMATCH:
 		val = pattern_match(s2, s1, ic);
-		if (type == EXPR_NOMATCH)
+		എങ്കിൽ (type == വ്യഞ്ജകം_NOMATCH)
 		    val = !val;
-		break;
+		നിർത്തുക;
 
-	default:  break;  // avoid gcc warning
+	സ്ഥിരസ്ഥിതി:  നിർത്തുക;  // avoid gcc warning
     }
     *res = val;
-    return OK;
+    തിരികെ OK;
 }
 /*
  * Convert any type to a string, never give an error.
@@ -2068,98 +2068,98 @@ typval_compare_string(
  * Returns an allocated string.
  */
     char_u *
-typval_tostring(typval_T *arg, int quotes)
+typval_tostring(typval_T *arg, പൂർണ്ണസംഖ്യ quotes)
 {
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
-    char_u	*ret = NULL;
+    char_u	*ret = ശൂന്യ;
 
-    if (arg == NULL)
-	return vim_strsave((char_u *)"(does not exist)");
-    if (!quotes && arg->v_type == VAR_STRING)
+    എങ്കിൽ (arg == ശൂന്യ)
+	തിരികെ vim_strsave((char_u *)"(does not exist)");
+    എങ്കിൽ (!quotes && arg->v_type == VAR_STRING)
     {
-	ret = vim_strsave(arg->vval.v_string == NULL ? (char_u *)""
+	ret = vim_strsave(arg->vval.v_string == ശൂന്യ ? (char_u *)""
 							 : arg->vval.v_string);
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	ret = tv2string(arg, &tofree, numbuf, 0);
 	// Make a copy if we have a value but it's not in allocated memory.
-	if (ret != NULL && tofree == NULL)
+	എങ്കിൽ (ret != ശൂന്യ && tofree == ശൂന്യ)
 	    ret = vim_strsave(ret);
     }
-    return ret;
+    തിരികെ ret;
 }
 
 /*
  * Return TRUE if typeval "tv" is locked: Either that value is locked itself
  * or it refers to a List or Dictionary that is locked.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 tv_islocked(typval_T *tv)
 {
-    return (tv->v_lock & VAR_LOCKED)
+    തിരികെ (tv->v_lock & VAR_LOCKED)
 	|| (tv->v_type == VAR_LIST
-		&& tv->vval.v_list != NULL
+		&& tv->vval.v_list != ശൂന്യ
 		&& (tv->vval.v_list->lv_lock & VAR_LOCKED))
 	|| (tv->v_type == VAR_TUPLE
-		&& tv->vval.v_tuple != NULL
+		&& tv->vval.v_tuple != ശൂന്യ
 		&& (tv->vval.v_tuple->tv_lock & VAR_LOCKED))
 	|| (tv->v_type == VAR_DICT
-		&& tv->vval.v_dict != NULL
+		&& tv->vval.v_dict != ശൂന്യ
 		&& (tv->vval.v_dict->dv_lock & VAR_LOCKED));
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 func_equal(
     typval_T *tv1,
     typval_T *tv2,
-    int	     ic)	    // ignore case
+    പൂർണ്ണസംഖ്യ	     ic)	    // ignore case
 {
     char_u	*s1, *s2;
     dict_T	*d1, *d2;
-    int		a1, a2;
-    int		i;
+    പൂർണ്ണസംഖ്യ		a1, a2;
+    പൂർണ്ണസംഖ്യ		i;
 
     // empty and NULL function name considered the same
     s1 = tv1->v_type == VAR_FUNC ? tv1->vval.v_string
 					   : partial_name(tv1->vval.v_partial);
-    if (s1 != NULL && *s1 == NUL)
-	s1 = NULL;
+    എങ്കിൽ (s1 != ശൂന്യ && *s1 == NUL)
+	s1 = ശൂന്യ;
     s2 = tv2->v_type == VAR_FUNC ? tv2->vval.v_string
 					   : partial_name(tv2->vval.v_partial);
-    if (s2 != NULL && *s2 == NUL)
-	s2 = NULL;
-    if (s1 == NULL || s2 == NULL)
+    എങ്കിൽ (s2 != ശൂന്യ && *s2 == NUL)
+	s2 = ശൂന്യ;
+    എങ്കിൽ (s1 == ശൂന്യ || s2 == ശൂന്യ)
     {
-	if (s1 != s2)
-	    return FALSE;
+	എങ്കിൽ (s1 != s2)
+	    തിരികെ FALSE;
     }
-    else if (STRCMP(s1, s2) != 0)
-	return FALSE;
+    അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(s1, s2) != 0)
+	തിരികെ FALSE;
 
     // empty dict and NULL dict is different
-    d1 = tv1->v_type == VAR_FUNC ? NULL : tv1->vval.v_partial->pt_dict;
-    d2 = tv2->v_type == VAR_FUNC ? NULL : tv2->vval.v_partial->pt_dict;
-    if (d1 == NULL || d2 == NULL)
+    d1 = tv1->v_type == VAR_FUNC ? ശൂന്യ : tv1->vval.v_partial->pt_dict;
+    d2 = tv2->v_type == VAR_FUNC ? ശൂന്യ : tv2->vval.v_partial->pt_dict;
+    എങ്കിൽ (d1 == ശൂന്യ || d2 == ശൂന്യ)
     {
-	if (d1 != d2)
-	    return FALSE;
+	എങ്കിൽ (d1 != d2)
+	    തിരികെ FALSE;
     }
-    else if (!dict_equal(d1, d2, ic))
-	return FALSE;
+    അല്ലെങ്കിൽ എങ്കിൽ (!dict_equal(d1, d2, ic))
+	തിരികെ FALSE;
 
     // empty list and no list considered the same
     a1 = tv1->v_type == VAR_FUNC ? 0 : tv1->vval.v_partial->pt_argc;
     a2 = tv2->v_type == VAR_FUNC ? 0 : tv2->vval.v_partial->pt_argc;
-    if (a1 != a2)
-	return FALSE;
-    for (i = 0; i < a1; ++i)
-	if (!tv_equal(tv1->vval.v_partial->pt_argv + i,
+    എങ്കിൽ (a1 != a2)
+	തിരികെ FALSE;
+    വേണ്ടി (i = 0; i < a1; ++i)
+	എങ്കിൽ (!tv_equal(tv1->vval.v_partial->pt_argv + i,
 		      tv2->vval.v_partial->pt_argv + i, ic))
-	    return FALSE;
+	    തിരികെ FALSE;
 
-    return TRUE;
+    തിരികെ TRUE;
 }
 
 /*
@@ -2167,17 +2167,17 @@ func_equal(
  * Compares the items just like "==" would compare them, but strings and
  * numbers are different.  Floats and numbers are also different.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 tv_equal(
     typval_T *tv1,
     typval_T *tv2,
-    int	     ic)	    // ignore case
+    പൂർണ്ണസംഖ്യ	     ic)	    // ignore case
 {
     char_u	buf1[NUMBUFLEN], buf2[NUMBUFLEN];
     char_u	*s1, *s2;
-    static int  recursive_cnt = 0;	    // catch recursive loops
-    int		r;
-    static int	tv_equal_recurse_limit;
+    സ്ഥിതം പൂർണ്ണസംഖ്യ  recursive_cnt = 0;	    // catch recursive loops
+    പൂർണ്ണസംഖ്യ		r;
+    സ്ഥിതം പൂർണ്ണസംഖ്യ	tv_equal_recurse_limit;
 
     // Catch lists and dicts that have an endless loop by limiting
     // recursiveness to a limit.  We guess they are equal then.
@@ -2185,106 +2185,106 @@ tv_equal(
     // Reduce the limit every time running into it. That should work fine for
     // deeply linked structures that are not recursively linked and catch
     // recursiveness quickly.
-    if (recursive_cnt == 0)
+    എങ്കിൽ (recursive_cnt == 0)
 	tv_equal_recurse_limit = 1000;
-    if (recursive_cnt >= tv_equal_recurse_limit)
+    എങ്കിൽ (recursive_cnt >= tv_equal_recurse_limit)
     {
 	--tv_equal_recurse_limit;
-	return TRUE;
+	തിരികെ TRUE;
     }
 
     // For VAR_FUNC and VAR_PARTIAL compare the function name, bound dict and
     // arguments.
-    if ((tv1->v_type == VAR_FUNC
-		|| (tv1->v_type == VAR_PARTIAL && tv1->vval.v_partial != NULL))
+    എങ്കിൽ ((tv1->v_type == VAR_FUNC
+		|| (tv1->v_type == VAR_PARTIAL && tv1->vval.v_partial != ശൂന്യ))
 	    && (tv2->v_type == VAR_FUNC
-		|| (tv2->v_type == VAR_PARTIAL && tv2->vval.v_partial != NULL)))
+		|| (tv2->v_type == VAR_PARTIAL && tv2->vval.v_partial != ശൂന്യ)))
     {
 	++recursive_cnt;
 	r = func_equal(tv1, tv2, ic);
 	--recursive_cnt;
-	return r;
+	തിരികെ r;
     }
 
-    if (tv1->v_type != tv2->v_type
+    എങ്കിൽ (tv1->v_type != tv2->v_type
 	    && ((tv1->v_type != VAR_BOOL && tv1->v_type != VAR_SPECIAL)
 		|| (tv2->v_type != VAR_BOOL && tv2->v_type != VAR_SPECIAL)))
-	return FALSE;
+	തിരികെ FALSE;
 
-    switch (tv1->v_type)
+    തിരഞ്ഞെടുപ്പ് (tv1->v_type)
     {
-	case VAR_LIST:
+	അവസ്ഥ VAR_LIST:
 	    ++recursive_cnt;
 	    r = list_equal(tv1->vval.v_list, tv2->vval.v_list, ic);
 	    --recursive_cnt;
-	    return r;
+	    തിരികെ r;
 
-	case VAR_TUPLE:
+	അവസ്ഥ VAR_TUPLE:
 	    ++recursive_cnt;
 	    r = tuple_equal(tv1->vval.v_tuple, tv2->vval.v_tuple, ic);
 	    --recursive_cnt;
-	    return r;
+	    തിരികെ r;
 
-	case VAR_DICT:
+	അവസ്ഥ VAR_DICT:
 	    ++recursive_cnt;
 	    r = dict_equal(tv1->vval.v_dict, tv2->vval.v_dict, ic);
 	    --recursive_cnt;
-	    return r;
+	    തിരികെ r;
 
-	case VAR_BLOB:
-	    return blob_equal(tv1->vval.v_blob, tv2->vval.v_blob);
+	അവസ്ഥ VAR_BLOB:
+	    തിരികെ blob_equal(tv1->vval.v_blob, tv2->vval.v_blob);
 
-	case VAR_NUMBER:
-	case VAR_BOOL:
-	case VAR_SPECIAL:
-	    return tv1->vval.v_number == tv2->vval.v_number;
+	അവസ്ഥ VAR_സംഖ്യ:
+	അവസ്ഥ VAR_BOOL:
+	അവസ്ഥ VAR_SPECIAL:
+	    തിരികെ tv1->vval.v_സംഖ്യ == tv2->vval.v_സംഖ്യ;
 
-	case VAR_STRING:
+	അവസ്ഥ VAR_STRING:
 	    s1 = tv_get_string_buf(tv1, buf1);
 	    s2 = tv_get_string_buf(tv2, buf2);
-	    return ((ic ? MB_STRICMP(s1, s2) : STRCMP(s1, s2)) == 0);
+	    തിരികെ ((ic ? MB_STRICMP(s1, s2) : STRCMP(s1, s2)) == 0);
 
-	case VAR_FLOAT:
-	    return tv1->vval.v_float == tv2->vval.v_float;
-	case VAR_JOB:
+	അവസ്ഥ VAR_FLOAT:
+	    തിരികെ tv1->vval.v_float == tv2->vval.v_float;
+	അവസ്ഥ VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    return tv1->vval.v_job == tv2->vval.v_job;
+	    തിരികെ tv1->vval.v_job == tv2->vval.v_job;
 #endif
-	case VAR_CHANNEL:
+	അവസ്ഥ VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    return tv1->vval.v_channel == tv2->vval.v_channel;
+	    തിരികെ tv1->vval.v_channel == tv2->vval.v_channel;
 #endif
-	case VAR_INSTR:
-	    return tv1->vval.v_instr == tv2->vval.v_instr;
+	അവസ്ഥ VAR_INSTR:
+	    തിരികെ tv1->vval.v_instr == tv2->vval.v_instr;
 
-	case VAR_CLASS:
+	അവസ്ഥ VAR_CLASS:
 	    // A class only exists once, equality is identity.
-	    return tv1->vval.v_class == tv2->vval.v_class;
+	    തിരികെ tv1->vval.v_class == tv2->vval.v_class;
 
-	case VAR_OBJECT:
+	അവസ്ഥ VAR_OBJECT:
 	    ++recursive_cnt;
 	    r = object_equal(tv1->vval.v_object, tv2->vval.v_object, ic);
 	    --recursive_cnt;
-	    return r;
+	    തിരികെ r;
 
-	case VAR_PARTIAL:
-	    return tv1->vval.v_partial == tv2->vval.v_partial;
+	അവസ്ഥ VAR_PARTIAL:
+	    തിരികെ tv1->vval.v_partial == tv2->vval.v_partial;
 
-	case VAR_FUNC:
-	    return tv1->vval.v_string == tv2->vval.v_string;
+	അവസ്ഥ VAR_FUNC:
+	    തിരികെ tv1->vval.v_string == tv2->vval.v_string;
 
-	case VAR_TYPEALIAS:
-	    return tv1->vval.v_typealias == tv2->vval.v_typealias;
+	അവസ്ഥ VAR_TYPEALIAS:
+	    തിരികെ tv1->vval.v_typealias == tv2->vval.v_typealias;
 
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	    break;
+	അവസ്ഥ VAR_UNKNOWN:
+	അവസ്ഥ VAR_ANY:
+	അവസ്ഥ VAR_VOID:
+	    നിർത്തുക;
     }
 
     // VAR_UNKNOWN can be the result of a invalid expression, let's say it
     // does not equal anything, not even itself.
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
@@ -2293,106 +2293,106 @@ tv_equal(
  * "arg" is advanced to character after the option name.
  * Return OK or FAIL.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 eval_option(
     char_u	**arg,
     typval_T	*rettv,	// when NULL, only check if option exists
-    int		evaluate)
+    പൂർണ്ണസംഖ്യ		evaluate)
 {
     char_u	*option_end;
     long	numval;
     char_u	*stringval;
     getoption_T	opt_type;
-    int		c;
-    int		working = (**arg == '+');    // has("+option")
-    int		ret = OK;
-    int		scope;
+    പൂർണ്ണസംഖ്യ		c;
+    പൂർണ്ണസംഖ്യ		working = (**arg == '+');    // has("+option")
+    പൂർണ്ണസംഖ്യ		ret = OK;
+    പൂർണ്ണസംഖ്യ		scope;
 
     // Isolate the option name and find its value.
     option_end = find_option_end(arg, &scope);
-    if (option_end == NULL)
+    എങ്കിൽ (option_end == ശൂന്യ)
     {
-	if (rettv != NULL)
+	എങ്കിൽ (rettv != ശൂന്യ)
 	    semsg(_(e_option_name_missing_str), *arg);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    if (!evaluate)
+    എങ്കിൽ (!evaluate)
     {
 	*arg = option_end;
-	return OK;
+	തിരികെ OK;
     }
 
     c = *option_end;
     *option_end = NUL;
-    opt_type = get_option_value(*arg, &numval,
-			       rettv == NULL ? NULL : &stringval, NULL, scope);
+    opt_type = get_option_മൂല്യം(*arg, &numval,
+			       rettv == ശൂന്യ ? ശൂന്യ : &stringval, ശൂന്യ, scope);
 
-    if (opt_type == gov_unknown)
+    എങ്കിൽ (opt_type == gov_unknown)
     {
-	if (rettv != NULL)
+	എങ്കിൽ (rettv != ശൂന്യ)
 	    semsg(_(e_unknown_option_str), *arg);
 	ret = FAIL;
     }
-    else if (rettv != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (rettv != ശൂന്യ)
     {
 	rettv->v_lock = 0;
-	if (opt_type == gov_hidden_string)
+	എങ്കിൽ (opt_type == gov_hidden_string)
 	{
 	    rettv->v_type = VAR_STRING;
-	    rettv->vval.v_string = NULL;
+	    rettv->vval.v_string = ശൂന്യ;
 	}
-	else if (opt_type == gov_hidden_bool || opt_type == gov_hidden_number)
+	അല്ലെങ്കിൽ എങ്കിൽ (opt_type == gov_hidden_bool || opt_type == gov_hidden_സംഖ്യ)
 	{
 	    rettv->v_type = in_vim9script() && opt_type == gov_hidden_bool
-						       ? VAR_BOOL : VAR_NUMBER;
-	    rettv->vval.v_number = 0;
+						       ? VAR_BOOL : VAR_സംഖ്യ;
+	    rettv->vval.v_സംഖ്യ = 0;
 	}
-	else if (opt_type == gov_bool || opt_type == gov_number)
+	അല്ലെങ്കിൽ എങ്കിൽ (opt_type == gov_bool || opt_type == gov_സംഖ്യ)
 	{
-	    if (in_vim9script() && opt_type == gov_bool)
+	    എങ്കിൽ (in_vim9script() && opt_type == gov_bool)
 	    {
 		rettv->v_type = VAR_BOOL;
-		rettv->vval.v_number = numval ? VVAL_TRUE : VVAL_FALSE;
+		rettv->vval.v_സംഖ്യ = numval ? VVAL_TRUE : VVAL_FALSE;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		rettv->v_type = VAR_NUMBER;
-		rettv->vval.v_number = numval;
+		rettv->v_type = VAR_സംഖ്യ;
+		rettv->vval.v_സംഖ്യ = numval;
 	    }
 	}
-	else				// string option
+	അല്ലെങ്കിൽ				// string option
 	{
 	    rettv->v_type = VAR_STRING;
 	    rettv->vval.v_string = stringval;
 	}
     }
-    else if (working && (opt_type == gov_hidden_bool
-			|| opt_type == gov_hidden_number
+    അല്ലെങ്കിൽ എങ്കിൽ (working && (opt_type == gov_hidden_bool
+			|| opt_type == gov_hidden_സംഖ്യ
 			|| opt_type == gov_hidden_string))
 	ret = FAIL;
 
     *option_end = c;		    // put back for error messages
     *arg = option_end;
 
-    return ret;
+    തിരികെ ret;
 }
 
 /*
  * Allocate a variable for a number constant.  Also deals with "0z" for blob.
  * Return OK or FAIL.
  */
-    int
-eval_number(
+    പൂർണ്ണസംഖ്യ
+eval_സംഖ്യ(
 	char_u	    **arg,
 	typval_T    *rettv,
-	int	    evaluate,
-	int	    want_string)
+	പൂർണ്ണസംഖ്യ	    evaluate,
+	പൂർണ്ണസംഖ്യ	    want_string)
 {
-    int		len;
-    int		skip_quotes = !in_old_script(4);
+    പൂർണ്ണസംഖ്യ		len;
+    പൂർണ്ണസംഖ്യ		skip_quotes = !in_old_script(4);
     char_u	*p;
-    int		get_float = FALSE;
+    പൂർണ്ണസംഖ്യ		get_float = FALSE;
 
     // We accept a float when the format matches
     // "[0-9]\+\.[0-9]\+\([eE][+-]\?[0-9]\+\)\?".  This is very
@@ -2401,104 +2401,104 @@ eval_number(
     // omitted.
     // Don't look for a float after the "." operator, so that
     // ":let vers = 1.2.3" doesn't fail.
-    if (**arg == '.')
+    എങ്കിൽ (**arg == '.')
 	p = *arg;
-    else
+    അല്ലെങ്കിൽ
     {
 	p = *arg + 1;
-	if (skip_quotes)
-	    for (;;)
+	എങ്കിൽ (skip_quotes)
+	    വേണ്ടി (;;)
 	    {
-		if (*p == '\'')
+		എങ്കിൽ (*p == '\'')
 		    ++p;
-		if (!vim_isdigit(*p))
-		    break;
+		എങ്കിൽ (!vim_isdigit(*p))
+		    നിർത്തുക;
 		p = skipdigits(p);
 	    }
-	else
+	അല്ലെങ്കിൽ
 	    p = skipdigits(p);
     }
-    if (!want_string && p[0] == '.' && vim_isdigit(p[1]))
+    എങ്കിൽ (!want_string && p[0] == '.' && vim_isdigit(p[1]))
     {
 	get_float = TRUE;
 	p = skipdigits(p + 2);
-	if (*p == 'e' || *p == 'E')
+	എങ്കിൽ (*p == 'e' || *p == 'E')
 	{
 	    ++p;
-	    if (*p == '-' || *p == '+')
+	    എങ്കിൽ (*p == '-' || *p == '+')
 		++p;
-	    if (!vim_isdigit(*p))
+	    എങ്കിൽ (!vim_isdigit(*p))
 		get_float = FALSE;
-	    else
+	    അല്ലെങ്കിൽ
 		p = skipdigits(p + 1);
 	}
-	if (ASCII_ISALPHA(*p) || *p == '.')
+	എങ്കിൽ (ASCII_ISALPHA(*p) || *p == '.')
 	    get_float = FALSE;
     }
-    if (get_float)
+    എങ്കിൽ (get_float)
     {
 	float_T	f;
 
 	*arg += string2float(*arg, &f, skip_quotes);
-	if (evaluate)
+	എങ്കിൽ (evaluate)
 	{
 	    rettv->v_type = VAR_FLOAT;
 	    rettv->vval.v_float = f;
 	}
     }
-    else
-    if (**arg == '0' && ((*arg)[1] == 'z' || (*arg)[1] == 'Z'))
+    അല്ലെങ്കിൽ
+    എങ്കിൽ (**arg == '0' && ((*arg)[1] == 'z' || (*arg)[1] == 'Z'))
     {
 	char_u  *bp;
-	blob_T  *blob = NULL;  // init for gcc
+	blob_T  *blob = ശൂന്യ;  // init for gcc
 
 	// Blob constant: 0z0123456789abcdef
-	if (evaluate)
+	എങ്കിൽ (evaluate)
 	    blob = blob_alloc();
-	for (bp = *arg + 2; vim_isxdigit(bp[0]); bp += 2)
+	വേണ്ടി (bp = *arg + 2; vim_isxdigit(bp[0]); bp += 2)
 	{
-	    if (!vim_isxdigit(bp[1]))
+	    എങ്കിൽ (!vim_isxdigit(bp[1]))
 	    {
-		if (blob != NULL)
+		എങ്കിൽ (blob != ശൂന്യ)
 		{
-		    emsg(_(e_blob_literal_should_have_an_even_number_of_hex_characters));
+		    emsg(_(e_blob_literal_should_have_an_even_സംഖ്യ_of_hex_characters));
 		    ga_clear(&blob->bv_ga);
 		    VIM_CLEAR(blob);
 		}
-		return FAIL;
+		തിരികെ FAIL;
 	    }
-	    if (blob != NULL)
+	    എങ്കിൽ (blob != ശൂന്യ)
 		ga_append(&blob->bv_ga,
 			     (hex2nr(*bp) << 4) + hex2nr(*(bp+1)));
-	    if (bp[2] == '.' && vim_isxdigit(bp[3]))
+	    എങ്കിൽ (bp[2] == '.' && vim_isxdigit(bp[3]))
 		++bp;
 	}
-	if (blob != NULL)
+	എങ്കിൽ (blob != ശൂന്യ)
 	    rettv_blob_set(rettv, blob);
 	*arg = bp;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	varnumber_T	n;
 
 	// decimal, hex or octal number
-	vim_str2nr(*arg, NULL, &len, skip_quotes
+	vim_str2nr(*arg, ശൂന്യ, &len, skip_quotes
 		      ? STR2NR_NO_OCT + STR2NR_QUOTE
-		      : STR2NR_ALL, &n, NULL, 0, TRUE, NULL);
-	if (len == 0)
+		      : STR2NR_ALL, &n, ശൂന്യ, 0, TRUE, ശൂന്യ);
+	എങ്കിൽ (len == 0)
 	{
-	    if (evaluate)
+	    എങ്കിൽ (evaluate)
 		semsg(_(e_invalid_expression_str), *arg);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	*arg += len;
-	if (evaluate)
+	എങ്കിൽ (evaluate)
 	{
-	    rettv->v_type = VAR_NUMBER;
-	    rettv->vval.v_number = n;
+	    rettv->v_type = VAR_സംഖ്യ;
+	    rettv->vval.v_സംഖ്യ = n;
 	}
     }
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -2508,105 +2508,105 @@ eval_number(
  * at a single "{".
  * Return OK or FAIL.
  */
-    int
-eval_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
+    പൂർണ്ണസംഖ്യ
+eval_string(char_u **arg, typval_T *rettv, പൂർണ്ണസംഖ്യ evaluate, പൂർണ്ണസംഖ്യ interpolate)
 {
     char_u	*p;
     char_u	*end;
-    int		extra = interpolate ? 1 : 0;
-    int		off = interpolate ? 0 : 1;
-    int		len;
+    പൂർണ്ണസംഖ്യ		extra = interpolate ? 1 : 0;
+    പൂർണ്ണസംഖ്യ		off = interpolate ? 0 : 1;
+    പൂർണ്ണസംഖ്യ		len;
 
     // Find the end of the string, skipping backslashed characters.
-    for (p = *arg + off; *p != NUL && *p != '"'; MB_PTR_ADV(p))
+    വേണ്ടി (p = *arg + off; *p != NUL && *p != '"'; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	എങ്കിൽ (*p == '\\' && p[1] != NUL)
 	{
 	    ++p;
 	    // A "\<x>" form occupies at least 4 characters, and produces up
 	    // to 9 characters (6 for the char and 3 for a modifier):
 	    // reserve space for 5 extra.
-	    if (*p == '<')
+	    എങ്കിൽ (*p == '<')
 	    {
-		int		modifiers = 0;
-		int		flags = FSK_KEYCODE | FSK_IN_STRING;
+		പൂർണ്ണസംഖ്യ		modifiers = 0;
+		പൂർണ്ണസംഖ്യ		flags = FSK_KEYCODE | FSK_IN_STRING;
 
 		extra += 5;
 
 		// Skip to the '>' to avoid using '{' inside for string
 		// interpolation.
-		if (p[1] != '*')
+		എങ്കിൽ (p[1] != '*')
 		    flags |= FSK_SIMPLIFY;
-		if (find_special_key(&p, &modifiers, flags, NULL) != 0)
+		എങ്കിൽ (find_special_താക്കോൽ(&p, &modifiers, flags, ശൂന്യ) != 0)
 		    --p;  // leave "p" on the ">"
 	    }
 	}
-	else if (interpolate && (*p == '{' || *p == '}'))
+	അല്ലെങ്കിൽ എങ്കിൽ (interpolate && (*p == '{' || *p == '}'))
 	{
-	    if (*p == '{' && p[1] != '{') // start of expression
-		break;
+	    എങ്കിൽ (*p == '{' && p[1] != '{') // start of expression
+		നിർത്തുക;
 	    ++p;
-	    if (p[-1] == '}' && *p != '}') // single '}' is an error
+	    എങ്കിൽ (p[-1] == '}' && *p != '}') // single '}' is an error
 	    {
 		semsg(_(e_stray_closing_curly_str), *arg);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	    --extra;  // "{{" becomes "{", "}}" becomes "}"
 	}
     }
 
-    if (*p != '"' && !(interpolate && *p == '{'))
+    എങ്കിൽ (*p != '"' && !(interpolate && *p == '{'))
     {
 	semsg(_(e_missing_double_quote_str), *arg);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     // If only parsing, set *arg and return here
-    if (!evaluate)
+    എങ്കിൽ (!evaluate)
     {
 	*arg = p + off;
-	return OK;
+	തിരികെ OK;
     }
 
     // Copy the string into allocated memory, handling backslashed
     // characters.
     rettv->v_type = VAR_STRING;
-    len = (int)(p - *arg + extra);
+    len = (പൂർണ്ണസംഖ്യ)(p - *arg + extra);
     rettv->vval.v_string = alloc(len);
-    if (rettv->vval.v_string == NULL)
-	return FAIL;
+    എങ്കിൽ (rettv->vval.v_string == ശൂന്യ)
+	തിരികെ FAIL;
     end = rettv->vval.v_string;
 
-    for (p = *arg + off; *p != NUL && *p != '"'; )
+    വേണ്ടി (p = *arg + off; *p != NUL && *p != '"'; )
     {
-	if (*p == '\\')
+	എങ്കിൽ (*p == '\\')
 	{
-	    switch (*++p)
+	    തിരഞ്ഞെടുപ്പ് (*++p)
 	    {
-		case 'b': *end++ = BS; ++p; break;
-		case 'e': *end++ = ESC; ++p; break;
-		case 'f': *end++ = FF; ++p; break;
-		case 'n': *end++ = NL; ++p; break;
-		case 'r': *end++ = CAR; ++p; break;
-		case 't': *end++ = TAB; ++p; break;
+		അവസ്ഥ 'b': *end++ = BS; ++p; നിർത്തുക;
+		അവസ്ഥ 'e': *end++ = ESC; ++p; നിർത്തുക;
+		അവസ്ഥ 'f': *end++ = FF; ++p; നിർത്തുക;
+		അവസ്ഥ 'n': *end++ = NL; ++p; നിർത്തുക;
+		അവസ്ഥ 'r': *end++ = CAR; ++p; നിർത്തുക;
+		അവസ്ഥ 't': *end++ = TAB; ++p; നിർത്തുക;
 
-		case 'X': // hex: "\x1", "\x12"
-		case 'x':
-		case 'u': // Unicode: "\u0023"
-		case 'U':
-			  if (vim_isxdigit(p[1]))
+		അവസ്ഥ 'X': // hex: "\x1", "\x12"
+		അവസ്ഥ 'x':
+		അവസ്ഥ 'u': // Unicode: "\u0023"
+		അവസ്ഥ 'U':
+			  എങ്കിൽ (vim_isxdigit(p[1]))
 			  {
-			      int	n, nr;
-			      int	c = SAFE_toupper(*p);
+			      പൂർണ്ണസംഖ്യ	n, nr;
+			      പൂർണ്ണസംഖ്യ	c = SAFE_toupper(*p);
 
-			      if (c == 'X')
+			      എങ്കിൽ (c == 'X')
 				  n = 2;
-			      else if (*p == 'u')
+			      അല്ലെങ്കിൽ എങ്കിൽ (*p == 'u')
 				  n = 4;
-			      else
+			      അല്ലെങ്കിൽ
 				  n = 8;
 			      nr = 0;
-			      while (--n >= 0 && vim_isxdigit(p[1]))
+			      ആകുമ്പോൾ (--n >= 0 && vim_isxdigit(p[1]))
 			      {
 				  ++p;
 				  nr = (nr << 4) + hex2nr(*p);
@@ -2614,70 +2614,70 @@ eval_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
 			      ++p;
 			      // For "\u" store the number according to
 			      // 'encoding'.
-			      if (c != 'X')
+			      എങ്കിൽ (c != 'X')
 				  end += (*mb_char2bytes)(nr, end);
-			      else
+			      അല്ലെങ്കിൽ
 				  *end++ = nr;
 			  }
-			  break;
+			  നിർത്തുക;
 
 			  // octal: "\1", "\12", "\123"
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7': *end = *p++ - '0';
-			  if (*p >= '0' && *p <= '7')
+		അവസ്ഥ '0':
+		അവസ്ഥ '1':
+		അവസ്ഥ '2':
+		അവസ്ഥ '3':
+		അവസ്ഥ '4':
+		അവസ്ഥ '5':
+		അവസ്ഥ '6':
+		അവസ്ഥ '7': *end = *p++ - '0';
+			  എങ്കിൽ (*p >= '0' && *p <= '7')
 			  {
 			      *end = (*end << 3) + *p++ - '0';
-			      if (*p >= '0' && *p <= '7')
+			      എങ്കിൽ (*p >= '0' && *p <= '7')
 				  *end = (*end << 3) + *p++ - '0';
 			  }
 			  ++end;
-			  break;
+			  നിർത്തുക;
 
 			  // Special key, e.g.: "\<C-W>"
-		case '<':
+		അവസ്ഥ '<':
 			  {
-			      int flags = FSK_KEYCODE | FSK_IN_STRING;
+			      പൂർണ്ണസംഖ്യ flags = FSK_KEYCODE | FSK_IN_STRING;
 
-			      if (p[1] != '*')
+			      എങ്കിൽ (p[1] != '*')
 				  flags |= FSK_SIMPLIFY;
-			      extra = trans_special(&p, end, flags, FALSE, NULL);
-			      if (extra != 0)
+			      extra = trans_special(&p, end, flags, FALSE, ശൂന്യ);
+			      എങ്കിൽ (extra != 0)
 			      {
 				  end += extra;
-				  if (end >= rettv->vval.v_string + len)
+				  എങ്കിൽ (end >= rettv->vval.v_string + len)
 				      iemsg("eval_string() used more space than allocated");
-				  break;
+				  നിർത്തുക;
 			      }
 			  }
 			  // FALLTHROUGH
 
-		default: MB_COPY_CHAR(p, end);
-			  break;
+		സ്ഥിരസ്ഥിതി: MB_COPY_CHAR(p, end);
+			  നിർത്തുക;
 	    }
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    if (interpolate && (*p == '{' || *p == '}'))
+	    എങ്കിൽ (interpolate && (*p == '{' || *p == '}'))
 	    {
-		if (*p == '{' && p[1] != '{') // start of expression
-		    break;
+		എങ്കിൽ (*p == '{' && p[1] != '{') // start of expression
+		    നിർത്തുക;
 		++p;  // reduce "{{" to "{" and "}}" to "}"
 	    }
 	    MB_COPY_CHAR(p, end);
 	}
     }
     *end = NUL;
-    if (*p == '"' && !interpolate)
+    എങ്കിൽ (*p == '"' && !interpolate)
 	++p;
     *arg = p;
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -2686,79 +2686,79 @@ eval_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
  * Return OK when a "rettv" was set to the string.
  * Return FAIL on error, "rettv" is not set.
  */
-    int
-eval_lit_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
+    പൂർണ്ണസംഖ്യ
+eval_lit_string(char_u **arg, typval_T *rettv, പൂർണ്ണസംഖ്യ evaluate, പൂർണ്ണസംഖ്യ interpolate)
 {
     char_u	*p;
     char_u	*str;
-    int		reduce = interpolate ? -1 : 0;
-    int		off = interpolate ? 0 : 1;
+    പൂർണ്ണസംഖ്യ		reduce = interpolate ? -1 : 0;
+    പൂർണ്ണസംഖ്യ		off = interpolate ? 0 : 1;
 
     // Find the end of the string, skipping ''.
-    for (p = *arg + off; *p != NUL; MB_PTR_ADV(p))
+    വേണ്ടി (p = *arg + off; *p != NUL; MB_PTR_ADV(p))
     {
-	if (*p == '\'')
+	എങ്കിൽ (*p == '\'')
 	{
-	    if (p[1] != '\'')
-		break;
+	    എങ്കിൽ (p[1] != '\'')
+		നിർത്തുക;
 	    ++reduce;
 	    ++p;
 	}
-	else if (interpolate)
+	അല്ലെങ്കിൽ എങ്കിൽ (interpolate)
 	{
-	    if (*p == '{')
+	    എങ്കിൽ (*p == '{')
 	    {
-		if (p[1] != '{')
-		    break;
+		എങ്കിൽ (p[1] != '{')
+		    നിർത്തുക;
 		++p;
 		++reduce;
 	    }
-	    else if (*p == '}')
+	    അല്ലെങ്കിൽ എങ്കിൽ (*p == '}')
 	    {
 		++p;
-		if (*p != '}')
+		എങ്കിൽ (*p != '}')
 		{
 		    semsg(_(e_stray_closing_curly_str), *arg);
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
 		++reduce;
 	    }
 	}
     }
 
-    if (*p != '\'' && !(interpolate && *p == '{'))
+    എങ്കിൽ (*p != '\'' && !(interpolate && *p == '{'))
     {
 	semsg(_(e_missing_single_quote_str), *arg);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     // If only parsing return after setting "*arg"
-    if (!evaluate)
+    എങ്കിൽ (!evaluate)
     {
 	*arg = p + off;
-	return OK;
+	തിരികെ OK;
     }
 
     // Copy the string into allocated memory, handling '' to ' reduction and
     // any expressions.
     str = alloc((p - *arg) - reduce);
-    if (str == NULL)
-	return FAIL;
+    എങ്കിൽ (str == ശൂന്യ)
+	തിരികെ FAIL;
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = str;
 
-    for (p = *arg + off; *p != NUL; )
+    വേണ്ടി (p = *arg + off; *p != NUL; )
     {
-	if (*p == '\'')
+	എങ്കിൽ (*p == '\'')
 	{
-	    if (p[1] != '\'')
-		break;
+	    എങ്കിൽ (p[1] != '\'')
+		നിർത്തുക;
 	    ++p;
 	}
-	else if (interpolate && (*p == '{' || *p == '}'))
+	അല്ലെങ്കിൽ എങ്കിൽ (interpolate && (*p == '{' || *p == '}'))
 	{
-	    if (*p == '{' && p[1] != '{')
-		break;
+	    എങ്കിൽ (*p == '{' && p[1] != '{')
+		നിർത്തുക;
 	    ++p;
 	}
 	MB_COPY_CHAR(p, str);
@@ -2766,7 +2766,7 @@ eval_lit_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
     *str = NUL;
     *arg = p + off;
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -2774,12 +2774,12 @@ eval_lit_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
  * "arg" points to the '$'.  The result is put in "rettv".
  * Returns OK or FAIL.
  */
-    int
-eval_interp_string(char_u **arg, typval_T *rettv, int evaluate)
+    പൂർണ്ണസംഖ്യ
+eval_interp_string(char_u **arg, typval_T *rettv, പൂർണ്ണസംഖ്യ evaluate)
 {
     typval_T	tv;
-    int		ret = OK;
-    int		quote;
+    പൂർണ്ണസംഖ്യ		ret = OK;
+    പൂർണ്ണസംഖ്യ		quote;
     garray_T	ga;
     char_u	*p;
 
@@ -2790,47 +2790,47 @@ eval_interp_string(char_u **arg, typval_T *rettv, int evaluate)
     quote = **arg;
     ++*arg;
 
-    for (;;)
+    വേണ്ടി (;;)
     {
 	// Get the string up to the matching quote or to a single '{'.
 	// "arg" is advanced to either the quote or the '{'.
-	if (quote == '"')
+	എങ്കിൽ (quote == '"')
 	    ret = eval_string(arg, &tv, evaluate, TRUE);
-	else
+	അല്ലെങ്കിൽ
 	    ret = eval_lit_string(arg, &tv, evaluate, TRUE);
-	if (ret == FAIL)
-	    break;
-	if (evaluate)
+	എങ്കിൽ (ret == FAIL)
+	    നിർത്തുക;
+	എങ്കിൽ (evaluate)
 	{
 	    ga_concat(&ga, tv.vval.v_string);
 	    clear_tv(&tv);
 	}
 
-	if (**arg != '{')
+	എങ്കിൽ (**arg != '{')
 	{
 	    // found terminating quote
 	    ++*arg;
-	    break;
+	    നിർത്തുക;
 	}
-	p = eval_one_expr_in_str(*arg, &ga, evaluate);
-	if (p == NULL)
+	p = eval_one_വ്യഞ്ജകം_in_str(*arg, &ga, evaluate);
+	എങ്കിൽ (p == ശൂന്യ)
 	{
 	    ret = FAIL;
-	    break;
+	    നിർത്തുക;
 	}
 	*arg = p;
     }
 
     rettv->v_type = VAR_STRING;
-    if (ret == FAIL || !evaluate || ga_append(&ga, NUL) == FAIL)
+    എങ്കിൽ (ret == FAIL || !evaluate || ga_append(&ga, NUL) == FAIL)
     {
 	ga_clear(&ga);
-	rettv->vval.v_string = NULL;
-	return ret;
+	rettv->vval.v_string = ശൂന്യ;
+	തിരികെ ret;
     }
 
     rettv->vval.v_string = ga.ga_data;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -2845,9 +2845,9 @@ tv2string(
     typval_T	*tv,
     char_u	**tofree,
     char_u	*numbuf,
-    int		copyID)
+    പൂർണ്ണസംഖ്യ		copyID)
 {
-    return echo_string_core(tv, tofree, numbuf, copyID, FALSE, TRUE, FALSE);
+    തിരികെ echo_string_core(tv, tofree, numbuf, copyID, FALSE, TRUE, FALSE);
 }
 
 /*
@@ -2856,40 +2856,40 @@ tv2string(
  * If the environment variable was not set, silently assume it is empty.
  * Return FAIL if the name is invalid.
  */
-    int
-eval_env_var(char_u **arg, typval_T *rettv, int evaluate)
+    പൂർണ്ണസംഖ്യ
+eval_env_var(char_u **arg, typval_T *rettv, പൂർണ്ണസംഖ്യ evaluate)
 {
-    char_u	*string = NULL;
-    int		len;
-    int		cc;
+    char_u	*string = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		len;
+    പൂർണ്ണസംഖ്യ		cc;
     char_u	*name;
-    int		mustfree = FALSE;
+    പൂർണ്ണസംഖ്യ		mustfree = FALSE;
 
     ++*arg;
     name = *arg;
     len = get_env_len(arg);
-    if (evaluate)
+    എങ്കിൽ (evaluate)
     {
-	if (len == 0)
-	    return FAIL; // invalid empty name
+	എങ്കിൽ (len == 0)
+	    തിരികെ FAIL; // invalid empty name
 
 	cc = name[len];
 	name[len] = NUL;
 	// first try vim_getenv(), fast for normal environment vars
 	string = vim_getenv(name, &mustfree);
-	if (string != NULL && *string != NUL)
+	എങ്കിൽ (string != ശൂന്യ && *string != NUL)
 	{
-	    if (!mustfree)
+	    എങ്കിൽ (!mustfree)
 		string = vim_strsave(string);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    if (mustfree)
+	    എങ്കിൽ (mustfree)
 		vim_free(string);
 
 	    // next try expanding things like $VIM and ${HOME}
 	    string = expand_env_save(name - 1);
-	    if (string != NULL && *string == '$')
+	    എങ്കിൽ (string != ശൂന്യ && *string == '$')
 		VIM_CLEAR(string);
 	}
 	name[len] = cc;
@@ -2899,7 +2899,7 @@ eval_env_var(char_u **arg, typval_T *rettv, int evaluate)
 	rettv->v_lock = 0;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -2911,22 +2911,22 @@ eval_env_var(char_u **arg, typval_T *rettv, int evaluate)
 tv_get_lnum(typval_T *argvars)
 {
     linenr_T	lnum = -1;
-    int		did_emsg_before = did_emsg;
+    പൂർണ്ണസംഖ്യ		did_emsg_before = did_emsg;
 
-    if (argvars[0].v_type != VAR_STRING || !in_vim9script())
-	lnum = (linenr_T)tv_get_number_chk(&argvars[0], NULL);
-    if (lnum <= 0 && did_emsg_before == did_emsg
-					    && argvars[0].v_type != VAR_NUMBER)
+    എങ്കിൽ (argvars[0].v_type != VAR_STRING || !in_vim9script())
+	lnum = (linenr_T)tv_get_സംഖ്യ_chk(&argvars[0], ശൂന്യ);
+    എങ്കിൽ (lnum <= 0 && did_emsg_before == did_emsg
+					    && argvars[0].v_type != VAR_സംഖ്യ)
     {
-	int	fnum;
+	പൂർണ്ണസംഖ്യ	fnum;
 	pos_T	*fp;
 
 	// no valid number, try using arg like line()
 	fp = var2fpos(&argvars[0], TRUE, &fnum, FALSE);
-	if (fp != NULL)
+	എങ്കിൽ (fp != ശൂന്യ)
 	    lnum = fp->lnum;
     }
-    return lnum;
+    തിരികെ lnum;
 }
 
 /*
@@ -2937,40 +2937,40 @@ tv_get_lnum(typval_T *argvars)
     linenr_T
 tv_get_lnum_buf(typval_T *argvars, buf_T *buf)
 {
-    if (argvars[0].v_type == VAR_STRING
-	    && argvars[0].vval.v_string != NULL
+    എങ്കിൽ (argvars[0].v_type == VAR_STRING
+	    && argvars[0].vval.v_string != ശൂന്യ
 	    && argvars[0].vval.v_string[0] == '$'
 	    && argvars[0].vval.v_string[1] == NUL
-	    && buf != NULL)
-	return buf->b_ml.ml_line_count;
-    return (linenr_T)tv_get_number_chk(&argvars[0], NULL);
+	    && buf != ശൂന്യ)
+	തിരികെ buf->b_ml.ml_വരി_എണ്ണം;
+    തിരികെ (linenr_T)tv_get_സംഖ്യ_chk(&argvars[0], ശൂന്യ);
 }
 
 /*
  * Get buffer by number or pattern.
  */
     buf_T *
-tv_get_buf(typval_T *tv, int curtab_only)
+tv_get_buf(typval_T *tv, പൂർണ്ണസംഖ്യ curtab_only)
 {
     char_u	*name = tv->vval.v_string;
     buf_T	*buf;
 
-    if (tv->v_type == VAR_NUMBER)
-	return buflist_findnr((int)tv->vval.v_number);
-    if (tv->v_type != VAR_STRING)
-	return NULL;
-    if (name == NULL || *name == NUL)
-	return curbuf;
-    if (name[0] == '$' && name[1] == NUL)
-	return lastbuf;
+    എങ്കിൽ (tv->v_type == VAR_സംഖ്യ)
+	തിരികെ buflist_findnr((പൂർണ്ണസംഖ്യ)tv->vval.v_സംഖ്യ);
+    എങ്കിൽ (tv->v_type != VAR_STRING)
+	തിരികെ ശൂന്യ;
+    എങ്കിൽ (name == ശൂന്യ || *name == NUL)
+	തിരികെ curbuf;
+    എങ്കിൽ (name[0] == '$' && name[1] == NUL)
+	തിരികെ lastbuf;
 
     buf = buflist_find_by_name(name, curtab_only);
 
     // If not found, try expanding the name, like done for bufexists().
-    if (buf == NULL)
+    എങ്കിൽ (buf == ശൂന്യ)
 	buf = find_buffer(tv);
 
-    return buf;
+    തിരികെ buf;
 }
 
 /*
@@ -2984,30 +2984,30 @@ tv_get_buf_from_arg(typval_T *tv)
     ++emsg_off;
     buf = tv_get_buf(tv, FALSE);
     --emsg_off;
-    if (buf == NULL
-	    && tv->v_type != VAR_NUMBER
+    എങ്കിൽ (buf == ശൂന്യ
+	    && tv->v_type != VAR_സംഖ്യ
 	    && tv->v_type != VAR_STRING)
 	// issue errmsg for type error
-	(void)tv_get_number(tv);
-    return buf;
+	(ശൂന്യം)tv_get_സംഖ്യ(tv);
+    തിരികെ buf;
 }
 
 /*
  * Check that repeating "slen" items "n" times, does not
  * overflow the int used for the resulting length.
  */
-    int
-check_repeat_count(varnumber_T slen, varnumber_T n)
+    പൂർണ്ണസംഖ്യ
+check_repeat_എണ്ണം(varnumber_T slen, varnumber_T n)
 {
     // Use a division so that the multiplication cannot overflow.
-    if (n <= (varnumber_T)INT_MAX / slen)
-	return OK;
+    എങ്കിൽ (n <= (varnumber_T)INT_MAX / slen)
+	തിരികെ OK;
 
-    char	buf[NUMBUFLEN];
+    അക്ഷരം	buf[NUMBUFLEN];
 
-    vim_snprintf(buf, sizeof(buf), "%lld", (long long)n);
+    vim_snprintf(buf, വലുപ്പം(buf), "%lld", (long long)n);
     semsg(_(e_val_too_large), buf);
-    return FAIL;
+    തിരികെ FAIL;
 }
 
 #endif // FEAT_EVAL

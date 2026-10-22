@@ -8,23 +8,23 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-#if defined(FEAT_BEVAL_GUI)
+#എങ്കിൽ defined(FEAT_BEVAL_GUI)
 
 // on Win32 only get_beval_info() is required
-#if !defined(FEAT_GUI_MSWIN)
+#എങ്കിൽ !defined(FEAT_GUI_MSWIN)
 
 # ifdef FEAT_GUI_GTK
 #  ifdef USE_GTK4
 #   include <gdk/gdkkeysyms.h>
 #  elif GTK_CHECK_VERSION(3,0,0)
 #   include <gdk/gdkkeysyms-compat.h>
-#  else
+#  അല്ലെങ്കിൽ
 #   include <gdk/gdkkeysyms.h>
 #  endif
 #  include <gtk/gtk.h>
-# else
+# അല്ലെങ്കിൽ
 #  include <X11/keysym.h>
 #  include <Xm/PushB.h>
 #  include <Xm/Separator.h>
@@ -35,47 +35,47 @@
 # endif
 
 # ifndef FEAT_GUI_GTK
-extern Widget vimShell;
+ബാഹ്യ Widget vimShell;
 
 /*
  * Currently, we assume that there can be only one BalloonEval showing
  * on-screen at any given moment.  This variable will hold the currently
  * showing BalloonEval or NULL if none is showing.
  */
-static BalloonEval *current_beval = NULL;
+സ്ഥിതം BalloonEval *current_beval = ശൂന്യ;
 # endif
 
 # ifdef FEAT_GUI_GTK
-static void addEventHandler(GtkWidget *, BalloonEval *);
-static void removeEventHandler(BalloonEval *);
+സ്ഥിതം ശൂന്യം addEventHandler(GtkWidget *, BalloonEval *);
+സ്ഥിതം ശൂന്യം removeEventHandler(BalloonEval *);
 #  ifdef USE_GTK4
-static gboolean event_cb(GtkEventController *, GdkEvent *, BalloonEval *);
-#  else
-static gint target_event_cb(GtkWidget *, GdkEvent *, gpointer);
-static gint mainwin_event_cb(GtkWidget *, GdkEvent *, gpointer);
+സ്ഥിതം gboolean event_cb(GtkEventController *, GdkEvent *, BalloonEval *);
+#  അല്ലെങ്കിൽ
+സ്ഥിതം gint target_event_cb(GtkWidget *, GdkEvent *, gpointer);
+സ്ഥിതം gint mainwin_event_cb(GtkWidget *, GdkEvent *, gpointer);
 #  endif
-static void pointer_event(BalloonEval *, int, int, unsigned);
-static void key_event(BalloonEval *, unsigned, int);
-static gboolean timeout_cb(gpointer);
+സ്ഥിതം ശൂന്യം pointer_event(BalloonEval *, പൂർണ്ണസംഖ്യ, പൂർണ്ണസംഖ്യ, unsigned);
+സ്ഥിതം ശൂന്യം താക്കോൽ_event(BalloonEval *, unsigned, പൂർണ്ണസംഖ്യ);
+സ്ഥിതം gboolean timeout_cb(gpointer);
 #  ifndef USE_GTK4
-#   if GTK_CHECK_VERSION(3,0,0)
-static gboolean balloon_draw_event_cb (GtkWidget *, cairo_t *, gpointer);
-#   else
-static gint balloon_expose_event_cb (GtkWidget *, GdkEventExpose *, gpointer);
+#   എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
+സ്ഥിതം gboolean balloon_draw_event_cb (GtkWidget *, cairo_t *, gpointer);
+#   അല്ലെങ്കിൽ
+സ്ഥിതം gint balloon_expose_event_cb (GtkWidget *, GdkEventExpose *, gpointer);
 #   endif
 #  endif
-# else
-static void addEventHandler(Widget, BalloonEval *);
-static void removeEventHandler(BalloonEval *);
-static void pointerEventEH(Widget, XtPointer, XEvent *, Boolean *);
-static void pointerEvent(BalloonEval *, XEvent *);
-static void timerRoutine(XtPointer, XtIntervalId *);
+# അല്ലെങ്കിൽ
+സ്ഥിതം ശൂന്യം addEventHandler(Widget, BalloonEval *);
+സ്ഥിതം ശൂന്യം removeEventHandler(BalloonEval *);
+സ്ഥിതം ശൂന്യം pointerEventEH(Widget, XtPointer, XEvent *, Boolean *);
+സ്ഥിതം ശൂന്യം pointerEvent(BalloonEval *, XEvent *);
+സ്ഥിതം ശൂന്യം timerRoutine(XtPointer, XtIntervalId *);
 # endif
-static void cancelBalloon(BalloonEval *);
-static void requestBalloon(BalloonEval *);
-static void drawBalloon(BalloonEval *);
-static void undrawBalloon(BalloonEval *beval);
-static void createBalloonEvalWindow(BalloonEval *);
+സ്ഥിതം ശൂന്യം cancelBalloon(BalloonEval *);
+സ്ഥിതം ശൂന്യം requestBalloon(BalloonEval *);
+സ്ഥിതം ശൂന്യം drawBalloon(BalloonEval *);
+സ്ഥിതം ശൂന്യം undrawBalloon(BalloonEval *beval);
+സ്ഥിതം ശൂന്യം createBalloonEvalWindow(BalloonEval *);
 
 /*
  * Create a balloon-evaluation area for a Widget.
@@ -87,37 +87,37 @@ static void createBalloonEvalWindow(BalloonEval *);
  */
     BalloonEval *
 gui_mch_create_beval_area(
-    void	*target,
+    ശൂന്യം	*target,
     char_u	*mesg,
-    void	(*mesgCB)(BalloonEval *, int),
-    void	*clientData)
+    ശൂന്യം	(*mesgCB)(BalloonEval *, പൂർണ്ണസംഖ്യ),
+    ശൂന്യം	*clientData)
 {
 # ifndef FEAT_GUI_GTK
-    char	*display_name;	    // get from gui.dpy
-    int		screen_num;
-    char	*p;
+    അക്ഷരം	*display_name;	    // get from gui.dpy
+    പൂർണ്ണസംഖ്യ		screen_അക്കം;
+    അക്ഷരം	*p;
 # endif
     BalloonEval	*beval;
 
-    if (mesg != NULL && mesgCB != NULL)
+    എങ്കിൽ (mesg != ശൂന്യ && mesgCB != ശൂന്യ)
     {
 	iemsg(e_cannot_create_ballooneval_with_both_message_and_callback);
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 
     beval = ALLOC_CLEAR_ONE(BalloonEval);
-    if (beval != NULL)
+    എങ്കിൽ (beval != ശൂന്യ)
     {
 # ifdef FEAT_GUI_GTK
 	beval->target = GTK_WIDGET(target);
-# else
+# അല്ലെങ്കിൽ
 	beval->target = (Widget)target;
 	beval->appContext = XtWidgetToApplicationContext((Widget)target);
 # endif
 	beval->showState = ShS_NEUTRAL;
-	vim_free(beval->msg);
-	beval->msg = mesg == NULL ? NULL : vim_strsave(mesg);
-	beval->msgCB = mesgCB;
+	vim_free(beval->സന്ദേശം);
+	beval->സന്ദേശം = mesg == ശൂന്യ ? ശൂന്യ : vim_strsave(mesg);
+	beval->സന്ദേശം_CB = mesgCB;
 	beval->clientData = clientData;
 
 	/*
@@ -134,23 +134,23 @@ gui_mch_create_beval_area(
 	 */
 	display_name = DisplayString(gui.dpy);
 	p = strrchr(display_name, '.');
-	if (p != NULL)
-	    screen_num = atoi(++p);
-	else
-	    screen_num = 0;
-	beval->screen_width = DisplayWidth(gui.dpy, screen_num);
-	beval->screen_height = DisplayHeight(gui.dpy, screen_num);
+	എങ്കിൽ (p != ശൂന്യ)
+	    screen_അക്കം = atoi(++p);
+	അല്ലെങ്കിൽ
+	    screen_അക്കം = 0;
+	beval->screen_width = DisplayWidth(gui.dpy, screen_അക്കം);
+	beval->screen_height = DisplayHeight(gui.dpy, screen_അക്കം);
 # endif
     }
 
-    return beval;
+    തിരികെ beval;
 }
 
-# if defined(FEAT_BEVAL_TIP) || defined(USE_GTK4)
+# എങ്കിൽ defined(FEAT_BEVAL_TIP) || defined(USE_GTK4)
 /*
  * Destroy a balloon-eval and free its associated memory.
  */
-    void
+    ശൂന്യം
 gui_mch_destroy_beval_area(BalloonEval *beval)
 {
     cancelBalloon(beval);
@@ -159,36 +159,36 @@ gui_mch_destroy_beval_area(BalloonEval *beval)
 #  ifdef FEAT_GUI_GTK
 #   ifdef USE_GTK4
     gtk_widget_unparent(beval->balloonShell);
-#   else
+#   അല്ലെങ്കിൽ
     gtk_widget_destroy(beval->balloonShell);
 #   endif
-#  else
+#  അല്ലെങ്കിൽ
     XtDestroyWidget(beval->balloonShell);
 #  endif
 #  ifdef FEAT_VARTABS
-    if (beval->vts)
+    എങ്കിൽ (beval->vts)
 	vim_free(beval->vts);
 #  endif
-    vim_free(beval->msg);
+    vim_free(beval->സന്ദേശം);
     vim_free(beval);
 }
 # endif
 
-    void
+    ശൂന്യം
 gui_mch_enable_beval_area(BalloonEval *beval)
 {
-    if (beval != NULL)
+    എങ്കിൽ (beval != ശൂന്യ)
 	addEventHandler(beval->target, beval);
 }
 
-    void
+    ശൂന്യം
 gui_mch_disable_beval_area(BalloonEval *beval)
 {
-    if (beval != NULL)
+    എങ്കിൽ (beval != ശൂന്യ)
 	removeEventHandler(beval);
 }
 
-# if defined(FEAT_BEVAL_TIP)
+# എങ്കിൽ defined(FEAT_BEVAL_TIP)
 /*
  * This function returns the BalloonEval * associated with the currently
  * displayed tooltip.  Returns NULL if there is no tooltip currently showing.
@@ -196,47 +196,47 @@ gui_mch_disable_beval_area(BalloonEval *beval)
  * Assumption: Only one tooltip can be shown at a time.
  */
     BalloonEval *
-gui_mch_currently_showing_beval(void)
+gui_mch_currently_showing_beval(ശൂന്യം)
 {
-    return current_beval;
+    തിരികെ current_beval;
 }
 # endif
 #endif // !FEAT_GUI_MSWIN
 
-#if defined(FEAT_NETBEANS_INTG) || defined(FEAT_EVAL)
-# if !defined(FEAT_GUI_MSWIN)
+#എങ്കിൽ defined(FEAT_NETBEANS_INTG) || defined(FEAT_EVAL)
+# എങ്കിൽ !defined(FEAT_GUI_MSWIN)
 
 /*
  * Show a balloon with "mesg".
  */
-    void
+    ശൂന്യം
 gui_mch_post_balloon(BalloonEval *beval, char_u *mesg)
 {
-    vim_free(beval->msg);
-    beval->msg = mesg == NULL ? NULL : vim_strsave(mesg);
-    if (beval->msg != NULL)
+    vim_free(beval->സന്ദേശം);
+    beval->സന്ദേശം = mesg == ശൂന്യ ? ശൂന്യ : vim_strsave(mesg);
+    എങ്കിൽ (beval->സന്ദേശം != ശൂന്യ)
 	drawBalloon(beval);
-    else
+    അല്ലെങ്കിൽ
 	undrawBalloon(beval);
 }
 # endif // !FEAT_GUI_MSWIN
 #endif // FEAT_NETBEANS_INTG || FEAT_EVAL
 
-#if !defined(FEAT_GUI_MSWIN)
-# if defined(FEAT_BEVAL_TIP)
+#എങ്കിൽ !defined(FEAT_GUI_MSWIN)
+# എങ്കിൽ defined(FEAT_BEVAL_TIP)
 /*
  * Hide the given balloon.
  */
-    void
+    ശൂന്യം
 gui_mch_unpost_balloon(BalloonEval *beval)
 {
-    VIM_CLEAR(beval->msg);
+    VIM_CLEAR(beval->സന്ദേശം);
     undrawBalloon(beval);
 }
 # endif
 
 # ifdef FEAT_GUI_GTK
-    static void
+    സ്ഥിതം ശൂന്യം
 addEventHandler(GtkWidget *target, BalloonEval *beval)
 {
 #  ifdef USE_GTK4
@@ -246,7 +246,7 @@ addEventHandler(GtkWidget *target, BalloonEval *beval)
 
     g_object_set_data(G_OBJECT(target), "beval", controller);
     gtk_widget_add_controller(target, controller);
-#  else
+#  അല്ലെങ്കിൽ
     /*
      * Connect to the generic "event" signal instead of the individual
      * signals for each event type, because the former is emitted earlier.
@@ -261,7 +261,7 @@ addEventHandler(GtkWidget *target, BalloonEval *beval)
      * will never see them.  This means we have to connect to the main window
      * as well in order to catch those events.
      */
-    if (gtk_socket_id == 0 && gui.mainwin != NULL
+    എങ്കിൽ (gtk_socket_id == 0 && gui.mainwin != ശൂന്യ
 	    && gtk_widget_is_ancestor(target, gui.mainwin))
     {
 	gtk_widget_add_events(gui.mainwin,
@@ -274,7 +274,7 @@ addEventHandler(GtkWidget *target, BalloonEval *beval)
 #  endif
 }
 
-    static void
+    സ്ഥിതം ശൂന്യം
 removeEventHandler(BalloonEval *beval)
 {
 #  ifdef USE_GTK4
@@ -282,17 +282,17 @@ removeEventHandler(BalloonEval *beval)
     GtkEventController	*controller;
 
     controller = g_object_get_data(G_OBJECT(target), "beval");
-    if (controller != NULL)
+    എങ്കിൽ (controller != ശൂന്യ)
     {
 	gtk_widget_remove_controller(target, controller);
-	g_object_set_data(G_OBJECT(target), "beval", NULL);
+	g_object_set_data(G_OBJECT(target), "beval", ശൂന്യ);
     }
-#  else
+#  അല്ലെങ്കിൽ
     g_signal_handlers_disconnect_by_func(G_OBJECT(beval->target),
 					 FUNC2GENERIC(target_event_cb),
 					 beval);
 
-    if (gtk_socket_id == 0 && gui.mainwin != NULL
+    എങ്കിൽ (gtk_socket_id == 0 && gui.mainwin != ശൂന്യ
 	    && gtk_widget_is_ancestor(beval->target, gui.mainwin))
     {
 	g_signal_handlers_disconnect_by_func(G_OBJECT(gui.mainwin),
@@ -303,168 +303,168 @@ removeEventHandler(BalloonEval *beval)
 }
 
 #  ifdef USE_GTK4
-    static gboolean
+    സ്ഥിതം gboolean
 event_cb(GtkEventController *controller UNUSED, GdkEvent *event, BalloonEval *beval)
 {
-    int type = gdk_event_get_event_type(event);
+    പൂർണ്ണസംഖ്യ type = gdk_event_get_event_type(event);
 
-    switch (type)
+    തിരഞ്ഞെടുപ്പ് (type)
     {
-	case GDK_ENTER_NOTIFY:
-	case GDK_MOTION_NOTIFY:
+	അവസ്ഥ GDK_ENTER_NOTIFY:
+	അവസ്ഥ GDK_MOTION_NOTIFY:
 	{
-	    GtkWidget		*root;
+	    GtkWidget		*വേര്;
 	    graphene_point_t	p;
 	    graphene_point_t	result;
-	    double		x = 0, y = 0;
+	    ഇരട്ട		x = 0, y = 0;
 
 	    // x and y coords returned by gdk_event_get_position are relative to
 	    // the surface, not the widget, must convert them into widget local
 	    // coordinates.
-	    root = GTK_WIDGET(gtk_widget_get_root(beval->target));
+	    വേര് = GTK_WIDGET(gtk_widget_get_വേര്(beval->target));
 	    gdk_event_get_position(event, &x, &y);
 	    p.x = x;
 	    p.y = y;
 
-	    if (gtk_widget_compute_point(root, beval->target, &p, &result))
+	    എങ്കിൽ (gtk_widget_compute_point(വേര്, beval->target, &p, &result))
 	    {
 		x = result.x;
 		y = result.y;
 	    }
 
-	    pointer_event(beval, (int)x, (int)y,
+	    pointer_event(beval, (പൂർണ്ണസംഖ്യ)x, (പൂർണ്ണസംഖ്യ)y,
 		    gdk_event_get_modifier_state(event));
-	    break;
+	    നിർത്തുക;
 	}
-	case GDK_LEAVE_NOTIFY:
-	    if (gdk_crossing_event_get_mode(event) == GDK_CROSSING_NORMAL)
+	അവസ്ഥ GDK_LEAVE_NOTIFY:
+	    എങ്കിൽ (gdk_crossing_event_get_mode(event) == GDK_CROSSING_NORMAL)
 		cancelBalloon(beval);
-	    break;
-	case GDK_BUTTON_PRESS:
-	case GDK_SCROLL:
+	    നിർത്തുക;
+	അവസ്ഥ GDK_BUTTON_PRESS:
+	അവസ്ഥ GDK_SCROLL:
 	    cancelBalloon(beval);
-	    break;
-	case GDK_KEY_PRESS:
-	case GDK_KEY_RELEASE:
-	    key_event(beval, gdk_key_event_get_keyval(event),
-		    type == GDK_KEY_PRESS);
-	    break;
-	default:
-	    break;
+	    നിർത്തുക;
+	അവസ്ഥ GDK_താക്കോൽ_PRESS:
+	അവസ്ഥ GDK_താക്കോൽ_RELEASE:
+	    താക്കോൽ_event(beval, gdk_താക്കോൽ_event_get_keyval(event),
+		    type == GDK_താക്കോൽ_PRESS);
+	    നിർത്തുക;
+	സ്ഥിരസ്ഥിതി:
+	    നിർത്തുക;
     }
 
     // Always pass through events?
-    return FALSE;
+    തിരികെ FALSE;
 }
-#  else
-    static gint
+#  അല്ലെങ്കിൽ
+    സ്ഥിതം gint
 target_event_cb(GtkWidget *widget, GdkEvent *event, gpointer data)
 {
     BalloonEval *beval = (BalloonEval *)data;
 
-    switch (event->type)
+    തിരഞ്ഞെടുപ്പ് (event->type)
     {
-	case GDK_ENTER_NOTIFY:
-	    pointer_event(beval, (int)event->crossing.x,
-				 (int)event->crossing.y,
+	അവസ്ഥ GDK_ENTER_NOTIFY:
+	    pointer_event(beval, (പൂർണ്ണസംഖ്യ)event->crossing.x,
+				 (പൂർണ്ണസംഖ്യ)event->crossing.y,
 				 event->crossing.state);
-	    break;
-	case GDK_MOTION_NOTIFY:
-	    if (event->motion.is_hint)
+	    നിർത്തുക;
+	അവസ്ഥ GDK_MOTION_NOTIFY:
+	    എങ്കിൽ (event->motion.is_hint)
 	    {
-		int		x;
-		int		y;
+		പൂർണ്ണസംഖ്യ		x;
+		പൂർണ്ണസംഖ്യ		y;
 		GdkModifierType	state;
 		/*
 		 * GDK_POINTER_MOTION_HINT_MASK is set, thus we cannot obtain
 		 * the coordinates from the GdkEventMotion struct directly.
 		 */
-#   if GTK_CHECK_VERSION(3,0,0)
+#   എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
 		{
-		    GdkWindow * const win = gtk_widget_get_window(widget);
-		    GdkDisplay * const dpy = gdk_window_get_display(win);
-#    if GTK_CHECK_VERSION(3,20,0)
-		    GdkSeat * const seat = gdk_display_get_default_seat(dpy);
-		    GdkDevice * const dev = gdk_seat_get_pointer(seat);
-#    else
-		    GdkDeviceManager * const mngr = gdk_display_get_device_manager(dpy);
-		    GdkDevice * const dev = gdk_device_manager_get_client_pointer(mngr);
+		    GdkWindow * സ്ഥിരം win = gtk_widget_get_window(widget);
+		    GdkDisplay * സ്ഥിരം dpy = gdk_window_get_display(win);
+#    എങ്കിൽ GTK_CHECK_VERSION(3,20,0)
+		    GdkSeat * സ്ഥിരം seat = gdk_display_get_default_seat(dpy);
+		    GdkDevice * സ്ഥിരം dev = gdk_seat_get_pointer(seat);
+#    അല്ലെങ്കിൽ
+		    GdkDeviceManager * സ്ഥിരം mngr = gdk_display_get_device_manager(dpy);
+		    GdkDevice * സ്ഥിരം dev = gdk_device_manager_get_client_pointer(mngr);
 #    endif
 		    gdk_window_get_device_position(win, dev , &x, &y, &state);
 		}
-#   else
+#   അല്ലെങ്കിൽ
 		gdk_window_get_pointer(widget->window, &x, &y, &state);
 #   endif
-		pointer_event(beval, x, y, (unsigned int)state);
+		pointer_event(beval, x, y, (unsigned പൂർണ്ണസംഖ്യ)state);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		pointer_event(beval, (int)event->motion.x,
-				     (int)event->motion.y,
+		pointer_event(beval, (പൂർണ്ണസംഖ്യ)event->motion.x,
+				     (പൂർണ്ണസംഖ്യ)event->motion.y,
 				     event->motion.state);
 	    }
-	    break;
-	case GDK_LEAVE_NOTIFY:
+	    നിർത്തുക;
+	അവസ്ഥ GDK_LEAVE_NOTIFY:
 	    /*
 	     * Ignore LeaveNotify events that are not "normal".
 	     * Apparently we also get it when somebody else grabs focus.
 	     */
-	    if (event->crossing.mode == GDK_CROSSING_NORMAL)
+	    എങ്കിൽ (event->crossing.mode == GDK_CROSSING_NORMAL)
 		cancelBalloon(beval);
-	    break;
-	case GDK_BUTTON_PRESS:
-	case GDK_SCROLL:
+	    നിർത്തുക;
+	അവസ്ഥ GDK_BUTTON_PRESS:
+	അവസ്ഥ GDK_SCROLL:
 	    cancelBalloon(beval);
-	    break;
-	case GDK_KEY_PRESS:
-	    key_event(beval, event->key.keyval, TRUE);
-	    break;
-	case GDK_KEY_RELEASE:
-	    key_event(beval, event->key.keyval, FALSE);
-	    break;
-	default:
-	    break;
+	    നിർത്തുക;
+	അവസ്ഥ GDK_താക്കോൽ_PRESS:
+	    താക്കോൽ_event(beval, event->താക്കോൽ.keyval, TRUE);
+	    നിർത്തുക;
+	അവസ്ഥ GDK_താക്കോൽ_RELEASE:
+	    താക്കോൽ_event(beval, event->താക്കോൽ.keyval, FALSE);
+	    നിർത്തുക;
+	സ്ഥിരസ്ഥിതി:
+	    നിർത്തുക;
     }
 
-    return FALSE; // continue emission
+    തിരികെ FALSE; // continue emission
 }
 
-    static gint
+    സ്ഥിതം gint
 mainwin_event_cb(GtkWidget *widget UNUSED, GdkEvent *event, gpointer data)
 {
     BalloonEval *beval = (BalloonEval *)data;
 
-    switch (event->type)
+    തിരഞ്ഞെടുപ്പ് (event->type)
     {
-	case GDK_KEY_PRESS:
-	    key_event(beval, event->key.keyval, TRUE);
-	    break;
-	case GDK_KEY_RELEASE:
-	    key_event(beval, event->key.keyval, FALSE);
-	    break;
-	case GDK_LEAVE_NOTIFY:
+	അവസ്ഥ GDK_താക്കോൽ_PRESS:
+	    താക്കോൽ_event(beval, event->താക്കോൽ.keyval, TRUE);
+	    നിർത്തുക;
+	അവസ്ഥ GDK_താക്കോൽ_RELEASE:
+	    താക്കോൽ_event(beval, event->താക്കോൽ.keyval, FALSE);
+	    നിർത്തുക;
+	അവസ്ഥ GDK_LEAVE_NOTIFY:
 	    // Ignore LeaveNotify events that are not "normal".
 	    // Apparently we also get it when somebody else grabs focus.
-	    if (event->crossing.mode == GDK_CROSSING_NORMAL)
+	    എങ്കിൽ (event->crossing.mode == GDK_CROSSING_NORMAL)
 		cancelBalloon(beval);
-	    break;
-	default:
-	    break;
+	    നിർത്തുക;
+	സ്ഥിരസ്ഥിതി:
+	    നിർത്തുക;
     }
 
-    return FALSE; // continue emission
+    തിരികെ FALSE; // continue emission
 }
 #  endif
 
-    static void
-pointer_event(BalloonEval *beval, int x, int y, unsigned state)
+    സ്ഥിതം ശൂന്യം
+pointer_event(BalloonEval *beval, പൂർണ്ണസംഖ്യ x, പൂർണ്ണസംഖ്യ y, unsigned state)
 {
-    int distance;
+    പൂർണ്ണസംഖ്യ distance;
 
     distance = ABS(x - beval->x) + ABS(y - beval->y);
 
-    if (distance <= 4)
-	return;
+    എങ്കിൽ (distance <= 4)
+	തിരികെ;
 
     /*
      * Moved out of the balloon location: cancel it.
@@ -474,77 +474,77 @@ pointer_event(BalloonEval *beval, int x, int y, unsigned state)
     cancelBalloon(beval);
 
     // Mouse buttons are pressed - no balloon now
-    if (!(state & ((int)GDK_BUTTON1_MASK | (int)GDK_BUTTON2_MASK
-		    | (int)GDK_BUTTON3_MASK)))
+    എങ്കിൽ (!(state & ((പൂർണ്ണസംഖ്യ)GDK_BUTTON1_MASK | (പൂർണ്ണസംഖ്യ)GDK_BUTTON2_MASK
+		    | (പൂർണ്ണസംഖ്യ)GDK_BUTTON3_MASK)))
     {
 	beval->x = x;
 	beval->y = y;
 
 #  ifdef USE_GTK4
-	if (state & (int)GDK_ALT_MASK)
-#  else
-	if (state & (int)GDK_MOD1_MASK)
+	എങ്കിൽ (state & (പൂർണ്ണസംഖ്യ)GDK_ALT_MASK)
+#  അല്ലെങ്കിൽ
+	എങ്കിൽ (state & (പൂർണ്ണസംഖ്യ)GDK_MOD1_MASK)
 #  endif
 	{
 	    /*
 	     * Alt is pressed -- enter super-evaluate-mode,
 	     * where there is no time delay
 	     */
-	    if (beval->msgCB != NULL)
+	    എങ്കിൽ (beval->സന്ദേശം_CB != ശൂന്യ)
 	    {
 		beval->showState = ShS_PENDING;
-		(*beval->msgCB)(beval, state);
+		(*beval->സന്ദേശം_CB)(beval, state);
 	    }
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    beval->timerID = g_timeout_add((guint)p_bdlay, &timeout_cb, beval);
 	}
     }
 }
 
-    static void
-key_event(BalloonEval *beval, unsigned keyval, int is_keypress)
+    സ്ഥിതം ശൂന്യം
+താക്കോൽ_event(BalloonEval *beval, unsigned keyval, പൂർണ്ണസംഖ്യ is_keypress)
 {
-    if (beval->showState == ShS_SHOWING && beval->msgCB != NULL)
+    എങ്കിൽ (beval->showState == ShS_SHOWING && beval->സന്ദേശം_CB != ശൂന്യ)
     {
-	switch (keyval)
+	തിരഞ്ഞെടുപ്പ് (keyval)
 	{
 #  ifdef USE_GTK4
-	    case GDK_KEY_Shift_L:
-	    case GDK_KEY_Shift_R:
-#  else
-	    case GDK_Shift_L:
-	    case GDK_Shift_R:
+	    അവസ്ഥ GDK_താക്കോൽ_Shift_L:
+	    അവസ്ഥ GDK_താക്കോൽ_Shift_R:
+#  അല്ലെങ്കിൽ
+	    അവസ്ഥ GDK_Shift_L:
+	    അവസ്ഥ GDK_Shift_R:
 #  endif
 		beval->showState = ShS_UPDATE_PENDING;
-		(*beval->msgCB)(beval, (is_keypress)
-						   ? (int)GDK_SHIFT_MASK : 0);
-		break;
+		(*beval->സന്ദേശം_CB)(beval, (is_keypress)
+						   ? (പൂർണ്ണസംഖ്യ)GDK_SHIFT_MASK : 0);
+		നിർത്തുക;
 #  ifdef USE_GTK4
-	    case GDK_KEY_Control_L:
-	    case GDK_KEY_Control_R:
-#  else
-	    case GDK_Control_L:
-	    case GDK_Control_R:
+	    അവസ്ഥ GDK_താക്കോൽ_Control_L:
+	    അവസ്ഥ GDK_താക്കോൽ_Control_R:
+#  അല്ലെങ്കിൽ
+	    അവസ്ഥ GDK_Control_L:
+	    അവസ്ഥ GDK_Control_R:
 #  endif
 		beval->showState = ShS_UPDATE_PENDING;
-		(*beval->msgCB)(beval, (is_keypress)
-						 ? (int)GDK_CONTROL_MASK : 0);
-		break;
-	    default:
+		(*beval->സന്ദേശം_CB)(beval, (is_keypress)
+						 ? (പൂർണ്ണസംഖ്യ)GDK_CONTROL_MASK : 0);
+		നിർത്തുക;
+	    സ്ഥിരസ്ഥിതി:
 		// Don't do this for key release, we apparently get these with
 		// focus changes in some GTK version.
-		if (is_keypress)
+		എങ്കിൽ (is_keypress)
 		    cancelBalloon(beval);
-		break;
+		നിർത്തുക;
 	}
     }
-    else
+    അല്ലെങ്കിൽ
 	cancelBalloon(beval);
 }
 
-    static gboolean
+    സ്ഥിതം gboolean
 timeout_cb(gpointer data)
 {
     BalloonEval *beval = (BalloonEval *)data;
@@ -557,21 +557,21 @@ timeout_cb(gpointer data)
      */
     requestBalloon(beval);
 
-    return FALSE; // don't call me again
+    തിരികെ FALSE; // don't call me again
 }
 
 #  ifndef USE_GTK4
-#   if GTK_CHECK_VERSION(3,0,0)
-    static gboolean
+#   എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
+    സ്ഥിതം gboolean
 balloon_draw_event_cb(GtkWidget *widget,
 		      cairo_t	*cr,
 		      gpointer	 data UNUSED)
 {
-    GtkStyleContext *context = NULL;
+    GtkStyleContext *context = ശൂന്യ;
     gint width = -1, height = -1;
 
-    if (widget == NULL)
-	return TRUE;
+    എങ്കിൽ (widget == ശൂന്യ)
+	തിരികെ TRUE;
 
     context = gtk_widget_get_style_context(widget);
     width = gtk_widget_get_allocated_width(widget);
@@ -589,10 +589,10 @@ balloon_draw_event_cb(GtkWidget *widget,
 
     gtk_style_context_restore(context);
 
-    return FALSE;
+    തിരികെ FALSE;
 }
-#   else
-    static gint
+#   അല്ലെങ്കിൽ
+    സ്ഥിതം gint
 balloon_expose_event_cb(GtkWidget *widget,
 			GdkEventExpose *event,
 			gpointer data UNUSED)
@@ -602,31 +602,31 @@ balloon_expose_event_cb(GtkWidget *widget,
 		       &event->area, widget, "tooltip",
 		       0, 0, -1, -1);
 
-    return FALSE; // continue emission
+    തിരികെ FALSE; // continue emission
 }
 #   endif // !GTK_CHECK_VERSION(3,0,0)
 #  endif
 
-# else // !FEAT_GUI_GTK
+# അല്ലെങ്കിൽ // !FEAT_GUI_GTK
 
-    static void
+    സ്ഥിതം ശൂന്യം
 addEventHandler(Widget target, BalloonEval *beval)
 {
     XtAddEventHandler(target,
 			PointerMotionMask | EnterWindowMask |
-			LeaveWindowMask | ButtonPressMask | KeyPressMask |
-			KeyReleaseMask,
+			LeaveWindowMask | ButtonPressMask | താക്കോൽ_Press_Mask |
+			താക്കോൽ_Release_Mask,
 			False,
 			pointerEventEH, (XtPointer)beval);
 }
 
-    static void
+    സ്ഥിതം ശൂന്യം
 removeEventHandler(BalloonEval *beval)
 {
     XtRemoveEventHandler(beval->target,
 			PointerMotionMask | EnterWindowMask |
-			LeaveWindowMask | ButtonPressMask | KeyPressMask |
-			KeyReleaseMask,
+			LeaveWindowMask | ButtonPressMask | താക്കോൽ_Press_Mask |
+			താക്കോൽ_Release_Mask,
 			False,
 			pointerEventEH, (XtPointer)beval);
 }
@@ -635,7 +635,7 @@ removeEventHandler(BalloonEval *beval)
 /*
  * The X event handler. All it does is call the real event handler.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 pointerEventEH(
     Widget	w UNUSED,
     XtPointer	client_data,
@@ -652,37 +652,37 @@ pointerEventEH(
  * interested in occurs.
  */
 
-    static void
+    സ്ഥിതം ശൂന്യം
 pointerEvent(BalloonEval *beval, XEvent *event)
 {
     Position	distance;	    // a measure of how much the pointer moved
     Position	delta;		    // used to compute distance
 
-    switch (event->type)
+    തിരഞ്ഞെടുപ്പ് (event->type)
     {
-	case EnterNotify:
-	case MotionNotify:
+	അവസ്ഥ EnterNotify:
+	അവസ്ഥ MotionNotify:
 	    delta = event->xmotion.x - beval->x;
-	    if (delta < 0)
+	    എങ്കിൽ (delta < 0)
 		delta = -delta;
 	    distance = delta;
 	    delta = event->xmotion.y - beval->y;
-	    if (delta < 0)
+	    എങ്കിൽ (delta < 0)
 		delta = -delta;
 	    distance += delta;
-	    if (distance > 4)
+	    എങ്കിൽ (distance > 4)
 	    {
 		/*
 		 * Moved out of the balloon location: cancel it.
 		 * Remember button state
 		 */
 		beval->state = event->xmotion.state;
-		if (beval->state & (Button1Mask|Button2Mask|Button3Mask))
+		എങ്കിൽ (beval->state & (Button1Mask|Button2Mask|Button3Mask))
 		{
 		    // Mouse buttons are pressed - no balloon now
 		    cancelBalloon(beval);
 		}
-		else if (beval->state & (Mod1Mask|Mod2Mask|Mod3Mask))
+		അല്ലെങ്കിൽ എങ്കിൽ (beval->state & (Mod1Mask|Mod2Mask|Mod3Mask))
 		{
 		    /*
 		     * Alt is pressed -- enter super-evaluate-mode,
@@ -690,106 +690,106 @@ pointerEvent(BalloonEval *beval, XEvent *event)
 		     */
 		    beval->x = event->xmotion.x;
 		    beval->y = event->xmotion.y;
-		    beval->x_root = event->xmotion.x_root;
-		    beval->y_root = event->xmotion.y_root;
+		    beval->x_വേര് = event->xmotion.x_വേര്;
+		    beval->y_വേര് = event->xmotion.y_വേര്;
 		    cancelBalloon(beval);
-		    if (beval->msgCB != NULL)
+		    എങ്കിൽ (beval->സന്ദേശം_CB != ശൂന്യ)
 		    {
 			beval->showState = ShS_PENDING;
-			(*beval->msgCB)(beval, beval->state);
+			(*beval->സന്ദേശം_CB)(beval, beval->state);
 		    }
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
 		    beval->x = event->xmotion.x;
 		    beval->y = event->xmotion.y;
-		    beval->x_root = event->xmotion.x_root;
-		    beval->y_root = event->xmotion.y_root;
+		    beval->x_വേര് = event->xmotion.x_വേര്;
+		    beval->y_വേര് = event->xmotion.y_വേര്;
 		    cancelBalloon(beval);
 		    beval->timerID = XtAppAddTimeOut( beval->appContext,
 					(long_u)p_bdlay, timerRoutine, beval);
 		}
 	    }
-	    break;
+	    നിർത്തുക;
 
 	/*
 	 * Motif version: Keystrokes will be caught by the
 	 * "textArea" widget, and handled in gui_x11_key_hit_cb().
 	 */
-	case KeyPress:
-	    if (beval->showState == ShS_SHOWING && beval->msgCB != NULL)
+	അവസ്ഥ താക്കോൽ_Press:
+	    എങ്കിൽ (beval->showState == ShS_SHOWING && beval->സന്ദേശം_CB != ശൂന്യ)
 	    {
 		Modifiers   modifier;
-		KeySym	    keysym;
+		താക്കോൽ_Sym	    keysym;
 
 		XtTranslateKeycode(gui.dpy,
 				       event->xkey.keycode, event->xkey.state,
 				       &modifier, &keysym);
-		if (keysym == XK_Shift_L || keysym == XK_Shift_R)
+		എങ്കിൽ (keysym == XK_Shift_L || keysym == XK_Shift_R)
 		{
 		    beval->showState = ShS_UPDATE_PENDING;
-		    (*beval->msgCB)(beval, ShiftMask);
+		    (*beval->സന്ദേശം_CB)(beval, ShiftMask);
 		}
-		else if (keysym == XK_Control_L || keysym == XK_Control_R)
+		അല്ലെങ്കിൽ എങ്കിൽ (keysym == XK_Control_L || keysym == XK_Control_R)
 		{
 		    beval->showState = ShS_UPDATE_PENDING;
-		    (*beval->msgCB)(beval, ControlMask);
+		    (*beval->സന്ദേശം_CB)(beval, ControlMask);
 		}
-		else
+		അല്ലെങ്കിൽ
 		    cancelBalloon(beval);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		cancelBalloon(beval);
-	    break;
+	    നിർത്തുക;
 
-	case KeyRelease:
-	    if (beval->showState == ShS_SHOWING && beval->msgCB != NULL)
+	അവസ്ഥ താക്കോൽ_Release:
+	    എങ്കിൽ (beval->showState == ShS_SHOWING && beval->സന്ദേശം_CB != ശൂന്യ)
 	    {
 		Modifiers modifier;
-		KeySym keysym;
+		താക്കോൽ_Sym keysym;
 
 		XtTranslateKeycode(gui.dpy, event->xkey.keycode,
 				event->xkey.state, &modifier, &keysym);
-		if ((keysym == XK_Shift_L) || (keysym == XK_Shift_R))
+		എങ്കിൽ ((keysym == XK_Shift_L) || (keysym == XK_Shift_R))
 		{
 		    beval->showState = ShS_UPDATE_PENDING;
-		    (*beval->msgCB)(beval, 0);
+		    (*beval->സന്ദേശം_CB)(beval, 0);
 		}
-		else if ((keysym == XK_Control_L) || (keysym == XK_Control_R))
+		അല്ലെങ്കിൽ എങ്കിൽ ((keysym == XK_Control_L) || (keysym == XK_Control_R))
 		{
 		    beval->showState = ShS_UPDATE_PENDING;
-		    (*beval->msgCB)(beval, 0);
+		    (*beval->സന്ദേശം_CB)(beval, 0);
 		}
-		else
+		അല്ലെങ്കിൽ
 		    cancelBalloon(beval);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		cancelBalloon(beval);
-	    break;
+	    നിർത്തുക;
 
-	case LeaveNotify:
+	അവസ്ഥ LeaveNotify:
 		// Ignore LeaveNotify events that are not "normal".
 		// Apparently we also get it when somebody else grabs focus.
 		// Happens for me every two seconds (some clipboard tool?)
-		if (event->xcrossing.mode == NotifyNormal)
+		എങ്കിൽ (event->xcrossing.mode == NotifyNormal)
 		    cancelBalloon(beval);
-		break;
+		നിർത്തുക;
 
-	case ButtonPress:
+	അവസ്ഥ ButtonPress:
 		cancelBalloon(beval);
-		break;
+		നിർത്തുക;
 
-	default:
-	    break;
+	സ്ഥിരസ്ഥിതി:
+	    നിർത്തുക;
     }
 }
 
-    static void
+    സ്ഥിതം ശൂന്യം
 timerRoutine(XtPointer dx, XtIntervalId *id UNUSED)
 {
     BalloonEval *beval = (BalloonEval *)dx;
 
-    beval->timerID = (XtIntervalId)NULL;
+    beval->timerID = (XtIntervalId)ശൂന്യ;
 
     /*
      * If the timer event happens then the mouse has stopped long enough for
@@ -801,19 +801,19 @@ timerRoutine(XtPointer dx, XtIntervalId *id UNUSED)
 
 # endif // !FEAT_GUI_GTK
 
-    static void
+    സ്ഥിതം ശൂന്യം
 requestBalloon(BalloonEval *beval)
 {
-    if (beval->showState == ShS_PENDING)
-	return;
+    എങ്കിൽ (beval->showState == ShS_PENDING)
+	തിരികെ;
 
     // Determine the beval to display
-    if (beval->msgCB != NULL)
+    എങ്കിൽ (beval->സന്ദേശം_CB != ശൂന്യ)
     {
 	beval->showState = ShS_PENDING;
-	(*beval->msgCB)(beval, beval->state);
+	(*beval->സന്ദേശം_CB)(beval, beval->state);
     }
-    else if (beval->msg != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (beval->സന്ദേശം != ശൂന്യ)
 	drawBalloon(beval);
 }
 
@@ -826,50 +826,50 @@ requestBalloon(BalloonEval *beval)
  */
 #  define IS_NONPRINTABLE(c) (((c) < 0x20 && (c) != TAB && (c) != NL) \
 			      || (c) == DEL)
-    static void
+    സ്ഥിതം ശൂന്യം
 set_printable_label_text(GtkLabel *label, char_u *text)
 {
-    char_u	    *convbuf = NULL;
+    char_u	    *convbuf = ശൂന്യ;
     char_u	    *buf;
     char_u	    *p;
     char_u	    *pdest;
-    unsigned int    len;
-    int		    charlen;
-    int		    uc;
+    unsigned പൂർണ്ണസംഖ്യ    len;
+    പൂർണ്ണസംഖ്യ		    charlen;
+    പൂർണ്ണസംഖ്യ		    uc;
     PangoAttrList   *attr_list;
 
     // Convert to UTF-8 if it isn't already
-    if (output_conv.vc_type != CONV_NONE)
+    എങ്കിൽ (output_conv.vc_type != CONV_NONE)
     {
-	convbuf = string_convert(&output_conv, text, NULL);
-	if (convbuf != NULL)
+	convbuf = string_convert(&output_conv, text, ശൂന്യ);
+	എങ്കിൽ (convbuf != ശൂന്യ)
 	    text = convbuf;
     }
 
     // First let's see how much we need to allocate
     len = 0;
-    for (p = text; *p != NUL; p += charlen)
+    വേണ്ടി (p = text; *p != NUL; p += charlen)
     {
-	if ((*p & 0x80) == 0)	// be quick for ASCII
+	എങ്കിൽ ((*p & 0x80) == 0)	// be quick for ASCII
 	{
 	    charlen = 1;
 	    len += IS_NONPRINTABLE(*p) ? 2 : 1;	// nonprintable: ^X
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    charlen = utf_ptr2len(p);
 	    uc = utf_ptr2char(p);
 
-	    if (charlen != utf_char2len(uc))
+	    എങ്കിൽ (charlen != utf_char2len(uc))
 		charlen = 1; // reject overlong sequences
 
-	    if (charlen == 1 || uc < 0xa0)	// illegal byte or
+	    എങ്കിൽ (charlen == 1 || uc < 0xa0)	// illegal byte or
 		len += 4;			// control char: <xx>
-	    else if (!utf_printable(uc))
+	    അല്ലെങ്കിൽ എങ്കിൽ (!utf_printable(uc))
 		// Note: we assume here that utf_printable() doesn't
 		// care about characters outside the BMP.
 		len += 6;			// nonprintable: <xxxx>
-	    else
+	    അല്ലെങ്കിൽ
 		len += charlen;
 	}
     }
@@ -878,112 +878,112 @@ set_printable_label_text(GtkLabel *label, char_u *text)
     buf = alloc(len + 1);
 
     // Now go for the real work
-    if (buf != NULL)
+    എങ്കിൽ (buf != ശൂന്യ)
     {
 	attrentry_T	*aep;
 	PangoAttribute	*attr;
 	guicolor_T	pixel;
-#  if GTK_CHECK_VERSION(3,0,0)
+#  എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
 	GdkRGBA		color = { 0.0, 0.0, 0.0, 1.0 };
-#   if PANGO_VERSION_CHECK(1,38,0)
+#   എങ്കിൽ PANGO_VERSION_CHECK(1,38,0)
 	PangoAttribute  *attr_alpha;
 #   endif
-#  else
+#  അല്ലെങ്കിൽ
 	GdkColor	color = { 0, 0, 0, 0 };
 #  endif
 
 	// Look up the RGB values of the SpecialKey foreground color.
 	aep = syn_gui_attr2entry(HL_ATTR(HLF_8));
-	pixel = (aep != NULL) ? aep->ae_u.gui.fg_color : INVALCOLOR;
-	if (pixel != INVALCOLOR)
-#  if GTK_CHECK_VERSION(3,0,0)
+	pixel = (aep != ശൂന്യ) ? aep->ae_u.gui.fg_color : INVALCOLOR;
+	എങ്കിൽ (pixel != INVALCOLOR)
+#  എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
 	{
 	    color.red = ((pixel & 0xff0000) >> 16) / 255.0;
 	    color.green = ((pixel & 0xff00) >> 8) / 255.0;
 	    color.blue = (pixel & 0xff) / 255.0;
 	    color.alpha = 1.0;
 	}
-#  else
+#  അല്ലെങ്കിൽ
 	    gdk_colormap_query_color(gtk_widget_get_colormap(gui.drawarea),
 				     (unsigned long)pixel, &color);
 #  endif
 
 	pdest = buf;
 	p = text;
-	while (*p != NUL)
+	ആകുമ്പോൾ (*p != NUL)
 	{
 	    // Be quick for ASCII
-	    if ((*p & 0x80) == 0 && !IS_NONPRINTABLE(*p))
+	    എങ്കിൽ ((*p & 0x80) == 0 && !IS_NONPRINTABLE(*p))
 	    {
 		*pdest++ = *p++;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		charlen = utf_ptr2len(p);
 		uc = utf_ptr2char(p);
 
-		if (charlen != utf_char2len(uc))
+		എങ്കിൽ (charlen != utf_char2len(uc))
 		    charlen = 1; // reject overlong sequences
 
-		if (charlen == 1 || uc < 0xa0 || !utf_printable(uc))
+		എങ്കിൽ (charlen == 1 || uc < 0xa0 || !utf_printable(uc))
 		{
-		    int	outlen;
+		    പൂർണ്ണസംഖ്യ	outlen;
 
 		    // Careful: we can't just use transchar_byte() here,
 		    // since 'encoding' is not necessarily set to "utf-8".
-		    if (*p & 0x80 && charlen == 1)
+		    എങ്കിൽ (*p & 0x80 && charlen == 1)
 		    {
 			transchar_hex(pdest, *p);	// <xx>
 			outlen = 4;
 		    }
-		    else if (uc >= 0x80)
+		    അല്ലെങ്കിൽ എങ്കിൽ (uc >= 0x80)
 		    {
 			// Note: we assume here that utf_printable() doesn't
 			// care about characters outside the BMP.
 			transchar_hex(pdest, uc);	// <xx> or <xxxx>
 			outlen = (uc < 0x100) ? 4 : 6;
 		    }
-		    else
+		    അല്ലെങ്കിൽ
 		    {
 			transchar_nonprint(curbuf, pdest, *p);	// ^X
 			outlen = 2;
 		    }
-		    if (pixel != INVALCOLOR)
+		    എങ്കിൽ (pixel != INVALCOLOR)
 		    {
-#  if GTK_CHECK_VERSION(3,0,0)
+#  എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
 #   define DOUBLE2UINT16(val) ((guint16)((val) * 65535 + 0.5))
 			attr = pango_attr_foreground_new(
 				DOUBLE2UINT16(color.red),
 				DOUBLE2UINT16(color.green),
 				DOUBLE2UINT16(color.blue));
-#   if PANGO_VERSION_CHECK(1,38,0)
+#   എങ്കിൽ PANGO_VERSION_CHECK(1,38,0)
 			attr_alpha = pango_attr_foreground_alpha_new(
 				DOUBLE2UINT16(color.alpha));
 #   endif
 #   undef DOUBLE2UINT16
-#  else
+#  അല്ലെങ്കിൽ
 			attr = pango_attr_foreground_new(
 				color.red, color.green, color.blue);
 #  endif
 			attr->start_index = pdest - buf;
 			attr->end_index   = pdest - buf + outlen;
-			pango_attr_list_insert(attr_list, attr);
-#  if GTK_CHECK_VERSION(3,0,0)
-#   if PANGO_VERSION_CHECK(1,38,0)
+			pango_attr_list_തിരുകുക(attr_list, attr);
+#  എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
+#   എങ്കിൽ PANGO_VERSION_CHECK(1,38,0)
 			attr_alpha->start_index = pdest - buf;
 			attr_alpha->end_index   = pdest - buf + outlen;
-			pango_attr_list_insert(attr_list, attr_alpha);
+			pango_attr_list_തിരുകുക(attr_list, attr_alpha);
 #   endif
 #  endif
 		    }
 		    pdest += outlen;
 		    p += charlen;
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
-		    do
+		    ചെയ്യുക
 			*pdest++ = *p++;
-		    while (--charlen != 0);
+		    ആകുമ്പോൾ (--charlen != 0);
 		}
 	    }
 	}
@@ -992,7 +992,7 @@ set_printable_label_text(GtkLabel *label, char_u *text)
 
     vim_free(convbuf);
 
-    gtk_label_set_text(label, (const char *)buf);
+    gtk_label_set_text(label, (സ്ഥിരം അക്ഷരം *)buf);
     vim_free(buf);
 
     gtk_label_set_attributes(label, attr_list);
@@ -1004,16 +1004,16 @@ set_printable_label_text(GtkLabel *label, char_u *text)
  * Draw a balloon.
  */
 #  ifdef USE_GTK4
-    static void
+    സ്ഥിതം ശൂന്യം
 drawBalloon(BalloonEval *beval)
 {
     GdkRectangle    rect;
-    int		    natural_width = 0;
+    പൂർണ്ണസംഖ്യ		    natural_width = 0;
 
-    if (beval->msg == NULL)
-	return;
+    എങ്കിൽ (beval->സന്ദേശം == ശൂന്യ)
+	തിരികെ;
 
-    set_printable_label_text(GTK_LABEL(beval->balloonLabel), beval->msg);
+    set_printable_label_text(GTK_LABEL(beval->balloonLabel), beval->സന്ദേശം);
 
     rect.x = beval->x;
     rect.y = beval->y;
@@ -1024,7 +1024,7 @@ drawBalloon(BalloonEval *beval)
     // events, making pressing alt (to force show beval) and moving cursor
     // around feel smooth.
     gtk_widget_measure(beval->balloonLabel, GTK_ORIENTATION_HORIZONTAL, -1,
-	    NULL, &natural_width, NULL, NULL);
+	    ശൂന്യ, &natural_width, ശൂന്യ, ശൂന്യ);
 
     rect.width = (natural_width > 0 ? natural_width : 1) + gui.char_width * 3;
     rect.height = gui.char_height;
@@ -1035,25 +1035,25 @@ drawBalloon(BalloonEval *beval)
     beval->showState = ShS_SHOWING;
     gui_mch_update();
 }
-#  else
-    static void
+#  അല്ലെങ്കിൽ
+    സ്ഥിതം ശൂന്യം
 drawBalloon(BalloonEval *beval)
 {
-    if (beval->msg == NULL)
-	return;
+    എങ്കിൽ (beval->സന്ദേശം == ശൂന്യ)
+	തിരികെ;
 
     GtkRequisition	requisition;
-    int		screen_w;
-    int		screen_h;
-    int		screen_x;
-    int		screen_y;
-    int		x;
-    int		y;
-    int		x_offset = EVAL_OFFSET_X;
-    int		y_offset = EVAL_OFFSET_Y;
+    പൂർണ്ണസംഖ്യ		screen_w;
+    പൂർണ്ണസംഖ്യ		screen_h;
+    പൂർണ്ണസംഖ്യ		screen_x;
+    പൂർണ്ണസംഖ്യ		screen_y;
+    പൂർണ്ണസംഖ്യ		x;
+    പൂർണ്ണസംഖ്യ		y;
+    പൂർണ്ണസംഖ്യ		x_offset = EVAL_OFFSET_X;
+    പൂർണ്ണസംഖ്യ		y_offset = EVAL_OFFSET_Y;
     PangoLayout	*layout;
 
-#   if !GTK_CHECK_VERSION(3,22,2)
+#   എങ്കിൽ !GTK_CHECK_VERSION(3,22,2)
     GdkScreen	*screen;
 
     screen = gtk_widget_get_screen(beval->target);
@@ -1061,12 +1061,12 @@ drawBalloon(BalloonEval *beval)
 #   endif
     gui_gtk_get_screen_geom_of_win(beval->target, 0, 0,
 	    &screen_x, &screen_y, &screen_w, &screen_h);
-#   if !GTK_CHECK_VERSION(3,0,0)
+#   എങ്കിൽ !GTK_CHECK_VERSION(3,0,0)
     gtk_widget_ensure_style(beval->balloonShell);
     gtk_widget_ensure_style(beval->balloonLabel);
 #   endif
 
-    set_printable_label_text(GTK_LABEL(beval->balloonLabel), beval->msg);
+    set_printable_label_text(GTK_LABEL(beval->balloonLabel), beval->സന്ദേശം);
     /*
      * Dirty trick:  Enable wrapping mode on the label's layout behind its
      * back.  This way GtkLabel won't try to constrain the wrap width to a
@@ -1075,19 +1075,19 @@ drawBalloon(BalloonEval *beval)
     layout = gtk_label_get_layout(GTK_LABEL(beval->balloonLabel));
 #   ifdef PANGO_WRAP_WORD_CHAR
     pango_layout_set_wrap(layout, PANGO_WRAP_WORD_CHAR);
-#   else
+#   അല്ലെങ്കിൽ
     pango_layout_set_wrap(layout, PANGO_WRAP_WORD);
 #   endif
     pango_layout_set_width(layout,
 	    // try to come up with some reasonable width
-	    PANGO_SCALE * CLAMP(gui.num_cols * gui.char_width,
+	    PANGO_SCALE * CLAMP(gui.അക്കം_cols * gui.char_width,
 		screen_w / 2,
 		MAX(20, screen_w - 20)));
 
     // Calculate the balloon's width and height.
-#   if GTK_CHECK_VERSION(3,0,0)
-    gtk_widget_get_preferred_size(beval->balloonShell, &requisition, NULL);
-#   else
+#   എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
+    gtk_widget_get_preferred_size(beval->balloonShell, &requisition, ശൂന്യ);
+#   അല്ലെങ്കിൽ
     gtk_widget_size_request(beval->balloonShell, &requisition);
 #   endif
 
@@ -1097,9 +1097,9 @@ drawBalloon(BalloonEval *beval)
     y += beval->y;
 
     // Get out of the way of the mouse pointer
-    if (x + x_offset + requisition.width > screen_x + screen_w)
+    എങ്കിൽ (x + x_offset + requisition.width > screen_x + screen_w)
 	y_offset += 15;
-    if (y + y_offset + requisition.height > screen_y + screen_h)
+    എങ്കിൽ (y + y_offset + requisition.height > screen_y + screen_h)
 	y_offset = -requisition.height - EVAL_OFFSET_Y;
 
     // Sanitize values
@@ -1109,9 +1109,9 @@ drawBalloon(BalloonEval *beval)
 	    MAX(0, screen_y + screen_h - requisition.height));
 
     // Show the balloon
-#   if GTK_CHECK_VERSION(3,0,0)
+#   എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
     gtk_window_move(GTK_WINDOW(beval->balloonShell), x, y);
-#   else
+#   അല്ലെങ്കിൽ
     gtk_widget_set_uposition(beval->balloonShell, x, y);
 #   endif
     gtk_widget_show(beval->balloonShell);
@@ -1124,26 +1124,26 @@ drawBalloon(BalloonEval *beval)
 /*
  * Undraw a balloon.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 undrawBalloon(BalloonEval *beval)
 {
-    if (beval->balloonShell != NULL)
+    എങ്കിൽ (beval->balloonShell != ശൂന്യ)
 #  ifdef USE_GTK4
 	gtk_popover_popdown(GTK_POPOVER(beval->balloonShell));
-#  else
+#  അല്ലെങ്കിൽ
 	gtk_widget_hide(beval->balloonShell);
 #  endif
     beval->showState = ShS_NEUTRAL;
 }
 
-    static void
+    സ്ഥിതം ശൂന്യം
 cancelBalloon(BalloonEval *beval)
 {
-    if (beval->showState == ShS_SHOWING
+    എങ്കിൽ (beval->showState == ShS_SHOWING
 	    || beval->showState == ShS_UPDATE_PENDING)
 	undrawBalloon(beval);
 
-    if (beval->timerID != 0)
+    എങ്കിൽ (beval->timerID != 0)
     {
 	g_source_remove(beval->timerID);
 	beval->timerID = 0;
@@ -1152,7 +1152,7 @@ cancelBalloon(BalloonEval *beval)
 }
 
 #  ifdef USE_GTK4
-    static void
+    സ്ഥിതം ശൂന്യം
 createBalloonEvalWindow(BalloonEval *beval)
 {
     GtkWidget *popover = gtk_popover_new();
@@ -1164,17 +1164,17 @@ createBalloonEvalWindow(BalloonEval *beval)
     // Don't make popover grab focus
     gtk_popover_set_autohide(GTK_POPOVER(popover), FALSE);
 
-    beval->balloonLabel = gtk_label_new(NULL);
+    beval->balloonLabel = gtk_label_new(ശൂന്യ);
 
     gtk_label_set_wrap(GTK_LABEL(beval->balloonLabel), FALSE);
-    gtk_label_set_justify(GTK_LABEL(beval->balloonLabel), GTK_JUSTIFY_LEFT);
+    gtk_label_set_justify(GTK_LABEL(beval->balloonLabel), GTK_JUSTIFY_ഇടത്);
     gtk_label_set_xalign(GTK_LABEL(beval->balloonLabel), 0.5);
     gtk_label_set_yalign(GTK_LABEL(beval->balloonLabel), 0.5);
 
     gtk_popover_set_child(GTK_POPOVER(popover), beval->balloonLabel);
 }
-#  else
-    static void
+#  അല്ലെങ്കിൽ
+    സ്ഥിതം ശൂന്യം
 createBalloonEvalWindow(BalloonEval *beval)
 {
     beval->balloonShell = gtk_window_new(GTK_WINDOW_POPUP);
@@ -1185,28 +1185,28 @@ createBalloonEvalWindow(BalloonEval *beval)
     gtk_widget_set_name(beval->balloonShell, "gtk-tooltips");
     gtk_container_set_border_width(GTK_CONTAINER(beval->balloonShell), 4);
 
-#   if GTK_CHECK_VERSION(3,0,0)
+#   എങ്കിൽ GTK_CHECK_VERSION(3,0,0)
     g_signal_connect(G_OBJECT(beval->balloonShell), "draw",
-	    G_CALLBACK(balloon_draw_event_cb), NULL);
-#   else
+	    G_CALLBACK(balloon_draw_event_cb), ശൂന്യ);
+#   അല്ലെങ്കിൽ
     gtk_signal_connect((GtkObject*)(beval->balloonShell), "expose_event",
-	    GTK_SIGNAL_FUNC(balloon_expose_event_cb), NULL);
+	    GTK_SIGNAL_FUNC(balloon_expose_event_cb), ശൂന്യ);
 #   endif
-    beval->balloonLabel = gtk_label_new(NULL);
+    beval->balloonLabel = gtk_label_new(ശൂന്യ);
 
-    gtk_label_set_line_wrap(GTK_LABEL(beval->balloonLabel), FALSE);
-    gtk_label_set_justify(GTK_LABEL(beval->balloonLabel), GTK_JUSTIFY_LEFT);
-#   if GTK_CHECK_VERSION(3,16,0)
+    gtk_label_set_വരി_wrap(GTK_LABEL(beval->balloonLabel), FALSE);
+    gtk_label_set_justify(GTK_LABEL(beval->balloonLabel), GTK_JUSTIFY_ഇടത്);
+#   എങ്കിൽ GTK_CHECK_VERSION(3,16,0)
     gtk_label_set_xalign(GTK_LABEL(beval->balloonLabel), 0.5);
     gtk_label_set_yalign(GTK_LABEL(beval->balloonLabel), 0.5);
 #   elif GTK_CHECK_VERSION(3,14,0)
-    GValue align_val = G_VALUE_INIT;
-    g_value_init(&align_val, G_TYPE_FLOAT);
-    g_value_set_float(&align_val, 0.5);
+    GValue align_val = G_മൂല്യം_INIT;
+    g_മൂല്യം_init(&align_val, G_TYPE_FLOAT);
+    g_മൂല്യം_set_float(&align_val, 0.5);
     g_object_set_property(G_OBJECT(beval->balloonLabel), "xalign", &align_val);
     g_object_set_property(G_OBJECT(beval->balloonLabel), "yalign", &align_val);
-    g_value_unset(&align_val);
-#   else
+    g_മൂല്യം_unset(&align_val);
+#   അല്ലെങ്കിൽ
     gtk_misc_set_alignment(GTK_MISC(beval->balloonLabel), 0.5f, 0.5f);
 #   endif
     gtk_widget_set_name(beval->balloonLabel, "vim-balloon-label");
@@ -1216,12 +1216,12 @@ createBalloonEvalWindow(BalloonEval *beval)
 }
 #  endif
 
-# else // !FEAT_GUI_GTK
+# അല്ലെങ്കിൽ // !FEAT_GUI_GTK
 
 /*
  * Draw a balloon.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 drawBalloon(BalloonEval *beval)
 {
     Dimension	w;
@@ -1229,8 +1229,8 @@ drawBalloon(BalloonEval *beval)
     Position tx;
     Position ty;
 
-    if (beval->msg == NULL)
-	return;
+    എങ്കിൽ (beval->സന്ദേശം == ശൂന്യ)
+	തിരികെ;
 
     XmString s;
     // Show the Balloon
@@ -1240,47 +1240,47 @@ drawBalloon(BalloonEval *beval)
     // For the callback function we parse NL characters to create a
     // multi-line label.  This doesn't work for all languages, but
     // XmStringCreateLocalized() doesn't do multi-line labels...
-    if (beval->msgCB != NULL)
-	s = XmStringCreateLtoR((char *)beval->msg, XmFONTLIST_DEFAULT_TAG);
-    else
-	s = XmStringCreateLocalized((char *)beval->msg);
+    എങ്കിൽ (beval->സന്ദേശം_CB != ശൂന്യ)
+	s = XmStringCreateLtoR((അക്ഷരം *)beval->സന്ദേശം, XmFONTLIST_DEFAULT_TAG);
+    അല്ലെങ്കിൽ
+	s = XmStringCreateLocalized((അക്ഷരം *)beval->സന്ദേശം);
     {
 	XmFontList fl;
 
 	fl = gui_motif_fontset2fontlist(&gui.tooltip_fontset);
-	if (fl == NULL)
+	എങ്കിൽ (fl == ശൂന്യ)
 	{
 	    XmStringFree(s);
-	    return;
+	    തിരികെ;
 	}
 	XmStringExtent(fl, s, &w, &h);
 	XmFontListFree(fl);
     }
     w += gui.border_offset << 1;
     h += gui.border_offset << 1;
-    XtVaSetValues(beval->balloonLabel, XmNlabelString, s, NULL);
+    Xt_Va_Set_മൂല്യങ്ങൾ(beval->balloonLabel, XmNlabelString, s, ശൂന്യ);
     XmStringFree(s);
 
     // Compute position of the balloon area
-    tx = beval->x_root + EVAL_OFFSET_X;
-    ty = beval->y_root + EVAL_OFFSET_Y;
-    if ((tx + w) > beval->screen_width)
+    tx = beval->x_വേര് + EVAL_OFFSET_X;
+    ty = beval->y_വേര് + EVAL_OFFSET_Y;
+    എങ്കിൽ ((tx + w) > beval->screen_width)
 	tx = beval->screen_width - w;
-    if ((ty + h) > beval->screen_height)
+    എങ്കിൽ ((ty + h) > beval->screen_height)
 	ty = beval->screen_height - h;
-    XtVaSetValues(beval->balloonShell,
+    Xt_Va_Set_മൂല്യങ്ങൾ(beval->balloonShell,
 	    XmNx, tx,
 	    XmNy, ty,
-	    NULL);
+	    ശൂന്യ);
     // Set tooltip colors
     {
 	Arg args[2];
 
 	args[0].name = XmNbackground;
-	args[0].value = gui.tooltip_bg_pixel;
+	args[0].മൂല്യം = gui.tooltip_bg_pixel;
 	args[1].name = XmNforeground;
-	args[1].value = gui.tooltip_fg_pixel;
-	XtSetValues(beval->balloonLabel, &args[0], XtNumber(args));
+	args[1].മൂല്യം = gui.tooltip_fg_pixel;
+	Xt_Set_മൂല്യങ്ങൾ(beval->balloonLabel, &args[0], Xt_സംഖ്യ(args));
     }
 
     XtPopup(beval->balloonShell, XtGrabNone);
@@ -1293,37 +1293,37 @@ drawBalloon(BalloonEval *beval)
 /*
  * Undraw a balloon.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 undrawBalloon(BalloonEval *beval)
 {
-    if (beval->balloonShell != (Widget)0)
+    എങ്കിൽ (beval->balloonShell != (Widget)0)
 	XtPopdown(beval->balloonShell);
     beval->showState = ShS_NEUTRAL;
 
-    current_beval = NULL;
+    current_beval = ശൂന്യ;
 }
 
-    static void
+    സ്ഥിതം ശൂന്യം
 cancelBalloon(BalloonEval *beval)
 {
-    if (beval->showState == ShS_SHOWING
+    എങ്കിൽ (beval->showState == ShS_SHOWING
 	    || beval->showState == ShS_UPDATE_PENDING)
 	undrawBalloon(beval);
 
-    if (beval->timerID != (XtIntervalId)NULL)
+    എങ്കിൽ (beval->timerID != (XtIntervalId)ശൂന്യ)
     {
 	XtRemoveTimeOut(beval->timerID);
-	beval->timerID = (XtIntervalId)NULL;
+	beval->timerID = (XtIntervalId)ശൂന്യ;
     }
     beval->showState = ShS_NEUTRAL;
 }
 
 
-    static void
+    സ്ഥിതം ശൂന്യം
 createBalloonEvalWindow(BalloonEval *beval)
 {
     Arg		args[12];
-    int		n;
+    പൂർണ്ണസംഖ്യ		n;
 
     n = 0;
     XtSetArg(args[n], XmNallowShellResize, True); n++;

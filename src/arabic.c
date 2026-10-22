@@ -28,9 +28,9 @@
  * Stand-Alone	- unicode form-B isolated
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-#if defined(FEAT_ARABIC)
+#എങ്കിൽ defined(FEAT_ARABIC)
 
 // Unicode values for Arabic characters.
 #define a_HAMZA				0x0621
@@ -98,7 +98,7 @@
 #define a_s_LAM_ALEF			0xfefb
 #define a_f_LAM_ALEF			0xfefc
 
-static struct achar {
+സ്ഥിതം ഘടന achar {
     unsigned c;
     unsigned isolated;
     unsigned initial;
@@ -167,153 +167,153 @@ static struct achar {
  * Find the struct achar pointer to the given Arabic char.
  * Returns NULL if not found.
  */
-    static struct achar *
-find_achar(int c)
+    സ്ഥിതം ഘടന achar *
+find_achar(പൂർണ്ണസംഖ്യ c)
 {
-    int h, m, l;
+    പൂർണ്ണസംഖ്യ h, m, l;
 
     // using binary search to find c
     h = ARRAY_LENGTH(achars);
     l = 0;
-    while (l < h)
+    ആകുമ്പോൾ (l < h)
     {
 	m = (h + l) / 2;
-	if (achars[m].c == (unsigned)c)
-	    return &achars[m];
-	if ((unsigned)c < achars[m].c)
+	എങ്കിൽ (achars[m].c == (unsigned)c)
+	    തിരികെ &achars[m];
+	എങ്കിൽ ((unsigned)c < achars[m].c)
 	    h = m;
-	else
+	അല്ലെങ്കിൽ
 	    l = m + 1;
     }
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
 /*
  * Change shape - from Combination (2 char) to an Isolated
  */
-    static int
-chg_c_laa2i(int hid_c)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+chg_c_laa2i(പൂർണ്ണസംഖ്യ hid_c)
 {
-    int tempc;
+    പൂർണ്ണസംഖ്യ tempc;
 
-    switch (hid_c)
+    തിരഞ്ഞെടുപ്പ് (hid_c)
     {
-	case a_ALEF_MADDA:
+	അവസ്ഥ a_ALEF_MADDA:
 	    tempc = a_s_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    നിർത്തുക;
+	അവസ്ഥ a_ALEF_HAMZA_ABOVE:
 	    tempc = a_s_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
+	    നിർത്തുക;
+	അവസ്ഥ a_ALEF_HAMZA_BELOW:
 	    tempc = a_s_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    നിർത്തുക;
+	അവസ്ഥ a_ALEF:
 	    tempc = a_s_LAM_ALEF;
-	    break;
-	default:
+	    നിർത്തുക;
+	സ്ഥിരസ്ഥിതി:
 	    tempc = 0;
     }
 
-    return tempc;
+    തിരികെ tempc;
 }
 
 /*
  * Change shape - from Combination-Isolated to Final
  */
-    static int
-chg_c_laa2f(int hid_c)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+chg_c_laa2f(പൂർണ്ണസംഖ്യ hid_c)
 {
-    int tempc;
+    പൂർണ്ണസംഖ്യ tempc;
 
-    switch (hid_c)
+    തിരഞ്ഞെടുപ്പ് (hid_c)
     {
-	case a_ALEF_MADDA:
+	അവസ്ഥ a_ALEF_MADDA:
 	    tempc = a_f_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    നിർത്തുക;
+	അവസ്ഥ a_ALEF_HAMZA_ABOVE:
 	    tempc = a_f_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
+	    നിർത്തുക;
+	അവസ്ഥ a_ALEF_HAMZA_BELOW:
 	    tempc = a_f_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    നിർത്തുക;
+	അവസ്ഥ a_ALEF:
 	    tempc = a_f_LAM_ALEF;
-	    break;
-	default:
+	    നിർത്തുക;
+	സ്ഥിരസ്ഥിതി:
 	    tempc = 0;
     }
 
-    return tempc;
+    തിരികെ tempc;
 }
 
 /*
  * Returns whether it is possible to join the given letters
  */
-    static int
-can_join(int c1, int c2)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+can_join(പൂർണ്ണസംഖ്യ c1, പൂർണ്ണസംഖ്യ c2)
 {
-    struct achar *a1 = find_achar(c1);
-    struct achar *a2 = find_achar(c2);
+    ഘടന achar *a1 = find_achar(c1);
+    ഘടന achar *a2 = find_achar(c2);
 
-    return a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
+    തിരികെ a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
 }
 
 /*
  * Check whether we are dealing with a character that could be regarded as an
  * Arabic combining character, need to check the character before this.
  */
-    int
-arabic_maycombine(int two)
+    പൂർണ്ണസംഖ്യ
+arabic_maycombine(പൂർണ്ണസംഖ്യ two)
 {
-    if (p_arshape && !p_tbidi)
-	return (two == a_ALEF_MADDA
+    എങ്കിൽ (p_arshape && !p_tbidi)
+	തിരികെ (two == a_ALEF_MADDA
 		    || two == a_ALEF_HAMZA_ABOVE
 		    || two == a_ALEF_HAMZA_BELOW
 		    || two == a_ALEF);
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
  * Check whether we are dealing with Arabic combining characters.
  * Note: these are NOT really composing characters!
  */
-    int
+    പൂർണ്ണസംഖ്യ
 arabic_combine(
-    int		one,	    // first character
-    int		two)	    // character just after "one"
+    പൂർണ്ണസംഖ്യ		one,	    // first character
+    പൂർണ്ണസംഖ്യ		two)	    // character just after "one"
 {
-    if (one == a_LAM)
-	return arabic_maycombine(two);
-    return FALSE;
+    എങ്കിൽ (one == a_LAM)
+	തിരികെ arabic_maycombine(two);
+    തിരികെ FALSE;
 }
 
 /*
  * A_is_iso returns true if 'c' is an Arabic ISO-8859-6 character
  *		(alphabet/number/punctuation)
  */
-    static int
-A_is_iso(int c)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+A_is_iso(പൂർണ്ണസംഖ്യ c)
 {
-    return find_achar(c) != NULL;
+    തിരികെ find_achar(c) != ശൂന്യ;
 }
 
 /*
  * A_is_ok returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  */
-    static int
-A_is_ok(int c)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+A_is_ok(പൂർണ്ണസംഖ്യ c)
 {
-    return (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
+    തിരികെ (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
 }
 
 /*
  * A_is_valid returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  *		with some exceptions/exclusions
  */
-    static int
-A_is_valid(int c)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+A_is_valid(പൂർണ്ണസംഖ്യ c)
 {
-    return (A_is_ok(c) && c != a_HAMZA);
+    തിരികെ (A_is_ok(c) && c != a_HAMZA);
 }
 
 /*
@@ -325,63 +325,63 @@ A_is_valid(int c)
  *		     (not shaped)
  * in:     "next_c"  is the next character (not shaped).
  */
-    int
+    പൂർണ്ണസംഖ്യ
 arabic_shape(
-    int		c,
-    int		*ccp,
-    int		*c1p,
-    int		prev_c,
-    int		prev_c1,
-    int		next_c)
+    പൂർണ്ണസംഖ്യ		c,
+    പൂർണ്ണസംഖ്യ		*ccp,
+    പൂർണ്ണസംഖ്യ		*c1p,
+    പൂർണ്ണസംഖ്യ		prev_c,
+    പൂർണ്ണസംഖ്യ		prev_c1,
+    പൂർണ്ണസംഖ്യ		next_c)
 {
-    int		curr_c;
-    int		curr_laa;
-    int		prev_laa;
+    പൂർണ്ണസംഖ്യ		curr_c;
+    പൂർണ്ണസംഖ്യ		curr_laa;
+    പൂർണ്ണസംഖ്യ		prev_laa;
 
     // Deal only with Arabic characters, pass back all others
-    if (!A_is_ok(c))
-	return c;
+    എങ്കിൽ (!A_is_ok(c))
+	തിരികെ c;
 
     curr_laa = arabic_combine(c, *c1p);
     prev_laa = arabic_combine(prev_c, prev_c1);
 
-    if (curr_laa)
+    എങ്കിൽ (curr_laa)
     {
-	if (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
+	എങ്കിൽ (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
 	    curr_c = chg_c_laa2f(*c1p);
-	else
+	അല്ലെങ്കിൽ
 	    curr_c = chg_c_laa2i(*c1p);
 
 	// Remove the composing character
 	*c1p = 0;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	struct achar *curr_a = find_achar(c);
-	int backward_combine = !prev_laa && can_join(prev_c, c);
-	int forward_combine = can_join(c, next_c);
+	ഘടന achar *curr_a = find_achar(c);
+	പൂർണ്ണസംഖ്യ backward_combine = !prev_laa && can_join(prev_c, c);
+	പൂർണ്ണസംഖ്യ forward_combine = can_join(c, next_c);
 
-	if (backward_combine)
+	എങ്കിൽ (backward_combine)
 	{
-	    if (forward_combine)
+	    എങ്കിൽ (forward_combine)
 		curr_c = curr_a->medial;
-	    else
+	    അല്ലെങ്കിൽ
 		curr_c = curr_a->final;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    if (forward_combine)
+	    എങ്കിൽ (forward_combine)
 		curr_c = curr_a->initial;
-	    else
+	    അല്ലെങ്കിൽ
 		curr_c = curr_a->isolated;
 	}
     }
 
     // Character missing from the table means using original character.
-    if (curr_c == NUL)
+    എങ്കിൽ (curr_c == NUL)
 	curr_c = c;
 
-    if (curr_c != c && ccp != NULL)
+    എങ്കിൽ (curr_c != c && ccp != ശൂന്യ)
     {
 	char_u buf[MB_MAXBYTES + 1];
 
@@ -391,6 +391,6 @@ arabic_shape(
     }
 
     // Return the shaped character
-    return curr_c;
+    തിരികെ curr_c;
 }
 #endif // FEAT_ARABIC

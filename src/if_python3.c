@@ -29,11 +29,11 @@
 // allocator
 // #define Py_DEBUG_NO_PYMALLOC
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-#include <limits.h>
+#അന്തര്ഭാവ <limits.h>
 
-#if defined(MSWIN) && defined(HAVE_FCNTL_H)
+#എങ്കിൽ defined(MSWIN) && defined(HAVE_FCNTL_H)
 # undef HAVE_FCNTL_H
 #endif
 
@@ -70,21 +70,21 @@
 # define USE_LIMITED_API // Using Python 3 limited ABI
 #endif
 
-#include <Python.h>
+#അന്തര്ഭാവ <Python.h>
 
-#undef main // Defined in python.h - aargh
+#undef പ്രധാന // Defined in python.h - aargh
 #undef HAVE_FCNTL_H // Clash with os_win32.h
 
 // The "surrogateescape" error handler is new in Python 3.1
-#if PY_VERSION_HEX >= 0x030100f0
+#എങ്കിൽ PY_VERSION_HEX >= 0x030100f0
 # define CODEC_ERROR_HANDLER "surrogateescape"
-#else
-# define CODEC_ERROR_HANDLER NULL
+#അല്ലെങ്കിൽ
+# define CODEC_ERROR_HANDLER ശൂന്യ
 #endif
 
 // Suppress Python 3.11 depreciations to see useful warnings
 #ifdef __GNUC__
-# pragma GCC diagnostic push
+# pragma GCC diagnostic തള്ളുക
 # pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
@@ -119,36 +119,36 @@
  * PySlice_GetIndicesEx(): first argument type changed from PySliceObject
  * to PyObject in Python 3.2 or later.
  */
-#if PY_VERSION_HEX >= 0x030200f0
-typedef PyObject PySliceObject_T;
-#else
-typedef PySliceObject PySliceObject_T;
+#എങ്കിൽ PY_VERSION_HEX >= 0x030200f0
+തരനിർവചനം PyObject PySliceObject_T;
+#അല്ലെങ്കിൽ
+തരനിർവചനം PySliceObject PySliceObject_T;
 #endif
 
 #ifndef MSWIN
-# define HINSTANCE void *
+# define HINSTANCE ശൂന്യം *
 #endif
-#if defined(DYNAMIC_PYTHON3) || defined(MSWIN)
-static HINSTANCE hinstPy3 = 0; // Instance of python.dll
+#എങ്കിൽ defined(DYNAMIC_PYTHON3) || defined(MSWIN)
+സ്ഥിതം HINSTANCE hinstPy3 = 0; // Instance of python.dll
 #endif
 
-#if defined(DYNAMIC_PYTHON3)
+#എങ്കിൽ defined(DYNAMIC_PYTHON3)
 
 # ifdef MSWIN
 #  define load_dll vimLoadLib
 #  define close_dll FreeLibrary
-#  define symbol_from_dll GetProcAddress
+#  define ചിഹ്നം_from_dll GetProcAddress
 #  define load_dll_error GetWin32Error
-# else
+# അല്ലെങ്കിൽ
 #  include <dlfcn.h>
-#  define FARPROC void*
-#  if defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)
+#  define FARPROC ശൂന്യം*
+#  എങ്കിൽ defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)
 #   define load_dll(n) dlopen((n), RTLD_LAZY)
-#  else
+#  അല്ലെങ്കിൽ
 #   define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
 #  endif
 #  define close_dll dlclose
-#  define symbol_from_dll dlsym
+#  define ചിഹ്നം_from_dll dlsym
 #  define load_dll_error dlerror
 # endif
 /*
@@ -180,7 +180,7 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PyLong_FromLong py3_PyLong_FromLong
 # define PyList_GetItem py3_PyList_GetItem
 # define PyList_Append py3_PyList_Append
-# define PyList_Insert py3_PyList_Insert
+# define Py_List_തിരുകുക py3_Py_List_തിരുകുക
 # define PyList_New py3_PyList_New
 # define PyList_SetItem py3_PyList_SetItem
 # define PyList_Size py3_PyList_Size
@@ -192,7 +192,7 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PySequence_Size py3_PySequence_Size
 # define PySequence_GetItem py3_PySequence_GetItem
 # define PySequence_Fast py3_PySequence_Fast
-# if PY_VERSION_HEX >= 0x030601f0
+# എങ്കിൽ PY_VERSION_HEX >= 0x030601f0
 #  define PySlice_AdjustIndices py3_PySlice_AdjustIndices
 #  define PySlice_Unpack py3_PySlice_Unpack
 # endif
@@ -204,10 +204,10 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PyDict_GetItemString py3_PyDict_GetItemString
 # define PyDict_Next py3_PyDict_Next
 # define PyMapping_Check py3_PyMapping_Check
-# ifndef PyMapping_Keys
-#  define PyMapping_Keys py3_PyMapping_Keys
+# ifndef Py_Mapping_താക്കോലുകൾ
+#  define Py_Mapping_താക്കോലുകൾ py3_Py_Mapping_താക്കോലുകൾ
 # endif
-# if (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
+# എങ്കിൽ (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
        (!defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x03080000)
 #  undef PyIter_Check
 #  define PyIter_Check py3_PyIter_Check
@@ -218,14 +218,14 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PyObject_GetItem py3_PyObject_GetItem
 # define PyObject_IsTrue py3_PyObject_IsTrue
 # define PyModule_GetDict py3_PyModule_GetDict
-# if defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
+# എങ്കിൽ defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
 #  define Py_IncRef py3_Py_IncRef
 #  define Py_DecRef py3_Py_DecRef
 # endif
 # ifdef USE_LIMITED_API
 #  define Py_CompileString py3_Py_CompileString
 #  define PyEval_EvalCode py3_PyEval_EvalCode
-# else
+# അല്ലെങ്കിൽ
 #  undef PyRun_SimpleString
 #  define PyRun_SimpleString py3_PyRun_SimpleString
 #  undef PyRun_String
@@ -235,9 +235,9 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PyObject_HasAttrString py3_PyObject_HasAttrString
 # define PyObject_SetAttrString py3_PyObject_SetAttrString
 # define PyObject_CallFunctionObjArgs py3_PyObject_CallFunctionObjArgs
-# if PY_VERSION_HEX >= 0x030d0000
+# എങ്കിൽ PY_VERSION_HEX >= 0x030d0000
 #  define PyObject_CallFunction py3_PyObject_CallFunction
-# else
+# അല്ലെങ്കിൽ
 #  define _PyObject_CallFunction_SizeT py3__PyObject_CallFunction_SizeT
 # endif
 # define PyObject_Call py3_PyObject_Call
@@ -247,11 +247,11 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PySys_GetObject py3_PySys_GetObject
 # define PySys_SetArgv py3_PySys_SetArgv
 # define PyType_Ready py3_PyType_Ready
-# if PY_VERSION_HEX >= 0x03040000
+# എങ്കിൽ PY_VERSION_HEX >= 0x03040000
 #  define PyType_GetFlags py3_PyType_GetFlags
 # endif
-# undef Py_BuildValue
-# define Py_BuildValue py3_Py_BuildValue
+# undef Py_Build_മൂല്യം
+# define Py_Build_മൂല്യം py3_Py_Build_മൂല്യം
 # define Py_SetPythonHome py3_Py_SetPythonHome
 # define Py_Initialize py3_Py_Initialize
 # define Py_Finalize py3_Py_Finalize
@@ -259,7 +259,7 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define _Py_NoneStruct (*py3__Py_NoneStruct)
 # define _Py_FalseStruct (*py3__Py_FalseStruct)
 # define _Py_TrueStruct (*py3__Py_TrueStruct)
-# if !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
+# എങ്കിൽ !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
 // Private symbol that used to be required as part of PyIter_Check.
 #  define _PyObject_NextNotImplemented (*py3__PyObject_NextNotImplemented)
 # endif
@@ -267,13 +267,13 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PyImport_AppendInittab py3_PyImport_AppendInittab
 # define PyImport_AddModule py3_PyImport_AddModule
 # ifdef USE_LIMITED_API
-#  if Py_LIMITED_API >= 0x030a0000
+#  എങ്കിൽ Py_LIMITED_API >= 0x030a0000
 #   define PyUnicode_AsUTF8AndSize py3_PyUnicode_AsUTF8AndSize
 #  endif
-# else
-#  if PY_VERSION_HEX >= 0x030300f0
+# അല്ലെങ്കിൽ
+#  എങ്കിൽ PY_VERSION_HEX >= 0x030300f0
 #   define PyUnicode_AsUTF8AndSize py3_PyUnicode_AsUTF8AndSize
-#  else
+#  അല്ലെങ്കിൽ
 #   define _PyUnicode_AsString py3__PyUnicode_AsString
 #  endif
 # endif
@@ -301,21 +301,21 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # endif
 # define PySlice_Type (*py3_PySlice_Type)
 # define PyFloat_Type (*py3_PyFloat_Type)
-# define PyNumber_Check (*py3_PyNumber_Check)
-# define PyNumber_Long (*py3_PyNumber_Long)
+# define Py_സംഖ്യ_Check (*py3_Py_സംഖ്യ_Check)
+# define Py_സംഖ്യ_Long (*py3_Py_സംഖ്യ_Long)
 # define PyBool_Type (*py3_PyBool_Type)
 # define PyErr_NewException py3_PyErr_NewException
 # ifdef Py_DEBUG
 #  define _Py_NegativeRefcount py3__Py_NegativeRefcount
 #  define _Py_RefTotal (*py3__Py_RefTotal)
 #  define PyModule_Create2TraceRefs py3_PyModule_Create2TraceRefs
-# else
+# അല്ലെങ്കിൽ
 #  define PyModule_Create2 py3_PyModule_Create2
 # endif
-# if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# എങ്കിൽ defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
 #  define _PyObject_DebugMalloc py3__PyObject_DebugMalloc
 #  define _PyObject_DebugFree py3__PyObject_DebugFree
-# else
+# അല്ലെങ്കിൽ
 #  define PyObject_Malloc py3_PyObject_Malloc
 #  define PyObject_Free py3_PyObject_Free
 # endif
@@ -329,10 +329,10 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # ifdef Py_UNICODE_USE_UCS_FUNCTIONS
 #  ifdef Py_UNICODE_WIDE
 #   define PyUnicodeUCS4_FromFormat py3_PyUnicodeUCS4_FromFormat
-#  else
+#  അല്ലെങ്കിൽ
 #   define PyUnicodeUCS2_FromFormat py3_PyUnicodeUCS2_FromFormat
 #  endif
-# else
+# അല്ലെങ്കിൽ
 #  define PyUnicode_FromFormat py3_PyUnicode_FromFormat
 # endif
 # undef PyUnicode_Decode
@@ -345,7 +345,7 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 #  define PyType_FromSpec py3_PyType_FromSpec
 # endif
 
-# if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# എങ്കിൽ defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
 #  undef PyObject_NEW
 #  define PyObject_NEW(type, typeobj) \
 ( (type *) PyObject_Init( \
@@ -359,203 +359,203 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 /*
  * Pointers for dynamic link
  */
-static int (*py3_PySys_SetArgv)(int, wchar_t **);
-static void (*py3_Py_SetPythonHome)(wchar_t *home);
-static void (*py3_Py_Initialize)(void);
-static PyObject* (*py3_PyList_New)(Py_ssize_t size);
-static PyGILState_STATE (*py3_PyGILState_Ensure)(void);
-static void (*py3_PyGILState_Release)(PyGILState_STATE);
-static int (*py3_PySys_SetObject)(char *, PyObject *);
-static PyObject* (*py3_PySys_GetObject)(char *);
-static int (*py3_PyList_Append)(PyObject *, PyObject *);
-static int (*py3_PyList_Insert)(PyObject *, int, PyObject *);
-static Py_ssize_t (*py3_PyList_Size)(PyObject *);
-static PyObject* (*py3_PyTuple_New)(Py_ssize_t size);
-static int (*py3_PyTuple_SetItem)(PyObject *, Py_ssize_t, PyObject *);
-static Py_ssize_t (*py3_PyTuple_Size)(PyObject *);
-static int (*py3_PySequence_Check)(PyObject *);
-static Py_ssize_t (*py3_PySequence_Size)(PyObject *);
-static PyObject* (*py3_PySequence_GetItem)(PyObject *, Py_ssize_t);
-static PyObject* (*py3_PySequence_Fast)(PyObject *, const char *);
-static PyObject* (*py3_PyTuple_GetItem)(PyObject *, Py_ssize_t);
-static int (*py3_PyMapping_Check)(PyObject *);
-static PyObject* (*py3_PyMapping_Keys)(PyObject *);
-# if PY_VERSION_HEX >= 0x030601f0
-static int (*py3_PySlice_AdjustIndices)(Py_ssize_t length,
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PySys_SetArgv)(പൂർണ്ണസംഖ്യ, wchar_t **);
+സ്ഥിതം ശൂന്യം (*py3_Py_SetPythonHome)(wchar_t *home);
+സ്ഥിതം ശൂന്യം (*py3_Py_Initialize)(ശൂന്യം);
+സ്ഥിതം PyObject* (*py3_PyList_New)(Py_ssize_t size);
+സ്ഥിതം PyGILState_STATE (*py3_PyGILState_Ensure)(ശൂന്യം);
+സ്ഥിതം ശൂന്യം (*py3_PyGILState_Release)(PyGILState_STATE);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PySys_SetObject)(അക്ഷരം *, PyObject *);
+സ്ഥിതം PyObject* (*py3_PySys_GetObject)(അക്ഷരം *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyList_Append)(PyObject *, PyObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_Py_List_തിരുകുക)(PyObject *, പൂർണ്ണസംഖ്യ, PyObject *);
+സ്ഥിതം Py_ssize_t (*py3_PyList_Size)(PyObject *);
+സ്ഥിതം PyObject* (*py3_PyTuple_New)(Py_ssize_t size);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyTuple_SetItem)(PyObject *, Py_ssize_t, PyObject *);
+സ്ഥിതം Py_ssize_t (*py3_PyTuple_Size)(PyObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PySequence_Check)(PyObject *);
+സ്ഥിതം Py_ssize_t (*py3_PySequence_Size)(PyObject *);
+സ്ഥിതം PyObject* (*py3_PySequence_GetItem)(PyObject *, Py_ssize_t);
+സ്ഥിതം PyObject* (*py3_PySequence_Fast)(PyObject *, സ്ഥിരം അക്ഷരം *);
+സ്ഥിതം PyObject* (*py3_PyTuple_GetItem)(PyObject *, Py_ssize_t);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyMapping_Check)(PyObject *);
+സ്ഥിതം PyObject* (*py3_Py_Mapping_താക്കോലുകൾ)(PyObject *);
+# എങ്കിൽ PY_VERSION_HEX >= 0x030601f0
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PySlice_AdjustIndices)(Py_ssize_t length,
 		     Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t step);
-static int (*py3_PySlice_Unpack)(PyObject *slice,
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PySlice_Unpack)(PyObject *slice,
 		     Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step);
 # endif
-static int (*py3_PySlice_GetIndicesEx)(PySliceObject_T *r, Py_ssize_t length,
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PySlice_GetIndicesEx)(PySliceObject_T *r, Py_ssize_t length,
 		     Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step,
 		     Py_ssize_t *slicelen);
-static PyObject* (*py3_PyErr_NoMemory)(void);
-static void (*py3_Py_Finalize)(void);
-static void (*py3_PyErr_SetString)(PyObject *, const char *);
-static void (*py3_PyErr_SetObject)(PyObject *, PyObject *);
-static int (*py3_PyErr_ExceptionMatches)(PyObject *);
-# if defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
-static void (*py3_Py_IncRef)(PyObject *);
-static void (*py3_Py_DecRef)(PyObject *);
+സ്ഥിതം PyObject* (*py3_PyErr_NoMemory)(ശൂന്യം);
+സ്ഥിതം ശൂന്യം (*py3_Py_Finalize)(ശൂന്യം);
+സ്ഥിതം ശൂന്യം (*py3_PyErr_SetString)(PyObject *, സ്ഥിരം അക്ഷരം *);
+സ്ഥിതം ശൂന്യം (*py3_PyErr_SetObject)(PyObject *, PyObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyErr_ExceptionMatches)(PyObject *);
+# എങ്കിൽ defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
+സ്ഥിതം ശൂന്യം (*py3_Py_IncRef)(PyObject *);
+സ്ഥിതം ശൂന്യം (*py3_Py_DecRef)(PyObject *);
 # endif
 # ifdef USE_LIMITED_API
-static PyObject* (*py3_Py_CompileString)(const char *, const char *, int);
-static PyObject* (*py3_PyEval_EvalCode)(PyObject *co, PyObject *globals, PyObject *locals);
-# else
-static int (*py3_PyRun_SimpleString)(char *);
-static PyObject* (*py3_PyRun_String)(char *, int, PyObject *, PyObject *);
+സ്ഥിതം PyObject* (*py3_Py_CompileString)(സ്ഥിരം അക്ഷരം *, സ്ഥിരം അക്ഷരം *, പൂർണ്ണസംഖ്യ);
+സ്ഥിതം PyObject* (*py3_PyEval_EvalCode)(PyObject *co, PyObject *globals, PyObject *locals);
+# അല്ലെങ്കിൽ
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyRun_SimpleString)(അക്ഷരം *);
+സ്ഥിതം PyObject* (*py3_PyRun_String)(അക്ഷരം *, പൂർണ്ണസംഖ്യ, PyObject *, PyObject *);
 # endif
-static PyObject* (*py3_PyObject_GetAttrString)(PyObject *, const char *);
-static int (*py3_PyObject_HasAttrString)(PyObject *, const char *);
-static int (*py3_PyObject_SetAttrString)(PyObject *, const char *, PyObject *);
-static PyObject* (*py3_PyObject_CallFunctionObjArgs)(PyObject *, ...);
-# if PY_VERSION_HEX >= 0x030d0000
-static PyObject* (*py3_PyObject_CallFunction)(PyObject *, char *, ...);
-# else
-static PyObject* (*py3__PyObject_CallFunction_SizeT)(PyObject *, char *, ...);
+സ്ഥിതം PyObject* (*py3_PyObject_GetAttrString)(PyObject *, സ്ഥിരം അക്ഷരം *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyObject_HasAttrString)(PyObject *, സ്ഥിരം അക്ഷരം *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyObject_SetAttrString)(PyObject *, സ്ഥിരം അക്ഷരം *, PyObject *);
+സ്ഥിതം PyObject* (*py3_PyObject_CallFunctionObjArgs)(PyObject *, ...);
+# എങ്കിൽ PY_VERSION_HEX >= 0x030d0000
+സ്ഥിതം PyObject* (*py3_PyObject_CallFunction)(PyObject *, അക്ഷരം *, ...);
+# അല്ലെങ്കിൽ
+സ്ഥിതം PyObject* (*py3__PyObject_CallFunction_SizeT)(PyObject *, അക്ഷരം *, ...);
 # endif
-static PyObject* (*py3_PyObject_Call)(PyObject *, PyObject *, PyObject *);
-static PyObject* (*py3_PyEval_GetGlobals)(void);
-static PyObject* (*py3_PyEval_GetLocals)(void);
-static PyObject* (*py3_PyList_GetItem)(PyObject *, Py_ssize_t);
-static PyObject* (*py3_PyImport_ImportModule)(const char *);
-static PyObject* (*py3_PyImport_AddModule)(const char *);
-static int (*py3_PyErr_BadArgument)(void);
-static PyObject* (*py3_PyErr_Occurred)(void);
-static PyObject* (*py3_PyModule_GetDict)(PyObject *);
-static int (*py3_PyList_SetItem)(PyObject *, Py_ssize_t, PyObject *);
-static PyObject* (*py3_PyDict_GetItemString)(PyObject *, const char *);
-static int (*py3_PyDict_Next)(PyObject *, Py_ssize_t *, PyObject **, PyObject **);
-static PyObject* (*py3_PyLong_FromLong)(long);
-static PyObject* (*py3_PyDict_New)(void);
-# if (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
+സ്ഥിതം PyObject* (*py3_PyObject_Call)(PyObject *, PyObject *, PyObject *);
+സ്ഥിതം PyObject* (*py3_PyEval_GetGlobals)(ശൂന്യം);
+സ്ഥിതം PyObject* (*py3_PyEval_GetLocals)(ശൂന്യം);
+സ്ഥിതം PyObject* (*py3_PyList_GetItem)(PyObject *, Py_ssize_t);
+സ്ഥിതം PyObject* (*py3_PyImport_ImportModule)(സ്ഥിരം അക്ഷരം *);
+സ്ഥിതം PyObject* (*py3_PyImport_AddModule)(സ്ഥിരം അക്ഷരം *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyErr_BadArgument)(ശൂന്യം);
+സ്ഥിതം PyObject* (*py3_PyErr_Occurred)(ശൂന്യം);
+സ്ഥിതം PyObject* (*py3_PyModule_GetDict)(PyObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyList_SetItem)(PyObject *, Py_ssize_t, PyObject *);
+സ്ഥിതം PyObject* (*py3_PyDict_GetItemString)(PyObject *, സ്ഥിരം അക്ഷരം *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyDict_Next)(PyObject *, Py_ssize_t *, PyObject **, PyObject **);
+സ്ഥിതം PyObject* (*py3_PyLong_FromLong)(long);
+സ്ഥിതം PyObject* (*py3_PyDict_New)(ശൂന്യം);
+# എങ്കിൽ (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
        (!defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x03080000)
-static int (*py3_PyIter_Check)(PyObject *o);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyIter_Check)(PyObject *o);
 # endif
-static PyObject* (*py3_PyIter_Next)(PyObject *);
-static PyObject* (*py3_PyObject_GetIter)(PyObject *);
-static PyObject* (*py3_PyObject_Repr)(PyObject *);
-static PyObject* (*py3_PyObject_GetItem)(PyObject *, PyObject *);
-static int (*py3_PyObject_IsTrue)(PyObject *);
-static PyObject* (*py3_Py_BuildValue)(char *, ...);
-# if PY_VERSION_HEX >= 0x03040000
-static int (*py3_PyType_GetFlags)(PyTypeObject *o);
+സ്ഥിതം PyObject* (*py3_PyIter_Next)(PyObject *);
+സ്ഥിതം PyObject* (*py3_PyObject_GetIter)(PyObject *);
+സ്ഥിതം PyObject* (*py3_PyObject_Repr)(PyObject *);
+സ്ഥിതം PyObject* (*py3_PyObject_GetItem)(PyObject *, PyObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyObject_IsTrue)(PyObject *);
+സ്ഥിതം PyObject* (*py3_Py_Build_മൂല്യം)(അക്ഷരം *, ...);
+# എങ്കിൽ PY_VERSION_HEX >= 0x03040000
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyType_GetFlags)(PyTypeObject *o);
 # endif
-static int (*py3_PyType_Ready)(PyTypeObject *type);
-static int (*py3_PyDict_SetItemString)(PyObject *dp, char *key, PyObject *item);
-static PyObject* (*py3_PyUnicode_FromString)(const char *u);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyType_Ready)(PyTypeObject *type);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyDict_SetItemString)(PyObject *dp, അക്ഷരം *താക്കോൽ, PyObject *item);
+സ്ഥിതം PyObject* (*py3_PyUnicode_FromString)(സ്ഥിരം അക്ഷരം *u);
 # ifdef Py_UNICODE_USE_UCS_FUNCTIONS
 #  ifdef Py_UNICODE_WIDE
-static PyObject* (*py3_PyUnicodeUCS4_FromFormat)(const char *u, ...);
-#  else
-static PyObject* (*py3_PyUnicodeUCS2_FromFormat)(const char *u, ...);
+സ്ഥിതം PyObject* (*py3_PyUnicodeUCS4_FromFormat)(സ്ഥിരം അക്ഷരം *u, ...);
+#  അല്ലെങ്കിൽ
+സ്ഥിതം PyObject* (*py3_PyUnicodeUCS2_FromFormat)(സ്ഥിരം അക്ഷരം *u, ...);
 #  endif
-# else
-static PyObject* (*py3_PyUnicode_FromFormat)(const char *u, ...);
+# അല്ലെങ്കിൽ
+സ്ഥിതം PyObject* (*py3_PyUnicode_FromFormat)(സ്ഥിരം അക്ഷരം *u, ...);
 # endif
-static PyObject* (*py3_PyUnicode_Decode)(const char *u, Py_ssize_t size,
-	const char *encoding, const char *errors);
-static long (*py3_PyLong_AsLong)(PyObject *);
-static void (*py3_PyErr_SetNone)(PyObject *);
-static void (*py3_PyEval_InitThreads)(void);
-static void(*py3_PyEval_RestoreThread)(PyThreadState *);
-static PyThreadState*(*py3_PyEval_SaveThread)(void);
-static int (*py3_PyArg_Parse)(PyObject *, char *, ...);
-static int (*py3_PyArg_ParseTuple)(PyObject *, char *, ...);
-static void (*py3_PyMem_Free)(void *);
-static void* (*py3_PyMem_Malloc)(size_t);
-static int (*py3_Py_IsInitialized)(void);
-static void (*py3_PyErr_Clear)(void);
-static PyObject* (*py3_PyErr_Format)(PyObject *, const char *, ...);
-static void (*py3_PyErr_PrintEx)(int);
-static PyObject*(*py3__PyObject_Init)(PyObject *, PyTypeObject *);
-# if !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
-static iternextfunc py3__PyObject_NextNotImplemented;
+സ്ഥിതം PyObject* (*py3_PyUnicode_Decode)(സ്ഥിരം അക്ഷരം *u, Py_ssize_t size,
+	സ്ഥിരം അക്ഷരം *encoding, സ്ഥിരം അക്ഷരം *errors);
+സ്ഥിതം long (*py3_PyLong_AsLong)(PyObject *);
+സ്ഥിതം ശൂന്യം (*py3_PyErr_SetNone)(PyObject *);
+സ്ഥിതം ശൂന്യം (*py3_PyEval_InitThreads)(ശൂന്യം);
+സ്ഥിതം ശൂന്യം(*py3_PyEval_RestoreThread)(PyThreadState *);
+സ്ഥിതം PyThreadState*(*py3_PyEval_SaveThread)(ശൂന്യം);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyArg_Parse)(PyObject *, അക്ഷരം *, ...);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyArg_ParseTuple)(PyObject *, അക്ഷരം *, ...);
+സ്ഥിതം ശൂന്യം (*py3_PyMem_Free)(ശൂന്യം *);
+സ്ഥിതം ശൂന്യം* (*py3_PyMem_Malloc)(size_t);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_Py_IsInitialized)(ശൂന്യം);
+സ്ഥിതം ശൂന്യം (*py3_PyErr_Clear)(ശൂന്യം);
+സ്ഥിതം PyObject* (*py3_PyErr_Format)(PyObject *, സ്ഥിരം അക്ഷരം *, ...);
+സ്ഥിതം ശൂന്യം (*py3_PyErr_PrintEx)(പൂർണ്ണസംഖ്യ);
+സ്ഥിതം PyObject*(*py3__PyObject_Init)(PyObject *, PyTypeObject *);
+# എങ്കിൽ !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
+സ്ഥിതം iternextfunc py3__PyObject_NextNotImplemented;
 # endif
-static PyObject* py3__Py_NoneStruct;
-static PyObject* py3__Py_FalseStruct;
-static PyObject* py3__Py_TrueStruct;
-static int (*py3_PyModule_AddObject)(PyObject *m, const char *name, PyObject *o);
-static int (*py3_PyImport_AppendInittab)(const char *name, PyObject* (*initfunc)(void));
+സ്ഥിതം PyObject* py3__Py_NoneStruct;
+സ്ഥിതം PyObject* py3__Py_FalseStruct;
+സ്ഥിതം PyObject* py3__Py_TrueStruct;
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyModule_AddObject)(PyObject *m, സ്ഥിരം അക്ഷരം *name, PyObject *o);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyImport_AppendInittab)(സ്ഥിരം അക്ഷരം *name, PyObject* (*initfunc)(ശൂന്യം));
 # ifdef USE_LIMITED_API
-#  if Py_LIMITED_API >= 0x030a0000
-static char* (*py3_PyUnicode_AsUTF8AndSize)(PyObject *unicode, Py_ssize_t *size);
+#  എങ്കിൽ Py_LIMITED_API >= 0x030a0000
+സ്ഥിതം അക്ഷരം* (*py3_PyUnicode_AsUTF8AndSize)(PyObject *unicode, Py_ssize_t *size);
 #  endif
-# else
-#  if PY_VERSION_HEX >= 0x030300f0
-static char* (*py3_PyUnicode_AsUTF8AndSize)(PyObject *unicode, Py_ssize_t *size);
-#  else
-static char* (*py3__PyUnicode_AsString)(PyObject *unicode);
+# അല്ലെങ്കിൽ
+#  എങ്കിൽ PY_VERSION_HEX >= 0x030300f0
+സ്ഥിതം അക്ഷരം* (*py3_PyUnicode_AsUTF8AndSize)(PyObject *unicode, Py_ssize_t *size);
+#  അല്ലെങ്കിൽ
+സ്ഥിതം അക്ഷരം* (*py3__PyUnicode_AsString)(PyObject *unicode);
 #  endif
 # endif
-static int (*py3_PyUnicode_CompareWithASCIIString)(PyObject *unicode, const char* string);
-static PyObject* (*py3_PyUnicode_AsEncodedString)(PyObject *unicode, const char* encoding, const char* errors);
-static PyObject* (*py3_PyUnicode_AsUTF8String)(PyObject *unicode);
-static char* (*py3_PyBytes_AsString)(PyObject *bytes);
-static int (*py3_PyBytes_AsStringAndSize)(PyObject *bytes, char **buffer, Py_ssize_t *length);
-static PyObject* (*py3_PyBytes_FromString)(char *str);
-static PyObject* (*py3_PyBytes_FromStringAndSize)(char *str, Py_ssize_t length);
-# if PY_VERSION_HEX >= 0x030900b0
-static PyObject* (*py3__PyObject_New)(PyTypeObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyUnicode_CompareWithASCIIString)(PyObject *unicode, സ്ഥിരം അക്ഷരം* string);
+സ്ഥിതം PyObject* (*py3_PyUnicode_AsEncodedString)(PyObject *unicode, സ്ഥിരം അക്ഷരം* encoding, സ്ഥിരം അക്ഷരം* errors);
+സ്ഥിതം PyObject* (*py3_PyUnicode_AsUTF8String)(PyObject *unicode);
+സ്ഥിതം അക്ഷരം* (*py3_PyBytes_AsString)(PyObject *bytes);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyBytes_AsStringAndSize)(PyObject *bytes, അക്ഷരം **buffer, Py_ssize_t *length);
+സ്ഥിതം PyObject* (*py3_PyBytes_FromString)(അക്ഷരം *str);
+സ്ഥിതം PyObject* (*py3_PyBytes_FromStringAndSize)(അക്ഷരം *str, Py_ssize_t length);
+# എങ്കിൽ PY_VERSION_HEX >= 0x030900b0
+സ്ഥിതം PyObject* (*py3__PyObject_New)(PyTypeObject *);
 # endif
-static PyObject* (*py3_PyFloat_FromDouble)(double num);
-static double (*py3_PyFloat_AsDouble)(PyObject *);
-static PyObject* (*py3_PyObject_GenericGetAttr)(PyObject *obj, PyObject *name);
-static PyObject* (*py3_PyType_GenericAlloc)(PyTypeObject *type, Py_ssize_t nitems);
-static PyObject* (*py3_PyType_GenericNew)(PyTypeObject *type, PyObject *args, PyObject *kwds);
-static PyTypeObject* py3_PyType_Type;
+സ്ഥിതം PyObject* (*py3_PyFloat_FromDouble)(ഇരട്ട അക്കം);
+സ്ഥിതം ഇരട്ട (*py3_PyFloat_AsDouble)(PyObject *);
+സ്ഥിതം PyObject* (*py3_PyObject_GenericGetAttr)(PyObject *obj, PyObject *name);
+സ്ഥിതം PyObject* (*py3_PyType_GenericAlloc)(PyTypeObject *type, Py_ssize_t nitems);
+സ്ഥിതം PyObject* (*py3_PyType_GenericNew)(PyTypeObject *type, PyObject *args, PyObject *kwds);
+സ്ഥിതം PyTypeObject* py3_PyType_Type;
 # ifndef USE_LIMITED_API
-static PyTypeObject* py3_PyStdPrinter_Type;
+സ്ഥിതം PyTypeObject* py3_PyStdPrinter_Type;
 # endif
-static PyTypeObject* py3_PySlice_Type;
-static PyTypeObject* py3_PyFloat_Type;
-static PyTypeObject* py3_PyBool_Type;
-static int (*py3_PyNumber_Check)(PyObject *);
-static PyObject* (*py3_PyNumber_Long)(PyObject *);
-static PyObject* (*py3_PyErr_NewException)(char *name, PyObject *base, PyObject *dict);
-static PyObject* (*py3_PyCapsule_New)(void *, char *, PyCapsule_Destructor);
-static void* (*py3_PyCapsule_GetPointer)(PyObject *, char *);
+സ്ഥിതം PyTypeObject* py3_PySlice_Type;
+സ്ഥിതം PyTypeObject* py3_PyFloat_Type;
+സ്ഥിതം PyTypeObject* py3_PyBool_Type;
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_Py_സംഖ്യ_Check)(PyObject *);
+സ്ഥിതം PyObject* (*py3_Py_സംഖ്യ_Long)(PyObject *);
+സ്ഥിതം PyObject* (*py3_PyErr_NewException)(അക്ഷരം *name, PyObject *base, PyObject *dict);
+സ്ഥിതം PyObject* (*py3_PyCapsule_New)(ശൂന്യം *, അക്ഷരം *, PyCapsule_Destructor);
+സ്ഥിതം ശൂന്യം* (*py3_PyCapsule_GetPointer)(PyObject *, അക്ഷരം *);
 # ifdef Py_DEBUG
-static void (*py3__Py_NegativeRefcount)(const char *fname, int lineno, PyObject *op);
-static Py_ssize_t* py3__Py_RefTotal;
-static PyObject* (*py3_PyModule_Create2TraceRefs)(struct PyModuleDef* module, int module_api_version);
-# else
-static PyObject* (*py3_PyModule_Create2)(struct PyModuleDef* module, int module_api_version);
+സ്ഥിതം ശൂന്യം (*py3__Py_NegativeRefcount)(സ്ഥിരം അക്ഷരം *fname, പൂർണ്ണസംഖ്യ lineno, PyObject *op);
+സ്ഥിതം Py_ssize_t* py3__Py_RefTotal;
+സ്ഥിതം PyObject* (*py3_PyModule_Create2TraceRefs)(ഘടന PyModuleDef* module, പൂർണ്ണസംഖ്യ module_api_version);
+# അല്ലെങ്കിൽ
+സ്ഥിതം PyObject* (*py3_PyModule_Create2)(ഘടന PyModuleDef* module, പൂർണ്ണസംഖ്യ module_api_version);
 # endif
-# if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
-static void (*py3__PyObject_DebugFree)(void*);
-static void* (*py3__PyObject_DebugMalloc)(size_t);
-# else
-static void (*py3_PyObject_Free)(void*);
-static void* (*py3_PyObject_Malloc)(size_t);
+# എങ്കിൽ defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+സ്ഥിതം ശൂന്യം (*py3__PyObject_DebugFree)(ശൂന്യം*);
+സ്ഥിതം ശൂന്യം* (*py3__PyObject_DebugMalloc)(size_t);
+# അല്ലെങ്കിൽ
+സ്ഥിതം ശൂന്യം (*py3_PyObject_Free)(ശൂന്യം*);
+സ്ഥിതം ശൂന്യം* (*py3_PyObject_Malloc)(size_t);
 # endif
-static PyObject*(*py3__PyObject_GC_New)(PyTypeObject *);
-static void(*py3_PyObject_GC_Del)(void *);
-static void(*py3_PyObject_GC_UnTrack)(void *);
-static int (*py3_PyType_IsSubtype)(PyTypeObject *, PyTypeObject *);
+സ്ഥിതം PyObject*(*py3__PyObject_GC_New)(PyTypeObject *);
+സ്ഥിതം ശൂന്യം(*py3_PyObject_GC_Del)(ശൂന്യം *);
+സ്ഥിതം ശൂന്യം(*py3_PyObject_GC_UnTrack)(ശൂന്യം *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ (*py3_PyType_IsSubtype)(PyTypeObject *, PyTypeObject *);
 # ifdef USE_LIMITED_API
-static void* (*py3_PyType_GetSlot)(PyTypeObject *, int);
-static PyObject* (*py3_PyType_FromSpec)(PyType_Spec *);
+സ്ഥിതം ശൂന്യം* (*py3_PyType_GetSlot)(PyTypeObject *, പൂർണ്ണസംഖ്യ);
+സ്ഥിതം PyObject* (*py3_PyType_FromSpec)(PyType_Spec *);
 # endif
 
 // Imported exception objects
-static PyObject *p3imp_PyExc_AttributeError;
-static PyObject *p3imp_PyExc_IndexError;
-static PyObject *p3imp_PyExc_KeyError;
-static PyObject *p3imp_PyExc_KeyboardInterrupt;
-static PyObject *p3imp_PyExc_TypeError;
-static PyObject *p3imp_PyExc_ValueError;
-static PyObject *p3imp_PyExc_SystemExit;
-static PyObject *p3imp_PyExc_RuntimeError;
-static PyObject *p3imp_PyExc_ImportError;
-static PyObject *p3imp_PyExc_OverflowError;
+സ്ഥിതം PyObject *p3imp_PyExc_AttributeError;
+സ്ഥിതം PyObject *p3imp_PyExc_IndexError;
+സ്ഥിതം PyObject *p3imp_Py_Exc_താക്കോൽ_Error;
+സ്ഥിതം PyObject *p3imp_PyExc_KeyboardInterrupt;
+സ്ഥിതം PyObject *p3imp_PyExc_TypeError;
+സ്ഥിതം PyObject *p3imp_Py_Exc_മൂല്യം_Error;
+സ്ഥിതം PyObject *p3imp_PyExc_SystemExit;
+സ്ഥിതം PyObject *p3imp_PyExc_RuntimeError;
+സ്ഥിതം PyObject *p3imp_PyExc_ImportError;
+സ്ഥിതം PyObject *p3imp_PyExc_OverflowError;
 
 # define PyExc_AttributeError p3imp_PyExc_AttributeError
 # define PyExc_IndexError p3imp_PyExc_IndexError
-# define PyExc_KeyError p3imp_PyExc_KeyError
+# define Py_Exc_താക്കോൽ_Error p3imp_Py_Exc_താക്കോൽ_Error
 # define PyExc_KeyboardInterrupt p3imp_PyExc_KeyboardInterrupt
 # define PyExc_TypeError p3imp_PyExc_TypeError
-# define PyExc_ValueError p3imp_PyExc_ValueError
+# define Py_Exc_മൂല്യം_Error p3imp_Py_Exc_മൂല്യം_Error
 # define PyExc_SystemExit p3imp_PyExc_SystemExit
 # define PyExc_RuntimeError p3imp_PyExc_RuntimeError
 # define PyExc_ImportError p3imp_PyExc_ImportError
@@ -565,9 +565,9 @@ static PyObject *p3imp_PyExc_OverflowError;
  * Table of name to function pointer of python.
  */
 # define PYTHON_PROC FARPROC
-static struct
+സ്ഥിതം ഘടന
 {
-    char *name;
+    അക്ഷരം *name;
     PYTHON_PROC *ptr;
 } py3_funcname_table[] =
 {
@@ -575,7 +575,7 @@ static struct
     {"Py_SetPythonHome", (PYTHON_PROC*)&py3_Py_SetPythonHome},
     {"Py_Initialize", (PYTHON_PROC*)&py3_Py_Initialize},
     {"_PyArg_ParseTuple_SizeT", (PYTHON_PROC*)&py3_PyArg_ParseTuple},
-    {"_Py_BuildValue_SizeT", (PYTHON_PROC*)&py3_Py_BuildValue},
+    {"_Py_BuildValue_SizeT", (PYTHON_PROC*)&py3_Py_Build_മൂല്യം},
     {"PyMem_Free", (PYTHON_PROC*)&py3_PyMem_Free},
     {"PyMem_Malloc", (PYTHON_PROC*)&py3_PyMem_Malloc},
     {"PyList_New", (PYTHON_PROC*)&py3_PyList_New},
@@ -584,7 +584,7 @@ static struct
     {"PySys_SetObject", (PYTHON_PROC*)&py3_PySys_SetObject},
     {"PySys_GetObject", (PYTHON_PROC*)&py3_PySys_GetObject},
     {"PyList_Append", (PYTHON_PROC*)&py3_PyList_Append},
-    {"PyList_Insert", (PYTHON_PROC*)&py3_PyList_Insert},
+    {"PyList_Insert", (PYTHON_PROC*)&py3_Py_List_തിരുകുക},
     {"PyList_Size", (PYTHON_PROC*)&py3_PyList_Size},
     {"PyTuple_New", (PYTHON_PROC*)&py3_PyTuple_New},
     {"PyTuple_GetItem", (PYTHON_PROC*)&py3_PyTuple_GetItem},
@@ -594,7 +594,7 @@ static struct
     {"PySequence_Size", (PYTHON_PROC*)&py3_PySequence_Size},
     {"PySequence_GetItem", (PYTHON_PROC*)&py3_PySequence_GetItem},
     {"PySequence_Fast", (PYTHON_PROC*)&py3_PySequence_Fast},
-# if PY_VERSION_HEX >= 0x030601f0
+# എങ്കിൽ PY_VERSION_HEX >= 0x030601f0
     {"PySlice_AdjustIndices", (PYTHON_PROC*)&py3_PySlice_AdjustIndices},
     {"PySlice_Unpack", (PYTHON_PROC*)&py3_PySlice_Unpack},
 # endif
@@ -604,14 +604,14 @@ static struct
     {"PyErr_SetString", (PYTHON_PROC*)&py3_PyErr_SetString},
     {"PyErr_SetObject", (PYTHON_PROC*)&py3_PyErr_SetObject},
     {"PyErr_ExceptionMatches", (PYTHON_PROC*)&py3_PyErr_ExceptionMatches},
-# if defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
+# എങ്കിൽ defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
     {"Py_IncRef", (PYTHON_PROC*)&py3_Py_IncRef},
     {"Py_DecRef", (PYTHON_PROC*)&py3_Py_DecRef},
 # endif
 # ifdef USE_LIMITED_API
     {"Py_CompileString", (PYTHON_PROC*)&py3_Py_CompileString},
     {"PyEval_EvalCode", (PYTHON_PROC*)&PyEval_EvalCode},
-# else
+# അല്ലെങ്കിൽ
     {"PyRun_SimpleString", (PYTHON_PROC*)&py3_PyRun_SimpleString},
     {"PyRun_String", (PYTHON_PROC*)&py3_PyRun_String},
 # endif
@@ -619,9 +619,9 @@ static struct
     {"PyObject_HasAttrString", (PYTHON_PROC*)&py3_PyObject_HasAttrString},
     {"PyObject_SetAttrString", (PYTHON_PROC*)&py3_PyObject_SetAttrString},
     {"PyObject_CallFunctionObjArgs", (PYTHON_PROC*)&py3_PyObject_CallFunctionObjArgs},
-# if PY_VERSION_HEX >= 0x030d0000
+# എങ്കിൽ PY_VERSION_HEX >= 0x030d0000
     {"PyObject_CallFunction", (PYTHON_PROC*)&py3_PyObject_CallFunction},
-# else
+# അല്ലെങ്കിൽ
     {"_PyObject_CallFunction_SizeT", (PYTHON_PROC*)&py3__PyObject_CallFunction_SizeT},
 # endif
     {"PyObject_Call", (PYTHON_PROC*)&py3_PyObject_Call},
@@ -637,8 +637,8 @@ static struct
     {"PyDict_GetItemString", (PYTHON_PROC*)&py3_PyDict_GetItemString},
     {"PyDict_Next", (PYTHON_PROC*)&py3_PyDict_Next},
     {"PyMapping_Check", (PYTHON_PROC*)&py3_PyMapping_Check},
-    {"PyMapping_Keys", (PYTHON_PROC*)&py3_PyMapping_Keys},
-# if (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
+    {"PyMapping_Keys", (PYTHON_PROC*)&py3_Py_Mapping_താക്കോലുകൾ},
+# എങ്കിൽ (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
        (!defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x03080000)
     {"PyIter_Check", (PYTHON_PROC*)&py3_PyIter_Check},
 # endif
@@ -649,7 +649,7 @@ static struct
     {"PyObject_IsTrue", (PYTHON_PROC*)&py3_PyObject_IsTrue},
     {"PyLong_FromLong", (PYTHON_PROC*)&py3_PyLong_FromLong},
     {"PyDict_New", (PYTHON_PROC*)&py3_PyDict_New},
-# if PY_VERSION_HEX >= 0x03040000
+# എങ്കിൽ PY_VERSION_HEX >= 0x03040000
     {"PyType_GetFlags", (PYTHON_PROC*)&py3_PyType_GetFlags},
 # endif
     {"PyType_Ready", (PYTHON_PROC*)&py3_PyType_Ready},
@@ -661,7 +661,7 @@ static struct
     {"PyEval_SaveThread", (PYTHON_PROC*)&py3_PyEval_SaveThread},
     {"_PyArg_Parse_SizeT", (PYTHON_PROC*)&py3_PyArg_Parse},
     {"Py_IsInitialized", (PYTHON_PROC*)&py3_Py_IsInitialized},
-# if !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
+# എങ്കിൽ !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
     {"_PyObject_NextNotImplemented", (PYTHON_PROC*)&py3__PyObject_NextNotImplemented},
 # endif
     {"_Py_NoneStruct", (PYTHON_PROC*)&py3__Py_NoneStruct},
@@ -674,13 +674,13 @@ static struct
     {"PyModule_AddObject", (PYTHON_PROC*)&py3_PyModule_AddObject},
     {"PyImport_AppendInittab", (PYTHON_PROC*)&py3_PyImport_AppendInittab},
 # ifdef USE_LIMITED_API
-#  if Py_LIMITED_API >= 0x030a0000
+#  എങ്കിൽ Py_LIMITED_API >= 0x030a0000
     {"PyUnicode_AsUTF8AndSize", (PYTHON_PROC*)&py3_PyUnicode_AsUTF8AndSize},
 #  endif
-# else
-#  if PY_VERSION_HEX >= 0x030300f0
+# അല്ലെങ്കിൽ
+#  എങ്കിൽ PY_VERSION_HEX >= 0x030300f0
     {"PyUnicode_AsUTF8AndSize", (PYTHON_PROC*)&py3_PyUnicode_AsUTF8AndSize},
-#  else
+#  അല്ലെങ്കിൽ
     {"_PyUnicode_AsString", (PYTHON_PROC*)&py3__PyUnicode_AsString},
 #  endif
 # endif
@@ -689,17 +689,17 @@ static struct
 # ifdef Py_UNICODE_USE_UCS_FUNCTIONS
 #  ifdef Py_UNICODE_WIDE
     {"PyUnicodeUCS4_FromFormat", (PYTHON_PROC*)&py3_PyUnicodeUCS4_FromFormat},
-#  else
+#  അല്ലെങ്കിൽ
     {"PyUnicodeUCS2_FromFormat", (PYTHON_PROC*)&py3_PyUnicodeUCS2_FromFormat},
 #  endif
-# else
+# അല്ലെങ്കിൽ
     {"PyUnicode_FromFormat", (PYTHON_PROC*)&py3_PyUnicode_FromFormat},
 # endif
     {"PyBytes_AsString", (PYTHON_PROC*)&py3_PyBytes_AsString},
     {"PyBytes_AsStringAndSize", (PYTHON_PROC*)&py3_PyBytes_AsStringAndSize},
     {"PyBytes_FromString", (PYTHON_PROC*)&py3_PyBytes_FromString},
     {"PyBytes_FromStringAndSize", (PYTHON_PROC*)&py3_PyBytes_FromStringAndSize},
-# if PY_VERSION_HEX >= 0x030900b0
+# എങ്കിൽ PY_VERSION_HEX >= 0x030900b0
     {"_PyObject_New", (PYTHON_PROC*)&py3__PyObject_New},
 # endif
     {"PyFloat_FromDouble", (PYTHON_PROC*)&py3_PyFloat_FromDouble},
@@ -714,20 +714,20 @@ static struct
     {"PySlice_Type", (PYTHON_PROC*)&py3_PySlice_Type},
     {"PyFloat_Type", (PYTHON_PROC*)&py3_PyFloat_Type},
     {"PyBool_Type", (PYTHON_PROC*)&py3_PyBool_Type},
-    {"PyNumber_Check", (PYTHON_PROC*)&py3_PyNumber_Check},
-    {"PyNumber_Long", (PYTHON_PROC*)&py3_PyNumber_Long},
+    {"PyNumber_Check", (PYTHON_PROC*)&py3_Py_സംഖ്യ_Check},
+    {"PyNumber_Long", (PYTHON_PROC*)&py3_Py_സംഖ്യ_Long},
     {"PyErr_NewException", (PYTHON_PROC*)&py3_PyErr_NewException},
 # ifdef Py_DEBUG
     {"_Py_NegativeRefcount", (PYTHON_PROC*)&py3__Py_NegativeRefcount},
     {"_Py_RefTotal", (PYTHON_PROC*)&py3__Py_RefTotal},
     {"PyModule_Create2TraceRefs", (PYTHON_PROC*)&py3_PyModule_Create2TraceRefs},
-# else
+# അല്ലെങ്കിൽ
     {"PyModule_Create2", (PYTHON_PROC*)&py3_PyModule_Create2},
 # endif
-# if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# എങ്കിൽ defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
     {"_PyObject_DebugFree", (PYTHON_PROC*)&py3__PyObject_DebugFree},
     {"_PyObject_DebugMalloc", (PYTHON_PROC*)&py3__PyObject_DebugMalloc},
-# else
+# അല്ലെങ്കിൽ
     {"PyObject_Malloc", (PYTHON_PROC*)&py3_PyObject_Malloc},
     {"PyObject_Free", (PYTHON_PROC*)&py3_PyObject_Free},
 # endif
@@ -738,15 +738,15 @@ static struct
     {"PyCapsule_New", (PYTHON_PROC*)&py3_PyCapsule_New},
     {"PyCapsule_GetPointer", (PYTHON_PROC*)&py3_PyCapsule_GetPointer},
 # ifdef USE_LIMITED_API
-#  if PY_VERSION_HEX >= 0x03040000
+#  എങ്കിൽ PY_VERSION_HEX >= 0x03040000
     {"PyType_GetSlot", (PYTHON_PROC*)&py3_PyType_GetSlot},
 #  endif
     {"PyType_FromSpec", (PYTHON_PROC*)&py3_PyType_FromSpec},
 # endif
-    {"", NULL},
+    {"", ശൂന്യ},
 };
 
-# if defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
+# എങ്കിൽ defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
 // Use stable versions of inc/dec ref. Note that these always null-check and
 // therefore there's no difference between XINCREF and INCREF.
 //
@@ -766,30 +766,30 @@ static struct
 #  define Py_XDECREF(obj) Py_DecRef((PyObject *)obj)
 # endif
 
-# if PY_VERSION_HEX >= 0x030900b0
-    static inline int
+# എങ്കിൽ PY_VERSION_HEX >= 0x030900b0
+    സ്ഥിതം വരിയിൽ പൂർണ്ണസംഖ്യ
 py3_PyType_HasFeature(PyTypeObject *type, unsigned long feature)
 {
-    return ((PyType_GetFlags(type) & feature) != 0);
+    തിരികെ ((PyType_GetFlags(type) & feature) != 0);
 }
 #  define PyType_HasFeature(t,f) py3_PyType_HasFeature(t,f)
 # endif
 
-# if PY_VERSION_HEX >= 0x030a00b2
-    static inline int
+# എങ്കിൽ PY_VERSION_HEX >= 0x030a00b2
+    സ്ഥിതം വരിയിൽ പൂർണ്ണസംഖ്യ
 py3__PyObject_TypeCheck(PyObject *ob, PyTypeObject *type)
 {
-    return Py_IS_TYPE(ob, type) || PyType_IsSubtype(Py_TYPE(ob), type);
+    തിരികെ Py_IS_TYPE(ob, type) || PyType_IsSubtype(Py_TYPE(ob), type);
 }
-#  if PY_VERSION_HEX >= 0x030b00b3
+#  എങ്കിൽ PY_VERSION_HEX >= 0x030b00b3
 #   undef PyObject_TypeCheck
 #   define PyObject_TypeCheck(o,t) py3__PyObject_TypeCheck(o,t)
-#  else
+#  അല്ലെങ്കിൽ
 #   define _PyObject_TypeCheck(o,t) py3__PyObject_TypeCheck(o,t)
 #  endif
 # endif
 
-# if !defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x030c00b0
+# എങ്കിൽ !defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x030c00b0
 // PyTuple_GET_SIZE/PyList_GET_SIZE are inlined functions that use Py_SIZE(),
 // which started to introduce linkage dependency from Python 3.12. When we
 // build Python in dynamic mode, we don't link against it in build time, and
@@ -805,117 +805,117 @@ py3__PyObject_TypeCheck(PyObject *ob, PyTypeObject *type)
  * Look up the library "libname" using the InstallPath registry key.
  * Return NULL when failed.  Return an allocated string when successful.
  */
-    static WCHAR *
-py3_get_system_libname(const char *libname)
+    സ്ഥിതം WCHAR *
+py3_get_system_libname(സ്ഥിരം അക്ഷരം *libname)
 {
-    const WCHAR	*pythoncore = L"Software\\Python\\PythonCore";
-    const char	*cp = libname;
+    സ്ഥിരം WCHAR	*pythoncore = L"Software\\Python\\PythonCore";
+    സ്ഥിരം അക്ഷരം	*cp = libname;
     WCHAR	subkey[128];
-    HKEY	hKey;
-    int		i;
+    HKEY	h_താക്കോൽ;
+    പൂർണ്ണസംഖ്യ		i;
     DWORD	j, len;
     LSTATUS	ret;
 
-    while (*cp != '\0')
+    ആകുമ്പോൾ (*cp != '\0')
     {
-	if (*cp == ':' || *cp == '\\' || *cp == '/')
+	എങ്കിൽ (*cp == ':' || *cp == '\\' || *cp == '/')
 	{
 	    // Bail out if "libname" contains path separator, assume it is
 	    // an absolute path.
-	    return NULL;
+	    തിരികെ ശൂന്യ;
 	}
 	++cp;
     }
 
     WCHAR   keyfound[32];
-    HKEY    hKeyTop[] = {HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE};
-    HKEY    hKeyFound = NULL;
+    HKEY    h_താക്കോൽ_മുകൾ[] = {HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE};
+    HKEY    h_താക്കോൽ_Found = ശൂന്യ;
 #  ifdef USE_LIMITED_API
     long    maxminor = -1;
 #  endif
-    for (i = 0; i < ARRAY_LENGTH(hKeyTop); i++)
+    വേണ്ടി (i = 0; i < ARRAY_LENGTH(h_താക്കോൽ_മുകൾ); i++)
     {
 	long	major, minor;
 
-	ret = RegOpenKeyExW(hKeyTop[i], pythoncore, 0, KEY_READ, &hKey);
-	if (ret != ERROR_SUCCESS)
-	    continue;
-	for (j = 0;; j++)
+	ret = Reg_Open_താക്കോൽ_Ex_W(h_താക്കോൽ_മുകൾ[i], pythoncore, 0, താക്കോൽ_READ, &h_താക്കോൽ);
+	എങ്കിൽ (ret != ERROR_SUCCESS)
+	    തുടരുക;
+	വേണ്ടി (j = 0;; j++)
 	{
 	    WCHAR   keyname[32];
 	    WCHAR   *wp;
 
 	    len = ARRAY_LENGTH(keyname);
-	    ret = RegEnumKeyExW(hKey, j, keyname, &len,
-						    NULL, NULL, NULL, NULL);
-	    if (ret == ERROR_NO_MORE_ITEMS)
-		break;
+	    ret = Reg_Enum_താക്കോൽ_Ex_W(h_താക്കോൽ, j, keyname, &len,
+						    ശൂന്യ, ശൂന്യ, ശൂന്യ, ശൂന്യ);
+	    എങ്കിൽ (ret == ERROR_NO_MORE_ഇനങ്ങൾ)
+		നിർത്തുക;
 
 	    major = wcstol(keyname, &wp, 10);
-	    if (*wp != L'.')
-		continue;
+	    എങ്കിൽ (*wp != L'.')
+		തുടരുക;
 	    minor = wcstol(wp + 1, &wp, 10);
 #  ifdef _WIN64
-	    if (*wp != L'\0')
-		continue;
-#  else
-	    if (wcscmp(wp, L"-32") != 0)
-		continue;
+	    എങ്കിൽ (*wp != L'\0')
+		തുടരുക;
+#  അല്ലെങ്കിൽ
+	    എങ്കിൽ (wcscmp(wp, L"-32") != 0)
+		തുടരുക;
 #  endif
 
-	    if (major != PY_MAJOR_VERSION)
-		continue;
+	    എങ്കിൽ (major != PY_MAJOR_VERSION)
+		തുടരുക;
 #  ifdef USE_LIMITED_API
 	    // Search the latest version.
-	    if ((minor > maxminor)
+	    എങ്കിൽ ((minor > maxminor)
 		    && (minor >= ((Py_LIMITED_API >> 16) & 0xff)))
 	    {
 		maxminor = minor;
 		wcscpy(keyfound, keyname);
-		hKeyFound = hKeyTop[i];
+		h_താക്കോൽ_Found = h_താക്കോൽ_മുകൾ[i];
 	    }
-#  else
+#  അല്ലെങ്കിൽ
 	    // Check if it matches with the compiled version.
-	    if (minor == PY_MINOR_VERSION)
+	    എങ്കിൽ (minor == PY_MINOR_VERSION)
 	    {
 		wcscpy(keyfound, keyname);
-		hKeyFound = hKeyTop[i];
-		break;
+		h_താക്കോൽ_Found = h_താക്കോൽ_മുകൾ[i];
+		നിർത്തുക;
 	    }
 #  endif
 	}
-	RegCloseKey(hKey);
+	Reg_Close_താക്കോൽ(h_താക്കോൽ);
 #  ifdef USE_LIMITED_API
-	if (hKeyFound != NULL)
-	    break;
+	എങ്കിൽ (h_താക്കോൽ_Found != ശൂന്യ)
+	    നിർത്തുക;
 #  endif
     }
-    if (hKeyFound == NULL)
-	return NULL;
+    എങ്കിൽ (h_താക്കോൽ_Found == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
     swprintf(subkey, ARRAY_LENGTH(subkey), L"%ls\\%ls\\InstallPath",
 							pythoncore, keyfound);
-    ret = RegGetValueW(hKeyFound, subkey, NULL, RRF_RT_REG_SZ,
-							    NULL, NULL, &len);
-    if (ret != ERROR_MORE_DATA && ret != ERROR_SUCCESS)
-	return NULL;
-    size_t len2 = len / sizeof(WCHAR) + 1 + strlen(libname);
-    WCHAR *path = alloc(len2 * sizeof(WCHAR));
-    if (path == NULL)
-	return NULL;
-    ret = RegGetValueW(hKeyFound, subkey, NULL, RRF_RT_REG_SZ,
-							    NULL, path, &len);
-    if (ret != ERROR_SUCCESS)
+    ret = Reg_Get_മൂല്യം_W(h_താക്കോൽ_Found, subkey, ശൂന്യ, RRF_RT_REG_SZ,
+							    ശൂന്യ, ശൂന്യ, &len);
+    എങ്കിൽ (ret != ERROR_MORE_DATA && ret != ERROR_SUCCESS)
+	തിരികെ ശൂന്യ;
+    size_t len2 = len / വലുപ്പം(WCHAR) + 1 + strlen(libname);
+    WCHAR *path = alloc(len2 * വലുപ്പം(WCHAR));
+    എങ്കിൽ (path == ശൂന്യ)
+	തിരികെ ശൂന്യ;
+    ret = Reg_Get_മൂല്യം_W(h_താക്കോൽ_Found, subkey, ശൂന്യ, RRF_RT_REG_SZ,
+							    ശൂന്യ, path, &len);
+    എങ്കിൽ (ret != ERROR_SUCCESS)
     {
 	vim_free(path);
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
     // Remove trailing path separators.
     size_t len3 = wcslen(path);
-    if ((len3 > 0) && (path[len3 - 1] == L'/' || path[len3 - 1] == L'\\'))
+    എങ്കിൽ ((len3 > 0) && (path[len3 - 1] == L'/' || path[len3 - 1] == L'\\'))
 	--len3;
     swprintf(path + len3, len2 - len3, L"\\%hs", libname);
-    return path;
+    തിരികെ path;
 }
 # endif
 
@@ -924,139 +924,139 @@ py3_get_system_libname(const char *libname)
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-py3_runtime_link_init(char *libname, int verbose)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+py3_runtime_link_init(അക്ഷരം *libname, പൂർണ്ണസംഖ്യ verbose)
 {
-    int i;
+    പൂർണ്ണസംഖ്യ i;
     PYTHON_PROC *ucs_from_string = (PYTHON_PROC *)&py3_PyUnicode_FromString;
     PYTHON_PROC *ucs_decode = (PYTHON_PROC *)&py3_PyUnicode_Decode;
     PYTHON_PROC *ucs_as_encoded_string =
 				 (PYTHON_PROC *)&py3_PyUnicode_AsEncodedString;
 
-# if !(defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)) && defined(UNIX) && defined(FEAT_PYTHON)
+# എങ്കിൽ !(defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)) && defined(UNIX) && defined(FEAT_PYTHON)
     // Can't have Python and Python3 loaded at the same time.
     // It causes a crash, because RTLD_GLOBAL is needed for
     // standard C extension libraries of one or both python versions.
-    if (python_loaded())
+    എങ്കിൽ (python_loaded())
     {
-	if (verbose)
+	എങ്കിൽ (verbose)
 	    emsg(_(e_this_vim_cannot_execute_py3_after_using_python));
-	return FAIL;
+	തിരികെ FAIL;
     }
 # endif
 
-    if (hinstPy3 != 0)
-	return OK;
+    എങ്കിൽ (hinstPy3 != 0)
+	തിരികെ OK;
     hinstPy3 = load_dll(libname);
 
 # ifdef MSWIN
-    if (!hinstPy3)
+    എങ്കിൽ (!hinstPy3)
     {
 	// Attempt to use the path from InstallPath as stored in the registry.
 	WCHAR *syslibname = py3_get_system_libname(libname);
 
-	if (syslibname != NULL)
+	എങ്കിൽ (syslibname != ശൂന്യ)
 	{
-	    hinstPy3 = LoadLibraryExW(syslibname, NULL,
-		    LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR |
-		    LOAD_LIBRARY_SEARCH_SYSTEM32);
+	    hinstPy3 = LoadLibraryExW(syslibname, ശൂന്യ,
+		    LOAD_LIBRARY_തിരയൽ_DLL_LOAD_DIR |
+		    LOAD_LIBRARY_തിരയൽ_SYSTEM32);
 	    vim_free(syslibname);
 	}
     }
 # endif
 
-    if (!hinstPy3)
+    എങ്കിൽ (!hinstPy3)
     {
-	if (verbose)
+	എങ്കിൽ (verbose)
 	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    for (i = 0; py3_funcname_table[i].ptr; ++i)
+    വേണ്ടി (i = 0; py3_funcname_table[i].ptr; ++i)
     {
-	if ((*py3_funcname_table[i].ptr = symbol_from_dll(hinstPy3,
-			py3_funcname_table[i].name)) == NULL)
+	എങ്കിൽ ((*py3_funcname_table[i].ptr = ചിഹ്നം_from_dll(hinstPy3,
+			py3_funcname_table[i].name)) == ശൂന്യ)
 	{
 	    close_dll(hinstPy3);
 	    hinstPy3 = 0;
-	    if (verbose)
+	    എങ്കിൽ (verbose)
 		semsg(_(e_could_not_load_library_function_str), py3_funcname_table[i].name);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
     }
 
     // Load unicode functions separately as only the ucs2 or the ucs4 functions
     // will be present in the library.
-# if PY_VERSION_HEX >= 0x030300f0
-    *ucs_from_string = symbol_from_dll(hinstPy3, "PyUnicode_FromString");
-    *ucs_decode = symbol_from_dll(hinstPy3, "PyUnicode_Decode");
-    *ucs_as_encoded_string = symbol_from_dll(hinstPy3,
+# എങ്കിൽ PY_VERSION_HEX >= 0x030300f0
+    *ucs_from_string = ചിഹ്നം_from_dll(hinstPy3, "PyUnicode_FromString");
+    *ucs_decode = ചിഹ്നം_from_dll(hinstPy3, "PyUnicode_Decode");
+    *ucs_as_encoded_string = ചിഹ്നം_from_dll(hinstPy3,
 	    "PyUnicode_AsEncodedString");
-# else
-    *ucs_from_string = symbol_from_dll(hinstPy3, "PyUnicodeUCS2_FromString");
-    *ucs_decode = symbol_from_dll(hinstPy3,
+# അല്ലെങ്കിൽ
+    *ucs_from_string = ചിഹ്നം_from_dll(hinstPy3, "PyUnicodeUCS2_FromString");
+    *ucs_decode = ചിഹ്നം_from_dll(hinstPy3,
 	    "PyUnicodeUCS2_Decode");
-    *ucs_as_encoded_string = symbol_from_dll(hinstPy3,
+    *ucs_as_encoded_string = ചിഹ്നം_from_dll(hinstPy3,
 	    "PyUnicodeUCS2_AsEncodedString");
-    if (*ucs_from_string == NULL || *ucs_decode == NULL
-					     || *ucs_as_encoded_string == NULL)
+    എങ്കിൽ (*ucs_from_string == ശൂന്യ || *ucs_decode == ശൂന്യ
+					     || *ucs_as_encoded_string == ശൂന്യ)
     {
-	*ucs_from_string = symbol_from_dll(hinstPy3,
+	*ucs_from_string = ചിഹ്നം_from_dll(hinstPy3,
 		"PyUnicodeUCS4_FromString");
-	*ucs_decode = symbol_from_dll(hinstPy3,
+	*ucs_decode = ചിഹ്നം_from_dll(hinstPy3,
 		"PyUnicodeUCS4_Decode");
-	*ucs_as_encoded_string = symbol_from_dll(hinstPy3,
+	*ucs_as_encoded_string = ചിഹ്നം_from_dll(hinstPy3,
 		"PyUnicodeUCS4_AsEncodedString");
     }
 # endif
-    if (*ucs_from_string == NULL || *ucs_decode == NULL
-					     || *ucs_as_encoded_string == NULL)
+    എങ്കിൽ (*ucs_from_string == ശൂന്യ || *ucs_decode == ശൂന്യ
+					     || *ucs_as_encoded_string == ശൂന്യ)
     {
 	close_dll(hinstPy3);
 	hinstPy3 = 0;
-	if (verbose)
+	എങ്കിൽ (verbose)
 	    semsg(_(e_could_not_load_library_function_str), "PyUnicode_UCSX_*");
-	return FAIL;
+	തിരികെ FAIL;
     }
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * If python is enabled (there is installed python on Windows system) return
  * TRUE, else FALSE.
  */
-    int
-python3_enabled(int verbose)
+    പൂർണ്ണസംഖ്യ
+python3_enabled(പൂർണ്ണസംഖ്യ verbose)
 {
-    return py3_runtime_link_init((char *)p_py3dll, verbose) == OK;
+    തിരികെ py3_runtime_link_init((അക്ഷരം *)p_py3dll, verbose) == OK;
 }
 
 /*
  * Load the standard Python exceptions - don't import the symbols from the
  * DLL, as this can cause errors (importing data symbols is not reliable).
  */
-    static void
-get_py3_exceptions(void)
+    സ്ഥിതം ശൂന്യം
+get_py3_exceptions(ശൂന്യം)
 {
     PyObject *exmod = PyImport_ImportModule("builtins");
     PyObject *exdict = PyModule_GetDict(exmod);
     p3imp_PyExc_AttributeError = PyDict_GetItemString(exdict, "AttributeError");
     p3imp_PyExc_IndexError = PyDict_GetItemString(exdict, "IndexError");
-    p3imp_PyExc_KeyError = PyDict_GetItemString(exdict, "KeyError");
+    p3imp_Py_Exc_താക്കോൽ_Error = PyDict_GetItemString(exdict, "KeyError");
     p3imp_PyExc_KeyboardInterrupt = PyDict_GetItemString(exdict, "KeyboardInterrupt");
     p3imp_PyExc_TypeError = PyDict_GetItemString(exdict, "TypeError");
-    p3imp_PyExc_ValueError = PyDict_GetItemString(exdict, "ValueError");
+    p3imp_Py_Exc_മൂല്യം_Error = PyDict_GetItemString(exdict, "ValueError");
     p3imp_PyExc_SystemExit = PyDict_GetItemString(exdict, "SystemExit");
     p3imp_PyExc_RuntimeError = PyDict_GetItemString(exdict, "RuntimeError");
     p3imp_PyExc_ImportError = PyDict_GetItemString(exdict, "ImportError");
     p3imp_PyExc_OverflowError = PyDict_GetItemString(exdict, "OverflowError");
     Py_XINCREF(p3imp_PyExc_AttributeError);
     Py_XINCREF(p3imp_PyExc_IndexError);
-    Py_XINCREF(p3imp_PyExc_KeyError);
+    Py_XINCREF(p3imp_Py_Exc_താക്കോൽ_Error);
     Py_XINCREF(p3imp_PyExc_KeyboardInterrupt);
     Py_XINCREF(p3imp_PyExc_TypeError);
-    Py_XINCREF(p3imp_PyExc_ValueError);
+    Py_XINCREF(p3imp_Py_Exc_മൂല്യം_Error);
     Py_XINCREF(p3imp_PyExc_SystemExit);
     Py_XINCREF(p3imp_PyExc_RuntimeError);
     Py_XINCREF(p3imp_PyExc_ImportError);
@@ -1065,14 +1065,14 @@ get_py3_exceptions(void)
 }
 #endif // DYNAMIC_PYTHON3
 
-static int py3initialised = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ py3initialised = 0;
 #define PYINITIALISED py3initialised
-static int python_end_called = FALSE;
+സ്ഥിതം പൂർണ്ണസംഖ്യ python_end_called = FALSE;
 
 #ifdef USE_LIMITED_API
 # define DESTRUCTOR_FINISH(self) \
     ((freefunc)PyType_GetSlot(Py_TYPE((PyObject*)self), Py_tp_free))((PyObject*)self)
-#else
+#അല്ലെങ്കിൽ
 # define DESTRUCTOR_FINISH(self) Py_TYPE(self)->tp_free((PyObject*)self)
 #endif
 
@@ -1080,59 +1080,59 @@ static int python_end_called = FALSE;
 #define BUF_PYTHON_REF(buf) buf->b_python3_ref
 #define TAB_PYTHON_REF(tab) tab->tp_python3_ref
 
-    static void
-call_PyObject_Free(void *p)
+    സ്ഥിതം ശൂന്യം
+call_PyObject_Free(ശൂന്യം *p)
 {
-#if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+#എങ്കിൽ defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
     _PyObject_DebugFree(p);
-#else
+#അല്ലെങ്കിൽ
     PyObject_Free(p);
 #endif
 }
 
-    static PyObject *
+    സ്ഥിതം PyObject *
 call_PyType_GenericNew(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    return PyType_GenericNew(type,args,kwds);
+    തിരികെ PyType_GenericNew(type,args,kwds);
 }
 
-    static PyObject *
+    സ്ഥിതം PyObject *
 call_PyType_GenericAlloc(PyTypeObject *type, Py_ssize_t nitems)
 {
-    return PyType_GenericAlloc(type,nitems);
+    തിരികെ PyType_GenericAlloc(type,nitems);
 }
 
-static PyObject *OutputGetattro(PyObject *, PyObject *);
-static int OutputSetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *BufferGetattro(PyObject *, PyObject *);
-static int BufferSetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *TabPageGetattro(PyObject *, PyObject *);
-static PyObject *WindowGetattro(PyObject *, PyObject *);
-static int WindowSetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *RangeGetattro(PyObject *, PyObject *);
-static PyObject *CurrentGetattro(PyObject *, PyObject *);
-static int CurrentSetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *DictionaryGetattro(PyObject *, PyObject *);
-static int DictionarySetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *ListGetattro(PyObject *, PyObject *);
-static int ListSetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *TupleGetattro(PyObject *, PyObject *);
-static int TupleSetattro(PyObject *, PyObject *, PyObject *);
-static PyObject *FunctionGetattro(PyObject *, PyObject *);
+സ്ഥിതം PyObject *OutputGetattro(PyObject *, PyObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ OutputSetattro(PyObject *, PyObject *, PyObject *);
+സ്ഥിതം PyObject *BufferGetattro(PyObject *, PyObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ BufferSetattro(PyObject *, PyObject *, PyObject *);
+സ്ഥിതം PyObject *TabPageGetattro(PyObject *, PyObject *);
+സ്ഥിതം PyObject *WindowGetattro(PyObject *, PyObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ WindowSetattro(PyObject *, PyObject *, PyObject *);
+സ്ഥിതം PyObject *RangeGetattro(PyObject *, PyObject *);
+സ്ഥിതം PyObject *CurrentGetattro(PyObject *, PyObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ CurrentSetattro(PyObject *, PyObject *, PyObject *);
+സ്ഥിതം PyObject *DictionaryGetattro(PyObject *, PyObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ DictionarySetattro(PyObject *, PyObject *, PyObject *);
+സ്ഥിതം PyObject *ListGetattro(PyObject *, PyObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ ListSetattro(PyObject *, PyObject *, PyObject *);
+സ്ഥിതം PyObject *TupleGetattro(PyObject *, PyObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ TupleSetattro(PyObject *, PyObject *, PyObject *);
+സ്ഥിതം PyObject *FunctionGetattro(PyObject *, PyObject *);
 
-static struct PyModuleDef vimmodule;
+സ്ഥിതം ഘടന PyModuleDef vimmodule;
 
 #define PY_CAN_RECURSE
 
 /*
  * Include the code shared with if_python.c
  */
-#include "if_py_both.h"
+#അന്തര്ഭാവ "if_py_both.h"
 
 #ifdef USE_LIMITED_API
-# if Py_LIMITED_API >= 0x030A0000
-#  define PY_UNICODE_GET_UTF8_CHARS(obj) PyUnicode_AsUTF8AndSize(obj, NULL)
-# else
+# എങ്കിൽ Py_LIMITED_API >= 0x030A0000
+#  define PY_UNICODE_GET_UTF8_CHARS(obj) PyUnicode_AsUTF8AndSize(obj, ശൂന്യ)
+# അല്ലെങ്കിൽ
 // Python limited API before 3.10 lack easy ways to query the raw UTF-8 chars.
 // We need to first convert the string to bytes, and then extract the chars.
 // This function is only used for attribute string comparisons, which have
@@ -1141,66 +1141,66 @@ static struct PyModuleDef vimmodule;
 //
 // An alternative would be to convert all attribute string comparisons to use
 // PyUnicode_CompareWithASCIIString to skip having to extract the chars.
-static char py3_unicode_utf8_chars[20];
-static char* PY_UNICODE_GET_UTF8_CHARS(PyObject* str)
+സ്ഥിതം അക്ഷരം py3_unicode_utf8_chars[20];
+സ്ഥിതം അക്ഷരം* PY_UNICODE_GET_UTF8_CHARS(PyObject* str)
 {
     py3_unicode_utf8_chars[0] = '\0';
     PyObject* bytes = PyUnicode_AsUTF8String(str);
-    if (bytes)
+    എങ്കിൽ (bytes)
     {
-	char *chars;
+	അക്ഷരം *chars;
 	Py_ssize_t len;
-	if (PyBytes_AsStringAndSize(bytes, &chars, &len) != -1)
+	എങ്കിൽ (PyBytes_AsStringAndSize(bytes, &chars, &len) != -1)
 	{
-	    if (len < (Py_ssize_t)sizeof(py3_unicode_utf8_chars))
+	    എങ്കിൽ (len < (Py_ssize_t)വലുപ്പം(py3_unicode_utf8_chars))
 		// PyBytes_AsStringAndSize guarantees null-termination
 		memcpy(py3_unicode_utf8_chars, chars, len + 1);
 	}
 	Py_DECREF(bytes);
     }
-    return py3_unicode_utf8_chars;
+    തിരികെ py3_unicode_utf8_chars;
 }
 # endif
-#else	// !USE_LIMITED_API
-# if PY_VERSION_HEX >= 0x030300f0
-#  define PY_UNICODE_GET_UTF8_CHARS(obj) PyUnicode_AsUTF8AndSize(obj, NULL)
-# else
+#അല്ലെങ്കിൽ	// !USE_LIMITED_API
+# എങ്കിൽ PY_VERSION_HEX >= 0x030300f0
+#  define PY_UNICODE_GET_UTF8_CHARS(obj) PyUnicode_AsUTF8AndSize(obj, ശൂന്യ)
+# അല്ലെങ്കിൽ
 #  define PY_UNICODE_GET_UTF8_CHARS _PyUnicode_AsString
 # endif
 #endif
 
 // NOTE: Must always be used at the start of a block, since it declares "name".
 #define GET_ATTR_STRING(name, nameobj) \
-    char	*name = ""; \
-    if (PyUnicode_Check(nameobj)) \
-	name = (char *)PY_UNICODE_GET_UTF8_CHARS(nameobj)
+    അക്ഷരം	*name = ""; \
+    എങ്കിൽ (PyUnicode_Check(nameobj)) \
+	name = (അക്ഷരം *)PY_UNICODE_GET_UTF8_CHARS(nameobj)
 
 #define PY3OBJ_DELETED(obj) (obj->ob_base.ob_refcnt<=0)
 
 ///////////////////////////////////////////////////////
 // Internal function prototypes.
 
-static PyObject *Py3Init_vim(void);
+സ്ഥിതം PyObject *Py3Init_vim(ശൂന്യം);
 
 ///////////////////////////////////////////////////////
 // 1. Python interpreter main program.
 
-    void
-python3_end(void)
+    ശൂന്യം
+python3_end(ശൂന്യം)
 {
-    static int recurse = 0;
+    സ്ഥിതം പൂർണ്ണസംഖ്യ recurse = 0;
 
     // If a crash occurs while doing this, don't try again.
-    if (recurse != 0)
-	return;
+    എങ്കിൽ (recurse != 0)
+	തിരികെ;
 
     python_end_called = TRUE;
     ++recurse;
 
 #ifdef DYNAMIC_PYTHON3
-    if (hinstPy3)
+    എങ്കിൽ (hinstPy3)
 #endif
-    if (Py_IsInitialized())
+    എങ്കിൽ (Py_IsInitialized())
     {
 #ifdef USE_LIMITED_API
 	shutdown_types();
@@ -1215,86 +1215,86 @@ python3_end(void)
     --recurse;
 }
 
-#if defined(DYNAMIC_PYTHON3) && defined(DYNAMIC_PYTHON) && defined(FEAT_PYTHON) && defined(UNIX)
-    int
-python3_loaded(void)
+#എങ്കിൽ defined(DYNAMIC_PYTHON3) && defined(DYNAMIC_PYTHON) && defined(FEAT_PYTHON) && defined(UNIX)
+    പൂർണ്ണസംഖ്യ
+python3_loaded(ശൂന്യം)
 {
-    return (hinstPy3 != 0);
+    തിരികെ (hinstPy3 != 0);
 }
 #endif
 
-static wchar_t *py_home_buf = NULL;
+സ്ഥിതം wchar_t *py_home_buf = ശൂന്യ;
 
-#if defined(MSWIN) && (PY_VERSION_HEX >= 0x030500f0)
+#എങ്കിൽ defined(MSWIN) && (PY_VERSION_HEX >= 0x030500f0)
 /*
  * Return TRUE if stdin is readable from Python 3.
  */
-    static BOOL
-is_stdin_readable(void)
+    സ്ഥിതം BOOL
+is_stdin_readable(ശൂന്യം)
 {
     DWORD	    mode, eventnum;
-    struct _stat    st;
-    int		    fd = fileno(stdin);
+    ഘടന _stat    st;
+    പൂർണ്ണസംഖ്യ		    fd = fileno(stdin);
     HANDLE	    hstdin = (HANDLE)_get_osfhandle(fd);
 
     // Check if stdin is connected to the console.
-    if (GetConsoleMode(hstdin, &mode))
+    എങ്കിൽ (GetConsoleMode(hstdin, &mode))
 	// Check if it is opened as input.
-	return GetNumberOfConsoleInputEvents(hstdin, &eventnum);
+	തിരികെ Get_സംഖ്യ_Of_Console_നിവേശം_Events(hstdin, &eventnum);
 
-    return _fstat(fd, &st) == 0;
+    തിരികെ _fstat(fd, &st) == 0;
 }
 
 // Python 3.5 or later will abort inside Py_Initialize() when stdin has
 // been closed (i.e. executed by "vim -").  Reconnect stdin to CONIN$.
 // Note that the python DLL is linked to its own stdio DLL which can be
 // differ from Vim's stdio.
-    static void
-reset_stdin(void)
+    സ്ഥിതം ശൂന്യം
+reset_stdin(ശൂന്യം)
 {
-    FILE *(*py__acrt_iob_func)(unsigned) = NULL;
-    FILE *(*pyfreopen)(const char *, const char *, FILE *) = NULL;
+    FILE *(*py__acrt_iob_func)(unsigned) = ശൂന്യ;
+    FILE *(*pyfreopen)(സ്ഥിരം അക്ഷരം *, സ്ഥിരം അക്ഷരം *, FILE *) = ശൂന്യ;
     HINSTANCE hinst = get_forwarded_dll(hinstPy3);
 
-    if (hinst == NULL || is_stdin_readable())
-	return;
+    എങ്കിൽ (hinst == ശൂന്യ || is_stdin_readable())
+	തിരികെ;
 
     // Get "freopen" and "stdin" which are used in the python DLL.
     // "stdin" is defined as "__acrt_iob_func(0)" in VC++ 2015 or later.
     py__acrt_iob_func = get_dll_import_func(hinst, "__acrt_iob_func");
-    if (py__acrt_iob_func)
+    എങ്കിൽ (py__acrt_iob_func)
     {
 	HINSTANCE hpystdiodll = find_imported_module_by_funcname(hinst,
 							    "__acrt_iob_func");
-	if (hpystdiodll)
-	    pyfreopen = (void *)GetProcAddress(hpystdiodll, "freopen");
+	എങ്കിൽ (hpystdiodll)
+	    pyfreopen = (ശൂന്യം *)GetProcAddress(hpystdiodll, "freopen");
     }
 
     // Reconnect stdin to CONIN$.
-    if (pyfreopen != NULL)
+    എങ്കിൽ (pyfreopen != ശൂന്യ)
 	pyfreopen("CONIN$", "r", py__acrt_iob_func(0));
-    else
+    അല്ലെങ്കിൽ
 	freopen("CONIN$", "r", stdin);
 }
-#else
+#അല്ലെങ്കിൽ
 # define reset_stdin()
 #endif
 
 // Python 3.2 or later will abort inside Py_Initialize() when mandatory
 // modules cannot be loaded (e.g. 'pythonthreehome' is wrongly set.).
 // Install a hook to python dll's exit() and recover from it.
-#if defined(MSWIN) && (PY_VERSION_HEX >= 0x030200f0)
+#എങ്കിൽ defined(MSWIN) && (PY_VERSION_HEX >= 0x030200f0)
 # define HOOK_EXIT
 # include <setjmp.h>
 
-static jmp_buf exit_hook_jump_buf;
-static void *orig_exit = NULL;
+സ്ഥിതം jmp_buf exit_hook_jump_buf;
+സ്ഥിതം ശൂന്യം *orig_exit = ശൂന്യ;
 
 /*
  * Function that replaces exit() while calling Py_Initialize().
  */
-    static void
-hooked_exit(int ret)
+    സ്ഥിതം ശൂന്യം
+hooked_exit(പൂർണ്ണസംഖ്യ ret)
 {
     // Recover from exit.
     longjmp(exit_hook_jump_buf, 1);
@@ -1303,44 +1303,44 @@ hooked_exit(int ret)
 /*
  * Install a hook to python dll's exit().
  */
-    static void
-hook_py_exit(void)
+    സ്ഥിതം ശൂന്യം
+hook_py_exit(ശൂന്യം)
 {
     HINSTANCE hinst = get_forwarded_dll(hinstPy3);
 
-    if (hinst == NULL || orig_exit != NULL)
-	return;
+    എങ്കിൽ (hinst == ശൂന്യ || orig_exit != ശൂന്യ)
+	തിരികെ;
 
-    orig_exit = hook_dll_import_func(hinst, "exit", (void *)hooked_exit);
+    orig_exit = hook_dll_import_func(hinst, "exit", (ശൂന്യം *)hooked_exit);
 }
 
 /*
  * Remove the hook installed by hook_py_exit().
  */
-    static void
-restore_py_exit(void)
+    സ്ഥിതം ശൂന്യം
+restore_py_exit(ശൂന്യം)
 {
     HINSTANCE hinst = hinstPy3;
 
-    if (hinst == NULL)
-	return;
+    എങ്കിൽ (hinst == ശൂന്യ)
+	തിരികെ;
 
-    if (orig_exit != NULL)
+    എങ്കിൽ (orig_exit != ശൂന്യ)
 	hook_dll_import_func(hinst, "exit", orig_exit);
-    orig_exit = NULL;
+    orig_exit = ശൂന്യ;
 }
 #endif
 
-    static int
-Python3_Init(void)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+Python3_Init(ശൂന്യം)
 {
-    if (!py3initialised)
+    എങ്കിൽ (!py3initialised)
     {
 #ifdef DYNAMIC_PYTHON3
-	if (!python3_enabled(TRUE))
+	എങ്കിൽ (!python3_enabled(TRUE))
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_python_library_could_not_be_found));
-	    goto fail;
+	    പോകുക fail;
 	}
 #endif
 	// Python 3.13 introduced a really useful feature: colorized exceptions.
@@ -1351,24 +1351,24 @@ Python3_Init(void)
 
 	init_structs();
 
-	if (*p_py3home != NUL)
+	എങ്കിൽ (*p_py3home != NUL)
 	{
-	    size_t len = mbstowcs(NULL, (char *)p_py3home, 0) + 1;
+	    size_t len = mbstowcs(ശൂന്യ, (അക്ഷരം *)p_py3home, 0) + 1;
 
 	    // The string must not change later, make a copy in static memory.
 	    py_home_buf = ALLOC_MULT(wchar_t, len);
-	    if (py_home_buf != NULL && mbstowcs(
-			    py_home_buf, (char *)p_py3home, len) != (size_t)-1)
+	    എങ്കിൽ (py_home_buf != ശൂന്യ && mbstowcs(
+			    py_home_buf, (അക്ഷരം *)p_py3home, len) != (size_t)-1)
 		Py_SetPythonHome(py_home_buf);
 	}
 #ifdef PYTHON3_HOME
-	else if (mch_getenv((char_u *)"PYTHONHOME") == NULL)
+	അല്ലെങ്കിൽ എങ്കിൽ (mch_getenv((char_u *)"PYTHONHOME") == ശൂന്യ)
 	    Py_SetPythonHome(PYTHON3_HOME);
 #endif
 
 	PyImport_AppendInittab("vim", Py3Init_vim);
 
-#if !defined(DYNAMIC_PYTHON3) && defined(MSWIN)
+#എങ്കിൽ !defined(DYNAMIC_PYTHON3) && defined(MSWIN)
 	hinstPy3 = GetModuleHandle(PYTHON3_DLL);
 #endif
 	reset_stdin();
@@ -1376,23 +1376,23 @@ Python3_Init(void)
 #ifdef HOOK_EXIT
 	// Catch exit() called in Py_Initialize().
 	hook_py_exit();
-	if (setjmp(exit_hook_jump_buf) == 0)
+	എങ്കിൽ (setjmp(exit_hook_jump_buf) == 0)
 	{
 	    Py_Initialize();
 	    restore_py_exit();
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // exit() was called in Py_Initialize().
 	    restore_py_exit();
 	    emsg(_(e_critical_error_in_python3_initialization_check_your_installation));
-	    goto fail;
+	    പോകുക fail;
 	}
-#else
+#അല്ലെങ്കിൽ
 	Py_Initialize();
 #endif
 
-#if PY_VERSION_HEX < 0x03090000
+#എങ്കിൽ PY_VERSION_HEX < 0x03090000
 	// Initialise threads.  This is deprecated since Python 3.9.
 	PyEval_InitThreads();
 #endif
@@ -1400,8 +1400,8 @@ Python3_Init(void)
 	get_py3_exceptions();
 #endif
 
-	if (PythonIO_Init_io())
-	    goto fail;
+	എങ്കിൽ (PythonIO_Init_io())
+	    പോകുക fail;
 
 	globals = PyModule_GetDict(PyImport_AddModule("__main__"));
 
@@ -1426,7 +1426,7 @@ Python3_Init(void)
 	py3initialised = 1;
     }
 
-    return 0;
+    തിരികെ 0;
 
 fail:
     // We call PythonIO_Flush() here to print any Python errors.
@@ -1434,46 +1434,46 @@ fail:
     // if PythonIO_Init_io() has not completed successfully (it will
     // not do anything in this case).
     PythonIO_Flush();
-    return -1;
+    തിരികെ -1;
 }
 
 /*
  * External interface
  */
-    static void
-DoPyCommand(const char *cmd,
+    സ്ഥിതം ശൂന്യം
+DoPyCommand(സ്ഥിരം അക്ഷരം *cmd,
 	    dict_T* locals,
 	    rangeinitializer init_range,
 	    runner run,
-	    void *arg)
+	    ശൂന്യം *arg)
 {
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-    char		*saved_locale;
+#എങ്കിൽ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+    അക്ഷരം		*saved_locale;
 #endif
     PyObject		*cmdstr;
     PyObject		*cmdbytes;
     PyGILState_STATE	pygilstate;
 
-    if (python_end_called)
-	goto theend;
+    എങ്കിൽ (python_end_called)
+	പോകുക theend;
 
-    if (Python3_Init())
-	goto theend;
+    എങ്കിൽ (Python3_Init())
+	പോകുക theend;
 
     init_range(arg);
 
     Python_Release_Vim();	    // leave Vim
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#എങ്കിൽ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
     // Python only works properly when the LC_NUMERIC locale is "C".
-    saved_locale = setlocale(LC_NUMERIC, NULL);
-    if (saved_locale == NULL || STRCMP(saved_locale, "C") == 0)
-	saved_locale = NULL;
-    else
+    saved_locale = setlocale(LC_NUMERIC, ശൂന്യ);
+    എങ്കിൽ (saved_locale == ശൂന്യ || STRCMP(saved_locale, "C") == 0)
+	saved_locale = ശൂന്യ;
+    അല്ലെങ്കിൽ
     {
 	// Need to make a copy, value may change when setting new locale.
-	saved_locale = (char *)vim_strsave((char_u *)saved_locale);
-	(void)setlocale(LC_NUMERIC, "C");
+	saved_locale = (അക്ഷരം *)vim_strsave((char_u *)saved_locale);
+	(ശൂന്യം)setlocale(LC_NUMERIC, "C");
     }
 #endif
 
@@ -1482,7 +1482,7 @@ DoPyCommand(const char *cmd,
     // PyRun_SimpleString expects a UTF-8 string. Wrong encoding may cause
     // SyntaxError (unicode error).
     cmdstr = PyUnicode_Decode(cmd, strlen(cmd),
-					(char *)ENC_OPT, ERRORS_DECODE_ARG);
+					(അക്ഷരം *)ENC_OPT, ERRORS_DECODE_ARG);
     cmdbytes = PyUnicode_AsEncodedString(cmdstr, "utf-8", ERRORS_ENCODE_ARG);
     Py_XDECREF(cmdstr);
 
@@ -1491,10 +1491,10 @@ DoPyCommand(const char *cmd,
 
     PyGILState_Release(pygilstate);
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-    if (saved_locale != NULL)
+#എങ്കിൽ defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+    എങ്കിൽ (saved_locale != ശൂന്യ)
     {
-	(void)setlocale(LC_NUMERIC, saved_locale);
+	(ശൂന്യം)setlocale(LC_NUMERIC, saved_locale);
 	vim_free(saved_locale);
     }
 #endif
@@ -1503,28 +1503,28 @@ DoPyCommand(const char *cmd,
     PythonIO_Flush();
 
 theend:
-    return;	    // keeps lint happy
+    തിരികെ;	    // keeps lint happy
 }
 
 /*
  * ":py3"
  */
-    void
+    ശൂന്യം
 ex_py3(exarg_T *eap)
 {
     char_u *script;
 
     script = script_get(eap, eap->arg);
-    if (!eap->skip)
+    എങ്കിൽ (!eap->skip)
     {
-	if (p_pyx == 0)
+	എങ്കിൽ (p_pyx == 0)
 	    p_pyx = 3;
 
-	DoPyCommand(script == NULL ? (char *) eap->arg : (char *) script,
-		NULL,
+	DoPyCommand(script == ശൂന്യ ? (അക്ഷരം *) eap->arg : (അക്ഷരം *) script,
+		ശൂന്യ,
 		init_range_cmd,
 		(runner) run_cmd,
-		(void *) eap);
+		(ശൂന്യം *) eap);
     }
     vim_free(script);
 }
@@ -1534,15 +1534,15 @@ ex_py3(exarg_T *eap)
 /*
  * ":py3file"
  */
-    void
+    ശൂന്യം
 ex_py3file(exarg_T *eap)
 {
-    static char buffer[BUFFER_SIZE];
-    const char *file;
-    char *p;
-    int i;
+    സ്ഥിതം അക്ഷരം buffer[BUFFER_SIZE];
+    സ്ഥിരം അക്ഷരം *file;
+    അക്ഷരം *p;
+    പൂർണ്ണസംഖ്യ i;
 
-    if (p_pyx == 0)
+    എങ്കിൽ (p_pyx == 0)
 	p_pyx = 3;
 
     // Have to do it like this. PyRun_SimpleFile requires you to pass a
@@ -1561,24 +1561,24 @@ ex_py3file(exarg_T *eap)
     strcpy(buffer, "exec(compile(open('");
     p = buffer + 19; // size of "exec(compile(open('"
 
-    for (i=0; i<2; ++i)
+    വേണ്ടി (i=0; i<2; ++i)
     {
-	file = (char *)eap->arg;
-	while (*file && p < buffer + (BUFFER_SIZE - 3))
+	file = (അക്ഷരം *)eap->arg;
+	ആകുമ്പോൾ (*file && p < buffer + (BUFFER_SIZE - 3))
 	{
-	    if (*file == '\\' || *file == '\'')
+	    എങ്കിൽ (*file == '\\' || *file == '\'')
 		*p++ = '\\';
 	    *p++ = *file++;
 	}
 	// If we didn't finish the file name, we hit a buffer overflow
-	if (*file != '\0')
-	    return;
-	if (i==0)
+	എങ്കിൽ (*file != '\0')
+	    തിരികെ;
+	എങ്കിൽ (i==0)
 	{
 	    strcpy(p,"','rb').read(),'");
 	    p += 16;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    strcpy(p,"','exec'))");
 	    p += 10;
@@ -1588,23 +1588,23 @@ ex_py3file(exarg_T *eap)
 
     // Execute the file
     DoPyCommand(buffer,
-	    NULL,
+	    ശൂന്യ,
 	    init_range_cmd,
 	    (runner) run_cmd,
-	    (void *) eap);
+	    (ശൂന്യം *) eap);
 }
 
-    void
+    ശൂന്യം
 ex_py3do(exarg_T *eap)
 {
-    if (p_pyx == 0)
+    എങ്കിൽ (p_pyx == 0)
 	p_pyx = 3;
 
-    DoPyCommand((char *)eap->arg,
-	    NULL,
+    DoPyCommand((അക്ഷരം *)eap->arg,
+	    ശൂന്യ,
 	    init_range_cmd,
 	    (runner)run_do,
-	    (void *)eap);
+	    (ശൂന്യം *)eap);
 }
 
 ///////////////////////////////////////////////////////
@@ -1612,27 +1612,27 @@ ex_py3do(exarg_T *eap)
 
 // Implementation functions
 
-    static PyObject *
+    സ്ഥിതം PyObject *
 OutputGetattro(PyObject *self, PyObject *nameobj)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "softspace") == 0)
-	return PyLong_FromLong(((OutputObject *)(self))->softspace);
-    else if (strcmp(name, "errors") == 0)
-	return PyString_FromString("strict");
-    else if (strcmp(name, "encoding") == 0)
-	return PyString_FromString(ENC_OPT);
+    എങ്കിൽ (strcmp(name, "softspace") == 0)
+	തിരികെ PyLong_FromLong(((OutputObject *)(self))->softspace);
+    അല്ലെങ്കിൽ എങ്കിൽ (strcmp(name, "errors") == 0)
+	തിരികെ PyString_FromString("strict");
+    അല്ലെങ്കിൽ എങ്കിൽ (strcmp(name, "encoding") == 0)
+	തിരികെ PyString_FromString(ENC_OPT);
 
-    return PyObject_GenericGetAttr(self, nameobj);
+    തിരികെ PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 OutputSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    return OutputSetattr(self, name, val);
+    തിരികെ OutputSetattr(self, name, val);
 }
 
 ///////////////////////////////////////////////////////
@@ -1648,22 +1648,22 @@ OutputSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 
 #define BufferType_Check(obj) ((obj)->ob_base.ob_type == &BufferType)
 
-static PyObject* BufferSubscript(PyObject *self, PyObject *idx);
-static int BufferAsSubscript(PyObject *self, PyObject *idx, PyObject *val);
+സ്ഥിതം PyObject* BufferSubscript(PyObject *self, PyObject *idx);
+സ്ഥിതം പൂർണ്ണസംഖ്യ BufferAsSubscript(PyObject *self, PyObject *idx, PyObject *val);
 
 // Line range type - Implementation functions
 // --------------------------------------
 
 #define RangeType_Check(obj) ((obj)->ob_base.ob_type == &RangeType)
 
-static PyObject* RangeSubscript(PyObject *self, PyObject *idx);
-static int RangeAsItem(PyObject *, Py_ssize_t, PyObject *);
-static int RangeAsSubscript(PyObject *self, PyObject *idx, PyObject *val);
+സ്ഥിതം PyObject* RangeSubscript(PyObject *self, PyObject *idx);
+സ്ഥിതം പൂർണ്ണസംഖ്യ RangeAsItem(PyObject *, Py_ssize_t, PyObject *);
+സ്ഥിതം പൂർണ്ണസംഖ്യ RangeAsSubscript(PyObject *self, PyObject *idx, PyObject *val);
 
 // Current objects type - Implementation functions
 // -----------------------------------------------
 
-static PySequenceMethods BufferAsSeq = {
+സ്ഥിതം PySequenceMethods BufferAsSeq = {
     (lenfunc)		BufferLength,	    // sq_length,    len(x)
     (binaryfunc)	0,		    // sq_concat,    x+y
     (ssizeargfunc)	0,		    // sq_repeat,    x*n
@@ -1676,7 +1676,7 @@ static PySequenceMethods BufferAsSeq = {
     0,					    // sq_inplace_repeat
 };
 
-static PyMappingMethods BufferAsMapping = {
+സ്ഥിതം PyMappingMethods BufferAsMapping = {
     /* mp_length	*/ (lenfunc)BufferLength,
     /* mp_subscript     */ (binaryfunc)BufferSubscript,
     /* mp_ass_subscript */ (objobjargproc)BufferAsSubscript,
@@ -1685,103 +1685,103 @@ static PyMappingMethods BufferAsMapping = {
 
 // Buffer object
 
-    static PyObject *
+    സ്ഥിതം PyObject *
 BufferGetattro(PyObject *self, PyObject *nameobj)
 {
     PyObject *r;
 
     GET_ATTR_STRING(name, nameobj);
 
-    if ((r = BufferAttrValid((BufferObject *)(self), name)))
-	return r;
+    എങ്കിൽ ((r = BufferAttrValid((BufferObject *)(self), name)))
+	തിരികെ r;
 
-    if (CheckBuffer((BufferObject *)(self)))
-	return NULL;
+    എങ്കിൽ (CheckBuffer((BufferObject *)(self)))
+	തിരികെ ശൂന്യ;
 
     r = BufferAttr((BufferObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    എങ്കിൽ (r || PyErr_Occurred())
+	തിരികെ r;
+    അല്ലെങ്കിൽ
+	തിരികെ PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 BufferSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    return BufferSetattr(self, name, val);
+    തിരികെ BufferSetattr(self, name, val);
 }
 
 //////////////////
 
-    static PyObject *
+    സ്ഥിതം PyObject *
 BufferSubscript(PyObject *self, PyObject* idx)
 {
-    if (PyLong_Check(idx))
+    എങ്കിൽ (PyLong_Check(idx))
     {
 	long _idx = PyLong_AsLong(idx);
-	return BufferItem((BufferObject *)(self), _idx);
+	തിരികെ BufferItem((BufferObject *)(self), _idx);
     }
-    else if (PySlice_Check(idx))
+    അല്ലെങ്കിൽ എങ്കിൽ (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (CheckBuffer((BufferObject *) self))
-	    return NULL;
+	എങ്കിൽ (CheckBuffer((BufferObject *) self))
+	    തിരികെ ശൂന്യ;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx,
-	      (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_line_count,
+	എങ്കിൽ (PySlice_GetIndicesEx((PySliceObject_T *)idx,
+	      (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_വരി_എണ്ണം,
 	      &start, &stop,
 	      &step, &slicelen) < 0)
-	    return NULL;
-	return BufferSlice((BufferObject *)(self), start, stop);
+	    തിരികെ ശൂന്യ;
+	തിരികെ BufferSlice((BufferObject *)(self), start, stop);
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 BufferAsSubscript(PyObject *self, PyObject* idx, PyObject* val)
 {
-    if (PyLong_Check(idx))
+    എങ്കിൽ (PyLong_Check(idx))
     {
 	long n = PyLong_AsLong(idx);
 
-	if (CheckBuffer((BufferObject *) self))
-	    return -1;
+	എങ്കിൽ (CheckBuffer((BufferObject *) self))
+	    തിരികെ -1;
 
-	return RBAsItem((BufferObject *)(self), n, val, 1,
-		    (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_line_count,
-		    NULL);
+	തിരികെ RBAsItem((BufferObject *)(self), n, val, 1,
+		    (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_വരി_എണ്ണം,
+		    ശൂന്യ);
     }
-    else if (PySlice_Check(idx))
+    അല്ലെങ്കിൽ എങ്കിൽ (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (CheckBuffer((BufferObject *) self))
-	    return -1;
+	എങ്കിൽ (CheckBuffer((BufferObject *) self))
+	    തിരികെ -1;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx,
-	      (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_line_count,
+	എങ്കിൽ (PySlice_GetIndicesEx((PySliceObject_T *)idx,
+	      (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_വരി_എണ്ണം,
 	      &start, &stop,
 	      &step, &slicelen) < 0)
-	    return -1;
-	return RBAsSlice((BufferObject *)(self), start, stop, val, 1,
-			  (PyInt)((BufferObject *)(self))->buf->b_ml.ml_line_count,
-			  NULL);
+	    തിരികെ -1;
+	തിരികെ RBAsSlice((BufferObject *)(self), start, stop, val, 1,
+			  (PyInt)((BufferObject *)(self))->buf->b_ml.ml_വരി_എണ്ണം,
+			  ശൂന്യ);
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return -1;
+	തിരികെ -1;
     }
 }
 
-static PySequenceMethods RangeAsSeq = {
+സ്ഥിതം PySequenceMethods RangeAsSeq = {
     (lenfunc)		RangeLength,	 // sq_length,	  len(x)
     (binaryfunc)	0,		 // RangeConcat, sq_concat,  x+y
     (ssizeargfunc)	0,		 // RangeRepeat, sq_repeat,  x*n
@@ -1794,7 +1794,7 @@ static PySequenceMethods RangeAsSeq = {
     0,					 // sq_inplace_repeat
 };
 
-static PyMappingMethods RangeAsMapping = {
+സ്ഥിതം PyMappingMethods RangeAsMapping = {
     /* mp_length	*/ (lenfunc)RangeLength,
     /* mp_subscript     */ (binaryfunc)RangeSubscript,
     /* mp_ass_subscript */ (objobjargproc)RangeAsSubscript,
@@ -1802,146 +1802,146 @@ static PyMappingMethods RangeAsMapping = {
 
 // Line range object - Implementation
 
-    static PyObject *
+    സ്ഥിതം PyObject *
 RangeGetattro(PyObject *self, PyObject *nameobj)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "start") == 0)
-	return Py_BuildValue("n", ((RangeObject *)(self))->start - 1);
-    else if (strcmp(name, "end") == 0)
-	return Py_BuildValue("n", ((RangeObject *)(self))->end - 1);
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    എങ്കിൽ (strcmp(name, "start") == 0)
+	തിരികെ Py_Build_മൂല്യം("n", ((RangeObject *)(self))->start - 1);
+    അല്ലെങ്കിൽ എങ്കിൽ (strcmp(name, "end") == 0)
+	തിരികെ Py_Build_മൂല്യം("n", ((RangeObject *)(self))->end - 1);
+    അല്ലെങ്കിൽ
+	തിരികെ PyObject_GenericGetAttr(self, nameobj);
 }
 
 ////////////////
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 RangeAsItem(PyObject *self, Py_ssize_t n, PyObject *val)
 {
-    return RBAsItem(((RangeObject *)(self))->buf, n, val,
+    തിരികെ RBAsItem(((RangeObject *)(self))->buf, n, val,
 		    ((RangeObject *)(self))->start,
 		    ((RangeObject *)(self))->end,
 		    &((RangeObject *)(self))->end);
 }
 
-    static Py_ssize_t
+    സ്ഥിതം Py_ssize_t
 RangeAsSlice(PyObject *self, Py_ssize_t lo, Py_ssize_t hi, PyObject *val)
 {
-    return RBAsSlice(((RangeObject *)(self))->buf, lo, hi, val,
+    തിരികെ RBAsSlice(((RangeObject *)(self))->buf, lo, hi, val,
 		    ((RangeObject *)(self))->start,
 		    ((RangeObject *)(self))->end,
 		    &((RangeObject *)(self))->end);
 }
 
-    static PyObject *
+    സ്ഥിതം PyObject *
 RangeSubscript(PyObject *self, PyObject* idx)
 {
-    if (PyLong_Check(idx))
+    എങ്കിൽ (PyLong_Check(idx))
     {
 	long _idx = PyLong_AsLong(idx);
-	return RangeItem((RangeObject *)(self), _idx);
+	തിരികെ RangeItem((RangeObject *)(self), _idx);
     }
-    else if (PySlice_Check(idx))
+    അല്ലെങ്കിൽ എങ്കിൽ (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx,
+	എങ്കിൽ (PySlice_GetIndicesEx((PySliceObject_T *)idx,
 		((RangeObject *)(self))->end-((RangeObject *)(self))->start+1,
 		&start, &stop,
 		&step, &slicelen) < 0)
-	    return NULL;
-	return RangeSlice((RangeObject *)(self), start, stop);
+	    തിരികെ ശൂന്യ;
+	തിരികെ RangeSlice((RangeObject *)(self), start, stop);
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 RangeAsSubscript(PyObject *self, PyObject *idx, PyObject *val)
 {
-    if (PyLong_Check(idx))
+    എങ്കിൽ (PyLong_Check(idx))
     {
 	long n = PyLong_AsLong(idx);
-	return RangeAsItem(self, n, val);
+	തിരികെ RangeAsItem(self, n, val);
     }
-    else if (PySlice_Check(idx))
+    അല്ലെങ്കിൽ എങ്കിൽ (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx,
+	എങ്കിൽ (PySlice_GetIndicesEx((PySliceObject_T *)idx,
 		((RangeObject *)(self))->end-((RangeObject *)(self))->start+1,
 		&start, &stop,
 		&step, &slicelen) < 0)
-	    return -1;
-	return RangeAsSlice(self, start, stop, val);
+	    തിരികെ -1;
+	തിരികെ RangeAsSlice(self, start, stop, val);
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return -1;
+	തിരികെ -1;
     }
 }
 
 // TabPage object - Implementation
 
-    static PyObject *
+    സ്ഥിതം PyObject *
 TabPageGetattro(PyObject *self, PyObject *nameobj)
 {
     PyObject *r;
 
     GET_ATTR_STRING(name, nameobj);
 
-    if ((r = TabPageAttrValid((TabPageObject *)(self), name)))
-	return r;
+    എങ്കിൽ ((r = TabPageAttrValid((TabPageObject *)(self), name)))
+	തിരികെ r;
 
-    if (CheckTabPage((TabPageObject *)(self)))
-	return NULL;
+    എങ്കിൽ (CheckTabPage((TabPageObject *)(self)))
+	തിരികെ ശൂന്യ;
 
     r = TabPageAttr((TabPageObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    എങ്കിൽ (r || PyErr_Occurred())
+	തിരികെ r;
+    അല്ലെങ്കിൽ
+	തിരികെ PyObject_GenericGetAttr(self, nameobj);
 }
 
 // Window object - Implementation
 
-    static PyObject *
+    സ്ഥിതം PyObject *
 WindowGetattro(PyObject *self, PyObject *nameobj)
 {
     PyObject *r;
 
     GET_ATTR_STRING(name, nameobj);
 
-    if ((r = WindowAttrValid((WindowObject *)(self), name)))
-	return r;
+    എങ്കിൽ ((r = WindowAttrValid((WindowObject *)(self), name)))
+	തിരികെ r;
 
-    if (CheckWindow((WindowObject *)(self)))
-	return NULL;
+    എങ്കിൽ (CheckWindow((WindowObject *)(self)))
+	തിരികെ ശൂന്യ;
 
     r = WindowAttr((WindowObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    എങ്കിൽ (r || PyErr_Occurred())
+	തിരികെ r;
+    അല്ലെങ്കിൽ
+	തിരികെ PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 WindowSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    return WindowSetattr(self, name, val);
+    തിരികെ WindowSetattr(self, name, val);
 }
 
 // Tab page list object - Definitions
 
-static PySequenceMethods TabListAsSeq = {
+സ്ഥിതം PySequenceMethods TabListAsSeq = {
     (lenfunc)	     TabListLength,	    // sq_length,    len(x)
     (binaryfunc)     0,			    // sq_concat,    x+y
     (ssizeargfunc)   0,			    // sq_repeat,    x*n
@@ -1956,7 +1956,7 @@ static PySequenceMethods TabListAsSeq = {
 
 // Window list object - Definitions
 
-static PySequenceMethods WinListAsSeq = {
+സ്ഥിതം PySequenceMethods WinListAsSeq = {
     (lenfunc)	     WinListLength,	    // sq_length,    len(x)
     (binaryfunc)     0,			    // sq_concat,    x+y
     (ssizeargfunc)   0,			    // sq_repeat,    x*n
@@ -1972,90 +1972,90 @@ static PySequenceMethods WinListAsSeq = {
 /*
  * Current items object - Implementation
  */
-    static PyObject *
+    സ്ഥിതം PyObject *
 CurrentGetattro(PyObject *self, PyObject *nameobj)
 {
     PyObject	*r;
     GET_ATTR_STRING(name, nameobj);
-    if (!(r = CurrentGetattr(self, name)))
-	return PyObject_GenericGetAttr(self, nameobj);
-    return r;
+    എങ്കിൽ (!(r = CurrentGetattr(self, name)))
+	തിരികെ PyObject_GenericGetAttr(self, nameobj);
+    തിരികെ r;
 }
 
-    static int
-CurrentSetattro(PyObject *self, PyObject *nameobj, PyObject *value)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+CurrentSetattro(PyObject *self, PyObject *nameobj, PyObject *മൂല്യം)
 {
     GET_ATTR_STRING(name, nameobj);
-    return CurrentSetattr(self, name, value);
+    തിരികെ CurrentSetattr(self, name, മൂല്യം);
 }
 
 // Dictionary object - Definitions
 
-    static PyObject *
+    സ്ഥിതം PyObject *
 DictionaryGetattro(PyObject *self, PyObject *nameobj)
 {
     DictionaryObject	*this = ((DictionaryObject *) (self));
 
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "locked") == 0)
-	return PyLong_FromLong(this->dict->dv_lock);
-    else if (strcmp(name, "scope") == 0)
-	return PyLong_FromLong(this->dict->dv_scope);
+    എങ്കിൽ (strcmp(name, "locked") == 0)
+	തിരികെ PyLong_FromLong(this->dict->dv_lock);
+    അല്ലെങ്കിൽ എങ്കിൽ (strcmp(name, "scope") == 0)
+	തിരികെ PyLong_FromLong(this->dict->dv_scope);
 
-    return PyObject_GenericGetAttr(self, nameobj);
+    തിരികെ PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 DictionarySetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
-    return DictionarySetattr(self, name, val);
+    തിരികെ DictionarySetattr(self, name, val);
 }
 
 // List object - Definitions
 
-    static PyObject *
+    സ്ഥിതം PyObject *
 ListGetattro(PyObject *self, PyObject *nameobj)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "locked") == 0)
-	return PyLong_FromLong(((ListObject *) (self))->list->lv_lock);
+    എങ്കിൽ (strcmp(name, "locked") == 0)
+	തിരികെ PyLong_FromLong(((ListObject *) (self))->list->lv_lock);
 
-    return PyObject_GenericGetAttr(self, nameobj);
+    തിരികെ PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 ListSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
-    return ListSetattr(self, name, val);
+    തിരികെ ListSetattr(self, name, val);
 }
 
 // Tuple object - Definitions
 
-    static PyObject *
+    സ്ഥിതം PyObject *
 TupleGetattro(PyObject *self, PyObject *nameobj)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "locked") == 0)
-	return PyLong_FromLong(((TupleObject *) (self))->tuple->tv_lock);
+    എങ്കിൽ (strcmp(name, "locked") == 0)
+	തിരികെ PyLong_FromLong(((TupleObject *) (self))->tuple->tv_lock);
 
-    return PyObject_GenericGetAttr(self, nameobj);
+    തിരികെ PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 TupleSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
-    return TupleSetattr(self, name, val);
+    തിരികെ TupleSetattr(self, name, val);
 }
 
 // Function object - Definitions
 
-    static PyObject *
+    സ്ഥിതം PyObject *
 FunctionGetattro(PyObject *self, PyObject *nameobj)
 {
     PyObject		*r;
@@ -2064,66 +2064,66 @@ FunctionGetattro(PyObject *self, PyObject *nameobj)
     GET_ATTR_STRING(name, nameobj);
 
     r = FunctionAttr(this, name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    എങ്കിൽ (r || PyErr_Occurred())
+	തിരികെ r;
+    അല്ലെങ്കിൽ
+	തിരികെ PyObject_GenericGetAttr(self, nameobj);
 }
 
 // External interface
 
-    void
+    ശൂന്യം
 python3_buffer_free(buf_T *buf)
 {
     BufferObject *bp = BUF_PYTHON_REF(buf);
-    if (bp == NULL)
-	return;
-    bp->buf = INVALID_BUFFER_VALUE;
-    BUF_PYTHON_REF(buf) = NULL;
+    എങ്കിൽ (bp == ശൂന്യ)
+	തിരികെ;
+    bp->buf = INVALID_BUFFER_മൂല്യം;
+    BUF_PYTHON_REF(buf) = ശൂന്യ;
 }
 
-    void
+    ശൂന്യം
 python3_window_free(win_T *win)
 {
     WindowObject *wp = WIN_PYTHON_REF(win);
-    if (wp == NULL)
-	return;
-    wp->win = INVALID_WINDOW_VALUE;
-    WIN_PYTHON_REF(win) = NULL;
+    എങ്കിൽ (wp == ശൂന്യ)
+	തിരികെ;
+    wp->win = INVALID_WINDOW_മൂല്യം;
+    WIN_PYTHON_REF(win) = ശൂന്യ;
 }
 
-    void
+    ശൂന്യം
 python3_tabpage_free(tabpage_T *tab)
 {
     TabPageObject *tp = TAB_PYTHON_REF(tab);
-    if (tp == NULL)
-	return;
-    tp->tab = INVALID_TABPAGE_VALUE;
-    TAB_PYTHON_REF(tab) = NULL;
+    എങ്കിൽ (tp == ശൂന്യ)
+	തിരികെ;
+    tp->tab = INVALID_TABPAGE_മൂല്യം;
+    TAB_PYTHON_REF(tab) = ശൂന്യ;
 }
 
-    static PyObject *
-Py3Init_vim(void)
+    സ്ഥിതം PyObject *
+Py3Init_vim(ശൂന്യം)
 {
     // The special value is removed from sys.path in Python3_Init().
-    static wchar_t *(argv[2]) = {L"/must>not&exist/foo", NULL};
+    സ്ഥിതം wchar_t *(argv[2]) = {L"/must>not&exist/foo", ശൂന്യ};
 
-    if (init_types())
-	return NULL;
+    എങ്കിൽ (init_types())
+	തിരികെ ശൂന്യ;
 
     // Set sys.argv[] to avoid a crash in warn().
     PySys_SetArgv(1, argv);
 
-    if ((vim_module = PyModule_Create(&vimmodule)) == NULL)
-	return NULL;
+    എങ്കിൽ ((vim_module = PyModule_Create(&vimmodule)) == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
-    if (populate_module(vim_module))
-	return NULL;
+    എങ്കിൽ (populate_module(vim_module))
+	തിരികെ ശൂന്യ;
 
-    if (init_sys_path())
-	return NULL;
+    എങ്കിൽ (init_sys_path())
+	തിരികെ ശൂന്യ;
 
-    return vim_module;
+    തിരികെ vim_module;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -2135,26 +2135,26 @@ Py3Init_vim(void)
  *
  * On errors, the Python exception data is set, and NULL is returned.
  */
-    static PyObject *
-LineToString(const char *str)
+    സ്ഥിതം PyObject *
+വരി_To_String(സ്ഥിരം അക്ഷരം *str)
 {
     PyObject *result;
     Py_ssize_t len = strlen(str);
-    char *tmp, *p;
+    അക്ഷരം *tmp, *p;
 
     tmp = alloc(len + 1);
     p = tmp;
-    if (p == NULL)
+    എങ്കിൽ (p == ശൂന്യ)
     {
 	PyErr_NoMemory();
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 
-    while (*str)
+    ആകുമ്പോൾ (*str)
     {
-	if (*str == '\n')
+	എങ്കിൽ (*str == '\n')
 	    *p = '\0';
-	else
+	അല്ലെങ്കിൽ
 	    *p = *str;
 
 	++p;
@@ -2162,39 +2162,39 @@ LineToString(const char *str)
     }
     *p = '\0';
 
-    result = PyUnicode_Decode(tmp, len, (char *)ENC_OPT, ERRORS_DECODE_ARG);
+    result = PyUnicode_Decode(tmp, len, (അക്ഷരം *)ENC_OPT, ERRORS_DECODE_ARG);
 
     vim_free(tmp);
-    return result;
+    തിരികെ result;
 }
 
-    void
+    ശൂന്യം
 do_py3eval(char_u *str, dict_T *locals, typval_T *rettv)
 {
-    DoPyCommand((char *) str,
+    DoPyCommand((അക്ഷരം *) str,
 	    locals,
 	    init_range_eval,
 	    (runner) run_eval,
-	    (void *) rettv);
-    if (rettv->v_type == VAR_UNKNOWN)
+	    (ശൂന്യം *) rettv);
+    എങ്കിൽ (rettv->v_type == VAR_UNKNOWN)
     {
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = 0;
+	rettv->v_type = VAR_സംഖ്യ;
+	rettv->vval.v_സംഖ്യ = 0;
     }
 }
 
-    int
-set_ref_in_python3(int copyID)
+    പൂർണ്ണസംഖ്യ
+set_ref_in_python3(പൂർണ്ണസംഖ്യ copyID)
 {
-    return set_ref_in_py(copyID);
+    തിരികെ set_ref_in_py(copyID);
 }
 
-    int
-python3_version(void)
+    പൂർണ്ണസംഖ്യ
+python3_version(ശൂന്യം)
 {
 #ifdef USE_LIMITED_API
-    return Py_LIMITED_API;
-#else
-    return PY_VERSION_HEX;
+    തിരികെ Py_LIMITED_API;
+#അല്ലെങ്കിൽ
+    തിരികെ PY_VERSION_HEX;
 #endif
 }

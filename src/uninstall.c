@@ -18,177 +18,177 @@
  */
 
 // Include common code for dosinst.c and uninstall.c.
-#include "dosinst.h"
+#അന്തര്ഭാവ "dosinst.h"
 
 /*
  * Return TRUE if the user types a 'y' or 'Y', FALSE otherwise.
  */
-    static int
-confirm(void)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+confirm(ശൂന്യം)
 {
-    char	answer[10];
+    അക്ഷരം	answer[10];
 
     fflush(stdout);
-    return (scanf(" %c", answer) == 1 && toupper((unsigned char)answer[0]) == 'Y');
+    തിരികെ (scanf(" %c", answer) == 1 && toupper((unsigned അക്ഷരം)answer[0]) == 'Y');
 }
 
-    static int
-reg_delete_key(HKEY hRootKey, const char *key, DWORD flag)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+reg_delete_താക്കോൽ(HKEY h_വേര്_താക്കോൽ, സ്ഥിരം അക്ഷരം *താക്കോൽ, DWORD flag)
 {
-    static int did_load = FALSE;
-    static HANDLE advapi_lib = NULL;
-    static LONG (WINAPI *delete_key_ex)(HKEY, LPCTSTR, REGSAM, DWORD) = NULL;
+    സ്ഥിതം പൂർണ്ണസംഖ്യ did_load = FALSE;
+    സ്ഥിതം HANDLE advapi_lib = ശൂന്യ;
+    സ്ഥിതം LONG (WINAPI *delete_താക്കോൽ_ex)(HKEY, LPCTSTR, REGSAM, DWORD) = ശൂന്യ;
 
-    if (!did_load)
+    എങ്കിൽ (!did_load)
     {
 	// The RegDeleteKeyEx() function is only available on new systems.  It
 	// is required for 64-bit registry access.  For other systems fall
 	// back to RegDeleteKey().
 	did_load = TRUE;
 	advapi_lib = LoadLibrary("ADVAPI32.DLL");
-	if (advapi_lib != NULL)
-	    delete_key_ex = (LONG (WINAPI *)(HKEY, LPCTSTR, REGSAM, DWORD))GetProcAddress(advapi_lib, "RegDeleteKeyExA");
+	എങ്കിൽ (advapi_lib != ശൂന്യ)
+	    delete_താക്കോൽ_ex = (LONG (WINAPI *)(HKEY, LPCTSTR, REGSAM, DWORD))GetProcAddress(advapi_lib, "RegDeleteKeyExA");
     }
-    if (delete_key_ex != NULL)
+    എങ്കിൽ (delete_താക്കോൽ_ex != ശൂന്യ)
     {
-	return (*delete_key_ex)(hRootKey, key, flag, 0);
+	തിരികെ (*delete_താക്കോൽ_ex)(h_വേര്_താക്കോൽ, താക്കോൽ, flag, 0);
     }
-    return RegDeleteKey(hRootKey, key);
+    തിരികെ Reg_Delete_താക്കോൽ(h_വേര്_താക്കോൽ, താക്കോൽ);
 }
 
 /*
  * Check if the popup menu entry exists and what gvim it refers to.
  * Returns non-zero when it's found.
  */
-    static int
-popup_gvim_path(char *buf, DWORD bufsize)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+popup_gvim_path(അക്ഷരം *buf, DWORD bufsize)
 {
-    HKEY	key_handle;
-    DWORD	value_type;
-    int		r;
+    HKEY	താക്കോൽ_handle;
+    DWORD	മൂല്യം_type;
+    പൂർണ്ണസംഖ്യ		r;
 
     // Open the key where the path to gvim.exe is stored.
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
-		    KEY_WOW64_64KEY | KEY_READ, &key_handle) != ERROR_SUCCESS)
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
-		    KEY_WOW64_32KEY | KEY_READ, &key_handle) != ERROR_SUCCESS)
-	    return 0;
+    എങ്കിൽ (Reg_Open_താക്കോൽ_Ex(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
+		    താക്കോൽ_WOW64_64_താക്കോൽ | താക്കോൽ_READ, &താക്കോൽ_handle) != ERROR_SUCCESS)
+	എങ്കിൽ (Reg_Open_താക്കോൽ_Ex(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
+		    താക്കോൽ_WOW64_32_താക്കോൽ | താക്കോൽ_READ, &താക്കോൽ_handle) != ERROR_SUCCESS)
+	    തിരികെ 0;
 
     // get the DisplayName out of it to show the user
-    r = RegQueryValueEx(key_handle, "path", 0,
-					  &value_type, (LPBYTE)buf, &bufsize);
-    RegCloseKey(key_handle);
+    r = Reg_Query_മൂല്യം_Ex(താക്കോൽ_handle, "path", 0,
+					  &മൂല്യം_type, (LPBYTE)buf, &bufsize);
+    Reg_Close_താക്കോൽ(താക്കോൽ_handle);
 
-    return (r == ERROR_SUCCESS);
+    തിരികെ (r == ERROR_SUCCESS);
 }
 
 /*
  * Check if the "Open With..." menu entry exists and what gvim it refers to.
  * Returns non-zero when it's found.
  */
-    static int
-openwith_gvim_path(char *buf, DWORD bufsize)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+openwith_gvim_path(അക്ഷരം *buf, DWORD bufsize)
 {
-    HKEY	key_handle;
-    DWORD	value_type;
-    int		r;
+    HKEY	താക്കോൽ_handle;
+    DWORD	മൂല്യം_type;
+    പൂർണ്ണസംഖ്യ		r;
 
     // Open the key where the path to gvim.exe is stored.
-    if (RegOpenKeyEx(HKEY_CLASSES_ROOT,
+    എങ്കിൽ (Reg_Open_താക്കോൽ_Ex(HKEY_CLASSES_വേര്,
 		"Applications\\gvim.exe\\shell\\edit\\command", 0,
-		    KEY_WOW64_64KEY | KEY_READ, &key_handle) != ERROR_SUCCESS)
-	return 0;
+		    താക്കോൽ_WOW64_64_താക്കോൽ | താക്കോൽ_READ, &താക്കോൽ_handle) != ERROR_SUCCESS)
+	തിരികെ 0;
 
     // get the DisplayName out of it to show the user
-    r = RegQueryValueEx(key_handle, "", 0, &value_type, (LPBYTE)buf, &bufsize);
-    RegCloseKey(key_handle);
+    r = Reg_Query_മൂല്യം_Ex(താക്കോൽ_handle, "", 0, &മൂല്യം_type, (LPBYTE)buf, &bufsize);
+    Reg_Close_താക്കോൽ(താക്കോൽ_handle);
 
-    return (r == ERROR_SUCCESS);
+    തിരികെ (r == ERROR_SUCCESS);
 }
 
-    static void
-remove_popup(void)
+    സ്ഥിതം ശൂന്യം
+remove_popup(ശൂന്യം)
 {
-    int		fail = 0;
-    int		i;
-    int		loop = is_64bit_os() ? 2 : 1;
-    int		maxfail = loop * 6;
+    പൂർണ്ണസംഖ്യ		fail = 0;
+    പൂർണ്ണസംഖ്യ		i;
+    പൂർണ്ണസംഖ്യ		loop = is_64bit_os() ? 2 : 1;
+    പൂർണ്ണസംഖ്യ		maxfail = loop * 6;
     DWORD	flag;
     HKEY	kh;
 
-    for (i = 0; i < loop; i++)
+    വേണ്ടി (i = 0; i < loop; i++)
     {
-	if (i == 0)
-	    flag = KEY_WOW64_32KEY;
-	else
-	    flag = KEY_WOW64_64KEY;
+	എങ്കിൽ (i == 0)
+	    flag = താക്കോൽ_WOW64_32_താക്കോൽ;
+	അല്ലെങ്കിൽ
+	    flag = താക്കോൽ_WOW64_64_താക്കോൽ;
 
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "CLSID\\{51EEE242-AD87-11d3-9C1E-0090278BBD99}\\InProcServer32", flag) != ERROR_SUCCESS)
+	എങ്കിൽ (reg_delete_താക്കോൽ(HKEY_CLASSES_വേര്, "CLSID\\{51EEE242-AD87-11d3-9C1E-0090278BBD99}\\InProcServer32", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "CLSID\\{51EEE242-AD87-11d3-9C1E-0090278BBD99}", flag) != ERROR_SUCCESS)
+	എങ്കിൽ (reg_delete_താക്കോൽ(HKEY_CLASSES_വേര്, "CLSID\\{51EEE242-AD87-11d3-9C1E-0090278BBD99}", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "*\\shellex\\ContextMenuHandlers\\gvim", flag) != ERROR_SUCCESS)
+	എങ്കിൽ (reg_delete_താക്കോൽ(HKEY_CLASSES_വേര്, "*\\shellex\\ContextMenuHandlers\\gvim", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved", 0,
-		    flag | KEY_ALL_ACCESS, &kh) != ERROR_SUCCESS)
+	എങ്കിൽ (Reg_Open_താക്കോൽ_Ex(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved", 0,
+		    flag | താക്കോൽ_ALL_ACCESS, &kh) != ERROR_SUCCESS)
 	    ++fail;
-	else
+	അല്ലെങ്കിൽ
 	{
-	    if (RegDeleteValue(kh, "{51EEE242-AD87-11d3-9C1E-0090278BBD99}") != ERROR_SUCCESS)
+	    എങ്കിൽ (Reg_Delete_മൂല്യം(kh, "{51EEE242-AD87-11d3-9C1E-0090278BBD99}") != ERROR_SUCCESS)
 		++fail;
-	    RegCloseKey(kh);
+	    Reg_Close_താക്കോൽ(kh);
 	}
-	if (reg_delete_key(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", flag) != ERROR_SUCCESS)
+	എങ്കിൽ (reg_delete_താക്കോൽ(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_LOCAL_MACHINE, "Software\\Vim", flag) != ERROR_SUCCESS)
+	എങ്കിൽ (reg_delete_താക്കോൽ(HKEY_LOCAL_MACHINE, "Software\\Vim", flag) != ERROR_SUCCESS)
 	    ++fail;
     }
 
-    if (fail == maxfail)
+    എങ്കിൽ (fail == maxfail)
 	printf("No Vim popup registry entries could be removed\n");
-    else if (fail > 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (fail > 0)
 	printf("Some Vim popup registry entries could not be removed\n");
-    else
+    അല്ലെങ്കിൽ
 	printf("The Vim popup registry entries have been removed\n");
 }
 
-    static void
-remove_openwith(void)
+    സ്ഥിതം ശൂന്യം
+remove_openwith(ശൂന്യം)
 {
-    int		fail = 0;
-    int		i;
-    int		loop = is_64bit_os() ? 2 : 1;
-    int		maxfail = loop * 7;
+    പൂർണ്ണസംഖ്യ		fail = 0;
+    പൂർണ്ണസംഖ്യ		i;
+    പൂർണ്ണസംഖ്യ		loop = is_64bit_os() ? 2 : 1;
+    പൂർണ്ണസംഖ്യ		maxfail = loop * 7;
     DWORD	flag;
 
-    for (i = 0; i < loop; i++)
+    വേണ്ടി (i = 0; i < loop; i++)
     {
-	if (i == 0)
-	    flag = KEY_WOW64_32KEY;
-	else
-	    flag = KEY_WOW64_64KEY;
+	എങ്കിൽ (i == 0)
+	    flag = താക്കോൽ_WOW64_32_താക്കോൽ;
+	അല്ലെങ്കിൽ
+	    flag = താക്കോൽ_WOW64_64_താക്കോൽ;
 
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "Applications\\gvim.exe\\shell\\edit\\command", flag) != ERROR_SUCCESS)
+	എങ്കിൽ (reg_delete_താക്കോൽ(HKEY_CLASSES_വേര്, "Applications\\gvim.exe\\shell\\edit\\command", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "Applications\\gvim.exe\\shell\\edit", flag) != ERROR_SUCCESS)
+	എങ്കിൽ (reg_delete_താക്കോൽ(HKEY_CLASSES_വേര്, "Applications\\gvim.exe\\shell\\edit", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "Applications\\gvim.exe\\shell", flag) != ERROR_SUCCESS)
+	എങ്കിൽ (reg_delete_താക്കോൽ(HKEY_CLASSES_വേര്, "Applications\\gvim.exe\\shell", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "Applications\\gvim.exe", flag) != ERROR_SUCCESS)
+	എങ്കിൽ (reg_delete_താക്കോൽ(HKEY_CLASSES_വേര്, "Applications\\gvim.exe", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, ".htm\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
+	എങ്കിൽ (reg_delete_താക്കോൽ(HKEY_CLASSES_വേര്, ".htm\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, ".vim\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
+	എങ്കിൽ (reg_delete_താക്കോൽ(HKEY_CLASSES_വേര്, ".vim\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
 	    ++fail;
-	if (reg_delete_key(HKEY_CLASSES_ROOT, "*\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
+	എങ്കിൽ (reg_delete_താക്കോൽ(HKEY_CLASSES_വേര്, "*\\OpenWithList\\gvim.exe", flag) != ERROR_SUCCESS)
 	    ++fail;
     }
 
-    if (fail == maxfail)
+    എങ്കിൽ (fail == maxfail)
 	printf("No Vim open-with registry entries could be removed\n");
-    else if (fail > 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (fail > 0)
 	printf("Some Vim open-with registry entries could not be removed\n");
-    else
+    അല്ലെങ്കിൽ
 	printf("The Vim open-with registry entries have been removed\n");
 }
 
@@ -196,101 +196,101 @@ remove_openwith(void)
  * Check if a batch file is really for the current version.  Don't delete a
  * batch file that was written for another (possibly newer) version.
  */
-    static int
-batfile_thisversion(char *path)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+batfile_thisversion(അക്ഷരം *path)
 {
     FILE	*fd;
-    char	line[BUFSIZE];
-    int		key_len = strlen(VIMBAT_UNINSTKEY);
-    int		found = FALSE;
+    അക്ഷരം	വരി[BUFSIZE];
+    പൂർണ്ണസംഖ്യ		താക്കോൽ_len = strlen(VIMBAT_UNINSTKEY);
+    പൂർണ്ണസംഖ്യ		found = FALSE;
 
     fd = fopen(path, "r");
-    if (fd == NULL)
-	return FALSE;
+    എങ്കിൽ (fd == ശൂന്യ)
+	തിരികെ FALSE;
 
-    while (fgets(line, sizeof(line), fd) != NULL)
+    ആകുമ്പോൾ (fgets(വരി, വലുപ്പം(വരി), fd) != ശൂന്യ)
     {
-	if (strncmp(line, VIMBAT_UNINSTKEY, key_len) == 0)
+	എങ്കിൽ (strncmp(വരി, VIMBAT_UNINSTKEY, താക്കോൽ_len) == 0)
 	{
 	    found = TRUE;
-	    break;
+	    നിർത്തുക;
 	}
     }
     fclose(fd);
-    return found;
+    തിരികെ found;
 }
 
-    static int
-remove_batfiles(int doit)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+remove_batfiles(പൂർണ്ണസംഖ്യ doit)
 {
-    char *batfile_path;
-    int	 i;
-    int	 found = 0;
+    അക്ഷരം *batfile_path;
+    പൂർണ്ണസംഖ്യ	 i;
+    പൂർണ്ണസംഖ്യ	 found = 0;
 
     // avoid looking in the "installdir" by chdir to system root
     mch_chdir(sysdrive);
     mch_chdir("\\");
 
-    for (i = 1; i < TARGET_COUNT; ++i)
+    വേണ്ടി (i = 1; i < TARGET_എണ്ണം; ++i)
     {
 	batfile_path = searchpath_save(targets[i].batname);
-	if (batfile_path != NULL && batfile_thisversion(batfile_path))
+	എങ്കിൽ (batfile_path != ശൂന്യ && batfile_thisversion(batfile_path))
 	{
 	    ++found;
-	    if (doit)
+	    എങ്കിൽ (doit)
 	    {
 		printf("removing %s\n", batfile_path);
 		remove(batfile_path);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		printf(" - the batch file %s\n", batfile_path);
-	    free(batfile_path);
+	    സ്വതന്ത്രം(batfile_path);
 	}
     }
 
     mch_chdir(installdir);
-    return found;
+    തിരികെ found;
 }
 
-    static void
-remove_if_exists(char *path, char *filename)
+    സ്ഥിതം ശൂന്യം
+remove_if_exists(അക്ഷരം *path, അക്ഷരം *filename)
 {
-    char buf[BUFSIZE];
+    അക്ഷരം buf[BUFSIZE];
     FILE *fd;
 
     sprintf(buf, "%s\\%s", path, filename);
 
     fd = fopen(buf, "r");
-    if (fd == NULL)
-	return;
+    എങ്കിൽ (fd == ശൂന്യ)
+	തിരികെ;
 
     fclose(fd);
     printf("removing %s\n", buf);
     remove(buf);
 }
 
-    static void
-remove_icons(void)
+    സ്ഥിതം ശൂന്യം
+remove_icons(ശൂന്യം)
 {
-    char	path[BUFSIZE];
-    int		i;
+    അക്ഷരം	path[BUFSIZE];
+    പൂർണ്ണസംഖ്യ		i;
 
-    if (get_shell_folder_path(path, "desktop"))
-	for (i = 0; i < ICON_COUNT; ++i)
+    എങ്കിൽ (get_shell_folder_path(path, "desktop"))
+	വേണ്ടി (i = 0; i < ICON_എണ്ണം; ++i)
 	    remove_if_exists(path, icon_link_names[i]);
 }
 
-    static void
-remove_start_menu(void)
+    സ്ഥിതം ശൂന്യം
+remove_start_menu(ശൂന്യം)
 {
-    char	path[BUFSIZE];
-    int		i;
-    struct stat st;
+    അക്ഷരം	path[BUFSIZE];
+    പൂർണ്ണസംഖ്യ		i;
+    ഘടന stat st;
 
-    if (get_shell_folder_path(path, VIM_STARTMENU) == FAIL)
-	return;
+    എങ്കിൽ (get_shell_folder_path(path, VIM_STARTMENU) == FAIL)
+	തിരികെ;
 
-    for (i = 1; i < TARGET_COUNT; ++i)
+    വേണ്ടി (i = 1; i < TARGET_എണ്ണം; ++i)
 	remove_if_exists(path, targets[i].lnkname);
     remove_if_exists(path, "uninstall.lnk");
     remove_if_exists(path, "Help.lnk");
@@ -298,34 +298,34 @@ remove_start_menu(void)
     remove_if_exists(path, "Vim tutor.pif");
     remove_if_exists(path, "Vim tutor.lnk");
     remove_if_exists(path, "Vim online.url");
-    if (stat(path, &st) == 0)
+    എങ്കിൽ (stat(path, &st) == 0)
     {
 	printf("removing %s\n", path);
 	rmdir(path);
     }
 }
 
-    static void
-delete_uninstall_key(void)
+    സ്ഥിതം ശൂന്യം
+delete_uninstall_താക്കോൽ(ശൂന്യം)
 {
-    reg_delete_key(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Vim " VIM_VERSION_SHORT, KEY_WOW64_64KEY);
+    reg_delete_താക്കോൽ(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Vim " VIM_VERSION_SHORT, താക്കോൽ_WOW64_64_താക്കോൽ);
 }
 
-    int
-main(int argc, char *argv[])
+    പൂർണ്ണസംഖ്യ
+പ്രധാന(പൂർണ്ണസംഖ്യ argc, അക്ഷരം *argv[])
 {
-    int		found = 0;
+    പൂർണ്ണസംഖ്യ		found = 0;
     FILE	*fd;
-    int		i;
-    struct stat st;
-    char	icon[BUFSIZE];
-    char	path[MAX_PATH];
-    char	popup_path[MAX_PATH];
+    പൂർണ്ണസംഖ്യ		i;
+    ഘടന stat st;
+    അക്ഷരം	icon[BUFSIZE];
+    അക്ഷരം	path[MAX_PATH];
+    അക്ഷരം	popup_path[MAX_PATH];
 
     // The nsis uninstaller calls us with a "-nsis" argument.
-    if (argc == 2 && stricmp(argv[1], "-nsis") == 0)
+    എങ്കിൽ (argc == 2 && stricmp(argv[1], "-nsis") == 0)
 	interactive = FALSE;
-    else
+    അല്ലെങ്കിൽ
 	interactive = TRUE;
 
     // Initialize this program.
@@ -333,13 +333,13 @@ main(int argc, char *argv[])
 
     printf("This program will remove the following items:\n");
 
-    if (popup_gvim_path(popup_path, sizeof(popup_path)))
+    എങ്കിൽ (popup_gvim_path(popup_path, വലുപ്പം(popup_path)))
     {
 	printf(" - the \"Edit with Vim\" entry in the popup menu\n");
 	printf("   which uses \"%s\"\n", popup_path);
-	if (interactive)
+	എങ്കിൽ (interactive)
 	    printf("\nRemove it (y/n)? ");
-	if (!interactive || confirm())
+	എങ്കിൽ (!interactive || confirm())
 	{
 	    remove_popup();
 	    // Assume the "Open With" entry can be removed as well, don't
@@ -347,80 +347,80 @@ main(int argc, char *argv[])
 	    remove_openwith();
 	}
     }
-    else if (openwith_gvim_path(popup_path, sizeof(popup_path)))
+    അല്ലെങ്കിൽ എങ്കിൽ (openwith_gvim_path(popup_path, വലുപ്പം(popup_path)))
     {
 	printf(" - the Vim \"Open With...\" entry in the popup menu\n");
 	printf("   which uses \"%s\"\n", popup_path);
 	printf("\nRemove it (y/n)? ");
-	if (confirm())
+	എങ്കിൽ (confirm())
 	    remove_openwith();
     }
 
-    if (get_shell_folder_path(path, "desktop"))
+    എങ്കിൽ (get_shell_folder_path(path, "desktop"))
     {
 	printf("\n");
-	for (i = 0; i < ICON_COUNT; ++i)
+	വേണ്ടി (i = 0; i < ICON_എണ്ണം; ++i)
 	{
 	    sprintf(icon, "%s\\%s", path, icon_link_names[i]);
-	    if (stat(icon, &st) == 0)
+	    എങ്കിൽ (stat(icon, &st) == 0)
 	    {
 		printf(" - the \"%s\" icon on the desktop\n", icon_names[i]);
 		++found;
 	    }
 	}
-	if (found > 0)
+	എങ്കിൽ (found > 0)
 	{
-	    if (interactive)
+	    എങ്കിൽ (interactive)
 		printf("\nRemove %s (y/n)? ", found > 1 ? "them" : "it");
-	    if (!interactive || confirm())
+	    എങ്കിൽ (!interactive || confirm())
 		remove_icons();
 	}
     }
 
-    if (get_shell_folder_path(path, VIM_STARTMENU)
+    എങ്കിൽ (get_shell_folder_path(path, VIM_STARTMENU)
 	    && stat(path, &st) == 0)
     {
 	printf("\n - the \"%s\" entry in the Start Menu\n", VIM_STARTMENU);
-	if (interactive)
+	എങ്കിൽ (interactive)
 	    printf("\nRemove it (y/n)? ");
-	if (!interactive || confirm())
+	എങ്കിൽ (!interactive || confirm())
 	    remove_start_menu();
     }
 
     printf("\n");
     found = remove_batfiles(0);
-    if (found > 0)
+    എങ്കിൽ (found > 0)
     {
-	if (interactive)
+	എങ്കിൽ (interactive)
 	    printf("\nRemove %s (y/n)? ", found > 1 ? "them" : "it");
-	if (!interactive || confirm())
+	എങ്കിൽ (!interactive || confirm())
 	    remove_batfiles(1);
     }
 
     fd = fopen("gvim.exe", "r");
-    if (fd != NULL)
+    എങ്കിൽ (fd != ശൂന്യ)
     {
 	fclose(fd);
 	printf("gvim.exe detected.  Attempting to unregister gvim with OLE\n");
 	system("gvim.exe -silent -unregister");
     }
 
-    delete_uninstall_key();
+    delete_uninstall_താക്കോൽ();
 
-    if (interactive)
+    എങ്കിൽ (interactive)
     {
 	printf("\nYou may now want to delete the Vim executables and runtime files.\n");
 	printf("(They are still where you unpacked them.)\n");
     }
 
-    if (interactive)
+    എങ്കിൽ (interactive)
     {
 	rewind(stdin);
 	printf("\nPress Enter to exit...");
-	(void)getchar();
+	(ശൂന്യം)getchar();
     }
-    else
+    അല്ലെങ്കിൽ
 	sleep(3);
 
-    return 0;
+    തിരികെ 0;
 }

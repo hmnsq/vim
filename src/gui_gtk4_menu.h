@@ -10,7 +10,7 @@
 #ifndef GUI_GTK4_MENU_H
 #define GUI_GTK4_MENU_H
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
 #ifdef FEAT_MENU
 
@@ -28,32 +28,32 @@ G_DECLARE_FINAL_TYPE(VimMenuItem, vim_menu_item, VIM, MENU_ITEM, GtkButton)
 # define VIM_TYPE_MENU (vim_menu_get_type())
 G_DECLARE_FINAL_TYPE(VimMenu, vim_menu, VIM, MENU, GtkPopover)
 
-typedef enum
+തരനിർവചനം എണ്ണൽ
 {
     VIM_MENU_ITEM_CLICKED,
     VIM_MENU_ITEM_SELECTED
 } VimMenuItemEvent;
 
-typedef void (*VimMenuItemFunc)(VimMenuItem *item, VimMenuItemEvent event, void *udata);
+തരനിർവചനം ശൂന്യം (*VimMenuItemFunc)(VimMenuItem *item, VimMenuItemEvent event, ശൂന്യം *udata);
 
-GtkWidget *vim_menu_bar_item_new(const char *text, VimMenu *menu);
-void vim_menu_bar_item_set_text(VimMenuBarItem *self, const char *text);
+GtkWidget *vim_menu_bar_item_new(സ്ഥിരം അക്ഷരം *text, VimMenu *menu);
+ശൂന്യം vim_menu_bar_item_set_text(VimMenuBarItem *self, സ്ഥിരം അക്ഷരം *text);
 
-GtkWidget *vim_menu_bar_new(void);
+GtkWidget *vim_menu_bar_new(ശൂന്യം);
 GtkWidget *vim_menu_bar_to_menu(VimMenuBar *self);
-void vim_menu_bar_insert_item(VimMenuBar *self, VimMenuBarItem *item, int idx);
-void vim_menu_bar_remove(VimMenuBar *self, GtkWidget *item);
-void vim_menu_bar_show(VimMenuBar *self, VimMenuBarItem *item);
+ശൂന്യം vim_menu_bar_തിരുകുക_item(VimMenuBar *self, VimMenuBarItem *item, പൂർണ്ണസംഖ്യ idx);
+ശൂന്യം vim_menu_bar_remove(VimMenuBar *self, GtkWidget *item);
+ശൂന്യം vim_menu_bar_show(VimMenuBar *self, VimMenuBarItem *item);
 
-GtkWidget *vim_menu_item_new(const char *text, VimMenuItemFunc func, void *udata);
-void vim_menu_item_set_text(VimMenuItem *self, const char *text);
-void vim_menu_item_set_accel(VimMenuItem *self, const char *accel_text);
-void vim_menu_item_set_submenu(VimMenuItem *self, VimMenu *submenu);
+GtkWidget *vim_menu_item_new(സ്ഥിരം അക്ഷരം *text, VimMenuItemFunc func, ശൂന്യം *udata);
+ശൂന്യം vim_menu_item_set_text(VimMenuItem *self, സ്ഥിരം അക്ഷരം *text);
+ശൂന്യം vim_menu_item_set_accel(VimMenuItem *self, സ്ഥിരം അക്ഷരം *accel_text);
+ശൂന്യം vim_menu_item_set_submenu(VimMenuItem *self, VimMenu *submenu);
 
-GtkWidget *vim_menu_new(void);
-void vim_menu_insert_item(VimMenu *self, VimMenuItem *item, int idx);
-GtkWidget *vim_menu_insert_separator(VimMenu *self, int idx);
-void vim_menu_remove(VimMenu *self, GtkWidget *item);
+GtkWidget *vim_menu_new(ശൂന്യം);
+ശൂന്യം vim_menu_തിരുകുക_item(VimMenu *self, VimMenuItem *item, പൂർണ്ണസംഖ്യ idx);
+GtkWidget *vim_menu_തിരുകുക_separator(VimMenu *self, പൂർണ്ണസംഖ്യ idx);
+ശൂന്യം vim_menu_remove(VimMenu *self, GtkWidget *item);
 GtkWidget *vim_menu_copy(VimMenu *self);
 
 #endif

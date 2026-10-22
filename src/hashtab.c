@@ -27,41 +27,41 @@
  * memory).
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-#if 0
+#എങ്കിൽ 0
 # define HT_DEBUG	// extra checks for table consistency  and statistics
 
-static long hash_count_lookup = 0;	// count number of hashtab lookups
-static long hash_count_perturb = 0;	// count number of "misses"
+സ്ഥിതം long hash_എണ്ണം_lookup = 0;	// count number of hashtab lookups
+സ്ഥിതം long hash_എണ്ണം_perturb = 0;	// count number of "misses"
 #endif
 
 // Magic value for algorithm that walks through the array.
 #define PERTURB_SHIFT 5
 
-static int hash_may_resize(hashtab_T *ht, int minitems);
+സ്ഥിതം പൂർണ്ണസംഖ്യ hash_may_resize(hashtab_T *ht, പൂർണ്ണസംഖ്യ minitems);
 
-#if 0 // currently not used
+#എങ്കിൽ 0 // currently not used
 /*
  * Create an empty hash table.
  * Returns NULL when out of memory.
  */
     hashtab_T *
-hash_create(void)
+hash_create(ശൂന്യം)
 {
     hashtab_T *ht;
 
     ht = ALLOC_ONE(hashtab_T);
-    if (ht != NULL)
+    എങ്കിൽ (ht != ശൂന്യ)
 	hash_init(ht);
-    return ht;
+    തിരികെ ht;
 }
 #endif
 
 /*
  * Initialize an empty hash table.
  */
-    void
+    ശൂന്യം
 hash_init(hashtab_T *ht)
 {
     // This zeroes all "ht_" entries and all the "hi_key" in "ht_smallarray".
@@ -74,24 +74,24 @@ hash_init(hashtab_T *ht)
  * If "ht->ht_flags" has HTFLAGS_FROZEN then give an error message using
  * "command" and return TRUE.
  */
-    int
-check_hashtab_frozen(hashtab_T *ht, char *command)
+    പൂർണ്ണസംഖ്യ
+check_hashtab_frozen(hashtab_T *ht, അക്ഷരം *command)
 {
-    if ((ht->ht_flags & HTFLAGS_FROZEN) == 0)
-	return FALSE;
+    എങ്കിൽ ((ht->ht_flags & HTFLAGS_FROZEN) == 0)
+	തിരികെ FALSE;
 
     semsg(_(e_not_allowed_to_add_or_remove_entries_str), command);
-    return TRUE;
+    തിരികെ TRUE;
 }
 
 /*
  * Free the array of a hash table.  Does not free the items it contains!
  * If "ht" is not freed then you should call hash_init() next!
  */
-    void
+    ശൂന്യം
 hash_clear(hashtab_T *ht)
 {
-    if (ht->ht_array != ht->ht_smallarray)
+    എങ്കിൽ (ht->ht_array != ht->ht_smallarray)
 	vim_free(ht->ht_array);
 }
 
@@ -100,18 +100,18 @@ hash_clear(hashtab_T *ht)
  * have been allocated.  "off" is the offset from the start of the allocate
  * memory to the location of the key (it's always positive).
  */
-    void
-hash_clear_all(hashtab_T *ht, int off)
+    ശൂന്യം
+hash_clear_all(hashtab_T *ht, പൂർണ്ണസംഖ്യ off)
 {
     long	todo;
     hashitem_T	*hi;
 
     todo = (long)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_ഇനങ്ങൾ(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	എങ്കിൽ (!HASHITEM_EMPTY(hi))
 	{
-	    vim_free(hi->hi_key - off);
+	    vim_free(hi->hi_താക്കോൽ - off);
 	    --todo;
 	}
     }
@@ -127,16 +127,16 @@ hash_clear_all(hashtab_T *ht, int off)
  * (adding, setting or removing an item)!
  */
     hashitem_T *
-hash_find(hashtab_T *ht, char_u *key)
+hash_find(hashtab_T *ht, char_u *താക്കോൽ)
 {
-    return hash_lookup(ht, key, hash_hash(key));
+    തിരികെ hash_lookup(ht, താക്കോൽ, hash_hash(താക്കോൽ));
 }
 
 /*
  * Like hash_find(), but caller computes "hash".
  */
     hashitem_T *
-hash_lookup(hashtab_T *ht, char_u *key, hash_T hash)
+hash_lookup(hashtab_T *ht, char_u *താക്കോൽ, hash_T hash)
 {
     hash_T	perturb;
     hashitem_T	*freeitem;
@@ -144,7 +144,7 @@ hash_lookup(hashtab_T *ht, char_u *key, hash_T hash)
     unsigned	idx;
 
 #ifdef HT_DEBUG
-    ++hash_count_lookup;
+    ++hash_എണ്ണം_lookup;
 #endif
 
     /*
@@ -156,14 +156,14 @@ hash_lookup(hashtab_T *ht, char_u *key, hash_T hash)
     idx = (unsigned)(hash & ht->ht_mask);
     hi = &ht->ht_array[idx];
 
-    if (hi->hi_key == NULL)
-	return hi;
-    if (hi->hi_key == HI_KEY_REMOVED)
+    എങ്കിൽ (hi->hi_താക്കോൽ == ശൂന്യ)
+	തിരികെ hi;
+    എങ്കിൽ (hi->hi_താക്കോൽ == HI_താക്കോൽ_REMOVED)
 	freeitem = hi;
-    else if (hi->hi_hash == hash && STRCMP(hi->hi_key, key) == 0)
-	return hi;
-    else
-	freeitem = NULL;
+    അല്ലെങ്കിൽ എങ്കിൽ (hi->hi_hash == hash && STRCMP(hi->hi_താക്കോൽ, താക്കോൽ) == 0)
+	തിരികെ hi;
+    അല്ലെങ്കിൽ
+	freeitem = ശൂന്യ;
 
     /*
      * Need to search through the table to find the key.  The algorithm
@@ -174,39 +174,39 @@ hash_lookup(hashtab_T *ht, char_u *key, hash_T hash)
      * Return the first available slot found (can be a slot of a removed
      * item).
      */
-    for (perturb = hash; ; perturb >>= PERTURB_SHIFT)
+    വേണ്ടി (perturb = hash; ; perturb >>= PERTURB_SHIFT)
     {
 #ifdef HT_DEBUG
-	++hash_count_perturb;	    // count a "miss" for hashtab lookup
+	++hash_എണ്ണം_perturb;	    // count a "miss" for hashtab lookup
 #endif
 	idx = (unsigned)((idx << 2U) + idx + perturb + 1U);
 	hi = &ht->ht_array[idx & ht->ht_mask];
-	if (hi->hi_key == NULL)
-	    return freeitem == NULL ? hi : freeitem;
-	if (hi->hi_hash == hash
-		&& hi->hi_key != HI_KEY_REMOVED
-		&& STRCMP(hi->hi_key, key) == 0)
-	    return hi;
-	if (hi->hi_key == HI_KEY_REMOVED && freeitem == NULL)
+	എങ്കിൽ (hi->hi_താക്കോൽ == ശൂന്യ)
+	    തിരികെ freeitem == ശൂന്യ ? hi : freeitem;
+	എങ്കിൽ (hi->hi_hash == hash
+		&& hi->hi_താക്കോൽ != HI_താക്കോൽ_REMOVED
+		&& STRCMP(hi->hi_താക്കോൽ, താക്കോൽ) == 0)
+	    തിരികെ hi;
+	എങ്കിൽ (hi->hi_താക്കോൽ == HI_താക്കോൽ_REMOVED && freeitem == ശൂന്യ)
 	    freeitem = hi;
     }
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_SYN_HL)
+#എങ്കിൽ defined(FEAT_EVAL) || defined(FEAT_SYN_HL)
 /*
  * Print the efficiency of hashtable lookups.
  * Useful when trying different hash algorithms.
  * Called when exiting.
  */
-    void
-hash_debug_results(void)
+    ശൂന്യം
+hash_debug_results(ശൂന്യം)
 {
 # ifdef HT_DEBUG
     fprintf(stderr, "\r\n\r\n\r\n\r\n");
-    fprintf(stderr, "Number of hashtable lookups: %ld\r\n", hash_count_lookup);
-    fprintf(stderr, "Number of perturb loops: %ld\r\n", hash_count_perturb);
+    fprintf(stderr, "Number of hashtable lookups: %ld\r\n", hash_എണ്ണം_lookup);
+    fprintf(stderr, "Number of perturb loops: %ld\r\n", hash_എണ്ണം_perturb);
     fprintf(stderr, "Percentage of perturb loops: %ld%%\r\n",
-				hash_count_perturb * 100 / hash_count_lookup);
+				hash_എണ്ണം_perturb * 100 / hash_എണ്ണം_lookup);
 # endif
 }
 #endif
@@ -216,21 +216,21 @@ hash_debug_results(void)
  * "command" is used for the error message when the hashtab if frozen.
  * Returns FAIL when out of memory or the key is already present.
  */
-    int
-hash_add(hashtab_T *ht, char_u *key, char *command)
+    പൂർണ്ണസംഖ്യ
+hash_add(hashtab_T *ht, char_u *താക്കോൽ, അക്ഷരം *command)
 {
-    hash_T	hash = hash_hash(key);
+    hash_T	hash = hash_hash(താക്കോൽ);
     hashitem_T	*hi;
 
-    if (check_hashtab_frozen(ht, command))
-	return FAIL;
-    hi = hash_lookup(ht, key, hash);
-    if (!HASHITEM_EMPTY(hi))
+    എങ്കിൽ (check_hashtab_frozen(ht, command))
+	തിരികെ FAIL;
+    hi = hash_lookup(ht, താക്കോൽ, hash);
+    എങ്കിൽ (!HASHITEM_EMPTY(hi))
     {
 	internal_error("hash_add()");
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return hash_add_item(ht, hi, key, hash);
+    തിരികെ hash_add_item(ht, hi, താക്കോൽ, hash);
 }
 
 /*
@@ -239,29 +239,29 @@ hash_add(hashtab_T *ht, char_u *key, char *command)
  * "hi" is invalid after this!
  * Returns OK or FAIL (out of memory).
  */
-    int
+    പൂർണ്ണസംഖ്യ
 hash_add_item(
     hashtab_T	*ht,
     hashitem_T	*hi,
-    char_u	*key,
+    char_u	*താക്കോൽ,
     hash_T	hash)
 {
     // If resizing failed before and it fails again we can't add an item.
-    if (ht->ht_flags & HTFLAGS_ERROR)
-	return FAIL;
+    എങ്കിൽ (ht->ht_flags & HTFLAGS_ERROR)
+	തിരികെ FAIL;
 
     ++ht->ht_used;
     ++ht->ht_changed;
-    if (hi->hi_key == NULL)
+    എങ്കിൽ (hi->hi_താക്കോൽ == ശൂന്യ)
 	++ht->ht_filled;
-    hi->hi_key = key;
+    hi->hi_താക്കോൽ = താക്കോൽ;
     hi->hi_hash = hash;
 
     // When the space gets low may resize the array.
-    return hash_may_resize(ht, 0);
+    തിരികെ hash_may_resize(ht, 0);
 }
 
-#if 0  // not used
+#എങ്കിൽ 0  // not used
 /*
  * Overwrite hashtable item "hi" with "key".  "hi" must point to the item that
  * is to be overwritten.  Thus the number of items in the hashtable doesn't
@@ -271,10 +271,10 @@ hash_add_item(
  * The caller must take care of freeing the old item.
  * "hi" is invalid after this!
  */
-    void
-hash_set(hashitem_T *hi, char_u *key)
+    ശൂന്യം
+hash_set(hashitem_T *hi, char_u *താക്കോൽ)
 {
-    hi->hi_key = key;
+    hi->hi_താക്കോൽ = താക്കോൽ;
 }
 #endif
 
@@ -284,16 +284,16 @@ hash_set(hashitem_T *hi, char_u *key)
  * "command" is used for the error message when the hashtab if frozen.
  * The caller must take care of freeing the item itself.
  */
-    int
-hash_remove(hashtab_T *ht, hashitem_T *hi, char *command)
+    പൂർണ്ണസംഖ്യ
+hash_remove(hashtab_T *ht, hashitem_T *hi, അക്ഷരം *command)
 {
-    if (check_hashtab_frozen(ht, command))
-	return FAIL;
+    എങ്കിൽ (check_hashtab_frozen(ht, command))
+	തിരികെ FAIL;
     --ht->ht_used;
     ++ht->ht_changed;
-    hi->hi_key = HI_KEY_REMOVED;
+    hi->hi_താക്കോൽ = HI_താക്കോൽ_REMOVED;
     hash_may_resize(ht, 0);
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -301,22 +301,22 @@ hash_remove(hashtab_T *ht, hashitem_T *hi, char *command)
  * Don't use this when items are to be added!
  * Must call hash_unlock() later.
  */
-    void
+    ശൂന്യം
 hash_lock(hashtab_T *ht)
 {
     ++ht->ht_locked;
 }
 
-#if defined(FEAT_PROP_POPUP)
+#എങ്കിൽ defined(FEAT_PROP_POPUP)
 /*
  * Lock a hashtable at the specified number of entries.
  * Caller must make sure no more than "size" entries will be added.
  * Must call hash_unlock() later.
  */
-    void
-hash_lock_size(hashtab_T *ht, int size)
+    ശൂന്യം
+hash_lock_size(hashtab_T *ht, പൂർണ്ണസംഖ്യ size)
 {
-    (void)hash_may_resize(ht, size);
+    (ശൂന്യം)hash_may_resize(ht, size);
     ++ht->ht_locked;
 }
 #endif
@@ -326,11 +326,11 @@ hash_lock_size(hashtab_T *ht, int size)
  * Table will be resized (shrink) when necessary.
  * This must balance a call to hash_lock().
  */
-    void
+    ശൂന്യം
 hash_unlock(hashtab_T *ht)
 {
     --ht->ht_locked;
-    (void)hash_may_resize(ht, 0);
+    (ശൂന്യം)hash_may_resize(ht, 0);
 }
 
 /*
@@ -338,40 +338,40 @@ hash_unlock(hashtab_T *ht)
  * Grow a hashtable when there is not enough empty space.
  * Returns OK or FAIL (out of memory).
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 hash_may_resize(
     hashtab_T	*ht,
-    int		minitems)		// minimal number of items
+    പൂർണ്ണസംഖ്യ		minitems)		// minimal number of items
 {
     hashitem_T	temparray[HT_INIT_SIZE];
     hashitem_T	*oldarray, *newarray;
     hashitem_T	*olditem, *newitem;
     unsigned	newi;
-    int		todo;
+    പൂർണ്ണസംഖ്യ		todo;
     long_u	newsize;
     long_u	minsize;
     long_u	newmask;
     hash_T	perturb;
 
     // Don't resize a locked table.
-    if (ht->ht_locked > 0)
-	return OK;
+    എങ്കിൽ (ht->ht_locked > 0)
+	തിരികെ OK;
 
 #ifdef HT_DEBUG
-    if (ht->ht_used > ht->ht_filled)
+    എങ്കിൽ (ht->ht_used > ht->ht_filled)
 	emsg("hash_may_resize(): more used than filled");
-    if (ht->ht_filled >= ht->ht_mask + 1)
+    എങ്കിൽ (ht->ht_filled >= ht->ht_mask + 1)
 	emsg("hash_may_resize(): table completely filled");
 #endif
 
     long_u oldsize = ht->ht_mask + 1;
-    if (minitems == 0)
+    എങ്കിൽ (minitems == 0)
     {
 	// Return quickly for small tables with at least two NULL items.  NULL
 	// items are required for the lookup to decide a key isn't there.
-	if (ht->ht_filled < HT_INIT_SIZE - 1
+	എങ്കിൽ (ht->ht_filled < HT_INIT_SIZE - 1
 					 && ht->ht_array == ht->ht_smallarray)
-	    return OK;
+	    തിരികെ OK;
 
 	/*
 	 * Grow or refill the array when it's more than 2/3 full (including
@@ -379,67 +379,67 @@ hash_may_resize(
 	 * Shrink the array when it's less than 1/5 full.  When growing it is
 	 * at least 1/4 full (avoids repeated grow-shrink operations)
 	 */
-	if (ht->ht_filled * 3 < oldsize * 2 && ht->ht_used > oldsize / 5)
-	    return OK;
+	എങ്കിൽ (ht->ht_filled * 3 < oldsize * 2 && ht->ht_used > oldsize / 5)
+	    തിരികെ OK;
 
-	if (ht->ht_used > 1000)
+	എങ്കിൽ (ht->ht_used > 1000)
 	    minsize = ht->ht_used * 2;  // it's big, don't make too much room
-	else
+	അല്ലെങ്കിൽ
 	    minsize = ht->ht_used * 4;  // make plenty of room
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	// Use specified size.
-	if ((long_u)minitems < ht->ht_used)	// just in case...
-	    minitems = (int)ht->ht_used;
+	എങ്കിൽ ((long_u)minitems < ht->ht_used)	// just in case...
+	    minitems = (പൂർണ്ണസംഖ്യ)ht->ht_used;
 	minsize = (minitems * 3 + 1) / 2;	// array is up to 2/3 full
     }
 
     newsize = HT_INIT_SIZE;
-    while (newsize < minsize)
+    ആകുമ്പോൾ (newsize < minsize)
     {
 	newsize <<= 1;		// make sure it's always a power of 2
-	if (newsize == 0)
-	    return FAIL;	// overflow
+	എങ്കിൽ (newsize == 0)
+	    തിരികെ FAIL;	// overflow
     }
 
-    if (newsize == HT_INIT_SIZE)
+    എങ്കിൽ (newsize == HT_INIT_SIZE)
     {
 	// Use the small array inside the hashdict structure.
 	newarray = ht->ht_smallarray;
-	if (ht->ht_array == newarray)
+	എങ്കിൽ (ht->ht_array == newarray)
 	{
 	    // Moving from ht_smallarray to ht_smallarray!  Happens when there
 	    // are many removed items.  Copy the items to be able to clean up
 	    // removed items.
-	    mch_memmove(temparray, newarray, sizeof(temparray));
+	    mch_memmove(temparray, newarray, വലുപ്പം(temparray));
 	    oldarray = temparray;
 	}
-	else
+	അല്ലെങ്കിൽ
 	    oldarray = ht->ht_array;
 	CLEAR_FIELD(ht->ht_smallarray);
     }
 
-    else if (newsize == oldsize && ht->ht_filled * 3 < oldsize * 2)
+    അല്ലെങ്കിൽ എങ്കിൽ (newsize == oldsize && ht->ht_filled * 3 < oldsize * 2)
     {
 	// The hashtab is already at the desired size, and there are not too
 	// many removed items, bail out.
-	return OK;
+	തിരികെ OK;
     }
 
-    else
+    അല്ലെങ്കിൽ
     {
 	// Allocate an array.
 	newarray = ALLOC_CLEAR_MULT(hashitem_T, newsize);
-	if (newarray == NULL)
+	എങ്കിൽ (newarray == ശൂന്യ)
 	{
 	    // Out of memory.  When there are NULL items still return OK.
 	    // Otherwise set ht_flags to HTFLAGS_ERROR, because lookup may
 	    // result in a hang if we add another item.
-	    if (ht->ht_filled < ht->ht_mask)
-		return OK;
+	    എങ്കിൽ (ht->ht_filled < ht->ht_mask)
+		തിരികെ OK;
 	    ht->ht_flags |= HTFLAGS_ERROR;
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 	oldarray = ht->ht_array;
     }
@@ -450,9 +450,9 @@ hash_may_resize(
      * is also a cleanup action.
      */
     newmask = newsize - 1;
-    todo = (int)ht->ht_used;
-    for (olditem = oldarray; todo > 0; ++olditem)
-	if (!HASHITEM_EMPTY(olditem))
+    todo = (പൂർണ്ണസംഖ്യ)ht->ht_used;
+    വേണ്ടി (olditem = oldarray; todo > 0; ++olditem)
+	എങ്കിൽ (!HASHITEM_EMPTY(olditem))
 	{
 	    /*
 	     * The algorithm to find the spot to add the item is identical to
@@ -462,19 +462,19 @@ hash_may_resize(
 	    newi = (unsigned)(olditem->hi_hash & newmask);
 	    newitem = &newarray[newi];
 
-	    if (newitem->hi_key != NULL)
-		for (perturb = olditem->hi_hash; ; perturb >>= PERTURB_SHIFT)
+	    എങ്കിൽ (newitem->hi_താക്കോൽ != ശൂന്യ)
+		വേണ്ടി (perturb = olditem->hi_hash; ; perturb >>= PERTURB_SHIFT)
 		{
 		    newi = (unsigned)((newi << 2U) + newi + perturb + 1U);
 		    newitem = &newarray[newi & newmask];
-		    if (newitem->hi_key == NULL)
-			break;
+		    എങ്കിൽ (newitem->hi_താക്കോൽ == ശൂന്യ)
+			നിർത്തുക;
 		}
 	    *newitem = *olditem;
 	    --todo;
 	}
 
-    if (ht->ht_array != ht->ht_smallarray)
+    എങ്കിൽ (ht->ht_array != ht->ht_smallarray)
 	vim_free(ht->ht_array);
     ht->ht_array = newarray;
     ht->ht_mask = newmask;
@@ -482,7 +482,7 @@ hash_may_resize(
     ++ht->ht_changed;
     ht->ht_flags &= ~HTFLAGS_ERROR;
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -493,19 +493,19 @@ hash_may_resize(
  * lower the percentage the better.
  */
     hash_T
-hash_hash(char_u *key)
+hash_hash(char_u *താക്കോൽ)
 {
     hash_T	hash;
     char_u	*p;
 
-    if ((hash = *key) == 0)
-	return (hash_T)0;
-    p = key + 1;
+    എങ്കിൽ ((hash = *താക്കോൽ) == 0)
+	തിരികെ (hash_T)0;
+    p = താക്കോൽ + 1;
 
     // A simplistic algorithm that appears to do very well.
     // Suggested by George Reilly.
-    while (*p != NUL)
+    ആകുമ്പോൾ (*p != NUL)
 	hash = hash * 101 + *p++;
 
-    return hash;
+    തിരികെ hash;
 }

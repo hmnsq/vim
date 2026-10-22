@@ -4,73 +4,73 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-import os
-import sys
-import time
+തഃ __future__ ഇറക്കുമതി print_function
+ഇറക്കുമതി os
+ഇറക്കുമതി sys
+ഇറക്കുമതി time
 
-if __name__ == "__main__":
+എങ്കിൽ __name__ == "__main__":
 
-    if len(sys.argv) > 1:
-        if sys.argv[1].startswith("err"):
+    എങ്കിൽ len(sys.argv) > 1:
+        എങ്കിൽ sys.argv[1].startswith("err"):
             print(sys.argv[1], file=sys.stderr)
             sys.stderr.flush()
-        elif sys.argv[1].startswith("incomplete"):
+        അല്ലെങ്കിലെങ്കിൽ sys.argv[1].startswith("incomplete"):
             print(sys.argv[1], end='')
             sys.stdout.flush()
             sys.exit(0)
-        elif sys.argv[1].startswith("busy"):
-            time.sleep(100)
+        അല്ലെങ്കിലെങ്കിൽ sys.argv[1].startswith("busy"):
+            time.സുഷുപ്തി(100)
             sys.exit(0)
-        else:
+        അല്ലെങ്കിൽ:
             print(sys.argv[1])
             sys.stdout.flush()
-            if sys.argv[1].startswith("quit"):
+            എങ്കിൽ sys.argv[1].startswith("quit"):
                 sys.exit(0)
 
-    if os.getenv('CI'):
-        try:
-            import thread_util
-            thread_util.set_high_priority()
-        except Exception:
+    എങ്കിൽ os.getenv('CI'):
+        ശ്രമിക്കുക:
+            ഇറക്കുമതി thread_util
+            thread_util.set_മുകളിലെ_priority()
+        അപവാദം Exception:
             pass
 
-    while True:
+    ആകുമ്പോൾ സത്യം:
         typed = sys.stdin.readline()
-        if typed == "":  # EOF -- stop
-            break
-        if typed.startswith("quit"):
+        എങ്കിൽ typed == "":  # EOF -- stop
+            നിർത്തുക
+        എങ്കിൽ typed.startswith("quit"):
             print("Goodbye!")
             sys.stdout.flush()
-            break
-        if typed.startswith("echo "):
+            നിർത്തുക
+        എങ്കിൽ typed.startswith("echo "):
             print(typed[5:-1])
             sys.stdout.flush()
-        if typed.startswith("echosplit "):
-            for part in typed[10:-1].split('|'):
-                sys.stdout.write(part)
+        എങ്കിൽ typed.startswith("echosplit "):
+            വേണ്ടി part ഇൽ typed[10:-1].split('|'):
+                sys.stdout.ലിഖ(part)
                 sys.stdout.flush()
-                time.sleep(0.05)
-        if typed.startswith("double "):
+                time.സുഷുപ്തി(0.05)
+        എങ്കിൽ typed.startswith("double "):
             print(typed[7:-1] + "\nAND " + typed[7:-1])
             sys.stdout.flush()
-        if typed.startswith("split "):
+        എങ്കിൽ typed.startswith("split "):
             print(typed[6:-1], end='')
             sys.stdout.flush()
-            time.sleep(0.05)
+            time.സുഷുപ്തി(0.05)
             print(typed[6:-1], end='')
             sys.stdout.flush()
-            time.sleep(0.05)
+            time.സുഷുപ്തി(0.05)
             print(typed[6:-1])
             sys.stdout.flush()
-        if typed.startswith("echoerr "):
+        എങ്കിൽ typed.startswith("echoerr "):
             print(typed[8:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("doubleerr "):
+        എങ്കിൽ typed.startswith("doubleerr "):
             print(typed[10:-1] + "\nAND " + typed[10:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("XXX"):
+        എങ്കിൽ typed.startswith("XXX"):
             print(typed, end='')
             sys.stderr.flush()
-            break
+            നിർത്തുക
 

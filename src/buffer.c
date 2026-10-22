@@ -25,7 +25,7 @@
  * The current implementation remembers all file names ever used.
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
 
 #ifdef FEAT_EVAL
@@ -33,59 +33,59 @@
 # define MAX_STL_EVAL_DEPTH 100
 #endif
 
-static void	enter_buffer(buf_T *buf);
-static void	buflist_getfpos(void);
-static char_u	*buflist_match(regmatch_T *rmp, buf_T *buf, int ignore_case);
-static char_u	*fname_match(regmatch_T *rmp, char_u *name, int ignore_case);
+സ്ഥിതം ശൂന്യം	enter_buffer(buf_T *buf);
+സ്ഥിതം ശൂന്യം	buflist_getfpos(ശൂന്യം);
+സ്ഥിതം char_u	*buflist_match(regmatch_T *rmp, buf_T *buf, പൂർണ്ണസംഖ്യ ignore_case);
+സ്ഥിതം char_u	*fname_match(regmatch_T *rmp, char_u *name, പൂർണ്ണസംഖ്യ ignore_case);
 #ifdef UNIX
-static buf_T	*buflist_findname_stat(char_u *ffname, stat_T *st);
-static int	otherfile_buf(buf_T *buf, char_u *ffname, stat_T *stp);
-static int	buf_same_ino(buf_T *buf, stat_T *stp);
-#else
-static int	otherfile_buf(buf_T *buf, char_u *ffname);
+സ്ഥിതം buf_T	*buflist_findname_stat(char_u *ffname, stat_T *st);
+സ്ഥിതം പൂർണ്ണസംഖ്യ	otherfile_buf(buf_T *buf, char_u *ffname, stat_T *stp);
+സ്ഥിതം പൂർണ്ണസംഖ്യ	buf_same_ino(buf_T *buf, stat_T *stp);
+#അല്ലെങ്കിൽ
+സ്ഥിതം പൂർണ്ണസംഖ്യ	otherfile_buf(buf_T *buf, char_u *ffname);
 #endif
-static int	value_changed(char_u *str, char_u **last);
-#if defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
-static int build_stl_str_hl_local(stl_mode_T mode, win_T *wp,
+സ്ഥിതം പൂർണ്ണസംഖ്യ	മൂല്യം_changed(char_u *str, char_u **last);
+#എങ്കിൽ defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
+സ്ഥിതം പൂർണ്ണസംഖ്യ build_stl_str_hl_local(stl_mode_T mode, win_T *wp,
 		char_u *out, size_t outlen, char_u **fmt_arg,
-		char_u *opt_name, int opt_scope, int fillchar, int maxwidth,
+		char_u *opt_name, പൂർണ്ണസംഖ്യ opt_scope, പൂർണ്ണസംഖ്യ fillchar, പൂർണ്ണസംഖ്യ maxwidth,
 		stl_hlrec_T **hltab, stl_hlrec_T **tabtab,
-		stl_clickrec_T **clicktab, int *lbreaks, int *carry_hl);
+		stl_clickrec_T **clicktab, പൂർണ്ണസംഖ്യ *lbreaks, പൂർണ്ണസംഖ്യ *carry_hl);
 #endif
-static int	append_arg_number(win_T *wp, char_u *buf, size_t buflen, int add_file);
-static void	free_buffer(buf_T *);
-static void	free_buffer_stuff(buf_T *buf, int free_options);
-static int	bt_nofileread(buf_T *buf);
-static int	do_buffer_ext(int action, int start, int dir, int count, int flags);
+സ്ഥിതം പൂർണ്ണസംഖ്യ	append_arg_സംഖ്യ(win_T *wp, char_u *buf, size_t buflen, പൂർണ്ണസംഖ്യ add_file);
+സ്ഥിതം ശൂന്യം	free_buffer(buf_T *);
+സ്ഥിതം ശൂന്യം	free_buffer_stuff(buf_T *buf, പൂർണ്ണസംഖ്യ free_options);
+സ്ഥിതം പൂർണ്ണസംഖ്യ	bt_nofileread(buf_T *buf);
+സ്ഥിതം പൂർണ്ണസംഖ്യ	do_buffer_ext(പൂർണ്ണസംഖ്യ action, പൂർണ്ണസംഖ്യ start, പൂർണ്ണസംഖ്യ dir, പൂർണ്ണസംഖ്യ എണ്ണം, പൂർണ്ണസംഖ്യ flags);
 
 #ifdef UNIX
 # define dev_T dev_t
-#else
+#അല്ലെങ്കിൽ
 # define dev_T unsigned
 #endif
 
 #define FOR_ALL_BUFS_FROM_LAST(buf) \
-    for ((buf) = lastbuf; (buf) != NULL; (buf) = (buf)->b_prev)
+    വേണ്ടി ((buf) = lastbuf; (buf) != ശൂന്യ; (buf) = (buf)->b_prev)
 
-#if defined(FEAT_QUICKFIX)
-static char *msg_loclist = N_("[Location List]");
-static char *msg_qflist = N_("[Quickfix List]");
+#എങ്കിൽ defined(FEAT_QUICKFIX)
+സ്ഥിതം അക്ഷരം *സന്ദേശം_loclist = N_("[Location List]");
+സ്ഥിതം അക്ഷരം *സന്ദേശം_qflist = N_("[Quickfix List]");
 #endif
 
 // Number of times free_buffer() was called.
-static int	buf_free_count = 0;
+സ്ഥിതം പൂർണ്ണസംഖ്യ	buf_free_എണ്ണം = 0;
 
-static int	top_file_num = 1;	// highest file number
-static garray_T buf_reuse = GA_EMPTY;	// file numbers to recycle
+സ്ഥിതം പൂർണ്ണസംഖ്യ	മുകൾ_file_അക്കം = 1;	// highest file number
+സ്ഥിതം garray_T buf_reuse = GA_EMPTY;	// file numbers to recycle
 
-    static void
+    സ്ഥിതം ശൂന്യം
 trigger_undo_ftplugin(buf_T *buf, win_T *win)
 {
     window_layout_lock();
     ++buf->b_locked;
     ++win->w_locked;
     // b:undo_ftplugin may be set, undo it
-    do_cmdline_cmd((char_u*)"if exists('b:undo_ftplugin') | :legacy :exe \
+    do_cmdline_cmd((char_u*)"എങ്കിൽ exists('b:undo_ftplugin') | :legacy :exe \
 	    b:undo_ftplugin | endif");
     --buf->b_locked;
     --win->w_locked;
@@ -95,103 +95,103 @@ trigger_undo_ftplugin(buf_T *buf, win_T *win)
 /*
  * Calculate the percentage that `part` is of the `whole`.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 calc_percentage(long part, long whole)
 {
     // With 32 bit longs and more than 21,474,836 lines multiplying by 100
     // causes an overflow, thus for large numbers divide instead.
-    return (part > 1000000L)
-	? (int)(part / (whole / 100L))
-	: (int)((part * 100L) / whole);
+    തിരികെ (part > 1000000L)
+	? (പൂർണ്ണസംഖ്യ)(part / (whole / 100L))
+	: (പൂർണ്ണസംഖ്യ)((part * 100L) / whole);
 }
 
 /*
  * Return the highest possible buffer number.
  */
-    int
-get_highest_fnum(void)
+    പൂർണ്ണസംഖ്യ
+get_highest_fnum(ശൂന്യം)
 {
-    return top_file_num - 1;
+    തിരികെ മുകൾ_file_അക്കം - 1;
 }
 
 /*
  * Read data from buffer for retrying.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 read_buffer(
-    int		read_stdin,	    // read file from stdin, otherwise fifo
+    പൂർണ്ണസംഖ്യ		read_stdin,	    // read file from stdin, otherwise fifo
     exarg_T	*eap,		    // for forced 'ff' and 'fenc' or NULL
-    int		flags)		    // extra flags for readfile()
+    പൂർണ്ണസംഖ്യ		flags)		    // extra flags for readfile()
 {
-    int		retval = OK;
-    linenr_T	line_count;
+    പൂർണ്ണസംഖ്യ		retval = OK;
+    linenr_T	വരി_എണ്ണം;
 
     // Read from the buffer which the text is already filled in and append at
     // the end.  This makes it possible to retry when 'fileformat' or
     // 'fileencoding' was guessed wrong.
-    line_count = curbuf->b_ml.ml_line_count;
+    വരി_എണ്ണം = curbuf->b_ml.ml_വരി_എണ്ണം;
     retval = readfile(
-	    read_stdin ? NULL : curbuf->b_ffname,
-	    read_stdin ? NULL : curbuf->b_fname,
-	    line_count, (linenr_T)0, (linenr_T)MAXLNUM, eap,
+	    read_stdin ? ശൂന്യ : curbuf->b_ffname,
+	    read_stdin ? ശൂന്യ : curbuf->b_fname,
+	    വരി_എണ്ണം, (linenr_T)0, (linenr_T)MAXLNUM, eap,
 	    flags | READ_BUFFER);
-    if (retval == OK)
+    എങ്കിൽ (retval == OK)
     {
 	// Delete the binary lines.
-	while (--line_count >= 0)
+	ആകുമ്പോൾ (--വരി_എണ്ണം >= 0)
 	    ml_delete((linenr_T)1);
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	// Delete the converted lines.
-	while (curbuf->b_ml.ml_line_count > line_count)
-	    ml_delete(line_count);
+	ആകുമ്പോൾ (curbuf->b_ml.ml_വരി_എണ്ണം > വരി_എണ്ണം)
+	    ml_delete(വരി_എണ്ണം);
     }
     // Put the cursor on the first line.
     curwin->w_cursor.lnum = 1;
     curwin->w_cursor.col = 0;
 
-    if (read_stdin)
+    എങ്കിൽ (read_stdin)
     {
 	// Set or reset 'modified' before executing autocommands, so that
 	// it can be changed there.
-	if (!readonlymode && !BUFEMPTY())
+	എങ്കിൽ (!readonlymode && !BUFEMPTY())
 	    changed();
-	else if (retval == OK)
+	അല്ലെങ്കിൽ എങ്കിൽ (retval == OK)
 	    unchanged(curbuf, FALSE, TRUE);
 
-	if (retval == OK)
+	എങ്കിൽ (retval == OK)
 	{
 #ifdef FEAT_EVAL
-	    apply_autocmds_retval(EVENT_STDINREADPOST, NULL, NULL, FALSE,
+	    apply_autocmds_retval(EVENT_STDINREADPOST, ശൂന്യ, ശൂന്യ, FALSE,
 							      curbuf, &retval);
-#else
-	    apply_autocmds(EVENT_STDINREADPOST, NULL, NULL, FALSE, curbuf);
+#അല്ലെങ്കിൽ
+	    apply_autocmds(EVENT_STDINREADPOST, ശൂന്യ, ശൂന്യ, FALSE, curbuf);
 #endif
 	}
     }
-    return retval;
+    തിരികെ retval;
 }
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 /*
  * Ensure buffer "buf" is loaded.  Does not trigger the swap-exists action.
  */
-    void
+    ശൂന്യം
 buffer_ensure_loaded(buf_T *buf)
 {
-    if (buf->b_ml.ml_mfp != NULL)
-	return;
+    എങ്കിൽ (buf->b_ml.ml_mfp != ശൂന്യ)
+	തിരികെ;
 
     aco_save_T	aco;
 
     // Make sure the buffer is in a window.  If not then skip it.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf == buf)
+    എങ്കിൽ (curbuf == buf)
     {
-	if (swap_exists_action != SEA_READONLY)
+	എങ്കിൽ (swap_exists_action != SEA_READONLY)
 	    swap_exists_action = SEA_NONE;
-	open_buffer(FALSE, NULL, 0);
+	open_buffer(FALSE, ശൂന്യ, 0);
 	aucmd_restbuf(&aco);
     }
 }
@@ -202,38 +202,38 @@ buffer_ensure_loaded(buf_T *buf)
  * memory.
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 open_buffer(
-    int		read_stdin,	    // read file from stdin
+    പൂർണ്ണസംഖ്യ		read_stdin,	    // read file from stdin
     exarg_T	*eap,		    // for forced 'ff' and 'fenc' or NULL
-    int		flags_arg)	    // extra flags for readfile()
+    പൂർണ്ണസംഖ്യ		flags_arg)	    // extra flags for readfile()
 {
-    int		flags = flags_arg;
-    int		retval = OK;
+    പൂർണ്ണസംഖ്യ		flags = flags_arg;
+    പൂർണ്ണസംഖ്യ		retval = OK;
     bufref_T	old_curbuf;
 #ifdef FEAT_SYN_HL
     long	old_tw = curbuf->b_p_tw;
 #endif
-    int		read_fifo = FALSE;
+    പൂർണ്ണസംഖ്യ		read_fifo = FALSE;
 
     // The 'readonly' flag is only set when BF_NEVERLOADED is being reset.
     // When re-entering the same buffer, it should not change, because the
     // user may have reset the flag by hand.
-    if (readonlymode && curbuf->b_ffname != NULL
+    എങ്കിൽ (readonlymode && curbuf->b_ffname != ശൂന്യ
 					&& (curbuf->b_flags & BF_NEVERLOADED))
 	curbuf->b_p_ro = TRUE;
 
-    if (ml_open(curbuf) == FAIL)
+    എങ്കിൽ (ml_open(curbuf) == FAIL)
     {
 	// There MUST be a memfile, otherwise we can't do anything
 	// If we can't create one for the current buffer, take another buffer
 	close_buffer(curwin, curbuf, 0, FALSE, FALSE, FALSE);
 	FOR_ALL_BUFFERS(curbuf)
-	    if (curbuf->b_ml.ml_mfp != NULL)
-		break;
+	    എങ്കിൽ (curbuf->b_ml.ml_mfp != ശൂന്യ)
+		നിർത്തുക;
 	// If there is no memfile at all, exit.
 	// This is OK, since there are no changes to lose.
-	if (curbuf == NULL)
+	എങ്കിൽ (curbuf == ശൂന്യ)
 	{
 	    emsg(_(e_cannot_allocate_any_buffer_exiting));
 
@@ -246,14 +246,14 @@ open_buffer(
 	emsg(_(e_cannot_allocate_buffer_using_other_one));
 	enter_buffer(curbuf);
 #ifdef FEAT_SYN_HL
-	if (old_tw != curbuf->b_p_tw)
-	    check_colorcolumn(NULL, curwin);
+	എങ്കിൽ (old_tw != curbuf->b_p_tw)
+	    check_colorcolumn(ശൂന്യ, curwin);
 #endif
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     // Do not sync this buffer yet, may first want to read the file.
-    if (curbuf->b_ml.ml_mfp != NULL)
+    എങ്കിൽ (curbuf->b_ml.ml_mfp != ശൂന്യ)
 	curbuf->b_ml.ml_mfp->mf_dirty = MF_DIRTY_YES_NOSYNC;
 
     // The autocommands in readfile() may change the buffer, but only AFTER
@@ -266,87 +266,87 @@ open_buffer(
 
     // A buffer without an actual file should not use the buffer name to read a
     // file.
-    if (bt_nofileread(curbuf))
+    എങ്കിൽ (bt_nofileread(curbuf))
 	flags |= READ_NOFILE;
 
     // Read the file if there is one.
-    if (curbuf->b_ffname != NULL
+    എങ്കിൽ (curbuf->b_ffname != ശൂന്യ
 #ifdef FEAT_NETBEANS_INTG
 	    && netbeansReadFile
 #endif
        )
     {
-	int old_msg_silent = msg_silent;
+	പൂർണ്ണസംഖ്യ old_സന്ദേശം_silent = സന്ദേശം_silent;
 #ifdef UNIX
-	int	save_bin = curbuf->b_p_bin;
-	int perm;
+	പൂർണ്ണസംഖ്യ	save_bin = curbuf->b_p_bin;
+	പൂർണ്ണസംഖ്യ perm;
 #endif
 #ifdef FEAT_NETBEANS_INTG
-	int oldFire = netbeansFireChanges;
+	പൂർണ്ണസംഖ്യ oldFire = netbeansFireChanges;
 
 	netbeansFireChanges = 0;
 #endif
 #ifdef UNIX
 	perm = mch_getperm(curbuf->b_ffname);
-	if (perm >= 0 && (S_ISFIFO(perm)
+	എങ്കിൽ (perm >= 0 && (S_ISFIFO(perm)
 		      || S_ISSOCK(perm)
 # ifdef OPEN_CHR_FILES
 		      || (S_ISCHR(perm) && is_dev_fd_file(curbuf->b_ffname))
 # endif
 		    ))
 		read_fifo = TRUE;
-	if (read_fifo)
+	എങ്കിൽ (read_fifo)
 	    curbuf->b_p_bin = TRUE;
 #endif
-	if (shortmess(SHM_FILEINFO))
-	    msg_silent = 1;
+	എങ്കിൽ (shortmess(SHM_FILEINFO))
+	    സന്ദേശം_silent = 1;
 	retval = readfile(curbuf->b_ffname, curbuf->b_fname,
 		  (linenr_T)0, (linenr_T)0, (linenr_T)MAXLNUM, eap,
 		  flags | READ_NEW | (read_fifo ? READ_FIFO : 0));
 #ifdef UNIX
-	if (read_fifo)
+	എങ്കിൽ (read_fifo)
 	{
 	    curbuf->b_p_bin = save_bin;
-	    if (retval == OK)
+	    എങ്കിൽ (retval == OK)
 		// don't add READ_FIFO here, otherwise we won't be able to
 		// detect the encoding
 		retval = read_buffer(FALSE, eap, flags);
 	}
 #endif
-	msg_silent = old_msg_silent;
+	സന്ദേശം_silent = old_സന്ദേശം_silent;
 #ifdef FEAT_NETBEANS_INTG
 	netbeansFireChanges = oldFire;
 #endif
 	// Help buffer is filtered.
-	if (bt_help(curbuf))
+	എങ്കിൽ (bt_help(curbuf))
 	    fix_help_buffer();
     }
-    else if (read_stdin)
+    അല്ലെങ്കിൽ എങ്കിൽ (read_stdin)
     {
-	int	save_bin = curbuf->b_p_bin;
+	പൂർണ്ണസംഖ്യ	save_bin = curbuf->b_p_bin;
 
 	// First read the text in binary mode into the buffer.
 	// Then read from that same buffer and append at the end.  This makes
 	// it possible to retry when 'fileformat' or 'fileencoding' was
 	// guessed wrong.
 	curbuf->b_p_bin = TRUE;
-	retval = readfile(NULL, NULL, (linenr_T)0,
-		  (linenr_T)0, (linenr_T)MAXLNUM, NULL,
+	retval = readfile(ശൂന്യ, ശൂന്യ, (linenr_T)0,
+		  (linenr_T)0, (linenr_T)MAXLNUM, ശൂന്യ,
 		  flags | (READ_NEW + READ_STDIN));
 	curbuf->b_p_bin = save_bin;
-	if (retval == OK)
+	എങ്കിൽ (retval == OK)
 	    retval = read_buffer(TRUE, eap, flags);
     }
 
     // Can now sync this buffer in ml_sync_all().
-    if (curbuf->b_ml.ml_mfp != NULL
+    എങ്കിൽ (curbuf->b_ml.ml_mfp != ശൂന്യ
 	    && curbuf->b_ml.ml_mfp->mf_dirty == MF_DIRTY_YES_NOSYNC)
 	curbuf->b_ml.ml_mfp->mf_dirty = MF_DIRTY_YES;
 
     // if first time loading this buffer, init b_chartab[]
-    if (curbuf->b_flags & BF_NEVERLOADED)
+    എങ്കിൽ (curbuf->b_flags & BF_NEVERLOADED)
     {
-	(void)buf_init_chartab(curbuf, FALSE);
+	(ശൂന്യം)buf_init_chartab(curbuf, FALSE);
 	parse_cino(curbuf);
     }
 
@@ -357,14 +357,14 @@ open_buffer(
     // When reading stdin, the buffer contents always needs writing, so set
     // the changed flag.  Unless in readonly mode: "ls | gview -".
     // When interrupted and 'cpoptions' contains 'i' set changed flag.
-    if ((got_int && vim_strchr(p_cpo, CPO_INTMOD) != NULL)
+    എങ്കിൽ ((got_int && vim_strchr(p_cpo, CPO_INTMOD) != ശൂന്യ)
 		|| curbuf->b_modified_was_set	// autocmd did ":set modified"
 #ifdef FEAT_EVAL
-		|| (aborting() && vim_strchr(p_cpo, CPO_INTMOD) != NULL)
+		|| (aborting() && vim_strchr(p_cpo, CPO_INTMOD) != ശൂന്യ)
 #endif
        )
 	changed();
-    else if (retval == OK && !read_stdin && !read_fifo)
+    അല്ലെങ്കിൽ എങ്കിൽ (retval == OK && !read_stdin && !read_fifo)
 	unchanged(curbuf, FALSE, TRUE);
     save_file_ff(curbuf);		// keep this fileformat
 
@@ -376,9 +376,9 @@ open_buffer(
 
     // require "!" to overwrite the file, because it wasn't read completely
 #ifdef FEAT_EVAL
-    if (aborting())
-#else
-    if (got_int)
+    എങ്കിൽ (aborting())
+#അല്ലെങ്കിൽ
+    എങ്കിൽ (got_int)
 #endif
 	curbuf->b_flags |= BF_READERR;
 
@@ -389,7 +389,7 @@ open_buffer(
 #endif
 
     // need to set w_topline, unless some autocommand already did that.
-    if (!(curwin->w_valid & VALID_TOPLINE))
+    എങ്കിൽ (!(curwin->w_valid & VALID_TOPLINE))
     {
 	curwin->w_topline = 1;
 #ifdef FEAT_DIFF
@@ -397,34 +397,34 @@ open_buffer(
 #endif
     }
 #ifdef FEAT_EVAL
-    apply_autocmds_retval(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf, &retval);
-#else
-    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
+    apply_autocmds_retval(EVENT_BUFENTER, ശൂന്യ, ശൂന്യ, FALSE, curbuf, &retval);
+#അല്ലെങ്കിൽ
+    apply_autocmds(EVENT_BUFENTER, ശൂന്യ, ശൂന്യ, FALSE, curbuf);
 #endif
 
-    if (retval != OK)
-	return retval;
+    എങ്കിൽ (retval != OK)
+	തിരികെ retval;
 
     // The autocommands may have changed the current buffer.  Apply the
     // modelines to the correct buffer, if it still exists and is loaded.
-    if (bufref_valid(&old_curbuf) && old_curbuf.br_buf->b_ml.ml_mfp != NULL)
+    എങ്കിൽ (bufref_valid(&old_curbuf) && old_curbuf.br_buf->b_ml.ml_mfp != ശൂന്യ)
     {
 	aco_save_T	aco;
 
 	// Go to the buffer that was opened, make sure it is in a window.
 	// If not then skip it.
 	aucmd_prepbuf(&aco, old_curbuf.br_buf);
-	if (curbuf == old_curbuf.br_buf)
+	എങ്കിൽ (curbuf == old_curbuf.br_buf)
 	{
 	    do_modelines(0);
 	    curbuf->b_flags &= ~(BF_CHECK_RO | BF_NEVERLOADED);
 
-	    if ((flags & READ_NOWINENTER) == 0)
+	    എങ്കിൽ ((flags & READ_NOWINENTER) == 0)
 #ifdef FEAT_EVAL
-		apply_autocmds_retval(EVENT_BUFWINENTER, NULL, NULL,
+		apply_autocmds_retval(EVENT_BUFWINENTER, ശൂന്യ, ശൂന്യ,
 			FALSE, curbuf, &retval);
-#else
-	    apply_autocmds(EVENT_BUFWINENTER, NULL, NULL,
+#അല്ലെങ്കിൽ
+	    apply_autocmds(EVENT_BUFWINENTER, ശൂന്യ, ശൂന്യ,
 		    FALSE, curbuf);
 #endif
 
@@ -433,18 +433,18 @@ open_buffer(
 	}
     }
 
-    return retval;
+    തിരികെ retval;
 }
 
 /*
  * Store "buf" in "bufref" and set the free count.
  */
-    void
+    ശൂന്യം
 set_bufref(bufref_T *bufref, buf_T *buf)
 {
     bufref->br_buf = buf;
-    bufref->br_fnum = buf == NULL ? 0 : buf->b_fnum;
-    bufref->br_buf_free_count = buf_free_count;
+    bufref->br_fnum = buf == ശൂന്യ ? 0 : buf->b_fnum;
+    bufref->br_buf_free_എണ്ണം = buf_free_എണ്ണം;
 }
 
 /*
@@ -454,10 +454,10 @@ set_bufref(bufref_T *bufref, buf_T *buf)
  * Also checks if b_fnum is still the same, a :bwipe followed by :new might get
  * the same allocated memory, but it's a different buffer.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 bufref_valid(bufref_T *bufref)
 {
-    return bufref->br_buf_free_count == buf_free_count
+    തിരികെ bufref->br_buf_free_എണ്ണം == buf_free_എണ്ണം
 	? TRUE : buf_valid(bufref->br_buf)
 				  && bufref->br_fnum == bufref->br_buf->b_fnum;
 }
@@ -466,7 +466,7 @@ bufref_valid(bufref_T *bufref)
  * Return TRUE if "buf" points to a valid buffer (in the buffer list).
  * This can be slow if there are many buffers, prefer using bufref_valid().
  */
-    int
+    പൂർണ്ണസംഖ്യ
 buf_valid(buf_T *buf)
 {
     buf_T	*bp;
@@ -474,30 +474,30 @@ buf_valid(buf_T *buf)
     // Assume that we more often have a recent buffer, start with the last
     // one.
     FOR_ALL_BUFS_FROM_LAST(bp)
-	if (bp == buf)
-	    return TRUE;
-    return FALSE;
+	എങ്കിൽ (bp == buf)
+	    തിരികെ TRUE;
+    തിരികെ FALSE;
 }
 
 /*
  * A hash table used to quickly lookup a buffer by its number.
  */
-static hashtab_T buf_hashtab;
+സ്ഥിതം hashtab_T buf_hashtab;
 
-    static void
+    സ്ഥിതം ശൂന്യം
 buf_hashtab_add(buf_T *buf)
 {
-    vim_snprintf((char *)buf->b_key, sizeof(buf->b_key), "%x", buf->b_fnum);
-    if (hash_add(&buf_hashtab, buf->b_key, "create buffer") == FAIL)
+    vim_snprintf((അക്ഷരം *)buf->b_താക്കോൽ, വലുപ്പം(buf->b_താക്കോൽ), "%x", buf->b_fnum);
+    എങ്കിൽ (hash_add(&buf_hashtab, buf->b_താക്കോൽ, "create buffer") == FAIL)
 	emsg(_(e_buffer_cannot_be_registered));
 }
 
-    static void
+    സ്ഥിതം ശൂന്യം
 buf_hashtab_remove(buf_T *buf)
 {
-    hashitem_T *hi = hash_find(&buf_hashtab, buf->b_key);
+    hashitem_T *hi = hash_find(&buf_hashtab, buf->b_താക്കോൽ);
 
-    if (!HASHITEM_EMPTY(hi))
+    എങ്കിൽ (!HASHITEM_EMPTY(hi))
 	hash_remove(&buf_hashtab, hi, "close buffer");
 }
 
@@ -506,34 +506,34 @@ buf_hashtab_remove(buf_T *buf)
  * Give an error message and return FALSE when the buffer is locked or the
  * screen is being redrawn and the buffer is in a window.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 can_unload_buffer(buf_T *buf)
 {
-    int	    can_unload = !buf->b_locked;
+    പൂർണ്ണസംഖ്യ	    can_unload = !buf->b_locked;
 
-    if (can_unload && updating_screen)
+    എങ്കിൽ (can_unload && updating_screen)
     {
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_buffer == buf)
+	    എങ്കിൽ (wp->w_buffer == buf)
 	    {
 		can_unload = FALSE;
-		break;
+		നിർത്തുക;
 	    }
     }
     // Don't unload the buffer while it's still being saved
-    if (can_unload && buf->b_saving)
+    എങ്കിൽ (can_unload && buf->b_saving)
 	can_unload = FALSE;
 
-    if (!can_unload)
+    എങ്കിൽ (!can_unload)
     {
-	char_u *fname = buf->b_fname != NULL ? buf->b_fname : buf->b_ffname;
+	char_u *fname = buf->b_fname != ശൂന്യ ? buf->b_fname : buf->b_ffname;
 
 	semsg(_(e_attempt_to_delete_buffer_that_is_in_use_str),
-				fname != NULL ? fname : (char_u *)"[No Name]");
+				fname != ശൂന്യ ? fname : (char_u *)"[No Name]");
     }
-    return can_unload;
+    തിരികെ can_unload;
 }
 
 /*
@@ -568,60 +568,60 @@ can_unload_buffer(buf_T *buf)
  *
  * Return TRUE when we got to the end and unloaded "buf".
  */
-    int
+    പൂർണ്ണസംഖ്യ
 close_buffer(
     win_T	*win,
     buf_T	*buf,
-    int		action,
-    int		abort_if_last,
-    int		ignore_abort,
-    int		set_context)
+    പൂർണ്ണസംഖ്യ		action,
+    പൂർണ്ണസംഖ്യ		abort_if_last,
+    പൂർണ്ണസംഖ്യ		ignore_abort,
+    പൂർണ്ണസംഖ്യ		set_context)
 {
-    int		hiding_buf;
+    പൂർണ്ണസംഖ്യ		hiding_buf;
     bufref_T	bufref;
-    int		is_curwin = (curwin != NULL && curwin == win
+    പൂർണ്ണസംഖ്യ		is_curwin = (curwin != ശൂന്യ && curwin == win
 				&& curwin->w_buffer == buf);
     tabpage_T	*the_curtab = curtab;
-    int		unload_buf = (action != 0);
-    int		wipe_buf = (action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
-    int		del_buf = (action == DOBUF_DEL || wipe_buf);
-    int		win_valid = win_valid_any_tab(win);
+    പൂർണ്ണസംഖ്യ		unload_buf = (action != 0);
+    പൂർണ്ണസംഖ്യ		wipe_buf = (action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
+    പൂർണ്ണസംഖ്യ		del_buf = (action == DOBUF_DEL || wipe_buf);
+    പൂർണ്ണസംഖ്യ		win_valid = win_valid_any_tab(win);
     // win_valid is FALSE for closing popups, as they're first removed from the
     // window list.  If so, skip some side-effects, but treat win as valid.
     // Shouldn't be possible for autocmds to prematurely free win then, as it's
     // not in the window list.
-    int		closed_popup = win && !win_valid && WIN_IS_POPUP(win);
+    പൂർണ്ണസംഖ്യ		closed_popup = win && !win_valid && WIN_IS_POPUP(win);
 
     CHECK_CURBUF;
 
     // Force unloading or deleting when 'bufhidden' says so.
     // The caller must take care of NOT deleting/freeing when 'bufhidden' is
     // "hide" (otherwise we could never free or delete a buffer).
-    if (buf->b_p_bh[0] == 'd')		// 'bufhidden' == "delete"
+    എങ്കിൽ (buf->b_p_bh[0] == 'd')		// 'bufhidden' == "delete"
     {
 	del_buf = TRUE;
 	unload_buf = TRUE;
     }
-    else if (buf->b_p_bh[0] == 'w')	// 'bufhidden' == "wipe"
+    അല്ലെങ്കിൽ എങ്കിൽ (buf->b_p_bh[0] == 'w')	// 'bufhidden' == "wipe"
     {
 	del_buf = TRUE;
 	unload_buf = TRUE;
 	wipe_buf = TRUE;
     }
-    else if (buf->b_p_bh[0] == 'u')	// 'bufhidden' == "unload"
+    അല്ലെങ്കിൽ എങ്കിൽ (buf->b_p_bh[0] == 'u')	// 'bufhidden' == "unload"
 	unload_buf = TRUE;
 
 #ifdef FEAT_TERMINAL
     // depending on how we get here b_nwindows may already be zero
-    if (bt_terminal(buf) && (buf->b_nwindows <= 1 || del_buf))
+    എങ്കിൽ (bt_terminal(buf) && (buf->b_nwindows <= 1 || del_buf))
     {
 	CHECK_CURBUF;
-	if (term_job_running(buf->b_term))
+	എങ്കിൽ (term_job_running(buf->b_term))
 	{
-	    if (wipe_buf || unload_buf)
+	    എങ്കിൽ (wipe_buf || unload_buf)
 	    {
-		if (!can_unload_buffer(buf))
-		    return FALSE;
+		എങ്കിൽ (!can_unload_buffer(buf))
+		    തിരികെ FALSE;
 
 		// Wiping out or unloading a terminal buffer kills the job.
 		free_terminal(buf);
@@ -631,21 +631,21 @@ close_buffer(
 		unload_buf = TRUE;
 		wipe_buf = TRUE;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		// The job keeps running, hide the buffer.
 		del_buf = FALSE;
 		unload_buf = FALSE;
 	    }
 	}
-	else if (buf->b_p_bh[0] == 'h' && !del_buf)
+	അല്ലെങ്കിൽ എങ്കിൽ (buf->b_p_bh[0] == 'h' && !del_buf)
 	{
 	    // Hide a terminal buffer.
 	    unload_buf = FALSE;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    if (del_buf || unload_buf)
+	    എങ്കിൽ (del_buf || unload_buf)
 	    {
 		// A terminal buffer is wiped out if the job has finished.
 		// We only do this when there's an intention to unload the
@@ -662,16 +662,16 @@ close_buffer(
 
     // Disallow deleting the buffer when it is locked (already being closed or
     // halfway a command that relies on it). Unloading is allowed.
-    if ((del_buf || wipe_buf) && !can_unload_buffer(buf))
-	return FALSE;
+    എങ്കിൽ ((del_buf || wipe_buf) && !can_unload_buffer(buf))
+	തിരികെ FALSE;
 
-    if (set_context && win_valid && win->w_buffer == buf)
+    എങ്കിൽ (set_context && win_valid && win->w_buffer == buf)
     {
 	// Set b_last_cursor when closing the last window for the buffer.
 	// Remember the last cursor position and window options of the buffer.
 	// This used to be only for the current window, but then options like
 	// 'foldmethod' may be lost with a ":only" command.
-	if (buf->b_nwindows == 1)
+	എങ്കിൽ (buf->b_nwindows == 1)
 	    set_last_cursor(win);
 	buflist_setfpos(buf, win,
 		    win->w_cursor.lnum == 1 ? 0 : win->w_cursor.lnum,
@@ -681,47 +681,47 @@ close_buffer(
     set_bufref(&bufref, buf);
 
     // When the buffer is no longer in a window, trigger BufWinLeave
-    if ((win_valid || closed_popup) && win->w_buffer == buf
+    എങ്കിൽ ((win_valid || closed_popup) && win->w_buffer == buf
 	    && buf->b_nwindows == 1)
     {
 	++buf->b_locked;
 	++buf->b_locked_split;
-	if (apply_autocmds(EVENT_BUFWINLEAVE, buf->b_fname, buf->b_fname,
+	എങ്കിൽ (apply_autocmds(EVENT_BUFWINLEAVE, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	{
 	    // Autocommands deleted the buffer.
 aucmd_abort:
 	    emsg(_(e_autocommands_caused_command_to_abort));
-	    return FALSE;
+	    തിരികെ FALSE;
 	}
 	--buf->b_locked;
 	--buf->b_locked_split;
-	if (abort_if_last && one_window())
+	എങ്കിൽ (abort_if_last && one_window())
 	    // Autocommands made this the only window.
-	    goto aucmd_abort;
+	    പോകുക aucmd_abort;
 
 	// When the buffer becomes hidden, but is not unloaded, trigger
 	// BufHidden
-	if (!unload_buf)
+	എങ്കിൽ (!unload_buf)
 	{
 	    ++buf->b_locked;
 	    ++buf->b_locked_split;
-	    if (apply_autocmds(EVENT_BUFHIDDEN, buf->b_fname, buf->b_fname,
+	    എങ്കിൽ (apply_autocmds(EVENT_BUFHIDDEN, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		    && !bufref_valid(&bufref))
 		// Autocommands deleted the buffer.
-		goto aucmd_abort;
+		പോകുക aucmd_abort;
 	    --buf->b_locked;
 	    --buf->b_locked_split;
-	    if (abort_if_last && one_window())
+	    എങ്കിൽ (abort_if_last && one_window())
 		// Autocommands made this the only window.
-		goto aucmd_abort;
+		പോകുക aucmd_abort;
 	}
 #ifdef FEAT_EVAL
 	// autocmds may abort script processing
-	if (!ignore_abort && aborting())
-	    return FALSE;
+	എങ്കിൽ (!ignore_abort && aborting())
+	    തിരികെ FALSE;
 #endif
 	win_valid = win_valid && win_valid_any_tab(win);
     }
@@ -729,7 +729,7 @@ aucmd_abort:
     // If the buffer was in curwin and the window has changed, go back to that
     // window, if it still exists.  This avoids that ":edit x" triggering a
     // "tabnext" BufUnload autocmd leaves a window behind without a buffer.
-    if (is_curwin && curwin != win && win_valid)
+    എങ്കിൽ (is_curwin && curwin != win && win_valid)
     {
 	block_autocmds();
 	goto_tabpage_win(the_curtab, win);
@@ -738,7 +738,7 @@ aucmd_abort:
 
     // When a quickfix buffer is deleted from a window, clear the
     // 'winfixheight' option.
-    if (bt_quickfix(buf) && win_valid && win->w_buffer == buf)
+    എങ്കിൽ (bt_quickfix(buf) && win_valid && win->w_buffer == buf)
 	win->w_p_wfh = FALSE;
 
     // Remember if the buffer may be hidden soon, or is already hidden.
@@ -746,33 +746,33 @@ aucmd_abort:
 	    && win->w_buffer == buf && buf->b_nwindows == 1);
 
 #ifdef FEAT_DIFF
-    if (diffopt_hiddenoff() && !unload_buf && hiding_buf)
+    എങ്കിൽ (diffopt_hiddenoff() && !unload_buf && hiding_buf)
 	diff_buf_delete(buf);	// Clear 'diff' for hidden buffer.
 #endif
 
     // Return when another window is displaying the buffer or when not unloaded.
-    if (!hiding_buf || !unload_buf)
-	return FALSE;
+    എങ്കിൽ (!hiding_buf || !unload_buf)
+	തിരികെ FALSE;
 
     // Always remove the buffer when there is no file name.
-    if (buf->b_ffname == NULL)
+    എങ്കിൽ (buf->b_ffname == ശൂന്യ)
 	del_buf = TRUE;
 
     // Free all things allocated for this buffer.
     // Also calls the "BufDelete" autocommands when del_buf is TRUE.
     // Abort if nothing was freed, or if autocommands delete the buffer.
-    if (!buf_freeall(buf, (del_buf ? BFA_DEL : 0)
+    എങ്കിൽ (!buf_freeall(buf, (del_buf ? BFA_DEL : 0)
 		   + (wipe_buf ? BFA_WIPE : 0)
 		   + (ignore_abort ? BFA_IGNORE_ABORT : 0)))
-	return FALSE;
+	തിരികെ FALSE;
 
     win_valid = win_valid && win_valid_any_tab(win);
-    if ((win_valid || closed_popup) && win->w_buffer == buf)
+    എങ്കിൽ ((win_valid || closed_popup) && win->w_buffer == buf)
     {
 	// Autocommands may have opened (despite b_locked_split) or closed
 	// windows for this buffer.  Decrement for the close we do here.
 	--buf->b_nwindows;
-	win->w_buffer = NULL;  // make sure we don't use the buffer now
+	win->w_buffer = ശൂന്യ;  // make sure we don't use the buffer now
     }
 
     /*
@@ -781,9 +781,9 @@ aucmd_abort:
      * wiped out all other buffers (unless when inside free_all_mem() where all
      * buffers need to be freed and autocommands are blocked).
      */
-    if (wipe_buf && buf->b_nwindows <= 0
-			    && (buf->b_prev != NULL || buf->b_next != NULL
-#if defined(EXITFREE)
+    എങ്കിൽ (wipe_buf && buf->b_nwindows <= 0
+			    && (buf->b_prev != ശൂന്യ || buf->b_next != ശൂന്യ
+#എങ്കിൽ defined(EXITFREE)
 				|| entered_free_all_mem
 #endif
 				))
@@ -794,32 +794,32 @@ aucmd_abort:
 	FOR_ALL_TAB_WINDOWS(tp, wp)
 	    mark_forget_file(wp, buf->b_fnum);
 
-	if (action == DOBUF_WIPE_REUSE)
+	എങ്കിൽ (action == DOBUF_WIPE_REUSE)
 	{
 	    // we can re-use this buffer number, store it
-	    if (buf_reuse.ga_itemsize == 0)
-		ga_init2(&buf_reuse, sizeof(int), 50);
-	    if (ga_grow(&buf_reuse, 1) == OK)
-		((int *)buf_reuse.ga_data)[buf_reuse.ga_len++] = buf->b_fnum;
+	    എങ്കിൽ (buf_reuse.ga_itemsize == 0)
+		ga_init2(&buf_reuse, വലുപ്പം(പൂർണ്ണസംഖ്യ), 50);
+	    എങ്കിൽ (ga_grow(&buf_reuse, 1) == OK)
+		((പൂർണ്ണസംഖ്യ *)buf_reuse.ga_data)[buf_reuse.ga_len++] = buf->b_fnum;
 	}
-	if (buf->b_sfname != buf->b_ffname)
+	എങ്കിൽ (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
-	    buf->b_sfname = NULL;
+	അല്ലെങ്കിൽ
+	    buf->b_sfname = ശൂന്യ;
 	VIM_CLEAR(buf->b_ffname);
-	if (buf->b_prev == NULL)
+	എങ്കിൽ (buf->b_prev == ശൂന്യ)
 	    firstbuf = buf->b_next;
-	else
+	അല്ലെങ്കിൽ
 	    buf->b_prev->b_next = buf->b_next;
-	if (buf->b_next == NULL)
+	എങ്കിൽ (buf->b_next == ശൂന്യ)
 	    lastbuf = buf->b_prev;
-	else
+	അല്ലെങ്കിൽ
 	    buf->b_next->b_prev = buf->b_prev;
 	free_buffer(buf);
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	if (del_buf)
+	എങ്കിൽ (del_buf)
 	{
 	    // Free all internal variables and reset option values, to make
 	    // ":bdel" compatible with Vim 5.7.
@@ -832,7 +832,7 @@ aucmd_abort:
 	    buf->b_p_initialized = false;
 	}
 	buf_clear_file(buf);
-	if (del_buf)
+	എങ്കിൽ (del_buf)
 	    buf->b_p_bl = FALSE;
     }
     // NOTE: at this point "curbuf" may be invalid!
@@ -840,17 +840,17 @@ aucmd_abort:
     // When closing curbuf for curwin, is_curwin checks should've ensured
     // autocmds don't switch windows, unless they closed curwin.  Otherwise
     // callers may leave the window open to a NULL buffer!
-    assert(!win_valid || !is_curwin || win == curwin);
-    return TRUE;
+    പ്രതിജ്ഞാ(!win_valid || !is_curwin || win == curwin);
+    തിരികെ TRUE;
 }
 
 /*
  * Make buffer not contain a file.
  */
-    void
+    ശൂന്യം
 buf_clear_file(buf_T *buf)
 {
-    buf->b_ml.ml_line_count = 1;
+    buf->b_ml.ml_വരി_എണ്ണം = 1;
     unchanged(buf, TRUE, TRUE);
     buf->b_shortname = false;
     buf->b_p_eof = FALSE;
@@ -859,10 +859,10 @@ buf_clear_file(buf_T *buf)
     buf->b_start_eol = TRUE;
     buf->b_p_bomb = FALSE;
     buf->b_start_bomb = FALSE;
-    buf->b_ml.ml_mfp = NULL;
+    buf->b_ml.ml_mfp = ശൂന്യ;
     buf->b_ml.ml_flags = ML_EMPTY;		// empty buffer
 #ifdef FEAT_NETBEANS_INTG
-    netbeans_deleted_all_lines(buf);
+    netbeans_deleted_all_വരികൾ(buf);
 #endif
 }
 
@@ -877,12 +877,12 @@ buf_clear_file(buf_T *buf)
  *
  * Return TRUE when we got to the end.
  */
-    int
-buf_freeall(buf_T *buf, int flags)
+    പൂർണ്ണസംഖ്യ
+buf_freeall(buf_T *buf, പൂർണ്ണസംഖ്യ flags)
 {
-    int		is_curbuf = (buf == curbuf);
+    പൂർണ്ണസംഖ്യ		is_curbuf = (buf == curbuf);
     bufref_T	bufref;
-    int		is_curwin = (curwin != NULL && curwin->w_buffer == buf);
+    പൂർണ്ണസംഖ്യ		is_curwin = (curwin != ശൂന്യ && curwin->w_buffer == buf);
     win_T	*the_curwin = curwin;
     tabpage_T	*the_curtab = curtab;
 
@@ -890,29 +890,29 @@ buf_freeall(buf_T *buf, int flags)
     ++buf->b_locked;
     ++buf->b_locked_split;
     set_bufref(&bufref, buf);
-    if (buf->b_ml.ml_mfp != NULL)
+    എങ്കിൽ (buf->b_ml.ml_mfp != ശൂന്യ)
     {
-	if (apply_autocmds(EVENT_BUFUNLOAD, buf->b_fname, buf->b_fname,
+	എങ്കിൽ (apply_autocmds(EVENT_BUFUNLOAD, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    തിരികെ FALSE;
     }
-    if ((flags & BFA_DEL) && buf->b_p_bl)
+    എങ്കിൽ ((flags & BFA_DEL) && buf->b_p_bl)
     {
-	if (apply_autocmds(EVENT_BUFDELETE, buf->b_fname, buf->b_fname,
+	എങ്കിൽ (apply_autocmds(EVENT_BUFDELETE, buf->b_fname, buf->b_fname,
 								   FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    തിരികെ FALSE;
     }
-    if (flags & BFA_WIPE)
+    എങ്കിൽ (flags & BFA_WIPE)
     {
-	if (apply_autocmds(EVENT_BUFWIPEOUT, buf->b_fname, buf->b_fname,
+	എങ്കിൽ (apply_autocmds(EVENT_BUFWIPEOUT, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    തിരികെ FALSE;
     }
     --buf->b_locked;
     --buf->b_locked_split;
@@ -920,7 +920,7 @@ buf_freeall(buf_T *buf, int flags)
     // If the buffer was in curwin and the window has changed, go back to that
     // window, if it still exists.  This avoids that ":edit x" triggering a
     // "tabnext" BufUnload autocmd leaves a window behind without a buffer.
-    if (is_curwin && curwin != the_curwin && win_valid_any_tab(the_curwin))
+    എങ്കിൽ (is_curwin && curwin != the_curwin && win_valid_any_tab(the_curwin))
     {
 	block_autocmds();
 	goto_tabpage_win(the_curtab, the_curwin);
@@ -929,21 +929,21 @@ buf_freeall(buf_T *buf, int flags)
 
 #ifdef FEAT_EVAL
     // autocmds may abort script processing
-    if ((flags & BFA_IGNORE_ABORT) == 0 && aborting())
-	return FALSE;
+    എങ്കിൽ ((flags & BFA_IGNORE_ABORT) == 0 && aborting())
+	തിരികെ FALSE;
 #endif
 
     // It's possible that autocommands change curbuf to the one being deleted.
     // This might cause curbuf to be deleted unexpectedly.  But in some cases
     // it's OK to delete the curbuf, because a new one is obtained anyway.
     // Therefore only return if curbuf changed to the deleted buffer.
-    if (buf == curbuf && !is_curbuf)
-	return FALSE;
+    എങ്കിൽ (buf == curbuf && !is_curbuf)
+	തിരികെ FALSE;
 
     // If curbuf, stop Visual mode just before freeing, but after autocmds that
     // may restart it.  May trigger TextYankPost, but with textlock set.
-    if (buf == curbuf && VIsual_active
-#if defined(EXITFREE)
+    എങ്കിൽ (buf == curbuf && VIsual_active
+#എങ്കിൽ defined(EXITFREE)
 	    && !entered_free_all_mem
 #endif
 	    )
@@ -954,7 +954,7 @@ buf_freeall(buf_T *buf, int flags)
 #endif
 #ifdef FEAT_SYN_HL
     // Remove any ownsyntax, unless exiting.
-    if (curwin != NULL && curwin->w_buffer == buf)
+    എങ്കിൽ (curwin != ശൂന്യ && curwin->w_buffer == buf)
 	reset_synblock(curwin);
 #endif
 
@@ -965,7 +965,7 @@ buf_freeall(buf_T *buf, int flags)
 	tabpage_T	*tp;
 
 	FOR_ALL_TAB_WINDOWS(tp, win)
-	    if (win->w_buffer == buf)
+	    എങ്കിൽ (win->w_buffer == buf)
 		clearFolding(win);
     }
 #endif
@@ -974,8 +974,8 @@ buf_freeall(buf_T *buf, int flags)
     tcl_buffer_free(buf);
 #endif
     ml_close(buf, TRUE);	    // close and delete the memline/memfile
-    buf->b_ml.ml_line_count = 0;    // no lines in buffer
-    if ((flags & BFA_KEEP_UNDO) == 0)
+    buf->b_ml.ml_വരി_എണ്ണം = 0;    // no lines in buffer
+    എങ്കിൽ ((flags & BFA_KEEP_UNDO) == 0)
 	// free the memory allocated for undo
 	// and reset all undo information
 	u_clearallandblockfree(buf);
@@ -986,17 +986,17 @@ buf_freeall(buf_T *buf, int flags)
     clear_buf_prop_types(buf);
 #endif
     buf->b_flags &= ~BF_READERR;    // a read error is no longer relevant
-    return TRUE;
+    തിരികെ TRUE;
 }
 
 /*
  * Free a buffer structure and the things it contains related to the buffer
  * itself (not the file, that must have been done already).
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 free_buffer(buf_T *buf)
 {
-    ++buf_free_count;
+    ++buf_free_എണ്ണം;
     free_buffer_stuff(buf, TRUE);
 #ifdef FEAT_EVAL
     // b:changedtick uses an item in buf_T, remove it now
@@ -1038,49 +1038,49 @@ free_buffer(buf_T *buf)
 
     aubuflocal_remove(buf);
 
-    if (autocmd_busy)
+    എങ്കിൽ (autocmd_busy)
     {
 	// Do not free the buffer structure while autocommands are executing,
 	// it's still needed. Free it when autocmd_busy is reset.
 	buf->b_next = au_pending_free_buf;
 	au_pending_free_buf = buf;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	vim_free(buf);
-	if (curbuf == buf)
-	    curbuf = NULL;  // make clear it's not to be used
+	എങ്കിൽ (curbuf == buf)
+	    curbuf = ശൂന്യ;  // make clear it's not to be used
     }
 }
 
 /*
  * Initializes b:changedtick.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 init_changedtick(buf_T *buf)
 {
     dictitem_T *di = (dictitem_T *)&buf->b_ct_di;
 
     di->di_flags = DI_FLAGS_FIX | DI_FLAGS_RO;
-    di->di_tv.v_type = VAR_NUMBER;
+    di->di_tv.v_type = VAR_സംഖ്യ;
     di->di_tv.v_lock = VAR_FIXED;
-    di->di_tv.vval.v_number = 0;
+    di->di_tv.vval.v_സംഖ്യ = 0;
 
 #ifdef FEAT_EVAL
-    STRCPY(buf->b_ct_di.di_key, "changedtick");
-    (void)dict_add(buf->b_vars, di);
+    STRCPY(buf->b_ct_di.di_താക്കോൽ, "changedtick");
+    (ശൂന്യം)dict_add(buf->b_vars, di);
 #endif
 }
 
 /*
  * Free the b_wininfo list for buffer "buf".
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 clear_wininfo(buf_T *buf)
 {
     wininfo_T	*wip;
 
-    while (buf->b_wininfo != NULL)
+    ആകുമ്പോൾ (buf->b_wininfo != ശൂന്യ)
     {
 	wip = buf->b_wininfo;
 	buf->b_wininfo = wip->wi_next;
@@ -1091,12 +1091,12 @@ clear_wininfo(buf_T *buf)
 /*
  * Free stuff in the buffer for ":bdel" and when wiping out the buffer.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 free_buffer_stuff(
     buf_T	*buf,
-    int		free_options)		// free options as well
+    പൂർണ്ണസംഖ്യ		free_options)		// free options as well
 {
-    if (free_options)
+    എങ്കിൽ (free_options)
     {
 	clear_wininfo(buf);		// including window-local options
 	free_buf_options(buf, TRUE);
@@ -1130,10 +1130,10 @@ free_buffer_stuff(
 /*
  * Free one wininfo_T.
  */
-    void
+    ശൂന്യം
 free_wininfo(wininfo_T *wip)
 {
-    if (wip->wi_optset)
+    എങ്കിൽ (wip->wi_optset)
     {
 	clear_winopt(&wip->wi_opt);
 #ifdef FEAT_FOLDING
@@ -1146,42 +1146,42 @@ free_wininfo(wininfo_T *wip)
 /*
  * Go to another buffer.  Handles the result of the ATTENTION dialog.
  */
-    void
+    ശൂന്യം
 goto_buffer(
     exarg_T	*eap,
-    int		start,
-    int		dir,
-    int		count)
+    പൂർണ്ണസംഖ്യ		start,
+    പൂർണ്ണസംഖ്യ		dir,
+    പൂർണ്ണസംഖ്യ		എണ്ണം)
 {
     bufref_T	old_curbuf;
-    int		save_sea = swap_exists_action;
-    int		skip_help_buf;
+    പൂർണ്ണസംഖ്യ		save_sea = swap_exists_action;
+    പൂർണ്ണസംഖ്യ		skip_help_buf;
 
-    switch (eap->cmdidx)
+    തിരഞ്ഞെടുപ്പ് (eap->cmdidx)
     {
-	case CMD_bnext:
-	case CMD_sbnext:
-	case CMD_bNext:
-	case CMD_bprevious:
-	case CMD_sbNext:
-	case CMD_sbprevious:
+	അവസ്ഥ CMD_bnext:
+	അവസ്ഥ CMD_sbnext:
+	അവസ്ഥ CMD_bNext:
+	അവസ്ഥ CMD_bprevious:
+	അവസ്ഥ CMD_sbNext:
+	അവസ്ഥ CMD_sbprevious:
 	    skip_help_buf = TRUE;
-	    break;
-	default:
+	    നിർത്തുക;
+	സ്ഥിരസ്ഥിതി:
 	    skip_help_buf = FALSE;
-	    break;
+	    നിർത്തുക;
     }
 
     set_bufref(&old_curbuf, curbuf);
 
-    if (swap_exists_action == SEA_NONE)
+    എങ്കിൽ (swap_exists_action == SEA_NONE)
 	swap_exists_action = SEA_DIALOG;
-    (void)do_buffer_ext(*eap->cmd == 's' ? DOBUF_SPLIT : DOBUF_GOTO, start, dir, count,
+    (ശൂന്യം)do_buffer_ext(*eap->cmd == 's' ? DOBUF_SPLIT : DOBUF_GOTO, start, dir, എണ്ണം,
 	    (eap->forceit ? DOBUF_FORCEIT : 0) |
 	    (skip_help_buf ? DOBUF_SKIPHELP : 0));
-    if (swap_exists_action == SEA_QUIT && *eap->cmd == 's')
+    എങ്കിൽ (swap_exists_action == SEA_QUIT && *eap->cmd == 's')
     {
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 	cleanup_T   cs;
 
 	// Reset the error/interrupt/exception state here so that
@@ -1194,13 +1194,13 @@ goto_buffer(
 	swap_exists_action = save_sea;
 	swap_exists_did_quit = TRUE;
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
 #endif
     }
-    else
+    അല്ലെങ്കിൽ
 	handle_swap_exists(&old_curbuf);
 }
 
@@ -1208,10 +1208,10 @@ goto_buffer(
  * Handle the situation of swap_exists_action being set.
  * It is allowed for "old_curbuf" to be NULL or invalid.
  */
-    void
+    ശൂന്യം
 handle_swap_exists(bufref_T *old_curbuf)
 {
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
     cleanup_T	cs;
 #endif
 #ifdef FEAT_SYN_HL
@@ -1219,9 +1219,9 @@ handle_swap_exists(bufref_T *old_curbuf)
 #endif
     buf_T	*buf;
 
-    if (swap_exists_action == SEA_QUIT)
+    എങ്കിൽ (swap_exists_action == SEA_QUIT)
     {
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 	// Reset the error/interrupt/exception state here so that
 	// aborting() returns FALSE when closing a buffer.
 	enter_cleanup(&cs);
@@ -1233,55 +1233,55 @@ handle_swap_exists(bufref_T *old_curbuf)
 	swap_exists_action = SEA_NONE;	// don't want it again
 	swap_exists_did_quit = TRUE;
 	close_buffer(curwin, curbuf, DOBUF_UNLOAD, FALSE, FALSE, TRUE);
-	if (old_curbuf == NULL || !bufref_valid(old_curbuf)
+	എങ്കിൽ (old_curbuf == ശൂന്യ || !bufref_valid(old_curbuf)
 					      || old_curbuf->br_buf == curbuf)
 	{
 	    // Block autocommands here because curwin->w_buffer may be NULL.
 	    block_autocmds();
-	    buf = buflist_new(NULL, NULL, 1L, BLN_CURBUF | BLN_LISTED);
+	    buf = buflist_new(ശൂന്യ, ശൂന്യ, 1L, BLN_CURBUF | BLN_LISTED);
 	    unblock_autocmds();
 	}
-	else
+	അല്ലെങ്കിൽ
 	    buf = old_curbuf->br_buf;
-	if (buf != NULL)
+	എങ്കിൽ (buf != ശൂന്യ)
 	{
-	    int old_msg_silent = msg_silent;
+	    പൂർണ്ണസംഖ്യ old_സന്ദേശം_silent = സന്ദേശം_silent;
 
-	    if (shortmess(SHM_FILEINFO))
-		msg_silent = 1;  // prevent fileinfo message
+	    എങ്കിൽ (shortmess(SHM_FILEINFO))
+		സന്ദേശം_silent = 1;  // prevent fileinfo message
 	    enter_buffer(buf);
 	    // restore msg_silent, so that the command line will be shown
-	    msg_silent = old_msg_silent;
+	    സന്ദേശം_silent = old_സന്ദേശം_silent;
 
 #ifdef FEAT_SYN_HL
-	    if (old_tw != curbuf->b_p_tw)
-		check_colorcolumn(NULL, curwin);
+	    എങ്കിൽ (old_tw != curbuf->b_p_tw)
+		check_colorcolumn(ശൂന്യ, curwin);
 #endif
 	}
 	// If "old_curbuf" is NULL we are in big trouble here...
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
 #endif
     }
-    else if (swap_exists_action == SEA_RECOVER)
+    അല്ലെങ്കിൽ എങ്കിൽ (swap_exists_action == SEA_RECOVER)
     {
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 	// Reset the error/interrupt/exception state here so that
 	// aborting() returns FALSE when closing a buffer.
 	enter_cleanup(&cs);
 #endif
 
 	// User selected Recover at ATTENTION prompt.
-	msg_scroll = TRUE;
+	സന്ദേശം_scroll = TRUE;
 	ml_recover(FALSE);
-	msg_puts("\n");	// don't overwrite the last message
-	cmdline_row = msg_row;
+	സന്ദേശം_puts("\n");	// don't overwrite the last message
+	cmdline_row = സന്ദേശം_row;
 	do_modelines(0);
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
@@ -1294,42 +1294,42 @@ handle_swap_exists(bufref_T *old_curbuf)
  * Make the current buffer empty.
  * Used when it is wiped out and it's the last buffer.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 empty_curbuf(
-    int close_others,
-    int forceit,
-    int action)
+    പൂർണ്ണസംഖ്യ close_others,
+    പൂർണ്ണസംഖ്യ forceit,
+    പൂർണ്ണസംഖ്യ action)
 {
-    int	    retval;
+    പൂർണ്ണസംഖ്യ	    retval;
     buf_T   *buf = curbuf;
     bufref_T bufref;
 
-    if (action == DOBUF_UNLOAD)
+    എങ്കിൽ (action == DOBUF_UNLOAD)
     {
 	emsg(_(e_cannot_unload_last_buffer));
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     set_bufref(&bufref, buf);
-    if (close_others)
+    എങ്കിൽ (close_others)
 	// Close any other windows on this buffer, then make it empty.
 	close_windows(buf, TRUE);
 
     setpcmark();
-    retval = do_ecmd(0, NULL, NULL, NULL, ECMD_ONE,
+    retval = do_ecmd(0, ശൂന്യ, ശൂന്യ, ശൂന്യ, ECMD_ONE,
 					  forceit ? ECMD_FORCEIT : 0, curwin);
 
     // do_ecmd() may create a new buffer, then we have to delete
     // the old one.  But do_ecmd() may have done that already, check
     // if the buffer still exists.
-    if (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows == 0)
-	close_buffer(NULL, buf, action, FALSE, FALSE, FALSE);
-    if (!close_others)
+    എങ്കിൽ (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows == 0)
+	close_buffer(ശൂന്യ, buf, action, FALSE, FALSE, FALSE);
+    എങ്കിൽ (!close_others)
 	need_fileinfo = FALSE;
-    else if (retval == OK && !shortmess(SHM_FILEINFO))
+    അല്ലെങ്കിൽ എങ്കിൽ (retval == OK && !shortmess(SHM_FILEINFO))
 	// do_ecmd() does not display file info for a new empty buffer.
 	need_fileinfo = TRUE;
-    return retval;
+    തിരികെ retval;
 }
 
 /*
@@ -1349,122 +1349,122 @@ empty_curbuf(
  *
  * Return FAIL or OK.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 do_buffer_ext(
-    int		action,
-    int		start,
-    int		dir,		// FORWARD or BACKWARD
-    int		count,		// buffer number or number of buffers
-    int		flags)		// DOBUF_FORCEIT etc.
+    പൂർണ്ണസംഖ്യ		action,
+    പൂർണ്ണസംഖ്യ		start,
+    പൂർണ്ണസംഖ്യ		dir,		// FORWARD or BACKWARD
+    പൂർണ്ണസംഖ്യ		എണ്ണം,		// buffer number or number of buffers
+    പൂർണ്ണസംഖ്യ		flags)		// DOBUF_FORCEIT etc.
 {
     buf_T	*buf;
     buf_T	*bp;
-    int		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
+    പൂർണ്ണസംഖ്യ		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
 			|| action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
 
-    switch (start)
+    തിരഞ്ഞെടുപ്പ് (start)
     {
-	case DOBUF_FIRST:   buf = firstbuf; break;
-	case DOBUF_LAST:    buf = lastbuf;  break;
-	default:	    buf = curbuf;   break;
+	അവസ്ഥ DOBUF_FIRST:   buf = firstbuf; നിർത്തുക;
+	അവസ്ഥ DOBUF_LAST:    buf = lastbuf;  നിർത്തുക;
+	സ്ഥിരസ്ഥിതി:	    buf = curbuf;   നിർത്തുക;
     }
-    if (start == DOBUF_MOD)	    // find next modified buffer
+    എങ്കിൽ (start == DOBUF_MOD)	    // find next modified buffer
     {
-	while (count-- > 0)
+	ആകുമ്പോൾ (എണ്ണം-- > 0)
 	{
-	    do
+	    ചെയ്യുക
 	    {
 		buf = buf->b_next;
-		if (buf == NULL)
+		എങ്കിൽ (buf == ശൂന്യ)
 		    buf = firstbuf;
 	    }
-	    while (buf != curbuf && !bufIsChanged(buf));
+	    ആകുമ്പോൾ (buf != curbuf && !bufIsChanged(buf));
 	}
-	if (!bufIsChanged(buf))
+	എങ്കിൽ (!bufIsChanged(buf))
 	{
 	    emsg(_(e_no_modified_buffer_found));
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
     }
-    else if (start == DOBUF_FIRST && count) // find specified buffer number
+    അല്ലെങ്കിൽ എങ്കിൽ (start == DOBUF_FIRST && എണ്ണം) // find specified buffer number
     {
-	while (buf != NULL && buf->b_fnum != count)
+	ആകുമ്പോൾ (buf != ശൂന്യ && buf->b_fnum != എണ്ണം)
 	    buf = buf->b_next;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	int help_only = (flags & DOBUF_SKIPHELP) != 0 && buf->b_help;
+	പൂർണ്ണസംഖ്യ help_only = (flags & DOBUF_SKIPHELP) != 0 && buf->b_help;
 
-	bp = NULL;
-	while (count > 0 || (bp != buf && !unload
+	bp = ശൂന്യ;
+	ആകുമ്പോൾ (എണ്ണം > 0 || (bp != buf && !unload
 				&& !(help_only ? buf->b_help : buf->b_p_bl)))
 	{
 	    // remember the buffer where we start, we come back there when all
 	    // buffers are unlisted.
-	    if (bp == NULL)
+	    എങ്കിൽ (bp == ശൂന്യ)
 		bp = buf;
-	    if (dir == FORWARD)
+	    എങ്കിൽ (dir == FORWARD)
 	    {
 		buf = buf->b_next;
-		if (buf == NULL)
+		എങ്കിൽ (buf == ശൂന്യ)
 		    buf = firstbuf;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		buf = buf->b_prev;
-		if (buf == NULL)
+		എങ്കിൽ (buf == ശൂന്യ)
 		    buf = lastbuf;
 	    }
 	    // Avoid non-help buffers if the starting point was a help buffer
 	    // and vice-versa.
 	    // Don't count unlisted buffers.
-	    if (unload
+	    എങ്കിൽ (unload
 		    || (help_only
 			? buf->b_help
 			: (buf->b_p_bl && ((flags & DOBUF_SKIPHELP) == 0
 							    || !buf->b_help))))
 	    {
-		--count;
-		bp = NULL;	// use this buffer as new starting point
+		--എണ്ണം;
+		bp = ശൂന്യ;	// use this buffer as new starting point
 	    }
-	    if (bp == buf)
+	    എങ്കിൽ (bp == buf)
 	    {
 		// back where we started, didn't find anything.
 		emsg(_(e_there_is_no_listed_buffer));
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	}
     }
 
-    if (buf == NULL)	    // could not find it
+    എങ്കിൽ (buf == ശൂന്യ)	    // could not find it
     {
-	if (start == DOBUF_FIRST)
+	എങ്കിൽ (start == DOBUF_FIRST)
 	{
 	    // don't warn when deleting
-	    if (!unload)
-		semsg(_(e_buffer_nr_does_not_exist), count);
+	    എങ്കിൽ (!unload)
+		semsg(_(e_buffer_nr_does_not_exist), എണ്ണം);
 	}
-	else if (dir == FORWARD)
+	അല്ലെങ്കിൽ എങ്കിൽ (dir == FORWARD)
 	    emsg(_(e_cannot_go_beyond_last_buffer));
-	else
+	അല്ലെങ്കിൽ
 	    emsg(_(e_cannot_go_before_first_buffer));
-	return FAIL;
+	തിരികെ FAIL;
     }
 #ifdef FEAT_PROP_POPUP
-    if ((flags & DOBUF_NOPOPUP) && bt_popup(buf) && !bt_terminal(buf))
-	return OK;
+    എങ്കിൽ ((flags & DOBUF_NOPOPUP) && bt_popup(buf) && !bt_terminal(buf))
+	തിരികെ OK;
 #endif
-    if (action == DOBUF_GOTO && buf != curbuf
+    എങ്കിൽ (action == DOBUF_GOTO && buf != curbuf
 	    && !check_can_set_curbuf_forceit((flags & DOBUF_FORCEIT) != 0))
 	// disallow navigating to another buffer when 'winfixbuf' is applied
-	return FAIL;
+	തിരികെ FAIL;
 
-    if ((action == DOBUF_GOTO || action == DOBUF_SPLIT)
+    എങ്കിൽ ((action == DOBUF_GOTO || action == DOBUF_SPLIT)
 						  && (buf->b_flags & BF_DUMMY))
     {
 	// disallow navigating to the dummy buffer
-	semsg(_(e_buffer_nr_does_not_exist), count);
-	return FAIL;
+	semsg(_(e_buffer_nr_does_not_exist), എണ്ണം);
+	തിരികെ FAIL;
     }
 
 #ifdef FEAT_GUI
@@ -1474,85 +1474,85 @@ do_buffer_ext(
     /*
      * delete buffer "buf" from memory and/or the list
      */
-    if (unload)
+    എങ്കിൽ (unload)
     {
-	int	forward;
+	പൂർണ്ണസംഖ്യ	forward;
 	bufref_T bufref;
 
-	if (!can_unload_buffer(buf))
-	    return FAIL;
+	എങ്കിൽ (!can_unload_buffer(buf))
+	    തിരികെ FAIL;
 
 	set_bufref(&bufref, buf);
 
 	// When unloading or deleting a buffer that's already unloaded and
 	// unlisted: fail silently.
-	if (action != DOBUF_WIPE && action != DOBUF_WIPE_REUSE
-				   && buf->b_ml.ml_mfp == NULL && !buf->b_p_bl)
-	    return FAIL;
+	എങ്കിൽ (action != DOBUF_WIPE && action != DOBUF_WIPE_REUSE
+				   && buf->b_ml.ml_mfp == ശൂന്യ && !buf->b_p_bl)
+	    തിരികെ FAIL;
 
-	if ((flags & DOBUF_FORCEIT) == 0 && bufIsChanged(buf))
+	എങ്കിൽ ((flags & DOBUF_FORCEIT) == 0 && bufIsChanged(buf))
 	{
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#എങ്കിൽ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    എങ്കിൽ ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	    {
 # ifdef FEAT_TERMINAL
-		if (term_job_running(buf->b_term))
+		എങ്കിൽ (term_job_running(buf->b_term))
 		{
-		    if (term_confirm_stop(buf) == FAIL)
-			return FAIL;
+		    എങ്കിൽ (term_confirm_stop(buf) == FAIL)
+			തിരികെ FAIL;
 		}
-		else
+		അല്ലെങ്കിൽ
 # endif
 		{
 		    dialog_changed(buf, FALSE);
-		    if (!bufref_valid(&bufref))
+		    എങ്കിൽ (!bufref_valid(&bufref))
 			// Autocommand deleted buffer, oops!  It's not changed
 			// now.
-			return FAIL;
+			തിരികെ FAIL;
 		    // If it's still changed fail silently, the dialog already
 		    // mentioned why it fails.
-		    if (bufIsChanged(buf))
-			return FAIL;
+		    എങ്കിൽ (bufIsChanged(buf))
+			തിരികെ FAIL;
 		}
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 #endif
 	    {
 		no_write_message_buf(buf);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	}
 
 	// When closing the current buffer stop Visual mode.
-	if (buf == curbuf && VIsual_active)
+	എങ്കിൽ (buf == curbuf && VIsual_active)
 	    end_visual_mode();
 
 	// If deleting the last (listed) buffer, make it empty.
 	// The last (listed) buffer cannot be unloaded.
 	FOR_ALL_BUFFERS(bp)
-	    if (bp->b_p_bl && bp != buf)
-		break;
-	if (bp == NULL && buf == curbuf)
-	    return empty_curbuf(TRUE, (flags & DOBUF_FORCEIT), action);
+	    എങ്കിൽ (bp->b_p_bl && bp != buf)
+		നിർത്തുക;
+	എങ്കിൽ (bp == ശൂന്യ && buf == curbuf)
+	    തിരികെ empty_curbuf(TRUE, (flags & DOBUF_FORCEIT), action);
 
 	// If the deleted buffer is the current one, close the current window
 	// (unless it's the only window).  Repeat this so long as we end up in
 	// a window with this buffer.
-	while (buf == curbuf
+	ആകുമ്പോൾ (buf == curbuf
 		   && !(win_locked(curwin) || curwin->w_buffer->b_locked > 0)
-		   && (!ONE_WINDOW || first_tabpage->tp_next != NULL))
+		   && (!ONE_WINDOW || first_tabpage->tp_next != ശൂന്യ))
 	{
-	    if (win_close(curwin, FALSE) == FAIL)
-		break;
+	    എങ്കിൽ (win_close(curwin, FALSE) == FAIL)
+		നിർത്തുക;
 	}
 
 	// If the buffer to be deleted is not the current one, delete it here.
-	if (buf != curbuf)
+	എങ്കിൽ (buf != curbuf)
 	{
 	    close_windows(buf, FALSE);
-	    if (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows <= 0)
-		    close_buffer(NULL, buf, action, FALSE, FALSE, FALSE);
-	    return OK;
+	    എങ്കിൽ (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows <= 0)
+		    close_buffer(ശൂന്യ, buf, action, FALSE, FALSE, FALSE);
+	    തിരികെ OK;
 	}
 
 	/*
@@ -1565,190 +1565,190 @@ do_buffer_ext(
 	 * then before the current buffer.
 	 * Finally use any buffer.  Skip buffers that are closing throughout.
 	 */
-	buf = NULL;	// selected buffer
-	bp = NULL;	// used when no loaded buffer found
-	if (au_new_curbuf.br_buf != NULL && bufref_valid(&au_new_curbuf)
+	buf = ശൂന്യ;	// selected buffer
+	bp = ശൂന്യ;	// used when no loaded buffer found
+	എങ്കിൽ (au_new_curbuf.br_buf != ശൂന്യ && bufref_valid(&au_new_curbuf)
 		&& !au_new_curbuf.br_buf->b_locked_split)
 	    buf = au_new_curbuf.br_buf;
-	else if (curwin->w_jumplistlen > 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (curwin->w_jumplistlen > 0)
 	{
-	    int     jumpidx;
+	    പൂർണ്ണസംഖ്യ     jumpidx;
 
 	    jumpidx = curwin->w_jumplistidx - 1;
-	    if (jumpidx < 0)
+	    എങ്കിൽ (jumpidx < 0)
 		jumpidx = curwin->w_jumplistlen - 1;
 
 	    forward = jumpidx;
-	    while (jumpidx != curwin->w_jumplistidx)
+	    ആകുമ്പോൾ (jumpidx != curwin->w_jumplistidx)
 	    {
 		buf = buflist_findnr(curwin->w_jumplist[jumpidx].fmark.fnum);
-		if (buf != NULL)
+		എങ്കിൽ (buf != ശൂന്യ)
 		{
 		    // Skip current and unlisted bufs.  Also skip a quickfix
 		    // or closing buffer, it might be deleted soon.
-		    if (buf == curbuf || !buf->b_p_bl || bt_quickfix(buf)
+		    എങ്കിൽ (buf == curbuf || !buf->b_p_bl || bt_quickfix(buf)
 			    || buf->b_locked_split)
-			buf = NULL;
-		    else if (buf->b_ml.ml_mfp == NULL)
+			buf = ശൂന്യ;
+		    അല്ലെങ്കിൽ എങ്കിൽ (buf->b_ml.ml_mfp == ശൂന്യ)
 		    {
 			// skip unloaded buf, but may keep it for later
-			if (bp == NULL)
+			എങ്കിൽ (bp == ശൂന്യ)
 			    bp = buf;
-			buf = NULL;
+			buf = ശൂന്യ;
 		    }
 		}
-		if (buf != NULL)   // found a valid buffer: stop searching
-		    break;
+		എങ്കിൽ (buf != ശൂന്യ)   // found a valid buffer: stop searching
+		    നിർത്തുക;
 		// advance to older entry in jump list
-		if (!jumpidx && curwin->w_jumplistidx == curwin->w_jumplistlen)
-		    break;
-		if (--jumpidx < 0)
+		എങ്കിൽ (!jumpidx && curwin->w_jumplistidx == curwin->w_jumplistlen)
+		    നിർത്തുക;
+		എങ്കിൽ (--jumpidx < 0)
 		    jumpidx = curwin->w_jumplistlen - 1;
-		if (jumpidx == forward)		// List exhausted for sure
-		    break;
+		എങ്കിൽ (jumpidx == forward)		// List exhausted for sure
+		    നിർത്തുക;
 	    }
 	}
 
-	if (buf == NULL)	// No previous buffer, Try 2'nd approach
+	എങ്കിൽ (buf == ശൂന്യ)	// No previous buffer, Try 2'nd approach
 	{
 	    forward = TRUE;
 	    buf = curbuf->b_next;
-	    for (;;)
+	    വേണ്ടി (;;)
 	    {
-		if (buf == NULL)
+		എങ്കിൽ (buf == ശൂന്യ)
 		{
-		    if (!forward)	// tried both directions
-			break;
+		    എങ്കിൽ (!forward)	// tried both directions
+			നിർത്തുക;
 		    buf = curbuf->b_prev;
 		    forward = FALSE;
-		    continue;
+		    തുടരുക;
 		}
 		// in non-help buffer, try to skip help buffers, and vv
-		if (buf->b_help == curbuf->b_help && buf->b_p_bl
+		എങ്കിൽ (buf->b_help == curbuf->b_help && buf->b_p_bl
 			    && !bt_quickfix(buf) && !buf->b_locked_split)
 		{
-		    if (buf->b_ml.ml_mfp != NULL)   // found loaded buffer
-			break;
-		    if (bp == NULL)	// remember unloaded buf for later
+		    എങ്കിൽ (buf->b_ml.ml_mfp != ശൂന്യ)   // found loaded buffer
+			നിർത്തുക;
+		    എങ്കിൽ (bp == ശൂന്യ)	// remember unloaded buf for later
 			bp = buf;
 		}
-		if (forward)
+		എങ്കിൽ (forward)
 		    buf = buf->b_next;
-		else
+		അല്ലെങ്കിൽ
 		    buf = buf->b_prev;
 	    }
 	}
-	if (buf == NULL)	// No loaded buffer, use unloaded one
+	എങ്കിൽ (buf == ശൂന്യ)	// No loaded buffer, use unloaded one
 	    buf = bp;
-	if (buf == NULL)	// No loaded buffer, find listed one
+	എങ്കിൽ (buf == ശൂന്യ)	// No loaded buffer, find listed one
 	{
 	    FOR_ALL_BUFFERS(buf)
-		if (buf->b_p_bl && buf != curbuf && !bt_quickfix(buf)
+		എങ്കിൽ (buf->b_p_bl && buf != curbuf && !bt_quickfix(buf)
 			&& !buf->b_locked_split)
-		    break;
+		    നിർത്തുക;
 	}
-	if (buf == NULL)	// Still no buffer, just take one
+	എങ്കിൽ (buf == ശൂന്യ)	// Still no buffer, just take one
 	{
-	    if (curbuf->b_next != NULL)
+	    എങ്കിൽ (curbuf->b_next != ശൂന്യ)
 		buf = curbuf->b_next;
-	    else
+	    അല്ലെങ്കിൽ
 		buf = curbuf->b_prev;
-	    if (bt_quickfix(buf)
-		    || (buf != NULL && buf != curbuf && buf->b_locked_split))
-		buf = NULL;
+	    എങ്കിൽ (bt_quickfix(buf)
+		    || (buf != ശൂന്യ && buf != curbuf && buf->b_locked_split))
+		buf = ശൂന്യ;
 	}
     }
 
-    if (buf == NULL)
+    എങ്കിൽ (buf == ശൂന്യ)
     {
 	// Autocommands must have wiped out all other buffers.  Only option
 	// now is to make the current buffer empty.
-	return empty_curbuf(FALSE, (flags & DOBUF_FORCEIT), action);
+	തിരികെ empty_curbuf(FALSE, (flags & DOBUF_FORCEIT), action);
     }
 
     /*
      * make "buf" the current buffer
      */
     // If 'switchbuf' is set jump to the window containing "buf".
-    if (action == DOBUF_SPLIT && swbuf_goto_win_with_buf(buf) != NULL)
-	return OK;
+    എങ്കിൽ (action == DOBUF_SPLIT && swbuf_goto_win_with_buf(buf) != ശൂന്യ)
+	തിരികെ OK;
     // Whether splitting or not, don't open a closing buffer in more windows.
-    if (buf != curbuf && buf->b_locked_split)
+    എങ്കിൽ (buf != curbuf && buf->b_locked_split)
     {
 	emsg(_(e_cannot_switch_to_a_closing_buffer));
-	return FAIL;
+	തിരികെ FAIL;
     }
-    if (action == DOBUF_SPLIT && win_split(0, 0) == FAIL) // split window first
-	return FAIL;
+    എങ്കിൽ (action == DOBUF_SPLIT && win_split(0, 0) == FAIL) // split window first
+	തിരികെ FAIL;
 
     // go to current buffer - nothing to do
-    if (buf == curbuf)
-	return OK;
+    എങ്കിൽ (buf == curbuf)
+	തിരികെ OK;
 
     // Check if the current buffer may be abandoned.
-    if (action == DOBUF_GOTO && !can_abandon(curbuf, (flags & DOBUF_FORCEIT)))
+    എങ്കിൽ (action == DOBUF_GOTO && !can_abandon(curbuf, (flags & DOBUF_FORCEIT)))
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#എങ്കിൽ defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	എങ്കിൽ ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	{
 # ifdef FEAT_TERMINAL
-	    if (term_job_running(curbuf->b_term))
+	    എങ്കിൽ (term_job_running(curbuf->b_term))
 	    {
-		if (term_confirm_stop(curbuf) == FAIL)
-		    return FAIL;
+		എങ്കിൽ (term_confirm_stop(curbuf) == FAIL)
+		    തിരികെ FAIL;
 		// Manually kill the terminal here because this command will
 		// hide it otherwise.
 		free_terminal(curbuf);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 # endif
 	    {
 		bufref_T bufref;
 
 		set_bufref(&bufref, buf);
 		dialog_changed(curbuf, FALSE);
-		if (!bufref_valid(&bufref))
+		എങ്കിൽ (!bufref_valid(&bufref))
 		    // Autocommand deleted buffer, oops!
-		    return FAIL;
+		    തിരികെ FAIL;
 
-		if (bufIsChanged(curbuf))
+		എങ്കിൽ (bufIsChanged(curbuf))
 		{
 		    no_write_message();
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
 	    }
 	}
-	else
+	അല്ലെങ്കിൽ
 #endif
 	{
 	    no_write_message();
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
     }
 
     // Go to the other buffer.
     set_curbuf(buf, action);
 
-    if (action == DOBUF_SPLIT)
+    എങ്കിൽ (action == DOBUF_SPLIT)
 	RESET_BINDING(curwin);	// reset 'scrollbind' and 'cursorbind'
 
-#if defined(FEAT_EVAL)
-    if (aborting())	    // autocmds may abort script processing
-	return FAIL;
+#എങ്കിൽ defined(FEAT_EVAL)
+    എങ്കിൽ (aborting())	    // autocmds may abort script processing
+	തിരികെ FAIL;
 #endif
 
-    return OK;
+    തിരികെ OK;
 }
 
-    int
+    പൂർണ്ണസംഖ്യ
 do_buffer(
-    int		action,
-    int		start,
-    int		dir,		// FORWARD or BACKWARD
-    int		count,		// buffer number or number of buffers
-    int		forceit)	// TRUE when using !
+    പൂർണ്ണസംഖ്യ		action,
+    പൂർണ്ണസംഖ്യ		start,
+    പൂർണ്ണസംഖ്യ		dir,		// FORWARD or BACKWARD
+    പൂർണ്ണസംഖ്യ		എണ്ണം,		// buffer number or number of buffers
+    പൂർണ്ണസംഖ്യ		forceit)	// TRUE when using !
 {
-    return do_buffer_ext(action, start, dir, count,
+    തിരികെ do_buffer_ext(action, start, dir, എണ്ണം,
 						  forceit ? DOBUF_FORCEIT : 0);
 }
 
@@ -1765,102 +1765,102 @@ do_buffer(
  *
  * Returns error message or NULL
  */
-    char *
+    അക്ഷരം *
 do_bufdel(
-    int		command,
+    പൂർണ്ണസംഖ്യ		command,
     char_u	*arg,		// pointer to extra arguments
-    int		addr_count,
-    int		start_bnr,	// first buffer number in a range
-    int		end_bnr,	// buffer nr or last buffer nr in a range
-    int		forceit)
+    പൂർണ്ണസംഖ്യ		addr_എണ്ണം,
+    പൂർണ്ണസംഖ്യ		start_bnr,	// first buffer number in a range
+    പൂർണ്ണസംഖ്യ		end_bnr,	// buffer nr or last buffer nr in a range
+    പൂർണ്ണസംഖ്യ		forceit)
 {
-    int		do_current = 0;	// delete current buffer?
-    int		deleted = 0;	// number of buffers deleted
-    char	*errormsg = NULL; // return value
-    int		bnr;		// buffer number
+    പൂർണ്ണസംഖ്യ		do_current = 0;	// delete current buffer?
+    പൂർണ്ണസംഖ്യ		deleted = 0;	// number of buffers deleted
+    അക്ഷരം	*errormsg = ശൂന്യ; // return value
+    പൂർണ്ണസംഖ്യ		bnr;		// buffer number
     char_u	*p;
 
-    if (addr_count == 0)
+    എങ്കിൽ (addr_എണ്ണം == 0)
     {
-	(void)do_buffer(command, DOBUF_CURRENT, FORWARD, 0, forceit);
+	(ശൂന്യം)do_buffer(command, DOBUF_CURRENT, FORWARD, 0, forceit);
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	if (addr_count == 2)
+	എങ്കിൽ (addr_എണ്ണം == 2)
 	{
-	    if (*arg)		// both range and argument is not allowed
-		return ex_errmsg(e_trailing_characters_str, arg);
+	    എങ്കിൽ (*arg)		// both range and argument is not allowed
+		തിരികെ ex_errmsg(e_trailing_characters_str, arg);
 	    bnr = start_bnr;
 	}
-	else	// addr_count == 1
+	അല്ലെങ്കിൽ	// addr_count == 1
 	    bnr = end_bnr;
 
-	for ( ;!got_int; ui_breakcheck())
+	വേണ്ടി ( ;!got_int; ui_breakcheck())
 	{
 	    // Delete the current buffer last, otherwise when the
 	    // current buffer is deleted, the next buffer becomes
 	    // the current one and will be loaded, which may then
 	    // also be deleted, etc.
-	    if (bnr == curbuf->b_fnum)
+	    എങ്കിൽ (bnr == curbuf->b_fnum)
 		do_current = bnr;
-	    else if (do_buffer_ext(command, DOBUF_FIRST, FORWARD, bnr,
+	    അല്ലെങ്കിൽ എങ്കിൽ (do_buffer_ext(command, DOBUF_FIRST, FORWARD, bnr,
 			  DOBUF_NOPOPUP | (forceit ? DOBUF_FORCEIT : 0)) == OK)
 		++deleted;
 
 	    // find next buffer number to delete/unload
-	    if (addr_count == 2)
+	    എങ്കിൽ (addr_എണ്ണം == 2)
 	    {
-		if (++bnr > end_bnr)
-		    break;
+		എങ്കിൽ (++bnr > end_bnr)
+		    നിർത്തുക;
 	    }
-	    else    // addr_count == 1
+	    അല്ലെങ്കിൽ    // addr_count == 1
 	    {
 		arg = skipwhite(arg);
-		if (*arg == NUL)
-		    break;
-		if (!VIM_ISDIGIT(*arg))
+		എങ്കിൽ (*arg == NUL)
+		    നിർത്തുക;
+		എങ്കിൽ (!VIM_ISDIGIT(*arg))
 		{
 		    p = skiptowhite_esc(arg);
 		    bnr = buflist_findpat(arg, p,
 			  command == DOBUF_WIPE || command == DOBUF_WIPE_REUSE,
 								FALSE, FALSE);
-		    if (bnr < 0)	    // failed
-			break;
+		    എങ്കിൽ (bnr < 0)	    // failed
+			നിർത്തുക;
 		    arg = p;
 		}
-		else
+		അല്ലെങ്കിൽ
 		    bnr = getdigits(&arg);
 	    }
 	}
-	if (!got_int && do_current && do_buffer(command, DOBUF_FIRST,
+	എങ്കിൽ (!got_int && do_current && do_buffer(command, DOBUF_FIRST,
 					  FORWARD, do_current, forceit) == OK)
 	    ++deleted;
 
-	if (deleted == 0)
+	എങ്കിൽ (deleted == 0)
 	{
-	    if (command == DOBUF_UNLOAD)
+	    എങ്കിൽ (command == DOBUF_UNLOAD)
 		STRCPY(IObuff, _(e_no_buffers_were_unloaded));
-	    else if (command == DOBUF_DEL)
+	    അല്ലെങ്കിൽ എങ്കിൽ (command == DOBUF_DEL)
 		STRCPY(IObuff, _(e_no_buffers_were_deleted));
-	    else
+	    അല്ലെങ്കിൽ
 		STRCPY(IObuff, _(e_no_buffers_were_wiped_out));
-	    errormsg = (char *)IObuff;
+	    errormsg = (അക്ഷരം *)IObuff;
 	}
-	else if (deleted >= p_report)
+	അല്ലെങ്കിൽ എങ്കിൽ (deleted >= p_report)
 	{
-	    if (command == DOBUF_UNLOAD)
+	    എങ്കിൽ (command == DOBUF_UNLOAD)
 		smsg(NGETTEXT("%d buffer unloaded",
 			    "%d buffers unloaded", deleted), deleted);
-	    else if (command == DOBUF_DEL)
+	    അല്ലെങ്കിൽ എങ്കിൽ (command == DOBUF_DEL)
 		smsg(NGETTEXT("%d buffer deleted",
 			    "%d buffers deleted", deleted), deleted);
-	    else
+	    അല്ലെങ്കിൽ
 		smsg(NGETTEXT("%d buffer wiped out",
 			    "%d buffers wiped out", deleted), deleted);
 	}
     }
 
-    return errormsg;
+    തിരികെ errormsg;
 }
 
 /*
@@ -1873,21 +1873,21 @@ do_bufdel(
  * DOBUF_WIPE	    wipe it out
  * DOBUF_WIPE_REUSE wipe it out and add to "buf_reuse"
  */
-    void
-set_curbuf(buf_T *buf, int action)
+    ശൂന്യം
+set_curbuf(buf_T *buf, പൂർണ്ണസംഖ്യ action)
 {
     buf_T	*prevbuf;
-    int		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
+    പൂർണ്ണസംഖ്യ		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
 			|| action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
 #ifdef FEAT_SYN_HL
     long	old_tw = curbuf->b_p_tw;
 #endif
     bufref_T	newbufref;
     bufref_T	prevbufref;
-    int		valid;
+    പൂർണ്ണസംഖ്യ		valid;
 
     setpcmark();
-    if ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+    എങ്കിൽ ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	curwin->w_alt_fnum = curbuf->b_fnum; // remember alternate file
     buflist_altfpos(curwin);			 // remember curpos
 
@@ -1901,7 +1901,7 @@ set_curbuf(buf_T *buf, int action)
 
     // Autocommands may delete the current buffer and/or the buffer we want to
     // go to.  In those cases don't close the buffer.
-    if (!apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf)
+    എങ്കിൽ (!apply_autocmds(EVENT_BUFLEAVE, ശൂന്യ, ശൂന്യ, FALSE, curbuf)
 	    || (bufref_valid(&prevbufref)
 		&& bufref_valid(&newbufref)
 #ifdef FEAT_EVAL
@@ -1910,22 +1910,22 @@ set_curbuf(buf_T *buf, int action)
 	       ))
     {
 #ifdef FEAT_SYN_HL
-	if (prevbuf == curwin->w_buffer)
+	എങ്കിൽ (prevbuf == curwin->w_buffer)
 	    reset_synblock(curwin);
 #endif
-	if (unload)
+	എങ്കിൽ (unload)
 	    close_windows(prevbuf, FALSE);
-#if defined(FEAT_EVAL)
-	if (bufref_valid(&prevbufref) && !aborting())
-#else
-	if (bufref_valid(&prevbufref))
+#എങ്കിൽ defined(FEAT_EVAL)
+	എങ്കിൽ (bufref_valid(&prevbufref) && !aborting())
+#അല്ലെങ്കിൽ
+	എങ്കിൽ (bufref_valid(&prevbufref))
 #endif
 	{
 	    // Do not sync when in Insert mode and the buffer is open in
 	    // another window, might be a timer doing something in another
 	    // window.
-	    if (prevbuf == curbuf
-		    && ((State & MODE_INSERT) == 0 || curbuf->b_nwindows <= 1))
+	    എങ്കിൽ (prevbuf == curbuf
+		    && ((State & MODE_തിരുകുക) == 0 || curbuf->b_nwindows <= 1))
 		u_sync(FALSE);
 	    close_buffer(curwin, prevbuf,
 		    unload ? action : (action == DOBUF_GOTO
@@ -1938,21 +1938,21 @@ set_curbuf(buf_T *buf, int action)
     // it did ":bunload") or aborted the script processing.
     // If curwin->w_buffer is null, enter_buffer() will make it valid again
     valid = buf_valid(buf);
-    if ((valid && buf != curbuf
+    എങ്കിൽ ((valid && buf != curbuf
 #ifdef FEAT_EVAL
 		&& !aborting()
 #endif
-	) || curwin->w_buffer == NULL)
+	) || curwin->w_buffer == ശൂന്യ)
     {
 	// If the buffer is not valid but curwin->w_buffer is NULL we must
 	// enter some buffer.  Using the last one is hopefully OK.
-	if (!valid)
+	എങ്കിൽ (!valid)
 	    enter_buffer(lastbuf);
-	else
+	അല്ലെങ്കിൽ
 	    enter_buffer(buf);
 #ifdef FEAT_SYN_HL
-	if (old_tw != curbuf->b_p_tw)
-	    check_colorcolumn(NULL, curwin);
+	എങ്കിൽ (old_tw != curbuf->b_p_tw)
+	    check_colorcolumn(ശൂന്യ, curwin);
 #endif
     }
 }
@@ -1962,20 +1962,20 @@ set_curbuf(buf_T *buf, int action)
  * Old curbuf must have been abandoned already!  This also means "curbuf" may
  * be pointing to freed memory.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 enter_buffer(buf_T *buf)
 {
     // Stop Visual mode before changing curbuf.  May trigger TextYankPost, but
     // with textlock set.  Assumes curbuf and curwin->w_buffer is valid; if not,
     // buf_freeall() should've done this already!
-    if (VIsual_active
-#if defined(EXITFREE)
+    എങ്കിൽ (VIsual_active
+#എങ്കിൽ defined(EXITFREE)
 	    && !entered_free_all_mem
 #endif
 	    )
 	end_visual_mode();
 
-    if (curwin->w_buffer != NULL)
+    എങ്കിൽ (curwin->w_buffer != ശൂന്യ)
 	--curwin->w_buffer->b_nwindows;
 
     // Get the buffer in the current window.
@@ -1985,17 +1985,17 @@ enter_buffer(buf_T *buf)
 
     // Copy buffer and window local option values.  Not for a help buffer.
     buf_copy_options(buf, BCO_ENTER | BCO_NOHELP);
-    if (!buf->b_help)
+    എങ്കിൽ (!buf->b_help)
 	get_winopts(buf);
 #ifdef FEAT_FOLDING
-    else
+    അല്ലെങ്കിൽ
 	// Remove all folds in the window.
 	clearFolding(curwin);
     foldUpdateAll(curwin);	// update folds (later).
 #endif
 
 #ifdef FEAT_DIFF
-    if (curwin->w_p_diff)
+    എങ്കിൽ (curwin->w_p_diff)
 	diff_buf_add(curbuf);
 #endif
 
@@ -2014,41 +2014,41 @@ enter_buffer(buf_T *buf)
     curwin->w_valid = 0;
 
     // Make sure the buffer is loaded.
-    if (curbuf->b_ml.ml_mfp == NULL)	// need to load the file
+    എങ്കിൽ (curbuf->b_ml.ml_mfp == ശൂന്യ)	// need to load the file
     {
 	// If there is no filetype, allow for detecting one.  Esp. useful for
 	// ":ball" used in an autocommand.  If there already is a filetype we
 	// might prefer to keep it.
-	if (*curbuf->b_p_ft == NUL)
+	എങ്കിൽ (*curbuf->b_p_ft == NUL)
 	    curbuf->b_did_filetype = false;
 
-	open_buffer(FALSE, NULL, 0);
+	open_buffer(FALSE, ശൂന്യ, 0);
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	if (!msg_silent && !shortmess(SHM_FILEINFO))
+	എങ്കിൽ (!സന്ദേശം_silent && !shortmess(SHM_FILEINFO))
 	    need_fileinfo = TRUE;	// display file info after redraw
 
 	// check if file changed
-	(void)buf_check_timestamp(curbuf, FALSE);
+	(ശൂന്യം)buf_check_timestamp(curbuf, FALSE);
 
 	curwin->w_topline = 1;
 #ifdef FEAT_DIFF
 	curwin->w_topfill = 0;
 #endif
-	apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
-	apply_autocmds(EVENT_BUFWINENTER, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_BUFENTER, ശൂന്യ, ശൂന്യ, FALSE, curbuf);
+	apply_autocmds(EVENT_BUFWINENTER, ശൂന്യ, ശൂന്യ, FALSE, curbuf);
     }
 
     // If autocommands did not change the cursor position, restore cursor lnum
     // and possibly cursor col.
-    if (curwin->w_cursor.lnum == 1 && inindent(0))
+    എങ്കിൽ (curwin->w_cursor.lnum == 1 && inindent(0))
 	buflist_getfpos();
 
     check_arg_idx(curwin);		// check for valid arg_idx
     maketitle();
 	// when autocmds didn't change it
-    if (curwin->w_topline == 1 && !curwin->w_topline_was_set)
+    എങ്കിൽ (curwin->w_topline == 1 && !curwin->w_topline_was_set)
 	scroll_cursor_halfway(FALSE, FALSE);	// redisplay at correct position
 
 #ifdef FEAT_NETBEANS_INTG
@@ -2060,14 +2060,14 @@ enter_buffer(buf_T *buf)
     DO_AUTOCHDIR;
 
 #ifdef FEAT_KEYMAP
-    if (curbuf->b_kmap_state & KEYMAP_INIT)
-	(void)keymap_init();
+    എങ്കിൽ (curbuf->b_kmap_state & KEYMAP_INIT)
+	(ശൂന്യം)keymap_init();
 #endif
 #ifdef FEAT_SPELL
     // May need to set the spell language.  Can only do this after the buffer
     // has been properly setup.
-    if (!curbuf->b_help && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
-	(void)parse_spelllang(curwin);
+    എങ്കിൽ (!curbuf->b_help && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
+	(ശൂന്യം)parse_spelllang(curwin);
 #endif
 #ifdef FEAT_VIMINFO
     curbuf->b_last_used = vim_time();
@@ -2076,16 +2076,16 @@ enter_buffer(buf_T *buf)
     redraw_later(UPD_NOT_VALID);
 }
 
-#if defined(FEAT_AUTOCHDIR)
+#എങ്കിൽ defined(FEAT_AUTOCHDIR)
 /*
  * Change to the directory of the current buffer.
  * Don't do this while still starting up.
  */
-    void
-do_autochdir(void)
+    ശൂന്യം
+do_autochdir(ശൂന്യം)
 {
-    if ((starting == 0 || test_autochdir)
-	    && curbuf->b_ffname != NULL
+    എങ്കിൽ ((starting == 0 || test_autochdir)
+	    && curbuf->b_ffname != ശൂന്യ
 	    && vim_chdirfile(curbuf->b_ffname, "auto") == OK)
     {
 	shorten_fnames(TRUE);
@@ -2094,36 +2094,36 @@ do_autochdir(void)
 }
 #endif
 
-    void
+    ശൂന്യം
 no_write_message_buf(buf_T *buf)
 {
 #ifdef FEAT_TERMINAL
-    if (term_job_running(buf->b_term))
+    എങ്കിൽ (term_job_running(buf->b_term))
 	emsg(_(e_job_still_running_add_bang_to_end_the_job));
-    else
+    അല്ലെങ്കിൽ
 #endif
 	semsg(_(e_no_write_since_last_change_for_buffer_nr_add_bang_to_override),
 		buf->b_fnum);
 }
 
-    void
-no_write_message(void)
+    ശൂന്യം
+no_write_message(ശൂന്യം)
 {
 #ifdef FEAT_TERMINAL
-    if (term_job_running(curbuf->b_term))
+    എങ്കിൽ (term_job_running(curbuf->b_term))
 	emsg(_(e_job_still_running_add_bang_to_end_the_job));
-    else
+    അല്ലെങ്കിൽ
 #endif
 	emsg(_(e_no_write_since_last_change_add_bang_to_override));
 }
 
-    void
+    ശൂന്യം
 no_write_message_nobang(buf_T *buf UNUSED)
 {
 #ifdef FEAT_TERMINAL
-    if (term_job_running(buf->b_term))
+    എങ്കിൽ (term_job_running(buf->b_term))
 	emsg(_(e_job_still_running));
-    else
+    അല്ലെങ്കിൽ
 #endif
 	emsg(_(e_no_write_since_last_change));
 }
@@ -2136,13 +2136,13 @@ no_write_message_nobang(buf_T *buf UNUSED)
  * Return TRUE if the current buffer is empty, unnamed, unmodified and used in
  * only one window.  That means it can be re-used.
  */
-    int
-curbuf_reusable(void)
+    പൂർണ്ണസംഖ്യ
+curbuf_reusable(ശൂന്യം)
 {
-    return (curbuf != NULL
-	&& curbuf->b_ffname == NULL
+    തിരികെ (curbuf != ശൂന്യ
+	&& curbuf->b_ffname == ശൂന്യ
 	&& curbuf->b_nwindows <= 1
-	&& (curbuf->b_ml.ml_mfp == NULL || BUFEMPTY())
+	&& (curbuf->b_ml.ml_mfp == ശൂന്യ || BUFEMPTY())
 	&& !bt_quickfix(curbuf)
 	&& !curbufIsChanged());
 }
@@ -2165,7 +2165,7 @@ buflist_new(
     char_u	*ffname_arg,	// full path of fname or relative
     char_u	*sfname_arg,	// short fname or NULL
     linenr_T	lnum,		// preferred cursor line
-    int		flags)		// BLN_ defines
+    പൂർണ്ണസംഖ്യ		flags)		// BLN_ defines
 {
     char_u	*ffname = ffname_arg;
     char_u	*sfname = sfname_arg;
@@ -2174,7 +2174,7 @@ buflist_new(
     stat_T	st;
 #endif
 
-    if (top_file_num == 1)
+    എങ്കിൽ (മുകൾ_file_അക്കം == 1)
 	hash_init(&buf_hashtab);
 
     fname_expand(curbuf, &ffname, &sfname);	// will allocate ffname
@@ -2185,41 +2185,41 @@ buflist_new(
 #ifdef UNIX
     // On Unix we can use inode numbers when the file exists.  Works better
     // for hard links.
-    if (sfname == NULL || mch_stat((char *)sfname, &st) < 0)
+    എങ്കിൽ (sfname == ശൂന്യ || mch_stat((അക്ഷരം *)sfname, &st) < 0)
 	st.st_dev = (dev_T)-1;
 #endif
-    if (ffname != NULL && !(flags & (BLN_DUMMY | BLN_NEW)) && (buf =
+    എങ്കിൽ (ffname != ശൂന്യ && !(flags & (BLN_DUMMY | BLN_NEW)) && (buf =
 #ifdef UNIX
 		buflist_findname_stat(ffname, &st)
-#else
+#അല്ലെങ്കിൽ
 		buflist_findname(ffname)
 #endif
-		) != NULL)
+		) != ശൂന്യ)
     {
 	vim_free(ffname);
-	if (lnum != 0)
-	    buflist_setfpos(buf, (flags & BLN_NOCURWIN) ? NULL : curwin,
+	എങ്കിൽ (lnum != 0)
+	    buflist_setfpos(buf, (flags & BLN_NOCURWIN) ? ശൂന്യ : curwin,
 						      lnum, (colnr_T)0, FALSE);
 
-	if ((flags & BLN_NOOPT) == 0)
+	എങ്കിൽ ((flags & BLN_NOOPT) == 0)
 	    // copy the options now, if 'cpo' doesn't have 's' and not done
 	    // already
 	    buf_copy_options(buf, 0);
 
-	if ((flags & BLN_LISTED) && !buf->b_p_bl)
+	എങ്കിൽ ((flags & BLN_LISTED) && !buf->b_p_bl)
 	{
 	    bufref_T bufref;
 
 	    buf->b_p_bl = TRUE;
 	    set_bufref(&bufref, buf);
-	    if (!(flags & BLN_DUMMY))
+	    എങ്കിൽ (!(flags & BLN_DUMMY))
 	    {
-		if (apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, buf)
+		എങ്കിൽ (apply_autocmds(EVENT_BUFADD, ശൂന്യ, ശൂന്യ, FALSE, buf)
 			&& !bufref_valid(&bufref))
-		    return NULL;
+		    തിരികെ ശൂന്യ;
 	    }
 	}
-	return buf;
+	തിരികെ buf;
     }
 
     /*
@@ -2230,8 +2230,8 @@ buflist_new(
      * (A spell file buffer is allocated in spell.c, but that's not a normal
      * buffer.)
      */
-    buf = NULL;
-    if ((flags & BLN_CURBUF) && curbuf_reusable())
+    buf = ശൂന്യ;
+    എങ്കിൽ ((flags & BLN_CURBUF) && curbuf_reusable())
     {
 	bufref_T bufref;
 
@@ -2242,38 +2242,38 @@ buflist_new(
 	// change curbuf!  If that happens, allocate a new buffer anyway.
 	buf_freeall(buf, BFA_WIPE | BFA_DEL);
 #ifdef FEAT_EVAL
-	if (aborting())		// autocmds may abort script processing
+	എങ്കിൽ (aborting())		// autocmds may abort script processing
 	{
 	    vim_free(ffname);
-	    return NULL;
+	    തിരികെ ശൂന്യ;
 	}
 #endif
-	if (!bufref_valid(&bufref))
-	    buf = NULL;		// buf was deleted; allocate a new buffer
+	എങ്കിൽ (!bufref_valid(&bufref))
+	    buf = ശൂന്യ;		// buf was deleted; allocate a new buffer
     }
-    if (buf != curbuf || curbuf == NULL)
+    എങ്കിൽ (buf != curbuf || curbuf == ശൂന്യ)
     {
 	buf = ALLOC_CLEAR_ONE(buf_T);
-	if (buf == NULL)
+	എങ്കിൽ (buf == ശൂന്യ)
 	{
 	    vim_free(ffname);
-	    return NULL;
+	    തിരികെ ശൂന്യ;
 	}
 #ifdef FEAT_EVAL
 	// init b: variables
 	buf->b_vars = dict_alloc_id(aid_newbuf_bvars);
-	if (buf->b_vars == NULL)
+	എങ്കിൽ (buf->b_vars == ശൂന്യ)
 	{
 	    vim_free(ffname);
 	    vim_free(buf);
-	    return NULL;
+	    തിരികെ ശൂന്യ;
 	}
 	init_var_dict(buf->b_vars, &buf->b_bufvar, VAR_SCOPE);
 #endif
 	init_changedtick(buf);
     }
 
-    if (ffname != NULL)
+    എങ്കിൽ (ffname != ശൂന്യ)
     {
 	buf->b_ffname = ffname;
 	buf->b_sfname = vim_strsave(sfname);
@@ -2282,20 +2282,20 @@ buflist_new(
     clear_wininfo(buf);
     buf->b_wininfo = ALLOC_CLEAR_ONE(wininfo_T);
 
-    if ((ffname != NULL && (buf->b_ffname == NULL || buf->b_sfname == NULL))
-	    || buf->b_wininfo == NULL)
+    എങ്കിൽ ((ffname != ശൂന്യ && (buf->b_ffname == ശൂന്യ || buf->b_sfname == ശൂന്യ))
+	    || buf->b_wininfo == ശൂന്യ)
     {
-	if (buf->b_sfname != buf->b_ffname)
+	എങ്കിൽ (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
-	    buf->b_sfname = NULL;
+	അല്ലെങ്കിൽ
+	    buf->b_sfname = ശൂന്യ;
 	VIM_CLEAR(buf->b_ffname);
-	if (buf != curbuf)
+	എങ്കിൽ (buf != curbuf)
 	    free_buffer(buf);
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
 
-    if (buf == curbuf)
+    എങ്കിൽ (buf == curbuf)
     {
 	free_buffer_stuff(buf, FALSE);	// delete local variables et al.
 
@@ -2308,60 +2308,60 @@ buflist_new(
 	curbuf->b_kmap_state |= KEYMAP_INIT;
 #endif
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	// put the new buffer at the end of the buffer list
-	buf->b_next = NULL;
-	if (firstbuf == NULL)		// buffer list is empty
+	buf->b_next = ശൂന്യ;
+	എങ്കിൽ (firstbuf == ശൂന്യ)		// buffer list is empty
 	{
-	    buf->b_prev = NULL;
+	    buf->b_prev = ശൂന്യ;
 	    firstbuf = buf;
 	}
-	else				// append new buffer at end of list
+	അല്ലെങ്കിൽ				// append new buffer at end of list
 	{
 	    lastbuf->b_next = buf;
 	    buf->b_prev = lastbuf;
 	}
 	lastbuf = buf;
 
-	if ((flags & BLN_REUSE) && buf_reuse.ga_len > 0)
+	എങ്കിൽ ((flags & BLN_REUSE) && buf_reuse.ga_len > 0)
 	{
 	    // Recycle a previously used buffer number.  Used for buffers which
 	    // are normally hidden, e.g. in a popup window.  Avoids that the
 	    // buffer number grows rapidly.
 	    --buf_reuse.ga_len;
-	    buf->b_fnum = ((int *)buf_reuse.ga_data)[buf_reuse.ga_len];
+	    buf->b_fnum = ((പൂർണ്ണസംഖ്യ *)buf_reuse.ga_data)[buf_reuse.ga_len];
 
 	    // Move buffer to the right place in the buffer list.
-	    while (buf->b_prev != NULL && buf->b_fnum < buf->b_prev->b_fnum)
+	    ആകുമ്പോൾ (buf->b_prev != ശൂന്യ && buf->b_fnum < buf->b_prev->b_fnum)
 	    {
 		buf_T	*prev = buf->b_prev;
 
 		prev->b_next = buf->b_next;
-		if (prev->b_next != NULL)
+		എങ്കിൽ (prev->b_next != ശൂന്യ)
 		    prev->b_next->b_prev = prev;
 		buf->b_next = prev;
 		buf->b_prev = prev->b_prev;
-		if (buf->b_prev != NULL)
+		എങ്കിൽ (buf->b_prev != ശൂന്യ)
 		    buf->b_prev->b_next = buf;
 		prev->b_prev = buf;
-		if (lastbuf == buf)
+		എങ്കിൽ (lastbuf == buf)
 		    lastbuf = prev;
-		if (firstbuf == prev)
+		എങ്കിൽ (firstbuf == prev)
 		    firstbuf = buf;
 	    }
 	}
-	else
-	    buf->b_fnum = top_file_num++;
-	if (top_file_num < 0)		// wrap around (may cause duplicates)
+	അല്ലെങ്കിൽ
+	    buf->b_fnum = മുകൾ_file_അക്കം++;
+	എങ്കിൽ (മുകൾ_file_അക്കം < 0)		// wrap around (may cause duplicates)
 	{
 	    emsg(_("W14: Warning: List of file names overflow"));
-	    if (emsg_silent == 0 && !in_assert_fails)
+	    എങ്കിൽ (emsg_silent == 0 && !in_assert_fails)
 	    {
 		out_flush();
 		ui_delay(3001L, TRUE);	// make sure it is noticed
 	    }
-	    top_file_num = 1;
+	    മുകൾ_file_അക്കം = 1;
 	}
 	buf_hashtab_add(buf);
 
@@ -2379,9 +2379,9 @@ buflist_new(
 
     buf->b_fname = buf->b_sfname;
 #ifdef UNIX
-    if (st.st_dev == (dev_T)-1)
+    എങ്കിൽ (st.st_dev == (dev_T)-1)
 	buf->b_dev_valid = false;
-    else
+    അല്ലെങ്കിൽ
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
@@ -2390,13 +2390,13 @@ buflist_new(
 #endif
     buf->b_u_synced = true;
     buf->b_flags = BF_CHECK_RO | BF_NEVERLOADED;
-    if (flags & BLN_DUMMY)
+    എങ്കിൽ (flags & BLN_DUMMY)
 	buf->b_flags |= BF_DUMMY;
     buf_clear_file(buf);
     clrallmarks(buf);			// clear marks
     fmarks_check_names(buf);		// check file marks for this file
     buf->b_p_bl = (flags & BLN_LISTED) ? TRUE : FALSE;	// init 'buflisted'
-    if (!(flags & BLN_DUMMY))
+    എങ്കിൽ (!(flags & BLN_DUMMY))
     {
 	bufref_T bufref;
 
@@ -2404,22 +2404,22 @@ buflist_new(
 	// also split the window with re-using the one empty buffer. This may
 	// result in unexpectedly losing the empty buffer.
 	set_bufref(&bufref, buf);
-	if (apply_autocmds(EVENT_BUFNEW, NULL, NULL, FALSE, buf)
+	എങ്കിൽ (apply_autocmds(EVENT_BUFNEW, ശൂന്യ, ശൂന്യ, FALSE, buf)
 		&& !bufref_valid(&bufref))
-	    return NULL;
-	if (flags & BLN_LISTED)
+	    തിരികെ ശൂന്യ;
+	എങ്കിൽ (flags & BLN_LISTED)
 	{
-	    if (apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, buf)
+	    എങ്കിൽ (apply_autocmds(EVENT_BUFADD, ശൂന്യ, ശൂന്യ, FALSE, buf)
 		    && !bufref_valid(&bufref))
-		return NULL;
+		തിരികെ ശൂന്യ;
 	}
 #ifdef FEAT_EVAL
-	if (aborting())		// autocmds may abort script processing
-	    return NULL;
+	എങ്കിൽ (aborting())		// autocmds may abort script processing
+	    തിരികെ ശൂന്യ;
 #endif
     }
 
-    return buf;
+    തിരികെ buf;
 }
 
 /*
@@ -2427,12 +2427,12 @@ buflist_new(
  * If "free_p_ff" is TRUE also free 'fileformat', 'buftype' and
  * 'fileencoding'.
  */
-    void
+    ശൂന്യം
 free_buf_options(
     buf_T	*buf,
-    int		free_p_ff)
+    പൂർണ്ണസംഖ്യ		free_p_ff)
 {
-    if (free_p_ff)
+    എങ്കിൽ (free_p_ff)
     {
 	clear_string_option(&buf->b_p_fenc);
 	clear_string_option(&buf->b_p_ff);
@@ -2446,27 +2446,27 @@ free_buf_options(
     clear_string_option(&buf->b_p_inex);
 # endif
 #endif
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_inde);
     clear_string_option(&buf->b_p_indk);
 #endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_BEVAL) && defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_bexpr);
 #endif
-#if defined(FEAT_CRYPT)
+#എങ്കിൽ defined(FEAT_CRYPT)
     clear_string_option(&buf->b_p_cm);
 #endif
     clear_string_option(&buf->b_p_fp);
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_fex);
 #endif
 #ifdef FEAT_CRYPT
 # ifdef FEAT_SODIUM
-    if (buf->b_p_key != NULL && *buf->b_p_key != NUL
+    എങ്കിൽ (buf->b_p_താക്കോൽ != ശൂന്യ && *buf->b_p_താക്കോൽ != NUL
 			   && crypt_method_is_sodium(crypt_get_method_nr(buf)))
-	crypt_sodium_munlock(buf->b_p_key, STRLEN(buf->b_p_key));
+	crypt_sodium_munlock(buf->b_p_താക്കോൽ, STRLEN(buf->b_p_താക്കോൽ));
 # endif
-    clear_string_option(&buf->b_p_key);
+    clear_string_option(&buf->b_p_താക്കോൽ);
 #endif
     clear_string_option(&buf->b_p_kp);
     clear_string_option(&buf->b_p_mps);
@@ -2496,7 +2496,7 @@ free_buf_options(
     clear_string_option(&buf->b_s.b_p_spc);
     clear_string_option(&buf->b_s.b_p_spf);
     vim_regfree(buf->b_s.b_cap_prog);
-    buf->b_s.b_cap_prog = NULL;
+    buf->b_s.b_cap_prog = ശൂന്യ;
     clear_string_option(&buf->b_s.b_p_spl);
     clear_string_option(&buf->b_s.b_p_spo);
 #endif
@@ -2519,8 +2519,8 @@ free_buf_options(
     free_callback(&buf->b_ofu_cb);
     clear_string_option(&buf->b_p_tsrfu);
     free_callback(&buf->b_tsrfu_cb);
-    clear_cpt_callbacks(&buf->b_p_cpt_cb, buf->b_p_cpt_count);
-    buf->b_p_cpt_count = 0;
+    clear_cpt_callbacks(&buf->b_p_cpt_cb, buf->b_p_cpt_എണ്ണം);
+    buf->b_p_cpt_എണ്ണം = 0;
 #endif
 #ifdef FEAT_QUICKFIX
     clear_string_option(&buf->b_p_gefm);
@@ -2565,71 +2565,71 @@ free_buf_options(
  *
  * Return FAIL for failure, OK for success.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 buflist_getfile(
-    int		n,
+    പൂർണ്ണസംഖ്യ		n,
     linenr_T	lnum,
-    int		options,
-    int		forceit)
+    പൂർണ്ണസംഖ്യ		options,
+    പൂർണ്ണസംഖ്യ		forceit)
 {
     buf_T	*buf;
-    win_T	*wp = NULL;
+    win_T	*wp = ശൂന്യ;
     pos_T	*fpos;
     colnr_T	col;
 
     buf = buflist_findnr(n);
-    if (buf == NULL)
+    എങ്കിൽ (buf == ശൂന്യ)
     {
-	if ((options & GETF_ALT) && n == 0)
+	എങ്കിൽ ((options & GETF_ALT) && n == 0)
 	    emsg(_(e_no_alternate_file));
-	else
+	അല്ലെങ്കിൽ
 	    semsg(_(e_buffer_nr_not_found), n);
-	return FAIL;
+	തിരികെ FAIL;
     }
 
     // if alternate file is the current buffer, nothing to do
-    if (buf == curbuf)
-	return OK;
+    എങ്കിൽ (buf == curbuf)
+	തിരികെ OK;
 
-    if (text_or_buf_locked())
-	return FAIL;
+    എങ്കിൽ (text_or_buf_locked())
+	തിരികെ FAIL;
 
     // altfpos may be changed by getfile(), get it now
-    if (lnum == 0)
+    എങ്കിൽ (lnum == 0)
     {
 	fpos = buflist_findfpos(buf);
 	lnum = fpos->lnum;
 	col = fpos->col;
     }
-    else
+    അല്ലെങ്കിൽ
 	col = 0;
 
-    if (options & GETF_SWITCH)
+    എങ്കിൽ (options & GETF_SWITCH)
     {
 	// If 'switchbuf' is set jump to the window containing "buf".
 	wp = swbuf_goto_win_with_buf(buf);
 
 	// If 'switchbuf' contains "split", "vsplit" or "newtab" and the
 	// current buffer isn't empty: open new tab or window
-	if (wp == NULL && (swb_flags & (SWB_VSPLIT | SWB_SPLIT | SWB_NEWTAB))
+	എങ്കിൽ (wp == ശൂന്യ && (swb_flags & (SWB_VSPLIT | SWB_SPLIT | SWB_NEWTAB))
 							       && !BUFEMPTY())
 	{
-	    if (swb_flags & SWB_NEWTAB)
+	    എങ്കിൽ (swb_flags & SWB_NEWTAB)
 		tabpage_new();
-	    else if (win_split(0, (swb_flags & SWB_VSPLIT) ? WSP_VERT : 0)
+	    അല്ലെങ്കിൽ എങ്കിൽ (win_split(0, (swb_flags & SWB_VSPLIT) ? WSP_VERT : 0)
 								      == FAIL)
-		return FAIL;
+		തിരികെ FAIL;
 	    RESET_BINDING(curwin);
 	}
     }
 
     ++RedrawingDisabled;
-    int retval = FAIL;
-    if (GETFILE_SUCCESS(getfile(buf->b_fnum, NULL, NULL,
+    പൂർണ്ണസംഖ്യ retval = FAIL;
+    എങ്കിൽ (GETFILE_SUCCESS(getfile(buf->b_fnum, ശൂന്യ, ശൂന്യ,
 				     (options & GETF_SETMARK), lnum, forceit)))
     {
 	// cursor is at to BOL and w_cursor.lnum is checked due to getfile()
-	if (!p_sol && col != 0)
+	എങ്കിൽ (!p_sol && col != 0)
 	{
 	    curwin->w_cursor.col = col;
 	    check_cursor_col();
@@ -2639,16 +2639,16 @@ buflist_getfile(
 	retval = OK;
     }
 
-    if (RedrawingDisabled > 0)
+    എങ്കിൽ (RedrawingDisabled > 0)
 	--RedrawingDisabled;
-    return retval;
+    തിരികെ retval;
 }
 
 /*
  * go to the last know line number for the current buffer
  */
-    static void
-buflist_getfpos(void)
+    സ്ഥിതം ശൂന്യം
+buflist_getfpos(ശൂന്യം)
 {
     pos_T	*fpos;
 
@@ -2657,9 +2657,9 @@ buflist_getfpos(void)
     curwin->w_cursor.lnum = fpos->lnum;
     check_cursor_lnum();
 
-    if (p_sol)
+    എങ്കിൽ (p_sol)
 	curwin->w_cursor.col = 0;
-    else
+    അല്ലെങ്കിൽ
     {
 	curwin->w_cursor.col = fpos->col;
 	check_cursor_col();
@@ -2676,22 +2676,22 @@ buflist_getfpos(void)
 buflist_findname_exp(char_u *fname)
 {
     char_u	*ffname;
-    buf_T	*buf = NULL;
+    buf_T	*buf = ശൂന്യ;
 
     // First make the name into a full path name
     ffname = FullName_save(fname,
 #ifdef UNIX
 	    TRUE	    // force expansion, get rid of symbolic links
-#else
+#അല്ലെങ്കിൽ
 	    FALSE
 #endif
 	    );
-    if (ffname != NULL)
+    എങ്കിൽ (ffname != ശൂന്യ)
     {
 	buf = buflist_findname(ffname);
 	vim_free(ffname);
     }
-    return buf;
+    തിരികെ buf;
 }
 
 /*
@@ -2706,9 +2706,9 @@ buflist_findname(char_u *ffname)
 #ifdef UNIX
     stat_T	st;
 
-    if (mch_stat((char *)ffname, &st) < 0)
+    എങ്കിൽ (mch_stat((അക്ഷരം *)ffname, &st) < 0)
 	st.st_dev = (dev_T)-1;
-    return buflist_findname_stat(ffname, &st);
+    തിരികെ buflist_findname_stat(ffname, &st);
 }
 
 /*
@@ -2716,7 +2716,7 @@ buflist_findname(char_u *ffname)
  * twice for the same file.
  * Returns NULL if not found.
  */
-    static buf_T *
+    സ്ഥിതം buf_T *
 buflist_findname_stat(
     char_u	*ffname,
     stat_T	*stp)
@@ -2726,13 +2726,13 @@ buflist_findname_stat(
 
     // Start at the last buffer, expect to find a match sooner.
     FOR_ALL_BUFS_FROM_LAST(buf)
-	if ((buf->b_flags & BF_DUMMY) == 0 && !otherfile_buf(buf, ffname
+	എങ്കിൽ ((buf->b_flags & BF_DUMMY) == 0 && !otherfile_buf(buf, ffname
 #ifdef UNIX
 		    , stp
 #endif
 		    ))
-	    return buf;
-    return NULL;
+	    തിരികെ buf;
+    തിരികെ ശൂന്യ;
 }
 
 /*
@@ -2740,34 +2740,34 @@ buflist_findname_stat(
  * Return fnum of the found buffer.
  * Return < 0 for error.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 buflist_findpat(
     char_u	*pattern,
     char_u	*pattern_end,	// pointer to first char after pattern
-    int		unlisted,	// find unlisted buffers
-    int		diffmode UNUSED, // find diff-mode buffers only
-    int		curtab_only)	// find buffers in current tab only
+    പൂർണ്ണസംഖ്യ		unlisted,	// find unlisted buffers
+    പൂർണ്ണസംഖ്യ		diffmode UNUSED, // find diff-mode buffers only
+    പൂർണ്ണസംഖ്യ		curtab_only)	// find buffers in current tab only
 {
     buf_T	*buf;
-    int		match = -1;
-    int		find_listed;
+    പൂർണ്ണസംഖ്യ		match = -1;
+    പൂർണ്ണസംഖ്യ		find_listed;
     char_u	*pat;
     char_u	*patend;
-    int		attempt;
+    പൂർണ്ണസംഖ്യ		attempt;
     char_u	*p;
-    int		toggledollar;
+    പൂർണ്ണസംഖ്യ		toggledollar;
 
     // "%" is current file, "%%" or "#" is alternate file
-    if ((pattern_end == pattern + 1 && (*pattern == '%' || *pattern == '#'))
+    എങ്കിൽ ((pattern_end == pattern + 1 && (*pattern == '%' || *pattern == '#'))
 	    || (in_vim9script() && pattern_end == pattern + 2
 				    && pattern[0] == '%' && pattern[1] == '%'))
     {
-	if (*pattern == '#' || pattern_end == pattern + 2)
+	എങ്കിൽ (*pattern == '#' || pattern_end == pattern + 2)
 	    match = curwin->w_alt_fnum;
-	else
+	അല്ലെങ്കിൽ
 	    match = curbuf->b_fnum;
 #ifdef FEAT_DIFF
-	if (diffmode && !diff_mode_buf(buflist_findnr(match)))
+	എങ്കിൽ (diffmode && !diff_mode_buf(buflist_findnr(match)))
 	    match = -1;
 #endif
     }
@@ -2781,90 +2781,90 @@ buflist_findpat(
      * Repeat this for finding an unlisted buffer if there was no matching
      * listed buffer.
      */
-    else
+    അല്ലെങ്കിൽ
     {
-	pat = file_pat_to_reg_pat(pattern, pattern_end, NULL, FALSE);
-	if (pat == NULL)
-	    return -1;
+	pat = file_pat_to_reg_pat(pattern, pattern_end, ശൂന്യ, FALSE);
+	എങ്കിൽ (pat == ശൂന്യ)
+	    തിരികെ -1;
 	patend = pat + STRLEN(pat) - 1;
 	toggledollar = (patend > pat && *patend == '$');
 
 	// First try finding a listed buffer.  If not found and "unlisted"
 	// is TRUE, try finding an unlisted buffer.
 	find_listed = TRUE;
-	for (;;)
+	വേണ്ടി (;;)
 	{
-	    for (attempt = 0; attempt <= 3; ++attempt)
+	    വേണ്ടി (attempt = 0; attempt <= 3; ++attempt)
 	    {
 		regmatch_T	regmatch;
 
 		// may add '^' and '$'
-		if (toggledollar)
+		എങ്കിൽ (toggledollar)
 		    *patend = (attempt < 2) ? NUL : '$'; // add/remove '$'
 		p = pat;
-		if (*p == '^' && !(attempt & 1))	 // add/remove '^'
+		എങ്കിൽ (*p == '^' && !(attempt & 1))	 // add/remove '^'
 		    ++p;
 		regmatch.regprog = vim_regcomp(p, magic_isset() ? RE_MAGIC : 0);
 
 		FOR_ALL_BUFS_FROM_LAST(buf)
 		{
-		    if (regmatch.regprog == NULL)
+		    എങ്കിൽ (regmatch.regprog == ശൂന്യ)
 		    {
 			// invalid pattern, possibly after switching engine
 			vim_free(pat);
-			return -1;
+			തിരികെ -1;
 		    }
-		    if (buf->b_p_bl == find_listed
+		    എങ്കിൽ (buf->b_p_bl == find_listed
 #ifdef FEAT_DIFF
 			    && (!diffmode || diff_mode_buf(buf))
 #endif
-			    && buflist_match(&regmatch, buf, FALSE) != NULL)
+			    && buflist_match(&regmatch, buf, FALSE) != ശൂന്യ)
 		    {
-			if (curtab_only)
+			എങ്കിൽ (curtab_only)
 			{
 			    // Ignore the match if the buffer is not open in
 			    // the current tab.
 			    win_T	*wp;
 
 			    FOR_ALL_WINDOWS(wp)
-				if (wp->w_buffer == buf)
-				    break;
-			    if (wp == NULL)
-				continue;
+				എങ്കിൽ (wp->w_buffer == buf)
+				    നിർത്തുക;
+			    എങ്കിൽ (wp == ശൂന്യ)
+				തുടരുക;
 			}
-			if (match >= 0)		// already found a match
+			എങ്കിൽ (match >= 0)		// already found a match
 			{
 			    match = -2;
-			    break;
+			    നിർത്തുക;
 			}
 			match = buf->b_fnum;	// remember first match
 		    }
 		}
 
 		vim_regfree(regmatch.regprog);
-		if (match >= 0)			// found one match
-		    break;
+		എങ്കിൽ (match >= 0)			// found one match
+		    നിർത്തുക;
 	    }
 
 	    // Only search for unlisted buffers if there was no match with
 	    // a listed buffer.
-	    if (!unlisted || !find_listed || match != -1)
-		break;
+	    എങ്കിൽ (!unlisted || !find_listed || match != -1)
+		നിർത്തുക;
 	    find_listed = FALSE;
 	}
 
 	vim_free(pat);
     }
 
-    if (match == -2)
+    എങ്കിൽ (match == -2)
 	semsg(_(e_more_than_one_match_for_str), pattern);
-    else if (match < 0)
+    അല്ലെങ്കിൽ എങ്കിൽ (match < 0)
 	semsg(_(e_no_matching_buffer_for_str), pattern);
-    return match;
+    തിരികെ match;
 }
 
 #ifdef FEAT_VIMINFO
-typedef struct {
+തരനിർവചനം ഘടന {
     buf_T   *buf;
     char_u  *match;
 } bufmatch_T;
@@ -2875,234 +2875,234 @@ typedef struct {
  * For command line expansion of ":buf" and ":sbuf".
  * Return OK if matches found, FAIL otherwise.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 ExpandBufnames(
     char_u	*pat,
-    int		*num_file,
+    പൂർണ്ണസംഖ്യ		*അക്കം_file,
     char_u	***file,
-    int		options)
+    പൂർണ്ണസംഖ്യ		options)
 {
-    int		count;
+    പൂർണ്ണസംഖ്യ		എണ്ണം;
     buf_T	*buf;
-    int		round;
+    പൂർണ്ണസംഖ്യ		round;
     char_u	*p;
-    char_u	*patc = NULL;
+    char_u	*patc = ശൂന്യ;
 #ifdef FEAT_VIMINFO
-    bufmatch_T	*matches = NULL;
+    bufmatch_T	*matches = ശൂന്യ;
 #endif
-    int		fuzzy;
-    fuzmatch_str_T  *fuzmatch = NULL;
+    പൂർണ്ണസംഖ്യ		fuzzy;
+    fuzmatch_str_T  *fuzmatch = ശൂന്യ;
     regmatch_T	regmatch;
-    int		score = 0;
-    int		to_free = FALSE;
+    പൂർണ്ണസംഖ്യ		score = 0;
+    പൂർണ്ണസംഖ്യ		to_free = FALSE;
 
-    *num_file = 0;		    // return values in case of FAIL
-    *file = NULL;
+    *അക്കം_file = 0;		    // return values in case of FAIL
+    *file = ശൂന്യ;
 
 #ifdef FEAT_DIFF
-    if ((options & BUF_DIFF_FILTER) && !curwin->w_p_diff)
-	return FAIL;
+    എങ്കിൽ ((options & BUF_DIFF_FILTER) && !curwin->w_p_diff)
+	തിരികെ FAIL;
 #endif
 
     fuzzy = cmdline_fuzzy_complete(pat);
 
     // Make a copy of "pat" and change "^" to "\(^\|[\/]\)" (if doing regular
     // expression matching)
-    if (!fuzzy)
+    എങ്കിൽ (!fuzzy)
     {
-	if (*pat == '^' && pat[1] != NUL)
+	എങ്കിൽ (*pat == '^' && pat[1] != NUL)
 	{
-	    int  len = (int)STRLEN(pat);
+	    പൂർണ്ണസംഖ്യ  len = (പൂർണ്ണസംഖ്യ)STRLEN(pat);
 	    patc = alloc(len);
-	    if (patc == NULL)
-		return FAIL;
+	    എങ്കിൽ (patc == ശൂന്യ)
+		തിരികെ FAIL;
 	    STRNCPY(patc, pat + 1, len - 1);
 	    patc[len - 1] = NUL;
 	    to_free = TRUE;
 	}
-	else if (*pat == '^')
+	അല്ലെങ്കിൽ എങ്കിൽ (*pat == '^')
 	    patc = (char_u *)"";
-	else
+	അല്ലെങ്കിൽ
 	    patc = pat;
 	regmatch.regprog = vim_regcomp(patc, RE_MAGIC);
     }
 
     // round == 1: Count the matches.
     // round == 2: Build the array to keep the matches.
-    for (round = 1; round <= 2; ++round)
+    വേണ്ടി (round = 1; round <= 2; ++round)
     {
-	count = 0;
+	എണ്ണം = 0;
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (!buf->b_p_bl)	// skip unlisted buffers
-		continue;
+	    എങ്കിൽ (!buf->b_p_bl)	// skip unlisted buffers
+		തുടരുക;
 #ifdef FEAT_DIFF
-	    if (options & BUF_DIFF_FILTER)
+	    എങ്കിൽ (options & BUF_DIFF_FILTER)
 		// Skip buffers not suitable for
 		// :diffget or :diffput completion.
-		if (buf == curbuf || !diff_mode_buf(buf))
-		    continue;
+		എങ്കിൽ (buf == curbuf || !diff_mode_buf(buf))
+		    തുടരുക;
 #endif
 
-	    if (!fuzzy)
+	    എങ്കിൽ (!fuzzy)
 	    {
-		if (regmatch.regprog == NULL)
+		എങ്കിൽ (regmatch.regprog == ശൂന്യ)
 		{
 		    // invalid pattern, possibly after recompiling
-		    if (to_free)
+		    എങ്കിൽ (to_free)
 			vim_free(patc);
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
 		p = buflist_match(&regmatch, buf, p_wic);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		p = NULL;
+		p = ശൂന്യ;
 		// first try matching with the short file name
-		if ((score = fuzzy_match_str(buf->b_sfname, pat))
+		എങ്കിൽ ((score = fuzzy_match_str(buf->b_sfname, pat))
 			!= FUZZY_SCORE_NONE)
 		    p = buf->b_sfname;
-		if (p == NULL)
+		എങ്കിൽ (p == ശൂന്യ)
 		{
 		    // next try matching with the full path file name
-		    if ((score = fuzzy_match_str(buf->b_ffname, pat))
+		    എങ്കിൽ ((score = fuzzy_match_str(buf->b_ffname, pat))
 			    != FUZZY_SCORE_NONE)
 			p = buf->b_ffname;
 		}
 	    }
 
-	    if (p == NULL)
-		continue;
+	    എങ്കിൽ (p == ശൂന്യ)
+		തുടരുക;
 
-	    if (round == 1)
+	    എങ്കിൽ (round == 1)
 	    {
-		++count;
-		continue;
+		++എണ്ണം;
+		തുടരുക;
 	    }
 
-	    if (options & WILD_HOME_REPLACE)
+	    എങ്കിൽ (options & WILD_HOME_REPLACE)
 		p = home_replace_save(buf, p);
-	    else
+	    അല്ലെങ്കിൽ
 		p = vim_strsave(p);
-	    if (p == NULL)
+	    എങ്കിൽ (p == ശൂന്യ)
 	    {
-		if (fuzzy && round == 2)
-		    fuzmatch_str_free(fuzmatch, count);
-		return FAIL;
+		എങ്കിൽ (fuzzy && round == 2)
+		    fuzmatch_str_free(fuzmatch, എണ്ണം);
+		തിരികെ FAIL;
 	    }
 
-	    if (!fuzzy)
+	    എങ്കിൽ (!fuzzy)
 	    {
 #ifdef FEAT_VIMINFO
-		if (matches != NULL)
+		എങ്കിൽ (matches != ശൂന്യ)
 		{
-		    matches[count].buf = buf;
-		    matches[count].match = p;
-		    count++;
+		    matches[എണ്ണം].buf = buf;
+		    matches[എണ്ണം].match = p;
+		    എണ്ണം++;
 		}
-		else
+		അല്ലെങ്കിൽ
 #endif
-		    (*file)[count++] = p;
+		    (*file)[എണ്ണം++] = p;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		fuzmatch[count].idx = count;
-		fuzmatch[count].str = p;
-		fuzmatch[count].score = score;
-		count++;
+		fuzmatch[എണ്ണം].idx = എണ്ണം;
+		fuzmatch[എണ്ണം].str = p;
+		fuzmatch[എണ്ണം].score = score;
+		എണ്ണം++;
 	    }
 	}
-	if (count == 0)	// no match found, break here
-	    break;
-	if (round == 1)
+	എങ്കിൽ (എണ്ണം == 0)	// no match found, break here
+	    നിർത്തുക;
+	എങ്കിൽ (round == 1)
 	{
-	    if (!fuzzy)
+	    എങ്കിൽ (!fuzzy)
 	    {
-		*file = ALLOC_MULT(char_u *, count);
-		if (*file == NULL)
+		*file = ALLOC_MULT(char_u *, എണ്ണം);
+		എങ്കിൽ (*file == ശൂന്യ)
 		{
 		    vim_regfree(regmatch.regprog);
-		    if (to_free)
+		    എങ്കിൽ (to_free)
 			vim_free(patc);
-		    return FAIL;
+		    തിരികെ FAIL;
 		}
 #ifdef FEAT_VIMINFO
-		if (options & WILD_BUFLASTUSED)
-		    matches = ALLOC_MULT(bufmatch_T, count);
+		എങ്കിൽ (options & WILD_BUFLASTUSED)
+		    matches = ALLOC_MULT(bufmatch_T, എണ്ണം);
 #endif
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		fuzmatch = ALLOC_MULT(fuzmatch_str_T, count);
-		if (fuzmatch == NULL)
+		fuzmatch = ALLOC_MULT(fuzmatch_str_T, എണ്ണം);
+		എങ്കിൽ (fuzmatch == ശൂന്യ)
 		{
-		    *num_file = 0;
-		    *file = NULL;
-		    return FAIL;
+		    *അക്കം_file = 0;
+		    *file = ശൂന്യ;
+		    തിരികെ FAIL;
 		}
 	    }
 	}
     }
 
-    if (!fuzzy)
+    എങ്കിൽ (!fuzzy)
     {
 	vim_regfree(regmatch.regprog);
-	if (to_free)
+	എങ്കിൽ (to_free)
 	    vim_free(patc);
     }
 
-    if (!fuzzy)
+    എങ്കിൽ (!fuzzy)
     {
 #ifdef FEAT_VIMINFO
-	if (matches != NULL)
+	എങ്കിൽ (matches != ശൂന്യ)
 	{
-	    int i;
-	    if (count > 1)
-		qsort(matches, count, sizeof(bufmatch_T), buf_compare);
+	    പൂർണ്ണസംഖ്യ i;
+	    എങ്കിൽ (എണ്ണം > 1)
+		qsort(matches, എണ്ണം, വലുപ്പം(bufmatch_T), buf_compare);
 	    // if the current buffer is first in the list, place it at the end
-	    if (matches[0].buf == curbuf)
+	    എങ്കിൽ (matches[0].buf == curbuf)
 	    {
-		for (i = 1; i < count; i++)
+		വേണ്ടി (i = 1; i < എണ്ണം; i++)
 		    (*file)[i-1] = matches[i].match;
-		(*file)[count-1] = matches[0].match;
+		(*file)[എണ്ണം-1] = matches[0].match;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		for (i = 0; i < count; i++)
+		വേണ്ടി (i = 0; i < എണ്ണം; i++)
 		    (*file)[i] = matches[i].match;
 	    }
 	    vim_free(matches);
 	}
 #endif
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	if (fuzzymatches_to_strmatches(fuzmatch, file, count, FALSE) == FAIL)
-	    return FAIL;
+	എങ്കിൽ (fuzzymatches_to_strmatches(fuzmatch, file, എണ്ണം, FALSE) == FAIL)
+	    തിരികെ FAIL;
     }
 
-    *num_file = count;
-    return (count == 0 ? FAIL : OK);
+    *അക്കം_file = എണ്ണം;
+    തിരികെ (എണ്ണം == 0 ? FAIL : OK);
 }
 
 /*
  * Check for a match on the file name for buffer "buf" with regprog "prog".
  * Note that rmp->regprog may become NULL when switching regexp engine.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 buflist_match(
     regmatch_T	*rmp,
     buf_T	*buf,
-    int		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
+    പൂർണ്ണസംഖ്യ		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
 {
     char_u	*match;
 
     // First try the short file name, then the long file name.
     match = fname_match(rmp, buf->b_sfname, ignore_case);
-    if (match == NULL && rmp->regprog != NULL)
+    എങ്കിൽ (match == ശൂന്യ && rmp->regprog != ശൂന്യ)
 	match = fname_match(rmp, buf->b_ffname, ignore_case);
 
-    return match;
+    തിരികെ match;
 }
 
 /*
@@ -3110,53 +3110,53 @@ buflist_match(
  * Note that rmp->regprog may become NULL when switching regexp engine.
  * Return "name" when there is a match, NULL when not.
  */
-    static char_u *
+    സ്ഥിതം char_u *
 fname_match(
     regmatch_T	*rmp,
     char_u	*name,
-    int		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
+    പൂർണ്ണസംഖ്യ		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
 {
-    char_u	*match = NULL;
+    char_u	*match = ശൂന്യ;
     char_u	*p;
 
     // extra check for valid arguments
-    if (name == NULL || rmp->regprog == NULL)
-	return NULL;
+    എങ്കിൽ (name == ശൂന്യ || rmp->regprog == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
     // Ignore case when 'fileignorecase' or the argument is set.
     rmp->rm_ic = p_fic || ignore_case;
-    if (vim_regexec(rmp, name, (colnr_T)0))
+    എങ്കിൽ (vim_regexec(rmp, name, (colnr_T)0))
 	match = name;
-    else if (rmp->regprog != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (rmp->regprog != ശൂന്യ)
     {
 	// Replace $(HOME) with '~' and try matching again.
-	p = home_replace_save(NULL, name);
-	if (p != NULL && vim_regexec(rmp, p, (colnr_T)0))
+	p = home_replace_save(ശൂന്യ, name);
+	എങ്കിൽ (p != ശൂന്യ && vim_regexec(rmp, p, (colnr_T)0))
 	    match = name;
 	vim_free(p);
     }
 
-    return match;
+    തിരികെ match;
 }
 
 /*
  * Find a file in the buffer list by buffer number.
  */
     buf_T *
-buflist_findnr(int nr)
+buflist_findnr(പൂർണ്ണസംഖ്യ nr)
 {
-    char_u	key[VIM_SIZEOF_INT * 2 + 1];
+    char_u	താക്കോൽ[VIM_SIZEOF_INT * 2 + 1];
     hashitem_T	*hi;
 
-    if (nr == 0)
+    എങ്കിൽ (nr == 0)
 	nr = curwin->w_alt_fnum;
-    vim_snprintf((char *)key, sizeof(key), "%x", nr);
-    hi = hash_find(&buf_hashtab, key);
+    vim_snprintf((അക്ഷരം *)താക്കോൽ, വലുപ്പം(താക്കോൽ), "%x", nr);
+    hi = hash_find(&buf_hashtab, താക്കോൽ);
 
-    if (!HASHITEM_EMPTY(hi))
-	return (buf_T *)(hi->hi_key
-			     - ((unsigned)(curbuf->b_key - (char_u *)curbuf)));
-    return NULL;
+    എങ്കിൽ (!HASHITEM_EMPTY(hi))
+	തിരികെ (buf_T *)(hi->hi_താക്കോൽ
+			     - ((unsigned)(curbuf->b_താക്കോൽ - (char_u *)curbuf)));
+    തിരികെ ശൂന്യ;
 }
 
 /*
@@ -3167,16 +3167,16 @@ buflist_findnr(int nr)
  */
     char_u *
 buflist_nr2name(
-    int		n,
-    int		fullname,
-    int		helptail)	// for help buffers return tail only
+    പൂർണ്ണസംഖ്യ		n,
+    പൂർണ്ണസംഖ്യ		fullname,
+    പൂർണ്ണസംഖ്യ		helptail)	// for help buffers return tail only
 {
     buf_T	*buf;
 
     buf = buflist_findnr(n);
-    if (buf == NULL)
-	return NULL;
-    return home_replace_save(helptail ? buf : NULL,
+    എങ്കിൽ (buf == ശൂന്യ)
+	തിരികെ ശൂന്യ;
+    തിരികെ home_replace_save(helptail ? buf : ശൂന്യ,
 				     fullname ? buf->b_ffname : buf->b_fname);
 }
 
@@ -3185,39 +3185,39 @@ buflist_nr2name(
  * When "copy_options" is TRUE save the local window option values.
  * When "lnum" is 0 only do the options.
  */
-    void
+    ശൂന്യം
 buflist_setfpos(
     buf_T	*buf,
     win_T	*win,		// may be NULL when using :badd
     linenr_T	lnum,
     colnr_T	col,
-    int		copy_options)
+    പൂർണ്ണസംഖ്യ		copy_options)
 {
     wininfo_T	*wip;
 
     FOR_ALL_BUF_WININFO(buf, wip)
-	if (wip->wi_win == win)
-	    break;
-    if (wip == NULL)
+	എങ്കിൽ (wip->wi_win == win)
+	    നിർത്തുക;
+    എങ്കിൽ (wip == ശൂന്യ)
     {
 	// allocate a new entry
 	wip = ALLOC_CLEAR_ONE(wininfo_T);
-	if (wip == NULL)
-	    return;
+	എങ്കിൽ (wip == ശൂന്യ)
+	    തിരികെ;
 	wip->wi_win = win;
-	if (lnum == 0)		// set lnum even when it's 0
+	എങ്കിൽ (lnum == 0)		// set lnum even when it's 0
 	    lnum = 1;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	// remove the entry from the list
-	if (wip->wi_prev)
+	എങ്കിൽ (wip->wi_prev)
 	    wip->wi_prev->wi_next = wip->wi_next;
-	else
+	അല്ലെങ്കിൽ
 	    buf->b_wininfo = wip->wi_next;
-	if (wip->wi_next)
+	എങ്കിൽ (wip->wi_next)
 	    wip->wi_next->wi_prev = wip->wi_prev;
-	if (copy_options && wip->wi_optset)
+	എങ്കിൽ (copy_options && wip->wi_optset)
 	{
 	    clear_winopt(&wip->wi_opt);
 #ifdef FEAT_FOLDING
@@ -3225,14 +3225,14 @@ buflist_setfpos(
 #endif
 	}
     }
-    if (lnum != 0)
+    എങ്കിൽ (lnum != 0)
     {
 	wip->wi_fpos.lnum = lnum;
 	wip->wi_fpos.col = col;
     }
-    if (win != NULL)
+    എങ്കിൽ (win != ശൂന്യ)
 	wip->wi_changelistidx = win->w_changelistidx;
-    if (copy_options && win != NULL)
+    എങ്കിൽ (copy_options && win != ശൂന്യ)
     {
 	// Save the window-specific option values.
 	copy_winopt(&win->w_onebuf_opt, &wip->wi_opt);
@@ -3246,8 +3246,8 @@ buflist_setfpos(
     // insert the entry in front of the list
     wip->wi_next = buf->b_wininfo;
     buf->b_wininfo = wip;
-    wip->wi_prev = NULL;
-    if (wip->wi_next)
+    wip->wi_prev = ശൂന്യ;
+    എങ്കിൽ (wip->wi_next)
 	wip->wi_next->wi_prev = wip;
 }
 
@@ -3256,20 +3256,20 @@ buflist_setfpos(
  * Return TRUE when "wip" has 'diff' set and the diff is only for another tab
  * page.  That's because a diff is local to a tab page.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 wininfo_other_tab_diff(wininfo_T *wip)
 {
     win_T	*wp;
 
-    if (!wip->wi_opt.wo_diff)
-	return FALSE;
+    എങ്കിൽ (!wip->wi_opt.wo_diff)
+	തിരികെ FALSE;
 
     FOR_ALL_WINDOWS(wp)
 	// return FALSE when it's a window in the current tab page, thus
 	// the buffer was in diff mode here
-	if (wip->wi_win == wp)
-	    return FALSE;
-    return TRUE;
+	എങ്കിൽ (wip->wi_win == wp)
+	    തിരികെ FALSE;
+    തിരികെ TRUE;
 }
 #endif
 
@@ -3281,25 +3281,25 @@ wininfo_other_tab_diff(wininfo_T *wip)
  * another tab page.
  * Returns NULL when there isn't any info.
  */
-    static wininfo_T *
+    സ്ഥിതം wininfo_T *
 find_wininfo(
     buf_T	*buf,
-    int		need_options,
-    int		skip_diff_buffer UNUSED)
+    പൂർണ്ണസംഖ്യ		need_options,
+    പൂർണ്ണസംഖ്യ		skip_diff_buffer UNUSED)
 {
     wininfo_T	*wip;
 
     FOR_ALL_BUF_WININFO(buf, wip)
-	if (wip->wi_win == curwin
+	എങ്കിൽ (wip->wi_win == curwin
 #ifdef FEAT_DIFF
 		&& (!skip_diff_buffer || !wininfo_other_tab_diff(wip))
 #endif
 
 		&& (!need_options || wip->wi_optset))
-	    break;
+	    നിർത്തുക;
 
-    if (wip != NULL)
-	return wip;
+    എങ്കിൽ (wip != ശൂന്യ)
+	തിരികെ wip;
 
     // If no wininfo for curwin, use the first in the list (that doesn't have
     // 'diff' set and is in another tab page).
@@ -3307,19 +3307,19 @@ find_wininfo(
     // unless the window is editing "buf", so we can copy from the window
     // itself.
 #ifdef FEAT_DIFF
-    if (skip_diff_buffer)
+    എങ്കിൽ (skip_diff_buffer)
     {
 	FOR_ALL_BUF_WININFO(buf, wip)
-	    if (!wininfo_other_tab_diff(wip)
+	    എങ്കിൽ (!wininfo_other_tab_diff(wip)
 		    && (!need_options || wip->wi_optset
-			|| (wip->wi_win != NULL
+			|| (wip->wi_win != ശൂന്യ
 			    && wip->wi_win->w_buffer == buf)))
-		break;
+		നിർത്തുക;
     }
-    else
+    അല്ലെങ്കിൽ
 #endif
 	wip = buf->b_wininfo;
-    return wip;
+    തിരികെ wip;
 }
 
 /*
@@ -3328,7 +3328,7 @@ find_wininfo(
  * the most recently used window.  If the values were never set, use the
  * global values for the window.
  */
-    void
+    ശൂന്യം
 get_winopts(buf_T *buf)
 {
     wininfo_T	*wip;
@@ -3339,7 +3339,7 @@ get_winopts(buf_T *buf)
 #endif
 
     wip = find_wininfo(buf, TRUE, TRUE);
-    if (wip != NULL && wip->wi_win != NULL
+    എങ്കിൽ (wip != ശൂന്യ && wip->wi_win != ശൂന്യ
 	    && wip->wi_win != curwin && wip->wi_win->w_buffer == buf)
     {
 	// The buffer is currently displayed in the window: use the actual
@@ -3357,7 +3357,7 @@ get_winopts(buf_T *buf)
 	cloneFoldGrowArray(&wp->w_folds, &curwin->w_folds);
 #endif
     }
-    else if (wip != NULL && wip->wi_optset)
+    അല്ലെങ്കിൽ എങ്കിൽ (wip != ശൂന്യ && wip->wi_optset)
     {
 	// the buffer was displayed in the current window earlier
 	copy_winopt(&wip->wi_opt, &curwin->w_onebuf_opt);
@@ -3367,22 +3367,22 @@ get_winopts(buf_T *buf)
 	cloneFoldGrowArray(&wip->wi_folds, &curwin->w_folds);
 #endif
     }
-    else
+    അല്ലെങ്കിൽ
 	copy_winopt(&curwin->w_allbuf_opt, &curwin->w_onebuf_opt);
-    if (wip != NULL)
+    എങ്കിൽ (wip != ശൂന്യ)
 	curwin->w_changelistidx = wip->wi_changelistidx;
 
 #ifdef FEAT_FOLDING
     // Set 'foldlevel' to 'foldlevelstart' if it's not negative.
-    if (p_fdls >= 0)
+    എങ്കിൽ (p_fdls >= 0)
 	curwin->w_p_fdl = p_fdls;
 #endif
 #ifdef FEAT_STL_OPT
     // Update rendered height for window-local 'statusline'.
-    if (*curwin->w_p_stl != NUL)
+    എങ്കിൽ (*curwin->w_p_stl != NUL)
 	update_stl_rendered_height(curwin);
     // If the effective statuslineopt changed, re-adjust all window heights.
-    if (curwin->w_status_height > 0
+    എങ്കിൽ (curwin->w_status_height > 0
 	    && curwin->w_status_height != statusline_height(curwin))
     {
 	frame_change_statusline_height();
@@ -3391,7 +3391,7 @@ get_winopts(buf_T *buf)
 	// inheritance is resolved here.  frame_change_statusline_height()
 	// redistributes space within the stale fr_height values set during the
 	// split, so the content rows may be unequal.  Re-equalize if needed.
-	if (p_ea)
+	എങ്കിൽ (p_ea)
 	    win_equal(curwin, TRUE, 'v');
     }
 #endif
@@ -3407,13 +3407,13 @@ get_winopts(buf_T *buf)
 buflist_findfpos(buf_T *buf)
 {
     wininfo_T	*wip;
-    static pos_T no_position = {1, 0, 0};
+    സ്ഥിതം pos_T no_position = {1, 0, 0};
 
     wip = find_wininfo(buf, FALSE, FALSE);
-    if (wip != NULL)
-	return &(wip->wi_fpos);
-    else
-	return &no_position;
+    എങ്കിൽ (wip != ശൂന്യ)
+	തിരികെ &(wip->wi_fpos);
+    അല്ലെങ്കിൽ
+	തിരികെ &no_position;
 }
 
 /*
@@ -3422,51 +3422,51 @@ buflist_findfpos(buf_T *buf)
     linenr_T
 buflist_findlnum(buf_T *buf)
 {
-    return buflist_findfpos(buf)->lnum;
+    തിരികെ buflist_findfpos(buf)->lnum;
 }
 
 /*
  * List all known file names (for :files and :buffers command).
  */
-    void
+    ശൂന്യം
 buflist_list(exarg_T *eap)
 {
     buf_T	*buf = firstbuf;
-    int		len;
-    int		i;
-    int		ro_char;
-    int		changed_char;
+    പൂർണ്ണസംഖ്യ		len;
+    പൂർണ്ണസംഖ്യ		i;
+    പൂർണ്ണസംഖ്യ		ro_char;
+    പൂർണ്ണസംഖ്യ		changed_char;
 #ifdef FEAT_TERMINAL
-    int		job_running;
-    int		job_none_open;
+    പൂർണ്ണസംഖ്യ		job_running;
+    പൂർണ്ണസംഖ്യ		job_none_open;
 #endif
 
 #ifdef FEAT_VIMINFO
     garray_T	buflist;
-    buf_T	**buflist_data = NULL, **p;
+    buf_T	**buflist_data = ശൂന്യ, **p;
 
-    if (vim_strchr(eap->arg, 't'))
+    എങ്കിൽ (vim_strchr(eap->arg, 't'))
     {
-	ga_init2(&buflist, sizeof(buf_T *), 50);
+	ga_init2(&buflist, വലുപ്പം(buf_T *), 50);
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (ga_grow(&buflist, 1) == OK)
+	    എങ്കിൽ (ga_grow(&buflist, 1) == OK)
 		((buf_T **)buflist.ga_data)[buflist.ga_len++] = buf;
 	}
 
 	qsort(buflist.ga_data, (size_t)buflist.ga_len,
-		sizeof(buf_T *), buf_compare);
+		വലുപ്പം(buf_T *), buf_compare);
 
 	buflist_data = (buf_T **)buflist.ga_data;
 	buf = *buflist_data;
     }
     p = buflist_data;
 
-    for (; buf != NULL && !got_int; buf = buflist_data != NULL
-	    ? (++p < buflist_data + buflist.ga_len ? *p : NULL)
+    വേണ്ടി (; buf != ശൂന്യ && !got_int; buf = buflist_data != ശൂന്യ
+	    ? (++p < buflist_data + buflist.ga_len ? *p : ശൂന്യ)
 	    : buf->b_next)
-#else
-    for (buf = firstbuf; buf != NULL && !got_int; buf = buf->b_next)
+#അല്ലെങ്കിൽ
+    വേണ്ടി (buf = firstbuf; buf != ശൂന്യ && !got_int; buf = buf->b_next)
 #endif
     {
 	char_u	*name;
@@ -3476,21 +3476,21 @@ buflist_list(exarg_T *eap)
 	job_none_open = term_none_open(buf->b_term);
 #endif
 	// skip unlisted buffers, unless ! was used
-	if ((!buf->b_p_bl && !eap->forceit && !vim_strchr(eap->arg, 'u'))
+	എങ്കിൽ ((!buf->b_p_bl && !eap->forceit && !vim_strchr(eap->arg, 'u'))
 		|| (vim_strchr(eap->arg, 'u') && buf->b_p_bl)
 		|| (vim_strchr(eap->arg, '+')
 			&& ((buf->b_flags & BF_READERR) || !bufIsChanged(buf)))
 		|| (vim_strchr(eap->arg, 'a')
-			&& (buf->b_ml.ml_mfp == NULL || buf->b_nwindows == 0))
+			&& (buf->b_ml.ml_mfp == ശൂന്യ || buf->b_nwindows == 0))
 		|| (vim_strchr(eap->arg, 'h')
-			&& (buf->b_ml.ml_mfp == NULL || buf->b_nwindows != 0))
+			&& (buf->b_ml.ml_mfp == ശൂന്യ || buf->b_nwindows != 0))
 #ifdef FEAT_TERMINAL
 		|| (vim_strchr(eap->arg, 'R')
 			&& (!job_running || (job_running && job_none_open)))
 		|| (vim_strchr(eap->arg, '?')
 			&& (!job_running || (job_running && !job_none_open)))
 		|| (vim_strchr(eap->arg, 'F')
-			&& (job_running || buf->b_term == NULL))
+			&& (job_running || buf->b_term == ശൂന്യ))
 #endif
 		|| (vim_strchr(eap->arg, '-') && buf->b_p_ma)
 		|| (vim_strchr(eap->arg, '=') && !buf->b_p_ro)
@@ -3498,40 +3498,40 @@ buflist_list(exarg_T *eap)
 		|| (vim_strchr(eap->arg, '%') && buf != curbuf)
 		|| (vim_strchr(eap->arg, '#')
 		      && (buf == curbuf || curwin->w_alt_fnum != buf->b_fnum)))
-	    continue;
+	    തുടരുക;
 	name = buf_spname(buf);
-	if (name != NULL)
+	എങ്കിൽ (name != ശൂന്യ)
 	    vim_strncpy(NameBuff, name, MAXPATHL - 1);
-	else
+	അല്ലെങ്കിൽ
 	    home_replace(buf, buf->b_fname, NameBuff, MAXPATHL, TRUE);
-	if (message_filtered(NameBuff))
-	    continue;
+	എങ്കിൽ (message_filtered(NameBuff))
+	    തുടരുക;
 
 	changed_char = (buf->b_flags & BF_READERR) ? 'x'
 					     : (bufIsChanged(buf) ? '+' : ' ');
 #ifdef FEAT_TERMINAL
-	if (job_running)
+	എങ്കിൽ (job_running)
 	{
-	    if (job_none_open)
+	    എങ്കിൽ (job_none_open)
 		ro_char = '?';
-	    else
+	    അല്ലെങ്കിൽ
 		ro_char = 'R';
 	    changed_char = ' ';  // bufIsChanged() returns TRUE to avoid
 				 // closing, but it's not actually changed.
 	}
-	else if (buf->b_term != NULL)
+	അല്ലെങ്കിൽ എങ്കിൽ (buf->b_term != ശൂന്യ)
 	    ro_char = 'F';
-	else
+	അല്ലെങ്കിൽ
 #endif
 	    ro_char = !buf->b_p_ma ? '-' : (buf->b_p_ro ? '=' : ' ');
 
-	msg_putchar('\n');
-	len = (int)vim_snprintf_safelen((char *)IObuff, IOSIZE - 20, "%3d%c%c%c%c%c \"%s\"",
+	സന്ദേശം_putchar('\n');
+	len = (പൂർണ്ണസംഖ്യ)vim_snprintf_safelen((അക്ഷരം *)IObuff, IOSIZE - 20, "%3d%c%c%c%c%c \"%s\"",
 		buf->b_fnum,
 		buf->b_p_bl ? ' ' : 'u',
 		buf == curbuf ? '%' :
 			(curwin->w_alt_fnum == buf->b_fnum ? '#' : ' '),
-		buf->b_ml.ml_mfp == NULL ? ' ' :
+		buf->b_ml.ml_mfp == ശൂന്യ ? ' ' :
 			(buf->b_nwindows == 0 ? 'h' : 'a'),
 		ro_char,
 		changed_char,
@@ -3539,24 +3539,24 @@ buflist_list(exarg_T *eap)
 
 	// put "line 999" in column 40 or after the file name
 	i = 40 - vim_strsize(IObuff);
-	do
+	ചെയ്യുക
 	    IObuff[len++] = ' ';
-	while (--i > 0 && len < IOSIZE - 18);
+	ആകുമ്പോൾ (--i > 0 && len < IOSIZE - 18);
 #ifdef FEAT_VIMINFO
-	if (vim_strchr(eap->arg, 't') && buf->b_last_used)
+	എങ്കിൽ (vim_strchr(eap->arg, 't') && buf->b_last_used)
 	    add_time(IObuff + len, (size_t)(IOSIZE - len), buf->b_last_used);
-	else
+	അല്ലെങ്കിൽ
 #endif
-	    vim_snprintf((char *)IObuff + len, (size_t)(IOSIZE - len),
+	    vim_snprintf((അക്ഷരം *)IObuff + len, (size_t)(IOSIZE - len),
 		    _("line %ld"), buf == curbuf ? curwin->w_cursor.lnum
 					       : (long)buflist_findlnum(buf));
-	msg_outtrans(IObuff);
+	സന്ദേശം_outtrans(IObuff);
 	out_flush();	    // output one line at a time
 	ui_breakcheck();
     }
 
 #ifdef FEAT_VIMINFO
-    if (buflist_data)
+    എങ്കിൽ (buflist_data)
 	ga_clear(&buflist);
 #endif
 }
@@ -3567,22 +3567,22 @@ buflist_list(exarg_T *eap)
  * Used by insert_reg() and cmdline_paste() for '#' register.
  * Return FAIL if not found, OK for success.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 buflist_name_nr(
-    int		fnum,
+    പൂർണ്ണസംഖ്യ		fnum,
     char_u	**fname,
     linenr_T	*lnum)
 {
     buf_T	*buf;
 
     buf = buflist_findnr(fnum);
-    if (buf == NULL || buf->b_fname == NULL)
-	return FAIL;
+    എങ്കിൽ (buf == ശൂന്യ || buf->b_fname == ശൂന്യ)
+	തിരികെ FAIL;
 
     *fname = buf->b_fname;
     *lnum = buflist_findlnum(buf);
 
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -3592,37 +3592,37 @@ buflist_name_nr(
  * Returns FAIL for failure (file name already in use by other buffer)
  *	OK otherwise.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 setfname(
     buf_T	*buf,
     char_u	*ffname_arg,
     char_u	*sfname_arg,
-    int		message)	// give message when buffer already exists
+    പൂർണ്ണസംഖ്യ		message)	// give message when buffer already exists
 {
     char_u	*ffname = ffname_arg;
     char_u	*sfname = sfname_arg;
-    buf_T	*obuf = NULL;
+    buf_T	*obuf = ശൂന്യ;
 #ifdef UNIX
     stat_T	st;
 #endif
 
-    if (ffname == NULL || *ffname == NUL)
+    എങ്കിൽ (ffname == ശൂന്യ || *ffname == NUL)
     {
 	// Removing the name.
-	if (buf->b_sfname != buf->b_ffname)
+	എങ്കിൽ (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
-	    buf->b_sfname = NULL;
+	അല്ലെങ്കിൽ
+	    buf->b_sfname = ശൂന്യ;
 	VIM_CLEAR(buf->b_ffname);
 #ifdef UNIX
 	st.st_dev = (dev_T)-1;
 #endif
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	fname_expand(buf, &ffname, &sfname); // will allocate ffname
-	if (ffname == NULL)		    // out of memory
-	    return FAIL;
+	എങ്കിൽ (ffname == ശൂന്യ)		    // out of memory
+	    തിരികെ FAIL;
 
 	/*
 	 * If the file name is already used in another buffer:
@@ -3630,48 +3630,48 @@ setfname(
 	 * - if the buffer is not loaded, delete it from the list
 	 */
 #ifdef UNIX
-	if (mch_stat((char *)ffname, &st) < 0)
+	എങ്കിൽ (mch_stat((അക്ഷരം *)ffname, &st) < 0)
 	    st.st_dev = (dev_T)-1;
 #endif
-	if (!(buf->b_flags & BF_DUMMY))
+	എങ്കിൽ (!(buf->b_flags & BF_DUMMY))
 #ifdef UNIX
 	    obuf = buflist_findname_stat(ffname, &st);
-#else
+#അല്ലെങ്കിൽ
 	    obuf = buflist_findname(ffname);
 #endif
-	if (obuf != NULL && obuf != buf)
+	എങ്കിൽ (obuf != ശൂന്യ && obuf != buf)
 	{
 	    win_T	*win;
 	    tabpage_T   *tab;
-	    int		in_use = FALSE;
+	    പൂർണ്ണസംഖ്യ		in_use = FALSE;
 
 	    // during startup a window may use a buffer that is not loaded yet
 	    FOR_ALL_TAB_WINDOWS(tab, win)
-		if (win->w_buffer == obuf)
+		എങ്കിൽ (win->w_buffer == obuf)
 		    in_use = TRUE;
 
 	    // it's loaded or used in a window, fail
-	    if (obuf->b_ml.ml_mfp != NULL || in_use)
+	    എങ്കിൽ (obuf->b_ml.ml_mfp != ശൂന്യ || in_use)
 	    {
-		if (message)
+		എങ്കിൽ (message)
 		    emsg(_(e_buffer_with_this_name_already_exists));
 		vim_free(ffname);
-		return FAIL;
+		തിരികെ FAIL;
 	    }
 	    // delete from the list
-	    close_buffer(NULL, obuf, DOBUF_WIPE, FALSE, FALSE, FALSE);
+	    close_buffer(ശൂന്യ, obuf, DOBUF_WIPE, FALSE, FALSE, FALSE);
 	}
 	sfname = vim_strsave(sfname);
-	if (ffname == NULL || sfname == NULL)
+	എങ്കിൽ (ffname == ശൂന്യ || sfname == ശൂന്യ)
 	{
 	    vim_free(sfname);
 	    vim_free(ffname);
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
 #ifdef USE_FNAME_CASE
 	fname_case(sfname, 0);    // set correct case for short file name
 #endif
-	if (buf->b_sfname != buf->b_ffname)
+	എങ്കിൽ (buf->b_sfname != buf->b_ffname)
 	    vim_free(buf->b_sfname);
 	vim_free(buf->b_ffname);
 	buf->b_ffname = ffname;
@@ -3679,9 +3679,9 @@ setfname(
     }
     buf->b_fname = buf->b_sfname;
 #ifdef UNIX
-    if (st.st_dev == (dev_T)-1)
+    എങ്കിൽ (st.st_dev == (dev_T)-1)
 	buf->b_dev_valid = false;
-    else
+    അല്ലെങ്കിൽ
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
@@ -3692,27 +3692,27 @@ setfname(
     buf->b_shortname = false;
 
     buf_name_changed(buf);
-    return OK;
+    തിരികെ OK;
 }
 
 /*
  * Crude way of changing the name of a buffer.  Use with care!
  * The name should be relative to the current directory.
  */
-    void
-buf_set_name(int fnum, char_u *name)
+    ശൂന്യം
+buf_set_name(പൂർണ്ണസംഖ്യ fnum, char_u *name)
 {
     buf_T	*buf;
 
     buf = buflist_findnr(fnum);
-    if (buf == NULL)
-	return;
+    എങ്കിൽ (buf == ശൂന്യ)
+	തിരികെ;
 
-    if (buf->b_sfname != buf->b_ffname)
+    എങ്കിൽ (buf->b_sfname != buf->b_ffname)
 	vim_free(buf->b_sfname);
     vim_free(buf->b_ffname);
     buf->b_ffname = vim_strsave(name);
-    buf->b_sfname = NULL;
+    buf->b_sfname = ശൂന്യ;
     // Allocate ffname and expand into full path.  Also resolves .lnk
     // files on Win32.
     fname_expand(buf, &buf->b_ffname, &buf->b_sfname);
@@ -3723,21 +3723,21 @@ buf_set_name(int fnum, char_u *name)
  * Take care of what needs to be done when the name of buffer "buf" has
  * changed.
  */
-    void
+    ശൂന്യം
 buf_name_changed(buf_T *buf)
 {
     /*
      * If the file name changed, also change the name of the swapfile
      */
-    if (buf->b_ml.ml_mfp != NULL)
+    എങ്കിൽ (buf->b_ml.ml_mfp != ശൂന്യ)
 	ml_setname(buf);
 
 #ifdef FEAT_TERMINAL
-    if (buf->b_term != NULL)
+    എങ്കിൽ (buf->b_term != ശൂന്യ)
 	term_clear_status_text(buf->b_term);
 #endif
 
-    if (curwin->w_buffer == buf)
+    എങ്കിൽ (curwin->w_buffer == buf)
 	check_arg_idx(curwin);	// check file name for arg list
     maketitle();		// set window title
     status_redraw_all();	// status lines need to be redrawn
@@ -3761,9 +3761,9 @@ setaltfname(
 
     // Create a buffer.  'buflisted' is not set if it's a new buffer
     buf = buflist_new(ffname, sfname, lnum, 0);
-    if (buf != NULL && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+    എങ്കിൽ (buf != ശൂന്യ && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	curwin->w_alt_fnum = buf->b_fnum;
-    return buf;
+    തിരികെ buf;
 }
 
 /*
@@ -3772,18 +3772,18 @@ setaltfname(
  */
     char_u  *
 getaltfname(
-    int		errmsg)		// give error message
+    പൂർണ്ണസംഖ്യ		errmsg)		// give error message
 {
     char_u	*fname;
     linenr_T	dummy;
 
-    if (buflist_name_nr(0, &fname, &dummy) == FAIL)
+    എങ്കിൽ (buflist_name_nr(0, &fname, &dummy) == FAIL)
     {
-	if (errmsg)
+	എങ്കിൽ (errmsg)
 	    emsg(_(e_no_alternate_file));
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
-    return fname;
+    തിരികെ fname;
 }
 
 /*
@@ -3792,31 +3792,31 @@ getaltfname(
  *
  * used by qf_init(), main() and doarglist()
  */
-    int
-buflist_add(char_u *fname, int flags)
+    പൂർണ്ണസംഖ്യ
+buflist_add(char_u *fname, പൂർണ്ണസംഖ്യ flags)
 {
     buf_T	*buf;
 
-    buf = buflist_new(fname, NULL, (linenr_T)0, flags);
-    if (buf != NULL)
-	return buf->b_fnum;
-    return 0;
+    buf = buflist_new(fname, ശൂന്യ, (linenr_T)0, flags);
+    എങ്കിൽ (buf != ശൂന്യ)
+	തിരികെ buf->b_fnum;
+    തിരികെ 0;
 }
 
-#if defined(BACKSLASH_IN_FILENAME)
+#എങ്കിൽ defined(BACKSLASH_IN_FILENAME)
 /*
  * Adjust slashes in file names.  Called after 'shellslash' was set.
  */
-    void
-buflist_slash_adjust(void)
+    ശൂന്യം
+buflist_slash_adjust(ശൂന്യം)
 {
     buf_T	*bp;
 
     FOR_ALL_BUFFERS(bp)
     {
-	if (bp->b_ffname != NULL)
+	എങ്കിൽ (bp->b_ffname != ശൂന്യ)
 	    slash_adjust(bp->b_ffname);
-	if (bp->b_sfname != NULL)
+	എങ്കിൽ (bp->b_sfname != ശൂന്യ)
 	    slash_adjust(bp->b_sfname);
     }
 }
@@ -3826,7 +3826,7 @@ buflist_slash_adjust(void)
  * Set alternate cursor position for the current buffer and window "win".
  * Also save the local window option values.
  */
-    void
+    ശൂന്യം
 buflist_altfpos(win_T *win)
 {
     buflist_setfpos(curbuf, win, win->w_cursor.lnum, win->w_cursor.col, TRUE);
@@ -3836,17 +3836,17 @@ buflist_altfpos(win_T *win)
  * Return TRUE if 'ffname' is not the same file as current file.
  * Fname must have a full path (expanded by mch_FullName()).
  */
-    int
+    പൂർണ്ണസംഖ്യ
 otherfile(char_u *ffname)
 {
-    return otherfile_buf(curbuf, ffname
+    തിരികെ otherfile_buf(curbuf, ffname
 #ifdef UNIX
-	    , NULL
+	    , ശൂന്യ
 #endif
 	    );
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 otherfile_buf(
     buf_T		*buf,
     char_u		*ffname
@@ -3856,18 +3856,18 @@ otherfile_buf(
     )
 {
     // no name is different
-    if (ffname == NULL || *ffname == NUL || buf->b_ffname == NULL)
-	return TRUE;
-    if (fnamecmp(ffname, buf->b_ffname) == 0)
-	return FALSE;
+    എങ്കിൽ (ffname == ശൂന്യ || *ffname == NUL || buf->b_ffname == ശൂന്യ)
+	തിരികെ TRUE;
+    എങ്കിൽ (fnamecmp(ffname, buf->b_ffname) == 0)
+	തിരികെ FALSE;
 #ifdef UNIX
     {
 	stat_T	    st;
 
 	// If no stat_T given, get it now
-	if (stp == NULL)
+	എങ്കിൽ (stp == ശൂന്യ)
 	{
-	    if (!buf->b_dev_valid || mch_stat((char *)ffname, &st) < 0)
+	    എങ്കിൽ (!buf->b_dev_valid || mch_stat((അക്ഷരം *)ffname, &st) < 0)
 		st.st_dev = (dev_T)-1;
 	    stp = &st;
 	}
@@ -3880,46 +3880,46 @@ otherfile_buf(
 	// dev/ino again when they appear to match, but not when they appear
 	// to be different: Could skip a buffer when it's actually the same
 	// file.
-	if (buf_same_ino(buf, stp))
+	എങ്കിൽ (buf_same_ino(buf, stp))
 	{
 	    buf_setino(buf);
-	    if (buf_same_ino(buf, stp))
-		return FALSE;
+	    എങ്കിൽ (buf_same_ino(buf, stp))
+		തിരികെ FALSE;
 	}
     }
 #endif
-    return TRUE;
+    തിരികെ TRUE;
 }
 
-#if defined(UNIX)
+#എങ്കിൽ defined(UNIX)
 /*
  * Set inode and device number for a buffer.
  * Must always be called when b_fname is changed!.
  */
-    void
+    ശൂന്യം
 buf_setino(buf_T *buf)
 {
     stat_T	st;
 
-    if (buf->b_fname != NULL && mch_stat((char *)buf->b_fname, &st) >= 0)
+    എങ്കിൽ (buf->b_fname != ശൂന്യ && mch_stat((അക്ഷരം *)buf->b_fname, &st) >= 0)
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
 	buf->b_ino = st.st_ino;
     }
-    else
+    അല്ലെങ്കിൽ
 	buf->b_dev_valid = false;
 }
 
 /*
  * Return TRUE if dev/ino in buffer "buf" matches with "stp".
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 buf_same_ino(
     buf_T	*buf,
     stat_T	*stp)
 {
-    return (buf->b_dev_valid
+    തിരികെ (buf->b_dev_valid
 	    && stp->st_dev == buf->b_dev
 	    && stp->st_ino == buf->b_ino);
 }
@@ -3928,37 +3928,37 @@ buf_same_ino(
 /*
  * Print info about the current buffer.
  */
-    void
+    ശൂന്യം
 fileinfo(
-    int fullname,	    // when non-zero print full path
-    int shorthelp,
-    int	dont_truncate)
+    പൂർണ്ണസംഖ്യ fullname,	    // when non-zero print full path
+    പൂർണ്ണസംഖ്യ shorthelp,
+    പൂർണ്ണസംഖ്യ	dont_truncate)
 {
     char_u	*name;
-    char	*buffer;
+    അക്ഷരം	*buffer;
     size_t	bufferlen = 0;
 
     buffer = alloc(IOSIZE);
-    if (buffer == NULL)
-	return;
+    എങ്കിൽ (buffer == ശൂന്യ)
+	തിരികെ;
 
-    if (fullname > 1)	    // 2 CTRL-G: include buffer number
+    എങ്കിൽ (fullname > 1)	    // 2 CTRL-G: include buffer number
 	bufferlen = vim_snprintf_safelen(buffer, IOSIZE, "buf %d: ", curbuf->b_fnum);
 
     buffer[bufferlen++] = '"';
 
     name = buf_spname(curbuf);
-    if (name != NULL)
+    എങ്കിൽ (name != ശൂന്യ)
 	bufferlen += vim_snprintf_safelen(buffer + bufferlen,
 	    IOSIZE - bufferlen, "%s", name);
-    else
+    അല്ലെങ്കിൽ
     {
-	if (!fullname && curbuf->b_fname != NULL)
+	എങ്കിൽ (!fullname && curbuf->b_fname != ശൂന്യ)
 	    name = curbuf->b_fname;
-	else
+	അല്ലെങ്കിൽ
 	    name = curbuf->b_ffname;
-	bufferlen += home_replace(shorthelp ? curbuf : NULL, name,
-	    (char_u *)buffer + bufferlen, IOSIZE - (int)bufferlen, TRUE);
+	bufferlen += home_replace(shorthelp ? curbuf : ശൂന്യ, name,
+	    (char_u *)buffer + bufferlen, IOSIZE - (പൂർണ്ണസംഖ്യ)bufferlen, TRUE);
     }
 
     bufferlen += vim_snprintf_safelen(
@@ -3976,126 +3976,126 @@ fileinfo(
 	(curbufIsChanged() || (curbuf->b_flags & BF_WRITE_MASK) || curbuf->b_p_ro)
 	    ? " " : "");
 
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    എങ്കിൽ (curbuf->b_ml.ml_flags & ML_EMPTY)
 	bufferlen += vim_snprintf_safelen(buffer + bufferlen,
-	    IOSIZE - bufferlen, "%s", _(no_lines_msg));
-    else if (p_ru)
+	    IOSIZE - bufferlen, "%s", _(no_വരികൾ_സന്ദേശം));
+    അല്ലെങ്കിൽ എങ്കിൽ (p_ru)
 	// Current line and column are already on the screen -- webb
 	bufferlen += vim_snprintf_safelen(
 	    buffer + bufferlen,
 	    IOSIZE - bufferlen,
-	    NGETTEXT("%ld line --%d%%--", "%ld lines --%d%%--", curbuf->b_ml.ml_line_count),
-	    (long)curbuf->b_ml.ml_line_count,
-	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_line_count));
-    else
+	    NGETTEXT("%ld line --%d%%--", "%ld lines --%d%%--", curbuf->b_ml.ml_വരി_എണ്ണം),
+	    (long)curbuf->b_ml.ml_വരി_എണ്ണം,
+	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_വരി_എണ്ണം));
+    അല്ലെങ്കിൽ
     {
 	bufferlen += vim_snprintf_safelen(
 	    buffer + bufferlen,
 	    IOSIZE - bufferlen,
 	    _("line %ld of %ld --%d%%-- col "),
 	    (long)curwin->w_cursor.lnum,
-	    (long)curbuf->b_ml.ml_line_count,
-	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_line_count));
+	    (long)curbuf->b_ml.ml_വരി_എണ്ണം,
+	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_വരി_എണ്ണം));
 
 	validate_virtcol();
 	bufferlen += col_print((char_u *)buffer + bufferlen, IOSIZE - bufferlen,
-		   (int)curwin->w_cursor.col + 1, (int)curwin->w_virtcol + 1);
+		   (പൂർണ്ണസംഖ്യ)curwin->w_cursor.col + 1, (പൂർണ്ണസംഖ്യ)curwin->w_virtcol + 1);
     }
 
-    (void)append_arg_number(curwin, (char_u *)buffer + bufferlen,
+    (ശൂന്യം)append_arg_സംഖ്യ(curwin, (char_u *)buffer + bufferlen,
 	IOSIZE - bufferlen, !shortmess(SHM_FILE));
 
-    if (dont_truncate)
+    എങ്കിൽ (dont_truncate)
     {
-	int	n;
+	പൂർണ്ണസംഖ്യ	n;
 
 	// Temporarily set msg_scroll to avoid the message being truncated.
 	// First call msg_start() to get the message in the right place.
-	msg_start();
-	n = msg_scroll;
-	msg_scroll = TRUE;
-	msg(buffer);
-	msg_scroll = n;
+	സന്ദേശം_start();
+	n = സന്ദേശം_scroll;
+	സന്ദേശം_scroll = TRUE;
+	സന്ദേശം(buffer);
+	സന്ദേശം_scroll = n;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	char	*p = msg_trunc_attr(buffer, FALSE, 0);
-	if (restart_edit != 0 || (msg_scrolled && !need_wait_return))
+	അക്ഷരം	*p = സന്ദേശം_trunc_attr(buffer, FALSE, 0);
+	എങ്കിൽ (restart_edit != 0 || (സന്ദേശം_scrolled && !need_wait_return))
 	    // Need to repeat the message after redrawing when:
 	    // - When restart_edit is set (otherwise there will be a delay
 	    //   before redrawing).
 	    // - When the screen was scrolled but there is no wait-return
 	    //   prompt.
-	    set_keep_msg((char_u *)p, 0);
+	    set_keep_സന്ദേശം((char_u *)p, 0);
     }
 
     vim_free(buffer);
 }
 
-    int
+    പൂർണ്ണസംഖ്യ
 col_print(
     char_u  *buf,
     size_t  buflen,
-    int	    col,
-    int	    vcol)
+    പൂർണ്ണസംഖ്യ	    col,
+    പൂർണ്ണസംഖ്യ	    vcol)
 {
-    if (col == vcol)
-	return (int)vim_snprintf_safelen((char *)buf, buflen, "%d", col);
+    എങ്കിൽ (col == vcol)
+	തിരികെ (പൂർണ്ണസംഖ്യ)vim_snprintf_safelen((അക്ഷരം *)buf, buflen, "%d", col);
 
-    return (int)vim_snprintf_safelen((char *)buf, buflen, "%d-%d", col, vcol);
+    തിരികെ (പൂർണ്ണസംഖ്യ)vim_snprintf_safelen((അക്ഷരം *)buf, buflen, "%d-%d", col, vcol);
 }
 
-static char_u *lasttitle = NULL;
-static char_u *lasticon = NULL;
+സ്ഥിതം char_u *lasttitle = ശൂന്യ;
+സ്ഥിതം char_u *lasticon = ശൂന്യ;
 
 /*
  * Put the file name in the title bar and icon of the window.
  */
-    void
-maketitle(void)
+    ശൂന്യം
+maketitle(ശൂന്യം)
 {
-    char_u	*title_str = NULL;
-    char_u	*icon_str = NULL;
-    int		mustset;
+    char_u	*title_str = ശൂന്യ;
+    char_u	*icon_str = ശൂന്യ;
+    പൂർണ്ണസംഖ്യ		mustset;
     char_u	buf[IOSIZE];
     size_t	buflen = 0;
 
-    if (!redrawing())
+    എങ്കിൽ (!redrawing())
     {
 	// Postpone updating the title when 'lazyredraw' is set.
 	need_maketitle = TRUE;
-	return;
+	തിരികെ;
     }
 
     need_maketitle = FALSE;
-    if (!p_title && !p_icon && lasttitle == NULL && lasticon == NULL)
-	return;  // nothing to do
+    എങ്കിൽ (!p_title && !p_icon && lasttitle == ശൂന്യ && lasticon == ശൂന്യ)
+	തിരികെ;  // nothing to do
 
-    if (p_title)
+    എങ്കിൽ (p_title)
     {
-	int maxlen = 0;
+	പൂർണ്ണസംഖ്യ maxlen = 0;
 
-	if (p_titlelen > 0)
+	എങ്കിൽ (p_titlelen > 0)
 	{
 	    maxlen = p_titlelen * Columns / 100;
-	    if (maxlen < 10)
+	    എങ്കിൽ (maxlen < 10)
 		maxlen = 10;
 	}
 
 	title_str = buf;
-	if (*p_titlestring != NUL)
+	എങ്കിൽ (*p_titlestring != NUL)
 	{
 #ifdef FEAT_STL_OPT
-	    if (stl_syntax & STL_IN_TITLE)
-		build_stl_str_hl(curwin, title_str, sizeof(buf), p_titlestring,
+	    എങ്കിൽ (stl_syntax & STL_IN_TITLE)
+		build_stl_str_hl(curwin, title_str, വലുപ്പം(buf), p_titlestring,
 				    (char_u *)"titlestring", 0,
-				    0, maxlen, NULL, NULL, NULL);
-	    else
+				    0, maxlen, ശൂന്യ, ശൂന്യ, ശൂന്യ);
+	    അല്ലെങ്കിൽ
 #endif
 		title_str = p_titlestring;
 	    buflen = STRLEN(title_str);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    char_u  *p;
 
@@ -4106,25 +4106,25 @@ maketitle(void)
 	    // reserve some space for different parts of the title.
 	    // use sizeof() to introduce 'size_t' so we don't have to
 	    // cast sizes to it.
-#define SPACE_FOR_FNAME (sizeof(buf) - 100)
-#define SPACE_FOR_DIR   (sizeof(buf) - 20)
-#define SPACE_FOR_ARGNR (sizeof(buf) - 10)  // at least room for " - VIM"
+#define SPACE_FOR_FNAME (വലുപ്പം(buf) - 100)
+#define SPACE_FOR_DIR   (വലുപ്പം(buf) - 20)
+#define SPACE_FOR_ARGNR (വലുപ്പം(buf) - 10)  // at least room for " - VIM"
 
 	    // file name
-	    if (curbuf->b_fname == NULL)
-		buflen = vim_snprintf_safelen((char *)buf,
+	    എങ്കിൽ (curbuf->b_fname == ശൂന്യ)
+		buflen = vim_snprintf_safelen((അക്ഷരം *)buf,
 		    SPACE_FOR_FNAME, "%s", _("[No Name]"));
 #ifdef FEAT_TERMINAL
-	    else if (curbuf->b_term != NULL)
-		buflen = vim_snprintf_safelen((char *)buf,
+	    അല്ലെങ്കിൽ എങ്കിൽ (curbuf->b_term != ശൂന്യ)
+		buflen = vim_snprintf_safelen((അക്ഷരം *)buf,
 		    SPACE_FOR_FNAME, "%s",
 		    term_get_status_text(curbuf->b_term));
 #endif
-	    else
+	    അല്ലെങ്കിൽ
 	    {
-		buflen = vim_snprintf_safelen((char *)buf,
+		buflen = vim_snprintf_safelen((അക്ഷരം *)buf,
 		    SPACE_FOR_FNAME, "%s",
-		    ((p = transstr(gettail(curbuf->b_fname))) != NULL)
+		    ((p = transstr(gettail(curbuf->b_fname))) != ശൂന്യ)
 			? p
 			: (char_u *)"");
 		vim_free(p);
@@ -4132,165 +4132,165 @@ maketitle(void)
 
 	    // flags
 #ifdef FEAT_TERMINAL
-	    if (curbuf->b_term == NULL)
+	    എങ്കിൽ (curbuf->b_term == ശൂന്യ)
 #endif
 	    {
-		switch (bufIsChanged(curbuf)
+		തിരഞ്ഞെടുപ്പ് (bufIsChanged(curbuf)
 			+ (curbuf->b_p_ro * 2)
 			+ (!curbuf->b_p_ma * 4))
 		{
-		    case 1:
+		    അവസ്ഥ 1:
 			// file was modified
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " +");
-			break;
-		    case 2:
+			    (അക്ഷരം *)buf + buflen,
+			    വലുപ്പം(buf) - buflen, " +");
+			നിർത്തുക;
+		    അവസ്ഥ 2:
 			// file is readonly
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " =");
-			break;
-		    case 3:
+			    (അക്ഷരം *)buf + buflen,
+			    വലുപ്പം(buf) - buflen, " =");
+			നിർത്തുക;
+		    അവസ്ഥ 3:
 			// file was modified and is readonly
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " =+");
-			break;
-		    case 4:
-		    case 6:
+			    (അക്ഷരം *)buf + buflen,
+			    വലുപ്പം(buf) - buflen, " =+");
+			നിർത്തുക;
+		    അവസ്ഥ 4:
+		    അവസ്ഥ 6:
 			// file cannot be modified
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " -");
-			break;
-		    case 5:
-		    case 7:
+			    (അക്ഷരം *)buf + buflen,
+			    വലുപ്പം(buf) - buflen, " -");
+			നിർത്തുക;
+		    അവസ്ഥ 5:
+		    അവസ്ഥ 7:
 			// file cannot be modified but was modified
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " -+");
-			break;
-		    default:
-			break;
+			    (അക്ഷരം *)buf + buflen,
+			    വലുപ്പം(buf) - buflen, " -+");
+			നിർത്തുക;
+		    സ്ഥിരസ്ഥിതി:
+			നിർത്തുക;
 		}
 	    }
 
 	    // path (surrounded by '()')
-	    if (curbuf->b_fname != NULL
+	    എങ്കിൽ (curbuf->b_fname != ശൂന്യ
 #ifdef FEAT_TERMINAL
-		    && curbuf->b_term == NULL
+		    && curbuf->b_term == ശൂന്യ
 #endif
 		    )
 	    {
 		// Get path of file, replace home dir with ~
-		buflen += vim_snprintf_safelen((char *)buf + buflen,
-		    sizeof(buf) - buflen, " (");
+		buflen += vim_snprintf_safelen((അക്ഷരം *)buf + buflen,
+		    വലുപ്പം(buf) - buflen, " (");
 
 		home_replace(curbuf, curbuf->b_ffname,
-		    buf + buflen, (int)(SPACE_FOR_DIR - buflen), TRUE);
+		    buf + buflen, (പൂർണ്ണസംഖ്യ)(SPACE_FOR_DIR - buflen), TRUE);
 
 #ifdef BACKSLASH_IN_FILENAME
 		// avoid "c:/name" to be reduced to "c"
-		if (SAFE_isalpha(buf[buflen]) && buf[buflen + 1] == ':')
+		എങ്കിൽ (SAFE_isalpha(buf[buflen]) && buf[buflen + 1] == ':')
 		    buflen += 2;			// step over "c:"
 #endif
 
 		// determine if we have a help or normal buffer
 		p = gettail_sep(buf + buflen);
-		if (p == buf + buflen)
+		എങ്കിൽ (p == buf + buflen)
 		{
 		    // help buffer
-		    buflen += vim_snprintf_safelen((char *)buf + buflen,
+		    buflen += vim_snprintf_safelen((അക്ഷരം *)buf + buflen,
 			SPACE_FOR_DIR - buflen, "%s)", _("help"));
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
 		    // normal buffer
 
 		    // Translate unprintable chars and concatenate.  Keep some
 		    // room for the server name.  When there is no room (very long
 		    // file name) use (...).
-		    if (buflen < SPACE_FOR_DIR)
+		    എങ്കിൽ (buflen < SPACE_FOR_DIR)
 		    {
 			// remove the file name
 			*p = NUL;
 
-			buflen += vim_snprintf_safelen((char *)buf + buflen,
+			buflen += vim_snprintf_safelen((അക്ഷരം *)buf + buflen,
 			    SPACE_FOR_DIR - buflen, "%s)",
-			    ((p = transstr(buf + buflen)) != NULL)
+			    ((p = transstr(buf + buflen)) != ശൂന്യ)
 				? p
 				: (char_u *)"");
 			vim_free(p);
 		    }
-		    else
-			buflen += vim_snprintf_safelen((char *)buf + buflen,
+		    അല്ലെങ്കിൽ
+			buflen += vim_snprintf_safelen((അക്ഷരം *)buf + buflen,
 			    SPACE_FOR_ARGNR - buflen, "...)");
 		}
 	    }
 
 	    // argument info
-	    buflen += append_arg_number(curwin, buf + buflen,
+	    buflen += append_arg_സംഖ്യ(curwin, buf + buflen,
 		SPACE_FOR_ARGNR - buflen, FALSE);
 
 	    // servername
-	    buflen += vim_snprintf_safelen((char *)buf + buflen,
-		sizeof(buf) - buflen, " - %s",
-#if defined(FEAT_CLIENTSERVER)
-		(serverName != NULL)
+	    buflen += vim_snprintf_safelen((അക്ഷരം *)buf + buflen,
+		വലുപ്പം(buf) - buflen, " - %s",
+#എങ്കിൽ defined(FEAT_CLIENTSERVER)
+		(serverName != ശൂന്യ)
 		    ? serverName :
 #endif
 		    (char_u *)"VIM");
 
-	    if (maxlen > 0)
+	    എങ്കിൽ (maxlen > 0)
 	    {
 		// make it shorter by removing a bit in the middle
-		if (vim_strsize(buf) > maxlen)
-		    trunc_string(buf, buf, maxlen, sizeof(buf));
+		എങ്കിൽ (vim_strsize(buf) > maxlen)
+		    trunc_string(buf, buf, maxlen, വലുപ്പം(buf));
 	    }
 	}
     }
-    mustset = value_changed(title_str, &lasttitle);
+    mustset = മൂല്യം_changed(title_str, &lasttitle);
 
-    if (p_icon)
+    എങ്കിൽ (p_icon)
     {
 	icon_str = buf;
-	if (*p_iconstring != NUL)
+	എങ്കിൽ (*p_iconstring != NUL)
 	{
 #ifdef FEAT_STL_OPT
-	    if (stl_syntax & STL_IN_ICON)
-		build_stl_str_hl(curwin, icon_str, sizeof(buf), p_iconstring,
-				 (char_u *)"iconstring", 0, 0, 0, NULL, NULL,
-				 NULL);
-	    else
+	    എങ്കിൽ (stl_syntax & STL_IN_ICON)
+		build_stl_str_hl(curwin, icon_str, വലുപ്പം(buf), p_iconstring,
+				 (char_u *)"iconstring", 0, 0, 0, ശൂന്യ, ശൂന്യ,
+				 ശൂന്യ);
+	    അല്ലെങ്കിൽ
 #endif
 		icon_str = p_iconstring;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    char_u  *name;
-	    int	    namelen;
+	    പൂർണ്ണസംഖ്യ	    namelen;
 
 	    name = buf_spname(curbuf);
-	    if (name == NULL)
+	    എങ്കിൽ (name == ശൂന്യ)
 		name = gettail(curbuf->b_ffname);
 	    // Truncate name at 100 bytes.
-	    namelen = (int)STRLEN(name);
-	    if (namelen > 100)
+	    namelen = (പൂർണ്ണസംഖ്യ)STRLEN(name);
+	    എങ്കിൽ (namelen > 100)
 	    {
 		namelen -= 100;
-		if (has_mbyte)
+		എങ്കിൽ (has_mbyte)
 		    namelen += (*mb_tail_off)(name, name + namelen) + 1;
 		name += namelen;
 	    }
 	    STRCPY(buf, name);
-	    trans_characters(buf, sizeof(buf));
+	    trans_characters(buf, വലുപ്പം(buf));
 	}
     }
 
-    mustset |= value_changed(icon_str, &lasticon);
+    mustset |= മൂല്യം_changed(icon_str, &lasticon);
 
-    if (mustset)
+    എങ്കിൽ (mustset)
 	resettitle();
 }
 
@@ -4299,40 +4299,40 @@ maketitle(void)
  * from "str" if it does.
  * Return TRUE if resettitle() is to be called.
  */
-    static int
-value_changed(char_u *str, char_u **last)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+മൂല്യം_changed(char_u *str, char_u **last)
 {
-    if ((str == NULL) != (*last == NULL)
-	    || (str != NULL && *last != NULL && STRCMP(str, *last) != 0))
+    എങ്കിൽ ((str == ശൂന്യ) != (*last == ശൂന്യ)
+	    || (str != ശൂന്യ && *last != ശൂന്യ && STRCMP(str, *last) != 0))
     {
 	vim_free(*last);
-	if (str == NULL)
+	എങ്കിൽ (str == ശൂന്യ)
 	{
-	    *last = NULL;
+	    *last = ശൂന്യ;
 	    mch_restore_title(
 		  last == &lasttitle ? SAVE_RESTORE_TITLE : SAVE_RESTORE_ICON);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    *last = vim_strsave(str);
-	    return TRUE;
+	    തിരികെ TRUE;
 	}
     }
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
  * Put current window title back (used after calling a shell)
  */
-    void
-resettitle(void)
+    ശൂന്യം
+resettitle(ശൂന്യം)
 {
     mch_settitle(lasttitle, lasticon);
 }
 
-#if defined(EXITFREE)
-    void
-free_titles(void)
+#എങ്കിൽ defined(EXITFREE)
+    ശൂന്യം
+free_titles(ശൂന്യം)
 {
     vim_free(lasttitle);
     vim_free(lasticon);
@@ -4340,17 +4340,17 @@ free_titles(void)
 #endif
 
 
-#if defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
+#എങ്കിൽ defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
 
 /*
  * Used for building in the status line.
  */
-typedef struct
+തരനിർവചനം ഘടന
 {
     char_u	*stl_start;
-    int		stl_minwid;
-    int		stl_maxwid;
-    enum {
+    പൂർണ്ണസംഖ്യ		stl_minwid;
+    പൂർണ്ണസംഖ്യ		stl_maxwid;
+    എണ്ണൽ {
 	Normal,
 	Empty,
 	Group,
@@ -4363,13 +4363,13 @@ typedef struct
     char_u	*stl_clickfunc;	// function name for ClickFunc items
 } stl_item_T;
 
-static size_t		stl_items_len = 20; // Initial value, grows as needed.
-static stl_item_T      *stl_items = NULL;
-static int	       *stl_groupitem = NULL;
-static stl_hlrec_T     *stl_hltab = NULL;
-static stl_hlrec_T     *stl_tabtab = NULL;
-static stl_clickrec_T  *stl_clicktab = NULL;
-static int		*stl_separator_locations = NULL;
+സ്ഥിതം size_t		stl_ഇനങ്ങൾ_len = 20; // Initial value, grows as needed.
+സ്ഥിതം stl_item_T      *stl_ഇനങ്ങൾ = ശൂന്യ;
+സ്ഥിതം പൂർണ്ണസംഖ്യ	       *stl_groupitem = ശൂന്യ;
+സ്ഥിതം stl_hlrec_T     *stl_hltab = ശൂന്യ;
+സ്ഥിതം stl_hlrec_T     *stl_tabtab = ശൂന്യ;
+സ്ഥിതം stl_clickrec_T  *stl_clicktab = ശൂന്യ;
+സ്ഥിതം പൂർണ്ണസംഖ്യ		*stl_separator_locations = ശൂന്യ;
 
 /*
  * Build a string from the status line items in "fmt".
@@ -4385,77 +4385,77 @@ static int		*stl_separator_locations = NULL;
  * If maxwidth is not zero, the string will be filled at any middle marker
  * or truncated if too long, fillchar is used for all whitespace.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 build_stl_str_hl(
     win_T	*wp,
     char_u	*out,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	*fmt,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    പൂർണ്ണസംഖ്യ		opt_scope,	// scope for "opt_name"
+    പൂർണ്ണസംഖ്യ		fillchar,
+    പൂർണ്ണസംഖ്യ		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab)	// return: click func regions (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_SINGLE, wp, out, outlen, &fmt,
+    തിരികെ build_stl_str_hl_local(STL_MODE_SINGLE, wp, out, outlen, &fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
-	    NULL, NULL);
+	    ശൂന്യ, ശൂന്യ);
 }
 
-    int
+    പൂർണ്ണസംഖ്യ
 build_stl_str_hl_mline(
     win_T	*wp,
     char_u	*out,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	**fmt,		// (in/out)
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    പൂർണ്ണസംഖ്യ		opt_scope,	// scope for "opt_name"
+    പൂർണ്ണസംഖ്യ		fillchar,
+    പൂർണ്ണസംഖ്യ		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    പൂർണ്ണസംഖ്യ		*carry_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_MULTI, wp, out, outlen, fmt,
+    തിരികെ build_stl_str_hl_local(STL_MODE_MULTI, wp, out, outlen, fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
-	    NULL, carry_hl);
+	    ശൂന്യ, carry_hl);
 }
 
 # ifdef ENABLE_STL_MODE_MULTI_NL
-    int
+    പൂർണ്ണസംഖ്യ
 build_stl_str_hl_mline_nl(
     win_T	*wp,
     char_u	*out,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	**fmt,		// (in/out)
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    പൂർണ്ണസംഖ്യ		opt_scope,	// scope for "opt_name"
+    പൂർണ്ണസംഖ്യ		fillchar,
+    പൂർണ്ണസംഖ്യ		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    പൂർണ്ണസംഖ്യ		*carry_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_MULTI_NL, wp, out, outlen, fmt,
+    തിരികെ build_stl_str_hl_local(STL_MODE_MULTI_NL, wp, out, outlen, fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
-	    NULL, carry_hl);
+	    ശൂന്യ, carry_hl);
 }
 # endif
 
-    int
+    പൂർണ്ണസംഖ്യ
 get_stl_rendered_height(
     win_T	*wp,
     char_u	*fmt,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope)	// scope for "opt_name"
+    പൂർണ്ണസംഖ്യ		opt_scope)	// scope for "opt_name"
 {
-    int rendered_height = 0;
+    പൂർണ്ണസംഖ്യ rendered_height = 0;
     char_u	buf[MAXPATHL] = {0};
 
     // Suppress errors while computing height: expressions (%!expr, %{expr})
@@ -4463,12 +4463,12 @@ get_stl_rendered_height(
     // effects.  Any errors (e.g. E48 in sandbox) will surface properly when
     // the statusline is actually drawn.
     ++emsg_off;
-    (void)build_stl_str_hl_local(STL_MODE_GET_RENDERED_HEIGHT,
-	    wp, buf, sizeof(buf), &fmt,
-	    opt_name, opt_scope, 0, 0, NULL, NULL, NULL, &rendered_height,
-	    NULL);
+    (ശൂന്യം)build_stl_str_hl_local(STL_MODE_GET_RENDERED_HEIGHT,
+	    wp, buf, വലുപ്പം(buf), &fmt,
+	    opt_name, opt_scope, 0, 0, ശൂന്യ, ശൂന്യ, ശൂന്യ, &rendered_height,
+	    ശൂന്യ);
     --emsg_off;
-    return rendered_height;
+    തിരികെ rendered_height;
 }
 
 /*
@@ -4488,7 +4488,7 @@ get_stl_rendered_height(
  * Therefore, layout decisions must be based on the fully evaluated statusline
  * string, not on pre-evaluation parsing.
  */
-static int
+സ്ഥിതം പൂർണ്ണസംഖ്യ
 build_stl_str_hl_local(
     stl_mode_T	mode,
     win_T	*wp,
@@ -4496,14 +4496,14 @@ build_stl_str_hl_local(
     size_t	outlen,		// length of out[]
     char_u	**fmt_arg,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    പൂർണ്ണസംഖ്യ		opt_scope,	// scope for "opt_name"
+    പൂർണ്ണസംഖ്യ		fillchar,
+    പൂർണ്ണസംഖ്യ		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*rendered_height,   // return: stl rendered height (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    പൂർണ്ണസംഖ്യ		*rendered_height,   // return: stl rendered height (can be NULL)
+    പൂർണ്ണസംഖ്യ		*carry_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
     linenr_T	lnum;
@@ -4511,30 +4511,30 @@ build_stl_str_hl_local(
     size_t	outputlen;	// length of out[] used (excluding the NUL)
     char_u	*p;
     char_u	*s;
-    int		byteval;
+    പൂർണ്ണസംഖ്യ		byteval;
 # ifdef FEAT_EVAL
-    int		use_sandbox;
-    int		save_VIsual_active;
+    പൂർണ്ണസംഖ്യ		use_sandbox;
+    പൂർണ്ണസംഖ്യ		save_VIsual_active;
 # endif
-    int		empty_line;
+    പൂർണ്ണസംഖ്യ		empty_വരി;
     long	l;
     long	n;
-    int		prevchar_isflag;
-    int		prevchar_isitem;
-    int		itemisflag;
-    int		fillable;
+    പൂർണ്ണസംഖ്യ		prevchar_isflag;
+    പൂർണ്ണസംഖ്യ		prevchar_isitem;
+    പൂർണ്ണസംഖ്യ		itemisflag;
+    പൂർണ്ണസംഖ്യ		fillable;
     char_u	*str;
-    long	num;
-    int		width;
-    int		itemcnt;
-    int		curitem;
-    int		groupdepth;
+    long	അക്കം;
+    പൂർണ്ണസംഖ്യ		width;
+    പൂർണ്ണസംഖ്യ		itemcnt;
+    പൂർണ്ണസംഖ്യ		curitem;
+    പൂർണ്ണസംഖ്യ		groupdepth;
 # ifdef FEAT_EVAL
-    int		evaldepth;
+    പൂർണ്ണസംഖ്യ		evaldepth;
 # endif
-    int		minwid;
-    int		maxwid;
-    int		zeropad;
+    പൂർണ്ണസംഖ്യ		minwid;
+    പൂർണ്ണസംഖ്യ		maxwid;
+    പൂർണ്ണസംഖ്യ		zeropad;
     char_u	base;
     char_u	opt;
 # define TMPLEN 70
@@ -4542,32 +4542,32 @@ build_stl_str_hl_local(
     char_u	*fmt = *fmt_arg;
     char_u	*usefmt = fmt;
     stl_hlrec_T *sp;
-    int		save_redraw_not_allowed = redraw_not_allowed;
-    int		save_KeyTyped = KeyTyped;
+    പൂർണ്ണസംഖ്യ		save_redraw_not_allowed = redraw_not_allowed;
+    പൂർണ്ണസംഖ്യ		save_താക്കോൽ_Typed = താക്കോൽ_Typed;
     // TODO: find out why using called_emsg_before makes tests fail, does it
     // matter?
     // int	called_emsg_before = called_emsg;
-    int		did_emsg_before = did_emsg;
-    int		rheight = 1;	// stl rendered height
+    പൂർണ്ണസംഖ്യ		did_emsg_before = did_emsg;
+    പൂർണ്ണസംഖ്യ		rheight = 1;	// stl rendered height
 
     // When inside update_screen() we do not want redrawing a statusline,
     // ruler, title, etc. to trigger another redraw, it may cause an endless
     // loop.
-    if (updating_screen)
+    എങ്കിൽ (updating_screen)
 	redraw_not_allowed = TRUE;
 
-    if (stl_items == NULL)
+    എങ്കിൽ (stl_ഇനങ്ങൾ == ശൂന്യ)
     {
-	stl_items = ALLOC_MULT(stl_item_T, stl_items_len);
-	stl_groupitem = ALLOC_MULT(int, stl_items_len);
+	stl_ഇനങ്ങൾ = ALLOC_MULT(stl_item_T, stl_ഇനങ്ങൾ_len);
+	stl_groupitem = ALLOC_MULT(പൂർണ്ണസംഖ്യ, stl_ഇനങ്ങൾ_len);
 
 	// Allocate one more, because the last element is used to indicate the
 	// end of the list.
-	stl_hltab  = ALLOC_MULT(stl_hlrec_T, stl_items_len + 1);
-	stl_tabtab = ALLOC_MULT(stl_hlrec_T, stl_items_len + 1);
-	stl_clicktab = ALLOC_MULT(stl_clickrec_T, stl_items_len + 1);
+	stl_hltab  = ALLOC_MULT(stl_hlrec_T, stl_ഇനങ്ങൾ_len + 1);
+	stl_tabtab = ALLOC_MULT(stl_hlrec_T, stl_ഇനങ്ങൾ_len + 1);
+	stl_clicktab = ALLOC_MULT(stl_clickrec_T, stl_ഇനങ്ങൾ_len + 1);
 
-	stl_separator_locations = ALLOC_MULT(int, stl_items_len);
+	stl_separator_locations = ALLOC_MULT(പൂർണ്ണസംഖ്യ, stl_ഇനങ്ങൾ_len);
     }
 
 # ifdef FEAT_EVAL
@@ -4576,43 +4576,43 @@ build_stl_str_hl_local(
 
     // When the format starts with "%!" then evaluate it as an expression and
     // use the result as the actual format string.
-    if (fmt[0] == '%' && fmt[1] == '!')
+    എങ്കിൽ (fmt[0] == '%' && fmt[1] == '!')
     {
 	typval_T	tv;
 
-	tv.v_type = VAR_NUMBER;
-	tv.vval.v_number = wp->w_id;
+	tv.v_type = VAR_സംഖ്യ;
+	tv.vval.v_സംഖ്യ = wp->w_id;
 	set_var((char_u *)"g:statusline_winid", &tv, FALSE);
 
 	usefmt = eval_to_string_safe(fmt + 2, use_sandbox, FALSE, FALSE);
-	if (usefmt == NULL)
+	എങ്കിൽ (usefmt == ശൂന്യ)
 	    usefmt = fmt;
 
 	do_unlet((char_u *)"g:statusline_winid", TRUE);
     }
 # endif
 
-    if (fillchar == 0)
+    എങ്കിൽ (fillchar == 0)
 	fillchar = ' ';
 
     // The cursor in windows other than the current one isn't always
     // up-to-date, esp. because of autocommands and timers.
     lnum = wp->w_cursor.lnum;
-    if (lnum > wp->w_buffer->b_ml.ml_line_count)
+    എങ്കിൽ (lnum > wp->w_buffer->b_ml.ml_വരി_എണ്ണം)
     {
-	lnum = wp->w_buffer->b_ml.ml_line_count;
+	lnum = wp->w_buffer->b_ml.ml_വരി_എണ്ണം;
 	wp->w_cursor.lnum = lnum;
     }
 
     // Get line & check if empty (cursorpos will show "0-1").  Note that
     // p will become invalid when getting another buffer line.
     p = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    empty_line = (*p == NUL);
+    empty_വരി = (*p == NUL);
 
     // Get the byte value now, in case we need it below. This is more efficient
     // than making a copy of the line.
     len = ml_get_buf_len(wp->w_buffer, lnum);
-    if (wp->w_cursor.col > len)
+    എങ്കിൽ (wp->w_cursor.col > len)
     {
 	// Line may have changed since checking the cursor column, or the lnum
 	// was adjusted above.
@@ -4620,7 +4620,7 @@ build_stl_str_hl_local(
 	wp->w_cursor.coladd = 0;
 	byteval = 0;
     }
-    else
+    അല്ലെങ്കിൽ
 	byteval = (*mb_ptr2char)(p + wp->w_cursor.col);
 
     groupdepth = 0;
@@ -4632,80 +4632,80 @@ build_stl_str_hl_local(
 
     // Pre-insert a Highlight item from carry_hl so that %# / %* set on a
     // previous multi-line statusline row continues to apply on this row.
-    if (carry_hl != NULL && *carry_hl != 0)
+    എങ്കിൽ (carry_hl != ശൂന്യ && *carry_hl != 0)
     {
-	stl_items[curitem].stl_type = Highlight;
-	stl_items[curitem].stl_start = p;
-	stl_items[curitem].stl_minwid = *carry_hl;
-	stl_items[curitem].stl_clickfunc = NULL;
+	stl_ഇനങ്ങൾ[curitem].stl_type = Highlight;
+	stl_ഇനങ്ങൾ[curitem].stl_start = p;
+	stl_ഇനങ്ങൾ[curitem].stl_minwid = *carry_hl;
+	stl_ഇനങ്ങൾ[curitem].stl_clickfunc = ശൂന്യ;
 	curitem++;
     }
 
     prevchar_isflag = TRUE;
     prevchar_isitem = FALSE;
-    for (s = usefmt; *s != NUL; )
+    വേണ്ടി (s = usefmt; *s != NUL; )
     {
-	if (curitem == (int)stl_items_len)
+	എങ്കിൽ (curitem == (പൂർണ്ണസംഖ്യ)stl_ഇനങ്ങൾ_len)
 	{
-	    size_t	new_len = stl_items_len * 3 / 2;
+	    size_t	new_len = stl_ഇനങ്ങൾ_len * 3 / 2;
 
-	    stl_item_T *new_items =
-			  vim_realloc(stl_items, sizeof(stl_item_T) * new_len);
-	    if (new_items == NULL)
-		break;
-	    stl_items = new_items;
+	    stl_item_T *new_ഇനങ്ങൾ =
+			  vim_realloc(stl_ഇനങ്ങൾ, വലുപ്പം(stl_item_T) * new_len);
+	    എങ്കിൽ (new_ഇനങ്ങൾ == ശൂന്യ)
+		നിർത്തുക;
+	    stl_ഇനങ്ങൾ = new_ഇനങ്ങൾ;
 
-	    int *new_groupitem =
-			     vim_realloc(stl_groupitem, sizeof(int) * new_len);
-	    if (new_groupitem == NULL)
-		break;
+	    പൂർണ്ണസംഖ്യ *new_groupitem =
+			     vim_realloc(stl_groupitem, വലുപ്പം(പൂർണ്ണസംഖ്യ) * new_len);
+	    എങ്കിൽ (new_groupitem == ശൂന്യ)
+		നിർത്തുക;
 	    stl_groupitem = new_groupitem;
 
 	    stl_hlrec_T	*new_hlrec = vim_realloc(stl_hltab,
-					  sizeof(stl_hlrec_T) * (new_len + 1));
-	    if (new_hlrec == NULL)
-		break;
+					  വലുപ്പം(stl_hlrec_T) * (new_len + 1));
+	    എങ്കിൽ (new_hlrec == ശൂന്യ)
+		നിർത്തുക;
 	    stl_hltab = new_hlrec;
 	    new_hlrec = vim_realloc(stl_tabtab,
-					  sizeof(stl_hlrec_T) * (new_len + 1));
-	    if (new_hlrec == NULL)
-		break;
+					  വലുപ്പം(stl_hlrec_T) * (new_len + 1));
+	    എങ്കിൽ (new_hlrec == ശൂന്യ)
+		നിർത്തുക;
 	    stl_tabtab = new_hlrec;
 
 	    stl_clickrec_T *new_clickrec = vim_realloc(stl_clicktab,
-				      sizeof(stl_clickrec_T) * (new_len + 1));
-	    if (new_clickrec == NULL)
-		break;
+				      വലുപ്പം(stl_clickrec_T) * (new_len + 1));
+	    എങ്കിൽ (new_clickrec == ശൂന്യ)
+		നിർത്തുക;
 	    stl_clicktab = new_clickrec;
 
-	    int *new_separator_locs = vim_realloc(stl_separator_locations,
-					    sizeof(int) * new_len);
-	    if (new_separator_locs == NULL)
-		break;
+	    പൂർണ്ണസംഖ്യ *new_separator_locs = vim_realloc(stl_separator_locations,
+					    വലുപ്പം(പൂർണ്ണസംഖ്യ) * new_len);
+	    എങ്കിൽ (new_separator_locs == ശൂന്യ)
+		നിർത്തുക;
 	    stl_separator_locations = new_separator_locs;
 
-	    stl_items_len = new_len;
+	    stl_ഇനങ്ങൾ_len = new_len;
 	}
 
-	stl_items[curitem].stl_clickfunc = NULL;
+	stl_ഇനങ്ങൾ[curitem].stl_clickfunc = ശൂന്യ;
 
-	if (*s != '%')
+	എങ്കിൽ (*s != '%')
 	    prevchar_isflag = prevchar_isitem = FALSE;
 
 	/*
 	 * Handle up to the next '%' or the end.
 	 */
-	while (*s != NUL && *s != '%' && p + 1 < out + outlen)
+	ആകുമ്പോൾ (*s != NUL && *s != '%' && p + 1 < out + outlen)
 # ifdef ENABLE_STL_MODE_MULTI_NL
 	{
-	    if (*s == '\n' || *s == '\r')
+	    എങ്കിൽ (*s == '\n' || *s == '\r')
 	    {
-		if (mode == STL_MODE_MULTI_NL)
+		എങ്കിൽ (mode == STL_MODE_MULTI_NL)
 		{
 		    s++;
-		    goto find_linebreak;
+		    പോകുക find_linebreak;
 		}
-		else if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+		അല്ലെങ്കിൽ എങ്കിൽ (mode == STL_MODE_GET_RENDERED_HEIGHT)
 		    rheight++;
 	    }
 # endif
@@ -4713,154 +4713,154 @@ build_stl_str_hl_local(
 # ifdef ENABLE_STL_MODE_MULTI_NL
 	}
 # endif
-	if (*s == NUL || p + 1 >= out + outlen)
-	    break;
+	എങ്കിൽ (*s == NUL || p + 1 >= out + outlen)
+	    നിർത്തുക;
 
 	/*
 	 * Handle one '%' item.
 	 */
 	s++;
-	if (*s == NUL)  // ignore trailing %
-	    break;
+	എങ്കിൽ (*s == NUL)  // ignore trailing %
+	    നിർത്തുക;
 
-	if (*s == STL_CLICKFUNC)
+	എങ്കിൽ (*s == STL_CLICKFUNC)
 	{
 	    // %[] - end click region
-	    if (s[1] == ']')
+	    എങ്കിൽ (s[1] == ']')
 	    {
-		stl_items[curitem].stl_type = ClickFunc;
-		stl_items[curitem].stl_start = p;
-		stl_items[curitem].stl_minwid = 0;
-		stl_items[curitem].stl_clickfunc = NULL;
+		stl_ഇനങ്ങൾ[curitem].stl_type = ClickFunc;
+		stl_ഇനങ്ങൾ[curitem].stl_start = p;
+		stl_ഇനങ്ങൾ[curitem].stl_minwid = 0;
+		stl_ഇനങ്ങൾ[curitem].stl_clickfunc = ശൂന്യ;
 		s += 2;
 		curitem++;
-		continue;
+		തുടരുക;
 	    }
 	    // %[FuncName] - start click region
-	    if (ASCII_ISALPHA(s[1]) || s[1] == '_')
+	    എങ്കിൽ (ASCII_ISALPHA(s[1]) || s[1] == '_')
 	    {
 		char_u *rb = vim_strchr(s + 1, ']');
-		if (rb != NULL)
+		എങ്കിൽ (rb != ശൂന്യ)
 		{
-		    stl_items[curitem].stl_type = ClickFunc;
-		    stl_items[curitem].stl_start = p;
-		    stl_items[curitem].stl_minwid = 0;
-		    stl_items[curitem].stl_clickfunc =
+		    stl_ഇനങ്ങൾ[curitem].stl_type = ClickFunc;
+		    stl_ഇനങ്ങൾ[curitem].stl_start = p;
+		    stl_ഇനങ്ങൾ[curitem].stl_minwid = 0;
+		    stl_ഇനങ്ങൾ[curitem].stl_clickfunc =
 					  vim_strnsave(s + 1, rb - s - 1);
 		    s = rb + 1;
 		    curitem++;
-		    continue;
+		    തുടരുക;
 		}
 	    }
 	}
-	if (*s == STL_LINEBREAK)
+	എങ്കിൽ (*s == STL_LINEBREAK)
 	{
 	    // Plain %@ - line break
-	    if (mode == STL_MODE_MULTI
+	    എങ്കിൽ (mode == STL_MODE_MULTI
 # ifdef ENABLE_STL_MODE_MULTI_NL
 		    || mode == STL_MODE_MULTI_NL
 # endif
 	       )
 	    {
 		s++;
-		break;
+		നിർത്തുക;
 	    }
-	    else if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+	    അല്ലെങ്കിൽ എങ്കിൽ (mode == STL_MODE_GET_RENDERED_HEIGHT)
 		rheight++;
 	}
-	if (*s == '%')
+	എങ്കിൽ (*s == '%')
 	{
-	    if (p + 1 >= out + outlen)
-		break;
+	    എങ്കിൽ (p + 1 >= out + outlen)
+		നിർത്തുക;
 	    *p++ = *s++;
 	    prevchar_isflag = prevchar_isitem = FALSE;
-	    continue;
+	    തുടരുക;
 	}
 	// STL_SEPARATE: Separation between items, filled with white space.
-	if (*s == STL_SEPARATE)
+	എങ്കിൽ (*s == STL_SEPARATE)
 	{
 	    s++;
-	    if (groupdepth > 0)
-		continue;
-	    stl_items[curitem].stl_type = Separate;
-	    stl_items[curitem++].stl_start = p;
-	    continue;
+	    എങ്കിൽ (groupdepth > 0)
+		തുടരുക;
+	    stl_ഇനങ്ങൾ[curitem].stl_type = Separate;
+	    stl_ഇനങ്ങൾ[curitem++].stl_start = p;
+	    തുടരുക;
 	}
-	if (*s == STL_TRUNCMARK)
+	എങ്കിൽ (*s == STL_TRUNCMARK)
 	{
 	    s++;
-	    stl_items[curitem].stl_type = Trunc;
-	    stl_items[curitem++].stl_start = p;
-	    continue;
+	    stl_ഇനങ്ങൾ[curitem].stl_type = Trunc;
+	    stl_ഇനങ്ങൾ[curitem++].stl_start = p;
+	    തുടരുക;
 	}
-	if (*s == ')')
+	എങ്കിൽ (*s == ')')
 	{
 	    char_u  *t;
 
 	    s++;
-	    if (groupdepth < 1)
-		continue;
+	    എങ്കിൽ (groupdepth < 1)
+		തുടരുക;
 	    groupdepth--;
 
-	    t = stl_items[stl_groupitem[groupdepth]].stl_start;
+	    t = stl_ഇനങ്ങൾ[stl_groupitem[groupdepth]].stl_start;
 	    *p = NUL;
 	    l = vim_strsize(t);
-	    if (curitem > stl_groupitem[groupdepth] + 1
-		    && stl_items[stl_groupitem[groupdepth]].stl_minwid == 0)
+	    എങ്കിൽ (curitem > stl_groupitem[groupdepth] + 1
+		    && stl_ഇനങ്ങൾ[stl_groupitem[groupdepth]].stl_minwid == 0)
 	    {
-		int group_start_userhl = 0;
-		int group_end_userhl = 0;
+		പൂർണ്ണസംഖ്യ group_start_userhl = 0;
+		പൂർണ്ണസംഖ്യ group_end_userhl = 0;
 
 		// remove group if all items are empty and highlight group
 		// doesn't change
-		for (n = stl_groupitem[groupdepth] - 1; n >= 0; n--)
+		വേണ്ടി (n = stl_groupitem[groupdepth] - 1; n >= 0; n--)
 		{
-		    if (stl_items[n].stl_type == Highlight)
+		    എങ്കിൽ (stl_ഇനങ്ങൾ[n].stl_type == Highlight)
 		    {
 			group_start_userhl = group_end_userhl =
-						       stl_items[n].stl_minwid;
-			break;
+						       stl_ഇനങ്ങൾ[n].stl_minwid;
+			നിർത്തുക;
 		    }
 		}
-		for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+		വേണ്ടി (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
 		{
-		    if (stl_items[n].stl_type == Normal)
-			break;
-		    if (stl_items[n].stl_type == Highlight)
-			group_end_userhl = stl_items[n].stl_minwid;
+		    എങ്കിൽ (stl_ഇനങ്ങൾ[n].stl_type == Normal)
+			നിർത്തുക;
+		    എങ്കിൽ (stl_ഇനങ്ങൾ[n].stl_type == Highlight)
+			group_end_userhl = stl_ഇനങ്ങൾ[n].stl_minwid;
 		}
-		if (n == curitem && group_start_userhl == group_end_userhl)
+		എങ്കിൽ (n == curitem && group_start_userhl == group_end_userhl)
 		{
 		    // empty group
 		    p = t;
 		    l = 0;
-		    for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+		    വേണ്ടി (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
 		    {
 			// do not use the highlighting from the removed group
-			if (stl_items[n].stl_type == Highlight)
-			    stl_items[n].stl_type = Empty;
+			എങ്കിൽ (stl_ഇനങ്ങൾ[n].stl_type == Highlight)
+			    stl_ഇനങ്ങൾ[n].stl_type = Empty;
 			// adjust the start position of TabPage to the next
 			// item position
-			if (stl_items[n].stl_type == TabPage)
-			    stl_items[n].stl_start = p;
+			എങ്കിൽ (stl_ഇനങ്ങൾ[n].stl_type == TabPage)
+			    stl_ഇനങ്ങൾ[n].stl_start = p;
 		    }
 		}
 	    }
-	    if (l > stl_items[stl_groupitem[groupdepth]].stl_maxwid)
+	    എങ്കിൽ (l > stl_ഇനങ്ങൾ[stl_groupitem[groupdepth]].stl_maxwid)
 	    {
 		// truncate, remove n bytes of text at the start
-		if (has_mbyte)
+		എങ്കിൽ (has_mbyte)
 		{
 		    // Find the first character that should be included.
 		    n = 0;
-		    while (l >= stl_items[stl_groupitem[groupdepth]].stl_maxwid)
+		    ആകുമ്പോൾ (l >= stl_ഇനങ്ങൾ[stl_groupitem[groupdepth]].stl_maxwid)
 		    {
 			l -= ptr2cells(t + n);
 			n += (*mb_ptr2len)(t + n);
 		    }
 		}
-		else
-		    n = (long)(p - t) - stl_items[stl_groupitem[groupdepth]]
+		അല്ലെങ്കിൽ
+		    n = (long)(p - t) - stl_ഇനങ്ങൾ[stl_groupitem[groupdepth]]
 							       .stl_maxwid + 1;
 
 		*t = '<';
@@ -4868,148 +4868,148 @@ build_stl_str_hl_local(
 		p = p - n + 1;
 
 		// Fill up space left over by half a double-wide char.
-		int minwid_fixed = MIN(stl_items[stl_groupitem[groupdepth]].stl_minwid,
-				       stl_items[stl_groupitem[groupdepth]].stl_maxwid);
-		while (++l < minwid_fixed)
+		പൂർണ്ണസംഖ്യ minwid_fixed = MIN(stl_ഇനങ്ങൾ[stl_groupitem[groupdepth]].stl_minwid,
+				       stl_ഇനങ്ങൾ[stl_groupitem[groupdepth]].stl_maxwid);
+		ആകുമ്പോൾ (++l < minwid_fixed)
 		    MB_CHAR2BYTES(fillchar, p);
 
 		// correct the start of the items for the truncation
-		for (l = stl_groupitem[groupdepth] + 1; l < curitem; l++)
+		വേണ്ടി (l = stl_groupitem[groupdepth] + 1; l < curitem; l++)
 		{
 		    // Minus one for the leading '<' added above.
-		    stl_items[l].stl_start -= n - 1;
-		    if (stl_items[l].stl_start < t)
-			stl_items[l].stl_start = t;
+		    stl_ഇനങ്ങൾ[l].stl_start -= n - 1;
+		    എങ്കിൽ (stl_ഇനങ്ങൾ[l].stl_start < t)
+			stl_ഇനങ്ങൾ[l].stl_start = t;
 		}
 	    }
-	    else if (abs(stl_items[stl_groupitem[groupdepth]].stl_minwid) > l)
+	    അല്ലെങ്കിൽ എങ്കിൽ (abs(stl_ഇനങ്ങൾ[stl_groupitem[groupdepth]].stl_minwid) > l)
 	    {
 		// fill
-		n = stl_items[stl_groupitem[groupdepth]].stl_minwid;
-		int fillchar_len = MB_CHAR2LEN(fillchar);
-		if (n < 0)
+		n = stl_ഇനങ്ങൾ[stl_groupitem[groupdepth]].stl_minwid;
+		പൂർണ്ണസംഖ്യ fillchar_len = MB_CHAR2LEN(fillchar);
+		എങ്കിൽ (n < 0)
 		{
 		    // fill by appending characters
 		    n = 0 - n;
-		    while (l++ < n && p + fillchar_len < out + outlen)
+		    ആകുമ്പോൾ (l++ < n && p + fillchar_len < out + outlen)
 			MB_CHAR2BYTES(fillchar, p);
 		}
-		else
+		അല്ലെങ്കിൽ
 		{
 		    // fill by inserting characters
 		    n = n - l;
 		    l = n * fillchar_len;
-		    if (p + l >= out + outlen)
+		    എങ്കിൽ (p + l >= out + outlen)
 		    {
 			n = (long)((out + outlen) - p - 1) / fillchar_len;
 			l = n * fillchar_len;
 		    }
 		    mch_memmove(t + l, t, (size_t)(p - t));
 		    p += l;
-		    for ( ; n > 0; n--)
+		    വേണ്ടി ( ; n > 0; n--)
 			MB_CHAR2BYTES(fillchar, t);
-		    for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
-			stl_items[n].stl_start += l;
+		    വേണ്ടി (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+			stl_ഇനങ്ങൾ[n].stl_start += l;
 		}
 	    }
-	    continue;
+	    തുടരുക;
 	}
 	minwid = 0;
 	maxwid = 9999;
 	zeropad = FALSE;
 	l = 1;
-	if (*s == '0')
+	എങ്കിൽ (*s == '0')
 	{
 	    s++;
 	    zeropad = TRUE;
 	}
-	if (*s == '-')
+	എങ്കിൽ (*s == '-')
 	{
 	    s++;
 	    l = -1;
 	}
-	if (VIM_ISDIGIT(*s))
+	എങ്കിൽ (VIM_ISDIGIT(*s))
 	{
-	    minwid = (int)getdigits(&s);
-	    if (minwid < 0)	// overflow
+	    minwid = (പൂർണ്ണസംഖ്യ)getdigits(&s);
+	    എങ്കിൽ (minwid < 0)	// overflow
 		minwid = 0;
 	}
-	if (*s == STL_USER_HL)
+	എങ്കിൽ (*s == STL_USER_HL)
 	{
-	    stl_items[curitem].stl_type = Highlight;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid > 9 ? 1 : minwid;
+	    stl_ഇനങ്ങൾ[curitem].stl_type = Highlight;
+	    stl_ഇനങ്ങൾ[curitem].stl_start = p;
+	    stl_ഇനങ്ങൾ[curitem].stl_minwid = minwid > 9 ? 1 : minwid;
 	    s++;
 	    curitem++;
-	    continue;
+	    തുടരുക;
 	}
-	if (*s == STL_TABPAGENR || *s == STL_TABCLOSENR)
+	എങ്കിൽ (*s == STL_TABPAGENR || *s == STL_TABCLOSENR)
 	{
-	    if (*s == STL_TABCLOSENR)
+	    എങ്കിൽ (*s == STL_TABCLOSENR)
 	    {
-		if (minwid == 0)
+		എങ്കിൽ (minwid == 0)
 		{
 		    // %X ends the close label, go back to the previously
 		    // define tab label nr.
-		    for (n = curitem - 1; n >= 0; --n)
-			if (stl_items[n].stl_type == TabPage
-					       && stl_items[n].stl_minwid >= 0)
+		    വേണ്ടി (n = curitem - 1; n >= 0; --n)
+			എങ്കിൽ (stl_ഇനങ്ങൾ[n].stl_type == TabPage
+					       && stl_ഇനങ്ങൾ[n].stl_minwid >= 0)
 			{
-			    minwid = stl_items[n].stl_minwid;
-			    break;
+			    minwid = stl_ഇനങ്ങൾ[n].stl_minwid;
+			    നിർത്തുക;
 			}
 		}
-		else
+		അല്ലെങ്കിൽ
 		    // close nrs are stored as negative values
 		    minwid = - minwid;
 	    }
-	    stl_items[curitem].stl_type = TabPage;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid;
+	    stl_ഇനങ്ങൾ[curitem].stl_type = TabPage;
+	    stl_ഇനങ്ങൾ[curitem].stl_start = p;
+	    stl_ഇനങ്ങൾ[curitem].stl_minwid = minwid;
 	    s++;
 	    curitem++;
-	    continue;
+	    തുടരുക;
 	}
-	if (*s == '.')
+	എങ്കിൽ (*s == '.')
 	{
 	    s++;
-	    if (VIM_ISDIGIT(*s))
+	    എങ്കിൽ (VIM_ISDIGIT(*s))
 	    {
-		maxwid = (int)getdigits(&s);
-		if (maxwid <= 0)	// overflow
+		maxwid = (പൂർണ്ണസംഖ്യ)getdigits(&s);
+		എങ്കിൽ (maxwid <= 0)	// overflow
 		    maxwid = 50;
 	    }
 	}
 	// Keep the uncapped value for %N[FuncName] click-region IDs; the 50
 	// cap below applies only when minwid is used as a padding width.
-	int raw_minwid = minwid * l;
+	പൂർണ്ണസംഖ്യ raw_minwid = minwid * l;
 	minwid = (minwid > 50 ? 50 : minwid) * l;
-	if (*s == '(')
+	എങ്കിൽ (*s == '(')
 	{
 	    stl_groupitem[groupdepth++] = curitem;
-	    stl_items[curitem].stl_type = Group;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid;
-	    stl_items[curitem].stl_maxwid = maxwid;
+	    stl_ഇനങ്ങൾ[curitem].stl_type = Group;
+	    stl_ഇനങ്ങൾ[curitem].stl_start = p;
+	    stl_ഇനങ്ങൾ[curitem].stl_minwid = minwid;
+	    stl_ഇനങ്ങൾ[curitem].stl_maxwid = maxwid;
 	    s++;
 	    curitem++;
-	    continue;
+	    തുടരുക;
 	}
 # ifdef FEAT_EVAL
 	// Denotes end of expanded %{} block
-	if (*s == '}' && evaldepth > 0)
+	എങ്കിൽ (*s == '}' && evaldepth > 0)
 	{
 	    s++;
 	    evaldepth--;
-	    continue;
+	    തുടരുക;
 	}
 # endif
-	if (vim_strchr(STL_ALL, *s) == NULL)
+	എങ്കിൽ (vim_strchr(STL_ALL, *s) == ശൂന്യ)
 	{
-	    if (*s == NUL)  // can happen with "%0"
-		break;
+	    എങ്കിൽ (*s == NUL)  // can happen with "%0"
+		നിർത്തുക;
 	    s++;
-	    continue;
+	    തുടരുക;
 	}
 	opt = *s++;
 
@@ -5017,65 +5017,65 @@ build_stl_str_hl_local(
 	base = 'D';
 	itemisflag = FALSE;
 	fillable = TRUE;
-	num = -1;
-	str = NULL;
-	switch (opt)
+	അക്കം = -1;
+	str = ശൂന്യ;
+	തിരഞ്ഞെടുപ്പ് (opt)
 	{
-	case STL_FILEPATH:
-	case STL_FULLPATH:
-	case STL_FILENAME:
+	അവസ്ഥ STL_FILEPATH:
+	അവസ്ഥ STL_FULLPATH:
+	അവസ്ഥ STL_FILENAME:
 	{
 	    char_u  *name;
 
 	    fillable = FALSE;	// don't change ' ' to fillchar
 	    name = buf_spname(wp->w_buffer);
-	    if (name != NULL)
+	    എങ്കിൽ (name != ശൂന്യ)
 		vim_strncpy(NameBuff, name, MAXPATHL - 1);
-	    else
+	    അല്ലെങ്കിൽ
 	    {
 		char_u	*t = (opt == STL_FULLPATH) ? wp->w_buffer->b_ffname
 					  : wp->w_buffer->b_fname;
 		home_replace(wp->w_buffer, t, NameBuff, MAXPATHL, TRUE);
 	    }
 	    trans_characters(NameBuff, MAXPATHL);
-	    if (opt != STL_FILENAME)
+	    എങ്കിൽ (opt != STL_FILENAME)
 		str = NameBuff;
-	    else
+	    അല്ലെങ്കിൽ
 		str = gettail(NameBuff);
-	    break;
+	    നിർത്തുക;
 	}
 
-	case STL_VIM_EXPR: // '{'
+	അവസ്ഥ STL_VIM_വ്യഞ്ജകം: // '{'
 	{
 # ifdef FEAT_EVAL
 	    char_u  *block_start = s - 1;
 # endif
-	    int	    reevaluate = (*s == '%');
+	    പൂർണ്ണസംഖ്യ	    reevaluate = (*s == '%');
 	    char_u  *t;
 	    buf_T   *save_curbuf;
 	    win_T   *save_curwin;
 
-	    if (reevaluate)
+	    എങ്കിൽ (reevaluate)
 		s++;
 	    // %0{} keeps the result verbatim
 	    itemisflag = zeropad ? FALSE : TRUE;
 	    t = p;
-	    while ((*s != '}' || (reevaluate && s[-1] != '%'))
+	    ആകുമ്പോൾ ((*s != '}' || (reevaluate && s[-1] != '%'))
 					  && *s != NUL && p + 1 < out + outlen)
 		*p++ = *s++;
-	    if (*s != '}')	// missing '}' or out of space
-		break;
+	    എങ്കിൽ (*s != '}')	// missing '}' or out of space
+		നിർത്തുക;
 	    s++;
-	    if (reevaluate && p > out)
+	    എങ്കിൽ (reevaluate && p > out)
 		p[-1] = NUL; // remove the % at the end of %{% expr %}
-	    else
+	    അല്ലെങ്കിൽ
 		*p = NUL;
 	    p = t;
 # ifdef FEAT_EVAL
-	    vim_snprintf((char *)buf_tmp, sizeof(buf_tmp),
+	    vim_snprintf((അക്ഷരം *)buf_tmp, വലുപ്പം(buf_tmp),
 							 "%d", curbuf->b_fnum);
 	    set_internal_string_var((char_u *)"g:actual_curbuf", buf_tmp);
-	    vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), "%d", curwin->w_id);
+	    vim_snprintf((അക്ഷരം *)buf_tmp, വലുപ്പം(buf_tmp), "%d", curwin->w_id);
 	    set_internal_string_var((char_u *)"g:actual_curwin", buf_tmp);
 
 	    save_curbuf = curbuf;
@@ -5084,7 +5084,7 @@ build_stl_str_hl_local(
 	    curwin = wp;
 	    curbuf = wp->w_buffer;
 	    // Visual mode is only valid in the current window.
-	    if (curwin != save_curwin)
+	    എങ്കിൽ (curwin != save_curwin)
 		VIsual_active = FALSE;
 
 	    str = eval_to_string_safe(p, use_sandbox, FALSE, FALSE);
@@ -5095,11 +5095,11 @@ build_stl_str_hl_local(
 	    do_unlet((char_u *)"g:actual_curbuf", TRUE);
 	    do_unlet((char_u *)"g:actual_curwin", TRUE);
 
-	    if (!zeropad && str != NULL && *str != NUL)
+	    എങ്കിൽ (!zeropad && str != ശൂന്യ && *str != NUL)
 	    {
-		if (*skipdigits(str) == NUL)
+		എങ്കിൽ (*skipdigits(str) == NUL)
 		{
-		    num = atoi((char *)str);
+		    അക്കം = atoi((അക്ഷരം *)str);
 		    VIM_CLEAR(str);
 		    itemisflag = FALSE;
 		}
@@ -5107,18 +5107,18 @@ build_stl_str_hl_local(
 
 	    // If the output of the expression needs to be evaluated
 	    // replace the %{} block with the result of evaluation
-	    if (reevaluate && str != NULL && *str != NUL
-		    && strchr((const char *)str, '%') != NULL
+	    എങ്കിൽ (reevaluate && str != ശൂന്യ && *str != NUL
+		    && strchr((സ്ഥിരം അക്ഷരം *)str, '%') != ശൂന്യ
 		    && evaldepth < MAX_STL_EVAL_DEPTH)
 	    {
 		size_t parsed_usefmt = (size_t)(block_start - usefmt);
-		size_t str_length = strlen((const char *)str);
-		size_t fmt_length = strlen((const char *)s);
+		size_t str_length = strlen((സ്ഥിരം അക്ഷരം *)str);
+		size_t fmt_length = strlen((സ്ഥിരം അക്ഷരം *)s);
 		size_t new_fmt_len = parsed_usefmt
 						 + str_length + fmt_length + 3;
-		char_u *new_fmt = (char_u *)alloc(new_fmt_len * sizeof(char_u));
+		char_u *new_fmt = (char_u *)alloc(new_fmt_len * വലുപ്പം(char_u));
 
-		if (new_fmt != NULL)
+		എങ്കിൽ (new_fmt != ശൂന്യ)
 		{
 		    char_u *new_fmt_p = new_fmt;
 
@@ -5130,347 +5130,347 @@ build_stl_str_hl_local(
 		    new_fmt_p = (char_u *)memcpy(new_fmt_p , s, fmt_length)
 								      + fmt_length;
 		    *new_fmt_p = 0;
-		    new_fmt_p = NULL;
+		    new_fmt_p = ശൂന്യ;
 
-		    if (usefmt != fmt)
+		    എങ്കിൽ (usefmt != fmt)
 			vim_free(usefmt);
 		    VIM_CLEAR(str);
 		    usefmt = new_fmt;
 		    s = usefmt + parsed_usefmt;
 		    evaldepth++;
-		    continue;
+		    തുടരുക;
 		}
 	    }
 # endif
-	    break;
+	    നിർത്തുക;
 	}
-	case STL_LINE:
-	    num = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY)
+	അവസ്ഥ STL_വരി:
+	    അക്കം = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY)
 		  ? 0L : (long)(wp->w_cursor.lnum);
-	    break;
+	    നിർത്തുക;
 
-	case STL_NUMLINES:
-	    num = wp->w_buffer->b_ml.ml_line_count;
-	    break;
+	അവസ്ഥ STL_NUMLINES:
+	    അക്കം = wp->w_buffer->b_ml.ml_വരി_എണ്ണം;
+	    നിർത്തുക;
 
-	case STL_COLUMN:
-	    num = (State & MODE_INSERT) == 0 && empty_line
-					       ? 0 : (int)wp->w_cursor.col + 1;
-	    break;
+	അവസ്ഥ STL_COLUMN:
+	    അക്കം = (State & MODE_തിരുകുക) == 0 && empty_വരി
+					       ? 0 : (പൂർണ്ണസംഖ്യ)wp->w_cursor.col + 1;
+	    നിർത്തുക;
 
-	case STL_VIRTCOL:
-	case STL_VIRTCOL_ALT:
+	അവസ്ഥ STL_VIRTCOL:
+	അവസ്ഥ STL_VIRTCOL_ALT:
 	{
 	    colnr_T virtcol = wp->w_virtcol + 1;
 
 	    // Don't display %V if it's the same as %c.
-	    if (opt == STL_VIRTCOL_ALT
-		    && (virtcol == (colnr_T)((State & MODE_INSERT) == 0
-			       && empty_line ? 0 : (int)wp->w_cursor.col + 1)))
-		break;
-	    num = (long)virtcol;
-	    break;
+	    എങ്കിൽ (opt == STL_VIRTCOL_ALT
+		    && (virtcol == (colnr_T)((State & MODE_തിരുകുക) == 0
+			       && empty_വരി ? 0 : (പൂർണ്ണസംഖ്യ)wp->w_cursor.col + 1)))
+		നിർത്തുക;
+	    അക്കം = (long)virtcol;
+	    നിർത്തുക;
 	}
 
-	case STL_PERCENTAGE:
-	    num = calc_percentage((long)wp->w_cursor.lnum, (long)wp->w_buffer->b_ml.ml_line_count);
-	    break;
+	അവസ്ഥ STL_PERCENTAGE:
+	    അക്കം = calc_percentage((long)wp->w_cursor.lnum, (long)wp->w_buffer->b_ml.ml_വരി_എണ്ണം);
+	    നിർത്തുക;
 
-	case STL_ALTPERCENT:
+	അവസ്ഥ STL_ALTPERCENT:
 	    str = buf_tmp;
-	    (void)get_rel_pos(wp, str, TMPLEN);
-	    break;
+	    (ശൂന്യം)get_rel_pos(wp, str, TMPLEN);
+	    നിർത്തുക;
 
-	case STL_SHOWCMD:
-	    if (p_sc && STRCMP(opt_name, p_sloc) == 0)
+	അവസ്ഥ STL_SHOWCMD:
+	    എങ്കിൽ (p_sc && STRCMP(opt_name, p_sloc) == 0)
 		str = showcmd_buf;
-	    break;
+	    നിർത്തുക;
 
-	case STL_ARGLISTSTAT:
+	അവസ്ഥ STL_ARGLISTSTAT:
 	    fillable = FALSE;
 	    buf_tmp[0] = NUL;
-	    if (append_arg_number(wp, buf_tmp, sizeof(buf_tmp), FALSE) > 0)
+	    എങ്കിൽ (append_arg_സംഖ്യ(wp, buf_tmp, വലുപ്പം(buf_tmp), FALSE) > 0)
 		str = buf_tmp;
-	    break;
+	    നിർത്തുക;
 
-	case STL_KEYMAP:
+	അവസ്ഥ STL_KEYMAP:
 	    fillable = FALSE;
-	    if (get_keymap_str(wp, (char_u *)"<%s>", buf_tmp, TMPLEN) > 0)
+	    എങ്കിൽ (get_keymap_str(wp, (char_u *)"<%s>", buf_tmp, TMPLEN) > 0)
 		str = buf_tmp;
-	    break;
-	case STL_PAGENUM:
-# if defined(FEAT_PRINTER) || defined(FEAT_GUI_TABLINE)
-	    num = printer_page_num;
-# else
-	    num = 0;
+	    നിർത്തുക;
+	അവസ്ഥ STL_PAGENUM:
+# എങ്കിൽ defined(FEAT_PRINTER) || defined(FEAT_GUI_TABLINE)
+	    അക്കം = printer_page_അക്കം;
+# അല്ലെങ്കിൽ
+	    അക്കം = 0;
 # endif
-	    break;
+	    നിർത്തുക;
 
-	case STL_BUFNO:
-	    num = wp->w_buffer->b_fnum;
-	    break;
+	അവസ്ഥ STL_BUFNO:
+	    അക്കം = wp->w_buffer->b_fnum;
+	    നിർത്തുക;
 
-	case STL_OFFSET_X:
+	അവസ്ഥ STL_OFFSET_X:
 	    base = 'X';
 	    // FALLTHROUGH
-	case STL_OFFSET:
+	അവസ്ഥ STL_OFFSET:
 # ifdef FEAT_BYTEOFF
-	    l = ml_find_line_or_offset(wp->w_buffer, wp->w_cursor.lnum, NULL);
-	    num = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY) || l < 0
-		       ? 0L : l + 1 + ((State & MODE_INSERT) == 0 && empty_line
-				? 0 : (int)wp->w_cursor.col);
+	    l = ml_find_വരി_or_offset(wp->w_buffer, wp->w_cursor.lnum, ശൂന്യ);
+	    അക്കം = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY) || l < 0
+		       ? 0L : l + 1 + ((State & MODE_തിരുകുക) == 0 && empty_വരി
+				? 0 : (പൂർണ്ണസംഖ്യ)wp->w_cursor.col);
 # endif
-	    break;
+	    നിർത്തുക;
 
-	case STL_BYTEVAL_X:
+	അവസ്ഥ STL_BYTEVAL_X:
 	    base = 'X';
 	    // FALLTHROUGH
-	case STL_BYTEVAL:
-	    num = byteval;
-	    if (num == NL)
-		num = 0;
-	    else if (num == CAR && get_fileformat(wp->w_buffer) == EOL_MAC)
-		num = NL;
-	    break;
+	അവസ്ഥ STL_BYTEVAL:
+	    അക്കം = byteval;
+	    എങ്കിൽ (അക്കം == NL)
+		അക്കം = 0;
+	    അല്ലെങ്കിൽ എങ്കിൽ (അക്കം == CAR && get_fileformat(wp->w_buffer) == EOL_MAC)
+		അക്കം = NL;
+	    നിർത്തുക;
 
-	case STL_ROFLAG:
-	case STL_ROFLAG_ALT:
+	അവസ്ഥ STL_ROFLAG:
+	അവസ്ഥ STL_ROFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_buffer->b_p_ro)
+	    എങ്കിൽ (wp->w_buffer->b_p_ro)
 		str = (char_u *)((opt == STL_ROFLAG_ALT) ? ",RO" : _("[RO]"));
-	    break;
+	    നിർത്തുക;
 
-	case STL_HELPFLAG:
-	case STL_HELPFLAG_ALT:
+	അവസ്ഥ STL_HELPFLAG:
+	അവസ്ഥ STL_HELPFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_buffer->b_help)
+	    എങ്കിൽ (wp->w_buffer->b_help)
 		str = (char_u *)((opt == STL_HELPFLAG_ALT) ? ",HLP"
 							       : _("[Help]"));
-	    break;
+	    നിർത്തുക;
 
-	case STL_FILETYPE:
-	    if (*wp->w_buffer->b_p_ft != NUL
+	അവസ്ഥ STL_FILETYPE:
+	    എങ്കിൽ (*wp->w_buffer->b_p_ft != NUL
 		    && STRLEN(wp->w_buffer->b_p_ft) < TMPLEN - 3)
 	    {
-		vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), "[%s]",
+		vim_snprintf((അക്ഷരം *)buf_tmp, വലുപ്പം(buf_tmp), "[%s]",
 							wp->w_buffer->b_p_ft);
 		str = buf_tmp;
 	    }
-	    break;
+	    നിർത്തുക;
 
-	case STL_FILETYPE_ALT:
+	അവസ്ഥ STL_FILETYPE_ALT:
 	    itemisflag = TRUE;
-	    if (*wp->w_buffer->b_p_ft != NUL
+	    എങ്കിൽ (*wp->w_buffer->b_p_ft != NUL
 		    && STRLEN(wp->w_buffer->b_p_ft) < TMPLEN - 2)
 	    {
 		char_u	*t;
 
-		vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), ",%s",
+		vim_snprintf((അക്ഷരം *)buf_tmp, വലുപ്പം(buf_tmp), ",%s",
 							wp->w_buffer->b_p_ft);
-		for (t = buf_tmp; *t != 0; t++)
+		വേണ്ടി (t = buf_tmp; *t != 0; t++)
 		    *t = TOUPPER_LOC(*t);
 		str = buf_tmp;
 	    }
-	    break;
+	    നിർത്തുക;
 
-# if defined(FEAT_QUICKFIX)
-	case STL_PREVIEWFLAG:
-	case STL_PREVIEWFLAG_ALT:
+# എങ്കിൽ defined(FEAT_QUICKFIX)
+	അവസ്ഥ STL_PREVIEWFLAG:
+	അവസ്ഥ STL_PREVIEWFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_p_pvw)
+	    എങ്കിൽ (wp->w_p_pvw)
 		str = (char_u *)((opt == STL_PREVIEWFLAG_ALT) ? ",PRV"
 							    : _("[Preview]"));
-	    break;
+	    നിർത്തുക;
 
-	case STL_QUICKFIX:
-	    if (bt_quickfix(wp->w_buffer))
+	അവസ്ഥ STL_QUICKFIX:
+	    എങ്കിൽ (bt_quickfix(wp->w_buffer))
 		str = (char_u *)(wp->w_llist_ref
-			    ? _(msg_loclist)
-			    : _(msg_qflist));
-	    break;
+			    ? _(സന്ദേശം_loclist)
+			    : _(സന്ദേശം_qflist));
+	    നിർത്തുക;
 # endif
 
-	case STL_MODIFIED:
-	case STL_MODIFIED_ALT:
+	അവസ്ഥ STL_MODIFIED:
+	അവസ്ഥ STL_MODIFIED_ALT:
 	    itemisflag = TRUE;
-	    switch ((opt == STL_MODIFIED_ALT)
+	    തിരഞ്ഞെടുപ്പ് ((opt == STL_MODIFIED_ALT)
 		    + bufIsChanged(wp->w_buffer) * 2
 		    + (!wp->w_buffer->b_p_ma) * 4)
 	    {
-		case 2: str = (char_u *)"[+]"; break;
-		case 3: str = (char_u *)",+"; break;
-		case 4: str = (char_u *)"[-]"; break;
-		case 5: str = (char_u *)",-"; break;
-		case 6: str = (char_u *)"[+-]"; break;
-		case 7: str = (char_u *)",+-"; break;
+		അവസ്ഥ 2: str = (char_u *)"[+]"; നിർത്തുക;
+		അവസ്ഥ 3: str = (char_u *)",+"; നിർത്തുക;
+		അവസ്ഥ 4: str = (char_u *)"[-]"; നിർത്തുക;
+		അവസ്ഥ 5: str = (char_u *)",-"; നിർത്തുക;
+		അവസ്ഥ 6: str = (char_u *)"[+-]"; നിർത്തുക;
+		അവസ്ഥ 7: str = (char_u *)",+-"; നിർത്തുക;
 	    }
-	    break;
+	    നിർത്തുക;
 
-	case STL_HIGHLIGHT:
+	അവസ്ഥ STL_HIGHLIGHT:
 	    {
 		char_u  *t = s;
 
-		while (*s != '#' && *s != NUL)
+		ആകുമ്പോൾ (*s != '#' && *s != NUL)
 		    ++s;
-		if (*s == '#')
+		എങ്കിൽ (*s == '#')
 		{
-		    stl_items[curitem].stl_type = Highlight;
-		    stl_items[curitem].stl_start = p;
-		    stl_items[curitem].stl_minwid = -syn_namen2id(t, (int)(s - t));
+		    stl_ഇനങ്ങൾ[curitem].stl_type = Highlight;
+		    stl_ഇനങ്ങൾ[curitem].stl_start = p;
+		    stl_ഇനങ്ങൾ[curitem].stl_minwid = -syn_namen2id(t, (പൂർണ്ണസംഖ്യ)(s - t));
 		    curitem++;
 		}
-		if (*s != NUL)
+		എങ്കിൽ (*s != NUL)
 		    ++s;
-		continue;
+		തുടരുക;
 	    }
 
-	case STL_CLICKFUNC:
+	അവസ്ഥ STL_CLICKFUNC:
 	    // %N[] - end click region (with minwid, minwid is ignored)
-	    if (*s == ']')
+	    എങ്കിൽ (*s == ']')
 	    {
-		stl_items[curitem].stl_type = ClickFunc;
-		stl_items[curitem].stl_start = p;
-		stl_items[curitem].stl_minwid = 0;
-		stl_items[curitem].stl_clickfunc = NULL;
+		stl_ഇനങ്ങൾ[curitem].stl_type = ClickFunc;
+		stl_ഇനങ്ങൾ[curitem].stl_start = p;
+		stl_ഇനങ്ങൾ[curitem].stl_minwid = 0;
+		stl_ഇനങ്ങൾ[curitem].stl_clickfunc = ശൂന്യ;
 		s++;
 		curitem++;
-		continue;
+		തുടരുക;
 	    }
 	    // %N[FuncName] with minwid
-	    if (ASCII_ISALPHA(*s) || *s == '_')
+	    എങ്കിൽ (ASCII_ISALPHA(*s) || *s == '_')
 	    {
 		char_u *rb = vim_strchr(s, ']');
-		if (rb != NULL)
+		എങ്കിൽ (rb != ശൂന്യ)
 		{
-		    stl_items[curitem].stl_type = ClickFunc;
-		    stl_items[curitem].stl_start = p;
+		    stl_ഇനങ്ങൾ[curitem].stl_type = ClickFunc;
+		    stl_ഇനങ്ങൾ[curitem].stl_start = p;
 		    // The stl_minwid field is overloaded: it may be the
 		    // "min" part of %<min>.<max> used for padding, or an
 		    // identifier passed to the %N[FuncName] callback.  Store
 		    // the uncapped value so IDs above 50 are preserved.
-		    stl_items[curitem].stl_minwid = raw_minwid;
-		    stl_items[curitem].stl_clickfunc =
+		    stl_ഇനങ്ങൾ[curitem].stl_minwid = raw_minwid;
+		    stl_ഇനങ്ങൾ[curitem].stl_clickfunc =
 					      vim_strnsave(s, rb - s);
 		    s = rb + 1;
 		    curitem++;
-		    continue;
+		    തുടരുക;
 		}
 	    }
-	    continue;
+	    തുടരുക;
 
-	case STL_LINEBREAK:
+	അവസ്ഥ STL_LINEBREAK:
 	    // %N@ - line break (already handled above, fallback)
-	    continue;
+	    തുടരുക;
 	}
 
-	stl_items[curitem].stl_start = p;
-	stl_items[curitem].stl_type = Normal;
-	if (str != NULL && *str)
+	stl_ഇനങ്ങൾ[curitem].stl_start = p;
+	stl_ഇനങ്ങൾ[curitem].stl_type = Normal;
+	എങ്കിൽ (str != ശൂന്യ && *str)
 	{
 	    char_u  *t = str;
 
-	    if (itemisflag)
+	    എങ്കിൽ (itemisflag)
 	    {
-		if ((t[0] && t[1])
+		എങ്കിൽ ((t[0] && t[1])
 			&& ((!prevchar_isitem && *t == ',')
 			      || (prevchar_isflag && *t == ' ')))
 		    t++;
 		prevchar_isflag = TRUE;
 	    }
 	    l = vim_strsize(t);
-	    if (l > 0)
+	    എങ്കിൽ (l > 0)
 		prevchar_isitem = TRUE;
-	    if (l > maxwid)
+	    എങ്കിൽ (l > maxwid)
 	    {
-		while (l >= maxwid)
-		    if (has_mbyte)
+		ആകുമ്പോൾ (l >= maxwid)
+		    എങ്കിൽ (has_mbyte)
 		    {
 			l -= ptr2cells(t);
 			t += (*mb_ptr2len)(t);
 		    }
-		    else
+		    അല്ലെങ്കിൽ
 			l -= byte2cells(*t++);
-		if (p + 1 >= out + outlen)
-		    break;
+		എങ്കിൽ (p + 1 >= out + outlen)
+		    നിർത്തുക;
 		*p++ = '<';
 	    }
-	    if (minwid > 0)
+	    എങ്കിൽ (minwid > 0)
 	    {
-		for (; l < minwid && p + 1 < out + outlen; l++)
+		വേണ്ടി (; l < minwid && p + 1 < out + outlen; l++)
 		{
 		    // Don't put a "-" in front of a digit.
-		    if (l + 1 == minwid && fillchar == '-' && VIM_ISDIGIT(*t))
+		    എങ്കിൽ (l + 1 == minwid && fillchar == '-' && VIM_ISDIGIT(*t))
 			*p++ = ' ';
-		    else
+		    അല്ലെങ്കിൽ
 			MB_CHAR2BYTES(fillchar, p);
 		}
 		minwid = 0;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		minwid *= -1;
-	    for (; *t && p + 1 < out + outlen; t++)
+	    വേണ്ടി (; *t && p + 1 < out + outlen; t++)
 	    {
 		// Change a space by fillchar, unless fillchar is '-' and a
 		// digit follows.
-		if (fillable && *t == ' '
+		എങ്കിൽ (fillable && *t == ' '
 				&& (!VIM_ISDIGIT(*(t + 1)) || fillchar != '-'))
 		    MB_CHAR2BYTES(fillchar, p);
-		else
+		അല്ലെങ്കിൽ
 		    *p++ = *t;
 	    }
-	    for (; l < minwid && p + 1 < out + outlen; l++)
+	    വേണ്ടി (; l < minwid && p + 1 < out + outlen; l++)
 		MB_CHAR2BYTES(fillchar, p);
 	}
-	else if (num >= 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (അക്കം >= 0)
 	{
-	    int	    nbase = (base == 'D' ? 10 : (base == 'O' ? 8 : 16));
+	    പൂർണ്ണസംഖ്യ	    nbase = (base == 'D' ? 10 : (base == 'O' ? 8 : 16));
 	    char_u  nstr[20];
 	    char_u  *t = nstr;
 
-	    if (p + 20 >= out + outlen)
-		break;		// not sufficient space
+	    എങ്കിൽ (p + 20 >= out + outlen)
+		നിർത്തുക;		// not sufficient space
 	    prevchar_isitem = TRUE;
-	    if (opt == STL_VIRTCOL_ALT)
+	    എങ്കിൽ (opt == STL_VIRTCOL_ALT)
 	    {
 		*t++ = '-';
 		minwid--;
 	    }
 	    *t++ = '%';
-	    if (zeropad)
+	    എങ്കിൽ (zeropad)
 		*t++ = '0';
 	    *t++ = '*';
 	    *t++ = nbase == 16 ? base : (char_u)(nbase == 8 ? 'o' : 'd');
 	    *t = NUL;
 
-	    for (n = num, l = 1; n >= nbase; n /= nbase)
+	    വേണ്ടി (n = അക്കം, l = 1; n >= nbase; n /= nbase)
 		l++;
-	    if (opt == STL_VIRTCOL_ALT)
+	    എങ്കിൽ (opt == STL_VIRTCOL_ALT)
 		l++;
 
-	    if (l > maxwid)
+	    എങ്കിൽ (l > maxwid)
 	    {
 		l += 2;
 		n = l - maxwid;
-		while (l-- > maxwid)
-		    num /= nbase;
+		ആകുമ്പോൾ (l-- > maxwid)
+		    അക്കം /= nbase;
 		*t++ = '>';
 		*t++ = '%';
 		*t = t[-3];
 		*++t = NUL;
-		p += vim_snprintf_safelen((char *)p, outlen - (p - out),
-		    (char *)nstr, 0, num, n);
+		p += vim_snprintf_safelen((അക്ഷരം *)p, outlen - (p - out),
+		    (അക്ഷരം *)nstr, 0, അക്കം, n);
 	    }
-	    else
-		p += vim_snprintf_safelen((char *)p, outlen - (p - out),
-		    (char *)nstr, minwid, num);
+	    അല്ലെങ്കിൽ
+		p += vim_snprintf_safelen((അക്ഷരം *)p, outlen - (p - out),
+		    (അക്ഷരം *)nstr, minwid, അക്കം);
 	}
-	else
-	    stl_items[curitem].stl_type = Empty;
+	അല്ലെങ്കിൽ
+	    stl_ഇനങ്ങൾ[curitem].stl_type = Empty;
 
-	if (num >= 0 || (!itemisflag && str != NULL && *str != NUL))
+	എങ്കിൽ (അക്കം >= 0 || (!itemisflag && str != ശൂന്യ && *str != NUL))
 	    prevchar_isflag = FALSE;	    // Item not NULL, but not a flag
 					    //
-	if (opt == STL_VIM_EXPR)
+	എങ്കിൽ (opt == STL_VIM_വ്യഞ്ജകം)
 	    vim_free(str);
 	curitem++;
     }
@@ -5483,16 +5483,16 @@ find_linebreak:
 
     // Remember the most recent %# / %* highlight so the next row of a
     // multi-line statusline can resume it.
-    if (carry_hl != NULL)
+    എങ്കിൽ (carry_hl != ശൂന്യ)
     {
-	int last_hl = 0;
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == Highlight)
-		last_hl = stl_items[l].stl_minwid;
+	പൂർണ്ണസംഖ്യ last_hl = 0;
+	വേണ്ടി (l = 0; l < itemcnt; l++)
+	    എങ്കിൽ (stl_ഇനങ്ങൾ[l].stl_type == Highlight)
+		last_hl = stl_ഇനങ്ങൾ[l].stl_minwid;
 	*carry_hl = last_hl;
     }
 
-    if (mode == STL_MODE_MULTI
+    എങ്കിൽ (mode == STL_MODE_MULTI
 # ifdef ENABLE_STL_MODE_MULTI_NL
 		    || mode == STL_MODE_MULTI_NL
 # endif
@@ -5506,93 +5506,93 @@ find_linebreak:
 	// "fmt" and shift the remaining format string within "usefmt" for the
 	// caller's next iteration.
 # ifdef FEAT_EVAL
-	if (usefmt != fmt)
+	എങ്കിൽ (usefmt != fmt)
 	    vim_free(fmt);
 # endif
-	size_t fmt_remain_len = strlen((char *)s);
+	size_t fmt_remain_len = strlen((അക്ഷരം *)s);
 
 	mch_memmove(usefmt, s, fmt_remain_len);
 	usefmt[fmt_remain_len] = NUL;
 	*fmt_arg = usefmt;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	// In single-line mode, the caller retains ownership of its buffer.
 	// Free the eval result if "%!" was used.
 # ifdef FEAT_EVAL
-	if (usefmt != fmt)
+	എങ്കിൽ (usefmt != fmt)
 	    vim_free(usefmt);
 # endif
     }
 
-    if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+    എങ്കിൽ (mode == STL_MODE_GET_RENDERED_HEIGHT)
     {
 	// Free click function names that were allocated during parsing.
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == ClickFunc)
-		vim_free(stl_items[l].stl_clickfunc);
-	if (rendered_height != NULL)
+	വേണ്ടി (l = 0; l < itemcnt; l++)
+	    എങ്കിൽ (stl_ഇനങ്ങൾ[l].stl_type == ClickFunc)
+		vim_free(stl_ഇനങ്ങൾ[l].stl_clickfunc);
+	എങ്കിൽ (rendered_height != ശൂന്യ)
 	    *rendered_height = rheight;
-	return 0;
+	തിരികെ 0;
     }
 
     width = vim_strsize(out);
-    if (maxwidth > 0 && width > maxwidth)
+    എങ്കിൽ (maxwidth > 0 && width > maxwidth)
     {
 	// Result is too long, must truncate somewhere.
 	l = 0;
-	if (itemcnt == 0)
+	എങ്കിൽ (itemcnt == 0)
 	    s = out;
-	else
+	അല്ലെങ്കിൽ
 	{
-	    for ( ; l < itemcnt; l++)
-		if (stl_items[l].stl_type == Trunc)
+	    വേണ്ടി ( ; l < itemcnt; l++)
+		എങ്കിൽ (stl_ഇനങ്ങൾ[l].stl_type == Trunc)
 		{
 		    // Truncate at %< item.
-		    s = stl_items[l].stl_start;
-		    break;
+		    s = stl_ഇനങ്ങൾ[l].stl_start;
+		    നിർത്തുക;
 		}
-	    if (l == itemcnt)
+	    എങ്കിൽ (l == itemcnt)
 	    {
 		// No %< item, truncate first item.
-		s = stl_items[0].stl_start;
+		s = stl_ഇനങ്ങൾ[0].stl_start;
 		l = 0;
 	    }
 	}
 
-	if (width - vim_strsize(s) >= maxwidth)
+	എങ്കിൽ (width - vim_strsize(s) >= maxwidth)
 	{
 	    // Truncation mark is beyond max length
-	    if (has_mbyte)
+	    എങ്കിൽ (has_mbyte)
 	    {
 		s = out;
 		width = 0;
-		for (;;)
+		വേണ്ടി (;;)
 		{
 		    width += ptr2cells(s);
-		    if (width >= maxwidth)
-			break;
+		    എങ്കിൽ (width >= maxwidth)
+			നിർത്തുക;
 		    s += (*mb_ptr2len)(s);
 		}
 		// Fill up for half a double-wide character.
-		while (++width < maxwidth)
+		ആകുമ്പോൾ (++width < maxwidth)
 		    MB_CHAR2BYTES(fillchar, s);
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		s = out + maxwidth - 1;
-	    for (l = 0; l < itemcnt; l++)
-		if (stl_items[l].stl_start > s)
-		    break;
+	    വേണ്ടി (l = 0; l < itemcnt; l++)
+		എങ്കിൽ (stl_ഇനങ്ങൾ[l].stl_start > s)
+		    നിർത്തുക;
 	    itemcnt = l;
 	    *s++ = '>';
 	    *s = NUL;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    char_u  *end = out + outputlen;
 
 	    n = 0;
-	    while (width >= maxwidth)
+	    ആകുമ്പോൾ (width >= maxwidth)
 	    {
 		width -= ptr2cells(s + n);
 		n += (*mb_ptr2len)(s + n);
@@ -5603,16 +5603,16 @@ find_linebreak:
 	    *s = '<';
 
 	    --n;	// count the '<'
-	    for (; l < itemcnt; l++)
+	    വേണ്ടി (; l < itemcnt; l++)
 	    {
-		if (stl_items[l].stl_start - n >= s)
-		    stl_items[l].stl_start -= n;
-		else
-		    stl_items[l].stl_start = s;
+		എങ്കിൽ (stl_ഇനങ്ങൾ[l].stl_start - n >= s)
+		    stl_ഇനങ്ങൾ[l].stl_start -= n;
+		അല്ലെങ്കിൽ
+		    stl_ഇനങ്ങൾ[l].stl_start = s;
 	    }
 
 	    // Fill up for half a double-wide character.
-	    while (++width < maxwidth)
+	    ആകുമ്പോൾ (++width < maxwidth)
 	    {
 		s = end;
 		MB_CHAR2BYTES(fillchar, s);
@@ -5622,46 +5622,46 @@ find_linebreak:
 	}
 	width = maxwidth;
     }
-    else if (width < maxwidth &&
+    അല്ലെങ്കിൽ എങ്കിൽ (width < maxwidth &&
 	    outputlen + (maxwidth - width) * MB_CHAR2LEN(fillchar) + 1 < outlen)
     {
 	// Find how many separators there are, which we will use when
 	// figuring out how many groups there are.
-	int num_separators = 0;
+	പൂർണ്ണസംഖ്യ അക്കം_separators = 0;
 
-	for (l = 0; l < itemcnt; l++)
+	വേണ്ടി (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == Separate)
+	    എങ്കിൽ (stl_ഇനങ്ങൾ[l].stl_type == Separate)
 	    {
 		// Create an array of the start location for each separator
 		// mark.
-		stl_separator_locations[num_separators] = l;
-		num_separators++;
+		stl_separator_locations[അക്കം_separators] = l;
+		അക്കം_separators++;
 	    }
 	}
 
 	// If we have separated groups, then we deal with it now
-	if (num_separators)
+	എങ്കിൽ (അക്കം_separators)
 	{
-	    int standard_spaces;
-	    int final_spaces;
+	    പൂർണ്ണസംഖ്യ standard_spaces;
+	    പൂർണ്ണസംഖ്യ final_spaces;
 
-	    standard_spaces = (maxwidth - width) / num_separators;
+	    standard_spaces = (maxwidth - width) / അക്കം_separators;
 	    final_spaces = (maxwidth - width) -
-					standard_spaces * (num_separators - 1);
-	    for (l = 0; l < num_separators; l++)
+					standard_spaces * (അക്കം_separators - 1);
+	    വേണ്ടി (l = 0; l < അക്കം_separators; l++)
 	    {
-		int dislocation = (l == (num_separators - 1)) ?
+		പൂർണ്ണസംഖ്യ dislocation = (l == (അക്കം_separators - 1)) ?
 					final_spaces : standard_spaces;
 		dislocation *= MB_CHAR2LEN(fillchar);
-		char_u *start = stl_items[stl_separator_locations[l]].stl_start;
+		char_u *start = stl_ഇനങ്ങൾ[stl_separator_locations[l]].stl_start;
 		char_u *seploc = start + dislocation;
 		STRMOVE(seploc, start);
-		for (s = start; s < seploc;)
+		വേണ്ടി (s = start; s < seploc;)
 		    MB_CHAR2BYTES(fillchar, s);
 
-		for (int i = stl_separator_locations[l] + 1; i < itemcnt; i++)
-		    stl_items[i].stl_start += dislocation;
+		വേണ്ടി (പൂർണ്ണസംഖ്യ i = stl_separator_locations[l] + 1; i < itemcnt; i++)
+		    stl_ഇനങ്ങൾ[i].stl_start += dislocation;
 	    }
 
 	    width = maxwidth;
@@ -5669,73 +5669,73 @@ find_linebreak:
     }
 
     // Store the info about highlighting.
-    if (hltab != NULL)
+    എങ്കിൽ (hltab != ശൂന്യ)
     {
 	*hltab = stl_hltab;
 	sp = stl_hltab;
-	for (l = 0; l < itemcnt; l++)
+	വേണ്ടി (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == Highlight)
+	    എങ്കിൽ (stl_ഇനങ്ങൾ[l].stl_type == Highlight)
 	    {
-		sp->start = stl_items[l].stl_start;
-		sp->userhl = stl_items[l].stl_minwid;
+		sp->start = stl_ഇനങ്ങൾ[l].stl_start;
+		sp->userhl = stl_ഇനങ്ങൾ[l].stl_minwid;
 		sp++;
 	    }
 	}
-	sp->start = NULL;
+	sp->start = ശൂന്യ;
 	sp->userhl = 0;
     }
 
     // Store the info about tab pages labels.
-    if (tabtab != NULL)
+    എങ്കിൽ (tabtab != ശൂന്യ)
     {
 	*tabtab = stl_tabtab;
 	sp = stl_tabtab;
-	for (l = 0; l < itemcnt; l++)
+	വേണ്ടി (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == TabPage)
+	    എങ്കിൽ (stl_ഇനങ്ങൾ[l].stl_type == TabPage)
 	    {
-		sp->start = stl_items[l].stl_start;
-		sp->userhl = stl_items[l].stl_minwid;
+		sp->start = stl_ഇനങ്ങൾ[l].stl_start;
+		sp->userhl = stl_ഇനങ്ങൾ[l].stl_minwid;
 		sp++;
 	    }
 	}
-	sp->start = NULL;
+	sp->start = ശൂന്യ;
 	sp->userhl = 0;
     }
 
     // Store the info about click function regions.
-    if (clicktab != NULL)
+    എങ്കിൽ (clicktab != ശൂന്യ)
     {
 	stl_clickrec_T *cp;
 
 	*clicktab = stl_clicktab;
 	cp = stl_clicktab;
-	for (l = 0; l < itemcnt; l++)
+	വേണ്ടി (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == ClickFunc)
+	    എങ്കിൽ (stl_ഇനങ്ങൾ[l].stl_type == ClickFunc)
 	    {
-		cp->start = stl_items[l].stl_start;
-		cp->funcname = stl_items[l].stl_clickfunc;
-		cp->minwid = stl_items[l].stl_minwid;
+		cp->start = stl_ഇനങ്ങൾ[l].stl_start;
+		cp->funcname = stl_ഇനങ്ങൾ[l].stl_clickfunc;
+		cp->minwid = stl_ഇനങ്ങൾ[l].stl_minwid;
 		cp++;
 	    }
 	}
-	cp->start = NULL;
-	cp->funcname = NULL;
+	cp->start = ശൂന്യ;
+	cp->funcname = ശൂന്യ;
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	// Free click function names when caller doesn't need them.
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == ClickFunc)
-		vim_free(stl_items[l].stl_clickfunc);
+	വേണ്ടി (l = 0; l < itemcnt; l++)
+	    എങ്കിൽ (stl_ഇനങ്ങൾ[l].stl_type == ClickFunc)
+		vim_free(stl_ഇനങ്ങൾ[l].stl_clickfunc);
     }
 
     redraw_not_allowed = save_redraw_not_allowed;
 
     // A user function may reset KeyTyped, restore it.
-    KeyTyped = save_KeyTyped;
+    താക്കോൽ_Typed = save_താക്കോൽ_Typed;
 
     // Check for an error.  If there is one the display will be messed up and
     // might loop redrawing.  Avoid that by making the corresponding option
@@ -5743,11 +5743,11 @@ find_linebreak:
     // TODO: find out why using called_emsg_before makes tests fail, does it
     // matter?
     // if (called_emsg > called_emsg_before)
-    if (did_emsg > did_emsg_before)
+    എങ്കിൽ (did_emsg > did_emsg_before)
 	set_string_option_direct(opt_name, -1, (char_u *)"",
 					      OPT_FREE | opt_scope, SID_ERROR);
 
-    return width;
+    തിരികെ width;
 }
 #endif // FEAT_STL_OPT
 
@@ -5755,65 +5755,65 @@ find_linebreak:
  * Get relative cursor position in window into "buf[]", in the localized
  * percentage form like %99, 99%; using "Top", "Bot" or "All" when appropriate.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 get_rel_pos(
     win_T	*wp,
     char_u	*buf,
-    int		buflen)
+    പൂർണ്ണസംഖ്യ		buflen)
 {
     long	above; // number of lines above window
     long	below; // number of lines below window
 
-    if (buflen < 3) // need at least 3 chars for writing
-	return 0;
+    എങ്കിൽ (buflen < 3) // need at least 3 chars for writing
+	തിരികെ 0;
     above = wp->w_topline - 1;
 #ifdef FEAT_DIFF
     above += diff_check_fill(wp, wp->w_topline) - wp->w_topfill;
-    if (wp->w_topline == 1 && wp->w_topfill >= 1)
+    എങ്കിൽ (wp->w_topline == 1 && wp->w_topfill >= 1)
 	above = 0;  // All buffer lines are displayed and there is an
 		    // indication of filler lines, that can be considered
 		    // seeing all lines.
 #endif
-    below = wp->w_buffer->b_ml.ml_line_count - wp->w_botline + 1;
-    if (below <= 0)
-	return (int)vim_snprintf_safelen((char *)buf, buflen,
+    below = wp->w_buffer->b_ml.ml_വരി_എണ്ണം - wp->w_botline + 1;
+    എങ്കിൽ (below <= 0)
+	തിരികെ (പൂർണ്ണസംഖ്യ)vim_snprintf_safelen((അക്ഷരം *)buf, buflen,
 	    "%s", (above == 0) ? _("All") : _("Bot"));
 
-    if (above <= 0)
-	return (int)vim_snprintf_safelen((char *)buf, buflen,
+    എങ്കിൽ (above <= 0)
+	തിരികെ (പൂർണ്ണസംഖ്യ)vim_snprintf_safelen((അക്ഷരം *)buf, buflen,
 	    "%s", _("Top"));
 
-    int perc = calc_percentage(above, above + below);
-    char tmp[8];
+    പൂർണ്ണസംഖ്യ perc = calc_percentage(above, above + below);
+    അക്ഷരം tmp[8];
     // localized percentage value
-    vim_snprintf(tmp, sizeof(tmp), _("%d%%"), perc);
-    return (int)vim_snprintf_safelen((char *)buf, buflen, _("%3s"), tmp);
+    vim_snprintf(tmp, വലുപ്പം(tmp), _("%d%%"), perc);
+    തിരികെ (പൂർണ്ണസംഖ്യ)vim_snprintf_safelen((അക്ഷരം *)buf, buflen, _("%3s"), tmp);
 }
 
 /*
  * Append (file 2 of 8) to "buf[]", if editing more than one file.
  * Return the number of characters appended.
  */
-    static int
-append_arg_number(
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+append_arg_സംഖ്യ(
     win_T	*wp,
     char_u	*buf,
     size_t	buflen,
-    int		add_file)	// Add "file" before the arg number
+    പൂർണ്ണസംഖ്യ		add_file)	// Add "file" before the arg number
 {
-    if (ARGCOUNT <= 1)		// nothing to do
-	return 0;
+    എങ്കിൽ (ARGCOUNT <= 1)		// nothing to do
+	തിരികെ 0;
 
-    char *msg;
-    switch ((wp->w_arg_idx_invalid ? 1 : 0) + (add_file ? 2 : 0))
+    അക്ഷരം *സന്ദേശം;
+    തിരഞ്ഞെടുപ്പ് ((wp->w_arg_idx_invalid ? 1 : 0) + (add_file ? 2 : 0))
     {
-	case 0: msg = _(" (%d of %d)"); break;
-	case 1: msg = _(" ((%d) of %d)"); break;
-	case 2: msg = _(" (file %d of %d)"); break;
-	case 3: msg = _(" (file (%d) of %d)"); break;
+	അവസ്ഥ 0: സന്ദേശം = _(" (%d of %d)"); നിർത്തുക;
+	അവസ്ഥ 1: സന്ദേശം = _(" ((%d) of %d)"); നിർത്തുക;
+	അവസ്ഥ 2: സന്ദേശം = _(" (file %d of %d)"); നിർത്തുക;
+	അവസ്ഥ 3: സന്ദേശം = _(" (file (%d) of %d)"); നിർത്തുക;
     }
 
-    return (int)vim_snprintf_safelen((char *)buf, buflen, msg,
+    തിരികെ (പൂർണ്ണസംഖ്യ)vim_snprintf_safelen((അക്ഷരം *)buf, buflen, സന്ദേശം,
 						  wp->w_arg_idx + 1, ARGCOUNT);
 }
 
@@ -5834,30 +5834,30 @@ fix_fname(char_u  *fname)
      * and provide drive letter for all absolute paths.
      */
 #ifdef UNIX
-    return FullName_save(fname, TRUE);
-#else
-    if (!vim_isAbsName(fname)
-	    || strstr((char *)fname, "..") != NULL
-	    || strstr((char *)fname, "//") != NULL
+    തിരികെ FullName_save(fname, TRUE);
+#അല്ലെങ്കിൽ
+    എങ്കിൽ (!vim_isAbsName(fname)
+	    || strstr((അക്ഷരം *)fname, "..") != ശൂന്യ
+	    || strstr((അക്ഷരം *)fname, "//") != ശൂന്യ
 # ifdef BACKSLASH_IN_FILENAME
-	    || strstr((char *)fname, "\\\\") != NULL
+	    || strstr((അക്ഷരം *)fname, "\\\\") != ശൂന്യ
 # endif
-# if defined(MSWIN)
-	    || vim_strchr(fname, '~') != NULL
+# എങ്കിൽ defined(MSWIN)
+	    || vim_strchr(fname, '~') != ശൂന്യ
 	    || fname[0] == '/'
 	    || fname[0] == '\\'
 # endif
 	    )
-	return FullName_save(fname, FALSE);
+	തിരികെ FullName_save(fname, FALSE);
 
     fname = vim_strsave(fname);
 
 # ifdef USE_FNAME_CASE
-    if (fname != NULL)
+    എങ്കിൽ (fname != ശൂന്യ)
 	fname_case(fname, 0);	// set correct case for file name
 # endif
 
-    return fname;
+    തിരികെ fname;
 #endif
 }
 
@@ -5869,26 +5869,26 @@ fix_fname(char_u  *fname)
  * The "*ffname" and "*sfname" pointer values on call will not be freed.
  * Note that the resulting "*ffname" pointer should be considered not allocated.
  */
-    void
+    ശൂന്യം
 fname_expand(
     buf_T	*buf UNUSED,
     char_u	**ffname,
     char_u	**sfname)
 {
-    if (*ffname == NULL)	    // no file name given, nothing to do
-	return;
-    if (*sfname == NULL)	    // no short file name given, use ffname
+    എങ്കിൽ (*ffname == ശൂന്യ)	    // no file name given, nothing to do
+	തിരികെ;
+    എങ്കിൽ (*sfname == ശൂന്യ)	    // no short file name given, use ffname
 	*sfname = *ffname;
     *ffname = fix_fname(*ffname);   // expand to full path
 
 #ifdef FEAT_SHORTCUT
-    if (!buf->b_p_bin)
+    എങ്കിൽ (!buf->b_p_bin)
     {
 	char_u  *rfname;
 
 	// If the file name is a shortcut file, use the file it links to.
 	rfname = mch_resolve_path(*ffname, FALSE);
-	if (rfname != NULL)
+	എങ്കിൽ (rfname != ശൂന്യ)
 	{
 	    vim_free(*ffname);
 	    *ffname = rfname;
@@ -5901,27 +5901,27 @@ fname_expand(
 /*
  * Open a window for a number of buffers.
  */
-    void
+    ശൂന്യം
 ex_buffer_all(exarg_T *eap)
 {
     buf_T	*buf;
     win_T	*wp, *wpnext;
-    int		split_ret = OK;
-    int		p_ea_save;
-    int		open_wins = 0;
-    int		r;
-    int		count;		// Maximum number of windows to open.
-    int		all;		// When TRUE also load inactive buffers.
-    int		had_tab = cmdmod.cmod_tab;
+    പൂർണ്ണസംഖ്യ		split_ret = OK;
+    പൂർണ്ണസംഖ്യ		p_ea_save;
+    പൂർണ്ണസംഖ്യ		open_wins = 0;
+    പൂർണ്ണസംഖ്യ		r;
+    പൂർണ്ണസംഖ്യ		എണ്ണം;		// Maximum number of windows to open.
+    പൂർണ്ണസംഖ്യ		all;		// When TRUE also load inactive buffers.
+    പൂർണ്ണസംഖ്യ		had_tab = cmdmod.cmod_tab;
     tabpage_T	*tpnext;
 
-    if (eap->addr_count == 0)	// make as many windows as possible
-	count = 9999;
-    else
-	count = eap->line2;	// make as many windows as specified
-    if (eap->cmdidx == CMD_unhide || eap->cmdidx == CMD_sunhide)
+    എങ്കിൽ (eap->addr_എണ്ണം == 0)	// make as many windows as possible
+	എണ്ണം = 9999;
+    അല്ലെങ്കിൽ
+	എണ്ണം = eap->line2;	// make as many windows as specified
+    എങ്കിൽ (eap->cmdidx == CMD_unhide || eap->cmdidx == CMD_sunhide)
 	all = FALSE;
-    else
+    അല്ലെങ്കിൽ
 	all = TRUE;
 
     // Stop Visual mode, the cursor and "VIsual" may very well be invalid after
@@ -5938,15 +5938,15 @@ ex_buffer_all(exarg_T *eap)
      * Close superfluous windows (two windows for the same buffer).
      * Also close windows that are not full-width.
      */
-    if (had_tab > 0)
+    എങ്കിൽ (had_tab > 0)
 	goto_tabpage_tp(first_tabpage, TRUE, TRUE);
-    for (;;)
+    വേണ്ടി (;;)
     {
 	tpnext = curtab->tp_next;
-	for (wp = firstwin; wp != NULL; wp = wpnext)
+	വേണ്ടി (wp = firstwin; wp != ശൂന്യ; wp = wpnext)
 	{
 	    wpnext = wp->w_next;
-	    if ((wp->w_buffer->b_nwindows > 1
+	    എങ്കിൽ ((wp->w_buffer->b_nwindows > 1
 			|| ((cmdmod.cmod_split & WSP_VERT)
 			    ? wp->w_height + wp->w_status_height < Rows - p_ch
 							     - tabline_height()
@@ -5956,21 +5956,21 @@ ex_buffer_all(exarg_T *eap)
 		    && !(win_locked(wp) || wp->w_buffer->b_locked > 0)
 		    && !win_unlisted(wp))
 	    {
-		if (win_close(wp, FALSE) == FAIL)
-		    break;
+		എങ്കിൽ (win_close(wp, FALSE) == FAIL)
+		    നിർത്തുക;
 		// Just in case an autocommand does something strange with
 		// windows: start all over...
 		wpnext = firstwin;
 		tpnext = first_tabpage;
 		open_wins = 0;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		++open_wins;
 	}
 
 	// Without the ":tab" modifier only do the current tab page.
-	if (had_tab == 0 || tpnext == NULL)
-	    break;
+	എങ്കിൽ (had_tab == 0 || tpnext == ശൂന്യ)
+	    നിർത്തുക;
 	goto_tabpage_tp(tpnext, TRUE, TRUE);
     }
 
@@ -5983,32 +5983,32 @@ ex_buffer_all(exarg_T *eap)
     ++autocmd_no_enter;
     win_enter(lastwin, FALSE);
     ++autocmd_no_leave;
-    for (buf = firstbuf; buf != NULL && open_wins < count; buf = buf->b_next)
+    വേണ്ടി (buf = firstbuf; buf != ശൂന്യ && open_wins < എണ്ണം; buf = buf->b_next)
     {
 	// Check if this buffer needs a window
-	if ((!all && buf->b_ml.ml_mfp == NULL) || !buf->b_p_bl)
-	    continue;
+	എങ്കിൽ ((!all && buf->b_ml.ml_mfp == ശൂന്യ) || !buf->b_p_bl)
+	    തുടരുക;
 
-	if (had_tab != 0)
+	എങ്കിൽ (had_tab != 0)
 	{
 	    // With the ":tab" modifier don't move the window.
-	    if (buf->b_nwindows > 0)
+	    എങ്കിൽ (buf->b_nwindows > 0)
 		wp = lastwin;	    // buffer has a window, skip it
-	    else
-		wp = NULL;
+	    അല്ലെങ്കിൽ
+		wp = ശൂന്യ;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // Check if this buffer already has a window
 	    FOR_ALL_WINDOWS(wp)
-		if (wp->w_buffer == buf)
-		    break;
+		എങ്കിൽ (wp->w_buffer == buf)
+		    നിർത്തുക;
 	    // If the buffer already has a window, move it
-	    if (wp != NULL)
+	    എങ്കിൽ (wp != ശൂന്യ)
 		win_move_after(wp, curwin);
 	}
 
-	if (wp == NULL && split_ret == OK)
+	എങ്കിൽ (wp == ശൂന്യ && split_ret == OK)
 	{
 	    bufref_T	bufref;
 
@@ -6020,21 +6020,21 @@ ex_buffer_all(exarg_T *eap)
 	    split_ret = win_split(0, WSP_ROOM | WSP_BELOW);
 	    ++open_wins;
 	    p_ea = p_ea_save;
-	    if (split_ret == FAIL)
-		continue;
+	    എങ്കിൽ (split_ret == FAIL)
+		തുടരുക;
 
 	    // Open the buffer in this window.
 	    swap_exists_action = SEA_DIALOG;
 	    set_curbuf(buf, DOBUF_GOTO);
-	    if (!bufref_valid(&bufref))
+	    എങ്കിൽ (!bufref_valid(&bufref))
 	    {
 		// autocommands deleted the buffer!!!
 		swap_exists_action = SEA_NONE;
-		break;
+		നിർത്തുക;
 	    }
-	    if (swap_exists_action == SEA_QUIT)
+	    എങ്കിൽ (swap_exists_action == SEA_QUIT)
 	    {
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 		cleanup_T   cs;
 
 		// Reset the error/interrupt/exception state here so that
@@ -6048,30 +6048,30 @@ ex_buffer_all(exarg_T *eap)
 		swap_exists_action = SEA_NONE;
 		swap_exists_did_quit = TRUE;
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 		// Restore the error/interrupt/exception state if not
 		// discarded by a new aborting error, interrupt, or uncaught
 		// exception.
 		leave_cleanup(&cs);
 #endif
 	    }
-	    else
-		handle_swap_exists(NULL);
+	    അല്ലെങ്കിൽ
+		handle_swap_exists(ശൂന്യ);
 	}
 
 	ui_breakcheck();
-	if (got_int)
+	എങ്കിൽ (got_int)
 	{
-	    (void)vgetc();	// only break the file loading, not the rest
-	    break;
+	    (ശൂന്യം)vgetc();	// only break the file loading, not the rest
+	    നിർത്തുക;
 	}
 #ifdef FEAT_EVAL
 	// Autocommands deleted the buffer or aborted script processing!!!
-	if (aborting())
-	    break;
+	എങ്കിൽ (aborting())
+	    നിർത്തുക;
 #endif
 	// When ":tab" was used open a new tab for a new window repeatedly.
-	if (had_tab > 0 && tabpage_index(NULL) <= p_tpm)
+	എങ്കിൽ (had_tab > 0 && tabpage_index(ശൂന്യ) <= p_tpm)
 	    cmdmod.cmod_tab = 9999;
     }
     --autocmd_no_enter;
@@ -6081,32 +6081,32 @@ ex_buffer_all(exarg_T *eap)
     /*
      * Close superfluous windows.
      */
-    for (wp = lastwin; open_wins > count; )
+    വേണ്ടി (wp = lastwin; open_wins > എണ്ണം; )
     {
 	r = (buf_hide(wp->w_buffer) || !bufIsChanged(wp->w_buffer)
 				     || autowrite(wp->w_buffer, FALSE) == OK);
-	if (!win_valid(wp))
+	എങ്കിൽ (!win_valid(wp))
 	{
 	    // BufWrite Autocommands made the window invalid, start over
 	    wp = lastwin;
 	}
-	else if (r)
+	അല്ലെങ്കിൽ എങ്കിൽ (r)
 	{
 	    win_close(wp, !buf_hide(wp->w_buffer));
 	    --open_wins;
 	    wp = lastwin;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    wp = wp->w_prev;
-	    if (wp == NULL)
-		break;
+	    എങ്കിൽ (wp == ശൂന്യ)
+		നിർത്തുക;
 	}
     }
 }
 
 
-static int  chk_modeline(linenr_T, int);
+സ്ഥിതം പൂർണ്ണസംഖ്യ  chk_modeline(linenr_T, പൂർണ്ണസംഖ്യ);
 
 /*
  * do_modelines() - process mode lines for the current file
@@ -6117,73 +6117,73 @@ static int  chk_modeline(linenr_T, int);
  *
  * Returns immediately if the "ml" option isn't set.
  */
-    void
-do_modelines(int flags)
+    ശൂന്യം
+do_modelines(പൂർണ്ണസംഖ്യ flags)
 {
     linenr_T	lnum;
-    int		nmlines;
-    static int	entered = 0;
+    പൂർണ്ണസംഖ്യ		nmlines;
+    സ്ഥിതം പൂർണ്ണസംഖ്യ	entered = 0;
 
-    if (!curbuf->b_p_ml || (nmlines = (int)p_mls) == 0)
-	return;
+    എങ്കിൽ (!curbuf->b_p_ml || (nmlines = (പൂർണ്ണസംഖ്യ)p_mls) == 0)
+	തിരികെ;
 
     // Disallow recursive entry here.  Can happen when executing a modeline
     // triggers an autocommand, which reloads modelines with a ":do".
-    if (entered)
-	return;
+    എങ്കിൽ (entered)
+	തിരികെ;
 
     ++entered;
-    for (lnum = 1; curbuf->b_p_ml && lnum <= curbuf->b_ml.ml_line_count && lnum <= nmlines;
+    വേണ്ടി (lnum = 1; curbuf->b_p_ml && lnum <= curbuf->b_ml.ml_വരി_എണ്ണം && lnum <= nmlines;
 								       ++lnum)
-	if (chk_modeline(lnum, flags) == FAIL)
+	എങ്കിൽ (chk_modeline(lnum, flags) == FAIL)
 	    nmlines = 0;
 
-    for (lnum = curbuf->b_ml.ml_line_count; curbuf->b_p_ml && lnum > 0 && lnum > nmlines
-		       && lnum > curbuf->b_ml.ml_line_count - nmlines; --lnum)
-	if (chk_modeline(lnum, flags) == FAIL)
+    വേണ്ടി (lnum = curbuf->b_ml.ml_വരി_എണ്ണം; curbuf->b_p_ml && lnum > 0 && lnum > nmlines
+		       && lnum > curbuf->b_ml.ml_വരി_എണ്ണം - nmlines; --lnum)
+	എങ്കിൽ (chk_modeline(lnum, flags) == FAIL)
 	    nmlines = 0;
     --entered;
 }
 
-#include "version.h"		// for version number
+#അന്തര്ഭാവ "version.h"		// for version number
 
 /*
  * chk_modeline() - check a single line for a mode string
  * Return FAIL if an error encountered.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 chk_modeline(
     linenr_T	lnum,
-    int		flags)		// Same as for do_modelines().
+    പൂർണ്ണസംഖ്യ		flags)		// Same as for do_modelines().
 {
     char_u	*s;
-    char_u	*line_end;		// point to the end of the line
+    char_u	*വരി_end;		// point to the end of the line
     char_u	*e;
-    int		prev;
-    int		retval = OK;
+    പൂർണ്ണസംഖ്യ		prev;
+    പൂർണ്ണസംഖ്യ		retval = OK;
     ESTACK_CHECK_DECLARATION;
 
     prev = -1;
     s = ml_get(lnum);
-    line_end = s + ml_get_len(lnum);
-    for (; *s != NUL; ++s)
+    വരി_end = s + ml_get_len(lnum);
+    വേണ്ടി (; *s != NUL; ++s)
     {
-	if (prev == -1 || vim_isspace(prev))
+	എങ്കിൽ (prev == -1 || vim_isspace(prev))
 	{
-	    if ((prev != -1 && STRNCMP(s, "ex:", (size_t)3) == 0)
+	    എങ്കിൽ ((prev != -1 && STRNCMP(s, "ex:", (size_t)3) == 0)
 		    || STRNCMP(s, "vi:", (size_t)3) == 0)
-		break;
+		നിർത്തുക;
 	    // Accept both "vim" and "Vim".
-	    if ((s[0] == 'v' || s[0] == 'V') && s[1] == 'i' && s[2] == 'm')
+	    എങ്കിൽ ((s[0] == 'v' || s[0] == 'V') && s[1] == 'i' && s[2] == 'm')
 	    {
-		int vers;
+		പൂർണ്ണസംഖ്യ vers;
 
-		if (s[3] == '<' || s[3] == '=' || s[3] == '>')
+		എങ്കിൽ (s[3] == '<' || s[3] == '=' || s[3] == '>')
 		    e = s + 4;
-		else
+		അല്ലെങ്കിൽ
 		    e = s + 3;
 		vers = getdigits(&e);
-		if (*e == ':'
+		എങ്കിൽ (*e == ':'
 			&& (s[0] != 'V'
 				  || STRNCMP(skipwhite(e + 1), "set", 3) == 0)
 			&& (s[3] == ':'
@@ -6191,53 +6191,53 @@ chk_modeline(
 			    || (VIM_VERSION_100 < vers && s[3] == '<')
 			    || (VIM_VERSION_100 > vers && s[3] == '>')
 			    || (VIM_VERSION_100 == vers && s[3] == '=')))
-		    break;
+		    നിർത്തുക;
 	    }
 	}
 	prev = *s;
     }
 
-    if (*s)
+    എങ്കിൽ (*s)
     {
 	size_t	len;
 	char_u	*linecopy;		// local copy of any modeline found
-	int	end;
+	പൂർണ്ണസംഖ്യ	end;
 
-	do				// skip over "ex:", "vi:" or "vim:"
+	ചെയ്യുക				// skip over "ex:", "vi:" or "vim:"
 	    ++s;
-	while (s[-1] != ':');
+	ആകുമ്പോൾ (s[-1] != ':');
 
-	len = (size_t)(line_end - s);		// remember the line length
+	len = (size_t)(വരി_end - s);		// remember the line length
 						// so we can restore 'line_end'
 						// after the copy
 	s = linecopy = vim_strnsave(s, len);	// copy the line, it will change
-	if (linecopy == NULL)
-	    return FAIL;
+	എങ്കിൽ (linecopy == ശൂന്യ)
+	    തിരികെ FAIL;
 
-	line_end = s + len;			// restore 'line_end'
+	വരി_end = s + len;			// restore 'line_end'
 
 	// prepare for emsg()
-	estack_push(ETYPE_MODELINE, (char_u *)"modelines", lnum);
+	estack_തള്ളുക(ETYPE_MODELINE, (char_u *)"modelines", lnum);
 	ESTACK_CHECK_SETUP;
 
 	end = FALSE;
-	while (end == FALSE)
+	ആകുമ്പോൾ (end == FALSE)
 	{
 	    s = skipwhite(s);
-	    if (*s == NUL)
-		break;
+	    എങ്കിൽ (*s == NUL)
+		നിർത്തുക;
 
 	    /*
 	     * Find end of set command: ':' or end of line.
 	     * Skip over "\:", replacing it with ":".
 	     */
-	    for (e = s; *e != ':' && *e != NUL; ++e)
-		if (e[0] == '\\' && e[1] == ':')
+	    വേണ്ടി (e = s; *e != ':' && *e != NUL; ++e)
+		എങ്കിൽ (e[0] == '\\' && e[1] == ':')
 		{
-		    mch_memmove(e, e + 1, (size_t)(line_end - (e + 1)) + 1);	// +1 for NUL
-		    --line_end;
+		    mch_memmove(e, e + 1, (size_t)(വരി_end - (e + 1)) + 1);	// +1 for NUL
+		    --വരി_end;
 		}
-	    if (*e == NUL)
+	    എങ്കിൽ (*e == NUL)
 		end = TRUE;
 
 	    /*
@@ -6247,19 +6247,19 @@ chk_modeline(
 	     * "vi:opt opt opt: foo" -- foo interpreted
 	     * Accept "se" for compatibility with Elvis.
 	     */
-	    if (STRNCMP(s, "set ", (size_t)4) == 0
+	    എങ്കിൽ (STRNCMP(s, "set ", (size_t)4) == 0
 		    || STRNCMP(s, "se ", (size_t)3) == 0)
 	    {
-		if (*e != ':')		// no terminating ':'?
-		    break;
+		എങ്കിൽ (*e != ':')		// no terminating ':'?
+		    നിർത്തുക;
 		end = TRUE;
 		s += (*(s + 2) == ' ') ? 3 : 4;
 	    }
 	    *e = NUL;			// truncate the set command
 
-	    if (*s != NUL)		// skip over an empty "::"
+	    എങ്കിൽ (*s != NUL)		// skip over an empty "::"
 	    {
-		int secure_save = secure;
+		പൂർണ്ണസംഖ്യ secure_save = secure;
 		sctx_T	save_current_sctx = current_sctx;
 
 		current_sctx.sc_version = 1;
@@ -6276,81 +6276,81 @@ chk_modeline(
 
 		secure = secure_save;
 		current_sctx = save_current_sctx;
-		if (retval == FAIL)		// stop if error found
-		    break;
+		എങ്കിൽ (retval == FAIL)		// stop if error found
+		    നിർത്തുക;
 	    }
-	    s = (e == line_end) ? e : e + 1;	// advance to next part
+	    s = (e == വരി_end) ? e : e + 1;	// advance to next part
 						// careful not to go off the end
 	}
 
 	ESTACK_CHECK_NOW;
-	estack_pop();
+	estack_എടുക്കുക();
 	vim_free(linecopy);
     }
-    return retval;
+    തിരികെ retval;
 }
 
 /*
  * Return TRUE if "buf" is a normal buffer, 'buftype' is empty.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 bt_normal(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == NUL;
+    തിരികെ buf != ശൂന്യ && buf->b_p_bt[0] == NUL;
 }
 
 /*
  * Return TRUE if "buf" is the quickfix buffer.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 bt_quickfix(buf_T *buf UNUSED)
 {
 #ifdef FEAT_QUICKFIX
-    return buf != NULL && buf->b_p_bt[0] == 'q';
-#else
-    return FALSE;
+    തിരികെ buf != ശൂന്യ && buf->b_p_bt[0] == 'q';
+#അല്ലെങ്കിൽ
+    തിരികെ FALSE;
 #endif
 }
 
 /*
  * Return TRUE if "buf" is a terminal buffer.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 bt_terminal(buf_T *buf UNUSED)
 {
-#if defined(FEAT_TERMINAL)
-    return buf != NULL && buf->b_p_bt[0] == 't';
-#else
-    return FALSE;
+#എങ്കിൽ defined(FEAT_TERMINAL)
+    തിരികെ buf != ശൂന്യ && buf->b_p_bt[0] == 't';
+#അല്ലെങ്കിൽ
+    തിരികെ FALSE;
 #endif
 }
 
 /*
  * Return TRUE if "buf" is a help buffer.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 bt_help(buf_T *buf)
 {
-    return buf != NULL && buf->b_help;
+    തിരികെ buf != ശൂന്യ && buf->b_help;
 }
 
 /*
  * Return TRUE if "buf" is a prompt buffer.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 bt_prompt(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'r';
+    തിരികെ buf != ശൂന്യ && buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'r';
 }
 
-#if defined(FEAT_PROP_POPUP)
+#എങ്കിൽ defined(FEAT_PROP_POPUP)
 /*
  * Return TRUE if "buf" is a buffer for a popup window.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 bt_popup(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt != NULL
+    തിരികെ buf != ശൂന്യ && buf->b_p_bt != ശൂന്യ
 	&& buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'o';
 }
 #endif
@@ -6360,10 +6360,10 @@ bt_popup(buf_T *buf)
  * buffer.  This means the buffer name may not be a file name, at least not for
  * writing the buffer.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 bt_nofilename(buf_T *buf)
 {
-    return buf != NULL && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
+    തിരികെ buf != ശൂന്യ && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
 	    || buf->b_p_bt[0] == 'a'
 	    || buf->b_p_bt[0] == 't'
 	    || buf->b_p_bt[0] == 'p');
@@ -6373,23 +6373,23 @@ bt_nofilename(buf_T *buf)
  * Return TRUE if "buf" is a "nofile", "quickfix", "terminal" or "prompt"
  * buffer.  This means the buffer is not to be read from a file.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 bt_nofileread(buf_T *buf)
 {
-    return buf != NULL && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
+    തിരികെ buf != ശൂന്യ && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
 	    || buf->b_p_bt[0] == 't'
 	    || buf->b_p_bt[0] == 'q'
 	    || buf->b_p_bt[0] == 'p');
 }
 
-#if defined(FEAT_QUICKFIX)
+#എങ്കിൽ defined(FEAT_QUICKFIX)
 /*
  * Return TRUE if "buf" has 'buftype' set to "nofile".
  */
-    int
+    പൂർണ്ണസംഖ്യ
 bt_nofile(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f';
+    തിരികെ buf != ശൂന്യ && buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f';
 }
 #endif
 
@@ -6397,41 +6397,41 @@ bt_nofile(buf_T *buf)
  * Return TRUE if "buf" is a "nowrite", "nofile", "terminal", "prompt", or
  * "popup" buffer.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 bt_dontwrite(buf_T *buf)
 {
-    return buf != NULL && (buf->b_p_bt[0] == 'n'
+    തിരികെ buf != ശൂന്യ && (buf->b_p_bt[0] == 'n'
 		 || buf->b_p_bt[0] == 't'
 		 || buf->b_p_bt[0] == 'p');
 }
 
-    int
-bt_dontwrite_msg(buf_T *buf)
+    പൂർണ്ണസംഖ്യ
+bt_dontwrite_സന്ദേശം(buf_T *buf)
 {
-    if (bt_dontwrite(buf))
+    എങ്കിൽ (bt_dontwrite(buf))
     {
 	emsg(_(e_cannot_write_buftype_option_is_set));
-	return TRUE;
+	തിരികെ TRUE;
     }
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
  * Return TRUE if the buffer should be hidden, according to 'hidden', ":hide"
  * and 'bufhidden'.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 buf_hide(buf_T *buf)
 {
     // 'bufhidden' overrules 'hidden' and ":hide", check it first
-    switch (buf->b_p_bh[0])
+    തിരഞ്ഞെടുപ്പ് (buf->b_p_bh[0])
     {
-	case 'u':		    // "unload"
-	case 'w':		    // "wipe"
-	case 'd': return FALSE;	    // "delete"
-	case 'h': return TRUE;	    // "hide"
+	അവസ്ഥ 'u':		    // "unload"
+	അവസ്ഥ 'w':		    // "wipe"
+	അവസ്ഥ 'd': തിരികെ FALSE;	    // "delete"
+	അവസ്ഥ 'h': തിരികെ TRUE;	    // "hide"
     }
-    return (p_hid || (cmdmod.cmod_flags & CMOD_HIDE));
+    തിരികെ (p_hid || (cmdmod.cmod_flags & CMOD_HIDE));
 }
 
 /*
@@ -6441,46 +6441,46 @@ buf_hide(buf_T *buf)
     char_u *
 buf_spname(buf_T *buf)
 {
-#if defined(FEAT_QUICKFIX)
-    if (bt_quickfix(buf))
+#എങ്കിൽ defined(FEAT_QUICKFIX)
+    എങ്കിൽ (bt_quickfix(buf))
     {
 	/*
 	 * Differentiate between the quickfix and location list buffers using
 	 * the buffer number stored in the global quickfix stack.
 	 */
-	if (buf->b_fnum == qf_stack_get_bufnr())
-	    return (char_u *)_(msg_qflist);
-	else
-	    return (char_u *)_(msg_loclist);
+	എങ്കിൽ (buf->b_fnum == qf_അട്ടി_get_bufnr())
+	    തിരികെ (char_u *)_(സന്ദേശം_qflist);
+	അല്ലെങ്കിൽ
+	    തിരികെ (char_u *)_(സന്ദേശം_loclist);
     }
 #endif
 
     // There is no _file_ when 'buftype' is "nofile", b_sfname
     // contains the name as specified by the user.
-    if (bt_nofilename(buf))
+    എങ്കിൽ (bt_nofilename(buf))
     {
 #ifdef FEAT_TERMINAL
-	if (buf->b_term != NULL)
-	    return term_get_status_text(buf->b_term);
+	എങ്കിൽ (buf->b_term != ശൂന്യ)
+	    തിരികെ term_get_status_text(buf->b_term);
 #endif
-	if (buf->b_fname != NULL)
-	    return buf->b_fname;
-	if (buf == cmdwin_buf)
-	    return (char_u *)_("[Command Line]");
+	എങ്കിൽ (buf->b_fname != ശൂന്യ)
+	    തിരികെ buf->b_fname;
+	എങ്കിൽ (buf == cmdwin_buf)
+	    തിരികെ (char_u *)_("[Command Line]");
 #ifdef FEAT_JOB_CHANNEL
-	if (bt_prompt(buf))
-	    return (char_u *)_("[Prompt]");
+	എങ്കിൽ (bt_prompt(buf))
+	    തിരികെ (char_u *)_("[Prompt]");
 #endif
 #ifdef FEAT_PROP_POPUP
-	if (bt_popup(buf))
-	    return (char_u *)_("[Popup]");
+	എങ്കിൽ (bt_popup(buf))
+	    തിരികെ (char_u *)_("[Popup]");
 #endif
-	return (char_u *)_("[Scratch]");
+	തിരികെ (char_u *)_("[Scratch]");
     }
 
-    if (buf->b_fname == NULL)
-	return buf_get_fname(buf);
-    return NULL;
+    എങ്കിൽ (buf->b_fname == ശൂന്യ)
+	തിരികെ buf_get_fname(buf);
+    തിരികെ ശൂന്യ;
 }
 
 /*
@@ -6489,78 +6489,78 @@ buf_spname(buf_T *buf)
     char_u *
 buf_get_fname(buf_T *buf)
 {
-    if (buf->b_fname == NULL)
-	return (char_u *)_("[No Name]");
-    return buf->b_fname;
+    എങ്കിൽ (buf->b_fname == ശൂന്യ)
+	തിരികെ (char_u *)_("[No Name]");
+    തിരികെ buf->b_fname;
 }
 
 /*
  * Set 'buflisted' for curbuf to "on" and trigger autocommands if it changed.
  */
-    void
-set_buflisted(int on)
+    ശൂന്യം
+set_buflisted(പൂർണ്ണസംഖ്യ on)
 {
-    if (on == curbuf->b_p_bl)
-	return;
+    എങ്കിൽ (on == curbuf->b_p_bl)
+	തിരികെ;
 
     curbuf->b_p_bl = on;
-    if (on)
-	apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, curbuf);
-    else
-	apply_autocmds(EVENT_BUFDELETE, NULL, NULL, FALSE, curbuf);
+    എങ്കിൽ (on)
+	apply_autocmds(EVENT_BUFADD, ശൂന്യ, ശൂന്യ, FALSE, curbuf);
+    അല്ലെങ്കിൽ
+	apply_autocmds(EVENT_BUFDELETE, ശൂന്യ, ശൂന്യ, FALSE, curbuf);
 }
 
 /*
  * Read the file for "buf" again and check if the contents changed.
  * Return TRUE if it changed or this could not be checked.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 buf_contents_changed(buf_T *buf)
 {
     buf_T	*newbuf;
-    int		differ = TRUE;
+    പൂർണ്ണസംഖ്യ		differ = TRUE;
     linenr_T	lnum;
     aco_save_T	aco;
     exarg_T	ea;
 
     // Allocate a buffer without putting it in the buffer list.
-    newbuf = buflist_new(NULL, NULL, (linenr_T)1, BLN_DUMMY);
-    if (newbuf == NULL)
-	return TRUE;
+    newbuf = buflist_new(ശൂന്യ, ശൂന്യ, (linenr_T)1, BLN_DUMMY);
+    എങ്കിൽ (newbuf == ശൂന്യ)
+	തിരികെ TRUE;
 
     // Force the 'fileencoding' and 'fileformat' to be equal.
-    if (prep_exarg(&ea, buf) == FAIL)
+    എങ്കിൽ (prep_exarg(&ea, buf) == FAIL)
     {
 	wipe_buffer(newbuf, FALSE);
-	return TRUE;
+	തിരികെ TRUE;
     }
 
     // Set curwin/curbuf to buf and save a few things.
     aucmd_prepbuf(&aco, newbuf);
-    if (curbuf != newbuf)
+    എങ്കിൽ (curbuf != newbuf)
     {
 	// Failed to find a window for "newbuf".
 	wipe_buffer(newbuf, FALSE);
-	return TRUE;
+	തിരികെ TRUE;
     }
 
     // We don't want to trigger autocommands now, they may have nasty
     // side-effects like wiping buffers
     block_autocmds();
-    if (ml_open(curbuf) == OK
+    എങ്കിൽ (ml_open(curbuf) == OK
 	    && readfile(buf->b_ffname, buf->b_fname,
 				  (linenr_T)0, (linenr_T)0, (linenr_T)MAXLNUM,
 					    &ea, READ_NEW | READ_DUMMY) == OK)
     {
 	// compare the two files line by line
-	if (buf->b_ml.ml_line_count == curbuf->b_ml.ml_line_count)
+	എങ്കിൽ (buf->b_ml.ml_വരി_എണ്ണം == curbuf->b_ml.ml_വരി_എണ്ണം)
 	{
 	    differ = FALSE;
-	    for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
-		if (STRCMP(ml_get_buf(buf, lnum, FALSE), ml_get(lnum)) != 0)
+	    വേണ്ടി (lnum = 1; lnum <= curbuf->b_ml.ml_വരി_എണ്ണം; ++lnum)
+		എങ്കിൽ (STRCMP(ml_get_buf(buf, lnum, FALSE), ml_get(lnum)) != 0)
 		{
 		    differ = TRUE;
-		    break;
+		    നിർത്തുക;
 		}
 	}
     }
@@ -6569,12 +6569,12 @@ buf_contents_changed(buf_T *buf)
     // restore curwin/curbuf and a few other things
     aucmd_restbuf(&aco);
 
-    if (curbuf != newbuf)	// safety check
+    എങ്കിൽ (curbuf != newbuf)	// safety check
 	wipe_buffer(newbuf, FALSE);
 
     unblock_autocmds();
 
-    return differ;
+    തിരികെ differ;
 }
 
 /*
@@ -6582,19 +6582,19 @@ buf_contents_changed(buf_T *buf)
  * this buffer.  Call this to wipe out a temp buffer that does not contain any
  * marks.
  */
-    void
+    ശൂന്യം
 wipe_buffer(
     buf_T	*buf,
-    int		aucmd)	    // When TRUE trigger autocommands.
+    പൂർണ്ണസംഖ്യ		aucmd)	    // When TRUE trigger autocommands.
 {
-    if (buf->b_fnum == top_file_num - 1)
-	--top_file_num;
+    എങ്കിൽ (buf->b_fnum == മുകൾ_file_അക്കം - 1)
+	--മുകൾ_file_അക്കം;
 
-    if (!aucmd)		    // Don't trigger BufDelete autocommands here.
+    എങ്കിൽ (!aucmd)		    // Don't trigger BufDelete autocommands here.
 	block_autocmds();
 
-    close_buffer(NULL, buf, DOBUF_WIPE, FALSE, TRUE, FALSE);
+    close_buffer(ശൂന്യ, buf, DOBUF_WIPE, FALSE, TRUE, FALSE);
 
-    if (!aucmd)
+    എങ്കിൽ (!aucmd)
 	unblock_autocmds();
 }

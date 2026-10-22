@@ -14,22 +14,22 @@
 #define GUI_DWRITE_H
 
 #ifdef __cplusplus
-extern "C" {
+ബാഹ്യ "C" {
 #endif
 
-typedef struct DWriteContext DWriteContext;
+തരനിർവചനം ഘടന DWriteContext DWriteContext;
 
-typedef struct DWriteRenderingParams {
-    float gamma;
-    float enhancedContrast;
-    float clearTypeLevel;
+തരനിർവചനം ഘടന DWriteRenderingParams {
+    ദശാംശം gamma;
+    ദശാംശം enhancedContrast;
+    ദശാംശം clearTypeLevel;
     /*
      * pixelGeometry:
      *	0 - DWRITE_PIXEL_GEOMETRY_FLAT
      *	1 - DWRITE_PIXEL_GEOMETRY_RGB
      *	2 - DWRITE_PIXEL_GEOMETRY_BGR
      */
-    int pixelGeometry;
+    പൂർണ്ണസംഖ്യ pixelGeometry;
     /*
      * renderingMode:
      *	0 - DWRITE_RENDERING_MODE_DEFAULT
@@ -40,7 +40,7 @@ typedef struct DWriteRenderingParams {
      *	5 - DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC
      *	6 - DWRITE_RENDERING_MODE_OUTLINE
      */
-    int renderingMode;
+    പൂർണ്ണസംഖ്യ renderingMode;
     /*
      * antialiasMode:
      *	0 - D2D1_TEXT_ANTIALIAS_MODE_DEFAULT
@@ -48,55 +48,55 @@ typedef struct DWriteRenderingParams {
      *	2 - D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE
      *	3 - D2D1_TEXT_ANTIALIAS_MODE_ALIASED
      */
-    int textAntialiasMode;
+    പൂർണ്ണസംഖ്യ textAntialiasMode;
 } DWriteRenderingParams;
 
 #define DWRITE_MAX_FONT_FEATURES 32
 
-typedef struct DWriteFontFeature {
-    unsigned int tag;	    // OpenType feature tag (4 bytes)
-    unsigned int parameter; // Feature parameter (0 = disable, 1 = enable)
+തരനിർവചനം ഘടന DWriteFontFeature {
+    unsigned പൂർണ്ണസംഖ്യ tag;	    // OpenType feature tag (4 bytes)
+    unsigned പൂർണ്ണസംഖ്യ parameter; // Feature parameter (0 = disable, 1 = enable)
 } DWriteFontFeature;
 
-void DWrite_Init(void);
-void DWrite_Final(void);
+ശൂന്യം DWrite_Init(ശൂന്യം);
+ശൂന്യം DWrite_Final(ശൂന്യം);
 
-DWriteContext *DWriteContext_Open(void);
-void DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, const RECT *rect);
-void DWriteContext_SetFont(DWriteContext *ctx, HFONT hFont);
-void DWriteContext_DrawText(
+DWriteContext *DWriteContext_Open(ശൂന്യം);
+ശൂന്യം DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, സ്ഥിരം RECT *rect);
+ശൂന്യം DWriteContext_SetFont(DWriteContext *ctx, HFONT hFont);
+ശൂന്യം DWriteContext_DrawText(
 	DWriteContext *ctx,
-	const WCHAR *text,
-	int len,
-	int x,
-	int y,
-	int w,
-	int h,
-	int cellWidth,
+	സ്ഥിരം WCHAR *text,
+	പൂർണ്ണസംഖ്യ len,
+	പൂർണ്ണസംഖ്യ x,
+	പൂർണ്ണസംഖ്യ y,
+	പൂർണ്ണസംഖ്യ w,
+	പൂർണ്ണസംഖ്യ h,
+	പൂർണ്ണസംഖ്യ cellWidth,
 	COLORREF color,
 	UINT fuOptions,
-	const RECT *lprc,
-	const INT *lpDx);
-void DWriteContext_FillRect(DWriteContext *ctx, const RECT *rc, COLORREF color);
-void DWriteContext_DrawLine(DWriteContext *ctx, int x1, int y1, int x2, int y2,
+	സ്ഥിരം RECT *lprc,
+	സ്ഥിരം INT *lpDx);
+ശൂന്യം DWriteContext_FillRect(DWriteContext *ctx, സ്ഥിരം RECT *rc, COLORREF color);
+ശൂന്യം DWrite_Context_Draw_വരി(DWriteContext *ctx, പൂർണ്ണസംഖ്യ x1, പൂർണ്ണസംഖ്യ y1, പൂർണ്ണസംഖ്യ x2, പൂർണ്ണസംഖ്യ y2,
 	COLORREF color);
-void DWriteContext_SetPixel(DWriteContext *ctx, int x, int y, COLORREF color);
-void DWriteContext_Scroll(DWriteContext *ctx, int x, int y, const RECT *rc);
-void DWriteContext_Flush(DWriteContext *ctx);
-void DWriteContext_Close(DWriteContext *ctx);
+ശൂന്യം DWriteContext_SetPixel(DWriteContext *ctx, പൂർണ്ണസംഖ്യ x, പൂർണ്ണസംഖ്യ y, COLORREF color);
+ശൂന്യം DWriteContext_Scroll(DWriteContext *ctx, പൂർണ്ണസംഖ്യ x, പൂർണ്ണസംഖ്യ y, സ്ഥിരം RECT *rc);
+ശൂന്യം DWriteContext_Flush(DWriteContext *ctx);
+ശൂന്യം DWriteContext_Close(DWriteContext *ctx);
 
-void DWriteContext_SetRenderingParams(
+ശൂന്യം DWriteContext_SetRenderingParams(
 	DWriteContext *ctx,
-	const DWriteRenderingParams *params);
+	സ്ഥിരം DWriteRenderingParams *params);
 
 DWriteRenderingParams *DWriteContext_GetRenderingParams(
 	DWriteContext *ctx,
 	DWriteRenderingParams *params);
 
-void DWriteContext_SetFontFeatures(
+ശൂന്യം DWriteContext_SetFontFeatures(
 	DWriteContext *ctx,
-	const DWriteFontFeature *features,
-	int count);
+	സ്ഥിരം DWriteFontFeature *features,
+	പൂർണ്ണസംഖ്യ എണ്ണം);
 
 #ifdef __cplusplus
 }

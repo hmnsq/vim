@@ -11,10 +11,10 @@
  *
  */
 
-#include "vim.h"
-#include "version.h"
+#അന്തര്ഭാവ "vim.h"
+#അന്തര്ഭാവ "version.h"
 
-#if (defined(FEAT_CLIENTSERVER) && defined(FEAT_X11))
+#എങ്കിൽ (defined(FEAT_CLIENTSERVER) && defined(FEAT_X11))
 
 # ifdef FEAT_X11
 #  include <X11/Intrinsic.h>
@@ -62,18 +62,18 @@
  * It's unlikely, but possible.
  */
 
-typedef struct PendingCommand
+തരനിർവചനം ഘടന PendingCommand
 {
-    int	    serial;	// Serial number expected in result.
-    int	    code;	// Result Code. 0 is OK
+    പൂർണ്ണസംഖ്യ	    serial;	// Serial number expected in result.
+    പൂർണ്ണസംഖ്യ	    code;	// Result Code. 0 is OK
     char_u  *result;	// String result for command (malloc'ed).
 			// NULL means command still pending.
-    struct PendingCommand *nextPtr;
+    ഘടന PendingCommand *nextPtr;
 			// Next in list of all outstanding commands.
 			// NULL means end of list.
 } PendingCommand;
 
-static PendingCommand *pendingCommands = NULL;
+സ്ഥിതം PendingCommand *pendingCommands = ശൂന്യ;
 				// List of all commands currently
 				// being waited for.
 
@@ -157,100 +157,100 @@ static PendingCommand *pendingCommands = NULL;
  * this module:
  */
 
-# define MAX_PROP_WORDS 100000
+# define MAX_PROP_വാക്കുകൾ 100000
 
-struct ServerReply
+ഘടന ServerReply
 {
     Window  id;
     garray_T strings;
 };
-static garray_T serverReply = { 0, 0, 0, 0, 0 };
-enum ServerReplyOp { SROP_Find, SROP_Add, SROP_Delete };
+സ്ഥിതം garray_T serverReply = { 0, 0, 0, 0, 0 };
+എണ്ണൽ ServerReplyOp { SROP_Find, SROP_Add, SROP_Delete };
 
-typedef int (*EndCond)(void *);
+തരനിർവചനം പൂർണ്ണസംഖ്യ (*EndCond)(ശൂന്യം *);
 
-struct x_cmdqueue
+ഘടന x_cmdqueue
 {
     char_u		*propInfo;
     long_u		len;
-    struct x_cmdqueue	*next;
-    struct x_cmdqueue	*prev;
+    ഘടന x_cmdqueue	*next;
+    ഘടന x_cmdqueue	*prev;
 };
 
-typedef struct x_cmdqueue x_queue_T;
+തരനിർവചനം ഘടന x_cmdqueue x_queue_T;
 
 // dummy node, header for circular queue
-static x_queue_T head = {NULL, 0, NULL, NULL};
+സ്ഥിതം x_queue_T head = {ശൂന്യ, 0, ശൂന്യ, ശൂന്യ};
 
 /*
  * Forward declarations for procedures defined later in this file:
  */
 
-static Window	LookupName(Display *dpy, char_u *name, int delete, char_u **loose);
-static int	SendInit(Display *dpy);
-static int	DoRegisterName(Display *dpy, char_u *name);
-static void	DeleteAnyLingerer(Display *dpy, Window w);
-static int	GetRegProp(Display *dpy, char_u **regPropp, long_u *numItemsp, int domsg);
-static int	WaitForPend(void *p);
-static int	WindowValid(Display *dpy, Window w);
-static void	ServerWait(Display *dpy, Window w, EndCond endCond, void *endData, int localLoop, int seconds);
-static int	AppendPropCarefully(Display *display, Window window, Atom property, char_u *value, int length);
-static int	x_error_check(Display *dpy, XErrorEvent *error_event);
-static int	IsSerialName(char_u *name);
-static void	save_in_queue(char_u *buf, long_u len);
-static void	server_parse_message(Display *dpy, char_u *propInfo, long_u numItems);
+സ്ഥിതം Window	LookupName(Display *dpy, char_u *name, പൂർണ്ണസംഖ്യ delete, char_u **loose);
+സ്ഥിതം പൂർണ്ണസംഖ്യ	SendInit(Display *dpy);
+സ്ഥിതം പൂർണ്ണസംഖ്യ	DoRegisterName(Display *dpy, char_u *name);
+സ്ഥിതം ശൂന്യം	DeleteAnyLingerer(Display *dpy, Window w);
+സ്ഥിതം പൂർണ്ണസംഖ്യ	GetRegProp(Display *dpy, char_u **regPropp, long_u *അക്കം_Itemsp, പൂർണ്ണസംഖ്യ domsg);
+സ്ഥിതം പൂർണ്ണസംഖ്യ	WaitForPend(ശൂന്യം *p);
+സ്ഥിതം പൂർണ്ണസംഖ്യ	WindowValid(Display *dpy, Window w);
+സ്ഥിതം ശൂന്യം	ServerWait(Display *dpy, Window w, EndCond endCond, ശൂന്യം *endData, പൂർണ്ണസംഖ്യ localLoop, പൂർണ്ണസംഖ്യ seconds);
+സ്ഥിതം പൂർണ്ണസംഖ്യ	AppendPropCarefully(Display *display, Window window, Atom property, char_u *മൂല്യം, പൂർണ്ണസംഖ്യ length);
+സ്ഥിതം പൂർണ്ണസംഖ്യ	x_error_check(Display *dpy, XErrorEvent *error_event);
+സ്ഥിതം പൂർണ്ണസംഖ്യ	IsSerialName(char_u *name);
+സ്ഥിതം ശൂന്യം	save_in_queue(char_u *buf, long_u len);
+സ്ഥിതം ശൂന്യം	server_parse_message(Display *dpy, char_u *propInfo, long_u അക്കം_ഇനങ്ങൾ);
 
 // Private variables for the "server" functionality
-static Atom	registryProperty = None;
-static Atom	vimProperty = None;
-static int	got_x_error = FALSE;
+സ്ഥിതം Atom	registryProperty = None;
+സ്ഥിതം Atom	vimProperty = None;
+സ്ഥിതം പൂർണ്ണസംഖ്യ	got_x_error = FALSE;
 
-static char_u	*empty_prop = (char_u *)"";	// empty GetRegProp() result
+സ്ഥിതം char_u	*empty_prop = (char_u *)"";	// empty GetRegProp() result
 
 /*
  * Associate an ASCII name with Vim.  Try real hard to get a unique one.
  * Returns FAIL or OK.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 serverRegisterName(
     Display	*dpy,		// display to register with
     char_u	*name)		// the name that will be used as a base
 {
-    int		i;
-    int		res;
-    char_u	*p = NULL;
+    പൂർണ്ണസംഖ്യ		i;
+    പൂർണ്ണസംഖ്യ		res;
+    char_u	*p = ശൂന്യ;
 
     res = DoRegisterName(dpy, name);
-    if (res >= 0)
-	return OK;
+    എങ്കിൽ (res >= 0)
+	തിരികെ OK;
 
     i = 1;
-    do
+    ചെയ്യുക
     {
-	if (res < -1 || i >= 1000)
+	എങ്കിൽ (res < -1 || i >= 1000)
 	{
-	    msg_attr(_("Unable to register a command server name"),
+	    സന്ദേശം_attr(_("Unable to register a command server name"),
 		    HL_ATTR(HLF_W));
-	    return FAIL;
+	    തിരികെ FAIL;
 	}
-	if (p == NULL)
+	എങ്കിൽ (p == ശൂന്യ)
 	    p = alloc(STRLEN(name) + 10);
-	if (p == NULL)
+	എങ്കിൽ (p == ശൂന്യ)
 	{
 	    res = -10;
-	    continue;
+	    തുടരുക;
 	}
-	sprintf((char *)p, "%s%d", name, i++);
+	sprintf((അക്ഷരം *)p, "%s%d", name, i++);
 	res = DoRegisterName(dpy, p);
     }
-    while (res < 0)
+    ആകുമ്പോൾ (res < 0)
 	;
     vim_free(p);
 
-    return OK;
+    തിരികെ OK;
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 DoRegisterName(Display *dpy, char_u *name)
 {
     Window	w;
@@ -258,10 +258,10 @@ DoRegisterName(Display *dpy, char_u *name)
 # define MAX_NAME_LENGTH 100
     char_u	propInfo[MAX_NAME_LENGTH + 20];
 
-    if (commProperty == None)
+    എങ്കിൽ (commProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return -2;
+	എങ്കിൽ (SendInit(dpy) < 0)
+	    തിരികെ -2;
     }
 
     /*
@@ -272,12 +272,12 @@ DoRegisterName(Display *dpy, char_u *name)
      * server!
      */
     XGrabServer(dpy);
-    w = LookupName(dpy, name, FALSE, NULL);
-    if (w != (Window)0)
+    w = LookupName(dpy, name, FALSE, ശൂന്യ);
+    എങ്കിൽ (w != (Window)0)
     {
 	Status		status;
-	int		dummyInt;
-	unsigned int	dummyUns;
+	പൂർണ്ണസംഖ്യ		dummyInt;
+	unsigned പൂർണ്ണസംഖ്യ	dummyUns;
 	Window		dummyWin;
 
 	/*
@@ -290,46 +290,46 @@ DoRegisterName(Display *dpy, char_u *name)
 	old_handler = XSetErrorHandler(x_error_check);
 	status = XGetGeometry(dpy, w, &dummyWin, &dummyInt, &dummyInt,
 				  &dummyUns, &dummyUns, &dummyUns, &dummyUns);
-	(void)XSetErrorHandler(old_handler);
-	if (status != Success && w != commWindow)
+	(ശൂന്യം)XSetErrorHandler(old_handler);
+	എങ്കിൽ (status != Success && w != commWindow)
 	{
 	    XUngrabServer(dpy);
 	    XFlush(dpy);
-	    return -1;
+	    തിരികെ -1;
 	}
-	(void)LookupName(dpy, name, /*delete=*/TRUE, NULL);
+	(ശൂന്യം)LookupName(dpy, name, /*delete=*/TRUE, ശൂന്യ);
     }
-    sprintf((char *)propInfo, "%x %.*s", (int_u)commWindow,
+    sprintf((അക്ഷരം *)propInfo, "%x %.*s", (int_u)commWindow,
 						       MAX_NAME_LENGTH, name);
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
-    XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING, 8,
+    XChangeProperty(dpy, വേര്_Window(dpy, 0), registryProperty, XA_STRING, 8,
 		    PropModeAppend, propInfo, STRLEN(propInfo) + 1);
     XUngrabServer(dpy);
     XSync(dpy, False);
-    (void)XSetErrorHandler(old_handler);
+    (ശൂന്യം)XSetErrorHandler(old_handler);
 
-    if (!got_x_error)
+    എങ്കിൽ (!got_x_error)
     {
 	size_t	namelen;
 
 	namelen = STRLEN(name);
 # ifdef FEAT_EVAL
-	set_vim_var_string(VV_SEND_SERVER, name, (int)namelen);
+	set_vim_var_string(VV_SEND_SERVER, name, (പൂർണ്ണസംഖ്യ)namelen);
 # endif
 	serverName = vim_strnsave(name, namelen);
 	need_maketitle = TRUE;
-	return 0;
+	തിരികെ 0;
     }
-    return -2;
+    തിരികെ -2;
 }
 
-# if defined(FEAT_GUI)
+# എങ്കിൽ defined(FEAT_GUI)
 /*
  * Clean out new ID from registry and set it as comm win.
  * Change any registered window ID.
  */
-    void
+    ശൂന്യം
 serverChangeRegisteredWindow(
     Display	*dpy,		// Display to register with
     Window	newwin)		// Re-register to this ID
@@ -340,20 +340,20 @@ serverChangeRegisteredWindow(
 
     // Always call SendInit() here, to make sure commWindow is marked as a Vim
     // window.
-    if (SendInit(dpy) < 0)
-	return;
+    എങ്കിൽ (SendInit(dpy) < 0)
+	തിരികെ;
 
     // WARNING: Do not step through this while debugging, it will hangup the X
     // server!
     XGrabServer(dpy);
     DeleteAnyLingerer(dpy, newwin);
-    if (serverName != NULL)
+    എങ്കിൽ (serverName != ശൂന്യ)
     {
 	// Reinsert name if it was already registered
-	(void)LookupName(dpy, serverName, /*delete=*/TRUE, NULL);
-	sprintf((char *)propInfo, "%x %.*s",
+	(ശൂന്യം)LookupName(dpy, serverName, /*delete=*/TRUE, ശൂന്യ);
+	sprintf((അക്ഷരം *)propInfo, "%x %.*s",
 		(int_u)newwin, MAX_NAME_LENGTH, serverName);
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING, 8,
+	XChangeProperty(dpy, വേര്_Window(dpy, 0), registryProperty, XA_STRING, 8,
 			PropModeAppend, (char_u *)propInfo,
 			STRLEN(propInfo) + 1);
     }
@@ -365,43 +365,43 @@ serverChangeRegisteredWindow(
  * Send to an instance of Vim via the X display.
  * Returns 0 for OK, negative for an error.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 serverSendToVim(
     Display	*dpy,			// Where to send.
     char_u	*name,			// Where to send.
     char_u	*cmd,			// What to send.
     char_u	**result,		// Result of eval'ed expression
     Window	*server,		// Actual ID of receiving app
-    Bool	asExpr,			// Interpret as keystrokes or expr ?
-    int		timeout,		// seconds to wait or zero
+    Bool	as_വ്യഞ്ജകം,			// Interpret as keystrokes or expr ?
+    പൂർണ്ണസംഖ്യ		timeout,		// seconds to wait or zero
     Bool	localLoop,		// Throw away everything but result
-    int		silent)			// don't complain about no server
+    പൂർണ്ണസംഖ്യ		silent)			// don't complain about no server
 {
     Window	    w;
     char_u	    *property;
-    int		    length;
-    int		    res;
-    static int	    serial = 0;	// Running count of sent commands.
+    പൂർണ്ണസംഖ്യ		    length;
+    പൂർണ്ണസംഖ്യ		    res;
+    സ്ഥിതം പൂർണ്ണസംഖ്യ	    serial = 0;	// Running count of sent commands.
 				// Used to give each command a
 				// different serial number.
     PendingCommand  pending;
-    char_u	    *loosename = NULL;
+    char_u	    *loosename = ശൂന്യ;
 
-    if (result != NULL)
-	*result = NULL;
-    if (name == NULL || *name == NUL)
+    എങ്കിൽ (result != ശൂന്യ)
+	*result = ശൂന്യ;
+    എങ്കിൽ (name == ശൂന്യ || *name == NUL)
 	name = (char_u *)"GVIM";    // use a default name
 
-    if (commProperty == None && dpy != NULL && SendInit(dpy) < 0)
-	return -1;
+    എങ്കിൽ (commProperty == None && dpy != ശൂന്യ && SendInit(dpy) < 0)
+	തിരികെ -1;
 
-# if defined(FEAT_EVAL)
-    ch_log(NULL, "serverSendToVim(%s, %s)", name, cmd);
+# എങ്കിൽ defined(FEAT_EVAL)
+    ch_log(ശൂന്യ, "serverSendToVim(%s, %s)", name, cmd);
 # endif
 
     // Execute locally if no display or target is ourselves
-    if (dpy == NULL || (serverName != NULL && STRICMP(name, serverName) == 0))
-	return sendToLocalVim(cmd, asExpr, result);
+    എങ്കിൽ (dpy == ശൂന്യ || (serverName != ശൂന്യ && STRICMP(name, serverName) == 0))
+	തിരികെ sendToLocalVim(cmd, as_വ്യഞ്ജകം, result);
 
     /*
      * Bind the server name to a communication window.
@@ -411,31 +411,31 @@ serverSendToVim(
      *
      * Delete any lingering names from dead editors.
      */
-    while (TRUE)
+    ആകുമ്പോൾ (TRUE)
     {
 	w = LookupName(dpy, name, FALSE, &loosename);
 	// Check that the window is hot
-	if (w != None)
+	എങ്കിൽ (w != None)
 	{
-	    if (!WindowValid(dpy, w))
+	    എങ്കിൽ (!WindowValid(dpy, w))
 	    {
 		LookupName(dpy, loosename ? loosename : name,
-			   /*DELETE=*/TRUE, NULL);
+			   /*DELETE=*/TRUE, ശൂന്യ);
 		VIM_CLEAR(loosename);
-		continue;
+		തുടരുക;
 	    }
 	}
-	break;
+	നിർത്തുക;
     }
-    if (w == None)
+    എങ്കിൽ (w == None)
     {
-	if (!silent)
+	എങ്കിൽ (!silent)
 	    semsg(_(e_no_registered_server_named_str), name);
-	return -1;
+	തിരികെ -1;
     }
-    else if (loosename != NULL)
+    അല്ലെങ്കിൽ എങ്കിൽ (loosename != ശൂന്യ)
 	name = loosename;
-    if (server != NULL)
+    എങ്കിൽ (server != ശൂന്യ)
 	*server = w;
 
     /*
@@ -446,27 +446,27 @@ serverSendToVim(
     length = STRLEN(name) + STRLEN(p_enc) + STRLEN(cmd) + 14;
     property = alloc(length + 30);
 
-    sprintf((char *)property, "%c%c%c-n %s%c-E %s%c-s %s",
-		      0, asExpr ? 'c' : 'k', 0, name, 0, p_enc, 0, cmd);
-    if (name == loosename)
+    sprintf((അക്ഷരം *)property, "%c%c%c-n %s%c-E %s%c-s %s",
+		      0, as_വ്യഞ്ജകം ? 'c' : 'k', 0, name, 0, p_enc, 0, cmd);
+    എങ്കിൽ (name == loosename)
 	vim_free(loosename);
     // Add a back reference to our comm window
     serial++;
-    sprintf((char *)property + length, "%c-r %x %d",
+    sprintf((അക്ഷരം *)property + length, "%c-r %x %d",
 						0, (int_u)commWindow, serial);
     // Add length of what "-r %x %d" resulted in, skipping the NUL.
     length += STRLEN(property + length + 1) + 1;
 
     res = AppendPropCarefully(dpy, w, commProperty, property, length + 1);
     vim_free(property);
-    if (res < 0)
+    എങ്കിൽ (res < 0)
     {
 	emsg(_(e_failed_to_send_command_to_destination_program));
-	return -1;
+	തിരികെ -1;
     }
 
-    if (!asExpr) // There is no answer for this - Keys are sent async
-	return 0;
+    എങ്കിൽ (!as_വ്യഞ്ജകം) // There is no answer for this - Keys are sent async
+	തിരികെ 0;
 
     /*
      * Register the fact that we're waiting for a command to
@@ -475,7 +475,7 @@ serverSendToVim(
      */
     pending.serial = serial;
     pending.code = 0;
-    pending.result = NULL;
+    pending.result = ശൂന്യ;
     pending.nextPtr = pendingCommands;
     pendingCommands = &pending;
 
@@ -486,79 +486,79 @@ serverSendToVim(
      * Unregister the information about the pending command
      * and return the result.
      */
-    if (pendingCommands == &pending)
+    എങ്കിൽ (pendingCommands == &pending)
 	pendingCommands = pending.nextPtr;
-    else
+    അല്ലെങ്കിൽ
     {
 	PendingCommand *pcPtr;
 
-	for (pcPtr = pendingCommands; pcPtr != NULL; pcPtr = pcPtr->nextPtr)
-	    if (pcPtr->nextPtr == &pending)
+	വേണ്ടി (pcPtr = pendingCommands; pcPtr != ശൂന്യ; pcPtr = pcPtr->nextPtr)
+	    എങ്കിൽ (pcPtr->nextPtr == &pending)
 	    {
 		pcPtr->nextPtr = pending.nextPtr;
-		break;
+		നിർത്തുക;
 	    }
     }
 
-# if defined(FEAT_EVAL)
-    ch_log(NULL, "serverSendToVim() result: %s",
-	    pending.result == NULL ? "NULL" : (char *)pending.result);
+# എങ്കിൽ defined(FEAT_EVAL)
+    ch_log(ശൂന്യ, "serverSendToVim() result: %s",
+	    pending.result == ശൂന്യ ? "NULL" : (അക്ഷരം *)pending.result);
 # endif
-    if (result != NULL)
+    എങ്കിൽ (result != ശൂന്യ)
 	*result = pending.result;
-    else
+    അല്ലെങ്കിൽ
 	vim_free(pending.result);
 
-    return pending.code == 0 ? 0 : -1;
+    തിരികെ pending.code == 0 ? 0 : -1;
 }
 
-    static int
-WaitForPend(void *p)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+WaitForPend(ശൂന്യം *p)
 {
     PendingCommand *pending = (PendingCommand *) p;
-    return pending->result != NULL;
+    തിരികെ pending->result != ശൂന്യ;
 }
 
 /*
  * Return TRUE if window "w" exists and has a "Vim" property on it.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 WindowValid(Display *dpy, Window w)
 {
     XErrorHandler   old_handler;
     Atom	    *plist;
-    int		    numProp;
-    int		    i;
+    പൂർണ്ണസംഖ്യ		    അക്കം_Prop;
+    പൂർണ്ണസംഖ്യ		    i;
 
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = 0;
-    plist = XListProperties(dpy, w, &numProp);
+    plist = XListProperties(dpy, w, &അക്കം_Prop);
     XSync(dpy, False);
     XSetErrorHandler(old_handler);
-    if (plist == NULL || got_x_error)
-	return FALSE;
+    എങ്കിൽ (plist == ശൂന്യ || got_x_error)
+	തിരികെ FALSE;
 
-    for (i = 0; i < numProp; i++)
-	if (plist[i] == vimProperty)
+    വേണ്ടി (i = 0; i < അക്കം_Prop; i++)
+	എങ്കിൽ (plist[i] == vimProperty)
 	{
 	    XFree(plist);
-	    return TRUE;
+	    തിരികെ TRUE;
 	}
     XFree(plist);
-    return FALSE;
+    തിരികെ FALSE;
 }
 
 /*
  * Enter a loop processing X events & polling chars until we see a result
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 ServerWait(
     Display	*dpy,
     Window	w,
     EndCond	endCond,
-    void	*endData,
-    int		localLoop,
-    int		seconds)
+    ശൂന്യം	*endData,
+    പൂർണ്ണസംഖ്യ		localLoop,
+    പൂർണ്ണസംഖ്യ		seconds)
 {
     time_t	    start;
     time_t	    now;
@@ -570,54 +570,54 @@ ServerWait(
     fd_set	    fds;
 
     FD_ZERO(&fds);
-    FD_SET(ConnectionNumber(dpy), &fds);
-# else
-    struct pollfd   fds;
+    FD_SET(Connection_സംഖ്യ(dpy), &fds);
+# അല്ലെങ്കിൽ
+    ഘടന pollfd   fds;
 
-    fds.fd = ConnectionNumber(dpy);
+    fds.fd = Connection_സംഖ്യ(dpy);
     fds.events = POLLIN;
 # endif
 
     time(&start);
-    while (TRUE)
+    ആകുമ്പോൾ (TRUE)
     {
-	while (XCheckWindowEvent(dpy, commWindow, PropertyChangeMask, &event))
+	ആകുമ്പോൾ (XCheckWindowEvent(dpy, commWindow, PropertyChangeMask, &event))
 	    serverEventProc(dpy, &event, 1);
 	server_parse_messages();
 
-	if (endCond(endData) != 0)
-	    break;
-	if (!WindowValid(dpy, w))
-	    break;
+	എങ്കിൽ (endCond(endData) != 0)
+	    നിർത്തുക;
+	എങ്കിൽ (!WindowValid(dpy, w))
+	    നിർത്തുക;
 	time(&now);
-	if (seconds >= 0 && (now - start) >= seconds)
-	    break;
+	എങ്കിൽ (seconds >= 0 && (now - start) >= seconds)
+	    നിർത്തുക;
 
 # ifdef FEAT_TIMERS
 	check_due_timer();
 # endif
 
 	// Just look out for the answer without calling back into Vim
-	if (localLoop)
+	എങ്കിൽ (localLoop)
 	{
 # ifdef HAVE_SELECT
-	    struct timeval  tv;
+	    ഘടന timeval  tv;
 
 	    // Set the time every call, select() may change it to the remaining
 	    // time.
 	    tv.tv_sec = 0;
 	    tv.tv_usec =  SEND_MSEC_POLL * 1000;
-	    if (select(FD_SETSIZE, &fds, NULL, NULL, &tv) < 0)
-		break;
-# else
-	    if (poll(&fds, 1, SEND_MSEC_POLL) < 0)
-		break;
+	    എങ്കിൽ (select(FD_SETSIZE, &fds, ശൂന്യ, ശൂന്യ, &tv) < 0)
+		നിർത്തുക;
+# അല്ലെങ്കിൽ
+	    എങ്കിൽ (poll(&fds, 1, SEND_MSEC_POLL) < 0)
+		നിർത്തുക;
 # endif
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    if (got_int)
-		break;
+	    എങ്കിൽ (got_int)
+		നിർത്തുക;
 	    ui_delay((long)UI_MSEC_DELAY, TRUE);
 	    ui_breakcheck();
 	}
@@ -637,88 +637,88 @@ serverGetVimNames(Display *dpy)
     char_u	*regProp;
     char_u	*entry;
     char_u	*p;
-    long_u	numItems;
+    long_u	അക്കം_ഇനങ്ങൾ;
     int_u	w;
     list_T	*list;
 
-    if (registryProperty == None)
+    എങ്കിൽ (registryProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return NULL;
+	എങ്കിൽ (SendInit(dpy) < 0)
+	    തിരികെ ശൂന്യ;
     }
 
     list = list_alloc();
-    if (list == NULL)
-	return NULL;
+    എങ്കിൽ (list == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, TRUE) == FAIL)
-	return NULL;
+    എങ്കിൽ (GetRegProp(dpy, &regProp, &അക്കം_ഇനങ്ങൾ, TRUE) == FAIL)
+	തിരികെ ശൂന്യ;
 
     /*
      * Scan all of the names out of the property.
      */
-    for (p = regProp; (long_u)(p - regProp) < numItems; p++)
+    വേണ്ടി (p = regProp; (long_u)(p - regProp) < അക്കം_ഇനങ്ങൾ; p++)
     {
 	entry = p;
-	while (*p != 0 && !SAFE_isspace(*p))
+	ആകുമ്പോൾ (*p != 0 && !SAFE_isspace(*p))
 	    p++;
-	if (*p != 0)
+	എങ്കിൽ (*p != 0)
 	{
 	    w = None;
-	    sscanf((char *)entry, "%x", &w);
-	    if (WindowValid(dpy, (Window)w))
+	    sscanf((അക്ഷരം *)entry, "%x", &w);
+	    എങ്കിൽ (WindowValid(dpy, (Window)w))
 		list_append_string(list, p + 1, -1);
-	    while (*p != 0)
+	    ആകുമ്പോൾ (*p != 0)
 		p++;
 	}
     }
-    if (regProp != empty_prop)
+    എങ്കിൽ (regProp != empty_prop)
 	XFree(regProp);
-    return list;
+    തിരികെ list;
 }
 
 /////////////////////////////////////////////////////////////
 // Reply stuff
 
-    static struct ServerReply *
-ServerReplyFind(Window w, enum ServerReplyOp op)
+    സ്ഥിതം ഘടന ServerReply *
+ServerReplyFind(Window w, എണ്ണൽ ServerReplyOp op)
 {
-    struct ServerReply *p;
-    struct ServerReply e;
-    int		i;
+    ഘടന ServerReply *p;
+    ഘടന ServerReply e;
+    പൂർണ്ണസംഖ്യ		i;
 
-    p = (struct ServerReply *) serverReply.ga_data;
-    for (i = 0; i < serverReply.ga_len; i++, p++)
-	if (p->id == w)
-	    break;
-    if (i >= serverReply.ga_len)
-	p = NULL;
+    p = (ഘടന ServerReply *) serverReply.ga_data;
+    വേണ്ടി (i = 0; i < serverReply.ga_len; i++, p++)
+	എങ്കിൽ (p->id == w)
+	    നിർത്തുക;
+    എങ്കിൽ (i >= serverReply.ga_len)
+	p = ശൂന്യ;
 
-    if (p == NULL && op == SROP_Add)
+    എങ്കിൽ (p == ശൂന്യ && op == SROP_Add)
     {
-	if (serverReply.ga_growsize == 0)
-	    ga_init2(&serverReply, sizeof(struct ServerReply), 1);
-	if (ga_grow(&serverReply, 1) == OK)
+	എങ്കിൽ (serverReply.ga_growsize == 0)
+	    ga_init2(&serverReply, വലുപ്പം(ഘടന ServerReply), 1);
+	എങ്കിൽ (ga_grow(&serverReply, 1) == OK)
 	{
-	    p = ((struct ServerReply *) serverReply.ga_data)
+	    p = ((ഘടന ServerReply *) serverReply.ga_data)
 		+ serverReply.ga_len;
 	    e.id = w;
 	    ga_init2(&e.strings, 1, 100);
-	    mch_memmove(p, &e, sizeof(e));
+	    mch_memmove(p, &e, വലുപ്പം(e));
 	    serverReply.ga_len++;
 	}
     }
-    else if (p != NULL && op == SROP_Delete)
+    അല്ലെങ്കിൽ എങ്കിൽ (p != ശൂന്യ && op == SROP_Delete)
     {
 	ga_clear(&p->strings);
-	mch_memmove(p, p + 1, (serverReply.ga_len - i - 1) * sizeof(*p));
+	mch_memmove(p, p + 1, (serverReply.ga_len - i - 1) * വലുപ്പം(*p));
 	serverReply.ga_len--;
     }
 
-    return p;
+    തിരികെ p;
 }
 
 /*
@@ -730,54 +730,54 @@ serverStrToWin(char_u *str)
 {
     unsigned  id = None;
 
-    sscanf((char *)str, "0x%x", &id);
-    if (id == None)
+    sscanf((അക്ഷരം *)str, "0x%x", &id);
+    എങ്കിൽ (id == None)
 	semsg(_(e_invalid_server_id_used_str), str);
 
-    return (Window)id;
+    തിരികെ (Window)id;
 }
 
 /*
  * Send a reply string (notification) to client with id "name".
  * Return -1 if the window is invalid.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 serverSendReply(char_u *name, char_u *str)
 {
     char_u	*property;
-    int		length;
-    int		res;
+    പൂർണ്ണസംഖ്യ		length;
+    പൂർണ്ണസംഖ്യ		res;
     Display	*dpy = X_DISPLAY;
     Window	win = serverStrToWin(name);
 
-    if (commProperty == None)
+    എങ്കിൽ (commProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return -2;
+	എങ്കിൽ (SendInit(dpy) < 0)
+	    തിരികെ -2;
     }
-    if (!WindowValid(dpy, win))
-	return -1;
+    എങ്കിൽ (!WindowValid(dpy, win))
+	തിരികെ -1;
 
     length = STRLEN(p_enc) + STRLEN(str) + 14;
-    if ((property = alloc(length + 30)) == NULL)
-	return -1;
+    എങ്കിൽ ((property = alloc(length + 30)) == ശൂന്യ)
+	തിരികെ -1;
 
-    sprintf((char *)property, "%cn%c-E %s%c-n %s%c-w %x",
-	    0, 0, p_enc, 0, str, 0, (unsigned int)commWindow);
+    sprintf((അക്ഷരം *)property, "%cn%c-E %s%c-n %s%c-w %x",
+	    0, 0, p_enc, 0, str, 0, (unsigned പൂർണ്ണസംഖ്യ)commWindow);
     // Add length of what "%x" resulted in.
     length += STRLEN(property + length);
     res = AppendPropCarefully(dpy, win, commProperty, property, length + 1);
     vim_free(property);
 
-    return res;
+    തിരികെ res;
 }
 
-    static int
-WaitForReply(void *p)
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
+WaitForReply(ശൂന്യം *p)
 {
     Window  *w = (Window *) p;
 
-    return ServerReplyFind(*w, SROP_Find) != NULL;
+    തിരികെ ServerReplyFind(*w, SROP_Find) != ശൂന്യ;
 }
 
 /*
@@ -786,60 +786,60 @@ WaitForReply(void *p)
  * Return 0 and the allocated string in "*str" when a reply is available.
  * Return -1 if the window becomes invalid while waiting.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 serverReadReply(
     Display	*dpy,
     Window	win,
     char_u	**str,
-    int		localLoop,
-    int		timeout)
+    പൂർണ്ണസംഖ്യ		localLoop,
+    പൂർണ്ണസംഖ്യ		timeout)
 {
-    int		len;
+    പൂർണ്ണസംഖ്യ		len;
     char_u	*s;
-    struct	ServerReply *p;
+    ഘടന	ServerReply *p;
 
     ServerWait(dpy, win, WaitForReply, &win, localLoop,
 						   timeout > 0 ? timeout : -1);
 
-    if ((p = ServerReplyFind(win, SROP_Find)) != NULL && p->strings.ga_len > 0)
+    എങ്കിൽ ((p = ServerReplyFind(win, SROP_Find)) != ശൂന്യ && p->strings.ga_len > 0)
     {
 	*str = vim_strsave(p->strings.ga_data);
 	len = STRLEN(*str) + 1;
-	if (len < p->strings.ga_len)
+	എങ്കിൽ (len < p->strings.ga_len)
 	{
 	    s = (char_u *) p->strings.ga_data;
 	    mch_memmove(s, s + len, p->strings.ga_len - len);
 	    p->strings.ga_len -= len;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    // Last string read.  Remove from list
 	    ga_clear(&p->strings);
 	    ServerReplyFind(win, SROP_Delete);
 	}
-	return 0;
+	തിരികെ 0;
     }
-    return -1;
+    തിരികെ -1;
 }
 
 /*
  * Check for replies from id (win).
  * Return TRUE and a non-malloc'ed string if there is.  Else return FALSE.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 serverPeekReply(Display *dpy, Window win, char_u **str)
 {
-    struct ServerReply *p;
+    ഘടന ServerReply *p;
 
-    if ((p = ServerReplyFind(win, SROP_Find)) != NULL && p->strings.ga_len > 0)
+    എങ്കിൽ ((p = ServerReplyFind(win, SROP_Find)) != ശൂന്യ && p->strings.ga_len > 0)
     {
-	if (str != NULL)
+	എങ്കിൽ (str != ശൂന്യ)
 	    *str = p->strings.ga_data;
-	return 1;
+	തിരികെ 1;
     }
-    if (!WindowValid(dpy, win))
-	return -1;
-    return 0;
+    എങ്കിൽ (!WindowValid(dpy, win))
+	തിരികെ -1;
+    തിരികെ 0;
 }
 
 
@@ -847,7 +847,7 @@ serverPeekReply(Display *dpy, Window win, char_u **str)
  * Initialize the communication channels for sending commands and receiving
  * results.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 SendInit(Display *dpy)
 {
     XErrorHandler old_handler;
@@ -859,20 +859,20 @@ SendInit(Display *dpy)
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
 
-    if (commProperty == None)
+    എങ്കിൽ (commProperty == None)
 	commProperty = XInternAtom(dpy, "Comm", False);
-    if (vimProperty == None)
+    എങ്കിൽ (vimProperty == None)
 	vimProperty = XInternAtom(dpy, "Vim", False);
-    if (registryProperty == None)
+    എങ്കിൽ (registryProperty == None)
 	registryProperty = XInternAtom(dpy, "VimRegistry", False);
 
-    if (commWindow == None)
+    എങ്കിൽ (commWindow == None)
     {
-	commWindow = XCreateSimpleWindow(dpy, XDefaultRootWindow(dpy),
+	commWindow = XCreateSimpleWindow(dpy, XDefault_വേര്_Window(dpy),
 				getpid(), 0, 10, 10, 0,
 				WhitePixel(dpy, DefaultScreen(dpy)),
 				WhitePixel(dpy, DefaultScreen(dpy)));
-	XSelectInput(dpy, commWindow, PropertyChangeMask);
+	XSelect_നിവേശം(dpy, commWindow, PropertyChangeMask);
 	// WARNING: Do not step through this while debugging, it will hangup
 	// the X server!
 	XGrabServer(dpy);
@@ -883,12 +883,12 @@ SendInit(Display *dpy)
     // Make window recognizable as a vim window
     XChangeProperty(dpy, commWindow, vimProperty, XA_STRING,
 		    8, PropModeReplace, (char_u *)VIM_VERSION_SHORT,
-			(int)STRLEN_LITERAL(VIM_VERSION_SHORT) + 1);
+			(പൂർണ്ണസംഖ്യ)STRLEN_LITERAL(VIM_VERSION_SHORT) + 1);
 
     XSync(dpy, False);
-    (void)XSetErrorHandler(old_handler);
+    (ശൂന്യം)XSetErrorHandler(old_handler);
 
-    return got_x_error ? -1 : 0;
+    തിരികെ got_x_error ? -1 : 0;
 }
 
 /*
@@ -903,61 +903,61 @@ SendInit(Display *dpy)
  *	If "delete" is non-zero, then if the named server is found it is
  *	removed from the registry property.
  */
-    static Window
+    സ്ഥിതം Window
 LookupName(
     Display	*dpy,	    // Display whose registry to check.
     char_u	*name,	    // Name of a server.
-    int		delete,	    // If non-zero, delete info about name.
+    പൂർണ്ണസംഖ്യ		delete,	    // If non-zero, delete info about name.
     char_u	**loose)    // Do another search matching -999 if not found
 			    // Return result here if a match is found
 {
     char_u	*regProp, *entry;
     char_u	*p;
-    long_u	numItems;
-    int_u	returnValue;
+    long_u	അക്കം_ഇനങ്ങൾ;
+    int_u	return_മൂല്യം;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
-	return 0;
+    എങ്കിൽ (GetRegProp(dpy, &regProp, &അക്കം_ഇനങ്ങൾ, FALSE) == FAIL)
+	തിരികെ 0;
 
     /*
      * Scan the property for the desired name.
      */
-    returnValue = (int_u)None;
-    entry = NULL;	// Not needed, but eliminates compiler warning.
-    for (p = regProp; (long_u)(p - regProp) < numItems; )
+    return_മൂല്യം = (int_u)None;
+    entry = ശൂന്യ;	// Not needed, but eliminates compiler warning.
+    വേണ്ടി (p = regProp; (long_u)(p - regProp) < അക്കം_ഇനങ്ങൾ; )
     {
 	entry = p;
-	while (*p != 0 && !SAFE_isspace(*p))
+	ആകുമ്പോൾ (*p != 0 && !SAFE_isspace(*p))
 	    p++;
-	if (*p != 0 && STRICMP(name, p + 1) == 0)
+	എങ്കിൽ (*p != 0 && STRICMP(name, p + 1) == 0)
 	{
-	    sscanf((char *)entry, "%x", &returnValue);
-	    break;
+	    sscanf((അക്ഷരം *)entry, "%x", &return_മൂല്യം);
+	    നിർത്തുക;
 	}
-	while (*p != 0)
+	ആകുമ്പോൾ (*p != 0)
 	    p++;
 	p++;
     }
 
-    if (loose != NULL && returnValue == (int_u)None && !IsSerialName(name))
+    എങ്കിൽ (loose != ശൂന്യ && return_മൂല്യം == (int_u)None && !IsSerialName(name))
     {
-	for (p = regProp; (long_u)(p - regProp) < numItems; )
+	വേണ്ടി (p = regProp; (long_u)(p - regProp) < അക്കം_ഇനങ്ങൾ; )
 	{
 	    entry = p;
-	    while (*p != 0 && !SAFE_isspace(*p))
+	    ആകുമ്പോൾ (*p != 0 && !SAFE_isspace(*p))
 		p++;
-	    if (*p != 0 && IsSerialName(p + 1)
+	    എങ്കിൽ (*p != 0 && IsSerialName(p + 1)
 		    && STRNICMP(name, p + 1, STRLEN(name)) == 0)
 	    {
-		if (sscanf((char *)entry, "%x", &returnValue) == 1
-			&& returnValue != (int_u)None)
+		എങ്കിൽ (sscanf((അക്ഷരം *)entry, "%x", &return_മൂല്യം) == 1
+			&& return_മൂല്യം != (int_u)None)
 		    *loose = vim_strsave(p + 1);
-		break;
+		നിർത്തുക;
 	    }
-	    while (*p != 0)
+	    ആകുമ്പോൾ (*p != 0)
 		p++;
 	    p++;
 	}
@@ -968,25 +968,25 @@ LookupName(
      * remainder of the registry property to overlay the deleted
      * info, then rewrite the property).
      */
-    if (delete && returnValue != (int_u)None)
+    എങ്കിൽ (delete && return_മൂല്യം != (int_u)None)
     {
-	int count;
+	പൂർണ്ണസംഖ്യ എണ്ണം;
 
-	while (*p != 0)
+	ആകുമ്പോൾ (*p != 0)
 	    p++;
 	p++;
-	count = numItems - (p - regProp);
-	if (count > 0)
-	    mch_memmove(entry, p, count);
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING,
+	എണ്ണം = അക്കം_ഇനങ്ങൾ - (p - regProp);
+	എങ്കിൽ (എണ്ണം > 0)
+	    mch_memmove(entry, p, എണ്ണം);
+	XChangeProperty(dpy, വേര്_Window(dpy, 0), registryProperty, XA_STRING,
 			8, PropModeReplace, regProp,
-			(int)(numItems - (p - entry)));
+			(പൂർണ്ണസംഖ്യ)(അക്കം_ഇനങ്ങൾ - (p - entry)));
 	XSync(dpy, False);
     }
 
-    if (regProp != empty_prop)
+    എങ്കിൽ (regProp != empty_prop)
 	XFree(regProp);
-    return (Window)returnValue;
+    തിരികെ (Window)return_മൂല്യം;
 }
 
 /*
@@ -998,59 +998,59 @@ LookupName(
  * 2. We get that id for our commWindow but only want to send, not register.
  * 3. The window will mistakenly be regarded valid because of own commWindow
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 DeleteAnyLingerer(
     Display	*dpy,	// Display whose registry to check.
     Window	win)	// Window to remove
 {
-    char_u	*regProp, *entry = NULL;
+    char_u	*regProp, *entry = ശൂന്യ;
     char_u	*p;
-    long_u	numItems;
+    long_u	അക്കം_ഇനങ്ങൾ;
     int_u	wwin;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
-	return;
+    എങ്കിൽ (GetRegProp(dpy, &regProp, &അക്കം_ഇനങ്ങൾ, FALSE) == FAIL)
+	തിരികെ;
 
     // Scan the property for the window id.
-    for (p = regProp; (long_u)(p - regProp) < numItems; )
+    വേണ്ടി (p = regProp; (long_u)(p - regProp) < അക്കം_ഇനങ്ങൾ; )
     {
-	if (*p != 0)
+	എങ്കിൽ (*p != 0)
 	{
-	    sscanf((char *)p, "%x", &wwin);
-	    if ((Window)wwin == win)
+	    sscanf((അക്ഷരം *)p, "%x", &wwin);
+	    എങ്കിൽ ((Window)wwin == win)
 	    {
-		int lastHalf;
+		പൂർണ്ണസംഖ്യ lastHalf;
 
 		// Copy down the remainder to delete entry
 		entry = p;
-		while (*p != 0)
+		ആകുമ്പോൾ (*p != 0)
 		    p++;
 		p++;
-		lastHalf = numItems - (p - regProp);
-		if (lastHalf > 0)
+		lastHalf = അക്കം_ഇനങ്ങൾ - (p - regProp);
+		എങ്കിൽ (lastHalf > 0)
 		    mch_memmove(entry, p, lastHalf);
-		numItems = (entry - regProp) + lastHalf;
+		അക്കം_ഇനങ്ങൾ = (entry - regProp) + lastHalf;
 		p = entry;
-		continue;
+		തുടരുക;
 	    }
 	}
-	while (*p != 0)
+	ആകുമ്പോൾ (*p != 0)
 	    p++;
 	p++;
     }
 
-    if (entry != NULL)
+    എങ്കിൽ (entry != ശൂന്യ)
     {
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty,
+	XChangeProperty(dpy, വേര്_Window(dpy, 0), registryProperty,
 			XA_STRING, 8, PropModeReplace, regProp,
-			(int)(p - regProp));
+			(പൂർണ്ണസംഖ്യ)(p - regProp));
 	XSync(dpy, False);
     }
 
-    if (regProp != empty_prop)
+    എങ്കിൽ (regProp != empty_prop)
 	XFree(regProp);
 }
 
@@ -1060,52 +1060,52 @@ DeleteAnyLingerer(
  * exist yet.
  * Return OK when successful.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 GetRegProp(
     Display	*dpy,
     char_u	**regPropp,
-    long_u	*numItemsp,
-    int		domsg)		// When TRUE give error message.
+    long_u	*അക്കം_Itemsp,
+    പൂർണ്ണസംഖ്യ		domsg)		// When TRUE give error message.
 {
-    int		result, actualFormat;
+    പൂർണ്ണസംഖ്യ		result, actualFormat;
     long_u	bytesAfter;
     Atom	actualType;
     XErrorHandler old_handler;
 
-    *regPropp = NULL;
+    *regPropp = ശൂന്യ;
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
 
-    result = XGetWindowProperty(dpy, RootWindow(dpy, 0), registryProperty, 0L,
-				(long)MAX_PROP_WORDS, False,
+    result = XGetWindowProperty(dpy, വേര്_Window(dpy, 0), registryProperty, 0L,
+				(long)MAX_PROP_വാക്കുകൾ, False,
 				XA_STRING, &actualType,
-				&actualFormat, numItemsp, &bytesAfter,
+				&actualFormat, അക്കം_Itemsp, &bytesAfter,
 				regPropp);
 
     XSync(dpy, FALSE);
-    (void)XSetErrorHandler(old_handler);
-    if (got_x_error)
-	return FAIL;
+    (ശൂന്യം)XSetErrorHandler(old_handler);
+    എങ്കിൽ (got_x_error)
+	തിരികെ FAIL;
 
-    if (actualType == None)
+    എങ്കിൽ (actualType == None)
     {
 	// No prop yet. Logically equal to the empty list
-	*numItemsp = 0;
+	*അക്കം_Itemsp = 0;
 	*regPropp = empty_prop;
-	return OK;
+	തിരികെ OK;
     }
 
     // If the property is improperly formed, then delete it.
-    if (result != Success || actualFormat != 8 || actualType != XA_STRING)
+    എങ്കിൽ (result != Success || actualFormat != 8 || actualType != XA_STRING)
     {
-	if (*regPropp != NULL)
+	എങ്കിൽ (*regPropp != ശൂന്യ)
 	    XFree(*regPropp);
-	XDeleteProperty(dpy, RootWindow(dpy, 0), registryProperty);
-	if (domsg)
+	XDeleteProperty(dpy, വേര്_Window(dpy, 0), registryProperty);
+	എങ്കിൽ (domsg)
 	    emsg(_(e_vim_instance_registry_property_is_badly_formed_deleted));
-	return FAIL;
+	തിരികെ FAIL;
     }
-    return OK;
+    തിരികെ OK;
 }
 
 
@@ -1117,92 +1117,92 @@ GetRegProp(
  * unintended behavior and should only be used for code that blocks for a
  * response.
  */
-    void
+    ശൂന്യം
 serverEventProc(
     Display	*dpy,
     XEvent	*eventPtr,	// Information about event.
-    int		immediate)	// Run event immediately. Should mostly be 0.
+    പൂർണ്ണസംഖ്യ		immediate)	// Run event immediately. Should mostly be 0.
 {
     char_u	*propInfo;
-    int		result, actualFormat;
-    long_u	numItems, bytesAfter;
+    പൂർണ്ണസംഖ്യ		result, actualFormat;
+    long_u	അക്കം_ഇനങ്ങൾ, bytesAfter;
     Atom	actualType;
 
-    if (eventPtr != NULL)
+    എങ്കിൽ (eventPtr != ശൂന്യ)
     {
-	if (eventPtr->xproperty.atom != commProperty
-		|| eventPtr->xproperty.state != PropertyNewValue)
-	    return;
+	എങ്കിൽ (eventPtr->xproperty.atom != commProperty
+		|| eventPtr->xproperty.state != Property_New_മൂല്യം)
+	    തിരികെ;
     }
 
     /*
      * Read the comm property and delete it.
      */
-    propInfo = NULL;
+    propInfo = ശൂന്യ;
     result = XGetWindowProperty(dpy, commWindow, commProperty, 0L,
-				(long)MAX_PROP_WORDS, True,
+				(long)MAX_PROP_വാക്കുകൾ, True,
 				XA_STRING, &actualType,
-				&actualFormat, &numItems, &bytesAfter,
+				&actualFormat, &അക്കം_ഇനങ്ങൾ, &bytesAfter,
 				&propInfo);
 
     // If the property doesn't exist or is improperly formed then ignore it.
-    if (result != Success || actualType != XA_STRING || actualFormat != 8)
+    എങ്കിൽ (result != Success || actualType != XA_STRING || actualFormat != 8)
     {
-	if (propInfo != NULL)
+	എങ്കിൽ (propInfo != ശൂന്യ)
 	    XFree(propInfo);
-	return;
+	തിരികെ;
     }
-    if (immediate)
-	server_parse_message(dpy, propInfo, numItems);
-    else
-	save_in_queue(propInfo, numItems);
+    എങ്കിൽ (immediate)
+	server_parse_message(dpy, propInfo, അക്കം_ഇനങ്ങൾ);
+    അല്ലെങ്കിൽ
+	save_in_queue(propInfo, അക്കം_ഇനങ്ങൾ);
 }
 
 /*
  * Saves x clientserver commands in a queue so that they can be called when
  * vim is idle.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 save_in_queue(char_u *propInfo, long_u len)
 {
-    x_queue_T *node;
+    x_queue_T *കണ്ണി;
 
-    node = ALLOC_ONE(x_queue_T);
-    if (node == NULL)
-	return;	    // out of memory
-    node->propInfo = propInfo;
-    node->len = len;
+    കണ്ണി = ALLOC_ONE(x_queue_T);
+    എങ്കിൽ (കണ്ണി == ശൂന്യ)
+	തിരികെ;	    // out of memory
+    കണ്ണി->propInfo = propInfo;
+    കണ്ണി->len = len;
 
-    if (head.next == NULL)   // initialize circular queue
+    എങ്കിൽ (head.next == ശൂന്യ)   // initialize circular queue
     {
 	head.next = &head;
 	head.prev = &head;
     }
 
     // insert node at tail of queue
-    node->next = &head;
-    node->prev = head.prev;
-    head.prev->next = node;
-    head.prev = node;
+    കണ്ണി->next = &head;
+    കണ്ണി->prev = head.prev;
+    head.prev->next = കണ്ണി;
+    head.prev = കണ്ണി;
 }
 
 /*
  * Parses queued clientserver messages.
  */
-    void
-server_parse_messages(void)
+    ശൂന്യം
+server_parse_messages(ശൂന്യം)
 {
-    x_queue_T	*node;
+    x_queue_T	*കണ്ണി;
 
-    if (!X_DISPLAY)
-	return; // cannot happen?
-    while (head.next != NULL && head.next != &head)
+    എങ്കിൽ (!X_DISPLAY)
+	തിരികെ; // cannot happen?
+    ആകുമ്പോൾ (head.next != ശൂന്യ && head.next != &head)
     {
-	node = head.next;
-	head.next = node->next;
-	node->next->prev = node->prev;
-	server_parse_message(X_DISPLAY, node->propInfo, node->len);
-	vim_free(node);
+	കണ്ണി = head.next;
+	head.next = കണ്ണി->next;
+	കണ്ണി->next->prev = കണ്ണി->prev;
+	server_parse_message(X_DISPLAY, കണ്ണി->propInfo, കണ്ണി->len);
+	vim_free(കണ്ണി);
     }
 }
 
@@ -1210,10 +1210,10 @@ server_parse_messages(void)
  * Returns a non-zero value if there are clientserver messages waiting
  * int the queue.
  */
-    int
-server_waiting(void)
+    പൂർണ്ണസംഖ്യ
+server_waiting(ശൂന്യം)
 {
-    return head.next != NULL && head.next != &head;
+    തിരികെ head.next != ശൂന്യ && head.next != &head;
 }
 
 /*
@@ -1221,18 +1221,18 @@ server_waiting(void)
  * commands.
  * "propInfo" will be freed.
  */
-    static void
+    സ്ഥിതം ശൂന്യം
 server_parse_message(
     Display	*dpy,
     char_u	*propInfo, // A string containing 0 or more X commands
-    long_u	numItems)  // The size of propInfo in bytes.
+    long_u	അക്കം_ഇനങ്ങൾ)  // The size of propInfo in bytes.
 {
     char_u	*p;
-    int		code;
+    പൂർണ്ണസംഖ്യ		code;
     char_u	*tofree;
 
-# if defined(FEAT_EVAL)
-    ch_log(NULL, "server_parse_message() numItems: %ld", numItems);
+# എങ്കിൽ defined(FEAT_EVAL)
+    ch_log(ശൂന്യ, "server_parse_message() numItems: %ld", അക്കം_ഇനങ്ങൾ);
 # endif
 
     /*
@@ -1240,7 +1240,7 @@ server_parse_message(
      * one time;  each iteration through the outer loop handles a
      * single command or result.
      */
-    for (p = propInfo; (long_u)(p - propInfo) < numItems; )
+    വേണ്ടി (p = propInfo; (long_u)(p - propInfo) < അക്കം_ഇനങ്ങൾ; )
     {
 	/*
 	 * Ignore leading NULs; each command or result starts with a
@@ -1248,17 +1248,17 @@ server_parse_message(
 	 * is, we'll be able to tell that a new command/result is
 	 * starting.
 	 */
-	if (*p == 0)
+	എങ്കിൽ (*p == 0)
 	{
 	    p++;
-	    continue;
+	    തുടരുക;
 	}
 
-	if ((*p == 'c' || *p == 'k') && p[1] == 0)
+	എങ്കിൽ ((*p == 'c' || *p == 'k') && p[1] == 0)
 	{
 	    Window	resWindow;
 	    char_u	*name, *script, *serial, *end;
-	    Bool	asKeys = *p == 'k';
+	    Bool	as_താക്കോലുകൾ = *p == 'k';
 	    char_u	*enc;
 
 	    /*
@@ -1268,80 +1268,80 @@ server_parse_message(
 	     * like an option.
 	     */
 	    p += 2;
-	    name = NULL;
+	    name = ശൂന്യ;
 	    resWindow = None;
 	    serial = (char_u *)"";
-	    script = NULL;
-	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    script = ശൂന്യ;
+	    enc = ശൂന്യ;
+	    ആകുമ്പോൾ ((long_u)(p - propInfo) < അക്കം_ഇനങ്ങൾ && *p == '-')
 	    {
-# if defined(FEAT_EVAL)
-		ch_log(NULL, "server_parse_message() item: %c, %s", p[-2], p);
+# എങ്കിൽ defined(FEAT_EVAL)
+		ch_log(ശൂന്യ, "server_parse_message() item: %c, %s", p[-2], p);
 # endif
-		switch (p[1])
+		തിരഞ്ഞെടുപ്പ് (p[1])
 		{
-		    case 'r':
+		    അവസ്ഥ 'r':
 			end = skipwhite(p + 2);
 			resWindow = 0;
-			while (vim_isxdigit(*end))
+			ആകുമ്പോൾ (vim_isxdigit(*end))
 			{
 			    resWindow = 16 * resWindow + (long_u)hex2nr(*end);
 			    ++end;
 			}
-			if (end == p + 2 || *end != ' ')
+			എങ്കിൽ (end == p + 2 || *end != ' ')
 			    resWindow = None;
-			else
+			അല്ലെങ്കിൽ
 			{
 			    p = serial = end + 1;
 			    clientWindow = resWindow; // Remember in global
 			}
-			break;
-		    case 'n':
-			if (p[2] == ' ')
+			നിർത്തുക;
+		    അവസ്ഥ 'n':
+			എങ്കിൽ (p[2] == ' ')
 			    name = p + 3;
-			break;
-		    case 's':
-			if (p[2] == ' ')
+			നിർത്തുക;
+		    അവസ്ഥ 's':
+			എങ്കിൽ (p[2] == ' ')
 			    script = p + 3;
-			break;
-		    case 'E':
-			if (p[2] == ' ')
+			നിർത്തുക;
+		    അവസ്ഥ 'E':
+			എങ്കിൽ (p[2] == ' ')
 			    enc = p + 3;
-			break;
+			നിർത്തുക;
 		}
-		while (*p != 0)
+		ആകുമ്പോൾ (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (script == NULL || name == NULL)
-		continue;
+	    എങ്കിൽ (script == ശൂന്യ || name == ശൂന്യ)
+		തുടരുക;
 
-	    if (serverName != NULL && STRICMP(name, serverName) == 0)
+	    എങ്കിൽ (serverName != ശൂന്യ && STRICMP(name, serverName) == 0)
 	    {
 		script = serverConvert(enc, script, &tofree);
-		if (asKeys)
-		    server_to_input_buf(script);
-		else
+		എങ്കിൽ (as_താക്കോലുകൾ)
+		    server_to_നിവേശം_buf(script);
+		അല്ലെങ്കിൽ
 		{
 		    char_u      *res;
 
-		    res = eval_client_expr_to_string(script);
-		    if (resWindow != None)
+		    res = eval_client_വ്യഞ്ജകം_to_string(script);
+		    എങ്കിൽ (resWindow != None)
 		    {
 			garray_T    reply;
 
 			// Initialize the result property.
 			ga_init2(&reply, 1, 100);
-			(void)ga_grow(&reply, 50 + STRLEN(p_enc) + STRLEN(serial));
+			(ശൂന്യം)ga_grow(&reply, 50 + STRLEN(p_enc) + STRLEN(serial));
 			sprintf(reply.ga_data, "%cr%c-E %s%c-s %s%c-r ",
 						   0, 0, p_enc, 0, serial, 0);
 			reply.ga_len = 14 + STRLEN(p_enc) + STRLEN(serial);
 
 			// Evaluate the expression and return the result.
-			if (res != NULL)
+			എങ്കിൽ (res != ശൂന്യ)
 			    ga_concat(&reply, res);
-			else
+			അല്ലെങ്കിൽ
 			{
 			    ga_concat(&reply,
 				   (char_u *)_(e_invalid_expression_received));
@@ -1349,7 +1349,7 @@ server_parse_message(
 			    GA_CONCAT_LITERAL(&reply, "-c 1");
 			}
 			ga_append(&reply, NUL);
-			(void)AppendPropCarefully(dpy, resWindow, commProperty,
+			(ശൂന്യം)AppendPropCarefully(dpy, resWindow, commProperty,
 						 reply.ga_data, reply.ga_len);
 			ga_clear(&reply);
 		    }
@@ -1358,9 +1358,9 @@ server_parse_message(
 		vim_free(tofree);
 	    }
 	}
-	else if (*p == 'r' && p[1] == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (*p == 'r' && p[1] == 0)
 	{
-	    int		    serial, gotSerial;
+	    പൂർണ്ണസംഖ്യ		    serial, gotSerial;
 	    char_u	    *res;
 	    PendingCommand  *pcPtr;
 	    char_u	    *enc;
@@ -1374,60 +1374,60 @@ server_parse_message(
 	    gotSerial = 0;
 	    res = (char_u *)"";
 	    code = 0;
-	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    enc = ശൂന്യ;
+	    ആകുമ്പോൾ ((long_u)(p - propInfo) < അക്കം_ഇനങ്ങൾ && *p == '-')
 	    {
-		switch (p[1])
+		തിരഞ്ഞെടുപ്പ് (p[1])
 		{
-		    case 'r':
-			if (p[2] == ' ')
+		    അവസ്ഥ 'r':
+			എങ്കിൽ (p[2] == ' ')
 			    res = p + 3;
-			break;
-		    case 'E':
-			if (p[2] == ' ')
+			നിർത്തുക;
+		    അവസ്ഥ 'E':
+			എങ്കിൽ (p[2] == ' ')
 			    enc = p + 3;
-			break;
-		    case 's':
-			if (sscanf((char *)p + 2, " %d", &serial) == 1)
+			നിർത്തുക;
+		    അവസ്ഥ 's':
+			എങ്കിൽ (sscanf((അക്ഷരം *)p + 2, " %d", &serial) == 1)
 			    gotSerial = 1;
-			break;
-		    case 'c':
-			if (sscanf((char *)p + 2, " %d", &code) != 1)
+			നിർത്തുക;
+		    അവസ്ഥ 'c':
+			എങ്കിൽ (sscanf((അക്ഷരം *)p + 2, " %d", &code) != 1)
 			    code = 0;
-			break;
+			നിർത്തുക;
 		}
-		while (*p != 0)
+		ആകുമ്പോൾ (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (!gotSerial)
-		continue;
+	    എങ്കിൽ (!gotSerial)
+		തുടരുക;
 
 	    /*
 	     * Give the result information to anyone who's
 	     * waiting for it.
 	     */
-	    for (pcPtr = pendingCommands; pcPtr != NULL; pcPtr = pcPtr->nextPtr)
+	    വേണ്ടി (pcPtr = pendingCommands; pcPtr != ശൂന്യ; pcPtr = pcPtr->nextPtr)
 	    {
-		if (serial != pcPtr->serial || pcPtr->result != NULL)
-		    continue;
+		എങ്കിൽ (serial != pcPtr->serial || pcPtr->result != ശൂന്യ)
+		    തുടരുക;
 
 		pcPtr->code = code;
 		res = serverConvert(enc, res, &tofree);
-		if (tofree == NULL)
+		എങ്കിൽ (tofree == ശൂന്യ)
 		    res = vim_strsave(res);
 		pcPtr->result = res;
-		break;
+		നിർത്തുക;
 	    }
 	}
-	else if (*p == 'n' && p[1] == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (*p == 'n' && p[1] == 0)
 	{
 	    Window	win = 0;
-	    unsigned int u;
-	    int		gotWindow;
+	    unsigned പൂർണ്ണസംഖ്യ u;
+	    പൂർണ്ണസംഖ്യ		gotWindow;
 	    char_u	*str;
-	    struct	ServerReply *r;
+	    ഘടന	ServerReply *r;
 	    char_u	*enc;
 
 	    /*
@@ -1437,36 +1437,36 @@ server_parse_message(
 	    p += 2;
 	    gotWindow = 0;
 	    str = (char_u *)"";
-	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    enc = ശൂന്യ;
+	    ആകുമ്പോൾ ((long_u)(p - propInfo) < അക്കം_ഇനങ്ങൾ && *p == '-')
 	    {
-		switch (p[1])
+		തിരഞ്ഞെടുപ്പ് (p[1])
 		{
-		    case 'n':
-			if (p[2] == ' ')
+		    അവസ്ഥ 'n':
+			എങ്കിൽ (p[2] == ' ')
 			    str = p + 3;
-			break;
-		    case 'E':
-			if (p[2] == ' ')
+			നിർത്തുക;
+		    അവസ്ഥ 'E':
+			എങ്കിൽ (p[2] == ' ')
 			    enc = p + 3;
-			break;
-		    case 'w':
-			if (sscanf((char *)p + 2, " %x", &u) == 1)
+			നിർത്തുക;
+		    അവസ്ഥ 'w':
+			എങ്കിൽ (sscanf((അക്ഷരം *)p + 2, " %x", &u) == 1)
 			{
 			    win = u;
 			    gotWindow = 1;
 			}
-			break;
+			നിർത്തുക;
 		}
-		while (*p != 0)
+		ആകുമ്പോൾ (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (!gotWindow)
-		continue;
+	    എങ്കിൽ (!gotWindow)
+		തുടരുക;
 	    str = serverConvert(enc, str, &tofree);
-	    if ((r = ServerReplyFind(win, SROP_Add)) != NULL)
+	    എങ്കിൽ ((r = ServerReplyFind(win, SROP_Add)) != ശൂന്യ)
 	    {
 		ga_concat(&(r->strings), str);
 		ga_append(&(r->strings), NUL);
@@ -1474,12 +1474,12 @@ server_parse_message(
 	    {
 		char_u	winstr[30];
 
-		sprintf((char *)winstr, "0x%x", (unsigned int)win);
+		sprintf((അക്ഷരം *)winstr, "0x%x", (unsigned പൂർണ്ണസംഖ്യ)win);
 		apply_autocmds(EVENT_REMOTEREPLY, winstr, str, TRUE, curbuf);
 	    }
 	    vim_free(tofree);
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
 	    /*
 	     * Didn't recognize this thing.  Just skip through the next
@@ -1487,7 +1487,7 @@ server_parse_message(
 	     * Even if we get an 'r'(eply) we will throw it away as we
 	     * never specify (and thus expect) one
 	     */
-	    while (*p != 0)
+	    ആകുമ്പോൾ (*p != 0)
 		p++;
 	    p++;
 	}
@@ -1501,45 +1501,45 @@ server_parse_message(
  * than having Xlib panic.
  * Return: 0 for OK, -1 for error
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 AppendPropCarefully(
     Display	*dpy,		// Display on which to operate.
     Window	window,		// Window whose property is to be modified.
     Atom	property,	// Name of property.
-    char_u	*value,		// Characters  to append to property.
-    int		length)		// How much to append
+    char_u	*മൂല്യം,		// Characters  to append to property.
+    പൂർണ്ണസംഖ്യ		length)		// How much to append
 {
     XErrorHandler old_handler;
 
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
     XChangeProperty(dpy, window, property, XA_STRING, 8,
-					       PropModeAppend, value, length);
+					       PropModeAppend, മൂല്യം, length);
     XSync(dpy, False);
-    (void) XSetErrorHandler(old_handler);
-    return got_x_error ? -1 : 0;
+    (ശൂന്യം) XSetErrorHandler(old_handler);
+    തിരികെ got_x_error ? -1 : 0;
 }
 
 
 /*
  * Another X Error handler, just used to check for errors.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 x_error_check(Display *dpy UNUSED, XErrorEvent *error_event UNUSED)
 {
     got_x_error = TRUE;
-    return 0;
+    തിരികെ 0;
 }
 
 /*
  * Check if "str" looks like it had a serial number appended.
  * Actually just checks if the name ends in a digit.
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 IsSerialName(char_u *str)
 {
-    int len = STRLEN(str);
+    പൂർണ്ണസംഖ്യ len = STRLEN(str);
 
-    return (len > 1 && vim_isdigit(str[len - 1]));
+    തിരികെ (len > 1 && vim_isdigit(str[len - 1]));
 }
 #endif	// FEAT_CLIENTSERVER

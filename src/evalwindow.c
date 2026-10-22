@@ -11,80 +11,80 @@
  * evalwindow.c: Window related builtin functions
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-#if defined(FEAT_EVAL)
+#എങ്കിൽ defined(FEAT_EVAL)
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 win_getid(typval_T *argvars)
 {
-    int	    winnr;
+    പൂർണ്ണസംഖ്യ	    winnr;
     win_T   *wp;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
-	return curwin->w_id;
-    winnr = tv_get_number(&argvars[0]);
-    if (winnr <= 0)
-	return 0;
+    എങ്കിൽ (argvars[0].v_type == VAR_UNKNOWN)
+	തിരികെ curwin->w_id;
+    winnr = tv_get_സംഖ്യ(&argvars[0]);
+    എങ്കിൽ (winnr <= 0)
+	തിരികെ 0;
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    എങ്കിൽ (argvars[1].v_type == VAR_UNKNOWN)
 	wp = firstwin;
-    else
+    അല്ലെങ്കിൽ
     {
 	tabpage_T	*tp;
-	int		tabnr = tv_get_number(&argvars[1]);
+	പൂർണ്ണസംഖ്യ		tabnr = tv_get_സംഖ്യ(&argvars[1]);
 
 	FOR_ALL_TABPAGES(tp)
-	    if (--tabnr == 0)
-		break;
-	if (tp == NULL)
-	    return -1;
-	if (tp == curtab)
+	    എങ്കിൽ (--tabnr == 0)
+		നിർത്തുക;
+	എങ്കിൽ (tp == ശൂന്യ)
+	    തിരികെ -1;
+	എങ്കിൽ (tp == curtab)
 	    wp = firstwin;
-	else
+	അല്ലെങ്കിൽ
 	    wp = tp->tp_firstwin;
     }
-    for ( ; wp != NULL; wp = wp->w_next)
-	if (--winnr == 0)
-	    return wp->w_id;
-    return 0;
+    വേണ്ടി ( ; wp != ശൂന്യ; wp = wp->w_next)
+	എങ്കിൽ (--winnr == 0)
+	    തിരികെ wp->w_id;
+    തിരികെ 0;
 }
 
-    static void
+    സ്ഥിതം ശൂന്യം
 win_id2tabwin(typval_T *argvars, list_T *list)
 {
     win_T	*wp;
     tabpage_T   *tp;
-    int		winnr = 1;
-    int		tabnr = 1;
-    int		id = tv_get_number(&argvars[0]);
+    പൂർണ്ണസംഖ്യ		winnr = 1;
+    പൂർണ്ണസംഖ്യ		tabnr = 1;
+    പൂർണ്ണസംഖ്യ		id = tv_get_സംഖ്യ(&argvars[0]);
 
     FOR_ALL_TABPAGES(tp)
     {
 	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
 	{
-	    if (wp->w_id == id)
+	    എങ്കിൽ (wp->w_id == id)
 	    {
-		list_append_number(list, tabnr);
-		list_append_number(list, winnr);
-		return;
+		list_append_സംഖ്യ(list, tabnr);
+		list_append_സംഖ്യ(list, winnr);
+		തിരികെ;
 	    }
 	    ++winnr;
 	}
 	++tabnr;
 	winnr = 1;
     }
-    list_append_number(list, 0);
-    list_append_number(list, 0);
+    list_append_സംഖ്യ(list, 0);
+    list_append_സംഖ്യ(list, 0);
 }
 
 /*
  * Return the window pointer of window "id".
  */
     win_T *
-win_id2wp(int id)
+win_id2wp(പൂർണ്ണസംഖ്യ id)
 {
-    return win_id2wp_tp(id, NULL);
+    തിരികെ win_id2wp_tp(id, ശൂന്യ);
 }
 
 /*
@@ -92,66 +92,66 @@ win_id2wp(int id)
  * Returns NULL when not found.
  */
     win_T *
-win_id2wp_tp(int id, tabpage_T **tpp)
+win_id2wp_tp(പൂർണ്ണസംഖ്യ id, tabpage_T **tpp)
 {
     win_T	*wp;
     tabpage_T   *tp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if (wp->w_id == id)
+	എങ്കിൽ (wp->w_id == id)
 	{
-	    if (tpp != NULL)
+	    എങ്കിൽ (tpp != ശൂന്യ)
 		*tpp = tp;
-	    return wp;
+	    തിരികെ wp;
 	}
 # ifdef FEAT_PROP_POPUP
     // popup windows are in separate lists
     FOR_ALL_TABPAGES(tp)
 	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-	     if (wp->w_id == id)
+	     എങ്കിൽ (wp->w_id == id)
 	     {
-		 if (tpp != NULL)
+		 എങ്കിൽ (tpp != ശൂന്യ)
 		     *tpp = tp;
-		 return wp;
+		 തിരികെ wp;
 	     }
     FOR_ALL_POPUPWINS(wp)
-	if (wp->w_id == id)
+	എങ്കിൽ (wp->w_id == id)
 	{
-	    if (tpp != NULL)
+	    എങ്കിൽ (tpp != ശൂന്യ)
 		*tpp = curtab;  // any tabpage would do
-	    return wp;
+	    തിരികെ wp;
 	}
 # endif
 
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 win_id2win(typval_T *argvars)
 {
     win_T   *wp;
-    int	    nr = 1;
-    int	    id = tv_get_number(&argvars[0]);
+    പൂർണ്ണസംഖ്യ	    nr = 1;
+    പൂർണ്ണസംഖ്യ	    id = tv_get_സംഖ്യ(&argvars[0]);
 
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_id == id)
-	    return nr;
+	എങ്കിൽ (wp->w_id == id)
+	    തിരികെ nr;
 	++nr;
     }
-    return 0;
+    തിരികെ 0;
 }
 
-    void
+    ശൂന്യം
 win_findbuf(typval_T *argvars, list_T *list)
 {
     win_T	*wp;
     tabpage_T   *tp;
-    int		bufnr = tv_get_number(&argvars[0]);
+    പൂർണ്ണസംഖ്യ		bufnr = tv_get_സംഖ്യ(&argvars[0]);
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer->b_fnum == bufnr)
-		list_append_number(list, wp->w_id);
+	    എങ്കിൽ (wp->w_buffer->b_fnum == bufnr)
+		list_append_സംഖ്യ(list, wp->w_id);
 }
 
 /*
@@ -165,39 +165,39 @@ find_win_by_nr(
     tabpage_T	*tp)	// NULL for current tab page
 {
     win_T	*wp;
-    int		nr = (int)tv_get_number_chk(vp, NULL);
+    പൂർണ്ണസംഖ്യ		nr = (പൂർണ്ണസംഖ്യ)tv_get_സംഖ്യ_chk(vp, ശൂന്യ);
 
-    if (nr < 0)
-	return NULL;
-    if (nr == 0)
-	return curwin;
+    എങ്കിൽ (nr < 0)
+	തിരികെ ശൂന്യ;
+    എങ്കിൽ (nr == 0)
+	തിരികെ curwin;
 
     FOR_ALL_WINDOWS_IN_TAB(tp, wp)
     {
-	if (nr >= LOWEST_WIN_ID)
+	എങ്കിൽ (nr >= LOWEST_WIN_ID)
 	{
-	    if (wp->w_id == nr)
-		return wp;
+	    എങ്കിൽ (wp->w_id == nr)
+		തിരികെ wp;
 	}
-	else if (--nr <= 0)
-	    break;
+	അല്ലെങ്കിൽ എങ്കിൽ (--nr <= 0)
+	    നിർത്തുക;
     }
-    if (nr >= LOWEST_WIN_ID)
+    എങ്കിൽ (nr >= LOWEST_WIN_ID)
     {
 # ifdef FEAT_PROP_POPUP
 	// check tab-local popup windows
-	for (wp = (tp == NULL ? curtab : tp)->tp_first_popupwin;
-						   wp != NULL; wp = wp->w_next)
-	    if (wp->w_id == nr)
-		return wp;
+	വേണ്ടി (wp = (tp == ശൂന്യ ? curtab : tp)->tp_first_popupwin;
+						   wp != ശൂന്യ; wp = wp->w_next)
+	    എങ്കിൽ (wp->w_id == nr)
+		തിരികെ wp;
 	// check global popup windows
 	FOR_ALL_POPUPWINS(wp)
-	    if (wp->w_id == nr)
-		return wp;
+	    എങ്കിൽ (wp->w_id == nr)
+		തിരികെ wp;
 # endif
-	return NULL;
+	തിരികെ ശൂന്യ;
     }
-    return wp;
+    തിരികെ wp;
 }
 
 /*
@@ -208,11 +208,11 @@ find_win_by_nr(
     win_T *
 find_win_by_nr_or_id(typval_T *vp)
 {
-    int	nr = (int)tv_get_number_chk(vp, NULL);
+    പൂർണ്ണസംഖ്യ	nr = (പൂർണ്ണസംഖ്യ)tv_get_സംഖ്യ_chk(vp, ശൂന്യ);
 
-    if (nr >= LOWEST_WIN_ID)
-	return win_id2wp(tv_get_number(vp));
-    return find_win_by_nr(vp, NULL);
+    എങ്കിൽ (nr >= LOWEST_WIN_ID)
+	തിരികെ win_id2wp(tv_get_സംഖ്യ(vp));
+    തിരികെ find_win_by_nr(vp, ശൂന്യ);
 }
 
 /*
@@ -225,96 +225,96 @@ find_tabwin(
     typval_T	*tvp,	// VAR_UNKNOWN for current tab page
     tabpage_T	**ptp)
 {
-    win_T	*wp = NULL;
-    tabpage_T	*tp = NULL;
+    win_T	*wp = ശൂന്യ;
+    tabpage_T	*tp = ശൂന്യ;
     long	n;
 
-    if (wvp->v_type != VAR_UNKNOWN)
+    എങ്കിൽ (wvp->v_type != VAR_UNKNOWN)
     {
-	if (tvp->v_type != VAR_UNKNOWN)
+	എങ്കിൽ (tvp->v_type != VAR_UNKNOWN)
 	{
-	    n = (long)tv_get_number(tvp);
-	    if (n >= 0)
+	    n = (long)tv_get_സംഖ്യ(tvp);
+	    എങ്കിൽ (n >= 0)
 		tp = find_tabpage(n);
 	}
-	else
+	അല്ലെങ്കിൽ
 	    tp = curtab;
 
-	if (tp != NULL)
+	എങ്കിൽ (tp != ശൂന്യ)
 	{
 	    wp = find_win_by_nr(wvp, tp);
-	    if (wp == NULL && wvp->v_type == VAR_NUMBER
-						&& wvp->vval.v_number != -1)
+	    എങ്കിൽ (wp == ശൂന്യ && wvp->v_type == VAR_സംഖ്യ
+						&& wvp->vval.v_സംഖ്യ != -1)
 		// A window with the specified number is not found
-		tp = NULL;
+		tp = ശൂന്യ;
 	}
     }
-    else
+    അല്ലെങ്കിൽ
     {
 	wp = curwin;
 	tp = curtab;
     }
 
-    if (ptp != NULL)
+    എങ്കിൽ (ptp != ശൂന്യ)
 	*ptp = tp;
 
-    return wp;
+    തിരികെ wp;
 }
 
 /*
  * Get the layout of the given tab page for winlayout() and add it to "l".
  */
-    static void
-get_framelayout(frame_T *fr, list_T *l, int outer)
+    സ്ഥിതം ശൂന്യം
+get_framelayout(frame_T *fr, list_T *l, പൂർണ്ണസംഖ്യ outer)
 {
     frame_T	*child;
     list_T	*fr_list;
     list_T	*win_list;
 
-    if (fr == NULL)
-	return;
+    എങ്കിൽ (fr == ശൂന്യ)
+	തിരികെ;
 
-    if (outer)
+    എങ്കിൽ (outer)
 	// outermost call from f_winlayout()
 	fr_list = l;
-    else
+    അല്ലെങ്കിൽ
     {
 	fr_list = list_alloc();
-	if (fr_list == NULL)
-	    return;
-	if (list_append_list(l, fr_list) == FAIL)
+	എങ്കിൽ (fr_list == ശൂന്യ)
+	    തിരികെ;
+	എങ്കിൽ (list_append_list(l, fr_list) == FAIL)
 	{
 	    list_free(fr_list);
-	    return;
+	    തിരികെ;
 	}
     }
 
-    if (fr->fr_layout == FR_LEAF)
+    എങ്കിൽ (fr->fr_layout == FR_LEAF)
     {
-	if (fr->fr_win != NULL)
+	എങ്കിൽ (fr->fr_win != ശൂന്യ)
 	{
 	    list_append_string(fr_list, (char_u *)"leaf", STRLEN_LITERAL("leaf"));
-	    list_append_number(fr_list, fr->fr_win->w_id);
+	    list_append_സംഖ്യ(fr_list, fr->fr_win->w_id);
 	}
     }
-    else
+    അല്ലെങ്കിൽ
     {
-	if (fr->fr_layout == FR_ROW)
+	എങ്കിൽ (fr->fr_layout == FR_ROW)
 	    list_append_string(fr_list, (char_u *)"row", STRLEN_LITERAL("row"));
-	else
+	അല്ലെങ്കിൽ
 	    list_append_string(fr_list, (char_u *)"col", STRLEN_LITERAL("col"));
 
 	win_list = list_alloc();
-	if (win_list == NULL)
-	    return;
-	if (list_append_list(fr_list, win_list) == FAIL)
+	എങ്കിൽ (win_list == ശൂന്യ)
+	    തിരികെ;
+	എങ്കിൽ (list_append_list(fr_list, win_list) == FAIL)
 	{
 	    list_free(win_list);
-	    return;
+	    തിരികെ;
 	}
 
 	child = fr->fr_child;
-	while (child != NULL)
+	ആകുമ്പോൾ (child != ശൂന്യ)
 	{
 	    get_framelayout(child, win_list, FALSE);
 	    child = child->fr_next;
@@ -325,218 +325,218 @@ get_framelayout(frame_T *fr, list_T *l, int outer)
 /*
  * Common code for tabpagewinnr() and winnr().
  */
-    static int
+    സ്ഥിതം പൂർണ്ണസംഖ്യ
 get_winnr(tabpage_T *tp, typval_T *argvar)
 {
     win_T	*twin;
-    int		nr = 1;
+    പൂർണ്ണസംഖ്യ		nr = 1;
     win_T	*wp;
     char_u	*arg;
 
     twin = (tp == curtab) ? curwin : tp->tp_curwin;
-    if (argvar->v_type != VAR_UNKNOWN)
+    എങ്കിൽ (argvar->v_type != VAR_UNKNOWN)
     {
-	int	invalid_arg = FALSE;
+	പൂർണ്ണസംഖ്യ	invalid_arg = FALSE;
 
 	arg = tv_get_string_chk(argvar);
-	if (arg == NULL)
+	എങ്കിൽ (arg == ശൂന്യ)
 	    nr = 0;		// type error; errmsg already given
-	else if (STRCMP(arg, "$") == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(arg, "$") == 0)
 	    twin = (tp == curtab) ? lastwin : tp->tp_lastwin;
-	else if (STRCMP(arg, "#") == 0)
+	അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(arg, "#") == 0)
 	{
 	    twin = (tp == curtab) ? prevwin : tp->tp_prevwin;
 	}
-	else
+	അല്ലെങ്കിൽ
 	{
-	    long	count;
+	    long	എണ്ണം;
 	    char_u	*endp;
 
 	    // Extract the window count (if specified). e.g. winnr('3j')
-	    count = strtol((char *)arg, (char **)&endp, 10);
-	    if (count <= 0)
-		count = 1;	// if count is not specified, default to 1
-	    if (endp != NULL && *endp != '\0')
+	    എണ്ണം = strtol((അക്ഷരം *)arg, (അക്ഷരം **)&endp, 10);
+	    എങ്കിൽ (എണ്ണം <= 0)
+		എണ്ണം = 1;	// if count is not specified, default to 1
+	    എങ്കിൽ (endp != ശൂന്യ && *endp != '\0')
 	    {
-		if (STRCMP(endp, "j") == 0)
-		    twin = win_vert_neighbor(tp, twin, FALSE, count);
-		else if (STRCMP(endp, "k") == 0)
-		    twin = win_vert_neighbor(tp, twin, TRUE, count);
-		else if (STRCMP(endp, "h") == 0)
-		    twin = win_horz_neighbor(tp, twin, TRUE, count);
-		else if (STRCMP(endp, "l") == 0)
-		    twin = win_horz_neighbor(tp, twin, FALSE, count);
-		else
+		എങ്കിൽ (STRCMP(endp, "j") == 0)
+		    twin = win_vert_neighbor(tp, twin, FALSE, എണ്ണം);
+		അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(endp, "k") == 0)
+		    twin = win_vert_neighbor(tp, twin, TRUE, എണ്ണം);
+		അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(endp, "h") == 0)
+		    twin = win_horz_neighbor(tp, twin, TRUE, എണ്ണം);
+		അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(endp, "l") == 0)
+		    twin = win_horz_neighbor(tp, twin, FALSE, എണ്ണം);
+		അല്ലെങ്കിൽ
 		    invalid_arg = TRUE;
 	    }
-	    else
+	    അല്ലെങ്കിൽ
 		invalid_arg = TRUE;
 	}
-	if (twin == NULL)
+	എങ്കിൽ (twin == ശൂന്യ)
 	    nr = 0;
 
-	if (invalid_arg)
+	എങ്കിൽ (invalid_arg)
 	{
 	    semsg(_(e_invalid_expression_str), arg);
 	    nr = 0;
 	}
     }
 
-    if (nr <= 0)
-	return 0;
+    എങ്കിൽ (nr <= 0)
+	തിരികെ 0;
 
-    for (wp = (tp == curtab) ? firstwin : tp->tp_firstwin;
+    വേണ്ടി (wp = (tp == curtab) ? firstwin : tp->tp_firstwin;
 	    wp != twin; wp = wp->w_next)
     {
-	if (wp == NULL)
+	എങ്കിൽ (wp == ശൂന്യ)
 	{
 	    // didn't find it in this tabpage
 	    nr = 0;
-	    break;
+	    നിർത്തുക;
 	}
 	++nr;
     }
-    return nr;
+    തിരികെ nr;
 }
 
 /*
  * Returns information about a window as a dictionary.
  */
-    static dict_T *
+    സ്ഥിതം dict_T *
 get_win_info(win_T *wp, short tpnr, short winnr)
 {
     dict_T	*dict;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    എങ്കിൽ (dict == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
     // make sure w_botline is valid
     validate_botline_win(wp);
 
-    dict_add_number(dict, "tabnr", tpnr);
-    dict_add_number(dict, "winnr", winnr);
-    dict_add_number(dict, "winid", wp->w_id);
-    dict_add_number(dict, "height", wp->w_height);
-    dict_add_number(dict, "status_height", wp->w_status_height);
-    dict_add_number(dict, "winrow", wp->w_winrow + 1);
-    dict_add_number(dict, "topline", wp->w_topline);
-    dict_add_number(dict, "botline", wp->w_botline - 1);
+    dict_add_സംഖ്യ(dict, "tabnr", tpnr);
+    dict_add_സംഖ്യ(dict, "winnr", winnr);
+    dict_add_സംഖ്യ(dict, "winid", wp->w_id);
+    dict_add_സംഖ്യ(dict, "height", wp->w_height);
+    dict_add_സംഖ്യ(dict, "status_height", wp->w_status_height);
+    dict_add_സംഖ്യ(dict, "winrow", wp->w_winrow + 1);
+    dict_add_സംഖ്യ(dict, "topline", wp->w_topline);
+    dict_add_സംഖ്യ(dict, "botline", wp->w_botline - 1);
 # ifdef FEAT_MENU
-    dict_add_number(dict, "winbar", wp->w_winbar_height);
+    dict_add_സംഖ്യ(dict, "winbar", wp->w_winbar_height);
 # endif
-    dict_add_number(dict, "width", wp->w_width);
-    dict_add_number(dict, "wincol", wp->w_wincol + 1);
-    dict_add_number(dict, "textoff", win_col_off(wp));
-    dict_add_number(dict, "bufnr", wp->w_buffer->b_fnum);
-    dict_add_number(dict, "leftcol", wp->w_leftcol);
+    dict_add_സംഖ്യ(dict, "width", wp->w_width);
+    dict_add_സംഖ്യ(dict, "wincol", wp->w_wincol + 1);
+    dict_add_സംഖ്യ(dict, "textoff", win_col_off(wp));
+    dict_add_സംഖ്യ(dict, "bufnr", wp->w_buffer->b_fnum);
+    dict_add_സംഖ്യ(dict, "leftcol", wp->w_leftcol);
 
 # ifdef FEAT_TERMINAL
-    dict_add_number(dict, "terminal", bt_terminal(wp->w_buffer));
+    dict_add_സംഖ്യ(dict, "terminal", bt_terminal(wp->w_buffer));
 # endif
 # ifdef FEAT_QUICKFIX
-    dict_add_number(dict, "quickfix", bt_quickfix(wp->w_buffer));
-    dict_add_number(dict, "loclist",
-		      (bt_quickfix(wp->w_buffer) && wp->w_llist_ref != NULL));
+    dict_add_സംഖ്യ(dict, "quickfix", bt_quickfix(wp->w_buffer));
+    dict_add_സംഖ്യ(dict, "loclist",
+		      (bt_quickfix(wp->w_buffer) && wp->w_llist_ref != ശൂന്യ));
 # endif
 
     // Add a reference to window variables
     dict_add_dict(dict, "variables", wp->w_vars);
 
-    return dict;
+    തിരികെ dict;
 }
 
 /*
  * Returns information (variables, options, etc.) about a tab page
  * as a dictionary.
  */
-    static dict_T *
-get_tabpage_info(tabpage_T *tp, int tp_idx)
+    സ്ഥിതം dict_T *
+get_tabpage_info(tabpage_T *tp, പൂർണ്ണസംഖ്യ tp_idx)
 {
     win_T	*wp;
     dict_T	*dict;
     list_T	*l;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    എങ്കിൽ (dict == ശൂന്യ)
+	തിരികെ ശൂന്യ;
 
-    dict_add_number(dict, "tabnr", tp_idx);
+    dict_add_സംഖ്യ(dict, "tabnr", tp_idx);
 
     l = list_alloc();
-    if (l != NULL)
+    എങ്കിൽ (l != ശൂന്യ)
     {
 	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
-	    list_append_number(l, (varnumber_T)wp->w_id);
+	    list_append_സംഖ്യ(l, (varnumber_T)wp->w_id);
 	dict_add_list(dict, "windows", l);
     }
 
     // Make a reference to tabpage variables
     dict_add_dict(dict, "variables", tp->tp_vars);
 
-    return dict;
+    തിരികെ dict;
 }
 
 /*
  * "gettabinfo()" function
  */
-    void
+    ശൂന്യം
 f_gettabinfo(typval_T *argvars, typval_T *rettv)
 {
-    tabpage_T	*tp, *tparg = NULL;
+    tabpage_T	*tp, *tparg = ശൂന്യ;
     dict_T	*d;
-    int		tpnr = 0;
+    പൂർണ്ണസംഖ്യ		tpnr = 0;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    എങ്കിൽ (rettv_list_alloc(rettv) == FAIL)
+	തിരികെ;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_opt_സംഖ്യ_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    എങ്കിൽ (argvars[0].v_type != VAR_UNKNOWN)
     {
 	// Information about one tab page
-	tparg = find_tabpage((int)tv_get_number_chk(&argvars[0], NULL));
-	if (tparg == NULL)
-	    return;
+	tparg = find_tabpage((പൂർണ്ണസംഖ്യ)tv_get_സംഖ്യ_chk(&argvars[0], ശൂന്യ));
+	എങ്കിൽ (tparg == ശൂന്യ)
+	    തിരികെ;
     }
 
     // Get information about a specific tab page or all tab pages
     FOR_ALL_TABPAGES(tp)
     {
 	tpnr++;
-	if (tparg != NULL && tp != tparg)
-	    continue;
+	എങ്കിൽ (tparg != ശൂന്യ && tp != tparg)
+	    തുടരുക;
 	d = get_tabpage_info(tp, tpnr);
-	if (d != NULL)
+	എങ്കിൽ (d != ശൂന്യ)
 	    list_append_dict(rettv->vval.v_list, d);
-	if (tparg != NULL)
-	    return;
+	എങ്കിൽ (tparg != ശൂന്യ)
+	    തിരികെ;
     }
 }
 
 /*
  * "getwininfo()" function
  */
-    void
+    ശൂന്യം
 f_getwininfo(typval_T *argvars, typval_T *rettv)
 {
     tabpage_T	*tp;
-    win_T	*wp = NULL, *wparg = NULL;
+    win_T	*wp = ശൂന്യ, *wparg = ശൂന്യ;
     dict_T	*d;
     short	tabnr = 0, winnr;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    എങ്കിൽ (rettv_list_alloc(rettv) == FAIL)
+	തിരികെ;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_opt_സംഖ്യ_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    എങ്കിൽ (argvars[0].v_type != VAR_UNKNOWN)
     {
-	wparg = win_id2wp(tv_get_number(&argvars[0]));
-	if (wparg == NULL)
-	    return;
+	wparg = win_id2wp(tv_get_സംഖ്യ(&argvars[0]));
+	എങ്കിൽ (wparg == ശൂന്യ)
+	    തിരികെ;
     }
 
     // Collect information about either all the windows across all the tab
@@ -548,30 +548,30 @@ f_getwininfo(typval_T *argvars, typval_T *rettv)
 	FOR_ALL_WINDOWS_IN_TAB(tp, wp)
 	{
 	    winnr++;
-	    if (wparg != NULL && wp != wparg)
-		continue;
+	    എങ്കിൽ (wparg != ശൂന്യ && wp != wparg)
+		തുടരുക;
 	    d = get_win_info(wp, tabnr, winnr);
-	    if (d != NULL)
+	    എങ്കിൽ (d != ശൂന്യ)
 		list_append_dict(rettv->vval.v_list, d);
-	    if (wparg != NULL)
+	    എങ്കിൽ (wparg != ശൂന്യ)
 		// found information about a specific window
-		return;
+		തിരികെ;
 	}
     }
 # ifdef FEAT_PROP_POPUP
-    if (wparg != NULL)
+    എങ്കിൽ (wparg != ശൂന്യ)
     {
 	tabnr = 0;
 	FOR_ALL_TABPAGES(tp)
 	{
 	    tabnr++;
 	    FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-		if (wp == wparg)
-		    goto found;
+		എങ്കിൽ (wp == wparg)
+		    പോകുക found;
 	}
 found:
-	d = get_win_info(wparg, tp == NULL ? 0 : tabnr, 0);
-	if (d != NULL)
+	d = get_win_info(wparg, tp == ശൂന്യ ? 0 : tabnr, 0);
+	എങ്കിൽ (d != ശൂന്യ)
 	    list_append_dict(rettv->vval.v_list, d);
     }
 # endif
@@ -580,51 +580,51 @@ found:
 /*
  * "getwinpos({timeout})" function
  */
-    void
+    ശൂന്യം
 f_getwinpos(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int x = -1;
-    int y = -1;
+    പൂർണ്ണസംഖ്യ x = -1;
+    പൂർണ്ണസംഖ്യ y = -1;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    എങ്കിൽ (rettv_list_alloc(rettv) == FAIL)
+	തിരികെ;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_opt_സംഖ്യ_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
-# if defined(FEAT_GUI) \
+# എങ്കിൽ defined(FEAT_GUI) \
 	|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)) \
 	|| defined(MSWIN)
     {
 	varnumber_T timeout = 100;
 
-	if (argvars[0].v_type != VAR_UNKNOWN)
-	    timeout = tv_get_number(&argvars[0]);
+	എങ്കിൽ (argvars[0].v_type != VAR_UNKNOWN)
+	    timeout = tv_get_സംഖ്യ(&argvars[0]);
 
-	(void)ui_get_winpos(&x, &y, timeout);
+	(ശൂന്യം)ui_get_winpos(&x, &y, timeout);
     }
 # endif
-    list_append_number(rettv->vval.v_list, (varnumber_T)x);
-    list_append_number(rettv->vval.v_list, (varnumber_T)y);
+    list_append_സംഖ്യ(rettv->vval.v_list, (varnumber_T)x);
+    list_append_സംഖ്യ(rettv->vval.v_list, (varnumber_T)y);
 }
 
 
 /*
  * "getwinposx()" function
  */
-    void
+    ശൂന്യം
 f_getwinposx(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
-# if defined(FEAT_GUI) \
+    rettv->vval.v_സംഖ്യ = -1;
+# എങ്കിൽ defined(FEAT_GUI) \
 	|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)) \
 	|| defined(MSWIN)
 
     {
-	int	    x, y;
+	പൂർണ്ണസംഖ്യ	    x, y;
 
-	if (ui_get_winpos(&x, &y, 100) == OK)
-	    rettv->vval.v_number = x;
+	എങ്കിൽ (ui_get_winpos(&x, &y, 100) == OK)
+	    rettv->vval.v_സംഖ്യ = x;
     }
 # endif
 }
@@ -632,18 +632,18 @@ f_getwinposx(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "getwinposy()" function
  */
-    void
+    ശൂന്യം
 f_getwinposy(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
-# if defined(FEAT_GUI) \
+    rettv->vval.v_സംഖ്യ = -1;
+# എങ്കിൽ defined(FEAT_GUI) \
 	|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)) \
 	|| defined(MSWIN)
     {
-	int	    x, y;
+	പൂർണ്ണസംഖ്യ	    x, y;
 
-	if (ui_get_winpos(&x, &y, 100) == OK)
-	    rettv->vval.v_number = y;
+	എങ്കിൽ (ui_get_winpos(&x, &y, 100) == OK)
+	    rettv->vval.v_സംഖ്യ = y;
     }
 # endif
 }
@@ -651,101 +651,101 @@ f_getwinposy(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "tabpagenr()" function
  */
-    void
+    ശൂന്യം
 f_tabpagenr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		nr = 1;
+    പൂർണ്ണസംഖ്യ		nr = 1;
     char_u	*arg;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    എങ്കിൽ (argvars[0].v_type != VAR_UNKNOWN)
     {
 	arg = tv_get_string_chk(&argvars[0]);
 	nr = 0;
-	if (arg != NULL)
+	എങ്കിൽ (arg != ശൂന്യ)
 	{
-	    if (STRCMP(arg, "$") == 0)
-		nr = tabpage_index(NULL) - 1;
-	    else if (STRCMP(arg, "#") == 0)
+	    എങ്കിൽ (STRCMP(arg, "$") == 0)
+		nr = tabpage_index(ശൂന്യ) - 1;
+	    അല്ലെങ്കിൽ എങ്കിൽ (STRCMP(arg, "#") == 0)
 		nr = valid_tabpage(lastused_tabpage) ?
 					tabpage_index(lastused_tabpage) : 0;
-	    else
+	    അല്ലെങ്കിൽ
 		semsg(_(e_invalid_expression_str), arg);
 	}
     }
-    else
+    അല്ലെങ്കിൽ
 	nr = tabpage_index(curtab);
-    rettv->vval.v_number = nr;
+    rettv->vval.v_സംഖ്യ = nr;
 }
 
 /*
  * "tabpagewinnr()" function
  */
-    void
+    ശൂന്യം
 f_tabpagewinnr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		nr = 1;
+    പൂർണ്ണസംഖ്യ		nr = 1;
     tabpage_T	*tp;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    എങ്കിൽ (in_vim9script()
+	    && (check_for_സംഖ്യ_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	തിരികെ;
 
-    tp = find_tabpage((int)tv_get_number(&argvars[0]));
-    if (tp == NULL)
+    tp = find_tabpage((പൂർണ്ണസംഖ്യ)tv_get_സംഖ്യ(&argvars[0]));
+    എങ്കിൽ (tp == ശൂന്യ)
 	nr = 0;
-    else
+    അല്ലെങ്കിൽ
 	nr = get_winnr(tp, &argvars[1]);
-    rettv->vval.v_number = nr;
+    rettv->vval.v_സംഖ്യ = nr;
 }
 
 /*
  * "win_execute()" function
  */
-    void
+    ശൂന്യം
 f_win_execute(typval_T *argvars, typval_T *rettv)
 {
-    int		id;
+    പൂർണ്ണസംഖ്യ		id;
     tabpage_T	*tp;
     win_T	*wp;
     switchwin_T	switchwin;
 
     // Return an empty string if something fails.
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ശൂന്യ;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    എങ്കിൽ (in_vim9script()
+	    && (check_for_സംഖ്യ_arg(argvars, 0) == FAIL
 		|| check_for_string_or_list_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	തിരികെ;
 
-    id = (int)tv_get_number(argvars);
+    id = (പൂർണ്ണസംഖ്യ)tv_get_സംഖ്യ(argvars);
     wp = win_id2wp_tp(id, &tp);
-    if (wp == NULL || tp == NULL)
-	return;
+    എങ്കിൽ (wp == ശൂന്യ || tp == ശൂന്യ)
+	തിരികെ;
 
     pos_T	curpos = wp->w_cursor;
     char_u	cwd[MAXPATHL];
-    int	cwd_status = FAIL;
+    പൂർണ്ണസംഖ്യ	cwd_status = FAIL;
 # ifdef FEAT_AUTOCHDIR
     char_u	autocwd[MAXPATHL];
-    int	apply_acd = FALSE;
-    char_u	*save_sfname = NULL;
+    പൂർണ്ണസംഖ്യ	apply_acd = FALSE;
+    char_u	*save_sfname = ശൂന്യ;
 # endif
 
     // Getting and setting directory can be slow on some systems, only do
     // this when the current or target window/tab have a local directory or
     // 'acd' is set.
-    if (curwin != wp
-	    && (curwin->w_localdir != NULL
-		|| wp->w_localdir != NULL
+    എങ്കിൽ (curwin != wp
+	    && (curwin->w_localdir != ശൂന്യ
+		|| wp->w_localdir != ശൂന്യ
 		|| (curtab != tp
-		    && (curtab->tp_localdir != NULL
-			|| tp->tp_localdir != NULL))
+		    && (curtab->tp_localdir != ശൂന്യ
+			|| tp->tp_localdir != ശൂന്യ))
 # ifdef FEAT_AUTOCHDIR
 		|| p_acd
 # endif
@@ -755,9 +755,9 @@ f_win_execute(typval_T *argvars, typval_T *rettv)
 # ifdef FEAT_AUTOCHDIR
     // If 'acd' is set, check we are using that directory.  If yes, then
     // apply 'acd' afterwards, otherwise restore the current directory.
-    if (cwd_status == OK && p_acd)
+    എങ്കിൽ (cwd_status == OK && p_acd)
     {
-	if (curbuf->b_sfname != NULL && curbuf->b_fname == curbuf->b_sfname)
+	എങ്കിൽ (curbuf->b_sfname != ശൂന്യ && curbuf->b_fname == curbuf->b_sfname)
 	    save_sfname = vim_strsave(curbuf->b_sfname);
 	do_autochdir();
 	apply_acd = mch_dirname(autocwd, MAXPATHL) == OK
@@ -765,25 +765,25 @@ f_win_execute(typval_T *argvars, typval_T *rettv)
     }
 # endif
 
-    if (switch_win_noblock(&switchwin, wp, tp, TRUE) == OK)
+    എങ്കിൽ (switch_win_noblock(&switchwin, wp, tp, TRUE) == OK)
     {
 	check_cursor();
 	execute_common(argvars, rettv, 1);
     }
     restore_win_noblock(&switchwin, TRUE);
 # ifdef FEAT_AUTOCHDIR
-    if (apply_acd)
+    എങ്കിൽ (apply_acd)
     {
 	vim_free(save_sfname);
 	do_autochdir();
     }
-    else
+    അല്ലെങ്കിൽ
 # endif
-	if (cwd_status == OK)
+	എങ്കിൽ (cwd_status == OK)
 	{
-	    mch_chdir((char *)cwd);
+	    mch_chdir((അക്ഷരം *)cwd);
 # ifdef FEAT_AUTOCHDIR
-	    if (save_sfname != NULL)
+	    എങ്കിൽ (save_sfname != ശൂന്യ)
 	    {
 		vim_free(curbuf->b_sfname);
 		curbuf->b_sfname = save_sfname;
@@ -793,294 +793,294 @@ f_win_execute(typval_T *argvars, typval_T *rettv)
 	}
 
     // Update the status line if the cursor moved.
-    if (win_valid(wp) && !EQUAL_POS(curpos, wp->w_cursor))
+    എങ്കിൽ (win_valid(wp) && !EQUAL_POS(curpos, wp->w_cursor))
 	wp->w_redr_status = true;
 
     // In case the command moved the cursor or changed the Visual area,
     // check it is valid.
     check_cursor();
-    if (VIsual_active)
+    എങ്കിൽ (VIsual_active)
 	check_pos(curbuf, &VIsual);
 }
 
 /*
  * "win_findbuf()" function
  */
-    void
+    ശൂന്യം
 f_win_findbuf(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_സംഖ്യ_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
-    if (rettv_list_alloc(rettv) == OK)
+    എങ്കിൽ (rettv_list_alloc(rettv) == OK)
 	win_findbuf(argvars, rettv->vval.v_list);
 }
 
 /*
  * "win_getid()" function
  */
-    void
+    ശൂന്യം
 f_win_getid(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+    എങ്കിൽ (in_vim9script()
+	    && (check_for_opt_സംഖ്യ_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_opt_സംഖ്യ_arg(argvars, 1) == FAIL)))
+	തിരികെ;
 
-    rettv->vval.v_number = win_getid(argvars);
+    rettv->vval.v_സംഖ്യ = win_getid(argvars);
 }
 
 /*
  * "win_gotoid()" function
  */
-    void
+    ശൂന്യം
 f_win_gotoid(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
     tabpage_T   *tp;
-    int		id;
+    പൂർണ്ണസംഖ്യ		id;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_സംഖ്യ_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
-    id = tv_get_number(&argvars[0]);
-    if (curwin->w_id == id)
+    id = tv_get_സംഖ്യ(&argvars[0]);
+    എങ്കിൽ (curwin->w_id == id)
     {
 	// Nothing to do.
-	rettv->vval.v_number = 1;
-	return;
+	rettv->vval.v_സംഖ്യ = 1;
+	തിരികെ;
     }
 
-    if (text_or_buf_locked())
-	return;
-# if defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
-    if (popup_is_popup(curwin) && curbuf->b_term != NULL)
+    എങ്കിൽ (text_or_buf_locked())
+	തിരികെ;
+# എങ്കിൽ defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
+    എങ്കിൽ (popup_is_popup(curwin) && curbuf->b_term != ശൂന്യ)
     {
 	emsg(_(e_not_allowed_for_terminal_in_popup_window));
-	return;
+	തിരികെ;
     }
 # endif
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if (wp->w_id == id)
+	എങ്കിൽ (wp->w_id == id)
 	{
 	    // When jumping to another buffer stop Visual mode.
-	    if (VIsual_active && wp->w_buffer != curbuf)
+	    എങ്കിൽ (VIsual_active && wp->w_buffer != curbuf)
 		end_visual_mode();
 	    goto_tabpage_win(tp, wp);
-	    rettv->vval.v_number = 1;
-	    return;
+	    rettv->vval.v_സംഖ്യ = 1;
+	    തിരികെ;
 	}
 }
 
 /*
  * "win_id2tabwin()" function
  */
-    void
+    ശൂന്യം
 f_win_id2tabwin(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_സംഖ്യ_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
-    if (rettv_list_alloc(rettv) == OK)
+    എങ്കിൽ (rettv_list_alloc(rettv) == OK)
 	win_id2tabwin(argvars, rettv->vval.v_list);
 }
 
 /*
  * "win_id2win()" function
  */
-    void
+    ശൂന്യം
 f_win_id2win(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_സംഖ്യ_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
-    rettv->vval.v_number = win_id2win(argvars);
+    rettv->vval.v_സംഖ്യ = win_id2win(argvars);
 }
 
 /*
  * "win_move_separator()" function
  */
-    void
+    ശൂന്യം
 f_win_move_separator(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
-    int		offset;
+    പൂർണ്ണസംഖ്യ		offset;
 
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_സംഖ്യ = FALSE;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    എങ്കിൽ (in_vim9script()
+	    && (check_for_സംഖ്യ_arg(argvars, 0) == FAIL
+		|| check_for_സംഖ്യ_arg(argvars, 1) == FAIL))
+	തിരികെ;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL || win_valid_popup(wp))
-	return;
-    if (!win_valid(wp))
+    എങ്കിൽ (wp == ശൂന്യ || win_valid_popup(wp))
+	തിരികെ;
+    എങ്കിൽ (!win_valid(wp))
     {
 	emsg(_(e_cannot_resize_window_in_another_tab_page));
-	return;
+	തിരികെ;
     }
 
-    offset = (int)tv_get_number(&argvars[1]);
-    win_drag_vsep_line(wp, offset);
-    rettv->vval.v_number = TRUE;
+    offset = (പൂർണ്ണസംഖ്യ)tv_get_സംഖ്യ(&argvars[1]);
+    win_drag_vsep_വരി(wp, offset);
+    rettv->vval.v_സംഖ്യ = TRUE;
 }
 
 /*
  * "win_move_statusline()" function
  */
-    void
+    ശൂന്യം
 f_win_move_statusline(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
-    int		offset;
+    പൂർണ്ണസംഖ്യ		offset;
 
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_സംഖ്യ = FALSE;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    എങ്കിൽ (in_vim9script()
+	    && (check_for_സംഖ്യ_arg(argvars, 0) == FAIL
+		|| check_for_സംഖ്യ_arg(argvars, 1) == FAIL))
+	തിരികെ;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL || win_valid_popup(wp))
-	return;
-    if (!win_valid(wp))
+    എങ്കിൽ (wp == ശൂന്യ || win_valid_popup(wp))
+	തിരികെ;
+    എങ്കിൽ (!win_valid(wp))
     {
 	emsg(_(e_cannot_resize_window_in_another_tab_page));
-	return;
+	തിരികെ;
     }
 
-    offset = (int)tv_get_number(&argvars[1]);
-    win_drag_status_line(wp, offset);
-    rettv->vval.v_number = TRUE;
+    offset = (പൂർണ്ണസംഖ്യ)tv_get_സംഖ്യ(&argvars[1]);
+    win_drag_status_വരി(wp, offset);
+    rettv->vval.v_സംഖ്യ = TRUE;
 }
 
 /*
  * "win_screenpos()" function
  */
-    void
+    ശൂന്യം
 f_win_screenpos(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    എങ്കിൽ (rettv_list_alloc(rettv) == FAIL)
+	തിരികെ;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_സംഖ്യ_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
-    list_append_number(rettv->vval.v_list, wp == NULL ? 0 : wp->w_winrow + 1);
-    list_append_number(rettv->vval.v_list, wp == NULL ? 0 : wp->w_wincol + 1);
+    list_append_സംഖ്യ(rettv->vval.v_list, wp == ശൂന്യ ? 0 : wp->w_winrow + 1);
+    list_append_സംഖ്യ(rettv->vval.v_list, wp == ശൂന്യ ? 0 : wp->w_wincol + 1);
 }
 
 /*
  * "win_splitmove()" function
  */
-    void
+    ശൂന്യം
 f_win_splitmove(typval_T *argvars, typval_T *rettv)
 {
     win_T   *wp, *targetwin;
     win_T   *oldwin = curwin;
-    int     flags = 0, size = 0;
+    പൂർണ്ണസംഖ്യ     flags = 0, size = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_സംഖ്യ = -1;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+    എങ്കിൽ (in_vim9script()
+	    && (check_for_സംഖ്യ_arg(argvars, 0) == FAIL
+		|| check_for_സംഖ്യ_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	തിരികെ;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
     targetwin = find_win_by_nr_or_id(&argvars[1]);
 
-    if (wp == NULL || targetwin == NULL || wp == targetwin
+    എങ്കിൽ (wp == ശൂന്യ || targetwin == ശൂന്യ || wp == targetwin
 	    || !win_valid(wp) || !win_valid(targetwin)
 	    || win_valid_popup(wp) || win_valid_popup(targetwin))
     {
-	emsg(_(e_invalid_window_number));
-	return;
+	emsg(_(e_invalid_window_സംഖ്യ));
+	തിരികെ;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    എങ്കിൽ (argvars[2].v_type != VAR_UNKNOWN)
     {
 	dict_T      *d;
 	dictitem_T  *di;
 
-	if (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
-	    return;
+	എങ്കിൽ (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
+	    തിരികെ;
 
 	d = argvars[2].vval.v_dict;
-	if (dict_get_bool(d, "vertical", FALSE))
+	എങ്കിൽ (dict_get_bool(d, "vertical", FALSE))
 	    flags |= WSP_VERT;
-	if ((di = dict_find(d, (char_u *)"rightbelow", -1)) != NULL)
+	എങ്കിൽ ((di = dict_find(d, (char_u *)"rightbelow", -1)) != ശൂന്യ)
 	    flags |= tv_get_bool(&di->di_tv) ? WSP_BELOW : WSP_ABOVE;
-	size = (int)dict_get_number(d, "size");
+	size = (പൂർണ്ണസംഖ്യ)dict_get_സംഖ്യ(d, "size");
     }
 
     // Check if we're allowed to continue before we bother switching windows.
-    if (text_or_buf_locked() || check_split_disallowed(wp) == FAIL)
-	return;
+    എങ്കിൽ (text_or_buf_locked() || check_split_disallowed(wp) == FAIL)
+	തിരികെ;
 
-    if (curwin != targetwin)
+    എങ്കിൽ (curwin != targetwin)
 	win_goto(targetwin);
 
     // Autocommands may have sent us elsewhere or closed "wp" or "oldwin".
-    if (curwin == targetwin && win_valid(wp))
+    എങ്കിൽ (curwin == targetwin && win_valid(wp))
     {
-	if (win_splitmove(wp, size, flags) == OK)
-	    rettv->vval.v_number = 0;
+	എങ്കിൽ (win_splitmove(wp, size, flags) == OK)
+	    rettv->vval.v_സംഖ്യ = 0;
     }
-    else
+    അല്ലെങ്കിൽ
 	emsg(_(e_autocommands_caused_command_to_abort));
 
-    if (oldwin != curwin && win_valid(oldwin))
+    എങ്കിൽ (oldwin != curwin && win_valid(oldwin))
 	win_goto(oldwin);
 }
 
 /*
  * "win_gettype(nr)" function
  */
-    void
+    ശൂന്യം
 f_win_gettype(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp = curwin;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ശൂന്യ;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_opt_സംഖ്യ_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    എങ്കിൽ (argvars[0].v_type != VAR_UNKNOWN)
     {
 	wp = find_win_by_nr_or_id(&argvars[0]);
-	if (wp == NULL)
+	എങ്കിൽ (wp == ശൂന്യ)
 	{
 	    rettv->vval.v_string = vim_strsave((char_u *)"unknown");
-	    return;
+	    തിരികെ;
 	}
     }
-    if (is_aucmd_win(wp))
+    എങ്കിൽ (is_aucmd_win(wp))
 	rettv->vval.v_string = vim_strsave((char_u *)"autocmd");
-# if defined(FEAT_QUICKFIX)
-    else if (wp->w_p_pvw)
+# എങ്കിൽ defined(FEAT_QUICKFIX)
+    അല്ലെങ്കിൽ എങ്കിൽ (wp->w_p_pvw)
 	rettv->vval.v_string = vim_strsave((char_u *)"preview");
 # endif
 # ifdef FEAT_PROP_POPUP
-    else if (WIN_IS_POPUP(wp))
+    അല്ലെങ്കിൽ എങ്കിൽ (WIN_IS_POPUP(wp))
 	rettv->vval.v_string = vim_strsave((char_u *)"popup");
 # endif
-    else if (wp == cmdwin_win)
+    അല്ലെങ്കിൽ എങ്കിൽ (wp == cmdwin_win)
 	rettv->vval.v_string = vim_strsave((char_u *)"command");
 # ifdef FEAT_QUICKFIX
-    else if (bt_quickfix(wp->w_buffer))
+    അല്ലെങ്കിൽ എങ്കിൽ (bt_quickfix(wp->w_buffer))
 	rettv->vval.v_string = vim_strsave((char_u *)
-		(wp->w_llist_ref != NULL ? "loclist" : "quickfix"));
+		(wp->w_llist_ref != ശൂന്യ ? "loclist" : "quickfix"));
 # endif
 
 }
@@ -1088,14 +1088,14 @@ f_win_gettype(typval_T *argvars, typval_T *rettv)
 /*
  * "getcmdwintype()" function
  */
-    void
+    ശൂന്യം
 f_getcmdwintype(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = ശൂന്യ;
     rettv->vval.v_string = alloc(2);
-    if (rettv->vval.v_string == NULL)
-	return;
+    എങ്കിൽ (rettv->vval.v_string == ശൂന്യ)
+	തിരികെ;
 
     rettv->vval.v_string[0] = cmdwin_type;
     rettv->vval.v_string[1] = NUL;
@@ -1104,75 +1104,75 @@ f_getcmdwintype(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "winbufnr(nr)" function
  */
-    void
+    ശൂന്യം
 f_winbufnr(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_സംഖ്യ_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = wp->w_buffer->b_fnum;
+    എങ്കിൽ (wp == ശൂന്യ)
+	rettv->vval.v_സംഖ്യ = -1;
+    അല്ലെങ്കിൽ
+	rettv->vval.v_സംഖ്യ = wp->w_buffer->b_fnum;
 }
 
 /*
  * "wincol()" function
  */
-    void
+    ശൂന്യം
 f_wincol(typval_T *argvars UNUSED, typval_T *rettv)
 {
     validate_cursor();
-    int col = curwin->w_wcol + 1;
+    പൂർണ്ണസംഖ്യ col = curwin->w_wcol + 1;
 # ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl)
+    എങ്കിൽ (curwin->w_p_rl)
 	col = curwin->w_width - curwin->w_wcol - cursor_screen_cells() + 1;
 # endif
-    rettv->vval.v_number = col;
+    rettv->vval.v_സംഖ്യ = col;
 }
 
 /*
  * "winheight(nr)" function
  */
-    void
+    ശൂന്യം
 f_winheight(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_സംഖ്യ_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = wp->w_height;
+    എങ്കിൽ (wp == ശൂന്യ)
+	rettv->vval.v_സംഖ്യ = -1;
+    അല്ലെങ്കിൽ
+	rettv->vval.v_സംഖ്യ = wp->w_height;
 }
 
 /*
  * "winlayout()" function
  */
-    void
+    ശൂന്യം
 f_winlayout(typval_T *argvars, typval_T *rettv)
 {
     tabpage_T	*tp;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    എങ്കിൽ (rettv_list_alloc(rettv) == FAIL)
+	തിരികെ;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_opt_സംഖ്യ_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    എങ്കിൽ (argvars[0].v_type == VAR_UNKNOWN)
 	tp = curtab;
-    else
+    അല്ലെങ്കിൽ
     {
-	tp = find_tabpage((int)tv_get_number(&argvars[0]));
-	if (tp == NULL)
-	    return;
+	tp = find_tabpage((പൂർണ്ണസംഖ്യ)tv_get_സംഖ്യ(&argvars[0]));
+	എങ്കിൽ (tp == ശൂന്യ)
+	    തിരികെ;
     }
 
     get_framelayout(tp->tp_topframe, rettv->vval.v_list, TRUE);
@@ -1181,54 +1181,54 @@ f_winlayout(typval_T *argvars, typval_T *rettv)
 /*
  * "winline()" function
  */
-    void
+    ശൂന്യം
 f_winline(typval_T *argvars UNUSED, typval_T *rettv)
 {
     validate_cursor();
-    rettv->vval.v_number = curwin->w_wrow + 1;
+    rettv->vval.v_സംഖ്യ = curwin->w_wrow + 1;
 }
 
 /*
  * "winnr()" function
  */
-    void
+    ശൂന്യം
 f_winnr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		nr = 1;
+    പൂർണ്ണസംഖ്യ		nr = 1;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
     nr = get_winnr(curtab, &argvars[0]);
-    rettv->vval.v_number = nr;
+    rettv->vval.v_സംഖ്യ = nr;
 }
 
 /*
  * "winrestcmd()" function
  */
-    void
+    ശൂന്യം
 f_winrestcmd(typval_T *argvars UNUSED, typval_T *rettv)
 {
     win_T	*wp;
-    int		i;
-    int		winnr;
+    പൂർണ്ണസംഖ്യ		i;
+    പൂർണ്ണസംഖ്യ		winnr;
     garray_T	ga;
     char_u	buf[50];
 
-    ga_init2(&ga, sizeof(char), 70);
+    ga_init2(&ga, വലുപ്പം(അക്ഷരം), 70);
 
     // Do this twice to handle some window layouts properly.
-    for (i = 0; i < 2; ++i)
+    വേണ്ടി (i = 0; i < 2; ++i)
     {
 	winnr = 1;
 	FOR_ALL_WINDOWS(wp)
 	{
 	    size_t  buflen;
 
-	    buflen = vim_snprintf_safelen((char *)buf, sizeof(buf),
+	    buflen = vim_snprintf_safelen((അക്ഷരം *)buf, വലുപ്പം(buf),
 		":%dresize %d|", winnr, wp->w_height);
 	    ga_concat_len(&ga, buf, buflen);
-	    buflen = vim_snprintf_safelen((char *)buf, sizeof(buf),
+	    buflen = vim_snprintf_safelen((അക്ഷരം *)buf, വലുപ്പം(buf),
 		"vert :%dresize %d|", winnr, wp->w_width);
 	    ga_concat_len(&ga, buf, buflen);
 	    ++winnr;
@@ -1243,47 +1243,47 @@ f_winrestcmd(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "winrestview()" function
  */
-    void
+    ശൂന്യം
 f_winrestview(typval_T *argvars, typval_T *rettv UNUSED)
 {
     dict_T	*dict;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
     dict = argvars[0].vval.v_dict;
-    if (dict_has_key(dict, "lnum"))
-	curwin->w_cursor.lnum = (linenr_T)dict_get_number(dict, "lnum");
-    if (dict_has_key(dict, "col"))
-	curwin->w_cursor.col = (colnr_T)dict_get_number(dict, "col");
-    if (dict_has_key(dict, "coladd"))
-	curwin->w_cursor.coladd = (colnr_T)dict_get_number(dict, "coladd");
-    if (dict_has_key(dict, "curswant"))
+    എങ്കിൽ (dict_has_താക്കോൽ(dict, "lnum"))
+	curwin->w_cursor.lnum = (linenr_T)dict_get_സംഖ്യ(dict, "lnum");
+    എങ്കിൽ (dict_has_താക്കോൽ(dict, "col"))
+	curwin->w_cursor.col = (colnr_T)dict_get_സംഖ്യ(dict, "col");
+    എങ്കിൽ (dict_has_താക്കോൽ(dict, "coladd"))
+	curwin->w_cursor.coladd = (colnr_T)dict_get_സംഖ്യ(dict, "coladd");
+    എങ്കിൽ (dict_has_താക്കോൽ(dict, "curswant"))
     {
-	curwin->w_curswant = (colnr_T)dict_get_number(dict, "curswant");
+	curwin->w_curswant = (colnr_T)dict_get_സംഖ്യ(dict, "curswant");
 	curwin->w_set_curswant = false;
     }
 
-    if (dict_has_key(dict, "topline"))
-	set_topline(curwin, (linenr_T)dict_get_number(dict, "topline"));
+    എങ്കിൽ (dict_has_താക്കോൽ(dict, "topline"))
+	set_topline(curwin, (linenr_T)dict_get_സംഖ്യ(dict, "topline"));
 # ifdef FEAT_DIFF
-    if (dict_has_key(dict, "topfill"))
-	curwin->w_topfill = (int)dict_get_number(dict, "topfill");
+    എങ്കിൽ (dict_has_താക്കോൽ(dict, "topfill"))
+	curwin->w_topfill = (പൂർണ്ണസംഖ്യ)dict_get_സംഖ്യ(dict, "topfill");
 # endif
-    if (dict_has_key(dict, "leftcol"))
-	curwin->w_leftcol = (colnr_T)dict_get_number(dict, "leftcol");
-    if (dict_has_key(dict, "skipcol"))
-	curwin->w_skipcol = (colnr_T)dict_get_number(dict, "skipcol");
+    എങ്കിൽ (dict_has_താക്കോൽ(dict, "leftcol"))
+	curwin->w_leftcol = (colnr_T)dict_get_സംഖ്യ(dict, "leftcol");
+    എങ്കിൽ (dict_has_താക്കോൽ(dict, "skipcol"))
+	curwin->w_skipcol = (colnr_T)dict_get_സംഖ്യ(dict, "skipcol");
 
     check_cursor();
     win_new_height(curwin, curwin->w_height);
     win_new_width(curwin, curwin->w_width);
     changed_window_setting();
 
-    if (curwin->w_topline <= 0)
+    എങ്കിൽ (curwin->w_topline <= 0)
 	curwin->w_topline = 1;
-    if (curwin->w_topline > curbuf->b_ml.ml_line_count)
-	curwin->w_topline = curbuf->b_ml.ml_line_count;
+    എങ്കിൽ (curwin->w_topline > curbuf->b_ml.ml_വരി_എണ്ണം)
+	curwin->w_topline = curbuf->b_ml.ml_വരി_എണ്ണം;
 # ifdef FEAT_DIFF
     check_topfill(curwin, TRUE);
 # endif
@@ -1292,49 +1292,49 @@ f_winrestview(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "winsaveview()" function
  */
-    void
+    ശൂന്യം
 f_winsaveview(typval_T *argvars UNUSED, typval_T *rettv)
 {
     dict_T	*dict;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    എങ്കിൽ (rettv_dict_alloc(rettv) == FAIL)
+	തിരികെ;
     dict = rettv->vval.v_dict;
 
-    dict_add_number(dict, "lnum", (long)curwin->w_cursor.lnum);
-    dict_add_number(dict, "col", (long)curwin->w_cursor.col);
-    dict_add_number(dict, "coladd", (long)curwin->w_cursor.coladd);
+    dict_add_സംഖ്യ(dict, "lnum", (long)curwin->w_cursor.lnum);
+    dict_add_സംഖ്യ(dict, "col", (long)curwin->w_cursor.col);
+    dict_add_സംഖ്യ(dict, "coladd", (long)curwin->w_cursor.coladd);
     update_curswant();
-    dict_add_number(dict, "curswant", (long)curwin->w_curswant);
+    dict_add_സംഖ്യ(dict, "curswant", (long)curwin->w_curswant);
 
-    dict_add_number(dict, "topline", (long)curwin->w_topline);
+    dict_add_സംഖ്യ(dict, "topline", (long)curwin->w_topline);
 # ifdef FEAT_DIFF
-    dict_add_number(dict, "topfill", (long)curwin->w_topfill);
+    dict_add_സംഖ്യ(dict, "topfill", (long)curwin->w_topfill);
 # endif
-    dict_add_number(dict, "leftcol", (long)curwin->w_leftcol);
-    dict_add_number(dict, "skipcol", (long)curwin->w_skipcol);
+    dict_add_സംഖ്യ(dict, "leftcol", (long)curwin->w_leftcol);
+    dict_add_സംഖ്യ(dict, "skipcol", (long)curwin->w_skipcol);
 }
 
 /*
  * "winwidth(nr)" function
  */
-    void
+    ശൂന്യം
 f_winwidth(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    എങ്കിൽ (in_vim9script() && check_for_സംഖ്യ_arg(argvars, 0) == FAIL)
+	തിരികെ;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = wp->w_width;
+    എങ്കിൽ (wp == ശൂന്യ)
+	rettv->vval.v_സംഖ്യ = -1;
+    അല്ലെങ്കിൽ
+	rettv->vval.v_സംഖ്യ = wp->w_width;
 }
 #endif // FEAT_EVAL
 
-#if defined(FEAT_EVAL) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#എങ്കിൽ defined(FEAT_EVAL) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Set "win" to be the curwin and "tp" to be the current tab page.
  * restore_win() MUST be called to undo, also when FAIL is returned.
@@ -1343,54 +1343,54 @@ f_winwidth(typval_T *argvars, typval_T *rettv)
  * triggered, another tabpage access is limited.
  * Returns FAIL if switching to "win" failed.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 switch_win(
 	switchwin_T *switchwin,
 	win_T	    *win,
 	tabpage_T   *tp,
-	int	    no_display)
+	പൂർണ്ണസംഖ്യ	    no_display)
 {
     block_autocmds();
-    return switch_win_noblock(switchwin, win, tp, no_display);
+    തിരികെ switch_win_noblock(switchwin, win, tp, no_display);
 }
 
 /*
  * As switch_win() but without blocking autocommands.
  */
-    int
+    പൂർണ്ണസംഖ്യ
 switch_win_noblock(
 	switchwin_T *switchwin,
 	win_T	    *win,
 	tabpage_T   *tp,
-	int	    no_display)
+	പൂർണ്ണസംഖ്യ	    no_display)
 {
     CLEAR_POINTER(switchwin);
     switchwin->sw_curwin = curwin;
-    if (win == curwin)
+    എങ്കിൽ (win == curwin)
 	switchwin->sw_same_win = TRUE;
-    else
+    അല്ലെങ്കിൽ
     {
 	// Disable Visual selection, because redrawing may fail.
 	switchwin->sw_visual_active = VIsual_active;
 	VIsual_active = FALSE;
     }
 
-    if (tp != NULL)
+    എങ്കിൽ (tp != ശൂന്യ)
     {
 	switchwin->sw_curtab = curtab;
-	if (no_display)
+	എങ്കിൽ (no_display)
 	{
 	    unuse_tabpage(curtab);
 	    use_tabpage(tp);
 	}
-	else
+	അല്ലെങ്കിൽ
 	    goto_tabpage_tp(tp, FALSE, FALSE);
     }
-    if (!win_valid(win))
-	return FAIL;
+    എങ്കിൽ (!win_valid(win))
+	തിരികെ FAIL;
     curwin = win;
     curbuf = curwin->w_buffer;
-    return OK;
+    തിരികെ OK;
 }
 
 /*
@@ -1398,10 +1398,10 @@ switch_win_noblock(
  * When "no_display" is TRUE the display won't be affected, no redraw is
  * triggered.
  */
-    void
+    ശൂന്യം
 restore_win(
 	switchwin_T *switchwin,
-	int	    no_display)
+	പൂർണ്ണസംഖ്യ	    no_display)
 {
     restore_win_noblock(switchwin, no_display);
     unblock_autocmds();
@@ -1410,14 +1410,14 @@ restore_win(
 /*
  * As restore_win() but without unblocking autocommands.
  */
-    void
+    ശൂന്യം
 restore_win_noblock(
 	switchwin_T *switchwin,
-	int	    no_display)
+	പൂർണ്ണസംഖ്യ	    no_display)
 {
-    if (switchwin->sw_curtab != NULL && valid_tabpage(switchwin->sw_curtab))
+    എങ്കിൽ (switchwin->sw_curtab != ശൂന്യ && valid_tabpage(switchwin->sw_curtab))
     {
-	if (no_display)
+	എങ്കിൽ (no_display)
 	{
 	    win_T	*old_tp_curwin = curtab->tp_curwin;
 
@@ -1426,20 +1426,20 @@ restore_win_noblock(
 	    curtab->tp_curwin = old_tp_curwin;
 	    use_tabpage(switchwin->sw_curtab);
 	}
-	else
+	അല്ലെങ്കിൽ
 	    goto_tabpage_tp(switchwin->sw_curtab, FALSE, FALSE);
     }
 
-    if (!switchwin->sw_same_win)
+    എങ്കിൽ (!switchwin->sw_same_win)
 	VIsual_active = switchwin->sw_visual_active;
 
-    if (win_valid(switchwin->sw_curwin))
+    എങ്കിൽ (win_valid(switchwin->sw_curwin))
     {
 	curwin = switchwin->sw_curwin;
 	curbuf = curwin->w_buffer;
     }
 # ifdef FEAT_PROP_POPUP
-    else if (WIN_IS_POPUP(curwin))
+    അല്ലെങ്കിൽ എങ്കിൽ (WIN_IS_POPUP(curwin))
 	// original window was closed and now we're in a popup window: Go
 	// to the first valid window.
 	win_goto(firstwin);

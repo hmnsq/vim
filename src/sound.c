@@ -11,15 +11,15 @@
  * sound.c: functions related making noise
  */
 
-#include "vim.h"
+#അന്തര്ഭാവ "vim.h"
 
-#if defined(FEAT_SOUND)
+#എങ്കിൽ defined(FEAT_SOUND)
 
-static long sound_id = 0;
+സ്ഥിതം long sound_id = 0;
 
 // soundcb_T is typedef'ed in vim.h
 
-struct soundcb_S
+ഘടന soundcb_S
 {
     callback_T snd_callback;
 # ifdef MSWIN
@@ -29,56 +29,56 @@ struct soundcb_S
     soundcb_T *snd_next;
 };
 
-static soundcb_T *first_callback = NULL;
+സ്ഥിതം soundcb_T *first_callback = ശൂന്യ;
 
 /*
  * Return TRUE when a sound callback has been created, it may be invoked when
  * the sound finishes playing.  Also see has_sound_callback_in_queue().
  */
-int
-has_any_sound_callback(void)
+പൂർണ്ണസംഖ്യ
+has_any_sound_callback(ശൂന്യം)
 {
-    return first_callback != NULL;
+    തിരികെ first_callback != ശൂന്യ;
 }
 
-static soundcb_T *
+സ്ഥിതം soundcb_T *
 get_sound_callback(typval_T *arg)
 {
     callback_T callback;
     soundcb_T *soundcb;
 
-    if (arg->v_type == VAR_UNKNOWN)
-        return NULL;
+    എങ്കിൽ (arg->v_type == VAR_UNKNOWN)
+        തിരികെ ശൂന്യ;
     callback = get_callback(arg);
-    if (callback.cb_name == NULL)
-        return NULL;
+    എങ്കിൽ (callback.cb_name == ശൂന്യ)
+        തിരികെ ശൂന്യ;
 
     soundcb = ALLOC_ONE(soundcb_T);
-    if (soundcb == NULL)
+    എങ്കിൽ (soundcb == ശൂന്യ)
     {
         free_callback(&callback);
-        return NULL;
+        തിരികെ ശൂന്യ;
     }
 
     soundcb->snd_next = first_callback;
     first_callback = soundcb;
     set_callback(&soundcb->snd_callback, &callback);
-    return soundcb;
+    തിരികെ soundcb;
 }
 
 /*
  * Call "soundcb" with proper parameters.
  */
-void
-call_sound_callback(soundcb_T *soundcb, long snd_id, int result)
+ശൂന്യം
+call_sound_callback(soundcb_T *soundcb, long snd_id, പൂർണ്ണസംഖ്യ result)
 {
     typval_T argv[3];
     typval_T rettv;
 
-    argv[0].v_type = VAR_NUMBER;
-    argv[0].vval.v_number = snd_id;
-    argv[1].v_type = VAR_NUMBER;
-    argv[1].vval.v_number = result;
+    argv[0].v_type = VAR_സംഖ്യ;
+    argv[0].vval.v_സംഖ്യ = snd_id;
+    argv[1].v_type = VAR_സംഖ്യ;
+    argv[1].vval.v_സംഖ്യ = result;
     argv[2].v_type = VAR_UNKNOWN;
 
     call_callback(&soundcb->snd_callback, -1, &rettv, 2, argv);
@@ -88,65 +88,65 @@ call_sound_callback(soundcb_T *soundcb, long snd_id, int result)
 /*
  * Delete "soundcb" from the list of pending callbacks.
  */
-void
+ശൂന്യം
 delete_sound_callback(soundcb_T *soundcb)
 {
     soundcb_T *p;
-    soundcb_T *prev = NULL;
+    soundcb_T *prev = ശൂന്യ;
 
-    for (p = first_callback; p != NULL; prev = p, p = p->snd_next)
-        if (p == soundcb)
+    വേണ്ടി (p = first_callback; p != ശൂന്യ; prev = p, p = p->snd_next)
+        എങ്കിൽ (p == soundcb)
         {
-            if (prev == NULL)
+            എങ്കിൽ (prev == ശൂന്യ)
                 first_callback = p->snd_next;
-            else
+            അല്ലെങ്കിൽ
                 prev->snd_next = p->snd_next;
             free_callback(&p->snd_callback);
             vim_free(p);
-            break;
+            നിർത്തുക;
         }
 }
 
-# if defined(HAVE_CANBERRA)
+# എങ്കിൽ defined(HAVE_CANBERRA)
 
 /*
  * Sound implementation for Linux/Unix using libcanberra.
  */
 #  include <canberra.h>
 
-static ca_context *context = NULL;
+സ്ഥിതം ca_context *context = ശൂന്യ;
 
 // Structure to store info about a sound callback to be invoked soon.
-typedef struct soundcb_queue_S soundcb_queue_T;
+തരനിർവചനം ഘടന soundcb_queue_S soundcb_queue_T;
 
-struct soundcb_queue_S
+ഘടന soundcb_queue_S
 {
     soundcb_queue_T *scb_next;
     uint32_t scb_id; // ID of the sound
-    int scb_result; // CA_ value
+    പൂർണ്ണസംഖ്യ scb_result; // CA_ value
     soundcb_T *scb_callback; // function to call
 };
 
 // Queue of callbacks to invoke from the main loop.
-static soundcb_queue_T *callback_queue = NULL;
+സ്ഥിതം soundcb_queue_T *callback_queue = ശൂന്യ;
 
 /*
  * Add a callback to the queue of callbacks to invoke later from the main loop.
  * That is because the callback may be called from another thread and invoking
  * another sound function may cause trouble.
  */
-static void
+സ്ഥിതം ശൂന്യം
 sound_callback(ca_context *c UNUSED,
                uint32_t id,
-               int error_code,
-               void *userdata)
+               പൂർണ്ണസംഖ്യ error_code,
+               ശൂന്യം *userdata)
 {
     soundcb_T *soundcb = (soundcb_T *)userdata;
     soundcb_queue_T *scb;
 
     scb = ALLOC_ONE(soundcb_queue_T);
-    if (scb == NULL)
-        return;
+    എങ്കിൽ (scb == ശൂന്യ)
+        തിരികെ;
     scb->scb_next = callback_queue;
     callback_queue = scb;
     scb->scb_id = id;
@@ -161,21 +161,21 @@ sound_callback(ca_context *c UNUSED,
 /*
  * Return TRUE if there is a sound callback to be called.
  */
-int
-has_sound_callback_in_queue(void)
+പൂർണ്ണസംഖ്യ
+has_sound_callback_in_queue(ശൂന്യം)
 {
-    return callback_queue != NULL;
+    തിരികെ callback_queue != ശൂന്യ;
 }
 
 /*
  * Invoke queued sound callbacks.
  */
-void
-invoke_sound_callback(void)
+ശൂന്യം
+invoke_sound_callback(ശൂന്യം)
 {
     soundcb_queue_T *scb;
 
-    while (callback_queue != NULL)
+    ആകുമ്പോൾ (callback_queue != ശൂന്യ)
     {
         scb = callback_queue;
         callback_queue = scb->scb_next;
@@ -188,56 +188,56 @@ invoke_sound_callback(void)
     redraw_after_callback(TRUE, FALSE);
 }
 
-static void
-sound_play_common(typval_T *argvars, typval_T *rettv, int playfile)
+സ്ഥിതം ശൂന്യം
+sound_play_common(typval_T *argvars, typval_T *rettv, പൂർണ്ണസംഖ്യ playfile)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    എങ്കിൽ (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        തിരികെ;
 
-    if (context == NULL)
+    എങ്കിൽ (context == ശൂന്യ)
         ca_context_create(&context);
-    if (context == NULL)
-        return;
+    എങ്കിൽ (context == ശൂന്യ)
+        തിരികെ;
 
     soundcb_T *soundcb = get_sound_callback(&argvars[1]);
-    int res = CA_ERROR_INVALID;
+    പൂർണ്ണസംഖ്യ res = CA_ERROR_INVALID;
 
     ++sound_id;
-    if (soundcb == NULL)
+    എങ്കിൽ (soundcb == ശൂന്യ)
     {
         res = ca_context_play(context, sound_id,
                               playfile ? CA_PROP_MEDIA_FILENAME
                                        : CA_PROP_EVENT_ID,
                               tv_get_string(&argvars[0]),
-                              CA_PROP_CANBERRA_CACHE_CONTROL, "volatile", NULL);
+                              CA_PROP_CANBERRA_CACHE_CONTROL, "volatile", ശൂന്യ);
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        static ca_proplist *proplist = NULL;
+        സ്ഥിതം ca_proplist *proplist = ശൂന്യ;
 
         ca_proplist_create(&proplist);
-        if (proplist != NULL)
+        എങ്കിൽ (proplist != ശൂന്യ)
         {
-            if (playfile)
+            എങ്കിൽ (playfile)
                 ca_proplist_sets(proplist, CA_PROP_MEDIA_FILENAME,
-                                 (char *)tv_get_string(&argvars[0]));
-            else
+                                 (അക്ഷരം *)tv_get_string(&argvars[0]));
+            അല്ലെങ്കിൽ
                 ca_proplist_sets(proplist, CA_PROP_EVENT_ID,
-                                 (char *)tv_get_string(&argvars[0]));
+                                 (അക്ഷരം *)tv_get_string(&argvars[0]));
             ca_proplist_sets(proplist, CA_PROP_CANBERRA_CACHE_CONTROL,
                              "volatile");
             res = ca_context_play_full(context, sound_id, proplist,
                                        sound_callback, soundcb);
-            if (res != CA_SUCCESS)
+            എങ്കിൽ (res != CA_SUCCESS)
                 delete_sound_callback(soundcb);
 
             ca_proplist_destroy(proplist);
         }
     }
-    rettv->vval.v_number = res == CA_SUCCESS ? sound_id : 0;
+    rettv->vval.v_സംഖ്യ = res == CA_SUCCESS ? sound_id : 0;
 }
 
-void
+ശൂന്യം
 f_sound_playevent(typval_T *argvars, typval_T *rettv)
 {
     sound_play_common(argvars, rettv, FALSE);
@@ -246,7 +246,7 @@ f_sound_playevent(typval_T *argvars, typval_T *rettv)
 /*
  * implementation of sound_playfile({path} [, {callback}])
  */
-void
+ശൂന്യം
 f_sound_playfile(typval_T *argvars, typval_T *rettv)
 {
     sound_play_common(argvars, rettv, TRUE);
@@ -255,41 +255,41 @@ f_sound_playfile(typval_T *argvars, typval_T *rettv)
 /*
  * implementation of sound_stop({id})
  */
-void
+ശൂന്യം
 f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-        return;
+    എങ്കിൽ (in_vim9script() && check_for_സംഖ്യ_arg(argvars, 0) == FAIL)
+        തിരികെ;
 
-    if (context != NULL)
-        ca_context_cancel(context, tv_get_number(&argvars[0]));
+    എങ്കിൽ (context != ശൂന്യ)
+        ca_context_cancel(context, tv_get_സംഖ്യ(&argvars[0]));
 }
 
 /*
  * implementation of sound_clear()
  */
-void
+ശൂന്യം
 f_sound_clear(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (context == NULL)
-        return;
+    എങ്കിൽ (context == ശൂന്യ)
+        തിരികെ;
     ca_context_destroy(context);
-    context = NULL;
+    context = ശൂന്യ;
 }
 
-#  if defined(EXITFREE)
-void
-sound_free(void)
+#  എങ്കിൽ defined(EXITFREE)
+ശൂന്യം
+sound_free(ശൂന്യം)
 {
     soundcb_queue_T *scb;
 
-    if (context != NULL)
+    എങ്കിൽ (context != ശൂന്യ)
         ca_context_destroy(context);
 
-    while (first_callback != NULL)
+    ആകുമ്പോൾ (first_callback != ശൂന്യ)
         delete_sound_callback(first_callback);
 
-    while (callback_queue != NULL)
+    ആകുമ്പോൾ (callback_queue != ശൂന്യ)
     {
         scb = callback_queue;
         callback_queue = scb->scb_next;
@@ -305,24 +305,24 @@ sound_free(void)
  * Sound implementation for MS-Windows.
  */
 
-static HWND g_hWndSound = NULL;
+സ്ഥിതം HWND g_hWndSound = ശൂന്യ;
 
-static LRESULT CALLBACK
+സ്ഥിതം LRESULT CALLBACK
 sound_wndproc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     soundcb_T *p;
 
-    switch (message)
+    തിരഞ്ഞെടുപ്പ് (message)
     {
-        case MM_MCINOTIFY:
-            for (p = first_callback; p != NULL; p = p->snd_next)
-                if (p->snd_device_id == (MCIDEVICEID)lParam)
+        അവസ്ഥ MM_MCINOTIFY:
+            വേണ്ടി (p = first_callback; p != ശൂന്യ; p = p->snd_next)
+                എങ്കിൽ (p->snd_device_id == (MCIDEVICEID)lParam)
                 {
-                    char buf[32];
+                    അക്ഷരം buf[32];
 
-                    vim_snprintf(buf, sizeof(buf), "close sound%06ld",
+                    vim_snprintf(buf, വലുപ്പം(buf), "close sound%06ld",
                                  p->snd_id);
-                    mciSendStringA(buf, NULL, 0, 0);
+                    mciSendStringA(buf, ശൂന്യ, 0, 0);
 
                     long result = wParam == MCI_NOTIFY_SUCCESSFUL ? 0
                                   : wParam == MCI_NOTIFY_ABORTED  ? 1
@@ -332,46 +332,46 @@ sound_wndproc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                     delete_sound_callback(p);
                     redraw_after_callback(TRUE, FALSE);
                 }
-            break;
+            നിർത്തുക;
     }
 
-    return DefWindowProc(hwnd, message, wParam, lParam);
+    തിരികെ DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-static HWND
-sound_window(void)
+സ്ഥിതം HWND
+sound_window(ശൂന്യം)
 {
-    if (g_hWndSound == NULL)
+    എങ്കിൽ (g_hWndSound == ശൂന്യ)
     {
         LPCSTR clazz = "VimSound";
-        WNDCLASS wndclass = { 0, sound_wndproc, 0,    0, g_hinst, NULL, 0,
-                              0, NULL,          clazz };
+        WNDCLASS wndclass = { 0, sound_wndproc, 0,    0, g_hinst, ശൂന്യ, 0,
+                              0, ശൂന്യ,          clazz };
         RegisterClass(&wndclass);
-        g_hWndSound = CreateWindow(clazz, NULL, 0, 0, 0, 0, 0, HWND_MESSAGE,
-                                   NULL, g_hinst, NULL);
+        g_hWndSound = CreateWindow(clazz, ശൂന്യ, 0, 0, 0, 0, 0, HWND_MESSAGE,
+                                   ശൂന്യ, g_hinst, ശൂന്യ);
     }
 
-    return g_hWndSound;
+    തിരികെ g_hWndSound;
 }
 
-void
+ശൂന്യം
 f_sound_playevent(typval_T *argvars, typval_T *rettv)
 {
     WCHAR *wp;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    എങ്കിൽ (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        തിരികെ;
 
-    wp = enc_to_utf16(tv_get_string(&argvars[0]), NULL);
-    if (wp == NULL)
-        return;
+    wp = enc_to_utf16(tv_get_string(&argvars[0]), ശൂന്യ);
+    എങ്കിൽ (wp == ശൂന്യ)
+        തിരികെ;
 
-    if (PlaySoundW(wp, NULL, SND_ASYNC | SND_ALIAS))
-        rettv->vval.v_number = ++sound_id;
-    free(wp);
+    എങ്കിൽ (PlaySoundW(wp, ശൂന്യ, SND_ASYNC | SND_ALIAS))
+        rettv->vval.v_സംഖ്യ = ++sound_id;
+    സ്വതന്ത്രം(wp);
 }
 
-void
+ശൂന്യം
 f_sound_playfile(typval_T *argvars, typval_T *rettv)
 {
     long newid = sound_id + 1;
@@ -379,83 +379,83 @@ f_sound_playfile(typval_T *argvars, typval_T *rettv)
     char_u *p, *filename;
     WCHAR *wp;
     soundcb_T *soundcb;
-    char buf[32];
+    അക്ഷരം buf[32];
     MCIERROR err;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    എങ്കിൽ (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        തിരികെ;
 
     filename = tv_get_string(&argvars[0]);
 
     len = STRLEN(filename) + 5 + 18 + 2 + 1;
     p = alloc(len);
-    if (p == NULL)
+    എങ്കിൽ (p == ശൂന്യ)
     {
-        return;
+        തിരികെ;
     }
-    vim_snprintf((char *)p, len, "open \"%s\" alias sound%06ld", filename,
+    vim_snprintf((അക്ഷരം *)p, len, "open \"%s\" alias sound%06ld", filename,
                  newid);
 
-    wp = enc_to_utf16((char_u *)p, NULL);
-    free(p);
-    if (wp == NULL)
-        return;
+    wp = enc_to_utf16((char_u *)p, ശൂന്യ);
+    സ്വതന്ത്രം(p);
+    എങ്കിൽ (wp == ശൂന്യ)
+        തിരികെ;
 
-    err = mciSendStringW(wp, NULL, 0, sound_window());
-    free(wp);
-    if (err != 0)
-        return;
+    err = mciSendStringW(wp, ശൂന്യ, 0, sound_window());
+    സ്വതന്ത്രം(wp);
+    എങ്കിൽ (err != 0)
+        തിരികെ;
 
-    vim_snprintf(buf, sizeof(buf), "play sound%06ld notify", newid);
-    err = mciSendStringA(buf, NULL, 0, sound_window());
-    if (err != 0)
-        goto failure;
+    vim_snprintf(buf, വലുപ്പം(buf), "play sound%06ld notify", newid);
+    err = mciSendStringA(buf, ശൂന്യ, 0, sound_window());
+    എങ്കിൽ (err != 0)
+        പോകുക failure;
 
     sound_id = newid;
-    rettv->vval.v_number = sound_id;
+    rettv->vval.v_സംഖ്യ = sound_id;
 
     soundcb = get_sound_callback(&argvars[1]);
-    if (soundcb != NULL)
+    എങ്കിൽ (soundcb != ശൂന്യ)
     {
-        vim_snprintf(buf, sizeof(buf), "sound%06ld", newid);
+        vim_snprintf(buf, വലുപ്പം(buf), "sound%06ld", newid);
         soundcb->snd_id = newid;
         soundcb->snd_device_id = mciGetDeviceID(buf);
     }
-    return;
+    തിരികെ;
 
 failure:
-    vim_snprintf(buf, sizeof(buf), "close sound%06ld", newid);
-    mciSendStringA(buf, NULL, 0, NULL);
+    vim_snprintf(buf, വലുപ്പം(buf), "close sound%06ld", newid);
+    mciSendStringA(buf, ശൂന്യ, 0, ശൂന്യ);
 }
 
-void
+ശൂന്യം
 f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
     long id;
-    char buf[32];
+    അക്ഷരം buf[32];
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-        return;
+    എങ്കിൽ (in_vim9script() && check_for_സംഖ്യ_arg(argvars, 0) == FAIL)
+        തിരികെ;
 
-    id = tv_get_number(&argvars[0]);
-    vim_snprintf(buf, sizeof(buf), "stop sound%06ld", id);
-    mciSendStringA(buf, NULL, 0, NULL);
+    id = tv_get_സംഖ്യ(&argvars[0]);
+    vim_snprintf(buf, വലുപ്പം(buf), "stop sound%06ld", id);
+    mciSendStringA(buf, ശൂന്യ, 0, ശൂന്യ);
 }
 
-void
+ശൂന്യം
 f_sound_clear(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    PlaySoundW(NULL, NULL, 0);
-    mciSendStringA("close all", NULL, 0, NULL);
+    PlaySoundW(ശൂന്യ, ശൂന്യ, 0);
+    mciSendStringA("close all", ശൂന്യ, 0, ശൂന്യ);
 }
 
-#  if defined(EXITFREE)
-void
-sound_free(void)
+#  എങ്കിൽ defined(EXITFREE)
+ശൂന്യം
+sound_free(ശൂന്യം)
 {
     CloseWindow(g_hWndSound);
 
-    while (first_callback != NULL)
+    ആകുമ്പോൾ (first_callback != ശൂന്യ)
         delete_sound_callback(first_callback);
 }
 #  endif
@@ -463,11 +463,11 @@ sound_free(void)
 # elif defined(MACOS_X_DARWIN)
 
 // Sound implementation for macOS.
-static void
+സ്ഥിതം ശൂന്യം
 sound_play_common(typval_T *argvars, typval_T *rettv, bool playfile)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    എങ്കിൽ (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        തിരികെ;
 
     char_u *sound_name = tv_get_string(&argvars[0]);
     soundcb_T *soundcb = get_sound_callback(&argvars[1]);
@@ -475,45 +475,45 @@ sound_play_common(typval_T *argvars, typval_T *rettv, bool playfile)
     ++sound_id;
 
     bool play_success = sound_mch_play(sound_name, sound_id, soundcb, playfile);
-    if (!play_success && soundcb)
+    എങ്കിൽ (!play_success && soundcb)
     {
         delete_sound_callback(soundcb);
     }
-    rettv->vval.v_number = play_success ? sound_id : 0;
+    rettv->vval.v_സംഖ്യ = play_success ? sound_id : 0;
 }
 
-void
+ശൂന്യം
 f_sound_playevent(typval_T *argvars, typval_T *rettv)
 {
     sound_play_common(argvars, rettv, false);
 }
 
-void
+ശൂന്യം
 f_sound_playfile(typval_T *argvars, typval_T *rettv)
 {
     sound_play_common(argvars, rettv, true);
 }
 
-void
+ശൂന്യം
 f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-        return;
-    sound_mch_stop(tv_get_number(&argvars[0]));
+    എങ്കിൽ (in_vim9script() && check_for_സംഖ്യ_arg(argvars, 0) == FAIL)
+        തിരികെ;
+    sound_mch_stop(tv_get_സംഖ്യ(&argvars[0]));
 }
 
-void
+ശൂന്യം
 f_sound_clear(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     sound_mch_clear();
 }
 
-#  if defined(EXITFREE)
-void
-sound_free(void)
+#  എങ്കിൽ defined(EXITFREE)
+ശൂന്യം
+sound_free(ശൂന്യം)
 {
     sound_mch_free();
-    while (first_callback != NULL)
+    ആകുമ്പോൾ (first_callback != ശൂന്യ)
         delete_sound_callback(first_callback);
 }
 #  endif
