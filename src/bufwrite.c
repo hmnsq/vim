@@ -11,65 +11,65 @@
  * bufwrite.c: functions for writing a buffer
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(HAVE_UTIME) && defined(HAVE_UTIME_H)
+#إذا defined(HAVE_UTIME) && defined(HAVE_UTIME_H)
 # include <utime.h>		// for struct utimbuf
-#endif
+#پایان_اگر
 
-#define SMALLBUFSIZE	256	// size of emergency write buffer
+#تعریف_کن SMALLBUFSIZE	256	// size of emergency write buffer
 
 /*
  * Structure to pass arguments from buf_write() to buf_write_bytes().
  */
-struct bw_info
+بنية bw_info
 {
-    int		bw_fd;		// file descriptor
+    صحيح		bw_fd;		// file descriptor
     char_u	*bw_buf;	// buffer with data to be written
-    int		bw_len;		// length of data
-    int		bw_flags;	// FIO_ flags
-#ifdef FEAT_CRYPT
-    buf_T	*bw_buffer;	// buffer being written
-    int		bw_finish;	// finish encrypting
-#endif
+    صحيح		bw_len;		// length of data
+    صحيح		bw_flags;	// FIO_ flags
+#اگر_تعریف_شده FEAT_CRYPT
+    buf_T	*bw_میانگیر;	// buffer being written
+    صحيح		bw_پایان;	// finish encrypting
+#پایان_اگر
     char_u	bw_rest[CONV_RESTLEN]; // not converted bytes
-    int		bw_restlen;	// nr of bytes in bw_rest[]
-    int		bw_first;	// first write call
+    صحيح		bw_restlen;	// nr of bytes in bw_rest[]
+    صحيح		bw_اولی;	// first write call
     char_u	*bw_conv_buf;	// buffer for writing converted chars
     size_t	bw_conv_buflen; // size of bw_conv_buf
-    int		bw_conv_error;	// set for conversion error
+    صحيح		bw_conv_error;	// set for conversion error
     linenr_T	bw_conv_error_lnum;  // first line with error or zero
-    linenr_T	bw_start_lnum;	// line number at start of buffer
-#ifdef USE_ICONV
+    linenr_T	bw_شروع_lnum;	// line number at start of buffer
+#اگر_تعریف_شده USE_ICONV
     iconv_t	bw_iconv_fd;	// descriptor for iconv() or -1
-#endif
+#پایان_اگر
 };
 
 /*
  * Convert a Unicode character to bytes.
  * Return TRUE for an error, FALSE when it's OK.
  */
-    static int
+    ساكن صحيح
 ucs2bytes(
-    unsigned	c,		// in: character
+    بیعلامت	c,		// in: character
     char_u	**pp,		// in/out: pointer to result
-    int		flags)		// FIO_ flags
+    صحيح		flags)		// FIO_ flags
 {
     char_u	*p = *pp;
-    int		error = FALSE;
-    int		cc;
+    صحيح		error = FALSE;
+    صحيح		cc;
 
 
-    if (flags & FIO_UCS4)
+    إذا (flags & FIO_UCS4)
     {
-	if (flags & FIO_ENDIAN_L)
+	إذا (flags & FIO_ENDIAN_L)
 	{
 	    *p++ = c;
 	    *p++ = (c >> 8);
 	    *p++ = (c >> 16);
 	    *p++ = (c >> 24);
 	}
-	else
+	وإلا
 	{
 	    *p++ = (c >> 24);
 	    *p++ = (c >> 16);
@@ -77,57 +77,57 @@ ucs2bytes(
 	    *p++ = c;
 	}
     }
-    else if (flags & (FIO_UCS2 | FIO_UTF16))
+    وإلا إذا (flags & (FIO_UCS2 | FIO_UTF16))
     {
-	if (c >= 0x10000)
+	إذا (c >= 0x10000)
 	{
-	    if (flags & FIO_UTF16)
+	    إذا (flags & FIO_UTF16)
 	    {
 		// Make two words, ten bits of the character in each.  First
 		// word is 0xd800 - 0xdbff, second one 0xdc00 - 0xdfff
 		c -= 0x10000;
-		if (c >= 0x100000)
+		إذا (c >= 0x100000)
 		    error = TRUE;
 		cc = ((c >> 10) & 0x3ff) + 0xd800;
-		if (flags & FIO_ENDIAN_L)
+		إذا (flags & FIO_ENDIAN_L)
 		{
 		    *p++ = cc;
-		    *p++ = ((unsigned)cc >> 8);
+		    *p++ = ((بیعلامت)cc >> 8);
 		}
-		else
+		وإلا
 		{
-		    *p++ = ((unsigned)cc >> 8);
+		    *p++ = ((بیعلامت)cc >> 8);
 		    *p++ = cc;
 		}
 		c = (c & 0x3ff) + 0xdc00;
 	    }
-	    else
+	    وإلا
 		error = TRUE;
 	}
-	if (flags & FIO_ENDIAN_L)
+	إذا (flags & FIO_ENDIAN_L)
 	{
 	    *p++ = c;
 	    *p++ = (c >> 8);
 	}
-	else
+	وإلا
 	{
 	    *p++ = (c >> 8);
 	    *p++ = c;
 	}
     }
-    else    // Latin1
+    وإلا    // Latin1
     {
-	if (c >= 0x100)
+	إذا (c >= 0x100)
 	{
 	    error = TRUE;
 	    *p++ = 0xBF;
 	}
-	else
+	وإلا
 	    *p++ = c;
     }
 
     *pp = p;
-    return error;
+    أرجع error;
 }
 
 /*
@@ -136,72 +136,72 @@ ucs2bytes(
  *
  * Return FAIL for failure, OK otherwise.
  */
-    static int
-buf_write_bytes(struct bw_info *ip)
+    ساكن صحيح
+buf_write_بایتها(بنية bw_info *ip)
 {
-    int		wlen;
+    صحيح		wlen;
     char_u	*buf = ip->bw_buf;	// data to write
-    int		len = ip->bw_len;	// length of data
-    int		flags = ip->bw_flags;	// extra flags
+    صحيح		len = ip->bw_len;	// length of data
+    صحيح		flags = ip->bw_flags;	// extra flags
 
     // Skip conversion when writing the crypt magic number or the BOM.
-    if (!(flags & FIO_NOCONVERT))
+    إذا (!(flags & FIO_NOCONVERT))
     {
 	char_u		*p;
-	unsigned	c;
-	int		n;
+	بیعلامت	c;
+	صحيح		n;
 
-	if (flags & FIO_UTF8)
+	إذا (flags & FIO_UTF8)
 	{
 	    // Convert latin1 in the buffer to UTF-8 in the file.
 	    p = ip->bw_conv_buf;	// translate to buffer
-	    for (wlen = 0; wlen < len; ++wlen)
+	    لكل (wlen = 0; wlen < len; ++wlen)
 		p += utf_char2bytes(buf[wlen], p);
 	    buf = ip->bw_conv_buf;
-	    len = (int)(p - ip->bw_conv_buf);
+	    len = (صحيح)(p - ip->bw_conv_buf);
 	}
-	else if (flags & (FIO_UCS4 | FIO_UTF16 | FIO_UCS2 | FIO_LATIN1))
+	وإلا إذا (flags & (FIO_UCS4 | FIO_UTF16 | FIO_UCS2 | FIO_LATIN1))
 	{
 	    // Convert UTF-8 bytes in the buffer to UCS-2, UCS-4, UTF-16 or
 	    // Latin1 chars in the file.
-	    if (flags & FIO_LATIN1)
+	    إذا (flags & FIO_LATIN1)
 		p = buf;	// translate in-place (can only get shorter)
-	    else
+	    وإلا
 		p = ip->bw_conv_buf;	// translate to buffer
-	    for (wlen = 0; wlen < len; wlen += n)
+	    لكل (wlen = 0; wlen < len; wlen += n)
 	    {
-		if (wlen == 0 && ip->bw_restlen != 0)
+		إذا (wlen == 0 && ip->bw_restlen != 0)
 		{
-		    int		l;
+		    صحيح		l;
 
 		    // Use remainder of previous call.  Append the start of
 		    // buf[] to get a full sequence.  Might still be too
 		    // short!
 		    l = CONV_RESTLEN - ip->bw_restlen;
-		    if (l > len)
+		    إذا (l > len)
 			l = len;
 		    mch_memmove(ip->bw_rest + ip->bw_restlen, buf, (size_t)l);
 		    n = utf_ptr2len_len(ip->bw_rest, ip->bw_restlen + l);
-		    if (n > ip->bw_restlen + len)
+		    إذا (n > ip->bw_restlen + len)
 		    {
 			// We have an incomplete byte sequence at the end to
 			// be written.  We can't convert it without the
 			// remaining bytes.  Keep them for the next call.
-			if (ip->bw_restlen + len > CONV_RESTLEN)
-			    return FAIL;
+			إذا (ip->bw_restlen + len > CONV_RESTLEN)
+			    أرجع FAIL;
 			ip->bw_restlen += len;
-			break;
+			اكسر;
 		    }
-		    if (n > 1)
+		    إذا (n > 1)
 			c = utf_ptr2char(ip->bw_rest);
-		    else
+		    وإلا
 			c = ip->bw_rest[0];
-		    if (n >= ip->bw_restlen)
+		    إذا (n >= ip->bw_restlen)
 		    {
 			n -= ip->bw_restlen;
 			ip->bw_restlen = 0;
 		    }
-		    else
+		    وإلا
 		    {
 			ip->bw_restlen -= n;
 			mch_memmove(ip->bw_rest, ip->bw_rest + n,
@@ -209,67 +209,67 @@ buf_write_bytes(struct bw_info *ip)
 			n = 0;
 		    }
 		}
-		else
+		وإلا
 		{
 		    n = utf_ptr2len_len(buf + wlen, len - wlen);
-		    if (n > len - wlen)
+		    إذا (n > len - wlen)
 		    {
 			// We have an incomplete byte sequence at the end to
 			// be written.  We can't convert it without the
 			// remaining bytes.  Keep them for the next call.
-			if (len - wlen > CONV_RESTLEN)
-			    return FAIL;
+			إذا (len - wlen > CONV_RESTLEN)
+			    أرجع FAIL;
 			ip->bw_restlen = len - wlen;
 			mch_memmove(ip->bw_rest, buf + wlen,
 						      (size_t)ip->bw_restlen);
-			break;
+			اكسر;
 		    }
-		    if (n > 1)
+		    إذا (n > 1)
 			c = utf_ptr2char(buf + wlen);
-		    else
+		    وإلا
 			c = buf[wlen];
 		}
 		// Check that there is enough space
-		if (!(flags & FIO_LATIN1))
+		إذا (!(flags & FIO_LATIN1))
 		{
 		    size_t need = (flags & FIO_UCS4) ? 4 : 2;
-		    if ((flags & FIO_UTF16) && c >= 0x10000)
+		    إذا ((flags & FIO_UTF16) && c >= 0x10000)
 			need = 4;
 
-		    if ((size_t)(p - ip->bw_conv_buf) + need > ip->bw_conv_buflen)
-			return FAIL;
+		    إذا ((size_t)(p - ip->bw_conv_buf) + need > ip->bw_conv_buflen)
+			أرجع FAIL;
 		}
 
-		if (ucs2bytes(c, &p, flags) && !ip->bw_conv_error)
+		إذا (ucs2bytes(c, &p, flags) && !ip->bw_conv_error)
 		{
 		    ip->bw_conv_error = TRUE;
-		    ip->bw_conv_error_lnum = ip->bw_start_lnum;
+		    ip->bw_conv_error_lnum = ip->bw_شروع_lnum;
 		}
-		if (c == NL)
-		    ++ip->bw_start_lnum;
+		إذا (c == NL)
+		    ++ip->bw_شروع_lnum;
 	    }
-	    if (flags & FIO_LATIN1)
-		len = (int)(p - buf);
-	    else
+	    إذا (flags & FIO_LATIN1)
+		len = (صحيح)(p - buf);
+	    وإلا
 	    {
 		buf = ip->bw_conv_buf;
-		len = (int)(p - ip->bw_conv_buf);
+		len = (صحيح)(p - ip->bw_conv_buf);
 	    }
 	}
 
-#ifdef MSWIN
-	else if (flags & FIO_CODEPAGE)
+#اگر_تعریف_شده MSWIN
+	وإلا إذا (flags & FIO_CODEPAGE)
 	{
 	    // Convert UTF-8 or codepage to UCS-2 and then to MS-Windows
 	    // codepage.
 	    char_u	*from;
 	    size_t	fromlen;
-	    char_u	*to;
-	    int		u8c;
+	    char_u	*مقصد;
+	    صحيح		u8c;
 	    BOOL	bad = FALSE;
-	    int		needed;
+	    صحيح		needed;
 
-	    if (ip->bw_restlen > 0)
+	    إذا (ip->bw_restlen > 0)
 	    {
 		// Need to concatenate the remainder of the previous call and
 		// the bytes of the current call.  Use the end of the
@@ -279,124 +279,124 @@ buf_write_bytes(struct bw_info *ip)
 		mch_memmove(from, ip->bw_rest, (size_t)ip->bw_restlen);
 		mch_memmove(from + ip->bw_restlen, buf, (size_t)len);
 	    }
-	    else
+	    وإلا
 	    {
 		from = buf;
 		fromlen = len;
 	    }
 
-	    to = ip->bw_conv_buf;
-	    if (enc_utf8)
+	    مقصد = ip->bw_conv_buf;
+	    إذا (enc_utf8)
 	    {
 		// Convert from UTF-8 to UCS-2, to the start of the buffer.
 		// The buffer has been allocated to be big enough.
-		while (fromlen > 0)
+		طالما (fromlen > 0)
 		{
-		    n = (int)utf_ptr2len_len(from, (int)fromlen);
-		    if (n > (int)fromlen)	// incomplete byte sequence
-			break;
+		    n = (صحيح)utf_ptr2len_len(from, (صحيح)fromlen);
+		    إذا (n > (صحيح)fromlen)	// incomplete byte sequence
+			اكسر;
 		    u8c = utf_ptr2char(from);
-		    *to++ = (u8c & 0xff);
-		    *to++ = (u8c >> 8);
+		    *مقصد++ = (u8c & 0xff);
+		    *مقصد++ = (u8c >> 8);
 		    fromlen -= n;
 		    from += n;
 		}
 
 		// Copy remainder to ip->bw_rest[] to be used for the next
 		// call.
-		if (fromlen > CONV_RESTLEN)
+		إذا (fromlen > CONV_RESTLEN)
 		{
 		    // weird overlong sequence
 		    ip->bw_conv_error = TRUE;
-		    return FAIL;
+		    أرجع FAIL;
 		}
 		mch_memmove(ip->bw_rest, from, fromlen);
-		ip->bw_restlen = (int)fromlen;
+		ip->bw_restlen = (صحيح)fromlen;
 	    }
-	    else
+	    وإلا
 	    {
 		// Convert from enc_codepage to UCS-2, to the start of the
 		// buffer.  The buffer has been allocated to be big enough.
 		ip->bw_restlen = 0;
-		needed = MultiByteToWideChar(enc_codepage,
-			     MB_ERR_INVALID_CHARS, (LPCSTR)from, (int)fromlen,
-								     NULL, 0);
-		if (needed == 0)
+		needed = Multi_Byte_مقصد_Wide_Char(enc_codepage,
+			     MB_ERR_INVALID_CHARS, (LPCSTR)from, (صحيح)fromlen,
+								     عدم, 0);
+		إذا (needed == 0)
 		{
 		    // When conversion fails there may be a trailing byte.
-		    needed = MultiByteToWideChar(enc_codepage,
-			 MB_ERR_INVALID_CHARS, (LPCSTR)from, (int)fromlen - 1,
-								     NULL, 0);
-		    if (needed == 0)
+		    needed = Multi_Byte_مقصد_Wide_Char(enc_codepage,
+			 MB_ERR_INVALID_CHARS, (LPCSTR)from, (صحيح)fromlen - 1,
+								     عدم, 0);
+		    إذا (needed == 0)
 		    {
 			// Conversion doesn't work.
 			ip->bw_conv_error = TRUE;
-			return FAIL;
+			أرجع FAIL;
 		    }
 		    // Save the trailing byte for the next call.
 		    ip->bw_rest[0] = from[fromlen - 1];
 		    ip->bw_restlen = 1;
 		}
-		needed = MultiByteToWideChar(enc_codepage, MB_ERR_INVALID_CHARS,
-				(LPCSTR)from, (int)(fromlen - ip->bw_restlen),
-							  (LPWSTR)to, needed);
-		if (needed == 0)
+		needed = Multi_Byte_مقصد_Wide_Char(enc_codepage, MB_ERR_INVALID_CHARS,
+				(LPCSTR)from, (صحيح)(fromlen - ip->bw_restlen),
+							  (LPWSTR)مقصد, needed);
+		إذا (needed == 0)
 		{
 		    // Safety check: Conversion doesn't work.
 		    ip->bw_conv_error = TRUE;
-		    return FAIL;
+		    أرجع FAIL;
 		}
-		to += needed * 2;
+		مقصد += needed * 2;
 	    }
 
-	    fromlen = to - ip->bw_conv_buf;
-	    buf = to;
+	    fromlen = مقصد - ip->bw_conv_buf;
+	    buf = مقصد;
 # ifdef CP_UTF8	// VC 4.1 doesn't define CP_UTF8
-	    if (FIO_GET_CP(flags) == CP_UTF8)
+	    إذا (FIO_GET_CP(flags) == CP_UTF8)
 	    {
 		// Convert from UCS-2 to UTF-8, using the remainder of the
 		// conversion buffer.  Fails when out of space.
-		for (from = ip->bw_conv_buf; fromlen > 1; fromlen -= 2)
+		لكل (from = ip->bw_conv_buf; fromlen > 1; fromlen -= 2)
 		{
 		    u8c = *from++;
 		    u8c += (*from++ << 8);
-		    to += utf_char2bytes(u8c, to);
-		    if (to + 6 >= ip->bw_conv_buf + ip->bw_conv_buflen)
+		    مقصد += utf_char2bytes(u8c, مقصد);
+		    إذا (مقصد + 6 >= ip->bw_conv_buf + ip->bw_conv_buflen)
 		    {
 			ip->bw_conv_error = TRUE;
-			return FAIL;
+			أرجع FAIL;
 		    }
 		}
-		len = (int)(to - buf);
+		len = (صحيح)(مقصد - buf);
 	    }
-	    else
+	    وإلا
 # endif
 	    {
 		// Convert from UCS-2 to the codepage, using the remainder of
 		// the conversion buffer.  If the conversion uses the default
 		// character "0", the data doesn't fit in this encoding, so
 		// fail.
-		len = WideCharToMultiByte(FIO_GET_CP(flags), 0,
-			(LPCWSTR)ip->bw_conv_buf, (int)fromlen / sizeof(WCHAR),
-			(LPSTR)to, (int)(ip->bw_conv_buflen - fromlen), 0,
+		len = Wide_Char_مقصد_Multi_Byte(FIO_GET_CP(flags), 0,
+			(LPCWSTR)ip->bw_conv_buf, (صحيح)fromlen / حجم(WCHAR),
+			(LPSTR)مقصد, (صحيح)(ip->bw_conv_buflen - fromlen), 0,
 									&bad);
-		if (bad)
+		إذا (bad)
 		{
 		    ip->bw_conv_error = TRUE;
-		    return FAIL;
+		    أرجع FAIL;
 		}
 	    }
 	}
-#endif
+#پایان_اگر
 
-#ifdef MACOS_CONVERT
-	else if (flags & FIO_MACROMAN)
+#اگر_تعریف_شده MACOS_CONVERT
+	وإلا إذا (flags & FIO_MACROMAN)
 	{
 	    // Convert UTF-8 or latin1 to Apple MacRoman.
 	    char_u	*from;
 	    size_t	fromlen;
 
-	    if (ip->bw_restlen > 0)
+	    إذا (ip->bw_restlen > 0)
 	    {
 		// Need to concatenate the remainder of the previous call and
 		// the bytes of the current call.  Use the end of the
@@ -406,126 +406,126 @@ buf_write_bytes(struct bw_info *ip)
 		mch_memmove(from, ip->bw_rest, (size_t)ip->bw_restlen);
 		mch_memmove(from + ip->bw_restlen, buf, (size_t)len);
 	    }
-	    else
+	    وإلا
 	    {
 		from = buf;
 		fromlen = len;
 	    }
 
-	    if (enc2macroman(from, fromlen,
+	    إذا (enc2macroman(from, fromlen,
 			ip->bw_conv_buf, &len, ip->bw_conv_buflen,
 			ip->bw_rest, &ip->bw_restlen) == FAIL)
 	    {
 		ip->bw_conv_error = TRUE;
-		return FAIL;
+		أرجع FAIL;
 	    }
 	    buf = ip->bw_conv_buf;
 	}
-#endif
+#پایان_اگر
 
-#ifdef USE_ICONV
-	if (ip->bw_iconv_fd != (iconv_t)-1)
+#اگر_تعریف_شده USE_ICONV
+	إذا (ip->bw_iconv_fd != (iconv_t)-1)
 	{
-	    const char	*from;
+	    ثابت حرف	*from;
 	    size_t	fromlen;
-	    char	*to;
+	    حرف	*مقصد;
 	    size_t	tolen;
 
 	    // Convert with iconv().
-	    if (ip->bw_restlen > 0)
+	    إذا (ip->bw_restlen > 0)
 	    {
-		char *fp;
+		حرف *fp;
 
 		// Need to concatenate the remainder of the previous call and
 		// the bytes of the current call.  Use the end of the
 		// conversion buffer for this.
 		fromlen = len + ip->bw_restlen;
-		fp = (char *)ip->bw_conv_buf + ip->bw_conv_buflen - fromlen;
+		fp = (حرف *)ip->bw_conv_buf + ip->bw_conv_buflen - fromlen;
 		mch_memmove(fp, ip->bw_rest, (size_t)ip->bw_restlen);
 		mch_memmove(fp + ip->bw_restlen, buf, (size_t)len);
 		from = fp;
 		tolen = ip->bw_conv_buflen - fromlen;
 	    }
-	    else
+	    وإلا
 	    {
-		from = (const char *)buf;
+		from = (ثابت حرف *)buf;
 		fromlen = len;
 		tolen = ip->bw_conv_buflen;
 	    }
-	    to = (char *)ip->bw_conv_buf;
+	    مقصد = (حرف *)ip->bw_conv_buf;
 
-	    if (ip->bw_first)
+	    إذا (ip->bw_اولی)
 	    {
 		size_t	save_len = tolen;
 
 		// output the initial shift state sequence
-		(void)iconv(ip->bw_iconv_fd, NULL, NULL, &to, &tolen);
+		(فراغ)iconv(ip->bw_iconv_fd, عدم, عدم, &مقصد, &tolen);
 
 		// There is a bug in iconv() on Linux (which appears to be
 		// wide-spread) which sets "to" to NULL and messes up "tolen".
-		if (to == NULL)
+		إذا (مقصد == عدم)
 		{
-		    to = (char *)ip->bw_conv_buf;
+		    مقصد = (حرف *)ip->bw_conv_buf;
 		    tolen = save_len;
 		}
-		ip->bw_first = FALSE;
+		ip->bw_اولی = FALSE;
 	    }
 
 	    // If iconv() has an error or there is not enough room, fail.
-	    if ((iconv(ip->bw_iconv_fd, (void *)&from, &fromlen, &to, &tolen)
+	    إذا ((iconv(ip->bw_iconv_fd, (فراغ *)&from, &fromlen, &مقصد, &tolen)
 			== (size_t)-1 && ICONV_ERRNO != ICONV_EINVAL)
 						    || fromlen > CONV_RESTLEN)
 	    {
 		ip->bw_conv_error = TRUE;
-		return FAIL;
+		أرجع FAIL;
 	    }
 
 	    // copy remainder to ip->bw_rest[] to be used for the next call.
-	    if (fromlen > 0)
-		mch_memmove(ip->bw_rest, (void *)from, fromlen);
-	    ip->bw_restlen = (int)fromlen;
+	    إذا (fromlen > 0)
+		mch_memmove(ip->bw_rest, (فراغ *)from, fromlen);
+	    ip->bw_restlen = (صحيح)fromlen;
 
 	    buf = ip->bw_conv_buf;
-	    len = (int)((char_u *)to - ip->bw_conv_buf);
+	    len = (صحيح)((char_u *)مقصد - ip->bw_conv_buf);
 	}
-#endif
+#پایان_اگر
     }
 
-    if (ip->bw_fd < 0)
+    إذا (ip->bw_fd < 0)
 	// Only checking conversion, which is OK if we get here.
-	return OK;
+	أرجع OK;
 
-#ifdef FEAT_CRYPT
-    if (flags & FIO_ENCRYPTED)
+#اگر_تعریف_شده FEAT_CRYPT
+    إذا (flags & FIO_ENCRYPTED)
     {
 	// Encrypt the data. Do it in-place if possible, otherwise use an
 	// allocated buffer.
 # ifdef CRYPT_NOT_INPLACE
-	if (crypt_works_inplace(ip->bw_buffer->b_cryptstate))
+	إذا (crypt_کار_میکند_inplace(ip->bw_میانگیر->b_cryptstate))
 	{
 # endif
-	    crypt_encode_inplace(ip->bw_buffer->b_cryptstate, buf, len,
-								ip->bw_finish);
+	    crypt_encode_inplace(ip->bw_میانگیر->b_cryptstate, buf, len,
+								ip->bw_پایان);
 # ifdef CRYPT_NOT_INPLACE
 	}
-	else
+	وإلا
 	{
 	    char_u *outbuf;
 
 	    len = crypt_encode_alloc(curbuf->b_cryptstate, buf, len, &outbuf,
-								ip->bw_finish);
-	    if (len == 0)
-		return OK;  // Crypt layer is buffering, will flush later.
+								ip->bw_پایان);
+	    إذا (len == 0)
+		أرجع OK;  // Crypt layer is buffering, will flush later.
 	    wlen = write_eintr(ip->bw_fd, outbuf, len);
 	    vim_free(outbuf);
-	    return (wlen < len) ? FAIL : OK;
+	    أرجع (wlen < len) ? FAIL : OK;
 	}
 # endif
     }
-#endif
+#پایان_اگر
 
     wlen = write_eintr(ip->bw_fd, buf, len);
-    return (wlen < len) ? FAIL : OK;
+    أرجع (wlen < len) ? FAIL : OK;
 }
 
 /*
@@ -533,84 +533,84 @@ buf_write_bytes(struct bw_info *ip)
  * The size isn't checked, because using a tool like "gzip" takes care of
  * using the same timestamp but can't set the size.
  */
-    static int
+    ساكن صحيح
 check_mtime(buf_T *buf, stat_T *st)
 {
-    if (buf->b_mtime_read != 0
-		  && time_differs(st, buf->b_mtime_read, buf->b_mtime_read_ns))
+    إذا (buf->b_mtime_read != 0
+		  && زمان_differs(st, buf->b_mtime_read, buf->b_mtime_read_ns))
     {
-	msg_scroll = TRUE;	    // don't overwrite messages here
-	msg_silent = 0;		    // must give this prompt
+	پیام_scroll = TRUE;	    // don't overwrite messages here
+	پیام_silent = 0;		    // must give this prompt
 	// don't use emsg() here, don't want to flush the buffers
-	msg_attr(_("WARNING: The file has been changed since reading it!!!"),
+	پیام_attr(_("WARNING: The file has been changed since reading it!!!"),
 						       HL_ATTR(HLF_E));
-	if (ask_yesno((char_u *)_("Do you really want to write to it"),
+	إذا (ask_yesno((char_u *)_("Do you really want to write to it"),
 								 TRUE) == 'n')
-	    return FAIL;
-	msg_scroll = FALSE;	    // always overwrite the file message now
+	    أرجع FAIL;
+	پیام_scroll = FALSE;	    // always overwrite the file message now
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate a BOM in "buf[4]" for encoding "name".
  * Return the length of the BOM (zero when no BOM).
  */
-    static int
+    ساكن صحيح
 make_bom(char_u *buf, char_u *name)
 {
-    int		flags;
+    صحيح		flags;
     char_u	*p;
 
     flags = get_fio_flags(name);
 
     // Can't put a BOM in a non-Unicode file.
-    if (flags == FIO_LATIN1 || flags == 0)
-	return 0;
+    إذا (flags == FIO_LATIN1 || flags == 0)
+	أرجع 0;
 
-    if (flags == FIO_UTF8)	// UTF-8
+    إذا (flags == FIO_UTF8)	// UTF-8
     {
 	buf[0] = 0xef;
 	buf[1] = 0xbb;
 	buf[2] = 0xbf;
-	return 3;
+	أرجع 3;
     }
     p = buf;
-    (void)ucs2bytes(0xfeff, &p, flags);
-    return (int)(p - buf);
+    (فراغ)ucs2bytes(0xfeff, &p, flags);
+    أرجع (صحيح)(p - buf);
 }
 
-#ifdef UNIX
-    static void
-set_file_time(
+#اگر_تعریف_شده UNIX
+    ساكن فراغ
+مجموعه_file_زمان(
     char_u  *fname,
     time_t  atime,	    // access time
     time_t  mtime)	    // modification time
 {
-# if defined(HAVE_UTIME) && defined(HAVE_UTIME_H)
-    struct utimbuf  buf;
+# إذا defined(HAVE_UTIME) && defined(HAVE_UTIME_H)
+    بنية utimbuf  buf;
 
     buf.actime	= atime;
     buf.modtime	= mtime;
-    (void)utime((char *)fname, &buf);
-# else
-#  if defined(HAVE_UTIMES)
-    struct timeval  tvp[2];
+    (فراغ)utime((حرف *)fname, &buf);
+# وإلا
+#  إذا defined(HAVE_UTIMES)
+    بنية timeval  tvp[2];
 
     tvp[0].tv_sec   = atime;
     tvp[0].tv_usec  = 0;
     tvp[1].tv_sec   = mtime;
     tvp[1].tv_usec  = 0;
-    (void)utimes((char *)fname, (const struct timeval *)&tvp);
+    (فراغ)utimes((حرف *)fname, (ثابت بنية timeval *)&tvp);
 #  endif
 # endif
 }
-#endif // UNIX
+#پایان_اگر // UNIX
 
-    char *
-new_file_message(void)
+    حرف *
+new_file_پیام(فراغ)
 {
-    return shortmess(SHM_NEW) ? _("[New]") : _("[New File]");
+    أرجع shortmess(SHM_NEW) ? _("[New]") : _("[New File]");
 }
 
 /*
@@ -629,111 +629,111 @@ new_file_message(void)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    صحيح
 buf_write(
     buf_T	    *buf,
     char_u	    *fname,
     char_u	    *sfname,
-    linenr_T	    start,
-    linenr_T	    end,
+    linenr_T	    شروع,
+    linenr_T	    انتها,
     exarg_T	    *eap,		// for forced 'ff' and 'fenc', can be
 					// NULL!
-    int		    append,		// append to the file
-    int		    forceit,
-    int		    reset_changed,
-    int		    filtering)
+    صحيح		    append,		// append to the file
+    صحيح		    forceit,
+    صحيح		    reset_تغییریافته,
+    صحيح		    filtering)
 {
-    int		    fd;
-    char_u	    *backup = NULL;
-    int		    backup_copy = FALSE; // copy the original file?
-    int		    dobackup;
+    صحيح		    fd;
+    char_u	    *backup = عدم;
+    صحيح		    backup_copy = FALSE; // copy the original file?
+    صحيح		    dobackup;
     char_u	    *ffname;
-    char_u	    *wfname = NULL;	// name of file to write to
+    char_u	    *wfname = عدم;	// name of file to write to
     char_u	    *s;
     char_u	    *ptr;
     char_u	    c;
-    int		    len;
+    صحيح		    len;
     linenr_T	    lnum;
-    long	    nchars;
-    char_u	    *errmsg = NULL;
-    int		    errmsg_allocated = FALSE;
-    char_u	    *errnum = NULL;
-    char_u	    *buffer;
+    دراز	    nchars;
+    char_u	    *errmsg = عدم;
+    صحيح		    errmsg_allocated = FALSE;
+    char_u	    *errnum = عدم;
+    char_u	    *میانگیر;
     char_u	    smallbuf[SMALLBUFSIZE];
     char_u	    *backup_ext;
-    int		    bufsize;
-    long	    perm;		    // file permissions
-    int		    retval = OK;
-    int		    newfile = FALSE;	    // TRUE if file doesn't exist yet
-    int		    msg_save = msg_scroll;
-    int		    overwriting;	    // TRUE if writing over original
-    int		    no_eol = FALSE;	    // no end-of-line written
-    int		    device = FALSE;	    // writing to a device
+    صحيح		    bufsize;
+    دراز	    perm;		    // file permissions
+    صحيح		    retval = OK;
+    صحيح		    newfile = FALSE;	    // TRUE if file doesn't exist yet
+    صحيح		    پیام_save = پیام_scroll;
+    صحيح		    overwriting;	    // TRUE if writing over original
+    صحيح		    no_eol = FALSE;	    // no end-of-line written
+    صحيح		    device = FALSE;	    // writing to a device
     stat_T	    st_old;
-    int		    prev_got_int = got_int;
-    int		    checking_conversion;
-    int		    file_readonly = FALSE;  // overwritten file is read-only
-#if defined(UNIX)			    // XXX fix me sometime?
-    int		    made_writable = FALSE;  // 'w' bit has been set
-#endif
+    صحيح		    prev_got_int = got_int;
+    صحيح		    checking_conversion;
+    صحيح		    file_readonly = FALSE;  // overwritten file is read-only
+#إذا defined(UNIX)			    // XXX fix me sometime?
+    صحيح		    made_writable = FALSE;  // 'w' bit has been set
+#پایان_اگر
 					// writing everything
-    int		    whole = (start == 1 && end == buf->b_ml.ml_line_count);
-    linenr_T	    old_line_count = buf->b_ml.ml_line_count;
-    int		    attr;
-    int		    fileformat;
-    int		    write_bin;
-    struct bw_info  write_info;		// info for buf_write_bytes()
-    int		    converted = FALSE;
-    int		    notconverted = FALSE;
+    صحيح		    کامل = (شروع == 1 && انتها == buf->b_ml.ml_سطر_شمار);
+    linenr_T	    old_سطر_شمار = buf->b_ml.ml_سطر_شمار;
+    صحيح		    attr;
+    صحيح		    fileformat;
+    صحيح		    write_bin;
+    بنية bw_info  write_info;		// info for buf_write_bytes()
+    صحيح		    converted = FALSE;
+    صحيح		    notconverted = FALSE;
     char_u	    *fenc;		// effective 'fileencoding'
-    char_u	    *fenc_tofree = NULL; // allocated "fenc"
-    int		    wb_flags = 0;
-#ifdef HAVE_ACL
-    vim_acl_T	    acl = NULL;		// ACL copied from original file to
+    char_u	    *fenc_tofree = عدم; // allocated "fenc"
+    صحيح		    wb_flags = 0;
+#اگر_تعریف_شده HAVE_ACL
+    vim_acl_T	    acl = عدم;		// ACL copied from original file to
 					// backup or new file
-#endif
-#ifdef FEAT_PERSISTENT_UNDO
-    int		    write_undo_file = FALSE;
+#پایان_اگر
+#اگر_تعریف_شده FEAT_PERSISTENT_UNDO
+    صحيح		    write_undo_file = FALSE;
     context_sha256_T sha_ctx;
-#endif
-    unsigned int    bkc = get_bkc_flags(buf);
-    pos_T	    orig_start = buf->b_op_start;
-    pos_T	    orig_end = buf->b_op_end;
+#پایان_اگر
+    بیعلامت صحيح    bkc = get_bkc_flags(buf);
+    pos_T	    orig_شروع = buf->b_op_شروع;
+    pos_T	    orig_انتها = buf->b_op_انتها;
 
-    if (fname == NULL || *fname == NUL)	// safety check
-	return FAIL;
-    if (buf->b_ml.ml_mfp == NULL)
+    إذا (fname == عدم || *fname == NUL)	// safety check
+	أرجع FAIL;
+    إذا (buf->b_ml.ml_mfp == عدم)
     {
 	// This can happen during startup when there is a stray "w" in the
 	// vimrc file.
-	emsg(_(e_empty_buffer));
-	return FAIL;
+	emsg(_(e_خالی_میانگیر));
+	أرجع FAIL;
     }
 
     // Disallow writing from .exrc and .vimrc in current directory for
     // security reasons.
-    if (check_secure())
-	return FAIL;
+    إذا (check_secure())
+	أرجع FAIL;
 
     // Avoid a crash for a long name.
-    if (STRLEN(fname) >= MAXPATHL)
+    إذا (STRLEN(fname) >= MAXPATHL)
     {
 	emsg(_(e_name_too_long));
-	return FAIL;
+	أرجع FAIL;
     }
 
     // must init bw_conv_buf and bw_iconv_fd before jumping to "fail"
-    write_info.bw_conv_buf = NULL;
+    write_info.bw_conv_buf = عدم;
     write_info.bw_conv_error = FALSE;
     write_info.bw_conv_error_lnum = 0;
     write_info.bw_restlen = 0;
-#ifdef USE_ICONV
+#اگر_تعریف_شده USE_ICONV
     write_info.bw_iconv_fd = (iconv_t)-1;
-#endif
-#ifdef FEAT_CRYPT
-    write_info.bw_buffer = buf;
-    write_info.bw_finish = FALSE;
-#endif
+#پایان_اگر
+#اگر_تعریف_شده FEAT_CRYPT
+    write_info.bw_میانگیر = buf;
+    write_info.bw_پایان = FALSE;
+#پایان_اگر
 
     // After writing a file changedtick changes but we don't want to display
     // the line.
@@ -744,107 +744,107 @@ buf_write(
     // Don't do this when the write is for a filter command.
     // Don't do this when appending.
     // Only do this when 'cpoptions' contains the 'F' flag.
-    if (buf->b_ffname == NULL
-	    && reset_changed
-	    && whole
+    إذا (buf->b_ffname == عدم
+	    && reset_تغییریافته
+	    && کامل
 	    && buf == curbuf
 	    && !bt_nofilename(buf)
 	    && !filtering
-	    && (!append || vim_strchr(p_cpo, CPO_FNAMEAPP) != NULL)
-	    && vim_strchr(p_cpo, CPO_FNAMEW) != NULL)
+	    && (!append || vim_strchr(p_cpo, CPO_FNAMEAPP) != عدم)
+	    && vim_strchr(p_cpo, CPO_FNAMEW) != عدم)
     {
-	if (set_rw_fname(fname, sfname) == FAIL)
-	    return FAIL;
+	إذا (مجموعه_rw_fname(fname, sfname) == FAIL)
+	    أرجع FAIL;
 	buf = curbuf;	    // just in case autocmds made "buf" invalid
     }
 
-    if (sfname == NULL)
+    إذا (sfname == عدم)
 	sfname = fname;
     // For Unix: Use the short file name whenever possible.
     // Avoids problems with networks and when directory names are changed.
     // Don't do this for MS-DOS, a "cd" in a sub-shell may have moved us to
     // another directory, which we don't detect
     ffname = fname;			    // remember full fname
-#ifdef UNIX
+#اگر_تعریف_شده UNIX
     fname = sfname;
-#endif
+#پایان_اگر
 
-    if (buf->b_ffname != NULL && fnamecmp(ffname, buf->b_ffname) == 0)
+    إذا (buf->b_ffname != عدم && fnamecmp(ffname, buf->b_ffname) == 0)
 	overwriting = TRUE;
-    else
+    وإلا
 	overwriting = FALSE;
 
-    if (exiting)
+    إذا (exiting)
 	settmode(TMODE_COOK);	    // when exiting allow typeahead now
 
     ++no_wait_return;		    // don't wait for return yet
 
     // Set '[ and '] marks to the lines to be written.
-    buf->b_op_start.lnum = start;
-    buf->b_op_start.col = 0;
-    buf->b_op_end.lnum = end;
-    buf->b_op_end.col = 0;
+    buf->b_op_شروع.lnum = شروع;
+    buf->b_op_شروع.ستون = 0;
+    buf->b_op_انتها.lnum = انتها;
+    buf->b_op_انتها.ستون = 0;
 
     {
 	aco_save_T	aco;
-	int		buf_ffname = FALSE;
-	int		buf_sfname = FALSE;
-	int		buf_fname_f = FALSE;
-	int		buf_fname_s = FALSE;
-	int		did_cmd = FALSE;
-	int		nofile_err = FALSE;
-	int		empty_memline = (buf->b_ml.ml_mfp == NULL);
+	صحيح		buf_ffname = FALSE;
+	صحيح		buf_sfname = FALSE;
+	صحيح		buf_fname_f = FALSE;
+	صحيح		buf_fname_s = FALSE;
+	صحيح		did_cmd = FALSE;
+	صحيح		nofile_err = FALSE;
+	صحيح		خالی_memline = (buf->b_ml.ml_mfp == عدم);
 	bufref_T	bufref;
 
 	// Apply PRE autocommands.
 	// Set curbuf to the buffer to be written.
 	// Careful: The autocommands may call buf_write() recursively!
-	if (ffname == buf->b_ffname)
+	إذا (ffname == buf->b_ffname)
 	    buf_ffname = TRUE;
-	if (sfname == buf->b_sfname)
+	إذا (sfname == buf->b_sfname)
 	    buf_sfname = TRUE;
-	if (fname == buf->b_ffname)
+	إذا (fname == buf->b_ffname)
 	    buf_fname_f = TRUE;
-	if (fname == buf->b_sfname)
+	إذا (fname == buf->b_sfname)
 	    buf_fname_s = TRUE;
 
 	// Set curwin/curbuf to buf and save a few things.
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf != buf)
+	إذا (curbuf != buf)
 	{
 	    // Could not find a window for "buf".  Doing more might cause
 	    // problems, better bail out.
-	    return FAIL;
+	    أرجع FAIL;
 	}
 
-	set_bufref(&bufref, buf);
+	مجموعه_bufref(&bufref, buf);
 
-	if (append)
+	إذا (append)
 	{
-	    if (!(did_cmd = apply_autocmds_exarg(EVENT_FILEAPPENDCMD,
+	    إذا (!(did_cmd = apply_autocmds_exarg(EVENT_FILEAPPENDCMD,
 					 sfname, sfname, FALSE, curbuf, eap)))
 	    {
-		if (overwriting && bt_nofilename(curbuf))
+		إذا (overwriting && bt_nofilename(curbuf))
 		    nofile_err = TRUE;
-		else
+		وإلا
 		    apply_autocmds_exarg(EVENT_FILEAPPENDPRE,
 					  sfname, sfname, FALSE, curbuf, eap);
 	    }
 	}
-	else if (filtering)
+	وإلا إذا (filtering)
 	{
 	    apply_autocmds_exarg(EVENT_FILTERWRITEPRE,
-					    NULL, sfname, FALSE, curbuf, eap);
+					    عدم, sfname, FALSE, curbuf, eap);
 	}
-	else if (reset_changed && whole)
+	وإلا إذا (reset_تغییریافته && کامل)
 	{
-	    int was_changed = curbufIsChanged();
+	    صحيح was_تغییریافته = curbuf_Is_تغییریافته();
 
 	    did_cmd = apply_autocmds_exarg(EVENT_BUFWRITECMD,
 					  sfname, sfname, FALSE, curbuf, eap);
-	    if (did_cmd)
+	    إذا (did_cmd)
 	    {
-		if (was_changed && !curbufIsChanged())
+		إذا (was_تغییریافته && !curbuf_Is_تغییریافته())
 		{
 		    // Written everything correctly and BufWriteCmd has reset
 		    // 'modified': Correct the undo information so that an
@@ -853,23 +853,23 @@ buf_write(
 		    u_update_save_nr(curbuf);
 		}
 	    }
-	    else
+	    وإلا
 	    {
-		if (overwriting && bt_nofilename(curbuf))
+		إذا (overwriting && bt_nofilename(curbuf))
 		    nofile_err = TRUE;
-		else
+		وإلا
 		    apply_autocmds_exarg(EVENT_BUFWRITEPRE,
 					  sfname, sfname, FALSE, curbuf, eap);
 	    }
 	}
-	else
+	وإلا
 	{
-	    if (!(did_cmd = apply_autocmds_exarg(EVENT_FILEWRITECMD,
+	    إذا (!(did_cmd = apply_autocmds_exarg(EVENT_FILEWRITECMD,
 					 sfname, sfname, FALSE, curbuf, eap)))
 	    {
-		if (overwriting && bt_nofilename(curbuf))
+		إذا (overwriting && bt_nofilename(curbuf))
 		    nofile_err = TRUE;
-		else
+		وإلا
 		    apply_autocmds_exarg(EVENT_FILEWRITEPRE,
 					  sfname, sfname, FALSE, curbuf, eap);
 	    }
@@ -882,84 +882,84 @@ buf_write(
 	// 1. the autocommands deleted or unloaded the buffer.
 	// 2. The autocommands abort script processing.
 	// 3. If one of the "Cmd" autocommands was executed.
-	if (!bufref_valid(&bufref))
-	    buf = NULL;
-	if (buf == NULL || (buf->b_ml.ml_mfp == NULL && !empty_memline)
+	إذا (!bufref_valid(&bufref))
+	    buf = عدم;
+	إذا (buf == عدم || (buf->b_ml.ml_mfp == عدم && !خالی_memline)
 				       || did_cmd || nofile_err
-#ifdef FEAT_EVAL
+#اگر_تعریف_شده FEAT_EVAL
 				       || aborting()
-#endif
+#پایان_اگر
 				       )
 	{
-	    if (buf != NULL && (cmdmod.cmod_flags & CMOD_LOCKMARKS))
+	    إذا (buf != عدم && (cmdmod.cmod_flags & CMOD_LOCKMARKS))
 	    {
 		// restore the original '[ and '] positions
-		buf->b_op_start = orig_start;
-		buf->b_op_end = orig_end;
+		buf->b_op_شروع = orig_شروع;
+		buf->b_op_انتها = orig_انتها;
 	    }
 
 	    --no_wait_return;
-	    msg_scroll = msg_save;
-	    if (nofile_err)
-		semsg(_(e_no_matching_autocommands_for_buftype_str_buffer),
+	    پیام_scroll = پیام_save;
+	    إذا (nofile_err)
+		semsg(_(e_no_matching_autocommands_for_buftype_str_میانگیر),
 							       curbuf->b_p_bt);
 
-	    if (nofile_err
-#ifdef FEAT_EVAL
+	    إذا (nofile_err
+#اگر_تعریف_شده FEAT_EVAL
 		    || aborting()
-#endif
+#پایان_اگر
 		    )
 		// An aborting error, interrupt or exception in the
 		// autocommands.
-		return FAIL;
-	    if (did_cmd)
+		أرجع FAIL;
+	    إذا (did_cmd)
 	    {
-		if (buf == NULL)
+		إذا (buf == عدم)
 		    // The buffer was deleted.  We assume it was written
 		    // (can't retry anyway).
-		    return OK;
-		if (overwriting)
+		    أرجع OK;
+		إذا (overwriting)
 		{
 		    // Assume the buffer was written, update the timestamp.
 		    ml_timestamp(buf);
-		    if (append)
+		    إذا (append)
 			buf->b_flags &= ~BF_NEW;
-		    else
-			buf->b_flags &= ~BF_WRITE_MASK;
+		    وإلا
+			buf->b_flags &= ~BF_WRITE_ماسک;
 		}
-		if (reset_changed && buf->b_changed && !append
-			&& (overwriting || vim_strchr(p_cpo, CPO_PLUS) != NULL))
+		إذا (reset_تغییریافته && buf->b_تغییریافته && !append
+			&& (overwriting || vim_strchr(p_cpo, CPO_PLUS) != عدم))
 		    // Buffer still changed, the autocommands didn't work
 		    // properly.
-		    return FAIL;
-		return OK;
+		    أرجع FAIL;
+		أرجع OK;
 	    }
-#ifdef FEAT_EVAL
-	    if (!aborting())
-#endif
-		emsg(_(e_autocommands_deleted_or_unloaded_buffer_to_be_written));
-	    return FAIL;
+#اگر_تعریف_شده FEAT_EVAL
+	    إذا (!aborting())
+#پایان_اگر
+		emsg(_(e_autocommands_deleted_or_unloaded_میانگیر_مقصد_be_written));
+	    أرجع FAIL;
 	}
 
 	// The autocommands may have changed the number of lines in the file.
 	// When writing the whole file, adjust the end.
 	// When writing part of the file, assume that the autocommands only
 	// changed the number of lines that are to be written (tricky!).
-	if (buf->b_ml.ml_line_count != old_line_count)
+	إذا (buf->b_ml.ml_سطر_شمار != old_سطر_شمار)
 	{
-	    if (whole)						// write all
-		end = buf->b_ml.ml_line_count;
-	    else if (buf->b_ml.ml_line_count > old_line_count)	// more lines
-		end += buf->b_ml.ml_line_count - old_line_count;
-	    else						// less lines
+	    إذا (کامل)						// write all
+		انتها = buf->b_ml.ml_سطر_شمار;
+	    وإلا إذا (buf->b_ml.ml_سطر_شمار > old_سطر_شمار)	// more lines
+		انتها += buf->b_ml.ml_سطر_شمار - old_سطر_شمار;
+	    وإلا						// less lines
 	    {
-		end -= old_line_count - buf->b_ml.ml_line_count;
-		if (end < start)
+		انتها -= old_سطر_شمار - buf->b_ml.ml_سطر_شمار;
+		إذا (انتها < شروع)
 		{
 		    --no_wait_return;
-		    msg_scroll = msg_save;
-		    emsg(_(e_autocommands_changed_number_of_lines_in_unexpected_way));
-		    return FAIL;
+		    پیام_scroll = پیام_save;
+		    emsg(_(e_autocommands_تغییریافته_عدد_از_سطرها_درون_unexpected_way));
+		    أرجع FAIL;
 		}
 	    }
 	}
@@ -967,103 +967,103 @@ buf_write(
 	// The autocommands may have changed the name of the buffer, which may
 	// be kept in fname, ffname and sfname.  A ":cd" may also have dropped
 	// the short name, then b_fname is the full name.
-	if (buf_ffname)
+	إذا (buf_ffname)
 	    ffname = buf->b_ffname;
-	if (buf_sfname)
+	إذا (buf_sfname)
 	    sfname = buf->b_fname;
-	if (buf_fname_f)
+	إذا (buf_fname_f)
 	    fname = buf->b_ffname;
-	if (buf_fname_s)
+	إذا (buf_fname_s)
 	    fname = buf->b_fname;
     }
 
-    if (cmdmod.cmod_flags & CMOD_LOCKMARKS)
+    إذا (cmdmod.cmod_flags & CMOD_LOCKMARKS)
     {
 	// restore the original '[ and '] positions
-	buf->b_op_start = orig_start;
-	buf->b_op_end = orig_end;
+	buf->b_op_شروع = orig_شروع;
+	buf->b_op_انتها = orig_انتها;
     }
 
-#ifdef FEAT_NETBEANS_INTG
-    if (netbeans_active() && isNetbeansBuffer(buf))
+#اگر_تعریف_شده FEAT_NETBEANS_INTG
+    إذا (netbeans_فعال() && is_Netbeans_میانگیر(buf))
     {
-	if (whole)
+	إذا (کامل)
 	{
 	    // b_changed can be 0 after an undo, but we still need to write
 	    // the buffer to NetBeans.
-	    if (buf->b_changed || isNetbeansModified(buf))
+	    إذا (buf->b_تغییریافته || isNetbeansModified(buf))
 	    {
 		--no_wait_return;		// may wait for return now
-		msg_scroll = msg_save;
-		netbeans_save_buffer(buf);	// no error checking...
-		return retval;
+		پیام_scroll = پیام_save;
+		netbeans_save_میانگیر(buf);	// no error checking...
+		أرجع retval;
 	    }
-	    else
+	    وإلا
 	    {
 		errnum = (char_u *)"E656: ";
-		errmsg = (char_u *)_(e_netbeans_disallows_writes_of_unmodified_buffers);
-		buffer = NULL;
-		goto fail;
+		errmsg = (char_u *)_(e_netbeans_disallows_writes_از_unmodified_buffers);
+		میانگیر = عدم;
+		اذهب fail;
 	    }
 	}
-	else
+	وإلا
 	{
 	    errnum = (char_u *)"E657: ";
 	    errmsg = (char_u *)_(e_partial_writes_disallowed_for_netbeans_buffers);
-	    buffer = NULL;
-	    goto fail;
+	    میانگیر = عدم;
+	    اذهب fail;
 	}
     }
-#endif
+#پایان_اگر
 
-    if (shortmess(SHM_OVER) && !exiting)
-	msg_scroll = FALSE;	    // overwrite previous file message
-    else
-	msg_scroll = TRUE;	    // don't overwrite previous file message
-    if (!filtering)
+    إذا (shortmess(SHM_OVER) && !exiting)
+	پیام_scroll = FALSE;	    // overwrite previous file message
+    وإلا
+	پیام_scroll = TRUE;	    // don't overwrite previous file message
+    إذا (!filtering)
 	filemess(buf,
-#ifndef UNIX
+#اگر_تعریف_نشده UNIX
 		sfname,
-#else
+#وإلا
 		fname,
-#endif
+#پایان_اگر
 		    (char_u *)"", 0);	// show that we are busy
-    msg_scroll = FALSE;		    // always overwrite the file message now
+    پیام_scroll = FALSE;		    // always overwrite the file message now
 
-    buffer = alloc(WRITEBUFSIZE);
-    if (buffer == NULL)		    // can't allocate big buffer, use small
+    میانگیر = alloc(WRITEBUFSIZE);
+    إذا (میانگیر == عدم)		    // can't allocate big buffer, use small
 				    // one (to be able to write when out of
 				    // memory)
     {
-	buffer = smallbuf;
+	میانگیر = smallbuf;
 	bufsize = SMALLBUFSIZE;
     }
-    else
+    وإلا
 	bufsize = WRITEBUFSIZE;
 
     // Get information about original file (if there is one).
-#if defined(UNIX)
+#إذا defined(UNIX)
     st_old.st_dev = 0;
     st_old.st_ino = 0;
     perm = -1;
-    if (mch_stat((char *)fname, &st_old) < 0)
+    إذا (mch_stat((حرف *)fname, &st_old) < 0)
 	newfile = TRUE;
-    else
+    وإلا
     {
-	perm = st_old.st_mode;
-	if (!S_ISREG(st_old.st_mode))		// not a file
+	perm = st_old.st_نما;
+	إذا (!S_ISREG(st_old.st_نما))		// not a file
 	{
-	    if (S_ISDIR(st_old.st_mode))
+	    إذا (S_ISDIR(st_old.st_نما))
 	    {
 		errnum = (char_u *)"E502: ";
 		errmsg = (char_u *)_(e_is_a_directory);
-		goto fail;
+		اذهب fail;
 	    }
-	    if (mch_nodetype(fname) != NODE_WRITABLE)
+	    إذا (mch_nodetype(fname) != گره_WRITABLE)
 	    {
 		errnum = (char_u *)"E503: ";
 		errmsg = (char_u *)_(e_is_not_file_or_writable_device);
-		goto fail;
+		اذهب fail;
 	    }
 	    // It's a device of some kind (or a fifo) which we can write to
 	    // but for which we can't make a backup.
@@ -1072,86 +1072,86 @@ buf_write(
 	    perm = -1;
 	}
     }
-#else // !UNIX
+#وإلا // !UNIX
     // Check for a writable device name.
     c = mch_nodetype(fname);
-    if (c == NODE_OTHER)
+    إذا (c == گره_OTHER)
     {
 	errnum = (char_u *)"E503: ";
 	errmsg = (char_u *)_(e_is_not_file_or_writable_device);
-	goto fail;
+	اذهب fail;
     }
-    if (c == NODE_WRITABLE)
+    إذا (c == گره_WRITABLE)
     {
-# if defined(MSWIN)
+# إذا defined(MSWIN)
 	// MS-Windows allows opening a device, but we will probably get stuck
 	// trying to write to it.
-	if (!p_odev)
+	إذا (!p_odev)
 	{
 	    errnum = (char_u *)"E796: ";
-	    errmsg = (char_u *)_(e_writing_to_device_disabled_with_opendevice_option);
-	    goto fail;
+	    errmsg = (char_u *)_(e_writing_مقصد_device_disabled_with_opendevice_option);
+	    اذهب fail;
 	}
 # endif
 	device = TRUE;
 	newfile = TRUE;
 	perm = -1;
     }
-    else
+    وإلا
     {
 	perm = mch_getperm(fname);
-	if (perm < 0)
+	إذا (perm < 0)
 	    newfile = TRUE;
-	else if (mch_isdir(fname))
+	وإلا إذا (mch_isdir(fname))
 	{
 	    errnum = (char_u *)"E502: ";
 	    errmsg = (char_u *)_(e_is_a_directory);
-	    goto fail;
+	    اذهب fail;
 	}
-	if (overwriting)
-	    (void)mch_stat((char *)fname, &st_old);
+	إذا (overwriting)
+	    (فراغ)mch_stat((حرف *)fname, &st_old);
     }
-#endif // !UNIX
+#پایان_اگر // !UNIX
 
-    if (!device && !newfile)
+    إذا (!device && !newfile)
     {
 	// Check if the file is really writable (when renaming the file to
 	// make a backup we won't discover it later).
-	file_readonly = check_file_readonly(fname, (int)perm);
+	file_readonly = check_file_readonly(fname, (صحيح)perm);
 
-	if (!forceit && file_readonly)
+	إذا (!forceit && file_readonly)
 	{
-	    if (vim_strchr(p_cpo, CPO_FWRITE) != NULL)
+	    إذا (vim_strchr(p_cpo, CPO_FWRITE) != عدم)
 	    {
 		errnum = (char_u *)"E504: ";
-		errmsg = (char_u *)_(e_is_read_only_cannot_override_W_in_cpoptions);
+		errmsg = (char_u *)_(e_is_read_only_cannot_override_W_درون_cpoptions);
 	    }
-	    else
+	    وإلا
 	    {
 		errnum = (char_u *)"E505: ";
-		errmsg = (char_u *)_(e_is_read_only_add_bang_to_override);
+		errmsg = (char_u *)_(e_is_read_only_جمع_کن_bang_مقصد_override);
 	    }
-	    goto fail;
+	    اذهب fail;
 	}
 
 	// Check if the timestamp hasn't changed since reading the file.
-	if (overwriting)
+	إذا (overwriting)
 	{
 	    retval = check_mtime(buf, &st_old);
-	    if (retval == FAIL)
-		goto fail;
+	    إذا (retval == FAIL)
+		اذهب fail;
 	}
     }
 
-#ifdef HAVE_ACL
+#اگر_تعریف_شده HAVE_ACL
     // For systems that support ACL: get the ACL from the original file.
-    if (!newfile)
+    إذا (!newfile)
 	acl = mch_get_acl(fname);
-#endif
+#پایان_اگر
 
     // If 'backupskip' is not empty, don't make a backup for some files.
     dobackup = (p_wb || p_bk || *p_pm != NUL);
-    if (dobackup && *p_bsk != NUL && match_file_list(p_bsk, sfname, ffname))
+    إذا (dobackup && *p_bsk != NUL && تطابق_file_list(p_bsk, sfname, ffname))
 	dobackup = FALSE;
 
     // Save the value of got_int and reset it.  We don't want a previous
@@ -1169,16 +1169,16 @@ buf_write(
     //
     // Do not make any backup, if 'writebackup' and 'backup' are both switched
     // off.  This helps when editing large files on almost-full disks.
-    if (!(append && *p_pm == NUL) && !filtering && perm >= 0 && dobackup)
+    إذا (!(append && *p_pm == NUL) && !filtering && perm >= 0 && dobackup)
     {
-#if defined(UNIX) || defined(MSWIN)
+#إذا defined(UNIX) || defined(MSWIN)
 	stat_T	    st;
-#endif
+#پایان_اگر
 
-	if ((bkc & BKC_YES) || append)	// "yes"
+	إذا ((bkc & BKC_YES) || append)	// "yes"
 	    backup_copy = TRUE;
-#if defined(UNIX) || defined(MSWIN)
-	else if ((bkc & BKC_AUTO))	// "auto"
+#إذا defined(UNIX) || defined(MSWIN)
+	وإلا إذا ((bkc & BKC_AUTO))	// "auto"
 	{
 # ifdef UNIX
 	    // Don't rename the file when:
@@ -1186,8 +1186,8 @@ buf_write(
 	    // - it's a symbolic link
 	    // - we don't have write permission in the directory
 	    // - we can't set the owner/group of the new file
-	    if (st_old.st_nlink > 1
-		    || mch_lstat((char *)fname, &st) < 0
+	    إذا (st_old.st_nlink > 1
+		    || mch_lstat((حرف *)fname, &st) < 0
 		    || st.st_dev != st_old.st_dev
 		    || st.st_ino != st_old.st_ino
 #  ifndef HAVE_FCHOWN
@@ -1196,19 +1196,19 @@ buf_write(
 #  endif
 		    )
 		backup_copy = TRUE;
-	    else
-# else
+	    وإلا
+# وإلا
 #  ifdef MSWIN
 	    // On NTFS file systems hard links are possible.
-	    if (mch_is_linked(fname))
+	    إذا (mch_is_linked(fname))
 		backup_copy = TRUE;
-	    else
+	    وإلا
 #  endif
 # endif
 	    {
 		size_t	dirlen;
 		char_u	tmp_fname[MAXPATHL];
-		int	i;
+		صحيح	i;
 
 		// Check if we can create a file and set the owner/group/mode to
 		// the ones from the original file.
@@ -1218,39 +1218,39 @@ buf_write(
 		dirlen = (size_t)(gettail(fname) - fname);
 		vim_strncpy(tmp_fname, fname, dirlen);
 		fd = -1;
-		for (i = 4913; ; i += 123)
+		لكل (i = 4913; ; i += 123)
 		{
-		    vim_snprintf((char *)tmp_fname + dirlen,
-			sizeof(tmp_fname) - dirlen, ".%d.swp", i);
-		    if (mch_lstat((char *)tmp_fname, &st) < 0)
+		    vim_snprintf((حرف *)tmp_fname + dirlen,
+			حجم(tmp_fname) - dirlen, ".%d.swp", i);
+		    إذا (mch_lstat((حرف *)tmp_fname, &st) < 0)
 		    {
-			fd = mch_open((char *)tmp_fname,
+			fd = mch_open((حرف *)tmp_fname,
 				    O_CREAT|O_WRONLY|O_EXCL|O_NOFOLLOW, perm);
-			if (fd < 0 && errno == EEXIST)
+			إذا (fd < 0 && errno == EEXIST)
 			    // If the same file name is created by another
 			    // process between lstat() and open(), find another
 			    // name.
-			    continue;
-			break;
+			    استمر;
+			اكسر;
 		    }
 		}
-		if (fd < 0)	// can't write in directory
+		إذا (fd < 0)	// can't write in directory
 		    backup_copy = TRUE;
-		else
+		وإلا
 		{
 # ifdef UNIX
 #  ifdef HAVE_FCHOWN
 		    vim_ignored = fchown(fd, st_old.st_uid, st_old.st_gid);
 #  endif
 #  ifdef HAVE_FCHMOD
-		    (void)mch_fsetperm(fd, perm);
-#  else
-		    (void)mch_setperm(tmp_fname, perm);
+		    (فراغ)mch_fsetperm(fd, perm);
+#  وإلا
+		    (فراغ)mch_setperm(tmp_fname, perm);
 #  endif
-		    if (mch_stat((char *)tmp_fname, &st) < 0
+		    إذا (mch_stat((حرف *)tmp_fname, &st) < 0
 			    || st.st_uid != st_old.st_uid
 			    || st.st_gid != st_old.st_gid
-			    || (long)st.st_mode != perm)
+			    || (دراز)st.st_نما != perm)
 			backup_copy = TRUE;
 # endif
 		    // Close the file before removing it, on MS-Windows we
@@ -1262,12 +1262,12 @@ buf_write(
 		    // file, we can't delete it then.  Keep trying for half a
 		    // second.
 		    {
-			int try;
+			صحيح try;
 
-			for (try = 0; try < 10; ++try)
+			لكل (try = 0; try < 10; ++try)
 			{
-			    if (mch_lstat((char *)tmp_fname, &st) < 0)
-				break;
+			    إذا (mch_lstat((حرف *)tmp_fname, &st) < 0)
+				اكسر;
 			    ui_delay(50L, TRUE);  // wait 50 msec
 			    mch_remove(tmp_fname);
 			}
@@ -1278,64 +1278,64 @@ buf_write(
 	}
 
 	// Break symlinks and/or hardlinks if we've been asked to.
-	if ((bkc & BKC_BREAKSYMLINK) || (bkc & BKC_BREAKHARDLINK))
+	إذا ((bkc & BKC_BREAKSYMLINK) || (bkc & BKC_BREAKHARDLINK))
 	{
 # ifdef UNIX
-	    int	lstat_res;
+	    صحيح	lstat_res;
 
-	    lstat_res = mch_lstat((char *)fname, &st);
+	    lstat_res = mch_lstat((حرف *)fname, &st);
 
 	    // Symlinks.
-	    if ((bkc & BKC_BREAKSYMLINK)
+	    إذا ((bkc & BKC_BREAKSYMLINK)
 		    && lstat_res == 0
 		    && st.st_ino != st_old.st_ino)
 		backup_copy = FALSE;
 
 	    // Hardlinks.
-	    if ((bkc & BKC_BREAKHARDLINK)
+	    إذا ((bkc & BKC_BREAKHARDLINK)
 		    && st_old.st_nlink > 1
 		    && (lstat_res != 0 || st.st_ino == st_old.st_ino))
 		backup_copy = FALSE;
-# else
-#  if defined(MSWIN)
+# وإلا
+#  إذا defined(MSWIN)
 	    // Symlinks.
-	    if ((bkc & BKC_BREAKSYMLINK) && mch_is_symbolic_link(fname))
+	    إذا ((bkc & BKC_BREAKSYMLINK) && mch_is_symbolic_link(fname))
 		backup_copy = FALSE;
 
 	    // Hardlinks.
-	    if ((bkc & BKC_BREAKHARDLINK) && mch_is_hard_link(fname))
+	    إذا ((bkc & BKC_BREAKHARDLINK) && mch_is_hard_link(fname))
 		backup_copy = FALSE;
 #  endif
 # endif
 	}
 
-#endif
+#پایان_اگر
 
 	// make sure we have a valid backup extension to use
-	if (*p_bex == NUL)
+	إذا (*p_bex == NUL)
 	    backup_ext = (char_u *)".bak";
-	else
+	وإلا
 	    backup_ext = p_bex;
 
-	if (backup_copy
-		&& (fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0)) >= 0)
+	إذا (backup_copy
+		&& (fd = mch_open((حرف *)fname, O_RDONLY | O_EXTRA, 0)) >= 0)
 	{
-	    int		bfd;
+	    صحيح		bfd;
 	    char_u	*copybuf;
-	    int		some_error = FALSE;
+	    صحيح		some_error = FALSE;
 	    stat_T	st_new;
 	    char_u	*dirp;
 	    char_u	*rootname;
-#if defined(UNIX)
-	    int		did_set_shortname;
+#إذا defined(UNIX)
+	    صحيح		did_مجموعه_shortname;
 	    mode_t	umask_save;
-#endif
+#پایان_اگر
 
 	    copybuf = alloc(WRITEBUFSIZE + 1);
-	    if (copybuf == NULL)
+	    إذا (copybuf == عدم)
 	    {
 		some_error = TRUE;	    // out of memory
-		goto nobackup;
+		اذهب nobackup;
 	    }
 
 	    // Try to make the backup in each directory in the 'bdir' option.
@@ -1349,192 +1349,192 @@ buf_write(
 	    // For these reasons, the existing writable file must be truncated
 	    // and reused. Creation of a backup COPY will be attempted.
 	    dirp = p_bdir;
-	    while (*dirp)
+	    طالما (*dirp)
 	    {
-		char_u	*p UNUSED;
-		int	copybuf_len UNUSED;
+		char_u	*p استفادهنشده;
+		صحيح	copybuf_len استفادهنشده;
 
-#ifdef UNIX
+#اگر_تعریف_شده UNIX
 		st_new.st_ino = 0;
 		st_new.st_dev = 0;
 		st_new.st_gid = 0;
-#endif
+#پایان_اگر
 
 		// Isolate one directory name, using an entry in 'bdir'.
 		copybuf_len = copy_option_part(&dirp, copybuf, WRITEBUFSIZE, ",");
 
-#if defined(UNIX) || defined(MSWIN)
+#إذا defined(UNIX) || defined(MSWIN)
 		p = copybuf + copybuf_len;
-		if (after_pathsep(copybuf, p) && p[-1] == p[-2])
+		إذا (after_pathsep(copybuf, p) && p[-1] == p[-2])
 		    // Ends with '//', use full path
-		    if ((p = make_percent_swname(copybuf, p, fname)) != NULL)
+		    إذا ((p = make_percent_swname(copybuf, p, fname)) != عدم)
 		    {
 			backup = modname(p, backup_ext, FALSE);
 			vim_free(p);
 		    }
-#endif
-		rootname = get_file_in_dir(fname, copybuf);
-		if (rootname == NULL)
+#پایان_اگر
+		rootname = get_file_درون_dir(fname, copybuf);
+		إذا (rootname == عدم)
 		{
 		    some_error = TRUE;	    // out of memory
-		    goto nobackup;
+		    اذهب nobackup;
 		}
 
-#if defined(UNIX)
-		did_set_shortname = FALSE;
-#endif
+#إذا defined(UNIX)
+		did_مجموعه_shortname = FALSE;
+#پایان_اگر
 
 		// May try twice if 'shortname' not set.
-		for (;;)
+		لكل (;;)
 		{
 		    // Make the backup file name.
-		    if (backup == NULL)
+		    إذا (backup == عدم)
 			backup = buf_modname((buf->b_p_sn || buf->b_shortname),
 						 rootname, backup_ext, FALSE);
-		    if (backup == NULL)
+		    إذا (backup == عدم)
 		    {
 			vim_free(rootname);
 			some_error = TRUE;		// out of memory
-			goto nobackup;
+			اذهب nobackup;
 		    }
 
 		    // Check if backup file already exists.
-		    if (mch_stat((char *)backup, &st_new) >= 0)
+		    إذا (mch_stat((حرف *)backup, &st_new) >= 0)
 		    {
-#ifdef UNIX
+#اگر_تعریف_شده UNIX
 			// Check if backup file is same as original file.
 			// May happen when modname() gave the same file back.
 			// E.g. silly link, or file name-length reached.
 			// If we don't check here, we either ruin the file
 			// when copying or erase it after writing. jw.
-			if (st_new.st_dev == st_old.st_dev
+			إذا (st_new.st_dev == st_old.st_dev
 					    && st_new.st_ino == st_old.st_ino)
 			{
 			    VIM_CLEAR(backup);	// no backup file to delete
 			    // may try again with 'shortname' set
-			    if (!(buf->b_shortname || buf->b_p_sn))
+			    إذا (!(buf->b_shortname || buf->b_p_sn))
 			    {
 				buf->b_shortname = true;
-				did_set_shortname = TRUE;
-				continue;
+				did_مجموعه_shortname = TRUE;
+				استمر;
 			    }
 				// setting shortname didn't help
-			    if (did_set_shortname)
+			    إذا (did_مجموعه_shortname)
 				buf->b_shortname = false;
-			    break;
+			    اكسر;
 			}
-#endif
+#پایان_اگر
 
 			// If we are not going to keep the backup file, don't
 			// delete an existing one, try to use another name.
 			// Change one character, just before the extension.
-			if (!p_bk)
+			إذا (!p_bk)
 			{
 			    char_u	*wp;
 
 			    wp = backup + STRLEN(backup) - 1
 							 - STRLEN(backup_ext);
-			    if (wp < backup)	// empty file name ???
+			    إذا (wp < backup)	// empty file name ???
 				wp = backup;
 			    *wp = 'z';
-			    while (*wp > 'a'
-				    && mch_stat((char *)backup, &st_new) >= 0)
+			    طالما (*wp > 'a'
+				    && mch_stat((حرف *)backup, &st_new) >= 0)
 				--*wp;
 			    // They all exist??? Must be something wrong.
-			    if (*wp == 'a')
+			    إذا (*wp == 'a')
 				VIM_CLEAR(backup);
 			}
 		    }
-		    break;
+		    اكسر;
 		}
 		vim_free(rootname);
 
 		// Try to create the backup file
-		if (backup != NULL)
+		إذا (backup != عدم)
 		{
 		    // remove old backup, if present
 		    mch_remove(backup);
 		    // Open with O_EXCL to avoid the file being created while
 		    // we were sleeping (symlink hacker attack?). Reset umask
 		    // if possible to avoid mch_setperm() below.
-#ifdef UNIX
+#اگر_تعریف_شده UNIX
 		    umask_save = umask(0);
-#endif
-		    bfd = mch_open((char *)backup,
+#پایان_اگر
+		    bfd = mch_open((حرف *)backup,
 				O_WRONLY|O_CREAT|O_EXTRA|O_EXCL|O_NOFOLLOW,
 								 perm & 0777);
-#ifdef UNIX
-		    (void)umask(umask_save);
-#endif
-		    if (bfd < 0)
+#اگر_تعریف_شده UNIX
+		    (فراغ)umask(umask_save);
+#پایان_اگر
+		    إذا (bfd < 0)
 			VIM_CLEAR(backup);
-		    else
+		    وإلا
 		    {
 			// Set file protection same as original file, but
 			// strip s-bit.  Only needed if umask() wasn't used
 			// above.
-#ifndef UNIX
-			(void)mch_setperm(backup, perm & 0777);
-#else
+#اگر_تعریف_نشده UNIX
+			(فراغ)mch_setperm(backup, perm & 0777);
+#وإلا
 			// Try to set the group of the backup same as the
 			// original file. If this fails, set the protection
 			// bits for the group same as the protection bits for
 			// others.
-			if (st_new.st_gid != st_old.st_gid
+			إذا (st_new.st_gid != st_old.st_gid
 # ifdef HAVE_FCHOWN  // sequent-ptx lacks fchown()
 				&& fchown(bfd, (uid_t)-1, st_old.st_gid) != 0
 # endif
 						)
 			    mch_setperm(backup,
 					  (perm & 0707) | ((perm & 07) << 3));
-# if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+# إذا defined(HAVE_SELINUX) || defined(HAVE_SMACK)
 			mch_copy_sec(fname, backup);
 # endif
 # ifdef FEAT_XATTR
 			mch_copy_xattr(fname, backup);
 # endif
-#endif
+#پایان_اگر
 
 			// copy the file.
 			write_info.bw_fd = bfd;
 			write_info.bw_buf = copybuf;
 			write_info.bw_flags = FIO_NOCONVERT;
-			while ((write_info.bw_len = read_eintr(fd, copybuf,
+			طالما ((write_info.bw_len = read_eintr(fd, copybuf,
 							    WRITEBUFSIZE)) > 0)
 			{
-			    if (buf_write_bytes(&write_info) == FAIL)
+			    إذا (buf_write_بایتها(&write_info) == FAIL)
 			    {
-				errmsg = (char_u *)_(e_cant_write_to_backup_file_add_bang_to_override);
-				break;
+				errmsg = (char_u *)_(e_cant_write_مقصد_backup_file_جمع_کن_bang_مقصد_override);
+				اكسر;
 			    }
 			    ui_breakcheck();
-			    if (got_int)
+			    إذا (got_int)
 			    {
 				errmsg = (char_u *)_(e_interrupted);
-				break;
+				اكسر;
 			    }
 			}
 
-			if (close(bfd) < 0 && errmsg == NULL)
-			    errmsg = (char_u *)_(e_close_error_for_backup_file_add_bang_to_write_anyway);
-			if (write_info.bw_len < 0)
-			    errmsg = (char_u *)_(e_cant_read_file_for_backup_add_bang_to_write_anyway);
-#ifdef UNIX
-			set_file_time(backup, st_old.st_atime, st_old.st_mtime);
-#endif
-#ifdef HAVE_ACL
-			mch_set_acl(backup, acl);
-#endif
-#if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+			إذا (close(bfd) < 0 && errmsg == عدم)
+			    errmsg = (char_u *)_(e_close_error_for_backup_file_جمع_کن_bang_مقصد_write_anyway);
+			إذا (write_info.bw_len < 0)
+			    errmsg = (char_u *)_(e_cant_read_file_for_backup_جمع_کن_bang_مقصد_write_anyway);
+#اگر_تعریف_شده UNIX
+			مجموعه_file_زمان(backup, st_old.st_atime, st_old.st_mtime);
+#پایان_اگر
+#اگر_تعریف_شده HAVE_ACL
+			mch_مجموعه_acl(backup, acl);
+#پایان_اگر
+#إذا defined(HAVE_SELINUX) || defined(HAVE_SMACK)
 			mch_copy_sec(fname, backup);
-#endif
-#ifdef FEAT_XATTR
+#پایان_اگر
+#اگر_تعریف_شده FEAT_XATTR
 			mch_copy_xattr(fname, backup);
-#endif
-#ifdef MSWIN
-			(void)mch_copy_file_attribute(fname, backup);
-#endif
-			break;
+#پایان_اگر
+#اگر_تعریف_شده MSWIN
+			(فراغ)mch_copy_file_attribute(fname, backup);
+#پایان_اگر
+			اكسر;
 		    }
 		}
 	    }
@@ -1542,17 +1542,17 @@ buf_write(
 	    close(fd);		// ignore errors for closing read file
 	    vim_free(copybuf);
 
-	    if (backup == NULL && errmsg == NULL)
-		errmsg = (char_u *)_(e_cannot_create_backup_file_add_bang_to_write_anyway);
+	    إذا (backup == عدم && errmsg == عدم)
+		errmsg = (char_u *)_(e_cannot_create_backup_file_جمع_کن_bang_مقصد_write_anyway);
 	    // ignore errors when forceit is TRUE
-	    if ((some_error || errmsg != NULL) && !forceit)
+	    إذا ((some_error || errmsg != عدم) && !forceit)
 	    {
 		retval = FAIL;
-		goto fail;
+		اذهب fail;
 	    }
-	    errmsg = NULL;
+	    errmsg = عدم;
 	}
-	else
+	وإلا
 	{
 	    char_u	*dirp;
 	    char_u	*p;
@@ -1563,40 +1563,40 @@ buf_write(
 	    // If 'cpoptions' includes the "W" flag, we don't want to
 	    // overwrite a read-only file.  But rename may be possible
 	    // anyway, thus we need an extra check here.
-	    if (file_readonly && vim_strchr(p_cpo, CPO_FWRITE) != NULL)
+	    إذا (file_readonly && vim_strchr(p_cpo, CPO_FWRITE) != عدم)
 	    {
 		errnum = (char_u *)"E504: ";
-		errmsg = (char_u *)_(e_is_read_only_cannot_override_W_in_cpoptions);
-		goto fail;
+		errmsg = (char_u *)_(e_is_read_only_cannot_override_W_درون_cpoptions);
+		اذهب fail;
 	    }
 
 	    // Form the backup file name - change path/fo.o.h to
 	    // path/fo.o.h.bak Try all directories in 'backupdir', first one
 	    // that works is used.
 	    dirp = p_bdir;
-	    while (*dirp)
+	    طالما (*dirp)
 	    {
-		int IObufflen UNUSED;
+		صحيح IObufflen استفادهنشده;
 
 		// Isolate one directory name and make the backup file name.
 		IObufflen = copy_option_part(&dirp, IObuff, IOSIZE, ",");
 
-#if defined(UNIX) || defined(MSWIN)
+#إذا defined(UNIX) || defined(MSWIN)
 		p = IObuff + IObufflen;
-		if (after_pathsep(IObuff, p) && p[-1] == p[-2])
+		إذا (after_pathsep(IObuff, p) && p[-1] == p[-2])
 		    // path ends with '//', use full path
-		    if ((p = make_percent_swname(IObuff, p, fname)) != NULL)
+		    إذا ((p = make_percent_swname(IObuff, p, fname)) != عدم)
 		    {
 			backup = modname(p, backup_ext, FALSE);
 			vim_free(p);
 		    }
-#endif
-		if (backup == NULL)
+#پایان_اگر
+		إذا (backup == عدم)
 		{
-		    rootname = get_file_in_dir(fname, IObuff);
-		    if (rootname == NULL)
-			backup = NULL;
-		    else
+		    rootname = get_file_درون_dir(fname, IObuff);
+		    إذا (rootname == عدم)
+			backup = عدم;
+		    وإلا
 		    {
 			backup = buf_modname(
 				(buf->b_p_sn || buf->b_shortname),
@@ -1605,25 +1605,25 @@ buf_write(
 		    }
 		}
 
-		if (backup != NULL)
+		إذا (backup != عدم)
 		{
 		    // If we are not going to keep the backup file, don't
 		    // delete an existing one, try to use another name.
 		    // Change one character, just before the extension.
-		    if (!p_bk && mch_getperm(backup) >= 0)
+		    إذا (!p_bk && mch_getperm(backup) >= 0)
 		    {
 			p = backup + STRLEN(backup) - 1 - STRLEN(backup_ext);
-			if (p < backup)	// empty file name ???
+			إذا (p < backup)	// empty file name ???
 			    p = backup;
 			*p = 'z';
-			while (*p > 'a' && mch_getperm(backup) >= 0)
+			طالما (*p > 'a' && mch_getperm(backup) >= 0)
 			    --*p;
 			// They all exist??? Must be something wrong!
-			if (*p == 'a')
+			إذا (*p == 'a')
 			    VIM_CLEAR(backup);
 		    }
 		}
-		if (backup != NULL)
+		إذا (backup != عدم)
 		{
 		    // Delete any existing backup and move the current version
 		    // to the backup.	For safety, we don't remove the backup
@@ -1632,76 +1632,76 @@ buf_write(
 
 		    // If the renaming of the original file to the backup file
 		    // works, quit here.
-		    if (vim_rename(fname, backup) == 0)
-			break;
+		    إذا (vim_rename(fname, backup) == 0)
+			اكسر;
 
 		    VIM_CLEAR(backup);   // don't do the rename below
 		}
 	    }
-	    if (backup == NULL && !forceit)
+	    إذا (backup == عدم && !forceit)
 	    {
-		errmsg = (char_u *)_(e_cant_make_backup_file_add_bang_to_write_anyway);
-		goto fail;
+		errmsg = (char_u *)_(e_cant_make_backup_file_جمع_کن_bang_مقصد_write_anyway);
+		اذهب fail;
 	    }
 	}
     }
 
-#if defined(UNIX)
+#إذا defined(UNIX)
     // When using ":w!" and the file was read-only: make it writable
-    if (forceit && perm >= 0 && !(perm & 0200) && st_old.st_uid == getuid()
-				     && vim_strchr(p_cpo, CPO_FWRITE) == NULL)
+    إذا (forceit && perm >= 0 && !(perm & 0200) && st_old.st_uid == getuid()
+				     && vim_strchr(p_cpo, CPO_FWRITE) == عدم)
     {
 	perm |= 0200;
-	(void)mch_setperm(fname, perm);
+	(فراغ)mch_setperm(fname, perm);
 	made_writable = TRUE;
     }
-#endif
+#پایان_اگر
 
     // When using ":w!" and writing to the current file, 'readonly' makes no
     // sense, reset it, unless 'Z' appears in 'cpoptions'.
-    if (forceit && overwriting && vim_strchr(p_cpo, CPO_KEEPRO) == NULL)
+    إذا (forceit && overwriting && vim_strchr(p_cpo, CPO_KEEPRO) == عدم)
     {
 	buf->b_p_ro = FALSE;
 	need_maketitle = TRUE;	    // set window title later
-	status_redraw_all();	    // redraw status lines later
+	وضعیت_redraw_all();	    // redraw status lines later
     }
 
-    if (end > buf->b_ml.ml_line_count)
-	end = buf->b_ml.ml_line_count;
-    if (buf->b_ml.ml_flags & ML_EMPTY)
-	start = end + 1;
+    إذا (انتها > buf->b_ml.ml_سطر_شمار)
+	انتها = buf->b_ml.ml_سطر_شمار;
+    إذا (buf->b_ml.ml_flags & ML_خالی)
+	شروع = انتها + 1;
 
     // If the original file is being overwritten, there is a small chance that
     // we crash in the middle of writing. Therefore the file is preserved now.
     // This makes all block numbers positive so that recovery does not need
     // the original file.
     // Don't do this if there is a backup file and we are exiting.
-    if (reset_changed && !newfile && overwriting
-					      && !(exiting && backup != NULL))
+    إذا (reset_تغییریافته && !newfile && overwriting
+					      && !(exiting && backup != عدم))
     {
 	ml_preserve(buf, FALSE);
-	if (got_int)
+	إذا (got_int)
 	{
 	    errmsg = (char_u *)_(e_interrupted);
-	    goto restore_backup;
+	    اذهب restore_backup;
 	}
     }
 
-#ifdef VMS
-    vms_remove_version(fname); // remove version
-#endif
+#اگر_تعریف_شده VMS
+    vms_remove_نسخه(fname); // remove version
+#پایان_اگر
     // Default: write the file directly.  May write to a temp file for
     // multi-byte conversion.
     wfname = fname;
 
     // Check for forced 'fileencoding' from "++opt=val" argument.
-    if (eap != NULL && eap->force_enc != 0)
+    إذا (eap != عدم && eap->force_enc != 0)
     {
 	fenc = eap->cmd + eap->force_enc;
 	fenc = enc_canonize(fenc);
 	fenc_tofree = fenc;
     }
-    else
+    وإلا
 	fenc = buf->b_p_fenc;
 
     // Check if the file needs to be converted.
@@ -1710,64 +1710,64 @@ buf_write(
     // Check if UTF-8 to UCS-2/4 or Latin1 conversion needs to be done.  Or
     // Latin1 to Unicode conversion.  This is handled in buf_write_bytes().
     // Prepare the flags for it and allocate bw_conv_buf when needed.
-    if (converted && (enc_utf8 || STRCMP(p_enc, "latin1") == 0))
+    إذا (converted && (enc_utf8 || STRCMP(p_enc, "latin1") == 0))
     {
 	wb_flags = get_fio_flags(fenc);
-	if (wb_flags & (FIO_UCS2 | FIO_UCS4 | FIO_UTF16 | FIO_UTF8))
+	إذا (wb_flags & (FIO_UCS2 | FIO_UCS4 | FIO_UTF16 | FIO_UTF8))
 	{
 	    // overallocate a bit, in case we read incomplete multi-byte chars
-	    int size = bufsize + CONV_RESTLEN;
+	    صحيح اندازه = bufsize + CONV_RESTLEN;
 	    // Need to allocate a buffer to translate into.
-	    if (wb_flags & (FIO_UCS2 | FIO_UTF16 | FIO_UTF8))
-		write_info.bw_conv_buflen = size * 2;
-	    else // FIO_UCS4
-		write_info.bw_conv_buflen = size * 4;
+	    إذا (wb_flags & (FIO_UCS2 | FIO_UTF16 | FIO_UTF8))
+		write_info.bw_conv_buflen = اندازه * 2;
+	    وإلا // FIO_UCS4
+		write_info.bw_conv_buflen = اندازه * 4;
 	    write_info.bw_conv_buf = alloc(write_info.bw_conv_buflen);
-	    if (write_info.bw_conv_buf == NULL)
-		end = 0;
+	    إذا (write_info.bw_conv_buf == عدم)
+		انتها = 0;
 	}
     }
 
-#ifdef MSWIN
-    if (converted && wb_flags == 0 && (wb_flags = get_win_fio_flags(fenc)) != 0)
+#اگر_تعریف_شده MSWIN
+    إذا (converted && wb_flags == 0 && (wb_flags = get_win_fio_flags(fenc)) != 0)
     {
 	// Convert UTF-8 -> UCS-2 and UCS-2 -> DBCS.  Worst-case * 4:
 	write_info.bw_conv_buflen = bufsize * 4;
 	write_info.bw_conv_buf = alloc(write_info.bw_conv_buflen);
-	if (write_info.bw_conv_buf == NULL)
-	    end = 0;
+	إذا (write_info.bw_conv_buf == عدم)
+	    انتها = 0;
     }
-#endif
+#پایان_اگر
 
-#ifdef MACOS_CONVERT
-    if (converted && wb_flags == 0 && (wb_flags = get_mac_fio_flags(fenc)) != 0)
+#اگر_تعریف_شده MACOS_CONVERT
+    إذا (converted && wb_flags == 0 && (wb_flags = get_mac_fio_flags(fenc)) != 0)
     {
 	write_info.bw_conv_buflen = bufsize * 3;
 	write_info.bw_conv_buf = alloc(write_info.bw_conv_buflen);
-	if (write_info.bw_conv_buf == NULL)
-	    end = 0;
+	إذا (write_info.bw_conv_buf == عدم)
+	    انتها = 0;
     }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_EVAL) || defined(USE_ICONV)
-    if (converted && wb_flags == 0)
+#إذا defined(FEAT_EVAL) || defined(USE_ICONV)
+    إذا (converted && wb_flags == 0)
     {
 # ifdef USE_ICONV
 	// Use iconv() conversion when conversion is needed and it's not done
 	// internally.
 	write_info.bw_iconv_fd = (iconv_t)my_iconv_open(fenc,
 					enc_utf8 ? (char_u *)"utf-8" : p_enc);
-	if (write_info.bw_iconv_fd != (iconv_t)-1)
+	إذا (write_info.bw_iconv_fd != (iconv_t)-1)
 	{
 	    // We're going to use iconv(), allocate a buffer to convert in.
 	    write_info.bw_conv_buflen = bufsize * ICONV_MULT;
 	    write_info.bw_conv_buf = alloc(write_info.bw_conv_buflen);
-	    if (write_info.bw_conv_buf == NULL)
-		end = 0;
-	    write_info.bw_first = TRUE;
+	    إذا (write_info.bw_conv_buf == عدم)
+		انتها = 0;
+	    write_info.bw_اولی = TRUE;
 	}
 #  ifdef FEAT_EVAL
-	else
+	وإلا
 #  endif
 # endif
 
@@ -1775,31 +1775,31 @@ buf_write(
 	    // When the file needs to be converted with 'charconvert' after
 	    // writing, write to a temp file instead and let the conversion
 	    // overwrite the original file.
-	    if (*p_ccv != NUL)
+	    إذا (*p_ccv != NUL)
 	    {
 		wfname = vim_tempname('w', FALSE);
-		if (wfname == NULL)	// Can't write without a tempfile!
+		إذا (wfname == عدم)	// Can't write without a tempfile!
 		{
-		    errmsg = (char_u *)_(e_cant_find_temp_file_for_writing);
-		    goto restore_backup;
+		    errmsg = (char_u *)_(e_cant_پیدا_کن_موقت_file_for_writing);
+		    اذهب restore_backup;
 		}
 	    }
 # endif
     }
-#endif
-    if (converted && wb_flags == 0
-#ifdef USE_ICONV
+#پایان_اگر
+    إذا (converted && wb_flags == 0
+#اگر_تعریف_شده USE_ICONV
 	    && write_info.bw_iconv_fd == (iconv_t)-1
-#endif
-#ifdef FEAT_EVAL
+#پایان_اگر
+#اگر_تعریف_شده FEAT_EVAL
 	    && wfname == fname
-#endif
+#پایان_اگر
 	    )
     {
-	if (!forceit)
+	إذا (!forceit)
 	{
-	    errmsg = (char_u *)_(e_cannot_convert_add_bang_to_write_without_conversion);
-	    goto restore_backup;
+	    errmsg = (char_u *)_(e_cannot_convert_جمع_کن_bang_مقصد_write_without_conversion);
+	    اذهب restore_backup;
 	}
 	notconverted = TRUE;
     }
@@ -1807,28 +1807,28 @@ buf_write(
     // If conversion is taking place, we may first pretend to write and check
     // for conversion errors.  Then loop again to write for real.
     // When not doing conversion this writes for real right away.
-    for (checking_conversion = TRUE; ; checking_conversion = FALSE)
+    لكل (checking_conversion = TRUE; ; checking_conversion = FALSE)
     {
 	// There is no need to check conversion when:
 	// - there is no conversion
 	// - we make a backup file, that can be restored in case of conversion
 	//   failure.
-	if (!converted || dobackup)
+	إذا (!converted || dobackup)
 	    checking_conversion = FALSE;
 
-	if (checking_conversion)
+	إذا (checking_conversion)
 	{
 	    // Make sure we don't write anything.
 	    fd = -1;
 	    write_info.bw_fd = fd;
 	}
-	else
+	وإلا
 	{
-#ifdef HAVE_FTRUNCATE
+#اگر_تعریف_شده HAVE_FTRUNCATE
 # define TRUNC_ON_OPEN 0
-#else
+#وإلا
 # define TRUNC_ON_OPEN O_TRUNC
-#endif
+#پایان_اگر
 	    // Open the file "wfname" for writing.
 	    // We may try to open the file twice: If we can't write to the file
 	    // and forceit is TRUE we delete the existing file and try to
@@ -1837,7 +1837,7 @@ buf_write(
 	    // quotum for number of files).
 	    // Appending will fail if the file does not exist and forceit is
 	    // FALSE.
-	    while ((fd = mch_open((char *)wfname, O_WRONLY | O_EXTRA | (append
+	    طالما ((fd = mch_open((حرف *)wfname, O_WRONLY | O_EXTRA | (append
 				? (forceit ? (O_APPEND | O_CREAT) : O_APPEND)
 				: (O_CREAT | TRUNC_ON_OPEN))
 				, perm < 0 ? 0666 : (perm & 0777))) < 0)
@@ -1845,38 +1845,38 @@ buf_write(
 		// A forced write will try to create a new file if the old one
 		// is still readonly. This may also happen when the directory
 		// is read-only. In that case the mch_remove() will fail.
-		if (errmsg == NULL)
+		إذا (errmsg == عدم)
 		{
-#ifdef UNIX
+#اگر_تعریف_شده UNIX
 		    stat_T	st;
 
 		    // Don't delete the file when it's a hard or symbolic link.
-		    if ((!newfile && st_old.st_nlink > 1)
-			    || (mch_lstat((char *)fname, &st) == 0
+		    إذا ((!newfile && st_old.st_nlink > 1)
+			    || (mch_lstat((حرف *)fname, &st) == 0
 				&& (st.st_dev != st_old.st_dev
 				    || st.st_ino != st_old.st_ino)))
 			errmsg =
 			      (char_u *)_(e_cant_open_linked_file_for_writing);
-		    else
-#endif
+		    وإلا
+#پایان_اگر
 		    {
 			errmsg = (char_u *)_(e_cant_open_file_for_writing);
-			if (forceit && vim_strchr(p_cpo, CPO_FWRITE) == NULL
+			إذا (forceit && vim_strchr(p_cpo, CPO_FWRITE) == عدم
 								  && perm >= 0)
 			{
-#ifdef UNIX
+#اگر_تعریف_شده UNIX
 			    // we write to the file, thus it should be marked
 			    // writable after all
-			    if (!(perm & 0200))
+			    إذا (!(perm & 0200))
 				made_writable = TRUE;
 			    perm |= 0200;
-			    if (st_old.st_uid != getuid()
+			    إذا (st_old.st_uid != getuid()
 						  || st_old.st_gid != getgid())
 				perm &= 0777;
-#endif
-			    if (!append)  // don't remove when appending
+#پایان_اگر
+			    إذا (!append)  // don't remove when appending
 				mch_remove(wfname);
-			    continue;
+			    استمر;
 			}
 		    }
 		}
@@ -1888,9 +1888,9 @@ restore_backup:
 		    // If we failed to open the file, we don't need a backup.
 		    // Throw it away.  If we moved or removed the original file
 		    // try to put the backup in its place.
-		    if (backup != NULL && wfname == fname)
+		    إذا (backup != عدم && wfname == fname)
 		    {
-			if (backup_copy)
+			إذا (backup_copy)
 			{
 			    // There is a small chance that we removed the
 			    // original, try to move the copy in its place.
@@ -1898,14 +1898,14 @@ restore_backup:
 			    // In that case we leave the copy around.
 
 			    // If file does not exist, put the copy in its
-			    // place
-			    if (mch_stat((char *)fname, &st) < 0)
+			    //قراربده
+			    إذا (mch_stat((حرف *)fname, &st) < 0)
 				vim_rename(backup, fname);
 			    // if original file does exist throw away the copy
-			    if (mch_stat((char *)fname, &st) >= 0)
+			    إذا (mch_stat((حرف *)fname, &st) >= 0)
 				mch_remove(backup);
 			}
-			else
+			وإلا
 			{
 			    // try to put the original file back
 			    vim_rename(backup, fname);
@@ -1913,23 +1913,23 @@ restore_backup:
 		    }
 
 		    // if original file no longer exists give an extra warning
-		    if (!newfile && mch_stat((char *)fname, &st) < 0)
-			end = 0;
+		    إذا (!newfile && mch_stat((حرف *)fname, &st) < 0)
+			انتها = 0;
 		}
 
-		if (wfname != fname)
+		إذا (wfname != fname)
 		    vim_free(wfname);
-		goto fail;
+		اذهب fail;
 	    }
 	    write_info.bw_fd = fd;
 
-#if defined(UNIX)
+#إذا defined(UNIX)
 	    {
 		stat_T	st;
 
 		// Double check we are writing the intended file before making
 		// any changes.
-		if (overwriting
+		إذا (overwriting
 			&& (!dobackup || backup_copy)
 			&& fname == wfname
 			&& perm >= 0
@@ -1937,84 +1937,84 @@ restore_backup:
 			&& st.st_ino != st_old.st_ino)
 		{
 		    close(fd);
-		    errmsg = (char_u *)_(e_file_changed_while_writing);
-		    goto fail;
+		    errmsg = (char_u *)_(e_file_تغییریافته_while_writing);
+		    اذهب fail;
 		}
 	    }
-#endif
-#ifdef HAVE_FTRUNCATE
-	    if (!append)
+#پایان_اگر
+#اگر_تعریف_شده HAVE_FTRUNCATE
+	    إذا (!append)
 		vim_ignored = ftruncate(fd, (off_t)0);
-#endif
+#پایان_اگر
 
-#if defined(MSWIN)
-	    if (backup != NULL && overwriting && !append)
-		(void)mch_copy_file_attribute(backup, wfname);
+#إذا defined(MSWIN)
+	    إذا (backup != عدم && overwriting && !append)
+		(فراغ)mch_copy_file_attribute(backup, wfname);
 
-	    if (!overwriting && !append)
+	    إذا (!overwriting && !append)
 	    {
-		if (buf->b_ffname != NULL)
-		    (void)mch_copy_file_attribute(buf->b_ffname, wfname);
+		إذا (buf->b_ffname != عدم)
+		    (فراغ)mch_copy_file_attribute(buf->b_ffname, wfname);
 		// Should copy resource fork
 	    }
-#endif
+#پایان_اگر
 
-#ifdef FEAT_CRYPT
-	    if (*buf->b_p_key != NUL && !filtering)
+#اگر_تعریف_شده FEAT_CRYPT
+	    إذا (*buf->b_p_کلید != NUL && !filtering)
 	    {
-		char_u		*header;
-		int		header_len;
+		char_u		*سرآیند;
+		صحيح		سرآیند_len;
 
 		buf->b_cryptstate = crypt_create_for_writing(
-						      crypt_get_method_nr(buf),
-					   buf->b_p_key, &header, &header_len);
-		if (buf->b_cryptstate == NULL || header == NULL)
-		    end = 0;
-		else
+						      crypt_get_روش_nr(buf),
+					   buf->b_p_کلید, &سرآیند, &سرآیند_len);
+		إذا (buf->b_cryptstate == عدم || سرآیند == عدم)
+		    انتها = 0;
+		وإلا
 		{
 		    // Write magic number, so that Vim knows how this file is
 		    // encrypted when reading it back.
-		    write_info.bw_buf = header;
-		    write_info.bw_len = header_len;
+		    write_info.bw_buf = سرآیند;
+		    write_info.bw_len = سرآیند_len;
 		    write_info.bw_flags = FIO_NOCONVERT;
-		    if (buf_write_bytes(&write_info) == FAIL)
-			end = 0;
+		    إذا (buf_write_بایتها(&write_info) == FAIL)
+			انتها = 0;
 		    wb_flags |= FIO_ENCRYPTED;
-		    vim_free(header);
+		    vim_free(سرآیند);
 		}
 	    }
-#endif
+#پایان_اگر
 	}
-	errmsg = NULL;
+	errmsg = عدم;
 
-	write_info.bw_buf = buffer;
+	write_info.bw_buf = میانگیر;
 	nchars = 0;
 
 	// use "++bin", "++nobin" or 'binary'
-	if (eap != NULL && eap->force_bin != 0)
+	إذا (eap != عدم && eap->force_bin != 0)
 	    write_bin = (eap->force_bin == FORCE_BIN);
-	else
+	وإلا
 	    write_bin = buf->b_p_bin;
 
 	// The BOM is written just after the encryption magic number.
 	// Skip it when appending and the file already existed, the BOM only
 	// makes sense at the start of the file.
-	if (buf->b_p_bomb && !write_bin && (!append || perm < 0))
+	إذا (buf->b_p_bomb && !write_bin && (!append || perm < 0))
 	{
-	    write_info.bw_len = make_bom(buffer, fenc);
-	    if (write_info.bw_len > 0)
+	    write_info.bw_len = make_bom(میانگیر, fenc);
+	    إذا (write_info.bw_len > 0)
 	    {
 		// don't convert, do encryption
 		write_info.bw_flags = FIO_NOCONVERT | wb_flags;
-		if (buf_write_bytes(&write_info) == FAIL)
-		    end = 0;
-		else
+		إذا (buf_write_بایتها(&write_info) == FAIL)
+		    انتها = 0;
+		وإلا
 		    nchars += write_info.bw_len;
 	    }
 	}
-	write_info.bw_start_lnum = start;
+	write_info.bw_شروع_lnum = شروع;
 
-#ifdef FEAT_PERSISTENT_UNDO
+#اگر_تعریف_شده FEAT_PERSISTENT_UNDO
 	write_undo_file = (buf->b_p_udf
 			    && overwriting
 			    && !append
@@ -2022,122 +2022,122 @@ restore_backup:
 # ifdef CRYPT_NOT_INPLACE
 			    // writing undo file requires
 			    // crypt_encode_inplace()
-			    && (buf->b_cryptstate == NULL
-				|| crypt_works_inplace(buf->b_cryptstate))
+			    && (buf->b_cryptstate == عدم
+				|| crypt_کار_میکند_inplace(buf->b_cryptstate))
 # endif
-			    && reset_changed
+			    && reset_تغییریافته
 			    && !checking_conversion);
 # ifdef CRYPT_NOT_INPLACE
 	// remove undo file if encrypting it is not possible
-	if (buf->b_p_udf
+	إذا (buf->b_p_udf
 		&& overwriting
 		&& !append
 		&& !filtering
 		&& !checking_conversion
-		&& buf->b_cryptstate != NULL
-		&& !crypt_works_inplace(buf->b_cryptstate))
+		&& buf->b_cryptstate != عدم
+		&& !crypt_کار_میکند_inplace(buf->b_cryptstate))
 	    u_undofile_reset_and_delete(buf);
 # endif
-	if (write_undo_file)
+	إذا (write_undo_file)
 	    // Prepare for computing the hash value of the text.
-	    sha256_start(&sha_ctx);
-#endif
+	    sha256_شروع(&sha_ctx);
+#پایان_اگر
 
 	write_info.bw_len = bufsize;
 	write_info.bw_flags = wb_flags;
 	fileformat = get_fileformat_force(buf, eap);
-	s = buffer;
+	s = میانگیر;
 	len = 0;
-	for (lnum = start; lnum <= end; ++lnum)
+	لكل (lnum = شروع; lnum <= انتها; ++lnum)
 	{
 	    // The next while loop is done once for each character written.
 	    // Keep it fast!
 	    ptr = ml_get_buf(buf, lnum, FALSE) - 1;
-#ifdef FEAT_PERSISTENT_UNDO
-	    if (write_undo_file)
+#اگر_تعریف_شده FEAT_PERSISTENT_UNDO
+	    إذا (write_undo_file)
 		sha256_update(&sha_ctx, ptr + 1,
 					      (UINT32_T)(STRLEN(ptr + 1) + 1));
-#endif
-	    while ((c = *++ptr) != NUL)
+#پایان_اگر
+	    طالما ((c = *++ptr) != NUL)
 	    {
-		if (c == NL)
+		إذا (c == NL)
 		    *s = NUL;		// replace newlines with NULs
-		else if (c == CAR && fileformat == EOL_MAC)
+		وإلا إذا (c == CAR && fileformat == EOL_MAC)
 		    *s = NL;		// Mac: replace CRs with NLs
-		else
+		وإلا
 		    *s = c;
 		++s;
-		if (++len != bufsize)
-		    continue;
-#ifdef FEAT_CRYPT
-		if (write_info.bw_fd > 0 && lnum == end
+		إذا (++len != bufsize)
+		    استمر;
+#اگر_تعریف_شده FEAT_CRYPT
+		إذا (write_info.bw_fd > 0 && lnum == انتها
 			&& (write_info.bw_flags & FIO_ENCRYPTED)
-			&& *buf->b_p_key != NUL && !filtering
+			&& *buf->b_p_کلید != NUL && !filtering
 			&& *ptr == NUL)
-		    write_info.bw_finish = TRUE;
-#endif
-		if (buf_write_bytes(&write_info) == FAIL)
+		    write_info.bw_پایان = TRUE;
+#پایان_اگر
+		إذا (buf_write_بایتها(&write_info) == FAIL)
 		{
-		    end = 0;		// write error: break loop
-		    break;
+		    انتها = 0;		// write error: break loop
+		    اكسر;
 		}
 		nchars += bufsize;
-		s = buffer;
+		s = میانگیر;
 		len = 0;
-		write_info.bw_start_lnum = lnum;
+		write_info.bw_شروع_lnum = lnum;
 	    }
 	    // write failed or last line has no EOL: stop here
-	    if (end == 0
-		    || (lnum == end
+	    إذا (انتها == 0
+		    || (lnum == انتها
 			&& (write_bin || !buf->b_p_fixeol)
 			&& ((write_bin && lnum == buf->b_no_eol_lnum)
-			    || (lnum == buf->b_ml.ml_line_count
+			    || (lnum == buf->b_ml.ml_سطر_شمار
 							   && !buf->b_p_eol))))
 	    {
 		++lnum;			// written the line, count it
 		no_eol = TRUE;
-		break;
+		اكسر;
 	    }
-	    if (fileformat == EOL_UNIX)
+	    إذا (fileformat == EOL_UNIX)
 		*s++ = NL;
-	    else
+	    وإلا
 	    {
 		*s++ = CAR;		    // EOL_MAC or EOL_DOS: write CR
-		if (fileformat == EOL_DOS)  // write CR-NL
+		إذا (fileformat == EOL_DOS)  // write CR-NL
 		{
-		    if (++len == bufsize)
+		    إذا (++len == bufsize)
 		    {
-			if (buf_write_bytes(&write_info) == FAIL)
+			إذا (buf_write_بایتها(&write_info) == FAIL)
 			{
-			    end = 0;	// write error: break loop
-			    break;
+			    انتها = 0;	// write error: break loop
+			    اكسر;
 			}
 			nchars += bufsize;
-			s = buffer;
+			s = میانگیر;
 			len = 0;
 		    }
 		    *s++ = NL;
 		}
 	    }
-	    if (++len == bufsize && end)
+	    إذا (++len == bufsize && انتها)
 	    {
-		if (buf_write_bytes(&write_info) == FAIL)
+		إذا (buf_write_بایتها(&write_info) == FAIL)
 		{
-		    end = 0;		// write error: break loop
-		    break;
+		    انتها = 0;		// write error: break loop
+		    اكسر;
 		}
 		nchars += bufsize;
-		s = buffer;
+		s = میانگیر;
 		len = 0;
 
 		ui_breakcheck();
-		if (got_int)
+		إذا (got_int)
 		{
-		    end = 0;		// Interrupted, break loop
-		    break;
+		    انتها = 0;		// Interrupted, break loop
+		    اكسر;
 		}
 	    }
-#ifdef VMS
+#اگر_تعریف_شده VMS
 	    // On VMS there is a problem: newlines get added when writing
 	    // blocks at a time. Fix it by writing a line at a time.
 	    // This is much slower!
@@ -2149,57 +2149,57 @@ restore_backup:
 // Older DECC compiler for VAX doesn't define MIN()
 #  define MIN(a, b) ((a) < (b) ? (a) : (b))
 # endif
-	    if (buf->b_fab_rfm == FAB$C_VFC
+	    إذا (buf->b_fab_rfm == FAB$C_VFC
 		    || ((buf->b_fab_rat & (FAB$M_FTN | FAB$M_CR)) != 0))
 	    {
-		int b2write;
+		صحيح b2write;
 
 		buf->b_fab_mrs = (buf->b_fab_mrs == 0
 			? MIN(4096, bufsize)
 			: MIN(buf->b_fab_mrs, bufsize));
 
 		b2write = len;
-		while (b2write > 0)
+		طالما (b2write > 0)
 		{
 		    write_info.bw_len = MIN(b2write, buf->b_fab_mrs);
-		    if (buf_write_bytes(&write_info) == FAIL)
+		    إذا (buf_write_بایتها(&write_info) == FAIL)
 		    {
-			end = 0;
-			break;
+			انتها = 0;
+			اكسر;
 		    }
 		    b2write -= MIN(b2write, buf->b_fab_mrs);
 		}
 		write_info.bw_len = bufsize;
 		nchars += len;
-		s = buffer;
+		s = میانگیر;
 		len = 0;
 	    }
-#endif
+#پایان_اگر
 	}
-	if (len > 0 && end > 0)
+	إذا (len > 0 && انتها > 0)
 	{
 	    write_info.bw_len = len;
-#ifdef FEAT_CRYPT
-	    if (write_info.bw_fd > 0 && lnum >= end
+#اگر_تعریف_شده FEAT_CRYPT
+	    إذا (write_info.bw_fd > 0 && lnum >= انتها
 		    && (write_info.bw_flags & FIO_ENCRYPTED)
-		    && *buf->b_p_key != NUL && !filtering)
-		write_info.bw_finish = TRUE;
-#endif
-	    if (buf_write_bytes(&write_info) == FAIL)
-		end = 0;		    // write error
+		    && *buf->b_p_کلید != NUL && !filtering)
+		write_info.bw_پایان = TRUE;
+#پایان_اگر
+	    إذا (buf_write_بایتها(&write_info) == FAIL)
+		انتها = 0;		    // write error
 	    nchars += len;
 	}
 
-	if (!buf->b_p_fixeol && buf->b_p_eof)
+	إذا (!buf->b_p_fixeol && buf->b_p_eof)
 	{
 	    // write trailing CTRL-Z
-	    (void)write_eintr(write_info.bw_fd, "\x1a", 1);
+	    (فراغ)write_eintr(write_info.bw_fd, "\x1a", 1);
 	    nchars++;
 	}
 
 	// Stop when writing done or an error was encountered.
-	if (!checking_conversion || end == 0)
-	    break;
+	إذا (!checking_conversion || انتها == 0)
+	    اكسر;
 
 	// If no error happened until now, writing should be ok, so loop to
 	// really write the buffer.
@@ -2207,9 +2207,9 @@ restore_backup:
 
     // If we started writing, finish writing. Also when an error was
     // encountered.
-    if (!checking_conversion)
+    إذا (!checking_conversion)
     {
-#if defined(UNIX) && defined(HAVE_FSYNC)
+#إذا defined(UNIX) && defined(HAVE_FSYNC)
 	// On many journaling file systems there is a bug that causes both the
 	// original and the backup file to be lost when halting the system
 	// right after writing the file.  That's because only the meta-data is
@@ -2218,76 +2218,76 @@ restore_backup:
 	// For a device do try the fsync() but don't complain if it does not
 	// work (could be a pipe).
 	// If the 'fsync' option is FALSE, don't fsync().  Useful for laptops.
-	if ((buf->b_p_fs >= 0 ? buf->b_p_fs : p_fs) && vim_fsync(fd) != 0
+	إذا ((buf->b_p_fs >= 0 ? buf->b_p_fs : p_fs) && vim_fsync(fd) != 0
 		&& !device)
 	{
 	    errmsg = (char_u *)_(e_fsync_failed);
-	    end = 0;
+	    انتها = 0;
 	}
-#endif
+#پایان_اگر
 
-#if defined(HAVE_SELINUX) || defined(HAVE_SMACK) || defined(FEAT_XATTR)
+#إذا defined(HAVE_SELINUX) || defined(HAVE_SMACK) || defined(FEAT_XATTR)
 	// Probably need to set the security context.
-	if (!backup_copy)
+	إذا (!backup_copy)
 	{
-# if defined(HAVE_SELINUX) || defined(HAVE_SMACK)
+# إذا defined(HAVE_SELINUX) || defined(HAVE_SMACK)
 	    mch_copy_sec(backup, wfname);
 # endif
 # ifdef FEAT_XATTR
 	    mch_copy_xattr(backup, wfname);
 # endif
 	}
-#endif
+#پایان_اگر
 
-#ifdef UNIX
+#اگر_تعریف_شده UNIX
 	// When creating a new file, set its owner/group to that of the
 	// original file.  Get the new device and inode number.
-	if (backup != NULL && !backup_copy)
+	إذا (backup != عدم && !backup_copy)
 	{
 # ifdef HAVE_FCHOWN
 	    stat_T	st;
 
 	    // Don't change the owner when it's already OK, some systems remove
 	    // permission or ACL stuff.
-	    if (mch_stat((char *)wfname, &st) < 0
+	    إذا (mch_stat((حرف *)wfname, &st) < 0
 		    || st.st_uid != st_old.st_uid
 		    || st.st_gid != st_old.st_gid)
 	    {
 		// changing owner might not be possible
 		vim_ignored = fchown(fd, st_old.st_uid, -1);
 		// if changing group fails clear the group permissions
-		if (fchown(fd, -1, st_old.st_gid) == -1 && perm > 0)
+		إذا (fchown(fd, -1, st_old.st_gid) == -1 && perm > 0)
 		    perm &= ~070;
 	    }
 # endif
 	    buf_setino(buf);
 	}
-	else if (!buf->b_dev_valid)
+	وإلا إذا (!buf->b_dev_valid)
 	    // Set the inode when creating a new file.
 	    buf_setino(buf);
-#endif
+#پایان_اگر
 
-#ifdef UNIX
-	if (made_writable)
+#اگر_تعریف_شده UNIX
+	إذا (made_writable)
 	    perm &= ~0200;	// reset 'w' bit for security reasons
-#endif
-#ifdef HAVE_FCHMOD
+#پایان_اگر
+#اگر_تعریف_شده HAVE_FCHMOD
 	// set permission of new file same as old file
-	if (perm >= 0)
-	    (void)mch_fsetperm(fd, perm);
-#endif
-	if (close(fd) != 0)
+	إذا (perm >= 0)
+	    (فراغ)mch_fsetperm(fd, perm);
+#پایان_اگر
+	إذا (close(fd) != 0)
 	{
 	    errmsg = (char_u *)_(e_close_failed);
-	    end = 0;
+	    انتها = 0;
 	}
 
-#ifndef HAVE_FCHMOD
+#اگر_تعریف_نشده HAVE_FCHMOD
 	// set permission of new file same as old file
-	if (perm >= 0)
-	    (void)mch_setperm(wfname, perm);
-#endif
-#ifdef HAVE_ACL
+	إذا (perm >= 0)
+	    (فراغ)mch_setperm(wfname, perm);
+#پایان_اگر
+#اگر_تعریف_شده HAVE_ACL
 	// Probably need to set the ACL before changing the user (can't set the
 	// ACL on a file the user doesn't own).
 	// On Solaris, with ZFS and the aclmode property set to "discard" (the
@@ -2295,61 +2295,61 @@ restore_backup:
 	// represent the mode of the file.  It's non-trivial for us to discover
 	// whether we're in that situation, so we simply always re-set the ACL.
 # ifndef HAVE_SOLARIS_ZFS_ACL
-	if (!backup_copy)
+	إذا (!backup_copy)
 # endif
-	    mch_set_acl(wfname, acl);
-#endif
-#ifdef FEAT_CRYPT
-	if (buf->b_cryptstate != NULL)
+	    mch_مجموعه_acl(wfname, acl);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_CRYPT
+	إذا (buf->b_cryptstate != عدم)
 	{
 	    crypt_free_state(buf->b_cryptstate);
-	    buf->b_cryptstate = NULL;
+	    buf->b_cryptstate = عدم;
 	}
-#endif
+#پایان_اگر
 
-#if defined(FEAT_EVAL)
-	if (wfname != fname)
+#إذا defined(FEAT_EVAL)
+	إذا (wfname != fname)
 	{
 	    // The file was written to a temp file, now it needs to be
 	    // converted with 'charconvert' to (overwrite) the output file.
-	    if (end != 0)
+	    إذا (انتها != 0)
 	    {
-		if (eval_charconvert(enc_utf8 ? (char_u *)"utf-8" : p_enc,
+		إذا (eval_charconvert(enc_utf8 ? (char_u *)"utf-8" : p_enc,
 						  fenc, wfname, fname) == FAIL)
 		{
 		    write_info.bw_conv_error = TRUE;
-		    end = 0;
+		    انتها = 0;
 		}
 	    }
 	    mch_remove(wfname);
 	    vim_free(wfname);
 	}
-#endif
+#پایان_اگر
     }
 
-    if (end == 0)
+    إذا (انتها == 0)
     {
 	// Error encountered.
-	if (errmsg == NULL)
+	إذا (errmsg == عدم)
 	{
-	    if (write_info.bw_conv_error)
+	    إذا (write_info.bw_conv_error)
 	    {
-		if (write_info.bw_conv_error_lnum == 0)
-		    errmsg = (char_u *)_(e_write_error_conversion_failed_make_fenc_empty_to_override);
-		else
+		إذا (write_info.bw_conv_error_lnum == 0)
+		    errmsg = (char_u *)_(e_write_error_conversion_failed_make_fenc_خالی_مقصد_override);
+		وإلا
 		{
 		    errmsg_allocated = TRUE;
 		    errmsg = alloc(300);
-		    if (errmsg == NULL)
-			goto fail;
-		    vim_snprintf((char *)errmsg, 300, _(e_write_error_conversion_failed_in_line_nr_make_fenc_empty_to_override),
-					 (long)write_info.bw_conv_error_lnum);
+		    إذا (errmsg == عدم)
+			اذهب fail;
+		    vim_snprintf((حرف *)errmsg, 300, _(e_write_error_conversion_failed_درون_سطر_nr_make_fenc_خالی_مقصد_override),
+					 (دراز)write_info.bw_conv_error_lnum);
 		}
 	    }
-	    else if (got_int)
+	    وإلا إذا (got_int)
 		errmsg = (char_u *)_(e_interrupted);
-	    else
-		errmsg = (char_u *)_(e_write_error_file_system_full);
+	    وإلا
+		errmsg = (char_u *)_(e_write_error_file_system_پر);
 	}
 
 	// If we have a backup file, try to put it in place of the new file,
@@ -2359,177 +2359,177 @@ restore_backup:
 	// When "backup_copy" is set we need to copy the backup over the new
 	// file.  Otherwise rename the backup file.
 	// If this is OK, don't give the extra warning message.
-	if (backup != NULL)
+	إذا (backup != عدم)
 	{
-	    if (backup_copy)
+	    إذا (backup_copy)
 	    {
 		// This may take a while, if we were interrupted let the user
 		// know we got the message.
-		if (got_int)
+		إذا (got_int)
 		{
-		    msg(_(e_interrupted));
-		    out_flush();
+		    پیام(_(e_interrupted));
+		    بیرون_flush();
 		}
-		if ((fd = mch_open((char *)backup, O_RDONLY | O_EXTRA, 0)) >= 0)
+		إذا ((fd = mch_open((حرف *)backup, O_RDONLY | O_EXTRA, 0)) >= 0)
 		{
-		    if ((write_info.bw_fd = mch_open((char *)fname,
+		    إذا ((write_info.bw_fd = mch_open((حرف *)fname,
 				    O_WRONLY | O_CREAT | O_TRUNC | O_EXTRA,
 							   perm & 0777)) >= 0)
 		    {
 			// copy the file.
 			write_info.bw_buf = smallbuf;
 			write_info.bw_flags = FIO_NOCONVERT;
-			while ((write_info.bw_len = read_eintr(fd, smallbuf,
+			طالما ((write_info.bw_len = read_eintr(fd, smallbuf,
 						      SMALLBUFSIZE)) > 0)
-			    if (buf_write_bytes(&write_info) == FAIL)
-				break;
+			    إذا (buf_write_بایتها(&write_info) == FAIL)
+				اكسر;
 
-			if (close(write_info.bw_fd) >= 0
+			إذا (close(write_info.bw_fd) >= 0
 						   && write_info.bw_len == 0)
-			    end = 1;		// success
+			    انتها = 1;		// success
 		    }
 		    close(fd);	// ignore errors for closing read file
 		}
 	    }
-	    else
+	    وإلا
 	    {
-		if (vim_rename(backup, fname) == 0)
-		    end = 1;
+		إذا (vim_rename(backup, fname) == 0)
+		    انتها = 1;
 	    }
 	}
-	goto fail;
+	اذهب fail;
     }
 
-    lnum -= start;	    // compute number of written lines
+    lnum -= شروع;	    // compute number of written lines
     --no_wait_return;	    // may wait for return now
 
-#if !(defined(UNIX) || defined(VMS))
+#إذا !(defined(UNIX) || defined(VMS))
     fname = sfname;	    // use shortname now, for the messages
-#endif
-    if (!filtering)
+#پایان_اگر
+    إذا (!filtering)
     {
-	msg_add_fname(buf, fname);	// put fname in IObuff with quotes
+	پیام_جمع_کن_fname(buf, fname);	// put fname in IObuff with quotes
 	c = FALSE;
-	if (write_info.bw_conv_error)
+	إذا (write_info.bw_conv_error)
 	{
 	    STRCAT(IObuff, _(" CONVERSION ERROR"));
 	    c = TRUE;
-	    if (write_info.bw_conv_error_lnum != 0)
-		vim_snprintf_add((char *)IObuff, IOSIZE, _(" in line %ld;"),
-			(long)write_info.bw_conv_error_lnum);
+	    إذا (write_info.bw_conv_error_lnum != 0)
+		vim_snprintf_جمع_کن((حرف *)IObuff, IOSIZE, _(" in line %ld;"),
+			(دراز)write_info.bw_conv_error_lnum);
 	}
-	else if (notconverted)
+	وإلا إذا (notconverted)
 	{
 	    STRCAT(IObuff, _("[NOT converted]"));
 	    c = TRUE;
 	}
-	else if (converted)
+	وإلا إذا (converted)
 	{
 	    STRCAT(IObuff, _("[converted]"));
 	    c = TRUE;
 	}
-	if (device)
+	إذا (device)
 	{
 	    STRCAT(IObuff, _("[Device]"));
 	    c = TRUE;
 	}
-	else if (newfile)
+	وإلا إذا (newfile)
 	{
-	    STRCAT(IObuff, new_file_message());
+	    STRCAT(IObuff, new_file_پیام());
 	    c = TRUE;
 	}
-	if (no_eol)
+	إذا (no_eol)
 	{
-	    msg_add_eol();
+	    پیام_جمع_کن_eol();
 	    c = TRUE;
 	}
 	// may add [unix/dos/mac]
-	if (msg_add_fileformat(fileformat))
+	إذا (پیام_جمع_کن_fileformat(fileformat))
 	    c = TRUE;
-#ifdef FEAT_CRYPT
-	if (wb_flags & FIO_ENCRYPTED)
+#اگر_تعریف_شده FEAT_CRYPT
+	إذا (wb_flags & FIO_ENCRYPTED)
 	{
-	    crypt_append_msg(buf);
+	    crypt_append_پیام(buf);
 	    c = TRUE;
 	}
-#endif
-	msg_add_lines(c, (long)lnum, nchars);	// add line/char count
-	if (!shortmess(SHM_WRITE))
+#پایان_اگر
+	پیام_جمع_کن_سطرها(c, (دراز)lnum, nchars);	// add line/char count
+	إذا (!shortmess(SHM_WRITE))
 	{
-	    if (append)
+	    إذا (append)
 		STRCAT(IObuff, shortmess(SHM_WRI) ? _(" [a]") : _(" appended"));
-	    else
+	    وإلا
 		STRCAT(IObuff, shortmess(SHM_WRI) ? _(" [w]") : _(" written"));
 	}
 
-	set_keep_msg((char_u *)msg_trunc_attr((char *)IObuff, FALSE, 0), 0);
+	مجموعه_keep_پیام((char_u *)پیام_trunc_attr((حرف *)IObuff, FALSE, 0), 0);
     }
 
     // When written everything correctly: reset 'modified'.  Unless not
     // writing to the original file and '+' is not in 'cpoptions'.
-    if (reset_changed && whole && !append
+    إذا (reset_تغییریافته && کامل && !append
 	    && !write_info.bw_conv_error
-	    && (overwriting || vim_strchr(p_cpo, CPO_PLUS) != NULL))
+	    && (overwriting || vim_strchr(p_cpo, CPO_PLUS) != عدم))
     {
 	unchanged(buf, TRUE, FALSE);
 	// b:changedtick may be incremented in unchanged() but that should not
 	// trigger a TextChanged event.
-	if (buf->b_last_changedtick + 1 == CHANGEDTICK(buf))
-	    buf->b_last_changedtick = CHANGEDTICK(buf);
+	إذا (buf->b_آخرین_changedtick + 1 == CHANGEDTICK(buf))
+	    buf->b_آخرین_changedtick = CHANGEDTICK(buf);
 	u_unchanged(buf);
 	u_update_save_nr(buf);
     }
 
     // If written to the current file, update the timestamp of the swap file
     // and reset the BF_WRITE_MASK flags. Also sets buf->b_mtime.
-    if (overwriting)
+    إذا (overwriting)
     {
 	ml_timestamp(buf);
-	if (append)
+	إذا (append)
 	    buf->b_flags &= ~BF_NEW;
-	else
-	    buf->b_flags &= ~BF_WRITE_MASK;
+	وإلا
+	    buf->b_flags &= ~BF_WRITE_ماسک;
     }
 
     // If we kept a backup until now, and we are in patch mode, then we make
     // the backup file our 'original' file.
-    if (*p_pm && dobackup)
+    إذا (*p_pm && dobackup)
     {
-	char *org = (char *)buf_modname((buf->b_p_sn || buf->b_shortname),
+	حرف *org = (حرف *)buf_modname((buf->b_p_sn || buf->b_shortname),
 							  fname, p_pm, FALSE);
 
-	if (backup != NULL)
+	إذا (backup != عدم)
 	{
 	    stat_T	st;
 
 	    // If the original file does not exist yet
 	    // the current backup file becomes the original file
-	    if (org == NULL)
+	    إذا (org == عدم)
 		emsg(_(e_patchmode_cant_save_original_file));
-	    else if (mch_stat(org, &st) < 0)
+	    وإلا إذا (mch_stat(org, &st) < 0)
 	    {
 		vim_rename(backup, (char_u *)org);
 		VIM_CLEAR(backup);	    // don't delete the file
-#ifdef UNIX
-		set_file_time((char_u *)org, st_old.st_atime, st_old.st_mtime);
-#endif
+#اگر_تعریف_شده UNIX
+		مجموعه_file_زمان((char_u *)org, st_old.st_atime, st_old.st_mtime);
+#پایان_اگر
 	    }
 	}
 	// If there is no backup file, remember that a (new) file was
 	// created.
-	else
+	وإلا
 	{
-	    int empty_fd;
+	    صحيح خالی_fd;
 
-	    if (org == NULL
-		    || (empty_fd = mch_open(org,
+	    إذا (org == عدم
+		    || (خالی_fd = mch_open(org,
 				      O_CREAT | O_EXTRA | O_EXCL | O_NOFOLLOW,
 					perm < 0 ? 0666 : (perm & 0777))) < 0)
-	      emsg(_(e_patchmode_cant_touch_empty_original_file));
-	    else
-	      close(empty_fd);
+	      emsg(_(e_patchmode_cant_touch_خالی_original_file));
+	    وإلا
+	      close(خالی_fd);
 	}
-	if (org != NULL)
+	إذا (org != عدم)
 	{
 	    mch_setperm((char_u *)org, mch_getperm(fname) & 0777);
 	    vim_free(org);
@@ -2538,11 +2538,11 @@ restore_backup:
 
     // Remove the backup unless 'backup' option is set or there was a
     // conversion error.
-    if (!p_bk && backup != NULL && !write_info.bw_conv_error
+    إذا (!p_bk && backup != عدم && !write_info.bw_conv_error
 	    && mch_remove(backup) != 0)
 	emsg(_(e_cant_delete_backup_file));
 
-    goto nofail;
+    اذهب nofail;
 
     // Finish up.  We get here either after failure or success.
 fail:
@@ -2553,84 +2553,84 @@ nofail:
     buf->b_saving = false;
 
     vim_free(backup);
-    if (buffer != smallbuf)
-	vim_free(buffer);
+    إذا (میانگیر != smallbuf)
+	vim_free(میانگیر);
     vim_free(fenc_tofree);
     vim_free(write_info.bw_conv_buf);
-#ifdef USE_ICONV
-    if (write_info.bw_iconv_fd != (iconv_t)-1)
+#اگر_تعریف_شده USE_ICONV
+    إذا (write_info.bw_iconv_fd != (iconv_t)-1)
     {
 	iconv_close(write_info.bw_iconv_fd);
 	write_info.bw_iconv_fd = (iconv_t)-1;
     }
-#endif
-#ifdef HAVE_ACL
+#پایان_اگر
+#اگر_تعریف_شده HAVE_ACL
     mch_free_acl(acl);
-#endif
+#پایان_اگر
 
-    if (errmsg != NULL)
+    إذا (errmsg != عدم)
     {
-	int numlen = errnum != NULL ? (int)STRLEN(errnum) : 0;
+	صحيح numlen = errnum != عدم ? (صحيح)STRLEN(errnum) : 0;
 
 	attr = HL_ATTR(HLF_E);	// set highlight for error messages
-	msg_add_fname(buf,
-#ifndef UNIX
+	پیام_جمع_کن_fname(buf,
+#اگر_تعریف_نشده UNIX
 		sfname
-#else
+#وإلا
 		fname
-#endif
+#پایان_اگر
 		     );		// put file name in IObuff with quotes
-	if (STRLEN(IObuff) + STRLEN(errmsg) + numlen >= IOSIZE)
+	إذا (STRLEN(IObuff) + STRLEN(errmsg) + numlen >= IOSIZE)
 	    IObuff[IOSIZE - STRLEN(errmsg) - numlen - 1] = NUL;
 	// If the error message has the form "is ...", put the error number in
 	// front of the file name.
-	if (errnum != NULL)
+	إذا (errnum != عدم)
 	{
 	    STRMOVE(IObuff + numlen, IObuff);
 	    mch_memmove(IObuff, errnum, (size_t)numlen);
 	}
 	STRCAT(IObuff, errmsg);
-	emsg((char *)IObuff);
-	if (errmsg_allocated)
+	emsg((حرف *)IObuff);
+	إذا (errmsg_allocated)
 	    vim_free(errmsg);
 
 	retval = FAIL;
-	if (end == 0)
+	إذا (انتها == 0)
 	{
-	    msg_puts_attr(_("\nWARNING: Original file may be lost or damaged\n"),
-		    attr | MSG_HIST);
-	    msg_puts_attr(_("don't quit the editor until the file is successfully written!"),
-		    attr | MSG_HIST);
+	    پیام_puts_attr(_("\nWARNING: Original file may be lost or damaged\n"),
+		    attr | پیام_HIST);
+	    پیام_puts_attr(_("don't quit the editor until the file is successfully written!"),
+		    attr | پیام_HIST);
 
 	    // Update the timestamp to avoid an "overwrite changed file"
 	    // prompt when writing again.
-	    if (mch_stat((char *)fname, &st_old) >= 0)
+	    إذا (mch_stat((حرف *)fname, &st_old) >= 0)
 	    {
-		buf_store_time(buf, &st_old, fname);
+		buf_store_زمان(buf, &st_old, fname);
 		buf->b_mtime_read = buf->b_mtime;
 		buf->b_mtime_read_ns = buf->b_mtime_ns;
 	    }
 	}
     }
-    msg_scroll = msg_save;
+    پیام_scroll = پیام_save;
 
-#ifdef FEAT_PERSISTENT_UNDO
+#اگر_تعریف_شده FEAT_PERSISTENT_UNDO
     // When writing the whole file and 'undofile' is set, also write the undo
     // file.
-    if (retval == OK && write_undo_file)
+    إذا (retval == OK && write_undo_file)
     {
-	char_u	    hash[UNDO_HASH_SIZE];
+	char_u	    hash[UNDO_HASH_اندازه];
 
-	sha256_finish(&sha_ctx, hash);
-	u_write_undo(NULL, FALSE, buf, hash);
+	sha256_پایان(&sha_ctx, hash);
+	u_write_undo(عدم, FALSE, buf, hash);
     }
-#endif
+#پایان_اگر
 
-#ifdef FEAT_EVAL
-    if (!should_abort(retval))
-#else
-    if (!got_int)
-#endif
+#اگر_تعریف_شده FEAT_EVAL
+    إذا (!should_abort(retval))
+#وإلا
+    إذا (!got_int)
+#پایان_اگر
     {
 	aco_save_T	aco;
 
@@ -2640,18 +2640,18 @@ nofail:
 	// Careful: The autocommands may call buf_write() recursively!
 	// Only do this when a window was found for "buf".
 	aucmd_prepbuf(&aco, buf);
-	if (curbuf == buf)
+	إذا (curbuf == buf)
 	{
-	    if (append)
+	    إذا (append)
 		apply_autocmds_exarg(EVENT_FILEAPPENDPOST, fname, fname,
 							   FALSE, curbuf, eap);
-	    else if (filtering)
-		apply_autocmds_exarg(EVENT_FILTERWRITEPOST, NULL, fname,
+	    وإلا إذا (filtering)
+		apply_autocmds_exarg(EVENT_FILTERWRITEPOST, عدم, fname,
 							   FALSE, curbuf, eap);
-	    else if (reset_changed && whole)
+	    وإلا إذا (reset_تغییریافته && کامل)
 		apply_autocmds_exarg(EVENT_BUFWRITEPOST, fname, fname,
 							   FALSE, curbuf, eap);
-	    else
+	    وإلا
 		apply_autocmds_exarg(EVENT_FILEWRITEPOST, fname, fname,
 							   FALSE, curbuf, eap);
 
@@ -2659,19 +2659,19 @@ nofail:
 	    aucmd_restbuf(&aco);
 	}
 
-#ifdef FEAT_EVAL
-	if (aborting())	    // autocmds may abort script processing
+#اگر_تعریف_شده FEAT_EVAL
+	إذا (aborting())	    // autocmds may abort script processing
 	    retval = FALSE;
-#endif
+#پایان_اگر
     }
 
-#ifdef FEAT_VIMINFO
+#اگر_تعریف_شده FEAT_VIMINFO
     // Make sure marks will be written out to the viminfo file later, even when
     // the file is new.
     curbuf->b_marks_read = true;
-#endif
+#پایان_اگر
 
     got_int |= prev_got_int;
 
-    return retval;
+    أرجع retval;
 }

@@ -1,82 +1,82 @@
-#define DEFINE_INLINES
+#تعریف_کن DEFINE_INLINES
 
 // vim: set sw=2 :
-#include "vterm_internal.h"
+#ضمن "vterm_internal.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
+#ضمن <stdio.h>
+#ضمن <stdlib.h>
+#ضمن <stdarg.h>
+#ضمن <string.h>
 
-#include "utf8.h"
+#ضمن "utf8.h"
 
 /*****************
  * API functions *
  *****************/
 
-static void *default_malloc(size_t size, void *allocdata UNUSED)
+ساكن فراغ *default_malloc(size_t اندازه, فراغ *allocdata استفادهنشده)
 {
-  void *ptr = malloc(size);
-  if(ptr)
-    memset(ptr, 0, size);
-  return ptr;
+  فراغ *ptr = حافظه_بده(اندازه);
+  إذا(ptr)
+    memset(ptr, 0, اندازه);
+  أرجع ptr;
 }
 
-static void default_free(void *ptr, void *allocdata UNUSED)
+ساكن فراغ default_free(فراغ *ptr, فراغ *allocdata استفادهنشده)
 {
-  free(ptr);
+  حرر(ptr);
 }
 
-static VTermAllocatorFunctions default_allocator = {
+ساكن VTermAllocatorFunctions default_allocator = {
   &default_malloc, // malloc
   &default_free // free
 };
 
-VTerm *vterm_new(int rows, int cols)
+VTerm *vterm_new(صحيح ردیفها_2, صحيح تعداد_ستون)
 {
-  struct VTermBuilder builder;
-  memset(&builder, 0, sizeof(builder));
-  builder.rows = rows;
-  builder.cols = cols;
-  return vterm_build(&builder);
+  بنية VTermBuilder builder;
+  memset(&builder, 0, حجم(builder));
+  builder.ردیفها_2 = ردیفها_2;
+  builder.تعداد_ستون = تعداد_ستون;
+  أرجع vterm_build(&builder);
 }
 
-VTerm *vterm_new_with_allocator(int rows, int cols, VTermAllocatorFunctions *funcs, void *allocdata)
+VTerm *vterm_new_with_allocator(صحيح ردیفها_2, صحيح تعداد_ستون, VTermAllocatorFunctions *funcs, فراغ *allocdata)
 {
-  struct VTermBuilder builder;
-  memset(&builder, 0, sizeof(builder));
-  builder.rows = rows;
-  builder.cols = cols;
+  بنية VTermBuilder builder;
+  memset(&builder, 0, حجم(builder));
+  builder.ردیفها_2 = ردیفها_2;
+  builder.تعداد_ستون = تعداد_ستون;
   builder.allocator = funcs;
   builder.allocdata = allocdata;
-  return vterm_build(&builder);
+  أرجع vterm_build(&builder);
 }
 
 /* A handy macro for defaulting values out of builder fields */
-#define DEFAULT(v, def)  ((v) ? (v) : (def))
+#تعریف_کن DEFAULT(v, def)  ((v) ? (v) : (def))
 
-VTerm *vterm_build(const struct VTermBuilder *builder)
+VTerm *vterm_build(ثابت بنية VTermBuilder *builder)
 {
-  const VTermAllocatorFunctions *allocator = DEFAULT(builder->allocator, &default_allocator);
+  ثابت VTermAllocatorFunctions *allocator = DEFAULT(builder->allocator, &default_allocator);
 
   /* Need to bootstrap using the allocator function directly */
-  VTerm *vt = (*allocator->malloc)(sizeof(VTerm), builder->allocdata);
+  VTerm *vt = (*allocator->حافظه_بده)(حجم(VTerm), builder->allocdata);
 
   vt->allocator = allocator;
   vt->allocdata = builder->allocdata;
 
-  vt->rows = builder->rows;
-  vt->cols = builder->cols;
+  vt->ردیفها_2 = builder->ردیفها_2;
+  vt->تعداد_ستون = builder->تعداد_ستون;
 
-  vt->parser.state = NORMAL;
+  vt->parser.state = نرمال_2;
 
-  vt->parser.callbacks = NULL;
-  vt->parser.cbdata    = NULL;
+  vt->parser.callbacks = عدم;
+  vt->parser.cbdata    = عدم;
 
   vt->parser.emit_nul  = FALSE;
 
-  vt->outfunc = NULL;
-  vt->outdata = NULL;
+  vt->outfunc = عدم;
+  vt->outdata = عدم;
 
   vt->outbuffer_len = DEFAULT(builder->outbuffer_len, 4096);
   vt->outbuffer_cur = 0;
@@ -85,25 +85,25 @@ VTerm *vterm_build(const struct VTermBuilder *builder)
   vt->tmpbuffer_len = DEFAULT(builder->tmpbuffer_len, 4096);
   vt->tmpbuffer = vterm_allocator_malloc(vt, vt->tmpbuffer_len);
 
-  if (vt->tmpbuffer == NULL
-      || vt->outbuffer == NULL
-      || vt->tmpbuffer == NULL)
+  إذا (vt->tmpbuffer == عدم
+      || vt->outbuffer == عدم
+      || vt->tmpbuffer == عدم)
   {
     vterm_allocator_free(vt, vt->outbuffer);
     vterm_allocator_free(vt, vt->tmpbuffer);
     vterm_allocator_free(vt, vt);
-    return NULL;
+    أرجع عدم;
   }
 
-  return vt;
+  أرجع vt;
 }
 
-void vterm_free(VTerm *vt)
+فراغ vterm_free(VTerm *vt)
 {
-  if(vt->screen)
+  إذا(vt->screen)
     vterm_screen_free(vt->screen);
 
-  if(vt->state)
+  إذا(vt->state)
     vterm_state_free(vt->state);
 
   vterm_allocator_free(vt, vt->outbuffer);
@@ -112,341 +112,341 @@ void vterm_free(VTerm *vt)
   vterm_allocator_free(vt, vt);
 }
 
-INTERNAL void *vterm_allocator_malloc(VTerm *vt, size_t size)
+داخلی فراغ *vterm_allocator_malloc(VTerm *vt, size_t اندازه)
 {
-  return (*vt->allocator->malloc)(size, vt->allocdata);
+  أرجع (*vt->allocator->حافظه_بده)(اندازه, vt->allocdata);
 }
 
 /*
  * Free "ptr" unless it is NULL.
  */
-INTERNAL void vterm_allocator_free(VTerm *vt, void *ptr)
+داخلی فراغ vterm_allocator_free(VTerm *vt, فراغ *ptr)
 {
-  if (ptr)
-    (*vt->allocator->free)(ptr, vt->allocdata);
+  إذا (ptr)
+    (*vt->allocator->حرر)(ptr, vt->allocdata);
 }
 
-void vterm_get_size(const VTerm *vt, int *rowsp, int *colsp)
+فراغ vterm_get_اندازه(ثابت VTerm *vt, صحيح *rowsp, صحيح *colsp)
 {
-  if(rowsp)
-    *rowsp = vt->rows;
-  if(colsp)
-    *colsp = vt->cols;
+  إذا(rowsp)
+    *rowsp = vt->ردیفها_2;
+  إذا(colsp)
+    *colsp = vt->تعداد_ستون;
 }
 
-void vterm_set_size(VTerm *vt, int rows, int cols)
+فراغ vterm_مجموعه_اندازه(VTerm *vt, صحيح ردیفها_2, صحيح تعداد_ستون)
 {
-  if(rows < 1 || cols < 1)
-    return;
+  إذا(ردیفها_2 < 1 || تعداد_ستون < 1)
+    أرجع;
 
-  vt->rows = rows;
-  vt->cols = cols;
+  vt->ردیفها_2 = ردیفها_2;
+  vt->تعداد_ستون = تعداد_ستون;
 
-  if(vt->parser.callbacks && vt->parser.callbacks->resize)
-    (*vt->parser.callbacks->resize)(rows, cols, vt->parser.cbdata);
+  إذا(vt->parser.callbacks && vt->parser.callbacks->resize)
+    (*vt->parser.callbacks->resize)(ردیفها_2, تعداد_ستون, vt->parser.cbdata);
 }
 
-int vterm_get_utf8(const VTerm *vt)
+صحيح vterm_get_utf8(ثابت VTerm *vt)
 {
-  return vt->mode.utf8;
+  أرجع vt->نما.utf8;
 }
 
-void vterm_set_utf8(VTerm *vt, int is_utf8)
+فراغ vterm_مجموعه_utf8(VTerm *vt, صحيح is_utf8)
 {
-  vt->mode.utf8 = is_utf8;
+  vt->نما.utf8 = is_utf8;
 }
 
-void vterm_output_set_callback(VTerm *vt, VTermOutputCallback *func, void *user)
+فراغ vterm_output_مجموعه_callback(VTerm *vt, VTermOutputCallback *func, فراغ *user)
 {
   vt->outfunc = func;
   vt->outdata = user;
 }
 
-INTERNAL void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len)
+داخلی فراغ vterm_افزودن_output_بایتها(VTerm *vt, ثابت حرف *بایتها, size_t len)
 {
-  if(vt->outfunc) {
-    (vt->outfunc)(bytes, len, vt->outdata);
-    return;
+  إذا(vt->outfunc) {
+    (vt->outfunc)(بایتها, len, vt->outdata);
+    أرجع;
   }
 
-  if(len > vt->outbuffer_len - vt->outbuffer_cur) {
+  إذا(len > vt->outbuffer_len - vt->outbuffer_cur) {
     DEBUG_LOG("vterm_push_output_bytes(): buffer overflow; dropping output\n");
-    return;
+    أرجع;
   }
 
-  memcpy(vt->outbuffer + vt->outbuffer_cur, bytes, len);
+  کپی_حافظه(vt->outbuffer + vt->outbuffer_cur, بایتها, len);
   vt->outbuffer_cur += len;
 }
 
-INTERNAL void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args)
+داخلی فراغ vterm_افزودن_output_vsprintf(VTerm *vt, ثابت حرف *format, va_list آرگومانها)
 {
   size_t len;
-#ifdef VSNPRINTF
-  len = VSNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len, format, args);
-#else
+#اگر_تعریف_شده VSNPRINTF
+  len = VSNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len, format, آرگومانها);
+#وإلا
   // When vsnprintf() is not available (C90) fall back to vsprintf().
   // Use the heap-allocated tmpbuffer (default 4096 bytes) instead of a small
   // stack buffer to reduce the risk of overflow.
-  len = vsprintf(vt->tmpbuffer, format, args);
-  if (len >= vt->tmpbuffer_len)
+  len = vsprintf(vt->tmpbuffer, format, آرگومانها);
+  إذا (len >= vt->tmpbuffer_len)
     len = vt->tmpbuffer_len - 1;
-#endif
-  vterm_push_output_bytes(vt, vt->tmpbuffer, len);
+#پایان_اگر
+  vterm_افزودن_output_بایتها(vt, vt->tmpbuffer, len);
 }
 
-INTERNAL void vterm_push_output_sprintf(VTerm *vt, const char *format, ...)
+داخلی فراغ vterm_افزودن_output_sprintf(VTerm *vt, ثابت حرف *format, ...)
 {
-  va_list args;
-  va_start(args, format);
-  vterm_push_output_vsprintf(vt, format, args);
-  va_end(args);
+  va_list آرگومانها;
+  va_start(آرگومانها, format);
+  vterm_افزودن_output_vsprintf(vt, format, آرگومانها);
+  va_end(آرگومانها);
 }
 
-INTERNAL void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...)
+داخلی فراغ vterm_افزودن_output_sprintf_ctrl(VTerm *vt, بیعلامت حرف ctrl, ثابت حرف *fmt, ...)
 {
   size_t cur;
 
-  if(ctrl >= 0x80 && !vt->mode.ctrl8bit)
+  إذا(ctrl >= 0x80 && !vt->نما.ctrl8bit)
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
         ESC_S "%c", ctrl - 0x40);
-  else
+  وإلا
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
         "%c", ctrl);
-  if(cur >= vt->tmpbuffer_len)
-    return;
-  vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+  إذا(cur >= vt->tmpbuffer_len)
+    أرجع;
+  vterm_افزودن_output_بایتها(vt, vt->tmpbuffer, cur);
 
-  va_list args;
-  va_start(args, fmt);
-  vterm_push_output_vsprintf(vt, fmt, args);
-  va_end(args);
+  va_list آرگومانها;
+  va_start(آرگومانها, fmt);
+  vterm_افزودن_output_vsprintf(vt, fmt, آرگومانها);
+  va_end(آرگومانها);
 }
 
-INTERNAL void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...)
+داخلی فراغ vterm_افزودن_output_sprintf_str(VTerm *vt, بیعلامت حرف ctrl, صحيح جمله, ثابت حرف *fmt, ...)
 {
   size_t cur;
 
-  if(ctrl) {
-    if(ctrl >= 0x80 && !vt->mode.ctrl8bit)
+  إذا(ctrl) {
+    إذا(ctrl >= 0x80 && !vt->نما.ctrl8bit)
       cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
           ESC_S "%c", ctrl - 0x40);
-    else
+    وإلا
       cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
           "%c", ctrl);
 
-    if(cur >= vt->tmpbuffer_len)
-      return;
-    vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+    إذا(cur >= vt->tmpbuffer_len)
+      أرجع;
+    vterm_افزودن_output_بایتها(vt, vt->tmpbuffer, cur);
   }
 
-  va_list args;
-  va_start(args, fmt);
-  vterm_push_output_vsprintf(vt, fmt, args);
-  va_end(args);
+  va_list آرگومانها;
+  va_start(آرگومانها, fmt);
+  vterm_افزودن_output_vsprintf(vt, fmt, آرگومانها);
+  va_end(آرگومانها);
 
-  if(term) {
+  إذا(جمله) {
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
-        vt->mode.ctrl8bit ? "\x9C" : ESC_S "\\"); // ST
-    if(cur >= vt->tmpbuffer_len)
-      return;
-    vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+        vt->نما.ctrl8bit ? "\x9C" : ESC_S "\\"); // ST
+    إذا(cur >= vt->tmpbuffer_len)
+      أرجع;
+    vterm_افزودن_output_بایتها(vt, vt->tmpbuffer, cur);
   }
 }
 
-size_t vterm_output_get_buffer_size(const VTerm *vt)
+size_t vterm_output_get_میانگیر_اندازه(ثابت VTerm *vt)
 {
-  return vt->outbuffer_len;
+  أرجع vt->outbuffer_len;
 }
 
-size_t vterm_output_get_buffer_current(const VTerm *vt)
+size_t vterm_output_get_میانگیر_current(ثابت VTerm *vt)
 {
-  return vt->outbuffer_cur;
+  أرجع vt->outbuffer_cur;
 }
 
-size_t vterm_output_get_buffer_remaining(const VTerm *vt)
+size_t vterm_output_get_میانگیر_مانده(ثابت VTerm *vt)
 {
-  return vt->outbuffer_len - vt->outbuffer_cur;
+  أرجع vt->outbuffer_len - vt->outbuffer_cur;
 }
 
-size_t vterm_output_read(VTerm *vt, char *buffer, size_t len)
+size_t vterm_output_read(VTerm *vt, حرف *میانگیر, size_t len)
 {
-  if(len > vt->outbuffer_cur)
+  إذا(len > vt->outbuffer_cur)
     len = vt->outbuffer_cur;
 
-  memcpy(buffer, vt->outbuffer, len);
+  کپی_حافظه(میانگیر, vt->outbuffer, len);
 
-  if(len < vt->outbuffer_cur)
+  إذا(len < vt->outbuffer_cur)
     memmove(vt->outbuffer, vt->outbuffer + len, vt->outbuffer_cur - len);
 
   vt->outbuffer_cur -= len;
 
-  return len;
+  أرجع len;
 }
 
-VTermValueType vterm_get_attr_type(VTermAttr attr)
+VTerm_مقدار_Type vterm_get_attr_type(VTermAttr attr)
 {
-  switch(attr) {
-    case VTERM_ATTR_BOLD:       return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_UNDERLINE:  return VTERM_VALUETYPE_INT;
-    case VTERM_ATTR_ITALIC:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_BLINK:      return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_REVERSE:    return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_CONCEAL:    return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_STRIKE:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_FONT:       return VTERM_VALUETYPE_INT;
-    case VTERM_ATTR_FOREGROUND: return VTERM_VALUETYPE_COLOR;
-    case VTERM_ATTR_BACKGROUND: return VTERM_VALUETYPE_COLOR;
-    case VTERM_ATTR_SMALL:      return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_BASELINE:   return VTERM_VALUETYPE_INT;
+  بدل(attr) {
+    حالة VTERM_ATTR_BOLD:       أرجع VTERM_VALUETYPE_BOOL;
+    حالة VTERM_ATTR_UNDERLINE:  أرجع VTERM_VALUETYPE_INT;
+    حالة VTERM_ATTR_ITALIC:     أرجع VTERM_VALUETYPE_BOOL;
+    حالة VTERM_ATTR_BLINK:      أرجع VTERM_VALUETYPE_BOOL;
+    حالة VTERM_ATTR_معکوس:    أرجع VTERM_VALUETYPE_BOOL;
+    حالة VTERM_ATTR_CONCEAL:    أرجع VTERM_VALUETYPE_BOOL;
+    حالة VTERM_ATTR_STRIKE:     أرجع VTERM_VALUETYPE_BOOL;
+    حالة VTERM_ATTR_FONT:       أرجع VTERM_VALUETYPE_INT;
+    حالة VTERM_ATTR_FOREGROUND: أرجع VTERM_VALUETYPE_COLOR;
+    حالة VTERM_ATTR_BACKGROUND: أرجع VTERM_VALUETYPE_COLOR;
+    حالة VTERM_ATTR_SMALL:      أرجع VTERM_VALUETYPE_BOOL;
+    حالة VTERM_ATTR_BASELINE:   أرجع VTERM_VALUETYPE_INT;
 
-    case VTERM_N_ATTRS: return 0;
+    حالة VTERM_N_ATTRS: أرجع 0;
   }
-  return 0; /* UNREACHABLE */
+  أرجع 0; /* UNREACHABLE */
 }
 
-VTermValueType vterm_get_prop_type(VTermProp prop)
+VTerm_مقدار_Type vterm_get_prop_type(VTermProp prop)
 {
-  switch(prop) {
-    case VTERM_PROP_CURSORVISIBLE: return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORBLINK:   return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_ALTSCREEN:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_TITLE:         return VTERM_VALUETYPE_STRING;
-    case VTERM_PROP_ICONNAME:      return VTERM_VALUETYPE_STRING;
-    case VTERM_PROP_REVERSE:       return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORSHAPE:   return VTERM_VALUETYPE_INT;
-    case VTERM_PROP_MOUSE:         return VTERM_VALUETYPE_INT;
-    case VTERM_PROP_FOCUSREPORT:   return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORCOLOR:   return VTERM_VALUETYPE_STRING;
+  بدل(prop) {
+    حالة VTERM_PROP_CURSORVISIBLE: أرجع VTERM_VALUETYPE_BOOL;
+    حالة VTERM_PROP_CURSORBLINK:   أرجع VTERM_VALUETYPE_BOOL;
+    حالة VTERM_PROP_ALTSCREEN:     أرجع VTERM_VALUETYPE_BOOL;
+    حالة VTERM_PROP_TITLE:         أرجع VTERM_VALUETYPE_STRING;
+    حالة VTERM_PROP_ICONNAME:      أرجع VTERM_VALUETYPE_STRING;
+    حالة VTERM_PROP_معکوس:       أرجع VTERM_VALUETYPE_BOOL;
+    حالة VTERM_PROP_CURSORSHAPE:   أرجع VTERM_VALUETYPE_INT;
+    حالة VTERM_PROP_MOUSE:         أرجع VTERM_VALUETYPE_INT;
+    حالة VTERM_PROP_FOCUSREPORT:   أرجع VTERM_VALUETYPE_BOOL;
+    حالة VTERM_PROP_CURSORCOLOR:   أرجع VTERM_VALUETYPE_STRING;
 
-    case VTERM_N_PROPS: return 0;
+    حالة VTERM_N_PROPS: أرجع 0;
   }
-  return 0; /* UNREACHABLE */
+  أرجع 0; /* UNREACHABLE */
 }
 
-void vterm_scroll_rect(VTermRect rect,
-    int downward,
-    int rightward,
-    int (*moverect)(VTermRect src, VTermRect dest, void *user),
-    int (*eraserect)(VTermRect rect, int selective, void *user),
-    void *user)
+فراغ vterm_scroll_rect(VTermRect rect,
+    صحيح downward,
+    صحيح rightward,
+    صحيح (*moverect)(VTermRect src, VTermRect dest, فراغ *user),
+    صحيح (*eraserect)(VTermRect rect, صحيح selective, فراغ *user),
+    فراغ *user)
 {
   VTermRect src;
   VTermRect dest;
 
-  if(abs(downward)  >= rect.end_row - rect.start_row ||
-     abs(rightward) >= rect.end_col - rect.start_col) {
+  إذا(قدر_مطلق(downward)  >= rect.انتها_ردیف - rect.شروع_ردیف ||
+     قدر_مطلق(rightward) >= rect.انتها_ستون - rect.شروع_ستون) {
     /* Scroll more than area; just erase the lot */
     (*eraserect)(rect, 0, user);
-    return;
+    أرجع;
   }
 
-  if(rightward >= 0) {
+  إذا(rightward >= 0) {
     /* rect: [XXX................]
      * src:     [----------------]
      * dest: [----------------]
      */
-    dest.start_col = rect.start_col;
-    dest.end_col   = rect.end_col   - rightward;
-    src.start_col  = rect.start_col + rightward;
-    src.end_col    = rect.end_col;
+    dest.شروع_ستون = rect.شروع_ستون;
+    dest.انتها_ستون   = rect.انتها_ستون   - rightward;
+    src.شروع_ستون  = rect.شروع_ستون + rightward;
+    src.انتها_ستون    = rect.انتها_ستون;
   }
-  else {
+  وإلا {
     /* rect: [................XXX]
      * src:  [----------------]
      * dest:    [----------------]
      */
-    int leftward = -rightward;
-    dest.start_col = rect.start_col + leftward;
-    dest.end_col   = rect.end_col;
-    src.start_col  = rect.start_col;
-    src.end_col    = rect.end_col - leftward;
+    صحيح leftward = -rightward;
+    dest.شروع_ستون = rect.شروع_ستون + leftward;
+    dest.انتها_ستون   = rect.انتها_ستون;
+    src.شروع_ستون  = rect.شروع_ستون;
+    src.انتها_ستون    = rect.انتها_ستون - leftward;
   }
 
-  if(downward >= 0) {
-    dest.start_row = rect.start_row;
-    dest.end_row   = rect.end_row   - downward;
-    src.start_row  = rect.start_row + downward;
-    src.end_row    = rect.end_row;
+  إذا(downward >= 0) {
+    dest.شروع_ردیف = rect.شروع_ردیف;
+    dest.انتها_ردیف   = rect.انتها_ردیف   - downward;
+    src.شروع_ردیف  = rect.شروع_ردیف + downward;
+    src.انتها_ردیف    = rect.انتها_ردیف;
   }
-  else {
-    int upward = -downward;
-    dest.start_row = rect.start_row + upward;
-    dest.end_row   = rect.end_row;
-    src.start_row  = rect.start_row;
-    src.end_row    = rect.end_row - upward;
+  وإلا {
+    صحيح upward = -downward;
+    dest.شروع_ردیف = rect.شروع_ردیف + upward;
+    dest.انتها_ردیف   = rect.انتها_ردیف;
+    src.شروع_ردیف  = rect.شروع_ردیف;
+    src.انتها_ردیف    = rect.انتها_ردیف - upward;
   }
 
-  if(moverect)
+  إذا(moverect)
     (*moverect)(dest, src, user);
 
-  if(downward > 0)
-    rect.start_row = rect.end_row - downward;
-  else if(downward < 0)
-    rect.end_row = rect.start_row - downward;
+  إذا(downward > 0)
+    rect.شروع_ردیف = rect.انتها_ردیف - downward;
+  وإلا إذا(downward < 0)
+    rect.انتها_ردیف = rect.شروع_ردیف - downward;
 
-  if(rightward > 0)
-    rect.start_col = rect.end_col - rightward;
-  else if(rightward < 0)
-    rect.end_col = rect.start_col - rightward;
+  إذا(rightward > 0)
+    rect.شروع_ستون = rect.انتها_ستون - rightward;
+  وإلا إذا(rightward < 0)
+    rect.انتها_ستون = rect.شروع_ستون - rightward;
 
   (*eraserect)(rect, 0, user);
 }
 
-void vterm_copy_cells(VTermRect dest,
+فراغ vterm_copy_cells(VTermRect dest,
     VTermRect src,
-    void (*copycell)(VTermPos dest, VTermPos src, void *user),
-    void *user)
+    فراغ (*copycell)(VTermPos dest, VTermPos src, فراغ *user),
+    فراغ *user)
 {
-  int downward  = src.start_row - dest.start_row;
-  int rightward = src.start_col - dest.start_col;
+  صحيح downward  = src.شروع_ردیف - dest.شروع_ردیف;
+  صحيح rightward = src.شروع_ستون - dest.شروع_ستون;
 
-  int init_row, test_row, init_col, test_col;
-  int inc_row, inc_col;
+  صحيح init_ردیف, test_ردیف, init_ستون, test_ستون;
+  صحيح inc_ردیف, inc_ستون;
 
-  if(downward < 0) {
-    init_row = dest.end_row - 1;
-    test_row = dest.start_row - 1;
-    inc_row = -1;
+  إذا(downward < 0) {
+    init_ردیف = dest.انتها_ردیف - 1;
+    test_ردیف = dest.شروع_ردیف - 1;
+    inc_ردیف = -1;
   }
-  else /* downward >= 0 */ {
-    init_row = dest.start_row;
-    test_row = dest.end_row;
-    inc_row = +1;
+  وإلا /* downward >= 0 */ {
+    init_ردیف = dest.شروع_ردیف;
+    test_ردیف = dest.انتها_ردیف;
+    inc_ردیف = +1;
   }
 
-  if(rightward < 0) {
-    init_col = dest.end_col - 1;
-    test_col = dest.start_col - 1;
-    inc_col = -1;
+  إذا(rightward < 0) {
+    init_ستون = dest.انتها_ستون - 1;
+    test_ستون = dest.شروع_ستون - 1;
+    inc_ستون = -1;
   }
-  else /* rightward >= 0 */ {
-    init_col = dest.start_col;
-    test_col = dest.end_col;
-    inc_col = +1;
+  وإلا /* rightward >= 0 */ {
+    init_ستون = dest.شروع_ستون;
+    test_ستون = dest.انتها_ستون;
+    inc_ستون = +1;
   }
 
   VTermPos pos;
-  for(pos.row = init_row; pos.row != test_row; pos.row += inc_row)
-    for(pos.col = init_col; pos.col != test_col; pos.col += inc_col) {
+  لكل(pos.ردیف = init_ردیف; pos.ردیف != test_ردیف; pos.ردیف += inc_ردیف)
+    لكل(pos.ستون = init_ستون; pos.ستون != test_ستون; pos.ستون += inc_ستون) {
       VTermPos srcpos;
-      srcpos.row = pos.row + downward;
-      srcpos.col = pos.col + rightward;
+      srcpos.ردیف = pos.ردیف + downward;
+      srcpos.ستون = pos.ستون + rightward;
       (*copycell)(pos, srcpos, user);
     }
 }
 
-void vterm_check_version(int major, int minor)
+فراغ vterm_check_نسخه(صحيح major, صحيح minor)
 {
-  if(major != VTERM_VERSION_MAJOR) {
+  إذا(major != VTERM_نسخه_MAJOR) {
     fprintf(stderr, "libvterm major version mismatch; %d (wants) != %d (library)\n",
-        major, VTERM_VERSION_MAJOR);
-    exit(1);
+        major, VTERM_نسخه_MAJOR);
+    خروج(1);
   }
 
-  if(minor > VTERM_VERSION_MINOR) {
+  إذا(minor > VTERM_نسخه_MINOR) {
     fprintf(stderr, "libvterm minor version mismatch; %d (wants) > %d (library)\n",
-        minor, VTERM_VERSION_MINOR);
-    exit(1);
+        minor, VTERM_نسخه_MINOR);
+    خروج(1);
   }
 
   // Happy

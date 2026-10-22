@@ -11,65 +11,65 @@
  * PhAttach() is called in os_qnx.c:qnx_init()
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#ifdef FEAT_TOOLBAR
+#اگر_تعریف_شده FEAT_TOOLBAR
 # include <photon/PxImage.h>
-#endif
+#پایان_اگر
 
-#if !defined(__QNX__)
+#إذا !defined(__QNX__)
 // Used when generating prototypes.
-# define PgColor_t	int
-# define PhEvent_t	int
-# define PhPoint_t	int
-# define PtWidget_t	int
+# define PgColor_t	صحيح
+# define PhEvent_t	صحيح
+# define Ph_نقطه_t	صحيح
+# define PtWidget_t	صحيح
 # define Pg_BLACK	0
-# define PtCallbackF_t	int
-# define PtCallbackInfo_t int
-# define PhTile_t	int
-# define PtWidget_t	int
-# define PhImage_t	int
-#endif
+# define PtCallbackF_t	صحيح
+# define PtCallbackInfo_t صحيح
+# define PhTile_t	صحيح
+# define PtWidget_t	صحيح
+# define PhImage_t	صحيح
+#پایان_اگر
 
-#define RGB(r, g, b) PgRGB(r, g, b)
+#تعریف_کن RGB(r, g, b) PgRGB(r, g, b)
 
-#define EVENT_BUFFER_SIZE sizeof(PhEvent_t) + 1000
+#تعریف_کن EVENT_میانگیر_اندازه حجم(PhEvent_t) + 1000
 
 // Some defines for gui_mch_mousehide()
-#define MOUSE_HIDE		TRUE
-#define MOUSE_SHOW		FALSE
+#تعریف_کن MOUSE_HIDE		TRUE
+#تعریف_کن MOUSE_SHOW		FALSE
 
 // Optional support for using a PtPanelGroup widget, needs work
-#undef USE_PANEL_GROUP
+#لغو_تعریف USE_PANEL_گروه
 
-#ifdef USE_PANEL_GROUP
-static char	*empty_title = "    ";
-static char	**panel_titles = NULL;
-static ushort_t	num_panels = 0;
-static short pg_margin_left, pg_margin_right, pg_margin_top, pg_margin_bottom;
-#endif
+#اگر_تعریف_شده USE_PANEL_گروه
+ساكن حرف	*خالی_title = "    ";
+ساكن حرف	**panel_titles = عدم;
+ساكن ushort_t	رقم_panels = 0;
+ساكن کوتاه pg_margin_چپ, pg_margin_راست, pg_margin_بالاترین, pg_margin_bottom;
+#پایان_اگر
 
-#define GUI_PH_MARGIN		4	// Size of the bevel
+#تعریف_کن GUI_PH_MARGIN		4	// Size of the bevel
 
-#define GUI_PH_MOUSE_TYPE		Ph_CURSOR_INSERT
-static PgColor_t gui_ph_mouse_color =	Pg_BLACK;
+#تعریف_کن GUI_PH_MOUSE_TYPE		Ph_CURSOR_درج
+ساكن PgColor_t gui_ph_mouse_color =	Pg_BLACK;
 
-static PhPoint_t    gui_ph_raw_offset;
-static PtWidget_t   *gui_ph_timer_cursor;   // handle cursor blinking
-static PtWidget_t   *gui_ph_timer_timeout;  // used in gui_mch_wait_for_chars
-static short	    is_timeout;		    // Has the timeout occurred?
+ساكن Ph_نقطه_t    gui_ph_raw_جابه_جایی;
+ساكن PtWidget_t   *gui_ph_timer_cursor;   // handle cursor blinking
+ساكن PtWidget_t   *gui_ph_timer_timeout;  // used in gui_mch_wait_for_chars
+ساكن کوتاه	    is_timeout;		    // Has the timeout occurred?
 
 /*
  * This is set inside the mouse callback for a right mouse
  * button click, and used for the popup menus
  */
-static PhPoint_t    abs_mouse;
+ساكن Ph_نقطه_t    abs_mouse;
 
 // Try and avoid redraws while a resize is in progress
-static int is_ignore_draw = FALSE;
+ساكن صحيح is_ignore_draw = FALSE;
 
 // Used for converting to/from utf-8 and other charsets
-static struct PxTransCtrl *charset_translate;
+ساكن بنية PxTransCtrl *charset_translate;
 
 /*
  * Cursor blink functions.
@@ -79,27 +79,27 @@ static struct PxTransCtrl *charset_translate;
  * BLINK_OFF	blinking, cursor is not shown
  * BLINK_ON	blinking, cursor is shown
  */
-static enum {
+ساكن تعداد {
     BLINK_NONE,
     BLINK_OFF,
     BLINK_ON
 } blink_state = BLINK_NONE;
 
-static long_u	blink_waittime	= 700;
-static long_u	blink_ontime	= 400;
-static long_u	blink_offtime	= 250;
+ساكن long_u	blink_waittime	= 700;
+ساكن long_u	blink_ontime	= 400;
+ساكن long_u	blink_offtime	= 250;
 
-static struct
+ساكن بنية
 {
-    int	    key_sym;
+    صحيح	    کلید_sym;
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_کلیدها[] =
 {
-    {Pk_Up,	    'k', 'u'},
-    {Pk_Down,	    'k', 'd'},
-    {Pk_Left,	    'k', 'l'},
-    {Pk_Right,	    'k', 'r'},
+    {Pk_به_بالا,	    'k', 'u'},
+    {Pk_پایین,	    'k', 'd'},
+    {Pk_چپ,	    'k', 'l'},
+    {Pk_راست,	    'k', 'r'},
 
     {Pk_F1,	    'k', '1'},
     {Pk_F2,	    'k', '2'},
@@ -141,22 +141,22 @@ static struct
     {Pk_F35,	    'F', 'P'},
 
     {Pk_Help,	    '%', '1'},
-    {Pk_BackSpace,  'k', 'b'},
-    {Pk_Insert,	    'k', 'I'},
+    {Pk_پشت_Space,  'k', 'b'},
+    {Pk_درج,	    'k', 'I'},
     {Pk_Delete,	    'k', 'D'},
     {Pk_Home,	    'k', 'h'},
-    {Pk_End,	    '@', '7'},
-    {Pk_Prior,	    'k', 'P'},
-    {Pk_Next,	    'k', 'N'},
+    {Pk_انتها,	    '@', '7'},
+    {Pk_پیشین,	    'k', 'P'},
+    {Pk_بعدی,	    'k', 'N'},
     {Pk_Print,	    '%', '9'},
 
-    {Pk_KP_Add,	    'K', '6'},
-    {Pk_KP_Subtract,'K', '7'},
+    {Pk_KP_جمع_کن,	    'K', '6'},
+    {Pk_KP_تفریق,'K', '7'},
     {Pk_KP_Divide,  'K', '8'},
     {Pk_KP_Multiply,'K', '9'},
     {Pk_KP_Enter,   'K', 'A'},
 
-    {Pk_KP_0,	    KS_EXTRA, KE_KINS}, // Insert
+    {Pk_KP_0,	    KS_EXTRA, KE_KINS}, //درج
     {Pk_KP_Decimal, KS_EXTRA, KE_KDEL}, // Delete
 
     {Pk_KP_4,	    'k', 'l'}, // Left
@@ -165,7 +165,7 @@ static struct
     {Pk_KP_2,	    'k', 'd'}, // Down
 
     {Pk_KP_7,	    'K', '1'}, // Home
-    {Pk_KP_1,	    'K', '4'}, // End
+    {Pk_KP_1,	    'K', '4'}, //انتها
 
     {Pk_KP_9,	    'K', '3'}, // Page Up
     {Pk_KP_3,	    'K', '5'}, // Page Down
@@ -187,454 +187,454 @@ static struct
 
 ////////////////////////////////////////////////////////////////////////////
 
-static PtCallbackF_t gui_ph_handle_timer_cursor;
-static PtCallbackF_t gui_ph_handle_timer_timeout;
+ساكن PtCallbackF_t gui_ph_handle_timer_cursor;
+ساكن PtCallbackF_t gui_ph_handle_timer_timeout;
 
-static PtCallbackF_t gui_ph_handle_window_cb;
+ساكن PtCallbackF_t gui_ph_handle_پنجره_cb;
 
-static PtCallbackF_t gui_ph_handle_scrollbar;
-static PtCallbackF_t gui_ph_handle_keyboard;
-static PtCallbackF_t gui_ph_handle_mouse;
-static PtCallbackF_t gui_ph_handle_pulldown_menu;
-static PtCallbackF_t gui_ph_handle_menu;
-static PtCallbackF_t gui_ph_handle_focus;	// focus change of text area
+ساكن PtCallbackF_t gui_ph_handle_scrollbar;
+ساكن PtCallbackF_t gui_ph_handle_keyboard;
+ساكن PtCallbackF_t gui_ph_handle_mouse;
+ساكن PtCallbackF_t gui_ph_handle_pulldown_menu;
+ساكن PtCallbackF_t gui_ph_handle_menu;
+ساكن PtCallbackF_t gui_ph_handle_focus;	// focus change of text area
 
-static PtCallbackF_t gui_ph_handle_menu_resize;
+ساكن PtCallbackF_t gui_ph_handle_menu_resize;
 
 // When a menu is unrealized, give focus back to vimTextArea
-static PtCallbackF_t gui_ph_handle_menu_unrealized;
+ساكن PtCallbackF_t gui_ph_handle_menu_unrealized;
 
-#ifdef USE_PANEL_GROUP
-static void gui_ph_get_panelgroup_margins(short*, short*, short*, short*);
-#endif
+#اگر_تعریف_شده USE_PANEL_گروه
+ساكن فراغ gui_ph_get_panelgroup_margins(کوتاه*, کوتاه*, کوتاه*, کوتاه*);
+#پایان_اگر
 
-static void gui_ph_draw_start(void);
-static void gui_ph_draw_end(void);
+ساكن فراغ gui_ph_draw_شروع(فراغ);
+ساكن فراغ gui_ph_draw_انتها(فراغ);
 
 // Set the text for the balloon
-static PtWidget_t * gui_ph_show_tooltip(PtWidget_t *window,
+ساكن PtWidget_t * gui_ph_show_tooltip(PtWidget_t *پنجره_2,
 			     PtWidget_t *widget,
-			     int position,
-			     char *text,
-			     char *font,
+			     صحيح position,
+			     حرف *متن,
+			     حرف *font,
 			     PgColor_t fill_color,
-			     PgColor_t text_color);
+			     PgColor_t متن_color);
 
 ////////////////////////////////////////////////////////////////////////////
 
-static PtWidget_t * gui_ph_show_tooltip(PtWidget_t *window,
+ساكن PtWidget_t * gui_ph_show_tooltip(PtWidget_t *پنجره_2,
 			     PtWidget_t *widget,
-			     int position,
-			     char *text,
-			     char *font,
+			     صحيح position,
+			     حرف *متن,
+			     حرف *font,
 			     PgColor_t fill_color,
-			     PgColor_t text_color)
+			     PgColor_t متن_color)
 {
     PtArg_t arg;
     vimmenu_T *menu;
     char_u  *tooltip;
 
-    PtSetArg(&arg, Pt_ARG_POINTER, &menu, 0);
+    Pt_مجموعه_Arg(&arg, Pt_ARG_اشاره_گر, &menu, 0);
     PtGetResources(widget, 1, &arg);
 
     // Override the text and position
 
-    tooltip = text;
-    if (menu != NULL)
+    tooltip = متن;
+    إذا (menu != عدم)
     {
-	int index = MENU_INDEX_TIP;
-	if (menu->strings[ index ] != NULL)
-	    tooltip = menu->strings[ index ];
+	صحيح شاخص = MENU_شاخص_TIP;
+	إذا (menu->رشتهها[ شاخص ] != عدم)
+	    tooltip = menu->رشتهها[ شاخص ];
     }
 
-    return PtInflateBalloon(
-	    window,
+    أرجع PtInflateBalloon(
+	    پنجره_2,
 	    widget,
 	    // Don't put the balloon at the bottom,
 	    // it gets drawn over by gfx done in the PtRaw
-	    Pt_BALLOON_TOP,
+	    Pt_BALLOON_بالاترین,
 	    tooltip,
 	    font,
 	    fill_color,
-	    text_color);
+	    متن_color);
 }
 
-    static void
-gui_ph_resize_container(void)
+    ساكن فراغ
+gui_ph_resize_container(فراغ)
 {
     PhArea_t area;
 
-    PtWidgetArea(gui.vimWindow, &area);
+    PtWidgetArea(gui.vim_پنجره, &area);
     PtWidgetPos (gui.vimContainer, &area.pos);
 
-    PtSetResource(gui.vimContainer, Pt_ARG_AREA, &area, 0);
+    Pt_مجموعه_Resource(gui.vimContainer, Pt_ARG_AREA, &area, 0);
 }
 
-    static int
+    ساكن صحيح
 gui_ph_handle_menu_resize(
 	PtWidget_t *widget,
-	void *other,
+	فراغ *other,
 	PtCallbackInfo_t *info)
 {
     PtContainerCallback_t *sizes = info->cbdata;
     PtWidget_t		*container;
-    PhPoint_t		below_menu;
-    int_u		height;
+    Ph_نقطه_t		زیر_menu;
+    int_u		ارتفاع;
 
-    height = sizes->new_dim.h;
+    ارتفاع = sizes->new_dim.h;
 
     // Because vim treats the toolbar and menubar separately,
     // and here they're lumped together into a PtToolbarGroup,
     // we only need either menu_height or toolbar_height set at once
-    if (gui.menu_is_active)
+    إذا (gui.menu_is_فعال)
     {
-	gui.menu_height = height;
-	gui.toolbar_height = 0;
+	gui.menu_ارتفاع = ارتفاع;
+	gui.toolbar_ارتفاع = 0;
     }
-#ifdef FEAT_TOOLBAR
-    else
-	gui.toolbar_height = height;
-#endif
+#اگر_تعریف_شده FEAT_TOOLBAR
+    وإلا
+	gui.toolbar_ارتفاع = ارتفاع;
+#پایان_اگر
 
-    below_menu.x = 0;
-    below_menu.y = height;
+    زیر_menu.x = 0;
+    زیر_menu.y = ارتفاع;
 
-#ifdef USE_PANEL_GROUP
-    container = gui.vimPanelGroup;
-#else
+#اگر_تعریف_شده USE_PANEL_گروه
+    container = gui.vim_Panel_گروه;
+#وإلا
     container = gui.vimContainer;
-#endif
+#پایان_اگر
 
-    PtSetResource(container, Pt_ARG_POS, &below_menu, 0);
+    Pt_مجموعه_Resource(container, Pt_ARG_POS, &زیر_menu, 0);
 
     gui_ph_resize_container();
 
-#ifdef USE_PANEL_GROUP
+#اگر_تعریف_شده USE_PANEL_گروه
     gui_ph_get_panelgroup_margins(
-	    &pg_margin_top, &pg_margin_bottom,
-	    &pg_margin_left, &pg_margin_right);
-#endif
-    return Pt_CONTINUE;
+	    &pg_margin_بالاترین, &pg_margin_bottom,
+	    &pg_margin_چپ, &pg_margin_راست);
+#پایان_اگر
+    أرجع Pt_CONTINUE;
 }
 
 /*
  * Pt_ARG_TIMER_REPEAT isn't used because the on & off times
  * are different
  */
-    static int
+    ساكن صحيح
 gui_ph_handle_timer_cursor(
 	PtWidget_t *widget,
-	void *data,
+	فراغ *داده,
 	PtCallbackInfo_t *info)
 {
-    if (blink_state == BLINK_ON)
+    إذا (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
-	PtSetResource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
+	Pt_مجموعه_Resource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
 		blink_offtime, 0);
     }
-    else
+    وإلا
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
-	PtSetResource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
+	Pt_مجموعه_Resource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
 		blink_ontime, 0);
     }
-    return Pt_CONTINUE;
+    أرجع Pt_CONTINUE;
 }
 
-    static int
+    ساكن صحيح
 gui_ph_handle_timer_timeout(
     PtWidget_t		*widget,
-    void		*data,
+    فراغ		*داده,
     PtCallbackInfo_t	*info)
 {
     is_timeout = TRUE;
 
-    return Pt_CONTINUE;
+    أرجع Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_window_cb(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ساكن صحيح
+gui_ph_handle_پنجره_cb(PtWidget_t *widget, فراغ *داده, PtCallbackInfo_t *info)
 {
-    PhWindowEvent_t *we = info->cbdata;
-    ushort_t *width, *height;
+    Ph_پنجره_Event_t *we = info->cbdata;
+    ushort_t *عرض, *ارتفاع;
 
-    switch (we->event_f)
+    بدل (we->event_f)
     {
-	case Ph_WM_CLOSE:
+	حالة Ph_WM_CLOSE:
 	    gui_shell_closed();
-	    break;
+	    اكسر;
 
-	case Ph_WM_FOCUS:
+	حالة Ph_WM_FOCUS:
 	    // Just in case it's hidden and needs to be shown
 	    gui_mch_mousehide(MOUSE_SHOW);
 
-	    if (we->event_state == Ph_WM_EVSTATE_FOCUS)
+	    إذا (we->event_state == Ph_WM_EVSTATE_FOCUS)
 	    {
 		gui_focus_change(TRUE);
-		gui_mch_start_blink();
+		gui_mch_شروع_blink();
 	    }
-	    else
+	    وإلا
 	    {
 		gui_focus_change(FALSE);
 		gui_mch_stop_blink(TRUE);
 	    }
-	    break;
+	    اكسر;
 
-	case Ph_WM_RESIZE:
-	    PtGetResource(gui.vimWindow, Pt_ARG_WIDTH, &width, 0);
-	    PtGetResource(gui.vimWindow, Pt_ARG_HEIGHT, &height, 0);
-#ifdef USE_PANEL_GROUP
-	    width  -= (pg_margin_left + pg_margin_right);
-	    height -= (pg_margin_top + pg_margin_bottom);
-#endif
-	    gui_resize_shell(*width, *height);
-	    gui_set_shellsize(FALSE, FALSE, RESIZE_BOTH);
+	حالة Ph_WM_RESIZE:
+	    PtGetResource(gui.vim_پنجره, Pt_ARG_عرض, &عرض, 0);
+	    PtGetResource(gui.vim_پنجره, Pt_ARG_ارتفاع, &ارتفاع, 0);
+#اگر_تعریف_شده USE_PANEL_گروه
+	    عرض  -= (pg_margin_چپ + pg_margin_راست);
+	    ارتفاع -= (pg_margin_بالاترین + pg_margin_bottom);
+#پایان_اگر
+	    gui_resize_shell(*عرض, *ارتفاع);
+	    gui_مجموعه_shellsize(FALSE, FALSE, RESIZE_BOTH);
 	    is_ignore_draw = FALSE;
-	    PtEndFlux(gui.vimContainer);
+	    Pt_انتها_Flux(gui.vimContainer);
 	    PtContainerRelease(gui.vimContainer);
-	    break;
+	    اكسر;
 
-	default:
-	    break;
+	افتراضي:
+	    اكسر;
     }
 
-    return Pt_CONTINUE;
+    أرجع Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_scrollbar(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ساكن صحيح
+gui_ph_handle_scrollbar(PtWidget_t *widget, فراغ *داده, PtCallbackInfo_t *info)
 {
     PtScrollbarCallback_t *scroll;
     scrollbar_T *sb;
-    int	    value, dragging = FALSE;
+    صحيح	    مقدار, dragging = FALSE;
 
     scroll = info->cbdata;
 
-    sb = (scrollbar_T *) data;
-    if (sb != NULL)
+    sb = (scrollbar_T *) داده;
+    إذا (sb != عدم)
     {
-	value = scroll->position;
-	switch (scroll->action)
+	مقدار = scroll->position;
+	بدل (scroll->action)
 	{
-	    case Pt_SCROLL_DRAGGED:
+	    حالة Pt_SCROLL_DRAGGED:
 		dragging = TRUE;
-		break;
+		اكسر;
 
-	    case Pt_SCROLL_SET:
+	    حالة Pt_SCROLL_مجموعه:
 		// FIXME: return straight away here?
-		return Pt_CONTINUE;
-		break;
+		أرجع Pt_CONTINUE;
+		اكسر;
 	}
 
-	gui_drag_scrollbar(sb, value, dragging);
+	gui_drag_scrollbar(sb, مقدار, dragging);
     }
-    return Pt_CONTINUE;
+    أرجع Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_keyboard(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ساكن صحيح
+gui_ph_handle_keyboard(PtWidget_t *widget, فراغ *داده, PtCallbackInfo_t *info)
 {
-    PhKeyEvent_t    *key;
-    unsigned char   string[6];
-    int		    len, i;
-    int		    ch, modifiers;
+    Ph_کلید_Event_t    *کلید;
+    بیعلامت حرف   string[6];
+    صحيح		    len, i;
+    صحيح		    ch, modifiers;
 
-    key = PhGetData(info->event);
+    کلید = Ph_Get_داده(info->event);
 
     ch = modifiers = len = 0;
 
-    if (p_mh)
+    إذا (p_mh)
 	gui_mch_mousehide(MOUSE_HIDE);
 
     // We're a good lil photon program, aren't we? yes we are, yeess wee arrr
-    if (key->key_flags & Pk_KF_Compose)
-	return Pt_CONTINUE;
+    إذا (کلید->کلید_flags & Pk_KF_Compose)
+	أرجع Pt_CONTINUE;
 
-    if ((key->key_flags & Pk_KF_Cap_Valid) &&
-	    PkIsKeyDown(key->key_flags))
+    إذا ((کلید->کلید_flags & Pk_KF_Cap_Valid) &&
+	    Pk_Is_کلید_پایین(کلید->کلید_flags))
     {
-#ifdef FEAT_MENU
+#اگر_تعریف_شده FEAT_MENU
 	/*
 	 * Only show the menu if the Alt key is down, and the Shift & Ctrl
 	 * keys aren't down, as well as the other conditions
 	 */
-	if (((key->key_mods & Pk_KM_Alt) &&
-		    !(key->key_mods & Pk_KM_Shift) &&
-		    !(key->key_mods & Pk_KM_Ctrl)) &&
-	    gui.menu_is_active &&
+	إذا (((کلید->کلید_mods & Pk_KM_Alt) &&
+		    !(کلید->کلید_mods & Pk_KM_لغزش) &&
+		    !(کلید->کلید_mods & Pk_KM_Ctrl)) &&
+	    gui.menu_is_فعال &&
 	    (*p_wak == 'y' ||
 	      (*p_wak == 'm' &&
-		gui_is_menu_shortcut(key->key_cap))))
+		gui_is_menu_shortcut(کلید->کلید_cap))))
 	{
 	    // Fallthrough and let photon look for the hotkey
-	    return Pt_CONTINUE;
+	    أرجع Pt_CONTINUE;
 	}
-#endif
+#پایان_اگر
 
-	for (i = 0; special_keys[i].key_sym != 0; i++)
+	لكل (i = 0; special_کلیدها[i].کلید_sym != 0; i++)
 	{
-	    if (special_keys[i].key_sym == key->key_cap)
+	    إذا (special_کلیدها[i].کلید_sym == کلید->کلید_cap)
 	    {
 		len = 0;
-		if (special_keys[i].vim_code1 == NUL)
-		    ch = special_keys[i].vim_code0;
-		else
+		إذا (special_کلیدها[i].vim_code1 == NUL)
+		    ch = special_کلیدها[i].vim_code0;
+		وإلا
 		{
 		    // Detect if a keypad number key has been pressed
 		    // and change the key if Num Lock is on
-		    if (key->key_cap >= Pk_KP_Enter && key->key_cap <= Pk_KP_9
-			    && (key->key_mods & Pk_KM_Num_Lock))
+		    إذا (کلید->کلید_cap >= Pk_KP_Enter && کلید->کلید_cap <= Pk_KP_9
+			    && (کلید->کلید_mods & Pk_KM_رقم_قفل))
 		    {
 			// FIXME: For now, just map the key to an ascii value
 			// (see <photon/PkKeyDef.h>)
-			ch = key->key_cap - 0xf080;
+			ch = کلید->کلید_cap - 0xf080;
 		    }
-		    else
-			ch = TO_SPECIAL(special_keys[i].vim_code0,
-				special_keys[i].vim_code1);
+		    وإلا
+			ch = مقصد_SPECIAL(special_کلیدها[i].vim_code0,
+				special_کلیدها[i].vim_code1);
 		}
-		break;
+		اكسر;
 	    }
 	}
 
-	if (key->key_mods & Pk_KM_Ctrl)
-	    modifiers |= MOD_MASK_CTRL;
-	if (key->key_mods & Pk_KM_Alt)
-	    modifiers |= MOD_MASK_ALT;
-	if (key->key_mods & Pk_KM_Shift)
-	    modifiers |= MOD_MASK_SHIFT;
+	إذا (کلید->کلید_mods & Pk_KM_Ctrl)
+	    modifiers |= MOD_ماسک_CTRL;
+	إذا (کلید->کلید_mods & Pk_KM_Alt)
+	    modifiers |= MOD_ماسک_ALT;
+	إذا (کلید->کلید_mods & Pk_KM_لغزش)
+	    modifiers |= MOD_ماسک_لغزش;
 
 	// Is this not a special key?
-	if (special_keys[i].key_sym == 0)
+	إذا (special_کلیدها[i].کلید_sym == 0)
 	{
-	    ch = PhTo8859_1(key);
-	    if (ch == -1 || (enc_utf8 && ch > 127))
+	    ch = PhTo8859_1(کلید);
+	    إذا (ch == -1 || (enc_utf8 && ch > 127))
 	    {
-		len = PhKeyToMb(string, key);
-		if (len > 0)
+		len = Ph_کلید_مقصد_Mb(string, کلید);
+		إذا (len > 0)
 		{
-		    static char buf[6];
-		    int src_taken, dst_made;
-		    if (enc_utf8 != TRUE)
+		    ساكن حرف buf[6];
+		    صحيح src_گرفته, dst_made;
+		    إذا (enc_utf8 != TRUE)
 		    {
 			PxTranslateFromUTF(
 				charset_translate,
 				string,
 				len,
-				&src_taken,
+				&src_گرفته,
 				buf,
 				6,
 				&dst_made);
 
-			add_to_input_buf(buf, dst_made);
+			جمع_کن_مقصد_درون_داد_buf(buf, dst_made);
 		    }
-		    else
+		    وإلا
 		    {
-			add_to_input_buf(string, len);
+			جمع_کن_مقصد_درون_داد_buf(string, len);
 		    }
 
-		    return Pt_CONSUME;
+		    أرجع Pt_CONSUME;
 		}
 		len = 0;
-		ch = key->key_cap;
-		if (ch < 0xff)
+		ch = کلید->کلید_cap;
+		إذا (ch < 0xff)
 		{
 		    // FIXME: is this the right thing to do?
-		    if (modifiers & MOD_MASK_CTRL)
+		    إذا (modifiers & MOD_ماسک_CTRL)
 		    {
-			modifiers &= ~MOD_MASK_CTRL;
+			modifiers &= ~MOD_ماسک_CTRL;
 
-			if ((ch >= 'a' && ch <= 'z') ||
+			إذا ((ch >= 'a' && ch <= 'z') ||
 				ch == '[' ||
 				ch == ']' ||
 				ch == '\\')
 			    ch = Ctrl_chr(ch);
-			else if (ch == '2')
+			وإلا إذا (ch == '2')
 			    ch = NUL;
-			else if (ch == '6')
+			وإلا إذا (ch == '6')
 			    ch = 0x1e;
-			else if (ch == '-')
+			وإلا إذا (ch == '-')
 			    ch = 0x1f;
-			else
-			    modifiers |= MOD_MASK_CTRL;
+			وإلا
+			    modifiers |= MOD_ماسک_CTRL;
 		    }
 
-		    if (modifiers & MOD_MASK_ALT)
+		    إذا (modifiers & MOD_ماسک_ALT)
 		    {
 			ch = Meta(ch);
-			modifiers &= ~MOD_MASK_ALT;
+			modifiers &= ~MOD_ماسک_ALT;
 		    }
 		}
-		else
+		وإلا
 		{
-		    return Pt_CONTINUE;
+		    أرجع Pt_CONTINUE;
 		}
 	    }
-	    else
-		modifiers &= ~MOD_MASK_SHIFT;
+	    وإلا
+		modifiers &= ~MOD_ماسک_لغزش;
 	}
 
-	ch = simplify_key(ch, &modifiers);
-	if (modifiers)
+	ch = simplify_کلید(ch, &modifiers);
+	إذا (modifiers)
 	{
 	    string[ len++ ] = CSI;
 	    string[ len++ ] = KS_MODIFIER;
 	    string[ len++ ] = modifiers;
 	}
 
-	if (IS_SPECIAL(ch))
+	إذا (IS_SPECIAL(ch))
 	{
 	    string[ len++ ] = CSI;
-	    string[ len++ ] = K_SECOND(ch);
-	    string[ len++ ] = K_THIRD(ch);
+	    string[ len++ ] = K_دومی(ch);
+	    string[ len++ ] = K_سوم(ch);
 	}
-	else
+	وإلا
 	{
 	    string[ len++ ] = ch;
 	}
 
 	// Check if the key interrupts.
 	{
-	    int int_ch = check_for_interrupt(ch, modifiers);
+	    صحيح int_ch = check_for_وقفه(ch, modifiers);
 
-	    if (int_ch != NUL)
+	    إذا (int_ch != NUL)
 	    {
 		ch = int_ch;
 		string[0] = ch;
 		len = 1;
-		trash_input_buf();
+		trash_درون_داد_buf();
 	    }
 	}
 
-	if (len == 1 && string[0] == CSI)
+	إذا (len == 1 && string[0] == CSI)
 	{
 	    // Turn CSI into K_CSI.
 	    string[ len++ ] = KS_EXTRA;
 	    string[ len++ ] = KE_CSI;
 	}
 
-	if (len > 0)
+	إذا (len > 0)
 	{
-	    add_to_input_buf(string, len);
-	    return Pt_CONSUME;
+	    جمع_کن_مقصد_درون_داد_buf(string, len);
+	    أرجع Pt_CONSUME;
 	}
     }
 
-    return Pt_CONTINUE;
+    أرجع Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_mouse(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ساكن صحيح
+gui_ph_handle_mouse(PtWidget_t *widget, فراغ *داده, PtCallbackInfo_t *info)
 {
-    PhPointerEvent_t *pointer;
+    Ph_اشاره_گر_Event_t *اشاره_گر;
     PhRect_t	     *pos;
-    int		     button = 0, repeated_click, modifiers = 0x0;
-    short	     mouse_x, mouse_y;
+    صحيح		     button = 0, repeated_click, modifiers = 0x0;
+    کوتاه	     mouse_x, mouse_y;
 
-    pointer = PhGetData(info->event);
+    اشاره_گر = Ph_Get_داده(info->event);
     pos = PhGetRects(info->event);
 
     gui_mch_mousehide(MOUSE_SHOW);
@@ -643,101 +643,101 @@ gui_ph_handle_mouse(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
      * Coordinates need to be relative to the base window,
      * not relative to the vimTextArea widget
      */
-    mouse_x = pos->ul.x + gui.border_width;
-    mouse_y = pos->ul.y + gui.border_width;
+    mouse_x = pos->ul.x + gui.border_عرض;
+    mouse_y = pos->ul.y + gui.border_عرض;
 
-    if (info->event->type == Ph_EV_PTR_MOTION_NOBUTTON)
+    إذا (info->event->type == Ph_EV_PTR_MOTION_NOBUTTON)
     {
 	gui_mouse_moved(mouse_x, mouse_y);
-	return Pt_CONTINUE;
+	أرجع Pt_CONTINUE;
     }
 
-    if (pointer->key_mods & Pk_KM_Shift)
-	modifiers |= MOUSE_SHIFT;
-    if (pointer->key_mods & Pk_KM_Ctrl)
+    إذا (اشاره_گر->کلید_mods & Pk_KM_لغزش)
+	modifiers |= MOUSE_لغزش;
+    إذا (اشاره_گر->کلید_mods & Pk_KM_Ctrl)
 	modifiers |= MOUSE_CTRL;
-    if (pointer->key_mods & Pk_KM_Alt)
+    إذا (اشاره_گر->کلید_mods & Pk_KM_Alt)
 	modifiers |= MOUSE_ALT;
 
     /*
      * FIXME More than one button may be involved, but for
      * now just deal with one
      */
-    if (pointer->buttons & Ph_BUTTON_SELECT)
-	button = MOUSE_LEFT;
+    إذا (اشاره_گر->buttons & Ph_BUTTON_SELECT)
+	button = MOUSE_چپ;
 
-    if (pointer->buttons & Ph_BUTTON_MENU)
+    إذا (اشاره_گر->buttons & Ph_BUTTON_MENU)
     {
-	button = MOUSE_RIGHT;
+	button = MOUSE_راست;
 	// Need the absolute coordinates for the popup menu
-	abs_mouse.x = pointer->pos.x;
-	abs_mouse.y = pointer->pos.y;
+	abs_mouse.x = اشاره_گر->pos.x;
+	abs_mouse.y = اشاره_گر->pos.y;
     }
 
-    if (pointer->buttons & Ph_BUTTON_ADJUST)
-	button = MOUSE_MIDDLE;
+    إذا (اشاره_گر->buttons & Ph_BUTTON_ADJUST)
+	button = MOUSE_میانه;
 
     // Catch a real release (not phantom or other releases
-    if (info->event->type == Ph_EV_BUT_RELEASE)
+    إذا (info->event->type == Ph_EV_BUT_RELEASE)
 	button = MOUSE_RELEASE;
 
-    if (info->event->type & Ph_EV_PTR_MOTION_BUTTON)
+    إذا (info->event->type & Ph_EV_PTR_MOTION_BUTTON)
 	button = MOUSE_DRAG;
 
-#if 0
+#إذا 0
     // Vim doesn't use button repeats
-    if (info->event->type & Ph_EV_BUT_REPEAT)
+    إذا (info->event->type & Ph_EV_BUT_REPEAT)
 	button = MOUSE_DRAG;
-#endif
+#پایان_اگر
 
     // Don't do anything if it is one of the phantom mouse release events
-    if ((button != MOUSE_RELEASE) ||
+    إذا ((button != MOUSE_RELEASE) ||
 	    (info->event->subtype == Ph_EV_RELEASE_REAL))
     {
-	repeated_click = (pointer->click_count >= 2) ? TRUE : FALSE;
+	repeated_click = (اشاره_گر->click_شمار >= 2) ? TRUE : FALSE;
 
 	gui_send_mouse_event(button , mouse_x, mouse_y, repeated_click, modifiers);
     }
 
-    return Pt_CONTINUE;
+    أرجع Pt_CONTINUE;
 }
 
 /*
  * Handle a focus change of the PtRaw widget
  */
-    static int
-gui_ph_handle_focus(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ساكن صحيح
+gui_ph_handle_focus(PtWidget_t *widget, فراغ *داده, PtCallbackInfo_t *info)
 {
-    if (info->reason == Pt_CB_LOST_FOCUS)
+    إذا (info->reason == Pt_CB_گمشده_FOCUS)
     {
-	PtRemoveEventHandler(gui.vimTextArea, Ph_EV_PTR_MOTION_NOBUTTON,
-		gui_ph_handle_mouse, NULL);
+	PtRemoveEventHandler(gui.vim_متن_Area, Ph_EV_PTR_MOTION_NOBUTTON,
+		gui_ph_handle_mouse, عدم);
 
 	gui_mch_mousehide(MOUSE_SHOW);
     }
-    else
+    وإلا
     {
-	PtAddEventHandler(gui.vimTextArea, Ph_EV_PTR_MOTION_NOBUTTON,
-		gui_ph_handle_mouse, NULL);
+	Pt_جمع_کن_Event_Handler(gui.vim_متن_Area, Ph_EV_PTR_MOTION_NOBUTTON,
+		gui_ph_handle_mouse, عدم);
     }
-    return Pt_CONTINUE;
+    أرجع Pt_CONTINUE;
 }
 
-    static void
+    ساكن فراغ
 gui_ph_handle_raw_draw(PtWidget_t *widget, PhTile_t *damage)
 {
     PhRect_t	*r;
-    PhPoint_t	offset;
-    PhPoint_t	translation;
+    Ph_نقطه_t	جابه_جایی;
+    Ph_نقطه_t	translation;
 
-    if (is_ignore_draw == TRUE)
-	return;
+    إذا (is_ignore_draw == TRUE)
+	أرجع;
 
     PtSuperClassDraw(PtBasic, widget, damage);
     PgGetTranslation(&translation);
     PgClearTranslation();
 
-#if 0
+#إذا 0
     /*
      * This causes some weird problems, with drawing being done from
      * within this raw drawing function (rather than just simple clearing
@@ -746,300 +746,300 @@ gui_ph_handle_raw_draw(PtWidget_t *widget, PhTile_t *damage)
      * The main problem is when PhBlit is used, and the cursor appearing
      * in places where it shouldn't
      */
-    out_flush();
-#endif
+    بیرون_flush();
+#پایان_اگر
 
-    PtWidgetOffset(widget, &offset);
-    PhTranslatePoint(&offset, PtWidgetPos(gui.vimTextArea, NULL));
+    Pt_Widget_جابه_جایی(widget, &جابه_جایی);
+    Ph_Translate_نقطه(&جابه_جایی, PtWidgetPos(gui.vim_متن_Area, عدم));
 
-#if 1
+#إذا 1
     // Redraw individual damage regions
-    if (damage->next != NULL)
-	damage = damage->next;
+    إذا (damage->بعدی != عدم)
+	damage = damage->بعدی;
 
-    while (damage != NULL)
+    طالما (damage != عدم)
     {
 	r = &damage->rect;
 	gui_redraw(
-		r->ul.x - offset.x, r->ul.y - offset.y,
+		r->ul.x - جابه_جایی.x, r->ul.y - جابه_جایی.y,
 		r->lr.x - r->ul.x + 1,
 		r->lr.y - r->ul.y + 1);
-	damage = damage->next;
+	damage = damage->بعدی;
     }
-#else
+#وإلا
     // Redraw the rectangle that covers all the damaged regions
     r = &damage->rect;
     gui_redraw(
-	    r->ul.x - offset.x, r->ul.y - offset.y,
+	    r->ul.x - جابه_جایی.x, r->ul.y - جابه_جایی.y,
 	    r->lr.x - r->ul.x + 1,
 	    r->lr.y - r->ul.y + 1);
-#endif
+#پایان_اگر
 
-    PgSetTranslation(&translation, 0);
+    Pg_مجموعه_Translation(&translation, 0);
 }
 
-    static int
+    ساكن صحيح
 gui_ph_handle_pulldown_menu(
 	PtWidget_t *widget,
-	void *data,
+	فراغ *داده,
 	PtCallbackInfo_t *info)
 {
-    if (data != NULL)
+    إذا (داده != عدم)
     {
-	vimmenu_T *menu = (vimmenu_T *) data;
+	vimmenu_T *menu = (vimmenu_T *) داده;
 
-	PtPositionMenu(menu->submenu_id, NULL);
+	PtPositionMenu(menu->submenu_id, عدم);
 	PtRealizeWidget(menu->submenu_id);
     }
 
-    return Pt_CONTINUE;
+    أرجع Pt_CONTINUE;
 }
 
 /*
  * This is used for pulldown/popup menus and also toolbar buttons
  */
-    static int
-gui_ph_handle_menu(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ساكن صحيح
+gui_ph_handle_menu(PtWidget_t *widget, فراغ *داده, PtCallbackInfo_t *info)
 {
-    if (data != NULL)
+    إذا (داده != عدم)
     {
-	vimmenu_T *menu = (vimmenu_T *) data;
+	vimmenu_T *menu = (vimmenu_T *) داده;
 	gui_menu_cb(menu);
     }
-    return Pt_CONTINUE;
+    أرجع Pt_CONTINUE;
 }
 
 /*
  * Stop focus from disappearing into the menubar...
  */
-    static int
+    ساكن صحيح
 gui_ph_handle_menu_unrealized(
 	PtWidget_t *widget,
-	void *data,
+	فراغ *داده,
 	PtCallbackInfo_t *info)
 {
-    PtGiveFocus(gui.vimTextArea, NULL);
-    return Pt_CONTINUE;
+    PtGiveFocus(gui.vim_متن_Area, عدم);
+    أرجع Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_window_open(
+    ساكن صحيح
+gui_ph_handle_پنجره_open(
 	PtWidget_t *widget,
-	void *data,
+	فراغ *داده,
 	PtCallbackInfo_t *info)
 {
-    gui_set_shellsize(FALSE, TRUE, RESIZE_BOTH);
-    return Pt_CONTINUE;
+    gui_مجموعه_shellsize(FALSE, TRUE, RESIZE_BOTH);
+    أرجع Pt_CONTINUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-#define DRAW_START  gui_ph_draw_start()
-#define DRAW_END    gui_ph_draw_end()
+#تعریف_کن DRAW_شروع  gui_ph_draw_شروع()
+#تعریف_کن DRAW_انتها    gui_ph_draw_انتها()
 
 /*
  * TODO: Set a clipping rect?
  */
-    static void
-gui_ph_draw_start(void)
+    ساكن فراغ
+gui_ph_draw_شروع(فراغ)
 {
     PhGC_t *gc;
 
     gc = PgGetGC();
-    PgSetRegion(PtWidgetRid(PtFindDisjoint(gui.vimTextArea)));
+    Pg_مجموعه_Region(PtWidgetRid(Pt_پیدا_کن_Disjoint(gui.vim_متن_Area)));
     PgClearClippingsCx(gc);
     PgClearTranslationCx(gc);
 
-    PtWidgetOffset(gui.vimTextArea, &gui_ph_raw_offset);
-    PhTranslatePoint(&gui_ph_raw_offset, PtWidgetPos(gui.vimTextArea, NULL));
+    Pt_Widget_جابه_جایی(gui.vim_متن_Area, &gui_ph_raw_جابه_جایی);
+    Ph_Translate_نقطه(&gui_ph_raw_جابه_جایی, PtWidgetPos(gui.vim_متن_Area, عدم));
 
-    PgSetTranslation(&gui_ph_raw_offset, Pg_RELATIVE);
+    Pg_مجموعه_Translation(&gui_ph_raw_جابه_جایی, Pg_RELATIVE);
 }
 
-    static void
-gui_ph_draw_end(void)
+    ساكن فراغ
+gui_ph_draw_انتها(فراغ)
 {
-    gui_ph_raw_offset.x = -gui_ph_raw_offset.x;
-    gui_ph_raw_offset.y = -gui_ph_raw_offset.y;
-    PgSetTranslation(&gui_ph_raw_offset, Pg_RELATIVE);
+    gui_ph_raw_جابه_جایی.x = -gui_ph_raw_جابه_جایی.x;
+    gui_ph_raw_جابه_جایی.y = -gui_ph_raw_جابه_جایی.y;
+    Pg_مجموعه_Translation(&gui_ph_raw_جابه_جایی, Pg_RELATIVE);
 }
 
-#ifdef USE_PANEL_GROUP
-    static vimmenu_T *
-gui_ph_find_buffer_item(char_u *name)
+#اگر_تعریف_شده USE_PANEL_گروه
+    ساكن vimmenu_T *
+gui_ph_پیدا_کن_میانگیر_قلم(char_u *name)
 {
-    vimmenu_T *top_level = root_menu;
-    vimmenu_T *items = NULL;
+    vimmenu_T *بالاترین_level = ریشه_menu;
+    vimmenu_T *اقلام = عدم;
 
-    while (top_level != NULL &&
-	    (STRCMP(top_level->dname, "Buffers") != 0))
-	top_level = top_level->next;
+    طالما (بالاترین_level != عدم &&
+	    (STRCMP(بالاترین_level->dname, "Buffers") != 0))
+	بالاترین_level = بالاترین_level->بعدی;
 
-    if (top_level != NULL)
+    إذا (بالاترین_level != عدم)
     {
-	items = top_level->children;
+	اقلام = بالاترین_level->children;
 
-	while (items != NULL &&
-		(STRCMP(items->dname, name) != 0))
-	    items = items->next;
+	طالما (اقلام != عدم &&
+		(STRCMP(اقلام->dname, name) != 0))
+	    اقلام = اقلام->بعدی;
     }
-    return items;
+    أرجع اقلام;
 }
 
-    static void
-gui_ph_pg_set_buffer_num(int_u buf_num)
+    ساكن فراغ
+gui_ph_pg_مجموعه_میانگیر_رقم(int_u buf_رقم)
 {
-    int i;
-    char search[16];
-    char *mark;
+    صحيح i;
+    حرف جستجو[16];
+    حرف *mark;
 
-    if (gui.vimTextArea == NULL || buf_num == 0)
-	return;
+    إذا (gui.vim_متن_Area == عدم || buf_رقم == 0)
+	أرجع;
 
-    search[0] = '(';
-    ultoa(buf_num, &search[1], 10);
-    STRCAT(search, ")");
+    جستجو[0] = '(';
+    ultoa(buf_رقم, &جستجو[1], 10);
+    STRCAT(جستجو, ")");
 
-    for (i = 0; i < num_panels; i++)
+    لكل (i = 0; i < رقم_panels; i++)
     {
 	// find the last "(" in the panel title and see if the buffer
 	// number in the title matches the one we're looking for
 	mark = STRRCHR(panel_titles[ i ], '(');
-	if (mark != NULL && STRCMP(mark, search) == 0)
+	إذا (mark != عدم && STRCMP(mark, جستجو) == 0)
 	{
-	    PtSetResource(gui.vimPanelGroup, Pt_ARG_PG_CURRENT_INDEX,
+	    Pt_مجموعه_Resource(gui.vim_Panel_گروه, Pt_ARG_PG_CURRENT_شاخص,
 		    i, 0);
 	}
     }
 }
 
-    static int
+    ساكن صحيح
 gui_ph_handle_pg_change(
 	PtWidget_t *widget,
-	void *data,
+	فراغ *داده,
 	PtCallbackInfo_t *info)
 {
     vimmenu_T *menu;
-    PtPanelGroupCallback_t *panel;
+    Pt_Panel_گروه_Callback_t *panel;
 
-    if (info->event != NULL)
+    إذا (info->event != عدم)
     {
 	panel = info->cbdata;
-	if (panel->new_panel != NULL)
+	إذا (panel->new_panel != عدم)
 	{
-	    menu = gui_ph_find_buffer_item(panel->new_panel);
-	    if (menu)
+	    menu = gui_ph_پیدا_کن_میانگیر_قلم(panel->new_panel);
+	    إذا (menu)
 		gui_menu_cb(menu);
 	}
     }
-    return Pt_CONTINUE;
+    أرجع Pt_CONTINUE;
 }
 
-    static void
+    ساكن فراغ
 gui_ph_get_panelgroup_margins(
-	short *top,
-	short *bottom,
-	short *left,
-	short *right)
+	کوتاه *بالاترین,
+	کوتاه *bottom,
+	کوتاه *چپ_2,
+	کوتاه *راست_2)
 {
-    unsigned short abs_raw_x, abs_raw_y, abs_panel_x, abs_panel_y;
-    const unsigned short *margin_top, *margin_bottom;
-    const unsigned short *margin_left, *margin_right;
+    بیعلامت کوتاه abs_raw_x, abs_raw_y, abs_panel_x, abs_panel_y;
+    ثابت بیعلامت کوتاه *margin_بالاترین, *margin_bottom;
+    ثابت بیعلامت کوتاه *margin_چپ, *margin_راست;
 
-    PtGetAbsPosition(gui.vimTextArea, &abs_raw_x, &abs_raw_y);
-    PtGetAbsPosition(gui.vimPanelGroup, &abs_panel_x, &abs_panel_y);
+    PtGetAbsPosition(gui.vim_متن_Area, &abs_raw_x, &abs_raw_y);
+    PtGetAbsPosition(gui.vim_Panel_گروه, &abs_panel_x, &abs_panel_y);
 
-    PtGetResource(gui.vimPanelGroup, Pt_ARG_MARGIN_RIGHT, &margin_right, 0);
-    PtGetResource(gui.vimPanelGroup, Pt_ARG_MARGIN_BOTTOM, &margin_bottom, 0);
+    PtGetResource(gui.vim_Panel_گروه, Pt_ARG_MARGIN_راست, &margin_راست, 0);
+    PtGetResource(gui.vim_Panel_گروه, Pt_ARG_MARGIN_BOTTOM, &margin_bottom, 0);
 
     abs_raw_x -= abs_panel_x;
     abs_raw_y -= abs_panel_y;
 
-    *top    = abs_raw_y;
+    *بالاترین    = abs_raw_y;
     *bottom = *margin_bottom;
 
-    *left  = abs_raw_x;
-    *right = *margin_right;
+    *چپ_2  = abs_raw_x;
+    *راست_2 = *margin_راست;
 }
 
 /*
  * Used for the tabs for PtPanelGroup
  */
-    static int
-gui_ph_is_buffer_item(vimmenu_T *menu, vimmenu_T *parent)
+    ساكن صحيح
+gui_ph_is_میانگیر_قلم(vimmenu_T *menu, vimmenu_T *والد)
 {
-    char *mark;
+    حرف *mark;
 
-    if (STRCMP(parent->dname, "Buffers") == 0)
+    إذا (STRCMP(والد->dname, "Buffers") == 0)
     {
 	// Look for '(' digits ')'
 	mark = vim_strchr(menu->dname, '(');
-	if (mark != NULL)
+	إذا (mark != عدم)
 	{
 	    mark++;
-	    while (SAFE_isdigit(*mark))
+	    طالما (امن_isdigit(*mark))
 		mark++;
 
-	    if (*mark == ')')
-		return TRUE;
+	    إذا (*mark == ')')
+		أرجع TRUE;
 	}
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
-    static void
-gui_ph_pg_add_buffer(char *name)
+    ساكن فراغ
+gui_ph_pg_جمع_کن_میانگیر(حرف *name)
 {
-    char **new_titles = NULL;
+    حرف **new_titles = عدم;
 
-    new_titles = ALLOC_MULT(char *, (num_panels + 1));
-    if (new_titles == NULL)
-	return;
+    new_titles = ALLOC_MULT(حرف *, (رقم_panels + 1));
+    إذا (new_titles == عدم)
+	أرجع;
 
-    if (num_panels > 0)
-	memcpy(new_titles, panel_titles, num_panels * sizeof(char **));
+    إذا (رقم_panels > 0)
+	کپی_حافظه(new_titles, panel_titles, رقم_panels * حجم(حرف **));
 
-    new_titles[ num_panels++ ] = name;
+    new_titles[ رقم_panels++ ] = name;
 
-    PtSetResource(gui.vimPanelGroup, Pt_ARG_PG_PANEL_TITLES, new_titles,
-	    num_panels);
+    Pt_مجموعه_Resource(gui.vim_Panel_گروه, Pt_ARG_PG_PANEL_TITLES, new_titles,
+	    رقم_panels);
 
     vim_free(panel_titles);
     panel_titles = new_titles;
 }
 
-    static void
-gui_ph_pg_remove_buffer(char *name)
+    ساكن فراغ
+gui_ph_pg_remove_میانگیر(حرف *name)
 {
-    int i;
-    char **new_titles = NULL;
+    صحيح i;
+    حرف **new_titles = عدم;
 
     // If there is only 1 panel, we just use the temporary place holder
-    if (num_panels > 1)
+    إذا (رقم_panels > 1)
     {
-	new_titles = ALLOC_MULT(char *, num_panels - 1);
-	if (new_titles != NULL)
+	new_titles = ALLOC_MULT(حرف *, رقم_panels - 1);
+	إذا (new_titles != عدم)
 	{
-	    char **s = new_titles;
+	    حرف **s = new_titles;
 	    // Copy all the titles except the one we're removing
-	    for (i = 0; i < num_panels; i++)
+	    لكل (i = 0; i < رقم_panels; i++)
 	    {
-		if (STRCMP(panel_titles[ i ], name) != 0)
+		إذا (STRCMP(panel_titles[ i ], name) != 0)
 		    *s++ = panel_titles[ i ];
 	    }
-	    num_panels--;
+	    رقم_panels--;
 
-	    PtSetResource(gui.vimPanelGroup, Pt_ARG_PG_PANEL_TITLES, new_titles,
-		    num_panels);
+	    Pt_مجموعه_Resource(gui.vim_Panel_گروه, Pt_ARG_PG_PANEL_TITLES, new_titles,
+		    رقم_panels);
 
 	    vim_free(panel_titles);
 	    panel_titles = new_titles;
 	}
     }
-    else
+    وإلا
     {
-	num_panels--;
-	PtSetResource(gui.vimPanelGroup, Pt_ARG_PG_PANEL_TITLES, &empty_title,
+	رقم_panels--;
+	Pt_مجموعه_Resource(gui.vim_Panel_گروه, Pt_ARG_PG_PANEL_TITLES, &خالی_title,
 		1);
 
 	VIM_CLEAR(panel_titles);
@@ -1049,49 +1049,49 @@ gui_ph_pg_remove_buffer(char *name)
 /*
  * When a buffer item is deleted from the buffer menu
  */
-    static int
-gui_ph_handle_buffer_remove(
+    ساكن صحيح
+gui_ph_handle_میانگیر_remove(
 	PtWidget_t *widget,
-	void *data,
+	فراغ *داده,
 	PtCallbackInfo_t *info)
 {
     vimmenu_T *menu;
 
-    if (data != NULL)
+    إذا (داده != عدم)
     {
-	menu = (vimmenu_T *) data;
-	gui_ph_pg_remove_buffer(menu->dname);
+	menu = (vimmenu_T *) داده;
+	gui_ph_pg_remove_میانگیر(menu->dname);
     }
 
-    return Pt_CONTINUE;
+    أرجع Pt_CONTINUE;
 }
-#endif
+#پایان_اگر
 
-    static int
-gui_ph_pane_resize(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ساكن صحيح
+gui_ph_pane_resize(PtWidget_t *widget, فراغ *داده, PtCallbackInfo_t *info)
 {
-    if (PtWidgetIsRealized(widget))
+    إذا (PtWidgetIsRealized(widget))
     {
 	is_ignore_draw = TRUE;
-	PtStartFlux(gui.vimContainer);
+	Pt_شروع_Flux(gui.vimContainer);
 	PtContainerHold(gui.vimContainer);
     }
 
-    return Pt_CONTINUE;
+    أرجع Pt_CONTINUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-    void
-gui_ph_encoding_changed(int new_encoding)
+    فراغ
+gui_ph_encoding_تغییریافته(صحيح new_encoding)
 {
     // Default encoding is latin1
-    char *charset = "latin1";
-    int i;
+    حرف *charset = "latin1";
+    صحيح i;
 
-    struct {
-	int encoding;
-	char *name;
+    بنية {
+	صحيح encoding;
+	حرف *name;
     } charsets[] = {
 	{ DBCS_JPN, "SHIFT_JIS" },
 	{ DBCS_KOR, "csEUCKR" },
@@ -1099,116 +1099,116 @@ gui_ph_encoding_changed(int new_encoding)
 	{ DBCS_CHS, "gb" }
     };
 
-    for (i = 0; i < ARRAY_LENGTH(charsets); i++)
+    لكل (i = 0; i < ARRAY_درازی(charsets); i++)
     {
-	if (new_encoding == charsets[ i ].encoding)
+	إذا (new_encoding == charsets[ i ].encoding)
 	    charset = charsets[ i ].name;
     }
 
-    charset_translate = PxTranslateSet(charset_translate, charset);
+    charset_translate = Px_Translate_مجموعه(charset_translate, charset);
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-    void
-gui_mch_prepare(int *argc, char **argv)
+    فراغ
+gui_mch_prepare(صحيح *argc, حرف **argv)
 {
-    PtInit(NULL);
+    PtInit(عدم);
 }
 
-    int
-gui_mch_init(void)
+    صحيح
+gui_mch_init(فراغ)
 {
-    PtArg_t args[10];
-    int	    flags = 0, n = 0;
+    PtArg_t آرگومانها[10];
+    صحيح	    flags = 0, n = 0;
 
-    PhDim_t	window_size = {100, 100}; // Arbitrary values
-    PhPoint_t	pos = {0, 0};
+    PhDim_t	پنجره_اندازه = {100, 100}; // Arbitrary values
+    Ph_نقطه_t	pos = {0, 0};
 
-    gui.event_buffer = alloc(EVENT_BUFFER_SIZE);
-    if (gui.event_buffer == NULL)
-	return FAIL;
+    gui.event_میانگیر = alloc(EVENT_میانگیر_اندازه);
+    إذا (gui.event_میانگیر == عدم)
+	أرجع FAIL;
 
     // Get a translation so we can convert from ISO Latin-1 to UTF
-    charset_translate = PxTranslateSet(NULL, "latin1");
+    charset_translate = Px_Translate_مجموعه(عدم, "latin1");
 
     // The +2 is for the 1 pixel dark line on each side
-    gui.border_offset = gui.border_width = GUI_PH_MARGIN + 2;
+    gui.border_جابه_جایی = gui.border_عرض = GUI_PH_MARGIN + 2;
 
     // Handle close events ourselves
-    PtSetArg(&args[ n++ ], Pt_ARG_WINDOW_MANAGED_FLAGS, Pt_FALSE, Ph_WM_CLOSE);
-    PtSetArg(&args[ n++ ], Pt_ARG_WINDOW_NOTIFY_FLAGS, Pt_TRUE,
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_پنجره_MANAGED_FLAGS, Pt_FALSE, Ph_WM_CLOSE);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_پنجره_NOTIFY_FLAGS, Pt_TRUE,
 	    Ph_WM_CLOSE | Ph_WM_RESIZE | Ph_WM_FOCUS);
-    PtSetArg(&args[ n++ ], Pt_ARG_DIM, &window_size, 0);
-    gui.vimWindow = PtCreateWidget(PtWindow, NULL, n, args);
-    if (gui.vimWindow == NULL)
-	return FAIL;
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_DIM, &پنجره_اندازه, 0);
+    gui.vim_پنجره = PtCreateWidget(Pt_پنجره, عدم, n, آرگومانها);
+    إذا (gui.vim_پنجره == عدم)
+	أرجع FAIL;
 
-    PtAddCallback(gui.vimWindow, Pt_CB_WINDOW, gui_ph_handle_window_cb, NULL);
-    PtAddCallback(gui.vimWindow, Pt_CB_WINDOW_OPENING,
-	    gui_ph_handle_window_open, NULL);
+    Pt_جمع_کن_Callback(gui.vim_پنجره, Pt_CB_پنجره, gui_ph_handle_پنجره_cb, عدم);
+    Pt_جمع_کن_Callback(gui.vim_پنجره, Pt_CB_پنجره_OPENING,
+	    gui_ph_handle_پنجره_open, عدم);
 
     n = 0;
-    PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS, Pt_ANCHOR_ALL, Pt_IS_ANCHORED);
-    PtSetArg(&args[ n++ ], Pt_ARG_DIM, &window_size, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_POS, &pos, 0);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_ANCHOR_FLAGS, Pt_ANCHOR_ALL, Pt_IS_ANCHORED);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_DIM, &پنجره_اندازه, 0);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_POS, &pos, 0);
 
-#ifdef USE_PANEL_GROUP
+#اگر_تعریف_شده USE_PANEL_گروه
     // Put in a temporary place holder title
-    PtSetArg(&args[ n++ ], Pt_ARG_PG_PANEL_TITLES, &empty_title, 1);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_PG_PANEL_TITLES, &خالی_title, 1);
 
-    gui.vimPanelGroup = PtCreateWidget(PtPanelGroup, gui.vimWindow, n, args);
-    if (gui.vimPanelGroup == NULL)
-	return FAIL;
+    gui.vim_Panel_گروه = PtCreateWidget(Pt_Panel_گروه, gui.vim_پنجره, n, آرگومانها);
+    إذا (gui.vim_Panel_گروه == عدم)
+	أرجع FAIL;
 
-    PtAddCallback(gui.vimPanelGroup, Pt_CB_PG_PANEL_SWITCHING,
-	    gui_ph_handle_pg_change, NULL);
-#else
+    Pt_جمع_کن_Callback(gui.vim_Panel_گروه, Pt_CB_PG_PANEL_SWITCHING,
+	    gui_ph_handle_pg_change, عدم);
+#وإلا
     // Turn off all edge decorations
-    PtSetArg(&args[ n++ ], Pt_ARG_BASIC_FLAGS, Pt_FALSE, Pt_ALL);
-    PtSetArg(&args[ n++ ], Pt_ARG_BEVEL_WIDTH, 0, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_MARGIN_WIDTH, 0, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_MARGIN_HEIGHT, 0, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_CONTAINER_FLAGS, Pt_TRUE, Pt_AUTO_EXTENT);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_BASIC_FLAGS, Pt_FALSE, Pt_ALL);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_BEVEL_عرض, 0, 0);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_MARGIN_عرض, 0, 0);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_MARGIN_ارتفاع, 0, 0);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_CONTAINER_FLAGS, Pt_TRUE, Pt_AUTO_EXTENT);
 
-    gui.vimContainer = PtCreateWidget(PtPane, gui.vimWindow, n, args);
-    if (gui.vimContainer == NULL)
-	return FAIL;
+    gui.vimContainer = PtCreateWidget(PtPane, gui.vim_پنجره, n, آرگومانها);
+    إذا (gui.vimContainer == عدم)
+	أرجع FAIL;
 
-    PtAddCallback(gui.vimContainer, Pt_CB_RESIZE, gui_ph_pane_resize, NULL);
-#endif
+    Pt_جمع_کن_Callback(gui.vimContainer, Pt_CB_RESIZE, gui_ph_pane_resize, عدم);
+#پایان_اگر
 
     // Size for the text area is set in gui_mch_set_text_area_pos
     n = 0;
 
-    PtSetArg(&args[ n++ ], Pt_ARG_RAW_DRAW_F, gui_ph_handle_raw_draw, 1);
-    PtSetArg(&args[ n++ ], Pt_ARG_BEVEL_WIDTH, GUI_PH_MARGIN, 0);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_RAW_DRAW_F, gui_ph_handle_raw_draw, 1);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_BEVEL_عرض, GUI_PH_MARGIN, 0);
     /*
      * Using focus render also causes the whole widget to be redrawn
      * whenever it changes focus, which is very annoying :p
      */
-    PtSetArg(&args[ n++ ], Pt_ARG_FLAGS, Pt_TRUE,
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_FLAGS, Pt_TRUE,
 	    Pt_GETS_FOCUS | Pt_HIGHLIGHTED);
-#ifndef FEAT_MOUSESHAPE
-    PtSetArg(&args[ n++ ], Pt_ARG_CURSOR_TYPE, GUI_PH_MOUSE_TYPE, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_CURSOR_COLOR, gui_ph_mouse_color, 0);
-#endif
+#اگر_تعریف_نشده FEAT_MOUSESHAPE
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_CURSOR_TYPE, GUI_PH_MOUSE_TYPE, 0);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_CURSOR_COLOR, gui_ph_mouse_color, 0);
+#پایان_اگر
 
-    gui.vimTextArea = PtCreateWidget(PtRaw, Pt_DFLT_PARENT, n, args);
-    if (gui.vimTextArea == NULL)
-	return FAIL;
+    gui.vim_متن_Area = PtCreateWidget(PtRaw, Pt_DFLT_والد, n, آرگومانها);
+    إذا (gui.vim_متن_Area == عدم)
+	أرجع FAIL;
 
     // TODO: use PtAddEventHandlers instead?
     // Not using Ph_EV_BUT_REPEAT because vim wouldn't use it anyway
-    PtAddEventHandler(gui.vimTextArea,
+    Pt_جمع_کن_Event_Handler(gui.vim_متن_Area,
 	    Ph_EV_BUT_PRESS | Ph_EV_BUT_RELEASE | Ph_EV_PTR_MOTION_BUTTON,
-	    gui_ph_handle_mouse, NULL);
-    PtAddEventHandler(gui.vimTextArea, Ph_EV_KEY,
-	    gui_ph_handle_keyboard, NULL);
-    PtAddCallback(gui.vimTextArea, Pt_CB_GOT_FOCUS,
-	    gui_ph_handle_focus, NULL);
-    PtAddCallback(gui.vimTextArea, Pt_CB_LOST_FOCUS,
-	    gui_ph_handle_focus, NULL);
+	    gui_ph_handle_mouse, عدم);
+    Pt_جمع_کن_Event_Handler(gui.vim_متن_Area, Ph_EV_کلید,
+	    gui_ph_handle_keyboard, عدم);
+    Pt_جمع_کن_Callback(gui.vim_متن_Area, Pt_CB_GOT_FOCUS,
+	    gui_ph_handle_focus, عدم);
+    Pt_جمع_کن_Callback(gui.vim_متن_Area, Pt_CB_گمشده_FOCUS,
+	    gui_ph_handle_focus, عدم);
 
     /*
      * Now that the text area widget has been created, set up the colours,
@@ -1219,62 +1219,62 @@ gui_mch_init(void)
      * Create the two timers, not as accurate as using the kernel timer
      * functions, but good enough
      */
-    gui_ph_timer_cursor  = PtCreateWidget(PtTimer, gui.vimWindow, 0, NULL);
-    if (gui_ph_timer_cursor == NULL)
-	return FAIL;
+    gui_ph_timer_cursor  = PtCreateWidget(PtTimer, gui.vim_پنجره, 0, عدم);
+    إذا (gui_ph_timer_cursor == عدم)
+	أرجع FAIL;
 
-    gui_ph_timer_timeout = PtCreateWidget(PtTimer, gui.vimWindow, 0, NULL);
-    if (gui_ph_timer_timeout == NULL)
-	return FAIL;
+    gui_ph_timer_timeout = PtCreateWidget(PtTimer, gui.vim_پنجره, 0, عدم);
+    إذا (gui_ph_timer_timeout == عدم)
+	أرجع FAIL;
 
-    PtAddCallback(gui_ph_timer_cursor,  Pt_CB_TIMER_ACTIVATE,
-	    gui_ph_handle_timer_cursor, NULL);
-    PtAddCallback(gui_ph_timer_timeout, Pt_CB_TIMER_ACTIVATE,
-	    gui_ph_handle_timer_timeout, NULL);
+    Pt_جمع_کن_Callback(gui_ph_timer_cursor,  Pt_CB_TIMER_ACTIVATE,
+	    gui_ph_handle_timer_cursor, عدم);
+    Pt_جمع_کن_Callback(gui_ph_timer_timeout, Pt_CB_TIMER_ACTIVATE,
+	    gui_ph_handle_timer_timeout, عدم);
 
-#ifdef FEAT_MENU
+#اگر_تعریف_شده FEAT_MENU
     n = 0;
-    PtSetArg(&args[ n++ ], Pt_ARG_WIDTH, window_size.w, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS, Pt_ANCHOR_LEFT_RIGHT,
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_عرض, پنجره_اندازه.w, 0);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_ANCHOR_FLAGS, Pt_ANCHOR_چپ_راست,
 	    Pt_IS_ANCHORED);
-    gui.vimToolBarGroup = PtCreateWidget(PtToolbarGroup, gui.vimWindow,
-	    n, args);
-    if (gui.vimToolBarGroup == NULL)
-	return FAIL;
+    gui.vim_Tool_Bar_گروه = PtCreateWidget(Pt_Toolbar_گروه, gui.vim_پنجره,
+	    n, آرگومانها);
+    إذا (gui.vim_Tool_Bar_گروه == عدم)
+	أرجع FAIL;
 
-    PtAddCallback(gui.vimToolBarGroup, Pt_CB_RESIZE,
-	    gui_ph_handle_menu_resize, NULL);
+    Pt_جمع_کن_Callback(gui.vim_Tool_Bar_گروه, Pt_CB_RESIZE,
+	    gui_ph_handle_menu_resize, عدم);
 
     n = 0;
     flags = 0;
-    PtSetArg(&args[ n++ ], Pt_ARG_WIDTH, window_size.w, 0);
-    if (! vim_strchr(p_go, GO_MENUS))
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_عرض, پنجره_اندازه.w, 0);
+    إذا (! vim_strchr(p_go, GO_MENUS))
     {
 	flags |= Pt_DELAY_REALIZE;
-	PtSetArg(&args[ n++ ], Pt_ARG_FLAGS, Pt_TRUE, flags);
+	Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_FLAGS, Pt_TRUE, flags);
     }
-    gui.vimMenuBar = PtCreateWidget(PtMenuBar, gui.vimToolBarGroup, n, args);
-    if (gui.vimMenuBar == NULL)
-	return FAIL;
+    gui.vimMenuBar = PtCreateWidget(PtMenuBar, gui.vim_Tool_Bar_گروه, n, آرگومانها);
+    إذا (gui.vimMenuBar == عدم)
+	أرجع FAIL;
 
 # ifdef FEAT_TOOLBAR
     n = 0;
 
-    PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS,
-	    Pt_ANCHOR_LEFT_RIGHT |Pt_TOP_ANCHORED_TOP, Pt_IS_ANCHORED);
-    PtSetArg(&args[ n++ ], Pt_ARG_RESIZE_FLAGS, Pt_TRUE,
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_ANCHOR_FLAGS,
+	    Pt_ANCHOR_چپ_راست |Pt_بالاترین_ANCHORED_بالاترین, Pt_IS_ANCHORED);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_RESIZE_FLAGS, Pt_TRUE,
 	    Pt_RESIZE_Y_AS_REQUIRED);
-    PtSetArg(&args[ n++ ], Pt_ARG_WIDTH, window_size.w, 0);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_عرض, پنجره_اندازه.w, 0);
 
     flags = Pt_GETS_FOCUS;
-    if (! vim_strchr(p_go, GO_TOOLBAR))
+    إذا (! vim_strchr(p_go, GO_TOOLBAR))
 	flags |= Pt_DELAY_REALIZE;
 
-    PtSetArg(&args[ n++ ], Pt_ARG_FLAGS, Pt_DELAY_REALIZE, flags);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_FLAGS, Pt_DELAY_REALIZE, flags);
 
-    gui.vimToolBar = PtCreateWidget(PtToolbar, gui.vimToolBarGroup, n, args);
-    if (gui.vimToolBar == NULL)
-	return FAIL;
+    gui.vimToolBar = PtCreateWidget(PtToolbar, gui.vim_Tool_Bar_گروه, n, آرگومانها);
+    إذا (gui.vimToolBar == عدم)
+	أرجع FAIL;
 
     /*
      * Size for the toolbar is fetched in gui_mch_show_toolbar, after
@@ -1283,49 +1283,49 @@ gui_mch_init(void)
      */
 # endif
 
-#endif
+#پایان_اگر
 
-    return OK;
+    أرجع OK;
 }
 
-    int
-gui_mch_init_check(void)
+    صحيح
+gui_mch_init_check(فراغ)
 {
-    return (is_photon_available == TRUE) ? OK : FAIL;
+    أرجع (is_photon_موجود == TRUE) ? OK : FAIL;
 }
 
-    int
-gui_mch_open(void)
+    صحيح
+gui_mch_open(فراغ)
 {
     gui.norm_pixel =  Pg_BLACK;
-    gui.back_pixel =  Pg_WHITE;
+    gui.پشت_pixel =  Pg_WHITE;
 
-    set_normal_colors();
+    مجموعه_نرمال_colors();
 
     gui_check_colors();
     gui.def_norm_pixel = gui.norm_pixel;
-    gui.def_back_pixel = gui.back_pixel;
+    gui.def_پشت_pixel = gui.پشت_pixel;
 
     highlight_gui_started();
 
-    if (gui_win_x != -1 && gui_win_y != -1)
-	gui_mch_set_winpos(gui_win_x, gui_win_y);
+    إذا (gui_win_x != -1 && gui_win_y != -1)
+	gui_mch_مجموعه_winpos(gui_win_x, gui_win_y);
 
-    return (PtRealizeWidget(gui.vimWindow) == 0) ? OK : FAIL;
+    أرجع (PtRealizeWidget(gui.vim_پنجره) == 0) ? OK : FAIL;
 }
 
-    void
-gui_mch_exit(int rc)
+    فراغ
+gui_mch_exit(صحيح rc)
 {
-    PtDestroyWidget(gui.vimWindow);
+    PtDestroyWidget(gui.vim_پنجره);
 
-    PxTranslateSet(charset_translate, NULL);
+    Px_Translate_مجموعه(charset_translate, عدم);
 
-    vim_free(gui.event_buffer);
+    vim_free(gui.event_میانگیر);
 
-#ifdef USE_PANEL_GROUPS
+#اگر_تعریف_شده USE_PANEL_GROUPS
     vim_free(panel_titles);
-#endif
+#پایان_اگر
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1335,46 +1335,46 @@ gui_mch_exit(int rc)
  * When no events are available, photon will call this function, working is
  * set to FALSE, and the gui_mch_update loop will exit.
  */
-    static int
-exit_gui_mch_update(void *data)
+    ساكن صحيح
+exit_gui_mch_update(فراغ *داده)
 {
-    *(int *)data = FALSE;
-    return Pt_END;
+    *(صحيح *)داده = FALSE;
+    أرجع Pt_انتها;
 }
 
-    void
-gui_mch_update(void)
+    فراغ
+gui_mch_update(فراغ)
 {
-    int working = TRUE;
+    صحيح working = TRUE;
 
-    PtAppAddWorkProc(NULL, exit_gui_mch_update, &working);
-    while ((working == TRUE) && !vim_is_input_buf_full())
+    Pt_App_جمع_کن_Work_Proc(عدم, exit_gui_mch_update, &working);
+    طالما ((working == TRUE) && !vim_is_درون_داد_buf_پر())
 	PtProcessEvent();
 }
 
-    int
-gui_mch_wait_for_chars(long wtime)
+    صحيح
+gui_mch_wait_for_chars(دراز wtime)
 {
     is_timeout = FALSE;
 
-    if (wtime >= 0)
-	PtSetResource(gui_ph_timer_timeout, Pt_ARG_TIMER_INITIAL,
+    إذا (wtime >= 0)
+	Pt_مجموعه_Resource(gui_ph_timer_timeout, Pt_ARG_TIMER_INITIAL,
 						    wtime == 0 ? 1 : wtime, 0);
 
-    while (1)
+    طالما (1)
     {
 	PtProcessEvent();
-	if (input_available())
+	إذا (درون_داد_موجود())
 	{
-	    PtSetResource(gui_ph_timer_timeout, Pt_ARG_TIMER_INITIAL, 0, 0);
-	    return OK;
+	    Pt_مجموعه_Resource(gui_ph_timer_timeout, Pt_ARG_TIMER_INITIAL, 0, 0);
+	    أرجع OK;
 	}
-	else if (is_timeout == TRUE)
-	    return FAIL;
+	وإلا إذا (is_timeout == TRUE)
+	    أرجع FAIL;
     }
 }
 
-#if defined(FEAT_BROWSE)
+#إذا defined(FEAT_BROWSE)
 /*
  * Put up a file requester.
  * Returns the selected name in allocated memory, or NULL for Cancel.
@@ -1387,7 +1387,7 @@ gui_mch_wait_for_chars(long wtime)
  */
     char_u *
 gui_mch_browse(
-	int saving,
+	صحيح saving,
 	char_u *title,
 	char_u *default_name,
 	char_u *ext,
@@ -1395,154 +1395,154 @@ gui_mch_browse(
 	char_u *filter)
 {
     PtFileSelectionInfo_t file;
-    int	    flags;
-    char_u  *default_path;
-    char_u  *open_text = NULL;
+    صحيح	    flags;
+    char_u  *default_مسیر;
+    char_u  *open_متن = عدم;
 
     flags = 0;
-    CLEAR_FIELD(file);
+    CLEAR_فیلد(file);
 
-    default_path = alloc(MAXPATHL + 1 + NAME_MAX + 1);
-    if (default_path != NULL)
+    default_مسیر = alloc(MAXPATHL + 1 + NAME_MAX + 1);
+    إذا (default_مسیر != عدم)
     {
-	if (saving == TRUE)
+	إذا (saving == TRUE)
 	{
 	    // Don't need Pt_FSR_CONFIRM_EXISTING, vim will ask anyway
 	    flags |= Pt_FSR_NO_FCHECK;
-	    open_text = "&Save";
+	    open_متن = "&Save";
 	}
 
 	// combine the directory and filename into a single path
-	if (initdir == NULL || *initdir == NUL)
+	إذا (initdir == عدم || *initdir == NUL)
 	{
-	    mch_dirname(default_path, MAXPATHL);
-	    initdir = default_path;
+	    mch_dirname(default_مسیر, MAXPATHL);
+	    initdir = default_مسیر;
 	}
-	else
+	وإلا
 	{
-	    STRCPY(default_path, initdir);
-	    initdir = default_path;
+	    STRCPY(default_مسیر, initdir);
+	    initdir = default_مسیر;
 	}
 
-	if (default_name != NULL)
+	إذا (default_name != عدم)
 	{
-	    if (default_path[ STRLEN(default_path) - 1 ] != '/')
-		STRCAT(default_path, "/");
+	    إذا (default_مسیر[ STRLEN(default_مسیر) - 1 ] != '/')
+		STRCAT(default_مسیر, "/");
 
-	    STRCAT(default_path, default_name);
+	    STRCAT(default_مسیر, default_name);
 	}
 
 	// TODO: add a filter?
 	PtFileSelection(
-		gui.vimWindow,
-		NULL,
+		gui.vim_پنجره,
+		عدم,
 		title,
-		default_path,
-		NULL,
-		open_text,
-		NULL,
-		NULL,
+		default_مسیر,
+		عدم,
+		open_متن,
+		عدم,
+		عدم,
 		&file,
 		flags);
 
-	vim_free(default_path);
+	vim_free(default_مسیر);
 
-	if (file.ret == Pt_FSDIALOG_BTN1)
-	    return vim_strsave(file.path);
+	إذا (file.ret == Pt_FSDIALOG_BTN1)
+	    أرجع vim_strsave(file.مسیر);
     }
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_GUI_DIALOG)
-static PtWidget_t *gui_ph_dialog_text = NULL;
+#إذا defined(FEAT_GUI_DIALOG)
+ساكن PtWidget_t *gui_ph_dialog_متن = عدم;
 
-    static int
-gui_ph_dialog_close(int button, void *data)
+    ساكن صحيح
+gui_ph_dialog_close(صحيح button, فراغ *داده)
 {
-    PtModalCtrl_t *modal_ctrl = data;
-    char_u *dialog_text, *vim_text;
+    PtModalCtrl_t *modal_ctrl = داده;
+    char_u *dialog_متن, *vim_متن;
 
-    if (gui_ph_dialog_text != NULL)
+    إذا (gui_ph_dialog_متن != عدم)
     {
-	PtGetResource(gui_ph_dialog_text, Pt_ARG_TEXT_STRING, &dialog_text, 0);
-	PtGetResource(gui_ph_dialog_text, Pt_ARG_POINTER, &vim_text, 0);
-	STRNCPY(vim_text, dialog_text, IOSIZE - 1);
+	PtGetResource(gui_ph_dialog_متن, Pt_ARG_متن_STRING, &dialog_متن, 0);
+	PtGetResource(gui_ph_dialog_متن, Pt_ARG_اشاره_گر, &vim_متن, 0);
+	STRNCPY(vim_متن, dialog_متن, IOSIZE - 1);
     }
 
-    PtModalUnblock(modal_ctrl, (void *) button);
+    PtModalUnblock(modal_ctrl, (فراغ *) button);
 
-    return Pt_TRUE;
+    أرجع Pt_TRUE;
 }
 
-    static int
-gui_ph_dialog_text_enter(
+    ساكن صحيح
+gui_ph_dialog_متن_enter(
     PtWidget_t		*widget,
-    void		*data,
+    فراغ		*داده,
     PtCallbackInfo_t	*info)
 {
-    if (info->reason_subtype == Pt_EDIT_ACTIVATE)
-	gui_ph_dialog_close(1, data);
-    return Pt_CONTINUE;
+    إذا (info->reason_subtype == Pt_EDIT_ACTIVATE)
+	gui_ph_dialog_close(1, داده);
+    أرجع Pt_CONTINUE;
 }
 
-    static int
-gui_ph_dialog_esc(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    ساكن صحيح
+gui_ph_dialog_esc(PtWidget_t *widget, فراغ *داده, PtCallbackInfo_t *info)
 {
-    PhKeyEvent_t *key;
+    Ph_کلید_Event_t *کلید;
 
-    key = PhGetData(info->event);
-    if ((key->key_flags & Pk_KF_Cap_Valid) && (key->key_cap == Pk_Escape))
+    کلید = Ph_Get_داده(info->event);
+    إذا ((کلید->کلید_flags & Pk_KF_Cap_Valid) && (کلید->کلید_cap == Pk_Escape))
     {
-	gui_ph_dialog_close(0, data);
-	return Pt_CONSUME;
+	gui_ph_dialog_close(0, داده);
+	أرجع Pt_CONSUME;
     }
-    return Pt_PROCESS;
+    أرجع Pt_PROCESS;
 }
 
-    int
+    صحيح
 gui_mch_dialog(
-	int	type,
+	صحيح	type,
 	char_u	*title,
-	char_u	*message,
+	char_u	*پیام_2,
 	char_u	*buttons,
-	int	default_button,
+	صحيح	default_button,
 	char_u	*textfield,
-	int	ex_cmd)
+	صحيح	ex_cmd)
 {
     char_u	*str;
     char_u	**button_array;
     char_u	*buttons_copy;
 
-    int		button_count;
-    int		i, len;
-    int		dialog_result = -1;
+    صحيح		button_شمار;
+    صحيح		i, len;
+    صحيح		dialog_نتیجه = -1;
 
     // FIXME: the vertical option in guioptions is blatantly ignored
     // FIXME: so is the type
 
-    button_count = len = i = 0;
+    button_شمار = len = i = 0;
 
-    if (buttons == NULL || *buttons == NUL)
-	return -1;
+    إذا (buttons == عدم || *buttons == NUL)
+	أرجع -1;
 
     // There is one less separator than buttons, so bump up the button count
-    button_count = 1;
+    button_شمار = 1;
 
     // Count string length and number of separators
-    for (str = buttons; *str; str++)
+    لكل (str = buttons; *str; str++)
     {
 	len++;
-	if (*str == DLG_BUTTON_SEP)
-	    button_count++;
+	إذا (*str == DLG_BUTTON_SEP)
+	    button_شمار++;
     }
 
-    if (title == NULL)
+    إذا (title == عدم)
 	title = "Vim";
 
     buttons_copy = alloc(len + 1);
-    button_array = ALLOC_MULT(char_u *, button_count);
-    if (buttons_copy != NULL && button_array != NULL)
+    button_array = ALLOC_MULT(char_u *, button_شمار);
+    إذا (buttons_copy != عدم && button_array != عدم)
     {
 	STRCPY(buttons_copy, buttons);
 
@@ -1551,90 +1551,90 @@ gui_mch_dialog(
 	 * button_array with the pointer to each NUL terminated string
 	 */
 	str = buttons_copy;
-	for (i = 0; i < button_count; i++)
+	لكل (i = 0; i < button_شمار; i++)
 	{
 	    button_array[ i ] = str;
-	    for (; *str; str++)
+	    لكل (; *str; str++)
 	    {
-		if (*str == DLG_BUTTON_SEP)
+		إذا (*str == DLG_BUTTON_SEP)
 		{
 		    *str++ = NUL;
-		    break;
+		    اكسر;
 		}
 	    }
 	}
 # ifndef FEAT_GUI_TEXTDIALOG
-	dialog_result = PtAlert(
-		gui.vimWindow, NULL,
+	dialog_نتیجه = PtAlert(
+		gui.vim_پنجره, عدم,
 		title,
-		NULL,
-		message, NULL,
-		button_count, (const char **) button_array, NULL,
+		عدم,
+		پیام_2, عدم,
+		button_شمار, (ثابت حرف **) button_array, عدم,
 		default_button, 0, Pt_MODAL);
-# else
+# وإلا
 	// Writing the dialog ourselves lets us add extra features, like
 	// trapping the escape key and returning 0 to vim
 	{
-	    int n;
-	    PtArg_t args[5];
+	    صحيح n;
+	    PtArg_t آرگومانها[5];
 	    PtWidget_t *dialog, *pane;
 	    PtModalCtrl_t modal_ctrl;
 	    PtDialogInfo_t di;
 
-	    CLEAR_FIELD(di);
-	    CLEAR_FIELD(modal_ctrl);
+	    CLEAR_فیلد(di);
+	    CLEAR_فیلد(modal_ctrl);
 
 	    n = 0;
-	    PtSetArg(&args[n++], Pt_ARG_GROUP_ROWS_COLS, 0, 0);
-	    PtSetArg(&args[n++], Pt_ARG_WIDTH, 350, 0);
-	    PtSetArg(&args[n++], Pt_ARG_GROUP_ORIENTATION,
-		    Pt_GROUP_VERTICAL, 0);
-	    PtSetArg(&args[n++], Pt_ARG_GROUP_FLAGS,
-		    Pt_TRUE, Pt_GROUP_NO_KEYS | Pt_GROUP_STRETCH_HORIZONTAL);
-	    PtSetArg(&args[n++], Pt_ARG_CONTAINER_FLAGS, Pt_FALSE, Pt_TRUE);
-	    pane = PtCreateWidget(PtGroup, NULL, n, args);
+	    Pt_مجموعه_Arg(&آرگومانها[n++], Pt_ARG_گروه_ردیفها_تعداد_ستون, 0, 0);
+	    Pt_مجموعه_Arg(&آرگومانها[n++], Pt_ARG_عرض, 350, 0);
+	    Pt_مجموعه_Arg(&آرگومانها[n++], Pt_ARG_گروه_ORIENTATION,
+		    Pt_گروه_VERTICAL, 0);
+	    Pt_مجموعه_Arg(&آرگومانها[n++], Pt_ARG_گروه_FLAGS,
+		    Pt_TRUE, Pt_گروه_NO_کلیدها | Pt_گروه_STRETCH_HORIZONTAL);
+	    Pt_مجموعه_Arg(&آرگومانها[n++], Pt_ARG_CONTAINER_FLAGS, Pt_FALSE, Pt_TRUE);
+	    pane = PtCreateWidget(Pt_گروه, عدم, n, آرگومانها);
 
 	    n = 0;
-	    PtSetArg(&args[n++], Pt_ARG_TEXT_STRING, message, 0);
-	    PtCreateWidget(PtLabel, pane, n, args);
+	    Pt_مجموعه_Arg(&آرگومانها[n++], Pt_ARG_متن_STRING, پیام_2, 0);
+	    PtCreateWidget(PtLabel, pane, n, آرگومانها);
 
-	    if (textfield != NULL)
+	    إذا (textfield != عدم)
 	    {
 		n = 0;
-		PtSetArg(&args[n++], Pt_ARG_MAX_LENGTH, IOSIZE - 1, 0);
-		PtSetArg(&args[n++], Pt_ARG_TEXT_STRING, textfield, 0);
-		PtSetArg(&args[n++], Pt_ARG_POINTER, textfield, 0);
-		gui_ph_dialog_text = PtCreateWidget(PtText, pane, n, args);
-		PtAddCallback(gui_ph_dialog_text, Pt_CB_ACTIVATE,
-			gui_ph_dialog_text_enter, &modal_ctrl);
+		Pt_مجموعه_Arg(&آرگومانها[n++], Pt_ARG_MAX_درازی, IOSIZE - 1, 0);
+		Pt_مجموعه_Arg(&آرگومانها[n++], Pt_ARG_متن_STRING, textfield, 0);
+		Pt_مجموعه_Arg(&آرگومانها[n++], Pt_ARG_اشاره_گر, textfield, 0);
+		gui_ph_dialog_متن = PtCreateWidget(Pt_متن, pane, n, آرگومانها);
+		Pt_جمع_کن_Callback(gui_ph_dialog_متن, Pt_CB_ACTIVATE,
+			gui_ph_dialog_متن_enter, &modal_ctrl);
 	    }
 
-	    di.parent = gui.vimWindow;
+	    di.والد = gui.vim_پنجره;
 	    di.pane = pane;
 	    di.title = title;
-	    di.buttons = (const char **) button_array;
-	    di.nbtns = button_count;
+	    di.buttons = (ثابت حرف **) button_array;
+	    di.nbtns = button_شمار;
 	    di.def_btn = default_button;
 	    // This is just to give the dialog the close button.
 	    // We check for the Escape key ourselves and return 0
-	    di.esc_btn = button_count;
+	    di.esc_btn = button_شمار;
 	    di.callback = gui_ph_dialog_close;
-	    di.data = &modal_ctrl;
+	    di.داده = &modal_ctrl;
 
 	    dialog = PtCreateDialog(&di);
-	    PtAddFilterCallback(dialog, Ph_EV_KEY,
+	    Pt_جمع_کن_Filter_Callback(dialog, Ph_EV_کلید,
 		    gui_ph_dialog_esc, &modal_ctrl);
 
-	    if (gui_ph_dialog_text != NULL)
-		PtGiveFocus(gui_ph_dialog_text, NULL);
+	    إذا (gui_ph_dialog_متن != عدم)
+		PtGiveFocus(gui_ph_dialog_متن, عدم);
 
 	    // Open dialog, block the vim window and wait for the dialog to close
 	    PtRealizeWidget(dialog);
 	    PtMakeModal(dialog, Ph_CURSOR_NOINPUT, Ph_CURSOR_DEFAULT_COLOR);
-	    dialog_result = (int) PtModalBlock(&modal_ctrl, 0);
+	    dialog_نتیجه = (صحيح) Pt_Modal_بلوک(&modal_ctrl, 0);
 
 	    PtDestroyWidget(dialog);
-	    gui_ph_dialog_text = NULL;
+	    gui_ph_dialog_متن = عدم;
 	}
 # endif
     }
@@ -1642,50 +1642,50 @@ gui_mch_dialog(
     vim_free(button_array);
     vim_free(buttons_copy);
 
-    return dialog_result;
+    أرجع dialog_نتیجه;
 }
-#endif
+#پایان_اگر
 ////////////////////////////////////////////////////////////////////////////
 // window size/position/state
 
-    int
-gui_mch_get_winpos(int *x, int *y)
+    صحيح
+gui_mch_get_winpos(صحيح *x, صحيح *y)
 {
-    PhPoint_t *pos;
+    Ph_نقطه_t *pos;
 
-    pos = PtWidgetPos(gui.vimWindow, NULL);
+    pos = PtWidgetPos(gui.vim_پنجره, عدم);
 
     *x = pos->x;
     *y = pos->y;
 
-    return OK;
+    أرجع OK;
 }
 
-    void
-gui_mch_set_winpos(int x, int y)
+    فراغ
+gui_mch_مجموعه_winpos(صحيح x, صحيح y)
 {
-    PhPoint_t pos = { x, y };
+    Ph_نقطه_t pos = { x, y };
 
-    PtSetResource(gui.vimWindow, Pt_ARG_POS, &pos, 0);
+    Pt_مجموعه_Resource(gui.vim_پنجره, Pt_ARG_POS, &pos, 0);
 }
 
-    void
-gui_mch_set_shellsize(int width, int height,
-	int min_width, int min_height, int base_width, int base_height,
-	int direction)
+    فراغ
+gui_mch_مجموعه_shellsize(صحيح عرض, صحيح ارتفاع,
+	صحيح min_عرض, صحيح min_ارتفاع, صحيح پایه_عرض, صحيح پایه_ارتفاع,
+	صحيح direction)
 {
-    PhDim_t window_size = { width, height };
-    PhDim_t min_size = { min_width, min_height };
+    PhDim_t پنجره_اندازه = { عرض, ارتفاع };
+    PhDim_t min_اندازه = { min_عرض, min_ارتفاع };
 
-#ifdef USE_PANEL_GROUP
-    window_size.w += pg_margin_left + pg_margin_right;
-    window_size.h += pg_margin_top + pg_margin_bottom;
-#endif
+#اگر_تعریف_شده USE_PANEL_گروه
+    پنجره_اندازه.w += pg_margin_چپ + pg_margin_راست;
+    پنجره_اندازه.h += pg_margin_بالاترین + pg_margin_bottom;
+#پایان_اگر
 
-    PtSetResource(gui.vimWindow, Pt_ARG_MINIMUM_DIM, &min_size, 0);
-    PtSetResource(gui.vimWindow, Pt_ARG_DIM, &window_size, 0);
+    Pt_مجموعه_Resource(gui.vim_پنجره, Pt_ARG_MINIMUM_DIM, &min_اندازه, 0);
+    Pt_مجموعه_Resource(gui.vim_پنجره, Pt_ARG_DIM, &پنجره_اندازه, 0);
 
-    if (! PtWidgetIsRealized(gui.vimWindow))
+    إذا (! PtWidgetIsRealized(gui.vim_پنجره))
 	gui_ph_resize_container();
 }
 
@@ -1693,102 +1693,102 @@ gui_mch_set_shellsize(int width, int height,
  * Return the amount of screen space that hasn't been allocated (such as
  * by the shelf).
  */
-    void
-gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
+    فراغ
+gui_mch_get_screen_dimensions(صحيح *screen_w, صحيح *screen_h)
 {
     PhRect_t console;
 
-    PhWindowQueryVisible(Ph_QUERY_WORKSPACE, 0,
-	    PhInputGroup(NULL), &console);
+    Ph_پنجره_Query_Visible(Ph_QUERY_WORKSPACE, 0,
+	    Ph_درون_داد_گروه(عدم), &console);
 
     *screen_w = console.lr.x - console.ul.x + 1;
     *screen_h = console.lr.y - console.ul.y + 1;
 }
 
-    void
-gui_mch_iconify(void)
+    فراغ
+gui_mch_iconify(فراغ)
 {
-    PhWindowEvent_t event;
+    Ph_پنجره_Event_t event;
 
-    CLEAR_FIELD(event);
+    CLEAR_فیلد(event);
     event.event_f = Ph_WM_HIDE;
     event.event_state = Ph_WM_EVSTATE_HIDE;
-    event.rid = PtWidgetRid(gui.vimWindow);
-    PtForwardWindowEvent(&event);
+    event.rid = PtWidgetRid(gui.vim_پنجره);
+    Pt_Forward_پنجره_Event(&event);
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Bring the Vim window to the foreground.
  */
-    void
-gui_mch_set_foreground(void)
+    فراغ
+gui_mch_مجموعه_foreground(فراغ)
 {
-    PhWindowEvent_t event;
+    Ph_پنجره_Event_t event;
 
-    CLEAR_FIELD(event);
+    CLEAR_فیلد(event);
     event.event_f = Ph_WM_TOFRONT;
     event.event_state = Ph_WM_EVSTATE_FFRONT;
-    event.rid = PtWidgetRid(gui.vimWindow);
-    PtForwardWindowEvent(&event);
+    event.rid = PtWidgetRid(gui.vim_پنجره);
+    Pt_Forward_پنجره_Event(&event);
 }
-#endif
+#پایان_اگر
 
-    void
+    فراغ
 gui_mch_settitle(char_u *title,	char_u *icon)
 {
-#ifdef USE_PANEL_GROUP
-    gui_ph_pg_set_buffer_num(curwin->w_buffer->b_fnum);
-#endif
-    PtSetResource(gui.vimWindow, Pt_ARG_WINDOW_TITLE, title, 0);
+#اگر_تعریف_شده USE_PANEL_گروه
+    gui_ph_pg_مجموعه_میانگیر_رقم(curwin->w_میانگیر->b_fnum);
+#پایان_اگر
+    Pt_مجموعه_Resource(gui.vim_پنجره, Pt_ARG_پنجره_TITLE, title, 0);
     // Not sure what to do with the icon text, set balloon text somehow?
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Scrollbar
 
-    void
-gui_mch_set_scrollbar_thumb(scrollbar_T *sb, int val, int size, int max)
+    فراغ
+gui_mch_مجموعه_scrollbar_thumb(scrollbar_T *sb, صحيح val, صحيح اندازه, صحيح max)
 {
-    int	    n = 0;
-    PtArg_t args[3];
+    صحيح	    n = 0;
+    PtArg_t آرگومانها[3];
 
-    PtSetArg(&args[ n++ ], Pt_ARG_MAXIMUM, max, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_SLIDER_SIZE, size, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_GAUGE_VALUE, val, 0);
-    PtSetResources(sb->id, n, args);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_بیشینه, max, 0);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_SLIDER_اندازه, اندازه, 0);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_GAUGE_مقدار, val, 0);
+    Pt_مجموعه_Resources(sb->id, n, آرگومانها);
 }
 
-    void
-gui_mch_set_scrollbar_pos(scrollbar_T *sb, int x, int y, int w, int h)
+    فراغ
+gui_mch_مجموعه_scrollbar_pos(scrollbar_T *sb, صحيح x, صحيح y, صحيح w, صحيح h)
 {
     PhArea_t area = {{ x, y }, { w, h }};
 
-    PtSetResource(sb->id, Pt_ARG_AREA, &area, 0);
+    Pt_مجموعه_Resource(sb->id, Pt_ARG_AREA, &area, 0);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    صحيح
+gui_mch_get_scrollbar_xpadding(فراغ)
 {
     // TODO: Calculate the padding for adjust scrollbar position when the
     // Window is maximized.
-    return 0;
+    أرجع 0;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    صحيح
+gui_mch_get_scrollbar_ypadding(فراغ)
 {
     // TODO: Calculate the padding for adjust scrollbar position when the
     // Window is maximized.
-    return 0;
+    أرجع 0;
 }
 
-    void
-gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
+    فراغ
+gui_mch_create_scrollbar(scrollbar_T *sb, صحيح orient)
 {
-    int	    n = 0;
+    صحيح	    n = 0;
 //    int	    anchor_flags = 0;
-    PtArg_t args[4];
+    PtArg_t آرگومانها[4];
 
     /*
      * Stop the scrollbar from being realized when the parent
@@ -1796,71 +1796,71 @@ gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
      *
      * Also, don't let the scrollbar get focus
      */
-    PtSetArg(&args[ n++ ], Pt_ARG_FLAGS, Pt_DELAY_REALIZE,
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_FLAGS, Pt_DELAY_REALIZE,
 	    Pt_DELAY_REALIZE | Pt_GETS_FOCUS);
-    PtSetArg(&args[ n++ ], Pt_ARG_SCROLLBAR_FLAGS, Pt_SCROLLBAR_SHOW_ARROWS, 0);
-#if 0
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_SCROLLBAR_FLAGS, Pt_SCROLLBAR_SHOW_ARROWS, 0);
+#إذا 0
     // Don't need this anchoring for the scrollbars
-    if (orient == SBAR_HORIZ)
+    إذا (orient == SBAR_HORIZ)
     {
 	anchor_flags = Pt_BOTTOM_ANCHORED_BOTTOM |
-	    Pt_LEFT_ANCHORED_LEFT | Pt_RIGHT_ANCHORED_RIGHT;
+	    Pt_چپ_ANCHORED_چپ | Pt_راست_ANCHORED_راست;
     }
-    else
+    وإلا
     {
-	anchor_flags = Pt_BOTTOM_ANCHORED_BOTTOM | Pt_TOP_ANCHORED_TOP;
-	if (sb->wp != NULL)
+	anchor_flags = Pt_BOTTOM_ANCHORED_BOTTOM | Pt_بالاترین_ANCHORED_بالاترین;
+	إذا (sb->wp != عدم)
 	{
-	    if (sb == &sb->wp->w_scrollbars[ SBAR_LEFT ])
-		anchor_flags |= Pt_LEFT_ANCHORED_LEFT;
-	    else
-		anchor_flags |= Pt_RIGHT_ANCHORED_RIGHT;
+	    إذا (sb == &sb->wp->w_scrollbars[ SBAR_چپ ])
+		anchor_flags |= Pt_چپ_ANCHORED_چپ;
+	    وإلا
+		anchor_flags |= Pt_راست_ANCHORED_راست;
 	}
     }
-    PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS, anchor_flags, Pt_IS_ANCHORED);
-#endif
-    PtSetArg(&args[ n++ ], Pt_ARG_ORIENTATION,
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_ANCHOR_FLAGS, anchor_flags, Pt_IS_ANCHORED);
+#پایان_اگر
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_ORIENTATION,
 	    (orient == SBAR_HORIZ) ? Pt_HORIZONTAL : Pt_VERTICAL, 0);
-#ifdef USE_PANEL_GROUP
-    sb->id = PtCreateWidget(PtScrollbar, gui.vimPanelGroup, n, args);
-#else
-    sb->id = PtCreateWidget(PtScrollbar, gui.vimContainer, n, args);
-#endif
+#اگر_تعریف_شده USE_PANEL_گروه
+    sb->id = PtCreateWidget(PtScrollbar, gui.vim_Panel_گروه, n, آرگومانها);
+#وإلا
+    sb->id = PtCreateWidget(PtScrollbar, gui.vimContainer, n, آرگومانها);
+#پایان_اگر
 
-    PtAddCallback(sb->id, Pt_CB_SCROLLBAR_MOVE, gui_ph_handle_scrollbar, sb);
+    Pt_جمع_کن_Callback(sb->id, Pt_CB_SCROLLBAR_MOVE, gui_ph_handle_scrollbar, sb);
 }
 
-    void
-gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
+    فراغ
+gui_mch_enable_scrollbar(scrollbar_T *sb, صحيح flag)
 {
-    if (flag != 0)
+    إذا (flag != 0)
 	PtRealizeWidget(sb->id);
-    else
+    وإلا
 	PtUnrealizeWidget(sb->id);
 }
 
-    void
+    فراغ
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
     PtDestroyWidget(sb->id);
-    sb->id = NULL;
+    sb->id = عدم;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Mouse functions
 
-#if defined(FEAT_MOUSESHAPE)
+#إذا defined(FEAT_MOUSESHAPE)
 // The last set mouse pointer shape is remembered, to be used when it goes
 // from hidden to not hidden.
-static int last_shape = 0;
+ساكن صحيح آخرین_shape = 0;
 
 // Table for shape IDs.  Keep in sync with the mshape_names[] table in
 // misc2.c!
-static int mshape_ids[] =
+ساكن صحيح mshape_ids[] =
 {
-    Ph_CURSOR_POINTER,		// arrow
+    Ph_CURSOR_اشاره_گر,		// arrow
     Ph_CURSOR_NONE,		// blank
-    Ph_CURSOR_INSERT,		// beam
+    Ph_CURSOR_درج,		// beam
     Ph_CURSOR_DRAG_VERTICAL,	// updown
     Ph_CURSOR_DRAG_VERTICAL,	// udsizing
     Ph_CURSOR_DRAG_HORIZONTAL,	// leftright
@@ -1871,80 +1871,80 @@ static int mshape_ids[] =
     Ph_CURSOR_FINGER,		// hand1
     Ph_CURSOR_FINGER,		// hand2
     Ph_CURSOR_FINGER,		// pencil
-    Ph_CURSOR_QUESTION_POINT,	// question
-    Ph_CURSOR_POINTER,		// right-arrow
-    Ph_CURSOR_POINTER,		// up-arrow
-    Ph_CURSOR_POINTER		// last one
+    Ph_CURSOR_QUESTION_نقطه,	// question
+    Ph_CURSOR_اشاره_گر,		// right-arrow
+    Ph_CURSOR_اشاره_گر,		// up-arrow
+    Ph_CURSOR_اشاره_گر		// last one
 };
 
-    void
-mch_set_mouse_shape(int shape)
+    فراغ
+mch_مجموعه_mouse_shape(صحيح shape)
 {
-    int	    id;
+    صحيح	    id;
 
-    if (!gui.in_use)
-	return;
+    إذا (!gui.درون_use)
+	أرجع;
 
-    if (shape == MSHAPE_HIDE || gui.pointer_hidden)
-	PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_TYPE, Ph_CURSOR_NONE,
+    إذا (shape == MSHAPE_HIDE || gui.اشاره_گر_hidden)
+	Pt_مجموعه_Resource(gui.vim_متن_Area, Pt_ARG_CURSOR_TYPE, Ph_CURSOR_NONE,
 		0);
-    else
+    وإلا
     {
-	if (shape >= MSHAPE_NUMBERED)
-	    id = Ph_CURSOR_POINTER;
-	else
+	إذا (shape >= MSHAPE_NUMBERED)
+	    id = Ph_CURSOR_اشاره_گر;
+	وإلا
 	    id = mshape_ids[shape];
 
-	PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_TYPE, id,	0);
+	Pt_مجموعه_Resource(gui.vim_متن_Area, Pt_ARG_CURSOR_TYPE, id,	0);
     }
-    if (shape != MSHAPE_HIDE)
-	last_shape = shape;
+    إذا (shape != MSHAPE_HIDE)
+	آخرین_shape = shape;
 }
-#endif
+#پایان_اگر
 
-    void
-gui_mch_mousehide(int hide)
+    فراغ
+gui_mch_mousehide(صحيح hide)
 {
-    if (gui.pointer_hidden == hide)
-	return;
+    إذا (gui.اشاره_گر_hidden == hide)
+	أرجع;
 
-    gui.pointer_hidden = hide;
-#ifdef FEAT_MOUSESHAPE
-    if (hide)
-	PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_TYPE,
+    gui.اشاره_گر_hidden = hide;
+#اگر_تعریف_شده FEAT_MOUSESHAPE
+    إذا (hide)
+	Pt_مجموعه_Resource(gui.vim_متن_Area, Pt_ARG_CURSOR_TYPE,
 		Ph_CURSOR_NONE, 0);
-    else
-	mch_set_mouse_shape(last_shape);
-#else
-    PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_TYPE,
+    وإلا
+	mch_مجموعه_mouse_shape(آخرین_shape);
+#وإلا
+    Pt_مجموعه_Resource(gui.vim_متن_Area, Pt_ARG_CURSOR_TYPE,
 	    (hide == MOUSE_SHOW) ? GUI_PH_MOUSE_TYPE : Ph_CURSOR_NONE,
 	    0);
-#endif
+#پایان_اگر
 }
 
-    void
-gui_mch_getmouse(int *x, int *y)
+    فراغ
+gui_mch_getmouse(صحيح *x, صحيح *y)
 {
     PhCursorInfo_t info;
-    short ix, iy;
+    کوتاه ix, iy;
 
     // FIXME: does this return the correct position,
     // with respect to the border?
-    PhQueryCursor(PhInputGroup(NULL), &info);
-    PtGetAbsPosition(gui.vimTextArea , &ix, &iy);
+    PhQueryCursor(Ph_درون_داد_گروه(عدم), &info);
+    PtGetAbsPosition(gui.vim_متن_Area , &ix, &iy);
 
     *x = info.pos.x - ix;
     *y = info.pos.y - iy;
 }
 
-    void
-gui_mch_setmouse(int x, int y)
+    فراغ
+gui_mch_setmouse(صحيح x, صحيح y)
 {
-    short abs_x, abs_y;
+    کوتاه abs_x, abs_y;
 
-    PtGetAbsPosition(gui.vimTextArea, &abs_x, &abs_y);
+    PtGetAbsPosition(gui.vim_متن_Area, &abs_x, &abs_y);
     // Add the border offset?
-    PhMoveCursorAbs(PhInputGroup(NULL), abs_x + x, abs_y + y);
+    PhMoveCursorAbs(Ph_درون_داد_گروه(عدم), abs_x + x, abs_y + y);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1956,40 +1956,40 @@ gui_mch_setmouse(int x, int y)
     guicolor_T
 gui_mch_get_rgb(guicolor_T pixel)
 {
-    return (guicolor_T)(PgRGB(PgRedValue(pixel),
-				     PgGreenValue(pixel), PgBlueValue(pixel)));
+    أرجع (guicolor_T)(PgRGB(Pg_Red_مقدار(pixel),
+				     Pg_Green_مقدار(pixel), Pg_Blue_مقدار(pixel)));
 }
 
-    void
-gui_mch_new_colors(void)
+    فراغ
+gui_mch_new_colors(فراغ)
 {
-#if 0 // Don't bother changing the cursor colour
-    short color_diff;
+#إذا 0 // Don't bother changing the cursor colour
+    کوتاه color_diff;
 
     /*
      * If there isn't enough difference between the background colour and
      * the mouse pointer colour then change the mouse pointer colour
      */
     color_diff = gui_get_lightness(gui_ph_mouse_color)
-					  - gui_get_lightness(gui.back_pixel);
+					  - gui_get_lightness(gui.پشت_pixel);
 
-    if (abs(color_diff) < 64)
+    إذا (قدر_مطلق(color_diff) < 64)
     {
-	short r, g, b;
+	کوتاه r, g, b;
 	// not a great algorithm...
-	r = PgRedValue(gui_ph_mouse_color) ^ 255;
-	g = PgGreenValue(gui_ph_mouse_color) ^ 255;
-	b = PgBlueValue(gui_ph_mouse_color) ^ 255;
+	r = Pg_Red_مقدار(gui_ph_mouse_color) ^ 255;
+	g = Pg_Green_مقدار(gui_ph_mouse_color) ^ 255;
+	b = Pg_Blue_مقدار(gui_ph_mouse_color) ^ 255;
 
 # ifndef FEAT_MOUSESHAPE
 	gui_ph_mouse_color = PgRGB(r, g, b);
-	PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_COLOR,
+	Pt_مجموعه_Resource(gui.vim_متن_Area, Pt_ARG_CURSOR_COLOR,
 		gui_ph_mouse_color, 0);
 # endif
     }
-#endif
+#پایان_اگر
 
-    PtSetResource(gui.vimTextArea, Pt_ARG_FILL_COLOR, gui.back_pixel, 0);
+    Pt_مجموعه_Resource(gui.vim_متن_Area, Pt_ARG_FILL_COLOR, gui.پشت_pixel, 0);
 }
 
 /*
@@ -2003,301 +2003,301 @@ gui_mch_new_colors(void)
     guicolor_T
 gui_mch_get_color(char_u *name)
 {
-    return gui_get_color_cmn(name);
+    أرجع gui_get_color_cmn(name);
 }
 
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(صحيح r, صحيح g, صحيح b)
 {
-    return gui_get_rgb_color_cmn(r, g, b);
+    أرجع gui_get_rgb_color_cmn(r, g, b);
 }
 
-    void
-gui_mch_set_fg_color(guicolor_T color)
+    فراغ
+gui_mch_مجموعه_fg_color(guicolor_T color)
 {
-    PgSetTextColor(color);
+    Pg_مجموعه_متن_Color(color);
 }
 
-    void
-gui_mch_set_bg_color(guicolor_T color)
+    فراغ
+gui_mch_مجموعه_bg_color(guicolor_T color)
 {
-    PgSetFillColor(color);
+    Pg_مجموعه_Fill_Color(color);
 }
 
-    void
-gui_mch_set_sp_color(guicolor_T color)
+    فراغ
+gui_mch_مجموعه_sp_color(guicolor_T color)
 {
 }
 
-    void
-gui_mch_invert_rectangle(int row, int col, int nr, int nc)
+    فراغ
+gui_mch_invert_rectangle(صحيح ردیف, صحيح ستون, صحيح nr, صحيح nc)
 {
     PhRect_t rect;
 
-    rect.ul.x = FILL_X(col);
-    rect.ul.y = FILL_Y(row);
+    rect.ul.x = FILL_X(ستون);
+    rect.ul.y = FILL_Y(ردیف);
 
     // FIXME: This has an off by one pixel problem
-    rect.lr.x = rect.ul.x + nc * gui.char_width;
-    rect.lr.y = rect.ul.y + nr * gui.char_height;
-    if (nc > 0)
+    rect.lr.x = rect.ul.x + nc * gui.char_عرض;
+    rect.lr.y = rect.ul.y + nr * gui.char_ارتفاع;
+    إذا (nc > 0)
 	rect.lr.x -= 1;
-    if (nr > 0)
+    إذا (nr > 0)
 	rect.lr.y -= 1;
 
-    DRAW_START;
-    PgSetDrawMode(Pg_DrawModeDSTINVERT);
+    DRAW_شروع;
+    Pg_مجموعه_Draw_نما(Pg_Draw_نما_DSTINVERT);
     PgDrawRect(&rect, Pg_DRAW_FILL);
-    PgSetDrawMode(Pg_DrawModeSRCCOPY);
-    DRAW_END;
+    Pg_مجموعه_Draw_نما(Pg_Draw_نما_SRCCOPY);
+    DRAW_انتها;
 }
 
-    void
-gui_mch_clear_block(int row1, int col1, int row2, int col2)
+    فراغ
+gui_mch_clear_بلوک(صحيح row1, صحيح col1, صحيح row2, صحيح col2)
 {
-    PhRect_t block = {
+    PhRect_t بلوک = {
 	{ FILL_X(col1), FILL_Y(row1) },
 	{ FILL_X(col2 + 1) - 1, FILL_Y(row2 + 1) - 1}
     };
 
-    DRAW_START;
-    gui_mch_set_bg_color(gui.back_pixel);
-    PgDrawRect(&block, Pg_DRAW_FILL);
-    DRAW_END;
+    DRAW_شروع;
+    gui_mch_مجموعه_bg_color(gui.پشت_pixel);
+    PgDrawRect(&بلوک, Pg_DRAW_FILL);
+    DRAW_انتها;
 }
 
-    void
-gui_mch_clear_all(void)
+    فراغ
+gui_mch_clear_all(فراغ)
 {
-    PhRect_t text_rect = {
-	{ gui.border_width, gui.border_width },
-	{ Columns * gui.char_width + gui.border_width - 1 ,
-	    Rows * gui.char_height + gui.border_width - 1 }
+    PhRect_t متن_rect = {
+	{ gui.border_عرض, gui.border_عرض },
+	{ Columns * gui.char_عرض + gui.border_عرض - 1 ,
+	    ردیفها * gui.char_ارتفاع + gui.border_عرض - 1 }
     };
 
-    if (is_ignore_draw == TRUE)
-	return;
+    إذا (is_ignore_draw == TRUE)
+	أرجع;
 
-    DRAW_START;
-    gui_mch_set_bg_color(gui.back_pixel);
-    PgDrawRect(&text_rect, Pg_DRAW_FILL);
-    DRAW_END;
+    DRAW_شروع;
+    gui_mch_مجموعه_bg_color(gui.پشت_pixel);
+    PgDrawRect(&متن_rect, Pg_DRAW_FILL);
+    DRAW_انتها;
 }
 
-    void
-gui_mch_delete_lines(int row, int num_lines)
+    فراغ
+gui_mch_delete_سطرها(صحيح ردیف, صحيح رقم_سطرها)
 {
     PhRect_t    rect;
-    PhPoint_t   delta;
+    Ph_نقطه_t   delta;
 
-    rect.ul.x = FILL_X(gui.scroll_region_left);
-    rect.ul.y = FILL_Y(row + num_lines);
+    rect.ul.x = FILL_X(gui.scroll_region_چپ);
+    rect.ul.y = FILL_Y(ردیف + رقم_سطرها);
 
-    rect.lr.x = FILL_X(gui.scroll_region_right + 1) - 1;
+    rect.lr.x = FILL_X(gui.scroll_region_راست + 1) - 1;
     rect.lr.y = FILL_Y(gui.scroll_region_bot + 1) - 1;
 
-    PtWidgetOffset(gui.vimTextArea, &gui_ph_raw_offset);
-    PhTranslatePoint(&gui_ph_raw_offset, PtWidgetPos(gui.vimTextArea, NULL));
-    PhTranslateRect(&rect, &gui_ph_raw_offset);
+    Pt_Widget_جابه_جایی(gui.vim_متن_Area, &gui_ph_raw_جابه_جایی);
+    Ph_Translate_نقطه(&gui_ph_raw_جابه_جایی, PtWidgetPos(gui.vim_متن_Area, عدم));
+    PhTranslateRect(&rect, &gui_ph_raw_جابه_جایی);
 
     delta.x = 0;
-    delta.y = -num_lines * gui.char_height;
+    delta.y = -رقم_سطرها * gui.char_ارتفاع;
 
     PgFlush();
 
-    PhBlit(PtWidgetRid(PtFindDisjoint(gui.vimTextArea)), &rect, &delta);
+    PhBlit(PtWidgetRid(Pt_پیدا_کن_Disjoint(gui.vim_متن_Area)), &rect, &delta);
 
-    gui_clear_block(
-	gui.scroll_region_bot - num_lines + 1,
-	gui.scroll_region_left,
+    gui_clear_بلوک(
+	gui.scroll_region_bot - رقم_سطرها + 1,
+	gui.scroll_region_چپ,
 	gui.scroll_region_bot,
-	gui.scroll_region_right);
+	gui.scroll_region_راست);
 }
 
-    void
-gui_mch_insert_lines(int row, int num_lines)
+    فراغ
+gui_mch_درج_سطرها(صحيح ردیف, صحيح رقم_سطرها)
 {
     PhRect_t    rect;
-    PhPoint_t   delta;
+    Ph_نقطه_t   delta;
 
-    rect.ul.x = FILL_X(gui.scroll_region_left);
-    rect.ul.y = FILL_Y(row);
+    rect.ul.x = FILL_X(gui.scroll_region_چپ);
+    rect.ul.y = FILL_Y(ردیف);
 
-    rect.lr.x = FILL_X(gui.scroll_region_right + 1) - 1;
-    rect.lr.y = FILL_Y(gui.scroll_region_bot - num_lines + 1) - 1;
+    rect.lr.x = FILL_X(gui.scroll_region_راست + 1) - 1;
+    rect.lr.y = FILL_Y(gui.scroll_region_bot - رقم_سطرها + 1) - 1;
 
-    PtWidgetOffset(gui.vimTextArea, &gui_ph_raw_offset);
-    PhTranslatePoint(&gui_ph_raw_offset, PtWidgetPos(gui.vimTextArea, NULL));
-    PhTranslateRect(&rect, &gui_ph_raw_offset);
+    Pt_Widget_جابه_جایی(gui.vim_متن_Area, &gui_ph_raw_جابه_جایی);
+    Ph_Translate_نقطه(&gui_ph_raw_جابه_جایی, PtWidgetPos(gui.vim_متن_Area, عدم));
+    PhTranslateRect(&rect, &gui_ph_raw_جابه_جایی);
 
     delta.x = 0;
-    delta.y = num_lines * gui.char_height;
+    delta.y = رقم_سطرها * gui.char_ارتفاع;
 
     PgFlush();
 
-    PhBlit(PtWidgetRid(PtFindDisjoint(gui.vimTextArea)) , &rect, &delta);
+    PhBlit(PtWidgetRid(Pt_پیدا_کن_Disjoint(gui.vim_متن_Area)) , &rect, &delta);
 
-    gui_clear_block(row, gui.scroll_region_left,
-	    row + num_lines - 1, gui.scroll_region_right);
+    gui_clear_بلوک(ردیف, gui.scroll_region_چپ,
+	    ردیف + رقم_سطرها - 1, gui.scroll_region_راست);
 }
 
-    void
-gui_mch_draw_string(int row, int col, char_u *s, int len, int flags)
+    فراغ
+gui_mch_draw_string(صحيح ردیف, صحيح ستون, char_u *s, صحيح len, صحيح flags)
 {
-    static char *utf8_buffer = NULL;
-    static int	utf8_len = 0;
+    ساكن حرف *utf8_میانگیر = عدم;
+    ساكن صحيح	utf8_len = 0;
 
-    PhPoint_t	pos = { TEXT_X(col), TEXT_Y(row) };
+    Ph_نقطه_t	pos = { متن_X(ستون), متن_Y(ردیف) };
     PhRect_t	rect;
 
-    if (is_ignore_draw == TRUE)
-	return;
+    إذا (is_ignore_draw == TRUE)
+	أرجع;
 
-    DRAW_START;
+    DRAW_شروع;
 
-    if (!(flags & DRAW_TRANSP))
+    إذا (!(flags & DRAW_TRANSP))
     {
 	PgDrawIRect(
-		FILL_X(col), FILL_Y(row),
-		FILL_X(col + len) - 1, FILL_Y(row + 1) - 1,
+		FILL_X(ستون), FILL_Y(ردیف),
+		FILL_X(ستون + len) - 1, FILL_Y(ردیف + 1) - 1,
 		Pg_DRAW_FILL);
     }
 
-    if (flags & DRAW_UNDERL)
-	PgSetUnderline(gui.norm_pixel, Pg_TRANSPARENT, 0);
+    إذا (flags & DRAW_UNDERL)
+	Pg_مجموعه_Underline(gui.norm_pixel, Pg_TRANSPARENT, 0);
 
-    if (charset_translate != NULL && enc_utf8 == 0)
+    إذا (charset_translate != عدم && enc_utf8 == 0)
     {
-	int src_taken, dst_made;
+	صحيح src_گرفته, dst_made;
 
 	// Use a static buffer to avoid large amounts of de/allocations
-	if (utf8_len < len)
+	إذا (utf8_len < len)
 	{
-	    char *new_buffer = realloc(utf8_buffer, len * MB_LEN_MAX);
+	    حرف *new_میانگیر = realloc(utf8_میانگیر, len * MB_LEN_MAX);
 
-	    if (new_buffer == NULL)
-		return;
-	    utf8_buffer = new_buffer;
+	    إذا (new_میانگیر == عدم)
+		أرجع;
+	    utf8_میانگیر = new_میانگیر;
 	    utf8_len = len;
 	}
 
-	PxTranslateToUTF(
+	Px_Translate_مقصد_UTF(
 		charset_translate,
 		s,
 		len,
-		&src_taken,
-		utf8_buffer,
+		&src_گرفته,
+		utf8_میانگیر,
 		utf8_len,
 		&dst_made);
-	s = utf8_buffer;
+	s = utf8_میانگیر;
 	len = dst_made;
     }
 
-    PgDrawText(s, len, &pos, 0);
+    Pg_Draw_متن(s, len, &pos, 0);
 
-    if (flags & DRAW_BOLD)
+    إذا (flags & DRAW_BOLD)
     {
 	// FIXME: try and only calculate these values once...
-	rect.ul.x = FILL_X(col) + 1;
-	rect.ul.y = FILL_Y(row);
-	rect.lr.x = FILL_X(col + len) - 1;
-	rect.lr.y = FILL_Y(row + 1) - 1;
+	rect.ul.x = FILL_X(ستون) + 1;
+	rect.ul.y = FILL_Y(ردیف);
+	rect.lr.x = FILL_X(ستون + len) - 1;
+	rect.lr.y = FILL_Y(ردیف + 1) - 1;
 	// PgSetUserClip(NULL) causes the scrollbar to not redraw...
-#if 0
+#إذا 0
 	pos.x++;
 
-	PgSetUserClip(&rect);
-	PgDrawText(s, len, &pos, 0);
-	PgSetUserClip(NULL);
-#else
+	Pg_مجموعه_User_Clip(&rect);
+	Pg_Draw_متن(s, len, &pos, 0);
+	Pg_مجموعه_User_Clip(عدم);
+#وإلا
 	rect.lr.y -= (p_linespace + 1) / 2;
 	// XXX: DrawTextArea doesn't work with phditto
-	PgDrawTextArea(s, len, &rect, Pg_TEXT_BOTTOM);
-#endif
+	Pg_Draw_متن_Area(s, len, &rect, Pg_متن_BOTTOM);
+#پایان_اگر
     }
 
-    if (flags & DRAW_UNDERL)
-	PgSetUnderline(Pg_TRANSPARENT, Pg_TRANSPARENT, 0);
+    إذا (flags & DRAW_UNDERL)
+	Pg_مجموعه_Underline(Pg_TRANSPARENT, Pg_TRANSPARENT, 0);
 
-    DRAW_END;
+    DRAW_انتها;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Cursor
 
-    void
+    فراغ
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
     PhRect_t r;
 
     // FIXME: Double width characters
 
-    r.ul.x = FILL_X(gui.col);
-    r.ul.y = FILL_Y(gui.row);
-    r.lr.x = r.ul.x + gui.char_width - 1;
-    r.lr.y = r.ul.y + gui.char_height - 1;
+    r.ul.x = FILL_X(gui.ستون);
+    r.ul.y = FILL_Y(gui.ردیف);
+    r.lr.x = r.ul.x + gui.char_عرض - 1;
+    r.lr.y = r.ul.y + gui.char_ارتفاع - 1;
 
-    DRAW_START;
-    PgSetStrokeColor(color);
+    DRAW_شروع;
+    Pg_مجموعه_Stroke_Color(color);
     PgDrawRect(&r, Pg_DRAW_STROKE);
-    DRAW_END;
+    DRAW_انتها;
 }
 
-    void
-gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
+    فراغ
+gui_mch_draw_part_cursor(صحيح w, صحيح h, guicolor_T color)
 {
     PhRect_t r;
 
-    r.ul.x = FILL_X(gui.col);
-    r.ul.y = FILL_Y(gui.row) + gui.char_height - h;
+    r.ul.x = FILL_X(gui.ستون);
+    r.ul.y = FILL_Y(gui.ردیف) + gui.char_ارتفاع - h;
     r.lr.x = r.ul.x + w - 1;
     r.lr.y = r.ul.y + h - 1;
 
-    DRAW_START;
-    gui_mch_set_bg_color(color);
+    DRAW_شروع;
+    gui_mch_مجموعه_bg_color(color);
     PgDrawRect(&r, Pg_DRAW_FILL);
-    DRAW_END;
+    DRAW_انتها;
 }
 
-    int
-gui_mch_is_blinking(void)
+    صحيح
+gui_mch_is_blinking(فراغ)
 {
-    return blink_state != BLINK_NONE;
+    أرجع blink_state != BLINK_NONE;
 }
 
-    int
-gui_mch_is_blink_off(void)
+    صحيح
+gui_mch_is_blink_off(فراغ)
 {
-    return blink_state == BLINK_OFF;
+    أرجع blink_state == BLINK_OFF;
 }
 
-    void
-gui_mch_set_blinking(long wait, long on, long off)
+    فراغ
+gui_mch_مجموعه_blinking(دراز wait, دراز on, دراز off)
 {
     blink_waittime = wait;
     blink_ontime = on;
     blink_offtime = off;
 }
 
-    void
-gui_mch_start_blink(void)
+    فراغ
+gui_mch_شروع_blink(فراغ)
 {
     // Only turn on the timer on if none of the times are zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    إذا (blink_waittime && blink_ontime && blink_offtime && gui.درون_focus)
     {
-	PtSetResource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
+	Pt_مجموعه_Resource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
 		blink_waittime, 0);
 	blink_state = BLINK_ON;
 	gui_update_cursor(TRUE, FALSE);
     }
 }
 
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    فراغ
+gui_mch_stop_blink(صحيح may_call_gui_update_cursor)
 {
-    PtSetResource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL, 0, 0);
+    Pt_مجموعه_Resource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL, 0, 0);
 
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    إذا (blink_state == BLINK_OFF && may_call_gui_update_cursor)
 	gui_update_cursor(TRUE, FALSE);
 
     blink_state = BLINK_NONE;
@@ -2306,60 +2306,60 @@ gui_mch_stop_blink(int may_call_gui_update_cursor)
 ////////////////////////////////////////////////////////////////////////////
 // miscellaneous functions
 
-    void
-gui_mch_beep(void)
+    فراغ
+gui_mch_beep(فراغ)
 {
     PtBeep();
 }
 
-    void
-gui_mch_flash(int msec)
+    فراغ
+gui_mch_flash(صحيح msec)
 {
-    PgSetFillXORColor(Pg_BLACK, Pg_WHITE);
-    PgSetDrawMode(Pg_DRAWMODE_XOR);
+    Pg_مجموعه_Fill_XORColor(Pg_BLACK, Pg_WHITE);
+    Pg_مجموعه_Draw_نما(Pg_DRAWMODE_XOR);
     gui_mch_clear_all();
     gui_mch_flush();
 
-    ui_delay((long) msec, TRUE);
+    ui_delay((دراز) msec, TRUE);
 
     gui_mch_clear_all();
-    PgSetDrawMode(Pg_DRAWMODE_OPAQUE);
+    Pg_مجموعه_Draw_نما(Pg_DRAWMODE_OPAQUE);
     gui_mch_flush();
 }
 
-    void
-gui_mch_flush(void)
+    فراغ
+gui_mch_flush(فراغ)
 {
     PgFlush();
 }
 
-    void
-gui_mch_set_text_area_pos(int x, int y, int w, int h)
+    فراغ
+gui_mch_مجموعه_متن_area_pos(صحيح x, صحيح y, صحيح w, صحيح h)
 {
     PhArea_t area = {{x, y}, {w, h}};
 
-    PtSetResource(gui.vimTextArea, Pt_ARG_AREA, &area, 0);
+    Pt_مجموعه_Resource(gui.vim_متن_Area, Pt_ARG_AREA, &area, 0);
 }
 
-    int
+    صحيح
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    صحيح i;
 
-    for (i = 0; special_keys[i].key_sym != 0; i++)
-	if (name[0] == special_keys[i].vim_code0 &&
-		 name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+    لكل (i = 0; special_کلیدها[i].کلید_sym != 0; i++)
+	إذا (name[0] == special_کلیدها[i].vim_code0 &&
+		 name[1] == special_کلیدها[i].vim_code1)
+	    أرجع OK;
+    أرجع FAIL;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Menu
 
-#ifdef FEAT_TOOLBAR
+#اگر_تعریف_شده FEAT_TOOLBAR
 # include "toolbar.phi"
 
-static PhImage_t *gui_ph_toolbar_images[] = {
+ساكن PhImage_t *gui_ph_toolbar_images[] = {
     &tb_new_phi,
     &tb_open_phi,
     &tb_save_phi,
@@ -2370,21 +2370,21 @@ static PhImage_t *gui_ph_toolbar_images[] = {
     &tb_paste_phi,
     &tb_print_phi,
     &tb_help_phi,
-    &tb_find_phi,
+    &tb_پیدا_کن_phi,
     &tb_save_all_phi,
     &tb_save_session_phi,
     &tb_new_session_phi,
-    &tb_load_session_phi,
+    &tb_بارگیری_session_phi,
     &tb_macro_phi,
     &tb_replace_phi,
     &tb_close_phi,
     &tb_maximize_phi,
     &tb_minimize_phi,
-    &tb_split_phi,
+    &tb_تقسیم_phi,
     &tb_shell_phi,
-    &tb_find_prev_phi,
-    &tb_find_next_phi,
-    &tb_find_help_phi,
+    &tb_پیدا_کن_prev_phi,
+    &tb_پیدا_کن_بعدی_phi,
+    &tb_پیدا_کن_help_phi,
     &tb_make_phi,
     &tb_jump_phi,
     &tb_ctags_phi,
@@ -2393,24 +2393,24 @@ static PhImage_t *gui_ph_toolbar_images[] = {
     &tb_minwidth_phi
 };
 
-static PhImage_t *
-gui_ph_toolbar_load_icon(char_u *iconfile)
+ساكن PhImage_t *
+gui_ph_toolbar_بارگیری_icon(char_u *iconfile)
 {
-    static PhImage_t external_icon;
-    PhImage_t *temp_phi = NULL;
+    ساكن PhImage_t external_icon;
+    PhImage_t *موقت_phi = عدم;
 
-    temp_phi = PxLoadImage(iconfile, NULL);
-    if (temp_phi != NULL)
+    موقت_phi = Px_بارگیری_Image(iconfile, عدم);
+    إذا (موقت_phi != عدم)
     {
 	// The label widget will free the image/palette/etc. for us when
 	// it's destroyed
-	temp_phi->flags |= Ph_RELEASE_IMAGE_ALL;
-	memcpy(&external_icon, temp_phi, sizeof(external_icon));
-	free(temp_phi);
+	موقت_phi->flags |= Ph_RELEASE_IMAGE_ALL;
+	کپی_حافظه(&external_icon, موقت_phi, حجم(external_icon));
+	حرر(موقت_phi);
 
-	temp_phi = &external_icon;
+	موقت_phi = &external_icon;
     }
-    return temp_phi;
+    أرجع موقت_phi;
 }
 
 /*
@@ -2420,48 +2420,48 @@ gui_ph_toolbar_load_icon(char_u *iconfile)
  * (When setting the Pt_ARG_LABEL_IMAGE resource, the contents of the
  * PhImage_t are copied, and the original PhImage_t aren't needed anymore).
  */
-static PhImage_t *
-gui_ph_toolbar_find_icon(vimmenu_T *menu)
+ساكن PhImage_t *
+gui_ph_toolbar_پیدا_کن_icon(vimmenu_T *menu)
 {
-    char_u full_pathname[ MAXPATHL + 1 ];
-    PhImage_t *icon = NULL;
+    char_u پر_pathname[ MAXPATHL + 1 ];
+    PhImage_t *icon = عدم;
 
-    if (menu->icon_builtin == FALSE)
+    إذا (menu->icon_builtin == FALSE)
     {
-	if (menu->iconfile != NULL)
+	إذا (menu->iconfile != عدم)
 	    // TODO: use gui_find_iconfile()
-	    icon = gui_ph_toolbar_load_icon(menu->iconfile);
+	    icon = gui_ph_toolbar_بارگیری_icon(menu->iconfile);
 
 	// TODO: Restrict loading to just .png? Search for any format?
-	if ((icon == NULL) &&
-	    ((gui_find_bitmap(menu->name, full_pathname, "gif") == OK) ||
-	      (gui_find_bitmap(menu->name, full_pathname, "png") == OK)))
-	    icon = gui_ph_toolbar_load_icon(full_pathname);
+	إذا ((icon == عدم) &&
+	    ((gui_پیدا_کن_bitmap(menu->name, پر_pathname, "gif") == OK) ||
+	      (gui_پیدا_کن_bitmap(menu->name, پر_pathname, "png") == OK)))
+	    icon = gui_ph_toolbar_بارگیری_icon(پر_pathname);
 
-	if (icon != NULL)
-	    return icon;
+	إذا (icon != عدم)
+	    أرجع icon;
     }
 
-    if (menu->iconidx >= 0 &&
-	    (menu->iconidx < ARRAY_LENGTH(gui_ph_toolbar_images)))
-	return gui_ph_toolbar_images[menu->iconidx];
+    إذا (menu->iconidx >= 0 &&
+	    (menu->iconidx < ARRAY_درازی(gui_ph_toolbar_images)))
+	أرجع gui_ph_toolbar_images[menu->iconidx];
 
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_MENU)
-    void
-gui_mch_enable_menu(int flag)
+#إذا defined(FEAT_MENU)
+    فراغ
+gui_mch_enable_menu(صحيح flag)
 {
-    if (flag != 0)
+    إذا (flag != 0)
 	PtRealizeWidget(gui.vimMenuBar);
-    else
+    وإلا
 	PtUnrealizeWidget(gui.vimMenuBar);
 }
 
-    void
-gui_mch_set_menu_pos(int x, int y, int w, int h)
+    فراغ
+gui_mch_مجموعه_menu_pos(صحيح x, صحيح y, صحيح w, صحيح h)
 {
     // Nothing
 }
@@ -2469,336 +2469,336 @@ gui_mch_set_menu_pos(int x, int y, int w, int h)
 /*
  * Change the position of a menu button in the parent
  */
-    static void
-gui_ph_position_menu(PtWidget_t *widget, int priority)
+    ساكن فراغ
+gui_ph_position_menu(PtWidget_t *widget, صحيح اولویت)
 {
     PtWidget_t	*traverse;
     vimmenu_T	*menu;
 
-    traverse = PtWidgetChildBack(PtWidgetParent(widget));
+    traverse = Pt_Widget_فرزند_پشت(Pt_Widget_والد(widget));
 
     // Iterate through the list of widgets in traverse, until
     // we find the position we want to insert our widget into
     // TODO: traverse from front to back, possible speedup?
-    while (traverse != NULL)
+    طالما (traverse != عدم)
     {
-	PtGetResource(traverse, Pt_ARG_POINTER, &menu, 0);
+	PtGetResource(traverse, Pt_ARG_اشاره_گر, &menu, 0);
 
-	if (menu != NULL &&
-		priority < menu->priority &&
+	إذا (menu != عدم &&
+		اولویت < menu->اولویت &&
 		widget != traverse)
 	{
 	    // Insert the widget before the current traverse widget
-	    PtWidgetInsert(widget, traverse, 1);
-	    return;
+	    Pt_Widget_درج(widget, traverse, 1);
+	    أرجع;
 	}
 
-	traverse = PtWidgetBrotherInFront(traverse);
+	traverse = Pt_Widget_Brother_درون_Front(traverse);
     }
 }
 
 /*
  * the index is ignored because it's not useful for our purposes
  */
-    void
-gui_mch_add_menu(vimmenu_T *menu, int index)
+    فراغ
+gui_mch_جمع_کن_menu(vimmenu_T *menu, صحيح شاخص)
 {
-    vimmenu_T	*parent = menu->parent;
-    char_u	*accel_key;
+    vimmenu_T	*والد = menu->والد;
+    char_u	*accel_کلید;
     char_u	mnemonic_str[MB_LEN_MAX];
-    int	    n;
-    PtArg_t args[5];
+    صحيح	    n;
+    PtArg_t آرگومانها[5];
 
-    menu->submenu_id = menu->id = NULL;
+    menu->submenu_id = menu->id = عدم;
 
-    if (menu_is_menubar(menu->name))
+    إذا (menu_is_menubar(menu->name))
     {
 
-	accel_key = vim_strchr(menu->name, '&');
-	if (accel_key != NULL)
+	accel_کلید = vim_strchr(menu->name, '&');
+	إذا (accel_کلید != عدم)
 	{
-	    mnemonic_str[0] = accel_key[1];
+	    mnemonic_str[0] = accel_کلید[1];
 	    mnemonic_str[1] = NUL;
 	}
 
 	// Create the menu button
 	n = 0;
-	PtSetArg(&args[ n++ ], Pt_ARG_TEXT_STRING, menu->dname, 0);
-	PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_TEXT, menu->actext, 0);
-	if (accel_key != NULL)
-	    PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_KEY, mnemonic_str, 0);
-	PtSetArg(&args[ n++ ], Pt_ARG_POINTER, menu, 0);
+	Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_متن_STRING, menu->dname, 0);
+	Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_ACCEL_متن, menu->actext, 0);
+	إذا (accel_کلید != عدم)
+	    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_ACCEL_کلید, mnemonic_str, 0);
+	Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_اشاره_گر, menu, 0);
 
-	if (parent != NULL)
-	    PtSetArg(&args[ n++ ], Pt_ARG_BUTTON_TYPE, Pt_MENU_RIGHT, 0);
+	إذا (والد != عدم)
+	    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_BUTTON_TYPE, Pt_MENU_راست, 0);
 
 	menu->id = PtCreateWidget(PtMenuButton,
-		(parent == NULL) ? gui.vimMenuBar : parent->submenu_id,
-		n, args);
+		(والد == عدم) ? gui.vimMenuBar : والد->submenu_id,
+		n, آرگومانها);
 
-	PtAddCallback(menu->id, Pt_CB_ARM, gui_ph_handle_pulldown_menu, menu);
+	Pt_جمع_کن_Callback(menu->id, Pt_CB_ARM, gui_ph_handle_pulldown_menu, menu);
 
 	// Create the actual menu
 	n = 0;
-	if (parent != NULL)
-	    PtSetArg(&args[ n++ ], Pt_ARG_MENU_FLAGS, Pt_TRUE, Pt_MENU_CHILD);
+	إذا (والد != عدم)
+	    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_MENU_FLAGS, Pt_TRUE, Pt_MENU_فرزند);
 
-	menu->submenu_id = PtCreateWidget(PtMenu, menu->id, n, args);
+	menu->submenu_id = PtCreateWidget(PtMenu, menu->id, n, آرگومانها);
 
-	if (parent == NULL)
+	إذا (والد == عدم)
 	{
-	    PtAddCallback(menu->submenu_id, Pt_CB_UNREALIZED,
+	    Pt_جمع_کن_Callback(menu->submenu_id, Pt_CB_UNREALIZED,
 		    gui_ph_handle_menu_unrealized, menu);
 
-	    if (menu->mnemonic != 0)
+	    إذا (menu->mnemonic != 0)
 	    {
-		PtAddHotkeyHandler(gui.vimWindow, SAFE_tolower(menu->mnemonic),
+		Pt_جمع_کن_Hotkey_Handler(gui.vim_پنجره, امن_tolower(menu->mnemonic),
 			Pk_KM_Alt, 0, menu, gui_ph_handle_pulldown_menu);
 	    }
 	}
 
-	gui_ph_position_menu(menu->id, menu->priority);
+	gui_ph_position_menu(menu->id, menu->اولویت);
 
 	// Redraw menubar here instead of gui_mch_draw_menubar
-	if (gui.menu_is_active)
+	إذا (gui.menu_is_فعال)
 	    PtRealizeWidget(menu->id);
     }
-    else if (menu_is_popup(menu->name))
+    وإلا إذا (menu_is_popup(menu->name))
     {
-	menu->submenu_id = PtCreateWidget(PtMenu, gui.vimWindow, 0, NULL);
-	PtAddCallback(menu->submenu_id, Pt_CB_UNREALIZED,
+	menu->submenu_id = PtCreateWidget(PtMenu, gui.vim_پنجره, 0, عدم);
+	Pt_جمع_کن_Callback(menu->submenu_id, Pt_CB_UNREALIZED,
 		gui_ph_handle_menu_unrealized, menu);
     }
 }
 
-    void
-gui_mch_add_menu_item(vimmenu_T *menu, int index)
+    فراغ
+gui_mch_جمع_کن_menu_قلم(vimmenu_T *menu, صحيح شاخص)
 {
-    vimmenu_T	*parent = menu->parent;
-    char_u	*accel_key;
+    vimmenu_T	*والد = menu->والد;
+    char_u	*accel_کلید;
     char_u	mnemonic_str[MB_LEN_MAX];
-    int	    n;
-    PtArg_t args[13];
+    صحيح	    n;
+    PtArg_t آرگومانها[13];
 
     n = 0;
-    PtSetArg(&args[ n++ ], Pt_ARG_POINTER, menu, 0);
+    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_اشاره_گر, menu, 0);
 
 # ifdef FEAT_TOOLBAR
-    if (menu_is_toolbar(parent->name))
+    إذا (menu_is_toolbar(والد->name))
     {
-	if (menu_is_separator(menu->name))
+	إذا (menu_is_separator(menu->name))
 	{
-	    PtSetArg(&args[ n++ ], Pt_ARG_SEP_FLAGS,
+	    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_SEP_FLAGS,
 		    Pt_SEP_VERTICAL, Pt_SEP_ORIENTATION);
-	    PtSetArg(&args[ n++ ], Pt_ARG_SEP_TYPE, Pt_ETCHED_IN, 0);
-	    PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS,
-		    Pt_TRUE, Pt_ANCHOR_TOP_BOTTOM);
-	    PtSetArg(&args[ n++ ], Pt_ARG_WIDTH, 2, 0);
-	    menu->id = PtCreateWidget(PtSeparator, gui.vimToolBar, n, args);
+	    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_SEP_TYPE, Pt_ETCHED_درون, 0);
+	    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_ANCHOR_FLAGS,
+		    Pt_TRUE, Pt_ANCHOR_بالاترین_BOTTOM);
+	    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_عرض, 2, 0);
+	    menu->id = PtCreateWidget(PtSeparator, gui.vimToolBar, n, آرگومانها);
 	}
-	else
+	وإلا
 	{
-	    if (strstr((const char *) p_toolbar, "text") != NULL)
+	    إذا (جستجوی_رشته((ثابت حرف *) p_toolbar, "text") != عدم)
 	    {
-		PtSetArg(&args[ n++ ], Pt_ARG_BALLOON_POSITION,
+		Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_BALLOON_POSITION,
 			Pt_BALLOON_BOTTOM, 0);
-		PtSetArg(&args[ n++ ], Pt_ARG_TEXT_STRING, menu->dname, 0);
-		PtSetArg(&args[ n++ ], Pt_ARG_TEXT_FONT, "TextFont08", 0);
+		Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_متن_STRING, menu->dname, 0);
+		Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_متن_FONT, "TextFont08", 0);
 	    }
-	    if ((strstr((const char *) p_toolbar, "icons") != NULL) &&
-		    (gui_ph_toolbar_images != NULL))
+	    إذا ((جستجوی_رشته((ثابت حرف *) p_toolbar, "icons") != عدم) &&
+		    (gui_ph_toolbar_images != عدم))
 	    {
-		PtSetArg(&args[ n++ ], Pt_ARG_LABEL_IMAGE,
-			gui_ph_toolbar_find_icon(menu), 0);
-		PtSetArg(&args[ n++ ], Pt_ARG_LABEL_TYPE, Pt_TEXT_IMAGE, 0);
-		PtSetArg(&args[ n++ ], Pt_ARG_TEXT_IMAGE_SPACING, 0, 0);
+		Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_LABEL_IMAGE,
+			gui_ph_toolbar_پیدا_کن_icon(menu), 0);
+		Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_LABEL_TYPE, Pt_متن_IMAGE, 0);
+		Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_متن_IMAGE_SPACING, 0, 0);
 	    }
-	    if (strstr((const char *) p_toolbar, "tooltips") != NULL)
+	    إذا (جستجوی_رشته((ثابت حرف *) p_toolbar, "tooltips") != عدم)
 	    {
-		PtSetArg(&args[ n++ ], Pt_ARG_LABEL_BALLOON,
+		Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_LABEL_BALLOON,
 			gui_ph_show_tooltip, 0);
-		PtSetArg(&args[ n++ ], Pt_ARG_LABEL_FLAGS,
+		Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_LABEL_FLAGS,
 			Pt_TRUE, Pt_SHOW_BALLOON);
 	    }
-	    PtSetArg(&args[ n++ ], Pt_ARG_MARGIN_HEIGHT, 1, 0);
-	    PtSetArg(&args[ n++ ], Pt_ARG_MARGIN_WIDTH, 1, 0);
-	    PtSetArg(&args[ n++ ], Pt_ARG_FLAGS, Pt_FALSE,
+	    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_MARGIN_ارتفاع, 1, 0);
+	    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_MARGIN_عرض, 1, 0);
+	    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_FLAGS, Pt_FALSE,
 		    Pt_HIGHLIGHTED | Pt_GETS_FOCUS);
-	    PtSetArg(&args[ n++ ], Pt_ARG_FILL_COLOR, Pg_TRANSPARENT, 0);
-	    menu->id = PtCreateWidget(PtButton, gui.vimToolBar, n, args);
+	    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_FILL_COLOR, Pg_TRANSPARENT, 0);
+	    menu->id = PtCreateWidget(PtButton, gui.vimToolBar, n, آرگومانها);
 
-	    PtAddCallback(menu->id, Pt_CB_ACTIVATE, gui_ph_handle_menu, menu);
+	    Pt_جمع_کن_Callback(menu->id, Pt_CB_ACTIVATE, gui_ph_handle_menu, menu);
 	}
 	// Update toolbar if it's open
-	if (PtWidgetIsRealized(gui.vimToolBar))
+	إذا (PtWidgetIsRealized(gui.vimToolBar))
 	    PtRealizeWidget(menu->id);
     }
-    else
+    وإلا
 # endif
-	if (menu_is_separator(menu->name))
+	إذا (menu_is_separator(menu->name))
     {
-	menu->id = PtCreateWidget(PtSeparator, parent->submenu_id, n, args);
+	menu->id = PtCreateWidget(PtSeparator, والد->submenu_id, n, آرگومانها);
     }
-    else
+    وإلا
     {
-	accel_key = vim_strchr(menu->name, '&');
-	if (accel_key != NULL)
+	accel_کلید = vim_strchr(menu->name, '&');
+	إذا (accel_کلید != عدم)
 	{
-	    mnemonic_str[0] = accel_key[1];
+	    mnemonic_str[0] = accel_کلید[1];
 	    mnemonic_str[1] = NUL;
 	}
 
-	PtSetArg(&args[ n++ ], Pt_ARG_TEXT_STRING, menu->dname, 0);
-	if (accel_key != NULL)
-	    PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_KEY, mnemonic_str,
+	Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_متن_STRING, menu->dname, 0);
+	إذا (accel_کلید != عدم)
+	    Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_ACCEL_کلید, mnemonic_str,
 		    0);
 
-	PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_TEXT, menu->actext, 0);
+	Pt_مجموعه_Arg(&آرگومانها[ n++ ], Pt_ARG_ACCEL_متن, menu->actext, 0);
 
-	menu->id = PtCreateWidget(PtMenuButton, parent->submenu_id, n, args);
+	menu->id = PtCreateWidget(PtMenuButton, والد->submenu_id, n, آرگومانها);
 
-	PtAddCallback(menu->id, Pt_CB_ACTIVATE, gui_ph_handle_menu, menu);
+	Pt_جمع_کن_Callback(menu->id, Pt_CB_ACTIVATE, gui_ph_handle_menu, menu);
 
-# ifdef USE_PANEL_GROUP
-	if (gui_ph_is_buffer_item(menu, parent) == TRUE)
+# ifdef USE_PANEL_گروه
+	إذا (gui_ph_is_میانگیر_قلم(menu, والد) == TRUE)
 	{
-	    PtAddCallback(menu->id, Pt_CB_DESTROYED,
-		    gui_ph_handle_buffer_remove, menu);
-	    gui_ph_pg_add_buffer(menu->dname);
+	    Pt_جمع_کن_Callback(menu->id, Pt_CB_DESTROYED,
+		    gui_ph_handle_میانگیر_remove, menu);
+	    gui_ph_pg_جمع_کن_میانگیر(menu->dname);
 	}
 # endif
     }
 
-    gui_ph_position_menu(menu->id, menu->priority);
+    gui_ph_position_menu(menu->id, menu->اولویت);
 }
 
-    void
+    فراغ
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
-    if (menu->submenu_id != NULL)
+    إذا (menu->submenu_id != عدم)
 	PtDestroyWidget(menu->submenu_id);
-    if (menu->id != NULL)
+    إذا (menu->id != عدم)
 	PtDestroyWidget(menu->id);
 
-    menu->submenu_id = NULL;
-    menu->id = NULL;
+    menu->submenu_id = عدم;
+    menu->id = عدم;
 }
 
-    void
-gui_mch_menu_grey(vimmenu_T *menu, int grey)
+    فراغ
+gui_mch_menu_grey(vimmenu_T *menu, صحيح grey)
 {
-    long    flags, mask, fields;
+    دراز    flags, ماسک, fields;
 
-    if (menu->id == NULL)
-	return;
+    إذا (menu->id == عدم)
+	أرجع;
 
     flags = PtWidgetFlags(menu->id);
-    if (PtWidgetIsClass(menu->id, PtMenuButton) &&
-	    PtWidgetIsClass(PtWidgetParent(menu->id), PtMenu))
+    إذا (PtWidgetIsClass(menu->id, PtMenuButton) &&
+	    PtWidgetIsClass(Pt_Widget_والد(menu->id), PtMenu))
     {
 	fields = Pt_FALSE;
-	mask = Pt_SELECTABLE | Pt_HIGHLIGHTED;
+	ماسک = Pt_SELECTABLE | Pt_HIGHLIGHTED;
     }
-    else
+    وإلا
     {
 	fields = Pt_TRUE;
-	mask = Pt_BLOCKED | Pt_GHOST;
+	ماسک = Pt_BLOCKED | Pt_GHOST;
     }
 
-    if (! grey)
+    إذا (! grey)
 	fields = ~fields;
 
-    PtSetResource(menu->id, Pt_ARG_FLAGS, fields,
-	    mask);
+    Pt_مجموعه_Resource(menu->id, Pt_ARG_FLAGS, fields,
+	    ماسک);
 }
 
-    void
-gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
+    فراغ
+gui_mch_menu_hidden(vimmenu_T *menu, صحيح hidden)
 {
     // TODO: [un]realize the widget?
 }
 
-    void
-gui_mch_draw_menubar(void)
+    فراغ
+gui_mch_draw_menubar(فراغ)
 {
     // The only time a redraw is needed is when a menu button
     // is added to the menubar, and that is detected and the bar
     // redrawn in gui_mch_add_menu_item
 }
 
-    void
+    فراغ
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
-    PtSetResource(menu->submenu_id, Pt_ARG_POS, &abs_mouse, 0);
+    Pt_مجموعه_Resource(menu->submenu_id, Pt_ARG_POS, &abs_mouse, 0);
     PtRealizeWidget(menu->submenu_id);
 }
 
-    void
-gui_mch_toggle_tearoffs(int enable)
+    فراغ
+gui_mch_toggle_tearoffs(صحيح enable)
 {
     // No tearoffs yet
 }
 
-#endif
+#پایان_اگر
 
-#if defined(FEAT_TOOLBAR)
-    void
-gui_mch_show_toolbar(int showit)
+#إذا defined(FEAT_TOOLBAR)
+    فراغ
+gui_mch_show_toolbar(صحيح showit)
 {
-    if (showit)
+    إذا (showit)
 	PtRealizeWidget(gui.vimToolBar);
-    else
+    وإلا
 	PtUnrealizeWidget(gui.vimToolBar);
 }
-#endif
+#پایان_اگر
 
 ////////////////////////////////////////////////////////////////////////////
 // Fonts
 
-    static GuiFont
+    ساكن GuiFont
 gui_ph_get_font(
 	char_u	*font_name,
 	int_u	font_flags,
-	int_u	font_size,
+	int_u	font_اندازه_2,
 	// Check whether the resulting font has the font flags and size that
 	// was asked for
 	int_u	enforce
 	)
 {
-    char_u	    *font_tag;
+    char_u	    *font_برچسب;
     FontQueryInfo   info;
     int_u	    style;
 
-    font_tag = alloc(MAX_FONT_TAG);
-    if (font_tag != NULL)
+    font_برچسب = alloc(MAX_FONT_برچسب);
+    إذا (font_برچسب != عدم)
     {
-	if (PfGenerateFontName(font_name, font_flags, font_size,
-		    font_tag) != NULL)
+	إذا (PfGenerateFontName(font_name, font_flags, font_اندازه_2,
+		    font_برچسب) != عدم)
 	{
 	    // Enforce some limits on the font used
 	    style = PHFONT_INFO_FIXED;
 
-	    if (enforce & PF_STYLE_BOLD)
+	    إذا (enforce & PF_STYLE_BOLD)
 		style |= PHFONT_INFO_BOLD;
-	    if (enforce & PF_STYLE_ANTIALIAS)
+	    إذا (enforce & PF_STYLE_ANTIALIAS)
 		style |= PHFONT_INFO_ALIAS;
-	    if (enforce & PF_STYLE_ITALIC)
+	    إذا (enforce & PF_STYLE_ITALIC)
 		style |= PHFONT_INFO_ITALIC;
 
-	    PfQueryFontInfo(font_tag, &info);
+	    PfQueryFontInfo(font_برچسب, &info);
 
-	    if (info.size == 0)
-		font_size = 0;
+	    إذا (info.اندازه == 0)
+		font_اندازه_2 = 0;
 
 	    // Make sure font size matches, and that the font style
 	    // at least has the bits we're checking for
-	    if (font_size == info.size &&
+	    إذا (font_اندازه_2 == info.اندازه &&
 		    style == (info.style & style))
-		return (GuiFont)font_tag;
+		أرجع (GuiFont)font_برچسب;
 	}
-	vim_free(font_tag);
+	vim_free(font_برچسب);
     }
-    return NULL;
+    أرجع عدم;
 }
 
 /*
@@ -2813,162 +2813,162 @@ gui_ph_get_font(
  *
  */
 
-    static int
+    ساكن صحيح
 gui_ph_parse_font_name(
 	char_u *vim_font,
 	char_u **font_name,
 	int_u *font_flags,
-	int_u *font_size)
+	int_u *font_اندازه_2)
 {
     char_u  *mark;
-    int_u   name_len, size;
+    int_u   name_len, اندازه;
 
     mark = vim_strchr(vim_font, ':');
-    if (mark == NULL)
+    إذا (mark == عدم)
 	name_len = STRLEN(vim_font);
-    else
+    وإلا
 	name_len = (int_u) (mark - vim_font);
 
     *font_name = vim_strnsave(vim_font, name_len);
-    if (*font_name != NULL)
+    إذا (*font_name != عدم)
     {
-	if (mark != NULL)
+	إذا (mark != عدم)
 	{
-	    while (*mark != NUL && *mark++ == ':')
+	    طالما (*mark != NUL && *mark++ == ':')
 	    {
-		switch (SAFE_tolower(*mark++))
+		بدل (امن_tolower(*mark++))
 		{
-		    case 'a': *font_flags |= PF_STYLE_ANTIALIAS; break;
-		    case 'b': *font_flags |= PF_STYLE_BOLD; break;
-		    case 'i': *font_flags |= PF_STYLE_ITALIC; break;
+		    حالة 'a': *font_flags |= PF_STYLE_ANTIALIAS; اكسر;
+		    حالة 'b': *font_flags |= PF_STYLE_BOLD; اكسر;
+		    حالة 'i': *font_flags |= PF_STYLE_ITALIC; اكسر;
 
-		    case 's':
-			size = getdigits(&mark);
+		    حالة 's':
+			اندازه = getdigits(&mark);
 			// Restrict the size to some vague limits
-			if (size < 1 || size > 100)
-			    size = 8;
+			إذا (اندازه < 1 || اندازه > 100)
+			    اندازه = 8;
 
-			*font_size = size;
-			break;
+			*font_اندازه_2 = اندازه;
+			اكسر;
 
-		    default:
-			break;
+		    افتراضي:
+			اكسر;
 		}
 	    }
 	}
-	return TRUE;
+	أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
-    int
-gui_mch_init_font(char_u *vim_font_name, int fontset)
+    صحيح
+gui_mch_init_font(char_u *vim_font_name, صحيح fontset)
 {
-    char_u  *font_tag;
-    char_u  *font_name = NULL;
+    char_u  *font_برچسب;
+    char_u  *font_name = عدم;
     int_u   font_flags = 0;
-    int_u   font_size  = 12;
+    int_u   font_اندازه_2  = 12;
 
     FontQueryInfo info;
     PhRect_t extent;
 
-    if (vim_font_name == NULL)
+    إذا (vim_font_name == عدم)
     {
 	// Default font
 	vim_font_name = "PC Terminal";
     }
 
-    if (STRCMP(vim_font_name, "*") == 0)
+    إذا (STRCMP(vim_font_name, "*") == 0)
     {
-	font_tag = PtFontSelection(gui.vimWindow, NULL, NULL,
-		"pcterm12", -1, PHFONT_FIXED, NULL);
+	font_برچسب = PtFontSelection(gui.vim_پنجره, عدم, عدم,
+		"pcterm12", -1, PHFONT_FIXED, عدم);
 
-	if (font_tag == NULL)
-	    return FAIL;
+	إذا (font_برچسب == عدم)
+	    أرجع FAIL;
 
 	gui_mch_free_font(gui.norm_font);
-	gui.norm_font = font_tag;
+	gui.norm_font = font_برچسب;
 
-	PfQueryFontInfo(font_tag, &info);
+	PfQueryFontInfo(font_برچسب, &info);
 	font_name = vim_strsave(info.font);
     }
-    else
+    وإلا
     {
-	if (gui_ph_parse_font_name(vim_font_name, &font_name, &font_flags,
-		    &font_size) == FALSE)
-	    return FAIL;
+	إذا (gui_ph_parse_font_name(vim_font_name, &font_name, &font_flags,
+		    &font_اندازه_2) == FALSE)
+	    أرجع FAIL;
 
-	font_tag = gui_ph_get_font(font_name, font_flags, font_size, 0);
-	if (font_tag == NULL)
+	font_برچسب = gui_ph_get_font(font_name, font_flags, font_اندازه_2, 0);
+	إذا (font_برچسب == عدم)
 	{
 	    vim_free(font_name);
-	    return FAIL;
+	    أرجع FAIL;
 	}
 
 	gui_mch_free_font(gui.norm_font);
-	gui.norm_font = font_tag;
+	gui.norm_font = font_برچسب;
     }
 
     gui_mch_free_font(gui.bold_font);
     gui.bold_font = gui_ph_get_font(font_name, font_flags | PF_STYLE_BOLD,
-	    font_size, PF_STYLE_BOLD);
+	    font_اندازه_2, PF_STYLE_BOLD);
 
     gui_mch_free_font(gui.ital_font);
     gui.ital_font = gui_ph_get_font(font_name, font_flags | PF_STYLE_ITALIC,
-	    font_size, PF_STYLE_ITALIC);
+	    font_اندازه_2, PF_STYLE_ITALIC);
 
     // This extent was brought to you by the letter 'g'
-    PfExtentText(&extent, NULL, font_tag, "g", 1);
+    Pf_Extent_متن(&extent, عدم, font_برچسب, "g", 1);
 
-    gui.char_width = extent.lr.x - extent.ul.x + 1;
-    gui.char_height = (- extent.ul.y) + extent.lr.y + 1;
+    gui.char_عرض = extent.lr.x - extent.ul.x + 1;
+    gui.char_ارتفاع = (- extent.ul.y) + extent.lr.y + 1;
     gui.char_ascent = - extent.ul.y;
 
     vim_free(font_name);
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
-gui_mch_adjust_charheight(void)
+    صحيح
+gui_mch_adjust_charheight(فراغ)
 {
     FontQueryInfo info;
 
     PfQueryFontInfo(gui.norm_font, &info);
 
-    gui.char_height = - info.ascender + info.descender + p_linespace;
+    gui.char_ارتفاع = - info.ascender + info.descender + p_linespace;
     gui.char_ascent = - info.ascender + p_linespace / 2;
 
-    return OK;
+    أرجع OK;
 }
 
     GuiFont
-gui_mch_get_font(char_u *vim_font_name, int report_error)
+gui_mch_get_font(char_u *vim_font_name, صحيح report_error)
 {
     char_u  *font_name;
-    char_u  *font_tag;
-    int_u   font_size = 12;
+    char_u  *font_برچسب;
+    int_u   font_اندازه_2 = 12;
     int_u   font_flags = 0;
 
-    if (gui_ph_parse_font_name(vim_font_name, &font_name, &font_flags,
-		&font_size) != FALSE)
+    إذا (gui_ph_parse_font_name(vim_font_name, &font_name, &font_flags,
+		&font_اندازه_2) != FALSE)
     {
-	font_tag = gui_ph_get_font(font_name, font_flags, font_size, -1);
+	font_برچسب = gui_ph_get_font(font_name, font_flags, font_اندازه_2, -1);
 	vim_free(font_name);
 
-	if (font_tag != NULL)
-	    return (GuiFont)font_tag;
+	إذا (font_برچسب != عدم)
+	    أرجع (GuiFont)font_برچسب;
     }
 
-    if (report_error)
+    إذا (report_error)
 	semsg(_(e_unknown_font_str), vim_font_name);
 
-    return FAIL;
+    أرجع FAIL;
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Return the name of font "font" in allocated memory.
  * Don't know how to get the actual name, thus use the provided name.
@@ -2976,19 +2976,19 @@ gui_mch_get_font(char_u *vim_font_name, int report_error)
     char_u *
 gui_mch_get_fontname(GuiFont font, char_u *name)
 {
-    if (name == NULL)
-	return NULL;
-    return vim_strsave(name);
+    إذا (name == عدم)
+	أرجع عدم;
+    أرجع vim_strsave(name);
 }
-#endif
+#پایان_اگر
 
-    void
-gui_mch_set_font(GuiFont font)
+    فراغ
+gui_mch_مجموعه_font(GuiFont font)
 {
-    PgSetFont(font);
+    Pg_مجموعه_Font(font);
 }
 
-    void
+    فراغ
 gui_mch_free_font(GuiFont font)
 {
     vim_free(font);

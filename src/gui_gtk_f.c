@@ -23,209 +23,209 @@
  * 2016  Kazunobu Kuriyama  <kazunobu.kuriyama@gmail.com>
  */
 
-#include "vim.h"
-#include <gtk/gtk.h>	// without this it compiles, but gives errors at
+#ضمن "vim.h"
+#ضمن <gtk/gtk.h>	// without this it compiles, but gives errors at
 			// runtime!
-#include "gui_gtk_f.h"
-#if !GTK_CHECK_VERSION(3,0,0)
+#ضمن "gui_gtk_f.h"
+#إذا !GTK_CHECK_نسخه(3,0,0)
 # include <gtk/gtksignal.h>
-#endif
-#ifdef MSWIN
+#پایان_اگر
+#اگر_تعریف_شده MSWIN
 # include <gdk/gdkwin32.h>
-#else
+#وإلا
 # include <gdk/gdkx.h>
-#endif
+#پایان_اگر
 
-typedef struct _GtkFormChild GtkFormChild;
+تعريفنوع بنية Gtk_Form_فرزند Gtk_Form_فرزند_2;
 
-struct _GtkFormChild
+بنية Gtk_Form_فرزند
 {
     GtkWidget *widget;
-    GdkWindow *window;
+    Gdk_پنجره *پنجره_2;
     gint x;		// relative subwidget x position
     gint y;		// relative subwidget y position
     gint mapped;
 };
 
 
-static void gui_gtk_form_class_init(GtkFormClass *klass);
-#if GTK_CHECK_VERSION(3,0,0)
-static void gui_gtk_form_init(GtkForm *form);
-#else
-static void gui_gtk_form_init(GtkForm *form, void *g_class);
-#endif
+ساكن فراغ gui_gtk_form_class_init(GtkFormClass *klass);
+#إذا GTK_CHECK_نسخه(3,0,0)
+ساكن فراغ gui_gtk_form_init(GtkForm *form);
+#وإلا
+ساكن فراغ gui_gtk_form_init(GtkForm *form, فراغ *g_class);
+#پایان_اگر
 
-static void form_realize(GtkWidget *widget);
-static void form_unrealize(GtkWidget *widget);
-static void form_map(GtkWidget *widget);
-static void form_size_request(GtkWidget *widget, GtkRequisition *requisition);
-#if GTK_CHECK_VERSION(3,0,0)
-static void form_get_preferred_width(GtkWidget *widget, gint *minimal_width, gint *natural_width);
-static void form_get_preferred_height(GtkWidget *widget, gint *minimal_height, gint *natural_height);
-#endif
-static void form_size_allocate(GtkWidget *widget, GtkAllocation *allocation);
-#if GTK_CHECK_VERSION(3,0,0)
-static gboolean form_draw(GtkWidget *widget, cairo_t *cr);
-#else
-static gint form_expose(GtkWidget *widget, GdkEventExpose *event);
-#endif
+ساكن فراغ form_realize(GtkWidget *widget);
+ساكن فراغ form_unrealize(GtkWidget *widget);
+ساكن فراغ form_map(GtkWidget *widget);
+ساكن فراغ form_اندازه_request(GtkWidget *widget, GtkRequisition *requisition);
+#إذا GTK_CHECK_نسخه(3,0,0)
+ساكن فراغ form_get_preferred_عرض(GtkWidget *widget, gint *کمینه_عرض, gint *natural_عرض);
+ساكن فراغ form_get_preferred_ارتفاع(GtkWidget *widget, gint *کمینه_ارتفاع, gint *natural_ارتفاع);
+#پایان_اگر
+ساكن فراغ form_اندازه_allocate(GtkWidget *widget, Gtk_تخصیص *تخصیص);
+#إذا GTK_CHECK_نسخه(3,0,0)
+ساكن gboolean form_draw(GtkWidget *widget, cairo_t *cr);
+#وإلا
+ساكن gint form_expose(GtkWidget *widget, GdkEventExpose *event);
+#پایان_اگر
 
-static void form_remove(GtkContainer *container, GtkWidget *widget);
-static void form_forall(GtkContainer *container, gboolean include_internals, GtkCallback callback, gpointer callback_data);
+ساكن فراغ form_remove(GtkContainer *container, GtkWidget *widget);
+ساكن فراغ form_forall(GtkContainer *container, gboolean include_internals, GtkCallback callback, gpointer callback_داده);
 
-static void form_attach_child_window(GtkForm *form, GtkFormChild *child);
-static void form_realize_child(GtkForm *form, GtkFormChild *child);
-static void form_position_child(GtkForm *form, GtkFormChild *child, gboolean force_allocate);
-static void form_position_children(GtkForm *form);
+ساكن فراغ form_attach_فرزند_پنجره(GtkForm *form, Gtk_Form_فرزند_2 *فرزند);
+ساكن فراغ form_realize_فرزند(GtkForm *form, Gtk_Form_فرزند_2 *فرزند);
+ساكن فراغ form_position_فرزند(GtkForm *form, Gtk_Form_فرزند_2 *فرزند, gboolean force_allocate);
+ساكن فراغ form_position_children(GtkForm *form);
 
-static void form_send_configure(GtkForm *form);
+ساكن فراغ form_send_configure(GtkForm *form);
 
-static void form_child_map(GtkWidget *widget, gpointer user_data);
-static void form_child_unmap(GtkWidget *widget, gpointer user_data);
+ساكن فراغ form_فرزند_map(GtkWidget *widget, gpointer user_داده);
+ساكن فراغ form_فرزند_unmap(GtkWidget *widget, gpointer user_داده);
 
-#if !GTK_CHECK_VERSION(3,0,0)
-static GtkWidgetClass *parent_class = NULL;
-#endif
+#إذا !GTK_CHECK_نسخه(3,0,0)
+ساكن GtkWidgetClass *والد_class = عدم;
+#پایان_اگر
 
 // Public interface
 
     GtkWidget *
-gui_gtk_form_new(void)
+gui_gtk_form_new(فراغ)
 {
     GtkForm *form;
 
-#if GTK_CHECK_VERSION(3,0,0)
-    form = g_object_new(GTK_TYPE_FORM, NULL);
-#else
+#إذا GTK_CHECK_نسخه(3,0,0)
+    form = g_object_new(GTK_TYPE_FORM, عدم);
+#وإلا
     form = gtk_type_new(gui_gtk_form_get_type());
-#endif
+#پایان_اگر
 
-    return GTK_WIDGET(form);
+    أرجع GTK_WIDGET(form);
 }
 
-    void
+    فراغ
 gui_gtk_form_put(
 	GtkForm	*form,
-	GtkWidget	*child_widget,
+	GtkWidget	*فرزند_widget,
 	gint	x,
 	gint	y)
 {
-    GtkFormChild *child;
+    Gtk_Form_فرزند_2 *فرزند;
 
     g_return_if_fail(GTK_IS_FORM(form));
 
     // LINTED: avoid warning: conversion to 'unsigned long'
-    child = g_new(GtkFormChild, 1);
-    if (child == NULL)
-	return;
+    فرزند = g_new(Gtk_Form_فرزند_2, 1);
+    إذا (فرزند == عدم)
+	أرجع;
 
-    child->widget = child_widget;
-    child->window = NULL;
-    child->x = x;
-    child->y = y;
-#if GTK_CHECK_VERSION(3,0,0)
-    gtk_widget_set_size_request(child->widget, -1, -1);
-#else
-    child->widget->requisition.width = 0;
-    child->widget->requisition.height = 0;
-#endif
-    child->mapped = FALSE;
+    فرزند->widget = فرزند_widget;
+    فرزند->پنجره_2 = عدم;
+    فرزند->x = x;
+    فرزند->y = y;
+#إذا GTK_CHECK_نسخه(3,0,0)
+    gtk_widget_مجموعه_اندازه_request(فرزند->widget, -1, -1);
+#وإلا
+    فرزند->widget->requisition.عرض = 0;
+    فرزند->widget->requisition.ارتفاع = 0;
+#پایان_اگر
+    فرزند->mapped = FALSE;
 
-    form->children = g_list_append(form->children, child);
+    form->children = g_list_append(form->children, فرزند);
 
     // child->window must be created and attached to the widget _before_
     // it has been realized, or else things will break with GTK2.  Note
     // that gtk_widget_set_parent() realizes the widget if it's visible
     // and its parent is mapped.
-    if (gtk_widget_get_realized(GTK_WIDGET(form)))
-	form_attach_child_window(form, child);
+    إذا (gtk_widget_get_realized(GTK_WIDGET(form)))
+	form_attach_فرزند_پنجره(form, فرزند);
 
-    gtk_widget_set_parent(child_widget, GTK_WIDGET(form));
+    gtk_widget_مجموعه_والد(فرزند_widget, GTK_WIDGET(form));
 
-    if (gtk_widget_get_realized(GTK_WIDGET(form))
-	    && !gtk_widget_get_realized(child_widget))
-	form_realize_child(form, child);
+    إذا (gtk_widget_get_realized(GTK_WIDGET(form))
+	    && !gtk_widget_get_realized(فرزند_widget))
+	form_realize_فرزند(form, فرزند);
 
-    form_position_child(form, child, TRUE);
+    form_position_فرزند(form, فرزند, TRUE);
 }
 
-    void
+    فراغ
 gui_gtk_form_move(
 	GtkForm	*form,
-	GtkWidget	*child_widget,
+	GtkWidget	*فرزند_widget,
 	gint	x,
 	gint	y)
 {
     GList *tmp_list;
-    GtkFormChild *child;
+    Gtk_Form_فرزند_2 *فرزند;
 
     g_return_if_fail(GTK_IS_FORM(form));
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    لكل (tmp_list = form->children; tmp_list; tmp_list = tmp_list->بعدی)
     {
-	child = tmp_list->data;
-	if (child->widget == child_widget)
+	فرزند = tmp_list->داده;
+	إذا (فرزند->widget == فرزند_widget)
 	{
-	    child->x = x;
-	    child->y = y;
+	    فرزند->x = x;
+	    فرزند->y = y;
 
-	    form_position_child(form, child, TRUE);
-	    return;
+	    form_position_فرزند(form, فرزند, TRUE);
+	    أرجع;
 	}
     }
 }
 
-    void
+    فراغ
 gui_gtk_form_freeze(GtkForm *form)
 {
     g_return_if_fail(GTK_IS_FORM(form));
 
-    ++form->freeze_count;
+    ++form->freeze_شمار;
 }
 
-    void
+    فراغ
 gui_gtk_form_thaw(GtkForm *form)
 {
     g_return_if_fail(GTK_IS_FORM(form));
 
-    if (!form->freeze_count)
-	return;
+    إذا (!form->freeze_شمار)
+	أرجع;
 
-    if (!(--form->freeze_count))
+    إذا (!(--form->freeze_شمار))
     {
 	form_position_children(form);
-	gtk_widget_queue_draw(GTK_WIDGET(form));
+	gtk_widget_صف_draw(GTK_WIDGET(form));
     }
 }
 
 // Basic Object handling procedures
 
-#if GTK_CHECK_VERSION(3,0,0)
+#إذا GTK_CHECK_نسخه(3,0,0)
 G_DEFINE_TYPE(GtkForm, gui_gtk_form, GTK_TYPE_CONTAINER)
-#else
+#وإلا
     GtkType
-gui_gtk_form_get_type(void)
+gui_gtk_form_get_type(فراغ)
 {
-    static GtkType form_type = 0;
+    ساكن GtkType form_type = 0;
 
-    if (!form_type)
+    إذا (!form_type)
     {
 	GtkTypeInfo form_info;
 
-	CLEAR_FIELD(form_info);
+	CLEAR_فیلد(form_info);
 	form_info.type_name = "GtkForm";
-	form_info.object_size = sizeof(GtkForm);
-	form_info.class_size = sizeof(GtkFormClass);
+	form_info.object_اندازه = حجم(GtkForm);
+	form_info.class_اندازه = حجم(GtkFormClass);
 	form_info.class_init_func = (GtkClassInitFunc)gui_gtk_form_class_init;
 	form_info.object_init_func = (GtkObjectInitFunc)gui_gtk_form_init;
 
 	form_type = gtk_type_unique(GTK_TYPE_CONTAINER, &form_info);
     }
-    return form_type;
+    أرجع form_type;
 }
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#پایان_اگر // !GTK_CHECK_VERSION(3,0,0)
 
-    static void
+    ساكن فراغ
 gui_gtk_form_class_init(GtkFormClass *klass)
 {
     GtkWidgetClass *widget_class;
@@ -234,122 +234,122 @@ gui_gtk_form_class_init(GtkFormClass *klass)
     widget_class = (GtkWidgetClass *) klass;
     container_class = (GtkContainerClass *) klass;
 
-#if !GTK_CHECK_VERSION(3,0,0)
-    parent_class = gtk_type_class(gtk_container_get_type());
-#endif
+#إذا !GTK_CHECK_نسخه(3,0,0)
+    والد_class = gtk_type_class(gtk_container_get_type());
+#پایان_اگر
 
     widget_class->realize = form_realize;
     widget_class->unrealize = form_unrealize;
     widget_class->map = form_map;
-#if GTK_CHECK_VERSION(3,0,0)
-    widget_class->get_preferred_width = form_get_preferred_width;
-    widget_class->get_preferred_height = form_get_preferred_height;
-#else
-    widget_class->size_request = form_size_request;
-#endif
-    widget_class->size_allocate = form_size_allocate;
-#if GTK_CHECK_VERSION(3,0,0)
+#إذا GTK_CHECK_نسخه(3,0,0)
+    widget_class->get_preferred_عرض = form_get_preferred_عرض;
+    widget_class->get_preferred_ارتفاع = form_get_preferred_ارتفاع;
+#وإلا
+    widget_class->اندازه_request = form_اندازه_request;
+#پایان_اگر
+    widget_class->اندازه_allocate = form_اندازه_allocate;
+#إذا GTK_CHECK_نسخه(3,0,0)
     widget_class->draw = form_draw;
-#else
+#وإلا
     widget_class->expose_event = form_expose;
-#endif
+#پایان_اگر
 
     container_class->remove = form_remove;
     container_class->forall = form_forall;
 }
 
-    static void
+    ساكن فراغ
 gui_gtk_form_init(GtkForm *form
-#if !GTK_CHECK_VERSION(3,0,0)
-	, void *g_class UNUSED
-#endif
+#إذا !GTK_CHECK_نسخه(3,0,0)
+	, فراغ *g_class استفادهنشده
+#پایان_اگر
 	)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    gtk_widget_set_has_window(GTK_WIDGET(form), TRUE);
-#endif
-    form->children = NULL;
-    form->bin_window = NULL;
-    form->freeze_count = 0;
+#إذا GTK_CHECK_نسخه(3,0,0)
+    gtk_widget_مجموعه_has_پنجره(GTK_WIDGET(form), TRUE);
+#پایان_اگر
+    form->children = عدم;
+    form->bin_پنجره = عدم;
+    form->freeze_شمار = 0;
 }
 
 /*
  * Widget methods
  */
 
-    static void
+    ساكن فراغ
 form_realize(GtkWidget *widget)
 {
     GList *tmp_list;
     GtkForm *form;
-    GdkWindowAttr attributes;
-    gint attributes_mask;
-    GtkAllocation allocation;
+    Gdk_پنجره_Attr صفات;
+    gint صفات_ماسک;
+    Gtk_تخصیص تخصیص;
 
     g_return_if_fail(GTK_IS_FORM(widget));
 
     form = GTK_FORM(widget);
-    gtk_widget_set_realized(widget, TRUE);
+    gtk_widget_مجموعه_realized(widget, TRUE);
 
-    gtk_widget_get_allocation(widget, &allocation);
-    attributes.window_type = GDK_WINDOW_CHILD;
-    attributes.x = allocation.x;
-    attributes.y = allocation.y;
-    attributes.width = allocation.width;
-    attributes.height = allocation.height;
-    attributes.wclass = GDK_INPUT_OUTPUT;
-    attributes.visual = gtk_widget_get_visual(widget);
-#if GTK_CHECK_VERSION(3,0,0)
-    attributes.event_mask = GDK_EXPOSURE_MASK;
-#else
-    attributes.colormap = gtk_widget_get_colormap(widget);
-    attributes.event_mask = GDK_VISIBILITY_NOTIFY_MASK;
-#endif
+    gtk_widget_get_تخصیص(widget, &تخصیص);
+    صفات.پنجره_type = GDK_پنجره_فرزند;
+    صفات.x = تخصیص.x;
+    صفات.y = تخصیص.y;
+    صفات.عرض = تخصیص.عرض;
+    صفات.ارتفاع = تخصیص.ارتفاع;
+    صفات.wclass = GDK_درون_داد_OUTPUT;
+    صفات.visual = gtk_widget_get_visual(widget);
+#إذا GTK_CHECK_نسخه(3,0,0)
+    صفات.event_ماسک = GDK_EXPOSURE_ماسک;
+#وإلا
+    صفات.colormap = gtk_widget_get_colormap(widget);
+    صفات.event_ماسک = GDK_VISIBILITY_NOTIFY_ماسک;
+#پایان_اگر
 
-#if GTK_CHECK_VERSION(3,0,0)
-    attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
-#else
-    attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
-#endif
+#إذا GTK_CHECK_نسخه(3,0,0)
+    صفات_ماسک = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
+#وإلا
+    صفات_ماسک = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
+#پایان_اگر
 
-    gtk_widget_set_window(widget,
-			  gdk_window_new(gtk_widget_get_parent_window(widget),
-					 &attributes, attributes_mask));
-    gdk_window_set_user_data(gtk_widget_get_window(widget), widget);
+    gtk_widget_مجموعه_پنجره(widget,
+			  gdk_پنجره_new(gtk_widget_get_والد_پنجره(widget),
+					 &صفات, صفات_ماسک));
+    gdk_پنجره_مجموعه_user_داده(gtk_widget_get_پنجره(widget), widget);
 
-    attributes.x = 0;
-    attributes.y = 0;
-    attributes.event_mask = gtk_widget_get_events(widget);
+    صفات.x = 0;
+    صفات.y = 0;
+    صفات.event_ماسک = gtk_widget_get_events(widget);
 
-    form->bin_window = gdk_window_new(gtk_widget_get_window(widget),
-				      &attributes, attributes_mask);
-    gdk_window_set_user_data(form->bin_window, widget);
+    form->bin_پنجره = gdk_پنجره_new(gtk_widget_get_پنجره(widget),
+				      &صفات, صفات_ماسک);
+    gdk_پنجره_مجموعه_user_داده(form->bin_پنجره, widget);
 
-#if GTK_CHECK_VERSION(3,0,0)
+#إذا GTK_CHECK_نسخه(3,0,0)
     {
-	GtkStyleContext * const sctx = gtk_widget_get_style_context(widget);
+	GtkStyleContext * ثابت sctx = gtk_widget_get_style_context(widget);
 
-	gtk_style_context_add_class(sctx, "gtk-form");
-	gtk_style_context_set_state(sctx, GTK_STATE_FLAG_NORMAL);
-# if !GTK_CHECK_VERSION(3,18,0)
-	gtk_style_context_set_background(sctx, gtk_widget_get_window(widget));
-	gtk_style_context_set_background(sctx, form->bin_window);
+	gtk_style_context_جمع_کن_class(sctx, "gtk-form");
+	gtk_style_context_مجموعه_state(sctx, GTK_STATE_FLAG_نرمال);
+# إذا !GTK_CHECK_نسخه(3,18,0)
+	gtk_style_context_مجموعه_background(sctx, gtk_widget_get_پنجره(widget));
+	gtk_style_context_مجموعه_background(sctx, form->bin_پنجره);
 # endif
     }
-#else
-    widget->style = gtk_style_attach(widget->style, widget->window);
-    gtk_style_set_background(widget->style, widget->window, GTK_STATE_NORMAL);
-    gtk_style_set_background(widget->style, form->bin_window, GTK_STATE_NORMAL);
-#endif
+#وإلا
+    widget->style = gtk_style_attach(widget->style, widget->پنجره_2);
+    gtk_style_مجموعه_background(widget->style, widget->پنجره_2, GTK_STATE_نرمال);
+    gtk_style_مجموعه_background(widget->style, form->bin_پنجره, GTK_STATE_نرمال);
+#پایان_اگر
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    لكل (tmp_list = form->children; tmp_list; tmp_list = tmp_list->بعدی)
     {
-	GtkFormChild *child = tmp_list->data;
+	Gtk_Form_فرزند_2 *فرزند = tmp_list->داده;
 
-	form_attach_child_window(form, child);
+	form_attach_فرزند_پنجره(form, فرزند);
 
-	if (gtk_widget_get_visible(child->widget))
-	    form_realize_child(form, child);
+	إذا (gtk_widget_get_visible(فرزند->widget))
+	    form_realize_فرزند(form, فرزند);
     }
 }
 
@@ -361,7 +361,7 @@ form_realize(GtkWidget *widget)
 //
 // Well, I reckon at least the gdk_window_show(form->bin_window)
 // is necessary.  GtkForm is anything but a usual container widget.
-    static void
+    ساكن فراغ
 form_map(GtkWidget *widget)
 {
     GList *tmp_list;
@@ -371,22 +371,22 @@ form_map(GtkWidget *widget)
 
     form = GTK_FORM(widget);
 
-    gtk_widget_set_mapped(widget, TRUE);
+    gtk_widget_مجموعه_mapped(widget, TRUE);
 
-    gdk_window_show(gtk_widget_get_window(widget));
-    gdk_window_show(form->bin_window);
+    gdk_پنجره_show(gtk_widget_get_پنجره(widget));
+    gdk_پنجره_show(form->bin_پنجره);
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    لكل (tmp_list = form->children; tmp_list; tmp_list = tmp_list->بعدی)
     {
-	GtkFormChild *child = tmp_list->data;
+	Gtk_Form_فرزند_2 *فرزند = tmp_list->داده;
 
-	if (gtk_widget_get_visible(child->widget)
-		&& !gtk_widget_get_mapped(child->widget))
-	    gtk_widget_map(child->widget);
+	إذا (gtk_widget_get_visible(فرزند->widget)
+		&& !gtk_widget_get_mapped(فرزند->widget))
+	    gtk_widget_map(فرزند->widget);
     }
 }
 
-    static void
+    ساكن فراغ
 form_unrealize(GtkWidget *widget)
 {
     GList *tmp_list;
@@ -398,155 +398,155 @@ form_unrealize(GtkWidget *widget)
 
     tmp_list = form->children;
 
-    gdk_window_set_user_data(form->bin_window, NULL);
-    gdk_window_destroy(form->bin_window);
-    form->bin_window = NULL;
+    gdk_پنجره_مجموعه_user_داده(form->bin_پنجره, عدم);
+    gdk_پنجره_destroy(form->bin_پنجره);
+    form->bin_پنجره = عدم;
 
-    while (tmp_list)
+    طالما (tmp_list)
     {
-	GtkFormChild *child = tmp_list->data;
+	Gtk_Form_فرزند_2 *فرزند = tmp_list->داده;
 
-	if (child->window != NULL)
+	إذا (فرزند->پنجره_2 != عدم)
 	{
-	    g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
-		    FUNC2GENERIC(form_child_map),
-		    child);
-	    g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
-		    FUNC2GENERIC(form_child_unmap),
-		    child);
+	    g_signal_handlers_disconnect_by_func(G_OBJECT(فرزند->widget),
+		    FUNC2GENERIC(form_فرزند_map),
+		    فرزند);
+	    g_signal_handlers_disconnect_by_func(G_OBJECT(فرزند->widget),
+		    FUNC2GENERIC(form_فرزند_unmap),
+		    فرزند);
 
-	    gdk_window_set_user_data(child->window, NULL);
-	    gdk_window_destroy(child->window);
+	    gdk_پنجره_مجموعه_user_داده(فرزند->پنجره_2, عدم);
+	    gdk_پنجره_destroy(فرزند->پنجره_2);
 
-	    child->window = NULL;
+	    فرزند->پنجره_2 = عدم;
 	}
 
-	tmp_list = tmp_list->next;
+	tmp_list = tmp_list->بعدی;
     }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    if (GTK_WIDGET_CLASS (gui_gtk_form_parent_class)->unrealize)
-	 (* GTK_WIDGET_CLASS (gui_gtk_form_parent_class)->unrealize) (widget);
-#else
-    if (GTK_WIDGET_CLASS (parent_class)->unrealize)
-	 (* GTK_WIDGET_CLASS (parent_class)->unrealize) (widget);
-#endif
+#إذا GTK_CHECK_نسخه(3,0,0)
+    إذا (GTK_WIDGET_CLASS (gui_gtk_form_والد_class)->unrealize)
+	 (* GTK_WIDGET_CLASS (gui_gtk_form_والد_class)->unrealize) (widget);
+#وإلا
+    إذا (GTK_WIDGET_CLASS (والد_class)->unrealize)
+	 (* GTK_WIDGET_CLASS (والد_class)->unrealize) (widget);
+#پایان_اگر
 }
 
-    static void
-form_size_request(GtkWidget *widget, GtkRequisition *requisition)
+    ساكن فراغ
+form_اندازه_request(GtkWidget *widget, GtkRequisition *requisition)
 {
     g_return_if_fail(GTK_IS_FORM(widget));
-    g_return_if_fail(requisition != NULL);
+    g_return_if_fail(requisition != عدم);
 
-    requisition->width = 1;
-    requisition->height = 1;
+    requisition->عرض = 1;
+    requisition->ارتفاع = 1;
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static void
-form_get_preferred_width(GtkWidget *widget,
-			     gint      *minimal_width,
-			     gint      *natural_width)
+#إذا GTK_CHECK_نسخه(3,0,0)
+    ساكن فراغ
+form_get_preferred_عرض(GtkWidget *widget,
+			     gint      *کمینه_عرض,
+			     gint      *natural_عرض)
 {
     GtkRequisition requisition;
 
-    form_size_request(widget, &requisition);
+    form_اندازه_request(widget, &requisition);
 
-    *minimal_width = requisition.width;
-    *natural_width = requisition.width;
+    *کمینه_عرض = requisition.عرض;
+    *natural_عرض = requisition.عرض;
 }
 
-    static void
-form_get_preferred_height(GtkWidget *widget,
-			      gint	*minimal_height,
-			      gint	*natural_height)
+    ساكن فراغ
+form_get_preferred_ارتفاع(GtkWidget *widget,
+			      gint	*کمینه_ارتفاع,
+			      gint	*natural_ارتفاع)
 {
     GtkRequisition requisition;
 
-    form_size_request(widget, &requisition);
+    form_اندازه_request(widget, &requisition);
 
-    *minimal_height = requisition.height;
-    *natural_height = requisition.height;
+    *کمینه_ارتفاع = requisition.ارتفاع;
+    *natural_ارتفاع = requisition.ارتفاع;
 }
-#endif // GTK_CHECK_VERSION(3,0,0)
+#پایان_اگر // GTK_CHECK_VERSION(3,0,0)
 
-    static void
-form_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
+    ساكن فراغ
+form_اندازه_allocate(GtkWidget *widget, Gtk_تخصیص *تخصیص)
 {
     GList *tmp_list;
     GtkForm *form;
     gboolean need_reposition;
-    GtkAllocation cur_alloc;
+    Gtk_تخصیص cur_alloc;
 
     g_return_if_fail(GTK_IS_FORM(widget));
 
-    gtk_widget_get_allocation(widget, &cur_alloc);
+    gtk_widget_get_تخصیص(widget, &cur_alloc);
 
-    if (cur_alloc.x == allocation->x
-	    && cur_alloc.y == allocation->y
-	    && cur_alloc.width == allocation->width
-	    && cur_alloc.height == allocation->height)
-	return;
+    إذا (cur_alloc.x == تخصیص->x
+	    && cur_alloc.y == تخصیص->y
+	    && cur_alloc.عرض == تخصیص->عرض
+	    && cur_alloc.ارتفاع == تخصیص->ارتفاع)
+	أرجع;
 
-    need_reposition = cur_alloc.width != allocation->width
-		   || cur_alloc.height != allocation->height;
+    need_reposition = cur_alloc.عرض != تخصیص->عرض
+		   || cur_alloc.ارتفاع != تخصیص->ارتفاع;
     form = GTK_FORM(widget);
 
-    if (need_reposition)
+    إذا (need_reposition)
     {
 	tmp_list = form->children;
 
-	while (tmp_list)
+	طالما (tmp_list)
 	{
-	    GtkFormChild *child = tmp_list->data;
-	    form_position_child(form, child, TRUE);
+	    Gtk_Form_فرزند_2 *فرزند = tmp_list->داده;
+	    form_position_فرزند(form, فرزند, TRUE);
 
-	    tmp_list = tmp_list->next;
+	    tmp_list = tmp_list->بعدی;
 	}
     }
 
-    if (gtk_widget_get_realized(widget))
+    إذا (gtk_widget_get_realized(widget))
     {
-	gdk_window_move_resize(gtk_widget_get_window(widget),
-			       allocation->x, allocation->y,
-			       allocation->width, allocation->height);
-	gdk_window_move_resize(GTK_FORM(widget)->bin_window,
+	gdk_پنجره_move_resize(gtk_widget_get_پنجره(widget),
+			       تخصیص->x, تخصیص->y,
+			       تخصیص->عرض, تخصیص->ارتفاع);
+	gdk_پنجره_move_resize(GTK_FORM(widget)->bin_پنجره,
 			       0, 0,
-			       allocation->width, allocation->height);
+			       تخصیص->عرض, تخصیص->ارتفاع);
     }
-    gtk_widget_set_allocation(widget, allocation);
-    if (need_reposition)
+    gtk_widget_مجموعه_تخصیص(widget, تخصیص);
+    إذا (need_reposition)
 	form_send_configure(form);
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
-    static void
+#إذا GTK_CHECK_نسخه(3,0,0)
+    ساكن فراغ
 gtk_form_render_background(GtkWidget *widget, cairo_t *cr)
 {
     gtk_render_background(gtk_widget_get_style_context(widget), cr,
 			  0, 0,
-			  gtk_widget_get_allocated_width(widget),
-			  gtk_widget_get_allocated_height(widget));
+			  gtk_widget_get_allocated_عرض(widget),
+			  gtk_widget_get_allocated_ارتفاع(widget));
 }
 
-    static gboolean
+    ساكن gboolean
 form_draw(GtkWidget *widget, cairo_t *cr)
 {
-    GList   *tmp_list = NULL;
-    GtkForm *form     = NULL;
+    GList   *tmp_list = عدم;
+    GtkForm *form     = عدم;
 
     g_return_val_if_fail(GTK_IS_FORM(widget), FALSE);
 
     gtk_form_render_background(widget, cr);
 
     form = GTK_FORM(widget);
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    لكل (tmp_list = form->children; tmp_list; tmp_list = tmp_list->بعدی)
     {
-	GtkFormChild * const formchild = tmp_list->data;
+	Gtk_Form_فرزند_2 * ثابت formchild = tmp_list->داده;
 
-	if (!gtk_widget_get_has_window(formchild->widget) &&
-		gtk_cairo_should_draw_window(cr, formchild->window))
+	إذا (!gtk_widget_get_has_پنجره(formchild->widget) &&
+		gtk_cairo_should_draw_پنجره(cr, formchild->پنجره_2))
 	{
 	    // To get gtk_widget_draw() to work, it is required to call
 	    // gtk_widget_size_allocate() in advance with a well-posed
@@ -558,16 +558,16 @@ form_draw(GtkWidget *widget, cairo_t *cr)
 	    //
 	    // Calling form_position_child() like this is one of ways
 	    // to make sure of that.
-	    form_position_child(form, formchild, TRUE);
+	    form_position_فرزند(form, formchild, TRUE);
 
 	    gtk_form_render_background(formchild->widget, cr);
 	}
     }
 
-    return GTK_WIDGET_CLASS(gui_gtk_form_parent_class)->draw(widget, cr);
+    أرجع GTK_WIDGET_CLASS(gui_gtk_form_والد_class)->draw(widget, cr);
 }
-#else // !GTK_CHECK_VERSION(3,0,0)
-    static gint
+#وإلا // !GTK_CHECK_VERSION(3,0,0)
+    ساكن gint
 form_expose(GtkWidget *widget, GdkEventExpose *event)
 {
     GList   *tmp_list;
@@ -577,310 +577,310 @@ form_expose(GtkWidget *widget, GdkEventExpose *event)
 
     form = GTK_FORM(widget);
 
-    if (event->window == form->bin_window)
-	return FALSE;
+    إذا (event->پنجره_2 == form->bin_پنجره)
+	أرجع FALSE;
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
+    لكل (tmp_list = form->children; tmp_list; tmp_list = tmp_list->بعدی)
 	gtk_container_propagate_expose(GTK_CONTAINER(widget),
-		GTK_WIDGET(((GtkFormChild *)tmp_list->data)->widget),
+		GTK_WIDGET(((Gtk_Form_فرزند_2 *)tmp_list->داده)->widget),
 		event);
 
-    return FALSE;
+    أرجع FALSE;
 }
-#endif // !GTK_CHECK_VERSION(3,0,0)
+#پایان_اگر // !GTK_CHECK_VERSION(3,0,0)
 
 // Container method
-    static void
+    ساكن فراغ
 form_remove(GtkContainer *container, GtkWidget *widget)
 {
     GList *tmp_list;
     GtkForm *form;
-    GtkFormChild *child = NULL;	    // init for gcc
+    Gtk_Form_فرزند_2 *فرزند = عدم;	    // init for gcc
 
     g_return_if_fail(GTK_IS_FORM(container));
 
     form = GTK_FORM(container);
 
     tmp_list = form->children;
-    while (tmp_list)
+    طالما (tmp_list)
     {
-	child = tmp_list->data;
-	if (child->widget == widget)
-	    break;
-	tmp_list = tmp_list->next;
+	فرزند = tmp_list->داده;
+	إذا (فرزند->widget == widget)
+	    اكسر;
+	tmp_list = tmp_list->بعدی;
     }
 
-    if (tmp_list == NULL)
-	return;
+    إذا (tmp_list == عدم)
+	أرجع;
 
-#if GTK_CHECK_VERSION(3,0,0)
-    const gboolean was_visible = gtk_widget_get_visible(widget);
-#endif
-    if (child->window)
+#إذا GTK_CHECK_نسخه(3,0,0)
+    ثابت gboolean was_visible = gtk_widget_get_visible(widget);
+#پایان_اگر
+    إذا (فرزند->پنجره_2)
     {
-	g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
-		FUNC2GENERIC(&form_child_map), child);
-	g_signal_handlers_disconnect_by_func(G_OBJECT(child->widget),
-		FUNC2GENERIC(&form_child_unmap), child);
+	g_signal_handlers_disconnect_by_func(G_OBJECT(فرزند->widget),
+		FUNC2GENERIC(&form_فرزند_map), فرزند);
+	g_signal_handlers_disconnect_by_func(G_OBJECT(فرزند->widget),
+		FUNC2GENERIC(&form_فرزند_unmap), فرزند);
 
 	// FIXME: This will cause problems for reparenting NO_WINDOW
 	// widgets out of a GtkForm
-	gdk_window_set_user_data(child->window, NULL);
-	gdk_window_destroy(child->window);
+	gdk_پنجره_مجموعه_user_داده(فرزند->پنجره_2, عدم);
+	gdk_پنجره_destroy(فرزند->پنجره_2);
     }
     gtk_widget_unparent(widget);
-#if GTK_CHECK_VERSION(3,0,0)
-    if (was_visible)
-	gtk_widget_queue_resize(GTK_WIDGET(container));
-#endif
+#إذا GTK_CHECK_نسخه(3,0,0)
+    إذا (was_visible)
+	gtk_widget_صف_resize(GTK_WIDGET(container));
+#پایان_اگر
     form->children = g_list_remove_link(form->children, tmp_list);
     g_list_free_1(tmp_list);
-    g_free(child);
+    g_free(فرزند);
 }
 
-    static void
+    ساكن فراغ
 form_forall(GtkContainer	*container,
-		gboolean	include_internals UNUSED,
+		gboolean	include_internals استفادهنشده,
 		GtkCallback	callback,
-		gpointer	callback_data)
+		gpointer	callback_داده)
 {
     GtkForm *form;
-    GtkFormChild *child;
+    Gtk_Form_فرزند_2 *فرزند;
     GList *tmp_list;
 
     g_return_if_fail(GTK_IS_FORM(container));
-    g_return_if_fail(callback != NULL);
+    g_return_if_fail(callback != عدم);
 
     form = GTK_FORM(container);
 
     tmp_list = form->children;
-    while (tmp_list)
+    طالما (tmp_list)
     {
-	child = tmp_list->data;
-	tmp_list = tmp_list->next;
+	فرزند = tmp_list->داده;
+	tmp_list = tmp_list->بعدی;
 
-	(*callback) (child->widget, callback_data);
+	(*callback) (فرزند->widget, callback_داده);
     }
 }
 
 // Operations on children
 
-    static void
-form_attach_child_window(GtkForm *form, GtkFormChild *child)
+    ساكن فراغ
+form_attach_فرزند_پنجره(GtkForm *form, Gtk_Form_فرزند_2 *فرزند)
 {
-    if (child->window != NULL)
-	return; // been there, done that
+    إذا (فرزند->پنجره_2 != عدم)
+	أرجع; // been there, done that
 
-    if (!gtk_widget_get_has_window(child->widget))
+    إذا (!gtk_widget_get_has_پنجره(فرزند->widget))
     {
 	GtkWidget	*widget;
-	GdkWindowAttr	attributes;
-	gint		attributes_mask;
+	Gdk_پنجره_Attr	صفات;
+	gint		صفات_ماسک;
 	GtkRequisition	requisition;
 
 	widget = GTK_WIDGET(form);
 
-#if GTK_CHECK_VERSION(3,0,0)
-	gtk_widget_get_preferred_size(child->widget, &requisition, NULL);
-#else
-	requisition = child->widget->requisition;
-#endif
-	attributes.window_type = GDK_WINDOW_CHILD;
-	attributes.x = child->x;
-	attributes.y = child->y;
-	attributes.width = requisition.width;
-	attributes.height = requisition.height;
-	attributes.wclass = GDK_INPUT_OUTPUT;
-	attributes.visual = gtk_widget_get_visual(widget);
-#if !GTK_CHECK_VERSION(3,0,0)
-	attributes.colormap = gtk_widget_get_colormap(widget);
-#endif
-	attributes.event_mask = GDK_EXPOSURE_MASK;
+#إذا GTK_CHECK_نسخه(3,0,0)
+	gtk_widget_get_preferred_اندازه(فرزند->widget, &requisition, عدم);
+#وإلا
+	requisition = فرزند->widget->requisition;
+#پایان_اگر
+	صفات.پنجره_type = GDK_پنجره_فرزند;
+	صفات.x = فرزند->x;
+	صفات.y = فرزند->y;
+	صفات.عرض = requisition.عرض;
+	صفات.ارتفاع = requisition.ارتفاع;
+	صفات.wclass = GDK_درون_داد_OUTPUT;
+	صفات.visual = gtk_widget_get_visual(widget);
+#إذا !GTK_CHECK_نسخه(3,0,0)
+	صفات.colormap = gtk_widget_get_colormap(widget);
+#پایان_اگر
+	صفات.event_ماسک = GDK_EXPOSURE_ماسک;
 
-#if GTK_CHECK_VERSION(3,0,0)
-	attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
-#else
-	attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
-#endif
-	child->window = gdk_window_new(form->bin_window,
-				       &attributes, attributes_mask);
-	gdk_window_set_user_data(child->window, widget);
+#إذا GTK_CHECK_نسخه(3,0,0)
+	صفات_ماسک = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
+#وإلا
+	صفات_ماسک = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
+#پایان_اگر
+	فرزند->پنجره_2 = gdk_پنجره_new(form->bin_پنجره,
+				       &صفات, صفات_ماسک);
+	gdk_پنجره_مجموعه_user_داده(فرزند->پنجره_2, widget);
 
-#if GTK_CHECK_VERSION(3,0,0)
+#إذا GTK_CHECK_نسخه(3,0,0)
 	{
-	    GtkStyleContext * const sctx = gtk_widget_get_style_context(widget);
+	    GtkStyleContext * ثابت sctx = gtk_widget_get_style_context(widget);
 
-	    gtk_style_context_set_state(sctx, GTK_STATE_FLAG_NORMAL);
-# if !GTK_CHECK_VERSION(3,18,0)
-	    gtk_style_context_set_background(sctx, child->window);
+	    gtk_style_context_مجموعه_state(sctx, GTK_STATE_FLAG_نرمال);
+# إذا !GTK_CHECK_نسخه(3,18,0)
+	    gtk_style_context_مجموعه_background(sctx, فرزند->پنجره_2);
 # endif
 	}
-#else
-	gtk_style_set_background(widget->style,
-				 child->window,
-				 GTK_STATE_NORMAL);
-#endif
+#وإلا
+	gtk_style_مجموعه_background(widget->style,
+				 فرزند->پنجره_2,
+				 GTK_STATE_نرمال);
+#پایان_اگر
 
-	gtk_widget_set_parent_window(child->widget, child->window);
+	gtk_widget_مجموعه_والد_پنجره(فرزند->widget, فرزند->پنجره_2);
 	/*
 	 * Install signal handlers to map/unmap child->window
 	 * alongside with the actual widget.
 	 */
-	g_signal_connect(G_OBJECT(child->widget), "map",
-			 G_CALLBACK(&form_child_map), child);
-	g_signal_connect(G_OBJECT(child->widget), "unmap",
-			 G_CALLBACK(&form_child_unmap), child);
+	g_signal_connect(G_OBJECT(فرزند->widget), "map",
+			 G_CALLBACK(&form_فرزند_map), فرزند);
+	g_signal_connect(G_OBJECT(فرزند->widget), "unmap",
+			 G_CALLBACK(&form_فرزند_unmap), فرزند);
     }
-    else if (!gtk_widget_get_realized(child->widget))
+    وإلا إذا (!gtk_widget_get_realized(فرزند->widget))
     {
-	gtk_widget_set_parent_window(child->widget, form->bin_window);
+	gtk_widget_مجموعه_والد_پنجره(فرزند->widget, form->bin_پنجره);
     }
 }
 
-    static void
-form_realize_child(GtkForm *form, GtkFormChild *child)
+    ساكن فراغ
+form_realize_فرزند(GtkForm *form, Gtk_Form_فرزند_2 *فرزند)
 {
-    form_attach_child_window(form, child);
-    gtk_widget_realize(child->widget);
+    form_attach_فرزند_پنجره(form, فرزند);
+    gtk_widget_realize(فرزند->widget);
 }
 
-    static void
-form_position_child(
+    ساكن فراغ
+form_position_فرزند(
     GtkForm		*form,
-    GtkFormChild	*child,
+    Gtk_Form_فرزند_2	*فرزند,
     gboolean		force_allocate)
 {
     gint x;
     gint y;
 
-    x = child->x;
-    y = child->y;
+    x = فرزند->x;
+    y = فرزند->y;
 
-    if ((x >= G_MINSHORT) && (x <= G_MAXSHORT) &&
+    إذا ((x >= G_MINSHORT) && (x <= G_MAXSHORT) &&
 	(y >= G_MINSHORT) && (y <= G_MAXSHORT))
     {
-	if (!child->mapped)
+	إذا (!فرزند->mapped)
 	{
-	    if (gtk_widget_get_mapped(GTK_WIDGET(form))
-		    && gtk_widget_get_visible(child->widget))
+	    إذا (gtk_widget_get_mapped(GTK_WIDGET(form))
+		    && gtk_widget_get_visible(فرزند->widget))
 	    {
-		if (!gtk_widget_get_mapped(child->widget))
-		    gtk_widget_map(child->widget);
+		إذا (!gtk_widget_get_mapped(فرزند->widget))
+		    gtk_widget_map(فرزند->widget);
 
-		child->mapped = TRUE;
+		فرزند->mapped = TRUE;
 		force_allocate = TRUE;
 	    }
 	}
 
-	if (force_allocate)
+	إذا (force_allocate)
 	{
-	    GtkAllocation allocation;
+	    Gtk_تخصیص تخصیص;
 	    GtkRequisition requisition;
 
-#if GTK_CHECK_VERSION(3,0,0)
-	    gtk_widget_get_preferred_size(child->widget, &requisition, NULL);
-#else
-	    requisition = child->widget->requisition;
-#endif
+#إذا GTK_CHECK_نسخه(3,0,0)
+	    gtk_widget_get_preferred_اندازه(فرزند->widget, &requisition, عدم);
+#وإلا
+	    requisition = فرزند->widget->requisition;
+#پایان_اگر
 
-	    if (!gtk_widget_get_has_window(child->widget))
+	    إذا (!gtk_widget_get_has_پنجره(فرزند->widget))
 	    {
-		if (child->window)
+		إذا (فرزند->پنجره_2)
 		{
-		    gdk_window_move_resize(child->window,
+		    gdk_پنجره_move_resize(فرزند->پنجره_2,
 			    x, y,
-			    requisition.width,
-			    requisition.height);
+			    requisition.عرض,
+			    requisition.ارتفاع);
 		}
 
-		allocation.x = 0;
-		allocation.y = 0;
+		تخصیص.x = 0;
+		تخصیص.y = 0;
 	    }
-	    else
+	    وإلا
 	    {
-		allocation.x = x;
-		allocation.y = y;
+		تخصیص.x = x;
+		تخصیص.y = y;
 	    }
 
-	    allocation.width = requisition.width;
-	    allocation.height = requisition.height;
+	    تخصیص.عرض = requisition.عرض;
+	    تخصیص.ارتفاع = requisition.ارتفاع;
 
-	    gtk_widget_size_allocate(child->widget, &allocation);
+	    gtk_widget_اندازه_allocate(فرزند->widget, &تخصیص);
 	}
     }
-    else
+    وإلا
     {
-	if (child->mapped)
+	إذا (فرزند->mapped)
 	{
-	    child->mapped = FALSE;
+	    فرزند->mapped = FALSE;
 
-	    if (gtk_widget_get_mapped(child->widget))
-		gtk_widget_unmap(child->widget);
+	    إذا (gtk_widget_get_mapped(فرزند->widget))
+		gtk_widget_unmap(فرزند->widget);
 	}
     }
 }
 
-    static void
+    ساكن فراغ
 form_position_children(GtkForm *form)
 {
     GList *tmp_list;
 
-    for (tmp_list = form->children; tmp_list; tmp_list = tmp_list->next)
-	form_position_child(form, tmp_list->data, FALSE);
+    لكل (tmp_list = form->children; tmp_list; tmp_list = tmp_list->بعدی)
+	form_position_فرزند(form, tmp_list->داده, FALSE);
 }
 
-    void
+    فراغ
 gui_gtk_form_move_resize(GtkForm *form, GtkWidget *widget,
 		     gint x, gint y, gint w, gint h)
 {
-#if GTK_CHECK_VERSION(3,0,0)
-    gtk_widget_set_size_request(widget, w, h);
-#else
-    widget->requisition.width  = w;
-    widget->requisition.height = h;
-#endif
+#إذا GTK_CHECK_نسخه(3,0,0)
+    gtk_widget_مجموعه_اندازه_request(widget, w, h);
+#وإلا
+    widget->requisition.عرض  = w;
+    widget->requisition.ارتفاع = h;
+#پایان_اگر
 
     gui_gtk_form_move(form, widget, x, y);
 }
 
-    static void
+    ساكن فراغ
 form_send_configure(GtkForm *form)
 {
     GtkWidget *widget;
     GdkEventConfigure event;
-    GtkAllocation allocation;
+    Gtk_تخصیص تخصیص;
 
     widget = GTK_WIDGET(form);
 
-    gtk_widget_get_allocation(widget, &allocation);
+    gtk_widget_get_تخصیص(widget, &تخصیص);
     event.type = GDK_CONFIGURE;
-    event.window = gtk_widget_get_window(widget);
-    event.x = allocation.x;
-    event.y = allocation.y;
-    event.width = allocation.width;
-    event.height = allocation.height;
+    event.پنجره_2 = gtk_widget_get_پنجره(widget);
+    event.x = تخصیص.x;
+    event.y = تخصیص.y;
+    event.عرض = تخصیص.عرض;
+    event.ارتفاع = تخصیص.ارتفاع;
 
     gtk_main_do_event((GdkEvent*)&event);
 }
 
-    static void
-form_child_map(GtkWidget *widget UNUSED, gpointer user_data)
+    ساكن فراغ
+form_فرزند_map(GtkWidget *widget استفادهنشده, gpointer user_داده)
 {
-    GtkFormChild *child;
+    Gtk_Form_فرزند_2 *فرزند;
 
-    child = (GtkFormChild *)user_data;
+    فرزند = (Gtk_Form_فرزند_2 *)user_داده;
 
-    child->mapped = TRUE;
-    gdk_window_show(child->window);
+    فرزند->mapped = TRUE;
+    gdk_پنجره_show(فرزند->پنجره_2);
 }
 
-    static void
-form_child_unmap(GtkWidget *widget UNUSED, gpointer user_data)
+    ساكن فراغ
+form_فرزند_unmap(GtkWidget *widget استفادهنشده, gpointer user_داده)
 {
-    GtkFormChild *child;
+    Gtk_Form_فرزند_2 *فرزند;
 
-    child = (GtkFormChild *)user_data;
+    فرزند = (Gtk_Form_فرزند_2 *)user_داده;
 
-    child->mapped = FALSE;
-    gdk_window_hide(child->window);
+    فرزند->mapped = FALSE;
+    gdk_پنجره_hide(فرزند->پنجره_2);
 }

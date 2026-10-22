@@ -20,36 +20,36 @@
  *
  */
 
-#if !defined(XDIFFI_H)
-#define XDIFFI_H
+#إذا !defined(XDIFFI_H)
+#تعریف_کن XDIFFI_H
 
 
-typedef struct s_xdalgoenv {
-	long mxcost;
-	long snake_cnt;
-	long heur_min;
+تعريفنوع بنية s_xdalgoenv {
+	دراز mxcost;
+	دراز snake_cnt;
+	دراز heur_min;
 } xdalgoenv_t;
 
-typedef struct s_xdchange {
-	struct s_xdchange *next;
-	long i1, i2;
-	long chg1, chg2;
-	int ignore;
+تعريفنوع بنية s_xdchange {
+	بنية s_xdchange *بعدی;
+	دراز i1, i2;
+	دراز chg1, chg2;
+	صحيح ignore;
 } xdchange_t;
 
 
 
-int xdl_recs_cmp(xdfile_t *xdf1, long off1, long lim1,
-		 xdfile_t *xdf2, long off2, long lim2,
-		 long *kvdf, long *kvdb, int need_min, xdalgoenv_t *xenv);
-int xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+صحيح xdl_recs_cmp(xdfile_t *xdf1, دراز off1, دراز lim1,
+		 xdfile_t *xdf2, دراز off2, دراز lim2,
+		 دراز *kvdf, دراز *kvdb, صحيح need_min, xdalgoenv_t *xenv);
+صحيح xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t ثابت *xpp,
 		xdfenv_t *xe);
-int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags);
-int xdl_build_script(xdfenv_t *xe, xdchange_t **xscr);
-void xdl_free_script(xdchange_t *xscr);
-int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
-		  xdemitconf_t const *xecfg);
-int xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env);
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env);
+صحيح xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, دراز flags);
+صحيح xdl_build_script(xdfenv_t *xe, xdchange_t **xscr);
+فراغ xdl_free_script(xdchange_t *xscr);
+صحيح xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
+		  xdemitconf_t ثابت *xecfg);
+صحيح xdl_do_patience_diff(xpparam_t ثابت *xpp, xdfenv_t *env);
+صحيح xdl_do_histogram_diff(xpparam_t ثابت *xpp, xdfenv_t *env);
 
-#endif /* #if !defined(XDIFFI_H) */
+#پایان_اگر /* #if !defined(XDIFFI_H) */

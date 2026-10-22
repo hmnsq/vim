@@ -10,48 +10,48 @@
 // Os (OptLev=s), W1, Zp8, env=Win32, ms_ext, c_ext
 // error checks: none
 //@@MIDL_FILE_HEADING(  )
-#ifdef __cplusplus
-extern "C"{
-#endif
+#اگر_تعریف_شده __cplusplus
+خارجي "C"{
+#پایان_اگر
 
-#ifdef __MINGW32__
+#اگر_تعریف_شده __MINGW32__
 # include <w32api.h>
 
-# if __W32API_MAJOR_VERSION == 3 && __W32API_MINOR_VERSION < 10
+# إذا __W32API_MAJOR_VERSION == 3 && __W32API_MINOR_VERSION < 10
    // This define is missing from older MingW versions of w32api, even though
    // IID is defined.
 #  define __IID_DEFINED__
 # endif
-#endif
+#پایان_اگر
 
-#ifndef __IID_DEFINED__
+#اگر_تعریف_نشده __IID_DEFINED__
 # define __IID_DEFINED__
 
-typedef struct _IID
+تعريفنوع بنية _IID
 {
-    unsigned long x;
-    unsigned short s1;
-    unsigned short s2;
-    unsigned char  c[8];
+    بیعلامت دراز x;
+    بیعلامت کوتاه s1;
+    بیعلامت کوتاه s2;
+    بیعلامت حرف  c[8];
 } IID;
 
-#endif
+#پایان_اگر
 
-#ifndef CLSID_DEFINED
+#اگر_تعریف_نشده CLSID_DEFINED
 # define CLSID_DEFINED
-typedef IID CLSID;
-#endif
+تعريفنوع IID CLSID;
+#پایان_اگر
 
-const IID IID_IVim = {0x0F0BFAE2,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
-
-
-const IID LIBID_Vim = {0x0F0BFAE0,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
+ثابت IID IID_IVim = {0x0F0BFAE2,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
 
 
-const CLSID CLSID_Vim = {0x0F0BFAE1,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
+ثابت IID LIBID_Vim = {0x0F0BFAE0,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
 
 
-#ifdef __cplusplus
+ثابت CLSID CLSID_Vim = {0x0F0BFAE1,0x4C90,0x11d1,{0x82,0xD7,0x00,0x04,0xAC,0x36,0x85,0x19}};
+
+
+#اگر_تعریف_شده __cplusplus
 }
-#endif
+#پایان_اگر
 

@@ -13,41 +13,41 @@
  * Ron Aaron <ronaharon@yahoo.com> wrote this and the DLL support code.
  * Adapted by Ken Takata.
  */
-#include "vim.h"
+#ضمن "vim.h"
 
 // cproto doesn't create a prototype for VimMain()
-#ifdef VIMDLL
+#اگر_تعریف_شده VIMDLL
 __declspec(dllimport)
-#endif
-int VimMain(int argc, char **argv);
+#پایان_اگر
+صحيح VimMain(صحيح argc, حرف **argv);
 
-#ifdef VIMDLL
+#اگر_تعریف_شده VIMDLL
 # define SaveInst(hInst)    // Do nothing
-#else
-void SaveInst(HINSTANCE hInst);
-#endif
+#وإلا
+فراغ SaveInst(HINSTANCE hInst);
+#پایان_اگر
 
-#ifdef FEAT_GUI
-    int WINAPI
+#اگر_تعریف_شده FEAT_GUI
+    صحيح WINAPI
 wWinMain(
     HINSTANCE	hInstance,
-    HINSTANCE	hPrevInst UNUSED,
-    LPWSTR	lpszCmdLine UNUSED,
-    int		nCmdShow UNUSED)
+    HINSTANCE	hPrevInst استفادهنشده,
+    LPWSTR	lpsz_Cmd_سطر استفادهنشده,
+    صحيح		nCmdShow استفادهنشده)
 {
     SaveInst(hInstance);
-    return VimMain(0, NULL);
+    أرجع VimMain(0, عدم);
 }
-#else
-    int
-wmain(int argc UNUSED, wchar_t **argv UNUSED)
+#وإلا
+    صحيح
+wmain(صحيح argc استفادهنشده, wchar_t **argv استفادهنشده)
 {
-    SaveInst(GetModuleHandleW(NULL));
-    return VimMain(0, NULL);
+    SaveInst(GetModuleHandleW(عدم));
+    أرجع VimMain(0, عدم);
 }
-#endif
+#پایان_اگر
 
-#ifdef USE_OWNSTARTUP
+#اگر_تعریف_شده USE_OWNSTARTUP
 // Use our own entry point and don't use the default CRT startup code to
 // reduce the size of (g)vim.exe.  This works only when VIMDLL is defined.
 //
@@ -57,37 +57,37 @@ wmain(int argc UNUSED, wchar_t **argv UNUSED)
 // For MinGW, the -nostdlib compiler option and the --entry linker option are
 // needed.
 # ifdef FEAT_GUI
-    void WINAPI
-wWinMainCRTStartup(void)
+    فراغ WINAPI
+wWinMainCRTStartup(فراغ)
 {
-    VimMain(0, NULL);
+    VimMain(0, عدم);
 }
-# else
-    void
-wmainCRTStartup(void)
+# وإلا
+    فراغ
+wmainCRTStartup(فراغ)
 {
-    VimMain(0, NULL);
+    VimMain(0, عدم);
 }
 # endif
-#endif	// USE_OWNSTARTUP
+#پایان_اگر	// USE_OWNSTARTUP
 
 
-#if defined(VIMDLL) && defined(FEAT_MZSCHEME)
+#إذا defined(VIMDLL) && defined(FEAT_MZSCHEME)
 
-# if defined(_MSC_VER)
-static __declspec(thread) void *tls_space;
-extern intptr_t _tls_index;
+# إذا defined(_MSC_VER)
+ساكن __declspec(thread) فراغ *tls_space;
+خارجي intptr_t tls_شاخص;
 # elif defined(__MINGW32__)
-static __thread void *tls_space;
-extern intptr_t _tls_index;
+ساكن __thread فراغ *tls_space;
+خارجي intptr_t tls_شاخص;
 # endif
 
 // Get TLS information that is needed for if_mzsch.
-    __declspec(dllexport) void
-get_tls_info(void ***ptls_space, intptr_t *ptls_index)
+    __declspec(dllexport) فراغ
+get_tls_info(فراغ ***ptls_space, intptr_t *ptls_شاخص)
 {
     *ptls_space = &tls_space;
-    *ptls_index = _tls_index;
-    return;
+    *ptls_شاخص = tls_شاخص;
+    أرجع;
 }
-#endif
+#پایان_اگر

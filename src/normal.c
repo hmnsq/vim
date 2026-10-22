@@ -12,187 +12,187 @@
  *		the operators.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-static int	VIsual_mode_orig = NUL;		// saved Visual mode
+ساكن صحيح	VIsual_نما_orig = NUL;		// saved Visual mode
 
-#ifdef FEAT_EVAL
-static void	set_vcount_ca(cmdarg_T *cap, int *set_prevcount);
-#endif
-static void	unshift_special(cmdarg_T *cap);
-static void	del_from_showcmd(int);
+#اگر_تعریف_شده FEAT_EVAL
+ساكن فراغ	مجموعه_vcount_ca(cmdarg_T *cap, صحيح *مجموعه_prevcount);
+#پایان_اگر
+ساكن فراغ	unshift_special(cmdarg_T *cap);
+ساكن فراغ	del_from_showcmd(صحيح);
 
 /*
  * nv_*(): functions called to handle Normal and Visual mode commands.
  * n_*(): functions called to handle Normal mode commands.
  * v_*(): functions called to handle Visual mode commands.
  */
-static void	nv_ignore(cmdarg_T *cap);
-static void	nv_nop(cmdarg_T *cap);
-static void	nv_error(cmdarg_T *cap);
-static void	nv_help(cmdarg_T *cap);
-static void	nv_addsub(cmdarg_T *cap);
-static void	nv_page(cmdarg_T *cap);
-static void	nv_zet(cmdarg_T *cap);
-#ifdef FEAT_GUI
-static void	nv_ver_scrollbar(cmdarg_T *cap);
-static void	nv_hor_scrollbar(cmdarg_T *cap);
-#endif
-#ifdef FEAT_GUI_TABLINE
-static void	nv_tabline(cmdarg_T *cap);
-static void	nv_tabmenu(cmdarg_T *cap);
-#endif
-static void	nv_exmode(cmdarg_T *cap);
-static void	nv_colon(cmdarg_T *cap);
-static void	nv_ctrlg(cmdarg_T *cap);
-static void	nv_ctrlh(cmdarg_T *cap);
-static void	nv_clear(cmdarg_T *cap);
-static void	nv_ctrlo(cmdarg_T *cap);
-static void	nv_hat(cmdarg_T *cap);
-static void	nv_Zet(cmdarg_T *cap);
-static void	nv_ident(cmdarg_T *cap);
-static void	nv_tagpop(cmdarg_T *cap);
-static void	nv_scroll(cmdarg_T *cap);
-static void	nv_right(cmdarg_T *cap);
-static void	nv_left(cmdarg_T *cap);
-static void	nv_up(cmdarg_T *cap);
-static void	nv_down(cmdarg_T *cap);
-static void	nv_end(cmdarg_T *cap);
-static void	nv_dollar(cmdarg_T *cap);
-static void	nv_search(cmdarg_T *cap);
-static void	nv_next(cmdarg_T *cap);
-static int	normal_search(cmdarg_T *cap, int dir, char_u *pat, size_t patlen, int opt, int *wrapped);
-static void	nv_csearch(cmdarg_T *cap);
-static void	nv_brackets(cmdarg_T *cap);
-static void	nv_percent(cmdarg_T *cap);
-static void	nv_brace(cmdarg_T *cap);
-static void	nv_mark(cmdarg_T *cap);
-static void	nv_findpar(cmdarg_T *cap);
-static void	nv_undo(cmdarg_T *cap);
-static void	nv_kundo(cmdarg_T *cap);
-static void	nv_Replace(cmdarg_T *cap);
-static void	nv_replace(cmdarg_T *cap);
-static void	nv_cursormark(cmdarg_T *cap, int flag, pos_T *pos);
-static void	v_visop(cmdarg_T *cap);
-static void	nv_subst(cmdarg_T *cap);
-static void	nv_abbrev(cmdarg_T *cap);
-static void	nv_optrans(cmdarg_T *cap);
-static void	nv_gomark(cmdarg_T *cap);
-static void	nv_pcmark(cmdarg_T *cap);
-static void	nv_regname(cmdarg_T *cap);
-static void	nv_visual(cmdarg_T *cap);
-static void	n_start_visual_mode(int c);
-static void	nv_window(cmdarg_T *cap);
-static void	nv_suspend(cmdarg_T *cap);
-static void	nv_g_cmd(cmdarg_T *cap);
-static void	nv_dot(cmdarg_T *cap);
-static void	nv_redo_or_register(cmdarg_T *cap);
-static void	nv_Undo(cmdarg_T *cap);
-static void	nv_tilde(cmdarg_T *cap);
-static void	nv_operator(cmdarg_T *cap);
-#ifdef FEAT_EVAL
-static void	set_op_var(int optype);
-#endif
-static void	nv_lineop(cmdarg_T *cap);
-static void	nv_home(cmdarg_T *cap);
-static void	nv_pipe(cmdarg_T *cap);
-static void	nv_bck_word(cmdarg_T *cap);
-static void	nv_wordcmd(cmdarg_T *cap);
-static void	nv_beginline(cmdarg_T *cap);
-static void	adjust_cursor(oparg_T *oap);
-static void	adjust_for_sel(cmdarg_T *cap);
-static void	nv_select(cmdarg_T *cap);
-static void	nv_goto(cmdarg_T *cap);
-static void	nv_normal(cmdarg_T *cap);
-static void	nv_esc(cmdarg_T *oap);
-static void	nv_edit(cmdarg_T *cap);
-static void	invoke_edit(cmdarg_T *cap, int repl, int cmd, int startln);
-static void	nv_object(cmdarg_T *cap);
-static void	nv_record(cmdarg_T *cap);
-static void	nv_at(cmdarg_T *cap);
-static void	nv_halfpage(cmdarg_T *cap);
-static void	nv_join(cmdarg_T *cap);
-static void	nv_put(cmdarg_T *cap);
-static void	nv_put_opt(cmdarg_T *cap, int fix_indent);
-static void	nv_open(cmdarg_T *cap);
-#ifdef FEAT_NETBEANS_INTG
-static void	nv_nbcmd(cmdarg_T *cap);
-#endif
-#ifdef FEAT_DND
-static void	nv_drop(cmdarg_T *cap);
-#endif
-static void	nv_cursorhold(cmdarg_T *cap);
+ساكن فراغ	nv_ignore(cmdarg_T *cap);
+ساكن فراغ	nv_nop(cmdarg_T *cap);
+ساكن فراغ	nv_error(cmdarg_T *cap);
+ساكن فراغ	nv_help(cmdarg_T *cap);
+ساكن فراغ	nv_addsub(cmdarg_T *cap);
+ساكن فراغ	nv_صفحه(cmdarg_T *cap);
+ساكن فراغ	nv_zet(cmdarg_T *cap);
+#اگر_تعریف_شده FEAT_GUI
+ساكن فراغ	nv_ver_scrollbar(cmdarg_T *cap);
+ساكن فراغ	nv_hor_scrollbar(cmdarg_T *cap);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_GUI_TABLINE
+ساكن فراغ	nv_tabline(cmdarg_T *cap);
+ساكن فراغ	nv_tabmenu(cmdarg_T *cap);
+#پایان_اگر
+ساكن فراغ	nv_exmode(cmdarg_T *cap);
+ساكن فراغ	nv_colon(cmdarg_T *cap);
+ساكن فراغ	nv_ctrlg(cmdarg_T *cap);
+ساكن فراغ	nv_ctrlh(cmdarg_T *cap);
+ساكن فراغ	nv_clear(cmdarg_T *cap);
+ساكن فراغ	nv_ctrlo(cmdarg_T *cap);
+ساكن فراغ	nv_hat(cmdarg_T *cap);
+ساكن فراغ	nv_Zet(cmdarg_T *cap);
+ساكن فراغ	nv_ident(cmdarg_T *cap);
+ساكن فراغ	nv_tagpop(cmdarg_T *cap);
+ساكن فراغ	nv_scroll(cmdarg_T *cap);
+ساكن فراغ	nv_راست(cmdarg_T *cap);
+ساكن فراغ	nv_چپ(cmdarg_T *cap);
+ساكن فراغ	nv_به_بالا(cmdarg_T *cap);
+ساكن فراغ	nv_پایین(cmdarg_T *cap);
+ساكن فراغ	nv_انتها(cmdarg_T *cap);
+ساكن فراغ	nv_dollar(cmdarg_T *cap);
+ساكن فراغ	nv_جستجو(cmdarg_T *cap);
+ساكن فراغ	nv_بعدی(cmdarg_T *cap);
+ساكن صحيح	نرمال_جستجو(cmdarg_T *cap, صحيح dir, char_u *pat, size_t patlen, صحيح opt, صحيح *wrapped);
+ساكن فراغ	nv_csearch(cmdarg_T *cap);
+ساكن فراغ	nv_brackets(cmdarg_T *cap);
+ساكن فراغ	nv_percent(cmdarg_T *cap);
+ساكن فراغ	nv_brace(cmdarg_T *cap);
+ساكن فراغ	nv_mark(cmdarg_T *cap);
+ساكن فراغ	nv_findpar(cmdarg_T *cap);
+ساكن فراغ	nv_undo(cmdarg_T *cap);
+ساكن فراغ	nv_kundo(cmdarg_T *cap);
+ساكن فراغ	nv_Replace(cmdarg_T *cap);
+ساكن فراغ	nv_replace(cmdarg_T *cap);
+ساكن فراغ	nv_cursormark(cmdarg_T *cap, صحيح flag, pos_T *pos);
+ساكن فراغ	v_visop(cmdarg_T *cap);
+ساكن فراغ	nv_subst(cmdarg_T *cap);
+ساكن فراغ	nv_abbrev(cmdarg_T *cap);
+ساكن فراغ	nv_optrans(cmdarg_T *cap);
+ساكن فراغ	nv_gomark(cmdarg_T *cap);
+ساكن فراغ	nv_pcmark(cmdarg_T *cap);
+ساكن فراغ	nv_regname(cmdarg_T *cap);
+ساكن فراغ	nv_visual(cmdarg_T *cap);
+ساكن فراغ	n_شروع_visual_نما(صحيح c);
+ساكن فراغ	nv_پنجره(cmdarg_T *cap);
+ساكن فراغ	nv_suspend(cmdarg_T *cap);
+ساكن فراغ	nv_g_cmd(cmdarg_T *cap);
+ساكن فراغ	nv_dot(cmdarg_T *cap);
+ساكن فراغ	nv_redo_or_ثبات(cmdarg_T *cap);
+ساكن فراغ	nv_Undo(cmdarg_T *cap);
+ساكن فراغ	nv_tilde(cmdarg_T *cap);
+ساكن فراغ	nv_operator(cmdarg_T *cap);
+#اگر_تعریف_شده FEAT_EVAL
+ساكن فراغ	مجموعه_op_var(صحيح optype);
+#پایان_اگر
+ساكن فراغ	nv_lineop(cmdarg_T *cap);
+ساكن فراغ	nv_home(cmdarg_T *cap);
+ساكن فراغ	nv_pipe(cmdarg_T *cap);
+ساكن فراغ	nv_bck_کلمه(cmdarg_T *cap);
+ساكن فراغ	nv_wordcmd(cmdarg_T *cap);
+ساكن فراغ	nv_beginline(cmdarg_T *cap);
+ساكن فراغ	adjust_cursor(oparg_T *oap);
+ساكن فراغ	adjust_for_sel(cmdarg_T *cap);
+ساكن فراغ	nv_select(cmdarg_T *cap);
+ساكن فراغ	nv_goto(cmdarg_T *cap);
+ساكن فراغ	nv_نرمال(cmdarg_T *cap);
+ساكن فراغ	nv_esc(cmdarg_T *oap);
+ساكن فراغ	nv_edit(cmdarg_T *cap);
+ساكن فراغ	invoke_edit(cmdarg_T *cap, صحيح repl, صحيح cmd, صحيح startln);
+ساكن فراغ	nv_object(cmdarg_T *cap);
+ساكن فراغ	nv_رکورد(cmdarg_T *cap);
+ساكن فراغ	nv_at(cmdarg_T *cap);
+ساكن فراغ	nv_halfpage(cmdarg_T *cap);
+ساكن فراغ	nv_join(cmdarg_T *cap);
+ساكن فراغ	nv_put(cmdarg_T *cap);
+ساكن فراغ	nv_put_opt(cmdarg_T *cap, صحيح fix_indent);
+ساكن فراغ	nv_open(cmdarg_T *cap);
+#اگر_تعریف_شده FEAT_NETBEANS_INTG
+ساكن فراغ	nv_nbcmd(cmdarg_T *cap);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_DND
+ساكن فراغ	nv_drop(cmdarg_T *cap);
+#پایان_اگر
+ساكن فراغ	nv_cursorhold(cmdarg_T *cap);
 
 // Declare nv_cmds[].
-#define DO_DECLARE_NVCMD
-#include "nv_cmds.h"
+#تعریف_کن DO_DECLARE_NVCMD
+#ضمن "nv_cmds.h"
 
 // Include the lookuptable generated by create_nvcmdidx.vim.
-#include "nv_cmdidxs.h"
+#ضمن "nv_cmdidxs.h"
 
 /*
  * Search for a command in the commands table.
  * Returns -1 for invalid command.
  */
-    static int
-find_command(int cmdchar)
+    ساكن صحيح
+پیدا_کن_command(صحيح cmdchar)
 {
-    int		i;
-    int		idx;
-    int		top, bot;
-    int		c;
+    صحيح		i;
+    صحيح		idx;
+    صحيح		بالاترین, bot;
+    صحيح		c;
 
     // A multi-byte character is never a command.
-    if (cmdchar >= 0x100)
-	return -1;
+    إذا (cmdchar >= 0x100)
+	أرجع -1;
 
     // We use the absolute value of the character.  Special keys have a
     // negative value, but are sorted on their absolute value.
-    if (cmdchar < 0)
+    إذا (cmdchar < 0)
 	cmdchar = -cmdchar;
 
     // If the character is in the first part: The character is the index into
     // nv_cmd_idx[].
-    if (cmdchar <= nv_max_linear)
-	return nv_cmd_idx[cmdchar];
+    إذا (cmdchar <= nv_max_خطی)
+	أرجع nv_cmd_idx[cmdchar];
 
     // Perform a binary search.
-    bot = nv_max_linear + 1;
-    top = NV_CMDS_SIZE - 1;
+    bot = nv_max_خطی + 1;
+    بالاترین = NV_CMDS_اندازه - 1;
     idx = -1;
-    while (bot <= top)
+    طالما (bot <= بالاترین)
     {
-	i = (top + bot) / 2;
+	i = (بالاترین + bot) / 2;
 	c = nv_cmds[nv_cmd_idx[i]].cmd_char;
-	if (c < 0)
+	إذا (c < 0)
 	    c = -c;
-	if (cmdchar == c)
+	إذا (cmdchar == c)
 	{
 	    idx = nv_cmd_idx[i];
-	    break;
+	    اكسر;
 	}
-	if (cmdchar > c)
+	إذا (cmdchar > c)
 	    bot = i + 1;
-	else
-	    top = i - 1;
+	وإلا
+	    بالاترین = i - 1;
     }
-    return idx;
+    أرجع idx;
 }
 
 /*
  * If currently editing a cmdline or text is locked: beep and give an error
  * message, return TRUE.
  */
-    static int
-check_text_locked(oparg_T *oap)
+    ساكن صحيح
+check_متن_locked(oparg_T *oap)
 {
-    if (!text_locked())
-	return FALSE;
+    إذا (!متن_locked())
+	أرجع FALSE;
 
-    if (oap != NULL)
+    إذا (oap != عدم)
 	clearopbeep(oap);
-    text_locked_msg();
-    return TRUE;
+    متن_locked_پیام();
+    أرجع TRUE;
 }
 
 /*
@@ -200,105 +200,105 @@ check_text_locked(oparg_T *oap)
  * Give an error message, possibly beep and return TRUE.
  * "oap" may be NULL.
  */
-    int
-check_text_or_curbuf_locked(oparg_T *oap)
+    صحيح
+check_متن_or_curbuf_locked(oparg_T *oap)
 {
-    if (check_text_locked(oap))
-	return TRUE;
+    إذا (check_متن_locked(oap))
+	أرجع TRUE;
 
-    if (!curbuf_locked())
-	return FALSE;
+    إذا (!curbuf_locked())
+	أرجع FALSE;
 
-    if (oap != NULL)
+    إذا (oap != عدم)
 	clearop(oap);
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
  * Handle the count before a normal command and set cap->count0.
  */
-    static int
-normal_cmd_get_count(
+    ساكن صحيح
+نرمال_cmd_get_شمار(
 	cmdarg_T	*cap,
-	int		c,
-	int		toplevel UNUSED,
-	int		set_prevcount UNUSED,
-	int		*ctrl_w,
-	int		*need_flushbuf UNUSED)
+	صحيح		c,
+	صحيح		toplevel استفادهنشده,
+	صحيح		مجموعه_prevcount استفادهنشده,
+	صحيح		*ctrl_w,
+	صحيح		*need_flushbuf استفادهنشده)
 {
 getcount:
-    if (!(VIsual_active && VIsual_select))
+    إذا (!(VIsual_فعال && VIsual_select))
     {
 	// Handle a count before a command and compute ca.count0.
 	// Note that '0' is a command and not the start of a count, but it's
 	// part of a count after other digits.
-	while ((c >= '1' && c <= '9')
+	طالما ((c >= '1' && c <= '9')
 		|| (cap->count0 != 0 && (c == K_DEL || c == K_KDEL
 			|| c == '0')))
 	{
-	    if (c == K_DEL || c == K_KDEL)
+	    إذا (c == K_DEL || c == K_KDEL)
 	    {
 		cap->count0 /= 10;
 		del_from_showcmd(4);	// delete the digit and ~@%
 	    }
-	    else if (cap->count0 > 99999999L)
+	    وإلا إذا (cap->count0 > 99999999L)
 	    {
 		cap->count0 = 999999999L;
 	    }
-	    else
+	    وإلا
 	    {
 		cap->count0 = cap->count0 * 10 + (c - '0');
 	    }
-#ifdef FEAT_EVAL
+#اگر_تعریف_شده FEAT_EVAL
 	    // Set v:count here, when called from main() and not a stuffed
 	    // command, so that v:count can be used in an expression mapping
 	    // right after the count. Do set it for redo.
-	    if (toplevel && readbuf1_empty())
-		set_vcount_ca(cap, &set_prevcount);
-#endif
-	    if (*ctrl_w)
+	    إذا (toplevel && readbuf1_خالی())
+		مجموعه_vcount_ca(cap, &مجموعه_prevcount);
+#پایان_اگر
+	    إذا (*ctrl_w)
 	    {
 		++no_mapping;
-		++allow_keys;		// no mapping for nchar, but keys
+		++allow_کلیدها;		// no mapping for nchar, but keys
 	    }
 	    ++no_zero_mapping;		// don't map zero here
 	    c = plain_vgetc();
 	    LANGMAP_ADJUST(c, TRUE);
 	    --no_zero_mapping;
-	    if (*ctrl_w)
+	    إذا (*ctrl_w)
 	    {
 		--no_mapping;
-		--allow_keys;
+		--allow_کلیدها;
 	    }
-	    *need_flushbuf |= add_to_showcmd(c);
+	    *need_flushbuf |= جمع_کن_مقصد_showcmd(c);
 	}
 
 	// If we got CTRL-W there may be a/another count
-	if (c == Ctrl_W && !*ctrl_w && cap->oap->op_type == OP_NOP)
+	إذا (c == Ctrl_W && !*ctrl_w && cap->oap->op_type == OP_NOP)
 	{
 	    *ctrl_w = TRUE;
 	    cap->opcount = cap->count0;	// remember first count
 	    cap->count0 = 0;
 	    did_cursorhold = TRUE;
 	    ++no_mapping;
-	    ++allow_keys;		// no mapping for nchar, but keys
+	    ++allow_کلیدها;		// no mapping for nchar, but keys
 	    c = plain_vgetc();		// get next character
 	    LANGMAP_ADJUST(c, TRUE);
 	    --no_mapping;
-	    --allow_keys;
-	    *need_flushbuf |= add_to_showcmd(c);
-	    goto getcount;		// jump back
+	    --allow_کلیدها;
+	    *need_flushbuf |= جمع_کن_مقصد_showcmd(c);
+	    اذهب getcount;		// jump back
 	}
     }
 
-    if (c == K_CURSORHOLD)
+    إذا (c == K_CURSORHOLD)
     {
 	// Save the count values so that ca.opcount and ca.count0 are exactly
 	// the same when coming back here after handling K_CURSORHOLD.
 	cap->oap->prev_opcount = cap->opcount;
 	cap->oap->prev_count0 = cap->count0;
     }
-    else if (cap->opcount != 0)
+    وإلا إذا (cap->opcount != 0)
     {
 	// If we're in the middle of an operator (including after entering a
 	// yank buffer with '"') AND we had a count before the operator, then
@@ -307,14 +307,14 @@ getcount:
 	// into "d3w" which makes things fall into place pretty neatly.
 	// If you give a count before AND after the operator, they are
 	// multiplied.
-	if (cap->count0)
+	إذا (cap->count0)
 	{
-	    if (cap->opcount >= 999999999L / cap->count0)
+	    إذا (cap->opcount >= 999999999L / cap->count0)
 		cap->count0 = 999999999L;
-	    else
+	    وإلا
 		cap->count0 *= cap->opcount;
 	}
-	else
+	وإلا
 	    cap->count0 = cap->opcount;
     }
 
@@ -325,23 +325,23 @@ getcount:
     cap->opcount = cap->count0;
     cap->count1 = (cap->count0 == 0 ? 1 : cap->count0);
 
-#ifdef FEAT_EVAL
+#اگر_تعریف_شده FEAT_EVAL
     // Only set v:count when called from main() and not a stuffed command.
     // Do set it for redo.
-    if (toplevel && readbuf1_empty())
-	set_vcount(cap->count0, cap->count1, set_prevcount);
-#endif
+    إذا (toplevel && readbuf1_خالی())
+	مجموعه_vcount(cap->count0, cap->count1, مجموعه_prevcount);
+#پایان_اگر
 
-    return c;
+    أرجع c;
 }
 
 /*
  * Returns TRUE if the normal command (cap) needs a second character.
  */
-    static int
-normal_cmd_needs_more_chars(cmdarg_T *cap, short_u cmd_flags)
+    ساكن صحيح
+نرمال_cmd_needs_بیشتر_chars(cmdarg_T *cap, short_u cmd_flags)
 {
-    return ((cmd_flags & NV_NCH)
+    أرجع ((cmd_flags & NV_NCH)
 	    && (((cmd_flags & NV_NCH_NOP) == NV_NCH_NOP
 		    && cap->oap->op_type == OP_NOP)
 		|| (cmd_flags & NV_NCH_ALW) == NV_NCH_ALW
@@ -350,36 +350,36 @@ normal_cmd_needs_more_chars(cmdarg_T *cap, short_u cmd_flags)
 		    && reg_recording == 0
 		    && reg_executing == 0)
 		|| ((cap->cmdchar == 'a' || cap->cmdchar == 'i')
-		    && (cap->oap->op_type != OP_NOP || VIsual_active))));
+		    && (cap->oap->op_type != OP_NOP || VIsual_فعال))));
 }
 
 /*
  * Get one or more additional characters for a normal command.
  * Return the updated command index (if changed).
  */
-    static int
-normal_cmd_get_more_chars(
-	int	    idx_arg,
+    ساكن صحيح
+نرمال_cmd_get_بیشتر_chars(
+	صحيح	    idx_arg,
 	cmdarg_T    *cap,
-	int	    *need_flushbuf UNUSED)
+	صحيح	    *need_flushbuf استفادهنشده)
 {
-    int		idx = idx_arg;
-    int		c;
-    int		*cp;
-    int		repl = FALSE;	// get character for replace mode
-    int		lit = FALSE;	// get extra character literally
-    int		langmap_active = FALSE;    // using :lmap mappings
-    int		lang;		// getting a text character
-#ifdef HAVE_INPUT_METHOD
-    int		save_smd;	// saved value of p_smd
-#endif
+    صحيح		idx = idx_arg;
+    صحيح		c;
+    صحيح		*cp;
+    صحيح		repl = FALSE;	// get character for replace mode
+    صحيح		lit = FALSE;	// get extra character literally
+    صحيح		langmap_فعال = FALSE;    // using :lmap mappings
+    صحيح		lang;		// getting a text character
+#اگر_تعریف_شده HAVE_درون_داد_روش
+    صحيح		save_smd;	// saved value of p_smd
+#پایان_اگر
 
     ++no_mapping;
-    ++allow_keys;		// no mapping for nchar, but allow key codes
+    ++allow_کلیدها;		// no mapping for nchar, but allow key codes
     // Don't generate a CursorHold event here, most commands can't handle
     // it, e.g., nv_replace(), nv_csearch().
     did_cursorhold = TRUE;
-    if (cap->cmdchar == 'g')
+    إذا (cap->cmdchar == 'g')
     {
 	/*
 	 * For 'g' get the next character now, so that we can check for
@@ -387,22 +387,22 @@ normal_cmd_get_more_chars(
 	 */
 	cap->nchar = plain_vgetc();
 	LANGMAP_ADJUST(cap->nchar, TRUE);
-	*need_flushbuf |= add_to_showcmd(cap->nchar);
-	if (cap->nchar == 'r' || cap->nchar == '\'' || cap->nchar == '`'
+	*need_flushbuf |= جمع_کن_مقصد_showcmd(cap->nchar);
+	إذا (cap->nchar == 'r' || cap->nchar == '\'' || cap->nchar == '`'
 		|| cap->nchar == Ctrl_BSL)
 	{
 	    cp = &cap->extra_char;	// need to get a third character
-	    if (cap->nchar != 'r')
+	    إذا (cap->nchar != 'r')
 		lit = TRUE;			// get it literally
-	    else
+	    وإلا
 		repl = TRUE;		// get it in replace mode
 	}
-	else
-	    cp = NULL;		// no third character needed
+	وإلا
+	    cp = عدم;		// no third character needed
     }
-    else
+    وإلا
     {
-	if (cap->cmdchar == 'r')		// get it in replace mode
+	إذا (cap->cmdchar == 'r')		// get it in replace mode
 	    repl = TRUE;
 	cp = &cap->nchar;
     }
@@ -411,143 +411,143 @@ normal_cmd_get_more_chars(
     /*
      * Get a second or third character.
      */
-    if (cp != NULL)
+    إذا (cp != عدم)
     {
-	if (repl)
+	إذا (repl)
 	{
-	    State = MODE_REPLACE;	// pretend Replace mode
-#ifdef CURSOR_SHAPE
+	    State = نما_REPLACE;	// pretend Replace mode
+#اگر_تعریف_شده CURSOR_SHAPE
 	    ui_cursor_shape();	// show different cursor shape
-#endif
-#ifdef FEAT_MOUSESHAPE
+#پایان_اگر
+#اگر_تعریف_شده FEAT_MOUSESHAPE
 	    update_mouseshape(-1);
-#endif
+#پایان_اگر
 	}
-	if (lang && curbuf->b_p_iminsert == B_IMODE_LMAP)
+	إذا (lang && curbuf->b_p_iminsert == B_IMODE_LMAP)
 	{
 	    // Allow mappings defined with ":lmap".
 	    --no_mapping;
-	    --allow_keys;
-	    if (repl)
-		State = MODE_LREPLACE;
-	    else
-		State = MODE_LANGMAP;
-	    langmap_active = TRUE;
+	    --allow_کلیدها;
+	    إذا (repl)
+		State = نما_LREPLACE;
+	    وإلا
+		State = نما_LANGMAP;
+	    langmap_فعال = TRUE;
 	}
-#ifdef HAVE_INPUT_METHOD
+#اگر_تعریف_شده HAVE_درون_داد_روش
 	save_smd = p_smd;
 	p_smd = FALSE;	// Don't let the IM code show the mode here
-	if (lang && curbuf->b_p_iminsert == B_IMODE_IM)
-	    im_set_active(TRUE);
-#endif
-	if ((State & MODE_INSERT) && !p_ek)
+	إذا (lang && curbuf->b_p_iminsert == B_IMODE_IM)
+	    im_مجموعه_فعال(TRUE);
+#پایان_اگر
+	إذا ((State & نما_درج) && !p_ek)
 	{
-	    MAY_WANT_TO_LOG_THIS;
+	    MAY_WANT_مقصد_LOG_THIS;
 
 	    // Disable bracketed paste and modifyOtherKeys here, we won't
 	    // recognize the escape sequences with 'esckeys' off.
-	    out_str(T_BD);
-	    out_str_t_TE();
+	    بیرون_str(T_BD);
+	    بیرون_str_t_TE();
 	}
 
 	*cp = plain_vgetc();
 
-	if ((State & MODE_INSERT) && !p_ek)
+	إذا ((State & نما_درج) && !p_ek)
 	{
-	    MAY_WANT_TO_LOG_THIS;
+	    MAY_WANT_مقصد_LOG_THIS;
 
 	    // Re-enable bracketed paste mode and modifyOtherKeys
-	    out_str_t_BE();
-	    out_str_t_TI();
+	    بیرون_str_t_BE();
+	    بیرون_str_t_TI();
 	}
 
-	if (langmap_active)
+	إذا (langmap_فعال)
 	{
 	    // Undo the decrement done above
 	    ++no_mapping;
-	    ++allow_keys;
-	    State = MODE_NORMAL_BUSY;
+	    ++allow_کلیدها;
+	    State = نما_نرمال_BUSY;
 	}
-#ifdef HAVE_INPUT_METHOD
-	if (lang)
+#اگر_تعریف_شده HAVE_درون_داد_روش
+	إذا (lang)
 	{
-	    if (curbuf->b_p_iminsert != B_IMODE_LMAP)
-		im_save_status(&curbuf->b_p_iminsert);
-	    im_set_active(FALSE);
+	    إذا (curbuf->b_p_iminsert != B_IMODE_LMAP)
+		im_save_وضعیت(&curbuf->b_p_iminsert);
+	    im_مجموعه_فعال(FALSE);
 	}
 	p_smd = save_smd;
-#endif
-	State = MODE_NORMAL_BUSY;
-	*need_flushbuf |= add_to_showcmd(*cp);
+#پایان_اگر
+	State = نما_نرمال_BUSY;
+	*need_flushbuf |= جمع_کن_مقصد_showcmd(*cp);
 
-	if (!lit)
+	إذا (!lit)
 	{
-#ifdef FEAT_DIGRAPHS
+#اگر_تعریف_شده FEAT_DIGRAPHS
 	    // Typing CTRL-K gets a digraph.
-	    if (*cp == Ctrl_K
+	    إذا (*cp == Ctrl_K
 		    && ((nv_cmds[idx].cmd_flags & NV_LANG)
 			|| cp == &cap->extra_char)
-		    && vim_strchr(p_cpo, CPO_DIGRAPH) == NULL)
+		    && vim_strchr(p_cpo, CPO_DIGRAPH) == عدم)
 	    {
 		c = get_digraph(FALSE);
-		if (c > 0)
+		إذا (c > 0)
 		{
 		    *cp = c;
 		    // Guessing how to update showcmd here...
 		    del_from_showcmd(3);
-		    *need_flushbuf |= add_to_showcmd(*cp);
+		    *need_flushbuf |= جمع_کن_مقصد_showcmd(*cp);
 		}
 	    }
-#endif
+#پایان_اگر
 
 	    // adjust chars > 127, except after "tTfFr" commands
 	    LANGMAP_ADJUST(*cp, !lang);
-#ifdef FEAT_RIGHTLEFT
+#اگر_تعریف_شده FEAT_RIGHTLEFT
 	    // adjust Hebrew mapped char
-	    if (p_hkmap && lang && KeyTyped)
+	    إذا (p_hkmap && lang && کلید_Typed)
 		*cp = hkmap(*cp);
-#endif
+#پایان_اگر
 	}
 
 	// When the next character is CTRL-\ a following CTRL-N means the
 	// command is aborted and we go to Normal mode.
-	if (cp == &cap->extra_char
+	إذا (cp == &cap->extra_char
 		&& cap->nchar == Ctrl_BSL
 		&& (cap->extra_char == Ctrl_N || cap->extra_char == Ctrl_G))
 	{
 	    cap->cmdchar = Ctrl_BSL;
 	    cap->nchar = cap->extra_char;
-	    idx = find_command(cap->cmdchar);
+	    idx = پیدا_کن_command(cap->cmdchar);
 	}
-	else if ((cap->nchar == 'n' || cap->nchar == 'N')
+	وإلا إذا ((cap->nchar == 'n' || cap->nchar == 'N')
 							&& cap->cmdchar == 'g')
 	    cap->oap->op_type = get_op_type(*cp, NUL);
-	else if (*cp == Ctrl_BSL)
+	وإلا إذا (*cp == Ctrl_BSL)
 	{
-	    long towait = (p_ttm >= 0 ? p_ttm : p_tm);
+	    دراز towait = (p_ttm >= 0 ? p_ttm : p_tm);
 
 	    // There is a busy wait here when typing "f<C-\>" and then
 	    // something different from CTRL-N.  Can't be avoided.
-	    while ((c = vpeekc()) <= 0 && towait > 0L)
+	    طالما ((c = vpeekc()) <= 0 && towait > 0L)
 	    {
 		do_sleep(towait > 50L ? 50L : towait, FALSE);
 		towait -= 50L;
 	    }
-	    if (c > 0)
+	    إذا (c > 0)
 	    {
 		c = plain_vgetc();
-		if (c != Ctrl_N && c != Ctrl_G)
+		إذا (c != Ctrl_N && c != Ctrl_G)
 		    vungetc(c);
-		else
+		وإلا
 		{
 		    cap->cmdchar = Ctrl_BSL;
 		    cap->nchar = c;
-		    idx = find_command(cap->cmdchar);
+		    idx = پیدا_کن_command(cap->cmdchar);
 		}
 	    }
 	}
 
-	if (enc_utf8 && lang)
+	إذا (enc_utf8 && lang)
 	{
 	    // When getting a text character and the next character is a
 	    // multi-byte character, it could be a composing character.
@@ -555,18 +555,18 @@ normal_cmd_get_more_chars(
 	    // because if it's put back with vungetc() it's too late to apply
 	    // mapping.
 	    --no_mapping;
-	    while ((c = vpeekc()) > 0
+	    طالما ((c = vpeekc()) > 0
 		    && (c >= 0x100 || MB_BYTE2LEN(vpeekc()) > 1))
 	    {
 		c = plain_vgetc();
-		if (!utf_iscomposing(c))
+		إذا (!utf_iscomposing(c))
 		{
 		    vungetc(c);		// it wasn't, put it back
-		    break;
+		    اكسر;
 		}
-		else if (cap->ncharC1 == 0)
+		وإلا إذا (cap->ncharC1 == 0)
 		    cap->ncharC1 = c;
-		else
+		وإلا
 		    cap->ncharC2 = c;
 	    }
 	    ++no_mapping;
@@ -580,9 +580,9 @@ normal_cmd_get_more_chars(
 	}
     }
     --no_mapping;
-    --allow_keys;
+    --allow_کلیدها;
 
-    return idx;
+    أرجع idx;
 }
 
 /*
@@ -590,8 +590,8 @@ normal_cmd_get_more_chars(
  * moment when a message is displayed that will be overwritten by the mode
  * message.
  */
-    static int
-normal_cmd_need_to_wait_for_msg(cmdarg_T *cap, pos_T *old_pos)
+    ساكن صحيح
+نرمال_cmd_need_مقصد_wait_for_پیام(cmdarg_T *cap, pos_T *old_pos)
 {
     // In Visual mode and with "^O" in Insert mode, a short message will be
     // overwritten by the mode message.  Wait a bit, until a key is hit.
@@ -601,28 +601,28 @@ normal_cmd_need_to_wait_for_msg(cmdarg_T *cap, pos_T *old_pos)
     // Don't wait when emsg_silent is non-zero.
     // Also wait a bit after an error message, e.g. for "^O:".
     // Don't redraw the screen, it would remove the message.
-    return (       ((p_smd
-		    && msg_silent == 0
+    أرجع (       ((p_smd
+		    && پیام_silent == 0
 		    && (restart_edit != 0
-			|| (VIsual_active
+			|| (VIsual_فعال
 			    && old_pos->lnum == curwin->w_cursor.lnum
-			    && old_pos->col == curwin->w_cursor.col)
+			    && old_pos->ستون == curwin->w_cursor.ستون)
 		       )
 		    && (clear_cmdline
 			|| redraw_cmdline)
-		    && (msg_didout || (msg_didany && msg_scroll))
-		    && !msg_nowait
-		    && KeyTyped)
+		    && (پیام_didout || (پیام_didany && پیام_scroll))
+		    && !پیام_nowait
+		    && کلید_Typed)
 		|| (restart_edit != 0
-		    && !VIsual_active
-		    && (msg_scroll
+		    && !VIsual_فعال
+		    && (پیام_scroll
 			|| emsg_on_display)))
 	    && cap->oap->regname == 0
 	    && !(cap->retval & CA_COMMAND_BUSY)
-	    && stuff_empty()
+	    && stuff_خالی()
 	    && typebuf_typed()
 	    && emsg_silent == 0
-	    && !in_assert_fails
+	    && !درون_assert_fails
 	    && !did_wait_return
 	    && cap->oap->op_type == OP_NOP);
 }
@@ -631,76 +631,76 @@ normal_cmd_need_to_wait_for_msg(cmdarg_T *cap, pos_T *old_pos)
  * After processing a normal mode command, wait for a moment when a message is
  * displayed that will be overwritten by the mode message.
  */
-    static void
-normal_cmd_wait_for_msg(void)
+    ساكن فراغ
+نرمال_cmd_wait_for_پیام(فراغ)
 {
-    int	save_State = State;
+    صحيح	save_State = State;
 
     // Draw the cursor with the right shape here
-    if (restart_edit != 0)
-	State = MODE_INSERT;
+    إذا (restart_edit != 0)
+	State = نما_درج;
 
     // If need to redraw, and there is a "keep_msg", redraw before the
     // delay
-    if (must_redraw && keep_msg != NULL && !emsg_on_display)
+    إذا (must_redraw && keep_پیام != عدم && !emsg_on_display)
     {
 	char_u	*kmsg;
 
-	kmsg = keep_msg;
-	keep_msg = NULL;
+	kmsg = keep_پیام;
+	keep_پیام = عدم;
 	// Showmode() will clear keep_msg, but we want to use it anyway.
 	// First update w_topline.
 	setcursor();
 	update_screen(0);
 	// now reset it, otherwise it's put in the history again
-	keep_msg = kmsg;
+	keep_پیام = kmsg;
 
-	kmsg = vim_strsave(keep_msg);
-	if (kmsg != NULL)
+	kmsg = vim_strsave(keep_پیام);
+	إذا (kmsg != عدم)
 	{
-	    msg_attr((char *)kmsg, keep_msg_attr);
+	    پیام_attr((حرف *)kmsg, keep_پیام_attr);
 	    vim_free(kmsg);
 	}
     }
     setcursor();
-#ifdef CURSOR_SHAPE
+#اگر_تعریف_شده CURSOR_SHAPE
     ui_cursor_shape();		// may show different cursor shape
-#endif
+#پایان_اگر
     cursor_on();
-    out_flush();
-    if (msg_scroll || emsg_on_display)
+    بیرون_flush();
+    إذا (پیام_scroll || emsg_on_display)
 	ui_delay(1003L, TRUE);	// wait at least one second
     ui_delay(3003L, FALSE);		// wait up to three seconds
     State = save_State;
 
-    msg_scroll = FALSE;
+    پیام_scroll = FALSE;
     emsg_on_display = FALSE;
 }
 
 /*
  * Execute a command in Normal mode.
  */
-    void
-normal_cmd(
+    فراغ
+نرمال_cmd(
     oparg_T	*oap,
-    int		toplevel UNUSED)	// TRUE when called from main()
+    صحيح		toplevel استفادهنشده)	// TRUE when called from main()
 {
     cmdarg_T	ca;			// command arguments
-    int		c;
-    int		ctrl_w = FALSE;		// got CTRL-W command
-    int		old_col = curwin->w_curswant;
-    int		need_flushbuf = FALSE;	// need to call out_flush()
+    صحيح		c;
+    صحيح		ctrl_w = FALSE;		// got CTRL-W command
+    صحيح		old_ستون = curwin->w_curswant;
+    صحيح		need_flushbuf = FALSE;	// need to call out_flush()
     pos_T	old_pos;		// cursor position before command
-    int		mapped_len;
-    static int	old_mapped_len = 0;
-    int		idx;
-    int		set_prevcount = FALSE;
-    int		save_did_cursorhold = did_cursorhold;
-#ifdef FEAT_EVAL
-    int		did_visual_op = FALSE;
-#endif
+    صحيح		mapped_len;
+    ساكن صحيح	old_mapped_len = 0;
+    صحيح		idx;
+    صحيح		مجموعه_prevcount = FALSE;
+    صحيح		save_did_cursorhold = did_cursorhold;
+#اگر_تعریف_شده FEAT_EVAL
+    صحيح		did_visual_op = FALSE;
+#پایان_اگر
 
-    CLEAR_FIELD(ca);	// also resets ca.retval
+    CLEAR_فیلد(ca);	// also resets ca.retval
     ca.oap = oap;
 
     // Use a count remembered from before entering an operator.  After typing
@@ -711,35 +711,35 @@ normal_cmd(
     // If there is an operator pending, then the command we take this time
     // will terminate it. Finish_op tells us to finish the operation before
     // returning this time (unless the operation was cancelled).
-#ifdef CURSOR_SHAPE
-    c = finish_op;
-#endif
-    finish_op = (oap->op_type != OP_NOP);
-#ifdef CURSOR_SHAPE
-    if (finish_op != c)
+#اگر_تعریف_شده CURSOR_SHAPE
+    c = پایان_op;
+#پایان_اگر
+    پایان_op = (oap->op_type != OP_NOP);
+#اگر_تعریف_شده CURSOR_SHAPE
+    إذا (پایان_op != c)
     {
 	ui_cursor_shape();		// may show different cursor shape
 # ifdef FEAT_MOUSESHAPE
 	update_mouseshape(-1);
 # endif
     }
-#endif
+#پایان_اگر
     may_trigger_modechanged();
 
     // When not finishing an operator and no register name typed, reset the
     // count.
-    if (!finish_op && !oap->regname)
+    إذا (!پایان_op && !oap->regname)
     {
 	ca.opcount = 0;
-#ifdef FEAT_EVAL
-	set_prevcount = TRUE;
-#endif
+#اگر_تعریف_شده FEAT_EVAL
+	مجموعه_prevcount = TRUE;
+#پایان_اگر
     }
 
     // Restore counts from before receiving K_CURSORHOLD.  This means after
     // typing "3", handling K_CURSORHOLD and then typing "2" we get "32", not
     // "3 * 2".
-    if (oap->prev_opcount > 0 || oap->prev_count0 > 0)
+    إذا (oap->prev_opcount > 0 || oap->prev_count0 > 0)
     {
 	ca.opcount = oap->prev_opcount;
 	ca.count0 = oap->prev_count0;
@@ -749,204 +749,204 @@ normal_cmd(
 
     mapped_len = typebuf_maplen();
 
-    State = MODE_NORMAL_BUSY;
-#ifdef USE_ON_FLY_SCROLL
+    State = نما_نرمال_BUSY;
+#اگر_تعریف_شده USE_ON_FLY_SCROLL
     dont_scroll = FALSE;	// allow scrolling here
-#endif
+#پایان_اگر
 
-#ifdef FEAT_EVAL
+#اگر_تعریف_شده FEAT_EVAL
     // Set v:count here, when called from main() and not a stuffed
     // command, so that v:count can be used in an expression mapping
     // when there is no count. Do set it for redo.
-    if (toplevel && readbuf1_empty())
-	set_vcount_ca(&ca, &set_prevcount);
-#endif
+    إذا (toplevel && readbuf1_خالی())
+	مجموعه_vcount_ca(&ca, &مجموعه_prevcount);
+#پایان_اگر
 
     /*
      * Get the command character from the user.
      */
-    c = safe_vgetc();
-    LANGMAP_ADJUST(c, get_real_state() != MODE_SELECT);
+    c = امن_vgetc();
+    LANGMAP_ADJUST(c, get_real_state() != نما_SELECT);
 
     // If a mapping was started in Visual or Select mode, remember the length
     // of the mapping.  This is used below to not return to Insert mode for as
     // long as the mapping is being executed.
-    if (restart_edit == 0)
+    إذا (restart_edit == 0)
 	old_mapped_len = 0;
-    else if (old_mapped_len
-		|| (VIsual_active && mapped_len == 0 && typebuf_maplen() > 0))
+    وإلا إذا (old_mapped_len
+		|| (VIsual_فعال && mapped_len == 0 && typebuf_maplen() > 0))
 	old_mapped_len = typebuf_maplen();
 
-    if (c == NUL)
+    إذا (c == NUL)
 	c = K_ZERO;
 
     // In Select mode, typed text replaces the selection.
-    if (VIsual_active
+    إذا (VIsual_فعال
 	    && VIsual_select
 	    && (vim_isprintc(c) || c == NL || c == CAR || c == K_KENTER))
     {
-	int len;
+	صحيح len;
 
 	// Fake a "c"hange command.  When "restart_edit" is set (e.g., because
 	// 'insertmode' is set) fake a "d"elete command, Insert mode will
 	// restart automatically.
 	// Insert the typed character in the typeahead buffer, so that it can
 	// be mapped in Insert mode.  Required for ":lmap" to work.
-	len = ins_char_typebuf(vgetc_char, vgetc_mod_mask);
+	len = ins_char_typebuf(vgetc_char, vgetc_mod_ماسک);
 
 	// When recording and gotchars() was called the character will be
 	// recorded again, remove the previous recording.
-	if (KeyTyped)
+	إذا (کلید_Typed)
 	    ungetchars(len);
 
-	if (restart_edit != 0)
+	إذا (restart_edit != 0)
 	    c = 'd';
-	else
+	وإلا
 	    c = 'c';
-	msg_nowait = TRUE;	// don't delay going to insert mode
+	پیام_nowait = TRUE;	// don't delay going to insert mode
 	old_mapped_len = 0;	// do go to Insert mode
     }
 
     // If the window was made so small that nothing shows, make it at least one
     // line and one column when typing a command.
-    if (KeyTyped && !KeyStuffed)
-	win_ensure_size();
+    إذا (کلید_Typed && !کلید_Stuffed)
+	win_ensure_اندازه();
 
-    need_flushbuf = add_to_showcmd(c);
+    need_flushbuf = جمع_کن_مقصد_showcmd(c);
 
     // Get the command count
-    c = normal_cmd_get_count(&ca, c, toplevel, set_prevcount, &ctrl_w,
+    c = نرمال_cmd_get_شمار(&ca, c, toplevel, مجموعه_prevcount, &ctrl_w,
 							&need_flushbuf);
 
     // Find the command character in the table of commands.
     // For CTRL-W we already got nchar when looking for a count.
-    if (ctrl_w)
+    إذا (ctrl_w)
     {
 	ca.nchar = c;
 	ca.cmdchar = Ctrl_W;
     }
-    else
+    وإلا
 	ca.cmdchar = c;
-    idx = find_command(ca.cmdchar);
-    if (idx < 0)
+    idx = پیدا_کن_command(ca.cmdchar);
+    إذا (idx < 0)
     {
 	// Not a known command: beep.
 	clearopbeep(oap);
-	goto normal_end;
+	اذهب نرمال_انتها;
     }
 
-    if ((nv_cmds[idx].cmd_flags & NV_NCW) && check_text_or_curbuf_locked(oap))
+    إذا ((nv_cmds[idx].cmd_flags & NV_NCW) && check_متن_or_curbuf_locked(oap))
 	// this command is not allowed now
-	goto normal_end;
+	اذهب نرمال_انتها;
 
     // In Visual/Select mode, a few keys are handled in a special way.
-    if (VIsual_active)
+    إذا (VIsual_فعال)
     {
 	// when 'keymodel' contains "stopsel" may stop Select/Visual mode
-	if (km_stopsel
+	إذا (km_stopsel
 		&& (nv_cmds[idx].cmd_flags & NV_STS)
-		&& !(mod_mask & MOD_MASK_SHIFT))
+		&& !(mod_ماسک & MOD_ماسک_لغزش))
 	{
-	    end_visual_mode();
+	    انتها_visual_نما();
 	    redraw_curbuf_later(UPD_INVERTED);
 	}
 
 	// Keys that work different when 'keymodel' contains "startsel"
-	if (km_startsel)
+	إذا (km_startsel)
 	{
-	    if (nv_cmds[idx].cmd_flags & NV_SS)
+	    إذا (nv_cmds[idx].cmd_flags & NV_SS)
 	    {
 		unshift_special(&ca);
-		idx = find_command(ca.cmdchar);
-		if (idx < 0)
+		idx = پیدا_کن_command(ca.cmdchar);
+		إذا (idx < 0)
 		{
 		    // Just in case
 		    clearopbeep(oap);
-		    goto normal_end;
+		    اذهب نرمال_انتها;
 		}
 	    }
-	    else if ((nv_cmds[idx].cmd_flags & NV_SSS)
-					       && (mod_mask & MOD_MASK_SHIFT))
-		mod_mask &= ~MOD_MASK_SHIFT;
+	    وإلا إذا ((nv_cmds[idx].cmd_flags & NV_SSS)
+					       && (mod_ماسک & MOD_ماسک_لغزش))
+		mod_ماسک &= ~MOD_ماسک_لغزش;
 	}
     }
 
-#ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl && KeyTyped && !KeyStuffed
+#اگر_تعریف_شده FEAT_RIGHTLEFT
+    إذا (curwin->w_p_rl && کلید_Typed && !کلید_Stuffed
 					  && (nv_cmds[idx].cmd_flags & NV_RL))
     {
 	// Invert horizontal movements and operations.  Only when typed by the
 	// user directly, not when the result of a mapping or "x" translated
 	// to "dl".
-	switch (ca.cmdchar)
+	بدل (ca.cmdchar)
 	{
-	    case 'l':	    ca.cmdchar = 'h'; break;
-	    case K_RIGHT:   ca.cmdchar = K_LEFT; break;
-	    case K_S_RIGHT: ca.cmdchar = K_S_LEFT; break;
-	    case K_C_RIGHT: ca.cmdchar = K_C_LEFT; break;
-	    case 'h':	    ca.cmdchar = 'l'; break;
-	    case K_LEFT:    ca.cmdchar = K_RIGHT; break;
-	    case K_S_LEFT:  ca.cmdchar = K_S_RIGHT; break;
-	    case K_C_LEFT:  ca.cmdchar = K_C_RIGHT; break;
-	    case '>':	    ca.cmdchar = '<'; break;
-	    case '<':	    ca.cmdchar = '>'; break;
+	    حالة 'l':	    ca.cmdchar = 'h'; اكسر;
+	    حالة K_راست:   ca.cmdchar = K_چپ; اكسر;
+	    حالة K_S_راست: ca.cmdchar = K_S_چپ; اكسر;
+	    حالة K_C_راست: ca.cmdchar = K_C_چپ; اكسر;
+	    حالة 'h':	    ca.cmdchar = 'l'; اكسر;
+	    حالة K_چپ:    ca.cmdchar = K_راست; اكسر;
+	    حالة K_S_چپ:  ca.cmdchar = K_S_راست; اكسر;
+	    حالة K_C_چپ:  ca.cmdchar = K_C_راست; اكسر;
+	    حالة '>':	    ca.cmdchar = '<'; اكسر;
+	    حالة '<':	    ca.cmdchar = '>'; اكسر;
 	}
-	idx = find_command(ca.cmdchar);
+	idx = پیدا_کن_command(ca.cmdchar);
     }
-#endif
+#پایان_اگر
 
     // Get additional characters if we need them.
-    if (normal_cmd_needs_more_chars(&ca, nv_cmds[idx].cmd_flags))
-	idx = normal_cmd_get_more_chars(idx, &ca, &need_flushbuf);
+    إذا (نرمال_cmd_needs_بیشتر_chars(&ca, nv_cmds[idx].cmd_flags))
+	idx = نرمال_cmd_get_بیشتر_chars(idx, &ca, &need_flushbuf);
 
     // Flush the showcmd characters onto the screen so we can see them while
     // the command is being executed.  Only do this when the shown command was
     // actually displayed, otherwise this will slow down a lot when executing
     // mappings.
-    if (need_flushbuf)
-	out_flush();
+    إذا (need_flushbuf)
+	بیرون_flush();
 
-    if (ca.cmdchar != K_IGNORE)
+    إذا (ca.cmdchar != K_IGNORE)
     {
-	if (ex_normal_busy)
+	إذا (ex_نرمال_busy)
 	    did_cursorhold = save_did_cursorhold;
-	else
+	وإلا
 	    did_cursorhold = FALSE;
     }
 
-    State = MODE_NORMAL;
+    State = نما_نرمال;
 
-    if (ca.nchar == ESC || ca.extra_char == ESC)
+    إذا (ca.nchar == ESC || ca.extra_char == ESC)
     {
 	clearop(oap);
-	if (restart_edit == 0 && goto_im())
+	إذا (restart_edit == 0 && goto_im())
 	    restart_edit = 'a';
-	goto normal_end;
+	اذهب نرمال_انتها;
     }
 
-    if (ca.cmdchar != K_IGNORE)
+    إذا (ca.cmdchar != K_IGNORE)
     {
-	msg_didout = FALSE;    // don't scroll screen up for normal command
-	msg_col = 0;
+	پیام_didout = FALSE;    // don't scroll screen up for normal command
+	پیام_ستون = 0;
     }
 
     old_pos = curwin->w_cursor;		// remember where the cursor was
 
     // When 'keymodel' contains "startsel" some keys start Select/Visual
     // mode.
-    if (!VIsual_active && km_startsel)
+    إذا (!VIsual_فعال && km_startsel)
     {
-	if (nv_cmds[idx].cmd_flags & NV_SS)
+	إذا (nv_cmds[idx].cmd_flags & NV_SS)
 	{
-	    start_selection();
+	    شروع_selection();
 	    unshift_special(&ca);
-	    idx = find_command(ca.cmdchar);
+	    idx = پیدا_کن_command(ca.cmdchar);
 	}
-	else if ((nv_cmds[idx].cmd_flags & NV_SSS)
-					   && (mod_mask & MOD_MASK_SHIFT))
+	وإلا إذا ((nv_cmds[idx].cmd_flags & NV_SSS)
+					   && (mod_ماسک & MOD_ماسک_لغزش))
 	{
-	    start_selection();
-	    mod_mask &= ~MOD_MASK_SHIFT;
+	    شروع_selection();
+	    mod_ماسک &= ~MOD_ماسک_لغزش;
 	}
     }
 
@@ -957,62 +957,62 @@ normal_cmd(
 
     // If we didn't start or finish an operator, reset oap->regname, unless we
     // need it later.
-    if (!finish_op
+    إذا (!پایان_op
 	    && !oap->op_type
 	    && (idx < 0 || !(nv_cmds[idx].cmd_flags & NV_KEEPREG)))
     {
 	clearop(oap);
-#ifdef FEAT_EVAL
+#اگر_تعریف_شده FEAT_EVAL
 	reset_reg_var();
-#endif
+#پایان_اگر
     }
 
     // Get the length of mapped chars again after typing a count, second
     // character or "z333<cr>".
-    if (old_mapped_len > 0)
+    إذا (old_mapped_len > 0)
 	old_mapped_len = typebuf_maplen();
 
     // If an operation is pending, handle it.  But not for K_IGNORE or
     // K_MOUSEMOVE.
-    if (ca.cmdchar != K_IGNORE && ca.cmdchar != K_MOUSEMOVE)
+    إذا (ca.cmdchar != K_IGNORE && ca.cmdchar != K_MOUSEMOVE)
     {
-#ifdef FEAT_EVAL
-	did_visual_op = VIsual_active && oap->op_type != OP_NOP
+#اگر_تعریف_شده FEAT_EVAL
+	did_visual_op = VIsual_فعال && oap->op_type != OP_NOP
 			// For OP_COLON, do_pending_operator() stuffs ':' into
 			// the read buffer, which isn't executed immediately.
 			&& oap->op_type != OP_COLON;
-#endif
-	do_pending_operator(&ca, old_col, FALSE);
+#پایان_اگر
+	do_pending_operator(&ca, old_ستون, FALSE);
     }
 
     // Wait for a moment when a message is displayed that will be overwritten
     // by the mode message.
-    if (normal_cmd_need_to_wait_for_msg(&ca, &old_pos))
-	normal_cmd_wait_for_msg();
+    إذا (نرمال_cmd_need_مقصد_wait_for_پیام(&ca, &old_pos))
+	نرمال_cmd_wait_for_پیام();
 
     // Finish up after executing a Normal mode command.
-normal_end:
+نرمال_انتها:
 
-    msg_nowait = FALSE;
+    پیام_nowait = FALSE;
 
-#ifdef FEAT_EVAL
-    if (finish_op || did_visual_op)
+#اگر_تعریف_شده FEAT_EVAL
+    إذا (پایان_op || did_visual_op)
 	reset_reg_var();
-#endif
+#پایان_اگر
 
-#ifdef CURSOR_SHAPE
-    int prev_finish_op = finish_op;
-#endif
-    if (oap->op_type == OP_NOP)
+#اگر_تعریف_شده CURSOR_SHAPE
+    صحيح prev_پایان_op = پایان_op;
+#پایان_اگر
+    إذا (oap->op_type == OP_NOP)
     {
 	// Reset finish_op, in case it was set
-	finish_op = FALSE;
+	پایان_op = FALSE;
 	may_trigger_modechanged();
     }
-#ifdef CURSOR_SHAPE
+#اگر_تعریف_شده CURSOR_SHAPE
     // Redraw the cursor with another shape, if we were in Operator-pending
     // mode or did a replace command.
-    if (prev_finish_op || ca.cmdchar == 'r'
+    إذا (prev_پایان_op || ca.cmdchar == 'r'
 				     || (ca.cmdchar == 'g' && ca.nchar == 'r'))
     {
 	ui_cursor_shape();		// may show different cursor shape
@@ -1020,47 +1020,47 @@ normal_end:
 	update_mouseshape(-1);
 # endif
     }
-#endif
+#پایان_اگر
 
-    if (oap->op_type == OP_NOP && oap->regname == 0
+    إذا (oap->op_type == OP_NOP && oap->regname == 0
 						 && ca.cmdchar != K_CURSORHOLD)
 	clear_showcmd();
 
     checkpcmark();		// check if we moved since setting pcmark
     vim_free(ca.searchbuf);
 
-    if (has_mbyte)
+    إذا (has_mbyte)
 	mb_adjust_cursor();
 
-    if (curwin->w_p_scb && toplevel)
+    إذا (curwin->w_p_scb && toplevel)
     {
 	validate_cursor();	// may need to update w_leftcol
 	do_check_scrollbind(TRUE);
     }
 
-    if (curwin->w_p_crb && toplevel)
+    إذا (curwin->w_p_crb && toplevel)
     {
 	validate_cursor();	// may need to update w_leftcol
 	do_check_cursorbind();
     }
 
-#ifdef FEAT_TERMINAL
+#اگر_تعریف_شده FEAT_TERMINAL
     // don't go to Insert mode if a terminal has a running job
-    if (term_job_running(curbuf->b_term))
+    إذا (جمله_کار_running(curbuf->b_جمله))
 	restart_edit = 0;
-#endif
+#پایان_اگر
 
     // May restart edit(), if we got here with CTRL-O in Insert mode (but not
     // if still inside a mapping that started in Visual mode).
     // May switch from Visual to Select mode after CTRL-O command.
-    if (       oap->op_type == OP_NOP
-	    && ((restart_edit != 0 && !VIsual_active && old_mapped_len == 0)
+    إذا (       oap->op_type == OP_NOP
+	    && ((restart_edit != 0 && !VIsual_فعال && old_mapped_len == 0)
 		|| restart_VIsual_select == 1)
 	    && !(ca.retval & CA_COMMAND_BUSY)
-	    && stuff_empty()
+	    && stuff_خالی()
 	    && oap->regname == 0)
     {
-	if (restart_VIsual_select == 1)
+	إذا (restart_VIsual_select == 1)
 	{
 	    VIsual_select = TRUE;
 	    may_trigger_modechanged();
@@ -1068,58 +1068,58 @@ normal_end:
 	    restart_VIsual_select = 0;
 	    VIsual_select_reg = 0;
 	}
-	if (restart_edit != 0 && !VIsual_active && old_mapped_len == 0)
-	    (void)edit(restart_edit, FALSE, 1L);
+	إذا (restart_edit != 0 && !VIsual_فعال && old_mapped_len == 0)
+	    (فراغ)edit(restart_edit, FALSE, 1L);
     }
 
-    if (restart_VIsual_select == 2)
+    إذا (restart_VIsual_select == 2)
 	restart_VIsual_select = 1;
 
     // Save count before an operator for next time.
     opcount = ca.opcount;
 }
 
-#ifdef FEAT_EVAL
+#اگر_تعریف_شده FEAT_EVAL
 /*
  * Set v:count and v:count1 according to "cap".
  * Set v:prevcount only when "set_prevcount" is TRUE.
  */
-    static void
-set_vcount_ca(cmdarg_T *cap, int *set_prevcount)
+    ساكن فراغ
+مجموعه_vcount_ca(cmdarg_T *cap, صحيح *مجموعه_prevcount)
 {
-    long count = cap->count0;
+    دراز شمار = cap->count0;
 
     // multiply with cap->opcount the same way as above
-    if (cap->opcount != 0)
-	count = cap->opcount * (count == 0 ? 1 : count);
-    set_vcount(count, count == 0 ? 1 : count, *set_prevcount);
-    *set_prevcount = FALSE;  // only set v:prevcount once
+    إذا (cap->opcount != 0)
+	شمار = cap->opcount * (شمار == 0 ? 1 : شمار);
+    مجموعه_vcount(شمار, شمار == 0 ? 1 : شمار, *مجموعه_prevcount);
+    *مجموعه_prevcount = FALSE;  // only set v:prevcount once
 }
-#endif
+#پایان_اگر
 
 /*
  * Check if highlighting for Visual mode is possible, give a warning message
  * if not.
  */
-    void
-check_visual_highlight(void)
+    فراغ
+check_visual_highlight(فراغ)
 {
-    static int	    did_check = FALSE;
+    ساكن صحيح	    did_check = FALSE;
 
-    if (full_screen)
+    إذا (پر_screen)
     {
-	if (!did_check && HL_ATTR(HLF_V) == 0)
-	    msg(_("Warning: terminal cannot highlight"));
+	إذا (!did_check && HL_ATTR(HLF_V) == 0)
+	    پیام(_("Warning: terminal cannot highlight"));
 	did_check = TRUE;
     }
 }
 
-#if defined(FEAT_CLIPBOARD) && defined(FEAT_EVAL)
+#إذا defined(FEAT_CLIPBOARD) && defined(FEAT_EVAL)
 /*
  * Call yank_do_autocmd() for "regname".
  */
-    static void
-call_yank_do_autocmd(int regname)
+    ساكن فراغ
+call_yank_do_autocmd(صحيح regname)
 {
     oparg_T	oa;
     yankreg_T	*reg;
@@ -1128,63 +1128,63 @@ call_yank_do_autocmd(int regname)
     oa.regname = regname;
     oa.op_type = OP_YANK;
     oa.is_VIsual = TRUE;
-    reg = get_register(regname, TRUE);
+    reg = get_ثبات(regname, TRUE);
     yank_do_autocmd(&oa, reg);
-    free_register(reg);
+    free_ثبات(reg);
 }
-#endif
+#پایان_اگر
 
 /*
  * End Visual mode.
  * This function or the next should ALWAYS be called to end Visual mode, except
  * from do_pending_operator().
  */
-    void
-end_visual_mode(void)
+    فراغ
+انتها_visual_نما(فراغ)
 {
     VIsual_select_exclu_adj = FALSE;
-    end_visual_mode_keep_button();
+    انتها_visual_نما_keep_button();
     reset_held_button();
 }
 
-    void
-end_visual_mode_keep_button(void)
+    فراغ
+انتها_visual_نما_keep_button(فراغ)
 {
-#ifdef FEAT_CLIPBOARD
+#اگر_تعریف_شده FEAT_CLIPBOARD
     // If we are using the clipboard, then remember what was selected in case
     // we need to paste it somewhere while we still own the selection.
     // Only do this when the clipboard is already owned.  Don't want to grab
     // the selection when hitting ESC.
-    if ((clip_star.available && clip_star.owned)
-	    || (clip_plus.available && clip_plus.owned))
+    إذا ((clip_ستاره.موجود && clip_ستاره.owned)
+	    || (clip_plus.موجود && clip_plus.owned))
 	clip_auto_select();
 
-# if defined(FEAT_EVAL)
+# إذا defined(FEAT_EVAL)
     // Emit a TextYankPost for the automatic copy of the selection into the
     // star and/or plus register.
-    if (has_textyankpost())
+    إذا (has_textyankpost())
     {
-	if (clip_isautosel_star())
+	إذا (clip_isautosel_ستاره())
 	    call_yank_do_autocmd('*');
-	if (clip_isautosel_plus())
+	إذا (clip_isautosel_plus())
 	    call_yank_do_autocmd('+');
     }
 # endif
-#endif
+#پایان_اگر
 
-    VIsual_active = FALSE;
+    VIsual_فعال = FALSE;
     setmouse();
     mouse_dragging = 0;
 
     // Save the current VIsual area for '< and '> marks, and "gv"
-    curbuf->b_visual.vi_mode = VIsual_mode;
-    curbuf->b_visual.vi_start = VIsual;
-    curbuf->b_visual.vi_end = curwin->w_cursor;
+    curbuf->b_visual.vi_نما = VIsual_نما;
+    curbuf->b_visual.vi_شروع = VIsual;
+    curbuf->b_visual.vi_انتها = curwin->w_cursor;
     curbuf->b_visual.vi_curswant = curwin->w_curswant;
-#ifdef FEAT_EVAL
-    curbuf->b_visual_mode_eval = VIsual_mode;
-#endif
-    if (!virtual_active())
+#اگر_تعریف_شده FEAT_EVAL
+    curbuf->b_visual_نما_eval = VIsual_نما;
+#پایان_اگر
+    إذا (!virtual_فعال())
 	curwin->w_cursor.coladd = 0;
     may_clear_cmdline();
 
@@ -1195,12 +1195,12 @@ end_visual_mode_keep_button(void)
 /*
  * Reset VIsual_active and VIsual_reselect.
  */
-    void
-reset_VIsual_and_resel(void)
+    فراغ
+reset_VIsual_and_resel(فراغ)
 {
-    if (VIsual_active)
+    إذا (VIsual_فعال)
     {
-	end_visual_mode();
+	انتها_visual_نما();
 	redraw_curbuf_later(UPD_INVERTED);	// delete the inversion later
     }
     VIsual_reselect = FALSE;
@@ -1209,24 +1209,24 @@ reset_VIsual_and_resel(void)
 /*
  * Reset VIsual_active and VIsual_reselect if it's set.
  */
-    void
-reset_VIsual(void)
+    فراغ
+reset_VIsual(فراغ)
 {
-    if (VIsual_active)
+    إذا (VIsual_فعال)
     {
-	end_visual_mode();
+	انتها_visual_نما();
 	redraw_curbuf_later(UPD_INVERTED);	// delete the inversion later
 	VIsual_reselect = FALSE;
     }
 }
 
-    void
-restore_visual_mode(void)
+    فراغ
+restore_visual_نما(فراغ)
 {
-    if (VIsual_mode_orig != NUL)
+    إذا (VIsual_نما_orig != NUL)
     {
-	curbuf->b_visual.vi_mode = VIsual_mode_orig;
-	VIsual_mode_orig = NUL;
+	curbuf->b_visual.vi_نما = VIsual_نما_orig;
+	VIsual_نما_orig = NUL;
     }
 }
 
@@ -1238,35 +1238,35 @@ restore_visual_mode(void)
  * "*colp" is in/decremented if "ptr[-dir]" should also be included.
  * "bnp" points to a counter for square brackets.
  */
-    static int
-find_is_eval_item(
+    ساكن صحيح
+پیدا_کن_is_eval_قلم(
     char_u	*ptr,
-    int		*colp,
-    int		*bnp,
-    int		dir)
+    صحيح		*colp,
+    صحيح		*bnp,
+    صحيح		dir)
 {
     // Accept everything inside [].
-    if ((*ptr == ']' && dir == BACKWARD) || (*ptr == '[' && dir == FORWARD))
+    إذا ((*ptr == ']' && dir == BACKWARD) || (*ptr == '[' && dir == FORWARD))
 	++*bnp;
-    if (*bnp > 0)
+    إذا (*bnp > 0)
     {
-	if ((*ptr == '[' && dir == BACKWARD) || (*ptr == ']' && dir == FORWARD))
+	إذا ((*ptr == '[' && dir == BACKWARD) || (*ptr == ']' && dir == FORWARD))
 	    --*bnp;
-	return TRUE;
+	أرجع TRUE;
     }
 
     // skip over "s.var"
-    if (*ptr == '.')
-	return TRUE;
+    إذا (*ptr == '.')
+	أرجع TRUE;
 
     // two-character item: s->var
-    if (ptr[dir == BACKWARD ? 0 : 1] == '>'
+    إذا (ptr[dir == BACKWARD ? 0 : 1] == '>'
 	    && ptr[dir == BACKWARD ? -1 : 0] == '-')
     {
 	*colp += dir;
-	return TRUE;
+	أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
@@ -1290,175 +1290,175 @@ find_is_eval_item(
  * If text is found, a pointer to the text is put in "*text".  This
  * points into the current buffer line and is not always NUL terminated.
  */
-    int
-find_ident_under_cursor(char_u **text, int find_type)
+    صحيح
+پیدا_کن_ident_under_cursor(char_u **متن, صحيح پیدا_کن_type)
 {
-    return find_ident_at_pos(curwin, curwin->w_cursor.lnum,
-				curwin->w_cursor.col, text, NULL, find_type);
+    أرجع پیدا_کن_ident_at_pos(curwin, curwin->w_cursor.lnum,
+				curwin->w_cursor.ستون, متن, عدم, پیدا_کن_type);
 }
 
 /*
  * Like find_ident_under_cursor(), but for any window and any position.
  * However: Uses 'iskeyword' from the current window!.
  */
-    int
-find_ident_at_pos(
+    صحيح
+پیدا_کن_ident_at_pos(
     win_T	*wp,
     linenr_T	lnum,
     colnr_T	startcol,
-    char_u	**text,
-    int		*textcol,	// column where "text" starts, can be NULL
-    int		find_type)
+    char_u	**متن,
+    صحيح		*textcol,	// column where "text" starts, can be NULL
+    صحيح		پیدا_کن_type)
 {
     char_u	*ptr;
-    int		col = 0;	// init to shut up GCC
-    int		i;
-    int		this_class = 0;
-    int		prev_class;
-    int		prevcol;
-    int		bn = 0;		// bracket nesting
+    صحيح		ستون = 0;	// init to shut up GCC
+    صحيح		i;
+    صحيح		this_class = 0;
+    صحيح		prev_class;
+    صحيح		prevcol;
+    صحيح		bn = 0;		// bracket nesting
 
     // if i == 0: try to find an identifier
     // if i == 1: try to find any non-white text
-    ptr = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    for (i = (find_type & FIND_IDENT) ? 0 : 1;	i < 2; ++i)
+    ptr = ml_get_buf(wp->w_میانگیر, lnum, FALSE);
+    لكل (i = (پیدا_کن_type & پیدا_کن_IDENT) ? 0 : 1;	i < 2; ++i)
     {
 	/*
 	 * 1. skip to start of identifier/text
 	 */
-	col = startcol;
-	if (has_mbyte)
+	ستون = startcol;
+	إذا (has_mbyte)
 	{
-	    while (ptr[col] != NUL)
+	    طالما (ptr[ستون] != NUL)
 	    {
 		// Stop at a ']' to evaluate "a[x]".
-		if ((find_type & FIND_EVAL) && ptr[col] == ']')
-		    break;
-		this_class = mb_get_class(ptr + col);
-		if (this_class != 0 && (i == 1 || this_class != 1))
-		    break;
-		col += (*mb_ptr2len)(ptr + col);
+		إذا ((پیدا_کن_type & پیدا_کن_EVAL) && ptr[ستون] == ']')
+		    اكسر;
+		this_class = mb_get_class(ptr + ستون);
+		إذا (this_class != 0 && (i == 1 || this_class != 1))
+		    اكسر;
+		ستون += (*mb_ptr2len)(ptr + ستون);
 	    }
 	}
-	else
-	    while (ptr[col] != NUL
-		    && (i == 0 ? !vim_iswordc(ptr[col]) : VIM_ISWHITE(ptr[col]))
-		    && (!(find_type & FIND_EVAL) || ptr[col] != ']')
+	وإلا
+	    طالما (ptr[ستون] != NUL
+		    && (i == 0 ? !vim_iswordc(ptr[ستون]) : VIM_ISWHITE(ptr[ستون]))
+		    && (!(پیدا_کن_type & پیدا_کن_EVAL) || ptr[ستون] != ']')
 		    )
-		++col;
+		++ستون;
 
 	// When starting on a ']' count it, so that we include the '['.
-	bn = ptr[col] == ']';
+	bn = ptr[ستون] == ']';
 
 	/*
 	 * 2. Back up to start of identifier/text.
 	 */
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
 	    // Remember class of character under cursor.
-	    if ((find_type & FIND_EVAL) && ptr[col] == ']')
+	    إذا ((پیدا_کن_type & پیدا_کن_EVAL) && ptr[ستون] == ']')
 		this_class = mb_get_class((char_u *)"a");
-	    else
-		this_class = mb_get_class(ptr + col);
-	    while (col > 0 && this_class != 0)
+	    وإلا
+		this_class = mb_get_class(ptr + ستون);
+	    طالما (ستون > 0 && this_class != 0)
 	    {
-		prevcol = col - 1 - (*mb_head_off)(ptr, ptr + col - 1);
+		prevcol = ستون - 1 - (*mb_سر_off)(ptr, ptr + ستون - 1);
 		prev_class = mb_get_class(ptr + prevcol);
-		if (this_class != prev_class
+		إذا (this_class != prev_class
 			&& (i == 0
 			    || prev_class == 0
-			    || (find_type & FIND_IDENT))
-			&& (!(find_type & FIND_EVAL)
+			    || (پیدا_کن_type & پیدا_کن_IDENT))
+			&& (!(پیدا_کن_type & پیدا_کن_EVAL)
 			    || prevcol == 0
-			    || !find_is_eval_item(ptr + prevcol, &prevcol,
+			    || !پیدا_کن_is_eval_قلم(ptr + prevcol, &prevcol,
 							       &bn, BACKWARD))
 			)
-		    break;
-		col = prevcol;
+		    اكسر;
+		ستون = prevcol;
 	    }
 
 	    // If we don't want just any old text, or we've found an
 	    // identifier, stop searching.
-	    if (this_class > 2)
+	    إذا (this_class > 2)
 		this_class = 2;
-	    if (!(find_type & FIND_STRING) || this_class == 2)
-		break;
+	    إذا (!(پیدا_کن_type & پیدا_کن_STRING) || this_class == 2)
+		اكسر;
 	}
-	else
+	وإلا
 	{
-	    while (col > 0
+	    طالما (ستون > 0
 		    && ((i == 0
-			    ? vim_iswordc(ptr[col - 1])
-			    : (!VIM_ISWHITE(ptr[col - 1])
-				&& (!(find_type & FIND_IDENT)
-				    || !vim_iswordc(ptr[col - 1]))))
-			|| ((find_type & FIND_EVAL)
-			    && col > 1
-			    && find_is_eval_item(ptr + col - 1, &col,
+			    ? vim_iswordc(ptr[ستون - 1])
+			    : (!VIM_ISWHITE(ptr[ستون - 1])
+				&& (!(پیدا_کن_type & پیدا_کن_IDENT)
+				    || !vim_iswordc(ptr[ستون - 1]))))
+			|| ((پیدا_کن_type & پیدا_کن_EVAL)
+			    && ستون > 1
+			    && پیدا_کن_is_eval_قلم(ptr + ستون - 1, &ستون,
 							       &bn, BACKWARD))
 			))
-		--col;
+		--ستون;
 
 	    // If we don't want just any old text, or we've found an
 	    // identifier, stop searching.
-	    if (!(find_type & FIND_STRING) || vim_iswordc(ptr[col]))
-		break;
+	    إذا (!(پیدا_کن_type & پیدا_کن_STRING) || vim_iswordc(ptr[ستون]))
+		اكسر;
 	}
     }
 
-    if (ptr[col] == NUL || (i == 0
-		&& (has_mbyte ? this_class != 2 : !vim_iswordc(ptr[col]))))
+    إذا (ptr[ستون] == NUL || (i == 0
+		&& (has_mbyte ? this_class != 2 : !vim_iswordc(ptr[ستون]))))
     {
 	// didn't find an identifier or text
-	if ((find_type & FIND_NOERROR) == 0)
+	إذا ((پیدا_کن_type & پیدا_کن_NOERROR) == 0)
 	{
-	    if (find_type & FIND_STRING)
+	    إذا (پیدا_کن_type & پیدا_کن_STRING)
 		emsg(_(e_no_string_under_cursor));
-	    else
+	    وإلا
 		emsg(_(e_no_identifier_under_cursor));
 	}
-	return 0;
+	أرجع 0;
     }
-    ptr += col;
-    *text = ptr;
-    if (textcol != NULL)
-	*textcol = col;
+    ptr += ستون;
+    *متن = ptr;
+    إذا (textcol != عدم)
+	*textcol = ستون;
 
     /*
      * 3. Find the end if the identifier/text.
      */
     bn = 0;
-    startcol -= col;
-    col = 0;
-    if (has_mbyte)
+    startcol -= ستون;
+    ستون = 0;
+    إذا (has_mbyte)
     {
 	// Search for point of changing multibyte character class.
 	this_class = mb_get_class(ptr);
-	while (ptr[col] != NUL
-		&& ((i == 0 ? mb_get_class(ptr + col) == this_class
-			    : mb_get_class(ptr + col) != 0)
-		    || ((find_type & FIND_EVAL)
-			&& col <= (int)startcol
-			&& find_is_eval_item(ptr + col, &col, &bn, FORWARD))
+	طالما (ptr[ستون] != NUL
+		&& ((i == 0 ? mb_get_class(ptr + ستون) == this_class
+			    : mb_get_class(ptr + ستون) != 0)
+		    || ((پیدا_کن_type & پیدا_کن_EVAL)
+			&& ستون <= (صحيح)startcol
+			&& پیدا_کن_is_eval_قلم(ptr + ستون, &ستون, &bn, FORWARD))
 		))
-	    col += (*mb_ptr2len)(ptr + col);
+	    ستون += (*mb_ptr2len)(ptr + ستون);
     }
-    else
-	while ((i == 0 ? vim_iswordc(ptr[col])
-		       : (ptr[col] != NUL && !VIM_ISWHITE(ptr[col])))
-		    || ((find_type & FIND_EVAL)
-			&& col <= (int)startcol
-			&& find_is_eval_item(ptr + col, &col, &bn, FORWARD))
+    وإلا
+	طالما ((i == 0 ? vim_iswordc(ptr[ستون])
+		       : (ptr[ستون] != NUL && !VIM_ISWHITE(ptr[ستون])))
+		    || ((پیدا_کن_type & پیدا_کن_EVAL)
+			&& ستون <= (صحيح)startcol
+			&& پیدا_کن_is_eval_قلم(ptr + ستون, &ستون, &bn, FORWARD))
 		)
-	    ++col;
+	    ++ستون;
 
-    return col;
+    أرجع ستون;
 }
 
 /*
  * Prepare for redo of a normal command.
  */
-    static void
+    ساكن فراغ
 prep_redo_cmd(cmdarg_T *cap)
 {
     prep_redo(cap->oap->regname, cap->count0,
@@ -1469,60 +1469,60 @@ prep_redo_cmd(cmdarg_T *cap)
  * Prepare for redo of any command.
  * Note that only the last argument can be a multi-byte char.
  */
-    void
+    فراغ
 prep_redo(
-    int	    regname,
-    long    num,
-    int	    cmd1,
-    int	    cmd2,
-    int	    cmd3,
-    int	    cmd4,
-    int	    cmd5)
+    صحيح	    regname,
+    دراز    رقم,
+    صحيح	    cmd1,
+    صحيح	    cmd2,
+    صحيح	    cmd3,
+    صحيح	    cmd4,
+    صحيح	    cmd5)
 {
-    prep_redo_num2(regname, num, cmd1, cmd2, 0L, cmd3, cmd4, cmd5);
+    prep_redo_num2(regname, رقم, cmd1, cmd2, 0L, cmd3, cmd4, cmd5);
 }
 
 /*
  * Prepare for redo of any command with extra count after "cmd2".
  */
-    void
+    فراغ
 prep_redo_num2(
-    int	    regname,
-    long    num1,
-    int	    cmd1,
-    int	    cmd2,
-    long    num2,
-    int	    cmd3,
-    int	    cmd4,
-    int	    cmd5)
+    صحيح	    regname,
+    دراز    num1,
+    صحيح	    cmd1,
+    صحيح	    cmd2,
+    دراز    num2,
+    صحيح	    cmd3,
+    صحيح	    cmd4,
+    صحيح	    cmd5)
 {
     ResetRedobuff();
 
-#ifdef FEAT_EVAL
+#اگر_تعریف_شده FEAT_EVAL
     // Put info about a mapping in the redo buffer, so that "." will use the
     // same script context.
-    may_add_last_used_map_to_redobuff();
-#endif
+    may_جمع_کن_آخرین_استفاده_شده_map_مقصد_redobuff();
+#پایان_اگر
 
-    if (regname != 0)	// yank from specified buffer
+    إذا (regname != 0)	// yank from specified buffer
     {
-	AppendCharToRedobuff('"');
-	AppendCharToRedobuff(regname);
+	Append_Char_مقصد_Redobuff('"');
+	Append_Char_مقصد_Redobuff(regname);
     }
-    if (num1 != 0)
-	AppendNumberToRedobuff(num1);
-    if (cmd1 != NUL)
-	AppendCharToRedobuff(cmd1);
-    if (cmd2 != NUL)
-	AppendCharToRedobuff(cmd2);
-    if (num2 != 0)
-	AppendNumberToRedobuff(num2);
-    if (cmd3 != NUL)
-	AppendCharToRedobuff(cmd3);
-    if (cmd4 != NUL)
-	AppendCharToRedobuff(cmd4);
-    if (cmd5 != NUL)
-	AppendCharToRedobuff(cmd5);
+    إذا (num1 != 0)
+	Append_عدد_مقصد_Redobuff(num1);
+    إذا (cmd1 != NUL)
+	Append_Char_مقصد_Redobuff(cmd1);
+    إذا (cmd2 != NUL)
+	Append_Char_مقصد_Redobuff(cmd2);
+    إذا (num2 != 0)
+	Append_عدد_مقصد_Redobuff(num2);
+    إذا (cmd3 != NUL)
+	Append_Char_مقصد_Redobuff(cmd3);
+    إذا (cmd4 != NUL)
+	Append_Char_مقصد_Redobuff(cmd4);
+    إذا (cmd5 != NUL)
+	Append_Char_مقصد_Redobuff(cmd5);
 }
 
 /*
@@ -1530,13 +1530,13 @@ prep_redo_num2(
  *
  * Beep and return TRUE if an operator was active.
  */
-    static int
+    ساكن صحيح
 checkclearop(oparg_T *oap)
 {
-    if (oap->op_type == OP_NOP)
-	return FALSE;
+    إذا (oap->op_type == OP_NOP)
+	أرجع FALSE;
     clearopbeep(oap);
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -1544,16 +1544,16 @@ checkclearop(oparg_T *oap)
  *
  * Beep and return TRUE if an operator or Visual was active.
  */
-    static int
+    ساكن صحيح
 checkclearopq(oparg_T *oap)
 {
-    if (oap->op_type == OP_NOP && !VIsual_active)
-	return FALSE;
+    إذا (oap->op_type == OP_NOP && !VIsual_فعال)
+	أرجع FALSE;
     clearopbeep(oap);
-    return TRUE;
+    أرجع TRUE;
 }
 
-    void
+    فراغ
 clearop(oparg_T *oap)
 {
     oap->op_type = OP_NOP;
@@ -1563,7 +1563,7 @@ clearop(oparg_T *oap)
     motion_force = NUL;
 }
 
-    void
+    فراغ
 clearopbeep(oparg_T *oap)
 {
     clearop(oap);
@@ -1573,31 +1573,31 @@ clearopbeep(oparg_T *oap)
 /*
  * Remove the shift modifier from a special key.
  */
-    static void
+    ساكن فراغ
 unshift_special(cmdarg_T *cap)
 {
-    switch (cap->cmdchar)
+    بدل (cap->cmdchar)
     {
-	case K_S_RIGHT:	cap->cmdchar = K_RIGHT; break;
-	case K_S_LEFT:	cap->cmdchar = K_LEFT; break;
-	case K_S_UP:	cap->cmdchar = K_UP; break;
-	case K_S_DOWN:	cap->cmdchar = K_DOWN; break;
-	case K_S_HOME:	cap->cmdchar = K_HOME; break;
-	case K_S_END:	cap->cmdchar = K_END; break;
+	حالة K_S_راست:	cap->cmdchar = K_راست; اكسر;
+	حالة K_S_چپ:	cap->cmdchar = K_چپ; اكسر;
+	حالة K_S_به_بالا:	cap->cmdchar = K_به_بالا; اكسر;
+	حالة K_S_پایین:	cap->cmdchar = K_پایین; اكسر;
+	حالة K_S_HOME:	cap->cmdchar = K_HOME; اكسر;
+	حالة K_S_انتها:	cap->cmdchar = K_انتها; اكسر;
     }
-    cap->cmdchar = simplify_key(cap->cmdchar, &mod_mask);
+    cap->cmdchar = simplify_کلید(cap->cmdchar, &mod_ماسک);
 }
 
 /*
  * If the mode is currently displayed clear the command line or update the
  * command displayed.
  */
-    void
-may_clear_cmdline(void)
+    فراغ
+may_clear_cmdline(فراغ)
 {
-    if (mode_displayed)
+    إذا (نما_displayed)
 	clear_cmdline = TRUE;   // unshow visual mode later
-    else
+    وإلا
 	clear_showcmd();
 }
 
@@ -1605,111 +1605,111 @@ may_clear_cmdline(void)
  * Routines for displaying a partly typed command
  */
 
-static char_u	old_showcmd_buf[SHOWCMD_BUFLEN];  // For push_showcmd()
-static int	showcmd_is_clear = TRUE;
-static int	showcmd_visual = FALSE;
+ساكن char_u	old_showcmd_buf[SHOWCMD_BUFLEN];  // For push_showcmd()
+ساكن صحيح	showcmd_is_clear = TRUE;
+ساكن صحيح	showcmd_visual = FALSE;
 
-static void display_showcmd(void);
+ساكن فراغ display_showcmd(فراغ);
 
-    void
-clear_showcmd(void)
+    فراغ
+clear_showcmd(فراغ)
 {
-    if (!p_sc)
-	return;
+    إذا (!p_sc)
+	أرجع;
 
-    if (VIsual_active
-	&& stuff_empty() && typebuf.tb_len == 0 && !using_script())
+    إذا (VIsual_فعال
+	&& stuff_خالی() && typebuf.tb_len == 0 && !using_script())
     {
-	int		cursor_bot = LT_POS(VIsual, curwin->w_cursor);
-	long		lines;
+	صحيح		cursor_bot = LT_POS(VIsual, curwin->w_cursor);
+	دراز		سطرها;
 	colnr_T		leftcol, rightcol;
-	linenr_T	top, bot;
+	linenr_T	بالاترین, bot;
 
 	// Show the size of the Visual area.
-	if (cursor_bot)
+	إذا (cursor_bot)
 	{
-	    top = VIsual.lnum;
+	    بالاترین = VIsual.lnum;
 	    bot = curwin->w_cursor.lnum;
 	}
-	else
+	وإلا
 	{
-	    top = curwin->w_cursor.lnum;
+	    بالاترین = curwin->w_cursor.lnum;
 	    bot = VIsual.lnum;
 	}
-#ifdef FEAT_FOLDING
+#اگر_تعریف_شده FEAT_FOLDING
 	// Include closed folds as a whole.
-	(void)hasFolding(top, &top, NULL);
-	(void)hasFolding(bot, NULL, &bot);
-#endif
-	lines = bot - top + 1;
+	(فراغ)hasFolding(بالاترین, &بالاترین, عدم);
+	(فراغ)hasFolding(bot, عدم, &bot);
+#پایان_اگر
+	سطرها = bot - بالاترین + 1;
 
-	if (VIsual_mode == Ctrl_V)
+	إذا (VIsual_نما == Ctrl_V)
 	{
-#ifdef FEAT_LINEBREAK
+#اگر_تعریف_شده FEAT_LINEBREAK
 	    char_u *saved_sbr = p_sbr;
 	    char_u *saved_w_sbr = curwin->w_p_sbr;
 
 	    // Make 'sbr' empty for a moment to get the correct size.
-	    p_sbr = empty_option;
-	    curwin->w_p_sbr = empty_option;
-#endif
+	    p_sbr = خالی_option;
+	    curwin->w_p_sbr = خالی_option;
+#پایان_اگر
 	    getvcols(curwin, &curwin->w_cursor, &VIsual,
-				    &leftcol, &rightcol, GETVCOL_END_EXCL_LBR);
-#ifdef FEAT_LINEBREAK
+				    &leftcol, &rightcol, GETVCOL_انتها_EXCL_LBR);
+#اگر_تعریف_شده FEAT_LINEBREAK
 	    p_sbr = saved_sbr;
 	    curwin->w_p_sbr = saved_w_sbr;
-#endif
-	    vim_snprintf((char *)showcmd_buf, SHOWCMD_BUFLEN, "%ldx%ld", lines,
-					      (long)(rightcol - leftcol + 1));
+#پایان_اگر
+	    vim_snprintf((حرف *)showcmd_buf, SHOWCMD_BUFLEN, "%ldx%ld", سطرها,
+					      (دراز)(rightcol - leftcol + 1));
 	}
-	else if (VIsual_mode == 'V' || VIsual.lnum != curwin->w_cursor.lnum)
-	    vim_snprintf((char *)showcmd_buf, SHOWCMD_BUFLEN, "%ld", lines);
-	else
+	وإلا إذا (VIsual_نما == 'V' || VIsual.lnum != curwin->w_cursor.lnum)
+	    vim_snprintf((حرف *)showcmd_buf, SHOWCMD_BUFLEN, "%ld", سطرها);
+	وإلا
 	{
 	    char_u  *s, *e;
-	    int	    l;
-	    int	    bytes = 0;
-	    int	    chars = 0;
+	    صحيح	    l;
+	    صحيح	    بایتها = 0;
+	    صحيح	    chars = 0;
 
-	    if (cursor_bot)
+	    إذا (cursor_bot)
 	    {
 		s = ml_get_pos(&VIsual);
 		e = ml_get_cursor();
 	    }
-	    else
+	    وإلا
 	    {
 		s = ml_get_cursor();
 		e = ml_get_pos(&VIsual);
 	    }
-	    while ((*p_sel != 'e') ? s <= e : s < e)
+	    طالما ((*p_sel != 'e') ? s <= e : s < e)
 	    {
 		l = (*mb_ptr2len)(s);
-		if (l == 0)
+		إذا (l == 0)
 		{
-		    ++bytes;
+		    ++بایتها;
 		    ++chars;
-		    break;  // end of line
+		    اكسر;  // end of line
 		}
-		bytes += l;
+		بایتها += l;
 		++chars;
 		s += l;
 	    }
-	    if (bytes == chars)
-		vim_snprintf((char *)showcmd_buf, SHOWCMD_BUFLEN, "%d", chars);
-	    else
-		vim_snprintf((char *)showcmd_buf, SHOWCMD_BUFLEN, "%d-%d", chars, bytes);
+	    إذا (بایتها == chars)
+		vim_snprintf((حرف *)showcmd_buf, SHOWCMD_BUFLEN, "%d", chars);
+	    وإلا
+		vim_snprintf((حرف *)showcmd_buf, SHOWCMD_BUFLEN, "%d-%d", chars, بایتها);
 	}
-	showcmd_buf[SHOWCMD_COLS] = NUL;	// truncate
+	showcmd_buf[SHOWCMD_تعداد_ستون] = NUL;	// truncate
 	showcmd_visual = TRUE;
     }
-    else
+    وإلا
     {
 	showcmd_buf[0] = NUL;
 	showcmd_visual = FALSE;
 
 	// Don't actually display something if there is nothing to clear.
-	if (showcmd_is_clear)
-	    return;
+	إذا (showcmd_is_clear)
+	    أرجع;
     }
 
     display_showcmd();
@@ -1719,21 +1719,21 @@ clear_showcmd(void)
  * Add 'c' to string of shown command chars.
  * Return TRUE if output has been written (and setcursor() has been called).
  */
-    int
-add_to_showcmd(int c)
+    صحيح
+جمع_کن_مقصد_showcmd(صحيح c)
 {
     char_u	*p;
-    int		old_len;
-    int		extra_len;
-    int		overflow;
-    int		i;
+    صحيح		old_len;
+    صحيح		extra_len;
+    صحيح		سرریز;
+    صحيح		i;
     char_u	mbyte_buf[MB_MAXBYTES];
-    static int	ignore[] =
+    ساكن صحيح	ignore[] =
     {
-#ifdef FEAT_GUI
+#اگر_تعریف_شده FEAT_GUI
 	K_VER_SCROLLBAR, K_HOR_SCROLLBAR,
 	K_LEFTMOUSE_NM, K_LEFTRELEASE_NM,
-#endif
+#پایان_اگر
 	K_IGNORE, K_PS,
 	K_LEFTMOUSE, K_LEFTDRAG, K_LEFTRELEASE, K_MOUSEMOVE,
 	K_MIDDLEMOUSE, K_MIDDLEDRAG, K_MIDDLERELEASE,
@@ -1744,72 +1744,72 @@ add_to_showcmd(int c)
 	0
     };
 
-    if (!p_sc || msg_silent != 0)
-	return FALSE;
+    إذا (!p_sc || پیام_silent != 0)
+	أرجع FALSE;
 
-    if (showcmd_visual)
+    إذا (showcmd_visual)
     {
 	showcmd_buf[0] = NUL;
 	showcmd_visual = FALSE;
     }
 
     // Ignore keys that are scrollbar updates and mouse clicks
-    if (IS_SPECIAL(c))
-	for (i = 0; ignore[i] != 0; ++i)
-	    if (ignore[i] == c)
-		return FALSE;
+    إذا (IS_SPECIAL(c))
+	لكل (i = 0; ignore[i] != 0; ++i)
+	    إذا (ignore[i] == c)
+		أرجع FALSE;
 
-    if (c <= 0x7f || !vim_isprintc(c))
+    إذا (c <= 0x7f || !vim_isprintc(c))
     {
 	p = transchar(c);
-	if (*p == ' ')
+	إذا (*p == ' ')
 	    STRCPY(p, "<20>");
     }
-    else
+    وإلا
     {
 	mbyte_buf[(*mb_char2bytes)(c, mbyte_buf)] = NUL;
 	p = mbyte_buf;
     }
-    old_len = (int)STRLEN(showcmd_buf);
-    extra_len = (int)STRLEN(p);
-    overflow = old_len + extra_len - SHOWCMD_COLS;
-    if (overflow > 0)
-	mch_memmove(showcmd_buf, showcmd_buf + overflow,
-						      old_len - overflow + 1);
+    old_len = (صحيح)STRLEN(showcmd_buf);
+    extra_len = (صحيح)STRLEN(p);
+    سرریز = old_len + extra_len - SHOWCMD_تعداد_ستون;
+    إذا (سرریز > 0)
+	mch_memmove(showcmd_buf, showcmd_buf + سرریز,
+						      old_len - سرریز + 1);
     STRCAT(showcmd_buf, p);
 
-    if (char_avail())
-	return FALSE;
+    إذا (char_avail())
+	أرجع FALSE;
 
     display_showcmd();
 
-    return TRUE;
+    أرجع TRUE;
 }
 
-    void
-add_to_showcmd_c(int c)
+    فراغ
+جمع_کن_مقصد_showcmd_c(صحيح c)
 {
-    if (!add_to_showcmd(c))
+    إذا (!جمع_کن_مقصد_showcmd(c))
 	setcursor();
 }
 
 /*
  * Delete 'len' characters from the end of the shown command.
  */
-    static void
-del_from_showcmd(int len)
+    ساكن فراغ
+del_from_showcmd(صحيح len)
 {
-    int	    old_len;
+    صحيح	    old_len;
 
-    if (!p_sc)
-	return;
+    إذا (!p_sc)
+	أرجع;
 
-    old_len = (int)STRLEN(showcmd_buf);
-    if (len > old_len)
+    old_len = (صحيح)STRLEN(showcmd_buf);
+    إذا (len > old_len)
 	len = old_len;
     showcmd_buf[old_len - len] = NUL;
 
-    if (!char_avail())
+    إذا (!char_avail())
 	display_showcmd();
 }
 
@@ -1817,62 +1817,62 @@ del_from_showcmd(int len)
  * push_showcmd() and pop_showcmd() are used when waiting for the user to type
  * something and there is a partial mapping.
  */
-    void
-push_showcmd(void)
+    فراغ
+افزودن_showcmd(فراغ)
 {
-    if (p_sc)
+    إذا (p_sc)
 	STRCPY(old_showcmd_buf, showcmd_buf);
 }
 
-    void
-pop_showcmd(void)
+    فراغ
+برداشت_showcmd(فراغ)
 {
-    if (!p_sc)
-	return;
+    إذا (!p_sc)
+	أرجع;
 
     STRCPY(showcmd_buf, old_showcmd_buf);
 
     display_showcmd();
 }
 
-    void
-showcmd_update_clear_state(void)
+    فراغ
+showcmd_update_clear_state(فراغ)
 {
     showcmd_is_clear = (showcmd_buf[0] == NUL);
 }
 
-    static void
-display_showcmd(void)
+    ساكن فراغ
+display_showcmd(فراغ)
 {
-    int	    len = vim_strsize(showcmd_buf);
+    صحيح	    len = vim_strsize(showcmd_buf);
 
     showcmd_update_clear_state();
     cursor_off();
 
-    if (*p_sloc == 's')
+    إذا (*p_sloc == 's')
     {
-	if (showcmd_is_clear && !vgetc_busy)
-	    curwin->w_redr_status = true;
-	else
-	    win_redr_status(curwin, FALSE);
+	إذا (showcmd_is_clear && !vgetc_busy)
+	    curwin->w_redr_وضعیت = true;
+	وإلا
+	    win_redr_وضعیت(curwin, FALSE);
     }
-    else if (*p_sloc == 't')
+    وإلا إذا (*p_sloc == 't')
     {
-	if (showcmd_is_clear && !vgetc_busy)
+	إذا (showcmd_is_clear && !vgetc_busy)
 	    redraw_tabline = TRUE;
-	else
+	وإلا
 	    draw_tabline();
     }
-    else // 'showcmdloc' is "last" or empty
+    وإلا // 'showcmdloc' is "last" or empty
     {
-	if (!showcmd_is_clear)
-	    screen_puts(showcmd_buf, (int)Rows - 1,
-		    cmdline_col_off + sc_col, 0);
+	إذا (!showcmd_is_clear)
+	    screen_puts(showcmd_buf, (صحيح)ردیفها - 1,
+		    cmdline_ستون_off + sc_ستون, 0);
 
 	// clear the rest of an old message by outputting up to SHOWCMD_COLS
 	// spaces
 	screen_puts((char_u *)"          " + len,
-		(int)Rows - 1, cmdline_col_off + sc_col + len, 0);
+		(صحيح)ردیفها - 1, cmdline_ستون_off + sc_ستون + len, 0);
     }
 
     setcursor();	    // put cursor back where it belongs
@@ -1883,44 +1883,44 @@ display_showcmd(void)
  * When "check" is TRUE, take care of scroll-binding after the window has
  * scrolled.  Called from normal_cmd() and edit().
  */
-    void
-do_check_scrollbind(int check)
+    فراغ
+do_check_scrollbind(صحيح check)
 {
-    static win_T	*old_curwin = NULL;
-    static linenr_T	old_topline = 0;
-#ifdef FEAT_DIFF
-    static int		old_topfill = 0;
-#endif
-    static buf_T	*old_buf = NULL;
-    static colnr_T	old_leftcol = 0;
+    ساكن win_T	*old_curwin = عدم;
+    ساكن linenr_T	old_topline = 0;
+#اگر_تعریف_شده FEAT_DIFF
+    ساكن صحيح		old_topfill = 0;
+#پایان_اگر
+    ساكن buf_T	*old_buf = عدم;
+    ساكن colnr_T	old_leftcol = 0;
 
-    if (check && curwin->w_p_scb)
+    إذا (check && curwin->w_p_scb)
     {
 	// If a ":syncbind" command was just used, don't scroll, only reset
 	// the values.
-	if (did_syncbind)
+	إذا (did_syncbind)
 	    did_syncbind = FALSE;
-	else if (curwin == old_curwin)
+	وإلا إذا (curwin == old_curwin)
 	{
 	    // Synchronize other windows, as necessary according to
 	    // 'scrollbind'.  Don't do this after an ":edit" command, except
 	    // when 'diff' is set.
-	    if ((curwin->w_buffer == old_buf
-#ifdef FEAT_DIFF
+	    إذا ((curwin->w_میانگیر == old_buf
+#اگر_تعریف_شده FEAT_DIFF
 			|| curwin->w_p_diff
-#endif
+#پایان_اگر
 		)
 		&& (curwin->w_topline != old_topline
-#ifdef FEAT_DIFF
+#اگر_تعریف_شده FEAT_DIFF
 			|| curwin->w_topfill != old_topfill
-#endif
+#پایان_اگر
 			|| curwin->w_leftcol != old_leftcol))
 	    {
 		check_scrollbind(curwin->w_topline - old_topline,
-			(long)(curwin->w_leftcol - old_leftcol));
+			(دراز)(curwin->w_leftcol - old_leftcol));
 	    }
 	}
-	else if (vim_strchr(p_sbo, 'j')) // jump flag set in 'scrollopt'
+	وإلا إذا (vim_strchr(p_sbo, 'j')) // jump flag set in 'scrollopt'
 	{
 	    // When switching between windows, make sure that the relative
 	    // vertical offset is valid for the new window.  The relative
@@ -1937,10 +1937,10 @@ do_check_scrollbind(int check)
 
     old_curwin = curwin;
     old_topline = curwin->w_topline;
-#ifdef FEAT_DIFF
+#اگر_تعریف_شده FEAT_DIFF
     old_topfill = curwin->w_topfill;
-#endif
-    old_buf = curwin->w_buffer;
+#پایان_اگر
+    old_buf = curwin->w_میانگیر;
     old_leftcol = curwin->w_leftcol;
 }
 
@@ -1949,73 +1949,73 @@ do_check_scrollbind(int check)
  * number of rows by which the current window has changed
  * (1998-11-02 16:21:01  R. Edward Ralston <eralston@computer.org>)
  */
-    void
-check_scrollbind(linenr_T topline_diff, long leftcol_diff)
+    فراغ
+check_scrollbind(linenr_T topline_diff, دراز leftcol_diff)
 {
-    int		want_ver;
-    int		want_hor;
+    صحيح		want_ver;
+    صحيح		want_hor;
     win_T	*old_curwin = curwin;
     buf_T	*old_curbuf = curbuf;
-    int		old_VIsual_select = VIsual_select;
-    int		old_VIsual_active = VIsual_active;
+    صحيح		old_VIsual_select = VIsual_select;
+    صحيح		old_VIsual_فعال = VIsual_فعال;
     colnr_T	tgt_leftcol = curwin->w_leftcol;
-    long	topline;
-    long	y;
+    دراز	topline;
+    دراز	y;
 
     // check 'scrollopt' string for vertical and horizontal scroll options
     want_ver = (vim_strchr(p_sbo, 'v') && topline_diff != 0);
-#ifdef FEAT_DIFF
+#اگر_تعریف_شده FEAT_DIFF
     want_ver |= old_curwin->w_p_diff;
-#endif
+#پایان_اگر
     want_hor = (vim_strchr(p_sbo, 'h') && (leftcol_diff || topline_diff != 0));
 
     // loop through the scrollbound windows and scroll accordingly
-    VIsual_select = VIsual_active = 0;
+    VIsual_select = VIsual_فعال = 0;
     FOR_ALL_WINDOWS(curwin)
     {
-	curbuf = curwin->w_buffer;
+	curbuf = curwin->w_میانگیر;
 	// skip original window and windows with 'noscrollbind'
-	if (curwin == old_curwin || !curwin->w_p_scb)
-	    continue;
+	إذا (curwin == old_curwin || !curwin->w_p_scb)
+	    استمر;
 
 	// do the vertical scroll
-	if (want_ver)
+	إذا (want_ver)
 	{
-#ifdef FEAT_DIFF
-	    if (old_curwin->w_p_diff && curwin->w_p_diff)
+#اگر_تعریف_شده FEAT_DIFF
+	    إذا (old_curwin->w_p_diff && curwin->w_p_diff)
 	    {
-		diff_set_topline(old_curwin, curwin);
+		diff_مجموعه_topline(old_curwin, curwin);
 	    }
-	    else
-#endif
+	    وإلا
+#پایان_اگر
 	    {
 		curwin->w_scbind_pos += topline_diff;
 		topline = curwin->w_scbind_pos;
-		if (topline > curbuf->b_ml.ml_line_count)
-		    topline = curbuf->b_ml.ml_line_count;
-		if (topline < 1)
+		إذا (topline > curbuf->b_ml.ml_سطر_شمار)
+		    topline = curbuf->b_ml.ml_سطر_شمار;
+		إذا (topline < 1)
 		    topline = 1;
 
 		y = topline - curwin->w_topline;
-		if (y > 0)
+		إذا (y > 0)
 		    scrollup(y, FALSE);
-		else
+		وإلا
 		    scrolldown(-y, FALSE);
 	    }
 
 	    redraw_later(UPD_VALID);
 	    cursor_correct();
-	    curwin->w_redr_status = true;
+	    curwin->w_redr_وضعیت = true;
 	}
 
 	// do the horizontal scroll
-	if (want_hor)
-	    (void)set_leftcol(tgt_leftcol);
+	إذا (want_hor)
+	    (فراغ)مجموعه_leftcol(tgt_leftcol);
     }
 
     // reset current-window
     VIsual_select = old_VIsual_select;
-    VIsual_active = old_VIsual_active;
+    VIsual_فعال = old_VIsual_فعال;
     curwin = old_curwin;
     curbuf = old_curbuf;
 }
@@ -2025,7 +2025,7 @@ check_scrollbind(linenr_T topline_diff, long leftcol_diff)
  * Used for CTRL-Q and CTRL-S to avoid problems with terminals that use
  * xon/xoff.
  */
-    static void
+    ساكن فراغ
 nv_ignore(cmdarg_T *cap)
 {
     cap->retval |= CA_COMMAND_BUSY;	// don't call edit() now
@@ -2035,15 +2035,15 @@ nv_ignore(cmdarg_T *cap)
  * Command character that doesn't do anything, but unlike nv_ignore() does
  * start edit().  Used for "startinsert" executed while starting up.
  */
-    static void
-nv_nop(cmdarg_T *cap UNUSED)
+    ساكن فراغ
+nv_nop(cmdarg_T *cap استفادهنشده)
 {
 }
 
 /*
  * Command character doesn't exist.
  */
-    static void
+    ساكن فراغ
 nv_error(cmdarg_T *cap)
 {
     clearopbeep(cap->oap);
@@ -2052,84 +2052,84 @@ nv_error(cmdarg_T *cap)
 /*
  * <Help> and <F1> commands.
  */
-    static void
+    ساكن فراغ
 nv_help(cmdarg_T *cap)
 {
-    if (!checkclearopq(cap->oap))
-	ex_help(NULL);
+    إذا (!checkclearopq(cap->oap))
+	ex_help(عدم);
 }
 
 /*
  * CTRL-A and CTRL-X: Add or subtract from letter or number under cursor.
  */
-    static void
+    ساكن فراغ
 nv_addsub(cmdarg_T *cap)
 {
-#ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf) && !prompt_curpos_editable())
+#اگر_تعریف_شده FEAT_کار_CHANNEL
+    إذا (bt_prompt(curbuf) && !prompt_curpos_editable())
 	clearopbeep(cap->oap);
-    else
-#endif
-    if (!VIsual_active && cap->oap->op_type == OP_NOP)
+    وإلا
+#پایان_اگر
+    إذا (!VIsual_فعال && cap->oap->op_type == OP_NOP)
     {
 	prep_redo_cmd(cap);
-	cap->oap->op_type = cap->cmdchar == Ctrl_A ?  OP_NR_ADD : OP_NR_SUB;
+	cap->oap->op_type = cap->cmdchar == Ctrl_A ?  OP_NR_جمع_کن : OP_NR_SUB;
 	op_addsub(cap->oap, cap->count1, cap->arg);
 	cap->oap->op_type = OP_NOP;
     }
-    else if (VIsual_active)
+    وإلا إذا (VIsual_فعال)
 	nv_operator(cap);
-    else
+    وإلا
 	clearop(cap->oap);
 }
 
 /*
  * CTRL-F, CTRL-B, etc: Scroll page up or down.
  */
-    static void
-nv_page(cmdarg_T *cap)
+    ساكن فراغ
+nv_صفحه(cmdarg_T *cap)
 {
-    if (checkclearop(cap->oap))
-	return;
+    إذا (checkclearop(cap->oap))
+	أرجع;
 
-    if (mod_mask & MOD_MASK_CTRL)
+    إذا (mod_ماسک & MOD_ماسک_CTRL)
     {
 	// <C-PageUp>: tab page back; <C-PageDown>: tab page forward
-	if (cap->arg == BACKWARD)
-	    goto_tabpage(-(int)cap->count1);
-	else
-	    goto_tabpage((int)cap->count0);
+	إذا (cap->arg == BACKWARD)
+	    goto_tabpage(-(صحيح)cap->count1);
+	وإلا
+	    goto_tabpage((صحيح)cap->count0);
     }
-    else
-	(void)pagescroll(cap->arg, cap->count1, FALSE);
+    وإلا
+	(فراغ)pagescroll(cap->arg, cap->count1, FALSE);
 }
 
 /*
  * Implementation of "gd" and "gD" command.
  */
-    static void
+    ساكن فراغ
 nv_gd(
     oparg_T	*oap,
-    int		nchar,
-    int		thisblock)	// 1 for "1gd" and "1gD"
+    صحيح		nchar,
+    صحيح		thisblock)	// 1 for "1gd" and "1gD"
 {
-    int		len;
+    صحيح		len;
     char_u	*ptr;
 
-    if ((len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0
-	    || find_decl(ptr, len, nchar == 'd', thisblock, SEARCH_START)
+    إذا ((len = پیدا_کن_ident_under_cursor(&ptr, پیدا_کن_IDENT)) == 0
+	    || پیدا_کن_decl(ptr, len, nchar == 'd', thisblock, جستجو_شروع)
 								       == FAIL)
     {
 	clearopbeep(oap);
-	return;
+	أرجع;
     }
 
-#ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_SEARCH) && KeyTyped && oap->op_type == OP_NOP)
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا ((fdo_flags & FDO_جستجو) && کلید_Typed && oap->op_type == OP_NOP)
 	foldOpenCursor();
-#endif
+#پایان_اگر
     // clear any search statistics
-    if (messaging() && !msg_silent && !shortmess(SHM_SEARCHCOUNT))
+    إذا (messaging() && !پیام_silent && !shortmess(SHM_SEARCHCOUNT))
 	clear_cmdline = TRUE;
 }
 
@@ -2137,46 +2137,46 @@ nv_gd(
  * Return TRUE if line[offset] is not inside a C-style comment or string, FALSE
  * otherwise.
  */
-    static int
-is_ident(char_u *line, int offset)
+    ساكن صحيح
+is_ident(char_u *سطر, صحيح جابه_جایی)
 {
-    int	i;
-    int	incomment = FALSE;
-    int	instring = 0;
-    int	prev = 0;
+    صحيح	i;
+    صحيح	incomment = FALSE;
+    صحيح	instring = 0;
+    صحيح	prev = 0;
 
-    for (i = 0; i < offset && line[i] != NUL; i++)
+    لكل (i = 0; i < جابه_جایی && سطر[i] != NUL; i++)
     {
-	if (instring != 0)
+	إذا (instring != 0)
 	{
-	    if (prev != '\\' && line[i] == instring)
+	    إذا (prev != '\\' && سطر[i] == instring)
 		instring = 0;
 	}
-	else if ((line[i] == '"' || line[i] == '\'') && !incomment)
+	وإلا إذا ((سطر[i] == '"' || سطر[i] == '\'') && !incomment)
 	{
-	    instring = line[i];
+	    instring = سطر[i];
 	}
-	else
+	وإلا
 	{
-	    if (incomment)
+	    إذا (incomment)
 	    {
-		if (prev == '*' && line[i] == '/')
+		إذا (prev == '*' && سطر[i] == '/')
 		    incomment = FALSE;
 	    }
-	    else if (prev == '/' && line[i] == '*')
+	    وإلا إذا (prev == '/' && سطر[i] == '*')
 	    {
 		incomment = TRUE;
 	    }
-	    else if (prev == '/' && line[i] == '/')
+	    وإلا إذا (prev == '/' && سطر[i] == '/')
 	    {
-		return FALSE;
+		أرجع FALSE;
 	    }
 	}
 
-	prev = line[i];
+	prev = سطر[i];
     }
 
-    return incomment == FALSE && instring == 0;
+    أرجع incomment == FALSE && instring == 0;
 }
 
 /*
@@ -2186,33 +2186,33 @@ is_ident(char_u *line, int offset)
  * When "thisblock" is TRUE check the {} block scope.
  * Return FAIL when not found.
  */
-    int
-find_decl(
+    صحيح
+پیدا_کن_decl(
     char_u	*ptr,
-    int		len,
-    int		locally,
-    int		thisblock,
-    int		flags_arg)	// flags passed to searchit()
+    صحيح		len,
+    صحيح		locally,
+    صحيح		thisblock,
+    صحيح		flags_arg)	// flags passed to searchit()
 {
     char_u	*pat;
     size_t	patlen;
     pos_T	old_pos;
     pos_T	par_pos;
-    pos_T	found_pos;
-    int		t;
-    int		save_p_ws;
-    int		save_p_scs;
-    int		retval = OK;
-    int		incll;
-    int		searchflags = flags_arg;
-    int		valid;
+    pos_T	یافت_pos;
+    صحيح		t;
+    صحيح		save_p_ws;
+    صحيح		save_p_scs;
+    صحيح		retval = OK;
+    صحيح		incll;
+    صحيح		searchflags = flags_arg;
+    صحيح		valid;
 
-    if ((pat = alloc(len + 7)) == NULL)
-	return FAIL;
+    إذا ((pat = alloc(len + 7)) == عدم)
+	أرجع FAIL;
 
     // Put "\V" before the pattern to avoid that the special meaning of "."
     // and "~" causes trouble.
-    patlen = vim_snprintf((char *)pat, len + 7,
+    patlen = vim_snprintf((حرف *)pat, len + 7,
 	    vim_iswordp(ptr) ? "\\V\\<%.*s\\>" : "\\V%.*s", len, ptr);
 
     old_pos = curwin->w_cursor;
@@ -2224,113 +2224,113 @@ find_decl(
     // With "gD" go to line 1.
     // With "gd" Search back for the start of the current function, then go
     // back until a blank line.  If this fails go to line 1.
-    if (!locally || !findpar(&incll, BACKWARD, 1L, '{', FALSE))
+    إذا (!locally || !findpar(&incll, BACKWARD, 1L, '{', FALSE))
     {
 	setpcmark();			// Set in findpar() otherwise
 	curwin->w_cursor.lnum = 1;
 	par_pos = curwin->w_cursor;
     }
-    else
+    وإلا
     {
 	par_pos = curwin->w_cursor;
-	while (curwin->w_cursor.lnum > 1 && *skipwhite(ml_get_curline()) != NUL)
+	طالما (curwin->w_cursor.lnum > 1 && *skipwhite(ml_get_curline()) != NUL)
 	    --curwin->w_cursor.lnum;
     }
-    curwin->w_cursor.col = 0;
+    curwin->w_cursor.ستون = 0;
 
     // Search forward for the identifier, ignore comment lines.
-    CLEAR_POS(&found_pos);
-    for (;;)
+    CLEAR_POS(&یافت_pos);
+    لكل (;;)
     {
-	t = searchit(curwin, curbuf, &curwin->w_cursor, NULL, FORWARD,
-					  pat, patlen, 1L, searchflags, RE_LAST, NULL);
-	if (curwin->w_cursor.lnum >= old_pos.lnum)
+	t = searchit(curwin, curbuf, &curwin->w_cursor, عدم, FORWARD,
+					  pat, patlen, 1L, searchflags, RE_آخرین, عدم);
+	إذا (curwin->w_cursor.lnum >= old_pos.lnum)
 	    t = FAIL;	// match after start is failure too
 
-	if (thisblock && t != FAIL)
+	إذا (thisblock && t != FAIL)
 	{
 	    pos_T	*pos;
 
 	    // Check that the block the match is in doesn't end before the
 	    // position where we started the search from.
-	    if ((pos = findmatchlimit(NULL, '}', FM_FORWARD,
-		     (int)(old_pos.lnum - curwin->w_cursor.lnum + 1))) != NULL
+	    إذا ((pos = findmatchlimit(عدم, '}', FM_FORWARD,
+		     (صحيح)(old_pos.lnum - curwin->w_cursor.lnum + 1))) != عدم
 		    && pos->lnum < old_pos.lnum)
 	    {
 		// There can't be a useful match before the end of this block.
 		// Skip to the end.
 		curwin->w_cursor = *pos;
-		continue;
+		استمر;
 	    }
 	}
 
-	if (t == FAIL)
+	إذا (t == FAIL)
 	{
 	    // If we previously found a valid position, use it.
-	    if (found_pos.lnum != 0)
+	    إذا (یافت_pos.lnum != 0)
 	    {
-		curwin->w_cursor = found_pos;
+		curwin->w_cursor = یافت_pos;
 		t = OK;
 	    }
-	    break;
+	    اكسر;
 	}
-	if (get_leader_len(ml_get_curline(), NULL, FALSE, TRUE) > 0)
+	إذا (get_leader_len(ml_get_curline(), عدم, FALSE, TRUE) > 0)
 	{
 	    // Ignore this line, continue at start of next line.
 	    ++curwin->w_cursor.lnum;
-	    curwin->w_cursor.col = 0;
-	    continue;
+	    curwin->w_cursor.ستون = 0;
+	    استمر;
 	}
-	valid = is_ident(ml_get_curline(), curwin->w_cursor.col);
+	valid = is_ident(ml_get_curline(), curwin->w_cursor.ستون);
 
 	// If the current position is not a valid identifier and a previous
 	// match is present, favor that one instead.
-	if (!valid && found_pos.lnum != 0)
+	إذا (!valid && یافت_pos.lnum != 0)
 	{
-	    curwin->w_cursor = found_pos;
-	    break;
+	    curwin->w_cursor = یافت_pos;
+	    اكسر;
 	}
 
 	// Global search: use first valid match found
-	if (valid && !locally)
-	    break;
-	if (valid && curwin->w_cursor.lnum >= par_pos.lnum)
+	إذا (valid && !locally)
+	    اكسر;
+	إذا (valid && curwin->w_cursor.lnum >= par_pos.lnum)
 	{
 	    // If we previously found a valid position, use it.
-	    if (found_pos.lnum != 0)
-		curwin->w_cursor = found_pos;
-	    break;
+	    إذا (یافت_pos.lnum != 0)
+		curwin->w_cursor = یافت_pos;
+	    اكسر;
 	}
 
 	// For finding a local variable and the match is before the "{" or
 	// inside a comment, continue searching.  For K&R style function
 	// declarations this skips the function header without types.
-	if (!valid)
-	    CLEAR_POS(&found_pos);
-	else
-	    found_pos = curwin->w_cursor;
+	إذا (!valid)
+	    CLEAR_POS(&یافت_pos);
+	وإلا
+	    یافت_pos = curwin->w_cursor;
 	// Remove SEARCH_START from flags to avoid getting stuck at one
 	// position.
-	searchflags &= ~SEARCH_START;
+	searchflags &= ~جستجو_شروع;
     }
 
-    if (t == FAIL)
+    إذا (t == FAIL)
     {
 	retval = FAIL;
 	curwin->w_cursor = old_pos;
     }
-    else
+    وإلا
     {
-	curwin->w_set_curswant = true;
+	curwin->w_مجموعه_curswant = true;
 	// "n" searches forward now
-	reset_search_dir();
+	reset_جستجو_dir();
     }
 
     vim_free(pat);
     p_ws = save_p_ws;
     p_scs = save_p_scs;
 
-    return retval;
+    أرجع retval;
 }
 
 /*
@@ -2340,123 +2340,123 @@ find_decl(
  *
  * Return OK if able to move cursor, FAIL otherwise.
  */
-    int
-nv_screengo(oparg_T *oap, int dir, long dist)
+    صحيح
+nv_screengo(oparg_T *oap, صحيح dir, دراز dist)
 {
 
-    int		linelen = linetabsize_no_outer(curwin, curwin->w_cursor.lnum);
+    صحيح		linelen = linetabsize_no_outer(curwin, curwin->w_cursor.lnum);
 
-    int		retval = OK;
-    int		atend = FALSE;
-    int		n;
-    int		col_off1;	// margin offset for first screen line
-    int		col_off2;	// margin offset for wrapped screen line
-    int		width1;		// text width for first screen line
-    int		width2;		// text width for wrapped screen line
+    صحيح		retval = OK;
+    صحيح		atend = FALSE;
+    صحيح		n;
+    صحيح		ستون_off1;	// margin offset for first screen line
+    صحيح		ستون_off2;	// margin offset for wrapped screen line
+    صحيح		width1;		// text width for first screen line
+    صحيح		width2;		// text width for wrapped screen line
 
     oap->motion_type = MCHAR;
     oap->inclusive = (curwin->w_curswant == MAXCOL);
 
-    col_off1 = curwin_col_off();
-    col_off2 = col_off1 - curwin_col_off2();
-    width1 = curwin->w_width - col_off1;
-    width2 = curwin->w_width - col_off2;
-    if (width2 == 0)
+    ستون_off1 = curwin_ستون_off();
+    ستون_off2 = ستون_off1 - curwin_ستون_off2();
+    width1 = curwin->w_عرض - ستون_off1;
+    width2 = curwin->w_عرض - ستون_off2;
+    إذا (width2 == 0)
 	width2 = 1; // avoid divide by zero
 
-    if (curwin->w_width != 0)
+    إذا (curwin->w_عرض != 0)
     {
       // Instead of sticking at the last character of the buffer line we
       // try to stick in the last column of the screen.
-      if (curwin->w_curswant == MAXCOL)
+      إذا (curwin->w_curswant == MAXCOL)
       {
 	atend = TRUE;
 	validate_virtcol();
-	if (width1 <= 0)
+	إذا (width1 <= 0)
 	    curwin->w_curswant = 0;
-	else
+	وإلا
 	{
 	    colnr_T virtcol = curwin->w_virtcol
-#ifdef FEAT_PROP_POPUP
-		- curwin->w_virtcol_first_char
-#endif
+#اگر_تعریف_شده FEAT_PROP_POPUP
+		- curwin->w_virtcol_اولی_char
+#پایان_اگر
 		;
 
 	    curwin->w_curswant = width1 - 1;
-	    if (virtcol > curwin->w_curswant)
+	    إذا (virtcol > curwin->w_curswant)
 		curwin->w_curswant += ((virtcol
 			     - curwin->w_curswant - 1) / width2 + 1) * width2;
 	}
       }
-      else
+      وإلا
       {
-	if (linelen > width1)
+	إذا (linelen > width1)
 	    n = ((linelen - width1 - 1) / width2 + 1) * width2 + width1;
-	else
+	وإلا
 	    n = width1;
-	if (curwin->w_curswant >= (colnr_T)n)
+	إذا (curwin->w_curswant >= (colnr_T)n)
 	    curwin->w_curswant = n - 1;
       }
 
-      while (dist--)
+      طالما (dist--)
       {
-	if (dir == BACKWARD)
+	إذا (dir == BACKWARD)
 	{
-	    if ((long)curwin->w_curswant >= width1
-#ifdef FEAT_FOLDING
-		    && !hasFolding(curwin->w_cursor.lnum, NULL, NULL)
-#endif
+	    إذا ((دراز)curwin->w_curswant >= width1
+#اگر_تعریف_شده FEAT_FOLDING
+		    && !hasFolding(curwin->w_cursor.lnum, عدم, عدم)
+#پایان_اگر
 	       )
 		// Move back within the line. This can give a negative value
 		// for w_curswant if width1 < width2 (with cpoptions+=n),
 		// which will get clipped to column 0.
 		curwin->w_curswant -= width2;
-	    else
+	    وإلا
 	    {
 		// to previous line
-		if (curwin->w_cursor.lnum <= 1)
+		إذا (curwin->w_cursor.lnum <= 1)
 		{
 		    retval = FAIL;
-		    break;
+		    اكسر;
 		}
-		cursor_up_inner(curwin, 1);
+		cursor_به_بالا_inner(curwin, 1);
 
 		linelen = linetabsize_no_outer(curwin, curwin->w_cursor.lnum);
-		if (linelen > width1)
+		إذا (linelen > width1)
 		    curwin->w_curswant += (((linelen - width1 - 1) / width2)
 								+ 1) * width2;
 	    }
 	}
-	else // dir == FORWARD
+	وإلا // dir == FORWARD
 	{
-	    if (linelen > width1)
+	    إذا (linelen > width1)
 		n = ((linelen - width1 - 1) / width2 + 1) * width2 + width1;
-	    else
+	    وإلا
 		n = width1;
-	    if (curwin->w_curswant + width2 < (colnr_T)n
-#ifdef FEAT_FOLDING
-		    && !hasFolding(curwin->w_cursor.lnum, NULL, NULL)
-#endif
+	    إذا (curwin->w_curswant + width2 < (colnr_T)n
+#اگر_تعریف_شده FEAT_FOLDING
+		    && !hasFolding(curwin->w_cursor.lnum, عدم, عدم)
+#پایان_اگر
 		    )
 		// move forward within line
 		curwin->w_curswant += width2;
-	    else
+	    وإلا
 	    {
 		// to next line
-		if (curwin->w_cursor.lnum
-				       >= curwin->w_buffer->b_ml.ml_line_count)
+		إذا (curwin->w_cursor.lnum
+				       >= curwin->w_میانگیر->b_ml.ml_سطر_شمار)
 		{
 		    retval = FAIL;
-		    break;
+		    اكسر;
 		}
-		cursor_down_inner(curwin, 1);
+		cursor_پایین_inner(curwin, 1);
 		curwin->w_curswant %= width2;
 
 		// Check if the cursor has moved below the number display
 		// when width1 < width2 (with cpoptions+=n). Subtract width2
 		// to get a negative value for w_curswant, which will get
 		// clipped to column 0.
-		if (curwin->w_curswant >= width1)
+		إذا (curwin->w_curswant >= width1)
 		    curwin->w_curswant -= width2;
 		linelen = linetabsize_no_outer(curwin, curwin->w_cursor.lnum);
 	    }
@@ -2464,59 +2464,59 @@ nv_screengo(oparg_T *oap, int dir, long dist)
       }
     }
 
-    if (virtual_active() && atend)
+    إذا (virtual_فعال() && atend)
 	coladvance(MAXCOL);
-    else
+    وإلا
 	coladvance(curwin->w_curswant);
 
-    if (curwin->w_cursor.col > 0 && curwin->w_p_wrap)
+    إذا (curwin->w_cursor.ستون > 0 && curwin->w_p_wrap)
     {
 	colnr_T virtcol;
-	int	c;
+	صحيح	c;
 
 	// Check for landing on a character that got split at the end of the
 	// last line.  We want to advance a screenline, not end up in the same
 	// screenline or move two screenlines.
 	validate_virtcol();
 	virtcol = curwin->w_virtcol
-#ifdef FEAT_PROP_POPUP
-	    - curwin->w_virtcol_first_char
-#endif
+#اگر_تعریف_شده FEAT_PROP_POPUP
+	    - curwin->w_virtcol_اولی_char
+#پایان_اگر
 	    ;
-#if defined(FEAT_LINEBREAK)
-	if (virtcol > (colnr_T)width1 && *get_showbreak_value(curwin) != NUL)
-	    virtcol -= vim_strsize(get_showbreak_value(curwin));
-#endif
+#إذا defined(FEAT_LINEBREAK)
+	إذا (virtcol > (colnr_T)width1 && *get_showbreak_مقدار(curwin) != NUL)
+	    virtcol -= vim_strsize(get_showbreak_مقدار(curwin));
+#پایان_اگر
 
 	c = (*mb_ptr2char)(ml_get_cursor());
-	if (dir == FORWARD && virtcol < curwin->w_curswant
+	إذا (dir == FORWARD && virtcol < curwin->w_curswant
 		&& (curwin->w_curswant <= (colnr_T)width1)
 		&& !vim_isprintc(c) && c > 255)
 	    oneright();
 
-	if (virtcol > curwin->w_curswant
+	إذا (virtcol > curwin->w_curswant
 		&& (curwin->w_curswant < (colnr_T)width1
 		    ? (curwin->w_curswant > (colnr_T)width1 / 2)
 		    : ((curwin->w_curswant - width1) % width2
 						      > (colnr_T)width2 / 2)))
-	    --curwin->w_cursor.col;
+	    --curwin->w_cursor.ستون;
     }
 
-    if (atend)
+    إذا (atend)
 	curwin->w_curswant = MAXCOL;	    // stick in the last column
     adjust_skipcol();
 
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Handle CTRL-E and CTRL-Y commands: scroll a line up or down.
  * cap->arg must be TRUE for CTRL-E.
  */
-    void
-nv_scroll_line(cmdarg_T *cap)
+    فراغ
+nv_scroll_سطر(cmdarg_T *cap)
 {
-    if (!checkclearop(cap->oap))
+    إذا (!checkclearop(cap->oap))
 	scroll_redraw(cap->arg, cap->count1);
 }
 
@@ -2525,68 +2525,68 @@ nv_scroll_line(cmdarg_T *cap)
  * 'z<Left>', and 'z<Right>' commands accept a count after 'z'.
  * Returns TRUE to process the 'z' command and FALSE to skip it.
  */
-    static int
-nv_z_get_count(cmdarg_T *cap, int *nchar_arg)
+    ساكن صحيح
+nv_z_get_شمار(cmdarg_T *cap, صحيح *nchar_arg)
 {
-    int		nchar = *nchar_arg;
-    long	n;
+    صحيح		nchar = *nchar_arg;
+    دراز	n;
 
     // "z123{nchar}": edit the count before obtaining {nchar}
-    if (checkclearop(cap->oap))
-	return FALSE;
+    إذا (checkclearop(cap->oap))
+	أرجع FALSE;
     n = nchar - '0';
 
-    for (;;)
+    لكل (;;)
     {
-#ifdef USE_ON_FLY_SCROLL
+#اگر_تعریف_شده USE_ON_FLY_SCROLL
 	dont_scroll = TRUE;		// disallow scrolling here
-#endif
+#پایان_اگر
 	++no_mapping;
-	++allow_keys;   // no mapping for nchar, but allow key codes
+	++allow_کلیدها;   // no mapping for nchar, but allow key codes
 	nchar = plain_vgetc();
 	LANGMAP_ADJUST(nchar, TRUE);
 	--no_mapping;
-	--allow_keys;
-	(void)add_to_showcmd(nchar);
+	--allow_کلیدها;
+	(فراغ)جمع_کن_مقصد_showcmd(nchar);
 
-	if (nchar == K_DEL || nchar == K_KDEL)
+	إذا (nchar == K_DEL || nchar == K_KDEL)
 	    n /= 10;
-	else if (VIM_ISDIGIT(nchar))
+	وإلا إذا (VIM_ISDIGIT(nchar))
 	{
-	    if (vim_append_digit_long(&n, nchar - '0') == FAIL)
+	    إذا (vim_append_digit_long(&n, nchar - '0') == FAIL)
 	    {
 		clearopbeep(cap->oap);
-		break;
+		اكسر;
 	    }
 	}
-	else if (nchar == CAR)
+	وإلا إذا (nchar == CAR)
 	{
-#ifdef FEAT_GUI
+#اگر_تعریف_شده FEAT_GUI
 	    need_mouse_correct = TRUE;
-#endif
-	    win_setheight((int)n);
-	    break;
+#پایان_اگر
+	    win_setheight((صحيح)n);
+	    اكسر;
 	}
-	else if (nchar == 'l'
+	وإلا إذا (nchar == 'l'
 		|| nchar == 'h'
-		|| nchar == K_LEFT
-		|| nchar == K_RIGHT)
+		|| nchar == K_چپ
+		|| nchar == K_راست)
 	{
 	    cap->count1 = n ? n * cap->count1 : cap->count1;
 	    *nchar_arg = nchar;
-	    return TRUE;
+	    أرجع TRUE;
 	}
-	else
+	وإلا
 	{
 	    clearopbeep(cap->oap);
-	    break;
+	    اكسر;
 	}
     }
     cap->oap->op_type = OP_NOP;
-    return FALSE;
+    أرجع FALSE;
 }
 
-#ifdef FEAT_SPELL
+#اگر_تعریف_شده FEAT_SPELL
 /*
  * "zug" and "zuw": undo "zg" and "zw"
  * "zg": add good word to word list
@@ -2594,36 +2594,36 @@ nv_z_get_count(cmdarg_T *cap, int *nchar_arg)
  * "zG": add good word to temp word list
  * "zW": add wrong word to temp word list
  */
-    static int
-nv_zg_zw(cmdarg_T *cap, int nchar)
+    ساكن صحيح
+nv_zg_zw(cmdarg_T *cap, صحيح nchar)
 {
-    char_u	*ptr = NULL;
-    int		len;
-    int		undo = FALSE;
+    char_u	*ptr = عدم;
+    صحيح		len;
+    صحيح		undo = FALSE;
 
-    if (nchar == 'u')
+    إذا (nchar == 'u')
     {
 	++no_mapping;
-	++allow_keys;   // no mapping for nchar, but allow key codes
+	++allow_کلیدها;   // no mapping for nchar, but allow key codes
 	nchar = plain_vgetc();
 	LANGMAP_ADJUST(nchar, TRUE);
 	--no_mapping;
-	--allow_keys;
-	(void)add_to_showcmd(nchar);
+	--allow_کلیدها;
+	(فراغ)جمع_کن_مقصد_showcmd(nchar);
 
-	if (vim_strchr((char_u *)"gGwW", nchar) == NULL)
+	إذا (vim_strchr((char_u *)"gGwW", nchar) == عدم)
 	{
 	    clearopbeep(cap->oap);
-	    return OK;
+	    أرجع OK;
 	}
 	undo = TRUE;
     }
 
-    if (checkclearop(cap->oap))
-	return OK;
-    if (VIsual_active && get_visual_text(cap, &ptr, &len) == FAIL)
-	return FAIL;
-    if (ptr == NULL)
+    إذا (checkclearop(cap->oap))
+	أرجع OK;
+    إذا (VIsual_فعال && get_visual_متن(cap, &ptr, &len) == FAIL)
+	أرجع FAIL;
+    إذا (ptr == عدم)
     {
 	pos_T	pos = curwin->w_cursor;
 
@@ -2631,425 +2631,425 @@ nv_zg_zw(cmdarg_T *cap, int nchar)
 	// off this fails and find_ident_under_cursor() is
 	// used below.
 	emsg_off++;
-	len = spell_move_to(curwin, FORWARD, SMT_ALL, TRUE, NULL);
+	len = spell_move_مقصد(curwin, FORWARD, SMT_ALL, TRUE, عدم);
 	emsg_off--;
-	if (len != 0 && curwin->w_cursor.col <= pos.col)
+	إذا (len != 0 && curwin->w_cursor.ستون <= pos.ستون)
 	    ptr = ml_get_pos(&curwin->w_cursor);
 	curwin->w_cursor = pos;
     }
 
-    if (ptr == NULL
-		&& (len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0)
-	return FAIL;
-    spell_add_word(ptr, len, nchar == 'w' || nchar == 'W'
-	    ? SPELL_ADD_BAD : SPELL_ADD_GOOD,
-	    (nchar == 'G' || nchar == 'W') ? 0 : (int)cap->count1, undo);
+    إذا (ptr == عدم
+		&& (len = پیدا_کن_ident_under_cursor(&ptr, پیدا_کن_IDENT)) == 0)
+	أرجع FAIL;
+    spell_جمع_کن_کلمه(ptr, len, nchar == 'w' || nchar == 'W'
+	    ? SPELL_جمع_کن_BAD : SPELL_جمع_کن_GOOD,
+	    (nchar == 'G' || nchar == 'W') ? 0 : (صحيح)cap->count1, undo);
 
-    return OK;
+    أرجع OK;
 }
-#endif
+#پایان_اگر
 
 /*
  * Commands that start with "z".
  */
-    static void
+    ساكن فراغ
 nv_zet(cmdarg_T *cap)
 {
-    long	n;
-    colnr_T	col;
-    int		nchar = cap->nchar;
-#ifdef FEAT_FOLDING
-    long	old_fdl = curwin->w_p_fdl;
-    int		old_fen = curwin->w_p_fen;
-#endif
-    long	siso = get_sidescrolloff_value();
+    دراز	n;
+    colnr_T	ستون;
+    صحيح		nchar = cap->nchar;
+#اگر_تعریف_شده FEAT_FOLDING
+    دراز	old_fdl = curwin->w_p_fdl;
+    صحيح		old_fen = curwin->w_p_fen;
+#پایان_اگر
+    دراز	siso = get_sidescrolloff_مقدار();
 
-    if (VIM_ISDIGIT(nchar) && !nv_z_get_count(cap, &nchar))
-	    return;
+    إذا (VIM_ISDIGIT(nchar) && !nv_z_get_شمار(cap, &nchar))
+	    أرجع;
 
-    if (
-#ifdef FEAT_FOLDING
+    إذا (
+#اگر_تعریف_شده FEAT_FOLDING
 	    // "zf" and "zF" are always an operator, "zd", "zo", "zO", "zc"
 	    // and "zC" only in Visual mode.  "zj" and "zk" are motion
 	    // commands.
 	    cap->nchar != 'f' && cap->nchar != 'F'
-	    && !(VIsual_active && vim_strchr((char_u *)"dcCoO", cap->nchar))
+	    && !(VIsual_فعال && vim_strchr((char_u *)"dcCoO", cap->nchar))
 	    && cap->nchar != 'j' && cap->nchar != 'k'
 	    &&
-#endif
+#پایان_اگر
 	    checkclearop(cap->oap))
-	return;
+	أرجع;
 
     // For "z+", "z<CR>", "zt", "z.", "zz", "z^", "z-", "zb":
     // If line number given, set cursor.
-    if ((vim_strchr((char_u *)"+\r\nt.z^-b", nchar) != NULL)
+    إذا ((vim_strchr((char_u *)"+\r\nt.z^-b", nchar) != عدم)
 	    && cap->count0
 	    && cap->count0 != curwin->w_cursor.lnum)
     {
 	setpcmark();
-	if (cap->count0 > curbuf->b_ml.ml_line_count)
-	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
-	else
+	إذا (cap->count0 > curbuf->b_ml.ml_سطر_شمار)
+	    curwin->w_cursor.lnum = curbuf->b_ml.ml_سطر_شمار;
+	وإلا
 	    curwin->w_cursor.lnum = cap->count0;
-	check_cursor_col();
+	check_cursor_ستون();
     }
 
-    switch (nchar)
+    بدل (nchar)
     {
 		// "z+", "z<CR>" and "zt": put cursor at top of screen
-    case '+':
-		if (cap->count0 == 0)
+    حالة '+':
+		إذا (cap->count0 == 0)
 		{
 		    // No count given: put cursor at the line below screen
 		    validate_botline();	// make sure w_botline is valid
-		    if (curwin->w_botline > curbuf->b_ml.ml_line_count)
-			curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
-		    else
+		    إذا (curwin->w_botline > curbuf->b_ml.ml_سطر_شمار)
+			curwin->w_cursor.lnum = curbuf->b_ml.ml_سطر_شمار;
+		    وإلا
 			curwin->w_cursor.lnum = curwin->w_botline;
 		}
 		// FALLTHROUGH
-    case NL:
-    case CAR:
-    case K_KENTER:
+    حالة NL:
+    حالة CAR:
+    حالة K_KENTER:
 		beginline(BL_WHITE | BL_FIX);
 		// FALLTHROUGH
 
-    case 't':	scroll_cursor_top(0, TRUE);
+    حالة 't':	scroll_cursor_بالاترین(0, TRUE);
 		redraw_later(UPD_VALID);
-		set_fraction(curwin);
-		break;
+		مجموعه_fraction(curwin);
+		اكسر;
 
 		// "z." and "zz": put cursor in middle of screen
-    case '.':	beginline(BL_WHITE | BL_FIX);
+    حالة '.':	beginline(BL_WHITE | BL_FIX);
 		// FALLTHROUGH
 
-    case 'z':	scroll_cursor_halfway(TRUE, FALSE);
+    حالة 'z':	scroll_cursor_halfway(TRUE, FALSE);
 		redraw_later(UPD_VALID);
-		set_fraction(curwin);
-		break;
+		مجموعه_fraction(curwin);
+		اكسر;
 
 		// "z^", "z-" and "zb": put cursor at bottom of screen
-    case '^':	// Strange Vi behavior: <count>z^ finds line at top of window
+    حالة '^':	// Strange Vi behavior: <count>z^ finds line at top of window
 		// when <count> is at bottom of window, and puts that one at
 		// bottom of window.
-		if (cap->count0 != 0)
+		إذا (cap->count0 != 0)
 		{
 		    scroll_cursor_bot(0, TRUE);
 		    curwin->w_cursor.lnum = curwin->w_topline;
 		}
-		else if (curwin->w_topline == 1)
+		وإلا إذا (curwin->w_topline == 1)
 		    curwin->w_cursor.lnum = 1;
-		else
+		وإلا
 		    curwin->w_cursor.lnum = curwin->w_topline - 1;
 		// FALLTHROUGH
-    case '-':
+    حالة '-':
 		beginline(BL_WHITE | BL_FIX);
 		// FALLTHROUGH
 
-    case 'b':	scroll_cursor_bot(0, TRUE);
+    حالة 'b':	scroll_cursor_bot(0, TRUE);
 		redraw_later(UPD_VALID);
-		set_fraction(curwin);
-		break;
+		مجموعه_fraction(curwin);
+		اكسر;
 
 		// "zH" - scroll screen right half-page
-    case 'H':
-		cap->count1 *= curwin->w_width / 2;
+    حالة 'H':
+		cap->count1 *= curwin->w_عرض / 2;
 		// FALLTHROUGH
 
 		// "zh" - scroll screen to the right
-    case 'h':
-    case K_LEFT:
-		if (!curwin->w_p_wrap)
-		    (void)set_leftcol((colnr_T)cap->count1 > curwin->w_leftcol
+    حالة 'h':
+    حالة K_چپ:
+		إذا (!curwin->w_p_wrap)
+		    (فراغ)مجموعه_leftcol((colnr_T)cap->count1 > curwin->w_leftcol
 			       ? 0 : curwin->w_leftcol - (colnr_T)cap->count1);
-		break;
+		اكسر;
 
 		// "zL" - scroll window left half-page
-    case 'L':	cap->count1 *= curwin->w_width / 2;
+    حالة 'L':	cap->count1 *= curwin->w_عرض / 2;
 		// FALLTHROUGH
 
 		// "zl" - scroll window to the left if not wrapping
-    case 'l':
-    case K_RIGHT:
-		if (!curwin->w_p_wrap)
-		    (void)set_leftcol(curwin->w_leftcol + (colnr_T)cap->count1);
-		break;
+    حالة 'l':
+    حالة K_راست:
+		إذا (!curwin->w_p_wrap)
+		    (فراغ)مجموعه_leftcol(curwin->w_leftcol + (colnr_T)cap->count1);
+		اكسر;
 
 		// "zs" - scroll screen, cursor at the start
-    case 's':	if (!curwin->w_p_wrap)
+    حالة 's':	إذا (!curwin->w_p_wrap)
 		{
-#ifdef FEAT_FOLDING
-		    if (hasFolding(curwin->w_cursor.lnum, NULL, NULL))
-			col = 0;	// like the cursor is in col 0
-		    else
-#endif
-		    getvcol(curwin, &curwin->w_cursor, &col, NULL, NULL, 0);
-		    if ((long)col > siso)
-			col -= siso;
-		    else
-			col = 0;
-		    if (curwin->w_leftcol != col)
+#اگر_تعریف_شده FEAT_FOLDING
+		    إذا (hasFolding(curwin->w_cursor.lnum, عدم, عدم))
+			ستون = 0;	// like the cursor is in col 0
+		    وإلا
+#پایان_اگر
+		    getvcol(curwin, &curwin->w_cursor, &ستون, عدم, عدم, 0);
+		    إذا ((دراز)ستون > siso)
+			ستون -= siso;
+		    وإلا
+			ستون = 0;
+		    إذا (curwin->w_leftcol != ستون)
 		    {
-			curwin->w_leftcol = col;
+			curwin->w_leftcol = ستون;
 			redraw_later(UPD_NOT_VALID);
 		    }
 		}
-		break;
+		اكسر;
 
 		// "ze" - scroll screen, cursor at the end
-    case 'e':	if (!curwin->w_p_wrap)
+    حالة 'e':	إذا (!curwin->w_p_wrap)
 		{
-#ifdef FEAT_FOLDING
-		    if (hasFolding(curwin->w_cursor.lnum, NULL, NULL))
-			col = 0;	// like the cursor is in col 0
-		    else
-#endif
-		    getvcol(curwin, &curwin->w_cursor, NULL, NULL, &col, 0);
-		    n = curwin->w_width - curwin_col_off();
-		    if ((long)col + siso < n)
-			col = 0;
-		    else if (siso - n < INT_MAX - col)
-			col = (int)(col + siso - n + 1);
-		    else
-			col = INT_MAX;
-		    if (curwin->w_leftcol != col)
+#اگر_تعریف_شده FEAT_FOLDING
+		    إذا (hasFolding(curwin->w_cursor.lnum, عدم, عدم))
+			ستون = 0;	// like the cursor is in col 0
+		    وإلا
+#پایان_اگر
+		    getvcol(curwin, &curwin->w_cursor, عدم, عدم, &ستون, 0);
+		    n = curwin->w_عرض - curwin_ستون_off();
+		    إذا ((دراز)ستون + siso < n)
+			ستون = 0;
+		    وإلا إذا (siso - n < بیشترین_صحیح - ستون)
+			ستون = (صحيح)(ستون + siso - n + 1);
+		    وإلا
+			ستون = بیشترین_صحیح;
+		    إذا (curwin->w_leftcol != ستون)
 		    {
-			curwin->w_leftcol = col;
+			curwin->w_leftcol = ستون;
 			redraw_later(UPD_NOT_VALID);
 		    }
 		}
-		break;
+		اكسر;
 
 		// "zp", "zP" in block mode put without adding trailing spaces
-    case 'P':
-    case 'p':  nv_put(cap);
-	       break;
+    حالة 'P':
+    حالة 'p':  nv_put(cap);
+	       اكسر;
 		// "zy" Yank without trailing spaces
-    case 'y':  nv_operator(cap);
-	       break;
-#ifdef FEAT_FOLDING
+    حالة 'y':  nv_operator(cap);
+	       اكسر;
+#اگر_تعریف_شده FEAT_FOLDING
 		// "zF": create fold command
 		// "zf": create fold operator
-    case 'F':
-    case 'f':   if (foldManualAllowed(TRUE))
+    حالة 'F':
+    حالة 'f':   إذا (foldManualAllowed(TRUE))
 		{
 		    cap->nchar = 'f';
 		    nv_operator(cap);
 		    curwin->w_p_fen = TRUE;
 
 		    // "zF" is like "zfzf"
-		    if (nchar == 'F' && cap->oap->op_type == OP_FOLD)
+		    إذا (nchar == 'F' && cap->oap->op_type == OP_FOLD)
 		    {
 			nv_operator(cap);
-			finish_op = TRUE;
+			پایان_op = TRUE;
 		    }
 		}
-		else
+		وإلا
 		    clearopbeep(cap->oap);
-		break;
+		اكسر;
 
 		// "zd": delete fold at cursor
 		// "zD": delete fold at cursor recursively
-    case 'd':
-    case 'D':	if (foldManualAllowed(FALSE))
+    حالة 'd':
+    حالة 'D':	إذا (foldManualAllowed(FALSE))
 		{
-		    if (VIsual_active)
+		    إذا (VIsual_فعال)
 			nv_operator(cap);
-		    else
+		    وإلا
 			deleteFold(curwin->w_cursor.lnum,
 				  curwin->w_cursor.lnum, nchar == 'D', FALSE);
 		}
-		break;
+		اكسر;
 
 		// "zE": erase all folds
-    case 'E':	if (foldmethodIsManual(curwin))
+    حالة 'E':	إذا (foldmethodIsManual(curwin))
 		{
 		    clearFolding(curwin);
-		    changed_window_setting();
+		    تغییریافته_پنجره_setting();
 		}
-		else if (foldmethodIsMarker(curwin))
-		    deleteFold((linenr_T)1, curbuf->b_ml.ml_line_count,
+		وإلا إذا (foldmethodIsMarker(curwin))
+		    deleteFold((linenr_T)1, curbuf->b_ml.ml_سطر_شمار,
 								 TRUE, FALSE);
-		else
+		وإلا
 		    emsg(_(e_cannot_erase_folds_with_current_foldmethod));
-		break;
+		اكسر;
 
 		// "zn": fold none: reset 'foldenable'
-    case 'n':	curwin->w_p_fen = FALSE;
-		break;
+    حالة 'n':	curwin->w_p_fen = FALSE;
+		اكسر;
 
 		// "zN": fold Normal: set 'foldenable'
-    case 'N':	curwin->w_p_fen = TRUE;
-		break;
+    حالة 'N':	curwin->w_p_fen = TRUE;
+		اكسر;
 
 		// "zi": invert folding: toggle 'foldenable'
-    case 'i':	curwin->w_p_fen = !curwin->w_p_fen;
-		break;
+    حالة 'i':	curwin->w_p_fen = !curwin->w_p_fen;
+		اكسر;
 
 		// "za": open closed fold or close open fold at cursor
-    case 'a':	if (hasFolding(curwin->w_cursor.lnum, NULL, NULL))
+    حالة 'a':	إذا (hasFolding(curwin->w_cursor.lnum, عدم, عدم))
 		    openFold(curwin->w_cursor.lnum, cap->count1);
-		else
+		وإلا
 		{
 		    closeFold(curwin->w_cursor.lnum, cap->count1);
 		    curwin->w_p_fen = TRUE;
 		}
-		break;
+		اكسر;
 
 		// "zA": open fold at cursor recursively
-    case 'A':	if (hasFolding(curwin->w_cursor.lnum, NULL, NULL))
+    حالة 'A':	إذا (hasFolding(curwin->w_cursor.lnum, عدم, عدم))
 		    openFoldRecurse(curwin->w_cursor.lnum);
-		else
+		وإلا
 		{
 		    closeFoldRecurse(curwin->w_cursor.lnum);
 		    curwin->w_p_fen = TRUE;
 		}
-		break;
+		اكسر;
 
 		// "zo": open fold at cursor or Visual area
-    case 'o':	if (VIsual_active)
+    حالة 'o':	إذا (VIsual_فعال)
 		    nv_operator(cap);
-		else
+		وإلا
 		    openFold(curwin->w_cursor.lnum, cap->count1);
-		break;
+		اكسر;
 
 		// "zO": open fold recursively
-    case 'O':	if (VIsual_active)
+    حالة 'O':	إذا (VIsual_فعال)
 		    nv_operator(cap);
-		else
+		وإلا
 		    openFoldRecurse(curwin->w_cursor.lnum);
-		break;
+		اكسر;
 
 		// "zc": close fold at cursor or Visual area
-    case 'c':	if (VIsual_active)
+    حالة 'c':	إذا (VIsual_فعال)
 		    nv_operator(cap);
-		else
+		وإلا
 		    closeFold(curwin->w_cursor.lnum, cap->count1);
 		curwin->w_p_fen = TRUE;
-		break;
+		اكسر;
 
 		// "zC": close fold recursively
-    case 'C':	if (VIsual_active)
+    حالة 'C':	إذا (VIsual_فعال)
 		    nv_operator(cap);
-		else
+		وإلا
 		    closeFoldRecurse(curwin->w_cursor.lnum);
 		curwin->w_p_fen = TRUE;
-		break;
+		اكسر;
 
 		// "zv": open folds at the cursor
-    case 'v':	foldOpenCursor();
-		break;
+    حالة 'v':	foldOpenCursor();
+		اكسر;
 
 		// "zx": re-apply 'foldlevel' and open folds at the cursor
-    case 'x':	curwin->w_p_fen = TRUE;
+    حالة 'x':	curwin->w_p_fen = TRUE;
 		curwin->w_foldinvalid = true;	// recompute folds
 		newFoldLevel();			// update right now
 		foldOpenCursor();
-		break;
+		اكسر;
 
 		// "zX": undo manual opens/closes, re-apply 'foldlevel'
-    case 'X':	curwin->w_p_fen = TRUE;
+    حالة 'X':	curwin->w_p_fen = TRUE;
 		curwin->w_foldinvalid = true;	// recompute folds
 		old_fdl = -1;			// force an update
-		break;
+		اكسر;
 
 		// "zm": fold more
-    case 'm':	if (curwin->w_p_fdl > 0)
+    حالة 'm':	إذا (curwin->w_p_fdl > 0)
 		{
 		    curwin->w_p_fdl -= cap->count1;
-		    if (curwin->w_p_fdl < 0)
+		    إذا (curwin->w_p_fdl < 0)
 			curwin->w_p_fdl = 0;
 		}
 		old_fdl = -1;		// force an update
 		curwin->w_p_fen = TRUE;
-		break;
+		اكسر;
 
 		// "zM": close all folds
-    case 'M':	curwin->w_p_fdl = 0;
+    حالة 'M':	curwin->w_p_fdl = 0;
 		old_fdl = -1;		// force an update
 		curwin->w_p_fen = TRUE;
-		break;
+		اكسر;
 
 		// "zr": reduce folding
-    case 'r':	curwin->w_p_fdl += cap->count1;
+    حالة 'r':	curwin->w_p_fdl += cap->count1;
 		{
-		    int d = getDeepestNesting();
+		    صحيح d = get_عمیقترین_Nesting();
 
-		    if (curwin->w_p_fdl >= d)
+		    إذا (curwin->w_p_fdl >= d)
 			curwin->w_p_fdl = d;
 		}
-		break;
+		اكسر;
 
 		// "zR": open all folds
-    case 'R':	curwin->w_p_fdl = getDeepestNesting();
+    حالة 'R':	curwin->w_p_fdl = get_عمیقترین_Nesting();
 		old_fdl = -1;		// force an update
-		break;
+		اكسر;
 
-    case 'j':	// "zj" move to next fold downwards
-    case 'k':	// "zk" move to next fold upwards
-		if (foldMoveTo(TRUE, nchar == 'j' ? FORWARD : BACKWARD,
+    حالة 'j':	// "zj" move to next fold downwards
+    حالة 'k':	// "zk" move to next fold upwards
+		إذا (fold_Move_مقصد(TRUE, nchar == 'j' ? FORWARD : BACKWARD,
 							  cap->count1) == FAIL)
 		    clearopbeep(cap->oap);
-		break;
+		اكسر;
 
-#endif // FEAT_FOLDING
+#پایان_اگر // FEAT_FOLDING
 
-#ifdef FEAT_SPELL
-    case 'u':	// "zug" and "zuw": undo "zg" and "zw"
-    case 'g':	// "zg": add good word to word list
-    case 'w':	// "zw": add wrong word to word list
-    case 'G':	// "zG": add good word to temp word list
-    case 'W':	// "zW": add wrong word to temp word list
-		if (nv_zg_zw(cap, nchar) == FAIL)
-		    return;
-		break;
+#اگر_تعریف_شده FEAT_SPELL
+    حالة 'u':	// "zug" and "zuw": undo "zg" and "zw"
+    حالة 'g':	// "zg": add good word to word list
+    حالة 'w':	// "zw": add wrong word to word list
+    حالة 'G':	// "zG": add good word to temp word list
+    حالة 'W':	// "zW": add wrong word to temp word list
+		إذا (nv_zg_zw(cap, nchar) == FAIL)
+		    أرجع;
+		اكسر;
 
-    case '=':	// "z=": suggestions for a badly spelled word
-		if (!checkclearop(cap->oap))
-		    spell_suggest((int)cap->count0);
-		break;
-#endif
+    حالة '=':	// "z=": suggestions for a badly spelled word
+		إذا (!checkclearop(cap->oap))
+		    spell_suggest((صحيح)cap->count0);
+		اكسر;
+#پایان_اگر
 
-    default:	clearopbeep(cap->oap);
+    افتراضي:	clearopbeep(cap->oap);
     }
 
-#ifdef FEAT_FOLDING
+#اگر_تعریف_شده FEAT_FOLDING
     // Redraw when 'foldenable' changed
-    if (old_fen != curwin->w_p_fen)
+    إذا (old_fen != curwin->w_p_fen)
     {
 # ifdef FEAT_DIFF
 	win_T	    *wp;
 
-	if (foldmethodIsDiff(curwin) && curwin->w_p_scb)
+	إذا (foldmethodIsDiff(curwin) && curwin->w_p_scb)
 	{
 	    // Adjust 'foldenable' in diff-synced windows.
 	    FOR_ALL_WINDOWS(wp)
 	    {
-		if (wp != curwin && foldmethodIsDiff(wp) && wp->w_p_scb)
+		إذا (wp != curwin && foldmethodIsDiff(wp) && wp->w_p_scb)
 		{
 		    wp->w_p_fen = curwin->w_p_fen;
-		    changed_window_setting_win(wp);
+		    تغییریافته_پنجره_setting_win(wp);
 		}
 	    }
 	}
 # endif
-	changed_window_setting();
+	تغییریافته_پنجره_setting();
     }
 
     // Redraw when 'foldlevel' changed.
-    if (old_fdl != curwin->w_p_fdl)
+    إذا (old_fdl != curwin->w_p_fdl)
 	newFoldLevel();
-#endif
+#پایان_اگر
 }
 
-#ifdef FEAT_GUI
+#اگر_تعریف_شده FEAT_GUI
 /*
  * Vertical scrollbar movement.
  */
-    static void
+    ساكن فراغ
 nv_ver_scrollbar(cmdarg_T *cap)
 {
-    if (cap->oap->op_type != OP_NOP)
+    إذا (cap->oap->op_type != OP_NOP)
 	clearopbeep(cap->oap);
 
     // Even if an operator was pending, we still want to scroll
@@ -3059,25 +3059,25 @@ nv_ver_scrollbar(cmdarg_T *cap)
 /*
  * Horizontal scrollbar movement.
  */
-    static void
+    ساكن فراغ
 nv_hor_scrollbar(cmdarg_T *cap)
 {
-    if (cap->oap->op_type != OP_NOP)
+    إذا (cap->oap->op_type != OP_NOP)
 	clearopbeep(cap->oap);
 
     // Even if an operator was pending, we still want to scroll
-    do_mousescroll_horiz(scrollbar_value);
+    do_mousescroll_horiz(scrollbar_مقدار);
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_GUI_TABLINE)
+#إذا defined(FEAT_GUI_TABLINE)
 /*
  * Click in GUI tab.
  */
-    static void
+    ساكن فراغ
 nv_tabline(cmdarg_T *cap)
 {
-    if (cap->oap->op_type != OP_NOP)
+    إذا (cap->oap->op_type != OP_NOP)
 	clearopbeep(cap->oap);
 
     // Even if an operator was pending, we still want to jump tabs.
@@ -3087,10 +3087,10 @@ nv_tabline(cmdarg_T *cap)
 /*
  * Selected item in tab line menu.
  */
-    static void
+    ساكن فراغ
 nv_tabmenu(cmdarg_T *cap)
 {
-    if (cap->oap->op_type != OP_NOP)
+    إذا (cap->oap->op_type != OP_NOP)
 	clearopbeep(cap->oap);
 
     // Even if an operator was pending, we still want to jump tabs.
@@ -3101,123 +3101,123 @@ nv_tabmenu(cmdarg_T *cap)
  * Handle selecting an item of the GUI tab line menu.
  * Used in Normal and Insert mode.
  */
-    void
-handle_tabmenu(void)
+    فراغ
+handle_tabmenu(فراغ)
 {
-    switch (current_tabmenu)
+    بدل (current_tabmenu)
     {
-	case TABLINE_MENU_CLOSE:
-	    if (current_tab == 0)
+	حالة TABLINE_MENU_CLOSE:
+	    إذا (current_tab == 0)
 		do_cmdline_cmd((char_u *)"confirm tabclose");
-	    else
+	    وإلا
 	    {
-		vim_snprintf((char *)IObuff, IOSIZE, "confirm tabclose %d",
+		vim_snprintf((حرف *)IObuff, IOSIZE, "confirm tabclose %d",
 								 current_tab);
 		do_cmdline_cmd(IObuff);
 	    }
-	    break;
+	    اكسر;
 
-	case TABLINE_MENU_NEW:
-	    if (current_tab == 0)
+	حالة TABLINE_MENU_NEW:
+	    إذا (current_tab == 0)
 		do_cmdline_cmd((char_u *)"$tabnew");
-	    else
+	    وإلا
 	    {
-		vim_snprintf((char *)IObuff, IOSIZE, "%dtabnew",
+		vim_snprintf((حرف *)IObuff, IOSIZE, "%dtabnew",
 							     current_tab - 1);
 		do_cmdline_cmd(IObuff);
 	    }
-	    break;
+	    اكسر;
 
-	case TABLINE_MENU_OPEN:
-	    if (current_tab == 0)
+	حالة TABLINE_MENU_OPEN:
+	    إذا (current_tab == 0)
 		do_cmdline_cmd((char_u *)"browse $tabnew");
-	    else
+	    وإلا
 	    {
-		vim_snprintf((char *)IObuff, IOSIZE, "browse %dtabnew",
+		vim_snprintf((حرف *)IObuff, IOSIZE, "browse %dtabnew",
 							     current_tab - 1);
 		do_cmdline_cmd(IObuff);
 	    }
-	    break;
+	    اكسر;
     }
 }
-#endif
+#پایان_اگر
 
 /*
  * "Q" command.
  */
-    static void
+    ساكن فراغ
 nv_exmode(cmdarg_T *cap)
 {
     // Ignore 'Q' in Visual mode, just give a beep.
-    if (VIsual_active)
+    إذا (VIsual_فعال)
 	vim_beep(BO_EX);
-    else if (!checkclearop(cap->oap))
+    وإلا إذا (!checkclearop(cap->oap))
 	do_exmode(FALSE);
 }
 
 /*
  * Handle a ":" command.
  */
-    static void
+    ساكن فراغ
 nv_colon(cmdarg_T *cap)
 {
-    int	old_p_im;
-    int	cmd_result;
-    int	is_cmdkey = cap->cmdchar == K_COMMAND
+    صحيح	old_p_im;
+    صحيح	cmd_نتیجه;
+    صحيح	is_cmdkey = cap->cmdchar == K_COMMAND
 					   || cap->cmdchar == K_SCRIPT_COMMAND;
-    int	flags;
+    صحيح	flags;
 
-    if (VIsual_active && !is_cmdkey)
+    إذا (VIsual_فعال && !is_cmdkey)
     {
 	nv_operator(cap);
-	return;
+	أرجع;
     }
 
-    if (cap->oap->op_type != OP_NOP)
+    إذا (cap->oap->op_type != OP_NOP)
     {
 	// Using ":" as a movement is characterwise exclusive.
 	cap->oap->motion_type = MCHAR;
 	cap->oap->inclusive = FALSE;
     }
-    else if (cap->count0 && !is_cmdkey)
+    وإلا إذا (cap->count0 && !is_cmdkey)
     {
 	// translate "count:" into ":.,.+(count - 1)"
 	stuffcharReadbuff('.');
-	if (cap->count0 > 1)
+	إذا (cap->count0 > 1)
 	{
 	    stuffReadbuff((char_u *)",.+");
-	    stuffnumReadbuff((long)cap->count0 - 1L);
+	    stuffnumReadbuff((دراز)cap->count0 - 1L);
 	}
     }
 
     // When typing, don't type below an old message
-    if (KeyTyped)
+    إذا (کلید_Typed)
 	compute_cmdrow();
 
     old_p_im = p_im;
 
     // get a command line and execute it
     flags = cap->oap->op_type != OP_NOP ? DOCMD_KEEPLINE : 0;
-    if (is_cmdkey)
-	cmd_result = do_cmdkey_command(cap->cmdchar, flags);
-    else
-	cmd_result = do_cmdline(NULL, getexline, NULL, flags);
+    إذا (is_cmdkey)
+	cmd_نتیجه = do_cmdkey_command(cap->cmdchar, flags);
+    وإلا
+	cmd_نتیجه = do_cmdline(عدم, getexline, عدم, flags);
 
     // If 'insertmode' changed, enter or exit Insert mode
-    if (p_im != old_p_im)
+    إذا (p_im != old_p_im)
     {
-	if (p_im)
+	إذا (p_im)
 	    restart_edit = 'i';
-	else
+	وإلا
 	    restart_edit = 0;
     }
 
-    if (cmd_result == FAIL)
+    إذا (cmd_نتیجه == FAIL)
 	// The Ex command failed, do not execute the operator.
 	clearop(cap->oap);
-    else if (cap->oap->op_type != OP_NOP
-	    && (cap->oap->start.lnum > curbuf->b_ml.ml_line_count
-		|| cap->oap->start.col > ml_get_len(cap->oap->start.lnum)
+    وإلا إذا (cap->oap->op_type != OP_NOP
+	    && (cap->oap->شروع.lnum > curbuf->b_ml.ml_سطر_شمار
+		|| cap->oap->شروع.ستون > ml_get_len(cap->oap->شروع.lnum)
 		|| did_emsg
 	       ))
 	// The start of the operator has become invalid by the Ex command.
@@ -3227,47 +3227,47 @@ nv_colon(cmdarg_T *cap)
 /*
  * Handle CTRL-G command.
  */
-    static void
+    ساكن فراغ
 nv_ctrlg(cmdarg_T *cap)
 {
-    if (VIsual_active)	// toggle Selection/Visual mode
+    إذا (VIsual_فعال)	// toggle Selection/Visual mode
     {
 	VIsual_select = !VIsual_select;
 	may_trigger_modechanged();
 	showmode();
     }
-    else if (!checkclearop(cap->oap))
+    وإلا إذا (!checkclearop(cap->oap))
 	// print full name if count given or :cd used
-	fileinfo((int)cap->count0, FALSE, TRUE);
+	fileinfo((صحيح)cap->count0, FALSE, TRUE);
 }
 
 /*
  * Handle CTRL-H <Backspace> command.
  */
-    static void
+    ساكن فراغ
 nv_ctrlh(cmdarg_T *cap)
 {
-    if (VIsual_active && VIsual_select)
+    إذا (VIsual_فعال && VIsual_select)
     {
 	cap->cmdchar = 'x';	// BS key behaves like 'x' in Select mode
 	v_visop(cap);
     }
-    else
-	nv_left(cap);
+    وإلا
+	nv_چپ(cap);
 }
 
 /*
  * CTRL-L: clear screen and redraw.
  */
-    static void
+    ساكن فراغ
 nv_clear(cmdarg_T *cap)
 {
-    if (checkclearop(cap->oap))
-	return;
+    إذا (checkclearop(cap->oap))
+	أرجع;
 
-#ifdef FEAT_SYN_HL
+#اگر_تعریف_شده FEAT_SYN_HL
     // Clear all syntax states to force resyncing.
-    syn_stack_free_all(curwin->w_s);
+    syn_پشته_free_all(curwin->w_s);
 # ifdef FEAT_RELTIME
     {
 	win_T *wp;
@@ -3276,31 +3276,31 @@ nv_clear(cmdarg_T *cap)
 	    wp->w_s->b_syn_slow = FALSE;
     }
 # endif
-#endif
+#پایان_اگر
     redraw_later(UPD_CLEAR);
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+#إذا defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-    if (!gui.in_use)
+    إذا (!gui.درون_use)
 # endif
 	resize_console_buf();
-#endif
+#پایان_اگر
 }
 
 /*
  * CTRL-O: In Select mode: switch to Visual mode for one command.
  * Otherwise: Go to older pcmark.
  */
-    static void
+    ساكن فراغ
 nv_ctrlo(cmdarg_T *cap)
 {
-    if (VIsual_active && VIsual_select)
+    إذا (VIsual_فعال && VIsual_select)
     {
 	VIsual_select = FALSE;
 	may_trigger_modechanged();
 	showmode();
 	restart_VIsual_select = 2;	// restart Select mode later
     }
-    else
+    وإلا
     {
 	cap->count1 = -cap->count1;
 	nv_pcmark(cap);
@@ -3311,48 +3311,48 @@ nv_ctrlo(cmdarg_T *cap)
  * CTRL-^ command, short for ":e #".  Works even when the alternate buffer is
  * not named.
  */
-    static void
+    ساكن فراغ
 nv_hat(cmdarg_T *cap)
 {
-    if (!checkclearopq(cap->oap))
-	(void)buflist_getfile((int)cap->count0, (linenr_T)0,
+    إذا (!checkclearopq(cap->oap))
+	(فراغ)buflist_getfile((صحيح)cap->count0, (linenr_T)0,
 						GETF_SETMARK|GETF_ALT, FALSE);
 }
 
 /*
  * "Z" commands.
  */
-    static void
+    ساكن فراغ
 nv_Zet(cmdarg_T *cap)
 {
-    if (checkclearopq(cap->oap))
-	return;
+    إذا (checkclearopq(cap->oap))
+	أرجع;
 
-    switch (cap->nchar)
+    بدل (cap->nchar)
     {
 	// "ZZ": equivalent to ":x".
-	case 'Z':	do_cmdline_cmd((char_u *)"x");
-			break;
+	حالة 'Z':	do_cmdline_cmd((char_u *)"x");
+			اكسر;
 
 			// "ZQ": equivalent to ":q!" (Elvis compatible).
-	case 'Q':	do_cmdline_cmd((char_u *)"q!");
-			break;
+	حالة 'Q':	do_cmdline_cmd((char_u *)"q!");
+			اكسر;
 
-	default:	clearopbeep(cap->oap);
+	افتراضي:	clearopbeep(cap->oap);
     }
 }
 
 /*
  * Call nv_ident() as if "c1" was used, with "c2" as next character.
  */
-    void
-do_nv_ident(int c1, int c2)
+    فراغ
+do_nv_ident(صحيح c1, صحيح c2)
 {
     oparg_T	oa;
     cmdarg_T	ca;
 
     clear_oparg(&oa);
-    CLEAR_FIELD(ca);
+    CLEAR_فیلد(ca);
     ca.oap = &oa;
     ca.cmdchar = c1;
     ca.nchar = c2;
@@ -3363,74 +3363,74 @@ do_nv_ident(int c1, int c2)
  * 'K' normal-mode command. Get the command to lookup the keyword under the
  * cursor.
  */
-    static int
+    ساكن صحيح
 nv_K_getcmd(
 	cmdarg_T	*cap,
 	char_u		*kp,
-	int		kp_help,
-	int		kp_ex,
+	صحيح		kp_help,
+	صحيح		kp_ex,
 	char_u		**ptr_arg,
-	int		n,
+	صحيح		n,
 	char_u		*buf,
 	size_t		bufsize,
 	size_t		*buflen)
 {
     char_u	*ptr = *ptr_arg;
-    int		isman;
-    int		isman_s;
+    صحيح		isman;
+    صحيح		isman_s;
 
-    if (kp_help)
+    إذا (kp_help)
     {
 	// in the help buffer
 	STRCPY(buf, "he! ");
 	*buflen = STRLEN_LITERAL("he! ");
-	return n;
+	أرجع n;
     }
 
-    if (kp_ex)
+    إذا (kp_ex)
     {
 	// 'keywordprog' is an ex command
-	if (cap->count0 != 0)
-	    *buflen = vim_snprintf((char *)buf, bufsize, "%s %ld ", kp, cap->count0);
-	else
-	    *buflen = vim_snprintf((char *)buf, bufsize, "%s ", kp);
-	return n;
+	إذا (cap->count0 != 0)
+	    *buflen = vim_snprintf((حرف *)buf, bufsize, "%s %ld ", kp, cap->count0);
+	وإلا
+	    *buflen = vim_snprintf((حرف *)buf, bufsize, "%s ", kp);
+	أرجع n;
     }
 
     // An external command will probably use an argument starting
     // with "-" as an option.  To avoid trouble we skip the "-".
-    while (*ptr == '-' && n > 0)
+    طالما (*ptr == '-' && n > 0)
     {
 	++ptr;
 	--n;
     }
-    if (n == 0)
+    إذا (n == 0)
     {
 	// found dashes only
 	emsg(_(e_no_identifier_under_cursor));
 	vim_free(buf);
 	*ptr_arg = ptr;
-	return 0;
+	أرجع 0;
     }
 
     // When a count is given, turn it into a range.  Is this
     // really what we want?
     isman = (STRCMP(kp, "man") == 0);
     isman_s = (STRCMP(kp, "man -s") == 0);
-    if (cap->count0 != 0 && !(isman || isman_s))
-	*buflen = vim_snprintf((char *)buf, bufsize, ".,.+%ld! ", cap->count0 - 1);
-    else
-	*buflen = vim_snprintf((char *)buf, bufsize, "! ");
+    إذا (cap->count0 != 0 && !(isman || isman_s))
+	*buflen = vim_snprintf((حرف *)buf, bufsize, ".,.+%ld! ", cap->count0 - 1);
+    وإلا
+	*buflen = vim_snprintf((حرف *)buf, bufsize, "! ");
 
-    if (cap->count0 == 0 && isman_s)
-	*buflen += vim_snprintf((char *)buf + *buflen, bufsize - *buflen, "man ");
-    else
-	*buflen += vim_snprintf((char *)buf + *buflen, bufsize - *buflen, "%s ", kp);
-    if (cap->count0 != 0 && (isman || isman_s))
-	*buflen += vim_snprintf((char *)buf + *buflen, bufsize - *buflen, "%ld ", cap->count0);
+    إذا (cap->count0 == 0 && isman_s)
+	*buflen += vim_snprintf((حرف *)buf + *buflen, bufsize - *buflen, "man ");
+    وإلا
+	*buflen += vim_snprintf((حرف *)buf + *buflen, bufsize - *buflen, "%s ", kp);
+    إذا (cap->count0 != 0 && (isman || isman_s))
+	*buflen += vim_snprintf((حرف *)buf + *buflen, bufsize - *buflen, "%ld ", cap->count0);
 
     *ptr_arg = ptr;
-    return n;
+    أرجع n;
 }
 
 /*
@@ -3441,53 +3441,53 @@ nv_K_getcmd(
  * [g] '#'	? to current identifier or string
  *  g  ']'	:tselect for current identifier
  */
-    static void
+    ساكن فراغ
 nv_ident(cmdarg_T *cap)
 {
-    char_u	*ptr = NULL;
+    char_u	*ptr = عدم;
     char_u	*buf;
     size_t	bufsize;
     size_t	buflen;
     char_u	*newbuf;
     char_u	*p;
     char_u	*kp;		// value of 'keywordprg'
-    int		kp_help;	// 'keywordprg' is ":he"
-    int		kp_ex;		// 'keywordprg' starts with ":"
-    int		n = 0;		// init for GCC
-    int		cmdchar;
-    int		g_cmd;		// "g" command
-    int		tag_cmd = FALSE;
+    صحيح		kp_help;	// 'keywordprg' is ":he"
+    صحيح		kp_ex;		// 'keywordprg' starts with ":"
+    صحيح		n = 0;		// init for GCC
+    صحيح		cmdchar;
+    صحيح		g_cmd;		// "g" command
+    صحيح		برچسب_cmd = FALSE;
     char_u	*aux_ptr;
 
-    if (cap->cmdchar == 'g')	// "g*", "g#", "g]" and "gCTRL-]"
+    إذا (cap->cmdchar == 'g')	// "g*", "g#", "g]" and "gCTRL-]"
     {
 	cmdchar = cap->nchar;
 	g_cmd = TRUE;
     }
-    else
+    وإلا
     {
 	cmdchar = cap->cmdchar;
 	g_cmd = FALSE;
     }
 
-    if (cmdchar == POUND)	// the pound sign, '#' for English keyboards
+    إذا (cmdchar == POUND)	// the pound sign, '#' for English keyboards
 	cmdchar = '#';
 
     // The "]", "CTRL-]" and "K" commands accept an argument in Visual mode.
-    if (cmdchar == ']' || cmdchar == Ctrl_RSB || cmdchar == 'K')
+    إذا (cmdchar == ']' || cmdchar == Ctrl_RSB || cmdchar == 'K')
     {
-	if (VIsual_active && get_visual_text(cap, &ptr, &n) == FAIL)
-	    return;
-	if (checkclearopq(cap->oap))
-	    return;
+	إذا (VIsual_فعال && get_visual_متن(cap, &ptr, &n) == FAIL)
+	    أرجع;
+	إذا (checkclearopq(cap->oap))
+	    أرجع;
     }
 
-    if (ptr == NULL && (n = find_ident_under_cursor(&ptr,
+    إذا (ptr == عدم && (n = پیدا_کن_ident_under_cursor(&ptr,
 		    (cmdchar == '*' || cmdchar == '#')
-				 ? FIND_IDENT|FIND_STRING : FIND_IDENT)) == 0)
+				 ? پیدا_کن_IDENT|پیدا_کن_STRING : پیدا_کن_IDENT)) == 0)
     {
 	clearop(cap->oap);
-	return;
+	أرجع;
     }
 
     // Allocate buffer to put the command in.  Inserting backslashes can
@@ -3496,147 +3496,147 @@ nv_ident(cmdarg_T *cap)
     kp = (*curbuf->b_p_kp == NUL ? p_kp : curbuf->b_p_kp);
     kp_help = (*kp == NUL || STRCMP(kp, ":he") == 0
 						 || STRCMP(kp, ":help") == 0);
-    if (kp_help && *skipwhite(ptr) == NUL)
+    إذا (kp_help && *skipwhite(ptr) == NUL)
     {
 	emsg(_(e_no_identifier_under_cursor));	 // found white space only
-	return;
+	أرجع;
     }
     kp_ex = (*kp == ':');
     bufsize = (size_t)(n * 2 + 30 + STRLEN(kp));
     buf = alloc(bufsize);
-    if (buf == NULL)
-	return;
+    إذا (buf == عدم)
+	أرجع;
     buf[0] = NUL;
     buflen = 0;
 
-    switch (cmdchar)
+    بدل (cmdchar)
     {
-	case '*':
-	case '#':
+	حالة '*':
+	حالة '#':
 	    // Put cursor at start of word, makes search skip the word
 	    // under the cursor.
 	    // Call setpcmark() first, so "*``" puts the cursor back where
 	    // it was.
 	    setpcmark();
-	    curwin->w_cursor.col = (colnr_T) (ptr - ml_get_curline());
+	    curwin->w_cursor.ستون = (colnr_T) (ptr - ml_get_curline());
 
-	    if (!g_cmd && vim_iswordp(ptr))
+	    إذا (!g_cmd && vim_iswordp(ptr))
 	    {
 		STRCPY(buf, "\\<");
 		buflen = STRLEN_LITERAL("\\<");
 	    }
 	    no_smartcase = TRUE;	// don't use 'smartcase' now
-	    break;
+	    اكسر;
 
-	case 'K':
+	حالة 'K':
 	    n = nv_K_getcmd(cap, kp, kp_help, kp_ex, &ptr, n, buf, bufsize, &buflen);
-	    if (n == 0)
-		return;
-	    break;
+	    إذا (n == 0)
+		أرجع;
+	    اكسر;
 
-	case ']':
-	    tag_cmd = TRUE;
-#ifdef FEAT_CSCOPE
-	    if (p_cst)
+	حالة ']':
+	    برچسب_cmd = TRUE;
+#اگر_تعریف_شده FEAT_CSCOPE
+	    إذا (p_cst)
 	    {
 		STRCPY(buf, "cstag ");
 		buflen = STRLEN_LITERAL("cstag ");
 	    }
-	    else
-#endif
+	    وإلا
+#پایان_اگر
 	    {
 		STRCPY(buf, "ts ");
 		buflen = STRLEN_LITERAL("ts ");
 	    }
-	    break;
+	    اكسر;
 
-	default:
-	    tag_cmd = TRUE;
-	    if (curbuf->b_help)
+	افتراضي:
+	    برچسب_cmd = TRUE;
+	    إذا (curbuf->b_help)
 	    {
 		STRCPY(buf, "he! ");
 		buflen = STRLEN_LITERAL("he! ");
 	    }
-	    else
+	    وإلا
 	    {
-		if (g_cmd)
+		إذا (g_cmd)
 		{
 		    STRCPY(buf, "tj ");
 		    buflen = STRLEN_LITERAL("tj ");
 		}
-		else if (cap->count0 == 0)
+		وإلا إذا (cap->count0 == 0)
 		{
 		    STRCPY(buf, "ta ");
 		    buflen = STRLEN_LITERAL("ta ");
 		}
-		else
-		    buflen = vim_snprintf((char *)buf, bufsize, ":%ldta ", cap->count0);
+		وإلا
+		    buflen = vim_snprintf((حرف *)buf, bufsize, ":%ldta ", cap->count0);
 	    }
     }
 
     // Now grab the chars in the identifier
-    if (cmdchar == 'K' && !kp_help)
+    إذا (cmdchar == 'K' && !kp_help)
     {
 	size_t plen;
 
 	ptr = vim_strnsave(ptr, n);
-	if (kp_ex)
+	إذا (kp_ex)
 	    // Escape the argument properly for an Ex command
 	    p = vim_strsave_fnameescape(ptr, VSE_NONE);
-	else
+	وإلا
 	    // Escape the argument properly for a shell command
 	    p = vim_strsave_shellescape(ptr, TRUE, TRUE);
 	vim_free(ptr);
-	if (p == NULL)
+	إذا (p == عدم)
 	{
 	    vim_free(buf);
-	    return;
+	    أرجع;
 	}
 	plen = STRLEN(p);
 	newbuf = vim_realloc(buf, buflen + plen + 1);
-	if (newbuf == NULL)
+	إذا (newbuf == عدم)
 	{
 	    vim_free(buf);
 	    vim_free(p);
-	    return;
+	    أرجع;
 	}
 	buf = newbuf;
 	STRCPY(buf + buflen, p);
 	buflen += plen;
 	vim_free(p);
     }
-    else
+    وإلا
     {
-	if (cmdchar == '*')
+	إذا (cmdchar == '*')
 	    aux_ptr = (char_u *)(magic_isset() ? "/.*~[^$\\" : "/^$\\");
-	else if (cmdchar == '#')
+	وإلا إذا (cmdchar == '#')
 	    aux_ptr = (char_u *)(magic_isset() ? "/?.*~[^$\\" : "/?^$\\");
-	else if (tag_cmd)
+	وإلا إذا (برچسب_cmd)
 	{
-	    if (STRCMP(curbuf->b_p_ft, "help") == 0)
+	    إذا (STRCMP(curbuf->b_p_ft, "help") == 0)
 		// ":help" handles unescaped argument
 		aux_ptr = (char_u *)"";
-	    else
+	    وإلا
 		aux_ptr = (char_u *)"\\|\"\n[";
 	}
-	else
+	وإلا
 	    aux_ptr = (char_u *)"\\|\"\n*?[";
 
 	p = buf + buflen;
-	while (n-- > 0)
+	طالما (n-- > 0)
 	{
 	    // put a backslash before \ and some others
-	    if (vim_strchr(aux_ptr, *ptr) != NULL)
+	    إذا (vim_strchr(aux_ptr, *ptr) != عدم)
 		*p++ = '\\';
 
 	    // When current byte is a part of multibyte character, copy all
 	    // bytes of that character.
-	    if (has_mbyte)
+	    إذا (has_mbyte)
 	    {
-		int i;
-		int len = (*mb_ptr2len)(ptr) - 1;
+		صحيح i;
+		صحيح len = (*mb_ptr2len)(ptr) - 1;
 
-		for (i = 0; i < len && n >= 1; ++i, --n)
+		لكل (i = 0; i < len && n >= 1; ++i, --n)
 		    *p++ = *ptr++;
 	    }
 	    *p++ = *ptr++;
@@ -3646,9 +3646,9 @@ nv_ident(cmdarg_T *cap)
     }
 
     // Execute the command.
-    if (cmdchar == '*' || cmdchar == '#')
+    إذا (cmdchar == '*' || cmdchar == '#')
     {
-	if (!g_cmd && (has_mbyte
+	إذا (!g_cmd && (has_mbyte
 		    ? vim_iswordp(mb_prevptr(ml_get_curline(), ptr))
 		    : vim_iswordc(ptr[-1])))
 	{
@@ -3658,15 +3658,15 @@ nv_ident(cmdarg_T *cap)
 
 	// put pattern in search history
 	init_history();
-	add_to_history(HIST_SEARCH, buf, buflen, TRUE, NUL);
+	جمع_کن_مقصد_history(HIST_جستجو, buf, buflen, TRUE, NUL);
 
-	(void)normal_search(cap, cmdchar == '*' ? '/' : '?', buf, buflen, 0, NULL);
+	(فراغ)نرمال_جستجو(cap, cmdchar == '*' ? '/' : '?', buf, buflen, 0, عدم);
     }
-    else
+    وإلا
     {
-	g_tag_at_cursor = TRUE;
+	g_برچسب_at_cursor = TRUE;
 	do_cmdline_cmd(buf);
-	g_tag_at_cursor = FALSE;
+	g_برچسب_at_cursor = FALSE;
     }
 
     vim_free(buf);
@@ -3676,164 +3676,164 @@ nv_ident(cmdarg_T *cap)
  * Get visually selected text, within one line only.
  * Returns FAIL if more than one line selected.
  */
-    int
-get_visual_text(
+    صحيح
+get_visual_متن(
     cmdarg_T	*cap,
     char_u	**pp,	    // return: start of selected text
-    int		*lenp)	    // return: length of selected text
+    صحيح		*lenp)	    // return: length of selected text
 {
-    if (VIsual_mode != 'V')
+    إذا (VIsual_نما != 'V')
 	unadjust_for_sel();
-    if (VIsual.lnum != curwin->w_cursor.lnum)
+    إذا (VIsual.lnum != curwin->w_cursor.lnum)
     {
-	if (cap != NULL)
+	إذا (cap != عدم)
 	    clearopbeep(cap->oap);
-	return FAIL;
+	أرجع FAIL;
     }
-    if (VIsual_mode == 'V')
+    إذا (VIsual_نما == 'V')
     {
 	*pp = ml_get_curline();
-	*lenp = (int)ml_get_curline_len();
+	*lenp = (صحيح)ml_get_curline_len();
     }
-    else
+    وإلا
     {
-	if (LT_POS(curwin->w_cursor, VIsual))
+	إذا (LT_POS(curwin->w_cursor, VIsual))
 	{
 	    *pp = ml_get_pos(&curwin->w_cursor);
-	    *lenp = VIsual.col - curwin->w_cursor.col + 1;
+	    *lenp = VIsual.ستون - curwin->w_cursor.ستون + 1;
 	}
-	else
+	وإلا
 	{
 	    *pp = ml_get_pos(&VIsual);
-	    *lenp = curwin->w_cursor.col - VIsual.col + 1;
+	    *lenp = curwin->w_cursor.ستون - VIsual.ستون + 1;
 	}
-	if (**pp == NUL)
+	إذا (**pp == NUL)
 	    *lenp = 0;
-	if (*lenp > 0)
+	إذا (*lenp > 0)
 	{
-	    if (has_mbyte)
+	    إذا (has_mbyte)
 		// Correct the length to include all bytes of the last
 		// character.
 		*lenp += (*mb_ptr2len)(*pp + (*lenp - 1)) - 1;
-	    else if ((*pp)[*lenp - 1] == NUL)
+	    وإلا إذا ((*pp)[*lenp - 1] == NUL)
 		// Do not include a trailing NUL.
 		*lenp -= 1;
 	}
     }
     reset_VIsual_and_resel();
-    return OK;
+    أرجع OK;
 }
 
 /*
  * CTRL-T: backwards in tag stack
  */
-    static void
+    ساكن فراغ
 nv_tagpop(cmdarg_T *cap)
 {
-    if (!checkclearopq(cap->oap))
-	do_tag((char_u *)"", DT_POP, (int)cap->count1, FALSE, TRUE);
+    إذا (!checkclearopq(cap->oap))
+	do_برچسب((char_u *)"", DT_برداشت, (صحيح)cap->count1, FALSE, TRUE);
 }
 
 /*
  * Handle scrolling command 'H', 'L' and 'M'.
  */
-    static void
+    ساكن فراغ
 nv_scroll(cmdarg_T *cap)
 {
-    int		used = 0;
-    long	n;
-#ifdef FEAT_FOLDING
+    صحيح		استفاده_شده = 0;
+    دراز	n;
+#اگر_تعریف_شده FEAT_FOLDING
     linenr_T	lnum;
-#endif
-    int		half;
+#پایان_اگر
+    صحيح		half;
 
     cap->oap->motion_type = MLINE;
     setpcmark();
 
-    if (cap->cmdchar == 'L')
+    إذا (cap->cmdchar == 'L')
     {
 	validate_botline();	    // make sure curwin->w_botline is valid
 	curwin->w_cursor.lnum = curwin->w_botline - 1;
-	if (cap->count1 - 1 >= curwin->w_cursor.lnum)
+	إذا (cap->count1 - 1 >= curwin->w_cursor.lnum)
 	    curwin->w_cursor.lnum = 1;
-	else
+	وإلا
 	{
-#ifdef FEAT_FOLDING
-	    if (hasAnyFolding(curwin))
+#اگر_تعریف_شده FEAT_FOLDING
+	    إذا (hasAnyFolding(curwin))
 	    {
 		// Count a fold for one screen line.
-		for (n = cap->count1 - 1; n > 0
+		لكل (n = cap->count1 - 1; n > 0
 			    && curwin->w_cursor.lnum > curwin->w_topline; --n)
 		{
-		    (void)hasFolding(curwin->w_cursor.lnum,
-						&curwin->w_cursor.lnum, NULL);
-		    if (curwin->w_cursor.lnum > curwin->w_topline)
+		    (فراغ)hasFolding(curwin->w_cursor.lnum,
+						&curwin->w_cursor.lnum, عدم);
+		    إذا (curwin->w_cursor.lnum > curwin->w_topline)
 			--curwin->w_cursor.lnum;
 		}
 	    }
-	    else
-#endif
+	    وإلا
+#پایان_اگر
 		curwin->w_cursor.lnum -= cap->count1 - 1;
 	}
     }
-    else
+    وإلا
     {
-	if (cap->cmdchar == 'M')
+	إذا (cap->cmdchar == 'M')
 	{
-#ifdef FEAT_DIFF
+#اگر_تعریف_شده FEAT_DIFF
 	    // Don't count filler lines above the window.
-	    used -= diff_check_fill(curwin, curwin->w_topline)
+	    استفاده_شده -= diff_check_fill(curwin, curwin->w_topline)
 							  - curwin->w_topfill;
-#endif
+#پایان_اگر
 	    validate_botline();	    // make sure w_empty_rows is valid
-	    half = (curwin->w_height - curwin->w_empty_rows + 1) / 2;
-	    for (n = 0; curwin->w_topline + n < curbuf->b_ml.ml_line_count; ++n)
+	    half = (curwin->w_ارتفاع - curwin->w_خالی_ردیفها + 1) / 2;
+	    لكل (n = 0; curwin->w_topline + n < curbuf->b_ml.ml_سطر_شمار; ++n)
 	    {
-#ifdef FEAT_DIFF
+#اگر_تعریف_شده FEAT_DIFF
 		// Count half he number of filler lines to be "below this
 		// line" and half to be "above the next line".
-		if (n > 0 && used + diff_check_fill(curwin, curwin->w_topline
+		إذا (n > 0 && استفاده_شده + diff_check_fill(curwin, curwin->w_topline
 							     + n) / 2 >= half)
 		{
 		    --n;
-		    break;
+		    اكسر;
 		}
-#endif
-		used += plines(curwin->w_topline + n);
-		if (used >= half)
-		    break;
-#ifdef FEAT_FOLDING
-		if (hasFolding(curwin->w_topline + n, NULL, &lnum))
+#پایان_اگر
+		استفاده_شده += plines(curwin->w_topline + n);
+		إذا (استفاده_شده >= half)
+		    اكسر;
+#اگر_تعریف_شده FEAT_FOLDING
+		إذا (hasFolding(curwin->w_topline + n, عدم, &lnum))
 		    n = lnum - curwin->w_topline;
-#endif
+#پایان_اگر
 	    }
-	    if (n > 0 && used > curwin->w_height)
+	    إذا (n > 0 && استفاده_شده > curwin->w_ارتفاع)
 		--n;
 	}
-	else // (cap->cmdchar == 'H')
+	وإلا // (cap->cmdchar == 'H')
 	{
 	    n = cap->count1 - 1;
-#ifdef FEAT_FOLDING
-	    if (hasAnyFolding(curwin))
+#اگر_تعریف_شده FEAT_FOLDING
+	    إذا (hasAnyFolding(curwin))
 	    {
 		// Count a fold for one screen line.
 		lnum = curwin->w_topline;
-		while (n-- > 0 && lnum < curwin->w_botline - 1)
+		طالما (n-- > 0 && lnum < curwin->w_botline - 1)
 		{
-		    (void)hasFolding(lnum, NULL, &lnum);
+		    (فراغ)hasFolding(lnum, عدم, &lnum);
 		    ++lnum;
 		}
 		n = lnum - curwin->w_topline;
 	    }
-#endif
+#پایان_اگر
 	}
 	curwin->w_cursor.lnum = curwin->w_topline + n;
-	if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
-	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	إذا (curwin->w_cursor.lnum > curbuf->b_ml.ml_سطر_شمار)
+	    curwin->w_cursor.lnum = curbuf->b_ml.ml_سطر_شمار;
     }
 
     // Correct for 'so', except when an operator is pending.
-    if (cap->oap->op_type == OP_NOP)
+    إذا (cap->oap->op_type == OP_NOP)
 	cursor_correct();
     beginline(BL_SOL | BL_FIX);
 }
@@ -3841,96 +3841,96 @@ nv_scroll(cmdarg_T *cap)
 /*
  * Cursor right commands.
  */
-    static void
-nv_right(cmdarg_T *cap)
+    ساكن فراغ
+nv_راست(cmdarg_T *cap)
 {
-    long	n;
-    int		past_line;
+    دراز	n;
+    صحيح		past_سطر;
 
-    if (mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL))
+    إذا (mod_ماسک & (MOD_ماسک_لغزش | MOD_ماسک_CTRL))
     {
 	// <C-Right> and <S-Right> move a word or WORD right
-	if (mod_mask & MOD_MASK_CTRL)
+	إذا (mod_ماسک & MOD_ماسک_CTRL)
 	    cap->arg = TRUE;
 	nv_wordcmd(cap);
-	return;
+	أرجع;
     }
 
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = FALSE;
-    past_line = (VIsual_active && *p_sel != 'o');
+    past_سطر = (VIsual_فعال && *p_sel != 'o');
 
     // In virtual edit mode, there's no such thing as "past_line", as lines
     // are (theoretically) infinitely long.
-    if (virtual_active())
-	past_line = 0;
+    إذا (virtual_فعال())
+	past_سطر = 0;
 
-    for (n = cap->count1; n > 0; --n)
+    لكل (n = cap->count1; n > 0; --n)
     {
-	if ((!past_line && oneright() == FAIL)
-		|| (past_line && *ml_get_cursor() == NUL)
+	إذا ((!past_سطر && oneright() == FAIL)
+		|| (past_سطر && *ml_get_cursor() == NUL)
 		)
 	{
 	    //	  <Space> wraps to next line if 'whichwrap' has 's'.
 	    //	      'l' wraps to next line if 'whichwrap' has 'l'.
 	    // CURS_RIGHT wraps to next line if 'whichwrap' has '>'.
-	    if (       ((cap->cmdchar == ' '
-			    && vim_strchr(p_ww, 's') != NULL)
+	    إذا (       ((cap->cmdchar == ' '
+			    && vim_strchr(p_ww, 's') != عدم)
 			|| (cap->cmdchar == 'l'
-			    && vim_strchr(p_ww, 'l') != NULL)
-			|| (cap->cmdchar == K_RIGHT
-			    && vim_strchr(p_ww, '>') != NULL))
-		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+			    && vim_strchr(p_ww, 'l') != عدم)
+			|| (cap->cmdchar == K_راست
+			    && vim_strchr(p_ww, '>') != عدم))
+		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_سطر_شمار)
 	    {
 		// When deleting we also count the NL as a character.
 		// Set cap->oap->inclusive when last char in the line is
 		// included, move to next line after that
-		if (	   cap->oap->op_type != OP_NOP
+		إذا (	   cap->oap->op_type != OP_NOP
 			&& !cap->oap->inclusive
 			&& !LINEEMPTY(curwin->w_cursor.lnum))
 		    cap->oap->inclusive = TRUE;
-		else
+		وإلا
 		{
 		    ++curwin->w_cursor.lnum;
-		    curwin->w_cursor.col = 0;
+		    curwin->w_cursor.ستون = 0;
 		    curwin->w_cursor.coladd = 0;
-		    curwin->w_set_curswant = true;
+		    curwin->w_مجموعه_curswant = true;
 		    cap->oap->inclusive = FALSE;
 		}
-		continue;
+		استمر;
 	    }
-	    if (cap->oap->op_type == OP_NOP)
+	    إذا (cap->oap->op_type == OP_NOP)
 	    {
 		// Only beep and flush if not moved at all
-		if (n == cap->count1)
+		إذا (n == cap->count1)
 		    beep_flush();
 	    }
-	    else
+	    وإلا
 	    {
-		if (!LINEEMPTY(curwin->w_cursor.lnum))
+		إذا (!LINEEMPTY(curwin->w_cursor.lnum))
 		    cap->oap->inclusive = TRUE;
 	    }
-	    break;
+	    اكسر;
 	}
-	else if (past_line)
+	وإلا إذا (past_سطر)
 	{
-	    curwin->w_set_curswant = true;
-	    if (virtual_active())
+	    curwin->w_مجموعه_curswant = true;
+	    إذا (virtual_فعال())
 		oneright();
-	    else
+	    وإلا
 	    {
-		if (has_mbyte)
-		    curwin->w_cursor.col += (*mb_ptr2len)(ml_get_cursor());
-		else
-		    ++curwin->w_cursor.col;
+		إذا (has_mbyte)
+		    curwin->w_cursor.ستون += (*mb_ptr2len)(ml_get_cursor());
+		وإلا
+		    ++curwin->w_cursor.ستون;
 	    }
 	}
     }
-#ifdef FEAT_FOLDING
-    if (n != cap->count1 && (fdo_flags & FDO_HOR) && KeyTyped
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا (n != cap->count1 && (fdo_flags & FDO_HOR) && کلید_Typed
 					       && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
-#endif
+#پایان_اگر
 }
 
 /*
@@ -3938,95 +3938,95 @@ nv_right(cmdarg_T *cap)
  *
  * Returns TRUE when operator end should not be adjusted.
  */
-    static void
-nv_left(cmdarg_T *cap)
+    ساكن فراغ
+nv_چپ(cmdarg_T *cap)
 {
-    long	n;
+    دراز	n;
 
-    if (mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL))
+    إذا (mod_ماسک & (MOD_ماسک_لغزش | MOD_ماسک_CTRL))
     {
 	// <C-Left> and <S-Left> move a word or WORD left
-	if (mod_mask & MOD_MASK_CTRL)
+	إذا (mod_ماسک & MOD_ماسک_CTRL)
 	    cap->arg = 1;
-	nv_bck_word(cap);
-	return;
+	nv_bck_کلمه(cap);
+	أرجع;
     }
 
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = FALSE;
-    for (n = cap->count1; n > 0; --n)
+    لكل (n = cap->count1; n > 0; --n)
     {
-	if (oneleft() == FAIL)
+	إذا (oneleft() == FAIL)
 	{
 	    // <BS> and <Del> wrap to previous line if 'whichwrap' has 'b'.
 	    //		 'h' wraps to previous line if 'whichwrap' has 'h'.
 	    //	   CURS_LEFT wraps to previous line if 'whichwrap' has '<'.
-	    if (       (((cap->cmdchar == K_BS
+	    إذا (       (((cap->cmdchar == K_BS
 				|| cap->cmdchar == Ctrl_H)
-			    && vim_strchr(p_ww, 'b') != NULL)
+			    && vim_strchr(p_ww, 'b') != عدم)
 			|| (cap->cmdchar == 'h'
-			    && vim_strchr(p_ww, 'h') != NULL)
-			|| (cap->cmdchar == K_LEFT
-			    && vim_strchr(p_ww, '<') != NULL))
+			    && vim_strchr(p_ww, 'h') != عدم)
+			|| (cap->cmdchar == K_چپ
+			    && vim_strchr(p_ww, '<') != عدم))
 		    && curwin->w_cursor.lnum > 1)
 	    {
 		--(curwin->w_cursor.lnum);
 		coladvance((colnr_T)MAXCOL);
-		curwin->w_set_curswant = true;
+		curwin->w_مجموعه_curswant = true;
 
 		// When the NL before the first char has to be deleted we
 		// put the cursor on the NUL after the previous line.
 		// This is a very special case, be careful!
 		// Don't adjust op_end now, otherwise it won't work.
-		if (	   (cap->oap->op_type == OP_DELETE
+		إذا (	   (cap->oap->op_type == OP_DELETE
 			    || cap->oap->op_type == OP_CHANGE)
 			&& !LINEEMPTY(curwin->w_cursor.lnum))
 		{
 		    char_u *cp = ml_get_cursor();
 
-		    if (*cp != NUL)
+		    إذا (*cp != NUL)
 		    {
-			if (has_mbyte)
-			    curwin->w_cursor.col += (*mb_ptr2len)(cp);
-			else
-			    ++curwin->w_cursor.col;
+			إذا (has_mbyte)
+			    curwin->w_cursor.ستون += (*mb_ptr2len)(cp);
+			وإلا
+			    ++curwin->w_cursor.ستون;
 		    }
-		    cap->retval |= CA_NO_ADJ_OP_END;
+		    cap->retval |= CA_NO_ADJ_OP_انتها;
 		}
-		continue;
+		استمر;
 	    }
 	    // Only beep and flush if not moved at all
-	    else if (cap->oap->op_type == OP_NOP && n == cap->count1)
+	    وإلا إذا (cap->oap->op_type == OP_NOP && n == cap->count1)
 		beep_flush();
-	    break;
+	    اكسر;
 	}
     }
-#ifdef FEAT_FOLDING
-    if (n != cap->count1 && (fdo_flags & FDO_HOR) && KeyTyped
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا (n != cap->count1 && (fdo_flags & FDO_HOR) && کلید_Typed
 					       && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
-#endif
+#پایان_اگر
 }
 
 /*
  * Cursor up commands.
  * cap->arg is TRUE for "-": Move cursor to first non-blank.
  */
-    static void
-nv_up(cmdarg_T *cap)
+    ساكن فراغ
+nv_به_بالا(cmdarg_T *cap)
 {
-    if (mod_mask & MOD_MASK_SHIFT)
+    إذا (mod_ماسک & MOD_ماسک_لغزش)
     {
 	// <S-Up> is page up
 	cap->arg = BACKWARD;
-	nv_page(cap);
-	return;
+	nv_صفحه(cap);
+	أرجع;
     }
 
     cap->oap->motion_type = MLINE;
-    if (cursor_up(cap->count1, cap->oap->op_type == OP_NOP) == FAIL)
+    إذا (cursor_به_بالا(cap->count1, cap->oap->op_type == OP_NOP) == FAIL)
 	clearopbeep(cap->oap);
-    else if (cap->arg)
+    وإلا إذا (cap->arg)
 	beginline(BL_WHITE | BL_FIX);
 }
 
@@ -4034,42 +4034,42 @@ nv_up(cmdarg_T *cap)
  * Cursor down commands.
  * cap->arg is TRUE for CR and "+": Move cursor to first non-blank.
  */
-    static void
-nv_down(cmdarg_T *cap)
+    ساكن فراغ
+nv_پایین(cmdarg_T *cap)
 {
-    if (mod_mask & MOD_MASK_SHIFT)
+    إذا (mod_ماسک & MOD_ماسک_لغزش)
     {
 	// <S-Down> is page down
 	cap->arg = FORWARD;
-	nv_page(cap);
+	nv_صفحه(cap);
     }
-#if defined(FEAT_QUICKFIX)
+#إذا defined(FEAT_QUICKFIX)
     // Quickfix window only: view the result under the cursor.
-    else if (bt_quickfix(curbuf) && cap->cmdchar == CAR)
-	qf_view_result(FALSE);
-#endif
-    else
+    وإلا إذا (bt_quickfix(curbuf) && cap->cmdchar == CAR)
+	qf_view_نتیجه(FALSE);
+#پایان_اگر
+    وإلا
     {
 	// In the cmdline window a <CR> executes the command.
-	if (cmdwin_type != 0 && cap->cmdchar == CAR)
-	    cmdwin_result = CAR;
-	else
-#ifdef FEAT_JOB_CHANNEL
+	إذا (cmdwin_type != 0 && cap->cmdchar == CAR)
+	    cmdwin_نتیجه = CAR;
+	وإلا
+#اگر_تعریف_شده FEAT_کار_CHANNEL
 	// In a prompt buffer a <CR> in the last line invokes the callback.
-	if (bt_prompt(curbuf) && cap->cmdchar == CAR
-		       && curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
+	إذا (bt_prompt(curbuf) && cap->cmdchar == CAR
+		       && curwin->w_cursor.lnum == curbuf->b_ml.ml_سطر_شمار)
 	{
 	    invoke_prompt_callback();
-	    if (restart_edit == 0)
+	    إذا (restart_edit == 0)
 		restart_edit = 'a';
 	}
-	else
-#endif
+	وإلا
+#پایان_اگر
 	{
 	    cap->oap->motion_type = MLINE;
-	    if (cursor_down(cap->count1, cap->oap->op_type == OP_NOP) == FAIL)
+	    إذا (cursor_پایین(cap->count1, cap->oap->op_type == OP_NOP) == FAIL)
 		clearopbeep(cap->oap);
-	    else if (cap->arg)
+	    وإلا إذا (cap->arg)
 		beginline(BL_WHITE | BL_FIX);
 	}
     }
@@ -4078,32 +4078,32 @@ nv_down(cmdarg_T *cap)
 /*
  * Grab the file name under the cursor and edit it.
  */
-    static void
+    ساكن فراغ
 nv_gotofile(cmdarg_T *cap)
 {
     char_u	*ptr;
     linenr_T	lnum = -1;
 
-    if (check_text_or_curbuf_locked(cap->oap))
-	return;
+    إذا (check_متن_or_curbuf_locked(cap->oap))
+	أرجع;
 
-#ifdef FEAT_PROP_POPUP
-    if (ERROR_IF_TERM_POPUP_WINDOW)
-	return;
-#endif
+#اگر_تعریف_شده FEAT_PROP_POPUP
+    إذا (ERROR_IF_جمله_POPUP_پنجره)
+	أرجع;
+#پایان_اگر
 
-    if (!check_can_set_curbuf_disabled())
-	return;
+    إذا (!check_can_مجموعه_curbuf_disabled())
+	أرجع;
 
     ptr = grab_file_name(cap->count1, &lnum);
 
-    if (ptr != NULL)
+    إذا (ptr != عدم)
     {
 	// do autowrite if necessary
-	if (curbufIsChanged() && curbuf->b_nwindows <= 1 && !buf_hide(curbuf))
-	    (void)autowrite(curbuf, FALSE);
+	إذا (curbuf_Is_تغییریافته() && curbuf->b_nwindows <= 1 && !buf_hide(curbuf))
+	    (فراغ)autowrite(curbuf, FALSE);
 	setpcmark();
-	if (do_ecmd(0, ptr, NULL, NULL, ECMD_LAST,
+	إذا (do_ecmd(0, ptr, عدم, عدم, ECMD_آخرین,
 				buf_hide(curbuf) ? ECMD_HIDE : 0, curwin) == OK
 		&& cap->nchar == 'F' && lnum >= 0)
 	{
@@ -4113,17 +4113,17 @@ nv_gotofile(cmdarg_T *cap)
 	}
 	vim_free(ptr);
     }
-    else
+    وإلا
 	clearop(cap->oap);
 }
 
 /*
  * <End> command: to end of current line or last line.
  */
-    static void
-nv_end(cmdarg_T *cap)
+    ساكن فراغ
+nv_انتها(cmdarg_T *cap)
 {
-    if (cap->arg || (mod_mask & MOD_MASK_CTRL))	// CTRL-END = goto last line
+    إذا (cap->arg || (mod_ماسک & MOD_ماسک_CTRL))	// CTRL-END = goto last line
     {
 	cap->arg = TRUE;
 	nv_goto(cap);
@@ -4135,7 +4135,7 @@ nv_end(cmdarg_T *cap)
 /*
  * Handle the "$" command.
  */
-    static void
+    ساكن فراغ
 nv_dollar(cmdarg_T *cap)
 {
     cap->oap->motion_type = MCHAR;
@@ -4143,50 +4143,50 @@ nv_dollar(cmdarg_T *cap)
     // In virtual mode when off the edge of a line and an operator
     // is pending (whew!) keep the cursor where it is.
     // Otherwise, send it to the end of the line.
-    if (!virtual_active() || gchar_cursor() != NUL
+    إذا (!virtual_فعال() || gchar_cursor() != NUL
 					       || cap->oap->op_type == OP_NOP)
 	curwin->w_curswant = MAXCOL;	// so we stay at the end
-    if (cursor_down((long)(cap->count1 - 1),
+    إذا (cursor_پایین((دراز)(cap->count1 - 1),
 					 cap->oap->op_type == OP_NOP) == FAIL)
 	clearopbeep(cap->oap);
-#ifdef FEAT_FOLDING
-    else if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+#اگر_تعریف_شده FEAT_FOLDING
+    وإلا إذا ((fdo_flags & FDO_HOR) && کلید_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
-#endif
+#پایان_اگر
 }
 
 /*
  * Implementation of '?' and '/' commands.
  * If cap->arg is TRUE don't set PC mark.
  */
-    static void
-nv_search(cmdarg_T *cap)
+    ساكن فراغ
+nv_جستجو(cmdarg_T *cap)
 {
     oparg_T	*oap = cap->oap;
     pos_T	save_cursor = curwin->w_cursor;
 
-    if (cap->cmdchar == '?' && cap->oap->op_type == OP_ROT13)
+    إذا (cap->cmdchar == '?' && cap->oap->op_type == OP_ROT13)
     {
 	// Translate "g??" to "g?g?"
 	cap->cmdchar = 'g';
 	cap->nchar = '?';
 	nv_operator(cap);
-	return;
+	أرجع;
     }
 
     // When using 'incsearch' the cursor may be moved to set a different search
     // start position.
     cap->searchbuf = getcmdline(cap->cmdchar, cap->count1, 0, 0);
 
-    if (cap->searchbuf == NULL)
+    إذا (cap->searchbuf == عدم)
     {
 	clearop(oap);
-	return;
+	أرجع;
     }
 
-    (void)normal_search(cap, cap->cmdchar, cap->searchbuf, STRLEN(cap->searchbuf),
+    (فراغ)نرمال_جستجو(cap, cap->cmdchar, cap->searchbuf, STRLEN(cap->searchbuf),
 			(cap->arg || !EQUAL_POS(save_cursor, curwin->w_cursor))
-						      ? 0 : SEARCH_MARK, NULL);
+						      ? 0 : جستجو_MARK, عدم);
 }
 
 
@@ -4194,28 +4194,28 @@ nv_search(cmdarg_T *cap)
  * Handle "N" and "n" commands.
  * cap->arg is SEARCH_REV for "N", 0 for "n".
  */
-    static void
-nv_next(cmdarg_T *cap)
+    ساكن فراغ
+nv_بعدی(cmdarg_T *cap)
 {
     pos_T   old = curwin->w_cursor;
-    int	    wrapped = FALSE;
-    int	    i = normal_search(cap, 0, NULL, 0, SEARCH_MARK | cap->arg, &wrapped);
+    صحيح	    wrapped = FALSE;
+    صحيح	    i = نرمال_جستجو(cap, 0, عدم, 0, جستجو_MARK | cap->arg, &wrapped);
 
-    if (i == 1 && !wrapped && EQUAL_POS(old, curwin->w_cursor))
+    إذا (i == 1 && !wrapped && EQUAL_POS(old, curwin->w_cursor))
     {
 	// Avoid getting stuck on the current cursor position, which can
 	// happen when an offset is given and the cursor is on the last char
 	// in the buffer: Repeat with count + 1.
 	cap->count1 += 1;
-	(void)normal_search(cap, 0, NULL, 0, SEARCH_MARK | cap->arg, NULL);
+	(فراغ)نرمال_جستجو(cap, 0, عدم, 0, جستجو_MARK | cap->arg, عدم);
 	cap->count1 -= 1;
     }
 
-#ifdef FEAT_SEARCH_EXTRA
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
     // Redraw the window to refresh the highlighted matches.
-    if (i > 0 && p_hls && !no_hlsearch)
+    إذا (i > 0 && p_hls && !no_hlsearch)
 	redraw_later(UPD_SOME_VALID);
-#endif
+#پایان_اگر
 }
 
 /*
@@ -4223,54 +4223,54 @@ nv_next(cmdarg_T *cap)
  * Uses only cap->count1 and cap->oap from "cap".
  * Return 0 for failure, 1 for found, 2 for found and line offset added.
  */
-    static int
-normal_search(
+    ساكن صحيح
+نرمال_جستجو(
     cmdarg_T	*cap,
-    int		dir,
+    صحيح		dir,
     char_u	*pat,
     size_t	patlen,
-    int		opt,		// extra flags for do_search()
-    int		*wrapped)
+    صحيح		opt,		// extra flags for do_search()
+    صحيح		*wrapped)
 {
-    int		i;
+    صحيح		i;
     searchit_arg_T sia;
-#ifdef FEAT_SEARCH_EXTRA
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
     pos_T	prev_cursor = curwin->w_cursor;
-#endif
+#پایان_اگر
 
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = FALSE;
     cap->oap->use_reg_one = TRUE;
-    curwin->w_set_curswant = true;
+    curwin->w_مجموعه_curswant = true;
 
-    CLEAR_FIELD(sia);
-    i = do_search(cap->oap, dir, dir, pat, patlen, cap->count1,
-			    opt | SEARCH_OPT | SEARCH_ECHO | SEARCH_MSG, &sia);
-    if (wrapped != NULL)
+    CLEAR_فیلد(sia);
+    i = do_جستجو(cap->oap, dir, dir, pat, patlen, cap->count1,
+			    opt | جستجو_OPT | جستجو_ECHO | جستجو_پیام, &sia);
+    إذا (wrapped != عدم)
 	*wrapped = sia.sa_wrapped;
-    if (i == 0)
+    إذا (i == 0)
 	clearop(cap->oap);
-    else
+    وإلا
     {
-	if (i == 2)
+	إذا (i == 2)
 	    cap->oap->motion_type = MLINE;
 	curwin->w_cursor.coladd = 0;
-#ifdef FEAT_FOLDING
-	if (cap->oap->op_type == OP_NOP && (fdo_flags & FDO_SEARCH) && KeyTyped)
+#اگر_تعریف_شده FEAT_FOLDING
+	إذا (cap->oap->op_type == OP_NOP && (fdo_flags & FDO_جستجو) && کلید_Typed)
 	    foldOpenCursor();
-#endif
+#پایان_اگر
     }
-#ifdef FEAT_SEARCH_EXTRA
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
     // Redraw the window to refresh the highlighted matches.
-    if (!EQUAL_POS(curwin->w_cursor, prev_cursor) && p_hls && !no_hlsearch)
+    إذا (!EQUAL_POS(curwin->w_cursor, prev_cursor) && p_hls && !no_hlsearch)
 	redraw_later(UPD_SOME_VALID);
-#endif
+#پایان_اگر
 
     // "/$" will put the cursor after the end of the line, may need to
     // correct that here
     check_cursor();
 
-    return i;
+    أرجع i;
 }
 
 /*
@@ -4279,52 +4279,52 @@ normal_search(
  * ',' and FALSE for ';'.
  * cap->nchar is NUL for ',' and ';' (repeat the search)
  */
-    static void
+    ساكن فراغ
 nv_csearch(cmdarg_T *cap)
 {
-    int		t_cmd;
-    int		cursor_dec = FALSE;
+    صحيح		t_cmd;
+    صحيح		cursor_dec = FALSE;
 
     // If adjusted cursor position previously, unadjust it.
-    if (*p_sel == 'e' && VIsual_active && VIsual_mode == 'v'
+    إذا (*p_sel == 'e' && VIsual_فعال && VIsual_نما == 'v'
 		&& VIsual_select_exclu_adj)
     {
 	unadjust_for_sel();
 	cursor_dec = TRUE;
     }
 
-    if (cap->cmdchar == 't' || cap->cmdchar == 'T')
+    إذا (cap->cmdchar == 't' || cap->cmdchar == 'T')
 	t_cmd = TRUE;
-    else
+    وإلا
 	t_cmd = FALSE;
 
     cap->oap->motion_type = MCHAR;
-    if (IS_SPECIAL(cap->nchar) || searchc(cap, t_cmd) == FAIL)
+    إذا (IS_SPECIAL(cap->nchar) || searchc(cap, t_cmd) == FAIL)
     {
 	clearopbeep(cap->oap);
 	// Revert unadjust when failed.
-	if (cursor_dec)
+	إذا (cursor_dec)
 	    adjust_for_sel(cap);
-	return;
+	أرجع;
     }
 
-    curwin->w_set_curswant = true;
+    curwin->w_مجموعه_curswant = true;
     // Include a Tab for "tx" and for "dfx".
-    if (gchar_cursor() == TAB && virtual_active() && cap->arg == FORWARD
+    إذا (gchar_cursor() == TAB && virtual_فعال() && cap->arg == FORWARD
 	    && (t_cmd || cap->oap->op_type != OP_NOP))
     {
 	colnr_T	scol, ecol;
 
-	getvcol(curwin, &curwin->w_cursor, &scol, NULL, &ecol, 0);
+	getvcol(curwin, &curwin->w_cursor, &scol, عدم, &ecol, 0);
 	curwin->w_cursor.coladd = ecol - scol;
     }
-    else
+    وإلا
 	curwin->w_cursor.coladd = 0;
     adjust_for_sel(cap);
-#ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا ((fdo_flags & FDO_HOR) && کلید_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
-#endif
+#پایان_اگر
 }
 
 /*
@@ -4334,45 +4334,45 @@ nv_csearch(cmdarg_T *cap)
  * "[m" or "]m" search for prev/next start of (Java) method.
  * "[M" or "]M" search for prev/next end of (Java) method.
  */
-    static void
-nv_bracket_block(cmdarg_T *cap, pos_T *old_pos)
+    ساكن فراغ
+nv_bracket_بلوک(cmdarg_T *cap, pos_T *old_pos)
 {
     pos_T	new_pos = {0, 0, 0};
-    pos_T	*pos = NULL;	    // init for GCC
+    pos_T	*pos = عدم;	    // init for GCC
     pos_T	prev_pos;
-    long	n;
-    int		findc;
-    int		c;
+    دراز	n;
+    صحيح		findc;
+    صحيح		c;
 
-    if (cap->nchar == '*')
+    إذا (cap->nchar == '*')
 	cap->nchar = '/';
     prev_pos.lnum = 0;
-    if (cap->nchar == 'm' || cap->nchar == 'M')
+    إذا (cap->nchar == 'm' || cap->nchar == 'M')
     {
-	if (cap->cmdchar == '[')
+	إذا (cap->cmdchar == '[')
 	    findc = '{';
-	else
+	وإلا
 	    findc = '}';
 	n = 9999;
     }
-    else
+    وإلا
     {
 	findc = cap->nchar;
 	n = cap->count1;
     }
-    for ( ; n > 0; --n)
+    لكل ( ; n > 0; --n)
     {
-	if ((pos = findmatchlimit(cap->oap, findc,
-			(cap->cmdchar == '[') ? FM_BACKWARD : FM_FORWARD, 0)) == NULL)
+	إذا ((pos = findmatchlimit(cap->oap, findc,
+			(cap->cmdchar == '[') ? FM_BACKWARD : FM_FORWARD, 0)) == عدم)
 	{
-	    if (new_pos.lnum == 0)	// nothing found
+	    إذا (new_pos.lnum == 0)	// nothing found
 	    {
-		if (cap->nchar != 'm' && cap->nchar != 'M')
+		إذا (cap->nchar != 'm' && cap->nchar != 'M')
 		    clearopbeep(cap->oap);
 	    }
-	    else
+	    وإلا
 		pos = &new_pos;	// use last one found
-	    break;
+	    اكسر;
 	}
 	prev_pos = new_pos;
 	curwin->w_cursor = *pos;
@@ -4384,40 +4384,40 @@ nv_bracket_block(cmdarg_T *cap, pos_T *old_pos)
     // brought us to the match for "[m" and "]M" when inside a method.
     // Try finding the '{' or '}' we want to be at.
     // Also repeat for the given count.
-    if (cap->nchar == 'm' || cap->nchar == 'M')
+    إذا (cap->nchar == 'm' || cap->nchar == 'M')
     {
 	// norm is TRUE for "]M" and "[m"
-	int	    norm = ((findc == '{') == (cap->nchar == 'm'));
+	صحيح	    norm = ((findc == '{') == (cap->nchar == 'm'));
 
 	n = cap->count1;
 	// found a match: we were inside a method
-	if (prev_pos.lnum != 0)
+	إذا (prev_pos.lnum != 0)
 	{
 	    pos = &prev_pos;
 	    curwin->w_cursor = prev_pos;
-	    if (norm)
+	    إذا (norm)
 		--n;
 	}
-	else
-	    pos = NULL;
-	while (n > 0)
+	وإلا
+	    pos = عدم;
+	طالما (n > 0)
 	{
-	    for (;;)
+	    لكل (;;)
 	    {
-		if ((findc == '{' ? dec_cursor() : inc_cursor()) < 0)
+		إذا ((findc == '{' ? dec_cursor() : inc_cursor()) < 0)
 		{
 		    // if not found anything, that's an error
-		    if (pos == NULL)
+		    إذا (pos == عدم)
 			clearopbeep(cap->oap);
 		    n = 0;
-		    break;
+		    اكسر;
 		}
 		c = gchar_cursor();
-		if (c == '{' || c == '}')
+		إذا (c == '{' || c == '}')
 		{
 		    // Must have found end/start of class: use it.
 		    // Or found the place to be at.
-		    if ((c == findc && norm) || (n == 1 && !norm))
+		    إذا ((c == findc && norm) || (n == 1 && !norm))
 		    {
 			new_pos = curwin->w_cursor;
 			pos = &new_pos;
@@ -4425,37 +4425,37 @@ nv_bracket_block(cmdarg_T *cap, pos_T *old_pos)
 		    }
 		    // if no match found at all, we started outside of the
 		    // class and we're inside now.  Just go on.
-		    else if (new_pos.lnum == 0)
+		    وإلا إذا (new_pos.lnum == 0)
 		    {
 			new_pos = curwin->w_cursor;
 			pos = &new_pos;
 		    }
 		    // found start/end of other method: go to match
-		    else if ((pos = findmatchlimit(cap->oap, findc,
+		    وإلا إذا ((pos = findmatchlimit(cap->oap, findc,
 			      (cap->cmdchar == '[') ? FM_BACKWARD : FM_FORWARD,
-								   0)) == NULL)
+								   0)) == عدم)
 			n = 0;
-		    else
+		    وإلا
 			curwin->w_cursor = *pos;
-		    break;
+		    اكسر;
 		}
 	    }
 	    --n;
 	}
 	curwin->w_cursor = *old_pos;
-	if (pos == NULL && new_pos.lnum != 0)
+	إذا (pos == عدم && new_pos.lnum != 0)
 	    clearopbeep(cap->oap);
     }
-    if (pos != NULL)
+    إذا (pos != عدم)
     {
 	setpcmark();
 	curwin->w_cursor = *pos;
-	curwin->w_set_curswant = true;
-#ifdef FEAT_FOLDING
-	if ((fdo_flags & FDO_BLOCK) && KeyTyped
+	curwin->w_مجموعه_curswant = true;
+#اگر_تعریف_شده FEAT_FOLDING
+	إذا ((fdo_flags & FDO_بلوک) && کلید_Typed
 		&& cap->oap->op_type == OP_NOP)
 	    foldOpenCursor();
-#endif
+#پایان_اگر
     }
 }
 
@@ -4463,14 +4463,14 @@ nv_bracket_block(cmdarg_T *cap, pos_T *old_pos)
  * "[" and "]" commands.
  * cap->arg is BACKWARD for "[" and FORWARD for "]".
  */
-    static void
+    ساكن فراغ
 nv_brackets(cmdarg_T *cap)
 {
     pos_T	prev_pos;
-    pos_T	*pos = NULL;	    // init for GCC
+    pos_T	*pos = عدم;	    // init for GCC
     pos_T	old_pos;	    // cursor position before command
-    int		flag;
-    long	n;
+    صحيح		flag;
+    دراز	n;
 
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = FALSE;
@@ -4478,11 +4478,11 @@ nv_brackets(cmdarg_T *cap)
     curwin->w_cursor.coladd = 0;    // TODO: don't do this for an error.
 
     // "[f" or "]f" : Edit file under the cursor (same as "gf")
-    if (cap->nchar == 'f')
+    إذا (cap->nchar == 'f')
 	nv_gotofile(cap);
-    else
+    وإلا
 
-#ifdef FEAT_FIND_ID
+#اگر_تعریف_شده FEAT_پیدا_کن_ID
     // Find the occurrence(s) of the identifier or define under cursor
     // in current and included files or jump to the first occurrence.
     //
@@ -4490,150 +4490,150 @@ nv_brackets(cmdarg_T *cap)
     //		      fwd   bwd    fwd	 bwd	 fwd	bwd
     // identifier     "]i"  "[i"   "]I"  "[I"	"]^I"  "[^I"
     // define	      "]d"  "[d"   "]D"  "[D"	"]^D"  "[^D"
-    if (vim_strchr((char_u *)"iI\011dD\004", cap->nchar) != NULL)
+    إذا (vim_strchr((char_u *)"iI\011dD\004", cap->nchar) != عدم)
     {
 	char_u	*ptr;
-	int	len;
+	صحيح	len;
 
-	if ((len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0)
+	إذا ((len = پیدا_کن_ident_under_cursor(&ptr, پیدا_کن_IDENT)) == 0)
 	    clearop(cap->oap);
-	else
+	وإلا
 	{
 	    // Make a copy, if the line was changed it will be freed.
 	    ptr = vim_strnsave(ptr, len);
-	    if (ptr == NULL)
-		return;
+	    إذا (ptr == عدم)
+		أرجع;
 
-	    find_pattern_in_path(ptr, 0, len, TRUE,
-		cap->count0 == 0 ? !SAFE_isupper(cap->nchar) : FALSE,
-		((cap->nchar & 0xf) == ('d' & 0xf)) ?  FIND_DEFINE : FIND_ANY,
+	    پیدا_کن_الگو_درون_مسیر(ptr, 0, len, TRUE,
+		cap->count0 == 0 ? !امن_isupper(cap->nchar) : FALSE,
+		((cap->nchar & 0xf) == ('d' & 0xf)) ?  پیدا_کن_DEFINE : پیدا_کن_ANY,
 		cap->count1,
-		SAFE_isupper(cap->nchar) ? ACTION_SHOW_ALL :
-			    SAFE_islower(cap->nchar) ? ACTION_SHOW : ACTION_GOTO,
+		امن_isupper(cap->nchar) ? ACTION_SHOW_ALL :
+			    امن_islower(cap->nchar) ? ACTION_SHOW : ACTION_GOTO,
 		cap->cmdchar == ']' ? curwin->w_cursor.lnum + 1 : (linenr_T)1,
 		(linenr_T)MAXLNUM,
 		FALSE, FALSE);
 	    vim_free(ptr);
-	    curwin->w_set_curswant = true;
+	    curwin->w_مجموعه_curswant = true;
 	}
     }
-    else
-#endif
+    وإلا
+#پایان_اگر
 
     // "[{", "[(", "]}" or "])": go to Nth unclosed '{', '(', '}' or ')'
     // "[#", "]#": go to start/end of Nth innermost #if..#endif construct.
     // "[/", "[*", "]/", "]*": go to Nth comment start/end.
     // "[m" or "]m" search for prev/next start of (Java) method.
     // "[M" or "]M" search for prev/next end of (Java) method.
-    if (  (cap->cmdchar == '['
-		&& vim_strchr((char_u *)"{(*/#mM", cap->nchar) != NULL)
+    إذا (  (cap->cmdchar == '['
+		&& vim_strchr((char_u *)"{(*/#mM", cap->nchar) != عدم)
 	    || (cap->cmdchar == ']'
-		&& vim_strchr((char_u *)"})*/#mM", cap->nchar) != NULL))
-	nv_bracket_block(cap, &old_pos);
+		&& vim_strchr((char_u *)"})*/#mM", cap->nchar) != عدم))
+	nv_bracket_بلوک(cap, &old_pos);
 
     // "[[", "[]", "]]" and "][": move to start or end of function
-    else if (cap->nchar == '[' || cap->nchar == ']')
+    وإلا إذا (cap->nchar == '[' || cap->nchar == ']')
     {
-	if (cap->nchar == cap->cmdchar)		    // "]]" or "[["
+	إذا (cap->nchar == cap->cmdchar)		    // "]]" or "[["
 	    flag = '{';
-	else
+	وإلا
 	    flag = '}';		    // "][" or "[]"
 
-	curwin->w_set_curswant = true;
+	curwin->w_مجموعه_curswant = true;
 	// Imitate strange Vi behaviour: When using "]]" with an operator
 	// we also stop at '}'.
-	if (!findpar(&cap->oap->inclusive, cap->arg, cap->count1, flag,
+	إذا (!findpar(&cap->oap->inclusive, cap->arg, cap->count1, flag,
 	      (cap->oap->op_type != OP_NOP
 				      && cap->arg == FORWARD && flag == '{')))
 	    clearopbeep(cap->oap);
-	else
+	وإلا
 	{
-	    if (cap->oap->op_type == OP_NOP)
+	    إذا (cap->oap->op_type == OP_NOP)
 		beginline(BL_WHITE | BL_FIX);
-#ifdef FEAT_FOLDING
-	    if ((fdo_flags & FDO_BLOCK) && KeyTyped && cap->oap->op_type == OP_NOP)
+#اگر_تعریف_شده FEAT_FOLDING
+	    إذا ((fdo_flags & FDO_بلوک) && کلید_Typed && cap->oap->op_type == OP_NOP)
 		foldOpenCursor();
-#endif
+#پایان_اگر
 	}
     }
 
     // "[p", "[P", "]P" and "]p": put with indent adjustment
-    else if (cap->nchar == 'p' || cap->nchar == 'P')
+    وإلا إذا (cap->nchar == 'p' || cap->nchar == 'P')
     {
 	nv_put_opt(cap, TRUE);
     }
 
     // "['", "[`", "]'" and "]`": jump to next mark
-    else if (cap->nchar == '\'' || cap->nchar == '`')
+    وإلا إذا (cap->nchar == '\'' || cap->nchar == '`')
     {
 	pos = &curwin->w_cursor;
-	for (n = cap->count1; n > 0; --n)
+	لكل (n = cap->count1; n > 0; --n)
 	{
 	    prev_pos = *pos;
 	    pos = getnextmark(pos, cap->cmdchar == '[' ? BACKWARD : FORWARD,
 							  cap->nchar == '\'');
-	    if (pos == NULL)
-		break;
+	    إذا (pos == عدم)
+		اكسر;
 	}
-	if (pos == NULL)
+	إذا (pos == عدم)
 	    pos = &prev_pos;
 	nv_cursormark(cap, cap->nchar == '\'', pos);
     }
 
     // [ or ] followed by a middle mouse click: put selected text with
     // indent adjustment.  Any other button just does as usual.
-    else if (cap->nchar >= K_RIGHTRELEASE && cap->nchar <= K_LEFTMOUSE)
+    وإلا إذا (cap->nchar >= K_RIGHTRELEASE && cap->nchar <= K_LEFTMOUSE)
     {
-	(void)do_mouse(cap->oap, cap->nchar,
+	(فراغ)do_mouse(cap->oap, cap->nchar,
 		       (cap->cmdchar == ']') ? FORWARD : BACKWARD,
 		       cap->count1, PUT_FIXINDENT);
     }
 
-#ifdef FEAT_FOLDING
+#اگر_تعریف_شده FEAT_FOLDING
     // "[z" and "]z": move to start or end of open fold.
-    else if (cap->nchar == 'z')
+    وإلا إذا (cap->nchar == 'z')
     {
-	if (foldMoveTo(FALSE, cap->cmdchar == ']' ? FORWARD : BACKWARD,
+	إذا (fold_Move_مقصد(FALSE, cap->cmdchar == ']' ? FORWARD : BACKWARD,
 							 cap->count1) == FAIL)
 	    clearopbeep(cap->oap);
     }
-#endif
+#پایان_اگر
 
-#ifdef FEAT_DIFF
+#اگر_تعریف_شده FEAT_DIFF
     // "[c" and "]c": move to next or previous diff-change.
-    else if (cap->nchar == 'c')
+    وإلا إذا (cap->nchar == 'c')
     {
-	if (diff_move_to(cap->cmdchar == ']' ? FORWARD : BACKWARD,
+	إذا (diff_move_مقصد(cap->cmdchar == ']' ? FORWARD : BACKWARD,
 							 cap->count1) == FAIL)
 	    clearopbeep(cap->oap);
     }
-#endif
+#پایان_اگر
 
-#ifdef FEAT_SPELL
+#اگر_تعریف_شده FEAT_SPELL
     // "[r", "[s", "[S", "]r", "]s" and "]S": move to next spell error.
-    else if (cap->nchar == 'r' || cap->nchar == 's' || cap->nchar == 'S')
+    وإلا إذا (cap->nchar == 'r' || cap->nchar == 's' || cap->nchar == 'S')
     {
 	setpcmark();
-	for (n = 0; n < cap->count1; ++n)
-	    if (spell_move_to(curwin, cap->cmdchar == ']' ? FORWARD : BACKWARD,
+	لكل (n = 0; n < cap->count1; ++n)
+	    إذا (spell_move_مقصد(curwin, cap->cmdchar == ']' ? FORWARD : BACKWARD,
 			  cap->nchar == 's' ? SMT_ALL :
 			  cap->nchar == 'r' ? SMT_RARE :
-			  SMT_BAD, FALSE, NULL) == 0)
+			  SMT_BAD, FALSE, عدم) == 0)
 	    {
 		clearopbeep(cap->oap);
-		break;
+		اكسر;
 	    }
-	    else
-		curwin->w_set_curswant = true;
+	    وإلا
+		curwin->w_مجموعه_curswant = true;
 # ifdef FEAT_FOLDING
-	if (cap->oap->op_type == OP_NOP && (fdo_flags & FDO_SEARCH) && KeyTyped)
+	إذا (cap->oap->op_type == OP_NOP && (fdo_flags & FDO_جستجو) && کلید_Typed)
 	    foldOpenCursor();
 # endif
     }
-#endif
+#پایان_اگر
 
     // Not a valid cap->nchar.
-    else
+    وإلا
 	clearopbeep(cap->oap);
 }
 
@@ -4642,42 +4642,42 @@ nv_brackets(cmdarg_T *cap)
  * This is when "%" should skip matching parens in comments, like the "="
  * operator does.
  */
-    static bool
-buf_has_cstyle_comments(void)
+    ساكن bool
+buf_has_cstyle_comments(فراغ)
 {
     char_u	*list;
     char_u	part_buf[COM_MAX_LEN];	// buffer for one 'comments' part
 
-    for (list = curbuf->b_p_com; *list; )
+    لكل (list = curbuf->b_p_com; *list; )
     {
 	char_u	*string;
 
-	(void)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
+	(فراغ)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
 	string = vim_strchr(part_buf, ':');	// flags and comment leader
-	if (string != NULL && string[1] == '/'
+	إذا (string != عدم && string[1] == '/'
 				    && (string[2] == '/' || string[2] == '*'))
-	    return true;
+	    أرجع true;
     }
-    return false;
+    أرجع false;
 }
 
 /*
  * Handle Normal mode "%" command.
  */
-    static void
+    ساكن فراغ
 nv_percent(cmdarg_T *cap)
 {
     pos_T	*pos;
-#if defined(FEAT_FOLDING)
+#إذا defined(FEAT_FOLDING)
     linenr_T	lnum = curwin->w_cursor.lnum;
-#endif
+#پایان_اگر
 
     cap->oap->inclusive = TRUE;
-    if (cap->count0)	    // {cnt}% : goto {cnt} percentage in file
+    إذا (cap->count0)	    // {cnt}% : goto {cnt} percentage in file
     {
-	if (cap->count0 > 100)
+	إذا (cap->count0 > 100)
 	    clearopbeep(cap->oap);
-	else
+	وإلا
 	{
 	    cap->oap->motion_type = MLINE;
 	    setpcmark();
@@ -4685,95 +4685,95 @@ nv_percent(cmdarg_T *cap)
 	    // Beyond 21474836 lines, (ml_line_count * 100 + 99) would
 	    // overflow on 32-bits, so use a formula with less accuracy
 	    // to avoid overflows.
-	    if (curbuf->b_ml.ml_line_count >= 21474836)
-		curwin->w_cursor.lnum = (curbuf->b_ml.ml_line_count + 99L)
+	    إذا (curbuf->b_ml.ml_سطر_شمار >= 21474836)
+		curwin->w_cursor.lnum = (curbuf->b_ml.ml_سطر_شمار + 99L)
 							 / 100L * cap->count0;
-	    else
-		curwin->w_cursor.lnum = (curbuf->b_ml.ml_line_count *
+	    وإلا
+		curwin->w_cursor.lnum = (curbuf->b_ml.ml_سطر_شمار *
 						    cap->count0 + 99L) / 100L;
-	    if (curwin->w_cursor.lnum < 1)
+	    إذا (curwin->w_cursor.lnum < 1)
 		curwin->w_cursor.lnum = 1;
-	    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
-		curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	    إذا (curwin->w_cursor.lnum > curbuf->b_ml.ml_سطر_شمار)
+		curwin->w_cursor.lnum = curbuf->b_ml.ml_سطر_شمار;
 	    beginline(BL_SOL | BL_FIX);
 	}
     }
-    else		    // "%" : go to matching paren
+    وإلا		    // "%" : go to matching paren
     {
-	int	flags = 0;
+	صحيح	flags = 0;
 
 	// Skip matching parens inside C-style comments, like the "=" operator
 	// does, but not when "%" is in 'cpoptions' (Vi-compatible) or the
 	// cursor sits in a line comment (so a match there can still be found).
-	if (vim_strchr(p_cpo, CPO_MATCH) == NULL && buf_has_cstyle_comments())
+	إذا (vim_strchr(p_cpo, CPO_تطابق) == عدم && buf_has_cstyle_comments())
 	{
-	    int	comment_col = check_linecomment(ml_get_curline());
+	    صحيح	comment_ستون = check_linecomment(ml_get_curline());
 
-	    if (comment_col == MAXCOL
-			   || curwin->w_cursor.col < (colnr_T)comment_col)
+	    إذا (comment_ستون == MAXCOL
+			   || curwin->w_cursor.ستون < (colnr_T)comment_ستون)
 		flags = FM_SKIPCOMM;
 	}
 
 	cap->oap->motion_type = MCHAR;
 	cap->oap->use_reg_one = TRUE;
-	if ((pos = findmatchlimit(cap->oap, NUL, flags, 0)) == NULL)
+	إذا ((pos = findmatchlimit(cap->oap, NUL, flags, 0)) == عدم)
 	    clearopbeep(cap->oap);
-	else
+	وإلا
 	{
 	    setpcmark();
 	    curwin->w_cursor = *pos;
-	    curwin->w_set_curswant = true;
+	    curwin->w_مجموعه_curswant = true;
 	    curwin->w_cursor.coladd = 0;
 	    adjust_for_sel(cap);
 	}
     }
-#ifdef FEAT_FOLDING
-    if (cap->oap->op_type == OP_NOP
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا (cap->oap->op_type == OP_NOP
 	    && lnum != curwin->w_cursor.lnum
 	    && (fdo_flags & FDO_PERCENT)
-	    && KeyTyped)
+	    && کلید_Typed)
 	foldOpenCursor();
-#endif
+#پایان_اگر
 }
 
 /*
  * Handle "(" and ")" commands.
  * cap->arg is BACKWARD for "(" and FORWARD for ")".
  */
-    static void
+    ساكن فراغ
 nv_brace(cmdarg_T *cap)
 {
     cap->oap->motion_type = MCHAR;
     cap->oap->use_reg_one = TRUE;
     // The motion used to be inclusive for "(", but that is not what Vi does.
     cap->oap->inclusive = FALSE;
-    curwin->w_set_curswant = true;
+    curwin->w_مجموعه_curswant = true;
 
-    if (findsent(cap->arg, cap->count1) == FAIL)
+    إذا (findsent(cap->arg, cap->count1) == FAIL)
     {
 	clearopbeep(cap->oap);
-	return;
+	أرجع;
     }
 
     // Don't leave the cursor on the NUL past end of line.
     adjust_cursor(cap->oap);
     curwin->w_cursor.coladd = 0;
-#ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_BLOCK) && KeyTyped && cap->oap->op_type == OP_NOP)
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا ((fdo_flags & FDO_بلوک) && کلید_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
-#endif
+#پایان_اگر
 }
 
 /*
  * "m" command: Mark a position.
  */
-    static void
+    ساكن فراغ
 nv_mark(cmdarg_T *cap)
 {
-    if (checkclearop(cap->oap))
-	return;
+    إذا (checkclearop(cap->oap))
+	أرجع;
 
-    if (setmark(cap->nchar) == FAIL)
+    إذا (setmark(cap->nchar) == FAIL)
 	clearopbeep(cap->oap);
 }
 
@@ -4781,160 +4781,160 @@ nv_mark(cmdarg_T *cap)
  * "{" and "}" commands.
  * cmd->arg is BACKWARD for "{" and FORWARD for "}".
  */
-    static void
+    ساكن فراغ
 nv_findpar(cmdarg_T *cap)
 {
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = FALSE;
     cap->oap->use_reg_one = TRUE;
-    curwin->w_set_curswant = true;
-    if (!findpar(&cap->oap->inclusive, cap->arg, cap->count1, NUL, FALSE))
+    curwin->w_مجموعه_curswant = true;
+    إذا (!findpar(&cap->oap->inclusive, cap->arg, cap->count1, NUL, FALSE))
     {
 	clearopbeep(cap->oap);
-	return;
+	أرجع;
     }
 
     curwin->w_cursor.coladd = 0;
-#ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_BLOCK) && KeyTyped && cap->oap->op_type == OP_NOP)
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا ((fdo_flags & FDO_بلوک) && کلید_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
-#endif
+#پایان_اگر
 }
 
 /*
  * "u" command: Undo or make lower case.
  */
-    static void
+    ساكن فراغ
 nv_undo(cmdarg_T *cap)
 {
-    if (cap->oap->op_type == OP_LOWER || VIsual_active)
+    إذا (cap->oap->op_type == OP_پایینی || VIsual_فعال)
     {
 	// translate "<Visual>u" to "<Visual>gu" and "guu" to "gugu"
 	cap->cmdchar = 'g';
 	cap->nchar = 'u';
 	nv_operator(cap);
     }
-    else
+    وإلا
 	nv_kundo(cap);
 }
 
 /*
  * <Undo> command.
  */
-    static void
+    ساكن فراغ
 nv_kundo(cmdarg_T *cap)
 {
-    if (checkclearopq(cap->oap))
-	return;
+    إذا (checkclearopq(cap->oap))
+	أرجع;
 
-#ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf))
+#اگر_تعریف_شده FEAT_کار_CHANNEL
+    إذا (bt_prompt(curbuf))
     {
 	clearopbeep(cap->oap);
-	return;
+	أرجع;
     }
-#endif
-    u_undo((int)cap->count1);
-    curwin->w_set_curswant = true;
+#پایان_اگر
+    u_undo((صحيح)cap->count1);
+    curwin->w_مجموعه_curswant = true;
 }
 
 /*
  * Handle the "r" command.
  */
-    static void
+    ساكن فراغ
 nv_replace(cmdarg_T *cap)
 {
-    int		had_ctrl_v;
-    long	n;
+    صحيح		had_ctrl_v;
+    دراز	n;
 
-    if (checkclearop(cap->oap))
-	return;
-#ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf) && !prompt_curpos_editable())
+    إذا (checkclearop(cap->oap))
+	أرجع;
+#اگر_تعریف_شده FEAT_کار_CHANNEL
+    إذا (bt_prompt(curbuf) && !prompt_curpos_editable())
     {
 	clearopbeep(cap->oap);
-	return;
+	أرجع;
     }
-#endif
+#پایان_اگر
 
     // get another character
-    if (cap->nchar == Ctrl_V || cap->nchar == Ctrl_Q)
+    إذا (cap->nchar == Ctrl_V || cap->nchar == Ctrl_Q)
     {
 	had_ctrl_v = Ctrl_V;
 	cap->nchar = get_literal(FALSE);
 	// Don't redo a multibyte character with CTRL-V.
-	if (cap->nchar > DEL)
+	إذا (cap->nchar > DEL)
 	    had_ctrl_v = NUL;
     }
-    else
+    وإلا
 	had_ctrl_v = NUL;
 
     // Abort if the character is a special key.
-    if (IS_SPECIAL(cap->nchar))
+    إذا (IS_SPECIAL(cap->nchar))
     {
 	clearopbeep(cap->oap);
-	return;
+	أرجع;
     }
 
     // Visual mode "r"
-    if (VIsual_active)
+    إذا (VIsual_فعال)
     {
-	if (got_int)
+	إذا (got_int)
 	    got_int = FALSE;
-	if (had_ctrl_v)
+	إذا (had_ctrl_v)
 	{
 	    // Use a special (negative) number to make a difference between a
 	    // literal CR or NL and a line break.
-	    if (cap->nchar == CAR)
+	    إذا (cap->nchar == CAR)
 		cap->nchar = REPLACE_CR_NCHAR;
-	    else if (cap->nchar == NL)
+	    وإلا إذا (cap->nchar == NL)
 		cap->nchar = REPLACE_NL_NCHAR;
 	}
 	nv_operator(cap);
-	return;
+	أرجع;
     }
 
     // Break tabs, etc.
-    if (virtual_active())
+    إذا (virtual_فعال())
     {
-	if (u_save_cursor() == FAIL)
-	    return;
-	if (gchar_cursor() == NUL)
+	إذا (u_save_cursor() == FAIL)
+	    أرجع;
+	إذا (gchar_cursor() == NUL)
 	{
 	    // Add extra space and put the cursor on the first one.
 	    coladvance_force((colnr_T)(getviscol() + cap->count1));
-	    curwin->w_cursor.col -= cap->count1;
+	    curwin->w_cursor.ستون -= cap->count1;
 	}
-	else if (gchar_cursor() == TAB)
+	وإلا إذا (gchar_cursor() == TAB)
 	    coladvance_force(getviscol());
     }
 
     // Abort if not enough characters to replace.
-    if ((size_t)ml_get_cursor_len() < (unsigned)cap->count1
+    إذا ((size_t)ml_get_cursor_len() < (بیعلامت)cap->count1
 	    || (has_mbyte && mb_charlen(ml_get_cursor()) < cap->count1))
     {
 	clearopbeep(cap->oap);
-	return;
+	أرجع;
     }
 
     // Replacing with a TAB is done by edit() when it is complicated because
     // 'expandtab' or 'smarttab' is set.  CTRL-V TAB inserts a literal TAB.
     // Other characters are done below to avoid problems with things like
     // CTRL-V 048 (for edit() this would be R CTRL-V 0 ESC).
-    if (had_ctrl_v != Ctrl_V && cap->nchar == '\t' && (curbuf->b_p_et || p_sta))
+    إذا (had_ctrl_v != Ctrl_V && cap->nchar == '\t' && (curbuf->b_p_et || p_sta))
     {
 	stuffnumReadbuff(cap->count1);
 	stuffcharReadbuff('R');
 	stuffcharReadbuff('\t');
 	stuffcharReadbuff(ESC);
-	return;
+	أرجع;
     }
 
     // save line for undo
-    if (u_save_cursor() == FAIL)
-	return;
+    إذا (u_save_cursor() == FAIL)
+	أرجع;
 
-    if (had_ctrl_v != Ctrl_V && (cap->nchar == '\r' || cap->nchar == '\n'))
+    إذا (had_ctrl_v != Ctrl_V && (cap->nchar == '\r' || cap->nchar == '\n'))
     {
 	// Replace character(s) by a single newline.
 	// Strange vi behaviour: Only one newline is inserted.
@@ -4942,106 +4942,106 @@ nv_replace(cmdarg_T *cap)
 	// Insert the newline with an insert command, takes care of
 	// autoindent.	The insert command depends on being on the last
 	// character of a line or not.
-	(void)del_chars(cap->count1, FALSE);	// delete the characters
+	(فراغ)del_chars(cap->count1, FALSE);	// delete the characters
 	stuffcharReadbuff('\r');
 	stuffcharReadbuff(ESC);
 
 	// Give 'r' to edit(), to get the redo command right.
 	invoke_edit(cap, TRUE, 'r', FALSE);
     }
-    else
+    وإلا
     {
 	prep_redo(cap->oap->regname, cap->count1,
 				       NUL, 'r', NUL, had_ctrl_v, cap->nchar);
 
-	curbuf->b_op_start = curwin->w_cursor;
-	if (has_mbyte)
+	curbuf->b_op_شروع = curwin->w_cursor;
+	إذا (has_mbyte)
 	{
-	    int		old_State = State;
+	    صحيح		old_State = State;
 
-	    if (cap->ncharC1 != 0)
-		AppendCharToRedobuff(cap->ncharC1);
-	    if (cap->ncharC2 != 0)
-		AppendCharToRedobuff(cap->ncharC2);
+	    إذا (cap->ncharC1 != 0)
+		Append_Char_مقصد_Redobuff(cap->ncharC1);
+	    إذا (cap->ncharC2 != 0)
+		Append_Char_مقصد_Redobuff(cap->ncharC2);
 
 	    // This is slow, but it handles replacing a single-byte with a
 	    // multi-byte and the other way around.  Also handles adding
 	    // composing characters for utf-8.
-	    for (n = cap->count1; n > 0; --n)
+	    لكل (n = cap->count1; n > 0; --n)
 	    {
-		State = MODE_REPLACE;
-		if (cap->nchar == Ctrl_E || cap->nchar == Ctrl_Y)
+		State = نما_REPLACE;
+		إذا (cap->nchar == Ctrl_E || cap->nchar == Ctrl_Y)
 		{
-		    int c = ins_copychar(curwin->w_cursor.lnum
+		    صحيح c = ins_copychar(curwin->w_cursor.lnum
 					   + (cap->nchar == Ctrl_Y ? -1 : 1));
-		    if (c != NUL)
+		    إذا (c != NUL)
 			ins_char(c);
-		    else
+		    وإلا
 			// will be decremented further down
-			++curwin->w_cursor.col;
+			++curwin->w_cursor.ستون;
 		}
-		else
+		وإلا
 		    ins_char(cap->nchar);
 		State = old_State;
-		if (cap->ncharC1 != 0)
+		إذا (cap->ncharC1 != 0)
 		    ins_char(cap->ncharC1);
-		if (cap->ncharC2 != 0)
+		إذا (cap->ncharC2 != 0)
 		    ins_char(cap->ncharC2);
 	    }
 	}
-	else
+	وإلا
 	{
 	    char_u *ptr;
 
 	    // Replace the characters within one line.
-	    for (n = cap->count1; n > 0; --n)
+	    لكل (n = cap->count1; n > 0; --n)
 	    {
 		// Get ptr again, because ins_copychar() and showmatch()
 		// will have released the line.
 		// At the same time we let know that the line will be changed.
-		if (cap->nchar == Ctrl_E || cap->nchar == Ctrl_Y)
+		إذا (cap->nchar == Ctrl_E || cap->nchar == Ctrl_Y)
 		{
-		  int c = ins_copychar(curwin->w_cursor.lnum
+		  صحيح c = ins_copychar(curwin->w_cursor.lnum
 					   + (cap->nchar == Ctrl_Y ? -1 : 1));
 
 		  ptr = ml_get_buf(curbuf, curwin->w_cursor.lnum, TRUE);
-		  if (c != NUL)
-		    ptr[curwin->w_cursor.col] = c;
+		  إذا (c != NUL)
+		    ptr[curwin->w_cursor.ستون] = c;
 		}
-		else
+		وإلا
 		{
 		    ptr = ml_get_buf(curbuf, curwin->w_cursor.lnum, TRUE);
-		    ptr[curwin->w_cursor.col] = cap->nchar;
+		    ptr[curwin->w_cursor.ستون] = cap->nchar;
 		}
-		if (p_sm && msg_silent == 0)
+		إذا (p_sm && پیام_silent == 0)
 		    showmatch(cap->nchar);
-		++curwin->w_cursor.col;
+		++curwin->w_cursor.ستون;
 	    }
-#ifdef FEAT_NETBEANS_INTG
-	    if (netbeans_active())
+#اگر_تعریف_شده FEAT_NETBEANS_INTG
+	    إذا (netbeans_فعال())
 	    {
-		colnr_T  start = (colnr_T)(curwin->w_cursor.col - cap->count1);
+		colnr_T  شروع = (colnr_T)(curwin->w_cursor.ستون - cap->count1);
 		ptr = ml_get_curline();
 
-		netbeans_removed(curbuf, curwin->w_cursor.lnum, start,
+		netbeans_removed(curbuf, curwin->w_cursor.lnum, شروع,
 							   cap->count1);
-		netbeans_inserted(curbuf, curwin->w_cursor.lnum, start,
-					       &ptr[start], (int)cap->count1);
+		netbeans_inserted(curbuf, curwin->w_cursor.lnum, شروع,
+					       &ptr[شروع], (صحيح)cap->count1);
 	    }
-#endif
+#پایان_اگر
 
 	    // mark the buffer as changed and prepare for displaying
-	    changed_bytes(curwin->w_cursor.lnum,
-			       (colnr_T)(curwin->w_cursor.col - cap->count1));
+	    تغییریافته_بایتها(curwin->w_cursor.lnum,
+			       (colnr_T)(curwin->w_cursor.ستون - cap->count1));
 	}
-	--curwin->w_cursor.col;	    // cursor on the last replaced char
+	--curwin->w_cursor.ستون;	    // cursor on the last replaced char
 	// if the character on the left of the current cursor is a multi-byte
 	// character, move two characters left
-	if (has_mbyte)
+	إذا (has_mbyte)
 	    mb_adjust_cursor();
-	curbuf->b_op_end = curwin->w_cursor;
-	curwin->w_set_curswant = true;
-	set_last_insert(cap->nchar);
+	curbuf->b_op_انتها = curwin->w_cursor;
+	curwin->w_مجموعه_curswant = true;
+	مجموعه_آخرین_درج(cap->nchar);
     }
 }
 
@@ -5049,75 +5049,75 @@ nv_replace(cmdarg_T *cap)
  * 'o': Exchange start and end of Visual area.
  * 'O': same, but in block mode exchange left and right corners.
  */
-    static void
-v_swap_corners(int cmdchar)
+    ساكن فراغ
+v_جابجا_corners(صحيح cmdchar)
 {
     pos_T	old_cursor;
-    colnr_T	left, right;
+    colnr_T	چپ_2, راست_2;
 
-    if (cmdchar == 'O' && VIsual_mode == Ctrl_V)
+    إذا (cmdchar == 'O' && VIsual_نما == Ctrl_V)
     {
 	old_cursor = curwin->w_cursor;
-	getvcols(curwin, &old_cursor, &VIsual, &left, &right, 0);
+	getvcols(curwin, &old_cursor, &VIsual, &چپ_2, &راست_2, 0);
 	curwin->w_cursor.lnum = VIsual.lnum;
-	coladvance(left);
+	coladvance(چپ_2);
 	VIsual = curwin->w_cursor;
 
 	curwin->w_cursor.lnum = old_cursor.lnum;
-	curwin->w_curswant = right;
+	curwin->w_curswant = راست_2;
 	// 'selection "exclusive" and cursor at right-bottom corner: move it
 	// right one column
-	if (old_cursor.lnum >= VIsual.lnum && *p_sel == 'e')
+	إذا (old_cursor.lnum >= VIsual.lnum && *p_sel == 'e')
 	    ++curwin->w_curswant;
 	coladvance(curwin->w_curswant);
-	if (curwin->w_cursor.col == old_cursor.col
-		&& (!virtual_active()
+	إذا (curwin->w_cursor.ستون == old_cursor.ستون
+		&& (!virtual_فعال()
 		    || curwin->w_cursor.coladd == old_cursor.coladd))
 	{
 	    curwin->w_cursor.lnum = VIsual.lnum;
-	    if (old_cursor.lnum <= VIsual.lnum && *p_sel == 'e')
-		++right;
-	    coladvance(right);
+	    إذا (old_cursor.lnum <= VIsual.lnum && *p_sel == 'e')
+		++راست_2;
+	    coladvance(راست_2);
 	    VIsual = curwin->w_cursor;
 
 	    curwin->w_cursor.lnum = old_cursor.lnum;
-	    coladvance(left);
-	    curwin->w_curswant = left;
+	    coladvance(چپ_2);
+	    curwin->w_curswant = چپ_2;
 	}
     }
-    else
+    وإلا
     {
 	old_cursor = curwin->w_cursor;
 	curwin->w_cursor = VIsual;
 	VIsual = old_cursor;
-	curwin->w_set_curswant = true;
+	curwin->w_مجموعه_curswant = true;
     }
 }
 
 /*
  * "R" (cap->arg is FALSE) and "gR" (cap->arg is TRUE).
  */
-    static void
+    ساكن فراغ
 nv_Replace(cmdarg_T *cap)
 {
-    if (VIsual_active)		// "R" is replace lines
+    إذا (VIsual_فعال)		// "R" is replace lines
     {
 	cap->cmdchar = 'c';
 	cap->nchar = NUL;
-	VIsual_mode_orig = VIsual_mode; // remember original area for gv
-	VIsual_mode = 'V';
+	VIsual_نما_orig = VIsual_نما; // remember original area for gv
+	VIsual_نما = 'V';
 	nv_operator(cap);
-	return;
+	أرجع;
     }
 
-    if (checkclearopq(cap->oap))
-	return;
+    إذا (checkclearopq(cap->oap))
+	أرجع;
 
-    if (!curbuf->b_p_ma)
+    إذا (!curbuf->b_p_ma)
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-    else
+    وإلا
     {
-	if (virtual_active())
+	إذا (virtual_فعال())
 	    coladvance(getviscol());
 	invoke_edit(cap, FALSE, cap->arg ? 'V' : 'R', FALSE);
     }
@@ -5126,34 +5126,34 @@ nv_Replace(cmdarg_T *cap)
 /*
  * "gr".
  */
-    static void
+    ساكن فراغ
 nv_vreplace(cmdarg_T *cap)
 {
-    if (VIsual_active)
+    إذا (VIsual_فعال)
     {
 	cap->cmdchar = 'r';
 	cap->nchar = cap->extra_char;
 	nv_replace(cap);	// Do same as "r" in Visual mode for now
-	return;
+	أرجع;
     }
 
-    if (checkclearopq(cap->oap))
-	return;
+    إذا (checkclearopq(cap->oap))
+	أرجع;
 
-    if (!curbuf->b_p_ma)
+    إذا (!curbuf->b_p_ma)
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-    else
+    وإلا
     {
-	if (cap->extra_char == Ctrl_V || cap->extra_char == Ctrl_Q)
+	إذا (cap->extra_char == Ctrl_V || cap->extra_char == Ctrl_Q)
 	    // get another character
 	    cap->extra_char = get_literal(FALSE);
-	if (cap->extra_char < ' ')
+	إذا (cap->extra_char < ' ')
 	    // Prefix a control character with CTRL-V to avoid it being used as
 	    // a command.
 	    stuffcharReadbuff(Ctrl_V);
 	stuffcharReadbuff(cap->extra_char);
 	stuffcharReadbuff(ESC);
-	if (virtual_active())
+	إذا (virtual_فعال())
 	    coladvance(getviscol());
 	invoke_edit(cap, TRUE, 'v', FALSE);
     }
@@ -5162,146 +5162,146 @@ nv_vreplace(cmdarg_T *cap)
 /*
  * Swap case for "~" command, when it does not work like an operator.
  */
-    static void
+    ساكن فراغ
 n_swapchar(cmdarg_T *cap)
 {
-    long	n;
+    دراز	n;
     pos_T	startpos;
-    int		did_change = 0;
-#ifdef FEAT_NETBEANS_INTG
+    صحيح		did_change = 0;
+#اگر_تعریف_شده FEAT_NETBEANS_INTG
     pos_T	pos;
     char_u	*ptr;
-    int		count;
-#endif
+    صحيح		شمار;
+#پایان_اگر
 
-    if (checkclearopq(cap->oap))
-	return;
+    إذا (checkclearopq(cap->oap))
+	أرجع;
 
-    if (LINEEMPTY(curwin->w_cursor.lnum) && vim_strchr(p_ww, '~') == NULL)
+    إذا (LINEEMPTY(curwin->w_cursor.lnum) && vim_strchr(p_ww, '~') == عدم)
     {
 	clearopbeep(cap->oap);
-	return;
+	أرجع;
     }
 
     prep_redo_cmd(cap);
 
-    if (u_save_cursor() == FAIL)
-	return;
+    إذا (u_save_cursor() == FAIL)
+	أرجع;
 
     startpos = curwin->w_cursor;
-#ifdef FEAT_NETBEANS_INTG
+#اگر_تعریف_شده FEAT_NETBEANS_INTG
     pos = startpos;
-#endif
-    for (n = cap->count1; n > 0; --n)
+#پایان_اگر
+    لكل (n = cap->count1; n > 0; --n)
     {
 	did_change |= swapchar(cap->oap->op_type, &curwin->w_cursor);
 	inc_cursor();
-	if (gchar_cursor() == NUL)
+	إذا (gchar_cursor() == NUL)
 	{
-	    if (vim_strchr(p_ww, '~') != NULL
-		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+	    إذا (vim_strchr(p_ww, '~') != عدم
+		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_سطر_شمار)
 	    {
-#ifdef FEAT_NETBEANS_INTG
-		if (netbeans_active())
+#اگر_تعریف_شده FEAT_NETBEANS_INTG
+		إذا (netbeans_فعال())
 		{
-		    if (did_change)
+		    إذا (did_change)
 		    {
 			ptr = ml_get(pos.lnum);
-			count = (int)ml_get_len(pos.lnum) - pos.col;
-			netbeans_removed(curbuf, pos.lnum, pos.col,
-								 (long)count);
+			شمار = (صحيح)ml_get_len(pos.lnum) - pos.ستون;
+			netbeans_removed(curbuf, pos.lnum, pos.ستون,
+								 (دراز)شمار);
 			// line may have been flushed, get it again
 			ptr = ml_get(pos.lnum);
-			netbeans_inserted(curbuf, pos.lnum, pos.col,
-							&ptr[pos.col], count);
+			netbeans_inserted(curbuf, pos.lnum, pos.ستون,
+							&ptr[pos.ستون], شمار);
 		    }
-		    pos.col = 0;
+		    pos.ستون = 0;
 		    pos.lnum++;
 		}
-#endif
+#پایان_اگر
 		++curwin->w_cursor.lnum;
-		curwin->w_cursor.col = 0;
-		if (n > 1)
+		curwin->w_cursor.ستون = 0;
+		إذا (n > 1)
 		{
-		    if (u_savesub(curwin->w_cursor.lnum) == FAIL)
-			break;
+		    إذا (u_savesub(curwin->w_cursor.lnum) == FAIL)
+			اكسر;
 		    u_clearline();
 		}
 	    }
-	    else
-		break;
+	    وإلا
+		اكسر;
 	}
     }
-#ifdef FEAT_NETBEANS_INTG
-    if (did_change && netbeans_active())
+#اگر_تعریف_شده FEAT_NETBEANS_INTG
+    إذا (did_change && netbeans_فعال())
     {
 	ptr = ml_get(pos.lnum);
-	count = curwin->w_cursor.col - pos.col;
-	netbeans_removed(curbuf, pos.lnum, pos.col, (long)count);
-	netbeans_inserted(curbuf, pos.lnum, pos.col, &ptr[pos.col], count);
+	شمار = curwin->w_cursor.ستون - pos.ستون;
+	netbeans_removed(curbuf, pos.lnum, pos.ستون, (دراز)شمار);
+	netbeans_inserted(curbuf, pos.lnum, pos.ستون, &ptr[pos.ستون], شمار);
     }
-#endif
+#پایان_اگر
 
 
     check_cursor();
-    curwin->w_set_curswant = true;
-    if (did_change)
+    curwin->w_مجموعه_curswant = true;
+    إذا (did_change)
     {
-	changed_lines(startpos.lnum, startpos.col, curwin->w_cursor.lnum + 1,
+	تغییریافته_سطرها(startpos.lnum, startpos.ستون, curwin->w_cursor.lnum + 1,
 									  0L);
-	curbuf->b_op_start = startpos;
-	curbuf->b_op_end = curwin->w_cursor;
-	if (curbuf->b_op_end.col > 0)
-	    --curbuf->b_op_end.col;
+	curbuf->b_op_شروع = startpos;
+	curbuf->b_op_انتها = curwin->w_cursor;
+	إذا (curbuf->b_op_انتها.ستون > 0)
+	    --curbuf->b_op_انتها.ستون;
     }
 }
 
 /*
  * Move cursor to mark.
  */
-    static void
-nv_cursormark(cmdarg_T *cap, int flag, pos_T *pos)
+    ساكن فراغ
+nv_cursormark(cmdarg_T *cap, صحيح flag, pos_T *pos)
 {
-    if (check_mark(pos) == FAIL)
+    إذا (check_mark(pos) == FAIL)
 	clearop(cap->oap);
-    else
+    وإلا
     {
-	if (cap->cmdchar == '\''
+	إذا (cap->cmdchar == '\''
 		|| cap->cmdchar == '`'
 		|| cap->cmdchar == '['
 		|| cap->cmdchar == ']')
 	    setpcmark();
 	curwin->w_cursor = *pos;
-	if (flag)
+	إذا (flag)
 	    beginline(BL_WHITE | BL_FIX);
-	else
+	وإلا
 	    check_cursor();
     }
     cap->oap->motion_type = flag ? MLINE : MCHAR;
-    if (cap->cmdchar == '`')
+    إذا (cap->cmdchar == '`')
 	cap->oap->use_reg_one = TRUE;
     cap->oap->inclusive = FALSE;		// ignored if not MCHAR
-    curwin->w_set_curswant = true;
+    curwin->w_مجموعه_curswant = true;
 }
 
 /*
  * Handle commands that are operators in Visual mode.
  */
-    static void
+    ساكن فراغ
 v_visop(cmdarg_T *cap)
 {
-    static char_u trans[] = "YyDdCcxdXdAAIIrr";
+    ساكن char_u trans[] = "YyDdCcxdXdAAIIrr";
 
     // Uppercase means linewise, except in block mode, then "D" deletes till
     // the end of the line, and "C" replaces till EOL
-    if (SAFE_isupper(cap->cmdchar))
+    إذا (امن_isupper(cap->cmdchar))
     {
-	if (VIsual_mode != Ctrl_V)
+	إذا (VIsual_نما != Ctrl_V)
 	{
-	    VIsual_mode_orig = VIsual_mode;
-	    VIsual_mode = 'V';
+	    VIsual_نما_orig = VIsual_نما;
+	    VIsual_نما = 'V';
 	}
-	else if (cap->cmdchar == 'C' || cap->cmdchar == 'D')
+	وإلا إذا (cap->cmdchar == 'C' || cap->cmdchar == 'D')
 	    curwin->w_curswant = MAXCOL;
     }
     cap->cmdchar = *(vim_strchr(trans, cap->cmdchar) + 1);
@@ -5311,85 +5311,85 @@ v_visop(cmdarg_T *cap)
 /*
  * "s" and "S" commands.
  */
-    static void
+    ساكن فراغ
 nv_subst(cmdarg_T *cap)
 {
-#ifdef FEAT_TERMINAL
+#اگر_تعریف_شده FEAT_TERMINAL
     // When showing output of term_dumpdiff() swap the top and bottom.
-    if (term_swap_diff() == OK)
-	return;
-#endif
-#ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf) && !prompt_curpos_editable())
+    إذا (جمله_جابجا_diff() == OK)
+	أرجع;
+#پایان_اگر
+#اگر_تعریف_شده FEAT_کار_CHANNEL
+    إذا (bt_prompt(curbuf) && !prompt_curpos_editable())
     {
 	clearopbeep(cap->oap);
-	return;
+	أرجع;
     }
-#endif
-    if (VIsual_active)	// "vs" and "vS" are the same as "vc"
+#پایان_اگر
+    إذا (VIsual_فعال)	// "vs" and "vS" are the same as "vc"
     {
-	if (cap->cmdchar == 'S')
+	إذا (cap->cmdchar == 'S')
 	{
-	    VIsual_mode_orig = VIsual_mode;
-	    VIsual_mode = 'V';
+	    VIsual_نما_orig = VIsual_نما;
+	    VIsual_نما = 'V';
 	}
 	cap->cmdchar = 'c';
 	nv_operator(cap);
     }
-    else
+    وإلا
 	nv_optrans(cap);
 }
 
 /*
  * Abbreviated commands.
  */
-    static void
+    ساكن فراغ
 nv_abbrev(cmdarg_T *cap)
 {
-    if (cap->cmdchar == K_DEL || cap->cmdchar == K_KDEL)
+    إذا (cap->cmdchar == K_DEL || cap->cmdchar == K_KDEL)
 	cap->cmdchar = 'x';		// DEL key behaves like 'x'
 
     // in Visual mode these commands are operators
-    if (VIsual_active)
+    إذا (VIsual_فعال)
 	v_visop(cap);
-    else
+    وإلا
 	nv_optrans(cap);
 }
 
 /*
  * Translate a command into another command.
  */
-    static void
+    ساكن فراغ
 nv_optrans(cmdarg_T *cap)
 {
-    static char_u *(ar[8]) = {(char_u *)"dl", (char_u *)"dh",
+    ساكن char_u *(ar[8]) = {(char_u *)"dl", (char_u *)"dh",
 			      (char_u *)"d$", (char_u *)"c$",
 			      (char_u *)"cl", (char_u *)"cc",
 			      (char_u *)"yy", (char_u *)":s\r"};
-    static char_u *str = (char_u *)"xXDCsSY&";
+    ساكن char_u *str = (char_u *)"xXDCsSY&";
 
-    if (!checkclearopq(cap->oap))
+    إذا (!checkclearopq(cap->oap))
     {
 	// In Vi "2D" doesn't delete the next line.  Can't translate it
 	// either, because "2." should also not use the count.
-	if (cap->cmdchar == 'D' && vim_strchr(p_cpo, CPO_HASH) != NULL)
+	إذا (cap->cmdchar == 'D' && vim_strchr(p_cpo, CPO_HASH) != عدم)
 	{
-	    cap->oap->start = curwin->w_cursor;
+	    cap->oap->شروع = curwin->w_cursor;
 	    cap->oap->op_type = OP_DELETE;
-#ifdef FEAT_EVAL
-	    set_op_var(OP_DELETE);
-#endif
+#اگر_تعریف_شده FEAT_EVAL
+	    مجموعه_op_var(OP_DELETE);
+#پایان_اگر
 	    cap->count1 = 1;
 	    nv_dollar(cap);
-	    finish_op = TRUE;
+	    پایان_op = TRUE;
 	    ResetRedobuff();
-	    AppendCharToRedobuff('D');
+	    Append_Char_مقصد_Redobuff('D');
 	}
-	else
+	وإلا
 	{
-	    if (cap->count0)
+	    إذا (cap->count0)
 		stuffnumReadbuff(cap->count0);
-	    stuffReadbuff(ar[(int)(vim_strchr(str, cap->cmdchar) - str)]);
+	    stuffReadbuff(ar[(صحيح)(vim_strchr(str, cap->cmdchar) - str)]);
 	}
     }
     cap->opcount = 0;
@@ -5399,121 +5399,121 @@ nv_optrans(cmdarg_T *cap)
  * "'" and "`" commands.  Also for "g'" and "g`".
  * cap->arg is TRUE for "'" and "g'".
  */
-    static void
+    ساكن فراغ
 nv_gomark(cmdarg_T *cap)
 {
     pos_T	*pos;
-    int		c;
-#ifdef FEAT_FOLDING
+    صحيح		c;
+#اگر_تعریف_شده FEAT_FOLDING
     pos_T	old_cursor = curwin->w_cursor;
-    int		old_KeyTyped = KeyTyped;    // getting file may reset it
-#endif
+    صحيح		old_کلید_Typed = کلید_Typed;    // getting file may reset it
+#پایان_اگر
 
-    if (cap->cmdchar == 'g')
+    إذا (cap->cmdchar == 'g')
 	c = cap->extra_char;
-    else
+    وإلا
 	c = cap->nchar;
     pos = getmark(c, (cap->oap->op_type == OP_NOP));
-    if (pos == (pos_T *)-1)	    // jumped to other file
+    إذا (pos == (pos_T *)-1)	    // jumped to other file
     {
-	if (cap->arg)
+	إذا (cap->arg)
 	{
 	    check_cursor_lnum();
 	    beginline(BL_WHITE | BL_FIX);
 	}
-	else
+	وإلا
 	    check_cursor();
     }
-    else
+    وإلا
 	nv_cursormark(cap, cap->arg, pos);
 
     // May need to clear the coladd that a mark includes.
-    if (!virtual_active())
+    إذا (!virtual_فعال())
 	curwin->w_cursor.coladd = 0;
-    check_cursor_col();
-#ifdef FEAT_FOLDING
-    if (cap->oap->op_type == OP_NOP
-	    && pos != NULL
+    check_cursor_ستون();
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا (cap->oap->op_type == OP_NOP
+	    && pos != عدم
 	    && (pos == (pos_T *)-1 || !EQUAL_POS(old_cursor, *pos))
 	    && (fdo_flags & FDO_MARK)
-	    && old_KeyTyped)
+	    && old_کلید_Typed)
 	foldOpenCursor();
-#endif
+#پایان_اگر
 }
 
 /*
  * Handle CTRL-O, CTRL-I, "g;", "g," and "CTRL-Tab" commands.
  */
-    static void
+    ساكن فراغ
 nv_pcmark(cmdarg_T *cap)
 {
     pos_T	*pos;
-#ifdef FEAT_FOLDING
+#اگر_تعریف_شده FEAT_FOLDING
     linenr_T	lnum = curwin->w_cursor.lnum;
-    int		old_KeyTyped = KeyTyped;    // getting file may reset it
-#endif
+    صحيح		old_کلید_Typed = کلید_Typed;    // getting file may reset it
+#پایان_اگر
 
-    if (checkclearopq(cap->oap))
-	return;
+    إذا (checkclearopq(cap->oap))
+	أرجع;
 
-    if (cap->cmdchar == TAB && mod_mask == MOD_MASK_CTRL)
+    إذا (cap->cmdchar == TAB && mod_ماسک == MOD_ماسک_CTRL)
     {
-	if (goto_tabpage_lastused() == FAIL)
+	إذا (goto_tabpage_lastused() == FAIL)
 	    clearopbeep(cap->oap);
-	return;
+	أرجع;
     }
-    if (cap->cmdchar == 'g')
-	pos = movechangelist((int)cap->count1);
-    else
-	pos = movemark((int)cap->count1);
-    if (pos == (pos_T *)-1)		// jump to other file
+    إذا (cap->cmdchar == 'g')
+	pos = movechangelist((صحيح)cap->count1);
+    وإلا
+	pos = movemark((صحيح)cap->count1);
+    إذا (pos == (pos_T *)-1)		// jump to other file
     {
-	curwin->w_set_curswant = true;
+	curwin->w_مجموعه_curswant = true;
 	check_cursor();
     }
-    else if (pos != NULL)		    // can jump
+    وإلا إذا (pos != عدم)		    // can jump
 	nv_cursormark(cap, FALSE, pos);
-    else if (cap->cmdchar == 'g')
+    وإلا إذا (cap->cmdchar == 'g')
     {
-	if (curbuf->b_changelistlen == 0)
-	    emsg(_(e_changelist_is_empty));
-	else if (cap->count1 < 0)
-	    emsg(_(e_at_start_of_changelist));
-	else
-	    emsg(_(e_at_end_of_changelist));
+	إذا (curbuf->b_changelistlen == 0)
+	    emsg(_(e_changelist_is_خالی));
+	وإلا إذا (cap->count1 < 0)
+	    emsg(_(e_at_شروع_از_changelist));
+	وإلا
+	    emsg(_(e_at_انتها_از_changelist));
     }
-    else
+    وإلا
 	clearopbeep(cap->oap);
-#ifdef FEAT_FOLDING
-    if (cap->oap->op_type == OP_NOP
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا (cap->oap->op_type == OP_NOP
 	    && (pos == (pos_T *)-1 || lnum != curwin->w_cursor.lnum)
 	    && (fdo_flags & FDO_MARK)
-	    && old_KeyTyped)
+	    && old_کلید_Typed)
 	foldOpenCursor();
-#endif
+#پایان_اگر
 }
 
 /*
  * Handle '"' command.
  */
-    static void
+    ساكن فراغ
 nv_regname(cmdarg_T *cap)
 {
-    if (checkclearop(cap->oap))
-	return;
-#ifdef FEAT_EVAL
-    if (cap->nchar == '=')
-	cap->nchar = get_expr_register();
-#endif
-    if (cap->nchar != NUL && valid_yank_reg(cap->nchar, FALSE))
+    إذا (checkclearop(cap->oap))
+	أرجع;
+#اگر_تعریف_شده FEAT_EVAL
+    إذا (cap->nchar == '=')
+	cap->nchar = get_عبارت_ثبات();
+#پایان_اگر
+    إذا (cap->nchar != NUL && valid_yank_reg(cap->nchar, FALSE))
     {
 	cap->oap->regname = cap->nchar;
 	cap->opcount = cap->count0;	// remember count before '"'
-#ifdef FEAT_EVAL
-	set_reg_var(cap->oap->regname);
-#endif
+#اگر_تعریف_شده FEAT_EVAL
+	مجموعه_reg_var(cap->oap->regname);
+#پایان_اگر
     }
-    else
+    وإلا
 	clearopbeep(cap->oap);
 }
 
@@ -5523,78 +5523,78 @@ nv_regname(cmdarg_T *cap)
  * is TRUE.
  * Handle CTRL-Q just like CTRL-V.
  */
-    static void
+    ساكن فراغ
 nv_visual(cmdarg_T *cap)
 {
-    if (cap->cmdchar == Ctrl_Q)
+    إذا (cap->cmdchar == Ctrl_Q)
 	cap->cmdchar = Ctrl_V;
 
     // 'v', 'V' and CTRL-V can be used while an operator is pending to make it
     // characterwise, linewise, or blockwise.
-    if (cap->oap->op_type != OP_NOP)
+    إذا (cap->oap->op_type != OP_NOP)
     {
 	motion_force = cap->oap->motion_force = cap->cmdchar;
-	finish_op = FALSE;	// operator doesn't finish now but later
-	return;
+	پایان_op = FALSE;	// operator doesn't finish now but later
+	أرجع;
     }
 
     VIsual_select = cap->arg;
-    if (VIsual_active)	    // change Visual mode
+    إذا (VIsual_فعال)	    // change Visual mode
     {
-	if (VIsual_mode == cap->cmdchar)    // stop visual mode
-	    end_visual_mode();
-	else				    // toggle char/block mode
+	إذا (VIsual_نما == cap->cmdchar)    // stop visual mode
+	    انتها_visual_نما();
+	وإلا				    // toggle char/block mode
 	{				    //	   or char/line mode
-	    VIsual_mode = cap->cmdchar;
+	    VIsual_نما = cap->cmdchar;
 	    showmode();
 	    may_trigger_modechanged();
 	}
 	redraw_curbuf_later(UPD_INVERTED);	    // update the inversion
     }
-    else		    // start Visual mode
+    وإلا		    // start Visual mode
     {
 	check_visual_highlight();
-	if (cap->count0 > 0 && resel_VIsual_mode != NUL)
+	إذا (cap->count0 > 0 && resel_VIsual_نما != NUL)
 	{
 	    // use previously selected part
 	    VIsual = curwin->w_cursor;
 
-	    VIsual_active = TRUE;
+	    VIsual_فعال = TRUE;
 	    VIsual_reselect = TRUE;
-	    if (!cap->arg)
+	    إذا (!cap->arg)
 		// start Select mode when 'selectmode' contains "cmd"
-		may_start_select('c');
+		may_شروع_select('c');
 	    setmouse();
-	    if (p_smd && msg_silent == 0)
+	    إذا (p_smd && پیام_silent == 0)
 		redraw_cmdline = TRUE;	    // show visual mode later
 	    // For V and ^V, we multiply the number of lines even if there
 	    // was only one -- webb
-	    if (resel_VIsual_mode != 'v' || resel_VIsual_line_count > 1)
+	    إذا (resel_VIsual_نما != 'v' || resel_VIsual_سطر_شمار > 1)
 	    {
 		curwin->w_cursor.lnum +=
-				    resel_VIsual_line_count * cap->count0 - 1;
+				    resel_VIsual_سطر_شمار * cap->count0 - 1;
 		check_cursor();
 	    }
-	    VIsual_mode = resel_VIsual_mode;
-	    if (VIsual_mode == 'v')
+	    VIsual_نما = resel_VIsual_نما;
+	    إذا (VIsual_نما == 'v')
 	    {
-		if (resel_VIsual_line_count <= 1)
+		إذا (resel_VIsual_سطر_شمار <= 1)
 		{
 		    update_curswant_force();
 		    curwin->w_curswant += resel_VIsual_vcol * cap->count0;
-		    if (*p_sel != 'e')
+		    إذا (*p_sel != 'e')
 			--curwin->w_curswant;
 		}
-		else
+		وإلا
 		    curwin->w_curswant = resel_VIsual_vcol;
 		coladvance(curwin->w_curswant);
 	    }
-	    if (resel_VIsual_vcol == MAXCOL)
+	    إذا (resel_VIsual_vcol == MAXCOL)
 	    {
 		curwin->w_curswant = MAXCOL;
 		coladvance((colnr_T)MAXCOL);
 	    }
-	    else if (VIsual_mode == Ctrl_V)
+	    وإلا إذا (VIsual_نما == Ctrl_V)
 	    {
 		// Update curswant at the original cursor position.
 		pos_T tmp_cursor = curwin->w_cursor;
@@ -5602,31 +5602,31 @@ nv_visual(cmdarg_T *cap)
 		update_curswant_force();
 		curwin->w_curswant += resel_VIsual_vcol * cap->count0 - 1;
 		curwin->w_cursor = tmp_cursor;
-		if (*p_sel == 'e')
+		إذا (*p_sel == 'e')
 		    ++curwin->w_curswant;
 		coladvance(curwin->w_curswant);
 	    }
-	    else
-		curwin->w_set_curswant = true;
+	    وإلا
+		curwin->w_مجموعه_curswant = true;
 	    redraw_curbuf_later(UPD_INVERTED);	// show the inversion
 	}
-	else
+	وإلا
 	{
-	    if (!cap->arg)
+	    إذا (!cap->arg)
 		// start Select mode when 'selectmode' contains "cmd"
-		may_start_select('c');
-	    n_start_visual_mode(cap->cmdchar);
-	    if (VIsual_mode != 'V' && *p_sel == 'e')
+		may_شروع_select('c');
+	    n_شروع_visual_نما(cap->cmdchar);
+	    إذا (VIsual_نما != 'V' && *p_sel == 'e')
 		++cap->count1;  // include one more char
-	    else
+	    وإلا
 		VIsual_select_exclu_adj = FALSE;
-	    if (cap->count0 > 0 && --cap->count1 > 0)
+	    إذا (cap->count0 > 0 && --cap->count1 > 0)
 	    {
 		// With a count select that many characters or lines.
-		if (VIsual_mode == 'v' || VIsual_mode == Ctrl_V)
-		    nv_right(cap);
-		else if (VIsual_mode == 'V')
-		    nv_down(cap);
+		إذا (VIsual_نما == 'v' || VIsual_نما == Ctrl_V)
+		    nv_راست(cap);
+		وإلا إذا (VIsual_نما == 'V')
+		    nv_پایین(cap);
 	    }
 	}
     }
@@ -5635,72 +5635,72 @@ nv_visual(cmdarg_T *cap)
 /*
  * Start selection for Shift-movement keys.
  */
-    void
-start_selection(void)
+    فراغ
+شروع_selection(فراغ)
 {
     // if 'selectmode' contains "key", start Select mode
-    may_start_select('k');
-    n_start_visual_mode('v');
+    may_شروع_select('k');
+    n_شروع_visual_نما('v');
 }
 
 /*
  * Start Select mode, if "c" is in 'selectmode' and not in a mapping or menu.
  * When "c" is 'o' (checking for "mouse") then also when mapped.
  */
-    void
-may_start_select(int c)
+    فراغ
+may_شروع_select(صحيح c)
 {
-    VIsual_select = (c == 'o' || (stuff_empty() && typebuf_typed()))
-		    && vim_strchr(p_slm, c) != NULL;
+    VIsual_select = (c == 'o' || (stuff_خالی() && typebuf_typed()))
+		    && vim_strchr(p_slm, c) != عدم;
 }
 
 /*
  * Start Visual mode "c".
  * Should set VIsual_select before calling this.
  */
-    static void
-n_start_visual_mode(int c)
+    ساكن فراغ
+n_شروع_visual_نما(صحيح c)
 {
-#ifdef FEAT_CONCEAL
-    int cursor_line_was_concealed = curwin->w_p_cole > 0
-						&& conceal_cursor_line(curwin);
-#endif
+#اگر_تعریف_شده FEAT_CONCEAL
+    صحيح cursor_سطر_was_concealed = curwin->w_p_cole > 0
+						&& conceal_cursor_سطر(curwin);
+#پایان_اگر
 
-    VIsual_mode = c;
-    VIsual_active = TRUE;
+    VIsual_نما = c;
+    VIsual_فعال = TRUE;
     VIsual_reselect = TRUE;
 
     // Corner case: the 0 position in a tab may change when going into
     // virtualedit.  Recalculate curwin->w_cursor to avoid bad highlighting.
-    if (c == Ctrl_V && (get_ve_flags() & VE_BLOCK) && gchar_cursor() == TAB)
+    إذا (c == Ctrl_V && (get_ve_flags() & VE_بلوک) && gchar_cursor() == TAB)
     {
 	validate_virtcol();
 	coladvance(curwin->w_virtcol);
     }
     VIsual = curwin->w_cursor;
 
-#ifdef FEAT_FOLDING
+#اگر_تعریف_شده FEAT_FOLDING
     foldAdjustVisual();
-#endif
+#پایان_اگر
 
     may_trigger_modechanged();
     setmouse();
-#ifdef FEAT_CONCEAL
+#اگر_تعریف_شده FEAT_CONCEAL
     // Check if redraw is needed after changing the state.
-    conceal_check_cursor_line(cursor_line_was_concealed);
-#endif
+    conceal_check_cursor_سطر(cursor_سطر_was_concealed);
+#پایان_اگر
 
-    if (p_smd && msg_silent == 0)
+    إذا (p_smd && پیام_silent == 0)
 	redraw_cmdline = TRUE;	// show visual mode later
-#ifdef FEAT_CLIPBOARD
+#اگر_تعریف_شده FEAT_CLIPBOARD
     // Make sure the clipboard gets updated.  Needed because start and
     // end may still be the same, and the selection needs to be owned
-    clip_star.vmode = NUL;
-#endif
+    clip_ستاره.vmode = NUL;
+#پایان_اگر
 
     // Only need to redraw this line, unless still need to redraw an old
     // Visual area (when 'lazyredraw' is set).
-    if (curwin->w_redr_type < UPD_INVERTED)
+    إذا (curwin->w_redr_type < UPD_INVERTED)
     {
 	curwin->w_old_cursor_lnum = curwin->w_cursor.lnum;
 	curwin->w_old_visual_lnum = curwin->w_cursor.lnum;
@@ -5711,29 +5711,29 @@ n_start_visual_mode(int c)
 /*
  * CTRL-W: Window commands
  */
-    static void
-nv_window(cmdarg_T *cap)
+    ساكن فراغ
+nv_پنجره(cmdarg_T *cap)
 {
-    if (cap->nchar == ':')
+    إذا (cap->nchar == ':')
     {
 	// "CTRL-W :" is the same as typing ":"; useful in a terminal window
 	cap->cmdchar = ':';
 	cap->nchar = NUL;
 	nv_colon(cap);
     }
-    else if (!checkclearop(cap->oap))
-	do_window(cap->nchar, cap->count0, NUL); // everything is in window.c
+    وإلا إذا (!checkclearop(cap->oap))
+	do_پنجره(cap->nchar, cap->count0, NUL); // everything is in window.c
 }
 
 /*
  * CTRL-Z: Suspend
  */
-    static void
+    ساكن فراغ
 nv_suspend(cmdarg_T *cap)
 {
     clearop(cap->oap);
-    if (VIsual_active)
-	end_visual_mode();		// stop Visual mode
+    إذا (VIsual_فعال)
+	انتها_visual_نما();		// stop Visual mode
     do_cmdline_cmd((char_u *)"stop");
 }
 
@@ -5741,47 +5741,47 @@ nv_suspend(cmdarg_T *cap)
  * "gv": Reselect the previous Visual area.  If Visual already active,
  *       exchange previous and current Visual area.
  */
-    static void
+    ساكن فراغ
 nv_gv_cmd(cmdarg_T *cap)
 {
     pos_T	tpos;
-    int		i;
+    صحيح		i;
 
-    if (curbuf->b_visual.vi_start.lnum == 0
-	    || curbuf->b_visual.vi_start.lnum > curbuf->b_ml.ml_line_count
-	    || curbuf->b_visual.vi_end.lnum == 0)
+    إذا (curbuf->b_visual.vi_شروع.lnum == 0
+	    || curbuf->b_visual.vi_شروع.lnum > curbuf->b_ml.ml_سطر_شمار
+	    || curbuf->b_visual.vi_انتها.lnum == 0)
     {
 	beep_flush();
-	return;
+	أرجع;
     }
 
     // set w_cursor to the start of the Visual area, tpos to the end
-    if (VIsual_active)
+    إذا (VIsual_فعال)
     {
-	i = VIsual_mode;
-	VIsual_mode = curbuf->b_visual.vi_mode;
-	curbuf->b_visual.vi_mode = i;
-#ifdef FEAT_EVAL
-	curbuf->b_visual_mode_eval = i;
-#endif
+	i = VIsual_نما;
+	VIsual_نما = curbuf->b_visual.vi_نما;
+	curbuf->b_visual.vi_نما = i;
+#اگر_تعریف_شده FEAT_EVAL
+	curbuf->b_visual_نما_eval = i;
+#پایان_اگر
 	i = curwin->w_curswant;
 	curwin->w_curswant = curbuf->b_visual.vi_curswant;
 	curbuf->b_visual.vi_curswant = i;
 
-	tpos = curbuf->b_visual.vi_end;
-	curbuf->b_visual.vi_end = curwin->w_cursor;
-	curwin->w_cursor = curbuf->b_visual.vi_start;
-	curbuf->b_visual.vi_start = VIsual;
+	tpos = curbuf->b_visual.vi_انتها;
+	curbuf->b_visual.vi_انتها = curwin->w_cursor;
+	curwin->w_cursor = curbuf->b_visual.vi_شروع;
+	curbuf->b_visual.vi_شروع = VIsual;
     }
-    else
+    وإلا
     {
-	VIsual_mode = curbuf->b_visual.vi_mode;
+	VIsual_نما = curbuf->b_visual.vi_نما;
 	curwin->w_curswant = curbuf->b_visual.vi_curswant;
-	tpos = curbuf->b_visual.vi_end;
-	curwin->w_cursor = curbuf->b_visual.vi_start;
+	tpos = curbuf->b_visual.vi_انتها;
+	curwin->w_cursor = curbuf->b_visual.vi_شروع;
     }
 
-    VIsual_active = TRUE;
+    VIsual_فعال = TRUE;
     VIsual_reselect = TRUE;
 
     // Set Visual to the start and w_cursor to the end of the Visual
@@ -5795,19 +5795,19 @@ nv_gv_cmd(cmdarg_T *cap)
     // When called from normal "g" command: start Select mode when
     // 'selectmode' contains "cmd".  When called for K_SELECT, always
     // start Select mode.
-    if (cap->arg)
+    إذا (cap->arg)
     {
 	VIsual_select = TRUE;
 	VIsual_select_reg = 0;
     }
-    else
-	may_start_select('c');
+    وإلا
+	may_شروع_select('c');
     setmouse();
-#ifdef FEAT_CLIPBOARD
+#اگر_تعریف_شده FEAT_CLIPBOARD
     // Make sure the clipboard gets updated.  Needed because start and
     // end are still the same, and the selection needs to be owned
-    clip_star.vmode = NUL;
-#endif
+    clip_ستاره.vmode = NUL;
+#پایان_اگر
     redraw_curbuf_later(UPD_INVERTED);
     showmode();
 }
@@ -5816,68 +5816,68 @@ nv_gv_cmd(cmdarg_T *cap)
  * "g0", "g^" : Like "0" and "^" but for screen lines.
  * "gm": middle of "g0" and "g$".
  */
-    void
+    فراغ
 nv_g_home_m_cmd(cmdarg_T *cap)
 {
-    int		i;
-    int		flag = FALSE;
+    صحيح		i;
+    صحيح		flag = FALSE;
 
-    if (cap->nchar == '^')
+    إذا (cap->nchar == '^')
 	flag = TRUE;
 
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = FALSE;
-    if (curwin->w_p_wrap && curwin->w_width != 0)
+    إذا (curwin->w_p_wrap && curwin->w_عرض != 0)
     {
-	int	width1 = curwin->w_width - curwin_col_off();
-	int	width2 = width1 + curwin_col_off2();
-	int	virtcol;
+	صحيح	width1 = curwin->w_عرض - curwin_ستون_off();
+	صحيح	width2 = width1 + curwin_ستون_off2();
+	صحيح	virtcol;
 
 	validate_virtcol();
 	virtcol = curwin->w_virtcol
-#ifdef FEAT_PROP_POPUP
-	    - curwin->w_virtcol_first_char
-#endif
+#اگر_تعریف_شده FEAT_PROP_POPUP
+	    - curwin->w_virtcol_اولی_char
+#پایان_اگر
 	    ;
 	i = 0;
-	if (virtcol >= (colnr_T)width1 && width2 > 0)
+	إذا (virtcol >= (colnr_T)width1 && width2 > 0)
 	    i = (virtcol - width1) / width2 * width2 + width1;
 
 	// When ending up below 'smoothscroll' marker, move just beyond it so
 	// that skipcol is not adjusted later.
-	if (curwin->w_skipcol > 0 && curwin->w_cursor.lnum == curwin->w_topline)
+	إذا (curwin->w_skipcol > 0 && curwin->w_cursor.lnum == curwin->w_topline)
 	{
-	    int overlap = sms_marker_overlap(curwin, curwin->w_width - width2);
-	    if (overlap > 0 && i == curwin->w_skipcol)
+	    صحيح overlap = sms_marker_overlap(curwin, curwin->w_عرض - width2);
+	    إذا (overlap > 0 && i == curwin->w_skipcol)
 		i += overlap;
 	}
     }
-    else
+    وإلا
 	i = curwin->w_leftcol;
     // Go to the middle of the screen line.  When 'number' or
     // 'relativenumber' is on and lines are wrapping the middle can be more
     // to the left.
-    if (cap->nchar == 'm')
-	i += (curwin->w_width - curwin_col_off()
+    إذا (cap->nchar == 'm')
+	i += (curwin->w_عرض - curwin_ستون_off()
 		+ ((curwin->w_p_wrap && i > 0)
-		    ? curwin_col_off2() : 0)) / 2;
+		    ? curwin_ستون_off2() : 0)) / 2;
     coladvance((colnr_T)i);
-    if (flag)
+    إذا (flag)
     {
-	do
+	افعل
 	    i = gchar_cursor();
-	while (VIM_ISWHITE(i) && oneright() == OK);
+	طالما (VIM_ISWHITE(i) && oneright() == OK);
 	curwin->w_valid &= ~VALID_WCOL;
     }
-    curwin->w_set_curswant = true;
-#ifdef FEAT_FOLDING
-    if (hasAnyFolding(curwin))
+    curwin->w_مجموعه_curswant = true;
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا (hasAnyFolding(curwin))
     {
 	validate_cheight();
-	if (curwin->w_cline_folded)
+	إذا (curwin->w_cline_folded)
 	    update_curswant_force();
     }
-#endif
+#پایان_اگر
     adjust_skipcol();
 }
 
@@ -5885,7 +5885,7 @@ nv_g_home_m_cmd(cmdarg_T *cap)
  * "g_": to the last non-blank character in the line or <count> lines
  *       downward.
  */
-    static void
+    ساكن فراغ
 nv_g_underscore_cmd(cmdarg_T *cap)
 {
     char_u  *ptr;
@@ -5893,110 +5893,110 @@ nv_g_underscore_cmd(cmdarg_T *cap)
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = TRUE;
     curwin->w_curswant = MAXCOL;
-    if (cursor_down((long)(cap->count1 - 1),
+    إذا (cursor_پایین((دراز)(cap->count1 - 1),
 					cap->oap->op_type == OP_NOP) == FAIL)
     {
 	clearopbeep(cap->oap);
-	return;
+	أرجع;
     }
 
     ptr = ml_get_curline();
 
     // In Visual mode we may end up after the line.
-    if (curwin->w_cursor.col > 0 && ptr[curwin->w_cursor.col] == NUL)
-	--curwin->w_cursor.col;
+    إذا (curwin->w_cursor.ستون > 0 && ptr[curwin->w_cursor.ستون] == NUL)
+	--curwin->w_cursor.ستون;
 
     // Decrease the cursor column until it's on a non-blank.
-    while (curwin->w_cursor.col > 0
-	    && VIM_ISWHITE(ptr[curwin->w_cursor.col]))
-	--curwin->w_cursor.col;
-    curwin->w_set_curswant = true;
+    طالما (curwin->w_cursor.ستون > 0
+	    && VIM_ISWHITE(ptr[curwin->w_cursor.ستون]))
+	--curwin->w_cursor.ستون;
+    curwin->w_مجموعه_curswant = true;
     adjust_for_sel(cap);
 }
 
 /*
  * "g$" : Like "$" but for screen lines.
  */
-    static void
+    ساكن فراغ
 nv_g_dollar_cmd(cmdarg_T *cap)
 {
     oparg_T	*oap = cap->oap;
-    int		i;
-    int		col_off = curwin_col_off();
-    int		flag = FALSE;
+    صحيح		i;
+    صحيح		ستون_off = curwin_ستون_off();
+    صحيح		flag = FALSE;
 
-    if (cap->nchar == K_END || cap->nchar == K_KEND)
+    إذا (cap->nchar == K_انتها || cap->nchar == K_KEND)
 	flag = TRUE;
 
     oap->motion_type = MCHAR;
     oap->inclusive = TRUE;
-    if (curwin->w_p_wrap && curwin->w_width != 0)
+    إذا (curwin->w_p_wrap && curwin->w_عرض != 0)
     {
 	curwin->w_curswant = MAXCOL;    // so we stay at the end
-	if (cap->count1 == 1)
+	إذا (cap->count1 == 1)
 	{
-	    int		width1 = curwin->w_width - col_off;
-	    int		width2 = width1 + curwin_col_off2();
-	    int		virtcol;
+	    صحيح		width1 = curwin->w_عرض - ستون_off;
+	    صحيح		width2 = width1 + curwin_ستون_off2();
+	    صحيح		virtcol;
 
 	    validate_virtcol();
 	    virtcol = curwin->w_virtcol
-#ifdef FEAT_PROP_POPUP
-		- curwin->w_virtcol_first_char
-#endif
+#اگر_تعریف_شده FEAT_PROP_POPUP
+		- curwin->w_virtcol_اولی_char
+#پایان_اگر
 		;
 	    i = width1 - 1;
-	    if (virtcol >= (colnr_T)width1)
+	    إذا (virtcol >= (colnr_T)width1)
 		i += ((virtcol - width1) / width2 + 1)
 		    * width2;
 	    coladvance((colnr_T)i);
 
 	    // Make sure we stick in this column.
 	    update_curswant_force();
-	    if (curwin->w_cursor.col > 0 && curwin->w_p_wrap)
+	    إذا (curwin->w_cursor.ستون > 0 && curwin->w_p_wrap)
 	    {
 		// Check for landing on a character that got split at
 		// the end of the line.  We do not want to advance to
 		// the next screen line.
-		if (curwin->w_virtcol
-#ifdef FEAT_PROP_POPUP
-			- curwin->w_virtcol_first_char
-#endif
+		إذا (curwin->w_virtcol
+#اگر_تعریف_شده FEAT_PROP_POPUP
+			- curwin->w_virtcol_اولی_char
+#پایان_اگر
 						> (colnr_T)i)
-		    --curwin->w_cursor.col;
+		    --curwin->w_cursor.ستون;
 	    }
 	}
-	else if (nv_screengo(oap, FORWARD, cap->count1 - 1) == FAIL)
+	وإلا إذا (nv_screengo(oap, FORWARD, cap->count1 - 1) == FAIL)
 	    clearopbeep(oap);
     }
-    else
+    وإلا
     {
-	if (cap->count1 > 1)
+	إذا (cap->count1 > 1)
 	    // if it fails, let the cursor still move to the last char
-	    (void)cursor_down(cap->count1 - 1, FALSE);
+	    (فراغ)cursor_پایین(cap->count1 - 1, FALSE);
 
-	i = curwin->w_leftcol + curwin->w_width - col_off - 1;
+	i = curwin->w_leftcol + curwin->w_عرض - ستون_off - 1;
 	coladvance((colnr_T)i);
 
 	// if the character doesn't fit move one back
-	if (curwin->w_cursor.col > 0
+	إذا (curwin->w_cursor.ستون > 0
 		&& (*mb_ptr2cells)(ml_get_cursor()) > 1)
 	{
 	    colnr_T vcol;
 
-	    getvvcol(curwin, &curwin->w_cursor, NULL, NULL, &vcol, 0);
-	    if (vcol >= curwin->w_leftcol + curwin->w_width - col_off)
-		--curwin->w_cursor.col;
+	    getvvcol(curwin, &curwin->w_cursor, عدم, عدم, &vcol, 0);
+	    إذا (vcol >= curwin->w_leftcol + curwin->w_عرض - ستون_off)
+		--curwin->w_cursor.ستون;
 	}
 
 	// Make sure we stick in this column.
 	update_curswant_force();
     }
-    if (flag)
+    إذا (flag)
     {
-	do
+	افعل
 	    i = gchar_cursor();
-	while (IS_WHITE_OR_NUL(i) && oneleft() == OK);
+	طالما (IS_WHITE_OR_NUL(i) && oneleft() == OK);
 	curwin->w_valid &= ~VALID_WCOL;
     }
 }
@@ -6004,21 +6004,21 @@ nv_g_dollar_cmd(cmdarg_T *cap)
 /*
  * "gi": start Insert at the last position.
  */
-    static void
+    ساكن فراغ
 nv_gi_cmd(cmdarg_T *cap)
 {
-    int		i;
+    صحيح		i;
 
-    if (curbuf->b_last_insert.lnum != 0)
+    إذا (curbuf->b_آخرین_درج.lnum != 0)
     {
-	curwin->w_cursor = curbuf->b_last_insert;
+	curwin->w_cursor = curbuf->b_آخرین_درج;
 	check_cursor_lnum();
-	i = (int)ml_get_curline_len();
-	if (curwin->w_cursor.col > (colnr_T)i)
+	i = (صحيح)ml_get_curline_len();
+	إذا (curwin->w_cursor.ستون > (colnr_T)i)
 	{
-	    if (virtual_active())
-		curwin->w_cursor.coladd += curwin->w_cursor.col - i;
-	    curwin->w_cursor.col = i;
+	    إذا (virtual_فعال())
+		curwin->w_cursor.coladd += curwin->w_cursor.ستون - i;
+	    curwin->w_cursor.ستون = i;
 	}
     }
     cap->cmdchar = 'i';
@@ -6028,239 +6028,239 @@ nv_gi_cmd(cmdarg_T *cap)
 /*
  * Commands starting with "g".
  */
-    static void
+    ساكن فراغ
 nv_g_cmd(cmdarg_T *cap)
 {
     oparg_T	*oap = cap->oap;
-    int		i;
+    صحيح		i;
 
-    switch (cap->nchar)
+    بدل (cap->nchar)
     {
-    case Ctrl_A:
-    case Ctrl_X:
-#ifdef MEM_PROFILE
+    حالة Ctrl_A:
+    حالة Ctrl_X:
+#اگر_تعریف_شده MEM_PROFILE
     // "g^A": dump log of used memory.
-	if (!VIsual_active && cap->nchar == Ctrl_A)
+	إذا (!VIsual_فعال && cap->nchar == Ctrl_A)
 	    vim_mem_profile_dump();
-	else
-#endif
+	وإلا
+#پایان_اگر
     // "g^A/g^X": sequentially increment visually selected region
-	if (VIsual_active)
+	إذا (VIsual_فعال)
 	{
 	    cap->arg = TRUE;
 	    cap->cmdchar = cap->nchar;
 	    cap->nchar = NUL;
 	    nv_addsub(cap);
 	}
-	else
+	وإلا
 	    clearopbeep(oap);
-	break;
+	اكسر;
 
     // "gR": Enter virtual replace mode.
-    case 'R':
+    حالة 'R':
 	cap->arg = TRUE;
 	nv_Replace(cap);
-	break;
+	اكسر;
 
-    case 'r':
+    حالة 'r':
 	nv_vreplace(cap);
-	break;
+	اكسر;
 
-    case '&':
+    حالة '&':
 	do_cmdline_cmd((char_u *)"%s//~/&");
-	break;
+	اكسر;
 
     // "gv": Reselect the previous Visual area.  If Visual already active,
     // exchange previous and current Visual area.
-    case 'v':
+    حالة 'v':
 	nv_gv_cmd(cap);
-	break;
+	اكسر;
 
     // "gV": Don't reselect the previous Visual area after a Select mode
     // mapping of menu.
-    case 'V':
+    حالة 'V':
 	VIsual_reselect = FALSE;
-	break;
+	اكسر;
 
     // "gh":  start Select mode.
     // "gH":  start Select line mode.
     // "g^H": start Select block mode.
-    case K_BS:
+    حالة K_BS:
 	cap->nchar = Ctrl_H;
 	// FALLTHROUGH
-    case 'h':
-    case 'H':
-    case Ctrl_H:
+    حالة 'h':
+    حالة 'H':
+    حالة Ctrl_H:
 	cap->cmdchar = cap->nchar + ('v' - 'h');
 	cap->arg = TRUE;
 	nv_visual(cap);
-	break;
+	اكسر;
 
     // "gn", "gN" visually select next/previous search match
     // "gn" selects next match
     // "gN" selects previous match
-    case 'N':
-    case 'n':
-	if (!current_search(cap->count1, cap->nchar == 'n'))
+    حالة 'N':
+    حالة 'n':
+	إذا (!current_جستجو(cap->count1, cap->nchar == 'n'))
 	    clearopbeep(oap);
-	break;
+	اكسر;
 
     // "gj" and "gk" two new funny movement keys -- up and down
     // movement based on *screen* line rather than *file* line.
-    case 'j':
-    case K_DOWN:
+    حالة 'j':
+    حالة K_پایین:
 	// with 'nowrap' it works just like the normal "j" command.
-	if (!curwin->w_p_wrap)
+	إذا (!curwin->w_p_wrap)
 	{
 	    oap->motion_type = MLINE;
-	    i = cursor_down(cap->count1, oap->op_type == OP_NOP);
+	    i = cursor_پایین(cap->count1, oap->op_type == OP_NOP);
 	}
-	else
+	وإلا
 	    i = nv_screengo(oap, FORWARD, cap->count1);
-	if (i == FAIL)
+	إذا (i == FAIL)
 	    clearopbeep(oap);
-	break;
+	اكسر;
 
-    case 'k':
-    case K_UP:
+    حالة 'k':
+    حالة K_به_بالا:
 	// with 'nowrap' it works just like the normal "k" command.
-	if (!curwin->w_p_wrap)
+	إذا (!curwin->w_p_wrap)
 	{
 	    oap->motion_type = MLINE;
-	    i = cursor_up(cap->count1, oap->op_type == OP_NOP);
+	    i = cursor_به_بالا(cap->count1, oap->op_type == OP_NOP);
 	}
-	else
+	وإلا
 	    i = nv_screengo(oap, BACKWARD, cap->count1);
-	if (i == FAIL)
+	إذا (i == FAIL)
 	    clearopbeep(oap);
-	break;
+	اكسر;
 
     // "gJ": join two lines without inserting a space.
-    case 'J':
+    حالة 'J':
 	nv_join(cap);
-	break;
+	اكسر;
 
     // "g0", "g^" : Like "0" and "^" but for screen lines.
     // "gm": middle of "g0" and "g$".
-    case '^':
-    case '0':
-    case 'm':
-    case K_HOME:
-    case K_KHOME:
+    حالة '^':
+    حالة '0':
+    حالة 'm':
+    حالة K_HOME:
+    حالة K_KHOME:
 	nv_g_home_m_cmd(cap);
-	break;
+	اكسر;
 
-    case 'M':
+    حالة 'M':
 	{
 	    oap->motion_type = MCHAR;
 	    oap->inclusive = FALSE;
 	    i = linetabsize_no_outer(curwin, curwin->w_cursor.lnum);
-	    if (cap->count0 > 0 && cap->count0 <= 100)
+	    إذا (cap->count0 > 0 && cap->count0 <= 100)
 		coladvance((colnr_T)(i * cap->count0 / 100));
-	    else
+	    وإلا
 		coladvance((colnr_T)(i / 2));
-	    curwin->w_set_curswant = true;
+	    curwin->w_مجموعه_curswant = true;
 	}
-	break;
+	اكسر;
 
     // "g_": to the last non-blank character in the line or <count> lines
     // downward.
-    case '_':
+    حالة '_':
 	nv_g_underscore_cmd(cap);
-	break;
+	اكسر;
 
     // "g$" : Like "$" but for screen lines.
-    case '$':
-    case K_END:
-    case K_KEND:
+    حالة '$':
+    حالة K_انتها:
+    حالة K_KEND:
 	nv_g_dollar_cmd(cap);
-	break;
+	اكسر;
 
     // "g*" and "g#", like "*" and "#" but without using "\<" and "\>"
-    case '*':
-    case '#':
-#if POUND != '#'
-    case POUND:		// pound sign (sometimes equal to '#')
-#endif
-    case Ctrl_RSB:		// :tag or :tselect for current identifier
-    case ']':			// :tselect for current identifier
+    حالة '*':
+    حالة '#':
+#إذا POUND != '#'
+    حالة POUND:		// pound sign (sometimes equal to '#')
+#پایان_اگر
+    حالة Ctrl_RSB:		// :tag or :tselect for current identifier
+    حالة ']':			// :tselect for current identifier
 	nv_ident(cap);
-	break;
+	اكسر;
 
     // ge and gE: go back to end of word
-    case 'e':
-    case 'E':
+    حالة 'e':
+    حالة 'E':
 	oap->motion_type = MCHAR;
-	curwin->w_set_curswant = true;
+	curwin->w_مجموعه_curswant = true;
 	oap->inclusive = TRUE;
-	if (bckend_word(cap->count1, cap->nchar == 'E', FALSE) == FAIL)
+	إذا (bckend_کلمه(cap->count1, cap->nchar == 'E', FALSE) == FAIL)
 	    clearopbeep(oap);
-	break;
+	اكسر;
 
     // "g CTRL-G": display info about cursor position
-    case Ctrl_G:
-	cursor_pos_info(NULL);
-	break;
+    حالة Ctrl_G:
+	cursor_pos_info(عدم);
+	اكسر;
 
     // "gi": start Insert at the last position.
-    case 'i':
+    حالة 'i':
 	nv_gi_cmd(cap);
-	break;
+	اكسر;
 
     // "gI": Start insert in column 1.
-    case 'I':
+    حالة 'I':
 	beginline(0);
-	if (!checkclearopq(oap))
+	إذا (!checkclearopq(oap))
 	    invoke_edit(cap, FALSE, 'g', FALSE);
-	break;
+	اكسر;
 
     // "gf": goto file, edit file under cursor
     // "]f" and "[f": can also be used.
-    case 'f':
-    case 'F':
+    حالة 'f':
+    حالة 'F':
 	nv_gotofile(cap);
-	break;
+	اكسر;
 
     // "g'm" and "g`m": jump to mark without setting pcmark
-    case '\'':
+    حالة '\'':
 	cap->arg = TRUE;
 	// FALLTHROUGH
-    case '`':
+    حالة '`':
 	nv_gomark(cap);
-	break;
+	اكسر;
 
     // "gs": Goto sleep.
-    case 's':
+    حالة 's':
 	do_sleep(cap->count1 * 1000L, FALSE);
-	break;
+	اكسر;
 
     // "ga": Display the ascii value of the character under the
     // cursor.	It is displayed in decimal, hex, and octal. -- webb
-    case 'a':
-	do_ascii(NULL);
-	break;
+    حالة 'a':
+	do_ascii(عدم);
+	اكسر;
 
     // "g8": Display the bytes used for the UTF-8 character under the
     // cursor.	It is displayed in hex.
     // "8g8" finds illegal byte sequence.
-    case '8':
-	if (cap->count0 == 8)
-	    utf_find_illegal();
-	else
+    حالة '8':
+	إذا (cap->count0 == 8)
+	    utf_پیدا_کن_illegal();
+	وإلا
 	    show_utf8();
-	break;
+	اكسر;
 
     // "g<": show scrollback text
-    case '<':
-	show_sb_text();
-	break;
+    حالة '<':
+	show_sb_متن();
+	اكسر;
 
     // "gg": Goto the first line in file.  With a count it goes to
     // that line number like for "G". -- webb
-    case 'g':
+    حالة 'g':
 	cap->arg = FALSE;
 	nv_goto(cap);
-	break;
+	اكسر;
 
     //	 Two-character operators:
     //	 "gq"	    Format text
@@ -6270,151 +6270,151 @@ nv_g_cmd(cmdarg_T *cap)
     //	 "gU"	    Change text to upper case.
     //   "g?"	    rot13 encoding
     //   "g@"	    call 'operatorfunc'
-    case 'q':
-    case 'w':
-	oap->cursor_start = curwin->w_cursor;
+    حالة 'q':
+    حالة 'w':
+	oap->cursor_شروع = curwin->w_cursor;
 	// FALLTHROUGH
-    case '~':
-    case 'u':
-    case 'U':
-    case '?':
-    case '@':
+    حالة '~':
+    حالة 'u':
+    حالة 'U':
+    حالة '?':
+    حالة '@':
 	nv_operator(cap);
-	break;
+	اكسر;
 
     // "gd": Find first occurrence of pattern under the cursor in the
     //	 current function
     // "gD": idem, but in the current file.
-    case 'd':
-    case 'D':
-	nv_gd(oap, cap->nchar, (int)cap->count0);
-	break;
+    حالة 'd':
+    حالة 'D':
+	nv_gd(oap, cap->nchar, (صحيح)cap->count0);
+	اكسر;
 
     // g<*Mouse> : <C-*mouse>
-    case K_MIDDLEMOUSE:
-    case K_MIDDLEDRAG:
-    case K_MIDDLERELEASE:
-    case K_LEFTMOUSE:
-    case K_LEFTDRAG:
-    case K_LEFTRELEASE:
-    case K_MOUSEMOVE:
-    case K_RIGHTMOUSE:
-    case K_RIGHTDRAG:
-    case K_RIGHTRELEASE:
-    case K_X1MOUSE:
-    case K_X1DRAG:
-    case K_X1RELEASE:
-    case K_X2MOUSE:
-    case K_X2DRAG:
-    case K_X2RELEASE:
-	mod_mask = MOD_MASK_CTRL;
-	(void)do_mouse(oap, cap->nchar, BACKWARD, cap->count1, 0);
-	break;
+    حالة K_MIDDLEMOUSE:
+    حالة K_MIDDLEDRAG:
+    حالة K_MIDDLERELEASE:
+    حالة K_LEFTMOUSE:
+    حالة K_LEFTDRAG:
+    حالة K_LEFTRELEASE:
+    حالة K_MOUSEMOVE:
+    حالة K_RIGHTMOUSE:
+    حالة K_RIGHTDRAG:
+    حالة K_RIGHTRELEASE:
+    حالة K_X1MOUSE:
+    حالة K_X1DRAG:
+    حالة K_X1RELEASE:
+    حالة K_X2MOUSE:
+    حالة K_X2DRAG:
+    حالة K_X2RELEASE:
+	mod_ماسک = MOD_ماسک_CTRL;
+	(فراغ)do_mouse(oap, cap->nchar, BACKWARD, cap->count1, 0);
+	اكسر;
 
-    case K_IGNORE:
-	break;
+    حالة K_IGNORE:
+	اكسر;
 
     // "gP" and "gp": same as "P" and "p" but leave cursor just after new text
-    case 'p':
-    case 'P':
+    حالة 'p':
+    حالة 'P':
 	nv_put(cap);
-	break;
+	اكسر;
 
-#ifdef FEAT_BYTEOFF
+#اگر_تعریف_شده FEAT_BYTEOFF
     // "go": goto byte count from start of buffer
-    case 'o':
+    حالة 'o':
 	oap->inclusive = FALSE;
 	goto_byte(cap->count0);
-	break;
-#endif
+	اكسر;
+#پایان_اگر
 
     // "gQ": improved Ex mode
-    case 'Q':
-	if (!check_text_locked(cap->oap) && !checkclearopq(oap))
+    حالة 'Q':
+	إذا (!check_متن_locked(cap->oap) && !checkclearopq(oap))
 	    do_exmode(TRUE);
-	break;
+	اكسر;
 
-    case ',':
+    حالة ',':
 	nv_pcmark(cap);
-	break;
+	اكسر;
 
-    case ';':
+    حالة ';':
 	cap->count1 = -cap->count1;
 	nv_pcmark(cap);
-	break;
+	اكسر;
 
-    case 't':
-	if (!checkclearop(oap))
-	    goto_tabpage((int)cap->count0);
-	break;
-    case 'T':
-	if (!checkclearop(oap))
-	    goto_tabpage(-(int)cap->count1);
-	break;
+    حالة 't':
+	إذا (!checkclearop(oap))
+	    goto_tabpage((صحيح)cap->count0);
+	اكسر;
+    حالة 'T':
+	إذا (!checkclearop(oap))
+	    goto_tabpage(-(صحيح)cap->count1);
+	اكسر;
 
-    case TAB:
-	if (!checkclearop(oap) && goto_tabpage_lastused() == FAIL)
+    حالة TAB:
+	إذا (!checkclearop(oap) && goto_tabpage_lastused() == FAIL)
 	    clearopbeep(oap);
-	break;
+	اكسر;
 
-    case '+':
-    case '-': // "g+" and "g-": undo or redo along the timeline
-	if (!checkclearopq(oap))
-	    undo_time(cap->nchar == '-' ? -cap->count1 : cap->count1,
+    حالة '+':
+    حالة '-': // "g+" and "g-": undo or redo along the timeline
+	إذا (!checkclearopq(oap))
+	    undo_زمان(cap->nchar == '-' ? -cap->count1 : cap->count1,
 							 FALSE, FALSE, FALSE);
-	break;
+	اكسر;
 
-    default:
+    افتراضي:
 	clearopbeep(oap);
-	break;
+	اكسر;
     }
 }
 
 /*
  * Handle "o" and "O" commands.
  */
-    static void
+    ساكن فراغ
 n_opencmd(cmdarg_T *cap)
 {
-#ifdef FEAT_CONCEAL
+#اگر_تعریف_شده FEAT_CONCEAL
     linenr_T	oldline = curwin->w_cursor.lnum;
-#endif
+#پایان_اگر
 
-    if (checkclearopq(cap->oap))
-	return;
+    إذا (checkclearopq(cap->oap))
+	أرجع;
 
-#ifdef FEAT_FOLDING
-    if (cap->cmdchar == 'O')
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا (cap->cmdchar == 'O')
 	// Open above the first line of a folded sequence of lines
-	(void)hasFolding(curwin->w_cursor.lnum,
-		&curwin->w_cursor.lnum, NULL);
-    else
+	(فراغ)hasFolding(curwin->w_cursor.lnum,
+		&curwin->w_cursor.lnum, عدم);
+    وإلا
 	// Open below the last line of a folded sequence of lines
-	(void)hasFolding(curwin->w_cursor.lnum,
-		NULL, &curwin->w_cursor.lnum);
-#endif
+	(فراغ)hasFolding(curwin->w_cursor.lnum,
+		عدم, &curwin->w_cursor.lnum);
+#پایان_اگر
     // trigger TextChangedI for the 'o/O' command
-    curbuf->b_last_changedtick_i = CHANGEDTICK(curbuf);
-    if (u_save((linenr_T)(curwin->w_cursor.lnum -
+    curbuf->b_آخرین_changedtick_i = CHANGEDTICK(curbuf);
+    إذا (u_save((linenr_T)(curwin->w_cursor.lnum -
 		    (cap->cmdchar == 'O' ? 1 : 0)),
 		(linenr_T)(curwin->w_cursor.lnum +
 		    (cap->cmdchar == 'o' ? 1 : 0))
 	      ) == OK
-	    && open_line(cap->cmdchar == 'O' ? BACKWARD : FORWARD,
+	    && open_سطر(cap->cmdchar == 'O' ? BACKWARD : FORWARD,
 		has_format_option(FO_OPEN_COMS) ? OPENLINE_DO_COM : 0,
-		0, NULL) == OK)
+		0, عدم) == OK)
     {
-#ifdef FEAT_CONCEAL
-	if (curwin->w_p_cole > 0 && oldline != curwin->w_cursor.lnum)
+#اگر_تعریف_شده FEAT_CONCEAL
+	إذا (curwin->w_p_cole > 0 && oldline != curwin->w_cursor.lnum)
 	    redrawWinline(curwin, oldline);
-#endif
-#ifdef FEAT_SYN_HL
-	if (curwin->w_p_cul)
+#پایان_اگر
+#اگر_تعریف_شده FEAT_SYN_HL
+	إذا (curwin->w_p_cul)
 	    // force redraw of cursorline
 	    curwin->w_valid &= ~VALID_CROW;
-#endif
+#پایان_اگر
 	// When '#' is in 'cpoptions' ignore the count.
-	if (vim_strchr(p_cpo, CPO_HASH) != NULL)
+	إذا (vim_strchr(p_cpo, CPO_HASH) != عدم)
 	    cap->count1 = 1;
 	invoke_edit(cap, FALSE, cap->cmdchar, TRUE);
     }
@@ -6423,93 +6423,93 @@ n_opencmd(cmdarg_T *cap)
 /*
  * "." command: redo last change.
  */
-    static void
+    ساكن فراغ
 nv_dot(cmdarg_T *cap)
 {
-    if (checkclearopq(cap->oap))
-	return;
+    إذا (checkclearopq(cap->oap))
+	أرجع;
 
     // If "restart_edit" is TRUE, the last but one command is repeated
     // instead of the last command (inserting text). This is used for
     // CTRL-O <.> in insert mode.
-    if (start_redo(cap->count0, restart_edit != 0 && !arrow_used) == FAIL)
+    إذا (شروع_redo(cap->count0, restart_edit != 0 && !arrow_استفاده_شده) == FAIL)
 	clearopbeep(cap->oap);
 }
 
 /*
  * CTRL-R: undo undo or specify register in select mode
  */
-    static void
-nv_redo_or_register(cmdarg_T *cap)
+    ساكن فراغ
+nv_redo_or_ثبات(cmdarg_T *cap)
 {
-    if (VIsual_select && VIsual_active)
+    إذا (VIsual_select && VIsual_فعال)
     {
-	int reg;
+	صحيح reg;
 	// Get register name
 	++no_mapping;
-	++allow_keys;
+	++allow_کلیدها;
 	reg = plain_vgetc();
 	LANGMAP_ADJUST(reg, TRUE);
 	--no_mapping;
-	--allow_keys;
+	--allow_کلیدها;
 
-	if (reg == '"')
+	إذا (reg == '"')
 	    // the unnamed register is 0
 	    reg = 0;
 
 	VIsual_select_reg = valid_yank_reg(reg, TRUE) ? reg : 0;
-	return;
+	أرجع;
     }
 
-    if (checkclearopq(cap->oap))
-	return;
+    إذا (checkclearopq(cap->oap))
+	أرجع;
 
-    u_redo((int)cap->count1);
-    curwin->w_set_curswant = true;
+    u_redo((صحيح)cap->count1);
+    curwin->w_مجموعه_curswant = true;
 }
 
 /*
  * Handle "U" command.
  */
-    static void
+    ساكن فراغ
 nv_Undo(cmdarg_T *cap)
 {
     // In Visual mode and typing "gUU" triggers an operator
-    if (cap->oap->op_type == OP_UPPER || VIsual_active)
+    إذا (cap->oap->op_type == OP_فوقانی || VIsual_فعال)
     {
 	// translate "gUU" to "gUgU"
 	cap->cmdchar = 'g';
 	cap->nchar = 'U';
 	nv_operator(cap);
-	return;
+	أرجع;
     }
 
-    if (checkclearopq(cap->oap))
-	return;
+    إذا (checkclearopq(cap->oap))
+	أرجع;
 
     u_undoline();
-    curwin->w_set_curswant = true;
+    curwin->w_مجموعه_curswant = true;
 }
 
 /*
  * '~' command: If tilde is not an operator and Visual is off: swap case of a
  * single character.
  */
-    static void
+    ساكن فراغ
 nv_tilde(cmdarg_T *cap)
 {
-    if (!p_to && !VIsual_active && cap->oap->op_type != OP_TILDE)
+    إذا (!p_مقصد && !VIsual_فعال && cap->oap->op_type != OP_TILDE)
     {
-#ifdef FEAT_JOB_CHANNEL
-	if (bt_prompt(curbuf) && !prompt_curpos_editable())
+#اگر_تعریف_شده FEAT_کار_CHANNEL
+	إذا (bt_prompt(curbuf) && !prompt_curpos_editable())
 	{
 	    clearopbeep(cap->oap);
-	    return;
+	    أرجع;
 	}
-#endif
+#پایان_اگر
 	n_swapchar(cap);
     }
-    else
+    وإلا
 	nv_operator(cap);
 }
 
@@ -6517,52 +6517,52 @@ nv_tilde(cmdarg_T *cap)
  * Handle an operator command.
  * The actual work is done by do_pending_operator().
  */
-    static void
+    ساكن فراغ
 nv_operator(cmdarg_T *cap)
 {
-    int	    op_type;
+    صحيح	    op_type;
 
     op_type = get_op_type(cap->cmdchar, cap->nchar);
-#ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf) && op_is_change(op_type) && !prompt_curpos_editable())
+#اگر_تعریف_شده FEAT_کار_CHANNEL
+    إذا (bt_prompt(curbuf) && op_is_change(op_type) && !prompt_curpos_editable())
     {
 	clearopbeep(cap->oap);
-	return;
+	أرجع;
     }
-#endif
+#پایان_اگر
 
-    if (op_type == cap->oap->op_type)	    // double operator works on lines
+    إذا (op_type == cap->oap->op_type)	    // double operator works on lines
 	nv_lineop(cap);
-    else if (!checkclearop(cap->oap))
+    وإلا إذا (!checkclearop(cap->oap))
     {
-	cap->oap->start = curwin->w_cursor;
+	cap->oap->شروع = curwin->w_cursor;
 	cap->oap->op_type = op_type;
-#ifdef FEAT_EVAL
-	set_op_var(op_type);
-#endif
+#اگر_تعریف_شده FEAT_EVAL
+	مجموعه_op_var(op_type);
+#پایان_اگر
     }
 }
 
-#ifdef FEAT_EVAL
+#اگر_تعریف_شده FEAT_EVAL
 /*
  * Set v:operator to the characters for "optype".
  */
-    static void
-set_op_var(int optype)
+    ساكن فراغ
+مجموعه_op_var(صحيح optype)
 {
-    if (optype == OP_NOP)
-	set_vim_var_string(VV_OP, NULL, 0);
-    else
+    إذا (optype == OP_NOP)
+	مجموعه_vim_var_string(VV_OP, عدم, 0);
+    وإلا
     {
 	char_u	opchars[3];
 
 	opchars[0] = get_op_char(optype);
 	opchars[1] = get_extra_op_char(optype);
 	opchars[2] = NUL;
-	set_vim_var_string(VV_OP, opchars, 2);
+	مجموعه_vim_var_string(VV_OP, opchars, 2);
     }
 }
-#endif
+#پایان_اگر
 
 /*
  * Handle linewise operator "dd", "yy", etc.
@@ -6573,32 +6573,32 @@ set_op_var(int optype)
  * are really an alternate form of "d_" and "y_".  It does accept a count, so
  * "d3_" works to delete 3 lines.
  */
-    static void
+    ساكن فراغ
 nv_lineop(cmdarg_T *cap)
 {
     cap->oap->motion_type = MLINE;
-    if (cursor_down(cap->count1 - 1L, cap->oap->op_type == OP_NOP) == FAIL)
+    إذا (cursor_پایین(cap->count1 - 1L, cap->oap->op_type == OP_NOP) == FAIL)
 	clearopbeep(cap->oap);
-    else if (  (cap->oap->op_type == OP_DELETE // only with linewise motions
+    وإلا إذا (  (cap->oap->op_type == OP_DELETE // only with linewise motions
 		&& cap->oap->motion_force != 'v'
 		&& cap->oap->motion_force != Ctrl_V)
 	    || cap->oap->op_type == OP_LSHIFT
 	    || cap->oap->op_type == OP_RSHIFT)
 	beginline(BL_SOL | BL_FIX);
-    else if (cap->oap->op_type != OP_YANK)	// 'Y' does not move cursor
+    وإلا إذا (cap->oap->op_type != OP_YANK)	// 'Y' does not move cursor
 	beginline(BL_WHITE | BL_FIX);
 }
 
 /*
  * <Home> command.
  */
-    static void
+    ساكن فراغ
 nv_home(cmdarg_T *cap)
 {
     // CTRL-HOME is like "gg"
-    if (mod_mask & MOD_MASK_CTRL)
+    إذا (mod_ماسک & MOD_ماسک_CTRL)
 	nv_goto(cap);
-    else
+    وإلا
     {
 	cap->count0 = 1;
 	nv_pipe(cap);
@@ -6610,25 +6610,25 @@ nv_home(cmdarg_T *cap)
 /*
  * "|" command.
  */
-    static void
+    ساكن فراغ
 nv_pipe(cmdarg_T *cap)
 {
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = FALSE;
     // Not using beginline(), the columns to skip for 'smoothscroll' must be
     // adjusted for the column we end up in, not for column zero.
-    curwin->w_cursor.col = 0;
+    curwin->w_cursor.ستون = 0;
     curwin->w_cursor.coladd = 0;
-    if (cap->count0 > 0)
+    إذا (cap->count0 > 0)
     {
 	coladvance((colnr_T)(cap->count0 - 1));
 	curwin->w_curswant = (colnr_T)(cap->count0 - 1);
     }
-    else
+    وإلا
 	curwin->w_curswant = 0;
     // keep curswant at the column where we wanted to go, not where
     // we ended; differs if line is too short
-    curwin->w_set_curswant = false;
+    curwin->w_مجموعه_curswant = false;
     adjust_skipcol();
 }
 
@@ -6636,59 +6636,59 @@ nv_pipe(cmdarg_T *cap)
  * Handle back-word command "b" and "B".
  * cap->arg is 1 for "B"
  */
-    static void
-nv_bck_word(cmdarg_T *cap)
+    ساكن فراغ
+nv_bck_کلمه(cmdarg_T *cap)
 {
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = FALSE;
-    curwin->w_set_curswant = true;
-    if (bck_word(cap->count1, cap->arg, FALSE) == FAIL)
+    curwin->w_مجموعه_curswant = true;
+    إذا (bck_کلمه(cap->count1, cap->arg, FALSE) == FAIL)
 	clearopbeep(cap->oap);
-#ifdef FEAT_FOLDING
-    else if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+#اگر_تعریف_شده FEAT_FOLDING
+    وإلا إذا ((fdo_flags & FDO_HOR) && کلید_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
-#endif
+#پایان_اگر
 }
 
 /*
  * Handle word motion commands "e", "E", "w" and "W".
  * cap->arg is TRUE for "E" and "W".
  */
-    static void
+    ساكن فراغ
 nv_wordcmd(cmdarg_T *cap)
 {
-    int		n;
-    int		word_end;
-    int		flag = FALSE;
+    صحيح		n;
+    صحيح		کلمه_انتها;
+    صحيح		flag = FALSE;
     pos_T	startpos = curwin->w_cursor;
 
     // Set inclusive for the "E" and "e" command.
-    if (cap->cmdchar == 'e' || cap->cmdchar == 'E')
-	word_end = TRUE;
-    else
-	word_end = FALSE;
-    cap->oap->inclusive = word_end;
+    إذا (cap->cmdchar == 'e' || cap->cmdchar == 'E')
+	کلمه_انتها = TRUE;
+    وإلا
+	کلمه_انتها = FALSE;
+    cap->oap->inclusive = کلمه_انتها;
 
     // "cw" and "cW" are a special case.
-    if (!word_end && cap->oap->op_type == OP_CHANGE)
+    إذا (!کلمه_انتها && cap->oap->op_type == OP_CHANGE)
     {
 	n = gchar_cursor();
-	if (n != NUL)			// not an empty line
+	إذا (n != NUL)			// not an empty line
 	{
-	    if (VIM_ISWHITE(n))
+	    إذا (VIM_ISWHITE(n))
 	    {
 		// Reproduce a funny Vi behaviour: "cw" on a blank only
 		// changes one character, not all blanks until the start of
 		// the next word.  Only do this when the 'w' flag is included
 		// in 'cpoptions'.
-		if (cap->count1 == 1 && vim_strchr(p_cpo, CPO_CW) != NULL)
+		إذا (cap->count1 == 1 && vim_strchr(p_cpo, CPO_CW) != عدم)
 		{
 		    cap->oap->inclusive = TRUE;
 		    cap->oap->motion_type = MCHAR;
-		    return;
+		    أرجع;
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		// This is a little strange. To match what the real Vi does,
 		// we effectively map 'cw' to 'ce', and 'cW' to 'cE', provided
@@ -6700,10 +6700,10 @@ nv_wordcmd(cmdarg_T *cap)
 		// will change only one character! This is done by setting
 		// flag.
 		// This can be configured using :set cpo-z
-		if (vim_strchr(p_cpo, CPO_WORD) != NULL)
+		إذا (vim_strchr(p_cpo, CPO_کلمه) != عدم)
 		{
 		    cap->oap->inclusive = TRUE;
-		    word_end = TRUE;
+		    کلمه_انتها = TRUE;
 		}
 		flag = TRUE;
 	    }
@@ -6711,26 +6711,26 @@ nv_wordcmd(cmdarg_T *cap)
     }
 
     cap->oap->motion_type = MCHAR;
-    curwin->w_set_curswant = true;
-    if (word_end)
-	n = end_word(cap->count1, cap->arg, flag, FALSE);
-    else
-	n = fwd_word(cap->count1, cap->arg, cap->oap->op_type != OP_NOP);
+    curwin->w_مجموعه_curswant = true;
+    إذا (کلمه_انتها)
+	n = انتها_کلمه(cap->count1, cap->arg, flag, FALSE);
+    وإلا
+	n = fwd_کلمه(cap->count1, cap->arg, cap->oap->op_type != OP_NOP);
 
     // Don't leave the cursor on the NUL past the end of line. Unless we
     // didn't move it forward.
-    if (LT_POS(startpos, curwin->w_cursor))
+    إذا (LT_POS(startpos, curwin->w_cursor))
 	adjust_cursor(cap->oap);
 
-    if (n == FAIL && cap->oap->op_type == OP_NOP)
+    إذا (n == FAIL && cap->oap->op_type == OP_NOP)
 	clearopbeep(cap->oap);
-    else
+    وإلا
     {
 	adjust_for_sel(cap);
-#ifdef FEAT_FOLDING
-	if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+#اگر_تعریف_شده FEAT_FOLDING
+	إذا ((fdo_flags & FDO_HOR) && کلید_Typed && cap->oap->op_type == OP_NOP)
 	    foldOpenCursor();
-#endif
+#پایان_اگر
     }
 }
 
@@ -6739,20 +6739,20 @@ nv_wordcmd(cmdarg_T *cap)
  * end of the line, may move it back to the last character and make the motion
  * inclusive.
  */
-    static void
+    ساكن فراغ
 adjust_cursor(oparg_T *oap)
 {
     // The cursor cannot remain on the NUL when:
     // - the column is > 0
     // - not in Visual mode or 'selection' is "o"
     // - 'virtualedit' is not "all" and not "onemore".
-    if (curwin->w_cursor.col > 0 && gchar_cursor() == NUL
-		&& (!VIsual_active || *p_sel == 'o')
-		&& !virtual_active() && (get_ve_flags() & VE_ONEMORE) == 0)
+    إذا (curwin->w_cursor.ستون > 0 && gchar_cursor() == NUL
+		&& (!VIsual_فعال || *p_sel == 'o')
+		&& !virtual_فعال() && (get_ve_flags() & VE_ONEMORE) == 0)
     {
-	--curwin->w_cursor.col;
+	--curwin->w_cursor.ستون;
 	// prevent cursor from moving on the trail byte
-	if (has_mbyte)
+	إذا (has_mbyte)
 	    mb_adjust_cursor();
 	oap->inclusive = TRUE;
     }
@@ -6762,16 +6762,16 @@ adjust_cursor(oparg_T *oap)
  * "0" and "^" commands.
  * cap->arg is the argument for beginline().
  */
-    static void
+    ساكن فراغ
 nv_beginline(cmdarg_T *cap)
 {
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = FALSE;
     beginline(cap->arg);
-#ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا ((fdo_flags & FDO_HOR) && کلید_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
-#endif
+#پایان_اگر
     ins_at_eol = FALSE;	    // Don't move cursor past eol (only necessary in a
 			    // one-character line).
 }
@@ -6779,16 +6779,16 @@ nv_beginline(cmdarg_T *cap)
 /*
  * In exclusive Visual mode, may include the last character.
  */
-    static void
+    ساكن فراغ
 adjust_for_sel(cmdarg_T *cap)
 {
-    if (VIsual_active && cap->oap->inclusive && *p_sel == 'e'
+    إذا (VIsual_فعال && cap->oap->inclusive && *p_sel == 'e'
 	    && gchar_cursor() != NUL && LT_POS(VIsual, curwin->w_cursor))
     {
-	if (has_mbyte)
+	إذا (has_mbyte)
 	    inc_cursor();
-	else
-	    ++curwin->w_cursor.col;
+	وإلا
+	    ++curwin->w_cursor.ستون;
 	cap->oap->inclusive = FALSE;
 	VIsual_select_exclu_adj = TRUE;
     }
@@ -6799,59 +6799,59 @@ adjust_for_sel(cmdarg_T *cap)
  * Should check VIsual_mode before calling this.
  * Returns TRUE when backed up to the previous line.
  */
-    int
-unadjust_for_sel(void)
+    صحيح
+unadjust_for_sel(فراغ)
 {
-    if (*p_sel == 'e' && !EQUAL_POS(VIsual, curwin->w_cursor))
-	return unadjust_for_sel_inner(LT_POS(VIsual, curwin->w_cursor)
+    إذا (*p_sel == 'e' && !EQUAL_POS(VIsual, curwin->w_cursor))
+	أرجع unadjust_for_sel_inner(LT_POS(VIsual, curwin->w_cursor)
 					? &curwin->w_cursor : &VIsual);
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
  * Move position "*pp" back one character for 'selection' == "exclusive".
  * Returns TRUE when backed up to the previous line.
  */
-    int
+    صحيح
 unadjust_for_sel_inner(pos_T *pp)
 {
     colnr_T	cs, ce;
     VIsual_select_exclu_adj = FALSE;
 
-    if (pp->coladd > 0)
+    إذا (pp->coladd > 0)
 	--pp->coladd;
-    else if (pp->col > 0)
+    وإلا إذا (pp->ستون > 0)
     {
-	--pp->col;
+	--pp->ستون;
 	mb_adjustpos(curbuf, pp);
-	if (virtual_active())
+	إذا (virtual_فعال())
 	{
-	    getvcol(curwin, pp, &cs, NULL, &ce, 0);
+	    getvcol(curwin, pp, &cs, عدم, &ce, 0);
 	    pp->coladd = ce - cs;
 	}
     }
-    else if (pp->lnum > 1)
+    وإلا إذا (pp->lnum > 1)
     {
 	--pp->lnum;
-	pp->col = ml_get_len(pp->lnum);
-	return TRUE;
+	pp->ستون = ml_get_len(pp->lnum);
+	أرجع TRUE;
     }
 
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
  * SELECT key in Normal or Visual mode: end of Select mode mapping.
  */
-    static void
+    ساكن فراغ
 nv_select(cmdarg_T *cap)
 {
-    if (VIsual_active)
+    إذا (VIsual_فعال)
     {
 	VIsual_select = TRUE;
 	VIsual_select_reg = 0;
     }
-    else if (VIsual_reselect)
+    وإلا إذا (VIsual_reselect)
     {
 	cap->nchar = 'v';	    // fake "gv" command
 	cap->arg = TRUE;
@@ -6864,57 +6864,57 @@ nv_select(cmdarg_T *cap)
  * "G", "gg", CTRL-END, CTRL-HOME.
  * cap->arg is TRUE for "G".
  */
-    static void
+    ساكن فراغ
 nv_goto(cmdarg_T *cap)
 {
     linenr_T	lnum;
 
-    if (cap->arg)
-	lnum = curbuf->b_ml.ml_line_count;
-    else
+    إذا (cap->arg)
+	lnum = curbuf->b_ml.ml_سطر_شمار;
+    وإلا
 	lnum = 1L;
     cap->oap->motion_type = MLINE;
     setpcmark();
 
     // When a count is given, use it instead of the default lnum
-    if (cap->count0 != 0)
+    إذا (cap->count0 != 0)
 	lnum = cap->count0;
-    if (lnum < 1L)
+    إذا (lnum < 1L)
 	lnum = 1L;
-    else if (lnum > curbuf->b_ml.ml_line_count)
-	lnum = curbuf->b_ml.ml_line_count;
+    وإلا إذا (lnum > curbuf->b_ml.ml_سطر_شمار)
+	lnum = curbuf->b_ml.ml_سطر_شمار;
     curwin->w_cursor.lnum = lnum;
     beginline(BL_SOL | BL_FIX);
-#ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_JUMP) && KeyTyped && cap->oap->op_type == OP_NOP)
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا ((fdo_flags & FDO_JUMP) && کلید_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
-#endif
+#پایان_اگر
 }
 
 /*
  * CTRL-\ in Normal mode.
  */
-    static void
-nv_normal(cmdarg_T *cap)
+    ساكن فراغ
+nv_نرمال(cmdarg_T *cap)
 {
-    if (cap->nchar == Ctrl_N || cap->nchar == Ctrl_G)
+    إذا (cap->nchar == Ctrl_N || cap->nchar == Ctrl_G)
     {
 	clearop(cap->oap);
-	if (restart_edit != 0 && mode_displayed)
+	إذا (restart_edit != 0 && نما_displayed)
 	    clear_cmdline = TRUE;		// unshow mode later
 	restart_edit = 0;
-	if (cmdwin_type != 0)
-	    cmdwin_result = Ctrl_C;
-	if (VIsual_active)
+	إذا (cmdwin_type != 0)
+	    cmdwin_نتیجه = Ctrl_C;
+	إذا (VIsual_فعال)
 	{
-	    end_visual_mode();		// stop Visual
+	    انتها_visual_نما();		// stop Visual
 	    redraw_curbuf_later(UPD_INVERTED);
 	}
 	// CTRL-\ CTRL-G restarts Insert mode when 'insertmode' is set.
-	if (cap->nchar == Ctrl_G && p_im)
+	إذا (cap->nchar == Ctrl_G && p_im)
 	    restart_edit = 'a';
     }
-    else
+    وإلا
 	clearopbeep(cap->oap);
 }
 
@@ -6922,10 +6922,10 @@ nv_normal(cmdarg_T *cap)
  * ESC in Normal mode: beep, but don't flush buffers.
  * Don't even beep if we are canceling a command.
  */
-    static void
+    ساكن فراغ
 nv_esc(cmdarg_T *cap)
 {
-    int		no_reason;
+    صحيح		no_reason;
 
     no_reason = (cap->oap->op_type == OP_NOP
 		&& cap->opcount == 0
@@ -6933,167 +6933,167 @@ nv_esc(cmdarg_T *cap)
 		&& cap->oap->regname == 0
 		&& !p_im);
 
-    if (cap->arg)		// TRUE for CTRL-C
+    إذا (cap->arg)		// TRUE for CTRL-C
     {
-	if (restart_edit == 0 && cmdwin_type == 0
-						&& !VIsual_active && no_reason)
+	إذا (restart_edit == 0 && cmdwin_type == 0
+						&& !VIsual_فعال && no_reason)
 	{
-	    int	out_redir = !stdout_isatty && !is_not_a_term_or_gui();
+	    صحيح	بیرون_redir = !stdout_isatty && !is_not_a_جمله_or_gui();
 
 	    // The user may accidentally do "vim file | grep word" and then
 	    // CTRL-C doesn't show anything.  With a changed buffer give the
 	    // message on stderr.  Without any changes might as well exit.
-	    if (anyBufIsChanged())
+	    إذا (any_Buf_Is_تغییریافته())
 	    {
-		char *ms = _("Type  :qa!  and press <Enter> to abandon all changes and exit Vim");
+		حرف *ms = _("Type  :qa!  and press <Enter> to abandon all changes and exit Vim");
 
-		if (out_redir)
+		إذا (بیرون_redir)
 		    mch_errmsg(ms);
-		else
-		    msg(ms);
+		وإلا
+		    پیام(ms);
 	    }
-	    else
+	    وإلا
 	    {
-		if (out_redir)
+		إذا (بیرون_redir)
 		{
 		    got_int = FALSE;
 		    do_cmdline_cmd((char_u *)"qa");
 		}
-		else
-		    msg(_("Type  :qa  and press <Enter> to exit Vim"));
+		وإلا
+		    پیام(_("Type  :qa  and press <Enter> to exit Vim"));
 	    }
 	}
 
-	if (restart_edit != 0)
-	    redraw_mode = TRUE;  // remove "-- (insert) --"
+	إذا (restart_edit != 0)
+	    redraw_نما = TRUE;  // remove "-- (insert) --"
 
 	// Don't reset "restart_edit" when 'insertmode' is set, it won't be
 	// set again below when halfway a mapping.
-	if (!p_im)
+	إذا (!p_im)
 	    restart_edit = 0;
-	if (cmdwin_type != 0)
+	إذا (cmdwin_type != 0)
 	{
-	    cmdwin_result = K_IGNORE;
+	    cmdwin_نتیجه = K_IGNORE;
 	    got_int = FALSE;	// don't stop executing autocommands et al.
-	    return;
+	    أرجع;
 	}
     }
-    else if (cmdwin_type != 0 && ex_normal_busy && typebuf_was_empty)
+    وإلا إذا (cmdwin_type != 0 && ex_نرمال_busy && typebuf_was_خالی)
     {
 	// When :normal runs out of characters while in the command line window
 	// vgetorpeek() will repeatedly return ESC.  Exit the cmdline window to
 	// break the loop.
-	cmdwin_result = K_IGNORE;
-	return;
+	cmdwin_نتیجه = K_IGNORE;
+	أرجع;
     }
 
-    if (VIsual_active)
+    إذا (VIsual_فعال)
     {
-	end_visual_mode();	// stop Visual
-	check_cursor_col();	// make sure cursor is not beyond EOL
-	curwin->w_set_curswant = true;
+	انتها_visual_نما();	// stop Visual
+	check_cursor_ستون();	// make sure cursor is not beyond EOL
+	curwin->w_مجموعه_curswant = true;
 	redraw_curbuf_later(UPD_INVERTED);
     }
-    else if (no_reason)
+    وإلا إذا (no_reason)
     {
-#ifdef HAS_MESSAGE_WINDOW
-	if (!cap->arg && popup_message_win_visible())
-	    popup_hide_message_win();
-	else
-#endif
+#اگر_تعریف_شده HAS_پیام_پنجره
+	إذا (!cap->arg && popup_پیام_win_visible())
+	    popup_hide_پیام_win();
+	وإلا
+#پایان_اگر
 	    vim_beep(BO_ESC);
     }
     clearop(cap->oap);
 
     // A CTRL-C is often used at the start of a menu.  When 'insertmode' is
     // set return to Insert mode afterwards.
-    if (restart_edit == 0 && goto_im() && ex_normal_busy == 0)
+    إذا (restart_edit == 0 && goto_im() && ex_نرمال_busy == 0)
 	restart_edit = 'a';
 }
 
 /*
  * Move the cursor for the "A" command.
  */
-    void
-set_cursor_for_append_to_line(void)
+    فراغ
+مجموعه_cursor_for_append_مقصد_سطر(فراغ)
 {
-    curwin->w_set_curswant = true;
-    if (get_ve_flags() == VE_ALL)
+    curwin->w_مجموعه_curswant = true;
+    إذا (get_ve_flags() == VE_ALL)
     {
-	int save_State = State;
+	صحيح save_State = State;
 
 	// Pretend Insert mode here to allow the cursor on the
 	// character past the end of the line
-	State = MODE_INSERT;
+	State = نما_درج;
 	coladvance((colnr_T)MAXCOL);
 	State = save_State;
     }
-    else
-	curwin->w_cursor.col += (colnr_T)STRLEN(ml_get_cursor());
+    وإلا
+	curwin->w_cursor.ستون += (colnr_T)STRLEN(ml_get_cursor());
 }
 
 /*
  * Handle "A", "a", "I", "i" and <Insert> commands.
  * Also handle K_PS, start bracketed paste.
  */
-    static void
+    ساكن فراغ
 nv_edit(cmdarg_T *cap)
 {
     // <Insert> is equal to "i"
-    if (cap->cmdchar == K_INS || cap->cmdchar == K_KINS)
+    إذا (cap->cmdchar == K_INS || cap->cmdchar == K_KINS)
 	cap->cmdchar = 'i';
 
     // in Visual mode "A" and "I" are an operator
-    if (VIsual_active && (cap->cmdchar == 'A' || cap->cmdchar == 'I'))
+    إذا (VIsual_فعال && (cap->cmdchar == 'A' || cap->cmdchar == 'I'))
     {
-#ifdef FEAT_TERMINAL
-	if (term_in_normal_mode(curbuf))
+#اگر_تعریف_شده FEAT_TERMINAL
+	إذا (جمله_درون_نرمال_نما(curbuf))
 	{
-	    end_visual_mode();
+	    انتها_visual_نما();
 	    clearop(cap->oap);
-	    term_enter_job_mode();
-	    return;
+	    جمله_enter_کار_نما();
+	    أرجع;
 	}
-#endif
+#پایان_اگر
 	v_visop(cap);
     }
 
     // in Visual mode and after an operator "a" and "i" are for text objects
-    else if ((cap->cmdchar == 'a' || cap->cmdchar == 'i')
-	    && (cap->oap->op_type != OP_NOP || VIsual_active))
+    وإلا إذا ((cap->cmdchar == 'a' || cap->cmdchar == 'i')
+	    && (cap->oap->op_type != OP_NOP || VIsual_فعال))
     {
 	nv_object(cap);
     }
-#ifdef FEAT_TERMINAL
-    else if (term_in_normal_mode(curbuf))
+#اگر_تعریف_شده FEAT_TERMINAL
+    وإلا إذا (جمله_درون_نرمال_نما(curbuf))
     {
 	clearop(cap->oap);
-	term_enter_job_mode();
-	return;
+	جمله_enter_کار_نما();
+	أرجع;
     }
-#endif
-    else if (!curbuf->b_p_ma && !p_im)
+#پایان_اگر
+    وإلا إذا (!curbuf->b_p_ma && !p_im)
     {
 	// Only give this error when 'insertmode' is off.
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
 	clearop(cap->oap);
-	if (cap->cmdchar == K_PS)
+	إذا (cap->cmdchar == K_PS)
 	    // drop the pasted text
-	    bracketed_paste(PASTE_INSERT, TRUE, NULL);
+	    bracketed_paste(PASTE_درج, TRUE, عدم);
     }
-    else if (cap->cmdchar == K_PS && VIsual_active)
+    وإلا إذا (cap->cmdchar == K_PS && VIsual_فعال)
     {
 	pos_T old_pos = curwin->w_cursor;
 	pos_T old_visual = VIsual;
-	int old_visual_mode = VIsual_mode;
+	صحيح old_visual_نما = VIsual_نما;
 
 	// In Visual mode the selected text is deleted.
-	if (VIsual_mode == 'V' || curwin->w_cursor.lnum != VIsual.lnum)
+	إذا (VIsual_نما == 'V' || curwin->w_cursor.lnum != VIsual.lnum)
 	{
-	    shift_delete_registers();
+	    لغزش_delete_registers();
 	    cap->oap->regname = '1';
 	}
-	else
+	وإلا
 	    cap->oap->regname = '-';
 	cap->cmdchar = 'd';
 	cap->nchar = NUL;
@@ -7101,107 +7101,107 @@ nv_edit(cmdarg_T *cap)
 	do_pending_operator(cap, 0, FALSE);
 	cap->cmdchar = K_PS;
 
-	if (*ml_get_cursor() != NUL)
+	إذا (*ml_get_cursor() != NUL)
 	{
-	    if (old_visual_mode == 'V')
+	    إذا (old_visual_نما == 'V')
 	    {
 		// In linewise Visual mode insert before the beginning of the
 		// next line.
 		// When the last line in the buffer was deleted then create a
 		// new line, otherwise there is not need to move cursor.
 		// Detect this by checking if cursor moved above Visual area.
-		if (curwin->w_cursor.lnum < old_pos.lnum
+		إذا (curwin->w_cursor.lnum < old_pos.lnum
 				&& curwin->w_cursor.lnum < old_visual.lnum)
 		{
-		    if (u_save_cursor() == OK)
+		    إذا (u_save_cursor() == OK)
 		    {
 			ml_append(curwin->w_cursor.lnum, (char_u *)"", 0,
 									FALSE);
-			appended_lines(curwin->w_cursor.lnum++, 1L);
+			appended_سطرها(curwin->w_cursor.lnum++, 1L);
 		    }
 		}
 	    }
 	    // When the last char in the line was deleted then append.
 	    // Detect this by checking if cursor moved before Visual area.
-	    else if (curwin->w_cursor.col < old_pos.col
-				&& curwin->w_cursor.col < old_visual.col)
+	    وإلا إذا (curwin->w_cursor.ستون < old_pos.ستون
+				&& curwin->w_cursor.ستون < old_visual.ستون)
 		inc_cursor();
 	}
 
 	// Insert to replace the deleted text with the pasted text.
 	invoke_edit(cap, FALSE, cap->cmdchar, FALSE);
     }
-    else if (!checkclearopq(cap->oap))
+    وإلا إذا (!checkclearopq(cap->oap))
     {
-	switch (cap->cmdchar)
+	بدل (cap->cmdchar)
 	{
-	    case 'A':	// "A"ppend after the line
-		set_cursor_for_append_to_line();
-		break;
+	    حالة 'A':	// "A"ppend after the line
+		مجموعه_cursor_for_append_مقصد_سطر();
+		اكسر;
 
-	    case 'I':	// "I"nsert before the first non-blank
-		if (vim_strchr(p_cpo, CPO_INSEND) == NULL)
+	    حالة 'I':	// "I"nsert before the first non-blank
+		إذا (vim_strchr(p_cpo, CPO_INSEND) == عدم)
 		    beginline(BL_WHITE);
-		else
+		وإلا
 		    beginline(BL_WHITE|BL_FIX);
-		break;
+		اكسر;
 
-	    case K_PS:
+	    حالة K_PS:
 		// Bracketed paste works like "a"ppend, unless the cursor is in
 		// the first column, then it inserts.
-		if (curwin->w_cursor.col == 0)
-		    break;
+		إذا (curwin->w_cursor.ستون == 0)
+		    اكسر;
 		// FALLTHROUGH
 
-	    case 'a':	// "a"ppend is like "i"nsert on the next character.
+	    حالة 'a':	// "a"ppend is like "i"nsert on the next character.
 		// increment coladd when in virtual space, increment the
 		// column otherwise, also to append after an unprintable char
-		if (virtual_active()
+		إذا (virtual_فعال()
 			&& (curwin->w_cursor.coladd > 0
 			    || *ml_get_cursor() == NUL
 			    || *ml_get_cursor() == TAB))
 		    curwin->w_cursor.coladd++;
-		else if (*ml_get_cursor() != NUL)
+		وإلا إذا (*ml_get_cursor() != NUL)
 		    inc_cursor();
-		break;
+		اكسر;
 	}
 
-	if (curwin->w_cursor.coladd && cap->cmdchar != 'A')
+	إذا (curwin->w_cursor.coladd && cap->cmdchar != 'A')
 	{
-	    int save_State = State;
+	    صحيح save_State = State;
 
 	    // Pretend Insert mode here to allow the cursor on the
 	    // character past the end of the line
-	    State = MODE_INSERT;
+	    State = نما_درج;
 	    coladvance(getviscol());
 	    State = save_State;
 	}
 
 	invoke_edit(cap, FALSE, cap->cmdchar, FALSE);
     }
-    else if (cap->cmdchar == K_PS)
+    وإلا إذا (cap->cmdchar == K_PS)
 	// drop the pasted text
-	bracketed_paste(PASTE_INSERT, TRUE, NULL);
+	bracketed_paste(PASTE_درج, TRUE, عدم);
 }
 
 /*
  * Invoke edit() and take care of "restart_edit" and the return value.
  */
-    static void
+    ساكن فراغ
 invoke_edit(
     cmdarg_T	*cap,
-    int		repl,		// "r" or "gr" command
-    int		cmd,
-    int		startln)
+    صحيح		repl,		// "r" or "gr" command
+    صحيح		cmd,
+    صحيح		startln)
 {
-    int		restart_edit_save = 0;
+    صحيح		restart_edit_save = 0;
 
     // Complicated: When the user types "a<C-O>a" we don't want to do Insert
     // mode recursively.  But when doing "a<C-O>." or "a<C-O>rx" we do allow
     // it.
-    if (repl || !stuff_empty())
+    إذا (repl || !stuff_خالی())
 	restart_edit_save = restart_edit;
-    else
+    وإلا
 	restart_edit_save = 0;
 
     // Always reset "restart_edit", this is not a restarted edit.
@@ -7209,214 +7209,214 @@ invoke_edit(
 
     // Reset Changedtick_i, so that TextChangedI will only be triggered for stuff
     // from insert mode, for 'o/O' this has already been done in n_opencmd
-    if (cap->cmdchar != 'O' && cap->cmdchar != 'o')
-	curbuf->b_last_changedtick_i = CHANGEDTICK(curbuf);
-    if (edit(cmd, startln, cap->count1))
+    إذا (cap->cmdchar != 'O' && cap->cmdchar != 'o')
+	curbuf->b_آخرین_changedtick_i = CHANGEDTICK(curbuf);
+    إذا (edit(cmd, startln, cap->count1))
 	cap->retval |= CA_COMMAND_BUSY;
 
-    if (restart_edit == 0)
+    إذا (restart_edit == 0)
 	restart_edit = restart_edit_save;
 }
 
 /*
  * "a" or "i" while an operator is pending or in Visual mode: object motion.
  */
-    static void
+    ساكن فراغ
 nv_object(
     cmdarg_T	*cap)
 {
-    int		flag;
-    int		include;
+    صحيح		flag;
+    صحيح		include;
     char_u	*mps_save;
 
-    if (cap->cmdchar == 'i')
+    إذا (cap->cmdchar == 'i')
 	include = FALSE;    // "ix" = inner object: exclude white space
-    else
+    وإلا
 	include = TRUE;	    // "ax" = an object: include white space
 
     // Make sure (), [], {} and <> are in 'matchpairs'
     mps_save = curbuf->b_p_mps;
     curbuf->b_p_mps = (char_u *)"(:),{:},[:],<:>";
 
-    switch (cap->nchar)
+    بدل (cap->nchar)
     {
-	case 'w': // "aw" = a word
-		flag = current_word(cap->oap, cap->count1, include, FALSE);
-		break;
-	case 'W': // "aW" = a WORD
-		flag = current_word(cap->oap, cap->count1, include, TRUE);
-		break;
-	case 'b': // "ab" = a braces block
-	case '(':
-	case ')':
-		flag = current_block(cap->oap, cap->count1, include, '(', ')');
-		break;
-	case 'B': // "aB" = a Brackets block
-	case '{':
-	case '}':
-		flag = current_block(cap->oap, cap->count1, include, '{', '}');
-		break;
-	case '[': // "a[" = a [] block
-	case ']':
-		flag = current_block(cap->oap, cap->count1, include, '[', ']');
-		break;
-	case '<': // "a<" = a <> block
-	case '>':
-		flag = current_block(cap->oap, cap->count1, include, '<', '>');
-		break;
-#ifdef FEAT_EVAL
-	case 't': // "at" = a tag block (xml and html)
+	حالة 'w': // "aw" = a word
+		flag = current_کلمه(cap->oap, cap->count1, include, FALSE);
+		اكسر;
+	حالة 'W': // "aW" = a WORD
+		flag = current_کلمه(cap->oap, cap->count1, include, TRUE);
+		اكسر;
+	حالة 'b': // "ab" = a braces block
+	حالة '(':
+	حالة ')':
+		flag = current_بلوک(cap->oap, cap->count1, include, '(', ')');
+		اكسر;
+	حالة 'B': // "aB" = a Brackets block
+	حالة '{':
+	حالة '}':
+		flag = current_بلوک(cap->oap, cap->count1, include, '{', '}');
+		اكسر;
+	حالة '[': // "a[" = a [] block
+	حالة ']':
+		flag = current_بلوک(cap->oap, cap->count1, include, '[', ']');
+		اكسر;
+	حالة '<': // "a<" = a <> block
+	حالة '>':
+		flag = current_بلوک(cap->oap, cap->count1, include, '<', '>');
+		اكسر;
+#اگر_تعریف_شده FEAT_EVAL
+	حالة 't': // "at" = a tag block (xml and html)
 		// Do not adjust oap->end in do_pending_operator()
 		// otherwise there are different results for 'dit'
 		// (note leading whitespace in last line):
 		// 1) <b>      2) <b>
 		//    foobar      foobar
 		//    </b>            </b>
-		cap->retval |= CA_NO_ADJ_OP_END;
+		cap->retval |= CA_NO_ADJ_OP_انتها;
 		flag = current_tagblock(cap->oap, cap->count1, include);
-		break;
-#endif
-	case 'p': // "ap" = a paragraph
+		اكسر;
+#پایان_اگر
+	حالة 'p': // "ap" = a paragraph
 		flag = current_par(cap->oap, cap->count1, include, 'p');
-		break;
-	case 's': // "as" = a sentence
-		flag = current_sent(cap->oap, cap->count1, include);
-		break;
-	case '"': // "a"" = a double quoted string
-	case '\'': // "a'" = a single quoted string
-	case '`': // "a`" = a backtick quoted string
+		اكسر;
+	حالة 's': // "as" = a sentence
+		flag = current_فرستاده(cap->oap, cap->count1, include);
+		اكسر;
+	حالة '"': // "a"" = a double quoted string
+	حالة '\'': // "a'" = a single quoted string
+	حالة '`': // "a`" = a backtick quoted string
 		flag = current_quote(cap->oap, cap->count1, include,
 								  cap->nchar);
-		break;
-#if 0	// TODO
-	case 'S': // "aS" = a section
-	case 'f': // "af" = a filename
-	case 'u': // "au" = a URL
-#endif
-	default:
+		اكسر;
+#إذا 0	// TODO
+	حالة 'S': // "aS" = a section
+	حالة 'f': // "af" = a filename
+	حالة 'u': // "au" = a URL
+#پایان_اگر
+	افتراضي:
 		flag = FAIL;
-		break;
+		اكسر;
     }
 
     curbuf->b_p_mps = mps_save;
-    if (flag == FAIL)
+    إذا (flag == FAIL)
 	clearopbeep(cap->oap);
-    adjust_cursor_col();
-    curwin->w_set_curswant = true;
+    adjust_cursor_ستون();
+    curwin->w_مجموعه_curswant = true;
 }
 
 /*
  * "q" command: Start/stop recording.
  * "q:", "q/", "q?": edit command-line in command-line window.
  */
-    static void
-nv_record(cmdarg_T *cap)
+    ساكن فراغ
+nv_رکورد(cmdarg_T *cap)
 {
-    if (cap->oap->op_type == OP_FORMAT)
+    إذا (cap->oap->op_type == OP_FORMAT)
     {
 	// "gqq" is the same as "gqgq": format line
 	cap->cmdchar = 'g';
 	cap->nchar = 'q';
 	nv_operator(cap);
-	return;
+	أرجع;
     }
 
-    if (checkclearop(cap->oap))
-	return;
+    إذا (checkclearop(cap->oap))
+	أرجع;
 
-    if (cap->nchar == ':' || cap->nchar == '/' || cap->nchar == '?')
+    إذا (cap->nchar == ':' || cap->nchar == '/' || cap->nchar == '?')
     {
-	if (cmdwin_type != 0)
+	إذا (cmdwin_type != 0)
 	{
-	    emsg(_(e_cmdline_window_already_open));
-	    return;
+	    emsg(_(e_cmdline_پنجره_already_open));
+	    أرجع;
 	}
 	stuffcharReadbuff(cap->nchar);
 	stuffcharReadbuff(K_CMDWIN);
     }
-    else
+    وإلا
 	// (stop) recording into a named register, unless executing a
-	// register
-	if (reg_executing == 0 && do_record(cap->nchar) == FAIL)
+	//ثبات
+	إذا (reg_executing == 0 && do_رکورد(cap->nchar) == FAIL)
 	    clearopbeep(cap->oap);
 }
 
 /*
  * Handle the "@r" command.
  */
-    static void
+    ساكن فراغ
 nv_at(cmdarg_T *cap)
 {
-    if (checkclearop(cap->oap))
-	return;
-#ifdef FEAT_EVAL
-    if (cap->nchar == '=')
+    إذا (checkclearop(cap->oap))
+	أرجع;
+#اگر_تعریف_شده FEAT_EVAL
+    إذا (cap->nchar == '=')
     {
-	if (get_expr_register() == NUL)
-	    return;
+	إذا (get_عبارت_ثبات() == NUL)
+	    أرجع;
     }
-#endif
-    while (cap->count1-- && !got_int)
+#پایان_اگر
+    طالما (cap->count1-- && !got_int)
     {
-	if (do_execreg(cap->nchar, FALSE, FALSE, FALSE) == FAIL)
+	إذا (do_execreg(cap->nchar, FALSE, FALSE, FALSE) == FAIL)
 	{
 	    clearopbeep(cap->oap);
-	    break;
+	    اكسر;
 	}
-	line_breakcheck();
+	سطر_breakcheck();
     }
 }
 
 /*
  * Handle the CTRL-U and CTRL-D commands.
  */
-    static void
+    ساكن فراغ
 nv_halfpage(cmdarg_T *cap)
 {
-    int	dir = cap->cmdchar == Ctrl_D ? FORWARD : BACKWARD;
-    if (!checkclearop(cap->oap))
+    صحيح	dir = cap->cmdchar == Ctrl_D ? FORWARD : BACKWARD;
+    إذا (!checkclearop(cap->oap))
 	pagescroll(dir, cap->count0, TRUE);
 }
 
 /*
  * Handle "J" or "gJ" command.
  */
-    static void
+    ساكن فراغ
 nv_join(cmdarg_T *cap)
 {
-    if (VIsual_active)	// join the visual lines
+    إذا (VIsual_فعال)	// join the visual lines
     {
 	nv_operator(cap);
-	return;
+	أرجع;
     }
 
-    if (checkclearop(cap->oap))
-	return;
+    إذا (checkclearop(cap->oap))
+	أرجع;
 
-    if (cap->count0 <= 1)
+    إذا (cap->count0 <= 1)
 	cap->count0 = 2;	    // default for join is two lines!
-    if (curwin->w_cursor.lnum + cap->count0 - 1 >
-	    curbuf->b_ml.ml_line_count)
+    إذا (curwin->w_cursor.lnum + cap->count0 - 1 >
+	    curbuf->b_ml.ml_سطر_شمار)
     {
 	// can't join when on the last line
-	if (cap->count0 <= 2)
+	إذا (cap->count0 <= 2)
 	{
 	    clearopbeep(cap->oap);
-	    return;
+	    أرجع;
 	}
-	cap->count0 = curbuf->b_ml.ml_line_count
+	cap->count0 = curbuf->b_ml.ml_سطر_شمار
 	    - curwin->w_cursor.lnum + 1;
     }
 
     prep_redo(cap->oap->regname, cap->count0,
 	    NUL, cap->cmdchar, NUL, NUL, cap->nchar);
-    (void)do_join(cap->count0, cap->nchar == NUL, TRUE, TRUE, TRUE);
+    (فراغ)do_join(cap->count0, cap->nchar == NUL, TRUE, TRUE, TRUE);
 }
 
 /*
  * "P", "gP", "p" and "gp" commands.
  */
-    static void
+    ساكن فراغ
 nv_put(cmdarg_T *cap)
 {
     nv_put_opt(cap, FALSE);
@@ -7426,60 +7426,60 @@ nv_put(cmdarg_T *cap)
  * "P", "gP", "p" and "gp" commands.
  * "fix_indent" is TRUE for "[p", "[P", "]p" and "]P".
  */
-    static void
-nv_put_opt(cmdarg_T *cap, int fix_indent)
+    ساكن فراغ
+nv_put_opt(cmdarg_T *cap, صحيح fix_indent)
 {
-    int		regname = 0;
-    void	*reg1 = NULL, *reg2 = NULL;
-    int		empty = FALSE;
-    int		was_visual = FALSE;
-    int		dir;
-    int		flags = 0;
-    int		keep_registers = FALSE;
-#ifdef FEAT_FOLDING
-    int		save_fen = curwin->w_p_fen;
-#endif
+    صحيح		regname = 0;
+    فراغ	*reg1 = عدم, *reg2 = عدم;
+    صحيح		خالی_2 = FALSE;
+    صحيح		was_visual = FALSE;
+    صحيح		dir;
+    صحيح		flags = 0;
+    صحيح		keep_registers = FALSE;
+#اگر_تعریف_شده FEAT_FOLDING
+    صحيح		save_fen = curwin->w_p_fen;
+#پایان_اگر
 
-    if (cap->oap->op_type != OP_NOP)
+    إذا (cap->oap->op_type != OP_NOP)
     {
-#ifdef FEAT_DIFF
+#اگر_تعریف_شده FEAT_DIFF
 	// "dp" is ":diffput"
-	if (cap->oap->op_type == OP_DELETE && cap->cmdchar == 'p')
+	إذا (cap->oap->op_type == OP_DELETE && cap->cmdchar == 'p')
 	{
 	    clearop(cap->oap);
 	    nv_diffgetput(TRUE, cap->opcount);
 	}
-	else
-#endif
+	وإلا
+#پایان_اگر
 	    clearopbeep(cap->oap);
-	return;
+	أرجع;
     }
 
-#ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf) && !prompt_curpos_editable())
+#اگر_تعریف_شده FEAT_کار_CHANNEL
+    إذا (bt_prompt(curbuf) && !prompt_curpos_editable())
     {
 	clearopbeep(cap->oap);
-	return;
+	أرجع;
     }
-#endif
+#پایان_اگر
 
-    if (fix_indent)
+    إذا (fix_indent)
     {
 	dir = (cap->cmdchar == ']' && cap->nchar == 'p')
 	    ? FORWARD : BACKWARD;
 	flags |= PUT_FIXINDENT;
     }
-    else
+    وإلا
 	dir = (cap->cmdchar == 'P'
 		|| ((cap->cmdchar == 'g' || cap->cmdchar == 'z')
 		    && cap->nchar == 'P')) ? BACKWARD : FORWARD;
     prep_redo_cmd(cap);
-    if (cap->cmdchar == 'g')
+    إذا (cap->cmdchar == 'g')
 	flags |= PUT_CURSEND;
-    else if (cap->cmdchar == 'z')
-	flags |= PUT_BLOCK_INNER;
+    وإلا إذا (cap->cmdchar == 'z')
+	flags |= PUT_بلوک_INNER;
 
-    if (VIsual_active)
+    إذا (VIsual_فعال)
     {
 	// Putting in Visual mode: The put text replaces the selected
 	// text.  First delete the selected text, then put the new text.
@@ -7488,102 +7488,102 @@ nv_put_opt(cmdarg_T *cap, int fix_indent)
 	was_visual = TRUE;
 	regname = cap->oap->regname;
 	keep_registers = cap->cmdchar == 'P';
-#ifdef HAVE_CLIPMETHOD
+#اگر_تعریف_شده HAVE_CLIPMETHOD
 	adjust_clip_reg(&regname);
-#endif
-	if (regname == 0 || regname == '"'
+#پایان_اگر
+	إذا (regname == 0 || regname == '"'
 		|| VIM_ISDIGIT(regname) || regname == '-'
-#ifdef FEAT_CLIPBOARD
+#اگر_تعریف_شده FEAT_CLIPBOARD
 		|| (clip_unnamed && (regname == '*' || regname == '+'))
-#endif
+#پایان_اگر
 
 	   )
 	{
 	    // The delete is going to overwrite the register we want to
 	    // put, save it first.
-	    reg1 = get_register(regname, TRUE);
+	    reg1 = get_ثبات(regname, TRUE);
 	}
 
-#ifdef FEAT_FOLDING
+#اگر_تعریف_شده FEAT_FOLDING
 	// Temporarily disable folding, as deleting a fold marker may cause
 	// the cursor to be included in a fold.
 	curwin->w_p_fen = FALSE;
-#endif
+#پایان_اگر
 
 	// Now delete the selected text. Avoid messages here.
 	cap->cmdchar = 'd';
 	cap->nchar = NUL;
 	cap->oap->regname = keep_registers ? '_' : NUL;
-	++msg_silent;
+	++پیام_silent;
 	nv_operator(cap);
 	do_pending_operator(cap, 0, FALSE);
-	empty = (curbuf->b_ml.ml_flags & ML_EMPTY);
-	--msg_silent;
+	خالی_2 = (curbuf->b_ml.ml_flags & ML_خالی);
+	--پیام_silent;
 
 	// delete PUT_LINE_BACKWARD;
 	cap->oap->regname = regname;
 
-	if (reg1 != NULL)
+	إذا (reg1 != عدم)
 	{
 	    // Delete probably changed the register we want to put, save
 	    // it first. Then put back what was there before the delete.
-	    reg2 = get_register(regname, FALSE);
-	    put_register(regname, reg1);
+	    reg2 = get_ثبات(regname, FALSE);
+	    put_ثبات(regname, reg1);
 	}
 
 	// When deleted a linewise Visual area, put the register as
 	// lines to avoid it joined with the next line.  When deletion was
 	// characterwise, split a line when putting lines.
-	if (VIsual_mode == 'V')
-	    flags |= PUT_LINE;
-	else if (VIsual_mode == 'v')
-	    flags |= PUT_LINE_SPLIT;
-	if (VIsual_mode == Ctrl_V && dir == FORWARD)
-	    flags |= PUT_LINE_FORWARD;
+	إذا (VIsual_نما == 'V')
+	    flags |= PUT_سطر;
+	وإلا إذا (VIsual_نما == 'v')
+	    flags |= PUT_سطر_تقسیم;
+	إذا (VIsual_نما == Ctrl_V && dir == FORWARD)
+	    flags |= PUT_سطر_FORWARD;
 	dir = BACKWARD;
-	if ((VIsual_mode != 'V'
-		    && curwin->w_cursor.col < curbuf->b_op_start.col)
-		|| (VIsual_mode == 'V'
-		    && curwin->w_cursor.lnum < curbuf->b_op_start.lnum))
+	إذا ((VIsual_نما != 'V'
+		    && curwin->w_cursor.ستون < curbuf->b_op_شروع.ستون)
+		|| (VIsual_نما == 'V'
+		    && curwin->w_cursor.lnum < curbuf->b_op_شروع.lnum))
 	    // cursor is at the end of the line or end of file, put
 	    // forward.
 	    dir = FORWARD;
 	// May have been reset in do_put().
-	VIsual_active = TRUE;
+	VIsual_فعال = TRUE;
     }
-    do_put(cap->oap->regname, NULL, dir, cap->count1, flags);
+    do_put(cap->oap->regname, عدم, dir, cap->count1, flags);
 
     // If a register was saved, put it back now.
-    if (reg2 != NULL)
-	put_register(regname, reg2);
+    إذا (reg2 != عدم)
+	put_ثبات(regname, reg2);
 
-    if (was_visual)
+    إذا (was_visual)
     {
-#ifdef FEAT_FOLDING
-	if (save_fen)
+#اگر_تعریف_شده FEAT_FOLDING
+	إذا (save_fen)
 	    curwin->w_p_fen = TRUE;
-#endif
+#پایان_اگر
 	// What to reselect with "gv"?  Selecting the just put text seems to
 	// be the most useful, since the original text was removed.
-	curbuf->b_visual.vi_start = curbuf->b_op_start;
-	curbuf->b_visual.vi_end = curbuf->b_op_end;
+	curbuf->b_visual.vi_شروع = curbuf->b_op_شروع;
+	curbuf->b_visual.vi_انتها = curbuf->b_op_انتها;
 	// need to adjust cursor position
-	if (*p_sel == 'e')
-	    inc(&curbuf->b_visual.vi_end);
+	إذا (*p_sel == 'e')
+	    inc(&curbuf->b_visual.vi_انتها);
     }
 
     // When all lines were selected and deleted do_put() leaves an empty
     // line that needs to be deleted now.
-    if (empty && *ml_get(curbuf->b_ml.ml_line_count) == NUL)
+    إذا (خالی_2 && *ml_get(curbuf->b_ml.ml_سطر_شمار) == NUL)
     {
-	ml_delete_flags(curbuf->b_ml.ml_line_count, ML_DEL_MESSAGE);
-	deleted_lines(curbuf->b_ml.ml_line_count + 1, 1);
+	ml_delete_flags(curbuf->b_ml.ml_سطر_شمار, ML_DEL_پیام);
+	deleted_سطرها(curbuf->b_ml.ml_سطر_شمار + 1, 1);
 
 	// If the cursor was in that line, move it to the end of the last
 	// line.
-	if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+	إذا (curwin->w_cursor.lnum > curbuf->b_ml.ml_سطر_شمار)
 	{
-	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	    curwin->w_cursor.lnum = curbuf->b_ml.ml_سطر_شمار;
 	    coladvance((colnr_T)MAXCOL);
 	}
     }
@@ -7593,53 +7593,53 @@ nv_put_opt(cmdarg_T *cap, int fix_indent)
 /*
  * "o" and "O" commands.
  */
-    static void
+    ساكن فراغ
 nv_open(cmdarg_T *cap)
 {
-#ifdef FEAT_DIFF
+#اگر_تعریف_شده FEAT_DIFF
     // "do" is ":diffget"
-    if (cap->oap->op_type == OP_DELETE && cap->cmdchar == 'o')
+    إذا (cap->oap->op_type == OP_DELETE && cap->cmdchar == 'o')
     {
 	clearop(cap->oap);
 	nv_diffgetput(FALSE, cap->opcount);
     }
-    else
-#endif
-    if (VIsual_active)  // switch start and end of visual
-	v_swap_corners(cap->cmdchar);
-#ifdef FEAT_JOB_CHANNEL
-    else if (bt_prompt(curbuf))
+    وإلا
+#پایان_اگر
+    إذا (VIsual_فعال)  // switch start and end of visual
+	v_جابجا_corners(cap->cmdchar);
+#اگر_تعریف_شده FEAT_کار_CHANNEL
+    وإلا إذا (bt_prompt(curbuf))
 	clearopbeep(cap->oap);
-#endif
-    else
+#پایان_اگر
+    وإلا
 	n_opencmd(cap);
 }
 
-#ifdef FEAT_NETBEANS_INTG
-    static void
+#اگر_تعریف_شده FEAT_NETBEANS_INTG
+    ساكن فراغ
 nv_nbcmd(cmdarg_T *cap)
 {
     netbeans_keycommand(cap->nchar);
 }
-#endif
+#پایان_اگر
 
-#ifdef FEAT_DND
-    static void
-nv_drop(cmdarg_T *cap UNUSED)
+#اگر_تعریف_شده FEAT_DND
+    ساكن فراغ
+nv_drop(cmdarg_T *cap استفادهنشده)
 {
-    do_put('~', NULL, BACKWARD, 1L, PUT_CURSEND);
+    do_put('~', عدم, BACKWARD, 1L, PUT_CURSEND);
 }
-#endif
+#پایان_اگر
 
 /*
  * Trigger CursorHold event.
  * When waiting for a character for 'updatetime' K_CURSORHOLD is put in the
  * input buffer.  "did_cursorhold" is set to avoid retriggering.
  */
-    static void
+    ساكن فراغ
 nv_cursorhold(cmdarg_T *cap)
 {
-    apply_autocmds(EVENT_CURSORHOLD, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_CURSORHOLD, عدم, عدم, FALSE, curbuf);
     did_cursorhold = TRUE;
     cap->retval |= CA_COMMAND_BUSY;	// don't call edit() now
 }

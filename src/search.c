@@ -10,43 +10,43 @@
  * search.c: code for normal mode searching commands
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#ifdef FEAT_EVAL
-static void set_vv_searchforward(void);
-static int first_submatch(regmmatch_T *rp);
-#endif
-#ifdef FEAT_FIND_ID
-static char_u *get_line_and_copy(linenr_T lnum, char_u *buf);
-static void show_pat_in_path(char_u *, int, int, int, FILE *, linenr_T *, long);
-#endif
+#اگر_تعریف_شده FEAT_EVAL
+ساكن فراغ مجموعه_vv_searchforward(فراغ);
+ساكن صحيح اولی_submatch(regmmatch_T *rp);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_پیدا_کن_ID
+ساكن char_u *get_سطر_and_copy(linenr_T lnum, char_u *buf);
+ساكن فراغ show_pat_درون_مسیر(char_u *, صحيح, صحيح, صحيح, FILE *, linenr_T *, دراز);
+#پایان_اگر
 
-typedef struct searchstat
+تعريفنوع بنية searchstat
 {
-    int	    cur;	    // current position of found words
-    int	    cnt;	    // total count of found words
-    int	    exact_match;    // TRUE if matched exactly on specified position
-    int	    incomplete;	    // 0: search was fully completed
+    صحيح	    cur;	    // current position of found words
+    صحيح	    cnt;	    // total count of found words
+    صحيح	    exact_تطابق;    // TRUE if matched exactly on specified position
+    صحيح	    incomplete;	    // 0: search was fully completed
 			    // 1: recomputing was timed out
 			    // 2: max count exceeded
-    int	    last_maxcount;  // the max count of the last search
+    صحيح	    آخرین_maxcount;  // the max count of the last search
 } searchstat_T;
 
-#ifdef FEAT_SEARCH_EXTRA
-static void save_incsearch_state(void);
-static void restore_incsearch_state(void);
-#endif
-static int check_prevcol(char_u *linep, int col, int ch, int *prevcol);
-static int find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos);
-static void find_mps_values(int *initc, int *findc, int *backwards, int switchit);
-static int is_zero_width(char_u *pattern, size_t patternlen, int move, pos_T *cur, int direction);
-static void cmdline_search_stat(int dirc, pos_T *pos, pos_T *cursor_pos, int show_top_bot_msg, char_u *msgbuf, size_t msgbuflen, int recompute, int maxcount, long timeout);
-static void update_search_stat(int dirc, pos_T *pos, pos_T *cursor_pos, searchstat_T *stat, int recompute, int maxcount, long timeout);
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
+ساكن فراغ save_incsearch_state(فراغ);
+ساكن فراغ restore_incsearch_state(فراغ);
+#پایان_اگر
+ساكن صحيح check_prevcol(char_u *linep, صحيح ستون, صحيح ch, صحيح *prevcol);
+ساكن صحيح پیدا_کن_rawstring_انتها(char_u *linep, pos_T *startpos, pos_T *endpos);
+ساكن فراغ پیدا_کن_mps_مقادیر(صحيح *initc, صحيح *findc, صحيح *backwards, صحيح switchit);
+ساكن صحيح is_zero_عرض(char_u *الگو, size_t patternlen, صحيح move, pos_T *cur, صحيح direction);
+ساكن فراغ cmdline_جستجو_stat(صحيح dirc, pos_T *pos, pos_T *cursor_pos, صحيح show_بالاترین_bot_پیام, char_u *msgbuf, size_t msgbuflen, صحيح recompute, صحيح maxcount, دراز timeout);
+ساكن فراغ update_جستجو_stat(صحيح dirc, pos_T *pos, pos_T *cursor_pos, searchstat_T *stat, صحيح recompute, صحيح maxcount, دراز timeout);
 
-#define SEARCH_STAT_DEF_TIMEOUT 40L
+#تعریف_کن جستجو_STAT_DEF_TIMEOUT 40L
 // 'W ':  2 +
 // '[>9999/>9999]': 13 + 1 (NUL)
-#define SEARCH_STAT_BUF_LEN 16
+#تعریف_کن جستجو_STAT_BUF_LEN 16
 
 /*
  * This file contains various searching-related routines. These fall into
@@ -76,46 +76,46 @@ static void update_search_stat(int dirc, pos_T *pos, pos_T *cursor_pos, searchst
  * one for other searches.  last_idx points to the one that was used the last
  * time.
  */
-static spat_T spats[2] =
+ساكن spat_T spats[2] =
 {
-    {NULL, 0, TRUE, FALSE, {'/', 0, 0, 0L}},	// last used search pat
-    {NULL, 0, TRUE, FALSE, {'/', 0, 0, 0L}}	// last used substitute pat
+    {عدم, 0, TRUE, FALSE, {'/', 0, 0, 0L}},	// last used search pat
+    {عدم, 0, TRUE, FALSE, {'/', 0, 0, 0L}}	// last used substitute pat
 };
 
-static int last_idx = 0;	// index in spats[] for RE_LAST
+ساكن صحيح آخرین_idx = 0;	// index in spats[] for RE_LAST
 
-static char_u lastc[2] = {NUL, NUL};	// last character searched for
-static int lastcdir = FORWARD;		// last direction of character search
-static int last_t_cmd = TRUE;		// last search t_cmd
-static char_u	lastc_bytes[MB_MAXBYTES + 1];
-static int	lastc_bytelen = 1;	// >1 for multi-byte char
+ساكن char_u lastc[2] = {NUL, NUL};	// last character searched for
+ساكن صحيح lastcdir = FORWARD;		// last direction of character search
+ساكن صحيح آخرین_t_cmd = TRUE;		// last search t_cmd
+ساكن char_u	lastc_بایتها[MB_MAXBYTES + 1];
+ساكن صحيح	lastc_bytelen = 1;	// >1 for multi-byte char
 
 // copy of spats[], for keeping the search patterns while executing autocmds
-static spat_T	    saved_spats[ARRAY_LENGTH(spats)];
-static char_u	    *saved_mr_pattern = NULL;
-static size_t	    saved_mr_patternlen = 0;
-#ifdef FEAT_SEARCH_EXTRA
-static int	    saved_spats_last_idx = 0;
-static int	    saved_spats_no_hlsearch = 0;
-#endif
+ساكن spat_T	    saved_spats[ARRAY_درازی(spats)];
+ساكن char_u	    *saved_mr_الگو = عدم;
+ساكن size_t	    saved_mr_patternlen = 0;
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
+ساكن صحيح	    saved_spats_آخرین_idx = 0;
+ساكن صحيح	    saved_spats_no_hlsearch = 0;
+#پایان_اگر
 
 // allocated copy of pattern used by search_regcomp()
-static char_u	    *mr_pattern = NULL;
-static size_t	    mr_patternlen = 0;
+ساكن char_u	    *mr_الگو = عدم;
+ساكن size_t	    mr_patternlen = 0;
 
-#ifdef FEAT_FIND_ID
+#اگر_تعریف_شده FEAT_پیدا_کن_ID
 /*
  * Type used by find_pattern_in_path() to remember which included files have
  * been searched already.
  */
-typedef struct SearchedFile
+تعريفنوع بنية SearchedFile
 {
     FILE	*fp;		// File pointer
     char_u	*name;		// Full name of file
     linenr_T	lnum;		// Line we were up to in file
-    int		matched;	// Found a match in this file
+    صحيح		matched;	// Found a match in this file
 } SearchedFile;
-#endif
+#پایان_اگر
 
 /*
  * translate search pattern for vim_regcomp()
@@ -131,17 +131,17 @@ typedef struct SearchedFile
  *
  * returns FAIL if failed, OK otherwise.
  */
-    int
-search_regcomp(
+    صحيح
+جستجو_regcomp(
     char_u	*pat,
     size_t	patlen,
-    char_u	**used_pat,
-    int		pat_save,
-    int		pat_use,
-    int		options,
+    char_u	**استفاده_شده_pat,
+    صحيح		pat_save,
+    صحيح		pat_use,
+    صحيح		options,
     regmmatch_T	*regmatch)	// return: pattern and ignore-case flag
 {
-    int		magic;
+    صحيح		magic;
 
     rc_did_emsg = FALSE;
     magic = magic_isset();
@@ -149,191 +149,191 @@ search_regcomp(
     /*
      * If no pattern given, use a previously defined pattern.
      */
-    if (pat == NULL || *pat == NUL)
+    إذا (pat == عدم || *pat == NUL)
     {
-	int i;
+	صحيح i;
 
-	if (pat_use == RE_LAST)
-	    i = last_idx;
-	else
+	إذا (pat_use == RE_آخرین)
+	    i = آخرین_idx;
+	وإلا
 	    i = pat_use;
-	if (spats[i].pat == NULL)	// pattern was never defined
+	إذا (spats[i].pat == عدم)	// pattern was never defined
 	{
-	    if (pat_use == RE_SUBST)
-		emsg(_(e_no_previous_substitute_regular_expression));
-	    else
-		emsg(_(e_no_previous_regular_expression));
+	    إذا (pat_use == RE_SUBST)
+		emsg(_(e_no_قبلی_substitute_regular_عبارت));
+	    وإلا
+		emsg(_(e_no_قبلی_regular_عبارت));
 	    rc_did_emsg = TRUE;
-	    return FAIL;
+	    أرجع FAIL;
 	}
 	pat = spats[i].pat;
 	patlen = spats[i].patlen;
 	magic = spats[i].magic;
 	no_smartcase = spats[i].no_scs;
     }
-    else if (options & SEARCH_HIS)	// put new pattern in history
-	add_to_history(HIST_SEARCH, pat, patlen, TRUE, NUL);
+    وإلا إذا (options & جستجو_HIS)	// put new pattern in history
+	جمع_کن_مقصد_history(HIST_جستجو, pat, patlen, TRUE, NUL);
 
-    if (used_pat)
-	*used_pat = pat;
+    إذا (استفاده_شده_pat)
+	*استفاده_شده_pat = pat;
 
-    vim_free(mr_pattern);
-#ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl && *curwin->w_p_rlc == 's')
-	mr_pattern = reverse_text(pat);
-    else
-#endif
-	mr_pattern = vim_strnsave(pat, patlen);
-    if (mr_pattern == NULL)
+    vim_free(mr_الگو);
+#اگر_تعریف_شده FEAT_RIGHTLEFT
+    إذا (curwin->w_p_rl && *curwin->w_p_rlc == 's')
+	mr_الگو = معکوس_متن(pat);
+    وإلا
+#پایان_اگر
+	mr_الگو = vim_strnsave(pat, patlen);
+    إذا (mr_الگو == عدم)
 	mr_patternlen = 0;
-    else
+    وإلا
 	mr_patternlen = patlen;
 
     /*
      * Save the currently used pattern in the appropriate place,
      * unless the pattern should not be remembered.
      */
-    if (!(options & SEARCH_KEEP)
+    إذا (!(options & جستجو_KEEP)
 			       && (cmdmod.cmod_flags & CMOD_KEEPPATTERNS) == 0)
     {
 	// search or global command
-	if (pat_save == RE_SEARCH || pat_save == RE_BOTH)
-	    save_re_pat(RE_SEARCH, pat, patlen, magic);
+	إذا (pat_save == RE_جستجو || pat_save == RE_BOTH)
+	    save_re_pat(RE_جستجو, pat, patlen, magic);
 	// substitute or global command
-	if (pat_save == RE_SUBST || pat_save == RE_BOTH)
+	إذا (pat_save == RE_SUBST || pat_save == RE_BOTH)
 	    save_re_pat(RE_SUBST, pat, patlen, magic);
     }
 
     regmatch->rmm_ic = ignorecase(pat);
     regmatch->rmm_maxcol = 0;
     regmatch->regprog = vim_regcomp(pat, magic ? RE_MAGIC : 0);
-    if (regmatch->regprog == NULL)
-	return FAIL;
-    return OK;
+    إذا (regmatch->regprog == عدم)
+	أرجع FAIL;
+    أرجع OK;
 }
 
 /*
  * Get search pattern used by search_regcomp().
  */
     char_u *
-get_search_pat(void)
+get_جستجو_pat(فراغ)
 {
-    return mr_pattern;
+    أرجع mr_الگو;
 }
 
-    void
-save_re_pat(int idx, char_u *pat, size_t patlen, int magic)
+    فراغ
+save_re_pat(صحيح idx, char_u *pat, size_t patlen, صحيح magic)
 {
-    if (spats[idx].pat == pat)
-	return;
+    إذا (spats[idx].pat == pat)
+	أرجع;
 
     vim_free(spats[idx].pat);
     spats[idx].pat = vim_strnsave(pat, patlen);
-    if (spats[idx].pat == NULL)
+    إذا (spats[idx].pat == عدم)
 	spats[idx].patlen = 0;
-    else
+    وإلا
 	spats[idx].patlen = patlen;
     spats[idx].magic = magic;
     spats[idx].no_scs = no_smartcase;
-    last_idx = idx;
-#ifdef FEAT_SEARCH_EXTRA
+    آخرین_idx = idx;
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
     // If 'hlsearch' set and search pat changed: need redraw.
-    if (p_hls)
+    إذا (p_hls)
 	redraw_all_later(UPD_SOME_VALID);
-    set_no_hlsearch(FALSE);
-#endif
+    مجموعه_no_hlsearch(FALSE);
+#پایان_اگر
 }
 
 /*
  * Save the search patterns, so they can be restored later.
  * Used before/after executing autocommands and user functions.
  */
-static int save_level = 0;
+ساكن صحيح save_level = 0;
 
-    void
-save_search_patterns(void)
+    فراغ
+save_جستجو_patterns(فراغ)
 {
-    int i;
+    صحيح i;
 
-    if (save_level++ != 0)
-	return;
+    إذا (save_level++ != 0)
+	أرجع;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(spats); ++i)
+    لكل (i = 0; i < (صحيح)ARRAY_درازی(spats); ++i)
     {
 	saved_spats[i] = spats[i];
-	if (spats[i].pat != NULL)
+	إذا (spats[i].pat != عدم)
 	{
 	    saved_spats[i].pat = vim_strnsave(spats[i].pat, spats[i].patlen);
-	    if (saved_spats[i].pat == NULL)
+	    إذا (saved_spats[i].pat == عدم)
 		saved_spats[i].patlen = 0;
-	    else
+	    وإلا
 		saved_spats[i].patlen = spats[i].patlen;
 	}
     }
-    if (mr_pattern == NULL)
-	saved_mr_pattern = NULL;
-    else
-	saved_mr_pattern = vim_strnsave(mr_pattern, mr_patternlen);
-    if (saved_mr_pattern == NULL)
+    إذا (mr_الگو == عدم)
+	saved_mr_الگو = عدم;
+    وإلا
+	saved_mr_الگو = vim_strnsave(mr_الگو, mr_patternlen);
+    إذا (saved_mr_الگو == عدم)
 	saved_mr_patternlen = 0;
-    else
+    وإلا
 	saved_mr_patternlen = mr_patternlen;
-#ifdef FEAT_SEARCH_EXTRA
-    saved_spats_last_idx = last_idx;
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
+    saved_spats_آخرین_idx = آخرین_idx;
     saved_spats_no_hlsearch = no_hlsearch;
-#endif
+#پایان_اگر
 }
 
-    void
-restore_search_patterns(void)
+    فراغ
+restore_جستجو_patterns(فراغ)
 {
-    int i;
+    صحيح i;
 
-    if (--save_level != 0)
-	return;
+    إذا (--save_level != 0)
+	أرجع;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(spats); ++i)
+    لكل (i = 0; i < (صحيح)ARRAY_درازی(spats); ++i)
     {
 	vim_free(spats[i].pat);
 	spats[i] = saved_spats[i];
     }
-#if defined(FEAT_EVAL)
-    set_vv_searchforward();
-#endif
-    vim_free(mr_pattern);
-    mr_pattern = saved_mr_pattern;
+#إذا defined(FEAT_EVAL)
+    مجموعه_vv_searchforward();
+#پایان_اگر
+    vim_free(mr_الگو);
+    mr_الگو = saved_mr_الگو;
     mr_patternlen = saved_mr_patternlen;
-#ifdef FEAT_SEARCH_EXTRA
-    last_idx = saved_spats_last_idx;
-    set_no_hlsearch(saved_spats_no_hlsearch);
-#endif
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
+    آخرین_idx = saved_spats_آخرین_idx;
+    مجموعه_no_hlsearch(saved_spats_no_hlsearch);
+#پایان_اگر
 }
 
-#if defined(EXITFREE)
-    void
-free_search_patterns(void)
+#إذا defined(EXITFREE)
+    فراغ
+free_جستجو_patterns(فراغ)
 {
-    int i;
+    صحيح i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(spats); ++i)
+    لكل (i = 0; i < (صحيح)ARRAY_درازی(spats); ++i)
     {
 	VIM_CLEAR(spats[i].pat);
 	spats[i].patlen = 0;
     }
-    VIM_CLEAR(mr_pattern);
+    VIM_CLEAR(mr_الگو);
     mr_patternlen = 0;
 }
-#endif
+#پایان_اگر
 
-#ifdef FEAT_SEARCH_EXTRA
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
 // copy of spats[RE_SEARCH], for keeping the search patterns while incremental
 // searching
-static spat_T	    saved_last_search_spat;
-static int	    did_save_last_search_spat = 0;
-static int	    saved_last_idx = 0;
-static int	    saved_no_hlsearch = 0;
-static int	    saved_search_match_endcol;
-static int	    saved_search_match_lines;
+ساكن spat_T	    saved_آخرین_جستجو_spat;
+ساكن صحيح	    did_save_آخرین_جستجو_spat = 0;
+ساكن صحيح	    saved_آخرین_idx = 0;
+ساكن صحيح	    saved_no_hlsearch = 0;
+ساكن صحيح	    saved_جستجو_تطابق_endcol;
+ساكن صحيح	    saved_جستجو_تطابق_سطرها;
 
 /*
  * Save and restore the search pattern for incremental highlight search
@@ -343,47 +343,47 @@ static int	    saved_search_match_lines;
  * restore_search_patterns(), because the search pattern must be restored when
  * canceling incremental searching even if it's called inside user functions.
  */
-    void
-save_last_search_pattern(void)
+    فراغ
+save_آخرین_جستجو_الگو(فراغ)
 {
-    if (++did_save_last_search_spat != 1)
+    إذا (++did_save_آخرین_جستجو_spat != 1)
 	// nested call, nothing to do
-	return;
+	أرجع;
 
-    saved_last_search_spat = spats[RE_SEARCH];
-    if (spats[RE_SEARCH].pat != NULL)
+    saved_آخرین_جستجو_spat = spats[RE_جستجو];
+    إذا (spats[RE_جستجو].pat != عدم)
     {
-	saved_last_search_spat.pat = vim_strnsave(spats[RE_SEARCH].pat, spats[RE_SEARCH].patlen);
-	if (saved_last_search_spat.pat == NULL)
-	    saved_last_search_spat.patlen = 0;
-	else
-	    saved_last_search_spat.patlen = spats[RE_SEARCH].patlen;
+	saved_آخرین_جستجو_spat.pat = vim_strnsave(spats[RE_جستجو].pat, spats[RE_جستجو].patlen);
+	إذا (saved_آخرین_جستجو_spat.pat == عدم)
+	    saved_آخرین_جستجو_spat.patlen = 0;
+	وإلا
+	    saved_آخرین_جستجو_spat.patlen = spats[RE_جستجو].patlen;
     }
-    saved_last_idx = last_idx;
+    saved_آخرین_idx = آخرین_idx;
     saved_no_hlsearch = no_hlsearch;
 }
 
-    void
-restore_last_search_pattern(void)
+    فراغ
+restore_آخرین_جستجو_الگو(فراغ)
 {
-    if (--did_save_last_search_spat > 0)
+    إذا (--did_save_آخرین_جستجو_spat > 0)
 	// nested call, nothing to do
-	return;
-    if (did_save_last_search_spat != 0)
+	أرجع;
+    إذا (did_save_آخرین_جستجو_spat != 0)
     {
 	iemsg("restore_last_search_pattern() called more often than save_last_search_pattern()");
-	return;
+	أرجع;
     }
 
-    vim_free(spats[RE_SEARCH].pat);
-    spats[RE_SEARCH] = saved_last_search_spat;
-    saved_last_search_spat.pat = NULL;
-    saved_last_search_spat.patlen = 0;
-# if defined(FEAT_EVAL)
-    set_vv_searchforward();
+    vim_free(spats[RE_جستجو].pat);
+    spats[RE_جستجو] = saved_آخرین_جستجو_spat;
+    saved_آخرین_جستجو_spat.pat = عدم;
+    saved_آخرین_جستجو_spat.patlen = 0;
+# إذا defined(FEAT_EVAL)
+    مجموعه_vv_searchforward();
 # endif
-    last_idx = saved_last_idx;
-    set_no_hlsearch(saved_no_hlsearch);
+    آخرین_idx = saved_آخرین_idx;
+    مجموعه_no_hlsearch(saved_no_hlsearch);
 }
 
 /*
@@ -391,245 +391,245 @@ restore_last_search_pattern(void)
  * This is required so that calling searchcount() at does not invalidate the
  * incsearch highlighting.
  */
-    static void
-save_incsearch_state(void)
+    ساكن فراغ
+save_incsearch_state(فراغ)
 {
-    saved_search_match_endcol = search_match_endcol;
-    saved_search_match_lines  = search_match_lines;
+    saved_جستجو_تطابق_endcol = جستجو_تطابق_endcol;
+    saved_جستجو_تطابق_سطرها  = جستجو_تطابق_سطرها;
 }
 
-    static void
-restore_incsearch_state(void)
+    ساكن فراغ
+restore_incsearch_state(فراغ)
 {
-    search_match_endcol = saved_search_match_endcol;
-    search_match_lines  = saved_search_match_lines;
+    جستجو_تطابق_endcol = saved_جستجو_تطابق_endcol;
+    جستجو_تطابق_سطرها  = saved_جستجو_تطابق_سطرها;
 }
 
     char_u *
-last_search_pattern(void)
+آخرین_جستجو_الگو(فراغ)
 {
-    return spats[RE_SEARCH].pat;
+    أرجع spats[RE_جستجو].pat;
 }
 
     size_t
-last_search_pattern_len(void)
+آخرین_جستجو_الگو_len(فراغ)
 {
-    return spats[RE_SEARCH].patlen;
+    أرجع spats[RE_جستجو].patlen;
 }
-#endif
+#پایان_اگر
 
 /*
  * Return TRUE when case should be ignored for search pattern "pat".
  * Uses the 'ignorecase' and 'smartcase' options.
  */
-    int
+    صحيح
 ignorecase(char_u *pat)
 {
-    return ignorecase_opt(pat, p_ic, p_scs);
+    أرجع ignorecase_opt(pat, p_ic, p_scs);
 }
 
 /*
  * As ignorecase() but pass the "ic" and "scs" flags.
  */
-    int
-ignorecase_opt(char_u *pat, int ic_in, int scs)
+    صحيح
+ignorecase_opt(char_u *pat, صحيح ic_درون, صحيح scs)
 {
-    int		ic = ic_in;
+    صحيح		ic = ic_درون;
 
-    if (ic && !no_smartcase && scs
-			    && !(ctrl_x_mode_not_default() && curbuf->b_p_inf))
+    إذا (ic && !no_smartcase && scs
+			    && !(ctrl_x_نما_not_default() && curbuf->b_p_inf))
 	ic = !pat_has_uppercase(pat);
     no_smartcase = FALSE;
 
-    return ic;
+    أرجع ic;
 }
 
 /*
  * Return TRUE if pattern "pat" has an uppercase character.
  */
-    int
+    صحيح
 pat_has_uppercase(char_u *pat)
 {
     char_u *p = pat;
     magic_T magic_val = MAGIC_ON;
 
     // get the magicness of the pattern
-    (void)skip_regexp_ex(pat, NUL, magic_isset(), NULL, NULL, &magic_val);
+    (فراغ)skip_regexp_ex(pat, NUL, magic_isset(), عدم, عدم, &magic_val);
 
-    while (*p != NUL)
+    طالما (*p != NUL)
     {
-	int		l;
+	صحيح		l;
 
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	إذا (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
-	    if (enc_utf8 && utf_isupper(utf_ptr2char(p)))
-		return TRUE;
+	    إذا (enc_utf8 && utf_isupper(utf_ptr2char(p)))
+		أرجع TRUE;
 	    p += l;
 	}
-	else if (*p == '\\' && magic_val <= MAGIC_ON)
+	وإلا إذا (*p == '\\' && magic_val <= MAGIC_ON)
 	{
-	    if (p[1] == '_' && p[2] != NUL)  // skip "\_X"
+	    إذا (p[1] == '_' && p[2] != NUL)  // skip "\_X"
 		p += 3;
-	    else if (p[1] == '%' && p[2] != NUL)  // skip "\%X"
+	    وإلا إذا (p[1] == '%' && p[2] != NUL)  // skip "\%X"
 		p += 3;
-	    else if (p[1] != NUL)  // skip "\X"
+	    وإلا إذا (p[1] != NUL)  // skip "\X"
 		p += 2;
-	    else
+	    وإلا
 		p += 1;
 	}
-	else if ((*p == '%' || *p == '_') && magic_val == MAGIC_ALL)
+	وإلا إذا ((*p == '%' || *p == '_') && magic_val == MAGIC_ALL)
 	{
-	    if (p[1] != NUL)  // skip "_X" and %X
+	    إذا (p[1] != NUL)  // skip "_X" and %X
 		p += 2;
-	    else
+	    وإلا
 		p++;
 	}
-	else if (MB_ISUPPER(*p))
-	    return TRUE;
-	else
+	وإلا إذا (MB_ISUPPER(*p))
+	    أرجع TRUE;
+	وإلا
 	    ++p;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
     char_u *
-last_csearch(void)
+آخرین_csearch(فراغ)
 {
-    return lastc_bytes;
+    أرجع lastc_بایتها;
 }
 
-    int
-last_csearch_forward(void)
+    صحيح
+آخرین_csearch_forward(فراغ)
 {
-    return lastcdir == FORWARD;
+    أرجع lastcdir == FORWARD;
 }
 
-    int
-last_csearch_until(void)
+    صحيح
+آخرین_csearch_until(فراغ)
 {
-    return last_t_cmd == TRUE;
+    أرجع آخرین_t_cmd == TRUE;
 }
 
-    void
-set_last_csearch(int c, char_u *s, int len)
+    فراغ
+مجموعه_آخرین_csearch(صحيح c, char_u *s, صحيح len)
 {
     *lastc = c;
     lastc_bytelen = len;
-    if (len)
-	memcpy(lastc_bytes, s, len);
-    else
-	CLEAR_FIELD(lastc_bytes);
+    إذا (len)
+	کپی_حافظه(lastc_بایتها, s, len);
+    وإلا
+	CLEAR_فیلد(lastc_بایتها);
 }
-#endif
+#پایان_اگر
 
-    void
-set_csearch_direction(int cdir)
+    فراغ
+مجموعه_csearch_direction(صحيح cdir)
 {
     lastcdir = cdir;
 }
 
-    void
-set_csearch_until(int t_cmd)
+    فراغ
+مجموعه_csearch_until(صحيح t_cmd)
 {
-    last_t_cmd = t_cmd;
+    آخرین_t_cmd = t_cmd;
 }
 
     char_u *
-last_search_pat(void)
+آخرین_جستجو_pat(فراغ)
 {
-    return spats[last_idx].pat;
+    أرجع spats[آخرین_idx].pat;
 }
 
 /*
  * Reset search direction to forward.  For "gd" and "gD" commands.
  */
-    void
-reset_search_dir(void)
+    فراغ
+reset_جستجو_dir(فراغ)
 {
     spats[0].off.dir = '/';
-#if defined(FEAT_EVAL)
-    set_vv_searchforward();
-#endif
+#إذا defined(FEAT_EVAL)
+    مجموعه_vv_searchforward();
+#پایان_اگر
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_VIMINFO)
+#إذا defined(FEAT_EVAL) || defined(FEAT_VIMINFO)
 /*
  * Set the last search pattern.  For ":let @/ =" and viminfo.
  * Also set the saved search pattern, so that this works in an autocommand.
  */
-    void
-set_last_search_pat(
+    فراغ
+مجموعه_آخرین_جستجو_pat(
     char_u	*s,
-    int		idx,
-    int		magic,
-    int		setlast)
+    صحيح		idx,
+    صحيح		magic,
+    صحيح		setlast)
 {
     vim_free(spats[idx].pat);
     // An empty string means that nothing should be matched.
-    if (*s == NUL)
-	spats[idx].pat = NULL;
-    else
+    إذا (*s == NUL)
+	spats[idx].pat = عدم;
+    وإلا
     {
 	spats[idx].patlen = STRLEN(s);
 	spats[idx].pat = vim_strnsave(s, spats[idx].patlen);
     }
-    if (spats[idx].pat == NULL)
+    إذا (spats[idx].pat == عدم)
 	spats[idx].patlen = 0;
     spats[idx].magic = magic;
     spats[idx].no_scs = FALSE;
     spats[idx].off.dir = '/';
-# if defined(FEAT_EVAL)
-    set_vv_searchforward();
+# إذا defined(FEAT_EVAL)
+    مجموعه_vv_searchforward();
 # endif
-    spats[idx].off.line = FALSE;
-    spats[idx].off.end = FALSE;
+    spats[idx].off.سطر = FALSE;
+    spats[idx].off.انتها = FALSE;
     spats[idx].off.off = 0;
-    if (setlast)
-	last_idx = idx;
-    if (save_level)
+    إذا (setlast)
+	آخرین_idx = idx;
+    إذا (save_level)
     {
 	vim_free(saved_spats[idx].pat);
 	saved_spats[idx] = spats[0];
-	if (spats[idx].pat == NULL)
-	    saved_spats[idx].pat = NULL;
-	else
+	إذا (spats[idx].pat == عدم)
+	    saved_spats[idx].pat = عدم;
+	وإلا
 	    saved_spats[idx].pat = vim_strnsave(spats[idx].pat, spats[idx].patlen);
-	if (saved_spats[idx].pat == NULL)
+	إذا (saved_spats[idx].pat == عدم)
 	    saved_spats[idx].patlen = 0;
-	else
+	وإلا
 	    saved_spats[idx].patlen = spats[idx].patlen;
-# ifdef FEAT_SEARCH_EXTRA
-	saved_spats_last_idx = last_idx;
+# ifdef FEAT_جستجو_EXTRA
+	saved_spats_آخرین_idx = آخرین_idx;
 # endif
     }
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_جستجو_EXTRA
     // If 'hlsearch' set and search pat changed: need redraw.
-    if (p_hls && idx == last_idx && !no_hlsearch)
+    إذا (p_hls && idx == آخرین_idx && !no_hlsearch)
 	redraw_all_later(UPD_SOME_VALID);
 # endif
 }
-#endif
+#پایان_اگر
 
-#ifdef FEAT_SEARCH_EXTRA
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
 /*
  * Get a regexp program for the last used search pattern.
  * This is used for highlighting all matches in a window.
  * Values returned in regmatch->regprog and regmatch->rmm_ic.
  */
-    void
-last_pat_prog(regmmatch_T *regmatch)
+    فراغ
+آخرین_pat_prog(regmmatch_T *regmatch)
 {
-    if (spats[last_idx].pat == NULL)
+    إذا (spats[آخرین_idx].pat == عدم)
     {
-	regmatch->regprog = NULL;
-	return;
+	regmatch->regprog = عدم;
+	أرجع;
     }
     ++emsg_off;		// So it doesn't beep if bad expr
-    (void)search_regcomp((char_u *)"", 0, NULL, 0, last_idx, SEARCH_KEEP, regmatch);
+    (فراغ)جستجو_regcomp((char_u *)"", 0, عدم, 0, آخرین_idx, جستجو_KEEP, regmatch);
     --emsg_off;
 }
-#endif
+#پایان_اگر
 
 /*
  * Lowest level search function.
@@ -651,115 +651,115 @@ last_pat_prog(regmmatch_T *regmatch)
  * When FEAT_EVAL is defined, returns the index of the first matching
  * subpattern plus one; one if there was none.
  */
-    int
+    صحيح
 searchit(
     win_T	*win,		// window to search in; can be NULL for a
 				// buffer without a window!
     buf_T	*buf,
     pos_T	*pos,
-    pos_T	*end_pos,	// set to end of the match, unless NULL
-    int		dir,
+    pos_T	*انتها_pos,	// set to end of the match, unless NULL
+    صحيح		dir,
     char_u	*pat,
     size_t	patlen,
-    long	count,
-    int		options,
-    int		pat_use,	// which pattern to use when "pat" is empty
+    دراز	شمار,
+    صحيح		options,
+    صحيح		pat_use,	// which pattern to use when "pat" is empty
     searchit_arg_T *extra_arg)	// optional extra arguments, can be NULL
 {
-    int		found;
+    صحيح		یافت;
     linenr_T	lnum;		// no init to shut up Apollo cc
-    colnr_T	col;
+    colnr_T	ستون;
     regmmatch_T	regmatch;
     char_u	*ptr;
     colnr_T	matchcol;
     lpos_T	endpos;
     lpos_T	matchpos;
-    int		loop;
-    pos_T	start_pos;
-    int		at_first_line;
-    int		extra_col;
-    int		start_char_len;
-    int		match_ok;
-    long	nmatched;
-    int		submatch = 0;
-    int		first_match = TRUE;
-    int		called_emsg_before = called_emsg;
-#ifdef FEAT_SEARCH_EXTRA
-    int		break_loop = FALSE;
-#endif
+    صحيح		loop;
+    pos_T	شروع_pos;
+    صحيح		at_اولی_سطر;
+    صحيح		extra_ستون;
+    صحيح		شروع_char_len;
+    صحيح		تطابق_ok;
+    دراز	nmatched;
+    صحيح		submatch = 0;
+    صحيح		اولی_تطابق = TRUE;
+    صحيح		called_emsg_before = called_emsg;
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
+    صحيح		break_loop = FALSE;
+#پایان_اگر
     linenr_T	stop_lnum = 0;	// stop after this line number when != 0
-    int		unused_timeout_flag = FALSE;
-    int		*timed_out = &unused_timeout_flag;  // set when timed out.
-    int		search_from_match_end;		    // vi-compatible search?
+    صحيح		استفادهنشده_timeout_flag = FALSE;
+    صحيح		*timed_بیرون = &استفادهنشده_timeout_flag;  // set when timed out.
+    صحيح		جستجو_from_تطابق_انتها;		    // vi-compatible search?
 
-    if (search_regcomp(pat, patlen, NULL, RE_SEARCH, pat_use,
-		   (options & (SEARCH_HIS + SEARCH_KEEP)), &regmatch) == FAIL)
+    إذا (جستجو_regcomp(pat, patlen, عدم, RE_جستجو, pat_use,
+		   (options & (جستجو_HIS + جستجو_KEEP)), &regmatch) == FAIL)
     {
-	if ((options & SEARCH_MSG) && !rc_did_emsg)
-	    semsg(_(e_invalid_search_string_str), mr_pattern);
-	return FAIL;
+	إذا ((options & جستجو_پیام) && !rc_did_emsg)
+	    semsg(_(e_invalid_جستجو_string_str), mr_الگو);
+	أرجع FAIL;
     }
 
-    search_from_match_end = vim_strchr(p_cpo, CPO_SEARCH) != NULL;
+    جستجو_from_تطابق_انتها = vim_strchr(p_cpo, CPO_جستجو) != عدم;
 
-    if (extra_arg != NULL)
+    إذا (extra_arg != عدم)
     {
 	stop_lnum = extra_arg->sa_stop_lnum;
-#ifdef FEAT_RELTIME
-	if (extra_arg->sa_tm > 0)
+#اگر_تعریف_شده FEAT_RELTIME
+	إذا (extra_arg->sa_tm > 0)
 	    init_regexp_timeout(extra_arg->sa_tm);
 	// Also set the pointer when sa_tm is zero, the caller may have set the
 	// timeout.
-	timed_out = &extra_arg->sa_timed_out;
-#endif
+	timed_بیرون = &extra_arg->sa_timed_بیرون;
+#پایان_اگر
     }
 
     /*
      * find the string
      */
-    do	// loop for count
+    افعل	// loop for count
     {
 	// When not accepting a match at the start position set "extra_col" to
 	// a non-zero value.  Don't do that when starting at MAXCOL, since
 	// MAXCOL + 1 is zero.
-	if (pos->col == MAXCOL)
-	    start_char_len = 0;
+	إذا (pos->ستون == MAXCOL)
+	    شروع_char_len = 0;
 	// Watch out for the "col" being MAXCOL - 2, used in a closed fold.
-	else if (has_mbyte
-		    && pos->lnum >= 1 && pos->lnum <= buf->b_ml.ml_line_count
-						    && pos->col < MAXCOL - 2)
+	وإلا إذا (has_mbyte
+		    && pos->lnum >= 1 && pos->lnum <= buf->b_ml.ml_سطر_شمار
+						    && pos->ستون < MAXCOL - 2)
 	{
 	    ptr = ml_get_buf(buf, pos->lnum, FALSE);
-	    if (ml_get_buf_len(buf, pos->lnum) <= pos->col)
-		start_char_len = 1;
-	    else
-		start_char_len = (*mb_ptr2len)(ptr + pos->col);
+	    إذا (ml_get_buf_len(buf, pos->lnum) <= pos->ستون)
+		شروع_char_len = 1;
+	    وإلا
+		شروع_char_len = (*mb_ptr2len)(ptr + pos->ستون);
 	}
-	else
-	    start_char_len = 1;
-	if (dir == FORWARD)
+	وإلا
+	    شروع_char_len = 1;
+	إذا (dir == FORWARD)
 	{
-	    if (options & SEARCH_START)
-		extra_col = 0;
-	    else
-		extra_col = start_char_len;
+	    إذا (options & جستجو_شروع)
+		extra_ستون = 0;
+	    وإلا
+		extra_ستون = شروع_char_len;
 	}
-	else
+	وإلا
 	{
-	    if (options & SEARCH_START)
-		extra_col = start_char_len;
-	    else
-		extra_col = 0;
+	    إذا (options & جستجو_شروع)
+		extra_ستون = شروع_char_len;
+	    وإلا
+		extra_ستون = 0;
 	}
 
-	start_pos = *pos;	// remember start pos for detecting no match
-	found = 0;		// default: not found
-	at_first_line = TRUE;	// default: start in first line
-	if (pos->lnum == 0)	// correct lnum for when starting in line 0
+	شروع_pos = *pos;	// remember start pos for detecting no match
+	یافت = 0;		// default: not found
+	at_اولی_سطر = TRUE;	// default: start in first line
+	إذا (pos->lnum == 0)	// correct lnum for when starting in line 0
 	{
 	    pos->lnum = 1;
-	    pos->col = 0;
-	    at_first_line = FALSE;  // not in first line now
+	    pos->ستون = 0;
+	    at_اولی_سطر = FALSE;  // not in first line now
 	}
 
 	/*
@@ -769,53 +769,53 @@ searchit(
 	 * current position, gain some efficiency by skipping back a line.
 	 * Otherwise begin the search in the current line.
 	 */
-	if (dir == BACKWARD && start_pos.col == 0
-					     && (options & SEARCH_START) == 0)
+	إذا (dir == BACKWARD && شروع_pos.ستون == 0
+					     && (options & جستجو_شروع) == 0)
 	{
 	    lnum = pos->lnum - 1;
-	    at_first_line = FALSE;
+	    at_اولی_سطر = FALSE;
 	}
-	else
+	وإلا
 	    lnum = pos->lnum;
 
-	for (loop = 0; loop <= 1; ++loop)   // loop twice if 'wrapscan' set
+	لكل (loop = 0; loop <= 1; ++loop)   // loop twice if 'wrapscan' set
 	{
-	    for ( ; lnum > 0 && lnum <= buf->b_ml.ml_line_count;
-					   lnum += dir, at_first_line = FALSE)
+	    لكل ( ; lnum > 0 && lnum <= buf->b_ml.ml_سطر_شمار;
+					   lnum += dir, at_اولی_سطر = FALSE)
 	    {
 		// Stop after checking "stop_lnum", if it's set.
-		if (stop_lnum != 0 && (dir == FORWARD
+		إذا (stop_lnum != 0 && (dir == FORWARD
 				       ? lnum > stop_lnum : lnum < stop_lnum))
-		    break;
+		    اكسر;
 		// Stop after passing the time limit.
-		if (*timed_out)
-		    break;
+		إذا (*timed_بیرون)
+		    اكسر;
 
 		/*
 		 * Look for a match somewhere in line "lnum".
 		 */
-		col = at_first_line && (options & SEARCH_COL) ? pos->col
+		ستون = at_اولی_سطر && (options & جستجو_ستون) ? pos->ستون
 								 : (colnr_T)0;
 		nmatched = vim_regexec_multi(&regmatch, win, buf,
-							 lnum, col, timed_out);
+							 lnum, ستون, timed_بیرون);
 		// vim_regexec_multi() may clear "regprog"
-		if (regmatch.regprog == NULL)
-		    break;
+		إذا (regmatch.regprog == عدم)
+		    اكسر;
 		// Abort searching on an error (e.g., out of stack).
-		if (called_emsg > called_emsg_before || *timed_out)
-		    break;
-		if (nmatched > 0)
+		إذا (called_emsg > called_emsg_before || *timed_بیرون)
+		    اكسر;
+		إذا (nmatched > 0)
 		{
 		    // match may actually be in another line when using \zs
 		    matchpos = regmatch.startpos[0];
 		    endpos = regmatch.endpos[0];
-#ifdef FEAT_EVAL
-		    submatch = first_submatch(&regmatch);
-#endif
+#اگر_تعریف_شده FEAT_EVAL
+		    submatch = اولی_submatch(&regmatch);
+#پایان_اگر
 		    // "lnum" may be past end of buffer for "\n\zs".
-		    if (lnum + matchpos.lnum > buf->b_ml.ml_line_count)
+		    إذا (lnum + matchpos.lnum > buf->b_ml.ml_سطر_شمار)
 			ptr = (char_u *)"";
-		    else
+		    وإلا
 			ptr = ml_get_buf(buf, lnum + matchpos.lnum, FALSE);
 
 		    /*
@@ -823,9 +823,9 @@ searchit(
 		     * the start position. If not, continue at the end of the
 		     * match (this is vi compatible) or on the next char.
 		     */
-		    if (dir == FORWARD && at_first_line)
+		    إذا (dir == FORWARD && at_اولی_سطر)
 		    {
-			match_ok = TRUE;
+			تطابق_ok = TRUE;
 
 			/*
 			 * When the match starts in a next line it's certainly
@@ -834,83 +834,83 @@ searchit(
 			 * one back afterwards, compare with that position,
 			 * otherwise "/$" will get stuck on end of line.
 			 */
-			while (matchpos.lnum == 0
-				&& ((options & SEARCH_END) && first_match
+			طالما (matchpos.lnum == 0
+				&& ((options & جستجو_انتها) && اولی_تطابق
 				    ?  (nmatched == 1
-					&& (int)endpos.col - 1
-					     < (int)start_pos.col + extra_col)
-				    : ((int)matchpos.col
-						  - (ptr[matchpos.col] == NUL)
-					    < (int)start_pos.col + extra_col)))
+					&& (صحيح)endpos.ستون - 1
+					     < (صحيح)شروع_pos.ستون + extra_ستون)
+				    : ((صحيح)matchpos.ستون
+						  - (ptr[matchpos.ستون] == NUL)
+					    < (صحيح)شروع_pos.ستون + extra_ستون)))
 			{
 			    /*
 			     * If vi-compatible searching, continue at the end
 			     * of the match, otherwise continue one position
 			     * forward.
 			     */
-			    if (search_from_match_end)
+			    إذا (جستجو_from_تطابق_انتها)
 			    {
-				if (nmatched > 1)
+				إذا (nmatched > 1)
 				{
 				    // end is in next line, thus no match in
 				    // this line
-				    match_ok = FALSE;
-				    break;
+				    تطابق_ok = FALSE;
+				    اكسر;
 				}
-				matchcol = endpos.col;
+				matchcol = endpos.ستون;
 				// for empty match: advance one char
-				if (matchcol == matchpos.col
+				إذا (matchcol == matchpos.ستون
 						      && ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    إذا (has_mbyte)
 					matchcol +=
 					  (*mb_ptr2len)(ptr + matchcol);
-				    else
+				    وإلا
 					++matchcol;
 				}
 			    }
-			    else
+			    وإلا
 			    {
 				// Advance "matchcol" to the next character.
 				// This uses rmm_matchcol, the actual start of
 				// the match, ignoring "\zs".
 				matchcol = regmatch.rmm_matchcol;
-				if (ptr[matchcol] != NUL)
+				إذا (ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    إذا (has_mbyte)
 					matchcol += (*mb_ptr2len)(ptr
 								  + matchcol);
-				    else
+				    وإلا
 					++matchcol;
 				}
 			    }
-			    if (matchcol == 0 && (options & SEARCH_START))
-				break;
-			    if (ptr[matchcol] == NUL
+			    إذا (matchcol == 0 && (options & جستجو_شروع))
+				اكسر;
+			    إذا (ptr[matchcol] == NUL
 				    || (nmatched = vim_regexec_multi(&regmatch,
 					      win, buf, lnum + matchpos.lnum,
-					      matchcol, timed_out)) == 0)
+					      matchcol, timed_بیرون)) == 0)
 			    {
-				match_ok = FALSE;
-				break;
+				تطابق_ok = FALSE;
+				اكسر;
 			    }
 			    // vim_regexec_multi() may clear "regprog"
-			    if (regmatch.regprog == NULL)
-				break;
+			    إذا (regmatch.regprog == عدم)
+				اكسر;
 			    matchpos = regmatch.startpos[0];
 			    endpos = regmatch.endpos[0];
-#ifdef FEAT_EVAL
-			    submatch = first_submatch(&regmatch);
-#endif
+#اگر_تعریف_شده FEAT_EVAL
+			    submatch = اولی_submatch(&regmatch);
+#پایان_اگر
 
 			    // Need to get the line pointer again, a
 			    // multi-line search may have made it invalid.
 			    ptr = ml_get_buf(buf, lnum + matchpos.lnum, FALSE);
 			}
-			if (!match_ok)
-			    continue;
+			إذا (!تطابق_ok)
+			    استمر;
 		    }
-		    if (dir == BACKWARD)
+		    إذا (dir == BACKWARD)
 		    {
 			/*
 			 * Now, if there are multiple matches on this line,
@@ -919,39 +919,39 @@ searchit(
 			 * When putting the new cursor at the end, compare
 			 * relative to the end of the match.
 			 */
-			match_ok = FALSE;
-			for (;;)
+			تطابق_ok = FALSE;
+			لكل (;;)
 			{
 			    // Remember a position that is before the start
 			    // position, we use it if it's the last match in
 			    // the line.  Always accept a position after
 			    // wrapping around.
-			    if (loop
-				|| ((options & SEARCH_END)
+			    إذا (loop
+				|| ((options & جستجو_انتها)
 				    ? (lnum + regmatch.endpos[0].lnum
-							      < start_pos.lnum
+							      < شروع_pos.lnum
 					|| (lnum + regmatch.endpos[0].lnum
-							     == start_pos.lnum
-					     && (int)regmatch.endpos[0].col - 1
-							< (int)start_pos.col
-								+ extra_col))
+							     == شروع_pos.lnum
+					     && (صحيح)regmatch.endpos[0].ستون - 1
+							< (صحيح)شروع_pos.ستون
+								+ extra_ستون))
 				    : (lnum + regmatch.startpos[0].lnum
-							      < start_pos.lnum
+							      < شروع_pos.lnum
 					|| (lnum + regmatch.startpos[0].lnum
-							     == start_pos.lnum
-					     && (int)regmatch.startpos[0].col
-						      < (int)start_pos.col
-							      + extra_col))))
+							     == شروع_pos.lnum
+					     && (صحيح)regmatch.startpos[0].ستون
+						      < (صحيح)شروع_pos.ستون
+							      + extra_ستون))))
 			    {
-				match_ok = TRUE;
+				تطابق_ok = TRUE;
 				matchpos = regmatch.startpos[0];
 				endpos = regmatch.endpos[0];
-#ifdef FEAT_EVAL
-				submatch = first_submatch(&regmatch);
-#endif
+#اگر_تعریف_شده FEAT_EVAL
+				submatch = اولی_submatch(&regmatch);
+#پایان_اگر
 			    }
-			    else
-				break;
+			    وإلا
+				اكسر;
 
 			    /*
 			     * We found a valid match, now check if there is
@@ -960,52 +960,52 @@ searchit(
 			     * of the match, otherwise continue one position
 			     * forward.
 			     */
-			    if (search_from_match_end)
+			    إذا (جستجو_from_تطابق_انتها)
 			    {
-				if (nmatched > 1)
-				    break;
-				matchcol = endpos.col;
+				إذا (nmatched > 1)
+				    اكسر;
+				matchcol = endpos.ستون;
 				// for empty match: advance one char
-				if (matchcol == matchpos.col
+				إذا (matchcol == matchpos.ستون
 						      && ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    إذا (has_mbyte)
 					matchcol +=
 					  (*mb_ptr2len)(ptr + matchcol);
-				    else
+				    وإلا
 					++matchcol;
 				}
 			    }
-			    else
+			    وإلا
 			    {
 				// Stop when the match is in a next line.
-				if (matchpos.lnum > 0)
-				    break;
-				matchcol = matchpos.col;
-				if (ptr[matchcol] != NUL)
+				إذا (matchpos.lnum > 0)
+				    اكسر;
+				matchcol = matchpos.ستون;
+				إذا (ptr[matchcol] != NUL)
 				{
-				    if (has_mbyte)
+				    إذا (has_mbyte)
 					matchcol +=
 					  (*mb_ptr2len)(ptr + matchcol);
-				    else
+				    وإلا
 					++matchcol;
 				}
 			    }
-			    if (ptr[matchcol] == NUL
+			    إذا (ptr[matchcol] == NUL
 				    || (nmatched = vim_regexec_multi(&regmatch,
 					      win, buf, lnum + matchpos.lnum,
-					      matchcol, timed_out)) == 0)
+					      matchcol, timed_بیرون)) == 0)
 			    {
 				// If the search timed out, we did find a match
 				// but it might be the wrong one, so that's not
 				// OK.
-				if (*timed_out)
-				    match_ok = FALSE;
-				break;
+				إذا (*timed_بیرون)
+				    تطابق_ok = FALSE;
+				اكسر;
 			    }
 			    // vim_regexec_multi() may clear "regprog"
-			    if (regmatch.regprog == NULL)
-				break;
+			    إذا (regmatch.regprog == عدم)
+				اكسر;
 
 			    // Need to get the line pointer again, a
 			    // multi-line search may have made it invalid.
@@ -1016,104 +1016,104 @@ searchit(
 			 * If there is only a match after the cursor, skip
 			 * this match.
 			 */
-			if (!match_ok)
-			    continue;
+			إذا (!تطابق_ok)
+			    استمر;
 		    }
 
 		    // With the SEARCH_END option move to the last character
 		    // of the match.  Don't do it for an empty match, end
 		    // should be same as start then.
-		    if ((options & SEARCH_END) && !(options & SEARCH_NOOF)
+		    إذا ((options & جستجو_انتها) && !(options & جستجو_NOOF)
 			    && !(matchpos.lnum == endpos.lnum
-				&& matchpos.col == endpos.col))
+				&& matchpos.ستون == endpos.ستون))
 		    {
 			// For a match in the first column, set the position
 			// on the NUL in the previous line.
 			pos->lnum = lnum + endpos.lnum;
-			pos->col = endpos.col;
-			if (endpos.col == 0)
+			pos->ستون = endpos.ستون;
+			إذا (endpos.ستون == 0)
 			{
-			    if (pos->lnum > 1)  // just in case
+			    إذا (pos->lnum > 1)  // just in case
 			    {
 				--pos->lnum;
-				pos->col = ml_get_buf_len(buf, pos->lnum);
+				pos->ستون = ml_get_buf_len(buf, pos->lnum);
 			    }
 			}
-			else
+			وإلا
 			{
-			    --pos->col;
-			    if (has_mbyte
-				    && pos->lnum <= buf->b_ml.ml_line_count)
+			    --pos->ستون;
+			    إذا (has_mbyte
+				    && pos->lnum <= buf->b_ml.ml_سطر_شمار)
 			    {
 				ptr = ml_get_buf(buf, pos->lnum, FALSE);
-				pos->col -= (*mb_head_off)(ptr, ptr + pos->col);
+				pos->ستون -= (*mb_سر_off)(ptr, ptr + pos->ستون);
 			    }
 			}
-			if (end_pos != NULL)
+			إذا (انتها_pos != عدم)
 			{
-			    end_pos->lnum = lnum + matchpos.lnum;
-			    end_pos->col = matchpos.col;
+			    انتها_pos->lnum = lnum + matchpos.lnum;
+			    انتها_pos->ستون = matchpos.ستون;
 			}
 		    }
-		    else
+		    وإلا
 		    {
 			pos->lnum = lnum + matchpos.lnum;
-			pos->col = matchpos.col;
-			if (end_pos != NULL)
+			pos->ستون = matchpos.ستون;
+			إذا (انتها_pos != عدم)
 			{
-			    end_pos->lnum = lnum + endpos.lnum;
-			    end_pos->col = endpos.col;
+			    انتها_pos->lnum = lnum + endpos.lnum;
+			    انتها_pos->ستون = endpos.ستون;
 			}
 		    }
 		    pos->coladd = 0;
-		    if (end_pos != NULL)
-			end_pos->coladd = 0;
-		    found = 1;
-		    first_match = FALSE;
+		    إذا (انتها_pos != عدم)
+			انتها_pos->coladd = 0;
+		    یافت = 1;
+		    اولی_تطابق = FALSE;
 
 		    // Set variables used for 'incsearch' highlighting.
-		    search_match_lines = endpos.lnum - matchpos.lnum;
-		    search_match_endcol = endpos.col;
-		    break;
+		    جستجو_تطابق_سطرها = endpos.lnum - matchpos.lnum;
+		    جستجو_تطابق_endcol = endpos.ستون;
+		    اكسر;
 		}
-		line_breakcheck();	// stop if ctrl-C typed
-		if (got_int)
-		    break;
+		سطر_breakcheck();	// stop if ctrl-C typed
+		إذا (got_int)
+		    اكسر;
 
-#ifdef FEAT_SEARCH_EXTRA
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
 		// Cancel searching if a character was typed.  Used for
 		// 'incsearch'.  Don't check too often, that would slowdown
 		// searching too much.
-		if ((options & SEARCH_PEEK)
+		إذا ((options & جستجو_PEEK)
 			&& ((lnum - pos->lnum) & 0x3f) == 0
 			&& char_avail())
 		{
 		    break_loop = TRUE;
-		    break;
+		    اكسر;
 		}
-#endif
+#پایان_اگر
 
-		if (loop && lnum == start_pos.lnum)
-		    break;	    // if second loop, stop where started
+		إذا (loop && lnum == شروع_pos.lnum)
+		    اكسر;	    // if second loop, stop where started
 	    }
-	    at_first_line = FALSE;
+	    at_اولی_سطر = FALSE;
 
 	    // vim_regexec_multi() may clear "regprog"
-	    if (regmatch.regprog == NULL)
-		break;
+	    إذا (regmatch.regprog == عدم)
+		اكسر;
 
 	    /*
 	     * Stop the search if wrapscan isn't set, "stop_lnum" is
 	     * specified, after an interrupt, after a match and after looping
 	     * twice.
 	     */
-	    if (!p_ws || stop_lnum != 0 || got_int
-			      || called_emsg > called_emsg_before || *timed_out
-#ifdef FEAT_SEARCH_EXTRA
+	    إذا (!p_ws || stop_lnum != 0 || got_int
+			      || called_emsg > called_emsg_before || *timed_بیرون
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
 			      || break_loop
-#endif
-			      || found || loop)
-		break;
+#پایان_اگر
+			      || یافت || loop)
+		اكسر;
 
 	    /*
 	     * If 'wrapscan' is set we continue at the other end of the file.
@@ -1124,96 +1124,96 @@ searchit(
 	     * is redrawn. The keep_msg is cleared whenever another message is
 	     * written.
 	     */
-	    if (dir == BACKWARD)    // start second loop at the other end
-		lnum = buf->b_ml.ml_line_count;
-	    else
+	    إذا (dir == BACKWARD)    // start second loop at the other end
+		lnum = buf->b_ml.ml_سطر_شمار;
+	    وإلا
 		lnum = 1;
-	    if (!shortmess(SHM_SEARCH)
+	    إذا (!shortmess(SHM_جستجو)
 		    && shortmess(SHM_SEARCHCOUNT)
-		    && (options & SEARCH_MSG))
+		    && (options & جستجو_پیام))
 		give_warning((char_u *)_(dir == BACKWARD
-					  ? top_bot_msg : bot_top_msg), TRUE);
-	    if (extra_arg != NULL)
+					  ? بالاترین_bot_پیام : bot_بالاترین_پیام), TRUE);
+	    إذا (extra_arg != عدم)
 		extra_arg->sa_wrapped = TRUE;
 	}
-	if (got_int || called_emsg > called_emsg_before || *timed_out
-#ifdef FEAT_SEARCH_EXTRA
+	إذا (got_int || called_emsg > called_emsg_before || *timed_بیرون
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
 		|| break_loop
-#endif
+#پایان_اگر
 		)
-	    break;
+	    اكسر;
     }
-    while (--count > 0 && found);   // stop after count matches or no match
+    طالما (--شمار > 0 && یافت);   // stop after count matches or no match
 
-#ifdef FEAT_RELTIME
-    if (extra_arg != NULL && extra_arg->sa_tm > 0)
+#اگر_تعریف_شده FEAT_RELTIME
+    إذا (extra_arg != عدم && extra_arg->sa_tm > 0)
 	disable_regexp_timeout();
-#endif
+#پایان_اگر
     vim_regfree(regmatch.regprog);
 
-    if (!found)		    // did not find it
+    إذا (!یافت)		    // did not find it
     {
-	if (got_int)
+	إذا (got_int)
 	    emsg(_(e_interrupted));
-	else if ((options & SEARCH_MSG) == SEARCH_MSG)
+	وإلا إذا ((options & جستجو_پیام) == جستجو_پیام)
 	{
-	    if (p_ws)
-		semsg(_(e_pattern_not_found_str), mr_pattern);
-	    else if (lnum == 0)
-		semsg(_(e_search_hit_top_without_match_for_str), mr_pattern);
-	    else
-		semsg(_(e_search_hit_bottom_without_match_for_str), mr_pattern);
+	    إذا (p_ws)
+		semsg(_(e_الگو_not_یافت_str), mr_الگو);
+	    وإلا إذا (lnum == 0)
+		semsg(_(e_جستجو_اصابت_بالاترین_without_تطابق_for_str), mr_الگو);
+	    وإلا
+		semsg(_(e_جستجو_اصابت_bottom_without_تطابق_for_str), mr_الگو);
 	}
-	return FAIL;
+	أرجع FAIL;
     }
 
     // A pattern like "\n\zs" may go past the last line.
-    if (pos->lnum > buf->b_ml.ml_line_count)
+    إذا (pos->lnum > buf->b_ml.ml_سطر_شمار)
     {
-	pos->lnum = buf->b_ml.ml_line_count;
-	pos->col = ml_get_buf_len(buf, pos->lnum);
-	if (pos->col > 0)
-	    --pos->col;
+	pos->lnum = buf->b_ml.ml_سطر_شمار;
+	pos->ستون = ml_get_buf_len(buf, pos->lnum);
+	إذا (pos->ستون > 0)
+	    --pos->ستون;
     }
 
-    return submatch + 1;
+    أرجع submatch + 1;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_PROTO)
-    void
-set_search_direction(int cdir)
+#إذا defined(FEAT_EVAL) || defined(FEAT_PROTO)
+    فراغ
+مجموعه_جستجو_direction(صحيح cdir)
 {
     spats[0].off.dir = cdir;
 }
 
-    static void
-set_vv_searchforward(void)
+    ساكن فراغ
+مجموعه_vv_searchforward(فراغ)
 {
-    set_vim_var_nr(VV_SEARCHFORWARD, (long)(spats[0].off.dir == '/'));
+    مجموعه_vim_var_nr(VV_SEARCHFORWARD, (دراز)(spats[0].off.dir == '/'));
 }
 
 /*
  * Return the number of the first subpat that matched.
  * Return zero if none of them matched.
  */
-    static int
-first_submatch(regmmatch_T *rp)
+    ساكن صحيح
+اولی_submatch(regmmatch_T *rp)
 {
-    int		submatch;
+    صحيح		submatch;
 
-    for (submatch = 1; ; ++submatch)
+    لكل (submatch = 1; ; ++submatch)
     {
-	if (rp->startpos[submatch].lnum >= 0)
-	    break;
-	if (submatch == 9)
+	إذا (rp->startpos[submatch].lnum >= 0)
+	    اكسر;
+	إذا (submatch == 9)
 	{
 	    submatch = 0;
-	    break;
+	    اكسر;
 	}
     }
-    return submatch;
+    أرجع submatch;
 }
-#endif
+#پایان_اگر
 
 /*
  * Parse a search pattern followed by an optional offset (e.g. "pat/e+1").
@@ -1231,91 +1231,91 @@ first_submatch(regmmatch_T *rp)
  * Returns the length of the parsed pattern + offset (used by get_address()
  * to know how much of the command line was consumed).
  */
-    int
-parse_search_pattern_offset(
+    صحيح
+parse_جستجو_الگو_جابه_جایی(
     char_u	**pat,
     size_t	*patlen,
-    int		search_delim,
-    int		options,
+    صحيح		جستجو_delim,
+    صحيح		options,
     char_u	**strcopy,
     char_u	**searchstr,
     size_t	*searchstrlen,
     char_u	**dircp,
-    soffset_T	*offset)
+    soffset_T	*جابه_جایی)
 {
-    int		cmdlen = 0;
+    صحيح		cmdlen = 0;
     char_u	*p;
     char_u	*ps;
 
-    if (*pat == NULL || **pat == NUL)
-	return 0;
+    إذا (*pat == عدم || **pat == NUL)
+	أرجع 0;
 
     ps = *strcopy;
     *searchstr = *pat;
     *searchstrlen = *patlen;
-    *dircp = NULL;
+    *dircp = عدم;
 
     /*
      * Find end of regular expression.
      * If there is a matching '/' or '?', toss it.
      */
-    p = skip_regexp_ex(*pat, search_delim, magic_isset(),
-						    strcopy, NULL, NULL);
-    if (*strcopy != ps)
+    p = skip_regexp_ex(*pat, جستجو_delim, magic_isset(),
+						    strcopy, عدم, عدم);
+    إذا (*strcopy != ps)
     {
 	size_t len = STRLEN(*strcopy);
 	// made a copy of "pat" to change "\?" to "?"
-	cmdlen += (int)(*patlen - len);
+	cmdlen += (صحيح)(*patlen - len);
 	*pat = *strcopy;
 	*patlen = len;
 	*searchstr = *strcopy;
 	*searchstrlen = len;
     }
-    if (*p == search_delim)
+    إذا (*p == جستجو_delim)
     {
 	*searchstrlen = p - *pat;
 	*dircp = p;	// remember where we put the NUL
 	*p++ = NUL;
     }
 
-    offset->line = FALSE;
-    offset->end = FALSE;
-    offset->off = 0;
+    جابه_جایی->سطر = FALSE;
+    جابه_جایی->انتها = FALSE;
+    جابه_جایی->off = 0;
     /*
      * Check for a line offset or a character offset.
      * For get_address (echo off) we don't check for a character
      * offset, because it is meaningless and the 's' could be a
      * substitute command.
      */
-    if (*p == '+' || *p == '-' || VIM_ISDIGIT(*p))
-	offset->line = TRUE;
-    else if ((options & SEARCH_OPT)
+    إذا (*p == '+' || *p == '-' || VIM_ISDIGIT(*p))
+	جابه_جایی->سطر = TRUE;
+    وإلا إذا ((options & جستجو_OPT)
 				  && (*p == 'e' || *p == 's' || *p == 'b'))
     {
-	if (*p == 'e')		// end
-	    offset->end = SEARCH_END;
+	إذا (*p == 'e')		// end
+	    جابه_جایی->انتها = جستجو_انتها;
 	++p;
     }
-    if (VIM_ISDIGIT(*p) || *p == '+' || *p == '-')  // got an offset
+    إذا (VIM_ISDIGIT(*p) || *p == '+' || *p == '-')  // got an offset
     {
 				    // 'nr' or '+nr' or '-nr'
-	if (VIM_ISDIGIT(*p) || VIM_ISDIGIT(*(p + 1)))
-	    offset->off = atol((char *)p);
-	else if (*p == '-')	    // single '-'
-	    offset->off = -1;
-	else			    // single '+'
-	    offset->off = 1;
+	إذا (VIM_ISDIGIT(*p) || VIM_ISDIGIT(*(p + 1)))
+	    جابه_جایی->off = atol((حرف *)p);
+	وإلا إذا (*p == '-')	    // single '-'
+	    جابه_جایی->off = -1;
+	وإلا			    // single '+'
+	    جابه_جایی->off = 1;
 	++p;
-	while (VIM_ISDIGIT(*p))	    // skip number
+	طالما (VIM_ISDIGIT(*p))	    // skip number
 	    ++p;
     }
 
     // compute length of search command for get_address()
-    cmdlen += (int)(p - *pat);
+    cmdlen += (صحيح)(p - *pat);
     *patlen -= p - *pat;
     *pat = p;			    // put pat after search command
 
-    return cmdlen;
+    أرجع cmdlen;
 }
 
 /*
@@ -1339,40 +1339,40 @@ parse_search_pattern_offset(
  *
  * Return 0 for failure, 1 for found, 2 for found and line offset added.
  */
-    int
-do_search(
+    صحيح
+do_جستجو(
     oparg_T	    *oap,	// can be NULL
-    int		    dirc,	// '/' or '?'
-    int		    search_delim, // the delimiter for the search, e.g. '%' in
+    صحيح		    dirc,	// '/' or '?'
+    صحيح		    جستجو_delim, // the delimiter for the search, e.g. '%' in
 				  // s%regex%replacement%
     char_u	    *pat,
     size_t	    patlen,
-    long	    count,
-    int		    options,
+    دراز	    شمار,
+    صحيح		    options,
     searchit_arg_T  *sia)	// optional arguments or NULL
 {
     pos_T	    pos;	// position of the last match
     char_u	    *searchstr;
     size_t	    searchstrlen;
     soffset_T	    old_off;
-    int		    retval;	// Return value
+    صحيح		    retval;	// Return value
     char_u	    *p;
-    long	    c;
+    دراز	    c;
     char_u	    *dircp;
-    char_u	    *strcopy = NULL;
-    int		    show_search_stats;
-    char_u	    *msgbuf = NULL;
+    char_u	    *strcopy = عدم;
+    صحيح		    show_جستجو_stats;
+    char_u	    *msgbuf = عدم;
     size_t	    msgbuflen = 0;
-    int		    has_offset = FALSE;
+    صحيح		    has_جابه_جایی = FALSE;
 
     searchcmdlen = 0;
 
     /*
      * A line offset is not remembered, this is vi compatible.
      */
-    if (spats[0].off.line && vim_strchr(p_cpo, CPO_LINEOFF) != NULL)
+    إذا (spats[0].off.سطر && vim_strchr(p_cpo, CPO_LINEOFF) != عدم)
     {
-	spats[0].off.line = FALSE;
+	spats[0].off.سطر = FALSE;
 	spats[0].off.off = 0;
     }
 
@@ -1387,81 +1387,81 @@ do_search(
     /*
      * Find out the direction of the search.
      */
-    if (dirc == 0)
+    إذا (dirc == 0)
 	dirc = spats[0].off.dir;
-    else
+    وإلا
     {
 	spats[0].off.dir = dirc;
-#if defined(FEAT_EVAL)
-	set_vv_searchforward();
-#endif
+#إذا defined(FEAT_EVAL)
+	مجموعه_vv_searchforward();
+#پایان_اگر
     }
-    if (options & SEARCH_REV)
+    إذا (options & جستجو_REV)
     {
-#ifdef MSWIN
+#اگر_تعریف_شده MSWIN
 	// There is a bug in the Visual C++ 2.2 compiler which means that
 	// dirc always ends up being '/'
 	dirc = (dirc == '/')  ?  '?'  :  '/';
-#else
-	if (dirc == '/')
+#وإلا
+	إذا (dirc == '/')
 	    dirc = '?';
-	else
+	وإلا
 	    dirc = '/';
-#endif
+#پایان_اگر
     }
 
-#ifdef FEAT_FOLDING
+#اگر_تعریف_شده FEAT_FOLDING
     // If the cursor is in a closed fold, don't find another match in the same
     // fold.
-    if (dirc == '/')
+    إذا (dirc == '/')
     {
-	if (hasFolding(pos.lnum, NULL, &pos.lnum))
-	    pos.col = MAXCOL - 2;	// avoid overflow when adding 1
+	إذا (hasFolding(pos.lnum, عدم, &pos.lnum))
+	    pos.ستون = MAXCOL - 2;	// avoid overflow when adding 1
     }
-    else
+    وإلا
     {
-	if (hasFolding(pos.lnum, &pos.lnum, NULL))
-	    pos.col = 0;
+	إذا (hasFolding(pos.lnum, &pos.lnum, عدم))
+	    pos.ستون = 0;
     }
-#endif
+#پایان_اگر
 
-#ifdef FEAT_SEARCH_EXTRA
+#اگر_تعریف_شده FEAT_جستجو_EXTRA
     /*
      * Turn 'hlsearch' highlighting back on.
      */
-    if (no_hlsearch && !(options & SEARCH_KEEP))
+    إذا (no_hlsearch && !(options & جستجو_KEEP))
     {
 	redraw_all_later(UPD_SOME_VALID);
-	set_no_hlsearch(FALSE);
+	مجموعه_no_hlsearch(FALSE);
     }
-#endif
+#پایان_اگر
 
     /*
      * Repeat the search when pattern followed by ';', e.g. "/foo/;?bar".
      */
-    for (;;)
+    لكل (;;)
     {
-	int		show_top_bot_msg = FALSE;
+	صحيح		show_بالاترین_bot_پیام = FALSE;
 
 	searchstr = pat;
 	searchstrlen = patlen;
 
-	dircp = NULL;
+	dircp = عدم;
 					    // use previous pattern
-	if (pat == NULL || *pat == NUL || *pat == search_delim)
+	إذا (pat == عدم || *pat == NUL || *pat == جستجو_delim)
 	{
-	    if (spats[RE_SEARCH].pat == NULL)	    // no previous pattern
+	    إذا (spats[RE_جستجو].pat == عدم)	    // no previous pattern
 	    {
-		if (spats[RE_SUBST].pat == NULL)
+		إذا (spats[RE_SUBST].pat == عدم)
 		{
-		    emsg(_(e_no_previous_regular_expression));
+		    emsg(_(e_no_قبلی_regular_عبارت));
 		    retval = 0;
-		    goto end_do_search;
+		    اذهب انتها_do_جستجو;
 		}
 		searchstr = spats[RE_SUBST].pat;
 		searchstrlen = spats[RE_SUBST].patlen;
 	    }
-	    else
+	    وإلا
 	    {
 		// make search_regcomp() use spats[RE_SEARCH].pat
 		searchstr = (char_u *)"";
@@ -1469,26 +1469,26 @@ do_search(
 	    }
 	}
 
-	if (pat != NULL && *pat != NUL)	// look for (new) offset
+	إذا (pat != عدم && *pat != NUL)	// look for (new) offset
 	{
 	    char_u	*prev_searchstr = searchstr;
 	    size_t	prev_searchstrlen = searchstrlen;
 
-	    searchcmdlen += parse_search_pattern_offset(&pat, &patlen,
-				search_delim, options, &strcopy, &searchstr,
+	    searchcmdlen += parse_جستجو_الگو_جابه_جایی(&pat, &patlen,
+				جستجو_delim, options, &strcopy, &searchstr,
 				&searchstrlen, &dircp, &spats[0].off);
 	    // An empty pattern (e.g. "//e") uses the previous pattern selected
 	    // above.
-	    if (*searchstr == NUL)
+	    إذا (*searchstr == NUL)
 	    {
 		searchstr = prev_searchstr;
 		searchstrlen = prev_searchstrlen;
 	    }
 	}
 
-	show_search_stats = FALSE;
-	if ((options & SEARCH_ECHO) && messaging()
-		&& !msg_silent
+	show_جستجو_stats = FALSE;
+	إذا ((options & جستجو_ECHO) && messaging()
+		&& !پیام_silent
 		&& (!cmd_silent || !shortmess(SHM_SEARCHCOUNT)))
 	{
 	    char_u	off_buf[40];
@@ -1497,132 +1497,132 @@ do_search(
 	    size_t	msgbufsize;
 
 	    // Compute msg_row early.
-	    msg_start();
+	    پیام_شروع();
 
 	    // Get the offset, so we know how long it is.
-	    if (!cmd_silent &&
-		    (spats[0].off.line || spats[0].off.end || spats[0].off.off))
+	    إذا (!cmd_silent &&
+		    (spats[0].off.سطر || spats[0].off.انتها || spats[0].off.off))
 	    {
 		off_buf[off_len++] = dirc;
-		if (spats[0].off.end)
+		إذا (spats[0].off.انتها)
 		    off_buf[off_len++] = 'e';
-		else if (!spats[0].off.line)
+		وإلا إذا (!spats[0].off.سطر)
 		    off_buf[off_len++] = 's';
 		off_buf[off_len] = NUL;
-		if (spats[0].off.off != 0 || spats[0].off.line)
-		    off_len += vim_snprintf((char *)off_buf + off_len,
-			   sizeof(off_buf) - off_len, "%+ld", spats[0].off.off);
+		إذا (spats[0].off.off != 0 || spats[0].off.سطر)
+		    off_len += vim_snprintf((حرف *)off_buf + off_len,
+			   حجم(off_buf) - off_len, "%+ld", spats[0].off.off);
 	    }
 
-	    if (*searchstr == NUL)
+	    إذا (*searchstr == NUL)
 	    {
 		p = spats[0].pat;
 		plen = spats[0].patlen;
 	    }
-	    else
+	    وإلا
 	    {
 		p = searchstr;
 		plen = searchstrlen;
 	    }
 
-	    if (!shortmess(SHM_SEARCHCOUNT) || cmd_silent)
+	    إذا (!shortmess(SHM_SEARCHCOUNT) || cmd_silent)
 	    {
 		// Reserve enough space for the search pattern + offset +
 		// search stat.  Use all the space available, so that the
 		// search state is right aligned.  If there is not enough space
 		// msg_strtrunc() will shorten in the middle.
-		if (msg_scrolled != 0 && !cmd_silent)
+		إذا (پیام_scrolled != 0 && !cmd_silent)
 		    // Use all the columns.
-		    msgbufsize = (int)(Rows - msg_row) * cmdline_width - 1;
-		else
+		    msgbufsize = (صحيح)(ردیفها - پیام_ردیف) * cmdline_عرض - 1;
+		وإلا
 		    // Use up to 'showcmd' column.
-		    msgbufsize = (int)(Rows - msg_row - 1) * cmdline_width
-			+ sc_col - 1;
-		if (msgbufsize < plen + off_len + SEARCH_STAT_BUF_LEN + 3)
-		    msgbufsize = plen + off_len + SEARCH_STAT_BUF_LEN + 3;
+		    msgbufsize = (صحيح)(ردیفها - پیام_ردیف - 1) * cmdline_عرض
+			+ sc_ستون - 1;
+		إذا (msgbufsize < plen + off_len + جستجو_STAT_BUF_LEN + 3)
+		    msgbufsize = plen + off_len + جستجو_STAT_BUF_LEN + 3;
 	    }
-	    else
+	    وإلا
 		// Reserve enough space for the search pattern + offset.
 		msgbufsize = plen + off_len + 3;
 
 	    vim_free(msgbuf);
 	    msgbuf = alloc(msgbufsize);
-	    if (msgbuf == NULL)
+	    إذا (msgbuf == عدم)
 	    {
 		msgbuflen = 0;
 	    }
-	    else
+	    وإلا
 	    {
 		vim_memset(msgbuf, ' ', msgbufsize);
 		msgbuflen = msgbufsize - 1;
 		msgbuf[msgbuflen] = NUL;
 		// do not fill the msgbuf buffer, if cmd_silent is set, leave it
 		// empty for the search_stat feature.
-		if (!cmd_silent)
+		إذا (!cmd_silent)
 		{
 		    char_u	*trunc;
 
 		    msgbuf[0] = dirc;
 
-		    if (enc_utf8 && utf_iscomposing(utf_ptr2char(p)))
+		    إذا (enc_utf8 && utf_iscomposing(utf_ptr2char(p)))
 		    {
 			// Use a space to draw the composing char on.
 			msgbuf[1] = ' ';
 			mch_memmove(msgbuf + 2, p, plen);
 		    }
-		    else
+		    وإلا
 			mch_memmove(msgbuf + 1, p, plen);
-		    if (off_len > 0)
+		    إذا (off_len > 0)
 			mch_memmove(msgbuf + plen + 1, off_buf, off_len);
 
-		    trunc = msg_strtrunc(msgbuf, TRUE);
-		    if (trunc != NULL)
+		    trunc = پیام_strtrunc(msgbuf, TRUE);
+		    إذا (trunc != عدم)
 		    {
 			vim_free(msgbuf);
 			msgbuf = trunc;
 			msgbuflen = STRLEN(msgbuf);
 		    }
 
-#ifdef FEAT_RIGHTLEFT
+#اگر_تعریف_شده FEAT_RIGHTLEFT
 		    // The search pattern could be shown on the right in
 		    // rightleft mode, but the 'ruler' and 'showcmd' area use
 		    // it too, thus it would be blanked out again very soon.
 		    // Show it on the left, but do reverse the text.
-		    if (curwin->w_p_rl && *curwin->w_p_rlc == 's')
+		    إذا (curwin->w_p_rl && *curwin->w_p_rlc == 's')
 		    {
 			char_u *r;
 			size_t pat_len;
 
-			r = reverse_text(msgbuf);
-			if (r != NULL)
+			r = معکوس_متن(msgbuf);
+			إذا (r != عدم)
 			{
 			    vim_free(msgbuf);
 			    msgbuf = r;
 			    msgbuflen = STRLEN(msgbuf);
 			    // move reversed text to beginning of buffer
-			    while (*r != NUL && *r == ' ')
+			    طالما (*r != NUL && *r == ' ')
 				r++;
 			    pat_len = msgbuf + msgbuflen - r;
 			    mch_memmove(msgbuf, r, pat_len);
 			    // overwrite old text
-			    if ((size_t)(r - msgbuf) >= pat_len)
+			    إذا ((size_t)(r - msgbuf) >= pat_len)
 				vim_memset(r, ' ', pat_len);
-			    else
+			    وإلا
 				vim_memset(msgbuf + pat_len, ' ', r - msgbuf);
 			}
 		    }
-#endif
-		    msg_outtrans(msgbuf);
-		    msg_clr_eos();
-		    msg_check();
+#پایان_اگر
+		    پیام_outtrans(msgbuf);
+		    پیام_clr_eos();
+		    پیام_check();
 
 		    gotocmdline(FALSE);
-		    out_flush();
-		    msg_nowait = TRUE;	    // don't wait for this message
+		    بیرون_flush();
+		    پیام_nowait = TRUE;	    // don't wait for this message
 		}
 
-		if (!shortmess(SHM_SEARCHCOUNT))
-		    show_search_stats = TRUE;
+		إذا (!shortmess(SHM_SEARCHCOUNT))
+		    show_جستجو_stats = TRUE;
 	    }	// msgbuf != NULL
 	}
 
@@ -1633,28 +1633,28 @@ do_search(
 	 * This is not done for a line offset, because then we would not be vi
 	 * compatible.
 	 */
-	if (!spats[0].off.line && spats[0].off.off && pos.col < MAXCOL - 2)
+	إذا (!spats[0].off.سطر && spats[0].off.off && pos.ستون < MAXCOL - 2)
 	{
-	    if (spats[0].off.off > 0)
+	    إذا (spats[0].off.off > 0)
 	    {
-		for (c = spats[0].off.off; c; --c)
-		    if (decl(&pos) == -1)
-			break;
-		if (c)			// at start of buffer
+		لكل (c = spats[0].off.off; c; --c)
+		    إذا (decl(&pos) == -1)
+			اكسر;
+		إذا (c)			// at start of buffer
 		{
 		    pos.lnum = 0;	// allow lnum == 0 here
-		    pos.col = MAXCOL;
+		    pos.ستون = MAXCOL;
 		}
 	    }
-	    else
+	    وإلا
 	    {
-		for (c = spats[0].off.off; c; ++c)
-		    if (incl(&pos) == -1)
-			break;
-		if (c)			// at end of buffer
+		لكل (c = spats[0].off.off; c; ++c)
+		    إذا (incl(&pos) == -1)
+			اكسر;
+		إذا (c)			// at end of buffer
 		{
-		    pos.lnum = curbuf->b_ml.ml_line_count + 1;
-		    pos.col = 0;
+		    pos.lnum = curbuf->b_ml.ml_سطر_شمار + 1;
+		    pos.ستون = 0;
 		}
 	    }
 	}
@@ -1662,26 +1662,26 @@ do_search(
 	/*
 	 * The actual search.
 	 */
-	c = searchit(curwin, curbuf, &pos, NULL,
+	c = searchit(curwin, curbuf, &pos, عدم,
 					      dirc == '/' ? FORWARD : BACKWARD,
-		searchstr, searchstrlen, count, spats[0].off.end + (options &
-		       (SEARCH_KEEP + SEARCH_PEEK + SEARCH_HIS
-			+ SEARCH_MSG + SEARCH_START
-			+ ((pat != NULL && *pat == ';') ? 0 : SEARCH_NOOF))),
-		RE_LAST, sia);
+		searchstr, searchstrlen, شمار, spats[0].off.انتها + (options &
+		       (جستجو_KEEP + جستجو_PEEK + جستجو_HIS
+			+ جستجو_پیام + جستجو_شروع
+			+ ((pat != عدم && *pat == ';') ? 0 : جستجو_NOOF))),
+		RE_آخرین, sia);
 
-	if (dircp != NULL)
-	    *dircp = search_delim; // restore second '/' or '?' for normal_cmd()
+	إذا (dircp != عدم)
+	    *dircp = جستجو_delim; // restore second '/' or '?' for normal_cmd()
 
-	if (!shortmess(SHM_SEARCH) && sia && sia->sa_wrapped)
-	    show_top_bot_msg = TRUE;
+	إذا (!shortmess(SHM_جستجو) && sia && sia->sa_wrapped)
+	    show_بالاترین_bot_پیام = TRUE;
 
-	if (c == FAIL)
+	إذا (c == FAIL)
 	{
 	    retval = 0;
-	    goto end_do_search;
+	    اذهب انتها_do_جستجو;
 	}
-	if (spats[0].off.end && oap != NULL)
+	إذا (spats[0].off.انتها && oap != عدم)
 	    oap->inclusive = TRUE;  // 'e' includes last character
 
 	retval = 1;		    // pattern found
@@ -1689,58 +1689,58 @@ do_search(
 	/*
 	 * Add character and/or line offset
 	 */
-	if (!(options & SEARCH_NOOF) || (pat != NULL && *pat == ';'))
+	إذا (!(options & جستجو_NOOF) || (pat != عدم && *pat == ';'))
 	{
 	    pos_T org_pos = pos;
 
-	    if (spats[0].off.line)	// Add the offset to the line number.
+	    إذا (spats[0].off.سطر)	// Add the offset to the line number.
 	    {
 		c = pos.lnum + spats[0].off.off;
-		if (c < 1)
+		إذا (c < 1)
 		    pos.lnum = 1;
-		else if (c > curbuf->b_ml.ml_line_count)
-		    pos.lnum = curbuf->b_ml.ml_line_count;
-		else
+		وإلا إذا (c > curbuf->b_ml.ml_سطر_شمار)
+		    pos.lnum = curbuf->b_ml.ml_سطر_شمار;
+		وإلا
 		    pos.lnum = c;
-		pos.col = 0;
+		pos.ستون = 0;
 
 		retval = 2;	    // pattern found, line offset added
 	    }
-	    else if (pos.col < MAXCOL - 2)	// just in case
+	    وإلا إذا (pos.ستون < MAXCOL - 2)	// just in case
 	    {
 		// to the right, check for end of file
 		c = spats[0].off.off;
-		if (c > 0)
+		إذا (c > 0)
 		{
-		    while (c-- > 0)
-			if (incl(&pos) == -1)
-			    break;
+		    طالما (c-- > 0)
+			إذا (incl(&pos) == -1)
+			    اكسر;
 		}
 		// to the left, check for start of file
-		else
+		وإلا
 		{
-		    while (c++ < 0)
-			if (decl(&pos) == -1)
-			    break;
+		    طالما (c++ < 0)
+			إذا (decl(&pos) == -1)
+			    اكسر;
 		}
 	    }
-	    if (!EQUAL_POS(pos, org_pos))
-		has_offset = TRUE;
+	    إذا (!EQUAL_POS(pos, org_pos))
+		has_جابه_جایی = TRUE;
 	}
 
 	// Show [1/15] if 'S' is not in 'shortmess'.
-	if (show_search_stats)
-	     cmdline_search_stat(dirc, &pos, &curwin->w_cursor,
-				show_top_bot_msg, msgbuf, msgbuflen,
-				(count != 1 || has_offset
-#ifdef FEAT_FOLDING
-				 || (!(fdo_flags & FDO_SEARCH)
+	إذا (show_جستجو_stats)
+	     cmdline_جستجو_stat(dirc, &pos, &curwin->w_cursor,
+				show_بالاترین_bot_پیام, msgbuf, msgbuflen,
+				(شمار != 1 || has_جابه_جایی
+#اگر_تعریف_شده FEAT_FOLDING
+				 || (!(fdo_flags & FDO_جستجو)
 				     && hasFolding(curwin->w_cursor.lnum,
-								   NULL, NULL))
-#endif
+								   عدم, عدم))
+#پایان_اگر
 				),
 				p_msc,
-				SEARCH_STAT_DEF_TIMEOUT);
+				جستجو_STAT_DEF_TIMEOUT);
 
 	/*
 	 * The search command can be followed by a ';' to do another search.
@@ -1750,34 +1750,34 @@ do_search(
 	 * - When an error happens the cursor isn't moved at all.
 	 * Don't do this when called by get_address() (it handles ';' itself).
 	 */
-	if (!(options & SEARCH_OPT) || pat == NULL || *pat != ';')
-	    break;
+	إذا (!(options & جستجو_OPT) || pat == عدم || *pat != ';')
+	    اكسر;
 
 	dirc = *++pat;
 	--patlen;
-	search_delim = dirc;
-	if (dirc != '?' && dirc != '/')
+	جستجو_delim = dirc;
+	إذا (dirc != '?' && dirc != '/')
 	{
 	    retval = 0;
 	    emsg(_(e_expected_question_or_slash_after_semicolon));
-	    goto end_do_search;
+	    اذهب انتها_do_جستجو;
 	}
 	++pat;
 	--patlen;
     }
 
-    if (options & SEARCH_MARK)
+    إذا (options & جستجو_MARK)
 	setpcmark();
     curwin->w_cursor = pos;
-    curwin->w_set_curswant = true;
+    curwin->w_مجموعه_curswant = true;
 
-end_do_search:
-    if ((options & SEARCH_KEEP) || (cmdmod.cmod_flags & CMOD_KEEPPATTERNS))
+انتها_do_جستجو:
+    إذا ((options & جستجو_KEEP) || (cmdmod.cmod_flags & CMOD_KEEPPATTERNS))
 	spats[0].off = old_off;
     vim_free(strcopy);
     vim_free(msgbuf);
 
-    return retval;
+    أرجع retval;
 }
 
 /*
@@ -1789,74 +1789,74 @@ end_do_search:
  * ADDING is set.  If p_ic is set then the pattern must be in lowercase.
  * Return OK for success, or FAIL if no line found.
  */
-    int
-search_for_exact_line(
+    صحيح
+جستجو_for_exact_سطر(
     buf_T	*buf,
     pos_T	*pos,
-    int		dir,
+    صحيح		dir,
     char_u	*pat)
 {
-    linenr_T	start = 0;
+    linenr_T	شروع = 0;
     char_u	*ptr;
     char_u	*p;
-    int		compl_len = ins_compl_len();
+    صحيح		compl_len = ins_compl_len();
 
-    if (buf->b_ml.ml_line_count == 0)
-	return FAIL;
-    for (;;)
+    إذا (buf->b_ml.ml_سطر_شمار == 0)
+	أرجع FAIL;
+    لكل (;;)
     {
 	pos->lnum += dir;
-	if (pos->lnum < 1)
+	إذا (pos->lnum < 1)
 	{
-	    if (p_ws)
+	    إذا (p_ws)
 	    {
-		pos->lnum = buf->b_ml.ml_line_count;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(top_bot_msg), TRUE);
+		pos->lnum = buf->b_ml.ml_سطر_شمار;
+		إذا (!shortmess(SHM_جستجو))
+		    give_warning((char_u *)_(بالاترین_bot_پیام), TRUE);
 	    }
-	    else
+	    وإلا
 	    {
 		pos->lnum = 1;
-		break;
+		اكسر;
 	    }
 	}
-	else if (pos->lnum > buf->b_ml.ml_line_count)
+	وإلا إذا (pos->lnum > buf->b_ml.ml_سطر_شمار)
 	{
-	    if (p_ws)
+	    إذا (p_ws)
 	    {
 		pos->lnum = 1;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(bot_top_msg), TRUE);
+		إذا (!shortmess(SHM_جستجو))
+		    give_warning((char_u *)_(bot_بالاترین_پیام), TRUE);
 	    }
-	    else
+	    وإلا
 	    {
 		pos->lnum = 1;
-		break;
+		اكسر;
 	    }
 	}
-	if (pos->lnum == start)
-	    break;
-	if (start == 0)
-	    start = pos->lnum;
+	إذا (pos->lnum == شروع)
+	    اكسر;
+	إذا (شروع == 0)
+	    شروع = pos->lnum;
 	ptr = ml_get_buf(buf, pos->lnum, FALSE);
 	p = skipwhite(ptr);
-	pos->col = (colnr_T) (p - ptr);
+	pos->ستون = (colnr_T) (p - ptr);
 
 	// when adding lines the matching line may be empty but it is not
 	// ignored because we are interested in the next line -- Acevedo
-	if (compl_status_adding() && !compl_status_sol())
+	إذا (compl_وضعیت_adding() && !compl_وضعیت_sol())
 	{
-	    if ((p_ic ? MB_STRICMP(p, pat) : STRCMP(p, pat)) == 0)
-		return OK;
+	    إذا ((p_ic ? MB_STRICMP(p, pat) : STRCMP(p, pat)) == 0)
+		أرجع OK;
 	}
-	else if (*p != NUL)	// ignore empty lines
+	وإلا إذا (*p != NUL)	// ignore empty lines
 	{	// expanding lines or words
-	    if ((p_ic ? MB_STRNICMP(p, pat, compl_len)
+	    إذا ((p_ic ? MB_STRNICMP(p, pat, compl_len)
 				   : STRNCMP(p, pat, compl_len)) == 0)
-		return OK;
+		أرجع OK;
 	}
     }
-    return FAIL;
+    أرجع FAIL;
 }
 
 /*
@@ -1869,122 +1869,122 @@ search_for_exact_line(
  * Do this "cap->count1" times.
  * Return FAIL or OK.
  */
-    int
-searchc(cmdarg_T *cap, int t_cmd)
+    صحيح
+searchc(cmdarg_T *cap, صحيح t_cmd)
 {
-    int			c = cap->nchar;	// char to search for
-    int			dir = cap->arg;	// TRUE for searching forward
-    long		count = cap->count1;	// repeat count
-    int			col;
+    صحيح			c = cap->nchar;	// char to search for
+    صحيح			dir = cap->arg;	// TRUE for searching forward
+    دراز		شمار = cap->count1;	// repeat count
+    صحيح			ستون;
     char_u		*p;
-    int			len;
-    int			stop = TRUE;
+    صحيح			len;
+    صحيح			stop = TRUE;
 
-    if (c != NUL)	// normal search: remember args for repeat
+    إذا (c != NUL)	// normal search: remember args for repeat
     {
-	if (!KeyStuffed)    // don't remember when redoing
+	إذا (!کلید_Stuffed)    // don't remember when redoing
 	{
 	    *lastc = c;
-	    set_csearch_direction(dir);
-	    set_csearch_until(t_cmd);
-	    lastc_bytelen = (*mb_char2bytes)(c, lastc_bytes);
-	    if (cap->ncharC1 != 0)
+	    مجموعه_csearch_direction(dir);
+	    مجموعه_csearch_until(t_cmd);
+	    lastc_bytelen = (*mb_char2bytes)(c, lastc_بایتها);
+	    إذا (cap->ncharC1 != 0)
 	    {
 		lastc_bytelen += (*mb_char2bytes)(cap->ncharC1,
-			lastc_bytes + lastc_bytelen);
-		if (cap->ncharC2 != 0)
+			lastc_بایتها + lastc_bytelen);
+		إذا (cap->ncharC2 != 0)
 		    lastc_bytelen += (*mb_char2bytes)(cap->ncharC2,
-			    lastc_bytes + lastc_bytelen);
+			    lastc_بایتها + lastc_bytelen);
 	    }
 	}
     }
-    else		// repeat previous search
+    وإلا		// repeat previous search
     {
-	if (*lastc == NUL && lastc_bytelen <= 1)
-	    return FAIL;
-	if (dir)	// repeat in opposite direction
+	إذا (*lastc == NUL && lastc_bytelen <= 1)
+	    أرجع FAIL;
+	إذا (dir)	// repeat in opposite direction
 	    dir = -lastcdir;
-	else
+	وإلا
 	    dir = lastcdir;
-	t_cmd = last_t_cmd;
+	t_cmd = آخرین_t_cmd;
 	c = *lastc;
 	// For multi-byte re-use last lastc_bytes[] and lastc_bytelen.
 
 	// Force a move of at least one char, so ";" and "," will move the
 	// cursor, even if the cursor is right in front of char we are looking
 	// at.
-	if (vim_strchr(p_cpo, CPO_SCOLON) == NULL && count == 1 && t_cmd)
+	إذا (vim_strchr(p_cpo, CPO_SCOLON) == عدم && شمار == 1 && t_cmd)
 	    stop = FALSE;
     }
 
-    if (dir == BACKWARD)
+    إذا (dir == BACKWARD)
 	cap->oap->inclusive = FALSE;
-    else
+    وإلا
 	cap->oap->inclusive = TRUE;
 
     p = ml_get_curline();
-    col = curwin->w_cursor.col;
+    ستون = curwin->w_cursor.ستون;
     len = ml_get_curline_len();
 
-    while (count--)
+    طالما (شمار--)
     {
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
-	    for (;;)
+	    لكل (;;)
 	    {
-		if (dir > 0)
+		إذا (dir > 0)
 		{
-		    col += (*mb_ptr2len)(p + col);
-		    if (col >= len)
-			return FAIL;
+		    ستون += (*mb_ptr2len)(p + ستون);
+		    إذا (ستون >= len)
+			أرجع FAIL;
 		}
-		else
+		وإلا
 		{
-		    if (col == 0)
-			return FAIL;
-		    col -= (*mb_head_off)(p, p + col - 1) + 1;
+		    إذا (ستون == 0)
+			أرجع FAIL;
+		    ستون -= (*mb_سر_off)(p, p + ستون - 1) + 1;
 		}
-		if (lastc_bytelen <= 1)
+		إذا (lastc_bytelen <= 1)
 		{
-		    if (p[col] == c && stop)
-			break;
+		    إذا (p[ستون] == c && stop)
+			اكسر;
 		}
-		else if (STRNCMP(p + col, lastc_bytes, lastc_bytelen) == 0
+		وإلا إذا (STRNCMP(p + ستون, lastc_بایتها, lastc_bytelen) == 0
 								       && stop)
-		    break;
+		    اكسر;
 		stop = TRUE;
 	    }
 	}
-	else
+	وإلا
 	{
-	    for (;;)
+	    لكل (;;)
 	    {
-		if ((col += dir) < 0 || col >= len)
-		    return FAIL;
-		if (p[col] == c && stop)
-		    break;
+		إذا ((ستون += dir) < 0 || ستون >= len)
+		    أرجع FAIL;
+		إذا (p[ستون] == c && stop)
+		    اكسر;
 		stop = TRUE;
 	    }
 	}
     }
 
-    if (t_cmd)
+    إذا (t_cmd)
     {
 	// backup to before the character (possibly double-byte)
-	col -= dir;
-	if (has_mbyte)
+	ستون -= dir;
+	إذا (has_mbyte)
 	{
-	    if (dir < 0)
+	    إذا (dir < 0)
 		// Landed on the search char which is lastc_bytelen long
-		col += lastc_bytelen - 1;
-	    else
+		ستون += lastc_bytelen - 1;
+	    وإلا
 		// To previous char, which may be multi-byte.
-		col -= (*mb_head_off)(p, p + col);
+		ستون -= (*mb_سر_off)(p, p + ستون);
 	}
     }
-    curwin->w_cursor.col = col;
+    curwin->w_cursor.ستون = ستون;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -1997,9 +1997,9 @@ searchc(cmdarg_T *cap, int t_cmd)
  * Improvement over vi: Braces inside quotes are ignored.
  */
     pos_T *
-findmatch(oparg_T *oap, int initc)
+findmatch(oparg_T *oap, صحيح initc)
 {
-    return findmatchlimit(oap, initc, 0, 0);
+    أرجع findmatchlimit(oap, initc, 0, 0);
 }
 
 /*
@@ -2009,61 +2009,61 @@ findmatch(oparg_T *oap, int initc)
  * is NULL.
  * Handles multibyte string correctly.
  */
-    static int
+    ساكن صحيح
 check_prevcol(
     char_u	*linep,
-    int		col,
-    int		ch,
-    int		*prevcol)
+    صحيح		ستون,
+    صحيح		ch,
+    صحيح		*prevcol)
 {
-    --col;
-    if (col > 0 && has_mbyte)
-	col -= (*mb_head_off)(linep, linep + col);
-    if (prevcol)
-	*prevcol = col;
-    return (col >= 0 && linep[col] == ch) ? TRUE : FALSE;
+    --ستون;
+    إذا (ستون > 0 && has_mbyte)
+	ستون -= (*mb_سر_off)(linep, linep + ستون);
+    إذا (prevcol)
+	*prevcol = ستون;
+    أرجع (ستون >= 0 && linep[ستون] == ch) ? TRUE : FALSE;
 }
 
 /*
  * Raw string start is found at linep[startpos.col - 1].
  * Return TRUE if the matching end can be found between startpos and endpos.
  */
-    static int
-find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos)
+    ساكن صحيح
+پیدا_کن_rawstring_انتها(char_u *linep, pos_T *startpos, pos_T *endpos)
 {
     char_u	*p;
     char_u	*delim_copy;
     size_t	delim_len;
     linenr_T	lnum;
-    int		found = FALSE;
+    صحيح		یافت = FALSE;
 
-    for (p = linep + startpos->col + 1; *p && *p != '('; ++p)
+    لكل (p = linep + startpos->ستون + 1; *p && *p != '('; ++p)
 	;
-    delim_len = (p - linep) - startpos->col - 1;
-    delim_copy = vim_strnsave(linep + startpos->col + 1, delim_len);
-    if (delim_copy == NULL)
-	return FALSE;
-    for (lnum = startpos->lnum; lnum <= endpos->lnum; ++lnum)
+    delim_len = (p - linep) - startpos->ستون - 1;
+    delim_copy = vim_strnsave(linep + startpos->ستون + 1, delim_len);
+    إذا (delim_copy == عدم)
+	أرجع FALSE;
+    لكل (lnum = startpos->lnum; lnum <= endpos->lnum; ++lnum)
     {
-	char_u *line = ml_get(lnum);
+	char_u *سطر = ml_get(lnum);
 
-	for (p = line + (lnum == startpos->lnum
-					    ? startpos->col + 1 : 0); *p; ++p)
+	لكل (p = سطر + (lnum == startpos->lnum
+					    ? startpos->ستون + 1 : 0); *p; ++p)
 	{
-	    if (lnum == endpos->lnum && (colnr_T)(p - line) >= endpos->col)
-		break;
-	    if (*p == ')' && STRNCMP(delim_copy, p + 1, delim_len) == 0
+	    إذا (lnum == endpos->lnum && (colnr_T)(p - سطر) >= endpos->ستون)
+		اكسر;
+	    إذا (*p == ')' && STRNCMP(delim_copy, p + 1, delim_len) == 0
 			  && p[delim_len + 1] == '"')
 	    {
-		found = TRUE;
-		break;
+		یافت = TRUE;
+		اكسر;
 	    }
 	}
-	if (found)
-	    break;
+	إذا (یافت)
+	    اكسر;
     }
     vim_free(delim_copy);
-    return found;
+    أرجع یافت;
 }
 
 /*
@@ -2072,92 +2072,92 @@ find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos)
  * the opposite character.  Set "*backwards" to the direction.
  * When "switchit" is TRUE swap the direction.
  */
-    static void
-find_mps_values(
-    int	    *initc,
-    int	    *findc,
-    int	    *backwards,
-    int	    switchit)
+    ساكن فراغ
+پیدا_کن_mps_مقادیر(
+    صحيح	    *initc,
+    صحيح	    *findc,
+    صحيح	    *backwards,
+    صحيح	    switchit)
 {
     char_u	*ptr;
 
     ptr = curbuf->b_p_mps;
-    while (*ptr != NUL)
+    طالما (*ptr != NUL)
     {
-	if (has_mbyte)
+	إذا (has_mbyte)
 	{
 	    char_u *prev;
 
-	    if (mb_ptr2char(ptr) == *initc)
+	    إذا (mb_ptr2char(ptr) == *initc)
 	    {
-		if (switchit)
+		إذا (switchit)
 		{
 		    *findc = *initc;
 		    *initc = mb_ptr2char(ptr + mb_ptr2len(ptr) + 1);
 		    *backwards = TRUE;
 		}
-		else
+		وإلا
 		{
 		    *findc = mb_ptr2char(ptr + mb_ptr2len(ptr) + 1);
 		    *backwards = FALSE;
 		}
-		return;
+		أرجع;
 	    }
 	    prev = ptr;
 	    ptr += mb_ptr2len(ptr) + 1;
-	    if (mb_ptr2char(ptr) == *initc)
+	    إذا (mb_ptr2char(ptr) == *initc)
 	    {
-		if (switchit)
+		إذا (switchit)
 		{
 		    *findc = *initc;
 		    *initc = mb_ptr2char(prev);
 		    *backwards = FALSE;
 		}
-		else
+		وإلا
 		{
 		    *findc = mb_ptr2char(prev);
 		    *backwards = TRUE;
 		}
-		return;
+		أرجع;
 	    }
 	    ptr += mb_ptr2len(ptr);
 	}
-	else
+	وإلا
 	{
-	    if (*ptr == *initc)
+	    إذا (*ptr == *initc)
 	    {
-		if (switchit)
+		إذا (switchit)
 		{
 		    *backwards = TRUE;
 		    *findc = *initc;
 		    *initc = ptr[2];
 		}
-		else
+		وإلا
 		{
 		    *backwards = FALSE;
 		    *findc = ptr[2];
 		}
-		return;
+		أرجع;
 	    }
 	    ptr += 2;
-	    if (*ptr == *initc)
+	    إذا (*ptr == *initc)
 	    {
-		if (switchit)
+		إذا (switchit)
 		{
 		    *backwards = FALSE;
 		    *findc = *initc;
 		    *initc = ptr[-2];
 		}
-		else
+		وإلا
 		{
 		    *backwards = TRUE;
 		    *findc =  ptr[-2];
 		}
-		return;
+		أرجع;
 	    }
 	    ++ptr;
 	}
-	if (*ptr == ',')
+	إذا (*ptr == ',')
 	    ++ptr;
     }
 }
@@ -2185,50 +2185,50 @@ find_mps_values(
     pos_T *
 findmatchlimit(
     oparg_T	*oap,
-    int		initc,
-    int		flags,
-    int		maxtravel)
+    صحيح		initc,
+    صحيح		flags,
+    صحيح		maxtravel)
 {
-    static pos_T pos;			// current search position
-    int		findc = 0;		// matching brace
-    int		c;
-    int		count = 0;		// cumulative number of braces
-    int		backwards = FALSE;	// init for gcc
-    int		raw_string = FALSE;	// search for raw string
-    int		inquote = FALSE;	// TRUE when inside quotes
+    ساكن pos_T pos;			// current search position
+    صحيح		findc = 0;		// matching brace
+    صحيح		c;
+    صحيح		شمار = 0;		// cumulative number of braces
+    صحيح		backwards = FALSE;	// init for gcc
+    صحيح		raw_string = FALSE;	// search for raw string
+    صحيح		inquote = FALSE;	// TRUE when inside quotes
     char_u	*linep;			// pointer to current line
     char_u	*ptr;
-    int		do_quotes;		// check for quotes in current line
-    int		at_start;		// do_quotes value at start position
-    int		hash_dir = 0;		// Direction searched for # things
-    int		comment_dir = 0;	// Direction searched for comments
-    pos_T	match_pos;		// Where last slash-star was found
-    int		start_in_quotes;	// start position is in quotes
-    int		traveled = 0;		// how far we've searched so far
-    int		ignore_cend = FALSE;    // ignore comment end
-    int		cpo_match;		// vi compatible matching
-    int		cpo_bsl;		// don't recognize backslashes
-    int		match_escaped = 0;	// search for escaped match
-    int		dir;			// Direction to search
-    int		comment_col = MAXCOL;   // start of / / comment
-    int		lispcomm = FALSE;	// inside of Lisp-style comment
-    int		lisp = curbuf->b_p_lisp; // engage Lisp-specific hacks ;)
-    int		skip_comments = (flags & FM_SKIPCOMM) != 0;
-    int		in_block_comment = FALSE; // inside /* */ block comment
+    صحيح		do_quotes;		// check for quotes in current line
+    صحيح		at_شروع;		// do_quotes value at start position
+    صحيح		hash_dir = 0;		// Direction searched for # things
+    صحيح		comment_dir = 0;	// Direction searched for comments
+    pos_T	تطابق_pos;		// Where last slash-star was found
+    صحيح		شروع_درون_quotes;	// start position is in quotes
+    صحيح		traveled = 0;		// how far we've searched so far
+    صحيح		ignore_cend = FALSE;    // ignore comment end
+    صحيح		cpo_تطابق;		// vi compatible matching
+    صحيح		cpo_bsl;		// don't recognize backslashes
+    صحيح		تطابق_escaped = 0;	// search for escaped match
+    صحيح		dir;			// Direction to search
+    صحيح		comment_ستون = MAXCOL;   // start of / / comment
+    صحيح		lispcomm = FALSE;	// inside of Lisp-style comment
+    صحيح		lisp = curbuf->b_p_lisp; // engage Lisp-specific hacks ;)
+    صحيح		skip_comments = (flags & FM_SKIPCOMM) != 0;
+    صحيح		درون_بلوک_comment = FALSE; // inside /* */ block comment
 
     pos = curwin->w_cursor;
     pos.coladd = 0;
     linep = ml_get(pos.lnum);
 
-    cpo_match = (vim_strchr(p_cpo, CPO_MATCH) != NULL);
-    cpo_bsl = (vim_strchr(p_cpo, CPO_MATCHBSL) != NULL);
+    cpo_تطابق = (vim_strchr(p_cpo, CPO_تطابق) != عدم);
+    cpo_bsl = (vim_strchr(p_cpo, CPO_MATCHBSL) != عدم);
 
     // Direction to search when initc is '/', '*' or '#'
-    if (flags & FM_BACKWARD)
+    إذا (flags & FM_BACKWARD)
 	dir = BACKWARD;
-    else if (flags & FM_FORWARD)
+    وإلا إذا (flags & FM_FORWARD)
 	dir = FORWARD;
-    else
+    وإلا
 	dir = 0;
 
     /*
@@ -2237,77 +2237,77 @@ findmatchlimit(
      * When '/' is used, we ignore running backwards into an star-slash, for
      * "[*" command, we just want to find any comment.
      */
-    if (initc == '/' || initc == '*' || initc == 'R')
+    إذا (initc == '/' || initc == '*' || initc == 'R')
     {
 	comment_dir = dir;
-	if (initc == '/')
+	إذا (initc == '/')
 	    ignore_cend = TRUE;
 	backwards = (dir == FORWARD) ? FALSE : TRUE;
 	raw_string = (initc == 'R');
 	initc = NUL;
     }
-    else if (initc != '#' && initc != NUL)
+    وإلا إذا (initc != '#' && initc != NUL)
     {
-	find_mps_values(&initc, &findc, &backwards, TRUE);
-	if (dir)
+	پیدا_کن_mps_مقادیر(&initc, &findc, &backwards, TRUE);
+	إذا (dir)
 	    backwards = (dir == FORWARD) ? FALSE : TRUE;
-	if (findc == NUL)
-	    return NULL;
+	إذا (findc == NUL)
+	    أرجع عدم;
     }
-    else
+    وإلا
     {
 	/*
 	 * Either initc is '#', or no initc was given and we need to look
 	 * under the cursor.
 	 */
-	if (initc == '#')
+	إذا (initc == '#')
 	{
 	    hash_dir = dir;
 	}
-	else
+	وإلا
 	{
 	    /*
 	     * initc was not given, must look for something to match under
 	     * or near the cursor.
 	     * Only check for special things when 'cpo' doesn't have '%'.
 	     */
-	    if (!cpo_match)
+	    إذا (!cpo_تطابق)
 	    {
 		// Are we before or at #if, #else etc.?
 		ptr = skipwhite(linep);
-		if (*ptr == '#' && pos.col <= (colnr_T)(ptr - linep))
+		إذا (*ptr == '#' && pos.ستون <= (colnr_T)(ptr - linep))
 		{
 		    ptr = skipwhite(ptr + 1);
-		    if (   STRNCMP(ptr, "if", 2) == 0
+		    إذا (   STRNCMP(ptr, "if", 2) == 0
 			|| STRNCMP(ptr, "endif", 5) == 0
 			|| STRNCMP(ptr, "el", 2) == 0)
 			hash_dir = 1;
 		}
 
 		// Are we on a comment?
-		else if (linep[pos.col] == '/')
+		وإلا إذا (linep[pos.ستون] == '/')
 		{
-		    if (linep[pos.col + 1] == '*')
+		    إذا (linep[pos.ستون + 1] == '*')
 		    {
 			comment_dir = FORWARD;
 			backwards = FALSE;
-			pos.col++;
+			pos.ستون++;
 		    }
-		    else if (pos.col > 0 && linep[pos.col - 1] == '*')
+		    وإلا إذا (pos.ستون > 0 && linep[pos.ستون - 1] == '*')
 		    {
 			comment_dir = BACKWARD;
 			backwards = TRUE;
-			pos.col--;
+			pos.ستون--;
 		    }
 		}
-		else if (linep[pos.col] == '*')
+		وإلا إذا (linep[pos.ستون] == '*')
 		{
-		    if (linep[pos.col + 1] == '/')
+		    إذا (linep[pos.ستون + 1] == '/')
 		    {
 			comment_dir = BACKWARD;
 			backwards = TRUE;
 		    }
-		    else if (pos.col > 0 && linep[pos.col - 1] == '/')
+		    وإلا إذا (pos.ستون > 0 && linep[pos.ستون - 1] == '/')
 		    {
 			comment_dir = FORWARD;
 			backwards = FALSE;
@@ -2319,213 +2319,213 @@ findmatchlimit(
 	     * If we are not on a comment or the # at the start of a line, then
 	     * look for brace anywhere on this line after the cursor.
 	     */
-	    if (!hash_dir && !comment_dir)
+	    إذا (!hash_dir && !comment_dir)
 	    {
 		/*
 		 * Find the brace under or after the cursor.
 		 * If beyond the end of the line, use the last character in
 		 * the line.
 		 */
-		if (linep[pos.col] == NUL && pos.col)
-		    --pos.col;
-		for (;;)
+		إذا (linep[pos.ستون] == NUL && pos.ستون)
+		    --pos.ستون;
+		لكل (;;)
 		{
-		    initc = PTR2CHAR(linep + pos.col);
-		    if (initc == NUL)
-			break;
+		    initc = PTR2CHAR(linep + pos.ستون);
+		    إذا (initc == NUL)
+			اكسر;
 
-		    find_mps_values(&initc, &findc, &backwards, FALSE);
-		    if (findc)
-			break;
-		    pos.col += mb_ptr2len(linep + pos.col);
+		    پیدا_کن_mps_مقادیر(&initc, &findc, &backwards, FALSE);
+		    إذا (findc)
+			اكسر;
+		    pos.ستون += mb_ptr2len(linep + pos.ستون);
 		}
-		if (!findc)
+		إذا (!findc)
 		{
 		    // no brace in the line, maybe use "  #if" then
-		    if (!cpo_match && *skipwhite(linep) == '#')
+		    إذا (!cpo_تطابق && *skipwhite(linep) == '#')
 			hash_dir = 1;
-		    else
-			return NULL;
+		    وإلا
+			أرجع عدم;
 		}
-		else if (!cpo_bsl)
+		وإلا إذا (!cpo_bsl)
 		{
-		    int col, bslcnt = 0;
+		    صحيح ستون, bslcnt = 0;
 
 		    // Set "match_escaped" if there are an odd number of
 		    // backslashes.
-		    for (col = pos.col; check_prevcol(linep, col, '\\', &col);)
+		    لكل (ستون = pos.ستون; check_prevcol(linep, ستون, '\\', &ستون);)
 			bslcnt++;
-		    match_escaped = (bslcnt & 1);
+		    تطابق_escaped = (bslcnt & 1);
 		}
 	    }
 	}
-	if (hash_dir)
+	إذا (hash_dir)
 	{
 	    /*
 	     * Look for matching #if, #else, #elif, or #endif
 	     */
-	    if (oap != NULL)
+	    إذا (oap != عدم)
 		oap->motion_type = MLINE;   // Linewise for this case only
-	    if (initc != '#')
+	    إذا (initc != '#')
 	    {
 		ptr = skipwhite(skipwhite(linep) + 1);
-		if (STRNCMP(ptr, "if", 2) == 0 || STRNCMP(ptr, "el", 2) == 0)
+		إذا (STRNCMP(ptr, "if", 2) == 0 || STRNCMP(ptr, "el", 2) == 0)
 		    hash_dir = 1;
-		else if (STRNCMP(ptr, "endif", 5) == 0)
+		وإلا إذا (STRNCMP(ptr, "endif", 5) == 0)
 		    hash_dir = -1;
-		else
-		    return NULL;
+		وإلا
+		    أرجع عدم;
 	    }
-	    pos.col = 0;
-	    while (!got_int)
+	    pos.ستون = 0;
+	    طالما (!got_int)
 	    {
-		if (hash_dir > 0)
+		إذا (hash_dir > 0)
 		{
-		    if (pos.lnum == curbuf->b_ml.ml_line_count)
-			break;
+		    إذا (pos.lnum == curbuf->b_ml.ml_سطر_شمار)
+			اكسر;
 		}
-		else if (pos.lnum == 1)
-		    break;
+		وإلا إذا (pos.lnum == 1)
+		    اكسر;
 		pos.lnum += hash_dir;
 		linep = ml_get(pos.lnum);
-		line_breakcheck();	// check for CTRL-C typed
+		سطر_breakcheck();	// check for CTRL-C typed
 		ptr = skipwhite(linep);
-		if (*ptr != '#')
-		    continue;
-		pos.col = (colnr_T) (ptr - linep);
+		إذا (*ptr != '#')
+		    استمر;
+		pos.ستون = (colnr_T) (ptr - linep);
 		ptr = skipwhite(ptr + 1);
-		if (hash_dir > 0)
+		إذا (hash_dir > 0)
 		{
-		    if (STRNCMP(ptr, "if", 2) == 0)
-			count++;
-		    else if (STRNCMP(ptr, "el", 2) == 0)
+		    إذا (STRNCMP(ptr, "if", 2) == 0)
+			شمار++;
+		    وإلا إذا (STRNCMP(ptr, "el", 2) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
+			إذا (شمار == 0)
+			    أرجع &pos;
 		    }
-		    else if (STRNCMP(ptr, "endif", 5) == 0)
+		    وإلا إذا (STRNCMP(ptr, "endif", 5) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
-			count--;
+			إذا (شمار == 0)
+			    أرجع &pos;
+			شمار--;
 		    }
 		}
-		else
+		وإلا
 		{
-		    if (STRNCMP(ptr, "if", 2) == 0)
+		    إذا (STRNCMP(ptr, "if", 2) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
-			count--;
+			إذا (شمار == 0)
+			    أرجع &pos;
+			شمار--;
 		    }
-		    else if (initc == '#' && STRNCMP(ptr, "el", 2) == 0)
+		    وإلا إذا (initc == '#' && STRNCMP(ptr, "el", 2) == 0)
 		    {
-			if (count == 0)
-			    return &pos;
+			إذا (شمار == 0)
+			    أرجع &pos;
 		    }
-		    else if (STRNCMP(ptr, "endif", 5) == 0)
-			count++;
+		    وإلا إذا (STRNCMP(ptr, "endif", 5) == 0)
+			شمار++;
 		}
 	    }
-	    return NULL;
+	    أرجع عدم;
 	}
     }
 
-#ifdef FEAT_RIGHTLEFT
+#اگر_تعریف_شده FEAT_RIGHTLEFT
     // This is just guessing: when 'rightleft' is set, search for a matching
     // paren/brace in the other direction.
-    if (curwin->w_p_rl && vim_strchr((char_u *)"()[]{}<>", initc) != NULL)
+    إذا (curwin->w_p_rl && vim_strchr((char_u *)"()[]{}<>", initc) != عدم)
 	backwards = !backwards;
-#endif
+#پایان_اگر
 
     do_quotes = -1;
-    start_in_quotes = MAYBE;
-    CLEAR_POS(&match_pos);
+    شروع_درون_quotes = MAYBE;
+    CLEAR_POS(&تطابق_pos);
 
     // backward search: Check if this line contains a single-line comment
-    if ((backwards && comment_dir) || lisp || skip_comments)
-	comment_col = check_linecomment(linep);
-    if (lisp && comment_col != MAXCOL && pos.col > (colnr_T)comment_col)
+    إذا ((backwards && comment_dir) || lisp || skip_comments)
+	comment_ستون = check_linecomment(linep);
+    إذا (lisp && comment_ستون != MAXCOL && pos.ستون > (colnr_T)comment_ستون)
 	lispcomm = TRUE;    // find match inside this comment
     // skip // comment portion at starting position
-    if (skip_comments && !in_block_comment && comment_col != MAXCOL
-	    && backwards && pos.col > (colnr_T)comment_col)
-	pos.col = comment_col;
+    إذا (skip_comments && !درون_بلوک_comment && comment_ستون != MAXCOL
+	    && backwards && pos.ستون > (colnr_T)comment_ستون)
+	pos.ستون = comment_ستون;
 
-    while (!got_int)
+    طالما (!got_int)
     {
 	/*
 	 * Go to the next position, forward or backward. We could use
 	 * inc() and dec() here, but that is much slower
 	 */
-	if (backwards)
+	إذا (backwards)
 	{
 	    // char to match is inside of comment, don't search outside
-	    if (lispcomm && pos.col < (colnr_T)comment_col)
-		break;
-	    if (pos.col == 0)		// at start of line, go to prev. one
+	    إذا (lispcomm && pos.ستون < (colnr_T)comment_ستون)
+		اكسر;
+	    إذا (pos.ستون == 0)		// at start of line, go to prev. one
 	    {
-		if (pos.lnum == 1)	// start of file
-		    break;
+		إذا (pos.lnum == 1)	// start of file
+		    اكسر;
 		--pos.lnum;
 
-		if (maxtravel > 0 && ++traveled > maxtravel)
-		    break;
+		إذا (maxtravel > 0 && ++traveled > maxtravel)
+		    اكسر;
 
 		linep = ml_get(pos.lnum);
-		pos.col = ml_get_len(pos.lnum); // pos.col on trailing NUL
+		pos.ستون = ml_get_len(pos.lnum); // pos.col on trailing NUL
 		do_quotes = -1;
-		line_breakcheck();
+		سطر_breakcheck();
 
 		// Check if this line contains a single-line comment
-		if (comment_dir || lisp || skip_comments)
-		    comment_col = check_linecomment(linep);
+		إذا (comment_dir || lisp || skip_comments)
+		    comment_ستون = check_linecomment(linep);
 		// skip comment
-		if (lisp && comment_col != MAXCOL)
-		    pos.col = comment_col;
-		else if (skip_comments && !in_block_comment
-			&& comment_col != MAXCOL
-			&& pos.col > (colnr_T)comment_col)
-		    pos.col = comment_col;
+		إذا (lisp && comment_ستون != MAXCOL)
+		    pos.ستون = comment_ستون;
+		وإلا إذا (skip_comments && !درون_بلوک_comment
+			&& comment_ستون != MAXCOL
+			&& pos.ستون > (colnr_T)comment_ستون)
+		    pos.ستون = comment_ستون;
 	    }
-	    else
+	    وإلا
 	    {
-		--pos.col;
-		if (has_mbyte)
-		    pos.col -= (*mb_head_off)(linep, linep + pos.col);
+		--pos.ستون;
+		إذا (has_mbyte)
+		    pos.ستون -= (*mb_سر_off)(linep, linep + pos.ستون);
 	    }
 	}
-	else				// forward search
+	وإلا				// forward search
 	{
-	    if (linep[pos.col] == NUL
+	    إذا (linep[pos.ستون] == NUL
 		    // at end of line, go to next one
 		    // For lisp don't search for match in comment
-		    || (lisp && comment_col != MAXCOL
-					   && pos.col == (colnr_T)comment_col))
+		    || (lisp && comment_ستون != MAXCOL
+					   && pos.ستون == (colnr_T)comment_ستون))
 	    {
-		if (pos.lnum == curbuf->b_ml.ml_line_count  // end of file
+		إذا (pos.lnum == curbuf->b_ml.ml_سطر_شمار  // end of file
 			// line is exhausted and comment with it,
 			// don't search for match in code
 			 || lispcomm)
-		    break;
+		    اكسر;
 		++pos.lnum;
 
-		if (maxtravel && traveled++ > maxtravel)
-		    break;
+		إذا (maxtravel && traveled++ > maxtravel)
+		    اكسر;
 
 		linep = ml_get(pos.lnum);
-		pos.col = 0;
+		pos.ستون = 0;
 		do_quotes = -1;
-		line_breakcheck();
-		if (lisp || skip_comments)   // find comment pos in new line
-		    comment_col = check_linecomment(linep);
+		سطر_breakcheck();
+		إذا (lisp || skip_comments)   // find comment pos in new line
+		    comment_ستون = check_linecomment(linep);
 	    }
-	    else
+	    وإلا
 	    {
-		if (has_mbyte)
-		    pos.col += (*mb_ptr2len)(linep + pos.col);
-		else
-		    ++pos.col;
+		إذا (has_mbyte)
+		    pos.ستون += (*mb_ptr2len)(linep + pos.ستون);
+		وإلا
+		    ++pos.ستون;
 	    }
 	}
 
@@ -2533,109 +2533,109 @@ findmatchlimit(
 	// string are not comments, so skip them while "inquote" is set.
 	// Backward: '/' of end-marker enters comment; '*' of start-marker exits.
 	// Forward:  '/' of start-marker enters comment; '/' of end-marker exits.
-	if (skip_comments && !comment_dir && !inquote)
+	إذا (skip_comments && !comment_dir && !inquote)
 	{
-	    if (backwards)
+	    إذا (backwards)
 	    {
 		// Guard pos.col < comment_col: don't misread '*/' at the '//'
 		// position as a block-comment end-marker.
-		if (!in_block_comment && pos.col > 0
-			&& linep[pos.col - 1] == '*' && linep[pos.col] == '/'
-			&& (comment_col == MAXCOL || (int)pos.col < comment_col))
-		    in_block_comment = TRUE;
-		else if (in_block_comment && pos.col > 0
-			&& linep[pos.col - 1] == '/' && linep[pos.col] == '*')
-		    in_block_comment = FALSE;
+		إذا (!درون_بلوک_comment && pos.ستون > 0
+			&& linep[pos.ستون - 1] == '*' && linep[pos.ستون] == '/'
+			&& (comment_ستون == MAXCOL || (صحيح)pos.ستون < comment_ستون))
+		    درون_بلوک_comment = TRUE;
+		وإلا إذا (درون_بلوک_comment && pos.ستون > 0
+			&& linep[pos.ستون - 1] == '/' && linep[pos.ستون] == '*')
+		    درون_بلوک_comment = FALSE;
 	    }
-	    else
+	    وإلا
 	    {
 		// Guard pos.col < comment_col: don't treat '/*' inside a '//'
 		// comment as a block-comment start-marker.
-		if (!in_block_comment && linep[pos.col] == '/'
-			&& linep[pos.col + 1] == '*'
-			&& (comment_col == MAXCOL || (int)pos.col < comment_col))
-		    in_block_comment = TRUE;
-		else if (in_block_comment && pos.col > 0
-			&& linep[pos.col - 1] == '*' && linep[pos.col] == '/')
-		    in_block_comment = FALSE;
+		إذا (!درون_بلوک_comment && linep[pos.ستون] == '/'
+			&& linep[pos.ستون + 1] == '*'
+			&& (comment_ستون == MAXCOL || (صحيح)pos.ستون < comment_ستون))
+		    درون_بلوک_comment = TRUE;
+		وإلا إذا (درون_بلوک_comment && pos.ستون > 0
+			&& linep[pos.ستون - 1] == '*' && linep[pos.ستون] == '/')
+		    درون_بلوک_comment = FALSE;
 	    }
 	}
 
 	/*
 	 * If FM_BLOCKSTOP given, stop at a '{' or '}' in column 0.
 	 */
-	if (pos.col == 0 && (flags & FM_BLOCKSTOP)
+	إذا (pos.ستون == 0 && (flags & FM_BLOCKSTOP)
 				       && (linep[0] == '{' || linep[0] == '}'))
 	{
-	    if (linep[0] == findc && count == 0)	// match!
-		return &pos;
-	    break;					// out of scope
+	    إذا (linep[0] == findc && شمار == 0)	// match!
+		أرجع &pos;
+	    اكسر;					// out of scope
 	}
 
-	if (comment_dir)
+	إذا (comment_dir)
 	{
 	    // Note: comments do not nest, and we ignore quotes in them
 	    // TODO: ignore comment brackets inside strings
-	    if (comment_dir == FORWARD)
+	    إذا (comment_dir == FORWARD)
 	    {
-		if (linep[pos.col] == '*' && linep[pos.col + 1] == '/')
+		إذا (linep[pos.ستون] == '*' && linep[pos.ستون + 1] == '/')
 		{
-		    pos.col++;
-		    return &pos;
+		    pos.ستون++;
+		    أرجع &pos;
 		}
 	    }
-	    else    // Searching backwards
+	    وإلا    // Searching backwards
 	    {
 		/*
 		 * A comment may contain / * or / /, it may also start or end
 		 * with / * /.	Ignore a / * after / / and after *.
 		 */
-		if (pos.col == 0)
-		    continue;
-		else if (raw_string)
+		إذا (pos.ستون == 0)
+		    استمر;
+		وإلا إذا (raw_string)
 		{
-		    if (linep[pos.col - 1] == 'R'
-			&& linep[pos.col] == '"'
-			&& vim_strchr(linep + pos.col + 1, '(') != NULL)
+		    إذا (linep[pos.ستون - 1] == 'R'
+			&& linep[pos.ستون] == '"'
+			&& vim_strchr(linep + pos.ستون + 1, '(') != عدم)
 		    {
 			// Possible start of raw string. Now that we have the
 			// delimiter we can check if it ends before where we
 			// started searching, or before the previously found
 			// raw string start.
-			if (!find_rawstring_end(linep, &pos,
-				  count > 0 ? &match_pos : &curwin->w_cursor))
+			إذا (!پیدا_کن_rawstring_انتها(linep, &pos,
+				  شمار > 0 ? &تطابق_pos : &curwin->w_cursor))
 			{
-			    count++;
-			    match_pos = pos;
-			    match_pos.col--;
+			    شمار++;
+			    تطابق_pos = pos;
+			    تطابق_pos.ستون--;
 			}
 			linep = ml_get(pos.lnum); // may have been released
 		    }
 		}
-		else if (  linep[pos.col - 1] == '/'
-			&& linep[pos.col] == '*'
-			&& (pos.col == 1 || linep[pos.col - 2] != '*')
-			&& (int)pos.col < comment_col)
+		وإلا إذا (  linep[pos.ستون - 1] == '/'
+			&& linep[pos.ستون] == '*'
+			&& (pos.ستون == 1 || linep[pos.ستون - 2] != '*')
+			&& (صحيح)pos.ستون < comment_ستون)
 		{
-		    count++;
-		    match_pos = pos;
-		    match_pos.col--;
+		    شمار++;
+		    تطابق_pos = pos;
+		    تطابق_pos.ستون--;
 		}
-		else if (linep[pos.col - 1] == '*' && linep[pos.col] == '/')
+		وإلا إذا (linep[pos.ستون - 1] == '*' && linep[pos.ستون] == '/')
 		{
-		    if (count > 0)
-			pos = match_pos;
-		    else if (pos.col > 1 && linep[pos.col - 2] == '/'
-					       && (int)pos.col <= comment_col)
-			pos.col -= 2;
-		    else if (ignore_cend)
-			continue;
-		    else
-			return NULL;
-		    return &pos;
+		    إذا (شمار > 0)
+			pos = تطابق_pos;
+		    وإلا إذا (pos.ستون > 1 && linep[pos.ستون - 2] == '/'
+					       && (صحيح)pos.ستون <= comment_ستون)
+			pos.ستون -= 2;
+		    وإلا إذا (ignore_cend)
+			استمر;
+		    وإلا
+			أرجع عدم;
+		    أرجع &pos;
 		}
 	    }
-	    continue;
+	    استمر;
 	}
 
 	/*
@@ -2643,23 +2643,23 @@ findmatchlimit(
 	 * of quotes are ignored, but only if there is an even number of
 	 * quotes in the line.
 	 */
-	if (cpo_match)
+	إذا (cpo_تطابق)
 	    do_quotes = 0;
-	else if (do_quotes == -1)
+	وإلا إذا (do_quotes == -1)
 	{
 	    /*
 	     * Count the number of quotes in the line, skipping \" and '"'.
 	     * Watch out for "\\".
 	     */
-	    at_start = do_quotes;
-	    for (ptr = linep; *ptr; ++ptr)
+	    at_شروع = do_quotes;
+	    لكل (ptr = linep; *ptr; ++ptr)
 	    {
-		if (ptr == linep + pos.col + backwards)
-		    at_start = (do_quotes & 1);
-		if (*ptr == '"'
+		إذا (ptr == linep + pos.ستون + backwards)
+		    at_شروع = (do_quotes & 1);
+		إذا (*ptr == '"'
 			&& (ptr == linep || ptr[-1] != '\'' || ptr[1] != '\''))
 		    ++do_quotes;
-		if (*ptr == '\\' && ptr[1] != NUL)
+		إذا (*ptr == '\\' && ptr[1] != NUL)
 		    ++ptr;
 	    }
 	    do_quotes &= 1;	    // result is 1 with even number of quotes
@@ -2668,34 +2668,34 @@ findmatchlimit(
 	     * If we find an uneven count, check current line and previous
 	     * one for a '\' at the end.
 	     */
-	    if (!do_quotes)
+	    إذا (!do_quotes)
 	    {
 		inquote = FALSE;
-		if (ptr[-1] == '\\')
+		إذا (ptr[-1] == '\\')
 		{
 		    do_quotes = 1;
-		    if (start_in_quotes == MAYBE)
+		    إذا (شروع_درون_quotes == MAYBE)
 		    {
-			inquote = at_start;
-			if (inquote)
-			    start_in_quotes = TRUE;
+			inquote = at_شروع;
+			إذا (inquote)
+			    شروع_درون_quotes = TRUE;
 		    }
-		    else if (backwards)
+		    وإلا إذا (backwards)
 			inquote = TRUE;
 		}
-		if (pos.lnum > 1)
+		إذا (pos.lnum > 1)
 		{
 		    ptr = ml_get(pos.lnum - 1);
-		    if (*ptr && *(ptr + ml_get_len(pos.lnum - 1) - 1) == '\\')
+		    إذا (*ptr && *(ptr + ml_get_len(pos.lnum - 1) - 1) == '\\')
 		    {
 			do_quotes = 1;
-			if (start_in_quotes == MAYBE)
+			إذا (شروع_درون_quotes == MAYBE)
 			{
-			    inquote = at_start;
-			    if (inquote)
-				start_in_quotes = TRUE;
+			    inquote = at_شروع;
+			    إذا (inquote)
+				شروع_درون_quotes = TRUE;
 			}
-			else if (!backwards)
+			وإلا إذا (!backwards)
 			    inquote = TRUE;
 		    }
 
@@ -2704,8 +2704,8 @@ findmatchlimit(
 		}
 	    }
 	}
-	if (start_in_quotes == MAYBE)
-	    start_in_quotes = FALSE;
+	إذا (شروع_درون_quotes == MAYBE)
+	    شروع_درون_quotes = FALSE;
 
 	/*
 	 * If 'smartmatch' is set:
@@ -2718,35 +2718,35 @@ findmatchlimit(
 	 *   inquote if the number of quotes in a line is even, unless this
 	 *   line or the previous one ends in a '\'.  Complicated, isn't it?
 	 */
-	c = PTR2CHAR(linep + pos.col);
-	switch (c)
+	c = PTR2CHAR(linep + pos.ستون);
+	بدل (c)
 	{
-	case NUL:
+	حالة NUL:
 	    // at end of line without trailing backslash, reset inquote
-	    if (pos.col == 0 || linep[pos.col - 1] != '\\')
+	    إذا (pos.ستون == 0 || linep[pos.ستون - 1] != '\\')
 	    {
 		inquote = FALSE;
-		start_in_quotes = FALSE;
+		شروع_درون_quotes = FALSE;
 	    }
-	    break;
+	    اكسر;
 
-	case '"':
+	حالة '"':
 	    // a quote that is preceded with an odd number of backslashes is
 	    // ignored
-	    if (do_quotes)
+	    إذا (do_quotes)
 	    {
-		int col;
+		صحيح ستون;
 
-		for (col = pos.col - 1; col >= 0; --col)
-		    if (linep[col] != '\\')
-			break;
-		if ((((int)pos.col - 1 - col) & 1) == 0)
+		لكل (ستون = pos.ستون - 1; ستون >= 0; --ستون)
+		    إذا (linep[ستون] != '\\')
+			اكسر;
+		إذا ((((صحيح)pos.ستون - 1 - ستون) & 1) == 0)
 		{
 		    inquote = !inquote;
-		    start_in_quotes = FALSE;
+		    شروع_درون_quotes = FALSE;
 		}
 	    }
-	    break;
+	    اكسر;
 
 	/*
 	 * If smart matching ('cpoptions' does not contain '%'):
@@ -2755,95 +2755,95 @@ findmatchlimit(
 	 *   skipped, there is never a brace in them.
 	 *   Ignore this when finding matches for `'.
 	 */
-	case '\'':
-	    if (!cpo_match && initc != '\'' && findc != '\'')
+	حالة '\'':
+	    إذا (!cpo_تطابق && initc != '\'' && findc != '\'')
 	    {
-		if (backwards)
+		إذا (backwards)
 		{
-		    if (pos.col > 1)
+		    إذا (pos.ستون > 1)
 		    {
-			if (linep[pos.col - 2] == '\'')
+			إذا (linep[pos.ستون - 2] == '\'')
 			{
-			    pos.col -= 2;
-			    break;
+			    pos.ستون -= 2;
+			    اكسر;
 			}
-			else if (linep[pos.col - 2] == '\\'
-				  && pos.col > 2 && linep[pos.col - 3] == '\'')
+			وإلا إذا (linep[pos.ستون - 2] == '\\'
+				  && pos.ستون > 2 && linep[pos.ستون - 3] == '\'')
 			{
-			    pos.col -= 3;
-			    break;
+			    pos.ستون -= 3;
+			    اكسر;
 			}
 		    }
 		}
-		else if (linep[pos.col + 1])	// forward search
+		وإلا إذا (linep[pos.ستون + 1])	// forward search
 		{
-		    if (linep[pos.col + 1] == '\\'
-			   && linep[pos.col + 2] && linep[pos.col + 3] == '\'')
+		    إذا (linep[pos.ستون + 1] == '\\'
+			   && linep[pos.ستون + 2] && linep[pos.ستون + 3] == '\'')
 		    {
-			pos.col += 3;
-			break;
+			pos.ستون += 3;
+			اكسر;
 		    }
-		    else if (linep[pos.col + 2] == '\'')
+		    وإلا إذا (linep[pos.ستون + 2] == '\'')
 		    {
-			pos.col += 2;
-			break;
+			pos.ستون += 2;
+			اكسر;
 		    }
 		}
 	    }
 	    // FALLTHROUGH
 
-	default:
+	افتراضي:
 	    /*
 	     * For Lisp skip over backslashed (), {} and [].
 	     * (actually, we skip #\( et al)
 	     */
-	    if (curbuf->b_p_lisp
-		    && vim_strchr((char_u *)"{}()[]", c) != NULL
-		    && pos.col > 1
-		    && check_prevcol(linep, pos.col, '\\', NULL)
-		    && check_prevcol(linep, pos.col - 1, '#', NULL))
-		break;
+	    إذا (curbuf->b_p_lisp
+		    && vim_strchr((char_u *)"{}()[]", c) != عدم
+		    && pos.ستون > 1
+		    && check_prevcol(linep, pos.ستون, '\\', عدم)
+		    && check_prevcol(linep, pos.ستون - 1, '#', عدم))
+		اكسر;
 
 	    // Skip matches inside comments when FM_SKIPCOMM is set.
-	    if (skip_comments && (in_block_comment
-		    || (comment_col != MAXCOL && (int)pos.col >= comment_col)))
-		break;
+	    إذا (skip_comments && (درون_بلوک_comment
+		    || (comment_ستون != MAXCOL && (صحيح)pos.ستون >= comment_ستون)))
+		اكسر;
 
 	    // Check for match outside of quotes, and inside of
 	    // quotes when the start is also inside of quotes.
-	    if ((!inquote || start_in_quotes == TRUE)
+	    إذا ((!inquote || شروع_درون_quotes == TRUE)
 		    && (c == initc || c == findc))
 	    {
-		int	col, bslcnt = 0;
+		صحيح	ستون, bslcnt = 0;
 
-		if (!cpo_bsl)
+		إذا (!cpo_bsl)
 		{
-		    for (col = pos.col; check_prevcol(linep, col, '\\', &col);)
+		    لكل (ستون = pos.ستون; check_prevcol(linep, ستون, '\\', &ستون);)
 			bslcnt++;
 		}
 		// Only accept a match when 'M' is in 'cpo' or when escaping
 		// is what we expect.
-		if (cpo_bsl || (bslcnt & 1) == match_escaped)
+		إذا (cpo_bsl || (bslcnt & 1) == تطابق_escaped)
 		{
-		    if (c == initc)
-			count++;
-		    else
+		    إذا (c == initc)
+			شمار++;
+		    وإلا
 		    {
-			if (count == 0)
-			    return &pos;
-			count--;
+			إذا (شمار == 0)
+			    أرجع &pos;
+			شمار--;
 		    }
 		}
 	    }
 	}
     }
 
-    if (comment_dir == BACKWARD && count > 0)
+    إذا (comment_dir == BACKWARD && شمار > 0)
     {
-	pos = match_pos;
-	return &pos;
+	pos = تطابق_pos;
+	أرجع &pos;
     }
-    return (pos_T *)NULL;	// never found it
+    أرجع (pos_T *)عدم;	// never found it
 }
 
 /*
@@ -2852,64 +2852,64 @@ findmatchlimit(
  * Show the match only if it is visible on the screen.
  * If there isn't a match, then beep.
  */
-    void
+    فراغ
 showmatch(
-    int		c)	    // char to show match for
+    صحيح		c)	    // char to show match for
 {
     pos_T	*lpos, save_cursor;
     pos_T	mpos;
     colnr_T	vcol;
-    long	save_so;
-    long	save_siso;
-#ifdef CURSOR_SHAPE
-    int		save_state;
-#endif
+    دراز	save_so;
+    دراز	save_siso;
+#اگر_تعریف_شده CURSOR_SHAPE
+    صحيح		save_state;
+#پایان_اگر
     colnr_T	save_dollar_vcol;
     char_u	*p;
-    long	*so = curwin->w_p_so >= 0 ? &curwin->w_p_so : &p_so;
-    long	*siso = curwin->w_p_siso >= 0 ? &curwin->w_p_siso : &p_siso;
+    دراز	*so = curwin->w_p_so >= 0 ? &curwin->w_p_so : &p_so;
+    دراز	*siso = curwin->w_p_siso >= 0 ? &curwin->w_p_siso : &p_siso;
 
     /*
      * Only show match for chars in the 'matchpairs' option.
      */
     // 'matchpairs' is "x:y,x:y"
-    for (p = curbuf->b_p_mps; *p != NUL; ++p)
+    لكل (p = curbuf->b_p_mps; *p != NUL; ++p)
     {
-#ifdef FEAT_RIGHTLEFT
-	if (PTR2CHAR(p) == c && (curwin->w_p_rl ^ p_ri))
-	    break;
-#endif
+#اگر_تعریف_شده FEAT_RIGHTLEFT
+	إذا (PTR2CHAR(p) == c && (curwin->w_p_rl ^ p_ri))
+	    اكسر;
+#پایان_اگر
 	p += mb_ptr2len(p) + 1;
-	if (PTR2CHAR(p) == c
-#ifdef FEAT_RIGHTLEFT
+	إذا (PTR2CHAR(p) == c
+#اگر_تعریف_شده FEAT_RIGHTLEFT
 		&& !(curwin->w_p_rl ^ p_ri)
-#endif
+#پایان_اگر
 	   )
-	    break;
+	    اكسر;
 	p += mb_ptr2len(p);
-	if (*p == NUL)
-	    return;
+	إذا (*p == NUL)
+	    أرجع;
     }
-    if (*p == NUL)
-	return;
+    إذا (*p == NUL)
+	أرجع;
 
-    if ((lpos = findmatch(NULL, NUL)) == NULL)	    // no match, so beep
+    إذا ((lpos = findmatch(عدم, NUL)) == عدم)	    // no match, so beep
     {
-	vim_beep(BO_MATCH);
-	return;
+	vim_beep(BO_تطابق);
+	أرجع;
     }
 
-    if (lpos->lnum < curwin->w_topline || lpos->lnum >= curwin->w_botline)
-	return;
+    إذا (lpos->lnum < curwin->w_topline || lpos->lnum >= curwin->w_botline)
+	أرجع;
 
-    if (!curwin->w_p_wrap)
-	getvcol(curwin, lpos, NULL, &vcol, NULL, 0);
+    إذا (!curwin->w_p_wrap)
+	getvcol(curwin, lpos, عدم, &vcol, عدم, 0);
 
-    int col_visible = (curwin->w_p_wrap
+    صحيح ستون_visible = (curwin->w_p_wrap
 	    || (vcol >= curwin->w_leftcol
-		&& vcol < curwin->w_leftcol + curwin->w_width));
-    if (!col_visible)
-	return;
+		&& vcol < curwin->w_leftcol + curwin->w_عرض));
+    إذا (!ستون_visible)
+	أرجع;
 
     mpos = *lpos;    // save the pos, update_screen() may change it
     save_cursor = curwin->w_cursor;
@@ -2917,24 +2917,24 @@ showmatch(
     save_siso = *siso;
     // Handle "$" in 'cpo': If the ')' is typed on top of the "$",
     // stop displaying the "$".
-    if (dollar_vcol >= 0 && dollar_vcol == curwin->w_virtcol)
+    إذا (dollar_vcol >= 0 && dollar_vcol == curwin->w_virtcol)
 	dollar_vcol = -1;
     ++curwin->w_virtcol;	// do display ')' just before "$"
     update_screen(UPD_VALID);	// show the new char first
 
     save_dollar_vcol = dollar_vcol;
-#ifdef CURSOR_SHAPE
+#اگر_تعریف_شده CURSOR_SHAPE
     save_state = State;
-    State = MODE_SHOWMATCH;
+    State = نما_SHOWMATCH;
     ui_cursor_shape();		// may show different cursor shape
-#endif
+#پایان_اگر
     curwin->w_cursor = mpos;	// move to matching char
     *so = 0;			// don't use 'scrolloff' here
     *siso = 0;			// don't use 'sidescrolloff' here
     showruler(FALSE);
     setcursor();
     cursor_on();		// make sure that the cursor is shown
-    out_flush_cursor(TRUE, FALSE);
+    بیرون_flush_cursor(TRUE, FALSE);
 
     // Restore dollar_vcol(), because setcursor() may call curs_rows()
     // which resets it if the matching position is in a previous line
@@ -2945,17 +2945,17 @@ showmatch(
      * brief pause, unless 'm' is present in 'cpo' and a character is
      * available.
      */
-    if (vim_strchr(p_cpo, CPO_SHOWMATCH) != NULL)
+    إذا (vim_strchr(p_cpo, CPO_SHOWMATCH) != عدم)
 	ui_delay(p_mat * 100L + 8, TRUE);
-    else if (!char_avail())
+    وإلا إذا (!char_avail())
 	ui_delay(p_mat * 100L + 9, FALSE);
     curwin->w_cursor = save_cursor;	// restore cursor position
     *so = save_so;
     *siso = save_siso;
-#ifdef CURSOR_SHAPE
+#اگر_تعریف_شده CURSOR_SHAPE
     State = save_state;
     ui_cursor_shape();		// may show different cursor shape
-#endif
+#پایان_اگر
 }
 
 /*
@@ -2965,71 +2965,71 @@ showmatch(
  * "direction" is FORWARD or BACKWARD.
  * Returns TRUE, FALSE or -1 for failure.
  */
-    static int
-is_zero_width(
-    char_u	*pattern,
+    ساكن صحيح
+is_zero_عرض(
+    char_u	*الگو,
     size_t	patternlen,
-    int		move,
+    صحيح		move,
     pos_T	*cur,
-    int		direction)
+    صحيح		direction)
 {
     regmmatch_T	regmatch;
-    int		nmatched = 0;
-    int		result = -1;
+    صحيح		nmatched = 0;
+    صحيح		نتیجه = -1;
     pos_T	pos;
-    int		called_emsg_before = called_emsg;
-    int		flag = 0;
+    صحيح		called_emsg_before = called_emsg;
+    صحيح		flag = 0;
 
-    if (pattern == NULL)
+    إذا (الگو == عدم)
     {
-	pattern = spats[last_idx].pat;
-	patternlen = spats[last_idx].patlen;
+	الگو = spats[آخرین_idx].pat;
+	patternlen = spats[آخرین_idx].patlen;
     }
 
-    if (search_regcomp(pattern, patternlen, NULL, RE_SEARCH, RE_SEARCH,
-					      SEARCH_KEEP, &regmatch) == FAIL)
-	return -1;
+    إذا (جستجو_regcomp(الگو, patternlen, عدم, RE_جستجو, RE_جستجو,
+					      جستجو_KEEP, &regmatch) == FAIL)
+	أرجع -1;
 
     // init startcol correctly
-    regmatch.startpos[0].col = -1;
+    regmatch.startpos[0].ستون = -1;
     // move to match
-    if (move)
+    إذا (move)
     {
 	CLEAR_POS(&pos);
     }
-    else
+    وإلا
     {
 	pos = *cur;
 	// accept a match at the cursor position
-	flag = SEARCH_START;
+	flag = جستجو_شروع;
     }
 
-    if (searchit(curwin, curbuf, &pos, NULL, direction, pattern, patternlen, 1,
-				  SEARCH_KEEP + flag, RE_SEARCH, NULL) != FAIL)
+    إذا (searchit(curwin, curbuf, &pos, عدم, direction, الگو, patternlen, 1,
+				  جستجو_KEEP + flag, RE_جستجو, عدم) != FAIL)
     {
 	// Zero-width pattern should match somewhere, then we can check if
 	// start and end are in the same position.
-	do
+	افعل
 	{
-	    regmatch.startpos[0].col++;
+	    regmatch.startpos[0].ستون++;
 	    nmatched = vim_regexec_multi(&regmatch, curwin, curbuf,
-			       pos.lnum, regmatch.startpos[0].col, NULL);
-	    if (nmatched != 0)
-		break;
-	} while (regmatch.regprog != NULL
-		&& (direction == FORWARD ? regmatch.startpos[0].col < pos.col
-				      : regmatch.startpos[0].col > pos.col));
+			       pos.lnum, regmatch.startpos[0].ستون, عدم);
+	    إذا (nmatched != 0)
+		اكسر;
+	} طالما (regmatch.regprog != عدم
+		&& (direction == FORWARD ? regmatch.startpos[0].ستون < pos.ستون
+				      : regmatch.startpos[0].ستون > pos.ستون));
 
-	if (called_emsg == called_emsg_before)
+	إذا (called_emsg == called_emsg_before)
 	{
-	    result = (nmatched != 0
+	    نتیجه = (nmatched != 0
 		&& regmatch.startpos[0].lnum == regmatch.endpos[0].lnum
-		&& regmatch.startpos[0].col == regmatch.endpos[0].col);
+		&& regmatch.startpos[0].ستون == regmatch.endpos[0].ستون);
 	}
     }
 
     vim_regfree(regmatch.regprog);
-    return result;
+    أرجع نتیجه;
 }
 
 
@@ -3037,77 +3037,77 @@ is_zero_width(
  * Find next search match under cursor, cursor at end.
  * Used while an operator is pending, and in Visual mode.
  */
-    int
-current_search(
-    long	count,
-    int		forward)	// TRUE for forward, FALSE for backward
+    صحيح
+current_جستجو(
+    دراز	شمار,
+    صحيح		forward)	// TRUE for forward, FALSE for backward
 {
-    pos_T	start_pos;	// start position of the pattern match
-    pos_T	end_pos;	// end position of the pattern match
+    pos_T	شروع_pos;	// start position of the pattern match
+    pos_T	انتها_pos;	// end position of the pattern match
     pos_T	orig_pos;	// position of the cursor at beginning
     pos_T	pos;		// position after the pattern
-    int		i;
-    int		dir;
-    int		result;		// result of various function calls
+    صحيح		i;
+    صحيح		dir;
+    صحيح		نتیجه;		// result of various function calls
     char_u	old_p_ws = p_ws;
-    int		flags = 0;
+    صحيح		flags = 0;
     pos_T	save_VIsual = VIsual;
-    int		zero_width;
-    int		skip_first_backward;
+    صحيح		zero_عرض;
+    صحيح		skip_اولی_backward;
 
     // Correct cursor when 'selection' is exclusive
-    if (VIsual_active && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
+    إذا (VIsual_فعال && *p_sel == 'e' && LT_POS(VIsual, curwin->w_cursor))
 	dec_cursor();
 
     // When searching forward and the cursor is at the start of the Visual
     // area, skip the first search backward, otherwise it doesn't move.
-    skip_first_backward = forward && VIsual_active
+    skip_اولی_backward = forward && VIsual_فعال
 					   && LT_POS(curwin->w_cursor, VIsual);
 
     orig_pos = pos = curwin->w_cursor;
-    if (VIsual_active)
+    إذا (VIsual_فعال)
     {
-	if (forward)
+	إذا (forward)
 	    incl(&pos);
-	else
+	وإلا
 	    decl(&pos);
     }
 
     // Is the pattern is zero-width?, this time, don't care about the direction
-    zero_width = is_zero_width(spats[last_idx].pat, spats[last_idx].patlen,
+    zero_عرض = is_zero_عرض(spats[آخرین_idx].pat, spats[آخرین_idx].patlen,
 						TRUE, &curwin->w_cursor, FORWARD);
-    if (zero_width == -1)
-	return FAIL;  // pattern not found
+    إذا (zero_عرض == -1)
+	أرجع FAIL;  // pattern not found
 
     /*
      * The trick is to first search backwards and then search forward again,
      * so that a match at the current cursor position will be correctly
      * captured.  When "forward" is false do it the other way around.
      */
-    for (i = 0; i < 2; i++)
+    لكل (i = 0; i < 2; i++)
     {
-	if (forward)
+	إذا (forward)
 	{
-	    if (i == 0 && skip_first_backward)
-		continue;
+	    إذا (i == 0 && skip_اولی_backward)
+		استمر;
 	    dir = i;
 	}
-	else
+	وإلا
 	    dir = !i;
 
 	flags = 0;
-	if (!dir && !zero_width)
-	    flags = SEARCH_END;
-	end_pos = pos;
+	إذا (!dir && !zero_عرض)
+	    flags = جستجو_انتها;
+	انتها_pos = pos;
 
 	// wrapping should not occur in the first round
-	if (i == 0)
+	إذا (i == 0)
 	    p_ws = FALSE;
 
-	result = searchit(curwin, curbuf, &pos, &end_pos,
+	نتیجه = searchit(curwin, curbuf, &pos, &انتها_pos,
 		(dir ? FORWARD : BACKWARD),
-		spats[last_idx].pat, spats[last_idx].patlen, (long) (i ? count : 1),
-		SEARCH_KEEP | flags, RE_SEARCH, NULL);
+		spats[آخرین_idx].pat, spats[آخرین_idx].patlen, (دراز) (i ? شمار : 1),
+		جستجو_KEEP | flags, RE_جستجو, عدم);
 
 	p_ws = old_p_ws;
 
@@ -3115,148 +3115,148 @@ current_search(
 	// beginning of the file (cursor might be on the search match)
 	// except when Visual mode is active, so that extending the visual
 	// selection works.
-	if (i == 1 && !result) // not found, abort
+	إذا (i == 1 && !نتیجه) // not found, abort
 	{
 	    curwin->w_cursor = orig_pos;
-	    if (VIsual_active)
+	    إذا (VIsual_فعال)
 		VIsual = save_VIsual;
-	    return FAIL;
+	    أرجع FAIL;
 	}
-	else if (i == 0 && !result)
+	وإلا إذا (i == 0 && !نتیجه)
 	{
-	    if (forward)
+	    إذا (forward)
 	    {
 		// try again from start of buffer
 		CLEAR_POS(&pos);
 	    }
-	    else
+	    وإلا
 	    {
 		// try again from end of buffer
 		// searching backwards, so set pos to last line and col
-		pos.lnum = curwin->w_buffer->b_ml.ml_line_count;
-		pos.col  = ml_get_len(curwin->w_buffer->b_ml.ml_line_count);
+		pos.lnum = curwin->w_میانگیر->b_ml.ml_سطر_شمار;
+		pos.ستون  = ml_get_len(curwin->w_میانگیر->b_ml.ml_سطر_شمار);
 	    }
 	}
     }
 
-    start_pos = pos;
+    شروع_pos = pos;
 
-    if (!VIsual_active)
-	VIsual = start_pos;
+    إذا (!VIsual_فعال)
+	VIsual = شروع_pos;
 
     // put the cursor after the match
-    curwin->w_cursor = end_pos;
-    if (LT_POS(VIsual, end_pos) && forward)
+    curwin->w_cursor = انتها_pos;
+    إذا (LT_POS(VIsual, انتها_pos) && forward)
     {
-	if (skip_first_backward)
+	إذا (skip_اولی_backward)
 	    // put the cursor on the start of the match
 	    curwin->w_cursor = pos;
-	else
+	وإلا
 	    // put the cursor on last character of match
 	    dec_cursor();
     }
-    else if (VIsual_active && LT_POS(curwin->w_cursor, VIsual) && forward)
+    وإلا إذا (VIsual_فعال && LT_POS(curwin->w_cursor, VIsual) && forward)
 	curwin->w_cursor = pos;   // put the cursor on the start of the match
-    VIsual_active = TRUE;
-    VIsual_mode = 'v';
+    VIsual_فعال = TRUE;
+    VIsual_نما = 'v';
 
-    if (*p_sel == 'e')
+    إذا (*p_sel == 'e')
     {
 	// Correction for exclusive selection depends on the direction.
-	if (forward && LTOREQ_POS(VIsual, curwin->w_cursor))
+	إذا (forward && LTOREQ_POS(VIsual, curwin->w_cursor))
 	    inc_cursor();
-	else if (!forward && LTOREQ_POS(curwin->w_cursor, VIsual))
+	وإلا إذا (!forward && LTOREQ_POS(curwin->w_cursor, VIsual))
 	    inc(&VIsual);
     }
 
-#ifdef FEAT_FOLDING
-    if (fdo_flags & FDO_SEARCH && KeyTyped)
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا (fdo_flags & FDO_جستجو && کلید_Typed)
 	foldOpenCursor();
-#endif
+#پایان_اگر
 
-    may_start_select('c');
+    may_شروع_select('c');
     setmouse();
-#ifdef FEAT_CLIPBOARD
+#اگر_تعریف_شده FEAT_CLIPBOARD
     // Make sure the clipboard gets updated.  Needed because start and
     // end are still the same, and the selection needs to be owned
-    clip_star.vmode = NUL;
-#endif
+    clip_ستاره.vmode = NUL;
+#پایان_اگر
     redraw_curbuf_later(UPD_INVERTED);
     showmode();
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * return TRUE if line 'lnum' is empty or has white chars only.
  */
-    int
+    صحيح
 linewhite(linenr_T lnum)
 {
     char_u  *p;
 
     p = skipwhite(ml_get(lnum));
-    return (*p == NUL);
+    أرجع (*p == NUL);
 }
 
 /*
  * Add the search count "[3/19]" to "msgbuf".
  * See update_search_stat() for other arguments.
  */
-    static void
-cmdline_search_stat(
-    int		dirc,
+    ساكن فراغ
+cmdline_جستجو_stat(
+    صحيح		dirc,
     pos_T	*pos,
     pos_T	*cursor_pos,
-    int		show_top_bot_msg,
+    صحيح		show_بالاترین_bot_پیام,
     char_u	*msgbuf,
     size_t	msgbuflen,
-    int		recompute,
-    int		maxcount,
-    long	timeout)
+    صحيح		recompute,
+    صحيح		maxcount,
+    دراز	timeout)
 {
     searchstat_T stat;
 
-    update_search_stat(dirc, pos, cursor_pos, &stat, recompute, maxcount,
+    update_جستجو_stat(dirc, pos, cursor_pos, &stat, recompute, maxcount,
 								      timeout);
-    if (stat.cur <= 0)
-	return;
+    إذا (stat.cur <= 0)
+	أرجع;
 
-    char	t[SEARCH_STAT_BUF_LEN];
+    حرف	t[جستجو_STAT_BUF_LEN];
     size_t	len;
 
-#ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl && *curwin->w_p_rlc == 's')
+#اگر_تعریف_شده FEAT_RIGHTLEFT
+    إذا (curwin->w_p_rl && *curwin->w_p_rlc == 's')
     {
-	if (stat.incomplete == 1)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[?/??]");
-	else if (stat.cnt > maxcount && stat.cur > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/>%d]",
+	إذا (stat.incomplete == 1)
+	    len = vim_snprintf(t, جستجو_STAT_BUF_LEN, "[?/??]");
+	وإلا إذا (stat.cnt > maxcount && stat.cur > maxcount)
+	    len = vim_snprintf(t, جستجو_STAT_BUF_LEN, "[>%d/>%d]",
 		    maxcount, maxcount);
-	else if (stat.cnt > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/%d]",
+	وإلا إذا (stat.cnt > maxcount)
+	    len = vim_snprintf(t, جستجو_STAT_BUF_LEN, "[>%d/%d]",
 		    maxcount, stat.cur);
-	else
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/%d]",
+	وإلا
+	    len = vim_snprintf(t, جستجو_STAT_BUF_LEN, "[%d/%d]",
 		    stat.cnt, stat.cur);
     }
-    else
-#endif
+    وإلا
+#پایان_اگر
     {
-	if (stat.incomplete == 1)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[?/??]");
-	else if (stat.cnt > maxcount && stat.cur > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/>%d]",
+	إذا (stat.incomplete == 1)
+	    len = vim_snprintf(t, جستجو_STAT_BUF_LEN, "[?/??]");
+	وإلا إذا (stat.cnt > maxcount && stat.cur > maxcount)
+	    len = vim_snprintf(t, جستجو_STAT_BUF_LEN, "[>%d/>%d]",
 		    maxcount, maxcount);
-	else if (stat.cnt > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/>%d]",
+	وإلا إذا (stat.cnt > maxcount)
+	    len = vim_snprintf(t, جستجو_STAT_BUF_LEN, "[%d/>%d]",
 		    stat.cur, maxcount);
-	else
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/%d]",
+	وإلا
+	    len = vim_snprintf(t, جستجو_STAT_BUF_LEN, "[%d/%d]",
 		    stat.cur, stat.cnt);
     }
 
-    if (show_top_bot_msg && len + 2 < SEARCH_STAT_BUF_LEN)
+    إذا (show_بالاترین_bot_پیام && len + 2 < جستجو_STAT_BUF_LEN)
     {
 	mch_memmove(t + 2, t, len);
 	t[0] = 'W';
@@ -3264,17 +3264,17 @@ cmdline_search_stat(
 	len += 2;
     }
 
-    if (len > msgbuflen)
+    إذا (len > msgbuflen)
 	len = msgbuflen;
     mch_memmove(msgbuf + msgbuflen - len, t, len);
 
-    if (dirc == '?' && stat.cur == maxcount + 1)
+    إذا (dirc == '?' && stat.cur == maxcount + 1)
 	stat.cur = -1;
 
     // keep the message even after redraw, but don't put in history
-    msg_hist_off = TRUE;
+    پیام_hist_off = TRUE;
     give_warning(msgbuf, FALSE);
-    msg_hist_off = FALSE;
+    پیام_hist_off = FALSE;
 }
 
 /*
@@ -3285,54 +3285,54 @@ cmdline_search_stat(
  * dirc == '/': find the next match
  * dirc == '?': find the previous match
  */
-    static void
-update_search_stat(
-    int			dirc,
+    ساكن فراغ
+update_جستجو_stat(
+    صحيح			dirc,
     pos_T		*pos,
     pos_T		*cursor_pos,
     searchstat_T	*stat,
-    int			recompute,
-    int			maxcount,
-    long		timeout UNUSED)
+    صحيح			recompute,
+    صحيح			maxcount,
+    دراز		timeout استفادهنشده)
 {
-    int		    save_ws = p_ws;
-    int		    wraparound = FALSE;
+    صحيح		    save_ws = p_ws;
+    صحيح		    wraparound = FALSE;
     pos_T	    p = (*pos);
-    static pos_T    lastpos = {0, 0, 0};
-    static int	    cur = 0;
-    static int	    cnt = 0;
-    static int	    exact_match = FALSE;
-    static int	    incomplete = 0;
-    static int	    last_maxcount = 0;
-    static int	    chgtick = 0;
-    static char_u   *lastpat = NULL;
-    static size_t   lastpatlen = 0;
-    static buf_T    *lbuf = NULL;
-#ifdef FEAT_RELTIME
-    proftime_T  start;
-#endif
+    ساكن pos_T    lastpos = {0, 0, 0};
+    ساكن صحيح	    cur = 0;
+    ساكن صحيح	    cnt = 0;
+    ساكن صحيح	    exact_تطابق = FALSE;
+    ساكن صحيح	    incomplete = 0;
+    ساكن صحيح	    آخرین_maxcount = 0;
+    ساكن صحيح	    chgtick = 0;
+    ساكن char_u   *lastpat = عدم;
+    ساكن size_t   lastpatlen = 0;
+    ساكن buf_T    *lbuf = عدم;
+#اگر_تعریف_شده FEAT_RELTIME
+    proftime_T  شروع;
+#پایان_اگر
 
-    CLEAR_POINTER(stat);
+    CLEAR_اشاره_گر(stat);
 
-    if (dirc == 0 && !recompute && !EMPTY_POS(lastpos))
+    إذا (dirc == 0 && !recompute && !خالی_POS(lastpos))
     {
 	stat->cur = cur;
 	stat->cnt = cnt;
-	stat->exact_match = exact_match;
+	stat->exact_تطابق = exact_تطابق;
 	stat->incomplete = incomplete;
-	stat->last_maxcount = last_maxcount;
-	return;
+	stat->آخرین_maxcount = آخرین_maxcount;
+	أرجع;
     }
-    last_maxcount = maxcount;
+    آخرین_maxcount = maxcount;
 
     wraparound = ((dirc == '?' && LT_POS(lastpos, p))
 	       || (dirc == '/' && LT_POS(p, lastpos)));
 
     // If anything relevant changed the count has to be recomputed.
-    if (!(chgtick == CHANGEDTICK(curbuf)
-	&& (lastpat != NULL
-	    && STRNCMP(lastpat, spats[last_idx].pat, lastpatlen) == 0
-	    && lastpatlen == spats[last_idx].patlen
+    إذا (!(chgtick == CHANGEDTICK(curbuf)
+	&& (lastpat != عدم
+	    && STRNCMP(lastpat, spats[آخرین_idx].pat, lastpatlen) == 0
+	    && lastpatlen == spats[آخرین_idx].patlen
 	)
 	&& EQUAL_POS(lastpos, *cursor_pos)
 	&& lbuf == curbuf) || wraparound || cur < 0
@@ -3340,7 +3340,7 @@ update_search_stat(
     {
 	cur = 0;
 	cnt = 0;
-	exact_match = FALSE;
+	exact_تطابق = FALSE;
 	incomplete = 0;
 	CLEAR_POS(&lastpos);
 	lbuf = curbuf;
@@ -3348,55 +3348,55 @@ update_search_stat(
 
     // when searching backwards and having jumped to the first occurrence,
     // cur must remain greater than 1
-    if (EQUAL_POS(lastpos, *cursor_pos) && !wraparound
+    إذا (EQUAL_POS(lastpos, *cursor_pos) && !wraparound
 		&& (dirc == 0 || dirc == '/' ? cur < cnt : cur > 1))
 	cur += dirc == 0 ? 0 : dirc == '/' ? 1 : -1;
-    else
+    وإلا
     {
-	int	done_search = FALSE;
+	صحيح	انجامشده_جستجو = FALSE;
 	pos_T	endpos = {0, 0, 0};
 
 	p_ws = FALSE;
-#ifdef FEAT_RELTIME
-	if (timeout > 0)
-	    profile_setlimit(timeout, &start);
-#endif
-	while (!got_int && searchit(curwin, curbuf, &lastpos, &endpos,
-			 FORWARD, NULL, 0, 1, SEARCH_KEEP, RE_LAST, NULL) != FAIL)
+#اگر_تعریف_شده FEAT_RELTIME
+	إذا (timeout > 0)
+	    profile_setlimit(timeout, &شروع);
+#پایان_اگر
+	طالما (!got_int && searchit(curwin, curbuf, &lastpos, &endpos,
+			 FORWARD, عدم, 0, 1, جستجو_KEEP, RE_آخرین, عدم) != FAIL)
 	{
-	    done_search = TRUE;
-#ifdef FEAT_RELTIME
+	    انجامشده_جستجو = TRUE;
+#اگر_تعریف_شده FEAT_RELTIME
 	    // Stop after passing the time limit.
-	    if (timeout > 0 && profile_passed_limit(&start))
+	    إذا (timeout > 0 && profile_passed_حد(&شروع))
 	    {
 		incomplete = 1;
-		break;
+		اكسر;
 	    }
-#endif
+#پایان_اگر
 	    cnt++;
-	    if (LTOREQ_POS(lastpos, p))
+	    إذا (LTOREQ_POS(lastpos, p))
 	    {
 		cur = cnt;
-		if (LT_POS(p, endpos))
-		    exact_match = TRUE;
+		إذا (LT_POS(p, endpos))
+		    exact_تطابق = TRUE;
 	    }
 	    fast_breakcheck();
-	    if (maxcount > 0 && cnt > maxcount)
+	    إذا (maxcount > 0 && cnt > maxcount)
 	    {
 		incomplete = 2;    // max count exceeded
-		break;
+		اكسر;
 	    }
 	}
-	if (got_int)
+	إذا (got_int)
 	    cur = -1; // abort
-	if (done_search)
+	إذا (انجامشده_جستجو)
 	{
 	    vim_free(lastpat);
-	    lastpat = vim_strnsave(spats[last_idx].pat, spats[last_idx].patlen);
-	    if (lastpat == NULL)
+	    lastpat = vim_strnsave(spats[آخرین_idx].pat, spats[آخرین_idx].patlen);
+	    إذا (lastpat == عدم)
 		lastpatlen = 0;
-	    else
-		lastpatlen = spats[last_idx].patlen;
+	    وإلا
+		lastpatlen = spats[آخرین_idx].patlen;
 	    chgtick = CHANGEDTICK(curbuf);
 	    lbuf = curbuf;
 	    lastpos = p;
@@ -3404,308 +3404,308 @@ update_search_stat(
     }
     stat->cur = cur;
     stat->cnt = cnt;
-    stat->exact_match = exact_match;
+    stat->exact_تطابق = exact_تطابق;
     stat->incomplete = incomplete;
-    stat->last_maxcount = last_maxcount;
+    stat->آخرین_maxcount = آخرین_maxcount;
     p_ws = save_ws;
 }
 
-#if defined(FEAT_FIND_ID)
+#إذا defined(FEAT_پیدا_کن_ID)
 
 /*
  * Get line "lnum" and copy it into "buf[LSIZE]".
  * The copy is made because the regexp may make the line invalid when using a
  * mark.
  */
-    static char_u *
-get_line_and_copy(linenr_T lnum, char_u *buf)
+    ساكن char_u *
+get_سطر_and_copy(linenr_T lnum, char_u *buf)
 {
-    char_u *line = ml_get(lnum);
+    char_u *سطر = ml_get(lnum);
 
-    vim_strncpy(buf, line, LSIZE - 1);
-    return buf;
+    vim_strncpy(buf, سطر, LSIZE - 1);
+    أرجع buf;
 }
 
 /*
  * Find identifiers or defines in included files.
  * If p_ic && compl_status_sol() then ptr must be in lowercase.
  */
-    void
-find_pattern_in_path(
+    فراغ
+پیدا_کن_الگو_درون_مسیر(
     char_u	*ptr,		// pointer to search pattern
-    int		dir UNUSED,	// direction of expansion
-    int		len,		// length of search pattern
-    int		whole,		// match whole words only
-    int		skip_comments,	// don't match inside comments
-    int		type,		// Type of search; are we looking for a type?
+    صحيح		dir استفادهنشده,	// direction of expansion
+    صحيح		len,		// length of search pattern
+    صحيح		کامل,		// match whole words only
+    صحيح		skip_comments,	// don't match inside comments
+    صحيح		type,		// Type of search; are we looking for a type?
 				// a macro?
-    long	count,
-    int		action,		// What to do when we find it
-    linenr_T	start_lnum,	// first line to start searching
-    linenr_T	end_lnum,	// last line for searching
-    int		forceit,	// If true, always switch to the found path
-    int		silent)		// Do not print messages when ACTION_EXPAND
+    دراز	شمار,
+    صحيح		action,		// What to do when we find it
+    linenr_T	شروع_lnum,	// first line to start searching
+    linenr_T	انتها_lnum,	// last line for searching
+    صحيح		forceit,	// If true, always switch to the found path
+    صحيح		silent)		// Do not print messages when ACTION_EXPAND
 {
     SearchedFile *files;		// Stack of included files
     SearchedFile *bigger;		// When we need more space
-    int		max_path_depth = 50;
-    long	match_count = 1;
+    صحيح		max_مسیر_عمق = 50;
+    دراز	تطابق_شمار = 1;
 
     char_u	*pat;
     char_u	*new_fname;
     char_u	*curr_fname = curbuf->b_fname;
-    char_u	*prev_fname = NULL;
+    char_u	*prev_fname = عدم;
     linenr_T	lnum;
-    int		depth;
-    int		depth_displayed;	// For type==CHECK_PATH
-    int		old_files;
-    int		already_searched;
-    char_u	*file_line;
-    char_u	*line;
+    صحيح		عمق;
+    صحيح		عمق_displayed;	// For type==CHECK_PATH
+    صحيح		old_files;
+    صحيح		already_searched;
+    char_u	*file_سطر;
+    char_u	*سطر;
     char_u	*p;
     char_u	save_char;
-    int		define_matched;
+    صحيح		define_matched;
     regmatch_T	regmatch;
     regmatch_T	incl_regmatch;
     regmatch_T	def_regmatch;
-    int		matched = FALSE;
-    int		did_show = FALSE;
-    int		found = FALSE;
-    int		i;
-    char_u	*already = NULL;
-    char_u	*startp = NULL;
-    char_u	*inc_opt = NULL;
-# if defined(FEAT_QUICKFIX)
-    win_T	*curwin_save = NULL;
+    صحيح		matched = FALSE;
+    صحيح		did_show = FALSE;
+    صحيح		یافت = FALSE;
+    صحيح		i;
+    char_u	*already = عدم;
+    char_u	*startp = عدم;
+    char_u	*inc_opt = عدم;
+# إذا defined(FEAT_QUICKFIX)
+    win_T	*curwin_save = عدم;
 # endif
 
-    regmatch.regprog = NULL;
-    incl_regmatch.regprog = NULL;
-    def_regmatch.regprog = NULL;
+    regmatch.regprog = عدم;
+    incl_regmatch.regprog = عدم;
+    def_regmatch.regprog = عدم;
 
-    file_line = alloc(LSIZE);
-    if (file_line == NULL)
-	return;
+    file_سطر = alloc(LSIZE);
+    إذا (file_سطر == عدم)
+	أرجع;
 
-    if (type != CHECK_PATH && type != FIND_DEFINE
+    إذا (type != CHECK_مسیر && type != پیدا_کن_DEFINE
 	    // when CONT_SOL is set compare "ptr" with the beginning of the
 	    // line is faster than quote_meta/regcomp/regexec "ptr" -- Acevedo
-	    && !compl_status_sol())
+	    && !compl_وضعیت_sol())
     {
 	pat = alloc(len + 5);
-	if (pat == NULL)
-	    goto fpip_end;
-	vim_snprintf((char *)pat, len + 5, whole ? "\\<%.*s\\>" : "%.*s", len, ptr);
+	إذا (pat == عدم)
+	    اذهب fpip_انتها;
+	vim_snprintf((حرف *)pat, len + 5, کامل ? "\\<%.*s\\>" : "%.*s", len, ptr);
 	// ignore case according to p_ic, p_scs and pat
 	regmatch.rm_ic = ignorecase(pat);
 	regmatch.regprog = vim_regcomp(pat, magic_isset() ? RE_MAGIC : 0);
 	vim_free(pat);
-	if (regmatch.regprog == NULL)
-	    goto fpip_end;
+	إذا (regmatch.regprog == عدم)
+	    اذهب fpip_انتها;
     }
     inc_opt = (*curbuf->b_p_inc == NUL) ? p_inc : curbuf->b_p_inc;
-    if (*inc_opt != NUL)
+    إذا (*inc_opt != NUL)
     {
 	incl_regmatch.regprog = vim_regcomp(inc_opt,
 						 magic_isset() ? RE_MAGIC : 0);
-	if (incl_regmatch.regprog == NULL)
-	    goto fpip_end;
+	إذا (incl_regmatch.regprog == عدم)
+	    اذهب fpip_انتها;
 	incl_regmatch.rm_ic = FALSE;	// don't ignore case in incl. pat.
     }
-    if (type == FIND_DEFINE && (*curbuf->b_p_def != NUL || *p_def != NUL))
+    إذا (type == پیدا_کن_DEFINE && (*curbuf->b_p_def != NUL || *p_def != NUL))
     {
 	def_regmatch.regprog = vim_regcomp(*curbuf->b_p_def == NUL ? p_def : curbuf->b_p_def,
 						 magic_isset() ? RE_MAGIC : 0);
-	if (def_regmatch.regprog == NULL)
-	    goto fpip_end;
+	إذا (def_regmatch.regprog == عدم)
+	    اذهب fpip_انتها;
 	def_regmatch.rm_ic = FALSE;	// don't ignore case in define pat.
     }
-    files = lalloc_clear(max_path_depth * sizeof(SearchedFile), TRUE);
-    if (files == NULL)
-	goto fpip_end;
-    old_files = max_path_depth;
-    depth = depth_displayed = -1;
+    files = lalloc_clear(max_مسیر_عمق * حجم(SearchedFile), TRUE);
+    إذا (files == عدم)
+	اذهب fpip_انتها;
+    old_files = max_مسیر_عمق;
+    عمق = عمق_displayed = -1;
 
-    lnum = start_lnum;
-    if (end_lnum > curbuf->b_ml.ml_line_count)
-	end_lnum = curbuf->b_ml.ml_line_count;
-    if (lnum > end_lnum)		// do at least one line
-	lnum = end_lnum;
-    line = get_line_and_copy(lnum, file_line);
+    lnum = شروع_lnum;
+    إذا (انتها_lnum > curbuf->b_ml.ml_سطر_شمار)
+	انتها_lnum = curbuf->b_ml.ml_سطر_شمار;
+    إذا (lnum > انتها_lnum)		// do at least one line
+	lnum = انتها_lnum;
+    سطر = get_سطر_and_copy(lnum, file_سطر);
 
-    for (;;)
+    لكل (;;)
     {
-	if (incl_regmatch.regprog != NULL
-		&& vim_regexec(&incl_regmatch, line, (colnr_T)0))
+	إذا (incl_regmatch.regprog != عدم
+		&& vim_regexec(&incl_regmatch, سطر, (colnr_T)0))
 	{
 	    char_u *p_fname = (curr_fname == curbuf->b_fname)
 					      ? curbuf->b_ffname : curr_fname;
 
-	    if (strstr((char *)inc_opt, "\\zs") != NULL)
+	    إذا (جستجوی_رشته((حرف *)inc_opt, "\\zs") != عدم)
 		// Use text from '\zs' to '\ze' (or end) of 'include'.
-		new_fname = find_file_name_in_path(incl_regmatch.startp[0],
-		       (int)(incl_regmatch.endp[0] - incl_regmatch.startp[0]),
+		new_fname = پیدا_کن_file_name_درون_مسیر(incl_regmatch.startp[0],
+		       (صحيح)(incl_regmatch.endp[0] - incl_regmatch.startp[0]),
 				 FNAME_EXP|FNAME_INCL|FNAME_REL, 1L, p_fname);
-	    else
+	    وإلا
 		// Use text after match with 'include'.
-		new_fname = file_name_in_line(incl_regmatch.endp[0], 0,
-			     FNAME_EXP|FNAME_INCL|FNAME_REL, 1L, p_fname, NULL);
+		new_fname = file_name_درون_سطر(incl_regmatch.endp[0], 0,
+			     FNAME_EXP|FNAME_INCL|FNAME_REL, 1L, p_fname, عدم);
 	    already_searched = FALSE;
-	    if (new_fname != NULL)
+	    إذا (new_fname != عدم)
 	    {
 		// Check whether we have already searched in this file
-		for (i = 0;; i++)
+		لكل (i = 0;; i++)
 		{
-		    if (i == depth + 1)
+		    إذا (i == عمق + 1)
 			i = old_files;
-		    if (i == max_path_depth)
-			break;
-		    if (fullpathcmp(new_fname, files[i].name, TRUE, TRUE)
+		    إذا (i == max_مسیر_عمق)
+			اكسر;
+		    إذا (fullpathcmp(new_fname, files[i].name, TRUE, TRUE)
 								    & FPC_SAME)
 		    {
-			if (type != CHECK_PATH
+			إذا (type != CHECK_مسیر
 				&& action == ACTION_SHOW_ALL
 				&& files[i].matched)
 			{
-			    msg_putchar('\n');	    // cursor below last one
-			    if (!got_int)	    // don't display if 'q'
+			    پیام_putchar('\n');	    // cursor below last one
+			    إذا (!got_int)	    // don't display if 'q'
 						    // typed at "--more--"
-						    // message
+						    //پیام
 			    {
-				msg_home_replace_hl(new_fname);
-				msg_puts(_(" (includes previously listed match)"));
-				prev_fname = NULL;
+				پیام_home_replace_hl(new_fname);
+				پیام_puts(_(" (includes previously listed match)"));
+				prev_fname = عدم;
 			    }
 			}
 			VIM_CLEAR(new_fname);
 			already_searched = TRUE;
-			break;
+			اكسر;
 		    }
 		}
 	    }
 
-	    if (type == CHECK_PATH && (action == ACTION_SHOW_ALL
-				 || (new_fname == NULL && !already_searched)))
+	    إذا (type == CHECK_مسیر && (action == ACTION_SHOW_ALL
+				 || (new_fname == عدم && !already_searched)))
 	    {
-		if (did_show)
-		    msg_putchar('\n');	    // cursor below last one
-		else
+		إذا (did_show)
+		    پیام_putchar('\n');	    // cursor below last one
+		وإلا
 		{
 		    gotocmdline(TRUE);	    // cursor at status line
-		    msg_puts_title(_("--- Included files "));
-		    if (action != ACTION_SHOW_ALL)
-			msg_puts_title(_("not found "));
-		    msg_puts_title(_("in path ---\n"));
+		    پیام_puts_title(_("--- Included files "));
+		    إذا (action != ACTION_SHOW_ALL)
+			پیام_puts_title(_("not found "));
+		    پیام_puts_title(_("in path ---\n"));
 		}
 		did_show = TRUE;
-		while (depth_displayed < depth && !got_int)
+		طالما (عمق_displayed < عمق && !got_int)
 		{
-		    ++depth_displayed;
-		    for (i = 0; i < depth_displayed; i++)
-			msg_puts("  ");
-		    msg_home_replace(files[depth_displayed].name);
-		    msg_puts(" -->\n");
+		    ++عمق_displayed;
+		    لكل (i = 0; i < عمق_displayed; i++)
+			پیام_puts("  ");
+		    پیام_home_replace(files[عمق_displayed].name);
+		    پیام_puts(" -->\n");
 		}
-		if (!got_int)		    // don't display if 'q' typed
+		إذا (!got_int)		    // don't display if 'q' typed
 					    // for "--more--" message
 		{
-		    for (i = 0; i <= depth_displayed; i++)
-			msg_puts("  ");
-		    if (new_fname != NULL)
+		    لكل (i = 0; i <= عمق_displayed; i++)
+			پیام_puts("  ");
+		    إذا (new_fname != عدم)
 		    {
 			// using "new_fname" is more reliable, e.g., when
 			// 'includeexpr' is set.
-			msg_outtrans_attr(new_fname, HL_ATTR(HLF_D));
+			پیام_outtrans_attr(new_fname, HL_ATTR(HLF_D));
 		    }
-		    else
+		    وإلا
 		    {
 			/*
 			 * Isolate the file name.
 			 * Include the surrounding "" or <> if present.
 			 */
-			if (strstr((char *)inc_opt, "\\zs") != NULL)
+			إذا (جستجوی_رشته((حرف *)inc_opt, "\\zs") != عدم)
 			{
 			    // pattern contains \zs, use the match
 			    p = incl_regmatch.startp[0];
-			    i = (int)(incl_regmatch.endp[0]
+			    i = (صحيح)(incl_regmatch.endp[0]
 						   - incl_regmatch.startp[0]);
 			}
-			else
+			وإلا
 			{
 			    // find the file name after the end of the match
-			    for (p = incl_regmatch.endp[0];
+			    لكل (p = incl_regmatch.endp[0];
 						  *p && !vim_isfilec(*p); p++)
 				;
-			    for (i = 0; vim_isfilec(p[i]); i++)
+			    لكل (i = 0; vim_isfilec(p[i]); i++)
 				;
 			}
 
-			if (i == 0)
+			إذا (i == 0)
 			{
 			    // Nothing found, use the rest of the line.
 			    p = incl_regmatch.endp[0];
-			    i = (int)STRLEN(p);
+			    i = (صحيح)STRLEN(p);
 			}
 			// Avoid checking before the start of the line, can
 			// happen if \zs appears in the regexp.
-			else if (p > line)
+			وإلا إذا (p > سطر)
 			{
-			    if (p[-1] == '"' || p[-1] == '<')
+			    إذا (p[-1] == '"' || p[-1] == '<')
 			    {
 				--p;
 				++i;
 			    }
-			    if (p[i] == '"' || p[i] == '>')
+			    إذا (p[i] == '"' || p[i] == '>')
 				++i;
 			}
 			save_char = p[i];
 			p[i] = NUL;
-			msg_outtrans_attr(p, HL_ATTR(HLF_D));
+			پیام_outtrans_attr(p, HL_ATTR(HLF_D));
 			p[i] = save_char;
 		    }
 
-		    if (new_fname == NULL && action == ACTION_SHOW_ALL)
+		    إذا (new_fname == عدم && action == ACTION_SHOW_ALL)
 		    {
-			if (already_searched)
-			    msg_puts(_("  (Already listed)"));
-			else
-			    msg_puts(_("  NOT FOUND"));
+			إذا (already_searched)
+			    پیام_puts(_("  (Already listed)"));
+			وإلا
+			    پیام_puts(_("  NOT FOUND"));
 		    }
 		}
-		out_flush();	    // output each line directly
+		بیرون_flush();	    // output each line directly
 	    }
 
-	    if (new_fname != NULL)
+	    إذا (new_fname != عدم)
 	    {
 		// Push the new file onto the file stack
-		if (depth + 1 == old_files)
+		إذا (عمق + 1 == old_files)
 		{
-		    bigger = ALLOC_MULT(SearchedFile, max_path_depth * 2);
-		    if (bigger != NULL)
+		    bigger = ALLOC_MULT(SearchedFile, max_مسیر_عمق * 2);
+		    إذا (bigger != عدم)
 		    {
-			for (i = 0; i <= depth; i++)
+			لكل (i = 0; i <= عمق; i++)
 			    bigger[i] = files[i];
-			for (i = depth + 1; i < old_files + max_path_depth; i++)
+			لكل (i = عمق + 1; i < old_files + max_مسیر_عمق; i++)
 			{
-			    bigger[i].fp = NULL;
-			    bigger[i].name = NULL;
+			    bigger[i].fp = عدم;
+			    bigger[i].name = عدم;
 			    bigger[i].lnum = 0;
 			    bigger[i].matched = FALSE;
 			}
-			for (i = old_files; i < max_path_depth; i++)
-			    bigger[i + max_path_depth] = files[i];
-			old_files += max_path_depth;
-			max_path_depth *= 2;
+			لكل (i = old_files; i < max_مسیر_عمق; i++)
+			    bigger[i + max_مسیر_عمق] = files[i];
+			old_files += max_مسیر_عمق;
+			max_مسیر_عمق *= 2;
 			vim_free(files);
 			files = bigger;
 		    }
 		}
-		if ((files[depth + 1].fp = mch_fopen((char *)new_fname, "r"))
-								    == NULL)
+		إذا ((files[عمق + 1].fp = mch_fopen((حرف *)new_fname, "r"))
+								    == عدم)
 		    vim_free(new_fname);
-		else
+		وإلا
 		{
-		    if (++depth == old_files)
+		    إذا (++عمق == old_files)
 		    {
 			/*
 			 * lalloc() for 'bigger' must have failed above.  We
@@ -3714,39 +3714,39 @@ find_pattern_in_path(
 			vim_free(files[old_files].name);
 			++old_files;
 		    }
-		    files[depth].name = curr_fname = new_fname;
-		    files[depth].lnum = 0;
-		    files[depth].matched = FALSE;
-		    if (action == ACTION_EXPAND
+		    files[عمق].name = curr_fname = new_fname;
+		    files[عمق].lnum = 0;
+		    files[عمق].matched = FALSE;
+		    إذا (action == ACTION_EXPAND
 			    && !shortmess(SHM_COMPLETIONSCAN) && !silent)
 		    {
-			msg_hist_off = TRUE;	// reset in msg_trunc_attr()
-			vim_snprintf((char*)IObuff, IOSIZE,
+			پیام_hist_off = TRUE;	// reset in msg_trunc_attr()
+			vim_snprintf((حرف*)IObuff, IOSIZE,
 				_("Scanning included file: %s"),
-				(char *)new_fname);
-			msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+				(حرف *)new_fname);
+			پیام_trunc_attr((حرف *)IObuff, TRUE, HL_ATTR(HLF_R));
 		    }
-		    else if (p_verbose >= 5)
+		    وإلا إذا (p_verbose >= 5)
 		    {
 			verbose_enter();
 			smsg(_("Searching included file %s"),
-							   (char *)new_fname);
+							   (حرف *)new_fname);
 			verbose_leave();
 		    }
 
 		}
 	    }
 	}
-	else
+	وإلا
 	{
 	    /*
 	     * Check if the line is a define (type == FIND_DEFINE)
 	     */
-	    p = line;
-search_line:
+	    p = سطر;
+جستجو_سطر:
 	    define_matched = FALSE;
-	    if (def_regmatch.regprog != NULL
-			      && vim_regexec(&def_regmatch, line, (colnr_T)0))
+	    إذا (def_regmatch.regprog != عدم
+			      && vim_regexec(&def_regmatch, سطر, (colnr_T)0))
 	    {
 		/*
 		 * Pattern must be first identifier after 'define', so skip
@@ -3754,7 +3754,7 @@ search_line:
 		 * don't let it match beyond the end of this identifier.
 		 */
 		p = def_regmatch.endp[0];
-		while (*p && !vim_iswordc(*p))
+		طالما (*p && !vim_iswordc(*p))
 		    p++;
 		define_matched = TRUE;
 	    }
@@ -3763,22 +3763,22 @@ search_line:
 	     * Look for a match.  Don't do this if we are looking for a
 	     * define and this line didn't match define_prog above.
 	     */
-	    if (def_regmatch.regprog == NULL || define_matched)
+	    إذا (def_regmatch.regprog == عدم || define_matched)
 	    {
-		if (define_matched || compl_status_sol())
+		إذا (define_matched || compl_وضعیت_sol())
 		{
 		    // compare the first "len" chars from "ptr"
 		    startp = skipwhite(p);
-		    if (p_ic)
+		    إذا (p_ic)
 			matched = MB_STRNICMP(startp, ptr, len) == 0;
-		    else
+		    وإلا
 			matched = STRNCMP(startp, ptr, len) == 0;
-		    if (matched && define_matched && whole
+		    إذا (matched && define_matched && کامل
 						  && vim_iswordc(startp[len]))
 			matched = FALSE;
 		}
-		else if (regmatch.regprog != NULL
-			 && vim_regexec(&regmatch, line, (colnr_T)(p - line)))
+		وإلا إذا (regmatch.regprog != عدم
+			 && vim_regexec(&regmatch, سطر, (colnr_T)(p - سطر)))
 		{
 		    matched = TRUE;
 		    startp = regmatch.startp[0];
@@ -3787,11 +3787,11 @@ search_line:
 		     * looking for a define).  A line starting with "# define"
 		     * is not considered to be a comment line.
 		     */
-		    if (!define_matched && skip_comments)
+		    إذا (!define_matched && skip_comments)
 		    {
-			if ((*line != '#' ||
-				STRNCMP(skipwhite(line + 1), "define", 6) != 0)
-				&& get_leader_len(line, NULL, FALSE, TRUE))
+			إذا ((*سطر != '#' ||
+				STRNCMP(skipwhite(سطر + 1), "define", 6) != 0)
+				&& get_leader_len(سطر, عدم, FALSE, TRUE))
 			    matched = FALSE;
 
 			/*
@@ -3800,22 +3800,22 @@ search_line:
 			 * * /" when looking for "normal".
 			 * Note: Doesn't skip "/ *" in comments.
 			 */
-			p = skipwhite(line);
-			if (matched
+			p = skipwhite(سطر);
+			إذا (matched
 				|| (p[0] == '/' && p[1] == '*') || p[0] == '*')
-			    for (p = line; *p && p < startp; ++p)
+			    لكل (p = سطر; *p && p < startp; ++p)
 			    {
-				if (matched
+				إذا (matched
 					&& p[0] == '/'
 					&& (p[1] == '*' || p[1] == '/'))
 				{
 				    matched = FALSE;
 				    // After "//" all text is comment
-				    if (p[1] == '/')
-					break;
+				    إذا (p[1] == '/')
+					اكسر;
 				    ++p;
 				}
-				else if (!matched && p[0] == '*' && p[1] == '/')
+				وإلا إذا (!matched && p[0] == '*' && p[1] == '/')
 				{
 				    // Can find match after "* /".
 				    matched = TRUE;
@@ -3826,29 +3826,29 @@ search_line:
 		}
 	    }
 	}
-	if (matched)
+	إذا (matched)
 	{
-	    if (action == ACTION_EXPAND)
+	    إذا (action == ACTION_EXPAND)
 	    {
-		int	cont_s_ipos = FALSE;
-		int	add_r;
+		صحيح	cont_s_ipos = FALSE;
+		صحيح	جمع_کن_r;
 		char_u	*aux;
 
-		if (depth == -1 && lnum == curwin->w_cursor.lnum)
-		    break;
-		found = TRUE;
+		إذا (عمق == -1 && lnum == curwin->w_cursor.lnum)
+		    اكسر;
+		یافت = TRUE;
 		aux = p = startp;
-		if (compl_status_adding() && (int)STRLEN(p) >= ins_compl_len())
+		إذا (compl_وضعیت_adding() && (صحيح)STRLEN(p) >= ins_compl_len())
 		{
 		    p += ins_compl_len();
-		    if (vim_iswordp(p))
-			goto exit_matched;
-		    p = find_word_start(p);
+		    إذا (vim_iswordp(p))
+			اذهب exit_matched;
+		    p = پیدا_کن_کلمه_شروع(p);
 		}
-		p = find_word_end(p);
-		i = (int)(p - aux);
+		p = پیدا_کن_کلمه_انتها(p);
+		i = (صحيح)(p - aux);
 
-		if (compl_status_adding() && i == ins_compl_len())
+		إذا (compl_وضعیت_adding() && i == ins_compl_len())
 		{
 		    // IOSIZE > compl_length, so the STRNCPY works
 		    STRNCPY(IObuff, aux, i);
@@ -3856,159 +3856,159 @@ search_line:
 		    // Get the next line: when "depth" < 0  from the current
 		    // buffer, otherwise from the included file.  Jump to
 		    // exit_matched when past the last line.
-		    if (depth < 0)
+		    إذا (عمق < 0)
 		    {
-			if (lnum >= end_lnum)
-			    goto exit_matched;
-			line = get_line_and_copy(++lnum, file_line);
+			إذا (lnum >= انتها_lnum)
+			    اذهب exit_matched;
+			سطر = get_سطر_and_copy(++lnum, file_سطر);
 		    }
-		    else if (vim_fgets(line = file_line,
-						      LSIZE, files[depth].fp))
-			goto exit_matched;
+		    وإلا إذا (vim_fgets(سطر = file_سطر,
+						      LSIZE, files[عمق].fp))
+			اذهب exit_matched;
 
 		    // we read a line, set "already" to check this "line" later
 		    // if depth >= 0 we'll increase files[depth].lnum far
 		    // below  -- Acevedo
-		    already = aux = p = skipwhite(line);
-		    p = find_word_start(p);
-		    p = find_word_end(p);
-		    if (p > aux)
+		    already = aux = p = skipwhite(سطر);
+		    p = پیدا_کن_کلمه_شروع(p);
+		    p = پیدا_کن_کلمه_انتها(p);
+		    إذا (p > aux)
 		    {
-			if (*aux != ')' && IObuff[i-1] != TAB)
+			إذا (*aux != ')' && IObuff[i-1] != TAB)
 			{
-			    if (IObuff[i-1] != ' ')
+			    إذا (IObuff[i-1] != ' ')
 				IObuff[i++] = ' ';
 			    // IObuf =~ "\(\k\|\i\).* ", thus i >= 2
-			    if (p_js
+			    إذا (p_js
 				&& (IObuff[i-2] == '.'
-				    || (vim_strchr(p_cpo, CPO_JOINSP) == NULL
+				    || (vim_strchr(p_cpo, CPO_JOINSP) == عدم
 					&& (IObuff[i-2] == '?'
 					    || IObuff[i-2] == '!'))))
 				IObuff[i++] = ' ';
 			}
 			// copy as much as possible of the new word
-			if (p - aux >= IOSIZE - i)
+			إذا (p - aux >= IOSIZE - i)
 			    p = aux + IOSIZE - i - 1;
 			STRNCPY(IObuff + i, aux, p - aux);
-			i += (int)(p - aux);
+			i += (صحيح)(p - aux);
 			cont_s_ipos = TRUE;
 		    }
 		    IObuff[i] = NUL;
 		    aux = IObuff;
 
-		    if (i == ins_compl_len())
-			goto exit_matched;
+		    إذا (i == ins_compl_len())
+			اذهب exit_matched;
 		}
 
-		add_r = ins_compl_add_infercase(aux, i, p_ic,
-			curr_fname == curbuf->b_fname ? NULL
+		جمع_کن_r = ins_compl_جمع_کن_infercase(aux, i, p_ic,
+			curr_fname == curbuf->b_fname ? عدم
 						  : shorten_fname1(curr_fname),
 			dir, cont_s_ipos, 0);
-		if (add_r == OK)
+		إذا (جمع_کن_r == OK)
 		    // if dir was BACKWARD then honor it just once
 		    dir = FORWARD;
-		else if (add_r == FAIL)
-		    break;
+		وإلا إذا (جمع_کن_r == FAIL)
+		    اكسر;
 	    }
-	    else if (action == ACTION_SHOW_ALL)
+	    وإلا إذا (action == ACTION_SHOW_ALL)
 	    {
-		found = TRUE;
-		if (!did_show)
+		یافت = TRUE;
+		إذا (!did_show)
 		    gotocmdline(TRUE);		// cursor at status line
-		if (curr_fname != prev_fname)
+		إذا (curr_fname != prev_fname)
 		{
-		    if (did_show)
-			msg_putchar('\n');	// cursor below last one
-		    if (!got_int)		// don't display if 'q' typed
+		    إذا (did_show)
+			پیام_putchar('\n');	// cursor below last one
+		    إذا (!got_int)		// don't display if 'q' typed
 						// at "--more--" message
-			msg_home_replace_hl(curr_fname);
+			پیام_home_replace_hl(curr_fname);
 		    prev_fname = curr_fname;
 		}
 		did_show = TRUE;
-		if (!got_int)
-		    show_pat_in_path(line, type, TRUE, action,
-			    (depth == -1) ? NULL : files[depth].fp,
-			    (depth == -1) ? &lnum : &files[depth].lnum,
-			    match_count++);
+		إذا (!got_int)
+		    show_pat_درون_مسیر(سطر, type, TRUE, action,
+			    (عمق == -1) ? عدم : files[عمق].fp,
+			    (عمق == -1) ? &lnum : &files[عمق].lnum,
+			    تطابق_شمار++);
 
 		// Set matched flag for this file and all the ones that
 		// include it
-		for (i = 0; i <= depth; ++i)
+		لكل (i = 0; i <= عمق; ++i)
 		    files[i].matched = TRUE;
 	    }
-	    else if (--count <= 0)
+	    وإلا إذا (--شمار <= 0)
 	    {
-		found = TRUE;
-		if (depth == -1 && lnum == curwin->w_cursor.lnum
-# if defined(FEAT_QUICKFIX)
+		یافت = TRUE;
+		إذا (عمق == -1 && lnum == curwin->w_cursor.lnum
+# إذا defined(FEAT_QUICKFIX)
 						      && g_do_tagpreview == 0
 # endif
 						      )
-		    emsg(_(e_match_is_on_current_line));
-		else if (action == ACTION_SHOW)
+		    emsg(_(e_تطابق_is_on_current_سطر));
+		وإلا إذا (action == ACTION_SHOW)
 		{
-		    show_pat_in_path(line, type, did_show, action,
-			    (depth == -1) ? NULL : files[depth].fp,
-			    (depth == -1) ? &lnum : &files[depth].lnum, 1L);
+		    show_pat_درون_مسیر(سطر, type, did_show, action,
+			    (عمق == -1) ? عدم : files[عمق].fp,
+			    (عمق == -1) ? &lnum : &files[عمق].lnum, 1L);
 		    did_show = TRUE;
 		}
-		else
+		وإلا
 		{
 # ifdef FEAT_GUI
 		    need_mouse_correct = TRUE;
 # endif
-# if defined(FEAT_QUICKFIX)
+# إذا defined(FEAT_QUICKFIX)
 		    // ":psearch" uses the preview window
-		    if (g_do_tagpreview != 0)
+		    إذا (g_do_tagpreview != 0)
 		    {
 			curwin_save = curwin;
 			prepare_tagpreview(TRUE, TRUE, FALSE);
 		    }
 # endif
-		    if (action == ACTION_SPLIT)
+		    إذا (action == ACTION_تقسیم)
 		    {
-			if (win_split(0, 0) == FAIL)
-			    break;
+			إذا (win_تقسیم(0, 0) == FAIL)
+			    اكسر;
 			RESET_BINDING(curwin);
 		    }
-		    if (depth == -1)
+		    إذا (عمق == -1)
 		    {
 			// match in current file
-# if defined(FEAT_QUICKFIX)
-			if (g_do_tagpreview != 0)
+# إذا defined(FEAT_QUICKFIX)
+			إذا (g_do_tagpreview != 0)
 			{
-			    if (!win_valid(curwin_save))
-				break;
-			    if (!GETFILE_SUCCESS(getfile(
-					   curwin_save->w_buffer->b_fnum, NULL,
-						     NULL, TRUE, lnum, forceit)))
-				break;	// failed to jump to file
+			    إذا (!win_valid(curwin_save))
+				اكسر;
+			    إذا (!GETFILE_SUCCESS(getfile(
+					   curwin_save->w_میانگیر->b_fnum, عدم,
+						     عدم, TRUE, lnum, forceit)))
+				اكسر;	// failed to jump to file
 			}
-			else
+			وإلا
 # endif
 			    setpcmark();
 			curwin->w_cursor.lnum = lnum;
 			check_cursor();
 		    }
-		    else
+		    وإلا
 		    {
-			if (!GETFILE_SUCCESS(getfile(
-					0, files[depth].name, NULL, TRUE,
-						    files[depth].lnum, forceit)))
-			    break;	// failed to jump to file
+			إذا (!GETFILE_SUCCESS(getfile(
+					0, files[عمق].name, عدم, TRUE,
+						    files[عمق].lnum, forceit)))
+			    اكسر;	// failed to jump to file
 			// autocommands may have changed the lnum, we don't
 			// want that here
-			curwin->w_cursor.lnum = files[depth].lnum;
+			curwin->w_cursor.lnum = files[عمق].lnum;
 		    }
 		}
-		if (action != ACTION_SHOW)
+		إذا (action != ACTION_SHOW)
 		{
-		    curwin->w_cursor.col = (colnr_T)(startp - line);
-		    curwin->w_set_curswant = true;
+		    curwin->w_cursor.ستون = (colnr_T)(startp - سطر);
+		    curwin->w_مجموعه_curswant = true;
 		}
 
-# if defined(FEAT_QUICKFIX)
-		if (g_do_tagpreview != 0
+# إذا defined(FEAT_QUICKFIX)
+		إذا (g_do_tagpreview != 0
 			   && curwin != curwin_save && win_valid(curwin_save))
 		{
 		    // Return cursor to where we were
@@ -4017,315 +4017,315 @@ search_line:
 		    win_enter(curwin_save, TRUE);
 		}
 #  ifdef FEAT_PROP_POPUP
-		else if (WIN_IS_POPUP(curwin))
+		وإلا إذا (WIN_IS_POPUP(curwin))
 		    // can't keep focus in popup window
 		    win_enter(firstwin, TRUE);
 #  endif
 # endif
-		break;
+		اكسر;
 	    }
 exit_matched:
 	    matched = FALSE;
 	    // look for other matches in the rest of the line if we
 	    // are not at the end of it already
-	    if (def_regmatch.regprog == NULL
+	    إذا (def_regmatch.regprog == عدم
 		    && action == ACTION_EXPAND
-		    && !compl_status_sol()
+		    && !compl_وضعیت_sol()
 		    && *startp != NUL
 		    && *(startp + mb_ptr2len(startp)) != NUL)
-		goto search_line;
+		اذهب جستجو_سطر;
 	}
-	line_breakcheck();
-	if (action == ACTION_EXPAND)
-	    ins_compl_check_keys(30, FALSE);
-	if (got_int || ins_compl_interrupted())
-	    break;
+	سطر_breakcheck();
+	إذا (action == ACTION_EXPAND)
+	    ins_compl_check_کلیدها(30, FALSE);
+	إذا (got_int || ins_compl_interrupted())
+	    اكسر;
 
 	/*
 	 * Read the next line.  When reading an included file and encountering
 	 * end-of-file, close the file and continue in the file that included
 	 * it.
 	 */
-	while (depth >= 0 && !already
-		&& vim_fgets(line = file_line, LSIZE, files[depth].fp))
+	طالما (عمق >= 0 && !already
+		&& vim_fgets(سطر = file_سطر, LSIZE, files[عمق].fp))
 	{
-	    fclose(files[depth].fp);
+	    fclose(files[عمق].fp);
 	    --old_files;
-	    files[old_files].name = files[depth].name;
-	    files[old_files].matched = files[depth].matched;
-	    --depth;
-	    curr_fname = (depth == -1) ? curbuf->b_fname
-				       : files[depth].name;
-	    if (depth < depth_displayed)
-		depth_displayed = depth;
+	    files[old_files].name = files[عمق].name;
+	    files[old_files].matched = files[عمق].matched;
+	    --عمق;
+	    curr_fname = (عمق == -1) ? curbuf->b_fname
+				       : files[عمق].name;
+	    إذا (عمق < عمق_displayed)
+		عمق_displayed = عمق;
 	}
-	if (depth >= 0)		// we could read the line
+	إذا (عمق >= 0)		// we could read the line
 	{
-	    files[depth].lnum++;
+	    files[عمق].lnum++;
 	    // Remove any CR and LF from the line.
-	    i = (int)STRLEN(line);
-	    if (i > 0 && line[i - 1] == '\n')
-		line[--i] = NUL;
-	    if (i > 0 && line[i - 1] == '\r')
-		line[--i] = NUL;
+	    i = (صحيح)STRLEN(سطر);
+	    إذا (i > 0 && سطر[i - 1] == '\n')
+		سطر[--i] = NUL;
+	    إذا (i > 0 && سطر[i - 1] == '\r')
+		سطر[--i] = NUL;
 	}
-	else if (!already)
+	وإلا إذا (!already)
 	{
-	    if (++lnum > end_lnum)
-		break;
-	    line = get_line_and_copy(lnum, file_line);
+	    إذا (++lnum > انتها_lnum)
+		اكسر;
+	    سطر = get_سطر_and_copy(lnum, file_سطر);
 	}
-	already = NULL;
+	already = عدم;
     }
     // End of big for (;;) loop.
 
     // Close any files that are still open.
-    for (i = 0; i <= depth; i++)
+    لكل (i = 0; i <= عمق; i++)
     {
 	fclose(files[i].fp);
 	vim_free(files[i].name);
     }
-    for (i = old_files; i < max_path_depth; i++)
+    لكل (i = old_files; i < max_مسیر_عمق; i++)
 	vim_free(files[i].name);
     vim_free(files);
 
-    if (type == CHECK_PATH)
+    إذا (type == CHECK_مسیر)
     {
-	if (!did_show)
+	إذا (!did_show)
 	{
-	    if (action != ACTION_SHOW_ALL)
-		msg(_("All included files were found"));
-	    else
-		msg(_("No included files"));
+	    إذا (action != ACTION_SHOW_ALL)
+		پیام(_("All included files were found"));
+	    وإلا
+		پیام(_("No included files"));
 	}
     }
-    else if (!found && action != ACTION_EXPAND && !silent)
+    وإلا إذا (!یافت && action != ACTION_EXPAND && !silent)
     {
-	if (got_int || ins_compl_interrupted())
+	إذا (got_int || ins_compl_interrupted())
 	    emsg(_(e_interrupted));
-	else if (type == FIND_DEFINE)
-	    emsg(_(e_couldnt_find_definition));
-	else
-	    emsg(_(e_couldnt_find_pattern));
+	وإلا إذا (type == پیدا_کن_DEFINE)
+	    emsg(_(e_couldnt_پیدا_کن_definition));
+	وإلا
+	    emsg(_(e_couldnt_پیدا_کن_الگو));
     }
-    if (action == ACTION_SHOW || action == ACTION_SHOW_ALL)
-	msg_end();
+    إذا (action == ACTION_SHOW || action == ACTION_SHOW_ALL)
+	پیام_انتها();
 
-fpip_end:
-    vim_free(file_line);
+fpip_انتها:
+    vim_free(file_سطر);
     vim_regfree(regmatch.regprog);
     vim_regfree(incl_regmatch.regprog);
     vim_regfree(def_regmatch.regprog);
 }
 
-    static void
-show_pat_in_path(
-    char_u  *line,
-    int	    type,
-    int	    did_show,
-    int	    action,
+    ساكن فراغ
+show_pat_درون_مسیر(
+    char_u  *سطر,
+    صحيح	    type,
+    صحيح	    did_show,
+    صحيح	    action,
     FILE    *fp,
     linenr_T *lnum,
-    long    count)
+    دراز    شمار)
 {
     char_u  *p;
     size_t  linelen;
 
-    if (did_show)
-	msg_putchar('\n');	// cursor below last one
-    else if (!msg_silent)
+    إذا (did_show)
+	پیام_putchar('\n');	// cursor below last one
+    وإلا إذا (!پیام_silent)
 	gotocmdline(TRUE);	// cursor at status line
-    if (got_int)		// 'q' typed at "--more--" message
-	return;
-    linelen = STRLEN(line);
-    for (;;)
+    إذا (got_int)		// 'q' typed at "--more--" message
+	أرجع;
+    linelen = STRLEN(سطر);
+    لكل (;;)
     {
-	p = line + linelen - 1;
-	if (fp != NULL)
+	p = سطر + linelen - 1;
+	إذا (fp != عدم)
 	{
 	    // We used fgets(), so get rid of newline at end
-	    if (p >= line && *p == '\n')
+	    إذا (p >= سطر && *p == '\n')
 		--p;
-	    if (p >= line && *p == '\r')
+	    إذا (p >= سطر && *p == '\r')
 		--p;
 	    *(p + 1) = NUL;
 	}
-	if (action == ACTION_SHOW_ALL)
+	إذا (action == ACTION_SHOW_ALL)
 	{
-	    sprintf((char *)IObuff, "%3ld: ", count);	// show match nr
-	    msg_puts((char *)IObuff);
-	    sprintf((char *)IObuff, "%4ld", *lnum);	// show line nr
+	    sprintf((حرف *)IObuff, "%3ld: ", شمار);	// show match nr
+	    پیام_puts((حرف *)IObuff);
+	    sprintf((حرف *)IObuff, "%4ld", *lnum);	// show line nr
 						// Highlight line numbers
-	    msg_puts_attr((char *)IObuff, HL_ATTR(HLF_N));
-	    msg_puts(" ");
+	    پیام_puts_attr((حرف *)IObuff, HL_ATTR(HLF_N));
+	    پیام_puts(" ");
 	}
-	msg_prt_line(line, FALSE);
-	out_flush();			// show one line at a time
+	پیام_prt_سطر(سطر, FALSE);
+	بیرون_flush();			// show one line at a time
 
 	// Definition continues until line that doesn't end with '\'
-	if (got_int || type != FIND_DEFINE || p < line || *p != '\\')
-	    break;
+	إذا (got_int || type != پیدا_کن_DEFINE || p < سطر || *p != '\\')
+	    اكسر;
 
-	if (fp != NULL)
+	إذا (fp != عدم)
 	{
-	    if (vim_fgets(line, LSIZE, fp)) // end of file
-		break;
-	    linelen = STRLEN(line);
+	    إذا (vim_fgets(سطر, LSIZE, fp)) // end of file
+		اكسر;
+	    linelen = STRLEN(سطر);
 	    ++*lnum;
 	}
-	else
+	وإلا
 	{
-	    if (++*lnum > curbuf->b_ml.ml_line_count)
-		break;
-	    line = ml_get(*lnum);
+	    إذا (++*lnum > curbuf->b_ml.ml_سطر_شمار)
+		اكسر;
+	    سطر = ml_get(*lnum);
 	    linelen = ml_get_len(*lnum);
 	}
-	msg_putchar('\n');
+	پیام_putchar('\n');
     }
 }
-#endif
+#پایان_اگر
 
-#ifdef FEAT_VIMINFO
+#اگر_تعریف_شده FEAT_VIMINFO
 /*
  * Return the last used search pattern at "idx".
  */
     spat_T *
-get_spat(int idx)
+get_spat(صحيح idx)
 {
-    return &spats[idx];
+    أرجع &spats[idx];
 }
 
 /*
  * Return the last used search pattern index.
  */
-    int
-get_spat_last_idx(void)
+    صحيح
+get_spat_آخرین_idx(فراغ)
 {
-    return last_idx;
+    أرجع آخرین_idx;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_EVAL) || defined(FEAT_PROTO)
+#إذا defined(FEAT_EVAL) || defined(FEAT_PROTO)
 /*
  * "searchcount()" function
  */
-    void
+    فراغ
 f_searchcount(typval_T *argvars, typval_T *rettv)
 {
     pos_T		pos = curwin->w_cursor;
-    char_u		*pattern = NULL;
-    int			maxcount = p_msc;
-    long		timeout = SEARCH_STAT_DEF_TIMEOUT;
-    int			recompute = TRUE;
+    char_u		*الگو = عدم;
+    صحيح			maxcount = p_msc;
+    دراز		timeout = جستجو_STAT_DEF_TIMEOUT;
+    صحيح			recompute = TRUE;
     searchstat_T	stat;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    إذا (rettv_dict_alloc(rettv) == FAIL)
+	أرجع;
 
-    if (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    إذا (درون_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    if (shortmess(SHM_SEARCHCOUNT))	// 'shortmess' contains 'S' flag
+    إذا (shortmess(SHM_SEARCHCOUNT))	// 'shortmess' contains 'S' flag
 	recompute = TRUE;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    إذا (argvars[0].v_type != VAR_UNKNOWN)
     {
 	dict_T		*dict;
 	dictitem_T	*di;
 	listitem_T	*li;
-	int		error = FALSE;
+	صحيح		error = FALSE;
 
-	if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	    return;
+	إذا (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	    أرجع;
 	dict = argvars[0].vval.v_dict;
-	di = dict_find(dict, (char_u *)"timeout", -1);
-	if (di != NULL)
+	di = dict_پیدا_کن(dict, (char_u *)"timeout", -1);
+	إذا (di != عدم)
 	{
-	    timeout = (long)tv_get_number_chk(&di->di_tv, &error);
-	    if (error)
-		return;
+	    timeout = (دراز)tv_get_عدد_chk(&di->di_tv, &error);
+	    إذا (error)
+		أرجع;
 	}
-	di = dict_find(dict, (char_u *)"maxcount", -1);
-	if (di != NULL)
+	di = dict_پیدا_کن(dict, (char_u *)"maxcount", -1);
+	إذا (di != عدم)
 	{
-	    maxcount = (int)tv_get_number_chk(&di->di_tv, &error);
-	    if (error)
-		return;
+	    maxcount = (صحيح)tv_get_عدد_chk(&di->di_tv, &error);
+	    إذا (error)
+		أرجع;
 	}
 	recompute = dict_get_bool(dict, "recompute", recompute);
-	di = dict_find(dict, (char_u *)"pattern", -1);
-	if (di != NULL)
+	di = dict_پیدا_کن(dict, (char_u *)"pattern", -1);
+	إذا (di != عدم)
 	{
-	    pattern = tv_get_string_chk(&di->di_tv);
-	    if (pattern == NULL)
-		return;
+	    الگو = tv_get_string_chk(&di->di_tv);
+	    إذا (الگو == عدم)
+		أرجع;
 	}
-	di = dict_find(dict, (char_u *)"pos", -1);
-	if (di != NULL)
+	di = dict_پیدا_کن(dict, (char_u *)"pos", -1);
+	إذا (di != عدم)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    إذا (di->di_tv.v_type != VAR_LIST)
 	    {
-		semsg(_(e_invalid_argument_str), "pos");
-		return;
+		semsg(_(e_invalid_آرگومان_str), "pos");
+		أرجع;
 	    }
-	    if (list_len(di->di_tv.vval.v_list) != 3)
+	    إذا (list_len(di->di_tv.vval.v_list) != 3)
 	    {
-		semsg(_(e_invalid_argument_str), "List format should be [lnum, col, off]");
-		return;
+		semsg(_(e_invalid_آرگومان_str), "List format should be [lnum, col, off]");
+		أرجع;
 	    }
-	    li = list_find(di->di_tv.vval.v_list, 0L);
-	    if (li != NULL)
+	    li = list_پیدا_کن(di->di_tv.vval.v_list, 0L);
+	    إذا (li != عدم)
 	    {
-		pos.lnum = tv_get_number_chk(&li->li_tv, &error);
-		if (error)
-		    return;
+		pos.lnum = tv_get_عدد_chk(&li->li_tv, &error);
+		إذا (error)
+		    أرجع;
 	    }
-	    li = list_find(di->di_tv.vval.v_list, 1L);
-	    if (li != NULL)
+	    li = list_پیدا_کن(di->di_tv.vval.v_list, 1L);
+	    إذا (li != عدم)
 	    {
-		pos.col = tv_get_number_chk(&li->li_tv, &error) - 1;
-		if (error)
-		    return;
+		pos.ستون = tv_get_عدد_chk(&li->li_tv, &error) - 1;
+		إذا (error)
+		    أرجع;
 	    }
-	    li = list_find(di->di_tv.vval.v_list, 2L);
-	    if (li != NULL)
+	    li = list_پیدا_کن(di->di_tv.vval.v_list, 2L);
+	    إذا (li != عدم)
 	    {
-		pos.coladd = tv_get_number_chk(&li->li_tv, &error);
-		if (error)
-		    return;
+		pos.coladd = tv_get_عدد_chk(&li->li_tv, &error);
+		إذا (error)
+		    أرجع;
 	    }
 	}
     }
 
-    save_last_search_pattern();
-# ifdef FEAT_SEARCH_EXTRA
+    save_آخرین_جستجو_الگو();
+# ifdef FEAT_جستجو_EXTRA
     save_incsearch_state();
 # endif
-    if (pattern != NULL)
+    إذا (الگو != عدم)
     {
-	if (*pattern == NUL)
-	    goto the_end;
-	vim_free(spats[last_idx].pat);
-	spats[last_idx].patlen = STRLEN(pattern);
-	spats[last_idx].pat = vim_strnsave(pattern, spats[last_idx].patlen);
-	if (spats[last_idx].pat == NULL)
-	    spats[last_idx].patlen = 0;
+	إذا (*الگو == NUL)
+	    اذهب the_انتها;
+	vim_free(spats[آخرین_idx].pat);
+	spats[آخرین_idx].patlen = STRLEN(الگو);
+	spats[آخرین_idx].pat = vim_strnsave(الگو, spats[آخرین_idx].patlen);
+	إذا (spats[آخرین_idx].pat == عدم)
+	    spats[آخرین_idx].patlen = 0;
     }
-    if (spats[last_idx].pat == NULL || *spats[last_idx].pat == NUL)
-	goto the_end;	// the previous pattern was never defined
+    إذا (spats[آخرین_idx].pat == عدم || *spats[آخرین_idx].pat == NUL)
+	اذهب the_انتها;	// the previous pattern was never defined
 
-    update_search_stat(0, &pos, &pos, &stat, recompute, maxcount, timeout);
+    update_جستجو_stat(0, &pos, &pos, &stat, recompute, maxcount, timeout);
 
-    dict_add_number(rettv->vval.v_dict, "current", stat.cur);
-    dict_add_number(rettv->vval.v_dict, "total", stat.cnt);
-    dict_add_number(rettv->vval.v_dict, "exact_match", stat.exact_match);
-    dict_add_number(rettv->vval.v_dict, "incomplete", stat.incomplete);
-    dict_add_number(rettv->vval.v_dict, "maxcount", stat.last_maxcount);
+    dict_جمع_کن_عدد(rettv->vval.v_dict, "current", stat.cur);
+    dict_جمع_کن_عدد(rettv->vval.v_dict, "total", stat.cnt);
+    dict_جمع_کن_عدد(rettv->vval.v_dict, "exact_match", stat.exact_تطابق);
+    dict_جمع_کن_عدد(rettv->vval.v_dict, "incomplete", stat.incomplete);
+    dict_جمع_کن_عدد(rettv->vval.v_dict, "maxcount", stat.آخرین_maxcount);
 
-the_end:
-    restore_last_search_pattern();
-# ifdef FEAT_SEARCH_EXTRA
+the_انتها:
+    restore_آخرین_جستجو_الگو();
+# ifdef FEAT_جستجو_EXTRA
     restore_incsearch_state();
 # endif
 }
-#endif
+#پایان_اگر

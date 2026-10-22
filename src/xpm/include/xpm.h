@@ -42,8 +42,8 @@
  * Lorens Younes (d93-hyo@nada.kth.se) 4/96
  */
 
-#ifndef XPM_h
-#define XPM_h
+#اگر_تعریف_نشده XPM_h
+#تعریف_کن XPM_h
 
 /*
  * first some identification numbers:
@@ -57,41 +57,41 @@
  *
  * Then the XpmIncludeVersion number is built from these numbers.
  */
-#define XpmFormat 3
-#define XpmVersion 4
-#define XpmRevision 11
-#define XpmIncludeVersion ((XpmFormat * 100 + XpmVersion) * 100 + XpmRevision)
+#تعریف_کن XpmFormat 3
+#تعریف_کن Xpm_نسخه 4
+#تعریف_کن XpmRevision 11
+#تعریف_کن Xpm_Include_نسخه ((XpmFormat * 100 + Xpm_نسخه) * 100 + XpmRevision)
 
-#ifndef XPM_NUMBERS
+#اگر_تعریف_نشده XPM_NUMBERS
 
-#ifdef FOR_MSW
+#اگر_تعریف_شده FOR_MSW
 # define SYSV			/* uses memcpy string.h etc. */
 # include <malloc.h>
 # include "simx.h"		/* defines some X stuff using MSW types */
-#define NEED_STRCASECMP		/* at least for MSVC++ */
-#else /* FOR_MSW */
+#تعریف_کن NEED_STRCASECMP		/* at least for MSVC++ */
+#وإلا /* FOR_MSW */
 # ifdef AMIGA
 #  include "amigax.h"
-# else /* not AMIGA */
+# وإلا /* not AMIGA */
 #  include <X11/Xlib.h>
 #  include <X11/Xutil.h>
 # endif /* not AMIGA */
-#endif /* FOR_MSW */
+#پایان_اگر /* FOR_MSW */
 
 /* let's define Pixel if it is not done yet */
-#if ! defined(_XtIntrinsic_h) && ! defined(PIXEL_ALREADY_TYPEDEFED)
-typedef unsigned long Pixel;	/* Index into colormap */
+#إذا ! defined(_XtIntrinsic_h) && ! defined(PIXEL_ALREADY_TYPEDEFED)
+تعريفنوع بیعلامت دراز Pixel;	/* Index into colormap */
 # define PIXEL_ALREADY_TYPEDEFED
-#endif
+#پایان_اگر
 
 /* make sure we know whether function prototypes are needed or not */
-#ifndef NeedFunctionPrototypes
-# if defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
+#اگر_تعریف_نشده NeedFunctionPrototypes
+# إذا defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
 #  define NeedFunctionPrototypes 1
-# else
+# وإلا
 #  define NeedFunctionPrototypes 0
 # endif
-#endif
+#پایان_اگر
 
 
 /* Return ErrorStatus codes:
@@ -100,402 +100,402 @@ typedef unsigned long Pixel;	/* Index into colormap */
  * negative if failure
  */
 
-#define XpmColorError    1
-#define XpmSuccess       0
-#define XpmOpenFailed   -1
-#define XpmFileInvalid  -2
-#define XpmNoMemory     -3
-#define XpmColorFailed  -4
+#تعریف_کن XpmColorError    1
+#تعریف_کن XpmSuccess       0
+#تعریف_کن XpmOpenFailed   -1
+#تعریف_کن XpmFileInvalid  -2
+#تعریف_کن Xpm_No_حافظه     -3
+#تعریف_کن XpmColorFailed  -4
 
-typedef struct {
-    char *name;			/* Symbolic color name */
-    char *value;		/* Color value */
+تعريفنوع بنية {
+    حرف *name;			/* Symbolic color name */
+    حرف *مقدار;		/* Color value */
     Pixel pixel;		/* Color pixel */
-}      XpmColorSymbol;
+}      Xpm_Color_نماد;
 
-typedef struct {
-    char *name;			/* name of the extension */
-    unsigned int nlines;	/* number of lines in this extension */
-    char **lines;		/* pointer to the extension array of strings */
+تعريفنوع بنية {
+    حرف *name;			/* name of the extension */
+    بیعلامت صحيح nlines;	/* number of lines in this extension */
+    حرف **سطرها;		/* pointer to the extension array of strings */
 }      XpmExtension;
 
-typedef struct {
-    char *string;		/* characters string */
-    char *symbolic;		/* symbolic name */
-    char *m_color;		/* monochrom default */
-    char *g4_color;		/* 4 level grayscale default */
-    char *g_color;		/* other level grayscale default */
-    char *c_color;		/* color default */
+تعريفنوع بنية {
+    حرف *string;		/* characters string */
+    حرف *symbolic;		/* symbolic name */
+    حرف *m_color;		/* monochrom default */
+    حرف *g4_color;		/* 4 level grayscale default */
+    حرف *g_color;		/* other level grayscale default */
+    حرف *c_color;		/* color default */
 }      XpmColor;
 
-typedef struct {
-    unsigned int width;		/* image width */
-    unsigned int height;	/* image height */
-    unsigned int cpp;		/* number of characters per pixel */
-    unsigned int ncolors;	/* number of colors */
-    XpmColor *colorTable;	/* list of related colors */
-    unsigned int *data;		/* image data */
+تعريفنوع بنية {
+    بیعلامت صحيح عرض;		/* image width */
+    بیعلامت صحيح ارتفاع;	/* image height */
+    بیعلامت صحيح cpp;		/* number of characters per pixel */
+    بیعلامت صحيح ncolors;	/* number of colors */
+    XpmColor *color_جدول;	/* list of related colors */
+    بیعلامت صحيح *داده;		/* image data */
 }      XpmImage;
 
-typedef struct {
-    unsigned long valuemask;	/* Specifies which attributes are defined */
-    char *hints_cmt;		/* Comment of the hints section */
-    char *colors_cmt;		/* Comment of the colors section */
-    char *pixels_cmt;		/* Comment of the pixels section */
-    unsigned int x_hotspot;	/* Returns the x hotspot's coordinate */
-    unsigned int y_hotspot;	/* Returns the y hotspot's coordinate */
-    unsigned int nextensions;	/* number of extensions */
+تعريفنوع بنية {
+    بیعلامت دراز valuemask;	/* Specifies which attributes are defined */
+    حرف *hints_cmt;		/* Comment of the hints section */
+    حرف *colors_cmt;		/* Comment of the colors section */
+    حرف *pixels_cmt;		/* Comment of the pixels section */
+    بیعلامت صحيح x_hotspot;	/* Returns the x hotspot's coordinate */
+    بیعلامت صحيح y_hotspot;	/* Returns the y hotspot's coordinate */
+    بیعلامت صحيح nextensions;	/* number of extensions */
     XpmExtension *extensions;	/* pointer to array of extensions */
 }      XpmInfo;
 
-typedef int (*XpmAllocColorFunc)(
-#if NeedFunctionPrototypes
+تعريفنوع صحيح (*XpmAllocColorFunc)(
+#إذا NeedFunctionPrototypes
     Display*			/* display */,
     Colormap			/* colormap */,
-    char*			/* colorname */,
+    حرف*			/* colorname */,
     XColor*			/* xcolor */,
-    void*			/* closure */
-#endif
+    فراغ*			/*بستگی*/
+#پایان_اگر
 );
 
-typedef int (*XpmFreeColorsFunc)(
-#if NeedFunctionPrototypes
+تعريفنوع صحيح (*XpmFreeColorsFunc)(
+#إذا NeedFunctionPrototypes
     Display*			/* display */,
     Colormap			/* colormap */,
     Pixel*			/* pixels */,
-    int				/* npixels */,
-    void*			/* closure */
-#endif
+    صحيح				/* npixels */,
+    فراغ*			/*بستگی*/
+#پایان_اگر
 );
 
-typedef struct {
-    unsigned long valuemask;		/* Specifies which attributes are
+تعريفنوع بنية {
+    بیعلامت دراز valuemask;		/* Specifies which attributes are
 					   defined */
 
     Visual *visual;			/* Specifies the visual to use */
     Colormap colormap;			/* Specifies the colormap to use */
-    unsigned int depth;			/* Specifies the depth */
-    unsigned int width;			/* Returns the width of the created
+    بیعلامت صحيح عمق;			/* Specifies the depth */
+    بیعلامت صحيح عرض;			/* Returns the width of the created
 					   pixmap */
-    unsigned int height;		/* Returns the height of the created
+    بیعلامت صحيح ارتفاع;		/* Returns the height of the created
 					   pixmap */
-    unsigned int x_hotspot;		/* Returns the x hotspot's
+    بیعلامت صحيح x_hotspot;		/* Returns the x hotspot's
 					   coordinate */
-    unsigned int y_hotspot;		/* Returns the y hotspot's
+    بیعلامت صحيح y_hotspot;		/* Returns the y hotspot's
 					   coordinate */
-    unsigned int cpp;			/* Specifies the number of char per
+    بیعلامت صحيح cpp;			/* Specifies the number of char per
 					   pixel */
     Pixel *pixels;			/* List of used color pixels */
-    unsigned int npixels;		/* Number of used pixels */
-    XpmColorSymbol *colorsymbols;	/* List of color symbols to override */
-    unsigned int numsymbols;		/* Number of symbols */
-    char *rgb_fname;			/* RGB text file name */
-    unsigned int nextensions;		/* Number of extensions */
+    بیعلامت صحيح npixels;		/* Number of used pixels */
+    Xpm_Color_نماد *colorsymbols;	/* List of color symbols to override */
+    بیعلامت صحيح numsymbols;		/* Number of symbols */
+    حرف *rgb_fname;			/* RGB text file name */
+    بیعلامت صحيح nextensions;		/* Number of extensions */
     XpmExtension *extensions;		/* List of extensions */
 
-    unsigned int ncolors;               /* Number of colors */
-    XpmColor *colorTable;               /* List of colors */
+    بیعلامت صحيح ncolors;               /* Number of colors */
+    XpmColor *color_جدول;               /* List of colors */
 /* 3.2 backward compatibility code */
-    char *hints_cmt;                    /* Comment of the hints section */
-    char *colors_cmt;                   /* Comment of the colors section */
-    char *pixels_cmt;                   /* Comment of the pixels section */
+    حرف *hints_cmt;                    /* Comment of the hints section */
+    حرف *colors_cmt;                   /* Comment of the colors section */
+    حرف *pixels_cmt;                   /* Comment of the pixels section */
 /* end 3.2 bc */
-    unsigned int mask_pixel;            /* Color table index of transparent
+    بیعلامت صحيح ماسک_pixel;            /* Color table index of transparent
                                            color */
 
     /* Color Allocation Directives */
     Bool exactColors;			/* Only use exact colors for visual */
-    unsigned int closeness;		/* Allowable RGB deviation */
-    unsigned int red_closeness;		/* Allowable red deviation */
-    unsigned int green_closeness;	/* Allowable green deviation */
-    unsigned int blue_closeness;	/* Allowable blue deviation */
-    int color_key;			/* Use colors from this color set */
+    بیعلامت صحيح closeness;		/* Allowable RGB deviation */
+    بیعلامت صحيح red_closeness;		/* Allowable red deviation */
+    بیعلامت صحيح green_closeness;	/* Allowable green deviation */
+    بیعلامت صحيح blue_closeness;	/* Allowable blue deviation */
+    صحيح color_کلید;			/* Use colors from this color set */
 
     Pixel *alloc_pixels;		/* Returns the list of alloc'ed color
 					   pixels */
-    int nalloc_pixels;			/* Returns the number of alloc'ed
+    صحيح nalloc_pixels;			/* Returns the number of alloc'ed
 					   color pixels */
 
     Bool alloc_close_colors;    	/* Specify whether close colors should
 					   be allocated using XAllocColor
 					   or not */
-    int bitmap_format;			/* Specify the format of 1bit depth
+    صحيح bitmap_format;			/* Specify the format of 1bit depth
 					   images: ZPixmap or XYBitmap */
 
     /* Color functions */
     XpmAllocColorFunc alloc_color;	/* Application color allocator */
     XpmFreeColorsFunc free_colors;	/* Application color de-allocator */
-    void *color_closure;		/* Application private data to pass to
+    فراغ *color_بستگی;		/* Application private data to pass to
 					   alloc_color and free_colors */
 
-}      XpmAttributes;
+}      Xpm_صفات;
 
 /* XpmAttributes value masks bits */
-#define XpmVisual	   (1L<<0)
-#define XpmColormap	   (1L<<1)
-#define XpmDepth	   (1L<<2)
-#define XpmSize		   (1L<<3)	/* width & height */
-#define XpmHotspot	   (1L<<4)	/* x_hotspot & y_hotspot */
-#define XpmCharsPerPixel   (1L<<5)
-#define XpmColorSymbols	   (1L<<6)
-#define XpmRgbFilename	   (1L<<7)
+#تعریف_کن XpmVisual	   (1L<<0)
+#تعریف_کن XpmColormap	   (1L<<1)
+#تعریف_کن Xpm_عمق	   (1L<<2)
+#تعریف_کن Xpm_اندازه		   (1L<<3)	/* width & height */
+#تعریف_کن XpmHotspot	   (1L<<4)	/* x_hotspot & y_hotspot */
+#تعریف_کن Xpm_Chars_در_هر_Pixel   (1L<<5)
+#تعریف_کن XpmColorSymbols	   (1L<<6)
+#تعریف_کن XpmRgbFilename	   (1L<<7)
 /* 3.2 backward compatibility code */
-#define XpmInfos	   (1L<<8)
-#define XpmReturnInfos	   XpmInfos
+#تعریف_کن XpmInfos	   (1L<<8)
+#تعریف_کن XpmReturnInfos	   XpmInfos
 /* end 3.2 bc */
-#define XpmReturnPixels	   (1L<<9)
-#define XpmExtensions      (1L<<10)
-#define XpmReturnExtensions XpmExtensions
+#تعریف_کن XpmReturnPixels	   (1L<<9)
+#تعریف_کن XpmExtensions      (1L<<10)
+#تعریف_کن XpmReturnExtensions XpmExtensions
 
-#define XpmExactColors     (1L<<11)
-#define XpmCloseness	   (1L<<12)
-#define XpmRGBCloseness	   (1L<<13)
-#define XpmColorKey	   (1L<<14)
+#تعریف_کن XpmExactColors     (1L<<11)
+#تعریف_کن XpmCloseness	   (1L<<12)
+#تعریف_کن XpmRGBCloseness	   (1L<<13)
+#تعریف_کن Xpm_Color_کلید	   (1L<<14)
 
-#define XpmColorTable      (1L<<15)
-#define XpmReturnColorTable XpmColorTable
+#تعریف_کن Xpm_Color_جدول      (1L<<15)
+#تعریف_کن Xpm_Return_Color_جدول Xpm_Color_جدول
 
-#define XpmReturnAllocPixels (1L<<16)
-#define XpmAllocCloseColors (1L<<17)
-#define XpmBitmapFormat    (1L<<18)
+#تعریف_کن XpmReturnAllocPixels (1L<<16)
+#تعریف_کن XpmAllocCloseColors (1L<<17)
+#تعریف_کن XpmBitmapFormat    (1L<<18)
 
-#define XpmAllocColor      (1L<<19)
-#define XpmFreeColors      (1L<<20)
-#define XpmColorClosure    (1L<<21)
+#تعریف_کن XpmAllocColor      (1L<<19)
+#تعریف_کن XpmFreeColors      (1L<<20)
+#تعریف_کن Xpm_Color_بستگی    (1L<<21)
 
 
 /* XpmInfo value masks bits */
-#define XpmComments        XpmInfos
-#define XpmReturnComments  XpmComments
+#تعریف_کن XpmComments        XpmInfos
+#تعریف_کن XpmReturnComments  XpmComments
 
 /* XpmAttributes mask_pixel value when there is no mask */
-#ifndef FOR_MSW
-#define XpmUndefPixel 0x80000000
-#else
+#اگر_تعریف_نشده FOR_MSW
+#تعریف_کن XpmUndefPixel 0x80000000
+#وإلا
 /* int is only 16 bit for MSW */
-#define XpmUndefPixel 0x8000
-#endif
+#تعریف_کن XpmUndefPixel 0x8000
+#پایان_اگر
 
 /*
  * color keys for visual type, they must fit along with the number key of
  * each related element in xpmColorKeys[] defined in XpmI.h
  */
-#define XPM_MONO	2
-#define XPM_GREY4	3
-#define XPM_GRAY4	3
-#define XPM_GREY 	4
-#define XPM_GRAY 	4
-#define XPM_COLOR	5
+#تعریف_کن XPM_MONO	2
+#تعریف_کن XPM_GREY4	3
+#تعریف_کن XPM_GRAY4	3
+#تعریف_کن XPM_GREY 	4
+#تعریف_کن XPM_خاکستری 	4
+#تعریف_کن XPM_COLOR	5
 
 
 /* macros for forward declarations of functions with prototypes */
-#if NeedFunctionPrototypes
-#define FUNC(f, t, p) extern t f p
-#define LFUNC(f, t, p) static t f p
-#else
-#define FUNC(f, t, p) extern t f()
-#define LFUNC(f, t, p) static t f()
-#endif
+#إذا NeedFunctionPrototypes
+#تعریف_کن FUNC(f, t, p) خارجي t f p
+#تعریف_کن LFUNC(f, t, p) ساكن t f p
+#وإلا
+#تعریف_کن FUNC(f, t, p) خارجي t f()
+#تعریف_کن LFUNC(f, t, p) ساكن t f()
+#پایان_اگر
 
 
 /*
  * functions declarations
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#اگر_تعریف_شده __cplusplus
+خارجي "C" {
+#پایان_اگر
 
 /* FOR_MSW, all ..Pixmap.. are excluded, only the ..XImage.. are used */
 /* Same for Amiga! */
 
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromData, int, (Display *display,
+#إذا !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(Xpm_Create_Pixmap_From_داده, صحيح, (Display *display,
 					Drawable d,
-					char **data,
+					حرف **داده,
 					Pixmap *pixmap_return,
 					Pixmap *shapemask_return,
-					XpmAttributes *attributes));
+					Xpm_صفات *صفات));
 
-    FUNC(XpmCreateDataFromPixmap, int, (Display *display,
-					char ***data_return,
+    FUNC(Xpm_Create_داده_From_Pixmap, صحيح, (Display *display,
+					حرف ***داده_return,
 					Pixmap pixmap,
 					Pixmap shapemask,
-					XpmAttributes *attributes));
+					Xpm_صفات *صفات));
 
-    FUNC(XpmReadFileToPixmap, int, (Display *display,
+    FUNC(Xpm_Read_File_مقصد_Pixmap, صحيح, (Display *display,
 				    Drawable d,
-				    char *filename,
+				    حرف *filename,
 				    Pixmap *pixmap_return,
 				    Pixmap *shapemask_return,
-				    XpmAttributes *attributes));
+				    Xpm_صفات *صفات));
 
-    FUNC(XpmWriteFileFromPixmap, int, (Display *display,
-				       char *filename,
+    FUNC(XpmWriteFileFromPixmap, صحيح, (Display *display,
+				       حرف *filename,
 				       Pixmap pixmap,
 				       Pixmap shapemask,
-				       XpmAttributes *attributes));
-#endif
+				       Xpm_صفات *صفات));
+#پایان_اگر
 
-    FUNC(XpmCreateImageFromData, int, (Display *display,
-				       char **data,
+    FUNC(Xpm_Create_Image_From_داده, صحيح, (Display *display,
+				       حرف **داده,
 				       XImage **image_return,
 				       XImage **shapemask_return,
-				       XpmAttributes *attributes));
+				       Xpm_صفات *صفات));
 
-    FUNC(XpmCreateDataFromImage, int, (Display *display,
-				       char ***data_return,
+    FUNC(Xpm_Create_داده_From_Image, صحيح, (Display *display,
+				       حرف ***داده_return,
 				       XImage *image,
 				       XImage *shapeimage,
-				       XpmAttributes *attributes));
+				       Xpm_صفات *صفات));
 
-    FUNC(XpmReadFileToImage, int, (Display *display,
-				   char *filename,
+    FUNC(Xpm_Read_File_مقصد_Image, صحيح, (Display *display,
+				   حرف *filename,
 				   XImage **image_return,
 				   XImage **shapeimage_return,
-				   XpmAttributes *attributes));
+				   Xpm_صفات *صفات));
 
-    FUNC(XpmWriteFileFromImage, int, (Display *display,
-				      char *filename,
+    FUNC(XpmWriteFileFromImage, صحيح, (Display *display,
+				      حرف *filename,
 				      XImage *image,
 				      XImage *shapeimage,
-				      XpmAttributes *attributes));
+				      Xpm_صفات *صفات));
 
-    FUNC(XpmCreateImageFromBuffer, int, (Display *display,
-					 char *buffer,
+    FUNC(Xpm_Create_Image_From_میانگیر, صحيح, (Display *display,
+					 حرف *میانگیر,
 					 XImage **image_return,
 					 XImage **shapemask_return,
-					 XpmAttributes *attributes));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromBuffer, int, (Display *display,
+					 Xpm_صفات *صفات));
+#إذا !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(Xpm_Create_Pixmap_From_میانگیر, صحيح, (Display *display,
 					  Drawable d,
-					  char *buffer,
+					  حرف *میانگیر,
 					  Pixmap *pixmap_return,
 					  Pixmap *shapemask_return,
-					  XpmAttributes *attributes));
+					  Xpm_صفات *صفات));
 
-    FUNC(XpmCreateBufferFromImage, int, (Display *display,
-					 char **buffer_return,
+    FUNC(Xpm_Create_میانگیر_From_Image, صحيح, (Display *display,
+					 حرف **میانگیر_return,
 					 XImage *image,
 					 XImage *shapeimage,
-					 XpmAttributes *attributes));
+					 Xpm_صفات *صفات));
 
-    FUNC(XpmCreateBufferFromPixmap, int, (Display *display,
-					  char **buffer_return,
+    FUNC(Xpm_Create_میانگیر_From_Pixmap, صحيح, (Display *display,
+					  حرف **میانگیر_return,
 					  Pixmap pixmap,
 					  Pixmap shapemask,
-					  XpmAttributes *attributes));
-#endif
-    FUNC(XpmReadFileToBuffer, int, (char *filename, char **buffer_return));
-    FUNC(XpmWriteFileFromBuffer, int, (char *filename, char *buffer));
+					  Xpm_صفات *صفات));
+#پایان_اگر
+    FUNC(Xpm_Read_File_مقصد_میانگیر, صحيح, (حرف *filename, حرف **میانگیر_return));
+    FUNC(Xpm_Write_File_From_میانگیر, صحيح, (حرف *filename, حرف *میانگیر));
 
-    FUNC(XpmReadFileToData, int, (char *filename, char ***data_return));
-    FUNC(XpmWriteFileFromData, int, (char *filename, char **data));
+    FUNC(Xpm_Read_File_مقصد_داده, صحيح, (حرف *filename, حرف ***داده_return));
+    FUNC(Xpm_Write_File_From_داده, صحيح, (حرف *filename, حرف **داده));
 
-    FUNC(XpmAttributesSize, int, ());
-    FUNC(XpmFreeAttributes, void, (XpmAttributes *attributes));
-    FUNC(XpmFreeExtensions, void, (XpmExtension *extensions,
-				   int nextensions));
+    FUNC(Xpm_صفات_اندازه, صحيح, ());
+    FUNC(Xpm_Free_صفات, فراغ, (Xpm_صفات *صفات));
+    FUNC(XpmFreeExtensions, فراغ, (XpmExtension *extensions,
+				   صحيح nextensions));
 
-    FUNC(XpmFreeXpmImage, void, (XpmImage *image));
-    FUNC(XpmFreeXpmInfo, void, (XpmInfo *info));
-    FUNC(XpmGetErrorString, char *, (int errcode));
-    FUNC(XpmLibraryVersion, int, ());
+    FUNC(XpmFreeXpmImage, فراغ, (XpmImage *image));
+    FUNC(XpmFreeXpmInfo, فراغ, (XpmInfo *info));
+    FUNC(XpmGetErrorString, حرف *, (صحيح errcode));
+    FUNC(Xpm_Library_نسخه, صحيح, ());
 
     /* XpmImage functions */
-    FUNC(XpmReadFileToXpmImage, int, (char *filename,
+    FUNC(Xpm_Read_File_مقصد_Xpm_Image, صحيح, (حرف *filename,
 				      XpmImage *image,
 				      XpmInfo *info));
 
-    FUNC(XpmWriteFileFromXpmImage, int, (char *filename,
+    FUNC(XpmWriteFileFromXpmImage, صحيح, (حرف *filename,
 					 XpmImage *image,
 					 XpmInfo *info));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromXpmImage, int, (Display *display,
+#إذا !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreatePixmapFromXpmImage, صحيح, (Display *display,
 					    Drawable d,
 					    XpmImage *image,
 					    Pixmap *pixmap_return,
 					    Pixmap *shapemask_return,
-					    XpmAttributes *attributes));
-#endif
-    FUNC(XpmCreateImageFromXpmImage, int, (Display *display,
+					    Xpm_صفات *صفات));
+#پایان_اگر
+    FUNC(XpmCreateImageFromXpmImage, صحيح, (Display *display,
 					   XpmImage *image,
 					   XImage **image_return,
 					   XImage **shapeimage_return,
-					   XpmAttributes *attributes));
+					   Xpm_صفات *صفات));
 
-    FUNC(XpmCreateXpmImageFromImage, int, (Display *display,
+    FUNC(XpmCreateXpmImageFromImage, صحيح, (Display *display,
 					   XImage *image,
 					   XImage *shapeimage,
 					   XpmImage *xpmimage,
-					   XpmAttributes *attributes));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreateXpmImageFromPixmap, int, (Display *display,
+					   Xpm_صفات *صفات));
+#إذا !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreateXpmImageFromPixmap, صحيح, (Display *display,
 					    Pixmap pixmap,
 					    Pixmap shapemask,
 					    XpmImage *xpmimage,
-					    XpmAttributes *attributes));
-#endif
-    FUNC(XpmCreateDataFromXpmImage, int, (char ***data_return,
+					    Xpm_صفات *صفات));
+#پایان_اگر
+    FUNC(Xpm_Create_داده_From_Xpm_Image, صحيح, (حرف ***داده_return,
 					  XpmImage *image,
 					  XpmInfo *info));
 
-    FUNC(XpmCreateXpmImageFromData, int, (char **data,
+    FUNC(Xpm_Create_Xpm_Image_From_داده, صحيح, (حرف **داده,
 					  XpmImage *image,
 					  XpmInfo *info));
 
-    FUNC(XpmCreateXpmImageFromBuffer, int, (char *buffer,
+    FUNC(Xpm_Create_Xpm_Image_From_میانگیر, صحيح, (حرف *میانگیر,
 					    XpmImage *image,
 					    XpmInfo *info));
 
-    FUNC(XpmCreateBufferFromXpmImage, int, (char **buffer_return,
+    FUNC(Xpm_Create_میانگیر_From_Xpm_Image, صحيح, (حرف **میانگیر_return,
 					    XpmImage *image,
 					    XpmInfo *info));
 
-    FUNC(XpmGetParseError, int, (char *filename,
-				 int *linenum_return,
-				 int *charnum_return));
+    FUNC(XpmGetParseError, صحيح, (حرف *filename,
+				 صحيح *linenum_return,
+				 صحيح *charnum_return));
 
-    FUNC(XpmFree, void, (void *ptr));
+    FUNC(XpmFree, فراغ, (فراغ *ptr));
 
-#ifdef __cplusplus
+#اگر_تعریف_شده __cplusplus
 } /* for C++ V2.0 */
-#endif
+#پایان_اگر
 
 
 /* backward compatibility */
 
 /* for version 3.0c */
-#define XpmPixmapColorError  XpmColorError
-#define XpmPixmapSuccess     XpmSuccess
-#define XpmPixmapOpenFailed  XpmOpenFailed
-#define XpmPixmapFileInvalid XpmFileInvalid
-#define XpmPixmapNoMemory    XpmNoMemory
-#define XpmPixmapColorFailed XpmColorFailed
+#تعریف_کن XpmPixmapColorError  XpmColorError
+#تعریف_کن XpmPixmapSuccess     XpmSuccess
+#تعریف_کن XpmPixmapOpenFailed  XpmOpenFailed
+#تعریف_کن XpmPixmapFileInvalid XpmFileInvalid
+#تعریف_کن Xpm_Pixmap_No_حافظه    Xpm_No_حافظه
+#تعریف_کن XpmPixmapColorFailed XpmColorFailed
 
-#define XpmReadPixmapFile(dpy, d, file, pix, mask, att) \
-    XpmReadFileToPixmap(dpy, d, file, pix, mask, att)
-#define XpmWritePixmapFile(dpy, file, pix, mask, att) \
-    XpmWriteFileFromPixmap(dpy, file, pix, mask, att)
+#تعریف_کن XpmReadPixmapFile(dpy, d, file, pix, ماسک, att) \
+    Xpm_Read_File_مقصد_Pixmap(dpy, d, file, pix, ماسک, att)
+#تعریف_کن XpmWritePixmapFile(dpy, file, pix, ماسک, att) \
+    XpmWriteFileFromPixmap(dpy, file, pix, ماسک, att)
 
 /* for version 3.0b */
-#define PixmapColorError  XpmColorError
-#define PixmapSuccess     XpmSuccess
-#define PixmapOpenFailed  XpmOpenFailed
-#define PixmapFileInvalid XpmFileInvalid
-#define PixmapNoMemory    XpmNoMemory
-#define PixmapColorFailed XpmColorFailed
+#تعریف_کن PixmapColorError  XpmColorError
+#تعریف_کن PixmapSuccess     XpmSuccess
+#تعریف_کن PixmapOpenFailed  XpmOpenFailed
+#تعریف_کن PixmapFileInvalid XpmFileInvalid
+#تعریف_کن Pixmap_No_حافظه    Xpm_No_حافظه
+#تعریف_کن PixmapColorFailed XpmColorFailed
 
-#define ColorSymbol XpmColorSymbol
+#تعریف_کن Color_نماد Xpm_Color_نماد
 
-#define XReadPixmapFile(dpy, d, file, pix, mask, att) \
-    XpmReadFileToPixmap(dpy, d, file, pix, mask, att)
-#define XWritePixmapFile(dpy, file, pix, mask, att) \
-    XpmWriteFileFromPixmap(dpy, file, pix, mask, att)
-#define XCreatePixmapFromData(dpy, d, data, pix, mask, att) \
-    XpmCreatePixmapFromData(dpy, d, data, pix, mask, att)
-#define XCreateDataFromPixmap(dpy, data, pix, mask, att) \
-    XpmCreateDataFromPixmap(dpy, data, pix, mask, att)
+#تعریف_کن XReadPixmapFile(dpy, d, file, pix, ماسک, att) \
+    Xpm_Read_File_مقصد_Pixmap(dpy, d, file, pix, ماسک, att)
+#تعریف_کن XWritePixmapFile(dpy, file, pix, ماسک, att) \
+    XpmWriteFileFromPixmap(dpy, file, pix, ماسک, att)
+#تعریف_کن XCreate_Pixmap_From_داده(dpy, d, داده, pix, ماسک, att) \
+    Xpm_Create_Pixmap_From_داده(dpy, d, داده, pix, ماسک, att)
+#تعریف_کن XCreate_داده_From_Pixmap(dpy, داده, pix, ماسک, att) \
+    Xpm_Create_داده_From_Pixmap(dpy, داده, pix, ماسک, att)
 
-#endif /* XPM_NUMBERS */
-#endif
+#پایان_اگر /* XPM_NUMBERS */
+#پایان_اگر

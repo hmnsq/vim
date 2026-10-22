@@ -7,51 +7,51 @@
 //  Os (OptLev=s), W1, Zp8, env=Win32, ms_ext, c_ext
 //  error checks: none
 //@@MIDL_FILE_HEADING(  )
-#include "rpc.h"
-#include "rpcndr.h"
-#ifndef COM_NO_WINDOWS_H
-#include "windows.h"
-#include "ole2.h"
-#endif //COM_NO_WINDOWS_H
+#ضمن "rpc.h"
+#ضمن "rpcndr.h"
+#اگر_تعریف_نشده COM_NO_WINDOWS_H
+#ضمن "windows.h"
+#ضمن "ole2.h"
+#پایان_اگر //COM_NO_WINDOWS_H
 
-#ifndef __if_ole_h__
-#define __if_ole_h__
+#اگر_تعریف_نشده __if_ole_h__
+#تعریف_کن __if_ole_h__
 
-#ifdef __cplusplus
-extern "C"{
-#endif
+#اگر_تعریف_شده __cplusplus
+خارجي "C"{
+#پایان_اگر
 
 // Forward Declarations
 
-#ifndef __IVim_FWD_DEFINED__
-#define __IVim_FWD_DEFINED__
-typedef interface IVim IVim;
-#endif	// __IVim_FWD_DEFINED__
+#اگر_تعریف_نشده __IVim_FWD_DEFINED__
+#تعریف_کن __IVim_FWD_DEFINED__
+تعريفنوع interface IVim IVim;
+#پایان_اگر	// __IVim_FWD_DEFINED__
 
 
-#ifndef __Vim_FWD_DEFINED__
-#define __Vim_FWD_DEFINED__
+#اگر_تعریف_نشده __Vim_FWD_DEFINED__
+#تعریف_کن __Vim_FWD_DEFINED__
 
-#ifdef __cplusplus
-typedef class Vim Vim;
-#else
-typedef struct Vim Vim;
-#endif // __cplusplus
+#اگر_تعریف_شده __cplusplus
+تعريفنوع class Vim Vim;
+#وإلا
+تعريفنوع بنية Vim Vim;
+#پایان_اگر // __cplusplus
 
-#endif	// __Vim_FWD_DEFINED__
+#پایان_اگر	// __Vim_FWD_DEFINED__
 
 
 // header files for imported files
-#include "oaidl.h"
+#ضمن "oaidl.h"
 
-#ifndef __MIDL_user_allocate_free_DEFINED__
-#define __MIDL_user_allocate_free_DEFINED__
-    void __RPC_FAR * __RPC_USER MIDL_user_allocate(size_t);
-    void __RPC_USER MIDL_user_free( void __RPC_FAR * );
-#endif
+#اگر_تعریف_نشده __MIDL_user_allocate_free_DEFINED__
+#تعریف_کن __MIDL_user_allocate_free_DEFINED__
+    فراغ __RPC_FAR * __RPC_USER MIDL_user_allocate(size_t);
+    فراغ __RPC_USER MIDL_user_free( فراغ __RPC_FAR * );
+#پایان_اگر
 
-#ifndef __IVim_INTERFACE_DEFINED__
-#define __IVim_INTERFACE_DEFINED__
+#اگر_تعریف_نشده __IVim_INTERFACE_DEFINED__
+#تعریف_کن __IVim_INTERFACE_DEFINED__
 
 //***************************************
 // Generated header for interface: IVim
@@ -62,46 +62,46 @@ typedef struct Vim Vim;
 
 
 
-EXTERN_C const IID IID_IVim;
+EXTERN_C ثابت IID IID_IVim;
 
-#if defined(__cplusplus) && !defined(CINTERFACE)
+#إذا defined(__cplusplus) && !defined(CINTERFACE)
 
     interface DECLSPEC_UUID("0F0BFAE2-4C90-11d1-82D7-0004AC368519")
-    IVim : public IDispatch
+    IVim : عام IDispatch
     {
-    public:
-	virtual HRESULT STDMETHODCALLTYPE SendKeys(
-	    /* [in] */ BSTR keys) = 0;
+    عام:
+	مجازی HRESULT STDMETHODCALLTYPE Send_کلیدها(
+	    /* [in] */ BSTR کلیدها) = 0;
 
-	virtual HRESULT STDMETHODCALLTYPE Eval(
-	    /* [in] */ BSTR expr,
-	    /* [retval][out] */ BSTR __RPC_FAR *result) = 0;
+	مجازی HRESULT STDMETHODCALLTYPE Eval(
+	    /* [in] */ BSTR عبارت,
+	    /* [retval][out] */ BSTR __RPC_FAR *نتیجه) = 0;
 
-	virtual HRESULT STDMETHODCALLTYPE SetForeground( void) = 0;
+	مجازی HRESULT STDMETHODCALLTYPE مجموعه_Foreground( فراغ) = 0;
 
-	virtual HRESULT STDMETHODCALLTYPE GetHwnd(
-	    /* [retval][out] */ UINT_PTR __RPC_FAR *result) = 0;
+	مجازی HRESULT STDMETHODCALLTYPE GetHwnd(
+	    /* [retval][out] */ UINT_PTR __RPC_FAR *نتیجه) = 0;
 
     };
 
-#else	// C style interface
+#وإلا	// C style interface
 
-    typedef struct IVimVtbl
+    تعريفنوع بنية IVimVtbl
     {
 	BEGIN_INTERFACE
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *QueryInterface )(
 	    IVim __RPC_FAR * This,
 	    /* [in] */ REFIID riid,
-	    /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject);
+	    /* [iid_is][out] */ فراغ __RPC_FAR *__RPC_FAR *ppvObject);
 
-	ULONG ( STDMETHODCALLTYPE __RPC_FAR *AddRef )(
+	ULONG ( STDMETHODCALLTYPE __RPC_FAR *جمع_کن_Ref )(
 	    IVim __RPC_FAR * This);
 
 	ULONG ( STDMETHODCALLTYPE __RPC_FAR *Release )(
 	    IVim __RPC_FAR * This);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *GetTypeInfoCount )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Get_Type_Info_شمار )(
 	    IVim __RPC_FAR * This,
 	    /* [out] */ UINT __RPC_FAR *pctinfo);
 
@@ -111,11 +111,11 @@ EXTERN_C const IID IID_IVim;
 	    /* [in] */ LCID lcid,
 	    /* [out] */ ITypeInfo __RPC_FAR *__RPC_FAR *ppTInfo);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *GetIDsOfNames )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Get_IDs_از_نامها )(
 	    IVim __RPC_FAR * This,
 	    /* [in] */ REFIID riid,
-	    /* [size_is][in] */ LPOLESTR __RPC_FAR *rgszNames,
-	    /* [in] */ UINT cNames,
+	    /* [size_is][in] */ LPOLESTR __RPC_FAR *rgsz_نامها,
+	    /* [in] */ UINT c_نامها,
 	    /* [in] */ LCID lcid,
 	    /* [size_is][out] */ DISPID __RPC_FAR *rgDispId);
 
@@ -124,136 +124,136 @@ EXTERN_C const IID IID_IVim;
 	    /* [in] */ DISPID dispIdMember,
 	    /* [in] */ REFIID riid,
 	    /* [in] */ LCID lcid,
-	    /* [in] */ WORD wFlags,
+	    /* [in] */ کلمه_2 wFlags,
 	    /* [out][in] */ DISPPARAMS __RPC_FAR *pDispParams,
-	    /* [out] */ VARIANT __RPC_FAR *pVarResult,
+	    /* [out] */ VARIANT __RPC_FAR *p_Var_نتیجه,
 	    /* [out] */ EXCEPINFO __RPC_FAR *pExcepInfo,
 	    /* [out] */ UINT __RPC_FAR *puArgErr);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *SendKeys )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Send_کلیدها )(
 	    IVim __RPC_FAR * This,
-	    /* [in] */ BSTR keys);
+	    /* [in] */ BSTR کلیدها);
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Eval )(
 	    IVim __RPC_FAR * This,
-	    /* [in] */ BSTR expr,
-	    /* [retval][out] */ BSTR __RPC_FAR *result);
+	    /* [in] */ BSTR عبارت,
+	    /* [retval][out] */ BSTR __RPC_FAR *نتیجه);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *SetForeground )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *مجموعه_Foreground )(
 	    IVim __RPC_FAR * This);
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *GetHwnd )(
 	    IVim __RPC_FAR * This,
-	    /* [retval][out] */ UINT_PTR __RPC_FAR *result);
+	    /* [retval][out] */ UINT_PTR __RPC_FAR *نتیجه);
 
-	END_INTERFACE
+	انتها_INTERFACE
     } IVimVtbl;
 
     interface IVim
     {
-	CONST_VTBL struct IVimVtbl __RPC_FAR *lpVtbl;
+	CONST_VTBL بنية IVimVtbl __RPC_FAR *lpVtbl;
     };
 
-#ifdef COBJMACROS
+#اگر_تعریف_شده COBJMACROS
 
 
-#define IVim_QueryInterface(This,riid,ppvObject)	\
+#تعریف_کن IVim_QueryInterface(This,riid,ppvObject)	\
     (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
 
-#define IVim_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+#تعریف_کن IVim_جمع_کن_Ref(This)	\
+    (This)->lpVtbl -> جمع_کن_Ref(This)
 
-#define IVim_Release(This)	\
+#تعریف_کن IVim_Release(This)	\
     (This)->lpVtbl -> Release(This)
 
 
-#define IVim_GetTypeInfoCount(This,pctinfo)	\
-    (This)->lpVtbl -> GetTypeInfoCount(This,pctinfo)
+#تعریف_کن IVim_Get_Type_Info_شمار(This,pctinfo)	\
+    (This)->lpVtbl -> Get_Type_Info_شمار(This,pctinfo)
 
-#define IVim_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
+#تعریف_کن IVim_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
     (This)->lpVtbl -> GetTypeInfo(This,iTInfo,lcid,ppTInfo)
 
-#define IVim_GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)	\
-    (This)->lpVtbl -> GetIDsOfNames(This,riid,rgszNames,cNames,lcid,rgDispId)
+#تعریف_کن IVim_Get_IDs_از_نامها(This,riid,rgsz_نامها,c_نامها,lcid,rgDispId)	\
+    (This)->lpVtbl -> Get_IDs_از_نامها(This,riid,rgsz_نامها,c_نامها,lcid,rgDispId)
 
-#define IVim_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)	\
-    (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)
-
-
-#define IVim_SendKeys(This,keys)	\
-    (This)->lpVtbl -> SendKeys(This,keys)
-
-#define IVim_Eval(This,expr,result)	\
-    (This)->lpVtbl -> Eval(This,expr,result)
-
-#define IVim_SetForeground(This)	\
-    (This)->lpVtbl -> SetForeground(This)
-
-#define IVim_GetHwnd(This,result)	\
-    (This)->lpVtbl -> GetHwnd(This,result)
-
-#endif // COBJMACROS
+#تعریف_کن IVim_Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,p_Var_نتیجه,pExcepInfo,puArgErr)	\
+    (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,p_Var_نتیجه,pExcepInfo,puArgErr)
 
 
-#endif	// C style interface
+#تعریف_کن IVim_Send_کلیدها(This,کلیدها)	\
+    (This)->lpVtbl -> Send_کلیدها(This,کلیدها)
+
+#تعریف_کن IVim_Eval(This,عبارت,نتیجه)	\
+    (This)->lpVtbl -> Eval(This,عبارت,نتیجه)
+
+#تعریف_کن IVim_مجموعه_Foreground(This)	\
+    (This)->lpVtbl -> مجموعه_Foreground(This)
+
+#تعریف_کن IVim_GetHwnd(This,نتیجه)	\
+    (This)->lpVtbl -> GetHwnd(This,نتیجه)
+
+#پایان_اگر // COBJMACROS
+
+
+#پایان_اگر	// C style interface
 
 
 
-HRESULT STDMETHODCALLTYPE IVim_SendKeys_Proxy(
+HRESULT STDMETHODCALLTYPE IVim_Send_کلیدها_Proxy(
     IVim __RPC_FAR * This,
-    /* [in] */ BSTR keys);
+    /* [in] */ BSTR کلیدها);
 
 
-void __RPC_STUB IVim_SendKeys_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
+فراغ __RPC_STUB IVim_Send_کلیدها_Stub(
+    IRpc_Stub_میانگیر *This,
+    IRpc_Channel_میانگیر *p_Rpc_Channel_میانگیر,
+    PRPC_پیام p_Rpc_پیام,
     DWORD *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IVim_Eval_Proxy(
     IVim __RPC_FAR * This,
-    /* [in] */ BSTR expr,
-    /* [retval][out] */ BSTR __RPC_FAR *result);
+    /* [in] */ BSTR عبارت,
+    /* [retval][out] */ BSTR __RPC_FAR *نتیجه);
 
 
-void __RPC_STUB IVim_Eval_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
+فراغ __RPC_STUB IVim_Eval_Stub(
+    IRpc_Stub_میانگیر *This,
+    IRpc_Channel_میانگیر *p_Rpc_Channel_میانگیر,
+    PRPC_پیام p_Rpc_پیام,
     DWORD *_pdwStubPhase);
 
 
-HRESULT STDMETHODCALLTYPE IVim_SetForeground_Proxy(
+HRESULT STDMETHODCALLTYPE IVim_مجموعه_Foreground_Proxy(
     IVim __RPC_FAR * This);
 
 
-void __RPC_STUB IVim_SetForeground_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
+فراغ __RPC_STUB IVim_مجموعه_Foreground_Stub(
+    IRpc_Stub_میانگیر *This,
+    IRpc_Channel_میانگیر *p_Rpc_Channel_میانگیر,
+    PRPC_پیام p_Rpc_پیام,
     DWORD *_pdwStubPhase);
 
 
 HRESULT STDMETHODCALLTYPE IVim_GetHwnd_Proxy(
     IVim __RPC_FAR * This,
-    /* [retval][out] */ UINT_PTR __RPC_FAR *result);
+    /* [retval][out] */ UINT_PTR __RPC_FAR *نتیجه);
 
 
-void __RPC_STUB IVim_GetHwnd_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
+فراغ __RPC_STUB IVim_GetHwnd_Stub(
+    IRpc_Stub_میانگیر *This,
+    IRpc_Channel_میانگیر *p_Rpc_Channel_میانگیر,
+    PRPC_پیام p_Rpc_پیام,
     DWORD *_pdwStubPhase);
 
 
 
-#endif	// __IVim_INTERFACE_DEFINED__
+#پایان_اگر	// __IVim_INTERFACE_DEFINED__
 
 
 
-#ifndef __Vim_LIBRARY_DEFINED__
-#define __Vim_LIBRARY_DEFINED__
+#اگر_تعریف_نشده __Vim_LIBRARY_DEFINED__
+#تعریف_کن __Vim_LIBRARY_DEFINED__
 
 //***************************************
 // Generated header for library: Vim
@@ -264,27 +264,27 @@ void __RPC_STUB IVim_GetHwnd_Stub(
 
 
 
-EXTERN_C const IID LIBID_Vim;
+EXTERN_C ثابت IID LIBID_Vim;
 
-#ifdef __cplusplus
-EXTERN_C const CLSID CLSID_Vim;
+#اگر_تعریف_شده __cplusplus
+EXTERN_C ثابت CLSID CLSID_Vim;
 
 class DECLSPEC_UUID("0F0BFAE1-4C90-11d1-82D7-0004AC368519")
 Vim;
-#endif
-#endif // __Vim_LIBRARY_DEFINED__
+#پایان_اگر
+#پایان_اگر // __Vim_LIBRARY_DEFINED__
 
 // Additional Prototypes for ALL interfaces
 
-unsigned long		  __RPC_USER  BSTR_UserSize(	 unsigned long __RPC_FAR *, unsigned long	     , BSTR __RPC_FAR * );
-unsigned char __RPC_FAR * __RPC_USER  BSTR_UserMarshal(  unsigned long __RPC_FAR *, unsigned char __RPC_FAR *, BSTR __RPC_FAR * );
-unsigned char __RPC_FAR * __RPC_USER  BSTR_UserUnmarshal(unsigned long __RPC_FAR *, unsigned char __RPC_FAR *, BSTR __RPC_FAR * );
-void			  __RPC_USER  BSTR_UserFree(	 unsigned long __RPC_FAR *, BSTR __RPC_FAR * );
+بیعلامت دراز		  __RPC_USER  BSTR_User_اندازه(	 بیعلامت دراز __RPC_FAR *, بیعلامت دراز	     , BSTR __RPC_FAR * );
+بیعلامت حرف __RPC_FAR * __RPC_USER  BSTR_UserMarshal(  بیعلامت دراز __RPC_FAR *, بیعلامت حرف __RPC_FAR *, BSTR __RPC_FAR * );
+بیعلامت حرف __RPC_FAR * __RPC_USER  BSTR_UserUnmarshal(بیعلامت دراز __RPC_FAR *, بیعلامت حرف __RPC_FAR *, BSTR __RPC_FAR * );
+فراغ			  __RPC_USER  BSTR_UserFree(	 بیعلامت دراز __RPC_FAR *, BSTR __RPC_FAR * );
 
 // end of Additional Prototypes
 
-#ifdef __cplusplus
+#اگر_تعریف_شده __cplusplus
 }
-#endif
+#پایان_اگر
 
-#endif
+#پایان_اگر

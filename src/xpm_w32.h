@@ -2,6 +2,6 @@
  * Header file for xpm_w32.c
  */
 
-#ifndef XPM_W32__H
-int LoadXpmImage(char *filename, HBITMAP *hImage, HBITMAP *hShape);
-#endif
+#اگر_تعریف_نشده XPM_W32__H
+صحيح بارگیری_Xpm_Image(حرف *filename, HBITMAP *hImage, HBITMAP *hShape);
+#پایان_اگر

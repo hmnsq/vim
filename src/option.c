@@ -35,43 +35,43 @@
  *   comment at the help for the 'compatible' option.
  */
 
-#define IN_OPTION_C
-#include "vim.h"
-#include "optiondefs.h"
+#تعریف_کن درون_OPTION_C
+#ضمن "vim.h"
+#ضمن "optiondefs.h"
 
-static void set_options_default(int opt_flags);
-static void set_string_default_esc(char *name, char_u *val, int escape);
-static char_u *find_dup_item(char_u *origval, char_u *newval, size_t newvallen, long_u flags);
-static char_u *option_expand(int opt_idx, char_u *val);
-static void didset_options(void);
-static void didset_options2(void);
-#if defined(FEAT_EVAL)
-static long_u *insecure_flag(win_T *wp, int opt_idx, int opt_flags);
-#else
+ساكن فراغ مجموعه_options_default(صحيح opt_flags);
+ساكن فراغ مجموعه_string_default_esc(حرف *name, char_u *val, صحيح escape);
+ساكن char_u *پیدا_کن_dup_قلم(char_u *origval, char_u *newval, size_t newvallen, long_u flags);
+ساكن char_u *option_expand(صحيح opt_idx, char_u *val);
+ساكن فراغ didset_options(فراغ);
+ساكن فراغ didset_options2(فراغ);
+#إذا defined(FEAT_EVAL)
+ساكن long_u *insecure_flag(win_T *wp, صحيح opt_idx, صحيح opt_flags);
+#وإلا
 # define insecure_flag(wp, opt_idx, opt_flags) (&options[opt_idx].flags)
-#endif
-static char *set_bool_option(int opt_idx, char_u *varp, int value, int opt_flags);
-static char *set_num_option(int opt_idx, char_u *varp, long value, char *errbuf, size_t errbuflen, int opt_flags);
-static int find_key_option(char_u *arg_arg, int has_lt);
-static void showoptions(int all, int opt_flags);
-static int optval_default(struct vimoption *, char_u *varp, int compatible);
-static void showoneopt(struct vimoption *, int opt_flags);
-static int put_setstring(FILE *fd, bool legacy, char *cmd, char *name, char_u **valuep, long_u flags);
-static int put_setnum(FILE *fd, char *cmd, char *name, long *valuep);
-static int put_setbool(FILE *fd, char *cmd, char *name, int value);
-static int istermoption(struct vimoption *p);
-static int istermoption_idx(int opt_idx);
-static char_u *get_varp_scope(struct vimoption *p, int scope);
-static char_u *get_varp(struct vimoption *);
-static void check_win_options(win_T *win);
-static void option_value2string(struct vimoption *, int scope);
-static void check_winopt(winopt_T *wop);
-static int wc_use_keyname(char_u *varp, long *wcp);
-static void compatible_set(void);
+#پایان_اگر
+ساكن حرف *مجموعه_bool_option(صحيح opt_idx, char_u *varp, صحيح مقدار, صحيح opt_flags);
+ساكن حرف *مجموعه_رقم_option(صحيح opt_idx, char_u *varp, دراز مقدار, حرف *errbuf, size_t errbuflen, صحيح opt_flags);
+ساكن صحيح پیدا_کن_کلید_option(char_u *arg_arg, صحيح has_lt);
+ساكن فراغ showoptions(صحيح all, صحيح opt_flags);
+ساكن صحيح optval_default(بنية vimoption *, char_u *varp, صحيح compatible);
+ساكن فراغ showoneopt(بنية vimoption *, صحيح opt_flags);
+ساكن صحيح put_setstring(FILE *fd, bool legacy, حرف *cmd, حرف *name, char_u **valuep, long_u flags);
+ساكن صحيح put_setnum(FILE *fd, حرف *cmd, حرف *name, دراز *valuep);
+ساكن صحيح put_setbool(FILE *fd, حرف *cmd, حرف *name, صحيح مقدار);
+ساكن صحيح istermoption(بنية vimoption *p);
+ساكن صحيح istermoption_idx(صحيح opt_idx);
+ساكن char_u *get_varp_scope(بنية vimoption *p, صحيح scope);
+ساكن char_u *get_varp(بنية vimoption *);
+ساكن فراغ check_win_options(win_T *win);
+ساكن فراغ option_value2string(بنية vimoption *, صحيح scope);
+ساكن فراغ check_winopt(winopt_T *wop);
+ساكن صحيح wc_use_keyname(char_u *varp, دراز *wcp);
+ساكن فراغ compatible_مجموعه(فراغ);
 
-#if defined(FEAT_EVAL)
-static char *(p_bin_dep_opts[])    = {"textwidth", "wrapmargin", "modeline", "expandtab", NULL};
-static char *(p_paste_dep_opts[])  = {"autoindent", "expandtab", "ruler", "showmatch", "smarttab",
+#إذا defined(FEAT_EVAL)
+ساكن حرف *(p_bin_dep_opts[])    = {"textwidth", "wrapmargin", "modeline", "expandtab", عدم};
+ساكن حرف *(p_paste_dep_opts[])  = {"autoindent", "expandtab", "ruler", "showmatch", "smarttab",
     "softtabstop", "textwidth", "wrapmargin",
 # ifdef FEAT_RIGHTLEFT
     "hkmap", "revins",
@@ -79,137 +79,137 @@ static char *(p_paste_dep_opts[])  = {"autoindent", "expandtab", "ruler", "showm
 # ifdef FEAT_VARTABS
     "varsofttabstop",
 # endif
-    NULL};
-static void didset_options_sctx(int opt_flags, char **buf);
-#endif
+    عدم};
+ساكن فراغ didset_options_sctx(صحيح opt_flags, حرف **buf);
+#پایان_اگر
 
 
 /*
  * Initialize the 'shell' option to a default value.
  */
-    static void
-set_init_default_shell(void)
+    ساكن فراغ
+مجموعه_init_default_shell(فراغ)
 {
     char_u	*p;
 
     // Find default value for 'shell' option.
     // Don't use it if it is empty.
-    if (((p = mch_getenv((char_u *)"SHELL")) != NULL && *p != NUL)
-#if defined(MSWIN)
-	    || ((p = mch_getenv((char_u *)"COMSPEC")) != NULL && *p != NUL)
-	    || ((p = (char_u *)default_shell()) != NULL && *p != NUL)
-#endif
+    إذا (((p = mch_getenv((char_u *)"SHELL")) != عدم && *p != NUL)
+#إذا defined(MSWIN)
+	    || ((p = mch_getenv((char_u *)"COMSPEC")) != عدم && *p != NUL)
+	    || ((p = (char_u *)default_shell()) != عدم && *p != NUL)
+#پایان_اگر
 	    )
-#if defined(MSWIN)
+#إذا defined(MSWIN)
     {
 	// For MS-Windows put the path in quotes instead of escaping spaces.
 	char_u	    *cmd;
 	size_t	    len;
 
-	if (vim_strchr(p, ' ') != NULL)
+	إذا (vim_strchr(p, ' ') != عدم)
 	{
 	    len = STRLEN(p) + 3;  // two quotes and a trailing NUL
 	    cmd = alloc(len);
-	    if (cmd != NULL)
+	    إذا (cmd != عدم)
 	    {
-		vim_snprintf((char *)cmd, len, "\"%s\"", p);
-		set_string_default("sh", cmd);
+		vim_snprintf((حرف *)cmd, len, "\"%s\"", p);
+		مجموعه_string_default("sh", cmd);
 		vim_free(cmd);
 	    }
 	}
-	else
-	    set_string_default("sh", p);
+	وإلا
+	    مجموعه_string_default("sh", p);
     }
-#else
-	set_string_default_esc("sh", p, TRUE);
-#endif
+#وإلا
+	مجموعه_string_default_esc("sh", p, TRUE);
+#پایان_اگر
 }
 
 /*
  * Set the default for 'backupskip' to include environment variables for
  * temp files.
  */
-    static void
-set_init_default_backupskip(void)
+    ساكن فراغ
+مجموعه_init_default_backupskip(فراغ)
 {
-    int		opt_idx;
-    int		i;
+    صحيح		opt_idx;
+    صحيح		i;
     char_u	*p;
-    int		plen;
-#ifdef UNIX
-    static char	*(names[4]) = {"", "TMPDIR", "TEMP", "TMP"};
-#else
-    static char	*(names[3]) = {"TMPDIR", "TEMP", "TMP"};
-#endif
+    صحيح		plen;
+#اگر_تعریف_شده UNIX
+    ساكن حرف	*(نامها[4]) = {"", "TMPDIR", "TEMP", "TMP"};
+#وإلا
+    ساكن حرف	*(نامها[3]) = {"TMPDIR", "TEMP", "TMP"};
+#پایان_اگر
     garray_T	ga;
 
     opt_idx = findoption((char_u *)"backupskip");
 
     ga_init2(&ga, 1, 100);
-    for (i = 0; i < (int)ARRAY_LENGTH(names); ++i)
+    لكل (i = 0; i < (صحيح)ARRAY_درازی(نامها); ++i)
     {
-	int		mustfree = FALSE;
-#ifdef UNIX
-	if (*names[i] == NUL)
+	صحيح		mustfree = FALSE;
+#اگر_تعریف_شده UNIX
+	إذا (*نامها[i] == NUL)
 	{
 # ifdef MACOS_X
 	    p = (char_u *)"/private/tmp";
-	    plen = (int)STRLEN_LITERAL("/private/tmp");
-# else
+	    plen = (صحيح)STRLEN_LITERAL("/private/tmp");
+# وإلا
 	    p = (char_u *)"/tmp";
-	    plen = (int)STRLEN_LITERAL("/tmp");
+	    plen = (صحيح)STRLEN_LITERAL("/tmp");
 # endif
 	}
-	else
-#endif
+	وإلا
+#پایان_اگر
 	{
-	    p = vim_getenv((char_u *)names[i], &mustfree);
+	    p = vim_getenv((char_u *)نامها[i], &mustfree);
 	    plen = 0;	    // will be calculated below
 	}
-	if (p != NULL && *p != NUL)
+	إذا (p != عدم && *p != NUL)
 	{
-	    char_u  *item;
+	    char_u  *قلم;
 	    size_t  itemsize;
-	    int	    has_trailing_path_sep = FALSE;
+	    صحيح	    has_trailing_مسیر_sep = FALSE;
 
-	    if (plen == 0)
+	    إذا (plen == 0)
 	    {
 		// the value was retrieved from the environment
-		plen = (int)STRLEN(p);
+		plen = (صحيح)STRLEN(p);
 		// does the value include a trailing path separator?
-		if (after_pathsep(p, p + plen))
-		    has_trailing_path_sep = TRUE;
+		إذا (after_pathsep(p, p + plen))
+		    has_trailing_مسیر_sep = TRUE;
 	    }
 
 	    // item size needs to be large enough to include "/*" and a trailing NUL
 	    // note: the value (and therefore plen) may already include a path separator
-	    itemsize = plen + (has_trailing_path_sep ? 0 : 1) + 2;
-	    item = alloc(itemsize);
-	    if (item != NULL)
+	    itemsize = plen + (has_trailing_مسیر_sep ? 0 : 1) + 2;
+	    قلم = alloc(itemsize);
+	    إذا (قلم != عدم)
 	    {
 		// add a preceding comma as a separator after the first item
 		size_t	itemseplen = (ga.ga_len == 0) ? 0 : 1;
 		size_t	itemlen;
 
-		itemlen = vim_snprintf((char *)item, itemsize, "%s%s*", p, (has_trailing_path_sep) ? "" : PATHSEPSTR);
+		itemlen = vim_snprintf((حرف *)قلم, itemsize, "%s%s*", p, (has_trailing_مسیر_sep) ? "" : PATHSEPSTR);
 
-		if (find_dup_item(ga.ga_data, item, itemlen, options[opt_idx].flags) == NULL
-			&& ga_grow(&ga, (int)(itemseplen + itemlen + 1)) == OK)
+		إذا (پیدا_کن_dup_قلم(ga.ga_داده, قلم, itemlen, options[opt_idx].flags) == عدم
+			&& ga_grow(&ga, (صحيح)(itemseplen + itemlen + 1)) == OK)
 		{
-		    ga.ga_len += vim_snprintf((char *)ga.ga_data + ga.ga_len,
+		    ga.ga_len += vim_snprintf((حرف *)ga.ga_داده + ga.ga_len,
 				    itemseplen + itemlen + 1,
-				    "%s%s", (itemseplen > 0) ? "," : "", item);
+				    "%s%s", (itemseplen > 0) ? "," : "", قلم);
 		}
-		vim_free(item);
+		vim_free(قلم);
 	    }
 	}
-	if (mustfree)
+	إذا (mustfree)
 	    vim_free(p);
     }
-    if (ga.ga_data != NULL)
+    إذا (ga.ga_داده != عدم)
     {
-	set_string_default("bsk", ga.ga_data);
-	vim_free(ga.ga_data);
+	مجموعه_string_default("bsk", ga.ga_داده);
+	vim_free(ga.ga_داده);
     }
 }
 
@@ -217,37 +217,37 @@ set_init_default_backupskip(void)
  * Initialize the 'maxmemtot' and 'maxmem' options to a default value.
  * 'maxmemtot' and 'maxmem' may have to be adjusted for available memory.
  */
-    static void
-set_init_default_maxmemtot(void)
+    ساكن فراغ
+مجموعه_init_default_maxmemtot(فراغ)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
     long_u	n;
 
     opt_idx = findoption((char_u *)"maxmemtot");
-    if (opt_idx < 0)
-	return;
+    إذا (opt_idx < 0)
+	أرجع;
 
-#if !defined(HAVE_AVAIL_MEM) && !defined(HAVE_TOTAL_MEM)
-    if (options[opt_idx].def_val[VI_DEFAULT] == (char_u *)0L)
-#endif
+#إذا !defined(HAVE_AVAIL_MEM) && !defined(HAVE_مجموع_MEM)
+    إذا (options[opt_idx].def_val[VI_DEFAULT] == (char_u *)0L)
+#پایان_اگر
     {
-#if defined(HAVE_AVAIL_MEM)
+#إذا defined(HAVE_AVAIL_MEM)
 	// Use amount of memory available at this moment.
 	n = (mch_avail_mem(FALSE) >> 1);
-#elif defined(HAVE_TOTAL_MEM)
+#وإلاإذا defined(HAVE_مجموع_MEM)
 	// Use amount of memory available to Vim.
-	n = (mch_total_mem(FALSE) >> 1);
-#else
+	n = (mch_مجموع_mem(FALSE) >> 1);
+#وإلا
 	n = (0x7fffffff >> 11);
-#endif
+#پایان_اگر
 	options[opt_idx].def_val[VI_DEFAULT] = (char_u *)n;
 	opt_idx = findoption((char_u *)"maxmem");
-	if (opt_idx >= 0)
+	إذا (opt_idx >= 0)
 	{
-#if !defined(HAVE_AVAIL_MEM) && !defined(HAVE_TOTAL_MEM)
-	    if ((long)(long_i)options[opt_idx].def_val[VI_DEFAULT] > (long)n
-		    || (long)(long_i)options[opt_idx].def_val[VI_DEFAULT] == 0L)
-#endif
+#إذا !defined(HAVE_AVAIL_MEM) && !defined(HAVE_مجموع_MEM)
+	    إذا ((دراز)(long_i)options[opt_idx].def_val[VI_DEFAULT] > (دراز)n
+		    || (دراز)(long_i)options[opt_idx].def_val[VI_DEFAULT] == 0L)
+#پایان_اگر
 		options[opt_idx].def_val[VI_DEFAULT] = (char_u *)n;
 	}
     }
@@ -256,137 +256,137 @@ set_init_default_maxmemtot(void)
 /*
  * Initialize the 'cdpath' option to a default value.
  */
-    static void
-set_init_default_cdpath(void)
+    ساكن فراغ
+مجموعه_init_default_cdpath(فراغ)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
     char_u	*cdpath;
     char_u	*buf;
-    int	i;
-    int	j;
-    int	mustfree = FALSE;
+    صحيح	i;
+    صحيح	j;
+    صحيح	mustfree = FALSE;
 
     cdpath = vim_getenv((char_u *)"CDPATH", &mustfree);
-    if (cdpath == NULL)
-	return;
+    إذا (cdpath == عدم)
+	أرجع;
 
     buf = alloc((STRLEN(cdpath) << 1) + 2);
-    if (buf != NULL)
+    إذا (buf != عدم)
     {
 	buf[0] = ',';	    // start with ",", current dir first
 	j = 1;
-	for (i = 0; cdpath[i] != NUL; ++i)
+	لكل (i = 0; cdpath[i] != NUL; ++i)
 	{
-	    if (vim_ispathlistsep(cdpath[i]))
+	    إذا (vim_ispathlistsep(cdpath[i]))
 		buf[j++] = ',';
-	    else
+	    وإلا
 	    {
-		if (cdpath[i] == ' ' || cdpath[i] == ',')
+		إذا (cdpath[i] == ' ' || cdpath[i] == ',')
 		    buf[j++] = '\\';
 		buf[j++] = cdpath[i];
 	    }
 	}
 	buf[j] = NUL;
 	opt_idx = findoption((char_u *)"cdpath");
-	if (opt_idx >= 0)
+	إذا (opt_idx >= 0)
 	{
 	    options[opt_idx].def_val[VI_DEFAULT] = buf;
 	    options[opt_idx].flags |= P_DEF_ALLOCED;
 	}
-	else
+	وإلا
 	    vim_free(buf); // cannot happen
     }
-    if (mustfree)
+    إذا (mustfree)
 	vim_free(cdpath);
 }
 
 /*
  * Initialize the 'printencoding' option to a default value.
  */
-    static void
-set_init_default_printencoding(void)
+    ساكن فراغ
+مجموعه_init_default_printencoding(فراغ)
 {
-#if defined(FEAT_POSTSCRIPT) && \
+#إذا defined(FEAT_POSTSCRIPT) && \
     (defined(MSWIN) || defined(VMS) || defined(MAC) || defined(hpux))
     // Set print encoding on platforms that don't default to latin1
-    set_string_default("penc",
-# if defined(MSWIN)
+    مجموعه_string_default("penc",
+# إذا defined(MSWIN)
 	    (char_u *)"cp1252"
 # elif defined(VMS)
 	    (char_u *)"dec-mcs"
 # elif defined(MAC)
 	    (char_u *)"mac-roman"
-# else // HPUX
+# وإلا // HPUX
 	    (char_u *)"hp-roman8"
 # endif
 	    );
-#endif
+#پایان_اگر
 }
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#إذا defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
 /*
  * Initialize the 'printexpr' option to a default value.
  */
-    static void
-set_init_default_printexpr(void)
+    ساكن فراغ
+مجموعه_init_default_printexpr(فراغ)
 {
     // 'printexpr' must be allocated to be able to evaluate it.
-    set_string_default("pexpr",
-# if defined(MSWIN)
+    مجموعه_string_default("pexpr",
+# إذا defined(MSWIN)
 	    (char_u *)"system('copy' . ' ' . v:fname_in . (&printdevice == '' ? ' LPT1:' : (' \"' . &printdevice . '\"'))) . delete(v:fname_in)"
 # elif defined(VMS)
 	    (char_u *)"system('print/delete' . (&printdevice == '' ? '' : ' /queue=' . &printdevice) . ' ' . v:fname_in)"
 
-# else
+# وإلا
 	    (char_u *)"system('lpr' . (&printdevice == '' ? '' : ' -P' . &printdevice) . ' ' . v:fname_in) . delete(v:fname_in) + v:shell_error"
 # endif
 	    );
 }
-#endif
+#پایان_اگر
 
-#ifdef UNIX
+#اگر_تعریف_شده UNIX
 /*
  * Force restricted-mode on for "nologin" or "false" $SHELL
  */
-    static void
-set_init_restricted_mode(void)
+    ساكن فراغ
+مجموعه_init_restricted_نما(فراغ)
 {
     char_u	*p;
 
     p = get_isolated_shell_name();
-    if (p == NULL)
-	return;
-    if (fnamecmp(p, "nologin") == 0 || fnamecmp(p, "false") == 0)
+    إذا (p == عدم)
+	أرجع;
+    إذا (fnamecmp(p, "nologin") == 0 || fnamecmp(p, "false") == 0)
 	restricted = TRUE;
     vim_free(p);
 }
-#endif
+#پایان_اگر
 
-#ifdef CLEAN_RUNTIMEPATH
+#اگر_تعریف_شده CLEAN_RUNTIMEPATH
 /*
  * When Vim is started with the "--clean" argument, set the default value
  * for the 'runtimepath' and 'packpath' options.
  */
-    static void
-set_init_clean_rtp(void)
+    ساكن فراغ
+مجموعه_init_clean_rtp(فراغ)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
 
     opt_idx = findoption((char_u *)"runtimepath");
-    if (opt_idx >= 0)
+    إذا (opt_idx >= 0)
     {
 	options[opt_idx].def_val[VI_DEFAULT] = (char_u *)CLEAN_RUNTIMEPATH;
 	p_rtp = (char_u *)CLEAN_RUNTIMEPATH;
     }
     opt_idx = findoption((char_u *)"packpath");
-    if (opt_idx < 0)
-	return;
+    إذا (opt_idx < 0)
+	أرجع;
     options[opt_idx].def_val[VI_DEFAULT] = (char_u *)CLEAN_RUNTIMEPATH;
     p_pp = (char_u *)CLEAN_RUNTIMEPATH;
 }
-#endif
+#پایان_اگر
 
-#ifdef UNIX
+#اگر_تعریف_شده UNIX
 /*
  * Change 'runtimepath' and 'packdir' to '$XDG_CONFIG_HOME/vim' if the only
  * vimrc found is located in '$XDG_CONFIG_HOME/vim/vimrc'.
@@ -394,25 +394,25 @@ set_init_clean_rtp(void)
  * as a fallback as is defined in the XDG base dir specification:
  * <https://specifications.freedesktop.org/basedir/latest/>
  */
-    static void
-set_init_xdg_rtp(void)
+    ساكن فراغ
+مجموعه_init_xdg_rtp(فراغ)
 {
-    int		opt_idx;
-    int		has_xdg_env = TRUE;
-    int		should_free_xdg_dir = FALSE;
-    char_u	*vimrc1 = NULL;
-    char_u	*vimrc2 = NULL;
-    char_u	*xdg_dir = NULL;
-    char_u	*xdg_rtp = NULL;
-    string_T	vimrc_xdg = {NULL, 0};
+    صحيح		opt_idx;
+    صحيح		has_xdg_env = TRUE;
+    صحيح		should_free_xdg_dir = FALSE;
+    char_u	*vimrc1 = عدم;
+    char_u	*vimrc2 = عدم;
+    char_u	*xdg_dir = عدم;
+    char_u	*xdg_rtp = عدم;
+    string_T	vimrc_xdg = {عدم, 0};
 
     // initialize chartab, so we can expand $HOME
-    (void)init_chartab();
+    (فراغ)init_chartab();
     vimrc1 = expand_env_save((char_u *)USR_VIMRC_FILE);
     vimrc2 = expand_env_save((char_u *)USR_VIMRC_FILE2);
 
     xdg_dir = mch_getenv("XDG_CONFIG_HOME");
-    if (!xdg_dir)
+    إذا (!xdg_dir)
     {
 	xdg_dir = expand_env_save((char_u *)"~/.config");
 	should_free_xdg_dir = TRUE;
@@ -421,28 +421,28 @@ set_init_xdg_rtp(void)
     concat_fnames(xdg_dir, STRLEN(xdg_dir),
 	(char_u *)"vim/vimrc", STRLEN_LITERAL("vim/vimrc"), TRUE, &vimrc_xdg);
 
-    if (file_is_readable(vimrc1) || file_is_readable(vimrc2) ||
+    إذا (file_is_readable(vimrc1) || file_is_readable(vimrc2) ||
 	    !file_is_readable(vimrc_xdg.string))
-	goto theend;
+	اذهب theend;
 
     xdg_rtp = has_xdg_env ? (char_u *)XDG_RUNTIMEPATH
 	: (char_u *)XDG_RUNTIMEPATH_FB;
 
-    if ((opt_idx = findoption((char_u *)"runtimepath")) < 0)
-	goto theend;
+    إذا ((opt_idx = findoption((char_u *)"runtimepath")) < 0)
+	اذهب theend;
 
     options[opt_idx].def_val[VI_DEFAULT] = xdg_rtp;
     p_rtp = xdg_rtp;
 
-    if ((opt_idx = findoption((char_u *)"packpath")) < 0)
-	goto theend;
+    إذا ((opt_idx = findoption((char_u *)"packpath")) < 0)
+	اذهب theend;
 
     options[opt_idx].def_val[VI_DEFAULT] = xdg_rtp;
     p_pp = xdg_rtp;
 
-# if defined(XDG_VDIR) && defined(FEAT_SESSION)
-    if ((opt_idx = findoption((char_u *)"viewdir")) < 0)
-	goto theend;
+# إذا defined(XDG_VDIR) && defined(FEAT_SESSION)
+    إذا ((opt_idx = findoption((char_u *)"viewdir")) < 0)
+	اذهب theend;
 
     options[opt_idx].def_val[VI_DEFAULT] = (char_u *)XDG_VDIR;
     p_vdir = (char_u *)XDG_VDIR;
@@ -452,10 +452,10 @@ theend:
     vim_free(vimrc1);
     vim_free(vimrc2);
     vim_free(vimrc_xdg.string);
-    if (should_free_xdg_dir)
+    إذا (should_free_xdg_dir)
 	vim_free(xdg_dir);
 }
-#endif
+#پایان_اگر
 
 /*
  * Expand environment variables and things like "~" for the defaults.
@@ -466,27 +466,27 @@ theend:
  * Don't set the P_ALLOCED flag, because we don't want to free the
  * default.
  */
-    static void
-set_init_expand_env(void)
+    ساكن فراغ
+مجموعه_init_expand_env(فراغ)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
     char_u	*p;
 
-    for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+    لكل (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
     {
-	if ((options[opt_idx].flags & P_GETTEXT)
-		&& options[opt_idx].var != NULL)
-	    p = (char_u *)_(*(char **)options[opt_idx].var);
-	else
-	    p = option_expand(opt_idx, NULL);
-	if (p != NULL && (p = vim_strsave(p)) != NULL)
+	إذا ((options[opt_idx].flags & P_GETTEXT)
+		&& options[opt_idx].var != عدم)
+	    p = (char_u *)_(*(حرف **)options[opt_idx].var);
+	وإلا
+	    p = option_expand(opt_idx, عدم);
+	إذا (p != عدم && (p = vim_strsave(p)) != عدم)
 	{
 	    *(char_u **)options[opt_idx].var = p;
 	    // VIMEXP
 	    // Defaults for all expanded options are currently the same for Vi
 	    // and Vim.  When this changes, add some code here!  Also need to
 	    // split P_DEF_ALLOCED in two.
-	    if (options[opt_idx].flags & P_DEF_ALLOCED)
+	    إذا (options[opt_idx].flags & P_DEF_ALLOCED)
 		vim_free(options[opt_idx].def_val[VI_DEFAULT]);
 	    options[opt_idx].def_val[VI_DEFAULT] = p;
 	    options[opt_idx].flags |= P_DEF_ALLOCED;
@@ -494,126 +494,126 @@ set_init_expand_env(void)
     }
 }
 
-#if defined(MSWIN) && defined(FEAT_GETTEXT)
+#إذا defined(MSWIN) && defined(FEAT_GETTEXT)
 /*
  * Get the display language of Windows and the languages to fall back on, as a
  * colon separated list for gettext, e.g. "ja_JP:en_US".  The list stops after
  * English, untranslated messages are English already.
  * Returns NULL when it cannot be obtained.  The result must be freed.
  */
-    static char_u *
-get_ui_langs(void)
+    ساكن char_u *
+get_ui_langs(فراغ)
 {
-    ULONG	num_languages = 0;
+    ULONG	رقم_languages = 0;
     ULONG	bufsize = 0;
-    WCHAR	*buffer;
-    char_u	*langs = NULL;
+    WCHAR	*میانگیر;
+    char_u	*langs = عدم;
 
-    if (!GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &num_languages, NULL,
+    إذا (!GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &رقم_languages, عدم,
 								    &bufsize)
 	    || bufsize == 0)
-	return NULL;
+	أرجع عدم;
 
-    buffer = ALLOC_MULT(WCHAR, bufsize);
-    if (buffer == NULL)
-	return NULL;
+    میانگیر = ALLOC_MULT(WCHAR, bufsize);
+    إذا (میانگیر == عدم)
+	أرجع عدم;
 
-    if (GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &num_languages, buffer,
+    إذا (GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &رقم_languages, میانگیر,
 								    &bufsize))
     {
 	// The list is NUL separated, the result needs the same room.
 	langs = alloc(bufsize);
-	if (langs != NULL)
+	إذا (langs != عدم)
 	{
 	    char_u	*d = langs;
-	    WCHAR	*s = buffer;
+	    WCHAR	*s = میانگیر;
 
-	    while (*s != L'\0')
+	    طالما (*s != L'\0')
 	    {
 		bool	english = s[0] == L'e' && s[1] == L'n'
 					&& (s[2] == L'\0' || s[2] == L'-');
 
-		if (d > langs)
+		إذا (d > langs)
 		    *d++ = ':';
 		// Locale names are ASCII, "en-US" becomes "en_US".
-		for ( ; *s != L'\0'; ++s)
+		لكل ( ; *s != L'\0'; ++s)
 		    *d++ = *s == L'-' ? '_' : (char_u)*s;
 		++s;
 
-		if (english)
-		    break;
+		إذا (english)
+		    اكسر;
 	    }
 	    *d = NUL;
 	}
     }
-    vim_free(buffer);
+    vim_free(میانگیر);
 
-    return langs;
+    أرجع langs;
 }
-#endif
+#پایان_اگر
 
 /*
  * Initialize the 'LANG' environment variable to a default value.
  */
-    static void
-set_init_lang_env(void)
+    ساكن فراغ
+مجموعه_init_lang_env(فراغ)
 {
-#if defined(MSWIN) && defined(FEAT_GETTEXT)
+#إذا defined(MSWIN) && defined(FEAT_GETTEXT)
     // If the language isn't set in the environment, use the display language
     // of Windows.  Not the regional format, which is what the CRT would use
     // for setlocale(LC_ALL, "").
-    if (mch_getenv((char_u *)"LANG") == NULL
-	    && mch_getenv((char_u *)"LANGUAGE") == NULL
-	    && mch_getenv((char_u *)"LC_ALL") == NULL
-	    && mch_getenv((char_u *)"LC_MESSAGES") == NULL)
+    إذا (mch_getenv((char_u *)"LANG") == عدم
+	    && mch_getenv((char_u *)"LANGUAGE") == عدم
+	    && mch_getenv((char_u *)"LC_ALL") == عدم
+	    && mch_getenv((char_u *)"LC_MESSAGES") == عدم)
     {
 	char_u	*langs = get_ui_langs();
 
-	if (langs != NULL && *langs != NUL)
+	إذا (langs != عدم && *langs != NUL)
 	{
 	    char_u	*colon = vim_strchr(langs, ':');
 
 	    // $LANGUAGE is the list gettext picks from, $LANG the language.
 	    vim_setenv((char_u *)"LANGUAGE", langs);
-	    if (colon != NULL)
+	    إذا (colon != عدم)
 		*colon = NUL;
 	    vim_setenv((char_u *)"LANG", langs);
 	}
 	vim_free(langs);
     }
-#elif defined(MACOS_CONVERT)
+#وإلاإذا defined(MACOS_CONVERT)
     // Moved to os_mac_conv.c to avoid dependency problems.
     mac_lang_init();
-#endif
+#پایان_اگر
 }
 
 /*
  * Initialize the 'encoding' option to a default value.
  */
-    static void
-set_init_default_encoding(void)
+    ساكن فراغ
+مجموعه_init_default_encoding(فراغ)
 {
     char_u	*p;
-    int		opt_idx;
+    صحيح		opt_idx;
 
-#if defined(MSWIN) || defined(__MVS__)
+#إذا defined(MSWIN) || defined(__MVS__)
     // MS-Windows has builtin support for conversion to and from Unicode, using
     // "utf-8" for 'encoding' should work best for most users.
     // z/OS built should default to UTF-8 mode as setlocale does not respect utf-8 environment variable locales
     p = vim_strnsave((char_u *)ENC_DFLT, STRLEN_LITERAL(ENC_DFLT));
-#else
+#وإلا
     // enc_locale() will try to find the encoding of the current locale.
     // This works best for properly configured systems, old and new.
     p = enc_locale();
-#endif
-    if (p == NULL)
-	return;
+#پایان_اگر
+    إذا (p == عدم)
+	أرجع;
 
     // Try setting 'encoding' and check if the value is valid.
     // If not, go back to the default encoding.
     char_u *save_enc = p_enc;
     p_enc = p;
-    if (STRCMP(p_enc, "gb18030") == 0)
+    إذا (STRCMP(p_enc, "gb18030") == 0)
     {
 	// We don't support "gb18030", but "cp936" is a good substitute
 	// for practical purposes, thus use that.  It's not an alias to
@@ -621,75 +621,75 @@ set_init_default_encoding(void)
 	p_enc = vim_strnsave((char_u *)"cp936", STRLEN_LITERAL("cp936"));
 	vim_free(p);
     }
-    if (mb_init() == NULL)
+    إذا (mb_init() == عدم)
     {
 	opt_idx = findoption((char_u *)"encoding");
-	if (opt_idx >= 0)
+	إذا (opt_idx >= 0)
 	{
 	    options[opt_idx].def_val[VI_DEFAULT] = p_enc;
 	    options[opt_idx].flags |= P_DEF_ALLOCED;
 	}
 
-#if defined(MSWIN) || defined(MACOS_X) || defined(VMS)
-	if (STRCMP(p_enc, "latin1") == 0 || enc_utf8)
+#إذا defined(MSWIN) || defined(MACOS_X) || defined(VMS)
+	إذا (STRCMP(p_enc, "latin1") == 0 || enc_utf8)
 	{
 	    // Adjust the default for 'isprint' and 'iskeyword' to match
 	    // latin1.  Also set the defaults for when 'nocompatible' is
 	    // set.
-	    set_string_option_direct((char_u *)"isp", -1,
+	    مجموعه_string_option_مستقیم((char_u *)"isp", -1,
 		    ISP_LATIN1, OPT_FREE, SID_NONE);
-	    set_string_option_direct((char_u *)"isk", -1,
+	    مجموعه_string_option_مستقیم((char_u *)"isk", -1,
 		    ISK_LATIN1, OPT_FREE, SID_NONE);
 	    opt_idx = findoption((char_u *)"isp");
-	    if (opt_idx >= 0)
+	    إذا (opt_idx >= 0)
 		options[opt_idx].def_val[VIM_DEFAULT] = ISP_LATIN1;
 	    opt_idx = findoption((char_u *)"isk");
-	    if (opt_idx >= 0)
+	    إذا (opt_idx >= 0)
 		options[opt_idx].def_val[VIM_DEFAULT] = ISK_LATIN1;
-	    (void)init_chartab();
+	    (فراغ)init_chartab();
 	}
-#endif
+#پایان_اگر
 
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#إذا defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
 	// Win32 console: When GetACP() returns a different value from
 	// GetConsoleCP() set 'termencoding'.
-	if (
+	إذا (
 # ifdef VIMDLL
-		(!gui.in_use && !gui.starting) &&
+		(!gui.درون_use && !gui.starting) &&
 # endif
 		GetACP() != GetConsoleCP())
 	{
-	    char	buf[50];
+	    حرف	buf[50];
 	    size_t	buflen;
 
 	    // Win32 console: In ConPTY, GetConsoleCP() returns zero.
 	    // Use an alternative value.
-	    if (GetConsoleCP() == 0)
-		buflen = vim_snprintf(buf, sizeof(buf), "cp%ld", (long)GetACP());
-	    else
-		buflen = vim_snprintf(buf, sizeof(buf), "cp%ld", (long)GetConsoleCP());
+	    إذا (GetConsoleCP() == 0)
+		buflen = vim_snprintf(buf, حجم(buf), "cp%ld", (دراز)GetACP());
+	    وإلا
+		buflen = vim_snprintf(buf, حجم(buf), "cp%ld", (دراز)GetConsoleCP());
 	    p_tenc = vim_strnsave((char_u *)buf, buflen);
-	    if (p_tenc != NULL)
+	    إذا (p_tenc != عدم)
 	    {
 		opt_idx = findoption((char_u *)"termencoding");
-		if (opt_idx >= 0)
+		إذا (opt_idx >= 0)
 		{
 		    options[opt_idx].def_val[VI_DEFAULT] = p_tenc;
 		    options[opt_idx].flags |= P_DEF_ALLOCED;
 		}
-		convert_setup(&input_conv, p_tenc, p_enc);
-		convert_setup(&output_conv, p_enc, p_tenc);
+		convert_راهاندازی(&درون_داد_conv, p_tenc, p_enc);
+		convert_راهاندازی(&output_conv, p_enc, p_tenc);
 	    }
-	    else
-		p_tenc = empty_option;
+	    وإلا
+		p_tenc = خالی_option;
 	}
-#endif
-#if defined(MSWIN)
+#پایان_اگر
+#إذا defined(MSWIN)
 	// $HOME may have characters in active code page.
 	init_homedir();
-#endif
+#پایان_اگر
     }
-    else
+    وإلا
     {
 	vim_free(p_enc);
 	p_enc = save_enc;
@@ -702,59 +702,59 @@ set_init_default_encoding(void)
  * Called only once from main(), just after creating the first buffer.
  * If "clean_arg" is TRUE Vim was started with --clean.
  */
-    void
-set_init_1(int clean_arg)
+    فراغ
+مجموعه_init_1(صحيح clean_arg)
 {
-#ifdef FEAT_LANGMAP
+#اگر_تعریف_شده FEAT_LANGMAP
     langmap_init();
-#endif
+#پایان_اگر
 
     // Be Vi compatible by default
     p_cp = TRUE;
 
     // Use POSIX compatibility when $VIM_POSIX is set.
-    if (mch_getenv((char_u *)"VIM_POSIX") != NULL)
+    إذا (mch_getenv((char_u *)"VIM_POSIX") != عدم)
     {
-	set_string_default("cpo", (char_u *)CPO_ALL);
-	set_string_default("shm", (char_u *)SHM_POSIX);
+	مجموعه_string_default("cpo", (char_u *)CPO_ALL);
+	مجموعه_string_default("shm", (char_u *)SHM_POSIX);
     }
 
-    set_init_default_shell();
-    set_init_default_backupskip();
-    set_init_default_maxmemtot();
-    set_init_default_cdpath();
-    set_init_default_printencoding();
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
-    set_init_default_printexpr();
-#endif
+    مجموعه_init_default_shell();
+    مجموعه_init_default_backupskip();
+    مجموعه_init_default_maxmemtot();
+    مجموعه_init_default_cdpath();
+    مجموعه_init_default_printencoding();
+#إذا defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+    مجموعه_init_default_printexpr();
+#پایان_اگر
 
     /*
      * Set all the options (except the terminal options) to their default
      * value.  Also set the global value for local options.
      */
-    set_options_default(0);
+    مجموعه_options_default(0);
 
-#ifdef UNIX
-    set_init_xdg_rtp();
-    set_init_restricted_mode();
-#endif
+#اگر_تعریف_شده UNIX
+    مجموعه_init_xdg_rtp();
+    مجموعه_init_restricted_نما();
+#پایان_اگر
 
-#ifdef CLEAN_RUNTIMEPATH
-    if (clean_arg)
-	set_init_clean_rtp();
-#endif
+#اگر_تعریف_شده CLEAN_RUNTIMEPATH
+    إذا (clean_arg)
+	مجموعه_init_clean_rtp();
+#پایان_اگر
 
-#ifdef FEAT_GUI
-    if (found_reverse_arg)
-	set_option_value_give_err((char_u *)"bg", 0L, (char_u *)"dark", 0);
-#endif
+#اگر_تعریف_شده FEAT_GUI
+    إذا (یافت_معکوس_arg)
+	مجموعه_option_مقدار_give_err((char_u *)"bg", 0L, (char_u *)"dark", 0);
+#پایان_اگر
 
     curbuf->b_p_initialized = true;
     curbuf->b_p_ac = -1;
     curbuf->b_p_ar = -1;	// no local 'autoread' value
-#ifdef HAVE_FSYNC
+#اگر_تعریف_شده HAVE_FSYNC
     curbuf->b_p_fs = -1;	// no local 'fsync' value
-#endif
+#پایان_اگر
     curbuf->b_p_ul = NO_LOCAL_UNDOLEVEL;
     check_buf_options(curbuf);
     check_win_options(curwin);
@@ -763,49 +763,49 @@ set_init_1(int clean_arg)
     // Must be before option_expand(), because that one needs vim_isIDc()
     didset_options();
 
-#ifdef FEAT_SPELL
+#اگر_تعریف_شده FEAT_SPELL
     // Use the current chartab for the generic chartab. This is not in
     // didset_options() because it only depends on 'encoding'.
     init_spell_chartab();
-#endif
+#پایان_اگر
 
-    set_init_default_encoding();
+    مجموعه_init_default_encoding();
 
     // Expand environment variables and things like "~" for the defaults.
-    set_init_expand_env();
+    مجموعه_init_expand_env();
 
     save_file_ff(curbuf);	// Buffer is unchanged
 
-#if defined(FEAT_ARABIC)
+#إذا defined(FEAT_ARABIC)
     // Detect use of mlterm.
     // Mlterm is a terminal emulator akin to xterm that has some special
     // abilities (bidi namely).
     // NOTE: mlterm's author is being asked to 'set' a variable
     //       instead of an environment variable due to inheritance.
-    if (mch_getenv((char_u *)"MLTERM") != NULL)
-	set_option_value_give_err((char_u *)"tbidi", 1L, NULL, 0);
-#endif
+    إذا (mch_getenv((char_u *)"MLTERM") != عدم)
+	مجموعه_option_مقدار_give_err((char_u *)"tbidi", 1L, عدم, 0);
+#پایان_اگر
 
     didset_options2();
 
-    set_init_lang_env();
+    مجموعه_init_lang_env();
 
-#ifdef FEAT_MULTI_LANG
+#اگر_تعریف_شده FEAT_MULTI_LANG
     // Set the default for 'helplang'.
-    set_helplang_default(get_mess_lang());
-#endif
+    مجموعه_helplang_default(get_mess_lang());
+#پایان_اگر
 }
 
-static char_u *fencs_utf8_default = (char_u *)"ucs-bom,utf-8,default,latin1";
+ساكن char_u *fencs_utf8_default = (char_u *)"ucs-bom,utf-8,default,latin1";
 
 /*
  * Set the "fileencodings" option to the default value for when 'encoding' is
  * utf-8.
  */
-    void
-set_fencs_unicode(void)
+    فراغ
+مجموعه_fencs_unicode(فراغ)
 {
-    set_string_option_direct((char_u *)"fencs", -1, fencs_utf8_default,
+    مجموعه_string_option_مستقیم((char_u *)"fencs", -1, fencs_utf8_default,
 								  OPT_FREE, 0);
 }
 
@@ -813,116 +813,116 @@ set_fencs_unicode(void)
  * Set an option to its default value.
  * This does not take care of side effects!
  */
-    static void
-set_option_default(
-    int		opt_idx,
-    int		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
-    int		compatible)	// use Vi default value
+    ساكن فراغ
+مجموعه_option_default(
+    صحيح		opt_idx,
+    صحيح		opt_flags,	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
+    صحيح		compatible)	// use Vi default value
 {
     char_u	*varp;		// pointer to variable for current option
-    int		dvi;		// index in def_val[]
+    صحيح		dvi;		// index in def_val[]
     long_u	flags;
     long_u	*flagsp;
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    صحيح		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
 
     varp = get_varp_scope(&(options[opt_idx]), both ? OPT_LOCAL : opt_flags);
     flags = options[opt_idx].flags;
-    if (varp != NULL)	    // skip hidden option, nothing to do for it
+    إذا (varp != عدم)	    // skip hidden option, nothing to do for it
     {
 	dvi = ((flags & P_VI_DEF) || compatible) ? VI_DEFAULT : VIM_DEFAULT;
-	if (flags & P_STRING)
+	إذا (flags & P_STRING)
 	{
 	    // 'fencs' default value depends on 'encoding'
-	    if (options[opt_idx].var == (char_u *)&p_fencs && enc_utf8)
-		set_fencs_unicode();
+	    إذا (options[opt_idx].var == (char_u *)&p_fencs && enc_utf8)
+		مجموعه_fencs_unicode();
 	    // Use set_string_option_direct() for local options to handle
 	    // freeing and allocating the value.
-	    else if (options[opt_idx].indir != PV_NONE)
-		set_string_option_direct(NULL, opt_idx,
+	    وإلا إذا (options[opt_idx].indir != PV_NONE)
+		مجموعه_string_option_مستقیم(عدم, opt_idx,
 				 options[opt_idx].def_val[dvi], opt_flags, 0);
-	    else
+	    وإلا
 	    {
-		if ((opt_flags & OPT_FREE) && (flags & P_ALLOCED))
+		إذا ((opt_flags & OPT_FREE) && (flags & P_ALLOCED))
 		    free_string_option(*(char_u **)(varp));
 		*(char_u **)varp = options[opt_idx].def_val[dvi];
 		options[opt_idx].flags &= ~P_ALLOCED;
 	    }
 	}
-	else if (flags & P_NUM)
+	وإلا إذا (flags & P_رقم)
 	{
-	    if (options[opt_idx].indir == PV_SCROLL)
+	    إذا (options[opt_idx].indir == PV_SCROLL)
 		win_comp_scroll(curwin);
-	    else
+	    وإلا
 	    {
-		long def_val = (long)(long_i)options[opt_idx].def_val[dvi];
+		دراز def_val = (دراز)(long_i)options[opt_idx].def_val[dvi];
 
-		if ((long *)varp == &curwin->w_p_so
-			|| (long *)varp == &curwin->w_p_siso
-			|| (long *)varp == &curwin->w_p_sop)
+		إذا ((دراز *)varp == &curwin->w_p_so
+			|| (دراز *)varp == &curwin->w_p_siso
+			|| (دراز *)varp == &curwin->w_p_sop)
 		    // 'scrolloff', 'sidescrolloff', and 'scrolloffpad' local values have a
 		    // different default value than the global default.
-		    *(long *)varp = -1;
-		else
-		    *(long *)varp = def_val;
+		    *(دراز *)varp = -1;
+		وإلا
+		    *(دراز *)varp = def_val;
 		// May also set global value for local option.
-		if (both)
-		    *(long *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
+		إذا (both)
+		    *(دراز *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
 								def_val;
 	    }
 	}
-	else	// P_BOOL
+	وإلا	// P_BOOL
 	{
 	    // the cast to long is required for Manx C, long_i is needed for
 	    // MSVC
-	    *(int *)varp = (int)(long)(long_i)options[opt_idx].def_val[dvi];
-#ifdef UNIX
+	    *(صحيح *)varp = (صحيح)(دراز)(long_i)options[opt_idx].def_val[dvi];
+#اگر_تعریف_شده UNIX
 	    // 'modeline' defaults to off for root
-	    if (options[opt_idx].indir == PV_ML && getuid() == ROOT_UID)
-		*(int *)varp = FALSE;
-#endif
+	    إذا (options[opt_idx].indir == PV_ML && getuid() == ریشه_UID)
+		*(صحيح *)varp = FALSE;
+#پایان_اگر
 	    // May also set global value for local option.
-	    if (both)
-		*(int *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
-								*(int *)varp;
+	    إذا (both)
+		*(صحيح *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) =
+								*(صحيح *)varp;
 	}
 
 	// The default value is not insecure.
 	flagsp = insecure_flag(curwin, opt_idx, opt_flags);
 	*flagsp = *flagsp & ~P_INSECURE;
-	if (both)
+	إذا (both)
 	{
 	    flagsp = insecure_flag(curwin, opt_idx, OPT_LOCAL);
 	    *flagsp = *flagsp & ~P_INSECURE;
 	}
     }
 
-#ifdef FEAT_EVAL
-    set_option_sctx_idx(opt_idx, opt_flags, current_sctx);
-#endif
+#اگر_تعریف_شده FEAT_EVAL
+    مجموعه_option_sctx_idx(opt_idx, opt_flags, current_sctx);
+#پایان_اگر
 }
 
 /*
  * Set all options (except terminal options) to their default value.
  * When "opt_flags" is non-zero skip 'encoding'.
  */
-    static void
-set_options_default(
-    int		opt_flags)	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
+    ساكن فراغ
+مجموعه_options_default(
+    صحيح		opt_flags)	// OPT_FREE, OPT_LOCAL and/or OPT_GLOBAL
 {
-    int		i;
+    صحيح		i;
     win_T	*wp;
     tabpage_T	*tp;
 
-    for (i = 0; !istermoption_idx(i); i++)
-	if (!(options[i].flags & P_NODEFAULT)
+    لكل (i = 0; !istermoption_idx(i); i++)
+	إذا (!(options[i].flags & P_NODEFAULT)
 		&& (opt_flags == 0
 		    || (options[i].var != (char_u *)&p_enc
-#if defined(FEAT_CRYPT)
+#إذا defined(FEAT_CRYPT)
 			&& options[i].var != (char_u *)&p_cm
-			&& options[i].var != (char_u *)&p_key
-#endif
+			&& options[i].var != (char_u *)&p_کلید
+#پایان_اگر
 			)))
-	    set_option_default(i, opt_flags, p_cp);
+	    مجموعه_option_default(i, opt_flags, p_cp);
 
     // The 'scroll' option must be computed for all windows.
     FOR_ALL_TAB_WINDOWS(tp, wp)
@@ -935,263 +935,263 @@ set_options_default(
  * Used for 'sh', 'backupskip' and 'term'.
  * When "escape" is TRUE escape spaces with a backslash.
  */
-    static void
-set_string_default_esc(char *name, char_u *val, int escape)
+    ساكن فراغ
+مجموعه_string_default_esc(حرف *name, char_u *val, صحيح escape)
 {
     char_u	*p;
-    int		opt_idx;
+    صحيح		opt_idx;
 
-    if (escape && vim_strchr(val, ' ') != NULL)
+    إذا (escape && vim_strchr(val, ' ') != عدم)
 	p = vim_strsave_escaped(val, (char_u *)" ");
-    else
+    وإلا
 	p = vim_strsave(val);
-    if (p == NULL)		// we don't want a NULL
-	return;
+    إذا (p == عدم)		// we don't want a NULL
+	أرجع;
 
     opt_idx = findoption((char_u *)name);
-    if (opt_idx < 0)
+    إذا (opt_idx < 0)
     {
 	vim_free(p);
-	return;
+	أرجع;
     }
 
-    if (options[opt_idx].flags & P_DEF_ALLOCED)
+    إذا (options[opt_idx].flags & P_DEF_ALLOCED)
 	vim_free(options[opt_idx].def_val[VI_DEFAULT]);
     options[opt_idx].def_val[VI_DEFAULT] = p;
     options[opt_idx].flags |= P_DEF_ALLOCED;
 }
 
-    void
-set_string_default(char *name, char_u *val)
+    فراغ
+مجموعه_string_default(حرف *name, char_u *val)
 {
-    set_string_default_esc(name, val, FALSE);
+    مجموعه_string_default_esc(name, val, FALSE);
 }
 
 /*
  * For an option value that contains comma separated items, find "newval" in
  * "origval".  Return NULL if not found.
  */
-    static char_u *
-find_dup_item(char_u *origval, char_u *newval, size_t newvallen, long_u flags)
+    ساكن char_u *
+پیدا_کن_dup_قلم(char_u *origval, char_u *newval, size_t newvallen, long_u flags)
 {
-    int	    bs = 0;
+    صحيح	    bs = 0;
     char_u  *s;
 
-    if (origval == NULL)
-	return NULL;
+    إذا (origval == عدم)
+	أرجع عدم;
 
-    for (s = origval; *s != NUL; ++s)
+    لكل (s = origval; *s != NUL; ++s)
     {
-	if ((!(flags & P_COMMA)
+	إذا ((!(flags & P_COMMA)
 		    || s == origval
 		    || (s[-1] == ',' && !(bs & 1)))
 		&& STRNCMP(s, newval, newvallen) == 0
 		&& (!(flags & P_COMMA)
 		    || s[newvallen] == ','
 		    || s[newvallen] == NUL))
-	    return s;
+	    أرجع s;
 	// Count backslashes.  Only a comma with an even number of backslashes
 	// or a single backslash preceded by a comma before it is recognized as
 	// a separator.
-	if ((s > origval + 1
+	إذا ((s > origval + 1
 		    && s[-1] == '\\'
 		    && s[-2] != ',')
 		|| (s == origval + 1
 		    && s[-1] == '\\'))
 	    ++bs;
-	else
+	وإلا
 	    bs = 0;
     }
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Set the Vi-default value of a number option.
  * Used for 'lines' and 'columns'.
  */
-    void
-set_number_default(char *name, long val)
+    فراغ
+مجموعه_عدد_default(حرف *name, دراز val)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
 
     opt_idx = findoption((char_u *)name);
-    if (opt_idx >= 0)
+    إذا (opt_idx >= 0)
 	options[opt_idx].def_val[VI_DEFAULT] = (char_u *)(long_i)val;
 }
 
-#if defined(FEAT_PROP_POPUP)
+#إذا defined(FEAT_PROP_POPUP)
 /*
  * Set all window-local and buffer-local options to the Vim default.
  * local-global options will use the global value.
  * When "do_buffer" is FALSE don't set buffer-local options.
  */
-    void
-set_local_options_default(win_T *wp, int do_buffer)
+    فراغ
+مجموعه_local_options_default(win_T *wp, صحيح do_میانگیر)
 {
     win_T	*save_curwin = curwin;
-    int		i;
+    صحيح		i;
 
     curwin = wp;
-    curbuf = curwin->w_buffer;
-    block_autocmds();
+    curbuf = curwin->w_میانگیر;
+    بلوک_autocmds();
 
-    for (i = 0; !istermoption_idx(i); i++)
+    لكل (i = 0; !istermoption_idx(i); i++)
     {
-	struct vimoption    *p = &(options[i]);
+	بنية vimoption    *p = &(options[i]);
 	char_u		    *varp = get_varp_scope(p, OPT_LOCAL);
 
-	if (p->indir != PV_NONE
-		&& (do_buffer || (p->indir & PV_BUF) == 0)
+	إذا (p->indir != PV_NONE
+		&& (do_میانگیر || (p->indir & PV_BUF) == 0)
 		&& !(options[i].flags & P_NODEFAULT)
 		&& !optval_default(p, varp, FALSE))
-	    set_option_default(i, OPT_FREE|OPT_LOCAL, FALSE);
+	    مجموعه_option_default(i, OPT_FREE|OPT_LOCAL, FALSE);
     }
 
     unblock_autocmds();
     curwin = save_curwin;
-    curbuf = curwin->w_buffer;
+    curbuf = curwin->w_میانگیر;
 }
-#endif
+#پایان_اگر
 
-#if defined(EXITFREE)
+#إذا defined(EXITFREE)
 /*
  * Free all options.
  */
-    void
-free_all_options(void)
+    فراغ
+free_all_options(فراغ)
 {
-    int		i;
+    صحيح		i;
 
-    for (i = 0; !istermoption_idx(i); i++)
+    لكل (i = 0; !istermoption_idx(i); i++)
     {
-	if (options[i].indir == PV_NONE)
+	إذا (options[i].indir == PV_NONE)
 	{
 	    // global option: free value and default value.
-	    if ((options[i].flags & P_ALLOCED) && options[i].var != NULL)
+	    إذا ((options[i].flags & P_ALLOCED) && options[i].var != عدم)
 		free_string_option(*(char_u **)options[i].var);
-	    if (options[i].flags & P_DEF_ALLOCED)
+	    إذا (options[i].flags & P_DEF_ALLOCED)
 		free_string_option(options[i].def_val[VI_DEFAULT]);
 	}
-	else if (options[i].var != VAR_WIN
+	وإلا إذا (options[i].var != VAR_WIN
 		&& (options[i].flags & P_STRING))
 	    // buffer-local option: free global value
 	    clear_string_option((char_u **)options[i].var);
     }
     free_operatorfunc_option();
     free_tagfunc_option();
-# if defined(FEAT_EVAL)
+# إذا defined(FEAT_EVAL)
     free_findfunc_option();
 # endif
 }
-#endif
+#پایان_اگر
 
 
 /*
  * Initialize the options, part two: After getting Rows and Columns and
  * setting 'term'.
  */
-    void
-set_init_2(void)
+    فراغ
+مجموعه_init_2(فراغ)
 {
-    int		idx;
+    صحيح		idx;
 
     // 'scroll' defaults to half the window height. The stored default is zero,
     // which results in the actual value computed from the window height.
     idx = findoption((char_u *)"scroll");
-    if (idx >= 0 && !(options[idx].flags & P_WAS_SET))
-	set_option_default(idx, OPT_LOCAL, p_cp);
-    comp_col();
+    إذا (idx >= 0 && !(options[idx].flags & P_WAS_مجموعه))
+	مجموعه_option_default(idx, OPT_LOCAL, p_cp);
+    comp_ستون();
 
     // 'window' is only for backwards compatibility with Vi.
     // Default is Rows - 1.
-    if (!option_was_set((char_u *)"window"))
-	p_window = Rows - 1;
-    set_number_default("window", Rows - 1);
+    إذا (!option_was_مجموعه((char_u *)"window"))
+	p_پنجره = ردیفها - 1;
+    مجموعه_عدد_default("window", ردیفها - 1);
 
     // For DOS console the default is always black.
-#if !((defined(MSWIN)) && !defined(FEAT_GUI))
+#إذا !((defined(MSWIN)) && !defined(FEAT_GUI))
     // If 'background' wasn't set by the user, try guessing the value,
     // depending on the terminal name.  Only need to check for terminals
     // with a dark background, that can handle color.
     idx = findoption((char_u *)"bg");
-    if (idx >= 0 && !(options[idx].flags & P_WAS_SET)
-						 && *term_bg_default() == 'd')
+    إذا (idx >= 0 && !(options[idx].flags & P_WAS_مجموعه)
+						 && *جمله_bg_default() == 'd')
     {
-	set_string_option_direct(NULL, idx, (char_u *)"dark", OPT_FREE, 0);
+	مجموعه_string_option_مستقیم(عدم, idx, (char_u *)"dark", OPT_FREE, 0);
 	// don't mark it as set, when starting the GUI it may be
 	// changed again
-	options[idx].flags &= ~P_WAS_SET;
+	options[idx].flags &= ~P_WAS_مجموعه;
     }
-#endif
+#پایان_اگر
 
-#ifdef CURSOR_SHAPE
+#اگر_تعریف_شده CURSOR_SHAPE
     parse_shape_opt(SHAPE_CURSOR);	// set cursor shapes from 'guicursor'
-#endif
-#ifdef FEAT_MOUSESHAPE
+#پایان_اگر
+#اگر_تعریف_شده FEAT_MOUSESHAPE
     parse_shape_opt(SHAPE_MOUSE);	// set mouse shapes from 'mouseshape'
-#endif
-#ifdef FEAT_PRINTER
-    (void)parse_printoptions(NULL);	// parse 'printoptions' default value
-#endif
+#پایان_اگر
+#اگر_تعریف_شده FEAT_PRINTER
+    (فراغ)parse_printoptions(عدم);	// parse 'printoptions' default value
+#پایان_اگر
 }
 
 /*
  * Initialize the options, part three: After reading the .vimrc
  */
-    void
-set_init_3(void)
+    فراغ
+مجموعه_init_3(فراغ)
 {
-#if defined(UNIX) || defined(MSWIN)
+#إذا defined(UNIX) || defined(MSWIN)
 /*
  * Set 'shellpipe' and 'shellredir', depending on the 'shell' option.
  * This is done after other initializations, where 'shell' might have been
  * set, but only if they have not been set before.
  */
     char_u  *p;
-    int	    idx_srr;
-    int	    do_srr;
+    صحيح	    idx_srr;
+    صحيح	    do_srr;
 # ifdef FEAT_QUICKFIX
-    int	    idx_sp;
-    int	    do_sp;
+    صحيح	    idx_sp;
+    صحيح	    do_sp;
 # endif
 
     idx_srr = findoption((char_u *)"srr");
-    if (idx_srr < 0)
+    إذا (idx_srr < 0)
 	do_srr = FALSE;
-    else
-	do_srr = !(options[idx_srr].flags & P_WAS_SET);
+    وإلا
+	do_srr = !(options[idx_srr].flags & P_WAS_مجموعه);
 # ifdef FEAT_QUICKFIX
     idx_sp = findoption((char_u *)"sp");
-    if (idx_sp < 0)
+    إذا (idx_sp < 0)
 	do_sp = FALSE;
-    else
-	do_sp = !(options[idx_sp].flags & P_WAS_SET);
+    وإلا
+	do_sp = !(options[idx_sp].flags & P_WAS_مجموعه);
 # endif
     p = get_isolated_shell_name();
-    if (p != NULL)
+    إذا (p != عدم)
     {
 	// Default for p_sp is "| tee", for p_srr is ">".
 	// For known shells it is changed here to include stderr.
-	if (	   fnamecmp(p, "csh") == 0
+	إذا (	   fnamecmp(p, "csh") == 0
 		|| fnamecmp(p, "tcsh") == 0
-# if defined(MSWIN)	// also check with .exe extension
+# إذا defined(MSWIN)	// also check with .exe extension
 		|| fnamecmp(p, "csh.exe") == 0
 		|| fnamecmp(p, "tcsh.exe") == 0
 # endif
 	   )
 	{
-# if defined(FEAT_QUICKFIX)
-	    if (do_sp)
+# إذا defined(FEAT_QUICKFIX)
+	    إذا (do_sp)
 	    {
 #  ifdef MSWIN
 		p_sp = (char_u *)">&";
-#  else
+#  وإلا
 		p_sp = (char_u *)"|& tee";
 #  endif
 		options[idx_sp].def_val[VI_DEFAULT] = p_sp;
 	    }
 # endif
-	    if (do_srr)
+	    إذا (do_srr)
 	    {
 		p_srr = (char_u *)">&";
 		options[idx_srr].def_val[VI_DEFAULT] = p_srr;
@@ -1200,27 +1200,27 @@ set_init_3(void)
 # ifdef MSWIN
 	// Windows PowerShell output is UTF-16 with BOM so re-encode to the
 	// current codepage.
-	else if (   fnamecmp(p, "powershell") == 0
+	وإلا إذا (   fnamecmp(p, "powershell") == 0
 		    || fnamecmp(p, "powershell.exe") == 0
 		)
 	{
-#  if defined(FEAT_QUICKFIX)
-		if (do_sp)
+#  إذا defined(FEAT_QUICKFIX)
+		إذا (do_sp)
 		{
 		    p_sp = (char_u *)"2>&1 | Out-File -Encoding default";
 		    options[idx_sp].def_val[VI_DEFAULT] = p_sp;
 		}
 #  endif
-		if (do_srr)
+		إذا (do_srr)
 		{
 		    p_srr = (char_u *)"2>&1 | Out-File -Encoding default";
 		    options[idx_srr].def_val[VI_DEFAULT] = p_srr;
 		}
 	}
 # endif
-	else
+	وإلا
 	    // Always use POSIX shell style redirection if we reach this
-	    if (       fnamecmp(p, "sh") == 0
+	    إذا (       fnamecmp(p, "sh") == 0
 		    || fnamecmp(p, "ksh") == 0
 		    || fnamecmp(p, "mksh") == 0
 		    || fnamecmp(p, "pdksh") == 0
@@ -1246,21 +1246,21 @@ set_init_3(void)
 # endif
 		    )
 	    {
-# if defined(FEAT_QUICKFIX)
-		if (do_sp)
+# إذا defined(FEAT_QUICKFIX)
+		إذا (do_sp)
 		{
 #  ifdef MSWIN
 		    p_sp = (char_u *)">%s 2>&1";
-#  else
-		    if (fnamecmp(p, "pwsh") == 0)
+#  وإلا
+		    إذا (fnamecmp(p, "pwsh") == 0)
 			p_sp = (char_u *)">%s 2>&1";
-		    else
+		    وإلا
 			p_sp = (char_u *)"2>&1| tee";
 #  endif
 		    options[idx_sp].def_val[VI_DEFAULT] = p_sp;
 		}
 # endif
-		if (do_srr)
+		إذا (do_srr)
 		{
 		    p_srr = (char_u *)">%s 2>&1";
 		    options[idx_srr].def_val[VI_DEFAULT] = p_srr;
@@ -1268,9 +1268,9 @@ set_init_3(void)
 	    }
 	vim_free(p);
     }
-#endif
+#پایان_اگر
 
-#if defined(MSWIN)
+#إذا defined(MSWIN)
     /*
      * Set 'shellcmdflag', 'shellxquote', and 'shellquote' depending on the
      * 'shell' option.
@@ -1286,30 +1286,30 @@ set_init_3(void)
      *
      * For Win32 p_sxq is set instead of p_shq to include shell redirection.
      */
-    if (strstr((char *)gettail(p_sh), "powershell") != NULL)
+    إذا (جستجوی_رشته((حرف *)gettail(p_sh), "powershell") != عدم)
     {
-	int	idx_opt;
+	صحيح	idx_opt;
 
 	idx_opt = findoption((char_u *)"shcf");
-	if (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_SET))
+	إذا (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_مجموعه))
 	{
 	    p_shcf = (char_u*)"-Command";
 	    options[idx_opt].def_val[VI_DEFAULT] = p_shcf;
 	}
 
 	idx_opt = findoption((char_u *)"sxq");
-	if (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_SET))
+	إذا (idx_opt >= 0 && !(options[idx_opt].flags & P_WAS_مجموعه))
 	{
 	    p_sxq = (char_u*)"\"";
 	    options[idx_opt].def_val[VI_DEFAULT] = p_sxq;
 	}
     }
-    else if (strstr((char *)gettail(p_sh), "sh") != NULL)
+    وإلا إذا (جستجوی_رشته((حرف *)gettail(p_sh), "sh") != عدم)
     {
-	int	idx3;
+	صحيح	idx3;
 
 	idx3 = findoption((char_u *)"shcf");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	إذا (idx3 >= 0 && !(options[idx3].flags & P_WAS_مجموعه))
 	{
 	    p_shcf = (char_u *)"-c";
 	    options[idx3].def_val[VI_DEFAULT] = p_shcf;
@@ -1317,15 +1317,15 @@ set_init_3(void)
 
 	// Somehow Win32 requires the quotes around the redirection too
 	idx3 = findoption((char_u *)"sxq");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	إذا (idx3 >= 0 && !(options[idx3].flags & P_WAS_مجموعه))
 	{
 	    p_sxq = (char_u *)"\"";
 	    options[idx3].def_val[VI_DEFAULT] = p_sxq;
 	}
     }
-    else if (strstr((char *)gettail(p_sh), "cmd.exe") != NULL)
+    وإلا إذا (جستجوی_رشته((حرف *)gettail(p_sh), "cmd.exe") != عدم)
     {
-	int	idx3;
+	صحيح	idx3;
 
 	/*
 	 * cmd.exe on Windows will strip the first and last double quote given
@@ -1341,70 +1341,70 @@ set_init_3(void)
 	 * '"path with spaces/cmd" "a&b"'.
 	 */
 	idx3 = findoption((char_u *)"sxq");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	إذا (idx3 >= 0 && !(options[idx3].flags & P_WAS_مجموعه))
 	{
 	    p_sxq = (char_u *)"(";
 	    options[idx3].def_val[VI_DEFAULT] = p_sxq;
 	}
 
 	idx3 = findoption((char_u *)"shcf");
-	if (idx3 >= 0 && !(options[idx3].flags & P_WAS_SET))
+	إذا (idx3 >= 0 && !(options[idx3].flags & P_WAS_مجموعه))
 	{
 	    p_shcf = (char_u *)"/c";
 	    options[idx3].def_val[VI_DEFAULT] = p_shcf;
 	}
     }
-#endif
+#پایان_اگر
 
-    if (BUFEMPTY())
+    إذا (BUFEMPTY())
     {
-	int idx_ffs = findoption((char_u *)"ffs");
+	صحيح idx_ffs = findoption((char_u *)"ffs");
 
 	// Apply the first entry of 'fileformats' to the initial buffer.
-	if (idx_ffs >= 0 && (options[idx_ffs].flags & P_WAS_SET))
-	    set_fileformat(default_fileformat(), OPT_LOCAL);
+	إذا (idx_ffs >= 0 && (options[idx_ffs].flags & P_WAS_مجموعه))
+	    مجموعه_fileformat(default_fileformat(), OPT_LOCAL);
     }
 
-    set_title_defaults();
+    مجموعه_title_defaults();
 }
 
-#if defined(FEAT_MULTI_LANG)
+#إذا defined(FEAT_MULTI_LANG)
 /*
  * When 'helplang' is still at its default value, set it to "lang".
  * Only the first two characters of "lang" are used.
  */
-    void
-set_helplang_default(char_u *lang)
+    فراغ
+مجموعه_helplang_default(char_u *lang)
 {
-    int		idx;
+    صحيح		idx;
     size_t	langlen;
 
-    if (lang == NULL)	// safety check
-	return;
+    إذا (lang == عدم)	// safety check
+	أرجع;
 
     langlen = STRLEN(lang);
-    if (langlen < 2)	// safety check
-	return;
+    إذا (langlen < 2)	// safety check
+	أرجع;
 
     idx = findoption((char_u *)"hlg");
-    if (idx < 0 || (options[idx].flags & P_WAS_SET))
-	return;
+    إذا (idx < 0 || (options[idx].flags & P_WAS_مجموعه))
+	أرجع;
 
-    if (options[idx].flags & P_ALLOCED)
+    إذا (options[idx].flags & P_ALLOCED)
 	free_string_option(p_hlg);
     p_hlg = vim_strnsave(lang, langlen);
-    if (p_hlg == NULL)
-	p_hlg = empty_option;
-    else
+    إذا (p_hlg == عدم)
+	p_hlg = خالی_option;
+    وإلا
     {
 	// zh_CN becomes "cn", zh_TW becomes "tw"
-	if (STRNICMP(p_hlg, "zh_", 3) == 0 && langlen >= 5)
+	إذا (STRNICMP(p_hlg, "zh_", 3) == 0 && langlen >= 5)
 	{
 	    p_hlg[0] = TOLOWER_ASC(p_hlg[3]);
 	    p_hlg[1] = TOLOWER_ASC(p_hlg[4]);
 	}
 	// any C like setting, such as C.UTF-8, becomes "en"
-	else if (langlen >= 1 && *p_hlg == 'C')
+	وإلا إذا (langlen >= 1 && *p_hlg == 'C')
 	{
 	    p_hlg[0] = 'e';
 	    p_hlg[1] = 'n';
@@ -1413,7 +1413,7 @@ set_helplang_default(char_u *lang)
     }
     options[idx].flags |= P_ALLOCED;
 }
-#endif
+#پایان_اگر
 
 /*
  * 'title' and 'icon' only default to true if they have not been set or reset
@@ -1422,95 +1422,95 @@ set_helplang_default(char_u *lang)
  * they can be reset.  This reduces startup time when using X on a remote
  * machine.
  */
-    void
-set_title_defaults(void)
+    فراغ
+مجموعه_title_defaults(فراغ)
 {
-    int	    idx1;
-    long    val;
+    صحيح	    idx1;
+    دراز    val;
 
     // If GUI is (going to be) used, we can always set the window title and
     // icon name.  Saves a bit of time, because the X11 display server does
     // not need to be contacted.
     idx1 = findoption((char_u *)"title");
-    if (idx1 >= 0 && !(options[idx1].flags & P_WAS_SET))
+    إذا (idx1 >= 0 && !(options[idx1].flags & P_WAS_مجموعه))
     {
-#ifdef FEAT_GUI
-	if (gui.starting || gui.in_use)
+#اگر_تعریف_شده FEAT_GUI
+	إذا (gui.starting || gui.درون_use)
 	    val = TRUE;
-	else
-#endif
+	وإلا
+#پایان_اگر
 	    val = mch_can_restore_title();
 	options[idx1].def_val[VI_DEFAULT] = (char_u *)(long_i)val;
 	p_title = val;
     }
     idx1 = findoption((char_u *)"icon");
-    if (idx1 < 0 || (options[idx1].flags & P_WAS_SET))
+    إذا (idx1 < 0 || (options[idx1].flags & P_WAS_مجموعه))
     {
-	return;
+	أرجع;
     }
 
-#ifdef FEAT_GUI
-    if (gui.starting || gui.in_use)
+#اگر_تعریف_شده FEAT_GUI
+    إذا (gui.starting || gui.درون_use)
 	val = TRUE;
-    else
-#endif
+    وإلا
+#پایان_اگر
 	val = mch_can_restore_icon();
     options[idx1].def_val[VI_DEFAULT] = (char_u *)(long_i)val;
     p_icon = val;
 }
 
-    void
-ex_set(exarg_T *eap)
+    فراغ
+ex_مجموعه(exarg_T *eap)
 {
-    int		flags = 0;
+    صحيح		flags = 0;
 
-    if (eap->cmdidx == CMD_setlocal)
+    إذا (eap->cmdidx == CMD_setlocal)
 	flags = OPT_LOCAL;
-    else if (eap->cmdidx == CMD_setglobal)
+    وإلا إذا (eap->cmdidx == CMD_setglobal)
 	flags = OPT_GLOBAL;
-#if defined(FEAT_EVAL) && defined(FEAT_BROWSE)
-    if ((cmdmod.cmod_flags & CMOD_BROWSE) && flags == 0)
+#إذا defined(FEAT_EVAL) && defined(FEAT_BROWSE)
+    إذا ((cmdmod.cmod_flags & CMOD_BROWSE) && flags == 0)
 	ex_options(eap);
-    else
-#endif
+    وإلا
+#پایان_اگر
     {
-	if (eap->forceit)
+	إذا (eap->forceit)
 	    flags |= OPT_ONECOLUMN;
-	(void)do_set(eap->arg, flags);
+	(فراغ)do_مجموعه(eap->arg, flags);
     }
 }
 
 /*
  * :set boolean option prefix
  */
-typedef enum {
-    PREFIX_NO = 0,	// "no" prefix
-    PREFIX_NONE,	// no prefix
-    PREFIX_INV,		// "inv" prefix
-} set_prefix_T;
+تعريفنوع تعداد {
+    پیشوند_NO = 0,	// "no" prefix
+    پیشوند_NONE,	// no prefix
+    پیشوند_INV,		// "inv" prefix
+} مجموعه_پیشوند_T;
 
 /*
  * Return the prefix type for the option name in *argp.
  */
-    static set_prefix_T
-get_option_prefix(char_u **argp)
+    ساكن مجموعه_پیشوند_T
+get_option_پیشوند(char_u **argp)
 {
-    int		prefix = PREFIX_NONE;
+    صحيح		پیشوند = پیشوند_NONE;
     char_u	*arg = *argp;
 
-    if (STRNCMP(arg, "no", 2) == 0 && STRNCMP(arg, "novice", 6) != 0)
+    إذا (STRNCMP(arg, "no", 2) == 0 && STRNCMP(arg, "novice", 6) != 0)
     {
-	prefix = PREFIX_NO;
+	پیشوند = پیشوند_NO;
 	arg += 2;
     }
-    else if (STRNCMP(arg, "inv", 3) == 0)
+    وإلا إذا (STRNCMP(arg, "inv", 3) == 0)
     {
-	prefix = PREFIX_INV;
+	پیشوند = پیشوند_INV;
 	arg += 3;
     }
 
     *argp = arg;
-    return prefix;
+    أرجع پیشوند;
 }
 
 /*
@@ -1521,84 +1521,84 @@ get_option_prefix(char_u **argp)
  * Returns FAIL if an option starting with "<" doesn't end with a ">",
  * otherwise returns OK.
  */
-    static int
-parse_option_name(char_u *arg, int *opt_idxp, int *lenp, int *keyp)
+    ساكن صحيح
+parse_option_name(char_u *arg, صحيح *opt_idxp, صحيح *lenp, صحيح *keyp)
 {
-    int	key = 0;
-    int	len;
-    int	opt_idx;
+    صحيح	کلید = 0;
+    صحيح	len;
+    صحيح	opt_idx;
 
-    if (*arg == '<')
+    إذا (*arg == '<')
     {
 	opt_idx = -1;
 	// look out for <t_>;>
-	if (arg[1] == 't' && arg[2] == '_' && arg[3] && arg[4])
+	إذا (arg[1] == 't' && arg[2] == '_' && arg[3] && arg[4])
 	    len = 5;
-	else
+	وإلا
 	{
 	    len = 1;
-	    while (arg[len] != NUL && arg[len] != '>')
+	    طالما (arg[len] != NUL && arg[len] != '>')
 		++len;
 	}
-	if (arg[len] != '>')
-	    return FAIL;
+	إذا (arg[len] != '>')
+	    أرجع FAIL;
 
 	arg[len] = NUL;			    // put NUL after name
-	if (arg[1] == 't' && arg[2] == '_') // could be term code
+	إذا (arg[1] == 't' && arg[2] == '_') // could be term code
 	    opt_idx = findoption(arg + 1);
 	arg[len++] = '>';		    // restore '>'
-	if (opt_idx == -1)
-	    key = find_key_option(arg + 1, TRUE);
+	إذا (opt_idx == -1)
+	    کلید = پیدا_کن_کلید_option(arg + 1, TRUE);
     }
-    else
+    وإلا
     {
-	int	nextchar;   // next non-white char after option name
+	صحيح	nextchar;   // next non-white char after option name
 
 	len = 0;
 	// The two characters after "t_" may not be alphanumeric.
-	if (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
+	إذا (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
 	    len = 4;
-	else
-	    while (ASCII_ISALNUM(arg[len]) || arg[len] == '_')
+	وإلا
+	    طالما (ASCII_ISALNUM(arg[len]) || arg[len] == '_')
 		++len;
 	nextchar = arg[len];
 	arg[len] = NUL;			    // put NUL after name
 	opt_idx = findoption(arg);
 	arg[len] = nextchar;		    // restore nextchar
-	if (opt_idx == -1)
-	    key = find_key_option(arg, FALSE);
+	إذا (opt_idx == -1)
+	    کلید = پیدا_کن_کلید_option(arg, FALSE);
     }
 
-    *keyp = key;
+    *keyp = کلید;
     *lenp = len;
     *opt_idxp = opt_idx;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Get the option operator (+=, ^=, -=).
  */
-    static set_op_T
+    ساكن مجموعه_op_T
 get_opt_op(char_u *arg)
 {
-    set_op_T op = OP_NONE;
+    مجموعه_op_T op = OP_NONE;
 
-    if (*arg != NUL && *(arg + 1) == '=')
+    إذا (*arg != NUL && *(arg + 1) == '=')
     {
-	if (*arg == '+')
+	إذا (*arg == '+')
 	    op = OP_ADDING;		// "+="
-	else if (*arg == '^')
+	وإلا إذا (*arg == '^')
 	    op = OP_PREPENDING;		// "^="
-	else if (*arg == '-')
+	وإلا إذا (*arg == '-')
 	    op = OP_REMOVING;		// "-="
     }
 
-    return op;
+    أرجع op;
 }
 
 // Options that are allowed in a modeline when 'modelinestrict' is on.
-static char *modeline_whitelist[] =
+ساكن حرف *modeline_whitelist[] =
 {
     "autoindent",
     "cindent",
@@ -1621,19 +1621,19 @@ static char *modeline_whitelist[] =
     "textwidth",
     "varsofttabstop",
     "vartabstop",
-    NULL
+    عدم
 };
 
 /*
  * Return TRUE if option "name" is in the modeline whitelist.
  */
-    static bool
-is_modeline_whitelisted(char *name)
+    ساكن bool
+is_modeline_whitelisted(حرف *name)
 {
-    for (int i = 0; modeline_whitelist[i] != NULL; i++)
-	if (STRCMP(name, modeline_whitelist[i]) == 0)
-	    return true;
-    return false;
+    لكل (صحيح i = 0; modeline_whitelist[i] != عدم; i++)
+	إذا (STRCMP(name, modeline_whitelist[i]) == 0)
+	    أرجع true;
+    أرجع false;
 }
 
 /*
@@ -1641,123 +1641,123 @@ is_modeline_whitelisted(char *name)
  * Returns FAIL if the option can be skipped or cannot be changed. Returns OK
  * if it can be changed.
  */
-    static int
+    ساكن صحيح
 validate_opt_idx(
-	int opt_idx,
-	int opt_flags,
+	صحيح opt_idx,
+	صحيح opt_flags,
 	long_u flags,
-	char **errmsg,
-	set_prefix_T prefix)
+	حرف **errmsg,
+	مجموعه_پیشوند_T پیشوند)
 {
     // Skip all options that are not window-local (used when showing
     // an already loaded buffer in a window).
-    if ((opt_flags & OPT_WINONLY)
+    إذا ((opt_flags & OPT_WINONLY)
 	    && (opt_idx < 0 || options[opt_idx].var != VAR_WIN))
-	return FAIL;
+	أرجع FAIL;
 
     // Skip all options that are window-local (used for :vimgrep).
-    if ((opt_flags & OPT_NOWIN) && opt_idx >= 0
+    إذا ((opt_flags & OPT_NOWIN) && opt_idx >= 0
 	    && options[opt_idx].var == VAR_WIN)
-	return FAIL;
+	أرجع FAIL;
 
     // Disallow changing some options from modelines.
-    if (opt_flags & OPT_MODELINE)
+    إذا (opt_flags & OPT_MODELINE)
     {
-	if (flags & (P_SECURE | P_NO_ML))
+	إذا (flags & (P_SECURE | P_NO_ML))
 	{
-	    *errmsg = e_not_allowed_in_modeline;
-	    return FAIL;
+	    *errmsg = e_not_allowed_درون_modeline;
+	    أرجع FAIL;
 	}
-	if ((flags & P_MLE) && !p_mle)
+	إذا ((flags & P_MLE) && !p_mle)
 	{
-	    *errmsg = e_not_allowed_in_modeline_when_modelineexpr_is_off;
-	    return FAIL;
+	    *errmsg = e_not_allowed_درون_modeline_when_modelineexpr_is_off;
+	    أرجع FAIL;
 	}
 	// When 'modelinestrict' is on, only whitelisted options may be
 	// set from a modeline.  Silently skip others.
-	if (p_mlstr && opt_idx >= 0)
+	إذا (p_mlstr && opt_idx >= 0)
 	{
 	    // special case: allow disabling modeline
-	    if (options[opt_idx].indir == PV_ML && prefix == PREFIX_NO)
-		return OK;
-	    else if (!is_modeline_whitelisted(options[opt_idx].fullname))
-		return FAIL;
+	    إذا (options[opt_idx].indir == PV_ML && پیشوند == پیشوند_NO)
+		أرجع OK;
+	    وإلا إذا (!is_modeline_whitelisted(options[opt_idx].fullname))
+		أرجع FAIL;
 	}
-#ifdef FEAT_DIFF
+#اگر_تعریف_شده FEAT_DIFF
 	// In diff mode some options are overruled.  This avoids that
 	// 'foldmethod' becomes "marker" instead of "diff" and that
 	// "wrap" gets set.
-	if (curwin->w_p_diff
+	إذا (curwin->w_p_diff
 		&& opt_idx >= 0  // shut up coverity warning
 		&& (
 # ifdef FEAT_FOLDING
 		    options[opt_idx].indir == PV_FDM ||
 # endif
 		    options[opt_idx].indir == PV_WRAP))
-	    return FAIL;
-#endif
+	    أرجع FAIL;
+#پایان_اگر
     }
 
-#ifdef HAVE_SANDBOX
+#اگر_تعریف_شده HAVE_SANDBOX
     // Disallow changing some options in the sandbox
-    if (sandbox != 0 && (flags & P_SECURE))
+    إذا (sandbox != 0 && (flags & P_SECURE))
     {
-	*errmsg = e_not_allowed_in_sandbox;
-	return FAIL;
+	*errmsg = e_not_allowed_درون_sandbox;
+	أرجع FAIL;
     }
-#endif
+#پایان_اگر
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Get the Vim/Vi default value for a string option.
  */
-    static char_u *
+    ساكن char_u *
 stropt_get_default_val(
-    int		opt_idx,
+    صحيح		opt_idx,
     char_u	*varp,
-    int		flags,
-    int		cp_val)
+    صحيح		flags,
+    صحيح		cp_val)
 {
     char_u	*newval;
 
     newval = options[opt_idx].def_val[((flags & P_VI_DEF) || cp_val)
 	? VI_DEFAULT : VIM_DEFAULT];
-    if ((char_u **)varp == &p_bg)
+    إذا ((char_u **)varp == &p_bg)
     {
 	// guess the value of 'background'
-#ifdef FEAT_GUI
-	if (gui.in_use)
+#اگر_تعریف_شده FEAT_GUI
+	إذا (gui.درون_use)
 	    newval = gui_bg_default();
-	else
-#endif
-	    newval = term_bg_default();
+	وإلا
+#پایان_اگر
+	    newval = جمله_bg_default();
     }
-    else if ((char_u **)varp == &p_fencs && enc_utf8)
+    وإلا إذا ((char_u **)varp == &p_fencs && enc_utf8)
 	newval = fencs_utf8_default;
 
     // expand environment variables and ~ since the default value was
     // already expanded, only required when an environment variable was set
     // later
-    if (newval == NULL)
-	newval = empty_option;
-    else
+    إذا (newval == عدم)
+	newval = خالی_option;
+    وإلا
     {
 	char_u *s = option_expand(opt_idx, newval);
-	if (s == NULL)
+	إذا (s == عدم)
 	    s = newval;
 	newval = vim_strsave(s);
     }
 
-    return newval;
+    أرجع newval;
 }
 
 /*
  * Convert the 'backspace' option number value to a string: for adding,
  * prepending and removing string.
  */
-    static void
+    ساكن فراغ
 opt_backspace_nr2str(
     char_u	*varp,
     char_u	**origval_p,
@@ -1765,29 +1765,29 @@ opt_backspace_nr2str(
     char_u	**origval_g_p,
     char_u	**oldval_p)
 {
-    int		i = getdigits((char_u **)varp);
+    صحيح		i = getdigits((char_u **)varp);
 
-    switch (i)
+    بدل (i)
     {
-	case 0:
-	    *(char_u **)varp = empty_option;
-	    break;
-	case 1:
+	حالة 0:
+	    *(char_u **)varp = خالی_option;
+	    اكسر;
+	حالة 1:
 	    *(char_u **)varp = vim_strnsave((char_u *)"indent,eol", STRLEN_LITERAL("indent,eol"));
-	    break;
-	case 2:
+	    اكسر;
+	حالة 2:
 	    *(char_u **)varp = vim_strnsave((char_u *)"indent,eol,start", STRLEN_LITERAL("indent,eol,start"));
-	    break;
-	case 3:
+	    اكسر;
+	حالة 3:
 	    *(char_u **)varp = vim_strnsave((char_u *)"indent,eol,nostop", STRLEN_LITERAL("indent,eol,nostop"));
-	    break;
+	    اكسر;
     }
     vim_free(*oldval_p);
-    if (*origval_p == *oldval_p)
+    إذا (*origval_p == *oldval_p)
 	*origval_p = *(char_u **)varp;
-    if (*origval_l_p == *oldval_p)
+    إذا (*origval_l_p == *oldval_p)
 	*origval_l_p = *(char_u **)varp;
-    if (*origval_g_p == *oldval_p)
+    إذا (*origval_g_p == *oldval_p)
 	*origval_g_p = *(char_u **)varp;
     *oldval_p = *(char_u **)varp;
 }
@@ -1797,42 +1797,42 @@ opt_backspace_nr2str(
  * compatibility with Vim 3.0.
  * Note: 'argp' is a pointer to a char_u pointer and is updated.
  */
-    static char_u *
+    ساكن char_u *
 opt_whichwrap_nr2str(char_u **argp, char_u *whichwrap)
 {
     size_t  len = 0;
 
     *whichwrap = NUL;
-    int i = getdigits(argp);
-    if (i & 1)
+    صحيح i = getdigits(argp);
+    إذا (i & 1)
     {
 	STRCPY(whichwrap, "b,");
 	len += 2;
     }
-    if (i & 2)
+    إذا (i & 2)
     {
 	STRCPY(whichwrap + len, "s,");
 	len += 2;
     }
-    if (i & 4)
+    إذا (i & 4)
     {
 	STRCPY(whichwrap + len, "h,l,");
 	len += 4;
     }
-    if (i & 8)
+    إذا (i & 8)
     {
 	STRCPY(whichwrap + len, "<,>,");
 	len += 4;
     }
-    if (i & 16)
+    إذا (i & 16)
     {
 	STRCPY(whichwrap + len, "[,],");
 	len += 4;
     }
-    if (*whichwrap != NUL)	// remove trailing ,
+    إذا (*whichwrap != NUL)	// remove trailing ,
 	whichwrap[len - 1] = NUL;
 
-    return whichwrap;
+    أرجع whichwrap;
 }
 
 /*
@@ -1840,25 +1840,25 @@ opt_whichwrap_nr2str(char_u **argp, char_u *whichwrap)
  * Can't use set_string_option_direct(), because we need to remove the
  * backslashes.
  */
-    static char_u *
-stropt_copy_value(
+    ساكن char_u *
+stropt_copy_مقدار(
     char_u	*origval,
     char_u	**argp,
-    set_op_T	op,
-    int		flags UNUSED)
+    مجموعه_op_T	op,
+    صحيح		flags استفادهنشده)
 {
     char_u	*arg = *argp;
-    unsigned	newlen;
+    بیعلامت	newlen;
     char_u	*newval;
-    char_u	*s = NULL;
+    char_u	*s = عدم;
 
     // get a bit too much
-    newlen = (unsigned)STRLEN(arg) + 1;
-    if (op != OP_NONE)
-	newlen += (unsigned)STRLEN(origval) + 1;
+    newlen = (بیعلامت)STRLEN(arg) + 1;
+    إذا (op != OP_NONE)
+	newlen += (بیعلامت)STRLEN(origval) + 1;
     newval = alloc(newlen);
-    if (newval == NULL)  // out of mem, don't change
-	return NULL;
+    إذا (newval == عدم)  // out of mem, don't change
+	أرجع عدم;
     s = newval;
 
     // Copy the string, skip over escaped chars.
@@ -1866,83 +1866,83 @@ stropt_copy_value(
     // are not removed, and keep backslash at start, for "\\machine\path",
     // but do remove it for "\\\\machine\\path".
     // The reverse is found in escape_option_str_cmdline().
-    while (*arg != NUL && !VIM_ISWHITE(*arg))
+    طالما (*arg != NUL && !VIM_ISWHITE(*arg))
     {
-	int i;
+	صحيح i;
 
-	if (*arg == '\\' && arg[1] != NUL
-#ifdef BACKSLASH_IN_FILENAME
+	إذا (*arg == '\\' && arg[1] != NUL
+#اگر_تعریف_شده BACKSLASH_درون_FILENAME
 		&& !((flags & P_EXPAND)
 		    && vim_isfilec(arg[1])
 		    && !VIM_ISWHITE(arg[1])
 		    && (arg[1] != '\\'
 			|| (s == newval && arg[2] != '\\')))
-#endif
+#پایان_اگر
 	   )
 	    ++arg;	// remove backslash
-	if (has_mbyte && (i = (*mb_ptr2len)(arg)) > 1)
+	إذا (has_mbyte && (i = (*mb_ptr2len)(arg)) > 1)
 	{
 	    // copy multibyte char
 	    mch_memmove(s, arg, (size_t)i);
 	    arg += i;
 	    s += i;
 	}
-	else
+	وإلا
 	    *s++ = *arg++;
     }
     *s = NUL;
 
     *argp = arg;
-    return newval;
+    أرجع newval;
 }
 
 /*
  * Expand environment variables and ~ in string option value 'newval'.
  */
-    static char_u *
+    ساكن char_u *
 stropt_expand_envvar(
-    int		opt_idx,
+    صحيح		opt_idx,
     char_u	*origval,
     char_u	*newval,
-    set_op_T	op)
+    مجموعه_op_T	op)
 {
     char_u *s = option_expand(opt_idx, newval);
-    if (s == NULL)
-	return newval;
+    إذا (s == عدم)
+	أرجع newval;
 
     vim_free(newval);
-    unsigned newlen = (unsigned)STRLEN(s) + 1;
-    if (op != OP_NONE)
-	newlen += (unsigned)STRLEN(origval) + 1;
+    بیعلامت newlen = (بیعلامت)STRLEN(s) + 1;
+    إذا (op != OP_NONE)
+	newlen += (بیعلامت)STRLEN(origval) + 1;
 
     newval = alloc(newlen);
-    if (newval == NULL)
-	return NULL;
+    إذا (newval == عدم)
+	أرجع عدم;
 
     STRCPY(newval, s);
 
-    return newval;
+    أرجع newval;
 }
 
 /*
  * Concatenate the original and new values of a string option, adding a "," if
  * needed.
  */
-    static void
+    ساكن فراغ
 stropt_concat_with_comma(
     char_u	*origval,
     char_u	*newval,
-    set_op_T	op,
-    int		flags)
+    مجموعه_op_T	op,
+    صحيح		flags)
 {
-    int		len = 0;
+    صحيح		len = 0;
 
-    int comma = ((flags & P_COMMA) && *origval != NUL && *newval != NUL);
-    if (op == OP_ADDING)
+    صحيح comma = ((flags & P_COMMA) && *origval != NUL && *newval != NUL);
+    إذا (op == OP_ADDING)
     {
-	len = (int)STRLEN(origval);
+	len = (صحيح)STRLEN(origval);
 	// strip a trailing comma, would get 2
-	if (comma && len > 1
+	إذا (comma && len > 1
 		&& (flags & P_ONECOMMA) == P_ONECOMMA
 		&& origval[len - 1] == ','
 		&& origval[len - 2] != '\\')
@@ -1950,12 +1950,12 @@ stropt_concat_with_comma(
 	mch_memmove(newval + len + comma, newval, STRLEN(newval) + 1);
 	mch_memmove(newval, origval, (size_t)len);
     }
-    else
+    وإلا
     {
-	len = (int)STRLEN(newval);
+	len = (صحيح)STRLEN(newval);
 	STRMOVE(newval + len + comma, origval);
     }
-    if (comma)
+    إذا (comma)
 	newval[len] = ',';
 }
 
@@ -1963,29 +1963,29 @@ stropt_concat_with_comma(
  * Remove a value from a string option.  Copy string option value in "origval"
  * to "newval" and then remove the string "strval" of length "len".
  */
-    static void
+    ساكن فراغ
 stropt_remove_val(
     char_u	*origval,
     char_u	*newval,
-    int		flags,
+    صحيح		flags,
     char_u	*strval,
-    int		len)
+    صحيح		len)
 {
     // Remove newval[] from origval[]. (Note: "len" has been set above
     // and is used here).
     STRCPY(newval, origval);
-    if (*strval)
+    إذا (*strval)
     {
 	// may need to remove a comma
-	if (flags & P_COMMA)
+	إذا (flags & P_COMMA)
 	{
-	    if (strval == origval)
+	    إذا (strval == origval)
 	    {
 		// include comma after string
-		if (strval[len] == ',')
+		إذا (strval[len] == ',')
 		    ++len;
 	    }
-	    else
+	    وإلا
 	    {
 		// include comma before string
 		--strval;
@@ -2002,71 +2002,71 @@ stropt_remove_val(
  * Returns a pointer to the found item in "src", or NULL if not found.
  * Sets "*itemlenp" to the length of the found item (up to ',' or NUL).
  */
-    static char_u *
-find_key_item(char_u *src, char_u *key, int keylen, int *itemlenp)
+    ساكن char_u *
+پیدا_کن_کلید_قلم(char_u *src, char_u *کلید, صحيح keylen, صحيح *itemlenp)
 {
     char_u  *p = src;
 
-    while (*p != NUL)
+    طالما (*p != NUL)
     {
 	// Check if this item starts with the same key
-	if ((p == src || *(p - 1) == ',')
-		&& STRNCMP(p, key, keylen) == 0)
+	إذا ((p == src || *(p - 1) == ',')
+		&& STRNCMP(p, کلید, keylen) == 0)
 	{
 	    // Find the end of this item
-	    char_u *end = vim_strchr(p, ',');
-	    if (end == NULL)
-		end = p + STRLEN(p);
-	    *itemlenp = (int)(end - p);
-	    return p;
+	    char_u *انتها = vim_strchr(p, ',');
+	    إذا (انتها == عدم)
+		انتها = p + STRLEN(p);
+	    *itemlenp = (صحيح)(انتها - p);
+	    أرجع p;
 	}
 	++p;
     }
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Remove one item of length "itemlen" at position "item" from comma-separated
  * string "str" in-place.  Handles the comma before or after the item.
  */
-    static void
-remove_comma_item(char_u *str, char_u *item, int itemlen)
+    ساكن فراغ
+remove_comma_قلم(char_u *str, char_u *قلم, صحيح itemlen)
 {
-    if (item[itemlen] == ',')
+    إذا (قلم[itemlen] == ',')
 	// Remove item and trailing comma
-	STRMOVE(item, item + itemlen + 1);
-    else if (item > str && *(item - 1) == ',')
+	STRMOVE(قلم, قلم + itemlen + 1);
+    وإلا إذا (قلم > str && *(قلم - 1) == ',')
 	// Last item: remove leading comma and item
-	STRMOVE(item - 1, item + itemlen);
-    else
+	STRMOVE(قلم - 1, قلم + itemlen);
+    وإلا
 	// Only item
-	*item = NUL;
+	*قلم = NUL;
 }
 
 /*
  * Remove all items matching "key" (with ':') from comma-separated string "str"
  * in-place.  If "skip" is not NULL, the item at that position is kept.
  */
-    static void
-remove_key_item(char_u *str, char_u *key, int keylen, char_u *skip)
+    ساكن فراغ
+remove_کلید_قلم(char_u *str, char_u *کلید, صحيح keylen, char_u *skip)
 {
-    int	    itemlen;
-    char_u  *found;
+    صحيح	    itemlen;
+    char_u  *یافت;
 
-    while ((found = find_key_item(str, key, keylen, &itemlen)) != NULL)
+    طالما ((یافت = پیدا_کن_کلید_قلم(str, کلید, keylen, &itemlen)) != عدم)
     {
-	if (found == skip)
+	إذا (یافت == skip)
 	{
 	    // Search for the next match after this one.
-	    char_u *next = found + itemlen;
-	    if (*next == ',')
-		++next;
-	    found = find_key_item(next, key, keylen, &itemlen);
-	    if (found == NULL)
-		break;
+	    char_u *بعدی = یافت + itemlen;
+	    إذا (*بعدی == ',')
+		++بعدی;
+	    یافت = پیدا_کن_کلید_قلم(بعدی, کلید, keylen, &itemlen);
+	    إذا (یافت == عدم)
+		اكسر;
 	}
 
-	remove_comma_item(str, found, itemlen);
+	remove_comma_قلم(str, یافت, itemlen);
     }
 }
 
@@ -2074,31 +2074,31 @@ remove_key_item(char_u *str, char_u *key, int keylen, char_u *skip)
  * Append a comma-separated item to the end of "str" in-place.
  * Adds a comma before the item if "str" is not empty.
  */
-    static void
-append_item(char_u *str, char_u *item, int item_len)
+    ساكن فراغ
+append_قلم(char_u *str, char_u *قلم, صحيح قلم_len)
 {
-    int len = (int)STRLEN(str);
+    صحيح len = (صحيح)STRLEN(str);
 
-    if (len > 0)
+    إذا (len > 0)
 	str[len++] = ',';
-    mch_memmove(str + len, item, (size_t)item_len);
-    str[len + item_len] = NUL;
+    mch_memmove(str + len, قلم, (size_t)قلم_len);
+    str[len + قلم_len] = NUL;
 }
 
 /*
  * Prepend a comma-separated item to the beginning of "str" in-place.
  * Adds a comma after the item if "str" is not empty.
  */
-    static void
-prepend_item(char_u *str, char_u *item, int item_len)
+    ساكن فراغ
+prepend_قلم(char_u *str, char_u *قلم, صحيح قلم_len)
 {
-    int len = (int)STRLEN(str);
-    int comma = (len > 0) ? 1 : 0;
+    صحيح len = (صحيح)STRLEN(str);
+    صحيح comma = (len > 0) ? 1 : 0;
 
-    mch_memmove(str + item_len + comma, str, (size_t)len + 1);
-    mch_memmove(str, item, (size_t)item_len);
-    if (comma)
-	str[item_len] = ',';
+    mch_memmove(str + قلم_len + comma, str, (size_t)len + 1);
+    mch_memmove(str, قلم, (size_t)قلم_len);
+    إذا (comma)
+	str[قلم_len] = ',';
 }
 
 /*
@@ -2121,150 +2121,150 @@ prepend_item(char_u *str, char_u *item, int item_len)
  * normal add/remove logic).  Returns false if newval is a single non-colon
  * item, meaning the caller should use the existing code path.
  */
-    static bool
+    ساكن bool
 stropt_handle_keymatch(
     char_u	*origval,
     char_u	*newval,
-    set_op_T	op,
-    int		flags UNUSED)
+    مجموعه_op_T	op,
+    صحيح		flags استفادهنشده)
 {
     char_u  *p;
-    char_u  *item_start;
+    char_u  *قلم_شروع;
 
     // Check if newval contains any "key:value" item or multiple
     // comma-separated items.  If neither, let the caller use the existing
     // code path.
-    if (vim_strchr(newval, ':') == NULL && vim_strchr(newval, ',') == NULL)
-	return false;
+    إذا (vim_strchr(newval, ':') == عدم && vim_strchr(newval, ',') == عدم)
+	أرجع false;
 
     // Work on a copy of newval for iteration.
     char_u *newval_copy = vim_strsave(newval);
-    if (newval_copy == NULL)
-	return false;
+    إذا (newval_copy == عدم)
+	أرجع false;
 
     // Build the result in newval.  Start with a copy of origval, then
     // modify it per-item.  newval buffer has room for origval + arg.
     STRCPY(newval, origval);
 
     // Process each item individually, modifying newval in-place.
-    item_start = newval_copy;
-    for (;;)
+    قلم_شروع = newval_copy;
+    لكل (;;)
     {
-	p = vim_strchr(item_start, ',');
-	int item_len = (p == NULL)
-			    ? (int)STRLEN(item_start) : (int)(p - item_start);
+	p = vim_strchr(قلم_شروع, ',');
+	صحيح قلم_len = (p == عدم)
+			    ? (صحيح)STRLEN(قلم_شروع) : (صحيح)(p - قلم_شروع);
 
-	if (item_len > 0)
+	إذا (قلم_len > 0)
 	{
-	    char_u *colon = vim_strchr(item_start, ':');
-	    if (colon != NULL && colon < item_start + item_len)
+	    char_u *colon = vim_strchr(قلم_شروع, ':');
+	    إذا (colon != عدم && colon < قلم_شروع + قلم_len)
 	    {
-		int keylen = (int)(colon - item_start) + 1;
+		صحيح keylen = (صحيح)(colon - قلم_شروع) + 1;
 
-		if (op == OP_ADDING || op == OP_PREPENDING)
+		إذا (op == OP_ADDING || op == OP_PREPENDING)
 		{
-		    int old_itemlen;
-		    char_u *found = find_key_item(newval, item_start,
+		    صحيح old_itemlen;
+		    char_u *یافت = پیدا_کن_کلید_قلم(newval, قلم_شروع,
 						       keylen, &old_itemlen);
-		    if (found != NULL)
+		    إذا (یافت != عدم)
 		    {
-			if (old_itemlen == item_len
-				&& STRNCMP(found, item_start,
-							 item_len) == 0)
+			إذا (old_itemlen == قلم_len
+				&& STRNCMP(یافت, قلم_شروع,
+							 قلم_len) == 0)
 			{
 			    // Exact duplicate: keep it in place, but
 			    // remove other items with the same key.
-			    remove_key_item(newval, item_start,
-							   keylen, found);
+			    remove_کلید_قلم(newval, قلم_شروع,
+							   keylen, یافت);
 			}
-			else
+			وإلا
 			{
 			    // Key match with different value: remove all
 			    // items with the same key, then add.
-			    remove_key_item(newval, item_start,
-							    keylen, NULL);
-			    if (op == OP_PREPENDING)
-				prepend_item(newval, item_start, item_len);
-			    else
-				append_item(newval, item_start, item_len);
+			    remove_کلید_قلم(newval, قلم_شروع,
+							    keylen, عدم);
+			    إذا (op == OP_PREPENDING)
+				prepend_قلم(newval, قلم_شروع, قلم_len);
+			    وإلا
+				append_قلم(newval, قلم_شروع, قلم_len);
 			}
 		    }
-		    else
+		    وإلا
 		    {
 			// New item.
-			if (op == OP_PREPENDING)
-			    prepend_item(newval, item_start, item_len);
-			else
-			    append_item(newval, item_start, item_len);
+			إذا (op == OP_PREPENDING)
+			    prepend_قلم(newval, قلم_شروع, قلم_len);
+			وإلا
+			    append_قلم(newval, قلم_شروع, قلم_len);
 		    }
 		}
-		else if (op == OP_REMOVING)
-		    remove_key_item(newval, item_start, keylen, NULL);
+		وإلا إذا (op == OP_REMOVING)
+		    remove_کلید_قلم(newval, قلم_شروع, keylen, عدم);
 	    }
-	    else
+	    وإلا
 	    {
-		if (op == OP_ADDING || op == OP_PREPENDING)
+		إذا (op == OP_ADDING || op == OP_PREPENDING)
 		{
-		    char_u *found = find_dup_item(newval, item_start,
-							   item_len, P_COMMA);
-		    if (found == NULL)
+		    char_u *یافت = پیدا_کن_dup_قلم(newval, قلم_شروع,
+							   قلم_len, P_COMMA);
+		    إذا (یافت == عدم)
 		    {
 			// New item.
-			if (op == OP_PREPENDING)
-			    prepend_item(newval, item_start, item_len);
-			else
-			    append_item(newval, item_start, item_len);
+			إذا (op == OP_PREPENDING)
+			    prepend_قلم(newval, قلم_شروع, قلم_len);
+			وإلا
+			    append_قلم(newval, قلم_شروع, قلم_len);
 		    }
 		    // else: exact duplicate — do nothing
 		}
-		else if (op == OP_REMOVING)
+		وإلا إذا (op == OP_REMOVING)
 		{
-		    char_u *found = find_dup_item(newval, item_start,
-							   item_len, P_COMMA);
-		    if (found != NULL)
-			remove_comma_item(newval, found, item_len);
+		    char_u *یافت = پیدا_کن_dup_قلم(newval, قلم_شروع,
+							   قلم_len, P_COMMA);
+		    إذا (یافت != عدم)
+			remove_comma_قلم(newval, یافت, قلم_len);
 		}
 	    }
 	}
 
-	if (p == NULL)
-	    break;
-	item_start = p + 1;
+	إذا (p == عدم)
+	    اكسر;
+	قلم_شروع = p + 1;
     }
 
     vim_free(newval_copy);
 
-    return true;
+    أرجع true;
 }
 
 /*
  * Remove flags that appear twice in the string option value 'newval'.
  */
-    static void
-stropt_remove_dupflags(char_u *newval, int flags)
+    ساكن فراغ
+stropt_remove_dupflags(char_u *newval, صحيح flags)
 {
     char_u	*s = newval;
 
     // Remove flags that appear twice.
-    while (*s)
+    طالما (*s)
     {
 	// if options have P_FLAGLIST and P_ONECOMMA such as 'whichwrap'
-	if (flags & P_ONECOMMA)
+	إذا (flags & P_ONECOMMA)
 	{
-	    if (*s != ',' && *(s + 1) == ',' && vim_strchr(s + 2, *s) != NULL)
+	    إذا (*s != ',' && *(s + 1) == ',' && vim_strchr(s + 2, *s) != عدم)
 	    {
 		// Remove the duplicated value and the next comma.
 		STRMOVE(s, s + 2);
-		continue;
+		استمر;
 	    }
 	}
-	else
+	وإلا
 	{
-	    if ((!(flags & P_COMMA) || *s != ',')
-		    && vim_strchr(s + 1, *s) != NULL)
+	    إذا ((!(flags & P_COMMA) || *s != ',')
+		    && vim_strchr(s + 1, *s) != عدم)
 	    {
 		STRMOVE(s, s + 1);
-		continue;
+		استمر;
 	    }
 	}
 	++s;
@@ -2279,52 +2279,52 @@ stropt_remove_dupflags(char_u *newval, int flags)
  *	set {opt}={val}
  *	set {opt}:{val}
  */
-    static char_u *
+    ساكن char_u *
 stropt_get_newval(
-    int		nextchar,
-    int		opt_idx,
+    صحيح		nextchar,
+    صحيح		opt_idx,
     char_u	**argp,
     char_u	*varp,
     char_u	**origval_arg,
     char_u	**origval_l_arg,
     char_u	**origval_g_arg,
     char_u	**oldval_arg,
-    set_op_T    *op_arg,
-    int		flags,
-    int		cp_val)
+    مجموعه_op_T    *op_arg,
+    صحيح		flags,
+    صحيح		cp_val)
 {
     char_u	*arg = *argp;
     char_u	*origval = *origval_arg;
     char_u	*origval_l = *origval_l_arg;
     char_u	*origval_g = *origval_g_arg;
     char_u	*oldval = *oldval_arg;
-    set_op_T    op = *op_arg;
-    char_u	*save_arg = NULL;
+    مجموعه_op_T    op = *op_arg;
+    char_u	*save_arg = عدم;
     char_u	*newval;
-    char_u	*s = NULL;
+    char_u	*s = عدم;
     char_u	whichwrap[80];
 
-    if (nextchar == '&')	// set to default val
+    إذا (nextchar == '&')	// set to default val
 	newval = stropt_get_default_val(opt_idx, varp, flags, cp_val);
-    else if (nextchar == '<')	// set to global val
+    وإلا إذا (nextchar == '<')	// set to global val
 	newval = vim_strsave(*(char_u **)get_varp_scope(
 					     &(options[opt_idx]), OPT_GLOBAL));
-    else
+    وإلا
     {
 	++arg;	// jump to after the '=' or ':'
 
 	// Set 'keywordprg' to ":help" if an empty
 	// value was passed to :set by the user.
-	if (varp == (char_u *)&p_kp && (*arg == NUL || *arg == ' '))
+	إذا (varp == (char_u *)&p_kp && (*arg == NUL || *arg == ' '))
 	{
 	    save_arg = arg;
 	    arg = (char_u *)":help";
 	}
 	// Convert 'backspace' number to string
-	else if (varp == (char_u *)&p_bs && VIM_ISDIGIT(**(char_u **)varp))
+	وإلا إذا (varp == (char_u *)&p_bs && VIM_ISDIGIT(**(char_u **)varp))
 	    opt_backspace_nr2str(varp, &origval, &origval_l, &origval_g,
 								&oldval);
-	else if (varp == (char_u *)&p_ww && VIM_ISDIGIT(*arg))
+	وإلا إذا (varp == (char_u *)&p_ww && VIM_ISDIGIT(*arg))
 	{
 	    // Convert 'whichwrap' number to string, for backwards
 	    // compatibility with Vim 3.0.
@@ -2334,68 +2334,68 @@ stropt_get_newval(
 	}
 	// Remove '>' before 'dir' and 'bdir', for backwards compatibility with
 	// version 3.0
-	else if (*arg == '>' && (varp == (char_u *)&p_dir
+	وإلا إذا (*arg == '>' && (varp == (char_u *)&p_dir
 		    || varp == (char_u *)&p_bdir))
 	    ++arg;
 
 	// Copy the new string into allocated memory.
-	newval = stropt_copy_value(origval, &arg, op, flags);
-	if (newval == NULL)
-	    goto done;
+	newval = stropt_copy_مقدار(origval, &arg, op, flags);
+	إذا (newval == عدم)
+	    اذهب انجامشده;
 
 	// Expand environment variables and ~.
 	// Don't do it when adding without inserting a comma.
-	if (op == OP_NONE || (flags & P_COMMA))
+	إذا (op == OP_NONE || (flags & P_COMMA))
 	{
 	    newval = stropt_expand_envvar(opt_idx, origval, newval, op);
-	    if (newval == NULL)
-		goto done;
+	    إذا (newval == عدم)
+		اذهب انجامشده;
 	}
 
 	// For P_COMMA|P_COLON options with "key:value" items: process
 	// each item individually by matching on the key part.  If
 	// handled, skip the normal add/remove logic below.
-	if ((flags & P_COMMA) && (flags & P_COLON) && op != OP_NONE
+	إذا ((flags & P_COMMA) && (flags & P_COLON) && op != OP_NONE
 		&& stropt_handle_keymatch(origval, newval, op, flags))
 	    ;  // fully handled
-	else
+	وإلا
 	{
 	    // locate newval[] in origval[] when removing it and when
 	    // adding to avoid duplicates
-	    int len = 0;
-	    if (op == OP_REMOVING || (flags & P_NODUP))
+	    صحيح len = 0;
+	    إذا (op == OP_REMOVING || (flags & P_NODUP))
 	    {
-		len = (int)STRLEN(newval);
-		s = find_dup_item(origval, newval, len, flags);
+		len = (صحيح)STRLEN(newval);
+		s = پیدا_کن_dup_قلم(origval, newval, len, flags);
 
 		// do not add if already there
-		if ((op == OP_ADDING || op == OP_PREPENDING) && s != NULL)
+		إذا ((op == OP_ADDING || op == OP_PREPENDING) && s != عدم)
 		{
 		    op = OP_NONE;
 		    STRCPY(newval, origval);
 		}
 
 		// if no duplicate, move pointer to end of original value
-		if (s == NULL)
-		    s = origval + (int)STRLEN(origval);
+		إذا (s == عدم)
+		    s = origval + (صحيح)STRLEN(origval);
 	    }
 
 	    // concatenate the two strings; add a ',' if needed
-	    if (op == OP_ADDING || op == OP_PREPENDING)
+	    إذا (op == OP_ADDING || op == OP_PREPENDING)
 		stropt_concat_with_comma(origval, newval, op, flags);
-	    else if (op == OP_REMOVING)
+	    وإلا إذا (op == OP_REMOVING)
 		// Remove newval[] from origval[]. (Note: "len" has been
 		// set above and is used here).
 		stropt_remove_val(origval, newval, flags, s, len);
 	}
 
-	if (flags & P_FLAGLIST)
+	إذا (flags & P_FLAGLIST)
 	    // Remove flags that appear twice.
 	    stropt_remove_dupflags(newval, flags);
     }
 
-done:
-    if (save_arg != NULL)
+انجامشده:
+    إذا (save_arg != عدم)
 	arg = save_arg;  // arg was temporarily changed, restore it
     *argp = arg;
     *origval_arg = origval;
@@ -2404,54 +2404,54 @@ done:
     *oldval_arg = oldval;
     *op_arg = op;
 
-    return newval;
+    أرجع newval;
 }
 
 /*
  * Part of do_set() for string options.
  * Returns FAIL on failure, do not process further options.
  */
-    static int
-do_set_option_string(
-	int	    opt_idx,
-	int	    opt_flags,
+    ساكن صحيح
+do_مجموعه_option_string(
+	صحيح	    opt_idx,
+	صحيح	    opt_flags,
 	char_u	    **argp,
-	int	    nextchar,
-	set_op_T    op_arg,
+	صحيح	    nextchar,
+	مجموعه_op_T    op_arg,
 	long_u	    flags,
-	int	    cp_val,
+	صحيح	    cp_val,
 	char_u	    *varp_arg,
-	char	    *errbuf,
+	حرف	    *errbuf,
 	size_t	    errbuflen,
-	int	    *value_checked,
-	char	    **errmsg)
+	صحيح	    *مقدار_checked,
+	حرف	    **errmsg)
 {
     char_u	*arg = *argp;
-    set_op_T    op = op_arg;
+    مجموعه_op_T    op = op_arg;
     char_u	*varp = varp_arg;
-    char_u	*oldval = NULL; // previous value if *varp
+    char_u	*oldval = عدم; // previous value if *varp
     char_u	*newval;
-    char_u	*origval = NULL;
-    char_u	*origval_l = NULL;
-    char_u	*origval_g = NULL;
-#if defined(FEAT_EVAL)
-    char_u	*saved_origval = NULL;
-    char_u	*saved_origval_l = NULL;
-    char_u	*saved_origval_g = NULL;
-    char_u	*saved_newval = NULL;
-#endif
+    char_u	*origval = عدم;
+    char_u	*origval_l = عدم;
+    char_u	*origval_g = عدم;
+#إذا defined(FEAT_EVAL)
+    char_u	*saved_origval = عدم;
+    char_u	*saved_origval_l = عدم;
+    char_u	*saved_origval_g = عدم;
+    char_u	*saved_newval = عدم;
+#پایان_اگر
 
     // When using ":set opt=val" for a global option
     // with a local value the local value will be
     // reset, use the global value here.
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
-	    && ((int)options[opt_idx].indir & PV_BOTH))
+    إذا ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0
+	    && ((صحيح)options[opt_idx].indir & PV_BOTH))
 	varp = options[opt_idx].var;
 
     // The old value is kept until we are sure that the new value is valid.
     oldval = *(char_u **)varp;
 
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    إذا ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	origval_l = *(char_u **)get_varp_scope(
 			   &(options[opt_idx]), OPT_LOCAL);
@@ -2460,16 +2460,16 @@ do_set_option_string(
 
 	// A global-local string option might have an empty option as value to
 	// indicate that the global value should be used.
-	if (((int)options[opt_idx].indir & PV_BOTH)
-						  && origval_l == empty_option)
+	إذا (((صحيح)options[opt_idx].indir & PV_BOTH)
+						  && origval_l == خالی_option)
 	    origval_l = origval_g;
     }
 
     // When setting the local value of a global option, the old value may be
     // the global value.
-    if (((int)options[opt_idx].indir & PV_BOTH) && (opt_flags & OPT_LOCAL))
+    إذا (((صحيح)options[opt_idx].indir & PV_BOTH) && (opt_flags & OPT_LOCAL))
 	origval = *(char_u **)get_varp(&options[opt_idx]);
-    else
+    وإلا
 	origval = oldval;
 
     // Get the new value for the option
@@ -2479,151 +2479,151 @@ do_set_option_string(
 
     // Set the new value.
     *(char_u **)(varp) = newval;
-    if (newval == NULL)
-	*(char_u **)(varp) = empty_option;
+    إذا (newval == عدم)
+	*(char_u **)(varp) = خالی_option;
 
-#if defined(FEAT_EVAL)
-    if (!starting
+#إذا defined(FEAT_EVAL)
+    إذا (!starting
 # ifdef FEAT_CRYPT
-	    && options[opt_idx].indir != PV_KEY
+	    && options[opt_idx].indir != PV_کلید
 # endif
-		      && origval != NULL && newval != NULL)
+		      && origval != عدم && newval != عدم)
     {
 	// origval may be freed by did_set_string_option(), make a copy.
 	saved_origval = vim_strsave(origval);
 	// newval (and varp) may become invalid if the buffer is closed by
 	// autocommands.
 	saved_newval = vim_strsave(newval);
-	if (origval_l != NULL)
+	إذا (origval_l != عدم)
 	    saved_origval_l = vim_strsave(origval_l);
-	if (origval_g != NULL)
+	إذا (origval_g != عدم)
 	    saved_origval_g = vim_strsave(origval_g);
     }
-#endif
+#پایان_اگر
 
     {
 	long_u	*p = insecure_flag(curwin, opt_idx, opt_flags);
-	int	secure_saved = secure;
+	صحيح	secure_saved = secure;
 
 	// When an option is set in the sandbox, from a modeline or in secure
 	// mode, then deal with side effects in secure mode.  Also when the
 	// value was set with the P_INSECURE flag and is not completely
 	// replaced.
-	if ((opt_flags & OPT_MODELINE)
-#ifdef HAVE_SANDBOX
+	إذا ((opt_flags & OPT_MODELINE)
+#اگر_تعریف_شده HAVE_SANDBOX
 	      || sandbox != 0
-#endif
+#پایان_اگر
 	      || (op != OP_NONE && (*p & P_INSECURE)))
 	    secure = 1;
 
 	// Handle side effects, and set the global value for ":set" on local
 	// options. Note: when setting 'syntax' or 'filetype' autocommands may
 	// be triggered that can cause havoc.
-	*errmsg = did_set_string_option(
+	*errmsg = did_مجموعه_string_option(
 			opt_idx, (char_u **)varp, oldval, newval, errbuf,
-			errbuflen, opt_flags, op, value_checked);
+			errbuflen, opt_flags, op, مقدار_checked);
 
 	secure = secure_saved;
     }
 
-#if defined(FEAT_EVAL)
-    if (*errmsg == NULL)
+#إذا defined(FEAT_EVAL)
+    إذا (*errmsg == عدم)
 	trigger_optionset_string(opt_idx, opt_flags, saved_origval,
 			       saved_origval_l, saved_origval_g, saved_newval);
     vim_free(saved_origval);
     vim_free(saved_origval_l);
     vim_free(saved_origval_g);
     vim_free(saved_newval);
-#endif
+#پایان_اگر
 
     *argp = arg;
-    return *errmsg == NULL ? OK : FAIL;
+    أرجع *errmsg == عدم ? OK : FAIL;
 }
 
 /*
  * Set a boolean option.
  * Returns an untranslated error message or NULL.
  */
-    static char *
-do_set_option_bool(
-    int		opt_idx,
-    int		opt_flags,
-    set_prefix_T prefix,
+    ساكن حرف *
+do_مجموعه_option_bool(
+    صحيح		opt_idx,
+    صحيح		opt_flags,
+    مجموعه_پیشوند_T پیشوند,
     long_u	flags,
     char_u	*varp,
-    int		nextchar,
-    int		afterchar,
-    int		cp_val)
+    صحيح		nextchar,
+    صحيح		afterchar,
+    صحيح		cp_val)
 
 {
-    varnumber_T	value;
+    varnumber_T	مقدار;
 
-    if (nextchar == '=' || nextchar == ':')
-	return e_invalid_argument;
-    if (opt_idx < 0 || varp == NULL)
-	return NULL;  // "cannot happen"
+    إذا (nextchar == '=' || nextchar == ':')
+	أرجع e_invalid_آرگومان;
+    إذا (opt_idx < 0 || varp == عدم)
+	أرجع عدم;  // "cannot happen"
 
     // ":set opt!": invert
     // ":set opt&": reset to default value
     // ":set opt<": reset to global value
-    if (nextchar == '!')
-	value = *(int *)(varp) ^ 1;
-    else if (nextchar == '&')
-	value = (int)(long)(long_i)options[opt_idx].def_val[
+    إذا (nextchar == '!')
+	مقدار = *(صحيح *)(varp) ^ 1;
+    وإلا إذا (nextchar == '&')
+	مقدار = (صحيح)(دراز)(long_i)options[opt_idx].def_val[
 	    ((flags & P_VI_DEF) || cp_val) ? VI_DEFAULT : VIM_DEFAULT];
-    else if (nextchar == '<')
+    وإلا إذا (nextchar == '<')
     {
 	// For 'autoread' -1 means to use global value.
-	if ((int *)varp == &curbuf->b_p_ar && opt_flags == OPT_LOCAL)
-	    value = -1;
-	else if ((int *)varp == &curbuf->b_p_ac && opt_flags == OPT_LOCAL)
-	    value = -1;
-#ifdef HAVE_FSYNC
-	else if ((int *)varp == &curbuf->b_p_fs && opt_flags == OPT_LOCAL)
-	    value = -1;
-#endif
-	else
-	    value = *(int *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
+	إذا ((صحيح *)varp == &curbuf->b_p_ar && opt_flags == OPT_LOCAL)
+	    مقدار = -1;
+	وإلا إذا ((صحيح *)varp == &curbuf->b_p_ac && opt_flags == OPT_LOCAL)
+	    مقدار = -1;
+#اگر_تعریف_شده HAVE_FSYNC
+	وإلا إذا ((صحيح *)varp == &curbuf->b_p_fs && opt_flags == OPT_LOCAL)
+	    مقدار = -1;
+#پایان_اگر
+	وإلا
+	    مقدار = *(صحيح *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
     }
-    else
+    وإلا
     {
 	// ":set invopt": invert
 	// ":set opt" or ":set noopt": set or reset
-	if (nextchar != NUL && !VIM_ISWHITE(afterchar))
-	    return e_trailing_characters;
-	if (prefix == PREFIX_INV)
-	    value = *(int *)(varp) ^ 1;
-	else
-	    value = prefix == PREFIX_NO ? 0 : 1;
+	إذا (nextchar != NUL && !VIM_ISWHITE(afterchar))
+	    أرجع e_trailing_characters;
+	إذا (پیشوند == پیشوند_INV)
+	    مقدار = *(صحيح *)(varp) ^ 1;
+	وإلا
+	    مقدار = پیشوند == پیشوند_NO ? 0 : 1;
     }
 
-    return set_bool_option(opt_idx, varp, (int)value, opt_flags);
+    أرجع مجموعه_bool_option(opt_idx, varp, (صحيح)مقدار, opt_flags);
 }
 
 /*
  * Set a numeric option.
  * Returns an untranslated error message or NULL.
  */
-    static char *
-do_set_option_numeric(
-    int		opt_idx,
-    int		opt_flags,
+    ساكن حرف *
+do_مجموعه_option_numeric(
+    صحيح		opt_idx,
+    صحيح		opt_flags,
     char_u	**argp,
-    int		nextchar,
-    set_op_T	op,
+    صحيح		nextchar,
+    مجموعه_op_T	op,
     long_u	flags,
-    int		cp_val,
+    صحيح		cp_val,
     char_u	*varp,
-    char	*errbuf,
+    حرف	*errbuf,
     size_t	errbuflen)
 {
     char_u		*arg = *argp;
-    varnumber_T		value;
-    int			i;
-    char		*errmsg = NULL;
+    varnumber_T		مقدار;
+    صحيح			i;
+    حرف		*errmsg = عدم;
 
-    if (opt_idx < 0 || varp == NULL)
-	return NULL;  // "cannot happen"
+    إذا (opt_idx < 0 || varp == عدم)
+	أرجع عدم;  // "cannot happen"
 		      //
     /*
      * Different ways to set a number option:
@@ -2636,186 +2636,186 @@ do_set_option_numeric(
      * other	    error
      */
     ++arg;
-    if (nextchar == '&')
-	value = (long)(long_i)options[opt_idx].def_val[
+    إذا (nextchar == '&')
+	مقدار = (دراز)(long_i)options[opt_idx].def_val[
 	    ((flags & P_VI_DEF) || cp_val) ? VI_DEFAULT : VIM_DEFAULT];
-    else if (nextchar == '<')
+    وإلا إذا (nextchar == '<')
     {
-	if ((long *)varp == &curbuf->b_p_ul && opt_flags == OPT_LOCAL)
+	إذا ((دراز *)varp == &curbuf->b_p_ul && opt_flags == OPT_LOCAL)
 	    // for 'undolevels' NO_LOCAL_UNDOLEVEL means using the global value
-	    value = NO_LOCAL_UNDOLEVEL;
-	else if (opt_flags == OPT_LOCAL
-		    && ((long *)varp == &curwin->w_p_siso
-		     || (long *)varp == &curwin->w_p_so
-		     || (long *)varp == &curwin->w_p_sop))
+	    مقدار = NO_LOCAL_UNDOLEVEL;
+	وإلا إذا (opt_flags == OPT_LOCAL
+		    && ((دراز *)varp == &curwin->w_p_siso
+		     || (دراز *)varp == &curwin->w_p_so
+		     || (دراز *)varp == &curwin->w_p_sop))
 	    // for 'scrolloff'/'sidescrolloff'/'scrolloffpad' -1 means using the global value
-	    value = -1;
-	else
-	    value = *(long *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
+	    مقدار = -1;
+	وإلا
+	    مقدار = *(دراز *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL);
     }
-    else if (((long *)varp == &p_wc || (long *)varp == &p_wcm)
+    وإلا إذا (((دراز *)varp == &p_wc || (دراز *)varp == &p_wcm)
 	    && (*arg == '<'
 		|| *arg == '^'
 		|| (*arg != NUL
 		    && (!arg[1] || VIM_ISWHITE(arg[1]))
 		    && !VIM_ISDIGIT(*arg))))
     {
-	value = string_to_key(arg, FALSE);
-	if (value == 0)
+	مقدار = string_مقصد_کلید(arg, FALSE);
+	إذا (مقدار == 0)
 	{
-	    errmsg = e_invalid_argument;
-	    goto skip;
+	    errmsg = e_invalid_آرگومان;
+	    اذهب skip;
 	}
     }
-    else if (*arg == '-' || VIM_ISDIGIT(*arg))
+    وإلا إذا (*arg == '-' || VIM_ISDIGIT(*arg))
     {
 	// Allow negative (for 'undolevels'), octal and hex numbers.
-	vim_str2nr(arg, NULL, &i, STR2NR_ALL, &value, NULL, 0, TRUE, NULL);
-	if (i == 0 || (arg[i] != NUL && !VIM_ISWHITE(arg[i])))
+	vim_str2nr(arg, عدم, &i, STR2NR_ALL, &مقدار, عدم, 0, TRUE, عدم);
+	إذا (i == 0 || (arg[i] != NUL && !VIM_ISWHITE(arg[i])))
 	{
-	    errmsg = e_number_required_after_equal;
-	    goto skip;
+	    errmsg = e_عدد_required_after_equal;
+	    اذهب skip;
 	}
     }
-    else
+    وإلا
     {
-	errmsg = e_number_required_after_equal;
-	goto skip;
+	errmsg = e_عدد_required_after_equal;
+	اذهب skip;
     }
 
-    if (op == OP_ADDING)
-	value = *(long *)varp + value;
-    else if (op == OP_PREPENDING)
-	value = *(long *)varp * value;
-    else if (op == OP_REMOVING)
-	value = *(long *)varp - value;
+    إذا (op == OP_ADDING)
+	مقدار = *(دراز *)varp + مقدار;
+    وإلا إذا (op == OP_PREPENDING)
+	مقدار = *(دراز *)varp * مقدار;
+    وإلا إذا (op == OP_REMOVING)
+	مقدار = *(دراز *)varp - مقدار;
 
-    if ((long *)varp == &curwin->w_p_sop && value < -1)
+    إذا ((دراز *)varp == &curwin->w_p_sop && مقدار < -1)
     {
-	errmsg = e_invalid_argument;
-	goto skip;
+	errmsg = e_invalid_آرگومان;
+	اذهب skip;
     }
 
-    errmsg = set_num_option(opt_idx, varp, value, errbuf, errbuflen,
+    errmsg = مجموعه_رقم_option(opt_idx, varp, مقدار, errbuf, errbuflen,
 								opt_flags);
 
 skip:
     *argp = arg;
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
  * Set a key code (t_xx) option
  */
-    static char *
-do_set_option_keycode(char_u **argp, char_u *key_name, int nextchar)
+    ساكن حرف *
+do_مجموعه_option_keycode(char_u **argp, char_u *کلید_name, صحيح nextchar)
 {
     char_u	*arg = *argp;
     char_u	*p;
 
-    if (nextchar == '&')
+    إذا (nextchar == '&')
     {
-	if (add_termcap_entry(key_name, TRUE) == FAIL)
-	    return e_not_found_in_termcap;
+	إذا (جمع_کن_termcap_مدخل(کلید_name, TRUE) == FAIL)
+	    أرجع e_not_یافت_درون_termcap;
     }
-    else
+    وإلا
     {
 	++arg; // jump to after the '=' or ':'
-	for (p = arg; *p && !VIM_ISWHITE(*p); ++p)
-	    if (*p == '\\' && p[1] != NUL)
+	لكل (p = arg; *p && !VIM_ISWHITE(*p); ++p)
+	    إذا (*p == '\\' && p[1] != NUL)
 		++p;
 	nextchar = *p;
 	*p = NUL;
-	add_termcode(key_name, arg, FALSE);
+	جمع_کن_termcode(کلید_name, arg, FALSE);
 	*p = nextchar;
     }
-    if (full_screen)
+    إذا (پر_screen)
 	ttest(FALSE);
     redraw_all_later(UPD_CLEAR);
 
     *argp = arg;
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Set an option to a new value.
  */
-    static char *
-do_set_option_value(
-    int		opt_idx,
-    int		opt_flags,
+    ساكن حرف *
+do_مجموعه_option_مقدار(
+    صحيح		opt_idx,
+    صحيح		opt_flags,
     char_u	**argp,
-    set_prefix_T prefix,
-    set_op_T	op,
+    مجموعه_پیشوند_T پیشوند,
+    مجموعه_op_T	op,
     long_u	flags,
     char_u	*varp,
-    char_u	*key_name,
-    int		nextchar,
-    int		afterchar,
-    int		cp_val,
-    int		*stopopteval,
-    char	*errbuf,
+    char_u	*کلید_name,
+    صحيح		nextchar,
+    صحيح		afterchar,
+    صحيح		cp_val,
+    صحيح		*stopopteval,
+    حرف	*errbuf,
     size_t	errbuflen)
 {
-    int		value_checked = FALSE;
-    char	*errmsg = NULL;
+    صحيح		مقدار_checked = FALSE;
+    حرف	*errmsg = عدم;
     char_u	*arg = *argp;
 
-    if (flags & P_BOOL)
+    إذا (flags & P_BOOL)
     {
 	// boolean option
-	errmsg = do_set_option_bool(opt_idx, opt_flags, prefix, flags, varp,
+	errmsg = do_مجموعه_option_bool(opt_idx, opt_flags, پیشوند, flags, varp,
 						nextchar, afterchar, cp_val);
-	if (errmsg != NULL)
-	    goto skip;
+	إذا (errmsg != عدم)
+	    اذهب skip;
     }
-    else
+    وإلا
     {
 	// numeric or string option
-	if (vim_strchr((char_u *)"=:&<", nextchar) == NULL
-		|| prefix != PREFIX_NONE)
+	إذا (vim_strchr((char_u *)"=:&<", nextchar) == عدم
+		|| پیشوند != پیشوند_NONE)
 	{
-	    errmsg = e_invalid_argument;
-	    goto skip;
+	    errmsg = e_invalid_آرگومان;
+	    اذهب skip;
 	}
 
-	if (flags & P_NUM)
+	إذا (flags & P_رقم)
 	{
 	    // numeric option
-	    errmsg = do_set_option_numeric(opt_idx, opt_flags, &arg, nextchar,
+	    errmsg = do_مجموعه_option_numeric(opt_idx, opt_flags, &arg, nextchar,
 						op, flags, cp_val, varp,
 						errbuf, errbuflen);
-	    if (errmsg != NULL)
-		goto skip;
+	    إذا (errmsg != عدم)
+		اذهب skip;
 	}
-	else if (opt_idx >= 0)
+	وإلا إذا (opt_idx >= 0)
 	{
 	    // string option
-	    if (do_set_option_string(opt_idx, opt_flags, &arg, nextchar, op,
+	    إذا (do_مجموعه_option_string(opt_idx, opt_flags, &arg, nextchar, op,
 					flags, cp_val, varp, errbuf, errbuflen,
-					&value_checked, &errmsg) == FAIL)
+					&مقدار_checked, &errmsg) == FAIL)
 	    {
-		if (errmsg != NULL)
-		    goto skip;
+		إذا (errmsg != عدم)
+		    اذهب skip;
 		*stopopteval = TRUE;
-		goto skip;
+		اذهب skip;
 	    }
 	}
-	else
+	وإلا
 	{
 	    // key code option
-	    errmsg = do_set_option_keycode(&arg, key_name, nextchar);
-	    if (errmsg != NULL)
-		goto skip;
+	    errmsg = do_مجموعه_option_keycode(&arg, کلید_name, nextchar);
+	    إذا (errmsg != عدم)
+		اذهب skip;
 	}
     }
 
-    if (opt_idx >= 0)
-	did_set_option(opt_idx, opt_flags, op == OP_NONE, value_checked);
+    إذا (opt_idx >= 0)
+	did_مجموعه_option(opt_idx, opt_flags, op == OP_NONE, مقدار_checked);
 
 skip:
     *argp = arg;
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
@@ -2823,199 +2823,199 @@ skip:
  * Return NULL if OK, return an untranslated error message when something is
  * wrong.  "errbuf[errbuflen]" can be used to create the error message.
  */
-    static char *
-do_set_option(
-    int		opt_flags,
+    ساكن حرف *
+do_مجموعه_option(
+    صحيح		opt_flags,
     char_u	**argp,
-    char_u	*arg_start,
+    char_u	*arg_شروع,
     char_u	**startarg,
-    int		*did_show,
-    int		*stopopteval,
-    char	*errbuf,
+    صحيح		*did_show,
+    صحيح		*stopopteval,
+    حرف	*errbuf,
     size_t	errbuflen)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
     char_u	*arg;
-    set_prefix_T prefix;	// no prefix, "no" prefix or "inv" prefix
-    set_op_T	op;
+    مجموعه_پیشوند_T پیشوند;	// no prefix, "no" prefix or "inv" prefix
+    مجموعه_op_T	op;
     long_u	flags;		// flags for current option
     char_u	*varp;		// pointer to variable for current option
-    char_u	key_name[2];
-    int		nextchar;	// next non-white char after option name
-    int		afterchar;	// character just after option name
-    char	*errmsg = NULL;
-    int		key;
-    int		len;
+    char_u	کلید_name[2];
+    صحيح		nextchar;	// next non-white char after option name
+    صحيح		afterchar;	// character just after option name
+    حرف	*errmsg = عدم;
+    صحيح		کلید;
+    صحيح		len;
 
-    prefix = get_option_prefix(argp);
+    پیشوند = get_option_پیشوند(argp);
     arg = *argp;
 
     // find end of name
-    key = 0;
-    if (parse_option_name(arg, &opt_idx, &len, &key) == FAIL)
-	return e_invalid_argument;
+    کلید = 0;
+    إذا (parse_option_name(arg, &opt_idx, &len, &کلید) == FAIL)
+	أرجع e_invalid_آرگومان;
 
     // remember character after option name
     afterchar = arg[len];
 
-    if (in_vim9script())
+    إذا (درون_vim9script())
     {
 	char_u *p = skipwhite(arg + len);
 
 	// disallow white space before =val, +=val, -=val, ^=val
-	if (p > arg + len && (p[0] == '='
-		    || (vim_strchr((char_u *)"+-^", p[0]) != NULL
+	إذا (p > arg + len && (p[0] == '='
+		    || (vim_strchr((char_u *)"+-^", p[0]) != عدم
 			&& p[1] == '=')))
 	{
 	    errmsg = e_no_white_space_allowed_between_option_and;
 	    arg = p;
 	    *startarg = p;
-	    goto skip;
+	    اذهب skip;
 	}
     }
-    else
+    وإلا
 	// skip white space, allow ":set ai  ?", ":set hlsearch  !"
-	while (VIM_ISWHITE(arg[len]))
+	طالما (VIM_ISWHITE(arg[len]))
 	    ++len;
 
     op = get_opt_op(arg + len);
-    if (op != OP_NONE)
+    إذا (op != OP_NONE)
 	len++;
 
     nextchar = arg[len];
 
-    if (opt_idx == -1 && key == 0)	// found a mismatch: skip
+    إذا (opt_idx == -1 && کلید == 0)	// found a mismatch: skip
     {
-	if (in_vim9script() && arg > arg_start
-		&& vim_strchr((char_u *)"!&<", *arg) != NULL)
+	إذا (درون_vim9script() && arg > arg_شروع
+		&& vim_strchr((char_u *)"!&<", *arg) != عدم)
 	    errmsg = e_no_white_space_allowed_between_option_and;
-	else
+	وإلا
 	    errmsg = e_unknown_option;
-	goto skip;
+	اذهب skip;
     }
 
-    if (opt_idx >= 0)
+    إذا (opt_idx >= 0)
     {
-	if (options[opt_idx].var == NULL)   // hidden option: skip
+	إذا (options[opt_idx].var == عدم)   // hidden option: skip
 	{
 	    // Only give an error message when requesting the value of
 	    // a hidden option, ignore setting it.
-	    if (vim_strchr((char_u *)"=:!&<", nextchar) == NULL
+	    إذا (vim_strchr((char_u *)"=:!&<", nextchar) == عدم
 		    && (!(options[opt_idx].flags & P_BOOL)
 			|| nextchar == '?'))
 		errmsg = e_option_not_supported;
-	    goto skip;
+	    اذهب skip;
 	}
 
 	flags = options[opt_idx].flags;
 	varp = get_varp_scope(&(options[opt_idx]), opt_flags);
     }
-    else
+    وإلا
     {
 	flags = P_STRING;
-	varp = NULL;
-	if (key < 0)
+	varp = عدم;
+	إذا (کلید < 0)
 	{
-	    key_name[0] = KEY2TERMCAP0(key);
-	    key_name[1] = KEY2TERMCAP1(key);
+	    کلید_name[0] = KEY2TERMCAP0(کلید);
+	    کلید_name[1] = KEY2TERMCAP1(کلید);
 	}
-	else
+	وإلا
 	{
-	    key_name[0] = KS_KEY;
-	    key_name[1] = (key & 0xff);
+	    کلید_name[0] = KS_کلید;
+	    کلید_name[1] = (کلید & 0xff);
 	}
     }
 
     // Make sure the option value can be changed.
-    if (validate_opt_idx(opt_idx, opt_flags, flags, &errmsg, prefix) == FAIL)
-	goto skip;
+    إذا (validate_opt_idx(opt_idx, opt_flags, flags, &errmsg, پیشوند) == FAIL)
+	اذهب skip;
 
-    int cp_val = p_cp;
-    if (vim_strchr((char_u *)"?=:!&<", nextchar) != NULL)
+    صحيح cp_val = p_cp;
+    إذا (vim_strchr((char_u *)"?=:!&<", nextchar) != عدم)
     {
 	arg += len;
-	if (nextchar == '&' && arg[1] == 'v' && arg[2] == 'i')
+	إذا (nextchar == '&' && arg[1] == 'v' && arg[2] == 'i')
 	{
-	    if (arg[3] == 'm')	// "opt&vim": set to Vim default
+	    إذا (arg[3] == 'm')	// "opt&vim": set to Vim default
 	    {
 		cp_val = FALSE;
 		arg += 3;
 	    }
-	    else		// "opt&vi": set to Vi default
+	    وإلا		// "opt&vi": set to Vi default
 	    {
 		cp_val = TRUE;
 		arg += 2;
 	    }
 	}
-	if (vim_strchr((char_u *)"?!&<", nextchar) != NULL
+	إذا (vim_strchr((char_u *)"?!&<", nextchar) != عدم
 		&& arg[1] != NUL && !VIM_ISWHITE(arg[1]))
 	{
 	    errmsg = e_trailing_characters;
-	    goto skip;
+	    اذهب skip;
 	}
     }
 
     // Allow '=' and ':' for historical reasons (MSDOS command.com).
     // Allows only one '=' character per "set" command line. grrr. (jw)
-    if (nextchar == '?'
-	    || (prefix == PREFIX_NONE
-		&& vim_strchr((char_u *)"=:&<", nextchar) == NULL
+    إذا (nextchar == '?'
+	    || (پیشوند == پیشوند_NONE
+		&& vim_strchr((char_u *)"=:&<", nextchar) == عدم
 		&& !(flags & P_BOOL)))
     {
 	// print value
-	if (*did_show)
-	    msg_putchar('\n');	    // cursor below last one
-	else
+	إذا (*did_show)
+	    پیام_putchar('\n');	    // cursor below last one
+	وإلا
 	{
 	    gotocmdline(TRUE);	    // cursor at status line
 	    *did_show = TRUE;	    // remember that we did a line
 	}
-	if (opt_idx >= 0)
+	إذا (opt_idx >= 0)
 	{
 	    showoneopt(&options[opt_idx], opt_flags);
-#ifdef FEAT_EVAL
-	    if (p_verbose > 0)
+#اگر_تعریف_شده FEAT_EVAL
+	    إذا (p_verbose > 0)
 	    {
 		// Mention where the option was last set.
-		if (varp == options[opt_idx].var)
-		    last_set_msg(options[opt_idx].script_ctx);
-		else if ((int)options[opt_idx].indir & PV_WIN)
-		    last_set_msg(curwin->w_p_script_ctx[
-			    (int)options[opt_idx].indir & PV_MASK]);
-		else if ((int)options[opt_idx].indir & PV_BUF)
-		    last_set_msg(curbuf->b_p_script_ctx[
-			    (int)options[opt_idx].indir & PV_MASK]);
+		إذا (varp == options[opt_idx].var)
+		    آخرین_مجموعه_پیام(options[opt_idx].script_ctx);
+		وإلا إذا ((صحيح)options[opt_idx].indir & PV_WIN)
+		    آخرین_مجموعه_پیام(curwin->w_p_script_ctx[
+			    (صحيح)options[opt_idx].indir & PV_ماسک]);
+		وإلا إذا ((صحيح)options[opt_idx].indir & PV_BUF)
+		    آخرین_مجموعه_پیام(curbuf->b_p_script_ctx[
+			    (صحيح)options[opt_idx].indir & PV_ماسک]);
 	    }
-#endif
+#پایان_اگر
 	}
-	else
+	وإلا
 	{
 	    char_u	    *p;
 
-	    p = find_termcode(key_name);
-	    if (p == NULL)
+	    p = پیدا_کن_termcode(کلید_name);
+	    إذا (p == عدم)
 	    {
-		errmsg = e_key_code_not_set;
-		goto skip;
+		errmsg = e_کلید_کد_not_مجموعه;
+		اذهب skip;
 	    }
-	    else
-		(void)show_one_termcode(key_name, p, TRUE);
+	    وإلا
+		(فراغ)show_one_termcode(کلید_name, p, TRUE);
 	}
-	if (nextchar != '?'
+	إذا (nextchar != '?'
 		&& nextchar != NUL && !VIM_ISWHITE(afterchar))
 	    errmsg = e_trailing_characters;
     }
-    else
+    وإلا
     {
-	errmsg = do_set_option_value(opt_idx, opt_flags, &arg, prefix, op,
-					flags, varp, key_name, nextchar,
+	errmsg = do_مجموعه_option_مقدار(opt_idx, opt_flags, &arg, پیشوند, op,
+					flags, varp, کلید_name, nextchar,
 					afterchar, cp_val, stopopteval, errbuf,
 					errbuflen);
     }
 
 skip:
     *argp = arg;
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
@@ -3034,83 +3034,83 @@ skip:
  *
  * Returns FAIL if an error is detected, OK otherwise.
  */
-    int
-do_set(
-    char_u	*arg_start,	// option string (may be written to!)
-    int		opt_flags)
+    صحيح
+do_مجموعه(
+    char_u	*arg_شروع,	// option string (may be written to!)
+    صحيح		opt_flags)
 {
-    char_u	*arg = arg_start;
-    int		i;
-    int		did_show = FALSE;   // already showed one value
+    char_u	*arg = arg_شروع;
+    صحيح		i;
+    صحيح		did_show = FALSE;   // already showed one value
 
-    if (*arg == NUL)
+    إذا (*arg == NUL)
     {
 	showoptions(0, opt_flags);
 	did_show = TRUE;
-	goto theend;
+	اذهب theend;
     }
 
-    while (*arg != NUL)		// loop to process all options
+    طالما (*arg != NUL)		// loop to process all options
     {
-	if (STRNCMP(arg, "all", 3) == 0 && !ASCII_ISALPHA(arg[3])
+	إذا (STRNCMP(arg, "all", 3) == 0 && !ASCII_ISALPHA(arg[3])
 						&& !(opt_flags & OPT_MODELINE))
 	{
 	    // ":set all"  show all options.
 	    // ":set all&" set all options to their default value.
 	    arg += 3;
-	    if (*arg == '&')
+	    إذا (*arg == '&')
 	    {
 		++arg;
 		// Only for :set command set global value of local options.
-		set_options_default(OPT_FREE | opt_flags);
+		مجموعه_options_default(OPT_FREE | opt_flags);
 		didset_options();
 		didset_options2();
 		redraw_all_later(UPD_CLEAR);
 	    }
-	    else
+	    وإلا
 	    {
 		showoptions(1, opt_flags);
 		did_show = TRUE;
 	    }
 	}
-	else if (STRNCMP(arg, "termcap", 7) == 0 && !(opt_flags & OPT_MODELINE))
+	وإلا إذا (STRNCMP(arg, "termcap", 7) == 0 && !(opt_flags & OPT_MODELINE))
 	{
 	    showoptions(2, opt_flags);
 	    show_termcodes(opt_flags);
 	    did_show = TRUE;
 	    arg += 7;
 	}
-	else
+	وإلا
 	{
-	    int		stopopteval = FALSE;
-	    char	*errmsg = NULL;
-	    char	errbuf[ERR_BUFLEN];
+	    صحيح		stopopteval = FALSE;
+	    حرف	*errmsg = عدم;
+	    حرف	errbuf[ERR_BUFLEN];
 	    char_u	*startarg = arg;
 
-	    errmsg = do_set_option(opt_flags, &arg, arg_start, &startarg,
+	    errmsg = do_مجموعه_option(opt_flags, &arg, arg_شروع, &startarg,
 					&did_show, &stopopteval, errbuf,
 					ERR_BUFLEN);
-	    if (stopopteval)
-		break;
+	    إذا (stopopteval)
+		اكسر;
 
 	    // Advance to next argument.
 	    // - skip until a blank found, taking care of backslashes
 	    // - skip blanks
 	    // - skip one "=val" argument (for hidden options ":set gfn =xx")
-	    for (i = 0; i < 2 ; ++i)
+	    لكل (i = 0; i < 2 ; ++i)
 	    {
-		while (*arg != NUL && !VIM_ISWHITE(*arg))
-		    if (*arg++ == '\\' && *arg != NUL)
+		طالما (*arg != NUL && !VIM_ISWHITE(*arg))
+		    إذا (*arg++ == '\\' && *arg != NUL)
 			++arg;
 		arg = skipwhite(arg);
-		if (*arg != '=')
-		    break;
+		إذا (*arg != '=')
+		    اكسر;
 	    }
 
-	    if (errmsg != NULL)
+	    إذا (errmsg != عدم)
 	    {
-		i = vim_snprintf((char *)IObuff, IOSIZE, "%s", (char_u *)_(errmsg)) + 2;
-		if (i + (arg - startarg) < IOSIZE)
+		i = vim_snprintf((حرف *)IObuff, IOSIZE, "%s", (char_u *)_(errmsg)) + 2;
+		إذا (i + (arg - startarg) < IOSIZE)
 		{
 		    // append the argument with the error
 		    STRCPY(IObuff + i - 2, ": ");
@@ -3121,10 +3121,10 @@ do_set(
 		trans_characters(IObuff, IOSIZE);
 
 		++no_wait_return;		// wait_return() done later
-		emsg((char *)IObuff);	// show error highlighted
+		emsg((حرف *)IObuff);	// show error highlighted
 		--no_wait_return;
 
-		return FAIL;
+		أرجع FAIL;
 	    }
 	}
 
@@ -3132,59 +3132,59 @@ do_set(
     }
 
 theend:
-    if (silent_mode && did_show)
+    إذا (silent_نما && did_show)
     {
 	// After displaying option values in silent mode.
-	silent_mode = FALSE;
-	info_message = TRUE;	// use mch_msg(), not mch_errmsg()
-	msg_putchar('\n');
+	silent_نما = FALSE;
+	info_پیام = TRUE;	// use mch_msg(), not mch_errmsg()
+	پیام_putchar('\n');
 	cursor_on();		// msg_start() switches it off
-	out_flush();
-	silent_mode = TRUE;
-	info_message = FALSE;	// use mch_msg(), not mch_errmsg()
+	بیرون_flush();
+	silent_نما = TRUE;
+	info_پیام = FALSE;	// use mch_msg(), not mch_errmsg()
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Call this when an option has been given a new value through a user command.
  * Sets the P_WAS_SET flag and takes care of the P_INSECURE flag.
  */
-    void
-did_set_option(
-    int	    opt_idx,
-    int	    opt_flags,	    // possibly with OPT_MODELINE
-    int	    new_value,	    // value was replaced completely
-    int	    value_checked)  // value was checked to be safe, no need to set the
+    فراغ
+did_مجموعه_option(
+    صحيح	    opt_idx,
+    صحيح	    opt_flags,	    // possibly with OPT_MODELINE
+    صحيح	    new_مقدار_2,	    // value was replaced completely
+    صحيح	    مقدار_checked)  // value was checked to be safe, no need to set the
 			    // P_INSECURE flag.
 {
     long_u	*flagsp;
-    long_u	*flagsp_local = NULL;
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    long_u	*flagsp_local = عدم;
+    صحيح		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
 
-    options[opt_idx].flags |= P_WAS_SET;
+    options[opt_idx].flags |= P_WAS_مجموعه;
 
     // When an option is set in the sandbox, from a modeline or in secure mode
     // set the P_INSECURE flag.  Otherwise, if a new value is stored reset the
     // flag.
     flagsp = insecure_flag(curwin, opt_idx, opt_flags);
-    if (both)
+    إذا (both)
 	flagsp_local = insecure_flag(curwin, opt_idx, OPT_LOCAL);
-    if (!value_checked && (secure
-#ifdef HAVE_SANDBOX
+    إذا (!مقدار_checked && (secure
+#اگر_تعریف_شده HAVE_SANDBOX
 	    || sandbox != 0
-#endif
+#پایان_اگر
 	    || (opt_flags & OPT_MODELINE)))
     {
 	*flagsp = *flagsp | P_INSECURE;
-	if (flagsp_local != NULL)
+	إذا (flagsp_local != عدم)
 	    *flagsp_local = *flagsp_local | P_INSECURE;
     }
-    else if (new_value)
+    وإلا إذا (new_مقدار_2)
     {
 	*flagsp = *flagsp & ~P_INSECURE;
-	if (flagsp_local != NULL)
+	إذا (flagsp_local != عدم)
 	    *flagsp_local = *flagsp_local & ~P_INSECURE;
     }
 }
@@ -3194,21 +3194,21 @@ did_set_option(
  * Used for 'cedit', 'termwinkey', 'wildchar' and 'wildcharm' options.
  * When "multi_byte" is TRUE allow for multi-byte characters.
  */
-    int
-string_to_key(char_u *arg, int multi_byte)
+    صحيح
+string_مقصد_کلید(char_u *arg, صحيح multi_byte)
 {
-    if (*arg == '<' && arg[1])
-	return find_key_option(arg + 1, TRUE);
-    if (*arg == '^' && arg[1])
+    إذا (*arg == '<' && arg[1])
+	أرجع پیدا_کن_کلید_option(arg + 1, TRUE);
+    إذا (*arg == '^' && arg[1])
     {
-	int key = Ctrl_chr(arg[1]);
-	if (key == 0)		// ^@ is <Nul>
-	    key = K_ZERO;
-	return key;
+	صحيح کلید = Ctrl_chr(arg[1]);
+	إذا (کلید == 0)		// ^@ is <Nul>
+	    کلید = K_ZERO;
+	أرجع کلید;
     }
-    if (multi_byte)
-	return PTR2CHAR(arg);
-    return *arg;
+    إذا (multi_byte)
+	أرجع PTR2CHAR(arg);
+    أرجع *arg;
 }
 
 /*
@@ -3217,13 +3217,13 @@ string_to_key(char_u *arg, int multi_byte)
  * When switching the title or icon off, call mch_restore_title() to get
  * the old value back.
  */
-    void
-did_set_title(void)
+    فراغ
+did_مجموعه_title(فراغ)
 {
-    if (starting != NO_SCREEN
-#ifdef FEAT_GUI
+    إذا (starting != NO_SCREEN
+#اگر_تعریف_شده FEAT_GUI
 	    && !gui.starting
-#endif
+#پایان_اگر
 				)
 	maketitle();
 }
@@ -3231,26 +3231,26 @@ did_set_title(void)
 /*
  * set_options_bin -  called when 'bin' changes value.
  */
-    void
-set_options_bin(
-    int		oldval,
-    int		newval,
-    int		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
+    فراغ
+مجموعه_options_bin(
+    صحيح		oldval,
+    صحيح		newval,
+    صحيح		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
 {
     // The option values that are changed when 'bin' changes are
     // copied when 'bin is set and restored when 'bin' is reset.
-    if (newval)
+    إذا (newval)
     {
-	if (!oldval)		// switched on
+	إذا (!oldval)		// switched on
 	{
-	    if (!(opt_flags & OPT_GLOBAL))
+	    إذا (!(opt_flags & OPT_GLOBAL))
 	    {
 		curbuf->b_p_tw_nobin = curbuf->b_p_tw;
 		curbuf->b_p_wm_nobin = curbuf->b_p_wm;
 		curbuf->b_p_ml_nobin = curbuf->b_p_ml;
 		curbuf->b_p_et_nobin = curbuf->b_p_et;
 	    }
-	    if (!(opt_flags & OPT_LOCAL))
+	    إذا (!(opt_flags & OPT_LOCAL))
 	    {
 		p_tw_nobin = p_tw;
 		p_wm_nobin = p_wm;
@@ -3259,14 +3259,14 @@ set_options_bin(
 	    }
 	}
 
-	if (!(opt_flags & OPT_GLOBAL))
+	إذا (!(opt_flags & OPT_GLOBAL))
 	{
 	    curbuf->b_p_tw = 0;	// no automatic line wrap
 	    curbuf->b_p_wm = 0;	// no automatic line wrap
 	    curbuf->b_p_ml = 0;	// no modelines
 	    curbuf->b_p_et = 0;	// no expandtab
 	}
-	if (!(opt_flags & OPT_LOCAL))
+	إذا (!(opt_flags & OPT_LOCAL))
 	{
 	    p_tw = 0;
 	    p_wm = 0;
@@ -3275,16 +3275,16 @@ set_options_bin(
 	    p_bin = TRUE;	// needed when called for the "-b" argument
 	}
     }
-    else if (oldval)		// switched off
+    وإلا إذا (oldval)		// switched off
     {
-	if (!(opt_flags & OPT_GLOBAL))
+	إذا (!(opt_flags & OPT_GLOBAL))
 	{
 	    curbuf->b_p_tw = curbuf->b_p_tw_nobin;
 	    curbuf->b_p_wm = curbuf->b_p_wm_nobin;
 	    curbuf->b_p_ml = curbuf->b_p_ml_nobin;
 	    curbuf->b_p_et = curbuf->b_p_et_nobin;
 	}
-	if (!(opt_flags & OPT_LOCAL))
+	إذا (!(opt_flags & OPT_LOCAL))
 	{
 	    p_tw = p_tw_nobin;
 	    p_wm = p_wm_nobin;
@@ -3292,10 +3292,10 @@ set_options_bin(
 	    p_et = p_et_nobin;
 	}
     }
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
     // Remember where the dependent option were reset
     didset_options_sctx(opt_flags, p_bin_dep_opts);
-#endif
+#پایان_اگر
 }
 
 /*
@@ -3304,19 +3304,19 @@ set_options_bin(
  * If "val" is NULL expand the current value of the option.
  * Return pointer to NameBuff, or NULL when not expanded.
  */
-    static char_u *
-option_expand(int opt_idx, char_u *val)
+    ساكن char_u *
+option_expand(صحيح opt_idx, char_u *val)
 {
     // if option doesn't need expansion nothing to do
-    if (!(options[opt_idx].flags & P_EXPAND) || options[opt_idx].var == NULL)
-	return NULL;
+    إذا (!(options[opt_idx].flags & P_EXPAND) || options[opt_idx].var == عدم)
+	أرجع عدم;
 
     // If val is longer than MAXPATHL no meaningful expansion can be done,
     // expand_env() would truncate the string.
-    if (val != NULL && STRLEN(val) > MAXPATHL)
-	return NULL;
+    إذا (val != عدم && STRLEN(val) > MAXPATHL)
+	أرجع عدم;
 
-    if (val == NULL)
+    إذا (val == عدم)
 	val = *(char_u **)options[opt_idx].var;
 
     /*
@@ -3326,87 +3326,87 @@ option_expand(int opt_idx, char_u *val)
      * For 'spellsuggest' expand after "file:".
      */
     char_u ** var = (char_u **)options[opt_idx].var;
-    int esc = var == &p_tags || var == &p_path;
+    صحيح esc = var == &p_برچسبها || var == &p_مسیر;
 
     expand_env_esc(val, NameBuff, MAXPATHL,
-	    esc ? (char_u *)" \t" : NULL, FALSE,
-#ifdef FEAT_SPELL
+	    esc ? (char_u *)" \t" : عدم, FALSE,
+#اگر_تعریف_شده FEAT_SPELL
 	    var == &p_sps ? (char_u *)"file:" :
-#endif
-				  NULL);
-    if (STRCMP(NameBuff, val) == 0)   // they are the same
-	return NULL;
+#پایان_اگر
+				  عدم);
+    إذا (STRCMP(NameBuff, val) == 0)   // they are the same
+	أرجع عدم;
 
-    return NameBuff;
+    أرجع NameBuff;
 }
 
 /*
  * After setting various option values: recompute variables that depend on
  * option values.
  */
-    static void
-didset_options(void)
+    ساكن فراغ
+didset_options(فراغ)
 {
     // initialize the table for 'iskeyword' et.al.
-    (void)init_chartab();
+    (فراغ)init_chartab();
 
     didset_string_options();
 
-#ifdef FEAT_SPELL
-    (void)spell_check_msm();
-    (void)spell_check_sps();
-    (void)compile_cap_prog(curwin->w_s);
-    (void)did_set_spell_option();
-#endif
+#اگر_تعریف_شده FEAT_SPELL
+    (فراغ)spell_check_msm();
+    (فراغ)spell_check_sps();
+    (فراغ)compile_cap_prog(curwin->w_s);
+    (فراغ)did_مجموعه_spell_option();
+#پایان_اگر
     // set cedit_key
-    (void)did_set_cedit(NULL);
-#ifdef FEAT_LINEBREAK
+    (فراغ)did_مجموعه_cedit(عدم);
+#اگر_تعریف_شده FEAT_LINEBREAK
     // initialize the table for 'breakat'.
-    did_set_breakat(NULL);
-#endif
+    did_مجموعه_breakat(عدم);
+#پایان_اگر
     after_copy_winopt(curwin);
 }
 
 /*
  * More side effects of setting options.
  */
-    static void
-didset_options2(void)
+    ساكن فراغ
+didset_options2(فراغ)
 {
     // Initialize the highlight_attr[] table.
-    (void)highlight_changed();
+    (فراغ)highlight_تغییریافته();
 
     // Parse default for 'wildmode'
     check_opt_wim();
 
     // Parse default for 'listchars'.
-    (void)set_listchars_option(curwin, curwin->w_p_lcs, TRUE, NULL, 0);
+    (فراغ)مجموعه_listchars_option(curwin, curwin->w_p_lcs, TRUE, عدم, 0);
 
     // Parse default for 'fillchars'.
-    (void)set_fillchars_option(curwin, curwin->w_p_fcs, TRUE, NULL, 0);
+    (فراغ)مجموعه_fillchars_option(curwin, curwin->w_p_fcs, TRUE, عدم, 0);
 
-#ifdef FEAT_CLIPBOARD
+#اگر_تعریف_شده FEAT_CLIPBOARD
     // Parse default for 'clipboard'
-    (void)did_set_clipboard(NULL);
-#endif
-#ifdef FEAT_VARTABS
+    (فراغ)did_مجموعه_clipboard(عدم);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_VARTABS
     vim_free(curbuf->b_p_vsts_array);
-    (void)tabstop_set(curbuf->b_p_vsts, &curbuf->b_p_vsts_array);
+    (فراغ)tabstop_مجموعه(curbuf->b_p_vsts, &curbuf->b_p_vsts_array);
     vim_free(curbuf->b_p_vts_array);
-    (void)tabstop_set(curbuf->b_p_vts,  &curbuf->b_p_vts_array);
-#endif
+    (فراغ)tabstop_مجموعه(curbuf->b_p_vts,  &curbuf->b_p_vts_array);
+#پایان_اگر
 }
 
 /*
  * Check for string options that are NULL (normally only termcap options).
  */
-    void
-check_options(void)
+    فراغ
+check_options(فراغ)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
 
-    for (opt_idx = 0; options[opt_idx].fullname != NULL; opt_idx++)
-	if ((options[opt_idx].flags & P_STRING) && options[opt_idx].var != NULL)
+    لكل (opt_idx = 0; options[opt_idx].fullname != عدم; opt_idx++)
+	إذا ((options[opt_idx].flags & P_STRING) && options[opt_idx].var != عدم)
 	    check_string_option((char_u **)get_varp(&(options[opt_idx])));
 }
 
@@ -3414,50 +3414,50 @@ check_options(void)
  * Return the option index found by a pointer into term_strings[].
  * Return -1 if not found.
  */
-    int
-get_term_opt_idx(char_u **p)
+    صحيح
+get_جمله_opt_idx(char_u **p)
 {
-    int opt_idx;
+    صحيح opt_idx;
 
-    for (opt_idx = 1; options[opt_idx].fullname != NULL; opt_idx++)
-	if (options[opt_idx].var == (char_u *)p)
-	    return opt_idx;
-    return -1; // cannot happen: didn't find it!
+    لكل (opt_idx = 1; options[opt_idx].fullname != عدم; opt_idx++)
+	إذا (options[opt_idx].var == (char_u *)p)
+	    أرجع opt_idx;
+    أرجع -1; // cannot happen: didn't find it!
 }
 
 /*
  * Mark a terminal option as allocated, found by a pointer into term_strings[].
  * Return the option index or -1 if not found.
  */
-    int
-set_term_option_alloced(char_u **p)
+    صحيح
+مجموعه_جمله_option_alloced(char_u **p)
 {
-    int		opt_idx = get_term_opt_idx(p);
+    صحيح		opt_idx = get_جمله_opt_idx(p);
 
-    if (opt_idx >= 0)
+    إذا (opt_idx >= 0)
 	options[opt_idx].flags |= P_ALLOCED;
-    return opt_idx;
+    أرجع opt_idx;
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Return TRUE when option "opt" was set from a modeline or in secure mode.
  * Return FALSE when it wasn't.
  * Return -1 for an unknown option.
  */
-    int
-was_set_insecurely(win_T *wp, char_u *opt, int opt_flags)
+    صحيح
+was_مجموعه_insecurely(win_T *wp, char_u *opt, صحيح opt_flags)
 {
-    int	    idx = findoption(opt);
+    صحيح	    idx = findoption(opt);
     long_u  *flagp;
 
-    if (idx >= 0)
+    إذا (idx >= 0)
     {
 	flagp = insecure_flag(wp, idx, opt_flags);
-	return (*flagp & P_INSECURE) != 0;
+	أرجع (*flagp & P_INSECURE) != 0;
     }
-    internal_error("was_set_insecurely()");
-    return -1;
+    داخلی_error("was_set_insecurely()");
+    أرجع -1;
 }
 
 /*
@@ -3466,116 +3466,116 @@ was_set_insecurely(win_T *wp, char_u *opt, int opt_flags)
  * NOTE: Caller must make sure that "curwin" is set to the window from which
  * the option is used.
  */
-    static long_u *
-insecure_flag(win_T *wp, int opt_idx, int opt_flags)
+    ساكن long_u *
+insecure_flag(win_T *wp, صحيح opt_idx, صحيح opt_flags)
 {
-    if (opt_flags & OPT_LOCAL)
-	switch ((int)options[opt_idx].indir)
+    إذا (opt_flags & OPT_LOCAL)
+	بدل ((صحيح)options[opt_idx].indir)
 	{
-	    case PV_WRAP:	return &wp->w_p_wrap_flags;
+	    حالة PV_WRAP:	أرجع &wp->w_p_wrap_flags;
 # ifdef FEAT_STL_OPT
-	    case PV_STL:	return &wp->w_p_stl_flags;
+	    حالة PV_STL:	أرجع &wp->w_p_stl_flags;
 # endif
 # ifdef FEAT_EVAL
 #  ifdef FEAT_FOLDING
-	    case PV_FDE:	return &wp->w_p_fde_flags;
-	    case PV_FDT:	return &wp->w_p_fdt_flags;
+	    حالة PV_FDE:	أرجع &wp->w_p_fde_flags;
+	    حالة PV_FDT:	أرجع &wp->w_p_fdt_flags;
 #  endif
 #  ifdef FEAT_BEVAL
-	    case PV_BEXPR:	return &wp->w_buffer->b_p_bexpr_flags;
+	    حالة PV_BEXPR:	أرجع &wp->w_میانگیر->b_p_bexpr_flags;
 #  endif
-	    case PV_INDE:	return &wp->w_buffer->b_p_inde_flags;
-	    case PV_FEX:	return &wp->w_buffer->b_p_fex_flags;
-#  ifdef FEAT_FIND_ID
-	    case PV_INEX:	return &wp->w_buffer->b_p_inex_flags;
+	    حالة PV_INDE:	أرجع &wp->w_میانگیر->b_p_inde_flags;
+	    حالة PV_FEX:	أرجع &wp->w_میانگیر->b_p_fex_flags;
+#  ifdef FEAT_پیدا_کن_ID
+	    حالة PV_INEX:	أرجع &wp->w_میانگیر->b_p_inex_flags;
 #  endif
 #  ifdef FEAT_COMPL_FUNC
-	    case PV_CPT:	return &wp->w_buffer->b_p_cpt_flags;
+	    حالة PV_CPT:	أرجع &wp->w_میانگیر->b_p_cpt_flags;
 #  endif
 # endif
 	}
-    else
+    وإلا
 	// For global value of window-local options, use flags in w_allbuf_opt.
-	switch ((int)options[opt_idx].indir)
+	بدل ((صحيح)options[opt_idx].indir)
 	{
-	    case PV_WRAP:	return &wp->w_allbuf_opt.wo_wrap_flags;
-# if defined(FEAT_EVAL) && defined(FEAT_FOLDING)
-	    case PV_FDE:	return &wp->w_allbuf_opt.wo_fde_flags;
-	    case PV_FDT:	return &wp->w_allbuf_opt.wo_fdt_flags;
+	    حالة PV_WRAP:	أرجع &wp->w_allbuf_opt.wo_wrap_flags;
+# إذا defined(FEAT_EVAL) && defined(FEAT_FOLDING)
+	    حالة PV_FDE:	أرجع &wp->w_allbuf_opt.wo_fde_flags;
+	    حالة PV_FDT:	أرجع &wp->w_allbuf_opt.wo_fdt_flags;
 # endif
 	}
 
     // Nothing special, return global flags field.
-    return &options[opt_idx].flags;
+    أرجع &options[opt_idx].flags;
 }
-#endif
+#پایان_اگر
 
 /*
  * Redraw the window title and/or tab page text later.
  */
-    void
-redraw_titles(void)
+    فراغ
+redraw_titles(فراغ)
 {
     need_maketitle = TRUE;
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#إذا defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
-#endif
+#پایان_اگر
 }
 
 /*
  * Return TRUE if "val" is a valid name: only consists of alphanumeric ASCII
  * characters or characters in "allowed".
  */
-    int
-valid_name(char_u *val, char *allowed)
+    صحيح
+valid_name(char_u *val, حرف *allowed)
 {
     char_u *s;
 
-    for (s = val; *s != NUL; ++s)
-	if (!ASCII_ISALNUM(*s) && vim_strchr((char_u *)allowed, *s) == NULL)
-	    return FALSE;
-    return TRUE;
+    لكل (s = val; *s != NUL; ++s)
+	إذا (!ASCII_ISALNUM(*s) && vim_strchr((char_u *)allowed, *s) == عدم)
+	    أرجع FALSE;
+    أرجع TRUE;
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Set the script_ctx for an option, taking care of setting the buffer- or
  * window-local value.
  */
-    void
-set_option_sctx_idx(int opt_idx, int opt_flags, sctx_T script_ctx)
+    فراغ
+مجموعه_option_sctx_idx(صحيح opt_idx, صحيح opt_flags, sctx_T script_ctx)
 {
-    int		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
-    int		indir = (int)options[opt_idx].indir;
+    صحيح		both = (opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0;
+    صحيح		indir = (صحيح)options[opt_idx].indir;
     sctx_T	new_script_ctx = script_ctx;
 
     // Modeline already has the line number set.
-    if (!(opt_flags & OPT_MODELINE))
+    إذا (!(opt_flags & OPT_MODELINE))
 	new_script_ctx.sc_lnum += SOURCING_LNUM;
 
     // ":legacy" and ":vim9cmd" change the execution context of an option.
-    if (cmdmod.cmod_flags & CMOD_VIM9CMD)
-	new_script_ctx.sc_version = SCRIPT_VERSION_VIM9;
-    if (cmdmod.cmod_flags & CMOD_LEGACY)
+    إذا (cmdmod.cmod_flags & CMOD_VIM9CMD)
+	new_script_ctx.sc_نسخه = SCRIPT_نسخه_VIM9;
+    إذا (cmdmod.cmod_flags & CMOD_LEGACY)
 	// It is a bit confusing, but "MAX" is actually the legacy Vim script
 	// version before Vim9.
-	new_script_ctx.sc_version = SCRIPT_VERSION_MAX;
+	new_script_ctx.sc_نسخه = SCRIPT_نسخه_MAX;
 
     // Remember where the option was set.  For local options need to do that
     // in the buffer or window structure.
-    if (both || (opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
+    إذا (both || (opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
 	options[opt_idx].script_ctx = new_script_ctx;
-    if (both || (opt_flags & OPT_LOCAL))
+    إذا (both || (opt_flags & OPT_LOCAL))
     {
-	if (indir & PV_BUF)
-	    curbuf->b_p_script_ctx[indir & PV_MASK] = new_script_ctx;
-	else if (indir & PV_WIN)
+	إذا (indir & PV_BUF)
+	    curbuf->b_p_script_ctx[indir & PV_ماسک] = new_script_ctx;
+	وإلا إذا (indir & PV_WIN)
 	{
-	    curwin->w_p_script_ctx[indir & PV_MASK] = new_script_ctx;
-	    if (both)
+	    curwin->w_p_script_ctx[indir & PV_ماسک] = new_script_ctx;
+	    إذا (both)
 		// also setting the "all buffers" value
-		curwin->w_allbuf_opt.wo_script_ctx[indir & PV_MASK] =
+		curwin->w_allbuf_opt.wo_script_ctx[indir & PV_ماسک] =
 								new_script_ctx;
 	}
     }
@@ -3588,27 +3588,27 @@ set_option_sctx_idx(int opt_idx, int opt_flags, sctx_T script_ctx)
  * OPT_LOCAL, selecting global or buffer/window context, respectively.
  */
     bool
-is_option_value_vim9(int opt_idx, int opt_flags)
+is_option_مقدار_vim9(صحيح opt_idx, صحيح opt_flags)
 {
-    int		indir = (int)options[opt_idx].indir;
-    sctx_T	*sctx = NULL;
+    صحيح		indir = (صحيح)options[opt_idx].indir;
+    sctx_T	*sctx = عدم;
 
-    if ((opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
+    إذا ((opt_flags & OPT_GLOBAL) || (indir & (PV_BUF|PV_WIN)) == 0)
 	sctx = &options[opt_idx].script_ctx;
 
-    if ((opt_flags & OPT_LOCAL) || (indir & (PV_BUF|PV_WIN)))
+    إذا ((opt_flags & OPT_LOCAL) || (indir & (PV_BUF|PV_WIN)))
     {
-	if (indir & PV_BUF)
-	    sctx = &curbuf->b_p_script_ctx[indir & PV_MASK];
-	else if (indir & PV_WIN)
-	    sctx = &curwin->w_p_script_ctx[indir & PV_MASK];
+	إذا (indir & PV_BUF)
+	    sctx = &curbuf->b_p_script_ctx[indir & PV_ماسک];
+	وإلا إذا (indir & PV_WIN)
+	    sctx = &curwin->w_p_script_ctx[indir & PV_ماسک];
     }
 
     // If "sc_sid" is not set, it means the option value was not modified from
     // the default yet.  As we move towards Vim9 all the default values should
     // be valid Vim9.
-    return !SCRIPT_ID_VALID(sctx->sc_sid) ||
-	sctx->sc_version >= SCRIPT_VERSION_VIM9;
+    أرجع !SCRIPT_ID_VALID(sctx->sc_sid) ||
+	sctx->sc_نسخه >= SCRIPT_نسخه_VIM9;
 }
 
 /*
@@ -3616,14 +3616,14 @@ is_option_value_vim9(int opt_idx, int opt_flags)
  *
  */
     sctx_T *
-get_option_sctx(char *name)
+get_option_sctx(حرف *name)
 {
-    int idx = findoption((char_u *)name);
+    صحيح idx = findoption((char_u *)name);
 
-    if (idx >= 0)
-	return &options[idx].script_ctx;
+    إذا (idx >= 0)
+	أرجع &options[idx].script_ctx;
     siemsg("no such option: %s", name);
-    return NULL;
+    أرجع عدم;
 }
 
 /*
@@ -3631,15 +3631,15 @@ get_option_sctx(char *name)
  * "name" must be the two character code, e.g. "RV".
  * When "name" is NULL use "opt_idx".
  */
-    void
-set_term_option_sctx_idx(char *name, int opt_idx)
+    فراغ
+مجموعه_جمله_option_sctx_idx(حرف *name, صحيح opt_idx)
 {
     char_u  buf[5];
-    int	    idx;
+    صحيح	    idx;
 
-    if (name == NULL)
+    إذا (name == عدم)
 	idx = opt_idx;
-    else
+    وإلا
     {
 	buf[0] = 't';
 	buf[1] = '_';
@@ -3648,97 +3648,97 @@ set_term_option_sctx_idx(char *name, int opt_idx)
 	buf[4] = 0;
 	idx = findoption(buf);
     }
-    if (idx >= 0)
-	set_option_sctx_idx(idx, OPT_GLOBAL, current_sctx);
+    إذا (idx >= 0)
+	مجموعه_option_sctx_idx(idx, OPT_GLOBAL, current_sctx);
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Apply the OptionSet autocommand.
  */
-    static void
+    ساكن فراغ
 apply_optionset_autocmd(
-	int	opt_idx,
-	long	opt_flags,
-	long	oldval,
-	long	oldval_g,
-	long	newval,
-	char	*errmsg)
+	صحيح	opt_idx,
+	دراز	opt_flags,
+	دراز	oldval,
+	دراز	oldval_g,
+	دراز	newval,
+	حرف	*errmsg)
 {
     char_u buf_old[12], buf_new[12], buf_type[12];
     size_t  buf_oldlen;
     size_t  len;
 
     // Don't do this while starting up, failure or recursively.
-    if (starting || errmsg != NULL || *get_vim_var_str(VV_OPTION_TYPE) != NUL)
-	return;
+    إذا (starting || errmsg != عدم || *get_vim_var_str(VV_OPTION_TYPE) != NUL)
+	أرجع;
 
-    len = vim_snprintf_safelen((char *)buf_new, sizeof(buf_new), "%ld", newval);
-    set_vim_var_string(VV_OPTION_NEW, buf_new, (int)len);
-    len = vim_snprintf_safelen((char *)buf_type, sizeof(buf_type), "%s",
+    len = vim_snprintf_safelen((حرف *)buf_new, حجم(buf_new), "%ld", newval);
+    مجموعه_vim_var_string(VV_OPTION_NEW, buf_new, (صحيح)len);
+    len = vim_snprintf_safelen((حرف *)buf_type, حجم(buf_type), "%s",
 				(opt_flags & OPT_LOCAL) ? "local" : "global");
-    set_vim_var_string(VV_OPTION_TYPE, buf_type, (int)len);
+    مجموعه_vim_var_string(VV_OPTION_TYPE, buf_type, (صحيح)len);
 
-    buf_oldlen = vim_snprintf_safelen((char *)buf_old, sizeof(buf_old), "%ld", oldval);
-    set_vim_var_string(VV_OPTION_OLD, buf_old, (int)buf_oldlen);
+    buf_oldlen = vim_snprintf_safelen((حرف *)buf_old, حجم(buf_old), "%ld", oldval);
+    مجموعه_vim_var_string(VV_OPTION_OLD, buf_old, (صحيح)buf_oldlen);
 
-    if (opt_flags & OPT_LOCAL)
+    إذا (opt_flags & OPT_LOCAL)
     {
-	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setlocal", STRLEN_LITERAL("setlocal"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (int)buf_oldlen);
+	مجموعه_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setlocal", STRLEN_LITERAL("setlocal"));
+	مجموعه_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (صحيح)buf_oldlen);
     }
-    if (opt_flags & OPT_GLOBAL)
+    إذا (opt_flags & OPT_GLOBAL)
     {
-	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setglobal", STRLEN_LITERAL("setglobal"));
-	set_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old, (int)buf_oldlen);
+	مجموعه_vim_var_string(VV_OPTION_COMMAND, (char_u *)"setglobal", STRLEN_LITERAL("setglobal"));
+	مجموعه_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old, (صحيح)buf_oldlen);
     }
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    إذا ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	char_u	buf_old_global[12];
 	size_t	buf_old_globallen;
 
-	buf_old_globallen = vim_snprintf_safelen((char *)buf_old_global,
-	    sizeof(buf_old_global), "%ld", oldval_g);
+	buf_old_globallen = vim_snprintf_safelen((حرف *)buf_old_global,
+	    حجم(buf_old_global), "%ld", oldval_g);
 
-	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"set", STRLEN_LITERAL("set"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (int)buf_oldlen);
-	set_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old_global, (int)buf_old_globallen);
+	مجموعه_vim_var_string(VV_OPTION_COMMAND, (char_u *)"set", STRLEN_LITERAL("set"));
+	مجموعه_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (صحيح)buf_oldlen);
+	مجموعه_vim_var_string(VV_OPTION_OLDGLOBAL, buf_old_global, (صحيح)buf_old_globallen);
     }
-    if (opt_flags & OPT_MODELINE)
+    إذا (opt_flags & OPT_MODELINE)
     {
-	set_vim_var_string(VV_OPTION_COMMAND, (char_u *)"modeline", STRLEN_LITERAL("modeline"));
-	set_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (int)buf_oldlen);
+	مجموعه_vim_var_string(VV_OPTION_COMMAND, (char_u *)"modeline", STRLEN_LITERAL("modeline"));
+	مجموعه_vim_var_string(VV_OPTION_OLDLOCAL, buf_old, (صحيح)buf_oldlen);
     }
     apply_autocmds(EVENT_OPTIONSET, (char_u *)options[opt_idx].fullname,
-	    NULL, FALSE, NULL);
+	    عدم, FALSE, عدم);
     reset_v_option_vars();
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_ARABIC)
+#إذا defined(FEAT_ARABIC)
 /*
  * Process the updated 'arabic' option value.
  */
-    char *
-did_set_arabic(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_arabic(optset_T *آرگومانها استفادهنشده)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (curwin->w_p_arab)
+    إذا (curwin->w_p_arab)
     {
 	// 'arabic' is set, handle various sub-settings.
-	if (!p_tbidi)
+	إذا (!p_tbidi)
 	{
 	    // set rightleft mode
-	    if (!curwin->w_p_rl)
+	    إذا (!curwin->w_p_rl)
 	    {
 		curwin->w_p_rl = TRUE;
-		changed_window_setting();
+		تغییریافته_پنجره_setting();
 	    }
 
 	    // Enable Arabic shaping (major part of what Arabic requires)
-	    if (!p_arshape)
+	    إذا (!p_arshape)
 	    {
 		p_arshape = TRUE;
 		redraw_later_clear();
@@ -3747,14 +3747,14 @@ did_set_arabic(optset_T *args UNUSED)
 
 	// Arabic requires a utf-8 encoding, inform the user if it's not
 	// set.
-	if (STRCMP(p_enc, "utf-8") != 0)
+	إذا (STRCMP(p_enc, "utf-8") != 0)
 	{
-	    static char *w_arabic = N_("W17: Arabic requires UTF-8, do ':set encoding=utf-8'");
+	    ساكن حرف *w_arabic = N_("W17: Arabic requires UTF-8, do ':set encoding=utf-8'");
 
-	    msg_source(HL_ATTR(HLF_W));
-	    msg_attr(_(w_arabic), HL_ATTR(HLF_W));
+	    پیام_منبع(HL_ATTR(HLF_W));
+	    پیام_attr(_(w_arabic), HL_ATTR(HLF_W));
 # ifdef FEAT_EVAL
-	    set_vim_var_string(VV_WARNINGMSG, (char_u *)_(w_arabic), -1);
+	    مجموعه_vim_var_string(VV_WARNINGMSG, (char_u *)_(w_arabic), -1);
 # endif
 	}
 
@@ -3763,20 +3763,20 @@ did_set_arabic(optset_T *args UNUSED)
 
 # ifdef FEAT_KEYMAP
 	// Force-set the necessary keymap for arabic
-	errmsg = set_option_value((char_u *)"keymap", 0L, (char_u *)"arabic",
+	errmsg = مجموعه_option_مقدار((char_u *)"keymap", 0L, (char_u *)"arabic",
 								OPT_LOCAL);
 # endif
     }
-    else
+    وإلا
     {
 	// 'arabic' is reset, handle various sub-settings.
-	if (!p_tbidi)
+	إذا (!p_tbidi)
 	{
 	    // reset rightleft mode
-	    if (curwin->w_p_rl)
+	    إذا (curwin->w_p_rl)
 	    {
 		curwin->w_p_rl = FALSE;
-		changed_window_setting();
+		تغییریافته_پنجره_setting();
 	    }
 
 	    // 'arabicshape' isn't reset, it is a global option and
@@ -3789,527 +3789,527 @@ did_set_arabic(optset_T *args UNUSED)
 # ifdef FEAT_KEYMAP
 	// Revert to the default keymap
 	curbuf->b_p_iminsert = B_IMODE_NONE;
-	curbuf->b_p_imsearch = B_IMODE_USE_INSERT;
+	curbuf->b_p_imsearch = B_IMODE_USE_درج;
 # endif
     }
 
-    return errmsg;
+    أرجع errmsg;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_AUTOCHDIR)
+#إذا defined(FEAT_AUTOCHDIR)
 /*
  * Process the updated 'autochdir' option value.
  */
-    char *
-did_set_autochdir(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_autochdir(optset_T *آرگومانها استفادهنشده)
 {
     // Change directories when the 'acd' option is set now.
     DO_AUTOCHDIR;
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_BEVAL_GUI)
+#إذا defined(FEAT_BEVAL_GUI)
 /*
  * Process the updated 'ballooneval' option value.
  */
-    char *
-did_set_ballooneval(optset_T *args)
+    حرف *
+did_مجموعه_ballooneval(optset_T *آرگومانها)
 {
-    if (balloonEvalForTerm)
-	return NULL;
+    إذا (balloon_Eval_For_جمله)
+	أرجع عدم;
 
-    if (p_beval && !args->os_oldval.boolean)
+    إذا (p_beval && !آرگومانها->os_oldval.boolean)
 	gui_mch_enable_beval_area(balloonEval);
-    else if (!p_beval && args->os_oldval.boolean)
+    وإلا إذا (!p_beval && آرگومانها->os_oldval.boolean)
 	gui_mch_disable_beval_area(balloonEval);
 
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_BEVAL_TERM)
+#إذا defined(FEAT_BEVAL_جمله)
 /*
  * Process the updated 'balloonevalterm' option value.
  */
-    char *
-did_set_balloonevalterm(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_balloonevalterm(optset_T *آرگومانها استفادهنشده)
 {
-    mch_bevalterm_changed();
-    return NULL;
+    mch_bevalterm_تغییریافته();
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the updated 'binary' option value.
  */
-    char *
-did_set_binary(optset_T *args)
+    حرف *
+did_مجموعه_دودویی(optset_T *آرگومانها)
 {
     // when 'bin' is set also set some other options
-    set_options_bin(args->os_oldval.boolean, curbuf->b_p_bin, args->os_flags);
+    مجموعه_options_bin(آرگومانها->os_oldval.boolean, curbuf->b_p_bin, آرگومانها->os_flags);
     redraw_titles();
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the updated 'buflisted' option value.
  */
-    char *
-did_set_buflisted(optset_T *args)
+    حرف *
+did_مجموعه_buflisted(optset_T *آرگومانها)
 {
     // when 'buflisted' changes, trigger autocommands
-    if (args->os_oldval.boolean != curbuf->b_p_bl)
+    إذا (آرگومانها->os_oldval.boolean != curbuf->b_p_bl)
 	apply_autocmds(curbuf->b_p_bl ? EVENT_BUFADD : EVENT_BUFDELETE,
-						NULL, NULL, TRUE, curbuf);
-    return NULL;
+						عدم, عدم, TRUE, curbuf);
+    أرجع عدم;
 }
 
 /*
  * Process the new 'cmdheight' option value.
  */
-    char *
-did_set_cmdheight(optset_T *args)
+    حرف *
+did_مجموعه_cmdheight(optset_T *آرگومانها)
 {
-    long old_value = args->os_oldval.number;
-    char *errmsg = NULL;
+    دراز old_مقدار = آرگومانها->os_oldval.عدد;
+    حرف *errmsg = عدم;
 
     // if p_ch changed value, change the command line height
-    if (p_ch < MIN_CMDHEIGHT)
+    إذا (p_ch < MIN_CMDHEIGHT)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_ch = MIN_CMDHEIGHT;
     }
-    if (p_ch > Rows - min_rows() + MIN_CMDHEIGHT)
-	p_ch = Rows - min_rows() + MIN_CMDHEIGHT;
+    إذا (p_ch > ردیفها - min_ردیفها() + MIN_CMDHEIGHT)
+	p_ch = ردیفها - min_ردیفها() + MIN_CMDHEIGHT;
 
     // Only compute the new window layout when startup has been
     // completed. Otherwise the frame sizes may be wrong.
-    if ((p_ch != old_value
-		|| tabline_height() + topframe->fr_height != Rows - p_ch)
-	    && full_screen
-#ifdef FEAT_GUI
+    إذا ((p_ch != old_مقدار
+		|| tabline_ارتفاع() + topframe->fr_ارتفاع != ردیفها - p_ch)
+	    && پر_screen
+#اگر_تعریف_شده FEAT_GUI
 	    && !gui.starting
-#endif
+#پایان_اگر
        )
-	command_height();
+	command_ارتفاع();
 
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
  * Process the updated 'compatible' option value.
  */
-    char *
-did_set_compatible(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_compatible(optset_T *آرگومانها استفادهنشده)
 {
-    compatible_set();
-    return NULL;
+    compatible_مجموعه();
+    أرجع عدم;
 }
 
-#if defined(FEAT_CONCEAL)
+#إذا defined(FEAT_CONCEAL)
 /*
  * Process the new 'conceallevel' option value.
  */
-    char *
-did_set_conceallevel(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_conceallevel(optset_T *آرگومانها استفادهنشده)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (curwin->w_p_cole < 0)
+    إذا (curwin->w_p_cole < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	curwin->w_p_cole = 0;
     }
-    else if (curwin->w_p_cole > 3)
+    وإلا إذا (curwin->w_p_cole > 3)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_آرگومان;
 	curwin->w_p_cole = 3;
     }
-    if (curwin->w_allbuf_opt.wo_cole < 0)
+    إذا (curwin->w_allbuf_opt.wo_cole < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	curwin->w_allbuf_opt.wo_cole = 0;
     }
-    else if (curwin->w_allbuf_opt.wo_cole > 3)
+    وإلا إذا (curwin->w_allbuf_opt.wo_cole > 3)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_آرگومان;
 	curwin->w_allbuf_opt.wo_cole = 3;
     }
 
-    return errmsg;
+    أرجع errmsg;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_DIFF)
+#إذا defined(FEAT_DIFF)
 /*
  * Process the updated 'diff' option value.
  */
-    char *
-did_set_diff(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_diff(optset_T *آرگومانها استفادهنشده)
 {
     // May add or remove the buffer from the list of diff buffers.
     diff_buf_adjust(curwin);
 # ifdef FEAT_FOLDING
-    if (foldmethodIsDiff(curwin))
+    إذا (foldmethodIsDiff(curwin))
 	foldUpdateAll(curwin);
 # endif
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the updated 'endoffile' or 'endofline' or 'fixendofline' or 'bomb'
  * option value.
  */
-    char *
-did_set_eof_eol_fixeol_bomb(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_eof_eol_fixeol_bomb(optset_T *آرگومانها استفادهنشده)
 {
     // redraw the window title and tab page text
     redraw_titles();
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the updated 'equalalways' option value.
  */
-    char *
-did_set_equalalways(optset_T *args)
+    حرف *
+did_مجموعه_equalalways(optset_T *آرگومانها)
 {
-    if (p_ea && !args->os_oldval.boolean)
+    إذا (p_ea && !آرگومانها->os_oldval.boolean)
 	win_equal(curwin, FALSE, 0);
 
-    return NULL;
+    أرجع عدم;
 }
 
-#if defined(FEAT_FOLDING)
+#إذا defined(FEAT_FOLDING)
 /*
  * Process the new 'foldcolumn' option value.
  */
-    char *
-did_set_foldcolumn(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_foldcolumn(optset_T *آرگومانها استفادهنشده)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (curwin->w_p_fdc < 0)
+    إذا (curwin->w_p_fdc < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	curwin->w_p_fdc = 0;
     }
-    else if (curwin->w_p_fdc > 12)
+    وإلا إذا (curwin->w_p_fdc > 12)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_آرگومان;
 	curwin->w_p_fdc = 12;
     }
-    if (curwin->w_allbuf_opt.wo_fdc < 0)
+    إذا (curwin->w_allbuf_opt.wo_fdc < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	curwin->w_allbuf_opt.wo_fdc = 0;
     }
-    else if (curwin->w_allbuf_opt.wo_fdc > 12)
+    وإلا إذا (curwin->w_allbuf_opt.wo_fdc > 12)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_آرگومان;
 	curwin->w_allbuf_opt.wo_fdc = 12;
     }
 
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
  * Process the new 'foldlevel' option value.
  */
-    char *
-did_set_foldlevel(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_foldlevel(optset_T *آرگومانها استفادهنشده)
 {
-    if (curwin->w_p_fdl < 0)
+    إذا (curwin->w_p_fdl < 0)
 	curwin->w_p_fdl = 0;
     newFoldLevel();
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the new 'foldminlines' option value.
  */
-    char *
-did_set_foldminlines(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_foldminlines(optset_T *آرگومانها استفادهنشده)
 {
     foldUpdateAll(curwin);
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the new 'foldnestmax' option value.
  */
-    char *
-did_set_foldnestmax(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_foldnestmax(optset_T *آرگومانها استفادهنشده)
 {
-    if (foldmethodIsSyntax(curwin) || foldmethodIsIndent(curwin))
+    إذا (foldmethodIsSyntax(curwin) || foldmethodIsIndent(curwin))
 	foldUpdateAll(curwin);
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_SEARCH_EXTRA)
+#إذا defined(FEAT_جستجو_EXTRA)
 /*
  * Process the updated 'hlsearch' option value.
  */
-    char *
-did_set_hlsearch(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_hlsearch(optset_T *آرگومانها استفادهنشده)
 {
     // when 'hlsearch' is set or reset: reset no_hlsearch
-    set_no_hlsearch(FALSE);
-    return NULL;
+    مجموعه_no_hlsearch(FALSE);
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the updated 'ignorecase' option value.
  */
-    char *
-did_set_ignorecase(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_ignorecase(optset_T *آرگومانها استفادهنشده)
 {
     // when 'ignorecase' is set or reset and 'hlsearch' is set, redraw
-    if (p_hls)
+    إذا (p_hls)
 	redraw_all_later(UPD_SOME_VALID);
-    return NULL;
+    أرجع عدم;
 }
 
-#if defined(HAVE_INPUT_METHOD)
+#إذا defined(HAVE_درون_داد_روش)
 /*
  * Process the updated 'imdisable' option value.
  */
-    char *
-did_set_imdisable(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_imdisable(optset_T *آرگومانها استفادهنشده)
 {
     // Only de-activate it here, it will be enabled when changing mode.
-    if (p_imdisable)
-	im_set_active(FALSE);
-    else if (State & MODE_INSERT)
+    إذا (p_imdisable)
+	im_مجموعه_فعال(FALSE);
+    وإلا إذا (State & نما_درج)
 	// When the option is set from an autocommand, it may need to take
 	// effect right away.
-	im_set_active(curbuf->b_p_iminsert == B_IMODE_IM);
-    return NULL;
+	im_مجموعه_فعال(curbuf->b_p_iminsert == B_IMODE_IM);
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the new 'iminsert' option value.
  */
-    char *
-did_set_iminsert(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_iminsert(optset_T *آرگومانها استفادهنشده)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (curbuf->b_p_iminsert < 0 || curbuf->b_p_iminsert > B_IMODE_LAST)
+    إذا (curbuf->b_p_iminsert < 0 || curbuf->b_p_iminsert > B_IMODE_آخرین)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_آرگومان;
 	curbuf->b_p_iminsert = B_IMODE_NONE;
     }
     p_iminsert = curbuf->b_p_iminsert;
-    if (termcap_active)	// don't do this in the alternate screen
+    إذا (termcap_فعال)	// don't do this in the alternate screen
 	showmode();
-#if defined(FEAT_KEYMAP)
+#إذا defined(FEAT_KEYMAP)
     // Show/unshow value of 'keymap' in status lines.
-    status_redraw_curbuf();
-#endif
+    وضعیت_redraw_curbuf();
+#پایان_اگر
 
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
  * Process the new 'imsearch' option value.
  */
-    char *
-did_set_imsearch(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_imsearch(optset_T *آرگومانها استفادهنشده)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (curbuf->b_p_imsearch < -1 || curbuf->b_p_imsearch > B_IMODE_LAST)
+    إذا (curbuf->b_p_imsearch < -1 || curbuf->b_p_imsearch > B_IMODE_آخرین)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_آرگومان;
 	curbuf->b_p_imsearch = B_IMODE_NONE;
     }
     p_imsearch = curbuf->b_p_imsearch;
 
-    return errmsg;
+    أرجع errmsg;
 }
 
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#إذا defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 /*
  * Process the new 'imstyle' option value.
  */
-    char *
-did_set_imstyle(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_imstyle(optset_T *آرگومانها استفادهنشده)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (p_imst != IM_ON_THE_SPOT && p_imst != IM_OVER_THE_SPOT)
-	errmsg = e_invalid_argument;
+    إذا (p_imst != IM_ON_THE_SPOT && p_imst != IM_OVER_THE_SPOT)
+	errmsg = e_invalid_آرگومان;
 
-    return errmsg;
+    أرجع errmsg;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the updated 'insertmode' option value.
  */
-    char *
-did_set_insertmode(optset_T *args)
+    حرف *
+did_مجموعه_insertmode(optset_T *آرگومانها)
 {
     // when 'insertmode' is set from an autocommand need to do work here
-    if (p_im)
+    إذا (p_im)
     {
-	if ((State & MODE_INSERT) == 0)
-	    need_start_insertmode = TRUE;
-	stop_insert_mode = FALSE;
+	إذا ((State & نما_درج) == 0)
+	    need_شروع_insertmode = TRUE;
+	stop_درج_نما = FALSE;
     }
     // only reset if it was set previously
-    else if (args->os_oldval.boolean)
+    وإلا إذا (آرگومانها->os_oldval.boolean)
     {
-	need_start_insertmode = FALSE;
-	stop_insert_mode = TRUE;
-	if (restart_edit != 0 && mode_displayed)
+	need_شروع_insertmode = FALSE;
+	stop_درج_نما = TRUE;
+	إذا (restart_edit != 0 && نما_displayed)
 	    clear_cmdline = TRUE;	// remove "(insert)"
 	restart_edit = 0;
     }
 
-    return NULL;
+    أرجع عدم;
 }
 
-#if defined(FEAT_LANGMAP)
+#إذا defined(FEAT_LANGMAP)
 /*
  * Process the updated 'langnoremap' option value.
  */
-    char *
-did_set_langnoremap(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_langnoremap(optset_T *آرگومانها استفادهنشده)
 {
     // 'langnoremap' -> !'langremap'
     p_lrm = !p_lnr;
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the updated 'langremap' option value.
  */
-    char *
-did_set_langremap(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_langremap(optset_T *آرگومانها استفادهنشده)
 {
     // 'langremap' -> !'langnoremap'
     p_lnr = !p_lrm;
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the new 'laststatus' option value.
  */
-    char *
-did_set_laststatus(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_laststatus(optset_T *آرگومانها استفادهنشده)
 {
-    last_status(FALSE);	// (re)set last window status line
-    return NULL;
+    آخرین_وضعیت(FALSE);	// (re)set last window status line
+    أرجع عدم;
 }
 
-#if defined(FEAT_GUI)
+#إذا defined(FEAT_GUI)
 /*
  * Process the new 'linespace' option value.
  */
-    char *
-did_set_linespace(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_linespace(optset_T *آرگومانها استفادهنشده)
 {
     // Recompute gui.char_height and resize the Vim window to keep the
     // same number of lines.
-    if (gui.in_use && gui_mch_adjust_charheight() == OK)
-	gui_set_shellsize(FALSE, FALSE, RESIZE_VERT);
-    return NULL;
+    إذا (gui.درون_use && gui_mch_adjust_charheight() == OK)
+	gui_مجموعه_shellsize(FALSE, FALSE, RESIZE_VERT);
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the updated 'lisp' option value.
  */
-    char *
-did_set_lisp(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_lisp(optset_T *آرگومانها استفادهنشده)
 {
     // When 'lisp' option changes include/exclude '-' in keyword characters.
-    (void)buf_init_chartab(curbuf, FALSE);	    // ignore errors
-    return NULL;
+    (فراغ)buf_init_chartab(curbuf, FALSE);	    // ignore errors
+    أرجع عدم;
 }
 
 /*
  * Process the new 'maxcombine' option value.
  */
-    char *
-did_set_maxcombine(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_maxcombine(optset_T *آرگومانها استفادهنشده)
 {
-    if (p_mco > MAX_MCO)
+    إذا (p_mco > MAX_MCO)
 	p_mco = MAX_MCO;
-    else if (p_mco < 0)
+    وإلا إذا (p_mco < 0)
 	p_mco = 0;
     screenclear();	    // will re-allocate the screen
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the updated 'modifiable' option value.
  */
-    char *
-did_set_modifiable(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_modifiable(optset_T *آرگومانها استفادهنشده)
 {
     // when 'modifiable' is changed, redraw the window title
 
-#ifdef FEAT_TERMINAL
+#اگر_تعریف_شده FEAT_TERMINAL
     // Cannot set 'modifiable' when in Terminal mode.
-    if (curbuf->b_p_ma && (term_in_normal_mode(curbuf) || (bt_terminal(curbuf)
-		    && curbuf->b_term != NULL && !term_is_finished(curbuf))))
+    إذا (curbuf->b_p_ma && (جمله_درون_نرمال_نما(curbuf) || (bt_terminal(curbuf)
+		    && curbuf->b_جمله != عدم && !جمله_is_پایانیافته(curbuf))))
     {
 	curbuf->b_p_ma = FALSE;
-	return e_cannot_make_terminal_with_running_job_modifiable;
+	أرجع e_cannot_make_terminal_with_running_کار_modifiable;
     }
-#endif
+#پایان_اگر
     redraw_titles();
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the updated 'modified' option value.
  */
-    char *
-did_set_modified(optset_T *args)
+    حرف *
+did_مجموعه_modified(optset_T *آرگومانها)
 {
-    if (!args->os_newval.boolean)
+    إذا (!آرگومانها->os_newval.boolean)
 	save_file_ff(curbuf);	// Buffer is unchanged
     redraw_titles();
-    curbuf->b_modified_was_set = !!args->os_newval.boolean;
-    return NULL;
+    curbuf->b_modified_was_مجموعه = !!آرگومانها->os_newval.boolean;
+    أرجع عدم;
 }
 
-#if defined(FEAT_GUI)
+#إذا defined(FEAT_GUI)
 /*
  * Process the updated 'mousehide' option value.
  */
-    char *
-did_set_mousehide(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_mousehide(optset_T *آرگومانها استفادهنشده)
 {
-    if (!p_mh)
+    إذا (!p_mh)
 	gui_mch_mousehide(FALSE);
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the updated 'number' or 'relativenumber' option value.
  */
-    char *
-did_set_number_relativenumber(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_عدد_relativenumber(optset_T *آرگومانها استفادهنشده)
 {
-#if defined(FEAT_SIGNS) && defined(FEAT_GUI)
-    if (gui.in_use
+#إذا defined(FEAT_SIGNS) && defined(FEAT_GUI)
+    إذا (gui.درون_use
 	    && (*curwin->w_p_scl == 'n' && *(curwin->w_p_scl + 1) == 'u')
-	    && curbuf->b_signlist != NULL)
+	    && curbuf->b_signlist != عدم)
     {
 	// If the 'number' or 'relativenumber' options are modified and
 	// 'signcolumn' is set to 'number', then clear the screen for a full
@@ -4317,86 +4317,86 @@ did_set_number_relativenumber(optset_T *args UNUSED)
 	// number column.  If the 'number' option is set and only the
 	// 'relativenumber' option is toggled, then don't refresh the screen
 	// (optimization).
-	if (!(curwin->w_p_nu && ((int *)args->os_varp == &curwin->w_p_rnu)))
+	إذا (!(curwin->w_p_nu && ((صحيح *)آرگومانها->os_varp == &curwin->w_p_rnu)))
 	    redraw_all_later(UPD_CLEAR);
     }
-#endif
-    return NULL;
+#پایان_اگر
+    أرجع عدم;
 }
 
-#if defined(FEAT_LINEBREAK)
+#إذا defined(FEAT_LINEBREAK)
 /*
  * Process the new 'numberwidth' option value.
  */
-    char *
-did_set_numberwidth(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_numberwidth(optset_T *آرگومانها استفادهنشده)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
     // 'numberwidth' must be positive
-    if (curwin->w_p_nuw < 1)
+    إذا (curwin->w_p_nuw < 1)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	curwin->w_p_nuw = 1;
     }
-    else if (curwin->w_p_nuw > 20)
+    وإلا إذا (curwin->w_p_nuw > 20)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_آرگومان;
 	curwin->w_p_nuw = 20;
     }
-    if (curwin->w_allbuf_opt.wo_nuw < 1)
+    إذا (curwin->w_allbuf_opt.wo_nuw < 1)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	curwin->w_allbuf_opt.wo_nuw = 1;
     }
-    else if (curwin->w_allbuf_opt.wo_nuw > 20)
+    وإلا إذا (curwin->w_allbuf_opt.wo_nuw > 20)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_آرگومان;
 	curwin->w_allbuf_opt.wo_nuw = 20;
     }
-    curwin->w_nrwidth_line_count = 0; // trigger a redraw
+    curwin->w_nrwidth_سطر_شمار = 0; // trigger a redraw
 
-    return errmsg;
+    أرجع errmsg;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the updated 'osctimeoutlen' option value.
  */
-    char *
-did_set_osctimeoutlen(optset_T *args)
+    حرف *
+did_مجموعه_osctimeoutlen(optset_T *آرگومانها)
 {
-    if (p_ost < 0)
+    إذا (p_ost < 0)
     {
-	p_ost = args->os_oldval.number;
-	return e_argument_must_be_positive;
+	p_ost = آرگومانها->os_oldval.عدد;
+	أرجع e_آرگومان_must_be_مثبت;
     }
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the updated 'paste' option value.  Called after p_paste was set or
  * reset.  When 'paste' is set or reset also change other options.
  */
-    char *
-did_set_paste(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_paste(optset_T *آرگومانها استفادهنشده)
 {
-    static int	old_p_paste = FALSE;
-    static int	save_sm = 0;
-    static int	save_sta = 0;
-    static int	save_ru = 0;
-#ifdef FEAT_RIGHTLEFT
-    static int	save_ri = 0;
-    static int	save_hkmap = 0;
-#endif
+    ساكن صحيح	old_p_paste = FALSE;
+    ساكن صحيح	save_sm = 0;
+    ساكن صحيح	save_sta = 0;
+    ساكن صحيح	save_ru = 0;
+#اگر_تعریف_شده FEAT_RIGHTLEFT
+    ساكن صحيح	save_ri = 0;
+    ساكن صحيح	save_hkmap = 0;
+#پایان_اگر
     buf_T	*buf;
 
-    if (p_paste)
+    إذا (p_paste)
     {
 	// Paste switched from off to on.
 	// Save the current values, so they can be restored later.
-	if (!old_p_paste)
+	إذا (!old_p_paste)
 	{
 	    // save options for each buffer
 	    FOR_ALL_BUFFERS(buf)
@@ -4406,35 +4406,35 @@ did_set_paste(optset_T *args UNUSED)
 		buf->b_p_sts_nopaste = buf->b_p_sts;
 		buf->b_p_ai_nopaste = buf->b_p_ai;
 		buf->b_p_et_nopaste = buf->b_p_et;
-#ifdef FEAT_VARTABS
-		if (buf->b_p_vsts_nopaste)
+#اگر_تعریف_شده FEAT_VARTABS
+		إذا (buf->b_p_vsts_nopaste)
 		    vim_free(buf->b_p_vsts_nopaste);
 		buf->b_p_vsts_nopaste =
-			buf->b_p_vsts && buf->b_p_vsts != empty_option
-					   ? vim_strsave(buf->b_p_vsts) : NULL;
-#endif
+			buf->b_p_vsts && buf->b_p_vsts != خالی_option
+					   ? vim_strsave(buf->b_p_vsts) : عدم;
+#پایان_اگر
 	    }
 
 	    // save global options
 	    save_sm = p_sm;
 	    save_sta = p_sta;
 	    save_ru = p_ru;
-#ifdef FEAT_RIGHTLEFT
+#اگر_تعریف_شده FEAT_RIGHTLEFT
 	    save_ri = p_ri;
 	    save_hkmap = p_hkmap;
-#endif
+#پایان_اگر
 	    // save global values for local buffer options
 	    p_ai_nopaste = p_ai;
 	    p_et_nopaste = p_et;
 	    p_sts_nopaste = p_sts;
 	    p_tw_nopaste = p_tw;
 	    p_wm_nopaste = p_wm;
-#ifdef FEAT_VARTABS
-	    if (p_vsts_nopaste)
+#اگر_تعریف_شده FEAT_VARTABS
+	    إذا (p_vsts_nopaste)
 		vim_free(p_vsts_nopaste);
-	    p_vsts_nopaste = p_vsts && p_vsts != empty_option
-						  ? vim_strsave(p_vsts) : NULL;
-#endif
+	    p_vsts_nopaste = p_vsts && p_vsts != خالی_option
+						  ? vim_strsave(p_vsts) : عدم;
+#پایان_اگر
 	}
 
 	// Always set the option values, also when 'paste' is set when it is
@@ -4446,39 +4446,39 @@ did_set_paste(optset_T *args UNUSED)
 	    buf->b_p_sts = 0;	    // softtabstop is 0
 	    buf->b_p_ai = 0;	    // no auto-indent
 	    buf->b_p_et = 0;	    // no expandtab
-#ifdef FEAT_VARTABS
-	    if (buf->b_p_vsts)
+#اگر_تعریف_شده FEAT_VARTABS
+	    إذا (buf->b_p_vsts)
 		free_string_option(buf->b_p_vsts);
-	    buf->b_p_vsts = empty_option;
+	    buf->b_p_vsts = خالی_option;
 	    VIM_CLEAR(buf->b_p_vsts_array);
-#endif
+#پایان_اگر
 	}
 
 	// set global options
 	p_sm = 0;		    // no showmatch
 	p_sta = 0;		    // no smarttab
-	if (p_ru)
-	    status_redraw_all();    // redraw to remove the ruler
+	إذا (p_ru)
+	    وضعیت_redraw_all();    // redraw to remove the ruler
 	p_ru = 0;		    // no ruler
-#ifdef FEAT_RIGHTLEFT
+#اگر_تعریف_شده FEAT_RIGHTLEFT
 	p_ri = 0;		    // no reverse insert
 	p_hkmap = 0;		    // no Hebrew keyboard
-#endif
+#پایان_اگر
 	// set global values for local buffer options
 	p_tw = 0;
 	p_wm = 0;
 	p_sts = 0;
 	p_ai = 0;
 	p_et = 0;
-#ifdef FEAT_VARTABS
-	if (p_vsts)
+#اگر_تعریف_شده FEAT_VARTABS
+	إذا (p_vsts)
 	    free_string_option(p_vsts);
-	p_vsts = empty_option;
-#endif
+	p_vsts = خالی_option;
+#پایان_اگر
     }
 
     // Paste switched from on to off: Restore saved values.
-    else if (old_p_paste)
+    وإلا إذا (old_p_paste)
     {
 	// restore options for each buffer
 	FOR_ALL_BUFFERS(buf)
@@ -4488,164 +4488,164 @@ did_set_paste(optset_T *args UNUSED)
 	    buf->b_p_sts = buf->b_p_sts_nopaste;
 	    buf->b_p_ai = buf->b_p_ai_nopaste;
 	    buf->b_p_et = buf->b_p_et_nopaste;
-#ifdef FEAT_VARTABS
-	    if (buf->b_p_vsts)
+#اگر_تعریف_شده FEAT_VARTABS
+	    إذا (buf->b_p_vsts)
 		free_string_option(buf->b_p_vsts);
 	    buf->b_p_vsts = buf->b_p_vsts_nopaste
-			 ? vim_strsave(buf->b_p_vsts_nopaste) : empty_option;
+			 ? vim_strsave(buf->b_p_vsts_nopaste) : خالی_option;
 	    vim_free(buf->b_p_vsts_array);
-	    if (buf->b_p_vsts && buf->b_p_vsts != empty_option)
-		(void)tabstop_set(buf->b_p_vsts, &buf->b_p_vsts_array);
-	    else
-		buf->b_p_vsts_array = NULL;
-#endif
+	    إذا (buf->b_p_vsts && buf->b_p_vsts != خالی_option)
+		(فراغ)tabstop_مجموعه(buf->b_p_vsts, &buf->b_p_vsts_array);
+	    وإلا
+		buf->b_p_vsts_array = عدم;
+#پایان_اگر
 	}
 
 	// restore global options
 	p_sm = save_sm;
 	p_sta = save_sta;
-	if (p_ru != save_ru)
-	    status_redraw_all();    // redraw to draw the ruler
+	إذا (p_ru != save_ru)
+	    وضعیت_redraw_all();    // redraw to draw the ruler
 	p_ru = save_ru;
-#ifdef FEAT_RIGHTLEFT
+#اگر_تعریف_شده FEAT_RIGHTLEFT
 	p_ri = save_ri;
 	p_hkmap = save_hkmap;
-#endif
+#پایان_اگر
 	// set global values for local buffer options
 	p_ai = p_ai_nopaste;
 	p_et = p_et_nopaste;
 	p_sts = p_sts_nopaste;
 	p_tw = p_tw_nopaste;
 	p_wm = p_wm_nopaste;
-#ifdef FEAT_VARTABS
-	if (p_vsts)
+#اگر_تعریف_شده FEAT_VARTABS
+	إذا (p_vsts)
 	    free_string_option(p_vsts);
-	p_vsts = p_vsts_nopaste ? vim_strsave(p_vsts_nopaste) : empty_option;
-#endif
+	p_vsts = p_vsts_nopaste ? vim_strsave(p_vsts_nopaste) : خالی_option;
+#پایان_اگر
     }
 
     old_p_paste = p_paste;
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
     // Remember where the dependent options were reset
     didset_options_sctx((OPT_LOCAL | OPT_GLOBAL), p_paste_dep_opts);
-#endif
+#پایان_اگر
 
-    return NULL;
+    أرجع عدم;
 }
 
 
-#ifdef FEAT_QUICKFIX
+#اگر_تعریف_شده FEAT_QUICKFIX
 /*
  * Process the updated 'previewwindow' option value.
  */
-    char *
-did_set_previewwindow(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_previewwindow(optset_T *آرگومانها استفادهنشده)
 {
-    if (!curwin->w_p_pvw)
-	return NULL;
+    إذا (!curwin->w_p_pvw)
+	أرجع عدم;
 
     // There can be only one window with 'previewwindow' set.
     win_T	*win;
 
     FOR_ALL_WINDOWS(win)
-	if (win->w_p_pvw && win != curwin)
+	إذا (win->w_p_pvw && win != curwin)
 	{
 	    curwin->w_p_pvw = FALSE;
-	    return e_preview_window_already_exists;
+	    أرجع e_preview_پنجره_already_exists;
 	}
 
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#إذا defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Process the new 'pyxversion' option value.
  */
-    char *
-did_set_pyxversion(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_pyxversion(optset_T *آرگومانها استفادهنشده)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (p_pyx != 0 && p_pyx != 2 && p_pyx != 3)
-	errmsg = e_invalid_argument;
+    إذا (p_pyx != 0 && p_pyx != 2 && p_pyx != 3)
+	errmsg = e_invalid_آرگومان;
 
-    return errmsg;
+    أرجع errmsg;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the updated 'readonly' option value.
  */
-    char *
-did_set_readonly(optset_T *args)
+    حرف *
+did_مجموعه_readonly(optset_T *آرگومانها)
 {
     // when 'readonly' is reset globally, also reset readonlymode
-    if (!curbuf->b_p_ro && (args->os_flags & OPT_LOCAL) == 0)
+    إذا (!curbuf->b_p_ro && (آرگومانها->os_flags & OPT_LOCAL) == 0)
 	readonlymode = FALSE;
 
     // when 'readonly' is set may give W10 again
-    if (curbuf->b_p_ro)
+    إذا (curbuf->b_p_ro)
 	curbuf->b_did_warn = false;
 
     redraw_titles();
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the updated 'scrollbind' option value.
  */
-    char *
-did_set_scrollbind(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_scrollbind(optset_T *آرگومانها استفادهنشده)
 {
     // when 'scrollbind' is set: snapshot the current position to avoid a jump
     // at the end of normal_cmd()
-    if (!curwin->w_p_scb)
-	return NULL;
+    إذا (!curwin->w_p_scb)
+	أرجع عدم;
 
     do_check_scrollbind(FALSE);
     curwin->w_scbind_pos = curwin->w_topline;
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the new 'maxsearchcount' option value.
  */
-    char *
-did_set_maxsearchcount(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_maxsearchcount(optset_T *آرگومانها استفادهنشده)
 {
-    char	*errmsg = NULL;
+    حرف	*errmsg = عدم;
 // if you increase this, also increase SEARCH_STAT_BUF_LEN in search.c
-#define MAX_SEARCH_COUNT 9999
+#تعریف_کن MAX_جستجو_شمار 9999
 
-    if (p_msc <= 0)
-	errmsg = e_argument_must_be_positive;
-    else if (p_msc > MAX_SEARCH_COUNT)
-	errmsg = e_invalid_argument;
+    إذا (p_msc <= 0)
+	errmsg = e_آرگومان_must_be_مثبت;
+    وإلا إذا (p_msc > MAX_جستجو_شمار)
+	errmsg = e_invalid_آرگومان;
 
-    if (errmsg != NULL)
+    إذا (errmsg != عدم)
 	p_msc = 99;
 
-    return errmsg;
-#undef MAX_SEARCH_COUNT
+    أرجع errmsg;
+#لغو_تعریف MAX_جستجو_شمار
 }
 
-#if defined(BACKSLASH_IN_FILENAME)
+#إذا defined(BACKSLASH_درون_FILENAME)
 /*
  * Process the updated 'shellslash' option value.
  */
-    char *
-did_set_shellslash(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_shellslash(optset_T *آرگومانها استفادهنشده)
 {
-    if (p_ssl)
+    إذا (p_ssl)
     {
 	psepc = '/';
 	psepcN = '\\';
 	pseps[0] = '/';
     }
-    else
+    وإلا
     {
 	psepc = '\\';
 	psepcN = '/';
@@ -4658,327 +4658,327 @@ did_set_shellslash(optset_T *args UNUSED)
 # ifdef FEAT_EVAL
     scriptnames_slash_adjust();
 # endif
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the new 'shiftwidth' or the 'tabstop' option value.
  */
-    char *
-did_set_shiftwidth_tabstop(optset_T *args)
+    حرف *
+did_مجموعه_shiftwidth_tabstop(optset_T *آرگومانها)
 {
-    long	*pp = (long *)args->os_varp;
-    char	*errmsg = NULL;
+    دراز	*pp = (دراز *)آرگومانها->os_varp;
+    حرف	*errmsg = عدم;
 
-    if (curbuf->b_p_ts <= 0)
+    إذا (curbuf->b_p_ts <= 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	curbuf->b_p_ts = 8;
     }
-    else if (curbuf->b_p_ts > TABSTOP_MAX)
+    وإلا إذا (curbuf->b_p_ts > TABSTOP_MAX)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_آرگومان;
 	curbuf->b_p_ts = 8;
     }
-    if (p_ts <= 0)
+    إذا (p_ts <= 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_ts = 8;
     }
-    else if (p_ts > TABSTOP_MAX)
+    وإلا إذا (p_ts > TABSTOP_MAX)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_آرگومان;
 	p_ts = 8;
     }
 
-    if (curbuf->b_p_sw < 0)
+    إذا (curbuf->b_p_sw < 0)
     {
-	errmsg = e_argument_must_be_positive;
-#ifdef FEAT_VARTABS
+	errmsg = e_آرگومان_must_be_مثبت;
+#اگر_تعریف_شده FEAT_VARTABS
 	// Use the first 'vartabstop' value, or 'tabstop' if vts isn't in use.
-	curbuf->b_p_sw = tabstop_count(curbuf->b_p_vts_array) > 0
-		       ? tabstop_first(curbuf->b_p_vts_array)
+	curbuf->b_p_sw = tabstop_شمار(curbuf->b_p_vts_array) > 0
+		       ? tabstop_اولی(curbuf->b_p_vts_array)
 		       : curbuf->b_p_ts;
-#else
+#وإلا
 	curbuf->b_p_sw = curbuf->b_p_ts;
-#endif
+#پایان_اگر
     }
-    if (p_sw < 0)
+    إذا (p_sw < 0)
     {
-	errmsg = e_argument_must_be_positive;
-#ifdef FEAT_VARTABS
+	errmsg = e_آرگومان_must_be_مثبت;
+#اگر_تعریف_شده FEAT_VARTABS
 	// Use the first 'vartabstop' value, or 'tabstop' if vts isn't in use.
-	p_sw = tabstop_count(curbuf->b_p_vts_array) > 0
-	     ? tabstop_first(curbuf->b_p_vts_array)
+	p_sw = tabstop_شمار(curbuf->b_p_vts_array) > 0
+	     ? tabstop_اولی(curbuf->b_p_vts_array)
 	     : curbuf->b_p_ts;
-#else
+#وإلا
 	p_sw = curbuf->b_p_ts;
-#endif
+#پایان_اگر
     }
 
-#ifdef FEAT_FOLDING
-    if (foldmethodIsIndent(curwin))
+#اگر_تعریف_شده FEAT_FOLDING
+    إذا (foldmethodIsIndent(curwin))
 	foldUpdateAll(curwin);
-#endif
+#پایان_اگر
     // When 'shiftwidth' changes, or it's zero and 'tabstop' changes:
     // parse 'cinoptions'.
-    if (pp == &curbuf->b_p_sw || curbuf->b_p_sw == 0)
+    إذا (pp == &curbuf->b_p_sw || curbuf->b_p_sw == 0)
 	parse_cino(curbuf);
 
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
  * Process the new 'showtabline' option value.
  */
-    char *
-did_set_showtabline(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_showtabline(optset_T *آرگومانها استفادهنشده)
 {
-    shell_new_rows();	// recompute window positions and heights
-    return NULL;
+    shell_new_ردیفها();	// recompute window positions and heights
+    أرجع عدم;
 }
 
 /*
  * Process the updated 'smoothscroll' option value.
  */
-    char *
-did_set_smoothscroll(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_smoothscroll(optset_T *آرگومانها استفادهنشده)
 {
-    if (!curwin->w_p_sms)
+    إذا (!curwin->w_p_sms)
 	curwin->w_skipcol = 0;
 
-    return NULL;
+    أرجع عدم;
 }
 
-#if defined(FEAT_SPELL)
+#إذا defined(FEAT_SPELL)
 /*
  * Process the updated 'spell' option value.
  */
-    char *
-did_set_spell(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_spell(optset_T *آرگومانها استفادهنشده)
 {
-    if (curwin->w_p_spell)
-	return parse_spelllang(curwin);
+    إذا (curwin->w_p_spell)
+	أرجع parse_spelllang(curwin);
 
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the updated 'swapfile' option value.
  */
-    char *
-did_set_swapfile(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_swapfile(optset_T *آرگومانها استفادهنشده)
 {
     // when 'swf' is set, create swapfile, when reset remove swapfile
-    if (curbuf->b_p_swf && p_uc)
+    إذا (curbuf->b_p_swf && p_uc)
 	ml_open_file(curbuf);		// create the swap file
-    else
+    وإلا
 	// no need to reset curbuf->b_may_swap, ml_open_file() will check
 	// buf->b_p_swf
 	mf_close_file(curbuf, TRUE);	// remove the swap file
-    return NULL;
+    أرجع عدم;
 }
 
-#if defined(FEAT_TERMGUICOLORS)
-    char *
-did_set_termguicolors(optset_T *args UNUSED)
+#إذا defined(FEAT_TERMGUICOLORS)
+    حرف *
+did_مجموعه_termguicolors(optset_T *آرگومانها استفادهنشده)
 {
 # ifdef FEAT_VTP
     // Do not turn on 'tgc' when 24-bit colors are not supported.
-    if (
+    إذا (
 #  ifdef VIMDLL
-	    !gui.in_use && !gui.starting &&
+	    !gui.درون_use && !gui.starting &&
 #  endif
 	    !has_vtp_working())
     {
-	p_tgc_set = TRUE;
+	p_tgc_مجموعه = TRUE;
 	p_tgc = 0;
-	return e_24_bit_colors_are_not_supported_on_this_environment;
+	أرجع e_24_بیت_colors_are_not_supported_on_this_environment;
     }
-    if (is_term_win32())
-	swap_tcap();
+    إذا (is_جمله_win32())
+	جابجا_tcap();
 # endif
 # ifdef FEAT_GUI
-    if (!gui.in_use && !gui.starting)
+    إذا (!gui.درون_use && !gui.starting)
 # endif
 	highlight_gui_started();
 # ifdef FEAT_VTP
     // reset t_Co
-    if (is_term_win32())
+    إذا (is_جمله_win32())
     {
 	control_console_color_rgb();
-	set_termname(T_NAME);
+	مجموعه_termname(T_NAME);
 	init_highlight(TRUE, FALSE);
     }
 # endif
 # ifdef FEAT_TERMINAL
-    term_update_colors_all();
-    term_update_palette_all();
-    term_update_hlfwin_all();
+    جمله_update_colors_all();
+    جمله_update_palette_all();
+    جمله_update_hlfwin_all();
 # endif
-    p_tgc_set = TRUE;
+    p_tgc_مجموعه = TRUE;
 
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
-    char *
-did_set_termsync(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_termsync(optset_T *آرگومانها استفادهنشده)
 {
-    if (!p_tsy)
-	term_set_sync_output(TERM_SYNC_OUTPUT_OFF);
-    return NULL;
+    إذا (!p_tsy)
+	جمله_مجموعه_sync_output(جمله_SYNC_OUTPUT_OFF);
+    أرجع عدم;
 }
 
-#if defined(FEAT_TERMINAL)
+#إذا defined(FEAT_TERMINAL)
 /*
  * Process the updated 'termwinscroll' option value.
  */
-    char *
-did_set_termwinscroll(optset_T *args)
+    حرف *
+did_مجموعه_termwinscroll(optset_T *آرگومانها)
 {
-    long	*pp = (long *)args->os_varp;
-    char	*errmsg = NULL;
+    دراز	*pp = (دراز *)آرگومانها->os_varp;
+    حرف	*errmsg = عدم;
 
-    if (*pp < 1)
+    إذا (*pp < 1)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	*pp = 1;
     }
 
-    return errmsg;
+    أرجع errmsg;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the updated 'terse' option value.
  */
-    char *
-did_set_terse(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_terse(optset_T *آرگومانها استفادهنشده)
 {
     char_u	*p;
 
     // when 'terse' is set change 'shortmess'
-    p = vim_strchr(p_shm, SHM_SEARCH);
+    p = vim_strchr(p_shm, SHM_جستجو);
 
     // insert 's' in p_shm
-    if (p_terse && p == NULL)
+    إذا (p_terse && p == عدم)
     {
 	STRCPY(IObuff, p_shm);
 	STRCAT(IObuff, "s");
-	set_string_option_direct((char_u *)"shm", -1, IObuff, OPT_FREE, 0);
+	مجموعه_string_option_مستقیم((char_u *)"shm", -1, IObuff, OPT_FREE, 0);
     }
     // remove 's' from p_shm
-    else if (!p_terse && p != NULL)
+    وإلا إذا (!p_terse && p != عدم)
 	STRMOVE(p, p + 1);
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the updated 'textauto' option value.
  */
-    char *
-did_set_textauto(optset_T *args)
+    حرف *
+did_مجموعه_textauto(optset_T *آرگومانها)
 {
     // when 'textauto' is set or reset also change 'fileformats'
-    set_string_option_direct((char_u *)"ffs", -1,
+    مجموعه_string_option_مستقیم((char_u *)"ffs", -1,
 				p_ta ? (char_u *)DFLT_FFS_VIM : (char_u *)"",
-				OPT_FREE | args->os_flags, 0);
+				OPT_FREE | آرگومانها->os_flags, 0);
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the updated 'textmode' option value.
  */
-    char *
-did_set_textmode(optset_T *args)
+    حرف *
+did_مجموعه_textmode(optset_T *آرگومانها)
 {
     // when 'textmode' is set or reset also change 'fileformat'
-    set_fileformat(curbuf->b_p_tx ? EOL_DOS : EOL_UNIX, args->os_flags);
+    مجموعه_fileformat(curbuf->b_p_tx ? EOL_DOS : EOL_UNIX, آرگومانها->os_flags);
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the new 'textwidth' option value.
  */
-    char *
-did_set_textwidth(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_textwidth(optset_T *آرگومانها استفادهنشده)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (curbuf->b_p_tw < 0)
+    إذا (curbuf->b_p_tw < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	curbuf->b_p_tw = 0;
     }
-    if (p_tw < 0)
+    إذا (p_tw < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_tw = 0;
     }
-#ifdef FEAT_SYN_HL
+#اگر_تعریف_شده FEAT_SYN_HL
     {
 	win_T	*wp;
 	tabpage_T	*tp;
 
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    check_colorcolumn(NULL, wp);
+	    check_colorcolumn(عدم, wp);
     }
-#endif
+#پایان_اگر
 
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
  * Process the updated 'title' or the 'icon' option value.
  */
-    char *
-did_set_title_icon(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_title_icon(optset_T *آرگومانها استفادهنشده)
 {
     // when 'title' changed, may need to change the title; same for 'icon'
-    did_set_title();
-    return NULL;
+    did_مجموعه_title();
+    أرجع عدم;
 }
 
 /*
  * Process the new 'titlelen' option value.
  */
-    char *
-did_set_titlelen(optset_T *args)
+    حرف *
+did_مجموعه_titlelen(optset_T *آرگومانها)
 {
-    long old_value = args->os_oldval.number;
-    char *errmsg = NULL;
+    دراز old_مقدار = آرگومانها->os_oldval.عدد;
+    حرف *errmsg = عدم;
 
     // if 'titlelen' has changed, redraw the title
-    if (p_titlelen < 0)
+    إذا (p_titlelen < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_titlelen = 85;
     }
-    if (starting != NO_SCREEN && old_value != p_titlelen)
+    إذا (starting != NO_SCREEN && old_مقدار != p_titlelen)
 	need_maketitle = TRUE;
 
-    return errmsg;
+    أرجع errmsg;
 }
 
-#if defined(FEAT_PERSISTENT_UNDO)
+#إذا defined(FEAT_PERSISTENT_UNDO)
 /*
  * Process the updated 'undofile' option value.
  */
-    char *
-did_set_undofile(optset_T *args)
+    حرف *
+did_مجموعه_undofile(optset_T *آرگومانها)
 {
     // Only take action when the option was set.
-    if (!curbuf->b_p_udf && !p_udf)
-	return NULL;
+    إذا (!curbuf->b_p_udf && !p_udf)
+	أرجع عدم;
 
     // When reset we do not delete the undo file, the option may be set again
     // without making any changes in between.
-    char_u	hash[UNDO_HASH_SIZE];
+    char_u	hash[UNDO_HASH_اندازه];
     buf_T	*save_curbuf = curbuf;
 
     FOR_ALL_BUFFERS(curbuf)
@@ -4987,680 +4987,680 @@ did_set_undofile(optset_T *args)
 	// only for the current buffer: Try to read in the undofile,
 	// if one exists, the buffer wasn't changed and the buffer was
 	// loaded
-	if ((curbuf == save_curbuf
-		    || (args->os_flags & OPT_GLOBAL)
-		    || args->os_flags == 0)
-		&& !curbufIsChanged() && curbuf->b_ml.ml_mfp != NULL)
+	إذا ((curbuf == save_curbuf
+		    || (آرگومانها->os_flags & OPT_GLOBAL)
+		    || آرگومانها->os_flags == 0)
+		&& !curbuf_Is_تغییریافته() && curbuf->b_ml.ml_mfp != عدم)
 	{
 # ifdef FEAT_CRYPT
-	    if (crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
-		continue;
+	    إذا (crypt_روش_is_sodium(crypt_get_روش_nr(curbuf)))
+		استمر;
 # endif
 	    u_compute_hash(hash);
-	    u_read_undo(NULL, hash, curbuf->b_fname);
+	    u_read_undo(عدم, hash, curbuf->b_fname);
 	}
     }
     curbuf = save_curbuf;
 
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the new global 'undolevels' option value.
  */
-    static void
-update_global_undolevels(long value, long old_value)
+    ساكن فراغ
+update_global_undolevels(دراز مقدار, دراز old_مقدار)
 {
     // sync undo before 'undolevels' changes
 
     // use the old value, otherwise u_sync() may not work properly
-    p_ul = old_value;
+    p_ul = old_مقدار;
     u_sync(TRUE);
-    p_ul = value;
+    p_ul = مقدار;
 }
 
 /*
  * Process the new buffer local 'undolevels' option value.
  */
-    static void
-update_buflocal_undolevels(long value, long old_value)
+    ساكن فراغ
+update_buflocal_undolevels(دراز مقدار, دراز old_مقدار)
 {
     // use the old value, otherwise u_sync() may not work properly
-    curbuf->b_p_ul = old_value;
+    curbuf->b_p_ul = old_مقدار;
     u_sync(TRUE);
-    curbuf->b_p_ul = value;
+    curbuf->b_p_ul = مقدار;
 }
 
 /*
  * Process the new 'undolevels' option value.
  */
-    char *
-did_set_undolevels(optset_T *args)
+    حرف *
+did_مجموعه_undolevels(optset_T *آرگومانها)
 {
-    long *pp = (long *)args->os_varp;
+    دراز *pp = (دراز *)آرگومانها->os_varp;
 
-    if (pp == &p_ul)			// global 'undolevels'
-	update_global_undolevels(args->os_newval.number,
-						       args->os_oldval.number);
-    else if (pp == &curbuf->b_p_ul)	// buffer local 'undolevels'
-	update_buflocal_undolevels(args->os_newval.number,
-						       args->os_oldval.number);
+    إذا (pp == &p_ul)			// global 'undolevels'
+	update_global_undolevels(آرگومانها->os_newval.عدد,
+						       آرگومانها->os_oldval.عدد);
+    وإلا إذا (pp == &curbuf->b_p_ul)	// buffer local 'undolevels'
+	update_buflocal_undolevels(آرگومانها->os_newval.عدد,
+						       آرگومانها->os_oldval.عدد);
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the new 'updatecount' option value.
  */
-    char *
-did_set_updatecount(optset_T *args)
+    حرف *
+did_مجموعه_updatecount(optset_T *آرگومانها)
 {
-    long old_value = args->os_oldval.number;
-    char *errmsg = NULL;
+    دراز old_مقدار = آرگومانها->os_oldval.عدد;
+    حرف *errmsg = عدم;
 
     // when 'updatecount' changes from zero to non-zero, open swap files
-    if (p_uc < 0)
+    إذا (p_uc < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_uc = 100;
     }
-    if (p_uc && !old_value)
+    إذا (p_uc && !old_مقدار)
 	ml_open_files();
 
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
  * Process the updated 'weirdinvert' option value.
  */
-    char *
-did_set_weirdinvert(optset_T *args)
+    حرف *
+did_مجموعه_weirdinvert(optset_T *آرگومانها)
 {
     // When 'weirdinvert' changed, set/reset 't_xs'.
     // Then set 'weirdinvert' according to value of 't_xs'.
-    if (p_wiv && !args->os_oldval.boolean)
+    إذا (p_wiv && !آرگومانها->os_oldval.boolean)
 	T_XS = (char_u *)"y";
-    else if (!p_wiv && args->os_oldval.boolean)
-	T_XS = empty_option;
+    وإلا إذا (!p_wiv && آرگومانها->os_oldval.boolean)
+	T_XS = خالی_option;
     p_wiv = (*T_XS != NUL);
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the new 'wildchar' / 'wildcharm' option value.
  */
-    char *
-did_set_wildchar(optset_T *args)
+    حرف *
+did_مجموعه_wildchar(optset_T *آرگومانها)
 {
-    long c = *(long *)args->os_varp;
+    دراز c = *(دراز *)آرگومانها->os_varp;
 
     // Don't allow key values that wouldn't work as wildchar.
-    if (c == Ctrl_C || c == '\n' || c == '\r' || c == K_KENTER)
-	return e_invalid_argument;
+    إذا (c == Ctrl_C || c == '\n' || c == '\r' || c == K_KENTER)
+	أرجع e_invalid_آرگومان;
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Process the new 'window' option value.
  */
-    char *
-did_set_window(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_پنجره(optset_T *آرگومانها استفادهنشده)
 {
-    if (p_window < 1)
-	p_window = 1;
-    else if (p_window >= Rows)
-	p_window = Rows - 1;
-    return NULL;
+    إذا (p_پنجره < 1)
+	p_پنجره = 1;
+    وإلا إذا (p_پنجره >= ردیفها)
+	p_پنجره = ردیفها - 1;
+    أرجع عدم;
 }
 
 /*
  * Process the new 'winheight' or the 'helpheight' option value.
  */
-    char *
-did_set_winheight_helpheight(optset_T *args)
+    حرف *
+did_مجموعه_winheight_helpheight(optset_T *آرگومانها)
 {
-    long	*pp = (long *)args->os_varp;
-    char	*errmsg = NULL;
+    دراز	*pp = (دراز *)آرگومانها->os_varp;
+    حرف	*errmsg = عدم;
 
-    if (p_wh < 1)
+    إذا (p_wh < 1)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_wh = 1;
     }
-    if (p_wmh > p_wh)
+    إذا (p_wmh > p_wh)
     {
 	errmsg = e_winheight_cannot_be_smaller_than_winminheight;
 	p_wh = p_wmh;
     }
-    if (p_hh < 0)
+    إذا (p_hh < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_hh = 0;
     }
 
     // Change window height NOW
-    if (!ONE_WINDOW)
+    إذا (!ONE_پنجره)
     {
-	if (pp == &p_wh && curwin->w_height < p_wh)
-	    win_setheight((int)p_wh);
-	if (pp == &p_hh && curbuf->b_help && curwin->w_height < p_hh)
-	    win_setheight((int)p_hh);
+	إذا (pp == &p_wh && curwin->w_ارتفاع < p_wh)
+	    win_setheight((صحيح)p_wh);
+	إذا (pp == &p_hh && curbuf->b_help && curwin->w_ارتفاع < p_hh)
+	    win_setheight((صحيح)p_hh);
     }
 
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
  * Process the new 'winminheight' option value.
  */
-    char *
-did_set_winminheight(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_winminheight(optset_T *آرگومانها استفادهنشده)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (p_wmh < 0)
+    إذا (p_wmh < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_wmh = 0;
     }
-    if (p_wmh > p_wh)
+    إذا (p_wmh > p_wh)
     {
 	errmsg = e_winheight_cannot_be_smaller_than_winminheight;
 	p_wmh = p_wh;
     }
     win_setminheight();
 
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
  * Process the new 'winminwidth' option value.
  */
-    char *
-did_set_winminwidth(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_winminwidth(optset_T *آرگومانها استفادهنشده)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (p_wmw < 0)
+    إذا (p_wmw < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_wmw = 0;
     }
-    if (p_wmw > p_wiw)
+    إذا (p_wmw > p_wiw)
     {
 	errmsg = e_winwidth_cannot_be_smaller_than_winminwidth;
 	p_wmw = p_wiw;
     }
     win_setminwidth();
 
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
  * Process the new 'winwidth' option value.
  */
-    char *
-did_set_winwidth(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_winwidth(optset_T *آرگومانها استفادهنشده)
 {
-    char *errmsg = NULL;
+    حرف *errmsg = عدم;
 
-    if (p_wiw < 1)
+    إذا (p_wiw < 1)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_wiw = 1;
     }
-    if (p_wmw > p_wiw)
+    إذا (p_wmw > p_wiw)
     {
 	errmsg = e_winwidth_cannot_be_smaller_than_winminwidth;
 	p_wiw = p_wmw;
     }
 
     // Change window width NOW
-    if (!ONE_WINDOW && curwin->w_width < p_wiw)
-	win_setwidth((int)p_wiw);
+    إذا (!ONE_پنجره && curwin->w_عرض < p_wiw)
+	win_setwidth((صحيح)p_wiw);
 
-    return errmsg;
+    أرجع errmsg;
 }
 
-#if defined(FEAT_WAYLAND_CLIPBOARD)
+#إذا defined(FEAT_WAYLAND_CLIPBOARD)
 /*
  * Process the new 'wlsteal' option value.
  */
-    char *
-did_set_wlsteal(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_wlsteal(optset_T *آرگومانها استفادهنشده)
 {
     clip_reset_wayland();
 
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_WAYLAND)
+#إذا defined(FEAT_WAYLAND)
 /*
  * Process the new 'wltimeoutlen' option value.
  */
-    char *
-did_set_wltimeoutlen(optset_T *args)
+    حرف *
+did_مجموعه_wltimeoutlen(optset_T *آرگومانها)
 {
-    if (p_wtm < 0)
+    إذا (p_wtm < 0)
     {
-	p_wtm = args->os_oldval.number;
-	return e_argument_must_be_positive;
+	p_wtm = آرگومانها->os_oldval.عدد;
+	أرجع e_آرگومان_must_be_مثبت;
     }
 
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
 /*
  * Process the updated 'wrap' option value.
  */
-    char *
-did_set_wrap(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_wrap(optset_T *آرگومانها استفادهنشده)
 {
     // Set w_leftcol or w_skipcol to zero.
-    if (curwin->w_p_wrap)
+    إذا (curwin->w_p_wrap)
 	curwin->w_leftcol = 0;
-    else
+    وإلا
 	curwin->w_skipcol = 0;
 
-    return NULL;
+    أرجع عدم;
 }
 
-#ifdef FEAT_QUICKFIX
+#اگر_تعریف_شده FEAT_QUICKFIX
 /*
  * Process the new 'chistory' or 'lhistory' option value. 'chistory' will
  * be used if args->os_varp is the same as p_chi, else 'lhistory'.
  */
-    char *
-did_set_xhistory(optset_T *args)
+    حرف *
+did_مجموعه_xhistory(optset_T *آرگومانها)
 {
-    int is_p_chi = (long*)args->os_varp == &p_chi;
-    int err;
-    long *arg = (is_p_chi) ? &p_chi :(long*)args->os_varp;
+    صحيح is_p_chi = (دراز*)آرگومانها->os_varp == &p_chi;
+    صحيح err;
+    دراز *arg = (is_p_chi) ? &p_chi :(دراز*)آرگومانها->os_varp;
 
     // cannot have zero or negative number of quickfix lists in a stack
-    if (*arg < 1)
+    إذا (*arg < 1)
     {
-	*arg = args->os_oldval.number;
-	return e_cannot_have_negative_or_zero_number_of_quickfix;
+	*arg = آرگومانها->os_oldval.عدد;
+	أرجع e_cannot_have_negative_or_zero_عدد_از_quickfix;
     }
 
     // cannot have more than 100 quickfix lists in a stack
-    if (*arg > 100)
+    إذا (*arg > 100)
     {
-	*arg = args->os_oldval.number;
-	return e_cannot_have_more_than_hundred_quickfix;
+	*arg = آرگومانها->os_oldval.عدد;
+	أرجع e_cannot_have_بیشتر_than_hundred_quickfix;
     }
 
-    if (is_p_chi)
-	err = qf_resize_stack(*arg);
-    else
-	err = ll_resize_stack(curwin, *arg);
+    إذا (is_p_chi)
+	err = qf_resize_پشته(*arg);
+    وإلا
+	err = ll_resize_پشته(curwin, *arg);
 
-    if (err == FAIL)
-	return e_failed_resizing_quickfix_stack;
+    إذا (err == FAIL)
+	أرجع e_failed_resizing_quickfix_پشته;
 
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
 /*
  * Set the value of a boolean option, and take care of side effects.
  * Returns NULL for success, or an error message for an error.
  */
-    static char *
-set_bool_option(
-    int		opt_idx,		// index in options[] table
+    ساكن حرف *
+مجموعه_bool_option(
+    صحيح		opt_idx,		// index in options[] table
     char_u	*varp,			// pointer to the option variable
-    int		value,			// new value
-    int		opt_flags)		// OPT_LOCAL and/or OPT_GLOBAL
+    صحيح		مقدار,			// new value
+    صحيح		opt_flags)		// OPT_LOCAL and/or OPT_GLOBAL
 {
-    int		old_value = *(int *)varp;
-#if defined(FEAT_EVAL)
-    int		old_global_value = 0;
-#endif
-    char	*errmsg = NULL;
+    صحيح		old_مقدار = *(صحيح *)varp;
+#إذا defined(FEAT_EVAL)
+    صحيح		old_global_مقدار = 0;
+#پایان_اگر
+    حرف	*errmsg = عدم;
 
     // Disallow changing some options from secure mode
-    if ((secure
-#ifdef HAVE_SANDBOX
+    إذا ((secure
+#اگر_تعریف_شده HAVE_SANDBOX
 		|| sandbox != 0
-#endif
+#پایان_اگر
 		) && (options[opt_idx].flags & P_SECURE))
-	return e_not_allowed_here;
+	أرجع e_not_allowed_اینجا;
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
     // Save the global value before changing anything. This is needed as for
     // a global-only option setting the "local value" in fact sets the global
     // value (since there is only one value).
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
-	old_global_value = *(int *)get_varp_scope(&(options[opt_idx]),
+    إذا ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+	old_global_مقدار = *(صحيح *)get_varp_scope(&(options[opt_idx]),
 								   OPT_GLOBAL);
-#endif
+#پایان_اگر
 
-    *(int *)varp = value;	    // set the new value
-#ifdef FEAT_EVAL
+    *(صحيح *)varp = مقدار;	    // set the new value
+#اگر_تعریف_شده FEAT_EVAL
     // Remember where the option was set.
-    set_option_sctx_idx(opt_idx, opt_flags, current_sctx);
-#endif
+    مجموعه_option_sctx_idx(opt_idx, opt_flags, current_sctx);
+#پایان_اگر
 
-#ifdef FEAT_GUI
+#اگر_تعریف_شده FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#پایان_اگر
 
     // May set global value for local option.
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
-	*(int *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = value;
+    إذا ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+	*(صحيح *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = مقدار;
 
     // Handle side effects of changing a bool option.
-    if (options[opt_idx].opt_did_set_cb != NULL)
+    إذا (options[opt_idx].opt_did_مجموعه_cb != عدم)
     {
-	optset_T args;
+	optset_T آرگومانها;
 
-	CLEAR_FIELD(args);
-	args.os_varp = varp;
-	args.os_flags = opt_flags;
-	args.os_oldval.boolean = old_value;
-	args.os_newval.boolean = value;
-	args.os_errbuf = NULL;
-	errmsg = options[opt_idx].opt_did_set_cb(&args);
-	if (errmsg != NULL)
-	    return errmsg;
+	CLEAR_فیلد(آرگومانها);
+	آرگومانها.os_varp = varp;
+	آرگومانها.os_flags = opt_flags;
+	آرگومانها.os_oldval.boolean = old_مقدار;
+	آرگومانها.os_newval.boolean = مقدار;
+	آرگومانها.os_errbuf = عدم;
+	errmsg = options[opt_idx].opt_did_مجموعه_cb(&آرگومانها);
+	إذا (errmsg != عدم)
+	    أرجع errmsg;
     }
 
     // after handling side effects, call autocommand
 
-    options[opt_idx].flags |= P_WAS_SET;
+    options[opt_idx].flags |= P_WAS_مجموعه;
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
     apply_optionset_autocmd(opt_idx, opt_flags,
-				(long)(old_value ? TRUE : FALSE),
-				(long)(old_global_value ? TRUE : FALSE),
-				(long)(value ? TRUE : FALSE), NULL);
-#endif
+				(دراز)(old_مقدار ? TRUE : FALSE),
+				(دراز)(old_global_مقدار ? TRUE : FALSE),
+				(دراز)(مقدار ? TRUE : FALSE), عدم);
+#پایان_اگر
 
-    comp_col();			    // in case 'ruler' or 'showcmd' changed
+    comp_ستون();			    // in case 'ruler' or 'showcmd' changed
 
-    if (curwin->w_curswant != MAXCOL
+    إذا (curwin->w_curswant != MAXCOL
 		     && (options[opt_idx].flags & (P_CURSWANT | P_RALL)) != 0
 				   && (options[opt_idx].flags & P_HLONLY) == 0)
-	curwin->w_set_curswant = true;
+	curwin->w_مجموعه_curswant = true;
 
-    if ((opt_flags & OPT_NO_REDRAW) == 0)
+    إذا ((opt_flags & OPT_NO_REDRAW) == 0)
 	check_redraw(options[opt_idx].flags);
 
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
  * Check the bounds of numeric options.
  */
-    static char *
-check_num_option_bounds(
-    long	*pp,
-    long	old_value,
-    long	old_Rows,
-    long	old_Columns,
-    char	*errbuf,
+    ساكن حرف *
+check_رقم_option_bounds(
+    دراز	*pp,
+    دراز	old_مقدار,
+    دراز	old_ردیفها_2,
+    دراز	old_Columns,
+    حرف	*errbuf,
     size_t	errbuflen,
-    char	*errmsg)
+    حرف	*errmsg)
 {
-    if (Rows < min_rows_for_all_tabpages() && full_screen)
+    إذا (ردیفها < min_ردیفها_for_all_tabpages() && پر_screen)
     {
-	if (errbuf != NULL)
+	إذا (errbuf != عدم)
 	{
 	    vim_snprintf(errbuf, errbuflen,
-		    _(e_need_at_least_nr_lines), min_rows_for_all_tabpages());
+		    _(e_need_at_کمترین_nr_سطرها), min_ردیفها_for_all_tabpages());
 	    errmsg = errbuf;
 	}
-	Rows = min_rows_for_all_tabpages();
+	ردیفها = min_ردیفها_for_all_tabpages();
     }
-    if (Columns < MIN_COLUMNS && full_screen)
+    إذا (Columns < MIN_COLUMNS && پر_screen)
     {
-	if (errbuf != NULL)
+	إذا (errbuf != عدم)
 	{
 	    vim_snprintf(errbuf, errbuflen,
-		    _(e_need_at_least_nr_columns), MIN_COLUMNS);
+		    _(e_need_at_کمترین_nr_columns), MIN_COLUMNS);
 	    errmsg = errbuf;
 	}
 	Columns = MIN_COLUMNS;
     }
-    limit_screen_size();
+    حد_screen_اندازه();
 
     // If the screen (shell) height has been changed, assume it is the
     // physical screenheight.
-    if (old_Rows != Rows || old_Columns != Columns)
+    إذا (old_ردیفها_2 != ردیفها || old_Columns != Columns)
     {
 	// Changing the screen size is not allowed while updating the screen.
-	if (updating_screen)
-	    *pp = old_value;
-	else if (full_screen
-#ifdef FEAT_GUI
+	إذا (updating_screen)
+	    *pp = old_مقدار;
+	وإلا إذا (پر_screen
+#اگر_تعریف_شده FEAT_GUI
 		&& !gui.starting
-#endif
+#پایان_اگر
 		)
-	    set_shellsize((int)Columns, (int)Rows, TRUE);
-	else
+	    مجموعه_shellsize((صحيح)Columns, (صحيح)ردیفها, TRUE);
+	وإلا
 	{
 	    // Postpone the resizing; check the size and cmdline position for
 	    // messages.
 	    check_shellsize();
-	    if (cmdline_row > Rows - p_ch && Rows > p_ch)
-		cmdline_row = Rows - p_ch;
+	    إذا (cmdline_ردیف > ردیفها - p_ch && ردیفها > p_ch)
+		cmdline_ردیف = ردیفها - p_ch;
 	}
-	if (p_window >= Rows || !option_was_set((char_u *)"window"))
-	    p_window = Rows - 1;
+	إذا (p_پنجره >= ردیفها || !option_was_مجموعه((char_u *)"window"))
+	    p_پنجره = ردیفها - 1;
     }
 
-    if (p_tm < 0)
+    إذا (p_tm < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_tm = 0;
     }
-    if ((curwin->w_p_scr <= 0
-		|| (curwin->w_p_scr > curwin->w_height
-		    && curwin->w_height > 0))
-	    && full_screen)
+    إذا ((curwin->w_p_scr <= 0
+		|| (curwin->w_p_scr > curwin->w_ارتفاع
+		    && curwin->w_ارتفاع > 0))
+	    && پر_screen)
     {
-	if (pp == &(curwin->w_p_scr))
+	إذا (pp == &(curwin->w_p_scr))
 	{
-	    if (curwin->w_p_scr != 0)
-		errmsg = e_invalid_scroll_size;
+	    إذا (curwin->w_p_scr != 0)
+		errmsg = e_invalid_scroll_اندازه;
 	    win_comp_scroll(curwin);
 	}
 	// If 'scroll' became invalid because of a side effect silently adjust
 	// it.
-	else if (curwin->w_p_scr <= 0)
+	وإلا إذا (curwin->w_p_scr <= 0)
 	    curwin->w_p_scr = 1;
-	else // curwin->w_p_scr > curwin->w_height
-	    curwin->w_p_scr = curwin->w_height;
+	وإلا // curwin->w_p_scr > curwin->w_height
+	    curwin->w_p_scr = curwin->w_ارتفاع;
     }
-    if (p_hi < 0)
+    إذا (p_hi < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_hi = 0;
     }
-    else if (p_hi > 10000)
+    وإلا إذا (p_hi > 10000)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_آرگومان;
 	p_hi = 10000;
     }
-    if (p_re < 0 || p_re > 2)
+    إذا (p_re < 0 || p_re > 2)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_آرگومان;
 	p_re = 0;
     }
-    if (p_report < 0)
+    إذا (p_report < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_report = 1;
     }
-    if ((p_sj < -100 || p_sj >= Rows) && full_screen)
+    إذا ((p_sj < -100 || p_sj >= ردیفها) && پر_screen)
     {
-	if (Rows != old_Rows)	// Rows changed, just adjust p_sj
-	    p_sj = Rows / 2;
-	else
+	إذا (ردیفها != old_ردیفها_2)	// Rows changed, just adjust p_sj
+	    p_sj = ردیفها / 2;
+	وإلا
 	{
-	    errmsg = e_invalid_scroll_size;
+	    errmsg = e_invalid_scroll_اندازه;
 	    p_sj = 1;
 	}
     }
-    if (p_so < 0 && full_screen)
+    إذا (p_so < 0 && پر_screen)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_so = 0;
     }
-    if (p_sop < 0 && full_screen)
+    إذا (p_sop < 0 && پر_screen)
     {
-	errmsg = e_invalid_argument;
+	errmsg = e_invalid_آرگومان;
 	p_sop = 0;
     }
-    if (p_siso < 0 && full_screen)
+    إذا (p_siso < 0 && پر_screen)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_siso = 0;
     }
-    if (p_cwh < 1)
+    إذا (p_cwh < 1)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_cwh = 1;
     }
-    if (p_ut < 0)
+    إذا (p_ut < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_ut = 2000;
     }
-    if (p_ss < 0)
+    إذا (p_ss < 0)
     {
-	errmsg = e_argument_must_be_positive;
+	errmsg = e_آرگومان_must_be_مثبت;
 	p_ss = 0;
     }
 
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
  * Set the value of a number option, and take care of side effects.
  * Returns NULL for success, or an error message for an error.
  */
-    static char *
-set_num_option(
-    int		opt_idx,		// index in options[] table
+    ساكن حرف *
+مجموعه_رقم_option(
+    صحيح		opt_idx,		// index in options[] table
     char_u	*varp,			// pointer to the option variable
-    long	value,			// new value
-    char	*errbuf,		// buffer for error messages
+    دراز	مقدار,			// new value
+    حرف	*errbuf,		// buffer for error messages
     size_t	errbuflen,		// length of "errbuf"
-    int		opt_flags)		// OPT_LOCAL, OPT_GLOBAL,
+    صحيح		opt_flags)		// OPT_LOCAL, OPT_GLOBAL,
 					// OPT_MODELINE, etc.
 {
-    char	*errmsg = NULL;
-    long	old_value = *(long *)varp;
-#if defined(FEAT_EVAL)
-    long	old_global_value = 0;	// only used when setting a local and
+    حرف	*errmsg = عدم;
+    دراز	old_مقدار = *(دراز *)varp;
+#إذا defined(FEAT_EVAL)
+    دراز	old_global_مقدار = 0;	// only used when setting a local and
 					// global option
-#endif
-    long	old_Rows = Rows;	// remember old Rows
-    long	old_Columns = Columns;	// remember old Columns
-    long	*pp = (long *)varp;
+#پایان_اگر
+    دراز	old_ردیفها_2 = ردیفها;	// remember old Rows
+    دراز	old_Columns = Columns;	// remember old Columns
+    دراز	*pp = (دراز *)varp;
 
     // Disallow changing some options from secure mode.
-    if ((secure
-#ifdef HAVE_SANDBOX
+    إذا ((secure
+#اگر_تعریف_شده HAVE_SANDBOX
 		|| sandbox != 0
-#endif
+#پایان_اگر
 		) && (options[opt_idx].flags & P_SECURE))
-	return e_not_allowed_here;
+	أرجع e_not_allowed_اینجا;
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
     // Save the global value before changing anything. This is needed as for
     // a global-only option setting the "local value" in fact sets the global
     // value (since there is only one value).
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
-	old_global_value = *(long *)get_varp_scope(&(options[opt_idx]),
+    إذا ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+	old_global_مقدار = *(دراز *)get_varp_scope(&(options[opt_idx]),
 								   OPT_GLOBAL);
-#endif
+#پایان_اگر
 
-    *pp = value;
-#ifdef FEAT_EVAL
+    *pp = مقدار;
+#اگر_تعریف_شده FEAT_EVAL
     // Remember where the option was set.
-    set_option_sctx_idx(opt_idx, opt_flags, current_sctx);
-#endif
-#ifdef FEAT_GUI
+    مجموعه_option_sctx_idx(opt_idx, opt_flags, current_sctx);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_GUI
     need_mouse_correct = TRUE;
-#endif
+#پایان_اگر
 
     // May set global value for local option.
-    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
-	*(long *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = value;
+    إذا ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+	*(دراز *)get_varp_scope(&(options[opt_idx]), OPT_GLOBAL) = مقدار;
 
     // Invoke the option specific callback function to validate and apply the
     // new value.
-    if (options[opt_idx].opt_did_set_cb != NULL)
+    إذا (options[opt_idx].opt_did_مجموعه_cb != عدم)
     {
-	optset_T args;
+	optset_T آرگومانها;
 
-	CLEAR_FIELD(args);
-	args.os_varp = varp;
-	args.os_flags = opt_flags;
-	args.os_oldval.number = old_value;
-	args.os_newval.number = value;
-	args.os_errbuf = NULL;
-	errmsg = options[opt_idx].opt_did_set_cb(&args);
+	CLEAR_فیلد(آرگومانها);
+	آرگومانها.os_varp = varp;
+	آرگومانها.os_flags = opt_flags;
+	آرگومانها.os_oldval.عدد = old_مقدار;
+	آرگومانها.os_newval.عدد = مقدار;
+	آرگومانها.os_errbuf = عدم;
+	errmsg = options[opt_idx].opt_did_مجموعه_cb(&آرگومانها);
     }
 
     // Check the bounds for numeric options here
-    errmsg = check_num_option_bounds(pp, old_value, old_Rows, old_Columns,
+    errmsg = check_رقم_option_bounds(pp, old_مقدار, old_ردیفها_2, old_Columns,
 						errbuf, errbuflen, errmsg);
 
-    options[opt_idx].flags |= P_WAS_SET;
+    options[opt_idx].flags |= P_WAS_مجموعه;
 
-#if defined(FEAT_EVAL)
-    apply_optionset_autocmd(opt_idx, opt_flags, old_value, old_global_value,
-								value, errmsg);
-#endif
+#إذا defined(FEAT_EVAL)
+    apply_optionset_autocmd(opt_idx, opt_flags, old_مقدار, old_global_مقدار,
+								مقدار, errmsg);
+#پایان_اگر
 
-    comp_col();			    // in case 'columns' or 'ls' changed
+    comp_ستون();			    // in case 'columns' or 'ls' changed
 
-    if (curwin->w_curswant != MAXCOL
+    إذا (curwin->w_curswant != MAXCOL
 		     && (options[opt_idx].flags & (P_CURSWANT | P_RALL)) != 0
 				   && (options[opt_idx].flags & P_HLONLY) == 0)
-	curwin->w_set_curswant = true;
+	curwin->w_مجموعه_curswant = true;
 
-    if ((opt_flags & OPT_NO_REDRAW) == 0)
+    إذا ((opt_flags & OPT_NO_REDRAW) == 0)
 	check_redraw(options[opt_idx].flags);
 
-    return errmsg;
+    أرجع errmsg;
 }
 
 /*
  * Called after an option changed: check if something needs to be redrawn.
  */
-    void
+    فراغ
 check_redraw(long_u flags)
 {
     // Careful: P_RCLR and P_RALL are a combination of other P_ flags
-    int		doclear = (flags & P_RCLR) == P_RCLR;
-    int		all = ((flags & P_RALL) == P_RALL || doclear);
+    صحيح		doclear = (flags & P_RCLR) == P_RCLR;
+    صحيح		all = ((flags & P_RALL) == P_RALL || doclear);
 
-    if ((flags & P_RSTAT) || all)	// mark all status lines dirty
-	status_redraw_all();
+    إذا ((flags & P_RSTAT) || all)	// mark all status lines dirty
+	وضعیت_redraw_all();
 
-    if ((flags & P_RBUF) || (flags & P_RWIN) || all)
+    إذا ((flags & P_RBUF) || (flags & P_RWIN) || all)
     {
-	if (flags & P_HLONLY)
+	إذا (flags & P_HLONLY)
 	    redraw_later(UPD_NOT_VALID);
-	else
-	    changed_window_setting();
+	وإلا
+	    تغییریافته_پنجره_setting();
     }
-    if (flags & P_RBUF)
+    إذا (flags & P_RBUF)
 	redraw_curbuf_later(UPD_NOT_VALID);
-    if (doclear)
+    إذا (doclear)
 	redraw_all_later(UPD_CLEAR);
-    else if (all)
+    وإلا إذا (all)
 	redraw_all_later(UPD_NOT_VALID);
 }
 
@@ -5668,76 +5668,76 @@ check_redraw(long_u flags)
  * Find index for option 'arg'.
  * Return -1 if not found.
  */
-    int
+    صحيح
 findoption(char_u *arg)
 {
-    int		    opt_idx;
-    char	    *s, *p;
-    static short    quick_tab[27] = {0, 0};	// quick access table
-    int		    is_term_opt;
+    صحيح		    opt_idx;
+    حرف	    *s, *p;
+    ساكن کوتاه    سریع_tab[27] = {0, 0};	// quick access table
+    صحيح		    is_جمله_opt;
 
     // For first call: Initialize the quick-access table.
     // It contains the index for the first option that starts with a certain
     // letter.  There are 26 letters, plus the first "t_" option.
-    if (quick_tab[1] == 0)
+    إذا (سریع_tab[1] == 0)
     {
 	// Make sure we do not leave any entries uninitialized, even if we have
 	// no options that start with a particular letter.
-	int last_opt_idx;
-	for (last_opt_idx = 0; options[last_opt_idx].fullname != NULL;
-		last_opt_idx++)
+	صحيح آخرین_opt_idx;
+	لكل (آخرین_opt_idx = 0; options[آخرین_opt_idx].fullname != عدم;
+		آخرین_opt_idx++)
 	    ;
-	for (int tab_idx = 1; tab_idx < 27; tab_idx++)
-	    quick_tab[tab_idx] = last_opt_idx;
+	لكل (صحيح tab_idx = 1; tab_idx < 27; tab_idx++)
+	    سریع_tab[tab_idx] = آخرین_opt_idx;
 
 	p = options[0].fullname;
-	for (opt_idx = 1; opt_idx < last_opt_idx; opt_idx++)
+	لكل (opt_idx = 1; opt_idx < آخرین_opt_idx; opt_idx++)
 	{
 	    s = options[opt_idx].fullname;
-	    if (s[0] != p[0])
+	    إذا (s[0] != p[0])
 	    {
-		if (s[0] == 't' && s[1] == '_')
-		    quick_tab[26] = opt_idx;
-		else
-		    quick_tab[CharOrdLow(s[0])] = opt_idx;
+		إذا (s[0] == 't' && s[1] == '_')
+		    سریع_tab[26] = opt_idx;
+		وإلا
+		    سریع_tab[Char_Ord_کم(s[0])] = opt_idx;
 	    }
 	    p = s;
 	}
     }
 
     // Check for name starting with an illegal character.
-    if (arg[0] < 'a' || arg[0] > 'z')
-	return -1;
+    إذا (arg[0] < 'a' || arg[0] > 'z')
+	أرجع -1;
 
-    is_term_opt = (arg[0] == 't' && arg[1] == '_');
-    if (is_term_opt)
-	opt_idx = quick_tab[26];
-    else
-	opt_idx = quick_tab[CharOrdLow(arg[0])];
-    for (; (s = options[opt_idx].fullname) != NULL && s[0] == arg[0]; opt_idx++)
+    is_جمله_opt = (arg[0] == 't' && arg[1] == '_');
+    إذا (is_جمله_opt)
+	opt_idx = سریع_tab[26];
+    وإلا
+	opt_idx = سریع_tab[Char_Ord_کم(arg[0])];
+    لكل (; (s = options[opt_idx].fullname) != عدم && s[0] == arg[0]; opt_idx++)
     {
-	if (STRCMP(arg, s) == 0)		    // match full name
-	    break;
+	إذا (STRCMP(arg, s) == 0)		    // match full name
+	    اكسر;
     }
-    if (s != NULL && s[0] != arg[0])
-	s = NULL;
-    if (s == NULL && !is_term_opt)
+    إذا (s != عدم && s[0] != arg[0])
+	s = عدم;
+    إذا (s == عدم && !is_جمله_opt)
     {
-	opt_idx = quick_tab[CharOrdLow(arg[0])];
-	for ( ; options[opt_idx].fullname != NULL; opt_idx++)
+	opt_idx = سریع_tab[Char_Ord_کم(arg[0])];
+	لكل ( ; options[opt_idx].fullname != عدم; opt_idx++)
 	{
 	    s = options[opt_idx].shortname;
-	    if (s != NULL && STRCMP(arg, s) == 0)   // match short name
-		break;
-	    s = NULL;
+	    إذا (s != عدم && STRCMP(arg, s) == 0)   // match short name
+		اكسر;
+	    s = عدم;
 	}
     }
-    if (s == NULL)
+    إذا (s == عدم)
 	opt_idx = -1;
-    return opt_idx;
+    أرجع opt_idx;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_TCL) || defined(FEAT_MZSCHEME) \
+#إذا defined(FEAT_EVAL) || defined(FEAT_TCL) || defined(FEAT_MZSCHEME) \
 	|| defined(FEAT_SPELL)
 /*
  * Get the value for an option.
@@ -5754,98 +5754,98 @@ findoption(char_u *arg)
  * "flagsp" (if not NULL) is set to the option flags (P_xxxx).
  */
     getoption_T
-get_option_value(
+get_option_مقدار(
     char_u	*name,
-    long	*numval,
+    دراز	*numval,
     char_u	**stringval,	    // NULL when only checking existence
-    int		*flagsp,
-    int		scope)
+    صحيح		*flagsp,
+    صحيح		scope)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
     char_u	*varp;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)		    // option not in the table
+    إذا (opt_idx < 0)		    // option not in the table
     {
-	int key;
+	صحيح کلید;
 
-	if (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
-				  && (key = find_key_option(name, FALSE)) != 0)
+	إذا (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
+				  && (کلید = پیدا_کن_کلید_option(name, FALSE)) != 0)
 	{
-	    char_u key_name[2];
+	    char_u کلید_name[2];
 	    char_u *p;
 
-	    if (flagsp != NULL)
+	    إذا (flagsp != عدم)
 		*flagsp = 0;  // terminal option has no flags
 
 	    // check for a terminal option
-	    if (key < 0)
+	    إذا (کلید < 0)
 	    {
-		key_name[0] = KEY2TERMCAP0(key);
-		key_name[1] = KEY2TERMCAP1(key);
+		کلید_name[0] = KEY2TERMCAP0(کلید);
+		کلید_name[1] = KEY2TERMCAP1(کلید);
 	    }
-	    else
+	    وإلا
 	    {
-		key_name[0] = KS_KEY;
-		key_name[1] = (key & 0xff);
+		کلید_name[0] = KS_کلید;
+		کلید_name[1] = (کلید & 0xff);
 	    }
-	    p = find_termcode(key_name);
-	    if (p != NULL)
+	    p = پیدا_کن_termcode(کلید_name);
+	    إذا (p != عدم)
 	    {
-		if (stringval != NULL)
+		إذا (stringval != عدم)
 		    *stringval = vim_strsave(p);
-		return gov_string;
+		أرجع gov_string;
 	    }
 	}
-	return gov_unknown;
+	أرجع gov_unknown;
     }
 
     varp = get_varp_scope(&(options[opt_idx]), scope);
 
-    if (flagsp != NULL)
+    إذا (flagsp != عدم)
 	// Return the P_xxxx option flags.
 	*flagsp = options[opt_idx].flags;
 
-    if (options[opt_idx].flags & P_STRING)
+    إذا (options[opt_idx].flags & P_STRING)
     {
-	if (varp == NULL)		    // hidden option
-	    return gov_hidden_string;
-	if (stringval != NULL)
+	إذا (varp == عدم)		    // hidden option
+	    أرجع gov_hidden_string;
+	إذا (stringval != عدم)
 	{
-	    if ((char_u **)varp == &p_pt)	// 'pastetoggle'
+	    إذا ((char_u **)varp == &p_pt)	// 'pastetoggle'
 		*stringval = str2special_save(*(char_u **)(varp), FALSE,
 									FALSE);
 # ifdef FEAT_CRYPT
 	    // never return the value of the crypt key
-	    else if ((char_u **)varp == &curbuf->b_p_key
+	    وإلا إذا ((char_u **)varp == &curbuf->b_p_کلید
 						&& **(char_u **)(varp) != NUL)
 		*stringval = vim_strnsave((char_u *)"*****", STRLEN_LITERAL("*****"));
 # endif
-	    else
+	    وإلا
 		*stringval = vim_strsave(*(char_u **)(varp));
 	}
-	return gov_string;
+	أرجع gov_string;
     }
 
-    if (varp == NULL)		    // hidden option
-	return (options[opt_idx].flags & P_NUM)
-					 ? gov_hidden_number : gov_hidden_bool;
-    if (options[opt_idx].flags & P_NUM)
-	*numval = *(long *)varp;
-    else
+    إذا (varp == عدم)		    // hidden option
+	أرجع (options[opt_idx].flags & P_رقم)
+					 ? gov_hidden_عدد : gov_hidden_bool;
+    إذا (options[opt_idx].flags & P_رقم)
+	*numval = *(دراز *)varp;
+    وإلا
     {
 	// Special case: 'modified' is b_changed, but we also want to consider
 	// it set when 'ff' or 'fenc' changed.
-	if ((int *)varp == &curbuf->b_changed)
-	    *numval = curbufIsChanged();
-	else
-	    *numval = (long) *(int *)varp;
+	إذا ((صحيح *)varp == &curbuf->b_تغییریافته)
+	    *numval = curbuf_Is_تغییریافته();
+	وإلا
+	    *numval = (دراز) *(صحيح *)varp;
     }
-    return (options[opt_idx].flags & P_NUM) ? gov_number : gov_bool;
+    أرجع (options[opt_idx].flags & P_رقم) ? gov_عدد : gov_bool;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#إذا defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Returns the option attributes and its value. Unlike the above function it
  * will return either global value or local value of the option depending on
@@ -5864,127 +5864,127 @@ get_option_value(
  *
  * Possible opt_type values: see SREQ_* in vim.h
  */
-    int
-get_option_value_strict(
+    صحيح
+get_option_مقدار_strict(
     char_u	*name,
-    long	*numval,
+    دراز	*numval,
     char_u	**stringval,	    // NULL when only obtaining attributes
-    int		opt_type,
-    void	*from)
+    صحيح		opt_type,
+    فراغ	*from)
 {
-    int		opt_idx;
-    char_u	*varp = NULL;
-    struct vimoption *p;
-    int		r = 0;
+    صحيح		opt_idx;
+    char_u	*varp = عدم;
+    بنية vimoption *p;
+    صحيح		r = 0;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)
-	return 0;
+    إذا (opt_idx < 0)
+	أرجع 0;
 
     p = &(options[opt_idx]);
 
     // Hidden option
-    if (p->var == NULL)
-	return 0;
+    إذا (p->var == عدم)
+	أرجع 0;
 
-    if (p->flags & P_BOOL)
+    إذا (p->flags & P_BOOL)
 	r |= SOPT_BOOL;
-    else if (p->flags & P_NUM)
-	r |= SOPT_NUM;
-    else if (p->flags & P_STRING)
+    وإلا إذا (p->flags & P_رقم)
+	r |= SOPT_رقم;
+    وإلا إذا (p->flags & P_STRING)
 	r |= SOPT_STRING;
 
-    if (p->indir == PV_NONE)
+    إذا (p->indir == PV_NONE)
     {
-	if (opt_type == SREQ_GLOBAL)
+	إذا (opt_type == SREQ_GLOBAL)
 	    r |= SOPT_GLOBAL;
-	else
-	    return 0; // Did not request global-only option
+	وإلا
+	    أرجع 0; // Did not request global-only option
     }
-    else
+    وإلا
     {
-	if (p->indir & PV_BOTH)
+	إذا (p->indir & PV_BOTH)
 	    r |= SOPT_GLOBAL;
-	else if (opt_type == SREQ_GLOBAL)
-	    return 0; // Requested global option
+	وإلا إذا (opt_type == SREQ_GLOBAL)
+	    أرجع 0; // Requested global option
 
-	if (p->indir & PV_WIN)
+	إذا (p->indir & PV_WIN)
 	{
-	    if (opt_type == SREQ_BUF)
-		return 0; // Did not request window-local option
-	    else
+	    إذا (opt_type == SREQ_BUF)
+		أرجع 0; // Did not request window-local option
+	    وإلا
 		r |= SOPT_WIN;
 	}
-	else if (p->indir & PV_BUF)
+	وإلا إذا (p->indir & PV_BUF)
 	{
-	    if (opt_type == SREQ_WIN)
-		return 0; // Did not request buffer-local option
-	    else
+	    إذا (opt_type == SREQ_WIN)
+		أرجع 0; // Did not request buffer-local option
+	    وإلا
 		r |= SOPT_BUF;
 	}
     }
 
-    if (stringval == NULL)
-	return r;
+    إذا (stringval == عدم)
+	أرجع r;
 
-    if (opt_type == SREQ_GLOBAL)
+    إذا (opt_type == SREQ_GLOBAL)
 	varp = p->var;
-    else
+    وإلا
     {
-	if (opt_type == SREQ_BUF)
+	إذا (opt_type == SREQ_BUF)
 	{
 	    // Special case: 'modified' is b_changed, but we also want to
 	    // consider it set when 'ff' or 'fenc' changed.
-	    if (p->indir == PV_MOD)
+	    إذا (p->indir == PV_MOD)
 	    {
-		*numval = bufIsChanged((buf_T *)from);
-		varp = NULL;
+		*numval = buf_Is_تغییریافته((buf_T *)from);
+		varp = عدم;
 	    }
 # ifdef FEAT_CRYPT
-	    else if (p->indir == PV_KEY)
+	    وإلا إذا (p->indir == PV_کلید)
 	    {
 		// never return the value of the crypt key
-		*stringval = NULL;
-		varp = NULL;
+		*stringval = عدم;
+		varp = عدم;
 	    }
 # endif
-	    else
+	    وإلا
 	    {
 		buf_T *save_curbuf = curbuf;
 
 		// only getting a pointer, no need to use aucmd_prepbuf()
 		curbuf = (buf_T *)from;
-		curwin->w_buffer = curbuf;
+		curwin->w_میانگیر = curbuf;
 		varp = get_varp(p);
 		curbuf = save_curbuf;
-		curwin->w_buffer = curbuf;
+		curwin->w_میانگیر = curbuf;
 	    }
 	}
-	else if (opt_type == SREQ_WIN)
+	وإلا إذا (opt_type == SREQ_WIN)
 	{
 	    win_T	*save_curwin = curwin;
 
 	    curwin = (win_T *)from;
-	    curbuf = curwin->w_buffer;
+	    curbuf = curwin->w_میانگیر;
 	    varp = get_varp(p);
 	    curwin = save_curwin;
-	    curbuf = curwin->w_buffer;
+	    curbuf = curwin->w_میانگیر;
 	}
-	if (varp == p->var)
-	    return (r | SOPT_UNSET);
+	إذا (varp == p->var)
+	    أرجع (r | SOPT_UNSET);
     }
 
-    if (varp != NULL)
+    إذا (varp != عدم)
     {
-	if (p->flags & P_STRING)
+	إذا (p->flags & P_STRING)
 	    *stringval = vim_strsave(*(char_u **)(varp));
-	else if (p->flags & P_NUM)
-	    *numval = *(long *) varp;
-	else
-	    *numval = *(int *)varp;
+	وإلا إذا (p->flags & P_رقم)
+	    *numval = *(دراز *) varp;
+	وإلا
+	    *numval = *(صحيح *)varp;
     }
 
-    return r;
+    أرجع r;
 }
 
 /*
@@ -6000,69 +6000,69 @@ get_option_value_strict(
  * Returns full option name for current option on each call.
  */
     char_u *
-option_iter_next(void **option, int opt_type)
+option_iter_بعدی(فراغ **option, صحيح opt_type)
 {
-    struct vimoption	*ret = NULL;
-    do
+    بنية vimoption	*ret = عدم;
+    افعل
     {
-	if (*option == NULL)
-	    *option = (void *) options;
-	else if (((struct vimoption *) (*option))->fullname == NULL)
+	إذا (*option == عدم)
+	    *option = (فراغ *) options;
+	وإلا إذا (((بنية vimoption *) (*option))->fullname == عدم)
 	{
-	    *option = NULL;
-	    return NULL;
+	    *option = عدم;
+	    أرجع عدم;
 	}
-	else
-	    *option = (void *) (((struct vimoption *) (*option)) + 1);
+	وإلا
+	    *option = (فراغ *) (((بنية vimoption *) (*option)) + 1);
 
-	ret = ((struct vimoption *) (*option));
+	ret = ((بنية vimoption *) (*option));
 
 	// Hidden option
-	if (ret->var == NULL)
+	إذا (ret->var == عدم)
 	{
-	    ret = NULL;
-	    continue;
+	    ret = عدم;
+	    استمر;
 	}
 
-	switch (opt_type)
+	بدل (opt_type)
 	{
-	    case SREQ_GLOBAL:
-		if (!(ret->indir == PV_NONE || ret->indir & PV_BOTH))
-		    ret = NULL;
-		break;
-	    case SREQ_BUF:
-		if (!(ret->indir & PV_BUF))
-		    ret = NULL;
-		break;
-	    case SREQ_WIN:
-		if (!(ret->indir & PV_WIN))
-		    ret = NULL;
-		break;
-	    default:
-		internal_error("option_iter_next()");
-		return NULL;
+	    حالة SREQ_GLOBAL:
+		إذا (!(ret->indir == PV_NONE || ret->indir & PV_BOTH))
+		    ret = عدم;
+		اكسر;
+	    حالة SREQ_BUF:
+		إذا (!(ret->indir & PV_BUF))
+		    ret = عدم;
+		اكسر;
+	    حالة SREQ_WIN:
+		إذا (!(ret->indir & PV_WIN))
+		    ret = عدم;
+		اكسر;
+	    افتراضي:
+		داخلی_error("option_iter_next()");
+		أرجع عدم;
 	}
     }
-    while (ret == NULL);
+    طالما (ret == عدم);
 
-    return (char_u *)ret->fullname;
+    أرجع (char_u *)ret->fullname;
 }
-#endif
+#پایان_اگر
 
 /*
  * Return the flags for the option at 'opt_idx'.
  */
     long_u
-get_option_flags(int opt_idx)
+get_option_flags(صحيح opt_idx)
 {
-    return options[opt_idx].flags;
+    أرجع options[opt_idx].flags;
 }
 
 /*
  * Set a flag for the option at 'opt_idx'.
  */
-    void
-set_option_flag(int opt_idx, long_u flag)
+    فراغ
+مجموعه_option_flag(صحيح opt_idx, long_u flag)
 {
     options[opt_idx].flags |= flag;
 }
@@ -6070,50 +6070,50 @@ set_option_flag(int opt_idx, long_u flag)
 /*
  * Returns TRUE if the option at 'opt_idx' is a global option
  */
-    int
-is_global_option(int opt_idx)
+    صحيح
+is_global_option(صحيح opt_idx)
 {
-    return options[opt_idx].indir == PV_NONE;
+    أرجع options[opt_idx].indir == PV_NONE;
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' is a global option which also has a
  * local value.
  */
-    int
-is_global_local_option(int opt_idx)
+    صحيح
+is_global_local_option(صحيح opt_idx)
 {
-    return options[opt_idx].indir & PV_BOTH;
+    أرجع options[opt_idx].indir & PV_BOTH;
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' is a window-local option
  */
-    int
-is_window_local_option(int opt_idx)
+    صحيح
+is_پنجره_local_option(صحيح opt_idx)
 {
-    return options[opt_idx].var == VAR_WIN;
+    أرجع options[opt_idx].var == VAR_WIN;
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' is a hidden option
  */
-    int
-is_hidden_option(int opt_idx)
+    صحيح
+is_hidden_option(صحيح opt_idx)
 {
-    return options[opt_idx].var == NULL;
+    أرجع options[opt_idx].var == عدم;
 }
 
-#if defined(FEAT_CRYPT)
+#إذا defined(FEAT_CRYPT)
 /*
  * Returns TRUE if the option at 'opt_idx' is a crypt key option
  */
-    int
-is_crypt_key_option(int opt_idx)
+    صحيح
+is_crypt_کلید_option(صحيح opt_idx)
 {
-    return options[opt_idx].indir == PV_KEY;
+    أرجع options[opt_idx].indir == PV_کلید;
 }
-#endif
+#پایان_اگر
 
 /*
  * Set the value of option "name".
@@ -6121,110 +6121,110 @@ is_crypt_key_option(int opt_idx)
  *
  * Returns NULL on success or an untranslated error message on error.
  */
-    char *
-set_option_value(
+    حرف *
+مجموعه_option_مقدار(
     char_u	*name,
-    long	number,
+    دراز	عدد,
     char_u	*string,
-    int		opt_flags)	// OPT_LOCAL or 0 (both)
+    صحيح		opt_flags)	// OPT_LOCAL or 0 (both)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
     char_u	*varp;
     long_u	flags;
-    static char	errbuf[ERR_BUFLEN];
-    int		errbuflen = ERR_BUFLEN;
+    ساكن حرف	errbuf[ERR_BUFLEN];
+    صحيح		errbuflen = ERR_BUFLEN;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)
+    إذا (opt_idx < 0)
     {
-	int key;
+	صحيح کلید;
 
-	if (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
-		&& (key = find_key_option(name, FALSE)) != 0)
+	إذا (STRLEN(name) == 4 && name[0] == 't' && name[1] == '_'
+		&& (کلید = پیدا_کن_کلید_option(name, FALSE)) != 0)
 	{
-	    char_u key_name[2];
+	    char_u کلید_name[2];
 
-	    if (key < 0)
+	    إذا (کلید < 0)
 	    {
-		key_name[0] = KEY2TERMCAP0(key);
-		key_name[1] = KEY2TERMCAP1(key);
+		کلید_name[0] = KEY2TERMCAP0(کلید);
+		کلید_name[1] = KEY2TERMCAP1(کلید);
 	    }
-	    else
+	    وإلا
 	    {
-		key_name[0] = KS_KEY;
-		key_name[1] = (key & 0xff);
+		کلید_name[0] = KS_کلید;
+		کلید_name[1] = (کلید & 0xff);
 	    }
-	    add_termcode(key_name, string, FALSE);
-	    if (full_screen)
+	    جمع_کن_termcode(کلید_name, string, FALSE);
+	    إذا (پر_screen)
 		ttest(FALSE);
 	    redraw_all_later(UPD_CLEAR);
-	    return NULL;
+	    أرجع عدم;
 	}
 
 	semsg(_(e_unknown_option_str_2), name);
     }
-    else
+    وإلا
     {
 	flags = options[opt_idx].flags;
-#ifdef HAVE_SANDBOX
+#اگر_تعریف_شده HAVE_SANDBOX
 	// Disallow changing some options in the sandbox
-	if (sandbox > 0 && (flags & P_SECURE))
+	إذا (sandbox > 0 && (flags & P_SECURE))
 	{
-	    emsg(_(e_not_allowed_in_sandbox));
-	    return NULL;
+	    emsg(_(e_not_allowed_درون_sandbox));
+	    أرجع عدم;
 	}
-#endif
-	if (flags & P_STRING)
-	    return set_string_option(opt_idx, string, opt_flags, errbuf, errbuflen);
+#پایان_اگر
+	إذا (flags & P_STRING)
+	    أرجع مجموعه_string_option(opt_idx, string, opt_flags, errbuf, errbuflen);
 
 	varp = get_varp_scope(&(options[opt_idx]), opt_flags);
-	if (varp != NULL)	// hidden option is not changed
+	إذا (varp != عدم)	// hidden option is not changed
 	{
-	    if (number == 0 && string != NULL)
+	    إذا (عدد == 0 && string != عدم)
 	    {
-		int idx;
+		صحيح idx;
 
 		// Either we are given a string or we are setting option
 		// to zero.
-		for (idx = 0; string[idx] == '0'; ++idx)
+		لكل (idx = 0; string[idx] == '0'; ++idx)
 		    ;
-		if (string[idx] != NUL || idx == 0)
+		إذا (string[idx] != NUL || idx == 0)
 		{
 		    // There's another character after zeros or the string
 		    // is empty.  In both cases, we are trying to set a
 		    // num option using a string.
-		    semsg(_(e_number_required_after_str_equal_str),
+		    semsg(_(e_عدد_required_after_str_equal_str),
 								 name, string);
-		    return NULL;     // do nothing as we hit an error
+		    أرجع عدم;     // do nothing as we hit an error
 
 		}
 	    }
-	    if (flags & P_NUM)
+	    إذا (flags & P_رقم)
 	    {
-		return set_num_option(opt_idx, varp, number,
-					   errbuf, sizeof(errbuf), opt_flags);
+		أرجع مجموعه_رقم_option(opt_idx, varp, عدد,
+					   errbuf, حجم(errbuf), opt_flags);
 	    }
-	    else
-		return set_bool_option(opt_idx, varp, (int)number, opt_flags);
+	    وإلا
+		أرجع مجموعه_bool_option(opt_idx, varp, (صحيح)عدد, opt_flags);
 	}
 
     }
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Call set_option_value() and when an error is returned report it.
  */
-    void
-set_option_value_give_err(
+    فراغ
+مجموعه_option_مقدار_give_err(
     char_u	*name,
-    long	number,
+    دراز	عدد,
     char_u	*string,
-    int		opt_flags)	// OPT_LOCAL or 0 (both)
+    صحيح		opt_flags)	// OPT_LOCAL or 0 (both)
 {
-    char *errmsg = set_option_value(name, number, string, opt_flags);
+    حرف *errmsg = مجموعه_option_مقدار(name, عدد, string, opt_flags);
 
-    if (errmsg != NULL)
+    إذا (errmsg != عدم)
 	emsg(_(errmsg));
 }
 
@@ -6233,85 +6233,85 @@ set_option_value_give_err(
  * Returns NULL when not found.
  */
     char_u *
-get_term_code(char_u *tname)
+get_جمله_کد(char_u *tname)
 {
-    int	    opt_idx;
+    صحيح	    opt_idx;
     char_u  *varp;
 
-    if (tname[0] != 't' || tname[1] != '_' ||
+    إذا (tname[0] != 't' || tname[1] != '_' ||
 	    tname[2] == NUL || tname[3] == NUL)
-	return NULL;
-    if ((opt_idx = findoption(tname)) >= 0)
+	أرجع عدم;
+    إذا ((opt_idx = findoption(tname)) >= 0)
     {
 	varp = get_varp(&(options[opt_idx]));
-	if (varp != NULL)
+	إذا (varp != عدم)
 	    varp = *(char_u **)(varp);
-	return varp;
+	أرجع varp;
     }
-    return find_termcode(tname + 2);
+    أرجع پیدا_کن_termcode(tname + 2);
 }
 
     char_u *
-get_highlight_default(void)
+get_highlight_default(فراغ)
 {
-    int i;
+    صحيح i;
 
     i = findoption((char_u *)"hl");
-    if (i >= 0)
-	return options[i].def_val[VI_DEFAULT];
-    return (char_u *)NULL;
+    إذا (i >= 0)
+	أرجع options[i].def_val[VI_DEFAULT];
+    أرجع (char_u *)عدم;
 }
 
     char_u *
-get_encoding_default(void)
+get_encoding_default(فراغ)
 {
-    int i;
+    صحيح i;
 
     i = findoption((char_u *)"enc");
-    if (i >= 0)
-	return options[i].def_val[VI_DEFAULT];
-    return (char_u *)NULL;
+    إذا (i >= 0)
+	أرجع options[i].def_val[VI_DEFAULT];
+    أرجع (char_u *)عدم;
 }
 
-#if defined(FEAT_QUICKFIX)
-    int
-is_option_allocated(char *name)
+#إذا defined(FEAT_QUICKFIX)
+    صحيح
+is_option_allocated(حرف *name)
 {
-    int idx = findoption((char_u *)name);
+    صحيح idx = findoption((char_u *)name);
 
-    return idx >= 0 && (options[idx].flags & P_ALLOCED);
+    أرجع idx >= 0 && (options[idx].flags & P_ALLOCED);
 }
-#endif
+#پایان_اگر
 
 /*
  * Translate a string like "t_xx", "<t_xx>" or "<S-Tab>" to a key number.
  * When "has_lt" is true there is a '<' before "*arg_arg".
  * Returns 0 when the key is not recognized.
  */
-    static int
-find_key_option(char_u *arg_arg, int has_lt)
+    ساكن صحيح
+پیدا_کن_کلید_option(char_u *arg_arg, صحيح has_lt)
 {
-    int		key = 0;
-    int		modifiers;
+    صحيح		کلید = 0;
+    صحيح		modifiers;
     char_u	*arg = arg_arg;
 
     // Don't use get_special_key_code() for t_xx, we don't want it to call
     // add_termcap_entry().
-    if (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
+    إذا (arg[0] == 't' && arg[1] == '_' && arg[2] && arg[3])
     {
-	if (!has_lt || arg[4] == '>')
-	    key = TERMCAP2KEY(arg[2], arg[3]);
+	إذا (!has_lt || arg[4] == '>')
+	    کلید = TERMCAP2_کلید(arg[2], arg[3]);
     }
-    else if (has_lt)
+    وإلا إذا (has_lt)
     {
 	--arg;			    // put arg at the '<'
 	modifiers = 0;
-	key = find_special_key(&arg, &modifiers,
-			    FSK_KEYCODE | FSK_KEEP_X_KEY | FSK_SIMPLIFY, NULL);
-	if (modifiers)		    // can't handle modifiers here
-	    key = 0;
+	کلید = پیدا_کن_special_کلید(&arg, &modifiers,
+			    FSK_KEYCODE | FSK_KEEP_X_کلید | FSK_SIMPLIFY, عدم);
+	إذا (modifiers)		    // can't handle modifiers here
+	    کلید = 0;
     }
-    return key;
+    أرجع کلید;
 }
 
 /*
@@ -6319,169 +6319,169 @@ find_key_option(char_u *arg_arg, int has_lt)
  * if 'all' == 1: show all normal options
  * if 'all' == 2: show all terminal options
  */
-    static void
+    ساكن فراغ
 showoptions(
-    int		all,
-    int		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
+    صحيح		all,
+    صحيح		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
 {
-    struct vimoption	*p;
-    int			col;
-    int			isterm;
+    بنية vimoption	*p;
+    صحيح			ستون;
+    صحيح			isterm;
     char_u		*varp;
-    struct vimoption	**items;
-    int			item_count;
-    int			run;
-    int			row, rows;
-    int			cols;
-    int			i;
-    int			len;
+    بنية vimoption	**اقلام;
+    صحيح			قلم_شمار;
+    صحيح			پیاپی;
+    صحيح			ردیف, ردیفها_2;
+    صحيح			تعداد_ستون;
+    صحيح			i;
+    صحيح			len;
 
-#define INC 20
-#define GAP 3
+#تعریف_کن INC 20
+#تعریف_کن GAP 3
 
-    items = ALLOC_MULT(struct vimoption *, OPTION_COUNT);
-    if (items == NULL)
-	return;
+    اقلام = ALLOC_MULT(بنية vimoption *, OPTION_شمار);
+    إذا (اقلام == عدم)
+	أرجع;
 
     // Highlight title
-    if (all == 2)
-	msg_puts_title(_("\n--- Terminal codes ---"));
-    else if (opt_flags & OPT_GLOBAL)
-	msg_puts_title(_("\n--- Global option values ---"));
-    else if (opt_flags & OPT_LOCAL)
-	msg_puts_title(_("\n--- Local option values ---"));
-    else
-	msg_puts_title(_("\n--- Options ---"));
+    إذا (all == 2)
+	پیام_puts_title(_("\n--- Terminal codes ---"));
+    وإلا إذا (opt_flags & OPT_GLOBAL)
+	پیام_puts_title(_("\n--- Global option values ---"));
+    وإلا إذا (opt_flags & OPT_LOCAL)
+	پیام_puts_title(_("\n--- Local option values ---"));
+    وإلا
+	پیام_puts_title(_("\n--- Options ---"));
 
     // Do the loop two times:
     // 1. display the short items
     // 2. display the long items (only strings and numbers)
     // When "opt_flags" has OPT_ONECOLUMN do everything in run 2.
-    for (run = 1; run <= 2 && !got_int; ++run)
+    لكل (پیاپی = 1; پیاپی <= 2 && !got_int; ++پیاپی)
     {
 	// collect the items in items[]
-	item_count = 0;
-	for (p = &options[0]; p->fullname != NULL; p++)
+	قلم_شمار = 0;
+	لكل (p = &options[0]; p->fullname != عدم; p++)
 	{
 	    // apply :filter /pat/
-	    if (message_filtered((char_u *)p->fullname))
-		continue;
+	    إذا (پیام_filtered((char_u *)p->fullname))
+		استمر;
 
-	    varp = NULL;
+	    varp = عدم;
 	    isterm = istermoption(p);
-	    if ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) != 0)
+	    إذا ((opt_flags & (OPT_LOCAL | OPT_GLOBAL)) != 0)
 	    {
-		if (p->indir != PV_NONE && !isterm)
+		إذا (p->indir != PV_NONE && !isterm)
 		    varp = get_varp_scope(p, opt_flags);
 	    }
-	    else
+	    وإلا
 		varp = get_varp(p);
-	    if (varp != NULL
+	    إذا (varp != عدم
 		    && ((all == 2 && isterm)
 			|| (all == 1 && !isterm)
 			|| (all == 0 && !optval_default(p, varp, p_cp))))
 	    {
-		if (opt_flags & OPT_ONECOLUMN)
+		إذا (opt_flags & OPT_ONECOLUMN)
 		    len = Columns;
-		else if (p->flags & P_BOOL)
+		وإلا إذا (p->flags & P_BOOL)
 		    len = 1;		// a toggle option fits always
-		else
+		وإلا
 		{
 		    option_value2string(p, opt_flags);
-		    len = (int)STRLEN(p->fullname) + vim_strsize(NameBuff) + 1;
+		    len = (صحيح)STRLEN(p->fullname) + vim_strsize(NameBuff) + 1;
 		}
-		if ((len <= INC - GAP && run == 1) ||
-						(len > INC - GAP && run == 2))
-		    items[item_count++] = p;
+		إذا ((len <= INC - GAP && پیاپی == 1) ||
+						(len > INC - GAP && پیاپی == 2))
+		    اقلام[قلم_شمار++] = p;
 	    }
 	}
 
 	// display the items
-	if (run == 1)
+	إذا (پیاپی == 1)
 	{
-	    cols = (Columns + GAP - 3) / INC;
-	    if (cols == 0)
-		cols = 1;
-	    rows = (item_count + cols - 1) / cols;
+	    تعداد_ستون = (Columns + GAP - 3) / INC;
+	    إذا (تعداد_ستون == 0)
+		تعداد_ستون = 1;
+	    ردیفها_2 = (قلم_شمار + تعداد_ستون - 1) / تعداد_ستون;
 	}
-	else	// run == 2
-	    rows = item_count;
-	for (row = 0; row < rows && !got_int; ++row)
+	وإلا	// run == 2
+	    ردیفها_2 = قلم_شمار;
+	لكل (ردیف = 0; ردیف < ردیفها_2 && !got_int; ++ردیف)
 	{
-	    msg_putchar('\n');			// go to next line
-	    if (got_int)			// 'q' typed in more
-		break;
-	    col = 0;
-	    for (i = row; i < item_count; i += rows)
+	    پیام_putchar('\n');			// go to next line
+	    إذا (got_int)			// 'q' typed in more
+		اكسر;
+	    ستون = 0;
+	    لكل (i = ردیف; i < قلم_شمار; i += ردیفها_2)
 	    {
-		msg_col = col;			// make columns
-		showoneopt(items[i], opt_flags);
-		col += INC;
+		پیام_ستون = ستون;			// make columns
+		showoneopt(اقلام[i], opt_flags);
+		ستون += INC;
 	    }
-	    out_flush();
+	    بیرون_flush();
 	    ui_breakcheck();
 	}
     }
-    vim_free(items);
+    vim_free(اقلام);
 }
 
 /*
  * Return TRUE if option "p" has its default value.
  */
-    static int
-optval_default(struct vimoption *p, char_u *varp, int compatible)
+    ساكن صحيح
+optval_default(بنية vimoption *p, char_u *varp, صحيح compatible)
 {
-    int		dvi;
+    صحيح		dvi;
 
-    if (varp == NULL)
-	return TRUE;	    // hidden option is always at default
+    إذا (varp == عدم)
+	أرجع TRUE;	    // hidden option is always at default
     dvi = ((p->flags & P_VI_DEF) || compatible) ? VI_DEFAULT : VIM_DEFAULT;
-    if (p->flags & P_NUM)
-	return (*(long *)varp == (long)(long_i)p->def_val[dvi]);
-    if (p->flags & P_BOOL)
+    إذا (p->flags & P_رقم)
+	أرجع (*(دراز *)varp == (دراز)(long_i)p->def_val[dvi]);
+    إذا (p->flags & P_BOOL)
 			// the cast to long is required for Manx C, long_i is
 			// needed for MSVC
-	return (*(int *)varp == (int)(long)(long_i)p->def_val[dvi]);
+	أرجع (*(صحيح *)varp == (صحيح)(دراز)(long_i)p->def_val[dvi]);
     // P_STRING
-    return (STRCMP(*(char_u **)varp, p->def_val[dvi]) == 0);
+    أرجع (STRCMP(*(char_u **)varp, p->def_val[dvi]) == 0);
 }
 
 /*
  * showoneopt: show the value of one option
  * must not be called with a hidden option!
  */
-    static void
+    ساكن فراغ
 showoneopt(
-    struct vimoption	*p,
-    int			opt_flags)	// OPT_LOCAL or OPT_GLOBAL
+    بنية vimoption	*p,
+    صحيح			opt_flags)	// OPT_LOCAL or OPT_GLOBAL
 {
     char_u	*varp;
-    int		save_silent = silent_mode;
+    صحيح		save_silent = silent_نما;
 
-    silent_mode = FALSE;
-    info_message = TRUE;	// use mch_msg(), not mch_errmsg()
+    silent_نما = FALSE;
+    info_پیام = TRUE;	// use mch_msg(), not mch_errmsg()
 
     varp = get_varp_scope(p, opt_flags);
 
     // for 'modified' we also need to check if 'ff' or 'fenc' changed.
-    if ((p->flags & P_BOOL) && ((int *)varp == &curbuf->b_changed
-					? !curbufIsChanged() : !*(int *)varp))
-	msg_puts("no");
-    else if ((p->flags & P_BOOL) && *(int *)varp < 0)
-	msg_puts("--");
-    else
-	msg_puts("  ");
-    msg_puts(p->fullname);
-    if (!(p->flags & P_BOOL))
+    إذا ((p->flags & P_BOOL) && ((صحيح *)varp == &curbuf->b_تغییریافته
+					? !curbuf_Is_تغییریافته() : !*(صحيح *)varp))
+	پیام_puts("no");
+    وإلا إذا ((p->flags & P_BOOL) && *(صحيح *)varp < 0)
+	پیام_puts("--");
+    وإلا
+	پیام_puts("  ");
+    پیام_puts(p->fullname);
+    إذا (!(p->flags & P_BOOL))
     {
-	msg_putchar('=');
+	پیام_putchar('=');
 	// put value string in NameBuff
 	option_value2string(p, opt_flags);
-	msg_outtrans(NameBuff);
+	پیام_outtrans(NameBuff);
     }
 
-    silent_mode = save_silent;
-    info_message = FALSE;
+    silent_نما = save_silent;
+    info_پیام = FALSE;
 }
 
 /*
@@ -6506,16 +6506,16 @@ showoneopt(
  *
  * Return FAIL on error, OK otherwise.
  */
-    int
-makeset(FILE *fd, int opt_flags, int local_only)
+    صحيح
+makeset(FILE *fd, صحيح opt_flags, صحيح local_only)
 {
-    struct vimoption	*p;
+    بنية vimoption	*p;
     char_u		*varp;			// currently used value
     char_u		*varp_fresh;		// local value
-    char_u		*varp_local = NULL;	// fresh value
-    char		*cmd;
-    int			round;
-    int			pri;
+    char_u		*varp_local = عدم;	// fresh value
+    حرف		*cmd;
+    صحيح			دور;
+    صحيح			pri;
 
     /*
      * The options that don't have a default (terminal name, columns, lines)
@@ -6523,47 +6523,47 @@ makeset(FILE *fd, int opt_flags, int local_only)
      * Do the loop over "options[]" twice: once for options with the
      * P_PRI_MKRC flag and once without.
      */
-    for (pri = 1; pri >= 0; --pri)
+    لكل (pri = 1; pri >= 0; --pri)
     {
-      for (p = &options[0]; !istermoption(p); p++)
-	if (!(p->flags & P_NO_MKRC)
+      لكل (p = &options[0]; !istermoption(p); p++)
+	إذا (!(p->flags & P_NO_MKRC)
 		&& !istermoption(p)
 		&& ((pri == 1) == ((p->flags & P_PRI_MKRC) != 0)))
 	{
 	    // skip global option when only doing locals
-	    if (p->indir == PV_NONE && !(opt_flags & OPT_GLOBAL))
-		continue;
+	    إذا (p->indir == PV_NONE && !(opt_flags & OPT_GLOBAL))
+		استمر;
 
 	    // Do not store options like 'bufhidden' and 'syntax' in a vimrc
 	    // file, they are always buffer-specific.
-	    if ((opt_flags & OPT_GLOBAL) && (p->flags & P_NOGLOB))
-		continue;
+	    إذا ((opt_flags & OPT_GLOBAL) && (p->flags & P_NOGLOB))
+		استمر;
 
 	    // Global values are only written when not at the default value.
 	    varp = get_varp_scope(p, opt_flags);
-	    if ((opt_flags & OPT_GLOBAL) && optval_default(p, varp, p_cp))
-		continue;
+	    إذا ((opt_flags & OPT_GLOBAL) && optval_default(p, varp, p_cp))
+		استمر;
 
-	    if ((opt_flags & OPT_SKIPRTP) && (p->var == (char_u *)&p_rtp
+	    إذا ((opt_flags & OPT_SKIPRTP) && (p->var == (char_u *)&p_rtp
 						 || p->var == (char_u *)&p_pp))
-		continue;
+		استمر;
 
-	    round = 2;
-	    if (p->indir != PV_NONE)
+	    دور = 2;
+	    إذا (p->indir != PV_NONE)
 	    {
-		if (p->var == VAR_WIN)
+		إذا (p->var == VAR_WIN)
 		{
 		    // skip window-local option when only doing globals
-		    if (!(opt_flags & OPT_LOCAL))
-			continue;
+		    إذا (!(opt_flags & OPT_LOCAL))
+			استمر;
 		    // When fresh value of window-local option is not at the
 		    // default, need to write it too.
-		    if (!(opt_flags & OPT_GLOBAL) && !local_only)
+		    إذا (!(opt_flags & OPT_GLOBAL) && !local_only)
 		    {
 			varp_fresh = get_varp_scope(p, OPT_GLOBAL);
-			if (!optval_default(p, varp_fresh, p_cp))
+			إذا (!optval_default(p, varp_fresh, p_cp))
 			{
-			    round = 1;
+			    دور = 1;
 			    varp_local = varp;
 			    varp = varp_fresh;
 			}
@@ -6573,81 +6573,81 @@ makeset(FILE *fd, int opt_flags, int local_only)
 
 	    // Round 1: fresh value for window-local options.
 	    // Round 2: other values
-	    for ( ; round <= 2; varp = varp_local, ++round)
+	    لكل ( ; دور <= 2; varp = varp_local, ++دور)
 	    {
-		if (round == 1 || (opt_flags & OPT_GLOBAL))
+		إذا (دور == 1 || (opt_flags & OPT_GLOBAL))
 		    cmd = "set";
-		else
+		وإلا
 		    cmd = "setlocal";
 
-		if (p->flags & P_BOOL)
+		إذا (p->flags & P_BOOL)
 		{
-		    if (put_setbool(fd, cmd, p->fullname, *(int *)varp) == FAIL)
-			return FAIL;
+		    إذا (put_setbool(fd, cmd, p->fullname, *(صحيح *)varp) == FAIL)
+			أرجع FAIL;
 		}
-		else if (p->flags & P_NUM)
+		وإلا إذا (p->flags & P_رقم)
 		{
-		    if (put_setnum(fd, cmd, p->fullname, (long *)varp) == FAIL)
-			return FAIL;
+		    إذا (put_setnum(fd, cmd, p->fullname, (دراز *)varp) == FAIL)
+			أرجع FAIL;
 		}
-		else    // P_STRING
+		وإلا    // P_STRING
 		{
-		    int		do_endif = FALSE;
+		    صحيح		do_endif = FALSE;
 		    bool	legacy;
 
 		    // Ignore those options associated to lambda expressions because
 		    // persistence makes no sense for them.
-		    if ((p->flags & P_FUNC) && *(char_u **)varp != NULL
-			    && strstr(*(char **)varp, "<lambda>") != NULL)
-			continue;
+		    إذا ((p->flags & P_FUNC) && *(char_u **)varp != عدم
+			    && جستجوی_رشته(*(حرف **)varp, "<lambda>") != عدم)
+			استمر;
 
-#ifdef FEAT_EVAL
-		    legacy = !is_option_value_vim9(p - &options[0],
-			    round == 1 ? opt_flags | OPT_GLOBAL : OPT_LOCAL);
-#else
+#اگر_تعریف_شده FEAT_EVAL
+		    legacy = !is_option_مقدار_vim9(p - &options[0],
+			    دور == 1 ? opt_flags | OPT_GLOBAL : OPT_LOCAL);
+#وإلا
 		    // I think none of the options that require expression
 		    // evaluation will be present if expression evaluation is
 		    // disabled.  For example, 'includeexpr' is set to NULL if
 		    // FEAT_EVAL is not present.  So it should be safe to use
 		    // normal "set" and "setlocal" in the session file.
 		    legacy = false;
-#endif
+#پایان_اگر
 
 		    // Don't set 'syntax' and 'filetype' again if the value is
 		    // already right, avoids reloading the syntax file.
-		    if (
-#if defined(FEAT_SYN_HL)
+		    إذا (
+#إذا defined(FEAT_SYN_HL)
 			    p->indir == PV_SYN ||
-#endif
+#پایان_اگر
 			    p->indir == PV_FT)
 		    {
-			if (fprintf(fd, "if &%s != '%s'", p->fullname,
+			إذا (fprintf(fd, "if &%s != '%s'", p->fullname,
 						       *(char_u **)(varp)) < 0
 				|| put_eol(fd) < 0)
-			    return FAIL;
+			    أرجع FAIL;
 			do_endif = TRUE;
 		    }
-		    if (put_setstring(fd, legacy, cmd, p->fullname,
+		    إذا (put_setstring(fd, legacy, cmd, p->fullname,
 					    (char_u **)varp, p->flags) == FAIL)
-			return FAIL;
-		    if (do_endif)
+			أرجع FAIL;
+		    إذا (do_endif)
 		    {
-			if (put_line(fd, "endif") == FAIL)
-			    return FAIL;
+			إذا (put_سطر(fd, "endif") == FAIL)
+			    أرجع FAIL;
 		    }
 		}
 	    }
 	}
     }
-    return OK;
+    أرجع OK;
 }
 
-#if defined(FEAT_FOLDING)
+#إذا defined(FEAT_FOLDING)
 /*
  * Generate set commands for the local fold options only.  Used when
  * 'sessionoptions' or 'viewoptions' contains "folds" but not "options".
  */
-    int
+    صحيح
 makefoldset(FILE *fd)
 {
 # ifdef FEAT_EVAL
@@ -6655,10 +6655,10 @@ makefoldset(FILE *fd)
     // Similarly to the check in is_option_value_vim9(), if "sc_id" is not set
     // we have a default value, so it is safe to avoid the ":legacy" prefix.
     bool	fde_is_legacy = SCRIPT_ID_VALID(fde_script_ctx->sc_sid)
-			&& fde_script_ctx->sc_version < SCRIPT_VERSION_VIM9;
+			&& fde_script_ctx->sc_نسخه < SCRIPT_نسخه_VIM9;
 # endif
 
-    if (put_setstring(fd, false, "setlocal", "fdm", &curwin->w_p_fdm, 0)
+    إذا (put_setstring(fd, false, "setlocal", "fdm", &curwin->w_p_fdm, 0)
 								       == FAIL
 # ifdef FEAT_EVAL
 	    || put_setstring(fd, fde_is_legacy, "setlocal", "fde",
@@ -6673,140 +6673,140 @@ makefoldset(FILE *fd)
 	    || put_setnum(fd, "setlocal", "fdn", &curwin->w_p_fdn) == FAIL
 	    || put_setbool(fd, "setlocal", "fen", curwin->w_p_fen) == FAIL
 	    )
-	return FAIL;
+	أرجع FAIL;
 
-    return OK;
+    أرجع OK;
 }
-#endif
+#پایان_اگر
 
-    static int
+    ساكن صحيح
 put_setstring(
     FILE	*fd,
     bool	legacy,
-    char	*cmd,
-    char	*name,
+    حرف	*cmd,
+    حرف	*name,
     char_u	**valuep,
     long_u	flags)
 {
     char_u	*s;
-    char_u	*buf = NULL;
-    char_u	*part = NULL;
+    char_u	*buf = عدم;
+    char_u	*part = عدم;
     char_u	*p;
 
-    if (legacy && fprintf(fd, "legacy ") < 0)
-	return FAIL;
-    if (fprintf(fd, "%s %s=", cmd, name) < 0)
-	return FAIL;
-    if (*valuep != NULL)
+    إذا (legacy && fprintf(fd, "legacy ") < 0)
+	أرجع FAIL;
+    إذا (fprintf(fd, "%s %s=", cmd, name) < 0)
+	أرجع FAIL;
+    إذا (*valuep != عدم)
     {
 	// Output 'pastetoggle' as key names.  For other
 	// options some characters have to be escaped with
 	// CTRL-V or backslash
-	if (valuep == &p_pt)
+	إذا (valuep == &p_pt)
 	{
 	    s = *valuep;
-	    while (*s != NUL)
-		if (put_escstr(fd, str2special(&s, FALSE, FALSE), 2) == FAIL)
-		    return FAIL;
+	    طالما (*s != NUL)
+		إذا (put_escstr(fd, str2special(&s, FALSE, FALSE), 2) == FAIL)
+		    أرجع FAIL;
 	}
 	// expand the option value, replace $HOME by ~
-	else if ((flags & P_EXPAND) != 0)
+	وإلا إذا ((flags & P_EXPAND) != 0)
 	{
-	    int  size = (int)STRLEN(*valuep) + 1;
+	    صحيح  اندازه = (صحيح)STRLEN(*valuep) + 1;
 
 	    // replace home directory in the whole option value into "buf"
-	    buf = alloc(size);
-	    if (buf == NULL)
-		goto fail;
-	    home_replace(NULL, *valuep, buf, size, FALSE);
+	    buf = alloc(اندازه);
+	    إذا (buf == عدم)
+		اذهب fail;
+	    home_replace(عدم, *valuep, buf, اندازه, FALSE);
 
 	    // If the option value is longer than MAXPATHL, we need to append
 	    // each comma separated part of the option separately, so that it
 	    // can be expanded when read back.
-	    if (size >= MAXPATHL && (flags & P_COMMA) != 0
-					   && vim_strchr(*valuep, ',') != NULL)
+	    إذا (اندازه >= MAXPATHL && (flags & P_COMMA) != 0
+					   && vim_strchr(*valuep, ',') != عدم)
 	    {
-		part = alloc(size);
-		if (part == NULL)
-		    goto fail;
+		part = alloc(اندازه);
+		إذا (part == عدم)
+		    اذهب fail;
 
 		// write line break to clear the option, e.g. ':set rtp='
-		if (put_eol(fd) == FAIL)
-		    goto fail;
+		إذا (put_eol(fd) == FAIL)
+		    اذهب fail;
 
 		p = buf;
-		while (*p != NUL)
+		طالما (*p != NUL)
 		{
-		    if (legacy && fprintf(fd, "legacy ") < 0)
-			return FAIL;
+		    إذا (legacy && fprintf(fd, "legacy ") < 0)
+			أرجع FAIL;
 		    // for each comma separated option part, append value to
 		    // the option, :set rtp+=value
-		    if (fprintf(fd, "%s %s+=", cmd, name) < 0)
-			goto fail;
-		    (void)copy_option_part(&p, part, size,  ",");
-		    if (put_escstr(fd, part, 2) == FAIL || put_eol(fd) == FAIL)
-			goto fail;
+		    إذا (fprintf(fd, "%s %s+=", cmd, name) < 0)
+			اذهب fail;
+		    (فراغ)copy_option_part(&p, part, اندازه,  ",");
+		    إذا (put_escstr(fd, part, 2) == FAIL || put_eol(fd) == FAIL)
+			اذهب fail;
 		}
 		vim_free(buf);
 		vim_free(part);
-		return OK;
+		أرجع OK;
 	    }
-	    if (put_escstr(fd, buf, 2) == FAIL)
+	    إذا (put_escstr(fd, buf, 2) == FAIL)
 	    {
 		vim_free(buf);
-		return FAIL;
+		أرجع FAIL;
 	    }
 	    vim_free(buf);
 	}
-	else if (put_escstr(fd, *valuep, 2) == FAIL)
-	    return FAIL;
+	وإلا إذا (put_escstr(fd, *valuep, 2) == FAIL)
+	    أرجع FAIL;
     }
-    if (put_eol(fd) < 0)
-	return FAIL;
-    return OK;
+    إذا (put_eol(fd) < 0)
+	أرجع FAIL;
+    أرجع OK;
 fail:
     vim_free(buf);
     vim_free(part);
-    return FAIL;
+    أرجع FAIL;
 }
 
-    static int
+    ساكن صحيح
 put_setnum(
     FILE	*fd,
-    char	*cmd,
-    char	*name,
-    long	*valuep)
+    حرف	*cmd,
+    حرف	*name,
+    دراز	*valuep)
 {
-    long	wc;
+    دراز	wc;
 
-    if (fprintf(fd, "%s %s=", cmd, name) < 0)
-	return FAIL;
-    if (wc_use_keyname((char_u *)valuep, &wc))
+    إذا (fprintf(fd, "%s %s=", cmd, name) < 0)
+	أرجع FAIL;
+    إذا (wc_use_keyname((char_u *)valuep, &wc))
     {
 	// print 'wildchar' and 'wildcharm' as a key name
-	if (fputs((char *)get_special_key_name((int)wc, 0), fd) < 0)
-	    return FAIL;
+	إذا (fputs((حرف *)get_special_کلید_name((صحيح)wc, 0), fd) < 0)
+	    أرجع FAIL;
     }
-    else if (fprintf(fd, "%ld", *valuep) < 0)
-	return FAIL;
-    if (put_eol(fd) < 0)
-	return FAIL;
-    return OK;
+    وإلا إذا (fprintf(fd, "%ld", *valuep) < 0)
+	أرجع FAIL;
+    إذا (put_eol(fd) < 0)
+	أرجع FAIL;
+    أرجع OK;
 }
 
-    static int
+    ساكن صحيح
 put_setbool(
     FILE	*fd,
-    char	*cmd,
-    char	*name,
-    int		value)
+    حرف	*cmd,
+    حرف	*name,
+    صحيح		مقدار)
 {
-    if (value < 0)	// global/local option using global value
-	return OK;
-    if (fprintf(fd, "%s %s%s", cmd, value ? "" : "no", name) < 0
+    إذا (مقدار < 0)	// global/local option using global value
+	أرجع OK;
+    إذا (fprintf(fd, "%s %s%s", cmd, مقدار ? "" : "no", name) < 0
 	    || put_eol(fd) < 0)
-	return FAIL;
-    return OK;
+	أرجع FAIL;
+    أرجع OK;
 }
 
 /*
@@ -6814,44 +6814,44 @@ put_setbool(
  * If the option has been allocated, free the memory.
  * Terminal options are never hidden or indirect.
  */
-    void
-clear_termoptions(void)
+    فراغ
+clear_termoptions(فراغ)
 {
     // Reset a few things before clearing the old options. This may cause
     // outputting a few things that the terminal doesn't understand, but the
     // screen will be cleared later, so this is OK.
     mch_setmouse(FALSE);	    // switch mouse off
     mch_restore_title(SAVE_RESTORE_BOTH);    // restore window titles
-#if defined(FEAT_XCLIPBOARD) && defined(FEAT_GUI)
+#إذا defined(FEAT_XCLIPBOARD) && defined(FEAT_GUI)
     // When starting the GUI close the display opened for the clipboard.
     // After restoring the title, because that will need the display.
-    if (gui.starting)
+    إذا (gui.starting)
 	clear_xterm_clip();
-#endif
+#پایان_اگر
     stoptermcap();			// stop termcap mode
 
     free_termoptions();
 }
 
-    void
-free_termoptions(void)
+    فراغ
+free_termoptions(فراغ)
 {
-    struct vimoption   *p;
+    بنية vimoption   *p;
 
-    for (p = options; p->fullname != NULL; p++)
-	if (istermoption(p))
+    لكل (p = options; p->fullname != عدم; p++)
+	إذا (istermoption(p))
 	{
-	    if (p->flags & P_ALLOCED)
+	    إذا (p->flags & P_ALLOCED)
 		free_string_option(*(char_u **)(p->var));
-	    if (p->flags & P_DEF_ALLOCED)
+	    إذا (p->flags & P_DEF_ALLOCED)
 		free_string_option(p->def_val[VI_DEFAULT]);
-	    *(char_u **)(p->var) = empty_option;
-	    p->def_val[VI_DEFAULT] = empty_option;
+	    *(char_u **)(p->var) = خالی_option;
+	    p->def_val[VI_DEFAULT] = خالی_option;
 	    p->flags &= ~(P_ALLOCED|P_DEF_ALLOCED);
-#ifdef FEAT_EVAL
+#اگر_تعریف_شده FEAT_EVAL
 	    // remember where the option was cleared
-	    set_option_sctx_idx((int)(p - options), OPT_GLOBAL, current_sctx);
-#endif
+	    مجموعه_option_sctx_idx((صحيح)(p - options), OPT_GLOBAL, current_sctx);
+#پایان_اگر
 	}
     clear_termcodes();
 }
@@ -6861,19 +6861,19 @@ free_termoptions(void)
  * Set the string to empty_option and clear allocated flag.
  * "var" points to the option value.
  */
-    void
+    فراغ
 free_one_termoption(char_u *var)
 {
-    struct vimoption   *p;
+    بنية vimoption   *p;
 
-    for (p = &options[0]; p->fullname != NULL; p++)
-	if (p->var == var)
+    لكل (p = &options[0]; p->fullname != عدم; p++)
+	إذا (p->var == var)
 	{
-	    if (p->flags & P_ALLOCED)
+	    إذا (p->flags & P_ALLOCED)
 		free_string_option(*(char_u **)(p->var));
-	    *(char_u **)(p->var) = empty_option;
+	    *(char_u **)(p->var) = خالی_option;
 	    p->flags &= ~P_ALLOCED;
-	    break;
+	    اكسر;
 	}
 }
 
@@ -6881,22 +6881,22 @@ free_one_termoption(char_u *var)
  * Set the terminal option defaults to the current value.
  * Used after setting the terminal name.
  */
-    void
-set_term_defaults(void)
+    فراغ
+مجموعه_جمله_defaults(فراغ)
 {
-    struct vimoption   *p;
+    بنية vimoption   *p;
 
-    for (p = &options[0]; p->fullname != NULL; p++)
+    لكل (p = &options[0]; p->fullname != عدم; p++)
     {
-	if (istermoption(p) && p->def_val[VI_DEFAULT] != *(char_u **)(p->var))
+	إذا (istermoption(p) && p->def_val[VI_DEFAULT] != *(char_u **)(p->var))
 	{
-	    if (p->flags & P_DEF_ALLOCED)
+	    إذا (p->flags & P_DEF_ALLOCED)
 	    {
 		free_string_option(p->def_val[VI_DEFAULT]);
 		p->flags &= ~P_DEF_ALLOCED;
 	    }
 	    p->def_val[VI_DEFAULT] = *(char_u **)(p->var);
-	    if (p->flags & P_ALLOCED)
+	    إذا (p->flags & P_ALLOCED)
 	    {
 		p->flags |= P_DEF_ALLOCED;
 		p->flags &= ~P_ALLOCED;	 // don't free the value now
@@ -6908,260 +6908,260 @@ set_term_defaults(void)
 /*
  * return TRUE if 'p' starts with 't_'
  */
-    static int
-istermoption(struct vimoption *p)
+    ساكن صحيح
+istermoption(بنية vimoption *p)
 {
-    return (p->fullname[0] == 't' && p->fullname[1] == '_');
+    أرجع (p->fullname[0] == 't' && p->fullname[1] == '_');
 }
 
 /*
  * Returns TRUE if the option at 'opt_idx' starts with 't_'
  */
-    static int
-istermoption_idx(int opt_idx)
+    ساكن صحيح
+istermoption_idx(صحيح opt_idx)
 {
-    return istermoption(&options[opt_idx]);
+    أرجع istermoption(&options[opt_idx]);
 }
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#إذا defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Unset local option value, similar to ":set opt<".
  */
-    void
-unset_global_local_option(char_u *name, void *from)
+    فراغ
+unset_global_local_option(char_u *name, فراغ *from)
 {
-    struct vimoption *p;
-    int		opt_idx;
+    بنية vimoption *p;
+    صحيح		opt_idx;
     buf_T	*buf = (buf_T *)from;
 
     opt_idx = findoption(name);
-    if (opt_idx < 0)
-	return;
+    إذا (opt_idx < 0)
+	أرجع;
     p = &(options[opt_idx]);
 
-    switch ((int)p->indir)
+    بدل ((صحيح)p->indir)
     {
 	// global option with local value: use local value if it's been set
-	case PV_EP:
+	حالة PV_EP:
 	    clear_string_option(&buf->b_p_ep);
-	    break;
-	case PV_KP:
+	    اكسر;
+	حالة PV_KP:
 	    clear_string_option(&buf->b_p_kp);
-	    break;
-	case PV_PATH:
-	    clear_string_option(&buf->b_p_path);
-	    break;
-	case PV_AC:
+	    اكسر;
+	حالة PV_مسیر:
+	    clear_string_option(&buf->b_p_مسیر);
+	    اكسر;
+	حالة PV_AC:
 	    buf->b_p_ac = -1;
-	    break;
-	case PV_AR:
+	    اكسر;
+	حالة PV_AR:
 	    buf->b_p_ar = -1;
-	    break;
+	    اكسر;
 # ifdef HAVE_FSYNC
-	case PV_FS:
+	حالة PV_FS:
 	    buf->b_p_fs = -1;
-	    break;
+	    اكسر;
 # endif
-	case PV_BKC:
+	حالة PV_BKC:
 	    clear_string_option(&buf->b_p_bkc);
 	    buf->b_bkc_flags = 0;
-	    break;
-	case PV_TAGS:
-	    clear_string_option(&buf->b_p_tags);
-	    break;
-	case PV_TC:
+	    اكسر;
+	حالة PV_برچسبها:
+	    clear_string_option(&buf->b_p_برچسبها);
+	    اكسر;
+	حالة PV_TC:
 	    clear_string_option(&buf->b_p_tc);
 	    buf->b_tc_flags = 0;
-	    break;
-	case PV_SISO:
+	    اكسر;
+	حالة PV_SISO:
 	    curwin->w_p_siso = -1;
-	    break;
-	case PV_SO:
+	    اكسر;
+	حالة PV_SO:
 	    curwin->w_p_so = -1;
-	    break;
-	case PV_SOP:
+	    اكسر;
+	حالة PV_SOP:
 	    curwin->w_p_sop = -1;
-	    break;
-# ifdef FEAT_FIND_ID
-	case PV_DEF:
+	    اكسر;
+# ifdef FEAT_پیدا_کن_ID
+	حالة PV_DEF:
 	    clear_string_option(&buf->b_p_def);
-	    break;
-	case PV_INC:
+	    اكسر;
+	حالة PV_INC:
 	    clear_string_option(&buf->b_p_inc);
-	    break;
+	    اكسر;
 # endif
-	case PV_COT:
+	حالة PV_COT:
 	    clear_string_option(&buf->b_p_cot);
 	    buf->b_cot_flags = 0;
-	    break;
-	case PV_DICT:
+	    اكسر;
+	حالة PV_DICT:
 	    clear_string_option(&buf->b_p_dict);
-	    break;
+	    اكسر;
 # ifdef FEAT_DIFF
-	case PV_DIA:
+	حالة PV_DIA:
 	    clear_string_option(&buf->b_p_dia);
-	    break;
+	    اكسر;
 # endif
-	case PV_TSR:
+	حالة PV_TSR:
 	    clear_string_option(&buf->b_p_tsr);
-	    break;
+	    اكسر;
 # ifdef FEAT_COMPL_FUNC
-	case PV_TSRFU:
+	حالة PV_TSRFU:
 	    clear_string_option(&buf->b_p_tsrfu);
-	    break;
+	    اكسر;
 # endif
-	case PV_FP:
+	حالة PV_FP:
 	    clear_string_option(&buf->b_p_fp);
-	    break;
+	    اكسر;
 # ifdef FEAT_EVAL
-	case PV_FFU:
+	حالة PV_FFU:
 	    clear_string_option(&buf->b_p_ffu);
-	    break;
+	    اكسر;
 # endif
 # ifdef FEAT_QUICKFIX
-	case PV_EFM:
+	حالة PV_EFM:
 	    clear_string_option(&buf->b_p_efm);
-	    break;
-	case PV_GEFM:
+	    اكسر;
+	حالة PV_GEFM:
 	    clear_string_option(&buf->b_p_gefm);
-	    break;
-	case PV_GP:
+	    اكسر;
+	حالة PV_GP:
 	    clear_string_option(&buf->b_p_gp);
-	    break;
-	case PV_MP:
+	    اكسر;
+	حالة PV_MP:
 	    clear_string_option(&buf->b_p_mp);
-	    break;
+	    اكسر;
 # endif
-# if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
-	case PV_BEXPR:
+# إذا defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+	حالة PV_BEXPR:
 	    clear_string_option(&buf->b_p_bexpr);
-	    break;
+	    اكسر;
 # endif
-# if defined(FEAT_CRYPT)
-	case PV_CM:
+# إذا defined(FEAT_CRYPT)
+	حالة PV_CM:
 	    clear_string_option(&buf->b_p_cm);
-	    break;
+	    اكسر;
 # endif
 # ifdef FEAT_LINEBREAK
-	case PV_SBR:
+	حالة PV_SBR:
 	    clear_string_option(&((win_T *)from)->w_p_sbr);
-	    break;
+	    اكسر;
 # endif
 # ifdef FEAT_STL_OPT
-	case PV_STL:
+	حالة PV_STL:
 	    clear_string_option(&((win_T *)from)->w_p_stl);
-	    break;
-	case PV_STLO:
+	    اكسر;
+	حالة PV_STLO:
 	    clear_string_option(&((win_T *)from)->w_p_stlo);
-	    break;
+	    اكسر;
 # endif
-	case PV_UL:
+	حالة PV_UL:
 	    buf->b_p_ul = NO_LOCAL_UNDOLEVEL;
-	    break;
-	case PV_LW:
+	    اكسر;
+	حالة PV_LW:
 	    clear_string_option(&buf->b_p_lw);
-	    break;
-	case PV_MENC:
+	    اكسر;
+	حالة PV_MENC:
 	    clear_string_option(&buf->b_p_menc);
-	    break;
-	case PV_LCS:
+	    اكسر;
+	حالة PV_LCS:
 	    clear_string_option(&((win_T *)from)->w_p_lcs);
-	    set_listchars_option((win_T *)from, ((win_T *)from)->w_p_lcs, TRUE,
-								      NULL, 0);
+	    مجموعه_listchars_option((win_T *)from, ((win_T *)from)->w_p_lcs, TRUE,
+								      عدم, 0);
 	    redraw_later(UPD_NOT_VALID);
-	    break;
-	case PV_FCS:
+	    اكسر;
+	حالة PV_FCS:
 	    clear_string_option(&((win_T *)from)->w_p_fcs);
-	    set_fillchars_option((win_T *)from, ((win_T *)from)->w_p_fcs, TRUE,
-								      NULL, 0);
+	    مجموعه_fillchars_option((win_T *)from, ((win_T *)from)->w_p_fcs, TRUE,
+								      عدم, 0);
 	    redraw_later(UPD_NOT_VALID);
-	    break;
-	case PV_VE:
+	    اكسر;
+	حالة PV_VE:
 	    clear_string_option(&((win_T *)from)->w_p_ve);
 	    ((win_T *)from)->w_ve_flags = 0;
-	    break;
+	    اكسر;
     }
 }
-#endif
+#پایان_اگر
 
 /*
  * Get pointer to option variable, depending on local or global scope.
  * "scope" can be OPT_LOCAL, OPT_GLOBAL or a combination.
  */
-    static char_u *
-get_varp_scope(struct vimoption *p, int scope)
+    ساكن char_u *
+get_varp_scope(بنية vimoption *p, صحيح scope)
 {
-    if ((scope & OPT_GLOBAL) && p->indir != PV_NONE)
+    إذا ((scope & OPT_GLOBAL) && p->indir != PV_NONE)
     {
-	if (p->var == VAR_WIN)
-	    return (char_u *)GLOBAL_WO(get_varp(p));
-	return p->var;
+	إذا (p->var == VAR_WIN)
+	    أرجع (char_u *)GLOBAL_WO(get_varp(p));
+	أرجع p->var;
     }
-    if ((scope & OPT_LOCAL) && ((int)p->indir & PV_BOTH))
+    إذا ((scope & OPT_LOCAL) && ((صحيح)p->indir & PV_BOTH))
     {
-	switch ((int)p->indir)
+	بدل ((صحيح)p->indir)
 	{
-	    case PV_FP:   return (char_u *)&(curbuf->b_p_fp);
-#ifdef HAVE_FSYNC
-	    case PV_FS:	return (char_u *)&(curbuf->b_p_fs);
-#endif
-#ifdef FEAT_EVAL
-	    case PV_FFU: return (char_u *)&(curbuf->b_p_ffu);
-#endif
-#ifdef FEAT_QUICKFIX
-	    case PV_EFM:  return (char_u *)&(curbuf->b_p_efm);
-	    case PV_GEFM: return (char_u *)&(curbuf->b_p_gefm);
-	    case PV_GP:   return (char_u *)&(curbuf->b_p_gp);
-	    case PV_MP:   return (char_u *)&(curbuf->b_p_mp);
-#endif
-	    case PV_EP:   return (char_u *)&(curbuf->b_p_ep);
-	    case PV_KP:   return (char_u *)&(curbuf->b_p_kp);
-	    case PV_PATH: return (char_u *)&(curbuf->b_p_path);
-	    case PV_AC:   return (char_u *)&(curbuf->b_p_ac);
-	    case PV_AR:   return (char_u *)&(curbuf->b_p_ar);
-	    case PV_TAGS: return (char_u *)&(curbuf->b_p_tags);
-	    case PV_TC:   return (char_u *)&(curbuf->b_p_tc);
-	    case PV_SISO: return (char_u *)&(curwin->w_p_siso);
-	    case PV_SO:   return (char_u *)&(curwin->w_p_so);
-	    case PV_SOP:  return (char_u *)&(curwin->w_p_sop);
-#ifdef FEAT_FIND_ID
-	    case PV_DEF:  return (char_u *)&(curbuf->b_p_def);
-	    case PV_INC:  return (char_u *)&(curbuf->b_p_inc);
-#endif
-	    case PV_COT:  return (char_u *)&(curbuf->b_p_cot);
-	    case PV_DICT: return (char_u *)&(curbuf->b_p_dict);
-#ifdef FEAT_DIFF
-	    case PV_DIA:  return (char_u *)&(curbuf->b_p_dia);
-#endif
-	    case PV_TSR:  return (char_u *)&(curbuf->b_p_tsr);
-#ifdef FEAT_COMPL_FUNC
-	    case PV_TSRFU: return (char_u *)&(curbuf->b_p_tsrfu);
-#endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
-	    case PV_BEXPR: return (char_u *)&(curbuf->b_p_bexpr);
-#endif
-#if defined(FEAT_CRYPT)
-	    case PV_CM:	  return (char_u *)&(curbuf->b_p_cm);
-#endif
-#ifdef FEAT_LINEBREAK
-	    case PV_SBR:  return (char_u *)&(curwin->w_p_sbr);
-#endif
-#ifdef FEAT_STL_OPT
-	    case PV_STL:  return (char_u *)&(curwin->w_p_stl);
-	    case PV_STLO: return (char_u *)&(curwin->w_p_stlo);
-#endif
-	    case PV_UL:   return (char_u *)&(curbuf->b_p_ul);
-	    case PV_LW:   return (char_u *)&(curbuf->b_p_lw);
-	    case PV_BKC:  return (char_u *)&(curbuf->b_p_bkc);
-	    case PV_MENC: return (char_u *)&(curbuf->b_p_menc);
-	    case PV_LCS:  return (char_u *)&(curwin->w_p_lcs);
-	    case PV_FCS:  return (char_u *)&(curwin->w_p_fcs);
-	    case PV_VE:	  return (char_u *)&(curwin->w_p_ve);
+	    حالة PV_FP:   أرجع (char_u *)&(curbuf->b_p_fp);
+#اگر_تعریف_شده HAVE_FSYNC
+	    حالة PV_FS:	أرجع (char_u *)&(curbuf->b_p_fs);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_EVAL
+	    حالة PV_FFU: أرجع (char_u *)&(curbuf->b_p_ffu);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_QUICKFIX
+	    حالة PV_EFM:  أرجع (char_u *)&(curbuf->b_p_efm);
+	    حالة PV_GEFM: أرجع (char_u *)&(curbuf->b_p_gefm);
+	    حالة PV_GP:   أرجع (char_u *)&(curbuf->b_p_gp);
+	    حالة PV_MP:   أرجع (char_u *)&(curbuf->b_p_mp);
+#پایان_اگر
+	    حالة PV_EP:   أرجع (char_u *)&(curbuf->b_p_ep);
+	    حالة PV_KP:   أرجع (char_u *)&(curbuf->b_p_kp);
+	    حالة PV_مسیر: أرجع (char_u *)&(curbuf->b_p_مسیر);
+	    حالة PV_AC:   أرجع (char_u *)&(curbuf->b_p_ac);
+	    حالة PV_AR:   أرجع (char_u *)&(curbuf->b_p_ar);
+	    حالة PV_برچسبها: أرجع (char_u *)&(curbuf->b_p_برچسبها);
+	    حالة PV_TC:   أرجع (char_u *)&(curbuf->b_p_tc);
+	    حالة PV_SISO: أرجع (char_u *)&(curwin->w_p_siso);
+	    حالة PV_SO:   أرجع (char_u *)&(curwin->w_p_so);
+	    حالة PV_SOP:  أرجع (char_u *)&(curwin->w_p_sop);
+#اگر_تعریف_شده FEAT_پیدا_کن_ID
+	    حالة PV_DEF:  أرجع (char_u *)&(curbuf->b_p_def);
+	    حالة PV_INC:  أرجع (char_u *)&(curbuf->b_p_inc);
+#پایان_اگر
+	    حالة PV_COT:  أرجع (char_u *)&(curbuf->b_p_cot);
+	    حالة PV_DICT: أرجع (char_u *)&(curbuf->b_p_dict);
+#اگر_تعریف_شده FEAT_DIFF
+	    حالة PV_DIA:  أرجع (char_u *)&(curbuf->b_p_dia);
+#پایان_اگر
+	    حالة PV_TSR:  أرجع (char_u *)&(curbuf->b_p_tsr);
+#اگر_تعریف_شده FEAT_COMPL_FUNC
+	    حالة PV_TSRFU: أرجع (char_u *)&(curbuf->b_p_tsrfu);
+#پایان_اگر
+#إذا defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+	    حالة PV_BEXPR: أرجع (char_u *)&(curbuf->b_p_bexpr);
+#پایان_اگر
+#إذا defined(FEAT_CRYPT)
+	    حالة PV_CM:	  أرجع (char_u *)&(curbuf->b_p_cm);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_LINEBREAK
+	    حالة PV_SBR:  أرجع (char_u *)&(curwin->w_p_sbr);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_STL_OPT
+	    حالة PV_STL:  أرجع (char_u *)&(curwin->w_p_stl);
+	    حالة PV_STLO: أرجع (char_u *)&(curwin->w_p_stlo);
+#پایان_اگر
+	    حالة PV_UL:   أرجع (char_u *)&(curbuf->b_p_ul);
+	    حالة PV_LW:   أرجع (char_u *)&(curbuf->b_p_lw);
+	    حالة PV_BKC:  أرجع (char_u *)&(curbuf->b_p_bkc);
+	    حالة PV_MENC: أرجع (char_u *)&(curbuf->b_p_menc);
+	    حالة PV_LCS:  أرجع (char_u *)&(curwin->w_p_lcs);
+	    حالة PV_FCS:  أرجع (char_u *)&(curwin->w_p_fcs);
+	    حالة PV_VE:	  أرجع (char_u *)&(curwin->w_p_ve);
 
 	}
-	return NULL; // "cannot happen"
+	أرجع عدم; // "cannot happen"
     }
-    return get_varp(p);
+    أرجع get_varp(p);
 }
 
 /*
@@ -7169,307 +7169,307 @@ get_varp_scope(struct vimoption *p, int scope)
  * scope.
  */
     char_u *
-get_option_varp_scope(int opt_idx, int scope)
+get_option_varp_scope(صحيح opt_idx, صحيح scope)
 {
-    return get_varp_scope(&(options[opt_idx]), scope);
+    أرجع get_varp_scope(&(options[opt_idx]), scope);
 }
 
 /*
  * Get pointer to option variable.
  */
-    static char_u *
-get_varp(struct vimoption *p)
+    ساكن char_u *
+get_varp(بنية vimoption *p)
 {
     // hidden option, always return NULL
-    if (p->var == NULL)
-	return NULL;
+    إذا (p->var == عدم)
+	أرجع عدم;
 
-    switch ((int)p->indir)
+    بدل ((صحيح)p->indir)
     {
-	case PV_NONE:	return p->var;
+	حالة PV_NONE:	أرجع p->var;
 
 	// global option with local value: use local value if it's been set
-	case PV_EP:	return *curbuf->b_p_ep != NUL
+	حالة PV_EP:	أرجع *curbuf->b_p_ep != NUL
 				    ? (char_u *)&curbuf->b_p_ep : p->var;
-	case PV_KP:	return *curbuf->b_p_kp != NUL
+	حالة PV_KP:	أرجع *curbuf->b_p_kp != NUL
 				    ? (char_u *)&curbuf->b_p_kp : p->var;
-	case PV_PATH:	return *curbuf->b_p_path != NUL
-				    ? (char_u *)&(curbuf->b_p_path) : p->var;
-	case PV_AC:	return curbuf->b_p_ac >= 0
+	حالة PV_مسیر:	أرجع *curbuf->b_p_مسیر != NUL
+				    ? (char_u *)&(curbuf->b_p_مسیر) : p->var;
+	حالة PV_AC:	أرجع curbuf->b_p_ac >= 0
 				    ? (char_u *)&(curbuf->b_p_ac) : p->var;
-	case PV_AR:	return curbuf->b_p_ar >= 0
+	حالة PV_AR:	أرجع curbuf->b_p_ar >= 0
 				    ? (char_u *)&(curbuf->b_p_ar) : p->var;
-	case PV_TAGS:	return *curbuf->b_p_tags != NUL
-				    ? (char_u *)&(curbuf->b_p_tags) : p->var;
-	case PV_TC:	return *curbuf->b_p_tc != NUL
+	حالة PV_برچسبها:	أرجع *curbuf->b_p_برچسبها != NUL
+				    ? (char_u *)&(curbuf->b_p_برچسبها) : p->var;
+	حالة PV_TC:	أرجع *curbuf->b_p_tc != NUL
 				    ? (char_u *)&(curbuf->b_p_tc) : p->var;
-	case PV_BKC:	return *curbuf->b_p_bkc != NUL
+	حالة PV_BKC:	أرجع *curbuf->b_p_bkc != NUL
 				    ? (char_u *)&(curbuf->b_p_bkc) : p->var;
-	case PV_SISO:	return curwin->w_p_siso >= 0
+	حالة PV_SISO:	أرجع curwin->w_p_siso >= 0
 				    ? (char_u *)&(curwin->w_p_siso) : p->var;
-	case PV_SO:	return curwin->w_p_so >= 0
+	حالة PV_SO:	أرجع curwin->w_p_so >= 0
 				    ? (char_u *)&(curwin->w_p_so) : p->var;
-	case PV_SOP:	return curwin->w_p_sop != -1
+	حالة PV_SOP:	أرجع curwin->w_p_sop != -1
 				    ? (char_u *)&(curwin->w_p_sop) : p->var;
-#ifdef FEAT_FIND_ID
-	case PV_DEF:	return *curbuf->b_p_def != NUL
+#اگر_تعریف_شده FEAT_پیدا_کن_ID
+	حالة PV_DEF:	أرجع *curbuf->b_p_def != NUL
 				    ? (char_u *)&(curbuf->b_p_def) : p->var;
-	case PV_INC:	return *curbuf->b_p_inc != NUL
+	حالة PV_INC:	أرجع *curbuf->b_p_inc != NUL
 				    ? (char_u *)&(curbuf->b_p_inc) : p->var;
-#endif
-	case PV_COT:	return *curbuf->b_p_cot != NUL
+#پایان_اگر
+	حالة PV_COT:	أرجع *curbuf->b_p_cot != NUL
 				    ? (char_u *)&(curbuf->b_p_cot) : p->var;
-	case PV_DICT:	return *curbuf->b_p_dict != NUL
+	حالة PV_DICT:	أرجع *curbuf->b_p_dict != NUL
 				    ? (char_u *)&(curbuf->b_p_dict) : p->var;
-#ifdef FEAT_DIFF
-	case PV_DIA:	return *curbuf->b_p_dia != NUL
+#اگر_تعریف_شده FEAT_DIFF
+	حالة PV_DIA:	أرجع *curbuf->b_p_dia != NUL
 				    ? (char_u *)&(curbuf->b_p_dia) : p->var;
-#endif
-	case PV_TSR:	return *curbuf->b_p_tsr != NUL
+#پایان_اگر
+	حالة PV_TSR:	أرجع *curbuf->b_p_tsr != NUL
 				    ? (char_u *)&(curbuf->b_p_tsr) : p->var;
-#ifdef FEAT_COMPL_FUNC
-	case PV_TSRFU:	return *curbuf->b_p_tsrfu != NUL
+#اگر_تعریف_شده FEAT_COMPL_FUNC
+	حالة PV_TSRFU:	أرجع *curbuf->b_p_tsrfu != NUL
 				    ? (char_u *)&(curbuf->b_p_tsrfu) : p->var;
-#endif
-	case PV_FP:	return *curbuf->b_p_fp != NUL
+#پایان_اگر
+	حالة PV_FP:	أرجع *curbuf->b_p_fp != NUL
 				    ? (char_u *)&(curbuf->b_p_fp) : p->var;
-#ifdef HAVE_FSYNC
-	case PV_FS:	return curbuf->b_p_fs >= 0
+#اگر_تعریف_شده HAVE_FSYNC
+	حالة PV_FS:	أرجع curbuf->b_p_fs >= 0
 				    ? (char_u *)&(curbuf->b_p_fs) : p->var;
-#endif
-#ifdef FEAT_EVAL
-	case PV_FFU:	return *curbuf->b_p_ffu != NUL
+#پایان_اگر
+#اگر_تعریف_شده FEAT_EVAL
+	حالة PV_FFU:	أرجع *curbuf->b_p_ffu != NUL
 				    ? (char_u *)&(curbuf->b_p_ffu) : p->var;
-#endif
-#ifdef FEAT_QUICKFIX
-	case PV_EFM:	return *curbuf->b_p_efm != NUL
+#پایان_اگر
+#اگر_تعریف_شده FEAT_QUICKFIX
+	حالة PV_EFM:	أرجع *curbuf->b_p_efm != NUL
 				    ? (char_u *)&(curbuf->b_p_efm) : p->var;
-	case PV_GEFM:	return *curbuf->b_p_gefm != NUL
+	حالة PV_GEFM:	أرجع *curbuf->b_p_gefm != NUL
 				    ? (char_u *)&(curbuf->b_p_gefm) : p->var;
-	case PV_GP:	return *curbuf->b_p_gp != NUL
+	حالة PV_GP:	أرجع *curbuf->b_p_gp != NUL
 				    ? (char_u *)&(curbuf->b_p_gp) : p->var;
-	case PV_MP:	return *curbuf->b_p_mp != NUL
+	حالة PV_MP:	أرجع *curbuf->b_p_mp != NUL
 				    ? (char_u *)&(curbuf->b_p_mp) : p->var;
-#endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
-	case PV_BEXPR:	return *curbuf->b_p_bexpr != NUL
+#پایان_اگر
+#إذا defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+	حالة PV_BEXPR:	أرجع *curbuf->b_p_bexpr != NUL
 				    ? (char_u *)&(curbuf->b_p_bexpr) : p->var;
-#endif
-#if defined(FEAT_CRYPT)
-	case PV_CM:	return *curbuf->b_p_cm != NUL
+#پایان_اگر
+#إذا defined(FEAT_CRYPT)
+	حالة PV_CM:	أرجع *curbuf->b_p_cm != NUL
 				    ? (char_u *)&(curbuf->b_p_cm) : p->var;
-#endif
-#ifdef FEAT_LINEBREAK
-	case PV_SBR:	return *curwin->w_p_sbr != NUL
+#پایان_اگر
+#اگر_تعریف_شده FEAT_LINEBREAK
+	حالة PV_SBR:	أرجع *curwin->w_p_sbr != NUL
 				    ? (char_u *)&(curwin->w_p_sbr) : p->var;
-#endif
-#ifdef FEAT_STL_OPT
-	case PV_STL:	return *curwin->w_p_stl != NUL
+#پایان_اگر
+#اگر_تعریف_شده FEAT_STL_OPT
+	حالة PV_STL:	أرجع *curwin->w_p_stl != NUL
 				    ? (char_u *)&(curwin->w_p_stl) : p->var;
-	case PV_STLO:	return *curwin->w_p_stlo != NUL
+	حالة PV_STLO:	أرجع *curwin->w_p_stlo != NUL
 				    ? (char_u *)&(curwin->w_p_stlo) : p->var;
-#endif
-	case PV_UL:	return curbuf->b_p_ul != NO_LOCAL_UNDOLEVEL
+#پایان_اگر
+	حالة PV_UL:	أرجع curbuf->b_p_ul != NO_LOCAL_UNDOLEVEL
 				    ? (char_u *)&(curbuf->b_p_ul) : p->var;
-	case PV_LW:	return *curbuf->b_p_lw != NUL
+	حالة PV_LW:	أرجع *curbuf->b_p_lw != NUL
 				    ? (char_u *)&(curbuf->b_p_lw) : p->var;
-	case PV_MENC:	return *curbuf->b_p_menc != NUL
+	حالة PV_MENC:	أرجع *curbuf->b_p_menc != NUL
 				    ? (char_u *)&(curbuf->b_p_menc) : p->var;
-#ifdef FEAT_ARABIC
-	case PV_ARAB:	return (char_u *)&(curwin->w_p_arab);
-#endif
-	case PV_LIST:	return (char_u *)&(curwin->w_p_list);
-	case PV_LCS:	return *curwin->w_p_lcs != NUL
+#اگر_تعریف_شده FEAT_ARABIC
+	حالة PV_ARAB:	أرجع (char_u *)&(curwin->w_p_arab);
+#پایان_اگر
+	حالة PV_LIST:	أرجع (char_u *)&(curwin->w_p_list);
+	حالة PV_LCS:	أرجع *curwin->w_p_lcs != NUL
 				    ? (char_u *)&(curwin->w_p_lcs) : p->var;
-	case PV_FCS:	return *curwin->w_p_fcs != NUL
+	حالة PV_FCS:	أرجع *curwin->w_p_fcs != NUL
 				    ? (char_u *)&(curwin->w_p_fcs) : p->var;
-	case PV_VE:	return *curwin->w_p_ve != NUL
+	حالة PV_VE:	أرجع *curwin->w_p_ve != NUL
 				    ? (char_u *)&(curwin->w_p_ve) : p->var;
-#ifdef FEAT_SPELL
-	case PV_SPELL:	return (char_u *)&(curwin->w_p_spell);
-#endif
-#ifdef FEAT_SYN_HL
-	case PV_CUC:	return (char_u *)&(curwin->w_p_cuc);
-	case PV_CUL:	return (char_u *)&(curwin->w_p_cul);
-	case PV_CULOPT:	return (char_u *)&(curwin->w_p_culopt);
-	case PV_CC:	return (char_u *)&(curwin->w_p_cc);
-#endif
-#ifdef FEAT_DIFF
-	case PV_DIFF:	return (char_u *)&(curwin->w_p_diff);
-#endif
-	case PV_EIW:	return (char_u *)&(curwin->w_p_eiw);
-#ifdef FEAT_FOLDING
-	case PV_FDC:	return (char_u *)&(curwin->w_p_fdc);
-	case PV_FEN:	return (char_u *)&(curwin->w_p_fen);
-	case PV_FDI:	return (char_u *)&(curwin->w_p_fdi);
-	case PV_FDL:	return (char_u *)&(curwin->w_p_fdl);
-	case PV_FDM:	return (char_u *)&(curwin->w_p_fdm);
-	case PV_FML:	return (char_u *)&(curwin->w_p_fml);
-	case PV_FDN:	return (char_u *)&(curwin->w_p_fdn);
+#اگر_تعریف_شده FEAT_SPELL
+	حالة PV_SPELL:	أرجع (char_u *)&(curwin->w_p_spell);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_SYN_HL
+	حالة PV_CUC:	أرجع (char_u *)&(curwin->w_p_cuc);
+	حالة PV_CUL:	أرجع (char_u *)&(curwin->w_p_cul);
+	حالة PV_CULOPT:	أرجع (char_u *)&(curwin->w_p_culopt);
+	حالة PV_CC:	أرجع (char_u *)&(curwin->w_p_cc);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_DIFF
+	حالة PV_DIFF:	أرجع (char_u *)&(curwin->w_p_diff);
+#پایان_اگر
+	حالة PV_EIW:	أرجع (char_u *)&(curwin->w_p_eiw);
+#اگر_تعریف_شده FEAT_FOLDING
+	حالة PV_FDC:	أرجع (char_u *)&(curwin->w_p_fdc);
+	حالة PV_FEN:	أرجع (char_u *)&(curwin->w_p_fen);
+	حالة PV_FDI:	أرجع (char_u *)&(curwin->w_p_fdi);
+	حالة PV_FDL:	أرجع (char_u *)&(curwin->w_p_fdl);
+	حالة PV_FDM:	أرجع (char_u *)&(curwin->w_p_fdm);
+	حالة PV_FML:	أرجع (char_u *)&(curwin->w_p_fml);
+	حالة PV_FDN:	أرجع (char_u *)&(curwin->w_p_fdn);
 # ifdef FEAT_EVAL
-	case PV_FDE:	return (char_u *)&(curwin->w_p_fde);
-	case PV_FDT:	return (char_u *)&(curwin->w_p_fdt);
+	حالة PV_FDE:	أرجع (char_u *)&(curwin->w_p_fde);
+	حالة PV_FDT:	أرجع (char_u *)&(curwin->w_p_fdt);
 # endif
-	case PV_FMR:	return (char_u *)&(curwin->w_p_fmr);
-#endif
-	case PV_NU:	return (char_u *)&(curwin->w_p_nu);
-	case PV_RNU:	return (char_u *)&(curwin->w_p_rnu);
-#ifdef FEAT_LINEBREAK
-	case PV_NUW:	return (char_u *)&(curwin->w_p_nuw);
-#endif
-	case PV_WFB:	return (char_u *)&(curwin->w_p_wfb);
-	case PV_WFH:	return (char_u *)&(curwin->w_p_wfh);
-	case PV_WFW:	return (char_u *)&(curwin->w_p_wfw);
-#if defined(FEAT_QUICKFIX)
-	case PV_PVW:	return (char_u *)&(curwin->w_p_pvw);
-	case PV_LHI:	return (char_u *)&(curwin->w_p_lhi);
-#endif
-#ifdef FEAT_RIGHTLEFT
-	case PV_RL:	return (char_u *)&(curwin->w_p_rl);
-	case PV_RLC:	return (char_u *)&(curwin->w_p_rlc);
-#endif
-	case PV_SCROLL:	return (char_u *)&(curwin->w_p_scr);
-	case PV_SMS:	return (char_u *)&(curwin->w_p_sms);
-	case PV_WRAP:	return (char_u *)&(curwin->w_p_wrap);
-#ifdef FEAT_LINEBREAK
-	case PV_LBR:	return (char_u *)&(curwin->w_p_lbr);
-	case PV_BRI:	return (char_u *)&(curwin->w_p_bri);
-	case PV_BRIOPT: return (char_u *)&(curwin->w_p_briopt);
-#endif
-	case PV_WCR:	return (char_u *)&(curwin->w_p_wcr);
-	case PV_SCBIND: return (char_u *)&(curwin->w_p_scb);
-	case PV_CRBIND: return (char_u *)&(curwin->w_p_crb);
-#ifdef FEAT_CONCEAL
-	case PV_COCU:   return (char_u *)&(curwin->w_p_cocu);
-	case PV_COLE:   return (char_u *)&(curwin->w_p_cole);
-#endif
-	case PV_WHL:	return (char_u *)&(curwin->w_p_whl);
+	حالة PV_FMR:	أرجع (char_u *)&(curwin->w_p_fmr);
+#پایان_اگر
+	حالة PV_NU:	أرجع (char_u *)&(curwin->w_p_nu);
+	حالة PV_RNU:	أرجع (char_u *)&(curwin->w_p_rnu);
+#اگر_تعریف_شده FEAT_LINEBREAK
+	حالة PV_NUW:	أرجع (char_u *)&(curwin->w_p_nuw);
+#پایان_اگر
+	حالة PV_WFB:	أرجع (char_u *)&(curwin->w_p_wfb);
+	حالة PV_WFH:	أرجع (char_u *)&(curwin->w_p_wfh);
+	حالة PV_WFW:	أرجع (char_u *)&(curwin->w_p_wfw);
+#إذا defined(FEAT_QUICKFIX)
+	حالة PV_PVW:	أرجع (char_u *)&(curwin->w_p_pvw);
+	حالة PV_LHI:	أرجع (char_u *)&(curwin->w_p_lhi);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_RIGHTLEFT
+	حالة PV_RL:	أرجع (char_u *)&(curwin->w_p_rl);
+	حالة PV_RLC:	أرجع (char_u *)&(curwin->w_p_rlc);
+#پایان_اگر
+	حالة PV_SCROLL:	أرجع (char_u *)&(curwin->w_p_scr);
+	حالة PV_SMS:	أرجع (char_u *)&(curwin->w_p_sms);
+	حالة PV_WRAP:	أرجع (char_u *)&(curwin->w_p_wrap);
+#اگر_تعریف_شده FEAT_LINEBREAK
+	حالة PV_LBR:	أرجع (char_u *)&(curwin->w_p_lbr);
+	حالة PV_BRI:	أرجع (char_u *)&(curwin->w_p_bri);
+	حالة PV_BRIOPT: أرجع (char_u *)&(curwin->w_p_briopt);
+#پایان_اگر
+	حالة PV_WCR:	أرجع (char_u *)&(curwin->w_p_wcr);
+	حالة PV_SCBIND: أرجع (char_u *)&(curwin->w_p_scb);
+	حالة PV_CRBIND: أرجع (char_u *)&(curwin->w_p_crb);
+#اگر_تعریف_شده FEAT_CONCEAL
+	حالة PV_COCU:   أرجع (char_u *)&(curwin->w_p_cocu);
+	حالة PV_COLE:   أرجع (char_u *)&(curwin->w_p_cole);
+#پایان_اگر
+	حالة PV_WHL:	أرجع (char_u *)&(curwin->w_p_whl);
 
-#ifdef FEAT_TERMINAL
-	case PV_TWK:    return (char_u *)&(curwin->w_p_twk);
-	case PV_TWS:    return (char_u *)&(curwin->w_p_tws);
-	case PV_TWSL:	return (char_u *)&(curbuf->b_p_twsl);
-#endif
+#اگر_تعریف_شده FEAT_TERMINAL
+	حالة PV_TWK:    أرجع (char_u *)&(curwin->w_p_twk);
+	حالة PV_TWS:    أرجع (char_u *)&(curwin->w_p_tws);
+	حالة PV_TWSL:	أرجع (char_u *)&(curbuf->b_p_twsl);
+#پایان_اگر
 
-	case PV_AI:	return (char_u *)&(curbuf->b_p_ai);
-	case PV_BIN:	return (char_u *)&(curbuf->b_p_bin);
-	case PV_BOMB:	return (char_u *)&(curbuf->b_p_bomb);
-	case PV_BH:	return (char_u *)&(curbuf->b_p_bh);
-	case PV_BT:	return (char_u *)&(curbuf->b_p_bt);
-	case PV_BL:	return (char_u *)&(curbuf->b_p_bl);
-	case PV_CI:	return (char_u *)&(curbuf->b_p_ci);
-	case PV_CIN:	return (char_u *)&(curbuf->b_p_cin);
-	case PV_CINK:	return (char_u *)&(curbuf->b_p_cink);
-	case PV_CINO:	return (char_u *)&(curbuf->b_p_cino);
-	case PV_CINSD:	return (char_u *)&(curbuf->b_p_cinsd);
-	case PV_CINW:	return (char_u *)&(curbuf->b_p_cinw);
-	case PV_COM:	return (char_u *)&(curbuf->b_p_com);
-	case PV_CMS:	return (char_u *)&(curbuf->b_p_cms);
-	case PV_CPT:	return (char_u *)&(curbuf->b_p_cpt);
-#ifdef BACKSLASH_IN_FILENAME
-	case PV_CSL:	return (char_u *)&(curbuf->b_p_csl);
-#endif
-#ifdef FEAT_COMPL_FUNC
-	case PV_CFU:	return (char_u *)&(curbuf->b_p_cfu);
-	case PV_OFU:	return (char_u *)&(curbuf->b_p_ofu);
-#endif
-#ifdef FEAT_EVAL
-	case PV_TFU:	return (char_u *)&(curbuf->b_p_tfu);
-#endif
-	case PV_EOF:	return (char_u *)&(curbuf->b_p_eof);
-	case PV_EOL:	return (char_u *)&(curbuf->b_p_eol);
-	case PV_FIXEOL:	return (char_u *)&(curbuf->b_p_fixeol);
-	case PV_ET:	return (char_u *)&(curbuf->b_p_et);
-	case PV_FENC:	return (char_u *)&(curbuf->b_p_fenc);
-	case PV_FF:	return (char_u *)&(curbuf->b_p_ff);
-	case PV_FT:	return (char_u *)&(curbuf->b_p_ft);
-	case PV_FO:	return (char_u *)&(curbuf->b_p_fo);
-	case PV_FLP:	return (char_u *)&(curbuf->b_p_flp);
-	case PV_IMI:	return (char_u *)&(curbuf->b_p_iminsert);
-	case PV_IMS:	return (char_u *)&(curbuf->b_p_imsearch);
-	case PV_INF:	return (char_u *)&(curbuf->b_p_inf);
-	case PV_ISK:	return (char_u *)&(curbuf->b_p_isk);
-#ifdef FEAT_FIND_ID
+	حالة PV_AI:	أرجع (char_u *)&(curbuf->b_p_ai);
+	حالة PV_BIN:	أرجع (char_u *)&(curbuf->b_p_bin);
+	حالة PV_BOMB:	أرجع (char_u *)&(curbuf->b_p_bomb);
+	حالة PV_BH:	أرجع (char_u *)&(curbuf->b_p_bh);
+	حالة PV_BT:	أرجع (char_u *)&(curbuf->b_p_bt);
+	حالة PV_BL:	أرجع (char_u *)&(curbuf->b_p_bl);
+	حالة PV_CI:	أرجع (char_u *)&(curbuf->b_p_ci);
+	حالة PV_CIN:	أرجع (char_u *)&(curbuf->b_p_cin);
+	حالة PV_CINK:	أرجع (char_u *)&(curbuf->b_p_cink);
+	حالة PV_CINO:	أرجع (char_u *)&(curbuf->b_p_cino);
+	حالة PV_CINSD:	أرجع (char_u *)&(curbuf->b_p_cinsd);
+	حالة PV_CINW:	أرجع (char_u *)&(curbuf->b_p_cinw);
+	حالة PV_COM:	أرجع (char_u *)&(curbuf->b_p_com);
+	حالة PV_CMS:	أرجع (char_u *)&(curbuf->b_p_cms);
+	حالة PV_CPT:	أرجع (char_u *)&(curbuf->b_p_cpt);
+#اگر_تعریف_شده BACKSLASH_درون_FILENAME
+	حالة PV_CSL:	أرجع (char_u *)&(curbuf->b_p_csl);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_COMPL_FUNC
+	حالة PV_CFU:	أرجع (char_u *)&(curbuf->b_p_cfu);
+	حالة PV_OFU:	أرجع (char_u *)&(curbuf->b_p_ofu);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_EVAL
+	حالة PV_TFU:	أرجع (char_u *)&(curbuf->b_p_tfu);
+#پایان_اگر
+	حالة PV_EOF:	أرجع (char_u *)&(curbuf->b_p_eof);
+	حالة PV_EOL:	أرجع (char_u *)&(curbuf->b_p_eol);
+	حالة PV_FIXEOL:	أرجع (char_u *)&(curbuf->b_p_fixeol);
+	حالة PV_ET:	أرجع (char_u *)&(curbuf->b_p_et);
+	حالة PV_FENC:	أرجع (char_u *)&(curbuf->b_p_fenc);
+	حالة PV_FF:	أرجع (char_u *)&(curbuf->b_p_ff);
+	حالة PV_FT:	أرجع (char_u *)&(curbuf->b_p_ft);
+	حالة PV_FO:	أرجع (char_u *)&(curbuf->b_p_fo);
+	حالة PV_FLP:	أرجع (char_u *)&(curbuf->b_p_flp);
+	حالة PV_IMI:	أرجع (char_u *)&(curbuf->b_p_iminsert);
+	حالة PV_IMS:	أرجع (char_u *)&(curbuf->b_p_imsearch);
+	حالة PV_INF:	أرجع (char_u *)&(curbuf->b_p_inf);
+	حالة PV_ISK:	أرجع (char_u *)&(curbuf->b_p_isk);
+#اگر_تعریف_شده FEAT_پیدا_کن_ID
 # ifdef FEAT_EVAL
-	case PV_INEX:	return (char_u *)&(curbuf->b_p_inex);
+	حالة PV_INEX:	أرجع (char_u *)&(curbuf->b_p_inex);
 # endif
-#endif
-#if defined(FEAT_EVAL)
-	case PV_INDE:	return (char_u *)&(curbuf->b_p_inde);
-	case PV_INDK:	return (char_u *)&(curbuf->b_p_indk);
-#endif
-#ifdef FEAT_EVAL
-	case PV_FEX:	return (char_u *)&(curbuf->b_p_fex);
-#endif
-#ifdef FEAT_CRYPT
-	case PV_KEY:	return (char_u *)&(curbuf->b_p_key);
-#endif
-	case PV_LISP:	return (char_u *)&(curbuf->b_p_lisp);
-	case PV_LOP:	return (char_u *)&(curbuf->b_p_lop);
-	case PV_ML:	return (char_u *)&(curbuf->b_p_ml);
-	case PV_MPS:	return (char_u *)&(curbuf->b_p_mps);
-	case PV_MA:	return (char_u *)&(curbuf->b_p_ma);
-	case PV_MOD:	return (char_u *)&(curbuf->b_changed);
-	case PV_NF:	return (char_u *)&(curbuf->b_p_nf);
-	case PV_PI:	return (char_u *)&(curbuf->b_p_pi);
-	case PV_QE:	return (char_u *)&(curbuf->b_p_qe);
-	case PV_RO:	return (char_u *)&(curbuf->b_p_ro);
-	case PV_SI:	return (char_u *)&(curbuf->b_p_si);
-	case PV_SN:	return (char_u *)&(curbuf->b_p_sn);
-	case PV_STS:	return (char_u *)&(curbuf->b_p_sts);
-	case PV_SUA:	return (char_u *)&(curbuf->b_p_sua);
-	case PV_SWF:	return (char_u *)&(curbuf->b_p_swf);
-#ifdef FEAT_SYN_HL
-	case PV_SMC:	return (char_u *)&(curbuf->b_p_smc);
-	case PV_SYN:	return (char_u *)&(curbuf->b_p_syn);
-#endif
-#ifdef FEAT_SPELL
-	case PV_SPC:	return (char_u *)&(curwin->w_s->b_p_spc);
-	case PV_SPF:	return (char_u *)&(curwin->w_s->b_p_spf);
-	case PV_SPL:	return (char_u *)&(curwin->w_s->b_p_spl);
-	case PV_SPO:	return (char_u *)&(curwin->w_s->b_p_spo);
-#endif
-	case PV_SW:	return (char_u *)&(curbuf->b_p_sw);
-	case PV_TS:	return (char_u *)&(curbuf->b_p_ts);
-	case PV_TW:	return (char_u *)&(curbuf->b_p_tw);
-	case PV_TX:	return (char_u *)&(curbuf->b_p_tx);
-#ifdef FEAT_PERSISTENT_UNDO
-	case PV_UDF:	return (char_u *)&(curbuf->b_p_udf);
-#endif
-	case PV_WM:	return (char_u *)&(curbuf->b_p_wm);
-#ifdef FEAT_KEYMAP
-	case PV_KMAP:	return (char_u *)&(curbuf->b_p_keymap);
-#endif
-#ifdef FEAT_SIGNS
-	case PV_SCL:	return (char_u *)&(curwin->w_p_scl);
-#endif
-#ifdef FEAT_VARTABS
-	case PV_VSTS:	return (char_u *)&(curbuf->b_p_vsts);
-	case PV_VTS:	return (char_u *)&(curbuf->b_p_vts);
-#endif
-	default:	iemsg(e_get_varp_error);
+#پایان_اگر
+#إذا defined(FEAT_EVAL)
+	حالة PV_INDE:	أرجع (char_u *)&(curbuf->b_p_inde);
+	حالة PV_INDK:	أرجع (char_u *)&(curbuf->b_p_indk);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_EVAL
+	حالة PV_FEX:	أرجع (char_u *)&(curbuf->b_p_fex);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_CRYPT
+	حالة PV_کلید:	أرجع (char_u *)&(curbuf->b_p_کلید);
+#پایان_اگر
+	حالة PV_LISP:	أرجع (char_u *)&(curbuf->b_p_lisp);
+	حالة PV_LOP:	أرجع (char_u *)&(curbuf->b_p_lop);
+	حالة PV_ML:	أرجع (char_u *)&(curbuf->b_p_ml);
+	حالة PV_MPS:	أرجع (char_u *)&(curbuf->b_p_mps);
+	حالة PV_MA:	أرجع (char_u *)&(curbuf->b_p_ma);
+	حالة PV_MOD:	أرجع (char_u *)&(curbuf->b_تغییریافته);
+	حالة PV_NF:	أرجع (char_u *)&(curbuf->b_p_nf);
+	حالة PV_PI:	أرجع (char_u *)&(curbuf->b_p_pi);
+	حالة PV_QE:	أرجع (char_u *)&(curbuf->b_p_qe);
+	حالة PV_RO:	أرجع (char_u *)&(curbuf->b_p_ro);
+	حالة PV_SI:	أرجع (char_u *)&(curbuf->b_p_si);
+	حالة PV_SN:	أرجع (char_u *)&(curbuf->b_p_sn);
+	حالة PV_STS:	أرجع (char_u *)&(curbuf->b_p_sts);
+	حالة PV_SUA:	أرجع (char_u *)&(curbuf->b_p_sua);
+	حالة PV_SWF:	أرجع (char_u *)&(curbuf->b_p_swf);
+#اگر_تعریف_شده FEAT_SYN_HL
+	حالة PV_SMC:	أرجع (char_u *)&(curbuf->b_p_smc);
+	حالة PV_SYN:	أرجع (char_u *)&(curbuf->b_p_syn);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_SPELL
+	حالة PV_SPC:	أرجع (char_u *)&(curwin->w_s->b_p_spc);
+	حالة PV_SPF:	أرجع (char_u *)&(curwin->w_s->b_p_spf);
+	حالة PV_SPL:	أرجع (char_u *)&(curwin->w_s->b_p_spl);
+	حالة PV_SPO:	أرجع (char_u *)&(curwin->w_s->b_p_spo);
+#پایان_اگر
+	حالة PV_SW:	أرجع (char_u *)&(curbuf->b_p_sw);
+	حالة PV_TS:	أرجع (char_u *)&(curbuf->b_p_ts);
+	حالة PV_TW:	أرجع (char_u *)&(curbuf->b_p_tw);
+	حالة PV_TX:	أرجع (char_u *)&(curbuf->b_p_tx);
+#اگر_تعریف_شده FEAT_PERSISTENT_UNDO
+	حالة PV_UDF:	أرجع (char_u *)&(curbuf->b_p_udf);
+#پایان_اگر
+	حالة PV_WM:	أرجع (char_u *)&(curbuf->b_p_wm);
+#اگر_تعریف_شده FEAT_KEYMAP
+	حالة PV_KMAP:	أرجع (char_u *)&(curbuf->b_p_keymap);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_SIGNS
+	حالة PV_SCL:	أرجع (char_u *)&(curwin->w_p_scl);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_VARTABS
+	حالة PV_VSTS:	أرجع (char_u *)&(curbuf->b_p_vsts);
+	حالة PV_VTS:	أرجع (char_u *)&(curbuf->b_p_vts);
+#پایان_اگر
+	افتراضي:	iemsg(e_get_varp_error);
     }
     // always return a valid pointer to avoid a crash!
-    return (char_u *)&(curbuf->b_p_wm);
+    أرجع (char_u *)&(curbuf->b_p_wm);
 }
 
 /*
  * Return a pointer to the variable for option at 'opt_idx'
  */
     char_u *
-get_option_var(int opt_idx)
+get_option_var(صحيح opt_idx)
 {
-    return options[opt_idx].var;
+    أرجع options[opt_idx].var;
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Return the full name of the option at 'opt_idx'
  */
     char_u *
-get_option_fullname(int opt_idx)
+get_option_fullname(صحيح opt_idx)
 {
-    return (char_u *)options[opt_idx].fullname;
+    أرجع (char_u *)options[opt_idx].fullname;
 }
 
 /*
@@ -7477,128 +7477,128 @@ get_option_fullname(int opt_idx)
  * whether the option is supported in this Vim.
  * Returns FAIL when there is no such option.
  */
-    int
+    صحيح
 option_info(char_u *name, dict_T *d)
 {
-    int			opt_idx;
-    struct vimoption	*p;
-    int			dvi;
+    صحيح			opt_idx;
+    بنية vimoption	*p;
+    صحيح			dvi;
 
     // The "g:" or "l:" scope does not matter for the definition.
-    if ((name[0] == 'g' || name[0] == 'l') && name[1] == ':')
+    إذا ((name[0] == 'g' || name[0] == 'l') && name[1] == ':')
 	name += 2;
     opt_idx = findoption(name);
-    if (opt_idx < 0)
-	return FAIL;
+    إذا (opt_idx < 0)
+	أرجع FAIL;
 
     p = &options[opt_idx];
-    dict_add_string(d, "name", (char_u *)p->fullname);
-    dict_add_string(d, "shortname",
-		    (char_u *)(p->shortname == NULL ? "" : p->shortname));
-    dict_add_bool(d, "available", p->var != NULL);
-    dict_add_string(d, "type", (char_u *)((p->flags & P_BOOL) ? "bool"
-				: (p->flags & P_NUM) ? "number" : "string"));
-    dict_add_string(d, "scope", (char_u *)(p->indir == PV_NONE ? "global"
+    dict_جمع_کن_string(d, "name", (char_u *)p->fullname);
+    dict_جمع_کن_string(d, "shortname",
+		    (char_u *)(p->shortname == عدم ? "" : p->shortname));
+    dict_جمع_کن_bool(d, "available", p->var != عدم);
+    dict_جمع_کن_string(d, "type", (char_u *)((p->flags & P_BOOL) ? "bool"
+				: (p->flags & P_رقم) ? "number" : "string"));
+    dict_جمع_کن_string(d, "scope", (char_u *)(p->indir == PV_NONE ? "global"
 		: (p->indir & PV_BOTH)
 		    ? ((p->indir & PV_WIN) ? "global-window" : "global-buffer")
 		    : ((p->indir & PV_WIN) ? "window" : "buffer")));
     dvi = (p->flags & P_VI_DEF) ? VI_DEFAULT : VIM_DEFAULT;
-    if (p->flags & P_BOOL)
-	dict_add_bool(d, "default", (int)(long_i)p->def_val[dvi]);
-    else if (p->flags & P_NUM)
-	dict_add_number(d, "default", (long)(long_i)p->def_val[dvi]);
-    else
-	dict_add_string(d, "default", p->def_val[dvi] == NULL
+    إذا (p->flags & P_BOOL)
+	dict_جمع_کن_bool(d, "default", (صحيح)(long_i)p->def_val[dvi]);
+    وإلا إذا (p->flags & P_رقم)
+	dict_جمع_کن_عدد(d, "default", (دراز)(long_i)p->def_val[dvi]);
+    وإلا
+	dict_جمع_کن_string(d, "default", p->def_val[dvi] == عدم
 					? (char_u *)"" : p->def_val[dvi]);
-    return OK;
+    أرجع OK;
 }
-#endif
+#پایان_اگر
 
 /*
  * Return the did_set callback function for the option at 'opt_idx'
  */
-    opt_did_set_cb_T
-get_option_did_set_cb(int opt_idx)
+    opt_did_مجموعه_cb_T
+get_option_did_مجموعه_cb(صحيح opt_idx)
 {
-    return options[opt_idx].opt_did_set_cb;
+    أرجع options[opt_idx].opt_did_مجموعه_cb;
 }
 
 /*
  * Get the value of 'equalprg', either the buffer-local one or the global one.
  */
     char_u *
-get_equalprg(void)
+get_equalprg(فراغ)
 {
-    if (*curbuf->b_p_ep == NUL)
-	return p_ep;
-    return curbuf->b_p_ep;
+    إذا (*curbuf->b_p_ep == NUL)
+	أرجع p_ep;
+    أرجع curbuf->b_p_ep;
 }
 
 /*
  * Get the value of 'findfunc', either the buffer-local one or the global one.
  */
     char_u *
-get_findfunc(void)
+get_findfunc(فراغ)
 {
-#ifdef FEAT_EVAL
-    if (*curbuf->b_p_ffu == NUL)
-	return p_ffu;
-    return curbuf->b_p_ffu;
-#else
-    return (char_u *)"";
-#endif
+#اگر_تعریف_شده FEAT_EVAL
+    إذا (*curbuf->b_p_ffu == NUL)
+	أرجع p_ffu;
+    أرجع curbuf->b_p_ffu;
+#وإلا
+    أرجع (char_u *)"";
+#پایان_اگر
 }
 
 /*
  * Copy options from one window to another.
  * Used when splitting a window.
  */
-    void
-win_copy_options(win_T *wp_from, win_T *wp_to)
+    فراغ
+win_copy_options(win_T *wp_from, win_T *wp_مقصد)
 {
-    copy_winopt(&wp_from->w_onebuf_opt, &wp_to->w_onebuf_opt);
-    copy_winopt(&wp_from->w_allbuf_opt, &wp_to->w_allbuf_opt);
-#ifdef FEAT_STL_OPT
+    copy_winopt(&wp_from->w_onebuf_opt, &wp_مقصد->w_onebuf_opt);
+    copy_winopt(&wp_from->w_allbuf_opt, &wp_مقصد->w_allbuf_opt);
+#اگر_تعریف_شده FEAT_STL_OPT
     // w_stl_rendered_height is in win_T directly, not in winvar_T, so it is
     // not copied by copy_winopt().  Copy it explicitly here.
-    wp_to->w_stl_rendered_height = wp_from->w_stl_rendered_height;
-#endif
-    after_copy_winopt(wp_to);
+    wp_مقصد->w_stl_rendered_ارتفاع = wp_from->w_stl_rendered_ارتفاع;
+#پایان_اگر
+    after_copy_winopt(wp_مقصد);
 }
 
 /*
  * After copying window options: update variables depending on options.
  */
-    void
+    فراغ
 after_copy_winopt(win_T *wp)
 {
-    char *errmsg = update_winhighlight(wp, wp->w_p_whl);
+    حرف *errmsg = update_winhighlight(wp, wp->w_p_whl);
 
-    if (errmsg != NULL)
+    إذا (errmsg != عدم)
 	emsg(_(errmsg));
 
     // Set w_leftcol or w_skipcol to zero.
-    if (wp->w_p_wrap)
+    إذا (wp->w_p_wrap)
 	wp->w_leftcol = 0;
-    else
+    وإلا
 	wp->w_skipcol = 0;
-#ifdef FEAT_LINEBREAK
-    briopt_check(NULL, wp);
-#endif
-#ifdef FEAT_SYN_HL
-    fill_culopt_flags(NULL, wp);
-    check_colorcolumn(NULL, wp);
-#endif
-    set_listchars_option(wp, wp->w_p_lcs, TRUE, NULL, 0);
-    set_fillchars_option(wp, wp->w_p_fcs, TRUE, NULL, 0);
+#اگر_تعریف_شده FEAT_LINEBREAK
+    briopt_check(عدم, wp);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_SYN_HL
+    fill_culopt_flags(عدم, wp);
+    check_colorcolumn(عدم, wp);
+#پایان_اگر
+    مجموعه_listchars_option(wp, wp->w_p_lcs, TRUE, عدم, 0);
+    مجموعه_fillchars_option(wp, wp->w_p_fcs, TRUE, عدم, 0);
 }
 
-    static char_u *
+    ساكن char_u *
 copy_option_val(char_u *val)
 {
-    if (val == empty_option)
-	return empty_option;  // no need to allocate memory
-    return vim_strsave(val);
+    إذا (val == خالی_option)
+	أرجع خالی_option;  // no need to allocate memory
+    أرجع vim_strsave(val);
 }
 
 /*
@@ -7607,123 +7607,123 @@ copy_option_val(char_u *val)
  * The 'scroll' option is not copied, because it depends on the window height.
  * The 'previewwindow' option is reset, there can be only one preview window.
  */
-    void
-copy_winopt(winopt_T *from, winopt_T *to)
+    فراغ
+copy_winopt(winopt_T *from, winopt_T *مقصد)
 {
-#ifdef FEAT_ARABIC
-    to->wo_arab = from->wo_arab;
-#endif
-    to->wo_list = from->wo_list;
-    to->wo_lcs = copy_option_val(from->wo_lcs);
-    to->wo_fcs = copy_option_val(from->wo_fcs);
-    to->wo_nu = from->wo_nu;
-    to->wo_rnu = from->wo_rnu;
-    to->wo_ve = copy_option_val(from->wo_ve);
-    to->wo_ve_flags = from->wo_ve_flags;
-#ifdef FEAT_LINEBREAK
-    to->wo_nuw = from->wo_nuw;
-#endif
-#ifdef FEAT_RIGHTLEFT
-    to->wo_rl  = from->wo_rl;
-    to->wo_rlc = copy_option_val(from->wo_rlc);
-#endif
-#ifdef FEAT_LINEBREAK
-    to->wo_sbr = copy_option_val(from->wo_sbr);
-#endif
-#ifdef FEAT_STL_OPT
-    to->wo_stl = copy_option_val(from->wo_stl);
-    to->wo_stlo = copy_option_val(from->wo_stlo);
-    to->wo_stlo_fh = from->wo_stlo_fh;
-    to->wo_stlo_mh = from->wo_stlo_mh;
-#endif
-    to->wo_wrap = from->wo_wrap;
-#ifdef FEAT_DIFF
-    to->wo_wrap_save = from->wo_wrap_save;
-#endif
-#ifdef FEAT_LINEBREAK
-    to->wo_lbr = from->wo_lbr;
-    to->wo_bri = from->wo_bri;
-    to->wo_briopt = copy_option_val(from->wo_briopt);
-#endif
-    to->wo_wcr = copy_option_val(from->wo_wcr);
-    to->wo_scb = from->wo_scb;
-    to->wo_scb_save = from->wo_scb_save;
-    to->wo_sms = from->wo_sms;
-    to->wo_crb = from->wo_crb;
-    to->wo_crb_save = from->wo_crb_save;
-    to->wo_siso = from->wo_siso;
-    to->wo_so = from->wo_so;
-    to->wo_sop = from->wo_sop;
-#ifdef FEAT_SPELL
-    to->wo_spell = from->wo_spell;
-#endif
-#ifdef FEAT_SYN_HL
-    to->wo_cuc = from->wo_cuc;
-    to->wo_cul = from->wo_cul;
-    to->wo_culopt = copy_option_val(from->wo_culopt);
-    to->wo_cc = copy_option_val(from->wo_cc);
-#endif
-#ifdef FEAT_DIFF
-    to->wo_diff = from->wo_diff;
-    to->wo_diff_saved = from->wo_diff_saved;
-#endif
-    to->wo_eiw = copy_option_val(from->wo_eiw);
-#ifdef FEAT_CONCEAL
-    to->wo_cocu = copy_option_val(from->wo_cocu);
-    to->wo_cole = from->wo_cole;
-#endif
-#ifdef FEAT_TERMINAL
-    to->wo_twk = copy_option_val(from->wo_twk);
-    to->wo_tws = copy_option_val(from->wo_tws);
-#endif
-#ifdef FEAT_FOLDING
-    to->wo_fdc = from->wo_fdc;
-    to->wo_fdc_save = from->wo_fdc_save;
-    to->wo_fen = from->wo_fen;
-    to->wo_fen_save = from->wo_fen_save;
-    to->wo_fdi = copy_option_val(from->wo_fdi);
-    to->wo_fml = from->wo_fml;
-    to->wo_fdl = from->wo_fdl;
-    to->wo_fdl_save = from->wo_fdl_save;
-    to->wo_fdm = copy_option_val(from->wo_fdm);
-    to->wo_fdm_save = from->wo_diff_saved
-			       ? vim_strsave(from->wo_fdm_save) : empty_option;
-    to->wo_fdn = from->wo_fdn;
+#اگر_تعریف_شده FEAT_ARABIC
+    مقصد->wo_arab = from->wo_arab;
+#پایان_اگر
+    مقصد->wo_list = from->wo_list;
+    مقصد->wo_lcs = copy_option_val(from->wo_lcs);
+    مقصد->wo_fcs = copy_option_val(from->wo_fcs);
+    مقصد->wo_nu = from->wo_nu;
+    مقصد->wo_rnu = from->wo_rnu;
+    مقصد->wo_ve = copy_option_val(from->wo_ve);
+    مقصد->wo_ve_flags = from->wo_ve_flags;
+#اگر_تعریف_شده FEAT_LINEBREAK
+    مقصد->wo_nuw = from->wo_nuw;
+#پایان_اگر
+#اگر_تعریف_شده FEAT_RIGHTLEFT
+    مقصد->wo_rl  = from->wo_rl;
+    مقصد->wo_rlc = copy_option_val(from->wo_rlc);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_LINEBREAK
+    مقصد->wo_sbr = copy_option_val(from->wo_sbr);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_STL_OPT
+    مقصد->wo_stl = copy_option_val(from->wo_stl);
+    مقصد->wo_stlo = copy_option_val(from->wo_stlo);
+    مقصد->wo_stlo_fh = from->wo_stlo_fh;
+    مقصد->wo_stlo_mh = from->wo_stlo_mh;
+#پایان_اگر
+    مقصد->wo_wrap = from->wo_wrap;
+#اگر_تعریف_شده FEAT_DIFF
+    مقصد->wo_wrap_save = from->wo_wrap_save;
+#پایان_اگر
+#اگر_تعریف_شده FEAT_LINEBREAK
+    مقصد->wo_lbr = from->wo_lbr;
+    مقصد->wo_bri = from->wo_bri;
+    مقصد->wo_briopt = copy_option_val(from->wo_briopt);
+#پایان_اگر
+    مقصد->wo_wcr = copy_option_val(from->wo_wcr);
+    مقصد->wo_scb = from->wo_scb;
+    مقصد->wo_scb_save = from->wo_scb_save;
+    مقصد->wo_sms = from->wo_sms;
+    مقصد->wo_crb = from->wo_crb;
+    مقصد->wo_crb_save = from->wo_crb_save;
+    مقصد->wo_siso = from->wo_siso;
+    مقصد->wo_so = from->wo_so;
+    مقصد->wo_sop = from->wo_sop;
+#اگر_تعریف_شده FEAT_SPELL
+    مقصد->wo_spell = from->wo_spell;
+#پایان_اگر
+#اگر_تعریف_شده FEAT_SYN_HL
+    مقصد->wo_cuc = from->wo_cuc;
+    مقصد->wo_cul = from->wo_cul;
+    مقصد->wo_culopt = copy_option_val(from->wo_culopt);
+    مقصد->wo_cc = copy_option_val(from->wo_cc);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_DIFF
+    مقصد->wo_diff = from->wo_diff;
+    مقصد->wo_diff_saved = from->wo_diff_saved;
+#پایان_اگر
+    مقصد->wo_eiw = copy_option_val(from->wo_eiw);
+#اگر_تعریف_شده FEAT_CONCEAL
+    مقصد->wo_cocu = copy_option_val(from->wo_cocu);
+    مقصد->wo_cole = from->wo_cole;
+#پایان_اگر
+#اگر_تعریف_شده FEAT_TERMINAL
+    مقصد->wo_twk = copy_option_val(from->wo_twk);
+    مقصد->wo_tws = copy_option_val(from->wo_tws);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_FOLDING
+    مقصد->wo_fdc = from->wo_fdc;
+    مقصد->wo_fdc_save = from->wo_fdc_save;
+    مقصد->wo_fen = from->wo_fen;
+    مقصد->wo_fen_save = from->wo_fen_save;
+    مقصد->wo_fdi = copy_option_val(from->wo_fdi);
+    مقصد->wo_fml = from->wo_fml;
+    مقصد->wo_fdl = from->wo_fdl;
+    مقصد->wo_fdl_save = from->wo_fdl_save;
+    مقصد->wo_fdm = copy_option_val(from->wo_fdm);
+    مقصد->wo_fdm_save = from->wo_diff_saved
+			       ? vim_strsave(from->wo_fdm_save) : خالی_option;
+    مقصد->wo_fdn = from->wo_fdn;
 # ifdef FEAT_EVAL
-    to->wo_fde = copy_option_val(from->wo_fde);
-    to->wo_fdt = copy_option_val(from->wo_fdt);
+    مقصد->wo_fde = copy_option_val(from->wo_fde);
+    مقصد->wo_fdt = copy_option_val(from->wo_fdt);
 # endif
-    to->wo_fmr = copy_option_val(from->wo_fmr);
-#endif
-#ifdef FEAT_SIGNS
-    to->wo_scl = copy_option_val(from->wo_scl);
-#endif
-#ifdef FEAT_QUICKFIX
-    to->wo_lhi = from->wo_lhi;
-#endif
+    مقصد->wo_fmr = copy_option_val(from->wo_fmr);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_SIGNS
+    مقصد->wo_scl = copy_option_val(from->wo_scl);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_QUICKFIX
+    مقصد->wo_lhi = from->wo_lhi;
+#پایان_اگر
 
-    to->wo_wrap_flags = from->wo_wrap_flags;
-#ifdef FEAT_STL_OPT
-    to->wo_stl_flags = from->wo_stl_flags;
-#endif
-#ifdef FEAT_EVAL
-    to->wo_fde_flags = from->wo_fde_flags;
-    to->wo_fdt_flags = from->wo_fdt_flags;
-#endif
-    to->wo_whl = copy_option_val(from->wo_whl);
+    مقصد->wo_wrap_flags = from->wo_wrap_flags;
+#اگر_تعریف_شده FEAT_STL_OPT
+    مقصد->wo_stl_flags = from->wo_stl_flags;
+#پایان_اگر
+#اگر_تعریف_شده FEAT_EVAL
+    مقصد->wo_fde_flags = from->wo_fde_flags;
+    مقصد->wo_fdt_flags = from->wo_fdt_flags;
+#پایان_اگر
+    مقصد->wo_whl = copy_option_val(from->wo_whl);
 
-#ifdef FEAT_EVAL
+#اگر_تعریف_شده FEAT_EVAL
     // Copy the script context so that we know where the value was last set.
-    mch_memmove(to->wo_script_ctx, from->wo_script_ctx,
-						    sizeof(to->wo_script_ctx));
-#endif
-    check_winopt(to);		// don't want NULL pointers
+    mch_memmove(مقصد->wo_script_ctx, from->wo_script_ctx,
+						    حجم(مقصد->wo_script_ctx));
+#پایان_اگر
+    check_winopt(مقصد);		// don't want NULL pointers
 }
 
 /*
  * Check string options in a window for a NULL value.
  */
-    static void
+    ساكن فراغ
 check_win_options(win_T *win)
 {
     check_winopt(&win->w_onebuf_opt);
@@ -7733,10 +7733,10 @@ check_win_options(win_T *win)
 /*
  * Check for NULL pointers in a winopt_T and replace them with empty_option.
  */
-    static void
-check_winopt(winopt_T *wop UNUSED)
+    ساكن فراغ
+check_winopt(winopt_T *wop استفادهنشده)
 {
-#ifdef FEAT_FOLDING
+#اگر_تعریف_شده FEAT_FOLDING
     check_string_option(&wop->wo_fdi);
     check_string_option(&wop->wo_fdm);
     check_string_option(&wop->wo_fdm_save);
@@ -7745,35 +7745,35 @@ check_winopt(winopt_T *wop UNUSED)
     check_string_option(&wop->wo_fdt);
 # endif
     check_string_option(&wop->wo_fmr);
-#endif
+#پایان_اگر
     check_string_option(&wop->wo_eiw);
-#ifdef FEAT_SIGNS
+#اگر_تعریف_شده FEAT_SIGNS
     check_string_option(&wop->wo_scl);
-#endif
-#ifdef FEAT_RIGHTLEFT
+#پایان_اگر
+#اگر_تعریف_شده FEAT_RIGHTLEFT
     check_string_option(&wop->wo_rlc);
-#endif
-#ifdef FEAT_LINEBREAK
+#پایان_اگر
+#اگر_تعریف_شده FEAT_LINEBREAK
     check_string_option(&wop->wo_sbr);
-#endif
-#ifdef FEAT_STL_OPT
+#پایان_اگر
+#اگر_تعریف_شده FEAT_STL_OPT
     check_string_option(&wop->wo_stl);
     check_string_option(&wop->wo_stlo);
-#endif
-#ifdef FEAT_SYN_HL
+#پایان_اگر
+#اگر_تعریف_شده FEAT_SYN_HL
     check_string_option(&wop->wo_culopt);
     check_string_option(&wop->wo_cc);
-#endif
-#ifdef FEAT_CONCEAL
+#پایان_اگر
+#اگر_تعریف_شده FEAT_CONCEAL
     check_string_option(&wop->wo_cocu);
-#endif
-#ifdef FEAT_TERMINAL
+#پایان_اگر
+#اگر_تعریف_شده FEAT_TERMINAL
     check_string_option(&wop->wo_twk);
     check_string_option(&wop->wo_tws);
-#endif
-#ifdef FEAT_LINEBREAK
+#پایان_اگر
+#اگر_تعریف_شده FEAT_LINEBREAK
     check_string_option(&wop->wo_briopt);
-#endif
+#پایان_اگر
     check_string_option(&wop->wo_wcr);
     check_string_option(&wop->wo_lcs);
     check_string_option(&wop->wo_fcs);
@@ -7784,10 +7784,10 @@ check_winopt(winopt_T *wop UNUSED)
 /*
  * Free the allocated memory inside a winopt_T.
  */
-    void
-clear_winopt(winopt_T *wop UNUSED)
+    فراغ
+clear_winopt(winopt_T *wop استفادهنشده)
 {
-#ifdef FEAT_FOLDING
+#اگر_تعریف_شده FEAT_FOLDING
     clear_string_option(&wop->wo_fdi);
     clear_string_option(&wop->wo_fdm);
     clear_string_option(&wop->wo_fdm_save);
@@ -7796,45 +7796,45 @@ clear_winopt(winopt_T *wop UNUSED)
     clear_string_option(&wop->wo_fdt);
 # endif
     clear_string_option(&wop->wo_fmr);
-#endif
+#پایان_اگر
     clear_string_option(&wop->wo_eiw);
-#ifdef FEAT_SIGNS
+#اگر_تعریف_شده FEAT_SIGNS
     clear_string_option(&wop->wo_scl);
-#endif
-#ifdef FEAT_LINEBREAK
+#پایان_اگر
+#اگر_تعریف_شده FEAT_LINEBREAK
     clear_string_option(&wop->wo_briopt);
-#endif
+#پایان_اگر
     clear_string_option(&wop->wo_wcr);
-#ifdef FEAT_RIGHTLEFT
+#اگر_تعریف_شده FEAT_RIGHTLEFT
     clear_string_option(&wop->wo_rlc);
-#endif
-#ifdef FEAT_LINEBREAK
+#پایان_اگر
+#اگر_تعریف_شده FEAT_LINEBREAK
     clear_string_option(&wop->wo_sbr);
-#endif
-#ifdef FEAT_STL_OPT
+#پایان_اگر
+#اگر_تعریف_شده FEAT_STL_OPT
     clear_string_option(&wop->wo_stl);
     clear_string_option(&wop->wo_stlo);
-#endif
-#ifdef FEAT_SYN_HL
+#پایان_اگر
+#اگر_تعریف_شده FEAT_SYN_HL
     clear_string_option(&wop->wo_culopt);
     clear_string_option(&wop->wo_cc);
-#endif
-#ifdef FEAT_CONCEAL
+#پایان_اگر
+#اگر_تعریف_شده FEAT_CONCEAL
     clear_string_option(&wop->wo_cocu);
-#endif
-#ifdef FEAT_TERMINAL
+#پایان_اگر
+#اگر_تعریف_شده FEAT_TERMINAL
     clear_string_option(&wop->wo_twk);
     clear_string_option(&wop->wo_tws);
-#endif
+#پایان_اگر
     clear_string_option(&wop->wo_lcs);
     clear_string_option(&wop->wo_fcs);
     clear_string_option(&wop->wo_ve);
     clear_string_option(&wop->wo_whl);
 }
 
-#ifdef FEAT_EVAL
+#اگر_تعریف_شده FEAT_EVAL
 // Index into the options table for a buffer-local option enum.
-static int buf_opt_idx[BV_COUNT];
+ساكن صحيح buf_opt_idx[BV_شمار];
 # define COPY_OPT_SCTX(buf, bv) buf->b_p_script_ctx[bv] = options[buf_opt_idx[bv]].script_ctx
 # define COPY_OPT_INSECURE(flagsfield, bv) \
 	(flagsfield) = (options[buf_opt_idx[bv]].flags & P_INSECURE)
@@ -7842,23 +7842,23 @@ static int buf_opt_idx[BV_COUNT];
 /*
  * Initialize buf_opt_idx[] if not done already.
  */
-    static void
-init_buf_opt_idx(void)
+    ساكن فراغ
+init_buf_opt_idx(فراغ)
 {
-    static int did_init_buf_opt_idx = FALSE;
-    int i;
+    ساكن صحيح did_init_buf_opt_idx = FALSE;
+    صحيح i;
 
-    if (did_init_buf_opt_idx)
-	return;
+    إذا (did_init_buf_opt_idx)
+	أرجع;
     did_init_buf_opt_idx = TRUE;
-    for (i = 0; !istermoption_idx(i); i++)
-	if (options[i].indir & PV_BUF)
-	    buf_opt_idx[options[i].indir & PV_MASK] = i;
+    لكل (i = 0; !istermoption_idx(i); i++)
+	إذا (options[i].indir & PV_BUF)
+	    buf_opt_idx[options[i].indir & PV_ماسک] = i;
 }
-#else
+#وإلا
 # define COPY_OPT_SCTX(buf, bv)
 # define COPY_OPT_INSECURE(flagsfield, bv)
-#endif
+#پایان_اگر
 
 /*
  * Copy global option values to local options for one buffer.
@@ -7869,17 +7869,17 @@ init_buf_opt_idx(void)
  *		appropriate.
  * BCO_NOHELP	Don't copy the values to a help buffer.
  */
-    void
-buf_copy_options(buf_T *buf, int flags)
+    فراغ
+buf_copy_options(buf_T *buf, صحيح flags)
 {
-    int		should_copy = TRUE;
-    char_u	*save_p_isk = NULL;	    // init for GCC
-    int		dont_do_help;
-    int		did_isk = FALSE;
+    صحيح		should_copy = TRUE;
+    char_u	*save_p_isk = عدم;	    // init for GCC
+    صحيح		dont_do_help;
+    صحيح		did_isk = FALSE;
 
     // Skip this when the option defaults have not been set yet.  Happens when
     // main() allocates the first buffer.
-    if (p_cpo != NULL)
+    إذا (p_cpo != عدم)
     {
 	/*
 	 * Always copy when entering and 'cpo' contains 'S'.
@@ -7893,53 +7893,53 @@ buf_copy_options(buf_T *buf, int flags)
 	 *  X	  no	      no	no	TRUE
 	 * no	  yes	      no	 X	TRUE
 	 */
-	if ((vim_strchr(p_cpo, CPO_BUFOPTGLOB) == NULL || !(flags & BCO_ENTER))
+	إذا ((vim_strchr(p_cpo, CPO_BUFOPTGLOB) == عدم || !(flags & BCO_ENTER))
 		&& (buf->b_p_initialized
 		    || (!(flags & BCO_ENTER)
-			&& vim_strchr(p_cpo, CPO_BUFOPT) != NULL)))
+			&& vim_strchr(p_cpo, CPO_BUFOPT) != عدم)))
 	    should_copy = FALSE;
 
-	if (should_copy || (flags & BCO_ALWAYS))
+	إذا (should_copy || (flags & BCO_ALWAYS))
 	{
-#ifdef FEAT_EVAL
-	    CLEAR_FIELD(buf->b_p_script_ctx);
+#اگر_تعریف_شده FEAT_EVAL
+	    CLEAR_فیلد(buf->b_p_script_ctx);
 	    init_buf_opt_idx();
-#endif
+#پایان_اگر
 	    // Don't copy the options specific to a help buffer when
 	    // BCO_NOHELP is given or the options were initialized already
 	    // (jumping back to a help file with CTRL-T or CTRL-O)
 	    dont_do_help = ((flags & BCO_NOHELP) && buf->b_help)
 						       || buf->b_p_initialized;
-	    if (dont_do_help)		// don't free b_p_isk
+	    إذا (dont_do_help)		// don't free b_p_isk
 	    {
 		save_p_isk = buf->b_p_isk;
-		buf->b_p_isk = NULL;
+		buf->b_p_isk = عدم;
 	    }
 	    // Always free the allocated strings.  If not already initialized,
 	    // reset 'readonly' and copy 'fileformat'.
-	    if (!buf->b_p_initialized)
+	    إذا (!buf->b_p_initialized)
 	    {
 		free_buf_options(buf, TRUE);
 		buf->b_p_ro = FALSE;		// don't copy readonly
 		buf->b_p_tx = p_tx;
 		buf->b_p_fenc = vim_strsave(p_fenc);
-		switch (*p_ffs)
+		بدل (*p_ffs)
 		{
-		    case 'm':
-			buf->b_p_ff = vim_strsave((char_u *)FF_MAC); break;
-		    case 'd':
-			buf->b_p_ff = vim_strsave((char_u *)FF_DOS); break;
-		    case 'u':
-			buf->b_p_ff = vim_strsave((char_u *)FF_UNIX); break;
-		    default:
+		    حالة 'm':
+			buf->b_p_ff = vim_strsave((char_u *)FF_MAC); اكسر;
+		    حالة 'd':
+			buf->b_p_ff = vim_strsave((char_u *)FF_DOS); اكسر;
+		    حالة 'u':
+			buf->b_p_ff = vim_strsave((char_u *)FF_UNIX); اكسر;
+		    افتراضي:
 			buf->b_p_ff = vim_strsave(p_ff);
 		}
-		if (buf->b_p_ff != NULL)
-		    buf->b_start_ffc = *buf->b_p_ff;
-		buf->b_p_bh = empty_option;
-		buf->b_p_bt = empty_option;
+		إذا (buf->b_p_ff != عدم)
+		    buf->b_شروع_ffc = *buf->b_p_ff;
+		buf->b_p_bh = خالی_option;
+		buf->b_p_bt = خالی_option;
 	    }
-	    else
+	    وإلا
 		free_buf_options(buf, FALSE);
 
 	    buf->b_p_ai = p_ai;
@@ -7970,49 +7970,49 @@ buf_copy_options(buf_T *buf, int flags)
 	    buf->b_p_ml_nobin = p_ml_nobin;
 	    buf->b_p_inf = p_inf;
 	    COPY_OPT_SCTX(buf, BV_INF);
-	    if (cmdmod.cmod_flags & CMOD_NOSWAPFILE)
+	    إذا (cmdmod.cmod_flags & CMOD_NOSWAPFILE)
 		buf->b_p_swf = FALSE;
-	    else
+	    وإلا
 	    {
 		buf->b_p_swf = p_swf;
 		COPY_OPT_SCTX(buf, BV_SWF);
 	    }
 	    buf->b_p_cpt = vim_strsave(p_cpt);
 	    COPY_OPT_SCTX(buf, BV_CPT);
-#ifdef FEAT_COMPL_FUNC
+#اگر_تعریف_شده FEAT_COMPL_FUNC
 	    COPY_OPT_INSECURE(buf->b_p_cpt_flags, BV_CPT);
-	    set_buflocal_cpt_callbacks(buf);
-#endif
-#ifdef BACKSLASH_IN_FILENAME
+	    مجموعه_buflocal_cpt_callbacks(buf);
+#پایان_اگر
+#اگر_تعریف_شده BACKSLASH_درون_FILENAME
 	    buf->b_p_csl = vim_strsave(p_csl);
 	    COPY_OPT_SCTX(buf, BV_CSL);
-#endif
-#ifdef FEAT_COMPL_FUNC
+#پایان_اگر
+#اگر_تعریف_شده FEAT_COMPL_FUNC
 	    buf->b_p_cfu = vim_strsave(p_cfu);
 	    COPY_OPT_SCTX(buf, BV_CFU);
-	    set_buflocal_cfu_callback(buf);
+	    مجموعه_buflocal_cfu_callback(buf);
 	    buf->b_p_ofu = vim_strsave(p_ofu);
 	    COPY_OPT_SCTX(buf, BV_OFU);
-	    set_buflocal_ofu_callback(buf);
-#endif
-#ifdef FEAT_EVAL
+	    مجموعه_buflocal_ofu_callback(buf);
+#پایان_اگر
+#اگر_تعریف_شده FEAT_EVAL
 	    buf->b_p_tfu = vim_strsave(p_tfu);
 	    COPY_OPT_SCTX(buf, BV_TFU);
-	    set_buflocal_tfu_callback(buf);
-#endif
+	    مجموعه_buflocal_tfu_callback(buf);
+#پایان_اگر
 	    buf->b_p_sts = p_sts;
 	    COPY_OPT_SCTX(buf, BV_STS);
 	    buf->b_p_sts_nopaste = p_sts_nopaste;
-#ifdef FEAT_VARTABS
+#اگر_تعریف_شده FEAT_VARTABS
 	    buf->b_p_vsts = vim_strsave(p_vsts);
 	    COPY_OPT_SCTX(buf, BV_VSTS);
-	    if (p_vsts && p_vsts != empty_option)
-		(void)tabstop_set(p_vsts, &buf->b_p_vsts_array);
-	    else
-		buf->b_p_vsts_array = NULL;
+	    إذا (p_vsts && p_vsts != خالی_option)
+		(فراغ)tabstop_مجموعه(p_vsts, &buf->b_p_vsts_array);
+	    وإلا
+		buf->b_p_vsts_array = عدم;
 	    buf->b_p_vsts_nopaste = p_vsts_nopaste
-				 ? vim_strsave(p_vsts_nopaste) : NULL;
-#endif
+				 ? vim_strsave(p_vsts_nopaste) : عدم;
+#پایان_اگر
 	    buf->b_p_sn = p_sn;
 	    COPY_OPT_SCTX(buf, BV_SN);
 	    buf->b_p_com = vim_strsave(p_com);
@@ -8046,59 +8046,59 @@ buf_copy_options(buf_T *buf, int flags)
 	    COPY_OPT_SCTX(buf, BV_LOP);
 
 	    // Don't copy 'filetype', it must be detected
-	    buf->b_p_ft = empty_option;
+	    buf->b_p_ft = خالی_option;
 	    buf->b_p_pi = p_pi;
 	    COPY_OPT_SCTX(buf, BV_PI);
 	    buf->b_p_cinw = vim_strsave(p_cinw);
 	    COPY_OPT_SCTX(buf, BV_CINW);
 	    buf->b_p_lisp = p_lisp;
 	    COPY_OPT_SCTX(buf, BV_LISP);
-#ifdef FEAT_SYN_HL
+#اگر_تعریف_شده FEAT_SYN_HL
 	    // Don't copy 'syntax', it must be set
-	    buf->b_p_syn = empty_option;
+	    buf->b_p_syn = خالی_option;
 	    buf->b_p_smc = p_smc;
 	    COPY_OPT_SCTX(buf, BV_SMC);
-	    buf->b_s.b_syn_isk = empty_option;
-#endif
-#ifdef FEAT_SPELL
+	    buf->b_s.b_syn_isk = خالی_option;
+#پایان_اگر
+#اگر_تعریف_شده FEAT_SPELL
 	    buf->b_s.b_p_spc = vim_strsave(p_spc);
 	    COPY_OPT_SCTX(buf, BV_SPC);
-	    (void)compile_cap_prog(&buf->b_s);
+	    (فراغ)compile_cap_prog(&buf->b_s);
 	    buf->b_s.b_p_spf = vim_strsave(p_spf);
 	    COPY_OPT_SCTX(buf, BV_SPF);
 	    buf->b_s.b_p_spl = vim_strsave(p_spl);
 	    COPY_OPT_SCTX(buf, BV_SPL);
 	    buf->b_s.b_p_spo = vim_strsave(p_spo);
 	    COPY_OPT_SCTX(buf, BV_SPO);
-#endif
-#if defined(FEAT_EVAL)
+#پایان_اگر
+#إذا defined(FEAT_EVAL)
 	    buf->b_p_inde = vim_strsave(p_inde);
 	    COPY_OPT_SCTX(buf, BV_INDE);
 	    COPY_OPT_INSECURE(buf->b_p_inde_flags, BV_INDE);
 	    buf->b_p_indk = vim_strsave(p_indk);
 	    COPY_OPT_SCTX(buf, BV_INDK);
-#endif
-	    buf->b_p_fp = empty_option;
-#if defined(FEAT_EVAL)
+#پایان_اگر
+	    buf->b_p_fp = خالی_option;
+#إذا defined(FEAT_EVAL)
 	    buf->b_p_fex = vim_strsave(p_fex);
 	    COPY_OPT_SCTX(buf, BV_FEX);
 	    COPY_OPT_INSECURE(buf->b_p_fex_flags, BV_FEX);
-#endif
-#ifdef FEAT_CRYPT
-	    buf->b_p_key = vim_strsave(p_key);
-	    COPY_OPT_SCTX(buf, BV_KEY);
-#endif
+#پایان_اگر
+#اگر_تعریف_شده FEAT_CRYPT
+	    buf->b_p_کلید = vim_strsave(p_کلید);
+	    COPY_OPT_SCTX(buf, BV_کلید);
+#پایان_اگر
 	    buf->b_p_sua = vim_strsave(p_sua);
 	    COPY_OPT_SCTX(buf, BV_SUA);
-#ifdef FEAT_KEYMAP
+#اگر_تعریف_شده FEAT_KEYMAP
 	    buf->b_p_keymap = vim_strsave(p_keymap);
 	    COPY_OPT_SCTX(buf, BV_KMAP);
 	    buf->b_kmap_state |= KEYMAP_INIT;
-#endif
-#ifdef FEAT_TERMINAL
+#پایان_اگر
+#اگر_تعریف_شده FEAT_TERMINAL
 	    buf->b_p_twsl = p_twsl;
 	    COPY_OPT_SCTX(buf, BV_TWSL);
-#endif
+#پایان_اگر
 	    // This isn't really an option, but copying the langmap and IME
 	    // state from the current buffer is better than resetting it.
 	    buf->b_p_iminsert = p_iminsert;
@@ -8110,92 +8110,92 @@ buf_copy_options(buf_T *buf, int flags)
 	    // are not copied, start using the global value
 	    buf->b_p_ac = -1;
 	    buf->b_p_ar = -1;
-#ifdef HAVE_FSYNC
+#اگر_تعریف_شده HAVE_FSYNC
 	    buf->b_p_fs = -1;
-#endif
+#پایان_اگر
 	    buf->b_p_ul = NO_LOCAL_UNDOLEVEL;
-	    buf->b_p_bkc = empty_option;
+	    buf->b_p_bkc = خالی_option;
 	    buf->b_bkc_flags = 0;
-#ifdef FEAT_QUICKFIX
-	    buf->b_p_gefm = empty_option;
-	    buf->b_p_gp = empty_option;
-	    buf->b_p_mp = empty_option;
-	    buf->b_p_efm = empty_option;
-#endif
-	    buf->b_p_ep = empty_option;
-#if defined(FEAT_EVAL)
-	    buf->b_p_ffu = empty_option;
-#endif
-	    buf->b_p_kp = empty_option;
-	    buf->b_p_path = empty_option;
-	    buf->b_p_tags = empty_option;
-	    buf->b_p_tc = empty_option;
+#اگر_تعریف_شده FEAT_QUICKFIX
+	    buf->b_p_gefm = خالی_option;
+	    buf->b_p_gp = خالی_option;
+	    buf->b_p_mp = خالی_option;
+	    buf->b_p_efm = خالی_option;
+#پایان_اگر
+	    buf->b_p_ep = خالی_option;
+#إذا defined(FEAT_EVAL)
+	    buf->b_p_ffu = خالی_option;
+#پایان_اگر
+	    buf->b_p_kp = خالی_option;
+	    buf->b_p_مسیر = خالی_option;
+	    buf->b_p_برچسبها = خالی_option;
+	    buf->b_p_tc = خالی_option;
 	    buf->b_tc_flags = 0;
-#ifdef FEAT_FIND_ID
-	    buf->b_p_def = empty_option;
-	    buf->b_p_inc = empty_option;
+#اگر_تعریف_شده FEAT_پیدا_کن_ID
+	    buf->b_p_def = خالی_option;
+	    buf->b_p_inc = خالی_option;
 # ifdef FEAT_EVAL
 	    buf->b_p_inex = vim_strsave(p_inex);
 	    COPY_OPT_SCTX(buf, BV_INEX);
 	    COPY_OPT_INSECURE(buf->b_p_inex_flags, BV_INEX);
 # endif
-#endif
-	    buf->b_p_cot = empty_option;
+#پایان_اگر
+	    buf->b_p_cot = خالی_option;
 	    buf->b_cot_flags = 0;
-	    buf->b_p_dict = empty_option;
-#ifdef FEAT_DIFF
-	    buf->b_p_dia = empty_option;
-#endif
-	    buf->b_p_tsr = empty_option;
-#ifdef FEAT_COMPL_FUNC
-	    buf->b_p_tsrfu = empty_option;
-#endif
+	    buf->b_p_dict = خالی_option;
+#اگر_تعریف_شده FEAT_DIFF
+	    buf->b_p_dia = خالی_option;
+#پایان_اگر
+	    buf->b_p_tsr = خالی_option;
+#اگر_تعریف_شده FEAT_COMPL_FUNC
+	    buf->b_p_tsrfu = خالی_option;
+#پایان_اگر
 	    buf->b_p_qe = vim_strsave(p_qe);
 	    COPY_OPT_SCTX(buf, BV_QE);
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
-	    buf->b_p_bexpr = empty_option;
-#endif
-#if defined(FEAT_CRYPT)
-	    buf->b_p_cm = empty_option;
-#endif
-#ifdef FEAT_PERSISTENT_UNDO
+#إذا defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+	    buf->b_p_bexpr = خالی_option;
+#پایان_اگر
+#إذا defined(FEAT_CRYPT)
+	    buf->b_p_cm = خالی_option;
+#پایان_اگر
+#اگر_تعریف_شده FEAT_PERSISTENT_UNDO
 	    buf->b_p_udf = p_udf;
 	    COPY_OPT_SCTX(buf, BV_UDF);
-#endif
-	    buf->b_p_lw = empty_option;
-	    buf->b_p_menc = empty_option;
+#پایان_اگر
+	    buf->b_p_lw = خالی_option;
+	    buf->b_p_menc = خالی_option;
 
 	    // Don't copy the options set by ex_help(), use the saved values,
 	    // when going from a help buffer to a non-help buffer.
 	    // Don't touch these at all when BCO_NOHELP is used and going from
 	    // or to a help buffer.
-	    if (dont_do_help)
+	    إذا (dont_do_help)
 	    {
 		buf->b_p_isk = save_p_isk;
-#ifdef FEAT_VARTABS
-		if (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
-		    (void)tabstop_set(p_vts, &buf->b_p_vts_array);
-		else
-		    buf->b_p_vts_array = NULL;
-#endif
+#اگر_تعریف_شده FEAT_VARTABS
+		إذا (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
+		    (فراغ)tabstop_مجموعه(p_vts, &buf->b_p_vts_array);
+		وإلا
+		    buf->b_p_vts_array = عدم;
+#پایان_اگر
 	    }
-	    else
+	    وإلا
 	    {
 		buf->b_p_isk = vim_strsave(p_isk);
 		COPY_OPT_SCTX(buf, BV_ISK);
 		did_isk = TRUE;
 		buf->b_p_ts = p_ts;
 		COPY_OPT_SCTX(buf, BV_TS);
-#ifdef FEAT_VARTABS
+#اگر_تعریف_شده FEAT_VARTABS
 		buf->b_p_vts = vim_strsave(p_vts);
 		COPY_OPT_SCTX(buf, BV_VTS);
-		if (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
-		    (void)tabstop_set(p_vts, &buf->b_p_vts_array);
-		else
-		    buf->b_p_vts_array = NULL;
-#endif
+		إذا (p_vts && *p_vts != NUL && !buf->b_p_vts_array)
+		    (فراغ)tabstop_مجموعه(p_vts, &buf->b_p_vts_array);
+		وإلا
+		    buf->b_p_vts_array = عدم;
+#پایان_اگر
 		buf->b_help = false;
-		if (buf->b_p_bt[0] == 'h')
+		إذا (buf->b_p_bt[0] == 'h')
 		    clear_string_option(&buf->b_p_bt);
 		buf->b_p_ma = p_ma;
 		COPY_OPT_SCTX(buf, BV_MA);
@@ -8204,35 +8204,35 @@ buf_copy_options(buf_T *buf, int flags)
 
 	// When the options should be copied (ignoring BCO_ALWAYS), set the
 	// flag that indicates that the options have been initialized.
-	if (should_copy)
+	إذا (should_copy)
 	    buf->b_p_initialized = true;
     }
 
     check_buf_options(buf);	    // make sure we don't have NULLs
-    if (did_isk)
-	(void)buf_init_chartab(buf, FALSE);
+    إذا (did_isk)
+	(فراغ)buf_init_chartab(buf, FALSE);
 }
 
 /*
  * Reset the 'modifiable' option and its default value.
  */
-    void
-reset_modifiable(void)
+    فراغ
+reset_modifiable(فراغ)
 {
-    int		opt_idx;
+    صحيح		opt_idx;
 
     curbuf->b_p_ma = FALSE;
     p_ma = FALSE;
     opt_idx = findoption((char_u *)"ma");
-    if (opt_idx >= 0)
+    إذا (opt_idx >= 0)
 	options[opt_idx].def_val[VI_DEFAULT] = FALSE;
 }
 
 /*
  * Set the global value for 'iminsert' to the local value.
  */
-    void
-set_iminsert_global(void)
+    فراغ
+مجموعه_iminsert_global(فراغ)
 {
     p_iminsert = curbuf->b_p_iminsert;
 }
@@ -8240,249 +8240,249 @@ set_iminsert_global(void)
 /*
  * Set the global value for 'imsearch' to the local value.
  */
-    void
-set_imsearch_global(void)
+    فراغ
+مجموعه_imsearch_global(فراغ)
 {
     p_imsearch = curbuf->b_p_imsearch;
 }
 
-static int expand_option_idx = -1;
-static int expand_option_start_col = 0;
-static char_u expand_option_name[5] = {'t', '_', NUL, NUL, NUL};
-static int expand_option_flags = 0;
-static int expand_option_append = FALSE;
+ساكن صحيح expand_option_idx = -1;
+ساكن صحيح expand_option_شروع_ستون = 0;
+ساكن char_u expand_option_name[5] = {'t', '_', NUL, NUL, NUL};
+ساكن صحيح expand_option_flags = 0;
+ساكن صحيح expand_option_append = FALSE;
 
-    void
-set_context_in_set_cmd(
+    فراغ
+مجموعه_context_درون_مجموعه_cmd(
     expand_T	*xp,
     char_u	*arg,
-    int		opt_flags)	// OPT_GLOBAL and/or OPT_LOCAL
+    صحيح		opt_flags)	// OPT_GLOBAL and/or OPT_LOCAL
 {
-    int		nextchar;
+    صحيح		nextchar;
     long_u	flags = 0;	// init for GCC
-    int		opt_idx = 0;	// init for GCC
+    صحيح		opt_idx = 0;	// init for GCC
     char_u	*p;
     char_u	*s;
-    int		is_term_option = FALSE;
-    int		key;
+    صحيح		is_جمله_option = FALSE;
+    صحيح		کلید;
     char_u	*argend;
 
     expand_option_flags = opt_flags;
 
     xp->xp_context = EXPAND_SETTINGS;
-    if (*arg == NUL)
+    إذا (*arg == NUL)
     {
-	xp->xp_pattern = arg;
-	return;
+	xp->xp_الگو = arg;
+	أرجع;
     }
     argend = arg + STRLEN(arg);
     p = argend - 1;
-    if (*p == ' ' && *(p - 1) != '\\')
+    إذا (*p == ' ' && *(p - 1) != '\\')
     {
-	xp->xp_pattern = p + 1;
-	return;
+	xp->xp_الگو = p + 1;
+	أرجع;
     }
-    while (p > arg)
+    طالما (p > arg)
     {
 	s = p;
 	// count number of backslashes before ' ' or ','
-	if (*p == ' ' || *p == ',')
+	إذا (*p == ' ' || *p == ',')
 	{
-	    while (s > arg && *(s - 1) == '\\')
+	    طالما (s > arg && *(s - 1) == '\\')
 		--s;
 	}
 	// break at a space with an even number of backslashes
-	if (*p == ' ' && ((p - s) & 1) == 0)
+	إذا (*p == ' ' && ((p - s) & 1) == 0)
 	{
 	    ++p;
-	    break;
+	    اكسر;
 	}
 	--p;
     }
-    if (STRNCMP(p, "no", 2) == 0 && STRNCMP(p, "novice", 6) != 0)
+    إذا (STRNCMP(p, "no", 2) == 0 && STRNCMP(p, "novice", 6) != 0)
     {
 	xp->xp_context = EXPAND_BOOL_SETTINGS;
-	xp->xp_prefix = XP_PREFIX_NO;
+	xp->xp_پیشوند = XP_پیشوند_NO;
 	p += 2;
     }
-    else if (STRNCMP(p, "inv", 3) == 0)
+    وإلا إذا (STRNCMP(p, "inv", 3) == 0)
     {
 	xp->xp_context = EXPAND_BOOL_SETTINGS;
-	xp->xp_prefix = XP_PREFIX_INV;
+	xp->xp_پیشوند = XP_پیشوند_INV;
 	p += 3;
     }
-    xp->xp_pattern = arg = p;
-    if (*arg == '<')
+    xp->xp_الگو = arg = p;
+    إذا (*arg == '<')
     {
-	while (*p != '>')
-	    if (*p++ == NUL)	    // expand terminal option name
-		return;
-	key = get_special_key_code(arg + 1);
-	if (key == 0)		    // unknown name
+	طالما (*p != '>')
+	    إذا (*p++ == NUL)	    // expand terminal option name
+		أرجع;
+	کلید = get_special_کلید_کد(arg + 1);
+	إذا (کلید == 0)		    // unknown name
 	{
 	    xp->xp_context = EXPAND_NOTHING;
-	    return;
+	    أرجع;
 	}
 	nextchar = *++p;
-	is_term_option = TRUE;
-	expand_option_name[2] = KEY2TERMCAP0(key);
-	expand_option_name[3] = KEY2TERMCAP1(key);
+	is_جمله_option = TRUE;
+	expand_option_name[2] = KEY2TERMCAP0(کلید);
+	expand_option_name[3] = KEY2TERMCAP1(کلید);
     }
-    else
+    وإلا
     {
-	if (p[0] == 't' && p[1] == '_')
+	إذا (p[0] == 't' && p[1] == '_')
 	{
 	    p += 2;
-	    if (*p != NUL)
+	    إذا (*p != NUL)
 		++p;
-	    if (*p == NUL)
-		return;		// expand option name
+	    إذا (*p == NUL)
+		أرجع;		// expand option name
 	    nextchar = *++p;
-	    is_term_option = TRUE;
+	    is_جمله_option = TRUE;
 	    expand_option_name[2] = p[-2];
 	    expand_option_name[3] = p[-1];
 	}
-	else
+	وإلا
 	{
 	    // Allow * wildcard
-	    while (ASCII_ISALNUM(*p) || *p == '_' || *p == '*')
+	    طالما (ASCII_ISALNUM(*p) || *p == '_' || *p == '*')
 		p++;
-	    if (*p == NUL)
-		return;
+	    إذا (*p == NUL)
+		أرجع;
 	    nextchar = *p;
 	    *p = NUL;
 	    opt_idx = findoption(arg);
 	    *p = nextchar;
-	    if (opt_idx == -1 || options[opt_idx].var == NULL)
+	    إذا (opt_idx == -1 || options[opt_idx].var == عدم)
 	    {
 		xp->xp_context = EXPAND_NOTHING;
-		return;
+		أرجع;
 	    }
 	    flags = options[opt_idx].flags;
-	    if (flags & P_BOOL)
+	    إذا (flags & P_BOOL)
 	    {
 		xp->xp_context = EXPAND_NOTHING;
-		return;
+		أرجع;
 	    }
 	}
     }
     // handle "-=" and "+="
     expand_option_append = FALSE;
-    int expand_option_subtract = FALSE;
-    if ((nextchar == '-' || nextchar == '+' || nextchar == '^') && p[1] == '=')
+    صحيح expand_option_تفریق = FALSE;
+    إذا ((nextchar == '-' || nextchar == '+' || nextchar == '^') && p[1] == '=')
     {
-	if (nextchar == '-')
-	    expand_option_subtract = TRUE;
-	if (nextchar == '+' || nextchar == '^')
+	إذا (nextchar == '-')
+	    expand_option_تفریق = TRUE;
+	إذا (nextchar == '+' || nextchar == '^')
 	    expand_option_append = TRUE;
 	++p;
 	nextchar = '=';
     }
-    if ((nextchar != '=' && nextchar != ':')
+    إذا ((nextchar != '=' && nextchar != ':')
 				    || xp->xp_context == EXPAND_BOOL_SETTINGS)
     {
 	xp->xp_context = EXPAND_UNSUCCESSFUL;
-	return;
+	أرجع;
     }
 
     // Below are for handling expanding a specific option's value after the '='
     // or ':'
 
-    if (is_term_option)
+    إذا (is_جمله_option)
 	expand_option_idx = -1;
-    else
+    وإلا
 	expand_option_idx = opt_idx;
 
-    if (!is_term_option)
+    إذا (!is_جمله_option)
     {
-	if (options[opt_idx].flags & P_NO_CMD_EXPAND)
+	إذا (options[opt_idx].flags & P_NO_CMD_EXPAND)
 	{
 	    xp->xp_context=EXPAND_UNSUCCESSFUL;
-	    return;
+	    أرجع;
 	}
     }
 
-    xp->xp_pattern = p + 1;
-    expand_option_start_col = (int)(p + 1 - xp->xp_line);
+    xp->xp_الگو = p + 1;
+    expand_option_شروع_ستون = (صحيح)(p + 1 - xp->xp_سطر);
 
     // Certain options currently have special case handling to reuse the
     // expansion logic with other commands.
-#ifdef FEAT_SYN_HL
-    if (options[opt_idx].var == (char_u *)&p_syn)
+#اگر_تعریف_شده FEAT_SYN_HL
+    إذا (options[opt_idx].var == (char_u *)&p_syn)
     {
 	xp->xp_context = EXPAND_OWNSYNTAX;
-	return;
+	أرجع;
     }
-#endif
-    if (options[opt_idx].var == (char_u *)&p_ft)
+#پایان_اگر
+    إذا (options[opt_idx].var == (char_u *)&p_ft)
     {
 	xp->xp_context = EXPAND_FILETYPE;
-	return;
+	أرجع;
     }
-#ifdef FEAT_KEYMAP
-    if (options[opt_idx].var == (char_u *)&p_keymap)
+#اگر_تعریف_شده FEAT_KEYMAP
+    إذا (options[opt_idx].var == (char_u *)&p_keymap)
     {
 	xp->xp_context = EXPAND_KEYMAP;
-	return;
+	أرجع;
     }
-#endif
+#پایان_اگر
 
     // Now pick. If the option has a custom expander, use that. Otherwise, just
     // fill with the existing option value.
-    if (expand_option_subtract)
+    إذا (expand_option_تفریق)
     {
-	xp->xp_context = EXPAND_SETTING_SUBTRACT;
-	return;
+	xp->xp_context = EXPAND_SETTING_تفریق;
+	أرجع;
     }
-    else if (expand_option_idx >= 0 &&
-	    options[expand_option_idx].opt_expand_cb != NULL)
+    وإلا إذا (expand_option_idx >= 0 &&
+	    options[expand_option_idx].opt_expand_cb != عدم)
     {
 	xp->xp_context = EXPAND_STRING_SETTING;
     }
-    else if (*xp->xp_pattern == NUL)
+    وإلا إذا (*xp->xp_الگو == NUL)
     {
 	xp->xp_context = EXPAND_OLD_SETTING;
-	return;
+	أرجع;
     }
-    else
+    وإلا
 	xp->xp_context = EXPAND_NOTHING;
 
-    if (is_term_option || (flags & P_NUM))
-	return;
+    إذا (is_جمله_option || (flags & P_رقم))
+	أرجع;
 
     // Only string options below
 
     // Options that have P_EXPAND are considered to all use file/dir expansion.
-    if (flags & P_EXPAND)
+    إذا (flags & P_EXPAND)
     {
 	p = options[opt_idx].var;
-	if (p == (char_u *)&p_bdir
+	إذا (p == (char_u *)&p_bdir
 		|| p == (char_u *)&p_dir
-		|| p == (char_u *)&p_path
+		|| p == (char_u *)&p_مسیر
 		|| p == (char_u *)&p_pp
 		|| p == (char_u *)&p_rtp
 		|| p == (char_u *)&p_cdpath
-#ifdef FEAT_SESSION
+#اگر_تعریف_شده FEAT_SESSION
 		|| p == (char_u *)&p_vdir
-#endif
+#پایان_اگر
 		)
 	{
 	    xp->xp_context = EXPAND_DIRECTORIES;
-	    if (p == (char_u *)&p_path || p == (char_u *)&p_cdpath)
+	    إذا (p == (char_u *)&p_مسیر || p == (char_u *)&p_cdpath)
 		xp->xp_backslash = XP_BS_THREE;
-	    else
+	    وإلا
 		xp->xp_backslash = XP_BS_ONE;
 	}
-	else
+	وإلا
 	{
 	    xp->xp_context = EXPAND_FILES;
 	    // for 'tags' need three backslashes for a space
-	    if (p == (char_u *)&p_tags)
+	    إذا (p == (char_u *)&p_برچسبها)
 		xp->xp_backslash = XP_BS_THREE;
-	    else
+	    وإلا
 		xp->xp_backslash = XP_BS_ONE;
 	}
-	if (flags & P_COMMA)
+	إذا (flags & P_COMMA)
 	    xp->xp_backslash |= XP_BS_COMMA;
     }
 
@@ -8491,27 +8491,27 @@ set_context_in_set_cmd(
     // pattern, while accounting for backslash-escaped space/commas/colons.
     // Triple-backslashed escaped file names (e.g. 'path') can also be
     // delimited by space.
-    if ((flags & P_EXPAND) || (flags & P_COMMA) || (flags & P_COLON))
+    إذا ((flags & P_EXPAND) || (flags & P_COMMA) || (flags & P_COLON))
     {
-	for (p = argend - 1; p >= xp->xp_pattern; --p)
+	لكل (p = argend - 1; p >= xp->xp_الگو; --p)
 	{
 	    // count number of backslashes before ' ' or ',' or ':'
-	    if (*p == ' ' || *p == ',' ||
+	    إذا (*p == ' ' || *p == ',' ||
 		    (*p == ':' && (flags & P_COLON)))
 	    {
 		s = p;
-		while (s > xp->xp_pattern && *(s - 1) == '\\')
+		طالما (s > xp->xp_الگو && *(s - 1) == '\\')
 		    --s;
-		if ((*p == ' ' && ((xp->xp_backslash & XP_BS_THREE) && (p - s) < 3))
-#if defined(BACKSLASH_IN_FILENAME)
+		إذا ((*p == ' ' && ((xp->xp_backslash & XP_BS_THREE) && (p - s) < 3))
+#إذا defined(BACKSLASH_درون_FILENAME)
 			|| (*p == ',' && (flags & P_COMMA) && (p - s) < 1)
-#else
+#وإلا
 			|| (*p == ',' && (flags & P_COMMA) && (p - s) < 2)
-#endif
+#پایان_اگر
 			|| (*p == ':' && (flags & P_COLON)))
 		{
-		    xp->xp_pattern = p + 1;
-		    break;
+		    xp->xp_الگو = p + 1;
+		    اكسر;
 		}
 	    }
 	}
@@ -8519,26 +8519,26 @@ set_context_in_set_cmd(
 
     // An option that is a list of single-character flags should always start
     // at the end as we don't complete words.
-    if (flags & P_FLAGLIST)
-	xp->xp_pattern = argend;
+    إذا (flags & P_FLAGLIST)
+	xp->xp_الگو = argend;
 
     // Some options can either be using file/dir expansions, or custom value
     // expansion depending on what the user typed. Unfortunately we have to
     // manually handle it here to make sure we have the correct xp_context set.
-#ifdef FEAT_SPELL
-    if (options[opt_idx].var == (char_u *)&p_sps)
+#اگر_تعریف_شده FEAT_SPELL
+    إذا (options[opt_idx].var == (char_u *)&p_sps)
     {
-	if (STRNCMP(xp->xp_pattern, "file:", 5) == 0)
+	إذا (STRNCMP(xp->xp_الگو, "file:", 5) == 0)
 	{
-	    xp->xp_pattern += 5;
-	    return;
+	    xp->xp_الگو += 5;
+	    أرجع;
 	}
-	else if (options[expand_option_idx].opt_expand_cb != NULL)
+	وإلا إذا (options[expand_option_idx].opt_expand_cb != عدم)
 	{
 	    xp->xp_context = EXPAND_STRING_SETTING;
 	}
     }
-#endif
+#پایان_اگر
 }
 
 /*
@@ -8557,135 +8557,135 @@ set_context_in_set_cmd(
  * If 'test_only' is FALSE and 'fuzzy' is TRUE and if 'str' fuzzy matches
  * 'fuzzystr', then stores the match details in fuzmatch[idx] and returns TRUE.
  */
-    static int
-match_str(
+    ساكن صحيح
+تطابق_str(
 	char_u		*str,
 	regmatch_T	*regmatch,
 	char_u		**matches,
-	int		idx,
-	int		test_only,
-	int		fuzzy,
+	صحيح		idx,
+	صحيح		test_only,
+	صحيح		fuzzy,
 	char_u		*fuzzystr,
 	fuzmatch_str_T  *fuzmatch)
 {
-    if (!fuzzy)
+    إذا (!fuzzy)
     {
-	if (vim_regexec(regmatch, str, (colnr_T)0))
+	إذا (vim_regexec(regmatch, str, (colnr_T)0))
 	{
-	    if (!test_only)
+	    إذا (!test_only)
 		matches[idx] = vim_strsave(str);
-	    return TRUE;
+	    أرجع TRUE;
 	}
     }
-    else
+    وإلا
     {
-	int score;
+	صحيح score;
 
-	score = fuzzy_match_str(str, fuzzystr);
-	if (score != FUZZY_SCORE_NONE)
+	score = fuzzy_تطابق_str(str, fuzzystr);
+	إذا (score != FUZZY_SCORE_NONE)
 	{
-	    if (!test_only)
+	    إذا (!test_only)
 	    {
 		fuzmatch[idx].idx = idx;
 		fuzmatch[idx].str = vim_strsave(str);
 		fuzmatch[idx].score = score;
 	    }
 
-	    return TRUE;
+	    أرجع TRUE;
 	}
     }
 
-    return FALSE;
+    أرجع FALSE;
 }
 
-    int
+    صحيح
 ExpandSettings(
     expand_T	*xp,
     regmatch_T	*regmatch,
     char_u	*fuzzystr,
-    int		*numMatches,
+    صحيح		*رقم_Matches,
     char_u	***matches,
-    int		can_fuzzy)
+    صحيح		can_fuzzy)
 {
-    int		num_normal = 0;	    // Nr of matching non-term-code settings
-    int		num_term = 0;	    // Nr of matching terminal code settings
-    int		opt_idx;
-    int		match;
-    int		count = 0;
+    صحيح		رقم_نرمال = 0;	    // Nr of matching non-term-code settings
+    صحيح		رقم_جمله = 0;	    // Nr of matching terminal code settings
+    صحيح		opt_idx;
+    صحيح		تطابق;
+    صحيح		شمار = 0;
     char_u	*str;
-    int		loop;
-    int		is_term_opt;
-    char_u	name_buf[MAX_KEY_NAME_LEN];
-    static char *(names[]) = {"all", "termcap"};
-    int		ic = regmatch->rm_ic;	// remember the ignore-case flag
-    int		fuzzy;
-    fuzmatch_str_T  *fuzmatch = NULL;
+    صحيح		loop;
+    صحيح		is_جمله_opt;
+    char_u	name_buf[MAX_کلید_NAME_LEN];
+    ساكن حرف *(نامها[]) = {"all", "termcap"};
+    صحيح		ic = regmatch->rm_ic;	// remember the ignore-case flag
+    صحيح		fuzzy;
+    fuzmatch_str_T  *fuzmatch = عدم;
 
     fuzzy = can_fuzzy && cmdline_fuzzy_complete(fuzzystr);
 
     // do this loop twice:
     // loop == 0: count the number of matching options
     // loop == 1: copy the matching options into allocated memory
-    for (loop = 0; loop <= 1; ++loop)
+    لكل (loop = 0; loop <= 1; ++loop)
     {
 	regmatch->rm_ic = ic;
-	if (xp->xp_context != EXPAND_BOOL_SETTINGS)
+	إذا (xp->xp_context != EXPAND_BOOL_SETTINGS)
 	{
-	    for (match = 0; match < (int)ARRAY_LENGTH(names); ++match)
+	    لكل (تطابق = 0; تطابق < (صحيح)ARRAY_درازی(نامها); ++تطابق)
 	    {
-		if (match_str((char_u *)names[match], regmatch, *matches,
-			    count, (loop == 0), fuzzy, fuzzystr, fuzmatch))
+		إذا (تطابق_str((char_u *)نامها[تطابق], regmatch, *matches,
+			    شمار, (loop == 0), fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
-			num_normal++;
-		    else
-			count++;
+		    إذا (loop == 0)
+			رقم_نرمال++;
+		    وإلا
+			شمار++;
 		}
 	    }
 	}
-	for (opt_idx = 0; (str = (char_u *)options[opt_idx].fullname) != NULL;
+	لكل (opt_idx = 0; (str = (char_u *)options[opt_idx].fullname) != عدم;
 								    opt_idx++)
 	{
-	    if (options[opt_idx].var == NULL)
-		continue;
-	    if (xp->xp_context == EXPAND_BOOL_SETTINGS
+	    إذا (options[opt_idx].var == عدم)
+		استمر;
+	    إذا (xp->xp_context == EXPAND_BOOL_SETTINGS
 		    && !(options[opt_idx].flags & P_BOOL))
-		continue;
-	    is_term_opt = istermoption_idx(opt_idx);
-	    if (is_term_opt && num_normal > 0)
-		continue;
+		استمر;
+	    is_جمله_opt = istermoption_idx(opt_idx);
+	    إذا (is_جمله_opt && رقم_نرمال > 0)
+		استمر;
 
-	    if (match_str(str, regmatch, *matches, count, (loop == 0),
+	    إذا (تطابق_str(str, regmatch, *matches, شمار, (loop == 0),
 						fuzzy, fuzzystr, fuzmatch))
 	    {
-		if (loop == 0)
+		إذا (loop == 0)
 		{
-		    if (is_term_opt)
-			num_term++;
-		    else
-			num_normal++;
+		    إذا (is_جمله_opt)
+			رقم_جمله++;
+		    وإلا
+			رقم_نرمال++;
 		}
-		else
-		    count++;
+		وإلا
+		    شمار++;
 	    }
-	    else if (!fuzzy && options[opt_idx].shortname != NULL
+	    وإلا إذا (!fuzzy && options[opt_idx].shortname != عدم
 			&& vim_regexec(regmatch,
 			     (char_u *)options[opt_idx].shortname, (colnr_T)0))
 	    {
 		// Compare against the abbreviated option name (for regular
 		// expression match). Fuzzy matching (previous if) already
 		// matches against both the expanded and abbreviated names.
-		if (loop == 0)
+		إذا (loop == 0)
 		{
-		    if (is_term_opt)
-			num_term++;
-		    else
-			num_normal++;
+		    إذا (is_جمله_opt)
+			رقم_جمله++;
+		    وإلا
+			رقم_نرمال++;
 		}
-		else
-		    (*matches)[count++] = vim_strsave(str);
+		وإلا
+		    (*matches)[شمار++] = vim_strsave(str);
 	    }
-	    else if (is_term_opt)
+	    وإلا إذا (is_جمله_opt)
 	    {
 		name_buf[0] = '<';
 		name_buf[1] = 't';
@@ -8695,24 +8695,24 @@ ExpandSettings(
 		name_buf[5] = '>';
 		name_buf[6] = NUL;
 
-		if (match_str(name_buf, regmatch, *matches, count, (loop == 0),
+		إذا (تطابق_str(name_buf, regmatch, *matches, شمار, (loop == 0),
 			    fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
-			num_term++;
-		    else
-			count++;
+		    إذا (loop == 0)
+			رقم_جمله++;
+		    وإلا
+			شمار++;
 		}
 	    }
 	}
 
 	// Check terminal key codes, these are not in the option table
-	if (xp->xp_context != EXPAND_BOOL_SETTINGS  && num_normal == 0)
+	إذا (xp->xp_context != EXPAND_BOOL_SETTINGS  && رقم_نرمال == 0)
 	{
-	    for (opt_idx = 0; (str = get_termcode(opt_idx)) != NULL; opt_idx++)
+	    لكل (opt_idx = 0; (str = get_termcode(opt_idx)) != عدم; opt_idx++)
 	    {
-		if (!SAFE_isprint(str[0]) || !SAFE_isprint(str[1]))
-		    continue;
+		إذا (!امن_isprint(str[0]) || !امن_isprint(str[1]))
+		    استمر;
 
 		name_buf[0] = 't';
 		name_buf[1] = '_';
@@ -8720,15 +8720,15 @@ ExpandSettings(
 		name_buf[3] = str[1];
 		name_buf[4] = NUL;
 
-		if (match_str(name_buf, regmatch, *matches, count,
+		إذا (تطابق_str(name_buf, regmatch, *matches, شمار,
 				       (loop == 0), fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
-			num_term++;
-		    else
-			count++;
+		    إذا (loop == 0)
+			رقم_جمله++;
+		    وإلا
+			شمار++;
 		}
-		else
+		وإلا
 		{
 		    name_buf[0] = '<';
 		    name_buf[1] = 't';
@@ -8738,75 +8738,75 @@ ExpandSettings(
 		    name_buf[5] = '>';
 		    name_buf[6] = NUL;
 
-		    if (match_str(name_buf, regmatch, *matches, count,
+		    إذا (تطابق_str(name_buf, regmatch, *matches, شمار,
 					    (loop == 0), fuzzy, fuzzystr,
 					    fuzmatch))
 		    {
-			if (loop == 0)
-			    num_term++;
-			else
-			    count++;
+			إذا (loop == 0)
+			    رقم_جمله++;
+			وإلا
+			    شمار++;
 		    }
 		}
 	    }
 
 	    // Check special key names.
 	    regmatch->rm_ic = TRUE;		// ignore case here
-	    for (opt_idx = 0; (str = get_key_name(opt_idx)) != NULL; opt_idx++)
+	    لكل (opt_idx = 0; (str = get_کلید_name(opt_idx)) != عدم; opt_idx++)
 	    {
 		name_buf[0] = '<';
 		STRCPY(name_buf + 1, str);
 		STRCAT(name_buf, ">");
 
-		if (match_str(name_buf, regmatch, *matches, count, (loop == 0),
+		إذا (تطابق_str(name_buf, regmatch, *matches, شمار, (loop == 0),
 			    fuzzy, fuzzystr, fuzmatch))
 		{
-		    if (loop == 0)
-			num_term++;
-		    else
-			count++;
+		    إذا (loop == 0)
+			رقم_جمله++;
+		    وإلا
+			شمار++;
 		}
 	    }
 	}
-	if (loop == 0)
+	إذا (loop == 0)
 	{
-	    if (num_normal > 0)
-		*numMatches = num_normal;
-	    else if (num_term > 0)
-		*numMatches = num_term;
-	    else
-		return OK;
-	    if (!fuzzy)
+	    إذا (رقم_نرمال > 0)
+		*رقم_Matches = رقم_نرمال;
+	    وإلا إذا (رقم_جمله > 0)
+		*رقم_Matches = رقم_جمله;
+	    وإلا
+		أرجع OK;
+	    إذا (!fuzzy)
 	    {
-		*matches = ALLOC_MULT(char_u *, *numMatches);
-		if (*matches == NULL)
+		*matches = ALLOC_MULT(char_u *, *رقم_Matches);
+		إذا (*matches == عدم)
 		{
 		    *matches = (char_u **)"";
-		    return FAIL;
+		    أرجع FAIL;
 		}
 	    }
-	    else
+	    وإلا
 	    {
-		fuzmatch = ALLOC_MULT(fuzmatch_str_T, *numMatches);
-		if (fuzmatch == NULL)
+		fuzmatch = ALLOC_MULT(fuzmatch_str_T, *رقم_Matches);
+		إذا (fuzmatch == عدم)
 		{
 		    *matches = (char_u **)"";
-		    return FAIL;
+		    أرجع FAIL;
 		}
 	    }
 	}
     }
 
-    if (fuzzy &&
-	fuzzymatches_to_strmatches(fuzmatch, matches, count, FALSE) == FAIL)
-	return FAIL;
+    إذا (fuzzy &&
+	fuzzymatches_مقصد_strmatches(fuzmatch, matches, شمار, FALSE) == FAIL)
+	أرجع FAIL;
 
-    return OK;
+    أرجع OK;
 }
 
 // Escape an option value that can be used on the command-line with :set.
 // Caller needs to free the returned string, unless NULL is returned.
-    static char_u*
+    ساكن char_u*
 escape_option_str_cmdline(char_u *var)
 {
     char_u *buf;
@@ -8814,97 +8814,97 @@ escape_option_str_cmdline(char_u *var)
     // A backslash is required before some characters.  This is the reverse of
     // what happens in do_set().
     buf = vim_strsave_escaped(var, escape_chars);
-    if (buf == NULL)
-	return NULL;
+    إذا (buf == عدم)
+	أرجع عدم;
 
-#ifdef BACKSLASH_IN_FILENAME
+#اگر_تعریف_شده BACKSLASH_درون_FILENAME
     // For MS-Windows et al. we don't double backslashes at the start and
     // before a file name character.
     // The reverse is found at stropt_copy_value().
-    for (var = buf; *var != NUL; MB_PTR_ADV(var))
-	if (var[0] == '\\' && var[1] == '\\'
+    لكل (var = buf; *var != NUL; MB_PTR_ADV(var))
+	إذا (var[0] == '\\' && var[1] == '\\'
 		&& expand_option_idx >= 0
 		&& (options[expand_option_idx].flags & P_EXPAND)
 		&& vim_isfilec(var[2])
 		&& (var[2] != '\\' || (var == buf && var[4] != '\\')))
 	    STRMOVE(var, var + 1);
-#endif
-    return buf;
+#پایان_اگر
+    أرجع buf;
 }
 
 /*
  * Expansion handler for :set= when we just want to fill in with the existing value.
  */
-    int
-ExpandOldSetting(int *numMatches, char_u ***matches)
+    صحيح
+ExpandOldSetting(صحيح *رقم_Matches, char_u ***matches)
 {
-    char_u  *var = NULL;	// init for GCC
+    char_u  *var = عدم;	// init for GCC
     char_u  *buf;
 
-    *numMatches = 0;
+    *رقم_Matches = 0;
     *matches = ALLOC_MULT(char_u *, 1);
-    if (*matches == NULL)
-	return FAIL;
+    إذا (*matches == عدم)
+	أرجع FAIL;
 
     // For a terminal key code expand_option_idx is < 0.
-    if (expand_option_idx < 0)
+    إذا (expand_option_idx < 0)
     {
-	var = find_termcode(expand_option_name + 2);
-	if (var == NULL)
+	var = پیدا_کن_termcode(expand_option_name + 2);
+	إذا (var == عدم)
 	    expand_option_idx = findoption(expand_option_name);
     }
 
-    if (expand_option_idx >= 0)
+    إذا (expand_option_idx >= 0)
     {
 	// put string of option value in NameBuff
 	option_value2string(&options[expand_option_idx], expand_option_flags);
 	var = NameBuff;
     }
-    else if (var == NULL)
+    وإلا إذا (var == عدم)
 	var = (char_u *)"";
 
     buf = escape_option_str_cmdline(var);
-    if (buf == NULL)
+    إذا (buf == عدم)
     {
 	VIM_CLEAR(*matches);
-	return FAIL;
+	أرجع FAIL;
     }
 
     (*matches)[0] = buf;
-    *numMatches = 1;
-    return OK;
+    *رقم_Matches = 1;
+    أرجع OK;
 }
 
 /*
  * Expansion handler for :set=/:set+= when the option has a custom expansion handler.
  */
-    int
+    صحيح
 ExpandStringSetting(
     expand_T	*xp,
     regmatch_T	*regmatch,
-    int		*numMatches,
+    صحيح		*رقم_Matches,
     char_u	***matches)
 {
-    char_u  *var = NULL;	// init for GCC
+    char_u  *var = عدم;	// init for GCC
     char_u  *buf;
 
-    if (expand_option_idx < 0 ||
-	    options[expand_option_idx].opt_expand_cb == NULL)
+    إذا (expand_option_idx < 0 ||
+	    options[expand_option_idx].opt_expand_cb == عدم)
     {
 	// Not supposed to reach this. This function is only for options with
 	// custom expansion callbacks.
-	return FAIL;
+	أرجع FAIL;
     }
 
-    optexpand_T args;
-    args.oe_varp = get_varp_scope(&options[expand_option_idx], expand_option_flags);
-    args.oe_append = expand_option_append;
-    args.oe_regmatch = regmatch;
-    args.oe_xp = xp;
-    args.oe_set_arg = xp->xp_line + expand_option_start_col;
-    args.oe_include_orig_val =
+    optexpand_T آرگومانها;
+    آرگومانها.oe_varp = get_varp_scope(&options[expand_option_idx], expand_option_flags);
+    آرگومانها.oe_append = expand_option_append;
+    آرگومانها.oe_regmatch = regmatch;
+    آرگومانها.oe_xp = xp;
+    آرگومانها.oe_مجموعه_arg = xp->xp_سطر + expand_option_شروع_ستون;
+    آرگومانها.oe_include_orig_val =
 	!expand_option_append &&
-	(*args.oe_set_arg == NUL);
+	(*آرگومانها.oe_مجموعه_arg == NUL);
 
     // Retrieve the existing value, but escape it as a reverse of setting it.
     // We technically only need to do this when oe_append or
@@ -8912,39 +8912,39 @@ ExpandStringSetting(
     option_value2string(&options[expand_option_idx], expand_option_flags);
     var = NameBuff;
     buf = escape_option_str_cmdline(var);
-    if (buf == NULL)
-	return FAIL;
+    إذا (buf == عدم)
+	أرجع FAIL;
 
-    args.oe_opt_value = buf;
+    آرگومانها.oe_opt_مقدار = buf;
 
-    int num_ret = options[expand_option_idx].opt_expand_cb(&args, numMatches, matches);
+    صحيح رقم_ret = options[expand_option_idx].opt_expand_cb(&آرگومانها, رقم_Matches, matches);
 
     vim_free(buf);
-    return num_ret;
+    أرجع رقم_ret;
 }
 
 /*
  * Expansion handler for :set-=
  */
-    int
-ExpandSettingSubtract(
+    صحيح
+Expand_Setting_تفریق(
     expand_T	*xp,
     regmatch_T	*regmatch,
-    int		*numMatches,
+    صحيح		*رقم_Matches,
     char_u	***matches)
 {
-    if (expand_option_idx < 0)
+    إذا (expand_option_idx < 0)
 	// term option
-	return ExpandOldSetting(numMatches, matches);
+	أرجع ExpandOldSetting(رقم_Matches, matches);
 
     char_u *option_val = *(char_u**)get_option_varp_scope(
 	expand_option_idx, expand_option_flags);
 
     long_u option_flags =  options[expand_option_idx].flags;
 
-    if (option_flags & P_NUM)
-	return ExpandOldSetting(numMatches, matches);
-    else if (option_flags & P_COMMA)
+    إذا (option_flags & P_رقم)
+	أرجع ExpandOldSetting(رقم_Matches, matches);
+    وإلا إذا (option_flags & P_COMMA)
     {
 	// Split the option by comma, then present each option to the user if
 	// it matches the pattern.
@@ -8952,161 +8952,161 @@ ExpandSettingSubtract(
 	// P_COMMA and P_FLAGLIST.
 	garray_T    ga;
 
-	char_u	    *item;
+	char_u	    *قلم;
 	char_u	    *option_copy;
-	char_u	    *next_val;
+	char_u	    *بعدی_val;
 	char_u	    *comma;
 
-	if (*option_val == NUL)
-	    return FAIL;
+	إذا (*option_val == NUL)
+	    أرجع FAIL;
 
 	// Make a copy as we need to inject null characters destructively.
 	option_copy = vim_strsave(option_val);
-	if (option_copy == NULL)
-	    return FAIL;
-	next_val = option_copy;
+	إذا (option_copy == عدم)
+	    أرجع FAIL;
+	بعدی_val = option_copy;
 
-	ga_init2(&ga, sizeof(char_u *), 10);
+	ga_init2(&ga, حجم(char_u *), 10);
 
-	do
+	افعل
 	{
-	    item = next_val;
-	    comma = vim_strchr(next_val, ',');
-	    while (comma != NULL && comma != next_val && *(comma - 1) == '\\')
+	    قلم = بعدی_val;
+	    comma = vim_strchr(بعدی_val, ',');
+	    طالما (comma != عدم && comma != بعدی_val && *(comma - 1) == '\\')
 	    {
 		// "\," is interpreted as a literal comma rather than option
 		// separator when reading options in copy_option_part(). Skip
 		// it.
 		comma = vim_strchr(comma + 1, ',');
 	    }
-	    if (comma != NULL)
+	    إذا (comma != عدم)
 	    {
 		*comma = NUL; // null-terminate this value, required by later functions
-		next_val = comma + 1;
+		بعدی_val = comma + 1;
 	    }
-	    else
-		next_val = NULL;
+	    وإلا
+		بعدی_val = عدم;
 
-	    if (*item == NUL)
+	    إذا (*قلم == NUL)
 		// empty value, don't add to list
-		continue;
+		استمر;
 
-	    if (!vim_regexec(regmatch, item, (colnr_T)0))
-		continue;
+	    إذا (!vim_regexec(regmatch, قلم, (colnr_T)0))
+		استمر;
 
-	    char_u *buf = escape_option_str_cmdline(item);
-	    if (buf == NULL)
+	    char_u *buf = escape_option_str_cmdline(قلم);
+	    إذا (buf == عدم)
 	    {
 		vim_free(option_copy);
-		ga_clear_strings(&ga);
-		return FAIL;
+		ga_clear_رشتهها(&ga);
+		أرجع FAIL;
 	    }
-	    if (ga_add_string(&ga, buf) != OK)
+	    إذا (ga_جمع_کن_string(&ga, buf) != OK)
 	    {
 		vim_free(buf);
-		break;
+		اكسر;
 	    }
-	} while (next_val != NULL);
+	} طالما (بعدی_val != عدم);
 
 	vim_free(option_copy);
 
-	*matches = ga.ga_data;
-	*numMatches = ga.ga_len;
-	return OK;
+	*matches = ga.ga_داده;
+	*رقم_Matches = ga.ga_len;
+	أرجع OK;
     }
-    else if (option_flags & P_FLAGLIST)
+    وإلا إذا (option_flags & P_FLAGLIST)
     {
 	// Only present the flags that are set on the option as the other flags
 	// are not meaningful to do set-= on.
 
-	if (*xp->xp_pattern != NUL)
+	إذا (*xp->xp_الگو != NUL)
 	{
 	    // Don't suggest anything if cmdline is non-empty. Vim's set-=
 	    // behavior requires consecutive strings and it's usually
 	    // unintuitive to users if they try to subtract multiple flags at
 	    // once.
-	    return FAIL;
+	    أرجع FAIL;
 	}
 
-	size_t num_flags = STRLEN(option_val);
-	if (num_flags == 0)
-	    return FAIL;
+	size_t رقم_flags = STRLEN(option_val);
+	إذا (رقم_flags == 0)
+	    أرجع FAIL;
 
-	*matches = ALLOC_MULT(char_u *, num_flags + 1);
-	if (*matches == NULL)
-	    return FAIL;
+	*matches = ALLOC_MULT(char_u *, رقم_flags + 1);
+	إذا (*matches == عدم)
+	    أرجع FAIL;
 
-	int count = 0;
+	صحيح شمار = 0;
 	char_u *p;
 
-	p = vim_strnsave(option_val, num_flags);
-	if (p == NULL)
+	p = vim_strnsave(option_val, رقم_flags);
+	إذا (p == عدم)
 	{
 	    VIM_CLEAR(*matches);
-	    return FAIL;
+	    أرجع FAIL;
 	}
-	(*matches)[count++] = p;
+	(*matches)[شمار++] = p;
 
-	if (num_flags > 1)
+	إذا (رقم_flags > 1)
 	{
 	    // If more than one flags, split the flags up and expose each
 	    // character as individual choice.
-	    for (char_u *flag = option_val; *flag != NUL; flag++)
+	    لكل (char_u *flag = option_val; *flag != NUL; flag++)
 	    {
 		p = vim_strnsave(flag, 1);
-		if (p == NULL)
-		    break;
-		(*matches)[count++] = p;
+		إذا (p == عدم)
+		    اكسر;
+		(*matches)[شمار++] = p;
 	    }
 	}
 
-	*numMatches = count;
-	return OK;
+	*رقم_Matches = شمار;
+	أرجع OK;
     }
 
-    return ExpandOldSetting(numMatches, matches);
+    أرجع ExpandOldSetting(رقم_Matches, matches);
 }
 
 /*
  * Get the value for the numeric or string option *opp in a nice format into
  * NameBuff[].  Must not be called with a hidden option!
  */
-    static void
+    ساكن فراغ
 option_value2string(
-    struct vimoption	*opp,
-    int			scope)	// OPT_GLOBAL and/or OPT_LOCAL
+    بنية vimoption	*opp,
+    صحيح			scope)	// OPT_GLOBAL and/or OPT_LOCAL
 {
     char_u	*varp;
 
     varp = get_varp_scope(opp, scope);
 
-    if (opp->flags & P_NUM)
+    إذا (opp->flags & P_رقم)
     {
-	long wc = 0;
+	دراز wc = 0;
 
-	if (wc_use_keyname(varp, &wc))
-	    STRCPY(NameBuff, get_special_key_name((int)wc, 0));
-	else if (wc != 0)
-	    STRCPY(NameBuff, transchar((int)wc));
-	else
-	    sprintf((char *)NameBuff, "%ld", *(long *)varp);
+	إذا (wc_use_keyname(varp, &wc))
+	    STRCPY(NameBuff, get_special_کلید_name((صحيح)wc, 0));
+	وإلا إذا (wc != 0)
+	    STRCPY(NameBuff, transchar((صحيح)wc));
+	وإلا
+	    sprintf((حرف *)NameBuff, "%ld", *(دراز *)varp);
     }
-    else    // P_STRING
+    وإلا    // P_STRING
     {
 	varp = *(char_u **)(varp);
-	if (varp == NULL)		    // just in case
+	إذا (varp == عدم)		    // just in case
 	    NameBuff[0] = NUL;
-#ifdef FEAT_CRYPT
+#اگر_تعریف_شده FEAT_CRYPT
 	// don't show the actual value of 'key', only that it's set
-	else if (opp->var == (char_u *)&p_key && *varp)
+	وإلا إذا (opp->var == (char_u *)&p_کلید && *varp)
 	    STRCPY(NameBuff, "*****");
-#endif
-	else if (opp->flags & P_EXPAND)
-	    home_replace(NULL, varp, NameBuff, MAXPATHL, FALSE);
+#پایان_اگر
+	وإلا إذا (opp->flags & P_EXPAND)
+	    home_replace(عدم, varp, NameBuff, MAXPATHL, FALSE);
 	// Translate 'pastetoggle' into special key names
-	else if ((char_u **)opp->var == &p_pt)
+	وإلا إذا ((char_u **)opp->var == &p_pt)
 	    str2specialbuf(p_pt, NameBuff, MAXPATHL);
-	else
+	وإلا
 	    vim_strncpy(NameBuff, varp, MAXPATHL - 1);
     }
 }
@@ -9116,29 +9116,29 @@ option_value2string(
  * printed as a keyname.
  * "*wcp" is set to the value of the option if it's 'wildchar' or 'wildcharm'.
  */
-    static int
-wc_use_keyname(char_u *varp, long *wcp)
+    ساكن صحيح
+wc_use_keyname(char_u *varp, دراز *wcp)
 {
-    if (((long *)varp == &p_wc) || ((long *)varp == &p_wcm))
+    إذا (((دراز *)varp == &p_wc) || ((دراز *)varp == &p_wcm))
     {
-	*wcp = *(long *)varp;
-	if (IS_SPECIAL(*wcp) || find_special_key_in_table((int)*wcp) >= 0)
-	    return TRUE;
+	*wcp = *(دراز *)varp;
+	إذا (IS_SPECIAL(*wcp) || پیدا_کن_special_کلید_درون_جدول((صحيح)*wcp) >= 0)
+	    أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
  * Return TRUE if "x" is present in 'shortmess' option, or
  * 'shortmess' contains 'a' and "x" is present in SHM_A.
  */
-    int
-shortmess(int x)
+    صحيح
+shortmess(صحيح x)
 {
-    return p_shm != NULL &&
-	    (   vim_strchr(p_shm, x) != NULL
-	    || (vim_strchr(p_shm, 'a') != NULL
-		&& vim_strchr((char_u *)SHM_A, x) != NULL));
+    أرجع p_shm != عدم &&
+	    (   vim_strchr(p_shm, x) != عدم
+	    || (vim_strchr(p_shm, 'a') != عدم
+		&& vim_strchr((char_u *)SHM_A, x) != عدم));
 }
 
 /*
@@ -9149,31 +9149,31 @@ shortmess(int x)
  * Don't do this if the 'compatible' option has been set or reset before.
  * When "fname" is not NULL, use it to set $"envname" when it wasn't set yet.
  */
-    void
-vimrc_found(char_u *fname, char_u *envname)
+    فراغ
+vimrc_یافت(char_u *fname, char_u *envname)
 {
-    int		opt_idx;
-    int		dofree = FALSE;
+    صحيح		opt_idx;
+    صحيح		dofree = FALSE;
     char_u	*p;
 
-    if (!option_was_set((char_u *)"cp"))
+    إذا (!option_was_مجموعه((char_u *)"cp"))
     {
 	p_cp = FALSE;
-	for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
-	    if (!(options[opt_idx].flags & (P_WAS_SET|P_VI_DEF)))
-		set_option_default(opt_idx, OPT_FREE, FALSE);
+	لكل (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+	    إذا (!(options[opt_idx].flags & (P_WAS_مجموعه|P_VI_DEF)))
+		مجموعه_option_default(opt_idx, OPT_FREE, FALSE);
 	didset_options();
 	didset_options2();
     }
 
-    if (fname != NULL)
+    إذا (fname != عدم)
     {
 	p = vim_getenv(envname, &dofree);
-	if (p == NULL)
+	إذا (p == عدم)
 	{
 	    // Set $MYVIMRC to the first vimrc file found.
-	    p = FullName_save(fname, FALSE);
-	    if (p != NULL)
+	    p = پر_Name_save(fname, FALSE);
+	    إذا (p != عدم)
 	    {
 		vim_setenv(envname, p);
 		vim_free(p);
@@ -9181,7 +9181,7 @@ vimrc_found(char_u *fname, char_u *envname)
 	    // Set $MYVIMDIR
 	    export_myvimdir();
 	}
-	else if (dofree)
+	وإلا إذا (dofree)
 	    vim_free(p);
     }
 }
@@ -9189,51 +9189,51 @@ vimrc_found(char_u *fname, char_u *envname)
 /*
  * Set 'compatible' on or off.  Called for "-C" and "-N" command line arg.
  */
-    void
-change_compatible(int on)
+    فراغ
+change_compatible(صحيح on)
 {
-    int	    opt_idx;
+    صحيح	    opt_idx;
 
-    if (p_cp != on)
+    إذا (p_cp != on)
     {
 	p_cp = on;
-	compatible_set();
+	compatible_مجموعه();
     }
     opt_idx = findoption((char_u *)"cp");
-    if (opt_idx >= 0)
-	options[opt_idx].flags |= P_WAS_SET;
+    إذا (opt_idx >= 0)
+	options[opt_idx].flags |= P_WAS_مجموعه;
 }
 
 /*
  * Return TRUE when option "name" has been set.
  * Only works correctly for global options.
  */
-    int
-option_was_set(char_u *name)
+    صحيح
+option_was_مجموعه(char_u *name)
 {
-    int idx;
+    صحيح idx;
 
     idx = findoption(name);
-    if (idx < 0)	// unknown option
-	return FALSE;
-    if (options[idx].flags & P_WAS_SET)
-	return TRUE;
-    return FALSE;
+    إذا (idx < 0)	// unknown option
+	أرجع FALSE;
+    إذا (options[idx].flags & P_WAS_مجموعه)
+	أرجع TRUE;
+    أرجع FALSE;
 }
 
 /*
  * Reset the flag indicating option "name" was set.
  */
-    int
-reset_option_was_set(char_u *name)
+    صحيح
+reset_option_was_مجموعه(char_u *name)
 {
-    int idx = findoption(name);
+    صحيح idx = findoption(name);
 
-    if (idx < 0)
-	return FAIL;
+    إذا (idx < 0)
+	أرجع FAIL;
 
-    options[idx].flags &= ~P_WAS_SET;
-    return OK;
+    options[idx].flags &= ~P_WAS_مجموعه;
+    أرجع OK;
 }
 
 /*
@@ -9244,15 +9244,15 @@ reset_option_was_set(char_u *name)
  * When 'compatible' is unset: Set all options that have a different default
  * for Vim (without the P_VI_DEF flag) to that default.
  */
-    static void
-compatible_set(void)
+    ساكن فراغ
+compatible_مجموعه(فراغ)
 {
-    int	    opt_idx;
+    صحيح	    opt_idx;
 
-    for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
-	if (	   ((options[opt_idx].flags & P_VIM) && p_cp)
+    لكل (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+	إذا (	   ((options[opt_idx].flags & P_VIM) && p_cp)
 		|| (!(options[opt_idx].flags & P_VI_DEF) && !p_cp))
-	    set_option_default(opt_idx, OPT_FREE, p_cp);
+	    مجموعه_option_default(opt_idx, OPT_FREE, p_cp);
     didset_options();
     didset_options2();
 }
@@ -9260,210 +9260,210 @@ compatible_set(void)
 /*
  * Check if backspacing over something is allowed.
  */
-    int
+    صحيح
 can_bs(
-    int		what)	    // BS_INDENT, BS_EOL, BS_START or BS_NOSTOP
+    صحيح		what)	    // BS_INDENT, BS_EOL, BS_START or BS_NOSTOP
 {
-#ifdef FEAT_JOB_CHANNEL
-    if (what == BS_START && bt_prompt(curbuf))
-	return FALSE;
-#endif
-    switch (*p_bs)
+#اگر_تعریف_شده FEAT_کار_CHANNEL
+    إذا (what == BS_شروع && bt_prompt(curbuf))
+	أرجع FALSE;
+#پایان_اگر
+    بدل (*p_bs)
     {
-	case '3':       return TRUE;
-	case '2':	return (what != BS_NOSTOP);
-	case '1':	return (what != BS_START);
-	case '0':	return FALSE;
+	حالة '3':       أرجع TRUE;
+	حالة '2':	أرجع (what != BS_NOSTOP);
+	حالة '1':	أرجع (what != BS_شروع);
+	حالة '0':	أرجع FALSE;
     }
-    return vim_strchr(p_bs, what) != NULL;
+    أرجع vim_strchr(p_bs, what) != عدم;
 }
 
 /*
  * Return the effective 'scrolloff' value for the current window, using the
  * global value when appropriate.
  */
-    long
-get_scrolloff_value(void)
+    دراز
+get_scrolloff_مقدار(فراغ)
 {
-    return curwin->w_p_so < 0 ? p_so : curwin->w_p_so;
+    أرجع curwin->w_p_so < 0 ? p_so : curwin->w_p_so;
 }
 
 /*
  * Return the effective 'scrolloffpad' value for the current window, using the
  * global value when appropriate.
  */
-    long
-get_scrolloffpad_value(void)
+    دراز
+get_scrolloffpad_مقدار(فراغ)
 {
-    return curwin->w_p_sop == -1 ? p_sop : curwin->w_p_sop;
+    أرجع curwin->w_p_sop == -1 ? p_sop : curwin->w_p_sop;
 }
 
 /*
  * Return the effective 'sidescrolloff' value for the current window, using the
  * global value when appropriate.
  */
-    long
-get_sidescrolloff_value(void)
+    دراز
+get_sidescrolloff_مقدار(فراغ)
 {
-    return curwin->w_p_siso < 0 ? p_siso : curwin->w_p_siso;
+    أرجع curwin->w_p_siso < 0 ? p_siso : curwin->w_p_siso;
 }
 
 /*
  * Get the local or global value of 'backupcopy' flags.
  */
-    unsigned int
+    بیعلامت صحيح
 get_bkc_flags(buf_T *buf)
 {
-    return buf->b_bkc_flags ? buf->b_bkc_flags : bkc_flags;
+    أرجع buf->b_bkc_flags ? buf->b_bkc_flags : bkc_flags;
 }
 
-#if defined(FEAT_LINEBREAK)
+#إذا defined(FEAT_LINEBREAK)
 /*
  * Get the local or global value of 'formatlistpat'.
  */
     char_u *
-get_flp_value(buf_T *buf)
+get_flp_مقدار(buf_T *buf)
 {
-    if (buf->b_p_flp == NULL || *buf->b_p_flp == NUL)
-	return p_flp;
-    return buf->b_p_flp;
+    إذا (buf->b_p_flp == عدم || *buf->b_p_flp == NUL)
+	أرجع p_flp;
+    أرجع buf->b_p_flp;
 }
-#endif
+#پایان_اگر
 
 /*
  * Get the local or global value of 'virtualedit' flags.
  */
-    unsigned int
-get_ve_flags(void)
+    بیعلامت صحيح
+get_ve_flags(فراغ)
 {
-    return (curwin->w_ve_flags ? curwin->w_ve_flags : ve_flags)
+    أرجع (curwin->w_ve_flags ? curwin->w_ve_flags : ve_flags)
 	    & ~(VE_NONE | VE_NONEU);
 }
 
-#if defined(FEAT_LINEBREAK)
+#إذا defined(FEAT_LINEBREAK)
 /*
  * Get the local or global value of 'showbreak'.
  */
     char_u *
-get_showbreak_value(win_T *win)
+get_showbreak_مقدار(win_T *win)
 {
-    if (win->w_p_sbr == NULL || *win->w_p_sbr == NUL)
-	return p_sbr;
-    if (STRCMP(win->w_p_sbr, "NONE") == 0)
-	return empty_option;
-    return win->w_p_sbr;
+    إذا (win->w_p_sbr == عدم || *win->w_p_sbr == NUL)
+	أرجع p_sbr;
+    إذا (STRCMP(win->w_p_sbr, "NONE") == 0)
+	أرجع خالی_option;
+    أرجع win->w_p_sbr;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Get window or buffer local options.
  */
     dict_T *
-get_winbuf_options(int bufopt)
+get_winbuf_options(صحيح bufopt)
 {
     dict_T	*d;
-    int		opt_idx;
+    صحيح		opt_idx;
 
     d = dict_alloc();
-    if (d == NULL)
-	return NULL;
+    إذا (d == عدم)
+	أرجع عدم;
 
-    for (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
+    لكل (opt_idx = 0; !istermoption_idx(opt_idx); opt_idx++)
     {
-	struct vimoption *opt = &options[opt_idx];
+	بنية vimoption *opt = &options[opt_idx];
 
-	if ((bufopt && (opt->indir & PV_BUF))
+	إذا ((bufopt && (opt->indir & PV_BUF))
 					 || (!bufopt && (opt->indir & PV_WIN)))
 	{
 	    char_u *varp = get_varp(opt);
 
-	    if (varp != NULL)
+	    إذا (varp != عدم)
 	    {
-		if (opt->flags & P_STRING)
-		    dict_add_string(d, opt->fullname, *(char_u **)varp);
-		else if (opt->flags & P_NUM)
-		    dict_add_number(d, opt->fullname, *(long *)varp);
-		else
-		    dict_add_number(d, opt->fullname, *(int *)varp);
+		إذا (opt->flags & P_STRING)
+		    dict_جمع_کن_string(d, opt->fullname, *(char_u **)varp);
+		وإلا إذا (opt->flags & P_رقم)
+		    dict_جمع_کن_عدد(d, opt->fullname, *(دراز *)varp);
+		وإلا
+		    dict_جمع_کن_عدد(d, opt->fullname, *(صحيح *)varp);
 	    }
 	}
     }
 
-    return d;
+    أرجع d;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_SYN_HL)
+#إذا defined(FEAT_SYN_HL)
 /*
  * This is called when 'culopt' is changed
  */
-    int
+    صحيح
 fill_culopt_flags(char_u *val, win_T *wp)
 {
     char_u	*p;
     char_u	culopt_flags_new = 0;
 
-    if (val == NULL)
+    إذا (val == عدم)
 	p = wp->w_p_culopt;
-    else
+    وإلا
 	p = val;
-    while (*p != NUL)
+    طالما (*p != NUL)
     {
 	// Note: Keep this in sync with p_culopt_values.
-	if (STRNCMP(p, "line", 4) == 0)
+	إذا (STRNCMP(p, "line", 4) == 0)
 	{
 	    p += 4;
-	    culopt_flags_new |= CULOPT_LINE;
+	    culopt_flags_new |= CULOPT_سطر;
 	}
-	else if (STRNCMP(p, "both", 4) == 0)
+	وإلا إذا (STRNCMP(p, "both", 4) == 0)
 	{
 	    p += 4;
-	    culopt_flags_new |= CULOPT_LINE | CULOPT_NBR;
+	    culopt_flags_new |= CULOPT_سطر | CULOPT_NBR;
 	}
-	else if (STRNCMP(p, "number", 6) == 0)
+	وإلا إذا (STRNCMP(p, "number", 6) == 0)
 	{
 	    p += 6;
 	    culopt_flags_new |= CULOPT_NBR;
 	}
-	else if (STRNCMP(p, "screenline", 10) == 0)
+	وإلا إذا (STRNCMP(p, "screenline", 10) == 0)
 	{
 	    p += 10;
 	    culopt_flags_new |= CULOPT_SCRLINE;
 	}
 
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	إذا (*p != ',' && *p != NUL)
+	    أرجع FAIL;
+	إذا (*p == ',')
 	    ++p;
     }
 
     // Can't have both "line" and "screenline".
-    if ((culopt_flags_new & CULOPT_LINE) && (culopt_flags_new & CULOPT_SCRLINE))
-	return FAIL;
+    إذا ((culopt_flags_new & CULOPT_سطر) && (culopt_flags_new & CULOPT_SCRLINE))
+	أرجع FAIL;
     wp->w_p_culopt_flags = culopt_flags_new;
 
-    return OK;
+    أرجع OK;
 }
-#endif
+#پایان_اگر
 
 /*
  * Get the value of 'magic' adjusted for Vim9 script.
  */
-    int
-magic_isset(void)
+    صحيح
+magic_isset(فراغ)
 {
-    switch (magic_overruled)
+    بدل (magic_overruled)
     {
-	case OPTION_MAGIC_ON:      return TRUE;
-	case OPTION_MAGIC_OFF:     return FALSE;
-	case OPTION_MAGIC_NOT_SET: break;
+	حالة OPTION_MAGIC_ON:      أرجع TRUE;
+	حالة OPTION_MAGIC_OFF:     أرجع FALSE;
+	حالة OPTION_MAGIC_NOT_مجموعه: اكسر;
     }
-#ifdef FEAT_EVAL
-    if (in_vim9script())
-	return TRUE;
-#endif
-    return p_magic;
+#اگر_تعریف_شده FEAT_EVAL
+    إذا (درون_vim9script())
+	أرجع TRUE;
+#پایان_اگر
+    أرجع p_magic;
 }
 
 /*
@@ -9472,66 +9472,66 @@ magic_isset(void)
  * Returns OK if the option is successfully set to a function, otherwise
  * returns FAIL.
  */
-    int
-option_set_callback_func(char_u *optval UNUSED, callback_T *optcb UNUSED)
+    صحيح
+option_مجموعه_callback_func(char_u *optval استفادهنشده, callback_T *optcb استفادهنشده)
 {
-#ifdef FEAT_EVAL
+#اگر_تعریف_شده FEAT_EVAL
     typval_T	*tv;
     callback_T	cb;
-    int		funcname = FALSE;
+    صحيح		funcname = FALSE;
 
-    if (optval == NULL || *optval == NUL)
+    إذا (optval == عدم || *optval == NUL)
     {
 	free_callback(optcb);
-	return OK;
+	أرجع OK;
     }
 
-    if (*optval == '{' || (in_vim9script() && *optval == '(')
+    إذا (*optval == '{' || (درون_vim9script() && *optval == '(')
 	    || (STRNCMP(optval, "function(", 9) == 0)
 	    || (STRNCMP(optval, "funcref(", 8) == 0))
 	// Lambda expression or a funcref
-	tv = eval_expr(optval, NULL);
-    else
+	tv = eval_عبارت(optval, عدم);
+    وإلا
     {
 	// treat everything else as a function name string
 	tv = alloc_string_tv(vim_strsave(optval));
 	funcname = TRUE;
     }
-    if (tv == NULL)
-	return FAIL;
+    إذا (tv == عدم)
+	أرجع FAIL;
 
     cb = get_callback(tv);
-    if (cb.cb_name == NULL || *cb.cb_name == NUL)
+    إذا (cb.cb_name == عدم || *cb.cb_name == NUL)
     {
 	free_tv(tv);
-	return FAIL;
+	أرجع FAIL;
     }
 
     free_callback(optcb);
-    set_callback(optcb, &cb);
+    مجموعه_callback(optcb, &cb);
     free_tv(tv);
 
-    char_u  *dot = NULL;
-    if (in_vim9script() && funcname
-				&& ((dot = vim_strchr(optval, '.')) != NULL))
+    char_u  *dot = عدم;
+    إذا (درون_vim9script() && funcname
+				&& ((dot = vim_strchr(optval, '.')) != عدم))
     {
-	if (optcb->cb_free_name)
+	إذا (optcb->cb_free_name)
 	    vim_free(optcb->cb_name);
 
-	imported_T *import = find_imported(optval, dot - optval, FALSE);
-	if (import != NULL && SCRIPT_ID_VALID(import->imp_sid)
+	imported_T *import = پیدا_کن_imported(optval, dot - optval, FALSE);
+	إذا (import != عدم && SCRIPT_ID_VALID(import->imp_sid)
 				&& !(import->imp_flags & IMP_FLAGS_AUTOLOAD))
 	{
 	    char_u	fnamebuf[MAX_FUNC_NAME_LEN];
 
 	    // Imported non-autoloaded function.  Replace the import script
 	    // name (import.funcname) with the script ID (<SNR>123_funcname)
-	    vim_snprintf((char *)fnamebuf, sizeof(fnamebuf), "<SNR>%d_%s",
+	    vim_snprintf((حرف *)fnamebuf, حجم(fnamebuf), "<SNR>%d_%s",
 						import->imp_sid, dot + 1);
 	    optcb->cb_name = vim_strsave(fnamebuf);
 	    optcb->cb_free_name = TRUE;
 	}
-	else
+	وإلا
 	{
 	    // Imported autoloaded function.  Store the function name as
 	    // "import.funcname".
@@ -9543,36 +9543,36 @@ option_set_callback_func(char_u *optval UNUSED, callback_T *optcb UNUSED)
     // "import#funcname".
     expand_autload_callback(optcb);
 
-    return OK;
-#else
-    return FAIL;
-#endif
+    أرجع OK;
+#وإلا
+    أرجع FAIL;
+#پایان_اگر
 }
 
-#if defined(FEAT_TABPANEL)
+#إذا defined(FEAT_TABPANEL)
 /*
  * Process the new 'showtabpanel' option value.
  */
-    char *
-did_set_showtabpanel(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_showtabpanel(optset_T *آرگومانها استفادهنشده)
 {
     shell_new_columns();
-    return NULL;
+    أرجع عدم;
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_EVAL)
-    static void
-didset_options_sctx(int opt_flags, char **buf)
+#إذا defined(FEAT_EVAL)
+    ساكن فراغ
+didset_options_sctx(صحيح opt_flags, حرف **buf)
 {
-	for (int i = 0; ; ++i)
+	لكل (صحيح i = 0; ; ++i)
 	{
-	    if (buf[i] == NULL)
-		break;
+	    إذا (buf[i] == عدم)
+		اكسر;
 
-	    int idx = findoption((char_u *)buf[i]);
-	    if (idx >= 0)
-		set_option_sctx_idx(idx, opt_flags, current_sctx);
+	    صحيح idx = findoption((char_u *)buf[i]);
+	    إذا (idx >= 0)
+		مجموعه_option_sctx_idx(idx, opt_flags, current_sctx);
 	}
 }
-#endif
+#پایان_اگر

@@ -12,29 +12,29 @@
  *
  * Follows this standard: https://tools.ietf.org/html/rfc7159.html
  */
-#define USING_FLOAT_STUFF
+#تعریف_کن USING_FLOAT_STUFF
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
-static int json_encode_item(garray_T *gap, typval_T *val, int copyID, int options);
+ساكن صحيح json_encode_قلم(garray_T *gap, typval_T *val, صحيح copyID, صحيح options);
 
 /*
  * Encode "val" into a JSON format string.
  * The result is added to "gap"
  * Returns FAIL on failure and makes gap->ga_data empty.
  */
-    static int
-json_encode_gap(garray_T *gap, typval_T *val, int options)
+    ساكن صحيح
+json_encode_gap(garray_T *gap, typval_T *val, صحيح options)
 {
-    if (json_encode_item(gap, val, get_copyID(), options) == FAIL)
+    إذا (json_encode_قلم(gap, val, get_copyID(), options) == FAIL)
     {
 	ga_clear(gap);
-	gap->ga_data = vim_strsave((char_u *)"");
-	return FAIL;
+	gap->ga_داده = vim_strsave((char_u *)"");
+	أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -44,49 +44,49 @@ json_encode_gap(garray_T *gap, typval_T *val, int options)
  * "options" can contain JSON_JS, JSON_NO_NONE and JSON_NL.
  */
     char_u *
-json_encode(typval_T *val, int options)
+json_encode(typval_T *val, صحيح options)
 {
     garray_T ga;
 
     // Store bytes in the growarray.
     ga_init2(&ga, 1, 4000);
     json_encode_gap(&ga, val, options);
-    if (options & JSON_NL)
+    إذا (options & JSON_NL)
 	ga_append(&ga, NL);
     ga_append(&ga, NUL);
-    return ga.ga_data;
+    أرجع ga.ga_داده;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#إذا defined(FEAT_کار_CHANNEL)
 /*
  * Encode ["nr", "val"] into a JSON format string in allocated memory.
  * "options" can contain JSON_JS, JSON_NO_NONE and JSON_NL.
  * Returns NULL when out of memory.
  */
     char_u *
-json_encode_nr_expr(int nr, typval_T *val, int options)
+json_encode_nr_عبارت(صحيح nr, typval_T *val, صحيح options)
 {
     typval_T	listtv;
     typval_T	nrtv;
     garray_T	ga;
 
-    nrtv.v_type = VAR_NUMBER;
-    nrtv.vval.v_number = nr;
-    if (rettv_list_alloc(&listtv) == FAIL)
-	return NULL;
-    if (list_append_tv(listtv.vval.v_list, &nrtv) == FAIL
+    nrtv.v_type = VAR_عدد;
+    nrtv.vval.v_عدد = nr;
+    إذا (rettv_list_alloc(&listtv) == FAIL)
+	أرجع عدم;
+    إذا (list_append_tv(listtv.vval.v_list, &nrtv) == FAIL
 	    || list_append_tv(listtv.vval.v_list, val) == FAIL)
     {
 	list_unref(listtv.vval.v_list);
-	return NULL;
+	أرجع عدم;
     }
 
     ga_init2(&ga, 1, 4000);
-    if (json_encode_gap(&ga, &listtv, options) == OK && (options & JSON_NL))
+    إذا (json_encode_gap(&ga, &listtv, options) == OK && (options & JSON_NL))
 	ga_append(&ga, '\n');
     list_unref(listtv.vval.v_list);
     ga_append(&ga, NUL);
-    return ga.ga_data;
+    أرجع ga.ga_داده;
 }
 
 /*
@@ -94,33 +94,33 @@ json_encode_nr_expr(int nr, typval_T *val, int options)
  * Returns NULL when out of memory.
  */
     char_u *
-json_encode_lsp_msg(typval_T *val)
+json_encode_lsp_پیام(typval_T *val)
 {
     garray_T	ga;
     garray_T	lspga;
     size_t	IObufflen;
 
     ga_init2(&ga, 1, 4000);
-    if (json_encode_gap(&ga, val, 0) == FAIL)
-	return NULL;
+    إذا (json_encode_gap(&ga, val, 0) == FAIL)
+	أرجع عدم;
     ga_append(&ga, NUL);
 
     ga_init2(&lspga, 1, 4000);
     // Header according to LSP specification.
-    IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
+    IObufflen = vim_snprintf_safelen((حرف *)IObuff, IOSIZE,
 	    "Content-Length: %u\r\n\r\n",
 	    ga.ga_len - 1);
     ga_concat_len(&lspga, IObuff, IObufflen);
-    ga_concat_len(&lspga, ga.ga_data, ga.ga_len);
+    ga_concat_len(&lspga, ga.ga_داده, ga.ga_len);
     ga_clear(&ga);
-    return lspga.ga_data;
+    أرجع lspga.ga_داده;
 }
-#endif
+#پایان_اگر
 
 /*
  * Lookup table to quickly know if the given ASCII character must be escaped.
  */
-static const char ascii_needs_escape[128] = {
+ساكن ثابت حرف ascii_needs_escape[128] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x0.
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0x1.
     0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0x2.
@@ -134,75 +134,75 @@ static const char ascii_needs_escape[128] = {
 /*
  * Encode the utf-8 encoded string "str" into "gap".
  */
-    static void
+    ساكن فراغ
 write_string(garray_T *gap, char_u *str)
 {
     char_u	*res = str;
     char_u	numbuf[NUMBUFLEN];
     char_u	*from;
-#if defined(USE_ICONV)
+#إذا defined(USE_ICONV)
     vimconv_T   conv;
-    char_u	*converted = NULL;
-#endif
-    int		c;
+    char_u	*converted = عدم;
+#پایان_اگر
+    صحيح		c;
 
-    if (res == NULL)
+    إذا (res == عدم)
     {
 	GA_CONCAT_LITERAL(gap, "\"\"");
-	return;
+	أرجع;
     }
 
-#if defined(USE_ICONV)
-    if (!enc_utf8)
+#إذا defined(USE_ICONV)
+    إذا (!enc_utf8)
     {
 	// Convert the text from 'encoding' to utf-8, because a JSON string is
 	// always utf-8.
 	conv.vc_type = CONV_NONE;
-	convert_setup(&conv, p_enc, (char_u*)"utf-8");
-	if (conv.vc_type != CONV_NONE)
-	    converted = res = string_convert(&conv, res, NULL);
-	convert_setup(&conv, NULL, NULL);
+	convert_راهاندازی(&conv, p_enc, (char_u*)"utf-8");
+	إذا (conv.vc_type != CONV_NONE)
+	    converted = res = string_convert(&conv, res, عدم);
+	convert_راهاندازی(&conv, عدم, عدم);
     }
-#endif
+#پایان_اگر
     ga_append(gap, '"');
     // Pre-grow for the common case: input length + quotes + some escapes.
-    ga_grow(gap, (int)STRLEN(res) + 2);
+    ga_grow(gap, (صحيح)STRLEN(res) + 2);
     // `from` is the beginning of a sequence of bytes we can directly copy from
     // the input string, avoiding the overhead associated to decoding/encoding
     // them.
     from = res;
-    while ((c = *res) != NUL)
+    طالما ((c = *res) != NUL)
     {
 	// always use utf-8 encoding, ignore 'encoding'
-	if (c < 0x80)
+	إذا (c < 0x80)
 	{
-	    if (!ascii_needs_escape[c])
+	    إذا (!ascii_needs_escape[c])
 	    {
 		res += 1;
-		continue;
+		استمر;
 	    }
 
-	    if (res != from)
+	    إذا (res != from)
 		ga_concat_len(gap, from, res - from);
 	    from = res + 1;
 
-	    switch (c)
+	    بدل (c)
 	    {
-		case 0x08:
-		    GA_CONCAT_LITERAL(gap, "\\b"); break;
-		case 0x09:
-		    GA_CONCAT_LITERAL(gap, "\\t"); break;
-		case 0x0a:
-		    GA_CONCAT_LITERAL(gap, "\\n"); break;
-		case 0x0c:
-		    GA_CONCAT_LITERAL(gap, "\\f"); break;
-		case 0x0d:
-		    GA_CONCAT_LITERAL(gap, "\\r"); break;
-		case 0x22: // "
-		    GA_CONCAT_LITERAL(gap, "\\\""); break;
-		case 0x5c: // backslash
-		    GA_CONCAT_LITERAL(gap, "\\\\"); break;
-		default:
+		حالة 0x08:
+		    GA_CONCAT_LITERAL(gap, "\\b"); اكسر;
+		حالة 0x09:
+		    GA_CONCAT_LITERAL(gap, "\\t"); اكسر;
+		حالة 0x0a:
+		    GA_CONCAT_LITERAL(gap, "\\n"); اكسر;
+		حالة 0x0c:
+		    GA_CONCAT_LITERAL(gap, "\\f"); اكسر;
+		حالة 0x0d:
+		    GA_CONCAT_LITERAL(gap, "\\r"); اكسر;
+		حالة 0x22: // "
+		    GA_CONCAT_LITERAL(gap, "\\\""); اكسر;
+		حالة 0x5c: // backslash
+		    GA_CONCAT_LITERAL(gap, "\\\\"); اكسر;
+		افتراضي:
 		{
 		    char_u escaped[] = "\\u0000";
 
@@ -215,20 +215,20 @@ write_string(garray_T *gap, char_u *str)
 
 	    res += 1;
 	}
-	else
+	وإلا
 	{
-	    int	    l = utf_ptr2len(res);
+	    صحيح	    l = utf_ptr2len(res);
 	    size_t  numbuflen;
 
-	    if (l > 1)
+	    إذا (l > 1)
 	    {
 		res += l;
-		continue;
+		استمر;
 	    }
 
 	    // Invalid utf-8 sequence, replace it with the Unicode replacement
 	    // character U+FFFD.
-	    if (res != from)
+	    إذا (res != from)
 		ga_concat_len(gap, from, res - from);
 	    from = res + 1;
 
@@ -240,13 +240,13 @@ write_string(garray_T *gap, char_u *str)
 	}
     }
 
-    if (res != from)
+    إذا (res != from)
 	ga_concat_len(gap, from, res - from);
 
     ga_append(gap, '"');
-#if defined(USE_ICONV)
+#إذا defined(USE_ICONV)
     vim_free(converted);
-#endif
+#پایان_اگر
 }
 
 /*
@@ -254,53 +254,53 @@ write_string(garray_T *gap, char_u *str)
  * That is when it starts with a letter and only contains letters, digits and
  * underscore.
  */
-    static int
-is_simple_key(char_u *key)
+    ساكن صحيح
+is_simple_کلید(char_u *کلید)
 {
     char_u *p;
 
-    if (!ASCII_ISALPHA(*key))
-	return FALSE;
-    for (p = key + 1; *p != NUL; ++p)
-	if (!ASCII_ISALPHA(*p) && *p != '_' && !vim_isdigit(*p))
-	    return FALSE;
-    return TRUE;
+    إذا (!ASCII_ISALPHA(*کلید))
+	أرجع FALSE;
+    لكل (p = کلید + 1; *p != NUL; ++p)
+	إذا (!ASCII_ISALPHA(*p) && *p != '_' && !vim_isdigit(*p))
+	    أرجع FALSE;
+    أرجع TRUE;
 }
 
-typedef enum {
+تعريفنوع تعداد {
     ENC_LIST,
     ENC_TUPLE,
     ENC_DICT,
 } json_enc_type_T;
 
-typedef struct {
+تعريفنوع بنية {
     json_enc_type_T je_type;
-    int		    je_options;	    // options when this container was entered
-    union {
-	struct {
+    صحيح		    je_options;	    // options when this container was entered
+    اتحاد {
+	بنية {
 	    list_T	*list;
 	    listitem_T	*li;	    // current item
 	} l;
-	struct {
+	بنية {
 	    tuple_T	*tuple;
-	    int		idx;	    // current index
-	    int		len;
+	    صحيح		idx;	    // current index
+	    صحيح		len;
 	} t;
-	struct {
+	بنية {
 	    dict_T	*dict;
 	    hashitem_T	*hi;	    // current entry
-	    int		todo;	    // remaining entries
+	    صحيح		todo;	    // remaining entries
 	} d;
     } je_u;
-} json_enc_frame_T;
+} json_enc_قاب_T;
 
 /*
  * Encode "val" into "gap".
  * Uses an explicit stack to avoid deep recursion on nested structures.
  * Return FAIL or OK.
  */
-    static int
-json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
+    ساكن صحيح
+json_encode_قلم(garray_T *gap, typval_T *val, صحيح copyID, صحيح options)
 {
     char_u		numbuf[NUMBUFLEN];
     char_u		*res;
@@ -308,418 +308,418 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
     list_T		*l;
     tuple_T		*tuple;
     dict_T		*d;
-    int			i;
-    garray_T		stack;
+    صحيح			i;
+    garray_T		پشته;
     typval_T		*cur_val;
-    json_enc_frame_T	*frame;
+    json_enc_قاب_T	*قاب;
 
-    ga_init2(&stack, sizeof(json_enc_frame_T), 100);
+    ga_init2(&پشته, حجم(json_enc_قاب_T), 100);
     cur_val = val;
 
-    for (;;)
+    لكل (;;)
     {
-    switch (cur_val->v_type)
+    بدل (cur_val->v_type)
     {
-	case VAR_BOOL:
-	    switch ((long)cur_val->vval.v_number)
+	حالة VAR_BOOL:
+	    بدل ((دراز)cur_val->vval.v_عدد)
 	    {
-		case VVAL_FALSE: GA_CONCAT_LITERAL(gap, "false"); break;
-		case VVAL_TRUE: GA_CONCAT_LITERAL(gap, "true"); break;
+		حالة VVAL_FALSE: GA_CONCAT_LITERAL(gap, "false"); اكسر;
+		حالة VVAL_TRUE: GA_CONCAT_LITERAL(gap, "true"); اكسر;
 	    }
-	    break;
+	    اكسر;
 
-	case VAR_SPECIAL:
-	    switch ((long)cur_val->vval.v_number)
+	حالة VAR_SPECIAL:
+	    بدل ((دراز)cur_val->vval.v_عدد)
 	    {
-		case VVAL_NONE: if ((options & JSON_JS) != 0
+		حالة VVAL_NONE: إذا ((options & JSON_JS) != 0
 					     && (options & JSON_NO_NONE) == 0)
 				    // empty item
-				    break;
+				    اكسر;
 				// FALLTHROUGH
-		case VVAL_NULL: GA_CONCAT_LITERAL(gap, "null"); break;
+		حالة VVAL_NULL: GA_CONCAT_LITERAL(gap, "null"); اكسر;
 	    }
-	    break;
+	    اكسر;
 
-	case VAR_NUMBER:
+	حالة VAR_عدد:
 	    {
 		size_t  numbuflen;
 
-		numbuflen = vim_snprintf_safelen((char *)numbuf, sizeof(numbuf),
-		    "%lld", (varnumber_T)cur_val->vval.v_number);
+		numbuflen = vim_snprintf_safelen((حرف *)numbuf, حجم(numbuf),
+		    "%lld", (varnumber_T)cur_val->vval.v_عدد);
 		ga_concat_len(gap, numbuf, numbuflen);
 	    }
-	    break;
+	    اكسر;
 
-	case VAR_STRING:
+	حالة VAR_STRING:
 	    res = cur_val->vval.v_string;
 	    write_string(gap, res);
-	    break;
+	    اكسر;
 
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
+	حالة VAR_FUNC:
+	حالة VAR_PARTIAL:
+	حالة VAR_کار:
+	حالة VAR_CHANNEL:
+	حالة VAR_INSTR:
+	حالة VAR_CLASS:
+	حالة VAR_OBJECT:
+	حالة VAR_TYPEALIAS:
 	    semsg(_(e_cannot_json_encode_str), vartype_name(cur_val->v_type));
-	    goto theend;
+	    اذهب theend;
 
-	case VAR_BLOB:
+	حالة VAR_BLOB:
 	    b = cur_val->vval.v_blob;
-	    if (b == NULL || b->bv_ga.ga_len == 0)
+	    إذا (b == عدم || b->bv_ga.ga_len == 0)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    وإلا
 	    {
-		int	blen = b->bv_ga.ga_len;
+		صحيح	blen = b->bv_ga.ga_len;
 		char_u	*src;
 		char_u	*dst;
 
 		// Worst case: '[' + ']' + per-byte 3 digits + comma = 2 + 4*blen
-		if (ga_grow(gap, 2 + 4 * blen) == FAIL)
-		    goto theend;
-		src = (char_u *)b->bv_ga.ga_data;
-		dst = (char_u *)gap->ga_data + gap->ga_len;
+		إذا (ga_grow(gap, 2 + 4 * blen) == FAIL)
+		    اذهب theend;
+		src = (char_u *)b->bv_ga.ga_داده;
+		dst = (char_u *)gap->ga_داده + gap->ga_len;
 		*dst++ = '[';
-		for (i = 0; i < blen; i++)
+		لكل (i = 0; i < blen; i++)
 		{
-		    int	    byte = src[i];
+		    صحيح	    byte = src[i];
 
-		    if (i > 0)
+		    إذا (i > 0)
 			*dst++ = ',';
-		    if (byte >= 100)
+		    إذا (byte >= 100)
 		    {
 			*dst++ = '0' + byte / 100;
 			*dst++ = '0' + (byte / 10) % 10;
 			*dst++ = '0' + byte % 10;
 		    }
-		    else if (byte >= 10)
+		    وإلا إذا (byte >= 10)
 		    {
 			*dst++ = '0' + byte / 10;
 			*dst++ = '0' + byte % 10;
 		    }
-		    else
+		    وإلا
 			*dst++ = '0' + byte;
 		}
 		*dst++ = ']';
-		gap->ga_len = (int)(dst - (char_u *)gap->ga_data);
+		gap->ga_len = (صحيح)(dst - (char_u *)gap->ga_داده);
 	    }
-	    break;
+	    اكسر;
 
-	case VAR_LIST:
+	حالة VAR_LIST:
 	    l = cur_val->vval.v_list;
-	    if (l == NULL)
+	    إذا (l == عدم)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    وإلا
 	    {
-		if (l->lv_copyID == copyID)
+		إذا (l->lv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "[]");
-		else
+		وإلا
 		{
 		    l->lv_copyID = copyID;
 		    ga_append(gap, '[');
 		    CHECK_LIST_MATERIALIZE(l);
-		    if (l->lv_first != NULL)
+		    إذا (l->lv_اولی != عدم)
 		    {
-			if (stack.ga_len >= p_mfd)
+			إذا (پشته.ga_len >= p_mfd)
 			{
-			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-			    goto theend;
+			    emsg(_(e_function_call_عمق_is_higher_than_maxfuncdepth));
+			    اذهب theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
-			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
-			frame->je_type = ENC_LIST;
-			frame->je_options = options;
-			frame->je_u.l.list = l;
-			frame->je_u.l.li = l->lv_first;
-			++stack.ga_len;
+			إذا (ga_grow(&پشته, 1) == FAIL)
+			    اذهب theend;
+			قاب = ((json_enc_قاب_T *)پشته.ga_داده)
+							    + پشته.ga_len;
+			قاب->je_type = ENC_LIST;
+			قاب->je_options = options;
+			قاب->je_u.l.list = l;
+			قاب->je_u.l.li = l->lv_اولی;
+			++پشته.ga_len;
 			options = options & JSON_JS;
-			cur_val = &l->lv_first->li_tv;
-			continue;
+			cur_val = &l->lv_اولی->li_tv;
+			استمر;
 		    }
 		    ga_append(gap, ']');
 		    l->lv_copyID = 0;
 		}
 	    }
-	    break;
+	    اكسر;
 
-	case VAR_TUPLE:
+	حالة VAR_TUPLE:
 	    tuple = cur_val->vval.v_tuple;
-	    if (tuple == NULL)
+	    إذا (tuple == عدم)
 		GA_CONCAT_LITERAL(gap, "[]");
-	    else
+	    وإلا
 	    {
-		if (tuple->tv_copyID == copyID)
+		إذا (tuple->tv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "[]");
-		else
+		وإلا
 		{
-		    int		len = TUPLE_LEN(tuple);
+		    صحيح		len = TUPLE_LEN(tuple);
 
-		    if (len > 0)
+		    إذا (len > 0)
 		    {
 			tuple->tv_copyID = copyID;
 			ga_append(gap, '[');
-			if (stack.ga_len >= p_mfd)
+			إذا (پشته.ga_len >= p_mfd)
 			{
-			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-			    goto theend;
+			    emsg(_(e_function_call_عمق_is_higher_than_maxfuncdepth));
+			    اذهب theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
-			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
-			frame->je_type = ENC_TUPLE;
-			frame->je_options = options;
-			frame->je_u.t.tuple = tuple;
-			frame->je_u.t.idx = 0;
-			frame->je_u.t.len = len;
-			++stack.ga_len;
+			إذا (ga_grow(&پشته, 1) == FAIL)
+			    اذهب theend;
+			قاب = ((json_enc_قاب_T *)پشته.ga_داده)
+							    + پشته.ga_len;
+			قاب->je_type = ENC_TUPLE;
+			قاب->je_options = options;
+			قاب->je_u.t.tuple = tuple;
+			قاب->je_u.t.idx = 0;
+			قاب->je_u.t.len = len;
+			++پشته.ga_len;
 			options = options & JSON_JS;
-			cur_val = TUPLE_ITEM(tuple, 0);
-			continue;
+			cur_val = TUPLE_قلم(tuple, 0);
+			استمر;
 		    }
-		    else
+		    وإلا
 			GA_CONCAT_LITERAL(gap, "[]");
 		}
 	    }
-	    break;
+	    اكسر;
 
-	case VAR_DICT:
+	حالة VAR_DICT:
 	    d = cur_val->vval.v_dict;
-	    if (d == NULL)
+	    إذا (d == عدم)
 		GA_CONCAT_LITERAL(gap, "{}");
-	    else
+	    وإلا
 	    {
-		if (d->dv_copyID == copyID)
+		إذا (d->dv_copyID == copyID)
 		    GA_CONCAT_LITERAL(gap, "{}");
-		else
+		وإلا
 		{
-		    int		todo = (int)d->dv_hashtab.ht_used;
+		    صحيح		todo = (صحيح)d->dv_hashtab.ht_استفاده_شده;
 		    hashitem_T	*hi;
 
-		    if (todo > 0)
+		    إذا (todo > 0)
 		    {
 			d->dv_copyID = copyID;
 			ga_append(gap, '{');
 
 			// Find first non-empty hash entry
-			for (hi = d->dv_hashtab.ht_array;
-						  HASHITEM_EMPTY(hi); ++hi)
+			لكل (hi = d->dv_hashtab.ht_array;
+						  HASHITEM_خالی(hi); ++hi)
 			    ;
 			--todo;
 
 			// Write first key
-			if ((options & JSON_JS)
-						 && is_simple_key(hi->hi_key))
-			    ga_concat(gap, hi->hi_key);
-			else
-			    write_string(gap, hi->hi_key);
+			إذا ((options & JSON_JS)
+						 && is_simple_کلید(hi->hi_کلید))
+			    ga_concat(gap, hi->hi_کلید);
+			وإلا
+			    write_string(gap, hi->hi_کلید);
 			ga_append(gap, ':');
 
-			if (stack.ga_len >= p_mfd)
+			إذا (پشته.ga_len >= p_mfd)
 			{
-			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
-			    goto theend;
+			    emsg(_(e_function_call_عمق_is_higher_than_maxfuncdepth));
+			    اذهب theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
-			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
-			frame->je_type = ENC_DICT;
-			frame->je_options = options;
-			frame->je_u.d.dict = d;
-			frame->je_u.d.hi = hi;
-			frame->je_u.d.todo = todo;
-			++stack.ga_len;
+			إذا (ga_grow(&پشته, 1) == FAIL)
+			    اذهب theend;
+			قاب = ((json_enc_قاب_T *)پشته.ga_داده)
+							    + پشته.ga_len;
+			قاب->je_type = ENC_DICT;
+			قاب->je_options = options;
+			قاب->je_u.d.dict = d;
+			قاب->je_u.d.hi = hi;
+			قاب->je_u.d.todo = todo;
+			++پشته.ga_len;
 			options = options | JSON_NO_NONE;
 			cur_val = &dict_lookup(hi)->di_tv;
-			continue;
+			استمر;
 		    }
-		    else
+		    وإلا
 			GA_CONCAT_LITERAL(gap, "{}");
 		}
 	    }
-	    break;
+	    اكسر;
 
-	case VAR_FLOAT:
-#if defined(HAVE_MATH_H)
-	    if (isnan(cur_val->vval.v_float))
+	حالة VAR_FLOAT:
+#إذا defined(HAVE_MATH_H)
+	    إذا (isnan(cur_val->vval.v_float))
 		GA_CONCAT_LITERAL(gap, "NaN");
-	    else if (isinf(cur_val->vval.v_float))
+	    وإلا إذا (isinf(cur_val->vval.v_float))
 	    {
-		if (cur_val->vval.v_float < 0.0)
+		إذا (cur_val->vval.v_float < 0.0)
 		    GA_CONCAT_LITERAL(gap, "-Infinity");
-		else
+		وإلا
 		    GA_CONCAT_LITERAL(gap, "Infinity");
 	    }
-	    else
-#endif
+	    وإلا
+#پایان_اگر
 	    {
 		size_t	numbuflen;
 
-		numbuflen = vim_snprintf_safelen((char *)numbuf, sizeof(numbuf),
+		numbuflen = vim_snprintf_safelen((حرف *)numbuf, حجم(numbuf),
 		    "%g", cur_val->vval.v_float);
 		ga_concat_len(gap, numbuf, numbuflen);
 	    }
-	    break;
+	    اكسر;
 
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	    internal_error_no_abort("json_encode_item()");
-	    goto theend;
+	حالة VAR_UNKNOWN:
+	حالة VAR_ANY:
+	حالة VAR_VOID:
+	    داخلی_error_no_abort("json_encode_item()");
+	    اذهب theend;
     }
 
 	// Process the completed item by advancing containers or
 	// returning when the stack is empty.
-	for (;;)
+	لكل (;;)
 	{
-	    int		advance = FALSE;
+	    صحيح		advance = FALSE;
 
-	    if (stack.ga_len == 0)
+	    إذا (پشته.ga_len == 0)
 	    {
-		ga_clear(&stack);
-		return OK;
+		ga_clear(&پشته);
+		أرجع OK;
 	    }
 
-	    frame = ((json_enc_frame_T *)stack.ga_data)
-							+ stack.ga_len - 1;
-	    switch (frame->je_type)
+	    قاب = ((json_enc_قاب_T *)پشته.ga_داده)
+							+ پشته.ga_len - 1;
+	    بدل (قاب->je_type)
 	    {
-		case ENC_LIST:
+		حالة ENC_LIST:
 		{
-		    listitem_T	*li = frame->je_u.l.li;
+		    listitem_T	*li = قاب->je_u.l.li;
 
 		    // JSON_JS: add trailing comma if last item is v:none
-		    if ((frame->je_options & JSON_JS)
-			    && li->li_next == NULL
+		    إذا ((قاب->je_options & JSON_JS)
+			    && li->li_بعدی == عدم
 			    && li->li_tv.v_type == VAR_SPECIAL
-			    && li->li_tv.vval.v_number == VVAL_NONE)
+			    && li->li_tv.vval.v_عدد == VVAL_NONE)
 			ga_append(gap, ',');
 
-		    li = li->li_next;
-		    frame->je_u.l.li = li;
-		    if (li != NULL && !got_int)
+		    li = li->li_بعدی;
+		    قاب->je_u.l.li = li;
+		    إذا (li != عدم && !got_int)
 		    {
 			ga_append(gap, ',');
-			options = frame->je_options & JSON_JS;
+			options = قاب->je_options & JSON_JS;
 			cur_val = &li->li_tv;
 			advance = TRUE;
-			break;
+			اكسر;
 		    }
 		    ga_append(gap, ']');
-		    frame->je_u.l.list->lv_copyID = 0;
-		    --stack.ga_len;
-		    break;
+		    قاب->je_u.l.list->lv_copyID = 0;
+		    --پشته.ga_len;
+		    اكسر;
 		}
 
-		case ENC_TUPLE:
+		حالة ENC_TUPLE:
 		{
-		    int	    idx = frame->je_u.t.idx;
-		    int	    len = frame->je_u.t.len;
+		    صحيح	    idx = قاب->je_u.t.idx;
+		    صحيح	    len = قاب->je_u.t.len;
 
 		    // JSON_JS: add trailing comma if last item is v:none
-		    if ((frame->je_options & JSON_JS) && idx == len - 1)
+		    إذا ((قاب->je_options & JSON_JS) && idx == len - 1)
 		    {
-			typval_T *t_item =
-				    TUPLE_ITEM(frame->je_u.t.tuple, idx);
+			typval_T *t_قلم =
+				    TUPLE_قلم(قاب->je_u.t.tuple, idx);
 
-			if (t_item->v_type == VAR_SPECIAL
-				&& t_item->vval.v_number == VVAL_NONE)
+			إذا (t_قلم->v_type == VAR_SPECIAL
+				&& t_قلم->vval.v_عدد == VVAL_NONE)
 			    ga_append(gap, ',');
 		    }
 
 		    ++idx;
-		    frame->je_u.t.idx = idx;
-		    if (idx < len && !got_int)
+		    قاب->je_u.t.idx = idx;
+		    إذا (idx < len && !got_int)
 		    {
 			ga_append(gap, ',');
-			options = frame->je_options & JSON_JS;
-			cur_val = TUPLE_ITEM(frame->je_u.t.tuple, idx);
+			options = قاب->je_options & JSON_JS;
+			cur_val = TUPLE_قلم(قاب->je_u.t.tuple, idx);
 			advance = TRUE;
-			break;
+			اكسر;
 		    }
 		    ga_append(gap, ']');
-		    frame->je_u.t.tuple->tv_copyID = 0;
-		    --stack.ga_len;
-		    break;
+		    قاب->je_u.t.tuple->tv_copyID = 0;
+		    --پشته.ga_len;
+		    اكسر;
 		}
 
-		case ENC_DICT:
+		حالة ENC_DICT:
 		{
-		    hashitem_T	*hi = frame->je_u.d.hi;
-		    int		todo = frame->je_u.d.todo;
+		    hashitem_T	*hi = قاب->je_u.d.hi;
+		    صحيح		todo = قاب->je_u.d.todo;
 
-		    if (todo > 0 && !got_int)
+		    إذا (todo > 0 && !got_int)
 		    {
 			// Advance to next non-empty entry
-			for (++hi; HASHITEM_EMPTY(hi); ++hi)
+			لكل (++hi; HASHITEM_خالی(hi); ++hi)
 			    ;
 			--todo;
-			frame->je_u.d.hi = hi;
-			frame->je_u.d.todo = todo;
+			قاب->je_u.d.hi = hi;
+			قاب->je_u.d.todo = todo;
 
 			ga_append(gap, ',');
-			if ((frame->je_options & JSON_JS)
-				&& is_simple_key(hi->hi_key))
-			    ga_concat(gap, hi->hi_key);
-			else
-			    write_string(gap, hi->hi_key);
+			إذا ((قاب->je_options & JSON_JS)
+				&& is_simple_کلید(hi->hi_کلید))
+			    ga_concat(gap, hi->hi_کلید);
+			وإلا
+			    write_string(gap, hi->hi_کلید);
 			ga_append(gap, ':');
 
-			options = frame->je_options | JSON_NO_NONE;
+			options = قاب->je_options | JSON_NO_NONE;
 			cur_val = &dict_lookup(hi)->di_tv;
 			advance = TRUE;
-			break;
+			اكسر;
 		    }
 		    ga_append(gap, '}');
-		    frame->je_u.d.dict->dv_copyID = 0;
-		    --stack.ga_len;
-		    break;
+		    قاب->je_u.d.dict->dv_copyID = 0;
+		    --پشته.ga_len;
+		    اكسر;
 		}
 	    }
-	    if (advance)
-		break;
+	    إذا (advance)
+		اكسر;
 	}
     }
 
 theend:
     // Clean up copyIDs for remaining frames on error/failure
-    for (i = 0; i < stack.ga_len; i++)
+    لكل (i = 0; i < پشته.ga_len; i++)
     {
-	frame = ((json_enc_frame_T *)stack.ga_data) + i;
-	switch (frame->je_type)
+	قاب = ((json_enc_قاب_T *)پشته.ga_داده) + i;
+	بدل (قاب->je_type)
 	{
-	    case ENC_LIST:
-		frame->je_u.l.list->lv_copyID = 0;
-		break;
-	    case ENC_TUPLE:
-		frame->je_u.t.tuple->tv_copyID = 0;
-		break;
-	    case ENC_DICT:
-		frame->je_u.d.dict->dv_copyID = 0;
-		break;
+	    حالة ENC_LIST:
+		قاب->je_u.l.list->lv_copyID = 0;
+		اكسر;
+	    حالة ENC_TUPLE:
+		قاب->je_u.t.tuple->tv_copyID = 0;
+		اكسر;
+	    حالة ENC_DICT:
+		قاب->je_u.d.dict->dv_copyID = 0;
+		اكسر;
 	}
     }
-    ga_clear(&stack);
-    return FAIL;
+    ga_clear(&پشته);
+    أرجع FAIL;
 }
 
 /*
  * When "reader" has less than NUMBUFLEN bytes available, call the fill
  * callback to get more.
  */
-    static void
+    ساكن فراغ
 fill_numbuflen(js_read_T *reader)
 {
-    if (reader->js_fill != NULL && (int)(reader->js_end - reader->js_buf)
-						- reader->js_used < NUMBUFLEN)
+    إذا (reader->js_fill != عدم && (صحيح)(reader->js_انتها - reader->js_buf)
+						- reader->js_استفاده_شده < NUMBUFLEN)
     {
-	if (reader->js_fill(reader))
-	    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
+	إذا (reader->js_fill(reader))
+	    reader->js_انتها = reader->js_buf + STRLEN(reader->js_buf);
     }
 }
 
@@ -728,113 +728,113 @@ fill_numbuflen(js_read_T *reader)
  * space.
  * Also tops up readahead when needed.
  */
-    static void
+    ساكن فراغ
 json_skip_white(js_read_T *reader)
 {
-    int c;
+    صحيح c;
 
-    for (;;)
+    لكل (;;)
     {
-	c = reader->js_buf[reader->js_used];
-	if (reader->js_fill != NULL && c == NUL)
+	c = reader->js_buf[reader->js_استفاده_شده];
+	إذا (reader->js_fill != عدم && c == NUL)
 	{
-	    if (reader->js_fill(reader))
+	    إذا (reader->js_fill(reader))
 	    {
-		reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
-		continue;
+		reader->js_انتها = reader->js_buf + STRLEN(reader->js_buf);
+		استمر;
 	    }
 	}
-	if (c == NUL || c > ' ')
-	    break;
-	++reader->js_used;
+	إذا (c == NUL || c > ' ')
+	    اكسر;
+	++reader->js_استفاده_شده;
     }
     fill_numbuflen(reader);
 }
 
-    static int
-json_decode_string(js_read_T *reader, typval_T *res, int quote)
+    ساكن صحيح
+json_decode_string(js_read_T *reader, typval_T *res, صحيح quote)
 {
     garray_T    ga;
-    int		len;
+    صحيح		len;
     char_u	*p;
-    int		c;
+    صحيح		c;
     varnumber_T	nr;
 
-    if (res != NULL)
+    إذا (res != عدم)
 	ga_init2(&ga, 1, 200);
 
-    p = reader->js_buf + reader->js_used + 1; // skip over " or '
-    while (*p != quote)
+    p = reader->js_buf + reader->js_استفاده_شده + 1; // skip over " or '
+    طالما (*p != quote)
     {
 	// The JSON is always expected to be utf-8, thus use utf functions
 	// here. The string is converted below if needed.
-	if (*p == NUL || p[1] == NUL || utf_ptr2len(p) < utf_byte2len(*p))
+	إذا (*p == NUL || p[1] == NUL || utf_ptr2len(p) < utf_byte2len(*p))
 	{
 	    // Not enough bytes to make a character or end of the string. Get
 	    // more if possible.
-	    if (reader->js_fill == NULL)
-		break;
-	    len = (int)(reader->js_end - p);
-	    reader->js_used = (int)(p - reader->js_buf);
-	    if (!reader->js_fill(reader))
-		break; // didn't get more
-	    p = reader->js_buf + reader->js_used;
-	    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
-	    continue;
+	    إذا (reader->js_fill == عدم)
+		اكسر;
+	    len = (صحيح)(reader->js_انتها - p);
+	    reader->js_استفاده_شده = (صحيح)(p - reader->js_buf);
+	    إذا (!reader->js_fill(reader))
+		اكسر; // didn't get more
+	    p = reader->js_buf + reader->js_استفاده_شده;
+	    reader->js_انتها = reader->js_buf + STRLEN(reader->js_buf);
+	    استمر;
 	}
 
-	if (*p == '\\')
+	إذا (*p == '\\')
 	{
 	    c = -1;
-	    switch (p[1])
+	    بدل (p[1])
 	    {
-		case '\\': c = '\\'; break;
-		case '"': c = '"'; break;
-		case 'b': c = BS; break;
-		case 't': c = TAB; break;
-		case 'n': c = NL; break;
-		case 'f': c = FF; break;
-		case 'r': c = CAR; break;
-		case 'u':
-		    if (reader->js_fill != NULL
-				     && (int)(reader->js_end - p) < NUMBUFLEN)
+		حالة '\\': c = '\\'; اكسر;
+		حالة '"': c = '"'; اكسر;
+		حالة 'b': c = BS; اكسر;
+		حالة 't': c = TAB; اكسر;
+		حالة 'n': c = NL; اكسر;
+		حالة 'f': c = FF; اكسر;
+		حالة 'r': c = CAR; اكسر;
+		حالة 'u':
+		    إذا (reader->js_fill != عدم
+				     && (صحيح)(reader->js_انتها - p) < NUMBUFLEN)
 		    {
-			reader->js_used = (int)(p - reader->js_buf);
-			if (reader->js_fill(reader))
+			reader->js_استفاده_شده = (صحيح)(p - reader->js_buf);
+			إذا (reader->js_fill(reader))
 			{
-			    p = reader->js_buf + reader->js_used;
-			    reader->js_end = reader->js_buf
+			    p = reader->js_buf + reader->js_استفاده_شده;
+			    reader->js_انتها = reader->js_buf
 						     + STRLEN(reader->js_buf);
 			}
 		    }
 		    nr = 0;
 		    len = 0;
-		    vim_str2nr(p + 2, NULL, &len,
-			     STR2NR_HEX + STR2NR_FORCE, &nr, NULL, 4, TRUE, NULL);
-		    if (len == 0)
+		    vim_str2nr(p + 2, عدم, &len,
+			     STR2NR_HEX + STR2NR_FORCE, &nr, عدم, 4, TRUE, عدم);
+		    إذا (len == 0)
 		    {
-			if (res != NULL)
+			إذا (res != عدم)
 			    ga_clear(&ga);
-			return FAIL;
+			أرجع FAIL;
 		    }
 		    p += len + 2;
-		    if (0xd800 <= nr && nr <= 0xdbff
-			    && (int)(reader->js_end - p) >= 6
+		    إذا (0xd800 <= nr && nr <= 0xdbff
+			    && (صحيح)(reader->js_انتها - p) >= 6
 			    && *p == '\\' && *(p+1) == 'u')
 		    {
 			varnumber_T	nr2 = 0;
 
 			// decode surrogate pair: \ud812\u3456
 			len = 0;
-			vim_str2nr(p + 2, NULL, &len, STR2NR_HEX + STR2NR_FORCE,
-						    &nr2, NULL, 4, TRUE, NULL);
-			if (len == 0)
+			vim_str2nr(p + 2, عدم, &len, STR2NR_HEX + STR2NR_FORCE,
+						    &nr2, عدم, 4, TRUE, عدم);
+			إذا (len == 0)
 			{
-			    if (res != NULL)
+			    إذا (res != عدم)
 				ga_clear(&ga);
-			    return FAIL;
+			    أرجع FAIL;
 			}
-			if (0xdc00 <= nr2 && nr2 <= 0xdfff)
+			إذا (0xdc00 <= nr2 && nr2 <= 0xdfff)
 			{
 			    p += len + 2;
 			    nr = (((nr - 0xd800) << 10) |
@@ -842,102 +842,102 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 			}
 		    }
 		    // Lone surrogate is invalid.
-		    if (0xd800 <= nr && nr <= 0xdfff)
+		    إذا (0xd800 <= nr && nr <= 0xdfff)
 		    {
-			if (res != NULL)
+			إذا (res != عدم)
 			    ga_clear(&ga);
-			return FAIL;
+			أرجع FAIL;
 		    }
-		    if (res != NULL)
+		    إذا (res != عدم)
 		    {
 			char_u	buf[NUMBUFLEN];
 			size_t	buflen;
 
-			buflen = utf_char2bytes((int)nr, buf);
+			buflen = utf_char2bytes((صحيح)nr, buf);
 			buf[buflen] = NUL;
 			ga_concat_len(&ga, buf, buflen);
 		    }
-		    break;
-		default:
+		    اكسر;
+		افتراضي:
 		    // not a special char, skip over backslash
 		    ++p;
-		    continue;
+		    استمر;
 	    }
-	    if (c > 0)
+	    إذا (c > 0)
 	    {
 		p += 2;
-		if (res != NULL)
+		إذا (res != عدم)
 		    ga_append(&ga, c);
 	    }
 	}
-	else
+	وإلا
 	{
 	    len = utf_ptr2len(p);
-	    if (res != NULL)
+	    إذا (res != عدم)
 	    {
-		if (ga_grow(&ga, len) == FAIL)
+		إذا (ga_grow(&ga, len) == FAIL)
 		{
 		    ga_clear(&ga);
-		    return FAIL;
+		    أرجع FAIL;
 		}
-		mch_memmove((char *)ga.ga_data + ga.ga_len, p, (size_t)len);
+		mch_memmove((حرف *)ga.ga_داده + ga.ga_len, p, (size_t)len);
 		ga.ga_len += len;
 	    }
 	    p += len;
 	}
     }
 
-    reader->js_used = (int)(p - reader->js_buf);
-    if (*p == quote)
+    reader->js_استفاده_شده = (صحيح)(p - reader->js_buf);
+    إذا (*p == quote)
     {
-	++reader->js_used;
-	if (res != NULL)
+	++reader->js_استفاده_شده;
+	إذا (res != عدم)
 	{
 	    ga_append(&ga, NUL);
 	    res->v_type = VAR_STRING;
-#if defined(USE_ICONV)
-	    if (!enc_utf8)
+#إذا defined(USE_ICONV)
+	    إذا (!enc_utf8)
 	    {
 		vimconv_T   conv;
 
 		// Convert the utf-8 string to 'encoding'.
 		conv.vc_type = CONV_NONE;
-		convert_setup(&conv, (char_u*)"utf-8", p_enc);
-		if (conv.vc_type != CONV_NONE)
+		convert_راهاندازی(&conv, (char_u*)"utf-8", p_enc);
+		إذا (conv.vc_type != CONV_NONE)
 		{
 		    res->vval.v_string =
-				      string_convert(&conv, ga.ga_data, NULL);
-		    vim_free(ga.ga_data);
+				      string_convert(&conv, ga.ga_داده, عدم);
+		    vim_free(ga.ga_داده);
 		}
-		convert_setup(&conv, NULL, NULL);
+		convert_راهاندازی(&conv, عدم, عدم);
 	    }
-	    else
-#endif
-		res->vval.v_string = ga.ga_data;
+	    وإلا
+#پایان_اگر
+		res->vval.v_string = ga.ga_داده;
 	}
-	return OK;
+	أرجع OK;
     }
-    if (res != NULL)
+    إذا (res != عدم)
     {
 	res->v_type = VAR_SPECIAL;
-	res->vval.v_number = VVAL_NONE;
+	res->vval.v_عدد = VVAL_NONE;
 	ga_clear(&ga);
     }
-    return MAYBE;
+    أرجع MAYBE;
 }
 
-typedef enum {
+تعريفنوع تعداد {
     JSON_ARRAY,		// parsing items in an array
-    JSON_OBJECT_KEY,	// parsing key of an object
+    JSON_OBJECT_کلید,	// parsing key of an object
     JSON_OBJECT		// parsing item in an object, after the key
 } json_decode_T;
 
-typedef struct {
+تعريفنوع بنية {
     json_decode_T jd_type;
     typval_T	  jd_tv;	// the list or dict
-    typval_T	  jd_key_tv;
-    char_u	  *jd_key;
-} json_dec_item_T;
+    typval_T	  jd_کلید_tv;
+    char_u	  *jd_کلید;
+} json_dec_قلم_T;
 
 /*
  * Decode one item and put it in "res".  If "res" is NULL only advance.
@@ -946,502 +946,502 @@ typedef struct {
  * Return FAIL for a decoding error (and give an error).
  * Return MAYBE for an incomplete message.
  */
-    static int
-json_decode_item(js_read_T *reader, typval_T *res, int options)
+    ساكن صحيح
+json_decode_قلم(js_read_T *reader, typval_T *res, صحيح options)
 {
     char_u	*p;
-    int		i;
-    int		len;
-    int		retval;
-    garray_T	stack;
-    typval_T	item;
-    typval_T	*cur_item;
-    json_dec_item_T *top_item;
-    char_u	key_buf[NUMBUFLEN];
+    صحيح		i;
+    صحيح		len;
+    صحيح		retval;
+    garray_T	پشته;
+    typval_T	قلم;
+    typval_T	*cur_قلم;
+    json_dec_قلم_T *بالاترین_قلم;
+    char_u	کلید_buf[NUMBUFLEN];
 
-    ga_init2(&stack, sizeof(json_dec_item_T), 100);
-    cur_item = res;
-    init_tv(&item);
-    if (res != NULL)
+    ga_init2(&پشته, حجم(json_dec_قلم_T), 100);
+    cur_قلم = res;
+    init_tv(&قلم);
+    إذا (res != عدم)
 	init_tv(res);
 
     fill_numbuflen(reader);
-    p = reader->js_buf + reader->js_used;
-    for (;;)
+    p = reader->js_buf + reader->js_استفاده_شده;
+    لكل (;;)
     {
-	top_item = NULL;
-	if (stack.ga_len > 0)
+	بالاترین_قلم = عدم;
+	إذا (پشته.ga_len > 0)
 	{
-	    top_item = ((json_dec_item_T *)stack.ga_data) + stack.ga_len - 1;
+	    بالاترین_قلم = ((json_dec_قلم_T *)پشته.ga_داده) + پشته.ga_len - 1;
 	    json_skip_white(reader);
-	    p = reader->js_buf + reader->js_used;
-	    if (*p == NUL)
+	    p = reader->js_buf + reader->js_استفاده_شده;
+	    إذا (*p == NUL)
 	    {
 		retval = MAYBE;
-		goto theend;
+		اذهب theend;
 	    }
-	    if (top_item->jd_type == JSON_OBJECT_KEY
-					    || top_item->jd_type == JSON_ARRAY)
+	    إذا (بالاترین_قلم->jd_type == JSON_OBJECT_کلید
+					    || بالاترین_قلم->jd_type == JSON_ARRAY)
 	    {
 		// Check for end of object or array.
-		if (*p == (top_item->jd_type == JSON_ARRAY ? ']' : '}'))
+		إذا (*p == (بالاترین_قلم->jd_type == JSON_ARRAY ? ']' : '}'))
 		{
-		    ++reader->js_used; // consume the ']' or '}'
-		    --stack.ga_len;
-		    if (stack.ga_len == 0)
+		    ++reader->js_استفاده_شده; // consume the ']' or '}'
+		    --پشته.ga_len;
+		    إذا (پشته.ga_len == 0)
 		    {
 			retval = OK;
-			goto theend;
+			اذهب theend;
 		    }
-		    if (cur_item != NULL)
-			cur_item = &top_item->jd_tv;
-		    goto item_end;
+		    إذا (cur_قلم != عدم)
+			cur_قلم = &بالاترین_قلم->jd_tv;
+		    اذهب قلم_انتها;
 		}
 	    }
 	}
 
-	if (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
+	إذا (بالاترین_قلم != عدم && بالاترین_قلم->jd_type == JSON_OBJECT_کلید
 		&& (options & JSON_JS)
-		&& reader->js_buf[reader->js_used] != '"'
-		&& reader->js_buf[reader->js_used] != '\''
-		&& reader->js_buf[reader->js_used] != '['
-		&& reader->js_buf[reader->js_used] != '{')
+		&& reader->js_buf[reader->js_استفاده_شده] != '"'
+		&& reader->js_buf[reader->js_استفاده_شده] != '\''
+		&& reader->js_buf[reader->js_استفاده_شده] != '['
+		&& reader->js_buf[reader->js_استفاده_شده] != '{')
 	{
-	    char_u *key;
+	    char_u *کلید;
 
 	    // accept an object key that is not in quotes
-	    key = p = reader->js_buf + reader->js_used;
-	    while (*p != NUL && *p != ':' && *p > ' ')
+	    کلید = p = reader->js_buf + reader->js_استفاده_شده;
+	    طالما (*p != NUL && *p != ':' && *p > ' ')
 		++p;
-	    if (cur_item != NULL)
+	    إذا (cur_قلم != عدم)
 	    {
-		cur_item->v_type = VAR_STRING;
-		cur_item->vval.v_string = vim_strnsave(key, p - key);
-		top_item->jd_key = cur_item->vval.v_string;
+		cur_قلم->v_type = VAR_STRING;
+		cur_قلم->vval.v_string = vim_strnsave(کلید, p - کلید);
+		بالاترین_قلم->jd_کلید = cur_قلم->vval.v_string;
 	    }
-	    reader->js_used += (int)(p - key);
+	    reader->js_استفاده_شده += (صحيح)(p - کلید);
 	}
-	else
+	وإلا
 	{
-	    switch (*p)
+	    بدل (*p)
 	    {
-		case '[': // start of array
-		    if (top_item && top_item->jd_type == JSON_OBJECT_KEY)
+		حالة '[': // start of array
+		    إذا (بالاترین_قلم && بالاترین_قلم->jd_type == JSON_OBJECT_کلید)
 		    {
 			retval = FAIL;
-			break;
+			اكسر;
 		    }
-		    if (stack.ga_len >= p_mfd)
+		    إذا (پشته.ga_len >= p_mfd)
 		    {
-			emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
+			emsg(_(e_function_call_عمق_is_higher_than_maxfuncdepth));
 			retval = FAIL;
-			break;
+			اكسر;
 		    }
-		    if (ga_grow(&stack, 1) == FAIL)
+		    إذا (ga_grow(&پشته, 1) == FAIL)
 		    {
 			retval = FAIL;
-			break;
+			اكسر;
 		    }
-		    if (cur_item != NULL && rettv_list_alloc(cur_item) == FAIL)
+		    إذا (cur_قلم != عدم && rettv_list_alloc(cur_قلم) == FAIL)
 		    {
-			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_قلم->v_type = VAR_SPECIAL;
+			cur_قلم->vval.v_عدد = VVAL_NONE;
 			retval = FAIL;
-			break;
+			اكسر;
 		    }
 
-		    ++reader->js_used; // consume the '['
-		    top_item = ((json_dec_item_T *)stack.ga_data)
-								+ stack.ga_len;
-		    top_item->jd_type = JSON_ARRAY;
-		    ++stack.ga_len;
-		    if (cur_item != NULL)
+		    ++reader->js_استفاده_شده; // consume the '['
+		    بالاترین_قلم = ((json_dec_قلم_T *)پشته.ga_داده)
+								+ پشته.ga_len;
+		    بالاترین_قلم->jd_type = JSON_ARRAY;
+		    ++پشته.ga_len;
+		    إذا (cur_قلم != عدم)
 		    {
-			top_item->jd_tv = *cur_item;
-			cur_item = &item;
+			بالاترین_قلم->jd_tv = *cur_قلم;
+			cur_قلم = &قلم;
 		    }
-		    continue;
+		    استمر;
 
-		case '{': // start of object
-		    if (top_item && top_item->jd_type == JSON_OBJECT_KEY)
+		حالة '{': // start of object
+		    إذا (بالاترین_قلم && بالاترین_قلم->jd_type == JSON_OBJECT_کلید)
 		    {
 			retval = FAIL;
-			break;
+			اكسر;
 		    }
-		    if (stack.ga_len >= p_mfd)
+		    إذا (پشته.ga_len >= p_mfd)
 		    {
-			emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
+			emsg(_(e_function_call_عمق_is_higher_than_maxfuncdepth));
 			retval = FAIL;
-			break;
+			اكسر;
 		    }
-		    if (ga_grow(&stack, 1) == FAIL)
+		    إذا (ga_grow(&پشته, 1) == FAIL)
 		    {
 			retval = FAIL;
-			break;
+			اكسر;
 		    }
-		    if (cur_item != NULL && rettv_dict_alloc(cur_item) == FAIL)
+		    إذا (cur_قلم != عدم && rettv_dict_alloc(cur_قلم) == FAIL)
 		    {
-			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_قلم->v_type = VAR_SPECIAL;
+			cur_قلم->vval.v_عدد = VVAL_NONE;
 			retval = FAIL;
-			break;
+			اكسر;
 		    }
 
-		    ++reader->js_used; // consume the '{'
-		    top_item = ((json_dec_item_T *)stack.ga_data)
-								+ stack.ga_len;
-		    top_item->jd_type = JSON_OBJECT_KEY;
-		    ++stack.ga_len;
-		    if (cur_item != NULL)
+		    ++reader->js_استفاده_شده; // consume the '{'
+		    بالاترین_قلم = ((json_dec_قلم_T *)پشته.ga_داده)
+								+ پشته.ga_len;
+		    بالاترین_قلم->jd_type = JSON_OBJECT_کلید;
+		    ++پشته.ga_len;
+		    إذا (cur_قلم != عدم)
 		    {
-			top_item->jd_tv = *cur_item;
-			cur_item = &top_item->jd_key_tv;
+			بالاترین_قلم->jd_tv = *cur_قلم;
+			cur_قلم = &بالاترین_قلم->jd_کلید_tv;
 		    }
-		    continue;
+		    استمر;
 
-		case '"': // string
-		    retval = json_decode_string(reader, cur_item, *p);
-		    break;
+		حالة '"': // string
+		    retval = json_decode_string(reader, cur_قلم, *p);
+		    اكسر;
 
-		case '\'':
-		    if (options & JSON_JS)
-			retval = json_decode_string(reader, cur_item, *p);
-		    else
+		حالة '\'':
+		    إذا (options & JSON_JS)
+			retval = json_decode_string(reader, cur_قلم, *p);
+		    وإلا
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    break;
+		    اكسر;
 
-		case ',': // comma: empty item
-		    if ((options & JSON_JS) == 0)
+		حالة ',': // comma: empty item
+		    إذا ((options & JSON_JS) == 0)
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
-			break;
+			اكسر;
 		    }
 		    // FALLTHROUGH
-		case NUL: // empty
-		    if (cur_item != NULL)
+		حالة NUL: //خالی
+		    إذا (cur_قلم != عدم)
 		    {
-			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_قلم->v_type = VAR_SPECIAL;
+			cur_قلم->vval.v_عدد = VVAL_NONE;
 		    }
 		    retval = OK;
-		    break;
+		    اكسر;
 
-		default:
-		    if (VIM_ISDIGIT(*p) || (*p == '-'
+		افتراضي:
+		    إذا (VIM_ISDIGIT(*p) || (*p == '-'
 					&& (VIM_ISDIGIT(p[1]) || p[1] == NUL)))
 		    {
 			char_u  *sp = p;
 
-			if (*sp == '-')
+			إذا (*sp == '-')
 			{
 			    ++sp;
-			    if (*sp == NUL)
+			    إذا (*sp == NUL)
 			    {
 				retval = MAYBE;
-				break;
+				اكسر;
 			    }
-			    if (!VIM_ISDIGIT(*sp))
+			    إذا (!VIM_ISDIGIT(*sp))
 			    {
 				semsg(_(e_json_decode_error_at_str), p);
 				retval = FAIL;
-				break;
+				اكسر;
 			    }
 			}
 			sp = skipdigits(sp);
-			if (*sp == '.' || *sp == 'e' || *sp == 'E')
+			إذا (*sp == '.' || *sp == 'e' || *sp == 'E')
 			{
-			    if (cur_item == NULL)
+			    إذا (cur_قلم == عدم)
 			    {
 				float_T f;
 
 				len = string2float(p, &f, FALSE);
 			    }
-			    else
+			    وإلا
 			    {
-				cur_item->v_type = VAR_FLOAT;
-				len = string2float(p, &cur_item->vval.v_float,
+				cur_قلم->v_type = VAR_FLOAT;
+				len = string2float(p, &cur_قلم->vval.v_float,
 									FALSE);
 			    }
 			}
-			else
+			وإلا
 			{
 			    varnumber_T nr;
 
-			    vim_str2nr(reader->js_buf + reader->js_used,
-				    NULL, &len, 0, // what
-				    &nr, NULL, 0, TRUE, NULL);
-			    if (len == 0)
+			    vim_str2nr(reader->js_buf + reader->js_استفاده_شده,
+				    عدم, &len, 0, // what
+				    &nr, عدم, 0, TRUE, عدم);
+			    إذا (len == 0)
 			    {
 				semsg(_(e_json_decode_error_at_str), p);
 				retval = FAIL;
-				goto theend;
+				اذهب theend;
 			    }
-			    if (cur_item != NULL)
+			    إذا (cur_قلم != عدم)
 			    {
-				cur_item->v_type = VAR_NUMBER;
-				cur_item->vval.v_number = nr;
+				cur_قلم->v_type = VAR_عدد;
+				cur_قلم->vval.v_عدد = nr;
 			    }
 			}
-			reader->js_used += len;
+			reader->js_استفاده_شده += len;
 			retval = OK;
-			break;
+			اكسر;
 		    }
 		    // In strinct JSON mode, keywords must be lowercase.
 		    // In JS mode, keywords are case-insensitive.
-#define MATCH_KW(p, kw, len) \
+#تعریف_کن تطابق_KW(p, kw, len) \
     ((options & JSON_JS) \
-     ? STRNICMP((char *)(p), (kw), (len)) == 0 \
-     : STRNCMP((char *)(p), (kw), (len)) == 0)
-		    if (MATCH_KW(p, "false", 5))
+     ? STRNICMP((حرف *)(p), (kw), (len)) == 0 \
+     : STRNCMP((حرف *)(p), (kw), (len)) == 0)
+		    إذا (تطابق_KW(p, "false", 5))
 		    {
-			reader->js_used += 5;
-			if (cur_item != NULL)
+			reader->js_استفاده_شده += 5;
+			إذا (cur_قلم != عدم)
 			{
-			    cur_item->v_type = VAR_BOOL;
-			    cur_item->vval.v_number = VVAL_FALSE;
+			    cur_قلم->v_type = VAR_BOOL;
+			    cur_قلم->vval.v_عدد = VVAL_FALSE;
 			}
 			retval = OK;
-			break;
+			اكسر;
 		    }
-		    if (MATCH_KW(p, "true", 4))
+		    إذا (تطابق_KW(p, "true", 4))
 		    {
-			reader->js_used += 4;
-			if (cur_item != NULL)
+			reader->js_استفاده_شده += 4;
+			إذا (cur_قلم != عدم)
 			{
-			    cur_item->v_type = VAR_BOOL;
-			    cur_item->vval.v_number = VVAL_TRUE;
+			    cur_قلم->v_type = VAR_BOOL;
+			    cur_قلم->vval.v_عدد = VVAL_TRUE;
 			}
 			retval = OK;
-			break;
+			اكسر;
 		    }
-		    if (MATCH_KW(p, "null", 4))
+		    إذا (تطابق_KW(p, "null", 4))
 		    {
-			reader->js_used += 4;
-			if (cur_item != NULL)
+			reader->js_استفاده_شده += 4;
+			إذا (cur_قلم != عدم)
 			{
-			    cur_item->v_type = VAR_SPECIAL;
-			    cur_item->vval.v_number = VVAL_NULL;
+			    cur_قلم->v_type = VAR_SPECIAL;
+			    cur_قلم->vval.v_عدد = VVAL_NULL;
 			}
 			retval = OK;
-			break;
+			اكسر;
 		    }
-		    if (MATCH_KW(p, "NaN", 3))
+		    إذا (تطابق_KW(p, "NaN", 3))
 		    {
-			reader->js_used += 3;
-			if (cur_item != NULL)
+			reader->js_استفاده_شده += 3;
+			إذا (cur_قلم != عدم)
 			{
-			    cur_item->v_type = VAR_FLOAT;
-			    cur_item->vval.v_float = NAN;
+			    cur_قلم->v_type = VAR_FLOAT;
+			    cur_قلم->vval.v_float = NAN;
 			}
 			retval = OK;
-			break;
+			اكسر;
 		    }
-		    if (MATCH_KW(p, "-Infinity", 9))
+		    إذا (تطابق_KW(p, "-Infinity", 9))
 		    {
-			reader->js_used += 9;
-			if (cur_item != NULL)
+			reader->js_استفاده_شده += 9;
+			إذا (cur_قلم != عدم)
 			{
-			    cur_item->v_type = VAR_FLOAT;
-			    cur_item->vval.v_float = -INFINITY;
+			    cur_قلم->v_type = VAR_FLOAT;
+			    cur_قلم->vval.v_float = -INFINITY;
 			}
 			retval = OK;
-			break;
+			اكسر;
 		    }
-		    if (MATCH_KW(p, "Infinity", 8))
+		    إذا (تطابق_KW(p, "Infinity", 8))
 		    {
-			reader->js_used += 8;
-			if (cur_item != NULL)
+			reader->js_استفاده_شده += 8;
+			إذا (cur_قلم != عدم)
 			{
-			    cur_item->v_type = VAR_FLOAT;
-			    cur_item->vval.v_float = INFINITY;
+			    cur_قلم->v_type = VAR_FLOAT;
+			    cur_قلم->vval.v_float = INFINITY;
 			}
 			retval = OK;
-			break;
+			اكسر;
 		    }
-#undef MATCH_KW
+#لغو_تعریف تطابق_KW
 		    // check for truncated name
-		    len = (int)(reader->js_end
-					 - (reader->js_buf + reader->js_used));
-		    if (
-			    (len < 5 && STRNICMP((char *)p, "false", len) == 0)
+		    len = (صحيح)(reader->js_انتها
+					 - (reader->js_buf + reader->js_استفاده_شده));
+		    إذا (
+			    (len < 5 && STRNICMP((حرف *)p, "false", len) == 0)
 			    || (len < 9
-				 && STRNICMP((char *)p, "-Infinity", len) == 0)
+				 && STRNICMP((حرف *)p, "-Infinity", len) == 0)
 			    || (len < 8
-				  && STRNICMP((char *)p, "Infinity", len) == 0)
-			    || (len < 3 && STRNICMP((char *)p, "NaN", len) == 0)
+				  && STRNICMP((حرف *)p, "Infinity", len) == 0)
+			    || (len < 3 && STRNICMP((حرف *)p, "NaN", len) == 0)
 			    || (len < 4
-				  && (STRNICMP((char *)p, "true", len) == 0
-				    || STRNICMP((char *)p, "null", len) == 0)))
+				  && (STRNICMP((حرف *)p, "true", len) == 0
+				    || STRNICMP((حرف *)p, "null", len) == 0)))
 
 			retval = MAYBE;
-		    else
+		    وإلا
 			retval = FAIL;
-		    break;
+		    اكسر;
 	    }
 
 	    // We are finished when retval is FAIL or MAYBE and when at the
 	    // toplevel.
-	    if (retval == FAIL)
-		break;
-	    if (retval == MAYBE || stack.ga_len == 0)
-		goto theend;
+	    إذا (retval == FAIL)
+		اكسر;
+	    إذا (retval == MAYBE || پشته.ga_len == 0)
+		اذهب theend;
 
-	    if (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
-		    && cur_item != NULL)
+	    إذا (بالاترین_قلم != عدم && بالاترین_قلم->jd_type == JSON_OBJECT_کلید
+		    && cur_قلم != عدم)
 	    {
-		if (cur_item->v_type == VAR_FLOAT)
+		إذا (cur_قلم->v_type == VAR_FLOAT)
 		{
 		    // cannot use a float as a key
 		    emsg(_(e_using_float_as_string));
 		    retval = FAIL;
-		    goto theend;
+		    اذهب theend;
 		}
-		top_item->jd_key = tv_get_string_buf_chk(cur_item, key_buf);
-		if (top_item->jd_key == NULL)
+		بالاترین_قلم->jd_کلید = tv_get_string_buf_chk(cur_قلم, کلید_buf);
+		إذا (بالاترین_قلم->jd_کلید == عدم)
 		{
-		    emsg(_(e_invalid_argument));
+		    emsg(_(e_invalid_آرگومان));
 		    retval = FAIL;
-		    goto theend;
+		    اذهب theend;
 		}
 	    }
 	}
 
-item_end:
-	top_item = ((json_dec_item_T *)stack.ga_data) + stack.ga_len - 1;
-	switch (top_item->jd_type)
+قلم_انتها:
+	بالاترین_قلم = ((json_dec_قلم_T *)پشته.ga_داده) + پشته.ga_len - 1;
+	بدل (بالاترین_قلم->jd_type)
 	{
-	    case JSON_ARRAY:
-		if (res != NULL)
+	    حالة JSON_ARRAY:
+		إذا (res != عدم)
 		{
 		    listitem_T	*li = listitem_alloc();
 
-		    if (li == NULL)
+		    إذا (li == عدم)
 		    {
-			clear_tv(cur_item);
+			clear_tv(cur_قلم);
 			retval = FAIL;
-			goto theend;
+			اذهب theend;
 		    }
-		    li->li_tv = *cur_item;
-		    list_append(top_item->jd_tv.vval.v_list, li);
+		    li->li_tv = *cur_قلم;
+		    list_append(بالاترین_قلم->jd_tv.vval.v_list, li);
 		}
-		if (cur_item != NULL)
-		    cur_item = &item;
+		إذا (cur_قلم != عدم)
+		    cur_قلم = &قلم;
 
 		json_skip_white(reader);
-		p = reader->js_buf + reader->js_used;
-		if (*p == ',')
-		    ++reader->js_used;
-		else if (*p != ']')
+		p = reader->js_buf + reader->js_استفاده_شده;
+		إذا (*p == ',')
+		    ++reader->js_استفاده_شده;
+		وإلا إذا (*p != ']')
 		{
-		    if (*p == NUL)
+		    إذا (*p == NUL)
 			retval = MAYBE;
-		    else
+		    وإلا
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    goto theend;
+		    اذهب theend;
 		}
-		break;
+		اكسر;
 
-	    case JSON_OBJECT_KEY:
+	    حالة JSON_OBJECT_کلید:
 		json_skip_white(reader);
-		p = reader->js_buf + reader->js_used;
-		if (*p != ':')
+		p = reader->js_buf + reader->js_استفاده_شده;
+		إذا (*p != ':')
 		{
-		    if (cur_item != NULL)
-			clear_tv(cur_item);
-		    if (*p == NUL)
+		    إذا (cur_قلم != عدم)
+			clear_tv(cur_قلم);
+		    إذا (*p == NUL)
 			retval = MAYBE;
-		    else
+		    وإلا
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    goto theend;
+		    اذهب theend;
 		}
-		++reader->js_used;
+		++reader->js_استفاده_شده;
 		json_skip_white(reader);
-		top_item->jd_type = JSON_OBJECT;
-		if (cur_item != NULL)
-		    cur_item = &item;
-		break;
+		بالاترین_قلم->jd_type = JSON_OBJECT;
+		إذا (cur_قلم != عدم)
+		    cur_قلم = &قلم;
+		اكسر;
 
-	    case JSON_OBJECT:
-		if (cur_item != NULL
-			&& dict_has_key(top_item->jd_tv.vval.v_dict,
-						(char *)top_item->jd_key))
+	    حالة JSON_OBJECT:
+		إذا (cur_قلم != عدم
+			&& dict_has_کلید(بالاترین_قلم->jd_tv.vval.v_dict,
+						(حرف *)بالاترین_قلم->jd_کلید))
 		{
-		    semsg(_(e_duplicate_key_in_json_str), top_item->jd_key);
-		    clear_tv(cur_item);
+		    semsg(_(e_duplicate_کلید_درون_json_str), بالاترین_قلم->jd_کلید);
+		    clear_tv(cur_قلم);
 		    retval = FAIL;
-		    goto theend;
+		    اذهب theend;
 		}
 
-		if (cur_item != NULL)
+		إذا (cur_قلم != عدم)
 		{
-		    dictitem_T *di = dictitem_alloc(top_item->jd_key);
+		    dictitem_T *di = dictitem_alloc(بالاترین_قلم->jd_کلید);
 
-		    clear_tv(&top_item->jd_key_tv);
-		    if (di == NULL)
+		    clear_tv(&بالاترین_قلم->jd_کلید_tv);
+		    إذا (di == عدم)
 		    {
-			clear_tv(cur_item);
+			clear_tv(cur_قلم);
 			retval = FAIL;
-			goto theend;
+			اذهب theend;
 		    }
-		    di->di_tv = *cur_item;
-		    di->di_tv.v_lock = 0;
-		    if (dict_add(top_item->jd_tv.vval.v_dict, di) == FAIL)
+		    di->di_tv = *cur_قلم;
+		    di->di_tv.v_قفل = 0;
+		    إذا (dict_جمع_کن(بالاترین_قلم->jd_tv.vval.v_dict, di) == FAIL)
 		    {
 			dictitem_free(di);
 			retval = FAIL;
-			goto theend;
+			اذهب theend;
 		    }
 		}
 
 		json_skip_white(reader);
-		p = reader->js_buf + reader->js_used;
-		if (*p == ',')
-		    ++reader->js_used;
-		else if (*p != '}')
+		p = reader->js_buf + reader->js_استفاده_شده;
+		إذا (*p == ',')
+		    ++reader->js_استفاده_شده;
+		وإلا إذا (*p != '}')
 		{
-		    if (*p == NUL)
+		    إذا (*p == NUL)
 			retval = MAYBE;
-		    else
+		    وإلا
 		    {
 			semsg(_(e_json_decode_error_at_str), p);
 			retval = FAIL;
 		    }
-		    goto theend;
+		    اذهب theend;
 		}
-		top_item->jd_type = JSON_OBJECT_KEY;
-		if (cur_item != NULL)
-		    cur_item = &top_item->jd_key_tv;
-		break;
+		بالاترین_قلم->jd_type = JSON_OBJECT_کلید;
+		إذا (cur_قلم != عدم)
+		    cur_قلم = &بالاترین_قلم->jd_کلید_tv;
+		اكسر;
 	}
     }
 
     // Get here when parsing failed.
-    if (res != NULL)
+    إذا (res != عدم)
     {
 	clear_tv(res);
 	res->v_type = VAR_SPECIAL;
-	res->vval.v_number = VVAL_NONE;
+	res->vval.v_عدد = VVAL_NONE;
     }
     // "p" may dangle into a buffer freed by a js_fill() refill in
     // json_decode_string(); report the position from the current reader.
-    semsg(_(e_json_decode_error_at_str), reader->js_buf + reader->js_used);
+    semsg(_(e_json_decode_error_at_str), reader->js_buf + reader->js_استفاده_شده);
 
 theend:
-    for (i = 0; i < stack.ga_len; i++)
-	clear_tv(&(((json_dec_item_T *)stack.ga_data) + i)->jd_key_tv);
-    ga_clear(&stack);
+    لكل (i = 0; i < پشته.ga_len; i++)
+	clear_tv(&(((json_dec_قلم_T *)پشته.ga_داده) + i)->jd_کلید_tv);
+    ga_clear(&پشته);
 
-    return retval;
+    أرجع retval;
 }
 
 /*
@@ -1449,31 +1449,31 @@ theend:
  * "options" can be JSON_JS or zero;
  * Return FAIL if not the whole message was consumed.
  */
-    static int
-json_decode_all(js_read_T *reader, typval_T *res, int options)
+    ساكن صحيح
+json_decode_all(js_read_T *reader, typval_T *res, صحيح options)
 {
-    int ret;
+    صحيح ret;
 
     // We find the end once, to avoid calling strlen() many times.
-    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
+    reader->js_انتها = reader->js_buf + STRLEN(reader->js_buf);
     json_skip_white(reader);
-    ret = json_decode_item(reader, res, options);
-    if (ret != OK)
+    ret = json_decode_قلم(reader, res, options);
+    إذا (ret != OK)
     {
-	if (ret == MAYBE)
+	إذا (ret == MAYBE)
 	    semsg(_(e_json_decode_error_at_str), reader->js_buf);
-	return FAIL;
+	أرجع FAIL;
     }
     json_skip_white(reader);
-    if (reader->js_buf[reader->js_used] != NUL)
+    إذا (reader->js_buf[reader->js_استفاده_شده] != NUL)
     {
-	semsg(_(e_trailing_characters_str), reader->js_buf + reader->js_used);
-	return FAIL;
+	semsg(_(e_trailing_characters_str), reader->js_buf + reader->js_استفاده_شده);
+	أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#إذا defined(FEAT_کار_CHANNEL)
 /*
  * Decode the JSON from "reader" and store the result in "res".
  * "options" can be JSON_JS or zero;
@@ -1481,20 +1481,20 @@ json_decode_all(js_read_T *reader, typval_T *res, int options)
  * Return MAYBE for an incomplete message.
  * Consumes the message anyway.
  */
-    int
-json_decode(js_read_T *reader, typval_T *res, int options)
+    صحيح
+json_decode(js_read_T *reader, typval_T *res, صحيح options)
 {
-    int ret;
+    صحيح ret;
 
     // We find the end once, to avoid calling strlen() many times.
-    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
+    reader->js_انتها = reader->js_buf + STRLEN(reader->js_buf);
     json_skip_white(reader);
-    ret = json_decode_item(reader, res, options);
+    ret = json_decode_قلم(reader, res, options);
     json_skip_white(reader);
 
-    return ret;
+    أرجع ret;
 }
-#endif
+#پایان_اگر
 
 /*
  * Decode the JSON from "reader" to find the end of the message.
@@ -1506,42 +1506,42 @@ json_decode(js_read_T *reader, typval_T *res, int options)
  * string.  A number might be truncated without knowing.
  * Does not advance the reader.
  */
-    int
-json_find_end(js_read_T *reader, int options)
+    صحيح
+json_پیدا_کن_انتها(js_read_T *reader, صحيح options)
 {
-    int used_save = reader->js_used;
-    int ret;
+    صحيح استفاده_شده_save = reader->js_استفاده_شده;
+    صحيح ret;
 
     // We find the end once, to avoid calling strlen() many times.
-    reader->js_end = reader->js_buf + STRLEN(reader->js_buf);
+    reader->js_انتها = reader->js_buf + STRLEN(reader->js_buf);
     json_skip_white(reader);
-    ret = json_decode_item(reader, NULL, options);
-    reader->js_used = used_save;
-    return ret;
+    ret = json_decode_قلم(reader, عدم, options);
+    reader->js_استفاده_شده = استفاده_شده_save;
+    أرجع ret;
 }
 
 /*
  * "js_decode()" function
  */
-    void
+    فراغ
 f_js_decode(typval_T *argvars, typval_T *rettv)
 {
     js_read_T	reader;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (درون_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     reader.js_buf = tv_get_string(&argvars[0]);
-    reader.js_fill = NULL;
-    reader.js_used = 0;
-    if (json_decode_all(&reader, rettv, JSON_JS) != OK)
-	emsg(_(e_invalid_argument));
+    reader.js_fill = عدم;
+    reader.js_استفاده_شده = 0;
+    إذا (json_decode_all(&reader, rettv, JSON_JS) != OK)
+	emsg(_(e_invalid_آرگومان));
 }
 
 /*
  * "js_encode()" function
  */
-    void
+    فراغ
 f_js_encode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
@@ -1551,27 +1551,27 @@ f_js_encode(typval_T *argvars, typval_T *rettv)
 /*
  * "json_decode()" function
  */
-    void
+    فراغ
 f_json_decode(typval_T *argvars, typval_T *rettv)
 {
     js_read_T	reader;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    إذا (درون_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	أرجع;
 
     reader.js_buf = tv_get_string(&argvars[0]);
-    reader.js_fill = NULL;
-    reader.js_used = 0;
+    reader.js_fill = عدم;
+    reader.js_استفاده_شده = 0;
     json_decode_all(&reader, rettv, 0);
 }
 
 /*
  * "json_encode()" function
  */
-    void
+    فراغ
 f_json_encode(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = json_encode(&argvars[0], 0);
 }
-#endif
+#پایان_اگر

@@ -23,52 +23,52 @@
 // The following includes come from Vim:
 
 // defines HAVE_ATTRIBUTE_UNUSED
-#ifdef HAVE_CONFIG_H
+#اگر_تعریف_شده HAVE_CONFIG_H
 # ifdef VMS
 #  include "config.h"
-# else
+# وإلا
 #  include "../auto/config.h"
 # endif
-#endif
+#پایان_اگر
 
 // Mark unused function arguments with UNUSED, so that gcc -Wunused-parameter
 // can be used to check for mistakes.
-#if defined(HAVE_ATTRIBUTE_UNUSED) || defined(__MINGW32__)
-# define UNUSED __attribute__((unused))
-#else
-# define UNUSED
-#endif
+#إذا defined(HAVE_ATTRIBUTE_استفادهنشده) || defined(__MINGW32__)
+# define استفادهنشده __attribute__((استفادهنشده_2))
+#وإلا
+# define استفادهنشده
+#پایان_اگر
 
-#if defined(_MSC_VER)
-# define inline __inline
-#endif
+#إذا defined(_MSC_VER)
+# define مضمن __inline
+#پایان_اگر
 
 // Vim replacement for BUG()
-void xdl_bug(const char *msg);
+فراغ xdl_bug(ثابت حرف *پیام);
 
-#if !defined(XINCLUDE_H)
-#define XINCLUDE_H
+#إذا !defined(XINCLUDE_H)
+#تعریف_کن XINCLUDE_H
 
 // This effectively re-verts b46054b3746271d23feab0 from git
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#if !defined(_WIN32)
-#include <unistd.h>
-#endif
-#include <string.h>
-#include <limits.h>
+#ضمن <ctype.h>
+#ضمن <stdio.h>
+#ضمن <stdlib.h>
+#إذا !defined(_WIN32)
+#ضمن <unistd.h>
+#پایان_اگر
+#ضمن <string.h>
+#ضمن <limits.h>
 // This include comes from git, so uncomment it
-#if 0
-#include "git-compat-util.h"
-#endif
-#include "xmacros.h"
-#include "xdiff.h"
-#include "xtypes.h"
-#include "xutils.h"
-#include "xprepare.h"
-#include "xdiffi.h"
-#include "xemit.h"
+#إذا 0
+#ضمن "git-compat-util.h"
+#پایان_اگر
+#ضمن "xmacros.h"
+#ضمن "xdiff.h"
+#ضمن "xtypes.h"
+#ضمن "xutils.h"
+#ضمن "xprepare.h"
+#ضمن "xdiffi.h"
+#ضمن "xemit.h"
 
 
-#endif /* #if !defined(XINCLUDE_H) */
+#پایان_اگر /* #if !defined(XINCLUDE_H) */

@@ -12,9 +12,9 @@
  * fold.c: code for folding
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_FOLDING)
+#إذا defined(FEAT_FOLDING)
 
 // local declarations. {{{1
 // typedef fold_T {{{2
@@ -24,14 +24,14 @@
  * fd_nested growarray.
  * The info stored in both growarrays is the same: An array of fold_T.
  */
-typedef struct
+تعريفنوع بنية
 {
-    linenr_T	fd_top;		// first line of fold; for nested fold
+    linenr_T	fd_بالاترین;		// first line of fold; for nested fold
 				// relative to parent
     linenr_T	fd_len;		// number of lines in the fold
     garray_T	fd_nested;	// array of nested folds
-    char	fd_flags;	// see below
-    char	fd_small;	// TRUE, FALSE or MAYBE: fold smaller than
+    حرف	fd_flags;	// see below
+    حرف	fd_small;	// TRUE, FALSE or MAYBE: fold smaller than
 				// 'foldminlines'; MAYBE applies to nested
 				// folds too
 } fold_T;
@@ -43,34 +43,34 @@ typedef struct
 # define MAX_LEVEL	20	// maximum fold depth
 
 // static functions {{{2
-static void newFoldLevelWin(win_T *wp);
-static int checkCloseRec(garray_T *gap, linenr_T lnum, int level);
-static int foldFind(garray_T *gap, linenr_T lnum, fold_T **fpp);
-static int foldLevelWin(win_T *wp, linenr_T lnum);
-static void checkupdate(win_T *wp);
-static void setFoldRepeat(linenr_T lnum, long count, int do_open);
-static linenr_T setManualFold(linenr_T lnum, int opening, int recurse, int *donep);
-static linenr_T setManualFoldWin(win_T *wp, linenr_T lnum, int opening, int recurse, int *donep);
-static void foldOpenNested(fold_T *fpr);
-static void deleteFoldEntry(garray_T *gap, int idx, int recursive);
-static void foldMarkAdjustRecurse(garray_T *gap, linenr_T line1, linenr_T line2, long amount, long amount_after);
-static int getDeepestNestingRecurse(garray_T *gap);
-static int check_closed(win_T *win, fold_T *fp, int *use_levelp, int level, int *maybe_smallp, linenr_T lnum_off);
-static void checkSmall(win_T *wp, fold_T *fp, linenr_T lnum_off);
-static void setSmallMaybe(garray_T *gap);
-static void foldCreateMarkers(linenr_T start, linenr_T end);
-static void foldAddMarker(linenr_T lnum, char_u *marker, int markerlen);
-static void deleteFoldMarkers(fold_T *fp, int recursive, linenr_T lnum_off);
-static void foldDelMarker(linenr_T lnum, char_u *marker, int markerlen);
-static void foldUpdateIEMS(win_T *wp, linenr_T top, linenr_T bot);
-static void parseMarker(win_T *wp);
+ساكن فراغ newFoldLevelWin(win_T *wp);
+ساكن صحيح checkCloseRec(garray_T *gap, linenr_T lnum, صحيح level);
+ساكن صحيح fold_پیدا_کن(garray_T *gap, linenr_T lnum, fold_T **fpp);
+ساكن صحيح foldLevelWin(win_T *wp, linenr_T lnum);
+ساكن فراغ checkupdate(win_T *wp);
+ساكن فراغ مجموعه_Fold_Repeat(linenr_T lnum, دراز شمار, صحيح do_open);
+ساكن linenr_T مجموعه_Manual_Fold(linenr_T lnum, صحيح opening, صحيح recurse, صحيح *donep);
+ساكن linenr_T مجموعه_Manual_Fold_Win(win_T *wp, linenr_T lnum, صحيح opening, صحيح recurse, صحيح *donep);
+ساكن فراغ foldOpenNested(fold_T *fpr);
+ساكن فراغ delete_Fold_مدخل(garray_T *gap, صحيح idx, صحيح recursive);
+ساكن فراغ foldMarkAdjustRecurse(garray_T *gap, linenr_T line1, linenr_T line2, دراز amount, دراز amount_after);
+ساكن صحيح get_عمیقترین_Nesting_Recurse(garray_T *gap);
+ساكن صحيح check_closed(win_T *win, fold_T *fp, صحيح *use_levelp, صحيح level, صحيح *maybe_smallp, linenr_T lnum_off);
+ساكن فراغ checkSmall(win_T *wp, fold_T *fp, linenr_T lnum_off);
+ساكن فراغ مجموعه_Small_Maybe(garray_T *gap);
+ساكن فراغ foldCreateMarkers(linenr_T شروع, linenr_T انتها);
+ساكن فراغ fold_جمع_کن_Marker(linenr_T lnum, char_u *marker, صحيح markerlen);
+ساكن فراغ deleteFoldMarkers(fold_T *fp, صحيح recursive, linenr_T lnum_off);
+ساكن فراغ foldDelMarker(linenr_T lnum, char_u *marker, صحيح markerlen);
+ساكن فراغ foldUpdateIEMS(win_T *wp, linenr_T بالاترین, linenr_T bot);
+ساكن فراغ parseMarker(win_T *wp);
 
 /*
  * While updating the folds lines between invalid_top and invalid_bot have an
  * undefined fold level.  Only used for the window currently being updated.
  */
-static linenr_T invalid_top = (linenr_T)0;
-static linenr_T invalid_bot = (linenr_T)0;
+ساكن linenr_T invalid_بالاترین = (linenr_T)0;
+ساكن linenr_T invalid_bot = (linenr_T)0;
 
 /*
  * When using 'foldexpr' we sometimes get the level of the next line, which
@@ -79,17 +79,17 @@ static linenr_T invalid_bot = (linenr_T)0;
  * previous line is stored here when available.  prev_lnum is zero when the
  * level is not available.
  */
-static linenr_T prev_lnum = 0;
-static int prev_lnum_lvl = -1;
+ساكن linenr_T prev_lnum = 0;
+ساكن صحيح prev_lnum_lvl = -1;
 
 // Flags used for "done" argument of setManualFold.
-# define DONE_NOTHING	0
-# define DONE_ACTION	1	// did close or open a fold
-# define DONE_FOLD	2	// did find a fold
+# define انجامشده_NOTHING	0
+# define انجامشده_ACTION	1	// did close or open a fold
+# define انجامشده_FOLD	2	// did find a fold
 
-static int foldstartmarkerlen;
-static char_u *foldendmarker;
-static int foldendmarkerlen;
+ساكن صحيح foldstartmarkerlen;
+ساكن char_u *foldendmarker;
+ساكن صحيح foldendmarkerlen;
 
 // Exported folding functions. {{{1
 // copyFoldingState() {{{2
@@ -97,23 +97,23 @@ static int foldendmarkerlen;
 /*
  * Copy that folding state from window "wp_from" to window "wp_to".
  */
-    void
-copyFoldingState(win_T *wp_from, win_T *wp_to)
+    فراغ
+copyFoldingState(win_T *wp_from, win_T *wp_مقصد)
 {
-    wp_to->w_fold_manual = wp_from->w_fold_manual;
-    wp_to->w_foldinvalid = wp_from->w_foldinvalid;
-    cloneFoldGrowArray(&wp_from->w_folds, &wp_to->w_folds);
+    wp_مقصد->w_fold_manual = wp_from->w_fold_manual;
+    wp_مقصد->w_foldinvalid = wp_from->w_foldinvalid;
+    cloneFoldGrowArray(&wp_from->w_folds, &wp_مقصد->w_folds);
 }
 
 // hasAnyFolding() {{{2
 /*
  * Return TRUE if there may be folded lines in window "win".
  */
-    int
+    صحيح
 hasAnyFolding(win_T *win)
 {
     // very simple now, but can become more complex later
-    return (win->w_p_fen
+    أرجع (win->w_p_fen
 	    && (!foldmethodIsManual(win) || win->w_folds.ga_len > 0));
 }
 
@@ -124,121 +124,121 @@ hasAnyFolding(win_T *win)
  * When returning TRUE, *firstp and *lastp are set to the first and last
  * lnum of the sequence of folded lines (skipped when NULL).
  */
-    int
+    صحيح
 hasFolding(linenr_T lnum, linenr_T *firstp, linenr_T *lastp)
 {
-    return hasFoldingWin(curwin, lnum, firstp, lastp, TRUE, NULL);
+    أرجع hasFoldingWin(curwin, lnum, firstp, lastp, TRUE, عدم);
 }
 
 // hasFoldingWin() {{{2
-    int
+    صحيح
 hasFoldingWin(
     win_T	*win,
     linenr_T	lnum,
     linenr_T	*firstp,
     linenr_T	*lastp,
-    int		cache,		// when TRUE: use cached values of window
+    صحيح		cache,		// when TRUE: use cached values of window
     foldinfo_T	*infop)		// where to store fold info
 {
-    int		had_folded = FALSE;
-    linenr_T	first = 0;
-    linenr_T	last = 0;
+    صحيح		had_folded = FALSE;
+    linenr_T	اولی = 0;
+    linenr_T	آخرین = 0;
     linenr_T	lnum_rel = lnum;
-    int		x;
+    صحيح		x;
     fold_T	*fp;
-    int		level = 0;
-    int		use_level = FALSE;
-    int		maybe_small = FALSE;
+    صحيح		level = 0;
+    صحيح		use_level = FALSE;
+    صحيح		maybe_small = FALSE;
     garray_T	*gap;
-    int		low_level = 0;
+    صحيح		کم_level = 0;
 
     checkupdate(win);
 
     /*
      * Return quickly when there is no folding at all in this window.
      */
-    if (!hasAnyFolding(win))
+    إذا (!hasAnyFolding(win))
     {
-	if (infop != NULL)
+	إذا (infop != عدم)
 	    infop->fi_level = 0;
-	return FALSE;
+	أرجع FALSE;
     }
 
-    if (cache)
+    إذا (cache)
     {
 	/*
 	 * First look in cached info for displayed lines.  This is probably
 	 * the fastest, but it can only be used if the entry is still valid.
 	 */
-	x = find_wl_entry(win, lnum);
-	if (x >= 0)
+	x = پیدا_کن_wl_مدخل(win, lnum);
+	إذا (x >= 0)
 	{
-	    first = win->w_lines[x].wl_lnum;
-	    last = win->w_lines[x].wl_lastlnum;
-	    had_folded = win->w_lines[x].wl_folded;
+	    اولی = win->w_سطرها[x].wl_lnum;
+	    آخرین = win->w_سطرها[x].wl_lastlnum;
+	    had_folded = win->w_سطرها[x].wl_folded;
 	}
     }
 
-    if (first == 0)
+    إذا (اولی == 0)
     {
 	/*
 	 * Recursively search for a fold that contains "lnum".
 	 */
 	gap = &win->w_folds;
-	for (;;)
+	لكل (;;)
 	{
-	    if (!foldFind(gap, lnum_rel, &fp))
-		break;
+	    إذا (!fold_پیدا_کن(gap, lnum_rel, &fp))
+		اكسر;
 
 	    // Remember lowest level of fold that starts in "lnum".
-	    if (lnum_rel == fp->fd_top && low_level == 0)
-		low_level = level + 1;
+	    إذا (lnum_rel == fp->fd_بالاترین && کم_level == 0)
+		کم_level = level + 1;
 
-	    first += fp->fd_top;
-	    last += fp->fd_top;
+	    اولی += fp->fd_بالاترین;
+	    آخرین += fp->fd_بالاترین;
 
 	    // is this fold closed?
 	    had_folded = check_closed(win, fp, &use_level, level,
 					       &maybe_small, lnum - lnum_rel);
-	    if (had_folded)
+	    إذا (had_folded)
 	    {
 		// Fold closed: Set last and quit loop.
-		last += fp->fd_len - 1;
-		break;
+		آخرین += fp->fd_len - 1;
+		اكسر;
 	    }
 
 	    // Fold found, but it's open: Check nested folds.  Line number is
 	    // relative to containing fold.
 	    gap = &fp->fd_nested;
-	    lnum_rel -= fp->fd_top;
+	    lnum_rel -= fp->fd_بالاترین;
 	    ++level;
 	}
     }
 
-    if (!had_folded)
+    إذا (!had_folded)
     {
-	if (infop != NULL)
+	إذا (infop != عدم)
 	{
 	    infop->fi_level = level;
 	    infop->fi_lnum = lnum - lnum_rel;
-	    infop->fi_low_level = low_level == 0 ? level : low_level;
+	    infop->fi_کم_level = کم_level == 0 ? level : کم_level;
 	}
-	return FALSE;
+	أرجع FALSE;
     }
 
-    if (last > win->w_buffer->b_ml.ml_line_count)
-	last = win->w_buffer->b_ml.ml_line_count;
-    if (lastp != NULL)
-	*lastp = last;
-    if (firstp != NULL)
-	*firstp = first;
-    if (infop != NULL)
+    إذا (آخرین > win->w_میانگیر->b_ml.ml_سطر_شمار)
+	آخرین = win->w_میانگیر->b_ml.ml_سطر_شمار;
+    إذا (lastp != عدم)
+	*lastp = آخرین;
+    إذا (firstp != عدم)
+	*firstp = اولی;
+    إذا (infop != عدم)
     {
 	infop->fi_level = level + 1;
-	infop->fi_lnum = first;
-	infop->fi_low_level = low_level == 0 ? level + 1 : low_level;
+	infop->fi_lnum = اولی;
+	infop->fi_کم_level = کم_level == 0 ? level + 1 : کم_level;
     }
-    return TRUE;
+    أرجع TRUE;
 }
 
 // lineFolded()	{{{2
@@ -248,10 +248,10 @@ hasFoldingWin(
  * Return FALSE if line is not folded.
  * Return MAYBE if the line is folded when next to a folded line.
  */
-    int
-lineFolded(win_T *win, linenr_T lnum)
+    صحيح
+سطر_Folded(win_T *win, linenr_T lnum)
 {
-    return foldedCount(win, lnum, NULL) != 0;
+    أرجع folded_شمار(win, lnum, عدم) != 0;
 }
 
 // foldedCount() {{{2
@@ -263,74 +263,74 @@ lineFolded(win_T *win, linenr_T lnum)
  * Returns number of folded lines from "lnum", or 0 if line is not folded.
  * When "infop" is not NULL, fills *infop with the fold level info.
  */
-    long
-foldedCount(win_T *win, linenr_T lnum, foldinfo_T *infop)
+    دراز
+folded_شمار(win_T *win, linenr_T lnum, foldinfo_T *infop)
 {
-    linenr_T	last;
+    linenr_T	آخرین;
 
-    if (hasFoldingWin(win, lnum, NULL, &last, FALSE, infop))
-	return (long)(last - lnum + 1);
-    return 0;
+    إذا (hasFoldingWin(win, lnum, عدم, &آخرین, FALSE, infop))
+	أرجع (دراز)(آخرین - lnum + 1);
+    أرجع 0;
 }
 
 // foldmethodIsManual() {{{2
 /*
  * Return TRUE if 'foldmethod' is "manual"
  */
-    int
+    صحيح
 foldmethodIsManual(win_T *wp)
 {
-    return (wp->w_p_fdm[0] != NUL && wp->w_p_fdm[3] == 'u');
+    أرجع (wp->w_p_fdm[0] != NUL && wp->w_p_fdm[3] == 'u');
 }
 
 // foldmethodIsIndent() {{{2
 /*
  * Return TRUE if 'foldmethod' is "indent"
  */
-    int
+    صحيح
 foldmethodIsIndent(win_T *wp)
 {
-    return (wp->w_p_fdm[0] == 'i');
+    أرجع (wp->w_p_fdm[0] == 'i');
 }
 
 // foldmethodIsExpr() {{{2
 /*
  * Return TRUE if 'foldmethod' is "expr"
  */
-    int
-foldmethodIsExpr(win_T *wp)
+    صحيح
+foldmethod_Is_عبارت(win_T *wp)
 {
-    return (wp->w_p_fdm[0] != NUL && wp->w_p_fdm[1] == 'x');
+    أرجع (wp->w_p_fdm[0] != NUL && wp->w_p_fdm[1] == 'x');
 }
 
 // foldmethodIsMarker() {{{2
 /*
  * Return TRUE if 'foldmethod' is "marker"
  */
-    int
+    صحيح
 foldmethodIsMarker(win_T *wp)
 {
-    return (wp->w_p_fdm[0] != NUL && wp->w_p_fdm[2] == 'r');
+    أرجع (wp->w_p_fdm[0] != NUL && wp->w_p_fdm[2] == 'r');
 }
 
 // foldmethodIsSyntax() {{{2
 /*
  * Return TRUE if 'foldmethod' is "syntax"
  */
-    int
+    صحيح
 foldmethodIsSyntax(win_T *wp)
 {
-    return (wp->w_p_fdm[0] == 's');
+    أرجع (wp->w_p_fdm[0] == 's');
 }
 
 // foldmethodIsDiff() {{{2
 /*
  * Return TRUE if 'foldmethod' is "diff"
  */
-    int
+    صحيح
 foldmethodIsDiff(win_T *wp)
 {
-    return (wp->w_p_fdm[0] == 'd');
+    أرجع (wp->w_p_fdm[0] == 'd');
 }
 
 // closeFold() {{{2
@@ -338,20 +338,20 @@ foldmethodIsDiff(win_T *wp)
  * Close fold for current window at line "lnum".
  * Repeat "count" times.
  */
-    void
-closeFold(linenr_T lnum, long count)
+    فراغ
+closeFold(linenr_T lnum, دراز شمار)
 {
-    setFoldRepeat(lnum, count, FALSE);
+    مجموعه_Fold_Repeat(lnum, شمار, FALSE);
 }
 
 // closeFoldRecurse() {{{2
 /*
  * Close fold for current window at line "lnum" recursively.
  */
-    void
+    فراغ
 closeFoldRecurse(linenr_T lnum)
 {
-    (void)setManualFold(lnum, FALSE, TRUE, NULL);
+    (فراغ)مجموعه_Manual_Fold(lnum, FALSE, TRUE, عدم);
 }
 
 // opFoldRange() {{{2
@@ -359,35 +359,35 @@ closeFoldRecurse(linenr_T lnum)
  * Open or Close folds for current window in lines "first" to "last".
  * Used for "zo", "zO", "zc" and "zC" in Visual mode.
  */
-    void
+    فراغ
 opFoldRange(
-    linenr_T	first,
-    linenr_T	last,
-    int		opening,	// TRUE to open, FALSE to close
-    int		recurse,	// TRUE to do it recursively
-    int		had_visual)	// TRUE when Visual selection used
+    linenr_T	اولی,
+    linenr_T	آخرین,
+    صحيح		opening,	// TRUE to open, FALSE to close
+    صحيح		recurse,	// TRUE to do it recursively
+    صحيح		had_visual)	// TRUE when Visual selection used
 {
-    int		done = DONE_NOTHING;	// avoid error messages
+    صحيح		انجامشده = انجامشده_NOTHING;	// avoid error messages
     linenr_T	lnum;
-    linenr_T	lnum_next;
+    linenr_T	lnum_بعدی;
 
-    for (lnum = first; lnum <= last; lnum = lnum_next + 1)
+    لكل (lnum = اولی; lnum <= آخرین; lnum = lnum_بعدی + 1)
     {
-	lnum_next = lnum;
+	lnum_بعدی = lnum;
 	// Opening one level only: next fold to open is after the one going to
 	// be opened.
-	if (opening && !recurse)
-	    (void)hasFolding(lnum, NULL, &lnum_next);
-	(void)setManualFold(lnum, opening, recurse, &done);
+	إذا (opening && !recurse)
+	    (فراغ)hasFolding(lnum, عدم, &lnum_بعدی);
+	(فراغ)مجموعه_Manual_Fold(lnum, opening, recurse, &انجامشده);
 	// Closing one level only: next line to close a fold is after just
 	// closed fold.
-	if (!opening && !recurse)
-	    (void)hasFolding(lnum, NULL, &lnum_next);
+	إذا (!opening && !recurse)
+	    (فراغ)hasFolding(lnum, عدم, &lnum_بعدی);
     }
-    if (done == DONE_NOTHING)
-	emsg(_(e_no_fold_found));
+    إذا (انجامشده == انجامشده_NOTHING)
+	emsg(_(e_no_fold_یافت));
     // Force a redraw to remove the Visual highlighting.
-    if (had_visual)
+    إذا (had_visual)
 	redraw_curbuf_later(UPD_INVERTED);
 }
 
@@ -396,39 +396,39 @@ opFoldRange(
  * Open fold for current window at line "lnum".
  * Repeat "count" times.
  */
-    void
-openFold(linenr_T lnum, long count)
+    فراغ
+openFold(linenr_T lnum, دراز شمار)
 {
-    setFoldRepeat(lnum, count, TRUE);
+    مجموعه_Fold_Repeat(lnum, شمار, TRUE);
 }
 
 // openFoldRecurse() {{{2
 /*
  * Open fold for current window at line "lnum" recursively.
  */
-    void
+    فراغ
 openFoldRecurse(linenr_T lnum)
 {
-    (void)setManualFold(lnum, TRUE, TRUE, NULL);
+    (فراغ)مجموعه_Manual_Fold(lnum, TRUE, TRUE, عدم);
 }
 
 // foldOpenCursor() {{{2
 /*
  * Open folds until the cursor line is not in a closed fold.
  */
-    void
-foldOpenCursor(void)
+    فراغ
+foldOpenCursor(فراغ)
 {
-    int		done;
+    صحيح		انجامشده;
 
     checkupdate(curwin);
-    if (hasAnyFolding(curwin))
-	for (;;)
+    إذا (hasAnyFolding(curwin))
+	لكل (;;)
 	{
-	    done = DONE_NOTHING;
-	    (void)setManualFold(curwin->w_cursor.lnum, TRUE, FALSE, &done);
-	    if (!(done & DONE_ACTION))
-		break;
+	    انجامشده = انجامشده_NOTHING;
+	    (فراغ)مجموعه_Manual_Fold(curwin->w_cursor.lnum, TRUE, FALSE, &انجامشده);
+	    إذا (!(انجامشده & انجامشده_ACTION))
+		اكسر;
 	}
 }
 
@@ -436,13 +436,13 @@ foldOpenCursor(void)
 /*
  * Set new foldlevel for current window.
  */
-    void
-newFoldLevel(void)
+    فراغ
+newFoldLevel(فراغ)
 {
     newFoldLevelWin(curwin);
 
 # ifdef FEAT_DIFF
-    if (foldmethodIsDiff(curwin) && curwin->w_p_scb)
+    إذا (foldmethodIsDiff(curwin) && curwin->w_p_scb)
     {
 	win_T	    *wp;
 
@@ -451,7 +451,7 @@ newFoldLevel(void)
 	 */
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp != curwin && foldmethodIsDiff(wp) && wp->w_p_scb)
+	    إذا (wp != curwin && foldmethodIsDiff(wp) && wp->w_p_scb)
 	    {
 		wp->w_p_fdl = curwin->w_p_fdl;
 		newFoldLevelWin(wp);
@@ -461,69 +461,69 @@ newFoldLevel(void)
 # endif
 }
 
-    static void
+    ساكن فراغ
 newFoldLevelWin(win_T *wp)
 {
     fold_T	*fp;
-    int		i;
+    صحيح		i;
 
     checkupdate(wp);
-    if (wp->w_fold_manual)
+    إذا (wp->w_fold_manual)
     {
 	// Set all flags for the first level of folds to FD_LEVEL.  Following
 	// manual open/close will then change the flags to FD_OPEN or
 	// FD_CLOSED for those folds that don't use 'foldlevel'.
-	fp = (fold_T *)wp->w_folds.ga_data;
-	for (i = 0; i < wp->w_folds.ga_len; ++i)
+	fp = (fold_T *)wp->w_folds.ga_داده;
+	لكل (i = 0; i < wp->w_folds.ga_len; ++i)
 	    fp[i].fd_flags = FD_LEVEL;
 	wp->w_fold_manual = false;
     }
-    changed_window_setting_win(wp);
+    تغییریافته_پنجره_setting_win(wp);
 }
 
 // foldCheckClose() {{{2
 /*
  * Apply 'foldlevel' to all folds that don't contain the cursor.
  */
-    void
-foldCheckClose(void)
+    فراغ
+foldCheckClose(فراغ)
 {
-    if (*p_fcl == NUL)
-	return;
+    إذا (*p_fcl == NUL)
+	أرجع;
 
     // 'foldclose' can only be "all" right now
     checkupdate(curwin);
-    if (checkCloseRec(&curwin->w_folds, curwin->w_cursor.lnum,
-		(int)curwin->w_p_fdl))
-	changed_window_setting();
+    إذا (checkCloseRec(&curwin->w_folds, curwin->w_cursor.lnum,
+		(صحيح)curwin->w_p_fdl))
+	تغییریافته_پنجره_setting();
 }
 
 // checkCloseRec() {{{2
-    static int
-checkCloseRec(garray_T *gap, linenr_T lnum, int level)
+    ساكن صحيح
+checkCloseRec(garray_T *gap, linenr_T lnum, صحيح level)
 {
     fold_T	*fp;
-    int		retval = FALSE;
-    int		i;
+    صحيح		retval = FALSE;
+    صحيح		i;
 
-    fp = (fold_T *)gap->ga_data;
-    for (i = 0; i < gap->ga_len; ++i)
+    fp = (fold_T *)gap->ga_داده;
+    لكل (i = 0; i < gap->ga_len; ++i)
     {
 	// Only manually opened folds may need to be closed.
-	if (fp[i].fd_flags == FD_OPEN)
+	إذا (fp[i].fd_flags == FD_OPEN)
 	{
-	    if (level <= 0 && (lnum < fp[i].fd_top
-				      || lnum >= fp[i].fd_top + fp[i].fd_len))
+	    إذا (level <= 0 && (lnum < fp[i].fd_بالاترین
+				      || lnum >= fp[i].fd_بالاترین + fp[i].fd_len))
 	    {
 		fp[i].fd_flags = FD_LEVEL;
 		retval = TRUE;
 	    }
-	    else
-		retval |= checkCloseRec(&fp[i].fd_nested, lnum - fp[i].fd_top,
+	    وإلا
+		retval |= checkCloseRec(&fp[i].fd_nested, lnum - fp[i].fd_بالاترین,
 								   level - 1);
 	}
     }
-    return retval;
+    أرجع retval;
 }
 
 // foldManualAllowed() {{{2
@@ -531,16 +531,16 @@ checkCloseRec(garray_T *gap, linenr_T lnum, int level)
  * Return TRUE if it's allowed to manually create or delete a fold.
  * Give an error message and return FALSE if not.
  */
-    int
-foldManualAllowed(int create)
+    صحيح
+foldManualAllowed(صحيح create)
 {
-    if (foldmethodIsManual(curwin) || foldmethodIsMarker(curwin))
-	return TRUE;
-    if (create)
+    إذا (foldmethodIsManual(curwin) || foldmethodIsMarker(curwin))
+	أرجع TRUE;
+    إذا (create)
 	emsg(_(e_cannot_create_fold_with_current_foldmethod));
-    else
+    وإلا
 	emsg(_(e_cannot_delete_fold_with_current_foldmethod));
-    return FALSE;
+    أرجع FALSE;
 }
 
 // foldCreate() {{{2
@@ -548,131 +548,131 @@ foldManualAllowed(int create)
  * Create a fold from line "start" to line "end" (inclusive) in the current
  * window.
  */
-    void
-foldCreate(linenr_T start, linenr_T end)
+    فراغ
+foldCreate(linenr_T شروع, linenr_T انتها)
 {
     fold_T	*fp;
     garray_T	*gap;
     garray_T	fold_ga;
-    int		i, j;
-    int		cont;
-    int		use_level = FALSE;
-    int		closed = FALSE;
-    int		level = 0;
-    linenr_T	start_rel = start;
-    linenr_T	end_rel = end;
+    صحيح		i, j;
+    صحيح		cont;
+    صحيح		use_level = FALSE;
+    صحيح		closed = FALSE;
+    صحيح		level = 0;
+    linenr_T	شروع_rel = شروع;
+    linenr_T	انتها_rel = انتها;
 
-    if (start > end)
+    إذا (شروع > انتها)
     {
 	// reverse the range
-	end = start_rel;
-	start = end_rel;
-	start_rel = start;
-	end_rel = end;
+	انتها = شروع_rel;
+	شروع = انتها_rel;
+	شروع_rel = شروع;
+	انتها_rel = انتها;
     }
 
     // When 'foldmethod' is "marker" add markers, which creates the folds.
-    if (foldmethodIsMarker(curwin))
+    إذا (foldmethodIsMarker(curwin))
     {
-	foldCreateMarkers(start, end);
-	return;
+	foldCreateMarkers(شروع, انتها);
+	أرجع;
     }
 
     checkupdate(curwin);
 
     // Find the place to insert the new fold.
     gap = &curwin->w_folds;
-    if (gap->ga_len == 0)
+    إذا (gap->ga_len == 0)
 	i = 0;
-    else
+    وإلا
     {
-	for (;;)
+	لكل (;;)
 	{
-	    if (!foldFind(gap, start_rel, &fp))
-		break;
-	    if (fp->fd_top + fp->fd_len > end_rel)
+	    إذا (!fold_پیدا_کن(gap, شروع_rel, &fp))
+		اكسر;
+	    إذا (fp->fd_بالاترین + fp->fd_len > انتها_rel)
 	    {
 		// New fold is completely inside this fold: Go one level
 		// deeper.
 		gap = &fp->fd_nested;
-		start_rel -= fp->fd_top;
-		end_rel -= fp->fd_top;
-		if (use_level || fp->fd_flags == FD_LEVEL)
+		شروع_rel -= fp->fd_بالاترین;
+		انتها_rel -= fp->fd_بالاترین;
+		إذا (use_level || fp->fd_flags == FD_LEVEL)
 		{
 		    use_level = TRUE;
-		    if (level >= curwin->w_p_fdl)
+		    إذا (level >= curwin->w_p_fdl)
 			closed = TRUE;
 		}
-		else if (fp->fd_flags == FD_CLOSED)
+		وإلا إذا (fp->fd_flags == FD_CLOSED)
 		    closed = TRUE;
 		++level;
 	    }
-	    else
+	    وإلا
 	    {
 		// This fold and new fold overlap: Insert here and move some
 		// folds inside the new fold.
-		break;
+		اكسر;
 	    }
 	}
-	if (gap->ga_len == 0)
+	إذا (gap->ga_len == 0)
 	    i = 0;
-	else
-	    i = (int)(fp - (fold_T *)gap->ga_data);
+	وإلا
+	    i = (صحيح)(fp - (fold_T *)gap->ga_داده);
     }
 
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    إذا (ga_grow(gap, 1) == FAIL)
+	أرجع;
 
-    fp = (fold_T *)gap->ga_data + i;
-    ga_init2(&fold_ga, sizeof(fold_T), 10);
+    fp = (fold_T *)gap->ga_داده + i;
+    ga_init2(&fold_ga, حجم(fold_T), 10);
 
     // Count number of folds that will be contained in the new fold.
-    for (cont = 0; i + cont < gap->ga_len; ++cont)
-	if (fp[cont].fd_top > end_rel)
-	    break;
-    if (cont > 0 && ga_grow(&fold_ga, cont) == OK)
+    لكل (cont = 0; i + cont < gap->ga_len; ++cont)
+	إذا (fp[cont].fd_بالاترین > انتها_rel)
+	    اكسر;
+    إذا (cont > 0 && ga_grow(&fold_ga, cont) == OK)
     {
 	// If the first fold starts before the new fold, let the new fold
 	// start there.  Otherwise the existing fold would change.
-	if (start_rel > fp->fd_top)
-	    start_rel = fp->fd_top;
+	إذا (شروع_rel > fp->fd_بالاترین)
+	    شروع_rel = fp->fd_بالاترین;
 
 	// When last contained fold isn't completely contained, adjust end
 	// of new fold.
-	if (end_rel < fp[cont - 1].fd_top + fp[cont - 1].fd_len - 1)
-	    end_rel = fp[cont - 1].fd_top + fp[cont - 1].fd_len - 1;
+	إذا (انتها_rel < fp[cont - 1].fd_بالاترین + fp[cont - 1].fd_len - 1)
+	    انتها_rel = fp[cont - 1].fd_بالاترین + fp[cont - 1].fd_len - 1;
 	// Move contained folds to inside new fold.
-	mch_memmove(fold_ga.ga_data, fp, sizeof(fold_T) * cont);
+	mch_memmove(fold_ga.ga_داده, fp, حجم(fold_T) * cont);
 	fold_ga.ga_len += cont;
 	i += cont;
 
 	// Adjust line numbers in contained folds to be relative to the
 	// new fold.
-	for (j = 0; j < cont; ++j)
-	    ((fold_T *)fold_ga.ga_data)[j].fd_top -= start_rel;
+	لكل (j = 0; j < cont; ++j)
+	    ((fold_T *)fold_ga.ga_داده)[j].fd_بالاترین -= شروع_rel;
     }
     // Move remaining entries to after the new fold.
-    if (i < gap->ga_len)
-	mch_memmove(fp + 1, (fold_T *)gap->ga_data + i,
-		sizeof(fold_T) * (gap->ga_len - i));
+    إذا (i < gap->ga_len)
+	mch_memmove(fp + 1, (fold_T *)gap->ga_داده + i,
+		حجم(fold_T) * (gap->ga_len - i));
     gap->ga_len = gap->ga_len + 1 - cont;
 
     // insert new fold
     fp->fd_nested = fold_ga;
-    fp->fd_top = start_rel;
-    fp->fd_len = end_rel - start_rel + 1;
+    fp->fd_بالاترین = شروع_rel;
+    fp->fd_len = انتها_rel - شروع_rel + 1;
 
     // We want the new fold to be closed.  If it would remain open because
     // of using 'foldlevel', need to adjust fd_flags of containing folds.
-    if (use_level && !closed && level < curwin->w_p_fdl)
-	closeFold(start, 1L);
-    if (!use_level)
+    إذا (use_level && !closed && level < curwin->w_p_fdl)
+	closeFold(شروع, 1L);
+    إذا (!use_level)
 	curwin->w_fold_manual = true;
     fp->fd_flags = FD_CLOSED;
     fp->fd_small = MAYBE;
 
     // redraw
-    changed_window_setting();
+    تغییریافته_پنجره_setting();
 }
 
 // deleteFold() {{{2
@@ -681,102 +681,102 @@ foldCreate(linenr_T start, linenr_T end)
  * When "end" is not 0, delete all folds from "start" to "end".
  * When "recursive" is TRUE delete recursively.
  */
-    void
+    فراغ
 deleteFold(
-    linenr_T	start,
-    linenr_T	end,
-    int		recursive,
-    int		had_visual)	// TRUE when Visual selection used
+    linenr_T	شروع,
+    linenr_T	انتها,
+    صحيح		recursive,
+    صحيح		had_visual)	// TRUE when Visual selection used
 {
     garray_T	*gap;
     fold_T	*fp;
-    garray_T	*found_ga;
-    fold_T	*found_fp = NULL;
-    linenr_T	found_off = 0;
-    int		use_level;
-    int		maybe_small = FALSE;
-    int		level = 0;
-    linenr_T	lnum = start;
+    garray_T	*یافت_ga;
+    fold_T	*یافت_fp = عدم;
+    linenr_T	یافت_off = 0;
+    صحيح		use_level;
+    صحيح		maybe_small = FALSE;
+    صحيح		level = 0;
+    linenr_T	lnum = شروع;
     linenr_T	lnum_off;
-    int		did_one = FALSE;
-    linenr_T	first_lnum = MAXLNUM;
-    linenr_T	last_lnum = 0;
+    صحيح		did_one = FALSE;
+    linenr_T	اولی_lnum = MAXLNUM;
+    linenr_T	آخرین_lnum = 0;
 
     checkupdate(curwin);
 
-    while (lnum <= end)
+    طالما (lnum <= انتها)
     {
 	// Find the deepest fold for "start".
 	gap = &curwin->w_folds;
-	found_ga = NULL;
+	یافت_ga = عدم;
 	lnum_off = 0;
 	use_level = FALSE;
-	for (;;)
+	لكل (;;)
 	{
-	    if (!foldFind(gap, lnum - lnum_off, &fp))
-		break;
+	    إذا (!fold_پیدا_کن(gap, lnum - lnum_off, &fp))
+		اكسر;
 	    // lnum is inside this fold, remember info
-	    found_ga = gap;
-	    found_fp = fp;
-	    found_off = lnum_off;
+	    یافت_ga = gap;
+	    یافت_fp = fp;
+	    یافت_off = lnum_off;
 
 	    // if "lnum" is folded, don't check nesting
-	    if (check_closed(curwin, fp, &use_level, level,
+	    إذا (check_closed(curwin, fp, &use_level, level,
 						      &maybe_small, lnum_off))
-		break;
+		اكسر;
 
 	    // check nested folds
 	    gap = &fp->fd_nested;
-	    lnum_off += fp->fd_top;
+	    lnum_off += fp->fd_بالاترین;
 	    ++level;
 	}
-	if (found_ga == NULL)
+	إذا (یافت_ga == عدم)
 	{
 	    ++lnum;
 	}
-	else
+	وإلا
 	{
-	    lnum = found_fp->fd_top + found_fp->fd_len + found_off;
+	    lnum = یافت_fp->fd_بالاترین + یافت_fp->fd_len + یافت_off;
 
-	    if (foldmethodIsManual(curwin))
-		deleteFoldEntry(found_ga,
-		    (int)(found_fp - (fold_T *)found_ga->ga_data), recursive);
-	    else
+	    إذا (foldmethodIsManual(curwin))
+		delete_Fold_مدخل(یافت_ga,
+		    (صحيح)(یافت_fp - (fold_T *)یافت_ga->ga_داده), recursive);
+	    وإلا
 	    {
-		if (first_lnum > found_fp->fd_top + found_off)
-		    first_lnum = found_fp->fd_top + found_off;
-		if (last_lnum < lnum)
-		    last_lnum = lnum;
-		if (!did_one)
+		إذا (اولی_lnum > یافت_fp->fd_بالاترین + یافت_off)
+		    اولی_lnum = یافت_fp->fd_بالاترین + یافت_off;
+		إذا (آخرین_lnum < lnum)
+		    آخرین_lnum = lnum;
+		إذا (!did_one)
 		    parseMarker(curwin);
-		deleteFoldMarkers(found_fp, recursive, found_off);
+		deleteFoldMarkers(یافت_fp, recursive, یافت_off);
 	    }
 	    did_one = TRUE;
 
 	    // redraw window
-	    changed_window_setting();
+	    تغییریافته_پنجره_setting();
 	}
     }
-    if (!did_one)
+    إذا (!did_one)
     {
-	emsg(_(e_no_fold_found));
+	emsg(_(e_no_fold_یافت));
 	// Force a redraw to remove the Visual highlighting.
-	if (had_visual)
+	إذا (had_visual)
 	    redraw_curbuf_later(UPD_INVERTED);
     }
-    else
+    وإلا
 	// Deleting markers may make cursor column invalid.
-	check_cursor_col();
+	check_cursor_ستون();
 
-    if (last_lnum > 0)
-	changed_lines(first_lnum, (colnr_T)0, last_lnum, 0L);
+    إذا (آخرین_lnum > 0)
+	تغییریافته_سطرها(اولی_lnum, (colnr_T)0, آخرین_lnum, 0L);
 }
 
 // clearFolding() {{{2
 /*
  * Remove all folding for window "win".
  */
-    void
+    فراغ
 clearFolding(win_T *win)
 {
     deleteFoldRecurse(&win->w_folds);
@@ -790,52 +790,52 @@ clearFolding(win_T *win)
  * calling foldMarkAdjust().
  * The changes in lines from top to bot (inclusive).
  */
-    void
-foldUpdate(win_T *wp, linenr_T top, linenr_T bot)
+    فراغ
+foldUpdate(win_T *wp, linenr_T بالاترین, linenr_T bot)
 {
     fold_T	*fp;
 
-    if (disable_fold_update > 0)
-	return;
+    إذا (disable_fold_update > 0)
+	أرجع;
 # ifdef FEAT_DIFF
-    if (need_diff_redraw)
+    إذا (need_diff_redraw)
 	// will update later
-	return;
+	أرجع;
 # endif
 
-    if (wp->w_folds.ga_len > 0)
+    إذا (wp->w_folds.ga_len > 0)
     {
-	linenr_T	maybe_small_start = top;
-	linenr_T	maybe_small_end = bot;
+	linenr_T	maybe_small_شروع = بالاترین;
+	linenr_T	maybe_small_انتها = bot;
 
 	// Mark all folds from top to bot (or bot to top) as maybe-small.
-	if (top > bot)
+	إذا (بالاترین > bot)
 	{
-	    maybe_small_start = bot;
-	    maybe_small_end = top;
+	    maybe_small_شروع = bot;
+	    maybe_small_انتها = بالاترین;
 	}
-	(void)foldFind(&wp->w_folds, maybe_small_start, &fp);
-	while (fp < (fold_T *)wp->w_folds.ga_data + wp->w_folds.ga_len
-		&& fp->fd_top <= maybe_small_end)
+	(فراغ)fold_پیدا_کن(&wp->w_folds, maybe_small_شروع, &fp);
+	طالما (fp < (fold_T *)wp->w_folds.ga_داده + wp->w_folds.ga_len
+		&& fp->fd_بالاترین <= maybe_small_انتها)
 	{
 	    fp->fd_small = MAYBE;
 	    ++fp;
 	}
     }
 
-    if (foldmethodIsIndent(wp)
-	    || foldmethodIsExpr(wp)
+    إذا (foldmethodIsIndent(wp)
+	    || foldmethod_Is_عبارت(wp)
 	    || foldmethodIsMarker(wp)
 # ifdef FEAT_DIFF
 	    || foldmethodIsDiff(wp)
 # endif
 	    || foldmethodIsSyntax(wp))
     {
-	int save_got_int = got_int;
+	صحيح save_got_int = got_int;
 
 	// reset got_int here, otherwise it won't work
 	got_int = FALSE;
-	foldUpdateIEMS(wp, top, bot);
+	foldUpdateIEMS(wp, بالاترین, bot);
 	got_int |= save_got_int;
     }
 }
@@ -847,7 +847,7 @@ foldUpdate(win_T *wp, linenr_T top, linenr_T bot)
  * The actual updating is postponed until fold info is used, to avoid doing
  * every time a setting is changed or a syntax item is added.
  */
-    void
+    فراغ
 foldUpdateAll(win_T *win)
 {
     win->w_foldinvalid = true;
@@ -860,149 +860,149 @@ foldUpdateAll(win_T *win)
  * If "updown" is TRUE: move to fold at the same level.
  * If not moved return FAIL.
  */
-    int
-foldMoveTo(
-    int		updown,
-    int		dir,	    // FORWARD or BACKWARD
-    long	count)
+    صحيح
+fold_Move_مقصد(
+    صحيح		updown,
+    صحيح		dir,	    // FORWARD or BACKWARD
+    دراز	شمار)
 {
-    long	n;
-    int		retval = FAIL;
+    دراز	n;
+    صحيح		retval = FAIL;
     linenr_T	lnum_off;
-    linenr_T	lnum_found;
+    linenr_T	lnum_یافت;
     linenr_T	lnum;
-    int		use_level;
-    int		maybe_small;
+    صحيح		use_level;
+    صحيح		maybe_small;
     garray_T	*gap;
     fold_T	*fp;
-    int		level;
-    int		last;
+    صحيح		level;
+    صحيح		آخرین;
 
     checkupdate(curwin);
 
     // Repeat "count" times.
-    for (n = 0; n < count; ++n)
+    لكل (n = 0; n < شمار; ++n)
     {
 	// Find nested folds.  Stop when a fold is closed.  The deepest fold
 	// that moves the cursor is used.
 	lnum_off = 0;
 	gap = &curwin->w_folds;
-	if (gap->ga_len == 0)
-	    break;
+	إذا (gap->ga_len == 0)
+	    اكسر;
 	use_level = FALSE;
 	maybe_small = FALSE;
-	lnum_found = curwin->w_cursor.lnum;
+	lnum_یافت = curwin->w_cursor.lnum;
 	level = 0;
-	last = FALSE;
-	for (;;)
+	آخرین = FALSE;
+	لكل (;;)
 	{
-	    if (!foldFind(gap, curwin->w_cursor.lnum - lnum_off, &fp))
+	    إذا (!fold_پیدا_کن(gap, curwin->w_cursor.lnum - lnum_off, &fp))
 	    {
-		if (!updown || gap->ga_len == 0)
-		    break;
+		إذا (!updown || gap->ga_len == 0)
+		    اكسر;
 
 		// When moving up, consider a fold above the cursor; when
 		// moving down consider a fold below the cursor.
-		if (dir == FORWARD)
+		إذا (dir == FORWARD)
 		{
-		    if (fp - (fold_T *)gap->ga_data >= gap->ga_len)
-			break;
+		    إذا (fp - (fold_T *)gap->ga_داده >= gap->ga_len)
+			اكسر;
 		    --fp;
 		}
-		else
+		وإلا
 		{
-		    if (fp == (fold_T *)gap->ga_data)
-			break;
+		    إذا (fp == (fold_T *)gap->ga_داده)
+			اكسر;
 		}
 		// don't look for contained folds, they will always move
 		// the cursor too far.
-		last = TRUE;
+		آخرین = TRUE;
 	    }
 
-	    if (!last)
+	    إذا (!آخرین)
 	    {
 		// Check if this fold is closed.
-		if (check_closed(curwin, fp, &use_level, level,
+		إذا (check_closed(curwin, fp, &use_level, level,
 						      &maybe_small, lnum_off))
-		    last = TRUE;
+		    آخرین = TRUE;
 
 		// "[z" and "]z" stop at closed fold
-		if (last && !updown)
-		    break;
+		إذا (آخرین && !updown)
+		    اكسر;
 	    }
 
-	    if (updown)
+	    إذا (updown)
 	    {
-		if (dir == FORWARD)
+		إذا (dir == FORWARD)
 		{
 		    // to start of next fold if there is one
-		    if (fp + 1 - (fold_T *)gap->ga_data < gap->ga_len)
+		    إذا (fp + 1 - (fold_T *)gap->ga_داده < gap->ga_len)
 		    {
-			lnum = fp[1].fd_top + lnum_off;
-			if (lnum > curwin->w_cursor.lnum)
-			    lnum_found = lnum;
+			lnum = fp[1].fd_بالاترین + lnum_off;
+			إذا (lnum > curwin->w_cursor.lnum)
+			    lnum_یافت = lnum;
 		    }
 		}
-		else
+		وإلا
 		{
 		    // to end of previous fold if there is one
-		    if (fp > (fold_T *)gap->ga_data)
+		    إذا (fp > (fold_T *)gap->ga_داده)
 		    {
-			lnum = fp[-1].fd_top + lnum_off + fp[-1].fd_len - 1;
-			if (lnum < curwin->w_cursor.lnum)
-			    lnum_found = lnum;
+			lnum = fp[-1].fd_بالاترین + lnum_off + fp[-1].fd_len - 1;
+			إذا (lnum < curwin->w_cursor.lnum)
+			    lnum_یافت = lnum;
 		    }
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		// Open fold found, set cursor to its start/end and then check
 		// nested folds.
-		if (dir == FORWARD)
+		إذا (dir == FORWARD)
 		{
-		    lnum = fp->fd_top + lnum_off + fp->fd_len - 1;
-		    if (lnum > curwin->w_cursor.lnum)
-			lnum_found = lnum;
+		    lnum = fp->fd_بالاترین + lnum_off + fp->fd_len - 1;
+		    إذا (lnum > curwin->w_cursor.lnum)
+			lnum_یافت = lnum;
 		}
-		else
+		وإلا
 		{
-		    lnum = fp->fd_top + lnum_off;
-		    if (lnum < curwin->w_cursor.lnum)
-			lnum_found = lnum;
+		    lnum = fp->fd_بالاترین + lnum_off;
+		    إذا (lnum < curwin->w_cursor.lnum)
+			lnum_یافت = lnum;
 		}
 	    }
 
-	    if (last)
-		break;
+	    إذا (آخرین)
+		اكسر;
 
 	    // Check nested folds (if any).
 	    gap = &fp->fd_nested;
-	    lnum_off += fp->fd_top;
+	    lnum_off += fp->fd_بالاترین;
 	    ++level;
 	}
-	if (lnum_found != curwin->w_cursor.lnum)
+	إذا (lnum_یافت != curwin->w_cursor.lnum)
 	{
-	    if (retval == FAIL)
+	    إذا (retval == FAIL)
 		setpcmark();
-	    curwin->w_cursor.lnum = lnum_found;
-	    curwin->w_cursor.col = 0;
+	    curwin->w_cursor.lnum = lnum_یافت;
+	    curwin->w_cursor.ستون = 0;
 	    retval = OK;
 	}
-	else
-	    break;
+	وإلا
+	    اكسر;
     }
 
-    return retval;
+    أرجع retval;
 }
 
 // foldInitWin() {{{2
 /*
  * Init the fold info in a new window.
  */
-    void
+    فراغ
 foldInitWin(win_T *new_win)
 {
-    ga_init2(&new_win->w_folds, sizeof(fold_T), 10);
+    ga_init2(&new_win->w_folds, حجم(fold_T), 10);
 }
 
 // find_wl_entry() {{{2
@@ -1012,55 +1012,55 @@ foldInitWin(win_T *new_win)
  * line number can be wrong).
  * Returns index of entry or -1 if not found.
  */
-    int
-find_wl_entry(win_T *win, linenr_T lnum)
+    صحيح
+پیدا_کن_wl_مدخل(win_T *win, linenr_T lnum)
 {
-    int		i;
+    صحيح		i;
 
-    for (i = 0; i < win->w_lines_valid; ++i)
-	if (win->w_lines[i].wl_valid)
+    لكل (i = 0; i < win->w_سطرها_valid; ++i)
+	إذا (win->w_سطرها[i].wl_valid)
 	{
-	    if (lnum < win->w_lines[i].wl_lnum)
-		return -1;
-	    if (lnum <= win->w_lines[i].wl_lastlnum)
-		return i;
+	    إذا (lnum < win->w_سطرها[i].wl_lnum)
+		أرجع -1;
+	    إذا (lnum <= win->w_سطرها[i].wl_lastlnum)
+		أرجع i;
 	}
-    return -1;
+    أرجع -1;
 }
 
 // foldAdjustVisual() {{{2
 /*
  * Adjust the Visual area to include any fold at the start or end completely.
  */
-    void
-foldAdjustVisual(void)
+    فراغ
+foldAdjustVisual(فراغ)
 {
-    pos_T	*start, *end;
+    pos_T	*شروع, *انتها;
 
-    if (!VIsual_active || !hasAnyFolding(curwin))
-	return;
+    إذا (!VIsual_فعال || !hasAnyFolding(curwin))
+	أرجع;
 
-    if (LTOREQ_POS(VIsual, curwin->w_cursor))
+    إذا (LTOREQ_POS(VIsual, curwin->w_cursor))
     {
-	start = &VIsual;
-	end = &curwin->w_cursor;
+	شروع = &VIsual;
+	انتها = &curwin->w_cursor;
     }
-    else
+    وإلا
     {
-	start = &curwin->w_cursor;
-	end = &VIsual;
+	شروع = &curwin->w_cursor;
+	انتها = &VIsual;
     }
-    if (hasFolding(start->lnum, &start->lnum, NULL))
-	start->col = 0;
+    إذا (hasFolding(شروع->lnum, &شروع->lnum, عدم))
+	شروع->ستون = 0;
 
-    if (!hasFolding(end->lnum, NULL, &end->lnum))
-	return;
+    إذا (!hasFolding(انتها->lnum, عدم, &انتها->lnum))
+	أرجع;
 
-    end->col = ml_get_len(end->lnum);
-    if (end->col > 0 && *p_sel == 'o')
-	--end->col;
+    انتها->ستون = ml_get_len(انتها->lnum);
+    إذا (انتها->ستون > 0 && *p_sel == 'o')
+	--انتها->ستون;
     // prevent cursor from moving on the trail byte
-    if (has_mbyte)
+    إذا (has_mbyte)
 	mb_adjust_cursor();
 }
 
@@ -1068,10 +1068,10 @@ foldAdjustVisual(void)
 /*
  * Move the cursor to the first line of a closed fold.
  */
-    void
-foldAdjustCursor(void)
+    فراغ
+foldAdjustCursor(فراغ)
 {
-    (void)hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum, NULL);
+    (فراغ)hasFolding(curwin->w_cursor.lnum, &curwin->w_cursor.lnum, عدم);
 }
 
 // Internal functions for "fold_T" {{{1
@@ -1081,30 +1081,30 @@ foldAdjustCursor(void)
  *
  * Return FAIL if the operation cannot be completed, otherwise OK.
  */
-    void
-cloneFoldGrowArray(garray_T *from, garray_T *to)
+    فراغ
+cloneFoldGrowArray(garray_T *from, garray_T *مقصد)
 {
-    int		i;
+    صحيح		i;
     fold_T	*from_p;
-    fold_T	*to_p;
+    fold_T	*مقصد_p;
 
-    ga_init2(to, from->ga_itemsize, from->ga_growsize);
-    if (from->ga_len == 0 || ga_grow(to, from->ga_len) == FAIL)
-	return;
+    ga_init2(مقصد, from->ga_itemsize, from->ga_growsize);
+    إذا (from->ga_len == 0 || ga_grow(مقصد, from->ga_len) == FAIL)
+	أرجع;
 
-    from_p = (fold_T *)from->ga_data;
-    to_p = (fold_T *)to->ga_data;
+    from_p = (fold_T *)from->ga_داده;
+    مقصد_p = (fold_T *)مقصد->ga_داده;
 
-    for (i = 0; i < from->ga_len; i++)
+    لكل (i = 0; i < from->ga_len; i++)
     {
-	to_p->fd_top = from_p->fd_top;
-	to_p->fd_len = from_p->fd_len;
-	to_p->fd_flags = from_p->fd_flags;
-	to_p->fd_small = from_p->fd_small;
-	cloneFoldGrowArray(&from_p->fd_nested, &to_p->fd_nested);
-	++to->ga_len;
+	مقصد_p->fd_بالاترین = from_p->fd_بالاترین;
+	مقصد_p->fd_len = from_p->fd_len;
+	مقصد_p->fd_flags = from_p->fd_flags;
+	مقصد_p->fd_small = from_p->fd_small;
+	cloneFoldGrowArray(&from_p->fd_nested, &مقصد_p->fd_nested);
+	++مقصد->ga_len;
 	++from_p;
-	++to_p;
+	++مقصد_p;
     }
 }
 
@@ -1115,17 +1115,17 @@ cloneFoldGrowArray(garray_T *from, garray_T *to)
  * the first fold below it (careful: it can be beyond the end of the array!).
  * Returns FALSE when there is no fold that contains "lnum".
  */
-    static int
-foldFind(garray_T *gap, linenr_T lnum, fold_T **fpp)
+    ساكن صحيح
+fold_پیدا_کن(garray_T *gap, linenr_T lnum, fold_T **fpp)
 {
-    linenr_T	low, high;
+    linenr_T	کم, بالا;
     fold_T	*fp;
-    int		i;
+    صحيح		i;
 
-    if (gap->ga_len == 0)
+    إذا (gap->ga_len == 0)
     {
-	*fpp = NULL;
-	return FALSE;
+	*fpp = عدم;
+	أرجع FALSE;
     }
 
     /*
@@ -1133,65 +1133,65 @@ foldFind(garray_T *gap, linenr_T lnum, fold_T **fpp)
      * "low" is lowest index of possible match.
      * "high" is highest index of possible match.
      */
-    fp = (fold_T *)gap->ga_data;
-    low = 0;
-    high = gap->ga_len - 1;
-    while (low <= high)
+    fp = (fold_T *)gap->ga_داده;
+    کم = 0;
+    بالا = gap->ga_len - 1;
+    طالما (کم <= بالا)
     {
-	i = (low + high) / 2;
-	if (fp[i].fd_top > lnum)
+	i = (کم + بالا) / 2;
+	إذا (fp[i].fd_بالاترین > lnum)
 	    // fold below lnum, adjust high
-	    high = i - 1;
-	else if (fp[i].fd_top + fp[i].fd_len <= lnum)
+	    بالا = i - 1;
+	وإلا إذا (fp[i].fd_بالاترین + fp[i].fd_len <= lnum)
 	    // fold above lnum, adjust low
-	    low = i + 1;
-	else
+	    کم = i + 1;
+	وإلا
 	{
 	    // lnum is inside this fold
 	    *fpp = fp + i;
-	    return TRUE;
+	    أرجع TRUE;
 	}
     }
-    *fpp = fp + low;
-    return FALSE;
+    *fpp = fp + کم;
+    أرجع FALSE;
 }
 
 // foldLevelWin() {{{2
 /*
  * Return fold level at line number "lnum" in window "wp".
  */
-    static int
+    ساكن صحيح
 foldLevelWin(win_T *wp, linenr_T lnum)
 {
     fold_T	*fp;
     linenr_T	lnum_rel = lnum;
-    int		level =  0;
+    صحيح		level =  0;
     garray_T	*gap;
 
     // Recursively search for a fold that contains "lnum".
     gap = &wp->w_folds;
-    for (;;)
+    لكل (;;)
     {
-	if (!foldFind(gap, lnum_rel, &fp))
-	    break;
+	إذا (!fold_پیدا_کن(gap, lnum_rel, &fp))
+	    اكسر;
 	// Check nested folds.  Line number is relative to containing fold.
 	gap = &fp->fd_nested;
-	lnum_rel -= fp->fd_top;
+	lnum_rel -= fp->fd_بالاترین;
 	++level;
     }
 
-    return level;
+    أرجع level;
 }
 
 // checkupdate() {{{2
 /*
  * Check if the folds in window "wp" are invalid and update them if needed.
  */
-    static void
+    ساكن فراغ
 checkupdate(win_T *wp)
 {
-    if (!wp->w_foldinvalid)
-	return;
+    إذا (!wp->w_foldinvalid)
+	أرجع;
 
     foldUpdate(wp, (linenr_T)1, (linenr_T)MAXLNUM); // will update all
     wp->w_foldinvalid = false;
@@ -1202,22 +1202,22 @@ checkupdate(win_T *wp)
  * Open or close fold for current window at line "lnum".
  * Repeat "count" times.
  */
-    static void
-setFoldRepeat(linenr_T lnum, long count, int do_open)
+    ساكن فراغ
+مجموعه_Fold_Repeat(linenr_T lnum, دراز شمار, صحيح do_open)
 {
-    int		done;
-    long	n;
+    صحيح		انجامشده;
+    دراز	n;
 
-    for (n = 0; n < count; ++n)
+    لكل (n = 0; n < شمار; ++n)
     {
-	done = DONE_NOTHING;
-	(void)setManualFold(lnum, do_open, FALSE, &done);
-	if (!(done & DONE_ACTION))
+	انجامشده = انجامشده_NOTHING;
+	(فراغ)مجموعه_Manual_Fold(lnum, do_open, FALSE, &انجامشده);
+	إذا (!(انجامشده & انجامشده_ACTION))
 	{
 	    // Only give an error message when no fold could be opened.
-	    if (n == 0 && !(done & DONE_FOLD))
-		emsg(_(e_no_fold_found));
-	    break;
+	    إذا (n == 0 && !(انجامشده & انجامشده_FOLD))
+		emsg(_(e_no_fold_یافت));
+	    اكسر;
 	}
     }
 }
@@ -1227,15 +1227,15 @@ setFoldRepeat(linenr_T lnum, long count, int do_open)
  * Open or close the fold in the current window which contains "lnum".
  * Also does this for other windows in diff mode when needed.
  */
-    static linenr_T
-setManualFold(
+    ساكن linenr_T
+مجموعه_Manual_Fold(
     linenr_T	lnum,
-    int		opening,    // TRUE when opening, FALSE when closing
-    int		recurse,    // TRUE when closing/opening recursive
-    int		*donep)
+    صحيح		opening,    // TRUE when opening, FALSE when closing
+    صحيح		recurse,    // TRUE when closing/opening recursive
+    صحيح		*donep)
 {
 # ifdef FEAT_DIFF
-    if (foldmethodIsDiff(curwin) && curwin->w_p_scb)
+    إذا (foldmethodIsDiff(curwin) && curwin->w_p_scb)
     {
 	win_T	    *wp;
 	linenr_T    dlnum;
@@ -1246,17 +1246,17 @@ setManualFold(
 	 */
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp != curwin && foldmethodIsDiff(wp) && wp->w_p_scb)
+	    إذا (wp != curwin && foldmethodIsDiff(wp) && wp->w_p_scb)
 	    {
 		dlnum = diff_lnum_win(curwin->w_cursor.lnum, wp);
-		if (dlnum != 0)
-		    (void)setManualFoldWin(wp, dlnum, opening, recurse, NULL);
+		إذا (dlnum != 0)
+		    (فراغ)مجموعه_Manual_Fold_Win(wp, dlnum, opening, recurse, عدم);
 	    }
 	}
     }
 # endif
 
-    return setManualFoldWin(curwin, lnum, opening, recurse, donep);
+    أرجع مجموعه_Manual_Fold_Win(curwin, lnum, opening, recurse, donep);
 }
 
 // setManualFoldWin() {{{2
@@ -1269,25 +1269,25 @@ setManualFold(
  * Return the line number of the next line that could be closed.
  * It's only valid when "opening" is TRUE!
  */
-    static linenr_T
-setManualFoldWin(
+    ساكن linenr_T
+مجموعه_Manual_Fold_Win(
     win_T	*wp,
     linenr_T	lnum,
-    int		opening,    // TRUE when opening, FALSE when closing
-    int		recurse,    // TRUE when closing/opening recursive
-    int		*donep)
+    صحيح		opening,    // TRUE when opening, FALSE when closing
+    صحيح		recurse,    // TRUE when closing/opening recursive
+    صحيح		*donep)
 {
     fold_T	*fp;
     fold_T	*fp2;
-    fold_T	*found = NULL;
-    int		j;
-    int		level = 0;
-    int		use_level = FALSE;
-    int		found_fold = FALSE;
+    fold_T	*یافت = عدم;
+    صحيح		j;
+    صحيح		level = 0;
+    صحيح		use_level = FALSE;
+    صحيح		یافت_fold = FALSE;
     garray_T	*gap;
-    linenr_T	next = MAXLNUM;
+    linenr_T	بعدی = MAXLNUM;
     linenr_T	off = 0;
-    int		done = 0;
+    صحيح		انجامشده = 0;
 
     checkupdate(wp);
 
@@ -1295,99 +1295,99 @@ setManualFoldWin(
      * Find the fold, open or close it.
      */
     gap = &wp->w_folds;
-    for (;;)
+    لكل (;;)
     {
-	if (!foldFind(gap, lnum, &fp))
+	إذا (!fold_پیدا_کن(gap, lnum, &fp))
 	{
 	    // If there is a following fold, continue there next time.
-	    if (fp != NULL && fp < (fold_T *)gap->ga_data + gap->ga_len)
-		next = fp->fd_top + off;
-	    break;
+	    إذا (fp != عدم && fp < (fold_T *)gap->ga_داده + gap->ga_len)
+		بعدی = fp->fd_بالاترین + off;
+	    اكسر;
 	}
 
 	// lnum is inside this fold
-	found_fold = TRUE;
+	یافت_fold = TRUE;
 
 	// If there is a following fold, continue there next time.
-	if (fp + 1 < (fold_T *)gap->ga_data + gap->ga_len)
-	    next = fp[1].fd_top + off;
+	إذا (fp + 1 < (fold_T *)gap->ga_داده + gap->ga_len)
+	    بعدی = fp[1].fd_بالاترین + off;
 
 	// Change from level-dependent folding to manual.
-	if (use_level || fp->fd_flags == FD_LEVEL)
+	إذا (use_level || fp->fd_flags == FD_LEVEL)
 	{
 	    use_level = TRUE;
-	    if (level >= wp->w_p_fdl)
+	    إذا (level >= wp->w_p_fdl)
 		fp->fd_flags = FD_CLOSED;
-	    else
+	    وإلا
 		fp->fd_flags = FD_OPEN;
-	    fp2 = (fold_T *)fp->fd_nested.ga_data;
-	    for (j = 0; j < fp->fd_nested.ga_len; ++j)
+	    fp2 = (fold_T *)fp->fd_nested.ga_داده;
+	    لكل (j = 0; j < fp->fd_nested.ga_len; ++j)
 		fp2[j].fd_flags = FD_LEVEL;
 	}
 
 	// Simple case: Close recursively means closing the fold.
-	if (!opening && recurse)
+	إذا (!opening && recurse)
 	{
-	    if (fp->fd_flags != FD_CLOSED)
+	    إذا (fp->fd_flags != FD_CLOSED)
 	    {
-		done |= DONE_ACTION;
+		انجامشده |= انجامشده_ACTION;
 		fp->fd_flags = FD_CLOSED;
 	    }
 	}
-	else if (fp->fd_flags == FD_CLOSED)
+	وإلا إذا (fp->fd_flags == FD_CLOSED)
 	{
 	    // When opening, open topmost closed fold.
-	    if (opening)
+	    إذا (opening)
 	    {
 		fp->fd_flags = FD_OPEN;
-		done |= DONE_ACTION;
-		if (recurse)
+		انجامشده |= انجامشده_ACTION;
+		إذا (recurse)
 		    foldOpenNested(fp);
 	    }
-	    break;
+	    اكسر;
 	}
 
 	// fold is open, check nested folds
-	found = fp;
+	یافت = fp;
 	gap = &fp->fd_nested;
-	lnum -= fp->fd_top;
-	off += fp->fd_top;
+	lnum -= fp->fd_بالاترین;
+	off += fp->fd_بالاترین;
 	++level;
     }
-    if (found_fold)
+    إذا (یافت_fold)
     {
 	// When closing and not recurse, close deepest open fold.
-	if (!opening && found != NULL)
+	إذا (!opening && یافت != عدم)
 	{
-	    found->fd_flags = FD_CLOSED;
-	    done |= DONE_ACTION;
+	    یافت->fd_flags = FD_CLOSED;
+	    انجامشده |= انجامشده_ACTION;
 	}
 	wp->w_fold_manual = true;
-	if (done & DONE_ACTION)
-	    changed_window_setting_win(wp);
-	done |= DONE_FOLD;
+	إذا (انجامشده & انجامشده_ACTION)
+	    تغییریافته_پنجره_setting_win(wp);
+	انجامشده |= انجامشده_FOLD;
     }
-    else if (donep == NULL && wp == curwin)
-	emsg(_(e_no_fold_found));
+    وإلا إذا (donep == عدم && wp == curwin)
+	emsg(_(e_no_fold_یافت));
 
-    if (donep != NULL)
-	*donep |= done;
+    إذا (donep != عدم)
+	*donep |= انجامشده;
 
-    return next;
+    أرجع بعدی;
 }
 
 // foldOpenNested() {{{2
 /*
  * Open all nested folds in fold "fpr" recursively.
  */
-    static void
+    ساكن فراغ
 foldOpenNested(fold_T *fpr)
 {
-    int		i;
+    صحيح		i;
     fold_T	*fp;
 
-    fp = (fold_T *)fpr->fd_nested.ga_data;
-    for (i = 0; i < fpr->fd_nested.ga_len; ++i)
+    fp = (fold_T *)fpr->fd_nested.ga_داده;
+    لكل (i = 0; i < fpr->fd_nested.ga_len; ++i)
     {
 	foldOpenNested(&fp[i]);
 	fp[i].fd_flags = FD_OPEN;
@@ -1400,50 +1400,50 @@ foldOpenNested(fold_T *fpr)
  * When "recursive" is TRUE also delete all the folds contained in it.
  * When "recursive" is FALSE contained folds are moved one level up.
  */
-    static void
-deleteFoldEntry(garray_T *gap, int idx, int recursive)
+    ساكن فراغ
+delete_Fold_مدخل(garray_T *gap, صحيح idx, صحيح recursive)
 {
     fold_T	*fp;
-    int		i;
-    long	moved;
+    صحيح		i;
+    دراز	moved;
     fold_T	*nfp;
 
-    fp = (fold_T *)gap->ga_data + idx;
-    if (recursive || fp->fd_nested.ga_len == 0)
+    fp = (fold_T *)gap->ga_داده + idx;
+    إذا (recursive || fp->fd_nested.ga_len == 0)
     {
 	// recursively delete the contained folds
 	deleteFoldRecurse(&fp->fd_nested);
 	--gap->ga_len;
-	if (idx < gap->ga_len)
-	    mch_memmove(fp, fp + 1, sizeof(fold_T) * (gap->ga_len - idx));
+	إذا (idx < gap->ga_len)
+	    mch_memmove(fp, fp + 1, حجم(fold_T) * (gap->ga_len - idx));
     }
-    else
+    وإلا
     {
 	// Move nested folds one level up, to overwrite the fold that is
 	// deleted.
 	moved = fp->fd_nested.ga_len;
-	if (ga_grow(gap, (int)(moved - 1)) == OK)
+	إذا (ga_grow(gap, (صحيح)(moved - 1)) == OK)
 	{
 	    // Get "fp" again, the array may have been reallocated.
-	    fp = (fold_T *)gap->ga_data + idx;
+	    fp = (fold_T *)gap->ga_داده + idx;
 
 	    // adjust fd_top and fd_flags for the moved folds
-	    nfp = (fold_T *)fp->fd_nested.ga_data;
-	    for (i = 0; i < moved; ++i)
+	    nfp = (fold_T *)fp->fd_nested.ga_داده;
+	    لكل (i = 0; i < moved; ++i)
 	    {
-		nfp[i].fd_top += fp->fd_top;
-		if (fp->fd_flags == FD_LEVEL)
+		nfp[i].fd_بالاترین += fp->fd_بالاترین;
+		إذا (fp->fd_flags == FD_LEVEL)
 		    nfp[i].fd_flags = FD_LEVEL;
-		if (fp->fd_small == MAYBE)
+		إذا (fp->fd_small == MAYBE)
 		    nfp[i].fd_small = MAYBE;
 	    }
 
 	    // move the existing folds down to make room
-	    if (idx + 1 < gap->ga_len)
+	    إذا (idx + 1 < gap->ga_len)
 		mch_memmove(fp + moved, fp + 1,
-				  sizeof(fold_T) * (gap->ga_len - (idx + 1)));
+				  حجم(fold_T) * (gap->ga_len - (idx + 1)));
 	    // move the contained folds one level up
-	    mch_memmove(fp, nfp, (size_t)(sizeof(fold_T) * moved));
+	    mch_memmove(fp, nfp, (size_t)(حجم(fold_T) * moved));
 	    vim_free(nfp);
 	    gap->ga_len += moved - 1;
 	}
@@ -1454,13 +1454,13 @@ deleteFoldEntry(garray_T *gap, int idx, int recursive)
 /*
  * Delete nested folds in a fold.
  */
-    void
+    فراغ
 deleteFoldRecurse(garray_T *gap)
 {
-    int		i;
+    صحيح		i;
 
-    for (i = 0; i < gap->ga_len; ++i)
-	deleteFoldRecurse(&(((fold_T *)(gap->ga_data))[i].fd_nested));
+    لكل (i = 0; i < gap->ga_len; ++i)
+	deleteFoldRecurse(&(((fold_T *)(gap->ga_داده))[i].fd_nested));
     ga_clear(gap);
 }
 
@@ -1471,58 +1471,58 @@ deleteFoldRecurse(garray_T *gap)
  * We are adjusting the folds in the range from line1 til line2,
  * make sure that line2 does not get smaller than line1
  */
-    void
+    فراغ
 foldMarkAdjust(
     win_T	*wp,
     linenr_T	line1,
     linenr_T	line2,
-    long	amount,
-    long	amount_after)
+    دراز	amount,
+    دراز	amount_after)
 {
     // If deleting marks from line1 to line2, but not deleting all those
     // lines, set line2 so that only deleted lines have their folds removed.
-    if (amount == MAXLNUM && line2 >= line1 && line2 - line1 >= -amount_after)
+    إذا (amount == MAXLNUM && line2 >= line1 && line2 - line1 >= -amount_after)
 	line2 = line1 - amount_after - 1;
-    if (line2 < line1)
+    إذا (line2 < line1)
 	line2 = line1;
     // If appending a line in Insert mode, it should be included in the fold
     // just above the line.
-    if ((State & MODE_INSERT) && amount == (linenr_T)1 && line2 == MAXLNUM)
+    إذا ((State & نما_درج) && amount == (linenr_T)1 && line2 == MAXLNUM)
 	--line1;
     foldMarkAdjustRecurse(&wp->w_folds, line1, line2, amount, amount_after);
 }
 
 // foldMarkAdjustRecurse() {{{2
-    static void
+    ساكن فراغ
 foldMarkAdjustRecurse(
     garray_T	*gap,
     linenr_T	line1,
     linenr_T	line2,
-    long	amount,
-    long	amount_after)
+    دراز	amount,
+    دراز	amount_after)
 {
     fold_T	*fp;
-    int		i;
-    linenr_T	last;
-    linenr_T	top;
+    صحيح		i;
+    linenr_T	آخرین;
+    linenr_T	بالاترین;
 
-    if (gap->ga_len == 0)
-	return;
+    إذا (gap->ga_len == 0)
+	أرجع;
 
     // In Insert mode an inserted line at the top of a fold is considered part
     // of the fold, otherwise it isn't.
-    if ((State & MODE_INSERT) && amount == (linenr_T)1 && line2 == MAXLNUM)
-	top = line1 + 1;
-    else
-	top = line1;
+    إذا ((State & نما_درج) && amount == (linenr_T)1 && line2 == MAXLNUM)
+	بالاترین = line1 + 1;
+    وإلا
+	بالاترین = line1;
 
     // Find the fold containing or just below "line1".
-    (void)foldFind(gap, line1, &fp);
+    (فراغ)fold_پیدا_کن(gap, line1, &fp);
 
     /*
      * Adjust all folds below "line1" that are affected.
      */
-    for (i = (int)(fp - (fold_T *)gap->ga_data); i < gap->ga_len; ++i, ++fp)
+    لكل (i = (صحيح)(fp - (fold_T *)gap->ga_داده); i < gap->ga_len; ++i, ++fp)
     {
 	/*
 	 * Check for these situations:
@@ -1536,78 +1536,78 @@ foldMarkAdjustRecurse(
 	 *		3     5  6
 	 */
 
-	last = fp->fd_top + fp->fd_len - 1; // last line of fold
+	آخرین = fp->fd_بالاترین + fp->fd_len - 1; // last line of fold
 
 	// 1. fold completely above line1: nothing to do
-	if (last < line1)
-	    continue;
+	إذا (آخرین < line1)
+	    استمر;
 
 	// 6. fold below line2: only adjust for amount_after
-	if (fp->fd_top > line2)
+	إذا (fp->fd_بالاترین > line2)
 	{
-	    if (amount_after == 0)
-		break;
-	    fp->fd_top += amount_after;
+	    إذا (amount_after == 0)
+		اكسر;
+	    fp->fd_بالاترین += amount_after;
 	}
-	else
+	وإلا
 	{
-	    if (fp->fd_top >= top && last <= line2)
+	    إذا (fp->fd_بالاترین >= بالاترین && آخرین <= line2)
 	    {
 		// 4. fold completely contained in range
-		if (amount == MAXLNUM)
+		إذا (amount == MAXLNUM)
 		{
 		    // Deleting lines: delete the fold completely
-		    deleteFoldEntry(gap, i, TRUE);
+		    delete_Fold_مدخل(gap, i, TRUE);
 		    --i;    // adjust index for deletion
 		    --fp;
 		}
-		else
-		    fp->fd_top += amount;
+		وإلا
+		    fp->fd_بالاترین += amount;
 	    }
-	    else
+	    وإلا
 	    {
-		if (fp->fd_top < top)
+		إذا (fp->fd_بالاترین < بالاترین)
 		{
 		    // 2 or 3: need to correct nested folds too
-		    foldMarkAdjustRecurse(&fp->fd_nested, line1 - fp->fd_top,
-				  line2 - fp->fd_top, amount, amount_after);
-		    if (last <= line2)
+		    foldMarkAdjustRecurse(&fp->fd_nested, line1 - fp->fd_بالاترین,
+				  line2 - fp->fd_بالاترین, amount, amount_after);
+		    إذا (آخرین <= line2)
 		    {
 			// 2. fold contains line1, line2 is below fold
-			if (amount == MAXLNUM)
-			    fp->fd_len = line1 - fp->fd_top;
-			else
+			إذا (amount == MAXLNUM)
+			    fp->fd_len = line1 - fp->fd_بالاترین;
+			وإلا
 			    fp->fd_len += amount;
 		    }
-		    else
+		    وإلا
 		    {
 			// 3. fold contains line1 and line2
 			fp->fd_len += amount_after;
 		    }
 		}
-		else
+		وإلا
 		{
 		    // 5. fold is below line1 and contains line2; need to
 		    // correct nested folds too
-		    if (amount == MAXLNUM)
+		    إذا (amount == MAXLNUM)
 		    {
 			foldMarkAdjustRecurse(&fp->fd_nested,
 				  0,
-				  line2 - fp->fd_top,
+				  line2 - fp->fd_بالاترین,
 				  amount,
-				  amount_after + (fp->fd_top - top));
-			fp->fd_len -= line2 - fp->fd_top + 1;
-			fp->fd_top = line1;
+				  amount_after + (fp->fd_بالاترین - بالاترین));
+			fp->fd_len -= line2 - fp->fd_بالاترین + 1;
+			fp->fd_بالاترین = line1;
 		    }
-		    else
+		    وإلا
 		    {
 			foldMarkAdjustRecurse(&fp->fd_nested,
 				  0,
-				  line2 - fp->fd_top,
+				  line2 - fp->fd_بالاترین,
 				  amount,
 				  amount_after - amount);
 			fp->fd_len += amount_after - amount;
-			fp->fd_top += amount;
+			fp->fd_بالاترین += amount;
 		    }
 		}
 	    }
@@ -1620,103 +1620,103 @@ foldMarkAdjustRecurse(
  * Get the lowest 'foldlevel' value that makes the deepest nested fold in the
  * current window open.
  */
-    int
-getDeepestNesting(void)
+    صحيح
+get_عمیقترین_Nesting(فراغ)
 {
     checkupdate(curwin);
-    return getDeepestNestingRecurse(&curwin->w_folds);
+    أرجع get_عمیقترین_Nesting_Recurse(&curwin->w_folds);
 }
 
-    static int
-getDeepestNestingRecurse(garray_T *gap)
+    ساكن صحيح
+get_عمیقترین_Nesting_Recurse(garray_T *gap)
 {
-    int		i;
-    int		level;
-    int		maxlevel = 0;
+    صحيح		i;
+    صحيح		level;
+    صحيح		maxlevel = 0;
     fold_T	*fp;
 
-    fp = (fold_T *)gap->ga_data;
-    for (i = 0; i < gap->ga_len; ++i)
+    fp = (fold_T *)gap->ga_داده;
+    لكل (i = 0; i < gap->ga_len; ++i)
     {
-	level = getDeepestNestingRecurse(&fp[i].fd_nested) + 1;
-	if (level > maxlevel)
+	level = get_عمیقترین_Nesting_Recurse(&fp[i].fd_nested) + 1;
+	إذا (level > maxlevel)
 	    maxlevel = level;
     }
 
-    return maxlevel;
+    أرجع maxlevel;
 }
 
 // check_closed() {{{2
 /*
  * Check if a fold is closed and update the info needed to check nested folds.
  */
-    static int
+    ساكن صحيح
 check_closed(
     win_T	*win,
     fold_T	*fp,
-    int		*use_levelp,	    // TRUE: outer fold had FD_LEVEL
-    int		level,		    // folding depth
-    int		*maybe_smallp,	    // TRUE: outer this had fd_small == MAYBE
+    صحيح		*use_levelp,	    // TRUE: outer fold had FD_LEVEL
+    صحيح		level,		    // folding depth
+    صحيح		*maybe_smallp,	    // TRUE: outer this had fd_small == MAYBE
     linenr_T	lnum_off)	    // line number offset for fp->fd_top
 {
-    int		closed = FALSE;
+    صحيح		closed = FALSE;
 
     // Check if this fold is closed.  If the flag is FD_LEVEL this
     // fold and all folds it contains depend on 'foldlevel'.
-    if (*use_levelp || fp->fd_flags == FD_LEVEL)
+    إذا (*use_levelp || fp->fd_flags == FD_LEVEL)
     {
 	*use_levelp = TRUE;
-	if (level >= win->w_p_fdl)
+	إذا (level >= win->w_p_fdl)
 	    closed = TRUE;
     }
-    else if (fp->fd_flags == FD_CLOSED)
+    وإلا إذا (fp->fd_flags == FD_CLOSED)
 	closed = TRUE;
 
     // Small fold isn't closed anyway.
-    if (fp->fd_small == MAYBE)
+    إذا (fp->fd_small == MAYBE)
 	*maybe_smallp = TRUE;
-    if (closed)
+    إذا (closed)
     {
-	if (*maybe_smallp)
+	إذا (*maybe_smallp)
 	    fp->fd_small = MAYBE;
 	checkSmall(win, fp, lnum_off);
-	if (fp->fd_small == TRUE)
+	إذا (fp->fd_small == TRUE)
 	    closed = FALSE;
     }
-    return closed;
+    أرجع closed;
 }
 
 // checkSmall() {{{2
 /*
  * Update fd_small field of fold "fp".
  */
-    static void
+    ساكن فراغ
 checkSmall(
     win_T	*wp,
     fold_T	*fp,
     linenr_T	lnum_off)	// offset for fp->fd_top
 {
-    int		count;
-    int		n;
+    صحيح		شمار;
+    صحيح		n;
 
-    if (fp->fd_small != MAYBE)
-	return;
+    إذا (fp->fd_small != MAYBE)
+	أرجع;
 
     // Mark any nested folds to maybe-small
-    setSmallMaybe(&fp->fd_nested);
+    مجموعه_Small_Maybe(&fp->fd_nested);
 
-    if (fp->fd_len > wp->w_p_fml)
+    إذا (fp->fd_len > wp->w_p_fml)
 	fp->fd_small = FALSE;
-    else
+    وإلا
     {
-	count = 0;
-	for (n = 0; n < fp->fd_len; ++n)
+	شمار = 0;
+	لكل (n = 0; n < fp->fd_len; ++n)
 	{
-	    count += plines_win_nofold(wp, fp->fd_top + lnum_off + n);
-	    if (count > wp->w_p_fml)
+	    شمار += plines_win_nofold(wp, fp->fd_بالاترین + lnum_off + n);
+	    إذا (شمار > wp->w_p_fml)
 	    {
 		fp->fd_small = FALSE;
-		return;
+		أرجع;
 	    }
 	}
 	fp->fd_small = TRUE;
@@ -1727,14 +1727,14 @@ checkSmall(
 /*
  * Set small flags in "gap" to MAYBE.
  */
-    static void
-setSmallMaybe(garray_T *gap)
+    ساكن فراغ
+مجموعه_Small_Maybe(garray_T *gap)
 {
-    int		i;
+    صحيح		i;
     fold_T	*fp;
 
-    fp = (fold_T *)gap->ga_data;
-    for (i = 0; i < gap->ga_len; ++i)
+    fp = (fold_T *)gap->ga_داده;
+    لكل (i = 0; i < gap->ga_len; ++i)
 	fp[i].fd_small = MAYBE;
 }
 
@@ -1743,59 +1743,59 @@ setSmallMaybe(garray_T *gap)
  * Create a fold from line "start" to line "end" (inclusive) in the current
  * window by adding markers.
  */
-    static void
-foldCreateMarkers(linenr_T start, linenr_T end)
+    ساكن فراغ
+foldCreateMarkers(linenr_T شروع, linenr_T انتها)
 {
-    if (!curbuf->b_p_ma)
+    إذا (!curbuf->b_p_ma)
     {
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-	return;
+	أرجع;
     }
     parseMarker(curwin);
 
-    foldAddMarker(start, curwin->w_p_fmr, foldstartmarkerlen);
-    foldAddMarker(end, foldendmarker, foldendmarkerlen);
+    fold_جمع_کن_Marker(شروع, curwin->w_p_fmr, foldstartmarkerlen);
+    fold_جمع_کن_Marker(انتها, foldendmarker, foldendmarkerlen);
 
     // Update both changes here, to avoid all folds after the start are
     // changed when the start marker is inserted and the end isn't.
-    changed_lines(start, (colnr_T)0, end, 0L);
+    تغییریافته_سطرها(شروع, (colnr_T)0, انتها, 0L);
 }
 
 // foldAddMarker() {{{2
 /*
  * Add "marker[markerlen]" in 'commentstring' to line "lnum".
  */
-    static void
-foldAddMarker(linenr_T lnum, char_u *marker, int markerlen)
+    ساكن فراغ
+fold_جمع_کن_Marker(linenr_T lnum, char_u *marker, صحيح markerlen)
 {
     char_u	*cms = curbuf->b_p_cms;
-    char_u	*line;
-    int		line_len;
+    char_u	*سطر;
+    صحيح		سطر_len;
     char_u	*newline;
-    char_u	*p = (char_u *)strstr((char *)curbuf->b_p_cms, "%s");
-    int		line_is_comment = FALSE;
+    char_u	*p = (char_u *)جستجوی_رشته((حرف *)curbuf->b_p_cms, "%s");
+    صحيح		سطر_is_comment = FALSE;
 
     // Allocate a new line: old-line + 'cms'-start + marker + 'cms'-end
-    line = ml_get(lnum);
-    line_len = ml_get_len(lnum);
+    سطر = ml_get(lnum);
+    سطر_len = ml_get_len(lnum);
 
-    if (u_save(lnum - 1, lnum + 1) != OK)
-	return;
+    إذا (u_save(lnum - 1, lnum + 1) != OK)
+	أرجع;
 
     // Check if the line ends with an unclosed comment
-    (void)skip_comment(line, FALSE, FALSE, &line_is_comment);
-    newline = alloc(line_len + markerlen + STRLEN(cms) + 1);
-    if (newline == NULL)
-	return;
-    STRCPY(newline, line);
+    (فراغ)skip_comment(سطر, FALSE, FALSE, &سطر_is_comment);
+    newline = alloc(سطر_len + markerlen + STRLEN(cms) + 1);
+    إذا (newline == عدم)
+	أرجع;
+    STRCPY(newline, سطر);
     // Append the marker to the end of the line
-    if (p == NULL || line_is_comment)
-	vim_strncpy(newline + line_len, marker, markerlen);
-    else
+    إذا (p == عدم || سطر_is_comment)
+	vim_strncpy(newline + سطر_len, marker, markerlen);
+    وإلا
     {
-	STRCPY(newline + line_len, cms);
-	STRNCPY(newline + line_len + (p - cms), marker, markerlen);
-	STRCPY(newline + line_len + (p - cms) + markerlen, p + 2);
+	STRCPY(newline + سطر_len, cms);
+	STRNCPY(newline + سطر_len + (p - cms), marker, markerlen);
+	STRCPY(newline + سطر_len + (p - cms) + markerlen, p + 2);
     }
 
     ml_replace(lnum, newline, FALSE);
@@ -1805,20 +1805,20 @@ foldAddMarker(linenr_T lnum, char_u *marker, int markerlen)
 /*
  * Delete the markers for a fold, causing it to be deleted.
  */
-    static void
+    ساكن فراغ
 deleteFoldMarkers(
     fold_T	*fp,
-    int		recursive,
+    صحيح		recursive,
     linenr_T	lnum_off)	// offset for fp->fd_top
 {
-    int		i;
+    صحيح		i;
 
-    if (recursive)
-	for (i = 0; i < fp->fd_nested.ga_len; ++i)
-	    deleteFoldMarkers((fold_T *)fp->fd_nested.ga_data + i, TRUE,
-						       lnum_off + fp->fd_top);
-    foldDelMarker(fp->fd_top + lnum_off, curwin->w_p_fmr, foldstartmarkerlen);
-    foldDelMarker(fp->fd_top + lnum_off + fp->fd_len - 1,
+    إذا (recursive)
+	لكل (i = 0; i < fp->fd_nested.ga_len; ++i)
+	    deleteFoldMarkers((fold_T *)fp->fd_nested.ga_داده + i, TRUE,
+						       lnum_off + fp->fd_بالاترین);
+    foldDelMarker(fp->fd_بالاترین + lnum_off, curwin->w_p_fmr, foldstartmarkerlen);
+    foldDelMarker(fp->fd_بالاترین + lnum_off + fp->fd_len - 1,
 					     foldendmarker, foldendmarkerlen);
 }
 
@@ -1829,51 +1829,51 @@ deleteFoldMarkers(
  * If the marker is not found, there is no error message.  Could be a missing
  * close-marker.
  */
-    static void
-foldDelMarker(linenr_T lnum, char_u *marker, int markerlen)
+    ساكن فراغ
+foldDelMarker(linenr_T lnum, char_u *marker, صحيح markerlen)
 {
-    char_u	*line;
+    char_u	*سطر;
     char_u	*newline;
     char_u	*p;
-    int		len;
+    صحيح		len;
     char_u	*cms = curbuf->b_p_cms;
     char_u	*cms2;
 
     // end marker may be missing and fold extends below the last line
-    if (lnum > curbuf->b_ml.ml_line_count)
-	return;
-    line = ml_get(lnum);
-    for (p = line; *p != NUL; ++p)
-	if (STRNCMP(p, marker, markerlen) == 0)
+    إذا (lnum > curbuf->b_ml.ml_سطر_شمار)
+	أرجع;
+    سطر = ml_get(lnum);
+    لكل (p = سطر; *p != NUL; ++p)
+	إذا (STRNCMP(p, marker, markerlen) == 0)
 	{
 	    // Found the marker, include a digit if it's there.
 	    len = markerlen;
-	    if (VIM_ISDIGIT(p[len]))
+	    إذا (VIM_ISDIGIT(p[len]))
 		++len;
-	    if (*cms != NUL)
+	    إذا (*cms != NUL)
 	    {
 		// Also delete 'commentstring' if it matches.
-		cms2 = (char_u *)strstr((char *)cms, "%s");
-		if (cms2 != NULL && p - line >= cms2 - cms
+		cms2 = (char_u *)جستجوی_رشته((حرف *)cms, "%s");
+		إذا (cms2 != عدم && p - سطر >= cms2 - cms
 			&& STRNCMP(p - (cms2 - cms), cms, cms2 - cms) == 0
 			&& STRNCMP(p + len, cms2 + 2, STRLEN(cms2 + 2)) == 0)
 		{
 		    p -= cms2 - cms;
-		    len += (int)STRLEN(cms) - 2;
+		    len += (صحيح)STRLEN(cms) - 2;
 		}
 	    }
-	    if (u_save(lnum - 1, lnum + 1) == OK)
+	    إذا (u_save(lnum - 1, lnum + 1) == OK)
 	    {
 		// Make new line: text-before-marker + text-after-marker
 		newline = alloc(ml_get_len(lnum) - len + 1);
-		if (newline != NULL)
+		إذا (newline != عدم)
 		{
-		    STRNCPY(newline, line, p - line);
-		    STRCPY(newline + (p - line), p + len);
+		    STRNCPY(newline, سطر, p - سطر);
+		    STRCPY(newline + (p - سطر), p + len);
 		    ml_replace(lnum, newline, FALSE);
 		}
 	    }
-	    break;
+	    اكسر;
 	}
 }
 
@@ -1891,113 +1891,113 @@ get_foldtext(
     foldinfo_T	*foldinfo,
     char_u	*buf)
 {
-    char_u	*text = NULL;
+    char_u	*متن = عدم;
 # ifdef FEAT_EVAL
      // an error occurred when evaluating 'fdt' setting
-    static int	    got_fdt_error = FALSE;
-    int		    save_did_emsg = did_emsg;
-    static win_T    *last_wp = NULL;
-    static linenr_T last_lnum = 0;
+    ساكن صحيح	    got_fdt_error = FALSE;
+    صحيح		    save_did_emsg = did_emsg;
+    ساكن win_T    *آخرین_wp = عدم;
+    ساكن linenr_T آخرین_lnum = 0;
 
-    if (last_wp != wp || last_wp == NULL
-					|| last_lnum > lnum || last_lnum == 0)
+    إذا (آخرین_wp != wp || آخرین_wp == عدم
+					|| آخرین_lnum > lnum || آخرین_lnum == 0)
 	// window changed, try evaluating foldtext setting once again
 	got_fdt_error = FALSE;
 
-    if (!got_fdt_error)
+    إذا (!got_fdt_error)
 	// a previous error should not abort evaluating 'foldexpr'
 	did_emsg = FALSE;
 
-    if (*wp->w_p_fdt != NUL)
+    إذا (*wp->w_p_fdt != NUL)
     {
 	char_u	dashes[MAX_LEVEL + 2];
-	int	level;
+	صحيح	level;
 	char_u	*p;
 
 	// Set "v:foldstart" and "v:foldend".
-	set_vim_var_nr(VV_FOLDSTART, lnum);
-	set_vim_var_nr(VV_FOLDEND, lnume);
+	مجموعه_vim_var_nr(VV_FOLDSTART, lnum);
+	مجموعه_vim_var_nr(VV_FOLDEND, lnume);
 
 	// Set "v:folddashes" to a string of "level" dashes.
 	// Set "v:foldlevel" to "level".
 	level = foldinfo->fi_level;
-	if (level > (int)sizeof(dashes) - 1)
-	    level = (int)sizeof(dashes) - 1;
+	إذا (level > (صحيح)حجم(dashes) - 1)
+	    level = (صحيح)حجم(dashes) - 1;
 	vim_memset(dashes, '-', (size_t)level);
 	dashes[level] = NUL;
-	set_vim_var_string(VV_FOLDDASHES, dashes, level);
-	set_vim_var_nr(VV_FOLDLEVEL, (long)level);
+	مجموعه_vim_var_string(VV_FOLDDASHES, dashes, level);
+	مجموعه_vim_var_nr(VV_FOLDLEVEL, (دراز)level);
 
 	// skip evaluating 'foldtext' on errors
-	if (!got_fdt_error)
+	إذا (!got_fdt_error)
 	{
 	    win_T   *save_curwin = curwin;
 	    sctx_T  saved_sctx = current_sctx;
 
 	    curwin = wp;
-	    curbuf = wp->w_buffer;
+	    curbuf = wp->w_میانگیر;
 	    current_sctx = wp->w_p_script_ctx[WV_FDT];
 
 	    ++emsg_off; // handle exceptions, but don't display errors
-	    text = eval_to_string_safe(wp->w_p_fdt,
-		       was_set_insecurely(wp, (char_u *)"foldtext", OPT_LOCAL),
+	    متن = eval_مقصد_string_امن(wp->w_p_fdt,
+		       was_مجموعه_insecurely(wp, (char_u *)"foldtext", OPT_LOCAL),
 		       TRUE, TRUE);
 	    --emsg_off;
 
-	    if (text == NULL || did_emsg)
+	    إذا (متن == عدم || did_emsg)
 		got_fdt_error = TRUE;
 
 	    curwin = save_curwin;
-	    curbuf = curwin->w_buffer;
+	    curbuf = curwin->w_میانگیر;
 	    current_sctx = saved_sctx;
 	}
-	last_lnum = lnum;
-	last_wp   = wp;
-	set_vim_var_string(VV_FOLDDASHES, NULL, -1);
+	آخرین_lnum = lnum;
+	آخرین_wp   = wp;
+	مجموعه_vim_var_string(VV_FOLDDASHES, عدم, -1);
 
-	if (!did_emsg && save_did_emsg)
+	إذا (!did_emsg && save_did_emsg)
 	    did_emsg = save_did_emsg;
 
-	if (text != NULL)
+	إذا (متن != عدم)
 	{
 	    // Replace unprintable characters, if there are any.  But
 	    // replace a TAB with a space.
-	    for (p = text; *p != NUL; ++p)
+	    لكل (p = متن; *p != NUL; ++p)
 	    {
-		int	len;
+		صحيح	len;
 
-		if (has_mbyte && (len = (*mb_ptr2len)(p)) > 1)
+		إذا (has_mbyte && (len = (*mb_ptr2len)(p)) > 1)
 		{
-		    if (!vim_isprintc((*mb_ptr2char)(p)))
-			break;
+		    إذا (!vim_isprintc((*mb_ptr2char)(p)))
+			اكسر;
 		    p += len - 1;
 		}
-		else
-		    if (*p == TAB)
+		وإلا
+		    إذا (*p == TAB)
 			*p = ' ';
-		    else if (ptr2cells(p) > 1)
-			break;
+		    وإلا إذا (ptr2cells(p) > 1)
+			اكسر;
 	    }
-	    if (*p != NUL)
+	    إذا (*p != NUL)
 	    {
-		p = transstr(text);
-		vim_free(text);
-		text = p;
+		p = transstr(متن);
+		vim_free(متن);
+		متن = p;
 	    }
 	}
     }
-    if (text == NULL)
+    إذا (متن == عدم)
 # endif
     {
-	long count = (long)(lnume - lnum + 1);
+	دراز شمار = (دراز)(lnume - lnum + 1);
 
-	vim_snprintf((char *)buf, FOLD_TEXT_LEN,
+	vim_snprintf((حرف *)buf, FOLD_متن_LEN,
 		     NGETTEXT("+--%3ld line folded ",
-					       "+--%3ld lines folded ", count),
-		     count);
-	text = buf;
+					       "+--%3ld lines folded ", شمار),
+		     شمار);
+	متن = buf;
     }
-    return text;
+    أرجع متن;
 }
 
 // foldtext_cleanup() {{{2
@@ -2005,87 +2005,87 @@ get_foldtext(
 /*
  * Remove 'foldmarker' and 'commentstring' from "str" (in-place).
  */
-    static void
+    ساكن فراغ
 foldtext_cleanup(char_u *str)
 {
-    char_u	*cms_start;	// first part or the whole comment
-    int		cms_slen = 0;	// length of cms_start
-    char_u	*cms_end;	// last part of the comment or NULL
-    int		cms_elen = 0;	// length of cms_end
+    char_u	*cms_شروع;	// first part or the whole comment
+    صحيح		cms_slen = 0;	// length of cms_start
+    char_u	*cms_انتها;	// last part of the comment or NULL
+    صحيح		cms_elen = 0;	// length of cms_end
     char_u	*s;
     char_u	*p;
-    int		len;
-    int		did1 = FALSE;
-    int		did2 = FALSE;
+    صحيح		len;
+    صحيح		did1 = FALSE;
+    صحيح		did2 = FALSE;
 
     // Ignore leading and trailing white space in 'commentstring'.
-    cms_start = skipwhite(curbuf->b_p_cms);
-    cms_slen = (int)STRLEN(cms_start);
-    while (cms_slen > 0 && VIM_ISWHITE(cms_start[cms_slen - 1]))
+    cms_شروع = skipwhite(curbuf->b_p_cms);
+    cms_slen = (صحيح)STRLEN(cms_شروع);
+    طالما (cms_slen > 0 && VIM_ISWHITE(cms_شروع[cms_slen - 1]))
 	--cms_slen;
 
     // locate "%s" in 'commentstring', use the part before and after it.
-    cms_end = (char_u *)strstr((char *)cms_start, "%s");
-    if (cms_end != NULL)
+    cms_انتها = (char_u *)جستجوی_رشته((حرف *)cms_شروع, "%s");
+    إذا (cms_انتها != عدم)
     {
-	cms_elen = cms_slen - (int)(cms_end - cms_start);
-	cms_slen = (int)(cms_end - cms_start);
+	cms_elen = cms_slen - (صحيح)(cms_انتها - cms_شروع);
+	cms_slen = (صحيح)(cms_انتها - cms_شروع);
 
 	// exclude white space before "%s"
-	while (cms_slen > 0 && VIM_ISWHITE(cms_start[cms_slen - 1]))
+	طالما (cms_slen > 0 && VIM_ISWHITE(cms_شروع[cms_slen - 1]))
 	    --cms_slen;
 
 	// skip "%s" and white space after it
-	s = skipwhite(cms_end + 2);
-	cms_elen -= (int)(s - cms_end);
-	cms_end = s;
+	s = skipwhite(cms_انتها + 2);
+	cms_elen -= (صحيح)(s - cms_انتها);
+	cms_انتها = s;
     }
     parseMarker(curwin);
 
-    for (s = str; *s != NUL; )
+    لكل (s = str; *s != NUL; )
     {
 	len = 0;
-	if (STRNCMP(s, curwin->w_p_fmr, foldstartmarkerlen) == 0)
+	إذا (STRNCMP(s, curwin->w_p_fmr, foldstartmarkerlen) == 0)
 	    len = foldstartmarkerlen;
-	else if (STRNCMP(s, foldendmarker, foldendmarkerlen) == 0)
+	وإلا إذا (STRNCMP(s, foldendmarker, foldendmarkerlen) == 0)
 	    len = foldendmarkerlen;
-	if (len > 0)
+	إذا (len > 0)
 	{
-	    if (VIM_ISDIGIT(s[len]))
+	    إذا (VIM_ISDIGIT(s[len]))
 		++len;
 
 	    // May remove 'commentstring' start.  Useful when it's a double
 	    // quote and we already removed a double quote.
-	    for (p = s; p > str && VIM_ISWHITE(p[-1]); --p)
+	    لكل (p = s; p > str && VIM_ISWHITE(p[-1]); --p)
 		;
-	    if (p >= str + cms_slen
-			   && STRNCMP(p - cms_slen, cms_start, cms_slen) == 0)
+	    إذا (p >= str + cms_slen
+			   && STRNCMP(p - cms_slen, cms_شروع, cms_slen) == 0)
 	    {
-		len += (int)(s - p) + cms_slen;
+		len += (صحيح)(s - p) + cms_slen;
 		s = p - cms_slen;
 	    }
 	}
-	else if (cms_end != NULL)
+	وإلا إذا (cms_انتها != عدم)
 	{
-	    if (!did1 && cms_slen > 0 && STRNCMP(s, cms_start, cms_slen) == 0)
+	    إذا (!did1 && cms_slen > 0 && STRNCMP(s, cms_شروع, cms_slen) == 0)
 	    {
 		len = cms_slen;
 		did1 = TRUE;
 	    }
-	    else if (!did2 && cms_elen > 0
-					&& STRNCMP(s, cms_end, cms_elen) == 0)
+	    وإلا إذا (!did2 && cms_elen > 0
+					&& STRNCMP(s, cms_انتها, cms_elen) == 0)
 	    {
 		len = cms_elen;
 		did2 = TRUE;
 	    }
 	}
-	if (len != 0)
+	إذا (len != 0)
 	{
-	    while (VIM_ISWHITE(s[len]))
+	    طالما (VIM_ISWHITE(s[len]))
 		++len;
 	    STRMOVE(s, s + len);
 	}
-	else
+	وإلا
 	{
 	    MB_PTR_ADV(s);
 	}
@@ -2095,99 +2095,99 @@ foldtext_cleanup(char_u *str)
 
 // Folding by indent, expr, marker and syntax. {{{1
 // Define "fline_T", passed to get fold level for a line. {{{2
-typedef struct
+تعريفنوع بنية
 {
-    win_T	*wp;		// window
+    win_T	*wp;		//پنجره
     linenr_T	lnum;		// current line number
     linenr_T	off;		// offset between lnum and real line number
     linenr_T	lnum_save;	// line nr used by foldUpdateIEMSRecurse()
-    int		lvl;		// current level (-1 for undefined)
-    int		lvl_next;	// level used for next line
-    int		start;		// number of folds that are forced to start at
+    صحيح		lvl;		// current level (-1 for undefined)
+    صحيح		lvl_بعدی;	// level used for next line
+    صحيح		شروع;		// number of folds that are forced to start at
 				// this line.
-    int		end;		// level of fold that is forced to end below
+    صحيح		انتها;		// level of fold that is forced to end below
 				// this line
-    int		had_end;	// level of fold that is forced to end above
+    صحيح		had_انتها;	// level of fold that is forced to end above
 				// this line (copy of "end" of prev. line)
 } fline_T;
 
 // Flag is set when redrawing is needed.
-static int fold_changed;
+ساكن صحيح fold_تغییریافته;
 
 // Function declarations. {{{2
-static linenr_T foldUpdateIEMSRecurse(garray_T *gap, int level, linenr_T startlnum, fline_T *flp, void (*getlevel)(fline_T *), linenr_T bot, int topflags);
-static int foldInsert(garray_T *gap, int i);
-static void foldSplit(garray_T *gap, int i, linenr_T top, linenr_T bot);
-static void foldRemove(garray_T *gap, linenr_T top, linenr_T bot);
-static void foldMerge(fold_T *fp1, garray_T *gap, fold_T *fp2);
-static void foldlevelIndent(fline_T *flp);
+ساكن linenr_T foldUpdateIEMSRecurse(garray_T *gap, صحيح level, linenr_T startlnum, fline_T *flp, فراغ (*getlevel)(fline_T *), linenr_T bot, صحيح topflags);
+ساكن صحيح fold_درج(garray_T *gap, صحيح i);
+ساكن فراغ fold_تقسیم(garray_T *gap, صحيح i, linenr_T بالاترین, linenr_T bot);
+ساكن فراغ foldRemove(garray_T *gap, linenr_T بالاترین, linenr_T bot);
+ساكن فراغ fold_ادغام(fold_T *fp1, garray_T *gap, fold_T *fp2);
+ساكن فراغ foldlevelIndent(fline_T *flp);
 # ifdef FEAT_DIFF
-static void foldlevelDiff(fline_T *flp);
+ساكن فراغ foldlevelDiff(fline_T *flp);
 # endif
-static void foldlevelExpr(fline_T *flp);
-static void foldlevelMarker(fline_T *flp);
-static void foldlevelSyntax(fline_T *flp);
+ساكن فراغ foldlevel_عبارت(fline_T *flp);
+ساكن فراغ foldlevelMarker(fline_T *flp);
+ساكن فراغ foldlevelSyntax(fline_T *flp);
 
 // foldUpdateIEMS() {{{2
 /*
  * Update the folding for window "wp", at least from lines "top" to "bot".
  * Return TRUE if any folds did change.
  */
-    static void
-foldUpdateIEMS(win_T *wp, linenr_T top, linenr_T bot)
+    ساكن فراغ
+foldUpdateIEMS(win_T *wp, linenr_T بالاترین, linenr_T bot)
 {
-    linenr_T	start;
-    linenr_T	end;
+    linenr_T	شروع;
+    linenr_T	انتها;
     fline_T	fline;
-    void	(*getlevel)(fline_T *);
-    int		level;
+    فراغ	(*getlevel)(fline_T *);
+    صحيح		level;
     fold_T	*fp;
 
     // Avoid problems when being called recursively.
-    if (invalid_top != (linenr_T)0)
-	return;
+    إذا (invalid_بالاترین != (linenr_T)0)
+	أرجع;
 
-    if (wp->w_foldinvalid)
+    إذا (wp->w_foldinvalid)
     {
 	// Need to update all folds.
-	top = 1;
-	bot = wp->w_buffer->b_ml.ml_line_count;
+	بالاترین = 1;
+	bot = wp->w_میانگیر->b_ml.ml_سطر_شمار;
 	wp->w_foldinvalid = false;
 
 	// Mark all folds as maybe-small.
-	setSmallMaybe(&wp->w_folds);
+	مجموعه_Small_Maybe(&wp->w_folds);
     }
 
 # ifdef FEAT_DIFF
     // add the context for "diff" folding
-    if (foldmethodIsDiff(wp))
+    إذا (foldmethodIsDiff(wp))
     {
-	if (top > diff_context)
-	    top -= diff_context;
-	else
-	    top = 1;
+	إذا (بالاترین > diff_context)
+	    بالاترین -= diff_context;
+	وإلا
+	    بالاترین = 1;
 	bot += diff_context;
     }
 # endif
 
     // When deleting lines at the end of the buffer "top" can be past the end
     // of the buffer.
-    if (top > wp->w_buffer->b_ml.ml_line_count)
-	top = wp->w_buffer->b_ml.ml_line_count;
+    إذا (بالاترین > wp->w_میانگیر->b_ml.ml_سطر_شمار)
+	بالاترین = wp->w_میانگیر->b_ml.ml_سطر_شمار;
 
-    fold_changed = FALSE;
+    fold_تغییریافته = FALSE;
     fline.wp = wp;
     fline.off = 0;
     fline.lvl = 0;
-    fline.lvl_next = -1;
-    fline.start = 0;
-    fline.end = MAX_LEVEL + 1;
-    fline.had_end = MAX_LEVEL + 1;
+    fline.lvl_بعدی = -1;
+    fline.شروع = 0;
+    fline.انتها = MAX_LEVEL + 1;
+    fline.had_انتها = MAX_LEVEL + 1;
 
-    invalid_top = top;
+    invalid_بالاترین = بالاترین;
     invalid_bot = bot;
 
-    if (foldmethodIsMarker(wp))
+    إذا (foldmethodIsMarker(wp))
     {
 	getlevel = foldlevelMarker;
 
@@ -2196,65 +2196,65 @@ foldUpdateIEMS(win_T *wp, linenr_T top, linenr_T bot)
 
 	// Need to get the level of the line above top, it is used if there is
 	// no marker at the top.
-	if (top > 1)
+	إذا (بالاترین > 1)
 	{
 	    // Get the fold level at top - 1.
-	    level = foldLevelWin(wp, top - 1);
+	    level = foldLevelWin(wp, بالاترین - 1);
 
 	    // The fold may end just above the top, check for that.
-	    fline.lnum = top - 1;
+	    fline.lnum = بالاترین - 1;
 	    fline.lvl = level;
 	    getlevel(&fline);
 
 	    // If a fold started here, we already had the level, if it stops
 	    // here, we need to use lvl_next.  Could also start and end a fold
 	    // in the same line.
-	    if (fline.lvl > level)
-		fline.lvl = level - (fline.lvl - fline.lvl_next);
-	    else
-		fline.lvl = fline.lvl_next;
+	    إذا (fline.lvl > level)
+		fline.lvl = level - (fline.lvl - fline.lvl_بعدی);
+	    وإلا
+		fline.lvl = fline.lvl_بعدی;
 	}
-	fline.lnum = top;
+	fline.lnum = بالاترین;
 	getlevel(&fline);
     }
-    else
+    وإلا
     {
-	fline.lnum = top;
-	if (foldmethodIsExpr(wp))
+	fline.lnum = بالاترین;
+	إذا (foldmethod_Is_عبارت(wp))
 	{
-	    getlevel = foldlevelExpr;
+	    getlevel = foldlevel_عبارت;
 	    // start one line back, because a "<1" may indicate the end of a
 	    // fold in the topline
-	    if (top > 1)
+	    إذا (بالاترین > 1)
 		--fline.lnum;
 	}
-	else if (foldmethodIsSyntax(wp))
+	وإلا إذا (foldmethodIsSyntax(wp))
 	    getlevel = foldlevelSyntax;
 # ifdef FEAT_DIFF
-	else if (foldmethodIsDiff(wp))
+	وإلا إذا (foldmethodIsDiff(wp))
 	    getlevel = foldlevelDiff;
 # endif
-	else
+	وإلا
 	{
 	    getlevel = foldlevelIndent;
 	    // Start one line back, because if the line above "top" has an
 	    // undefined fold level, folding it relies on the line under it,
 	    // which is "top".
-	    if (top > 1)
+	    إذا (بالاترین > 1)
 		--fline.lnum;
 	}
 
 	// Backup to a line for which the fold level is defined.  Since it's
 	// always defined for line one, we will stop there.
 	fline.lvl = -1;
-	for ( ; !got_int; --fline.lnum)
+	لكل ( ; !got_int; --fline.lnum)
 	{
 	    // Reset lvl_next each time, because it will be set to a value for
 	    // the next line, but we search backwards here.
-	    fline.lvl_next = -1;
+	    fline.lvl_بعدی = -1;
 	    getlevel(&fline);
-	    if (fline.lvl >= 0)
-		break;
+	    إذا (fline.lvl >= 0)
+		اكسر;
 	}
     }
 
@@ -2265,103 +2265,103 @@ foldUpdateIEMS(win_T *wp, linenr_T top, linenr_T bot)
      * appear). To take that into account we should adjust the value of "bot"
      * to point to the end of the current fold:
      */
-    if (foldlevelSyntax == getlevel)
+    إذا (foldlevelSyntax == getlevel)
     {
 	garray_T *gap = &wp->w_folds;
-	fold_T	 *fpn = NULL;
-	int	  current_fdl = 0;
-	linenr_T  fold_start_lnum = 0;
+	fold_T	 *fpn = عدم;
+	صحيح	  current_fdl = 0;
+	linenr_T  fold_شروع_lnum = 0;
 	linenr_T  lnum_rel = fline.lnum;
 
-	while (current_fdl < fline.lvl)
+	طالما (current_fdl < fline.lvl)
 	{
-	    if (!foldFind(gap, lnum_rel, &fpn))
-		break;
+	    إذا (!fold_پیدا_کن(gap, lnum_rel, &fpn))
+		اكسر;
 	    ++current_fdl;
 
-	    fold_start_lnum += fpn->fd_top;
+	    fold_شروع_lnum += fpn->fd_بالاترین;
 	    gap = &fpn->fd_nested;
-	    lnum_rel -= fpn->fd_top;
+	    lnum_rel -= fpn->fd_بالاترین;
 	}
-	if (fpn != NULL && current_fdl == fline.lvl)
+	إذا (fpn != عدم && current_fdl == fline.lvl)
 	{
-	    linenr_T fold_end_lnum = fold_start_lnum + fpn->fd_len;
+	    linenr_T fold_انتها_lnum = fold_شروع_lnum + fpn->fd_len;
 
-	    if (fold_end_lnum > bot)
-		bot = fold_end_lnum;
+	    إذا (fold_انتها_lnum > bot)
+		bot = fold_انتها_lnum;
 	}
     }
 
-    start = fline.lnum;
-    end = bot;
+    شروع = fline.lnum;
+    انتها = bot;
     // Do at least one line.
-    if (start > end && end < wp->w_buffer->b_ml.ml_line_count)
-	end = start;
-    while (!got_int)
+    إذا (شروع > انتها && انتها < wp->w_میانگیر->b_ml.ml_سطر_شمار)
+	انتها = شروع;
+    طالما (!got_int)
     {
 	// Always stop at the end of the file ("end" can be past the end of
 	// the file).
-	if (fline.lnum > wp->w_buffer->b_ml.ml_line_count)
-	    break;
-	if (fline.lnum > end)
+	إذا (fline.lnum > wp->w_میانگیر->b_ml.ml_سطر_شمار)
+	    اكسر;
+	إذا (fline.lnum > انتها)
 	{
 	    // For "marker", "expr"  and "syntax"  methods: If a change caused
 	    // a fold to be removed, we need to continue at least until where
 	    // it ended.
-	    if (getlevel != foldlevelMarker
+	    إذا (getlevel != foldlevelMarker
 		    && getlevel != foldlevelSyntax
-		    && getlevel != foldlevelExpr)
-		break;
-	    if ((start <= end
-			&& foldFind(&wp->w_folds, end, &fp)
-			&& fp->fd_top + fp->fd_len - 1 > end)
+		    && getlevel != foldlevel_عبارت)
+		اكسر;
+	    إذا ((شروع <= انتها
+			&& fold_پیدا_کن(&wp->w_folds, انتها, &fp)
+			&& fp->fd_بالاترین + fp->fd_len - 1 > انتها)
 		    || (fline.lvl == 0
-			&& foldFind(&wp->w_folds, fline.lnum, &fp)
-			&& fp->fd_top < fline.lnum))
-		end = fp->fd_top + fp->fd_len - 1;
-	    else if (getlevel == foldlevelSyntax
+			&& fold_پیدا_کن(&wp->w_folds, fline.lnum, &fp)
+			&& fp->fd_بالاترین < fline.lnum))
+		انتها = fp->fd_بالاترین + fp->fd_len - 1;
+	    وإلا إذا (getlevel == foldlevelSyntax
 		    && foldLevelWin(wp, fline.lnum) != fline.lvl)
 		// For "syntax" method: Compare the foldlevel that the syntax
 		// tells us to the foldlevel from the existing folds.  If they
 		// don't match continue updating folds.
-		end = fline.lnum;
-	    else
-		break;
+		انتها = fline.lnum;
+	    وإلا
+		اكسر;
 	}
 
 	// A level 1 fold starts at a line with foldlevel > 0.
-	if (fline.lvl > 0)
+	إذا (fline.lvl > 0)
 	{
-	    invalid_top = fline.lnum;
-	    invalid_bot = end;
-	    end = foldUpdateIEMSRecurse(&wp->w_folds,
-				   1, start, &fline, getlevel, end, FD_LEVEL);
-	    start = fline.lnum;
+	    invalid_بالاترین = fline.lnum;
+	    invalid_bot = انتها;
+	    انتها = foldUpdateIEMSRecurse(&wp->w_folds,
+				   1, شروع, &fline, getlevel, انتها, FD_LEVEL);
+	    شروع = fline.lnum;
 	}
-	else
+	وإلا
 	{
-	    if (fline.lnum == wp->w_buffer->b_ml.ml_line_count)
-		break;
+	    إذا (fline.lnum == wp->w_میانگیر->b_ml.ml_سطر_شمار)
+		اكسر;
 	    ++fline.lnum;
-	    fline.lvl = fline.lvl_next;
+	    fline.lvl = fline.lvl_بعدی;
 	    getlevel(&fline);
 	}
     }
 
     // There can't be any folds from start until end now.
-    foldRemove(&wp->w_folds, start, end);
+    foldRemove(&wp->w_folds, شروع, انتها);
 
     // If some fold changed, need to redraw and position cursor.
-    if (fold_changed && wp->w_p_fen)
-	changed_window_setting_win(wp);
+    إذا (fold_تغییریافته && wp->w_p_fen)
+	تغییریافته_پنجره_setting_win(wp);
 
     // If we updated folds past "bot", need to redraw more lines.  Don't do
     // this in other situations, the changed lines will be redrawn anyway and
     // this method can cause the whole window to be updated.
-    if (end != bot)
-	redraw_win_range_later(wp, top, end);
+    إذا (انتها != bot)
+	redraw_win_range_later(wp, بالاترین, انتها);
 
-    invalid_top = (linenr_T)0;
+    invalid_بالاترین = (linenr_T)0;
 }
 
 // foldUpdateIEMSRecurse() {{{2
@@ -2388,26 +2388,26 @@ foldUpdateIEMS(win_T *wp, linenr_T top, linenr_T bot)
  * Returns bot, which may have been increased for lines that also need to be
  * updated as a result of a detected change in the fold.
  */
-    static linenr_T
+    ساكن linenr_T
 foldUpdateIEMSRecurse(
     garray_T	*gap,
-    int		level,
+    صحيح		level,
     linenr_T	startlnum,
     fline_T	*flp,
-    void	(*getlevel)(fline_T *),
+    فراغ	(*getlevel)(fline_T *),
     linenr_T	bot,
-    int		topflags)	// flags used by containing fold
+    صحيح		topflags)	// flags used by containing fold
 {
     linenr_T	ll;
-    fold_T	*fp = NULL;
+    fold_T	*fp = عدم;
     fold_T	*fp2;
-    int		lvl = level;
+    صحيح		lvl = level;
     linenr_T	startlnum2 = startlnum;
     linenr_T	firstlnum = flp->lnum;	// first lnum we got
-    int		i;
-    int		finish = FALSE;
-    linenr_T	linecount = flp->wp->w_buffer->b_ml.ml_line_count - flp->off;
-    int		concat;
+    صحيح		i;
+    صحيح		پایان = FALSE;
+    linenr_T	linecount = flp->wp->w_میانگیر->b_ml.ml_سطر_شمار - flp->off;
+    صحيح		concat;
 
     /*
      * If using the marker method, the start line is not the start of a fold
@@ -2415,13 +2415,13 @@ foldUpdateIEMSRecurse(
      * the previous fold.  But ignore a fold that starts at or below
      * startlnum, it must be deleted.
      */
-    if (getlevel == foldlevelMarker && flp->start <= flp->lvl - level
+    إذا (getlevel == foldlevelMarker && flp->شروع <= flp->lvl - level
 							      && flp->lvl > 0)
     {
-	(void)foldFind(gap, startlnum - 1, &fp);
-	if (fp != NULL && (fp >= ((fold_T *)gap->ga_data) + gap->ga_len
-						   || fp->fd_top >= startlnum))
-	    fp = NULL;
+	(فراغ)fold_پیدا_کن(gap, startlnum - 1, &fp);
+	إذا (fp != عدم && (fp >= ((fold_T *)gap->ga_داده) + gap->ga_len
+						   || fp->fd_بالاترین >= startlnum))
+	    fp = عدم;
     }
 
     /*
@@ -2436,124 +2436,124 @@ foldUpdateIEMSRecurse(
      * valid, thus "flp->lnum_save" is equal to "flp->lnum".
      */
     flp->lnum_save = flp->lnum;
-    while (!got_int)
+    طالما (!got_int)
     {
 	// Updating folds can be slow, check for CTRL-C.
-	line_breakcheck();
+	سطر_breakcheck();
 
 	// Set "lvl" to the level of line "flp->lnum".  When flp->start is set
 	// and after the first line of the fold, set the level to zero to
 	// force the fold to end.  Do the same when had_end is set: Previous
 	// line was marked as end of a fold.
 	lvl = flp->lvl;
-	if (lvl > MAX_LEVEL)
+	إذا (lvl > MAX_LEVEL)
 	    lvl = MAX_LEVEL;
-	if (flp->lnum > firstlnum
-		&& (level > lvl - flp->start || level >= flp->had_end))
+	إذا (flp->lnum > firstlnum
+		&& (level > lvl - flp->شروع || level >= flp->had_انتها))
 	    lvl = 0;
 
-	if (flp->lnum > bot && !finish && fp != NULL)
+	إذا (flp->lnum > bot && !پایان && fp != عدم)
 	{
 	    // For "marker" and "syntax" methods:
 	    // - If a change caused a nested fold to be removed, we need to
 	    //   delete it and continue at least until where it ended.
 	    // - If a change caused a nested fold to be created, or this fold
 	    //   to continue below its original end, need to finish this fold.
-	    if (getlevel != foldlevelMarker
-		    && getlevel != foldlevelExpr
+	    إذا (getlevel != foldlevelMarker
+		    && getlevel != foldlevel_عبارت
 		    && getlevel != foldlevelSyntax)
-		break;
+		اكسر;
 	    i = 0;
 	    fp2 = fp;
-	    if (lvl >= level)
+	    إذا (lvl >= level)
 	    {
 		// Compute how deep the folds currently are, if it's deeper
 		// than "lvl" then some must be deleted, need to update
 		// at least one nested fold.
-		ll = flp->lnum - fp->fd_top;
-		while (foldFind(&fp2->fd_nested, ll, &fp2))
+		ll = flp->lnum - fp->fd_بالاترین;
+		طالما (fold_پیدا_کن(&fp2->fd_nested, ll, &fp2))
 		{
 		    ++i;
-		    ll -= fp2->fd_top;
+		    ll -= fp2->fd_بالاترین;
 		}
 	    }
-	    if (lvl < level + i)
+	    إذا (lvl < level + i)
 	    {
-		(void)foldFind(&fp->fd_nested, flp->lnum - fp->fd_top, &fp2);
-		if (fp2 != NULL)
-		    bot = fp2->fd_top + fp2->fd_len - 1 + fp->fd_top;
+		(فراغ)fold_پیدا_کن(&fp->fd_nested, flp->lnum - fp->fd_بالاترین, &fp2);
+		إذا (fp2 != عدم)
+		    bot = fp2->fd_بالاترین + fp2->fd_len - 1 + fp->fd_بالاترین;
 	    }
-	    else if (fp->fd_top + fp->fd_len <= flp->lnum && lvl >= level)
-		finish = TRUE;
-	    else
-		break;
+	    وإلا إذا (fp->fd_بالاترین + fp->fd_len <= flp->lnum && lvl >= level)
+		پایان = TRUE;
+	    وإلا
+		اكسر;
 	}
 
 	// At the start of the first nested fold and at the end of the current
 	// fold: check if existing folds at this level, before the current
 	// one, need to be deleted or truncated.
-	if (fp == NULL
+	إذا (fp == عدم
 		&& (lvl != level
 		    || flp->lnum_save >= bot
-		    || flp->start != 0
-		    || flp->had_end <= MAX_LEVEL
+		    || flp->شروع != 0
+		    || flp->had_انتها <= MAX_LEVEL
 		    || flp->lnum == linecount))
 	{
 	    /*
 	     * Remove or update folds that have lines between startlnum and
 	     * firstlnum.
 	     */
-	    while (!got_int)
+	    طالما (!got_int)
 	    {
 		// set concat to 1 if it's allowed to concatenate this fold
 		// with a previous one that touches it.
-		if (flp->start != 0 || flp->had_end <= MAX_LEVEL)
+		إذا (flp->شروع != 0 || flp->had_انتها <= MAX_LEVEL)
 		    concat = 0;
-		else
+		وإلا
 		    concat = 1;
 
 		// Find an existing fold to re-use.  Preferably one that
 		// includes startlnum, otherwise one that ends just before
 		// startlnum or starts after it.
-		if (gap->ga_len > 0 && (foldFind(gap, startlnum, &fp)
-			|| (fp < ((fold_T *)gap->ga_data) + gap->ga_len
-			    && fp->fd_top <= firstlnum)
-			|| foldFind(gap, firstlnum - concat, &fp)
-			|| (fp < ((fold_T *)gap->ga_data) + gap->ga_len
-			    && ((lvl < level && fp->fd_top < flp->lnum)
+		إذا (gap->ga_len > 0 && (fold_پیدا_کن(gap, startlnum, &fp)
+			|| (fp < ((fold_T *)gap->ga_داده) + gap->ga_len
+			    && fp->fd_بالاترین <= firstlnum)
+			|| fold_پیدا_کن(gap, firstlnum - concat, &fp)
+			|| (fp < ((fold_T *)gap->ga_داده) + gap->ga_len
+			    && ((lvl < level && fp->fd_بالاترین < flp->lnum)
 				|| (lvl >= level
-					   && fp->fd_top <= flp->lnum_save)))))
+					   && fp->fd_بالاترین <= flp->lnum_save)))))
 		{
-		    if (fp->fd_top + fp->fd_len + concat > firstlnum)
+		    إذا (fp->fd_بالاترین + fp->fd_len + concat > firstlnum)
 		    {
 			// Use existing fold for the new fold.  If it starts
 			// before where we started looking, extend it.  If it
 			// starts at another line, update nested folds to keep
 			// their position, compensating for the new fd_top.
-			if (fp->fd_top == firstlnum)
+			إذا (fp->fd_بالاترین == firstlnum)
 			{
 			    // have found a fold beginning where we want
 			}
-			else if (fp->fd_top >= startlnum)
+			وإلا إذا (fp->fd_بالاترین >= startlnum)
 			{
-			    if (fp->fd_top > firstlnum)
+			    إذا (fp->fd_بالاترین > firstlnum)
 				// like lines are inserted
 				foldMarkAdjustRecurse(&fp->fd_nested,
 					(linenr_T)0, (linenr_T)MAXLNUM,
-					(long)(fp->fd_top - firstlnum), 0L);
-			    else
+					(دراز)(fp->fd_بالاترین - firstlnum), 0L);
+			    وإلا
 				// like lines are deleted
 				foldMarkAdjustRecurse(&fp->fd_nested,
 					(linenr_T)0,
-					(long)(firstlnum - fp->fd_top - 1),
+					(دراز)(firstlnum - fp->fd_بالاترین - 1),
 					(linenr_T)MAXLNUM,
-					(long)(fp->fd_top - firstlnum));
-			    fp->fd_len += fp->fd_top - firstlnum;
-			    fp->fd_top = firstlnum;
+					(دراز)(fp->fd_بالاترین - firstlnum));
+			    fp->fd_len += fp->fd_بالاترین - firstlnum;
+			    fp->fd_بالاترین = firstlnum;
 			    fp->fd_small = MAYBE;
-			    fold_changed = TRUE;
+			    fold_تغییریافته = TRUE;
 			}
-			else if ((flp->start != 0 && lvl == level)
+			وإلا إذا ((flp->شروع != 0 && lvl == level)
 						     || firstlnum != startlnum)
 			{
 			    linenr_T breakstart;
@@ -2575,149 +2575,149 @@ foldUpdateIEMSRecurse(
 			     * range.
 			     * Any splits have to be done recursively.
 			     */
-			    if (firstlnum != startlnum)
+			    إذا (firstlnum != startlnum)
 			    {
 				breakstart = startlnum;
 				breakend = firstlnum;
 			    }
-			    else
+			    وإلا
 			    {
 				breakstart = flp->lnum;
 				breakend = flp->lnum;
 			    }
-			    foldRemove(&fp->fd_nested, breakstart - fp->fd_top,
-						      breakend - fp->fd_top);
-			    i = (int)(fp - (fold_T *)gap->ga_data);
-			    foldSplit(gap, i, breakstart, breakend - 1);
-			    fp = (fold_T *)gap->ga_data + i + 1;
+			    foldRemove(&fp->fd_nested, breakstart - fp->fd_بالاترین,
+						      breakend - fp->fd_بالاترین);
+			    i = (صحيح)(fp - (fold_T *)gap->ga_داده);
+			    fold_تقسیم(gap, i, breakstart, breakend - 1);
+			    fp = (fold_T *)gap->ga_داده + i + 1;
 
 			    // If using the "marker" or "syntax" method, we
 			    // need to continue until the end of the fold is
 			    // found.
-			    if (getlevel == foldlevelMarker
-				    || getlevel == foldlevelExpr
+			    إذا (getlevel == foldlevelMarker
+				    || getlevel == foldlevel_عبارت
 				    || getlevel == foldlevelSyntax)
-				finish = TRUE;
+				پایان = TRUE;
 			}
 
-			if (fp->fd_top == startlnum && concat)
+			إذا (fp->fd_بالاترین == startlnum && concat)
 			{
-			    i = (int)(fp - (fold_T *)gap->ga_data);
-			    if (i != 0)
+			    i = (صحيح)(fp - (fold_T *)gap->ga_داده);
+			    إذا (i != 0)
 			    {
 				fp2 = fp - 1;
-				if (fp2->fd_top + fp2->fd_len == fp->fd_top)
+				إذا (fp2->fd_بالاترین + fp2->fd_len == fp->fd_بالاترین)
 				{
-				    foldMerge(fp2, gap, fp);
+				    fold_ادغام(fp2, gap, fp);
 				    fp = fp2;
 				}
 			    }
 			}
-			break;
+			اكسر;
 		    }
-		    if (fp->fd_top >= startlnum)
+		    إذا (fp->fd_بالاترین >= startlnum)
 		    {
 			// A fold that starts at or after startlnum and stops
 			// before the new fold must be deleted.  Continue
 			// looking for the next one.
-			deleteFoldEntry(gap,
-				     (int)(fp - (fold_T *)gap->ga_data), TRUE);
+			delete_Fold_مدخل(gap,
+				     (صحيح)(fp - (fold_T *)gap->ga_داده), TRUE);
 		    }
-		    else
+		    وإلا
 		    {
 			// A fold has some lines above startlnum, truncate it
 			// to stop just above startlnum.
-			fp->fd_len = startlnum - fp->fd_top;
+			fp->fd_len = startlnum - fp->fd_بالاترین;
 			foldMarkAdjustRecurse(&fp->fd_nested,
 				fp->fd_len, (linenr_T)MAXLNUM,
 						       (linenr_T)MAXLNUM, 0L);
-			fold_changed = TRUE;
+			fold_تغییریافته = TRUE;
 		    }
 		}
-		else
+		وإلا
 		{
 		    // Insert new fold.  Careful: ga_data may be NULL and it
 		    // may change!
-		    if (gap->ga_len == 0)
+		    إذا (gap->ga_len == 0)
 			i = 0;
-		    else
-			i = (int)(fp - (fold_T *)gap->ga_data);
-		    if (foldInsert(gap, i) != OK)
-			return bot;
-		    fp = (fold_T *)gap->ga_data + i;
+		    وإلا
+			i = (صحيح)(fp - (fold_T *)gap->ga_داده);
+		    إذا (fold_درج(gap, i) != OK)
+			أرجع bot;
+		    fp = (fold_T *)gap->ga_داده + i;
 		    // The new fold continues until bot, unless we find the
 		    // end earlier.
-		    fp->fd_top = firstlnum;
+		    fp->fd_بالاترین = firstlnum;
 		    fp->fd_len = bot - firstlnum + 1;
 		    // When the containing fold is open, the new fold is open.
 		    // The new fold is closed if the fold above it is closed.
 		    // The first fold depends on the containing fold.
-		    if (topflags == FD_OPEN)
+		    إذا (topflags == FD_OPEN)
 		    {
 			flp->wp->w_fold_manual = true;
 			fp->fd_flags = FD_OPEN;
 		    }
-		    else if (i <= 0)
+		    وإلا إذا (i <= 0)
 		    {
 			fp->fd_flags = topflags;
-			if (topflags != FD_LEVEL)
+			إذا (topflags != FD_LEVEL)
 			    flp->wp->w_fold_manual = true;
 		    }
-		    else
+		    وإلا
 			fp->fd_flags = (fp - 1)->fd_flags;
 		    fp->fd_small = MAYBE;
 		    // If using the "marker", "expr" or "syntax" method, we
 		    // need to continue until the end of the fold is found.
-		    if (getlevel == foldlevelMarker
-			    || getlevel == foldlevelExpr
+		    إذا (getlevel == foldlevelMarker
+			    || getlevel == foldlevel_عبارت
 			    || getlevel == foldlevelSyntax)
-			finish = TRUE;
-		    fold_changed = TRUE;
-		    break;
+			پایان = TRUE;
+		    fold_تغییریافته = TRUE;
+		    اكسر;
 		}
 	    }
 	}
 
-	if (lvl < level || flp->lnum > linecount)
+	إذا (lvl < level || flp->lnum > linecount)
 	{
 	    /*
 	     * Found a line with a lower foldlevel, this fold ends just above
 	     * "flp->lnum".
 	     */
-	    break;
+	    اكسر;
 	}
 
 	/*
 	 * The fold includes the line "flp->lnum" and "flp->lnum_save".
 	 * Check "fp" for safety.
 	 */
-	if (lvl > level && fp != NULL)
+	إذا (lvl > level && fp != عدم)
 	{
 	    /*
 	     * There is a nested fold, handle it recursively.
 	     */
 	    // At least do one line (can happen when finish is TRUE).
-	    if (bot < flp->lnum)
+	    إذا (bot < flp->lnum)
 		bot = flp->lnum;
 
 	    // Line numbers in the nested fold are relative to the start of
 	    // this fold.
-	    flp->lnum = flp->lnum_save - fp->fd_top;
-	    flp->off += fp->fd_top;
-	    i = (int)(fp - (fold_T *)gap->ga_data);
+	    flp->lnum = flp->lnum_save - fp->fd_بالاترین;
+	    flp->off += fp->fd_بالاترین;
+	    i = (صحيح)(fp - (fold_T *)gap->ga_داده);
 	    bot = foldUpdateIEMSRecurse(&fp->fd_nested, level + 1,
-				       startlnum2 - fp->fd_top, flp, getlevel,
-					      bot - fp->fd_top, fp->fd_flags);
-	    fp = (fold_T *)gap->ga_data + i;
-	    flp->lnum += fp->fd_top;
-	    flp->lnum_save += fp->fd_top;
-	    flp->off -= fp->fd_top;
-	    bot += fp->fd_top;
+				       startlnum2 - fp->fd_بالاترین, flp, getlevel,
+					      bot - fp->fd_بالاترین, fp->fd_flags);
+	    fp = (fold_T *)gap->ga_داده + i;
+	    flp->lnum += fp->fd_بالاترین;
+	    flp->lnum_save += fp->fd_بالاترین;
+	    flp->off -= fp->fd_بالاترین;
+	    bot += fp->fd_بالاترین;
 	    startlnum2 = flp->lnum;
 
 	    // This fold may end at the same line, don't incr. flp->lnum.
 	}
-	else
+	وإلا
 	{
 	    /*
 	     * Get the level of the next line, then continue the loop to check
@@ -2727,22 +2727,22 @@ foldUpdateIEMSRecurse(
 	     */
 	    flp->lnum = flp->lnum_save;
 	    ll = flp->lnum + 1;
-	    while (!got_int)
+	    طالما (!got_int)
 	    {
 		// Make the previous level available to foldlevel().
 		prev_lnum = flp->lnum;
 		prev_lnum_lvl = flp->lvl;
 
-		if (++flp->lnum > linecount)
-		    break;
-		flp->lvl = flp->lvl_next;
+		إذا (++flp->lnum > linecount)
+		    اكسر;
+		flp->lvl = flp->lvl_بعدی;
 		getlevel(flp);
-		if (flp->lvl >= 0 || flp->had_end <= MAX_LEVEL)
-		    break;
+		إذا (flp->lvl >= 0 || flp->had_انتها <= MAX_LEVEL)
+		    اكسر;
 	    }
 	    prev_lnum = 0;
-	    if (flp->lnum > linecount)
-		break;
+	    إذا (flp->lnum > linecount)
+		اكسر;
 
 	    // leave flp->lnum_save to lnum of the line that was used to get
 	    // the level, flp->lnum to the lnum of the next line.
@@ -2751,8 +2751,8 @@ foldUpdateIEMSRecurse(
 	}
     }
 
-    if (fp == NULL)	// only happens when got_int is set
-	return bot;
+    إذا (fp == عدم)	// only happens when got_int is set
+	أرجع bot;
 
     /*
      * Get here when:
@@ -2761,90 +2761,90 @@ foldUpdateIEMSRecurse(
      */
 
     // Current fold at least extends until lnum.
-    if (fp->fd_len < flp->lnum - fp->fd_top)
+    إذا (fp->fd_len < flp->lnum - fp->fd_بالاترین)
     {
-	fp->fd_len = flp->lnum - fp->fd_top;
+	fp->fd_len = flp->lnum - fp->fd_بالاترین;
 	fp->fd_small = MAYBE;
-	fold_changed = TRUE;
+	fold_تغییریافته = TRUE;
     }
-    else if (fp->fd_top + fp->fd_len > linecount)
+    وإلا إذا (fp->fd_بالاترین + fp->fd_len > linecount)
 	// running into the end of the buffer (deleted last line)
-	fp->fd_len = linecount - fp->fd_top + 1;
+	fp->fd_len = linecount - fp->fd_بالاترین + 1;
 
     // Delete contained folds from the end of the last one found until where
     // we stopped looking.
-    foldRemove(&fp->fd_nested, startlnum2 - fp->fd_top,
-						  flp->lnum - 1 - fp->fd_top);
+    foldRemove(&fp->fd_nested, startlnum2 - fp->fd_بالاترین,
+						  flp->lnum - 1 - fp->fd_بالاترین);
 
-    if (lvl < level)
+    إذا (lvl < level)
     {
 	// End of fold found, update the length when it got shorter.
-	if (fp->fd_len != flp->lnum - fp->fd_top)
+	إذا (fp->fd_len != flp->lnum - fp->fd_بالاترین)
 	{
-	    if (fp->fd_top + fp->fd_len - 1 > bot)
+	    إذا (fp->fd_بالاترین + fp->fd_len - 1 > bot)
 	    {
 		// fold continued below bot
-		if (getlevel == foldlevelMarker
-			|| getlevel == foldlevelExpr
+		إذا (getlevel == foldlevelMarker
+			|| getlevel == foldlevel_عبارت
 			|| getlevel == foldlevelSyntax)
 		{
 		    // marker method: truncate the fold and make sure the
 		    // previously included lines are processed again
-		    bot = fp->fd_top + fp->fd_len - 1;
-		    fp->fd_len = flp->lnum - fp->fd_top;
+		    bot = fp->fd_بالاترین + fp->fd_len - 1;
+		    fp->fd_len = flp->lnum - fp->fd_بالاترین;
 		}
-		else
+		وإلا
 		{
 		    // indent or expr method: split fold to create a new one
 		    // below bot
-		    i = (int)(fp - (fold_T *)gap->ga_data);
-		    foldSplit(gap, i, flp->lnum, bot);
-		    fp = (fold_T *)gap->ga_data + i;
+		    i = (صحيح)(fp - (fold_T *)gap->ga_داده);
+		    fold_تقسیم(gap, i, flp->lnum, bot);
+		    fp = (fold_T *)gap->ga_داده + i;
 		}
 	    }
-	    else
-		fp->fd_len = flp->lnum - fp->fd_top;
-	    fold_changed = TRUE;
+	    وإلا
+		fp->fd_len = flp->lnum - fp->fd_بالاترین;
+	    fold_تغییریافته = TRUE;
 	}
     }
 
     // delete following folds that end before the current line
-    for (;;)
+    لكل (;;)
     {
 	fp2 = fp + 1;
-	if (fp2 >= (fold_T *)gap->ga_data + gap->ga_len
-						  || fp2->fd_top > flp->lnum)
-	    break;
-	if (fp2->fd_top + fp2->fd_len > flp->lnum)
+	إذا (fp2 >= (fold_T *)gap->ga_داده + gap->ga_len
+						  || fp2->fd_بالاترین > flp->lnum)
+	    اكسر;
+	إذا (fp2->fd_بالاترین + fp2->fd_len > flp->lnum)
 	{
-	    if (fp2->fd_top < flp->lnum)
+	    إذا (fp2->fd_بالاترین < flp->lnum)
 	    {
 		// Make fold that includes lnum start at lnum.
 		foldMarkAdjustRecurse(&fp2->fd_nested,
-			(linenr_T)0, (long)(flp->lnum - fp2->fd_top - 1),
-			(linenr_T)MAXLNUM, (long)(fp2->fd_top - flp->lnum));
-		fp2->fd_len -= flp->lnum - fp2->fd_top;
-		fp2->fd_top = flp->lnum;
-		fold_changed = TRUE;
+			(linenr_T)0, (دراز)(flp->lnum - fp2->fd_بالاترین - 1),
+			(linenr_T)MAXLNUM, (دراز)(fp2->fd_بالاترین - flp->lnum));
+		fp2->fd_len -= flp->lnum - fp2->fd_بالاترین;
+		fp2->fd_بالاترین = flp->lnum;
+		fold_تغییریافته = TRUE;
 	    }
 
-	    if (lvl >= level)
+	    إذا (lvl >= level)
 	    {
 		// merge new fold with existing fold that follows
-		foldMerge(fp, gap, fp2);
+		fold_ادغام(fp, gap, fp2);
 	    }
-	    break;
+	    اكسر;
 	}
-	fold_changed = TRUE;
-	deleteFoldEntry(gap, (int)(fp2 - (fold_T *)gap->ga_data), TRUE);
+	fold_تغییریافته = TRUE;
+	delete_Fold_مدخل(gap, (صحيح)(fp2 - (fold_T *)gap->ga_داده), TRUE);
     }
 
     // Need to redraw the lines we inspected, which might be further down than
     // was asked for.
-    if (bot < flp->lnum - 1)
+    إذا (bot < flp->lnum - 1)
 	bot = flp->lnum - 1;
 
-    return bot;
+    أرجع bot;
 }
 
 // foldInsert() {{{2
@@ -2852,19 +2852,19 @@ foldUpdateIEMSRecurse(
  * Insert a new fold in "gap" at position "i".
  * Returns OK for success, FAIL for failure.
  */
-    static int
-foldInsert(garray_T *gap, int i)
+    ساكن صحيح
+fold_درج(garray_T *gap, صحيح i)
 {
     fold_T	*fp;
 
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
-    fp = (fold_T *)gap->ga_data + i;
-    if (gap->ga_len > 0 && i < gap->ga_len)
-	mch_memmove(fp + 1, fp, sizeof(fold_T) * (gap->ga_len - i));
+    إذا (ga_grow(gap, 1) == FAIL)
+	أرجع FAIL;
+    fp = (fold_T *)gap->ga_داده + i;
+    إذا (gap->ga_len > 0 && i < gap->ga_len)
+	mch_memmove(fp + 1, fp, حجم(fold_T) * (gap->ga_len - i));
     ++gap->ga_len;
-    ga_init2(&fp->fd_nested, sizeof(fold_T), 10);
-    return OK;
+    ga_init2(&fp->fd_nested, حجم(fold_T), 10);
+    أرجع OK;
 }
 
 // foldSplit() {{{2
@@ -2875,26 +2875,26 @@ foldInsert(garray_T *gap, int i)
  * The caller must first have taken care of any nested folds from "top" to
  * "bot"!
  */
-    static void
-foldSplit(
+    ساكن فراغ
+fold_تقسیم(
     garray_T	*gap,
-    int		i,
-    linenr_T	top,
+    صحيح		i,
+    linenr_T	بالاترین,
     linenr_T	bot)
 {
     fold_T	*fp;
     fold_T	*fp2;
     garray_T	*gap1;
     garray_T	*gap2;
-    int		idx;
-    int		len;
+    صحيح		idx;
+    صحيح		len;
 
     // The fold continues below bot, need to split it.
-    if (foldInsert(gap, i + 1) == FAIL)
-	return;
-    fp = (fold_T *)gap->ga_data + i;
-    fp[1].fd_top = bot + 1;
-    fp[1].fd_len = fp->fd_len - (fp[1].fd_top - fp->fd_top);
+    إذا (fold_درج(gap, i + 1) == FAIL)
+	أرجع;
+    fp = (fold_T *)gap->ga_داده + i;
+    fp[1].fd_بالاترین = bot + 1;
+    fp[1].fd_len = fp->fd_len - (fp[1].fd_بالاترین - fp->fd_بالاترین);
     fp[1].fd_flags = fp->fd_flags;
     fp[1].fd_small = MAYBE;
     fp->fd_small = MAYBE;
@@ -2903,24 +2903,24 @@ foldSplit(
     // any between top and bot, they have been removed by the caller.
     gap1 = &fp->fd_nested;
     gap2 = &fp[1].fd_nested;
-    (void)foldFind(gap1, bot + 1 - fp->fd_top, &fp2);
-    if (fp2 != NULL)
+    (فراغ)fold_پیدا_کن(gap1, bot + 1 - fp->fd_بالاترین, &fp2);
+    إذا (fp2 != عدم)
     {
-	len = (int)((fold_T *)gap1->ga_data + gap1->ga_len - fp2);
-	if (len > 0 && ga_grow(gap2, len) == OK)
+	len = (صحيح)((fold_T *)gap1->ga_داده + gap1->ga_len - fp2);
+	إذا (len > 0 && ga_grow(gap2, len) == OK)
 	{
-	    for (idx = 0; idx < len; ++idx)
+	    لكل (idx = 0; idx < len; ++idx)
 	    {
-		((fold_T *)gap2->ga_data)[idx] = fp2[idx];
-		((fold_T *)gap2->ga_data)[idx].fd_top
-						  -= fp[1].fd_top - fp->fd_top;
+		((fold_T *)gap2->ga_داده)[idx] = fp2[idx];
+		((fold_T *)gap2->ga_داده)[idx].fd_بالاترین
+						  -= fp[1].fd_بالاترین - fp->fd_بالاترین;
 	    }
 	    gap2->ga_len = len;
 	    gap1->ga_len -= len;
 	}
     }
-    fp->fd_len = top - fp->fd_top;
-    fold_changed = TRUE;
+    fp->fd_len = بالاترین - fp->fd_بالاترین;
+    fold_تغییریافته = TRUE;
 }
 
 // foldRemove() {{{2
@@ -2942,77 +2942,77 @@ foldSplit(
  * 5: made to start below "bot".
  * 6: not changed
  */
-    static void
-foldRemove(garray_T *gap, linenr_T top, linenr_T bot)
+    ساكن فراغ
+foldRemove(garray_T *gap, linenr_T بالاترین, linenr_T bot)
 {
-    fold_T	*fp = NULL;
+    fold_T	*fp = عدم;
 
-    if (bot < top)
-	return;		// nothing to do
+    إذا (bot < بالاترین)
+	أرجع;		// nothing to do
 
-    while (gap->ga_len > 0)
+    طالما (gap->ga_len > 0)
     {
 	// Find fold that includes top or a following one.
-	if (foldFind(gap, top, &fp) && fp->fd_top < top)
+	إذا (fold_پیدا_کن(gap, بالاترین, &fp) && fp->fd_بالاترین < بالاترین)
 	{
 	    // 2: or 3: need to delete nested folds
-	    foldRemove(&fp->fd_nested, top - fp->fd_top, bot - fp->fd_top);
-	    if (fp->fd_top + fp->fd_len - 1 > bot)
+	    foldRemove(&fp->fd_nested, بالاترین - fp->fd_بالاترین, bot - fp->fd_بالاترین);
+	    إذا (fp->fd_بالاترین + fp->fd_len - 1 > bot)
 	    {
 		// 3: need to split it.
-		foldSplit(gap, (int)(fp - (fold_T *)gap->ga_data), top, bot);
+		fold_تقسیم(gap, (صحيح)(fp - (fold_T *)gap->ga_داده), بالاترین, bot);
 	    }
-	    else
+	    وإلا
 	    {
 		// 2: truncate fold at "top".
-		fp->fd_len = top - fp->fd_top;
+		fp->fd_len = بالاترین - fp->fd_بالاترین;
 	    }
-	    fold_changed = TRUE;
-	    continue;
+	    fold_تغییریافته = TRUE;
+	    استمر;
 	}
-	if (fp >= (fold_T *)(gap->ga_data) + gap->ga_len
-		|| fp->fd_top > bot)
+	إذا (fp >= (fold_T *)(gap->ga_داده) + gap->ga_len
+		|| fp->fd_بالاترین > bot)
 	{
 	    // 6: Found a fold below bot, can stop looking.
-	    break;
+	    اكسر;
 	}
-	if (fp->fd_top >= top)
+	إذا (fp->fd_بالاترین >= بالاترین)
 	{
 	    // Found an entry below top.
-	    fold_changed = TRUE;
-	    if (fp->fd_top + fp->fd_len - 1 > bot)
+	    fold_تغییریافته = TRUE;
+	    إذا (fp->fd_بالاترین + fp->fd_len - 1 > bot)
 	    {
 		// 5: Make fold that includes bot start below bot.
 		foldMarkAdjustRecurse(&fp->fd_nested,
-			(linenr_T)0, (long)(bot - fp->fd_top),
-			(linenr_T)MAXLNUM, (long)(fp->fd_top - bot - 1));
-		fp->fd_len -= bot - fp->fd_top + 1;
-		fp->fd_top = bot + 1;
-		break;
+			(linenr_T)0, (دراز)(bot - fp->fd_بالاترین),
+			(linenr_T)MAXLNUM, (دراز)(fp->fd_بالاترین - bot - 1));
+		fp->fd_len -= bot - fp->fd_بالاترین + 1;
+		fp->fd_بالاترین = bot + 1;
+		اكسر;
 	    }
 
 	    // 4: Delete completely contained fold.
-	    deleteFoldEntry(gap, (int)(fp - (fold_T *)gap->ga_data), TRUE);
+	    delete_Fold_مدخل(gap, (صحيح)(fp - (fold_T *)gap->ga_داده), TRUE);
 	}
     }
 }
 
 // foldReverseOrder() {{{2
-    static void
-foldReverseOrder(garray_T *gap, linenr_T start_arg, linenr_T end_arg)
+    ساكن فراغ
+fold_معکوس_ترتیب(garray_T *gap, linenr_T شروع_arg, linenr_T انتها_arg)
 {
-    fold_T *left, *right;
+    fold_T *چپ_2, *راست_2;
     fold_T tmp;
-    linenr_T start = start_arg;
-    linenr_T end = end_arg;
+    linenr_T شروع = شروع_arg;
+    linenr_T انتها = انتها_arg;
 
-    for (; start < end; start++, end--)
+    لكل (; شروع < انتها; شروع++, انتها--)
     {
-	left = (fold_T *)gap->ga_data + start;
-	right = (fold_T *)gap->ga_data + end;
-	tmp  = *left;
-	*left = *right;
-	*right = tmp;
+	چپ_2 = (fold_T *)gap->ga_داده + شروع;
+	راست_2 = (fold_T *)gap->ga_داده + انتها;
+	tmp  = *چپ_2;
+	*چپ_2 = *راست_2;
+	*راست_2 = tmp;
     }
 }
 
@@ -3049,48 +3049,48 @@ foldReverseOrder(garray_T *gap, linenr_T start_arg, linenr_T end_arg)
  * 10. not changed
  */
 
-    static void
-truncate_fold(fold_T *fp, linenr_T end)
+    ساكن فراغ
+truncate_fold(fold_T *fp, linenr_T انتها)
 {
-    end += 1;
-    foldRemove(&fp->fd_nested, end - fp->fd_top, MAXLNUM);
-    fp->fd_len = end - fp->fd_top;
+    انتها += 1;
+    foldRemove(&fp->fd_nested, انتها - fp->fd_بالاترین, MAXLNUM);
+    fp->fd_len = انتها - fp->fd_بالاترین;
 }
 
-# define fold_end(fp) ((fp)->fd_top + (fp)->fd_len - 1)
-# define valid_fold(fp, gap) ((gap)->ga_len > 0 && (fp) < ((fold_T *)(gap)->ga_data + (gap)->ga_len))
-# define fold_index(fp, gap) ((size_t)((fp) - ((fold_T *)(gap)->ga_data)))
+# define fold_انتها(fp) ((fp)->fd_بالاترین + (fp)->fd_len - 1)
+# define valid_fold(fp, gap) ((gap)->ga_len > 0 && (fp) < ((fold_T *)(gap)->ga_داده + (gap)->ga_len))
+# define fold_شاخص(fp, gap) ((size_t)((fp) - ((fold_T *)(gap)->ga_داده)))
 
-    void
+    فراغ
 foldMoveRange(garray_T *gap, linenr_T line1, linenr_T line2, linenr_T dest)
 {
     fold_T *fp;
     linenr_T range_len = line2 - line1 + 1;
     linenr_T move_len = dest - line2;
-    int at_start = foldFind(gap, line1 - 1, &fp);
-    size_t move_start = 0, move_end = 0, dest_index = 0;
+    صحيح at_شروع = fold_پیدا_کن(gap, line1 - 1, &fp);
+    size_t move_شروع = 0, move_انتها = 0, dest_شاخص = 0;
 
-    if (at_start)
+    إذا (at_شروع)
     {
-	if (fold_end(fp) > dest)
+	إذا (fold_انتها(fp) > dest)
 	{
 	    // Case 4
 	   // don't have to change this fold, but have to move nested folds.
-	    foldMoveRange(&fp->fd_nested, line1 - fp->fd_top, line2 -
-		    fp->fd_top, dest - fp->fd_top);
-	    return;
+	    foldMoveRange(&fp->fd_nested, line1 - fp->fd_بالاترین, line2 -
+		    fp->fd_بالاترین, dest - fp->fd_بالاترین);
+	    أرجع;
 	}
-	else if (fold_end(fp) > line2)
+	وإلا إذا (fold_انتها(fp) > line2)
 	{
 	    // Case 3
 	    // Remove nested folds between line1 and line2 & reduce the
 	    // length of fold by "range_len".
 	    // Folds after this one must be dealt with.
-	    foldMarkAdjustRecurse(&fp->fd_nested, line1 - fp->fd_top, line2 -
-		    fp->fd_top, MAXLNUM, -range_len);
+	    foldMarkAdjustRecurse(&fp->fd_nested, line1 - fp->fd_بالاترین, line2 -
+		    fp->fd_بالاترین, MAXLNUM, -range_len);
 	    fp->fd_len -= range_len;
 	}
-	else
+	وإلا
 	    // Case 2 truncate fold, folds after this one must be dealt with.
 	    truncate_fold(fp, line1 - 1);
 
@@ -3099,84 +3099,84 @@ foldMoveRange(garray_T *gap, linenr_T line1, linenr_T line2, linenr_T dest)
 	fp = fp + 1;
     }
 
-    if (!valid_fold(fp, gap) || fp->fd_top > dest)
+    إذا (!valid_fold(fp, gap) || fp->fd_بالاترین > dest)
     {
 	// Case 10
 	// No folds after "line1" and before "dest"
-	return;
+	أرجع;
     }
-    else if (fp->fd_top > line2)
+    وإلا إذا (fp->fd_بالاترین > line2)
     {
-	for (; valid_fold(fp, gap) && fold_end(fp) <= dest; fp++)
+	لكل (; valid_fold(fp, gap) && fold_انتها(fp) <= dest; fp++)
 	// Case 9. (for all case 9's) -- shift up.
-	    fp->fd_top -= range_len;
+	    fp->fd_بالاترین -= range_len;
 
-	if (valid_fold(fp, gap) && fp->fd_top <= dest)
+	إذا (valid_fold(fp, gap) && fp->fd_بالاترین <= dest)
 	{
 	    // Case 8. -- ensure truncated at dest, shift up
 	    truncate_fold(fp, dest);
-	    fp->fd_top -= range_len;
+	    fp->fd_بالاترین -= range_len;
 	}
-	return;
+	أرجع;
     }
-    else if (fold_end(fp) > dest)
+    وإلا إذا (fold_انتها(fp) > dest)
     {
 	// Case 7 -- remove nested folds and shrink
-	foldMarkAdjustRecurse(&fp->fd_nested, line2 + 1 - fp->fd_top, dest -
-		fp->fd_top, MAXLNUM, -move_len);
+	foldMarkAdjustRecurse(&fp->fd_nested, line2 + 1 - fp->fd_بالاترین, dest -
+		fp->fd_بالاترین, MAXLNUM, -move_len);
 	fp->fd_len -= move_len;
-	fp->fd_top += move_len;
-	return;
+	fp->fd_بالاترین += move_len;
+	أرجع;
     }
 
     // Case 5 or 6
     // changes rely on whether there are folds between the end of
     // this fold and "dest".
-    move_start = fold_index(fp, gap);
+    move_شروع = fold_شاخص(fp, gap);
 
-    for (; valid_fold(fp, gap) && fp->fd_top <= dest; fp++)
+    لكل (; valid_fold(fp, gap) && fp->fd_بالاترین <= dest; fp++)
     {
-	if (fp->fd_top <= line2)
+	إذا (fp->fd_بالاترین <= line2)
 	{
 	    // 1. 2. or 3.
-	    if (fold_end(fp) > line2)
+	    إذا (fold_انتها(fp) > line2)
 		// 2. or 3., truncate before moving
 		truncate_fold(fp, line2);
 
-	    fp->fd_top += move_len;
-	    continue;
+	    fp->fd_بالاترین += move_len;
+	    استمر;
 	}
 
 	// Record index of the first fold after the moved range.
-	if (move_end == 0)
-	    move_end = fold_index(fp, gap);
+	إذا (move_انتها == 0)
+	    move_انتها = fold_شاخص(fp, gap);
 
-	if (fold_end(fp) > dest)
+	إذا (fold_انتها(fp) > dest)
 	    truncate_fold(fp, dest);
 
-	fp->fd_top -= range_len;
+	fp->fd_بالاترین -= range_len;
     }
 
-    dest_index = fold_index(fp, gap);
+    dest_شاخص = fold_شاخص(fp, gap);
 
     /*
      * All folds are now correct, but not necessarily in the correct order.  We
      * must swap folds in the range [move_end, dest_index) with those in the
      * range [move_start, move_end).
      */
-    if (move_end == 0)
+    إذا (move_انتها == 0)
 	// There are no folds after those moved, hence no folds have been moved
 	// out of order.
-	return;
-    foldReverseOrder(gap, (linenr_T)move_start, (linenr_T)dest_index - 1);
-    foldReverseOrder(gap, (linenr_T)move_start,
-			   (linenr_T)(move_start + dest_index - move_end - 1));
-    foldReverseOrder(gap, (linenr_T)(move_start + dest_index - move_end),
-						   (linenr_T)(dest_index - 1));
+	أرجع;
+    fold_معکوس_ترتیب(gap, (linenr_T)move_شروع, (linenr_T)dest_شاخص - 1);
+    fold_معکوس_ترتیب(gap, (linenr_T)move_شروع,
+			   (linenr_T)(move_شروع + dest_شاخص - move_انتها - 1));
+    fold_معکوس_ترتیب(gap, (linenr_T)(move_شروع + dest_شاخص - move_انتها),
+						   (linenr_T)(dest_شاخص - 1));
 }
-# undef fold_end
+# undef fold_انتها
 # undef valid_fold
-# undef fold_index
+# undef fold_شاخص
 
 // foldMerge() {{{2
 /*
@@ -3186,36 +3186,36 @@ foldMoveRange(garray_T *gap, linenr_T line1, linenr_T line2, linenr_T dest)
  * The resulting fold is "fp1", nested folds are moved from "fp2" to "fp1".
  * Fold entry "fp2" in "gap" is deleted.
  */
-    static void
-foldMerge(fold_T *fp1, garray_T *gap, fold_T *fp2)
+    ساكن فراغ
+fold_ادغام(fold_T *fp1, garray_T *gap, fold_T *fp2)
 {
     fold_T	*fp3;
     fold_T	*fp4;
-    int		idx;
+    صحيح		idx;
     garray_T	*gap1 = &fp1->fd_nested;
     garray_T	*gap2 = &fp2->fd_nested;
 
     // If the last nested fold in fp1 touches the first nested fold in fp2,
     // merge them recursively.
-    if (foldFind(gap1, fp1->fd_len - 1L, &fp3) && foldFind(gap2, 0L, &fp4))
-	foldMerge(fp3, gap2, fp4);
+    إذا (fold_پیدا_کن(gap1, fp1->fd_len - 1L, &fp3) && fold_پیدا_کن(gap2, 0L, &fp4))
+	fold_ادغام(fp3, gap2, fp4);
 
     // Move nested folds in fp2 to the end of fp1.
-    if (gap2->ga_len > 0 && ga_grow(gap1, gap2->ga_len) == OK)
+    إذا (gap2->ga_len > 0 && ga_grow(gap1, gap2->ga_len) == OK)
     {
-	for (idx = 0; idx < gap2->ga_len; ++idx)
+	لكل (idx = 0; idx < gap2->ga_len; ++idx)
 	{
-	    ((fold_T *)gap1->ga_data)[gap1->ga_len]
-					= ((fold_T *)gap2->ga_data)[idx];
-	    ((fold_T *)gap1->ga_data)[gap1->ga_len].fd_top += fp1->fd_len;
+	    ((fold_T *)gap1->ga_داده)[gap1->ga_len]
+					= ((fold_T *)gap2->ga_داده)[idx];
+	    ((fold_T *)gap1->ga_داده)[gap1->ga_len].fd_بالاترین += fp1->fd_len;
 	    ++gap1->ga_len;
 	}
 	gap2->ga_len = 0;
     }
 
     fp1->fd_len += fp2->fd_len;
-    deleteFoldEntry(gap, (int)(fp2 - (fold_T *)gap->ga_data), TRUE);
-    fold_changed = TRUE;
+    delete_Fold_مدخل(gap, (صحيح)(fp2 - (fold_T *)gap->ga_داده), TRUE);
+    fold_تغییریافته = TRUE;
 }
 
 // foldlevelIndent() {{{2
@@ -3224,32 +3224,32 @@ foldMerge(fold_T *fp1, garray_T *gap, fold_T *fp2)
  * Doesn't use any caching.
  * Returns a level of -1 if the foldlevel depends on surrounding lines.
  */
-    static void
+    ساكن فراغ
 foldlevelIndent(fline_T *flp)
 {
     char_u	*s;
     buf_T	*buf;
     linenr_T	lnum = flp->lnum + flp->off;
 
-    buf = flp->wp->w_buffer;
+    buf = flp->wp->w_میانگیر;
     s = skipwhite(ml_get_buf(buf, lnum, FALSE));
 
     // empty line or lines starting with a character in 'foldignore': level
     // depends on surrounding lines
-    if (*s == NUL || vim_strchr(flp->wp->w_p_fdi, *s) != NULL)
+    إذا (*s == NUL || vim_strchr(flp->wp->w_p_fdi, *s) != عدم)
     {
 	// first and last line can't be undefined, use level 0
-	if (lnum == 1 || lnum == buf->b_ml.ml_line_count)
+	إذا (lnum == 1 || lnum == buf->b_ml.ml_سطر_شمار)
 	    flp->lvl = 0;
-	else
+	وإلا
 	    flp->lvl = -1;
     }
-    else
-	flp->lvl = get_indent_buf(buf, lnum) / get_sw_value(buf);
-    if (flp->lvl > flp->wp->w_p_fdn)
+    وإلا
+	flp->lvl = get_indent_buf(buf, lnum) / get_sw_مقدار(buf);
+    إذا (flp->lvl > flp->wp->w_p_fdn)
     {
 	flp->lvl = flp->wp->w_p_fdn;
-	if (flp->lvl < 0)
+	إذا (flp->lvl < 0)
 	    flp->lvl = 0;
     }
 }
@@ -3260,12 +3260,12 @@ foldlevelIndent(fline_T *flp)
  * Low level function to get the foldlevel for the "diff" method.
  * Doesn't use any caching.
  */
-    static void
+    ساكن فراغ
 foldlevelDiff(fline_T *flp)
 {
-    if (diff_infold(flp->wp, flp->lnum + flp->off))
+    إذا (diff_infold(flp->wp, flp->lnum + flp->off))
 	flp->lvl = 1;
-    else
+    وإلا
 	flp->lvl = 0;
 }
 # endif
@@ -3276,101 +3276,101 @@ foldlevelDiff(fline_T *flp)
  * Doesn't use any caching.
  * Returns a level of -1 if the foldlevel depends on surrounding lines.
  */
-    static void
-foldlevelExpr(fline_T *flp)
+    ساكن فراغ
+foldlevel_عبارت(fline_T *flp)
 {
 # ifndef FEAT_EVAL
-    flp->start = FALSE;
+    flp->شروع = FALSE;
     flp->lvl = 0;
-# else
+# وإلا
     win_T	*win;
-    int		n;
-    int		c;
+    صحيح		n;
+    صحيح		c;
     linenr_T	lnum = flp->lnum + flp->off;
-    int		save_keytyped;
+    صحيح		save_keytyped;
 
     win = curwin;
     curwin = flp->wp;
-    curbuf = flp->wp->w_buffer;
-    set_vim_var_nr(VV_LNUM, lnum);
+    curbuf = flp->wp->w_میانگیر;
+    مجموعه_vim_var_nr(VV_LNUM, lnum);
 
-    flp->start = 0;
-    flp->had_end = flp->end;
-    flp->end = MAX_LEVEL + 1;
-    if (lnum <= 1)
+    flp->شروع = 0;
+    flp->had_انتها = flp->انتها;
+    flp->انتها = MAX_LEVEL + 1;
+    إذا (lnum <= 1)
 	flp->lvl = 0;
 
     // KeyTyped may be reset to 0 when calling a function which invokes
     // do_cmdline().  To make 'foldopen' work correctly restore KeyTyped.
-    save_keytyped = KeyTyped;
+    save_keytyped = کلید_Typed;
     n = eval_foldexpr(flp->wp, &c);
-    KeyTyped = save_keytyped;
+    کلید_Typed = save_keytyped;
 
-    switch (c)
+    بدل (c)
     {
 	// "a1", "a2", .. : add to the fold level
-	case 'a': if (flp->lvl >= 0)
+	حالة 'a': إذا (flp->lvl >= 0)
 		  {
 		      flp->lvl += n;
-		      flp->lvl_next = flp->lvl;
+		      flp->lvl_بعدی = flp->lvl;
 		  }
-		  flp->start = n;
-		  break;
+		  flp->شروع = n;
+		  اكسر;
 
 	// "s1", "s2", .. : subtract from the fold level
-	case 's': if (flp->lvl >= 0)
+	حالة 's': إذا (flp->lvl >= 0)
 		  {
-		      if (n > flp->lvl)
-			  flp->lvl_next = 0;
-		      else
-			  flp->lvl_next = flp->lvl - n;
-		      flp->end = flp->lvl_next + 1;
+		      إذا (n > flp->lvl)
+			  flp->lvl_بعدی = 0;
+		      وإلا
+			  flp->lvl_بعدی = flp->lvl - n;
+		      flp->انتها = flp->lvl_بعدی + 1;
 		  }
-		  break;
+		  اكسر;
 
 	// ">1", ">2", .. : start a fold with a certain level
-	case '>': flp->lvl = n;
-		  flp->lvl_next = n;
-		  flp->start = 1;
-		  break;
+	حالة '>': flp->lvl = n;
+		  flp->lvl_بعدی = n;
+		  flp->شروع = 1;
+		  اكسر;
 
 	// "<1", "<2", .. : end a fold with a certain level
-	case '<': // To prevent an unexpected start of a new fold, the next
+	حالة '<': // To prevent an unexpected start of a new fold, the next
 		  // level must not exceed the level of the current fold.
-		  flp->lvl_next = MIN(flp->lvl, n - 1);
-		  flp->end = n;
-		  break;
+		  flp->lvl_بعدی = MIN(flp->lvl, n - 1);
+		  flp->انتها = n;
+		  اكسر;
 
 	// "=": No change in level
-	case '=': flp->lvl_next = flp->lvl;
-		  break;
+	حالة '=': flp->lvl_بعدی = flp->lvl;
+		  اكسر;
 
 	// "-1", "0", "1", ..: set fold level
-	default:  if (n < 0)
+	افتراضي:  إذا (n < 0)
 		      // Use the current level for the next line, so that "a1"
 		      // will work there.
-		      flp->lvl_next = flp->lvl;
-		  else
-		      flp->lvl_next = n;
+		      flp->lvl_بعدی = flp->lvl;
+		  وإلا
+		      flp->lvl_بعدی = n;
 		  flp->lvl = n;
-		  break;
+		  اكسر;
     }
 
     // If the level is unknown for the first or the last line in the file, use
     // level 0.
-    if (flp->lvl < 0)
+    إذا (flp->lvl < 0)
     {
-	if (lnum <= 1)
+	إذا (lnum <= 1)
 	{
 	    flp->lvl = 0;
-	    flp->lvl_next = 0;
+	    flp->lvl_بعدی = 0;
 	}
-	if (lnum == curbuf->b_ml.ml_line_count)
-	    flp->lvl_next = 0;
+	إذا (lnum == curbuf->b_ml.ml_سطر_شمار)
+	    flp->lvl_بعدی = 0;
     }
 
     curwin = win;
-    curbuf = curwin->w_buffer;
+    curbuf = curwin->w_میانگیر;
 # endif
 }
 
@@ -3380,12 +3380,12 @@ foldlevelExpr(fline_T *flp)
  * "foldendmarkerlen".
  * Relies on the option value to have been checked for correctness already.
  */
-    static void
+    ساكن فراغ
 parseMarker(win_T *wp)
 {
     foldendmarker = vim_strchr(wp->w_p_fmr, ',');
-    foldstartmarkerlen = (int)(foldendmarker++ - wp->w_p_fmr);
-    foldendmarkerlen = (int)STRLEN(foldendmarker);
+    foldstartmarkerlen = (صحيح)(foldendmarker++ - wp->w_p_fmr);
+    foldendmarkerlen = (صحيح)STRLEN(foldendmarker);
 }
 
 // foldlevelMarker() {{{2
@@ -3398,15 +3398,15 @@ parseMarker(win_T *wp)
  * Doesn't use any caching.
  * Sets flp->start when a start marker was found.
  */
-    static void
+    ساكن فراغ
 foldlevelMarker(fline_T *flp)
 {
     char_u	*startmarker;
-    int		cstart;
-    int		cend;
-    int		start_lvl = flp->lvl;
+    صحيح		cstart;
+    صحيح		cend;
+    صحيح		شروع_lvl = flp->lvl;
     char_u	*s;
-    int		n;
+    صحيح		n;
 
     // cache a few values for speed
     startmarker = flp->wp->w_p_fmr;
@@ -3415,64 +3415,64 @@ foldlevelMarker(fline_T *flp)
     cend = *foldendmarker;
 
     // Default: no start found, next level is same as current level
-    flp->start = 0;
-    flp->lvl_next = flp->lvl;
+    flp->شروع = 0;
+    flp->lvl_بعدی = flp->lvl;
 
-    s = ml_get_buf(flp->wp->w_buffer, flp->lnum + flp->off, FALSE);
-    while (*s)
+    s = ml_get_buf(flp->wp->w_میانگیر, flp->lnum + flp->off, FALSE);
+    طالما (*s)
     {
-	if (*s == cstart
+	إذا (*s == cstart
 		  && STRNCMP(s + 1, startmarker, foldstartmarkerlen - 1) == 0)
 	{
 	    // found startmarker: set flp->lvl
 	    s += foldstartmarkerlen;
-	    if (VIM_ISDIGIT(*s))
+	    إذا (VIM_ISDIGIT(*s))
 	    {
-		n = atoi((char *)s);
-		if (n > 0)
+		n = atoi((حرف *)s);
+		إذا (n > 0)
 		{
 		    flp->lvl = n;
-		    flp->lvl_next = n;
-		    if (n <= start_lvl)
-			flp->start = 1;
-		    else
-			flp->start = n - start_lvl;
+		    flp->lvl_بعدی = n;
+		    إذا (n <= شروع_lvl)
+			flp->شروع = 1;
+		    وإلا
+			flp->شروع = n - شروع_lvl;
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		++flp->lvl;
-		++flp->lvl_next;
-		++flp->start;
+		++flp->lvl_بعدی;
+		++flp->شروع;
 	    }
 	}
-	else if (*s == cend
+	وإلا إذا (*s == cend
 	      && STRNCMP(s + 1, foldendmarker + 1, foldendmarkerlen - 1) == 0)
 	{
 	    // found endmarker: set flp->lvl_next
 	    s += foldendmarkerlen;
-	    if (VIM_ISDIGIT(*s))
+	    إذا (VIM_ISDIGIT(*s))
 	    {
-		n = atoi((char *)s);
-		if (n > 0)
+		n = atoi((حرف *)s);
+		إذا (n > 0)
 		{
 		    flp->lvl = n;
-		    flp->lvl_next = n - 1;
+		    flp->lvl_بعدی = n - 1;
 		    // never start a fold with an end marker
-		    if (flp->lvl_next > start_lvl)
-			flp->lvl_next = start_lvl;
+		    إذا (flp->lvl_بعدی > شروع_lvl)
+			flp->lvl_بعدی = شروع_lvl;
 		}
 	    }
-	    else
-		--flp->lvl_next;
+	    وإلا
+		--flp->lvl_بعدی;
 	}
-	else
+	وإلا
 	    MB_PTR_ADV(s);
     }
 
     // The level can't go negative, must be missing a start marker.
-    if (flp->lvl_next < 0)
-	flp->lvl_next = 0;
+    إذا (flp->lvl_بعدی < 0)
+	flp->lvl_بعدی = 0;
 }
 
 // foldlevelSyntax() {{{2
@@ -3480,25 +3480,25 @@ foldlevelMarker(fline_T *flp)
  * Low level function to get the foldlevel for the "syntax" method.
  * Doesn't use any caching.
  */
-    static void
+    ساكن فراغ
 foldlevelSyntax(fline_T *flp)
 {
 # ifndef FEAT_SYN_HL
-    flp->start = 0;
+    flp->شروع = 0;
     flp->lvl = 0;
-# else
+# وإلا
     linenr_T	lnum = flp->lnum + flp->off;
-    int		n;
+    صحيح		n;
 
     // Use the maximum fold level at the start of this line and the next.
     flp->lvl = syn_get_foldlevel(flp->wp, lnum);
-    flp->start = 0;
-    if (lnum < flp->wp->w_buffer->b_ml.ml_line_count)
+    flp->شروع = 0;
+    إذا (lnum < flp->wp->w_میانگیر->b_ml.ml_سطر_شمار)
     {
 	n = syn_get_foldlevel(flp->wp, lnum + 1);
-	if (n > flp->lvl)
+	إذا (n > flp->lvl)
 	{
-	    flp->start = n - flp->lvl;	// fold(s) start here
+	    flp->شروع = n - flp->lvl;	// fold(s) start here
 	    flp->lvl = n;
 	}
     }
@@ -3507,31 +3507,31 @@ foldlevelSyntax(fline_T *flp)
 
 // functions for storing the fold state in a View {{{1
 // put_folds() {{{2
-# if defined(FEAT_SESSION)
-static int put_folds_recurse(FILE *fd, garray_T *gap, linenr_T off);
-static int put_foldopen_recurse(FILE *fd, win_T *wp, garray_T *gap, linenr_T off);
-static int put_fold_open_close(FILE *fd, fold_T *fp, linenr_T off);
+# إذا defined(FEAT_SESSION)
+ساكن صحيح put_folds_recurse(FILE *fd, garray_T *gap, linenr_T off);
+ساكن صحيح put_foldopen_recurse(FILE *fd, win_T *wp, garray_T *gap, linenr_T off);
+ساكن صحيح put_fold_open_close(FILE *fd, fold_T *fp, linenr_T off);
 
 /*
  * Write commands to "fd" to restore the manual folds in window "wp".
  * Return FAIL if writing fails.
  */
-    int
+    صحيح
 put_folds(FILE *fd, win_T *wp)
 {
-    if (foldmethodIsManual(wp))
+    إذا (foldmethodIsManual(wp))
     {
-	if (put_line(fd, "silent! normal! zE") == FAIL
+	إذا (put_سطر(fd, "silent! normal! zE") == FAIL
 		|| put_folds_recurse(fd, &wp->w_folds, (linenr_T)0) == FAIL
-		|| put_line(fd, "&fdl = &fdl") == FAIL)
-	    return FAIL;
+		|| put_سطر(fd, "&fdl = &fdl") == FAIL)
+	    أرجع FAIL;
     }
 
     // If some folds are manually opened/closed, need to restore that.
-    if (wp->w_fold_manual)
-	return put_foldopen_recurse(fd, wp, &wp->w_folds, (linenr_T)0);
+    إذا (wp->w_fold_manual)
+	أرجع put_foldopen_recurse(fd, wp, &wp->w_folds, (linenr_T)0);
 
-    return OK;
+    أرجع OK;
 }
 
 // put_folds_recurse() {{{2
@@ -3539,25 +3539,25 @@ put_folds(FILE *fd, win_T *wp)
  * Write commands to "fd" to recreate manually created folds.
  * Returns FAIL when writing failed.
  */
-    static int
+    ساكن صحيح
 put_folds_recurse(FILE *fd, garray_T *gap, linenr_T off)
 {
-    int		i;
+    صحيح		i;
     fold_T	*fp;
 
-    fp = (fold_T *)gap->ga_data;
-    for (i = 0; i < gap->ga_len; i++)
+    fp = (fold_T *)gap->ga_داده;
+    لكل (i = 0; i < gap->ga_len; i++)
     {
 	// Do nested folds first, they will be created closed.
-	if (put_folds_recurse(fd, &fp->fd_nested, off + fp->fd_top) == FAIL)
-	    return FAIL;
-	if (fprintf(fd, "sil! :%ld,%ldfold", fp->fd_top + off,
-					fp->fd_top + off + fp->fd_len - 1) < 0
+	إذا (put_folds_recurse(fd, &fp->fd_nested, off + fp->fd_بالاترین) == FAIL)
+	    أرجع FAIL;
+	إذا (fprintf(fd, "sil! :%ld,%ldfold", fp->fd_بالاترین + off,
+					fp->fd_بالاترین + off + fp->fd_len - 1) < 0
 		|| put_eol(fd) == FAIL)
-	    return FAIL;
+	    أرجع FAIL;
 	++fp;
     }
-    return OK;
+    أرجع OK;
 }
 
 // put_foldopen_recurse() {{{2
@@ -3565,57 +3565,57 @@ put_folds_recurse(FILE *fd, garray_T *gap, linenr_T off)
  * Write commands to "fd" to open and close manually opened/closed folds.
  * Returns FAIL when writing failed.
  */
-    static int
+    ساكن صحيح
 put_foldopen_recurse(
     FILE	*fd,
     win_T	*wp,
     garray_T	*gap,
     linenr_T	off)
 {
-    int		i;
-    int		level;
+    صحيح		i;
+    صحيح		level;
     fold_T	*fp;
 
-    fp = (fold_T *)gap->ga_data;
-    for (i = 0; i < gap->ga_len; i++)
+    fp = (fold_T *)gap->ga_داده;
+    لكل (i = 0; i < gap->ga_len; i++)
     {
-	if (fp->fd_flags != FD_LEVEL)
+	إذا (fp->fd_flags != FD_LEVEL)
 	{
-	    if (fp->fd_nested.ga_len > 0)
+	    إذا (fp->fd_nested.ga_len > 0)
 	    {
 		// open nested folds while this fold is open
 		// ignore errors
-		if (fprintf(fd, ":%ld", fp->fd_top + off) < 0
+		إذا (fprintf(fd, ":%ld", fp->fd_بالاترین + off) < 0
 			|| put_eol(fd) == FAIL
-			|| put_line(fd, "sil! normal! zo") == FAIL)
-		    return FAIL;
-		if (put_foldopen_recurse(fd, wp, &fp->fd_nested,
-							     off + fp->fd_top)
+			|| put_سطر(fd, "sil! normal! zo") == FAIL)
+		    أرجع FAIL;
+		إذا (put_foldopen_recurse(fd, wp, &fp->fd_nested,
+							     off + fp->fd_بالاترین)
 			== FAIL)
-		    return FAIL;
+		    أرجع FAIL;
 		// close the parent when needed
-		if (fp->fd_flags == FD_CLOSED)
+		إذا (fp->fd_flags == FD_CLOSED)
 		{
-		    if (put_fold_open_close(fd, fp, off) == FAIL)
-			return FAIL;
+		    إذا (put_fold_open_close(fd, fp, off) == FAIL)
+			أرجع FAIL;
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		// Open or close the leaf according to the window foldlevel.
 		// Do not close a leaf that is already closed, as it will close
 		// the parent.
-		level = foldLevelWin(wp, off + fp->fd_top);
-		if ((fp->fd_flags == FD_CLOSED && wp->w_p_fdl >= level)
+		level = foldLevelWin(wp, off + fp->fd_بالاترین);
+		إذا ((fp->fd_flags == FD_CLOSED && wp->w_p_fdl >= level)
 			|| (fp->fd_flags != FD_CLOSED && wp->w_p_fdl < level))
-		if (put_fold_open_close(fd, fp, off) == FAIL)
-		    return FAIL;
+		إذا (put_fold_open_close(fd, fp, off) == FAIL)
+		    أرجع FAIL;
 	    }
 	}
 	++fp;
     }
 
-    return OK;
+    أرجع OK;
 }
 
 // put_fold_open_close() {{{2
@@ -3623,84 +3623,84 @@ put_foldopen_recurse(
  * Write the open or close command to "fd".
  * Returns FAIL when writing failed.
  */
-    static int
+    ساكن صحيح
 put_fold_open_close(FILE *fd, fold_T *fp, linenr_T off)
 {
-    if (fprintf(fd, ":%ld", fp->fd_top + off) < 0
+    إذا (fprintf(fd, ":%ld", fp->fd_بالاترین + off) < 0
 	    || put_eol(fd) == FAIL
 	    || fprintf(fd, "sil! normal! z%c",
 			   fp->fd_flags == FD_CLOSED ? 'c' : 'o') < 0
 	    || put_eol(fd) == FAIL)
-	return FAIL;
+	أرجع FAIL;
 
-    return OK;
+    أرجع OK;
 }
 # endif // FEAT_SESSION
 
 // }}}1
-#endif // defined(FEAT_FOLDING)
+#پایان_اگر // defined(FEAT_FOLDING)
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
 /*
  * "foldclosed()" and "foldclosedend()" functions
  */
-    static void
+    ساكن فراغ
 foldclosed_both(
-    typval_T	*argvars UNUSED,
+    typval_T	*argvars استفادهنشده,
     typval_T	*rettv,
-    int		end UNUSED)
+    صحيح		انتها استفادهنشده)
 {
 # ifdef FEAT_FOLDING
     linenr_T	lnum = 0;
-    linenr_T	first, last;
+    linenr_T	اولی, آخرین;
     win_T	*wp  = curwin;
 
-    if (in_vim9script()
+    إذا (درون_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_عدد_arg(argvars, 1) == FAIL))
+	أرجع;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    إذا (argvars[1].v_type != VAR_UNKNOWN)
     {
 	tabpage_T	*tp;
 	switchwin_T	switchwin;
 	// use window specified in the second argument
-	wp = win_id2wp_tp(tv_get_number(&argvars[1]), &tp);
-	if (wp != NULL && tp != NULL)
+	wp = win_id2wp_tp(tv_get_عدد(&argvars[1]), &tp);
+	إذا (wp != عدم && tp != عدم)
 	{
-	    if (switch_win(&switchwin, wp, tp, TRUE) == OK)
+	    إذا (switch_win(&switchwin, wp, tp, TRUE) == OK)
 		lnum = tv_get_lnum(argvars);
 	    restore_win(&switchwin, TRUE);
 	}
-	else
+	وإلا
 	{
-	    rettv->vval.v_number = -2;
-	    return;
+	    rettv->vval.v_عدد = -2;
+	    أرجع;
 	}
     }
-    else
+    وإلا
 	lnum = tv_get_lnum(argvars);
 
-    if (lnum >= 1 && lnum <= wp->w_buffer->b_ml.ml_line_count)
+    إذا (lnum >= 1 && lnum <= wp->w_میانگیر->b_ml.ml_سطر_شمار)
     {
-	if (hasFoldingWin(wp, lnum, &first, &last, FALSE, NULL))
+	إذا (hasFoldingWin(wp, lnum, &اولی, &آخرین, FALSE, عدم))
 	{
-	    if (end)
-		rettv->vval.v_number = (varnumber_T)last;
-	    else
-		rettv->vval.v_number = (varnumber_T)first;
-	    return;
+	    إذا (انتها)
+		rettv->vval.v_عدد = (varnumber_T)آخرین;
+	    وإلا
+		rettv->vval.v_عدد = (varnumber_T)اولی;
+	    أرجع;
 	}
     }
 # endif
-    rettv->vval.v_number = -1;
+    rettv->vval.v_عدد = -1;
 }
 
 /*
  * "foldclosed()" function
  */
-    void
+    فراغ
 f_foldclosed(typval_T *argvars, typval_T *rettv)
 {
     foldclosed_both(argvars, rettv, FALSE);
@@ -3709,7 +3709,7 @@ f_foldclosed(typval_T *argvars, typval_T *rettv)
 /*
  * "foldclosedend()" function
  */
-    void
+    فراغ
 f_foldclosedend(typval_T *argvars, typval_T *rettv)
 {
     foldclosed_both(argvars, rettv, TRUE);
@@ -3719,64 +3719,64 @@ f_foldclosedend(typval_T *argvars, typval_T *rettv)
 /*
  * Return fold level at line number "lnum" in the current window.
  */
-    static int
+    ساكن صحيح
 foldLevel(linenr_T lnum)
 {
     // While updating the folds lines between invalid_top and invalid_bot have
     // an undefined fold level.  Otherwise update the folds first.
-    if (invalid_top == (linenr_T)0)
+    إذا (invalid_بالاترین == (linenr_T)0)
 	checkupdate(curwin);
-    else if (lnum == prev_lnum && prev_lnum_lvl >= 0)
-	return prev_lnum_lvl;
-    else if (lnum >= invalid_top && lnum <= invalid_bot)
-	return -1;
+    وإلا إذا (lnum == prev_lnum && prev_lnum_lvl >= 0)
+	أرجع prev_lnum_lvl;
+    وإلا إذا (lnum >= invalid_بالاترین && lnum <= invalid_bot)
+	أرجع -1;
 
     // Return quickly when there is no folding at all in this window.
-    if (!hasAnyFolding(curwin))
-	return 0;
+    إذا (!hasAnyFolding(curwin))
+	أرجع 0;
 
-    return foldLevelWin(curwin, lnum);
+    أرجع foldLevelWin(curwin, lnum);
 }
 # endif
 
 /*
  * "foldlevel()" function
  */
-    void
-f_foldlevel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    فراغ
+f_foldlevel(typval_T *argvars استفادهنشده, typval_T *rettv استفادهنشده)
 {
 # ifdef FEAT_FOLDING
     linenr_T	lnum;
     switchwin_T	switchwin;
 
-    if (in_vim9script()
+    إذا (درون_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_عدد_arg(argvars, 1) == FAIL))
+	أرجع;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    إذا (argvars[1].v_type != VAR_UNKNOWN)
     {
 	tabpage_T	*tp;
 	win_T	*wp;
-	wp = win_id2wp_tp(tv_get_number(&argvars[1]), &tp);
-	if (wp != NULL && tp != NULL)
+	wp = win_id2wp_tp(tv_get_عدد(&argvars[1]), &tp);
+	إذا (wp != عدم && tp != عدم)
 	{
-	    if (switch_win(&switchwin, wp, tp, TRUE) == OK)
+	    إذا (switch_win(&switchwin, wp, tp, TRUE) == OK)
 	    {
 		lnum = tv_get_lnum(argvars);
-		if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
-		    rettv->vval.v_number = foldLevel(lnum);
+		إذا (lnum >= 1 && lnum <= curbuf->b_ml.ml_سطر_شمار)
+		    rettv->vval.v_عدد = foldLevel(lnum);
 	    }
 	    restore_win(&switchwin, TRUE);
 	}
-	else
-	    rettv->vval.v_number = -2;
+	وإلا
+	    rettv->vval.v_عدد = -2;
     }
-    else
+    وإلا
     {
 	lnum = tv_get_lnum(argvars);
-	if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
-	    rettv->vval.v_number = foldLevel(lnum);
+	إذا (lnum >= 1 && lnum <= curbuf->b_ml.ml_سطر_شمار)
+	    rettv->vval.v_عدد = foldLevel(lnum);
     }
 # endif
 }
@@ -3784,8 +3784,8 @@ f_foldlevel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "foldtext()" function
  */
-    void
-f_foldtext(typval_T *argvars UNUSED, typval_T *rettv)
+    فراغ
+f_foldtext(typval_T *argvars استفادهنشده, typval_T *rettv)
 {
 # ifdef FEAT_FOLDING
     linenr_T	foldstart;
@@ -3794,49 +3794,49 @@ f_foldtext(typval_T *argvars UNUSED, typval_T *rettv)
     linenr_T	lnum;
     char_u	*s;
     char_u	*r;
-    int		len;
-    char	*txt;
-    long	count;
+    صحيح		len;
+    حرف	*txt;
+    دراز	شمار;
 # endif
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = عدم;
 # ifdef FEAT_FOLDING
     foldstart = (linenr_T)get_vim_var_nr(VV_FOLDSTART);
     foldend = (linenr_T)get_vim_var_nr(VV_FOLDEND);
     dashes = get_vim_var_str(VV_FOLDDASHES);
-    if (foldstart > 0 && foldend <= curbuf->b_ml.ml_line_count
-	    && dashes != NULL)
+    إذا (foldstart > 0 && foldend <= curbuf->b_ml.ml_سطر_شمار
+	    && dashes != عدم)
     {
 	// Find first non-empty line in the fold.
-	for (lnum = foldstart; lnum < foldend; ++lnum)
-	    if (!linewhite(lnum))
-		break;
+	لكل (lnum = foldstart; lnum < foldend; ++lnum)
+	    إذا (!linewhite(lnum))
+		اكسر;
 
 	// Find interesting text in this line.
 	s = skipwhite(ml_get(lnum));
 	// skip C comment-start
-	if (s[0] == '/' && (s[1] == '*' || s[1] == '/'))
+	إذا (s[0] == '/' && (s[1] == '*' || s[1] == '/'))
 	{
 	    s = skipwhite(s + 2);
-	    if (*skipwhite(s) == NUL
+	    إذا (*skipwhite(s) == NUL
 			    && lnum + 1 < (linenr_T)get_vim_var_nr(VV_FOLDEND))
 	    {
 		s = skipwhite(ml_get(lnum + 1));
-		if (*s == '*')
+		إذا (*s == '*')
 		    s = skipwhite(s + 1);
 	    }
 	}
-	count = (long)(foldend - foldstart + 1);
-	txt = NGETTEXT("+-%s%3ld line: ", "+-%s%3ld lines: ", count);
+	شمار = (دراز)(foldend - foldstart + 1);
+	txt = NGETTEXT("+-%s%3ld line: ", "+-%s%3ld lines: ", شمار);
 	r = alloc(STRLEN(txt)
 		    + STRLEN(dashes)	    // for %s
 		    + 20		    // for %3ld
 		    + STRLEN(s));	    // concatenated
-	if (r != NULL)
+	إذا (r != عدم)
 	{
-	    sprintf((char *)r, txt, dashes, count);
-	    len = (int)STRLEN(r);
+	    sprintf((حرف *)r, txt, dashes, شمار);
+	    len = (صحيح)STRLEN(r);
 	    STRCAT(r, s);
 	    // remove 'foldmarker' and 'commentstring'
 	    foldtext_cleanup(r + len);
@@ -3849,62 +3849,62 @@ f_foldtext(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "foldtextresult(lnum)" function
  */
-    void
-f_foldtextresult(typval_T *argvars UNUSED, typval_T *rettv)
+    فراغ
+f_foldtextresult(typval_T *argvars استفادهنشده, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = عدم;
 
 # ifdef FEAT_FOLDING
     linenr_T	lnum = 0;
-    char_u	*text;
-    char_u	buf[FOLD_TEXT_LEN];
+    char_u	*متن;
+    char_u	buf[FOLD_متن_LEN];
     foldinfo_T  foldinfo;
-    int		fold_count;
+    صحيح		fold_شمار;
     win_T	*wp  = curwin;
-    static int	entered = FALSE;
-    if (in_vim9script()
+    ساكن صحيح	entered = FALSE;
+    إذا (درون_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_عدد_arg(argvars, 1) == FAIL))
+	أرجع;
 
-    if (entered)
-	return; // reject recursive use
+    إذا (entered)
+	أرجع; // reject recursive use
     entered = TRUE;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    إذا (argvars[1].v_type != VAR_UNKNOWN)
     {
 	tabpage_T	*tp;
 	switchwin_T	switchwin;
 	// use window specified in the second argument
-	wp = win_id2wp_tp(tv_get_number(&argvars[1]), &tp);
-	if (wp == NULL || tp == NULL) // wrong winid
+	wp = win_id2wp_tp(tv_get_عدد(&argvars[1]), &tp);
+	إذا (wp == عدم || tp == عدم) // wrong winid
 	{
 	    entered = FALSE;
-	    return;
+	    أرجع;
 	}
-	if (switch_win(&switchwin, wp, tp, TRUE) == OK)
+	إذا (switch_win(&switchwin, wp, tp, TRUE) == OK)
 	    lnum = tv_get_lnum(argvars);
 	restore_win(&switchwin, TRUE);
     }
-    else
+    وإلا
 	lnum = tv_get_lnum(argvars);
 
     // treat illegal types and illegal string values for {lnum} the same
-    if (lnum < 0)
+    إذا (lnum < 0)
 	lnum = 0;
-    fold_count = foldedCount(wp, lnum, &foldinfo);
-    if (fold_count > 0)
+    fold_شمار = folded_شمار(wp, lnum, &foldinfo);
+    إذا (fold_شمار > 0)
     {
-	text = get_foldtext(wp, lnum, lnum + fold_count - 1,
+	متن = get_foldtext(wp, lnum, lnum + fold_شمار - 1,
 							       &foldinfo, buf);
-	if (text == buf)
-	    text = vim_strsave(text);
-	rettv->vval.v_string = text;
+	إذا (متن == buf)
+	    متن = vim_strsave(متن);
+	rettv->vval.v_string = متن;
     }
 
     entered = FALSE;
 # endif
 }
 
-#endif // FEAT_EVAL
+#پایان_اگر // FEAT_EVAL

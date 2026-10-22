@@ -2,28 +2,28 @@
  *
  * MzScheme interface for Vim, wrapper around scheme.h
  */
-#ifndef _IF_MZSCH_H_
-#define _IF_MZSCH_H_
-#ifdef __MINGW32__
+#اگر_تعریف_نشده _IF_MZSCH_H_
+#تعریف_کن _IF_MZSCH_H_
+#اگر_تعریف_شده __MINGW32__
 // Hack to engage Cygwin-specific settings
 # define __CYGWIN32__
 # include <stdint.h>
-#endif
+#پایان_اگر
 
 // #ifdef needed for "make depend"
-#ifdef FEAT_MZSCHEME
+#اگر_تعریف_شده FEAT_MZSCHEME
 # include <schvers.h>
 # include <scheme.h>
-#endif
+#پایان_اگر
 
-#ifdef __MINGW32__
+#اگر_تعریف_شده __MINGW32__
 # undef __CYGWIN32__
-#endif
+#پایان_اگر
 
-#if MZSCHEME_VERSION_MAJOR >= 299
+#إذا MZSCHEME_نسخه_MAJOR >= 299
 # define SCHEME_STRINGP(obj) (SCHEME_BYTE_STRINGP(obj) || SCHEME_CHAR_STRINGP(obj))
-# define BYTE_STRING_VALUE(obj) ((char_u *)SCHEME_BYTE_STR_VAL(obj))
-#else
+# define BYTE_STRING_مقدار(obj) ((char_u *)SCHEME_BYTE_STR_VAL(obj))
+#وإلا
 // macros for compatibility with older versions
 # define scheme_current_config() scheme_config
 # define scheme_make_sized_byte_string scheme_make_sized_string
@@ -32,40 +32,40 @@
 // for dynamic MzScheme there will be separate definitions in if_mzsch.c
 #  define scheme_get_sized_byte_string_output scheme_get_sized_string_output
 #  define scheme_make_byte_string scheme_make_string
-#  define scheme_make_byte_string_output_port scheme_make_string_output_port
+#  define scheme_make_byte_string_output_پورت scheme_make_string_output_پورت
 # endif
 
 # define SCHEME_BYTE_STRLEN_VAL SCHEME_STRLEN_VAL
-# define BYTE_STRING_VALUE(obj) ((char_u *)SCHEME_STR_VAL(obj))
-# define scheme_byte_string_to_char_string(obj) (obj)
+# define BYTE_STRING_مقدار(obj) ((char_u *)SCHEME_STR_VAL(obj))
+# define scheme_byte_string_مقصد_char_string(obj) (obj)
 # define SCHEME_BYTE_STRINGP SCHEME_STRINGP
-#endif
+#پایان_اگر
 
 // Precise GC macros
-#ifndef MZ_GC_DECL_REG
-# define MZ_GC_DECL_REG(size)		 // empty
-#endif
-#ifndef MZ_GC_VAR_IN_REG
-# define MZ_GC_VAR_IN_REG(x, v)		 // empty
-#endif
-#ifndef MZ_GC_ARRAY_VAR_IN_REG
-# define MZ_GC_ARRAY_VAR_IN_REG(x, v, l) // empty
-#endif
-#ifndef MZ_GC_REG
-# define MZ_GC_REG()			 // empty
-#endif
-#ifndef MZ_GC_UNREG
-# define MZ_GC_UNREG()			 // empty
-#endif
+#اگر_تعریف_نشده MZ_GC_DECL_REG
+# define MZ_GC_DECL_REG(اندازه)		 //خالی
+#پایان_اگر
+#اگر_تعریف_نشده MZ_GC_VAR_درون_REG
+# define MZ_GC_VAR_درون_REG(x, v)		 //خالی
+#پایان_اگر
+#اگر_تعریف_نشده MZ_GC_ARRAY_VAR_درون_REG
+# define MZ_GC_ARRAY_VAR_درون_REG(x, v, l) //خالی
+#پایان_اگر
+#اگر_تعریف_نشده MZ_GC_REG
+# define MZ_GC_REG()			 //خالی
+#پایان_اگر
+#اگر_تعریف_نشده MZ_GC_UNREG
+# define MZ_GC_UNREG()			 //خالی
+#پایان_اگر
 
-#ifdef MZSCHEME_FORCE_GC
+#اگر_تعریف_شده MZSCHEME_FORCE_GC
 /*
  * force garbage collection to check all references are registered
  * seg faults will indicate not registered refs
  */
 # define MZ_GC_CHECK() scheme_collect_garbage();
-#else
-# define MZ_GC_CHECK()			// empty
-#endif
+#وإلا
+# define MZ_GC_CHECK()			//خالی
+#پایان_اگر
 
-#endif // _IF_MZSCH_H_
+#پایان_اگر // _IF_MZSCH_H_

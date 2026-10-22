@@ -4,15 +4,15 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-import sys
-import time
+من __future__ استورد print_function
+استورد sys
+استورد زمان
 
-if __name__ == "__main__":
+إذا __name__ == "__main__":
 
-    done = 0
-    while done < 10:
-        done = done + 1
-        print(done)
+    انجامشده = 0
+    طالما انجامشده < 10:
+        انجامشده = انجامشده + 1
+        چاپ(انجامشده)
         sys.stdout.flush()
-        time.sleep(0.05)  # sleep 50 msec
+        زمان.نوم(0.05)  # sleep 50 msec

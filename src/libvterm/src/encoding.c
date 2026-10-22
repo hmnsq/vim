@@ -1,219 +1,219 @@
-#include "vterm_internal.h"
+#ضمن "vterm_internal.h"
 
-#define UNICODE_INVALID 0xFFFD
+#تعریف_کن UNICODE_INVALID 0xFFFD
 
-#if defined(DEBUG) && DEBUG > 1
+#إذا defined(DEBUG) && DEBUG > 1
 # define DEBUG_PRINT_UTF8
-#endif
+#پایان_اگر
 
-struct UTF8DecoderData {
+بنية UTF8_Decoder_داده {
   // number of bytes remaining in this codepoint
-  int bytes_remaining;
+  صحيح بایتها_مانده;
 
   // number of bytes total in this codepoint once it's finished
   // (for detecting overlongs)
-  int bytes_total;
+  صحيح بایتها_مجموع;
 
-  int this_cp;
+  صحيح this_cp;
 };
 
-static void init_utf8(VTermEncoding *enc UNUSED, void *data_)
+ساكن فراغ init_utf8(VTermEncoding *enc استفادهنشده, فراغ *داده_4)
 {
-  struct UTF8DecoderData *data = data_;
+  بنية UTF8_Decoder_داده *داده = داده_4;
 
-  data->bytes_remaining = 0;
-  data->bytes_total     = 0;
+  داده->بایتها_مانده = 0;
+  داده->بایتها_مجموع     = 0;
 }
 
-static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
-                        uint32_t cp[], int *cpi, int cplen,
-                        const char bytes[], size_t *pos, size_t bytelen)
+ساكن فراغ decode_utf8(VTermEncoding *enc استفادهنشده, فراغ *داده_4,
+                        uint32_t cp[], صحيح *cpi, صحيح cplen,
+                        ثابت حرف بایتها[], size_t *pos, size_t bytelen)
 {
-  struct UTF8DecoderData *data = data_;
+  بنية UTF8_Decoder_داده *داده = داده_4;
 
-#ifdef DEBUG_PRINT_UTF8
-  printf("BEGIN UTF-8\n");
-#endif
+#اگر_تعریف_شده DEBUG_PRINT_UTF8
+  چاپ_کن("BEGIN UTF-8\n");
+#پایان_اگر
 
-  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos];
+  لكل(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    بیعلامت حرف c = بایتها[*pos];
 
-#ifdef DEBUG_PRINT_UTF8
-    printf(" pos=%zd c=%02x rem=%d\n", *pos, c, data->bytes_remaining);
-#endif
+#اگر_تعریف_شده DEBUG_PRINT_UTF8
+    چاپ_کن(" pos=%zd c=%02x rem=%d\n", *pos, c, داده->بایتها_مانده);
+#پایان_اگر
 
-    if(c < 0x20) // C0
-      return;
+    إذا(c < 0x20) // C0
+      أرجع;
 
-    else if(c >= 0x20 && c < 0x7f) {
-      if(data->bytes_remaining) {
-        data->bytes_remaining = 0;
+    وإلا إذا(c >= 0x20 && c < 0x7f) {
+      إذا(داده->بایتها_مانده) {
+        داده->بایتها_مانده = 0;
         cp[(*cpi)++] = UNICODE_INVALID;
 	// VIM: avoid going over the end
-	if (*cpi >= cplen)
-	  break;
+	إذا (*cpi >= cplen)
+	  اكسر;
       }
       cp[(*cpi)++] = c;
-#ifdef DEBUG_PRINT_UTF8
-      printf(" UTF-8 char: U+%04x\n", c);
-#endif
+#اگر_تعریف_شده DEBUG_PRINT_UTF8
+      چاپ_کن(" UTF-8 char: U+%04x\n", c);
+#پایان_اگر
     }
 
-    else if(c == 0x7f) // DEL
-      return;
+    وإلا إذا(c == 0x7f) // DEL
+      أرجع;
 
-    else if(c >= 0x80 && c < 0xc0) {
-      if(!data->bytes_remaining) {
+    وإلا إذا(c >= 0x80 && c < 0xc0) {
+      إذا(!داده->بایتها_مانده) {
         cp[(*cpi)++] = UNICODE_INVALID;
-        continue;
+        استمر;
       }
 
-      data->this_cp <<= 6;
-      data->this_cp |= c & 0x3f;
-      data->bytes_remaining--;
+      داده->this_cp <<= 6;
+      داده->this_cp |= c & 0x3f;
+      داده->بایتها_مانده--;
 
-      if(!data->bytes_remaining) {
-#ifdef DEBUG_PRINT_UTF8
-        printf(" UTF-8 raw char U+%04x bytelen=%d ", data->this_cp, data->bytes_total);
-#endif
+      إذا(!داده->بایتها_مانده) {
+#اگر_تعریف_شده DEBUG_PRINT_UTF8
+        چاپ_کن(" UTF-8 raw char U+%04x bytelen=%d ", داده->this_cp, داده->بایتها_مجموع);
+#پایان_اگر
         // Check for overlong sequences
-        switch(data->bytes_total) {
-        case 2:
-          if(data->this_cp <  0x0080) data->this_cp = UNICODE_INVALID;
-          break;
-        case 3:
-          if(data->this_cp <  0x0800) data->this_cp = UNICODE_INVALID;
-          break;
-        case 4:
-          if(data->this_cp < 0x10000) data->this_cp = UNICODE_INVALID;
-          break;
-        case 5:
-          if(data->this_cp < 0x200000) data->this_cp = UNICODE_INVALID;
-          break;
-        case 6:
-          if(data->this_cp < 0x4000000) data->this_cp = UNICODE_INVALID;
-          break;
+        بدل(داده->بایتها_مجموع) {
+        حالة 2:
+          إذا(داده->this_cp <  0x0080) داده->this_cp = UNICODE_INVALID;
+          اكسر;
+        حالة 3:
+          إذا(داده->this_cp <  0x0800) داده->this_cp = UNICODE_INVALID;
+          اكسر;
+        حالة 4:
+          إذا(داده->this_cp < 0x10000) داده->this_cp = UNICODE_INVALID;
+          اكسر;
+        حالة 5:
+          إذا(داده->this_cp < 0x200000) داده->this_cp = UNICODE_INVALID;
+          اكسر;
+        حالة 6:
+          إذا(داده->this_cp < 0x4000000) داده->this_cp = UNICODE_INVALID;
+          اكسر;
         }
         // Now look for plain invalid ones
-        if((data->this_cp >= 0xD800 && data->this_cp <= 0xDFFF) ||
-           data->this_cp == 0xFFFE ||
-           data->this_cp == 0xFFFF)
-          data->this_cp = UNICODE_INVALID;
-#ifdef DEBUG_PRINT_UTF8
-        printf(" char: U+%04x\n", data->this_cp);
-#endif
-        cp[(*cpi)++] = data->this_cp;
+        إذا((داده->this_cp >= 0xD800 && داده->this_cp <= 0xDFFF) ||
+           داده->this_cp == 0xFFFE ||
+           داده->this_cp == 0xFFFF)
+          داده->this_cp = UNICODE_INVALID;
+#اگر_تعریف_شده DEBUG_PRINT_UTF8
+        چاپ_کن(" char: U+%04x\n", داده->this_cp);
+#پایان_اگر
+        cp[(*cpi)++] = داده->this_cp;
       }
     }
 
-    else if(c >= 0xc0 && c < 0xe0) {
-      if(data->bytes_remaining)
+    وإلا إذا(c >= 0xc0 && c < 0xe0) {
+      إذا(داده->بایتها_مانده)
         cp[(*cpi)++] = UNICODE_INVALID;
 
-      data->this_cp = c & 0x1f;
-      data->bytes_total = 2;
-      data->bytes_remaining = 1;
+      داده->this_cp = c & 0x1f;
+      داده->بایتها_مجموع = 2;
+      داده->بایتها_مانده = 1;
     }
 
-    else if(c >= 0xe0 && c < 0xf0) {
-      if(data->bytes_remaining)
+    وإلا إذا(c >= 0xe0 && c < 0xf0) {
+      إذا(داده->بایتها_مانده)
         cp[(*cpi)++] = UNICODE_INVALID;
 
-      data->this_cp = c & 0x0f;
-      data->bytes_total = 3;
-      data->bytes_remaining = 2;
+      داده->this_cp = c & 0x0f;
+      داده->بایتها_مجموع = 3;
+      داده->بایتها_مانده = 2;
     }
 
-    else if(c >= 0xf0 && c < 0xf8) {
-      if(data->bytes_remaining)
+    وإلا إذا(c >= 0xf0 && c < 0xf8) {
+      إذا(داده->بایتها_مانده)
         cp[(*cpi)++] = UNICODE_INVALID;
 
-      data->this_cp = c & 0x07;
-      data->bytes_total = 4;
-      data->bytes_remaining = 3;
+      داده->this_cp = c & 0x07;
+      داده->بایتها_مجموع = 4;
+      داده->بایتها_مانده = 3;
     }
 
-    else if(c >= 0xf8 && c < 0xfc) {
-      if(data->bytes_remaining)
+    وإلا إذا(c >= 0xf8 && c < 0xfc) {
+      إذا(داده->بایتها_مانده)
         cp[(*cpi)++] = UNICODE_INVALID;
 
-      data->this_cp = c & 0x03;
-      data->bytes_total = 5;
-      data->bytes_remaining = 4;
+      داده->this_cp = c & 0x03;
+      داده->بایتها_مجموع = 5;
+      داده->بایتها_مانده = 4;
     }
 
-    else if(c >= 0xfc && c < 0xfe) {
-      if(data->bytes_remaining)
+    وإلا إذا(c >= 0xfc && c < 0xfe) {
+      إذا(داده->بایتها_مانده)
         cp[(*cpi)++] = UNICODE_INVALID;
 
-      data->this_cp = c & 0x01;
-      data->bytes_total = 6;
-      data->bytes_remaining = 5;
+      داده->this_cp = c & 0x01;
+      داده->بایتها_مجموع = 6;
+      داده->بایتها_مانده = 5;
     }
 
-    else {
+    وإلا {
       cp[(*cpi)++] = UNICODE_INVALID;
     }
   }
 }
 
-static VTermEncoding encoding_utf8 = {
+ساكن VTermEncoding encoding_utf8 = {
   &init_utf8,  // init
   &decode_utf8 // decode
 };
 
-static void decode_usascii(VTermEncoding *enc UNUSED, void *data UNUSED,
-                           uint32_t cp[], int *cpi, int cplen,
-                           const char bytes[], size_t *pos, size_t bytelen)
+ساكن فراغ decode_usascii(VTermEncoding *enc استفادهنشده, فراغ *داده استفادهنشده,
+                           uint32_t cp[], صحيح *cpi, صحيح cplen,
+                           ثابت حرف بایتها[], size_t *pos, size_t bytelen)
 {
-  int is_gr = bytes[*pos] & 0x80;
+  صحيح is_gr = بایتها[*pos] & 0x80;
 
-  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos] ^ is_gr;
+  لكل(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    بیعلامت حرف c = بایتها[*pos] ^ is_gr;
 
-    if(c < 0x20 || c == 0x7f || c >= 0x80)
-      return;
+    إذا(c < 0x20 || c == 0x7f || c >= 0x80)
+      أرجع;
 
     cp[(*cpi)++] = c;
   }
 }
 
-static VTermEncoding encoding_usascii = {
-  NULL,           // init
+ساكن VTermEncoding encoding_usascii = {
+  عدم,           // init
   &decode_usascii // decode
 };
 
-struct StaticTableEncoding {
-  const VTermEncoding enc;
-  const uint32_t chars[128];
+بنية Static_جدول_Encoding {
+  ثابت VTermEncoding enc;
+  ثابت uint32_t chars[128];
 };
 
-static void decode_table(VTermEncoding *enc, void *data UNUSED,
-                         uint32_t cp[], int *cpi, int cplen,
-                         const char bytes[], size_t *pos, size_t bytelen)
+ساكن فراغ decode_جدول(VTermEncoding *enc, فراغ *داده استفادهنشده,
+                         uint32_t cp[], صحيح *cpi, صحيح cplen,
+                         ثابت حرف بایتها[], size_t *pos, size_t bytelen)
 {
-  struct StaticTableEncoding *table = (struct StaticTableEncoding *)enc;
-  int is_gr = bytes[*pos] & 0x80;
+  بنية Static_جدول_Encoding *جدول = (بنية Static_جدول_Encoding *)enc;
+  صحيح is_gr = بایتها[*pos] & 0x80;
 
-  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos] ^ is_gr;
+  لكل(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    بیعلامت حرف c = بایتها[*pos] ^ is_gr;
 
-    if(c < 0x20 || c == 0x7f || c >= 0x80)
-      return;
+    إذا(c < 0x20 || c == 0x7f || c >= 0x80)
+      أرجع;
 
-    if(table->chars[c])
-      cp[(*cpi)++] = table->chars[c];
-    else
+    إذا(جدول->chars[c])
+      cp[(*cpi)++] = جدول->chars[c];
+    وإلا
       cp[(*cpi)++] = c;
   }
 }
 
-#include "encoding/DECdrawing.inc"
-#include "encoding/uk.inc"
+#ضمن "encoding/DECdrawing.inc"
+#ضمن "encoding/uk.inc"
 
-static struct {
+ساكن بنية {
   VTermEncodingType type;
-  char designation;
+  حرف designation;
   VTermEncoding *enc;
 }
 encodings[] = {
@@ -221,14 +221,14 @@ encodings[] = {
   { ENC_SINGLE_94, '0', (VTermEncoding*)&encoding_DECdrawing },
   { ENC_SINGLE_94, 'A', (VTermEncoding*)&encoding_uk },
   { ENC_SINGLE_94, 'B', &encoding_usascii },
-  { 0, 0, NULL },
+  { 0, 0, عدم },
 };
 
 /* This ought to be INTERNAL but isn't because it's used by unit testing */
-VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, char designation)
+VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, حرف designation)
 {
-  for(int i = 0; encodings[i].designation; i++)
-    if(encodings[i].type == type && encodings[i].designation == designation)
-      return encodings[i].enc;
-  return NULL;
+  لكل(صحيح i = 0; encodings[i].designation; i++)
+    إذا(encodings[i].type == type && encodings[i].designation == designation)
+      أرجع encodings[i].enc;
+  أرجع عدم;
 }

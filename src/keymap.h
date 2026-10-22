@@ -16,7 +16,7 @@
  * For MSDOS some keys produce codes larger than 0xff. They are split into two
  * chars, the first one is K_NUL (same value used in term.h).
  */
-#define K_NUL			(0xce)	// for MSDOS: special key follows
+#تعریف_کن K_NUL			(0xce)	// for MSDOS: special key follows
 
 /*
  * K_SPECIAL is the first byte of a special key code and is always followed by
@@ -26,7 +26,7 @@
  * The third byte is guaranteed to be between 0x02 and 0x7f.
  */
 
-#define K_SPECIAL		(0x80)
+#تعریف_کن K_SPECIAL		(0x80)
 
 /*
  * Positive characters are "normal" characters.
@@ -34,112 +34,112 @@
  * are used to so that the absolute value can't be mistaken for a single-byte
  * character.
  */
-#define IS_SPECIAL(c)		((c) < 0)
+#تعریف_کن IS_SPECIAL(c)		((c) < 0)
 
 /*
  * Characters 0x0100 - 0x01ff have a special meaning for abbreviations.
  * Multi-byte characters also have ABBR_OFF added, thus are above 0x0200.
  */
-#define ABBR_OFF		0x100
+#تعریف_کن ABBR_OFF		0x100
 
 /*
  * NUL cannot be in the input string, therefore it is replaced by
  *	K_SPECIAL   KS_ZERO	KE_FILLER
  */
-#define KS_ZERO			255
+#تعریف_کن KS_ZERO			255
 
 /*
  * K_SPECIAL cannot be in the input string, therefore it is replaced by
  *	K_SPECIAL   KS_SPECIAL	KE_FILLER
  */
-#define KS_SPECIAL		254
+#تعریف_کن KS_SPECIAL		254
 
 /*
  * KS_EXTRA is used for keys that have no termcap name
  *	K_SPECIAL   KS_EXTRA	KE_xxx
  */
-#define KS_EXTRA		253
+#تعریف_کن KS_EXTRA		253
 
 /*
  * KS_MODIFIER is used when a modifier is given for a (special) key
  *	K_SPECIAL   KS_MODIFIER	bitmask
  */
-#define KS_MODIFIER		252
+#تعریف_کن KS_MODIFIER		252
 
 /*
  * These are used for the GUI
  *	K_SPECIAL   KS_xxx	KE_FILLER
  */
-#define KS_MOUSE		251
-#define KS_MENU			250
-#define KS_VER_SCROLLBAR	249
-#define KS_HOR_SCROLLBAR	248
+#تعریف_کن KS_MOUSE		251
+#تعریف_کن KS_MENU			250
+#تعریف_کن KS_VER_SCROLLBAR	249
+#تعریف_کن KS_HOR_SCROLLBAR	248
 
 /*
  * These are used for DEC mouse
  */
-#define KS_NETTERM_MOUSE	247
-#define KS_DEC_MOUSE		246
+#تعریف_کن KS_NETTERM_MOUSE	247
+#تعریف_کن KS_DEC_MOUSE		246
 
 /*
  * Used for switching Select mode back on after a mapping or menu.
  */
-#define KS_SELECT		245
-#define K_SELECT_STRING		(char_u *)"\200\365X"
+#تعریف_کن KS_SELECT		245
+#تعریف_کن K_SELECT_STRING		(char_u *)"\200\365X"
 
 /*
  * Used for tearing off a menu.
  */
-#define KS_TEAROFF		244
+#تعریف_کن KS_TEAROFF		244
 
 // Used for JSB term mouse.
-#define KS_JSBTERM_MOUSE	243
+#تعریف_کن KS_JSBTERM_MOUSE	243
 
 // Used a termcap entry that produces a normal character.
-#define KS_KEY			242
+#تعریف_کن KS_کلید			242
 
 // Used for the qnx pterm mouse.
-#define KS_PTERM_MOUSE		241
+#تعریف_کن KS_PTERM_MOUSE		241
 
 // Used for click in a tab pages label.
-#define KS_TABLINE		240
+#تعریف_کن KS_TABLINE		240
 
 // Used for menu in a tab pages line.
-#define KS_TABMENU		239
+#تعریف_کن KS_TABMENU		239
 
 // Used for the urxvt mouse.
-#define KS_URXVT_MOUSE		238
+#تعریف_کن KS_URXVT_MOUSE		238
 
 // Used for the sgr mouse.
-#define KS_SGR_MOUSE		237
-#define KS_SGR_MOUSE_RELEASE	236
+#تعریف_کن KS_SGR_MOUSE		237
+#تعریف_کن KS_SGR_MOUSE_RELEASE	236
 
 // Used for the GPM mouse.
-#define KS_GPM_MOUSE		235
+#تعریف_کن KS_GPM_MOUSE		235
 
 /*
  * Filler used after KS_SPECIAL and others
  */
-#define KE_FILLER		('X')
+#تعریف_کن KE_FILLER		('X')
 
 /*
  * translation of three byte code "K_SPECIAL a b" into int "K_xxx" and back
  */
-#define TERMCAP2KEY(a, b)	(-((a) + ((int)(b) << 8)))
-#define KEY2TERMCAP0(x)		((-(x)) & 0xff)
-#define KEY2TERMCAP1(x)		(((unsigned)(-(x)) >> 8) & 0xff)
+#تعریف_کن TERMCAP2_کلید(a, b)	(-((a) + ((صحيح)(b) << 8)))
+#تعریف_کن KEY2TERMCAP0(x)		((-(x)) & 0xff)
+#تعریف_کن KEY2TERMCAP1(x)		(((بیعلامت)(-(x)) >> 8) & 0xff)
 
 /*
  * get second or third byte when translating special key code into three bytes
  */
-#define K_SECOND(c)	((c) == K_SPECIAL ? KS_SPECIAL : (c) == NUL ? KS_ZERO : KEY2TERMCAP0(c))
+#تعریف_کن K_دومی(c)	((c) == K_SPECIAL ? KS_SPECIAL : (c) == NUL ? KS_ZERO : KEY2TERMCAP0(c))
 
-#define K_THIRD(c)	(((c) == K_SPECIAL || (c) == NUL) ? KE_FILLER : KEY2TERMCAP1(c))
+#تعریف_کن K_سوم(c)	(((c) == K_SPECIAL || (c) == NUL) ? KE_FILLER : KEY2TERMCAP1(c))
 
 /*
  * get single int code from second byte after K_SPECIAL
  */
-#define TO_SPECIAL(a, b)    ((a) == KS_SPECIAL ? K_SPECIAL : (a) == KS_ZERO ? K_ZERO : TERMCAP2KEY(a, b))
+#تعریف_کن مقصد_SPECIAL(a, b)    ((a) == KS_SPECIAL ? K_SPECIAL : (a) == KS_ZERO ? K_ZERO : TERMCAP2_کلید(a, b))
 
 /*
  * Codes for keys that do not have a termcap name.
@@ -148,10 +148,10 @@
  *
  * K_SPECIAL KS_EXTRA KE_xxx
  */
-enum key_extra
+تعداد کلید_extra
 {
-      KE_S_UP = 4		// shift-up
-    , KE_S_DOWN = 5		// shift-down
+      KE_S_به_بالا = 4		// shift-up
+    , KE_S_پایین = 5		// shift-down
 
     , KE_S_F1 = 6		// shifted function keys
     , KE_S_F2 = 7
@@ -215,7 +215,7 @@ enum key_extra
     , KE_TAB = 54		// unshifted TAB key
     , KE_S_TAB_OLD = 55		// shifted TAB key (no longer used)
 
-    , KE_SNIFF_UNUSED = 56	// obsolete
+    , KE_SNIFF_استفادهنشده = 56	// obsolete
     , KE_XF1 = 57		// extra vt100 function keys for xterm
     , KE_XF2 = 58
     , KE_XF3 = 59
@@ -254,10 +254,10 @@ enum key_extra
     , KE_CMDWIN = 84		// open command-line window from Command-line
 				// Mode
 
-    , KE_C_LEFT = 85		// control-left
-    , KE_C_RIGHT = 86		// control-right
+    , KE_C_چپ = 85		// control-left
+    , KE_C_راست = 86		// control-right
     , KE_C_HOME = 87		// control-home
-    , KE_C_END = 88		// control-end
+    , KE_C_انتها = 88		// control-end
 
     , KE_X1MOUSE = 89		// X1/X2 mouse-buttons
     , KE_X1DRAG = 90
@@ -287,238 +287,238 @@ enum key_extra
 /*
  * The three-byte codes are replaced with a negative number when using vgetc().
  */
-#define K_ZERO		TERMCAP2KEY(KS_ZERO, KE_FILLER)
+#تعریف_کن K_ZERO		TERMCAP2_کلید(KS_ZERO, KE_FILLER)
 
-#define K_ESC		TERMCAP2KEY(KS_EXTRA, KE_ESC)
+#تعریف_کن K_ESC		TERMCAP2_کلید(KS_EXTRA, KE_ESC)
 
-#define K_UP		TERMCAP2KEY('k', 'u')
-#define K_DOWN		TERMCAP2KEY('k', 'd')
-#define K_LEFT		TERMCAP2KEY('k', 'l')
-#define K_RIGHT		TERMCAP2KEY('k', 'r')
-#define K_S_UP		TERMCAP2KEY(KS_EXTRA, KE_S_UP)
-#define K_S_DOWN	TERMCAP2KEY(KS_EXTRA, KE_S_DOWN)
-#define K_S_LEFT	TERMCAP2KEY('#', '4')
-#define K_C_LEFT	TERMCAP2KEY(KS_EXTRA, KE_C_LEFT)
-#define K_S_RIGHT	TERMCAP2KEY('%', 'i')
-#define K_C_RIGHT	TERMCAP2KEY(KS_EXTRA, KE_C_RIGHT)
+#تعریف_کن K_به_بالا		TERMCAP2_کلید('k', 'u')
+#تعریف_کن K_پایین		TERMCAP2_کلید('k', 'd')
+#تعریف_کن K_چپ		TERMCAP2_کلید('k', 'l')
+#تعریف_کن K_راست		TERMCAP2_کلید('k', 'r')
+#تعریف_کن K_S_به_بالا		TERMCAP2_کلید(KS_EXTRA, KE_S_به_بالا)
+#تعریف_کن K_S_پایین	TERMCAP2_کلید(KS_EXTRA, KE_S_پایین)
+#تعریف_کن K_S_چپ	TERMCAP2_کلید('#', '4')
+#تعریف_کن K_C_چپ	TERMCAP2_کلید(KS_EXTRA, KE_C_چپ)
+#تعریف_کن K_S_راست	TERMCAP2_کلید('%', 'i')
+#تعریف_کن K_C_راست	TERMCAP2_کلید(KS_EXTRA, KE_C_راست)
 
-#define K_S_HOME	TERMCAP2KEY('#', '2')
-#define K_C_HOME	TERMCAP2KEY(KS_EXTRA, KE_C_HOME)
-#define K_S_END		TERMCAP2KEY('*', '7')
-#define K_C_END		TERMCAP2KEY(KS_EXTRA, KE_C_END)
+#تعریف_کن K_S_HOME	TERMCAP2_کلید('#', '2')
+#تعریف_کن K_C_HOME	TERMCAP2_کلید(KS_EXTRA, KE_C_HOME)
+#تعریف_کن K_S_انتها		TERMCAP2_کلید('*', '7')
+#تعریف_کن K_C_انتها		TERMCAP2_کلید(KS_EXTRA, KE_C_انتها)
 
-#define K_TAB		TERMCAP2KEY(KS_EXTRA, KE_TAB)
-#define K_S_TAB		TERMCAP2KEY('k', 'B')
-#define K_S_BS		TERMCAP2KEY(KS_EXTRA, KE_S_BS)
+#تعریف_کن K_TAB		TERMCAP2_کلید(KS_EXTRA, KE_TAB)
+#تعریف_کن K_S_TAB		TERMCAP2_کلید('k', 'B')
+#تعریف_کن K_S_BS		TERMCAP2_کلید(KS_EXTRA, KE_S_BS)
 
 // extra set of function keys F1-F4, for vt100 compatible xterm
-#define K_XF1		TERMCAP2KEY(KS_EXTRA, KE_XF1)
-#define K_XF2		TERMCAP2KEY(KS_EXTRA, KE_XF2)
-#define K_XF3		TERMCAP2KEY(KS_EXTRA, KE_XF3)
-#define K_XF4		TERMCAP2KEY(KS_EXTRA, KE_XF4)
+#تعریف_کن K_XF1		TERMCAP2_کلید(KS_EXTRA, KE_XF1)
+#تعریف_کن K_XF2		TERMCAP2_کلید(KS_EXTRA, KE_XF2)
+#تعریف_کن K_XF3		TERMCAP2_کلید(KS_EXTRA, KE_XF3)
+#تعریف_کن K_XF4		TERMCAP2_کلید(KS_EXTRA, KE_XF4)
 
 // extra set of cursor keys for vt100 compatible xterm
-#define K_XUP		TERMCAP2KEY(KS_EXTRA, KE_XUP)
-#define K_XDOWN		TERMCAP2KEY(KS_EXTRA, KE_XDOWN)
-#define K_XLEFT		TERMCAP2KEY(KS_EXTRA, KE_XLEFT)
-#define K_XRIGHT	TERMCAP2KEY(KS_EXTRA, KE_XRIGHT)
+#تعریف_کن K_XUP		TERMCAP2_کلید(KS_EXTRA, KE_XUP)
+#تعریف_کن K_XDOWN		TERMCAP2_کلید(KS_EXTRA, KE_XDOWN)
+#تعریف_کن K_XLEFT		TERMCAP2_کلید(KS_EXTRA, KE_XLEFT)
+#تعریف_کن K_XRIGHT	TERMCAP2_کلید(KS_EXTRA, KE_XRIGHT)
 
-#define K_F1		TERMCAP2KEY('k', '1')	// function keys
-#define K_F2		TERMCAP2KEY('k', '2')
-#define K_F3		TERMCAP2KEY('k', '3')
-#define K_F4		TERMCAP2KEY('k', '4')
-#define K_F5		TERMCAP2KEY('k', '5')
-#define K_F6		TERMCAP2KEY('k', '6')
-#define K_F7		TERMCAP2KEY('k', '7')
-#define K_F8		TERMCAP2KEY('k', '8')
-#define K_F9		TERMCAP2KEY('k', '9')
-#define K_F10		TERMCAP2KEY('k', ';')
+#تعریف_کن K_F1		TERMCAP2_کلید('k', '1')	// function keys
+#تعریف_کن K_F2		TERMCAP2_کلید('k', '2')
+#تعریف_کن K_F3		TERMCAP2_کلید('k', '3')
+#تعریف_کن K_F4		TERMCAP2_کلید('k', '4')
+#تعریف_کن K_F5		TERMCAP2_کلید('k', '5')
+#تعریف_کن K_F6		TERMCAP2_کلید('k', '6')
+#تعریف_کن K_F7		TERMCAP2_کلید('k', '7')
+#تعریف_کن K_F8		TERMCAP2_کلید('k', '8')
+#تعریف_کن K_F9		TERMCAP2_کلید('k', '9')
+#تعریف_کن K_F10		TERMCAP2_کلید('k', ';')
 
-#define K_F11		TERMCAP2KEY('F', '1')
-#define K_F12		TERMCAP2KEY('F', '2')
-#define K_F13		TERMCAP2KEY('F', '3')
-#define K_F14		TERMCAP2KEY('F', '4')
-#define K_F15		TERMCAP2KEY('F', '5')
-#define K_F16		TERMCAP2KEY('F', '6')
-#define K_F17		TERMCAP2KEY('F', '7')
-#define K_F18		TERMCAP2KEY('F', '8')
-#define K_F19		TERMCAP2KEY('F', '9')
-#define K_F20		TERMCAP2KEY('F', 'A')
+#تعریف_کن K_F11		TERMCAP2_کلید('F', '1')
+#تعریف_کن K_F12		TERMCAP2_کلید('F', '2')
+#تعریف_کن K_F13		TERMCAP2_کلید('F', '3')
+#تعریف_کن K_F14		TERMCAP2_کلید('F', '4')
+#تعریف_کن K_F15		TERMCAP2_کلید('F', '5')
+#تعریف_کن K_F16		TERMCAP2_کلید('F', '6')
+#تعریف_کن K_F17		TERMCAP2_کلید('F', '7')
+#تعریف_کن K_F18		TERMCAP2_کلید('F', '8')
+#تعریف_کن K_F19		TERMCAP2_کلید('F', '9')
+#تعریف_کن K_F20		TERMCAP2_کلید('F', 'A')
 
-#define K_F21		TERMCAP2KEY('F', 'B')
-#define K_F22		TERMCAP2KEY('F', 'C')
-#define K_F23		TERMCAP2KEY('F', 'D')
-#define K_F24		TERMCAP2KEY('F', 'E')
-#define K_F25		TERMCAP2KEY('F', 'F')
-#define K_F26		TERMCAP2KEY('F', 'G')
-#define K_F27		TERMCAP2KEY('F', 'H')
-#define K_F28		TERMCAP2KEY('F', 'I')
-#define K_F29		TERMCAP2KEY('F', 'J')
-#define K_F30		TERMCAP2KEY('F', 'K')
+#تعریف_کن K_F21		TERMCAP2_کلید('F', 'B')
+#تعریف_کن K_F22		TERMCAP2_کلید('F', 'C')
+#تعریف_کن K_F23		TERMCAP2_کلید('F', 'D')
+#تعریف_کن K_F24		TERMCAP2_کلید('F', 'E')
+#تعریف_کن K_F25		TERMCAP2_کلید('F', 'F')
+#تعریف_کن K_F26		TERMCAP2_کلید('F', 'G')
+#تعریف_کن K_F27		TERMCAP2_کلید('F', 'H')
+#تعریف_کن K_F28		TERMCAP2_کلید('F', 'I')
+#تعریف_کن K_F29		TERMCAP2_کلید('F', 'J')
+#تعریف_کن K_F30		TERMCAP2_کلید('F', 'K')
 
-#define K_F31		TERMCAP2KEY('F', 'L')
-#define K_F32		TERMCAP2KEY('F', 'M')
-#define K_F33		TERMCAP2KEY('F', 'N')
-#define K_F34		TERMCAP2KEY('F', 'O')
-#define K_F35		TERMCAP2KEY('F', 'P')
-#define K_F36		TERMCAP2KEY('F', 'Q')
-#define K_F37		TERMCAP2KEY('F', 'R')
+#تعریف_کن K_F31		TERMCAP2_کلید('F', 'L')
+#تعریف_کن K_F32		TERMCAP2_کلید('F', 'M')
+#تعریف_کن K_F33		TERMCAP2_کلید('F', 'N')
+#تعریف_کن K_F34		TERMCAP2_کلید('F', 'O')
+#تعریف_کن K_F35		TERMCAP2_کلید('F', 'P')
+#تعریف_کن K_F36		TERMCAP2_کلید('F', 'Q')
+#تعریف_کن K_F37		TERMCAP2_کلید('F', 'R')
 
 // extra set of shifted function keys F1-F4, for vt100 compatible xterm
-#define K_S_XF1		TERMCAP2KEY(KS_EXTRA, KE_S_XF1)
-#define K_S_XF2		TERMCAP2KEY(KS_EXTRA, KE_S_XF2)
-#define K_S_XF3		TERMCAP2KEY(KS_EXTRA, KE_S_XF3)
-#define K_S_XF4		TERMCAP2KEY(KS_EXTRA, KE_S_XF4)
+#تعریف_کن K_S_XF1		TERMCAP2_کلید(KS_EXTRA, KE_S_XF1)
+#تعریف_کن K_S_XF2		TERMCAP2_کلید(KS_EXTRA, KE_S_XF2)
+#تعریف_کن K_S_XF3		TERMCAP2_کلید(KS_EXTRA, KE_S_XF3)
+#تعریف_کن K_S_XF4		TERMCAP2_کلید(KS_EXTRA, KE_S_XF4)
 
-#define K_S_F1		TERMCAP2KEY(KS_EXTRA, KE_S_F1)	// shifted func. keys
-#define K_S_F2		TERMCAP2KEY(KS_EXTRA, KE_S_F2)
-#define K_S_F3		TERMCAP2KEY(KS_EXTRA, KE_S_F3)
-#define K_S_F4		TERMCAP2KEY(KS_EXTRA, KE_S_F4)
-#define K_S_F5		TERMCAP2KEY(KS_EXTRA, KE_S_F5)
-#define K_S_F6		TERMCAP2KEY(KS_EXTRA, KE_S_F6)
-#define K_S_F7		TERMCAP2KEY(KS_EXTRA, KE_S_F7)
-#define K_S_F8		TERMCAP2KEY(KS_EXTRA, KE_S_F8)
-#define K_S_F9		TERMCAP2KEY(KS_EXTRA, KE_S_F9)
-#define K_S_F10		TERMCAP2KEY(KS_EXTRA, KE_S_F10)
+#تعریف_کن K_S_F1		TERMCAP2_کلید(KS_EXTRA, KE_S_F1)	// shifted func. keys
+#تعریف_کن K_S_F2		TERMCAP2_کلید(KS_EXTRA, KE_S_F2)
+#تعریف_کن K_S_F3		TERMCAP2_کلید(KS_EXTRA, KE_S_F3)
+#تعریف_کن K_S_F4		TERMCAP2_کلید(KS_EXTRA, KE_S_F4)
+#تعریف_کن K_S_F5		TERMCAP2_کلید(KS_EXTRA, KE_S_F5)
+#تعریف_کن K_S_F6		TERMCAP2_کلید(KS_EXTRA, KE_S_F6)
+#تعریف_کن K_S_F7		TERMCAP2_کلید(KS_EXTRA, KE_S_F7)
+#تعریف_کن K_S_F8		TERMCAP2_کلید(KS_EXTRA, KE_S_F8)
+#تعریف_کن K_S_F9		TERMCAP2_کلید(KS_EXTRA, KE_S_F9)
+#تعریف_کن K_S_F10		TERMCAP2_کلید(KS_EXTRA, KE_S_F10)
 
-#define K_S_F11		TERMCAP2KEY(KS_EXTRA, KE_S_F11)
-#define K_S_F12		TERMCAP2KEY(KS_EXTRA, KE_S_F12)
+#تعریف_کن K_S_F11		TERMCAP2_کلید(KS_EXTRA, KE_S_F11)
+#تعریف_کن K_S_F12		TERMCAP2_کلید(KS_EXTRA, KE_S_F12)
 // K_S_F13 to K_S_F37  are currently not used
 
-#define K_HELP		TERMCAP2KEY('%', '1')
-#define K_UNDO		TERMCAP2KEY('&', '8')
+#تعریف_کن K_HELP		TERMCAP2_کلید('%', '1')
+#تعریف_کن K_UNDO		TERMCAP2_کلید('&', '8')
 
-#define K_BS		TERMCAP2KEY('k', 'b')
+#تعریف_کن K_BS		TERMCAP2_کلید('k', 'b')
 
-#define K_INS		TERMCAP2KEY('k', 'I')
-#define K_KINS		TERMCAP2KEY(KS_EXTRA, KE_KINS)
-#define K_DEL		TERMCAP2KEY('k', 'D')
-#define K_KDEL		TERMCAP2KEY(KS_EXTRA, KE_KDEL)
-#define K_HOME		TERMCAP2KEY('k', 'h')
-#define K_KHOME		TERMCAP2KEY('K', '1')	// keypad home (upper left)
-#define K_XHOME		TERMCAP2KEY(KS_EXTRA, KE_XHOME)
-#define K_ZHOME		TERMCAP2KEY(KS_EXTRA, KE_ZHOME)
-#define K_END		TERMCAP2KEY('@', '7')
-#define K_KEND		TERMCAP2KEY('K', '4')	// keypad end (lower left)
-#define K_XEND		TERMCAP2KEY(KS_EXTRA, KE_XEND)
-#define K_ZEND		TERMCAP2KEY(KS_EXTRA, KE_ZEND)
-#define K_PAGEUP	TERMCAP2KEY('k', 'P')
-#define K_PAGEDOWN	TERMCAP2KEY('k', 'N')
-#define K_KPAGEUP	TERMCAP2KEY('K', '3')	// keypad pageup (upper R.)
-#define K_KPAGEDOWN	TERMCAP2KEY('K', '5')	// keypad pagedown (lower R.)
+#تعریف_کن K_INS		TERMCAP2_کلید('k', 'I')
+#تعریف_کن K_KINS		TERMCAP2_کلید(KS_EXTRA, KE_KINS)
+#تعریف_کن K_DEL		TERMCAP2_کلید('k', 'D')
+#تعریف_کن K_KDEL		TERMCAP2_کلید(KS_EXTRA, KE_KDEL)
+#تعریف_کن K_HOME		TERMCAP2_کلید('k', 'h')
+#تعریف_کن K_KHOME		TERMCAP2_کلید('K', '1')	// keypad home (upper left)
+#تعریف_کن K_XHOME		TERMCAP2_کلید(KS_EXTRA, KE_XHOME)
+#تعریف_کن K_ZHOME		TERMCAP2_کلید(KS_EXTRA, KE_ZHOME)
+#تعریف_کن K_انتها		TERMCAP2_کلید('@', '7')
+#تعریف_کن K_KEND		TERMCAP2_کلید('K', '4')	// keypad end (lower left)
+#تعریف_کن K_XEND		TERMCAP2_کلید(KS_EXTRA, KE_XEND)
+#تعریف_کن K_ZEND		TERMCAP2_کلید(KS_EXTRA, KE_ZEND)
+#تعریف_کن K_PAGEUP	TERMCAP2_کلید('k', 'P')
+#تعریف_کن K_PAGEDOWN	TERMCAP2_کلید('k', 'N')
+#تعریف_کن K_KPAGEUP	TERMCAP2_کلید('K', '3')	// keypad pageup (upper R.)
+#تعریف_کن K_KPAGEDOWN	TERMCAP2_کلید('K', '5')	// keypad pagedown (lower R.)
 
-#define K_KPLUS		TERMCAP2KEY('K', '6')	// keypad plus
-#define K_KMINUS	TERMCAP2KEY('K', '7')	// keypad minus
-#define K_KDIVIDE	TERMCAP2KEY('K', '8')	// keypad /
-#define K_KMULTIPLY	TERMCAP2KEY('K', '9')	// keypad *
-#define K_KENTER	TERMCAP2KEY('K', 'A')	// keypad Enter
-#define K_KPOINT	TERMCAP2KEY('K', 'B')	// keypad . or ,
-#define K_PS		TERMCAP2KEY('P', 'S')	// paste start
-#define K_PE		TERMCAP2KEY('P', 'E')	// paste end
+#تعریف_کن K_KPLUS		TERMCAP2_کلید('K', '6')	// keypad plus
+#تعریف_کن K_KMINUS	TERMCAP2_کلید('K', '7')	// keypad minus
+#تعریف_کن K_KDIVIDE	TERMCAP2_کلید('K', '8')	// keypad /
+#تعریف_کن K_KMULTIPLY	TERMCAP2_کلید('K', '9')	// keypad *
+#تعریف_کن K_KENTER	TERMCAP2_کلید('K', 'A')	// keypad Enter
+#تعریف_کن K_KPOINT	TERMCAP2_کلید('K', 'B')	// keypad . or ,
+#تعریف_کن K_PS		TERMCAP2_کلید('P', 'S')	// paste start
+#تعریف_کن K_PE		TERMCAP2_کلید('P', 'E')	// paste end
 
-#define K_K0		TERMCAP2KEY('K', 'C')	// keypad 0
-#define K_K1		TERMCAP2KEY('K', 'D')	// keypad 1
-#define K_K2		TERMCAP2KEY('K', 'E')	// keypad 2
-#define K_K3		TERMCAP2KEY('K', 'F')	// keypad 3
-#define K_K4		TERMCAP2KEY('K', 'G')	// keypad 4
-#define K_K5		TERMCAP2KEY('K', 'H')	// keypad 5
-#define K_K6		TERMCAP2KEY('K', 'I')	// keypad 6
-#define K_K7		TERMCAP2KEY('K', 'J')	// keypad 7
-#define K_K8		TERMCAP2KEY('K', 'K')	// keypad 8
-#define K_K9		TERMCAP2KEY('K', 'L')	// keypad 9
+#تعریف_کن K_K0		TERMCAP2_کلید('K', 'C')	// keypad 0
+#تعریف_کن K_K1		TERMCAP2_کلید('K', 'D')	// keypad 1
+#تعریف_کن K_K2		TERMCAP2_کلید('K', 'E')	// keypad 2
+#تعریف_کن K_K3		TERMCAP2_کلید('K', 'F')	// keypad 3
+#تعریف_کن K_K4		TERMCAP2_کلید('K', 'G')	// keypad 4
+#تعریف_کن K_K5		TERMCAP2_کلید('K', 'H')	// keypad 5
+#تعریف_کن K_K6		TERMCAP2_کلید('K', 'I')	// keypad 6
+#تعریف_کن K_K7		TERMCAP2_کلید('K', 'J')	// keypad 7
+#تعریف_کن K_K8		TERMCAP2_کلید('K', 'K')	// keypad 8
+#تعریف_کن K_K9		TERMCAP2_کلید('K', 'L')	// keypad 9
 
-#define K_MOUSE		TERMCAP2KEY(KS_MOUSE, KE_FILLER)
-#define K_MENU		TERMCAP2KEY(KS_MENU, KE_FILLER)
-#define K_VER_SCROLLBAR	TERMCAP2KEY(KS_VER_SCROLLBAR, KE_FILLER)
-#define K_HOR_SCROLLBAR   TERMCAP2KEY(KS_HOR_SCROLLBAR, KE_FILLER)
+#تعریف_کن K_MOUSE		TERMCAP2_کلید(KS_MOUSE, KE_FILLER)
+#تعریف_کن K_MENU		TERMCAP2_کلید(KS_MENU, KE_FILLER)
+#تعریف_کن K_VER_SCROLLBAR	TERMCAP2_کلید(KS_VER_SCROLLBAR, KE_FILLER)
+#تعریف_کن K_HOR_SCROLLBAR   TERMCAP2_کلید(KS_HOR_SCROLLBAR, KE_FILLER)
 
-#define K_NETTERM_MOUSE	TERMCAP2KEY(KS_NETTERM_MOUSE, KE_FILLER)
-#define K_DEC_MOUSE	TERMCAP2KEY(KS_DEC_MOUSE, KE_FILLER)
-#define K_JSBTERM_MOUSE	TERMCAP2KEY(KS_JSBTERM_MOUSE, KE_FILLER)
-#define K_PTERM_MOUSE	TERMCAP2KEY(KS_PTERM_MOUSE, KE_FILLER)
-#define K_URXVT_MOUSE	TERMCAP2KEY(KS_URXVT_MOUSE, KE_FILLER)
-#define K_SGR_MOUSE	TERMCAP2KEY(KS_SGR_MOUSE, KE_FILLER)
-#define K_SGR_MOUSERELEASE TERMCAP2KEY(KS_SGR_MOUSE_RELEASE, KE_FILLER)
+#تعریف_کن K_NETTERM_MOUSE	TERMCAP2_کلید(KS_NETTERM_MOUSE, KE_FILLER)
+#تعریف_کن K_DEC_MOUSE	TERMCAP2_کلید(KS_DEC_MOUSE, KE_FILLER)
+#تعریف_کن K_JSBTERM_MOUSE	TERMCAP2_کلید(KS_JSBTERM_MOUSE, KE_FILLER)
+#تعریف_کن K_PTERM_MOUSE	TERMCAP2_کلید(KS_PTERM_MOUSE, KE_FILLER)
+#تعریف_کن K_URXVT_MOUSE	TERMCAP2_کلید(KS_URXVT_MOUSE, KE_FILLER)
+#تعریف_کن K_SGR_MOUSE	TERMCAP2_کلید(KS_SGR_MOUSE, KE_FILLER)
+#تعریف_کن K_SGR_MOUSERELEASE TERMCAP2_کلید(KS_SGR_MOUSE_RELEASE, KE_FILLER)
 
-#define K_SELECT	TERMCAP2KEY(KS_SELECT, KE_FILLER)
-#define K_TEAROFF	TERMCAP2KEY(KS_TEAROFF, KE_FILLER)
+#تعریف_کن K_SELECT	TERMCAP2_کلید(KS_SELECT, KE_FILLER)
+#تعریف_کن K_TEAROFF	TERMCAP2_کلید(KS_TEAROFF, KE_FILLER)
 
-#define K_TABLINE	TERMCAP2KEY(KS_TABLINE, KE_FILLER)
-#define K_TABMENU	TERMCAP2KEY(KS_TABMENU, KE_FILLER)
+#تعریف_کن K_TABLINE	TERMCAP2_کلید(KS_TABLINE, KE_FILLER)
+#تعریف_کن K_TABMENU	TERMCAP2_کلید(KS_TABMENU, KE_FILLER)
 
 /*
  * Symbols for pseudo keys which are translated from the real key symbols
  * above.
  */
-#define K_LEFTMOUSE	TERMCAP2KEY(KS_EXTRA, KE_LEFTMOUSE)
-#define K_LEFTMOUSE_NM	TERMCAP2KEY(KS_EXTRA, KE_LEFTMOUSE_NM)
-#define K_LEFTDRAG	TERMCAP2KEY(KS_EXTRA, KE_LEFTDRAG)
-#define K_LEFTRELEASE	TERMCAP2KEY(KS_EXTRA, KE_LEFTRELEASE)
-#define K_LEFTRELEASE_NM TERMCAP2KEY(KS_EXTRA, KE_LEFTRELEASE_NM)
-#define K_MOUSEMOVE	TERMCAP2KEY(KS_EXTRA, KE_MOUSEMOVE)
-#define K_MIDDLEMOUSE	TERMCAP2KEY(KS_EXTRA, KE_MIDDLEMOUSE)
-#define K_MIDDLEDRAG	TERMCAP2KEY(KS_EXTRA, KE_MIDDLEDRAG)
-#define K_MIDDLERELEASE	TERMCAP2KEY(KS_EXTRA, KE_MIDDLERELEASE)
-#define K_RIGHTMOUSE	TERMCAP2KEY(KS_EXTRA, KE_RIGHTMOUSE)
-#define K_RIGHTDRAG	TERMCAP2KEY(KS_EXTRA, KE_RIGHTDRAG)
-#define K_RIGHTRELEASE	TERMCAP2KEY(KS_EXTRA, KE_RIGHTRELEASE)
-#define K_X1MOUSE	TERMCAP2KEY(KS_EXTRA, KE_X1MOUSE)
-#define K_X1MOUSE	TERMCAP2KEY(KS_EXTRA, KE_X1MOUSE)
-#define K_X1DRAG	TERMCAP2KEY(KS_EXTRA, KE_X1DRAG)
-#define K_X1RELEASE     TERMCAP2KEY(KS_EXTRA, KE_X1RELEASE)
-#define K_X2MOUSE	TERMCAP2KEY(KS_EXTRA, KE_X2MOUSE)
-#define K_X2DRAG	TERMCAP2KEY(KS_EXTRA, KE_X2DRAG)
-#define K_X2RELEASE     TERMCAP2KEY(KS_EXTRA, KE_X2RELEASE)
+#تعریف_کن K_LEFTMOUSE	TERMCAP2_کلید(KS_EXTRA, KE_LEFTMOUSE)
+#تعریف_کن K_LEFTMOUSE_NM	TERMCAP2_کلید(KS_EXTRA, KE_LEFTMOUSE_NM)
+#تعریف_کن K_LEFTDRAG	TERMCAP2_کلید(KS_EXTRA, KE_LEFTDRAG)
+#تعریف_کن K_LEFTRELEASE	TERMCAP2_کلید(KS_EXTRA, KE_LEFTRELEASE)
+#تعریف_کن K_LEFTRELEASE_NM TERMCAP2_کلید(KS_EXTRA, KE_LEFTRELEASE_NM)
+#تعریف_کن K_MOUSEMOVE	TERMCAP2_کلید(KS_EXTRA, KE_MOUSEMOVE)
+#تعریف_کن K_MIDDLEMOUSE	TERMCAP2_کلید(KS_EXTRA, KE_MIDDLEMOUSE)
+#تعریف_کن K_MIDDLEDRAG	TERMCAP2_کلید(KS_EXTRA, KE_MIDDLEDRAG)
+#تعریف_کن K_MIDDLERELEASE	TERMCAP2_کلید(KS_EXTRA, KE_MIDDLERELEASE)
+#تعریف_کن K_RIGHTMOUSE	TERMCAP2_کلید(KS_EXTRA, KE_RIGHTMOUSE)
+#تعریف_کن K_RIGHTDRAG	TERMCAP2_کلید(KS_EXTRA, KE_RIGHTDRAG)
+#تعریف_کن K_RIGHTRELEASE	TERMCAP2_کلید(KS_EXTRA, KE_RIGHTRELEASE)
+#تعریف_کن K_X1MOUSE	TERMCAP2_کلید(KS_EXTRA, KE_X1MOUSE)
+#تعریف_کن K_X1MOUSE	TERMCAP2_کلید(KS_EXTRA, KE_X1MOUSE)
+#تعریف_کن K_X1DRAG	TERMCAP2_کلید(KS_EXTRA, KE_X1DRAG)
+#تعریف_کن K_X1RELEASE     TERMCAP2_کلید(KS_EXTRA, KE_X1RELEASE)
+#تعریف_کن K_X2MOUSE	TERMCAP2_کلید(KS_EXTRA, KE_X2MOUSE)
+#تعریف_کن K_X2DRAG	TERMCAP2_کلید(KS_EXTRA, KE_X2DRAG)
+#تعریف_کن K_X2RELEASE     TERMCAP2_کلید(KS_EXTRA, KE_X2RELEASE)
 
-#define K_IGNORE	TERMCAP2KEY(KS_EXTRA, KE_IGNORE)
-#define K_NOP		TERMCAP2KEY(KS_EXTRA, KE_NOP)
-#define K_CANCEL	TERMCAP2KEY(KS_EXTRA, KE_CANCEL)
+#تعریف_کن K_IGNORE	TERMCAP2_کلید(KS_EXTRA, KE_IGNORE)
+#تعریف_کن K_NOP		TERMCAP2_کلید(KS_EXTRA, KE_NOP)
+#تعریف_کن K_CANCEL	TERMCAP2_کلید(KS_EXTRA, KE_CANCEL)
 
-#define K_MOUSEDOWN	TERMCAP2KEY(KS_EXTRA, KE_MOUSEDOWN)
-#define K_MOUSEUP	TERMCAP2KEY(KS_EXTRA, KE_MOUSEUP)
-#define K_MOUSELEFT	TERMCAP2KEY(KS_EXTRA, KE_MOUSELEFT)
-#define K_MOUSERIGHT	TERMCAP2KEY(KS_EXTRA, KE_MOUSERIGHT)
+#تعریف_کن K_MOUSEDOWN	TERMCAP2_کلید(KS_EXTRA, KE_MOUSEDOWN)
+#تعریف_کن K_MOUSEUP	TERMCAP2_کلید(KS_EXTRA, KE_MOUSEUP)
+#تعریف_کن K_MOUSELEFT	TERMCAP2_کلید(KS_EXTRA, KE_MOUSELEFT)
+#تعریف_کن K_MOUSERIGHT	TERMCAP2_کلید(KS_EXTRA, KE_MOUSERIGHT)
 
-#define K_CSI		TERMCAP2KEY(KS_EXTRA, KE_CSI)
-#define K_OSC		TERMCAP2KEY(KS_EXTRA, KE_OSC)
-#define K_SNR		TERMCAP2KEY(KS_EXTRA, KE_SNR)
-#define K_PLUG		TERMCAP2KEY(KS_EXTRA, KE_PLUG)
-#define K_CMDWIN	TERMCAP2KEY(KS_EXTRA, KE_CMDWIN)
+#تعریف_کن K_CSI		TERMCAP2_کلید(KS_EXTRA, KE_CSI)
+#تعریف_کن K_OSC		TERMCAP2_کلید(KS_EXTRA, KE_OSC)
+#تعریف_کن K_SNR		TERMCAP2_کلید(KS_EXTRA, KE_SNR)
+#تعریف_کن K_PLUG		TERMCAP2_کلید(KS_EXTRA, KE_PLUG)
+#تعریف_کن K_CMDWIN	TERMCAP2_کلید(KS_EXTRA, KE_CMDWIN)
 
-#define K_DROP		TERMCAP2KEY(KS_EXTRA, KE_DROP)
-#define K_FOCUSGAINED	TERMCAP2KEY(KS_EXTRA, KE_FOCUSGAINED)
-#define K_FOCUSLOST	TERMCAP2KEY(KS_EXTRA, KE_FOCUSLOST)
+#تعریف_کن K_DROP		TERMCAP2_کلید(KS_EXTRA, KE_DROP)
+#تعریف_کن K_FOCUSGAINED	TERMCAP2_کلید(KS_EXTRA, KE_FOCUSGAINED)
+#تعریف_کن K_FOCUSLOST	TERMCAP2_کلید(KS_EXTRA, KE_FOCUSLOST)
 
-#define K_CURSORHOLD	TERMCAP2KEY(KS_EXTRA, KE_CURSORHOLD)
-#define K_COMPLETE_DELAY TERMCAP2KEY(KS_EXTRA, KE_COMPLETE_DELAY)
+#تعریف_کن K_CURSORHOLD	TERMCAP2_کلید(KS_EXTRA, KE_CURSORHOLD)
+#تعریف_کن K_COMPLETE_DELAY TERMCAP2_کلید(KS_EXTRA, KE_COMPLETE_DELAY)
 
-#define K_COMMAND	TERMCAP2KEY(KS_EXTRA, KE_COMMAND)
-#define K_SCRIPT_COMMAND TERMCAP2KEY(KS_EXTRA, KE_SCRIPT_COMMAND)
-#define K_SID		TERMCAP2KEY(KS_EXTRA, KE_SID)
+#تعریف_کن K_COMMAND	TERMCAP2_کلید(KS_EXTRA, KE_COMMAND)
+#تعریف_کن K_SCRIPT_COMMAND TERMCAP2_کلید(KS_EXTRA, KE_SCRIPT_COMMAND)
+#تعریف_کن K_SID		TERMCAP2_کلید(KS_EXTRA, KE_SID)
 
-#define K_WILD		TERMCAP2KEY(KS_EXTRA, KE_WILD)
+#تعریف_کن K_WILD		TERMCAP2_کلید(KS_EXTRA, KE_WILD)
 
 // Bits for modifier mask
 // 0x01 cannot be used, because the modifier must be 0x02 or higher
-#define MOD_MASK_SHIFT	    0x02
-#define MOD_MASK_CTRL	    0x04
-#define MOD_MASK_ALT	    0x08	// aka META
-#define MOD_MASK_META	    0x10	// META when it's different from ALT
-#define MOD_MASK_2CLICK	    0x20	// use MOD_MASK_MULTI_CLICK
-#define MOD_MASK_3CLICK	    0x40	// use MOD_MASK_MULTI_CLICK
-#define MOD_MASK_4CLICK	    0x60	// use MOD_MASK_MULTI_CLICK
-#if defined(MACOS_X) || defined(FEAT_GUI_GTK)
-# define MOD_MASK_CMD	    0x80        // aka SUPER
-#endif
+#تعریف_کن MOD_ماسک_لغزش	    0x02
+#تعریف_کن MOD_ماسک_CTRL	    0x04
+#تعریف_کن MOD_ماسک_ALT	    0x08	// aka META
+#تعریف_کن MOD_ماسک_META	    0x10	// META when it's different from ALT
+#تعریف_کن MOD_ماسک_2_CLICK	    0x20	// use MOD_MASK_MULTI_CLICK
+#تعریف_کن MOD_ماسک_3_CLICK	    0x40	// use MOD_MASK_MULTI_CLICK
+#تعریف_کن MOD_ماسک_4_CLICK	    0x60	// use MOD_MASK_MULTI_CLICK
+#إذا defined(MACOS_X) || defined(FEAT_GUI_GTK)
+# define MOD_ماسک_CMD	    0x80        // aka SUPER
+#پایان_اگر
 
-#define MOD_MASK_MULTI_CLICK	(MOD_MASK_2CLICK|MOD_MASK_3CLICK|MOD_MASK_4CLICK)
+#تعریف_کن MOD_ماسک_MULTI_CLICK	(MOD_ماسک_2_CLICK|MOD_ماسک_3_CLICK|MOD_ماسک_4_CLICK)
 
 /*
  * The length of the longest special key name, including modifiers.
  * Current longest is <M-C-S-T-D-A-4-ScrollWheelRight> (length includes '<' and
  * '>').
  */
-#define MAX_KEY_NAME_LEN    32
+#تعریف_کن MAX_کلید_NAME_LEN    32
 
 /*
  * Maximum length of a special key event as tokens.  This includes modifiers.
@@ -529,4 +529,4 @@ enum key_extra
  *
  * This is a total of 6 tokens, and is currently the longest one possible.
  */
-#define MAX_KEY_CODE_LEN    6
+#تعریف_کن MAX_کلید_کد_LEN    6

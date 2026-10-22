@@ -12,122 +12,122 @@
  * Mostly by Ivan Krasilnikov.
  */
 
-#undef NDEBUG
-#include <assert.h>
+#لغو_تعریف NDEBUG
+#ضمن <assert.h>
 
 // Must include main.c because it contains much more than just main()
-#define NO_VIM_MAIN
-#include "main.c"
+#تعریف_کن NO_VIM_MAIN
+#ضمن "main.c"
 
 // This file has to be included because the tested functions are static
-#include "memfile.c"
+#ضمن "memfile.c"
 
-#define index_to_key(i) ((i) ^ 15167)
-#define TEST_COUNT 50000
+#تعریف_کن شاخص_مقصد_کلید(i) ((i) ^ 15167)
+#تعریف_کن TEST_شمار 50000
 
 /*
  * Test mf_hash_*() functions.
  */
-    static void
-test_mf_hash(void)
+    ساكن فراغ
+test_mf_hash(فراغ)
 {
     mf_hashtab_T   ht;
-    mf_hashitem_T  *item;
-    blocknr_T      key;
+    mf_hashitem_T  *قلم;
+    blocknr_T      کلید;
     long_u	   i;
-    long_u	   num_buckets;
+    long_u	   رقم_buckets;
 
     mf_hash_init(&ht);
 
     // insert some items and check invariants
-    for (i = 0; i < TEST_COUNT; i++)
+    لكل (i = 0; i < TEST_شمار; i++)
     {
-	assert(ht.mht_count == i);
+	أكد(ht.mht_شمار == i);
 
 	// check that number of buckets is a power of 2
-	num_buckets = ht.mht_mask + 1;
-	assert(num_buckets > 0 && (num_buckets & (num_buckets - 1)) == 0);
+	رقم_buckets = ht.mht_ماسک + 1;
+	أكد(رقم_buckets > 0 && (رقم_buckets & (رقم_buckets - 1)) == 0);
 
 	// check load factor
-	assert(ht.mht_count <= (num_buckets << MHT_LOG_LOAD_FACTOR));
+	أكد(ht.mht_شمار <= (رقم_buckets << MHT_LOG_بارگیری_ضریب));
 
-	if (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
+	إذا (i < (MHT_INIT_اندازه << MHT_LOG_بارگیری_ضریب))
 	{
 	    // first expansion shouldn't have occurred yet
-	    assert(num_buckets == MHT_INIT_SIZE);
-	    assert(ht.mht_buckets == ht.mht_small_buckets);
+	    أكد(رقم_buckets == MHT_INIT_اندازه);
+	    أكد(ht.mht_buckets == ht.mht_small_buckets);
 	}
-	else
+	وإلا
 	{
-	    assert(num_buckets > MHT_INIT_SIZE);
-	    assert(ht.mht_buckets != ht.mht_small_buckets);
+	    أكد(رقم_buckets > MHT_INIT_اندازه);
+	    أكد(ht.mht_buckets != ht.mht_small_buckets);
 	}
 
-	key = index_to_key(i);
-	assert(mf_hash_find(&ht, key) == NULL);
+	کلید = شاخص_مقصد_کلید(i);
+	أكد(mf_hash_پیدا_کن(&ht, کلید) == عدم);
 
 	// allocate and add new item
-	item = LALLOC_CLEAR_ONE(mf_hashitem_T);
-	assert(item != NULL);
-	item->mhi_key = key;
-	mf_hash_add_item(&ht, item);
+	قلم = LALLOC_CLEAR_ONE(mf_hashitem_T);
+	أكد(قلم != عدم);
+	قلم->mhi_کلید = کلید;
+	mf_hash_جمع_کن_قلم(&ht, قلم);
 
-	assert(mf_hash_find(&ht, key) == item);
+	أكد(mf_hash_پیدا_کن(&ht, کلید) == قلم);
 
-	if (ht.mht_mask + 1 != num_buckets)
+	إذا (ht.mht_ماسک + 1 != رقم_buckets)
 	{
 	    // hash table was expanded
-	    assert(ht.mht_mask + 1 == num_buckets * MHT_GROWTH_FACTOR);
-	    assert(i + 1 == (num_buckets << MHT_LOG_LOAD_FACTOR));
+	    أكد(ht.mht_ماسک + 1 == رقم_buckets * MHT_GROWTH_ضریب);
+	    أكد(i + 1 == (رقم_buckets << MHT_LOG_بارگیری_ضریب));
 	}
     }
 
     // check presence of inserted items
-    for (i = 0; i < TEST_COUNT; i++)
+    لكل (i = 0; i < TEST_شمار; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
-	assert(item != NULL);
-	assert(item->mhi_key == key);
+	کلید = شاخص_مقصد_کلید(i);
+	قلم = mf_hash_پیدا_کن(&ht, کلید);
+	أكد(قلم != عدم);
+	أكد(قلم->mhi_کلید == کلید);
     }
 
     // delete some items
-    for (i = 0; i < TEST_COUNT; i++)
+    لكل (i = 0; i < TEST_شمار; i++)
     {
-	if (i % 100 < 70)
+	إذا (i % 100 < 70)
 	{
-	    key = index_to_key(i);
-	    item = mf_hash_find(&ht, key);
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    کلید = شاخص_مقصد_کلید(i);
+	    قلم = mf_hash_پیدا_کن(&ht, کلید);
+	    أكد(قلم != عدم);
+	    أكد(قلم->mhi_کلید == کلید);
 
-	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    mf_hash_rem_قلم(&ht, قلم);
+	    أكد(mf_hash_پیدا_کن(&ht, کلید) == عدم);
 
-	    mf_hash_add_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == item);
+	    mf_hash_جمع_کن_قلم(&ht, قلم);
+	    أكد(mf_hash_پیدا_کن(&ht, کلید) == قلم);
 
-	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    mf_hash_rem_قلم(&ht, قلم);
+	    أكد(mf_hash_پیدا_کن(&ht, کلید) == عدم);
 
-	    vim_free(item);
+	    vim_free(قلم);
 	}
     }
 
     // check again
-    for (i = 0; i < TEST_COUNT; i++)
+    لكل (i = 0; i < TEST_شمار; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
+	کلید = شاخص_مقصد_کلید(i);
+	قلم = mf_hash_پیدا_کن(&ht, کلید);
 
-	if (i % 100 < 70)
+	إذا (i % 100 < 70)
 	{
-	    assert(item == NULL);
+	    أكد(قلم == عدم);
 	}
-	else
+	وإلا
 	{
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    أكد(قلم != عدم);
+	    أكد(قلم->mhi_کلید == کلید);
 	}
     }
 
@@ -135,9 +135,9 @@ test_mf_hash(void)
     mf_hash_free_all(&ht);
 }
 
-    int
-main(void)
+    صحيح
+اصلی(فراغ)
 {
     test_mf_hash();
-    return 0;
+    أرجع 0;
 }

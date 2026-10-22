@@ -11,53 +11,53 @@
  * gui_xim.c: functions for the X Input Method
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if !defined(GTK_CHECK_VERSION)
-# define GTK_CHECK_VERSION(a, b, c) 0
-#endif
+#إذا !defined(GTK_CHECK_نسخه)
+# define GTK_CHECK_نسخه(a, b, c) 0
+#پایان_اگر
 
-#if defined(FEAT_GUI_GTK) && defined(FEAT_XIM)
+#إذا defined(FEAT_GUI_GTK) && defined(FEAT_XIM)
 # ifdef USE_GTK4
 #  include <gdk/gdkkeysyms.h>
-# elif GTK_CHECK_VERSION(3,0,0)
+# elif GTK_CHECK_نسخه(3,0,0)
 #  include <gdk/gdkkeysyms-compat.h>
-# else
+# وإلا
 #  include <gdk/gdkkeysyms.h>
 # endif
-# if !defined(USE_GTK4)
+# إذا !defined(USE_GTK4)
 #  ifdef MSWIN
 #   include <gdk/gdkwin32.h>
-#  else
+#  وإلا
 #   include <gdk/gdkx.h>
 #  endif
 # endif
-#endif
+#پایان_اگر
 
 /*
  * XIM often causes trouble.  Define XIM_DEBUG to get a log of XIM callbacks
  * in the "xim.log" file.
  */
 // #define XIM_DEBUG
-#if defined(XIM_DEBUG) && defined(FEAT_GUI_GTK)
-static void xim_log(char *s, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+#إذا defined(XIM_DEBUG) && defined(FEAT_GUI_GTK)
+ساكن فراغ xim_log(حرف *s, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-    static void
-xim_log(char *s, ...)
+    ساكن فراغ
+xim_log(حرف *s, ...)
 {
     va_list arglist;
-    static FILE *fd = NULL;
+    ساكن FILE *fd = عدم;
 
-    if (fd == (FILE *)-1)
-	return;
-    if (fd == NULL)
+    إذا (fd == (FILE *)-1)
+	أرجع;
+    إذا (fd == عدم)
     {
 	fd = mch_fopen("xim.log", "w");
-	if (fd == NULL)
+	إذا (fd == عدم)
 	{
 	    emsg("Cannot open xim.log");
 	    fd = (FILE *)-1;
-	    return;
+	    أرجع;
 	}
     }
 
@@ -65,246 +65,246 @@ xim_log(char *s, ...)
     vfprintf(fd, s, arglist);
     va_end(arglist);
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_GUI_MSWIN)
-# define USE_IMACTIVATEFUNC (!gui.in_use && *p_imaf != NUL)
-# define USE_IMSTATUSFUNC (!gui.in_use && *p_imsf != NUL)
-#else
+#إذا defined(FEAT_GUI_MSWIN)
+# define USE_IMACTIVATEFUNC (!gui.درون_use && *p_imaf != NUL)
+# define USE_IMSTATUSFUNC (!gui.درون_use && *p_imsf != NUL)
+#وإلا
 # define USE_IMACTIVATEFUNC (*p_imaf != NUL)
 # define USE_IMSTATUSFUNC (*p_imsf != NUL)
-#endif
+#پایان_اگر
 
-#if defined(FEAT_EVAL) && \
+#إذا defined(FEAT_EVAL) && \
      (defined(FEAT_XIM) || defined(IME_WITHOUT_XIM) || defined(VIMDLL))
-static callback_T imaf_cb;	    // 'imactivatefunc' callback function
-static callback_T imsf_cb;	    // 'imstatusfunc' callback function
+ساكن callback_T imaf_cb;	    // 'imactivatefunc' callback function
+ساكن callback_T imsf_cb;	    // 'imstatusfunc' callback function
 
-    char *
-did_set_imactivatefunc(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_imactivatefunc(optset_T *آرگومانها استفادهنشده)
 {
-    if (option_set_callback_func(p_imaf, &imaf_cb) == FAIL)
-	return e_invalid_argument;
+    إذا (option_مجموعه_callback_func(p_imaf, &imaf_cb) == FAIL)
+	أرجع e_invalid_آرگومان;
 
-    return NULL;
+    أرجع عدم;
 }
 
-    char *
-did_set_imstatusfunc(optset_T *args UNUSED)
+    حرف *
+did_مجموعه_imstatusfunc(optset_T *آرگومانها استفادهنشده)
 {
-    if (option_set_callback_func(p_imsf, &imsf_cb) == FAIL)
-	return e_invalid_argument;
+    إذا (option_مجموعه_callback_func(p_imsf, &imsf_cb) == FAIL)
+	أرجع e_invalid_آرگومان;
 
-    return NULL;
+    أرجع عدم;
 }
 
-    static void
-call_imactivatefunc(int active)
+    ساكن فراغ
+call_imactivatefunc(صحيح فعال)
 {
     typval_T argv[2];
-    int save_KeyTyped = KeyTyped;
+    صحيح save_کلید_Typed = کلید_Typed;
 
-    argv[0].v_type = VAR_NUMBER;
-    argv[0].vval.v_number = active ? 1 : 0;
+    argv[0].v_type = VAR_عدد;
+    argv[0].vval.v_عدد = فعال ? 1 : 0;
     argv[1].v_type = VAR_UNKNOWN;
-    (void)call_callback_retnr(&imaf_cb, 1, argv);
+    (فراغ)call_callback_retnr(&imaf_cb, 1, argv);
 
-    KeyTyped = save_KeyTyped;
+    کلید_Typed = save_کلید_Typed;
 }
 
-    static int
-call_imstatusfunc(void)
+    ساكن صحيح
+call_imstatusfunc(فراغ)
 {
-    int is_active;
-    int save_KeyTyped = KeyTyped;
+    صحيح is_فعال;
+    صحيح save_کلید_Typed = کلید_Typed;
 
     // FIXME: Don't execute user function in unsafe situation.
-    if (exiting || is_autocmd_blocked())
-	return FALSE;
+    إذا (exiting || is_autocmd_blocked())
+	أرجع FALSE;
     // FIXME: :py print 'xxx' is shown duplicate result.
     // Use silent to avoid it.
-    ++msg_silent;
-    is_active = call_callback_retnr(&imsf_cb, 0, NULL);
-    --msg_silent;
+    ++پیام_silent;
+    is_فعال = call_callback_retnr(&imsf_cb, 0, عدم);
+    --پیام_silent;
 
-    KeyTyped = save_KeyTyped;
-    return (is_active > 0);
+    کلید_Typed = save_کلید_Typed;
+    أرجع (is_فعال > 0);
 }
-#endif
+#پایان_اگر
 
-#if defined(EXITFREE)
-    void
-free_xim_stuff(void)
+#إذا defined(EXITFREE)
+    فراغ
+free_xim_stuff(فراغ)
 {
-# if defined(FEAT_EVAL) && \
+# إذا defined(FEAT_EVAL) && \
     (defined(FEAT_XIM) || defined(IME_WITHOUT_XIM) || defined(VIMDLL))
     free_callback(&imaf_cb);
     free_callback(&imsf_cb);
 # endif
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Mark the global 'imactivatefunc' and 'imstatusfunc' callbacks with "copyID"
  * so that they are not garbage collected.
  */
-    int
-set_ref_in_im_funcs(int copyID UNUSED)
+    صحيح
+مجموعه_ref_درون_im_funcs(صحيح copyID استفادهنشده)
 {
-    int abort = FALSE;
+    صحيح abort = FALSE;
 
-# if defined(FEAT_XIM) || defined(IME_WITHOUT_XIM) || defined(VIMDLL)
-    abort = set_ref_in_callback(&imaf_cb, copyID);
-    abort = abort || set_ref_in_callback(&imsf_cb, copyID);
+# إذا defined(FEAT_XIM) || defined(IME_WITHOUT_XIM) || defined(VIMDLL)
+    abort = مجموعه_ref_درون_callback(&imaf_cb, copyID);
+    abort = abort || مجموعه_ref_درون_callback(&imsf_cb, copyID);
 # endif
 
-    return abort;
+    أرجع abort;
 }
-#endif
+#پایان_اگر
 
 
-#if defined(FEAT_XIM)
+#إذا defined(FEAT_XIM)
 
-# if defined(FEAT_GUI_GTK)
-static int xim_has_preediting = FALSE;  // IM current status
+# إذا defined(FEAT_GUI_GTK)
+ساكن صحيح xim_has_preediting = FALSE;  // IM current status
 
 /*
  * Set preedit_start_col to the current cursor position.
  */
-    static void
-init_preedit_start_col(void)
+    ساكن فراغ
+init_preedit_شروع_ستون(فراغ)
 {
-    if (State & MODE_CMDLINE)
-	preedit_start_col = cmdline_getvcol_cursor();
-    else if (curwin != NULL && curwin->w_buffer != NULL)
-	getvcol(curwin, &curwin->w_cursor, &preedit_start_col, NULL, NULL, 0);
+    إذا (State & نما_CMDLINE)
+	preedit_شروع_ستون = cmdline_getvcol_cursor();
+    وإلا إذا (curwin != عدم && curwin->w_میانگیر != عدم)
+	getvcol(curwin, &curwin->w_cursor, &preedit_شروع_ستون, عدم, عدم, 0);
     // Prevent that preediting marks the buffer as changed.
-    xim_changed_while_preediting = curbuf->b_changed;
+    xim_تغییریافته_while_preediting = curbuf->b_تغییریافته;
 }
 
-static int im_is_active	       = FALSE;	// IM is enabled for current mode
-static int preedit_is_active   = FALSE;
-static int im_preedit_cursor   = 0;	// cursor offset in characters
-static int im_preedit_trailing = 0;	// number of characters after cursor
+ساكن صحيح im_is_فعال	       = FALSE;	// IM is enabled for current mode
+ساكن صحيح preedit_is_فعال   = FALSE;
+ساكن صحيح im_preedit_cursor   = 0;	// cursor offset in characters
+ساكن صحيح im_preedit_trailing = 0;	// number of characters after cursor
 
-static unsigned long im_commit_handler_id  = 0;
+ساكن بیعلامت دراز im_commit_handler_id  = 0;
 #  ifndef USE_GTK4
-#   ifndef GDK_KEY_VoidSymbol
-#    define GDK_KEY_VoidSymbol GDK_VoidSymbol
+#   ifndef GDK_کلید_Void_نماد
+#    define GDK_کلید_Void_نماد GDK_Void_نماد
 #   endif
-static unsigned int  im_activatekey_keyval = GDK_KEY_VoidSymbol;
-static unsigned int  im_activatekey_state  = 0;
+ساكن بیعلامت صحيح  im_activatekey_keyval = GDK_کلید_Void_نماد;
+ساكن بیعلامت صحيح  im_activatekey_state  = 0;
 #  endif
 
-static GtkWidget *preedit_window = NULL;
-static GtkWidget *preedit_label = NULL;
+ساكن GtkWidget *preedit_پنجره = عدم;
+ساكن GtkWidget *preedit_label = عدم;
 #  ifdef USE_GTK4
-static int preedit_label_width = 0;	// last measured popover natural width
-static int preedit_popover_height = 0;	// last measured popover natural height
+ساكن صحيح preedit_label_عرض = 0;	// last measured popover natural width
+ساكن صحيح preedit_popover_ارتفاع = 0;	// last measured popover natural height
 // CSS provider that styles the preedit popover frame; rebuilt whenever
 // gui.back_pixel changes so the popover background matches the editor's
 // background colour and fully covers the cursor cell.
-static GtkCssProvider *preedit_css_provider = NULL;
-static guicolor_T preedit_css_cached_bg = INVALCOLOR;
+ساكن GtkCssProvider *preedit_css_provider = عدم;
+ساكن guicolor_T preedit_css_cached_bg = INVALCOLOR;
 #  endif
 
-static void im_preedit_window_set_position(void);
+ساكن فراغ im_preedit_پنجره_مجموعه_position(فراغ);
 
-    void
-im_set_active(int active)
+    فراغ
+im_مجموعه_فعال(صحيح فعال)
 {
-    int was_active;
+    صحيح was_فعال;
 
-    was_active = !!im_get_status();
-    im_is_active = (active && !p_imdisable);
+    was_فعال = !!im_get_وضعیت();
+    im_is_فعال = (فعال && !p_imdisable);
 
-    if (im_is_active != was_active)
+    إذا (im_is_فعال != was_فعال)
 	xim_reset();
 }
 
-    void
-xim_set_focus(int focus)
+    فراغ
+xim_مجموعه_focus(صحيح focus)
 {
-    if (xic == NULL)
-	return;
+    إذا (xic == عدم)
+	أرجع;
 
-    if (focus)
-	gtk_im_context_focus_in(xic);
-    else
-	gtk_im_context_focus_out(xic);
+    إذا (focus)
+	gtk_im_context_focus_درون(xic);
+    وإلا
+	gtk_im_context_focus_بیرون(xic);
 }
 
-    void
-im_set_position(int row, int col)
+    فراغ
+im_مجموعه_position(صحيح ردیف, صحيح ستون)
 {
-    if (xic == NULL)
-	return;
+    إذا (xic == عدم)
+	أرجع;
 
     GdkRectangle area;
 
-    area.x = FILL_X(col);
-    area.y = FILL_Y(row);
+    area.x = FILL_X(ستون);
+    area.y = FILL_Y(ردیف);
     // The screen buffer may not be allocated yet when this is called from
     // xim_init() during gui_mch_init() to seed the IM's initial cursor
     // location, so guard mb_lefthalve() against a NULL LineOffset[].
-    area.width  = gui.char_width
-		    * ((ScreenLines != NULL && mb_lefthalve(row, col)) ? 2 : 1);
-    area.height = gui.char_height;
+    area.عرض  = gui.char_عرض
+		    * ((Screen_سطرها != عدم && mb_lefthalve(ردیف, ستون)) ? 2 : 1);
+    area.ارتفاع = gui.char_ارتفاع;
 
 #  ifdef USE_GTK4
     // Stretch the cursor rect height to cover the preedit popover so the
     // IM's candidate window is placed below the popover rather than on
     // top of it.  Coordinates stay in client-widget (drawarea) space;
     // GTK4's IM module translates to the surface internally.
-    if (p_imst == IM_OVER_THE_SPOT)
+    إذا (p_imst == IM_OVER_THE_SPOT)
     {
-	int popover_h = preedit_popover_height;
-	if (popover_h <= 0)
-	    popover_h = gui.char_height;
-	if (popover_h > area.height)
-	    area.height = popover_h;
+	صحيح popover_h = preedit_popover_ارتفاع;
+	إذا (popover_h <= 0)
+	    popover_h = gui.char_ارتفاع;
+	إذا (popover_h > area.ارتفاع)
+	    area.ارتفاع = popover_h;
     }
 #  endif
 
-    gtk_im_context_set_cursor_location(xic, &area);
+    gtk_im_context_مجموعه_cursor_location(xic, &area);
 
-    if (p_imst == IM_OVER_THE_SPOT)
-	im_preedit_window_set_position();
+    إذا (p_imst == IM_OVER_THE_SPOT)
+	im_preedit_پنجره_مجموعه_position();
 }
 
-#  if 0 || defined(PROTO) // apparently only used in gui_x11.c
-    void
-xim_set_preedit(void)
+#  إذا 0 || defined(PROTO) // apparently only used in gui_x11.c
+    فراغ
+xim_مجموعه_preedit(فراغ)
 {
-    im_set_position(gui.row, gui.col);
+    im_مجموعه_position(gui.ردیف, gui.ستون);
 }
 #  endif
 
-    static void
-im_add_to_input(char_u *str, int len)
+    ساكن فراغ
+im_جمع_کن_مقصد_درون_داد(char_u *str, صحيح len)
 {
     // Convert from 'termencoding' (always "utf-8") to 'encoding'
-    if (input_conv.vc_type != CONV_NONE)
+    إذا (درون_داد_conv.vc_type != CONV_NONE)
     {
-	str = string_convert(&input_conv, str, &len);
-	g_return_if_fail(str != NULL);
+	str = string_convert(&درون_داد_conv, str, &len);
+	g_return_if_fail(str != عدم);
     }
 
-    add_to_input_buf_csi(str, len);
+    جمع_کن_مقصد_درون_داد_buf_csi(str, len);
 
-    if (input_conv.vc_type != CONV_NONE)
+    إذا (درون_داد_conv.vc_type != CONV_NONE)
 	vim_free(str);
 
-    if (p_mh) // blank out the pointer if necessary
+    إذا (p_mh) // blank out the pointer if necessary
 	gui_mch_mousehide(TRUE);
 }
 
-    static void
-im_preedit_window_set_position(void)
+    ساكن فراغ
+im_preedit_پنجره_مجموعه_position(فراغ)
 {
-    if (preedit_window == NULL)
-	return;
+    إذا (preedit_پنجره == عدم)
+	أرجع;
 
 #  ifdef USE_GTK4
     // GTK4: The popover is parented to gui.mainwin (the toplevel) rather
@@ -318,64 +318,64 @@ im_preedit_window_set_position(void)
     // With anchor.w == label_w and popup_w ≈ label_w (after CSS zeroing
     // popover frame padding), popup_origin.x ≈ anchor.x.
     GdkRectangle rect;
-    graphene_point_t pt_in, pt_out;
+    graphene_نقطه_t pt_درون, pt_بیرون;
 
-    pt_in.x = FILL_X(gui.col);
-    pt_in.y = FILL_Y(gui.row);
-    if (!gtk_widget_compute_point(gui.drawarea, gui.mainwin,
-						&pt_in, &pt_out))
+    pt_درون.x = FILL_X(gui.ستون);
+    pt_درون.y = FILL_Y(gui.ردیف);
+    إذا (!gtk_widget_compute_نقطه(gui.drawarea, gui.mainwin,
+						&pt_درون, &pt_بیرون))
     {
-	pt_out.x = pt_in.x;
-	pt_out.y = pt_in.y;
+	pt_بیرون.x = pt_درون.x;
+	pt_بیرون.y = pt_درون.y;
     }
-    rect.x = (int)pt_out.x;
-    rect.y = (int)pt_out.y;
-    rect.width = preedit_label_width;
-    rect.height = 0;
+    rect.x = (صحيح)pt_بیرون.x;
+    rect.y = (صحيح)pt_بیرون.y;
+    rect.عرض = preedit_label_عرض;
+    rect.ارتفاع = 0;
     // make up for the difference between GVim's line height and GtkLabel's line height
-    int offset = gui.char_height - preedit_popover_height;
-    gtk_popover_set_offset(GTK_POPOVER(preedit_window), 0, offset);
+    صحيح جابه_جایی = gui.char_ارتفاع - preedit_popover_ارتفاع;
+    gtk_popover_مجموعه_جابه_جایی(GTK_POPOVER(preedit_پنجره), 0, جابه_جایی);
     // make the arrow pointer at start so that it only starts sliding
     // horizontally when screen border is reached
-    gtk_widget_set_halign(preedit_window, GTK_ALIGN_START);
-    gtk_popover_set_pointing_to(GTK_POPOVER(preedit_window), &rect);
-#  else
-    int x, y, width, height;
-    int screen_x, screen_y, screen_width, screen_height;
+    gtk_widget_مجموعه_halign(preedit_پنجره, GTK_ALIGN_شروع);
+    gtk_popover_مجموعه_pointing_مقصد(GTK_POPOVER(preedit_پنجره), &rect);
+#  وإلا
+    صحيح x, y, عرض, ارتفاع;
+    صحيح screen_x, screen_y, screen_عرض, screen_ارتفاع;
 
-    gui_gtk_get_screen_geom_of_win(gui.drawarea, 0, 0,
-			  &screen_x, &screen_y, &screen_width, &screen_height);
-    gdk_window_get_origin(gtk_widget_get_window(gui.drawarea), &x, &y);
-    gtk_window_get_size(GTK_WINDOW(preedit_window), &width, &height);
-    x = x + FILL_X(gui.col);
-    y = y + FILL_Y(gui.row);
-    if (x + width > screen_x + screen_width)
-	x = screen_x + screen_width - width;
-    if (y + height > screen_y + screen_height)
-	y = screen_y + screen_height - height;
-    gtk_window_move(GTK_WINDOW(preedit_window), x, y);
+    gui_gtk_get_screen_geom_از_win(gui.drawarea, 0, 0,
+			  &screen_x, &screen_y, &screen_عرض, &screen_ارتفاع);
+    gdk_پنجره_get_origin(gtk_widget_get_پنجره(gui.drawarea), &x, &y);
+    gtk_پنجره_get_اندازه(GTK_پنجره(preedit_پنجره), &عرض, &ارتفاع);
+    x = x + FILL_X(gui.ستون);
+    y = y + FILL_Y(gui.ردیف);
+    إذا (x + عرض > screen_x + screen_عرض)
+	x = screen_x + screen_عرض - عرض;
+    إذا (y + ارتفاع > screen_y + screen_ارتفاع)
+	y = screen_y + screen_ارتفاع - ارتفاع;
+    gtk_پنجره_move(GTK_پنجره(preedit_پنجره), x, y);
 #  endif
 }
 
-    static void
-im_preedit_window_open(void)
+    ساكن فراغ
+im_preedit_پنجره_open(فراغ)
 {
-    char *preedit_string;
-#  if !GTK_CHECK_VERSION(3,16,0)
-    char buf[8];
+    حرف *preedit_string;
+#  إذا !GTK_CHECK_نسخه(3,16,0)
+    حرف buf[8];
 #  endif
     PangoAttrList *attr_list;
     PangoLayout *layout;
-#  if GTK_CHECK_VERSION(3,0,0)
-#   if !GTK_CHECK_VERSION(3,16,0)
+#  إذا GTK_CHECK_نسخه(3,0,0)
+#   إذا !GTK_CHECK_نسخه(3,16,0)
     GdkRGBA color;
 #   endif
-#  else
+#  وإلا
     GdkColor color;
 #  endif
     gint w, h;
 
-    if (preedit_window == NULL)
+    إذا (preedit_پنجره == عدم)
     {
 #  ifdef USE_GTK4
 	// GTK4: use GtkPopover (xdg_popup) so the compositor keeps keyboard
@@ -384,37 +384,37 @@ im_preedit_window_open(void)
 	// container) rather than gui.drawarea: GtkDrawingArea is a leaf
 	// widget and using it as a popover parent causes snapshot artifacts
 	// (white-out) on the drawing area.
-	preedit_window = gtk_popover_new();
-	gtk_popover_set_autohide(GTK_POPOVER(preedit_window), FALSE);
-	gtk_popover_set_has_arrow(GTK_POPOVER(preedit_window), FALSE);
+	preedit_پنجره = gtk_popover_new();
+	gtk_popover_مجموعه_autohide(GTK_POPOVER(preedit_پنجره), FALSE);
+	gtk_popover_مجموعه_has_arrow(GTK_POPOVER(preedit_پنجره), FALSE);
 	// Pin the popover below the anchor.  Together with anchor.h == 0 in
 	// im_preedit_window_set_position() this lands the popover's top edge
 	// exactly on FILL_Y(row), so the popover covers the cursor cell rather
 	// than landing above it (the default GTK_POS_TOP would do that and
 	// only flip to bottom when there is no room above, which is flaky).
-	gtk_popover_set_position(GTK_POPOVER(preedit_window), GTK_POS_BOTTOM);
-	gtk_widget_set_can_focus(preedit_window, FALSE);
-	gtk_widget_set_focusable(preedit_window, FALSE);
-	gtk_widget_set_can_target(preedit_window, FALSE);
-	gtk_widget_set_parent(preedit_window, gui.mainwin);
-#  else
-	preedit_window = gtk_window_new(GTK_WINDOW_POPUP);
-	gtk_window_set_transient_for(GTK_WINDOW(preedit_window),
-						     GTK_WINDOW(gui.mainwin));
+	gtk_popover_مجموعه_position(GTK_POPOVER(preedit_پنجره), GTK_POS_BOTTOM);
+	gtk_widget_مجموعه_can_focus(preedit_پنجره, FALSE);
+	gtk_widget_مجموعه_focusable(preedit_پنجره, FALSE);
+	gtk_widget_مجموعه_can_هدف(preedit_پنجره, FALSE);
+	gtk_widget_مجموعه_والد(preedit_پنجره, gui.mainwin);
+#  وإلا
+	preedit_پنجره = gtk_پنجره_new(GTK_پنجره_POPUP);
+	gtk_پنجره_مجموعه_transient_for(GTK_پنجره(preedit_پنجره),
+						     GTK_پنجره(gui.mainwin));
 #  endif
 	preedit_label = gtk_label_new("");
-	gtk_widget_set_name(preedit_label, "vim-gui-preedit-area");
+	gtk_widget_مجموعه_name(preedit_label, "vim-gui-preedit-area");
 #  ifdef USE_GTK4
-	gtk_label_set_xalign(GTK_LABEL(preedit_label), 0.0);
-	gtk_widget_set_halign(preedit_label, GTK_ALIGN_START);
-	gtk_widget_set_valign(preedit_label, GTK_ALIGN_START);
+	gtk_label_مجموعه_xalign(GTK_LABEL(preedit_label), 0.0);
+	gtk_widget_مجموعه_halign(preedit_label, GTK_ALIGN_شروع);
+	gtk_widget_مجموعه_valign(preedit_label, GTK_ALIGN_شروع);
 	// Tag the popover with a CSS class so the minimal frame CSS below
 	// (no border, no rounded corners, no shadow, no padding) applies
 	// only to our preedit popover and not other popovers in the app.
-	gtk_widget_add_css_class(preedit_window, "vim-preedit-popover");
-	gtk_popover_set_child(GTK_POPOVER(preedit_window), preedit_label);
-#  else
-	gtk_container_add(GTK_CONTAINER(preedit_window), preedit_label);
+	gtk_widget_جمع_کن_css_class(preedit_پنجره, "vim-preedit-popover");
+	gtk_popover_مجموعه_فرزند(GTK_POPOVER(preedit_پنجره), preedit_label);
+#  وإلا
+	gtk_container_جمع_کن(GTK_CONTAINER(preedit_پنجره), preedit_label);
 #  endif
     }
 
@@ -426,12 +426,12 @@ im_preedit_window_open(void)
     // surface is allocated a pixel or two larger than the glyph bounding
     // box (e.g. due to residual theme insets) -- otherwise the blinking
     // text cursor at the cell origin shows through the popover frame.
-    if (preedit_css_provider == NULL || preedit_css_cached_bg != gui.back_pixel)
+    إذا (preedit_css_provider == عدم || preedit_css_cached_bg != gui.پشت_pixel)
     {
 	GdkDisplay *display = gdk_display_get_default();
 	gchar *css;
 
-	if (preedit_css_provider != NULL)
+	إذا (preedit_css_provider != عدم)
 	{
 	    gtk_style_context_remove_provider_for_display(display,
 				    GTK_STYLE_PROVIDER(preedit_css_provider));
@@ -455,44 +455,44 @@ im_preedit_window_open(void)
 		"  background: transparent;\n"
 		"  border: none;\n"
 		"}\n",
-		(unsigned long)((gui.back_pixel >> 16) & 0xff),
-		(unsigned long)((gui.back_pixel >> 8) & 0xff),
-		(unsigned long)(gui.back_pixel & 0xff));
-	gtk_css_provider_load_from_string(preedit_css_provider, css);
+		(بیعلامت دراز)((gui.پشت_pixel >> 16) & 0xff),
+		(بیعلامت دراز)((gui.پشت_pixel >> 8) & 0xff),
+		(بیعلامت دراز)(gui.پشت_pixel & 0xff));
+	gtk_css_provider_بارگیری_from_string(preedit_css_provider, css);
 	g_free(css);
-	gtk_style_context_add_provider_for_display(display,
+	gtk_style_context_جمع_کن_provider_for_display(display,
 			    GTK_STYLE_PROVIDER(preedit_css_provider), G_MAXUINT);
-	preedit_css_cached_bg = gui.back_pixel;
+	preedit_css_cached_bg = gui.پشت_pixel;
     }
 #  endif
 
 #  ifndef USE_GTK4
-#   if GTK_CHECK_VERSION(3,16,0)
+#   إذا GTK_CHECK_نسخه(3,16,0)
     {
-	GtkStyleContext * const context
+	GtkStyleContext * ثابت context
 				  = gtk_widget_get_style_context(preedit_label);
-	GtkCssProvider * const provider = gtk_css_provider_new();
-	gchar		   *css = NULL;
-	const char * const fontname
+	GtkCssProvider * ثابت provider = gtk_css_provider_new();
+	gchar		   *css = عدم;
+	ثابت حرف * ثابت fontname
 			   = pango_font_description_get_family(gui.norm_font);
 	// Since font sizes can be specified as non-integer values like 10.5,
 	// they must be handled as floating-point (gdouble).
 	gdouble	fontsize
-		= (gdouble)pango_font_description_get_size(gui.norm_font) / PANGO_SCALE;
-	gchar	*fontsize_propval = NULL;
+		= (gdouble)pango_font_description_get_اندازه(gui.norm_font) / PANGO_SCALE;
+	gchar	*fontsize_propval = عدم;
 
-	if (!pango_font_description_get_size_is_absolute(gui.norm_font))
+	إذا (!pango_font_description_get_اندازه_is_absolute(gui.norm_font))
 	{
 	    // fontsize was given in points.  Convert it into that in pixels
 	    // to use with CSS.
-	    GdkScreen * const screen
-		  = gdk_window_get_screen(gtk_widget_get_window(gui.mainwin));
-	    const gdouble dpi = gdk_screen_get_resolution(screen);
+	    GdkScreen * ثابت screen
+		  = gdk_پنجره_get_screen(gtk_widget_get_پنجره(gui.mainwin));
+	    ثابت gdouble dpi = gdk_screen_get_resolution(screen);
 	    fontsize = dpi * fontsize / 72;
 	}
-	if (fontsize > 0)
+	إذا (fontsize > 0)
 	    fontsize_propval = g_strdup_printf("%dpx", (gint)(fontsize + 0.5));
-	else
+	وإلا
 	    fontsize_propval = g_strdup_printf("inherit");
 
 	css = g_strdup_printf(
@@ -502,50 +502,50 @@ im_preedit_window_open(void)
 		"  color: #%.2lx%.2lx%.2lx;\n"
 		"  background-color: #%.2lx%.2lx%.2lx;\n"
 		"}\n",
-		fontname != NULL ? fontname : "inherit",
+		fontname != عدم ? fontname : "inherit",
 		fontsize_propval,
 		(gui.norm_pixel >> 16) & 0xff,
 		(gui.norm_pixel >> 8) & 0xff,
 		gui.norm_pixel & 0xff,
-		(gui.back_pixel >> 16) & 0xff,
-		(gui.back_pixel >> 8) & 0xff,
-		gui.back_pixel & 0xff);
+		(gui.پشت_pixel >> 16) & 0xff,
+		(gui.پشت_pixel >> 8) & 0xff,
+		gui.پشت_pixel & 0xff);
 
-	gtk_css_provider_load_from_data(provider, css, -1, NULL);
-	gtk_style_context_add_provider(context,
+	gtk_css_provider_بارگیری_from_داده(provider, css, -1, عدم);
+	gtk_style_context_جمع_کن_provider(context,
 				     GTK_STYLE_PROVIDER(provider), G_MAXUINT);
 
 	g_free(css);
 	g_free(fontsize_propval);
 	g_object_unref(provider);
     }
-#   elif GTK_CHECK_VERSION(3,0,0)
+#   elif GTK_CHECK_نسخه(3,0,0)
     gtk_widget_override_font(preedit_label, gui.norm_font);
 
-    vim_snprintf(buf, sizeof(buf), "#%06X", gui.norm_pixel);
+    vim_snprintf(buf, حجم(buf), "#%06X", gui.norm_pixel);
     gdk_rgba_parse(&color, buf);
-    gtk_widget_override_color(preedit_label, GTK_STATE_FLAG_NORMAL, &color);
+    gtk_widget_override_color(preedit_label, GTK_STATE_FLAG_نرمال, &color);
 
-    vim_snprintf(buf, sizeof(buf), "#%06X", gui.back_pixel);
+    vim_snprintf(buf, حجم(buf), "#%06X", gui.پشت_pixel);
     gdk_rgba_parse(&color, buf);
-    gtk_widget_override_background_color(preedit_label, GTK_STATE_FLAG_NORMAL,
+    gtk_widget_override_background_color(preedit_label, GTK_STATE_FLAG_نرمال,
 								      &color);
-#   else
+#   وإلا
     gtk_widget_modify_font(preedit_label, gui.norm_font);
 
-    vim_snprintf(buf, sizeof(buf), "#%06X", (unsigned)gui.norm_pixel);
+    vim_snprintf(buf, حجم(buf), "#%06X", (بیعلامت)gui.norm_pixel);
     gdk_color_parse(buf, &color);
-    gtk_widget_modify_fg(preedit_label, GTK_STATE_NORMAL, &color);
+    gtk_widget_modify_fg(preedit_label, GTK_STATE_نرمال, &color);
 
-    vim_snprintf(buf, sizeof(buf), "#%06X", (unsigned)gui.back_pixel);
+    vim_snprintf(buf, حجم(buf), "#%06X", (بیعلامت)gui.پشت_pixel);
     gdk_color_parse(buf, &color);
-    gtk_widget_modify_bg(preedit_window, GTK_STATE_NORMAL, &color);
+    gtk_widget_modify_bg(preedit_پنجره, GTK_STATE_نرمال, &color);
 #   endif
 #  endif // !USE_GTK4
 
-    gtk_im_context_get_preedit_string(xic, &preedit_string, &attr_list, NULL);
+    gtk_im_context_get_preedit_string(xic, &preedit_string, &attr_list, عدم);
 
-    if (preedit_string[0] != NUL)
+    إذا (preedit_string[0] != NUL)
     {
 #  ifdef USE_GTK4
 	// GTK4: drive all styling (font + foreground + background) via
@@ -556,61 +556,61 @@ im_preedit_window_open(void)
 	// the IM gave us (e.g. underline for composing range).
 	PangoAttribute *pa;
 
-	if (attr_list == NULL)
+	إذا (attr_list == عدم)
 	    attr_list = pango_attr_list_new();
 
-	if (gui.norm_font != NULL)
+	إذا (gui.norm_font != عدم)
 	{
 	    pa = pango_attr_font_desc_new(gui.norm_font);
-	    pa->start_index = 0;
-	    pa->end_index = G_MAXUINT;
-	    pango_attr_list_insert(attr_list, pa);
+	    pa->شروع_شاخص = 0;
+	    pa->انتها_شاخص = G_MAXUINT;
+	    pango_attr_list_درج(attr_list, pa);
 	}
 
 	pa = pango_attr_foreground_new(
 		((gui.norm_pixel >> 16) & 0xff) * 257,
 		((gui.norm_pixel >> 8) & 0xff) * 257,
 		(gui.norm_pixel & 0xff) * 257);
-	pa->start_index = 0;
-	pa->end_index = G_MAXUINT;
-	pango_attr_list_insert(attr_list, pa);
+	pa->شروع_شاخص = 0;
+	pa->انتها_شاخص = G_MAXUINT;
+	pango_attr_list_درج(attr_list, pa);
 
 	pa = pango_attr_background_new(
-		((gui.back_pixel >> 16) & 0xff) * 257,
-		((gui.back_pixel >> 8) & 0xff) * 257,
-		(gui.back_pixel & 0xff) * 257);
-	pa->start_index = 0;
-	pa->end_index = G_MAXUINT;
-	pango_attr_list_insert(attr_list, pa);
+		((gui.پشت_pixel >> 16) & 0xff) * 257,
+		((gui.پشت_pixel >> 8) & 0xff) * 257,
+		(gui.پشت_pixel & 0xff) * 257);
+	pa->شروع_شاخص = 0;
+	pa->انتها_شاخص = G_MAXUINT;
+	pango_attr_list_درج(attr_list, pa);
 #  endif
-	gtk_label_set_text(GTK_LABEL(preedit_label), preedit_string);
-	gtk_label_set_attributes(GTK_LABEL(preedit_label), attr_list);
+	gtk_label_مجموعه_متن(GTK_LABEL(preedit_label), preedit_string);
+	gtk_label_مجموعه_صفات(GTK_LABEL(preedit_label), attr_list);
 
 	layout = gtk_label_get_layout(GTK_LABEL(preedit_label));
-	pango_layout_get_pixel_size(layout, &w, &h);
-	h = MAX(h, gui.char_height);
+	pango_layout_get_pixel_اندازه(layout, &w, &h);
+	h = MAX(h, gui.char_ارتفاع);
 #  ifdef USE_GTK4
 	// Cache label/popover size derived from the Pango layout, which is
 	// available without mapping the popover.  Using these for positioning
 	// avoids calling gtk_popover_set_pointing_to() after popup, which
 	// triggers a GDK "compositor doesn't support moving popups" warning
 	// on compositors without xdg_popup.reposition (e.g. Weston).
-	preedit_label_width = w;
-	preedit_popover_height = h;
+	preedit_label_عرض = w;
+	preedit_popover_ارتفاع = h;
 
 	// Report an enlarged cursor rectangle that covers both the cursor
 	// cell and the preedit popover.  This way the IM (e.g. fcitx5)
 	// places its candidate window below the popover instead of on top
 	// of it.  Coordinates are in client-widget (drawarea) space.
-	if (xic != NULL)
+	إذا (xic != عدم)
 	{
 	    GdkRectangle area;
 
-	    area.x = FILL_X(gui.col);
-	    area.y = FILL_Y(gui.row);
-	    area.width = preedit_label_width;
-	    area.height = MAX(gui.char_height, preedit_popover_height);
-	    gtk_im_context_set_cursor_location(xic, &area);
+	    area.x = FILL_X(gui.ستون);
+	    area.y = FILL_Y(gui.ردیف);
+	    area.عرض = preedit_label_عرض;
+	    area.ارتفاع = MAX(gui.char_ارتفاع, preedit_popover_ارتفاع);
+	    gtk_im_context_مجموعه_cursor_location(xic, &area);
 	}
 
 	// Pop down before re-anchoring: on compositors that lack
@@ -618,18 +618,18 @@ im_preedit_window_open(void)
 	// a mapped popover triggers GDK's remap fallback and a warning.
 	// Doing the popdown ourselves makes the next popup land at the new
 	// anchor cleanly without that warning.
-	if (gtk_widget_get_mapped(preedit_window))
-	    gtk_popover_popdown(GTK_POPOVER(preedit_window));
+	إذا (gtk_widget_get_mapped(preedit_پنجره))
+	    gtk_popover_popdown(GTK_POPOVER(preedit_پنجره));
 
-	im_preedit_window_set_position();
+	im_preedit_پنجره_مجموعه_position();
 
-	gtk_widget_queue_resize(preedit_window);
-	gtk_popover_popup(GTK_POPOVER(preedit_window));
-#  else
-	gtk_window_resize(GTK_WINDOW(preedit_window), w, h);
-	gtk_widget_show_all(preedit_window);
+	gtk_widget_صف_resize(preedit_پنجره);
+	gtk_popover_popup(GTK_POPOVER(preedit_پنجره));
+#  وإلا
+	gtk_پنجره_resize(GTK_پنجره(preedit_پنجره), w, h);
+	gtk_widget_show_all(preedit_پنجره);
 
-	im_preedit_window_set_position();
+	im_preedit_پنجره_مجموعه_position();
 #  endif
     }
 
@@ -637,53 +637,53 @@ im_preedit_window_open(void)
     pango_attr_list_unref(attr_list);
 }
 
-    static void
-im_preedit_window_close(void)
+    ساكن فراغ
+im_preedit_پنجره_close(فراغ)
 {
-    if (preedit_window == NULL)
-	return;
+    إذا (preedit_پنجره == عدم)
+	أرجع;
 #  ifdef USE_GTK4
-    gtk_popover_popdown(GTK_POPOVER(preedit_window));
-#  else
-    gtk_widget_hide(preedit_window);
+    gtk_popover_popdown(GTK_POPOVER(preedit_پنجره));
+#  وإلا
+    gtk_widget_hide(preedit_پنجره);
 #  endif
 }
 
-    static void
-im_show_preedit(void)
+    ساكن فراغ
+im_show_preedit(فراغ)
 {
-    im_preedit_window_open();
+    im_preedit_پنجره_open();
 
-    if (p_mh) // blank out the pointer if necessary
+    إذا (p_mh) // blank out the pointer if necessary
 	gui_mch_mousehide(TRUE);
 }
 
-    static void
-im_delete_preedit(void)
+    ساكن فراغ
+im_delete_preedit(فراغ)
 {
     char_u bskey[]  = {CSI, 'k', 'b'};
     char_u delkey[] = {CSI, 'k', 'D'};
 
-    if (p_imst == IM_OVER_THE_SPOT)
+    إذا (p_imst == IM_OVER_THE_SPOT)
     {
-	im_preedit_window_close();
-	return;
+	im_preedit_پنجره_close();
+	أرجع;
     }
 
-    if (State & MODE_NORMAL
+    إذا (State & نما_نرمال
 #  ifdef FEAT_TERMINAL
-	    && !term_use_loop()
+	    && !جمله_use_loop()
 #  endif
        )
     {
 	im_preedit_cursor = 0;
-	return;
+	أرجع;
     }
-    for (; im_preedit_cursor > 0; --im_preedit_cursor)
-	add_to_input_buf(bskey, (int)sizeof(bskey));
+    لكل (; im_preedit_cursor > 0; --im_preedit_cursor)
+	جمع_کن_مقصد_درون_داد_buf(bskey, (صحيح)حجم(bskey));
 
-    for (; im_preedit_trailing > 0; --im_preedit_trailing)
-	add_to_input_buf(delkey, (int)sizeof(delkey));
+    لكل (; im_preedit_trailing > 0; --im_preedit_trailing)
+	جمع_کن_مقصد_درون_داد_buf(delkey, (صحيح)حجم(delkey));
 }
 
 /*
@@ -691,71 +691,71 @@ im_delete_preedit(void)
  * Note that ins_left() checks im_is_preediting() to avoid breaking undo for
  * these K_LEFT keys.
  */
-    static void
-im_correct_cursor(int num_move_back)
+    ساكن فراغ
+im_correct_cursor(صحيح رقم_move_پشت)
 {
     char_u backkey[] = {CSI, 'k', 'l'};
 
-    if (State & MODE_NORMAL)
-	return;
+    إذا (State & نما_نرمال)
+	أرجع;
 #  ifdef FEAT_RIGHTLEFT
-    if ((State & MODE_CMDLINE) == 0 && curwin != NULL && curwin->w_p_rl)
+    إذا ((State & نما_CMDLINE) == 0 && curwin != عدم && curwin->w_p_rl)
 	backkey[2] = 'r';
 #  endif
-    for (; num_move_back > 0; --num_move_back)
-	add_to_input_buf(backkey, (int)sizeof(backkey));
+    لكل (; رقم_move_پشت > 0; --رقم_move_پشت)
+	جمع_کن_مقصد_درون_داد_buf(backkey, (صحيح)حجم(backkey));
 }
 
-static int xim_expected_char = NUL;
-static int xim_ignored_char = FALSE;
+ساكن صحيح xim_expected_char = NUL;
+ساكن صحيح xim_ignored_char = FALSE;
 
 /*
  * Update the mode and cursor while in an IM callback.
  */
-    static void
-im_show_info(void)
+    ساكن فراغ
+im_show_info(فراغ)
 {
-    int	    old_vgetc_busy;
+    صحيح	    old_vgetc_busy;
 
     old_vgetc_busy = vgetc_busy;
     vgetc_busy = TRUE;
     showmode();
     vgetc_busy = old_vgetc_busy;
-    if ((State & MODE_NORMAL) || (State & MODE_INSERT))
+    إذا ((State & نما_نرمال) || (State & نما_درج))
 	setcursor();
-    out_flush();
+    بیرون_flush();
 }
 
 /*
  * Callback invoked when the user finished preediting.
  * Put the final string into the input buffer.
  */
-    static void
-im_commit_cb(GtkIMContext *context UNUSED,
-	     const gchar *str,
-	     gpointer data UNUSED)
+    ساكن فراغ
+im_commit_cb(GtkIMContext *context استفادهنشده,
+	     ثابت gchar *str,
+	     gpointer داده استفادهنشده)
 {
-    int		slen = (int)STRLEN(str);
-    int		add_to_input = TRUE;
-    int		clen;
-    int		len = slen;
-    int		commit_with_preedit = TRUE;
+    صحيح		slen = (صحيح)STRLEN(str);
+    صحيح		جمع_کن_مقصد_درون_داد = TRUE;
+    صحيح		clen;
+    صحيح		len = slen;
+    صحيح		commit_with_preedit = TRUE;
     char_u	*im_str;
 
 #  ifdef XIM_DEBUG
     xim_log("im_commit_cb(): %s\n", str);
 #  endif
 
-    if (p_imst == IM_ON_THE_SPOT)
+    إذا (p_imst == IM_ON_THE_SPOT)
     {
 	// The imhangul module doesn't reset the preedit string before
 	// committing.  Call im_delete_preedit() to work around that.
 	im_delete_preedit();
 
 	// Indicate that preediting has finished.
-	if (preedit_start_col == MAXCOL)
+	إذا (preedit_شروع_ستون == MAXCOL)
 	{
-	    init_preedit_start_col();
+	    init_preedit_شروع_ستون();
 	    commit_with_preedit = FALSE;
 	}
 
@@ -768,72 +768,72 @@ im_commit_cb(GtkIMContext *context UNUSED,
 	// flushed to screen, then it can't get correct "preedit_start_col".
 	// Thus, it should calculate the cells by adding cells of the committed
 	// string.
-	if (input_conv.vc_type != CONV_NONE)
+	إذا (درون_داد_conv.vc_type != CONV_NONE)
 	{
-	    im_str = string_convert(&input_conv, (char_u *)str, &len);
-	    g_return_if_fail(im_str != NULL);
+	    im_str = string_convert(&درون_داد_conv, (char_u *)str, &len);
+	    g_return_if_fail(im_str != عدم);
 	}
-	else
+	وإلا
 	    im_str = (char_u *)str;
 
 	clen = mb_string2cells(im_str, len);
 
-	if (input_conv.vc_type != CONV_NONE)
+	إذا (درون_داد_conv.vc_type != CONV_NONE)
 	    vim_free(im_str);
-	preedit_start_col += clen;
+	preedit_شروع_ستون += clen;
     }
 
     // Is this a single character that matches a keypad key that's just
     // been pressed?  If so, we don't want it to be entered as such - let
     // us carry on processing the raw keycode so that it may be used in
     // mappings as <kSomething>.
-    if (xim_expected_char != NUL)
+    إذا (xim_expected_char != NUL)
     {
 	// We're currently processing a keypad or other special key
-	if (slen == 1 && str[0] == xim_expected_char)
+	إذا (slen == 1 && str[0] == xim_expected_char)
 	{
 	    // It's a match - don't do it here
 	    xim_ignored_char = TRUE;
-	    add_to_input = FALSE;
+	    جمع_کن_مقصد_درون_داد = FALSE;
 	}
-	else
+	وإلا
 	{
 	    // Not a match
 	    xim_ignored_char = FALSE;
 	}
     }
 
-    if (add_to_input)
-	im_add_to_input((char_u *)str, slen);
+    إذا (جمع_کن_مقصد_درون_داد)
+	im_جمع_کن_مقصد_درون_داد((char_u *)str, slen);
 
-    if (p_imst == IM_ON_THE_SPOT)
+    إذا (p_imst == IM_ON_THE_SPOT)
     {
 	// Inserting chars while "im_is_active" is set does not cause a
 	// change of buffer.  When the chars are committed the buffer must be
 	// marked as changed.
-	if (!commit_with_preedit)
-	    preedit_start_col = MAXCOL;
+	إذا (!commit_with_preedit)
+	    preedit_شروع_ستون = MAXCOL;
 
 	// This flag is used in changed() at next call.
-	xim_changed_while_preediting = TRUE;
+	xim_تغییریافته_while_preediting = TRUE;
     }
 
-    if (gtk_main_level() > 0)
+    إذا (gtk_main_level() > 0)
 	gtk_main_quit();
 }
 
 /*
  * Callback invoked after start to the preedit.
  */
-    static void
-im_preedit_start_cb(GtkIMContext *context UNUSED, gpointer data UNUSED)
+    ساكن فراغ
+im_preedit_شروع_cb(GtkIMContext *context استفادهنشده, gpointer داده استفادهنشده)
 {
 #  ifdef XIM_DEBUG
     xim_log("im_preedit_start_cb()\n");
 #  endif
 
-    im_is_active = TRUE;
-    preedit_is_active = TRUE;
+    im_is_فعال = TRUE;
+    preedit_is_فعال = TRUE;
     gui_update_cursor(TRUE, FALSE);
     im_show_info();
 }
@@ -841,8 +841,8 @@ im_preedit_start_cb(GtkIMContext *context UNUSED, gpointer data UNUSED)
 /*
  * Callback invoked after end to the preedit.
  */
-    static void
-im_preedit_end_cb(GtkIMContext *context UNUSED, gpointer data UNUSED)
+    ساكن فراغ
+im_preedit_انتها_cb(GtkIMContext *context استفادهنشده, gpointer داده استفادهنشده)
 {
 #  ifdef XIM_DEBUG
     xim_log("im_preedit_end_cb()\n");
@@ -850,17 +850,17 @@ im_preedit_end_cb(GtkIMContext *context UNUSED, gpointer data UNUSED)
     im_delete_preedit();
 
     // Indicate that preediting has finished
-    if (p_imst == IM_ON_THE_SPOT)
-	preedit_start_col = MAXCOL;
+    إذا (p_imst == IM_ON_THE_SPOT)
+	preedit_شروع_ستون = MAXCOL;
     xim_has_preediting = FALSE;
 
-#  if 0
+#  إذا 0
     // Removal of this line suggested by Takuhiro Nishioka.  Fixes that IM was
     // switched off unintentionally.  We now use preedit_is_active (added by
     // SungHyun Nam).
-    im_is_active = FALSE;
+    im_is_فعال = FALSE;
 #  endif
-    preedit_is_active = FALSE;
+    preedit_is_فعال = FALSE;
     gui_update_cursor(TRUE, FALSE);
     im_show_info();
 }
@@ -902,61 +902,61 @@ im_preedit_end_cb(GtkIMContext *context UNUSED, gpointer data UNUSED)
  * remaining input from within the "retrieve_surrounding" signal handler, this
  * might not be necessary.  Gotta ask on vim-dev for opinions.
  */
-    static void
-im_preedit_changed_cb(GtkIMContext *context, gpointer data UNUSED)
+    ساكن فراغ
+im_preedit_تغییریافته_cb(GtkIMContext *context, gpointer داده استفادهنشده)
 {
-    char    *preedit_string = NULL;
-    int	    cursor_index    = 0;
-    int	    num_move_back   = 0;
+    حرف    *preedit_string = عدم;
+    صحيح	    cursor_شاخص    = 0;
+    صحيح	    رقم_move_پشت   = 0;
     char_u  *str;
     char_u  *p;
-    int	    i;
+    صحيح	    i;
 
-    if (p_imst == IM_ON_THE_SPOT)
+    إذا (p_imst == IM_ON_THE_SPOT)
 	gtk_im_context_get_preedit_string(context,
-					  &preedit_string, NULL,
-					  &cursor_index);
-    else
+					  &preedit_string, عدم,
+					  &cursor_شاخص);
+    وإلا
 	gtk_im_context_get_preedit_string(context,
-					  &preedit_string, NULL,
-					  NULL);
+					  &preedit_string, عدم,
+					  عدم);
 
 #  ifdef XIM_DEBUG
     xim_log("im_preedit_changed_cb(): %s\n", preedit_string);
 #  endif
 
-    g_return_if_fail(preedit_string != NULL); // just in case
+    g_return_if_fail(preedit_string != عدم); // just in case
 
-    if (p_imst == IM_OVER_THE_SPOT)
+    إذا (p_imst == IM_OVER_THE_SPOT)
     {
-	if (preedit_string[0] == NUL)
+	إذا (preedit_string[0] == NUL)
 	{
 	    xim_has_preediting = FALSE;
 	    im_delete_preedit();
 	}
-	else
+	وإلا
 	{
 	    xim_has_preediting = TRUE;
 	    im_show_preedit();
 	}
     }
-    else
+    وإلا
     {
 	// If preedit_start_col is MAXCOL set it to the current cursor position.
-	if (preedit_start_col == MAXCOL && preedit_string[0] != '\0')
+	إذا (preedit_شروع_ستون == MAXCOL && preedit_string[0] != '\0')
 	{
 	    xim_has_preediting = TRUE;
 
 	    // Urgh, this breaks if the input buffer isn't empty now
-	    init_preedit_start_col();
+	    init_preedit_شروع_ستون();
 	}
-	else if (cursor_index == 0 && preedit_string[0] == '\0')
+	وإلا إذا (cursor_شاخص == 0 && preedit_string[0] == '\0')
 	{
 	    xim_has_preediting = FALSE;
 
 	    // If at the start position (after typing backspace)
 	    // preedit_start_col must be reset.
-	    preedit_start_col = MAXCOL;
+	    preedit_شروع_ستون = MAXCOL;
 	}
 
 	im_delete_preedit();
@@ -967,45 +967,45 @@ im_preedit_changed_cb(GtkIMContext *context, gpointer data UNUSED)
 	// returns the offset in bytes.  This is unfortunately not true -- real
 	// life shows the offset is in characters, and the GTK+ source code
 	// agrees with me.  Will file a bug later.
-	if (preedit_start_col != MAXCOL)
-	    preedit_end_col = preedit_start_col;
+	إذا (preedit_شروع_ستون != MAXCOL)
+	    preedit_انتها_ستون = preedit_شروع_ستون;
 	str = (char_u *)preedit_string;
-	for (p = str, i = 0; *p != NUL; p += utf_byte2len(*p), ++i)
+	لكل (p = str, i = 0; *p != NUL; p += utf_byte2len(*p), ++i)
 	{
-	    int is_composing;
+	    صحيح is_composing;
 
 	    is_composing = ((*p & 0x80) != 0
 					  && utf_iscomposing(utf_ptr2char(p)));
 	    // These offsets are used as counters when generating <BS> and
 	    // <Del> to delete the preedit string.  So don't count composing
 	    // characters unless 'delcombine' is enabled.
-	    if (!is_composing || p_deco)
+	    إذا (!is_composing || p_deco)
 	    {
-		if (i < cursor_index)
+		إذا (i < cursor_شاخص)
 		    ++im_preedit_cursor;
-		else
+		وإلا
 		    ++im_preedit_trailing;
 	    }
-	    if (!is_composing && i >= cursor_index)
+	    إذا (!is_composing && i >= cursor_شاخص)
 	    {
 		// This is essentially the same as im_preedit_trailing, except
 		// composing characters are not counted even if p_deco is set.
-		++num_move_back;
+		++رقم_move_پشت;
 	    }
-	    if (preedit_start_col != MAXCOL)
-		preedit_end_col += utf_ptr2cells(p);
+	    إذا (preedit_شروع_ستون != MAXCOL)
+		preedit_انتها_ستون += utf_ptr2cells(p);
 	}
 
-	if (p > str)
+	إذا (p > str)
 	{
-	    im_add_to_input(str, (int)(p - str));
-	    im_correct_cursor(num_move_back);
+	    im_جمع_کن_مقصد_درون_داد(str, (صحيح)(p - str));
+	    im_correct_cursor(رقم_move_پشت);
 	}
     }
 
     g_free(preedit_string);
 
-    if (gtk_main_level() > 0)
+    إذا (gtk_main_level() > 0)
 	gtk_main_quit();
 }
 
@@ -1015,117 +1015,117 @@ im_preedit_changed_cb(GtkIMContext *context, gpointer data UNUSED)
  * too much impact -- right now we handle even more attributes than necessary
  * for the IM modules I tested with.
  */
-    static int
-translate_pango_attributes(PangoAttrIterator *iter)
+    ساكن صحيح
+translate_pango_صفات(PangoAttrIterator *iter)
 {
     PangoAttribute  *attr;
-    int		    char_attr = HL_NORMAL;
+    صحيح		    char_attr = HL_نرمال;
 
     attr = pango_attr_iterator_get(iter, PANGO_ATTR_UNDERLINE);
-    if (attr != NULL && ((PangoAttrInt *)attr)->value
-						 != (int)PANGO_UNDERLINE_NONE)
+    إذا (attr != عدم && ((PangoAttrInt *)attr)->مقدار
+						 != (صحيح)PANGO_UNDERLINE_NONE)
 	char_attr |= HL_UNDERLINE;
 
-    attr = pango_attr_iterator_get(iter, PANGO_ATTR_WEIGHT);
-    if (attr != NULL && ((PangoAttrInt *)attr)->value >= (int)PANGO_WEIGHT_BOLD)
+    attr = pango_attr_iterator_get(iter, PANGO_ATTR_وزن);
+    إذا (attr != عدم && ((PangoAttrInt *)attr)->مقدار >= (صحيح)PANGO_وزن_BOLD)
 	char_attr |= HL_BOLD;
 
     attr = pango_attr_iterator_get(iter, PANGO_ATTR_STYLE);
-    if (attr != NULL && ((PangoAttrInt *)attr)->value
-						   != (int)PANGO_STYLE_NORMAL)
+    إذا (attr != عدم && ((PangoAttrInt *)attr)->مقدار
+						   != (صحيح)PANGO_STYLE_نرمال)
 	char_attr |= HL_ITALIC;
 
     attr = pango_attr_iterator_get(iter, PANGO_ATTR_BACKGROUND);
-    if (attr != NULL)
+    إذا (attr != عدم)
     {
-	const PangoColor *color = &((PangoAttrColor *)attr)->color;
+	ثابت PangoColor *color = &((PangoAttrColor *)attr)->color;
 
 	// Assume inverse if black background is requested
-	if ((color->red | color->green | color->blue) == 0)
+	إذا ((color->red | color->green | color->blue) == 0)
 	    char_attr |= HL_INVERSE;
     }
 
-    return char_attr;
+    أرجع char_attr;
 }
 
 /*
  * Retrieve the highlighting attributes at column col in the preedit string.
  * Return -1 if not in preediting mode or if col is out of range.
  */
-    int
-im_get_feedback_attr(int col)
+    صحيح
+im_get_feedback_attr(صحيح ستون)
 {
-    char	    *preedit_string = NULL;
-    PangoAttrList   *attr_list	    = NULL;
-    int		    char_attr	    = -1;
+    حرف	    *preedit_string = عدم;
+    PangoAttrList   *attr_list	    = عدم;
+    صحيح		    char_attr	    = -1;
 
-    if (xic == NULL)
-	return char_attr;
+    إذا (xic == عدم)
+	أرجع char_attr;
 
-    gtk_im_context_get_preedit_string(xic, &preedit_string, &attr_list, NULL);
+    gtk_im_context_get_preedit_string(xic, &preedit_string, &attr_list, عدم);
 
-    if (preedit_string != NULL && attr_list != NULL)
+    إذا (preedit_string != عدم && attr_list != عدم)
     {
-	int idx;
+	صحيح idx;
 
 	// Get the byte index as used by PangoAttrIterator
-	for (idx = 0; col > 0 && preedit_string[idx] != '\0'; --col)
+	لكل (idx = 0; ستون > 0 && preedit_string[idx] != '\0'; --ستون)
 	    idx += utfc_ptr2len((char_u *)preedit_string + idx);
 
-	if (preedit_string[idx] != '\0')
+	إذا (preedit_string[idx] != '\0')
 	{
 	    PangoAttrIterator	*iter;
-	    int			start, end;
+	    صحيح			شروع, انتها;
 
-	    char_attr = HL_NORMAL;
+	    char_attr = HL_نرمال;
 	    iter = pango_attr_list_get_iterator(attr_list);
 
 	    // Extract all relevant attributes from the list.
-	    do
+	    افعل
 	    {
-		pango_attr_iterator_range(iter, &start, &end);
+		pango_attr_iterator_range(iter, &شروع, &انتها);
 
-		if (idx >= start && idx < end)
-		    char_attr |= translate_pango_attributes(iter);
+		إذا (idx >= شروع && idx < انتها)
+		    char_attr |= translate_pango_صفات(iter);
 	    }
-	    while (pango_attr_iterator_next(iter));
+	    طالما (pango_attr_iterator_بعدی(iter));
 
 	    pango_attr_iterator_destroy(iter);
 	}
     }
 
-    if (attr_list != NULL)
+    إذا (attr_list != عدم)
 	pango_attr_list_unref(attr_list);
     g_free(preedit_string);
 
-    return char_attr;
+    أرجع char_attr;
 }
 
-    void
-xim_init(void)
+    فراغ
+xim_init(فراغ)
 {
 #  ifdef XIM_DEBUG
     xim_log("xim_init()\n");
 #  endif
 
-    g_return_if_fail(gui.drawarea != NULL);
+    g_return_if_fail(gui.drawarea != عدم);
 #  ifndef USE_GTK4
-    g_return_if_fail(gtk_widget_get_window(gui.drawarea) != NULL);
+    g_return_if_fail(gtk_widget_get_پنجره(gui.drawarea) != عدم);
 #  endif
 
     xic = gtk_im_multicontext_new();
 
     im_commit_handler_id = g_signal_connect(G_OBJECT(xic), "commit",
-					    G_CALLBACK(&im_commit_cb), NULL);
+					    G_CALLBACK(&im_commit_cb), عدم);
     g_signal_connect(G_OBJECT(xic), "preedit_changed",
-		     G_CALLBACK(&im_preedit_changed_cb), NULL);
+		     G_CALLBACK(&im_preedit_تغییریافته_cb), عدم);
     g_signal_connect(G_OBJECT(xic), "preedit_start",
-		     G_CALLBACK(&im_preedit_start_cb), NULL);
+		     G_CALLBACK(&im_preedit_شروع_cb), عدم);
     g_signal_connect(G_OBJECT(xic), "preedit_end",
-		     G_CALLBACK(&im_preedit_end_cb), NULL);
+		     G_CALLBACK(&im_preedit_انتها_cb), عدم);
 
 #  ifdef USE_GTK4
-    gtk_im_context_set_client_widget(xic, gui.drawarea);
+    gtk_im_context_مجموعه_client_widget(xic, gui.drawarea);
 
     // Seed the cursor location immediately.  GTK4's Wayland IM module
     // batches text-input-v3 state and sends it on the next commit cycle
@@ -1134,48 +1134,48 @@ xim_init(void)
     // cursor rectangle, and the IM's candidate window for the very first
     // composition would appear at the top-left of the surface instead of
     // next to the cursor.
-    im_set_position(gui.row, gui.col);
-#  else
-    gtk_im_context_set_client_window(xic, gtk_widget_get_window(gui.drawarea));
+    im_مجموعه_position(gui.ردیف, gui.ستون);
+#  وإلا
+    gtk_im_context_مجموعه_client_پنجره(xic, gtk_widget_get_پنجره(gui.drawarea));
 #  endif
 }
 
-    void
-im_shutdown(void)
+    فراغ
+im_shutdown(فراغ)
 {
 #  ifdef XIM_DEBUG
     xim_log("im_shutdown()\n");
 #  endif
 
-    if (xic != NULL)
+    إذا (xic != عدم)
     {
-	gtk_im_context_focus_out(xic);
+	gtk_im_context_focus_بیرون(xic);
 	g_object_unref(xic);
-	xic = NULL;
+	xic = عدم;
     }
 #  ifdef USE_GTK4
     // GTK4: a widget added via gtk_widget_set_parent() must be detached
     // with gtk_widget_unparent() before its parent is finalized, otherwise
     // GTK prints "Finalizing ..., but it still has children left".
-    if (preedit_window != NULL)
+    إذا (preedit_پنجره != عدم)
     {
-	gtk_widget_unparent(preedit_window);
-	preedit_window = NULL;
-	preedit_label = NULL;
+	gtk_widget_unparent(preedit_پنجره);
+	preedit_پنجره = عدم;
+	preedit_label = عدم;
     }
-    if (preedit_css_provider != NULL)
+    إذا (preedit_css_provider != عدم)
     {
 	gtk_style_context_remove_provider_for_display(gdk_display_get_default(),
 				GTK_STYLE_PROVIDER(preedit_css_provider));
 	g_object_unref(preedit_css_provider);
-	preedit_css_provider = NULL;
+	preedit_css_provider = عدم;
 	preedit_css_cached_bg = INVALCOLOR;
     }
 #  endif
-    im_is_active = FALSE;
+    im_is_فعال = FALSE;
     im_commit_handler_id = 0;
-    if (p_imst == IM_ON_THE_SPOT)
-	preedit_start_col = MAXCOL;
+    إذا (p_imst == IM_ON_THE_SPOT)
+	preedit_شروع_ستون = MAXCOL;
     xim_has_preediting = FALSE;
 }
 
@@ -1186,44 +1186,44 @@ im_shutdown(void)
  *
  * See 'imactivatekey' for documentation of the format.
  */
-    static int
-im_string_to_keyval(const char *str, unsigned int *keyval, unsigned int *state)
+    ساكن صحيح
+im_string_مقصد_keyval(ثابت حرف *str, بیعلامت صحيح *keyval, بیعلامت صحيح *state)
 {
-    const char	    *mods_end;
-    unsigned	    tmp_keyval;
-    unsigned	    tmp_state = 0;
+    ثابت حرف	    *mods_انتها;
+    بیعلامت	    tmp_keyval;
+    بیعلامت	    tmp_state = 0;
 
-    mods_end = strrchr(str, '-');
-    mods_end = (mods_end != NULL) ? mods_end + 1 : str;
+    mods_انتها = strrchr(str, '-');
+    mods_انتها = (mods_انتها != عدم) ? mods_انتها + 1 : str;
 
     // Parse modifier keys
-    while (str < mods_end)
-	switch (*str++)
+    طالما (str < mods_انتها)
+	بدل (*str++)
 	{
-	    case '-':							break;
-	    case 'S': case 's': tmp_state |= (unsigned)GDK_SHIFT_MASK;	break;
-	    case 'L': case 'l': tmp_state |= (unsigned)GDK_LOCK_MASK;	break;
-	    case 'C': case 'c': tmp_state |= (unsigned)GDK_CONTROL_MASK;break;
-	    case '1':		tmp_state |= (unsigned)GDK_MOD1_MASK;	break;
-	    case '2':		tmp_state |= (unsigned)GDK_MOD2_MASK;	break;
-	    case '3':		tmp_state |= (unsigned)GDK_MOD3_MASK;	break;
-	    case '4':		tmp_state |= (unsigned)GDK_MOD4_MASK;	break;
-	    case '5':		tmp_state |= (unsigned)GDK_MOD5_MASK;	break;
-	    default:
-		return FALSE;
+	    حالة '-':							اكسر;
+	    حالة 'S': حالة 's': tmp_state |= (بیعلامت)GDK_لغزش_ماسک;	اكسر;
+	    حالة 'L': حالة 'l': tmp_state |= (بیعلامت)GDK_قفل_ماسک;	اكسر;
+	    حالة 'C': حالة 'c': tmp_state |= (بیعلامت)GDK_CONTROL_ماسک;اكسر;
+	    حالة '1':		tmp_state |= (بیعلامت)GDK_MOD1_ماسک;	اكسر;
+	    حالة '2':		tmp_state |= (بیعلامت)GDK_MOD2_ماسک;	اكسر;
+	    حالة '3':		tmp_state |= (بیعلامت)GDK_MOD3_ماسک;	اكسر;
+	    حالة '4':		tmp_state |= (بیعلامت)GDK_MOD4_ماسک;	اكسر;
+	    حالة '5':		tmp_state |= (بیعلامت)GDK_MOD5_ماسک;	اكسر;
+	    افتراضي:
+		أرجع FALSE;
 	}
 
     tmp_keyval = gdk_keyval_from_name(str);
 
-    if (tmp_keyval == 0 || tmp_keyval == GDK_VoidSymbol)
-	return FALSE;
+    إذا (tmp_keyval == 0 || tmp_keyval == GDK_Void_نماد)
+	أرجع FALSE;
 
-    if (keyval != NULL)
+    إذا (keyval != عدم)
 	*keyval = tmp_keyval;
-    if (state != NULL)
+    إذا (state != عدم)
 	*state = tmp_state;
 
-    return TRUE;
+    أرجع TRUE;
 }
 
 /*
@@ -1235,45 +1235,45 @@ im_string_to_keyval(const char *str, unsigned int *keyval, unsigned int *state)
  * 'imak' changes.  This is currently the case but not obvious -- should
  * probably rename the function for clarity.
  */
-    int
-im_xim_isvalid_imactivate(void)
+    صحيح
+im_xim_isvalid_imactivate(فراغ)
 {
-    if (p_imak[0] == NUL)
+    إذا (p_imak[0] == NUL)
     {
-	im_activatekey_keyval = GDK_VoidSymbol;
+	im_activatekey_keyval = GDK_Void_نماد;
 	im_activatekey_state  = 0;
-	return TRUE;
+	أرجع TRUE;
     }
 
-    return im_string_to_keyval((const char *)p_imak,
+    أرجع im_string_مقصد_keyval((ثابت حرف *)p_imak,
 			       &im_activatekey_keyval,
 			       &im_activatekey_state);
 }
 #  endif // !USE_GTK4
 
 #  ifndef USE_GTK4
-    static void
-im_synthesize_keypress(unsigned int keyval, unsigned int state)
+    ساكن فراغ
+im_synthesize_keypress(بیعلامت صحيح keyval, بیعلامت صحيح state)
 {
-    GdkEventKey *event;
+    Gdk_Event_کلید *event;
 
-    event = (GdkEventKey *)gdk_event_new(GDK_KEY_PRESS);
-    g_object_ref(gtk_widget_get_window(gui.drawarea));
+    event = (Gdk_Event_کلید *)gdk_event_new(GDK_کلید_PRESS);
+    g_object_ref(gtk_widget_get_پنجره(gui.drawarea));
 					// unreffed by gdk_event_free()
-    event->window = gtk_widget_get_window(gui.drawarea);
+    event->پنجره_2 = gtk_widget_get_پنجره(gui.drawarea);
     event->send_event = TRUE;
-    event->time = GDK_CURRENT_TIME;
+    event->زمان = GDK_CURRENT_زمان;
     event->state  = state;
     event->keyval = keyval;
     event->hardware_keycode = // needed for XIM
-	XKeysymToKeycode(GDK_WINDOW_XDISPLAY(event->window), (KeySym)keyval);
-    event->length = 0;
-    event->string = NULL;
+	XKeysym_مقصد_Keycode(GDK_پنجره_XDISPLAY(event->پنجره_2), (کلید_Sym)keyval);
+    event->درازی = 0;
+    event->string = عدم;
 
     gtk_im_context_filter_keypress(xic, event);
 
     // For consistency, also send the corresponding release event.
-    event->type = GDK_KEY_RELEASE;
+    event->type = GDK_کلید_RELEASE;
     event->send_event = FALSE;
     gtk_im_context_filter_keypress(xic, event);
 
@@ -1281,62 +1281,62 @@ im_synthesize_keypress(unsigned int keyval, unsigned int state)
 }
 #  endif // !USE_GTK4
 
-    void
-xim_reset(void)
+    فراغ
+xim_reset(فراغ)
 {
 #  ifdef FEAT_EVAL
-    if (USE_IMACTIVATEFUNC)
-	call_imactivatefunc(im_is_active);
-    else
+    إذا (USE_IMACTIVATEFUNC)
+	call_imactivatefunc(im_is_فعال);
+    وإلا
 #  endif
-    if (xic != NULL)
+    إذا (xic != عدم)
     {
 	gtk_im_context_reset(xic);
 
-	if (p_imdisable)
+	إذا (p_imdisable)
 	    im_shutdown();
-	else
+	وإلا
 	{
-	    xim_set_focus(gui.in_focus);
+	    xim_مجموعه_focus(gui.درون_focus);
 
 #  ifdef USE_GTK4
 	    im_shutdown();
 	    xim_init();
-	    xim_set_focus(gui.in_focus);
-#  else
-	    if (im_activatekey_keyval != GDK_VoidSymbol)
+	    xim_مجموعه_focus(gui.درون_focus);
+#  وإلا
+	    إذا (im_activatekey_keyval != GDK_Void_نماد)
 	    {
-		if (im_is_active)
+		إذا (im_is_فعال)
 		{
-		    g_signal_handler_block(xic, im_commit_handler_id);
+		    g_signal_handler_بلوک(xic, im_commit_handler_id);
 		    im_synthesize_keypress(im_activatekey_keyval,
 						    im_activatekey_state);
 		    g_signal_handler_unblock(xic, im_commit_handler_id);
 		}
 	    }
-	    else
+	    وإلا
 	    {
 		im_shutdown();
 		xim_init();
-		xim_set_focus(gui.in_focus);
+		xim_مجموعه_focus(gui.درون_focus);
 	    }
 #  endif
 	}
     }
 
-    if (p_imst == IM_ON_THE_SPOT)
-	preedit_start_col = MAXCOL;
+    إذا (p_imst == IM_ON_THE_SPOT)
+	preedit_شروع_ستون = MAXCOL;
     xim_has_preediting = FALSE;
 }
 
 #  ifndef USE_GTK4
-    int
-xim_queue_key_press_event(GdkEventKey *event, int down)
+    صحيح
+xim_صف_کلید_press_event(Gdk_Event_کلید *event, صحيح پایین)
 {
 #   ifdef FEAT_GUI_GTK
-    if (event->state & GDK_SUPER_MASK) return FALSE;
+    إذا (event->state & GDK_SUPER_ماسک) أرجع FALSE;
 #   endif
-    if (down)
+    إذا (پایین)
     {
 	// Workaround GTK2 XIM 'feature' that always converts keypad keys to
 	// chars., even when not part of an IM sequence (ref. feature of
@@ -1347,26 +1347,26 @@ xim_queue_key_press_event(GdkEventKey *event, int down)
 	// that commit and go ahead & process it ourselves.  That way we can
 	// still distinguish keypad keys for use in mappings.
 	// Also add GDK_space to make <S-Space> work.
-	switch (event->keyval)
+	بدل (event->keyval)
 	{
-	    case GDK_KP_Add:      xim_expected_char = '+';  break;
-	    case GDK_KP_Subtract: xim_expected_char = '-';  break;
-	    case GDK_KP_Divide:   xim_expected_char = '/';  break;
-	    case GDK_KP_Multiply: xim_expected_char = '*';  break;
-	    case GDK_KP_Decimal:  xim_expected_char = '.';  break;
-	    case GDK_KP_Equal:    xim_expected_char = '=';  break;
-	    case GDK_KP_0:	  xim_expected_char = '0';  break;
-	    case GDK_KP_1:	  xim_expected_char = '1';  break;
-	    case GDK_KP_2:	  xim_expected_char = '2';  break;
-	    case GDK_KP_3:	  xim_expected_char = '3';  break;
-	    case GDK_KP_4:	  xim_expected_char = '4';  break;
-	    case GDK_KP_5:	  xim_expected_char = '5';  break;
-	    case GDK_KP_6:	  xim_expected_char = '6';  break;
-	    case GDK_KP_7:	  xim_expected_char = '7';  break;
-	    case GDK_KP_8:	  xim_expected_char = '8';  break;
-	    case GDK_KP_9:	  xim_expected_char = '9';  break;
-	    case GDK_space:	  xim_expected_char = ' ';  break;
-	    default:		  xim_expected_char = NUL;
+	    حالة GDK_KP_جمع_کن:      xim_expected_char = '+';  اكسر;
+	    حالة GDK_KP_تفریق: xim_expected_char = '-';  اكسر;
+	    حالة GDK_KP_Divide:   xim_expected_char = '/';  اكسر;
+	    حالة GDK_KP_Multiply: xim_expected_char = '*';  اكسر;
+	    حالة GDK_KP_Decimal:  xim_expected_char = '.';  اكسر;
+	    حالة GDK_KP_Equal:    xim_expected_char = '=';  اكسر;
+	    حالة GDK_KP_0:	  xim_expected_char = '0';  اكسر;
+	    حالة GDK_KP_1:	  xim_expected_char = '1';  اكسر;
+	    حالة GDK_KP_2:	  xim_expected_char = '2';  اكسر;
+	    حالة GDK_KP_3:	  xim_expected_char = '3';  اكسر;
+	    حالة GDK_KP_4:	  xim_expected_char = '4';  اكسر;
+	    حالة GDK_KP_5:	  xim_expected_char = '5';  اكسر;
+	    حالة GDK_KP_6:	  xim_expected_char = '6';  اكسر;
+	    حالة GDK_KP_7:	  xim_expected_char = '7';  اكسر;
+	    حالة GDK_KP_8:	  xim_expected_char = '8';  اكسر;
+	    حالة GDK_KP_9:	  xim_expected_char = '9';  اكسر;
+	    حالة GDK_space:	  xim_expected_char = ' ';  اكسر;
+	    افتراضي:		  xim_expected_char = NUL;
 	}
 	xim_ignored_char = FALSE;
     }
@@ -1374,62 +1374,62 @@ xim_queue_key_press_event(GdkEventKey *event, int down)
     // When typing fFtT, XIM may be activated. Thus it must pass
     // gtk_im_context_filter_keypress() in Normal mode.
     // And while doing :sh too.
-    if (xic != NULL && !p_imdisable
-		    && (State & (MODE_INSERT | MODE_CMDLINE
-					      | MODE_NORMAL | MODE_EXTERNCMD)))
+    إذا (xic != عدم && !p_imdisable
+		    && (State & (نما_درج | نما_CMDLINE
+					      | نما_نرمال | نما_EXTERNCMD)))
     {
 	// Filter 'imactivatekey' and map it to CTRL-^.  This way, Vim is
 	// always aware of the current status of IM, and can even emulate
 	// the activation key for modules that don't support one.
-	if (event->keyval == im_activatekey_keyval
+	إذا (event->keyval == im_activatekey_keyval
 	     && (event->state & im_activatekey_state) == im_activatekey_state)
 	{
-	    unsigned int state_mask;
+	    بیعلامت صحيح state_ماسک;
 
 	    // Require the state of the 3 most used modifiers to match exactly.
 	    // Otherwise e.g. <S-C-space> would be unusable for other purposes
 	    // if the IM activate key is <S-space>.
-	    state_mask  = im_activatekey_state;
-	    state_mask |= ((int)GDK_SHIFT_MASK | (int)GDK_CONTROL_MASK
-							| (int)GDK_MOD1_MASK);
+	    state_ماسک  = im_activatekey_state;
+	    state_ماسک |= ((صحيح)GDK_لغزش_ماسک | (صحيح)GDK_CONTROL_ماسک
+							| (صحيح)GDK_MOD1_ماسک);
 
-	    if ((event->state & state_mask) != im_activatekey_state)
-		return FALSE;
+	    إذا ((event->state & state_ماسک) != im_activatekey_state)
+		أرجع FALSE;
 
 	    // Don't send it a second time on GDK_KEY_RELEASE.
-	    if (event->type != GDK_KEY_PRESS)
-		return TRUE;
+	    إذا (event->type != GDK_کلید_PRESS)
+		أرجع TRUE;
 
-	    if (map_to_exists_mode((char_u *)"", MODE_LANGMAP, FALSE))
+	    إذا (map_مقصد_exists_نما((char_u *)"", نما_LANGMAP, FALSE))
 	    {
-		im_set_active(FALSE);
+		im_مجموعه_فعال(FALSE);
 
 		// ":lmap" mappings exists, toggle use of mappings.
-		State ^= MODE_LANGMAP;
-		if (State & MODE_LANGMAP)
+		State ^= نما_LANGMAP;
+		إذا (State & نما_LANGMAP)
 		{
 		    curbuf->b_p_iminsert = B_IMODE_NONE;
-		    State &= ~MODE_LANGMAP;
+		    State &= ~نما_LANGMAP;
 		}
-		else
+		وإلا
 		{
 		    curbuf->b_p_iminsert = B_IMODE_LMAP;
-		    State |= MODE_LANGMAP;
+		    State |= نما_LANGMAP;
 		}
-		return TRUE;
+		أرجع TRUE;
 	    }
 
-	    return gtk_im_context_filter_keypress(xic, event);
+	    أرجع gtk_im_context_filter_keypress(xic, event);
 	}
 
 	// Don't filter events through the IM context if IM isn't active
 	// right now.  Unlike with GTK+ 1.2 we cannot rely on the IM module
 	// not doing anything before the activation key was sent.
-	if (im_activatekey_keyval == GDK_VoidSymbol || im_is_active)
+	إذا (im_activatekey_keyval == GDK_Void_نماد || im_is_فعال)
 	{
-	    int imresult = gtk_im_context_filter_keypress(xic, event);
+	    صحيح imresult = gtk_im_context_filter_keypress(xic, event);
 
-	    if (p_imst == IM_ON_THE_SPOT)
+	    إذا (p_imst == IM_ON_THE_SPOT)
 	    {
 		// Some XIM send following sequence:
 		// 1. preedited string.
@@ -1439,142 +1439,142 @@ xim_queue_key_press_event(GdkEventKey *event, int down)
 		// 5. remove preedited string.
 		// if 3, Vim can't move back the above line for 5.
 		// thus, this part should not parse the key.
-		if (!imresult && preedit_start_col != MAXCOL
+		إذا (!imresult && preedit_شروع_ستون != MAXCOL
 					    && event->keyval == GDK_Return)
 		{
 		    im_synthesize_keypress(GDK_Return, 0U);
-		    return FALSE;
+		    أرجع FALSE;
 		}
 	    }
 
 	    // If XIM tried to commit a keypad key as a single char.,
 	    // ignore it so we can use the keypad key 'raw', for mappings.
-	    if (xim_expected_char != NUL && xim_ignored_char)
+	    إذا (xim_expected_char != NUL && xim_ignored_char)
 		// We had a keypad key, and XIM tried to thieve it
-		return FALSE;
+		أرجع FALSE;
 
 	    // This is supposed to fix a problem with iBus, that space
 	    // characters don't work in input mode.
 	    xim_expected_char = NUL;
 
 	    // Normal processing
-	    return imresult;
+	    أرجع imresult;
 	}
     }
 
-    return FALSE;
+    أرجع FALSE;
 }
-#  else // USE_GTK4
+#  وإلا // USE_GTK4
 // GTK4: imactivatekey is not supported because GTK4's GtkIMContext
 // does not allow synthesizing key events for IM activation.
-    int
-im_xim_isvalid_imactivate(void)
+    صحيح
+im_xim_isvalid_imactivate(فراغ)
 {
     // Empty string is always valid (means no activation key).
     // Any other value is not supported in GTK4.
-    return p_imak[0] == NUL;
+    أرجع p_imak[0] == NUL;
 }
 
-    int
-xim_queue_key_press_event(GdkEvent *event UNUSED, int down UNUSED)
+    صحيح
+xim_صف_کلید_press_event(GdkEvent *event استفادهنشده, صحيح پایین استفادهنشده)
 {
-    return FALSE;
+    أرجع FALSE;
 }
 #  endif // !USE_GTK4
 
-    int
-im_get_status(void)
+    صحيح
+im_get_وضعیت(فراغ)
 {
 #  ifdef FEAT_EVAL
-    if (USE_IMSTATUSFUNC)
-	return call_imstatusfunc();
+    إذا (USE_IMSTATUSFUNC)
+	أرجع call_imstatusfunc();
 #  endif
-    return im_is_active;
+    أرجع im_is_فعال;
 }
 
-    int
-preedit_get_status(void)
+    صحيح
+preedit_get_وضعیت(فراغ)
 {
-    return preedit_is_active;
+    أرجع preedit_is_فعال;
 }
 
-    int
-im_is_preediting(void)
+    صحيح
+im_is_preediting(فراغ)
 {
-    return xim_has_preediting;
+    أرجع xim_has_preediting;
 }
 
-# else // !FEAT_GUI_GTK
+# وإلا // !FEAT_GUI_GTK
 
-static int	xim_is_active = FALSE;  // XIM should be active in the current
-					// mode
-static int	xim_has_focus = FALSE;	// XIM is really being used for Vim
+ساكن صحيح	xim_is_فعال = FALSE;  // XIM should be active in the current
+					//نما
+ساكن صحيح	xim_has_focus = FALSE;	// XIM is really being used for Vim
 #  ifdef FEAT_GUI_X11
-static XIMStyle	input_style;
-static int	status_area_enabled = TRUE;
+ساكن XIMStyle	درون_داد_style;
+ساكن صحيح	وضعیت_area_enabled = TRUE;
 #  endif
 
 /*
  * Switch using XIM on/off.  This is used by the code that changes "State".
  * When 'imactivatefunc' is defined use that function instead.
  */
-    void
-im_set_active(int active_arg)
+    فراغ
+im_مجموعه_فعال(صحيح فعال_arg)
 {
-    int active = active_arg;
+    صحيح فعال = فعال_arg;
 
     // If 'imdisable' is set, XIM is never active.
-    if (p_imdisable)
-	active = FALSE;
-    else if (input_style & XIMPreeditPosition)
+    إذا (p_imdisable)
+	فعال = FALSE;
+    وإلا إذا (درون_داد_style & XIMPreeditPosition)
 	// There is a problem in switching XIM off when preediting is used,
 	// and it is not clear how this can be solved.  For now, keep XIM on
 	// all the time, like it was done in Vim 5.8.
-	active = TRUE;
+	فعال = TRUE;
 
-#  if defined(FEAT_EVAL)
-    if (USE_IMACTIVATEFUNC)
+#  إذا defined(FEAT_EVAL)
+    إذا (USE_IMACTIVATEFUNC)
     {
-	if (active != im_get_status())
+	إذا (فعال != im_get_وضعیت())
 	{
-	    call_imactivatefunc(active);
-	    xim_has_focus = active;
+	    call_imactivatefunc(فعال);
+	    xim_has_focus = فعال;
 	}
-	return;
+	أرجع;
     }
 #  endif
 
-    if (xic == NULL)
-	return;
+    إذا (xic == عدم)
+	أرجع;
 
     // Remember the active state, it is needed when Vim gets keyboard focus.
-    xim_is_active = active;
-    xim_set_preedit();
+    xim_is_فعال = فعال;
+    xim_مجموعه_preedit();
 }
 
 /*
  * Adjust using XIM for gaining or losing keyboard focus.  Also called when
  * "xim_is_active" changes.
  */
-    void
-xim_set_focus(int focus)
+    فراغ
+xim_مجموعه_focus(صحيح focus)
 {
-    if (xic == NULL)
-	return;
+    إذا (xic == عدم)
+	أرجع;
 
     // XIM only gets focus when the Vim window has keyboard focus and XIM has
     // been set active for the current mode.
-    if (focus && xim_is_active)
+    إذا (focus && xim_is_فعال)
     {
-	if (!xim_has_focus)
+	إذا (!xim_has_focus)
 	{
 	    xim_has_focus = TRUE;
 	    XSetICFocus(xic);
 	}
     }
-    else
+    وإلا
     {
-	if (xim_has_focus)
+	إذا (xim_has_focus)
 	{
 	    xim_has_focus = FALSE;
 	    XUnsetICFocus(xic);
@@ -1582,29 +1582,29 @@ xim_set_focus(int focus)
     }
 }
 
-    void
-im_set_position(int row UNUSED, int col UNUSED)
+    فراغ
+im_مجموعه_position(صحيح ردیف استفادهنشده, صحيح ستون استفادهنشده)
 {
-    xim_set_preedit();
+    xim_مجموعه_preedit();
 }
 
 /*
  * Set the XIM to the current cursor position.
  */
-    void
-xim_set_preedit(void)
+    فراغ
+xim_مجموعه_preedit(فراغ)
 {
     XVaNestedList attr_list;
     XRectangle spot_area;
     XPoint over_spot;
-    int line_space;
+    صحيح سطر_space;
 
-    if (xic == NULL)
-	return;
+    إذا (xic == عدم)
+	أرجع;
 
-    xim_set_focus(TRUE);
+    xim_مجموعه_focus(TRUE);
 
-    if (!xim_has_focus)
+    إذا (!xim_has_focus)
     {
 	// hide XIM cursor
 	over_spot.x = 0;
@@ -1612,194 +1612,194 @@ xim_set_preedit(void)
 	attr_list = (XVaNestedList) XVaCreateNestedList(0,
 							XNSpotLocation,
 							&over_spot,
-							NULL);
-	XSetICValues(xic, XNPreeditAttributes, attr_list, NULL);
+							عدم);
+	XSetICValues(xic, XNPreedit_صفات, attr_list, عدم);
 	XFree(attr_list);
-	return;
+	أرجع;
     }
 
-    if (input_style & XIMPreeditPosition)
+    إذا (درون_داد_style & XIMPreeditPosition)
     {
-	if (xim_fg_color == INVALCOLOR)
+	إذا (xim_fg_color == INVALCOLOR)
 	{
 	    xim_fg_color = gui.def_norm_pixel;
-	    xim_bg_color = gui.def_back_pixel;
+	    xim_bg_color = gui.def_پشت_pixel;
 	}
-	over_spot.x = TEXT_X(gui.col);
-	over_spot.y = TEXT_Y(gui.row);
+	over_spot.x = متن_X(gui.ستون);
+	over_spot.y = متن_Y(gui.ردیف);
 	spot_area.x = 0;
 	spot_area.y = 0;
-	spot_area.height = gui.char_height * Rows;
-	spot_area.width  = gui.char_width * Columns;
-	line_space = gui.char_height;
+	spot_area.ارتفاع = gui.char_ارتفاع * ردیفها;
+	spot_area.عرض  = gui.char_عرض * Columns;
+	سطر_space = gui.char_ارتفاع;
 	attr_list = (XVaNestedList) XVaCreateNestedList(0,
 					XNSpotLocation, &over_spot,
 					XNForeground, (Pixel) xim_fg_color,
 					XNBackground, (Pixel) xim_bg_color,
 					XNArea, &spot_area,
-					XNLineSpace, line_space,
-					NULL);
-	if (XSetICValues(xic, XNPreeditAttributes, attr_list, NULL))
-	    emsg(_(e_cannot_set_ic_values));
+					XNLineSpace, سطر_space,
+					عدم);
+	إذا (XSetICValues(xic, XNPreedit_صفات, attr_list, عدم))
+	    emsg(_(e_cannot_مجموعه_ic_مقادیر));
 	XFree(attr_list);
     }
 }
 
-#  if defined(FEAT_GUI_X11)
-#   if defined(XtSpecificationRelease) && XtSpecificationRelease >= 6 && !defined(SUN_SYSTEM)
+#  إذا defined(FEAT_GUI_X11)
+#   إذا defined(XtSpecificationRelease) && XtSpecificationRelease >= 6 && !defined(SUN_SYSTEM)
 #    define USE_X11R6_XIM
 #   endif
 
-static int xim_real_init(Window x11_window, Display *x11_display);
+ساكن صحيح xim_real_init(پنجره x11_پنجره, Display *x11_display);
 
 
 #   ifdef USE_X11R6_XIM
-    static void
+    ساكن فراغ
 xim_instantiate_cb(
     Display	*display,
-    XPointer	client_data UNUSED,
-    XPointer	call_data UNUSED)
+    XPointer	client_داده_2 استفادهنشده,
+    XPointer	call_داده استفادهنشده)
 {
-    Window	x11_window;
+    پنجره	x11_پنجره;
     Display	*x11_display;
 
 #    ifdef XIM_DEBUG
     xim_log("xim_instantiate_cb()\n");
 #    endif
 
-    gui_get_x11_windis(&x11_window, &x11_display);
-    if (display != x11_display)
-	return;
+    gui_get_x11_windis(&x11_پنجره, &x11_display);
+    إذا (display != x11_display)
+	أرجع;
 
-    xim_real_init(x11_window, x11_display);
-    gui_set_shellsize(FALSE, FALSE, RESIZE_BOTH);
-    if (xic != NULL)
-	XUnregisterIMInstantiateCallback(x11_display, NULL, NULL, NULL,
-					 xim_instantiate_cb, NULL);
+    xim_real_init(x11_پنجره, x11_display);
+    gui_مجموعه_shellsize(FALSE, FALSE, RESIZE_BOTH);
+    إذا (xic != عدم)
+	XUnregisterIMInstantiateCallback(x11_display, عدم, عدم, عدم,
+					 xim_instantiate_cb, عدم);
 }
 
-    static void
+    ساكن فراغ
 xim_destroy_cb(
-    XIM		im UNUSED,
-    XPointer	client_data UNUSED,
-    XPointer	call_data UNUSED)
+    XIM		im استفادهنشده,
+    XPointer	client_داده_2 استفادهنشده,
+    XPointer	call_داده استفادهنشده)
 {
-    Window	x11_window;
+    پنجره	x11_پنجره;
     Display	*x11_display;
 
 #    ifdef XIM_DEBUG
     xim_log("xim_destroy_cb()\n");
 #    endif
-    gui_get_x11_windis(&x11_window, &x11_display);
+    gui_get_x11_windis(&x11_پنجره, &x11_display);
 
-    xic = NULL;
-    status_area_enabled = FALSE;
+    xic = عدم;
+    وضعیت_area_enabled = FALSE;
 
-    gui_set_shellsize(FALSE, FALSE, RESIZE_BOTH);
+    gui_مجموعه_shellsize(FALSE, FALSE, RESIZE_BOTH);
 
-    XRegisterIMInstantiateCallback(x11_display, NULL, NULL, NULL,
-				   xim_instantiate_cb, NULL);
+    XRegisterIMInstantiateCallback(x11_display, عدم, عدم, عدم,
+				   xim_instantiate_cb, عدم);
 }
 #   endif
 
-    void
-xim_init(void)
+    فراغ
+xim_init(فراغ)
 {
-    Window	x11_window;
+    پنجره	x11_پنجره;
     Display	*x11_display;
 
 #   ifdef XIM_DEBUG
     xim_log("xim_init()\n");
 #   endif
 
-    gui_get_x11_windis(&x11_window, &x11_display);
+    gui_get_x11_windis(&x11_پنجره, &x11_display);
 
-    xic = NULL;
+    xic = عدم;
 
-    if (xim_real_init(x11_window, x11_display))
-	return;
+    إذا (xim_real_init(x11_پنجره, x11_display))
+	أرجع;
 
-    gui_set_shellsize(FALSE, FALSE, RESIZE_BOTH);
+    gui_مجموعه_shellsize(FALSE, FALSE, RESIZE_BOTH);
 
 #   ifdef USE_X11R6_XIM
-    XRegisterIMInstantiateCallback(x11_display, NULL, NULL, NULL,
-				   xim_instantiate_cb, NULL);
+    XRegisterIMInstantiateCallback(x11_display, عدم, عدم, عدم,
+				   xim_instantiate_cb, عدم);
 #   endif
 }
 
-    static int
-xim_real_init(Window x11_window, Display *x11_display)
+    ساكن صحيح
+xim_real_init(پنجره x11_پنجره, Display *x11_display)
 {
-    int		i;
-    char	*p,
+    صحيح		i;
+    حرف	*p,
 		*s,
 		*ns,
-		*end,
+		*انتها,
 		tmp[1024];
 #   define IMLEN_MAX 40
-    char	buf[IMLEN_MAX + 7];
-    XIM		xim = NULL;
+    حرف	buf[IMLEN_MAX + 7];
+    XIM		xim = عدم;
     XIMStyles	*xim_styles;
-    XIMStyle	this_input_style = 0;
-    Boolean	found;
+    XIMStyle	this_درون_داد_style = 0;
+    Boolean	یافت;
     XPoint	over_spot;
-    XVaNestedList preedit_list, status_list;
+    XVaNestedList preedit_list, وضعیت_list;
 
-    input_style = 0;
-    status_area_enabled = FALSE;
+    درون_داد_style = 0;
+    وضعیت_area_enabled = FALSE;
 
-    if (xic != NULL)
-	return FALSE;
+    إذا (xic != عدم)
+	أرجع FALSE;
 
-    if (gui.rsrc_input_method != NULL && *gui.rsrc_input_method != NUL)
+    إذا (gui.rsrc_درون_داد_روش != عدم && *gui.rsrc_درون_داد_روش != NUL)
     {
-	vim_strncpy((char_u *)tmp, (char_u *)gui.rsrc_input_method,
-	    sizeof(tmp) - 1);
-	for (ns = s = tmp; ns != NULL && *s != NUL;)
+	vim_strncpy((char_u *)tmp, (char_u *)gui.rsrc_درون_داد_روش,
+	    حجم(tmp) - 1);
+	لكل (ns = s = tmp; ns != عدم && *s != NUL;)
 	{
-	    s = (char *)skipwhite((char_u *)s);
-	    if (*s == NUL)
-		break;
-	    if ((ns = end = strchr(s, ',')) == NULL)
-		end = s + strlen(s);
-	    while (SAFE_isspace(end[-1]))
-		end--;
-	    *end = NUL;
+	    s = (حرف *)skipwhite((char_u *)s);
+	    إذا (*s == NUL)
+		اكسر;
+	    إذا ((ns = انتها = strchr(s, ',')) == عدم)
+		انتها = s + طول_رشته(s);
+	    طالما (امن_isspace(انتها[-1]))
+		انتها--;
+	    *انتها = NUL;
 
-	    if (strlen(s) <= IMLEN_MAX)
+	    إذا (طول_رشته(s) <= IMLEN_MAX)
 	    {
 		strcpy(buf, "@im=");
 		strcat(buf, s);
-		if ((p = XSetLocaleModifiers(buf)) != NULL && *p != NUL
-			&& (xim = XOpenIM(x11_display, NULL, NULL, NULL))
-								      != NULL)
-		    break;
+		إذا ((p = XSetLocaleModifiers(buf)) != عدم && *p != NUL
+			&& (xim = XOpenIM(x11_display, عدم, عدم, عدم))
+								      != عدم)
+		    اكسر;
 	    }
 
 	    s = ns + 1;
 	}
     }
 
-    if (xim == NULL && (p = XSetLocaleModifiers("")) != NULL && *p != NUL)
-	xim = XOpenIM(x11_display, NULL, NULL, NULL);
+    إذا (xim == عدم && (p = XSetLocaleModifiers("")) != عدم && *p != NUL)
+	xim = XOpenIM(x11_display, عدم, عدم, عدم);
 
     // This is supposed to be useful to obtain characters through
     // XmbLookupString() without really using a XIM.
-    if (xim == NULL && (p = XSetLocaleModifiers("@im=none")) != NULL
+    إذا (xim == عدم && (p = XSetLocaleModifiers("@im=none")) != عدم
 								 && *p != NUL)
-	xim = XOpenIM(x11_display, NULL, NULL, NULL);
+	xim = XOpenIM(x11_display, عدم, عدم, عدم);
 
-    if (xim == NULL)
+    إذا (xim == عدم)
     {
 	// Only give this message when verbose is set, because too many people
 	// got this message when they didn't want to use a XIM.
-	if (p_verbose > 0)
+	إذا (p_verbose > 0)
 	{
 	    verbose_enter();
-	    emsg(_(e_failed_to_open_input_method));
+	    emsg(_(e_failed_مقصد_open_درون_داد_روش));
 	    verbose_leave();
 	}
-	return FALSE;
+	أرجع FALSE;
     }
 
 #   ifdef USE_X11R6_XIM
@@ -1807,60 +1807,60 @@ xim_real_init(Window x11_window, Display *x11_display)
 	XIMCallback destroy_cb;
 
 	destroy_cb.callback = xim_destroy_cb;
-	destroy_cb.client_data = NULL;
-	if (XSetIMValues(xim, XNDestroyCallback, &destroy_cb, NULL))
-	    emsg(_(e_warning_could_not_set_destroy_callback_to_im));
+	destroy_cb.client_داده_2 = عدم;
+	إذا (XSetIMValues(xim, XNDestroyCallback, &destroy_cb, عدم))
+	    emsg(_(e_warning_could_not_مجموعه_destroy_callback_مقصد_im));
     }
 #   endif
 
-    if (XGetIMValues(xim, XNQueryInputStyle, &xim_styles, NULL) || !xim_styles)
+    إذا (XGetIMValues(xim, XNQuery_درون_داد_Style, &xim_styles, عدم) || !xim_styles)
     {
-	emsg(_(e_input_method_doesnt_support_any_style));
+	emsg(_(e_درون_داد_روش_doesnt_support_any_style));
 	XCloseIM(xim);
-	return FALSE;
+	أرجع FALSE;
     }
 
-    found = False;
+    یافت = False;
     vim_strncpy((char_u *)tmp, (char_u *)gui.rsrc_preedit_type_name,
-	    sizeof(tmp) - 1);
-    for (s = tmp; s && !found; )
+	    حجم(tmp) - 1);
+    لكل (s = tmp; s && !یافت; )
     {
-	while (*s && SAFE_isspace(*s))
+	طالما (*s && امن_isspace(*s))
 	    s++;
-	if (!*s)
-	    break;
-	if ((ns = end = strchr(s, ',')) != 0)
+	إذا (!*s)
+	    اكسر;
+	إذا ((ns = انتها = strchr(s, ',')) != 0)
 	    ns++;
-	else
-	    end = s + strlen(s);
-	while (SAFE_isspace(*end))
-	    end--;
-	*end = '\0';
+	وإلا
+	    انتها = s + طول_رشته(s);
+	طالما (امن_isspace(*انتها))
+	    انتها--;
+	*انتها = '\0';
 
-	if (!strcmp(s, "OverTheSpot"))
-	    this_input_style = (XIMPreeditPosition | XIMStatusArea);
-	else if (!strcmp(s, "OffTheSpot"))
-	    this_input_style = (XIMPreeditArea | XIMStatusArea);
-	else if (!strcmp(s, "Root"))
-	    this_input_style = (XIMPreeditNothing | XIMStatusNothing);
+	إذا (!strcmp(s, "OverTheSpot"))
+	    this_درون_داد_style = (XIMPreeditPosition | XIMStatusArea);
+	وإلا إذا (!strcmp(s, "OffTheSpot"))
+	    this_درون_داد_style = (XIMPreeditArea | XIMStatusArea);
+	وإلا إذا (!strcmp(s, "Root"))
+	    this_درون_داد_style = (XIMPreeditNothing | XIMStatusNothing);
 
-	for (i = 0; (unsigned short)i < xim_styles->count_styles; i++)
+	لكل (i = 0; (بیعلامت کوتاه)i < xim_styles->شمار_styles; i++)
 	{
-	    if (this_input_style == xim_styles->supported_styles[i])
+	    إذا (this_درون_داد_style == xim_styles->supported_styles[i])
 	    {
-		found = True;
-		break;
+		یافت = True;
+		اكسر;
 	    }
 	}
-	if (!found)
-	    for (i = 0; (unsigned short)i < xim_styles->count_styles; i++)
+	إذا (!یافت)
+	    لكل (i = 0; (بیعلامت کوتاه)i < xim_styles->شمار_styles; i++)
 	    {
-		if ((xim_styles->supported_styles[i] & this_input_style)
-			== (this_input_style & ~XIMStatusArea))
+		إذا ((xim_styles->supported_styles[i] & this_درون_داد_style)
+			== (this_درون_داد_style & ~XIMStatusArea))
 		{
-		    this_input_style &= ~XIMStatusArea;
-		    found = True;
-		    break;
+		    this_درون_داد_style &= ~XIMStatusArea;
+		    یافت = True;
+		    اكسر;
 		}
 	    }
 
@@ -1868,83 +1868,83 @@ xim_real_init(Window x11_window, Display *x11_display)
     }
     XFree(xim_styles);
 
-    if (!found)
+    إذا (!یافت)
     {
 	// Only give this message when verbose is set, because too many people
 	// got this message when they didn't want to use a XIM.
-	if (p_verbose > 0)
+	إذا (p_verbose > 0)
 	{
 	    verbose_enter();
-	    emsg(_(e_input_method_doesnt_support_my_preedit_type));
+	    emsg(_(e_درون_داد_روش_doesnt_support_my_preedit_type));
 	    verbose_leave();
 	}
 	XCloseIM(xim);
-	return FALSE;
+	أرجع FALSE;
     }
 
-    over_spot.x = TEXT_X(gui.col);
-    over_spot.y = TEXT_Y(gui.row);
-    input_style = this_input_style;
+    over_spot.x = متن_X(gui.ستون);
+    over_spot.y = متن_Y(gui.ردیف);
+    درون_داد_style = this_درون_داد_style;
 
     // A crash was reported when trying to pass gui.norm_font as XNFontSet,
     // thus that has been removed.  Hopefully the default works...
 #   ifdef FEAT_XFONTSET
-    if (gui.fontset != NOFONTSET)
+    إذا (gui.fontset != NOFONTSET)
     {
 	preedit_list = XVaCreateNestedList(0,
 				XNSpotLocation, &over_spot,
 				XNForeground, (Pixel)gui.def_norm_pixel,
-				XNBackground, (Pixel)gui.def_back_pixel,
-				XNFontSet, (XFontSet)gui.fontset,
-				NULL);
-	status_list = XVaCreateNestedList(0,
+				XNBackground, (Pixel)gui.def_پشت_pixel,
+				XNFont_مجموعه, (XFont_مجموعه)gui.fontset,
+				عدم);
+	وضعیت_list = XVaCreateNestedList(0,
 				XNForeground, (Pixel)gui.def_norm_pixel,
-				XNBackground, (Pixel)gui.def_back_pixel,
-				XNFontSet, (XFontSet)gui.fontset,
-				NULL);
+				XNBackground, (Pixel)gui.def_پشت_pixel,
+				XNFont_مجموعه, (XFont_مجموعه)gui.fontset,
+				عدم);
     }
-    else
+    وإلا
 #   endif
     {
 	preedit_list = XVaCreateNestedList(0,
 				XNSpotLocation, &over_spot,
 				XNForeground, (Pixel)gui.def_norm_pixel,
-				XNBackground, (Pixel)gui.def_back_pixel,
-				NULL);
-	status_list = XVaCreateNestedList(0,
+				XNBackground, (Pixel)gui.def_پشت_pixel,
+				عدم);
+	وضعیت_list = XVaCreateNestedList(0,
 				XNForeground, (Pixel)gui.def_norm_pixel,
-				XNBackground, (Pixel)gui.def_back_pixel,
-				NULL);
+				XNBackground, (Pixel)gui.def_پشت_pixel,
+				عدم);
     }
 
     xic = XCreateIC(xim,
-		    XNInputStyle, input_style,
-		    XNClientWindow, x11_window,
-		    XNFocusWindow, gui.wid,
-		    XNPreeditAttributes, preedit_list,
-		    XNStatusAttributes, status_list,
-		    NULL);
-    XFree(status_list);
+		    XNInputStyle, درون_داد_style,
+		    XNClient_پنجره, x11_پنجره,
+		    XNFocus_پنجره, gui.wid,
+		    XNPreedit_صفات, preedit_list,
+		    XNStatus_صفات, وضعیت_list,
+		    عدم);
+    XFree(وضعیت_list);
     XFree(preedit_list);
-    if (xic != NULL)
+    إذا (xic != عدم)
     {
-	if (input_style & XIMStatusArea)
+	إذا (درون_داد_style & XIMStatusArea)
 	{
-	    xim_set_status_area();
-	    status_area_enabled = TRUE;
+	    xim_مجموعه_وضعیت_area();
+	    وضعیت_area_enabled = TRUE;
 	}
-	else
-	    gui_set_shellsize(FALSE, FALSE, RESIZE_BOTH);
+	وإلا
+	    gui_مجموعه_shellsize(FALSE, FALSE, RESIZE_BOTH);
     }
-    else
+    وإلا
     {
-	if (!is_not_a_term())
-	    emsg(_(e_failed_to_create_input_context));
+	إذا (!is_not_a_جمله())
+	    emsg(_(e_failed_مقصد_create_درون_داد_context));
 	XCloseIM(xim);
-	return FALSE;
+	أرجع FALSE;
     }
 
-    return TRUE;
+    أرجع TRUE;
 }
 
 #  endif // FEAT_GUI_X11
@@ -1955,19 +1955,19 @@ xim_real_init(Window x11_window, Display *x11_display)
  * active, when not having focus XIM may still be active (e.g., when using a
  * tear-off menu item).
  */
-    int
-im_get_status(void)
+    صحيح
+im_get_وضعیت(فراغ)
 {
 #  ifdef FEAT_EVAL
-    if (USE_IMSTATUSFUNC)
-	return call_imstatusfunc();
+    إذا (USE_IMSTATUSFUNC)
+	أرجع call_imstatusfunc();
 #  endif
-    return xim_has_focus;
+    أرجع xim_has_focus;
 }
 
 # endif // !FEAT_GUI_GTK
 
-# if !defined(FEAT_GUI_GTK)
+# إذا !defined(FEAT_GUI_GTK)
 /*
  * Set up the status area.
  *
@@ -1976,155 +1976,155 @@ im_get_status(void)
  * text input.  Unfortunately this means the status area pollutes the text
  * window...
  */
-    void
-xim_set_status_area(void)
+    فراغ
+xim_مجموعه_وضعیت_area(فراغ)
 {
-    XVaNestedList preedit_list = 0, status_list = 0, list = 0;
-    XRectangle pre_area, status_area;
+    XVaNestedList preedit_list = 0, وضعیت_list = 0, list = 0;
+    XRectangle pre_area, وضعیت_area;
 
-    if (xic == NULL)
-	return;
+    إذا (xic == عدم)
+	أرجع;
 
-    if (input_style & XIMStatusArea)
+    إذا (درون_داد_style & XIMStatusArea)
     {
-	if (input_style & XIMPreeditArea)
+	إذا (درون_داد_style & XIMPreeditArea)
 	{
 	    XRectangle *needed_rect;
 
 	    // to get status_area width
-	    status_list = XVaCreateNestedList(0, XNAreaNeeded,
-					      &needed_rect, NULL);
-	    XGetICValues(xic, XNStatusAttributes, status_list, NULL);
-	    XFree(status_list);
+	    وضعیت_list = XVaCreateNestedList(0, XNAreaNeeded,
+					      &needed_rect, عدم);
+	    XGetICValues(xic, XNStatus_صفات, وضعیت_list, عدم);
+	    XFree(وضعیت_list);
 
-	    status_area.width = needed_rect->width;
+	    وضعیت_area.عرض = needed_rect->عرض;
 	}
-	else
-	    status_area.width = gui.char_width * Columns;
+	وإلا
+	    وضعیت_area.عرض = gui.char_عرض * Columns;
 
-	status_area.x = 0;
-	status_area.y = gui.char_height * Rows + gui.border_offset;
-	if (gui.which_scrollbars[SBAR_BOTTOM])
-	    status_area.y += gui.scrollbar_height;
+	وضعیت_area.x = 0;
+	وضعیت_area.y = gui.char_ارتفاع * ردیفها + gui.border_جابه_جایی;
+	إذا (gui.which_scrollbars[SBAR_BOTTOM])
+	    وضعیت_area.y += gui.scrollbar_ارتفاع;
 #  ifdef FEAT_MENU
-	if (gui.menu_is_active)
-	    status_area.y += gui.menu_height;
+	إذا (gui.menu_is_فعال)
+	    وضعیت_area.y += gui.menu_ارتفاع;
 #  endif
-	status_area.height = gui.char_height;
-	status_list = XVaCreateNestedList(0, XNArea, &status_area, NULL);
+	وضعیت_area.ارتفاع = gui.char_ارتفاع;
+	وضعیت_list = XVaCreateNestedList(0, XNArea, &وضعیت_area, عدم);
     }
-    else
+    وإلا
     {
-	status_area.x = 0;
-	status_area.y = gui.char_height * Rows + gui.border_offset;
-	if (gui.which_scrollbars[SBAR_BOTTOM])
-	    status_area.y += gui.scrollbar_height;
+	وضعیت_area.x = 0;
+	وضعیت_area.y = gui.char_ارتفاع * ردیفها + gui.border_جابه_جایی;
+	إذا (gui.which_scrollbars[SBAR_BOTTOM])
+	    وضعیت_area.y += gui.scrollbar_ارتفاع;
 #  ifdef FEAT_MENU
-	if (gui.menu_is_active)
-	    status_area.y += gui.menu_height;
+	إذا (gui.menu_is_فعال)
+	    وضعیت_area.y += gui.menu_ارتفاع;
 #  endif
-	status_area.width = 0;
-	status_area.height = gui.char_height;
+	وضعیت_area.عرض = 0;
+	وضعیت_area.ارتفاع = gui.char_ارتفاع;
     }
 
-    if (input_style & XIMPreeditArea)   // off-the-spot
+    إذا (درون_داد_style & XIMPreeditArea)   // off-the-spot
     {
-	pre_area.x = status_area.x + status_area.width;
-	pre_area.y = gui.char_height * Rows + gui.border_offset;
-	pre_area.width = gui.char_width * Columns - pre_area.x;
-	if (gui.which_scrollbars[SBAR_BOTTOM])
-	    pre_area.y += gui.scrollbar_height;
+	pre_area.x = وضعیت_area.x + وضعیت_area.عرض;
+	pre_area.y = gui.char_ارتفاع * ردیفها + gui.border_جابه_جایی;
+	pre_area.عرض = gui.char_عرض * Columns - pre_area.x;
+	إذا (gui.which_scrollbars[SBAR_BOTTOM])
+	    pre_area.y += gui.scrollbar_ارتفاع;
 #  ifdef FEAT_MENU
-	if (gui.menu_is_active)
-	    pre_area.y += gui.menu_height;
+	إذا (gui.menu_is_فعال)
+	    pre_area.y += gui.menu_ارتفاع;
 #  endif
-	pre_area.height = gui.char_height;
-	preedit_list = XVaCreateNestedList(0, XNArea, &pre_area, NULL);
+	pre_area.ارتفاع = gui.char_ارتفاع;
+	preedit_list = XVaCreateNestedList(0, XNArea, &pre_area, عدم);
     }
-    else if (input_style & XIMPreeditPosition)   // over-the-spot
+    وإلا إذا (درون_داد_style & XIMPreeditPosition)   // over-the-spot
     {
 	pre_area.x = 0;
 	pre_area.y = 0;
-	pre_area.height = gui.char_height * Rows;
-	pre_area.width = gui.char_width * Columns;
-	preedit_list = XVaCreateNestedList(0, XNArea, &pre_area, NULL);
+	pre_area.ارتفاع = gui.char_ارتفاع * ردیفها;
+	pre_area.عرض = gui.char_عرض * Columns;
+	preedit_list = XVaCreateNestedList(0, XNArea, &pre_area, عدم);
     }
 
-    if (preedit_list && status_list)
-	list = XVaCreateNestedList(0, XNPreeditAttributes, preedit_list,
-				   XNStatusAttributes, status_list, NULL);
-    else if (preedit_list)
-	list = XVaCreateNestedList(0, XNPreeditAttributes, preedit_list,
-				   NULL);
-    else if (status_list)
-	list = XVaCreateNestedList(0, XNStatusAttributes, status_list,
-				   NULL);
-    else
-	list = NULL;
+    إذا (preedit_list && وضعیت_list)
+	list = XVaCreateNestedList(0, XNPreedit_صفات, preedit_list,
+				   XNStatus_صفات, وضعیت_list, عدم);
+    وإلا إذا (preedit_list)
+	list = XVaCreateNestedList(0, XNPreedit_صفات, preedit_list,
+				   عدم);
+    وإلا إذا (وضعیت_list)
+	list = XVaCreateNestedList(0, XNStatus_صفات, وضعیت_list,
+				   عدم);
+    وإلا
+	list = عدم;
 
-    if (list)
+    إذا (list)
     {
-	XSetICValues(xic, XNVaNestedList, list, NULL);
+	XSetICValues(xic, XNVaNestedList, list, عدم);
 	XFree(list);
     }
-    if (status_list)
-	XFree(status_list);
-    if (preedit_list)
+    إذا (وضعیت_list)
+	XFree(وضعیت_list);
+    إذا (preedit_list)
 	XFree(preedit_list);
 }
 
-    int
-xim_get_status_area_height(void)
+    صحيح
+xim_get_وضعیت_area_ارتفاع(فراغ)
 {
-    if (status_area_enabled)
-	return gui.char_height;
-    return 0;
+    إذا (وضعیت_area_enabled)
+	أرجع gui.char_ارتفاع;
+    أرجع 0;
 }
 # endif
 
-#else // !defined(FEAT_XIM)
+#وإلا // !defined(FEAT_XIM)
 
-# if defined(IME_WITHOUT_XIM) || defined(VIMDLL)
-static int im_was_set_active = FALSE;
+# إذا defined(IME_WITHOUT_XIM) || defined(VIMDLL)
+ساكن صحيح im_was_مجموعه_فعال = FALSE;
 
-    int
+    صحيح
 #  ifdef VIMDLL
-mbyte_im_get_status(void)
-#  else
-im_get_status(void)
+mbyte_im_get_وضعیت(فراغ)
+#  وإلا
+im_get_وضعیت(فراغ)
 #  endif
 {
-#  if defined(FEAT_EVAL)
-    if (USE_IMSTATUSFUNC)
-	return call_imstatusfunc();
+#  إذا defined(FEAT_EVAL)
+    إذا (USE_IMSTATUSFUNC)
+	أرجع call_imstatusfunc();
 #  endif
-    return im_was_set_active;
+    أرجع im_was_مجموعه_فعال;
 }
 
-    void
+    فراغ
 #  ifdef VIMDLL
-mbyte_im_set_active(int active_arg)
-#  else
-im_set_active(int active_arg)
+mbyte_im_مجموعه_فعال(صحيح فعال_arg)
+#  وإلا
+im_مجموعه_فعال(صحيح فعال_arg)
 #  endif
 {
-#  if defined(FEAT_EVAL)
-    int	    active = !p_imdisable && active_arg;
+#  إذا defined(FEAT_EVAL)
+    صحيح	    فعال = !p_imdisable && فعال_arg;
 
-    if (USE_IMACTIVATEFUNC && active != im_get_status())
+    إذا (USE_IMACTIVATEFUNC && فعال != im_get_وضعیت())
     {
-	call_imactivatefunc(active);
-	im_was_set_active = active;
+	call_imactivatefunc(فعال);
+	im_was_مجموعه_فعال = فعال;
     }
 #  endif
 }
 
-#  if defined(FEAT_GUI) && !defined(FEAT_GUI_HAIKU) && !defined(VIMDLL)
-    void
-im_set_position(int row UNUSED, int col UNUSED)
+#  إذا defined(FEAT_GUI) && !defined(FEAT_GUI_HAIKU) && !defined(VIMDLL)
+    فراغ
+im_مجموعه_position(صحيح ردیف استفادهنشده, صحيح ستون استفادهنشده)
 {
 }
 #  endif
 # endif
 
-#endif // FEAT_XIM
+#پایان_اگر // FEAT_XIM

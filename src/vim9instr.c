@@ -11,16 +11,16 @@
  * vim9instr.c: Dealing with instructions of a compiled function
  */
 
-#define USING_FLOAT_STUFF
-#include "vim.h"
+#تعریف_کن USING_FLOAT_STUFF
+#ضمن "vim.h"
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
 /////////////////////////////////////////////////////////////////////
 // Following generate_ functions expect the caller to call ga_grow().
 
-#define RETURN_NULL_IF_SKIP(cctx) if (cctx->ctx_skip == SKIP_YES) return NULL
-#define RETURN_OK_IF_SKIP(cctx) if (cctx->ctx_skip == SKIP_YES) return OK
+#تعریف_کن RETURN_NULL_IF_SKIP(cctx) إذا (cctx->ctx_skip == SKIP_YES) أرجع عدم
+#تعریف_کن RETURN_OK_IF_SKIP(cctx) إذا (cctx->ctx_skip == SKIP_YES) أرجع OK
 
 /*
  * Generate an instruction without arguments.
@@ -33,14 +33,14 @@ generate_instr(cctx_T *cctx, isntype_T isn_type)
     isn_T	*isn;
 
     RETURN_NULL_IF_SKIP(cctx);
-    if (GA_GROW_FAILS(instr, 1))
-	return NULL;
-    isn = ((isn_T *)instr->ga_data) + instr->ga_len;
+    إذا (GA_GROW_FAILS(instr, 1))
+	أرجع عدم;
+    isn = ((isn_T *)instr->ga_داده) + instr->ga_len;
     isn->isn_type = isn_type;
     isn->isn_lnum = cctx->ctx_lnum + 1;
     ++instr->ga_len;
 
-    return isn;
+    أرجع isn;
 }
 
 /*
@@ -49,18 +49,18 @@ generate_instr(cctx_T *cctx, isntype_T isn_type)
  * Returns a pointer to the new instruction, NULL if failed.
  */
     isn_T *
-generate_instr_drop(cctx_T *cctx, isntype_T isn_type, int drop)
+generate_instr_drop(cctx_T *cctx, isntype_T isn_type, صحيح drop)
 {
     RETURN_NULL_IF_SKIP(cctx);
-    cctx->ctx_type_stack.ga_len -= drop;
-    return generate_instr(cctx, isn_type);
+    cctx->ctx_type_پشته.ga_len -= drop;
+    أرجع generate_instr(cctx, isn_type);
 }
 
 /*
  * Generate instruction "isn_type" and put "type" on the type stack,
  * use "decl_type" for the declared type.
  */
-    static isn_T *
+    ساكن isn_T *
 generate_instr_type2(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
@@ -69,14 +69,14 @@ generate_instr_type2(
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr(cctx, isn_type)) == NULL)
-	return NULL;
+    إذا ((isn = generate_instr(cctx, isn_type)) == عدم)
+	أرجع عدم;
 
-    if (push_type_stack2(cctx, type == NULL ? &t_any : type,
-			       decl_type == NULL ? &t_any : decl_type) == FAIL)
-	return NULL;
+    إذا (افزودن_type_stack2(cctx, type == عدم ? &t_any : type,
+			       decl_type == عدم ? &t_any : decl_type) == FAIL)
+	أرجع عدم;
 
-    return isn;
+    أرجع isn;
 }
 
 /*
@@ -87,7 +87,7 @@ generate_instr_type2(
     isn_T *
 generate_instr_type(cctx_T *cctx, isntype_T isn_type, type_T *type)
 {
-    return generate_instr_type2(cctx, isn_type, type, &t_any);
+    أرجع generate_instr_type2(cctx, isn_type, type, &t_any);
 }
 
 /*
@@ -97,89 +97,89 @@ generate_instr_type(cctx_T *cctx, isntype_T isn_type, type_T *type)
 generate_instr_debug(cctx_T *cctx)
 {
     isn_T	*isn;
-    dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_data)
+    dfunc_T	*dfunc = ((dfunc_T *)def_functions.ga_داده)
 					       + cctx->ctx_ufunc->uf_dfunc_idx;
 
-    if ((isn = generate_instr(cctx, ISN_DEBUG)) == NULL)
-	return NULL;
-    isn->isn_arg.debug.dbg_var_names_len = dfunc->df_var_names.ga_len;
+    إذا ((isn = generate_instr(cctx, ISN_DEBUG)) == عدم)
+	أرجع عدم;
+    isn->isn_arg.debug.dbg_var_نامها_len = dfunc->df_var_نامها.ga_len;
     isn->isn_arg.debug.dbg_break_lnum = cctx->ctx_prev_lnum;
-    return isn;
+    أرجع isn;
 }
 
 /*
  * Generate an ISN_CONSTRUCT instruction.
  * The object will have "size" members.
  */
-    int
+    صحيح
 generate_CONSTRUCT(cctx_T *cctx, class_T *cl)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_CONSTRUCT)) == NULL)
-	return FAIL;
-    isn->isn_arg.construct.construct_size = sizeof(object_T)
-			       + cl->class_obj_member_count * sizeof(typval_T);
+    إذا ((isn = generate_instr(cctx, ISN_CONSTRUCT)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.construct.construct_اندازه = حجم(object_T)
+			       + cl->class_obj_member_شمار * حجم(typval_T);
     isn->isn_arg.construct.construct_class = cl;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate ISN_GET_OBJ_MEMBER - access member of object at bottom of stack by
  * index.
  */
-    int
-generate_GET_OBJ_MEMBER(cctx_T *cctx, int idx, type_T *type)
+    صحيح
+generate_GET_OBJ_MEMBER(cctx_T *cctx, صحيح idx, type_T *type)
 {
     RETURN_OK_IF_SKIP(cctx);
 
     // drop the object type
     isn_T *isn = generate_instr_drop(cctx, ISN_GET_OBJ_MEMBER, 1);
-    if (isn == NULL)
-	return FAIL;
+    إذا (isn == عدم)
+	أرجع FAIL;
 
-    isn->isn_arg.classmember.cm_class = NULL;
+    isn->isn_arg.classmember.cm_class = عدم;
     isn->isn_arg.classmember.cm_idx = idx;
-    return push_type_stack2(cctx, type, &t_any);
+    أرجع افزودن_type_stack2(cctx, type, &t_any);
 }
 
 /*
  * Generate ISN_GET_ITF_MEMBER - access member of interface at bottom of stack
  * by index.
  */
-    int
-generate_GET_ITF_MEMBER(cctx_T *cctx, class_T *itf, int idx, type_T *type)
+    صحيح
+generate_GET_ITF_MEMBER(cctx_T *cctx, class_T *itf, صحيح idx, type_T *type)
 {
     RETURN_OK_IF_SKIP(cctx);
 
     // drop the object type
     isn_T *isn = generate_instr_drop(cctx, ISN_GET_ITF_MEMBER, 1);
-    if (isn == NULL)
-	return FAIL;
+    إذا (isn == عدم)
+	أرجع FAIL;
 
     isn->isn_arg.classmember.cm_class = itf;
     ++itf->class_refcount;
     isn->isn_arg.classmember.cm_idx = idx;
-    return push_type_stack2(cctx, type, &t_any);
+    أرجع افزودن_type_stack2(cctx, type, &t_any);
 }
 
 /*
  * Generate ISN_STORE_THIS - store value in member of "this" object with member
  * index "idx".
  */
-    int
-generate_STORE_THIS(cctx_T *cctx, int idx)
+    صحيح
+generate_STORE_THIS(cctx_T *cctx, صحيح idx)
 {
     RETURN_OK_IF_SKIP(cctx);
 
     // drop the value type
     isn_T *isn = generate_instr_drop(cctx, ISN_STORE_THIS, 1);
-    if (isn == NULL)
-	return FAIL;
+    إذا (isn == عدم)
+	أرجع FAIL;
 
-    isn->isn_arg.number = idx;
-    return OK;
+    isn->isn_arg.عدد = idx;
+    أرجع OK;
 }
 
 /*
@@ -189,109 +189,109 @@ generate_STORE_THIS(cctx_T *cctx, int idx)
  * strings.  When tostring_flags has TOSTRING_INTERPOLATE, convert a List or a
  * Dict to the corresponding textual representation.
  */
-    int
-may_generate_2STRING(int offset, int tostring_flags, cctx_T *cctx)
+    صحيح
+may_generate_2STRING(صحيح جابه_جایی, صحيح tostring_flags, cctx_T *cctx)
 {
     isn_T	*isn;
     isntype_T	isntype = ISN_2STRING;
     type_T	*type;
 
     RETURN_OK_IF_SKIP(cctx);
-    type = get_type_on_stack(cctx, -1 - offset);
+    type = get_type_on_پشته(cctx, -1 - جابه_جایی);
 
-    switch (type->tt_type)
+    بدل (type->tt_type)
     {
 	// nothing to be done
-	case VAR_STRING: return OK;
+	حالة VAR_STRING: أرجع OK;
 
 	// conversion possible
-	case VAR_SPECIAL:
-	case VAR_BOOL:
-	case VAR_NUMBER:
-	case VAR_FLOAT:
-			 break;
+	حالة VAR_SPECIAL:
+	حالة VAR_BOOL:
+	حالة VAR_عدد:
+	حالة VAR_FLOAT:
+			 اكسر;
 
 	// conversion possible (with runtime check)
-	case VAR_ANY:
-	case VAR_UNKNOWN:
+	حالة VAR_ANY:
+	حالة VAR_UNKNOWN:
 			 isntype = ISN_2STRING_ANY;
-			 break;
+			 اكسر;
 
 	// conversion possible when tolerant
-	case VAR_LIST:
-	case VAR_TUPLE:
-	case VAR_DICT:
-			 if (tostring_flags & TOSTRING_TOLERANT)
+	حالة VAR_LIST:
+	حالة VAR_TUPLE:
+	حالة VAR_DICT:
+			 إذا (tostring_flags & TOSTRING_TOLERANT)
 			 {
 			     isntype = ISN_2STRING_ANY;
-			     break;
+			     اكسر;
 			 }
-			 if (tostring_flags & TOSTRING_INTERPOLATE)
-			     break;
+			 إذا (tostring_flags & TOSTRING_INTERPOLATE)
+			     اكسر;
 			 // FALLTHROUGH
 
 	// conversion not possible
-	case VAR_VOID:
-	case VAR_BLOB:
-	case VAR_FUNC:
-	case VAR_PARTIAL:
-	case VAR_JOB:
-	case VAR_CHANNEL:
-	case VAR_INSTR:
-	case VAR_CLASS:
-	case VAR_OBJECT:
-	case VAR_TYPEALIAS:
-			 to_string_error(type->tt_type);
-			 return FAIL;
+	حالة VAR_VOID:
+	حالة VAR_BLOB:
+	حالة VAR_FUNC:
+	حالة VAR_PARTIAL:
+	حالة VAR_کار:
+	حالة VAR_CHANNEL:
+	حالة VAR_INSTR:
+	حالة VAR_CLASS:
+	حالة VAR_OBJECT:
+	حالة VAR_TYPEALIAS:
+			 مقصد_string_error(type->tt_type);
+			 أرجع FAIL;
     }
 
-    set_type_on_stack(cctx, &t_string, -1 - offset);
-    if ((isn = generate_instr(cctx, isntype)) == NULL)
-	return FAIL;
-    isn->isn_arg.tostring.offset = offset;
+    مجموعه_type_on_پشته(cctx, &t_string, -1 - جابه_جایی);
+    إذا ((isn = generate_instr(cctx, isntype)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.tostring.جابه_جایی = جابه_جایی;
     isn->isn_arg.tostring.flags = tostring_flags;
 
-    return OK;
+    أرجع OK;
 }
 
-    static int
-check_number_or_float(type_T *typ1, type_T *typ2, char_u *op)
+    ساكن صحيح
+check_عدد_or_float(type_T *typ1, type_T *typ2, char_u *op)
 {
     vartype_T	    type1 = typ1->tt_type;
     vartype_T	    type2 = typ2->tt_type;
-    if (!((type1 == VAR_NUMBER || type1 == VAR_FLOAT
+    إذا (!((type1 == VAR_عدد || type1 == VAR_FLOAT
 				   || type1 == VAR_ANY || type1 == VAR_UNKNOWN)
-	    && (type2 == VAR_NUMBER || type2 == VAR_FLOAT
+	    && (type2 == VAR_عدد || type2 == VAR_FLOAT
 				 || type2 == VAR_ANY || type2 == VAR_UNKNOWN)))
     {
-	if (check_type_is_value(typ1) == FAIL
-		|| check_type_is_value(typ2) == FAIL)
-	    return FAIL;
-	if (*op == '+')
-	    emsg(_(e_wrong_argument_type_for_plus));
-	else
-	    semsg(_(e_char_requires_number_or_float_arguments), *op);
-	return FAIL;
+	إذا (check_type_is_مقدار(typ1) == FAIL
+		|| check_type_is_مقدار(typ2) == FAIL)
+	    أرجع FAIL;
+	إذا (*op == '+')
+	    emsg(_(e_wrong_آرگومان_type_for_plus));
+	وإلا
+	    semsg(_(e_char_requires_عدد_or_float_arguments), *op);
+	أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Append the tuple item types from "tuple_type" to the grow array "gap".
  */
-    static int
+    ساكن صحيح
 ga_append_tuple_types(type_T *tuple_type, garray_T *gap)
 {
-    for (int i = 0; i < tuple_type->tt_argcount; i++)
+    لكل (صحيح i = 0; i < tuple_type->tt_argcount; i++)
     {
-	if (ga_grow(gap, 1) == FAIL)
-	    return FAIL;
+	إذا (ga_grow(gap, 1) == FAIL)
+	    أرجع FAIL;
 
-	((type_T **)gap->ga_data)[gap->ga_len] = tuple_type->tt_args[i];
+	((type_T **)gap->ga_داده)[gap->ga_len] = tuple_type->tt_آرگومانها[i];
 	gap->ga_len++;
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -301,85 +301,85 @@ ga_append_tuple_types(type_T *tuple_type, garray_T *gap)
  *
  * Returns OK on success and FAIL on memory allocation failure.
  */
-    static int
-set_tuple_union_type_on_stack(type_T *type1, type_T *type2, cctx_T *cctx)
+    ساكن صحيح
+مجموعه_tuple_union_type_on_پشته(type_T *type1, type_T *type2, cctx_T *cctx)
 {
     // The concatenated tuple has the union of types from both the tuples
     garray_T	tuple_types_ga;
 
-    ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
+    ga_init2(&tuple_types_ga, حجم(type_T *), 10);
 
-    if (type1->tt_argcount > 0)
+    إذا (type1->tt_argcount > 0)
 	ga_append_tuple_types(type1, &tuple_types_ga);
-    if (!(type1->tt_flags & TTFLAG_VARARGS) && (type2->tt_argcount > 0))
+    إذا (!(type1->tt_flags & TTFLAG_VARARGS) && (type2->tt_argcount > 0))
 	ga_append_tuple_types(type2, &tuple_types_ga);
 
     type_T *new_tuple_type = get_tuple_type(&tuple_types_ga,
 							cctx->ctx_type_list);
     // result inherits the variadic flag from the operands
-    if ((new_tuple_type->tt_flags & TTFLAG_STATIC) == 0)
+    إذا ((new_tuple_type->tt_flags & TTFLAG_STATIC) == 0)
 	new_tuple_type->tt_flags |= (type1->tt_flags & TTFLAG_VARARGS)
 					| (type2->tt_flags & TTFLAG_VARARGS);
 
     // set the type on the stack for the resulting tuple
-    set_type_on_stack(cctx, new_tuple_type, 0);
+    مجموعه_type_on_پشته(cctx, new_tuple_type, 0);
 
     ga_clear(&tuple_types_ga);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate instruction for "+".  For a list this creates a new list.
  */
-    int
-generate_add_instr(
+    صحيح
+generate_جمع_کن_instr(
 	cctx_T	    *cctx,
 	vartype_T   vartype,
 	type_T	    *type1,
 	type_T	    *type2,
-	exprtype_T  expr_type)
+	exprtype_T  عبارت_type)
 {
     isn_T	*isn = generate_instr_drop(cctx,
-		      vartype == VAR_NUMBER ? ISN_OPNR
+		      vartype == VAR_عدد ? ISN_OPNR
 		    : vartype == VAR_LIST ? ISN_ADDLIST
 		    : vartype == VAR_TUPLE ? ISN_ADDTUPLE
 		    : vartype == VAR_BLOB ? ISN_ADDBLOB
 		    : vartype == VAR_FLOAT ? ISN_OPFLOAT
 		    : ISN_OPANY, 1);
 
-    if (vartype != VAR_LIST && vartype != VAR_BLOB && vartype != VAR_TUPLE
+    إذا (vartype != VAR_LIST && vartype != VAR_BLOB && vartype != VAR_TUPLE
 	    && type1->tt_type != VAR_ANY
 	    && type1->tt_type != VAR_UNKNOWN
 	    && type2->tt_type != VAR_ANY
 	    && type2->tt_type != VAR_UNKNOWN
-	    && check_number_or_float(type1, type2, (char_u *)"+") == FAIL)
-	return FAIL;
+	    && check_عدد_or_float(type1, type2, (char_u *)"+") == FAIL)
+	أرجع FAIL;
 
-    if (isn != NULL)
+    إذا (isn != عدم)
     {
-	if (isn->isn_type == ISN_ADDLIST)
-	    isn->isn_arg.op.op_type = expr_type;
-	else
-	    isn->isn_arg.op.op_type = EXPR_ADD;
+	إذا (isn->isn_type == ISN_ADDLIST)
+	    isn->isn_arg.op.op_type = عبارت_type;
+	وإلا
+	    isn->isn_arg.op.op_type = عبارت_جمع_کن;
     }
 
     // When concatenating two lists with different member types the member type
     // becomes "any".
-    if (vartype == VAR_LIST
+    إذا (vartype == VAR_LIST
 	    && type1->tt_type == VAR_LIST && type2->tt_type == VAR_LIST
 	    && type1->tt_member != type2->tt_member)
-	set_type_on_stack(cctx, &t_list_any, 0);
-    else if (vartype == VAR_TUPLE)
+	مجموعه_type_on_پشته(cctx, &t_list_any, 0);
+    وإلا إذا (vartype == VAR_TUPLE)
     {
-	if (!check_tuples_addable(type1, type2))
-	    return FAIL;
+	إذا (!check_tuples_addable(type1, type2))
+	    أرجع FAIL;
 
-	if (set_tuple_union_type_on_stack(type1, type2, cctx) == FAIL)
-	    return FAIL;
+	إذا (مجموعه_tuple_union_type_on_پشته(type1, type2, cctx) == FAIL)
+	    أرجع FAIL;
     }
 
-    return isn == NULL ? FAIL : OK;
+    أرجع isn == عدم ? FAIL : OK;
 }
 
 /*
@@ -390,21 +390,21 @@ generate_add_instr(
     vartype_T
 operator_type(type_T *type1, type_T *type2)
 {
-    if (type1->tt_type == type2->tt_type
-	    && (type1->tt_type == VAR_NUMBER
+    إذا (type1->tt_type == type2->tt_type
+	    && (type1->tt_type == VAR_عدد
 		|| type1->tt_type == VAR_LIST
 		|| type1->tt_type == VAR_TUPLE
 		|| type1->tt_type == VAR_FLOAT
 		|| type1->tt_type == VAR_BLOB))
-	return type1->tt_type;
-    return VAR_ANY;
+	أرجع type1->tt_type;
+    أرجع VAR_ANY;
 }
 
 /*
  * Generate an instruction with two arguments.  The instruction depends on the
  * type of the arguments.
  */
-    int
+    صحيح
 generate_two_op(cctx_T *cctx, char_u *op)
 {
     type_T	*type1;
@@ -415,76 +415,76 @@ generate_two_op(cctx_T *cctx, char_u *op)
     RETURN_OK_IF_SKIP(cctx);
 
     // Get the known type of the two items on the stack.
-    type1 = get_type_on_stack(cctx, 1);
-    type2 = get_type_on_stack(cctx, 0);
+    type1 = get_type_on_پشته(cctx, 1);
+    type2 = get_type_on_پشته(cctx, 0);
     vartype = operator_type(type1, type2);
 
-    switch (*op)
+    بدل (*op)
     {
-	case '+':
-		  if (generate_add_instr(cctx, vartype, type1, type2,
-							    EXPR_COPY) == FAIL)
-		      return FAIL;
-		  break;
+	حالة '+':
+		  إذا (generate_جمع_کن_instr(cctx, vartype, type1, type2,
+							    عبارت_COPY) == FAIL)
+		      أرجع FAIL;
+		  اكسر;
 
-	case '-':
-	case '*':
-	case '/': if (check_number_or_float(type1, type2, op) == FAIL)
-		      return FAIL;
-		  if (vartype == VAR_NUMBER)
+	حالة '-':
+	حالة '*':
+	حالة '/': إذا (check_عدد_or_float(type1, type2, op) == FAIL)
+		      أرجع FAIL;
+		  إذا (vartype == VAR_عدد)
 		      isn = generate_instr_drop(cctx, ISN_OPNR, 1);
-		  else if (vartype == VAR_FLOAT)
+		  وإلا إذا (vartype == VAR_FLOAT)
 		      isn = generate_instr_drop(cctx, ISN_OPFLOAT, 1);
-		  else
+		  وإلا
 		      isn = generate_instr_drop(cctx, ISN_OPANY, 1);
-		  if (isn != NULL)
+		  إذا (isn != عدم)
 		      isn->isn_arg.op.op_type = *op == '*'
-				 ? EXPR_MULT : *op == '/'? EXPR_DIV : EXPR_SUB;
-		  break;
+				 ? عبارت_MULT : *op == '/'? عبارت_DIV : عبارت_SUB;
+		  اكسر;
 
-	case '%': if ((type1->tt_type != VAR_ANY
+	حالة '%': إذا ((type1->tt_type != VAR_ANY
 			      && type1->tt_type != VAR_UNKNOWN
-					       && type1->tt_type != VAR_NUMBER)
+					       && type1->tt_type != VAR_عدد)
 			  || (type2->tt_type != VAR_ANY
 			      && type2->tt_type != VAR_UNKNOWN
-					      && type2->tt_type != VAR_NUMBER))
+					      && type2->tt_type != VAR_عدد))
 		  {
-		      emsg(_(e_percent_requires_number_arguments));
-		      return FAIL;
+		      emsg(_(e_percent_requires_عدد_arguments));
+		      أرجع FAIL;
 		  }
 		  isn = generate_instr_drop(cctx,
-			      vartype == VAR_NUMBER ? ISN_OPNR : ISN_OPANY, 1);
-		  if (isn != NULL)
-		      isn->isn_arg.op.op_type = EXPR_REM;
-		  break;
+			      vartype == VAR_عدد ? ISN_OPNR : ISN_OPANY, 1);
+		  إذا (isn != عدم)
+		      isn->isn_arg.op.op_type = عبارت_REM;
+		  اكسر;
     }
 
     // correct type of result
-    if (vartype == VAR_ANY)
+    إذا (vartype == VAR_ANY)
     {
 	type_T *type = &t_any;
 
 	// float+number and number+float results in float
-	if ((type1->tt_type == VAR_NUMBER || type1->tt_type == VAR_FLOAT)
-	      && (type2->tt_type == VAR_NUMBER || type2->tt_type == VAR_FLOAT))
+	إذا ((type1->tt_type == VAR_عدد || type1->tt_type == VAR_FLOAT)
+	      && (type2->tt_type == VAR_عدد || type2->tt_type == VAR_FLOAT))
 	    type = &t_float;
-	set_type_on_stack(cctx, type, 0);
+	مجموعه_type_on_پشته(cctx, type, 0);
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Choose correct error message for the specified type information.
  */
-    static isntype_T
-compare_isn_not_values(typval_T *tv, type_T *type)
+    ساكن isntype_T
+compare_isn_not_مقادیر(typval_T *tv, type_T *type)
 {
-    if (tv != NULL)
-	(void)check_typval_is_value(tv);
-    else
-	(void)check_type_is_value(type);
-    return ISN_DROP;
+    إذا (tv != عدم)
+	(فراغ)check_typval_is_مقدار(tv);
+    وإلا
+	(فراغ)check_type_is_مقدار(type);
+    أرجع ISN_DROP;
 }
 
 /*
@@ -492,7 +492,7 @@ compare_isn_not_values(typval_T *tv, type_T *type)
  * Either "tv1" and "tv2" are passed or "type1" and "type2".
  * Return ISN_DROP when failed.
  */
-    static isntype_T
+    ساكن isntype_T
 get_compare_isn(
 	exprtype_T  exprtype,
 	typval_T    *tv1,
@@ -501,133 +501,133 @@ get_compare_isn(
 	type_T	    *type2)
 {
     isntype_T	isntype = ISN_DROP;
-    vartype_T	vartype1 = tv1 != NULL ? tv1->v_type : type1->tt_type;
-    vartype_T	vartype2 = tv2 != NULL ? tv2->v_type : type2->tt_type;
+    vartype_T	vartype1 = tv1 != عدم ? tv1->v_type : type1->tt_type;
+    vartype_T	vartype2 = tv2 != عدم ? tv2->v_type : type2->tt_type;
 
-    if (vartype1 == VAR_CLASS || vartype1 == VAR_TYPEALIAS)
-	return compare_isn_not_values(tv1, type1);
-    if (vartype2 == VAR_CLASS || vartype2 == VAR_TYPEALIAS)
-	return compare_isn_not_values(tv2, type2);
+    إذا (vartype1 == VAR_CLASS || vartype1 == VAR_TYPEALIAS)
+	أرجع compare_isn_not_مقادیر(tv1, type1);
+    إذا (vartype2 == VAR_CLASS || vartype2 == VAR_TYPEALIAS)
+	أرجع compare_isn_not_مقادیر(tv2, type2);
 
-    if (vartype1 == vartype2)
+    إذا (vartype1 == vartype2)
     {
-	switch (vartype1)
+	بدل (vartype1)
 	{
-	    case VAR_BOOL: isntype = ISN_COMPAREBOOL; break;
-	    case VAR_SPECIAL: isntype = ISN_COMPARESPECIAL; break;
-	    case VAR_NUMBER: isntype = ISN_COMPARENR; break;
-	    case VAR_FLOAT: isntype = ISN_COMPAREFLOAT; break;
-	    case VAR_STRING: isntype = ISN_COMPARESTRING; break;
-	    case VAR_BLOB: isntype = ISN_COMPAREBLOB; break;
-	    case VAR_LIST: isntype = ISN_COMPARELIST; break;
-	    case VAR_TUPLE: isntype = ISN_COMPARETUPLE; break;
-	    case VAR_DICT: isntype = ISN_COMPAREDICT; break;
-	    case VAR_FUNC: isntype = ISN_COMPAREFUNC; break;
-	    case VAR_OBJECT: isntype = ISN_COMPAREOBJECT; break;
-	    default: isntype = ISN_COMPAREANY; break;
+	    حالة VAR_BOOL: isntype = ISN_COMPAREBOOL; اكسر;
+	    حالة VAR_SPECIAL: isntype = ISN_COMPARESPECIAL; اكسر;
+	    حالة VAR_عدد: isntype = ISN_COMPARENR; اكسر;
+	    حالة VAR_FLOAT: isntype = ISN_COMPAREFLOAT; اكسر;
+	    حالة VAR_STRING: isntype = ISN_COMPARESTRING; اكسر;
+	    حالة VAR_BLOB: isntype = ISN_COMPAREBLOB; اكسر;
+	    حالة VAR_LIST: isntype = ISN_COMPARELIST; اكسر;
+	    حالة VAR_TUPLE: isntype = ISN_COMPARETUPLE; اكسر;
+	    حالة VAR_DICT: isntype = ISN_COMPAREDICT; اكسر;
+	    حالة VAR_FUNC: isntype = ISN_COMPAREFUNC; اكسر;
+	    حالة VAR_OBJECT: isntype = ISN_COMPAREOBJECT; اكسر;
+	    افتراضي: isntype = ISN_COMPAREANY; اكسر;
 	}
     }
-    else if (vartype1 == VAR_ANY || vartype2 == VAR_ANY
-	    || ((vartype1 == VAR_NUMBER || vartype1 == VAR_FLOAT)
-			  && (vartype2 == VAR_NUMBER || vartype2 == VAR_FLOAT))
+    وإلا إذا (vartype1 == VAR_ANY || vartype2 == VAR_ANY
+	    || ((vartype1 == VAR_عدد || vartype1 == VAR_FLOAT)
+			  && (vartype2 == VAR_عدد || vartype2 == VAR_FLOAT))
 	    || (vartype1 == VAR_FUNC && vartype2 == VAR_PARTIAL)
 	    || (vartype1 == VAR_PARTIAL && vartype2 == VAR_FUNC))
 	isntype = ISN_COMPAREANY;
-    else if (vartype1 == VAR_SPECIAL || vartype2 == VAR_SPECIAL)
+    وإلا إذا (vartype1 == VAR_SPECIAL || vartype2 == VAR_SPECIAL)
     {
-	if ((vartype1 == VAR_SPECIAL
-		&& (tv1 != NULL ? tv1->vval.v_number == VVAL_NONE
+	إذا ((vartype1 == VAR_SPECIAL
+		&& (tv1 != عدم ? tv1->vval.v_عدد == VVAL_NONE
 							    : type1 == &t_none)
 		&& vartype2 != VAR_STRING)
 	    || (vartype2 == VAR_SPECIAL
-		&& (tv2 != NULL ? tv2->vval.v_number == VVAL_NONE
+		&& (tv2 != عدم ? tv2->vval.v_عدد == VVAL_NONE
 							    : type2 == &t_none)
 		&& vartype1 != VAR_STRING))
 	{
 	    semsg(_(e_cannot_compare_str_with_str),
 			       vartype_name(vartype1), vartype_name(vartype2));
-	    return ISN_DROP;
+	    أرجع ISN_DROP;
 	}
 	// although comparing null with number, float or bool is not useful, we
 	// allow it
 	isntype = ISN_COMPARENULL;
     }
 
-    if ((exprtype == EXPR_IS || exprtype == EXPR_ISNOT)
+    إذا ((exprtype == عبارت_IS || exprtype == عبارت_ISNOT)
 	    && (isntype == ISN_COMPAREBOOL
 	    || isntype == ISN_COMPARESPECIAL
 	    || isntype == ISN_COMPARENR
 	    || isntype == ISN_COMPAREFLOAT))
     {
 	semsg(_(e_cannot_use_str_with_str),
-		exprtype == EXPR_IS ? "is" : "isnot" , vartype_name(vartype1));
-	return ISN_DROP;
+		exprtype == عبارت_IS ? "is" : "isnot" , vartype_name(vartype1));
+	أرجع ISN_DROP;
     }
-    if (!(exprtype == EXPR_IS || exprtype == EXPR_ISNOT
-		|| exprtype == EXPR_EQUAL || exprtype == EXPR_NEQUAL)
+    إذا (!(exprtype == عبارت_IS || exprtype == عبارت_ISNOT
+		|| exprtype == عبارت_EQUAL || exprtype == عبارت_NEQUAL)
 	    && (isntype == ISN_COMPAREOBJECT))
     {
 	semsg(_(e_invalid_operation_for_str), vartype_name(vartype1));
-	return ISN_DROP;
+	أرجع ISN_DROP;
     }
-    if (isntype == ISN_DROP
+    إذا (isntype == ISN_DROP
 	    || (isntype != ISN_COMPARENULL
-		&& (((exprtype != EXPR_EQUAL
-			&& exprtype != EXPR_NEQUAL
+		&& (((exprtype != عبارت_EQUAL
+			&& exprtype != عبارت_NEQUAL
 			&& (vartype1 == VAR_BOOL || vartype1 == VAR_SPECIAL
 			  || vartype2 == VAR_BOOL || vartype2 == VAR_SPECIAL)))
-		    || ((exprtype != EXPR_EQUAL
-			 && exprtype != EXPR_NEQUAL
-			 && exprtype != EXPR_IS
-			 && exprtype != EXPR_ISNOT
+		    || ((exprtype != عبارت_EQUAL
+			 && exprtype != عبارت_NEQUAL
+			 && exprtype != عبارت_IS
+			 && exprtype != عبارت_ISNOT
 			 && (vartype1 == VAR_BLOB || vartype2 == VAR_BLOB
 			  || vartype1 == VAR_LIST || vartype2 == VAR_LIST))))))
     {
 	semsg(_(e_cannot_compare_str_with_str),
 		vartype_name(vartype1), vartype_name(vartype2));
-	return ISN_DROP;
+	أرجع ISN_DROP;
     }
-    return isntype;
+    أرجع isntype;
 }
 
-    int
+    صحيح
 check_compare_types(exprtype_T type, typval_T *tv1, typval_T *tv2)
 {
-    if (get_compare_isn(type, tv1, tv2, NULL, NULL) == ISN_DROP)
-	return FAIL;
-    return OK;
+    إذا (get_compare_isn(type, tv1, tv2, عدم, عدم) == ISN_DROP)
+	أرجع FAIL;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_COMPARE* instruction with a boolean result.
  */
-    int
-generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
+    صحيح
+generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, صحيح ic)
 {
     isntype_T	isntype;
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*پشته = &cctx->ctx_type_پشته;
 
     RETURN_OK_IF_SKIP(cctx);
 
     // Get the known type of the two items on the stack.  If they are matching
     // use a type-specific instruction. Otherwise fall back to runtime type
     // checking.
-    isntype = get_compare_isn(exprtype, NULL, NULL,
-		       get_type_on_stack(cctx, 1), get_type_on_stack(cctx, 0));
-    if (isntype == ISN_DROP)
-	return FAIL;
+    isntype = get_compare_isn(exprtype, عدم, عدم,
+		       get_type_on_پشته(cctx, 1), get_type_on_پشته(cctx, 0));
+    إذا (isntype == ISN_DROP)
+	أرجع FAIL;
 
-    if ((isn = generate_instr(cctx, isntype)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, isntype)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.op.op_type = exprtype;
     isn->isn_arg.op.op_ic = ic;
 
     // takes two arguments, puts one bool back
-    --stack->ga_len;
-    set_type_on_stack(cctx, &t_bool, 0);
+    --پشته->ga_len;
+    مجموعه_type_on_پشته(cctx, &t_bool, 0);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -636,108 +636,108 @@ generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
  * greater or equal to one.
  * The caller ensures all the "count" elements on the stack have the right type.
  */
-    int
-generate_CONCAT(cctx_T *cctx, int count)
+    صحيح
+generate_CONCAT(cctx_T *cctx, صحيح شمار)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*پشته = &cctx->ctx_type_پشته;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if ((isn = generate_instr(cctx, ISN_CONCAT)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = count;
+    إذا ((isn = generate_instr(cctx, ISN_CONCAT)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.عدد = شمار;
 
     // drop the argument types
-    stack->ga_len -= count - 1;
+    پشته->ga_len -= شمار - 1;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_2BOOL instruction.
  * "offset" is the offset in the type stack.
  */
-    int
-generate_2BOOL(cctx_T *cctx, int invert, int offset)
+    صحيح
+generate_2BOOL(cctx_T *cctx, صحيح invert, صحيح جابه_جایی)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_2BOOL)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, ISN_2BOOL)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.tobool.invert = invert;
-    isn->isn_arg.tobool.offset = offset;
+    isn->isn_arg.tobool.جابه_جایی = جابه_جایی;
 
     // type becomes bool
-    set_type_on_stack(cctx, &t_bool, -1 - offset);
+    مجموعه_type_on_پشته(cctx, &t_bool, -1 - جابه_جایی);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_COND2BOOL instruction.
  */
-    int
+    صحيح
 generate_COND2BOOL(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-    if (generate_instr(cctx, ISN_COND2BOOL) == NULL)
-	return FAIL;
+    إذا (generate_instr(cctx, ISN_COND2BOOL) == عدم)
+	أرجع FAIL;
 
     // type becomes bool
-    set_type_on_stack(cctx, &t_bool, 0);
+    مجموعه_type_on_پشته(cctx, &t_bool, 0);
 
-    return OK;
+    أرجع OK;
 }
 
-    int
+    صحيح
 generate_TYPECHECK(
 	cctx_T	    *cctx,
 	type_T	    *expected,
-	int	    typechk_flags,	// type check flags
-	int	    offset,
-	int	    is_var,
-	int	    argidx)
+	صحيح	    typechk_flags,	// type check flags
+	صحيح	    جابه_جایی,
+	صحيح	    is_var,
+	صحيح	    argidx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_CHECKTYPE)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, ISN_CHECKTYPE)) == عدم)
+	أرجع FAIL;
     type_T *tt;
-    if ((expected->tt_type == VAR_FLOAT
-		&& (typechk_flags & TYPECHK_NUMBER_OK))
+    إذا ((expected->tt_type == VAR_FLOAT
+		&& (typechk_flags & TYPECHK_عدد_OK))
 	    || (expected->tt_type == VAR_LIST
 		&& (typechk_flags & TYPECHK_TUPLE_OK)))
     {
 	// always allocate, also for static types
 	tt = ALLOC_ONE(type_T);
-	if (tt != NULL)
+	إذا (tt != عدم)
 	{
 	    *tt = *expected;
 	    tt->tt_flags &= ~TTFLAG_STATIC;
-	    if (typechk_flags & TYPECHK_NUMBER_OK)
-		tt->tt_flags |= TTFLAG_NUMBER_OK;
-	    else
+	    إذا (typechk_flags & TYPECHK_عدد_OK)
+		tt->tt_flags |= TTFLAG_عدد_OK;
+	    وإلا
 		tt->tt_flags |= TTFLAG_TUPLE_OK;
 	}
     }
-    else
+    وإلا
 	tt = alloc_type(expected);
 
     isn->isn_arg.type.ct_type = tt;
-    isn->isn_arg.type.ct_off = (int8_T)offset;
+    isn->isn_arg.type.ct_off = (int8_T)جابه_جایی;
     isn->isn_arg.type.ct_is_var = is_var;
     isn->isn_arg.type.ct_arg_idx = (int8_T)argidx;
 
     // type becomes expected
-    set_type_on_stack(cctx, expected, -1 - offset);
+    مجموعه_type_on_پشته(cctx, expected, -1 - جابه_جایی);
 
-    return OK;
+    أرجع OK;
 }
 
-    int
+    صحيح
 generate_SETTYPE(
 	cctx_T	    *cctx,
 	type_T	    *expected)
@@ -745,195 +745,195 @@ generate_SETTYPE(
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_SETTYPE)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, ISN_SETTYPE)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.type.ct_type = alloc_type(expected);
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_PUSHOBJ instruction.  Object is always NULL.
  */
-    int
+    صحيح
 generate_PUSHOBJ(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-    if (generate_instr_type(cctx, ISN_PUSHOBJ, &t_object_any) == NULL)
-	return FAIL;
-    return OK;
+    إذا (generate_instr_type(cctx, ISN_PUSHOBJ, &t_object_any) == عدم)
+	أرجع FAIL;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_PUSHCLASS instruction.  "class" can be NULL.
  */
-    static int
+    ساكن صحيح
 generate_PUSHCLASS(cctx_T *cctx, class_T *class)
 {
     RETURN_OK_IF_SKIP(cctx);
     isn_T *isn = generate_instr_type(cctx, ISN_PUSHCLASS,
-				  class == NULL ? &t_any : &class->class_type);
-    if (isn == NULL)
-	return FAIL;
+				  class == عدم ? &t_any : &class->class_type);
+    إذا (isn == عدم)
+	أرجع FAIL;
     isn->isn_arg.classarg = class;
-    if (class != NULL)
+    إذا (class != عدم)
 	++class->class_refcount;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate a PUSH instruction for "tv".
  * "tv" will be consumed or cleared.
  */
-    int
-generate_tv_PUSH(cctx_T *cctx, typval_T *tv)
+    صحيح
+generate_tv_افزودن(cctx_T *cctx, typval_T *tv)
 {
-    switch (tv->v_type)
+    بدل (tv->v_type)
     {
-	case VAR_BOOL:
-	    generate_PUSHBOOL(cctx, tv->vval.v_number);
-	    break;
-	case VAR_SPECIAL:
-	    generate_PUSHSPEC(cctx, tv->vval.v_number);
-	    break;
-	case VAR_NUMBER:
-	    generate_PUSHNR(cctx, tv->vval.v_number);
-	    break;
-	case VAR_FLOAT:
+	حالة VAR_BOOL:
+	    generate_PUSHBOOL(cctx, tv->vval.v_عدد);
+	    اكسر;
+	حالة VAR_SPECIAL:
+	    generate_PUSHSPEC(cctx, tv->vval.v_عدد);
+	    اكسر;
+	حالة VAR_عدد:
+	    generate_PUSHNR(cctx, tv->vval.v_عدد);
+	    اكسر;
+	حالة VAR_FLOAT:
 	    generate_PUSHF(cctx, tv->vval.v_float);
-	    break;
-	case VAR_BLOB:
+	    اكسر;
+	حالة VAR_BLOB:
 	    generate_PUSHBLOB(cctx, tv->vval.v_blob);
-	    tv->vval.v_blob = NULL;
-	    break;
-	case VAR_LIST:
-	    if (tv->vval.v_list != NULL)
+	    tv->vval.v_blob = عدم;
+	    اكسر;
+	حالة VAR_LIST:
+	    إذا (tv->vval.v_list != عدم)
 		iemsg("non-empty list constant not supported");
 	    generate_NEWLIST(cctx, 0, TRUE);
-	    break;
-	case VAR_TUPLE:
-	    if (tv->vval.v_tuple != NULL)
+	    اكسر;
+	حالة VAR_TUPLE:
+	    إذا (tv->vval.v_tuple != عدم)
 		iemsg("non-empty tuple constant not supported");
 	    generate_NEWTUPLE(cctx, 0, TRUE);
-	    break;
-	case VAR_DICT:
-	    if (tv->vval.v_dict != NULL)
+	    اكسر;
+	حالة VAR_DICT:
+	    إذا (tv->vval.v_dict != عدم)
 		iemsg("non-empty dict constant not supported");
 	    generate_NEWDICT(cctx, 0, TRUE);
-	    break;
-#ifdef FEAT_JOB_CHANNEL
-	case VAR_JOB:
-	    if (tv->vval.v_job != NULL)
+	    اكسر;
+#اگر_تعریف_شده FEAT_کار_CHANNEL
+	حالة VAR_کار:
+	    إذا (tv->vval.v_کار != عدم)
 		iemsg("non-null job constant not supported");
 	    generate_PUSHJOB(cctx);
-	    break;
-	case VAR_CHANNEL:
-	    if (tv->vval.v_channel != NULL)
+	    اكسر;
+	حالة VAR_CHANNEL:
+	    إذا (tv->vval.v_channel != عدم)
 		iemsg("non-null channel constant not supported");
 	    generate_PUSHCHANNEL(cctx);
-	    break;
-#endif
-	case VAR_FUNC:
-	    if (tv->vval.v_string != NULL)
+	    اكسر;
+#پایان_اگر
+	حالة VAR_FUNC:
+	    إذا (tv->vval.v_string != عدم)
 		iemsg("non-null function constant not supported");
-	    generate_PUSHFUNC(cctx, NULL, &t_func_unknown, TRUE);
-	    break;
-	case VAR_PARTIAL:
-	    if (tv->vval.v_partial != NULL)
+	    generate_PUSHFUNC(cctx, عدم, &t_func_unknown, TRUE);
+	    اكسر;
+	حالة VAR_PARTIAL:
+	    إذا (tv->vval.v_partial != عدم)
 		iemsg("non-null partial constant not supported");
-	    if (generate_instr_type(cctx, ISN_NEWPARTIAL, &t_func_unknown)
-								   == NULL)
-		return FAIL;
-	    break;
-	case VAR_STRING:
+	    إذا (generate_instr_type(cctx, ISN_NEWPARTIAL, &t_func_unknown)
+								   == عدم)
+		أرجع FAIL;
+	    اكسر;
+	حالة VAR_STRING:
 	    generate_PUSHS(cctx, &tv->vval.v_string);
-	    tv->vval.v_string = NULL;
-	    break;
-	case VAR_OBJECT:
-	    if (tv->vval.v_object != NULL)
+	    tv->vval.v_string = عدم;
+	    اكسر;
+	حالة VAR_OBJECT:
+	    إذا (tv->vval.v_object != عدم)
 	    {
 		emsg(_(e_cannot_use_non_null_object));
-		return FAIL;
+		أرجع FAIL;
 	    }
 	    generate_PUSHOBJ(cctx);
-	    break;
-	case VAR_CLASS:
+	    اكسر;
+	حالة VAR_CLASS:
 	    generate_PUSHCLASS(cctx, tv->vval.v_class);
-	    break;
-	default:
+	    اكسر;
+	افتراضي:
 	    siemsg("constant type %d not supported", tv->v_type);
 	    clear_tv(tv);
-	    return FAIL;
+	    أرجع FAIL;
     }
     tv->v_type = VAR_UNKNOWN;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_PUSHNR instruction.
  */
-    int
-generate_PUSHNR(cctx_T *cctx, varnumber_T number)
+    صحيح
+generate_PUSHNR(cctx_T *cctx, varnumber_T عدد)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHNR, &t_number)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = number;
+    إذا ((isn = generate_instr_type(cctx, ISN_PUSHNR, &t_عدد)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.عدد = عدد;
 
-    if (number == 0 || number == 1)
+    إذا (عدد == 0 || عدد == 1)
 	// A 0 or 1 number can also be used as a bool.
-	set_type_on_stack(cctx, &t_number_bool, 0);
-    return OK;
+	مجموعه_type_on_پشته(cctx, &t_عدد_bool, 0);
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_PUSHBOOL instruction.
  */
-    int
-generate_PUSHBOOL(cctx_T *cctx, varnumber_T number)
+    صحيح
+generate_PUSHBOOL(cctx_T *cctx, varnumber_T عدد)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHBOOL, &t_bool)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = number;
+    إذا ((isn = generate_instr_type(cctx, ISN_PUSHBOOL, &t_bool)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.عدد = عدد;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_PUSHSPEC instruction.
  */
-    int
-generate_PUSHSPEC(cctx_T *cctx, varnumber_T number)
+    صحيح
+generate_PUSHSPEC(cctx_T *cctx, varnumber_T عدد)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHSPEC,
-			     number == VVAL_NULL ? &t_null : &t_none)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = number;
+    إذا ((isn = generate_instr_type(cctx, ISN_PUSHSPEC,
+			     عدد == VVAL_NULL ? &t_null : &t_none)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.عدد = عدد;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_PUSHF instruction.
  */
-    int
+    صحيح
 generate_PUSHF(cctx_T *cctx, float_T fnumber)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHF, &t_float)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr_type(cctx, ISN_PUSHF, &t_float)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.fnumber = fnumber;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -942,77 +942,77 @@ generate_PUSHF(cctx_T *cctx, float_T fnumber)
  * Note that if "str" is used in the instruction OK is returned and "*str" is
  * not set to NULL.
  */
-    int
+    صحيح
 generate_PUSHS(cctx_T *cctx, char_u **str)
 {
     isn_T	*isn;
-    int		ret = OK;
+    صحيح		ret = OK;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    إذا (cctx->ctx_skip != SKIP_YES)
     {
-	if ((isn = generate_instr_type(cctx, ISN_PUSHS, &t_string)) == NULL)
+	إذا ((isn = generate_instr_type(cctx, ISN_PUSHS, &t_string)) == عدم)
 	    ret = FAIL;
-	else
+	وإلا
 	{
-	    isn->isn_arg.string = str == NULL ? NULL : *str;
-	    return OK;
+	    isn->isn_arg.string = str == عدم ? عدم : *str;
+	    أرجع OK;
 	}
     }
-    if (str != NULL)
+    إذا (str != عدم)
 	VIM_CLEAR(*str);
-    return ret;
+    أرجع ret;
 }
 
 /*
  * Generate an ISN_PUSHCHANNEL instruction.  Channel is always NULL.
  */
-    int
+    صحيح
 generate_PUSHCHANNEL(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-#ifdef FEAT_JOB_CHANNEL
-    if (generate_instr_type(cctx, ISN_PUSHCHANNEL, &t_channel) == NULL)
-	return FAIL;
-    return OK;
-#else
-    emsg(_(e_channel_job_feature_not_available));
-    return FAIL;
-#endif
+#اگر_تعریف_شده FEAT_کار_CHANNEL
+    إذا (generate_instr_type(cctx, ISN_PUSHCHANNEL, &t_channel) == عدم)
+	أرجع FAIL;
+    أرجع OK;
+#وإلا
+    emsg(_(e_channel_کار_feature_not_موجود));
+    أرجع FAIL;
+#پایان_اگر
 }
 
 /*
  * Generate an ISN_PUSHJOB instruction.  Job is always NULL.
  */
-    int
+    صحيح
 generate_PUSHJOB(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-#ifdef FEAT_JOB_CHANNEL
-    if (generate_instr_type(cctx, ISN_PUSHJOB, &t_job) == NULL)
-	return FAIL;
-    return OK;
-#else
-    emsg(_(e_channel_job_feature_not_available));
-    return FAIL;
-#endif
+#اگر_تعریف_شده FEAT_کار_CHANNEL
+    إذا (generate_instr_type(cctx, ISN_PUSHJOB, &t_کار) == عدم)
+	أرجع FAIL;
+    أرجع OK;
+#وإلا
+    emsg(_(e_channel_کار_feature_not_موجود));
+    أرجع FAIL;
+#پایان_اگر
 }
 
 /*
  * Generate an ISN_PUSHBLOB instruction.
  * Consumes "blob".
  */
-    int
+    صحيح
 generate_PUSHBLOB(cctx_T *cctx, blob_T *blob)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type2(cctx, ISN_PUSHBLOB,
-					&t_blob, &t_blob)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr_type2(cctx, ISN_PUSHBLOB,
+					&t_blob, &t_blob)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.blob = blob;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -1020,25 +1020,25 @@ generate_PUSHBLOB(cctx_T *cctx, blob_T *blob)
  * When "may_prefix" is TRUE prefix "g:" unless "name" is script-local or
  * autoload.
  */
-    int
-generate_PUSHFUNC(cctx_T *cctx, char_u *name, type_T *type, int may_prefix)
+    صحيح
+generate_PUSHFUNC(cctx_T *cctx, char_u *name, type_T *type, صحيح may_پیشوند)
 {
     isn_T	*isn;
     char_u	*funcname;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHFUNC, type)) == NULL)
-	return FAIL;
-    if (name == NULL)
-	funcname = NULL;
-    else if (!may_prefix
+    إذا ((isn = generate_instr_type(cctx, ISN_PUSHFUNC, type)) == عدم)
+	أرجع FAIL;
+    إذا (name == عدم)
+	funcname = عدم;
+    وإلا إذا (!may_پیشوند
 	    || *name == K_SPECIAL			    // script-local
-	    || vim_strchr(name, AUTOLOAD_CHAR) != NULL)	    // autoload
+	    || vim_strchr(name, AUTOLOAD_CHAR) != عدم)	    // autoload
 	funcname = vim_strsave(name);
-    else
+    وإلا
     {
 	funcname = alloc(STRLEN(name) + 3);
-	if (funcname != NULL)
+	إذا (funcname != عدم)
 	{
 	    STRCPY(funcname, "g:");
 	    STRCPY(funcname + 2, name);
@@ -1046,24 +1046,24 @@ generate_PUSHFUNC(cctx_T *cctx, char_u *name, type_T *type, int may_prefix)
     }
 
     isn->isn_arg.string = funcname;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_AUTOLOAD instruction.
  */
-    int
+    صحيح
 generate_AUTOLOAD(cctx_T *cctx, char_u *name, type_T *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_AUTOLOAD, type)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr_type(cctx, ISN_AUTOLOAD, type)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.string = vim_strsave(name);
-    if (isn->isn_arg.string == NULL)
-	return FAIL;
-    return OK;
+    إذا (isn->isn_arg.string == عدم)
+	أرجع FAIL;
+    أرجع OK;
 }
 
 /*
@@ -1072,57 +1072,57 @@ generate_AUTOLOAD(cctx_T *cctx, char_u *name, type_T *type)
  * value below the list with values.
  * Caller must check the type is a list.
  */
-    int
-generate_GETITEM(cctx_T *cctx, int index, int with_op)
+    صحيح
+generate_GETITEM(cctx_T *cctx, صحيح شاخص, صحيح with_op)
 {
     isn_T	*isn;
-    type_T	*type = get_type_on_stack(cctx, with_op ? 1 : 0);
-    type_T	*item_type = &t_any;
+    type_T	*type = get_type_on_پشته(cctx, with_op ? 1 : 0);
+    type_T	*قلم_type = &t_any;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    item_type = get_item_type(type);
-    if ((isn = generate_instr(cctx, ISN_GETITEM)) == NULL)
-	return FAIL;
-    isn->isn_arg.getitem.gi_index = index;
+    قلم_type = get_قلم_type(type);
+    إذا ((isn = generate_instr(cctx, ISN_GETITEM)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.getitem.gi_شاخص = شاخص;
     isn->isn_arg.getitem.gi_with_op = with_op;
 
     // add the item type to the type stack
-    return push_type_stack(cctx, item_type);
+    أرجع افزودن_type_پشته(cctx, قلم_type);
 }
 
 /*
  * Set the type of the tuple that is left after dropping the first "count"
  * items of the tuple with type "type".
  */
-    static void
-set_tuple_slice_type_on_stack(type_T *type, int count, cctx_T *cctx)
+    ساكن فراغ
+مجموعه_tuple_برش_type_on_پشته(type_T *type, صحيح شمار, cctx_T *cctx)
 {
     garray_T	tuple_types_ga;
 
     // The item types are only known for a tuple with a fixed number of items.
-    if ((type->tt_flags & TTFLAG_VARARGS) || type->tt_argcount <= count)
+    إذا ((type->tt_flags & TTFLAG_VARARGS) || type->tt_argcount <= شمار)
     {
-	set_type_on_stack(cctx, &t_tuple_any, 0);
-	return;
+	مجموعه_type_on_پشته(cctx, &t_tuple_any, 0);
+	أرجع;
     }
 
-    ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
+    ga_init2(&tuple_types_ga, حجم(type_T *), 10);
 
-    for (int i = count; i < type->tt_argcount; i++)
+    لكل (صحيح i = شمار; i < type->tt_argcount; i++)
     {
-	if (ga_grow(&tuple_types_ga, 1) == FAIL)
+	إذا (ga_grow(&tuple_types_ga, 1) == FAIL)
 	{
 	    ga_clear(&tuple_types_ga);
-	    set_type_on_stack(cctx, &t_tuple_any, 0);
-	    return;
+	    مجموعه_type_on_پشته(cctx, &t_tuple_any, 0);
+	    أرجع;
 	}
-	((type_T **)tuple_types_ga.ga_data)[tuple_types_ga.ga_len] =
-							     type->tt_args[i];
+	((type_T **)tuple_types_ga.ga_داده)[tuple_types_ga.ga_len] =
+							     type->tt_آرگومانها[i];
 	tuple_types_ga.ga_len++;
     }
 
-    set_type_on_stack(cctx,
+    مجموعه_type_on_پشته(cctx,
 		get_tuple_type(&tuple_types_ga, cctx->ctx_type_list), 0);
 
     ga_clear(&tuple_types_ga);
@@ -1131,341 +1131,341 @@ set_tuple_slice_type_on_stack(type_T *type, int count, cctx_T *cctx)
 /*
  * Generate an ISN_SLICE instruction with "count".
  */
-    int
-generate_SLICE(cctx_T *cctx, int count)
+    صحيح
+generate_برش(cctx_T *cctx, صحيح شمار)
 {
     isn_T	*isn;
     type_T	*type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_SLICE)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = count;
+    إذا ((isn = generate_instr(cctx, ISN_برش)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.عدد = شمار;
 
     // Slicing a tuple leaves a tuple with the remaining item types, not the
     // type of the whole tuple.
-    type = get_type_on_stack(cctx, 0);
-    if (type->tt_type == VAR_TUPLE)
-	set_tuple_slice_type_on_stack(type, count, cctx);
+    type = get_type_on_پشته(cctx, 0);
+    إذا (type->tt_type == VAR_TUPLE)
+	مجموعه_tuple_برش_type_on_پشته(type, شمار, cctx);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_CHECKLEN instruction with "min_len".
  */
-    int
-generate_CHECKLEN(cctx_T *cctx, int min_len, int more_OK)
+    صحيح
+generate_CHECKLEN(cctx_T *cctx, صحيح min_len, صحيح بیشتر_OK)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if ((isn = generate_instr(cctx, ISN_CHECKLEN)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, ISN_CHECKLEN)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.checklen.cl_min_len = min_len;
-    isn->isn_arg.checklen.cl_more_OK = more_OK;
+    isn->isn_arg.checklen.cl_بیشتر_OK = بیشتر_OK;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_STORE instruction.
  */
-    int
-generate_STORE(cctx_T *cctx, isntype_T isn_type, int idx, char_u *name)
+    صحيح
+generate_STORE(cctx_T *cctx, isntype_T isn_type, صحيح idx, char_u *name)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, isn_type, 1)) == NULL)
-	return FAIL;
-    if (name != NULL)
+    إذا ((isn = generate_instr_drop(cctx, isn_type, 1)) == عدم)
+	أرجع FAIL;
+    إذا (name != عدم)
 	isn->isn_arg.string = vim_strsave(name);
-    else
-	isn->isn_arg.number = idx;
+    وإلا
+	isn->isn_arg.عدد = idx;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_LOAD_CLASSMEMBER ("load" == TRUE) or ISN_STORE_CLASSMEMBER
  * ("load" == FALSE) instruction.
  */
-    int
+    صحيح
 generate_CLASSMEMBER(
 	cctx_T	    *cctx,
-	int	    load,
+	صحيح	    بارگیری,
 	class_T	    *cl,
-	int	    idx)
+	صحيح	    idx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (load)
+    إذا (بارگیری)
     {
 	ocmember_T *m = &cl->class_class_members[idx];
-	isn = generate_instr_type(cctx, ISN_LOAD_CLASSMEMBER, m->ocm_type);
+	isn = generate_instr_type(cctx, ISN_بارگیری_CLASSMEMBER, m->ocm_type);
     }
-    else
+    وإلا
     {
 	isn = generate_instr_drop(cctx, ISN_STORE_CLASSMEMBER, 1);
     }
-    if (isn == NULL)
-	return FAIL;
+    إذا (isn == عدم)
+	أرجع FAIL;
     isn->isn_arg.classmember.cm_class = cl;
     ++cl->class_refcount;
     isn->isn_arg.classmember.cm_idx = idx;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_STOREOUTER instruction.
  */
-    static int
+    ساكن صحيح
 generate_STOREOUTER(
 	cctx_T	    *cctx,
-	int	    idx,
-	int	    level,
-	int	    loop_depth,
-	int	    loop_idx)
+	صحيح	    idx,
+	صحيح	    level,
+	صحيح	    loop_عمق,
+	صحيح	    loop_idx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, ISN_STOREOUTER, 1)) == NULL)
-	return FAIL;
-    if (level == 1 && loop_idx >= 0 && idx >= loop_idx)
+    إذا ((isn = generate_instr_drop(cctx, ISN_STOREOUTER, 1)) == عدم)
+	أرجع FAIL;
+    إذا (level == 1 && loop_idx >= 0 && idx >= loop_idx)
     {
 	// Store a variable defined in a loop.  A copy will be made at the end
 	// of the loop.
 	isn->isn_arg.outer.outer_idx = idx - loop_idx;
-	isn->isn_arg.outer.outer_depth = -loop_depth - 1;
+	isn->isn_arg.outer.outer_عمق = -loop_عمق - 1;
     }
-    else
+    وإلا
     {
 	isn->isn_arg.outer.outer_idx = idx;
-	isn->isn_arg.outer.outer_depth = level;
+	isn->isn_arg.outer.outer_عمق = level;
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_STORENR instruction (short for ISN_PUSHNR + ISN_STORE)
  */
-    int
-generate_STORENR(cctx_T *cctx, int idx, varnumber_T value)
+    صحيح
+generate_STORENR(cctx_T *cctx, صحيح idx, varnumber_T مقدار)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_STORENR)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, ISN_STORENR)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.storenr.stnr_idx = idx;
-    isn->isn_arg.storenr.stnr_val = value;
+    isn->isn_arg.storenr.stnr_val = مقدار;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_STOREOPT or ISN_STOREFUNCOPT instruction
  */
-    static int
+    ساكن صحيح
 generate_STOREOPT(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
 	char_u	    *name,
-	int	    opt_flags)
+	صحيح	    opt_flags)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, isn_type, 1)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr_drop(cctx, isn_type, 1)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.storeopt.so_name = vim_strsave(name);
     isn->isn_arg.storeopt.so_flags = opt_flags;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_LOAD or similar instruction.
  */
-    int
-generate_LOAD(
+    صحيح
+generate_بارگیری(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
-	int	    idx,
+	صحيح	    idx,
 	char_u	    *name,
 	type_T	    *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type2(cctx, isn_type, type, type)) == NULL)
-	return FAIL;
-    if (name != NULL)
+    إذا ((isn = generate_instr_type2(cctx, isn_type, type, type)) == عدم)
+	أرجع FAIL;
+    إذا (name != عدم)
 	isn->isn_arg.string = vim_strsave(name);
-    else
-	isn->isn_arg.number = idx;
+    وإلا
+	isn->isn_arg.عدد = idx;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_LOADOUTER instruction
  */
-    int
+    صحيح
 generate_LOADOUTER(
 	cctx_T	    *cctx,
-	int	    idx,
-	int	    nesting,
-	int	    loop_depth,
-	int	    loop_idx,
+	صحيح	    idx,
+	صحيح	    nesting,
+	صحيح	    loop_عمق,
+	صحيح	    loop_idx,
 	type_T	    *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type2(cctx, ISN_LOADOUTER, type, type)) == NULL)
-	return FAIL;
-    if (nesting == 1 && loop_idx >= 0 && idx >= loop_idx)
+    إذا ((isn = generate_instr_type2(cctx, ISN_LOADOUTER, type, type)) == عدم)
+	أرجع FAIL;
+    إذا (nesting == 1 && loop_idx >= 0 && idx >= loop_idx)
     {
 	// Load a variable defined in a loop.  A copy will be made at the end
 	// of the loop.
 	isn->isn_arg.outer.outer_idx = idx - loop_idx;
-	isn->isn_arg.outer.outer_depth = -loop_depth - 1;
+	isn->isn_arg.outer.outer_عمق = -loop_عمق - 1;
     }
-    else
+    وإلا
     {
 	isn->isn_arg.outer.outer_idx = idx;
-	isn->isn_arg.outer.outer_depth = nesting;
+	isn->isn_arg.outer.outer_عمق = nesting;
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_LOADV instruction for v:var.
  */
-    int
+    صحيح
 generate_LOADV(
 	cctx_T	    *cctx,
 	char_u	    *name)
 {
-    int	    di_flags;
-    int	    vidx = find_vim_var(name, &di_flags);
+    صحيح	    di_flags;
+    صحيح	    vidx = پیدا_کن_vim_var(name, &di_flags);
     type_T  *type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (vidx < 0)
+    إذا (vidx < 0)
     {
-	semsg(_(e_variable_not_found_str), name);
-	return FAIL;
+	semsg(_(e_variable_not_یافت_str), name);
+	أرجع FAIL;
     }
     type = get_vim_var_type(vidx, cctx->ctx_type_list);
-    return generate_LOAD(cctx, ISN_LOADV, vidx, NULL, type);
+    أرجع generate_بارگیری(cctx, ISN_LOADV, vidx, عدم, type);
 }
 
 /*
  * Generate an ISN_UNLET instruction.
  */
-    int
-generate_UNLET(cctx_T *cctx, isntype_T isn_type, char_u *name, int forceit)
+    صحيح
+generate_UNLET(cctx_T *cctx, isntype_T isn_type, char_u *name, صحيح forceit)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, isn_type)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, isn_type)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.unlet.ul_name = vim_strsave(name);
     isn->isn_arg.unlet.ul_forceit = forceit;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_LOCKCONST instruction.
  */
-    int
+    صحيح
 generate_LOCKCONST(cctx_T *cctx)
 {
     RETURN_OK_IF_SKIP(cctx);
-    if (generate_instr(cctx, ISN_LOCKCONST) == NULL)
-	return FAIL;
-    return OK;
+    إذا (generate_instr(cctx, ISN_LOCKCONST) == عدم)
+	أرجع FAIL;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_LOADS instruction.
  */
-    int
+    صحيح
 generate_OLDSCRIPT(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
 	char_u	    *name,
-	int	    sid,
+	صحيح	    sid,
 	type_T	    *type)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (isn_type == ISN_LOADS || isn_type == ISN_LOADEXPORT)
+    إذا (isn_type == ISN_LOADS || isn_type == ISN_LOADEXPORT)
 	isn = generate_instr_type(cctx, isn_type, type);
-    else
+    وإلا
 	isn = generate_instr_drop(cctx, isn_type, 1);
-    if (isn == NULL)
-	return FAIL;
+    إذا (isn == عدم)
+	أرجع FAIL;
     isn->isn_arg.loadstore.ls_name = vim_strsave(name);
     isn->isn_arg.loadstore.ls_sid = sid;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_LOADSCRIPT or ISN_STORESCRIPT instruction.
  */
-    int
+    صحيح
 generate_VIM9SCRIPT(
 	cctx_T	    *cctx,
 	isntype_T   isn_type,
-	int	    sid,
-	int	    idx,
+	صحيح	    sid,
+	صحيح	    idx,
 	type_T	    *type)
 {
     isn_T	*isn;
     scriptref_T	*sref;
-    scriptitem_T *si = SCRIPT_ITEM(sid);
+    scriptitem_T *si = SCRIPT_قلم(sid);
 
     RETURN_OK_IF_SKIP(cctx);
-    if (isn_type == ISN_LOADSCRIPT)
+    إذا (isn_type == ISN_LOADSCRIPT)
 	isn = generate_instr_type2(cctx, isn_type, type, type);
-    else
+    وإلا
 	isn = generate_instr_drop(cctx, isn_type, 1);
-    if (isn == NULL)
-	return FAIL;
+    إذا (isn == عدم)
+	أرجع FAIL;
 
     // This requires three arguments, which doesn't fit in an instruction, thus
     // we need to allocate a struct for this.
     sref = ALLOC_ONE(scriptref_T);
-    if (sref == NULL)
-	return FAIL;
+    إذا (sref == عدم)
+	أرجع FAIL;
     isn->isn_arg.script.scriptref = sref;
     sref->sref_sid = sid;
     sref->sref_idx = idx;
     sref->sref_seq = si->sn_script_seq;
     sref->sref_type = type;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_NEWLIST instruction for "count" items.
  * "use_null" is TRUE for null_list.
  */
-    int
-generate_NEWLIST(cctx_T *cctx, int count, int use_null)
+    صحيح
+generate_NEWLIST(cctx_T *cctx, صحيح شمار, صحيح use_null)
 {
     isn_T	*isn;
     type_T	*member_type;
@@ -1473,49 +1473,49 @@ generate_NEWLIST(cctx_T *cctx, int count, int use_null)
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_NEWLIST)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = use_null ? -1 : count;
+    إذا ((isn = generate_instr(cctx, ISN_NEWLIST)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.عدد = use_null ? -1 : شمار;
 
     // Get the member type and the declared member type from all the items on
     // the stack.
-    if ((member_type = get_member_type_from_stack(count, 1, cctx)) == NULL)
-	return FAIL;
+    إذا ((member_type = get_member_type_from_پشته(شمار, 1, cctx)) == عدم)
+	أرجع FAIL;
     type = get_list_type(member_type, cctx->ctx_type_list);
     decl_type = get_list_type(&t_any, cctx->ctx_type_list);
 
     // drop the value types
-    cctx->ctx_type_stack.ga_len -= count;
+    cctx->ctx_type_پشته.ga_len -= شمار;
 
     // add the list type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    أرجع افزودن_type_stack2(cctx, type, decl_type);
 }
 
 /*
  * Generate an ISN_NEWTUPLE instruction for "count" items.
  * "use_null" is TRUE for null_tuple.
  */
-    int
-generate_NEWTUPLE(cctx_T *cctx, int count, int use_null)
+    صحيح
+generate_NEWTUPLE(cctx_T *cctx, صحيح شمار, صحيح use_null)
 {
     isn_T	*isn;
     type_T	*type;
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_NEWTUPLE)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = use_null ? -1 : count;
+    إذا ((isn = generate_instr(cctx, ISN_NEWTUPLE)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.عدد = use_null ? -1 : شمار;
 
     // Get the member type and the declared member type from all the items on
     // the stack.
     garray_T	tuple_types_ga;
-    ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
+    ga_init2(&tuple_types_ga, حجم(type_T *), 10);
 
-    if (get_tuple_type_from_stack(count, &tuple_types_ga, cctx) < 0)
+    إذا (get_tuple_type_from_پشته(شمار, &tuple_types_ga, cctx) < 0)
     {
 	ga_clear(&tuple_types_ga);
-	return FAIL;
+	أرجع FAIL;
     }
 
     type = get_tuple_type(&tuple_types_ga, cctx->ctx_type_list);
@@ -1524,18 +1524,18 @@ generate_NEWTUPLE(cctx_T *cctx, int count, int use_null)
     ga_clear(&tuple_types_ga);
 
     // drop the value types
-    cctx->ctx_type_stack.ga_len -= count;
+    cctx->ctx_type_پشته.ga_len -= شمار;
 
     // add the tuple type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    أرجع افزودن_type_stack2(cctx, type, decl_type);
 }
 
 /*
  * Generate an ISN_NEWDICT instruction.
  * "use_null" is TRUE for null_dict.
  */
-    int
-generate_NEWDICT(cctx_T *cctx, int count, int use_null)
+    صحيح
+generate_NEWDICT(cctx_T *cctx, صحيح شمار, صحيح use_null)
 {
     isn_T	*isn;
     type_T	*member_type;
@@ -1543,20 +1543,20 @@ generate_NEWDICT(cctx_T *cctx, int count, int use_null)
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_NEWDICT)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = use_null ? -1 : count;
+    إذا ((isn = generate_instr(cctx, ISN_NEWDICT)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.عدد = use_null ? -1 : شمار;
 
-    if ((member_type = get_member_type_from_stack(count, 2, cctx)) == NULL)
-	return FAIL;
+    إذا ((member_type = get_member_type_from_پشته(شمار, 2, cctx)) == عدم)
+	أرجع FAIL;
     type = get_dict_type(member_type, cctx->ctx_type_list);
     decl_type = get_dict_type(&t_any, cctx->ctx_type_list);
 
     // drop the key and value types
-    cctx->ctx_type_stack.ga_len -= 2 * count;
+    cctx->ctx_type_پشته.ga_len -= 2 * شمار;
 
     // add the dict type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    أرجع افزودن_type_stack2(cctx, type, decl_type);
 }
 
 /*
@@ -1567,67 +1567,67 @@ generate_NEWDICT(cctx_T *cctx, int count, int use_null)
  * be set later.  The index is used instead of a pointer to the instruction
  * because the instruction memory can be reallocated.
  */
-    int
+    صحيح
 generate_FUNCREF(
 	cctx_T	    *cctx,
 	ufunc_T	    *ufunc,
 	class_T	    *cl,
-	int	    object_method,
-	int	    fi,
-	int	    *isn_idx)
+	صحيح	    object_روش,
+	صحيح	    fi,
+	صحيح	    *isn_idx)
 {
     isn_T	    *isn;
     type_T	    *type;
     funcref_extra_T *extra;
     loopvarinfo_T   loopinfo;
-    int		    has_vars;
+    صحيح		    has_vars;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_FUNCREF)) == NULL)
-	return FAIL;
-    if (isn_idx != NULL)
+    إذا ((isn = generate_instr(cctx, ISN_FUNCREF)) == عدم)
+	أرجع FAIL;
+    إذا (isn_idx != عدم)
 	// save the index of the new instruction
 	*isn_idx = cctx->ctx_instr.ga_len - 1;
 
     has_vars = get_loop_var_info(cctx, &loopinfo);
-    if (ufunc->uf_def_status == UF_NOT_COMPILED || has_vars || cl != NULL)
+    إذا (ufunc->uf_def_وضعیت == UF_NOT_COMPILED || has_vars || cl != عدم)
     {
 	extra = ALLOC_CLEAR_ONE(funcref_extra_T);
-	if (extra == NULL)
-	    return FAIL;
+	إذا (extra == عدم)
+	    أرجع FAIL;
 	isn->isn_arg.funcref.fr_extra = extra;
 	extra->fre_loopvar_info = loopinfo;
-	if (cl != NULL)
+	إذا (cl != عدم)
 	{
 	    extra->fre_class = cl;
 	    ++cl->class_refcount;
-	    extra->fre_object_method = object_method;
-	    extra->fre_method_idx = fi;
+	    extra->fre_object_روش = object_روش;
+	    extra->fre_روش_idx = fi;
 	}
     }
-    if (ufunc->uf_def_status == UF_NOT_COMPILED || cl != NULL)
+    إذا (ufunc->uf_def_وضعیت == UF_NOT_COMPILED || cl != عدم)
 	extra->fre_func_name = vim_strnsave(ufunc->uf_name, ufunc->uf_namelen);
-    if (ufunc->uf_def_status != UF_NOT_COMPILED && cl == NULL)
+    إذا (ufunc->uf_def_وضعیت != UF_NOT_COMPILED && cl == عدم)
     {
-	if (isn_idx == NULL && ufunc->uf_def_status == UF_TO_BE_COMPILED)
+	إذا (isn_idx == عدم && ufunc->uf_def_وضعیت == UF_مقصد_BE_COMPILED)
 	    // compile the function now, we need the uf_dfunc_idx value
-	    (void)compile_def_function(ufunc, FALSE, CT_NONE, NULL);
+	    (فراغ)compile_def_function(ufunc, FALSE, CT_NONE, عدم);
 	isn->isn_arg.funcref.fr_dfunc_idx = ufunc->uf_dfunc_idx;
     }
 
     // Reserve an extra variable to keep track of the number of closures
     // created.
-    cctx->ctx_has_closure = 1;
+    cctx->ctx_has_بستگی = 1;
 
     // If the referenced function is a closure, it may use items further up in
     // the nested context, including this one.  But not a function defined at
     // the script level.
-    if ((ufunc->uf_flags & FC_CLOSURE)
+    إذا ((ufunc->uf_flags & FC_بستگی)
 			       && func_name_refcount(cctx->ctx_ufunc->uf_name))
-	cctx->ctx_ufunc->uf_flags |= FC_CLOSURE;
+	cctx->ctx_ufunc->uf_flags |= FC_بستگی;
 
-    type = ufunc->uf_func_type == NULL ? &t_func_any : ufunc->uf_func_type;
-    return push_type_stack(cctx, type);
+    type = ufunc->uf_func_type == عدم ? &t_func_any : ufunc->uf_func_type;
+    أرجع افزودن_type_پشته(cctx, type);
 }
 
 /*
@@ -1635,167 +1635,167 @@ generate_FUNCREF(
  * "lambda_name" and "func_name" must be in allocated memory and will be
  * consumed.
  */
-    int
+    صحيح
 generate_NEWFUNC(
 	cctx_T	*cctx,
 	char_u	*lambda_name,
 	char_u	*func_name)
 {
     isn_T	*isn;
-    int		ret = OK;
+    صحيح		ret = OK;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    إذا (cctx->ctx_skip != SKIP_YES)
     {
-	if ((isn = generate_instr(cctx, ISN_NEWFUNC)) == NULL)
+	إذا ((isn = generate_instr(cctx, ISN_NEWFUNC)) == عدم)
 	    ret = FAIL;
-	else
+	وإلا
 	{
 	    newfuncarg_T *arg = ALLOC_CLEAR_ONE(newfuncarg_T);
 
-	    if (arg == NULL)
+	    إذا (arg == عدم)
 		ret = FAIL;
-	    else
+	    وإلا
 	    {
 		// Reserve an extra variable to keep track of the number of
 		// closures created.
-		cctx->ctx_has_closure = 1;
+		cctx->ctx_has_بستگی = 1;
 
 		isn->isn_arg.newfunc.nf_arg = arg;
 		arg->nfa_lambda = lambda_name;
 		arg->nfa_global = func_name;
-		(void)get_loop_var_info(cctx, &arg->nfa_loopvar_info);
-		return OK;
+		(فراغ)get_loop_var_info(cctx, &arg->nfa_loopvar_info);
+		أرجع OK;
 	    }
 	}
     }
     vim_free(lambda_name);
     vim_free(func_name);
-    return ret;
+    أرجع ret;
 }
 
 /*
  * Generate an ISN_DEF instruction: list functions
  */
-    int
+    صحيح
 generate_DEF(cctx_T *cctx, char_u *name, size_t len)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_DEF)) == NULL)
-	return FAIL;
-    if (len > 0)
+    إذا ((isn = generate_instr(cctx, ISN_DEF)) == عدم)
+	أرجع FAIL;
+    إذا (len > 0)
     {
 	isn->isn_arg.string = vim_strnsave(name, len);
-	if (isn->isn_arg.string == NULL)
-	    return FAIL;
+	إذا (isn->isn_arg.string == عدم)
+	    أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_JUMP instruction.
  */
-    int
-generate_JUMP(cctx_T *cctx, jumpwhen_T when, int where)
+    صحيح
+generate_JUMP(cctx_T *cctx, jumpwhen_T when, صحيح where)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*پشته = &cctx->ctx_type_پشته;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_JUMP)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, ISN_JUMP)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.jump.jump_when = when;
     isn->isn_arg.jump.jump_where = where;
 
-    if (when != JUMP_ALWAYS && stack->ga_len > 0)
-	--stack->ga_len;
+    إذا (when != JUMP_ALWAYS && پشته->ga_len > 0)
+	--پشته->ga_len;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_WHILE instruction.  Similar to ISN_JUMP for :while
  */
-    int
-generate_WHILE(cctx_T *cctx, int funcref_idx)
+    صحيح
+generate_WHILE(cctx_T *cctx, صحيح funcref_idx)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*پشته = &cctx->ctx_type_پشته;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_WHILE)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, ISN_WHILE)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.whileloop.while_funcref_idx = funcref_idx;
-    isn->isn_arg.whileloop.while_end = 0;  // filled in later
+    isn->isn_arg.whileloop.while_انتها = 0;  // filled in later
 
-    if (stack->ga_len > 0)
-	--stack->ga_len;
+    إذا (پشته->ga_len > 0)
+	--پشته->ga_len;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_JUMP_IF_ARG_SET or ISN_JUMP_IF_ARG_NOT_SET instruction.
  */
-    int
-generate_JUMP_IF_ARG(cctx_T *cctx, isntype_T isn_type, int arg_off)
+    صحيح
+generate_JUMP_IF_ARG(cctx_T *cctx, isntype_T isn_type, صحيح arg_off)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, isn_type)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, isn_type)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.jumparg.jump_arg_off = arg_off;
     // jump_where is set later
-    return OK;
+    أرجع OK;
 }
 
-    int
-generate_FOR(cctx_T *cctx, int loop_idx)
+    صحيح
+generate_FOR(cctx_T *cctx, صحيح loop_idx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_FOR)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, ISN_FOR)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.forloop.for_loop_idx = loop_idx;
 
     // type doesn't matter, will be stored next
-    return push_type_stack(cctx, &t_any);
+    أرجع افزودن_type_پشته(cctx, &t_any);
 }
 
-    int
+    صحيح
 generate_ENDLOOP(cctx_T *cctx, loop_info_T *loop_info)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_ENDLOOP)) == NULL)
-	return FAIL;
-    isn->isn_arg.endloop.end_depth = loop_info->li_depth;
-    isn->isn_arg.endloop.end_funcref_idx = loop_info->li_funcref_idx;
-    isn->isn_arg.endloop.end_var_idx = loop_info->li_local_count;
-    isn->isn_arg.endloop.end_var_count =
-			   cctx->ctx_locals.ga_len - loop_info->li_local_count;
-    return OK;
+    إذا ((isn = generate_instr(cctx, ISN_ENDLOOP)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.endloop.انتها_عمق = loop_info->li_عمق;
+    isn->isn_arg.endloop.انتها_funcref_idx = loop_info->li_funcref_idx;
+    isn->isn_arg.endloop.انتها_var_idx = loop_info->li_local_شمار;
+    isn->isn_arg.endloop.انتها_var_شمار =
+			   cctx->ctx_locals.ga_len - loop_info->li_local_شمار;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_TRYCONT instruction.
  */
-    int
-generate_TRYCONT(cctx_T *cctx, int levels, int where)
+    صحيح
+generate_TRYCONT(cctx_T *cctx, صحيح سطوح, صحيح where)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_TRYCONT)) == NULL)
-	return FAIL;
-    isn->isn_arg.trycont.tct_levels = levels;
+    إذا ((isn = generate_instr(cctx, ISN_TRYCONT)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.trycont.tct_سطوح = سطوح;
     isn->isn_arg.trycont.tct_where = where;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -1803,65 +1803,65 @@ generate_TRYCONT(cctx_T *cctx, int levels, int where)
  * Give an error and return FAIL if something is wrong.
  * When "method_call" is NULL no code is generated.
  */
-    int
-check_internal_func_args(
+    صحيح
+check_داخلی_func_آرگومانها(
 	cctx_T	*cctx,
-	int	func_idx,
-	int	argcount,
-	int	method_call,
+	صحيح	func_idx,
+	صحيح	argcount,
+	صحيح	روش_call,
 	type2_T **argtypes,
 	type2_T *shuffled_argtypes)
 {
-    garray_T	*stack = &cctx->ctx_type_stack;
-    int		argoff = check_internal_func(func_idx, argcount);
+    garray_T	*پشته = &cctx->ctx_type_پشته;
+    صحيح		argoff = check_داخلی_func(func_idx, argcount);
 
-    if (argoff < 0)
-	return FAIL;
+    إذا (argoff < 0)
+	أرجع FAIL;
 
-    if (method_call && argoff > 1)
+    إذا (روش_call && argoff > 1)
     {
-	if (argcount < argoff)
+	إذا (argcount < argoff)
 	{
 	    semsg(_(e_not_enough_arguments_for_function_str),
-						 internal_func_name(func_idx));
-	    return FAIL;
+						 داخلی_func_name(func_idx));
+	    أرجع FAIL;
 	}
 
 	isn_T	*isn = generate_instr(cctx, ISN_SHUFFLE);
-	if (isn  == NULL)
-	    return FAIL;
-	isn->isn_arg.shuffle.shfl_item = argcount;
-	isn->isn_arg.shuffle.shfl_up = argoff - 1;
+	إذا (isn  == عدم)
+	    أرجع FAIL;
+	isn->isn_arg.shuffle.shfl_قلم = argcount;
+	isn->isn_arg.shuffle.shfl_به_بالا = argoff - 1;
     }
 
-    if (argcount > 0)
+    إذا (argcount > 0)
     {
-	type2_T	*typep = ((type2_T *)stack->ga_data) + stack->ga_len - argcount;
+	type2_T	*typep = ((type2_T *)پشته->ga_داده) + پشته->ga_len - argcount;
 
 	// Check the types of the arguments.
-	if (method_call && argoff > 1)
+	إذا (روش_call && argoff > 1)
 	{
-	    int i;
+	    صحيح i;
 
-	    for (i = 0; i < argcount; ++i)
+	    لكل (i = 0; i < argcount; ++i)
 		shuffled_argtypes[i] = (i < argoff - 1)
 				    ? typep[i + 1]
 				    : (i == argoff - 1) ? typep[0] : typep[i];
 	    *argtypes = shuffled_argtypes;
 	}
-	else
+	وإلا
 	{
-	    int i;
+	    صحيح i;
 
-	    for (i = 0; i < argcount; ++i)
+	    لكل (i = 0; i < argcount; ++i)
 		shuffled_argtypes[i] = typep[i];
 	    *argtypes = shuffled_argtypes;
 	}
-	if (internal_func_check_arg_types(*argtypes, func_idx, argcount,
+	إذا (داخلی_func_check_arg_types(*argtypes, func_idx, argcount,
 								 cctx) == FAIL)
-	    return FAIL;
+	    أرجع FAIL;
     }
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -1869,96 +1869,96 @@ check_internal_func_args(
  * "method_call" is TRUE for "value->method()"
  * Return FAIL if the number of arguments is wrong.
  */
-    int
-generate_BCALL(cctx_T *cctx, int func_idx, int argcount, int method_call)
+    صحيح
+generate_BCALL(cctx_T *cctx, صحيح func_idx, صحيح argcount, صحيح روش_call)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
-    type2_T	*argtypes = NULL;
-    type2_T	shuffled_argtypes[MAX_FUNC_ARGS];
-    type2_T	*maptype = NULL;
+    garray_T	*پشته = &cctx->ctx_type_پشته;
+    type2_T	*argtypes = عدم;
+    type2_T	shuffled_argtypes[MAX_FUNC_آرگومانها];
+    type2_T	*maptype = عدم;
     type_T	*type;
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if (check_internal_func_args(cctx, func_idx, argcount, method_call,
+    إذا (check_داخلی_func_آرگومانها(cctx, func_idx, argcount, روش_call,
 					 &argtypes, shuffled_argtypes) == FAIL)
-	return FAIL;
+	أرجع FAIL;
 
-    if (internal_func_is_map(func_idx))
+    إذا (داخلی_func_is_map(func_idx))
 	maptype = argtypes;
 
-    if ((isn = generate_instr(cctx, ISN_BCALL)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, ISN_BCALL)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.bfunc.cbf_idx = func_idx;
     isn->isn_arg.bfunc.cbf_argcount = argcount;
 
     // Drop the argument types and push the return type.
-    stack->ga_len -= argcount;
-    type = internal_func_ret_type(func_idx, argcount, argtypes, &decl_type,
+    پشته->ga_len -= argcount;
+    type = داخلی_func_ret_type(func_idx, argcount, argtypes, &decl_type,
 							  cctx->ctx_type_list);
-    if (push_type_stack2(cctx, type, decl_type) == FAIL)
-	return FAIL;
+    إذا (افزودن_type_stack2(cctx, type, decl_type) == FAIL)
+	أرجع FAIL;
 
-    if (maptype != NULL && maptype[0].type_decl->tt_member != NULL
+    إذا (maptype != عدم && maptype[0].type_decl->tt_member != عدم
 				  && maptype[0].type_decl->tt_member != &t_any)
 	// Check that map() didn't change the item types.
 	generate_TYPECHECK(cctx, maptype[0].type_decl, 0, -1, FALSE, 1);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_LISTAPPEND instruction.  Works like add().
  * Argument count is already checked.
  */
-    int
+    صحيح
 generate_LISTAPPEND(cctx_T *cctx)
 {
     type_T	*list_type;
-    type_T	*item_type;
+    type_T	*قلم_type;
     type_T	*expected;
 
     // Caller already checked that list_type is a list.
     // For checking the item type we use the declared type of the list and the
     // current type of the added item, adding a string to [1, 2] is OK.
-    list_type = get_decl_type_on_stack(cctx, 1);
-    if (arg_type_modifiable(list_type, 1) == FAIL)
-	return FAIL;
-    item_type = get_type_on_stack(cctx, 0);
+    list_type = get_decl_type_on_پشته(cctx, 1);
+    إذا (arg_type_modifiable(list_type, 1) == FAIL)
+	أرجع FAIL;
+    قلم_type = get_type_on_پشته(cctx, 0);
     expected = list_type->tt_member;
-    if (need_type(item_type, expected, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
-	return FAIL;
+    إذا (need_type(قلم_type, expected, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
+	أرجع FAIL;
 
-    if (generate_instr(cctx, ISN_LISTAPPEND) == NULL)
-	return FAIL;
+    إذا (generate_instr(cctx, ISN_LISTAPPEND) == عدم)
+	أرجع FAIL;
 
-    --cctx->ctx_type_stack.ga_len;	    // drop the argument
-    return OK;
+    --cctx->ctx_type_پشته.ga_len;	    // drop the argument
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_BLOBAPPEND instruction.  Works like add().
  * Argument count is already checked.
  */
-    int
+    صحيح
 generate_BLOBAPPEND(cctx_T *cctx)
 {
-    type_T	*item_type;
+    type_T	*قلم_type;
 
     // Caller already checked that blob_type is a blob, check it is modifiable.
-    if (arg_type_modifiable(get_decl_type_on_stack(cctx, 1), 1) == FAIL)
-	return FAIL;
-    item_type = get_type_on_stack(cctx, 0);
-    if (need_type(item_type, &t_number, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
-	return FAIL;
+    إذا (arg_type_modifiable(get_decl_type_on_پشته(cctx, 1), 1) == FAIL)
+	أرجع FAIL;
+    قلم_type = get_type_on_پشته(cctx, 0);
+    إذا (need_type(قلم_type, &t_عدد, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
+	أرجع FAIL;
 
-    if (generate_instr(cctx, ISN_BLOBAPPEND) == NULL)
-	return FAIL;
+    إذا (generate_instr(cctx, ISN_BLOBAPPEND) == عدم)
+	أرجع FAIL;
 
-    --cctx->ctx_type_stack.ga_len;	    // drop the argument
-    return OK;
+    --cctx->ctx_type_پشته.ga_len;	    // drop the argument
+    أرجع OK;
 }
 
 /*
@@ -1968,29 +1968,29 @@ generate_BLOBAPPEND(cctx_T *cctx)
  *   ISN_UCALL      - uncompiled function, or
  *                    compiled script-local function called from a lambda
  */
-    static isntype_T
+    ساكن isntype_T
 isn_get_calltype(
 	cctx_T	    *cctx,
 	ufunc_T	    *ufunc,
 	class_T	    *cl)
 {
-    if (cl != NULL)
-	return ISN_METHODCALL;
+    إذا (cl != عدم)
+	أرجع ISN_METHODCALL;
 
-    if (ufunc->uf_def_status == UF_NOT_COMPILED)
-	return ISN_UCALL;
+    إذا (ufunc->uf_def_وضعیت == UF_NOT_COMPILED)
+	أرجع ISN_UCALL;
 
     // function invoked from a lambda
-    if (cctx->ctx_ufunc->uf_flags & FC_LAMBDA)
+    إذا (cctx->ctx_ufunc->uf_flags & FC_LAMBDA)
     {
 	// Script-local funcs in a lambda may be redefined by re-sourcing;
 	// resolve by name at runtime.  Patched to ISN_DCALL on next call once
 	// recompiled.
-	if (ufunc->uf_name[0] == K_SPECIAL)
-	    return ISN_UCALL;
+	إذا (ufunc->uf_name[0] == K_SPECIAL)
+	    أرجع ISN_UCALL;
     }
 
-    return ISN_DCALL;
+    أرجع ISN_DCALL;
 }
 
 /*
@@ -2001,92 +2001,92 @@ isn_get_calltype(
  * directly to determine ufunc.
  * Return FAIL if the number of arguments is wrong.
  */
-    int
+    صحيح
 generate_CALL(
 	cctx_T	    *cctx,
 	ufunc_T	    *ufunc,
 	class_T	    *cl,
-	int	    mi,
-	int	    pushed_argcount,
-	int	    is_super)
+	صحيح	    mi,
+	صحيح	    pushed_argcount,
+	صحيح	    is_super)
 {
     isn_T	*isn;
-    int		regular_args = ufunc->uf_args.ga_len;
-    int		argcount = pushed_argcount;
+    صحيح		regular_آرگومانها = ufunc->uf_آرگومانها.ga_len;
+    صحيح		argcount = pushed_argcount;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (argcount > regular_args && !has_varargs(ufunc))
+    إذا (argcount > regular_آرگومانها && !has_varargs(ufunc))
     {
 	semsg(_(e_too_many_arguments_for_function_str),
 						   printable_func_name(ufunc));
-	return FAIL;
+	أرجع FAIL;
     }
-    if (argcount < regular_args - ufunc->uf_def_args.ga_len)
+    إذا (argcount < regular_آرگومانها - ufunc->uf_def_آرگومانها.ga_len)
     {
 	semsg(_(e_not_enough_arguments_for_function_str),
 						   printable_func_name(ufunc));
-	return FAIL;
+	أرجع FAIL;
     }
 
-    if (ufunc->uf_def_status != UF_NOT_COMPILED
-	    && ufunc->uf_def_status != UF_COMPILE_ERROR)
+    إذا (ufunc->uf_def_وضعیت != UF_NOT_COMPILED
+	    && ufunc->uf_def_وضعیت != UF_COMPILE_ERROR)
     {
-	int		i;
+	صحيح		i;
 	compiletype_T	compile_type;
 
-	for (i = 0; i < argcount; ++i)
+	لكل (i = 0; i < argcount; ++i)
 	{
 	    type_T *expected;
 	    type_T *actual;
 
-	    actual = get_type_on_stack(cctx, argcount - i - 1);
-	    if (check_type_is_value(actual) == FAIL)
-		return FAIL;
-	    if (actual->tt_type == VAR_SPECIAL
-			      && i >= regular_args - ufunc->uf_def_args.ga_len)
+	    actual = get_type_on_پشته(cctx, argcount - i - 1);
+	    إذا (check_type_is_مقدار(actual) == FAIL)
+		أرجع FAIL;
+	    إذا (actual->tt_type == VAR_SPECIAL
+			      && i >= regular_آرگومانها - ufunc->uf_def_آرگومانها.ga_len)
 	    {
 		// assume v:none used for default argument value
-		continue;
+		استمر;
 	    }
-	    if (i < regular_args)
+	    إذا (i < regular_آرگومانها)
 	    {
-		if (ufunc->uf_arg_types == NULL)
-		    continue;
+		إذا (ufunc->uf_arg_types == عدم)
+		    استمر;
 		expected = ufunc->uf_arg_types[i];
 	    }
-	    else if (ufunc->uf_va_type == NULL
+	    وإلا إذا (ufunc->uf_va_type == عدم
 					   || ufunc->uf_va_type == &t_list_any)
 		// possibly a lambda or "...: any"
 		expected = &t_any;
-	    else
+	    وإلا
 		expected = ufunc->uf_va_type->tt_member;
-	    if (need_type(actual, expected, 0,
+	    إذا (need_type(actual, expected, 0,
 			      -argcount + i, i + 1, cctx, TRUE, FALSE) == FAIL)
 	    {
 		arg_type_mismatch(expected, actual, i + 1);
-		return FAIL;
+		أرجع FAIL;
 	    }
 	}
 	compile_type = get_compile_type(ufunc);
-	if (func_needs_compiling(ufunc, compile_type)
-		&& compile_def_function(ufunc, ufunc->uf_ret_type == NULL,
-						   compile_type, NULL) == FAIL)
-	    return FAIL;
+	إذا (func_needs_compiling(ufunc, compile_type)
+		&& compile_def_function(ufunc, ufunc->uf_ret_type == عدم,
+						   compile_type, عدم) == FAIL)
+	    أرجع FAIL;
     }
-    if (ufunc->uf_def_status == UF_COMPILE_ERROR)
+    إذا (ufunc->uf_def_وضعیت == UF_COMPILE_ERROR)
     {
-	emsg_funcname(e_call_to_function_that_failed_to_compile_str,
+	emsg_funcname(e_call_مقصد_function_that_failed_مقصد_compile_str,
 							       ufunc->uf_name);
-	return FAIL;
+	أرجع FAIL;
     }
 
-    if ((isn = generate_instr(cctx, isn_get_calltype(cctx, ufunc, cl))) == NULL)
-	return FAIL;
-    if (cl != NULL /* isn->isn_type == ISN_METHODCALL */)
+    إذا ((isn = generate_instr(cctx, isn_get_calltype(cctx, ufunc, cl))) == عدم)
+	أرجع FAIL;
+    إذا (cl != عدم /* isn->isn_type == ISN_METHODCALL */)
     {
 	isn->isn_arg.mfunc = ALLOC_ONE(cmfunc_T);
-	if (isn->isn_arg.mfunc == NULL)
-	    return FAIL;
+	إذا (isn->isn_arg.mfunc == عدم)
+	    أرجع FAIL;
 	isn->isn_arg.mfunc->cmf_itf = cl;
 	++cl->class_refcount;
 	isn->isn_arg.mfunc->cmf_idx = mi;
@@ -2095,19 +2095,19 @@ generate_CALL(
 	// For a generic method "ufunc" has the type arguments, the method of
 	// the object class is created with the same type arguments when
 	// called.
-	isn->isn_arg.mfunc->cmf_ufunc = NULL;
-	if (ufunc != cl->class_obj_methods[mi])
+	isn->isn_arg.mfunc->cmf_ufunc = عدم;
+	إذا (ufunc != cl->class_obj_methods[mi])
 	    isn->isn_arg.mfunc->cmf_ufunc = ufunc;
-	isn->isn_arg.mfunc->cmf_cache_cl = NULL;
-	isn->isn_arg.mfunc->cmf_cache_generic = NULL;
-	isn->isn_arg.mfunc->cmf_cache_ufunc = NULL;
+	isn->isn_arg.mfunc->cmf_cache_cl = عدم;
+	isn->isn_arg.mfunc->cmf_cache_generic = عدم;
+	isn->isn_arg.mfunc->cmf_cache_ufunc = عدم;
     }
-    else if (isn->isn_type == ISN_DCALL)
+    وإلا إذا (isn->isn_type == ISN_DCALL)
     {
 	isn->isn_arg.dfunc.cdf_idx = ufunc->uf_dfunc_idx;
 	isn->isn_arg.dfunc.cdf_argcount = argcount;
     }
-    else
+    وإلا
     {
 	// A user function may be deleted and redefined later, can't use the
 	// ufunc pointer, need to look it up again at runtime.
@@ -2116,296 +2116,296 @@ generate_CALL(
     }
 
     // drop the argument types
-    cctx->ctx_type_stack.ga_len -= argcount;
+    cctx->ctx_type_پشته.ga_len -= argcount;
 
     // For an object or class method call, drop the object/class type.
-    if (ufunc->uf_class != NULL)
+    إذا (ufunc->uf_class != عدم)
     {
 	// When a class method is called without the class name prefix, then
 	// the type will not be in the stack.
-	type_T *stype = get_type_on_stack(cctx, 0);
-	if (stype->tt_type == VAR_CLASS || stype->tt_type == VAR_OBJECT)
-	    cctx->ctx_type_stack.ga_len--;
+	type_T *stype = get_type_on_پشته(cctx, 0);
+	إذا (stype->tt_type == VAR_CLASS || stype->tt_type == VAR_OBJECT)
+	    cctx->ctx_type_پشته.ga_len--;
     }
 
     // add return type
-    return push_type_stack(cctx, ufunc->uf_ret_type);
+    أرجع افزودن_type_پشته(cctx, ufunc->uf_ret_type);
 }
 
 /*
  * Generate an ISN_UCALL instruction when the function isn't defined yet.
  */
-    int
-generate_UCALL(cctx_T *cctx, char_u *name, int argcount)
+    صحيح
+generate_UCALL(cctx_T *cctx, char_u *name, صحيح argcount)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_UCALL)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, ISN_UCALL)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.ufunc.cuf_name = vim_strsave(name);
     isn->isn_arg.ufunc.cuf_argcount = argcount;
 
     // drop the argument types
-    cctx->ctx_type_stack.ga_len -= argcount;
+    cctx->ctx_type_پشته.ga_len -= argcount;
 
     // add return value
-    return push_type_stack(cctx, &t_any);
+    أرجع افزودن_type_پشته(cctx, &t_any);
 }
 
 /*
  * Check the arguments of function "type" against the types on the stack.
  * Returns OK or FAIL;
  */
-    int
-check_func_args_from_type(
+    صحيح
+check_func_آرگومانها_from_type(
 	cctx_T	*cctx,
 	type_T	*type,
-	int	argcount,
-	int	at_top,
+	صحيح	argcount,
+	صحيح	at_بالاترین,
 	char_u	*name)
 {
-    if (type->tt_argcount != -1)
+    إذا (type->tt_argcount != -1)
     {
-	int	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
+	صحيح	    varargs = (type->tt_flags & TTFLAG_VARARGS) ? 1 : 0;
 
-	if (argcount < type->tt_min_argcount - varargs)
+	إذا (argcount < type->tt_min_argcount - varargs)
 	{
 	    emsg_funcname(e_not_enough_arguments_for_function_str, name);
-	    return FAIL;
+	    أرجع FAIL;
 	}
-	if (!varargs && argcount > type->tt_argcount)
+	إذا (!varargs && argcount > type->tt_argcount)
 	{
 	    emsg_funcname(e_too_many_arguments_for_function_str, name);
-	    return FAIL;
+	    أرجع FAIL;
 	}
-	if (type->tt_args != NULL)
+	إذا (type->tt_آرگومانها != عدم)
 	{
-	    int i;
+	    صحيح i;
 
-	    for (i = 0; i < argcount; ++i)
+	    لكل (i = 0; i < argcount; ++i)
 	    {
-		int	offset = -argcount + i - (at_top ? 0 : 1);
-		type_T	*actual = get_type_on_stack(cctx, -1 - offset);
+		صحيح	جابه_جایی = -argcount + i - (at_بالاترین ? 0 : 1);
+		type_T	*actual = get_type_on_پشته(cctx, -1 - جابه_جایی);
 		type_T	*expected;
 
-		if (check_type_is_value(actual) == FAIL)
-		    return FAIL;
-		if (varargs && i >= type->tt_argcount - 1)
+		إذا (check_type_is_مقدار(actual) == FAIL)
+		    أرجع FAIL;
+		إذا (varargs && i >= type->tt_argcount - 1)
 		{
-		    expected = type->tt_args[type->tt_argcount - 1];
-		    if (expected != NULL && expected->tt_type == VAR_LIST)
+		    expected = type->tt_آرگومانها[type->tt_argcount - 1];
+		    إذا (expected != عدم && expected->tt_type == VAR_LIST)
 			expected = expected->tt_member;
-		    if (expected == NULL)
+		    إذا (expected == عدم)
 			expected = &t_any;
 		}
-		else if (i >= type->tt_min_argcount
+		وإلا إذا (i >= type->tt_min_argcount
 					     && actual->tt_type == VAR_SPECIAL)
 		    expected = &t_any;
-		else
-		    expected = type->tt_args[i];
-		if (need_type(actual, expected, 0,
-				     offset, i + 1, cctx, TRUE, FALSE) == FAIL)
+		وإلا
+		    expected = type->tt_آرگومانها[i];
+		إذا (need_type(actual, expected, 0,
+				     جابه_جایی, i + 1, cctx, TRUE, FALSE) == FAIL)
 		{
 		    arg_type_mismatch(expected, actual, i + 1);
-		    return FAIL;
+		    أرجع FAIL;
 		}
 	    }
 	}
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_PCALL instruction.
  * "type" is the type of the FuncRef.
  */
-    int
+    صحيح
 generate_PCALL(
 	cctx_T	*cctx,
-	int	argcount,
+	صحيح	argcount,
 	char_u	*name,
 	type_T	*type,
-	int	at_top)
+	صحيح	at_بالاترین)
 {
     isn_T	*isn;
     type_T	*ret_type;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if (type->tt_type == VAR_ANY || type->tt_type == VAR_UNKNOWN
+    إذا (type->tt_type == VAR_ANY || type->tt_type == VAR_UNKNOWN
 						|| type == &t_object_any)
 	ret_type = &t_any;
-    else if (type->tt_type == VAR_FUNC || type->tt_type == VAR_PARTIAL)
+    وإلا إذا (type->tt_type == VAR_FUNC || type->tt_type == VAR_PARTIAL)
     {
-	if (check_func_args_from_type(cctx, type, argcount, at_top, name)
+	إذا (check_func_آرگومانها_from_type(cctx, type, argcount, at_بالاترین, name)
 								       == FAIL)
-	    return FAIL;
+	    أرجع FAIL;
 
 	ret_type = type->tt_member;
-	if (ret_type == &t_unknown)
+	إذا (ret_type == &t_unknown)
 	    // return type not known yet, use a runtime check
 	    ret_type = &t_any;
     }
-    else
+    وإلا
     {
 	semsg(_(e_not_callable_type_str), name);
-	return FAIL;
+	أرجع FAIL;
     }
 
-    if ((isn = generate_instr(cctx, ISN_PCALL)) == NULL)
-	return FAIL;
-    isn->isn_arg.pfunc.cpf_top = at_top;
+    إذا ((isn = generate_instr(cctx, ISN_PCALL)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.pfunc.cpf_بالاترین = at_بالاترین;
     isn->isn_arg.pfunc.cpf_argcount = argcount;
 
     // drop the arguments and the funcref/partial
-    cctx->ctx_type_stack.ga_len -= argcount + 1;
+    cctx->ctx_type_پشته.ga_len -= argcount + 1;
 
     // push the return value
-    push_type_stack(cctx, ret_type);
+    افزودن_type_پشته(cctx, ret_type);
 
     // If partial is above the arguments it must be cleared and replaced with
     // the return value.
-    if (at_top && generate_instr(cctx, ISN_PCALL_END) == NULL)
-	return FAIL;
+    إذا (at_بالاترین && generate_instr(cctx, ISN_PCALL_انتها) == عدم)
+	أرجع FAIL;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_DEFER instruction.
  */
-    int
-generate_DEFER(cctx_T *cctx, int var_idx, int argcount)
+    صحيح
+generate_DEFER(cctx_T *cctx, صحيح var_idx, صحيح argcount)
 {
     isn_T *isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, ISN_DEFER, argcount + 1)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr_drop(cctx, ISN_DEFER, argcount + 1)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.defer.defer_var_idx = var_idx;
     isn->isn_arg.defer.defer_argcount = argcount;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_STRINGMEMBER instruction.
  */
-    int
+    صحيح
 generate_STRINGMEMBER(cctx_T *cctx, char_u *name, size_t len)
 {
     isn_T	*isn;
     type_T	*type;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_STRINGMEMBER)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, ISN_STRINGMEMBER)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.string = vim_strnsave(name, len);
 
     // check for dict type
-    type = get_type_on_stack(cctx, 0);
-    if (type->tt_type != VAR_DICT
+    type = get_type_on_پشته(cctx, 0);
+    إذا (type->tt_type != VAR_DICT
 	    && type->tt_type != VAR_OBJECT
 	    && type->tt_type != VAR_ANY
 	    && type->tt_type != VAR_UNKNOWN)
     {
-	char *tofree;
+	حرف *tofree;
 
-	semsg(_(e_expected_dictionary_for_using_key_str_but_got_str),
+	semsg(_(e_expected_dictionary_for_using_کلید_str_but_got_str),
 					       name, type_name(type, &tofree));
 	vim_free(tofree);
-	return FAIL;
+	أرجع FAIL;
     }
     // change dict type to dict member type
-    if (type->tt_type == VAR_DICT)
+    إذا (type->tt_type == VAR_DICT)
     {
 	type_T *ntype = type->tt_member->tt_type == VAR_UNKNOWN
 						    ? &t_any : type->tt_member;
-	set_type_on_stack(cctx, ntype, 0);
+	مجموعه_type_on_پشته(cctx, ntype, 0);
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_ECHO instruction.
  */
-    int
-generate_ECHO(cctx_T *cctx, int with_white, int count)
+    صحيح
+generate_ECHO(cctx_T *cctx, صحيح with_white, صحيح شمار)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, ISN_ECHO, count)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr_drop(cctx, ISN_ECHO, شمار)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.echo.echo_with_white = with_white;
-    isn->isn_arg.echo.echo_count = count;
+    isn->isn_arg.echo.echo_شمار = شمار;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_EXECUTE/ISN_ECHOMSG/ISN_ECHOERR instruction.
  */
-    int
-generate_MULT_EXPR(cctx_T *cctx, isntype_T isn_type, int count)
+    صحيح
+generate_MULT_عبارت(cctx_T *cctx, isntype_T isn_type, صحيح شمار)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, isn_type, count)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = count;
-    return OK;
+    إذا ((isn = generate_instr_drop(cctx, isn_type, شمار)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.عدد = شمار;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_ECHOWINDOW instruction
  */
-    int
-generate_ECHOWINDOW(cctx_T *cctx, int count, long time)
+    صحيح
+generate_ECHOWINDOW(cctx_T *cctx, صحيح شمار, دراز زمان)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr_drop(cctx, ISN_ECHOWINDOW, count)) == NULL)
-	return FAIL;
-    isn->isn_arg.echowin.ewin_count = count;
-    isn->isn_arg.echowin.ewin_time = time;
-    return OK;
+    إذا ((isn = generate_instr_drop(cctx, ISN_ECHOWINDOW, شمار)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.echowin.ewin_شمار = شمار;
+    isn->isn_arg.echowin.ewin_زمان = زمان;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_SOURCE instruction.
  */
-    int
-generate_SOURCE(cctx_T *cctx, int sid)
+    صحيح
+generate_منبع(cctx_T *cctx, صحيح sid)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr(cctx, ISN_SOURCE)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = sid;
+    إذا ((isn = generate_instr(cctx, ISN_منبع)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.عدد = sid;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an ISN_PUT or ISN_IPUT instruction depending on fixindent.
  */
-    int
-generate_PUT(cctx_T *cctx, int regname, linenr_T lnum, int fixindent)
+    صحيح
+generate_PUT(cctx_T *cctx, صحيح regname, linenr_T lnum, صحيح fixindent)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
     isn = (fixindent) ? generate_instr(cctx, ISN_IPUT) :
 			generate_instr(cctx, ISN_PUT);
-    if (isn == NULL)
-	return FAIL;
+    إذا (isn == عدم)
+	أرجع FAIL;
     isn->isn_arg.put.put_regname = regname;
     isn->isn_arg.put.put_lnum = lnum;
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -2416,147 +2416,147 @@ generate_PUT(cctx_T *cctx, int regname, linenr_T lnum, int fixindent)
  * - if the root item is a function argument
  * A copy is made of "line".
  */
-    int
-generate_LOCKUNLOCK(cctx_T *cctx, char_u *line, int is_arg)
+    صحيح
+generate_LOCKUNLOCK(cctx_T *cctx, char_u *سطر, صحيح is_arg)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_LOCKUNLOCK)) == NULL)
-	return FAIL;
-    class_T *cl = cctx->ctx_ufunc != NULL ? cctx->ctx_ufunc->uf_class : NULL;
-    isn->isn_arg.lockunlock.lu_string = vim_strsave(line);
+    إذا ((isn = generate_instr(cctx, ISN_LOCKUNLOCK)) == عدم)
+	أرجع FAIL;
+    class_T *cl = cctx->ctx_ufunc != عدم ? cctx->ctx_ufunc->uf_class : عدم;
+    isn->isn_arg.lockunlock.lu_string = vim_strsave(سطر);
     isn->isn_arg.lockunlock.lu_cl_exec = cl;
-    if (cl != NULL)
+    إذا (cl != عدم)
 	++cl->class_refcount;
     isn->isn_arg.lockunlock.lu_is_arg = is_arg;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an EXEC instruction that takes a string argument.
  * A copy is made of "line".
  */
-    int
-generate_EXEC_copy(cctx_T *cctx, isntype_T isntype, char_u *line)
+    صحيح
+generate_EXEC_copy(cctx_T *cctx, isntype_T isntype, char_u *سطر)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, isntype)) == NULL)
-	return FAIL;
-    isn->isn_arg.string = vim_strsave(line);
-    return OK;
+    إذا ((isn = generate_instr(cctx, isntype)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.string = vim_strsave(سطر);
+    أرجع OK;
 }
 
 /*
  * Generate an EXEC instruction that takes a string argument.
  * "str" must be allocated, it is consumed.
  */
-    int
+    صحيح
 generate_EXEC(cctx_T *cctx, isntype_T isntype, char_u *str)
 {
     isn_T	*isn;
-    int		ret = OK;
+    صحيح		ret = OK;
 
-    if (cctx->ctx_skip != SKIP_YES)
+    إذا (cctx->ctx_skip != SKIP_YES)
     {
-	if ((isn = generate_instr(cctx, isntype)) == NULL)
+	إذا ((isn = generate_instr(cctx, isntype)) == عدم)
 	    ret = FAIL;
-	else
+	وإلا
 	{
 	    isn->isn_arg.string = str;
-	    return OK;
+	    أرجع OK;
 	}
     }
     vim_free(str);
-    return ret;
+    أرجع ret;
 }
 
-    int
-generate_LEGACY_EVAL(cctx_T *cctx, char_u *line)
+    صحيح
+generate_LEGACY_EVAL(cctx_T *cctx, char_u *سطر)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_LEGACY_EVAL)) == NULL)
-	return FAIL;
-    isn->isn_arg.string = vim_strsave(line);
+    إذا ((isn = generate_instr(cctx, ISN_LEGACY_EVAL)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.string = vim_strsave(سطر);
 
-    return push_type_stack(cctx, &t_any);
+    أرجع افزودن_type_پشته(cctx, &t_any);
 }
 
-    int
-generate_EXECCONCAT(cctx_T *cctx, int count)
+    صحيح
+generate_EXECCONCAT(cctx_T *cctx, صحيح شمار)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr_drop(cctx, ISN_EXECCONCAT, count)) == NULL)
-	return FAIL;
-    isn->isn_arg.number = count;
-    return OK;
+    إذا ((isn = generate_instr_drop(cctx, ISN_EXECCONCAT, شمار)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.عدد = شمار;
+    أرجع OK;
 }
 
 /*
  * Generate ISN_RANGE.  Consumes "range".  Return OK/FAIL.
  */
-    int
+    صحيح
 generate_RANGE(cctx_T *cctx, char_u *range)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr(cctx, ISN_RANGE)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, ISN_RANGE)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.string = range;
 
-    return push_type_stack(cctx, &t_number);
+    أرجع افزودن_type_پشته(cctx, &t_عدد);
 }
 
-    int
-generate_UNPACK(cctx_T *cctx, int var_count, int semicolon)
+    صحيح
+generate_UNPACK(cctx_T *cctx, صحيح var_شمار, صحيح semicolon)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_UNPACK)) == NULL)
-	return FAIL;
-    isn->isn_arg.unpack.unp_count = var_count;
+    إذا ((isn = generate_instr(cctx, ISN_UNPACK)) == عدم)
+	أرجع FAIL;
+    isn->isn_arg.unpack.unp_شمار = var_شمار;
     isn->isn_arg.unpack.unp_semicolon = semicolon;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Generate an instruction for any command modifiers.
  */
-    int
+    صحيح
 generate_cmdmods(cctx_T *cctx, cmdmod_T *cmod)
 {
     isn_T	*isn;
 
-    if (has_cmdmod(cmod, FALSE))
+    إذا (has_cmdmod(cmod, FALSE))
     {
 	cctx->ctx_has_cmdmod = TRUE;
 
-	if ((isn = generate_instr(cctx, ISN_CMDMOD)) == NULL)
-	    return FAIL;
+	إذا ((isn = generate_instr(cctx, ISN_CMDMOD)) == عدم)
+	    أرجع FAIL;
 	isn->isn_arg.cmdmod.cf_cmdmod = ALLOC_ONE(cmdmod_T);
-	if (isn->isn_arg.cmdmod.cf_cmdmod == NULL)
-	    return FAIL;
-	mch_memmove(isn->isn_arg.cmdmod.cf_cmdmod, cmod, sizeof(cmdmod_T));
+	إذا (isn->isn_arg.cmdmod.cf_cmdmod == عدم)
+	    أرجع FAIL;
+	mch_memmove(isn->isn_arg.cmdmod.cf_cmdmod, cmod, حجم(cmdmod_T));
 	// filter program now belongs to the instruction
-	cmod->cmod_filter_regmatch.regprog = NULL;
+	cmod->cmod_filter_regmatch.regprog = عدم;
     }
 
-    return OK;
+    أرجع OK;
 }
 
-    int
+    صحيح
 generate_undo_cmdmods(cctx_T *cctx)
 {
-    if (cctx->ctx_has_cmdmod && generate_instr(cctx, ISN_CMDMOD_REV) == NULL)
-	return FAIL;
+    إذا (cctx->ctx_has_cmdmod && generate_instr(cctx, ISN_CMDMOD_REV) == عدم)
+	أرجع FAIL;
     cctx->ctx_has_cmdmod = FALSE;
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -2564,152 +2564,152 @@ generate_undo_cmdmods(cctx_T *cctx)
  * "lhs" might be NULL.
  * Return FAIL when out of memory.
  */
-    int
+    صحيح
 generate_store_var(
 	cctx_T		*cctx,
-	assign_dest_T	dest,
-	int		opt_flags,
-	int		vimvaridx,
+	تخصیص_بده_dest_T	dest,
+	صحيح		opt_flags,
+	صحيح		vimvaridx,
 	type_T		*type,
 	char_u		*name,
 	lhs_T		*lhs)
 {
-    switch (dest)
+    بدل (dest)
     {
-	case dest_option:
-	    return generate_STOREOPT(cctx, ISN_STOREOPT,
+	حالة dest_option:
+	    أرجع generate_STOREOPT(cctx, ISN_STOREOPT,
 					skip_option_env_lead(name), opt_flags);
-	case dest_func_option:
-	    return generate_STOREOPT(cctx, ISN_STOREFUNCOPT,
+	حالة dest_func_option:
+	    أرجع generate_STOREOPT(cctx, ISN_STOREFUNCOPT,
 					skip_option_env_lead(name), opt_flags);
-	case dest_global:
+	حالة dest_global:
 	    // include g: with the name, easier to execute that way
-	    return generate_STORE(cctx, vim_strchr(name, AUTOLOAD_CHAR) == NULL
+	    أرجع generate_STORE(cctx, vim_strchr(name, AUTOLOAD_CHAR) == عدم
 					? ISN_STOREG : ISN_STOREAUTO, 0, name);
-	case dest_buffer:
+	حالة dest_میانگیر:
 	    // include b: with the name, easier to execute that way
-	    return generate_STORE(cctx, ISN_STOREB, 0, name);
-	case dest_window:
+	    أرجع generate_STORE(cctx, ISN_STOREB, 0, name);
+	حالة dest_پنجره:
 	    // include w: with the name, easier to execute that way
-	    return generate_STORE(cctx, ISN_STOREW, 0, name);
-	case dest_tab:
+	    أرجع generate_STORE(cctx, ISN_STOREW, 0, name);
+	حالة dest_tab:
 	    // include t: with the name, easier to execute that way
-	    return generate_STORE(cctx, ISN_STORET, 0, name);
-	case dest_env:
-	    return generate_STORE(cctx, ISN_STOREENV, 0, name + 1);
-	case dest_reg:
-	    return generate_STORE(cctx, ISN_STOREREG,
-					 name[1] == '@' ? '"' : name[1], NULL);
-	case dest_vimvar:
-	    return generate_STORE(cctx, ISN_STOREV, vimvaridx, NULL);
-	case dest_script:
-	case dest_script_v9:
+	    أرجع generate_STORE(cctx, ISN_STORET, 0, name);
+	حالة dest_env:
+	    أرجع generate_STORE(cctx, ISN_STOREENV, 0, name + 1);
+	حالة dest_reg:
+	    أرجع generate_STORE(cctx, ISN_STOREREG,
+					 name[1] == '@' ? '"' : name[1], عدم);
+	حالة dest_vimvar:
+	    أرجع generate_STORE(cctx, ISN_STOREV, vimvaridx, عدم);
+	حالة dest_script:
+	حالة dest_script_v9:
 	    {
-		int	    scriptvar_idx = lhs->lhs_scriptvar_idx;
-		int	    scriptvar_sid = lhs->lhs_scriptvar_sid;
-		if (scriptvar_idx < 0)
+		صحيح	    scriptvar_idx = lhs->lhs_scriptvar_idx;
+		صحيح	    scriptvar_sid = lhs->lhs_scriptvar_sid;
+		إذا (scriptvar_idx < 0)
 		{
 		    isntype_T   isn_type = ISN_STORES;
 
 		    // If "sn_import_autoload", generate ISN_STOREEXPORT (not
 		    // ISN_STORES) if destination is in a vim9script or if
 		    // there is no "sn_autoload_prefix".
-		    if (SCRIPT_ID_VALID(scriptvar_sid)
-			     && SCRIPT_ITEM(scriptvar_sid)->sn_import_autoload
-			     && ((SCRIPT_ITEM(scriptvar_sid)
-						  ->sn_autoload_prefix == NULL)
+		    إذا (SCRIPT_ID_VALID(scriptvar_sid)
+			     && SCRIPT_قلم(scriptvar_sid)->sn_import_autoload
+			     && ((SCRIPT_قلم(scriptvar_sid)
+						  ->sn_autoload_پیشوند == عدم)
 				|| lhs->lhs_dest == dest_script_v9))
 		    {
 			// "import autoload './dir/script.vim'" - load script
-			// first
-			if (generate_SOURCE(cctx, scriptvar_sid) == FAIL)
-			    return FAIL;
+			//اولی
+			إذا (generate_منبع(cctx, scriptvar_sid) == FAIL)
+			    أرجع FAIL;
 			isn_type = ISN_STOREEXPORT;
 		    }
 
 		    // "s:" may be included in the name.
-		    return generate_OLDSCRIPT(cctx, isn_type, name,
+		    أرجع generate_OLDSCRIPT(cctx, isn_type, name,
 							  scriptvar_sid, type);
 		}
-		return generate_VIM9SCRIPT(cctx, ISN_STORESCRIPT,
+		أرجع generate_VIM9SCRIPT(cctx, ISN_STORESCRIPT,
 					   scriptvar_sid, scriptvar_idx, type);
 	    }
-	case dest_class_member:
-	    return generate_CLASSMEMBER(cctx, FALSE,
+	حالة dest_class_member:
+	    أرجع generate_CLASSMEMBER(cctx, FALSE,
 				     lhs->lhs_class, lhs->lhs_classmember_idx);
 
-	case dest_local:
-	case dest_expr:
+	حالة dest_local:
+	حالة dest_عبارت:
 	    // cannot happen
-	    break;
+	    اكسر;
     }
-    return FAIL;
+    أرجع FAIL;
 }
 
 /*
  * Return TRUE when inside a "for" or "while" loop.
  */
-    int
+    صحيح
 inside_loop_scope(cctx_T *cctx)
 {
     scope_T	*scope = cctx->ctx_scope;
 
-    for (;;)
+    لكل (;;)
     {
-	if (scope == NULL)
-	    break;
-	if (scope->se_type == FOR_SCOPE || scope->se_type == WHILE_SCOPE)
-	    return TRUE;
+	إذا (scope == عدم)
+	    اكسر;
+	إذا (scope->se_type == FOR_SCOPE || scope->se_type == WHILE_SCOPE)
+	    أرجع TRUE;
 	scope = scope->se_outer;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
-    int
-generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_count, int is_decl)
+    صحيح
+generate_store_lhs(cctx_T *cctx, lhs_T *lhs, صحيح instr_شمار, صحيح is_decl)
 {
-    if (lhs->lhs_dest != dest_local)
-	return generate_store_var(cctx, lhs->lhs_dest,
+    إذا (lhs->lhs_dest != dest_local)
+	أرجع generate_store_var(cctx, lhs->lhs_dest,
 			    lhs->lhs_opt_flags, lhs->lhs_vimvaridx,
 			    lhs->lhs_type, lhs->lhs_name, lhs);
 
-    if (lhs->lhs_lvar == NULL)
-	return OK;
+    إذا (lhs->lhs_lvar == عدم)
+	أرجع OK;
 
     garray_T	*instr = &cctx->ctx_instr;
-    isn_T		*isn = ((isn_T *)instr->ga_data) + instr->ga_len - 1;
+    isn_T		*isn = ((isn_T *)instr->ga_داده) + instr->ga_len - 1;
 
     // Optimization: turn "var = 123" from ISN_PUSHNR + ISN_STORE into
     // ISN_STORENR.
     // And "var = 0" does not need any instruction.
-    if (lhs->lhs_lvar->lv_from_outer == 0
-	    && instr->ga_len == instr_count + 1
+    إذا (lhs->lhs_lvar->lv_from_outer == 0
+	    && instr->ga_len == instr_شمار + 1
 	    && isn->isn_type == ISN_PUSHNR)
     {
-	varnumber_T val = isn->isn_arg.number;
-	garray_T    *stack = &cctx->ctx_type_stack;
+	varnumber_T val = isn->isn_arg.عدد;
+	garray_T    *پشته = &cctx->ctx_type_پشته;
 
-	if (val == 0 && is_decl && !inside_loop_scope(cctx))
+	إذا (val == 0 && is_decl && !inside_loop_scope(cctx))
 	{
 	    // zero is the default value, no need to do anything
 	    --instr->ga_len;
 	}
-	else
+	وإلا
 	{
 	    isn->isn_type = ISN_STORENR;
 	    isn->isn_arg.storenr.stnr_idx = lhs->lhs_lvar->lv_idx;
 	    isn->isn_arg.storenr.stnr_val = val;
 	}
-	if (stack->ga_len > 0)
-	    --stack->ga_len;
+	إذا (پشته->ga_len > 0)
+	    --پشته->ga_len;
     }
-    else if (lhs->lhs_lvar->lv_from_outer > 0)
+    وإلا إذا (lhs->lhs_lvar->lv_from_outer > 0)
 	generate_STOREOUTER(cctx, lhs->lhs_lvar->lv_idx,
-		lhs->lhs_lvar->lv_from_outer, lhs->lhs_lvar->lv_loop_depth,
+		lhs->lhs_lvar->lv_from_outer, lhs->lhs_lvar->lv_loop_عمق,
 		lhs->lhs_lvar->lv_loop_idx);
-    else
-	generate_STORE(cctx, ISN_STORE, lhs->lhs_lvar->lv_idx, NULL);
-    return OK;
+    وإلا
+	generate_STORE(cctx, ISN_STORE, lhs->lhs_lvar->lv_idx, عدم);
+    أرجع OK;
 }
 
 /*
@@ -2717,180 +2717,180 @@ generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_count, int is_decl)
  * object member variable initialization expression in the context of the
  * script where the class is defined.
  */
-    int
-generate_SCRIPTCTX_SET(cctx_T *cctx, sctx_T new_sctx)
+    صحيح
+generate_SCRIPTCTX_مجموعه(cctx_T *cctx, sctx_T new_sctx)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr(cctx, ISN_SCRIPTCTX_SET)) == NULL)
-	return FAIL;
+    إذا ((isn = generate_instr(cctx, ISN_SCRIPTCTX_مجموعه)) == عدم)
+	أرجع FAIL;
     isn->isn_arg.setsctx = new_sctx;
-    return OK;
+    أرجع OK;
 }
 
-#if defined(FEAT_PROFILE)
-    void
-may_generate_prof_end(cctx_T *cctx, int prof_lnum)
+#إذا defined(FEAT_PROFILE)
+    فراغ
+may_generate_prof_انتها(cctx_T *cctx, صحيح prof_lnum)
 {
-    if (cctx->ctx_compile_type == CT_PROFILE && prof_lnum >= 0)
-	generate_instr(cctx, ISN_PROF_END);
+    إذا (cctx->ctx_compile_type == CT_PROFILE && prof_lnum >= 0)
+	generate_instr(cctx, ISN_PROF_انتها);
 }
-#endif
+#پایان_اگر
 
 
 /*
  * Delete an instruction, free what it contains.
  */
-    void
+    فراغ
 delete_instr(isn_T *isn)
 {
-    switch (isn->isn_type)
+    بدل (isn->isn_type)
     {
-	case ISN_AUTOLOAD:
-	case ISN_DEF:
-	case ISN_EXEC:
-	case ISN_EXECRANGE:
-	case ISN_EXEC_SPLIT:
-	case ISN_LEGACY_EVAL:
-	case ISN_LOADAUTO:
-	case ISN_LOADB:
-	case ISN_LOADENV:
-	case ISN_LOADG:
-	case ISN_LOADOPT:
-	case ISN_LOADT:
-	case ISN_LOADW:
-	case ISN_PUSHEXC:
-	case ISN_PUSHFUNC:
-	case ISN_PUSHS:
-	case ISN_RANGE:
-	case ISN_STOREAUTO:
-	case ISN_STOREB:
-	case ISN_STOREENV:
-	case ISN_STOREG:
-	case ISN_STORET:
-	case ISN_STOREW:
-	case ISN_STRINGMEMBER:
+	حالة ISN_AUTOLOAD:
+	حالة ISN_DEF:
+	حالة ISN_EXEC:
+	حالة ISN_EXECRANGE:
+	حالة ISN_EXEC_تقسیم:
+	حالة ISN_LEGACY_EVAL:
+	حالة ISN_LOADAUTO:
+	حالة ISN_LOADB:
+	حالة ISN_LOADENV:
+	حالة ISN_LOADG:
+	حالة ISN_LOADOPT:
+	حالة ISN_LOADT:
+	حالة ISN_LOADW:
+	حالة ISN_PUSHEXC:
+	حالة ISN_PUSHFUNC:
+	حالة ISN_PUSHS:
+	حالة ISN_RANGE:
+	حالة ISN_STOREAUTO:
+	حالة ISN_STOREB:
+	حالة ISN_STOREENV:
+	حالة ISN_STOREG:
+	حالة ISN_STORET:
+	حالة ISN_STOREW:
+	حالة ISN_STRINGMEMBER:
 	    vim_free(isn->isn_arg.string);
-	    break;
+	    اكسر;
 
-	case ISN_LOCKUNLOCK:
+	حالة ISN_LOCKUNLOCK:
 	    class_unref(isn->isn_arg.lockunlock.lu_cl_exec);
 	    vim_free(isn->isn_arg.lockunlock.lu_string);
-	    break;
+	    اكسر;
 
-	case ISN_SUBSTITUTE:
+	حالة ISN_SUBSTITUTE:
 	    {
-		int	idx;
+		صحيح	idx;
 		isn_T	*list = isn->isn_arg.subs.subs_instr;
 
 		vim_free(isn->isn_arg.subs.subs_cmd);
-		for (idx = 0; list[idx].isn_type != ISN_FINISH; ++idx)
+		لكل (idx = 0; list[idx].isn_type != ISN_پایان; ++idx)
 		    delete_instr(list + idx);
 		vim_free(list);
 	    }
-	    break;
+	    اكسر;
 
-	case ISN_INSTR:
+	حالة ISN_INSTR:
 	    {
-		int	idx;
+		صحيح	idx;
 		isn_T	*list = isn->isn_arg.instr;
 
-		for (idx = 0; list[idx].isn_type != ISN_FINISH; ++idx)
+		لكل (idx = 0; list[idx].isn_type != ISN_پایان; ++idx)
 		    delete_instr(list + idx);
 		vim_free(list);
 	    }
-	    break;
+	    اكسر;
 
-	case ISN_LOADS:
-	case ISN_LOADEXPORT:
-	case ISN_STORES:
-	case ISN_STOREEXPORT:
+	حالة ISN_LOADS:
+	حالة ISN_LOADEXPORT:
+	حالة ISN_STORES:
+	حالة ISN_STOREEXPORT:
 	    vim_free(isn->isn_arg.loadstore.ls_name);
-	    break;
+	    اكسر;
 
-	case ISN_UNLET:
-	case ISN_UNLETENV:
+	حالة ISN_UNLET:
+	حالة ISN_UNLETENV:
 	    vim_free(isn->isn_arg.unlet.ul_name);
-	    break;
+	    اكسر;
 
-	case ISN_STOREOPT:
-	case ISN_STOREFUNCOPT:
+	حالة ISN_STOREOPT:
+	حالة ISN_STOREFUNCOPT:
 	    vim_free(isn->isn_arg.storeopt.so_name);
-	    break;
+	    اكسر;
 
-	case ISN_PUSHBLOB:   // push blob isn_arg.blob
+	حالة ISN_PUSHBLOB:   // push blob isn_arg.blob
 	    blob_unref(isn->isn_arg.blob);
-	    break;
+	    اكسر;
 
-	case ISN_PUSHCLASS:
+	حالة ISN_PUSHCLASS:
 	    class_unref(isn->isn_arg.classarg);
-	    break;
+	    اكسر;
 
-	case ISN_UCALL:
+	حالة ISN_UCALL:
 	    vim_free(isn->isn_arg.ufunc.cuf_name);
-	    break;
+	    اكسر;
 
-	case ISN_FUNCREF:
+	حالة ISN_FUNCREF:
 	    {
 		funcref_T	*funcref = &isn->isn_arg.funcref;
 		funcref_extra_T *extra = funcref->fr_extra;
 
-		if (extra == NULL || extra->fre_func_name == NULL)
+		إذا (extra == عدم || extra->fre_func_name == عدم)
 		{
-		    dfunc_T *dfunc = ((dfunc_T *)def_functions.ga_data)
+		    dfunc_T *dfunc = ((dfunc_T *)def_functions.ga_داده)
 						       + funcref->fr_dfunc_idx;
 		    ufunc_T *ufunc = dfunc->df_ufunc;
 
-		    if (ufunc != NULL && func_name_refcount(ufunc->uf_name))
+		    إذا (ufunc != عدم && func_name_refcount(ufunc->uf_name))
 			func_ptr_unref(ufunc);
 		}
-		if (extra != NULL)
+		إذا (extra != عدم)
 		{
 		    char_u *name = extra->fre_func_name;
 
-		    if (name != NULL)
+		    إذا (name != عدم)
 		    {
 			func_unref(name);
 			vim_free(name);
 		    }
-		    if (extra->fre_class != NULL)
+		    إذا (extra->fre_class != عدم)
 			class_unref(extra->fre_class);
 		    vim_free(extra);
 		}
 	    }
-	    break;
+	    اكسر;
 
-	case ISN_DCALL:
+	حالة ISN_DCALL:
 	    {
-		dfunc_T *dfunc = ((dfunc_T *)def_functions.ga_data)
+		dfunc_T *dfunc = ((dfunc_T *)def_functions.ga_داده)
 		    + isn->isn_arg.dfunc.cdf_idx;
 
-		if (dfunc->df_ufunc != NULL
+		إذا (dfunc->df_ufunc != عدم
 			&& func_name_refcount(dfunc->df_ufunc->uf_name))
 		    func_ptr_unref(dfunc->df_ufunc);
 	    }
-	    break;
+	    اكسر;
 
-	case ISN_METHODCALL:
+	حالة ISN_METHODCALL:
 	    {
 		cmfunc_T  *mfunc = isn->isn_arg.mfunc;
 		class_unref(mfunc->cmf_itf);
 		class_unref(mfunc->cmf_cache_cl);
 		vim_free(mfunc);
 	    }
-	    break;
+	    اكسر;
 
-	case ISN_NEWFUNC:
+	حالة ISN_NEWFUNC:
 	    {
 		newfuncarg_T *arg = isn->isn_arg.newfunc.nf_arg;
 
-		if (arg != NULL)
+		إذا (arg != عدم)
 		{
-		    ufunc_T *ufunc = find_func_even_dead(
+		    ufunc_T *ufunc = پیدا_کن_func_even_dead(
 					      arg->nfa_lambda, FFED_IS_GLOBAL);
 
-		    if (ufunc != NULL)
+		    إذا (ufunc != عدم)
 		    {
 			unlink_def_function(ufunc);
 			func_ptr_unref(ufunc);
@@ -2901,171 +2901,171 @@ delete_instr(isn_T *isn)
 		    vim_free(arg);
 		}
 	    }
-	    break;
+	    اكسر;
 
-	case ISN_CHECKTYPE:
-	case ISN_SETTYPE:
+	حالة ISN_CHECKTYPE:
+	حالة ISN_SETTYPE:
 	    free_type(isn->isn_arg.type.ct_type);
-	    break;
+	    اكسر;
 
-	case ISN_CMDMOD:
+	حالة ISN_CMDMOD:
 	    vim_regfree(isn->isn_arg.cmdmod.cf_cmdmod
 		    ->cmod_filter_regmatch.regprog);
 	    vim_free(isn->isn_arg.cmdmod.cf_cmdmod);
-	    break;
+	    اكسر;
 
-	case ISN_LOADSCRIPT:
-	case ISN_STORESCRIPT:
+	حالة ISN_LOADSCRIPT:
+	حالة ISN_STORESCRIPT:
 	    vim_free(isn->isn_arg.script.scriptref);
-	    break;
+	    اكسر;
 
-	case ISN_LOAD_CLASSMEMBER:
-	case ISN_STORE_CLASSMEMBER:
-	case ISN_GET_ITF_MEMBER:
+	حالة ISN_بارگیری_CLASSMEMBER:
+	حالة ISN_STORE_CLASSMEMBER:
+	حالة ISN_GET_ITF_MEMBER:
 	    class_unref(isn->isn_arg.classmember.cm_class);
-	    break;
+	    اكسر;
 
-	case ISN_STOREINDEX:
+	حالة ISN_STOREINDEX:
 	    class_unref(isn->isn_arg.storeindex.si_class);
-	    break;
+	    اكسر;
 
-	case ISN_TRY:
+	حالة ISN_TRY:
 	    vim_free(isn->isn_arg.tryref.try_ref);
-	    break;
+	    اكسر;
 
-	case ISN_CEXPR_CORE:
+	حالة ISN_CEXPR_CORE:
 	    vim_free(isn->isn_arg.cexpr.cexpr_ref->cer_cmdline);
 	    vim_free(isn->isn_arg.cexpr.cexpr_ref);
-	    break;
+	    اكسر;
 
-	case ISN_2BOOL:
-	case ISN_2STRING:
-	case ISN_2STRING_ANY:
-	case ISN_ADDBLOB:
-	case ISN_ADDLIST:
-	case ISN_ADDTUPLE:
-	case ISN_ANYINDEX:
-	case ISN_ANYSLICE:
-	case ISN_BCALL:
-	case ISN_BLOBAPPEND:
-	case ISN_BLOBINDEX:
-	case ISN_BLOBSLICE:
-	case ISN_CATCH:
-	case ISN_CEXPR_AUCMD:
-	case ISN_CHECKLEN:
-	case ISN_CLEARDICT:
-	case ISN_CMDMOD_REV:
-	case ISN_COMPAREANY:
-	case ISN_COMPAREBLOB:
-	case ISN_COMPAREBOOL:
-	case ISN_COMPAREDICT:
-	case ISN_COMPAREFLOAT:
-	case ISN_COMPAREFUNC:
-	case ISN_COMPARELIST:
-	case ISN_COMPARETUPLE:
-	case ISN_COMPARENR:
-	case ISN_COMPARENULL:
-	case ISN_COMPAREOBJECT:
-	case ISN_COMPARESPECIAL:
-	case ISN_COMPARESTRING:
-	case ISN_CONCAT:
-	case ISN_CONSTRUCT:
-	case ISN_COND2BOOL:
-	case ISN_DEBUG:
-	case ISN_DEFER:
-	case ISN_DROP:
-	case ISN_ECHO:
-	case ISN_ECHOCONSOLE:
-	case ISN_ECHOERR:
-	case ISN_ECHOMSG:
-	case ISN_ECHOWINDOW:
-	case ISN_ENDLOOP:
-	case ISN_ENDTRY:
-	case ISN_EXECCONCAT:
-	case ISN_EXECUTE:
-	case ISN_FINALLY:
-	case ISN_FINISH:
-	case ISN_FOR:
-	case ISN_GETITEM:
-	case ISN_GET_OBJ_MEMBER:
-	case ISN_JUMP:
-	case ISN_JUMP_IF_ARG_NOT_SET:
-	case ISN_JUMP_IF_ARG_SET:
-	case ISN_LISTAPPEND:
-	case ISN_LISTINDEX:
-	case ISN_LISTSLICE:
-	case ISN_TUPLEINDEX:
-	case ISN_TUPLESLICE:
-	case ISN_LOAD:
-	case ISN_LOADBDICT:
-	case ISN_LOADGDICT:
-	case ISN_LOADOUTER:
-	case ISN_LOADREG:
-	case ISN_LOADTDICT:
-	case ISN_LOADV:
-	case ISN_LOADWDICT:
-	case ISN_LOCKCONST:
-	case ISN_MEMBER:
-	case ISN_NEGATENR:
-	case ISN_NEWDICT:
-	case ISN_NEWLIST:
-	case ISN_NEWTUPLE:
-	case ISN_NEWPARTIAL:
-	case ISN_OPANY:
-	case ISN_OPFLOAT:
-	case ISN_OPNR:
-	case ISN_PCALL:
-	case ISN_PCALL_END:
-	case ISN_PROF_END:
-	case ISN_PROF_START:
-	case ISN_PUSHBOOL:
-	case ISN_PUSHCHANNEL:
-	case ISN_PUSHF:
-	case ISN_PUSHJOB:
-	case ISN_PUSHNR:
-	case ISN_PUSHOBJ:
-	case ISN_PUSHSPEC:
-	case ISN_PUT:
-	case ISN_IPUT:
-	case ISN_REDIREND:
-	case ISN_REDIRSTART:
-	case ISN_RETURN:
-	case ISN_RETURN_OBJECT:
-	case ISN_RETURN_VOID:
-	case ISN_SHUFFLE:
-	case ISN_SLICE:
-	case ISN_SOURCE:
-	case ISN_STORE:
-	case ISN_STORENR:
-	case ISN_STOREOUTER:
-	case ISN_STORE_THIS:
-	case ISN_STORERANGE:
-	case ISN_STOREREG:
-	case ISN_STOREV:
-	case ISN_STRINDEX:
-	case ISN_STRSLICE:
-	case ISN_THROW:
-	case ISN_TRYCONT:
-	case ISN_UNLETINDEX:
-	case ISN_UNLETRANGE:
-	case ISN_UNPACK:
-	case ISN_USEDICT:
-	case ISN_WHILE:
-	case ISN_SCRIPTCTX_SET:
+	حالة ISN_2BOOL:
+	حالة ISN_2STRING:
+	حالة ISN_2STRING_ANY:
+	حالة ISN_ADDBLOB:
+	حالة ISN_ADDLIST:
+	حالة ISN_ADDTUPLE:
+	حالة ISN_ANYINDEX:
+	حالة ISN_ANYSLICE:
+	حالة ISN_BCALL:
+	حالة ISN_BLOBAPPEND:
+	حالة ISN_BLOBINDEX:
+	حالة ISN_BLOBSLICE:
+	حالة ISN_CATCH:
+	حالة ISN_CEXPR_AUCMD:
+	حالة ISN_CHECKLEN:
+	حالة ISN_CLEARDICT:
+	حالة ISN_CMDMOD_REV:
+	حالة ISN_COMPAREANY:
+	حالة ISN_COMPAREBLOB:
+	حالة ISN_COMPAREBOOL:
+	حالة ISN_COMPAREDICT:
+	حالة ISN_COMPAREFLOAT:
+	حالة ISN_COMPAREFUNC:
+	حالة ISN_COMPARELIST:
+	حالة ISN_COMPARETUPLE:
+	حالة ISN_COMPARENR:
+	حالة ISN_COMPARENULL:
+	حالة ISN_COMPAREOBJECT:
+	حالة ISN_COMPARESPECIAL:
+	حالة ISN_COMPARESTRING:
+	حالة ISN_CONCAT:
+	حالة ISN_CONSTRUCT:
+	حالة ISN_COND2BOOL:
+	حالة ISN_DEBUG:
+	حالة ISN_DEFER:
+	حالة ISN_DROP:
+	حالة ISN_ECHO:
+	حالة ISN_ECHOCONSOLE:
+	حالة ISN_ECHOERR:
+	حالة ISN_ECHOMSG:
+	حالة ISN_ECHOWINDOW:
+	حالة ISN_ENDLOOP:
+	حالة ISN_ENDTRY:
+	حالة ISN_EXECCONCAT:
+	حالة ISN_EXECUTE:
+	حالة ISN_FINALLY:
+	حالة ISN_پایان:
+	حالة ISN_FOR:
+	حالة ISN_GETITEM:
+	حالة ISN_GET_OBJ_MEMBER:
+	حالة ISN_JUMP:
+	حالة ISN_JUMP_IF_ARG_NOT_مجموعه:
+	حالة ISN_JUMP_IF_ARG_مجموعه:
+	حالة ISN_LISTAPPEND:
+	حالة ISN_LISTINDEX:
+	حالة ISN_LISTSLICE:
+	حالة ISN_TUPLEINDEX:
+	حالة ISN_TUPLESLICE:
+	حالة ISN_بارگیری:
+	حالة ISN_LOADBDICT:
+	حالة ISN_LOADGDICT:
+	حالة ISN_LOADOUTER:
+	حالة ISN_LOADREG:
+	حالة ISN_LOADTDICT:
+	حالة ISN_LOADV:
+	حالة ISN_LOADWDICT:
+	حالة ISN_LOCKCONST:
+	حالة ISN_MEMBER:
+	حالة ISN_NEGATENR:
+	حالة ISN_NEWDICT:
+	حالة ISN_NEWLIST:
+	حالة ISN_NEWTUPLE:
+	حالة ISN_NEWPARTIAL:
+	حالة ISN_OPANY:
+	حالة ISN_OPFLOAT:
+	حالة ISN_OPNR:
+	حالة ISN_PCALL:
+	حالة ISN_PCALL_انتها:
+	حالة ISN_PROF_انتها:
+	حالة ISN_PROF_شروع:
+	حالة ISN_PUSHBOOL:
+	حالة ISN_PUSHCHANNEL:
+	حالة ISN_PUSHF:
+	حالة ISN_PUSHJOB:
+	حالة ISN_PUSHNR:
+	حالة ISN_PUSHOBJ:
+	حالة ISN_PUSHSPEC:
+	حالة ISN_PUT:
+	حالة ISN_IPUT:
+	حالة ISN_REDIREND:
+	حالة ISN_REDIRSTART:
+	حالة ISN_RETURN:
+	حالة ISN_RETURN_OBJECT:
+	حالة ISN_RETURN_VOID:
+	حالة ISN_SHUFFLE:
+	حالة ISN_برش:
+	حالة ISN_منبع:
+	حالة ISN_STORE:
+	حالة ISN_STORENR:
+	حالة ISN_STOREOUTER:
+	حالة ISN_STORE_THIS:
+	حالة ISN_STORERANGE:
+	حالة ISN_STOREREG:
+	حالة ISN_STOREV:
+	حالة ISN_STRINDEX:
+	حالة ISN_STRSLICE:
+	حالة ISN_THROW:
+	حالة ISN_TRYCONT:
+	حالة ISN_UNLETINDEX:
+	حالة ISN_UNLETRANGE:
+	حالة ISN_UNPACK:
+	حالة ISN_USEDICT:
+	حالة ISN_WHILE:
+	حالة ISN_SCRIPTCTX_مجموعه:
 	// nothing allocated
-	break;
+	اكسر;
     }
 }
 
-    void
+    فراغ
 clear_instr_ga(garray_T *gap)
 {
-    int idx;
+    صحيح idx;
 
-    for (idx = 0; idx < gap->ga_len; ++idx)
-	delete_instr(((isn_T *)gap->ga_data) + idx);
+    لكل (idx = 0; idx < gap->ga_len; ++idx)
+	delete_instr(((isn_T *)gap->ga_داده) + idx);
     ga_clear(gap);
 }
 
 
-#endif  // defined(FEAT_EVAL)
+#پایان_اگر  // defined(FEAT_EVAL)

@@ -10,13 +10,13 @@
  * Amiga Machine-dependent things
  */
 
-#define CASE_INSENSITIVE_FILENAME   // ignore case when comparing file names
-#define USE_FNAME_CASE		    // adjust case of file names
-#define USE_TERM_CONSOLE
-#define HAVE_AVAIL_MEM
+#تعریف_کن CASE_INSENSITIVE_FILENAME   // ignore case when comparing file names
+#تعریف_کن USE_FNAME_CASE		    // adjust case of file names
+#تعریف_کن USE_جمله_CONSOLE
+#تعریف_کن HAVE_AVAIL_MEM
 
-#ifndef HAVE_CONFIG_H
-# if defined(AZTEC_C) || defined(__amigaos4__)
+#اگر_تعریف_نشده HAVE_CONFIG_H
+# إذا defined(AZTEC_C) || defined(__amigaos4__)
 #  define HAVE_STAT_H
 # endif
 # define HAVE_LOCALE_H
@@ -29,57 +29,57 @@
 # define HAVE_SETENV
 # define HAVE_MEMSET
 # define HAVE_QSORT
-# if defined(__DATE__) && defined(__TIME__)
-#  define HAVE_DATE_TIME
+# إذا defined(__DATE__) && defined(__TIME__)
+#  define HAVE_DATE_زمان
 # endif
 
-#endif // HAVE_CONFIG_H
+#پایان_اگر // HAVE_CONFIG_H
 
-#ifndef	DFLT_ERRORFILE
+#اگر_تعریف_نشده	DFLT_ERRORFILE
 # define DFLT_ERRORFILE		"AztecC.Err"	// Should this change?
-#endif
+#پایان_اگر
 
-#ifndef	DFLT_RUNTIMEPATH
+#اگر_تعریف_نشده	DFLT_RUNTIMEPATH
 # define DFLT_RUNTIMEPATH "VIM:vimfiles,VIM:,VIM:vimfiles/after"
-#endif
-#ifndef	CLEAN_RUNTIMEPATH
+#پایان_اگر
+#اگر_تعریف_نشده	CLEAN_RUNTIMEPATH
 # define CLEAN_RUNTIMEPATH "VIM:vimfiles,VIM:,VIM:vimfiles/after"
-#endif
+#پایان_اگر
 
-#ifndef	BASENAMELEN
+#اگر_تعریف_نشده	BASENAMELEN
 # define BASENAMELEN	26	// Amiga
-#endif
+#پایان_اگر
 
-#ifndef	TEMPNAME
+#اگر_تعریف_نشده	TEMPNAME
 # define TEMPNAME	"t:v?XXXXXX"
 # define TEMPNAMELEN	12
-#endif
+#پایان_اگر
 
-#include <exec/types.h>
-#include <libraries/dos.h>
-#include <libraries/dosextens.h>
+#ضمن <exec/types.h>
+#ضمن <libraries/dos.h>
+#ضمن <libraries/dosextens.h>
 
 // Currently, all Amiga compilers except AZTEC C have these...
-#ifndef AZTEC_C
+#اگر_تعریف_نشده AZTEC_C
 # include <proto/exec.h>
 # include <proto/dos.h>
 # include <proto/intuition.h>
-#endif
+#پایان_اگر
 
-#define FNAME_ILLEGAL ";*?`#%" // illegal characters in a file name
+#تعریف_کن FNAME_ILLEGAL ";*?`#%" // illegal characters in a file name
 
 /*
  * Manx doesn't have off_t, define it here.
  */
-#ifdef AZTEC_C
-typedef long off_t;
-#endif
+#اگر_تعریف_شده AZTEC_C
+تعريفنوع دراز off_t;
+#پایان_اگر
 
-#ifdef LATTICE
+#اگر_تعریف_شده LATTICE
 # define USE_TMPNAM	// use tmpnam() instead of mktemp()
-#endif
+#پایان_اگر
 
-#ifdef __GNUC__
+#اگر_تعریف_شده __GNUC__
 # include <sys/stat.h>
 # include <unistd.h>
 # include <limits.h>
@@ -87,134 +87,134 @@ typedef long off_t;
 # include <pwd.h>
 # include <grp.h>
 # include <dirent.h>
-#endif
+#پایان_اگر
 
 // Classic AmigaOS 3.x with GCC/libnix does not provide fchown, fchmod, or
 // ftruncate.  Stub them as no-ops.  (OS4 has these via clib2; MorphOS and
 // AROS provide them in their respective C libraries.)
-#if defined(__GNUC__) && defined(AMIGA) && !defined(__amigaos4__) \
+#إذا defined(__GNUC__) && defined(AMIGA) && !defined(__amigaos4__) \
 	&& !defined(__AROS__) && !defined(__MORPHOS__)
 # define fchown(fd, uid, gid) (0)
-# define fchmod(fd, mode) (0)
+# define fchmod(fd, نما) (0)
 # define ftruncate(fd, len) (0)
-#endif
+#پایان_اگر
 
-#include <time.h>	// for strftime() and others
+#ضمن <time.h>	// for strftime() and others
 
 /*
  * arpbase.h must be included before functions.h
  */
-#ifdef FEAT_ARP
+#اگر_تعریف_شده FEAT_ARP
 # include <libraries/arpbase.h>
-#endif
+#پایان_اگر
 
 /*
  * This won't be needed if you have a version of Lattice 4.01 without broken
  * break signal handling.
  */
-#include <signal.h>
+#ضمن <signal.h>
 
 /*
  * Names for the EXRC, HELP and temporary files.
  * Some of these may have been defined in the makefile.
  */
-#ifndef SYS_VIMRC_FILE
+#اگر_تعریف_نشده SYS_VIMRC_FILE
 # define SYS_VIMRC_FILE "VIM:vimrc"
-#endif
-#ifndef SYS_GVIMRC_FILE
+#پایان_اگر
+#اگر_تعریف_نشده SYS_GVIMRC_FILE
 # define SYS_GVIMRC_FILE "VIM:gvimrc"
-#endif
-#ifndef SYS_MENU_FILE
+#پایان_اگر
+#اگر_تعریف_نشده SYS_MENU_FILE
 # define SYS_MENU_FILE	"VIM:menu.vim"
-#endif
-#ifndef DFLT_HELPFILE
+#پایان_اگر
+#اگر_تعریف_نشده DFLT_HELPFILE
 # define DFLT_HELPFILE	"VIM:doc/help.txt"
-#endif
-#ifndef SYNTAX_FNAME
+#پایان_اگر
+#اگر_تعریف_نشده SYNTAX_FNAME
 # define SYNTAX_FNAME	"VIM:syntax/%s.vim"
-#endif
+#پایان_اگر
 
-#ifndef USR_EXRC_FILE
+#اگر_تعریف_نشده USR_EXRC_FILE
 # define USR_EXRC_FILE	"HOME:.exrc"
-#endif
-#ifndef USR_EXRC_FILE2
+#پایان_اگر
+#اگر_تعریف_نشده USR_EXRC_FILE2
 # define USR_EXRC_FILE2	"VIM:.exrc"
-#endif
+#پایان_اگر
 
-#ifndef USR_VIMRC_FILE
+#اگر_تعریف_نشده USR_VIMRC_FILE
 # define USR_VIMRC_FILE	"HOME:.vimrc"
-#endif
-#ifndef USR_VIMRC_FILE2
+#پایان_اگر
+#اگر_تعریف_نشده USR_VIMRC_FILE2
 # define USR_VIMRC_FILE2 "VIM:.vimrc"
-#endif
-#ifndef USR_VIMRC_FILE3
+#پایان_اگر
+#اگر_تعریف_نشده USR_VIMRC_FILE3
 # define USR_VIMRC_FILE3 "HOME:vimfiles/vimrc"
-#endif
-#ifndef USR_VIMRC_FILE4
+#پایان_اگر
+#اگر_تعریف_نشده USR_VIMRC_FILE4
 # define USR_VIMRC_FILE4 "S:.vimrc"
-#endif
-#ifndef VIM_DEFAULTS_FILE
+#پایان_اگر
+#اگر_تعریف_نشده VIM_DEFAULTS_FILE
 # define VIM_DEFAULTS_FILE "VIM:defaults.vim"
-#endif
-#ifndef EVIM_FILE
+#پایان_اگر
+#اگر_تعریف_نشده EVIM_FILE
 # define EVIM_FILE	"VIM:evim.vim"
-#endif
+#پایان_اگر
 
-#ifndef USR_GVIMRC_FILE
+#اگر_تعریف_نشده USR_GVIMRC_FILE
 # define USR_GVIMRC_FILE "HOME:.gvimrc"
-#endif
-#ifndef USR_GVIMRC_FILE2
+#پایان_اگر
+#اگر_تعریف_نشده USR_GVIMRC_FILE2
 # define USR_GVIMRC_FILE2 "VIM:.gvimrc"
-#endif
-#ifndef USR_GVIMRC_FILE3
+#پایان_اگر
+#اگر_تعریف_نشده USR_GVIMRC_FILE3
 # define USR_GVIMRC_FILE3 "HOME:vimfiles/gvimrc"
-#endif
-#ifndef USR_GVIMRC_FILE4
+#پایان_اگر
+#اگر_تعریف_نشده USR_GVIMRC_FILE4
 # define USR_GVIMRC_FILE4 "S:.gvimrc"
-#endif
+#پایان_اگر
 
-#ifdef FEAT_VIMINFO
+#اگر_تعریف_شده FEAT_VIMINFO
 # ifndef VIMINFO_FILE
 #  define VIMINFO_FILE	"VIM:.viminfo"
 # endif
-#endif
+#پایان_اگر
 
-#ifndef EXRC_FILE
+#اگر_تعریف_نشده EXRC_FILE
 # define EXRC_FILE	".exrc"
-#endif
+#پایان_اگر
 
-#ifndef VIMRC_FILE
+#اگر_تعریف_نشده VIMRC_FILE
 # define VIMRC_FILE	".vimrc"
-#endif
+#پایان_اگر
 
-#ifndef GVIMRC_FILE
+#اگر_تعریف_نشده GVIMRC_FILE
 # define GVIMRC_FILE	".gvimrc"
-#endif
+#پایان_اگر
 
-#ifndef DFLT_BDIR
+#اگر_تعریف_نشده DFLT_BDIR
 # define DFLT_BDIR	"T:"		// default for 'backupdir'
-#endif
+#پایان_اگر
 
-#ifndef DFLT_DIR
+#اگر_تعریف_نشده DFLT_DIR
 # define DFLT_DIR	"T:"		// default for 'directory'
-#endif
+#پایان_اگر
 
-#ifndef DFLT_VDIR
+#اگر_تعریف_نشده DFLT_VDIR
 # define DFLT_VDIR	"HOME:vimfiles/view"	// default for 'viewdir'
-#endif
+#پایان_اگر
 
-#ifndef DFLT_MAXMEM
+#اگر_تعریف_نشده DFLT_MAXMEM
 # define DFLT_MAXMEM	256		// use up to 256Kbyte for buffer
-#endif
-#ifndef DFLT_MAXMEMTOT
+#پایان_اگر
+#اگر_تعریف_نشده DFLT_MAXMEMTOT
 # define DFLT_MAXMEMTOT	0		// decide in set_init
-#endif
+#پایان_اگر
 
-#if defined(SASC)
-int setenv(const char *, const char *);
-#endif
+#إذا defined(SASC)
+صحيح setenv(ثابت حرف *, ثابت حرف *);
+#پایان_اگر
 
-#define mch_remove(x) remove((char *)(x))
-#define mch_rename(src, dst) rename(src, dst)
-#define mch_chdir(s) chdir(s)
-#define vim_mkdir(x, y) mch_mkdir(x)
+#تعریف_کن mch_remove(x) remove((حرف *)(x))
+#تعریف_کن mch_rename(src, dst) rename(src, dst)
+#تعریف_کن mch_chdir(s) chdir(s)
+#تعریف_کن vim_mkdir(x, y) mch_mkdir(x)

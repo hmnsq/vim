@@ -13,22 +13,22 @@
  * caused by including both the X11 and Carbon header files.
  */
 
-#define NO_X11_INCLUDES
+#تعریف_کن NO_X11_INCLUDES
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#include <CoreServices/CoreServices.h>
+#ضمن <CoreServices/CoreServices.h>
 
 
-#if defined(MACOS_CONVERT)
+#إذا defined(MACOS_CONVERT)
 
-static char_u	    *mac_utf16_to_utf8(UniChar *from, size_t fromLen, size_t *actualLen);
-static UniChar	    *mac_utf8_to_utf16(char_u *from, size_t fromLen, size_t *actualLen);
+ساكن char_u	    *mac_utf16_مقصد_utf8(UniChar *from, size_t fromLen, size_t *actualLen);
+ساكن UniChar	    *mac_utf8_مقصد_utf16(char_u *from, size_t fromLen, size_t *actualLen);
 
 // Converter for composing decomposed HFS+ file paths
-static TECObjectRef gPathConverter;
+ساكن TECObjectRef g_مسیر_Converter;
 // Converter used by mac_utf16_to_utf8
-static TECObjectRef gUTF16ToUTF8Converter;
+ساكن TECObjectRef g_UTF16_مقصد_UTF8_Converter;
 
 /*
  * A Mac version of string_convert_ext() for special cases.
@@ -36,130 +36,130 @@ static TECObjectRef gUTF16ToUTF8Converter;
     char_u *
 mac_string_convert(
     char_u		*ptr,
-    int			len,
-    int			*lenp,
-    int			fail_on_error,
-    int			from_enc,
-    int			to_enc,
-    int			*unconvlenp)
+    صحيح			len,
+    صحيح			*lenp,
+    صحيح			fail_on_error,
+    صحيح			from_enc,
+    صحيح			مقصد_enc,
+    صحيح			*unconvlenp)
 {
     char_u		*retval, *d;
     CFStringRef		cfstr;
-    int			buflen, in, out, l, i;
+    صحيح			buflen, درون, بیرون, l, i;
     CFStringEncoding	from;
-    CFStringEncoding	to;
+    CFStringEncoding	مقصد;
 
-    switch (from_enc)
+    بدل (from_enc)
     {
-	case 'l':   from = kCFStringEncodingISOLatin1; break;
-	case 'm':   from = kCFStringEncodingMacRoman; break;
-	case 'u':   from = kCFStringEncodingUTF8; break;
-	default:    return NULL;
+	حالة 'l':   from = kCFStringEncodingISOLatin1; اكسر;
+	حالة 'm':   from = kCFStringEncodingMacRoman; اكسر;
+	حالة 'u':   from = kCFStringEncodingUTF8; اكسر;
+	افتراضي:    أرجع عدم;
     }
-    switch (to_enc)
+    بدل (مقصد_enc)
     {
-	case 'l':   to = kCFStringEncodingISOLatin1; break;
-	case 'm':   to = kCFStringEncodingMacRoman; break;
-	case 'u':   to = kCFStringEncodingUTF8; break;
-	default:    return NULL;
+	حالة 'l':   مقصد = kCFStringEncodingISOLatin1; اكسر;
+	حالة 'm':   مقصد = kCFStringEncodingMacRoman; اكسر;
+	حالة 'u':   مقصد = kCFStringEncodingUTF8; اكسر;
+	افتراضي:    أرجع عدم;
     }
 
-    if (unconvlenp != NULL)
+    إذا (unconvlenp != عدم)
 	*unconvlenp = 0;
-    cfstr = CFStringCreateWithBytes(NULL, ptr, len, from, 0);
+    cfstr = CFString_Create_With_بایتها(عدم, ptr, len, from, 0);
 
-    if (cfstr == NULL)
+    إذا (cfstr == عدم)
 	fprintf(stderr, "Encoding failed\n");
     // When conversion failed, try excluding bytes from the end, helps when
     // there is an incomplete byte sequence.  Only do up to 6 bytes to avoid
     // looping a long time when there really is something unconvertible.
-    while (cfstr == NULL && unconvlenp != NULL && len > 1 && *unconvlenp < 6)
+    طالما (cfstr == عدم && unconvlenp != عدم && len > 1 && *unconvlenp < 6)
     {
 	--len;
 	++*unconvlenp;
-	cfstr = CFStringCreateWithBytes(NULL, ptr, len, from, 0);
+	cfstr = CFString_Create_With_بایتها(عدم, ptr, len, from, 0);
     }
-    if (cfstr == NULL)
-	return NULL;
+    إذا (cfstr == عدم)
+	أرجع عدم;
 
-    if (to == kCFStringEncodingUTF8)
+    إذا (مقصد == kCFStringEncodingUTF8)
 	buflen = len * 6 + 1;
-    else
+    وإلا
 	buflen = len + 1;
     retval = alloc(buflen);
-    if (retval == NULL)
+    إذا (retval == عدم)
     {
 	CFRelease(cfstr);
-	return NULL;
+	أرجع عدم;
     }
 
-#if 0
-    CFRange convertRange = CFRangeMake(0, CFStringGetLength(cfstr));
+#إذا 0
+    CFRange convertRange = CFRangeMake(0, CFString_Get_درازی(cfstr));
     //  Determine output buffer size
-    CFStringGetBytes(cfstr, convertRange, to, NULL, FALSE, NULL, 0, (CFIndex *)&buflen);
-    retval = (buflen > 0) ? alloc(buflen) : NULL;
-    if (retval == NULL)
+    CFString_Get_بایتها(cfstr, convertRange, مقصد, عدم, FALSE, عدم, 0, (CFIndex *)&buflen);
+    retval = (buflen > 0) ? alloc(buflen) : عدم;
+    إذا (retval == عدم)
     {
 	CFRelease(cfstr);
-	return NULL;
+	أرجع عدم;
     }
 
-    if (lenp)
-	*lenp = buflen / sizeof(char_u);
+    إذا (lenp)
+	*lenp = buflen / حجم(char_u);
 
-    if (!CFStringGetBytes(cfstr, convertRange, to, NULL, FALSE, retval, buflen, NULL))
-#endif
-    if (!CFStringGetCString(cfstr, (char *)retval, buflen, to))
+    إذا (!CFString_Get_بایتها(cfstr, convertRange, مقصد, عدم, FALSE, retval, buflen, عدم))
+#پایان_اگر
+    إذا (!CFStringGetCString(cfstr, (حرف *)retval, buflen, مقصد))
     {
 	CFRelease(cfstr);
-	if (fail_on_error)
+	إذا (fail_on_error)
 	{
 	    vim_free(retval);
-	    return NULL;
+	    أرجع عدم;
 	}
 
 	fprintf(stderr, "Trying char-by-char conversion...\n");
 	// conversion failed for the whole string, but maybe it will work
 	// for each character
-	for (d = retval, in = 0, out = 0; in < len && out < buflen - 1;)
+	لكل (d = retval, درون = 0, بیرون = 0; درون < len && بیرون < buflen - 1;)
 	{
-	    if (from == kCFStringEncodingUTF8)
-		l = utf_ptr2len(ptr + in);
-	    else
+	    إذا (from == kCFStringEncodingUTF8)
+		l = utf_ptr2len(ptr + درون);
+	    وإلا
 		l = 1;
-	    cfstr = CFStringCreateWithBytes(NULL, ptr + in, l, from, 0);
-	    if (cfstr == NULL)
+	    cfstr = CFString_Create_With_بایتها(عدم, ptr + درون, l, from, 0);
+	    إذا (cfstr == عدم)
 	    {
 		*d++ = '?';
-		out++;
+		بیرون++;
 	    }
-	    else
+	    وإلا
 	    {
-		if (!CFStringGetCString(cfstr, (char *)d, buflen - out, to))
+		إذا (!CFStringGetCString(cfstr, (حرف *)d, buflen - بیرون, مقصد))
 		{
 		    *d++ = '?';
-		    out++;
+		    بیرون++;
 		}
-		else
+		وإلا
 		{
 		    i = STRLEN(d);
 		    d += i;
-		    out += i;
+		    بیرون += i;
 		}
 		CFRelease(cfstr);
 	    }
-	    in += l;
+	    درون += l;
 	}
 	*d = NUL;
-	if (lenp != NULL)
-	    *lenp = out;
-	return retval;
+	إذا (lenp != عدم)
+	    *lenp = بیرون;
+	أرجع retval;
     }
     CFRelease(cfstr);
-    if (lenp != NULL)
+    إذا (lenp != عدم)
 	*lenp = STRLEN(retval);
 
-    return retval;
+    أرجع retval;
 }
 
 /*
@@ -170,11 +170,11 @@ mac_string_convert(
  * output is in-place, "sizep" is adjusted.
  * Returns OK or FAIL.
  */
-    int
+    صحيح
 macroman2enc(
     char_u	*ptr,
-    long	*sizep,
-    long	real_size)
+    دراز	*sizep,
+    دراز	real_اندازه)
 {
     CFStringRef		cfstr;
     CFRange		r;
@@ -182,31 +182,31 @@ macroman2enc(
 
     // MacRoman is an 8-bit encoding, no need to move bytes to
     // conv_rest[].
-    cfstr = CFStringCreateWithBytes(NULL, ptr, len,
+    cfstr = CFString_Create_With_بایتها(عدم, ptr, len,
 						kCFStringEncodingMacRoman, 0);
     /*
      * If there is a conversion error, try using another
      * conversion.
      */
-    if (cfstr == NULL)
-	return FAIL;
+    إذا (cfstr == عدم)
+	أرجع FAIL;
 
     r.location = 0;
-    r.length = CFStringGetLength(cfstr);
-    if (r.length != CFStringGetBytes(cfstr, r,
+    r.درازی = CFString_Get_درازی(cfstr);
+    إذا (r.درازی != CFString_Get_بایتها(cfstr, r,
 	    (enc_utf8) ? kCFStringEncodingUTF8 : kCFStringEncodingISOLatin1,
 	    0, // no lossy conversion
 	    0, // not external representation
-	    ptr + *sizep, real_size - *sizep, &len))
+	    ptr + *sizep, real_اندازه - *sizep, &len))
     {
 	CFRelease(cfstr);
-	return FAIL;
+	أرجع FAIL;
     }
     CFRelease(cfstr);
     mch_memmove(ptr, ptr + *sizep, len);
     *sizep = len;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -216,102 +216,102 @@ macroman2enc(
  * Unconverted rest in rest[*restlenp].
  * Returns OK or FAIL.
  */
-    int
+    صحيح
 enc2macroman(
     char_u	*from,
     size_t	fromlen,
-    char_u	*to,
-    int		*tolenp,
-    int		maxtolen,
+    char_u	*مقصد,
+    صحيح		*tolenp,
+    صحيح		maxtolen,
     char_u	*rest,
-    int		*restlenp)
+    صحيح		*restlenp)
 {
     CFStringRef	cfstr;
     CFRange	r;
     CFIndex	l;
 
     *restlenp = 0;
-    cfstr = CFStringCreateWithBytes(NULL, from, fromlen,
+    cfstr = CFString_Create_With_بایتها(عدم, from, fromlen,
 	    (enc_utf8) ? kCFStringEncodingUTF8 : kCFStringEncodingISOLatin1,
 	    0);
-    while (cfstr == NULL && *restlenp < 3 && fromlen > 1)
+    طالما (cfstr == عدم && *restlenp < 3 && fromlen > 1)
     {
 	rest[*restlenp++] = from[--fromlen];
-	cfstr = CFStringCreateWithBytes(NULL, from, fromlen,
+	cfstr = CFString_Create_With_بایتها(عدم, from, fromlen,
 		(enc_utf8) ? kCFStringEncodingUTF8 : kCFStringEncodingISOLatin1,
 		0);
     }
-    if (cfstr == NULL)
-	return FAIL;
+    إذا (cfstr == عدم)
+	أرجع FAIL;
 
     r.location = 0;
-    r.length = CFStringGetLength(cfstr);
-    if (r.length != CFStringGetBytes(cfstr, r,
+    r.درازی = CFString_Get_درازی(cfstr);
+    إذا (r.درازی != CFString_Get_بایتها(cfstr, r,
 		kCFStringEncodingMacRoman,
 		0, // no lossy conversion
 		0, // not external representation (since vim
 		   // handles this internally)
-		to, maxtolen, &l))
+		مقصد, maxtolen, &l))
     {
 	CFRelease(cfstr);
-	return FAIL;
+	أرجع FAIL;
     }
     CFRelease(cfstr);
     *tolenp = l;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Initializes text converters
  */
-    void
-mac_conv_init(void)
+    فراغ
+mac_conv_init(فراغ)
 {
-    TextEncoding    utf8_encoding;
-    TextEncoding    utf8_hfsplus_encoding;
-    TextEncoding    utf8_canon_encoding;
-    TextEncoding    utf16_encoding;
+    متن_Encoding    utf8_encoding;
+    متن_Encoding    utf8_hfsplus_encoding;
+    متن_Encoding    utf8_canon_encoding;
+    متن_Encoding    utf16_encoding;
 
-    utf8_encoding = CreateTextEncoding(kTextEncodingUnicodeDefault,
-	    kTextEncodingDefaultVariant, kUnicodeUTF8Format);
-    utf8_hfsplus_encoding = CreateTextEncoding(kTextEncodingUnicodeDefault,
+    utf8_encoding = Create_متن_Encoding(k_متن_Encoding_Unicode_Default,
+	    k_متن_Encoding_Default_Variant, kUnicodeUTF8Format);
+    utf8_hfsplus_encoding = Create_متن_Encoding(k_متن_Encoding_Unicode_Default,
 	    kUnicodeHFSPlusCompVariant, kUnicodeUTF8Format);
-    utf8_canon_encoding = CreateTextEncoding(kTextEncodingUnicodeDefault,
+    utf8_canon_encoding = Create_متن_Encoding(k_متن_Encoding_Unicode_Default,
 	    kUnicodeCanonicalCompVariant, kUnicodeUTF8Format);
-    utf16_encoding = CreateTextEncoding(kTextEncodingUnicodeDefault,
-	    kTextEncodingDefaultVariant, kUnicode16BitFormat);
+    utf16_encoding = Create_متن_Encoding(k_متن_Encoding_Unicode_Default,
+	    k_متن_Encoding_Default_Variant, k_Unicode16_بیت_Format);
 
-    if (TECCreateConverter(&gPathConverter, utf8_encoding,
+    إذا (TECCreateConverter(&g_مسیر_Converter, utf8_encoding,
 		utf8_hfsplus_encoding) != noErr)
-	gPathConverter = NULL;
+	g_مسیر_Converter = عدم;
 
-    if (TECCreateConverter(&gUTF16ToUTF8Converter, utf16_encoding,
+    إذا (TECCreateConverter(&g_UTF16_مقصد_UTF8_Converter, utf16_encoding,
 		utf8_canon_encoding) != noErr)
     {
 	// On pre-10.3, Unicode normalization is not available so
 	// fall back to non-normalizing converter
-	if (TECCreateConverter(&gUTF16ToUTF8Converter, utf16_encoding,
+	إذا (TECCreateConverter(&g_UTF16_مقصد_UTF8_Converter, utf16_encoding,
 		    utf8_encoding) != noErr)
-	    gUTF16ToUTF8Converter = NULL;
+	    g_UTF16_مقصد_UTF8_Converter = عدم;
     }
 }
 
 /*
  * Destroys text converters
  */
-    void
-mac_conv_cleanup(void)
+    فراغ
+mac_conv_cleanup(فراغ)
 {
-    if (gUTF16ToUTF8Converter)
+    إذا (g_UTF16_مقصد_UTF8_Converter)
     {
-	TECDisposeConverter(gUTF16ToUTF8Converter);
-	gUTF16ToUTF8Converter = NULL;
+	TECDisposeConverter(g_UTF16_مقصد_UTF8_Converter);
+	g_UTF16_مقصد_UTF8_Converter = عدم;
     }
 
-    if (gPathConverter)
+    إذا (g_مسیر_Converter)
     {
-	TECDisposeConverter(gPathConverter);
-	gPathConverter = NULL;
+	TECDisposeConverter(g_مسیر_Converter);
+	g_مسیر_Converter = عدم;
     }
 }
 
@@ -321,8 +321,8 @@ mac_conv_cleanup(void)
  * CFBase.h) to avoid clashes with X11 header files in the .pro file
  */
     char_u *
-mac_utf16_to_enc(
-    unsigned short *from,
+mac_utf16_مقصد_enc(
+    بیعلامت کوتاه *from,
     size_t fromLen,
     size_t *actualLen)
 {
@@ -330,13 +330,13 @@ mac_utf16_to_enc(
     vimconv_T	conv;
     size_t      utf8_len;
     char_u      *utf8_str;
-    char_u      *result = NULL;
+    char_u      *نتیجه = عدم;
 
     // Convert to utf-8 first, works better with iconv
     utf8_len = 0;
-    utf8_str = mac_utf16_to_utf8(from, fromLen, &utf8_len);
+    utf8_str = mac_utf16_مقصد_utf8(from, fromLen, &utf8_len);
 
-    if (utf8_str)
+    إذا (utf8_str)
     {
 	// We might be called before we have p_enc set up.
 	conv.vc_type = CONV_NONE;
@@ -344,31 +344,31 @@ mac_utf16_to_enc(
 	// If encoding (p_enc) is any unicode, it is actually in utf-8 (vim
 	// internal unicode is always utf-8) so don't convert in such cases
 
-	if ((enc_canon_props(p_enc) & ENC_UNICODE) == 0)
-	    convert_setup(&conv, (char_u *)"utf-8",
+	إذا ((enc_canon_props(p_enc) & ENC_UNICODE) == 0)
+	    convert_راهاندازی(&conv, (char_u *)"utf-8",
 		    p_enc? p_enc: (char_u *)"macroman");
-	if (conv.vc_type == CONV_NONE)
+	إذا (conv.vc_type == CONV_NONE)
 	{
 	    // p_enc is utf-8, so we're done.
-	    result = utf8_str;
+	    نتیجه = utf8_str;
 	}
-	else
+	وإلا
 	{
-	    int len = utf8_len;
-	    result = string_convert(&conv, utf8_str, &len);
+	    صحيح len = utf8_len;
+	    نتیجه = string_convert(&conv, utf8_str, &len);
 	    utf8_len = len;
 	    vim_free(utf8_str);
 	}
 
-	convert_setup(&conv, NULL, NULL);
+	convert_راهاندازی(&conv, عدم, عدم);
 
-	if (actualLen)
+	إذا (actualLen)
 	    *actualLen = utf8_len;
     }
-    else if (actualLen)
+    وإلا إذا (actualLen)
 	*actualLen = 0;
 
-    return result;
+    أرجع نتیجه;
 }
 
 /*
@@ -376,8 +376,8 @@ mac_utf16_to_enc(
  * The function return uses the real type of UniChar (as typedef'ed in
  * CFBase.h) to avoid clashes with X11 header files in the .pro file
  */
-    unsigned short *
-mac_enc_to_utf16(
+    بیعلامت کوتاه *
+mac_enc_مقصد_utf16(
     char_u *from,
     size_t fromLen,
     size_t *actualLen)
@@ -386,205 +386,205 @@ mac_enc_to_utf16(
     vimconv_T	conv;
     size_t      utf8_len;
     char_u      *utf8_str;
-    UniChar     *result = NULL;
+    UniChar     *نتیجه = عدم;
     Boolean     should_free_utf8 = FALSE;
 
-    do
+    افعل
     {
 	// Use MacRoman by default, we might be called before we have p_enc
 	// set up.  Convert to utf-8 first, works better with iconv().  Does
 	// nothing if 'encoding' is "utf-8".
 	conv.vc_type = CONV_NONE;
-	if ((enc_canon_props(p_enc) & ENC_UNICODE) == 0 &&
-		convert_setup(&conv, p_enc ? p_enc : (char_u *)"macroman",
+	إذا ((enc_canon_props(p_enc) & ENC_UNICODE) == 0 &&
+		convert_راهاندازی(&conv, p_enc ? p_enc : (char_u *)"macroman",
 		    (char_u *)"utf-8") == FAIL)
-	    break;
+	    اكسر;
 
-	if (conv.vc_type != CONV_NONE)
+	إذا (conv.vc_type != CONV_NONE)
 	{
 	    utf8_len = fromLen;
-	    utf8_str = string_convert(&conv, from, (int *)&utf8_len);
+	    utf8_str = string_convert(&conv, from, (صحيح *)&utf8_len);
 	    should_free_utf8 = TRUE;
 	}
-	else
+	وإلا
 	{
 	    utf8_str = from;
 	    utf8_len = fromLen;
 	}
 
-	if (utf8_str == NULL)
-	    break;
+	إذا (utf8_str == عدم)
+	    اكسر;
 
-	convert_setup(&conv, NULL, NULL);
+	convert_راهاندازی(&conv, عدم, عدم);
 
-	result = mac_utf8_to_utf16(utf8_str, utf8_len, actualLen);
+	نتیجه = mac_utf8_مقصد_utf16(utf8_str, utf8_len, actualLen);
 
-	if (should_free_utf8)
+	إذا (should_free_utf8)
 	    vim_free(utf8_str);
-	return result;
+	أرجع نتیجه;
     }
-    while (0);
+    طالما (0);
 
-    if (actualLen)
+    إذا (actualLen)
 	*actualLen = 0;
 
-    return result;
+    أرجع نتیجه;
 }
 
 /*
  * Converts from UTF-16 UniChars to CFString
  * The void * return type is actually a CFStringRef
  */
-    void *
-mac_enc_to_cfstring(
+    فراغ *
+mac_enc_مقصد_cfstring(
     char_u  *from,
     size_t  fromLen)
 {
     UniChar	*utf16_str;
     size_t	utf16_len;
-    CFStringRef	result = NULL;
+    CFStringRef	نتیجه = عدم;
 
-    utf16_str = mac_enc_to_utf16(from, fromLen, &utf16_len);
-    if (utf16_str)
+    utf16_str = mac_enc_مقصد_utf16(from, fromLen, &utf16_len);
+    إذا (utf16_str)
     {
-	result = CFStringCreateWithCharacters(NULL, utf16_str, utf16_len/sizeof(UniChar));
+	نتیجه = CFStringCreateWithCharacters(عدم, utf16_str, utf16_len/حجم(UniChar));
 	vim_free(utf16_str);
     }
 
-    return (void *)result;
+    أرجع (فراغ *)نتیجه;
 }
 
 /*
  * Converts a decomposed HFS+ UTF-8 path to precomposed UTF-8
  */
     char_u *
-mac_precompose_path(
-    char_u  *decompPath,
+mac_precompose_مسیر(
+    char_u  *decomp_مسیر,
     size_t  decompLen,
     size_t  *precompLen)
 {
-    char_u  *result = NULL;
+    char_u  *نتیجه = عدم;
     size_t  actualLen = 0;
 
-    if (gPathConverter)
+    إذا (g_مسیر_Converter)
     {
-	result = alloc(decompLen);
-	if (result)
+	نتیجه = alloc(decompLen);
+	إذا (نتیجه)
 	{
-	    if (TECConvertText(gPathConverter, decompPath,
-			decompLen, &decompLen, result,
+	    إذا (TECConvert_متن(g_مسیر_Converter, decomp_مسیر,
+			decompLen, &decompLen, نتیجه,
 			decompLen, &actualLen) != noErr)
-		VIM_CLEAR(result);
+		VIM_CLEAR(نتیجه);
 	}
     }
 
-    if (precompLen)
+    إذا (precompLen)
 	*precompLen = actualLen;
 
-    return result;
+    أرجع نتیجه;
 }
 
 /*
  * Converts from UTF-16 UniChars to precomposed UTF-8
  */
-    static char_u *
-mac_utf16_to_utf8(
+    ساكن char_u *
+mac_utf16_مقصد_utf8(
     UniChar *from,
     size_t fromLen,
     size_t *actualLen)
 {
-    ByteCount		utf8_len;
-    ByteCount		inputRead;
-    char_u		*result;
+    Byte_شمار		utf8_len;
+    Byte_شمار		درون_داد_Read;
+    char_u		*نتیجه;
 
-    if (gUTF16ToUTF8Converter)
+    إذا (g_UTF16_مقصد_UTF8_Converter)
     {
-	result = alloc(fromLen * 6 + 1);
-	if (result && TECConvertText(gUTF16ToUTF8Converter, (ConstTextPtr)from,
-		    fromLen, &inputRead, result,
-		    (fromLen*6+1)*sizeof(char_u), &utf8_len) == noErr)
+	نتیجه = alloc(fromLen * 6 + 1);
+	إذا (نتیجه && TECConvert_متن(g_UTF16_مقصد_UTF8_Converter, (Const_متن_Ptr)from,
+		    fromLen, &درون_داد_Read, نتیجه,
+		    (fromLen*6+1)*حجم(char_u), &utf8_len) == noErr)
 	{
-	    TECFlushText(gUTF16ToUTF8Converter, result, (fromLen*6+1)*sizeof(char_u), &inputRead);
-	    utf8_len += inputRead;
+	    TECFlush_متن(g_UTF16_مقصد_UTF8_Converter, نتیجه, (fromLen*6+1)*حجم(char_u), &درون_داد_Read);
+	    utf8_len += درون_داد_Read;
 	}
-	else
-	    VIM_CLEAR(result);
+	وإلا
+	    VIM_CLEAR(نتیجه);
     }
-    else
+    وإلا
     {
-	result = NULL;
+	نتیجه = عدم;
     }
 
-    if (actualLen)
-	*actualLen = result ? utf8_len : 0;
+    إذا (actualLen)
+	*actualLen = نتیجه ? utf8_len : 0;
 
-    return result;
+    أرجع نتیجه;
 }
 
 /*
  * Converts from UTF-8 to UTF-16 UniChars
  */
-    static UniChar *
-mac_utf8_to_utf16(
+    ساكن UniChar *
+mac_utf8_مقصد_utf16(
     char_u *from,
     size_t fromLen,
     size_t *actualLen)
 {
     CFStringRef  utf8_str;
     CFRange      convertRange;
-    UniChar      *result = NULL;
+    UniChar      *نتیجه = عدم;
 
-    utf8_str = CFStringCreateWithBytes(NULL, from, fromLen,
+    utf8_str = CFString_Create_With_بایتها(عدم, from, fromLen,
 	    kCFStringEncodingUTF8, FALSE);
 
-    if (utf8_str == NULL)
+    إذا (utf8_str == عدم)
     {
-	if (actualLen)
+	إذا (actualLen)
 	    *actualLen = 0;
-	return NULL;
+	أرجع عدم;
     }
 
-    convertRange = CFRangeMake(0, CFStringGetLength(utf8_str));
-    result = ALLOC_MULT(UniChar, convertRange.length);
+    convertRange = CFRangeMake(0, CFString_Get_درازی(utf8_str));
+    نتیجه = ALLOC_MULT(UniChar, convertRange.درازی);
 
-    CFStringGetCharacters(utf8_str, convertRange, result);
+    CFStringGetCharacters(utf8_str, convertRange, نتیجه);
 
     CFRelease(utf8_str);
 
-    if (actualLen)
-	*actualLen = convertRange.length * sizeof(UniChar);
+    إذا (actualLen)
+	*actualLen = convertRange.درازی * حجم(UniChar);
 
-    return result;
+    أرجع نتیجه;
 }
 
 /*
  * Sets LANG environment variable in Vim from Mac locale
  */
-    void
-mac_lang_init(void)
+    فراغ
+mac_lang_init(فراغ)
 {
-    if (mch_getenv((char_u *)"LANG") != NULL)
-	return;
+    إذا (mch_getenv((char_u *)"LANG") != عدم)
+	أرجع;
 
-    char	buf[50];
+    حرف	buf[50];
 
     // $LANG is not set, either because it was unset or Vim was started
     // from the Dock.  Query the system locale.
-    if (LocaleRefGetPartString(NULL,
-		kLocaleLanguageMask | kLocaleLanguageVariantMask |
-		kLocaleRegionMask | kLocaleRegionVariantMask,
-		sizeof(buf) - 10, buf) == noErr && *buf)
+    إذا (LocaleRefGetPartString(عدم,
+		k_Locale_Language_ماسک | k_Locale_Language_Variant_ماسک |
+		k_Locale_Region_ماسک | k_Locale_Region_Variant_ماسک,
+		حجم(buf) - 10, buf) == noErr && *buf)
     {
-	if (strcasestr(buf, "utf-8") == NULL)
+	إذا (strcasestr(buf, "utf-8") == عدم)
 	    strcat(buf, ".UTF-8");
 	vim_setenv((char_u *)"LANG", (char_u *)buf);
-#ifdef HAVE_LOCALE_H
+#اگر_تعریف_شده HAVE_LOCALE_H
 	setlocale(LC_ALL, "");
-#endif
-#if defined(LC_NUMERIC)
+#پایان_اگر
+#إذا defined(LC_NUMERIC)
 	// Make sure strtod() uses a decimal point, not a comma.
 	setlocale(LC_NUMERIC, "C");
-#endif
+#پایان_اگر
     }
 }
-#endif // MACOS_CONVERT
+#پایان_اگر // MACOS_CONVERT

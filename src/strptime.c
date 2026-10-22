@@ -53,86 +53,86 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#ifdef MSWIN
+#اگر_تعریف_شده MSWIN
 
 /* Constants lifted from NetBSD's <tzfile.h>. */
-#define TM_YEAR_BASE	1900
-#define TM_SUNDAY	0
-#define TM_MONDAY	1
-#define SECSPERHOUR	3600
-#define SECSPERMIN	60
-#define HOURSPERDAY	24
+#تعریف_کن TM_YEAR_پایه	1900
+#تعریف_کن TM_SUNDAY	0
+#تعریف_کن TM_MONDAY	1
+#تعریف_کن SECSPERHOUR	3600
+#تعریف_کن SECSPERMIN	60
+#تعریف_کن HOURSPERDAY	24
 
-#define isleap(y)	(((y) % 4 == 0 && (y) % 100 != 0) || (y) % 400 == 0)
+#تعریف_کن isleap(y)	(((y) % 4 == 0 && (y) % 100 != 0) || (y) % 400 == 0)
 /* isleap_sum avoids integer overflow when adding the 1900 base. */
-#define isleap_sum(a, b) \
-			isleap(((unsigned)(a) + (unsigned)(b)) % 400)
+#تعریف_کن isleap_جمع(a, b) \
+			isleap(((بیعلامت)(a) + (بیعلامت)(b)) % 400)
 
 /*
  * _get_tzname() is provided by the UCRT and by the MSVC CRT.  Older MinGW
  * builds linking against msvcrt.dll fall back to the deprecated tzname[]
  * global (mingw-w64 already exposes the POSIX-named tzname[]).
  */
-#if defined(_UCRT) || defined(_MSC_VER)
+#إذا defined(_UCRT) || defined(_MSC_VER)
 # define USE_GET_TZNAME
-#endif
+#پایان_اگر
 
 /* Locale tables (English / "C" locale). */
-static const char *const c_day[] = {
+ساكن ثابت حرف *ثابت c_day[] = {
     "Sunday", "Monday", "Tuesday", "Wednesday",
     "Thursday", "Friday", "Saturday"
 };
-static const char *const c_abday[] = {
+ساكن ثابت حرف *ثابت c_abday[] = {
     "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 };
-static const char *const c_mon[] = {
+ساكن ثابت حرف *ثابت c_mon[] = {
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 };
-static const char *const c_abmon[] = {
+ساكن ثابت حرف *ثابت c_abmon[] = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
-static const char *const c_am_pm[] = { "AM", "PM" };
-static const char c_d_t_fmt[] = "%a %b %e %H:%M:%S %Y";
-static const char c_d_fmt[] = "%m/%d/%y";
-static const char c_t_fmt[] = "%H:%M:%S";
-static const char c_t_fmt_ampm[] = "%I:%M:%S %p";
+ساكن ثابت حرف *ثابت c_am_pm[] = { "AM", "PM" };
+ساكن ثابت حرف c_d_t_fmt[] = "%a %b %e %H:%M:%S %Y";
+ساكن ثابت حرف c_d_fmt[] = "%m/%d/%y";
+ساكن ثابت حرف c_t_fmt[] = "%H:%M:%S";
+ساكن ثابت حرف c_t_fmt_ampm[] = "%I:%M:%S %p";
 
-static const unsigned char *conv_num(const unsigned char *, int *,
-						unsigned int, unsigned int);
-static const unsigned char *find_string(const unsigned char *, int *,
-			const char * const *, const char * const *, int);
+ساكن ثابت بیعلامت حرف *conv_رقم(ثابت بیعلامت حرف *, صحيح *,
+						بیعلامت صحيح, بیعلامت صحيح);
+ساكن ثابت بیعلامت حرف *پیدا_کن_string(ثابت بیعلامت حرف *, صحيح *,
+			ثابت حرف * ثابت *, ثابت حرف * ثابت *, صحيح);
 
 /*
  * We do not implement alternate representations. However, we always
  * check whether a given modifier is allowed for a certain conversion.
  */
-#define ALT_E			0x01
-#define ALT_O			0x02
-#define LEGAL_ALT(x)		{ if (alt_format & ~(x)) return NULL; }
+#تعریف_کن ALT_E			0x01
+#تعریف_کن ALT_O			0x02
+#تعریف_کن LEGAL_ALT(x)		{ إذا (alt_format & ~(x)) أرجع عدم; }
 
-#define S_YEAR			(1 << 0)
-#define S_MON			(1 << 1)
-#define S_YDAY			(1 << 2)
-#define S_MDAY			(1 << 3)
-#define S_WDAY			(1 << 4)
-#define S_HOUR			(1 << 5)
+#تعریف_کن S_YEAR			(1 << 0)
+#تعریف_کن S_MON			(1 << 1)
+#تعریف_کن S_YDAY			(1 << 2)
+#تعریف_کن S_MDAY			(1 << 3)
+#تعریف_کن S_WDAY			(1 << 4)
+#تعریف_کن S_HOUR			(1 << 5)
 
-#define HAVE_MDAY(s)		(s & S_MDAY)
-#define HAVE_MON(s)		(s & S_MON)
-#define HAVE_WDAY(s)		(s & S_WDAY)
-#define HAVE_YDAY(s)		(s & S_YDAY)
-#define HAVE_YEAR(s)		(s & S_YEAR)
-#define HAVE_HOUR(s)		(s & S_HOUR)
+#تعریف_کن HAVE_MDAY(s)		(s & S_MDAY)
+#تعریف_کن HAVE_MON(s)		(s & S_MON)
+#تعریف_کن HAVE_WDAY(s)		(s & S_WDAY)
+#تعریف_کن HAVE_YDAY(s)		(s & S_YDAY)
+#تعریف_کن HAVE_YEAR(s)		(s & S_YEAR)
+#تعریف_کن HAVE_HOUR(s)		(s & S_HOUR)
 
 /* RFC-822/RFC-2822 */
-static const char *const nast[5] = {
+ساكن ثابت حرف *ثابت nast[5] = {
     "EST",    "CST",    "MST",    "PST",    "\0\0\0"
 };
-static const char *const nadt[5] = {
+ساكن ثابت حرف *ثابت nadt[5] = {
     "EDT",    "CDT",    "MDT",    "PDT",    "\0\0\0"
 };
 
@@ -140,7 +140,7 @@ static const char *const nadt[5] = {
  * Table to determine the ordinal date for the start of a month.
  * Ref: http://en.wikipedia.org/wiki/ISO_week_date
  */
-static const int start_of_month[2][13] = {
+ساكن ثابت صحيح شروع_از_month[2][13] = {
     /* non-leap year */
     { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
     /* leap year */
@@ -153,14 +153,14 @@ static const int start_of_month[2][13] = {
  * and its colonies. Ref:
  * http://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week
  */
-    static int
-first_wday_of(int yr)
+    ساكن صحيح
+اولی_wday_از(صحيح yr)
 {
-    return ((2 * (3 - (yr / 100) % 4)) + (yr % 100) + ((yr % 100) /  4) +
+    أرجع ((2 * (3 - (yr / 100) % 4)) + (yr % 100) + ((yr % 100) /  4) +
 	    (isleap(yr) ? 6 : 0) + 1) % 7;
 }
 
-#define delim(p)	((p) == '\0' || isspace((unsigned char)(p)))
+#تعریف_کن delim(p)	((p) == '\0' || آیا_فاصله((بیعلامت حرف)(p)))
 
 /*
  * Stub replacing NetBSD's fromzone(): the Windows CRT does not provide
@@ -168,325 +168,325 @@ first_wday_of(int yr)
  * we simply decline to recognize arbitrary timezone names.  The %Z / %z
  * numeric and RFC-822/2822 forms are still handled by the caller.
  */
-    static int
-fromzone(const unsigned char **bp UNUSED, struct tm *tm UNUSED,
-						    int mandatory UNUSED)
+    ساكن صحيح
+fromzone(ثابت بیعلامت حرف **bp استفادهنشده, بنية tm *tm استفادهنشده,
+						    صحيح mandatory استفادهنشده)
 {
-    return 0;
+    أرجع 0;
 }
 
-    char *
-strptime(const char *buf, const char *fmt, struct tm *tm)
+    حرف *
+strptime(ثابت حرف *buf, ثابت حرف *fmt, بنية tm *tm)
 {
-    unsigned char c;
-    const unsigned char *bp, *ep, *zname;
-    int alt_format, i, split_year = 0, neg = 0, state = 0,
-	day_offset = -1, week_offset = 0, offs, mandatory;
-    const char *new_fmt;
+    بیعلامت حرف c;
+    ثابت بیعلامت حرف *bp, *ep, *zname;
+    صحيح alt_format, i, تقسیم_year = 0, neg = 0, state = 0,
+	day_جابه_جایی = -1, week_جابه_جایی = 0, offs, mandatory;
+    ثابت حرف *new_fmt;
 
-    bp = (const unsigned char *)buf;
+    bp = (ثابت بیعلامت حرف *)buf;
 
-    while (bp != NULL && (c = *fmt++) != '\0')
+    طالما (bp != عدم && (c = *fmt++) != '\0')
     {
 	/* Clear `alternate' modifier prior to new conversion. */
 	alt_format = 0;
 	i = 0;
 
 	/* Eat up white-space. */
-	if (isspace(c))
+	إذا (آیا_فاصله(c))
 	{
-	    while (isspace(*bp))
+	    طالما (آیا_فاصله(*bp))
 		bp++;
-	    continue;
+	    استمر;
 	}
 
-	if (c != '%')
-	    goto literal;
+	إذا (c != '%')
+	    اذهب literal;
 
 
-again:	switch (c = *fmt++)
+again:	بدل (c = *fmt++)
 	{
-	case '%':	/* "%%" is converted to "%". */
+	حالة '%':	/* "%%" is converted to "%". */
 literal:
-	    if (c != *bp++)
-		return NULL;
+	    إذا (c != *bp++)
+		أرجع عدم;
 	    LEGAL_ALT(0);
-	    continue;
+	    استمر;
 
 	/*
 	 * "Alternative" modifiers. Just set the appropriate flag
 	 * and start over again.
 	 */
-	case 'E':	/* "%E?" alternative conversion modifier. */
+	حالة 'E':	/* "%E?" alternative conversion modifier. */
 	    LEGAL_ALT(0);
 	    alt_format |= ALT_E;
-	    goto again;
+	    اذهب again;
 
-	case 'O':	/* "%O?" alternative conversion modifier. */
+	حالة 'O':	/* "%O?" alternative conversion modifier. */
 	    LEGAL_ALT(0);
 	    alt_format |= ALT_O;
-	    goto again;
+	    اذهب again;
 
 	/*
 	 * "Complex" conversion rules, implemented through recursion.
 	 */
-	case 'c':	/* Date and time, using the locale's format. */
+	حالة 'c':	/* Date and time, using the locale's format. */
 	    new_fmt = c_d_t_fmt;
 	    state |= S_WDAY | S_MON | S_MDAY | S_YEAR;
-	    goto recurse;
+	    اذهب recurse;
 
-	case 'D':	/* The date as "%m/%d/%y". */
+	حالة 'D':	/* The date as "%m/%d/%y". */
 	    new_fmt = "%m/%d/%y";
 	    LEGAL_ALT(0);
 	    state |= S_MON | S_MDAY | S_YEAR;
-	    goto recurse;
+	    اذهب recurse;
 
-	case 'F':	/* The date as "%Y-%m-%d". */
+	حالة 'F':	/* The date as "%Y-%m-%d". */
 	    new_fmt = "%Y-%m-%d";
 	    LEGAL_ALT(0);
 	    state |= S_MON | S_MDAY | S_YEAR;
-	    goto recurse;
+	    اذهب recurse;
 
-	case 'R':	/* The time as "%H:%M". */
+	حالة 'R':	/* The time as "%H:%M". */
 	    new_fmt = "%H:%M";
 	    LEGAL_ALT(0);
-	    goto recurse;
+	    اذهب recurse;
 
-	case 'r':	/* The time in 12-hour clock representation. */
+	حالة 'r':	/* The time in 12-hour clock representation. */
 	    new_fmt = c_t_fmt_ampm;
 	    LEGAL_ALT(0);
-	    goto recurse;
+	    اذهب recurse;
 
-	case 'T':	/* The time as "%H:%M:%S". */
+	حالة 'T':	/* The time as "%H:%M:%S". */
 	    new_fmt = "%H:%M:%S";
 	    LEGAL_ALT(0);
-	    goto recurse;
+	    اذهب recurse;
 
-	case 'X':	/* The time, using the locale's format. */
+	حالة 'X':	/* The time, using the locale's format. */
 	    new_fmt = c_t_fmt;
-	    goto recurse;
+	    اذهب recurse;
 
-	case 'x':	/* The date, using the locale's format. */
+	حالة 'x':	/* The date, using the locale's format. */
 	    new_fmt = c_d_fmt;
 	    state |= S_MON | S_MDAY | S_YEAR;
 	recurse:
-	    bp = (const unsigned char *)strptime((const char *)bp,
+	    bp = (ثابت بیعلامت حرف *)strptime((ثابت حرف *)bp,
 							new_fmt, tm);
 	    LEGAL_ALT(ALT_E);
-	    continue;
+	    استمر;
 
 	/*
 	 * "Elementary" conversion rules.
 	 */
-	case 'A':	/* The day of week, using the locale's form. */
-	case 'a':
-	    bp = find_string(bp, &tm->tm_wday, c_day, c_abday, 7);
+	حالة 'A':	/* The day of week, using the locale's form. */
+	حالة 'a':
+	    bp = پیدا_کن_string(bp, &tm->tm_wday, c_day, c_abday, 7);
 	    LEGAL_ALT(0);
 	    state |= S_WDAY;
-	    continue;
+	    استمر;
 
-	case 'B':	/* The month, using the locale's form. */
-	case 'b':
-	case 'h':
-	    bp = find_string(bp, &tm->tm_mon, c_mon, c_abmon, 12);
+	حالة 'B':	/* The month, using the locale's form. */
+	حالة 'b':
+	حالة 'h':
+	    bp = پیدا_کن_string(bp, &tm->tm_mon, c_mon, c_abmon, 12);
 	    LEGAL_ALT(0);
 	    state |= S_MON;
-	    continue;
+	    استمر;
 
-	case 'C':	/* The century number. */
+	حالة 'C':	/* The century number. */
 	    i = 20;
-	    bp = conv_num(bp, &i, 0, 99);
+	    bp = conv_رقم(bp, &i, 0, 99);
 
-	    i = i * 100 - TM_YEAR_BASE;
-	    if (split_year)
+	    i = i * 100 - TM_YEAR_پایه;
+	    إذا (تقسیم_year)
 		i += tm->tm_year % 100;
-	    split_year = 1;
+	    تقسیم_year = 1;
 	    tm->tm_year = i;
 	    LEGAL_ALT(ALT_E);
 	    state |= S_YEAR;
-	    continue;
+	    استمر;
 
-	case 'd':	/* The day of month. */
-	case 'e':
-	    bp = conv_num(bp, &tm->tm_mday, 1, 31);
+	حالة 'd':	/* The day of month. */
+	حالة 'e':
+	    bp = conv_رقم(bp, &tm->tm_mday, 1, 31);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_MDAY;
-	    continue;
+	    استمر;
 
-	case 'k':	/* The hour (24-hour clock representation). */
+	حالة 'k':	/* The hour (24-hour clock representation). */
 	    LEGAL_ALT(0);
 	    /* FALLTHROUGH */
-	case 'H':
-	    bp = conv_num(bp, &tm->tm_hour, 0, 23);
+	حالة 'H':
+	    bp = conv_رقم(bp, &tm->tm_hour, 0, 23);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_HOUR;
-	    continue;
+	    استمر;
 
-	case 'l':	/* The hour (12-hour clock representation). */
+	حالة 'l':	/* The hour (12-hour clock representation). */
 	    LEGAL_ALT(0);
 	    /* FALLTHROUGH */
-	case 'I':
-	    bp = conv_num(bp, &tm->tm_hour, 1, 12);
-	    if (tm->tm_hour == 12)
+	حالة 'I':
+	    bp = conv_رقم(bp, &tm->tm_hour, 1, 12);
+	    إذا (tm->tm_hour == 12)
 		tm->tm_hour = 0;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_HOUR;
-	    continue;
+	    استمر;
 
-	case 'j':	/* The day of year. */
+	حالة 'j':	/* The day of year. */
 	    i = 1;
-	    bp = conv_num(bp, &i, 1, 366);
+	    bp = conv_رقم(bp, &i, 1, 366);
 	    tm->tm_yday = i - 1;
 	    LEGAL_ALT(0);
 	    state |= S_YDAY;
-	    continue;
+	    استمر;
 
-	case 'M':	/* The minute. */
-	    bp = conv_num(bp, &tm->tm_min, 0, 59);
+	حالة 'M':	/* The minute. */
+	    bp = conv_رقم(bp, &tm->tm_min, 0, 59);
 	    LEGAL_ALT(ALT_O);
-	    continue;
+	    استمر;
 
-	case 'm':	/* The month. */
+	حالة 'm':	/* The month. */
 	    i = 1;
-	    bp = conv_num(bp, &i, 1, 12);
+	    bp = conv_رقم(bp, &i, 1, 12);
 	    tm->tm_mon = i - 1;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_MON;
-	    continue;
+	    استمر;
 
-	case 'p':	/* The locale's equivalent of AM/PM. */
-	    bp = find_string(bp, &i, c_am_pm, NULL, 2);
-	    if (HAVE_HOUR(state) && tm->tm_hour > 11)
-		return NULL;
+	حالة 'p':	/* The locale's equivalent of AM/PM. */
+	    bp = پیدا_کن_string(bp, &i, c_am_pm, عدم, 2);
+	    إذا (HAVE_HOUR(state) && tm->tm_hour > 11)
+		أرجع عدم;
 	    tm->tm_hour += i * 12;
 	    LEGAL_ALT(0);
-	    continue;
+	    استمر;
 
-	case 'S':	/* The seconds. */
-	    bp = conv_num(bp, &tm->tm_sec, 0, 61);
+	حالة 'S':	/* The seconds. */
+	    bp = conv_رقم(bp, &tm->tm_sec, 0, 61);
 	    LEGAL_ALT(ALT_O);
-	    continue;
+	    استمر;
 
-	case 's':	/* seconds since the epoch */
+	حالة 's':	/* seconds since the epoch */
 	    {
-		const time_t TIME_MAX = (time_t)((sizeof(time_t) == 8)
-					? LLONG_MAX : INT_MAX);
+		ثابت time_t زمان_MAX = (time_t)((حجم(time_t) == 8)
+					? LLONG_MAX : بیشترین_صحیح);
 		time_t sse, d;
 
-		if (*bp < '0' || *bp > '9')
+		إذا (*bp < '0' || *bp > '9')
 		{
-		    bp = NULL;
-		    continue;
+		    bp = عدم;
+		    استمر;
 		}
 
 		sse = *bp++ - '0';
-		while (*bp >= '0' && *bp <= '9')
+		طالما (*bp >= '0' && *bp <= '9')
 		{
 		    d = *bp++ - '0';
-		    if (sse > TIME_MAX / 10)
+		    إذا (sse > زمان_MAX / 10)
 		    {
-			bp = NULL;
-			break;
+			bp = عدم;
+			اكسر;
 		    }
 		    sse *= 10;
-		    if (sse > TIME_MAX - d)
+		    إذا (sse > زمان_MAX - d)
 		    {
-			bp = NULL;
-			break;
+			bp = عدم;
+			اكسر;
 		    }
 		    sse += d;
 		}
-		if (bp == NULL)
-		    continue;
+		إذا (bp == عدم)
+		    استمر;
 
 		{
-		    struct tm *lt = localtime(&sse);
+		    بنية tm *lt = localtime(&sse);
 
-		    if (lt == NULL)
-			bp = NULL;
-		    else
+		    إذا (lt == عدم)
+			bp = عدم;
+		    وإلا
 		    {
 			*tm = *lt;
 			state |= S_YDAY | S_WDAY |
 				S_MON | S_MDAY | S_YEAR;
 		    }
 		}
-		continue;
+		استمر;
 	    }
 
-	case 'U':	/* The week of year, beginning on sunday. */
-	case 'W':	/* The week of year, beginning on monday. */
+	حالة 'U':	/* The week of year, beginning on sunday. */
+	حالة 'W':	/* The week of year, beginning on monday. */
 	    /*
 	     * This is bogus, as we can not assume any valid
 	     * information present in the tm structure at this
 	     * point to calculate a real value, so save the
 	     * week for now in case it can be used later.
 	     */
-	    bp = conv_num(bp, &i, 0, 53);
+	    bp = conv_رقم(bp, &i, 0, 53);
 	    LEGAL_ALT(ALT_O);
-	    if (c == 'U')
-		day_offset = TM_SUNDAY;
-	    else
-		day_offset = TM_MONDAY;
-	    week_offset = i;
-	    continue;
+	    إذا (c == 'U')
+		day_جابه_جایی = TM_SUNDAY;
+	    وإلا
+		day_جابه_جایی = TM_MONDAY;
+	    week_جابه_جایی = i;
+	    استمر;
 
-	case 'w':	/* The day of week, beginning on sunday. */
-	    bp = conv_num(bp, &tm->tm_wday, 0, 6);
+	حالة 'w':	/* The day of week, beginning on sunday. */
+	    bp = conv_رقم(bp, &tm->tm_wday, 0, 6);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_WDAY;
-	    continue;
+	    استمر;
 
-	case 'u':	/* The day of week, monday = 1. */
-	    bp = conv_num(bp, &i, 1, 7);
+	حالة 'u':	/* The day of week, monday = 1. */
+	    bp = conv_رقم(bp, &i, 1, 7);
 	    tm->tm_wday = i % 7;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_WDAY;
-	    continue;
+	    استمر;
 
-	case 'g':	/* ISO week year without century (parsed, ignored). */
-	    bp = conv_num(bp, &i, 0, 99);
-	    continue;
+	حالة 'g':	/* ISO week year without century (parsed, ignored). */
+	    bp = conv_رقم(bp, &i, 0, 99);
+	    استمر;
 
-	case 'G':	/* ISO week year with century (parsed, ignored). */
-	    do
+	حالة 'G':	/* ISO week year with century (parsed, ignored). */
+	    افعل
 		bp++;
-	    while (isdigit(*bp));
-	    continue;
+	    طالما (آیا_رقم(*bp));
+	    استمر;
 
-	case 'V':	/* ISO 8601:1988 week number (parsed, ignored). */
-	    bp = conv_num(bp, &i, 1, 53);
-	    continue;
+	حالة 'V':	/* ISO 8601:1988 week number (parsed, ignored). */
+	    bp = conv_رقم(bp, &i, 1, 53);
+	    استمر;
 
-	case 'Y':	/* The year. */
-	    i = TM_YEAR_BASE;	/* just for data sanity... */
-	    bp = conv_num(bp, &i, 0, 9999);
-	    tm->tm_year = i - TM_YEAR_BASE;
+	حالة 'Y':	/* The year. */
+	    i = TM_YEAR_پایه;	/* just for data sanity... */
+	    bp = conv_رقم(bp, &i, 0, 9999);
+	    tm->tm_year = i - TM_YEAR_پایه;
 	    LEGAL_ALT(ALT_E);
 	    state |= S_YEAR;
-	    continue;
+	    استمر;
 
-	case 'y':	/* The year within 100 years of the epoch. */
+	حالة 'y':	/* The year within 100 years of the epoch. */
 	    /* LEGAL_ALT(ALT_E | ALT_O); */
-	    bp = conv_num(bp, &i, 0, 99);
+	    bp = conv_رقم(bp, &i, 0, 99);
 
-	    if (split_year)
+	    إذا (تقسیم_year)
 		/* preserve century */
 		i += (tm->tm_year / 100) * 100;
-	    else
+	    وإلا
 	    {
-		split_year = 1;
-		if (i <= 68)
-		    i = i + 2000 - TM_YEAR_BASE;
-		else
-		    i = i + 1900 - TM_YEAR_BASE;
+		تقسیم_year = 1;
+		إذا (i <= 68)
+		    i = i + 2000 - TM_YEAR_پایه;
+		وإلا
+		    i = i + 1900 - TM_YEAR_پایه;
 	    }
 	    tm->tm_year = i;
 	    state |= S_YEAR;
-	    continue;
+	    استمر;
 
-	case 'Z':
-	case 'z':
+	حالة 'Z':
+	حالة 'z':
 	    tzset();
 	    mandatory = c == 'z';
 	    /*
@@ -508,299 +508,299 @@ literal:
 	     * Note: J maybe used to denote non-nautical
 	     *       local time
 	     */
-	    if (mandatory)
-		while (isspace(*bp))
+	    إذا (mandatory)
+		طالما (آیا_فاصله(*bp))
 		    bp++;
 
 	    zname = bp;
-	    switch (*bp++)
+	    بدل (*bp++)
 	    {
-	    case 'G':
-		if (*bp++ != 'M')
-		    goto namedzone;
+	    حالة 'G':
+		إذا (*bp++ != 'M')
+		    اذهب namedzone;
 		/*FALLTHROUGH*/
-	    case 'U':
-		if (*bp++ != 'T')
-		    goto namedzone;
-		else if (!delim(*bp) && *bp++ != 'C')
-		    goto namedzone;
+	    حالة 'U':
+		إذا (*bp++ != 'T')
+		    اذهب namedzone;
+		وإلا إذا (!delim(*bp) && *bp++ != 'C')
+		    اذهب namedzone;
 		/*FALLTHROUGH*/
-	    case 'Z':
-		if (!delim(*bp))
-		    goto namedzone;
+	    حالة 'Z':
+		إذا (!delim(*bp))
+		    اذهب namedzone;
 		tm->tm_isdst = 0;
-		continue;
-	    case '+':
+		استمر;
+	    حالة '+':
 		neg = 0;
-		break;
-	    case '-':
+		اكسر;
+	    حالة '-':
 		neg = 1;
-		break;
-	    default:
+		اكسر;
+	    افتراضي:
 namedzone:
 		bp = zname;
 
 		/* Nautical / Military style */
-		if (delim(bp[1]) &&
+		إذا (delim(bp[1]) &&
 			((*bp >= 'A' && *bp <= 'I') ||
 			 (*bp >= 'L' && *bp <= 'Y')))
 		{
 		    bp++;
-		    continue;
+		    استمر;
 		}
 		/* 'J' is local time */
-		if (delim(bp[1]) && *bp == 'J')
+		إذا (delim(bp[1]) && *bp == 'J')
 		{
 		    bp++;
-		    continue;
+		    استمر;
 		}
 
 		/*
 		 * From our 3 letter hard-coded table.
 		 */
-		if (delim(bp[0]) || delim(bp[1]) ||
+		إذا (delim(bp[0]) || delim(bp[1]) ||
 			delim(bp[2]) || !delim(bp[3]))
-		    goto loadzone;
-		ep = find_string(bp, &i, nast, NULL, 4);
-		if (ep != NULL)
+		    اذهب loadzone;
+		ep = پیدا_کن_string(bp, &i, nast, عدم, 4);
+		إذا (ep != عدم)
 		{
 		    bp = ep;
-		    continue;
+		    استمر;
 		}
-		ep = find_string(bp, &i, nadt, NULL, 4);
-		if (ep != NULL)
+		ep = پیدا_کن_string(bp, &i, nadt, عدم, 4);
+		إذا (ep != عدم)
 		{
 		    tm->tm_isdst = 1;
 		    bp = ep;
-		    continue;
+		    استمر;
 		}
 		/*
 		 * Our current timezone.  Prefer _get_tzname() over the
 		 * tzname[] global, which UCRT marks deprecated because it
 		 * may be inaccurate after locale changes.
 		 */
-#ifdef USE_GET_TZNAME
+#اگر_تعریف_شده USE_GET_TZNAME
 		{
-		    char tzbuf[2][32];
-		    const char *tznames[2] = { tzbuf[0], tzbuf[1] };
+		    حرف tzbuf[2][32];
+		    ثابت حرف *tznames[2] = { tzbuf[0], tzbuf[1] };
 		    size_t tzlen;
 
 		    _tzset();
-		    if (_get_tzname(&tzlen, tzbuf[0], sizeof(tzbuf[0]), 0) != 0)
+		    إذا (_get_tzname(&tzlen, tzbuf[0], حجم(tzbuf[0]), 0) != 0)
 			tzbuf[0][0] = NUL;
-		    if (_get_tzname(&tzlen, tzbuf[1], sizeof(tzbuf[1]), 1) != 0)
+		    إذا (_get_tzname(&tzlen, tzbuf[1], حجم(tzbuf[1]), 1) != 0)
 			tzbuf[1][0] = NUL;
-		    ep = find_string(bp, &i, tznames, NULL, 2);
+		    ep = پیدا_کن_string(bp, &i, tznames, عدم, 2);
 		}
-#else
-		ep = find_string(bp, &i,
-			(const char *const *)tzname, NULL, 2);
-#endif
-		if (ep != NULL)
+#وإلا
+		ep = پیدا_کن_string(bp, &i,
+			(ثابت حرف *ثابت *)tzname, عدم, 2);
+#پایان_اگر
+		إذا (ep != عدم)
 		{
 		    tm->tm_isdst = i;
 		    bp = ep;
-		    continue;
+		    استمر;
 		}
 loadzone:
 		/*
 		 * The hard way, load the zone!
 		 */
-		if (fromzone(&bp, tm, mandatory))
-		    continue;
-		goto out;
+		إذا (fromzone(&bp, tm, mandatory))
+		    استمر;
+		اذهب بیرون;
 	    }
 	    offs = 0;
-	    for (i = 0; i < 4; )
+	    لكل (i = 0; i < 4; )
 	    {
-		if (isdigit(*bp))
+		إذا (آیا_رقم(*bp))
 		{
 		    offs = offs * 10 + (*bp++ - '0');
 		    i++;
-		    continue;
+		    استمر;
 		}
-		if (i == 2 && *bp == ':')
+		إذا (i == 2 && *bp == ':')
 		{
 		    bp++;
-		    continue;
+		    استمر;
 		}
-		break;
+		اكسر;
 	    }
-	    if (isdigit(*bp))
-		goto out;
-	    switch (i)
+	    إذا (آیا_رقم(*bp))
+		اذهب بیرون;
+	    بدل (i)
 	    {
-	    case 2:
+	    حالة 2:
 		offs *= SECSPERHOUR;
-		break;
-	    case 4:
+		اكسر;
+	    حالة 4:
 		i = offs % 100;
 		offs /= 100;
-		if (i >= SECSPERMIN)
-		    goto out;
+		إذا (i >= SECSPERMIN)
+		    اذهب بیرون;
 		/* Convert minutes into decimal */
 		offs = offs * SECSPERHOUR + i * SECSPERMIN;
-		break;
-	    default:
-out:
-		if (mandatory)
-		    return NULL;
+		اكسر;
+	    افتراضي:
+بیرون:
+		إذا (mandatory)
+		    أرجع عدم;
 		bp = zname;
-		continue;
+		استمر;
 	    }
 	    /* ISO 8601 & RFC 3339 limit to 23:59 max */
-	    if (offs >= (HOURSPERDAY * SECSPERHOUR))
-		goto out;
-	    if (neg)
+	    إذا (offs >= (HOURSPERDAY * SECSPERHOUR))
+		اذهب بیرون;
+	    إذا (neg)
 		offs = -offs;
 	    tm->tm_isdst = 0;	/* XXX */
-	    continue;
+	    استمر;
 
 	/*
 	 * Miscellaneous conversions.
 	 */
-	case 'n':	/* Any kind of white-space. */
-	case 't':
-	    while (isspace(*bp))
+	حالة 'n':	/* Any kind of white-space. */
+	حالة 't':
+	    طالما (آیا_فاصله(*bp))
 		bp++;
 	    LEGAL_ALT(0);
-	    continue;
+	    استمر;
 
 
-	default:	/* Unknown/unsupported conversion. */
-	    return NULL;
+	افتراضي:	/* Unknown/unsupported conversion. */
+	    أرجع عدم;
 	}
     }
 
-    if (!HAVE_YDAY(state) && HAVE_YEAR(state))
+    إذا (!HAVE_YDAY(state) && HAVE_YEAR(state))
     {
-	if (HAVE_MON(state) && HAVE_MDAY(state))
+	إذا (HAVE_MON(state) && HAVE_MDAY(state))
 	{
 	    /* calculate day of year (ordinal date) */
-	    tm->tm_yday =  start_of_month[isleap_sum(tm->tm_year,
-			    TM_YEAR_BASE)][tm->tm_mon] + (tm->tm_mday - 1);
+	    tm->tm_yday =  شروع_از_month[isleap_جمع(tm->tm_year,
+			    TM_YEAR_پایه)][tm->tm_mon] + (tm->tm_mday - 1);
 	    state |= S_YDAY;
 	}
-	else if (day_offset != -1)
+	وإلا إذا (day_جابه_جایی != -1)
 	{
 	    /*
 	     * Set the date to the first Sunday (or Monday)
 	     * of the specified week of the year.
 	     */
-	    if (!HAVE_WDAY(state))
+	    إذا (!HAVE_WDAY(state))
 	    {
-		tm->tm_wday = day_offset;
+		tm->tm_wday = day_جابه_جایی;
 		state |= S_WDAY;
 	    }
 	    tm->tm_yday = (7 -
-		    first_wday_of(tm->tm_year + TM_YEAR_BASE) +
-		    day_offset) % 7 + (week_offset - 1) * 7 +
-		    tm->tm_wday  - day_offset;
+		    اولی_wday_از(tm->tm_year + TM_YEAR_پایه) +
+		    day_جابه_جایی) % 7 + (week_جابه_جایی - 1) * 7 +
+		    tm->tm_wday  - day_جابه_جایی;
 	    state |= S_YDAY;
 	}
     }
 
-    if (HAVE_YDAY(state) && HAVE_YEAR(state))
+    إذا (HAVE_YDAY(state) && HAVE_YEAR(state))
     {
-	int leap;
+	صحيح leap;
 
-	if (!HAVE_MON(state))
+	إذا (!HAVE_MON(state))
 	{
 	    /* calculate month of day of year */
 	    i = 0;
-	    leap = isleap_sum(tm->tm_year, TM_YEAR_BASE);
-	    while (tm->tm_yday >= start_of_month[leap][i])
+	    leap = isleap_جمع(tm->tm_year, TM_YEAR_پایه);
+	    طالما (tm->tm_yday >= شروع_از_month[leap][i])
 		i++;
-	    if (i > 12)
+	    إذا (i > 12)
 	    {
 		i = 1;
-		tm->tm_yday -= start_of_month[leap][12];
+		tm->tm_yday -= شروع_از_month[leap][12];
 		tm->tm_year++;
 	    }
 	    tm->tm_mon = i - 1;
 	    state |= S_MON;
 	}
 
-	if (!HAVE_MDAY(state))
+	إذا (!HAVE_MDAY(state))
 	{
 	    /* calculate day of month */
-	    leap = isleap_sum(tm->tm_year, TM_YEAR_BASE);
+	    leap = isleap_جمع(tm->tm_year, TM_YEAR_پایه);
 	    tm->tm_mday = tm->tm_yday -
-		start_of_month[leap][tm->tm_mon] + 1;
+		شروع_از_month[leap][tm->tm_mon] + 1;
 	    state |= S_MDAY;
 	}
 
-	if (!HAVE_WDAY(state))
+	إذا (!HAVE_WDAY(state))
 	{
 	    /* calculate day of week */
 	    i = 0;
-	    week_offset = first_wday_of(tm->tm_year);
-	    while (i++ <= tm->tm_yday)
+	    week_جابه_جایی = اولی_wday_از(tm->tm_year);
+	    طالما (i++ <= tm->tm_yday)
 	    {
-		if (week_offset++ >= 6)
-		    week_offset = 0;
+		إذا (week_جابه_جایی++ >= 6)
+		    week_جابه_جایی = 0;
 	    }
-	    tm->tm_wday = week_offset;
+	    tm->tm_wday = week_جابه_جایی;
 	    state |= S_WDAY;
 	}
     }
 
-    return (char *)bp;
+    أرجع (حرف *)bp;
 }
 
 
-    static const unsigned char *
-conv_num(const unsigned char *buf, int *dest, unsigned int llim,
-						    unsigned int ulim)
+    ساكن ثابت بیعلامت حرف *
+conv_رقم(ثابت بیعلامت حرف *buf, صحيح *dest, بیعلامت صحيح llim,
+						    بیعلامت صحيح ulim)
 {
-    unsigned int result = 0;
-    unsigned char ch;
+    بیعلامت صحيح نتیجه = 0;
+    بیعلامت حرف ch;
 
     /* The limit also determines the number of valid digits. */
-    unsigned int rulim = ulim;
+    بیعلامت صحيح rulim = ulim;
 
     ch = *buf;
-    if (ch < '0' || ch > '9')
-	return NULL;
+    إذا (ch < '0' || ch > '9')
+	أرجع عدم;
 
-    do
+    افعل
     {
-	result *= 10;
-	result += ch - '0';
+	نتیجه *= 10;
+	نتیجه += ch - '0';
 	rulim /= 10;
 	ch = *++buf;
-    } while ((result * 10 <= ulim) && rulim && ch >= '0' && ch <= '9');
+    } طالما ((نتیجه * 10 <= ulim) && rulim && ch >= '0' && ch <= '9');
 
-    if (result < llim || result > ulim)
-	return NULL;
+    إذا (نتیجه < llim || نتیجه > ulim)
+	أرجع عدم;
 
-    *dest = result;
-    return buf;
+    *dest = نتیجه;
+    أرجع buf;
 }
 
-    static const unsigned char *
-find_string(const unsigned char *bp, int *tgt, const char *const *n1,
-					    const char *const *n2, int c)
+    ساكن ثابت بیعلامت حرف *
+پیدا_کن_string(ثابت بیعلامت حرف *bp, صحيح *tgt, ثابت حرف *ثابت *n1,
+					    ثابت حرف *ثابت *n2, صحيح c)
 {
-    int		i;
+    صحيح		i;
     size_t	len;
 
     /* check full name - then abbreviated ones */
-    for (; n1 != NULL; n1 = n2, n2 = NULL)
+    لكل (; n1 != عدم; n1 = n2, n2 = عدم)
     {
-	for (i = 0; i < c; i++, n1++)
+	لكل (i = 0; i < c; i++, n1++)
 	{
-	    len = strlen(*n1);
-	    if (STRNICMP(*n1, bp, len) == 0)
+	    len = طول_رشته(*n1);
+	    إذا (STRNICMP(*n1, bp, len) == 0)
 	    {
 		*tgt = i;
-		return bp + len;
+		أرجع bp + len;
 	    }
 	}
     }
 
     /* Nothing matched */
-    return NULL;
+    أرجع عدم;
 }
 
-#endif // MSWIN
+#پایان_اگر // MSWIN

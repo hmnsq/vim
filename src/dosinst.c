@@ -16,59 +16,59 @@
 /*
  * Include common code for dosinst.c and uninstall.c.
  */
-#define DOSINST
-#include "dosinst.h"
-#include <io.h>
+#تعریف_کن DOSINST
+#ضمن "dosinst.h"
+#ضمن <io.h>
 
-#define GVIMEXT64_PATH	    "GvimExt64\\gvimext.dll"
-#define GVIMEXT32_PATH	    "GvimExt32\\gvimext.dll"
+#تعریف_کن GVIMEXT64_مسیر	    "GvimExt64\\gvimext.dll"
+#تعریف_کن GVIMEXT32_مسیر	    "GvimExt32\\gvimext.dll"
 
 // Macro to do an error check I was typing over and over
-#define CHECK_REG_ERROR(code) \
-    do { \
-	if (code != ERROR_SUCCESS) \
+#تعریف_کن CHECK_REG_ERROR(کد) \
+    افعل { \
+	إذا (کد != ERROR_SUCCESS) \
 	{ \
-	    printf("%ld error number:  %ld\n", (long)__LINE__, (long)code); \
-	    return 1; \
+	    چاپ_کن("%ld error number:  %ld\n", (دراز)__LINE__, (دراز)کد); \
+	    أرجع 1; \
 	} \
-    } while (0)
+    } طالما (0)
 
-int	has_vim = 0;		// installable vim.exe exists
-int	has_gvim = 0;		// installable gvim.exe exists
+صحيح	has_vim = 0;		// installable vim.exe exists
+صحيح	has_gvim = 0;		// installable gvim.exe exists
 
-char	oldvimrc[BUFSIZE];	// name of existing vimrc file
-char	vimrc[BUFSIZE];		// name of vimrc file to create
+حرف	oldvimrc[BUFSIZE];	// name of existing vimrc file
+حرف	vimrc[BUFSIZE];		// name of vimrc file to create
 
-char	*default_bat_dir = NULL;  // when not NULL, use this as the default
+حرف	*default_bat_dir = عدم;  // when not NULL, use this as the default
 				  // directory to write .bat files in
-char	*default_vim_dir = NULL;  // when not NULL, use this as the default
+حرف	*default_vim_dir = عدم;  // when not NULL, use this as the default
 				  // install dir for NSIS
 
 /*
  * Structure used for each choice the user can make.
  */
-struct choice
+بنية choice
 {
-    int	    active;			// non-zero when choice is active
-    char    *text;			// text displayed for this choice
-    void    (*changefunc)(int idx);	// function to change this choice
-    int	    arg;			// argument for function
-    void    (*installfunc)(int idx);	// function to install this choice
+    صحيح	    فعال;			// non-zero when choice is active
+    حرف    *متن;			// text displayed for this choice
+    فراغ    (*changefunc)(صحيح idx);	// function to change this choice
+    صحيح	    arg;			// argument for function
+    فراغ    (*installfunc)(صحيح idx);	// function to install this choice
 };
 
-struct choice	choices[30];		// choices the user can make
-int		choice_count = 0;	// number of choices available
+بنية choice	choices[30];		// choices the user can make
+صحيح		choice_شمار = 0;	// number of choices available
 
-#define TABLE_SIZE(s)	(int)ARRAYSIZE(s)
+#تعریف_کن جدول_اندازه(s)	(صحيح)ARRAYSIZE(s)
 
-enum
+تعداد
 {
     compat_vi = 1,
     compat_vim,
     compat_some_enhancements,
     compat_all_enhancements
 };
-char	*(compat_choices[]) =
+حرف	*(compat_choices[]) =
 {
     "\nChoose the default way to run Vim:",
     "Vi compatible",
@@ -76,46 +76,46 @@ char	*(compat_choices[]) =
     "with some Vim enhancements",
     "with syntax highlighting and other features switched on",
 };
-int	compat_choice = (int)compat_all_enhancements;
-char	*compat_text = "- run Vim %s";
+صحيح	compat_choice = (صحيح)compat_all_enhancements;
+حرف	*compat_متن = "- run Vim %s";
 
-enum
+تعداد
 {
     remap_no = 1,
     remap_win
 };
-char	*(remap_choices[]) =
+حرف	*(remap_choices[]) =
 {
     "\nChoose:",
     "Do not remap keys for Windows behavior",
     "Remap a few keys for Windows behavior (CTRL-V, CTRL-C, CTRL-F, etc)",
 };
-int	remap_choice = (int)remap_no;
-char	*remap_text = "- %s";
+صحيح	remap_choice = (صحيح)remap_no;
+حرف	*remap_متن = "- %s";
 
-enum
+تعداد
 {
     mouse_xterm = 1,
     mouse_mswin,
     mouse_default
 };
-char	*(mouse_choices[]) =
+حرف	*(mouse_choices[]) =
 {
     "\nChoose the way how Vim uses the mouse:",
     "right button extends selection (the Unix way)",
     "right button has a popup menu, left button starts select mode (the Windows way)",
     "right button has a popup menu, left button starts visual mode",
 };
-int	mouse_choice = (int)mouse_default;
-char	*mouse_text = "- The mouse %s";
+صحيح	mouse_choice = (صحيح)mouse_default;
+حرف	*mouse_متن = "- The mouse %s";
 
-enum
+تعداد
 {
     vimfiles_dir_none = 1,
     vimfiles_dir_vim,
     vimfiles_dir_home
 };
-static char *(vimfiles_dir_choices[]) =
+ساكن حرف *(vimfiles_dir_choices[]) =
 {
     "\nCreate plugin directories:",
     "No",
@@ -124,19 +124,19 @@ static char *(vimfiles_dir_choices[]) =
 };
 
 // non-zero when selected to install the popup menu entry.
-static int	install_popup = 0;
+ساكن صحيح	install_popup = 0;
 
 // non-zero when selected to install the "Open with" entry.
-static int	install_openwith = 0;
+ساكن صحيح	install_openwith = 0;
 
 // non-zero when need to add an uninstall entry in the registry
-static int	need_uninstall_entry = 0;
+ساكن صحيح	need_uninstall_مدخل = 0;
 
 /*
  * Definitions of the directory name (under $VIM) of the vimfiles directory
  * and its subdirectories:
  */
-static char	*(vimfiles_subdirs[]) =
+ساكن حرف	*(vimfiles_subdirs[]) =
 {
     "colors",
     "compiler",
@@ -153,83 +153,83 @@ static char	*(vimfiles_subdirs[]) =
  * Obtain a choice from a table.
  * First entry is a question, others are choices.
  */
-    static int
-get_choice(char **table, int entries)
+    ساكن صحيح
+get_choice(حرف **جدول, صحيح entries)
 {
-    int		answer;
-    int		idx;
-    char	dummy[100];
+    صحيح		answer;
+    صحيح		idx;
+    حرف	dummy[100];
 
-    do
+    افعل
     {
-	for (idx = 0; idx < entries; ++idx)
+	لكل (idx = 0; idx < entries; ++idx)
 	{
-	    if (idx)
-		printf("%2d  ", idx);
-	    puts(table[idx]);
+	    إذا (idx)
+		چاپ_کن("%2d  ", idx);
+	    puts(جدول[idx]);
 	}
-	printf("Choice: ");
-	if (scanf("%d", &answer) != 1)
+	چاپ_کن("Choice: ");
+	إذا (scanf("%d", &answer) != 1)
 	{
 	    scanf("%99s", dummy);
 	    answer = 0;
 	}
     }
-    while (answer < 1 || answer >= entries);
+    طالما (answer < 1 || answer >= entries);
 
-    return answer;
+    أرجع answer;
 }
 
 /*
  * Check if the user unpacked the archives properly.
  * Sets "runtimeidx".
  */
-    static void
-check_unpack(void)
+    ساكن فراغ
+check_unpack(فراغ)
 {
-    char	buf[BUFSIZE];
+    حرف	buf[BUFSIZE];
     FILE	*fd;
-    struct stat	st;
+    بنية stat	st;
 
     // check for presence of the correct version number in installdir[]
-    runtimeidx = strlen(installdir) - strlen(VIM_VERSION_NODOT);
-    if (runtimeidx <= 0
-	    || stricmp(installdir + runtimeidx, VIM_VERSION_NODOT) != 0
+    runtimeidx = طول_رشته(installdir) - طول_رشته(VIM_نسخه_NODOT);
+    إذا (runtimeidx <= 0
+	    || stricmp(installdir + runtimeidx, VIM_نسخه_NODOT) != 0
 	    || (installdir[runtimeidx - 1] != '/'
 		&& installdir[runtimeidx - 1] != '\\'))
     {
-	printf("ERROR: Install program not in directory \"%s\"\n",
-		VIM_VERSION_NODOT);
-	printf("This program can only work when it is located in its original directory\n");
+	چاپ_کن("ERROR: Install program not in directory \"%s\"\n",
+		VIM_نسخه_NODOT);
+	چاپ_کن("This program can only work when it is located in its original directory\n");
 	myexit(1);
     }
 
     // check if filetype.vim is present, which means the runtime archive has
     // been unpacked
     sprintf(buf, "%s\\filetype.vim", installdir);
-    if (stat(buf, &st) < 0)
+    إذا (stat(buf, &st) < 0)
     {
-	printf("ERROR: Cannot find filetype.vim in \"%s\"\n", installdir);
-	printf("It looks like you did not unpack the runtime archive.\n");
-	printf("You must unpack the runtime archive \"%srt.zip\" before installing.\n",
-		VIM_VERSION_NODOT);
+	چاپ_کن("ERROR: Cannot find filetype.vim in \"%s\"\n", installdir);
+	چاپ_کن("It looks like you did not unpack the runtime archive.\n");
+	چاپ_کن("You must unpack the runtime archive \"%srt.zip\" before installing.\n",
+		VIM_نسخه_NODOT);
 	myexit(1);
     }
 
     // Check if vim.exe or gvim.exe is in the current directory.
-    if ((fd = fopen("gvim.exe", "r")) != NULL)
+    إذا ((fd = fopen("gvim.exe", "r")) != عدم)
     {
 	fclose(fd);
 	has_gvim = 1;
     }
-    if ((fd = fopen("vim.exe", "r")) != NULL)
+    إذا ((fd = fopen("vim.exe", "r")) != عدم)
     {
 	fclose(fd);
 	has_vim = 1;
     }
-    if (!has_gvim && !has_vim)
+    إذا (!has_gvim && !has_vim)
     {
-	printf("ERROR: Cannot find any Vim executables in \"%s\"\n\n",
+	چاپ_کن("ERROR: Cannot find any Vim executables in \"%s\"\n\n",
 								  installdir);
 	myexit(1);
     }
@@ -240,41 +240,41 @@ check_unpack(void)
  * Ignores case and differences between '/' and '\'.
  * "plen" and "qlen" can be negative, strlen() is used then.
  */
-    static int
-pathcmp(char *p, int plen, char *q, int qlen)
+    ساكن صحيح
+pathcmp(حرف *p, صحيح plen, حرف *q, صحيح qlen)
 {
-    int		i;
+    صحيح		i;
 
-    if (plen < 0)
-	plen = strlen(p);
-    if (qlen < 0)
-	qlen = strlen(q);
-    for (i = 0; ; ++i)
+    إذا (plen < 0)
+	plen = طول_رشته(p);
+    إذا (qlen < 0)
+	qlen = طول_رشته(q);
+    لكل (i = 0; ; ++i)
     {
 	// End of "p": check if "q" also ends or just has a slash.
-	if (i == plen)
+	إذا (i == plen)
 	{
-	    if (i == qlen)  // match
-		return 0;
-	    if (i == qlen - 1 && (q[i] == '\\' || q[i] == '/'))
-		return 0;   // match with trailing slash
-	    return 1;	    // no match
+	    إذا (i == qlen)  //تطابق
+		أرجع 0;
+	    إذا (i == qlen - 1 && (q[i] == '\\' || q[i] == '/'))
+		أرجع 0;   // match with trailing slash
+	    أرجع 1;	    // no match
 	}
 
 	// End of "q": check if "p" also ends or just has a slash.
-	if (i == qlen)
+	إذا (i == qlen)
 	{
-	    if (i == plen)  // match
-		return 0;
-	    if (i == plen - 1 && (p[i] == '\\' || p[i] == '/'))
-		return 0;   // match with trailing slash
-	    return 1;	    // no match
+	    إذا (i == plen)  //تطابق
+		أرجع 0;
+	    إذا (i == plen - 1 && (p[i] == '\\' || p[i] == '/'))
+		أرجع 0;   // match with trailing slash
+	    أرجع 1;	    // no match
 	}
 
-	if (!(mytoupper(p[i]) == mytoupper(q[i])
+	إذا (!(mytoupper(p[i]) == mytoupper(q[i])
 		|| ((p[i] == '/' || p[i] == '\\')
 		    && (q[i] == '/' || q[i] == '\\'))))
-	    return 1;	    // no match
+	    أرجع 1;	    // no match
     }
     //NOTREACHED
 }
@@ -286,55 +286,55 @@ pathcmp(char *p, int plen, char *q, int qlen)
  * (or NULL).
  * "*destination" is set to NULL or the location of the file.
  */
-    static void
-findoldfile(char **destination)
+    ساكن فراغ
+findoldfile(حرف **destination)
 {
-    char	*bp = *destination;
-    size_t	indir_l = strlen(installdir);
-    char	*cp;
-    char	*tmpname;
-    char	*farname;
+    حرف	*bp = *destination;
+    size_t	indir_l = طول_رشته(installdir);
+    حرف	*cp;
+    حرف	*tmpname;
+    حرف	*farname;
 
     /*
      * No action needed if exe not found or not in this directory.
      */
-    if (bp == NULL || strnicmp(bp, installdir, indir_l) != 0)
-	return;
+    إذا (bp == عدم || strnicmp(bp, installdir, indir_l) != 0)
+	أرجع;
     cp = bp + indir_l;
-    if (strchr("/\\", *cp++) == NULL
-	    || strchr(cp, '\\') != NULL
-	    || strchr(cp, '/') != NULL)
-	return;
+    إذا (strchr("/\\", *cp++) == عدم
+	    || strchr(cp, '\\') != عدم
+	    || strchr(cp, '/') != عدم)
+	أرجع;
 
-    tmpname = alloc(strlen(cp) + 1);
+    tmpname = alloc(طول_رشته(cp) + 1);
     strcpy(tmpname, cp);
-    tmpname[strlen(tmpname) - 1] = 'x';	// .exe -> .exx
+    tmpname[طول_رشته(tmpname) - 1] = 'x';	// .exe -> .exx
 
-    if (access(tmpname, 0) == 0)
+    إذا (access(tmpname, 0) == 0)
     {
-	printf("\nERROR: %s and %s clash.  Remove or rename %s.\n",
+	چاپ_کن("\nERROR: %s and %s clash.  Remove or rename %s.\n",
 	    tmpname, cp, tmpname);
 	myexit(1);
     }
 
-    if (rename(cp, tmpname) != 0)
+    إذا (rename(cp, tmpname) != 0)
     {
-	printf("\nERROR: failed to rename %s to %s: %s\n",
+	چاپ_کن("\nERROR: failed to rename %s to %s: %s\n",
 	    cp, tmpname, strerror(0));
 	myexit(1);
     }
 
     farname = searchpath_save(cp);
 
-    if (rename(tmpname, cp) != 0)
+    إذا (rename(tmpname, cp) != 0)
     {
-	printf("\nERROR: failed to rename %s back to %s: %s\n",
+	چاپ_کن("\nERROR: failed to rename %s back to %s: %s\n",
 	    tmpname, cp, strerror(0));
 	myexit(1);
     }
 
-    free(*destination);
-    free(tmpname);
+    حرر(*destination);
+    حرر(tmpname);
     *destination = farname;
 }
 
@@ -342,31 +342,31 @@ findoldfile(char **destination)
  * Check if there is a vim.[exe|bat|, gvim.[exe|bat|, etc. in the path.
  * When "check_bat_only" is TRUE, only find "default_bat_dir".
  */
-    static void
-find_bat_exe(int check_bat_only)
+    ساكن فراغ
+پیدا_کن_bat_exe(صحيح check_bat_only)
 {
-    int		i;
+    صحيح		i;
 
     // avoid looking in the "installdir" by chdir to system root
     mch_chdir(sysdrive);
     mch_chdir("\\");
 
-    for (i = 1; i < TARGET_COUNT; ++i)
+    لكل (i = 1; i < هدف_شمار; ++i)
     {
 	targets[i].oldbat = searchpath_save(targets[i].batname);
-	if (!check_bat_only)
+	إذا (!check_bat_only)
 	    targets[i].oldexe = searchpath_save(targets[i].exename);
 
-	if (default_bat_dir == NULL && targets[i].oldbat != NULL)
+	إذا (default_bat_dir == عدم && targets[i].oldbat != عدم)
 	{
-	    default_bat_dir = alloc(strlen(targets[i].oldbat) + 1);
+	    default_bat_dir = alloc(طول_رشته(targets[i].oldbat) + 1);
 	    strcpy(default_bat_dir, targets[i].oldbat);
-	    remove_tail(default_bat_dir);
+	    remove_دم(default_bat_dir);
 	}
-	if (check_bat_only && targets[i].oldbat != NULL)
+	إذا (check_bat_only && targets[i].oldbat != عدم)
 	{
-	    free(targets[i].oldbat);
-	    targets[i].oldbat = NULL;
+	    حرر(targets[i].oldbat);
+	    targets[i].oldbat = عدم;
 	}
     }
 
@@ -378,31 +378,31 @@ find_bat_exe(int check_bat_only)
  * that NSIS can read it.
  * When not set, use the directory of a previously installed Vim.
  */
-    static void
-get_vim_env(void)
+    ساكن فراغ
+get_vim_env(فراغ)
 {
-    char	*vim;
-    char	buf[BUFSIZE];
+    حرف	*vim;
+    حرف	buf[BUFSIZE];
     FILE	*fd;
-    char	fname[BUFSIZE];
+    حرف	fname[BUFSIZE];
 
     // First get $VIMRUNTIME.  If it's set, remove the tail.
     vim = getenv("VIMRUNTIME");
-    if (vim != NULL && *vim != 0 && strlen(vim) < sizeof(buf))
+    إذا (vim != عدم && *vim != 0 && طول_رشته(vim) < حجم(buf))
     {
 	strcpy(buf, vim);
-	remove_tail(buf);
+	remove_دم(buf);
 	vim = buf;
     }
-    else
+    وإلا
     {
 	vim = getenv("VIM");
-	if (vim == NULL || *vim == 0)
+	إذا (vim == عدم || *vim == 0)
 	{
 	    // Use the directory from an old uninstall entry.
-	    if (default_vim_dir != NULL)
+	    إذا (default_vim_dir != عدم)
 		vim = default_vim_dir;
-	    else
+	    وإلا
 		// Let NSIS know there is no default, it should use
 		// $PROGRAMFILES.
 		vim = "";
@@ -411,12 +411,12 @@ get_vim_env(void)
 
     // NSIS also uses GetTempPath(), thus we should get the same directory
     // name as where NSIS will look for vimini.ini.
-    GetTempPath(sizeof(fname) - 12, fname);
-    add_pathsep(fname);
+    Get_موقت_مسیر(حجم(fname) - 12, fname);
+    جمع_کن_pathsep(fname);
     strcat(fname, "vimini.ini");
 
     fd = fopen(fname, "w");
-    if (fd != NULL)
+    إذا (fd != عدم)
     {
 	// Make it look like an .ini file, so that NSIS can read it with a
 	// ReadINIStr command.
@@ -424,207 +424,207 @@ get_vim_env(void)
 	fprintf(fd, "dir=\"%s\"\n", vim);
 	fclose(fd);
     }
-    else
+    وإلا
     {
-	printf("Failed to open %s\n", fname);
+	چاپ_کن("Failed to open %s\n", fname);
 	sleep(2);
     }
 }
 
-static int num_windows;
+ساكن صحيح رقم_windows;
 
 /*
  * Callback used for EnumWindows():
  * Count the window if the title looks like it is for the uninstaller.
  */
 //ARGSUSED
-    static BOOL CALLBACK
-window_cb(HWND hwnd, LPARAM lparam UNUSED)
+    ساكن BOOL CALLBACK
+پنجره_cb(HWND hwnd, LPARAM lparam استفادهنشده)
 {
-    char title[256];
+    حرف title[256];
 
     title[0] = 0;
-    GetWindowText(hwnd, title, 256);
-    if (strstr(title, "Vim ") != NULL && strstr(title, " Uninstall") != NULL)
-	++num_windows;
-    return TRUE;
+    Get_پنجره_متن(hwnd, title, 256);
+    إذا (جستجوی_رشته(title, "Vim ") != عدم && جستجوی_رشته(title, " Uninstall") != عدم)
+	++رقم_windows;
+    أرجع TRUE;
 }
 
 /*
  * Run the uninstaller silently.
  */
-    static int
-run_silent_uninstall(char *uninst_exe)
+    ساكن صحيح
+پیاپی_silent_uninstall(حرف *uninst_exe)
 {
-    char    vimrt_dir[BUFSIZE];
-    char    temp_uninst[BUFSIZE];
-    char    temp_dir[MAX_PATH];
-    char    buf[BUFSIZE * 2 + 10];
-    int	    i;
+    حرف    vimrt_dir[BUFSIZE];
+    حرف    موقت_uninst[BUFSIZE];
+    حرف    موقت_dir[MAX_مسیر];
+    حرف    buf[BUFSIZE * 2 + 10];
+    صحيح	    i;
     DWORD   tick;
 
     strcpy(vimrt_dir, uninst_exe);
-    remove_tail(vimrt_dir);
+    remove_دم(vimrt_dir);
 
-    if (!GetTempPath(sizeof(temp_dir), temp_dir))
-	return FAIL;
+    إذا (!Get_موقت_مسیر(حجم(موقت_dir), موقت_dir))
+	أرجع FAIL;
 
     // Copy the uninstaller to a temporary exe.
-    tick = GetTickCount();
-    for (i = 0; ; i++)
+    tick = Get_Tick_شمار();
+    لكل (i = 0; ; i++)
     {
-	sprintf(temp_uninst, "%s\\vimun%04X.exe", temp_dir,
-					  (unsigned int)((i + tick) & 0xFFFF));
-	if (CopyFile(uninst_exe, temp_uninst, TRUE))
-	    break;
-	if (GetLastError() != ERROR_FILE_EXISTS)
-	    return FAIL;
-	if (i == 65535)
-	    return FAIL;
+	sprintf(موقت_uninst, "%s\\vimun%04X.exe", موقت_dir,
+					  (بیعلامت صحيح)((i + tick) & 0xFFFF));
+	إذا (CopyFile(uninst_exe, موقت_uninst, TRUE))
+	    اكسر;
+	إذا (Get_آخرین_Error() != ERROR_FILE_EXISTS)
+	    أرجع FAIL;
+	إذا (i == 65535)
+	    أرجع FAIL;
     }
 
     // Run the copied uninstaller silently.
-    if (strchr(temp_uninst, ' ') != NULL)
-	sprintf(buf, "\"%s\" /S _?=%s", temp_uninst, vimrt_dir);
-    else
-	sprintf(buf, "%s /S _?=%s", temp_uninst, vimrt_dir);
-    run_command(buf);
+    إذا (strchr(موقت_uninst, ' ') != عدم)
+	sprintf(buf, "\"%s\" /S _?=%s", موقت_uninst, vimrt_dir);
+    وإلا
+	sprintf(buf, "%s /S _?=%s", موقت_uninst, vimrt_dir);
+    پیاپی_command(buf);
 
-    DeleteFile(temp_uninst);
-    return OK;
+    DeleteFile(موقت_uninst);
+    أرجع OK;
 }
 
 /*
  * Check for already installed Vims.
  * Return non-zero when found one.
  */
-    static int
-uninstall_check(int skip_question)
+    ساكن صحيح
+uninstall_check(صحيح skip_question)
 {
-    HKEY	key_handle;
-    HKEY	uninstall_key_handle;
-    char	*uninstall_key = "software\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
-    char	subkey_name_buff[BUFSIZE];
-    char	temp_string_buffer[BUFSIZE-2];
+    HKEY	کلید_handle;
+    HKEY	uninstall_کلید_handle;
+    حرف	*uninstall_کلید = "software\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
+    حرف	subkey_name_buff[BUFSIZE];
+    حرف	موقت_string_میانگیر[BUFSIZE-2];
     DWORD	local_bufsize;
-    FILETIME	temp_pfiletime;
-    DWORD	key_index;
-    char	input;
-    long	code;
-    DWORD	value_type;
-    DWORD	orig_num_keys;
-    DWORD	new_num_keys;
+    FILETIME	موقت_pfiletime;
+    DWORD	کلید_شاخص;
+    حرف	درون_داد;
+    دراز	کد;
+    DWORD	مقدار_type;
+    DWORD	orig_رقم_کلیدها;
+    DWORD	new_رقم_کلیدها;
     DWORD	allow_silent;
-    int		foundone = 0;
+    صحيح		foundone = 0;
 
-    code = RegOpenKeyEx(HKEY_LOCAL_MACHINE, uninstall_key, 0,
-				     KEY_WOW64_64KEY | KEY_READ, &key_handle);
-    CHECK_REG_ERROR(code);
+    کد = Reg_Open_کلید_Ex(HKEY_LOCAL_MACHINE, uninstall_کلید, 0,
+				     کلید_WOW64_64_کلید | کلید_READ, &کلید_handle);
+    CHECK_REG_ERROR(کد);
 
-    key_index = 0;
-    while (TRUE)
+    کلید_شاخص = 0;
+    طالما (TRUE)
     {
-	local_bufsize = sizeof(subkey_name_buff);
-	if (RegEnumKeyEx(key_handle, key_index, subkey_name_buff, &local_bufsize,
-		NULL, NULL, NULL, &temp_pfiletime) == ERROR_NO_MORE_ITEMS)
-	    break;
+	local_bufsize = حجم(subkey_name_buff);
+	إذا (Reg_Enum_کلید_Ex(کلید_handle, کلید_شاخص, subkey_name_buff, &local_bufsize,
+		عدم, عدم, عدم, &موقت_pfiletime) == ERROR_NO_بیشتر_اقلام)
+	    اكسر;
 
-	if (strncmp("Vim", subkey_name_buff, 3) == 0)
+	إذا (مقایسه_رشته("Vim", subkey_name_buff, 3) == 0)
 	{
 	    // Open the key named Vim*
-	    code = RegOpenKeyEx(key_handle, subkey_name_buff, 0,
-			   KEY_WOW64_64KEY | KEY_READ, &uninstall_key_handle);
-	    CHECK_REG_ERROR(code);
+	    کد = Reg_Open_کلید_Ex(کلید_handle, subkey_name_buff, 0,
+			   کلید_WOW64_64_کلید | کلید_READ, &uninstall_کلید_handle);
+	    CHECK_REG_ERROR(کد);
 
 	    // get the DisplayName out of it to show the user
-	    local_bufsize = sizeof(temp_string_buffer);
-	    code = RegQueryValueEx(uninstall_key_handle, "displayname", 0,
-		    &value_type, (LPBYTE)temp_string_buffer,
+	    local_bufsize = حجم(موقت_string_میانگیر);
+	    کد = Reg_Query_مقدار_Ex(uninstall_کلید_handle, "displayname", 0,
+		    &مقدار_type, (LPBYTE)موقت_string_میانگیر,
 		    &local_bufsize);
-	    CHECK_REG_ERROR(code);
+	    CHECK_REG_ERROR(کد);
 
 	    allow_silent = 0;
-	    if (skip_question)
+	    إذا (skip_question)
 	    {
-		DWORD varsize = sizeof(DWORD);
+		DWORD varsize = حجم(DWORD);
 
-		RegQueryValueEx(uninstall_key_handle, "AllowSilent", 0,
-			&value_type, (LPBYTE)&allow_silent,
+		Reg_Query_مقدار_Ex(uninstall_کلید_handle, "AllowSilent", 0,
+			&مقدار_type, (LPBYTE)&allow_silent,
 			&varsize);
 	    }
 
 	    foundone = 1;
-	    printf("\n*********************************************************\n");
-	    printf("Vim Install found what looks like an existing Vim version.\n");
-	    printf("The name of the entry is:\n");
-	    printf("\n        \"%s\"\n\n", temp_string_buffer);
+	    چاپ_کن("\n*********************************************************\n");
+	    چاپ_کن("Vim Install found what looks like an existing Vim version.\n");
+	    چاپ_کن("The name of the entry is:\n");
+	    چاپ_کن("\n        \"%s\"\n\n", موقت_string_میانگیر);
 
-	    printf("Installing the new version will disable part of the existing version.\n");
-	    printf("(The batch files used in a console and the \"Edit with Vim\" entry in\n");
-	    printf("the popup menu will use the new version)\n");
+	    چاپ_کن("Installing the new version will disable part of the existing version.\n");
+	    چاپ_کن("(The batch files used in a console and the \"Edit with Vim\" entry in\n");
+	    چاپ_کن("the popup menu will use the new version)\n");
 
-	    if (skip_question)
-		printf("\nRunning uninstall program for \"%s\"\n", temp_string_buffer);
-	    else
-		printf("\nDo you want to uninstall \"%s\" now?\n(y)es/(n)o)  ", temp_string_buffer);
+	    إذا (skip_question)
+		چاپ_کن("\nRunning uninstall program for \"%s\"\n", موقت_string_میانگیر);
+	    وإلا
+		چاپ_کن("\nDo you want to uninstall \"%s\" now?\n(y)es/(n)o)  ", موقت_string_میانگیر);
 	    fflush(stdout);
 
 	    // get the UninstallString
-	    local_bufsize = sizeof(temp_string_buffer);
-	    code = RegQueryValueEx(uninstall_key_handle, "uninstallstring", 0,
-		    &value_type, (LPBYTE)temp_string_buffer, &local_bufsize);
-	    CHECK_REG_ERROR(code);
+	    local_bufsize = حجم(موقت_string_میانگیر);
+	    کد = Reg_Query_مقدار_Ex(uninstall_کلید_handle, "uninstallstring", 0,
+		    &مقدار_type, (LPBYTE)موقت_string_میانگیر, &local_bufsize);
+	    CHECK_REG_ERROR(کد);
 
 	    // Remember the directory, it is used as the default for NSIS.
-	    default_vim_dir = alloc(strlen(temp_string_buffer) + 1);
-	    strcpy(default_vim_dir, temp_string_buffer);
-	    remove_tail(default_vim_dir);
-	    remove_tail(default_vim_dir);
+	    default_vim_dir = alloc(طول_رشته(موقت_string_میانگیر) + 1);
+	    strcpy(default_vim_dir, موقت_string_میانگیر);
+	    remove_دم(default_vim_dir);
+	    remove_دم(default_vim_dir);
 
-	    input = 'n';
-	    do
+	    درون_داد = 'n';
+	    افعل
 	    {
-		if (input != 'n')
-		    printf("%c is an invalid reply.  Please enter either 'y' or 'n'\n", input);
+		إذا (درون_داد != 'n')
+		    چاپ_کن("%c is an invalid reply.  Please enter either 'y' or 'n'\n", درون_داد);
 
-		if (skip_question)
-		    input = 'y';
-		else
+		إذا (skip_question)
+		    درون_داد = 'y';
+		وإلا
 		{
 		    rewind(stdin);
-		    scanf("%c", &input);
+		    scanf("%c", &درون_داد);
 		}
-		switch (input)
+		بدل (درون_داد)
 		{
-		    case 'y':
-		    case 'Y':
+		    حالة 'y':
+		    حالة 'Y':
 			// save the number of uninstall keys so we can know if
 			// it changed
-			RegQueryInfoKey(key_handle, NULL, NULL, NULL,
-					     &orig_num_keys, NULL, NULL, NULL,
-						      NULL, NULL, NULL, NULL);
+			Reg_Query_Info_کلید(کلید_handle, عدم, عدم, عدم,
+					     &orig_رقم_کلیدها, عدم, عدم, عدم,
+						      عدم, عدم, عدم, عدم);
 
 			// Find existing .bat files before deleting them.
-			find_bat_exe(TRUE);
+			پیدا_کن_bat_exe(TRUE);
 
-			if (allow_silent)
+			إذا (allow_silent)
 			{
-			    if (run_silent_uninstall(temp_string_buffer)
+			    إذا (پیاپی_silent_uninstall(موقت_string_میانگیر)
 								    == FAIL)
 				allow_silent = 0; // Retry with non silent.
 			}
-			if (!allow_silent)
+			إذا (!allow_silent)
 			{
 			    // Execute the uninstall program.  Put it in double
 			    // quotes if there is an embedded space.
 			    {
-				char buf[BUFSIZE];
+				حرف buf[BUFSIZE];
 
-				if (strchr(temp_string_buffer, ' ') != NULL)
-				    sprintf(buf, "\"%s\"", temp_string_buffer);
-				else
-				    strcpy(buf, temp_string_buffer);
-				run_command(buf);
+				إذا (strchr(موقت_string_میانگیر, ' ') != عدم)
+				    sprintf(buf, "\"%s\"", موقت_string_میانگیر);
+				وإلا
+				    strcpy(buf, موقت_string_میانگیر);
+				پیاپی_command(buf);
 			    }
 
 			    // Count the number of windows with a title that
@@ -633,128 +633,128 @@ uninstall_check(int skip_question)
 			    // executes the copy and exits, thus we can't wait
 			    // for the process to finish.
 			    sleep(1);  // wait for uninstaller to start up
-			    num_windows = 0;
-			    EnumWindows(window_cb, 0);
-			    if (num_windows == 0)
+			    رقم_windows = 0;
+			    EnumWindows(پنجره_cb, 0);
+			    إذا (رقم_windows == 0)
 			    {
 				// Did not find the uninstaller, ask user to
 				// press Enter when done. Just in case.
-				printf("Press Enter when the uninstaller is finished\n");
+				چاپ_کن("Press Enter when the uninstaller is finished\n");
 				rewind(stdin);
-				(void)getchar();
+				(فراغ)getchar();
 			    }
-			    else
+			    وإلا
 			    {
-				printf("Waiting for the uninstaller to finish (press CTRL-C to abort).");
-				do
+				چاپ_کن("Waiting for the uninstaller to finish (press CTRL-C to abort).");
+				افعل
 				{
-				    printf(".");
+				    چاپ_کن(".");
 				    fflush(stdout);
 				    sleep(1);	// wait for the uninstaller to
-						// finish
-				    num_windows = 0;
-				    EnumWindows(window_cb, 0);
-				} while (num_windows > 0);
+						//پایان
+				    رقم_windows = 0;
+				    EnumWindows(پنجره_cb, 0);
+				} طالما (رقم_windows > 0);
 			    }
 			}
-			printf("\nDone!\n");
+			چاپ_کن("\nDone!\n");
 
 			// Check if an uninstall reg key was deleted.
 			// if it was, we want to decrement key_index.
 			// if we don't do this, we will skip the key
 			// immediately after any key that we delete.
-			RegQueryInfoKey(key_handle, NULL, NULL, NULL,
-					      &new_num_keys, NULL, NULL, NULL,
-						      NULL, NULL, NULL, NULL);
-			if (new_num_keys < orig_num_keys)
-			    key_index--;
+			Reg_Query_Info_کلید(کلید_handle, عدم, عدم, عدم,
+					      &new_رقم_کلیدها, عدم, عدم, عدم,
+						      عدم, عدم, عدم, عدم);
+			إذا (new_رقم_کلیدها < orig_رقم_کلیدها)
+			    کلید_شاخص--;
 
-			input = 'y';
-			break;
+			درون_داد = 'y';
+			اكسر;
 
-		    case 'n':
-		    case 'N':
+		    حالة 'n':
+		    حالة 'N':
 			// Do not uninstall
-			input = 'n';
-			break;
+			درون_داد = 'n';
+			اكسر;
 
-		    default: // just drop through and redo the loop
-			break;
+		    افتراضي: // just drop through and redo the loop
+			اكسر;
 		}
 
-	    } while (input != 'n' && input != 'y');
+	    } طالما (درون_داد != 'n' && درون_داد != 'y');
 
-	    RegCloseKey(uninstall_key_handle);
+	    Reg_Close_کلید(uninstall_کلید_handle);
 	}
 
-	key_index++;
+	کلید_شاخص++;
     }
-    RegCloseKey(key_handle);
+    Reg_Close_کلید(کلید_handle);
 
-    return foundone;
+    أرجع foundone;
 }
 
 /*
  * Find out information about the system.
  */
-    static void
-inspect_system(void)
+    ساكن فراغ
+inspect_system(فراغ)
 {
-    char	*p;
-    char	buf[BUFSIZE];
+    حرف	*p;
+    حرف	buf[BUFSIZE];
     FILE	*fd;
-    int		i;
-    int		foundone;
+    صحيح		i;
+    صحيح		foundone;
 
     // This may take a little while, let the user know what we're doing.
-    printf("Inspecting system...\n");
+    چاپ_کن("Inspecting system...\n");
 
     /*
      * If $VIM is set, check that it's pointing to our directory.
      */
     p = getenv("VIM");
-    if (p != NULL && pathcmp(p, -1, installdir, runtimeidx - 1) != 0)
+    إذا (p != عدم && pathcmp(p, -1, installdir, runtimeidx - 1) != 0)
     {
-	printf("------------------------------------------------------\n");
-	printf("$VIM is set to \"%s\".\n", p);
-	printf("This is different from where this version of Vim is:\n");
+	چاپ_کن("------------------------------------------------------\n");
+	چاپ_کن("$VIM is set to \"%s\".\n", p);
+	چاپ_کن("This is different from where this version of Vim is:\n");
 	strcpy(buf, installdir);
 	*(buf + runtimeidx - 1) = NUL;
-	printf("\"%s\"\n", buf);
-	printf("You must adjust or remove the setting of $VIM,\n");
-	if (interactive)
+	چاپ_کن("\"%s\"\n", buf);
+	چاپ_کن("You must adjust or remove the setting of $VIM,\n");
+	إذا (interactive)
 	{
-	    printf("to be able to use this install program.\n");
+	    چاپ_کن("to be able to use this install program.\n");
 	    myexit(1);
 	}
-	printf("otherwise Vim WILL NOT WORK properly!\n");
-	printf("------------------------------------------------------\n");
+	چاپ_کن("otherwise Vim WILL NOT WORK properly!\n");
+	چاپ_کن("------------------------------------------------------\n");
     }
 
     /*
      * If $VIMRUNTIME is set, check that it's pointing to our runtime directory.
      */
     p = getenv("VIMRUNTIME");
-    if (p != NULL && pathcmp(p, -1, installdir, -1) != 0)
+    إذا (p != عدم && pathcmp(p, -1, installdir, -1) != 0)
     {
-	printf("------------------------------------------------------\n");
-	printf("$VIMRUNTIME is set to \"%s\".\n", p);
-	printf("This is different from where this version of Vim is:\n");
-	printf("\"%s\"\n", installdir);
-	printf("You must adjust or remove the setting of $VIMRUNTIME,\n");
-	if (interactive)
+	چاپ_کن("------------------------------------------------------\n");
+	چاپ_کن("$VIMRUNTIME is set to \"%s\".\n", p);
+	چاپ_کن("This is different from where this version of Vim is:\n");
+	چاپ_کن("\"%s\"\n", installdir);
+	چاپ_کن("You must adjust or remove the setting of $VIMRUNTIME,\n");
+	إذا (interactive)
 	{
-	    printf("to be able to use this install program.\n");
+	    چاپ_کن("to be able to use this install program.\n");
 	    myexit(1);
 	}
-	printf("otherwise Vim WILL NOT WORK properly!\n");
-	printf("------------------------------------------------------\n");
+	چاپ_کن("otherwise Vim WILL NOT WORK properly!\n");
+	چاپ_کن("------------------------------------------------------\n");
     }
 
     /*
      * Check if there is a vim.[exe|bat|, gvim.[exe|bat|, etc. in the path.
      */
-    find_bat_exe(FALSE);
+    پیدا_کن_bat_exe(FALSE);
 
     /*
      * A .exe in the install directory may be found anyway on Windows 2000.
@@ -762,21 +762,21 @@ inspect_system(void)
      * w.briscoe@ponl.com 2001-01-20
      */
     foundone = 0;
-    for (i = 1; i < TARGET_COUNT; ++i)
+    لكل (i = 1; i < هدف_شمار; ++i)
     {
 	findoldfile(&(targets[i].oldexe));
-	if (targets[i].oldexe != NULL)
+	إذا (targets[i].oldexe != عدم)
 	    foundone = 1;
     }
 
-    if (foundone)
+    إذا (foundone)
     {
-	printf("Warning: Found Vim executable(s) in your $PATH:\n");
-	for (i = 1; i < TARGET_COUNT; ++i)
-	    if (targets[i].oldexe != NULL)
-		printf("%s\n", targets[i].oldexe);
-	printf("It will be used instead of the version you are installing.\n");
-	printf("Please delete or rename it, or adjust your $PATH setting.\n");
+	چاپ_کن("Warning: Found Vim executable(s) in your $PATH:\n");
+	لكل (i = 1; i < هدف_شمار; ++i)
+	    إذا (targets[i].oldexe != عدم)
+		چاپ_کن("%s\n", targets[i].oldexe);
+	چاپ_کن("It will be used instead of the version you are installing.\n");
+	چاپ_کن("Please delete or rename it, or adjust your $PATH setting.\n");
     }
 
     /*
@@ -784,18 +784,18 @@ inspect_system(void)
      */
     strcpy(oldvimrc, installdir);
     strcpy(oldvimrc + runtimeidx, "_vimrc");
-    if ((fd = fopen(oldvimrc, "r")) == NULL)
+    إذا ((fd = fopen(oldvimrc, "r")) == عدم)
     {
 	strcpy(oldvimrc + runtimeidx, "vimrc~1"); // short version of .vimrc
-	if ((fd = fopen(oldvimrc, "r")) == NULL)
+	إذا ((fd = fopen(oldvimrc, "r")) == عدم)
 	{
 	    strcpy(oldvimrc + runtimeidx, ".vimrc");
 	    fd = fopen(oldvimrc, "r");
 	}
     }
-    if (fd != NULL)
+    إذا (fd != عدم)
 	fclose(fd);
-    else
+    وإلا
 	*oldvimrc = NUL;
 }
 
@@ -804,15 +804,15 @@ inspect_system(void)
  * in the environment.  The user may type a number he remembered without
  * looking.
  */
-    static void
-add_dummy_choice(void)
+    ساكن فراغ
+جمع_کن_dummy_choice(فراغ)
 {
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = 0;
-    choices[choice_count].changefunc = NULL;
-    choices[choice_count].text = NULL;
-    choices[choice_count].arg = 0;
-    ++choice_count;
+    choices[choice_شمار].installfunc = عدم;
+    choices[choice_شمار].فعال = 0;
+    choices[choice_شمار].changefunc = عدم;
+    choices[choice_شمار].متن = عدم;
+    choices[choice_شمار].arg = 0;
+    ++choice_شمار;
 }
 
 ////////////////////////////////////////////////
@@ -821,26 +821,26 @@ add_dummy_choice(void)
 /*
  * Install the vim.bat, gvim.bat, etc. files.
  */
-    static void
-install_bat_choice(int idx)
+    ساكن فراغ
+install_bat_choice(صحيح idx)
 {
-    char	*batpath = targets[choices[idx].arg].batpath;
-    char	*oldname = targets[choices[idx].arg].oldbat;
-    char	*exename = targets[choices[idx].arg].exenamearg;
-    char	*vimarg = targets[choices[idx].arg].exearg;
+    حرف	*batpath = targets[choices[idx].arg].batpath;
+    حرف	*oldname = targets[choices[idx].arg].oldbat;
+    حرف	*exename = targets[choices[idx].arg].exenamearg;
+    حرف	*vimarg = targets[choices[idx].arg].exearg;
     FILE	*fd;
 
-    if (*batpath == NUL)
-	return;
+    إذا (*batpath == NUL)
+	أرجع;
 
     fd = fopen(batpath, "w");
-    if (fd == NULL)
+    إذا (fd == عدم)
     {
-	printf("\nERROR: Cannot open \"%s\" for writing.\n", batpath);
-	return;
+	چاپ_کن("\nERROR: Cannot open \"%s\" for writing.\n", batpath);
+	أرجع;
     }
 
-    need_uninstall_entry = 1;
+    need_uninstall_مدخل = 1;
 
     fprintf(fd, "@echo off\n");
     fprintf(fd, "rem -- Run Vim --\n");
@@ -858,7 +858,7 @@ install_bat_choice(int idx)
      */
     fprintf(fd, "set VIM_EXE_DIR=%s\n", installdir);
     fprintf(fd, "if exist \"%%VIM%%\\%s\\%s\" set VIM_EXE_DIR=%%VIM%%\\%s\n",
-	    VIM_VERSION_NODOT, exename, VIM_VERSION_NODOT);
+	    VIM_نسخه_NODOT, exename, VIM_نسخه_NODOT);
     fprintf(fd, "if exist \"%%VIMRUNTIME%%\\%s\" set VIM_EXE_DIR=%%VIMRUNTIME%%\n", exename);
     fprintf(fd, "\n");
 
@@ -869,7 +869,7 @@ install_bat_choice(int idx)
     fprintf(fd, ")\n");
     fprintf(fd, "\n");
 
-    if (*exename == 'g')
+    إذا (*exename == 'g')
     {
 	fprintf(fd, "rem check --nofork argument\n");
 	fprintf(fd, "set VIMNOFORK=\n");
@@ -886,7 +886,7 @@ install_bat_choice(int idx)
 	fprintf(fd, "\n");
     }
 
-    if (*exename == 'g')
+    إذا (*exename == 'g')
     {
 	// For gvim.exe use "start /b" to avoid that the console window
 	// stays open.
@@ -902,7 +902,7 @@ install_bat_choice(int idx)
 		exename, vimarg);
 	fprintf(fd, ")\n");
     }
-    else
+    وإلا
     {
 	// Always use quotes, $VIM or $VIMRUNTIME might have a space.
 	fprintf(fd, "\"%%VIM_EXE_DIR%%\\%s\" %s %%*\n",
@@ -910,41 +910,41 @@ install_bat_choice(int idx)
     }
 
     fclose(fd);
-    printf("%s has been %s\n", batpath,
-	    oldname == NULL ? "created" : "overwritten");
+    چاپ_کن("%s has been %s\n", batpath,
+	    oldname == عدم ? "created" : "overwritten");
 }
 
 /*
  * Make the text string for choice "idx".
  * The format "fmt" is must have one %s item, which "arg" is used for.
  */
-    static void
-alloc_text(int idx, char *fmt, char *arg)
+    ساكن فراغ
+alloc_متن(صحيح idx, حرف *fmt, حرف *arg)
 {
-    if (choices[idx].text != NULL)
-	free(choices[idx].text);
+    إذا (choices[idx].متن != عدم)
+	حرر(choices[idx].متن);
 
-    choices[idx].text = alloc(strlen(fmt) + strlen(arg) - 1);
-    sprintf(choices[idx].text, fmt, arg);
+    choices[idx].متن = alloc(طول_رشته(fmt) + طول_رشته(arg) - 1);
+    sprintf(choices[idx].متن, fmt, arg);
 }
 
 /*
  * Toggle the "Overwrite .../vim.bat" to "Don't overwrite".
  */
-    static void
-toggle_bat_choice(int idx)
+    ساكن فراغ
+toggle_bat_choice(صحيح idx)
 {
-    char	*batname = targets[choices[idx].arg].batpath;
-    char	*oldname = targets[choices[idx].arg].oldbat;
+    حرف	*batname = targets[choices[idx].arg].batpath;
+    حرف	*oldname = targets[choices[idx].arg].oldbat;
 
-    if (*batname == NUL)
+    إذا (*batname == NUL)
     {
-	alloc_text(idx, "    Overwrite %s", oldname);
+	alloc_متن(idx, "    Overwrite %s", oldname);
 	strcpy(batname, oldname);
     }
-    else
+    وإلا
     {
-	alloc_text(idx, "    Do NOT overwrite %s", oldname);
+	alloc_متن(idx, "    Do NOT overwrite %s", oldname);
 	*batname = NUL;
     }
 }
@@ -953,289 +953,289 @@ toggle_bat_choice(int idx)
  * Do some work for a batch file entry: Append the batch file name to the path
  * and set the text for the choice.
  */
-    static void
-set_bat_text(int idx, char *batpath, char *name)
+    ساكن فراغ
+مجموعه_bat_متن(صحيح idx, حرف *batpath, حرف *name)
 {
     strcat(batpath, name);
 
-    alloc_text(idx, "    Create %s", batpath);
+    alloc_متن(idx, "    Create %s", batpath);
 }
 
 /*
  * Select a directory to write the batch file line.
  */
-    static void
-change_bat_choice(int idx)
+    ساكن فراغ
+change_bat_choice(صحيح idx)
 {
-    char	*path;
-    char	*batpath;
-    char	*name;
-    int		n;
-    char	*s;
-    char	*p;
-    int		count;
-    char	**names = NULL;
-    int		i;
-    int		target = choices[idx].arg;
+    حرف	*مسیر;
+    حرف	*batpath;
+    حرف	*name;
+    صحيح		n;
+    حرف	*s;
+    حرف	*p;
+    صحيح		شمار;
+    حرف	**نامها = عدم;
+    صحيح		i;
+    صحيح		هدف = choices[idx].arg;
 
-    name = targets[target].batname;
-    batpath = targets[target].batpath;
+    name = targets[هدف].batname;
+    batpath = targets[هدف].batpath;
 
-    path = getenv("PATH");
-    if (path == NULL)
+    مسیر = getenv("PATH");
+    إذا (مسیر == عدم)
     {
-	printf("\nERROR: The variable $PATH is not set\n");
-	return;
+	چاپ_کن("\nERROR: The variable $PATH is not set\n");
+	أرجع;
     }
 
     /*
      * first round: count number of names in path;
      * second round: save names to names[].
      */
-    for (;;)
+    لكل (;;)
     {
-	count = 1;
-	for (p = path; *p; )
+	شمار = 1;
+	لكل (p = مسیر; *p; )
 	{
 	    s = strchr(p, ';');
-	    if (s == NULL)
-		s = p + strlen(p);
-	    if (names != NULL)
+	    إذا (s == عدم)
+		s = p + طول_رشته(p);
+	    إذا (نامها != عدم)
 	    {
-		names[count] = alloc(s - p + 1);
-		strncpy(names[count], p, s - p);
-		names[count][s - p] = NUL;
+		نامها[شمار] = alloc(s - p + 1);
+		strncpy(نامها[شمار], p, s - p);
+		نامها[شمار][s - p] = NUL;
 	    }
-	    ++count;
+	    ++شمار;
 	    p = s;
-	    if (*p != NUL)
+	    إذا (*p != NUL)
 		++p;
 	}
-	if (names != NULL)
-	    break;
-	names = alloc((count + 1) * sizeof(char *));
+	إذا (نامها != عدم)
+	    اكسر;
+	نامها = alloc((شمار + 1) * حجم(حرف *));
     }
-    names[0] = alloc(50);
-    sprintf(names[0], "Select directory to create %s in:", name);
-    names[count] = alloc(50);
-    if (choices[idx].arg == 0)
-	sprintf(names[count], "Do not create any .bat file.");
-    else
-	sprintf(names[count], "Do not create a %s file.", name);
-    n = get_choice(names, count + 1);
+    نامها[0] = alloc(50);
+    sprintf(نامها[0], "Select directory to create %s in:", name);
+    نامها[شمار] = alloc(50);
+    إذا (choices[idx].arg == 0)
+	sprintf(نامها[شمار], "Do not create any .bat file.");
+    وإلا
+	sprintf(نامها[شمار], "Do not create a %s file.", name);
+    n = get_choice(نامها, شمار + 1);
 
-    if (n == count)
+    إذا (n == شمار)
     {
 	// Selected last item, don't create bat file.
 	*batpath = NUL;
-	if (choices[idx].arg != 0)
-	    alloc_text(idx, "    Do NOT create %s", name);
+	إذا (choices[idx].arg != 0)
+	    alloc_متن(idx, "    Do NOT create %s", name);
     }
-    else
+    وإلا
     {
 	// Selected one of the paths.  For the first item only keep the path,
 	// for the others append the batch file name.
-	strcpy(batpath, names[n]);
-	add_pathsep(batpath);
-	if (choices[idx].arg != 0)
-	    set_bat_text(idx, batpath, name);
+	strcpy(batpath, نامها[n]);
+	جمع_کن_pathsep(batpath);
+	إذا (choices[idx].arg != 0)
+	    مجموعه_bat_متن(idx, batpath, name);
     }
 
-    for (i = 0; i <= count; ++i)
-	free(names[i]);
-    free(names);
+    لكل (i = 0; i <= شمار; ++i)
+	حرر(نامها[i]);
+    حرر(نامها);
 }
 
-char *bat_text_yes = "Install .bat files to use Vim at the command line:";
-char *bat_text_no = "do NOT install .bat files to use Vim at the command line";
+حرف *bat_متن_yes = "Install .bat files to use Vim at the command line:";
+حرف *bat_متن_no = "do NOT install .bat files to use Vim at the command line";
 
-    static void
-change_main_bat_choice(int idx)
+    ساكن فراغ
+change_main_bat_choice(صحيح idx)
 {
-    int		i;
+    صحيح		i;
 
     // let the user select a default directory or NONE
     change_bat_choice(idx);
 
-    if (targets[0].batpath[0] != NUL)
-	choices[idx].text = bat_text_yes;
-    else
-	choices[idx].text = bat_text_no;
+    إذا (targets[0].batpath[0] != NUL)
+	choices[idx].متن = bat_متن_yes;
+    وإلا
+	choices[idx].متن = bat_متن_no;
 
     // update the individual batch file selections
-    for (i = 1; i < TARGET_COUNT; ++i)
+    لكل (i = 1; i < هدف_شمار; ++i)
     {
 	// Only make it active when the first item has a path and the vim.exe
 	// or gvim.exe exists (there is a changefunc then).
-	if (targets[0].batpath[0] != NUL
-		&& choices[idx + i].changefunc != NULL)
+	إذا (targets[0].batpath[0] != NUL
+		&& choices[idx + i].changefunc != عدم)
 	{
-	    choices[idx + i].active = 1;
-	    if (choices[idx + i].changefunc == change_bat_choice
+	    choices[idx + i].فعال = 1;
+	    إذا (choices[idx + i].changefunc == change_bat_choice
 		    && targets[i].batpath[0] != NUL)
 	    {
 		strcpy(targets[i].batpath, targets[0].batpath);
-		set_bat_text(idx + i, targets[i].batpath, targets[i].batname);
+		مجموعه_bat_متن(idx + i, targets[i].batpath, targets[i].batname);
 	    }
 	}
-	else
-	    choices[idx + i].active = 0;
+	وإلا
+	    choices[idx + i].فعال = 0;
     }
 }
 
 /*
  * Initialize a choice for creating a batch file.
  */
-    static void
-init_bat_choice(int target)
+    ساكن فراغ
+init_bat_choice(صحيح هدف)
 {
-    char	*batpath = targets[target].batpath;
-    char	*oldbat = targets[target].oldbat;
-    char	*p;
-    int		i;
+    حرف	*batpath = targets[هدف].batpath;
+    حرف	*oldbat = targets[هدف].oldbat;
+    حرف	*p;
+    صحيح		i;
 
-    choices[choice_count].arg = target;
-    choices[choice_count].installfunc = install_bat_choice;
-    choices[choice_count].active = 1;
-    choices[choice_count].text = NULL;	// will be set below
-    if (oldbat != NULL)
+    choices[choice_شمار].arg = هدف;
+    choices[choice_شمار].installfunc = install_bat_choice;
+    choices[choice_شمار].فعال = 1;
+    choices[choice_شمار].متن = عدم;	// will be set below
+    إذا (oldbat != عدم)
     {
 	// A [g]vim.bat exists: Only choice is to overwrite it or not.
-	choices[choice_count].changefunc = toggle_bat_choice;
+	choices[choice_شمار].changefunc = toggle_bat_choice;
 	*batpath = NUL;
-	toggle_bat_choice(choice_count);
+	toggle_bat_choice(choice_شمار);
     }
-    else
+    وإلا
     {
-	if (default_bat_dir != NULL)
+	إذا (default_bat_dir != عدم)
 	    // Prefer using the same path as an existing .bat file.
 	    strcpy(batpath, default_bat_dir);
-	else
+	وإلا
 	{
 	    // No [g]vim.bat exists: Write it to a directory in $PATH.  Use
 	    // $WINDIR by default, if it's empty the first item in $PATH.
 	    p = getenv("WINDIR");
-	    if (p != NULL && *p != NUL)
+	    إذا (p != عدم && *p != NUL)
 		strcpy(batpath, p);
-	    else
+	    وإلا
 	    {
 		p = getenv("PATH");
-		if (p == NULL || *p == NUL)		// "cannot happen"
+		إذا (p == عدم || *p == NUL)		// "cannot happen"
 		    strcpy(batpath, "C:/Windows");
-		else
+		وإلا
 		{
 		    i = 0;
-		    while (*p != NUL && *p != ';')
+		    طالما (*p != NUL && *p != ';')
 			batpath[i++] = *p++;
 		    batpath[i] = NUL;
 		}
 	    }
 	}
-	add_pathsep(batpath);
-	set_bat_text(choice_count, batpath, targets[target].batname);
+	جمع_کن_pathsep(batpath);
+	مجموعه_bat_متن(choice_شمار, batpath, targets[هدف].batname);
 
-	choices[choice_count].changefunc = change_bat_choice;
+	choices[choice_شمار].changefunc = change_bat_choice;
     }
-    ++choice_count;
+    ++choice_شمار;
 }
 
 /*
  * Set up the choices for installing .bat files.
  * For these items "arg" is the index in targets[].
  */
-    static void
-init_bat_choices(void)
+    ساكن فراغ
+init_bat_choices(فراغ)
 {
-    int		i;
+    صحيح		i;
 
     // The first item is used to switch installing batch files on/off and
     // setting the default path.
-    choices[choice_count].text = bat_text_yes;
-    choices[choice_count].changefunc = change_main_bat_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = 1;
-    choices[choice_count].arg = 0;
-    ++choice_count;
+    choices[choice_شمار].متن = bat_متن_yes;
+    choices[choice_شمار].changefunc = change_main_bat_choice;
+    choices[choice_شمار].installfunc = عدم;
+    choices[choice_شمار].فعال = 1;
+    choices[choice_شمار].arg = 0;
+    ++choice_شمار;
 
     // Add items for each batch file target.  Only used when not disabled by
     // the first item.  When a .exe exists, don't offer to create a .bat.
-    for (i = 1; i < TARGET_COUNT; ++i)
-	if (targets[i].oldexe == NULL
+    لكل (i = 1; i < هدف_شمار; ++i)
+	إذا (targets[i].oldexe == عدم
 		&& (targets[i].exenamearg[0] == 'g' ? has_gvim : has_vim))
 	    init_bat_choice(i);
-	else
-	    add_dummy_choice();
+	وإلا
+	    جمع_کن_dummy_choice();
 }
 
 /*
  * Install the vimrc file.
  */
-    static void
-install_vimrc(int idx UNUSED)
+    ساكن فراغ
+install_vimrc(صحيح idx استفادهنشده)
 {
     FILE	*fd, *tfd;
-    char	*fname;
+    حرف	*fname;
 
     // If an old vimrc file exists, overwrite it.
     // Otherwise create a new one.
-    if (*oldvimrc != NUL)
+    إذا (*oldvimrc != NUL)
 	fname = oldvimrc;
-    else
+    وإلا
 	fname = vimrc;
 
     fd = fopen(fname, "w");
-    if (fd == NULL)
+    إذا (fd == عدم)
     {
-	printf("\nERROR: Cannot open \"%s\" for writing.\n", fname);
-	return;
+	چاپ_کن("\nERROR: Cannot open \"%s\" for writing.\n", fname);
+	أرجع;
     }
-    switch (compat_choice)
+    بدل (compat_choice)
     {
-	case compat_vi:
+	حالة compat_vi:
 		    fprintf(fd, "\" Vi compatible\n");
 		    fprintf(fd, "set compatible\n");
-		    break;
-	case compat_vim:
+		    اكسر;
+	حالة compat_vim:
 		    fprintf(fd, "\" Vim's default behavior\n");
 		    fprintf(fd, "if &compatible\n");
 		    fprintf(fd, "  set nocompatible\n");
 		    fprintf(fd, "endif\n");
-		    break;
-	case compat_some_enhancements:
+		    اكسر;
+	حالة compat_some_enhancements:
 		    fprintf(fd, "\" Vim with some enhancements\n");
 		    fprintf(fd, "source $VIMRUNTIME/defaults.vim\n");
-		    break;
-	case compat_all_enhancements:
+		    اكسر;
+	حالة compat_all_enhancements:
 		    fprintf(fd, "\" Vim with all enhancements\n");
 		    fprintf(fd, "source $VIMRUNTIME/vimrc_example.vim\n");
-		    break;
+		    اكسر;
     }
-    switch (remap_choice)
+    بدل (remap_choice)
     {
-	case remap_no:
-		    break;
-	case remap_win:
+	حالة remap_no:
+		    اكسر;
+	حالة remap_win:
 		    fprintf(fd, "\n");
 		    fprintf(fd, "\" Remap a few keys for Windows behavior\n");
 		    fprintf(fd, "source $VIMRUNTIME/mswin.vim\n");
-		    break;
+		    اكسر;
     }
-    switch (mouse_choice)
+    بدل (mouse_choice)
     {
-	case mouse_xterm:
+	حالة mouse_xterm:
 		    fprintf(fd, "\n");
 		    fprintf(fd, "\" Mouse behavior (the Unix way)\n");
 		    fprintf(fd, "behave xterm\n");
-		    break;
-	case mouse_mswin:
+		    اكسر;
+	حالة mouse_mswin:
 		    fprintf(fd, "\n");
 		    fprintf(fd, "\" Mouse behavior (the Windows way)\n");
 		    fprintf(fd, "behave mswin\n");
-		    break;
-	case mouse_default:
-		    break;
+		    اكسر;
+	حالة mouse_default:
+		    اكسر;
     }
-    if ((tfd = fopen("diff.exe", "r")) != NULL)
+    إذا ((tfd = fopen("diff.exe", "r")) != عدم)
     {
 	// Use the diff.exe that comes with the self-extracting gvim.exe.
 	fclose(tfd);
@@ -1290,277 +1290,277 @@ install_vimrc(int idx UNUSED)
 	fprintf(fd, "\n");
     }
     fclose(fd);
-    printf("%s has been written\n", fname);
+    چاپ_کن("%s has been written\n", fname);
 }
 
-    static void
-change_vimrc_choice(int idx)
+    ساكن فراغ
+change_vimrc_choice(صحيح idx)
 {
-    if (choices[idx].installfunc != NULL)
+    إذا (choices[idx].installfunc != عدم)
     {
 	// Switch to NOT change or create a vimrc file.
-	if (*oldvimrc != NUL)
-	    alloc_text(idx, "Do NOT change startup file %s", oldvimrc);
-	else
-	    alloc_text(idx, "Do NOT create startup file %s", vimrc);
-	choices[idx].installfunc = NULL;
-	choices[idx + 1].active = 0;
-	choices[idx + 2].active = 0;
-	choices[idx + 3].active = 0;
+	إذا (*oldvimrc != NUL)
+	    alloc_متن(idx, "Do NOT change startup file %s", oldvimrc);
+	وإلا
+	    alloc_متن(idx, "Do NOT create startup file %s", vimrc);
+	choices[idx].installfunc = عدم;
+	choices[idx + 1].فعال = 0;
+	choices[idx + 2].فعال = 0;
+	choices[idx + 3].فعال = 0;
     }
-    else
+    وإلا
     {
 	// Switch to change or create a vimrc file.
-	if (*oldvimrc != NUL)
-	    alloc_text(idx, "Overwrite startup file %s with:", oldvimrc);
-	else
-	    alloc_text(idx, "Create startup file %s with:", vimrc);
+	إذا (*oldvimrc != NUL)
+	    alloc_متن(idx, "Overwrite startup file %s with:", oldvimrc);
+	وإلا
+	    alloc_متن(idx, "Create startup file %s with:", vimrc);
 	choices[idx].installfunc = install_vimrc;
-	choices[idx + 1].active = 1;
-	choices[idx + 2].active = 1;
-	choices[idx + 3].active = 1;
+	choices[idx + 1].فعال = 1;
+	choices[idx + 2].فعال = 1;
+	choices[idx + 3].فعال = 1;
     }
 }
 
 /*
  * Change the choice how to run Vim.
  */
-    static void
-change_run_choice(int idx)
+    ساكن فراغ
+change_پیاپی_choice(صحيح idx)
 {
-    compat_choice = get_choice(compat_choices, TABLE_SIZE(compat_choices));
-    alloc_text(idx, compat_text, compat_choices[compat_choice]);
+    compat_choice = get_choice(compat_choices, جدول_اندازه(compat_choices));
+    alloc_متن(idx, compat_متن, compat_choices[compat_choice]);
 }
 
 /*
  * Change the choice if keys are to be remapped.
  */
-    static void
-change_remap_choice(int idx)
+    ساكن فراغ
+change_remap_choice(صحيح idx)
 {
-    remap_choice = get_choice(remap_choices, TABLE_SIZE(remap_choices));
-    alloc_text(idx, remap_text, remap_choices[remap_choice]);
+    remap_choice = get_choice(remap_choices, جدول_اندازه(remap_choices));
+    alloc_متن(idx, remap_متن, remap_choices[remap_choice]);
 }
 
 /*
  * Change the choice how to select text.
  */
-    static void
-change_mouse_choice(int idx)
+    ساكن فراغ
+change_mouse_choice(صحيح idx)
 {
-    mouse_choice = get_choice(mouse_choices, TABLE_SIZE(mouse_choices));
-    alloc_text(idx, mouse_text, mouse_choices[mouse_choice]);
+    mouse_choice = get_choice(mouse_choices, جدول_اندازه(mouse_choices));
+    alloc_متن(idx, mouse_متن, mouse_choices[mouse_choice]);
 }
 
-    static void
-init_vimrc_choices(void)
+    ساكن فراغ
+init_vimrc_choices(فراغ)
 {
     // set path for a new _vimrc file (also when not used)
     strcpy(vimrc, installdir);
     strcpy(vimrc + runtimeidx, "_vimrc");
 
     // Set opposite value and then toggle it by calling change_vimrc_choice()
-    if (*oldvimrc == NUL)
-	choices[choice_count].installfunc = NULL;
-    else
-	choices[choice_count].installfunc = install_vimrc;
-    choices[choice_count].text = NULL;
-    change_vimrc_choice(choice_count);
-    choices[choice_count].changefunc = change_vimrc_choice;
-    choices[choice_count].active = 1;
-    ++choice_count;
+    إذا (*oldvimrc == NUL)
+	choices[choice_شمار].installfunc = عدم;
+    وإلا
+	choices[choice_شمار].installfunc = install_vimrc;
+    choices[choice_شمار].متن = عدم;
+    change_vimrc_choice(choice_شمار);
+    choices[choice_شمار].changefunc = change_vimrc_choice;
+    choices[choice_شمار].فعال = 1;
+    ++choice_شمار;
 
     // default way to run Vim
-    alloc_text(choice_count, compat_text, compat_choices[compat_choice]);
-    choices[choice_count].changefunc = change_run_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = (*oldvimrc == NUL);
-    ++choice_count;
+    alloc_متن(choice_شمار, compat_متن, compat_choices[compat_choice]);
+    choices[choice_شمار].changefunc = change_پیاپی_choice;
+    choices[choice_شمار].installfunc = عدم;
+    choices[choice_شمار].فعال = (*oldvimrc == NUL);
+    ++choice_شمار;
 
     // Whether to remap keys
-    alloc_text(choice_count, remap_text , remap_choices[remap_choice]);
-    choices[choice_count].changefunc = change_remap_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = (*oldvimrc == NUL);
-    ++choice_count;
+    alloc_متن(choice_شمار, remap_متن , remap_choices[remap_choice]);
+    choices[choice_شمار].changefunc = change_remap_choice;
+    choices[choice_شمار].installfunc = عدم;
+    choices[choice_شمار].فعال = (*oldvimrc == NUL);
+    ++choice_شمار;
 
     // default way to use the mouse
-    alloc_text(choice_count, mouse_text, mouse_choices[mouse_choice]);
-    choices[choice_count].changefunc = change_mouse_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = (*oldvimrc == NUL);
-    ++choice_count;
+    alloc_متن(choice_شمار, mouse_متن, mouse_choices[mouse_choice]);
+    choices[choice_شمار].changefunc = change_mouse_choice;
+    choices[choice_شمار].installfunc = عدم;
+    choices[choice_شمار].فعال = (*oldvimrc == NUL);
+    ++choice_شمار;
 }
 
-    static LONG
-reg_create_key(
-    HKEY root,
-    const char *subkey,
-    PHKEY phKey,
+    ساكن LONG
+reg_create_کلید(
+    HKEY ریشه,
+    ثابت حرف *subkey,
+    PHKEY ph_کلید,
     DWORD flag)
 {
     DWORD disp;
 
-    *phKey = NULL;
-    return RegCreateKeyEx(
-		root, subkey,
-		0, NULL, REG_OPTION_NON_VOLATILE,
-		flag | KEY_WRITE,
-		NULL, phKey, &disp);
+    *ph_کلید = عدم;
+    أرجع Reg_Create_کلید_Ex(
+		ریشه, subkey,
+		0, عدم, REG_OPTION_NON_VOLATILE,
+		flag | کلید_WRITE,
+		عدم, ph_کلید, &disp);
 }
 
-    static LONG
-reg_set_string_value(
-    HKEY hKey,
-    const char *value_name,
-    const char *data)
+    ساكن LONG
+reg_مجموعه_string_مقدار(
+    HKEY h_کلید,
+    ثابت حرف *مقدار_name,
+    ثابت حرف *داده)
 {
-    return RegSetValueEx(hKey, value_name, 0, REG_SZ,
-				     (LPBYTE)data, (DWORD)(1 + strlen(data)));
+    أرجع Reg_مجموعه_مقدار_Ex(h_کلید, مقدار_name, 0, REG_SZ,
+				     (LPBYTE)داده, (DWORD)(1 + طول_رشته(داده)));
 }
 
-    static LONG
-reg_create_key_and_value(
-    HKEY hRootKey,
-    const char *subkey,
-    const char *value_name,
-    const char *data,
+    ساكن LONG
+reg_create_کلید_and_مقدار(
+    HKEY h_ریشه_کلید,
+    ثابت حرف *subkey,
+    ثابت حرف *مقدار_name,
+    ثابت حرف *داده,
     DWORD flag)
 {
-    HKEY hKey;
-    LONG lRet = reg_create_key(hRootKey, subkey, &hKey, flag);
+    HKEY h_کلید;
+    LONG lRet = reg_create_کلید(h_ریشه_کلید, subkey, &h_کلید, flag);
 
-    if (ERROR_SUCCESS == lRet)
+    إذا (ERROR_SUCCESS == lRet)
     {
-	lRet = reg_set_string_value(hKey, value_name, data);
-	RegCloseKey(hKey);
+	lRet = reg_مجموعه_string_مقدار(h_کلید, مقدار_name, داده);
+	Reg_Close_کلید(h_کلید);
     }
-    return lRet;
+    أرجع lRet;
 }
 
-    static LONG
-register_inproc_server(
-    HKEY hRootKey,
-    const char *clsid,
-    const char *extname,
-    const char *module,
-    const char *threading_model,
+    ساكن LONG
+ثبات_inproc_server(
+    HKEY h_ریشه_کلید,
+    ثابت حرف *clsid,
+    ثابت حرف *extname,
+    ثابت حرف *module,
+    ثابت حرف *threading_model,
     DWORD flag)
 {
     CHAR subkey[BUFSIZE];
     LONG lRet;
 
     sprintf(subkey, "CLSID\\%s", clsid);
-    lRet = reg_create_key_and_value(hRootKey, subkey, NULL, extname, flag);
-    if (ERROR_SUCCESS == lRet)
+    lRet = reg_create_کلید_and_مقدار(h_ریشه_کلید, subkey, عدم, extname, flag);
+    إذا (ERROR_SUCCESS == lRet)
     {
 	sprintf(subkey, "CLSID\\%s\\InProcServer32", clsid);
-	lRet = reg_create_key_and_value(hRootKey, subkey, NULL, module, flag);
-	if (ERROR_SUCCESS == lRet)
+	lRet = reg_create_کلید_and_مقدار(h_ریشه_کلید, subkey, عدم, module, flag);
+	إذا (ERROR_SUCCESS == lRet)
 	{
-	    lRet = reg_create_key_and_value(hRootKey, subkey,
+	    lRet = reg_create_کلید_and_مقدار(h_ریشه_کلید, subkey,
 					   "ThreadingModel", threading_model, flag);
 	}
     }
-    return lRet;
+    أرجع lRet;
 }
 
-    static LONG
-register_shellex(
-    HKEY hRootKey,
-    const char *clsid,
-    const char *name,
-    const char *exe_path,
+    ساكن LONG
+ثبات_shellex(
+    HKEY h_ریشه_کلید,
+    ثابت حرف *clsid,
+    ثابت حرف *name,
+    ثابت حرف *exe_مسیر,
     DWORD flag)
 {
-    LONG lRet = reg_create_key_and_value(
-	    hRootKey,
+    LONG lRet = reg_create_کلید_and_مقدار(
+	    h_ریشه_کلید,
 	    "*\\shellex\\ContextMenuHandlers\\gvim",
-	    NULL,
+	    عدم,
 	    clsid,
 	    flag);
 
-    if (ERROR_SUCCESS == lRet)
+    إذا (ERROR_SUCCESS == lRet)
     {
-	lRet = reg_create_key_and_value(
+	lRet = reg_create_کلید_and_مقدار(
 		HKEY_LOCAL_MACHINE,
 		"Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
 		clsid,
 		name,
 		flag);
 
-	if (ERROR_SUCCESS == lRet)
+	إذا (ERROR_SUCCESS == lRet)
 	{
-	    lRet = reg_create_key_and_value(
+	    lRet = reg_create_کلید_and_مقدار(
 		    HKEY_LOCAL_MACHINE,
 		    "Software\\Vim\\Gvim",
 		    "path",
-		    exe_path,
+		    exe_مسیر,
 		    flag);
 	}
     }
-    return lRet;
+    أرجع lRet;
 }
 
-    static LONG
-register_openwith(
-    HKEY hRootKey,
-    const char *exe_path,
+    ساكن LONG
+ثبات_openwith(
+    HKEY h_ریشه_کلید,
+    ثابت حرف *exe_مسیر,
     DWORD flag)
 {
-    char	exe_cmd[BUFSIZE];
+    حرف	exe_cmd[BUFSIZE];
     LONG	lRet;
 
-    sprintf(exe_cmd, "\"%s\" \"%%1\"", exe_path);
-    lRet = reg_create_key_and_value(
-	    hRootKey,
+    sprintf(exe_cmd, "\"%s\" \"%%1\"", exe_مسیر);
+    lRet = reg_create_کلید_and_مقدار(
+	    h_ریشه_کلید,
 	    "Applications\\gvim.exe\\shell\\edit\\command",
-	    NULL,
+	    عدم,
 	    exe_cmd,
 	    flag);
 
-    if (ERROR_SUCCESS == lRet)
+    إذا (ERROR_SUCCESS == lRet)
     {
-	int i;
-	static const char *openwith[] = {
+	صحيح i;
+	ساكن ثابت حرف *openwith[] = {
 		".htm\\OpenWithList\\gvim.exe",
 		".vim\\OpenWithList\\gvim.exe",
 		"*\\OpenWithList\\gvim.exe",
 	};
 
-	for (i = 0; ERROR_SUCCESS == lRet && i < (int)ARRAYSIZE(openwith); i++)
-	    lRet = reg_create_key_and_value(hRootKey, openwith[i], NULL, "", flag);
+	لكل (i = 0; ERROR_SUCCESS == lRet && i < (صحيح)ARRAYSIZE(openwith); i++)
+	    lRet = reg_create_کلید_and_مقدار(h_ریشه_کلید, openwith[i], عدم, "", flag);
     }
 
-    return lRet;
+    أرجع lRet;
 }
 
-    static LONG
-register_uninstall(
-    HKEY hRootKey,
-    const char *appname,
-    const char *display_name,
-    const char *uninstall_string,
-    const char *display_icon,
-    const char *display_version,
-    const char *publisher)
+    ساكن LONG
+ثبات_uninstall(
+    HKEY h_ریشه_کلید,
+    ثابت حرف *appname,
+    ثابت حرف *display_name,
+    ثابت حرف *uninstall_string,
+    ثابت حرف *display_icon,
+    ثابت حرف *display_نسخه,
+    ثابت حرف *publisher)
 {
-    LONG lRet = reg_create_key_and_value(hRootKey, appname,
-			     "DisplayName", display_name, KEY_WOW64_64KEY);
+    LONG lRet = reg_create_کلید_and_مقدار(h_ریشه_کلید, appname,
+			     "DisplayName", display_name, کلید_WOW64_64_کلید);
 
-    if (ERROR_SUCCESS == lRet)
-	lRet = reg_create_key_and_value(hRootKey, appname,
-		     "UninstallString", uninstall_string, KEY_WOW64_64KEY);
-    if (ERROR_SUCCESS == lRet)
-	lRet = reg_create_key_and_value(hRootKey, appname,
-		     "DisplayIcon", display_icon, KEY_WOW64_64KEY);
-    if (ERROR_SUCCESS == lRet)
-	lRet = reg_create_key_and_value(hRootKey, appname,
-		     "DisplayVersion", display_version, KEY_WOW64_64KEY);
-    if (ERROR_SUCCESS == lRet)
-	lRet = reg_create_key_and_value(hRootKey, appname,
-		     "Publisher", publisher, KEY_WOW64_64KEY);
-    return lRet;
+    إذا (ERROR_SUCCESS == lRet)
+	lRet = reg_create_کلید_and_مقدار(h_ریشه_کلید, appname,
+		     "UninstallString", uninstall_string, کلید_WOW64_64_کلید);
+    إذا (ERROR_SUCCESS == lRet)
+	lRet = reg_create_کلید_and_مقدار(h_ریشه_کلید, appname,
+		     "DisplayIcon", display_icon, کلید_WOW64_64_کلید);
+    إذا (ERROR_SUCCESS == lRet)
+	lRet = reg_create_کلید_and_مقدار(h_ریشه_کلید, appname,
+		     "DisplayVersion", display_نسخه, کلید_WOW64_64_کلید);
+    إذا (ERROR_SUCCESS == lRet)
+	lRet = reg_create_کلید_and_مقدار(h_ریشه_کلید, appname,
+		     "Publisher", publisher, کلید_WOW64_64_کلید);
+    أرجع lRet;
 }
 
 /*
@@ -1570,117 +1570,117 @@ register_uninstall(
  * - to uninstall Vim
  */
 //ARGSUSED
-    static int
-install_registry(void)
+    ساكن صحيح
+install_registry(فراغ)
 {
     LONG	lRet = ERROR_SUCCESS;
-    const char	*vim_ext_ThreadingModel = "Apartment";
-    const char	*vim_ext_name = "Vim Shell Extension";
-    const char	*vim_ext_clsid = "{51EEE242-AD87-11d3-9C1E-0090278BBD99}";
-    char	vim_exe_path[MAX_PATH];
-    char	display_name[BUFSIZE];
-    char	uninstall_string[BUFSIZE];
-    char	icon_string[BUFSIZE];
-    char	version_string[BUFSIZE];
-    int		i;
-    int		loop_count = is_64bit_os() ? 2 : 1;
+    ثابت حرف	*vim_ext_ThreadingModel = "Apartment";
+    ثابت حرف	*vim_ext_name = "Vim Shell Extension";
+    ثابت حرف	*vim_ext_clsid = "{51EEE242-AD87-11d3-9C1E-0090278BBD99}";
+    حرف	vim_exe_مسیر[MAX_مسیر];
+    حرف	display_name[BUFSIZE];
+    حرف	uninstall_string[BUFSIZE];
+    حرف	icon_string[BUFSIZE];
+    حرف	نسخه_string[BUFSIZE];
+    صحيح		i;
+    صحيح		loop_شمار = is_64bit_os() ? 2 : 1;
     DWORD	flag;
 
-    sprintf(vim_exe_path, "%s\\gvim.exe", installdir);
+    sprintf(vim_exe_مسیر, "%s\\gvim.exe", installdir);
 
-    if (install_popup)
+    إذا (install_popup)
     {
-	char	    bufg[BUFSIZE];
+	حرف	    bufg[BUFSIZE];
 
-	printf("Creating \"Edit with Vim\" popup menu entry\n");
+	چاپ_کن("Creating \"Edit with Vim\" popup menu entry\n");
 
-	for (i = 0; i < loop_count; i++)
+	لكل (i = 0; i < loop_شمار; i++)
 	{
-	    if (i == 0)
+	    إذا (i == 0)
 	    {
-		sprintf(bufg, "%s\\" GVIMEXT32_PATH, installdir);
-		flag = KEY_WOW64_32KEY;
+		sprintf(bufg, "%s\\" GVIMEXT32_مسیر, installdir);
+		flag = کلید_WOW64_32_کلید;
 	    }
-	    else
+	    وإلا
 	    {
-		sprintf(bufg, "%s\\" GVIMEXT64_PATH, installdir);
-		flag = KEY_WOW64_64KEY;
+		sprintf(bufg, "%s\\" GVIMEXT64_مسیر, installdir);
+		flag = کلید_WOW64_64_کلید;
 	    }
 
-	    lRet = register_inproc_server(
-		    HKEY_CLASSES_ROOT, vim_ext_clsid, vim_ext_name,
+	    lRet = ثبات_inproc_server(
+		    HKEY_CLASSES_ریشه, vim_ext_clsid, vim_ext_name,
 		    bufg, vim_ext_ThreadingModel, flag);
-	    if (ERROR_SUCCESS != lRet)
-		return FAIL;
-	    lRet = register_shellex(
-		    HKEY_CLASSES_ROOT, vim_ext_clsid, vim_ext_name,
-		    vim_exe_path, flag);
-	    if (ERROR_SUCCESS != lRet)
-		return FAIL;
+	    إذا (ERROR_SUCCESS != lRet)
+		أرجع FAIL;
+	    lRet = ثبات_shellex(
+		    HKEY_CLASSES_ریشه, vim_ext_clsid, vim_ext_name,
+		    vim_exe_مسیر, flag);
+	    إذا (ERROR_SUCCESS != lRet)
+		أرجع FAIL;
 	}
     }
 
-    if (install_openwith)
+    إذا (install_openwith)
     {
-	printf("Creating \"Open with ...\" list entry\n");
+	چاپ_کن("Creating \"Open with ...\" list entry\n");
 
-	for (i = 0; i < loop_count; i++)
+	لكل (i = 0; i < loop_شمار; i++)
 	{
-	    if (i == 0)
-		flag = KEY_WOW64_32KEY;
-	    else
-		flag = KEY_WOW64_64KEY;
+	    إذا (i == 0)
+		flag = کلید_WOW64_32_کلید;
+	    وإلا
+		flag = کلید_WOW64_64_کلید;
 
-	    lRet = register_openwith(HKEY_CLASSES_ROOT, vim_exe_path, flag);
-	    if (ERROR_SUCCESS != lRet)
-		return FAIL;
+	    lRet = ثبات_openwith(HKEY_CLASSES_ریشه, vim_exe_مسیر, flag);
+	    إذا (ERROR_SUCCESS != lRet)
+		أرجع FAIL;
 	}
     }
 
-    printf("Creating an uninstall entry\n");
-    sprintf(display_name, "Vim " VIM_VERSION_SHORT
-#ifdef _M_ARM64
+    چاپ_کن("Creating an uninstall entry\n");
+    sprintf(display_name, "Vim " VIM_نسخه_SHORT
+#اگر_تعریف_شده _M_ARM64
 	    " (arm64)"
-#elif _M_X64
+#وإلاإذا _M_X64
 	    " (x64)"
-#endif
+#پایان_اگر
 	    );
 
     // For the NSIS installer use the generated uninstaller.
-    if (interactive)
+    إذا (interactive)
 	sprintf(uninstall_string, "%s\\uninstall.exe", installdir);
-    else
+    وإلا
 	sprintf(uninstall_string, "%s\\uninstall-gui.exe", installdir);
 
     sprintf(icon_string, "%s\\gvim.exe,0", installdir);
 
-    sprintf(version_string, VIM_VERSION_SHORT "." VIM_VERSION_PATCHLEVEL_STR);
+    sprintf(نسخه_string, VIM_نسخه_SHORT "." VIM_نسخه_PATCHLEVEL_STR);
 
-    lRet = register_uninstall(
+    lRet = ثبات_uninstall(
 	HKEY_LOCAL_MACHINE,
-	"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Vim " VIM_VERSION_SHORT,
+	"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Vim " VIM_نسخه_SHORT,
 	display_name,
 	uninstall_string,
 	icon_string,
-	version_string,
+	نسخه_string,
 	"The Vim Project");
-    if (ERROR_SUCCESS != lRet)
-	return FAIL;
+    إذا (ERROR_SUCCESS != lRet)
+	أرجع FAIL;
 
-    return OK;
+    أرجع OK;
 }
 
-    static void
-change_popup_choice(int idx)
+    ساكن فراغ
+change_popup_choice(صحيح idx)
 {
-    if (install_popup == 0)
+    إذا (install_popup == 0)
     {
-	choices[idx].text = "Install an entry for Vim in the popup menu for the right\n    mouse button so that you can edit any file with Vim";
+	choices[idx].متن = "Install an entry for Vim in the popup menu for the right\n    mouse button so that you can edit any file with Vim";
 	install_popup = 1;
     }
-    else
+    وإلا
     {
-	choices[idx].text = "Do NOT install an entry for Vim in the popup menu for the\n    right mouse button to edit any file with Vim";
+	choices[idx].متن = "Do NOT install an entry for Vim in the popup menu for the\n    right mouse button to edit any file with Vim";
 	install_popup = 0;
     }
 }
@@ -1689,36 +1689,36 @@ change_popup_choice(int idx)
  * Only add the choice for the popup menu entry when gvim.exe was found and
  * both gvimext.dll and regedit.exe exist.
  */
-    static void
-init_popup_choice(void)
+    ساكن فراغ
+init_popup_choice(فراغ)
 {
-    struct stat	st;
+    بنية stat	st;
 
-    if (has_gvim
-	    && (stat(GVIMEXT32_PATH, &st) >= 0
-		|| stat(GVIMEXT64_PATH, &st) >= 0))
+    إذا (has_gvim
+	    && (stat(GVIMEXT32_مسیر, &st) >= 0
+		|| stat(GVIMEXT64_مسیر, &st) >= 0))
     {
-	choices[choice_count].changefunc = change_popup_choice;
-	choices[choice_count].installfunc = NULL;
-	choices[choice_count].active = 1;
-	change_popup_choice(choice_count);  // set the text
-	++choice_count;
+	choices[choice_شمار].changefunc = change_popup_choice;
+	choices[choice_شمار].installfunc = عدم;
+	choices[choice_شمار].فعال = 1;
+	change_popup_choice(choice_شمار);  // set the text
+	++choice_شمار;
     }
-    else
-	add_dummy_choice();
+    وإلا
+	جمع_کن_dummy_choice();
 }
 
-    static void
-change_openwith_choice(int idx)
+    ساكن فراغ
+change_openwith_choice(صحيح idx)
 {
-    if (install_openwith == 0)
+    إذا (install_openwith == 0)
     {
-	choices[idx].text = "Add Vim to the \"Open With...\" list in the popup menu for the right\n    mouse button so that you can edit any file with Vim";
+	choices[idx].متن = "Add Vim to the \"Open With...\" list in the popup menu for the right\n    mouse button so that you can edit any file with Vim";
 	install_openwith = 1;
     }
-    else
+    وإلا
     {
-	choices[idx].text = "Do NOT add Vim to the \"Open With...\" list in the popup menu for the\n    right mouse button to edit any file with Vim";
+	choices[idx].متن = "Do NOT add Vim to the \"Open With...\" list in the popup menu for the\n    right mouse button to edit any file with Vim";
 	install_openwith = 0;
     }
 }
@@ -1727,19 +1727,19 @@ change_openwith_choice(int idx)
  * Only add the choice for the open-with menu entry when gvim.exe was found
  * and regedit.exe exist.
  */
-    static void
-init_openwith_choice(void)
+    ساكن فراغ
+init_openwith_choice(فراغ)
 {
-    if (has_gvim)
+    إذا (has_gvim)
     {
-	choices[choice_count].changefunc = change_openwith_choice;
-	choices[choice_count].installfunc = NULL;
-	choices[choice_count].active = 1;
-	change_openwith_choice(choice_count);  // set the text
-	++choice_count;
+	choices[choice_شمار].changefunc = change_openwith_choice;
+	choices[choice_شمار].installfunc = عدم;
+	choices[choice_شمار].فعال = 1;
+	change_openwith_choice(choice_شمار);  // set the text
+	++choice_شمار;
     }
-    else
-	add_dummy_choice();
+    وإلا
+	جمع_کن_dummy_choice();
 }
 
 /*
@@ -1749,14 +1749,14 @@ init_openwith_choice(void)
  *
  * NOTE:  Currently untested with mingw.
  */
-    int
+    صحيح
 create_shortcut(
-	const char *shortcut_name,
-	const char *iconfile_path,
-	int	    iconindex,
-	const char *shortcut_target,
-	const char *shortcut_args,
-	const char *workingdir
+	ثابت حرف *shortcut_name,
+	ثابت حرف *iconfile_مسیر,
+	صحيح	    iconindex,
+	ثابت حرف *shortcut_هدف,
+	ثابت حرف *shortcut_آرگومانها,
+	ثابت حرف *workingdir
 	)
 {
     IShellLink	    *shelllink_ptr;
@@ -1764,64 +1764,64 @@ create_shortcut(
     IPersistFile	    *persistfile_ptr;
 
     // Initialize COM library
-    hres = CoInitialize(NULL);
-    if (!SUCCEEDED(hres))
+    hres = CoInitialize(عدم);
+    إذا (!SUCCEEDED(hres))
     {
-	printf("Error:  Could not open the COM library.  Not creating shortcut.\n");
-	return FAIL;
+	چاپ_کن("Error:  Could not open the COM library.  Not creating shortcut.\n");
+	أرجع FAIL;
     }
 
     // Instantiate a COM object for the ShellLink, store a pointer to it
     // in shelllink_ptr.
     hres = CoCreateInstance(&CLSID_ShellLink,
-			   NULL,
+			   عدم,
 			   CLSCTX_INPROC_SERVER,
 			   &IID_IShellLink,
-			   (void **) &shelllink_ptr);
+			   (فراغ **) &shelllink_ptr);
 
-    if (SUCCEEDED(hres)) // If the instantiation was successful...
+    إذا (SUCCEEDED(hres)) // If the instantiation was successful...
     {
 	// ...Then build a PersistFile interface for the ShellLink so we can
 	// save it as a file after we build it.
 	hres = shelllink_ptr->lpVtbl->QueryInterface(shelllink_ptr,
-		&IID_IPersistFile, (void **) &persistfile_ptr);
+		&IID_IPersistFile, (فراغ **) &persistfile_ptr);
 
-	if (SUCCEEDED(hres))
+	إذا (SUCCEEDED(hres))
 	{
 	    wchar_t wsz[BUFSIZE];
 
 	    // translate the (possibly) multibyte shortcut filename to windows
 	    // Unicode so it can be used as a file name.
-	    MultiByteToWideChar(CP_ACP, 0, shortcut_name, -1, wsz, sizeof(wsz)/sizeof(wsz[0]));
+	    Multi_Byte_مقصد_Wide_Char(CP_ACP, 0, shortcut_name, -1, wsz, حجم(wsz)/حجم(wsz[0]));
 
 	    // set the attributes
-	    shelllink_ptr->lpVtbl->SetPath(shelllink_ptr, shortcut_target);
-	    shelllink_ptr->lpVtbl->SetWorkingDirectory(shelllink_ptr,
+	    shelllink_ptr->lpVtbl->مجموعه_مسیر(shelllink_ptr, shortcut_هدف);
+	    shelllink_ptr->lpVtbl->مجموعه_Working_Directory(shelllink_ptr,
 								  workingdir);
-	    shelllink_ptr->lpVtbl->SetIconLocation(shelllink_ptr,
-						    iconfile_path, iconindex);
-	    shelllink_ptr->lpVtbl->SetArguments(shelllink_ptr, shortcut_args);
+	    shelllink_ptr->lpVtbl->مجموعه_Icon_Location(shelllink_ptr,
+						    iconfile_مسیر, iconindex);
+	    shelllink_ptr->lpVtbl->مجموعه_Arguments(shelllink_ptr, shortcut_آرگومانها);
 
 	    // save the shortcut to a file and return the PersistFile object
 	    persistfile_ptr->lpVtbl->Save(persistfile_ptr, wsz, 1);
 	    persistfile_ptr->lpVtbl->Release(persistfile_ptr);
 	}
-	else
+	وإلا
 	{
-	    printf("QueryInterface Error\n");
-	    return FAIL;
+	    چاپ_کن("QueryInterface Error\n");
+	    أرجع FAIL;
 	}
 
 	// Return the ShellLink object
 	shelllink_ptr->lpVtbl->Release(shelllink_ptr);
     }
-    else
+    وإلا
     {
-	printf("CoCreateInstance Error - hres = %08x\n", (int)hres);
-	return FAIL;
+	چاپ_کن("CoCreateInstance Error - hres = %08x\n", (صحيح)hres);
+	أرجع FAIL;
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -1829,55 +1829,55 @@ create_shortcut(
  *
  * Return 0 on error, non-zero on success
  */
-   int
+   صحيح
 build_link_name(
-	char	   *link_path,
-	const char *link_name,
-	const char *shell_folder_name)
+	حرف	   *link_مسیر,
+	ثابت حرف *link_name,
+	ثابت حرف *shell_folder_name)
 {
-    char	shell_folder_path[MAX_PATH];
+    حرف	shell_folder_مسیر[MAX_مسیر];
 
-    if (get_shell_folder_path(shell_folder_path, shell_folder_name) == FAIL)
+    إذا (get_shell_folder_مسیر(shell_folder_مسیر, shell_folder_name) == FAIL)
     {
-	printf("An error occurred while attempting to find the path to %s.\n",
+	چاپ_کن("An error occurred while attempting to find the path to %s.\n",
 							   shell_folder_name);
-	return FAIL;
+	أرجع FAIL;
     }
 
     // Make sure the directory exists (create Start Menu\Programs\Vim).
     // Ignore errors if it already exists.
-    vim_mkdir(shell_folder_path, 0755);
+    vim_mkdir(shell_folder_مسیر, 0755);
 
     // build the path to the shortcut and the path to gvim.exe
-    sprintf(link_path, "%s\\%s.lnk", shell_folder_path, link_name);
+    sprintf(link_مسیر, "%s\\%s.lnk", shell_folder_مسیر, link_name);
 
-    return OK;
+    أرجع OK;
 }
 
-    static int
+    ساكن صحيح
 build_shortcut(
-	const char *name,	// Name of the shortcut
-	const char *exename,	// Name of the executable (e.g., vim.exe)
-	const char *args,
-	const char *shell_folder,
-	const char *workingdir)
+	ثابت حرف *name,	// Name of the shortcut
+	ثابت حرف *exename,	// Name of the executable (e.g., vim.exe)
+	ثابت حرف *آرگومانها,
+	ثابت حرف *shell_folder,
+	ثابت حرف *workingdir)
 {
-    char	executable_path[BUFSIZE];
-    char	link_name[BUFSIZE];
+    حرف	executable_مسیر[BUFSIZE];
+    حرف	link_name[BUFSIZE];
 
-    sprintf(executable_path, "%s\\%s", installdir, exename);
+    sprintf(executable_مسیر, "%s\\%s", installdir, exename);
 
-    if (build_link_name(link_name, name, shell_folder) == FAIL)
+    إذا (build_link_name(link_name, name, shell_folder) == FAIL)
     {
-	printf("An error has occurred.  A shortcut to %s will not be created %s.\n",
+	چاپ_کن("An error has occurred.  A shortcut to %s will not be created %s.\n",
 		name,
 		*shell_folder == 'd' ? "on the desktop" : "in the Start menu");
-	return FAIL;
+	أرجع FAIL;
     }
 
     // Create the shortcut:
-    return create_shortcut(link_name, executable_path, 0,
-					   executable_path, args, workingdir);
+    أرجع create_shortcut(link_name, executable_مسیر, 0,
+					   executable_مسیر, آرگومانها, workingdir);
 }
 
 /*
@@ -1886,87 +1886,87 @@ build_shortcut(
  * current directory to be c:\Windows\system32 on Windows 7. Use environment
  * variables instead.
  */
-#define WORKDIR "%HOMEDRIVE%%HOMEPATH%"
+#تعریف_کن WORKDIR "%HOMEDRIVE%%HOMEPATH%"
 
 /*
  * Create shortcut(s) in the Start Menu\Programs\Vim folder.
  */
-    static void
-install_start_menu(int idx UNUSED)
+    ساكن فراغ
+install_شروع_menu(صحيح idx استفادهنشده)
 {
-    need_uninstall_entry = 1;
-    printf("Creating start menu\n");
-    if (has_vim)
+    need_uninstall_مدخل = 1;
+    چاپ_کن("Creating start menu\n");
+    إذا (has_vim)
     {
-	if (build_shortcut("Vim", "vim.exe", "",
+	إذا (build_shortcut("Vim", "vim.exe", "",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("Vim Read-only", "vim.exe", "-R",
+	    أرجع;
+	إذا (build_shortcut("Vim Read-only", "vim.exe", "-R",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("Vim Diff", "vim.exe", "-d",
+	    أرجع;
+	إذا (build_shortcut("Vim Diff", "vim.exe", "-d",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
+	    أرجع;
     }
-    if (has_gvim)
+    إذا (has_gvim)
     {
-	if (build_shortcut("gVim", "gvim.exe", "",
+	إذا (build_shortcut("gVim", "gvim.exe", "",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("gVim Easy", "gvim.exe", "-y",
+	    أرجع;
+	إذا (build_shortcut("gVim Easy", "gvim.exe", "-y",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("gVim Read-only", "gvim.exe", "-R",
+	    أرجع;
+	إذا (build_shortcut("gVim Read-only", "gvim.exe", "-R",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
-	if (build_shortcut("gVim Diff", "gvim.exe", "-d",
+	    أرجع;
+	إذا (build_shortcut("gVim Diff", "gvim.exe", "-d",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	    return;
+	    أرجع;
     }
-    if (build_shortcut("Uninstall",
+    إذا (build_shortcut("Uninstall",
 		interactive ? "uninstall.exe" : "uninstall-gui.exe", "",
 					   VIM_STARTMENU, installdir) == FAIL)
-	return;
+	أرجع;
     // For Windows NT the working dir of the vimtutor.bat must be right,
     // otherwise gvim.exe won't be found and using gvimbat doesn't work.
-    if (build_shortcut("Vim tutor", "vimtutor.bat", "",
+    إذا (build_shortcut("Vim tutor", "vimtutor.bat", "",
 					   VIM_STARTMENU, installdir) == FAIL)
-	return;
-    if (build_shortcut("Help", has_gvim ? "gvim.exe" : "vim.exe", "-c h",
+	أرجع;
+    إذا (build_shortcut("Help", has_gvim ? "gvim.exe" : "vim.exe", "-c h",
 					      VIM_STARTMENU, WORKDIR) == FAIL)
-	return;
+	أرجع;
     {
-	char	shell_folder_path[BUFSIZE];
+	حرف	shell_folder_مسیر[BUFSIZE];
 
 	// Creating the URL shortcut works a bit differently...
-	if (get_shell_folder_path(shell_folder_path, VIM_STARTMENU) == FAIL)
+	إذا (get_shell_folder_مسیر(shell_folder_مسیر, VIM_STARTMENU) == FAIL)
 	{
-	    printf("Finding the path of the Start menu failed\n");
-	    return ;
+	    چاپ_کن("Finding the path of the Start menu failed\n");
+	    أرجع ;
 	}
-	add_pathsep(shell_folder_path);
-	strcat(shell_folder_path, "Vim Online.url");
-	if (!WritePrivateProfileString("InternetShortcut", "URL",
-				    "https://www.vim.org/", shell_folder_path))
+	جمع_کن_pathsep(shell_folder_مسیر);
+	strcat(shell_folder_مسیر, "Vim Online.url");
+	إذا (!Write_خصوصی_Profile_String("InternetShortcut", "URL",
+				    "https://www.vim.org/", shell_folder_مسیر))
 	{
-	    printf("Creating the Vim online URL failed\n");
-	    return;
+	    چاپ_کن("Creating the Vim online URL failed\n");
+	    أرجع;
 	}
     }
 }
 
-    static void
-toggle_startmenu_choice(int idx)
+    ساكن فراغ
+toggle_startmenu_choice(صحيح idx)
 {
-    if (choices[idx].installfunc == NULL)
+    إذا (choices[idx].installfunc == عدم)
     {
-	choices[idx].installfunc = install_start_menu;
-	choices[idx].text = "Add Vim to the Start menu";
+	choices[idx].installfunc = install_شروع_menu;
+	choices[idx].متن = "Add Vim to the Start menu";
     }
-    else
+    وإلا
     {
-	choices[idx].installfunc = NULL;
-	choices[idx].text = "Do NOT add Vim to the Start menu";
+	choices[idx].installfunc = عدم;
+	choices[idx].متن = "Do NOT add Vim to the Start menu";
     }
 }
 
@@ -1979,157 +1979,157 @@ toggle_startmenu_choice(int idx)
  *    - the location of the file being edited if a file is supplied (ie via
  *      drag and drop onto the shortcut).
  */
-    void
-install_shortcut_gvim(int idx)
+    فراغ
+install_shortcut_gvim(صحيح idx)
 {
     // Create shortcut(s) on the desktop
-    if (choices[idx].arg)
+    إذا (choices[idx].arg)
     {
-	(void)build_shortcut(icon_names[0], "gvim.exe",
+	(فراغ)build_shortcut(icon_نامها[0], "gvim.exe",
 						      "", "desktop", WORKDIR);
-	need_uninstall_entry = 1;
+	need_uninstall_مدخل = 1;
     }
 }
 
-    void
-install_shortcut_evim(int idx)
+    فراغ
+install_shortcut_evim(صحيح idx)
 {
-    if (choices[idx].arg)
+    إذا (choices[idx].arg)
     {
-	(void)build_shortcut(icon_names[1], "gvim.exe",
+	(فراغ)build_shortcut(icon_نامها[1], "gvim.exe",
 						    "-y", "desktop", WORKDIR);
-	need_uninstall_entry = 1;
+	need_uninstall_مدخل = 1;
     }
 }
 
-    void
-install_shortcut_gview(int idx)
+    فراغ
+install_shortcut_gview(صحيح idx)
 {
-    if (choices[idx].arg)
+    إذا (choices[idx].arg)
     {
-	(void)build_shortcut(icon_names[2], "gvim.exe",
+	(فراغ)build_shortcut(icon_نامها[2], "gvim.exe",
 						    "-R", "desktop", WORKDIR);
-	need_uninstall_entry = 1;
+	need_uninstall_مدخل = 1;
     }
 }
 
-    void
-toggle_shortcut_choice(int idx)
+    فراغ
+toggle_shortcut_choice(صحيح idx)
 {
-    char	*arg;
+    حرف	*arg;
 
-    if (choices[idx].installfunc == install_shortcut_gvim)
+    إذا (choices[idx].installfunc == install_shortcut_gvim)
 	arg = "gVim";
-    else if (choices[idx].installfunc == install_shortcut_evim)
+    وإلا إذا (choices[idx].installfunc == install_shortcut_evim)
 	arg = "gVim Easy";
-    else
+    وإلا
 	arg = "gVim Read-only";
-    if (choices[idx].arg)
+    إذا (choices[idx].arg)
     {
 	choices[idx].arg = 0;
-	alloc_text(idx, "Do NOT create a desktop icon for %s", arg);
+	alloc_متن(idx, "Do NOT create a desktop icon for %s", arg);
     }
-    else
+    وإلا
     {
 	choices[idx].arg = 1;
-	alloc_text(idx, "Create a desktop icon for %s", arg);
+	alloc_متن(idx, "Create a desktop icon for %s", arg);
     }
 }
 
-    static void
-init_startmenu_choice(void)
+    ساكن فراغ
+init_startmenu_choice(فراغ)
 {
     // Start menu
-    choices[choice_count].changefunc = toggle_startmenu_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = 1;
-    toggle_startmenu_choice(choice_count);	// set the text
-    ++choice_count;
+    choices[choice_شمار].changefunc = toggle_startmenu_choice;
+    choices[choice_شمار].installfunc = عدم;
+    choices[choice_شمار].فعال = 1;
+    toggle_startmenu_choice(choice_شمار);	// set the text
+    ++choice_شمار;
 }
 
 /*
  * Add the choice for the desktop shortcuts.
  */
-    static void
-init_shortcut_choices(void)
+    ساكن فراغ
+init_shortcut_choices(فراغ)
 {
     // Shortcut to gvim
-    choices[choice_count].text = NULL;
-    choices[choice_count].arg = 0;
-    choices[choice_count].active = has_gvim;
-    choices[choice_count].changefunc = toggle_shortcut_choice;
-    choices[choice_count].installfunc = install_shortcut_gvim;
-    toggle_shortcut_choice(choice_count);
-    ++choice_count;
+    choices[choice_شمار].متن = عدم;
+    choices[choice_شمار].arg = 0;
+    choices[choice_شمار].فعال = has_gvim;
+    choices[choice_شمار].changefunc = toggle_shortcut_choice;
+    choices[choice_شمار].installfunc = install_shortcut_gvim;
+    toggle_shortcut_choice(choice_شمار);
+    ++choice_شمار;
 
     // Shortcut to evim
-    choices[choice_count].text = NULL;
-    choices[choice_count].arg = 0;
-    choices[choice_count].active = has_gvim;
-    choices[choice_count].changefunc = toggle_shortcut_choice;
-    choices[choice_count].installfunc = install_shortcut_evim;
-    toggle_shortcut_choice(choice_count);
-    ++choice_count;
+    choices[choice_شمار].متن = عدم;
+    choices[choice_شمار].arg = 0;
+    choices[choice_شمار].فعال = has_gvim;
+    choices[choice_شمار].changefunc = toggle_shortcut_choice;
+    choices[choice_شمار].installfunc = install_shortcut_evim;
+    toggle_shortcut_choice(choice_شمار);
+    ++choice_شمار;
 
     // Shortcut to gview
-    choices[choice_count].text = NULL;
-    choices[choice_count].arg = 0;
-    choices[choice_count].active = has_gvim;
-    choices[choice_count].changefunc = toggle_shortcut_choice;
-    choices[choice_count].installfunc = install_shortcut_gview;
-    toggle_shortcut_choice(choice_count);
-    ++choice_count;
+    choices[choice_شمار].متن = عدم;
+    choices[choice_شمار].arg = 0;
+    choices[choice_شمار].فعال = has_gvim;
+    choices[choice_شمار].changefunc = toggle_shortcut_choice;
+    choices[choice_شمار].installfunc = install_shortcut_gview;
+    toggle_shortcut_choice(choice_شمار);
+    ++choice_شمار;
 }
 
 /*
  * Attempt to register OLE for Vim.
  */
-   static void
-install_OLE_register(void)
+   ساكن فراغ
+install_OLE_ثبات(فراغ)
 {
-    char register_command_string[BUFSIZE + 30];
+    حرف ثبات_command_string[BUFSIZE + 30];
 
-    printf("\n--- Attempting to register Vim with OLE ---\n");
-    printf("(There is no message whether this works or not.)\n");
+    چاپ_کن("\n--- Attempting to register Vim with OLE ---\n");
+    چاپ_کن("(There is no message whether this works or not.)\n");
 
-    sprintf(register_command_string, "\"%s\\gvim.exe\" -silent -register", installdir);
-    system(register_command_string);
+    sprintf(ثبات_command_string, "\"%s\\gvim.exe\" -silent -register", installdir);
+    system(ثبات_command_string);
 }
 
 /*
  * Remove the last part of directory "path[]" to get its parent, and put the
  * result in "to[]".
  */
-    static void
-dir_remove_last(const char *path, char to[MAX_PATH])
+    ساكن فراغ
+dir_remove_آخرین(ثابت حرف *مسیر, حرف مقصد[MAX_مسیر])
 {
-    char c;
-    long last_char_to_copy;
-    long path_length = strlen(path);
+    حرف c;
+    دراز آخرین_char_مقصد_copy;
+    دراز مسیر_درازی = طول_رشته(مسیر);
 
     // skip the last character just in case it is a '\\'
-    last_char_to_copy = path_length - 2;
-    c = path[last_char_to_copy];
+    آخرین_char_مقصد_copy = مسیر_درازی - 2;
+    c = مسیر[آخرین_char_مقصد_copy];
 
-    while (c != '\\')
+    طالما (c != '\\')
     {
-	last_char_to_copy--;
-	c = path[last_char_to_copy];
+	آخرین_char_مقصد_copy--;
+	c = مسیر[آخرین_char_مقصد_copy];
     }
 
-    strncpy(to, path, (size_t)last_char_to_copy);
-    to[last_char_to_copy] = NUL;
+    strncpy(مقصد, مسیر, (size_t)آخرین_char_مقصد_copy);
+    مقصد[آخرین_char_مقصد_copy] = NUL;
 }
 
-    static void
-set_directories_text(int idx)
+    ساكن فراغ
+مجموعه_directories_متن(صحيح idx)
 {
-    int vimfiles_dir_choice = choices[idx].arg;
+    صحيح vimfiles_dir_choice = choices[idx].arg;
 
-    if (vimfiles_dir_choice == (int)vimfiles_dir_none)
-	alloc_text(idx, "Do NOT create plugin directories%s", "");
-    else
-	alloc_text(idx, "Create plugin directories: %s",
+    إذا (vimfiles_dir_choice == (صحيح)vimfiles_dir_none)
+	alloc_متن(idx, "Do NOT create plugin directories%s", "");
+    وإلا
+	alloc_متن(idx, "Create plugin directories: %s",
 				   vimfiles_dir_choices[vimfiles_dir_choice]);
 }
 
@@ -2141,18 +2141,18 @@ set_directories_text(int idx)
  *
  * This code is based on init_homedir() in misc1.c, keep in sync!
  */
-static char *homedir = NULL;
+ساكن حرف *homedir = عدم;
 
-    void
-init_homedir(void)
+    فراغ
+init_homedir(فراغ)
 {
-    char    *var;
-    char    buf[MAX_PATH];
+    حرف    *var;
+    حرف    buf[MAX_مسیر];
 
-    if (homedir != NULL)
+    إذا (homedir != عدم)
     {
-	free(homedir);
-	homedir = NULL;
+	حرر(homedir);
+	homedir = عدم;
     }
 
     var = getenv("HOME");
@@ -2163,24 +2163,24 @@ init_homedir(void)
      * platforms, $HOMEDRIVE and $HOMEPATH are automatically defined for
      * each user.  Try constructing $HOME from these.
      */
-    if (var == NULL || *var == NUL)
+    إذا (var == عدم || *var == NUL)
     {
-	char	*homedrive, *homepath;
+	حرف	*homedrive, *homepath;
 
 	homedrive = getenv("HOMEDRIVE");
 	homepath = getenv("HOMEPATH");
-	if (homepath == NULL || *homepath == NUL)
+	إذا (homepath == عدم || *homepath == NUL)
 	    homepath = "\\";
-	if (homedrive != NULL
-		   && strlen(homedrive) + strlen(homepath) < sizeof(buf))
+	إذا (homedrive != عدم
+		   && طول_رشته(homedrive) + طول_رشته(homepath) < حجم(buf))
 	{
-	    if (snprintf(buf, sizeof(buf), "%s%s", homedrive, homepath) > 0
+	    إذا (snprintf(buf, حجم(buf), "%s%s", homedrive, homepath) > 0
 		&& buf[0] != NUL)
 		var = buf;
 	}
     }
 
-    if (var == NULL)
+    إذا (var == عدم)
 	var = getenv("USERPROFILE");
 
     /*
@@ -2188,32 +2188,32 @@ init_homedir(void)
      * variable, esp. "%USERPROFILE%".  Happens when $USERPROFILE isn't set
      * when $HOME is being set.
      */
-    if (var != NULL && *var == '%')
+    إذا (var != عدم && *var == '%')
     {
-	char	*p;
-	char	*exp;
+	حرف	*p;
+	حرف	*نمایی_تابع;
 
 	p = strchr(var + 1, '%');
-	if (p != NULL)
+	إذا (p != عدم)
 	{
 	    strncpy(buf, var + 1, p - (var + 1));
 	    buf[p - (var + 1)] = NUL;
-	    exp = getenv(buf);
-	    if (exp != NULL && *exp != NUL
-				&& strlen(exp) + strlen(p) < sizeof(buf))
+	    نمایی_تابع = getenv(buf);
+	    إذا (نمایی_تابع != عدم && *نمایی_تابع != NUL
+				&& طول_رشته(نمایی_تابع) + طول_رشته(p) < حجم(buf))
 	    {
-		snprintf(buf, sizeof(buf), "%s%s", exp, p + 1);
+		snprintf(buf, حجم(buf), "%s%s", نمایی_تابع, p + 1);
 		var = buf;
 	    }
 	}
     }
 
-    if (var != NULL && *var == NUL)	// empty is same as not set
-	var = NULL;
+    إذا (var != عدم && *var == NUL)	// empty is same as not set
+	var = عدم;
 
-    if (var == NULL)
-	homedir = NULL;
-    else
+    إذا (var == عدم)
+	homedir = عدم;
+    وإلا
 	homedir = _strdup(var);
 }
 
@@ -2221,132 +2221,132 @@ init_homedir(void)
  * Change the directory that the vim plugin directories will be created in:
  * $HOME, $VIM or nowhere.
  */
-    static void
-change_directories_choice(int idx)
+    ساكن فراغ
+change_directories_choice(صحيح idx)
 {
-    int	    choice_count = TABLE_SIZE(vimfiles_dir_choices);
+    صحيح	    choice_شمار = جدول_اندازه(vimfiles_dir_choices);
 
     // Don't offer the $HOME choice if $HOME isn't set.
-    if (homedir == NULL)
-	--choice_count;
-    choices[idx].arg = get_choice(vimfiles_dir_choices, choice_count);
-    set_directories_text(idx);
+    إذا (homedir == عدم)
+	--choice_شمار;
+    choices[idx].arg = get_choice(vimfiles_dir_choices, choice_شمار);
+    مجموعه_directories_متن(idx);
 }
 
 /*
  * Create the plugin directories...
  */
 //ARGSUSED
-    static void
-install_vimfilesdir(int idx)
+    ساكن فراغ
+install_vimfilesdir(صحيح idx)
 {
-    int i;
-    int vimfiles_dir_choice = choices[idx].arg;
-    char *p;
-    char vimdir_path[MAX_PATH];
-    char vimfiles_path[MAX_PATH + 9];
-    char tmp_dirname[BUFSIZE];
+    صحيح i;
+    صحيح vimfiles_dir_choice = choices[idx].arg;
+    حرف *p;
+    حرف vimdir_مسیر[MAX_مسیر];
+    حرف vimfiles_مسیر[MAX_مسیر + 9];
+    حرف tmp_dirname[BUFSIZE];
 
     // switch on the location that the user wants the plugin directories
     // built in
-    switch (vimfiles_dir_choice)
+    بدل (vimfiles_dir_choice)
     {
-	case vimfiles_dir_vim:
+	حالة vimfiles_dir_vim:
 	{
 	    // Go to the %VIM% directory - check env first, then go one dir
 	    //	   below installdir if there is no %VIM% environment variable.
 	    //	   The accuracy of $VIM is checked in inspect_system(), so we
 	    //	   can be sure it is ok to use here.
 	    p = getenv("VIM");
-	    if (p == NULL) // No $VIM in path
-		dir_remove_last(installdir, vimdir_path);
-	    else
-		strcpy(vimdir_path, p);
-	    break;
+	    إذا (p == عدم) // No $VIM in path
+		dir_remove_آخرین(installdir, vimdir_مسیر);
+	    وإلا
+		strcpy(vimdir_مسیر, p);
+	    اكسر;
 	}
-	case vimfiles_dir_home:
+	حالة vimfiles_dir_home:
 	{
 	    // Find the $HOME directory.  Its existence was already checked.
 	    p = homedir;
-	    if (p == NULL)
+	    إذا (p == عدم)
 	    {
-		printf("Internal error: $HOME is NULL\n");
+		چاپ_کن("Internal error: $HOME is NULL\n");
 		p = "c:\\";
 	    }
-	    strcpy(vimdir_path, p);
-	    break;
+	    strcpy(vimdir_مسیر, p);
+	    اكسر;
 	}
-	case vimfiles_dir_none:
+	حالة vimfiles_dir_none:
 	{
 	    // Do not create vim plugin directory.
-	    return;
+	    أرجع;
 	}
     }
 
     // Now, just create the directory.	If it already exists, it will fail
     // silently.
-    sprintf(vimfiles_path, "%s\\vimfiles", vimdir_path);
-    vim_mkdir(vimfiles_path, 0755);
+    sprintf(vimfiles_مسیر, "%s\\vimfiles", vimdir_مسیر);
+    vim_mkdir(vimfiles_مسیر, 0755);
 
-    printf("Creating the following directories in \"%s\":\n", vimfiles_path);
-    for (i = 0; i < TABLE_SIZE(vimfiles_subdirs); i++)
+    چاپ_کن("Creating the following directories in \"%s\":\n", vimfiles_مسیر);
+    لكل (i = 0; i < جدول_اندازه(vimfiles_subdirs); i++)
     {
-	sprintf(tmp_dirname, "%s\\%s", vimfiles_path, vimfiles_subdirs[i]);
-	printf("  %s", vimfiles_subdirs[i]);
+	sprintf(tmp_dirname, "%s\\%s", vimfiles_مسیر, vimfiles_subdirs[i]);
+	چاپ_کن("  %s", vimfiles_subdirs[i]);
 	vim_mkdir(tmp_dirname, 0755);
     }
-    printf("\n");
+    چاپ_کن("\n");
 }
 
 /*
  * Add the creation of runtime files to the setup sequence.
  */
-    static void
-init_directories_choice(void)
+    ساكن فراغ
+init_directories_choice(فراغ)
 {
-    struct stat	st;
-    char	tmp_dirname[BUFSIZE];
-    char	*p;
-    int		vimfiles_dir_choice;
+    بنية stat	st;
+    حرف	tmp_dirname[BUFSIZE];
+    حرف	*p;
+    صحيح		vimfiles_dir_choice;
 
-    choices[choice_count].text = alloc(150);
-    choices[choice_count].changefunc = change_directories_choice;
-    choices[choice_count].installfunc = install_vimfilesdir;
-    choices[choice_count].active = 1;
+    choices[choice_شمار].متن = alloc(150);
+    choices[choice_شمار].changefunc = change_directories_choice;
+    choices[choice_شمار].installfunc = install_vimfilesdir;
+    choices[choice_شمار].فعال = 1;
 
     // Check if the "compiler" directory already exists.  That's a good
     // indication that the plugin directories were already created.
     p = getenv("HOME");
-    if (p != NULL)
+    إذا (p != عدم)
     {
-	vimfiles_dir_choice = (int)vimfiles_dir_home;
+	vimfiles_dir_choice = (صحيح)vimfiles_dir_home;
 	sprintf(tmp_dirname, "%s\\vimfiles\\compiler", p);
-	if (stat(tmp_dirname, &st) == 0)
-	    vimfiles_dir_choice = (int)vimfiles_dir_none;
+	إذا (stat(tmp_dirname, &st) == 0)
+	    vimfiles_dir_choice = (صحيح)vimfiles_dir_none;
     }
-    else
+    وإلا
     {
-	vimfiles_dir_choice = (int)vimfiles_dir_vim;
+	vimfiles_dir_choice = (صحيح)vimfiles_dir_vim;
 	p = getenv("VIM");
-	if (p == NULL)  // No $VIM in path, use the install dir.
-	    dir_remove_last(installdir, tmp_dirname);
-	else
+	إذا (p == عدم)  // No $VIM in path, use the install dir.
+	    dir_remove_آخرین(installdir, tmp_dirname);
+	وإلا
 	    strcpy(tmp_dirname, p);
 	strcat(tmp_dirname, "\\vimfiles\\compiler");
-	if (stat(tmp_dirname, &st) == 0)
-	    vimfiles_dir_choice = (int)vimfiles_dir_none;
+	إذا (stat(tmp_dirname, &st) == 0)
+	    vimfiles_dir_choice = (صحيح)vimfiles_dir_none;
     }
 
-    choices[choice_count].arg = vimfiles_dir_choice;
-    set_directories_text(choice_count);
-    ++choice_count;
+    choices[choice_شمار].arg = vimfiles_dir_choice;
+    مجموعه_directories_متن(choice_شمار);
+    ++choice_شمار;
 }
 
 /*
  * Setup the choices and the default values.
  */
-    static void
-setup_choices(void)
+    ساكن فراغ
+راهاندازی_choices(فراغ)
 {
     // install the batch files
     init_bat_choices();
@@ -2370,163 +2370,163 @@ setup_choices(void)
     init_directories_choice();
 }
 
-    static void
-print_cmd_line_help(void)
+    ساكن فراغ
+print_cmd_سطر_help(فراغ)
 {
-    printf("Vim installer non-interactive command line arguments:\n");
-    printf("\n");
-    printf("-create-batfiles  [vim gvim evim view gview vimdiff gvimdiff]\n");
-    printf("    Create .bat files for Vim variants in the Windows directory.\n");
-    printf("-create-vimrc\n");
-    printf("    Create a default _vimrc file if one does not already exist.\n");
-    printf("-vimrc-remap [no|win]\n");
-    printf("    Remap keys when creating a default _vimrc file.\n");
-    printf("-vimrc-behave [unix|mswin|default]\n");
-    printf("    Set mouse behavior when creating a default _vimrc file.\n");
-    printf("-vimrc-compat [vi|vim|defaults|all]\n");
-    printf("    Set Vi compatibility when creating a default _vimrc file.\n");
-    printf("-install-popup\n");
-    printf("    Install the Edit-with-Vim context menu entry\n");
-    printf("-install-openwith\n");
-    printf("    Add Vim to the \"Open With...\" context menu list\n");
-    printf("-add-start-menu");
-    printf("    Add Vim to the start menu\n");
-    printf("-install-icons");
-    printf("    Create icons for gVim executables on the desktop\n");
-    printf("-create-directories [vim|home]\n");
-    printf("    Create runtime directories to drop plugins into; in the $VIM\n");
-    printf("    or $HOME directory\n");
-    printf("-register-OLE");
-    printf("    Ignored\n");
-    printf("\n");
+    چاپ_کن("Vim installer non-interactive command line arguments:\n");
+    چاپ_کن("\n");
+    چاپ_کن("-create-batfiles  [vim gvim evim view gview vimdiff gvimdiff]\n");
+    چاپ_کن("    Create .bat files for Vim variants in the Windows directory.\n");
+    چاپ_کن("-create-vimrc\n");
+    چاپ_کن("    Create a default _vimrc file if one does not already exist.\n");
+    چاپ_کن("-vimrc-remap [no|win]\n");
+    چاپ_کن("    Remap keys when creating a default _vimrc file.\n");
+    چاپ_کن("-vimrc-behave [unix|mswin|default]\n");
+    چاپ_کن("    Set mouse behavior when creating a default _vimrc file.\n");
+    چاپ_کن("-vimrc-compat [vi|vim|defaults|all]\n");
+    چاپ_کن("    Set Vi compatibility when creating a default _vimrc file.\n");
+    چاپ_کن("-install-popup\n");
+    چاپ_کن("    Install the Edit-with-Vim context menu entry\n");
+    چاپ_کن("-install-openwith\n");
+    چاپ_کن("    Add Vim to the \"Open With...\" context menu list\n");
+    چاپ_کن("-add-start-menu");
+    چاپ_کن("    Add Vim to the start menu\n");
+    چاپ_کن("-install-icons");
+    چاپ_کن("    Create icons for gVim executables on the desktop\n");
+    چاپ_کن("-create-directories [vim|home]\n");
+    چاپ_کن("    Create runtime directories to drop plugins into; in the $VIM\n");
+    چاپ_کن("    or $HOME directory\n");
+    چاپ_کن("-register-OLE");
+    چاپ_کن("    Ignored\n");
+    چاپ_کن("\n");
 }
 
 /*
  * Setup installation choices based on command line switches
  */
-    static void
-command_line_setup_choices(int argc, char **argv)
+    ساكن فراغ
+command_سطر_راهاندازی_choices(صحيح argc, حرف **argv)
 {
-    int i, j;
+    صحيح i, j;
 
-    for (i = 1; i < argc; i++)
+    لكل (i = 1; i < argc; i++)
     {
-	if (strcmp(argv[i], "-create-batfiles") == 0)
+	إذا (strcmp(argv[i], "-create-batfiles") == 0)
 	{
-	    if (i + 1 == argc)
-		continue;
-	    while (argv[i + 1][0] != '-' && i < argc)
+	    إذا (i + 1 == argc)
+		استمر;
+	    طالما (argv[i + 1][0] != '-' && i < argc)
 	    {
 		i++;
-		for (j = 1; j < TARGET_COUNT; ++j)
-		    if ((targets[j].exenamearg[0] == 'g' ? has_gvim : has_vim)
+		لكل (j = 1; j < هدف_شمار; ++j)
+		    إذا ((targets[j].exenamearg[0] == 'g' ? has_gvim : has_vim)
 			    && strcmp(argv[i], targets[j].name) == 0)
 		    {
 			init_bat_choice(j);
-			break;
+			اكسر;
 		    }
-		if (j == TARGET_COUNT)
-		    printf("%s is not a valid choice for -create-batfiles\n",
+		إذا (j == هدف_شمار)
+		    چاپ_کن("%s is not a valid choice for -create-batfiles\n",
 								     argv[i]);
 
-		if (i + 1 == argc)
-		    break;
+		إذا (i + 1 == argc)
+		    اكسر;
 	    }
 	}
-	else if (strcmp(argv[i], "-create-vimrc") == 0)
+	وإلا إذا (strcmp(argv[i], "-create-vimrc") == 0)
 	{
 	    // Setup default vimrc choices.  If there is already a _vimrc file,
 	    // it will NOT be overwritten.
 	    init_vimrc_choices();
 	}
-	else if (strcmp(argv[i], "-vimrc-remap") == 0)
+	وإلا إذا (strcmp(argv[i], "-vimrc-remap") == 0)
 	{
-	    if (i + 1 == argc)
-		break;
+	    إذا (i + 1 == argc)
+		اكسر;
 	    i++;
-	    if (strcmp(argv[i], "no") == 0)
+	    إذا (strcmp(argv[i], "no") == 0)
 		remap_choice = remap_no;
-	    else if (strcmp(argv[i], "win") == 0)
+	    وإلا إذا (strcmp(argv[i], "win") == 0)
 		remap_choice = remap_win;
 	}
-	else if (strcmp(argv[i], "-vimrc-behave") == 0)
+	وإلا إذا (strcmp(argv[i], "-vimrc-behave") == 0)
 	{
-	    if (i + 1 == argc)
-		break;
+	    إذا (i + 1 == argc)
+		اكسر;
 	    i++;
-	    if (strcmp(argv[i], "unix") == 0)
+	    إذا (strcmp(argv[i], "unix") == 0)
 		mouse_choice = mouse_xterm;
-	    else if (strcmp(argv[i], "mswin") == 0)
+	    وإلا إذا (strcmp(argv[i], "mswin") == 0)
 		mouse_choice = mouse_mswin;
-	    else if (strcmp(argv[i], "default") == 0)
+	    وإلا إذا (strcmp(argv[i], "default") == 0)
 		mouse_choice = mouse_default;
 	}
-	else if (strcmp(argv[i], "-vimrc-compat") == 0)
+	وإلا إذا (strcmp(argv[i], "-vimrc-compat") == 0)
 	{
-	    if (i + 1 == argc)
-		break;
+	    إذا (i + 1 == argc)
+		اكسر;
 	    i++;
-	    if (strcmp(argv[i], "vi") == 0)
+	    إذا (strcmp(argv[i], "vi") == 0)
 		compat_choice = compat_vi;
-	    else if (strcmp(argv[i], "vim") == 0)
+	    وإلا إذا (strcmp(argv[i], "vim") == 0)
 		compat_choice = compat_vim;
-	    else if (strcmp(argv[i], "defaults") == 0)
+	    وإلا إذا (strcmp(argv[i], "defaults") == 0)
 		compat_choice = compat_some_enhancements;
-	    else if (strcmp(argv[i], "all") == 0)
+	    وإلا إذا (strcmp(argv[i], "all") == 0)
 		compat_choice = compat_all_enhancements;
 	}
-	else if (strcmp(argv[i], "-install-popup") == 0)
+	وإلا إذا (strcmp(argv[i], "-install-popup") == 0)
 	{
 	    init_popup_choice();
 	}
-	else if (strcmp(argv[i], "-install-openwith") == 0)
+	وإلا إذا (strcmp(argv[i], "-install-openwith") == 0)
 	{
 	    init_openwith_choice();
 	}
-	else if (strcmp(argv[i], "-add-start-menu") == 0)
+	وإلا إذا (strcmp(argv[i], "-add-start-menu") == 0)
 	{
 	    init_startmenu_choice();
 	}
-	else if (strcmp(argv[i], "-install-icons") == 0)
+	وإلا إذا (strcmp(argv[i], "-install-icons") == 0)
 	{
 	    init_shortcut_choices();
 	}
-	else if (strcmp(argv[i], "-create-directories") == 0)
+	وإلا إذا (strcmp(argv[i], "-create-directories") == 0)
 	{
-	    int vimfiles_dir_choice = (int)vimfiles_dir_none;
+	    صحيح vimfiles_dir_choice = (صحيح)vimfiles_dir_none;
 
 	    init_directories_choice();
-	    if (i + 1 < argc && argv[i + 1][0] != '-')
+	    إذا (i + 1 < argc && argv[i + 1][0] != '-')
 	    {
 		i++;
-		if (strcmp(argv[i], "vim") == 0)
-		    vimfiles_dir_choice = (int)vimfiles_dir_vim;
-		else if (strcmp(argv[i], "home") == 0)
+		إذا (strcmp(argv[i], "vim") == 0)
+		    vimfiles_dir_choice = (صحيح)vimfiles_dir_vim;
+		وإلا إذا (strcmp(argv[i], "home") == 0)
 		{
-		    if (homedir == NULL)  // No $HOME in environment
-			vimfiles_dir_choice = (int)vimfiles_dir_none;
-		    else
-			vimfiles_dir_choice = (int)vimfiles_dir_home;
+		    إذا (homedir == عدم)  // No $HOME in environment
+			vimfiles_dir_choice = (صحيح)vimfiles_dir_none;
+		    وإلا
+			vimfiles_dir_choice = (صحيح)vimfiles_dir_home;
 		}
-		else
+		وإلا
 		{
-		    printf("Unknown argument for -create-directories: %s\n",
+		    چاپ_کن("Unknown argument for -create-directories: %s\n",
 								     argv[i]);
-		    print_cmd_line_help();
+		    print_cmd_سطر_help();
 		}
 	    }
-	    else // No choice specified, default to vim directory
-		vimfiles_dir_choice = (int)vimfiles_dir_vim;
-	    choices[choice_count - 1].arg = vimfiles_dir_choice;
+	    وإلا // No choice specified, default to vim directory
+		vimfiles_dir_choice = (صحيح)vimfiles_dir_vim;
+	    choices[choice_شمار - 1].arg = vimfiles_dir_choice;
 	}
-	else if (strcmp(argv[i], "-register-OLE") == 0)
+	وإلا إذا (strcmp(argv[i], "-register-OLE") == 0)
 	{
 	    // This is always done when gvim is found
 	}
-	else // Unknown switch
+	وإلا // Unknown switch
 	{
-	    printf("Got unknown argument argv[%d] = %s\n", i, argv[i]);
-	    print_cmd_line_help();
+	    چاپ_کن("Got unknown argument argv[%d] = %s\n", i, argv[i]);
+	    print_cmd_سطر_help();
 	}
     }
 }
@@ -2535,10 +2535,10 @@ command_line_setup_choices(int argc, char **argv)
 /*
  * Show a few screens full of helpful information.
  */
-    static void
-show_help(void)
+    ساكن فراغ
+show_help(فراغ)
 {
-    static char *(items[]) =
+    ساكن حرف *(اقلام[]) =
     {
 "Installing .bat files\n"
 "---------------------\n"
@@ -2634,92 +2634,92 @@ show_help(void)
 "This choice allows creating them in $HOME (if you have a home directory) or\n"
 "$VIM (used for everybody on the system).\n"
 ,
-NULL
+عدم
     };
-    int		i;
-    int		c;
+    صحيح		i;
+    صحيح		c;
 
     rewind(stdin);
-    printf("\n");
-    for (i = 0; items[i] != NULL; ++i)
+    چاپ_کن("\n");
+    لكل (i = 0; اقلام[i] != عدم; ++i)
     {
-	puts(items[i]);
-	printf("Hit Enter to continue, b (back) or q (quit help): ");
+	puts(اقلام[i]);
+	چاپ_کن("Hit Enter to continue, b (back) or q (quit help): ");
 	c = getchar();
 	rewind(stdin);
-	if (c == 'b' || c == 'B')
+	إذا (c == 'b' || c == 'B')
 	{
-	    if (i == 0)
+	    إذا (i == 0)
 		--i;
-	    else
+	    وإلا
 		i -= 2;
 	}
-	if (c == 'q' || c == 'Q')
-	    break;
-	printf("\n");
+	إذا (c == 'q' || c == 'Q')
+	    اكسر;
+	چاپ_کن("\n");
     }
 }
 
 /*
  * Install the choices.
  */
-    static void
-install(void)
+    ساكن فراغ
+install(فراغ)
 {
-    int		i;
+    صحيح		i;
 
     // Install the selected choices.
-    for (i = 0; i < choice_count; ++i)
-	if (choices[i].installfunc != NULL && choices[i].active)
+    لكل (i = 0; i < choice_شمار; ++i)
+	إذا (choices[i].installfunc != عدم && choices[i].فعال)
 	    (choices[i].installfunc)(i);
 
     // Add some entries to the registry, if needed.
-    if (install_popup
+    إذا (install_popup
 	    || install_openwith
-	    || (need_uninstall_entry && interactive)
+	    || (need_uninstall_مدخل && interactive)
 	    || !interactive)
 	install_registry();
 
     // Register gvim with OLE.
-    if (has_gvim)
-	install_OLE_register();
+    إذا (has_gvim)
+	install_OLE_ثبات();
 }
 
 /*
  * request_choice
  */
-    static void
-request_choice(void)
+    ساكن فراغ
+request_choice(فراغ)
 {
-    int		      i;
+    صحيح		      i;
 
-    printf("\n\nInstall will do for you:\n");
-    for (i = 0; i < choice_count; ++i)
-	if (choices[i].active)
-	    printf("%2d  %s\n", i + 1, choices[i].text);
-    printf("To change an item, enter its number\n\n");
-    printf("Enter item number, h (help), d (do it) or q (quit): ");
+    چاپ_کن("\n\nInstall will do for you:\n");
+    لكل (i = 0; i < choice_شمار; ++i)
+	إذا (choices[i].فعال)
+	    چاپ_کن("%2d  %s\n", i + 1, choices[i].متن);
+    چاپ_کن("To change an item, enter its number\n\n");
+    چاپ_کن("Enter item number, h (help), d (do it) or q (quit): ");
 }
 
-    int
-main(int argc, char **argv)
+    صحيح
+اصلی(صحيح argc, حرف **argv)
 {
-    int		i;
-    char	buf[BUFSIZE];
+    صحيح		i;
+    حرف	buf[BUFSIZE];
 
     /*
      * Run interactively if there are no command line arguments.
      */
-    if (argc > 1)
+    إذا (argc > 1)
 	interactive = 0;
-    else
+    وإلا
 	interactive = 1;
 
     // Initialize this program.
     do_inits(argv);
     init_homedir();
 
-    if (argc > 1 && strcmp(argv[1], "-uninstall-check") == 0)
+    إذا (argc > 1 && strcmp(argv[1], "-uninstall-check") == 0)
     {
 	// Only check for already installed Vims.  Used by NSIS installer.
 	i = uninstall_check(1);
@@ -2730,76 +2730,76 @@ main(int argc, char **argv)
 
 	// When nothing found exit quietly.  If something found wait for
 	// a little while, so that the user can read the messages.
-	if (i && _isatty(1))
+	إذا (i && _isatty(1))
 	    sleep(3);
-	exit(0);
+	خروج(0);
     }
 
-    printf("This program sets up the installation of Vim "
-						   VIM_VERSION_MEDIUM "\n\n");
+    چاپ_کن("This program sets up the installation of Vim "
+						   VIM_نسخه_MEDIUM "\n\n");
 
     // Check if the user unpacked the archives properly.
     check_unpack();
 
     // Check for already installed Vims.
-    if (interactive)
+    إذا (interactive)
 	uninstall_check(0);
 
     // Find out information about the system.
     inspect_system();
 
-    if (interactive)
+    إذا (interactive)
     {
 	// Setup all the choices.
-	setup_choices();
+	راهاندازی_choices();
 
 	// Let the user change choices and finally install (or quit).
-	for (;;)
+	لكل (;;)
 	{
 	    request_choice();
 	    rewind(stdin);
-	    if (scanf("%99s", buf) == 1)
+	    إذا (scanf("%99s", buf) == 1)
 	    {
-		if (isdigit((unsigned char)buf[0]))
+		إذا (آیا_رقم((بیعلامت حرف)buf[0]))
 		{
 		    // Change a choice.
 		    i = atoi(buf);
-		    if (i > 0 && i <= choice_count && choices[i - 1].active)
+		    إذا (i > 0 && i <= choice_شمار && choices[i - 1].فعال)
 			(choices[i - 1].changefunc)(i - 1);
-		    else
-			printf("\nIllegal choice\n");
+		    وإلا
+			چاپ_کن("\nIllegal choice\n");
 		}
-		else if (buf[0] == 'h' || buf[0] == 'H')
+		وإلا إذا (buf[0] == 'h' || buf[0] == 'H')
 		{
 		    // Help
 		    show_help();
 		}
-		else if (buf[0] == 'd' || buf[0] == 'D')
+		وإلا إذا (buf[0] == 'd' || buf[0] == 'D')
 		{
 		    // Install!
 		    install();
-		    printf("\nThat finishes the installation.  Happy Vimming!\n");
-		    break;
+		    چاپ_کن("\nThat finishes the installation.  Happy Vimming!\n");
+		    اكسر;
 		}
-		else if (buf[0] == 'q' || buf[0] == 'Q')
+		وإلا إذا (buf[0] == 'q' || buf[0] == 'Q')
 		{
 		    // Quit
-		    printf("\nExiting without anything done\n");
-		    break;
+		    چاپ_کن("\nExiting without anything done\n");
+		    اكسر;
 		}
-		else
-		    printf("\nIllegal choice\n");
+		وإلا
+		    چاپ_کن("\nIllegal choice\n");
 	    }
 	}
-	printf("\n");
+	چاپ_کن("\n");
 	myexit(0);
     }
-    else
+    وإلا
     {
 	/*
 	 * Run non-interactive - setup according to the command line switches
 	 */
-	command_line_setup_choices(argc, argv);
+	command_سطر_راهاندازی_choices(argc, argv);
 	install();
 
 	// Avoid that the user has to hit Enter, just wait a little bit to
@@ -2807,5 +2807,5 @@ main(int argc, char **argv)
 	sleep(2);
     }
 
-    return 0;
+    أرجع 0;
 }

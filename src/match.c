@@ -11,11 +11,11 @@
  * match.c: functions for highlighting matches
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_SEARCH_EXTRA)
+#إذا defined(FEAT_جستجو_EXTRA)
 
-# define SEARCH_HL_PRIORITY 0
+# define جستجو_HL_اولویت 0
 
 /*
  * Add match to the match list of window "wp".
@@ -26,163 +26,163 @@
  * If no particular ID is desired, -1 must be specified for "id".
  * Return ID of added match, -1 on failure.
  */
-    static int
-match_add(
+    ساكن صحيح
+تطابق_جمع_کن(
     win_T	*wp,
     char_u	*grp,
     char_u	*pat,
-    int		prio,
-    int		id,
+    صحيح		prio,
+    صحيح		id,
     list_T	*pos_list,
-    char_u      *conceal_char UNUSED) // pointer to conceal replacement char
+    char_u      *conceal_char استفادهنشده) // pointer to conceal replacement char
 {
     matchitem_T	*cur;
     matchitem_T	*prev;
-    matchitem_T	*m = NULL;
-    int		hlg_id;
-    regprog_T	*regprog = NULL;
-    int		rtype = UPD_SOME_VALID;
+    matchitem_T	*m = عدم;
+    صحيح		hlg_id;
+    regprog_T	*regprog = عدم;
+    صحيح		rtype = UPD_SOME_VALID;
 
-    if (*grp == NUL || (pat != NULL && *pat == NUL))
-	return -1;
-    if (id < -1 || id == 0)
+    إذا (*grp == NUL || (pat != عدم && *pat == NUL))
+	أرجع -1;
+    إذا (id < -1 || id == 0)
     {
-	semsg(_(e_invalid_id_nr_must_be_greater_than_or_equal_to_one_1), id);
-	return -1;
+	semsg(_(e_invalid_id_nr_must_be_greater_than_or_equal_مقصد_one_1), id);
+	أرجع -1;
     }
-    if (id == -1)
+    إذا (id == -1)
     {
 	// use the next available match ID
-	id = wp->w_next_match_id++;
+	id = wp->w_بعدی_تطابق_id++;
     }
-    else
+    وإلا
     {
 	// check the given ID is not already in use
-	for (cur = wp->w_match_head; cur != NULL; cur = cur->mit_next)
-	    if (cur->mit_id == id)
+	لكل (cur = wp->w_تطابق_سر; cur != عدم; cur = cur->mit_بعدی)
+	    إذا (cur->mit_id == id)
 	    {
-		semsg(_(e_id_already_taken_nr), id);
-		return -1;
+		semsg(_(e_id_already_گرفته_nr), id);
+		أرجع -1;
 	    }
 
 	// Make sure the next match ID is always higher than the highest
 	// manually selected ID.  Add some extra in case a few more IDs are
 	// added soon.
-	if (wp->w_next_match_id < id + 100)
-	    wp->w_next_match_id = id + 100;
+	إذا (wp->w_بعدی_تطابق_id < id + 100)
+	    wp->w_بعدی_تطابق_id = id + 100;
     }
 
-    if ((hlg_id = syn_namen2id(grp, (int)STRLEN(grp))) == 0)
+    إذا ((hlg_id = syn_namen2id(grp, (صحيح)STRLEN(grp))) == 0)
     {
-	semsg(_(e_no_such_highlight_group_name_str), grp);
-	return -1;
+	semsg(_(e_no_such_highlight_گروه_name_str), grp);
+	أرجع -1;
     }
-    if (pat != NULL && (regprog = vim_regcomp(pat, RE_MAGIC)) == NULL)
+    إذا (pat != عدم && (regprog = vim_regcomp(pat, RE_MAGIC)) == عدم)
     {
-	semsg(_(e_invalid_argument_str), pat);
-	return -1;
+	semsg(_(e_invalid_آرگومان_str), pat);
+	أرجع -1;
     }
 
     // Build new match.
     m = ALLOC_CLEAR_ONE(matchitem_T);
-    if (m == NULL)
-	goto fail;
-    if (pos_list != NULL && pos_list->lv_len > 0)
+    إذا (m == عدم)
+	اذهب fail;
+    إذا (pos_list != عدم && pos_list->lv_len > 0)
     {
 	m->mit_pos_array = ALLOC_CLEAR_MULT(llpos_T, pos_list->lv_len);
-	if (m->mit_pos_array == NULL)
-	    goto fail;
-	m->mit_pos_count = pos_list->lv_len;
+	إذا (m->mit_pos_array == عدم)
+	    اذهب fail;
+	m->mit_pos_شمار = pos_list->lv_len;
     }
     m->mit_id = id;
-    m->mit_priority = prio;
-    m->mit_pattern = pat == NULL ? NULL : vim_strsave(pat);
+    m->mit_اولویت = prio;
+    m->mit_الگو = pat == عدم ? عدم : vim_strsave(pat);
     m->mit_hlg_id = hlg_id;
-    m->mit_match.regprog = regprog;
-    m->mit_match.rmm_ic = FALSE;
-    m->mit_match.rmm_maxcol = 0;
-# if defined(FEAT_CONCEAL)
+    m->mit_تطابق.regprog = regprog;
+    m->mit_تطابق.rmm_ic = FALSE;
+    m->mit_تطابق.rmm_maxcol = 0;
+# إذا defined(FEAT_CONCEAL)
     m->mit_conceal_char = 0;
-    if (conceal_char != NULL)
+    إذا (conceal_char != عدم)
 	m->mit_conceal_char = (*mb_ptr2char)(conceal_char);
 # endif
 
     // Set up position matches
-    if (pos_list != NULL)
+    إذا (pos_list != عدم)
     {
 	linenr_T	toplnum = 0;
 	linenr_T	botlnum = 0;
 	listitem_T	*li;
-	int		i;
+	صحيح		i;
 
 	CHECK_LIST_MATERIALIZE(pos_list);
-	for (i = 0, li = pos_list->lv_first; li != NULL; i++, li = li->li_next)
+	لكل (i = 0, li = pos_list->lv_اولی; li != عدم; i++, li = li->li_بعدی)
 	{
 	    linenr_T	lnum = 0;
-	    colnr_T	col = 0;
-	    int		len = 1;
+	    colnr_T	ستون = 0;
+	    صحيح		len = 1;
 	    list_T	*subl;
 	    listitem_T	*subli;
-	    int		error = FALSE;
+	    صحيح		error = FALSE;
 
-	    if (li->li_tv.v_type == VAR_LIST)
+	    إذا (li->li_tv.v_type == VAR_LIST)
 	    {
 		subl = li->li_tv.vval.v_list;
-		if (subl == NULL)
-		    goto fail;
-		subli = subl->lv_first;
-		if (subli == NULL)
-		    goto fail;
-		lnum = tv_get_number_chk(&subli->li_tv, &error);
-		if (error == TRUE)
-		    goto fail;
-		if (lnum == 0)
+		إذا (subl == عدم)
+		    اذهب fail;
+		subli = subl->lv_اولی;
+		إذا (subli == عدم)
+		    اذهب fail;
+		lnum = tv_get_عدد_chk(&subli->li_tv, &error);
+		إذا (error == TRUE)
+		    اذهب fail;
+		إذا (lnum == 0)
 		{
 		    --i;
-		    continue;
+		    استمر;
 		}
 		m->mit_pos_array[i].lnum = lnum;
-		subli = subli->li_next;
-		if (subli != NULL)
+		subli = subli->li_بعدی;
+		إذا (subli != عدم)
 		{
-		    col = tv_get_number_chk(&subli->li_tv, &error);
-		    if (error == TRUE)
-			goto fail;
-		    subli = subli->li_next;
-		    if (subli != NULL)
+		    ستون = tv_get_عدد_chk(&subli->li_tv, &error);
+		    إذا (error == TRUE)
+			اذهب fail;
+		    subli = subli->li_بعدی;
+		    إذا (subli != عدم)
 		    {
-			len = tv_get_number_chk(&subli->li_tv, &error);
-			if (error == TRUE)
-			    goto fail;
+			len = tv_get_عدد_chk(&subli->li_tv, &error);
+			إذا (error == TRUE)
+			    اذهب fail;
 		    }
 		}
-		m->mit_pos_array[i].col = col;
+		m->mit_pos_array[i].ستون = ستون;
 		m->mit_pos_array[i].len = len;
 	    }
-	    else if (li->li_tv.v_type == VAR_NUMBER)
+	    وإلا إذا (li->li_tv.v_type == VAR_عدد)
 	    {
-		if (li->li_tv.vval.v_number == 0)
+		إذا (li->li_tv.vval.v_عدد == 0)
 		{
 		    --i;
-		    continue;
+		    استمر;
 		}
-		m->mit_pos_array[i].lnum = li->li_tv.vval.v_number;
-		m->mit_pos_array[i].col = 0;
+		m->mit_pos_array[i].lnum = li->li_tv.vval.v_عدد;
+		m->mit_pos_array[i].ستون = 0;
 		m->mit_pos_array[i].len = 0;
 	    }
-	    else
+	    وإلا
 	    {
-		emsg(_(e_list_or_number_required));
-		goto fail;
+		emsg(_(e_list_or_عدد_required));
+		اذهب fail;
 	    }
-	    if (toplnum == 0 || lnum < toplnum)
+	    إذا (toplnum == 0 || lnum < toplnum)
 		toplnum = lnum;
-	    if (botlnum == 0 || lnum >= botlnum)
+	    إذا (botlnum == 0 || lnum >= botlnum)
 		botlnum = lnum + 1;
 	}
 
 	// Calculate top and bottom lines for redrawing area
-	if (toplnum != 0)
+	إذا (toplnum != 0)
 	{
 	    redraw_win_range_later(wp, toplnum, botlnum);
 	    m->mit_toplnum = toplnum;
@@ -193,69 +193,69 @@ match_add(
 
     // Insert new match.  The match list is in ascending order with regard to
     // the match priorities.
-    cur = wp->w_match_head;
+    cur = wp->w_تطابق_سر;
     prev = cur;
-    while (cur != NULL && prio >= cur->mit_priority)
+    طالما (cur != عدم && prio >= cur->mit_اولویت)
     {
 	prev = cur;
-	cur = cur->mit_next;
+	cur = cur->mit_بعدی;
     }
-    if (cur == prev)
-	wp->w_match_head = m;
-    else
-	prev->mit_next = m;
-    m->mit_next = cur;
+    إذا (cur == prev)
+	wp->w_تطابق_سر = m;
+    وإلا
+	prev->mit_بعدی = m;
+    m->mit_بعدی = cur;
 
     redraw_win_later(wp, rtype);
-    return id;
+    أرجع id;
 
 fail:
     vim_regfree(regprog);
-    if (m != NULL)
+    إذا (m != عدم)
     {
-	vim_free(m->mit_pattern);
+	vim_free(m->mit_الگو);
 	vim_free(m->mit_pos_array);
 	vim_free(m);
     }
-    return -1;
+    أرجع -1;
 }
 
 /*
  * Delete match with ID 'id' in the match list of window 'wp'.
  * Print error messages if 'perr' is TRUE.
  */
-    static int
-match_delete(win_T *wp, int id, int perr)
+    ساكن صحيح
+تطابق_delete(win_T *wp, صحيح id, صحيح perr)
 {
-    matchitem_T	*cur = wp->w_match_head;
+    matchitem_T	*cur = wp->w_تطابق_سر;
     matchitem_T	*prev = cur;
-    int		rtype = UPD_SOME_VALID;
+    صحيح		rtype = UPD_SOME_VALID;
 
-    if (id < 1)
+    إذا (id < 1)
     {
-	if (perr == TRUE)
-	    semsg(_(e_invalid_id_nr_must_be_greater_than_or_equal_to_one_2),
+	إذا (perr == TRUE)
+	    semsg(_(e_invalid_id_nr_must_be_greater_than_or_equal_مقصد_one_2),
 									   id);
-	return -1;
+	أرجع -1;
     }
-    while (cur != NULL && cur->mit_id != id)
+    طالما (cur != عدم && cur->mit_id != id)
     {
 	prev = cur;
-	cur = cur->mit_next;
+	cur = cur->mit_بعدی;
     }
-    if (cur == NULL)
+    إذا (cur == عدم)
     {
-	if (perr == TRUE)
-	    semsg(_(e_id_not_found_nr), id);
-	return -1;
+	إذا (perr == TRUE)
+	    semsg(_(e_id_not_یافت_nr), id);
+	أرجع -1;
     }
-    if (cur == prev)
-	wp->w_match_head = cur->mit_next;
-    else
-	prev->mit_next = cur->mit_next;
-    vim_regfree(cur->mit_match.regprog);
-    vim_free(cur->mit_pattern);
-    if (cur->mit_toplnum != 0)
+    إذا (cur == prev)
+	wp->w_تطابق_سر = cur->mit_بعدی;
+    وإلا
+	prev->mit_بعدی = cur->mit_بعدی;
+    vim_regfree(cur->mit_تطابق.regprog);
+    vim_free(cur->mit_الگو);
+    إذا (cur->mit_toplnum != 0)
     {
 	redraw_win_range_later(wp, cur->mit_toplnum, cur->mit_botlnum);
 	rtype = UPD_VALID;
@@ -263,25 +263,25 @@ match_delete(win_T *wp, int id, int perr)
     vim_free(cur->mit_pos_array);
     vim_free(cur);
     redraw_win_later(wp, rtype);
-    return 0;
+    أرجع 0;
 }
 
 /*
  * Delete all matches in the match list of window 'wp'.
  */
-    void
+    فراغ
 clear_matches(win_T *wp)
 {
     matchitem_T *m;
 
-    while (wp->w_match_head != NULL)
+    طالما (wp->w_تطابق_سر != عدم)
     {
-	m = wp->w_match_head->mit_next;
-	vim_regfree(wp->w_match_head->mit_match.regprog);
-	vim_free(wp->w_match_head->mit_pattern);
-	vim_free(wp->w_match_head->mit_pos_array);
-	vim_free(wp->w_match_head);
-	wp->w_match_head = m;
+	m = wp->w_تطابق_سر->mit_بعدی;
+	vim_regfree(wp->w_تطابق_سر->mit_تطابق.regprog);
+	vim_free(wp->w_تطابق_سر->mit_الگو);
+	vim_free(wp->w_تطابق_سر->mit_pos_array);
+	vim_free(wp->w_تطابق_سر);
+	wp->w_تطابق_سر = m;
     }
     redraw_win_later(wp, UPD_SOME_VALID);
 }
@@ -290,45 +290,45 @@ clear_matches(win_T *wp)
  * Get match from ID 'id' in window 'wp'.
  * Return NULL if match not found.
  */
-    static matchitem_T *
-get_match(win_T *wp, int id)
+    ساكن matchitem_T *
+get_تطابق(win_T *wp, صحيح id)
 {
-    matchitem_T *cur = wp->w_match_head;
+    matchitem_T *cur = wp->w_تطابق_سر;
 
-    while (cur != NULL && cur->mit_id != id)
-	cur = cur->mit_next;
-    return cur;
+    طالما (cur != عدم && cur->mit_id != id)
+	cur = cur->mit_بعدی;
+    أرجع cur;
 }
 
 /*
  * Init for calling prepare_search_hl().
  */
-    void
-init_search_hl(win_T *wp, match_T *search_hl)
+    فراغ
+init_جستجو_hl(win_T *wp, تطابق_T *جستجو_hl)
 {
     matchitem_T *cur;
 
     // Setup for match and 'hlsearch' highlighting.  Disable any previous
-    // match
-    cur = wp->w_match_head;
-    while (cur != NULL)
+    //تطابق
+    cur = wp->w_تطابق_سر;
+    طالما (cur != عدم)
     {
-	cur->mit_hl.rm = cur->mit_match;
-	if (cur->mit_hlg_id == 0)
+	cur->mit_hl.rm = cur->mit_تطابق;
+	إذا (cur->mit_hlg_id == 0)
 	    cur->mit_hl.attr = 0;
-	else
+	وإلا
 	    cur->mit_hl.attr = syn_id2attr(cur->mit_hlg_id);
-	cur->mit_hl.buf = wp->w_buffer;
+	cur->mit_hl.buf = wp->w_میانگیر;
 	cur->mit_hl.lnum = 0;
-	cur->mit_hl.first_lnum = 0;
-	cur = cur->mit_next;
+	cur->mit_hl.اولی_lnum = 0;
+	cur = cur->mit_بعدی;
     }
     // Must update this every time since highlight group override can change it.
-    search_hl->attr = HL_ATTR(HLF_L);
+    جستجو_hl->attr = HL_ATTR(HLF_L);
 
-    search_hl->buf = wp->w_buffer;
-    search_hl->lnum = 0;
-    search_hl->first_lnum = 0;
+    جستجو_hl->buf = wp->w_میانگیر;
+    جستجو_hl->lnum = 0;
+    جستجو_hl->اولی_lnum = 0;
     // time limit is set at the toplevel, for all windows
 }
 
@@ -336,60 +336,60 @@ init_search_hl(win_T *wp, match_T *search_hl)
  * If there is a match fill "shl" and return one.
  * Return zero otherwise.
  */
-    static int
-next_search_hl_pos(
-    match_T	    *shl,	// points to a match
+    ساكن صحيح
+بعدی_جستجو_hl_pos(
+    تطابق_T	    *shl,	// points to a match
     linenr_T	    lnum,
-    matchitem_T	    *match,	// match item with positions
+    matchitem_T	    *تطابق,	// match item with positions
     colnr_T	    mincol)	// minimal column for a match
 {
-    int	    i;
-    int	    found = -1;
+    صحيح	    i;
+    صحيح	    یافت = -1;
 
-    for (i = match->mit_pos_cur; i < match->mit_pos_count; i++)
+    لكل (i = تطابق->mit_pos_cur; i < تطابق->mit_pos_شمار; i++)
     {
-	llpos_T	*pos = &match->mit_pos_array[i];
+	llpos_T	*pos = &تطابق->mit_pos_array[i];
 
-	if (pos->lnum == 0)
-	    break;
-	if (pos->len == 0 && pos->col < mincol)
-	    continue;
-	if (pos->lnum == lnum)
+	إذا (pos->lnum == 0)
+	    اكسر;
+	إذا (pos->len == 0 && pos->ستون < mincol)
+	    استمر;
+	إذا (pos->lnum == lnum)
 	{
-	    if (found >= 0)
+	    إذا (یافت >= 0)
 	    {
 		// if this match comes before the one at "found" then swap them
-		if (pos->col < match->mit_pos_array[found].col)
+		إذا (pos->ستون < تطابق->mit_pos_array[یافت].ستون)
 		{
 		    llpos_T	tmp = *pos;
 
-		    *pos = match->mit_pos_array[found];
-		    match->mit_pos_array[found] = tmp;
+		    *pos = تطابق->mit_pos_array[یافت];
+		    تطابق->mit_pos_array[یافت] = tmp;
 		}
 	    }
-	    else
-		found = i;
+	    وإلا
+		یافت = i;
 	}
     }
-    match->mit_pos_cur = 0;
-    if (found >= 0)
+    تطابق->mit_pos_cur = 0;
+    إذا (یافت >= 0)
     {
-	colnr_T	start = match->mit_pos_array[found].col == 0
-				     ? 0 : match->mit_pos_array[found].col - 1;
-	colnr_T	end = match->mit_pos_array[found].col == 0
-			    ? MAXCOL : start + match->mit_pos_array[found].len;
+	colnr_T	شروع = تطابق->mit_pos_array[یافت].ستون == 0
+				     ? 0 : تطابق->mit_pos_array[یافت].ستون - 1;
+	colnr_T	انتها = تطابق->mit_pos_array[یافت].ستون == 0
+			    ? MAXCOL : شروع + تطابق->mit_pos_array[یافت].len;
 
 	shl->lnum = lnum;
 	shl->rm.startpos[0].lnum = 0;
-	shl->rm.startpos[0].col = start;
+	shl->rm.startpos[0].ستون = شروع;
 	shl->rm.endpos[0].lnum = 0;
-	shl->rm.endpos[0].col = end;
+	shl->rm.endpos[0].ستون = انتها;
 	shl->is_addpos = TRUE;
 	shl->has_cursor = FALSE;
-	match->mit_pos_cur = found + 1;
-	return 1;
+	تطابق->mit_pos_cur = یافت + 1;
+	أرجع 1;
     }
-    return 0;
+    أرجع 0;
 }
 
 /*
@@ -400,120 +400,120 @@ next_search_hl_pos(
  * shl->lnum is zero.
  * Careful: Any pointers for buffer lines will become invalid.
  */
-    static void
-next_search_hl(
+    ساكن فراغ
+بعدی_جستجو_hl(
     win_T	    *win,
-    match_T	    *search_hl,
-    match_T	    *shl,	// points to search_hl or a match
+    تطابق_T	    *جستجو_hl,
+    تطابق_T	    *shl,	// points to search_hl or a match
     linenr_T	    lnum,
     colnr_T	    mincol,	// minimal column for a match
     matchitem_T	    *cur)	// to retrieve match positions if any
 {
     linenr_T	l;
     colnr_T	matchcol;
-    long	nmatched;
-    int		called_emsg_before = called_emsg;
-    int		timed_out = FALSE;
+    دراز	nmatched;
+    صحيح		called_emsg_before = called_emsg;
+    صحيح		timed_بیرون = FALSE;
 
     // for :{range}s/pat only highlight inside the range
-    if ((lnum < search_first_line || lnum > search_last_line) && cur == NULL)
+    إذا ((lnum < جستجو_اولی_سطر || lnum > جستجو_آخرین_سطر) && cur == عدم)
     {
 	shl->lnum = 0;
-	return;
+	أرجع;
     }
 
-    if (shl->lnum != 0)
+    إذا (shl->lnum != 0)
     {
 	// Check for three situations:
 	// 1. If the "lnum" is below a previous match, start a new search.
 	// 2. If the previous match includes "mincol", use it.
 	// 3. Continue after the previous match.
 	l = shl->lnum + shl->rm.endpos[0].lnum - shl->rm.startpos[0].lnum;
-	if (lnum > l)
+	إذا (lnum > l)
 	    shl->lnum = 0;
-	else if (lnum < l || shl->rm.endpos[0].col > mincol)
-	    return;
+	وإلا إذا (lnum < l || shl->rm.endpos[0].ستون > mincol)
+	    أرجع;
     }
 
     // Repeat searching for a match until one is found that includes "mincol"
     // or none is found in this line.
-    for (;;)
+    لكل (;;)
     {
 	// Three situations:
 	// 1. No useful previous match: search from start of line.
 	// 2. Not Vi compatible or empty match: continue at next character.
 	//    Break the loop if this is beyond the end of the line.
 	// 3. Vi compatible searching: continue at end of previous match.
-	if (shl->lnum == 0)
+	إذا (shl->lnum == 0)
 	    matchcol = 0;
-	else if (vim_strchr(p_cpo, CPO_SEARCH) == NULL
+	وإلا إذا (vim_strchr(p_cpo, CPO_جستجو) == عدم
 		|| (shl->rm.endpos[0].lnum == 0
-		    && shl->rm.endpos[0].col <= shl->rm.startpos[0].col))
+		    && shl->rm.endpos[0].ستون <= shl->rm.startpos[0].ستون))
 	{
 	    char_u	*ml;
 
-	    matchcol = shl->rm.startpos[0].col;
+	    matchcol = shl->rm.startpos[0].ستون;
 	    ml = ml_get_buf(shl->buf, lnum, FALSE) + matchcol;
-	    if (*ml == NUL)
+	    إذا (*ml == NUL)
 	    {
 		++matchcol;
 		shl->lnum = 0;
-		break;
+		اكسر;
 	    }
-	    if (has_mbyte)
+	    إذا (has_mbyte)
 		matchcol += mb_ptr2len(ml);
-	    else
+	    وإلا
 		++matchcol;
 	}
-	else
-	    matchcol = shl->rm.endpos[0].col;
+	وإلا
+	    matchcol = shl->rm.endpos[0].ستون;
 
 	shl->lnum = lnum;
-	if (shl->rm.regprog != NULL)
+	إذا (shl->rm.regprog != عدم)
 	{
 	    // Remember whether shl->rm is using a copy of the regprog in
 	    // cur->mit_match.
-	    int regprog_is_copy = (shl != search_hl && cur != NULL
+	    صحيح regprog_is_copy = (shl != جستجو_hl && cur != عدم
 			  && shl == &cur->mit_hl
-			  && cur->mit_match.regprog == cur->mit_hl.rm.regprog);
+			  && cur->mit_تطابق.regprog == cur->mit_hl.rm.regprog);
 
 	    nmatched = vim_regexec_multi(&shl->rm, win, shl->buf, lnum,
-							 matchcol, &timed_out);
+							 matchcol, &timed_بیرون);
 	    // Copy the regprog, in case it got freed and recompiled.
-	    if (regprog_is_copy)
-		cur->mit_match.regprog = cur->mit_hl.rm.regprog;
+	    إذا (regprog_is_copy)
+		cur->mit_تطابق.regprog = cur->mit_hl.rm.regprog;
 
-	    if (called_emsg > called_emsg_before || got_int || timed_out)
+	    إذا (called_emsg > called_emsg_before || got_int || timed_بیرون)
 	    {
 		// Error while handling regexp: stop using this regexp.
-		if (shl == search_hl)
+		إذا (shl == جستجو_hl)
 		{
 		    // don't free regprog in the match list, it's a copy
 		    vim_regfree(shl->rm.regprog);
-		    set_no_hlsearch(TRUE);
+		    مجموعه_no_hlsearch(TRUE);
 		}
-		shl->rm.regprog = NULL;
+		shl->rm.regprog = عدم;
 		shl->lnum = 0;
 		got_int = FALSE;  // avoid the "Type :quit to exit Vim" message
-		break;
+		اكسر;
 	    }
 	}
-	else if (cur != NULL)
-	    nmatched = next_search_hl_pos(shl, lnum, cur, matchcol);
-	else
+	وإلا إذا (cur != عدم)
+	    nmatched = بعدی_جستجو_hl_pos(shl, lnum, cur, matchcol);
+	وإلا
 	    nmatched = 0;
-	if (nmatched == 0)
+	إذا (nmatched == 0)
 	{
 	    shl->lnum = 0;		// no match found
-	    break;
+	    اكسر;
 	}
-	if (shl->rm.startpos[0].lnum > 0
-		|| shl->rm.startpos[0].col >= mincol
+	إذا (shl->rm.startpos[0].lnum > 0
+		|| shl->rm.startpos[0].ستون >= mincol
 		|| nmatched > 1
-		|| shl->rm.endpos[0].col > mincol)
+		|| shl->rm.endpos[0].ستون > mincol)
 	{
 	    shl->lnum += shl->rm.startpos[0].lnum;
-	    break;			// useful match found
+	    اكسر;			// useful match found
 	}
     }
 }
@@ -521,74 +521,74 @@ next_search_hl(
 /*
  * Advance to the match in window "wp" line "lnum" or past it.
  */
-    void
-prepare_search_hl(win_T *wp, match_T *search_hl, linenr_T lnum)
+    فراغ
+prepare_جستجو_hl(win_T *wp, تطابق_T *جستجو_hl, linenr_T lnum)
 {
     matchitem_T *cur;		// points to the match list
-    match_T	*shl;		// points to search_hl or a match
-    int		shl_flag;	// flag to indicate whether search_hl
+    تطابق_T	*shl;		// points to search_hl or a match
+    صحيح		shl_flag;	// flag to indicate whether search_hl
 				// has been processed or not
-    int		pos_inprogress;	// marks that position match search is
+    صحيح		pos_inprogress;	// marks that position match search is
 				// in progress
-    int		n;
+    صحيح		n;
 
     // When using a multi-line pattern, start searching at the top
     // of the window or just after a closed fold.
     // Do this both for search_hl and the match list.
-    cur = wp->w_match_head;
+    cur = wp->w_تطابق_سر;
     shl_flag = WIN_IS_POPUP(wp);  // skip search_hl in a popup window
-    while (cur != NULL || shl_flag == FALSE)
+    طالما (cur != عدم || shl_flag == FALSE)
     {
-	if (shl_flag == FALSE)
+	إذا (shl_flag == FALSE)
 	{
-	    shl = search_hl;
+	    shl = جستجو_hl;
 	    shl_flag = TRUE;
 	}
-	else
+	وإلا
 	    shl = &cur->mit_hl;
-	if (shl->rm.regprog != NULL
+	إذا (shl->rm.regprog != عدم
 		&& shl->lnum == 0
 		&& re_multiline(shl->rm.regprog))
 	{
-	    if (shl->first_lnum == 0)
+	    إذا (shl->اولی_lnum == 0)
 	    {
 # ifdef FEAT_FOLDING
-		for (shl->first_lnum = lnum;
-			   shl->first_lnum > wp->w_topline; --shl->first_lnum)
-		    if (hasFoldingWin(wp, shl->first_lnum - 1,
-						      NULL, NULL, TRUE, NULL))
-			break;
-# else
-		shl->first_lnum = wp->w_topline;
+		لكل (shl->اولی_lnum = lnum;
+			   shl->اولی_lnum > wp->w_topline; --shl->اولی_lnum)
+		    إذا (hasFoldingWin(wp, shl->اولی_lnum - 1,
+						      عدم, عدم, TRUE, عدم))
+			اكسر;
+# وإلا
+		shl->اولی_lnum = wp->w_topline;
 # endif
 	    }
-	    if (cur != NULL)
+	    إذا (cur != عدم)
 		cur->mit_pos_cur = 0;
 	    pos_inprogress = TRUE;
 	    n = 0;
-	    while (shl->first_lnum < lnum && (shl->rm.regprog != NULL
-					  || (cur != NULL && pos_inprogress)))
+	    طالما (shl->اولی_lnum < lnum && (shl->rm.regprog != عدم
+					  || (cur != عدم && pos_inprogress)))
 	    {
-		next_search_hl(wp, search_hl, shl, shl->first_lnum, (colnr_T)n,
-					       shl == search_hl ? NULL : cur);
-		pos_inprogress = cur == NULL || cur->mit_pos_cur == 0
+		بعدی_جستجو_hl(wp, جستجو_hl, shl, shl->اولی_lnum, (colnr_T)n,
+					       shl == جستجو_hl ? عدم : cur);
+		pos_inprogress = cur == عدم || cur->mit_pos_cur == 0
 							      ? FALSE : TRUE;
-		if (shl->lnum != 0)
+		إذا (shl->lnum != 0)
 		{
-		    shl->first_lnum = shl->lnum
+		    shl->اولی_lnum = shl->lnum
 				    + shl->rm.endpos[0].lnum
 				    - shl->rm.startpos[0].lnum;
-		    n = shl->rm.endpos[0].col;
+		    n = shl->rm.endpos[0].ستون;
 		}
-		else
+		وإلا
 		{
-		    ++shl->first_lnum;
+		    ++shl->اولی_lnum;
 		    n = 0;
 		}
 	    }
 	}
-	if (shl != search_hl && cur != NULL)
-	    cur = cur->mit_next;
+	إذا (shl != جستجو_hl && cur != عدم)
+	    cur = cur->mit_بعدی;
     }
 }
 
@@ -596,19 +596,19 @@ prepare_search_hl(win_T *wp, match_T *search_hl, linenr_T lnum)
  * Update "shl->has_cursor" based on the match in "shl" and the cursor
  * position.
  */
-    static void
-check_cur_search_hl(win_T *wp, match_T *shl)
+    ساكن فراغ
+check_cur_جستجو_hl(win_T *wp, تطابق_T *shl)
 {
     linenr_T linecount = shl->rm.endpos[0].lnum - shl->rm.startpos[0].lnum;
 
-    if (wp->w_cursor.lnum >= shl->lnum
+    إذا (wp->w_cursor.lnum >= shl->lnum
 	    && wp->w_cursor.lnum <= shl->lnum + linecount
 	    && (wp->w_cursor.lnum > shl->lnum
-				|| wp->w_cursor.col >= shl->rm.startpos[0].col)
+				|| wp->w_cursor.ستون >= shl->rm.startpos[0].ستون)
 	    && (wp->w_cursor.lnum < shl->lnum + linecount
-				  || wp->w_cursor.col < shl->rm.endpos[0].col))
+				  || wp->w_cursor.ستون < shl->rm.endpos[0].ستون))
 	shl->has_cursor = TRUE;
-    else
+    وإلا
 	shl->has_cursor = FALSE;
 }
 
@@ -617,84 +617,84 @@ check_cur_search_hl(win_T *wp, match_T *shl)
  * Return TRUE if there is such highlighting and set "search_attr" to the
  * current highlight attribute.
  */
-    int
-prepare_search_hl_line(
+    صحيح
+prepare_جستجو_hl_سطر(
 	win_T	    *wp,
 	linenr_T    lnum,
 	colnr_T	    mincol,
-	char_u	    **line,
-	match_T	    *search_hl,
-	int	    *search_attr)
+	char_u	    **سطر,
+	تطابق_T	    *جستجو_hl,
+	صحيح	    *جستجو_attr)
 {
     matchitem_T *cur;			// points to the match list
-    match_T	*shl;			// points to search_hl or a match
-    int		shl_flag;		// flag to indicate whether search_hl
+    تطابق_T	*shl;			// points to search_hl or a match
+    صحيح		shl_flag;		// flag to indicate whether search_hl
 					// has been processed or not
-    int		area_highlighting = FALSE;
+    صحيح		area_highlighting = FALSE;
 
     // Handle highlighting the last used search pattern and matches.
     // Do this for both search_hl and the match list.
     // Do not use search_hl in a popup window.
-    cur = wp->w_match_head;
+    cur = wp->w_تطابق_سر;
     shl_flag = WIN_IS_POPUP(wp);
-    while (cur != NULL || shl_flag == FALSE)
+    طالما (cur != عدم || shl_flag == FALSE)
     {
-	if (shl_flag == FALSE)
+	إذا (shl_flag == FALSE)
 	{
-	    shl = search_hl;
+	    shl = جستجو_hl;
 	    shl_flag = TRUE;
 	}
-	else
+	وإلا
 	    shl = &cur->mit_hl;
 	shl->startcol = MAXCOL;
 	shl->endcol = MAXCOL;
 	shl->attr_cur = 0;
 	shl->is_addpos = FALSE;
 	shl->has_cursor = FALSE;
-	if (cur != NULL)
+	إذا (cur != عدم)
 	    cur->mit_pos_cur = 0;
-	next_search_hl(wp, search_hl, shl, lnum, mincol,
-						shl == search_hl ? NULL : cur);
+	بعدی_جستجو_hl(wp, جستجو_hl, shl, lnum, mincol,
+						shl == جستجو_hl ? عدم : cur);
 
 	// Need to get the line again, a multi-line regexp may have made it
 	// invalid.
-	*line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	*سطر = ml_get_buf(wp->w_میانگیر, lnum, FALSE);
 
-	if (shl->lnum != 0 && shl->lnum <= lnum)
+	إذا (shl->lnum != 0 && shl->lnum <= lnum)
 	{
-	    if (shl->lnum == lnum)
-		shl->startcol = shl->rm.startpos[0].col;
-	    else
+	    إذا (shl->lnum == lnum)
+		shl->startcol = shl->rm.startpos[0].ستون;
+	    وإلا
 		shl->startcol = 0;
-	    if (lnum == shl->lnum + shl->rm.endpos[0].lnum
+	    إذا (lnum == shl->lnum + shl->rm.endpos[0].lnum
 						- shl->rm.startpos[0].lnum)
-		shl->endcol = shl->rm.endpos[0].col;
-	    else
+		shl->endcol = shl->rm.endpos[0].ستون;
+	    وإلا
 		shl->endcol = MAXCOL;
 
 	    // check if the cursor is in the match before changing the columns
-	    if (shl == search_hl)
-		check_cur_search_hl(wp, shl);
+	    إذا (shl == جستجو_hl)
+		check_cur_جستجو_hl(wp, shl);
 
 	    // Highlight one character for an empty match.
-	    if (shl->startcol == shl->endcol)
+	    إذا (shl->startcol == shl->endcol)
 	    {
-		if (has_mbyte && (*line)[shl->endcol] != NUL)
-		    shl->endcol += (*mb_ptr2len)((*line) + shl->endcol);
-		else
+		إذا (has_mbyte && (*سطر)[shl->endcol] != NUL)
+		    shl->endcol += (*mb_ptr2len)((*سطر) + shl->endcol);
+		وإلا
 		    ++shl->endcol;
 	    }
-	    if ((long)shl->startcol < mincol)  // match at leftcol
+	    إذا ((دراز)shl->startcol < mincol)  // match at leftcol
 	    {
 		shl->attr_cur = shl->attr;
-		*search_attr = shl->attr;
+		*جستجو_attr = shl->attr;
 	    }
 	    area_highlighting = TRUE;
 	}
-	if (shl != search_hl && cur != NULL)
-	    cur = cur->mit_next;
+	إذا (shl != جستجو_hl && cur != عدم)
+	    cur = cur->mit_بعدی;
     }
-    return area_highlighting;
+    أرجع area_highlighting;
 }
 
 /*
@@ -707,283 +707,283 @@ prepare_search_hl_line(
  * is endcol.
  * Return the updated search_attr.
  */
-    int
-update_search_hl(
+    صحيح
+update_جستجو_hl(
 	win_T	    *wp,
 	linenr_T    lnum,
-	colnr_T	    col,
-	char_u	    **line,
-	match_T	    *search_hl,
-	int	    *has_match_conc UNUSED,
-	int	    *match_conc UNUSED,
-	int	    did_line_attr,
-	int	    lcs_eol_one,
-	int	    *on_last_col)
+	colnr_T	    ستون,
+	char_u	    **سطر,
+	تطابق_T	    *جستجو_hl,
+	صحيح	    *has_تطابق_conc استفادهنشده,
+	صحيح	    *تطابق_conc استفادهنشده,
+	صحيح	    did_سطر_attr,
+	صحيح	    lcs_eol_one,
+	صحيح	    *on_آخرین_ستون)
 {
     matchitem_T *cur;		    // points to the match list
-    match_T	*shl;		    // points to search_hl or a match
-    int		shl_flag;	    // flag to indicate whether search_hl
+    تطابق_T	*shl;		    // points to search_hl or a match
+    صحيح		shl_flag;	    // flag to indicate whether search_hl
 				    // has been processed or not
-    int		pos_inprogress;	    // marks that position match search is in
-				    // progress
-    int		search_attr = 0;
+    صحيح		pos_inprogress;	    // marks that position match search is in
+				    //پیشرفت
+    صحيح		جستجو_attr = 0;
 
 
     // Do this for 'search_hl' and the match list (ordered by priority).
-    cur = wp->w_match_head;
+    cur = wp->w_تطابق_سر;
     shl_flag = WIN_IS_POPUP(wp);
-    while (cur != NULL || shl_flag == FALSE)
+    طالما (cur != عدم || shl_flag == FALSE)
     {
-	if (shl_flag == FALSE
-		&& (cur == NULL
-			|| cur->mit_priority > SEARCH_HL_PRIORITY))
+	إذا (shl_flag == FALSE
+		&& (cur == عدم
+			|| cur->mit_اولویت > جستجو_HL_اولویت))
 	{
-	    shl = search_hl;
+	    shl = جستجو_hl;
 	    shl_flag = TRUE;
 	}
-	else
+	وإلا
 	    shl = &cur->mit_hl;
-	if (cur != NULL)
+	إذا (cur != عدم)
 	    cur->mit_pos_cur = 0;
 	pos_inprogress = TRUE;
-	while (shl->rm.regprog != NULL || (cur != NULL && pos_inprogress))
+	طالما (shl->rm.regprog != عدم || (cur != عدم && pos_inprogress))
 	{
-	    if (shl->startcol != MAXCOL
-		    && col >= shl->startcol
-		    && col < shl->endcol)
+	    إذا (shl->startcol != MAXCOL
+		    && ستون >= shl->startcol
+		    && ستون < shl->endcol)
 	    {
-		int next_col = col + mb_ptr2len(*line + col);
+		صحيح بعدی_ستون = ستون + mb_ptr2len(*سطر + ستون);
 
-		if (shl->endcol < next_col)
-		    shl->endcol = next_col;
+		إذا (shl->endcol < بعدی_ستون)
+		    shl->endcol = بعدی_ستون;
 		shl->attr_cur = shl->attr;
 # ifdef FEAT_CONCEAL
 		// Match with the "Conceal" group results in hiding
 		// the match.
-		if (cur != NULL
-			&& shl != search_hl
+		إذا (cur != عدم
+			&& shl != جستجو_hl
 			&& syn_name2id((char_u *)"Conceal") == cur->mit_hlg_id)
 		{
-		    *has_match_conc = col == shl->startcol ? 2 : 1;
-		    *match_conc = cur->mit_conceal_char;
+		    *has_تطابق_conc = ستون == shl->startcol ? 2 : 1;
+		    *تطابق_conc = cur->mit_conceal_char;
 		}
-		else
-		    *has_match_conc = 0;
+		وإلا
+		    *has_تطابق_conc = 0;
 # endif
 		// Highlight the match were the cursor is using the CurSearch
 		// group.
-		if (shl == search_hl && shl->has_cursor)
+		إذا (shl == جستجو_hl && shl->has_cursor)
 		{
 		    shl->attr_cur = HL_ATTR(HLF_LC);
-		    if (shl->attr_cur != shl->attr)
-			search_hl_has_cursor_lnum = lnum;
+		    إذا (shl->attr_cur != shl->attr)
+			جستجو_hl_has_cursor_lnum = lnum;
 		}
 
 	    }
-	    else if (col == shl->endcol)
+	    وإلا إذا (ستون == shl->endcol)
 	    {
 		shl->attr_cur = 0;
-		next_search_hl(wp, search_hl, shl, lnum, col,
-					       shl == search_hl ? NULL : cur);
-		pos_inprogress = !(cur == NULL || cur->mit_pos_cur == 0);
+		بعدی_جستجو_hl(wp, جستجو_hl, shl, lnum, ستون,
+					       shl == جستجو_hl ? عدم : cur);
+		pos_inprogress = !(cur == عدم || cur->mit_pos_cur == 0);
 
 		// Need to get the line again, a multi-line regexp may have
 		// made it invalid.
-		*line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+		*سطر = ml_get_buf(wp->w_میانگیر, lnum, FALSE);
 
-		if (shl->lnum == lnum)
+		إذا (shl->lnum == lnum)
 		{
-		    shl->startcol = shl->rm.startpos[0].col;
-		    if (shl->rm.endpos[0].lnum == 0)
-			shl->endcol = shl->rm.endpos[0].col;
-		    else
+		    shl->startcol = shl->rm.startpos[0].ستون;
+		    إذا (shl->rm.endpos[0].lnum == 0)
+			shl->endcol = shl->rm.endpos[0].ستون;
+		    وإلا
 			shl->endcol = MAXCOL;
 
 		    // check if the cursor is in the match
-		    if (shl == search_hl)
-			check_cur_search_hl(wp, shl);
+		    إذا (shl == جستجو_hl)
+			check_cur_جستجو_hl(wp, shl);
 
-		    if (shl->startcol == shl->endcol)
+		    إذا (shl->startcol == shl->endcol)
 		    {
 			// highlight empty match, try again after
 			// it
-			if (has_mbyte)
+			إذا (has_mbyte)
 			{
-			    char_u *p = *line + shl->endcol;
+			    char_u *p = *سطر + shl->endcol;
 
-			    if (*p == NUL)
+			    إذا (*p == NUL)
 				// consistent with non-mbyte
 				++shl->endcol;
-			    else
+			    وإلا
 				shl->endcol += (*mb_ptr2len)(p);
 			}
-			else
+			وإلا
 			    ++shl->endcol;
 		    }
 
 		    // Loop to check if the match starts at the
 		    // current position
-		    continue;
+		    استمر;
 		}
 	    }
-	    break;
+	    اكسر;
 	}
-	if (shl != search_hl && cur != NULL)
-	    cur = cur->mit_next;
+	إذا (shl != جستجو_hl && cur != عدم)
+	    cur = cur->mit_بعدی;
     }
 
     // Use attributes from match with highest priority among 'search_hl' and
     // the match list.
-    cur = wp->w_match_head;
+    cur = wp->w_تطابق_سر;
     shl_flag = WIN_IS_POPUP(wp);
-    while (cur != NULL || shl_flag == FALSE)
+    طالما (cur != عدم || shl_flag == FALSE)
     {
-	if (shl_flag == FALSE
-		&& (cur == NULL ||
-			cur->mit_priority > SEARCH_HL_PRIORITY))
+	إذا (shl_flag == FALSE
+		&& (cur == عدم ||
+			cur->mit_اولویت > جستجو_HL_اولویت))
 	{
-	    shl = search_hl;
+	    shl = جستجو_hl;
 	    shl_flag = TRUE;
 	}
-	else
+	وإلا
 	    shl = &cur->mit_hl;
-	if (shl->attr_cur != 0)
+	إذا (shl->attr_cur != 0)
 	{
-	    search_attr = shl->attr_cur;
-	    *on_last_col = col + 1 >= shl->endcol;
+	    جستجو_attr = shl->attr_cur;
+	    *on_آخرین_ستون = ستون + 1 >= shl->endcol;
 	}
-	if (shl != search_hl && cur != NULL)
-	    cur = cur->mit_next;
+	إذا (shl != جستجو_hl && cur != عدم)
+	    cur = cur->mit_بعدی;
     }
     // Only highlight one character after the last column.
-    if (*(*line + col) == NUL && (did_line_attr >= 1
+    إذا (*(*سطر + ستون) == NUL && (did_سطر_attr >= 1
 				       || (wp->w_p_list && lcs_eol_one == -1)))
-	search_attr = 0;
-    return search_attr;
+	جستجو_attr = 0;
+    أرجع جستجو_attr;
 }
 
-    int
-get_prevcol_hl_flag(win_T *wp, match_T *search_hl, long curcol)
+    صحيح
+get_prevcol_hl_flag(win_T *wp, تطابق_T *جستجو_hl, دراز curcol)
 {
-    long	prevcol = curcol;
-    int		prevcol_hl_flag = FALSE;
+    دراز	prevcol = curcol;
+    صحيح		prevcol_hl_flag = FALSE;
     matchitem_T *cur;			// points to the match list
 
-# if defined(FEAT_PROP_POPUP)
+# إذا defined(FEAT_PROP_POPUP)
     // don't do this in a popup window
-    if (popup_is_popup(wp))
-	return FALSE;
+    إذا (popup_is_popup(wp))
+	أرجع FALSE;
 # endif
 
     // we're not really at that column when skipping some text
-    if ((long)(wp->w_p_wrap ? wp->w_skipcol : wp->w_leftcol) > prevcol)
+    إذا ((دراز)(wp->w_p_wrap ? wp->w_skipcol : wp->w_leftcol) > prevcol)
 	++prevcol;
 
     // Highlight a character after the end of the line if the match started
     // at the end of the line or when the match continues in the next line
     // (match includes the line break).
-    if (!search_hl->is_addpos && (prevcol == (long)search_hl->startcol
-		|| (prevcol > (long)search_hl->startcol
-					      && search_hl->endcol == MAXCOL)))
+    إذا (!جستجو_hl->is_addpos && (prevcol == (دراز)جستجو_hl->startcol
+		|| (prevcol > (دراز)جستجو_hl->startcol
+					      && جستجو_hl->endcol == MAXCOL)))
 	prevcol_hl_flag = TRUE;
-    else
+    وإلا
     {
-	cur = wp->w_match_head;
-	while (cur != NULL)
+	cur = wp->w_تطابق_سر;
+	طالما (cur != عدم)
 	{
-	    if (!cur->mit_hl.is_addpos && (prevcol == (long)cur->mit_hl.startcol
-			|| (prevcol > (long)cur->mit_hl.startcol
+	    إذا (!cur->mit_hl.is_addpos && (prevcol == (دراز)cur->mit_hl.startcol
+			|| (prevcol > (دراز)cur->mit_hl.startcol
 					     && cur->mit_hl.endcol == MAXCOL)))
 	    {
 		prevcol_hl_flag = TRUE;
-		break;
+		اكسر;
 	    }
-	    cur = cur->mit_next;
+	    cur = cur->mit_بعدی;
 	}
     }
-    return prevcol_hl_flag;
+    أرجع prevcol_hl_flag;
 }
 
 /*
  * Get highlighting for the char after the text in "char_attr" from 'hlsearch'
  * or match highlighting.
  */
-    void
-get_search_match_hl(win_T *wp, match_T *search_hl, long col, int *char_attr)
+    فراغ
+get_جستجو_تطابق_hl(win_T *wp, تطابق_T *جستجو_hl, دراز ستون, صحيح *char_attr)
 {
     matchitem_T *cur;			// points to the match list
-    match_T	*shl;			// points to search_hl or a match
-    int		shl_flag;		// flag to indicate whether search_hl
+    تطابق_T	*shl;			// points to search_hl or a match
+    صحيح		shl_flag;		// flag to indicate whether search_hl
 					// has been processed or not
 
-    cur = wp->w_match_head;
+    cur = wp->w_تطابق_سر;
     shl_flag = WIN_IS_POPUP(wp);
-    while (cur != NULL || shl_flag == FALSE)
+    طالما (cur != عدم || shl_flag == FALSE)
     {
-	if (shl_flag == FALSE
-		&& ((cur != NULL
-			&& cur->mit_priority > SEARCH_HL_PRIORITY)
-		    || cur == NULL))
+	إذا (shl_flag == FALSE
+		&& ((cur != عدم
+			&& cur->mit_اولویت > جستجو_HL_اولویت)
+		    || cur == عدم))
 	{
-	    shl = search_hl;
+	    shl = جستجو_hl;
 	    shl_flag = TRUE;
 	}
-	else
+	وإلا
 	    shl = &cur->mit_hl;
-	if (col - 1 == (long)shl->startcol
-		&& (shl == search_hl || !shl->is_addpos))
+	إذا (ستون - 1 == (دراز)shl->startcol
+		&& (shl == جستجو_hl || !shl->is_addpos))
 	    *char_attr = shl->attr;
-	if (shl != search_hl && cur != NULL)
-	    cur = cur->mit_next;
+	إذا (shl != جستجو_hl && cur != عدم)
+	    cur = cur->mit_بعدی;
     }
 }
 
-#endif // FEAT_SEARCH_EXTRA
+#پایان_اگر // FEAT_SEARCH_EXTRA
 
-#if defined(FEAT_EVAL)
-# ifdef FEAT_SEARCH_EXTRA
-    static int
+#إذا defined(FEAT_EVAL)
+# ifdef FEAT_جستجو_EXTRA
+    ساكن صحيح
 matchadd_dict_arg(typval_T *tv, char_u **conceal_char, win_T **win)
 {
     dictitem_T *di;
 
-    if (tv->v_type != VAR_DICT)
+    إذا (tv->v_type != VAR_DICT)
     {
 	emsg(_(e_dictionary_required));
-	return FAIL;
+	أرجع FAIL;
     }
 
-    if (dict_has_key(tv->vval.v_dict, "conceal"))
+    إذا (dict_has_کلید(tv->vval.v_dict, "conceal"))
 	*conceal_char = dict_get_string(tv->vval.v_dict, "conceal", FALSE);
 
-    if ((di = dict_find(tv->vval.v_dict, (char_u *)"window", -1)) == NULL)
-	return OK;
+    إذا ((di = dict_پیدا_کن(tv->vval.v_dict, (char_u *)"window", -1)) == عدم)
+	أرجع OK;
 
-    *win = find_win_by_nr_or_id(&di->di_tv);
-    if (*win == NULL)
+    *win = پیدا_کن_win_by_nr_or_id(&di->di_tv);
+    إذا (*win == عدم)
     {
-	emsg(_(e_invalid_window_number));
-	return FAIL;
+	emsg(_(e_invalid_پنجره_عدد));
+	أرجع FAIL;
     }
 
-    return OK;
+    أرجع OK;
 }
 # endif
 
 /*
  * "clearmatches()" function
  */
-    void
-f_clearmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    فراغ
+f_clearmatches(typval_T *argvars استفادهنشده, typval_T *rettv استفادهنشده)
 {
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_جستجو_EXTRA
     win_T   *win;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    إذا (درون_vim9script() && check_for_opt_عدد_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    win = get_optional_window(argvars, 0);
-    if (win != NULL)
+    win = get_optional_پنجره(argvars, 0);
+    إذا (win != عدم)
 	clear_matches(win);
 # endif
 }
@@ -991,75 +991,75 @@ f_clearmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "getmatches()" function
  */
-    void
-f_getmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    فراغ
+f_getmatches(typval_T *argvars استفادهنشده, typval_T *rettv استفادهنشده)
 {
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_جستجو_EXTRA
     dict_T	*dict;
     matchitem_T	*cur;
-    int		i;
+    صحيح		i;
     win_T	*win;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    إذا (درون_vim9script() && check_for_opt_عدد_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    win = get_optional_window(argvars, 0);
-    if (rettv_list_alloc(rettv) == FAIL || win == NULL)
-	return;
+    win = get_optional_پنجره(argvars, 0);
+    إذا (rettv_list_alloc(rettv) == FAIL || win == عدم)
+	أرجع;
 
-    cur = win->w_match_head;
-    while (cur != NULL)
+    cur = win->w_تطابق_سر;
+    طالما (cur != عدم)
     {
 	dict = dict_alloc();
-	if (dict == NULL)
-	    return;
-	if (cur->mit_match.regprog == NULL)
+	إذا (dict == عدم)
+	    أرجع;
+	إذا (cur->mit_تطابق.regprog == عدم)
 	{
 	    // match added with matchaddpos()
-	    for (i = 0; i < cur->mit_pos_count; ++i)
+	    لكل (i = 0; i < cur->mit_pos_شمار; ++i)
 	    {
 		llpos_T	*llpos;
-		char	buf[30];  // use 30 to avoid compiler warning
+		حرف	buf[30];  // use 30 to avoid compiler warning
 		list_T	*l;
 
 		llpos = &cur->mit_pos_array[i];
-		if (llpos->lnum == 0)
-		    break;
+		إذا (llpos->lnum == 0)
+		    اكسر;
 		l = list_alloc();
-		if (l == NULL)
-		    break;
-		list_append_number(l, (varnumber_T)llpos->lnum);
-		if (llpos->col > 0)
+		إذا (l == عدم)
+		    اكسر;
+		list_append_عدد(l, (varnumber_T)llpos->lnum);
+		إذا (llpos->ستون > 0)
 		{
-		    list_append_number(l, (varnumber_T)llpos->col);
-		    list_append_number(l, (varnumber_T)llpos->len);
+		    list_append_عدد(l, (varnumber_T)llpos->ستون);
+		    list_append_عدد(l, (varnumber_T)llpos->len);
 		}
 		sprintf(buf, "pos%d", i + 1);
-		if (dict_add_list(dict, buf, l) == FAIL)
+		إذا (dict_جمع_کن_list(dict, buf, l) == FAIL)
 		    list_unref(l);
 	    }
 	}
-	else
+	وإلا
 	{
-	    dict_add_string(dict, "pattern", cur->mit_pattern);
+	    dict_جمع_کن_string(dict, "pattern", cur->mit_الگو);
 	}
-	dict_add_string(dict, "group", syn_id2name(cur->mit_hlg_id));
-	dict_add_number(dict, "priority", (long)cur->mit_priority);
-	dict_add_number(dict, "id", (long)cur->mit_id);
-#  if defined(FEAT_CONCEAL)
-	if (cur->mit_conceal_char)
+	dict_جمع_کن_string(dict, "group", syn_id2name(cur->mit_hlg_id));
+	dict_جمع_کن_عدد(dict, "priority", (دراز)cur->mit_اولویت);
+	dict_جمع_کن_عدد(dict, "id", (دراز)cur->mit_id);
+#  إذا defined(FEAT_CONCEAL)
+	إذا (cur->mit_conceal_char)
 	{
 	    char_u  buf[MB_MAXBYTES + 1];
-	    int	    buflen;
+	    صحيح	    buflen;
 
 	    buflen = (*mb_char2bytes)(cur->mit_conceal_char, buf);
 	    buf[buflen] = NUL;
-	    dict_add_string_len(dict, "conceal", (char_u *)&buf, buflen);
+	    dict_جمع_کن_string_len(dict, "conceal", (char_u *)&buf, buflen);
 	}
 #  endif
-	if (list_append_dict(rettv->vval.v_list, dict) == FAIL)
+	إذا (list_append_dict(rettv->vval.v_list, dict) == FAIL)
 	    dict_unref(dict);
-	cur = cur->mit_next;
+	cur = cur->mit_بعدی;
     }
 # endif
 }
@@ -1067,120 +1067,120 @@ f_getmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "setmatches()" function
  */
-    void
-f_setmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    فراغ
+f_setmatches(typval_T *argvars استفادهنشده, typval_T *rettv استفادهنشده)
 {
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_جستجو_EXTRA
     list_T	*l;
     listitem_T	*li;
     dict_T	*d;
-    list_T	*s = NULL;
+    list_T	*s = عدم;
     win_T	*win;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_عدد = -1;
 
-    if (in_vim9script()
+    إذا (درون_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_عدد_arg(argvars, 1) == FAIL))
+	أرجع;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
-    win = get_optional_window(argvars, 1);
-    if (win == NULL)
-	return;
+    إذا (check_for_list_arg(argvars, 0) == FAIL)
+	أرجع;
+    win = get_optional_پنجره(argvars, 1);
+    إذا (win == عدم)
+	أرجع;
 
-    if ((l = argvars[0].vval.v_list) != NULL)
+    إذا ((l = argvars[0].vval.v_list) != عدم)
     {
 	// To some extent make sure that we are dealing with a list from
 	// "getmatches()".
-	li = l->lv_first;
-	while (li != NULL)
+	li = l->lv_اولی;
+	طالما (li != عدم)
 	{
-	    if (li->li_tv.v_type != VAR_DICT
-		    || (d = li->li_tv.vval.v_dict) == NULL)
+	    إذا (li->li_tv.v_type != VAR_DICT
+		    || (d = li->li_tv.vval.v_dict) == عدم)
 	    {
-		emsg(_(e_invalid_argument));
-		return;
+		emsg(_(e_invalid_آرگومان));
+		أرجع;
 	    }
-	    if (!(dict_has_key(d, "group")
-			&& (dict_has_key(d, "pattern")
-			    || dict_has_key(d, "pos1"))
-			&& dict_has_key(d, "priority")
-			&& dict_has_key(d, "id")))
+	    إذا (!(dict_has_کلید(d, "group")
+			&& (dict_has_کلید(d, "pattern")
+			    || dict_has_کلید(d, "pos1"))
+			&& dict_has_کلید(d, "priority")
+			&& dict_has_کلید(d, "id")))
 	    {
-		emsg(_(e_invalid_argument));
-		return;
+		emsg(_(e_invalid_آرگومان));
+		أرجع;
 	    }
-	    li = li->li_next;
+	    li = li->li_بعدی;
 	}
 
 	clear_matches(win);
-	li = l->lv_first;
-	while (li != NULL)
+	li = l->lv_اولی;
+	طالما (li != عدم)
 	{
-	    int		i = 0;
-	    char	buf[30];  // use 30 to avoid compiler warning
+	    صحيح		i = 0;
+	    حرف	buf[30];  // use 30 to avoid compiler warning
 	    dictitem_T  *di;
-	    char_u	*group;
-	    int		priority;
-	    int		id;
+	    char_u	*گروه;
+	    صحيح		اولویت;
+	    صحيح		id;
 	    char_u	*conceal;
 
 	    d = li->li_tv.vval.v_dict;
-	    if (!dict_has_key(d, "pattern"))
+	    إذا (!dict_has_کلید(d, "pattern"))
 	    {
-		if (s == NULL)
+		إذا (s == عدم)
 		{
 		    s = list_alloc();
-		    if (s == NULL)
-			return;
+		    إذا (s == عدم)
+			أرجع;
 		    ++s->lv_refcount;
 		}
 
 		// match from matchaddpos()
-		for (i = 1; i < 9; i++)
+		لكل (i = 1; i < 9; i++)
 		{
-		    sprintf((char *)buf, (char *)"pos%d", i);
-		    if ((di = dict_find(d, (char_u *)buf, -1)) != NULL)
+		    sprintf((حرف *)buf, (حرف *)"pos%d", i);
+		    إذا ((di = dict_پیدا_کن(d, (char_u *)buf, -1)) != عدم)
 		    {
-			if (di->di_tv.v_type != VAR_LIST)
+			إذا (di->di_tv.v_type != VAR_LIST)
 			{
 			    list_unref(s);
-			    return;
+			    أرجع;
 			}
 
 			list_append_tv(s, &di->di_tv);
 		    }
-		    else
-			break;
+		    وإلا
+			اكسر;
 		}
 	    }
 
-	    group = dict_get_string(d, "group", TRUE);
-	    priority = (int)dict_get_number(d, "priority");
-	    id = (int)dict_get_number(d, "id");
-	    conceal = dict_has_key(d, "conceal")
+	    گروه = dict_get_string(d, "group", TRUE);
+	    اولویت = (صحيح)dict_get_عدد(d, "priority");
+	    id = (صحيح)dict_get_عدد(d, "id");
+	    conceal = dict_has_کلید(d, "conceal")
 			      ? dict_get_string(d, "conceal", TRUE)
-			      : NULL;
-	    if (i == 0)
+			      : عدم;
+	    إذا (i == 0)
 	    {
-		match_add(win, group,
+		تطابق_جمع_کن(win, گروه,
 		    dict_get_string(d, "pattern", FALSE),
-		    priority, id, NULL, conceal);
+		    اولویت, id, عدم, conceal);
 	    }
-	    else
+	    وإلا
 	    {
-		match_add(win, group, NULL, priority, id, s, conceal);
+		تطابق_جمع_کن(win, گروه, عدم, اولویت, id, s, conceal);
 		list_unref(s);
-		s = NULL;
+		s = عدم;
 	    }
-	    vim_free(group);
+	    vim_free(گروه);
 	    vim_free(conceal);
 
-	    li = li->li_next;
+	    li = li->li_بعدی;
 	}
-	rettv->vval.v_number = 0;
+	rettv->vval.v_عدد = 0;
     }
 # endif
 }
@@ -1188,55 +1188,55 @@ f_setmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "matchadd()" function
  */
-    void
-f_matchadd(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    فراغ
+f_matchadd(typval_T *argvars استفادهنشده, typval_T *rettv استفادهنشده)
 {
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_جستجو_EXTRA
     char_u	buf[NUMBUFLEN];
-    char_u	*grp;		// group
-    char_u	*pat;		// pattern
-    int		prio = 10;	// default priority
-    int		id = -1;
-    int		error = FALSE;
-    char_u	*conceal_char = NULL;
+    char_u	*grp;		//گروه
+    char_u	*pat;		//الگو
+    صحيح		prio = 10;	// default priority
+    صحيح		id = -1;
+    صحيح		error = FALSE;
+    char_u	*conceal_char = عدم;
     win_T	*win = curwin;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_عدد = -1;
 
-    if (in_vim9script()
+    إذا (درون_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_opt_عدد_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
-		    && (check_for_opt_number_arg(argvars, 3) == FAIL
+		    && (check_for_opt_عدد_arg(argvars, 3) == FAIL
 			|| (argvars[3].v_type != VAR_UNKNOWN
 			    && check_for_opt_dict_arg(argvars, 4) == FAIL)))))
-	return;
+	أرجع;
 
-    grp = tv_get_string_buf_chk(&argvars[0], buf);	// group
-    pat = tv_get_string_buf_chk(&argvars[1], buf);	// pattern
-    if (grp == NULL || pat == NULL)
-	return;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    grp = tv_get_string_buf_chk(&argvars[0], buf);	//گروه
+    pat = tv_get_string_buf_chk(&argvars[1], buf);	//الگو
+    إذا (grp == عدم || pat == عدم)
+	أرجع;
+    إذا (argvars[2].v_type != VAR_UNKNOWN)
     {
-	prio = (int)tv_get_number_chk(&argvars[2], &error);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	prio = (صحيح)tv_get_عدد_chk(&argvars[2], &error);
+	إذا (argvars[3].v_type != VAR_UNKNOWN)
 	{
-	    id = (int)tv_get_number_chk(&argvars[3], &error);
-	    if (argvars[4].v_type != VAR_UNKNOWN
+	    id = (صحيح)tv_get_عدد_chk(&argvars[3], &error);
+	    إذا (argvars[4].v_type != VAR_UNKNOWN
 		&& matchadd_dict_arg(&argvars[4], &conceal_char, &win) == FAIL)
-		return;
+		أرجع;
 	}
     }
-    if (error == TRUE)
-	return;
-    if (id >= 1 && id <= 3)
+    إذا (error == TRUE)
+	أرجع;
+    إذا (id >= 1 && id <= 3)
     {
-	semsg(_(e_id_is_reserved_for_match_nr), id);
-	return;
+	semsg(_(e_id_is_reserved_for_تطابق_nr), id);
+	أرجع;
     }
 
-    rettv->vval.v_number = match_add(win, grp, pat, prio, id, NULL,
+    rettv->vval.v_عدد = تطابق_جمع_کن(win, grp, pat, prio, id, عدم,
 								conceal_char);
 # endif
 }
@@ -1244,67 +1244,67 @@ f_matchadd(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "matchaddpos()" function
  */
-    void
-f_matchaddpos(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    فراغ
+f_matchaddpos(typval_T *argvars استفادهنشده, typval_T *rettv استفادهنشده)
 {
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_جستجو_EXTRA
     char_u	buf[NUMBUFLEN];
-    char_u	*group;
-    int		prio = 10;
-    int		id = -1;
-    int		error = FALSE;
+    char_u	*گروه;
+    صحيح		prio = 10;
+    صحيح		id = -1;
+    صحيح		error = FALSE;
     list_T	*l;
-    char_u	*conceal_char = NULL;
+    char_u	*conceal_char = عدم;
     win_T	*win = curwin;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_عدد = -1;
 
-    if (in_vim9script()
+    إذا (درون_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_opt_عدد_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
-		    && (check_for_opt_number_arg(argvars, 3) == FAIL
+		    && (check_for_opt_عدد_arg(argvars, 3) == FAIL
 			|| (argvars[3].v_type != VAR_UNKNOWN
 			    && check_for_opt_dict_arg(argvars, 4) == FAIL)))))
-	return;
+	أرجع;
 
-    group = tv_get_string_buf_chk(&argvars[0], buf);
-    if (group == NULL)
-	return;
+    گروه = tv_get_string_buf_chk(&argvars[0], buf);
+    إذا (گروه == عدم)
+	أرجع;
 
-    if (argvars[1].v_type != VAR_LIST)
+    إذا (argvars[1].v_type != VAR_LIST)
     {
-	semsg(_(e_argument_of_str_must_be_list), "matchaddpos()");
-	return;
+	semsg(_(e_آرگومان_از_str_must_be_list), "matchaddpos()");
+	أرجع;
     }
     l = argvars[1].vval.v_list;
-    if (l == NULL || l->lv_len == 0)
-	return;
+    إذا (l == عدم || l->lv_len == 0)
+	أرجع;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    إذا (argvars[2].v_type != VAR_UNKNOWN)
     {
-	prio = (int)tv_get_number_chk(&argvars[2], &error);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	prio = (صحيح)tv_get_عدد_chk(&argvars[2], &error);
+	إذا (argvars[3].v_type != VAR_UNKNOWN)
 	{
-	    id = (int)tv_get_number_chk(&argvars[3], &error);
+	    id = (صحيح)tv_get_عدد_chk(&argvars[3], &error);
 
-	    if (argvars[4].v_type != VAR_UNKNOWN
+	    إذا (argvars[4].v_type != VAR_UNKNOWN
 		&& matchadd_dict_arg(&argvars[4], &conceal_char, &win) == FAIL)
-		return;
+		أرجع;
 	}
     }
-    if (error == TRUE)
-	return;
+    إذا (error == TRUE)
+	أرجع;
 
     // id == 3 is ok because matchaddpos() is supposed to substitute :3match
-    if (id == 1 || id == 2)
+    إذا (id == 1 || id == 2)
     {
-	semsg(_(e_id_is_reserved_for_match_nr), id);
-	return;
+	semsg(_(e_id_is_reserved_for_تطابق_nr), id);
+	أرجع;
     }
 
-    rettv->vval.v_number = match_add(win, group, NULL, prio, id, l,
+    rettv->vval.v_عدد = تطابق_جمع_کن(win, گروه, عدم, prio, id, l,
 								conceal_char);
 # endif
 }
@@ -1312,32 +1312,32 @@ f_matchaddpos(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "matcharg()" function
  */
-    void
-f_matcharg(typval_T *argvars UNUSED, typval_T *rettv)
+    فراغ
+f_matcharg(typval_T *argvars استفادهنشده, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) != OK)
-	return;
+    إذا (rettv_list_alloc(rettv) != OK)
+	أرجع;
 
-# ifdef FEAT_SEARCH_EXTRA
-    int	    id;
+# ifdef FEAT_جستجو_EXTRA
+    صحيح	    id;
     matchitem_T *m;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    إذا (درون_vim9script() && check_for_عدد_arg(argvars, 0) == FAIL)
+	أرجع;
 
-    id = (int)tv_get_number(&argvars[0]);
-    if (id >= 1 && id <= 3)
+    id = (صحيح)tv_get_عدد(&argvars[0]);
+    إذا (id >= 1 && id <= 3)
     {
-	if ((m = get_match(curwin, id)) != NULL)
+	إذا ((m = get_تطابق(curwin, id)) != عدم)
 	{
 	    list_append_string(rettv->vval.v_list,
 		    syn_id2name(m->mit_hlg_id), -1);
-	    list_append_string(rettv->vval.v_list, m->mit_pattern, -1);
+	    list_append_string(rettv->vval.v_list, m->mit_الگو, -1);
 	}
-	else
+	وإلا
 	{
-	    list_append_string(rettv->vval.v_list, NULL, -1);
-	    list_append_string(rettv->vval.v_list, NULL, -1);
+	    list_append_string(rettv->vval.v_list, عدم, -1);
+	    list_append_string(rettv->vval.v_list, عدم, -1);
 	}
     }
 # endif
@@ -1346,96 +1346,96 @@ f_matcharg(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "matchdelete()" function
  */
-    void
-f_matchdelete(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
+    فراغ
+f_matchdelete(typval_T *argvars استفادهنشده, typval_T *rettv استفادهنشده)
 {
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_جستجو_EXTRA
     win_T   *win;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+    إذا (درون_vim9script()
+	    && (check_for_عدد_arg(argvars, 0) == FAIL
+		|| check_for_opt_عدد_arg(argvars, 1) == FAIL))
+	أرجع;
 
-    win = get_optional_window(argvars, 1);
-    if (win == NULL)
-	rettv->vval.v_number = -1;
-    else
-	rettv->vval.v_number = match_delete(win,
-				       (int)tv_get_number(&argvars[0]), TRUE);
+    win = get_optional_پنجره(argvars, 1);
+    إذا (win == عدم)
+	rettv->vval.v_عدد = -1;
+    وإلا
+	rettv->vval.v_عدد = تطابق_delete(win,
+				       (صحيح)tv_get_عدد(&argvars[0]), TRUE);
 # endif
 }
-#endif
+#پایان_اگر
 
-#if defined(FEAT_SEARCH_EXTRA)
+#إذا defined(FEAT_جستجو_EXTRA)
 /*
  * ":[N]match {group} {pattern}"
  * Sets nextcmd to the start of the next command, if any.  Also called when
  * skipping commands to find the next command.
  */
-    void
-ex_match(exarg_T *eap)
+    فراغ
+ex_تطابق(exarg_T *eap)
 {
     char_u	*p;
-    char_u	*g = NULL;
-    char_u	*end;
-    int		c;
-    int		id;
+    char_u	*g = عدم;
+    char_u	*انتها;
+    صحيح		c;
+    صحيح		id;
 
-    if (eap->line2 <= 3)
+    إذا (eap->line2 <= 3)
 	id = eap->line2;
-    else
+    وإلا
     {
 	emsg(_(e_invalid_command));
-	return;
+	أرجع;
     }
 
     // First clear any old pattern.
-    if (!eap->skip)
-	match_delete(curwin, id, FALSE);
+    إذا (!eap->skip)
+	تطابق_delete(curwin, id, FALSE);
 
-    if (ends_excmd2(eap->cmd, eap->arg))
-	end = eap->arg;
-    else if ((STRNICMP(eap->arg, "none", 4) == 0
+    إذا (دوسر_excmd2(eap->cmd, eap->arg))
+	انتها = eap->arg;
+    وإلا إذا ((STRNICMP(eap->arg, "none", 4) == 0
 		&& (VIM_ISWHITE(eap->arg[4])
-				      || ends_excmd2(eap->arg, eap->arg + 4))))
-	end = eap->arg + 4;
-    else
+				      || دوسر_excmd2(eap->arg, eap->arg + 4))))
+	انتها = eap->arg + 4;
+    وإلا
     {
 	p = skiptowhite(eap->arg);
-	if (!eap->skip)
+	إذا (!eap->skip)
 	    g = vim_strnsave(eap->arg, p - eap->arg);
 	p = skipwhite(p);
-	if (*p == NUL)
+	إذا (*p == NUL)
 	{
 	    // There must be two arguments.
 	    vim_free(g);
-	    semsg(_(e_invalid_argument_str), eap->arg);
-	    return;
+	    semsg(_(e_invalid_آرگومان_str), eap->arg);
+	    أرجع;
 	}
-	end = skip_regexp(p + 1, *p, TRUE);
-	if (!eap->skip)
+	انتها = skip_regexp(p + 1, *p, TRUE);
+	إذا (!eap->skip)
 	{
-	    if (*end != NUL && !ends_excmd2(end, skipwhite(end + 1)))
+	    إذا (*انتها != NUL && !دوسر_excmd2(انتها, skipwhite(انتها + 1)))
 	    {
 		vim_free(g);
-		eap->errmsg = ex_errmsg(e_trailing_characters_str, end);
-		return;
+		eap->errmsg = ex_errmsg(e_trailing_characters_str, انتها);
+		أرجع;
 	    }
-	    if (*end != *p)
+	    إذا (*انتها != *p)
 	    {
 		vim_free(g);
-		semsg(_(e_invalid_argument_str), p);
-		return;
+		semsg(_(e_invalid_آرگومان_str), p);
+		أرجع;
 	    }
 
-	    c = *end;
-	    *end = NUL;
-	    match_add(curwin, g, p + 1, 10, id, NULL, NULL);
+	    c = *انتها;
+	    *انتها = NUL;
+	    تطابق_جمع_کن(curwin, g, p + 1, 10, id, عدم, عدم);
 	    vim_free(g);
-	    *end = c;
+	    *انتها = c;
 	}
     }
-    eap->nextcmd = find_nextcmd(end);
+    eap->nextcmd = پیدا_کن_nextcmd(انتها);
 }
-#endif
+#پایان_اگر

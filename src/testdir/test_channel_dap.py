@@ -2,134 +2,134 @@
 
 # Used by Test_channel_dap_mode in test_channel.vim to test DAP functionality.
 
-import json
-import socket
-import threading
-import time
+استورد json
+استورد socket
+استورد threading
+استورد زمان
 
-try:
-    import socketserver
-except ImportError:
-    import SocketServer as socketserver
+حاول:
+    استورد socketserver
+استثناء ImportError:
+    استورد SocketServer كـ socketserver
 
-def make_dap_message(obj):
+تعریف make_dap_پیام(obj):
     payload = json.dumps(obj).encode("utf-8")
-    header = f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
-    return header + payload
+    سرآیند = f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
+    أرجع سرآیند + payload
 
 
-def parse_messages(buffer):
+تعریف parse_messages(میانگیر):
     messages = []
 
-    while True:
-        hdr_end = buffer.find(b"\r\n\r\n")
-        if hdr_end == -1:
-            break
+    طالما درست:
+        hdr_انتها = میانگیر.پیدا_کن(b"\r\n\r\n")
+        إذا hdr_انتها == -1:
+            اكسر
 
-        header = buffer[:hdr_end].decode("ascii", errors="ignore")
-        content_length = None
+        سرآیند = میانگیر[:hdr_انتها].decode("ascii", errors="ignore")
+        content_درازی = هیچ
 
-        for line in header.split("\r\n"):
-            if line.lower().startswith("content-length:"):
-                content_length = int(line.split(":")[1].strip())
+        لكل سطر في سرآیند.تقسیم("\r\n"):
+            إذا سطر.پایینی().startswith("content-length:"):
+                content_درازی = صحيح(سطر.تقسیم(":")[1].strip())
 
-        if content_length is None:
-            break
+        إذا content_درازی است هیچ:
+            اكسر
 
-        total_len = hdr_end + 4 + content_length
-        if len(buffer) < total_len:
-            break  # partial
+        مجموع_len = hdr_انتها + 4 + content_درازی
+        إذا طول(میانگیر) < مجموع_len:
+            اكسر  # partial
 
-        body = buffer[hdr_end + 4:total_len]
+        body = میانگیر[hdr_انتها + 4:مجموع_len]
         messages.append(json.loads(body.decode("utf-8")))
-        buffer = buffer[total_len:]
+        میانگیر = میانگیر[مجموع_len:]
 
-    return messages, buffer
+    أرجع messages, میانگیر
 
 
-class DAPHandler(socketserver.BaseRequestHandler):
+صنف DAPHandler(socketserver.پایه_Request_Handler):
 
-    def setup(self):
+    تعریف راهاندازی(self):
         self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.seq = 1  # server sequence counter
 
-    def send(self, obj):
+    تعریف send(self, obj):
         obj["seq"] = self.seq
         self.seq += 1
-        self.request.sendall(make_dap_message(obj))
+        self.request.sendall(make_dap_پیام(obj))
 
-    def send_response(self, request, body=None, success=True):
+    تعریف send_response(self, request, body=هیچ, success=درست):
         self.send({
             "type": "response",
             "request_seq": request["seq"],
             "success": success,
             "command": request["command"],
-            "body": body or {}
+            "body": body أو {}
         })
 
-    def send_event(self, event, body=None):
+    تعریف send_event(self, event, body=هیچ):
         self.send({
             "type": "event",
             "event": event,
-            "body": body or {}
+            "body": body أو {}
         })
 
-    def handle_request(self, msg):
-        cmd = msg.get("command")
+    تعریف handle_request(self, پیام):
+        cmd = پیام.get("command")
 
-        if cmd == "initialize":
-            self.send_response(msg, {
-                "supportsConfigurationDoneRequest": True
+        إذا cmd == "initialize":
+            self.send_response(پیام, {
+                "supportsConfigurationDoneRequest": درست
             })
             self.send_event("initialized")
-        else:
-            self.send_response(msg)
+        وإلا:
+            self.send_response(پیام)
 
-        return True
+        أرجع درست
 
-    def handle(self):
-        buffer = b""
+    تعریف handle(self):
+        میانگیر = b""
 
-        while True:
-            data = self.request.recv(4096)
-            if not data:
-                break
+        طالما درست:
+            داده = self.request.recv(4096)
+            إذا ليس داده:
+                اكسر
 
-            buffer += data
-            messages, buffer = parse_messages(buffer)
+            میانگیر += داده
+            messages, میانگیر = parse_messages(میانگیر)
 
-            for msg in messages:
-                if msg.get("type") == "request":
-                    if not self.handle_request(msg):
-                        return
+            لكل پیام في messages:
+                إذا پیام.get("type") == "request":
+                    إذا ليس self.handle_request(پیام):
+                        أرجع
 
 
-class ThreadedDAPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
-    allow_reuse_address = True
+صنف ThreadedDAPServer(socketserver.Threading_Mix_درون, socketserver.TCPServer):
+    allow_reuse_آدرس = درست
 
-def write_port_to_file(port, filename="Xportnr"):
-    with open(filename, "w") as f:
-        f.write(str(port))
+تعریف write_پورت_مقصد_file(پورت, filename="Xportnr"):
+    با open(filename, "w") كـ f:
+        f.اكتب(str(پورت))
 
-def main():
+تعریف اصلی():
     server = ThreadedDAPServer(("localhost", 0), DAPHandler)
 
     # Get the actual assigned port
-    ip, assigned_port = server.server_address
+    ip, assigned_پورت = server.server_آدرس
 
     # Write port so client/test can read it
-    write_port_to_file(assigned_port)
+    write_پورت_مقصد_file(assigned_پورت)
 
-    thread = threading.Thread(target=server.serve_forever)
-    thread.daemon = True
-    thread.start()
+    thread = threading.خيط(هدف=server.serve_forever)
+    thread.daemon = درست
+    thread.شروع()
 
-    try:
-        while thread.is_alive():
+    حاول:
+        طالما thread.is_alive():
             thread.join(1)
-    except KeyboardInterrupt:
+    استثناء Keyboard_وقفه:
         server.shutdown()
 
-if __name__ == "__main__":
-    main()
+إذا __name__ == "__main__":
+    اصلی()
 
