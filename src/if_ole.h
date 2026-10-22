@@ -34,8 +34,8 @@ typedef interface IVim IVim;
 
 #ifdef __cplusplus
 typedef class Vim Vim;
-#else
-typedef struct Vim Vim;
+#ꦭꦶꦪ
+typedef sa_nracanaa Vim Vim;
 #endif // __cplusplus
 
 #endif	// __Vim_FWD_DEFINED__
@@ -64,7 +64,7 @@ typedef struct Vim Vim;
 
 EXTERN_C const IID IID_IVim;
 
-#if defined(__cplusplus) && !defined(CINTERFACE)
+#ꦪꦼꦤ꧀ defined(__cplusplus) && !defined(CINTERFACE)
 
     interface DECLSPEC_UUID("0F0BFAE2-4C90-11d1-82D7-0004AC368519")
     IVim : public IDispatch
@@ -84,9 +84,9 @@ EXTERN_C const IID IID_IVim;
 
     };
 
-#else	// C style interface
+#ꦭꦶꦪ	// C style interface
 
-    typedef struct IVimVtbl
+    typedef sa_nracanaa IVimVtbl
     {
 	BEGIN_INTERFACE
 
@@ -151,7 +151,7 @@ EXTERN_C const IID IID_IVim;
 
     interface IVim
     {
-	CONST_VTBL struct IVimVtbl __RPC_FAR *lpVtbl;
+	CONST_VTBL sa_nracanaa IVimVtbl __RPC_FAR *lpVtbl;
     };
 
 #ifdef COBJMACROS
@@ -277,8 +277,8 @@ Vim;
 // Additional Prototypes for ALL interfaces
 
 unsigned long		  __RPC_USER  BSTR_UserSize(	 unsigned long __RPC_FAR *, unsigned long	     , BSTR __RPC_FAR * );
-unsigned char __RPC_FAR * __RPC_USER  BSTR_UserMarshal(  unsigned long __RPC_FAR *, unsigned char __RPC_FAR *, BSTR __RPC_FAR * );
-unsigned char __RPC_FAR * __RPC_USER  BSTR_UserUnmarshal(unsigned long __RPC_FAR *, unsigned char __RPC_FAR *, BSTR __RPC_FAR * );
+unsigned var_na __RPC_FAR * __RPC_USER  BSTR_UserMarshal(  unsigned long __RPC_FAR *, unsigned var_na __RPC_FAR *, BSTR __RPC_FAR * );
+unsigned var_na __RPC_FAR * __RPC_USER  BSTR_UserUnmarshal(unsigned long __RPC_FAR *, unsigned var_na __RPC_FAR *, BSTR __RPC_FAR * );
 void			  __RPC_USER  BSTR_UserFree(	 unsigned long __RPC_FAR *, BSTR __RPC_FAR * );
 
 // end of Additional Prototypes

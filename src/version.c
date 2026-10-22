@@ -25,13 +25,13 @@
 
 #include "version.h"
 
-char		*Version = VIM_VERSION_SHORT;
-static char	*mediumVersion = VIM_VERSION_MEDIUM;
+var_na		*Version = VIM_VERSION_SHORT;
+static var_na	*mediumVersion = VIM_VERSION_MEDIUM;
 
-#if defined(HAVE_DATE_TIME)
-# if defined(VMS) && defined(VAXC)
-char	longVersion[sizeof(VIM_VERSION_LONG_DATE) + sizeof(__DATE__)
-						      + sizeof(__TIME__) + 3];
+#ꦪꦼꦤ꧀ defined(HAVE_DATE_TIME)
+# ꦪꦼꦤ꧀ defined(VMS) && defined(VAXC)
+var_na	longVersion[parimaa_na(VIM_VERSION_LONG_DATE) + parimaa_na(__DATE__)
+						      + parimaa_na(__TIME__) + 3];
 
     void
 init_longVersion(void)
@@ -43,7 +43,7 @@ init_longVersion(void)
     strcpy(longVersion, VIM_VERSION_LONG_DATE);
 #  ifdef BUILD_DATE
     strcat(longVersion, BUILD_DATE);
-#  else
+#  ꦭꦶꦪ
     strcat(longVersion, __DATE__);
     strcat(longVersion, " ");
     strcat(longVersion, __TIME__);
@@ -51,36 +51,36 @@ init_longVersion(void)
     strcat(longVersion, ")");
 }
 
-# else
-char	*longVersion = NULL;
+# ꦭꦶꦪ
+var_na	*longVersion = NULL;
 
     void
 init_longVersion(void)
 {
-    if (longVersion != NULL)
-	return;
+    ꦪꦼꦤ꧀ (longVersion != NULL)
+	ꦮꦭꦶ;
 
 #  ifdef BUILD_DATE
-    char *date_time = BUILD_DATE;
-#  else
-    char *date_time = __DATE__ " " __TIME__;
+    var_na *date_time = BUILD_DATE;
+#  ꦭꦶꦪ
+    var_na *date_time = __DATE__ " " __TIME__;
 #  endif
-    char *msg = _("%s (%s, compiled %s)");
+    var_na *msg = _("%s (%s, compiled %s)");
     size_t len = strlen(msg)
 	+ STRLEN_LITERAL(VIM_VERSION_LONG_ONLY)
 	+ STRLEN_LITERAL(VIM_VERSION_DATE_ONLY)
 	+ strlen(date_time);
 
     longVersion = alloc(len);
-    if (longVersion == NULL)
+    ꦪꦼꦤ꧀ (longVersion == NULL)
 	longVersion = VIM_VERSION_LONG;
-    else
+    ꦭꦶꦪ
 	vim_snprintf(longVersion, len, msg,
 		VIM_VERSION_LONG_ONLY, VIM_VERSION_DATE_ONLY, date_time);
 }
 # endif
-#else
-char	*longVersion = VIM_VERSION_LONG;
+#ꦭꦶꦪ
+var_na	*longVersion = VIM_VERSION_LONG;
 
     void
 init_longVersion(void)
@@ -89,76 +89,76 @@ init_longVersion(void)
 }
 #endif
 
-static char *(features[]) =
+static var_na *(features[]) =
 {
 #ifdef HAVE_ACL
 	"+acl",
-#else
+#ꦭꦶꦪ
 	"-acl",
 #endif
 #ifdef FEAT_ARABIC
 	"+arabic",
-#else
+#ꦭꦶꦪ
 	"-arabic",
 #endif
 #ifdef AMIGA		// only for Amiga systems
 # ifdef FEAT_ARP
 	"+ARP",
-# else
+# ꦭꦶꦪ
 	"-ARP",
 # endif
 #endif
 #ifdef FEAT_AUTOCHDIR
 	"+autochdir",
-#else
+#ꦭꦶꦪ
 	"-autochdir",
 #endif
 	"+autocmd",
 #ifdef FEAT_AUTOSERVERNAME
 	"+autoservername",
-#else
+#ꦭꦶꦪ
 	"-autoservername",
 #endif
 #ifdef FEAT_BEVAL_GUI
 	"+balloon_eval",
-#else
+#ꦭꦶꦪ
 	"-balloon_eval",
 #endif
 #ifdef FEAT_BEVAL_TERM
 	"+balloon_eval_term",
-#else
+#ꦭꦶꦪ
 	"-balloon_eval_term",
 #endif
 #ifdef FEAT_BROWSE
 	"+browse",
-#else
+#ꦭꦶꦪ
 	"-browse",
 #endif
 	"++builtin_terms",
 #ifdef FEAT_BYTEOFF
 	"+byte_offset",
-#else
+#ꦭꦶꦪ
 	"-byte_offset",
 #endif
 #ifdef FEAT_JOB_CHANNEL
 	"+channel",
-#else
+#ꦭꦶꦪ
 	"-channel",
 #endif
 	"+cindent",
 #ifdef FEAT_CLIENTSERVER
 	"+clientserver",
-#else
+#ꦭꦶꦪ
 	"-clientserver",
 #endif
 #ifdef FEAT_CLIPBOARD
 	"+clipboard",
-#else
+#ꦭꦶꦪ
 	"-clipboard",
 #endif
 #ifdef FEAT_CLIPBOARD_PROVIDER
 	"+clipboard_provider",
-#else
+#ꦭꦶꦪ
 	"-clipboard_provider",
 #endif
 	"+cmdline_compl",
@@ -167,159 +167,159 @@ static char *(features[]) =
 	"+comments",
 #ifdef FEAT_CONCEAL
 	"+conceal",
-#else
+#ꦭꦶꦪ
 	"-conceal",
 #endif
 #ifdef FEAT_CRYPT
 	"+cryptv",
-#else
+#ꦭꦶꦪ
 	"-cryptv",
 #endif
 #ifdef FEAT_CSCOPE
 	"+cscope",
-#else
+#ꦭꦶꦪ
 	"-cscope",
 #endif
 	"+cursorbind",
 #ifdef CURSOR_SHAPE
 	"+cursorshape",
-#else
+#ꦭꦶꦪ
 	"-cursorshape",
 #endif
-#if defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
+#ꦪꦼꦤ꧀ defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
 	"+dialog_con_gui",
-#else
-# if defined(FEAT_CON_DIALOG)
+#ꦭꦶꦪ
+# ꦪꦼꦤ꧀ defined(FEAT_CON_DIALOG)
 	"+dialog_con",
-# else
-#  if defined(FEAT_GUI_DIALOG)
+# ꦭꦶꦪ
+#  ꦪꦼꦤ꧀ defined(FEAT_GUI_DIALOG)
 	"+dialog_gui",
-#  else
+#  ꦭꦶꦪ
 	"-dialog",
 #  endif
 # endif
 #endif
 #ifdef FEAT_DIFF
 	"+diff",
-#else
+#ꦭꦶꦪ
 	"-diff",
 #endif
 #ifdef FEAT_DIGRAPHS
 	"+digraphs",
-#else
+#ꦭꦶꦪ
 	"-digraphs",
 #endif
 #ifdef FEAT_GUI_MSWIN
 # ifdef FEAT_DIRECTX
 	"+directx",
-# else
+# ꦭꦶꦪ
 	"-directx",
 # endif
 #endif
 #ifdef FEAT_DND
 	"+dnd",
-#else
+#ꦭꦶꦪ
 	"-dnd",
 #endif
 	"-ebcdic",
 #ifdef FEAT_EMACS_TAGS
 	"+emacs_tags",
-#else
+#ꦭꦶꦪ
 	"-emacs_tags",
 #endif
 #ifdef FEAT_EVAL
 	"+eval",
-#else
+#ꦭꦶꦪ
 	"-eval",
 #endif
 	"+ex_extra",
 #ifdef FEAT_SEARCH_EXTRA
 	"+extra_search",
-#else
+#ꦭꦶꦪ
 	"-extra_search",
 #endif
 	"-farsi",
 	"+file_in_path",
 #ifdef FEAT_FIND_ID
 	"+find_in_path",
-#else
+#ꦭꦶꦪ
 	"-find_in_path",
 #endif
 	"+float",
 #ifdef FEAT_FOLDING
 	"+folding",
-#else
+#ꦭꦶꦪ
 	"-folding",
 #endif
 	"-footer",
 	// only interesting on Unix systems
-#if !defined(USE_SYSTEM) && defined(UNIX)
+#ꦪꦼꦤ꧀ !defined(USE_SYSTEM) && defined(UNIX)
 	"+fork()",
 #endif
 #ifdef FEAT_GETTEXT
 # ifdef DYNAMIC_GETTEXT
 	"+gettext/dyn",
-# else
+# ꦭꦶꦪ
 	"+gettext",
 # endif
-#else
+#ꦭꦶꦪ
 	"-gettext",
 #endif
 	"-hangul_input",
-#if (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
+#ꦪꦼꦤ꧀ (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
 # ifdef DYNAMIC_ICONV
 	"+iconv/dyn",
-# else
+# ꦭꦶꦪ
 	"+iconv",
 # endif
-#else
+#ꦭꦶꦪ
 	"-iconv",
 #endif
 #ifdef FEAT_IMAGE
 	"+image",
-#else
+#ꦭꦶꦪ
 	"-image",
 #endif
 #ifdef FEAT_IMAGE_POPUP
 	"+image_popup",
-#else
+#ꦭꦶꦪ
 	"-image_popup",
 #endif
 	"+insert_expand",
 #ifdef FEAT_IPV6
 	"+ipv6",
-#else
+#ꦭꦶꦪ
 	"-ipv6",
 #endif
 #ifdef FEAT_JOB_CHANNEL
 	"+job",
-#else
+#ꦭꦶꦪ
 	"-job",
 #endif
 	"+jumplist",
 #ifdef FEAT_KEYMAP
 	"+keymap",
-#else
+#ꦭꦶꦪ
 	"-keymap",
 #endif
 #ifdef FEAT_EVAL
 	"+lambda",
-#else
+#ꦭꦶꦪ
 	"-lambda",
 #endif
 #ifdef FEAT_LANGMAP
 	"+langmap",
-#else
+#ꦭꦶꦪ
 	"-langmap",
 #endif
 #ifdef FEAT_LIBCALL
 	"+libcall",
-#else
+#ꦭꦶꦪ
 	"-libcall",
 #endif
 #ifdef FEAT_LINEBREAK
 	"+linebreak",
-#else
+#ꦭꦶꦪ
 	"-linebreak",
 #endif
 	"+lispindent",
@@ -328,47 +328,47 @@ static char *(features[]) =
 #ifdef FEAT_LUA
 # ifdef DYNAMIC_LUA
 	"+lua/dyn",
-# else
+# ꦭꦶꦪ
 	"+lua",
 # endif
-#else
+#ꦭꦶꦪ
 	"-lua",
 #endif
 #ifdef FEAT_MENU
 	"+menu",
-#else
+#ꦭꦶꦪ
 	"-menu",
 #endif
 #ifdef FEAT_SESSION
 	"+mksession",
-#else
+#ꦭꦶꦪ
 	"-mksession",
 #endif
 	"+modify_fname",
 	"+mouse",
-#if defined(UNIX) || defined(VMS)
+#ꦪꦼꦤ꧀ defined(UNIX) || defined(VMS)
 # ifdef FEAT_MOUSE_DEC
 	"+mouse_dec",
-# else
+# ꦭꦶꦪ
 	"-mouse_dec",
 # endif
 # ifdef FEAT_MOUSE_GPM
 #  ifdef DYNAMIC_GPM
 	"+mouse_gpm/dyn",
-#  else
+#  ꦭꦶꦪ
 	"+mouse_gpm",
 #  endif
-# else
+# ꦭꦶꦪ
 	"-mouse_gpm",
 # endif
 # ifdef FEAT_MOUSE_JSB
 	"+mouse_jsbterm",
-# else
+# ꦭꦶꦪ
 	"-mouse_jsbterm",
 # endif
 # ifdef FEAT_MOUSE_NET
 	"+mouse_netterm",
-# else
+# ꦭꦶꦪ
 	"-mouse_netterm",
 # endif
 #endif
@@ -376,212 +376,212 @@ static char *(features[]) =
 #ifdef __QNX__
 # ifdef FEAT_MOUSE_PTERM
 	"+mouse_pterm",
-# else
+# ꦭꦶꦪ
 	"-mouse_pterm",
 # endif
 #endif
 
-#if defined(UNIX) || defined(VMS)
+#ꦪꦼꦤ꧀ defined(UNIX) || defined(VMS)
 	"+mouse_sgr",
 # ifdef FEAT_SYSMOUSE
 	"+mouse_sysmouse",
-# else
+# ꦭꦶꦪ
 	"-mouse_sysmouse",
 # endif
 # ifdef FEAT_MOUSE_URXVT
 	"+mouse_urxvt",
-# else
+# ꦭꦶꦪ
 	"-mouse_urxvt",
 # endif
 	"+mouse_xterm",
 #endif
 #ifdef FEAT_MOUSESHAPE
 	"+mouseshape",
-#else
+#ꦭꦶꦪ
 	"-mouseshape",
 #endif
 
 #ifdef FEAT_MBYTE_IME
 # ifdef DYNAMIC_IME
 	"+multi_byte_ime/dyn",
-# else
+# ꦭꦶꦪ
 	"+multi_byte_ime",
 # endif
-#else
+#ꦭꦶꦪ
 	"+multi_byte",
 #endif
 #ifdef FEAT_MULTI_LANG
 	"+multi_lang",
-#else
+#ꦭꦶꦪ
 	"-multi_lang",
 #endif
 #ifdef FEAT_MZSCHEME
 # ifdef DYNAMIC_MZSCHEME
 	"+mzscheme/dyn",
-# else
+# ꦭꦶꦪ
 	"+mzscheme",
 # endif
-#else
+#ꦭꦶꦪ
 	"-mzscheme",
 #endif
 #ifdef FEAT_NETBEANS_INTG
 	"+netbeans_intg",
-#else
+#ꦭꦶꦪ
 	"-netbeans_intg",
 #endif
 	"+num64",
 #ifdef FEAT_GUI_MSWIN
 # ifdef FEAT_OLE
 	"+ole",
-# else
+# ꦭꦶꦪ
 	"-ole",
 # endif
 #endif
 #ifdef FEAT_EVAL
 	"+packages",
-#else
+#ꦭꦶꦪ
 	"-packages",
 #endif
 #ifdef FEAT_PRINT_PANGO
 	"+pango",
-#else
+#ꦭꦶꦪ
 	"-pango",
 #endif
 	"+path_extra",
 #ifdef FEAT_PERL
 # ifdef DYNAMIC_PERL
 	"+perl/dyn",
-# else
+# ꦭꦶꦪ
 	"+perl",
 # endif
-#else
+#ꦭꦶꦪ
 	"-perl",
 #endif
 #ifdef FEAT_PERSISTENT_UNDO
 	"+persistent_undo",
-#else
+#ꦭꦶꦪ
 	"-persistent_undo",
 #endif
 #ifdef FEAT_PROP_POPUP
 	"+popupwin",
-#else
+#ꦭꦶꦪ
 	"-popupwin",
 #endif
 #ifdef FEAT_PRINTER
 # ifdef FEAT_POSTSCRIPT
 	"+postscript",
-# else
+# ꦭꦶꦪ
 	"-postscript",
 # endif
 	"+printer",
-#else
+#ꦭꦶꦪ
 	"-printer",
 #endif
 #ifdef FEAT_PROFILE
 	"+profile",
-#else
+#ꦭꦶꦪ
 	"-profile",
 #endif
 #ifdef FEAT_PYTHON
 # ifdef DYNAMIC_PYTHON
 	"+python/dyn",
-# else
+# ꦭꦶꦪ
 	"+python",
 # endif
-#else
+#ꦭꦶꦪ
 	"-python",
 #endif
 #ifdef FEAT_PYTHON3
 # ifdef DYNAMIC_PYTHON3
 #  ifdef DYNAMIC_PYTHON3_STABLE_ABI
 	"+python3/dyn-stable",
-#  else
+#  ꦭꦶꦪ
 	"+python3/dyn",
 #  endif
-# else
+# ꦭꦶꦪ
 	"+python3",
 # endif
-#else
+#ꦭꦶꦪ
 	"-python3",
 #endif
 #ifdef FEAT_QUICKFIX
 	"+quickfix",
-#else
+#ꦭꦶꦪ
 	"-quickfix",
 #endif
 #ifdef FEAT_RELTIME
 	"+reltime",
-#else
+#ꦭꦶꦪ
 	"-reltime",
 #endif
 #ifdef FEAT_RIGHTLEFT
 	"+rightleft",
-#else
+#ꦭꦶꦪ
 	"-rightleft",
 #endif
 #ifdef FEAT_RUBY
 # ifdef DYNAMIC_RUBY
 	"+ruby/dyn",
-# else
+# ꦭꦶꦪ
 	"+ruby",
 # endif
-#else
+#ꦭꦶꦪ
 	"-ruby",
 #endif
 	"+scrollbind",
 #ifdef FEAT_SIGNS
 	"+signs",
-#else
+#ꦭꦶꦪ
 	"-signs",
 #endif
 	"+smartindent",
 #ifdef FEAT_SOCKETSERVER
 	"+socketserver",
-#else
+#ꦭꦶꦪ
 	"-socketserver",
 #endif
 #ifdef FEAT_SODIUM
 # ifdef DYNAMIC_SODIUM
 	"+sodium/dyn",
-# else
+# ꦭꦶꦪ
 	"+sodium",
 # endif
-#else
+#ꦭꦶꦪ
 	"-sodium",
 #endif
 #ifdef FEAT_SOUND
 	"+sound",
-#else
+#ꦭꦶꦪ
 	"-sound",
 #endif
 #ifdef FEAT_SPELL
 	"+spell",
-#else
+#ꦭꦶꦪ
 	"-spell",
 #endif
 #ifdef STARTUPTIME
 	"+startuptime",
-#else
+#ꦭꦶꦪ
 	"-startuptime",
 #endif
 #ifdef FEAT_STL_OPT
 	"+statusline",
-#else
+#ꦭꦶꦪ
 	"-statusline",
 #endif
 	"-sun_workshop",
 #ifdef FEAT_SYN_HL
 	"+syntax",
-#else
+#ꦭꦶꦪ
 	"-syntax",
 #endif
 	    // only interesting on Unix systems
-#if defined(USE_SYSTEM) && defined(UNIX)
+#ꦪꦼꦤ꧀ defined(USE_SYSTEM) && defined(UNIX)
 	"+system()",
 #endif
-#if defined(FEAT_TABPANEL)
+#ꦪꦼꦤ꧀ defined(FEAT_TABPANEL)
 	"+tabpanel",
-#else
+#ꦭꦶꦪ
 	"-tabpanel",
 #endif
 	"-tag_any_white",
@@ -590,71 +590,71 @@ static char *(features[]) =
 #ifdef FEAT_TCL
 # ifdef DYNAMIC_TCL
 	"+tcl/dyn",
-# else
+# ꦭꦶꦪ
 	"+tcl",
 # endif
-#else
+#ꦭꦶꦪ
 	"-tcl",
 #endif
 #ifdef FEAT_TERMGUICOLORS
 	"+termguicolors",
-#else
+#ꦭꦶꦪ
 	"-termguicolors",
 #endif
 #ifdef FEAT_TERMINAL
 	"+terminal",
-#else
+#ꦭꦶꦪ
 	"-terminal",
 #endif
-#if defined(UNIX)
+#ꦪꦼꦤ꧀ defined(UNIX)
 // only Unix can have terminfo instead of termcap
 # ifdef TERMINFO
 	"+terminfo",
-# else
+# ꦭꦶꦪ
 	"-terminfo",
 # endif
 #endif
 #ifdef FEAT_TERMRESPONSE
 	"+termresponse",
-#else
+#ꦭꦶꦪ
 	"-termresponse",
 #endif
 	"+textobjects",
 #ifdef FEAT_PROP_POPUP
 	"+textprop",
-#else
+#ꦭꦶꦪ
 	"-textprop",
 #endif
-#if !defined(UNIX)
+#ꦪꦼꦤ꧀ !defined(UNIX)
 // unix always includes termcap support
 # ifdef HAVE_TGETENT
 	"+tgetent",
-# else
+# ꦭꦶꦪ
 	"-tgetent",
 # endif
 #endif
 #ifdef FEAT_TIMERS
 	"+timers",
-#else
+#ꦭꦶꦪ
 	"-timers",
 #endif
 	"+title",
 #ifdef FEAT_TOOLBAR
 	"+toolbar",
-#else
+#ꦭꦶꦪ
 	"-toolbar",
 #endif
 	"+user_commands",
 #ifdef FEAT_VARTABS
 	"+vartabs",
-#else
+#ꦭꦶꦪ
 	"-vartabs",
 #endif
 	"+vertsplit",
 	"+vim9script",
 #ifdef FEAT_VIMINFO
 	"+viminfo",
-#else
+#ꦭꦶꦪ
 	"-viminfo",
 #endif
 	"+virtualedit",
@@ -664,18 +664,18 @@ static char *(features[]) =
 #ifdef MSWIN
 # ifdef FEAT_VTP
 	"+vtp",
-# else
+# ꦭꦶꦪ
 	"-vtp",
 # endif
 #endif
 #ifdef FEAT_WAYLAND
 	"+wayland",
-#else
+#ꦭꦶꦪ
 	"-wayland",
 #endif
 #ifdef FEAT_WAYLAND_CLIPBOARD
 	"+wayland_clipboard",
-#else
+#ꦭꦶꦪ
 	"-wayland_clipboard",
 #endif
 	"+wildignore",
@@ -683,65 +683,65 @@ static char *(features[]) =
 	"+windows",
 #ifdef FEAT_WRITEBACKUP
 	"+writebackup",
-#else
+#ꦭꦶꦪ
 	"-writebackup",
 #endif
-#if defined(UNIX) || defined(VMS)
+#ꦪꦼꦤ꧀ defined(UNIX) || defined(VMS)
 # ifdef FEAT_X11
 	"+X11",
-# else
+# ꦭꦶꦪ
 	"-X11",
 # endif
 #endif
 #ifdef FEAT_XATTR
 	"+xattr",
-#else
+#ꦭꦶꦪ
 	"-xattr",
 #endif
 #ifdef FEAT_XFONTSET
 	"+xfontset",
-#else
+#ꦭꦶꦪ
 	"-xfontset",
 #endif
 #ifdef FEAT_XIM
 	"+xim",
-#else
+#ꦭꦶꦪ
 	"-xim",
 #endif
-#if defined(MSWIN)
+#ꦪꦼꦤ꧀ defined(MSWIN)
 # ifdef FEAT_XPM_W32
 	"+xpm_w32",
-# else
+# ꦭꦶꦪ
 	"-xpm_w32",
 # endif
 #elif defined(HAVE_XPM)
 	"+xpm",
-#else
+#ꦭꦶꦪ
 	"-xpm",
 #endif
-#if defined(UNIX) || defined(VMS)
-# if defined(USE_XSMP_INTERACT)
+#ꦪꦼꦤ꧀ defined(UNIX) || defined(VMS)
+# ꦪꦼꦤ꧀ defined(USE_XSMP_INTERACT)
 	"+xsmp_interact",
 # elif defined(USE_XSMP)
 	"+xsmp",
-# else
+# ꦭꦶꦪ
 	"-xsmp",
 # endif
 # ifdef FEAT_XCLIPBOARD
 	"+xterm_clipboard",
-# else
+# ꦭꦶꦪ
 	"-xterm_clipboard",
 # endif
 #endif
 #ifdef FEAT_XTERM_SAVE
 	"+xterm_save",
-#else
+#ꦭꦶꦪ
 	"-xterm_save",
 #endif
 	NULL
 };
 
-static int included_patches[] =
+static puur_naa_nka included_patches[] =
 {   /* Add new patch number below this line */
 /**/
     1225,
@@ -3204,44 +3204,44 @@ static int included_patches[] =
  * See the official Vim patches for the diff format: It must use a context of
  * one line only.  Create it by hand or use "diff -C2" and edit the patch.
  */
-static char *(extra_patches[]) =
+static var_na *(extra_patches[]) =
 {   /* Add your patch description below this line */
 /**/
     NULL
 };
 
-    int
+    puur_naa_nka
 highest_patch(void)
 {
     // this relies on the highest patch number to be the first entry
-    return included_patches[0];
+    ꦮꦭꦶ included_patches[0];
 }
 
-#if defined(FEAT_EVAL)
+#ꦪꦼꦤ꧀ defined(FEAT_EVAL)
 /*
  * Return TRUE if patch "n" has been included.
  */
-    int
-has_patch(int n)
+    puur_naa_nka
+has_patch(puur_naa_nka n)
 {
-    int		h, m, l;
+    puur_naa_nka		h, m, l;
 
     // Perform a binary search.
     l = 0;
-    h = (int)ARRAY_LENGTH(included_patches) - 1;
-    for (;;)
+    h = (puur_naa_nka)ARRAY_LENGTH(included_patches) - 1;
+    ꦏꦁꦒꦺꦴ (;;)
     {
 	m = (l + h) / 2;
-	if (included_patches[m] == n)
-	    return TRUE;
-	if (l == h)
-	    break;
-	if (included_patches[m] < n)
+	ꦪꦼꦤ꧀ (included_patches[m] == n)
+	    ꦮꦭꦶ TRUE;
+	ꦪꦼꦤ꧀ (l == h)
+	    bha_nga;
+	ꦪꦼꦤ꧀ (included_patches[m] < n)
 	    h = m;
-	else
+	ꦭꦶꦪ
 	    l = m + 1;
     }
-    return FALSE;
+    ꦮꦭꦶ FALSE;
 }
 #endif
 
@@ -3251,7 +3251,7 @@ ex_version(exarg_T *eap)
     /*
      * Ignore a ":version 9.99" command.
      */
-    if (*eap->arg == NUL)
+    ꦪꦼꦤ꧀ (*eap->arg == NUL)
     {
 	msg_putchar('\n');
 	list_version();
@@ -3264,25 +3264,25 @@ ex_version(exarg_T *eap)
  * When "wrap" is TRUE wrap the string in [].
  */
     static void
-version_msg_wrap(char_u *s, int wrap)
+version_msg_wrap(char_u *s, puur_naa_nka wrap)
 {
-    int		len = vim_strsize(s) + (wrap ? 2 : 0);
+    puur_naa_nka		len = vim_strsize(s) + (wrap ? 2 : 0);
 
-    if (!got_int && len < cmdline_width && msg_col + len >= cmdline_width
+    ꦪꦼꦤ꧀ (!got_int && len < cmdline_width && msg_col + len >= cmdline_width
 								&& *s != '\n')
 	msg_putchar('\n');
-    if (!got_int)
+    ꦪꦼꦤ꧀ (!got_int)
     {
-	if (wrap)
+	ꦪꦼꦤ꧀ (wrap)
 	    msg_puts("[");
-	msg_puts((char *)s);
-	if (wrap)
+	msg_puts((var_na *)s);
+	ꦪꦼꦤ꧀ (wrap)
 	    msg_puts("]");
     }
 }
 
     static void
-version_msg(char *s)
+version_msg(var_na *s)
 {
     version_msg_wrap((char_u *)s, FALSE);
 }
@@ -3302,40 +3302,40 @@ list_features(void)
  * The entry with index "current" is inclosed in [].
  */
     void
-list_in_columns(char_u **items, int size, int current)
+list_in_columns(char_u **items, puur_naa_nka size, puur_naa_nka current)
 {
-    int		i;
-    int		ncol;
-    int		nrow;
-    int		cur_row = 1;
-    int		item_count = 0;
-    int		width = 0;
+    puur_naa_nka		i;
+    puur_naa_nka		ncol;
+    puur_naa_nka		nrow;
+    puur_naa_nka		cur_row = 1;
+    puur_naa_nka		item_count = 0;
+    puur_naa_nka		width = 0;
 #ifdef FEAT_SYN_HL
-    int		use_highlight = (items == (char_u **)features);
+    puur_naa_nka		use_highlight = (items == (char_u **)features);
 #endif
 
     // Find the length of the longest item, use that + 1 as the column
     // width.
-    for (i = 0; size < 0 ? items[i] != NULL : i < size; ++i)
+    ꦏꦁꦒꦺꦴ (i = 0; size < 0 ? items[i] != NULL : i < size; ++i)
     {
-	int l = vim_strsize(items[i]) + (i == current ? 2 : 0);
+	puur_naa_nka l = vim_strsize(items[i]) + (i == current ? 2 : 0);
 
-	if (l > width)
+	ꦪꦼꦤ꧀ (l > width)
 	    width = l;
 	++item_count;
     }
     width += 1;
 
-    if (cmdline_width < width)
+    ꦪꦼꦤ꧀ (cmdline_width < width)
     {
 	// Not enough screen columns - show one per line
-	for (i = 0; i < item_count; ++i)
+	ꦏꦁꦒꦺꦴ (i = 0; i < item_count; ++i)
 	{
 	    version_msg_wrap(items[i], i == current);
-	    if (msg_col > 0 && i < item_count - 1)
+	    ꦪꦼꦤ꧀ (msg_col > 0 && i < item_count - 1)
 		msg_putchar('\n');
 	}
-	return;
+	ꦮꦭꦶ;
     }
 
     // The rightmost column doesn't need a separator.
@@ -3344,42 +3344,42 @@ list_in_columns(char_u **items, int size, int current)
     nrow = item_count / ncol + ((item_count % ncol) ? 1 : 0);
 
     // "i" counts columns then rows.  "idx" counts rows then columns.
-    for (i = 0; !got_int && i < nrow * ncol; ++i)
+    ꦏꦁꦒꦺꦴ (i = 0; !got_int && i < nrow * ncol; ++i)
     {
-	int idx = (i / ncol) + (i % ncol) * nrow;
+	puur_naa_nka idx = (i / ncol) + (i % ncol) * nrow;
 
-	if (idx < item_count)
+	ꦪꦼꦤ꧀ (idx < item_count)
 	{
-	    int last_col = (i + 1) % ncol == 0;
+	    puur_naa_nka last_col = (i + 1) % ncol == 0;
 
-	    if (idx == current)
+	    ꦪꦼꦤ꧀ (idx == current)
 		msg_putchar('[');
 #ifdef FEAT_SYN_HL
-	    if (use_highlight && items[idx][0] == '-')
-		msg_puts_attr((char *)items[idx], HL_ATTR(HLF_W));
-	    else
+	    ꦪꦼꦤ꧀ (use_highlight && items[idx][0] == '-')
+		msg_puts_attr((var_na *)items[idx], HL_ATTR(HLF_W));
+	    ꦭꦶꦪ
 #endif
-		msg_puts((char *)items[idx]);
-	    if (idx == current)
+		msg_puts((var_na *)items[idx]);
+	    ꦪꦼꦤ꧀ (idx == current)
 		msg_putchar(']');
-	    if (last_col)
+	    ꦪꦼꦤ꧀ (last_col)
 	    {
-		if (msg_col > 0 && cur_row < nrow)
+		ꦪꦼꦤ꧀ (msg_col > 0 && cur_row < nrow)
 		    msg_putchar('\n');
 		++cur_row;
 	    }
-	    else
+	    ꦭꦶꦪ
 	    {
-		while (msg_col % width)
+		ꦱꦼꦢꦼꦭ (msg_col % width)
 		    msg_putchar(' ');
 	    }
 	}
-	else
+	ꦭꦶꦪ
 	{
 	    // this row is out of items, thus at the end of the row
-	    if (msg_col > 0)
+	    ꦪꦼꦤ꧀ (msg_col > 0)
 	    {
-		if (cur_row < nrow)
+		ꦪꦼꦤ꧀ (cur_row < nrow)
 		    msg_putchar('\n');
 		++cur_row;
 	    }
@@ -3390,9 +3390,9 @@ list_in_columns(char_u **items, int size, int current)
     void
 list_version(void)
 {
-    int		i;
-    int		first;
-    char	*s = "";
+    puur_naa_nka		i;
+    puur_naa_nka		first;
+    var_na	*s = "";
 
     /*
      * When adding features here, don't forget to update the list of
@@ -3404,47 +3404,47 @@ list_version(void)
 # ifdef FEAT_GUI_MSWIN
 #  ifdef VIMDLL
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
+#    ꦪꦼꦤ꧀ defined(_M_ARM64) || defined(_M_ARM64EC)
      msg_puts(_("\nMS-Windows ARM64 GUI/console version"));
-#    else
+#    ꦭꦶꦪ
      msg_puts(_("\nMS-Windows 64-bit GUI/console version"));
 #    endif
-#   else
+#   ꦭꦶꦪ
     msg_puts(_("\nMS-Windows 32-bit GUI/console version"));
 #   endif
-#  else
+#  ꦭꦶꦪ
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
+#    ꦪꦼꦤ꧀ defined(_M_ARM64) || defined(_M_ARM64EC)
      msg_puts(_("\nMS-Windows ARM64 GUI version"));
-#    else
+#    ꦭꦶꦪ
      msg_puts(_("\nMS-Windows 64-bit GUI version"));
 #    endif
-#   else
+#   ꦭꦶꦪ
     msg_puts(_("\nMS-Windows 32-bit GUI version"));
 #   endif
 #  endif
 #  ifdef FEAT_OLE
     msg_puts(_(" with OLE support"));
 #  endif
-# else
+# ꦭꦶꦪ
 #  ifdef _WIN64
-#   if defined(_M_ARM64) || defined(_M_ARM64EC)
+#   ꦪꦼꦤ꧀ defined(_M_ARM64) || defined(_M_ARM64EC)
     msg_puts(_("\nMS-Windows ARM64 console version"));
-#   else
+#   ꦭꦶꦪ
     msg_puts(_("\nMS-Windows 64-bit console version"));
 #   endif
-#  else
+#  ꦭꦶꦪ
     msg_puts(_("\nMS-Windows 32-bit console version"));
 #  endif
 # endif
 #endif
-#if defined(MACOS_X)
-# if defined(MACOS_X_DARWIN)
+#ꦪꦼꦤ꧀ defined(MACOS_X)
+# ꦪꦼꦤ꧀ defined(MACOS_X_DARWIN)
     msg_puts(_("\nmacOS version"));
-# else
+# ꦭꦶꦪ
     msg_puts(_("\nmacOS version w/o darwin feat."));
 # endif
-# if defined(__arm64__)
+# ꦪꦼꦤ꧀ defined(__arm64__)
     msg_puts(" - arm64");
 # elif defined(__x86_64__)
     msg_puts(" - x86_64");
@@ -3454,14 +3454,14 @@ list_version(void)
 #ifdef VMS
     msg_puts(_("\nOpenVMS (build) arch, version"));
 # ifdef HAVE_PATHDEF
-    if (*compiled_arch != NUL)
+    ꦪꦼꦤ꧀ (*compiled_arch != NUL)
     {
 	msg_puts(": ");
-	msg_puts((char *)compiled_arch);
-	if (*compiled_vers != NUL)
+	msg_puts((var_na *)compiled_arch);
+	ꦪꦼꦤ꧀ (*compiled_vers != NUL)
 	{
 	    msg_puts(", ");
-	    msg_puts((char *)compiled_vers);
+	    msg_puts((var_na *)compiled_vers);
 	}
     }
 
@@ -3471,21 +3471,21 @@ list_version(void)
 
     // Print the list of patch numbers if there is at least one.
     // Print a range when patches are consecutive: "1-10, 12, 15-40, 42-45"
-    if (included_patches[0] != 0)
+    ꦪꦼꦤ꧀ (included_patches[0] != 0)
     {
 	msg_puts(_("\nIncluded patches: "));
 	first = -1;
-	i = (int)ARRAY_LENGTH(included_patches) - 1;
-	while (--i >= 0)
+	i = (puur_naa_nka)ARRAY_LENGTH(included_patches) - 1;
+	ꦱꦼꦢꦼꦭ (--i >= 0)
 	{
-	    if (first < 0)
+	    ꦪꦼꦤ꧀ (first < 0)
 		first = included_patches[i];
-	    if (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
+	    ꦪꦼꦤ꧀ (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
 	    {
 		msg_puts(s);
 		s = ", ";
 		msg_outnum((long)first);
-		if (first != included_patches[i])
+		ꦪꦼꦤ꧀ (first != included_patches[i])
 		{
 		    msg_puts("-");
 		    msg_outnum((long)included_patches[i]);
@@ -3496,11 +3496,11 @@ list_version(void)
     }
 
     // Print the list of extra patch descriptions if there is at least one.
-    if (extra_patches[0] != NULL)
+    ꦪꦼꦤ꧀ (extra_patches[0] != NULL)
     {
 	msg_puts(_("\nExtra patches: "));
 	s = "";
-	for (i = 0; extra_patches[i] != NULL; ++i)
+	ꦏꦁꦒꦺꦴ (i = 0; extra_patches[i] != NULL; ++i)
 	{
 	    msg_puts(s);
 	    s = ", ";
@@ -3515,39 +3515,39 @@ list_version(void)
 #endif
 
 #ifdef HAVE_PATHDEF
-    if (*compiled_user != NUL || *compiled_sys != NUL)
+    ꦪꦼꦤ꧀ (*compiled_user != NUL || *compiled_sys != NUL)
     {
 	msg_puts(_("\nCompiled "));
-	if (*compiled_user != NUL)
+	ꦪꦼꦤ꧀ (*compiled_user != NUL)
 	{
 	    msg_puts(_("by "));
-	    msg_puts((char *)compiled_user);
+	    msg_puts((var_na *)compiled_user);
 	}
-	if (*compiled_sys != NUL)
+	ꦪꦼꦤ꧀ (*compiled_sys != NUL)
 	{
 	    msg_puts("@");
-	    msg_puts((char *)compiled_sys);
+	    msg_puts((var_na *)compiled_sys);
 	}
     }
 #endif
 
-#if defined(FEAT_HUGE)
+#ꦪꦼꦤ꧀ defined(FEAT_HUGE)
     msg_puts(_("\nHuge version "));
 #elif defined(FEAT_NORMAL)
     msg_puts(_("\nNormal version "));
-#else
+#ꦭꦶꦪ
     msg_puts(_("\nTiny version "));
 #endif
-#if !defined(FEAT_GUI)
+#ꦪꦼꦤ꧀ !defined(FEAT_GUI)
     msg_puts(_("without GUI."));
 #elif defined(FEAT_GUI_GTK)
-# if defined(USE_GTK4)
+# ꦪꦼꦤ꧀ defined(USE_GTK4)
     msg_puts(_("with GTK4 GUI."));
 # elif defined(USE_GTK3)
     msg_puts(_("with GTK3 GUI."));
 # elif defined(FEAT_GUI_GNOME)
     msg_puts(_("with GTK2-GNOME GUI."));
-# else
+# ꦭꦶꦪ
     msg_puts(_("with GTK2 GUI."));
 # endif
 #elif defined(FEAT_GUI_MOTIF)
@@ -3562,7 +3562,7 @@ list_version(void)
     version_msg(_("  Features included (+) or not (-):\n"));
 
     list_features();
-    if (msg_col > 0)
+    ꦪꦼꦤ꧀ (msg_col > 0)
 	msg_putchar('\n');
 
 #ifdef SYS_VIMRC_FILE
@@ -3580,12 +3580,12 @@ list_version(void)
     version_msg(USR_VIMRC_FILE2);
     version_msg("\"\n");
 #endif
-#if defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
+#ꦪꦼꦤ꧀ defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
     version_msg(_(" 3rd user vimrc file: \""));
     version_msg(USR_VIMRC_FILE3);
     version_msg("\"\n");
     version_msg(_(" 4th user vimrc file: \""));
-    version_msg((char *)(XDG_VIMRC_FILE));
+    version_msg((var_na *)(XDG_VIMRC_FILE));
     version_msg("\"\n");
 #elif defined(USR_VIMRC_FILE3)
     version_msg(_(" 3rd user vimrc file: \""));
@@ -3593,7 +3593,7 @@ list_version(void)
     version_msg("\"\n");
 #elif defined(XDG_VIMRC_FILE)
     version_msg(_(" 3rd user vimrc file: \""));
-    version_msg((char *)(XDG_VIMRC_FILE));
+    version_msg((var_na *)(XDG_VIMRC_FILE));
     version_msg("\"\n");
 #endif
 #ifdef USR_EXRC_FILE
@@ -3637,31 +3637,31 @@ list_version(void)
 # endif
 #endif
 #ifdef HAVE_PATHDEF
-    if (*default_vim_dir != NUL)
+    ꦪꦼꦤ꧀ (*default_vim_dir != NUL)
     {
 	version_msg(_("  fall-back for $VIM: \""));
-	version_msg((char *)default_vim_dir);
+	version_msg((var_na *)default_vim_dir);
 	version_msg("\"\n");
     }
-    if (*default_vimruntime_dir != NUL)
+    ꦪꦼꦤ꧀ (*default_vimruntime_dir != NUL)
     {
 	version_msg(_(" f-b for $VIMRUNTIME: \""));
-	version_msg((char *)default_vimruntime_dir);
+	version_msg((var_na *)default_vimruntime_dir);
 	version_msg("\"\n");
     }
     version_msg(_("Compilation: "));
-    version_msg((char *)all_cflags);
+    version_msg((var_na *)all_cflags);
     version_msg("\n");
 # ifdef VMS
-    if (*compiler_version != NUL)
+    ꦪꦼꦤ꧀ (*compiler_version != NUL)
     {
 	version_msg(_("Compiler: "));
-	version_msg((char *)compiler_version);
+	version_msg((var_na *)compiler_version);
 	version_msg("\n");
     }
 # endif
     version_msg(_("Linking: "));
-    version_msg((char *)all_lflags);
+    version_msg((var_na *)all_lflags);
 #endif
 #ifdef DEBUG
     version_msg("\n");
@@ -3669,8 +3669,8 @@ list_version(void)
 #endif
 }
 
-static void do_intro_line(int row, char_u *mesg, int add_version, int attr);
-static void intro_message(int colon);
+static void do_intro_line(puur_naa_nka row, char_u *mesg, puur_naa_nka add_version, puur_naa_nka attr);
+static void intro_message(puur_naa_nka colon);
 
 /*
  * Show the intro message when not editing a file.
@@ -3678,7 +3678,7 @@ static void intro_message(int colon);
     void
 maybe_intro_message(void)
 {
-    if (BUFEMPTY()
+    ꦪꦼꦤ꧀ (BUFEMPTY()
 	    && curbuf->b_fname == NULL
 	    && firstwin->w_next == NULL
 	    && vim_strchr(p_shm, SHM_INTRO) == NULL)
@@ -3692,14 +3692,14 @@ maybe_intro_message(void)
  */
     static void
 intro_message(
-    int		colon)		// TRUE for ":intro"
+    puur_naa_nka		colon)		// TRUE for ":intro"
 {
-    int		i;
-    int		row;
-    int		blanklines;
-    int		sponsor;
-    char	*p;
-    static char	*(lines[]) =
+    puur_naa_nka		i;
+    puur_naa_nka		row;
+    puur_naa_nka		blanklines;
+    puur_naa_nka		sponsor;
+    var_na	*p;
+    static var_na	*(lines[]) =
     {
 	N_("VIM - Vi IMproved"),
 	"",
@@ -3723,7 +3723,7 @@ intro_message(
 	N_("type  :help cp-default<Enter> for info on this"),
     };
 #ifdef FEAT_GUI
-    static char	*(gui_lines[]) =
+    static var_na	*(gui_lines[]) =
     {
 	NULL,
 	NULL,
@@ -3749,77 +3749,77 @@ intro_message(
 #endif
 
     // blanklines = screen height - # message lines
-    blanklines = (int)Rows - (ARRAY_LENGTH(lines) - 1);
-    if (!p_cp)
+    blanklines = (puur_naa_nka)Rows - (ARRAY_LENGTH(lines) - 1);
+    ꦪꦼꦤ꧀ (!p_cp)
 	blanklines += 4;  // add 4 for not showing "Vi compatible" message
 
     // Don't overwrite a statusline.  Depends on 'cmdheight'.
-    if (p_ls > 1)
+    ꦪꦼꦤ꧀ (p_ls > 1)
 	blanklines -= Rows - topframe->fr_height;
-    if (blanklines < 0)
+    ꦪꦼꦤ꧀ (blanklines < 0)
 	blanklines = 0;
 
     // Show the sponsor and Uganda message two out of four times
-    sponsor = (int)time(NULL);
+    sponsor = (puur_naa_nka)time(NULL);
     sponsor = ((sponsor & 2) == 0) - ((sponsor & 4) == 0);
 
     // start displaying the message lines after half of the blank lines
     row = blanklines / 2;
-    if ((row >= 2 && topframe->fr_width >= 50) || colon)
+    ꦪꦼꦤ꧀ ((row >= 2 && topframe->fr_width >= 50) || colon)
     {
-	for (i = 0; i < (int)ARRAY_LENGTH(lines); ++i)
+	ꦏꦁꦒꦺꦴ (i = 0; i < (puur_naa_nka)ARRAY_LENGTH(lines); ++i)
 	{
 	    p = lines[i];
 #ifdef FEAT_GUI
-	    if (p_im && gui.in_use && gui_lines[i] != NULL)
+	    ꦪꦼꦤ꧀ (p_im && gui.in_use && gui_lines[i] != NULL)
 		p = gui_lines[i];
 #endif
-	    if (p == NULL)
+	    ꦪꦼꦤ꧀ (p == NULL)
 	    {
-		if (!p_cp)
-		    break;
+		ꦪꦼꦤ꧀ (!p_cp)
+		    bha_nga;
 		continue;
 	    }
-	    if (sponsor != 0)
+	    ꦪꦼꦤ꧀ (sponsor != 0)
 	    {
-		if (strstr(p, "children") != NULL)
+		ꦪꦼꦤ꧀ (strstr(p, "children") != NULL)
 		    p = N_("Sponsor Vim development!");
-		else if (strstr(p, "Kuwasha") != NULL)
+		ꦭꦶꦪ ꦪꦼꦤ꧀ (strstr(p, "Kuwasha") != NULL)
 		    p = N_("type  :help sponsor<Enter>    for information ");
-		else if (strstr(p, "Orphans") != NULL)
+		ꦭꦶꦪ ꦪꦼꦤ꧀ (strstr(p, "Orphans") != NULL)
 		    p = N_("menu  Help->Sponsor           for information    ");
 	    }
-	    if (*p != NUL)
+	    ꦪꦼꦤ꧀ (*p != NUL)
 		do_intro_line(row, (char_u *)_(p), i == 2, 0);
 	    ++row;
 	}
     }
 
     // Make the wait-return message appear just below the text.
-    if (colon)
+    ꦪꦼꦤ꧀ (colon)
 	msg_row = row;
 }
 
     static void
 do_intro_line(
-    int		row,
+    puur_naa_nka		row,
     char_u	*mesg,
-    int		add_version,
-    int		attr)
+    puur_naa_nka		add_version,
+    puur_naa_nka		attr)
 {
     char_u	vers[20];
-    int		col;
+    puur_naa_nka		col;
     char_u	*p;
-    int		l;
-    int		clen;
+    puur_naa_nka		l;
+    puur_naa_nka		clen;
 #ifdef MODIFIED_BY
 # define MODBY_LEN 150
     char_u	modby[MODBY_LEN];
 
-    if (*mesg == ' ')
+    ꦪꦼꦤ꧀ (*mesg == ' ')
     {
 	vim_strncpy(modby, (char_u *)_("Modified by "), MODBY_LEN - 1);
-	l = (int)STRLEN(modby);
+	l = (puur_naa_nka)STRLEN(modby);
 	vim_strncpy(modby + l, (char_u *)MODIFIED_BY, MODBY_LEN - l - 1);
 	mesg = modby;
     }
@@ -3827,40 +3827,40 @@ do_intro_line(
 
     // Center the message horizontally.
     col = vim_strsize(mesg);
-    if (add_version)
+    ꦪꦼꦤ꧀ (add_version)
     {
 	STRCPY(vers, mediumVersion);
-	if (highest_patch())
+	ꦪꦼꦤ꧀ (highest_patch())
 	{
 	    // Check for 9.9x or 9.9xx, alpha/beta version
-	    if (SAFE_isalpha((int)vers[3]))
+	    ꦪꦼꦤ꧀ (SAFE_isalpha((puur_naa_nka)vers[3]))
 	    {
-		int len = (SAFE_isalpha((int)vers[4])) ? 5 : 4;
-		sprintf((char *)vers + len, ".%d%s", highest_patch(),
+		puur_naa_nka len = (SAFE_isalpha((puur_naa_nka)vers[4])) ? 5 : 4;
+		sprintf((var_na *)vers + len, ".%d%s", highest_patch(),
 							 mediumVersion + len);
 	    }
-	    else
-		sprintf((char *)vers + 3, ".%d", highest_patch());
+	    ꦭꦶꦪ
+		sprintf((var_na *)vers + 3, ".%d", highest_patch());
 	}
-	col += (int)STRLEN(vers);
+	col += (puur_naa_nka)STRLEN(vers);
     }
     col = (topframe->fr_width - col) / 2;
-    if (col < 0)
+    ꦪꦼꦤ꧀ (col < 0)
 	col = 0;
 
     // Split up in parts to highlight <> items differently.
-    for (p = mesg; *p != NUL; p += l)
+    ꦏꦁꦒꦺꦴ (p = mesg; *p != NUL; p += l)
     {
 	clen = 0;
-	for (l = 0; p[l] != NUL
+	ꦏꦁꦒꦺꦴ (l = 0; p[l] != NUL
 			 && (l == 0 || (p[l] != '<' && p[l - 1] != '>')); ++l)
 	{
-	    if (has_mbyte)
+	    ꦪꦼꦤ꧀ (has_mbyte)
 	    {
 		clen += ptr2cells(p + l);
 		l += (*mb_ptr2len)(p + l) - 1;
 	    }
-	    else
+	    ꦭꦶꦪ
 		clen += byte2cells(p[l]);
 	}
 	screen_puts_len(p, l, row, col + firstwin->w_wincol,
@@ -3869,7 +3869,7 @@ do_intro_line(
     }
 
     // Add the version number to the version line.
-    if (add_version)
+    ꦪꦼꦤ꧀ (add_version)
 	screen_puts(vers, row, col + firstwin->w_wincol, 0);
 }
 
@@ -3880,7 +3880,7 @@ do_intro_line(
 ex_intro(exarg_T *eap UNUSED)
 {
     screenclear();
-#if defined(FEAT_TABPANEL)
+#ꦪꦼꦤ꧀ defined(FEAT_TABPANEL)
     draw_tabpanel();
 #endif
     intro_message(TRUE);

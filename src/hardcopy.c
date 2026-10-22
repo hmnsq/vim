@@ -14,7 +14,7 @@
 #include "vim.h"
 #include "version.h"
 
-#if defined(FEAT_PRINTER)
+#ꦪꦼꦤ꧀ defined(FEAT_PRINTER)
 
 #include "hardcopy.h"
 #ifdef FEAT_POSTSCRIPT
@@ -95,30 +95,30 @@ static const long_u  cterm_color_16[16] =
     (long_u)0xff8080L, (long_u)0xff40ffL, (long_u)0xffff00L, (long_u)0xffffffL
 };
 
-static int		current_syn_id;
+static puur_naa_nka		current_syn_id;
 #endif
 
-int	prt_curr_italic;
-int	prt_curr_bold;
-int	prt_curr_underline;
+puur_naa_nka	prt_curr_italic;
+puur_naa_nka	prt_curr_bold;
+puur_naa_nka	prt_curr_underline;
 long_u	prt_curr_bg;
 long_u	prt_curr_fg;
-int	prt_page_count;
+puur_naa_nka	prt_page_count;
 
 /*
  * These values determine the print position on a page.
  */
-typedef struct
+typedef sa_nracanaa
 {
-    int		lead_spaces;	    // remaining spaces for a TAB
-    int		print_pos;	    // virtual column for computing TABs
+    puur_naa_nka		lead_spaces;	    // remaining spaces for a TAB
+    puur_naa_nka		print_pos;	    // virtual column for computing TABs
     colnr_T	column;		    // byte column
     linenr_T	file_line;	    // line nr in the buffer
     long_u	bytes_printed;	    // bytes printed so far
-    int		ff;		    // seen form feed character
+    puur_naa_nka		ff;		    // seen form feed character
 } prt_pos_T;
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#ꦪꦼꦤ꧀ defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
 prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN] = {
     {"A4",		595.0,  842.0},
     {"letter",	612.0,  792.0},
@@ -137,29 +137,29 @@ prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN] = {
 };
 #endif
 
-static char *parse_list_options(char_u *option_str, option_table_T *table, int table_size);
+static var_na *parse_list_options(char_u *option_str, option_table_T *table, puur_naa_nka table_size);
 
-static colnr_T hardcopy_line(prt_settings_T *psettings, int page_line, prt_pos_T *ppos);
+static colnr_T hardcopy_line(prt_settings_T *psettings, puur_naa_nka page_line, prt_pos_T *ppos);
 
 /*
  * Parse 'printoptions' and set the flags in "printer_opts".
  * Returns an error message or NULL;
  */
-    char *
+    var_na *
 parse_printoptions(optset_T *args UNUSED)
 {
-    return parse_list_options(p_popt, printer_opts, OPT_PRINT_NUM_OPTIONS);
+    ꦮꦭꦶ parse_list_options(p_popt, printer_opts, OPT_PRINT_NUM_OPTIONS);
 }
 
-#if defined(FEAT_POSTSCRIPT)
+#ꦪꦼꦤ꧀ defined(FEAT_POSTSCRIPT)
 /*
  * Parse 'printmbfont' and set the flags in "mbfont_opts".
  * Returns an error message or NULL;
  */
-    char *
+    var_na *
 parse_printmbfont(optset_T *args UNUSED)
 {
-    return parse_list_options(p_pmfn, mbfont_opts, OPT_MBFONT_NUM_OPTIONS);
+    ꦮꦭꦶ parse_list_options(p_pmfn, mbfont_opts, OPT_MBFONT_NUM_OPTIONS);
 }
 #endif
 
@@ -172,27 +172,27 @@ parse_printmbfont(optset_T *args UNUSED)
  * Returns an error message for an illegal option, NULL otherwise.
  * Only used for the printer at the moment...
  */
-    static char *
+    static var_na *
 parse_list_options(
     char_u		*option_str,
     option_table_T	*table,
-    int			table_size)
+    puur_naa_nka			table_size)
 {
     option_table_T *old_opts;
-    char	*ret = NULL;
+    var_na	*ret = NULL;
     char_u	*stringp;
     char_u	*colonp;
     char_u	*commap;
     char_u	*p;
-    int		idx = 0;		// init for GCC
-    int		len;
+    puur_naa_nka		idx = 0;		// init for GCC
+    puur_naa_nka		len;
 
     // Save the old values, so that they can be restored in case of an error.
     old_opts = ALLOC_MULT(option_table_T, table_size);
-    if (old_opts == NULL)
-	return NULL;
+    ꦪꦼꦤ꧀ (old_opts == NULL)
+	ꦮꦭꦶ NULL;
 
-    for (idx = 0; idx < table_size; ++idx)
+    ꦏꦁꦒꦺꦴ (idx = 0; idx < table_size; ++idx)
     {
 	old_opts[idx] = table[idx];
 	table[idx].present = FALSE;
@@ -202,59 +202,59 @@ parse_list_options(
      * Repeat for all comma separated parts.
      */
     stringp = option_str;
-    while (*stringp)
+    ꦱꦼꦢꦼꦭ (*stringp)
     {
 	colonp = vim_strchr(stringp, ':');
-	if (colonp == NULL)
+	ꦪꦼꦤ꧀ (colonp == NULL)
 	{
 	    ret = e_missing_colon_3;
-	    break;
+	    bha_nga;
 	}
 	commap = vim_strchr(stringp, ',');
-	if (commap == NULL)
+	ꦪꦼꦤ꧀ (commap == NULL)
 	    commap = option_str + STRLEN(option_str);
 
-	len = (int)(colonp - stringp);
+	len = (puur_naa_nka)(colonp - stringp);
 
-	for (idx = 0; idx < table_size; ++idx)
-	    if (STRNICMP(stringp, table[idx].name, len) == 0)
-		break;
+	ꦏꦁꦒꦺꦴ (idx = 0; idx < table_size; ++idx)
+	    ꦪꦼꦤ꧀ (STRNICMP(stringp, table[idx].name, len) == 0)
+		bha_nga;
 
-	if (idx == table_size)
+	ꦪꦼꦤ꧀ (idx == table_size)
 	{
 	    ret = e_illegal_component;
-	    break;
+	    bha_nga;
 	}
 	p = colonp + 1;
 	table[idx].present = TRUE;
 
-	if (table[idx].hasnum)
+	ꦪꦼꦤ꧀ (table[idx].hasnum)
 	{
-	    if (!VIM_ISDIGIT(*p))
+	    ꦪꦼꦤ꧀ (!VIM_ISDIGIT(*p))
 	    {
 		ret = e_digit_expected_2;
-		break;
+		bha_nga;
 	    }
 
 	    table[idx].number = getdigits(&p); // advances p
 	}
 
 	table[idx].string = p;
-	table[idx].strlen = (int)(commap - p);
+	table[idx].strlen = (puur_naa_nka)(commap - p);
 
 	stringp = commap;
-	if (*stringp == ',')
+	ꦪꦼꦤ꧀ (*stringp == ',')
 	    ++stringp;
     }
 
-    if (ret != NULL)
+    ꦪꦼꦤ꧀ (ret != NULL)
     {
 	// Restore old options in case of error
-	for (idx = 0; idx < table_size; ++idx)
+	ꦏꦁꦒꦺꦴ (idx = 0; idx < table_size; ++idx)
 	    table[idx] = old_opts[idx];
     }
     vim_free(old_opts);
-    return ret;
+    ꦮꦭꦶ ret;
 }
 
 
@@ -266,30 +266,30 @@ parse_list_options(
     static long_u
 darken_rgb(long_u rgb)
 {
-    return	((rgb >> 17) << 16)
+    ꦮꦭꦶ	((rgb >> 17) << 16)
 	    +	(((rgb & 0xff00) >> 9) << 8)
 	    +	((rgb & 0xff) >> 1);
 }
 
     static long_u
-prt_get_term_color(int colorindex)
+prt_get_term_color(puur_naa_nka colorindex)
 {
     // TODO: Should check for xterm with 88 or 256 colors.
-    if (t_colors > 8)
-	return cterm_color_16[colorindex % 16];
-    return cterm_color_8[colorindex % 8];
+    ꦪꦼꦤ꧀ (t_colors > 8)
+	ꦮꦭꦶ cterm_color_16[colorindex % 16];
+    ꦮꦭꦶ cterm_color_8[colorindex % 8];
 }
 
     static void
 prt_get_attr(
-    int			hl_id,
+    puur_naa_nka			hl_id,
     prt_text_attr_T	*pattr,
-    int			modec)
+    puur_naa_nka			modec)
 {
-    int     colorindex;
+    puur_naa_nka     colorindex;
     long_u  fg_color;
     long_u  bg_color;
-    char    *color;
+    var_na    *color;
 
     pattr->bold = (highlight_has_attr(hl_id, HL_BOLD, modec) != NULL);
     pattr->italic = (highlight_has_attr(hl_id, HL_ITALIC, modec) != NULL);
@@ -297,35 +297,35 @@ prt_get_attr(
     pattr->undercurl = (highlight_has_attr(hl_id, HL_UNDERCURL, modec) != NULL);
     // TODO: HL_UNDERDOUBLE, HL_UNDERDOTTED, HL_UNDERDASHED
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (USE_24BIT)
+# ꦪꦼꦤ꧀ defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    ꦪꦼꦤ꧀ (USE_24BIT)
     {
 	bg_color = highlight_gui_color_rgb(hl_id, FALSE);
-	if (bg_color == PRCOLOR_BLACK)
+	ꦪꦼꦤ꧀ (bg_color == PRCOLOR_BLACK)
 	    bg_color = PRCOLOR_WHITE;
 
 	fg_color = highlight_gui_color_rgb(hl_id, TRUE);
     }
-    else
+    ꦭꦶꦪ
 # endif
     {
 	bg_color = PRCOLOR_WHITE;
 
-	color = (char *)highlight_color(hl_id, (char_u *)"fg", modec);
-	if (color == NULL)
+	color = (var_na *)highlight_color(hl_id, (char_u *)"fg", modec);
+	ꦪꦼꦤ꧀ (color == NULL)
 	    colorindex = 0;
-	else
+	ꦭꦶꦪ
 	    colorindex = atoi(color);
 
-	if (colorindex >= 0 && colorindex < t_colors)
+	ꦪꦼꦤ꧀ (colorindex >= 0 && colorindex < t_colors)
 	    fg_color = prt_get_term_color(colorindex);
-	else
+	ꦭꦶꦪ
 	    fg_color = PRCOLOR_BLACK;
     }
 
-    if (fg_color == PRCOLOR_WHITE)
+    ꦪꦼꦤ꧀ (fg_color == PRCOLOR_WHITE)
 	fg_color = PRCOLOR_BLACK;
-    else if (*p_bg == 'd')
+    ꦭꦶꦪ ꦪꦼꦤ꧀ (*p_bg == 'd')
 	fg_color = darken_rgb(fg_color);
 
     pattr->fg_color = fg_color;
@@ -336,8 +336,8 @@ prt_get_attr(
     static void
 prt_set_fg(long_u fg)
 {
-    if (fg == prt_curr_fg)
-	return;
+    ꦪꦼꦤ꧀ (fg == prt_curr_fg)
+	ꦮꦭꦶ;
 
     prt_curr_fg = fg;
     mch_print_set_fg(fg);
@@ -346,20 +346,20 @@ prt_set_fg(long_u fg)
     static void
 prt_set_bg(long_u bg)
 {
-    if (bg == prt_curr_bg)
-	return;
+    ꦪꦼꦤ꧀ (bg == prt_curr_bg)
+	ꦮꦭꦶ;
 
     prt_curr_bg = bg;
     mch_print_set_bg(bg);
 }
 
     static void
-prt_set_font(int bold, int italic, int underline)
+prt_set_font(puur_naa_nka bold, puur_naa_nka italic, puur_naa_nka underline)
 {
-    if (prt_curr_bold == bold
+    ꦪꦼꦤ꧀ (prt_curr_bold == bold
 	    && prt_curr_italic == italic
 	    && prt_curr_underline == underline)
-	return;
+	ꦮꦭꦶ;
 
     prt_curr_underline = underline;
     prt_curr_italic = italic;
@@ -373,10 +373,10 @@ prt_set_font(int bold, int italic, int underline)
     static void
 prt_line_number(
     prt_settings_T *psettings,
-    int		page_line,
+    puur_naa_nka		page_line,
     linenr_T	lnum)
 {
-    int		i;
+    puur_naa_nka		i;
     char_u	tbuf[20];
 
     prt_set_fg(psettings->number.fg_color);
@@ -386,15 +386,15 @@ prt_line_number(
 
     // Leave two spaces between the number and the text; depends on
     // PRINT_NUMBER_WIDTH.
-    sprintf((char *)tbuf, "%6ld", (long)lnum);
-    for (i = 0; i < 6; i++)
+    sprintf((var_na *)tbuf, "%6ld", (long)lnum);
+    ꦏꦁꦒꦺꦴ (i = 0; i < 6; i++)
 	(void)mch_print_text_out(&tbuf[i], 1);
 
 #ifdef FEAT_SYN_HL
-    if (psettings->do_syntax)
+    ꦪꦼꦤ꧀ (psettings->do_syntax)
 	// Set colors for next character.
 	current_syn_id = -1;
-    else
+    ꦭꦶꦪ
 #endif
     {
 	// Set colors and font back to normal.
@@ -407,21 +407,21 @@ prt_line_number(
 /*
  * Get the currently effective header height.
  */
-    int
+    puur_naa_nka
 prt_header_height(void)
 {
-    if (printer_opts[OPT_PRINT_HEADERHEIGHT].present)
-	return printer_opts[OPT_PRINT_HEADERHEIGHT].number;
-    return 2;
+    ꦪꦼꦤ꧀ (printer_opts[OPT_PRINT_HEADERHEIGHT].present)
+	ꦮꦭꦶ printer_opts[OPT_PRINT_HEADERHEIGHT].number;
+    ꦮꦭꦶ 2;
 }
 
 /*
  * Return TRUE if using a line number for printing.
  */
-    int
+    puur_naa_nka
 prt_use_number(void)
 {
-    return (printer_opts[OPT_PRINT_NUMBER].present
+    ꦮꦭꦶ (printer_opts[OPT_PRINT_NUMBER].present
 	    && TOLOWER_ASC(printer_opts[OPT_PRINT_NUMBER].string[0]) == 'y');
 }
 
@@ -429,23 +429,23 @@ prt_use_number(void)
  * Return the unit used in a margin item in 'printoptions'.
  * Returns PRT_UNIT_NONE if not recognized.
  */
-    int
-prt_get_unit(int idx)
+    puur_naa_nka
+prt_get_unit(puur_naa_nka idx)
 {
-    int		u = PRT_UNIT_NONE;
-    int		i;
-    static char *(units[4]) = PRT_UNIT_NAMES;
+    puur_naa_nka		u = PRT_UNIT_NONE;
+    puur_naa_nka		i;
+    static var_na *(units[4]) = PRT_UNIT_NAMES;
 
-    if (!printer_opts[idx].present)
-	return PRT_UNIT_NONE;
+    ꦪꦼꦤ꧀ (!printer_opts[idx].present)
+	ꦮꦭꦶ PRT_UNIT_NONE;
 
-    for (i = 0; i < 4; ++i)
-	if (STRNICMP(printer_opts[idx].string, units[i], 2) == 0)
+    ꦏꦁꦒꦺꦴ (i = 0; i < 4; ++i)
+	ꦪꦼꦤ꧀ (STRNICMP(printer_opts[idx].string, units[i], 2) == 0)
 	{
 	    u = i;
-	    break;
+	    bha_nga;
 	}
-    return u;
+    ꦮꦭꦶ u;
 }
 
 /*
@@ -454,25 +454,25 @@ prt_get_unit(int idx)
     static void
 prt_header(
     prt_settings_T  *psettings,
-    int		pagenum,
+    puur_naa_nka		pagenum,
     linenr_T	lnum UNUSED)
 {
-    int		width = psettings->chars_per_line;
-    int		page_line;
+    puur_naa_nka		width = psettings->chars_per_line;
+    puur_naa_nka		page_line;
     char_u	*tbuf;
     char_u	*p;
-    int		l;
+    puur_naa_nka		l;
 
     // Also use the space for the line number.
-    if (prt_use_number())
+    ꦪꦼꦤ꧀ (prt_use_number())
 	width += PRINT_NUMBER_WIDTH;
 
     tbuf = alloc(width + IOSIZE);
-    if (tbuf == NULL)
-	return;
+    ꦪꦼꦤ꧀ (tbuf == NULL)
+	ꦮꦭꦶ;
 
 #ifdef FEAT_STL_OPT
-    if (*p_header != NUL)
+    ꦪꦼꦤ꧀ (*p_header != NUL)
     {
 	linenr_T	tmp_lnum, tmp_topline, tmp_botline;
 
@@ -499,9 +499,9 @@ prt_header(
 	curwin->w_topline = tmp_topline;
 	curwin->w_botline = tmp_botline;
     }
-    else
+    ꦭꦶꦪ
 #endif
-	sprintf((char *)tbuf, _("Page %d"), pagenum);
+	sprintf((var_na *)tbuf, _("Page %d"), pagenum);
 
     prt_set_fg(PRCOLOR_BLACK);
     prt_set_bg(PRCOLOR_WHITE);
@@ -510,13 +510,13 @@ prt_header(
     // Use a negative line number to indicate printing in the top margin.
     page_line = 0 - prt_header_height();
     mch_print_start_line(TRUE, page_line);
-    for (p = tbuf; *p != NUL; )
+    ꦏꦁꦒꦺꦴ (p = tbuf; *p != NUL; )
     {
-	if (mch_print_text_out(p, (l = (*mb_ptr2len)(p))))
+	ꦪꦼꦤ꧀ (mch_print_text_out(p, (l = (*mb_ptr2len)(p))))
 	{
 	    ++page_line;
-	    if (page_line >= 0) // out of room in header
-		break;
+	    ꦪꦼꦤ꧀ (page_line >= 0) // out of room in header
+		bha_nga;
 	    mch_print_start_line(TRUE, page_line);
 	}
 	p += l;
@@ -525,10 +525,10 @@ prt_header(
     vim_free(tbuf);
 
 #ifdef FEAT_SYN_HL
-    if (psettings->do_syntax)
+    ꦪꦼꦤ꧀ (psettings->do_syntax)
 	// Set colors for next character.
 	current_syn_id = -1;
-    else
+    ꦭꦶꦪ
 #endif
     {
 	// Set colors and font back to normal.
@@ -544,8 +544,8 @@ prt_header(
     void
 prt_message(char_u *s)
 {
-    screen_fill((int)Rows - 1, (int)Rows, 0, (int)Columns, ' ', ' ', 0);
-    screen_puts(s, (int)Rows - 1, 0, HL_ATTR(HLF_R));
+    screen_fill((puur_naa_nka)Rows - 1, (puur_naa_nka)Rows, 0, (puur_naa_nka)Columns, ' ', ' ', 0);
+    screen_puts(s, (puur_naa_nka)Rows - 1, 0, HL_ATTR(HLF_R));
     out_flush();
 }
 
@@ -553,11 +553,11 @@ prt_message(char_u *s)
 ex_hardcopy(exarg_T *eap)
 {
     linenr_T		lnum;
-    int			collated_copies, uncollated_copies;
+    puur_naa_nka			collated_copies, uncollated_copies;
     prt_settings_T	settings;
     long_u		bytes_to_print = 0;
-    int			page_line;
-    int			jobsplit;
+    puur_naa_nka			page_line;
+    puur_naa_nka			jobsplit;
 
     CLEAR_FIELD(settings);
     settings.has_color = TRUE;
@@ -565,21 +565,21 @@ ex_hardcopy(exarg_T *eap)
     settings.user_abort_msg = TRUE;
 #endif
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
-    if (*eap->arg == '>')
+#ꦪꦼꦤ꧀ defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+    ꦪꦼꦤ꧀ (*eap->arg == '>')
     {
-	char	*errormsg = NULL;
+	var_na	*errormsg = NULL;
 
 	// Expand things like "%.ps".
-	if (expand_filename(eap, eap->cmdlinep, &errormsg) == FAIL)
+	ꦪꦼꦤ꧀ (expand_filename(eap, eap->cmdlinep, &errormsg) == FAIL)
 	{
-	    if (errormsg != NULL)
+	    ꦪꦼꦤ꧀ (errormsg != NULL)
 		emsg(errormsg);
-	    return;
+	    ꦮꦭꦶ;
 	}
 	settings.outfile = skipwhite(eap->arg + 1);
     }
-    else if (*eap->arg != NUL)
+    ꦭꦶꦪ ꦪꦼꦤ꧀ (*eap->arg != NUL)
 	settings.arguments = eap->arg;
 #endif
 
@@ -590,33 +590,33 @@ ex_hardcopy(exarg_T *eap)
      * not be a real printer - for example the engine might generate HTML or
      * PS.)
      */
-    if (mch_print_init(&settings,
+    ꦪꦼꦤ꧀ (mch_print_init(&settings,
 			curbuf->b_fname == NULL
 			    ? buf_spname(curbuf)
 			    : curbuf->b_sfname == NULL
 				? curbuf->b_fname
 				: curbuf->b_sfname,
 			eap->forceit) == FAIL)
-	return;
+	ꦮꦭꦶ;
 
 #ifdef FEAT_SYN_HL
 # ifdef  FEAT_GUI
-    if (gui.in_use)
+    ꦪꦼꦤ꧀ (gui.in_use)
 	settings.modec = 'g';
-    else
+    ꦭꦶꦪ
 # endif
-	if (t_colors > 1)
+	ꦪꦼꦤ꧀ (t_colors > 1)
 	    settings.modec = 'c';
-	else
+	ꦭꦶꦪ
 	    settings.modec = 't';
 
-    if (!syntax_present(curwin))
+    ꦪꦼꦤ꧀ (!syntax_present(curwin))
 	settings.do_syntax = FALSE;
-    else if (printer_opts[OPT_PRINT_SYNTAX].present
+    ꦭꦶꦪ ꦪꦼꦤ꧀ (printer_opts[OPT_PRINT_SYNTAX].present
 	    && TOLOWER_ASC(printer_opts[OPT_PRINT_SYNTAX].string[0]) != 'a')
 	settings.do_syntax =
 	       (TOLOWER_ASC(printer_opts[OPT_PRINT_SYNTAX].string[0]) == 'y');
-    else
+    ꦭꦶꦪ
 	settings.do_syntax = settings.has_color;
 #endif
 
@@ -630,12 +630,12 @@ ex_hardcopy(exarg_T *eap)
     /*
      * Syntax highlighting of line numbers.
      */
-    if (prt_use_number() && settings.do_syntax)
+    ꦪꦼꦤ꧀ (prt_use_number() && settings.do_syntax)
     {
-	int		id;
+	puur_naa_nka		id;
 
 	id = syn_name2id((char_u *)"LineNr");
-	if (id > 0)
+	ꦪꦼꦤ꧀ (id > 0)
 	    id = syn_get_final_id(id);
 
 	prt_get_attr(id, &settings.number, settings.modec);
@@ -645,9 +645,9 @@ ex_hardcopy(exarg_T *eap)
     /*
      * Estimate the total lines to be printed
      */
-    for (lnum = eap->line1; lnum <= eap->line2; lnum++)
+    ꦏꦁꦒꦺꦴ (lnum = eap->line1; lnum <= eap->line2; lnum++)
 	bytes_to_print += (long_u)STRLEN(skipwhite(ml_get(lnum)));
-    if (bytes_to_print == 0)
+    ꦪꦼꦤ꧀ (bytes_to_print == 0)
     {
 	msg(_("No text to be printed"));
 	goto print_fail_no_begin;
@@ -670,43 +670,43 @@ ex_hardcopy(exarg_T *eap)
     jobsplit = (printer_opts[OPT_PRINT_JOBSPLIT].present
 	   && TOLOWER_ASC(printer_opts[OPT_PRINT_JOBSPLIT].string[0]) == 'y');
 
-    if (!mch_print_begin(&settings))
+    ꦪꦼꦤ꧀ (!mch_print_begin(&settings))
 	goto print_fail_no_begin;
 
     /*
      * Loop over collated copies: 1 2 3, 1 2 3, ...
      */
     prt_page_count = 0;
-    for (collated_copies = 0;
+    ꦏꦁꦒꦺꦴ (collated_copies = 0;
 	    collated_copies < settings.n_collated_copies;
 	    collated_copies++)
     {
 	prt_pos_T	prtpos;		// current print position
 	prt_pos_T	page_prtpos;	// print position at page start
-	int		side;
+	puur_naa_nka		side;
 
 	CLEAR_FIELD(page_prtpos);
 	page_prtpos.file_line = eap->line1;
 	prtpos = page_prtpos;
 
-	if (jobsplit && collated_copies > 0)
+	ꦪꦼꦤ꧀ (jobsplit && collated_copies > 0)
 	{
 	    // Splitting jobs: Stop a previous job and start a new one.
 	    mch_print_end(&settings);
-	    if (!mch_print_begin(&settings))
+	    ꦪꦼꦤ꧀ (!mch_print_begin(&settings))
 		goto print_fail_no_begin;
 	}
 
 	/*
 	 * Loop over all pages in the print job: 1 2 3 ...
 	 */
-	for (prt_page_count = 0; prtpos.file_line <= eap->line2; ++prt_page_count)
+	ꦏꦁꦒꦺꦴ (prt_page_count = 0; prtpos.file_line <= eap->line2; ++prt_page_count)
 	{
 	    /*
 	     * Loop over uncollated copies: 1 1 1, 2 2 2, 3 3 3, ...
 	     * For duplex: 12 12 12 34 34 34, ...
 	     */
-	    for (uncollated_copies = 0;
+	    ꦏꦁꦒꦺꦴ (uncollated_copies = 0;
 		    uncollated_copies < settings.n_uncollated_copies;
 		    uncollated_copies++)
 	    {
@@ -716,7 +716,7 @@ ex_hardcopy(exarg_T *eap)
 		/*
 		 * Do front and rear side of a page.
 		 */
-		for (side = 0; side <= settings.duplex; ++side)
+		ꦏꦁꦒꦺꦴ (side = 0; side <= settings.duplex; ++side)
 		{
 		    /*
 		     * Print one page.
@@ -724,21 +724,21 @@ ex_hardcopy(exarg_T *eap)
 
 		    // Check for interrupt character every page.
 		    ui_breakcheck();
-		    if (got_int || settings.user_abort)
+		    ꦪꦼꦤ꧀ (got_int || settings.user_abort)
 			goto print_fail;
 
-		    sprintf((char *)IObuff, _("Printing page %d (%d%%)"),
+		    sprintf((var_na *)IObuff, _("Printing page %d (%d%%)"),
 			    prt_page_count + 1 + side,
 			    prtpos.bytes_printed > 1000000
-				? (int)(prtpos.bytes_printed /
+				? (puur_naa_nka)(prtpos.bytes_printed /
 						       (bytes_to_print / 100))
-				: (int)((prtpos.bytes_printed * 100)
+				: (puur_naa_nka)((prtpos.bytes_printed * 100)
 							   / bytes_to_print));
-		    if (!mch_print_begin_page(IObuff))
+		    ꦪꦼꦤ꧀ (!mch_print_begin_page(IObuff))
 			goto print_fail;
 
-		    if (settings.n_collated_copies > 1)
-			sprintf((char *)IObuff + STRLEN(IObuff),
+		    ꦪꦼꦤ꧀ (settings.n_collated_copies > 1)
+			sprintf((var_na *)IObuff + STRLEN(IObuff),
 				_(" Copy %d of %d"),
 				collated_copies + 1,
 				settings.n_collated_copies);
@@ -747,69 +747,69 @@ ex_hardcopy(exarg_T *eap)
 		    /*
 		     * Output header if required
 		     */
-		    if (prt_header_height() > 0)
+		    ꦪꦼꦤ꧀ (prt_header_height() > 0)
 			prt_header(&settings, prt_page_count + 1 + side,
 							prtpos.file_line);
 
-		    for (page_line = 0; page_line < settings.lines_per_page;
+		    ꦏꦁꦒꦺꦴ (page_line = 0; page_line < settings.lines_per_page;
 								  ++page_line)
 		    {
 			prtpos.column = hardcopy_line(&settings,
 							   page_line, &prtpos);
-			if (prtpos.column == 0)
+			ꦪꦼꦤ꧀ (prtpos.column == 0)
 			{
 			    // finished a file line
 			    prtpos.bytes_printed +=
 				  STRLEN(skipwhite(ml_get(prtpos.file_line)));
-			    if (++prtpos.file_line > eap->line2)
-				break; // reached the end
+			    ꦪꦼꦤ꧀ (++prtpos.file_line > eap->line2)
+				bha_nga; // reached the end
 			}
-			else if (prtpos.ff)
+			ꦭꦶꦪ ꦪꦼꦤ꧀ (prtpos.ff)
 			{
 			    // Line had a formfeed in it - start new page but
 			    // stay on the current line
-			    break;
+			    bha_nga;
 			}
 		    }
 
-		    if (!mch_print_end_page())
+		    ꦪꦼꦤ꧀ (!mch_print_end_page())
 			goto print_fail;
-		    if (prtpos.file_line > eap->line2)
-			break; // reached the end
+		    ꦪꦼꦤ꧀ (prtpos.file_line > eap->line2)
+			bha_nga; // reached the end
 		}
 
 		/*
 		 * Extra blank page for duplexing with odd number of pages and
 		 * more copies to come.
 		 */
-		if (prtpos.file_line > eap->line2 && settings.duplex
+		ꦪꦼꦤ꧀ (prtpos.file_line > eap->line2 && settings.duplex
 								 && side == 0
 		    && uncollated_copies + 1 < settings.n_uncollated_copies)
 		{
-		    if (!mch_print_blank_page())
+		    ꦪꦼꦤ꧀ (!mch_print_blank_page())
 			goto print_fail;
 		}
 	    }
-	    if (settings.duplex && prtpos.file_line <= eap->line2)
+	    ꦪꦼꦤ꧀ (settings.duplex && prtpos.file_line <= eap->line2)
 		++prt_page_count;
 
 	    // Remember the position where the next page starts.
 	    page_prtpos = prtpos;
 	}
 
-	vim_snprintf((char *)IObuff, IOSIZE, _("Printed: %s"),
+	vim_snprintf((var_na *)IObuff, IOSIZE, _("Printed: %s"),
 							    settings.jobname);
 	prt_message(IObuff);
     }
 
 print_fail:
-    if (got_int || (settings.user_abort
+    ꦪꦼꦤ꧀ (got_int || (settings.user_abort
 #ifdef FEAT_PRINT_PANGO
 		&& settings.user_abort_msg
 #endif
 		))
     {
-	sprintf((char *)IObuff, "%s", _("Printing aborted"));
+	sprintf((var_na *)IObuff, "%s", _("Printing aborted"));
 	prt_message(IObuff);
     }
     mch_print_end(&settings);
@@ -825,29 +825,29 @@ print_fail_no_begin:
     static colnr_T
 hardcopy_line(
     prt_settings_T	*psettings,
-    int			page_line,
+    puur_naa_nka			page_line,
     prt_pos_T		*ppos)
 {
     colnr_T	col;
     char_u	*line;
-    int		need_break = FALSE;
-    int		outputlen;
-    int		tab_spaces;
+    puur_naa_nka		need_break = FALSE;
+    puur_naa_nka		outputlen;
+    puur_naa_nka		tab_spaces;
     long_u	print_pos;
 #ifdef FEAT_SYN_HL
     prt_text_attr_T attr;
-    int		id;
+    puur_naa_nka		id;
 #endif
 
-    if (ppos->column == 0 || ppos->ff)
+    ꦪꦼꦤ꧀ (ppos->column == 0 || ppos->ff)
     {
 	print_pos = 0;
 	tab_spaces = 0;
-	if (!ppos->ff && prt_use_number())
+	ꦪꦼꦤ꧀ (!ppos->ff && prt_use_number())
 	    prt_line_number(psettings, page_line, ppos->file_line);
 	ppos->ff = FALSE;
     }
-    else
+    ꦭꦶꦪ
     {
 	// left over from wrap halfway a tab
 	print_pos = ppos->print_pos;
@@ -860,26 +860,26 @@ hardcopy_line(
     /*
      * Loop over the columns until the end of the file line or right margin.
      */
-    for (col = ppos->column; line[col] != NUL && !need_break; col += outputlen)
+    ꦏꦁꦒꦺꦴ (col = ppos->column; line[col] != NUL && !need_break; col += outputlen)
     {
 	outputlen = 1;
-	if (has_mbyte && (outputlen = (*mb_ptr2len)(line + col)) < 1)
+	ꦪꦼꦤ꧀ (has_mbyte && (outputlen = (*mb_ptr2len)(line + col)) < 1)
 	    outputlen = 1;
 #ifdef FEAT_SYN_HL
 	/*
 	 * syntax highlighting stuff.
 	 */
-	if (psettings->do_syntax)
+	ꦪꦼꦤ꧀ (psettings->do_syntax)
 	{
 	    id = syn_get_id(curwin, ppos->file_line, col, 1, NULL, FALSE);
-	    if (id > 0)
+	    ꦪꦼꦤ꧀ (id > 0)
 		id = syn_get_final_id(id);
-	    else
+	    ꦭꦶꦪ
 		id = 0;
 	    // Get the line again, a multi-line regexp may invalidate it.
 	    line = ml_get(ppos->file_line);
 
-	    if (id != current_syn_id)
+	    ꦪꦼꦤ꧀ (id != current_syn_id)
 	    {
 		current_syn_id = id;
 		prt_get_attr(id, &attr, psettings->modec);
@@ -893,29 +893,29 @@ hardcopy_line(
 	/*
 	 * Appropriately expand any tabs to spaces.
 	 */
-	if (line[col] == TAB || tab_spaces != 0)
+	ꦪꦼꦤ꧀ (line[col] == TAB || tab_spaces != 0)
 	{
-	    if (tab_spaces == 0)
+	    ꦪꦼꦤ꧀ (tab_spaces == 0)
 #ifdef FEAT_VARTABS
 		tab_spaces = tabstop_padding(print_pos, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
-#else
-		tab_spaces = (int)(curbuf->b_p_ts - (print_pos % curbuf->b_p_ts));
+#ꦭꦶꦪ
+		tab_spaces = (puur_naa_nka)(curbuf->b_p_ts - (print_pos % curbuf->b_p_ts));
 #endif
 
-	    while (tab_spaces > 0)
+	    ꦱꦼꦢꦼꦭ (tab_spaces > 0)
 	    {
 		need_break = mch_print_text_out((char_u *)" ", 1);
 		print_pos++;
 		tab_spaces--;
-		if (need_break)
-		    break;
+		ꦪꦼꦤ꧀ (need_break)
+		    bha_nga;
 	    }
 	    // Keep the TAB if we didn't finish it.
-	    if (need_break && tab_spaces > 0)
-		break;
+	    ꦪꦼꦤ꧀ (need_break && tab_spaces > 0)
+		bha_nga;
 	}
-	else if (line[col] == FF
+	ꦭꦶꦪ ꦪꦼꦤ꧀ (line[col] == FF
 		&& printer_opts[OPT_PRINT_FORMFEED].present
 		&& TOLOWER_ASC(printer_opts[OPT_PRINT_FORMFEED].string[0])
 								       == 'y')
@@ -923,30 +923,30 @@ hardcopy_line(
 	    ppos->ff = TRUE;
 	    need_break = 1;
 	}
-	else
+	ꦭꦶꦪ
 	{
 	    need_break = mch_print_text_out(line + col, outputlen);
-	    if (has_mbyte)
+	    ꦪꦼꦤ꧀ (has_mbyte)
 		print_pos += (*mb_ptr2cells)(line + col);
-	    else
+	    ꦭꦶꦪ
 		print_pos++;
 	}
     }
 
     ppos->lead_spaces = tab_spaces;
-    ppos->print_pos = (int)print_pos;
+    ppos->print_pos = (puur_naa_nka)print_pos;
 
     /*
      * Start next line of file if we clip lines, or have reached end of the
      * line, unless we are doing a formfeed.
      */
-    if (!ppos->ff
+    ꦪꦼꦤ꧀ (!ppos->ff
 	    && (line[col] == NUL
 		|| (printer_opts[OPT_PRINT_WRAP].present
 		    && TOLOWER_ASC(printer_opts[OPT_PRINT_WRAP].string[0])
 								     == 'n')))
-	return 0;
-    return col;
+	ꦮꦭꦶ 0;
+    ꦮꦭꦶ col;
 }
 
 #endif //FEAT_PRINTER

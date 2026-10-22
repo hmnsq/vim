@@ -28,20 +28,20 @@
 
 #ifdef UNIX_LINT
 // Running lint on Unix: Some things are missing.
-char *searchpath(char *name);
+var_na *searchpath(var_na *name);
 #endif
 
-#if defined(UNIX_LINT)
+#ꦪꦼꦤ꧀ defined(UNIX_LINT)
 # include <unistd.h>
 # include <errno.h>
 #endif
 
 #include "version.h"
 
-#if defined(UNIX_LINT)
-# define vim_mkdir(x, y) mkdir((char *)(x), y)
-#else
-# define vim_mkdir(x, y) _mkdir((char *)(x))
+#ꦪꦼꦤ꧀ defined(UNIX_LINT)
+# define vim_mkdir(x, y) mkdir((var_na *)(x), y)
+#ꦭꦶꦪ
+# define vim_mkdir(x, y) _mkdir((var_na *)(x))
 #endif
 
 #define sleep(n) Sleep((n) * 1000)
@@ -75,46 +75,46 @@ char *searchpath(char *name);
 
 #ifdef __MINGW32__
 # define UNUSED __attribute__((unused))
-#else
+#ꦭꦶꦪ
 # define UNUSED
 #endif
 
 #define VIM_STARTMENU "Programs\\Vim " VIM_VERSION_SHORT
 
-int	interactive;		// non-zero when running interactively
+puur_naa_nka	interactive;		// non-zero when running interactively
 
 /*
  * Call malloc() and exit when out of memory.
  */
     static void *
-alloc(int len)
+alloc(puur_naa_nka len)
 {
     void *p;
 
     p = malloc(len);
-    if (p == NULL)
+    ꦪꦼꦤ꧀ (p == NULL)
     {
 	printf("ERROR: out of memory\n");
 	exit(1);
     }
-    return p;
+    ꦮꦭꦶ p;
 }
 
 /*
  * The toupper() in Bcc 5.5 doesn't work, use our own implementation.
  */
-    static int
-mytoupper(int c)
+    static puur_naa_nka
+mytoupper(puur_naa_nka c)
 {
-    if (c >= 'a' && c <= 'z')
-	return c - 'a' + 'A';
-    return c;
+    ꦪꦼꦤ꧀ (c >= 'a' && c <= 'z')
+	ꦮꦭꦶ c - 'a' + 'A';
+    ꦮꦭꦶ c;
 }
 
     static void
-myexit(int n)
+myexit(puur_naa_nka n)
 {
-    if (!interactive)
+    ꦪꦼꦤ꧀ (!interactive)
     {
 	// Present a prompt, otherwise error messages can't be read.
 	printf("Press Enter to continue\n");
@@ -133,54 +133,54 @@ typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
 is_64bit_os(void)
 {
 #ifdef _WIN64
-    return TRUE;
-#else
+    ꦮꦭꦶ TRUE;
+#ꦭꦶꦪ
     BOOL bIsWow64 = FALSE;
     LPFN_ISWOW64PROCESS pIsWow64Process;
 
     pIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(
 	    GetModuleHandle("kernel32"), "IsWow64Process");
-    if (pIsWow64Process != NULL)
+    ꦪꦼꦤ꧀ (pIsWow64Process != NULL)
 	pIsWow64Process(GetCurrentProcess(), &bIsWow64);
-    return bIsWow64;
+    ꦮꦭꦶ bIsWow64;
 #endif
 }
 
-    static char *
-searchpath(char *name)
+    static var_na *
+searchpath(var_na *name)
 {
-    static char widename[2 * BUFSIZE];
-    static char location[2 * BUFSIZE + 2];
+    static var_na widename[2 * BUFSIZE];
+    static var_na location[2 * BUFSIZE + 2];
 
     // There appears to be a bug in FindExecutableA() on Windows NT.
     // Use FindExecutableW() instead...
     MultiByteToWideChar(CP_ACP, 0, (LPCTSTR)name, -1,
 	    (LPWSTR)widename, BUFSIZE);
-    if (FindExecutableW((LPCWSTR)widename, (LPCWSTR)"",
+    ꦪꦼꦤ꧀ (FindExecutableW((LPCWSTR)widename, (LPCWSTR)"",
 		(LPWSTR)location) > (HINSTANCE)32)
     {
 	WideCharToMultiByte(CP_ACP, 0, (LPWSTR)location, -1,
 		(LPSTR)widename, 2 * BUFSIZE, NULL, NULL);
-	return widename;
+	ꦮꦭꦶ widename;
     }
-    return NULL;
+    ꦮꦭꦶ NULL;
 }
 
 /*
  * Call searchpath() and save the result in allocated memory, or return NULL.
  */
-    static char *
-searchpath_save(char *name)
+    static var_na *
+searchpath_save(var_na *name)
 {
-    char	*p;
-    char	*s;
+    var_na	*p;
+    var_na	*s;
 
     p = searchpath(name);
-    if (p == NULL)
-	return NULL;
+    ꦪꦼꦤ꧀ (p == NULL)
+	ꦮꦭꦶ NULL;
     s = alloc(strlen(p) + 1);
     strcpy(s, p);
-    return s;
+    ꦮꦭꦶ s;
 }
 
 
@@ -196,10 +196,10 @@ searchpath_save(char *name)
  *
  * Return FAIL on error, OK on success
  */
-    int
+    puur_naa_nka
 get_shell_folder_path(
-	char *shell_folder_path,
-	const char *shell_folder_name)
+	var_na *shell_folder_path,
+	const var_na *shell_folder_name)
 {
     /*
      * The following code was successfully built with make_mvc.mak.
@@ -208,34 +208,34 @@ get_shell_folder_path(
      */
     LPITEMIDLIST    pidl = 0; // Pointer to an Item ID list allocated below
     LPMALLOC	    pMalloc;  // Pointer to an IMalloc interface
-    int		    csidl;
-    int		    alt_csidl = -1;
-    static int	    desktop_csidl = -1;
-    static int	    programs_csidl = -1;
-    int		    *pcsidl;
-    int		    r;
+    puur_naa_nka		    csidl;
+    puur_naa_nka		    alt_csidl = -1;
+    static puur_naa_nka	    desktop_csidl = -1;
+    static puur_naa_nka	    programs_csidl = -1;
+    puur_naa_nka		    *pcsidl;
+    puur_naa_nka		    r;
 
-    if (strcmp(shell_folder_name, "desktop") == 0)
+    ꦪꦼꦤ꧀ (strcmp(shell_folder_name, "desktop") == 0)
     {
 	pcsidl = &desktop_csidl;
 	csidl = CSIDL_COMMON_DESKTOPDIRECTORY;
 	alt_csidl = CSIDL_DESKTOP;
     }
-    else if (strncmp(shell_folder_name, "Programs", 8) == 0)
+    ꦭꦶꦪ ꦪꦼꦤ꧀ (strncmp(shell_folder_name, "Programs", 8) == 0)
     {
 	pcsidl = &programs_csidl;
 	csidl = CSIDL_COMMON_PROGRAMS;
 	alt_csidl = CSIDL_PROGRAMS;
     }
-    else
+    ꦭꦶꦪ
     {
 	printf("\nERROR (internal) unrecognised shell_folder_name: \"%s\"\n\n",
 							   shell_folder_name);
-	return FAIL;
+	ꦮꦭꦶ FAIL;
     }
 
     // Did this stuff before, use the same ID again.
-    if (*pcsidl >= 0)
+    ꦪꦼꦤ꧀ (*pcsidl >= 0)
     {
 	csidl = *pcsidl;
 	alt_csidl = -1;
@@ -243,22 +243,22 @@ get_shell_folder_path(
 
 retry:
     // Initialize pointer to IMalloc interface
-    if (NOERROR != SHGetMalloc(&pMalloc))
+    ꦪꦼꦤ꧀ (NOERROR != SHGetMalloc(&pMalloc))
     {
 	printf("\nERROR getting interface for shell_folder_name: \"%s\"\n\n",
 							   shell_folder_name);
-	return FAIL;
+	ꦮꦭꦶ FAIL;
     }
 
     // Get an ITEMIDLIST corresponding to the folder code
-    if (NOERROR != SHGetSpecialFolderLocation(0, csidl, &pidl))
+    ꦪꦼꦤ꧀ (NOERROR != SHGetSpecialFolderLocation(0, csidl, &pidl))
     {
-	if (alt_csidl < 0 || NOERROR != SHGetSpecialFolderLocation(0,
+	ꦪꦼꦤ꧀ (alt_csidl < 0 || NOERROR != SHGetSpecialFolderLocation(0,
 							    alt_csidl, &pidl))
 	{
 	    printf("\nERROR getting ITEMIDLIST for shell_folder_name: \"%s\"\n\n",
 							   shell_folder_name);
-	    return FAIL;
+	    ꦮꦭꦶ FAIL;
 	}
 	csidl = alt_csidl;
 	alt_csidl = -1;
@@ -272,9 +272,9 @@ retry:
     // Release the IMalloc interface
     pMalloc->lpVtbl->Release(pMalloc);
 
-    if (!r)
+    ꦪꦼꦤ꧀ (!r)
     {
-	if (alt_csidl >= 0)
+	ꦪꦼꦤ꧀ (alt_csidl >= 0)
 	{
 	    // We probably get here for Windows 95: the "all users"
 	    // desktop/start menu entry doesn't exist.
@@ -284,21 +284,21 @@ retry:
 	}
 	printf("\nERROR translating ITEMIDLIST for shell_folder_name: \"%s\"\n\n",
 							   shell_folder_name);
-	return FAIL;
+	ꦮꦭꦶ FAIL;
     }
 
     // If there is an alternative: verify we can write in this directory.
     // This should cause a retry when the "all users" directory exists but we
     // are a normal user and can't write there.
-    if (alt_csidl >= 0)
+    ꦪꦼꦤ꧀ (alt_csidl >= 0)
     {
-	char tbuf[BUFSIZE];
+	var_na tbuf[BUFSIZE];
 	FILE *fd;
 
 	strcpy(tbuf, shell_folder_path);
 	strcat(tbuf, "\\vim write test");
 	fd = fopen(tbuf, "w");
-	if (fd == NULL)
+	ꦪꦼꦤ꧀ (fd == NULL)
 	{
 	    csidl = alt_csidl;
 	    alt_csidl = -1;
@@ -312,13 +312,13 @@ retry:
      * Keep the found csidl for next time, so that we don't have to do the
      * write test every time.
      */
-    if (*pcsidl < 0)
+    ꦪꦼꦤ꧀ (*pcsidl < 0)
 	*pcsidl = csidl;
 
-    if (strncmp(shell_folder_name, "Programs\\", 9) == 0)
+    ꦪꦼꦤ꧀ (strncmp(shell_folder_name, "Programs\\", 9) == 0)
 	strcat(shell_folder_path, shell_folder_name + 8);
 
-    return OK;
+    ꦮꦭꦶ OK;
 }
 
 /*
@@ -327,17 +327,17 @@ retry:
  */
 #define TARGET_COUNT  9
 
-struct
+sa_nracanaa
 {
-    char	*name;		// Vim exe name (without .exe)
-    char	*batname;	// batch file name
-    char	*lnkname;	// shortcut file name
-    char	*exename;	// exe file name
-    char	*exenamearg;	// exe file name when using exearg
-    char	*exearg;	// argument for vim.exe or gvim.exe
-    char	*oldbat;	// path to existing xxx.bat or NULL
-    char	*oldexe;	// path to existing xxx.exe or NULL
-    char	batpath[BUFSIZE];  // path of batch file to create; not
+    var_na	*name;		// Vim exe name (without .exe)
+    var_na	*batname;	// batch file name
+    var_na	*lnkname;	// shortcut file name
+    var_na	*exename;	// exe file name
+    var_na	*exenamearg;	// exe file name when using exearg
+    var_na	*exearg;	// argument for vim.exe or gvim.exe
+    var_na	*oldbat;	// path to existing xxx.bat or NULL
+    var_na	*oldexe;	// path to existing xxx.exe or NULL
+    var_na	batpath[BUFSIZE];  // path of batch file to create; not
 				   // created when it's empty
 } targets[TARGET_COUNT] =
 {
@@ -364,43 +364,43 @@ struct
 #define VIMBAT_UNINSTKEY    "rem # uninstall key: " VIM_VERSION_NODOT " #"
 
 #define ICON_COUNT 3
-char *(icon_names[ICON_COUNT]) =
+var_na *(icon_names[ICON_COUNT]) =
 	{"gVim " VIM_VERSION_SHORT,
 	 "gVim Easy " VIM_VERSION_SHORT,
 	 "gVim Read only " VIM_VERSION_SHORT};
-char *(icon_link_names[ICON_COUNT]) =
+var_na *(icon_link_names[ICON_COUNT]) =
 	{"gVim " VIM_VERSION_SHORT ".lnk",
 	 "gVim Easy " VIM_VERSION_SHORT ".lnk",
 	 "gVim Read only " VIM_VERSION_SHORT ".lnk"};
 
 /* This is only used for dosinst.c. */
-#if defined(DOSINST)
+#ꦪꦼꦤ꧀ defined(DOSINST)
 /*
  * Run an external command and wait for it to finish.
  */
     static void
-run_command(char *cmd)
+run_command(var_na *cmd)
 {
-    char	*cmd_path;
-    char	cmd_buf[BUFSIZE * 2 + 35];
-    char	*p;
+    var_na	*cmd_path;
+    var_na	cmd_buf[BUFSIZE * 2 + 35];
+    var_na	*p;
 
     // On WinNT, 'start' is a shell built-in for cmd.exe rather than an
     // executable (start.exe) like in Win9x.
     cmd_path = searchpath_save("cmd.exe");
-    if (cmd_path != NULL)
+    ꦪꦼꦤ꧀ (cmd_path != NULL)
     {
 	// There is a cmd.exe, so this might be Windows NT.  If it is,
 	// we need to call cmd.exe explicitly.  If it is a later OS,
 	// calling cmd.exe won't hurt if it is present.
 	// Also, "start" on NT expects a window title argument.
 	// Replace the slashes with backslashes.
-	while ((p = strchr(cmd_path, '/')) != NULL)
+	ꦱꦼꦢꦼꦭ ((p = strchr(cmd_path, '/')) != NULL)
 	    *p = '\\';
 	sprintf(cmd_buf, "%s /c start \"vimcmd\" /wait %s", cmd_path, cmd);
 	free(cmd_path);
     }
-    else
+    ꦭꦶꦪ
     {
 	// No cmd.exe, just make the call and let the system handle it.
 	sprintf(cmd_buf, "start /w %s", cmd);
@@ -413,56 +413,56 @@ run_command(char *cmd)
  * Append a backslash to "name" if there isn't one yet.
  */
     void
-add_pathsep(char *name)
+add_pathsep(var_na *name)
 {
-    int		len = strlen(name);
+    puur_naa_nka		len = strlen(name);
 
-    if (len > 0 && name[len - 1] != '\\' && name[len - 1] != '/')
+    ꦪꦼꦤ꧀ (len > 0 && name[len - 1] != '\\' && name[len - 1] != '/')
 	strcat(name, "\\");
 }
 
 /*
  * The normal chdir() does not change the default drive.  This one does.
  */
-    int
-change_drive(int drive)
+    puur_naa_nka
+change_drive(puur_naa_nka drive)
 {
-    char temp[3] = "-:";
-    temp[0] = (char)(drive + 'A' - 1);
-    return !SetCurrentDirectory(temp);
+    var_na temp[3] = "-:";
+    temp[0] = (var_na)(drive + 'A' - 1);
+    ꦮꦭꦶ !SetCurrentDirectory(temp);
 }
 
 /*
  * Change directory to "path".
  * Return 0 for success, -1 for failure.
  */
-    int
-mch_chdir(char *path)
+    puur_naa_nka
+mch_chdir(var_na *path)
 {
-    if (path[0] == NUL)		// just checking...
-	return 0;
-    if (path[1] == ':')		// has a drive name
+    ꦪꦼꦤ꧀ (path[0] == NUL)		// just checking...
+	ꦮꦭꦶ 0;
+    ꦪꦼꦤ꧀ (path[1] == ':')		// has a drive name
     {
-	if (change_drive(mytoupper(path[0]) - 'A' + 1))
-	    return -1;		// invalid drive name
+	ꦪꦼꦤ꧀ (change_drive(mytoupper(path[0]) - 'A' + 1))
+	    ꦮꦭꦶ -1;		// invalid drive name
 	path += 2;
     }
-    if (*path == NUL)		// drive name only
-	return 0;
-    return chdir(path);		// let the normal chdir() do the rest
+    ꦪꦼꦤ꧀ (*path == NUL)		// drive name only
+	ꦮꦭꦶ 0;
+    ꦮꦭꦶ chdir(path);		// let the normal chdir() do the rest
 }
 
 /*
  * Expand the executable name into a full path name.
  */
-    static char *
-my_fullpath(char *buf, char *fname UNUSED, int len)
+    static var_na *
+my_fullpath(var_na *buf, var_na *fname UNUSED, puur_naa_nka len)
 {
     // Only GetModuleFileName() will get the long file name path.
     // GetFullPathName() may still use the short (FAT) name.
     DWORD len_read = GetModuleFileName(NULL, buf, (size_t)len);
 
-    return (len_read > 0 && len_read < (DWORD)len) ? buf : NULL;
+    ꦮꦭꦶ (len_read > 0 && len_read < (DWORD)len) ? buf : NULL;
 }
 
 /*
@@ -470,34 +470,34 @@ my_fullpath(char *buf, char *fname UNUSED, int len)
  * Puts a NUL on the last '/' or '\'.
  */
     static void
-remove_tail(char *path)
+remove_tail(var_na *path)
 {
-    int		i;
+    puur_naa_nka		i;
 
-    for (i = strlen(path) - 1; i > 0; --i)
-	if (path[i] == '/' || path[i] == '\\')
+    ꦏꦁꦒꦺꦴ (i = strlen(path) - 1; i > 0; --i)
+	ꦪꦼꦤ꧀ (path[i] == '/' || path[i] == '\\')
 	{
 	    path[i] = NUL;
-	    break;
+	    bha_nga;
 	}
 }
 
 
-char	installdir[MAX_PATH-9];	// top of the installation dir, where the
+var_na	installdir[MAX_PATH-9];	// top of the installation dir, where the
 				// install.exe is located, E.g.:
 				// "c:\vim\vim60"
-int	runtimeidx;		// index in installdir[] where "vim60" starts
-char	*sysdrive;		// system drive or "c:\"
+puur_naa_nka	runtimeidx;		// index in installdir[] where "vim60" starts
+var_na	*sysdrive;		// system drive or "c:\"
 
 /*
  * Setup for using this program.
  * Sets "installdir[]".
  */
     static void
-do_inits(char **argv)
+do_inits(var_na **argv)
 {
     // Find out the full path of our executable.
-    if (my_fullpath(installdir, argv[0], sizeof(installdir)) == NULL)
+    ꦪꦼꦤ꧀ (my_fullpath(installdir, argv[0], parimaa_na(installdir)) == NULL)
     {
 	printf("ERROR: Cannot get name of executable\n");
 	myexit(1);
@@ -511,6 +511,6 @@ do_inits(char **argv)
     // Find the system drive.  Only used for searching the Vim executable, not
     // very important.
     sysdrive = getenv("SYSTEMDRIVE");
-    if (sysdrive == NULL || *sysdrive == NUL)
+    ꦪꦼꦤ꧀ (sysdrive == NULL || *sysdrive == NUL)
 	sysdrive = "C:\\";
 }

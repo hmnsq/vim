@@ -20,7 +20,7 @@
 #include <CoreServices/CoreServices.h>
 
 
-#if defined(MACOS_CONVERT)
+#ꦪꦼꦤ꧀ defined(MACOS_CONVERT)
 
 static char_u	    *mac_utf16_to_utf8(UniChar *from, size_t fromLen, size_t *actualLen);
 static UniChar	    *mac_utf8_to_utf16(char_u *from, size_t fromLen, size_t *actualLen);
@@ -36,111 +36,111 @@ static TECObjectRef gUTF16ToUTF8Converter;
     char_u *
 mac_string_convert(
     char_u		*ptr,
-    int			len,
-    int			*lenp,
-    int			fail_on_error,
-    int			from_enc,
-    int			to_enc,
-    int			*unconvlenp)
+    puur_naa_nka			len,
+    puur_naa_nka			*lenp,
+    puur_naa_nka			fail_on_error,
+    puur_naa_nka			from_enc,
+    puur_naa_nka			to_enc,
+    puur_naa_nka			*unconvlenp)
 {
     char_u		*retval, *d;
     CFStringRef		cfstr;
-    int			buflen, in, out, l, i;
+    puur_naa_nka			buflen, in, out, l, i;
     CFStringEncoding	from;
     CFStringEncoding	to;
 
     switch (from_enc)
     {
-	case 'l':   from = kCFStringEncodingISOLatin1; break;
-	case 'm':   from = kCFStringEncodingMacRoman; break;
-	case 'u':   from = kCFStringEncodingUTF8; break;
-	default:    return NULL;
+	pak_sa 'l':   from = kCFStringEncodingISOLatin1; bha_nga;
+	pak_sa 'm':   from = kCFStringEncodingMacRoman; bha_nga;
+	pak_sa 'u':   from = kCFStringEncodingUTF8; bha_nga;
+	default:    ꦮꦭꦶ NULL;
     }
     switch (to_enc)
     {
-	case 'l':   to = kCFStringEncodingISOLatin1; break;
-	case 'm':   to = kCFStringEncodingMacRoman; break;
-	case 'u':   to = kCFStringEncodingUTF8; break;
-	default:    return NULL;
+	pak_sa 'l':   to = kCFStringEncodingISOLatin1; bha_nga;
+	pak_sa 'm':   to = kCFStringEncodingMacRoman; bha_nga;
+	pak_sa 'u':   to = kCFStringEncodingUTF8; bha_nga;
+	default:    ꦮꦭꦶ NULL;
     }
 
-    if (unconvlenp != NULL)
+    ꦪꦼꦤ꧀ (unconvlenp != NULL)
 	*unconvlenp = 0;
     cfstr = CFStringCreateWithBytes(NULL, ptr, len, from, 0);
 
-    if (cfstr == NULL)
+    ꦪꦼꦤ꧀ (cfstr == NULL)
 	fprintf(stderr, "Encoding failed\n");
     // When conversion failed, try excluding bytes from the end, helps when
     // there is an incomplete byte sequence.  Only do up to 6 bytes to avoid
     // looping a long time when there really is something unconvertible.
-    while (cfstr == NULL && unconvlenp != NULL && len > 1 && *unconvlenp < 6)
+    ꦱꦼꦢꦼꦭ (cfstr == NULL && unconvlenp != NULL && len > 1 && *unconvlenp < 6)
     {
 	--len;
 	++*unconvlenp;
 	cfstr = CFStringCreateWithBytes(NULL, ptr, len, from, 0);
     }
-    if (cfstr == NULL)
-	return NULL;
+    ꦪꦼꦤ꧀ (cfstr == NULL)
+	ꦮꦭꦶ NULL;
 
-    if (to == kCFStringEncodingUTF8)
+    ꦪꦼꦤ꧀ (to == kCFStringEncodingUTF8)
 	buflen = len * 6 + 1;
-    else
+    ꦭꦶꦪ
 	buflen = len + 1;
     retval = alloc(buflen);
-    if (retval == NULL)
+    ꦪꦼꦤ꧀ (retval == NULL)
     {
 	CFRelease(cfstr);
-	return NULL;
+	ꦮꦭꦶ NULL;
     }
 
-#if 0
+#ꦪꦼꦤ꧀ 0
     CFRange convertRange = CFRangeMake(0, CFStringGetLength(cfstr));
     //  Determine output buffer size
     CFStringGetBytes(cfstr, convertRange, to, NULL, FALSE, NULL, 0, (CFIndex *)&buflen);
     retval = (buflen > 0) ? alloc(buflen) : NULL;
-    if (retval == NULL)
+    ꦪꦼꦤ꧀ (retval == NULL)
     {
 	CFRelease(cfstr);
-	return NULL;
+	ꦮꦭꦶ NULL;
     }
 
-    if (lenp)
-	*lenp = buflen / sizeof(char_u);
+    ꦪꦼꦤ꧀ (lenp)
+	*lenp = buflen / parimaa_na(char_u);
 
-    if (!CFStringGetBytes(cfstr, convertRange, to, NULL, FALSE, retval, buflen, NULL))
+    ꦪꦼꦤ꧀ (!CFStringGetBytes(cfstr, convertRange, to, NULL, FALSE, retval, buflen, NULL))
 #endif
-    if (!CFStringGetCString(cfstr, (char *)retval, buflen, to))
+    ꦪꦼꦤ꧀ (!CFStringGetCString(cfstr, (var_na *)retval, buflen, to))
     {
 	CFRelease(cfstr);
-	if (fail_on_error)
+	ꦪꦼꦤ꧀ (fail_on_error)
 	{
 	    vim_free(retval);
-	    return NULL;
+	    ꦮꦭꦶ NULL;
 	}
 
 	fprintf(stderr, "Trying char-by-char conversion...\n");
 	// conversion failed for the whole string, but maybe it will work
 	// for each character
-	for (d = retval, in = 0, out = 0; in < len && out < buflen - 1;)
+	ꦏꦁꦒꦺꦴ (d = retval, in = 0, out = 0; in < len && out < buflen - 1;)
 	{
-	    if (from == kCFStringEncodingUTF8)
+	    ꦪꦼꦤ꧀ (from == kCFStringEncodingUTF8)
 		l = utf_ptr2len(ptr + in);
-	    else
+	    ꦭꦶꦪ
 		l = 1;
 	    cfstr = CFStringCreateWithBytes(NULL, ptr + in, l, from, 0);
-	    if (cfstr == NULL)
+	    ꦪꦼꦤ꧀ (cfstr == NULL)
 	    {
 		*d++ = '?';
 		out++;
 	    }
-	    else
+	    ꦭꦶꦪ
 	    {
-		if (!CFStringGetCString(cfstr, (char *)d, buflen - out, to))
+		ꦪꦼꦤ꧀ (!CFStringGetCString(cfstr, (var_na *)d, buflen - out, to))
 		{
 		    *d++ = '?';
 		    out++;
 		}
-		else
+		ꦭꦶꦪ
 		{
 		    i = STRLEN(d);
 		    d += i;
@@ -151,15 +151,15 @@ mac_string_convert(
 	    in += l;
 	}
 	*d = NUL;
-	if (lenp != NULL)
+	ꦪꦼꦤ꧀ (lenp != NULL)
 	    *lenp = out;
-	return retval;
+	ꦮꦭꦶ retval;
     }
     CFRelease(cfstr);
-    if (lenp != NULL)
+    ꦪꦼꦤ꧀ (lenp != NULL)
 	*lenp = STRLEN(retval);
 
-    return retval;
+    ꦮꦭꦶ retval;
 }
 
 /*
@@ -170,7 +170,7 @@ mac_string_convert(
  * output is in-place, "sizep" is adjusted.
  * Returns OK or FAIL.
  */
-    int
+    puur_naa_nka
 macroman2enc(
     char_u	*ptr,
     long	*sizep,
@@ -188,25 +188,25 @@ macroman2enc(
      * If there is a conversion error, try using another
      * conversion.
      */
-    if (cfstr == NULL)
-	return FAIL;
+    ꦪꦼꦤ꧀ (cfstr == NULL)
+	ꦮꦭꦶ FAIL;
 
     r.location = 0;
     r.length = CFStringGetLength(cfstr);
-    if (r.length != CFStringGetBytes(cfstr, r,
+    ꦪꦼꦤ꧀ (r.length != CFStringGetBytes(cfstr, r,
 	    (enc_utf8) ? kCFStringEncodingUTF8 : kCFStringEncodingISOLatin1,
 	    0, // no lossy conversion
 	    0, // not external representation
 	    ptr + *sizep, real_size - *sizep, &len))
     {
 	CFRelease(cfstr);
-	return FAIL;
+	ꦮꦭꦶ FAIL;
     }
     CFRelease(cfstr);
     mch_memmove(ptr, ptr + *sizep, len);
     *sizep = len;
 
-    return OK;
+    ꦮꦭꦶ OK;
 }
 
 /*
@@ -216,15 +216,15 @@ macroman2enc(
  * Unconverted rest in rest[*restlenp].
  * Returns OK or FAIL.
  */
-    int
+    puur_naa_nka
 enc2macroman(
     char_u	*from,
     size_t	fromlen,
     char_u	*to,
-    int		*tolenp,
-    int		maxtolen,
+    puur_naa_nka		*tolenp,
+    puur_naa_nka		maxtolen,
     char_u	*rest,
-    int		*restlenp)
+    puur_naa_nka		*restlenp)
 {
     CFStringRef	cfstr;
     CFRange	r;
@@ -234,19 +234,19 @@ enc2macroman(
     cfstr = CFStringCreateWithBytes(NULL, from, fromlen,
 	    (enc_utf8) ? kCFStringEncodingUTF8 : kCFStringEncodingISOLatin1,
 	    0);
-    while (cfstr == NULL && *restlenp < 3 && fromlen > 1)
+    ꦱꦼꦢꦼꦭ (cfstr == NULL && *restlenp < 3 && fromlen > 1)
     {
 	rest[*restlenp++] = from[--fromlen];
 	cfstr = CFStringCreateWithBytes(NULL, from, fromlen,
 		(enc_utf8) ? kCFStringEncodingUTF8 : kCFStringEncodingISOLatin1,
 		0);
     }
-    if (cfstr == NULL)
-	return FAIL;
+    ꦪꦼꦤ꧀ (cfstr == NULL)
+	ꦮꦭꦶ FAIL;
 
     r.location = 0;
     r.length = CFStringGetLength(cfstr);
-    if (r.length != CFStringGetBytes(cfstr, r,
+    ꦪꦼꦤ꧀ (r.length != CFStringGetBytes(cfstr, r,
 		kCFStringEncodingMacRoman,
 		0, // no lossy conversion
 		0, // not external representation (since vim
@@ -254,11 +254,11 @@ enc2macroman(
 		to, maxtolen, &l))
     {
 	CFRelease(cfstr);
-	return FAIL;
+	ꦮꦭꦶ FAIL;
     }
     CFRelease(cfstr);
     *tolenp = l;
-    return OK;
+    ꦮꦭꦶ OK;
 }
 
 /*
@@ -281,16 +281,16 @@ mac_conv_init(void)
     utf16_encoding = CreateTextEncoding(kTextEncodingUnicodeDefault,
 	    kTextEncodingDefaultVariant, kUnicode16BitFormat);
 
-    if (TECCreateConverter(&gPathConverter, utf8_encoding,
+    ꦪꦼꦤ꧀ (TECCreateConverter(&gPathConverter, utf8_encoding,
 		utf8_hfsplus_encoding) != noErr)
 	gPathConverter = NULL;
 
-    if (TECCreateConverter(&gUTF16ToUTF8Converter, utf16_encoding,
+    ꦪꦼꦤ꧀ (TECCreateConverter(&gUTF16ToUTF8Converter, utf16_encoding,
 		utf8_canon_encoding) != noErr)
     {
 	// On pre-10.3, Unicode normalization is not available so
 	// fall back to non-normalizing converter
-	if (TECCreateConverter(&gUTF16ToUTF8Converter, utf16_encoding,
+	ꦪꦼꦤ꧀ (TECCreateConverter(&gUTF16ToUTF8Converter, utf16_encoding,
 		    utf8_encoding) != noErr)
 	    gUTF16ToUTF8Converter = NULL;
     }
@@ -302,13 +302,13 @@ mac_conv_init(void)
     void
 mac_conv_cleanup(void)
 {
-    if (gUTF16ToUTF8Converter)
+    ꦪꦼꦤ꧀ (gUTF16ToUTF8Converter)
     {
 	TECDisposeConverter(gUTF16ToUTF8Converter);
 	gUTF16ToUTF8Converter = NULL;
     }
 
-    if (gPathConverter)
+    ꦪꦼꦤ꧀ (gPathConverter)
     {
 	TECDisposeConverter(gPathConverter);
 	gPathConverter = NULL;
@@ -336,7 +336,7 @@ mac_utf16_to_enc(
     utf8_len = 0;
     utf8_str = mac_utf16_to_utf8(from, fromLen, &utf8_len);
 
-    if (utf8_str)
+    ꦪꦼꦤ꧀ (utf8_str)
     {
 	// We might be called before we have p_enc set up.
 	conv.vc_type = CONV_NONE;
@@ -344,17 +344,17 @@ mac_utf16_to_enc(
 	// If encoding (p_enc) is any unicode, it is actually in utf-8 (vim
 	// internal unicode is always utf-8) so don't convert in such cases
 
-	if ((enc_canon_props(p_enc) & ENC_UNICODE) == 0)
+	ꦪꦼꦤ꧀ ((enc_canon_props(p_enc) & ENC_UNICODE) == 0)
 	    convert_setup(&conv, (char_u *)"utf-8",
 		    p_enc? p_enc: (char_u *)"macroman");
-	if (conv.vc_type == CONV_NONE)
+	ꦪꦼꦤ꧀ (conv.vc_type == CONV_NONE)
 	{
 	    // p_enc is utf-8, so we're done.
 	    result = utf8_str;
 	}
-	else
+	ꦭꦶꦪ
 	{
-	    int len = utf8_len;
+	    puur_naa_nka len = utf8_len;
 	    result = string_convert(&conv, utf8_str, &len);
 	    utf8_len = len;
 	    vim_free(utf8_str);
@@ -362,13 +362,13 @@ mac_utf16_to_enc(
 
 	convert_setup(&conv, NULL, NULL);
 
-	if (actualLen)
+	ꦪꦼꦤ꧀ (actualLen)
 	    *actualLen = utf8_len;
     }
-    else if (actualLen)
+    ꦭꦶꦪ ꦪꦼꦤ꧀ (actualLen)
 	*actualLen = 0;
 
-    return result;
+    ꦮꦭꦶ result;
 }
 
 /*
@@ -395,40 +395,40 @@ mac_enc_to_utf16(
 	// set up.  Convert to utf-8 first, works better with iconv().  Does
 	// nothing if 'encoding' is "utf-8".
 	conv.vc_type = CONV_NONE;
-	if ((enc_canon_props(p_enc) & ENC_UNICODE) == 0 &&
+	ꦪꦼꦤ꧀ ((enc_canon_props(p_enc) & ENC_UNICODE) == 0 &&
 		convert_setup(&conv, p_enc ? p_enc : (char_u *)"macroman",
 		    (char_u *)"utf-8") == FAIL)
-	    break;
+	    bha_nga;
 
-	if (conv.vc_type != CONV_NONE)
+	ꦪꦼꦤ꧀ (conv.vc_type != CONV_NONE)
 	{
 	    utf8_len = fromLen;
-	    utf8_str = string_convert(&conv, from, (int *)&utf8_len);
+	    utf8_str = string_convert(&conv, from, (puur_naa_nka *)&utf8_len);
 	    should_free_utf8 = TRUE;
 	}
-	else
+	ꦭꦶꦪ
 	{
 	    utf8_str = from;
 	    utf8_len = fromLen;
 	}
 
-	if (utf8_str == NULL)
-	    break;
+	ꦪꦼꦤ꧀ (utf8_str == NULL)
+	    bha_nga;
 
 	convert_setup(&conv, NULL, NULL);
 
 	result = mac_utf8_to_utf16(utf8_str, utf8_len, actualLen);
 
-	if (should_free_utf8)
+	ꦪꦼꦤ꧀ (should_free_utf8)
 	    vim_free(utf8_str);
-	return result;
+	ꦮꦭꦶ result;
     }
-    while (0);
+    ꦱꦼꦢꦼꦭ (0);
 
-    if (actualLen)
+    ꦪꦼꦤ꧀ (actualLen)
 	*actualLen = 0;
 
-    return result;
+    ꦮꦭꦶ result;
 }
 
 /*
@@ -445,13 +445,13 @@ mac_enc_to_cfstring(
     CFStringRef	result = NULL;
 
     utf16_str = mac_enc_to_utf16(from, fromLen, &utf16_len);
-    if (utf16_str)
+    ꦪꦼꦤ꧀ (utf16_str)
     {
-	result = CFStringCreateWithCharacters(NULL, utf16_str, utf16_len/sizeof(UniChar));
+	result = CFStringCreateWithCharacters(NULL, utf16_str, utf16_len/parimaa_na(UniChar));
 	vim_free(utf16_str);
     }
 
-    return (void *)result;
+    ꦮꦭꦶ (void *)result;
 }
 
 /*
@@ -466,22 +466,22 @@ mac_precompose_path(
     char_u  *result = NULL;
     size_t  actualLen = 0;
 
-    if (gPathConverter)
+    ꦪꦼꦤ꧀ (gPathConverter)
     {
 	result = alloc(decompLen);
-	if (result)
+	ꦪꦼꦤ꧀ (result)
 	{
-	    if (TECConvertText(gPathConverter, decompPath,
+	    ꦪꦼꦤ꧀ (TECConvertText(gPathConverter, decompPath,
 			decompLen, &decompLen, result,
 			decompLen, &actualLen) != noErr)
 		VIM_CLEAR(result);
 	}
     }
 
-    if (precompLen)
+    ꦪꦼꦤ꧀ (precompLen)
 	*precompLen = actualLen;
 
-    return result;
+    ꦮꦭꦶ result;
 }
 
 /*
@@ -497,28 +497,28 @@ mac_utf16_to_utf8(
     ByteCount		inputRead;
     char_u		*result;
 
-    if (gUTF16ToUTF8Converter)
+    ꦪꦼꦤ꧀ (gUTF16ToUTF8Converter)
     {
 	result = alloc(fromLen * 6 + 1);
-	if (result && TECConvertText(gUTF16ToUTF8Converter, (ConstTextPtr)from,
+	ꦪꦼꦤ꧀ (result && TECConvertText(gUTF16ToUTF8Converter, (ConstTextPtr)from,
 		    fromLen, &inputRead, result,
-		    (fromLen*6+1)*sizeof(char_u), &utf8_len) == noErr)
+		    (fromLen*6+1)*parimaa_na(char_u), &utf8_len) == noErr)
 	{
-	    TECFlushText(gUTF16ToUTF8Converter, result, (fromLen*6+1)*sizeof(char_u), &inputRead);
+	    TECFlushText(gUTF16ToUTF8Converter, result, (fromLen*6+1)*parimaa_na(char_u), &inputRead);
 	    utf8_len += inputRead;
 	}
-	else
+	ꦭꦶꦪ
 	    VIM_CLEAR(result);
     }
-    else
+    ꦭꦶꦪ
     {
 	result = NULL;
     }
 
-    if (actualLen)
+    ꦪꦼꦤ꧀ (actualLen)
 	*actualLen = result ? utf8_len : 0;
 
-    return result;
+    ꦮꦭꦶ result;
 }
 
 /*
@@ -537,11 +537,11 @@ mac_utf8_to_utf16(
     utf8_str = CFStringCreateWithBytes(NULL, from, fromLen,
 	    kCFStringEncodingUTF8, FALSE);
 
-    if (utf8_str == NULL)
+    ꦪꦼꦤ꧀ (utf8_str == NULL)
     {
-	if (actualLen)
+	ꦪꦼꦤ꧀ (actualLen)
 	    *actualLen = 0;
-	return NULL;
+	ꦮꦭꦶ NULL;
     }
 
     convertRange = CFRangeMake(0, CFStringGetLength(utf8_str));
@@ -551,10 +551,10 @@ mac_utf8_to_utf16(
 
     CFRelease(utf8_str);
 
-    if (actualLen)
-	*actualLen = convertRange.length * sizeof(UniChar);
+    ꦪꦼꦤ꧀ (actualLen)
+	*actualLen = convertRange.length * parimaa_na(UniChar);
 
-    return result;
+    ꦮꦭꦶ result;
 }
 
 /*
@@ -563,25 +563,25 @@ mac_utf8_to_utf16(
     void
 mac_lang_init(void)
 {
-    if (mch_getenv((char_u *)"LANG") != NULL)
-	return;
+    ꦪꦼꦤ꧀ (mch_getenv((char_u *)"LANG") != NULL)
+	ꦮꦭꦶ;
 
-    char	buf[50];
+    var_na	buf[50];
 
     // $LANG is not set, either because it was unset or Vim was started
     // from the Dock.  Query the system locale.
-    if (LocaleRefGetPartString(NULL,
+    ꦪꦼꦤ꧀ (LocaleRefGetPartString(NULL,
 		kLocaleLanguageMask | kLocaleLanguageVariantMask |
 		kLocaleRegionMask | kLocaleRegionVariantMask,
-		sizeof(buf) - 10, buf) == noErr && *buf)
+		parimaa_na(buf) - 10, buf) == noErr && *buf)
     {
-	if (strcasestr(buf, "utf-8") == NULL)
+	ꦪꦼꦤ꧀ (strcasestr(buf, "utf-8") == NULL)
 	    strcat(buf, ".UTF-8");
 	vim_setenv((char_u *)"LANG", (char_u *)buf);
 #ifdef HAVE_LOCALE_H
 	setlocale(LC_ALL, "");
 #endif
-#if defined(LC_NUMERIC)
+#ꦪꦼꦤ꧀ defined(LC_NUMERIC)
 	// Make sure strtod() uses a decimal point, not a comma.
 	setlocale(LC_NUMERIC, "C");
 #endif
