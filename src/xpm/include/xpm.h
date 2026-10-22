@@ -69,26 +69,26 @@
 # include <malloc.h>
 # include "simx.h"		/* defines some X stuff using MSW types */
 #define NEED_STRCASECMP		/* at least for MSVC++ */
-#else /* FOR_MSW */
+#অন্যথা /* FOR_MSW */
 # ifdef AMIGA
 #  include "amigax.h"
-# else /* not AMIGA */
+# অন্যথা /* not AMIGA */
 #  include <X11/Xlib.h>
 #  include <X11/Xutil.h>
 # endif /* not AMIGA */
 #endif /* FOR_MSW */
 
 /* let's define Pixel if it is not done yet */
-#if ! defined(_XtIntrinsic_h) && ! defined(PIXEL_ALREADY_TYPEDEFED)
-typedef unsigned long Pixel;	/* Index into colormap */
+#যদি ! defined(_XtIntrinsic_h) && ! defined(PIXEL_ALREADY_TYPEDEFED)
+প্রকারনির্দেশ unsigned long Pixel;	/* Index into colormap */
 # define PIXEL_ALREADY_TYPEDEFED
 #endif
 
 /* make sure we know whether function prototypes are needed or not */
 #ifndef NeedFunctionPrototypes
-# if defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
+# যদি defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
 #  define NeedFunctionPrototypes 1
-# else
+# অন্যথা
 #  define NeedFunctionPrototypes 0
 # endif
 #endif
@@ -107,125 +107,125 @@ typedef unsigned long Pixel;	/* Index into colormap */
 #define XpmNoMemory     -3
 #define XpmColorFailed  -4
 
-typedef struct {
-    char *name;			/* Symbolic color name */
-    char *value;		/* Color value */
+প্রকারনির্দেশ সংরচনা {
+    বর্ণ *name;			/* Symbolic color name */
+    বর্ণ *মান;		/* Color value */
     Pixel pixel;		/* Color pixel */
-}      XpmColorSymbol;
+}      Xpm_Color_প্রতীক;
 
-typedef struct {
-    char *name;			/* name of the extension */
-    unsigned int nlines;	/* number of lines in this extension */
-    char **lines;		/* pointer to the extension array of strings */
+প্রকারনির্দেশ সংরচনা {
+    বর্ণ *name;			/* name of the extension */
+    unsigned পূর্ণাঙ্ক nlines;	/* number of lines in this extension */
+    বর্ণ **সারিগুলি;		/* pointer to the extension array of strings */
 }      XpmExtension;
 
-typedef struct {
-    char *string;		/* characters string */
-    char *symbolic;		/* symbolic name */
-    char *m_color;		/* monochrom default */
-    char *g4_color;		/* 4 level grayscale default */
-    char *g_color;		/* other level grayscale default */
-    char *c_color;		/* color default */
+প্রকারনির্দেশ সংরচনা {
+    বর্ণ *string;		/* characters string */
+    বর্ণ *symbolic;		/* symbolic name */
+    বর্ণ *m_color;		/* monochrom default */
+    বর্ণ *g4_color;		/* 4 level grayscale default */
+    বর্ণ *g_color;		/* other level grayscale default */
+    বর্ণ *c_color;		/* color default */
 }      XpmColor;
 
-typedef struct {
-    unsigned int width;		/* image width */
-    unsigned int height;	/* image height */
-    unsigned int cpp;		/* number of characters per pixel */
-    unsigned int ncolors;	/* number of colors */
+প্রকারনির্দেশ সংরচনা {
+    unsigned পূর্ণাঙ্ক width;		/* image width */
+    unsigned পূর্ণাঙ্ক height;	/* image height */
+    unsigned পূর্ণাঙ্ক cpp;		/* number of characters per pixel */
+    unsigned পূর্ণাঙ্ক ncolors;	/* number of colors */
     XpmColor *colorTable;	/* list of related colors */
-    unsigned int *data;		/* image data */
+    unsigned পূর্ণাঙ্ক *data;		/* image data */
 }      XpmImage;
 
-typedef struct {
+প্রকারনির্দেশ সংরচনা {
     unsigned long valuemask;	/* Specifies which attributes are defined */
-    char *hints_cmt;		/* Comment of the hints section */
-    char *colors_cmt;		/* Comment of the colors section */
-    char *pixels_cmt;		/* Comment of the pixels section */
-    unsigned int x_hotspot;	/* Returns the x hotspot's coordinate */
-    unsigned int y_hotspot;	/* Returns the y hotspot's coordinate */
-    unsigned int nextensions;	/* number of extensions */
+    বর্ণ *hints_cmt;		/* Comment of the hints section */
+    বর্ণ *colors_cmt;		/* Comment of the colors section */
+    বর্ণ *pixels_cmt;		/* Comment of the pixels section */
+    unsigned পূর্ণাঙ্ক x_hotspot;	/* Returns the x hotspot's coordinate */
+    unsigned পূর্ণাঙ্ক y_hotspot;	/* Returns the y hotspot's coordinate */
+    unsigned পূর্ণাঙ্ক nextensions;	/* number of extensions */
     XpmExtension *extensions;	/* pointer to array of extensions */
 }      XpmInfo;
 
-typedef int (*XpmAllocColorFunc)(
-#if NeedFunctionPrototypes
+প্রকারনির্দেশ পূর্ণাঙ্ক (*XpmAllocColorFunc)(
+#যদি NeedFunctionPrototypes
     Display*			/* display */,
     Colormap			/* colormap */,
-    char*			/* colorname */,
+    বর্ণ*			/* colorname */,
     XColor*			/* xcolor */,
-    void*			/* closure */
+    শূন্য*			/* closure */
 #endif
 );
 
-typedef int (*XpmFreeColorsFunc)(
-#if NeedFunctionPrototypes
+প্রকারনির্দেশ পূর্ণাঙ্ক (*XpmFreeColorsFunc)(
+#যদি NeedFunctionPrototypes
     Display*			/* display */,
     Colormap			/* colormap */,
     Pixel*			/* pixels */,
-    int				/* npixels */,
-    void*			/* closure */
+    পূর্ণাঙ্ক				/* npixels */,
+    শূন্য*			/* closure */
 #endif
 );
 
-typedef struct {
+প্রকারনির্দেশ সংরচনা {
     unsigned long valuemask;		/* Specifies which attributes are
 					   defined */
 
     Visual *visual;			/* Specifies the visual to use */
     Colormap colormap;			/* Specifies the colormap to use */
-    unsigned int depth;			/* Specifies the depth */
-    unsigned int width;			/* Returns the width of the created
+    unsigned পূর্ণাঙ্ক depth;			/* Specifies the depth */
+    unsigned পূর্ণাঙ্ক width;			/* Returns the width of the created
 					   pixmap */
-    unsigned int height;		/* Returns the height of the created
+    unsigned পূর্ণাঙ্ক height;		/* Returns the height of the created
 					   pixmap */
-    unsigned int x_hotspot;		/* Returns the x hotspot's
+    unsigned পূর্ণাঙ্ক x_hotspot;		/* Returns the x hotspot's
 					   coordinate */
-    unsigned int y_hotspot;		/* Returns the y hotspot's
+    unsigned পূর্ণাঙ্ক y_hotspot;		/* Returns the y hotspot's
 					   coordinate */
-    unsigned int cpp;			/* Specifies the number of char per
+    unsigned পূর্ণাঙ্ক cpp;			/* Specifies the number of char per
 					   pixel */
     Pixel *pixels;			/* List of used color pixels */
-    unsigned int npixels;		/* Number of used pixels */
-    XpmColorSymbol *colorsymbols;	/* List of color symbols to override */
-    unsigned int numsymbols;		/* Number of symbols */
-    char *rgb_fname;			/* RGB text file name */
-    unsigned int nextensions;		/* Number of extensions */
+    unsigned পূর্ণাঙ্ক npixels;		/* Number of used pixels */
+    Xpm_Color_প্রতীক *colorsymbols;	/* List of color symbols to override */
+    unsigned পূর্ণাঙ্ক numsymbols;		/* Number of symbols */
+    বর্ণ *rgb_fname;			/* RGB text file name */
+    unsigned পূর্ণাঙ্ক nextensions;		/* Number of extensions */
     XpmExtension *extensions;		/* List of extensions */
 
-    unsigned int ncolors;               /* Number of colors */
+    unsigned পূর্ণাঙ্ক ncolors;               /* Number of colors */
     XpmColor *colorTable;               /* List of colors */
 /* 3.2 backward compatibility code */
-    char *hints_cmt;                    /* Comment of the hints section */
-    char *colors_cmt;                   /* Comment of the colors section */
-    char *pixels_cmt;                   /* Comment of the pixels section */
+    বর্ণ *hints_cmt;                    /* Comment of the hints section */
+    বর্ণ *colors_cmt;                   /* Comment of the colors section */
+    বর্ণ *pixels_cmt;                   /* Comment of the pixels section */
 /* end 3.2 bc */
-    unsigned int mask_pixel;            /* Color table index of transparent
+    unsigned পূর্ণাঙ্ক mask_pixel;            /* Color table index of transparent
                                            color */
 
     /* Color Allocation Directives */
     Bool exactColors;			/* Only use exact colors for visual */
-    unsigned int closeness;		/* Allowable RGB deviation */
-    unsigned int red_closeness;		/* Allowable red deviation */
-    unsigned int green_closeness;	/* Allowable green deviation */
-    unsigned int blue_closeness;	/* Allowable blue deviation */
-    int color_key;			/* Use colors from this color set */
+    unsigned পূর্ণাঙ্ক closeness;		/* Allowable RGB deviation */
+    unsigned পূর্ণাঙ্ক red_closeness;		/* Allowable red deviation */
+    unsigned পূর্ণাঙ্ক green_closeness;	/* Allowable green deviation */
+    unsigned পূর্ণাঙ্ক blue_closeness;	/* Allowable blue deviation */
+    পূর্ণাঙ্ক color_চাবি;			/* Use colors from this color set */
 
     Pixel *alloc_pixels;		/* Returns the list of alloc'ed color
 					   pixels */
-    int nalloc_pixels;			/* Returns the number of alloc'ed
+    পূর্ণাঙ্ক nalloc_pixels;			/* Returns the number of alloc'ed
 					   color pixels */
 
     Bool alloc_close_colors;    	/* Specify whether close colors should
 					   be allocated using XAllocColor
 					   or not */
-    int bitmap_format;			/* Specify the format of 1bit depth
+    পূর্ণাঙ্ক bitmap_format;			/* Specify the format of 1bit depth
 					   images: ZPixmap or XYBitmap */
 
     /* Color functions */
     XpmAllocColorFunc alloc_color;	/* Application color allocator */
     XpmFreeColorsFunc free_colors;	/* Application color de-allocator */
-    void *color_closure;		/* Application private data to pass to
+    শূন্য *color_closure;		/* Application private data to pass to
 					   alloc_color and free_colors */
 
 }      XpmAttributes;
@@ -250,7 +250,7 @@ typedef struct {
 #define XpmExactColors     (1L<<11)
 #define XpmCloseness	   (1L<<12)
 #define XpmRGBCloseness	   (1L<<13)
-#define XpmColorKey	   (1L<<14)
+#define Xpm_Color_চাবি	   (1L<<14)
 
 #define XpmColorTable      (1L<<15)
 #define XpmReturnColorTable XpmColorTable
@@ -271,7 +271,7 @@ typedef struct {
 /* XpmAttributes mask_pixel value when there is no mask */
 #ifndef FOR_MSW
 #define XpmUndefPixel 0x80000000
-#else
+#অন্যথা
 /* int is only 16 bit for MSW */
 #define XpmUndefPixel 0x8000
 #endif
@@ -289,12 +289,12 @@ typedef struct {
 
 
 /* macros for forward declarations of functions with prototypes */
-#if NeedFunctionPrototypes
-#define FUNC(f, t, p) extern t f p
-#define LFUNC(f, t, p) static t f p
-#else
-#define FUNC(f, t, p) extern t f()
-#define LFUNC(f, t, p) static t f()
+#যদি NeedFunctionPrototypes
+#define FUNC(f, t, p) বাহ্য t f p
+#define LFUNC(f, t, p) স্থির t f p
+#অন্যথা
+#define FUNC(f, t, p) বাহ্য t f()
+#define LFUNC(f, t, p) স্থির t f()
 #endif
 
 
@@ -303,160 +303,160 @@ typedef struct {
  */
 
 #ifdef __cplusplus
-extern "C" {
+বাহ্য "C" {
 #endif
 
 /* FOR_MSW, all ..Pixmap.. are excluded, only the ..XImage.. are used */
 /* Same for Amiga! */
 
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromData, int, (Display *display,
+#যদি !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreatePixmapFromData, পূর্ণাঙ্ক, (Display *display,
 					Drawable d,
-					char **data,
+					বর্ণ **data,
 					Pixmap *pixmap_return,
 					Pixmap *shapemask_return,
 					XpmAttributes *attributes));
 
-    FUNC(XpmCreateDataFromPixmap, int, (Display *display,
-					char ***data_return,
+    FUNC(XpmCreateDataFromPixmap, পূর্ণাঙ্ক, (Display *display,
+					বর্ণ ***data_return,
 					Pixmap pixmap,
 					Pixmap shapemask,
 					XpmAttributes *attributes));
 
-    FUNC(XpmReadFileToPixmap, int, (Display *display,
+    FUNC(XpmReadFileToPixmap, পূর্ণাঙ্ক, (Display *display,
 				    Drawable d,
-				    char *filename,
+				    বর্ণ *filename,
 				    Pixmap *pixmap_return,
 				    Pixmap *shapemask_return,
 				    XpmAttributes *attributes));
 
-    FUNC(XpmWriteFileFromPixmap, int, (Display *display,
-				       char *filename,
+    FUNC(XpmWriteFileFromPixmap, পূর্ণাঙ্ক, (Display *display,
+				       বর্ণ *filename,
 				       Pixmap pixmap,
 				       Pixmap shapemask,
 				       XpmAttributes *attributes));
 #endif
 
-    FUNC(XpmCreateImageFromData, int, (Display *display,
-				       char **data,
+    FUNC(XpmCreateImageFromData, পূর্ণাঙ্ক, (Display *display,
+				       বর্ণ **data,
 				       XImage **image_return,
 				       XImage **shapemask_return,
 				       XpmAttributes *attributes));
 
-    FUNC(XpmCreateDataFromImage, int, (Display *display,
-				       char ***data_return,
+    FUNC(XpmCreateDataFromImage, পূর্ণাঙ্ক, (Display *display,
+				       বর্ণ ***data_return,
 				       XImage *image,
 				       XImage *shapeimage,
 				       XpmAttributes *attributes));
 
-    FUNC(XpmReadFileToImage, int, (Display *display,
-				   char *filename,
+    FUNC(XpmReadFileToImage, পূর্ণাঙ্ক, (Display *display,
+				   বর্ণ *filename,
 				   XImage **image_return,
 				   XImage **shapeimage_return,
 				   XpmAttributes *attributes));
 
-    FUNC(XpmWriteFileFromImage, int, (Display *display,
-				      char *filename,
+    FUNC(XpmWriteFileFromImage, পূর্ণাঙ্ক, (Display *display,
+				      বর্ণ *filename,
 				      XImage *image,
 				      XImage *shapeimage,
 				      XpmAttributes *attributes));
 
-    FUNC(XpmCreateImageFromBuffer, int, (Display *display,
-					 char *buffer,
+    FUNC(XpmCreateImageFromBuffer, পূর্ণাঙ্ক, (Display *display,
+					 বর্ণ *buffer,
 					 XImage **image_return,
 					 XImage **shapemask_return,
 					 XpmAttributes *attributes));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromBuffer, int, (Display *display,
+#যদি !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreatePixmapFromBuffer, পূর্ণাঙ্ক, (Display *display,
 					  Drawable d,
-					  char *buffer,
+					  বর্ণ *buffer,
 					  Pixmap *pixmap_return,
 					  Pixmap *shapemask_return,
 					  XpmAttributes *attributes));
 
-    FUNC(XpmCreateBufferFromImage, int, (Display *display,
-					 char **buffer_return,
+    FUNC(XpmCreateBufferFromImage, পূর্ণাঙ্ক, (Display *display,
+					 বর্ণ **buffer_return,
 					 XImage *image,
 					 XImage *shapeimage,
 					 XpmAttributes *attributes));
 
-    FUNC(XpmCreateBufferFromPixmap, int, (Display *display,
-					  char **buffer_return,
+    FUNC(XpmCreateBufferFromPixmap, পূর্ণাঙ্ক, (Display *display,
+					  বর্ণ **buffer_return,
 					  Pixmap pixmap,
 					  Pixmap shapemask,
 					  XpmAttributes *attributes));
 #endif
-    FUNC(XpmReadFileToBuffer, int, (char *filename, char **buffer_return));
-    FUNC(XpmWriteFileFromBuffer, int, (char *filename, char *buffer));
+    FUNC(XpmReadFileToBuffer, পূর্ণাঙ্ক, (বর্ণ *filename, বর্ণ **buffer_return));
+    FUNC(XpmWriteFileFromBuffer, পূর্ণাঙ্ক, (বর্ণ *filename, বর্ণ *buffer));
 
-    FUNC(XpmReadFileToData, int, (char *filename, char ***data_return));
-    FUNC(XpmWriteFileFromData, int, (char *filename, char **data));
+    FUNC(XpmReadFileToData, পূর্ণাঙ্ক, (বর্ণ *filename, বর্ণ ***data_return));
+    FUNC(XpmWriteFileFromData, পূর্ণাঙ্ক, (বর্ণ *filename, বর্ণ **data));
 
-    FUNC(XpmAttributesSize, int, ());
-    FUNC(XpmFreeAttributes, void, (XpmAttributes *attributes));
-    FUNC(XpmFreeExtensions, void, (XpmExtension *extensions,
-				   int nextensions));
+    FUNC(XpmAttributesSize, পূর্ণাঙ্ক, ());
+    FUNC(XpmFreeAttributes, শূন্য, (XpmAttributes *attributes));
+    FUNC(XpmFreeExtensions, শূন্য, (XpmExtension *extensions,
+				   পূর্ণাঙ্ক nextensions));
 
-    FUNC(XpmFreeXpmImage, void, (XpmImage *image));
-    FUNC(XpmFreeXpmInfo, void, (XpmInfo *info));
-    FUNC(XpmGetErrorString, char *, (int errcode));
-    FUNC(XpmLibraryVersion, int, ());
+    FUNC(XpmFreeXpmImage, শূন্য, (XpmImage *image));
+    FUNC(XpmFreeXpmInfo, শূন্য, (XpmInfo *info));
+    FUNC(XpmGetErrorString, বর্ণ *, (পূর্ণাঙ্ক errcode));
+    FUNC(XpmLibraryVersion, পূর্ণাঙ্ক, ());
 
     /* XpmImage functions */
-    FUNC(XpmReadFileToXpmImage, int, (char *filename,
+    FUNC(XpmReadFileToXpmImage, পূর্ণাঙ্ক, (বর্ণ *filename,
 				      XpmImage *image,
 				      XpmInfo *info));
 
-    FUNC(XpmWriteFileFromXpmImage, int, (char *filename,
+    FUNC(XpmWriteFileFromXpmImage, পূর্ণাঙ্ক, (বর্ণ *filename,
 					 XpmImage *image,
 					 XpmInfo *info));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromXpmImage, int, (Display *display,
+#যদি !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreatePixmapFromXpmImage, পূর্ণাঙ্ক, (Display *display,
 					    Drawable d,
 					    XpmImage *image,
 					    Pixmap *pixmap_return,
 					    Pixmap *shapemask_return,
 					    XpmAttributes *attributes));
 #endif
-    FUNC(XpmCreateImageFromXpmImage, int, (Display *display,
+    FUNC(XpmCreateImageFromXpmImage, পূর্ণাঙ্ক, (Display *display,
 					   XpmImage *image,
 					   XImage **image_return,
 					   XImage **shapeimage_return,
 					   XpmAttributes *attributes));
 
-    FUNC(XpmCreateXpmImageFromImage, int, (Display *display,
+    FUNC(XpmCreateXpmImageFromImage, পূর্ণাঙ্ক, (Display *display,
 					   XImage *image,
 					   XImage *shapeimage,
 					   XpmImage *xpmimage,
 					   XpmAttributes *attributes));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreateXpmImageFromPixmap, int, (Display *display,
+#যদি !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreateXpmImageFromPixmap, পূর্ণাঙ্ক, (Display *display,
 					    Pixmap pixmap,
 					    Pixmap shapemask,
 					    XpmImage *xpmimage,
 					    XpmAttributes *attributes));
 #endif
-    FUNC(XpmCreateDataFromXpmImage, int, (char ***data_return,
+    FUNC(XpmCreateDataFromXpmImage, পূর্ণাঙ্ক, (বর্ণ ***data_return,
 					  XpmImage *image,
 					  XpmInfo *info));
 
-    FUNC(XpmCreateXpmImageFromData, int, (char **data,
+    FUNC(XpmCreateXpmImageFromData, পূর্ণাঙ্ক, (বর্ণ **data,
 					  XpmImage *image,
 					  XpmInfo *info));
 
-    FUNC(XpmCreateXpmImageFromBuffer, int, (char *buffer,
+    FUNC(XpmCreateXpmImageFromBuffer, পূর্ণাঙ্ক, (বর্ণ *buffer,
 					    XpmImage *image,
 					    XpmInfo *info));
 
-    FUNC(XpmCreateBufferFromXpmImage, int, (char **buffer_return,
+    FUNC(XpmCreateBufferFromXpmImage, পূর্ণাঙ্ক, (বর্ণ **buffer_return,
 					    XpmImage *image,
 					    XpmInfo *info));
 
-    FUNC(XpmGetParseError, int, (char *filename,
-				 int *linenum_return,
-				 int *charnum_return));
+    FUNC(XpmGetParseError, পূর্ণাঙ্ক, (বর্ণ *filename,
+				 পূর্ণাঙ্ক *linenum_return,
+				 পূর্ণাঙ্ক *charnum_return));
 
-    FUNC(XpmFree, void, (void *ptr));
+    FUNC(XpmFree, শূন্য, (শূন্য *ptr));
 
 #ifdef __cplusplus
 } /* for C++ V2.0 */
@@ -486,7 +486,7 @@ extern "C" {
 #define PixmapNoMemory    XpmNoMemory
 #define PixmapColorFailed XpmColorFailed
 
-#define ColorSymbol XpmColorSymbol
+#define Color_প্রতীক Xpm_Color_প্রতীক
 
 #define XReadPixmapFile(dpy, d, file, pix, mask, att) \
     XpmReadFileToPixmap(dpy, d, file, pix, mask, att)

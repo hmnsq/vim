@@ -11,7 +11,7 @@
  * filepath.c: dealing with file names and paths.
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
 #ifdef MSWIN
 /*
@@ -26,62 +26,62 @@
  * *fnamelen is the length of "fnamep" and set to 0 for a nonexistent path.
  * Returns OK on success, FAIL on failure.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 get_short_pathname(char_u **fnamep, char_u **bufp, size_t *fnamelen)
 {
-    int		l, len;
+    পূর্ণাঙ্ক		l, len;
     WCHAR	*newbuf;
     WCHAR	*wfname;
 
     len = MAXPATHL;
-    newbuf = malloc(len * sizeof(*newbuf));
-    if (newbuf == NULL)
-	return FAIL;
+    newbuf = malloc(len * পরিমাণ(*newbuf));
+    যদি (newbuf == রিক্ত)
+	প্রত্যাগম FAIL;
 
-    wfname = enc_to_utf16(*fnamep, NULL);
-    if (wfname == NULL)
+    wfname = enc_to_utf16(*fnamep, রিক্ত);
+    যদি (wfname == রিক্ত)
     {
 	vim_free(newbuf);
-	return FAIL;
+	প্রত্যাগম FAIL;
     }
 
     l = GetShortPathNameW(wfname, newbuf, len);
-    if (l > len - 1)
+    যদি (l > len - 1)
     {
 	// If that doesn't work (not enough space), then save the string
 	// and try again with a new buffer big enough.
 	WCHAR *newbuf_t = newbuf;
-	newbuf = vim_realloc(newbuf, (l + 1) * sizeof(*newbuf));
-	if (newbuf == NULL)
+	newbuf = vim_realloc(newbuf, (l + 1) * পরিমাণ(*newbuf));
+	যদি (newbuf == রিক্ত)
 	{
 	    vim_free(wfname);
 	    vim_free(newbuf_t);
-	    return FAIL;
+	    প্রত্যাগম FAIL;
 	}
 	// Really should always succeed, as the buffer is big enough.
 	l = GetShortPathNameW(wfname, newbuf, l+1);
     }
-    if (l != 0)
+    যদি (l != 0)
     {
-	char_u *p = utf16_to_enc(newbuf, NULL);
+	char_u *p = utf16_to_enc(newbuf, রিক্ত);
 
-	if (p != NULL)
+	যদি (p != রিক্ত)
 	{
 	    vim_free(*bufp);
 	    *fnamep = *bufp = p;
 	}
-	else
+	অন্যথা
 	{
 	    vim_free(wfname);
 	    vim_free(newbuf);
-	    return FAIL;
+	    প্রত্যাগম FAIL;
 	}
     }
     vim_free(wfname);
     vim_free(newbuf);
 
     *fnamelen = l == 0 ? l : STRLEN(*bufp);
-    return OK;
+    প্রত্যাগম OK;
 }
 
 /*
@@ -99,29 +99,29 @@ get_short_pathname(char_u **fnamep, char_u **bufp, size_t *fnamelen)
  *
  * Returns OK on success (or nothing done) and FAIL on failure (out of memory).
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 shortpath_for_invalid_fname(
     char_u	**fname,
     char_u	**bufp,
     size_t	*fnamelen)
 {
     char_u	*save_fname;
-    char_u	*pbuf_unused = NULL;
-    char_u	*short_fname = NULL;
+    char_u	*pbuf_unused = রিক্ত;
+    char_u	*short_fname = রিক্ত;
     char_u	*endp, *save_endp;
     char_u	ch;
     size_t	old_len;
     size_t	len;
     size_t	new_len, sfx_len;
-    int		retval = OK;
+    পূর্ণাঙ্ক		retval = OK;
 
     // Make a copy
     old_len = *fnamelen;
     save_fname = vim_strnsave(*fname, old_len);
-    if (save_fname == NULL)
+    যদি (save_fname == রিক্ত)
     {
 	retval = FAIL;
-	goto theend;
+	গচ্ছ theend;
     }
 
     endp = save_fname + old_len - 1; // Find the end of the copy
@@ -132,13 +132,13 @@ shortpath_for_invalid_fname(
      * directory at a time from the tail of the path.
      */
     len = 0;
-    for (;;)
+    প্রতি (;;)
     {
 	// go back one path-separator
-	while (endp > save_fname && !after_pathsep(save_fname, endp + 1))
+	যাবত্ (endp > save_fname && !after_pathsep(save_fname, endp + 1))
 	    --endp;
-	if (endp <= save_fname)
-	    break;		// processed the complete path
+	যদি (endp <= save_fname)
+	    ভঙ্গ;		// processed the complete path
 
 	/*
 	 * Replace the path separator with a NUL and try to shorten the
@@ -148,21 +148,21 @@ shortpath_for_invalid_fname(
 	*endp = 0;
 	short_fname = save_fname;
 	len = STRLEN(short_fname) + 1;
-	if (get_short_pathname(&short_fname, &pbuf_unused, &len) == FAIL)
+	যদি (get_short_pathname(&short_fname, &pbuf_unused, &len) == FAIL)
 	{
 	    retval = FAIL;
-	    goto theend;
+	    গচ্ছ theend;
 	}
 	*endp = ch;	// preserve the string
 
-	if (len > 0)
-	    break;	// successfully shortened the path
+	যদি (len > 0)
+	    ভঙ্গ;	// successfully shortened the path
 
 	// failed to shorten the path. Skip the path separator
 	--endp;
     }
 
-    if (len > 0)
+    যদি (len > 0)
     {
 	/*
 	 * Succeeded in shortening the path. Now concatenate the shortened
@@ -175,29 +175,29 @@ shortpath_for_invalid_fname(
 
 	*fnamelen = new_len;
 	vim_free(*bufp);
-	if (new_len > old_len)
+	যদি (new_len > old_len)
 	{
 	    // There is not enough space in the currently allocated string,
 	    // copy it to a buffer big enough.
 	    *fname = *bufp = vim_strnsave(short_fname, new_len);
-	    if (*fname == NULL)
+	    যদি (*fname == রিক্ত)
 	    {
 		retval = FAIL;
-		goto theend;
+		গচ্ছ theend;
 	    }
 	}
-	else
+	অন্যথা
 	{
 	    // Transfer short_fname to the main buffer (it's big enough),
 	    // unless get_short_pathname() did its work in-place.
 	    *fname = *bufp = save_fname;
-	    if (short_fname != save_fname)
+	    যদি (short_fname != save_fname)
 		STRNCPY(save_fname, short_fname, len);
-	    save_fname = NULL;
+	    save_fname = রিক্ত;
 	}
 
 	// concat the not-shortened part of the path
-	if ((*fname + len) != endp)
+	যদি ((*fname + len) != endp)
 	    vim_strncpy(*fname + len, endp, sfx_len);
 	(*fname)[new_len] = NUL;
     }
@@ -206,78 +206,78 @@ theend:
     vim_free(pbuf_unused);
     vim_free(save_fname);
 
-    return retval;
+    প্রত্যাগম retval;
 }
 
 /*
  * Get a pathname for a partial path.
  * Returns OK for success, FAIL for failure.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 shortpath_for_partial(
     char_u	**fnamep,
     char_u	**bufp,
     size_t	*fnamelen)
 {
-    int		sepcount;
+    পূর্ণাঙ্ক		sepcount;
     size_t	len, tflen;
     char_u	*p;
     char_u	*pbuf, *tfname;
-    int		hasTilde;
+    পূর্ণাঙ্ক		hasTilde;
 
     // Count up the path separators from the RHS.. so we know which part
     // of the path to return.
     sepcount = 0;
-    for (p = *fnamep; p < *fnamep + *fnamelen; MB_PTR_ADV(p))
-	if (vim_ispathsep(*p))
+    প্রতি (p = *fnamep; p < *fnamep + *fnamelen; MB_PTR_ADV(p))
+	যদি (vim_ispathsep(*p))
 	    ++sepcount;
 
     // Need full path first (use expand_env() to remove a "~/")
     hasTilde = (**fnamep == '~');
-    if (hasTilde)
+    যদি (hasTilde)
 	pbuf = tfname = expand_env_save(*fnamep);
-    else
+    অন্যথা
 	pbuf = tfname = FullName_save(*fnamep, FALSE);
-    if (tfname == NULL)
-	return FAIL;
+    যদি (tfname == রিক্ত)
+	প্রত্যাগম FAIL;
 
     len = tflen = STRLEN(tfname);
 
-    if (get_short_pathname(&tfname, &pbuf, &len) == FAIL)
-	return FAIL;
+    যদি (get_short_pathname(&tfname, &pbuf, &len) == FAIL)
+	প্রত্যাগম FAIL;
 
-    if (len == 0)
+    যদি (len == 0)
     {
 	// Don't have a valid filename, so shorten the rest of the
 	// path if we can. This CAN give us invalid 8.3 filenames, but
 	// there's not a lot of point in guessing what it might be.
 	len = tflen;
-	if (shortpath_for_invalid_fname(&tfname, &pbuf, &len) == FAIL)
-	    return FAIL;
+	যদি (shortpath_for_invalid_fname(&tfname, &pbuf, &len) == FAIL)
+	    প্রত্যাগম FAIL;
     }
 
     // Count the paths backward to find the beginning of the desired string.
-    for (p = tfname + len - 1; p >= tfname; --p)
+    প্রতি (p = tfname + len - 1; p >= tfname; --p)
     {
-	if (has_mbyte)
+	যদি (has_mbyte)
 	    p -= mb_head_off(tfname, p);
-	if (vim_ispathsep(*p))
+	যদি (vim_ispathsep(*p))
 	{
-	    if (sepcount == 0 || (hasTilde && sepcount == 1))
-		break;
-	    else
+	    যদি (sepcount == 0 || (hasTilde && sepcount == 1))
+		ভঙ্গ;
+	    অন্যথা
 		sepcount --;
 	}
     }
-    if (hasTilde)
+    যদি (hasTilde)
     {
 	--p;
-	if (p >= tfname)
+	যদি (p >= tfname)
 	    *p = '~';
-	else
-	    return FAIL;
+	অন্যথা
+	    প্রত্যাগম FAIL;
     }
-    else
+    অন্যথা
 	++p;
 
     // Copy in the string - p indexes into tfname - allocated at pbuf
@@ -286,7 +286,7 @@ shortpath_for_partial(
     *bufp = pbuf;
     *fnamep = p;
 
-    return OK;
+    প্রত্যাগম OK;
 }
 #endif // MSWIN
 
@@ -297,30 +297,30 @@ shortpath_for_partial(
  * Returns VALID_ flags or -1 for failure.
  * When there is an error, *fnamep is set to NULL.
  */
-    int
+    পূর্ণাঙ্ক
 modify_fname(
     char_u	*src,		// string with modifiers
-    int		tilde_file,	// "~" is a file name, not $HOME
+    পূর্ণাঙ্ক		tilde_file,	// "~" is a file name, not $HOME
     size_t	*usedlen,	// characters after src that are used
     char_u	**fnamep,	// file name so far
     char_u	**bufp,		// buffer for allocated file name or NULL
     size_t	*fnamelen)	// length of fnamep
 {
-    int		valid = 0;
+    পূর্ণাঙ্ক		valid = 0;
     char_u	*tail;
     char_u	*s, *p, *pbuf;
     char_u	dirname[MAXPATHL];
-    int		c;
-    int		has_fullname = 0;
-    int		has_homerelative = 0;
+    পূর্ণাঙ্ক		c;
+    পূর্ণাঙ্ক		has_fullname = 0;
+    পূর্ণাঙ্ক		has_homerelative = 0;
 #ifdef MSWIN
     char_u	*fname_start = *fnamep;
-    int		has_shortname = 0;
+    পূর্ণাঙ্ক		has_shortname = 0;
 #endif
 
 repeat:
     // ":p" - full path/file_name
-    if (src[*usedlen] == ':' && src[*usedlen + 1] == 'p')
+    যদি (src[*usedlen] == ':' && src[*usedlen + 1] == 'p')
     {
 	has_fullname = 1;
 
@@ -328,8 +328,8 @@ repeat:
 	*usedlen += 2;
 
 	// Expand "~/path" for all systems and "~user/path" for Unix and VMS
-	if ((*fnamep)[0] == '~'
-#if !defined(UNIX) && !(defined(VMS) && defined(USER_HOME))
+	যদি ((*fnamep)[0] == '~'
+#যদি !defined(UNIX) && !(defined(VMS) && defined(USER_HOME))
 		&& ((*fnamep)[1] == '/'
 # ifdef BACKSLASH_IN_FILENAME
 		    || (*fnamep)[1] == '\\'
@@ -342,24 +342,24 @@ repeat:
 	    *fnamep = expand_env_save(*fnamep);
 	    vim_free(*bufp);	// free any allocated file name
 	    *bufp = *fnamep;
-	    if (*fnamep == NULL)
-		return -1;
+	    যদি (*fnamep == রিক্ত)
+		প্রত্যাগম -1;
 	}
 
 	// When "/." or "/.." is used: force expansion to get rid of it.
-	for (p = *fnamep; *p != NUL; MB_PTR_ADV(p))
+	প্রতি (p = *fnamep; *p != NUL; MB_PTR_ADV(p))
 	{
-	    if (vim_ispathsep(*p)
+	    যদি (vim_ispathsep(*p)
 		    && p[1] == '.'
 		    && (p[2] == NUL
 			|| vim_ispathsep(p[2])
 			|| (p[2] == '.'
 			    && (p[3] == NUL || vim_ispathsep(p[3])))))
-		break;
+		ভঙ্গ;
 	}
 
 	// FullName_save() is slow, don't use it when not needed.
-	if (*p != NUL || !vim_isAbsName(*fnamep)
+	যদি (*p != NUL || !vim_isAbsName(*fnamep)
 #ifdef MSWIN	// enforce drive letter on Windows paths
 		|| **fnamep == '/' || **fnamep == '\\'
 #endif
@@ -368,27 +368,27 @@ repeat:
 	    *fnamep = FullName_save(*fnamep, *p != NUL);
 	    vim_free(*bufp);	// free any allocated file name
 	    *bufp = *fnamep;
-	    if (*fnamep == NULL)
-		return -1;
+	    যদি (*fnamep == রিক্ত)
+		প্রত্যাগম -1;
 	}
 
 #ifdef MSWIN
-# if _WIN32_WINNT >= 0x0500
-	if (vim_strchr(*fnamep, '~') != NULL)
+# যদি _WIN32_WINNT >= 0x0500
+	যদি (vim_strchr(*fnamep, '~') != রিক্ত)
 	{
 	    // Expand 8.3 filename to full path.  Needed to make sure the same
 	    // file does not have two different names.
 	    // Note: problem does not occur if _WIN32_WINNT < 0x0500.
-	    WCHAR *wfname = enc_to_utf16(*fnamep, NULL);
+	    WCHAR *wfname = enc_to_utf16(*fnamep, রিক্ত);
 	    WCHAR buf[_MAX_PATH];
 
-	    if (wfname != NULL)
+	    যদি (wfname != রিক্ত)
 	    {
-		if (GetLongPathNameW(wfname, buf, _MAX_PATH))
+		যদি (GetLongPathNameW(wfname, buf, _MAX_PATH))
 		{
-		    char_u *q = utf16_to_enc(buf, NULL);
+		    char_u *q = utf16_to_enc(buf, রিক্ত);
 
-		    if (q != NULL)
+		    যদি (q != রিক্ত)
 		    {
 			vim_free(*bufp);    // free any allocated file name
 			*bufp = *fnamep = q;
@@ -400,14 +400,14 @@ repeat:
 # endif
 #endif
 	// Append a path separator to a directory.
-	if (mch_isdir(*fnamep))
+	যদি (mch_isdir(*fnamep))
 	{
 	    // Make room for one or two extra characters.
 	    *fnamep = vim_strnsave(*fnamep, STRLEN(*fnamep) + 2);
 	    vim_free(*bufp);	// free any allocated file name
 	    *bufp = *fnamep;
-	    if (*fnamep == NULL)
-		return -1;
+	    যদি (*fnamep == রিক্ত)
+		প্রত্যাগম -1;
 	    add_pathsep(*fnamep);
 	}
     }
@@ -415,79 +415,79 @@ repeat:
     // ":." - path relative to the current directory
     // ":~" - path relative to the home directory
     // ":8" - shortname path - postponed till after
-    while (src[*usedlen] == ':'
+    যাবত্ (src[*usedlen] == ':'
 		  && ((c = src[*usedlen + 1]) == '.' || c == '~' || c == '8'))
     {
 	*usedlen += 2;
-	if (c == '8')
+	যদি (c == '8')
 	{
 #ifdef MSWIN
 	    has_shortname = 1; // Postpone this.
 #endif
-	    continue;
+	    অনুবর্ত;
 	}
-	pbuf = NULL;
+	pbuf = রিক্ত;
 	// Need full path first (use expand_env() to remove a "~/")
-	if (!has_fullname && !has_homerelative)
+	যদি (!has_fullname && !has_homerelative)
 	{
-	    if (**fnamep == '~')
+	    যদি (**fnamep == '~')
 		p = pbuf = expand_env_save(*fnamep);
-	    else
+	    অন্যথা
 		p = pbuf = FullName_save(*fnamep, FALSE);
 	}
-	else
+	অন্যথা
 	    p = *fnamep;
 
 	has_fullname = 0;
 
-	if (p != NULL)
+	যদি (p != রিক্ত)
 	{
 	    size_t  dirnamelen = 0;
 
-	    if (c == '.')
+	    যদি (c == '.')
 	    {
 		mch_dirname(dirname, MAXPATHL);
-		if (has_homerelative)
+		যদি (has_homerelative)
 		{
 		    s = vim_strsave(dirname);
-		    if (s != NULL)
+		    যদি (s != রিক্ত)
 		    {
-			dirnamelen = home_replace(NULL, s, dirname, MAXPATHL, TRUE);
+			dirnamelen = home_replace(রিক্ত, s, dirname, MAXPATHL, TRUE);
 			vim_free(s);
 		    }
 		}
 
-		if (dirnamelen == 0)
+		যদি (dirnamelen == 0)
 		    dirnamelen = STRLEN(dirname);
 
 		// Do not call shorten_fname() here since it removes the prefix
 		// even though the path does not have a prefix.
-		if (fnamencmp(p, dirname, dirnamelen) == 0)
+		যদি (fnamencmp(p, dirname, dirnamelen) == 0)
 		{
 		    p += dirnamelen;
-		    if (vim_ispathsep(*p))
+		    যদি (vim_ispathsep(*p))
 		    {
-			while (*p && vim_ispathsep(*p))
+			যাবত্ (*p && vim_ispathsep(*p))
 			    ++p;
 			*fnamep = p;
-			if (pbuf != NULL)
+			যদি (pbuf != রিক্ত)
 			{
 			    // free any allocated file name
 			    vim_free(*bufp);
 			    *bufp = pbuf;
-			    pbuf = NULL;
+			    pbuf = রিক্ত;
 			}
 		    }
 		}
 	    }
-	    else
+	    অন্যথা
 	    {
-		dirnamelen = home_replace(NULL, p, dirname, MAXPATHL, TRUE);
+		dirnamelen = home_replace(রিক্ত, p, dirname, MAXPATHL, TRUE);
 		// Only replace it when it starts with '~'
-		if (*dirname == '~')
+		যদি (*dirname == '~')
 		{
 		    s = vim_strnsave(dirname, dirnamelen);
-		    if (s != NULL)
+		    যদি (s != রিক্ত)
 		    {
 			*fnamep = s;
 			vim_free(*bufp);
@@ -505,37 +505,37 @@ repeat:
 
     // ":h" - head, remove "/file_name", can be repeated
     // Don't remove the first "/" or "c:\"
-    while (src[*usedlen] == ':' && src[*usedlen + 1] == 'h')
+    যাবত্ (src[*usedlen] == ':' && src[*usedlen + 1] == 'h')
     {
 	valid |= VALID_HEAD;
 	*usedlen += 2;
 	s = get_past_head(*fnamep);
-	while (tail > s && after_pathsep(s, tail))
+	যাবত্ (tail > s && after_pathsep(s, tail))
 	    MB_PTR_BACK(*fnamep, tail);
 	*fnamelen = tail - *fnamep;
 #ifdef VMS
-	if (*fnamelen > 0)
+	যদি (*fnamelen > 0)
 	    *fnamelen += 1; // the path separator is part of the path
 #endif
-	if (*fnamelen == 0)
+	যদি (*fnamelen == 0)
 	{
 	    // Result is empty.  Turn it into "." to make ":cd %:h" work.
 	    p = vim_strsave((char_u *)".");
-	    if (p == NULL)
-		return -1;
+	    যদি (p == রিক্ত)
+		প্রত্যাগম -1;
 	    vim_free(*bufp);
 	    *bufp = *fnamep = tail = p;
 	    *fnamelen = 1;
 	}
-	else
+	অন্যথা
 	{
-	    while (tail > s && !after_pathsep(s, tail))
+	    যাবত্ (tail > s && !after_pathsep(s, tail))
 		MB_PTR_BACK(*fnamep, tail);
 	}
     }
 
     // ":8" - shortname
-    if (src[*usedlen] == ':' && src[*usedlen + 1] == '8')
+    যদি (src[*usedlen] == ':' && src[*usedlen + 1] == '8')
     {
 	*usedlen += 2;
 #ifdef MSWIN
@@ -547,42 +547,42 @@ repeat:
     /*
      * Handle ":8" after we have done 'heads' and before we do 'tails'.
      */
-    if (has_shortname)
+    যদি (has_shortname)
     {
 	// Copy the string if it is shortened by :h and when it wasn't copied
 	// yet, because we are going to change it in place.  Avoids changing
 	// the buffer name for "%:8".
-	if (*fnamelen < STRLEN(*fnamep) || *fnamep == fname_start)
+	যদি (*fnamelen < STRLEN(*fnamep) || *fnamep == fname_start)
 	{
 	    p = vim_strnsave(*fnamep, *fnamelen);
-	    if (p == NULL)
-		return -1;
+	    যদি (p == রিক্ত)
+		প্রত্যাগম -1;
 	    vim_free(*bufp);
 	    *bufp = *fnamep = p;
 	}
 
 	// Split into two implementations - makes it easier.  First is where
 	// there isn't a full name already, second is where there is.
-	if (!has_fullname && !vim_isAbsName(*fnamep))
+	যদি (!has_fullname && !vim_isAbsName(*fnamep))
 	{
-	    if (shortpath_for_partial(fnamep, bufp, fnamelen) == FAIL)
-		return -1;
+	    যদি (shortpath_for_partial(fnamep, bufp, fnamelen) == FAIL)
+		প্রত্যাগম -1;
 	}
-	else
+	অন্যথা
 	{
 	    size_t	l = *fnamelen;
 
 	    // Simple case, already have the full-name.
 	    // Nearly always shorter, so try first time.
-	    if (get_short_pathname(fnamep, bufp, &l) == FAIL)
-		return -1;
+	    যদি (get_short_pathname(fnamep, bufp, &l) == FAIL)
+		প্রত্যাগম -1;
 
-	    if (l == 0)
+	    যদি (l == 0)
 	    {
 		// Couldn't find the filename, search the paths.
 		l = *fnamelen;
-		if (shortpath_for_invalid_fname(fnamep, bufp, &l) == FAIL)
-		    return -1;
+		যদি (shortpath_for_invalid_fname(fnamep, bufp, &l) == FAIL)
+		    প্রত্যাগম -1;
 	    }
 	    *fnamelen = l;
 	}
@@ -594,7 +594,7 @@ repeat:
 #endif // MSWIN
 
     // ":t" - tail, just the basename
-    if (src[*usedlen] == ':' && src[*usedlen + 1] == 't')
+    যদি (src[*usedlen] == ':' && src[*usedlen + 1] == 't')
     {
 	*usedlen += 2;
 	*fnamelen -= tail - *fnamep;
@@ -603,45 +603,45 @@ repeat:
 
     // ":e" - extension, can be repeated
     // ":r" - root, without extension, can be repeated
-    while (src[*usedlen] == ':'
+    যাবত্ (src[*usedlen] == ':'
 	    && (src[*usedlen + 1] == 'e' || src[*usedlen + 1] == 'r'))
     {
 	// find a '.' in the tail:
 	// - for second :e: before the current fname
 	// - otherwise: The last '.'
-	if (src[*usedlen + 1] == 'e' && *fnamep > tail)
+	যদি (src[*usedlen + 1] == 'e' && *fnamep > tail)
 	    s = *fnamep - 2;
-	else
+	অন্যথা
 	    s = *fnamep + *fnamelen - 1;
-	for ( ; s > tail; --s)
-	    if (s[0] == '.')
-		break;
-	if (src[*usedlen + 1] == 'e')		// :e
+	প্রতি ( ; s > tail; --s)
+	    যদি (s[0] == '.')
+		ভঙ্গ;
+	যদি (src[*usedlen + 1] == 'e')		// :e
 	{
-	    if (s > tail)
+	    যদি (s > tail)
 	    {
 		*fnamelen += (*fnamep - (s + 1));
 		*fnamep = s + 1;
 #ifdef VMS
 		// cut version from the extension
 		s = *fnamep + *fnamelen - 1;
-		for ( ; s > *fnamep; --s)
-		    if (s[0] == ';')
-			break;
-		if (s > *fnamep)
+		প্রতি ( ; s > *fnamep; --s)
+		    যদি (s[0] == ';')
+			ভঙ্গ;
+		যদি (s > *fnamep)
 		    *fnamelen = s - *fnamep;
 #endif
 	    }
-	    else if (*fnamep <= tail)
+	    অন্যথা যদি (*fnamep <= tail)
 		*fnamelen = 0;
 	}
-	else				// :r
+	অন্যথা				// :r
 	{
 	    char_u *limit = *fnamep;
 
-	    if (limit < tail)
+	    যদি (limit < tail)
 		limit = tail;
-	    if (s > limit)	// remove one extension
+	    যদি (s > limit)	// remove one extension
 		*fnamelen = s - *fnamep;
 	}
 	*usedlen += 2;
@@ -649,49 +649,49 @@ repeat:
 
     // ":s?pat?foo?" - substitute
     // ":gs?pat?foo?" - global substitute
-    if (src[*usedlen] == ':'
+    যদি (src[*usedlen] == ':'
 	    && (src[*usedlen + 1] == 's'
 		|| (src[*usedlen + 1] == 'g' && src[*usedlen + 2] == 's')))
     {
 	char_u	    *str;
 	char_u	    *pat;
 	char_u	    *sub;
-	int	    sep;
+	পূর্ণাঙ্ক	    sep;
 	char_u	    *flags;
-	int	    didit = FALSE;
+	পূর্ণাঙ্ক	    didit = FALSE;
 
 	flags = (char_u *)"";
 	s = src + *usedlen + 2;
-	if (src[*usedlen + 1] == 'g')
+	যদি (src[*usedlen + 1] == 'g')
 	{
 	    flags = (char_u *)"g";
 	    ++s;
 	}
 
 	sep = *s++;
-	if (sep)
+	যদি (sep)
 	{
 	    // find end of pattern
 	    p = vim_strchr(s, sep);
-	    if (p != NULL)
+	    যদি (p != রিক্ত)
 	    {
 		pat = vim_strnsave(s, p - s);
-		if (pat != NULL)
+		যদি (pat != রিক্ত)
 		{
 		    s = p + 1;
 		    // find end of substitution
 		    p = vim_strchr(s, sep);
-		    if (p != NULL)
+		    যদি (p != রিক্ত)
 		    {
 			sub = vim_strnsave(s, p - s);
 			str = vim_strnsave(*fnamep, *fnamelen);
-			if (sub != NULL && str != NULL)
+			যদি (sub != রিক্ত && str != রিক্ত)
 			{
 			    size_t slen;
 
 			    *usedlen = p + 1 - src;
-			    s = do_string_sub(str, *fnamelen, pat, sub, NULL, flags, &slen);
-			    if (s != NULL)
+			    s = do_string_sub(str, *fnamelen, pat, sub, রিক্ত, flags, &slen);
+			    যদি (s != রিক্ত)
 			    {
 				*fnamep = s;
 				*fnamelen = slen;
@@ -707,29 +707,29 @@ repeat:
 		}
 	    }
 	    // after using ":s", repeat all the modifiers
-	    if (didit)
-		goto repeat;
+	    যদি (didit)
+		গচ্ছ repeat;
 	}
     }
 
-    if (src[*usedlen] == ':' && src[*usedlen + 1] == 'S')
+    যদি (src[*usedlen] == ':' && src[*usedlen + 1] == 'S')
     {
 	// vim_strsave_shellescape() needs a NUL terminated string.
 	c = (*fnamep)[*fnamelen];
-	if (c != NUL)
+	যদি (c != NUL)
 	    (*fnamep)[*fnamelen] = NUL;
 	p = vim_strsave_shellescape(*fnamep, FALSE, FALSE);
-	if (c != NUL)
+	যদি (c != NUL)
 	    (*fnamep)[*fnamelen] = c;
-	if (p == NULL)
-	    return -1;
+	যদি (p == রিক্ত)
+	    প্রত্যাগম -1;
 	vim_free(*bufp);
 	*bufp = *fnamep = p;
 	*fnamelen = STRLEN(p);
 	*usedlen += 2;
     }
 
-    return valid;
+    প্রত্যাগম valid;
 }
 
 /*
@@ -738,47 +738,47 @@ repeat:
  * Must be 1 or more.
  * It's done in-place.
  */
-    static void
-shorten_dir_len(char_u *str, int trim_len)
+    স্থির শূন্য
+shorten_dir_len(char_u *str, পূর্ণাঙ্ক trim_len)
 {
     char_u	*tail, *s, *d;
-    int		skip = FALSE;
-    int		dirchunk_len = 0;
+    পূর্ণাঙ্ক		skip = FALSE;
+    পূর্ণাঙ্ক		dirchunk_len = 0;
 
     tail = gettail(str);
     d = str;
-    for (s = str; ; ++s)
+    প্রতি (s = str; ; ++s)
     {
-	if (s >= tail)		    // copy the whole tail
+	যদি (s >= tail)		    // copy the whole tail
 	{
 	    *d++ = *s;
-	    if (*s == NUL)
-		break;
+	    যদি (*s == NUL)
+		ভঙ্গ;
 	}
-	else if (vim_ispathsep(*s))	    // copy '/' and next char
+	অন্যথা যদি (vim_ispathsep(*s))	    // copy '/' and next char
 	{
 	    *d++ = *s;
 	    skip = FALSE;
 	    dirchunk_len = 0;
 	}
-	else if (!skip)
+	অন্যথা যদি (!skip)
 	{
 	    *d++ = *s;			// copy next char
-	    if (*s != '~' && *s != '.') // and leading "~" and "."
+	    যদি (*s != '~' && *s != '.') // and leading "~" and "."
 	    {
 		++dirchunk_len; // only count word chars for the size
 
 		// keep copying chars until we have our preferred length (or
 		// until the above if/else branches move us along)
-		if (dirchunk_len >= trim_len)
+		যদি (dirchunk_len >= trim_len)
 		    skip = TRUE;
 	    }
 
-	    if (has_mbyte)
+	    যদি (has_mbyte)
 	    {
-		int l = mb_ptr2len(s);
+		পূর্ণাঙ্ক l = mb_ptr2len(s);
 
-		while (--l > 0)
+		যাবত্ (--l > 0)
 		    *d++ = *++s;
 	    }
 	}
@@ -789,7 +789,7 @@ shorten_dir_len(char_u *str, int trim_len)
  * Shorten the path of a file from "~/foo/../.bar/fname" to "~/f/../.b/fname"
  * It's done in-place.
  */
-    void
+    শূন্য
 shorten_dir(char_u *str)
 {
     shorten_dir_len(str, 1);
@@ -798,56 +798,56 @@ shorten_dir(char_u *str)
 /*
  * Return TRUE if "fname" is a readable file.
  */
-    int
+    পূর্ণাঙ্ক
 file_is_readable(char_u *fname)
 {
-    int		fd;
+    পূর্ণাঙ্ক		fd;
 
 #ifndef O_NONBLOCK
 # define O_NONBLOCK 0
 #endif
     // Opening a file that does not exist is slow.
-    if (*fname == NUL || mch_isdir_or_missing(fname))
-	return FALSE;
-    if ((fd = mch_open((char *)fname, O_RDONLY | O_NONBLOCK, 0)) >= 0)
+    যদি (*fname == NUL || mch_isdir_or_missing(fname))
+	প্রত্যাগম FALSE;
+    যদি ((fd = mch_open((বর্ণ *)fname, O_RDONLY | O_NONBLOCK, 0)) >= 0)
     {
 	close(fd);
-	return TRUE;
+	প্রত্যাগম TRUE;
     }
-    return FALSE;
+    প্রত্যাগম FALSE;
 }
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 
 /*
  * "chdir(dir)" function
  */
-    void
+    শূন্য
 f_chdir(typval_T *argvars, typval_T *rettv)
 {
     char_u	*cwd;
     cdscope_T	scope = CDSCOPE_GLOBAL;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = রিক্ত;
 
-    if (check_secure())
-	return;
+    যদি (check_secure())
+	প্রত্যাগম;
 
-    if (argvars[0].v_type != VAR_STRING)
+    যদি (argvars[0].v_type != VAR_STRING)
     {
 	// Returning an empty string means it failed.
 	// No error message, for historic reasons.
-	if (in_vim9script())
-	    (void) check_for_string_arg(argvars, 0);
-	return;
+	যদি (in_vim9script())
+	    (শূন্য) check_for_string_arg(argvars, 0);
+	প্রত্যাগম;
     }
 
     // Return the current directory
     cwd = alloc(MAXPATHL);
-    if (cwd != NULL)
+    যদি (cwd != রিক্ত)
     {
-	if (mch_dirname(cwd, MAXPATHL) != FAIL)
+	যদি (mch_dirname(cwd, MAXPATHL) != FAIL)
 	{
 # ifdef BACKSLASH_IN_FILENAME
 	    slash_adjust(cwd);
@@ -857,27 +857,27 @@ f_chdir(typval_T *argvars, typval_T *rettv)
 	vim_free(cwd);
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u *s = tv_get_string(&argvars[1]);
-	if (STRCMP(s, "global") == 0)
+	যদি (STRCMP(s, "global") == 0)
 	    scope = CDSCOPE_GLOBAL;
-	else if (STRCMP(s, "tabpage") == 0)
+	অন্যথা যদি (STRCMP(s, "tabpage") == 0)
 	    scope = CDSCOPE_TABPAGE;
-	else if (STRCMP(s, "window") == 0)
+	অন্যথা যদি (STRCMP(s, "window") == 0)
 	    scope = CDSCOPE_WINDOW;
-	else
+	অন্যথা
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "scope", s);
-	    return;
+	    semsg(_(e_invalid_মান_for_argument_str_str), "scope", s);
+	    প্রত্যাগম;
 	}
     }
-    else if (curwin->w_localdir != NULL)
+    অন্যথা যদি (curwin->w_localdir != রিক্ত)
 	scope = CDSCOPE_WINDOW;
-    else if (curtab->tp_localdir != NULL)
+    অন্যথা যদি (curtab->tp_localdir != রিক্ত)
 	scope = CDSCOPE_TABPAGE;
 
-    if (!changedir_func(argvars[0].vval.v_string, TRUE, scope))
+    যদি (!changedir_func(argvars[0].vval.v_string, TRUE, scope))
 	// Directory change failed
 	VIM_CLEAR(rettv->vval.v_string);
 }
@@ -885,71 +885,71 @@ f_chdir(typval_T *argvars, typval_T *rettv)
 /*
  * "delete()" function
  */
-    void
+    শূন্য
 f_delete(typval_T *argvars, typval_T *rettv)
 {
     char_u	nbuf[NUMBUFLEN];
     char_u	*name;
     char_u	*flags;
 
-    rettv->vval.v_number = -1;
-    if (check_restricted() || check_secure())
-	return;
+    rettv->vval.v_সংখ্যা = -1;
+    যদি (check_restricted() || check_secure())
+	প্রত্যাগম;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	প্রত্যাগম;
 
     name = tv_get_string(&argvars[0]);
-    if (name == NULL || *name == NUL)
+    যদি (name == রিক্ত || *name == NUL)
     {
 	emsg(_(e_invalid_argument));
-	return;
+	প্রত্যাগম;
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
 	flags = tv_get_string_buf(&argvars[1], nbuf);
-    else
+    অন্যথা
 	flags = (char_u *)"";
 
-    if (*flags == NUL)
+    যদি (*flags == NUL)
 	// delete a file
-	rettv->vval.v_number = mch_remove(name) == 0 ? 0 : -1;
-    else if (STRCMP(flags, "d") == 0)
+	rettv->vval.v_সংখ্যা = mch_remove(name) == 0 ? 0 : -1;
+    অন্যথা যদি (STRCMP(flags, "d") == 0)
 	// delete an empty directory
-	rettv->vval.v_number = mch_rmdir(name) == 0 ? 0 : -1;
-    else if (STRCMP(flags, "rf") == 0)
+	rettv->vval.v_সংখ্যা = mch_rmdir(name) == 0 ? 0 : -1;
+    অন্যথা যদি (STRCMP(flags, "rf") == 0)
 	// delete a directory recursively
-	rettv->vval.v_number = delete_recursive(name);
-    else
+	rettv->vval.v_সংখ্যা = delete_recursive(name);
+    অন্যথা
 	semsg(_(e_invalid_expression_str), flags);
 }
 
 /*
  * "executable()" function
  */
-    void
+    শূন্য
 f_executable(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	প্রত্যাগম;
 
     // Check in $PATH and also check directly if there is a directory name.
-    rettv->vval.v_number = mch_can_exe(tv_get_string(&argvars[0]), NULL, TRUE);
+    rettv->vval.v_সংখ্যা = mch_can_exe(tv_get_string(&argvars[0]), রিক্ত, TRUE);
 }
 
 /*
  * "exepath()" function
  */
-    void
+    শূন্য
 f_exepath(typval_T *argvars, typval_T *rettv)
 {
-    char_u *p = NULL;
+    char_u *p = রিক্ত;
 
-    if (in_vim9script() && check_for_nonempty_string_arg(argvars, 0) == FAIL)
-	return;
-    (void)mch_can_exe(tv_get_string(&argvars[0]), &p, TRUE);
+    যদি (in_vim9script() && check_for_nonempty_string_arg(argvars, 0) == FAIL)
+	প্রত্যাগম;
+    (শূন্য)mch_can_exe(tv_get_string(&argvars[0]), &p, TRUE);
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = p;
 }
@@ -957,106 +957,106 @@ f_exepath(typval_T *argvars, typval_T *rettv)
 /*
  * "filereadable()" function
  */
-    void
+    শূন্য
 f_filereadable(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
-    rettv->vval.v_number = file_is_readable(tv_get_string(&argvars[0]));
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	প্রত্যাগম;
+    rettv->vval.v_সংখ্যা = file_is_readable(tv_get_string(&argvars[0]));
 }
 
 /*
  * Return 0 for not writable, 1 for writable file, 2 for a dir which we have
  * rights to write into.
  */
-    void
+    শূন্য
 f_filewritable(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
-    rettv->vval.v_number = filewritable(tv_get_string(&argvars[0]));
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	প্রত্যাগম;
+    rettv->vval.v_সংখ্যা = filewritable(tv_get_string(&argvars[0]));
 }
 
-    static void
+    স্থির শূন্য
 findfilendir(
     typval_T	*argvars,
     typval_T	*rettv,
-    int		find_what)
+    পূর্ণাঙ্ক		find_what)
 {
     char_u	*fname;
-    char_u	*fresult = NULL;
+    char_u	*fresult = রিক্ত;
     char_u	*path = *curbuf->b_p_path == NUL ? p_path : curbuf->b_p_path;
     char_u	*p;
     char_u	pathbuf[NUMBUFLEN];
-    int		count = 1;
-    int		first = TRUE;
-    int		error = FALSE;
+    পূর্ণাঙ্ক		গুনতি = 1;
+    পূর্ণাঙ্ক		first = TRUE;
+    পূর্ণাঙ্ক		error = FALSE;
 
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = রিক্ত;
     rettv->v_type = VAR_STRING;
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_nonempty_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_সংখ্যা_arg(argvars, 2) == FAIL)))
+	প্রত্যাগম;
 
     fname = tv_get_string(&argvars[0]);
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
 	p = tv_get_string_buf_chk(&argvars[1], pathbuf);
-	if (p == NULL)
+	যদি (p == রিক্ত)
 	    error = TRUE;
-	else
+	অন্যথা
 	{
-	    if (*p != NUL)
+	    যদি (*p != NUL)
 		path = p;
 
-	    if (argvars[2].v_type != VAR_UNKNOWN)
-		count = (int)tv_get_number_chk(&argvars[2], &error);
+	    যদি (argvars[2].v_type != VAR_UNKNOWN)
+		গুনতি = (পূর্ণাঙ্ক)tv_get_সংখ্যা_chk(&argvars[2], &error);
 	}
     }
 
-    if (count < 0 && rettv_list_alloc(rettv) == FAIL)
+    যদি (গুনতি < 0 && rettv_list_alloc(rettv) == FAIL)
 	error = TRUE;
 
-    if (*fname != NUL && !error)
+    যদি (*fname != NUL && !error)
     {
-	char_u	*file_to_find = NULL;
-	char	*search_ctx = NULL;
+	char_u	*file_to_find = রিক্ত;
+	বর্ণ	*অনুসন্ধান_ctx = রিক্ত;
 
-	do
+	কুরু
 	{
-	    if (rettv->v_type == VAR_STRING || rettv->v_type == VAR_LIST)
+	    যদি (rettv->v_type == VAR_STRING || rettv->v_type == VAR_LIST)
 		vim_free(fresult);
-	    fresult = find_file_in_path_option(first ? fname : NULL,
-					       first ? (int)STRLEN(fname) : 0,
+	    fresult = find_file_in_path_option(first ? fname : রিক্ত,
+					       first ? (পূর্ণাঙ্ক)STRLEN(fname) : 0,
 					0, first, path,
 					find_what,
 					curbuf->b_ffname,
 					find_what == FINDFILE_DIR
 					    ? (char_u *)"" : curbuf->b_p_sua,
-					    &file_to_find, &search_ctx);
+					    &file_to_find, &অনুসন্ধান_ctx);
 	    first = FALSE;
 
-	    if (fresult != NULL && rettv->v_type == VAR_LIST)
+	    যদি (fresult != রিক্ত && rettv->v_type == VAR_LIST)
 		list_append_string(rettv->vval.v_list, fresult, -1);
 
-	} while ((rettv->v_type == VAR_LIST || --count > 0) && fresult != NULL);
+	} যাবত্ ((rettv->v_type == VAR_LIST || --গুনতি > 0) && fresult != রিক্ত);
 
 	vim_free(file_to_find);
-	vim_findfile_cleanup(search_ctx);
+	vim_findfile_cleanup(অনুসন্ধান_ctx);
     }
 
-    if (rettv->v_type == VAR_STRING)
+    যদি (rettv->v_type == VAR_STRING)
 	rettv->vval.v_string = fresult;
 }
 
 /*
  * "finddir({fname}[, {path}[, {count}]])" function
  */
-    void
+    শূন্য
 f_finddir(typval_T *argvars, typval_T *rettv)
 {
     findfilendir(argvars, rettv, FINDFILE_DIR);
@@ -1065,7 +1065,7 @@ f_finddir(typval_T *argvars, typval_T *rettv)
 /*
  * "findfile({fname}[, {path}[, {count}]])" function
  */
-    void
+    শূন্য
 f_findfile(typval_T *argvars, typval_T *rettv)
 {
     findfilendir(argvars, rettv, FINDFILE_FILE);
@@ -1074,36 +1074,36 @@ f_findfile(typval_T *argvars, typval_T *rettv)
 /*
  * "fnamemodify({fname}, {mods})" function
  */
-    void
+    শূন্য
 f_fnamemodify(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     char_u	*mods;
     size_t	usedlen = 0;
     size_t	len = 0;
-    char_u	*fbuf = NULL;
+    char_u	*fbuf = রিক্ত;
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	প্রত্যাগম;
 
     fname = tv_get_string_chk(&argvars[0]);
     mods = tv_get_string_buf_chk(&argvars[1], buf);
-    if (mods == NULL || fname == NULL)
-	fname = NULL;
-    else
+    যদি (mods == রিক্ত || fname == রিক্ত)
+	fname = রিক্ত;
+    অন্যথা
     {
 	len = STRLEN(fname);
-	if (mods != NULL && *mods != NUL)
-	    (void)modify_fname(mods, FALSE, &usedlen, &fname, &fbuf, &len);
+	যদি (mods != রিক্ত && *mods != NUL)
+	    (শূন্য)modify_fname(mods, FALSE, &usedlen, &fname, &fbuf, &len);
     }
 
     rettv->v_type = VAR_STRING;
-    if (fname == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    যদি (fname == রিক্ত)
+	rettv->vval.v_string = রিক্ত;
+    অন্যথা
 	rettv->vval.v_string = vim_strnsave(fname, len);
     vim_free(fbuf);
 }
@@ -1125,53 +1125,53 @@ f_fnamemodify(typval_T *argvars, typval_T *rettv)
  * specified window in the specified tab page.
  * If the window or the tab page doesn't exist then return NULL.
  */
-    void
+    শূন্য
 f_getcwd(typval_T *argvars, typval_T *rettv)
 {
-    win_T	*wp = NULL;
-    tabpage_T	*tp = NULL;
+    win_T	*wp = রিক্ত;
+    tabpage_T	*tp = রিক্ত;
     char_u	*cwd;
-    int		global = FALSE;
+    পূর্ণাঙ্ক		global = FALSE;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = রিক্ত;
 
-    if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+    যদি (in_vim9script()
+	    && (check_for_opt_সংখ্যা_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_opt_সংখ্যা_arg(argvars, 1) == FAIL)))
+	প্রত্যাগম;
 
-    if (argvars[0].v_type == VAR_NUMBER
-	    && argvars[0].vval.v_number == -1
+    যদি (argvars[0].v_type == VAR_সংখ্যা
+	    && argvars[0].vval.v_সংখ্যা == -1
 	    && argvars[1].v_type == VAR_UNKNOWN)
 	global = TRUE;
-    else
+    অন্যথা
 	wp = find_tabwin(&argvars[0], &argvars[1], &tp);
 
-    if (wp != NULL && wp->w_localdir != NULL
+    যদি (wp != রিক্ত && wp->w_localdir != রিক্ত
 					   && argvars[0].v_type != VAR_UNKNOWN)
 	rettv->vval.v_string = vim_strsave(wp->w_localdir);
-    else if (tp != NULL && tp->tp_localdir != NULL
+    অন্যথা যদি (tp != রিক্ত && tp->tp_localdir != রিক্ত
 					   && argvars[0].v_type != VAR_UNKNOWN)
 	rettv->vval.v_string = vim_strsave(tp->tp_localdir);
-    else if (wp != NULL || tp != NULL || global)
+    অন্যথা যদি (wp != রিক্ত || tp != রিক্ত || global)
     {
-	if (globaldir != NULL && argvars[0].v_type != VAR_UNKNOWN)
+	যদি (globaldir != রিক্ত && argvars[0].v_type != VAR_UNKNOWN)
 	    rettv->vval.v_string = vim_strsave(globaldir);
-	else
+	অন্যথা
 	{
 	    cwd = alloc(MAXPATHL);
-	    if (cwd != NULL)
+	    যদি (cwd != রিক্ত)
 	    {
-		if (mch_dirname(cwd, MAXPATHL) != FAIL)
+		যদি (mch_dirname(cwd, MAXPATHL) != FAIL)
 		    rettv->vval.v_string = vim_strsave(cwd);
 		vim_free(cwd);
 	    }
 	}
     }
 # ifdef BACKSLASH_IN_FILENAME
-    if (rettv->vval.v_string != NULL)
+    যদি (rettv->vval.v_string != রিক্ত)
 	slash_adjust(rettv->vval.v_string);
 # endif
 }
@@ -1183,36 +1183,36 @@ f_getcwd(typval_T *argvars, typval_T *rettv)
 getfpermst(stat_T *st, char_u *perm)
 {
     char_u	    flags[] = "rwx";
-    int		    i;
+    পূর্ণাঙ্ক		    i;
 
-    for (i = 0; i < 9; i++)
+    প্রতি (i = 0; i < 9; i++)
     {
-	if (st->st_mode & (1 << (8 - i)))
+	যদি (st->st_mode & (1 << (8 - i)))
 	    perm[i] = flags[i % 3];
-	else
+	অন্যথা
 	    perm[i] = '-';
     }
-    return perm;
+    প্রত্যাগম perm;
 }
 
 /*
  * "getfperm({fname})" function
  */
-    void
+    শূন্য
 f_getfperm(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     stat_T	st;
-    char_u	*perm = NULL;
+    char_u	*perm = রিক্ত;
     char_u	permbuf[] = "---------";
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	প্রত্যাগম;
 
     fname = tv_get_string(&argvars[0]);
 
     rettv->v_type = VAR_STRING;
-    if (mch_stat((char *)fname, &st) >= 0)
+    যদি (mch_stat((বর্ণ *)fname, &st) >= 0)
 	perm = vim_strsave(getfpermst(&st, permbuf));
     rettv->vval.v_string = perm;
 }
@@ -1220,50 +1220,50 @@ f_getfperm(typval_T *argvars, typval_T *rettv)
 /*
  * "getfsize({fname})" function
  */
-    void
+    শূন্য
 f_getfsize(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     stat_T	st;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	প্রত্যাগম;
 
     fname = tv_get_string(&argvars[0]);
-    if (mch_stat((char *)fname, &st) >= 0)
+    যদি (mch_stat((বর্ণ *)fname, &st) >= 0)
     {
-	if (S_ISDIR(st.st_mode))
-	    rettv->vval.v_number = 0;
-	else
+	যদি (S_ISDIR(st.st_mode))
+	    rettv->vval.v_সংখ্যা = 0;
+	অন্যথা
 	{
-	    rettv->vval.v_number = (varnumber_T)st.st_size;
+	    rettv->vval.v_সংখ্যা = (varnumber_T)st.st_size;
 
 	    // non-perfect check for overflow
-	    if ((off_T)rettv->vval.v_number != (off_T)st.st_size)
-		rettv->vval.v_number = -2;
+	    যদি ((off_T)rettv->vval.v_সংখ্যা != (off_T)st.st_size)
+		rettv->vval.v_সংখ্যা = -2;
 	}
     }
-    else
-	  rettv->vval.v_number = -1;
+    অন্যথা
+	  rettv->vval.v_সংখ্যা = -1;
 }
 
 /*
  * "getftime({fname})" function
  */
-    void
+    শূন্য
 f_getftime(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     stat_T	st;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	প্রত্যাগম;
 
     fname = tv_get_string(&argvars[0]);
-    if (mch_stat((char *)fname, &st) >= 0)
-	rettv->vval.v_number = (varnumber_T)st.st_mtime;
-    else
-	rettv->vval.v_number = -1;
+    যদি (mch_stat((বর্ণ *)fname, &st) >= 0)
+	rettv->vval.v_সংখ্যা = (varnumber_T)st.st_mtime;
+    অন্যথা
+	rettv->vval.v_সংখ্যা = -1;
 }
 
 /*
@@ -1272,44 +1272,44 @@ f_getftime(typval_T *argvars, typval_T *rettv)
     char_u *
 getftypest(stat_T *st)
 {
-    char    *t;
+    বর্ণ    *t;
 
-    if (S_ISREG(st->st_mode))
+    যদি (S_ISREG(st->st_mode))
 	t = "file";
-    else if (S_ISDIR(st->st_mode))
+    অন্যথা যদি (S_ISDIR(st->st_mode))
 	t = "dir";
-    else if (S_ISLNK(st->st_mode))
+    অন্যথা যদি (S_ISLNK(st->st_mode))
 	t = "link";
-    else if (S_ISBLK(st->st_mode))
+    অন্যথা যদি (S_ISBLK(st->st_mode))
 	t = "bdev";
-    else if (S_ISCHR(st->st_mode))
+    অন্যথা যদি (S_ISCHR(st->st_mode))
 	t = "cdev";
-    else if (S_ISFIFO(st->st_mode))
+    অন্যথা যদি (S_ISFIFO(st->st_mode))
 	t = "fifo";
-    else if (S_ISSOCK(st->st_mode))
+    অন্যথা যদি (S_ISSOCK(st->st_mode))
 	t = "socket";
-    else
+    অন্যথা
 	t = "other";
-    return (char_u*)t;
+    প্রত্যাগম (char_u*)t;
 }
 
 /*
  * "getftype({fname})" function
  */
-    void
+    শূন্য
 f_getftype(typval_T *argvars, typval_T *rettv)
 {
     char_u	*fname;
     stat_T	st;
-    char_u	*type = NULL;
+    char_u	*type = রিক্ত;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	প্রত্যাগম;
 
     fname = tv_get_string(&argvars[0]);
 
     rettv->v_type = VAR_STRING;
-    if (mch_lstat((char *)fname, &st) >= 0)
+    যদি (mch_lstat((বর্ণ *)fname, &st) >= 0)
 	type = vim_strsave(getftypest(&st));
     rettv->vval.v_string = type;
 }
@@ -1317,95 +1317,95 @@ f_getftype(typval_T *argvars, typval_T *rettv)
 /*
  * "glob()" function
  */
-    void
+    শূন্য
 f_glob(typval_T *argvars, typval_T *rettv)
 {
-    int		options = WILD_SILENT|WILD_USE_NL;
+    পূর্ণাঙ্ক		options = WILD_SILENT|WILD_USE_NL;
     expand_T	xpc;
-    int		error = FALSE;
+    পূর্ণাঙ্ক		error = FALSE;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && (check_for_opt_bool_arg(argvars, 2) == FAIL
 			|| (argvars[2].v_type != VAR_UNKNOWN
 			    && check_for_opt_bool_arg(argvars, 3) == FAIL)))))
-	return;
+	প্রত্যাগম;
 
     // When the optional second argument is non-zero, don't remove matches
     // for 'wildignore' and don't put matches for 'suffixes' at the end.
     rettv->v_type = VAR_STRING;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (tv_get_bool_chk(&argvars[1], &error))
+	যদি (tv_get_bool_chk(&argvars[1], &error))
 	    options |= WILD_KEEP_ALL;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	যদি (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    if (tv_get_bool_chk(&argvars[2], &error))
-		rettv_list_set(rettv, NULL);
-	    if (argvars[3].v_type != VAR_UNKNOWN
+	    যদি (tv_get_bool_chk(&argvars[2], &error))
+		rettv_list_set(rettv, রিক্ত);
+	    যদি (argvars[3].v_type != VAR_UNKNOWN
 				    && tv_get_bool_chk(&argvars[3], &error))
 		options |= WILD_ALLLINKS;
 	}
     }
-    if (!error)
+    যদি (!error)
     {
 	ExpandInit(&xpc);
 	xpc.xp_context = EXPAND_FILES;
-	if (p_wic)
+	যদি (p_wic)
 	    options += WILD_ICASE;
-	if (rettv->v_type == VAR_STRING)
+	যদি (rettv->v_type == VAR_STRING)
 	    rettv->vval.v_string = ExpandOne(&xpc, tv_get_string(&argvars[0]),
-						     NULL, options, WILD_ALL);
-	else if (rettv_list_alloc(rettv) == OK)
+						     রিক্ত, options, WILD_ALL);
+	অন্যথা যদি (rettv_list_alloc(rettv) == OK)
 	{
-	  int i;
+	  পূর্ণাঙ্ক i;
 
 	  ExpandOne(&xpc, tv_get_string(&argvars[0]),
-						NULL, options, WILD_ALL_KEEP);
-	  for (i = 0; i < xpc.xp_numfiles; i++)
+						রিক্ত, options, WILD_ALL_KEEP);
+	  প্রতি (i = 0; i < xpc.xp_numfiles; i++)
 	      list_append_string(rettv->vval.v_list, xpc.xp_files[i], -1);
 
 	  ExpandCleanup(&xpc);
 	}
     }
-    else
-	rettv->vval.v_string = NULL;
+    অন্যথা
+	rettv->vval.v_string = রিক্ত;
 }
 
 /*
  * "glob2regpat()" function
  */
-    void
+    শূন্য
 f_glob2regpat(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
     char_u	*pat;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	প্রত্যাগম;
 
     pat = tv_get_string_buf_chk_strict(&argvars[0], buf, in_vim9script());
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = (pat == NULL)
-			 ? NULL : file_pat_to_reg_pat(pat, NULL, NULL, FALSE);
+    rettv->vval.v_string = (pat == রিক্ত)
+			 ? রিক্ত : file_pat_to_reg_pat(pat, রিক্ত, রিক্ত, FALSE);
 }
 
 /*
  * "globpath()" function
  */
-    void
+    শূন্য
 f_globpath(typval_T *argvars, typval_T *rettv)
 {
-    int		flags = WILD_IGNORE_COMPLETESLASH;
+    পূর্ণাঙ্ক		flags = WILD_IGNORE_COMPLETESLASH;
     char_u	buf1[NUMBUFLEN];
     char_u	*file;
-    int		error = FALSE;
+    পূর্ণাঙ্ক		error = FALSE;
     garray_T	ga;
-    int		i;
+    পূর্ণাঙ্ক		i;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
@@ -1413,64 +1413,64 @@ f_globpath(typval_T *argvars, typval_T *rettv)
 		    && (check_for_opt_bool_arg(argvars, 3) == FAIL
 			|| (argvars[3].v_type != VAR_UNKNOWN
 			    && check_for_opt_bool_arg(argvars, 4) == FAIL)))))
-	return;
+	প্রত্যাগম;
 
     file = tv_get_string_buf_chk(&argvars[1], buf1);
 
     // When the optional second argument is non-zero, don't remove matches
     // for 'wildignore' and don't put matches for 'suffixes' at the end.
     rettv->v_type = VAR_STRING;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    যদি (argvars[2].v_type != VAR_UNKNOWN)
     {
-	if (tv_get_bool_chk(&argvars[2], &error))
+	যদি (tv_get_bool_chk(&argvars[2], &error))
 	    flags |= WILD_KEEP_ALL;
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	যদি (argvars[3].v_type != VAR_UNKNOWN)
 	{
-	    if (tv_get_bool_chk(&argvars[3], &error))
-		rettv_list_set(rettv, NULL);
-	    if (argvars[4].v_type != VAR_UNKNOWN
+	    যদি (tv_get_bool_chk(&argvars[3], &error))
+		rettv_list_set(rettv, রিক্ত);
+	    যদি (argvars[4].v_type != VAR_UNKNOWN
 				    && tv_get_bool_chk(&argvars[4], &error))
 		flags |= WILD_ALLLINKS;
 	}
     }
-    if (file != NULL && !error)
+    যদি (file != রিক্ত && !error)
     {
-	ga_init2(&ga, sizeof(char_u *), 10);
+	ga_init2(&ga, পরিমাণ(char_u *), 10);
 	globpath(tv_get_string(&argvars[0]), file, &ga, flags, FALSE);
-	if (rettv->v_type == VAR_STRING)
+	যদি (rettv->v_type == VAR_STRING)
 	    rettv->vval.v_string = ga_concat_strings(&ga, "\n");
-	else if (rettv_list_alloc(rettv) == OK)
-	    for (i = 0; i < ga.ga_len; ++i)
+	অন্যথা যদি (rettv_list_alloc(rettv) == OK)
+	    প্রতি (i = 0; i < ga.ga_len; ++i)
 		list_append_string(rettv->vval.v_list,
 					    ((char_u **)(ga.ga_data))[i], -1);
 	ga_clear_strings(&ga);
     }
-    else
-	rettv->vval.v_string = NULL;
+    অন্যথা
+	rettv->vval.v_string = রিক্ত;
 }
 
 /*
  * "isdirectory()" function
  */
-    void
+    শূন্য
 f_isdirectory(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	প্রত্যাগম;
 
-    rettv->vval.v_number = mch_isdir(tv_get_string(&argvars[0]));
+    rettv->vval.v_সংখ্যা = mch_isdir(tv_get_string(&argvars[0]));
 }
 
 /*
  * "isabsolutepath()" function
  */
-    void
+    শূন্য
 f_isabsolutepath(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	প্রত্যাগম;
 
-    rettv->vval.v_number = mch_isFullName(tv_get_string_strict(&argvars[0]));
+    rettv->vval.v_সংখ্যা = mch_isFullName(tv_get_string_strict(&argvars[0]));
 }
 
 /*
@@ -1480,101 +1480,101 @@ f_isabsolutepath(typval_T *argvars, typval_T *rettv)
  * NULL until that happens.
  * Return OK or FAIL.
  */
-    static int
-mkdir_recurse(char_u *dir, int prot, char_u **created)
+    স্থির পূর্ণাঙ্ক
+mkdir_recurse(char_u *dir, পূর্ণাঙ্ক prot, char_u **created)
 {
     char_u	*p;
     char_u	*updir;
-    int		r = FAIL;
+    পূর্ণাঙ্ক		r = FAIL;
 
     // Get end of directory name in "dir".
     // We're done when it's "/" or "c:/".
     p = gettail_sep(dir);
-    if (p <= get_past_head(dir))
-	return OK;
+    যদি (p <= get_past_head(dir))
+	প্রত্যাগম OK;
 
     // If the directory exists we're done.  Otherwise: create it.
     updir = vim_strnsave(dir, p - dir);
-    if (updir == NULL)
-	return FAIL;
-    if (mch_isdir(updir))
+    যদি (updir == রিক্ত)
+	প্রত্যাগম FAIL;
+    যদি (mch_isdir(updir))
 	r = OK;
-    else if (mkdir_recurse(updir, prot, created) == OK)
+    অন্যথা যদি (mkdir_recurse(updir, prot, created) == OK)
     {
 	r = vim_mkdir_emsg(updir, prot);
-	if (r == OK && created != NULL && *created == NULL)
+	যদি (r == OK && created != রিক্ত && *created == রিক্ত)
 	    *created = FullName_save(updir, FALSE);
     }
     vim_free(updir);
-    return r;
+    প্রত্যাগম r;
 }
 
 /*
  * "mkdir()" function
  */
-    void
+    শূন্য
 f_mkdir(typval_T *argvars, typval_T *rettv)
 {
     char_u	*dir;
     char_u	buf[NUMBUFLEN];
-    int		prot = 0755;
-    int		defer = FALSE;
-    int		defer_recurse = FALSE;
-    char_u	*created = NULL;
+    পূর্ণাঙ্ক		prot = 0755;
+    পূর্ণাঙ্ক		defer = FALSE;
+    পূর্ণাঙ্ক		defer_recurse = FALSE;
+    char_u	*created = রিক্ত;
 
-    rettv->vval.v_number = FAIL;
-    if (check_restricted() || check_secure())
-	return;
+    rettv->vval.v_সংখ্যা = FAIL;
+    যদি (check_restricted() || check_secure())
+	প্রত্যাগম;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_nonempty_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_সংখ্যা_arg(argvars, 2) == FAIL)))
+	প্রত্যাগম;
 
     dir = tv_get_string_buf(&argvars[0], buf);
-    if (*dir == NUL)
-	return;
+    যদি (*dir == NUL)
+	প্রত্যাগম;
 
-    if (*gettail(dir) == NUL)
+    যদি (*gettail(dir) == NUL)
 	// remove trailing slashes
 	*gettail_sep(dir) = NUL;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u *arg2;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	যদি (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    prot = (int)tv_get_number_chk(&argvars[2], NULL);
-	    if (prot == -1)
-		return;
+	    prot = (পূর্ণাঙ্ক)tv_get_সংখ্যা_chk(&argvars[2], রিক্ত);
+	    যদি (prot == -1)
+		প্রত্যাগম;
 	}
 	arg2 = tv_get_string(&argvars[1]);
-	defer = vim_strchr(arg2, 'D') != NULL;
-	defer_recurse = vim_strchr(arg2, 'R') != NULL;
-	if ((defer || defer_recurse) && !can_add_defer())
-	    return;
+	defer = vim_strchr(arg2, 'D') != রিক্ত;
+	defer_recurse = vim_strchr(arg2, 'R') != রিক্ত;
+	যদি ((defer || defer_recurse) && !can_add_defer())
+	    প্রত্যাগম;
 
-	if (vim_strchr(arg2, 'p') != NULL)
+	যদি (vim_strchr(arg2, 'p') != রিক্ত)
 	{
-	    if (mch_isdir(dir))
+	    যদি (mch_isdir(dir))
 	    {
 		// With the "p" flag it's OK if the dir already exists.
-		rettv->vval.v_number = OK;
-		return;
+		rettv->vval.v_সংখ্যা = OK;
+		প্রত্যাগম;
 	    }
-	    mkdir_recurse(dir, prot, defer || defer_recurse ? &created : NULL);
+	    mkdir_recurse(dir, prot, defer || defer_recurse ? &created : রিক্ত);
 	}
     }
-    rettv->vval.v_number = vim_mkdir_emsg(dir, prot);
+    rettv->vval.v_সংখ্যা = vim_mkdir_emsg(dir, prot);
 
     // Handle "D" and "R": deferred deletion of the created directory.
-    if (rettv->vval.v_number == OK
-				&& created == NULL && (defer || defer_recurse))
+    যদি (rettv->vval.v_সংখ্যা == OK
+				&& created == রিক্ত && (defer || defer_recurse))
 	created = FullName_save(dir, FALSE);
-    if (created != NULL)
+    যদি (created != রিক্ত)
     {
 	typval_T tv[2];
 
@@ -1585,7 +1585,7 @@ f_mkdir(typval_T *argvars, typval_T *rettv)
 	tv[1].v_lock = 0;
 	tv[1].vval.v_string = vim_strsave(
 				       (char_u *)(defer_recurse ? "rf" : "d"));
-	if (tv[0].vval.v_string == NULL || tv[1].vval.v_string == NULL
+	যদি (tv[0].vval.v_string == রিক্ত || tv[1].vval.v_string == রিক্ত
 		|| add_defer((char_u *)"delete", 2, tv) == FAIL)
 	{
 	    vim_free(tv[0].vval.v_string);
@@ -1597,34 +1597,34 @@ f_mkdir(typval_T *argvars, typval_T *rettv)
 /*
  * "pathshorten()" function
  */
-    void
+    শূন্য
 f_pathshorten(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		trim_len = 1;
+    পূর্ণাঙ্ক		trim_len = 1;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_সংখ্যা_arg(argvars, 1) == FAIL))
+	প্রত্যাগম;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
-	trim_len = (int)tv_get_number(&argvars[1]);
-	if (trim_len < 1)
+	trim_len = (পূর্ণাঙ্ক)tv_get_সংখ্যা(&argvars[1]);
+	যদি (trim_len < 1)
 	    trim_len = 1;
     }
 
     rettv->v_type = VAR_STRING;
     p = tv_get_string_chk(&argvars[0]);
 
-    if (p == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    যদি (p == রিক্ত)
+	rettv->vval.v_string = রিক্ত;
+    অন্যথা
     {
 	p = vim_strsave(p);
 	rettv->vval.v_string = p;
-	if (p != NULL)
+	যদি (p != রিক্ত)
 	    shorten_dir_len(p, trim_len);
     }
 }
@@ -1633,132 +1633,132 @@ f_pathshorten(typval_T *argvars, typval_T *rettv)
  * Common code for readdir_checkitem() and readdirex_checkitem().
  * Either "name" or "dict" is NULL.
  */
-    static int
-checkitem_common(void *context, char_u *name, dict_T *dict)
+    স্থির পূর্ণাঙ্ক
+checkitem_common(শূন্য *context, char_u *name, dict_T *dict)
 {
-    typval_T	*expr = (typval_T *)context;
+    typval_T	*রাশিমালা = (typval_T *)context;
     typval_T	save_val;
     typval_T	rettv;
     typval_T	argv[2];
-    int		retval = 0;
-    int		error = FALSE;
+    পূর্ণাঙ্ক		retval = 0;
+    পূর্ণাঙ্ক		error = FALSE;
 
     prepare_vimvar(VV_VAL, &save_val);
-    if (name != NULL)
+    যদি (name != রিক্ত)
     {
 	set_vim_var_string(VV_VAL, name, -1);
 	argv[0].v_type = VAR_STRING;
 	argv[0].vval.v_string = name;
     }
-    else
+    অন্যথা
     {
 	set_vim_var_dict(VV_VAL, dict);
 	argv[0].v_type = VAR_DICT;
 	argv[0].vval.v_dict = dict;
     }
 
-    if (eval_expr_typval(expr, FALSE, argv, 1, NULL, &rettv) == FAIL)
-	goto theend;
+    যদি (eval_রাশিমালা_typval(রাশিমালা, FALSE, argv, 1, রিক্ত, &rettv) == FAIL)
+	গচ্ছ theend;
 
     // We want to use -1, but also true/false should be allowed.
-    if (rettv.v_type == VAR_SPECIAL || rettv.v_type == VAR_BOOL)
+    যদি (rettv.v_type == VAR_SPECIAL || rettv.v_type == VAR_BOOL)
     {
-	rettv.v_type = VAR_NUMBER;
-	rettv.vval.v_number = rettv.vval.v_number == VVAL_TRUE;
+	rettv.v_type = VAR_সংখ্যা;
+	rettv.vval.v_সংখ্যা = rettv.vval.v_সংখ্যা == VVAL_TRUE;
     }
-    retval = tv_get_number_chk(&rettv, &error);
-    if (error)
+    retval = tv_get_সংখ্যা_chk(&rettv, &error);
+    যদি (error)
 	retval = -1;
     clear_tv(&rettv);
 
 theend:
-    if (name != NULL)
-	set_vim_var_string(VV_VAL, NULL, 0);
-    else
-	set_vim_var_dict(VV_VAL, NULL);
+    যদি (name != রিক্ত)
+	set_vim_var_string(VV_VAL, রিক্ত, 0);
+    অন্যথা
+	set_vim_var_dict(VV_VAL, রিক্ত);
     restore_vimvar(VV_VAL, &save_val);
-    return retval;
+    প্রত্যাগম retval;
 }
 
 /*
  * Evaluate "expr" (= "context") for readdir().
  */
-    static int
-readdir_checkitem(void *context, void *item)
+    স্থির পূর্ণাঙ্ক
+readdir_checkitem(শূন্য *context, শূন্য *item)
 {
     char_u	*name = (char_u *)item;
 
-    return checkitem_common(context, name, NULL);
+    প্রত্যাগম checkitem_common(context, name, রিক্ত);
 }
 
 /*
  * Process the keys in the Dict argument to the readdir() and readdirex()
  * functions.  Assumes the Dict argument is the 3rd argument.
  */
-    static int
-readdirex_dict_arg(typval_T *argvars, int *cmp)
+    স্থির পূর্ণাঙ্ক
+readdirex_dict_arg(typval_T *argvars, পূর্ণাঙ্ক *cmp)
 {
     char_u     *compare;
 
-    if (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
-	return FAIL;
+    যদি (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
+	প্রত্যাগম FAIL;
 
-    if (dict_has_key(argvars[2].vval.v_dict, "sort"))
+    যদি (dict_has_চাবি(argvars[2].vval.v_dict, "sort"))
 	compare = dict_get_string(argvars[2].vval.v_dict, "sort", FALSE);
-    else
+    অন্যথা
     {
-	semsg(_(e_dictionary_key_str_required), "sort");
-	return FAIL;
+	semsg(_(e_dictionary_চাবি_str_required), "sort");
+	প্রত্যাগম FAIL;
     }
 
-    if (STRCMP(compare, (char_u *) "none") == 0)
+    যদি (STRCMP(compare, (char_u *) "none") == 0)
 	*cmp = READDIR_SORT_NONE;
-    else if (STRCMP(compare, (char_u *) "case") == 0)
+    অন্যথা যদি (STRCMP(compare, (char_u *) "case") == 0)
 	*cmp = READDIR_SORT_BYTE;
-    else if (STRCMP(compare, (char_u *) "icase") == 0)
+    অন্যথা যদি (STRCMP(compare, (char_u *) "icase") == 0)
 	*cmp = READDIR_SORT_IC;
-    else if (STRCMP(compare, (char_u *) "collate") == 0)
+    অন্যথা যদি (STRCMP(compare, (char_u *) "collate") == 0)
 	*cmp = READDIR_SORT_COLLATE;
-    return OK;
+    প্রত্যাগম OK;
 }
 
 /*
  * "readdir()" function
  */
-    void
+    শূন্য
 f_readdir(typval_T *argvars, typval_T *rettv)
 {
-    typval_T	*expr;
-    int		ret;
+    typval_T	*রাশিমালা;
+    পূর্ণাঙ্ক		ret;
     char_u	*path;
     char_u	*p;
     garray_T	ga;
-    int		i;
-    int		sort = READDIR_SORT_BYTE;
+    পূর্ণাঙ্ক		i;
+    পূর্ণাঙ্ক		sort = READDIR_SORT_BYTE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (check_secure())
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	প্রত্যাগম;
+    যদি (check_secure())
+	প্রত্যাগম;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	প্রত্যাগম;
 
     path = tv_get_string(&argvars[0]);
-    expr = &argvars[1];
+    রাশিমালা = &argvars[1];
 
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
+    যদি (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
 	    readdirex_dict_arg(argvars, &sort) == FAIL)
-	return;
+	প্রত্যাগম;
 
-    ret = readdir_core(&ga, path, FALSE, (void *)expr,
-	    (expr->v_type == VAR_UNKNOWN) ? NULL : readdir_checkitem, sort);
-    if (ret == OK)
+    ret = readdir_core(&ga, path, FALSE, (শূন্য *)রাশিমালা,
+	    (রাশিমালা->v_type == VAR_UNKNOWN) ? রিক্ত : readdir_checkitem, sort);
+    যদি (ret == OK)
     {
-	for (i = 0; i < ga.ga_len; i++)
+	প্রতি (i = 0; i < ga.ga_len; i++)
 	{
 	    p = ((char_u **)ga.ga_data)[i];
 	    list_append_string(rettv->vval.v_list, p, -1);
@@ -1770,50 +1770,50 @@ f_readdir(typval_T *argvars, typval_T *rettv)
 /*
  * Evaluate "expr" (= "context") for readdirex().
  */
-    static int
-readdirex_checkitem(void *context, void *item)
+    স্থির পূর্ণাঙ্ক
+readdirex_checkitem(শূন্য *context, শূন্য *item)
 {
     dict_T	*dict = (dict_T*)item;
 
-    return checkitem_common(context, NULL, dict);
+    প্রত্যাগম checkitem_common(context, রিক্ত, dict);
 }
 
 /*
  * "readdirex()" function
  */
-    void
+    শূন্য
 f_readdirex(typval_T *argvars, typval_T *rettv)
 {
-    typval_T	*expr;
-    int		ret;
+    typval_T	*রাশিমালা;
+    পূর্ণাঙ্ক		ret;
     char_u	*path;
     garray_T	ga;
-    int		i;
-    int		sort = READDIR_SORT_BYTE;
+    পূর্ণাঙ্ক		i;
+    পূর্ণাঙ্ক		sort = READDIR_SORT_BYTE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (check_secure())
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	প্রত্যাগম;
+    যদি (check_secure())
+	প্রত্যাগম;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	প্রত্যাগম;
 
     path = tv_get_string(&argvars[0]);
-    expr = &argvars[1];
+    রাশিমালা = &argvars[1];
 
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
+    যদি (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
 	    readdirex_dict_arg(argvars, &sort) == FAIL)
-	return;
+	প্রত্যাগম;
 
-    ret = readdir_core(&ga, path, TRUE, (void *)expr,
-	    (expr->v_type == VAR_UNKNOWN) ? NULL : readdirex_checkitem, sort);
-    if (ret == OK)
+    ret = readdir_core(&ga, path, TRUE, (শূন্য *)রাশিমালা,
+	    (রাশিমালা->v_type == VAR_UNKNOWN) ? রিক্ত : readdirex_checkitem, sort);
+    যদি (ret == OK)
     {
-	for (i = 0; i < ga.ga_len; i++)
+	প্রতি (i = 0; i < ga.ga_len; i++)
 	{
 	    dict_T  *dict = ((dict_T**)ga.ga_data)[i];
 	    list_append_dict(rettv->vval.v_list, dict);
@@ -1826,18 +1826,18 @@ f_readdirex(typval_T *argvars, typval_T *rettv)
 /*
  * "readfile()" function
  */
-    static void
-read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
+    স্থির শূন্য
+read_file_or_blob(typval_T *argvars, typval_T *rettv, পূর্ণাঙ্ক always_blob)
 {
-    int		binary = FALSE;
-    int		blob = always_blob;
-    int		failed = FALSE;
+    পূর্ণাঙ্ক		দ্বিমিক = FALSE;
+    পূর্ণাঙ্ক		blob = always_blob;
+    পূর্ণাঙ্ক		failed = FALSE;
     char_u	*fname;
     FILE	*fd;
     char_u	buf[(IOSIZE/256)*256];	// rounded to avoid odd + 1
-    int		io_size = sizeof(buf);
-    int		readlen;		// size of last fread()
-    char_u	*prev	 = NULL;	// previously read bytes, if any
+    পূর্ণাঙ্ক		io_size = পরিমাণ(buf);
+    পূর্ণাঙ্ক		readlen;		// size of last fread()
+    char_u	*prev	 = রিক্ত;	// previously read bytes, if any
     long	prevlen  = 0;		// length of data in prev
     long	prevsize = 0;		// size of prev buffer
     long	maxline  = MAXLNUM;
@@ -1847,109 +1847,109 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
     off_T	offset = 0;
     off_T	size = -1;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    যদি (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (always_blob)
+	যদি (always_blob)
 	{
-	    offset = (off_T)tv_get_number(&argvars[1]);
-	    if (argvars[2].v_type != VAR_UNKNOWN)
-		size = (off_T)tv_get_number(&argvars[2]);
+	    offset = (off_T)tv_get_সংখ্যা(&argvars[1]);
+	    যদি (argvars[2].v_type != VAR_UNKNOWN)
+		size = (off_T)tv_get_সংখ্যা(&argvars[2]);
 	}
-	else
+	অন্যথা
 	{
-	    if (STRCMP(tv_get_string(&argvars[1]), "b") == 0)
-		binary = TRUE;
-	    if (STRCMP(tv_get_string(&argvars[1]), "B") == 0)
+	    যদি (STRCMP(tv_get_string(&argvars[1]), "b") == 0)
+		দ্বিমিক = TRUE;
+	    যদি (STRCMP(tv_get_string(&argvars[1]), "B") == 0)
 		blob = TRUE;
 
-	    if (argvars[2].v_type != VAR_UNKNOWN)
-		maxline = (long)tv_get_number(&argvars[2]);
+	    যদি (argvars[2].v_type != VAR_UNKNOWN)
+		maxline = (long)tv_get_সংখ্যা(&argvars[2]);
 	}
     }
 
-    if ((blob ? rettv_blob_alloc(rettv) : rettv_list_alloc(rettv)) == FAIL)
-	return;
+    যদি ((blob ? rettv_blob_alloc(rettv) : rettv_list_alloc(rettv)) == FAIL)
+	প্রত্যাগম;
 
     // Always open the file in binary mode, library functions have a mind of
     // their own about CR-LF conversion.
     fname = tv_get_string(&argvars[0]);
 
-    if (mch_isdir(fname))
+    যদি (mch_isdir(fname))
     {
 	semsg(_(e_str_is_directory), fname);
-	return;
+	প্রত্যাগম;
     }
-    if (*fname == NUL || (fd = mch_fopen((char *)fname, READBIN)) == NULL)
+    যদি (*fname == NUL || (fd = mch_fopen((বর্ণ *)fname, READBIN)) == রিক্ত)
     {
 	semsg(_(e_cant_open_file_str),
 			       *fname == NUL ? (char_u *)_("<empty>") : fname);
-	return;
+	প্রত্যাগম;
     }
 
-    if (blob)
+    যদি (blob)
     {
-	if (read_blob(fd, rettv, offset, size) == FAIL)
+	যদি (read_blob(fd, rettv, offset, size) == FAIL)
 	    semsg(_(e_cant_read_file_str), fname);
 	fclose(fd);
-	return;
+	প্রত্যাগম;
     }
 
-    while (cnt < maxline || maxline < 0)
+    যাবত্ (cnt < maxline || maxline < 0)
     {
-	readlen = (int)fread(buf, 1, io_size, fd);
+	readlen = (পূর্ণাঙ্ক)fread(buf, 1, io_size, fd);
 
 	// This for loop processes what was read, but is also entered at end
 	// of file so that either:
 	// - an incomplete line gets written
 	// - a "binary" file gets an empty line at the end if it ends in a
 	//   newline.
-	for (p = buf, start = buf;
-		p < buf + readlen || (readlen <= 0 && (prevlen > 0 || binary));
+	প্রতি (p = buf, start = buf;
+		p < buf + readlen || (readlen <= 0 && (prevlen > 0 || দ্বিমিক));
 		++p)
 	{
-	    if (readlen <= 0 || *p == '\n')
+	    যদি (readlen <= 0 || *p == '\n')
 	    {
 		listitem_T  *li;
-		char_u	    *s	= NULL;
+		char_u	    *s	= রিক্ত;
 		long_u	    len = p - start;
 
 		// Finished a line.  Remove CRs before NL.
-		if (readlen > 0 && !binary)
+		যদি (readlen > 0 && !দ্বিমিক)
 		{
-		    while (len > 0 && start[len - 1] == '\r')
+		    যাবত্ (len > 0 && start[len - 1] == '\r')
 			--len;
 		    // removal may cross back to the "prev" string
-		    if (len == 0)
-			while (prevlen > 0 && prev[prevlen - 1] == '\r')
+		    যদি (len == 0)
+			যাবত্ (prevlen > 0 && prev[prevlen - 1] == '\r')
 			    --prevlen;
 		}
-		if (prevlen == 0)
+		যদি (prevlen == 0)
 		    s = vim_strnsave(start, len);
-		else
+		অন্যথা
 		{
 		    // Change "prev" buffer to be the right size.  This way
 		    // the bytes are only copied once, and very long lines are
 		    // allocated only once.
-		    if ((s = vim_realloc(prev, prevlen + len + 1)) != NULL)
+		    যদি ((s = vim_realloc(prev, prevlen + len + 1)) != রিক্ত)
 		    {
 			mch_memmove(s + prevlen, start, len);
 			s[prevlen + len] = NUL;
-			prev = NULL; // the list will own the string
+			prev = রিক্ত; // the list will own the string
 			prevlen = prevsize = 0;
 		    }
 		}
-		if (s == NULL)
+		যদি (s == রিক্ত)
 		{
-		    do_outofmem_msg((long_u) prevlen + len + 1);
+		    do_outofmem_বার্তা((long_u) prevlen + len + 1);
 		    failed = TRUE;
-		    break;
+		    ভঙ্গ;
 		}
 
-		if ((li = listitem_alloc()) == NULL)
+		যদি ((li = listitem_alloc()) == রিক্ত)
 		{
 		    vim_free(s);
 		    failed = TRUE;
-		    break;
+		    ভঙ্গ;
 		}
 		li->li_tv.v_type = VAR_STRING;
 		li->li_tv.v_lock = 0;
@@ -1957,14 +1957,14 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 		list_append(rettv->vval.v_list, li);
 
 		start = p + 1; // step over newline
-		if ((++cnt >= maxline && maxline >= 0) || readlen <= 0)
-		    break;
+		যদি ((++cnt >= maxline && maxline >= 0) || readlen <= 0)
+		    ভঙ্গ;
 	    }
-	    else if (*p == NUL)
+	    অন্যথা যদি (*p == NUL)
 		*p = '\n';
 	    // Check for utf8 "bom"; U+FEFF is encoded as EF BB BF.  Do this
 	    // when finding the BF and check the previous two bytes.
-	    else if (*p == 0xbf && enc_utf8 && !binary)
+	    অন্যথা যদি (*p == 0xbf && enc_utf8 && !দ্বিমিক)
 	    {
 		// Find the two bytes before the 0xbf.	If p is at buf, or buf
 		// + 1, these may be in the "prev" string.
@@ -1974,26 +1974,26 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 			  : p == buf + 1 && prevlen >= 1 ? prev[prevlen - 1]
 			  : prevlen >= 2 ? prev[prevlen - 2] : NUL;
 
-		if (back2 == 0xef && back1 == 0xbb)
+		যদি (back2 == 0xef && back1 == 0xbb)
 		{
 		    char_u *dest = p - 2;
 
 		    // Usually a BOM is at the beginning of a file, and so at
 		    // the beginning of a line; then we can just step over it.
-		    if (start == dest)
+		    যদি (start == dest)
 			start = p + 1;
-		    else
+		    অন্যথা
 		    {
 			// have to shuffle buf to close gap
-			int adjust_prevlen = 0;
+			পূর্ণাঙ্ক adjust_prevlen = 0;
 
-			if (dest < buf)
+			যদি (dest < buf)
 			{
 			    // must be 1 or 2
-			    adjust_prevlen = (int)(buf - dest);
+			    adjust_prevlen = (পূর্ণাঙ্ক)(buf - dest);
 			    dest = buf;
 			}
-			if (readlen > p - buf + 1)
+			যদি (readlen > p - buf + 1)
 			    mch_memmove(dest, p + 1, readlen - (p - buf) - 1);
 			readlen -= 3 - adjust_prevlen;
 			prevlen -= adjust_prevlen;
@@ -2003,12 +2003,12 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 	    }
 	} // for
 
-	if (failed || (cnt >= maxline && maxline >= 0) || readlen <= 0)
-	    break;
-	if (start < p)
+	যদি (failed || (cnt >= maxline && maxline >= 0) || readlen <= 0)
+	    ভঙ্গ;
+	যদি (start < p)
 	{
 	    // There's part of a line in buf, store it in "prev".
-	    if (p - start + prevlen >= prevsize)
+	    যদি (p - start + prevlen >= prevsize)
 	    {
 		// need bigger "prev" buffer
 		char_u *newprev;
@@ -2017,20 +2017,20 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 		// fragment of a line, so the first allocation is made
 		// small, to avoid repeatedly 'allocing' large and
 		// 'reallocing' small.
-		if (prevsize == 0)
+		যদি (prevsize == 0)
 		    prevsize = (long)(p - start);
-		else
+		অন্যথা
 		{
 		    long grow50pc = (prevsize * 3) / 2;
 		    long growmin  = (long)((p - start) * 2 + prevlen);
 		    prevsize = grow50pc > growmin ? grow50pc : growmin;
 		}
 		newprev = vim_realloc(prev, prevsize);
-		if (newprev == NULL)
+		যদি (newprev == রিক্ত)
 		{
-		    do_outofmem_msg((long_u)prevsize);
+		    do_outofmem_বার্তা((long_u)prevsize);
 		    failed = TRUE;
-		    break;
+		    ভঙ্গ;
 		}
 		prev = newprev;
 	    }
@@ -2042,14 +2042,14 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 
     // For a negative line count use only the lines at the end of the file,
     // free the rest.
-    if (!failed && maxline < 0)
-	while (cnt > -maxline)
+    যদি (!failed && maxline < 0)
+	যাবত্ (cnt > -maxline)
 	{
 	    listitem_remove(rettv->vval.v_list, rettv->vval.v_list->lv_first);
 	    --cnt;
 	}
 
-    if (failed)
+    যদি (failed)
     {
 	// an empty list is returned on error
 	list_free(rettv->vval.v_list);
@@ -2063,18 +2063,18 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 /*
  * "readblob()" function
  */
-    void
+    শূন্য
 f_readblob(typval_T *argvars, typval_T *rettv)
 {
-    if (check_secure())
-	return;
+    যদি (check_secure())
+	প্রত্যাগম;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_সংখ্যা_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_সংখ্যা_arg(argvars, 2) == FAIL)))
+	প্রত্যাগম;
 
     read_file_or_blob(argvars, rettv, TRUE);
 }
@@ -2082,18 +2082,18 @@ f_readblob(typval_T *argvars, typval_T *rettv)
 /*
  * "readfile()" function
  */
-    void
+    শূন্য
 f_readfile(typval_T *argvars, typval_T *rettv)
 {
-    if (check_secure())
-	return;
+    যদি (check_secure())
+	প্রত্যাগম;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_nonempty_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_সংখ্যা_arg(argvars, 2) == FAIL)))
+	প্রত্যাগম;
 
     read_file_or_blob(argvars, rettv, FALSE);
 }
@@ -2101,55 +2101,55 @@ f_readfile(typval_T *argvars, typval_T *rettv)
 /*
  * "resolve()" function
  */
-    void
+    শূন্য
 f_resolve(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
 # ifdef HAVE_READLINK
-    char_u	*buf = NULL;
+    char_u	*buf = রিক্ত;
 # endif
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	প্রত্যাগম;
 
     p = tv_get_string(&argvars[0]);
 # ifdef FEAT_SHORTCUT
     {
-	char_u	*v = NULL;
+	char_u	*v = রিক্ত;
 
 	v = mch_resolve_path(p, TRUE);
-	if (v != NULL)
+	যদি (v != রিক্ত)
 	    rettv->vval.v_string = v;
-	else
+	অন্যথা
 	    rettv->vval.v_string = vim_strsave(p);
     }
-# else
+# অন্যথা
 #  ifdef HAVE_READLINK
     {
 	char_u	*cpy;
-	int	len;
-	char_u	*remain = NULL;
+	পূর্ণাঙ্ক	len;
+	char_u	*remain = রিক্ত;
 	char_u	*q;
-	int	is_relative_to_current = FALSE;
-	int	has_trailing_pathsep = FALSE;
-	int	limit = 100;
+	পূর্ণাঙ্ক	is_relative_to_current = FALSE;
+	পূর্ণাঙ্ক	has_trailing_pathsep = FALSE;
+	পূর্ণাঙ্ক	limit = 100;
 
 	p = vim_strsave(p);
-	if (p == NULL)
-	    goto fail;
-	if (p[0] == '.' && (vim_ispathsep(p[1])
+	যদি (p == রিক্ত)
+	    গচ্ছ fail;
+	যদি (p[0] == '.' && (vim_ispathsep(p[1])
 				   || (p[1] == '.' && (vim_ispathsep(p[2])))))
 	    is_relative_to_current = TRUE;
 
 	len = STRLEN(p);
-	if (len > 1 && after_pathsep(p, p + len))
+	যদি (len > 1 && after_pathsep(p, p + len))
 	{
 	    has_trailing_pathsep = TRUE;
 	    p[len - 1] = NUL; // the trailing slash breaks readlink()
 	}
 
 	q = getnextcomp(p);
-	if (*q != NUL)
+	যদি (*q != NUL)
 	{
 	    // Separate the first path component in "p", and keep the
 	    // remainder (beginning with the path separator).
@@ -2158,47 +2158,47 @@ f_resolve(typval_T *argvars, typval_T *rettv)
 	}
 
 	buf = alloc(MAXPATHL + 1);
-	if (buf == NULL)
+	যদি (buf == রিক্ত)
 	{
 	    vim_free(p);
 	    vim_free(remain);
-	    goto fail;
+	    গচ্ছ fail;
 	}
 
-	for (;;)
+	প্রতি (;;)
 	{
-	    for (;;)
+	    প্রতি (;;)
 	    {
-		len = readlink((char *)p, (char *)buf, MAXPATHL);
-		if (len <= 0)
-		    break;
+		len = readlink((বর্ণ *)p, (বর্ণ *)buf, MAXPATHL);
+		যদি (len <= 0)
+		    ভঙ্গ;
 		buf[len] = NUL;
 
-		if (limit-- == 0)
+		যদি (limit-- == 0)
 		{
 		    vim_free(p);
 		    vim_free(remain);
 		    emsg(_(e_too_many_symbolic_links_cycle));
-		    rettv->vval.v_string = NULL;
-		    goto fail;
+		    rettv->vval.v_string = রিক্ত;
+		    গচ্ছ fail;
 		}
 
 		// Ensure that the result will have a trailing path separator
 		// if the argument has one.
-		if (remain == NULL && has_trailing_pathsep)
+		যদি (remain == রিক্ত && has_trailing_pathsep)
 		    add_pathsep(buf);
 
 		// Separate the first path component in the link value and
 		// concatenate the remainders.
 		q = getnextcomp(vim_ispathsep(*buf) ? buf + 1 : buf);
-		if (*q != NUL)
+		যদি (*q != NUL)
 		{
-		    if (remain == NULL)
+		    যদি (remain == রিক্ত)
 			remain = vim_strsave(q - 1);
-		    else
+		    অন্যথা
 		    {
 			cpy = concat_str(q - 1, remain);
-			if (cpy != NULL)
+			যদি (cpy != রিক্ত)
 			{
 			    vim_free(remain);
 			    remain = cpy;
@@ -2208,17 +2208,17 @@ f_resolve(typval_T *argvars, typval_T *rettv)
 		}
 
 		q = gettail(p);
-		if (q > p && *q == NUL)
+		যদি (q > p && *q == NUL)
 		{
 		    // Ignore trailing path separator.
 		    p[q - p - 1] = NUL;
 		    q = gettail(p);
 		}
-		if (q > p && !mch_isFullName(buf))
+		যদি (q > p && !mch_isFullName(buf))
 		{
 		    // symlink is relative to directory of argument
 		    cpy = alloc(STRLEN(p) + STRLEN(buf) + 1);
-		    if (cpy != NULL)
+		    যদি (cpy != রিক্ত)
 		    {
 			STRCPY(cpy, p);
 			STRCPY(gettail(cpy), buf);
@@ -2226,38 +2226,38 @@ f_resolve(typval_T *argvars, typval_T *rettv)
 			p = cpy;
 		    }
 		}
-		else
+		অন্যথা
 		{
 		    vim_free(p);
 		    p = vim_strsave(buf);
 		}
 	    }
 
-	    if (remain == NULL)
-		break;
+	    যদি (remain == রিক্ত)
+		ভঙ্গ;
 
 	    // Append the first path component of "remain" to "p".
 	    q = getnextcomp(remain + 1);
 	    len = q - remain - (*q != NUL);
 	    cpy = vim_strnsave(p, STRLEN(p) + len);
-	    if (cpy != NULL)
+	    যদি (cpy != রিক্ত)
 	    {
 		STRNCAT(cpy, remain, len);
 		vim_free(p);
 		p = cpy;
 	    }
 	    // Shorten "remain".
-	    if (*q != NUL)
+	    যদি (*q != NUL)
 		STRMOVE(remain, q - 1);
-	    else
+	    অন্যথা
 		VIM_CLEAR(remain);
 	}
 
 	// If the result is a relative path name, make it explicitly relative to
 	// the current directory if and only if the argument had this form.
-	if (!vim_ispathsep(*p))
+	যদি (!vim_ispathsep(*p))
 	{
-	    if (is_relative_to_current
+	    যদি (is_relative_to_current
 		    && *p != NUL
 		    && !(p[0] == '.'
 			&& (p[1] == NUL
@@ -2268,35 +2268,35 @@ f_resolve(typval_T *argvars, typval_T *rettv)
 	    {
 		// Prepend "./".
 		cpy = concat_str((char_u *)"./", p);
-		if (cpy != NULL)
+		যদি (cpy != রিক্ত)
 		{
 		    vim_free(p);
 		    p = cpy;
 		}
 	    }
-	    else if (!is_relative_to_current)
+	    অন্যথা যদি (!is_relative_to_current)
 	    {
 		// Strip leading "./".
 		q = p;
-		while (q[0] == '.' && vim_ispathsep(q[1]))
+		যাবত্ (q[0] == '.' && vim_ispathsep(q[1]))
 		    q += 2;
-		if (q > p)
+		যদি (q > p)
 		    STRMOVE(p, p + 2);
 	    }
 	}
 
 	// Ensure that the result will have no trailing path separator
 	// if the argument had none.  But keep "/" or "//".
-	if (!has_trailing_pathsep)
+	যদি (!has_trailing_pathsep)
 	{
 	    q = p + STRLEN(p);
-	    if (after_pathsep(p, q))
+	    যদি (after_pathsep(p, q))
 		*gettail_sep(p) = NUL;
 	}
 
 	rettv->vval.v_string = p;
     }
-#  else
+#  অন্যথা
     rettv->vval.v_string = vim_strsave(p);
 #  endif
 # endif
@@ -2313,147 +2313,147 @@ fail:
 /*
  * "tempname()" function
  */
-    void
+    শূন্য
 f_tempname(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    static int	x = 'A';
+    স্থির পূর্ণাঙ্ক	x = 'A';
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = vim_tempname(x, FALSE);
 
     // Advance 'x' to use A-Z and 0-9, so that there are at least 34 different
     // names.  Skip 'I' and 'O', they are used for shell redirection.
-    do
+    কুরু
     {
-	if (x == 'Z')
+	যদি (x == 'Z')
 	    x = '0';
-	else if (x == '9')
+	অন্যথা যদি (x == '9')
 	    x = 'A';
-	else
+	অন্যথা
 	    ++x;
-    } while (x == 'I' || x == 'O');
+    } যাবত্ (x == 'I' || x == 'O');
 }
 
 /*
  * "writefile()" function
  */
-    void
+    শূন্য
 f_writefile(typval_T *argvars, typval_T *rettv)
 {
-    int		binary = FALSE;
-    int		append = FALSE;
-    int		defer = FALSE;
+    পূর্ণাঙ্ক		দ্বিমিক = FALSE;
+    পূর্ণাঙ্ক		append = FALSE;
+    পূর্ণাঙ্ক		defer = FALSE;
 # ifdef HAVE_FSYNC
-    int		do_fsync = p_fs;
+    পূর্ণাঙ্ক		do_fsync = p_fs;
 # endif
     char_u	*fname;
     FILE	*fd;
-    int		ret = 0;
+    পূর্ণাঙ্ক		ret = 0;
     listitem_T	*li;
-    list_T	*list = NULL;
-    blob_T	*blob = NULL;
+    list_T	*list = রিক্ত;
+    blob_T	*blob = রিক্ত;
 
-    rettv->vval.v_number = -1;
-    if (check_secure())
-	return;
+    rettv->vval.v_সংখ্যা = -1;
+    যদি (check_secure())
+	প্রত্যাগম;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	প্রত্যাগম;
 
-    if (argvars[0].v_type == VAR_LIST)
+    যদি (argvars[0].v_type == VAR_LIST)
     {
 	list = argvars[0].vval.v_list;
-	if (list == NULL)
-	    return;
+	যদি (list == রিক্ত)
+	    প্রত্যাগম;
 	CHECK_LIST_MATERIALIZE(list);
-	FOR_ALL_LIST_ITEMS(list, li)
-	    if (tv_get_string_chk(&li->li_tv) == NULL)
-		return;
+	FOR_ALL_LIST_বস্তুসমূহ(list, li)
+	    যদি (tv_get_string_chk(&li->li_tv) == রিক্ত)
+		প্রত্যাগম;
     }
-    else if (argvars[0].v_type == VAR_BLOB)
+    অন্যথা যদি (argvars[0].v_type == VAR_BLOB)
     {
 	blob = argvars[0].vval.v_blob;
-	if (blob == NULL)
-	    return;
+	যদি (blob == রিক্ত)
+	    প্রত্যাগম;
     }
-    else
+    অন্যথা
     {
 	semsg(_(e_invalid_argument_str),
 		_("writefile() first argument must be a List or a Blob"));
-	return;
+	প্রত্যাগম;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    যদি (argvars[2].v_type != VAR_UNKNOWN)
     {
 	char_u *arg2 = tv_get_string_chk(&argvars[2]);
 
-	if (arg2 == NULL)
-	    return;
-	if (vim_strchr(arg2, 'b') != NULL)
-	    binary = TRUE;
-	if (vim_strchr(arg2, 'a') != NULL)
+	যদি (arg2 == রিক্ত)
+	    প্রত্যাগম;
+	যদি (vim_strchr(arg2, 'b') != রিক্ত)
+	    দ্বিমিক = TRUE;
+	যদি (vim_strchr(arg2, 'a') != রিক্ত)
 	    append = TRUE;
-	if (vim_strchr(arg2, 'D') != NULL)
+	যদি (vim_strchr(arg2, 'D') != রিক্ত)
 	    defer = TRUE;
 # ifdef HAVE_FSYNC
-	if (vim_strchr(arg2, 's') != NULL)
+	যদি (vim_strchr(arg2, 's') != রিক্ত)
 	    do_fsync = TRUE;
-	else if (vim_strchr(arg2, 'S') != NULL)
+	অন্যথা যদি (vim_strchr(arg2, 'S') != রিক্ত)
 	    do_fsync = FALSE;
 # endif
     }
 
     fname = tv_get_string_chk(&argvars[1]);
-    if (fname == NULL)
-	return;
+    যদি (fname == রিক্ত)
+	প্রত্যাগম;
 
-    if (defer && !can_add_defer())
-	return;
+    যদি (defer && !can_add_defer())
+	প্রত্যাগম;
 
     // Always open the file in binary mode, library functions have a mind of
     // their own about CR-LF conversion.
-    if (*fname == NUL || (fd = mch_fopen((char *)fname,
-				      append ? APPENDBIN : WRITEBIN)) == NULL)
+    যদি (*fname == NUL || (fd = mch_fopen((বর্ণ *)fname,
+				      append ? APPENDBIN : WRITEBIN)) == রিক্ত)
     {
 	semsg(_(e_cant_create_file_str),
 			       *fname == NUL ? (char_u *)_("<empty>") : fname);
 	ret = -1;
     }
-    else
+    অন্যথা
     {
-	if (defer)
+	যদি (defer)
 	{
 	    typval_T tv;
 
 	    tv.v_type = VAR_STRING;
 	    tv.v_lock = 0;
 	    tv.vval.v_string = FullName_save(fname, FALSE);
-	    if (tv.vval.v_string == NULL
+	    যদি (tv.vval.v_string == রিক্ত
 		    || add_defer((char_u *)"delete", 1, &tv) == FAIL)
 	    {
 		ret = -1;
 		fclose(fd);
-		(void)mch_remove(fname);
+		(শূন্য)mch_remove(fname);
 	    }
 	}
 
-	if (ret == 0)
+	যদি (ret == 0)
 	{
-	    if (blob)
+	    যদি (blob)
 	    {
-		if (write_blob(fd, blob) == FAIL)
+		যদি (write_blob(fd, blob) == FAIL)
 		    ret = -1;
 	    }
-	    else
+	    অন্যথা
 	    {
-		if (write_list(fd, list, binary) == FAIL)
+		যদি (write_list(fd, list, দ্বিমিক) == FAIL)
 		    ret = -1;
 	    }
 # ifdef HAVE_FSYNC
-	    if (ret == 0 && do_fsync)
+	    যদি (ret == 0 && do_fsync)
 		// Ignore the error, the user wouldn't know what to do about
 		// it.  May happen for a device.
 		vim_ignored = vim_fsync(fileno(fd));
@@ -2462,19 +2462,19 @@ f_writefile(typval_T *argvars, typval_T *rettv)
 	}
     }
 
-    rettv->vval.v_number = ret;
+    rettv->vval.v_সংখ্যা = ret;
 }
 
 #endif // FEAT_EVAL
 
-#if defined(FEAT_BROWSE)
+#যদি defined(FEAT_BROWSE)
 /*
  * Generic browse function.  Calls gui_mch_browse() when possible.
  * Later this may pop-up a non-GUI file selector (external command?).
  */
     char_u *
 do_browse(
-    int		flags,		// BROWSE_SAVE and BROWSE_DIR
+    পূর্ণাঙ্ক		flags,		// BROWSE_SAVE and BROWSE_DIR
     char_u	*title,		// title for the window
     char_u	*dflt,		// default file name (may include directory)
     char_u	*ext,		// extension added
@@ -2484,37 +2484,37 @@ do_browse(
     buf_T	*buf)		// buffer to read/write for
 {
     char_u		*fname;
-    static char_u	*last_dir = NULL;    // last used directory
-    char_u		*tofree = NULL;
-    int			save_cmod_flags = cmdmod.cmod_flags;
+    স্থির char_u	*last_dir = রিক্ত;    // last used directory
+    char_u		*tofree = রিক্ত;
+    পূর্ণাঙ্ক			save_cmod_flags = cmdmod.cmod_flags;
 
     // Must turn off browse to avoid that autocommands will get the
     // flag too!
     cmdmod.cmod_flags &= ~CMOD_BROWSE;
 
-    if (title == NULL || *title == NUL)
+    যদি (title == রিক্ত || *title == NUL)
     {
-	if (flags & BROWSE_DIR)
+	যদি (flags & BROWSE_DIR)
 	    title = (char_u *)_("Select Directory dialog");
-	else if (flags & BROWSE_SAVE)
+	অন্যথা যদি (flags & BROWSE_SAVE)
 	    title = (char_u *)_("Save File dialog");
-	else
+	অন্যথা
 	    title = (char_u *)_("Open File dialog");
     }
 
     // When no directory specified, use default file name, default dir, buffer
     // dir, last dir or current dir
-    if ((initdir == NULL || *initdir == NUL) && dflt != NULL && *dflt != NUL)
+    যদি ((initdir == রিক্ত || *initdir == NUL) && dflt != রিক্ত && *dflt != NUL)
     {
-	if (mch_isdir(dflt))		// default file name is a directory
+	যদি (mch_isdir(dflt))		// default file name is a directory
 	{
 	    initdir = dflt;
-	    dflt = NULL;
+	    dflt = রিক্ত;
 	}
-	else if (gettail(dflt) != dflt)	// default file name includes a path
+	অন্যথা যদি (gettail(dflt) != dflt)	// default file name includes a path
 	{
 	    tofree = vim_strsave(dflt);
-	    if (tofree != NULL)
+	    যদি (tofree != রিক্ত)
 	    {
 		initdir = tofree;
 		*gettail(initdir) = NUL;
@@ -2523,69 +2523,69 @@ do_browse(
 	}
     }
 
-    if (initdir == NULL || *initdir == NUL)
+    যদি (initdir == রিক্ত || *initdir == NUL)
     {
 	// When 'browsedir' is a directory, use it
-	if (STRCMP(p_bsdir, "last") != 0
+	যদি (STRCMP(p_bsdir, "last") != 0
 		&& STRCMP(p_bsdir, "buffer") != 0
 		&& STRCMP(p_bsdir, "current") != 0
 		&& mch_isdir(p_bsdir))
 	    initdir = p_bsdir;
 	// When saving or 'browsedir' is "buffer", use buffer fname
-	else if (((flags & BROWSE_SAVE) || *p_bsdir == 'b')
-		&& buf != NULL && buf->b_ffname != NULL)
+	অন্যথা যদি (((flags & BROWSE_SAVE) || *p_bsdir == 'b')
+		&& buf != রিক্ত && buf->b_ffname != রিক্ত)
 	{
-	    if (dflt == NULL || *dflt == NUL)
+	    যদি (dflt == রিক্ত || *dflt == NUL)
 		dflt = gettail(curbuf->b_ffname);
 	    tofree = vim_strsave(curbuf->b_ffname);
-	    if (tofree != NULL)
+	    যদি (tofree != রিক্ত)
 	    {
 		initdir = tofree;
 		*gettail(initdir) = NUL;
 	    }
 	}
 	// When 'browsedir' is "last", use dir from last browse
-	else if (*p_bsdir == 'l')
+	অন্যথা যদি (*p_bsdir == 'l')
 	    initdir = last_dir;
 	// When 'browsedir is "current", use current directory.  This is the
 	// default already, leave initdir empty.
     }
 
 # ifdef FEAT_GUI
-    if (gui.in_use)		// when this changes, also adjust f_has()!
+    যদি (gui.in_use)		// when this changes, also adjust f_has()!
     {
-	if (filter == NULL
+	যদি (filter == রিক্ত
 #  ifdef FEAT_EVAL
-		&& (filter = get_var_value((char_u *)"b:browsefilter")) == NULL
-		&& (filter = get_var_value((char_u *)"g:browsefilter")) == NULL
+		&& (filter = get_var_মান((char_u *)"b:browsefilter")) == রিক্ত
+		&& (filter = get_var_মান((char_u *)"g:browsefilter")) == রিক্ত
 #  endif
 	)
 	    filter = BROWSE_FILTER_DEFAULT;
-	if (flags & BROWSE_DIR)
+	যদি (flags & BROWSE_DIR)
 	{
-#  if defined(FEAT_GUI_GTK) || defined(MSWIN)
+#  যদি defined(FEAT_GUI_GTK) || defined(MSWIN)
 	    // For systems that have a directory dialog.
 	    fname = gui_mch_browsedir(title, initdir);
-#  else
+#  অন্যথা
 	    // Generic solution for selecting a directory: select a file and
 	    // remove the file name.
 	    fname = gui_mch_browse(0, title, dflt, ext, initdir, (char_u *)"");
 #  endif
-#  if !defined(FEAT_GUI_GTK)
+#  যদি !defined(FEAT_GUI_GTK)
 	    // Win32 adds a dummy file name, others return an arbitrary file
 	    // name.  GTK+ 2 returns only the directory,
-	    if (fname != NULL && *fname != NUL && !mch_isdir(fname))
+	    যদি (fname != রিক্ত && *fname != NUL && !mch_isdir(fname))
 	    {
 		// Remove the file name.
 		char_u	    *tail = gettail_sep(fname);
 
-		if (tail == fname)
+		যদি (tail == fname)
 		    *tail++ = '.';	// use current dir
 		*tail = NUL;
 	    }
 #  endif
 	}
-	else
+	অন্যথা
 	    fname = gui_mch_browse(flags & BROWSE_SAVE,
 			       title, dflt, ext, initdir, (char_u *)_(filter));
 
@@ -2595,28 +2595,28 @@ do_browse(
 	need_check_timestamps = TRUE;
 	did_check_timestamps = FALSE;
     }
-    else
+    অন্যথা
 # endif
     {
 	// TODO: non-GUI file selector here
 	emsg(_(e_sorry_no_file_browser_in_console_mode));
-	fname = NULL;
+	fname = রিক্ত;
     }
 
     // keep the directory for next time
-    if (fname != NULL)
+    যদি (fname != রিক্ত)
     {
 	vim_free(last_dir);
 	last_dir = vim_strsave(fname);
-	if (last_dir != NULL && !(flags & BROWSE_DIR))
+	যদি (last_dir != রিক্ত && !(flags & BROWSE_DIR))
 	{
 	    *gettail(last_dir) = NUL;
-	    if (*last_dir == NUL)
+	    যদি (*last_dir == NUL)
 	    {
 		// filename only returned, must be in current dir
 		vim_free(last_dir);
 		last_dir = alloc(MAXPATHL);
-		if (last_dir != NULL)
+		যদি (last_dir != রিক্ত)
 		    mch_dirname(last_dir, MAXPATHL);
 	    }
 	}
@@ -2625,47 +2625,47 @@ do_browse(
     vim_free(tofree);
     cmdmod.cmod_flags = save_cmod_flags;
 
-    return fname;
+    প্রত্যাগম fname;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 
 /*
  * "browse(save, title, initdir, default)" function
  */
-    void
+    শূন্য
 f_browse(typval_T *argvars UNUSED, typval_T *rettv)
 {
 # ifdef FEAT_BROWSE
-    int		save;
+    পূর্ণাঙ্ক		save;
     char_u	*title;
     char_u	*initdir;
     char_u	*defname;
     char_u	buf[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
-    int		error = FALSE;
+    পূর্ণাঙ্ক		error = FALSE;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_bool_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL
 		|| check_for_string_arg(argvars, 3) == FAIL))
-	return;
+	প্রত্যাগম;
 
-    save = (int)tv_get_bool_chk(&argvars[0], &error);
+    save = (পূর্ণাঙ্ক)tv_get_bool_chk(&argvars[0], &error);
     title = tv_get_string_chk(&argvars[1]);
     initdir = tv_get_string_buf_chk(&argvars[2], buf);
     defname = tv_get_string_buf_chk(&argvars[3], buf2);
 
-    if (error || title == NULL || initdir == NULL || defname == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    যদি (error || title == রিক্ত || initdir == রিক্ত || defname == রিক্ত)
+	rettv->vval.v_string = রিক্ত;
+    অন্যথা
 	rettv->vval.v_string =
 		 do_browse(save ? BROWSE_SAVE : 0,
-				 title, defname, NULL, initdir, NULL, curbuf);
-# else
-    rettv->vval.v_string = NULL;
+				 title, defname, রিক্ত, initdir, রিক্ত, curbuf);
+# অন্যথা
+    rettv->vval.v_string = রিক্ত;
 # endif
     rettv->v_type = VAR_STRING;
 }
@@ -2673,7 +2673,7 @@ f_browse(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "browsedir(title, initdir)" function
  */
-    void
+    শূন্য
 f_browsedir(typval_T *argvars UNUSED, typval_T *rettv)
 {
 # ifdef FEAT_BROWSE
@@ -2681,21 +2681,21 @@ f_browsedir(typval_T *argvars UNUSED, typval_T *rettv)
     char_u	*initdir;
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	প্রত্যাগম;
 
     title = tv_get_string_chk(&argvars[0]);
     initdir = tv_get_string_buf_chk(&argvars[1], buf);
 
-    if (title == NULL || initdir == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    যদি (title == রিক্ত || initdir == রিক্ত)
+	rettv->vval.v_string = রিক্ত;
+    অন্যথা
 	rettv->vval.v_string = do_browse(BROWSE_DIR,
-				    title, NULL, NULL, initdir, NULL, curbuf);
-# else
-    rettv->vval.v_string = NULL;
+				    title, রিক্ত, রিক্ত, initdir, রিক্ত, curbuf);
+# অন্যথা
+    rettv->vval.v_string = রিক্ত;
 # endif
     rettv->v_type = VAR_STRING;
 }
@@ -2703,24 +2703,24 @@ f_browsedir(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "filecopy()" function
  */
-    void
+    শূন্য
 f_filecopy(typval_T *argvars, typval_T *rettv)
 {
     char_u	*from;
     stat_T	st;
 
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_সংখ্যা = FALSE;
 
-    if (check_restricted() || check_secure()
+    যদি (check_restricted() || check_secure()
 	|| check_for_string_arg(argvars, 0) == FAIL
 	|| check_for_string_arg(argvars, 1) == FAIL)
-	return;
+	প্রত্যাগম;
 
     from = tv_get_string(&argvars[0]);
 
-    if (mch_lstat((char *)from, &st) >= 0
+    যদি (mch_lstat((বর্ণ *)from, &st) >= 0
 	&& (S_ISREG(st.st_mode) || S_ISLNK(st.st_mode)))
-	rettv->vval.v_number = vim_copyfile(
+	rettv->vval.v_সংখ্যা = vim_copyfile(
 	    tv_get_string(&argvars[0]),
 	    tv_get_string(&argvars[1])) == OK ? TRUE : FALSE;
 }
@@ -2737,8 +2737,8 @@ home_replace(
     buf_T	*buf,	// when not NULL, check for help files
     char_u	*src,	// input file name
     char_u	*dst,	// where to put the result
-    int		dstlen,	// maximum length of the result
-    int		one)	// if TRUE, only replace one file name, include
+    পূর্ণাঙ্ক		dstlen,	// maximum length of the result
+    পূর্ণাঙ্ক		one)	// if TRUE, only replace one file name, include
 			// spaces and commas in the file name.
 {
     size_t	dirlen = 0, envlen = 0;
@@ -2747,60 +2747,60 @@ home_replace(
     char_u	*p;
     char_u	*dst_start;
 
-    if (src == NULL)
+    যদি (src == রিক্ত)
     {
 	*dst = NUL;
-	return 0;
+	প্রত্যাগম 0;
     }
 
     /*
      * If the file is a help file, remove the path completely.
      */
-    if (buf != NULL && buf->b_help)
-	return vim_snprintf_safelen((char *)dst, dstlen, "%s", gettail(src));
+    যদি (buf != রিক্ত && buf->b_help)
+	প্রত্যাগম vim_snprintf_safelen((বর্ণ *)dst, dstlen, "%s", gettail(src));
 
     /*
      * We check both the value of the $HOME environment variable and the
      * "real" home directory.
      */
-    if (homedir != NULL)
+    যদি (homedir != রিক্ত)
 	dirlen = STRLEN(homedir);
 
 #ifdef VMS
     homedir_env_orig = homedir_env = mch_getenv((char_u *)"SYS$LOGIN");
-#else
+#অন্যথা
     homedir_env_orig = homedir_env = mch_getenv((char_u *)"HOME");
 #endif
 #ifdef MSWIN
-    if (homedir_env == NULL)
+    যদি (homedir_env == রিক্ত)
 	homedir_env_orig = homedir_env = mch_getenv((char_u *)"USERPROFILE");
 #endif
     // Empty is the same as not set.
-    if (homedir_env != NULL && *homedir_env == NUL)
-	homedir_env = NULL;
+    যদি (homedir_env != রিক্ত && *homedir_env == NUL)
+	homedir_env = রিক্ত;
 
-    if (homedir_env != NULL && *homedir_env == '~')
+    যদি (homedir_env != রিক্ত && *homedir_env == '~')
     {
 	size_t	usedlen = 0;
 	size_t	flen;
-	char_u	*fbuf = NULL;
+	char_u	*fbuf = রিক্ত;
 
 	flen = STRLEN(homedir_env);
-	(void)modify_fname((char_u *)":p", FALSE, &usedlen,
+	(শূন্য)modify_fname((char_u *)":p", FALSE, &usedlen,
 						  &homedir_env, &fbuf, &flen);
 	flen = STRLEN(homedir_env);
-	if (flen > 0 && vim_ispathsep(homedir_env[flen - 1]))
+	যদি (flen > 0 && vim_ispathsep(homedir_env[flen - 1]))
 	    // Remove the trailing / that is added to a directory.
 	    homedir_env[flen - 1] = NUL;
     }
 
-    if (homedir_env != NULL)
+    যদি (homedir_env != রিক্ত)
 	envlen = STRLEN(homedir_env);
 
-    if (!one)
+    যদি (!one)
 	src = skipwhite(src);
     dst_start = dst;		// remember the start
-    while (*src && dstlen > 0)
+    যাবত্ (*src && dstlen > 0)
     {
 	/*
 	 * Here we are at the beginning of a file name.
@@ -2813,44 +2813,44 @@ home_replace(
 	 */
 	p = homedir;
 	len = dirlen;
-	for (;;)
+	প্রতি (;;)
 	{
-	    if (   len
+	    যদি (   len
 		&& fnamencmp(src, p, len) == 0
 		&& (vim_ispathsep(src[len])
 		    || (!one && (src[len] == ',' || src[len] == ' '))
 		    || src[len] == NUL))
 	    {
 		src += len;
-		if (--dstlen > 0)
+		যদি (--dstlen > 0)
 		    *dst++ = '~';
 
 		// Do not add directory separator into dst, because dst is
 		// expected to just return the directory name without the
 		// directory separator '/'.
-		break;
+		ভঙ্গ;
 	    }
-	    if (p == homedir_env)
-		break;
+	    যদি (p == homedir_env)
+		ভঙ্গ;
 	    p = homedir_env;
 	    len = envlen;
 	}
 
 	// if (!one) skip to separator: space or comma
-	while (*src && (one || (*src != ',' && *src != ' ')) && --dstlen > 0)
+	যাবত্ (*src && (one || (*src != ',' && *src != ' ')) && --dstlen > 0)
 	    *dst++ = *src++;
 	// skip separator
-	while ((*src == ' ' || *src == ',') && --dstlen > 0)
+	যাবত্ ((*src == ' ' || *src == ',') && --dstlen > 0)
 	    *dst++ = *src++;
     }
     // if (dstlen == 0) out of space, what to do???
 
     *dst = NUL;
 
-    if (homedir_env != homedir_env_orig)
+    যদি (homedir_env != homedir_env_orig)
 	vim_free(homedir_env);
 
-    return (size_t)(dst - dst_start);
+    প্রত্যাগম (size_t)(dst - dst_start);
 }
 
 /*
@@ -2866,12 +2866,12 @@ home_replace_save(
     unsigned	len;
 
     len = 3;			// space for "~/" and trailing NUL
-    if (src != NULL)		// just in case
+    যদি (src != রিক্ত)		// just in case
 	len += (unsigned)STRLEN(src);
     dst = alloc(len);
-    if (dst != NULL)
+    যদি (dst != রিক্ত)
 	home_replace(buf, src, dst, len, TRUE);
-    return dst;
+    প্রত্যাগম dst;
 }
 
 /*
@@ -2884,82 +2884,82 @@ home_replace_save(
  * For the first name environment variables are expanded if "expandenv" is
  * TRUE.
  */
-    int
+    পূর্ণাঙ্ক
 fullpathcmp(
     char_u *s1,
     char_u *s2,
-    int	    checkname,		// when both don't exist, check file names
-    int	    expandenv)
+    পূর্ণাঙ্ক	    checkname,		// when both don't exist, check file names
+    পূর্ণাঙ্ক	    expandenv)
 {
 #ifdef UNIX
     char_u	    exp1[MAXPATHL];
     char_u	    full1[MAXPATHL];
     char_u	    full2[MAXPATHL];
     stat_T	    st1, st2;
-    int		    r1, r2;
+    পূর্ণাঙ্ক		    r1, r2;
 
-    if (expandenv)
+    যদি (expandenv)
 	expand_env(s1, exp1, MAXPATHL);
-    else
+    অন্যথা
 	vim_strncpy(exp1, s1, MAXPATHL - 1);
-    r1 = mch_stat((char *)exp1, &st1);
-    r2 = mch_stat((char *)s2, &st2);
-    if (r1 != 0 && r2 != 0)
+    r1 = mch_stat((বর্ণ *)exp1, &st1);
+    r2 = mch_stat((বর্ণ *)s2, &st2);
+    যদি (r1 != 0 && r2 != 0)
     {
 	// if mch_stat() doesn't work, may compare the names
-	if (checkname)
+	যদি (checkname)
 	{
-	    if (fnamecmp(exp1, s2) == 0)
-		return FPC_SAMEX;
+	    যদি (fnamecmp(exp1, s2) == 0)
+		প্রত্যাগম FPC_SAMEX;
 	    r1 = vim_FullName(exp1, full1, MAXPATHL, FALSE);
 	    r2 = vim_FullName(s2, full2, MAXPATHL, FALSE);
-	    if (r1 == OK && r2 == OK && fnamecmp(full1, full2) == 0)
-		return FPC_SAMEX;
+	    যদি (r1 == OK && r2 == OK && fnamecmp(full1, full2) == 0)
+		প্রত্যাগম FPC_SAMEX;
 	}
-	return FPC_NOTX;
+	প্রত্যাগম FPC_NOTX;
     }
-    if (r1 != 0 || r2 != 0)
-	return FPC_DIFFX;
-    if (st1.st_dev == st2.st_dev && st1.st_ino == st2.st_ino)
-	return FPC_SAME;
-    return FPC_DIFF;
-#else
+    যদি (r1 != 0 || r2 != 0)
+	প্রত্যাগম FPC_DIFFX;
+    যদি (st1.st_dev == st2.st_dev && st1.st_ino == st2.st_ino)
+	প্রত্যাগম FPC_SAME;
+    প্রত্যাগম FPC_DIFF;
+#অন্যথা
     char_u  *exp1;		// expanded s1
     char_u  *full1;		// full path of s1
     char_u  *full2;		// full path of s2
-    int	    retval = FPC_DIFF;
-    int	    r1, r2;
+    পূর্ণাঙ্ক	    retval = FPC_DIFF;
+    পূর্ণাঙ্ক	    r1, r2;
 
     // allocate one buffer to store three paths (alloc()/free() is slow!)
-    if ((exp1 = alloc(MAXPATHL * 3)) != NULL)
+    যদি ((exp1 = alloc(MAXPATHL * 3)) != রিক্ত)
     {
 	full1 = exp1 + MAXPATHL;
 	full2 = full1 + MAXPATHL;
 
-	if (expandenv)
+	যদি (expandenv)
 	    expand_env(s1, exp1, MAXPATHL);
-	else
+	অন্যথা
 	    vim_strncpy(exp1, s1, MAXPATHL - 1);
 	r1 = vim_FullName(exp1, full1, MAXPATHL, FALSE);
 	r2 = vim_FullName(s2, full2, MAXPATHL, FALSE);
 
 	// If vim_FullName() fails, the file probably doesn't exist.
-	if (r1 != OK && r2 != OK)
+	যদি (r1 != OK && r2 != OK)
 	{
-	    if (checkname && fnamecmp(exp1, s2) == 0)
+	    যদি (checkname && fnamecmp(exp1, s2) == 0)
 		retval = FPC_SAMEX;
-	    else
+	    অন্যথা
 		retval = FPC_NOTX;
 	}
-	else if (r1 != OK || r2 != OK)
+	অন্যথা যদি (r1 != OK || r2 != OK)
 	    retval = FPC_DIFFX;
-	else if (fnamecmp(full1, full2))
+	অন্যথা যদি (fnamecmp(full1, full2))
 	    retval = FPC_DIFF;
-	else
+	অন্যথা
 	    retval = FPC_SAME;
 	vim_free(exp1);
     }
-    return retval;
+    প্রত্যাগম retval;
 #endif
 }
 
@@ -2973,15 +2973,15 @@ gettail(char_u *fname)
 {
     char_u  *p1, *p2;
 
-    if (fname == NULL)
-	return (char_u *)"";
-    for (p1 = p2 = get_past_head(fname); *p2; )	// find last part of path
+    যদি (fname == রিক্ত)
+	প্রত্যাগম (char_u *)"";
+    প্রতি (p1 = p2 = get_past_head(fname); *p2; )	// find last part of path
     {
-	if (vim_ispathsep_nocolon(*p2))
+	যদি (vim_ispathsep_nocolon(*p2))
 	    p1 = p2 + 1;
 	MB_PTR_ADV(p2);
     }
-    return p1;
+    প্রত্যাগম p1;
 }
 
 /*
@@ -2997,13 +2997,13 @@ gettail_sep(char_u *fname)
 
     p = get_past_head(fname);	// don't remove the '/' from "c:/file"
     t = gettail(fname);
-    while (t > p && after_pathsep(fname, t))
+    যাবত্ (t > p && after_pathsep(fname, t))
 	--t;
 #ifdef VMS
     // path separator is part of the path
     ++t;
 #endif
-    return t;
+    প্রত্যাগম t;
 }
 
 /*
@@ -3012,11 +3012,11 @@ gettail_sep(char_u *fname)
     char_u *
 getnextcomp(char_u *fname)
 {
-    while (*fname && !vim_ispathsep(*fname))
+    যাবত্ (*fname && !vim_ispathsep(*fname))
 	MB_PTR_ADV(fname);
-    if (*fname)
+    যদি (*fname)
 	++fname;
-    return fname;
+    প্রত্যাগম fname;
 }
 
 /*
@@ -3029,48 +3029,48 @@ get_past_head(char_u *path)
 {
     char_u  *retval;
 
-#if defined(MSWIN)
+#যদি defined(MSWIN)
     // may skip "c:"
-    if (SAFE_isalpha(path[0]) && path[1] == ':')
+    যদি (SAFE_isalpha(path[0]) && path[1] == ':')
 	retval = path + 2;
-    else
+    অন্যথা
 	retval = path;
-#else
-# if defined(AMIGA)
+#অন্যথা
+# যদি defined(AMIGA)
     // may skip "label:"
     retval = vim_strchr(path, ':');
-    if (retval == NULL)
+    যদি (retval == রিক্ত)
 	retval = path;
-# else	// Unix
+# অন্যথা	// Unix
     retval = path;
 # endif
 #endif
 
-    while (vim_ispathsep(*retval))
+    যাবত্ (vim_ispathsep(*retval))
 	++retval;
 
-    return retval;
+    প্রত্যাগম retval;
 }
 
 /*
  * Return TRUE if 'c' is a path separator.
  * Note that for MS-Windows this includes the colon.
  */
-    int
-vim_ispathsep(int c)
+    পূর্ণাঙ্ক
+vim_ispathsep(পূর্ণাঙ্ক c)
 {
 #ifdef UNIX
-    return (c == '/');	    // UNIX has ':' inside file names
-#else
+    প্রত্যাগম (c == '/');	    // UNIX has ':' inside file names
+#অন্যথা
 # ifdef BACKSLASH_IN_FILENAME
-    return (c == ':' || c == '/' || c == '\\');
-# else
+    প্রত্যাগম (c == ':' || c == '/' || c == '\\');
+# অন্যথা
 #  ifdef VMS
     // server"user passwd"::device:[full.path.name]fname.extension;version"
-    return (c == ':' || c == '[' || c == ']' || c == '/'
+    প্রত্যাগম (c == ':' || c == '[' || c == ']' || c == '/'
 	    || c == '<' || c == '>' || c == '"' );
-#  else
-    return (c == ':' || c == '/');
+#  অন্যথা
+    প্রত্যাগম (c == ':' || c == '/');
 #  endif // VMS
 # endif
 #endif
@@ -3079,10 +3079,10 @@ vim_ispathsep(int c)
 /*
  * Like vim_ispathsep(c), but exclude the colon for MS-Windows.
  */
-    int
-vim_ispathsep_nocolon(int c)
+    পূর্ণাঙ্ক
+vim_ispathsep_nocolon(পূর্ণাঙ্ক c)
 {
-    return vim_ispathsep(c)
+    প্রত্যাগম vim_ispathsep(c)
 #ifdef BACKSLASH_IN_FILENAME
 	&& c != ':'
 #endif
@@ -3094,47 +3094,47 @@ vim_ispathsep_nocolon(int c)
  * Also returns TRUE if there is no directory name.
  * "fname" must be writable!.
  */
-    int
+    পূর্ণাঙ্ক
 dir_of_file_exists(char_u *fname)
 {
     char_u	*p;
-    int		c;
-    int		retval;
+    পূর্ণাঙ্ক		c;
+    পূর্ণাঙ্ক		retval;
 
     p = gettail_sep(fname);
-    if (p == fname)
-	return TRUE;
+    যদি (p == fname)
+	প্রত্যাগম TRUE;
     c = *p;
     *p = NUL;
     retval = mch_isdir(fname);
     *p = c;
-    return retval;
+    প্রত্যাগম retval;
 }
 
 /*
  * Versions of fnamecmp() and fnamencmp() that handle '/' and '\' equally
  * and deal with 'fileignorecase'.
  */
-    int
+    পূর্ণাঙ্ক
 vim_fnamecmp(char_u *x, char_u *y)
 {
 #ifdef BACKSLASH_IN_FILENAME
-    return vim_fnamencmp(x, y, MAXPATHL);
-#else
-    if (p_fic)
-	return MB_STRICMP(x, y);
-    return STRCMP(x, y);
+    প্রত্যাগম vim_fnamencmp(x, y, MAXPATHL);
+#অন্যথা
+    যদি (p_fic)
+	প্রত্যাগম MB_STRICMP(x, y);
+    প্রত্যাগম STRCMP(x, y);
 #endif
 }
 
-    int
+    পূর্ণাঙ্ক
 vim_fnamencmp(char_u *x, char_u *y, size_t len)
 {
 #ifdef BACKSLASH_IN_FILENAME
     char_u	*px = x;
     char_u	*py = y;
-    int		cx = NUL;
-    int		cy = NUL;
+    পূর্ণাঙ্ক		cx = NUL;
+    পূর্ণাঙ্ক		cy = NUL;
 
 # ifdef MSWIN
     /*
@@ -3143,25 +3143,25 @@ vim_fnamencmp(char_u *x, char_u *y, size_t len)
      *	 - another with implicit drive letter \xxx
      * advance the pointer, of the explicit one, to skip the drive
      */
-    for (int swap = 0, drive = NUL; swap < 2; ++swap)
+    প্রতি (পূর্ণাঙ্ক swap = 0, drive = NUL; swap < 2; ++swap)
     {
 	// Handle absolute paths with implicit drive letter
 	cx = PTR2CHAR(px);
 	cy = PTR2CHAR(py);
 
-	if ((cx == '/' || cx == '\\') && ASCII_ISALPHA(cy))
+	যদি ((cx == '/' || cx == '\\') && ASCII_ISALPHA(cy))
 	{
 	    drive = MB_TOUPPER(cy) - 'A' + 1;
 
 	    // Check for the colon
 	    py += mb_ptr2len(py);
 	    cy = PTR2CHAR(py);
-	    if (cy == ':' && drive == _getdrive())
+	    যদি (cy == ':' && drive == _getdrive())
 	    { // skip the drive for comparison
 		py += mb_ptr2len(py);
-		break;
+		ভঙ্গ;
 	    }
-	    else // ignore
+	    অন্যথা // ignore
 		py -= mb_ptr2len(py);
 	}
 
@@ -3172,26 +3172,26 @@ vim_fnamencmp(char_u *x, char_u *y, size_t len)
     }
 # endif
 
-    while (len > 0)
+    যাবত্ (len > 0)
     {
 	cx = PTR2CHAR(px);
 	cy = PTR2CHAR(py);
-	if (cx == NUL || cy == NUL
+	যদি (cx == NUL || cy == NUL
 	    || ((p_fic ? MB_TOLOWER(cx) != MB_TOLOWER(cy) : cx != cy)
 		&& !(cx == '/' && cy == '\\')
 		&& !(cx == '\\' && cy == '/')))
-	    break;
+	    ভঙ্গ;
 	len -= mb_ptr2len(px);
 	px += mb_ptr2len(px);
 	py += mb_ptr2len(py);
     }
-    if (len == 0)
-	return 0;
-    return (cx - cy);
-#else
-    if (p_fic)
-	return MB_STRNICMP(x, y, len);
-    return STRNCMP(x, y, len);
+    যদি (len == 0)
+	প্রত্যাগম 0;
+    প্রত্যাগম (cx - cy);
+#অন্যথা
+    যদি (p_fic)
+	প্রত্যাগম MB_STRNICMP(x, y, len);
+    প্রত্যাগম STRNCMP(x, y, len);
 #endif
 }
 
@@ -3200,41 +3200,41 @@ vim_fnamencmp(char_u *x, char_u *y, size_t len)
  * Only add a '/' or '\\' when 'sep' is TRUE and it is necessary.
  */
     char_u  *
-concat_fnames(char_u *fname1, size_t fname1len, char_u *fname2, size_t fname2len, int sep, string_T *ret)
+concat_fnames(char_u *fname1, size_t fname1len, char_u *fname2, size_t fname2len, পূর্ণাঙ্ক sep, string_T *ret)
 {
-    ret->string = alloc(fname1len + (sep ? sizeof(PATHSEP) : 0) + fname2len + 1);
-    if (ret->string == NULL)
+    ret->string = alloc(fname1len + (sep ? পরিমাণ(PATHSEP) : 0) + fname2len + 1);
+    যদি (ret->string == রিক্ত)
 	ret->length = 0;
-    else
+    অন্যথা
     {
 	STRCPY(ret->string, fname1);
 	ret->length = fname1len;
-	if (sep && *ret->string != NUL && !after_pathsep(ret->string, ret->string + ret->length))
+	যদি (sep && *ret->string != NUL && !after_pathsep(ret->string, ret->string + ret->length))
 	{
 	    STRCPY(ret->string + ret->length, PATHSEPSTR);
-	    ret->length += sizeof(PATHSEP);
+	    ret->length += পরিমাণ(PATHSEP);
 	}
 	STRCPY(ret->string + ret->length, fname2);
 	ret->length += fname2len;
     }
 
-    return ret->string;
+    প্রত্যাগম ret->string;
 }
 
 /*
  * Add a path separator to a file name, unless it already ends in a path
  * separator.
  */
-    void
+    শূন্য
 add_pathsep(char_u *p)
 {
     size_t  plen;
 
-    if (*p == NUL)
-	return;
+    যদি (*p == NUL)
+	প্রত্যাগম;
 
     plen = STRLEN(p);
-    if (!after_pathsep(p, p + plen))
+    যদি (!after_pathsep(p, p + plen))
 	STRCPY(p + plen, PATHSEPSTR);
 }
 
@@ -3245,38 +3245,38 @@ add_pathsep(char_u *p)
     char_u  *
 FullName_save(
     char_u	*fname,
-    int		force)		// force expansion, even when it already looks
+    পূর্ণাঙ্ক		force)		// force expansion, even when it already looks
 				// like a full path name
 {
     char_u	*buf;
-    char_u	*new_fname = NULL;
+    char_u	*new_fname = রিক্ত;
 
-    if (fname == NULL)
-	return NULL;
+    যদি (fname == রিক্ত)
+	প্রত্যাগম রিক্ত;
 
     buf = alloc(MAXPATHL);
-    if (buf == NULL)
-	return NULL;
+    যদি (buf == রিক্ত)
+	প্রত্যাগম রিক্ত;
 
-    if (vim_FullName(fname, buf, MAXPATHL, force) != FAIL)
+    যদি (vim_FullName(fname, buf, MAXPATHL, force) != FAIL)
 	new_fname = vim_strsave(buf);
-    else
+    অন্যথা
 	new_fname = vim_strsave(fname);
     vim_free(buf);
-    return new_fname;
+    প্রত্যাগম new_fname;
 }
 
 /*
  * return TRUE if "fname" exists.
  */
-    int
+    পূর্ণাঙ্ক
 vim_fexists(char_u *fname)
 {
     stat_T st;
 
-    if (mch_stat((char *)fname, &st))
-	return FALSE;
-    return TRUE;
+    যদি (mch_stat((বর্ণ *)fname, &st))
+	প্রত্যাগম FALSE;
+    প্রত্যাগম TRUE;
 }
 
 /*
@@ -3284,50 +3284,50 @@ vim_fexists(char_u *fname)
  * Expand items like "%:h" before the expansion.
  * Returns OK or FAIL.
  */
-    int
+    পূর্ণাঙ্ক
 expand_wildcards_eval(
     char_u	 **pat,		// pointer to input pattern
-    int		  *num_file,	// resulting number of files
+    পূর্ণাঙ্ক		  *অঙ্ক_file,	// resulting number of files
     char_u	***file,	// array of resulting files
-    int		   flags)	// EW_DIR, etc.
+    পূর্ণাঙ্ক		   flags)	// EW_DIR, etc.
 {
-    int		ret = FAIL;
-    char_u	*eval_pat = NULL;
+    পূর্ণাঙ্ক		ret = FAIL;
+    char_u	*eval_pat = রিক্ত;
     char_u	*exp_pat = *pat;
-    char	*ignored_msg;
+    বর্ণ	*ignored_বার্তা;
     size_t	usedlen;
-    int		is_cur_alt_file = *exp_pat == '%' || *exp_pat == '#';
-    int		star_follows = FALSE;
+    পূর্ণাঙ্ক		is_cur_alt_file = *exp_pat == '%' || *exp_pat == '#';
+    পূর্ণাঙ্ক		star_follows = FALSE;
 
-    if (is_cur_alt_file || *exp_pat == '<')
+    যদি (is_cur_alt_file || *exp_pat == '<')
     {
 	++emsg_off;
 	eval_pat = eval_vars(exp_pat, exp_pat, &usedlen,
-					       NULL, &ignored_msg, NULL, TRUE);
+					       রিক্ত, &ignored_বার্তা, রিক্ত, TRUE);
 	--emsg_off;
-	if (eval_pat != NULL)
+	যদি (eval_pat != রিক্ত)
 	{
 	    star_follows = STRCMP(exp_pat + usedlen, "*") == 0;
 	    exp_pat = concat_str(eval_pat, exp_pat + usedlen);
 	}
     }
 
-    if (exp_pat != NULL)
-	ret = expand_wildcards(1, &exp_pat, num_file, file, flags);
+    যদি (exp_pat != রিক্ত)
+	ret = expand_wildcards(1, &exp_pat, অঙ্ক_file, file, flags);
 
-    if (eval_pat != NULL)
+    যদি (eval_pat != রিক্ত)
     {
-	if (*num_file == 0 && is_cur_alt_file && star_follows)
+	যদি (*অঙ্ক_file == 0 && is_cur_alt_file && star_follows)
 	{
 	    // Expanding "%" or "#" and the file does not exist: Add the
 	    // pattern anyway (without the star) so that this works for remote
 	    // files and non-file buffer names.
 	    *file = ALLOC_ONE(char_u *);
-	    if (*file != NULL)
+	    যদি (*file != রিক্ত)
 	    {
 		**file = eval_pat;
-		eval_pat = NULL;
-		*num_file = 1;
+		eval_pat = রিক্ত;
+		*অঙ্ক_file = 1;
 		ret = OK;
 	    }
 	}
@@ -3335,7 +3335,7 @@ expand_wildcards_eval(
 	vim_free(eval_pat);
     }
 
-    return ret;
+    প্রত্যাগম ret;
 }
 
 /*
@@ -3343,58 +3343,58 @@ expand_wildcards_eval(
  * 'wildignore'.
  * Returns OK or FAIL.  When FAIL then "num_files" won't be set.
  */
-    int
+    পূর্ণাঙ্ক
 expand_wildcards(
-    int		   num_pat,	// number of input patterns
+    পূর্ণাঙ্ক		   অঙ্ক_pat,	// number of input patterns
     char_u	 **pat,		// array of input patterns
-    int		  *num_files,	// resulting number of files
+    পূর্ণাঙ্ক		  *অঙ্ক_files,	// resulting number of files
     char_u	***files,	// array of resulting files
-    int		   flags)	// EW_DIR, etc.
+    পূর্ণাঙ্ক		   flags)	// EW_DIR, etc.
 {
-    int		retval;
-    int		i, j;
+    পূর্ণাঙ্ক		retval;
+    পূর্ণাঙ্ক		i, j;
     char_u	*p;
-    int		non_suf_match;	// number without matching suffix
+    পূর্ণাঙ্ক		non_suf_match;	// number without matching suffix
 
-    retval = gen_expand_wildcards(num_pat, pat, num_files, files, flags);
+    retval = gen_expand_wildcards(অঙ্ক_pat, pat, অঙ্ক_files, files, flags);
 
     // When keeping all matches, return here
-    if ((flags & EW_KEEPALL) || retval == FAIL)
-	return retval;
+    যদি ((flags & EW_KEEPALL) || retval == FAIL)
+	প্রত্যাগম retval;
 
     /*
      * Remove names that match 'wildignore'.
      */
-    if (*p_wig)
+    যদি (*p_wig)
     {
 	char_u	*ffname;
 
 	// check all files in (*files)[]
-	for (i = 0; i < *num_files; ++i)
+	প্রতি (i = 0; i < *অঙ্ক_files; ++i)
 	{
 	    ffname = FullName_save((*files)[i], FALSE);
-	    if (ffname == NULL)		// out of memory
-		break;
+	    যদি (ffname == রিক্ত)		// out of memory
+		ভঙ্গ;
 #ifdef VMS
 	    vms_remove_version(ffname);
 #endif
-	    if (match_file_list(p_wig, (*files)[i], ffname))
+	    যদি (match_file_list(p_wig, (*files)[i], ffname))
 	    {
 		// remove this matching file from the list
 		vim_free((*files)[i]);
-		for (j = i; j + 1 < *num_files; ++j)
+		প্রতি (j = i; j + 1 < *অঙ্ক_files; ++j)
 		    (*files)[j] = (*files)[j + 1];
-		--*num_files;
+		--*অঙ্ক_files;
 		--i;
 	    }
 	    vim_free(ffname);
 	}
 
 	// If the number of matches is now zero, we fail.
-	if (*num_files == 0)
+	যদি (*অঙ্ক_files == 0)
 	{
 	    VIM_CLEAR(*files);
-	    return FAIL;
+	    প্রত্যাগম FAIL;
 	}
     }
 
@@ -3402,74 +3402,74 @@ expand_wildcards(
      * Move the names where 'suffixes' match to the end.
      * Skip when interrupted, the result probably won't be used.
      */
-    if (*num_files > 1 && !got_int)
+    যদি (*অঙ্ক_files > 1 && !got_int)
     {
 	non_suf_match = 0;
-	for (i = 0; i < *num_files; ++i)
+	প্রতি (i = 0; i < *অঙ্ক_files; ++i)
 	{
-	    if (!match_suffix((*files)[i]))
+	    যদি (!match_suffix((*files)[i]))
 	    {
 		/*
 		 * Move the name without matching suffix to the front
 		 * of the list.
 		 */
 		p = (*files)[i];
-		for (j = i; j > non_suf_match; --j)
+		প্রতি (j = i; j > non_suf_match; --j)
 		    (*files)[j] = (*files)[j - 1];
 		(*files)[non_suf_match++] = p;
 	    }
 	}
     }
 
-    return retval;
+    প্রত্যাগম retval;
 }
 
 /*
  * Return TRUE if "fname" matches with an entry in 'suffixes'.
  */
-    int
+    পূর্ণাঙ্ক
 match_suffix(char_u *fname)
 {
-    int		fnamelen, setsuflen;
+    পূর্ণাঙ্ক		fnamelen, setsuflen;
     char_u	*setsuf;
 #define MAXSUFLEN 30	    // maximum length of a file suffix
     char_u	suf_buf[MAXSUFLEN];
 
-    fnamelen = (int)STRLEN(fname);
+    fnamelen = (পূর্ণাঙ্ক)STRLEN(fname);
     setsuflen = 0;
-    for (setsuf = p_su; *setsuf; )
+    প্রতি (setsuf = p_su; *setsuf; )
     {
 	setsuflen = copy_option_part(&setsuf, suf_buf, MAXSUFLEN, ".,");
-	if (setsuflen == 0)
+	যদি (setsuflen == 0)
 	{
 	    char_u *tail = gettail(fname);
 
 	    // empty entry: match name without a '.'
-	    if (vim_strchr(tail, '.') == NULL)
+	    যদি (vim_strchr(tail, '.') == রিক্ত)
 	    {
 		setsuflen = 1;
-		break;
+		ভঙ্গ;
 	    }
 	}
-	else
+	অন্যথা
 	{
-	    if (fnamelen >= setsuflen
+	    যদি (fnamelen >= setsuflen
 		    && fnamencmp(suf_buf, fname + fnamelen - setsuflen,
 						  (size_t)setsuflen) == 0)
-		break;
+		ভঙ্গ;
 	    setsuflen = 0;
 	}
     }
-    return (setsuflen != 0);
+    প্রত্যাগম (setsuflen != 0);
 }
 
 /*
  * Return TRUE if we can expand this backtick thing here.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 vim_backtick(char_u *p)
 {
-    return (*p == '`' && *(p + 1) != NUL && *(p + STRLEN(p) - 1) == '`');
+    প্রত্যাগম (*p == '`' && *(p + 1) != NUL && *(p + STRLEN(p) - 1) == '`');
 }
 
 /*
@@ -3477,43 +3477,43 @@ vim_backtick(char_u *p)
  * Currently only works when pat[] starts and ends with a `.
  * Returns number of file names found, -1 if an error is encountered.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 expand_backtick(
     garray_T	*gap,
     char_u	*pat,
-    int		flags)	// EW_* flags
+    পূর্ণাঙ্ক		flags)	// EW_* flags
 {
     char_u	*p;
     char_u	*cmd;
     char_u	*buffer;
-    int		cnt = 0;
-    int		i;
+    পূর্ণাঙ্ক		cnt = 0;
+    পূর্ণাঙ্ক		i;
 
     // Create the command: lop off the backticks.
     cmd = vim_strnsave(pat + 1, STRLEN(pat) - 2);
-    if (cmd == NULL)
-	return -1;
+    যদি (cmd == রিক্ত)
+	প্রত্যাগম -1;
 
 #ifdef FEAT_EVAL
-    if (*cmd == '=')	    // `={expr}`: Expand expression
+    যদি (*cmd == '=')	    // `={expr}`: Expand expression
 	buffer = eval_to_string(cmd + 1, TRUE, FALSE);
-    else
+    অন্যথা
 #endif
-	buffer = get_cmd_output(cmd, NULL,
-				(flags & EW_SILENT) ? SHELL_SILENT : 0, NULL);
+	buffer = get_cmd_output(cmd, রিক্ত,
+				(flags & EW_SILENT) ? SHELL_SILENT : 0, রিক্ত);
     vim_free(cmd);
-    if (buffer == NULL)
-	return -1;
+    যদি (buffer == রিক্ত)
+	প্রত্যাগম -1;
 
     cmd = buffer;
-    while (*cmd != NUL)
+    যাবত্ (*cmd != NUL)
     {
 	cmd = skipwhite(cmd);		// skip over white space
 	p = cmd;
-	while (*p != NUL && *p != '\r' && *p != '\n') // skip over entry
+	যাবত্ (*p != NUL && *p != '\r' && *p != '\n') // skip over entry
 	    ++p;
 	// add an entry if it is not empty
-	if (p > cmd)
+	যদি (p > cmd)
 	{
 	    i = *p;
 	    *p = NUL;
@@ -3522,15 +3522,15 @@ expand_backtick(
 	    ++cnt;
 	}
 	cmd = p;
-	while (*cmd != NUL && (*cmd == '\r' || *cmd == '\n'))
+	যাবত্ (*cmd != NUL && (*cmd == '\r' || *cmd == '\n'))
 	    ++cmd;
     }
 
     vim_free(buffer);
-    return cnt;
+    প্রত্যাগম cnt;
 }
 
-#if defined(MSWIN)
+#যদি defined(MSWIN)
 /*
  * File name expansion code for MS-DOS, Win16 and Win32.  It's here because
  * it's shared between these systems.
@@ -3539,10 +3539,10 @@ expand_backtick(
 /*
  * comparison function for qsort in dos_expandpath()
  */
-    static int
-pstrcmp(const void *a, const void *b)
+    স্থির পূর্ণাঙ্ক
+pstrcmp(ধ্রুব শূন্য *a, ধ্রুব শূন্য *b)
 {
-    return (pathcmp(*(char **)a, *(char **)b, -1));
+    প্রত্যাগম (pathcmp(*(বর্ণ **)a, *(বর্ণ **)b, -1));
 }
 
 /*
@@ -3554,47 +3554,47 @@ pstrcmp(const void *a, const void *b)
  * Return the number of matches found.
  * NOTE: much of this is identical to unix_expandpath(), keep in sync!
  */
-    int
+    পূর্ণাঙ্ক
 dos_expandpath(
     garray_T	*gap,
     char_u	*path,
     size_t	wildoff,
-    int		flags,		// EW_* flags
-    int		didstar)	// expanded "**" once already
+    পূর্ণাঙ্ক		flags,		// EW_* flags
+    পূর্ণাঙ্ক		didstar)	// expanded "**" once already
 {
     char_u	*buf;
     char_u	*path_end;
     char_u	*p, *s, *e;
-    int		start_len = gap->ga_len;
+    পূর্ণাঙ্ক		start_len = gap->ga_len;
     char_u	*pat;
     regmatch_T	regmatch;
-    int		starts_with_dot;
-    int		matches;
+    পূর্ণাঙ্ক		starts_with_dot;
+    পূর্ণাঙ্ক		matches;
     size_t	buflen;
     size_t	len;
-    int		starstar = FALSE;
-    static int	stardepth = 0;	    // depth for "**" expansion
-    HANDLE		hFind = INVALID_HANDLE_VALUE;
+    পূর্ণাঙ্ক		starstar = FALSE;
+    স্থির পূর্ণাঙ্ক	stardepth = 0;	    // depth for "**" expansion
+    HANDLE		hFind = INVALID_HANDLE_মান;
     WIN32_FIND_DATAW    wfb;
-    WCHAR		*wn = NULL;	// UCS-2 name, NULL when not used.
+    WCHAR		*wn = রিক্ত;	// UCS-2 name, NULL when not used.
     char_u		*matchname;
-    int			ok;
+    পূর্ণাঙ্ক			ok;
     char_u		*p_alt;
-    int			use_short_name;
+    পূর্ণাঙ্ক			use_short_name;
 
     // Expanding "**" may take a long time, check for CTRL-C.
-    if (stardepth > 0)
+    যদি (stardepth > 0)
     {
 	ui_breakcheck();
-	if (got_int)
-	    return 0;
+	যদি (got_int)
+	    প্রত্যাগম 0;
     }
 
     // Make room for file name (a bit too much to stay on the safe side).
     buflen = STRLEN(path) + MAXPATHL;
     buf = alloc(buflen);
-    if (buf == NULL)
-	return 0;
+    যদি (buf == রিক্ত)
+	প্রত্যাগম 0;
 
     /*
      * Find the first part in the path name that contains a wildcard or a ~1.
@@ -3602,32 +3602,32 @@ dos_expandpath(
      */
     p = buf;
     s = buf;
-    e = NULL;
+    e = রিক্ত;
     path_end = path;
-    while (*path_end != NUL)
+    যাবত্ (*path_end != NUL)
     {
 	// May ignore a wildcard that has a backslash before it; it will
 	// be removed by rem_backslash() or file_pat_to_reg_pat() below.
-	if (path_end >= path + wildoff && rem_backslash(path_end))
+	যদি (path_end >= path + wildoff && rem_backslash(path_end))
 	    *p++ = *path_end++;
-	else if (*path_end == '\\' || *path_end == ':' || *path_end == '/')
+	অন্যথা যদি (*path_end == '\\' || *path_end == ':' || *path_end == '/')
 	{
-	    if (e != NULL)
-		break;
+	    যদি (e != রিক্ত)
+		ভঙ্গ;
 	    s = p + 1;
 	}
-	else if (path_end >= path + wildoff
-			 && vim_strchr((char_u *)"*?[~", *path_end) != NULL)
+	অন্যথা যদি (path_end >= path + wildoff
+			 && vim_strchr((char_u *)"*?[~", *path_end) != রিক্ত)
 	    e = p;
-	if (has_mbyte)
+	যদি (has_mbyte)
 	{
-	    int charlen = (*mb_ptr2len)(path_end);
+	    পূর্ণাঙ্ক charlen = (*mb_ptr2len)(path_end);
 
 	    STRNCPY(p, path_end, (size_t)charlen);
 	    p += charlen;
 	    path_end += charlen;
 	}
-	else
+	অন্যথা
 	    *p++ = *path_end++;
     }
     e = p;
@@ -3636,8 +3636,8 @@ dos_expandpath(
     // now we have one wildcard component between s and e
     // Remove backslashes between "wildoff" and the start of the wildcard
     // component.
-    for (p = buf + wildoff; p < s; ++p)
-	if (rem_backslash(p))
+    প্রতি (p = buf + wildoff; p < s; ++p)
+	যদি (rem_backslash(p))
 	{
 	    STRMOVE(p, p + 1);
 	    --e;
@@ -3645,31 +3645,31 @@ dos_expandpath(
 	}
 
     // Check for "**" between "s" and "e".
-    for (p = s; p < e; ++p)
-	if (p[0] == '*' && p[1] == '*')
+    প্রতি (p = s; p < e; ++p)
+	যদি (p[0] == '*' && p[1] == '*')
 	    starstar = TRUE;
 
     starts_with_dot = *s == '.';
-    pat = file_pat_to_reg_pat(s, e, NULL, FALSE);
-    if (pat == NULL)
+    pat = file_pat_to_reg_pat(s, e, রিক্ত, FALSE);
+    যদি (pat == রিক্ত)
     {
 	vim_free(buf);
-	return 0;
+	প্রত্যাগম 0;
     }
 
     // compile the regexp into a program
-    if (flags & (EW_NOERROR | EW_NOTWILD))
+    যদি (flags & (EW_NOERROR | EW_NOTWILD))
 	++emsg_silent;
     regmatch.rm_ic = TRUE;		// Always ignore case
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC);
-    if (flags & (EW_NOERROR | EW_NOTWILD))
+    যদি (flags & (EW_NOERROR | EW_NOTWILD))
 	--emsg_silent;
     vim_free(pat);
 
-    if (regmatch.regprog == NULL && (flags & EW_NOTWILD) == 0)
+    যদি (regmatch.regprog == রিক্ত && (flags & EW_NOTWILD) == 0)
     {
 	vim_free(buf);
-	return 0;
+	প্রত্যাগম 0;
     }
 
     // remember the pattern or file name being looked for
@@ -3677,89 +3677,89 @@ dos_expandpath(
 
     // Only match against the alternate (8.3) file name when the pattern looks
     // like a short name, it contains a '~'.
-    use_short_name = vim_strchr(s, '~') != NULL;
+    use_short_name = vim_strchr(s, '~') != রিক্ত;
 
     len = (size_t)(s - buf);
     // If "**" is by itself, this is the first time we encounter it and more
     // is following then find matches without any directory.
-    if (!didstar && stardepth < 100 && starstar && e - s == 2
+    যদি (!didstar && stardepth < 100 && starstar && e - s == 2
 							  && *path_end == '/')
     {
-	vim_snprintf((char *)s, buflen - len, "%s", path_end + 1);
+	vim_snprintf((বর্ণ *)s, buflen - len, "%s", path_end + 1);
 	++stardepth;
-	(void)dos_expandpath(gap, buf, len, flags, TRUE);
+	(শূন্য)dos_expandpath(gap, buf, len, flags, TRUE);
 	--stardepth;
     }
 
     // Scan all files in the directory with "dir/ *.*"
-    vim_snprintf((char *)s, buflen - len, "*.*");
-    wn = enc_to_utf16(buf, NULL);
-    if (wn != NULL)
+    vim_snprintf((বর্ণ *)s, buflen - len, "*.*");
+    wn = enc_to_utf16(buf, রিক্ত);
+    যদি (wn != রিক্ত)
 	hFind = FindFirstFileW(wn, &wfb);
-    ok = (hFind != INVALID_HANDLE_VALUE);
+    ok = (hFind != INVALID_HANDLE_মান);
 
-    while (ok)
+    যাবত্ (ok)
     {
-	p = utf16_to_enc(wfb.cFileName, NULL);   // p is allocated here
+	p = utf16_to_enc(wfb.cFileName, রিক্ত);   // p is allocated here
 
-	if (p == NULL)
-	    break;  // out of memory
+	যদি (p == রিক্ত)
+	    ভঙ্গ;  // out of memory
 
 	// Do not use the alternate filename when the file name ends in '~',
 	// because it picks up backup files: short name for "foo.vim~" is
 	// "foo~1.vim", which matches "*.vim".
-	if (!use_short_name || *wfb.cAlternateFileName == NUL
+	যদি (!use_short_name || *wfb.cAlternateFileName == NUL
 						  || p[STRLEN(p) - 1] == '~')
-	    p_alt = NULL;
-	else
-	    p_alt = utf16_to_enc(wfb.cAlternateFileName, NULL);
+	    p_alt = রিক্ত;
+	অন্যথা
+	    p_alt = utf16_to_enc(wfb.cAlternateFileName, রিক্ত);
 
 	len = (size_t)(s - buf);
 	// Ignore entries starting with a dot, unless when asked for.  Accept
 	// all entries found with "matchname".
-	if ((p[0] != '.' || starts_with_dot
+	যদি ((p[0] != '.' || starts_with_dot
 			 || ((flags & EW_DODOT)
 			     && p[1] != NUL && (p[1] != '.' || p[2] != NUL)))
-		&& (matchname == NULL
-		  || (regmatch.regprog != NULL
+		&& (matchname == রিক্ত
+		  || (regmatch.regprog != রিক্ত
 		      && (vim_regexec(&regmatch, p, (colnr_T)0)
-			 || (p_alt != NULL
+			 || (p_alt != রিক্ত
 				&& vim_regexec(&regmatch, p_alt, (colnr_T)0))))
 		  || ((flags & EW_NOTWILD)
 		     && fnamencmp(path + len, p, e - s) == 0)))
 	{
-	    len += vim_snprintf((char *)s, buflen - len, "%s", p);
-	    if (len + 1 < buflen)
+	    len += vim_snprintf((বর্ণ *)s, buflen - len, "%s", p);
+	    যদি (len + 1 < buflen)
 	    {
-		if (starstar && stardepth < 100
+		যদি (starstar && stardepth < 100
 			  && (wfb.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 		{
 		    // For "**" in the pattern first go deeper in the tree to
 		    // find matches.
-		    vim_snprintf((char *)buf + len, buflen - len,
+		    vim_snprintf((বর্ণ *)buf + len, buflen - len,
 							    "/**%s", path_end);
 		    ++stardepth;
-		    (void)dos_expandpath(gap, buf, len + 1, flags, TRUE);
+		    (শূন্য)dos_expandpath(gap, buf, len + 1, flags, TRUE);
 		    --stardepth;
 		}
 
-		vim_snprintf((char *)buf + len, buflen - len, "%s", path_end);
-		if (mch_has_exp_wildcard(path_end))
+		vim_snprintf((বর্ণ *)buf + len, buflen - len, "%s", path_end);
+		যদি (mch_has_exp_wildcard(path_end))
 		{
-		    if (stardepth < 100)
+		    যদি (stardepth < 100)
 		    {
 			// need to expand another component of the path
 			// remove backslashes for the remaining components only
 			++stardepth;
-			(void)dos_expandpath(gap, buf, len + 1, flags, FALSE);
+			(শূন্য)dos_expandpath(gap, buf, len + 1, flags, FALSE);
 			--stardepth;
 		    }
 		}
-		else
+		অন্যথা
 		{
 		    // no more wildcards, check if there is a match
 		    // remove backslashes for the remaining components only
-		    if (*path_end != 0)
+		    যদি (*path_end != 0)
 			backslash_halve(buf + len + 1);
 		    // addfile() checks existence; do not stat the same path twice.
 		    // Even with EW_NOTFOUND, a literal suffix must exist.
@@ -3780,22 +3780,22 @@ dos_expandpath(
     vim_free(matchname);
 
     matches = gap->ga_len - start_len;
-    if (matches > 0)
+    যদি (matches > 0)
 	qsort(((char_u **)gap->ga_data) + start_len, (size_t)matches,
-						   sizeof(char_u *), pstrcmp);
-    return matches;
+						   পরিমাণ(char_u *), pstrcmp);
+    প্রত্যাগম matches;
 }
 #endif // MSWIN
 
-#if (defined(UNIX) && !defined(VMS)) || defined(USE_UNIXFILENAME)
+#যদি (defined(UNIX) && !defined(VMS)) || defined(USE_UNIXFILENAME)
 /*
  * Unix style wildcard expansion code.
  * It's here because it's used both for Unix and Mac.
  */
-    static int
-pstrcmp(const void *a, const void *b)
+    স্থির পূর্ণাঙ্ক
+pstrcmp(ধ্রুব শূন্য *a, ধ্রুব শূন্য *b)
 {
-    return (pathcmp(*(char **)a, *(char **)b, -1));
+    প্রত্যাগম (pathcmp(*(বর্ণ **)a, *(বর্ণ **)b, -1));
 }
 
 /*
@@ -3806,43 +3806,43 @@ pstrcmp(const void *a, const void *b)
  * Return the number of matches found.
  * NOTE: much of this is identical to dos_expandpath(), keep in sync!
  */
-    int
+    পূর্ণাঙ্ক
 unix_expandpath(
     garray_T	*gap,
     char_u	*path,
     size_t	wildoff,
-    int		flags,		// EW_* flags
-    int		didstar)	// expanded "**" once already
+    পূর্ণাঙ্ক		flags,		// EW_* flags
+    পূর্ণাঙ্ক		didstar)	// expanded "**" once already
 {
     char_u	*buf;
     char_u	*path_end;
     char_u	*p, *s, *e;
-    int		start_len = gap->ga_len;
+    পূর্ণাঙ্ক		start_len = gap->ga_len;
     char_u	*pat;
     regmatch_T	regmatch;
-    int		starts_with_dot;
-    int		matches;
+    পূর্ণাঙ্ক		starts_with_dot;
+    পূর্ণাঙ্ক		matches;
     size_t	buflen;
     size_t	len;
-    int		starstar = FALSE;
-    static int	stardepth = 0;	    // depth for "**" expansion
+    পূর্ণাঙ্ক		starstar = FALSE;
+    স্থির পূর্ণাঙ্ক	stardepth = 0;	    // depth for "**" expansion
 
     DIR		*dirp;
-    struct dirent *dp;
+    সংরচনা dirent *dp;
 
     // Expanding "**" may take a long time, check for CTRL-C.
-    if (stardepth > 0)
+    যদি (stardepth > 0)
     {
 	ui_breakcheck();
-	if (got_int)
-	    return 0;
+	যদি (got_int)
+	    প্রত্যাগম 0;
     }
 
     // Make room for file name (a bit too much to stay on the safe side).
     buflen = STRLEN(path) + MAXPATHL;
     buf = alloc(buflen);
-    if (buf == NULL)
-	return 0;
+    যদি (buf == রিক্ত)
+	প্রত্যাগম 0;
 
     /*
      * Find the first part in the path name that contains a wildcard.
@@ -3851,34 +3851,34 @@ unix_expandpath(
      */
     p = buf;
     s = buf;
-    e = NULL;
+    e = রিক্ত;
     path_end = path;
-    while (*path_end != NUL)
+    যাবত্ (*path_end != NUL)
     {
 	// May ignore a wildcard that has a backslash before it; it will
 	// be removed by rem_backslash() or file_pat_to_reg_pat() below.
-	if (path_end >= path + wildoff && rem_backslash(path_end))
+	যদি (path_end >= path + wildoff && rem_backslash(path_end))
 	    *p++ = *path_end++;
-	else if (*path_end == '/')
+	অন্যথা যদি (*path_end == '/')
 	{
-	    if (e != NULL)
-		break;
+	    যদি (e != রিক্ত)
+		ভঙ্গ;
 	    s = p + 1;
 	}
-	else if (path_end >= path + wildoff
-			 && (vim_strchr((char_u *)"*?[{~$", *path_end) != NULL
+	অন্যথা যদি (path_end >= path + wildoff
+			 && (vim_strchr((char_u *)"*?[{~$", *path_end) != রিক্ত
 			     || (!p_fic && (flags & EW_ICASE)
 					  && vim_isalpha(PTR2CHAR(path_end)))))
 	    e = p;
-	if (has_mbyte)
+	যদি (has_mbyte)
 	{
-	    int charlen = (*mb_ptr2len)(path_end);
+	    পূর্ণাঙ্ক charlen = (*mb_ptr2len)(path_end);
 
 	    STRNCPY(p, path_end, (size_t)charlen);
 	    p += charlen;
 	    path_end += charlen;
 	}
-	else
+	অন্যথা
 	    *p++ = *path_end++;
     }
     e = p;
@@ -3887,8 +3887,8 @@ unix_expandpath(
     // Now we have one wildcard component between "s" and "e".
     // Remove backslashes between "wildoff" and the start of the wildcard
     // component.
-    for (p = buf + wildoff; p < s; ++p)
-	if (rem_backslash(p))
+    প্রতি (p = buf + wildoff; p < s; ++p)
+	যদি (rem_backslash(p))
 	{
 	    STRMOVE(p, p + 1);
 	    --e;
@@ -3896,108 +3896,108 @@ unix_expandpath(
 	}
 
     // Check for "**" between "s" and "e".
-    for (p = s; p < e; ++p)
-	if (p[0] == '*' && p[1] == '*')
+    প্রতি (p = s; p < e; ++p)
+	যদি (p[0] == '*' && p[1] == '*')
 	    starstar = TRUE;
 
     // convert the file pattern to a regexp pattern
     starts_with_dot = *s == '.';
-    pat = file_pat_to_reg_pat(s, e, NULL, FALSE);
-    if (pat == NULL)
+    pat = file_pat_to_reg_pat(s, e, রিক্ত, FALSE);
+    যদি (pat == রিক্ত)
     {
 	vim_free(buf);
-	return 0;
+	প্রত্যাগম 0;
     }
 
     // compile the regexp into a program
-    if (flags & EW_ICASE)
+    যদি (flags & EW_ICASE)
 	regmatch.rm_ic = TRUE;		// 'wildignorecase' set
-    else
+    অন্যথা
 	regmatch.rm_ic = p_fic;	// ignore case when 'fileignorecase' is set
-    if (flags & (EW_NOERROR | EW_NOTWILD))
+    যদি (flags & (EW_NOERROR | EW_NOTWILD))
 	++emsg_silent;
     regmatch.regprog = vim_regcomp(pat, RE_MAGIC);
-    if (flags & (EW_NOERROR | EW_NOTWILD))
+    যদি (flags & (EW_NOERROR | EW_NOTWILD))
 	--emsg_silent;
     vim_free(pat);
 
-    if (regmatch.regprog == NULL && (flags & EW_NOTWILD) == 0)
+    যদি (regmatch.regprog == রিক্ত && (flags & EW_NOTWILD) == 0)
     {
 	vim_free(buf);
-	return 0;
+	প্রত্যাগম 0;
     }
 
     len = (size_t)(s - buf);
     // If "**" is by itself, this is the first time we encounter it and more
     // is following then find matches without any directory.
-    if (!didstar && stardepth < 100 && starstar && e - s == 2
+    যদি (!didstar && stardepth < 100 && starstar && e - s == 2
 							  && *path_end == '/')
     {
-	vim_snprintf((char *)s, buflen - len, "%s", path_end + 1);
+	vim_snprintf((বর্ণ *)s, buflen - len, "%s", path_end + 1);
 	++stardepth;
-	(void)unix_expandpath(gap, buf, len, flags, TRUE);
+	(শূন্য)unix_expandpath(gap, buf, len, flags, TRUE);
 	--stardepth;
     }
 
     // open the directory for scanning
     *s = NUL;
-    dirp = opendir(*buf == NUL ? "." : (char *)buf);
+    dirp = opendir(*buf == NUL ? "." : (বর্ণ *)buf);
 
     // Find all matching entries
-    if (dirp != NULL)
+    যদি (dirp != রিক্ত)
     {
-	while (!got_int)
+	যাবত্ (!got_int)
 	{
 	    dp = readdir(dirp);
-	    if (dp == NULL)
-		break;
+	    যদি (dp == রিক্ত)
+		ভঙ্গ;
 	    len = (size_t)(s - buf);
-	    if ((dp->d_name[0] != '.' || starts_with_dot
+	    যদি ((dp->d_name[0] != '.' || starts_with_dot
 			|| ((flags & EW_DODOT)
 			    && dp->d_name[1] != NUL
 			    && (dp->d_name[1] != '.' || dp->d_name[2] != NUL)))
-		 && ((regmatch.regprog != NULL && vim_regexec(&regmatch,
+		 && ((regmatch.regprog != রিক্ত && vim_regexec(&regmatch,
 					     (char_u *)dp->d_name, (colnr_T)0))
 		   || ((flags & EW_NOTWILD)
 		     && fnamencmp(path + len, dp->d_name, e - s) == 0)))
 	    {
-		len += vim_snprintf((char *)s, buflen - len, "%s", dp->d_name);
-		if (len + 1 >= buflen)
-		    continue;
+		len += vim_snprintf((বর্ণ *)s, buflen - len, "%s", dp->d_name);
+		যদি (len + 1 >= buflen)
+		    অনুবর্ত;
 
-		if (starstar && stardepth < 100)
+		যদি (starstar && stardepth < 100)
 		{
 		    // For "**" in the pattern first go deeper in the tree to
 		    // find matches.
-		    vim_snprintf((char *)buf + len, buflen - len,
+		    vim_snprintf((বর্ণ *)buf + len, buflen - len,
 							    "/**%s", path_end);
 		    ++stardepth;
-		    (void)unix_expandpath(gap, buf, len + 1, flags, TRUE);
+		    (শূন্য)unix_expandpath(gap, buf, len + 1, flags, TRUE);
 		    --stardepth;
 		}
 
-		vim_snprintf((char *)buf + len, buflen - len, "%s", path_end);
-		if (mch_has_exp_wildcard(path_end)) // handle more wildcards
+		vim_snprintf((বর্ণ *)buf + len, buflen - len, "%s", path_end);
+		যদি (mch_has_exp_wildcard(path_end)) // handle more wildcards
 		{
-		    if (stardepth < 100)
+		    যদি (stardepth < 100)
 		    {
 			// need to expand another component of the path
 			// remove backslashes for the remaining components only
 			++stardepth;
-			(void)unix_expandpath(gap, buf, len + 1, flags, FALSE);
+			(শূন্য)unix_expandpath(gap, buf, len + 1, flags, FALSE);
 			--stardepth;
 		    }
 		}
-		else
+		অন্যথা
 		{
 		    stat_T  sb;
 
 		    // no more wildcards, check if there is a match
 		    // remove backslashes for the remaining components only
-		    if (*path_end != NUL)
+		    যদি (*path_end != NUL)
 			backslash_halve(buf + len + 1);
 		    // add existing file or symbolic link
-		    if ((flags & EW_ALLLINKS) ? mch_lstat((char *)buf, &sb) >= 0
+		    যদি ((flags & EW_ALLLINKS) ? mch_lstat((বর্ণ *)buf, &sb) >= 0
 						      : mch_getperm(buf) >= 0)
 		    {
 # ifdef MACOS_CONVERT
@@ -4005,7 +4005,7 @@ unix_expandpath(
 			char_u *precomp_buf =
 			    mac_precompose_path(buf, precomp_len, &precomp_len);
 
-			if (precomp_buf)
+			যদি (precomp_buf)
 			{
 			    mch_memmove(buf, precomp_buf, precomp_len);
 			    vim_free(precomp_buf);
@@ -4026,10 +4026,10 @@ unix_expandpath(
     // When interrupted the matches probably won't be used and sorting can be
     // slow, thus skip it.
     matches = gap->ga_len - start_len;
-    if (matches > 0 && !got_int)
+    যদি (matches > 0 && !got_int)
 	qsort(((char_u **)gap->ga_data) + start_len, matches,
-						   sizeof(char_u *), pstrcmp);
-    return matches;
+						   পরিমাণ(char_u *), pstrcmp);
+    প্রত্যাগম matches;
 }
 #endif
 
@@ -4037,23 +4037,23 @@ unix_expandpath(
  * Return TRUE if "p" contains what looks like an environment variable.
  * Allowing for escaping.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 has_env_var(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    প্রতি ( ; *p; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	যদি (*p == '\\' && p[1] != NUL)
 	    ++p;
-	else if (vim_strchr((char_u *)
-#if defined(MSWIN)
+	অন্যথা যদি (vim_strchr((char_u *)
+#যদি defined(MSWIN)
 				    "$%"
-#else
+#অন্যথা
 				    "$"
 #endif
-					, *p) != NULL)
-	    return TRUE;
+					, *p) != রিক্ত)
+	    প্রত্যাগম TRUE;
     }
-    return FALSE;
+    প্রত্যাগম FALSE;
 }
 
 #ifdef SPECIAL_WILDCHAR
@@ -4061,29 +4061,29 @@ has_env_var(char_u *p)
  * Return TRUE if "p" contains a special wildcard character, one that Vim
  * cannot expand, requires using a shell.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 has_special_wildchar(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    প্রতি ( ; *p; MB_PTR_ADV(p))
     {
 	// Disallow line break characters.
-	if (*p == '\r' || *p == '\n')
-	    break;
+	যদি (*p == '\r' || *p == '\n')
+	    ভঙ্গ;
 	// Allow for escaping.
-	if (*p == '\\' && p[1] != NUL && p[1] != '\r' && p[1] != '\n')
+	যদি (*p == '\\' && p[1] != NUL && p[1] != '\r' && p[1] != '\n')
 	    ++p;
-	else if (vim_strchr((char_u *)SPECIAL_WILDCHAR, *p) != NULL)
+	অন্যথা যদি (vim_strchr((char_u *)SPECIAL_WILDCHAR, *p) != রিক্ত)
 	{
 	    // A { must be followed by a matching }.
-	    if (*p == '{' && vim_strchr(p, '}') == NULL)
-		continue;
+	    যদি (*p == '{' && vim_strchr(p, '}') == রিক্ত)
+		অনুবর্ত;
 	    // A quote and backtick must be followed by another one.
-	    if ((*p == '`' || *p == '\'') && vim_strchr(p, *p) == NULL)
-		continue;
-	    return TRUE;
+	    যদি ((*p == '`' || *p == '\'') && vim_strchr(p, *p) == রিক্ত)
+		অনুবর্ত;
+	    প্রত্যাগম TRUE;
 	}
     }
-    return FALSE;
+    প্রত্যাগম FALSE;
 }
 #endif
 
@@ -4098,21 +4098,21 @@ has_special_wildchar(char_u *p)
  * Return OK when some files found.  "num_file" is set to the number of
  * matches, "file" to the array of matches.  Call FreeWild() later.
  */
-    int
+    পূর্ণাঙ্ক
 gen_expand_wildcards(
-    int		num_pat,	// number of input patterns
+    পূর্ণাঙ্ক		অঙ্ক_pat,	// number of input patterns
     char_u	**pat,		// array of input patterns
-    int		*num_file,	// resulting number of files
+    পূর্ণাঙ্ক		*অঙ্ক_file,	// resulting number of files
     char_u	***file,	// array of resulting files
-    int		flags)		// EW_* flags
+    পূর্ণাঙ্ক		flags)		// EW_* flags
 {
-    int			i;
+    পূর্ণাঙ্ক			i;
     garray_T		ga;
     char_u		*p;
-    static int		recursive = FALSE;
-    int			add_pat;
-    int			retval = OK;
-    int			did_expand_in_path = FALSE;
+    স্থির পূর্ণাঙ্ক		recursive = FALSE;
+    পূর্ণাঙ্ক			add_pat;
+    পূর্ণাঙ্ক			retval = OK;
+    পূর্ণাঙ্ক			did_expand_in_path = FALSE;
     char_u		*path_option = *curbuf->b_p_path == NUL ?
 					p_path : curbuf->b_p_path;
 
@@ -4122,11 +4122,11 @@ gen_expand_wildcards(
      * call the machine specific expansion function, if possible.  Otherwise,
      * return FAIL.
      */
-    if (recursive)
+    যদি (recursive)
 #ifdef SPECIAL_WILDCHAR
-	return mch_expand_wildcards(num_pat, pat, num_file, file, flags);
-#else
-	return FAIL;
+	প্রত্যাগম mch_expand_wildcards(অঙ্ক_pat, pat, অঙ্ক_file, file, flags);
+#অন্যথা
+	প্রত্যাগম FAIL;
 #endif
 
 #ifdef SPECIAL_WILDCHAR
@@ -4136,12 +4136,12 @@ gen_expand_wildcards(
      * avoids starting the shell for each argument separately.
      * For `=expr` do use the internal function.
      */
-    for (i = 0; i < num_pat; i++)
+    প্রতি (i = 0; i < অঙ্ক_pat; i++)
     {
-	if (has_special_wildchar(pat[i])
+	যদি (has_special_wildchar(pat[i])
 		&& !(vim_backtick(pat[i]) && pat[i][1] == '=')
 	   )
-	    return mch_expand_wildcards(num_pat, pat, num_file, file, flags);
+	    প্রত্যাগম mch_expand_wildcards(অঙ্ক_pat, pat, অঙ্ক_file, file, flags);
     }
 #endif
 
@@ -4150,28 +4150,28 @@ gen_expand_wildcards(
     /*
      * The matching file names are stored in a growarray.  Init it empty.
      */
-    ga_init2(&ga, sizeof(char_u *), 30);
+    ga_init2(&ga, পরিমাণ(char_u *), 30);
 
-    for (i = 0; i < num_pat && !got_int; ++i)
+    প্রতি (i = 0; i < অঙ্ক_pat && !got_int; ++i)
     {
 	add_pat = -1;
 	p = pat[i];
 
-	if (vim_backtick(p))
+	যদি (vim_backtick(p))
 	{
 	    add_pat = expand_backtick(&ga, p, flags);
-	    if (add_pat == -1)
+	    যদি (add_pat == -1)
 		retval = FAIL;
 	}
-	else
+	অন্যথা
 	{
 	    /*
 	     * First expand environment variables, "~/" and "~user/".
 	     */
-	    if ((has_env_var(p) && !(flags & EW_NOTENV)) || *p == '~')
+	    যদি ((has_env_var(p) && !(flags & EW_NOTENV)) || *p == '~')
 	    {
 		p = expand_env_save_opt(p, TRUE, (char_u *)PATH_ESC_WILDCARDS);
-		if (p == NULL)
+		যদি (p == রিক্ত)
 		    p = pat[i];
 #ifdef UNIX
 		/*
@@ -4179,14 +4179,14 @@ gen_expand_wildcards(
 		 * variable, use the shell to do that.  Discard previously
 		 * found file names and start all over again.
 		 */
-		else if (has_env_var(p) || *p == '~')
+		অন্যথা যদি (has_env_var(p) || *p == '~')
 		{
 		    vim_free(p);
 		    ga_clear_strings(&ga);
-		    i = mch_expand_wildcards(num_pat, pat, num_file, file,
+		    i = mch_expand_wildcards(অঙ্ক_pat, pat, অঙ্ক_file, file,
 							 flags|EW_KEEPDOLLAR);
 		    recursive = FALSE;
-		    return i;
+		    প্রত্যাগম i;
 		}
 #endif
 	    }
@@ -4198,9 +4198,9 @@ gen_expand_wildcards(
 	     * Otherwise: Add the file name if it exists or when EW_NOTFOUND is
 	     * given.
 	     */
-	    if (mch_has_exp_wildcard(p) || (flags & EW_ICASE))
+	    যদি (mch_has_exp_wildcard(p) || (flags & EW_ICASE))
 	    {
-		if ((flags & (EW_PATH | EW_CDPATH))
+		যদি ((flags & (EW_PATH | EW_CDPATH))
 			&& !mch_isFullName(p)
 			&& !(p[0] == '.'
 			    && (vim_ispathsep(p[1])
@@ -4214,43 +4214,43 @@ gen_expand_wildcards(
 		    recursive = TRUE;
 		    did_expand_in_path = TRUE;
 		}
-		else
+		অন্যথা
 		    add_pat = mch_expandpath(&ga, p, flags);
 	    }
 	}
 
-	if (add_pat == -1 || (add_pat == 0 && (flags & EW_NOTFOUND)))
+	যদি (add_pat == -1 || (add_pat == 0 && (flags & EW_NOTFOUND)))
 	{
 	    char_u	*t = backslash_halve_save(p);
 
 	    // When EW_NOTFOUND is used, always add files and dirs.  Makes
 	    // "vim c:/" work.
-	    if (flags & EW_NOTFOUND)
+	    যদি (flags & EW_NOTFOUND)
 		addfile(&ga, t, flags | EW_DIR | EW_FILE);
-	    else
+	    অন্যথা
 		addfile(&ga, t, flags);
 
-	    if (t != p)
+	    যদি (t != p)
 		vim_free(t);
 	}
 
-	if (did_expand_in_path && ga.ga_len > 0 && (flags & (EW_PATH | EW_CDPATH)))
+	যদি (did_expand_in_path && ga.ga_len > 0 && (flags & (EW_PATH | EW_CDPATH)))
 	    uniquefy_paths(&ga, p, path_option);
-	if (p != pat[i])
+	যদি (p != pat[i])
 	    vim_free(p);
     }
 
     // When returning FAIL the array must be freed here.
-    if (retval == FAIL)
+    যদি (retval == FAIL)
 	ga_clear_strings(&ga);
 
-    *num_file = ga.ga_len;
-    *file = (ga.ga_data != NULL) ? (char_u **)ga.ga_data
+    *অঙ্ক_file = ga.ga_len;
+    *file = (ga.ga_data != রিক্ত) ? (char_u **)ga.ga_data
 						  : (char_u **)_("no matches");
 
     recursive = FALSE;
 
-    return ((flags & EW_EMPTYOK) || ga.ga_data != NULL) ? retval : FAIL;
+    প্রত্যাগম ((flags & EW_EMPTYOK) || ga.ga_data != রিক্ত) ? retval : FAIL;
 }
 
 /*
@@ -4262,58 +4262,58 @@ gen_expand_wildcards(
  * EW_ADDSLASH	add slash after directory name
  * EW_ALLLINKS	add symlink also when the referred file does not exist
  */
-    void
+    শূন্য
 addfile(
     garray_T	*gap,
     char_u	*f,	// filename
-    int		flags)
+    পূর্ণাঙ্ক		flags)
 {
     char_u	*p;
-    int		isdir;
+    পূর্ণাঙ্ক		isdir;
     stat_T	sb;
 
 #ifdef MSWIN
-    if (!(flags & (EW_NOTFOUND | EW_ALLLINKS)))
+    যদি (!(flags & (EW_NOTFOUND | EW_ALLLINKS)))
     {
 	long perm = mch_getperm(f);
 
-	if (perm < 0)
-	    return;
+	যদি (perm < 0)
+	    প্রত্যাগম;
 	// The stat result already tells us whether this is a directory.
 	isdir = (perm & S_IFMT) == S_IFDIR;
     }
-    else
+    অন্যথা
 #endif
     {
 	// if the file/dir/link doesn't exist, may not add it
-	if (!(flags & EW_NOTFOUND) && ((flags & EW_ALLLINKS)
-		    ? mch_lstat((char *)f, &sb) < 0 : mch_getperm(f) < 0))
-	    return;
+	যদি (!(flags & EW_NOTFOUND) && ((flags & EW_ALLLINKS)
+		    ? mch_lstat((বর্ণ *)f, &sb) < 0 : mch_getperm(f) < 0))
+	    প্রত্যাগম;
 	isdir = mch_isdir(f);
     }
 
 #ifdef FNAME_ILLEGAL
     // if the file/dir contains illegal characters, don't add it
-    if (vim_strpbrk(f, (char_u *)FNAME_ILLEGAL) != NULL)
-	return;
+    যদি (vim_strpbrk(f, (char_u *)FNAME_ILLEGAL) != রিক্ত)
+	প্রত্যাগম;
 #endif
 
-    if ((isdir && !(flags & EW_DIR)) || (!isdir && !(flags & EW_FILE)))
-	return;
+    যদি ((isdir && !(flags & EW_DIR)) || (!isdir && !(flags & EW_FILE)))
+	প্রত্যাগম;
 
     // If the file isn't executable, may not add it.  Do accept directories.
     // When invoked from expand_shellcmd() do not use $PATH.
-    if (!isdir && (flags & EW_EXEC)
-			     && !mch_can_exe(f, NULL, !(flags & EW_SHELLCMD)))
-	return;
+    যদি (!isdir && (flags & EW_EXEC)
+			     && !mch_can_exe(f, রিক্ত, !(flags & EW_SHELLCMD)))
+	প্রত্যাগম;
 
     // Make room for another item in the file list.
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    যদি (ga_grow(gap, 1) == FAIL)
+	প্রত্যাগম;
 
     p = alloc(STRLEN(f) + 1 + isdir);
-    if (p == NULL)
-	return;
+    যদি (p == রিক্ত)
+	প্রত্যাগম;
 
     STRCPY(p, f);
 #ifdef BACKSLASH_IN_FILENAME
@@ -4322,7 +4322,7 @@ addfile(
     /*
      * Append a slash or backslash after directory names if none is present.
      */
-    if (isdir && (flags & EW_ADDSLASH))
+    যদি (isdir && (flags & EW_ADDSLASH))
 	add_pathsep(p);
     ((char_u **)gap->ga_data)[gap->ga_len++] = p;
 }
@@ -4331,13 +4331,13 @@ addfile(
  * Free the list of files returned by expand_wildcards() or other expansion
  * functions.
  */
-    void
-FreeWild(int count, char_u **files)
+    শূন্য
+FreeWild(পূর্ণাঙ্ক গুনতি, char_u **files)
 {
-    if (count <= 0 || files == NULL)
-	return;
-    while (count--)
-	vim_free(files[count]);
+    যদি (গুনতি <= 0 || files == রিক্ত)
+	প্রত্যাগম;
+    যাবত্ (গুনতি--)
+	vim_free(files[গুনতি]);
     vim_free(files);
 }
 
@@ -4346,36 +4346,36 @@ FreeWild(int count, char_u **files)
  * If "maxlen" >= 0 compare "p[maxlen]" to "q[maxlen]"
  * Return value like strcmp(p, q), but consider path separators.
  */
-    int
-pathcmp(const char *p, const char *q, int maxlen)
+    পূর্ণাঙ্ক
+pathcmp(ধ্রুব বর্ণ *p, ধ্রুব বর্ণ *q, পূর্ণাঙ্ক maxlen)
 {
-    int		i, j;
-    int		c1, c2;
-    const char	*s = NULL;
+    পূর্ণাঙ্ক		i, j;
+    পূর্ণাঙ্ক		c1, c2;
+    ধ্রুব বর্ণ	*s = রিক্ত;
 
-    for (i = 0, j = 0; maxlen < 0 || (i < maxlen && j < maxlen);)
+    প্রতি (i = 0, j = 0; maxlen < 0 || (i < maxlen && j < maxlen);)
     {
 	c1 = PTR2CHAR((char_u *)p + i);
 	c2 = PTR2CHAR((char_u *)q + j);
 
 	// End of "p": check if "q" also ends or just has a slash.
-	if (c1 == NUL)
+	যদি (c1 == NUL)
 	{
-	    if (c2 == NUL)  // full match
-		return 0;
+	    যদি (c2 == NUL)  // full match
+		প্রত্যাগম 0;
 	    s = q;
 	    i = j;
-	    break;
+	    ভঙ্গ;
 	}
 
 	// End of "q": check if "p" just has a slash.
-	if (c2 == NUL)
+	যদি (c2 == NUL)
 	{
 	    s = p;
-	    break;
+	    ভঙ্গ;
 	}
 
-	if ((p_fic ? MB_TOUPPER(c1) != MB_TOUPPER(c2) : c1 != c2)
+	যদি ((p_fic ? MB_TOUPPER(c1) != MB_TOUPPER(c2) : c1 != c2)
 #ifdef BACKSLASH_IN_FILENAME
 		// consider '/' and '\\' to be equal
 		&& !((c1 == '/' && c2 == '\\')
@@ -4383,45 +4383,45 @@ pathcmp(const char *p, const char *q, int maxlen)
 #endif
 		)
 	{
-	    if (vim_ispathsep(c1))
-		return -1;
-	    if (vim_ispathsep(c2))
-		return 1;
-	    return p_fic ? MB_TOUPPER(c1) - MB_TOUPPER(c2)
+	    যদি (vim_ispathsep(c1))
+		প্রত্যাগম -1;
+	    যদি (vim_ispathsep(c2))
+		প্রত্যাগম 1;
+	    প্রত্যাগম p_fic ? MB_TOUPPER(c1) - MB_TOUPPER(c2)
 		    : c1 - c2;  // no match
 	}
 
 	i += mb_ptr2len((char_u *)p + i);
 	j += mb_ptr2len((char_u *)q + j);
     }
-    if (s == NULL)	// "i" or "j" ran into "maxlen"
-	return 0;
+    যদি (s == রিক্ত)	// "i" or "j" ran into "maxlen"
+	প্রত্যাগম 0;
 
     c1 = PTR2CHAR((char_u *)s + i);
     c2 = PTR2CHAR((char_u *)s + i + mb_ptr2len((char_u *)s + i));
     // ignore a trailing slash, but not "//" or ":/"
-    if (c2 == NUL
+    যদি (c2 == NUL
 	    && i > 0
 	    && !after_pathsep((char_u *)s, (char_u *)s + i)
 #ifdef BACKSLASH_IN_FILENAME
 	    && (c1 == '/' || c1 == '\\')
-#else
+#অন্যথা
 	    && c1 == '/'
 #endif
        )
-	return 0;   // match with trailing slash
-    if (s == q)
-	return -1;	    // no match
-    return 1;
+	প্রত্যাগম 0;   // match with trailing slash
+    যদি (s == q)
+	প্রত্যাগম -1;	    // no match
+    প্রত্যাগম 1;
 }
 
 /*
  * Return TRUE if "name" is a full (absolute) path name or URL.
  */
-    int
+    পূর্ণাঙ্ক
 vim_isAbsName(char_u *name)
 {
-    return (path_with_url(name) != 0 || mch_isFullName(name));
+    প্রত্যাগম (path_with_url(name) != 0 || mch_isFullName(name));
 }
 
 /*
@@ -4429,30 +4429,30 @@ vim_isAbsName(char_u *name)
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    পূর্ণাঙ্ক
 vim_FullName(
     char_u	*fname,
     char_u	*buf,
-    int		len,
-    int		force)	    // force expansion even when already absolute
+    পূর্ণাঙ্ক		len,
+    পূর্ণাঙ্ক		force)	    // force expansion even when already absolute
 {
-    int		retval = OK;
-    int		url;
+    পূর্ণাঙ্ক		retval = OK;
+    পূর্ণাঙ্ক		url;
 
     *buf = NUL;
-    if (fname == NULL)
-	return FAIL;
+    যদি (fname == রিক্ত)
+	প্রত্যাগম FAIL;
 
     url = path_with_url(fname);
-    if (!url)
+    যদি (!url)
 	retval = mch_FullName(fname, buf, len, force);
-    if (url || retval == FAIL)
+    যদি (url || retval == FAIL)
     {
 	// something failed; use the file name (truncate when too long)
 	vim_strncpy(buf, fname, len - 1);
     }
-#if defined(MSWIN)
+#যদি defined(MSWIN)
     slash_adjust(buf);
 #endif
-    return retval;
+    প্রত্যাগম retval;
 }

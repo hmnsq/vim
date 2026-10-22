@@ -6,7 +6,7 @@
  */
 
 // nv_cmd_idx[<normal mode command character>] => nv_cmds[] index
-static const unsigned short nv_cmd_idx[] =
+স্থির ধ্রুব unsigned short nv_cmd_idx[] =
 {
   /*     0 */   0,
   /*     1 */   1,
@@ -206,4 +206,4 @@ static const unsigned short nv_cmd_idx[] =
 
 // The highest index for which
 // nv_cmds[idx].cmd_char == nv_cmd_idx[nv_cmds[idx].cmd_char]
-static const int nv_max_linear = 126;
+স্থির ধ্রুব পূর্ণাঙ্ক nv_max_linear = 126;

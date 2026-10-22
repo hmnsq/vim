@@ -1,30 +1,30 @@
-#include "vterm_internal.h"
+#অন্তর্ভাব "vterm_internal.h"
 
-#include "utf8.h"
+#অন্তর্ভাব "utf8.h"
 
-static void output_mouse(VTermState *state, int code, int pressed, int modifiers, int col, int row)
+স্থির শূন্য output_mouse(VTermState *state, পূর্ণাঙ্ক code, পূর্ণাঙ্ক pressed, পূর্ণাঙ্ক modifiers, পূর্ণাঙ্ক col, পূর্ণাঙ্ক row)
 {
   modifiers <<= 2;
 
-  switch(state->mouse_protocol) {
-  case MOUSE_X10:
-    if(col + 0x21 > 0xff)
+  বিকল্প(state->mouse_protocol) {
+  পক্ষ MOUSE_X10:
+    যদি(col + 0x21 > 0xff)
       col = 0xff - 0x21;
-    if(row + 0x21 > 0xff)
+    যদি(row + 0x21 > 0xff)
       row = 0xff - 0x21;
 
-    if(!pressed)
+    যদি(!pressed)
       code = 3;
 
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "M%c%c%c",
+    vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, "M%c%c%c",
         (code | modifiers) + 0x20, col + 0x21, row + 0x21);
-    break;
+    ভঙ্গ;
 
-  case MOUSE_UTF8:
+  পক্ষ MOUSE_UTF8:
     {
-      char utf8[18]; size_t len = 0;
+      বর্ণ utf8[18]; size_t len = 0;
 
-      if(!pressed)
+      যদি(!pressed)
         code = 3;
 
       len += fill_utf8((code | modifiers) + 0x20, utf8 + len);
@@ -32,70 +32,70 @@ static void output_mouse(VTermState *state, int code, int pressed, int modifiers
       len += fill_utf8(row + 0x21, utf8 + len);
       utf8[len] = 0;
 
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "M%s", utf8);
+      vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, "M%s", utf8);
     }
-    break;
+    ভঙ্গ;
 
-  case MOUSE_SGR:
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "<%d;%d;%d%c",
+  পক্ষ MOUSE_SGR:
+    vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, "<%d;%d;%d%c",
         code | modifiers, col + 1, row + 1, pressed ? 'M' : 'm');
-    break;
+    ভঙ্গ;
 
-  case MOUSE_RXVT:
-    if(!pressed)
+  পক্ষ MOUSE_RXVT:
+    যদি(!pressed)
       code = 3;
 
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "%d;%d;%dM",
+    vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, "%d;%d;%dM",
         code | modifiers, col + 1, row + 1);
-    break;
+    ভঙ্গ;
   }
 }
 
-void vterm_mouse_move(VTerm *vt, int row, int col, VTermModifier mod)
+শূন্য vterm_mouse_move(VTerm *vt, পূর্ণাঙ্ক row, পূর্ণাঙ্ক col, VTermModifier mod)
 {
   VTermState *state = vt->state;
 
-  if(col == state->mouse_col && row == state->mouse_row)
-    return;
+  যদি(col == state->mouse_col && row == state->mouse_row)
+    প্রত্যাগম;
 
   state->mouse_col = col;
   state->mouse_row = row;
 
-  if((state->mouse_flags & MOUSE_WANT_DRAG && state->mouse_buttons) ||
+  যদি((state->mouse_flags & MOUSE_WANT_DRAG && state->mouse_buttons) ||
      (state->mouse_flags & MOUSE_WANT_MOVE)) {
-    int button = state->mouse_buttons & MOUSE_BUTTON_LEFT ? 1 :
-                 state->mouse_buttons & MOUSE_BUTTON_MIDDLE ? 2 :
-                 state->mouse_buttons & MOUSE_BUTTON_RIGHT ? 3 : 4;
+    পূর্ণাঙ্ক button = state->mouse_buttons & MOUSE_BUTTON_বাম ? 1 :
+                 state->mouse_buttons & MOUSE_BUTTON_মধ্য ? 2 :
+                 state->mouse_buttons & MOUSE_BUTTON_ডান ? 3 : 4;
     output_mouse(state, button-1 + 0x20, 1, mod, col, row);
   }
 }
 
-void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod)
+শূন্য vterm_mouse_button(VTerm *vt, পূর্ণাঙ্ক button, পূর্ণাঙ্ক pressed, VTermModifier mod)
 {
   VTermState *state = vt->state;
 
-  int old_buttons = state->mouse_buttons;
+  পূর্ণাঙ্ক old_buttons = state->mouse_buttons;
 
-  if(button > 0 && button <= 3) {
-    if(pressed)
+  যদি(button > 0 && button <= 3) {
+    যদি(pressed)
       state->mouse_buttons |= (1 << (button-1));
-    else
+    অন্যথা
       state->mouse_buttons &= ~(1 << (button-1));
   }
 
   /* Most of the time we don't get button releases from 4/5/6/7 */
-  if(state->mouse_buttons == old_buttons && button < 4)
-    return;
-  if (!(state->mouse_flags & MOUSE_WANT_CLICK))
-    return;
+  যদি(state->mouse_buttons == old_buttons && button < 4)
+    প্রত্যাগম;
+  যদি (!(state->mouse_flags & MOUSE_WANT_CLICK))
+    প্রত্যাগম;
 
-  if(!state->mouse_flags)
-    return;
+  যদি(!state->mouse_flags)
+    প্রত্যাগম;
 
-  if(button < 4) {
+  যদি(button < 4) {
     output_mouse(state, button-1, pressed, mod, state->mouse_col, state->mouse_row);
   }
-  else if(button < 8) {
+  অন্যথা যদি(button < 8) {
     output_mouse(state, button-4 + 0x40, pressed, mod, state->mouse_col, state->mouse_row);
   }
 }

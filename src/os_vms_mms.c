@@ -1,68 +1,68 @@
-#include	<stdio.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<unixio.h>
-#include	"vim.h"
-int main(int argc, char *argv[])
+#অন্তর্ভাব	<stdio.h>
+#অন্তর্ভাব	<stdlib.h>
+#অন্তর্ভাব	<string.h>
+#অন্তর্ভাব	<unixio.h>
+#অন্তর্ভাব	"vim.h"
+পূর্ণাঙ্ক main(পূর্ণাঙ্ক argc, বর্ণ *argv[])
 {
     FILE	*fpi, *fpo;
-    char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    বর্ণ	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
+    পূর্ণাঙ্ক		err = 0, err_সারি = 0;
 
     mms = "mms";
     argc--;
     argv++;
-    while (argc-- > 0)
+    যাবত্ (argc-- > 0)
     {
 	argp = *argv++;
-	if (*argp == '-')
+	যদি (*argp == '-')
 	{
-	    switch (*++argp)
+	    বিকল্প (*++argp)
 	    {
-		case 'm':
+		পক্ষ 'm':
 		    mms = ++argp;
-		    break;
-		case 'e':
-		    if (!*(error_file = ++argp))
+		    ভঙ্গ;
+		পক্ষ 'e':
+		    যদি (!*(error_file = ++argp))
 		    {
 			error_file = *argv++;
 			argc--;
 		    }
-		    break;
-		default:
-		    break;
+		    ভঙ্গ;
+		স্বভাব:
+		    ভঙ্গ;
 	    }
 	}
-	else
+	অন্যথা
 	{
-	    if (*target)
+	    যদি (*target)
 		strcat(target, " ");
 	    strcat(target, argp);
 	}
     }
-    vim_snprintf(cmd, sizeof(cmd), "%s/output=tmp:errors.vim_tmp %s",
+    vim_snprintf(cmd, পরিমাণ(cmd), "%s/output=tmp:errors.vim_tmp %s",
 								 mms, target);
     system(cmd);
     fpi = fopen("tmp:errors.vim_tmp", "r");
     fpo = fopen(error_file, "w");
-    while (fgets(buf, BUFSIZ, fpi))
+    যাবত্ (fgets(buf, BUFSIZ, fpi))
     {
-	if (!memcmp(buf, "%CC-", 4))
+	যদি (!memcmp(buf, "%CC-", 4))
 	{
-	    err_line++;
+	    err_সারি++;
 	    buf[strlen(buf)-1] = '\0';
 	    err++;
 	}
-	else
+	অন্যথা
 	{
-	    if (err_line)
+	    যদি (err_সারি)
 	    {
-		if (strstr(buf, _("At line")))
+		যদি (strstr(buf, _("At line")))
 		{
-		    err_line = 0;
+		    err_সারি = 0;
 		    fprintf(fpo, "@");
 		}
-		else
+		অন্যথা
 		    buf[strlen(buf)-1] = '\0';
 	    }
 	}
@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
     }
     fclose(fpi);
     fclose(fpo);
-    while (!delete("tmp:errors.vim_tmp"))
+    যাবত্ (!delete("tmp:errors.vim_tmp"))
 	/*nop*/;
     exit(err ? 44 : 1);
-    return(0);
+    প্রত্যাগম(0);
 }

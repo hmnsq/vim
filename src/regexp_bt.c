@@ -241,20 +241,20 @@
 #define HASLOOKBH	0x10	// Contains "\@<=" or "\@<!".
 #define WORST		0	// Worst case.
 
-static int	num_complex_braces; // Complex \{...} count
-static char_u	*regcode;	// Code-emit pointer, or JUST_CALC_SIZE
-static long	regsize;	// Code size.
-static int	reg_toolong;	// TRUE when offset out of range
-static int	bt_reg_parse_depth;	// nesting depth in reg()
-static char_u	had_endbrace[NSUBEXP];	// flags, TRUE if end of () found
-static long	brace_min[10];	// Minimums for complex brace repeats
-static long	brace_max[10];	// Maximums for complex brace repeats
-static int	brace_count[10]; // Current counts for complex brace repeats
-static int	one_exactly = FALSE;	// only do one char for EXACTLY
+স্থির পূর্ণাঙ্ক	অঙ্ক_complex_braces; // Complex \{...} count
+স্থির char_u	*regcode;	// Code-emit pointer, or JUST_CALC_SIZE
+স্থির long	regsize;	// Code size.
+স্থির পূর্ণাঙ্ক	reg_toolong;	// TRUE when offset out of range
+স্থির পূর্ণাঙ্ক	bt_reg_parse_depth;	// nesting depth in reg()
+স্থির char_u	had_endbrace[NSUBEXP];	// flags, TRUE if end of () found
+স্থির long	brace_min[10];	// Minimums for complex brace repeats
+স্থির long	brace_max[10];	// Maximums for complex brace repeats
+স্থির পূর্ণাঙ্ক	brace_গুনতি[10]; // Current counts for complex brace repeats
+স্থির পূর্ণাঙ্ক	one_exactly = FALSE;	// only do one char for EXACTLY
 
 // When making changes to classchars also change nfa_classcodes.
-static char_u	*classchars = (char_u *)".iIkKfFpPsSdDxXoOwWhHaAlLuU";
-static const int classcodes[] = {
+স্থির char_u	*classchars = (char_u *)".iIkKfFpPsSdDxXoOwWhHaAlLuU";
+স্থির ধ্রুব পূর্ণাঙ্ক classcodes[] = {
     ANY, IDENT, SIDENT, KWORD, SKWORD,
     FNAME, SFNAME, PRINT, SPRINT,
     WHITE, NWHITE, DIGIT, NDIGIT,
@@ -269,46 +269,46 @@ static const int classcodes[] = {
  * "]") and try to recognize a character class in expanded form, for example
  * [0-9].  On success, return the atom to be emitted, on failure 0.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 bt_recognize_char_class(char_u *start, char_u *end)
 {
-    int		newl;
-    int		config = get_char_class_bits(start, end, &newl);
+    পূর্ণাঙ্ক		newl;
+    পূর্ণাঙ্ক		config = get_char_class_bits(start, end, &newl);
 
     // A newline would need the ADD_NL variant, don't bother with it here.
-    if (config < 0 || newl)
-	return 0;
+    যদি (config < 0 || newl)
+	প্রত্যাগম 0;
 
 	// The old engine has no case-insensitive class opcode, so [a-z] and [A-Z]
 	// are left as collections.  The classes below are case-independent.
-    switch (config)
+    বিকল্প (config)
     {
-	case CLASS_o9:
-	    return DIGIT;
-	case CLASS_not | CLASS_o9:
-	    return NDIGIT;
-	case CLASS_af | CLASS_AF | CLASS_o9:
-	    return HEX;
-	case CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
-	    return NHEX;
-	case CLASS_o7:
-	    return OCTAL;
-	case CLASS_not | CLASS_o7:
-	    return NOCTAL;
-	case CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return WORD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
-	    return NWORD;
-	case CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return HEAD;
-	case CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
-	    return NHEAD;
-	case CLASS_az | CLASS_AZ:
-	    return ALPHA;
-	case CLASS_not | CLASS_az | CLASS_AZ:
-	    return NALPHA;
+	পক্ষ CLASS_o9:
+	    প্রত্যাগম DIGIT;
+	পক্ষ CLASS_not | CLASS_o9:
+	    প্রত্যাগম NDIGIT;
+	পক্ষ CLASS_af | CLASS_AF | CLASS_o9:
+	    প্রত্যাগম HEX;
+	পক্ষ CLASS_not | CLASS_af | CLASS_AF | CLASS_o9:
+	    প্রত্যাগম NHEX;
+	পক্ষ CLASS_o7:
+	    প্রত্যাগম OCTAL;
+	পক্ষ CLASS_not | CLASS_o7:
+	    প্রত্যাগম NOCTAL;
+	পক্ষ CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    প্রত্যাগম WORD;
+	পক্ষ CLASS_not | CLASS_az | CLASS_AZ | CLASS_o9 | CLASS_underscore:
+	    প্রত্যাগম NWORD;
+	পক্ষ CLASS_az | CLASS_AZ | CLASS_underscore:
+	    প্রত্যাগম HEAD;
+	পক্ষ CLASS_not | CLASS_az | CLASS_AZ | CLASS_underscore:
+	    প্রত্যাগম NHEAD;
+	পক্ষ CLASS_az | CLASS_AZ:
+	    প্রত্যাগম ALPHA;
+	পক্ষ CLASS_not | CLASS_az | CLASS_AZ:
+	    প্রত্যাগম NALPHA;
     }
-    return 0;
+    প্রত্যাগম 0;
 }
 
 /*
@@ -318,7 +318,7 @@ bt_recognize_char_class(char_u *start, char_u *end)
 #define JUST_CALC_SIZE	((char_u *) -1)
 
 // Values for rs_state in regitem_T.
-typedef enum regstate_E
+প্রকারনির্দেশ গণনা regstate_E
 {
     RS_NOPEN = 0	// NOPEN and NCLOSE
     , RS_MOPEN		// MOPEN + [0-9]
@@ -343,20 +343,20 @@ typedef enum regstate_E
  * restored after trying a match.  Used by reg_save() and reg_restore().
  * Also stores the length of "backpos".
  */
-typedef struct
+প্রকারনির্দেশ সংরচনা
 {
-    union
+    সঙ্ঘ
     {
 	char_u	*ptr;	// rex.input pointer, for single-line regexp
 	lpos_T	pos;	// rex.input pos, for multi-line regexp
     } rs_u;
-    int		rs_len;
+    পূর্ণাঙ্ক		rs_len;
 } regsave_T;
 
 // struct to save start/end pointer/position in for \(\)
-typedef struct
+প্রকারনির্দেশ সংরচনা
 {
-    union
+    সঙ্ঘ
     {
 	char_u	*ptr;
 	lpos_T	pos;
@@ -364,11 +364,11 @@ typedef struct
 } save_se_T;
 
 // used for BEHIND and NOBEHIND matching
-typedef struct regbehind_S
+প্রকারনির্দেশ সংরচনা regbehind_S
 {
     regsave_T	save_after;
     regsave_T	save_behind;
-    int		save_need_clear_subexpr;
+    পূর্ণাঙ্ক		save_need_clear_subexpr;
     save_se_T   save_start[NSUBEXP];
     save_se_T   save_end[NSUBEXP];
 } regbehind_T;
@@ -379,12 +379,12 @@ typedef struct regbehind_S
  * Before it may be another type of item, depending on rs_state, to remember
  * more things.
  */
-typedef struct regitem_S
+প্রকারনির্দেশ সংরচনা regitem_S
 {
     regstate_T	rs_state;	// what we are doing, one of RS_ above
     short	rs_no;		// submatch nr or BEHIND/NOBEHIND
     char_u	*rs_scan;	// current node in program
-    union
+    সঙ্ঘ
     {
 	save_se_T  sesave;
 	regsave_T  regsave;
@@ -393,18 +393,18 @@ typedef struct regitem_S
 
 
 // used for STAR, PLUS and BRACE_SIMPLE matching
-typedef struct regstar_S
+প্রকারনির্দেশ সংরচনা regstar_S
 {
-    int		nextb;		// next byte
-    int		nextb_ic;	// next byte reverse case
-    long	count;
+    পূর্ণাঙ্ক		nextb;		// next byte
+    পূর্ণাঙ্ক		nextb_ic;	// next byte reverse case
+    long	গুনতি;
     long	minval;
     long	maxval;
 } regstar_T;
 
 // used to store input position when a BACK was encountered, so that we now if
 // we made any progress since the last time.
-typedef struct backpos_S
+প্রকারনির্দেশ সংরচনা backpos_S
 {
     char_u	*bp_scan;	// "scan" where BACK was encountered
     regsave_T	bp_pos;		// last input position
@@ -417,10 +417,10 @@ typedef struct backpos_S
  * or regbehind_T.
  * "backpos_T" is a table with backpos_T for BACK
  */
-static garray_T	regstack = {0, 0, 0, 0, NULL};
-static garray_T	backpos = {0, 0, 0, 0, NULL};
+স্থির garray_T	regstack = {0, 0, 0, 0, রিক্ত};
+স্থির garray_T	backpos = {0, 0, 0, 0, রিক্ত};
 
-static regsave_T behind_pos;
+স্থির regsave_T behind_pos;
 
 /*
  * Both for regstack and backpos tables we use the following strategy of
@@ -473,7 +473,7 @@ static regsave_T behind_pos;
  * Using two bytes for the "next" pointer is vast overkill for most things,
  * but allows patterns to get big without disasters.
  */
-#define OP(p)		((int)*(p))
+#define OP(p)		((পূর্ণাঙ্ক)*(p))
 #define NEXT(p)		(((*((p) + 1) & 0377) << 8) + (*((p) + 2) & 0377))
 #define OPERAND(p)	((p) + 3)
 // Obtain an operand that was stored as four bytes, MSB first.
@@ -484,39 +484,39 @@ static regsave_T behind_pos;
 // Obtain a second single-byte operand stored after a four bytes operand.
 #define OPERAND_CMP(p)	(p)[7]
 
-static char_u *reg(int paren, int *flagp);
+স্থির char_u *reg(পূর্ণাঙ্ক paren, পূর্ণাঙ্ক *flagp);
 
 #ifdef BT_REGEXP_DUMP
-static void	regdump(char_u *, bt_regprog_T *);
+স্থির শূন্য	regdump(char_u *, bt_regprog_T *);
 #endif
 
-static int	re_num_cmp(long_u val, char_u *scan);
+স্থির পূর্ণাঙ্ক	re_অঙ্ক_cmp(long_u val, char_u *scan);
 
 #ifdef DEBUG
-static char_u	*regprop(char_u *);
+স্থির char_u	*regprop(char_u *);
 
-static int	regnarrate = 0;
+স্থির পূর্ণাঙ্ক	regnarrate = 0;
 #endif
 
 
 /*
  * Setup to parse the regexp.  Used once to get the length and once to do it.
  */
-    static void
+    স্থির শূন্য
 regcomp_start(
-    char_u	*expr,
-    int		re_flags)	    // see vim_regcomp()
+    char_u	*রাশিমালা,
+    পূর্ণাঙ্ক		re_flags)	    // see vim_regcomp()
 {
-    initchr(expr);
-    if (re_flags & RE_MAGIC)
+    initchr(রাশিমালা);
+    যদি (re_flags & RE_MAGIC)
 	reg_magic = MAGIC_ON;
-    else
+    অন্যথা
 	reg_magic = MAGIC_OFF;
     reg_string = (re_flags & RE_STRING);
     reg_strict = (re_flags & RE_STRICT);
     get_cpo_flags();
 
-    num_complex_braces = 0;
+    অঙ্ক_complex_braces = 0;
     regnpar = 1;
     CLEAR_FIELD(had_endbrace);
 #ifdef FEAT_SYN_HL
@@ -527,7 +527,7 @@ regcomp_start(
     reg_toolong = FALSE;
     bt_reg_parse_depth = 0;
     regflags = 0;
-#if defined(FEAT_SYN_HL)
+#যদি defined(FEAT_SYN_HL)
     had_eol = FALSE;
 #endif
 }
@@ -536,10 +536,10 @@ regcomp_start(
  * Return TRUE if MULTIBYTECODE should be used instead of EXACTLY for
  * character "c".
  */
-    static int
-use_multibytecode(int c)
+    স্থির পূর্ণাঙ্ক
+use_multibytecode(পূর্ণাঙ্ক c)
 {
-    return has_mbyte && (*mb_char2len)(c) > 1
+    প্রত্যাগম has_mbyte && (*mb_char2len)(c) > 1
 		     && (re_multi_type(peekchr()) != NOT_MULTI
 			     || (enc_utf8 && utf_iscomposing(c)));
 }
@@ -547,26 +547,26 @@ use_multibytecode(int c)
 /*
  * Emit (if appropriate) a byte of code
  */
-    static void
-regc(int b)
+    স্থির শূন্য
+regc(পূর্ণাঙ্ক b)
 {
-    if (regcode == JUST_CALC_SIZE)
+    যদি (regcode == JUST_CALC_SIZE)
 	regsize++;
-    else
+    অন্যথা
 	*regcode++ = b;
 }
 
 /*
  * Emit (if appropriate) a multi-byte character of code
  */
-    static void
-regmbc(int c)
+    স্থির শূন্য
+regmbc(পূর্ণাঙ্ক c)
 {
-    if (!has_mbyte && c > 0xff)
-	return;
-    if (regcode == JUST_CALC_SIZE)
+    যদি (!has_mbyte && c > 0xff)
+	প্রত্যাগম;
+    যদি (regcode == JUST_CALC_SIZE)
 	regsize += (*mb_char2len)(c);
-    else
+    অন্যথা
 	regcode += (*mb_char2bytes)(c, regcode);
 }
 
@@ -576,21 +576,21 @@ regmbc(int c)
  * Currently only handles latin1, latin9 and utf-8.
  * NOTE: When changing this function, also change nfa_emit_equi_class()
  */
-    static void
-reg_equi_class(int c)
+    স্থির শূন্য
+reg_equi_class(পূর্ণাঙ্ক c)
 {
-    if (enc_utf8 || STRCMP(p_enc, "latin1") == 0
+    যদি (enc_utf8 || STRCMP(p_enc, "latin1") == 0
 					 || STRCMP(p_enc, "iso-8859-15") == 0)
     {
-	switch (c)
+	বিকল্প (c)
 	{
 	    // Do not use '\300' style, it results in a negative number.
-	    case 'A': case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4:
-	    case 0xc5: case 0x100: case 0x102: case 0x104: case 0x1cd:
-	    case 0x1de: case 0x1e0: case 0x1fa: case 0x202: case 0x226:
-	    case 0x23a: case 0x1e00: case 0x1ea0: case 0x1ea2: case 0x1ea4:
-	    case 0x1ea6: case 0x1ea8: case 0x1eaa: case 0x1eac: case 0x1eae:
-	    case 0x1eb0: case 0x1eb2: case 0x1eb4: case 0x1eb6:
+	    পক্ষ 'A': পক্ষ 0xc0: পক্ষ 0xc1: পক্ষ 0xc2: পক্ষ 0xc3: পক্ষ 0xc4:
+	    পক্ষ 0xc5: পক্ষ 0x100: পক্ষ 0x102: পক্ষ 0x104: পক্ষ 0x1cd:
+	    পক্ষ 0x1de: পক্ষ 0x1e0: পক্ষ 0x1fa: পক্ষ 0x202: পক্ষ 0x226:
+	    পক্ষ 0x23a: পক্ষ 0x1e00: পক্ষ 0x1ea0: পক্ষ 0x1ea2: পক্ষ 0x1ea4:
+	    পক্ষ 0x1ea6: পক্ষ 0x1ea8: পক্ষ 0x1eaa: পক্ষ 0x1eac: পক্ষ 0x1eae:
+	    পক্ষ 0x1eb0: পক্ষ 0x1eb2: পক্ষ 0x1eb4: পক্ষ 0x1eb6:
 		      regmbc('A'); regmbc(0xc0); regmbc(0xc1); regmbc(0xc2);
 		      regmbc(0xc3); regmbc(0xc4); regmbc(0xc5);
 		      regmbc(0x100); regmbc(0x102); regmbc(0x104);
@@ -601,34 +601,34 @@ reg_equi_class(int c)
 		      regmbc(0x1ea8); regmbc(0x1eaa); regmbc(0x1eac);
 		      regmbc(0x1eae); regmbc(0x1eb0); regmbc(0x1eb2);
 		      regmbc(0x1eb4); regmbc(0x1eb6);
-		      return;
-	    case 'B': case 0x181: case 0x243: case 0x1e02:
-	    case 0x1e04: case 0x1e06:
+		      প্রত্যাগম;
+	    পক্ষ 'B': পক্ষ 0x181: পক্ষ 0x243: পক্ষ 0x1e02:
+	    পক্ষ 0x1e04: পক্ষ 0x1e06:
 		      regmbc('B');
 		      regmbc(0x181); regmbc(0x243); regmbc(0x1e02);
 		      regmbc(0x1e04); regmbc(0x1e06);
-		      return;
-	    case 'C': case 0xc7:
-	    case 0x106: case 0x108: case 0x10a: case 0x10c: case 0x187:
-	    case 0x23b: case 0x1e08: case 0xa792:
+		      প্রত্যাগম;
+	    পক্ষ 'C': পক্ষ 0xc7:
+	    পক্ষ 0x106: পক্ষ 0x108: পক্ষ 0x10a: পক্ষ 0x10c: পক্ষ 0x187:
+	    পক্ষ 0x23b: পক্ষ 0x1e08: পক্ষ 0xa792:
 		      regmbc('C'); regmbc(0xc7);
 		      regmbc(0x106); regmbc(0x108); regmbc(0x10a);
 		      regmbc(0x10c); regmbc(0x187); regmbc(0x23b);
 		      regmbc(0x1e08); regmbc(0xa792);
-		      return;
-	    case 'D': case 0x10e: case 0x110: case 0x18a:
-	    case 0x1e0a: case 0x1e0c: case 0x1e0e: case 0x1e10:
-	    case 0x1e12:
+		      প্রত্যাগম;
+	    পক্ষ 'D': পক্ষ 0x10e: পক্ষ 0x110: পক্ষ 0x18a:
+	    পক্ষ 0x1e0a: পক্ষ 0x1e0c: পক্ষ 0x1e0e: পক্ষ 0x1e10:
+	    পক্ষ 0x1e12:
 		      regmbc('D'); regmbc(0x10e); regmbc(0x110);
 		      regmbc(0x18a); regmbc(0x1e0a); regmbc(0x1e0c);
 		      regmbc(0x1e0e); regmbc(0x1e10); regmbc(0x1e12);
-		      return;
-	    case 'E': case 0xc8: case 0xc9: case 0xca: case 0xcb:
-	    case 0x112: case 0x114: case 0x116: case 0x118: case 0x11a:
-	    case 0x204: case 0x206: case 0x228: case 0x246: case 0x1e14:
-	    case 0x1e16: case 0x1e18: case 0x1e1a: case 0x1e1c:
-	    case 0x1eb8: case 0x1eba: case 0x1ebc: case 0x1ebe:
-	    case 0x1ec0: case 0x1ec2: case 0x1ec4: case 0x1ec6:
+		      প্রত্যাগম;
+	    পক্ষ 'E': পক্ষ 0xc8: পক্ষ 0xc9: পক্ষ 0xca: পক্ষ 0xcb:
+	    পক্ষ 0x112: পক্ষ 0x114: পক্ষ 0x116: পক্ষ 0x118: পক্ষ 0x11a:
+	    পক্ষ 0x204: পক্ষ 0x206: পক্ষ 0x228: পক্ষ 0x246: পক্ষ 0x1e14:
+	    পক্ষ 0x1e16: পক্ষ 0x1e18: পক্ষ 0x1e1a: পক্ষ 0x1e1c:
+	    পক্ষ 0x1eb8: পক্ষ 0x1eba: পক্ষ 0x1ebc: পক্ষ 0x1ebe:
+	    পক্ষ 0x1ec0: পক্ষ 0x1ec2: পক্ষ 0x1ec4: পক্ষ 0x1ec6:
 		      regmbc('E'); regmbc(0xc8); regmbc(0xc9);
 		      regmbc(0xca); regmbc(0xcb); regmbc(0x112);
 		      regmbc(0x114); regmbc(0x116); regmbc(0x118);
@@ -638,77 +638,77 @@ reg_equi_class(int c)
 		      regmbc(0x1e1c); regmbc(0x1eb8); regmbc(0x1eba);
 		      regmbc(0x1ebc); regmbc(0x1ebe); regmbc(0x1ec0);
 		      regmbc(0x1ec2); regmbc(0x1ec4); regmbc(0x1ec6);
-		      return;
-	    case 'F': case 0x191: case 0x1e1e: case 0xa798:
+		      প্রত্যাগম;
+	    পক্ষ 'F': পক্ষ 0x191: পক্ষ 0x1e1e: পক্ষ 0xa798:
 		      regmbc('F'); regmbc(0x191); regmbc(0x1e1e);
 		      regmbc(0xa798);
-		      return;
-	    case 'G': case 0x11c: case 0x11e: case 0x120:
-	    case 0x122: case 0x193: case 0x1e4: case 0x1e6:
-	    case 0x1f4: case 0x1e20: case 0xa7a0:
+		      প্রত্যাগম;
+	    পক্ষ 'G': পক্ষ 0x11c: পক্ষ 0x11e: পক্ষ 0x120:
+	    পক্ষ 0x122: পক্ষ 0x193: পক্ষ 0x1e4: পক্ষ 0x1e6:
+	    পক্ষ 0x1f4: পক্ষ 0x1e20: পক্ষ 0xa7a0:
 		      regmbc('G'); regmbc(0x11c); regmbc(0x11e);
 		      regmbc(0x120); regmbc(0x122); regmbc(0x193);
 		      regmbc(0x1e4); regmbc(0x1e6); regmbc(0x1f4);
 		      regmbc(0x1e20); regmbc(0xa7a0);
-		      return;
-	    case 'H': case 0x124: case 0x126: case 0x21e:
-	    case 0x1e22: case 0x1e24: case 0x1e26:
-	    case 0x1e28: case 0x1e2a: case 0x2c67:
+		      প্রত্যাগম;
+	    পক্ষ 'H': পক্ষ 0x124: পক্ষ 0x126: পক্ষ 0x21e:
+	    পক্ষ 0x1e22: পক্ষ 0x1e24: পক্ষ 0x1e26:
+	    পক্ষ 0x1e28: পক্ষ 0x1e2a: পক্ষ 0x2c67:
 		      regmbc('H'); regmbc(0x124); regmbc(0x126);
 		      regmbc(0x21e); regmbc(0x1e22); regmbc(0x1e24);
 		      regmbc(0x1e26); regmbc(0x1e28); regmbc(0x1e2a);
 		      regmbc(0x2c67);
-		      return;
-	    case 'I': case 0xcc: case 0xcd: case 0xce: case 0xcf:
-	    case 0x128: case 0x12a: case 0x12c: case 0x12e:
-	    case 0x130: case 0x197: case 0x1cf: case 0x208:
-	    case 0x20a: case 0x1e2c: case 0x1e2e: case 0x1ec8:
-	    case 0x1eca:
+		      প্রত্যাগম;
+	    পক্ষ 'I': পক্ষ 0xcc: পক্ষ 0xcd: পক্ষ 0xce: পক্ষ 0xcf:
+	    পক্ষ 0x128: পক্ষ 0x12a: পক্ষ 0x12c: পক্ষ 0x12e:
+	    পক্ষ 0x130: পক্ষ 0x197: পক্ষ 0x1cf: পক্ষ 0x208:
+	    পক্ষ 0x20a: পক্ষ 0x1e2c: পক্ষ 0x1e2e: পক্ষ 0x1ec8:
+	    পক্ষ 0x1eca:
 		      regmbc('I'); regmbc(0xcc); regmbc(0xcd);
 		      regmbc(0xce); regmbc(0xcf); regmbc(0x128);
 		      regmbc(0x12a); regmbc(0x12c); regmbc(0x12e);
 		      regmbc(0x130); regmbc(0x197); regmbc(0x1cf);
 		      regmbc(0x208); regmbc(0x20a); regmbc(0x1e2c);
 		      regmbc(0x1e2e); regmbc(0x1ec8); regmbc(0x1eca);
-		      return;
-	    case 'J': case 0x134: case 0x248:
+		      প্রত্যাগম;
+	    পক্ষ 'J': পক্ষ 0x134: পক্ষ 0x248:
 		      regmbc('J'); regmbc(0x134); regmbc(0x248);
-		      return;
-	    case 'K': case 0x136: case 0x198: case 0x1e8: case 0x1e30:
-	    case 0x1e32: case 0x1e34: case 0x2c69: case 0xa740:
+		      প্রত্যাগম;
+	    পক্ষ 'K': পক্ষ 0x136: পক্ষ 0x198: পক্ষ 0x1e8: পক্ষ 0x1e30:
+	    পক্ষ 0x1e32: পক্ষ 0x1e34: পক্ষ 0x2c69: পক্ষ 0xa740:
 		      regmbc('K'); regmbc(0x136); regmbc(0x198);
 		      regmbc(0x1e8); regmbc(0x1e30); regmbc(0x1e32);
 		      regmbc(0x1e34); regmbc(0x2c69); regmbc(0xa740);
-		      return;
-	    case 'L': case 0x139: case 0x13b: case 0x13d: case 0x13f:
-	    case 0x141: case 0x23d: case 0x1e36: case 0x1e38:
-	    case 0x1e3a: case 0x1e3c: case 0x2c60:
+		      প্রত্যাগম;
+	    পক্ষ 'L': পক্ষ 0x139: পক্ষ 0x13b: পক্ষ 0x13d: পক্ষ 0x13f:
+	    পক্ষ 0x141: পক্ষ 0x23d: পক্ষ 0x1e36: পক্ষ 0x1e38:
+	    পক্ষ 0x1e3a: পক্ষ 0x1e3c: পক্ষ 0x2c60:
 		      regmbc('L'); regmbc(0x139); regmbc(0x13b);
 		      regmbc(0x13d); regmbc(0x13f); regmbc(0x141);
 		      regmbc(0x23d); regmbc(0x1e36); regmbc(0x1e38);
 		      regmbc(0x1e3a); regmbc(0x1e3c); regmbc(0x2c60);
-		      return;
-	    case 'M': case 0x1e3e: case 0x1e40: case 0x1e42:
+		      প্রত্যাগম;
+	    পক্ষ 'M': পক্ষ 0x1e3e: পক্ষ 0x1e40: পক্ষ 0x1e42:
 		      regmbc('M'); regmbc(0x1e3e); regmbc(0x1e40);
 		      regmbc(0x1e42);
-		      return;
-	    case 'N': case 0xd1:
-	    case 0x143: case 0x145: case 0x147: case 0x1f8:
-	    case 0x1e44: case 0x1e46: case 0x1e48: case 0x1e4a:
-	    case 0xa7a4:
+		      প্রত্যাগম;
+	    পক্ষ 'N': পক্ষ 0xd1:
+	    পক্ষ 0x143: পক্ষ 0x145: পক্ষ 0x147: পক্ষ 0x1f8:
+	    পক্ষ 0x1e44: পক্ষ 0x1e46: পক্ষ 0x1e48: পক্ষ 0x1e4a:
+	    পক্ষ 0xa7a4:
 		      regmbc('N'); regmbc(0xd1);
 		      regmbc(0x143); regmbc(0x145); regmbc(0x147);
 		      regmbc(0x1f8); regmbc(0x1e44); regmbc(0x1e46);
 		      regmbc(0x1e48); regmbc(0x1e4a); regmbc(0xa7a4);
-		      return;
-	    case 'O': case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6:
-	    case 0xd8: case 0x14c: case 0x14e: case 0x150: case 0x19f:
-	    case 0x1a0: case 0x1d1: case 0x1ea: case 0x1ec: case 0x1fe:
-	    case 0x20c: case 0x20e: case 0x22a: case 0x22c: case 0x22e:
-	    case 0x230: case 0x1e4c: case 0x1e4e: case 0x1e50: case 0x1e52:
-	    case 0x1ecc: case 0x1ece: case 0x1ed0: case 0x1ed2: case 0x1ed4:
-	    case 0x1ed6: case 0x1ed8: case 0x1eda: case 0x1edc: case 0x1ede:
-	    case 0x1ee0: case 0x1ee2:
+		      প্রত্যাগম;
+	    পক্ষ 'O': পক্ষ 0xd2: পক্ষ 0xd3: পক্ষ 0xd4: পক্ষ 0xd5: পক্ষ 0xd6:
+	    পক্ষ 0xd8: পক্ষ 0x14c: পক্ষ 0x14e: পক্ষ 0x150: পক্ষ 0x19f:
+	    পক্ষ 0x1a0: পক্ষ 0x1d1: পক্ষ 0x1ea: পক্ষ 0x1ec: পক্ষ 0x1fe:
+	    পক্ষ 0x20c: পক্ষ 0x20e: পক্ষ 0x22a: পক্ষ 0x22c: পক্ষ 0x22e:
+	    পক্ষ 0x230: পক্ষ 0x1e4c: পক্ষ 0x1e4e: পক্ষ 0x1e50: পক্ষ 0x1e52:
+	    পক্ষ 0x1ecc: পক্ষ 0x1ece: পক্ষ 0x1ed0: পক্ষ 0x1ed2: পক্ষ 0x1ed4:
+	    পক্ষ 0x1ed6: পক্ষ 0x1ed8: পক্ষ 0x1eda: পক্ষ 0x1edc: পক্ষ 0x1ede:
+	    পক্ষ 0x1ee0: পক্ষ 0x1ee2:
 		      regmbc('O'); regmbc(0xd2); regmbc(0xd3); regmbc(0xd4);
 		      regmbc(0xd5); regmbc(0xd6); regmbc(0xd8);
 		      regmbc(0x14c); regmbc(0x14e); regmbc(0x150);
@@ -722,48 +722,48 @@ reg_equi_class(int c)
 		      regmbc(0x1ed6); regmbc(0x1ed8); regmbc(0x1eda);
 		      regmbc(0x1edc); regmbc(0x1ede); regmbc(0x1ee0);
 		      regmbc(0x1ee2);
-		      return;
-	    case 'P': case 0x1a4: case 0x1e54: case 0x1e56: case 0x2c63:
+		      প্রত্যাগম;
+	    পক্ষ 'P': পক্ষ 0x1a4: পক্ষ 0x1e54: পক্ষ 0x1e56: পক্ষ 0x2c63:
 		      regmbc('P'); regmbc(0x1a4); regmbc(0x1e54);
 		      regmbc(0x1e56); regmbc(0x2c63);
-		      return;
-	    case 'Q': case 0x24a:
+		      প্রত্যাগম;
+	    পক্ষ 'Q': পক্ষ 0x24a:
 		      regmbc('Q'); regmbc(0x24a);
-		      return;
-	    case 'R': case 0x154: case 0x156: case 0x158: case 0x210:
-	    case 0x212: case 0x24c: case 0x1e58: case 0x1e5a:
-	    case 0x1e5c: case 0x1e5e: case 0x2c64: case 0xa7a6:
+		      প্রত্যাগম;
+	    পক্ষ 'R': পক্ষ 0x154: পক্ষ 0x156: পক্ষ 0x158: পক্ষ 0x210:
+	    পক্ষ 0x212: পক্ষ 0x24c: পক্ষ 0x1e58: পক্ষ 0x1e5a:
+	    পক্ষ 0x1e5c: পক্ষ 0x1e5e: পক্ষ 0x2c64: পক্ষ 0xa7a6:
 		      regmbc('R'); regmbc(0x154); regmbc(0x156);
 		      regmbc(0x210); regmbc(0x212); regmbc(0x158);
 		      regmbc(0x24c); regmbc(0x1e58); regmbc(0x1e5a);
 		      regmbc(0x1e5c); regmbc(0x1e5e); regmbc(0x2c64);
 		      regmbc(0xa7a6);
-		      return;
-	    case 'S': case 0x15a: case 0x15c: case 0x15e: case 0x160:
-	    case 0x218: case 0x1e60: case 0x1e62: case 0x1e64:
-	    case 0x1e66: case 0x1e68: case 0x2c7e: case 0xa7a8:
+		      প্রত্যাগম;
+	    পক্ষ 'S': পক্ষ 0x15a: পক্ষ 0x15c: পক্ষ 0x15e: পক্ষ 0x160:
+	    পক্ষ 0x218: পক্ষ 0x1e60: পক্ষ 0x1e62: পক্ষ 0x1e64:
+	    পক্ষ 0x1e66: পক্ষ 0x1e68: পক্ষ 0x2c7e: পক্ষ 0xa7a8:
 		      regmbc('S'); regmbc(0x15a); regmbc(0x15c);
 		      regmbc(0x15e); regmbc(0x160); regmbc(0x218);
 		      regmbc(0x1e60); regmbc(0x1e62); regmbc(0x1e64);
 		      regmbc(0x1e66); regmbc(0x1e68); regmbc(0x2c7e);
 			  regmbc(0xa7a8);
-		      return;
-	    case 'T': case 0x162: case 0x164: case 0x166: case 0x1ac:
-	    case 0x1ae: case 0x21a: case 0x23e: case 0x1e6a: case 0x1e6c:
-	    case 0x1e6e: case 0x1e70:
+		      প্রত্যাগম;
+	    পক্ষ 'T': পক্ষ 0x162: পক্ষ 0x164: পক্ষ 0x166: পক্ষ 0x1ac:
+	    পক্ষ 0x1ae: পক্ষ 0x21a: পক্ষ 0x23e: পক্ষ 0x1e6a: পক্ষ 0x1e6c:
+	    পক্ষ 0x1e6e: পক্ষ 0x1e70:
 		      regmbc('T'); regmbc(0x162); regmbc(0x164);
 		      regmbc(0x166); regmbc(0x1ac); regmbc(0x23e);
 		      regmbc(0x1ae); regmbc(0x21a); regmbc(0x1e6a);
 		      regmbc(0x1e6c); regmbc(0x1e6e); regmbc(0x1e70);
-		      return;
-	    case 'U': case 0xd9: case 0xda: case 0xdb: case 0xdc:
-	    case 0x168: case 0x16a: case 0x16c: case 0x16e:
-	    case 0x170: case 0x172: case 0x1af: case 0x1d3:
-	    case 0x1d5: case 0x1d7: case 0x1d9: case 0x1db:
-	    case 0x214: case 0x216: case 0x244: case 0x1e72:
-	    case 0x1e74: case 0x1e76: case 0x1e78: case 0x1e7a:
-	    case 0x1ee4: case 0x1ee6: case 0x1ee8: case 0x1eea:
-	    case 0x1eec: case 0x1eee: case 0x1ef0:
+		      প্রত্যাগম;
+	    পক্ষ 'U': পক্ষ 0xd9: পক্ষ 0xda: পক্ষ 0xdb: পক্ষ 0xdc:
+	    পক্ষ 0x168: পক্ষ 0x16a: পক্ষ 0x16c: পক্ষ 0x16e:
+	    পক্ষ 0x170: পক্ষ 0x172: পক্ষ 0x1af: পক্ষ 0x1d3:
+	    পক্ষ 0x1d5: পক্ষ 0x1d7: পক্ষ 0x1d9: পক্ষ 0x1db:
+	    পক্ষ 0x214: পক্ষ 0x216: পক্ষ 0x244: পক্ষ 0x1e72:
+	    পক্ষ 0x1e74: পক্ষ 0x1e76: পক্ষ 0x1e78: পক্ষ 0x1e7a:
+	    পক্ষ 0x1ee4: পক্ষ 0x1ee6: পক্ষ 0x1ee8: পক্ষ 0x1eea:
+	    পক্ষ 0x1eec: পক্ষ 0x1eee: পক্ষ 0x1ef0:
 		      regmbc('U'); regmbc(0xd9); regmbc(0xda);
 		      regmbc(0xdb); regmbc(0xdc); regmbc(0x168);
 		      regmbc(0x16a); regmbc(0x16c); regmbc(0x16e);
@@ -775,42 +775,42 @@ reg_equi_class(int c)
 		      regmbc(0x1e7a); regmbc(0x1ee4); regmbc(0x1ee6);
 		      regmbc(0x1ee8); regmbc(0x1eea); regmbc(0x1eec);
 		      regmbc(0x1eee); regmbc(0x1ef0);
-		      return;
-	    case 'V': case 0x1b2: case 0x1e7c: case 0x1e7e:
+		      প্রত্যাগম;
+	    পক্ষ 'V': পক্ষ 0x1b2: পক্ষ 0x1e7c: পক্ষ 0x1e7e:
 		      regmbc('V'); regmbc(0x1b2); regmbc(0x1e7c);
 		      regmbc(0x1e7e);
-		      return;
-	    case 'W': case 0x174: case 0x1e80: case 0x1e82:
-	    case 0x1e84: case 0x1e86: case 0x1e88:
+		      প্রত্যাগম;
+	    পক্ষ 'W': পক্ষ 0x174: পক্ষ 0x1e80: পক্ষ 0x1e82:
+	    পক্ষ 0x1e84: পক্ষ 0x1e86: পক্ষ 0x1e88:
 		      regmbc('W'); regmbc(0x174); regmbc(0x1e80);
 		      regmbc(0x1e82); regmbc(0x1e84); regmbc(0x1e86);
 		      regmbc(0x1e88);
-		      return;
-	    case 'X': case 0x1e8a: case 0x1e8c:
+		      প্রত্যাগম;
+	    পক্ষ 'X': পক্ষ 0x1e8a: পক্ষ 0x1e8c:
 		      regmbc('X'); regmbc(0x1e8a); regmbc(0x1e8c);
-		      return;
-	    case 'Y': case 0xdd:
-	    case 0x176: case 0x178: case 0x1b3: case 0x232: case 0x24e:
-	    case 0x1e8e: case 0x1ef2: case 0x1ef6: case 0x1ef4: case 0x1ef8:
+		      প্রত্যাগম;
+	    পক্ষ 'Y': পক্ষ 0xdd:
+	    পক্ষ 0x176: পক্ষ 0x178: পক্ষ 0x1b3: পক্ষ 0x232: পক্ষ 0x24e:
+	    পক্ষ 0x1e8e: পক্ষ 0x1ef2: পক্ষ 0x1ef6: পক্ষ 0x1ef4: পক্ষ 0x1ef8:
 		      regmbc('Y'); regmbc(0xdd); regmbc(0x176);
 		      regmbc(0x178); regmbc(0x1b3); regmbc(0x232);
 		      regmbc(0x24e); regmbc(0x1e8e); regmbc(0x1ef2);
 		      regmbc(0x1ef4); regmbc(0x1ef6); regmbc(0x1ef8);
-		      return;
-	    case 'Z': case 0x179: case 0x17b: case 0x17d: case 0x1b5:
-	    case 0x1e90: case 0x1e92: case 0x1e94: case 0x2c6b:
+		      প্রত্যাগম;
+	    পক্ষ 'Z': পক্ষ 0x179: পক্ষ 0x17b: পক্ষ 0x17d: পক্ষ 0x1b5:
+	    পক্ষ 0x1e90: পক্ষ 0x1e92: পক্ষ 0x1e94: পক্ষ 0x2c6b:
 		      regmbc('Z'); regmbc(0x179); regmbc(0x17b);
 		      regmbc(0x17d); regmbc(0x1b5); regmbc(0x1e90);
 		      regmbc(0x1e92); regmbc(0x1e94); regmbc(0x2c6b);
-		      return;
-	    case 'a': case 0xe0: case 0xe1: case 0xe2:
-	    case 0xe3: case 0xe4: case 0xe5: case 0x101: case 0x103:
-	    case 0x105: case 0x1ce: case 0x1df: case 0x1e1: case 0x1fb:
-	    case 0x201: case 0x203: case 0x227: case 0x1d8f: case 0x1e01:
-	    case 0x1e9a: case 0x1ea1: case 0x1ea3: case 0x1ea5:
-	    case 0x1ea7: case 0x1ea9: case 0x1eab: case 0x1ead:
-	    case 0x1eaf: case 0x1eb1: case 0x1eb3: case 0x1eb5:
-	    case 0x1eb7: case 0x2c65:
+		      প্রত্যাগম;
+	    পক্ষ 'a': পক্ষ 0xe0: পক্ষ 0xe1: পক্ষ 0xe2:
+	    পক্ষ 0xe3: পক্ষ 0xe4: পক্ষ 0xe5: পক্ষ 0x101: পক্ষ 0x103:
+	    পক্ষ 0x105: পক্ষ 0x1ce: পক্ষ 0x1df: পক্ষ 0x1e1: পক্ষ 0x1fb:
+	    পক্ষ 0x201: পক্ষ 0x203: পক্ষ 0x227: পক্ষ 0x1d8f: পক্ষ 0x1e01:
+	    পক্ষ 0x1e9a: পক্ষ 0x1ea1: পক্ষ 0x1ea3: পক্ষ 0x1ea5:
+	    পক্ষ 0x1ea7: পক্ষ 0x1ea9: পক্ষ 0x1eab: পক্ষ 0x1ead:
+	    পক্ষ 0x1eaf: পক্ষ 0x1eb1: পক্ষ 0x1eb3: পক্ষ 0x1eb5:
+	    পক্ষ 0x1eb7: পক্ষ 0x2c65:
 		      regmbc('a'); regmbc(0xe0); regmbc(0xe1);
 		      regmbc(0xe2); regmbc(0xe3); regmbc(0xe4);
 		      regmbc(0xe5); regmbc(0x101); regmbc(0x103);
@@ -822,37 +822,37 @@ reg_equi_class(int c)
 		      regmbc(0x1ea9); regmbc(0x1eab); regmbc(0x1ead);
 		      regmbc(0x1eaf); regmbc(0x1eb1); regmbc(0x1eb3);
 		      regmbc(0x1eb5); regmbc(0x1eb7); regmbc(0x2c65);
-		      return;
-	    case 'b': case 0x180: case 0x253: case 0x1d6c: case 0x1d80:
-	    case 0x1e03: case 0x1e05: case 0x1e07:
+		      প্রত্যাগম;
+	    পক্ষ 'b': পক্ষ 0x180: পক্ষ 0x253: পক্ষ 0x1d6c: পক্ষ 0x1d80:
+	    পক্ষ 0x1e03: পক্ষ 0x1e05: পক্ষ 0x1e07:
 		      regmbc('b');
 		      regmbc(0x180); regmbc(0x253); regmbc(0x1d6c);
 		      regmbc(0x1d80); regmbc(0x1e03); regmbc(0x1e05);
 		      regmbc(0x1e07);
-		      return;
-	    case 'c': case 0xe7:
-	    case 0x107: case 0x109: case 0x10b: case 0x10d: case 0x188:
-	    case 0x23c: case 0x1e09: case 0xa793: case 0xa794:
+		      প্রত্যাগম;
+	    পক্ষ 'c': পক্ষ 0xe7:
+	    পক্ষ 0x107: পক্ষ 0x109: পক্ষ 0x10b: পক্ষ 0x10d: পক্ষ 0x188:
+	    পক্ষ 0x23c: পক্ষ 0x1e09: পক্ষ 0xa793: পক্ষ 0xa794:
 		      regmbc('c'); regmbc(0xe7); regmbc(0x107);
 		      regmbc(0x109); regmbc(0x10b); regmbc(0x10d);
 		      regmbc(0x188); regmbc(0x23c); regmbc(0x1e09);
 		      regmbc(0xa793); regmbc(0xa794);
-		      return;
-	    case 'd': case 0x10f: case 0x111: case 0x257: case 0x1d6d:
-	    case 0x1d81: case 0x1d91: case 0x1e0b: case 0x1e0d:
-	    case 0x1e0f: case 0x1e11: case 0x1e13:
+		      প্রত্যাগম;
+	    পক্ষ 'd': পক্ষ 0x10f: পক্ষ 0x111: পক্ষ 0x257: পক্ষ 0x1d6d:
+	    পক্ষ 0x1d81: পক্ষ 0x1d91: পক্ষ 0x1e0b: পক্ষ 0x1e0d:
+	    পক্ষ 0x1e0f: পক্ষ 0x1e11: পক্ষ 0x1e13:
 		      regmbc('d'); regmbc(0x10f); regmbc(0x111);
 		      regmbc(0x257); regmbc(0x1d6d); regmbc(0x1d81);
 		      regmbc(0x1d91); regmbc(0x1e0b); regmbc(0x1e0d);
 		      regmbc(0x1e0f); regmbc(0x1e11); regmbc(0x1e13);
-		      return;
-	    case 'e': case 0xe8: case 0xe9: case 0xea: case 0xeb:
-	    case 0x113: case 0x115: case 0x117: case 0x119:
-	    case 0x11b: case 0x205: case 0x207: case 0x229:
-	    case 0x247: case 0x1d92: case 0x1e15: case 0x1e17:
-	    case 0x1e19: case 0x1e1b: case 0x1eb9: case 0x1ebb:
-	    case 0x1e1d: case 0x1ebd: case 0x1ebf: case 0x1ec1:
-	    case 0x1ec3: case 0x1ec5: case 0x1ec7:
+		      প্রত্যাগম;
+	    পক্ষ 'e': পক্ষ 0xe8: পক্ষ 0xe9: পক্ষ 0xea: পক্ষ 0xeb:
+	    পক্ষ 0x113: পক্ষ 0x115: পক্ষ 0x117: পক্ষ 0x119:
+	    পক্ষ 0x11b: পক্ষ 0x205: পক্ষ 0x207: পক্ষ 0x229:
+	    পক্ষ 0x247: পক্ষ 0x1d92: পক্ষ 0x1e15: পক্ষ 0x1e17:
+	    পক্ষ 0x1e19: পক্ষ 0x1e1b: পক্ষ 0x1eb9: পক্ষ 0x1ebb:
+	    পক্ষ 0x1e1d: পক্ষ 0x1ebd: পক্ষ 0x1ebf: পক্ষ 0x1ec1:
+	    পক্ষ 0x1ec3: পক্ষ 0x1ec5: পক্ষ 0x1ec7:
 		      regmbc('e'); regmbc(0xe8); regmbc(0xe9);
 		      regmbc(0xea); regmbc(0xeb); regmbc(0x113);
 		      regmbc(0x115); regmbc(0x117); regmbc(0x119);
@@ -863,83 +863,83 @@ reg_equi_class(int c)
 		      regmbc(0x1ebb); regmbc(0x1ebd); regmbc(0x1ebf);
 		      regmbc(0x1ec1); regmbc(0x1ec3); regmbc(0x1ec5);
 		      regmbc(0x1ec7);
-		      return;
-	    case 'f': case 0x192: case 0x1d6e: case 0x1d82:
-	    case 0x1e1f: case 0xa799:
+		      প্রত্যাগম;
+	    পক্ষ 'f': পক্ষ 0x192: পক্ষ 0x1d6e: পক্ষ 0x1d82:
+	    পক্ষ 0x1e1f: পক্ষ 0xa799:
 		     regmbc('f'); regmbc(0x192); regmbc(0x1d6e);
 		     regmbc(0x1d82); regmbc(0x1e1f); regmbc(0xa799);
-		     return;
-	    case 'g': case 0x11d: case 0x11f: case 0x121: case 0x123:
-	    case 0x1e5: case 0x1e7: case 0x260: case 0x1f5: case 0x1d83:
-	    case 0x1e21: case 0xa7a1:
+		     প্রত্যাগম;
+	    পক্ষ 'g': পক্ষ 0x11d: পক্ষ 0x11f: পক্ষ 0x121: পক্ষ 0x123:
+	    পক্ষ 0x1e5: পক্ষ 0x1e7: পক্ষ 0x260: পক্ষ 0x1f5: পক্ষ 0x1d83:
+	    পক্ষ 0x1e21: পক্ষ 0xa7a1:
 		      regmbc('g'); regmbc(0x11d); regmbc(0x11f);
 		      regmbc(0x121); regmbc(0x123); regmbc(0x1e5);
 		      regmbc(0x1e7); regmbc(0x1f5); regmbc(0x260);
 		      regmbc(0x1d83); regmbc(0x1e21); regmbc(0xa7a1);
-		      return;
-	    case 'h': case 0x125: case 0x127: case 0x21f: case 0x1e23:
-	    case 0x1e25: case 0x1e27: case 0x1e29: case 0x1e2b:
-	    case 0x1e96: case 0x2c68: case 0xa795:
+		      প্রত্যাগম;
+	    পক্ষ 'h': পক্ষ 0x125: পক্ষ 0x127: পক্ষ 0x21f: পক্ষ 0x1e23:
+	    পক্ষ 0x1e25: পক্ষ 0x1e27: পক্ষ 0x1e29: পক্ষ 0x1e2b:
+	    পক্ষ 0x1e96: পক্ষ 0x2c68: পক্ষ 0xa795:
 		      regmbc('h'); regmbc(0x125); regmbc(0x127);
 		      regmbc(0x21f); regmbc(0x1e23); regmbc(0x1e25);
 		      regmbc(0x1e27); regmbc(0x1e29); regmbc(0x1e2b);
 		      regmbc(0x1e96); regmbc(0x2c68); regmbc(0xa795);
-		      return;
-	    case 'i': case 0xec: case 0xed: case 0xee: case 0xef:
-	    case 0x129: case 0x12b: case 0x12d: case 0x12f:
-	    case 0x1d0: case 0x209: case 0x20b: case 0x268:
-	    case 0x1d96: case 0x1e2d: case 0x1e2f: case 0x1ec9:
-	    case 0x1ecb:
+		      প্রত্যাগম;
+	    পক্ষ 'i': পক্ষ 0xec: পক্ষ 0xed: পক্ষ 0xee: পক্ষ 0xef:
+	    পক্ষ 0x129: পক্ষ 0x12b: পক্ষ 0x12d: পক্ষ 0x12f:
+	    পক্ষ 0x1d0: পক্ষ 0x209: পক্ষ 0x20b: পক্ষ 0x268:
+	    পক্ষ 0x1d96: পক্ষ 0x1e2d: পক্ষ 0x1e2f: পক্ষ 0x1ec9:
+	    পক্ষ 0x1ecb:
 		      regmbc('i'); regmbc(0xec); regmbc(0xed);
 		      regmbc(0xee); regmbc(0xef); regmbc(0x129);
 		      regmbc(0x12b); regmbc(0x12d); regmbc(0x12f);
 		      regmbc(0x1d0); regmbc(0x209); regmbc(0x20b);
 		      regmbc(0x268); regmbc(0x1d96); regmbc(0x1e2d);
 		      regmbc(0x1e2f); regmbc(0x1ec9); regmbc(0x1ecb);
-		      return;
-	    case 'j': case 0x135: case 0x1f0: case 0x249:
+		      প্রত্যাগম;
+	    পক্ষ 'j': পক্ষ 0x135: পক্ষ 0x1f0: পক্ষ 0x249:
 		      regmbc('j'); regmbc(0x135); regmbc(0x1f0);
 		      regmbc(0x249);
-		      return;
-	    case 'k': case 0x137: case 0x199: case 0x1e9:
-	    case 0x1d84: case 0x1e31: case 0x1e33: case 0x1e35:
-	    case 0x2c6a: case 0xa741:
+		      প্রত্যাগম;
+	    পক্ষ 'k': পক্ষ 0x137: পক্ষ 0x199: পক্ষ 0x1e9:
+	    পক্ষ 0x1d84: পক্ষ 0x1e31: পক্ষ 0x1e33: পক্ষ 0x1e35:
+	    পক্ষ 0x2c6a: পক্ষ 0xa741:
 		      regmbc('k'); regmbc(0x137); regmbc(0x199);
 		      regmbc(0x1e9); regmbc(0x1d84); regmbc(0x1e31);
 		      regmbc(0x1e33); regmbc(0x1e35); regmbc(0x2c6a);
 		      regmbc(0xa741);
-		      return;
-	    case 'l': case 0x13a: case 0x13c: case 0x13e:
-	    case 0x140: case 0x142: case 0x19a: case 0x1e37:
-	    case 0x1e39: case 0x1e3b: case 0x1e3d: case 0x2c61:
+		      প্রত্যাগম;
+	    পক্ষ 'l': পক্ষ 0x13a: পক্ষ 0x13c: পক্ষ 0x13e:
+	    পক্ষ 0x140: পক্ষ 0x142: পক্ষ 0x19a: পক্ষ 0x1e37:
+	    পক্ষ 0x1e39: পক্ষ 0x1e3b: পক্ষ 0x1e3d: পক্ষ 0x2c61:
 		      regmbc('l'); regmbc(0x13a); regmbc(0x13c);
 		      regmbc(0x13e); regmbc(0x140); regmbc(0x142);
 		      regmbc(0x19a); regmbc(0x1e37); regmbc(0x1e39);
 		      regmbc(0x1e3b); regmbc(0x1e3d); regmbc(0x2c61);
-		      return;
-	    case 'm': case 0x1d6f: case 0x1e3f: case 0x1e41: case 0x1e43:
+		      প্রত্যাগম;
+	    পক্ষ 'm': পক্ষ 0x1d6f: পক্ষ 0x1e3f: পক্ষ 0x1e41: পক্ষ 0x1e43:
 		      regmbc('m'); regmbc(0x1d6f); regmbc(0x1e3f);
 		      regmbc(0x1e41); regmbc(0x1e43);
-		      return;
-	    case 'n': case 0xf1: case 0x144: case 0x146: case 0x148:
-	    case 0x149: case 0x1f9: case 0x1d70: case 0x1d87:
-	    case 0x1e45: case 0x1e47: case 0x1e49: case 0x1e4b:
-	    case 0xa7a5:
+		      প্রত্যাগম;
+	    পক্ষ 'n': পক্ষ 0xf1: পক্ষ 0x144: পক্ষ 0x146: পক্ষ 0x148:
+	    পক্ষ 0x149: পক্ষ 0x1f9: পক্ষ 0x1d70: পক্ষ 0x1d87:
+	    পক্ষ 0x1e45: পক্ষ 0x1e47: পক্ষ 0x1e49: পক্ষ 0x1e4b:
+	    পক্ষ 0xa7a5:
 		      regmbc('n'); regmbc(0xf1); regmbc(0x144);
 		      regmbc(0x146); regmbc(0x148); regmbc(0x149);
 		      regmbc(0x1f9); regmbc(0x1d70); regmbc(0x1d87);
 		      regmbc(0x1e45); regmbc(0x1e47); regmbc(0x1e49);
 		      regmbc(0x1e4b); regmbc(0xa7a5);
-		      return;
-	    case 'o': case 0xf2: case 0xf3: case 0xf4: case 0xf5:
-	    case 0xf6: case 0xf8: case 0x14d: case 0x14f: case 0x151:
-	    case 0x1a1: case 0x1d2: case 0x1eb: case 0x1ed: case 0x1ff:
-	    case 0x20d: case 0x20f: case 0x22b: case 0x22d: case 0x22f:
-	    case 0x231: case 0x275: case 0x1e4d: case 0x1e4f:
-	    case 0x1e51: case 0x1e53: case 0x1ecd: case 0x1ecf:
-	    case 0x1ed1: case 0x1ed3: case 0x1ed5: case 0x1ed7:
-	    case 0x1ed9: case 0x1edb: case 0x1edd: case 0x1edf:
-	    case 0x1ee1: case 0x1ee3:
+		      প্রত্যাগম;
+	    পক্ষ 'o': পক্ষ 0xf2: পক্ষ 0xf3: পক্ষ 0xf4: পক্ষ 0xf5:
+	    পক্ষ 0xf6: পক্ষ 0xf8: পক্ষ 0x14d: পক্ষ 0x14f: পক্ষ 0x151:
+	    পক্ষ 0x1a1: পক্ষ 0x1d2: পক্ষ 0x1eb: পক্ষ 0x1ed: পক্ষ 0x1ff:
+	    পক্ষ 0x20d: পক্ষ 0x20f: পক্ষ 0x22b: পক্ষ 0x22d: পক্ষ 0x22f:
+	    পক্ষ 0x231: পক্ষ 0x275: পক্ষ 0x1e4d: পক্ষ 0x1e4f:
+	    পক্ষ 0x1e51: পক্ষ 0x1e53: পক্ষ 0x1ecd: পক্ষ 0x1ecf:
+	    পক্ষ 0x1ed1: পক্ষ 0x1ed3: পক্ষ 0x1ed5: পক্ষ 0x1ed7:
+	    পক্ষ 0x1ed9: পক্ষ 0x1edb: পক্ষ 0x1edd: পক্ষ 0x1edf:
+	    পক্ষ 0x1ee1: পক্ষ 0x1ee3:
 		      regmbc('o'); regmbc(0xf2); regmbc(0xf3);
 		      regmbc(0xf4); regmbc(0xf5); regmbc(0xf6);
 		      regmbc(0xf8); regmbc(0x14d); regmbc(0x14f);
@@ -953,54 +953,54 @@ reg_equi_class(int c)
 		      regmbc(0x1ed5); regmbc(0x1ed7); regmbc(0x1ed9);
 		      regmbc(0x1edb); regmbc(0x1edd); regmbc(0x1edf);
 		      regmbc(0x1ee1); regmbc(0x1ee3);
-		      return;
-	    case 'p': case 0x1a5: case 0x1d71: case 0x1d88: case 0x1d7d:
-	    case 0x1e55: case 0x1e57:
+		      প্রত্যাগম;
+	    পক্ষ 'p': পক্ষ 0x1a5: পক্ষ 0x1d71: পক্ষ 0x1d88: পক্ষ 0x1d7d:
+	    পক্ষ 0x1e55: পক্ষ 0x1e57:
 		      regmbc('p'); regmbc(0x1a5); regmbc(0x1d71);
 		      regmbc(0x1d7d); regmbc(0x1d88); regmbc(0x1e55);
 		      regmbc(0x1e57);
-		      return;
-	    case 'q': case 0x24b: case 0x2a0:
+		      প্রত্যাগম;
+	    পক্ষ 'q': পক্ষ 0x24b: পক্ষ 0x2a0:
 		      regmbc('q'); regmbc(0x24b); regmbc(0x2a0);
-		      return;
-	    case 'r': case 0x155: case 0x157: case 0x159: case 0x211:
-	    case 0x213: case 0x24d: case 0x27d: case 0x1d72: case 0x1d73:
-	    case 0x1d89: case 0x1e59: case 0x1e5b: case 0x1e5d: case 0x1e5f:
-	    case 0xa7a7:
+		      প্রত্যাগম;
+	    পক্ষ 'r': পক্ষ 0x155: পক্ষ 0x157: পক্ষ 0x159: পক্ষ 0x211:
+	    পক্ষ 0x213: পক্ষ 0x24d: পক্ষ 0x27d: পক্ষ 0x1d72: পক্ষ 0x1d73:
+	    পক্ষ 0x1d89: পক্ষ 0x1e59: পক্ষ 0x1e5b: পক্ষ 0x1e5d: পক্ষ 0x1e5f:
+	    পক্ষ 0xa7a7:
 		      regmbc('r'); regmbc(0x155); regmbc(0x157);
 		      regmbc(0x159); regmbc(0x211); regmbc(0x213);
 		      regmbc(0x24d); regmbc(0x1d72); regmbc(0x1d73);
 		      regmbc(0x1d89); regmbc(0x1e59); regmbc(0x27d);
 		      regmbc(0x1e5b); regmbc(0x1e5d); regmbc(0x1e5f);
 		      regmbc(0xa7a7);
-		      return;
-	    case 's': case 0x15b: case 0x15d: case 0x15f: case 0x161:
-	    case 0x1e61: case 0x219: case 0x23f: case 0x1d74: case 0x1d8a:
-	    case 0x1e63: case 0x1e65: case 0x1e67: case 0x1e69: case 0xa7a9:
+		      প্রত্যাগম;
+	    পক্ষ 's': পক্ষ 0x15b: পক্ষ 0x15d: পক্ষ 0x15f: পক্ষ 0x161:
+	    পক্ষ 0x1e61: পক্ষ 0x219: পক্ষ 0x23f: পক্ষ 0x1d74: পক্ষ 0x1d8a:
+	    পক্ষ 0x1e63: পক্ষ 0x1e65: পক্ষ 0x1e67: পক্ষ 0x1e69: পক্ষ 0xa7a9:
 		      regmbc('s'); regmbc(0x15b); regmbc(0x15d);
 		      regmbc(0x15f); regmbc(0x161); regmbc(0x23f);
 		      regmbc(0x219); regmbc(0x1d74); regmbc(0x1d8a);
 		      regmbc(0x1e61); regmbc(0x1e63); regmbc(0x1e65);
 		      regmbc(0x1e67); regmbc(0x1e69); regmbc(0xa7a9);
-		      return;
-	    case 't': case 0x163: case 0x165: case 0x167: case 0x1ab:
-	    case 0x1ad: case 0x21b: case 0x288: case 0x1d75: case 0x1e6b:
-	    case 0x1e6d: case 0x1e6f: case 0x1e71: case 0x1e97: case 0x2c66:
+		      প্রত্যাগম;
+	    পক্ষ 't': পক্ষ 0x163: পক্ষ 0x165: পক্ষ 0x167: পক্ষ 0x1ab:
+	    পক্ষ 0x1ad: পক্ষ 0x21b: পক্ষ 0x288: পক্ষ 0x1d75: পক্ষ 0x1e6b:
+	    পক্ষ 0x1e6d: পক্ষ 0x1e6f: পক্ষ 0x1e71: পক্ষ 0x1e97: পক্ষ 0x2c66:
 		      regmbc('t'); regmbc(0x163); regmbc(0x165);
 		      regmbc(0x167); regmbc(0x1ab); regmbc(0x21b);
 		      regmbc(0x1ad); regmbc(0x288); regmbc(0x1d75);
 		      regmbc(0x1e6b); regmbc(0x1e6d); regmbc(0x1e6f);
 		      regmbc(0x1e71); regmbc(0x1e97); regmbc(0x2c66);
-		      return;
-	    case 'u': case 0xf9: case 0xfa: case 0xfb: case 0xfc:
-	    case 0x169: case 0x16b: case 0x16d: case 0x16f:
-	    case 0x171: case 0x173: case 0x1b0: case 0x1d4:
-	    case 0x1d6: case 0x1d8: case 0x1da: case 0x1dc:
-	    case 0x215: case 0x217: case 0x289: case 0x1e73:
-	    case 0x1d7e: case 0x1d99: case 0x1e75: case 0x1e77:
-	    case 0x1e79: case 0x1e7b: case 0x1ee5: case 0x1ee7:
-	    case 0x1ee9: case 0x1eeb: case 0x1eed: case 0x1eef:
-	    case 0x1ef1:
+		      প্রত্যাগম;
+	    পক্ষ 'u': পক্ষ 0xf9: পক্ষ 0xfa: পক্ষ 0xfb: পক্ষ 0xfc:
+	    পক্ষ 0x169: পক্ষ 0x16b: পক্ষ 0x16d: পক্ষ 0x16f:
+	    পক্ষ 0x171: পক্ষ 0x173: পক্ষ 0x1b0: পক্ষ 0x1d4:
+	    পক্ষ 0x1d6: পক্ষ 0x1d8: পক্ষ 0x1da: পক্ষ 0x1dc:
+	    পক্ষ 0x215: পক্ষ 0x217: পক্ষ 0x289: পক্ষ 0x1e73:
+	    পক্ষ 0x1d7e: পক্ষ 0x1d99: পক্ষ 0x1e75: পক্ষ 0x1e77:
+	    পক্ষ 0x1e79: পক্ষ 0x1e7b: পক্ষ 0x1ee5: পক্ষ 0x1ee7:
+	    পক্ষ 0x1ee9: পক্ষ 0x1eeb: পক্ষ 0x1eed: পক্ষ 0x1eef:
+	    পক্ষ 0x1ef1:
 		      regmbc('u'); regmbc(0xf9); regmbc(0xfa);
 		      regmbc(0xfb); regmbc(0xfc); regmbc(0x169);
 		      regmbc(0x16b); regmbc(0x16d); regmbc(0x16f);
@@ -1013,37 +1013,37 @@ reg_equi_class(int c)
 		      regmbc(0x1ee5); regmbc(0x1ee7); regmbc(0x1ee9);
 		      regmbc(0x1eeb); regmbc(0x1eed); regmbc(0x1eef);
 		      regmbc(0x1ef1);
-		      return;
-	    case 'v': case 0x28b: case 0x1d8c: case 0x1e7d: case 0x1e7f:
+		      প্রত্যাগম;
+	    পক্ষ 'v': পক্ষ 0x28b: পক্ষ 0x1d8c: পক্ষ 0x1e7d: পক্ষ 0x1e7f:
 		      regmbc('v'); regmbc(0x28b); regmbc(0x1d8c);
 		      regmbc(0x1e7d); regmbc(0x1e7f);
-		      return;
-	    case 'w': case 0x175: case 0x1e81: case 0x1e83:
-	    case 0x1e85: case 0x1e87: case 0x1e89: case 0x1e98:
+		      প্রত্যাগম;
+	    পক্ষ 'w': পক্ষ 0x175: পক্ষ 0x1e81: পক্ষ 0x1e83:
+	    পক্ষ 0x1e85: পক্ষ 0x1e87: পক্ষ 0x1e89: পক্ষ 0x1e98:
 		      regmbc('w'); regmbc(0x175); regmbc(0x1e81);
 		      regmbc(0x1e83); regmbc(0x1e85); regmbc(0x1e87);
 		      regmbc(0x1e89); regmbc(0x1e98);
-		      return;
-	    case 'x': case 0x1e8b: case 0x1e8d:
+		      প্রত্যাগম;
+	    পক্ষ 'x': পক্ষ 0x1e8b: পক্ষ 0x1e8d:
 		      regmbc('x'); regmbc(0x1e8b); regmbc(0x1e8d);
-		      return;
-	    case 'y': case 0xfd: case 0xff: case 0x177: case 0x1b4:
-	    case 0x233: case 0x24f: case 0x1e8f: case 0x1e99: case 0x1ef3:
-	    case 0x1ef5: case 0x1ef7: case 0x1ef9:
+		      প্রত্যাগম;
+	    পক্ষ 'y': পক্ষ 0xfd: পক্ষ 0xff: পক্ষ 0x177: পক্ষ 0x1b4:
+	    পক্ষ 0x233: পক্ষ 0x24f: পক্ষ 0x1e8f: পক্ষ 0x1e99: পক্ষ 0x1ef3:
+	    পক্ষ 0x1ef5: পক্ষ 0x1ef7: পক্ষ 0x1ef9:
 		      regmbc('y'); regmbc(0xfd); regmbc(0xff);
 		      regmbc(0x177); regmbc(0x1b4); regmbc(0x233);
 		      regmbc(0x24f); regmbc(0x1e8f); regmbc(0x1e99);
 		      regmbc(0x1ef3); regmbc(0x1ef5); regmbc(0x1ef7);
 		      regmbc(0x1ef9);
-		      return;
-	    case 'z': case 0x17a: case 0x17c: case 0x17e: case 0x1b6:
-	    case 0x1d76: case 0x1d8e: case 0x1e91: case 0x1e93:
-	    case 0x1e95: case 0x2c6c:
+		      প্রত্যাগম;
+	    পক্ষ 'z': পক্ষ 0x17a: পক্ষ 0x17c: পক্ষ 0x17e: পক্ষ 0x1b6:
+	    পক্ষ 0x1d76: পক্ষ 0x1d8e: পক্ষ 0x1e91: পক্ষ 0x1e93:
+	    পক্ষ 0x1e95: পক্ষ 0x2c6c:
 		      regmbc('z'); regmbc(0x17a); regmbc(0x17c);
 		      regmbc(0x17e); regmbc(0x1b6); regmbc(0x1d76);
 		      regmbc(0x1d8e); regmbc(0x1e91); regmbc(0x1e93);
 		      regmbc(0x1e95); regmbc(0x2c6c);
-		      return;
+		      প্রত্যাগম;
 	}
     }
     regmbc(c);
@@ -1053,34 +1053,34 @@ reg_equi_class(int c)
  * Emit a node.
  * Return pointer to generated code.
  */
-    static char_u *
-regnode(int op)
+    স্থির char_u *
+regnode(পূর্ণাঙ্ক op)
 {
     char_u  *ret;
 
     ret = regcode;
-    if (ret == JUST_CALC_SIZE)
+    যদি (ret == JUST_CALC_SIZE)
 	regsize += 3;
-    else
+    অন্যথা
     {
 	*regcode++ = op;
 	*regcode++ = NUL;		// Null "next" pointer.
 	*regcode++ = NUL;
     }
-    return ret;
+    প্রত্যাগম ret;
 }
 
 /*
  * Write a long as four bytes at "p" and return pointer to the next char.
  */
-    static char_u *
+    স্থির char_u *
 re_put_long(char_u *p, long_u val)
 {
     *p++ = (char_u) ((val >> 24) & 0377);
     *p++ = (char_u) ((val >> 16) & 0377);
     *p++ = (char_u) ((val >> 8) & 0377);
     *p++ = (char_u) (val & 0377);
-    return p;
+    প্রত্যাগম p;
 }
 
 /*
@@ -1088,57 +1088,57 @@ re_put_long(char_u *p, long_u val)
  * Returns NULL when calculating size, when there is no next item and when
  * there is an error.
  */
-    static char_u *
+    স্থির char_u *
 regnext(char_u *p)
 {
-    int	    offset;
+    পূর্ণাঙ্ক	    offset;
 
-    if (p == JUST_CALC_SIZE || reg_toolong)
-	return NULL;
+    যদি (p == JUST_CALC_SIZE || reg_toolong)
+	প্রত্যাগম রিক্ত;
 
     offset = NEXT(p);
-    if (offset == 0)
-	return NULL;
+    যদি (offset == 0)
+	প্রত্যাগম রিক্ত;
 
-    if (OP(p) == BACK)
-	return p - offset;
-    else
-	return p + offset;
+    যদি (OP(p) == BACK)
+	প্রত্যাগম p - offset;
+    অন্যথা
+	প্রত্যাগম p + offset;
 }
 
 /*
  * Set the next-pointer at the end of a node chain.
  */
-    static void
+    স্থির শূন্য
 regtail(char_u *p, char_u *val)
 {
     char_u	*scan;
     char_u	*temp;
-    int		offset;
+    পূর্ণাঙ্ক		offset;
 
-    if (p == JUST_CALC_SIZE)
-	return;
+    যদি (p == JUST_CALC_SIZE)
+	প্রত্যাগম;
 
     // Find last node.
     scan = p;
-    for (;;)
+    প্রতি (;;)
     {
 	temp = regnext(scan);
-	if (temp == NULL)
-	    break;
+	যদি (temp == রিক্ত)
+	    ভঙ্গ;
 	scan = temp;
     }
 
-    if (OP(scan) == BACK)
-	offset = (int)(scan - val);
-    else
-	offset = (int)(val - scan);
+    যদি (OP(scan) == BACK)
+	offset = (পূর্ণাঙ্ক)(scan - val);
+    অন্যথা
+	offset = (পূর্ণাঙ্ক)(val - scan);
     // When the offset uses more than 16 bits it can no longer fit in the two
     // bytes available.  Use a global flag to avoid having to check return
     // values in too many places.
-    if (offset > 0xffff)
+    যদি (offset > 0xffff)
 	reg_toolong = TRUE;
-    else
+    অন্যথা
     {
 	*(scan + 1) = (char_u) (((unsigned)offset >> 8) & 0377);
 	*(scan + 2) = (char_u) (offset & 0377);
@@ -1148,14 +1148,14 @@ regtail(char_u *p, char_u *val)
 /*
  * Like regtail, on item after a BRANCH; nop if none.
  */
-    static void
+    স্থির শূন্য
 regoptail(char_u *p, char_u *val)
 {
     // When op is neither BRANCH nor BRACE_COMPLEX0-9, it is "operandless"
-    if (p == NULL || p == JUST_CALC_SIZE
+    যদি (p == রিক্ত || p == JUST_CALC_SIZE
 	    || (OP(p) != BRANCH
 		&& (OP(p) < BRACE_COMPLEX || OP(p) > BRACE_COMPLEX + 9)))
-	return;
+	প্রত্যাগম;
     regtail(OPERAND(p), val);
 }
 
@@ -1164,22 +1164,22 @@ regoptail(char_u *p, char_u *val)
  *
  * Means relocating the operand.
  */
-    static void
-reginsert(int op, char_u *opnd)
+    স্থির শূন্য
+reginsert(পূর্ণাঙ্ক op, char_u *opnd)
 {
     char_u	*src;
     char_u	*dst;
     char_u	*place;
 
-    if (regcode == JUST_CALC_SIZE)
+    যদি (regcode == JUST_CALC_SIZE)
     {
 	regsize += 3;
-	return;
+	প্রত্যাগম;
     }
     src = regcode;
     regcode += 3;
     dst = regcode;
-    while (src > opnd)
+    যাবত্ (src > opnd)
 	*--dst = *--src;
 
     place = opnd;		// Op node, where operand used to be.
@@ -1192,22 +1192,22 @@ reginsert(int op, char_u *opnd)
  * Insert an operator in front of already-emitted operand.
  * Add a number to the operator.
  */
-    static void
-reginsert_nr(int op, long val, char_u *opnd)
+    স্থির শূন্য
+reginsert_nr(পূর্ণাঙ্ক op, long val, char_u *opnd)
 {
     char_u	*src;
     char_u	*dst;
     char_u	*place;
 
-    if (regcode == JUST_CALC_SIZE)
+    যদি (regcode == JUST_CALC_SIZE)
     {
 	regsize += 7;
-	return;
+	প্রত্যাগম;
     }
     src = regcode;
     regcode += 7;
     dst = regcode;
-    while (src > opnd)
+    যাবত্ (src > opnd)
 	*--dst = *--src;
 
     place = opnd;		// Op node, where operand used to be.
@@ -1223,9 +1223,9 @@ reginsert_nr(int op, long val, char_u *opnd)
  *
  * Means relocating the operand.
  */
-    static void
+    স্থির শূন্য
 reginsert_limits(
-    int		op,
+    পূর্ণাঙ্ক		op,
     long	minval,
     long	maxval,
     char_u	*opnd)
@@ -1234,15 +1234,15 @@ reginsert_limits(
     char_u	*dst;
     char_u	*place;
 
-    if (regcode == JUST_CALC_SIZE)
+    যদি (regcode == JUST_CALC_SIZE)
     {
 	regsize += 11;
-	return;
+	প্রত্যাগম;
     }
     src = regcode;
     regcode += 11;
     dst = regcode;
-    while (src > opnd)
+    যাবত্ (src > opnd)
 	*--dst = *--src;
 
     place = opnd;		// Op node, where operand used to be.
@@ -1260,26 +1260,26 @@ reginsert_limits(
  * TODO: Should also check that we don't refer to something that is repeated
  * (+*=): what instance of the repetition should we match?
  */
-    static int
-seen_endbrace(int refnum)
+    স্থির পূর্ণাঙ্ক
+seen_endbrace(পূর্ণাঙ্ক refnum)
 {
-    if (!had_endbrace[refnum])
+    যদি (!had_endbrace[refnum])
     {
 	char_u *p;
 
 	// Trick: check if "@<=" or "@<!" follows, in which case
 	// the \1 can appear before the referenced match.
-	for (p = regparse; *p != NUL; ++p)
-	    if (p[0] == '@' && p[1] == '<' && (p[2] == '!' || p[2] == '='))
-		break;
-	if (*p == NUL)
+	প্রতি (p = regparse; *p != NUL; ++p)
+	    যদি (p[0] == '@' && p[1] == '<' && (p[2] == '!' || p[2] == '='))
+		ভঙ্গ;
+	যদি (*p == NUL)
 	{
 	    emsg(_(e_illegal_back_reference));
 	    rc_did_emsg = TRUE;
-	    return FALSE;
+	    প্রত্যাগম FALSE;
 	}
     }
-    return TRUE;
+    প্রত্যাগম TRUE;
 }
 
 /*
@@ -1289,111 +1289,111 @@ seen_endbrace(int refnum)
  * it can turn them into a single node, which is smaller to store and
  * faster to run.  Don't do this when one_exactly is set.
  */
-    static char_u *
-regatom(int *flagp)
+    স্থির char_u *
+regatom(পূর্ণাঙ্ক *flagp)
 {
     char_u	    *ret;
-    int		    flags;
-    int		    c;
+    পূর্ণাঙ্ক		    flags;
+    পূর্ণাঙ্ক		    c;
     char_u	    *p;
-    int		    extra = 0;
-    int		    save_prev_at_start = prev_at_start;
+    পূর্ণাঙ্ক		    extra = 0;
+    পূর্ণাঙ্ক		    save_prev_at_start = prev_at_start;
 
     *flagp = WORST;		// Tentatively.
 
     c = getchr();
-    switch (c)
+    বিকল্প (c)
     {
-      case Magic('^'):
+      পক্ষ Magic('^'):
 	ret = regnode(BOL);
-	break;
+	ভঙ্গ;
 
-      case Magic('$'):
+      পক্ষ Magic('$'):
 	ret = regnode(EOL);
-#if defined(FEAT_SYN_HL)
+#যদি defined(FEAT_SYN_HL)
 	had_eol = TRUE;
 #endif
-	break;
+	ভঙ্গ;
 
-      case Magic('<'):
+      পক্ষ Magic('<'):
 	ret = regnode(BOW);
-	break;
+	ভঙ্গ;
 
-      case Magic('>'):
+      পক্ষ Magic('>'):
 	ret = regnode(EOW);
-	break;
+	ভঙ্গ;
 
-      case Magic('_'):
+      পক্ষ Magic('_'):
 	c = no_Magic(getchr());
-	if (c == '^')		// "\_^" is start-of-line
+	যদি (c == '^')		// "\_^" is start-of-line
 	{
 	    ret = regnode(BOL);
-	    break;
+	    ভঙ্গ;
 	}
-	if (c == '$')		// "\_$" is end-of-line
+	যদি (c == '$')		// "\_$" is end-of-line
 	{
 	    ret = regnode(EOL);
-#if defined(FEAT_SYN_HL)
+#যদি defined(FEAT_SYN_HL)
 	    had_eol = TRUE;
 #endif
-	    break;
+	    ভঙ্গ;
 	}
 
 	extra = ADD_NL;
 	*flagp |= HASNL;
 
 	// "\_[" is character range plus newline
-	if (c == '[')
-	    goto collection;
+	যদি (c == '[')
+	    গচ্ছ collection;
 
 	// "\_x" is character class plus newline
 	// FALLTHROUGH
 
 	// Character classes.
-      case Magic('.'):
-      case Magic('i'):
-      case Magic('I'):
-      case Magic('k'):
-      case Magic('K'):
-      case Magic('f'):
-      case Magic('F'):
-      case Magic('p'):
-      case Magic('P'):
-      case Magic('s'):
-      case Magic('S'):
-      case Magic('d'):
-      case Magic('D'):
-      case Magic('x'):
-      case Magic('X'):
-      case Magic('o'):
-      case Magic('O'):
-      case Magic('w'):
-      case Magic('W'):
-      case Magic('h'):
-      case Magic('H'):
-      case Magic('a'):
-      case Magic('A'):
-      case Magic('l'):
-      case Magic('L'):
-      case Magic('u'):
-      case Magic('U'):
+      পক্ষ Magic('.'):
+      পক্ষ Magic('i'):
+      পক্ষ Magic('I'):
+      পক্ষ Magic('k'):
+      পক্ষ Magic('K'):
+      পক্ষ Magic('f'):
+      পক্ষ Magic('F'):
+      পক্ষ Magic('p'):
+      পক্ষ Magic('P'):
+      পক্ষ Magic('s'):
+      পক্ষ Magic('S'):
+      পক্ষ Magic('d'):
+      পক্ষ Magic('D'):
+      পক্ষ Magic('x'):
+      পক্ষ Magic('X'):
+      পক্ষ Magic('o'):
+      পক্ষ Magic('O'):
+      পক্ষ Magic('w'):
+      পক্ষ Magic('W'):
+      পক্ষ Magic('h'):
+      পক্ষ Magic('H'):
+      পক্ষ Magic('a'):
+      পক্ষ Magic('A'):
+      পক্ষ Magic('l'):
+      পক্ষ Magic('L'):
+      পক্ষ Magic('u'):
+      পক্ষ Magic('U'):
 	p = vim_strchr(classchars, no_Magic(c));
-	if (p == NULL)
+	যদি (p == রিক্ত)
 	    EMSG_RET_NULL(_(e_invalid_use_of_underscore));
 
 	// When '.' is followed by a composing char ignore the dot, so that
 	// the composing char is matched here.
-	if (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
+	যদি (enc_utf8 && c == Magic('.') && utf_iscomposing(peekchr()))
 	{
 	    c = getchr();
-	    goto do_multibyte;
+	    গচ্ছ do_multibyte;
 	}
 	ret = regnode(classcodes[p - classchars] + extra);
 	*flagp |= HASWIDTH | SIMPLE;
-	break;
+	ভঙ্গ;
 
-      case Magic('n'):
-	if (reg_string)
+      পক্ষ Magic('n'):
+	যদি (reg_string)
 	{
 	    // In a string "\n" matches a newline character.
 	    ret = regnode(EXACTLY);
@@ -1401,359 +1401,359 @@ regatom(int *flagp)
 	    regc(NUL);
 	    *flagp |= HASWIDTH | SIMPLE;
 	}
-	else
+	অন্যথা
 	{
 	    // In buffer text "\n" matches the end of a line.
 	    ret = regnode(NEWL);
 	    *flagp |= HASWIDTH | HASNL;
 	}
-	break;
+	ভঙ্গ;
 
-      case Magic('('):
-	if (one_exactly)
+      পক্ষ Magic('('):
+	যদি (one_exactly)
 	    EMSG_ONE_RET_NULL;
 	ret = reg(REG_PAREN, &flags);
-	if (ret == NULL)
-	    return NULL;
+	যদি (ret == রিক্ত)
+	    প্রত্যাগম রিক্ত;
 	*flagp |= flags & (HASWIDTH | SPSTART | HASNL | HASLOOKBH);
-	break;
+	ভঙ্গ;
 
-      case NUL:
-      case Magic('|'):
-      case Magic('&'):
-      case Magic(')'):
-	if (one_exactly)
+      পক্ষ NUL:
+      পক্ষ Magic('|'):
+      পক্ষ Magic('&'):
+      পক্ষ Magic(')'):
+	যদি (one_exactly)
 	    EMSG_ONE_RET_NULL;
 	// Supposed to be caught earlier.
 	IEMSG_RET_NULL(e_internal_error_in_regexp);
 	// NOTREACHED
 
-      case Magic('='):
-      case Magic('?'):
-      case Magic('+'):
-      case Magic('@'):
-      case Magic('{'):
-      case Magic('*'):
+      পক্ষ Magic('='):
+      পক্ষ Magic('?'):
+      পক্ষ Magic('+'):
+      পক্ষ Magic('@'):
+      পক্ষ Magic('{'):
+      পক্ষ Magic('*'):
 	c = no_Magic(c);
 	EMSG3_RET_NULL(_(e_str_chr_follows_nothing),
 		(c == '*' ? reg_magic >= MAGIC_ON : reg_magic == MAGIC_ALL), c);
 	// NOTREACHED
 
-      case Magic('~'):		// previous substitute pattern
-	    if (reg_prev_sub != NULL)
+      পক্ষ Magic('~'):		// previous substitute pattern
+	    যদি (reg_prev_sub != রিক্ত)
 	    {
 		char_u	    *lp;
 
 		ret = regnode(EXACTLY);
 		lp = reg_prev_sub;
-		while (*lp != NUL)
+		যাবত্ (*lp != NUL)
 		    regc(*lp++);
 		regc(NUL);
-		if (*reg_prev_sub != NUL)
+		যদি (*reg_prev_sub != NUL)
 		{
 		    *flagp |= HASWIDTH;
-		    if ((lp - reg_prev_sub) == 1)
+		    যদি ((lp - reg_prev_sub) == 1)
 			*flagp |= SIMPLE;
 		}
 	    }
-	    else
+	    অন্যথা
 		EMSG_RET_NULL(_(e_no_previous_substitute_regular_expression));
-	    break;
+	    ভঙ্গ;
 
-      case Magic('1'):
-      case Magic('2'):
-      case Magic('3'):
-      case Magic('4'):
-      case Magic('5'):
-      case Magic('6'):
-      case Magic('7'):
-      case Magic('8'):
-      case Magic('9'):
+      পক্ষ Magic('1'):
+      পক্ষ Magic('2'):
+      পক্ষ Magic('3'):
+      পক্ষ Magic('4'):
+      পক্ষ Magic('5'):
+      পক্ষ Magic('6'):
+      পক্ষ Magic('7'):
+      পক্ষ Magic('8'):
+      পক্ষ Magic('9'):
 	    {
-		int		    refnum;
+		পূর্ণাঙ্ক		    refnum;
 
 		refnum = c - Magic('0');
-		if (!seen_endbrace(refnum))
-		    return NULL;
+		যদি (!seen_endbrace(refnum))
+		    প্রত্যাগম রিক্ত;
 		ret = regnode(BACKREF + refnum);
 	    }
-	    break;
+	    ভঙ্গ;
 
-      case Magic('z'):
+      পক্ষ Magic('z'):
 	{
 	    c = no_Magic(getchr());
-	    switch (c)
+	    বিকল্প (c)
 	    {
 #ifdef FEAT_SYN_HL
-		case '(': if ((reg_do_extmatch & REX_SET) == 0)
+		পক্ষ '(': যদি ((reg_do_extmatch & REX_SET) == 0)
 			      EMSG_RET_NULL(_(e_z_not_allowed_here));
-			  if (one_exactly)
+			  যদি (one_exactly)
 			      EMSG_ONE_RET_NULL;
 			  ret = reg(REG_ZPAREN, &flags);
-			  if (ret == NULL)
-			      return NULL;
+			  যদি (ret == রিক্ত)
+			      প্রত্যাগম রিক্ত;
 			  *flagp |= flags & (HASWIDTH|SPSTART|HASNL|HASLOOKBH);
 			  re_has_z = REX_SET;
-			  break;
+			  ভঙ্গ;
 
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9': if ((reg_do_extmatch & REX_USE) == 0)
+		পক্ষ '1':
+		পক্ষ '2':
+		পক্ষ '3':
+		পক্ষ '4':
+		পক্ষ '5':
+		পক্ষ '6':
+		পক্ষ '7':
+		পক্ষ '8':
+		পক্ষ '9': যদি ((reg_do_extmatch & REX_USE) == 0)
 			      EMSG_RET_NULL(_(e_z1_z9_not_allowed_here));
 			  ret = regnode(ZREF + c - '0');
 			  re_has_z = REX_USE;
-			  break;
+			  ভঙ্গ;
 #endif
 
-		case 's': ret = regnode(MOPEN + 0);
-			  if (re_mult_next("\\zs") == FAIL)
-			      return NULL;
-			  break;
+		পক্ষ 's': ret = regnode(MOPEN + 0);
+			  যদি (re_mult_next("\\zs") == FAIL)
+			      প্রত্যাগম রিক্ত;
+			  ভঙ্গ;
 
-		case 'e': ret = regnode(MCLOSE + 0);
-			  if (re_mult_next("\\ze") == FAIL)
-			      return NULL;
-			  break;
+		পক্ষ 'e': ret = regnode(MCLOSE + 0);
+			  যদি (re_mult_next("\\ze") == FAIL)
+			      প্রত্যাগম রিক্ত;
+			  ভঙ্গ;
 
-		default:  EMSG_RET_NULL(_(e_invalid_character_after_bsl_z));
+		স্বভাব:  EMSG_RET_NULL(_(e_invalid_character_after_bsl_z));
 	    }
 	}
-	break;
+	ভঙ্গ;
 
-      case Magic('%'):
+      পক্ষ Magic('%'):
 	{
 	    c = no_Magic(getchr());
-	    switch (c)
+	    বিকল্প (c)
 	    {
 		// () without a back reference
-		case '(':
-		    if (one_exactly)
+		পক্ষ '(':
+		    যদি (one_exactly)
 			EMSG_ONE_RET_NULL;
 		    ret = reg(REG_NPAREN, &flags);
-		    if (ret == NULL)
-			return NULL;
+		    যদি (ret == রিক্ত)
+			প্রত্যাগম রিক্ত;
 		    *flagp |= flags & (HASWIDTH | SPSTART | HASNL | HASLOOKBH);
-		    break;
+		    ভঙ্গ;
 
 		// Catch \%^ and \%$ regardless of where they appear in the
 		// pattern -- regardless of whether or not it makes sense.
-		case '^':
+		পক্ষ '^':
 		    ret = regnode(RE_BOF);
-		    break;
+		    ভঙ্গ;
 
-		case '$':
+		পক্ষ '$':
 		    ret = regnode(RE_EOF);
-		    break;
+		    ভঙ্গ;
 
-		case '#':
-		    if (regparse[0] == '=' && regparse[1] >= 48
+		পক্ষ '#':
+		    যদি (regparse[0] == '=' && regparse[1] >= 48
 							  && regparse[1] <= 50)
 		    {
 			// misplaced \%#=1
 			semsg(_(e_atom_engine_must_be_at_start_of_pattern),
 								  regparse[1]);
-			return FAIL;
+			প্রত্যাগম FAIL;
 		    }
 		    ret = regnode(CURSOR);
-		    break;
+		    ভঙ্গ;
 
-		case 'V':
+		পক্ষ 'V':
 		    ret = regnode(RE_VISUAL);
-		    break;
+		    ভঙ্গ;
 
-		case 'C':
+		পক্ষ 'C':
 		    ret = regnode(RE_COMPOSING);
-		    break;
+		    ভঙ্গ;
 
 		// \%[abc]: Emit as a list of branches, all ending at the last
 		// branch which matches nothing.
-		case '[':
-			  if (one_exactly)	// doesn't nest
+		পক্ষ '[':
+			  যদি (one_exactly)	// doesn't nest
 			      EMSG_ONE_RET_NULL;
 			  {
 			      char_u	*lastbranch;
-			      char_u	*lastnode = NULL;
+			      char_u	*lastnode = রিক্ত;
 			      char_u	*br;
 
-			      ret = NULL;
-			      while ((c = getchr()) != ']')
+			      ret = রিক্ত;
+			      যাবত্ ((c = getchr()) != ']')
 			      {
-				  if (c == NUL)
+				  যদি (c == NUL)
 				      EMSG2_RET_NULL(_(e_missing_sb_after_str),
 						      reg_magic == MAGIC_ALL);
 				  br = regnode(BRANCH);
-				  if (ret == NULL)
+				  যদি (ret == রিক্ত)
 				      ret = br;
-				  else
+				  অন্যথা
 				  {
 				      regtail(lastnode, br);
-				      if (reg_toolong)
-					  return NULL;
+				      যদি (reg_toolong)
+					  প্রত্যাগম রিক্ত;
 				  }
 
 				  ungetchr();
 				  one_exactly = TRUE;
 				  lastnode = regatom(flagp);
 				  one_exactly = FALSE;
-				  if (lastnode == NULL)
-				      return NULL;
+				  যদি (lastnode == রিক্ত)
+				      প্রত্যাগম রিক্ত;
 			      }
-			      if (ret == NULL)
+			      যদি (ret == রিক্ত)
 				  EMSG2_RET_NULL(_(e_empty_str_brackets),
 						      reg_magic == MAGIC_ALL);
 			      lastbranch = regnode(BRANCH);
 			      br = regnode(NOTHING);
-			      if (ret != JUST_CALC_SIZE)
+			      যদি (ret != JUST_CALC_SIZE)
 			      {
 				  regtail(lastnode, br);
 				  regtail(lastbranch, br);
 				  // connect all branches to the NOTHING
 				  // branch at the end
-				  for (br = ret; br != lastnode; )
+				  প্রতি (br = ret; br != lastnode; )
 				  {
-				      if (OP(br) == BRANCH)
+				      যদি (OP(br) == BRANCH)
 				      {
 					  regtail(br, lastbranch);
-					  if (reg_toolong)
-					      return NULL;
+					  যদি (reg_toolong)
+					      প্রত্যাগম রিক্ত;
 					  br = OPERAND(br);
 				      }
-				      else
+				      অন্যথা
 					  br = regnext(br);
 				  }
 			      }
 			      *flagp &= ~(HASWIDTH | SIMPLE);
-			      break;
+			      ভঙ্গ;
 			  }
 
-		case 'd':   // %d123 decimal
-		case 'o':   // %o123 octal
-		case 'x':   // %xab hex 2
-		case 'u':   // %uabcd hex 4
-		case 'U':   // %U1234abcd hex 8
+		পক্ষ 'd':   // %d123 decimal
+		পক্ষ 'o':   // %o123 octal
+		পক্ষ 'x':   // %xab hex 2
+		পক্ষ 'u':   // %uabcd hex 4
+		পক্ষ 'U':   // %U1234abcd hex 8
 			  {
 			      vimlong_T i;
 
-			      switch (c)
+			      বিকল্প (c)
 			      {
-				  case 'd': i = getdecchrs(); break;
-				  case 'o': i = getoctchrs(); break;
-				  case 'x': i = gethexchrs(2); break;
-				  case 'u': i = gethexchrs(4); break;
-				  case 'U': i = gethexchrs(8); break;
-				  default:  i = -1; break;
+				  পক্ষ 'd': i = getdecchrs(); ভঙ্গ;
+				  পক্ষ 'o': i = getoctchrs(); ভঙ্গ;
+				  পক্ষ 'x': i = gethexchrs(2); ভঙ্গ;
+				  পক্ষ 'u': i = gethexchrs(4); ভঙ্গ;
+				  পক্ষ 'U': i = gethexchrs(8); ভঙ্গ;
+				  স্বভাব:  i = -1; ভঙ্গ;
 			      }
 
-			      if (i < 0 || i > INT_MAX)
+			      যদি (i < 0 || i > INT_MAX)
 				  EMSG2_RET_NULL(
 					    _(e_invalid_character_after_str_2),
 						       reg_magic == MAGIC_ALL);
-			      if (use_multibytecode(i))
+			      যদি (use_multibytecode(i))
 				  ret = regnode(MULTIBYTECODE);
-			      else
+			      অন্যথা
 				  ret = regnode(EXACTLY);
-			      if (i == 0)
+			      যদি (i == 0)
 				  regc(0x0a);
-			      else
-				  regmbc((int)i);
+			      অন্যথা
+				  regmbc((পূর্ণাঙ্ক)i);
 			      regc(NUL);
 			      *flagp |= HASWIDTH;
-			      break;
+			      ভঙ্গ;
 			  }
 
-		default:
-			  if (VIM_ISDIGIT(c) || c == '<' || c == '>'
+		স্বভাব:
+			  যদি (VIM_ISDIGIT(c) || c == '<' || c == '>'
 						|| c == '\'' || c == '.')
 			  {
 			      long_u	n = 0;
-			      int	cmp;
-			      int	cur = FALSE;
-			      int	got_digit = FALSE;
+			      পূর্ণাঙ্ক	cmp;
+			      পূর্ণাঙ্ক	cur = FALSE;
+			      পূর্ণাঙ্ক	got_digit = FALSE;
 
 			      cmp = c;
-			      if (cmp == '<' || cmp == '>')
+			      যদি (cmp == '<' || cmp == '>')
 				  c = getchr();
-			      if (no_Magic(c) == '.')
+			      যদি (no_Magic(c) == '.')
 			      {
 				  cur = TRUE;
 				  c = getchr();
 			      }
-			      while (VIM_ISDIGIT(c))
+			      যাবত্ (VIM_ISDIGIT(c))
 			      {
 				  got_digit = TRUE;
 				  n = n * 10 + (c - '0');
 				  c = getchr();
 			      }
-			      if (no_Magic(c) == '\'' && n == 0)
+			      যদি (no_Magic(c) == '\'' && n == 0)
 			      {
 				  // "\%'m", "\%<'m" and "\%>'m": Mark
 				  c = getchr();
 				  ret = regnode(RE_MARK);
-				  if (ret == JUST_CALC_SIZE)
+				  যদি (ret == JUST_CALC_SIZE)
 				      regsize += 2;
-				  else
+				  অন্যথা
 				  {
 				      *regcode++ = c;
 				      *regcode++ = cmp;
 				  }
-				  break;
+				  ভঙ্গ;
 			      }
-			      else if ((c == 'l' || c == 'c' || c == 'v')
+			      অন্যথা যদি ((c == 'l' || c == 'c' || c == 'v')
 					  && (cur || got_digit))
 			      {
-				  if (cur && n)
+				  যদি (cur && n)
 				  {
-				    semsg(_(e_regexp_number_after_dot_pos_search_chr),
+				    semsg(_(e_regexp_সংখ্যা_after_dot_pos_অনুসন্ধান_chr),
 								  no_Magic(c));
 				    rc_did_emsg = TRUE;
-				    return NULL;
+				    প্রত্যাগম রিক্ত;
 				  }
-				  if (c == 'l')
+				  যদি (c == 'l')
 				  {
-				      if (cur)
+				      যদি (cur)
 					  n = curwin->w_cursor.lnum;
 				      ret = regnode(RE_LNUM);
-				      if (save_prev_at_start)
+				      যদি (save_prev_at_start)
 					  at_start = TRUE;
 				  }
-				  else if (c == 'c')
+				  অন্যথা যদি (c == 'c')
 				  {
-				      if (cur)
+				      যদি (cur)
 				      {
 					  n = curwin->w_cursor.col;
 					  n++;
 				      }
 				      ret = regnode(RE_COL);
 				  }
-				  else
+				  অন্যথা
 				  {
-				      if (cur)
+				      যদি (cur)
 				      {
 					  colnr_T vcol = 0;
 
 					  getvvcol(curwin, &curwin->w_cursor,
-							 NULL, NULL, &vcol, 0);
+							 রিক্ত, রিক্ত, &vcol, 0);
 					  ++vcol;
 					  n = vcol;
 				      }
 				      ret = regnode(RE_VCOL);
 				  }
-				  if (ret == JUST_CALC_SIZE)
+				  যদি (ret == JUST_CALC_SIZE)
 				      regsize += 5;
-				  else
+				  অন্যথা
 				  {
 				      // put the number and the optional
 				      // comparator after the opcode
 				      regcode = re_put_long(regcode, n);
 				      *regcode++ = cmp;
 				  }
-				  break;
+				  ভঙ্গ;
 			      }
 			  }
 
@@ -1761,9 +1761,9 @@ regatom(int *flagp)
 						      reg_magic == MAGIC_ALL);
 	    }
 	}
-	break;
+	ভঙ্গ;
 
-      case Magic('['):
+      পক্ষ Magic('['):
 collection:
 	{
 	    char_u	*lp;
@@ -1771,88 +1771,88 @@ collection:
 	    // If there is no matching ']', we assume the '[' is a normal
 	    // character.  This makes 'incsearch' and ":help [" work.
 	    lp = skip_anyof(regparse);
-	    if (*lp == ']')	// there is a matching ']'
+	    যদি (*lp == ']')	// there is a matching ']'
 	    {
-		int	startc = -1;	// > 0 when next '-' is a range
-		int	endc;
+		পূর্ণাঙ্ক	startc = -1;	// > 0 when next '-' is a range
+		পূর্ণাঙ্ক	endc;
 
-		if (extra == 0)
+		যদি (extra == 0)
 		{
-		    int	cl = bt_recognize_char_class(regparse, lp);
+		    পূর্ণাঙ্ক	cl = bt_recognize_char_class(regparse, lp);
 
-		    if (cl != 0)
+		    যদি (cl != 0)
 		    {
 			ret = regnode(cl);
 			regparse = lp;
 			skipchr();
 			*flagp |= HASWIDTH | SIMPLE;
-			break;
+			ভঙ্গ;
 		    }
 		}
 
 		// In a character class, different parsing rules apply.
 		// Not even \ is special anymore, nothing is.
-		if (*regparse == '^')	    // Complement of range.
+		যদি (*regparse == '^')	    // Complement of range.
 		{
 		    ret = regnode(ANYBUT + extra);
 		    regparse++;
 		}
-		else
+		অন্যথা
 		    ret = regnode(ANYOF + extra);
 
 		// At the start ']' and '-' mean the literal character.
-		if (*regparse == ']' || *regparse == '-')
+		যদি (*regparse == ']' || *regparse == '-')
 		{
 		    startc = *regparse;
 		    regc(*regparse++);
 		}
 
-		while (*regparse != NUL && *regparse != ']')
+		যাবত্ (*regparse != NUL && *regparse != ']')
 		{
-		    if (*regparse == '-')
+		    যদি (*regparse == '-')
 		    {
 			++regparse;
 			// The '-' is not used for a range at the end and
 			// after or before a '\n'.
-			if (*regparse == ']' || *regparse == NUL
+			যদি (*regparse == ']' || *regparse == NUL
 				|| startc == -1
 				|| (regparse[0] == '\\' && regparse[1] == 'n'))
 			{
 			    regc('-');
 			    startc = '-';	// [--x] is a range
 			}
-			else
+			অন্যথা
 			{
 			    // Also accept "a-[.z.]"
 			    endc = 0;
-			    if (*regparse == '[')
+			    যদি (*regparse == '[')
 				endc = get_coll_element(&regparse);
-			    if (endc == 0)
+			    যদি (endc == 0)
 			    {
-				if (has_mbyte)
+				যদি (has_mbyte)
 				    endc = mb_ptr2char_adv(&regparse);
-				else
+				অন্যথা
 				    endc = *regparse++;
 			    }
 
 			    // Handle \o40, \x20 and \u20AC style sequences
-			    if (endc == '\\' && !reg_cpo_lit && !reg_cpo_bsl)
+			    যদি (endc == '\\' && !reg_cpo_lit && !reg_cpo_bsl)
 				endc = coll_get_char();
 
-			    if (startc > endc)
+			    যদি (startc > endc)
 				EMSG_RET_NULL(_(e_reverse_range_in_character_class));
-			    if (has_mbyte && ((*mb_char2len)(startc) > 1
+			    যদি (has_mbyte && ((*mb_char2len)(startc) > 1
 						 || (*mb_char2len)(endc) > 1))
 			    {
 				// Limit to a range of 256 chars.
-				if (endc > startc + 256)
+				যদি (endc > startc + 256)
 				    EMSG_RET_NULL(_(e_range_too_large_in_character_class));
-				while (++startc <= endc)
+				যাবত্ (++startc <= endc)
 				    regmbc(startc);
 			    }
-			    else
+			    অন্যথা
 			    {
-				while (++startc <= endc)
+				যাবত্ (++startc <= endc)
 				    regc(startc);
 			    }
 			    startc = -1;
@@ -1862,22 +1862,22 @@ collection:
 		    // accepts "\t", "\e", etc., but only when the 'l' flag in
 		    // 'cpoptions' is not included.
 		    // Posix doesn't recognize backslash at all.
-		    else if (*regparse == '\\'
+		    অন্যথা যদি (*regparse == '\\'
 			    && !reg_cpo_bsl
-			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != NULL
+			    && (vim_strchr(REGEXP_INRANGE, regparse[1]) != রিক্ত
 				|| (!reg_cpo_lit
 				    && vim_strchr(REGEXP_ABBR,
-						       regparse[1]) != NULL)))
+						       regparse[1]) != রিক্ত)))
 		    {
 			regparse++;
-			if (*regparse == 'n')
+			যদি (*regparse == 'n')
 			{
 			    // '\n' in range: also match NL
-			    if (ret != JUST_CALC_SIZE)
+			    যদি (ret != JUST_CALC_SIZE)
 			    {
 				// Using \n inside [^] does not change what
 				// matches. "[^\n]" is the same as ".".
-				if (*ret == ANYOF)
+				যদি (*ret == ANYOF)
 				{
 				    *ret = ANYOF + ADD_NL;
 				    *flagp |= HASNL;
@@ -1887,7 +1887,7 @@ collection:
 			    regparse++;
 			    startc = -1;
 			}
-			else if (*regparse == 'd'
+			অন্যথা যদি (*regparse == 'd'
 				|| *regparse == 'o'
 				|| *regparse == 'x'
 				|| *regparse == 'u'
@@ -1896,154 +1896,154 @@ collection:
 			    startc = coll_get_char();
 			    // max UTF-8 Codepoint is U+10FFFF,
 			    // but allow values until INT_MAX
-			    if (startc == INT_MAX)
+			    যদি (startc == INT_MAX)
 				EMSG_RET_NULL(_(e_unicode_val_too_large));
-			    if (startc == 0)
+			    যদি (startc == 0)
 				regc(0x0a);
-			    else
+			    অন্যথা
 				regmbc(startc);
 			}
-			else
+			অন্যথা
 			{
 			    startc = backslash_trans(*regparse++);
 			    regc(startc);
 			}
 		    }
-		    else if (*regparse == '[')
+		    অন্যথা যদি (*regparse == '[')
 		    {
-			int c_class;
-			int cu;
+			পূর্ণাঙ্ক c_class;
+			পূর্ণাঙ্ক cu;
 
 			c_class = get_char_class(&regparse);
 			startc = -1;
 			// Characters assumed to be 8 bits!
-			switch (c_class)
+			বিকল্প (c_class)
 			{
-			    case CLASS_NONE:
+			    পক্ষ CLASS_NONE:
 				c_class = get_equi_class(&regparse);
-				if (c_class != 0)
+				যদি (c_class != 0)
 				{
 				    // produce equivalence class
 				    reg_equi_class(c_class);
 				}
-				else if ((c_class =
+				অন্যথা যদি ((c_class =
 					    get_coll_element(&regparse)) != 0)
 				{
 				    // produce a collating element
 				    regmbc(c_class);
 				}
-				else
+				অন্যথা
 				{
 				    // literal '[', allow [[-x] as a range
 				    startc = *regparse++;
 				    regc(startc);
 				}
-				break;
-			    case CLASS_ALNUM:
-				for (cu = 1; cu < 128; cu++)
-				    if (isalnum(cu))
+				ভঙ্গ;
+			    পক্ষ CLASS_ALNUM:
+				প্রতি (cu = 1; cu < 128; cu++)
+				    যদি (isalnum(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_ALPHA:
-				for (cu = 1; cu < 128; cu++)
-				    if (isalpha(cu))
+				ভঙ্গ;
+			    পক্ষ CLASS_ALPHA:
+				প্রতি (cu = 1; cu < 128; cu++)
+				    যদি (isalpha(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_BLANK:
+				ভঙ্গ;
+			    পক্ষ CLASS_BLANK:
 				regc(' ');
 				regc('\t');
-				break;
-			    case CLASS_CNTRL:
-				for (cu = 1; cu <= 127; cu++)
-				    if (iscntrl(cu))
+				ভঙ্গ;
+			    পক্ষ CLASS_CNTRL:
+				প্রতি (cu = 1; cu <= 127; cu++)
+				    যদি (iscntrl(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_DIGIT:
-				for (cu = 1; cu <= 127; cu++)
-				    if (VIM_ISDIGIT(cu))
+				ভঙ্গ;
+			    পক্ষ CLASS_DIGIT:
+				প্রতি (cu = 1; cu <= 127; cu++)
+				    যদি (VIM_ISDIGIT(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_GRAPH:
-				for (cu = 1; cu <= 127; cu++)
-				    if (isgraph(cu))
+				ভঙ্গ;
+			    পক্ষ CLASS_GRAPH:
+				প্রতি (cu = 1; cu <= 127; cu++)
+				    যদি (isgraph(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_LOWER:
-				for (cu = 1; cu <= 255; cu++)
-				    if (MB_ISLOWER(cu) && cu != 170
+				ভঙ্গ;
+			    পক্ষ CLASS_LOWER:
+				প্রতি (cu = 1; cu <= 255; cu++)
+				    যদি (MB_ISLOWER(cu) && cu != 170
 								 && cu != 186)
 					regmbc(cu);
-				break;
-			    case CLASS_PRINT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isprintc(cu))
+				ভঙ্গ;
+			    পক্ষ CLASS_PRINT:
+				প্রতি (cu = 1; cu <= 255; cu++)
+				    যদি (vim_isprintc(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_PUNCT:
-				for (cu = 1; cu < 128; cu++)
-				    if (ispunct(cu))
+				ভঙ্গ;
+			    পক্ষ CLASS_PUNCT:
+				প্রতি (cu = 1; cu < 128; cu++)
+				    যদি (ispunct(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_SPACE:
-				for (cu = 9; cu <= 13; cu++)
+				ভঙ্গ;
+			    পক্ষ CLASS_SPACE:
+				প্রতি (cu = 9; cu <= 13; cu++)
 				    regc(cu);
 				regc(' ');
-				break;
-			    case CLASS_UPPER:
-				for (cu = 1; cu <= 255; cu++)
-				    if (MB_ISUPPER(cu))
+				ভঙ্গ;
+			    পক্ষ CLASS_UPPER:
+				প্রতি (cu = 1; cu <= 255; cu++)
+				    যদি (MB_ISUPPER(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_XDIGIT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isxdigit(cu))
+				ভঙ্গ;
+			    পক্ষ CLASS_XDIGIT:
+				প্রতি (cu = 1; cu <= 255; cu++)
+				    যদি (vim_isxdigit(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_TAB:
+				ভঙ্গ;
+			    পক্ষ CLASS_TAB:
 				regc('\t');
-				break;
-			    case CLASS_RETURN:
+				ভঙ্গ;
+			    পক্ষ CLASS_RETURN:
 				regc('\r');
-				break;
-			    case CLASS_BACKSPACE:
+				ভঙ্গ;
+			    পক্ষ CLASS_BACKSPACE:
 				regc('\b');
-				break;
-			    case CLASS_ESCAPE:
+				ভঙ্গ;
+			    পক্ষ CLASS_ESCAPE:
 				regc('\033');
-				break;
-			    case CLASS_IDENT:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isIDc(cu))
+				ভঙ্গ;
+			    পক্ষ CLASS_IDENT:
+				প্রতি (cu = 1; cu <= 255; cu++)
+				    যদি (vim_isIDc(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_KEYWORD:
-				for (cu = 1; cu <= 255; cu++)
-				    if (reg_iswordc(cu))
+				ভঙ্গ;
+			    পক্ষ CLASS_KEYWORD:
+				প্রতি (cu = 1; cu <= 255; cu++)
+				    যদি (reg_iswordc(cu))
 					regmbc(cu);
-				break;
-			    case CLASS_FNAME:
-				for (cu = 1; cu <= 255; cu++)
-				    if (vim_isfilec(cu))
+				ভঙ্গ;
+			    পক্ষ CLASS_FNAME:
+				প্রতি (cu = 1; cu <= 255; cu++)
+				    যদি (vim_isfilec(cu))
 					regmbc(cu);
-				break;
+				ভঙ্গ;
 			}
 		    }
-		    else
+		    অন্যথা
 		    {
-			if (has_mbyte)
+			যদি (has_mbyte)
 			{
-			    int	len;
+			    পূর্ণাঙ্ক	len;
 
 			    // produce a multibyte character, including any
 			    // following composing characters
 			    startc = mb_ptr2char(regparse);
 			    len = (*mb_ptr2len)(regparse);
-			    if (enc_utf8 && utf_char2len(startc) != len)
+			    যদি (enc_utf8 && utf_char2len(startc) != len)
 				startc = -1;	// composing chars
-			    while (--len >= 0)
+			    যাবত্ (--len >= 0)
 				regc(*regparse++);
 			}
-			else
+			অন্যথা
 			{
 			    startc = *regparse++;
 			    regc(startc);
@@ -2052,31 +2052,31 @@ collection:
 		}
 		regc(NUL);
 		prevchr_len = 1;	// last char was the ']'
-		if (*regparse != ']')
+		যদি (*regparse != ']')
 		    EMSG_RET_NULL(_(e_too_many_brackets));  // Cannot happen?
 		skipchr();	    // let's be friends with the lexer again
 		*flagp |= HASWIDTH | SIMPLE;
-		break;
+		ভঙ্গ;
 	    }
-	    else if (reg_strict)
+	    অন্যথা যদি (reg_strict)
 		EMSG2_RET_NULL(_(e_missing_rsb_after_str_lsb),
 							reg_magic > MAGIC_OFF);
 	}
 	// FALLTHROUGH
 
-      default:
+      স্বভাব:
 	{
-	    int		len;
+	    পূর্ণাঙ্ক		len;
 
 	    // A multi-byte character is handled as a separate atom if it's
 	    // before a multi and when it's a composing char.
-	    if (use_multibytecode(c))
+	    যদি (use_multibytecode(c))
 	    {
 do_multibyte:
 		ret = regnode(MULTIBYTECODE);
 		regmbc(c);
 		*flagp |= HASWIDTH | SIMPLE;
-		break;
+		ভঙ্গ;
 	    }
 
 	    ret = regnode(EXACTLY);
@@ -2088,31 +2088,31 @@ do_multibyte:
 	    // - "one_exactly" is not set
 	    // But always emit at least one character.  Might be a Multi,
 	    // e.g., a "[" without matching "]".
-	    for (len = 0; c != NUL && (len == 0
+	    প্রতি (len = 0; c != NUL && (len == 0
 			|| (re_multi_type(peekchr()) == NOT_MULTI
 			    && !one_exactly
 			    && !is_Magic(c))); ++len)
 	    {
 		c = no_Magic(c);
-		if (has_mbyte)
+		যদি (has_mbyte)
 		{
 		    regmbc(c);
-		    if (enc_utf8)
+		    যদি (enc_utf8)
 		    {
-			int	l;
+			পূর্ণাঙ্ক	l;
 
 			// Need to get composing character too.
-			for (;;)
+			প্রতি (;;)
 			{
 			    l = utf_ptr2len(regparse);
-			    if (!UTF_COMPOSINGLIKE(regparse, regparse + l))
-				break;
+			    যদি (!UTF_COMPOSINGLIKE(regparse, regparse + l))
+				ভঙ্গ;
 			    regmbc(utf_ptr2char(regparse));
 			    skipchr();
 			}
 		    }
 		}
-		else
+		অন্যথা
 		    regc(c);
 		c = getchr();
 	    }
@@ -2120,13 +2120,13 @@ do_multibyte:
 
 	    regc(NUL);
 	    *flagp |= HASWIDTH;
-	    if (len == 1)
+	    যদি (len == 1)
 		*flagp |= SIMPLE;
 	}
-	break;
+	ভঙ্গ;
     }
 
-    return ret;
+    প্রত্যাগম ret;
 }
 
 /*
@@ -2138,36 +2138,36 @@ do_multibyte:
  * It might seem that this node could be dispensed with entirely, but the
  * endmarker role is not redundant.
  */
-    static char_u *
-regpiece(int *flagp)
+    স্থির char_u *
+regpiece(পূর্ণাঙ্ক *flagp)
 {
     char_u	    *ret;
-    int		    op;
+    পূর্ণাঙ্ক		    op;
     char_u	    *next;
-    int		    flags;
+    পূর্ণাঙ্ক		    flags;
     long	    minval;
     long	    maxval;
 
     ret = regatom(&flags);
-    if (ret == NULL)
-	return NULL;
+    যদি (ret == রিক্ত)
+	প্রত্যাগম রিক্ত;
 
     op = peekchr();
-    if (re_multi_type(op) == NOT_MULTI)
+    যদি (re_multi_type(op) == NOT_MULTI)
     {
 	*flagp = flags;
-	return ret;
+	প্রত্যাগম ret;
     }
     // default flags
     *flagp = (WORST | SPSTART | (flags & (HASNL | HASLOOKBH)));
 
     skipchr();
-    switch (op)
+    বিকল্প (op)
     {
-	case Magic('*'):
-	    if (flags & SIMPLE)
+	পক্ষ Magic('*'):
+	    যদি (flags & SIMPLE)
 		reginsert(STAR, ret);
-	    else
+	    অন্যথা
 	    {
 		// Emit x* as (x&|), where & means "self".
 		reginsert(BRANCH, ret); // Either x
@@ -2176,12 +2176,12 @@ regpiece(int *flagp)
 		regtail(ret, regnode(BRANCH));	// or
 		regtail(ret, regnode(NOTHING)); // null.
 	    }
-	    break;
+	    ভঙ্গ;
 
-	case Magic('+'):
-	    if (flags & SIMPLE)
+	পক্ষ Magic('+'):
+	    যদি (flags & SIMPLE)
 		reginsert(PLUS, ret);
-	    else
+	    অন্যথা
 	    {
 		// Emit x+ as x(&|), where & means "self".
 		next = regnode(BRANCH); // Either
@@ -2191,188 +2191,188 @@ regpiece(int *flagp)
 		regtail(ret, regnode(NOTHING)); // null.
 	    }
 	    *flagp = (WORST | HASWIDTH | (flags & (HASNL | HASLOOKBH)));
-	    break;
+	    ভঙ্গ;
 
-	case Magic('@'):
+	পক্ষ Magic('@'):
 	    {
-		int	lop = END;
+		পূর্ণাঙ্ক	lop = END;
 		long	nr;
 
 		nr = (long)getdecchrs();
-		switch (no_Magic(getchr()))
+		বিকল্প (no_Magic(getchr()))
 		{
-		    case '=': lop = MATCH; break;		  // \@=
-		    case '!': lop = NOMATCH; break;		  // \@!
-		    case '>': lop = SUBPAT; break;		  // \@>
-		    case '<': switch (no_Magic(getchr()))
+		    পক্ষ '=': lop = MATCH; ভঙ্গ;		  // \@=
+		    পক্ষ '!': lop = NOMATCH; ভঙ্গ;		  // \@!
+		    পক্ষ '>': lop = SUBPAT; ভঙ্গ;		  // \@>
+		    পক্ষ '<': বিকল্প (no_Magic(getchr()))
 			      {
-				  case '=': lop = BEHIND; break;   // \@<=
-				  case '!': lop = NOBEHIND; break; // \@<!
+				  পক্ষ '=': lop = BEHIND; ভঙ্গ;   // \@<=
+				  পক্ষ '!': lop = NOBEHIND; ভঙ্গ; // \@<!
 			      }
 		}
-		if (lop == END)
+		যদি (lop == END)
 		    EMSG2_RET_NULL(_(e_invalid_character_after_str_at),
 						      reg_magic == MAGIC_ALL);
 		// Look behind must match with behind_pos.
-		if (lop == BEHIND || lop == NOBEHIND)
+		যদি (lop == BEHIND || lop == NOBEHIND)
 		{
 		    regtail(ret, regnode(BHPOS));
 		    *flagp |= HASLOOKBH;
 		}
 		regtail(ret, regnode(END)); // operand ends
-		if (lop == BEHIND || lop == NOBEHIND)
+		যদি (lop == BEHIND || lop == NOBEHIND)
 		{
-		    if (nr < 0)
+		    যদি (nr < 0)
 			nr = 0; // no limit is same as zero limit
 		    reginsert_nr(lop, nr, ret);
 		}
-		else
+		অন্যথা
 		    reginsert(lop, ret);
-		break;
+		ভঙ্গ;
 	    }
 
-	case Magic('?'):
-	case Magic('='):
+	পক্ষ Magic('?'):
+	পক্ষ Magic('='):
 	    // Emit x= as (x|)
 	    reginsert(BRANCH, ret);		// Either x
 	    regtail(ret, regnode(BRANCH));	// or
 	    next = regnode(NOTHING);		// null.
 	    regtail(ret, next);
 	    regoptail(ret, next);
-	    break;
+	    ভঙ্গ;
 
-	case Magic('{'):
-	    if (!read_limits(&minval, &maxval))
-		return NULL;
-	    if (flags & SIMPLE)
+	পক্ষ Magic('{'):
+	    যদি (!read_limits(&minval, &maxval))
+		প্রত্যাগম রিক্ত;
+	    যদি (flags & SIMPLE)
 	    {
 		reginsert(BRACE_SIMPLE, ret);
 		reginsert_limits(BRACE_LIMITS, minval, maxval, ret);
 	    }
-	    else
+	    অন্যথা
 	    {
-		if (num_complex_braces >= 10)
+		যদি (অঙ্ক_complex_braces >= 10)
 		    EMSG2_RET_NULL(_(e_too_many_complex_str_curly),
 						      reg_magic == MAGIC_ALL);
-		reginsert(BRACE_COMPLEX + num_complex_braces, ret);
+		reginsert(BRACE_COMPLEX + অঙ্ক_complex_braces, ret);
 		regoptail(ret, regnode(BACK));
 		regoptail(ret, ret);
 		reginsert_limits(BRACE_LIMITS, minval, maxval, ret);
-		++num_complex_braces;
+		++অঙ্ক_complex_braces;
 	    }
-	    if (minval > 0 && maxval > 0)
+	    যদি (minval > 0 && maxval > 0)
 		*flagp = (HASWIDTH | (flags & (HASNL | HASLOOKBH)));
-	    break;
+	    ভঙ্গ;
     }
-    if (re_multi_type(peekchr()) != NOT_MULTI)
+    যদি (re_multi_type(peekchr()) != NOT_MULTI)
     {
 	// Can't have a multi follow a multi.
-	if (peekchr() == Magic('*'))
+	যদি (peekchr() == Magic('*'))
 	    EMSG2_RET_NULL(_(e_nested_str), reg_magic >= MAGIC_ON);
 	EMSG3_RET_NULL(_(e_nested_str_chr), reg_magic == MAGIC_ALL,
 							  no_Magic(peekchr()));
     }
 
-    return ret;
+    প্রত্যাগম ret;
 }
 
 /*
  * Parse one alternative of an | or & operator.
  * Implements the concatenation operator.
  */
-    static char_u *
-regconcat(int *flagp)
+    স্থির char_u *
+regconcat(পূর্ণাঙ্ক *flagp)
 {
-    char_u	*first = NULL;
-    char_u	*chain = NULL;
+    char_u	*first = রিক্ত;
+    char_u	*chain = রিক্ত;
     char_u	*latest;
-    int		flags;
-    int		cont = TRUE;
+    পূর্ণাঙ্ক		flags;
+    পূর্ণাঙ্ক		cont = TRUE;
 
     *flagp = WORST;		// Tentatively.
 
-    while (cont)
+    যাবত্ (cont)
     {
-	switch (peekchr())
+	বিকল্প (peekchr())
 	{
-	    case NUL:
-	    case Magic('|'):
-	    case Magic('&'):
-	    case Magic(')'):
+	    পক্ষ NUL:
+	    পক্ষ Magic('|'):
+	    পক্ষ Magic('&'):
+	    পক্ষ Magic(')'):
 			    cont = FALSE;
-			    break;
-	    case Magic('Z'):
+			    ভঙ্গ;
+	    পক্ষ Magic('Z'):
 			    regflags |= RF_ICOMBINE;
 			    skipchr_keepstart();
-			    break;
-	    case Magic('c'):
+			    ভঙ্গ;
+	    পক্ষ Magic('c'):
 			    regflags |= RF_ICASE;
 			    skipchr_keepstart();
-			    break;
-	    case Magic('C'):
+			    ভঙ্গ;
+	    পক্ষ Magic('C'):
 			    regflags |= RF_NOICASE;
 			    skipchr_keepstart();
-			    break;
-	    case Magic('v'):
+			    ভঙ্গ;
+	    পক্ষ Magic('v'):
 			    reg_magic = MAGIC_ALL;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    case Magic('m'):
+			    ভঙ্গ;
+	    পক্ষ Magic('m'):
 			    reg_magic = MAGIC_ON;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    case Magic('M'):
+			    ভঙ্গ;
+	    পক্ষ Magic('M'):
 			    reg_magic = MAGIC_OFF;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    case Magic('V'):
+			    ভঙ্গ;
+	    পক্ষ Magic('V'):
 			    reg_magic = MAGIC_NONE;
 			    skipchr_keepstart();
 			    curchr = -1;
-			    break;
-	    default:
+			    ভঙ্গ;
+	    স্বভাব:
 			    latest = regpiece(&flags);
-			    if (latest == NULL || reg_toolong)
-				return NULL;
+			    যদি (latest == রিক্ত || reg_toolong)
+				প্রত্যাগম রিক্ত;
 			    *flagp |= flags & (HASWIDTH | HASNL | HASLOOKBH);
-			    if (chain == NULL)	// First piece.
+			    যদি (chain == রিক্ত)	// First piece.
 				*flagp |= flags & SPSTART;
-			    else
+			    অন্যথা
 				regtail(chain, latest);
 			    chain = latest;
-			    if (first == NULL)
+			    যদি (first == রিক্ত)
 				first = latest;
-			    break;
+			    ভঙ্গ;
 	}
     }
-    if (first == NULL)		// Loop ran zero times.
+    যদি (first == রিক্ত)		// Loop ran zero times.
 	first = regnode(NOTHING);
-    return first;
+    প্রত্যাগম first;
 }
 
 /*
  * Parse one alternative of an | operator.
  * Implements the & operator.
  */
-    static char_u *
-regbranch(int *flagp)
+    স্থির char_u *
+regbranch(পূর্ণাঙ্ক *flagp)
 {
     char_u	*ret;
-    char_u	*chain = NULL;
+    char_u	*chain = রিক্ত;
     char_u	*latest;
-    int		flags;
+    পূর্ণাঙ্ক		flags;
 
     *flagp = WORST | HASNL;		// Tentatively.
 
     ret = regnode(BRANCH);
-    for (;;)
+    প্রতি (;;)
     {
 	latest = regconcat(&flags);
-	if (latest == NULL)
-	    return NULL;
+	যদি (latest == রিক্ত)
+	    প্রত্যাগম রিক্ত;
 	// If one of the branches has width, the whole thing has.  If one of
 	// the branches anchors at start-of-line, the whole thing does.
 	// If one of the branches uses look-behind, the whole thing does.
@@ -2380,19 +2380,19 @@ regbranch(int *flagp)
 	// If one of the branches doesn't match a line-break, the whole thing
 	// doesn't.
 	*flagp &= ~HASNL | (flags & HASNL);
-	if (chain != NULL)
+	যদি (chain != রিক্ত)
 	    regtail(chain, latest);
-	if (peekchr() != Magic('&'))
-	    break;
+	যদি (peekchr() != Magic('&'))
+	    ভঙ্গ;
 	skipchr();
 	regtail(latest, regnode(END)); // operand ends
-	if (reg_toolong)
-	    break;
+	যদি (reg_toolong)
+	    ভঙ্গ;
 	reginsert(MATCH, latest);
 	chain = latest;
     }
 
-    return ret;
+    প্রত্যাগম ret;
 }
 
 /*
@@ -2404,80 +2404,80 @@ regbranch(int *flagp)
  * is a trifle forced, but the need to tie the tails of the branches to what
  * follows makes it hard to avoid.
  */
-    static char_u *
+    স্থির char_u *
 reg(
-    int		paren,	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
-    int		*flagp)
+    পূর্ণাঙ্ক		paren,	// REG_NOPAREN, REG_PAREN, REG_NPAREN or REG_ZPAREN
+    পূর্ণাঙ্ক		*flagp)
 {
     char_u	*ret;
     char_u	*br;
     char_u	*ender;
-    int		parno = 0;
-    int		flags;
+    পূর্ণাঙ্ক		parno = 0;
+    পূর্ণাঙ্ক		flags;
 
     *flagp = HASWIDTH;		// Tentatively.
 
 #ifdef FEAT_SYN_HL
-    if (paren == REG_ZPAREN)
+    যদি (paren == REG_ZPAREN)
     {
 	// Make a ZOPEN node.
-	if (regnzpar >= NSUBEXP)
+	যদি (regnzpar >= NSUBEXP)
 	    EMSG_RET_NULL(_(e_too_many_z));
 	parno = regnzpar;
 	regnzpar++;
 	ret = regnode(ZOPEN + parno);
     }
-    else
+    অন্যথা
 #endif
-	if (paren == REG_PAREN)
+	যদি (paren == REG_PAREN)
     {
 	// Make a MOPEN node.
-	if (regnpar >= NSUBEXP)
+	যদি (regnpar >= NSUBEXP)
 	    EMSG2_RET_NULL(_(e_too_many_str_open), reg_magic == MAGIC_ALL);
 	parno = regnpar;
 	++regnpar;
 	ret = regnode(MOPEN + parno);
     }
-    else if (paren == REG_NPAREN)
+    অন্যথা যদি (paren == REG_NPAREN)
     {
 	// Make a NOPEN node.
 	ret = regnode(NOPEN);
     }
-    else
-	ret = NULL;
+    অন্যথা
+	ret = রিক্ত;
 
-    if (bt_reg_parse_depth >= REG_MAX_PAREN_DEPTH)
+    যদি (bt_reg_parse_depth >= REG_MAX_PAREN_DEPTH)
 	EMSG_RET_NULL(_(e_command_too_complex));
     ++bt_reg_parse_depth;
 
     // Pick up the branches, linking them together.
     br = regbranch(&flags);
-    if (br == NULL)
+    যদি (br == রিক্ত)
     {
-	ret = NULL;
-	goto theend;
+	ret = রিক্ত;
+	গচ্ছ theend;
     }
-    if (ret != NULL)
+    যদি (ret != রিক্ত)
 	regtail(ret, br);	// [MZ]OPEN -> first.
-    else
+    অন্যথা
 	ret = br;
     // If one of the branches can be zero-width, the whole thing can.
     // If one of the branches has * at start or matches a line-break, the
     // whole thing can.
-    if (!(flags & HASWIDTH))
+    যদি (!(flags & HASWIDTH))
 	*flagp &= ~HASWIDTH;
     *flagp |= flags & (SPSTART | HASNL | HASLOOKBH);
-    while (peekchr() == Magic('|'))
+    যাবত্ (peekchr() == Magic('|'))
     {
 	skipchr();
 	br = regbranch(&flags);
-	if (br == NULL || reg_toolong)
+	যদি (br == রিক্ত || reg_toolong)
 	{
-	    ret = NULL;
-	    goto theend;
+	    ret = রিক্ত;
+	    গচ্ছ theend;
 	}
 	regtail(ret, br);	// BRANCH -> BRANCH.
-	if (!(flags & HASWIDTH))
+	যদি (!(flags & HASWIDTH))
 	    *flagp &= ~HASWIDTH;
 	*flagp |= flags & (SPSTART | HASNL | HASLOOKBH);
     }
@@ -2492,65 +2492,65 @@ reg(
     regtail(ret, ender);
 
     // Hook the tails of the branches to the closing node.
-    for (br = ret; br != NULL; br = regnext(br))
+    প্রতি (br = ret; br != রিক্ত; br = regnext(br))
 	regoptail(br, ender);
 
     // Check for proper termination.
-    if (paren != REG_NOPAREN && getchr() != Magic(')'))
+    যদি (paren != REG_NOPAREN && getchr() != Magic(')'))
     {
 #ifdef FEAT_SYN_HL
-	if (paren == REG_ZPAREN)
+	যদি (paren == REG_ZPAREN)
 	{
 	    emsg(_(e_unmatched_z));
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = রিক্ত;
+	    গচ্ছ theend;
 	}
-	else
+	অন্যথা
 #endif
-	if (paren == REG_NPAREN)
+	যদি (paren == REG_NPAREN)
 	{
 	    semsg(_(e_unmatched_str_percent_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = রিক্ত;
+	    গচ্ছ theend;
 	}
-	else
+	অন্যথা
 	{
 	    semsg(_(e_unmatched_str_open),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = রিক্ত;
+	    গচ্ছ theend;
 	}
     }
-    else if (paren == REG_NOPAREN && peekchr() != NUL)
+    অন্যথা যদি (paren == REG_NOPAREN && peekchr() != NUL)
     {
-	if (curchr == Magic(')'))
+	যদি (curchr == Magic(')'))
 	{
 	    semsg(_(e_unmatched_str_close),
 				       reg_magic == MAGIC_ALL ? "" : "\\");
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = রিক্ত;
+	    গচ্ছ theend;
 	}
-	else
+	অন্যথা
 	{
 	    emsg(_(e_trailing_characters));	// "Can't happen".
 	    rc_did_emsg = TRUE;
-	    ret = NULL;
-	    goto theend;
+	    ret = রিক্ত;
+	    গচ্ছ theend;
 	}
     }
     // Here we set the flag allowing back references to this set of
     // parentheses.
-    if (paren == REG_PAREN)
+    যদি (paren == REG_PAREN)
 	had_endbrace[parno] = TRUE;	// have seen the close paren
 
 theend:
     --bt_reg_parse_depth;
-    return ret;
+    প্রত্যাগম ret;
 }
 
 /*
@@ -2574,91 +2574,91 @@ theend:
  * of the structure of the compiled regexp.
  * "re_flags": RE_MAGIC and/or RE_STRING.
  */
-    static regprog_T *
-bt_regcomp(char_u *expr, int re_flags)
+    স্থির regprog_T *
+bt_regcomp(char_u *রাশিমালা, পূর্ণাঙ্ক re_flags)
 {
     bt_regprog_T    *r;
     char_u	*scan;
     char_u	*longest;
-    int		len;
-    int		flags;
+    পূর্ণাঙ্ক		len;
+    পূর্ণাঙ্ক		flags;
 
-    if (expr == NULL)
+    যদি (রাশিমালা == রিক্ত)
 	IEMSG_RET_NULL(e_null_argument);
 
     init_class_tab();
 
     // First pass: determine size, legality.
-    regcomp_start(expr, re_flags);
+    regcomp_start(রাশিমালা, re_flags);
     regcode = JUST_CALC_SIZE;
     regc(REGMAGIC);
-    if (reg(REG_NOPAREN, &flags) == NULL)
-	return NULL;
+    যদি (reg(REG_NOPAREN, &flags) == রিক্ত)
+	প্রত্যাগম রিক্ত;
 
     // Allocate space.
     r = alloc(offsetof(bt_regprog_T, program) + regsize);
-    if (r == NULL)
-	return NULL;
+    যদি (r == রিক্ত)
+	প্রত্যাগম রিক্ত;
     r->re_in_use = FALSE;
 #ifdef DEBUG
     r->regsz = regsize;
 #endif
 
     // Second pass: emit code.
-    regcomp_start(expr, re_flags);
+    regcomp_start(রাশিমালা, re_flags);
     regcode = r->program;
     regc(REGMAGIC);
-    if (reg(REG_NOPAREN, &flags) == NULL || reg_toolong)
+    যদি (reg(REG_NOPAREN, &flags) == রিক্ত || reg_toolong)
     {
 	vim_free(r);
-	if (reg_toolong)
+	যদি (reg_toolong)
 	    EMSG_RET_NULL(_(e_pattern_too_long));
-	return NULL;
+	প্রত্যাগম রিক্ত;
     }
 
     // Dig out information for optimizations.
     r->regstart = NUL;		// Worst-case defaults.
     r->reganch = 0;
-    r->regmust = NULL;
+    r->regmust = রিক্ত;
     r->regmlen = 0;
     r->regflags = regflags;
-    if (flags & HASNL)
+    যদি (flags & HASNL)
 	r->regflags |= RF_HASNL;
-    if (flags & HASLOOKBH)
+    যদি (flags & HASLOOKBH)
 	r->regflags |= RF_LOOKBH;
 #ifdef FEAT_SYN_HL
     // Remember whether this pattern has any \z specials in it.
     r->reghasz = re_has_z;
 #endif
     scan = r->program + 1;	// First BRANCH.
-    if (OP(regnext(scan)) == END)   // Only one top-level choice.
+    যদি (OP(regnext(scan)) == END)   // Only one top-level choice.
     {
 	scan = OPERAND(scan);
 
 	// Starting-point info.
-	if (OP(scan) == BOL || OP(scan) == RE_BOF)
+	যদি (OP(scan) == BOL || OP(scan) == RE_BOF)
 	{
 	    r->reganch++;
 	    scan = regnext(scan);
 	}
 
-	if (OP(scan) == EXACTLY)
+	যদি (OP(scan) == EXACTLY)
 	{
-	    if (has_mbyte)
+	    যদি (has_mbyte)
 		r->regstart = (*mb_ptr2char)(OPERAND(scan));
-	    else
+	    অন্যথা
 		r->regstart = *OPERAND(scan);
 	}
-	else if ((OP(scan) == BOW
+	অন্যথা যদি ((OP(scan) == BOW
 		    || OP(scan) == EOW
 		    || OP(scan) == NOTHING
 		    || OP(scan) == MOPEN + 0 || OP(scan) == NOPEN
 		    || OP(scan) == MCLOSE + 0 || OP(scan) == NCLOSE)
 		 && OP(regnext(scan)) == EXACTLY)
 	{
-	    if (has_mbyte)
+	    যদি (has_mbyte)
 		r->regstart = (*mb_ptr2char)(OPERAND(regnext(scan)));
-	    else
+	    অন্যথা
 		r->regstart = *OPERAND(regnext(scan));
 	}
 
@@ -2671,22 +2671,22 @@ bt_regcomp(char_u *expr, int re_flags)
 
 	// When the r.e. starts with BOW, it is faster to look for a regmust
 	// first. Used a lot for "#" and "*" commands. (Added by mool).
-	if ((flags & SPSTART || OP(scan) == BOW || OP(scan) == EOW)
+	যদি ((flags & SPSTART || OP(scan) == BOW || OP(scan) == EOW)
 							  && !(flags & HASNL))
 	{
 	    size_t  scanlen;
 
-	    longest = NULL;
+	    longest = রিক্ত;
 	    len = 0;
-	    for (; scan != NULL; scan = regnext(scan))
+	    প্রতি (; scan != রিক্ত; scan = regnext(scan))
 	    {
-		if (OP(scan) == EXACTLY)
+		যদি (OP(scan) == EXACTLY)
 		{
 		    scanlen = STRLEN(OPERAND(scan));
-		    if (scanlen >= (size_t)len)
+		    যদি (scanlen >= (size_t)len)
 		    {
 			longest = OPERAND(scan);
-			len = (int)scanlen;
+			len = (পূর্ণাঙ্ক)scanlen;
 		    }
 		}
 	    }
@@ -2695,21 +2695,21 @@ bt_regcomp(char_u *expr, int re_flags)
 	}
     }
 #ifdef BT_REGEXP_DUMP
-    regdump(expr, r);
+    regdump(রাশিমালা, r);
 #endif
     r->engine = &bt_regengine;
-    return (regprog_T *)r;
+    প্রত্যাগম (regprog_T *)r;
 }
 
-#if defined(FEAT_SYN_HL)
+#যদি defined(FEAT_SYN_HL)
 /*
  * Check if during the previous call to vim_regcomp the EOL item "$" has been
  * found.  This is messy, but it works fine.
  */
-    int
-vim_regcomp_had_eol(void)
+    পূর্ণাঙ্ক
+vim_regcomp_had_eol(শূন্য)
 {
-    return had_eol;
+    প্রত্যাগম had_eol;
 }
 #endif
 
@@ -2717,98 +2717,98 @@ vim_regcomp_had_eol(void)
  * Get a number after a backslash that is inside [].
  * When nothing is recognized return a backslash.
  */
-    static int
-coll_get_char(void)
+    স্থির পূর্ণাঙ্ক
+coll_get_char(শূন্য)
 {
     vimlong_T	nr = -1;
 
-    switch (*regparse++)
+    বিকল্প (*regparse++)
     {
-	case 'd': nr = getdecchrs(); break;
-	case 'o': nr = getoctchrs(); break;
-	case 'x': nr = gethexchrs(2); break;
-	case 'u': nr = gethexchrs(4); break;
-	case 'U': nr = gethexchrs(8); break;
+	পক্ষ 'd': nr = getdecchrs(); ভঙ্গ;
+	পক্ষ 'o': nr = getoctchrs(); ভঙ্গ;
+	পক্ষ 'x': nr = gethexchrs(2); ভঙ্গ;
+	পক্ষ 'u': nr = gethexchrs(4); ভঙ্গ;
+	পক্ষ 'U': nr = gethexchrs(8); ভঙ্গ;
     }
-    if (nr < 0)
+    যদি (nr < 0)
     {
 	// If getting the number fails be backwards compatible: the character
 	// is a backslash.
 	--regparse;
 	nr = '\\';
     }
-    if (nr > INT_MAX)
+    যদি (nr > INT_MAX)
 	nr = INT_MAX;
-    return nr;
+    প্রত্যাগম nr;
 }
 
 /*
  * Free a compiled regexp program, returned by bt_regcomp().
  */
-    static void
+    স্থির শূন্য
 bt_regfree(regprog_T *prog)
 {
     vim_free(prog);
 }
 
-#define ADVANCE_REGINPUT() MB_PTR_ADV(rex.input)
+#define ADVANCE_REGINPUT() MB_PTR_ADV(rex.প্রবেশ)
 
 /*
  * The arguments from BRACE_LIMITS are stored here.  They are actually local
  * to regmatch(), but they are here to reduce the amount of stack space used
  * (it can be called recursively many times).
  */
-static long	bl_minval;
-static long	bl_maxval;
+স্থির long	bl_minval;
+স্থির long	bl_maxval;
 
 /*
  * Save the input line and position in a regsave_T.
  */
-    static void
+    স্থির শূন্য
 reg_save(regsave_T *save, garray_T *gap)
 {
-    if (REG_MULTI)
+    যদি (REG_MULTI)
     {
-	save->rs_u.pos.col = (colnr_T)(rex.input - rex.line);
+	save->rs_u.pos.col = (colnr_T)(rex.প্রবেশ - rex.সারি);
 	save->rs_u.pos.lnum = rex.lnum;
     }
-    else
-	save->rs_u.ptr = rex.input;
+    অন্যথা
+	save->rs_u.ptr = rex.প্রবেশ;
     save->rs_len = gap->ga_len;
 }
 
 /*
  * Restore the input line and position from a regsave_T.
  */
-    static void
+    স্থির শূন্য
 reg_restore(regsave_T *save, garray_T *gap)
 {
-    if (REG_MULTI)
+    যদি (REG_MULTI)
     {
-	if (rex.lnum != save->rs_u.pos.lnum)
+	যদি (rex.lnum != save->rs_u.pos.lnum)
 	{
 	    // only call reg_getline() when the line number changed to save
 	    // a bit of time
 	    rex.lnum = save->rs_u.pos.lnum;
-	    rex.line = reg_getline(rex.lnum);
+	    rex.সারি = reg_getline(rex.lnum);
 	}
-	rex.input = rex.line + save->rs_u.pos.col;
+	rex.প্রবেশ = rex.সারি + save->rs_u.pos.col;
     }
-    else
-	rex.input = save->rs_u.ptr;
+    অন্যথা
+	rex.প্রবেশ = save->rs_u.ptr;
     gap->ga_len = save->rs_len;
 }
 
 /*
  * Return TRUE if current position is equal to saved position.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 reg_save_equal(regsave_T *save)
 {
-    if (REG_MULTI)
-	return rex.lnum == save->rs_u.pos.lnum
-				  && rex.input == rex.line + save->rs_u.pos.col;
-    return rex.input == save->rs_u.ptr;
+    যদি (REG_MULTI)
+	প্রত্যাগম rex.lnum == save->rs_u.pos.lnum
+				  && rex.প্রবেশ == rex.সারি + save->rs_u.pos.col;
+    প্রত্যাগম rex.প্রবেশ == save->rs_u.ptr;
 }
 
 // Save the sub-expressions before attempting a match.
@@ -2818,9 +2818,9 @@ reg_save_equal(regsave_T *save)
 // After a failed match restore the sub-expressions.
 #define restore_se(savep, posp, pp) \
 { \
-    if (REG_MULTI) \
+    যদি (REG_MULTI) \
 	*(posp) = (savep)->se_u.pos; \
-    else \
+    অন্যথা \
 	*(pp) = (savep)->se_u.ptr; \
 }
 
@@ -2831,469 +2831,469 @@ reg_save_equal(regsave_T *save)
  * Use se_save() to use pointer (save_se_multi()) or position (save_se_one()),
  * depending on REG_MULTI.
  */
-    static void
+    স্থির শূন্য
 save_se_multi(save_se_T *savep, lpos_T *posp)
 {
     savep->se_u.pos = *posp;
     posp->lnum = rex.lnum;
-    posp->col = (colnr_T)(rex.input - rex.line);
+    posp->col = (colnr_T)(rex.প্রবেশ - rex.সারি);
 }
 
-    static void
+    স্থির শূন্য
 save_se_one(save_se_T *savep, char_u **pp)
 {
     savep->se_u.ptr = *pp;
-    *pp = rex.input;
+    *pp = rex.প্রবেশ;
 }
 
 /*
  * regrepeat - repeatedly match something simple, return how many.
  * Advances rex.input (and rex.lnum) to just after the matched chars.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 regrepeat(
     char_u	*p,
     long	maxcount)   // maximum number of matches allowed
 {
-    long	count = 0;
+    long	গুনতি = 0;
     char_u	*scan;
     char_u	*opnd;
-    int		mask;
-    int		testval = 0;
+    পূর্ণাঙ্ক		mask;
+    পূর্ণাঙ্ক		testval = 0;
 
-    scan = rex.input;	    // Make local copy of rex.input for speed.
+    scan = rex.প্রবেশ;	    // Make local copy of rex.input for speed.
     opnd = OPERAND(p);
-    switch (OP(p))
+    বিকল্প (OP(p))
     {
-      case ANY:
-      case ANY + ADD_NL:
-	while (count < maxcount)
+      পক্ষ ANY:
+      পক্ষ ANY + ADD_NL:
+	যাবত্ (গুনতি < maxcount)
 	{
 	    // Matching anything means we continue until end-of-line (or
 	    // end-of-file for ANY + ADD_NL), only limited by maxcount.
-	    while (*scan != NUL && count < maxcount)
+	    যাবত্ (*scan != NUL && গুনতি < maxcount)
 	    {
-		++count;
+		++গুনতি;
 		MB_PTR_ADV(scan);
 	    }
-	    if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-				      || rex.reg_line_lbr || count == maxcount)
-		break;
-	    ++count;		// count the line-break
+	    যদি (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+				      || rex.reg_সারি_lbr || গুনতি == maxcount)
+		ভঙ্গ;
+	    ++গুনতি;		// count the line-break
 	    reg_nextline();
-	    scan = rex.input;
-	    if (got_int)
-		break;
+	    scan = rex.প্রবেশ;
+	    যদি (got_int)
+		ভঙ্গ;
 	}
-	break;
+	ভঙ্গ;
 
-      case IDENT:
-      case IDENT + ADD_NL:
+      পক্ষ IDENT:
+      পক্ষ IDENT + ADD_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SIDENT:
-      case SIDENT + ADD_NL:
-	while (count < maxcount)
+      পক্ষ SIDENT:
+      পক্ষ SIDENT + ADD_NL:
+	যাবত্ (গুনতি < maxcount)
 	{
-	    if (vim_isIDc(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
+	    যদি (vim_isIDc(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
 	    {
 		MB_PTR_ADV(scan);
 	    }
-	    else if (*scan == NUL)
+	    অন্যথা যদি (*scan == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		যদি (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_সারি_lbr)
+		    ভঙ্গ;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		scan = rex.প্রবেশ;
+		যদি (got_int)
+		    ভঙ্গ;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    অন্যথা যদি (rex.reg_সারি_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
-	    else
-		break;
-	    ++count;
+	    অন্যথা
+		ভঙ্গ;
+	    ++গুনতি;
 	}
-	break;
+	ভঙ্গ;
 
-      case KWORD:
-      case KWORD + ADD_NL:
+      পক্ষ KWORD:
+      পক্ষ KWORD + ADD_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SKWORD:
-      case SKWORD + ADD_NL:
-	while (count < maxcount)
+      পক্ষ SKWORD:
+      পক্ষ SKWORD + ADD_NL:
+	যাবত্ (গুনতি < maxcount)
 	{
-	    if (vim_iswordp_buf(scan, rex.reg_buf)
+	    যদি (vim_iswordp_buf(scan, rex.reg_buf)
 					  && (testval || !VIM_ISDIGIT(*scan)))
 	    {
 		MB_PTR_ADV(scan);
 	    }
-	    else if (*scan == NUL)
+	    অন্যথা যদি (*scan == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		যদি (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_সারি_lbr)
+		    ভঙ্গ;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		scan = rex.প্রবেশ;
+		যদি (got_int)
+		    ভঙ্গ;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    অন্যথা যদি (rex.reg_সারি_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
-	    else
-		break;
-	    ++count;
+	    অন্যথা
+		ভঙ্গ;
+	    ++গুনতি;
 	}
-	break;
+	ভঙ্গ;
 
-      case FNAME:
-      case FNAME + ADD_NL:
+      পক্ষ FNAME:
+      পক্ষ FNAME + ADD_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SFNAME:
-      case SFNAME + ADD_NL:
-	while (count < maxcount)
+      পক্ষ SFNAME:
+      পক্ষ SFNAME + ADD_NL:
+	যাবত্ (গুনতি < maxcount)
 	{
-	    if (vim_isfilec(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
+	    যদি (vim_isfilec(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
 	    {
 		MB_PTR_ADV(scan);
 	    }
-	    else if (*scan == NUL)
+	    অন্যথা যদি (*scan == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		যদি (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_সারি_lbr)
+		    ভঙ্গ;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		scan = rex.প্রবেশ;
+		যদি (got_int)
+		    ভঙ্গ;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    অন্যথা যদি (rex.reg_সারি_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
-	    else
-		break;
-	    ++count;
+	    অন্যথা
+		ভঙ্গ;
+	    ++গুনতি;
 	}
-	break;
+	ভঙ্গ;
 
-      case PRINT:
-      case PRINT + ADD_NL:
+      পক্ষ PRINT:
+      পক্ষ PRINT + ADD_NL:
 	testval = TRUE;
 	// FALLTHROUGH
-      case SPRINT:
-      case SPRINT + ADD_NL:
-	while (count < maxcount)
+      পক্ষ SPRINT:
+      পক্ষ SPRINT + ADD_NL:
+	যাবত্ (গুনতি < maxcount)
 	{
-	    if (*scan == NUL)
+	    যদি (*scan == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		যদি (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_সারি_lbr)
+		    ভঙ্গ;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		scan = rex.প্রবেশ;
+		যদি (got_int)
+		    ভঙ্গ;
 	    }
-	    else if (vim_isprintc(PTR2CHAR(scan)) == 1
+	    অন্যথা যদি (vim_isprintc(PTR2CHAR(scan)) == 1
 					  && (testval || !VIM_ISDIGIT(*scan)))
 	    {
 		MB_PTR_ADV(scan);
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    অন্যথা যদি (rex.reg_সারি_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
-	    else
-		break;
-	    ++count;
+	    অন্যথা
+		ভঙ্গ;
+	    ++গুনতি;
 	}
-	break;
+	ভঙ্গ;
 
-      case WHITE:
-      case WHITE + ADD_NL:
+      পক্ষ WHITE:
+      পক্ষ WHITE + ADD_NL:
 	testval = mask = RI_WHITE;
 do_class:
-	while (count < maxcount)
+	যাবত্ (গুনতি < maxcount)
 	{
-	    int		l;
+	    পূর্ণাঙ্ক		l;
 
-	    if (*scan == NUL)
+	    যদি (*scan == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		যদি (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_সারি_lbr)
+		    ভঙ্গ;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		scan = rex.প্রবেশ;
+		যদি (got_int)
+		    ভঙ্গ;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(scan)) > 1)
+	    অন্যথা যদি (has_mbyte && (l = (*mb_ptr2len)(scan)) > 1)
 	    {
-		if (testval != 0)
-		    break;
+		যদি (testval != 0)
+		    ভঙ্গ;
 		scan += l;
 	    }
-	    else if ((class_tab[*scan] & mask) == testval)
+	    অন্যথা যদি ((class_tab[*scan] & mask) == testval)
 		++scan;
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    অন্যথা যদি (rex.reg_সারি_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
-	    else
-		break;
-	    ++count;
+	    অন্যথা
+		ভঙ্গ;
+	    ++গুনতি;
 	}
-	break;
+	ভঙ্গ;
 
-      case NWHITE:
-      case NWHITE + ADD_NL:
+      পক্ষ NWHITE:
+      পক্ষ NWHITE + ADD_NL:
 	mask = RI_WHITE;
-	goto do_class;
-      case DIGIT:
-      case DIGIT + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ DIGIT:
+      পক্ষ DIGIT + ADD_NL:
 	testval = mask = RI_DIGIT;
-	goto do_class;
-      case NDIGIT:
-      case NDIGIT + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ NDIGIT:
+      পক্ষ NDIGIT + ADD_NL:
 	mask = RI_DIGIT;
-	goto do_class;
-      case HEX:
-      case HEX + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ HEX:
+      পক্ষ HEX + ADD_NL:
 	testval = mask = RI_HEX;
-	goto do_class;
-      case NHEX:
-      case NHEX + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ NHEX:
+      পক্ষ NHEX + ADD_NL:
 	mask = RI_HEX;
-	goto do_class;
-      case OCTAL:
-      case OCTAL + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ OCTAL:
+      পক্ষ OCTAL + ADD_NL:
 	testval = mask = RI_OCTAL;
-	goto do_class;
-      case NOCTAL:
-      case NOCTAL + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ NOCTAL:
+      পক্ষ NOCTAL + ADD_NL:
 	mask = RI_OCTAL;
-	goto do_class;
-      case WORD:
-      case WORD + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ WORD:
+      পক্ষ WORD + ADD_NL:
 	testval = mask = RI_WORD;
-	goto do_class;
-      case NWORD:
-      case NWORD + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ NWORD:
+      পক্ষ NWORD + ADD_NL:
 	mask = RI_WORD;
-	goto do_class;
-      case HEAD:
-      case HEAD + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ HEAD:
+      পক্ষ HEAD + ADD_NL:
 	testval = mask = RI_HEAD;
-	goto do_class;
-      case NHEAD:
-      case NHEAD + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ NHEAD:
+      পক্ষ NHEAD + ADD_NL:
 	mask = RI_HEAD;
-	goto do_class;
-      case ALPHA:
-      case ALPHA + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ ALPHA:
+      পক্ষ ALPHA + ADD_NL:
 	testval = mask = RI_ALPHA;
-	goto do_class;
-      case NALPHA:
-      case NALPHA + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ NALPHA:
+      পক্ষ NALPHA + ADD_NL:
 	mask = RI_ALPHA;
-	goto do_class;
-      case LOWER:
-      case LOWER + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ LOWER:
+      পক্ষ LOWER + ADD_NL:
 	testval = mask = RI_LOWER;
-	goto do_class;
-      case NLOWER:
-      case NLOWER + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ NLOWER:
+      পক্ষ NLOWER + ADD_NL:
 	mask = RI_LOWER;
-	goto do_class;
-      case UPPER:
-      case UPPER + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ UPPER:
+      পক্ষ UPPER + ADD_NL:
 	testval = mask = RI_UPPER;
-	goto do_class;
-      case NUPPER:
-      case NUPPER + ADD_NL:
+	গচ্ছ do_class;
+      পক্ষ NUPPER:
+      পক্ষ NUPPER + ADD_NL:
 	mask = RI_UPPER;
-	goto do_class;
+	গচ্ছ do_class;
 
-      case EXACTLY:
+      পক্ষ EXACTLY:
 	{
-	    int	    cu, cl;
+	    পূর্ণাঙ্ক	    cu, cl;
 
 	    // This doesn't do a multi-byte character, because a MULTIBYTECODE
 	    // would have been used for it.  It does handle single-byte
 	    // characters, such as latin1.
-	    if (rex.reg_ic)
+	    যদি (rex.reg_ic)
 	    {
 		cu = MB_TOUPPER(*opnd);
 		cl = MB_TOLOWER(*opnd);
-		while (count < maxcount && (*scan == cu || *scan == cl))
+		যাবত্ (গুনতি < maxcount && (*scan == cu || *scan == cl))
 		{
-		    count++;
+		    গুনতি++;
 		    scan++;
 		}
 	    }
-	    else
+	    অন্যথা
 	    {
 		cu = *opnd;
-		while (count < maxcount && *scan == cu)
+		যাবত্ (গুনতি < maxcount && *scan == cu)
 		{
-		    count++;
+		    গুনতি++;
 		    scan++;
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 	}
 
-      case MULTIBYTECODE:
+      পক্ষ MULTIBYTECODE:
 	{
-	    int		i, len, cf = 0;
+	    পূর্ণাঙ্ক		i, len, cf = 0;
 
 	    // Safety check (just in case 'encoding' was changed since
 	    // compiling the program).
-	    if ((len = (*mb_ptr2len)(opnd)) > 1)
+	    যদি ((len = (*mb_ptr2len)(opnd)) > 1)
 	    {
-		if (rex.reg_ic && enc_utf8)
+		যদি (rex.reg_ic && enc_utf8)
 		    cf = utf_fold(utf_ptr2char(opnd));
-		while (count < maxcount && (*mb_ptr2len)(scan) >= len)
+		যাবত্ (গুনতি < maxcount && (*mb_ptr2len)(scan) >= len)
 		{
-		    for (i = 0; i < len; ++i)
-			if (opnd[i] != scan[i])
-			    break;
-		    if (i < len && (!rex.reg_ic || !enc_utf8
+		    প্রতি (i = 0; i < len; ++i)
+			যদি (opnd[i] != scan[i])
+			    ভঙ্গ;
+		    যদি (i < len && (!rex.reg_ic || !enc_utf8
 					|| utf_fold(utf_ptr2char(scan)) != cf))
-			break;
+			ভঙ্গ;
 		    scan += len;
-		    ++count;
+		    ++গুনতি;
 		}
 	    }
 	}
-	break;
+	ভঙ্গ;
 
-      case ANYOF:
-      case ANYOF + ADD_NL:
+      পক্ষ ANYOF:
+      পক্ষ ANYOF + ADD_NL:
 	testval = TRUE;
 	// FALLTHROUGH
 
-      case ANYBUT:
-      case ANYBUT + ADD_NL:
-	while (count < maxcount)
+      পক্ষ ANYBUT:
+      পক্ষ ANYBUT + ADD_NL:
+	যাবত্ (গুনতি < maxcount)
 	{
-	    int len;
+	    পূর্ণাঙ্ক len;
 
-	    if (*scan == NUL)
+	    যদি (*scan == NUL)
 	    {
-		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
-		    break;
+		যদি (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
+							   || rex.reg_সারি_lbr)
+		    ভঙ্গ;
 		reg_nextline();
-		scan = rex.input;
-		if (got_int)
-		    break;
+		scan = rex.প্রবেশ;
+		যদি (got_int)
+		    ভঙ্গ;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    অন্যথা যদি (rex.reg_সারি_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
-	    else if (has_mbyte && (len = (*mb_ptr2len)(scan)) > 1)
+	    অন্যথা যদি (has_mbyte && (len = (*mb_ptr2len)(scan)) > 1)
 	    {
-		if ((cstrchr(opnd, (*mb_ptr2char)(scan)) == NULL) == testval)
-		    break;
+		যদি ((cstrchr(opnd, (*mb_ptr2char)(scan)) == রিক্ত) == testval)
+		    ভঙ্গ;
 		scan += len;
 	    }
-	    else
+	    অন্যথা
 	    {
-		if ((cstrchr(opnd, *scan) == NULL) == testval)
-		    break;
+		যদি ((cstrchr(opnd, *scan) == রিক্ত) == testval)
+		    ভঙ্গ;
 		++scan;
 	    }
-	    ++count;
+	    ++গুনতি;
 	}
-	break;
+	ভঙ্গ;
 
-      case NEWL:
-	while (count < maxcount
+      পক্ষ NEWL:
+	যাবত্ (গুনতি < maxcount
 		&& ((*scan == NUL && rex.lnum <= rex.reg_maxline
-				       && !rex.reg_line_lbr && REG_MULTI)
-		    || (*scan == '\n' && rex.reg_line_lbr)))
+				       && !rex.reg_সারি_lbr && REG_MULTI)
+		    || (*scan == '\n' && rex.reg_সারি_lbr)))
 	{
-	    count++;
-	    if (rex.reg_line_lbr)
+	    গুনতি++;
+	    যদি (rex.reg_সারি_lbr)
 		ADVANCE_REGINPUT();
-	    else
+	    অন্যথা
 		reg_nextline();
-	    scan = rex.input;
-	    if (got_int)
-		break;
+	    scan = rex.প্রবেশ;
+	    যদি (got_int)
+		ভঙ্গ;
 	}
-	break;
+	ভঙ্গ;
 
-      default:			// Oh dear.  Called inappropriately.
+      স্বভাব:			// Oh dear.  Called inappropriately.
 	iemsg(e_corrupted_regexp_program);
 #ifdef DEBUG
 	printf("Called regrepeat with op code %d\n", OP(p));
 #endif
-	break;
+	ভঙ্গ;
     }
 
-    rex.input = scan;
+    rex.প্রবেশ = scan;
 
-    return (int)count;
+    প্রত্যাগম (পূর্ণাঙ্ক)গুনতি;
 }
 
 /*
  * Push an item onto the regstack.
  * Returns pointer to new item.  Returns NULL when out of memory.
  */
-    static regitem_T *
-regstack_push(regstate_T state, char_u *scan)
+    স্থির regitem_T *
+regstack_ঠেলো(regstate_T state, char_u *scan)
 {
     regitem_T	*rp;
 
-    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+    যদি ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
     {
 	emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
-	return NULL;
+	প্রত্যাগম রিক্ত;
     }
-    if (GA_GROW_FAILS(&regstack, (int)sizeof(regitem_T)))
-	return NULL;
+    যদি (GA_GROW_FAILS(&regstack, (পূর্ণাঙ্ক)পরিমাণ(regitem_T)))
+	প্রত্যাগম রিক্ত;
 
-    rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len);
+    rp = (regitem_T *)((বর্ণ *)regstack.ga_data + regstack.ga_len);
     rp->rs_state = state;
     rp->rs_scan = scan;
 
-    regstack.ga_len += sizeof(regitem_T);
-    return rp;
+    regstack.ga_len += পরিমাণ(regitem_T);
+    প্রত্যাগম rp;
 }
 
 /*
  * Pop an item from the regstack.
  */
-    static void
-regstack_pop(char_u **scan)
+    স্থির শূন্য
+regstack_বের_করো(char_u **scan)
 {
     regitem_T	*rp;
 
-    rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len) - 1;
+    rp = (regitem_T *)((বর্ণ *)regstack.ga_data + regstack.ga_len) - 1;
     *scan = rp->rs_scan;
 
-    regstack.ga_len -= sizeof(regitem_T);
+    regstack.ga_len -= পরিমাণ(regitem_T);
 }
 
 #ifdef FEAT_RELTIME
 /*
  * Check if the timer expired, return TRUE if so.
  */
-    static int
-bt_did_time_out(int *timed_out)
+    স্থির পূর্ণাঙ্ক
+bt_did_time_out(পূর্ণাঙ্ক *timed_out)
 {
-    if (*timeout_flag)
+    যদি (*timeout_flag)
     {
-	if (timed_out != NULL)
+	যদি (timed_out != রিক্ত)
 	{
 # ifdef FEAT_EVAL
-	    if (!*timed_out)
-		ch_log(NULL, "BT regexp timed out");
+	    যদি (!*timed_out)
+		ch_log(রিক্ত, "BT regexp timed out");
 # endif
 	    *timed_out = TRUE;
 	}
-	return TRUE;
+	প্রত্যাগম TRUE;
     }
-    return FALSE;
+    প্রত্যাগম FALSE;
 }
 #endif
 
@@ -3301,25 +3301,25 @@ bt_did_time_out(int *timed_out)
  * Save the current subexpr to "bp", so that they can be restored
  * later by restore_subexpr().
  */
-    static void
+    স্থির শূন্য
 save_subexpr(regbehind_T *bp)
 {
-    int i;
+    পূর্ণাঙ্ক i;
 
     // When "rex.need_clear_subexpr" is set we don't need to save the values,
     // only remember that this flag needs to be set again when restoring.
     bp->save_need_clear_subexpr = rex.need_clear_subexpr;
-    if (rex.need_clear_subexpr)
-	return;
+    যদি (rex.need_clear_subexpr)
+	প্রত্যাগম;
 
-    for (i = 0; i < NSUBEXP; ++i)
+    প্রতি (i = 0; i < NSUBEXP; ++i)
     {
-	if (REG_MULTI)
+	যদি (REG_MULTI)
 	{
 	    bp->save_start[i].se_u.pos = rex.reg_startpos[i];
 	    bp->save_end[i].se_u.pos = rex.reg_endpos[i];
 	}
-	else
+	অন্যথা
 	{
 	    bp->save_start[i].se_u.ptr = rex.reg_startp[i];
 	    bp->save_end[i].se_u.ptr = rex.reg_endp[i];
@@ -3330,24 +3330,24 @@ save_subexpr(regbehind_T *bp)
 /*
  * Restore the subexpr from "bp".
  */
-    static void
+    স্থির শূন্য
 restore_subexpr(regbehind_T *bp)
 {
-    int i;
+    পূর্ণাঙ্ক i;
 
     // Only need to restore saved values when they are not to be cleared.
     rex.need_clear_subexpr = bp->save_need_clear_subexpr;
-    if (rex.need_clear_subexpr)
-	return;
+    যদি (rex.need_clear_subexpr)
+	প্রত্যাগম;
 
-    for (i = 0; i < NSUBEXP; ++i)
+    প্রতি (i = 0; i < NSUBEXP; ++i)
     {
-	if (REG_MULTI)
+	যদি (REG_MULTI)
 	{
 	    rex.reg_startpos[i] = bp->save_start[i].se_u.pos;
 	    rex.reg_endpos[i] = bp->save_end[i].se_u.pos;
 	}
-	else
+	অন্যথা
 	{
 	    rex.reg_startp[i] = bp->save_start[i].se_u.ptr;
 	    rex.reg_endp[i] = bp->save_end[i].se_u.ptr;
@@ -3370,17 +3370,17 @@ restore_subexpr(regbehind_T *bp)
  * Returns FALSE when there is no match.  Leaves rex.input and rex.lnum in an
  * undefined state!
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 regmatch(
     char_u	*scan,		    // Current node.
-    int		*timed_out UNUSED)  // flag set on timeout or NULL
+    পূর্ণাঙ্ক		*timed_out UNUSED)  // flag set on timeout or NULL
 {
   char_u	*next;		// Next node.
-  int		op;
-  int		c;
+  পূর্ণাঙ্ক		op;
+  পূর্ণাঙ্ক		c;
   regitem_T	*rp;
-  int		no;
-  int		status;		// one of the RA_ values:
+  পূর্ণাঙ্ক		no;
+  পূর্ণাঙ্ক		status;		// one of the RA_ values:
 
   // Make "regstack" and "backpos" empty.  They are allocated and freed in
   // bt_regexec_both() to reduce malloc()/free() calls.
@@ -3388,54 +3388,54 @@ regmatch(
   backpos.ga_len = 0;
 
   // Repeat until "regstack" is empty.
-  for (;;)
+  প্রতি (;;)
   {
     // Some patterns may take a long time to match, e.g., "\([a-z]\+\)\+Q".
     // Allow interrupting them with CTRL-C.
     fast_breakcheck();
 
 #ifdef DEBUG
-    if (scan != NULL && regnarrate)
+    যদি (scan != রিক্ত && regnarrate)
     {
-	mch_errmsg((char *)regprop(scan));
+	mch_errmsg((বর্ণ *)regprop(scan));
 	mch_errmsg("(\n");
     }
 #endif
 
     // Repeat for items that can be matched sequentially, without using the
     // regstack.
-    for (;;)
+    প্রতি (;;)
     {
-	if (got_int || scan == NULL)
+	যদি (got_int || scan == রিক্ত)
 	{
 	    status = RA_FAIL;
-	    break;
+	    ভঙ্গ;
 	}
 #ifdef FEAT_RELTIME
-	if (bt_did_time_out(timed_out))
+	যদি (bt_did_time_out(timed_out))
 	{
 	    status = RA_FAIL;
-	    break;
+	    ভঙ্গ;
 	}
 #endif
 	status = RA_CONT;
 
 #ifdef DEBUG
-	if (regnarrate)
+	যদি (regnarrate)
 	{
-	    mch_errmsg((char *)regprop(scan));
+	    mch_errmsg((বর্ণ *)regprop(scan));
 	    mch_errmsg("...\n");
 # ifdef FEAT_SYN_HL
-	    if (re_extmatch_in != NULL)
+	    যদি (re_extmatch_in != রিক্ত)
 	    {
-		int i;
+		পূর্ণাঙ্ক i;
 
 		mch_errmsg(_("External submatches:\n"));
-		for (i = 0; i < NSUBEXP; i++)
+		প্রতি (i = 0; i < NSUBEXP; i++)
 		{
 		    mch_errmsg("    \"");
-		    if (re_extmatch_in->matches[i] != NULL)
-			mch_errmsg((char *)re_extmatch_in->matches[i]);
+		    যদি (re_extmatch_in->matches[i] != রিক্ত)
+			mch_errmsg((বর্ণ *)re_extmatch_in->matches[i]);
 		    mch_errmsg("\"\n");
 		}
 	    }
@@ -3446,93 +3446,93 @@ regmatch(
 
 	op = OP(scan);
 	// Check for character class with NL added.
-	if (!rex.reg_line_lbr && WITH_NL(op) && REG_MULTI
-			     && *rex.input == NUL && rex.lnum <= rex.reg_maxline)
+	যদি (!rex.reg_সারি_lbr && WITH_NL(op) && REG_MULTI
+			     && *rex.প্রবেশ == NUL && rex.lnum <= rex.reg_maxline)
 	{
 	    reg_nextline();
 	}
-	else if (rex.reg_line_lbr && WITH_NL(op) && *rex.input == '\n')
+	অন্যথা যদি (rex.reg_সারি_lbr && WITH_NL(op) && *rex.প্রবেশ == '\n')
 	{
 	    ADVANCE_REGINPUT();
 	}
-	else
+	অন্যথা
 	{
-	  if (WITH_NL(op))
+	  যদি (WITH_NL(op))
 	      op -= ADD_NL;
-	  if (has_mbyte)
-	      c = (*mb_ptr2char)(rex.input);
-	  else
-	      c = *rex.input;
-	  switch (op)
+	  যদি (has_mbyte)
+	      c = (*mb_ptr2char)(rex.প্রবেশ);
+	  অন্যথা
+	      c = *rex.প্রবেশ;
+	  বিকল্প (op)
 	  {
-	  case BOL:
-	    if (rex.input != rex.line)
+	  পক্ষ BOL:
+	    যদি (rex.প্রবেশ != rex.সারি)
 		status = RA_NOMATCH;
-	    break;
+	    ভঙ্গ;
 
-	  case EOL:
-	    if (c != NUL)
+	  পক্ষ EOL:
+	    যদি (c != NUL)
 		status = RA_NOMATCH;
-	    break;
+	    ভঙ্গ;
 
-	  case RE_BOF:
+	  পক্ষ RE_BOF:
 	    // We're not at the beginning of the file when below the first
 	    // line where we started, not at the start of the line or we
 	    // didn't start at the first line of the buffer.
-	    if (rex.lnum != 0 || rex.input != rex.line
+	    যদি (rex.lnum != 0 || rex.প্রবেশ != rex.সারি
 				       || (REG_MULTI && rex.reg_firstlnum > 1))
 		status = RA_NOMATCH;
-	    break;
+	    ভঙ্গ;
 
-	  case RE_EOF:
-	    if (rex.lnum != rex.reg_maxline || c != NUL)
+	  পক্ষ RE_EOF:
+	    যদি (rex.lnum != rex.reg_maxline || c != NUL)
 		status = RA_NOMATCH;
-	    break;
+	    ভঙ্গ;
 
-	  case CURSOR:
+	  পক্ষ CURSOR:
 	    // Check if the buffer is in a window and compare the
 	    // rex.reg_win->w_cursor position to the match position.
-	    if (rex.reg_win == NULL
+	    যদি (rex.reg_win == রিক্ত
 		    || (rex.lnum + rex.reg_firstlnum
 						 != rex.reg_win->w_cursor.lnum)
-		    || ((colnr_T)(rex.input - rex.line)
+		    || ((colnr_T)(rex.প্রবেশ - rex.সারি)
 						 != rex.reg_win->w_cursor.col))
 		status = RA_NOMATCH;
-	    break;
+	    ভঙ্গ;
 
-	  case RE_MARK:
+	  পক্ষ RE_MARK:
 	    // Compare the mark position to the match position.
 	    {
-		int	mark = OPERAND(scan)[0];
-		int	cmp = OPERAND(scan)[1];
+		পূর্ণাঙ্ক	mark = OPERAND(scan)[0];
+		পূর্ণাঙ্ক	cmp = OPERAND(scan)[1];
 		pos_T	*pos;
-		size_t	col = REG_MULTI ? rex.input - rex.line : 0;
+		size_t	col = REG_MULTI ? rex.প্রবেশ - rex.সারি : 0;
 
 		pos = getmark_buf(rex.reg_buf, mark, FALSE);
 
 		// Line may have been freed, get it again.
-		if (REG_MULTI)
+		যদি (REG_MULTI)
 		{
-		    rex.line = reg_getline(rex.lnum);
-		    rex.input = rex.line + col;
+		    rex.সারি = reg_getline(rex.lnum);
+		    rex.প্রবেশ = rex.সারি + col;
 		}
 
-		if (pos == NULL		     // mark doesn't exist
+		যদি (pos == রিক্ত		     // mark doesn't exist
 			|| pos->lnum <= 0)   // mark isn't set in reg_buf
 		{
 		    status = RA_NOMATCH;
 		}
-		else
+		অন্যথা
 		{
 		    colnr_T pos_col = pos->lnum == rex.lnum + rex.reg_firstlnum
 							  && pos->col == MAXCOL
 				      ? reg_getline_len(pos->lnum - rex.reg_firstlnum)
 				      : pos->col;
 
-		    if ((pos->lnum == rex.lnum + rex.reg_firstlnum
-				? (pos_col == (colnr_T)(rex.input - rex.line)
+		    যদি ((pos->lnum == rex.lnum + rex.reg_firstlnum
+				? (pos_col == (colnr_T)(rex.প্রবেশ - rex.সারি)
 				    ? (cmp == '<' || cmp == '>')
-				    : (pos_col < (colnr_T)(rex.input - rex.line)
+				    : (pos_col < (colnr_T)(rex.প্রবেশ - rex.সারি)
 					? cmp != '>'
 					: cmp != '<'))
 				: (pos->lnum < rex.lnum + rex.reg_firstlnum
@@ -3541,311 +3541,311 @@ regmatch(
 		    status = RA_NOMATCH;
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case RE_VISUAL:
-	    if (!reg_match_visual())
+	  পক্ষ RE_VISUAL:
+	    যদি (!reg_match_visual())
 		status = RA_NOMATCH;
-	    break;
+	    ভঙ্গ;
 
-	  case RE_LNUM:
-	    if (!REG_MULTI || !re_num_cmp((long_u)(rex.lnum + rex.reg_firstlnum),
+	  পক্ষ RE_LNUM:
+	    যদি (!REG_MULTI || !re_অঙ্ক_cmp((long_u)(rex.lnum + rex.reg_firstlnum),
 									scan))
 		status = RA_NOMATCH;
-	    break;
+	    ভঙ্গ;
 
-	  case RE_COL:
-	    if (!re_num_cmp((long_u)(rex.input - rex.line) + 1, scan))
+	  পক্ষ RE_COL:
+	    যদি (!re_অঙ্ক_cmp((long_u)(rex.প্রবেশ - rex.সারি) + 1, scan))
 		status = RA_NOMATCH;
-	    break;
+	    ভঙ্গ;
 
-	  case RE_VCOL:
+	  পক্ষ RE_VCOL:
 	    {
-		win_T	    *wp = rex.reg_win == NULL ? curwin : rex.reg_win;
+		win_T	    *wp = rex.reg_win == রিক্ত ? curwin : rex.reg_win;
 		linenr_T    lnum = REG_MULTI ? rex.reg_firstlnum + rex.lnum : 1;
 		long_u	    vcol;
 
-		if (REG_MULTI && (lnum <= 0
-				   || lnum > wp->w_buffer->b_ml.ml_line_count))
+		যদি (REG_MULTI && (lnum <= 0
+				   || lnum > wp->w_buffer->b_ml.ml_সারি_গুনতি))
 		    lnum = 1;
-		vcol = (long_u)win_linetabsize(wp, lnum, rex.line,
-					      (colnr_T)(rex.input - rex.line));
-		if (!re_num_cmp(vcol + 1, scan))
+		vcol = (long_u)win_linetabsize(wp, lnum, rex.সারি,
+					      (colnr_T)(rex.প্রবেশ - rex.সারি));
+		যদি (!re_অঙ্ক_cmp(vcol + 1, scan))
 		    status = RA_NOMATCH;
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case BOW:	// \<word; rex.input points to w
-	    if (c == NUL)	// Can't match at end of line
+	  পক্ষ BOW:	// \<word; rex.input points to w
+	    যদি (c == NUL)	// Can't match at end of line
 		status = RA_NOMATCH;
-	    else if (has_mbyte)
+	    অন্যথা যদি (has_mbyte)
 	    {
-		int this_class;
+		পূর্ণাঙ্ক this_class;
 
 		// Get class of current and previous char (if it exists).
-		this_class = mb_get_class_buf(rex.input, rex.reg_buf);
-		if (this_class <= 1)
+		this_class = mb_get_class_buf(rex.প্রবেশ, rex.reg_buf);
+		যদি (this_class <= 1)
 		    status = RA_NOMATCH;  // not on a word at all
-		else if (reg_prev_class() == this_class)
+		অন্যথা যদি (reg_prev_class() == this_class)
 		    status = RA_NOMATCH;  // previous char is in same word
 	    }
-	    else
+	    অন্যথা
 	    {
-		if (!vim_iswordc_buf(c, rex.reg_buf) || (rex.input > rex.line
-				&& vim_iswordc_buf(rex.input[-1], rex.reg_buf)))
+		যদি (!vim_iswordc_buf(c, rex.reg_buf) || (rex.প্রবেশ > rex.সারি
+				&& vim_iswordc_buf(rex.প্রবেশ[-1], rex.reg_buf)))
 		    status = RA_NOMATCH;
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case EOW:	// word\>; rex.input points after d
-	    if (rex.input == rex.line)    // Can't match at start of line
+	  পক্ষ EOW:	// word\>; rex.input points after d
+	    যদি (rex.প্রবেশ == rex.সারি)    // Can't match at start of line
 		status = RA_NOMATCH;
-	    else if (has_mbyte)
+	    অন্যথা যদি (has_mbyte)
 	    {
-		int this_class, prev_class;
+		পূর্ণাঙ্ক this_class, prev_class;
 
 		// Get class of current and previous char (if it exists).
-		this_class = mb_get_class_buf(rex.input, rex.reg_buf);
+		this_class = mb_get_class_buf(rex.প্রবেশ, rex.reg_buf);
 		prev_class = reg_prev_class();
-		if (this_class == prev_class
+		যদি (this_class == prev_class
 			|| prev_class == 0 || prev_class == 1)
 		    status = RA_NOMATCH;
 	    }
-	    else
+	    অন্যথা
 	    {
-		if (!vim_iswordc_buf(rex.input[-1], rex.reg_buf)
-			|| (rex.input[0] != NUL
+		যদি (!vim_iswordc_buf(rex.প্রবেশ[-1], rex.reg_buf)
+			|| (rex.প্রবেশ[0] != NUL
 					   && vim_iswordc_buf(c, rex.reg_buf)))
 		    status = RA_NOMATCH;
 	    }
-	    break; // Matched with EOW
+	    ভঙ্গ; // Matched with EOW
 
-	  case ANY:
+	  পক্ষ ANY:
 	    // ANY does not match new lines.
-	    if (c == NUL)
+	    যদি (c == NUL)
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case IDENT:
-	    if (!vim_isIDc(c))
+	  পক্ষ IDENT:
+	    যদি (!vim_isIDc(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case SIDENT:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isIDc(c))
+	  পক্ষ SIDENT:
+	    যদি (VIM_ISDIGIT(*rex.প্রবেশ) || !vim_isIDc(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case KWORD:
-	    if (!vim_iswordp_buf(rex.input, rex.reg_buf))
+	  পক্ষ KWORD:
+	    যদি (!vim_iswordp_buf(rex.প্রবেশ, rex.reg_buf))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case SKWORD:
-	    if (VIM_ISDIGIT(*rex.input)
-				    || !vim_iswordp_buf(rex.input, rex.reg_buf))
+	  পক্ষ SKWORD:
+	    যদি (VIM_ISDIGIT(*rex.প্রবেশ)
+				    || !vim_iswordp_buf(rex.প্রবেশ, rex.reg_buf))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case FNAME:
-	    if (!vim_isfilec(c))
+	  পক্ষ FNAME:
+	    যদি (!vim_isfilec(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case SFNAME:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isfilec(c))
+	  পক্ষ SFNAME:
+	    যদি (VIM_ISDIGIT(*rex.প্রবেশ) || !vim_isfilec(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case PRINT:
-	    if (!vim_isprintc(PTR2CHAR(rex.input)))
+	  পক্ষ PRINT:
+	    যদি (!vim_isprintc(PTR2CHAR(rex.প্রবেশ)))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case SPRINT:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isprintc(PTR2CHAR(rex.input)))
+	  পক্ষ SPRINT:
+	    যদি (VIM_ISDIGIT(*rex.প্রবেশ) || !vim_isprintc(PTR2CHAR(rex.প্রবেশ)))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case WHITE:
-	    if (!VIM_ISWHITE(c))
+	  পক্ষ WHITE:
+	    যদি (!VIM_ISWHITE(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case NWHITE:
-	    if (c == NUL || VIM_ISWHITE(c))
+	  পক্ষ NWHITE:
+	    যদি (c == NUL || VIM_ISWHITE(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case DIGIT:
-	    if (!ri_digit(c))
+	  পক্ষ DIGIT:
+	    যদি (!ri_digit(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case NDIGIT:
-	    if (c == NUL || ri_digit(c))
+	  পক্ষ NDIGIT:
+	    যদি (c == NUL || ri_digit(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case HEX:
-	    if (!ri_hex(c))
+	  পক্ষ HEX:
+	    যদি (!ri_hex(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case NHEX:
-	    if (c == NUL || ri_hex(c))
+	  পক্ষ NHEX:
+	    যদি (c == NUL || ri_hex(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case OCTAL:
-	    if (!ri_octal(c))
+	  পক্ষ OCTAL:
+	    যদি (!ri_octal(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case NOCTAL:
-	    if (c == NUL || ri_octal(c))
+	  পক্ষ NOCTAL:
+	    যদি (c == NUL || ri_octal(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case WORD:
-	    if (!ri_word(c))
+	  পক্ষ WORD:
+	    যদি (!ri_word(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case NWORD:
-	    if (c == NUL || ri_word(c))
+	  পক্ষ NWORD:
+	    যদি (c == NUL || ri_word(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case HEAD:
-	    if (!ri_head(c))
+	  পক্ষ HEAD:
+	    যদি (!ri_head(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case NHEAD:
-	    if (c == NUL || ri_head(c))
+	  পক্ষ NHEAD:
+	    যদি (c == NUL || ri_head(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case ALPHA:
-	    if (!ri_alpha(c))
+	  পক্ষ ALPHA:
+	    যদি (!ri_alpha(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case NALPHA:
-	    if (c == NUL || ri_alpha(c))
+	  পক্ষ NALPHA:
+	    যদি (c == NUL || ri_alpha(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case LOWER:
-	    if (!ri_lower(c))
+	  পক্ষ LOWER:
+	    যদি (!ri_lower(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case NLOWER:
-	    if (c == NUL || ri_lower(c))
+	  পক্ষ NLOWER:
+	    যদি (c == NUL || ri_lower(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case UPPER:
-	    if (!ri_upper(c))
+	  পক্ষ UPPER:
+	    যদি (!ri_upper(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case NUPPER:
-	    if (c == NUL || ri_upper(c))
+	  পক্ষ NUPPER:
+	    যদি (c == NUL || ri_upper(c))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 		ADVANCE_REGINPUT();
-	    break;
+	    ভঙ্গ;
 
-	  case EXACTLY:
+	  পক্ষ EXACTLY:
 	    {
-		int	len;
+		পূর্ণাঙ্ক	len;
 		char_u	*opnd;
 
 		opnd = OPERAND(scan);
 		// Inline the first byte, for speed.
-		if (*opnd != *rex.input
+		যদি (*opnd != *rex.প্রবেশ
 			&& (!rex.reg_ic
 			    || (!enc_utf8
-			      && MB_TOLOWER(*opnd) != MB_TOLOWER(*rex.input))))
+			      && MB_TOLOWER(*opnd) != MB_TOLOWER(*rex.প্রবেশ))))
 		    status = RA_NOMATCH;
-		else if (*opnd == NUL)
+		অন্যথা যদি (*opnd == NUL)
 		{
 		    // match empty string always works; happens when "~" is
 		    // empty.
 		}
-		else
+		অন্যথা
 		{
-		    if (opnd[1] == NUL && !(enc_utf8 && rex.reg_ic))
+		    যদি (opnd[1] == NUL && !(enc_utf8 && rex.reg_ic))
 		    {
 			len = 1;	// matched a single byte above
 		    }
-		    else
+		    অন্যথা
 		    {
 			// Need to match first byte again for multi-byte.
-			len = (int)STRLEN(opnd);
-			if (cstrncmp(opnd, rex.input, &len) != 0)
+			len = (পূর্ণাঙ্ক)STRLEN(opnd);
+			যদি (cstrncmp(opnd, rex.প্রবেশ, &len) != 0)
 			    status = RA_NOMATCH;
 		    }
 		    // Check for following composing character, unless %C
 		    // follows (skips over all composing chars).
-		    if (status != RA_NOMATCH
+		    যদি (status != RA_NOMATCH
 			    && enc_utf8
-			    && UTF_COMPOSINGLIKE(rex.input, rex.input + len)
+			    && UTF_COMPOSINGLIKE(rex.প্রবেশ, rex.প্রবেশ + len)
 			    && !rex.reg_icombine
 			    && OP(next) != RE_COMPOSING)
 		    {
@@ -3854,122 +3854,122 @@ regmatch(
 			// for voweled Hebrew texts.
 			status = RA_NOMATCH;
 		    }
-		    if (status != RA_NOMATCH)
-			rex.input += len;
+		    যদি (status != RA_NOMATCH)
+			rex.প্রবেশ += len;
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case ANYOF:
-	  case ANYBUT:
+	  পক্ষ ANYOF:
+	  পক্ষ ANYBUT:
 	    {
 		char_u  *q = OPERAND(scan);
 
-		if (c == NUL)
+		যদি (c == NUL)
 		    status = RA_NOMATCH;
-		else if ((cstrchr(q, c) == NULL) == (op == ANYOF))
+		অন্যথা যদি ((cstrchr(q, c) == রিক্ত) == (op == ANYOF))
 		    status = RA_NOMATCH;
-		else
+		অন্যথা
 		{
 		    // Check following combining characters
-		    int	len = 0;
-		    int i;
+		    পূর্ণাঙ্ক	len = 0;
+		    পূর্ণাঙ্ক i;
 
-		    if (enc_utf8)
+		    যদি (enc_utf8)
 			len = utfc_ptr2len(q) - utf_ptr2len(q);
 
-		    MB_CPTR_ADV(rex.input);
+		    MB_CPTR_ADV(rex.প্রবেশ);
 		    MB_CPTR_ADV(q);
 
-		    if (!enc_utf8 || len == 0)
-			break;
+		    যদি (!enc_utf8 || len == 0)
+			ভঙ্গ;
 
-		    for (i = 0; i < len; ++i)
-			if (q[i] != rex.input[i])
+		    প্রতি (i = 0; i < len; ++i)
+			যদি (q[i] != rex.প্রবেশ[i])
 			{
 			    status = RA_NOMATCH;
-			    break;
+			    ভঙ্গ;
 			}
-		    rex.input += len;
+		    rex.প্রবেশ += len;
 		}
-		break;
+		ভঙ্গ;
 	    }
 
-	  case MULTIBYTECODE:
-	    if (has_mbyte)
+	  পক্ষ MULTIBYTECODE:
+	    যদি (has_mbyte)
 	    {
-		int	i, len;
+		পূর্ণাঙ্ক	i, len;
 		char_u	*opnd;
-		int	opndc = 0, inpc;
+		পূর্ণাঙ্ক	opndc = 0, inpc;
 
 		opnd = OPERAND(scan);
 		// Safety check (just in case 'encoding' was changed since
 		// compiling the program).
-		if ((len = (*mb_ptr2len)(opnd)) < 2)
+		যদি ((len = (*mb_ptr2len)(opnd)) < 2)
 		{
 		    status = RA_NOMATCH;
-		    break;
+		    ভঙ্গ;
 		}
-		if (enc_utf8)
+		যদি (enc_utf8)
 		    opndc = utf_ptr2char(opnd);
-		if (enc_utf8 && utf_iscomposing(opndc))
+		যদি (enc_utf8 && utf_iscomposing(opndc))
 		{
 		    // When only a composing char is given match at any
 		    // position where that composing char appears.
 		    status = RA_NOMATCH;
-		    for (i = 0; rex.input[i] != NUL;
-						i += utf_ptr2len(rex.input + i))
+		    প্রতি (i = 0; rex.প্রবেশ[i] != NUL;
+						i += utf_ptr2len(rex.প্রবেশ + i))
 		    {
-			inpc = utf_ptr2char(rex.input + i);
-			if (!utf_iscomposing(inpc))
+			inpc = utf_ptr2char(rex.প্রবেশ + i);
+			যদি (!utf_iscomposing(inpc))
 			{
-			    if (i > 0)
-				break;
+			    যদি (i > 0)
+				ভঙ্গ;
 			}
-			else if (opndc == inpc)
+			অন্যথা যদি (opndc == inpc)
 			{
 			    // Include all following composing chars.
-			    len = i + utfc_ptr2len(rex.input + i);
+			    len = i + utfc_ptr2len(rex.প্রবেশ + i);
 			    status = RA_MATCH;
-			    break;
+			    ভঙ্গ;
 			}
 		    }
 		}
-		else if (enc_utf8)
+		অন্যথা যদি (enc_utf8)
 		{
-		    if (cstrncmp(opnd, rex.input, &len) != 0)
+		    যদি (cstrncmp(opnd, rex.প্রবেশ, &len) != 0)
 		    {
 			status = RA_NOMATCH;
-			break;
+			ভঙ্গ;
 		    }
 		}
-		else
-		    for (i = 0; i < len; ++i)
-			if (opnd[i] != rex.input[i])
+		অন্যথা
+		    প্রতি (i = 0; i < len; ++i)
+			যদি (opnd[i] != rex.প্রবেশ[i])
 			{
 			    status = RA_NOMATCH;
-			    break;
+			    ভঙ্গ;
 			}
-		rex.input += len;
+		rex.প্রবেশ += len;
 	    }
-	    else
+	    অন্যথা
 		status = RA_NOMATCH;
-	    break;
-	  case RE_COMPOSING:
-	    if (enc_utf8)
+	    ভঙ্গ;
+	  পক্ষ RE_COMPOSING:
+	    যদি (enc_utf8)
 	    {
 		// Skip composing characters.
-		while (utf_iscomposing(utf_ptr2char(rex.input)))
-		    MB_CPTR_ADV(rex.input);
+		যাবত্ (utf_iscomposing(utf_ptr2char(rex.প্রবেশ)))
+		    MB_CPTR_ADV(rex.প্রবেশ);
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case NOTHING:
-	    break;
+	  পক্ষ NOTHING:
+	    ভঙ্গ;
 
-	  case BACK:
+	  পক্ষ BACK:
 	    {
-		int		i;
+		পূর্ণাঙ্ক		i;
 		backpos_T	*bp;
 
 		// When we run into BACK we need to check if we don't keep
@@ -3979,15 +3979,15 @@ regmatch(
 		// The positions are stored in "backpos" and found by the
 		// current value of "scan", the position in the RE program.
 		bp = (backpos_T *)backpos.ga_data;
-		for (i = 0; i < backpos.ga_len; ++i)
-		    if (bp[i].bp_scan == scan)
-			break;
-		if (i == backpos.ga_len)
+		প্রতি (i = 0; i < backpos.ga_len; ++i)
+		    যদি (bp[i].bp_scan == scan)
+			ভঙ্গ;
+		যদি (i == backpos.ga_len)
 		{
 		    // First time at this BACK, make room to store the pos.
-		    if (GA_GROW_FAILS(&backpos, 1))
+		    যদি (GA_GROW_FAILS(&backpos, 1))
 			status = RA_FAIL;
-		    else
+		    অন্যথা
 		    {
 			// get "ga_data" again, it may have changed
 			bp = (backpos_T *)backpos.ga_data;
@@ -3995,32 +3995,32 @@ regmatch(
 			++backpos.ga_len;
 		    }
 		}
-		else if (reg_save_equal(&bp[i].bp_pos))
+		অন্যথা যদি (reg_save_equal(&bp[i].bp_pos))
 		    // Still at same position as last time, fail.
 		    status = RA_NOMATCH;
 
-		if (status != RA_FAIL && status != RA_NOMATCH)
+		যদি (status != RA_FAIL && status != RA_NOMATCH)
 		    reg_save(&bp[i].bp_pos, &backpos);
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case MOPEN + 0:   // Match start: \zs
-	  case MOPEN + 1:   // \(
-	  case MOPEN + 2:
-	  case MOPEN + 3:
-	  case MOPEN + 4:
-	  case MOPEN + 5:
-	  case MOPEN + 6:
-	  case MOPEN + 7:
-	  case MOPEN + 8:
-	  case MOPEN + 9:
+	  পক্ষ MOPEN + 0:   // Match start: \zs
+	  পক্ষ MOPEN + 1:   // \(
+	  পক্ষ MOPEN + 2:
+	  পক্ষ MOPEN + 3:
+	  পক্ষ MOPEN + 4:
+	  পক্ষ MOPEN + 5:
+	  পক্ষ MOPEN + 6:
+	  পক্ষ MOPEN + 7:
+	  পক্ষ MOPEN + 8:
+	  পক্ষ MOPEN + 9:
 	    {
 		no = op - MOPEN;
 		cleanup_subexpr();
-		rp = regstack_push(RS_MOPEN, scan);
-		if (rp == NULL)
+		rp = regstack_ঠেলো(RS_MOPEN, scan);
+		যদি (rp == রিক্ত)
 		    status = RA_FAIL;
-		else
+		অন্যথা
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &rex.reg_startpos[no],
@@ -4028,32 +4028,32 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case NOPEN:	    // \%(
-	  case NCLOSE:	    // \) after \%(
-		if (regstack_push(RS_NOPEN, scan) == NULL)
+	  পক্ষ NOPEN:	    // \%(
+	  পক্ষ NCLOSE:	    // \) after \%(
+		যদি (regstack_ঠেলো(RS_NOPEN, scan) == রিক্ত)
 		    status = RA_FAIL;
 		// We simply continue and handle the result when done.
-		break;
+		ভঙ্গ;
 
 #ifdef FEAT_SYN_HL
-	  case ZOPEN + 1:
-	  case ZOPEN + 2:
-	  case ZOPEN + 3:
-	  case ZOPEN + 4:
-	  case ZOPEN + 5:
-	  case ZOPEN + 6:
-	  case ZOPEN + 7:
-	  case ZOPEN + 8:
-	  case ZOPEN + 9:
+	  পক্ষ ZOPEN + 1:
+	  পক্ষ ZOPEN + 2:
+	  পক্ষ ZOPEN + 3:
+	  পক্ষ ZOPEN + 4:
+	  পক্ষ ZOPEN + 5:
+	  পক্ষ ZOPEN + 6:
+	  পক্ষ ZOPEN + 7:
+	  পক্ষ ZOPEN + 8:
+	  পক্ষ ZOPEN + 9:
 	    {
 		no = op - ZOPEN;
 		cleanup_zsubexpr();
-		rp = regstack_push(RS_ZOPEN, scan);
-		if (rp == NULL)
+		rp = regstack_ঠেলো(RS_ZOPEN, scan);
+		যদি (rp == রিক্ত)
 		    status = RA_FAIL;
-		else
+		অন্যথা
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &reg_startzpos[no],
@@ -4061,26 +4061,26 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 #endif
 
-	  case MCLOSE + 0:  // Match end: \ze
-	  case MCLOSE + 1:  // \)
-	  case MCLOSE + 2:
-	  case MCLOSE + 3:
-	  case MCLOSE + 4:
-	  case MCLOSE + 5:
-	  case MCLOSE + 6:
-	  case MCLOSE + 7:
-	  case MCLOSE + 8:
-	  case MCLOSE + 9:
+	  পক্ষ MCLOSE + 0:  // Match end: \ze
+	  পক্ষ MCLOSE + 1:  // \)
+	  পক্ষ MCLOSE + 2:
+	  পক্ষ MCLOSE + 3:
+	  পক্ষ MCLOSE + 4:
+	  পক্ষ MCLOSE + 5:
+	  পক্ষ MCLOSE + 6:
+	  পক্ষ MCLOSE + 7:
+	  পক্ষ MCLOSE + 8:
+	  পক্ষ MCLOSE + 9:
 	    {
 		no = op - MCLOSE;
 		cleanup_subexpr();
-		rp = regstack_push(RS_MCLOSE, scan);
-		if (rp == NULL)
+		rp = regstack_ঠেলো(RS_MCLOSE, scan);
+		যদি (rp == রিক্ত)
 		    status = RA_FAIL;
-		else
+		অন্যথা
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &rex.reg_endpos[no],
@@ -4088,25 +4088,25 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 
 #ifdef FEAT_SYN_HL
-	  case ZCLOSE + 1:  // \) after \z(
-	  case ZCLOSE + 2:
-	  case ZCLOSE + 3:
-	  case ZCLOSE + 4:
-	  case ZCLOSE + 5:
-	  case ZCLOSE + 6:
-	  case ZCLOSE + 7:
-	  case ZCLOSE + 8:
-	  case ZCLOSE + 9:
+	  পক্ষ ZCLOSE + 1:  // \) after \z(
+	  পক্ষ ZCLOSE + 2:
+	  পক্ষ ZCLOSE + 3:
+	  পক্ষ ZCLOSE + 4:
+	  পক্ষ ZCLOSE + 5:
+	  পক্ষ ZCLOSE + 6:
+	  পক্ষ ZCLOSE + 7:
+	  পক্ষ ZCLOSE + 8:
+	  পক্ষ ZCLOSE + 9:
 	    {
 		no = op - ZCLOSE;
 		cleanup_zsubexpr();
-		rp = regstack_push(RS_ZCLOSE, scan);
-		if (rp == NULL)
+		rp = regstack_ঠেলো(RS_ZCLOSE, scan);
+		যদি (rp == রিক্ত)
 		    status = RA_FAIL;
-		else
+		অন্যথা
 		{
 		    rp->rs_no = no;
 		    save_se(&rp->rs_un.sesave, &reg_endzpos[no],
@@ -4114,193 +4114,193 @@ regmatch(
 		    // We simply continue and handle the result when done.
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 #endif
 
-	  case BACKREF + 1:
-	  case BACKREF + 2:
-	  case BACKREF + 3:
-	  case BACKREF + 4:
-	  case BACKREF + 5:
-	  case BACKREF + 6:
-	  case BACKREF + 7:
-	  case BACKREF + 8:
-	  case BACKREF + 9:
+	  পক্ষ BACKREF + 1:
+	  পক্ষ BACKREF + 2:
+	  পক্ষ BACKREF + 3:
+	  পক্ষ BACKREF + 4:
+	  পক্ষ BACKREF + 5:
+	  পক্ষ BACKREF + 6:
+	  পক্ষ BACKREF + 7:
+	  পক্ষ BACKREF + 8:
+	  পক্ষ BACKREF + 9:
 	    {
-		int		len;
+		পূর্ণাঙ্ক		len;
 
 		no = op - BACKREF;
 		cleanup_subexpr();
-		if (!REG_MULTI)		// Single-line regexp
+		যদি (!REG_MULTI)		// Single-line regexp
 		{
-		    if (rex.reg_startp[no] == NULL || rex.reg_endp[no] == NULL)
+		    যদি (rex.reg_startp[no] == রিক্ত || rex.reg_endp[no] == রিক্ত)
 		    {
 			// Backref was not set: Match an empty string.
 			len = 0;
 		    }
-		    else
+		    অন্যথা
 		    {
 			// Compare current input with back-ref in the same
 			// line.
-			len = (int)(rex.reg_endp[no] - rex.reg_startp[no]);
-			if (cstrncmp(rex.reg_startp[no], rex.input, &len) != 0)
+			len = (পূর্ণাঙ্ক)(rex.reg_endp[no] - rex.reg_startp[no]);
+			যদি (cstrncmp(rex.reg_startp[no], rex.প্রবেশ, &len) != 0)
 			    status = RA_NOMATCH;
 		    }
 		}
-		else				// Multi-line regexp
+		অন্যথা				// Multi-line regexp
 		{
-		    if (rex.reg_startpos[no].lnum < 0
+		    যদি (rex.reg_startpos[no].lnum < 0
 						|| rex.reg_endpos[no].lnum < 0)
 		    {
 			// Backref was not set: Match an empty string.
 			len = 0;
 		    }
-		    else
+		    অন্যথা
 		    {
-			if (rex.reg_startpos[no].lnum == rex.lnum
+			যদি (rex.reg_startpos[no].lnum == rex.lnum
 				&& rex.reg_endpos[no].lnum == rex.lnum)
 			{
 			    // Compare back-ref within the current line.
 			    len = rex.reg_endpos[no].col
 						    - rex.reg_startpos[no].col;
-			    if (cstrncmp(rex.line + rex.reg_startpos[no].col,
-							  rex.input, &len) != 0)
+			    যদি (cstrncmp(rex.সারি + rex.reg_startpos[no].col,
+							  rex.প্রবেশ, &len) != 0)
 				status = RA_NOMATCH;
 			}
-			else
+			অন্যথা
 			{
 			    // Messy situation: Need to compare between two
 			    // lines.
-			    int r = match_with_backref(
+			    পূর্ণাঙ্ক r = match_with_backref(
 					    rex.reg_startpos[no].lnum,
 					    rex.reg_startpos[no].col,
 					    rex.reg_endpos[no].lnum,
 					    rex.reg_endpos[no].col,
 					    &len);
 
-			    if (r != RA_MATCH)
+			    যদি (r != RA_MATCH)
 				status = r;
 			}
 		    }
 		}
 
 		// Matched the backref, skip over it.
-		rex.input += len;
+		rex.প্রবেশ += len;
 	    }
-	    break;
+	    ভঙ্গ;
 
 #ifdef FEAT_SYN_HL
-	  case ZREF + 1:
-	  case ZREF + 2:
-	  case ZREF + 3:
-	  case ZREF + 4:
-	  case ZREF + 5:
-	  case ZREF + 6:
-	  case ZREF + 7:
-	  case ZREF + 8:
-	  case ZREF + 9:
+	  পক্ষ ZREF + 1:
+	  পক্ষ ZREF + 2:
+	  পক্ষ ZREF + 3:
+	  পক্ষ ZREF + 4:
+	  পক্ষ ZREF + 5:
+	  পক্ষ ZREF + 6:
+	  পক্ষ ZREF + 7:
+	  পক্ষ ZREF + 8:
+	  পক্ষ ZREF + 9:
 	    {
-		int	len;
+		পূর্ণাঙ্ক	len;
 
 		cleanup_zsubexpr();
 		no = op - ZREF;
-		if (re_extmatch_in != NULL
-			&& re_extmatch_in->matches[no] != NULL)
+		যদি (re_extmatch_in != রিক্ত
+			&& re_extmatch_in->matches[no] != রিক্ত)
 		{
-		    len = (int)STRLEN(re_extmatch_in->matches[no]);
-		    if (cstrncmp(re_extmatch_in->matches[no],
-							  rex.input, &len) != 0)
+		    len = (পূর্ণাঙ্ক)STRLEN(re_extmatch_in->matches[no]);
+		    যদি (cstrncmp(re_extmatch_in->matches[no],
+							  rex.প্রবেশ, &len) != 0)
 			status = RA_NOMATCH;
-		    else
-			rex.input += len;
+		    অন্যথা
+			rex.প্রবেশ += len;
 		}
-		else
+		অন্যথা
 		{
 		    // Backref was not set: Match an empty string.
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 #endif
 
-	  case BRANCH:
+	  পক্ষ BRANCH:
 	    {
-		if (OP(next) != BRANCH) // No choice.
+		যদি (OP(next) != BRANCH) // No choice.
 		    next = OPERAND(scan);	// Avoid recursion.
-		else
+		অন্যথা
 		{
-		    rp = regstack_push(RS_BRANCH, scan);
-		    if (rp == NULL)
+		    rp = regstack_ঠেলো(RS_BRANCH, scan);
+		    যদি (rp == রিক্ত)
 			status = RA_FAIL;
-		    else
+		    অন্যথা
 			status = RA_BREAK;	// rest is below
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case BRACE_LIMITS:
+	  পক্ষ BRACE_LIMITS:
 	    {
-		if (OP(next) == BRACE_SIMPLE)
+		যদি (OP(next) == BRACE_SIMPLE)
 		{
 		    bl_minval = OPERAND_MIN(scan);
 		    bl_maxval = OPERAND_MAX(scan);
 		}
-		else if (OP(next) >= BRACE_COMPLEX
+		অন্যথা যদি (OP(next) >= BRACE_COMPLEX
 			&& OP(next) < BRACE_COMPLEX + 10)
 		{
 		    no = OP(next) - BRACE_COMPLEX;
 		    brace_min[no] = OPERAND_MIN(scan);
 		    brace_max[no] = OPERAND_MAX(scan);
-		    brace_count[no] = 0;
+		    brace_গুনতি[no] = 0;
 		}
-		else
+		অন্যথা
 		{
 		    internal_error("BRACE_LIMITS");
 		    status = RA_FAIL;
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case BRACE_COMPLEX + 0:
-	  case BRACE_COMPLEX + 1:
-	  case BRACE_COMPLEX + 2:
-	  case BRACE_COMPLEX + 3:
-	  case BRACE_COMPLEX + 4:
-	  case BRACE_COMPLEX + 5:
-	  case BRACE_COMPLEX + 6:
-	  case BRACE_COMPLEX + 7:
-	  case BRACE_COMPLEX + 8:
-	  case BRACE_COMPLEX + 9:
+	  পক্ষ BRACE_COMPLEX + 0:
+	  পক্ষ BRACE_COMPLEX + 1:
+	  পক্ষ BRACE_COMPLEX + 2:
+	  পক্ষ BRACE_COMPLEX + 3:
+	  পক্ষ BRACE_COMPLEX + 4:
+	  পক্ষ BRACE_COMPLEX + 5:
+	  পক্ষ BRACE_COMPLEX + 6:
+	  পক্ষ BRACE_COMPLEX + 7:
+	  পক্ষ BRACE_COMPLEX + 8:
+	  পক্ষ BRACE_COMPLEX + 9:
 	    {
 		no = op - BRACE_COMPLEX;
-		++brace_count[no];
+		++brace_গুনতি[no];
 
 		// If not matched enough times yet, try one more
-		if (brace_count[no] <= (brace_min[no] <= brace_max[no]
+		যদি (brace_গুনতি[no] <= (brace_min[no] <= brace_max[no]
 					     ? brace_min[no] : brace_max[no]))
 		{
-		    rp = regstack_push(RS_BRCPLX_MORE, scan);
-		    if (rp == NULL)
+		    rp = regstack_ঠেলো(RS_BRCPLX_MORE, scan);
+		    যদি (rp == রিক্ত)
 			status = RA_FAIL;
-		    else
+		    অন্যথা
 		    {
 			rp->rs_no = no;
 			reg_save(&rp->rs_un.regsave, &backpos);
 			next = OPERAND(scan);
 			// We continue and handle the result when done.
 		    }
-		    break;
+		    ভঙ্গ;
 		}
 
 		// If matched enough times, may try matching some more
-		if (brace_min[no] <= brace_max[no])
+		যদি (brace_min[no] <= brace_max[no])
 		{
 		    // Range is the normal way around, use longest match
-		    if (brace_count[no] <= brace_max[no])
+		    যদি (brace_গুনতি[no] <= brace_max[no])
 		    {
-			rp = regstack_push(RS_BRCPLX_LONG, scan);
-			if (rp == NULL)
+			rp = regstack_ঠেলো(RS_BRCPLX_LONG, scan);
+			যদি (rp == রিক্ত)
 			    status = RA_FAIL;
-			else
+			অন্যথা
 			{
 			    rp->rs_no = no;
 			    reg_save(&rp->rs_un.regsave, &backpos);
@@ -4309,15 +4309,15 @@ regmatch(
 			}
 		    }
 		}
-		else
+		অন্যথা
 		{
 		    // Range is backwards, use shortest match first
-		    if (brace_count[no] <= brace_min[no])
+		    যদি (brace_গুনতি[no] <= brace_min[no])
 		    {
-			rp = regstack_push(RS_BRCPLX_SHORT, scan);
-			if (rp == NULL)
+			rp = regstack_ঠেলো(RS_BRCPLX_SHORT, scan);
+			যদি (rp == রিক্ত)
 			    status = RA_FAIL;
-			else
+			অন্যথা
 			{
 			    reg_save(&rp->rs_un.regsave, &backpos);
 			    // We continue and handle the result when done.
@@ -4325,40 +4325,40 @@ regmatch(
 		    }
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case BRACE_SIMPLE:
-	  case STAR:
-	  case PLUS:
+	  পক্ষ BRACE_SIMPLE:
+	  পক্ষ STAR:
+	  পক্ষ PLUS:
 	    {
 		regstar_T	rst;
 
 		// Lookahead to avoid useless match attempts when we know
 		// what character comes next.
-		if (OP(next) == EXACTLY)
+		যদি (OP(next) == EXACTLY)
 		{
 		    rst.nextb = *OPERAND(next);
-		    if (rex.reg_ic)
+		    যদি (rex.reg_ic)
 		    {
-			if (MB_ISUPPER(rst.nextb))
+			যদি (MB_ISUPPER(rst.nextb))
 			    rst.nextb_ic = MB_TOLOWER(rst.nextb);
-			else
+			অন্যথা
 			    rst.nextb_ic = MB_TOUPPER(rst.nextb);
 		    }
-		    else
+		    অন্যথা
 			rst.nextb_ic = rst.nextb;
 		}
-		else
+		অন্যথা
 		{
 		    rst.nextb = NUL;
 		    rst.nextb_ic = NUL;
 		}
-		if (op != BRACE_SIMPLE)
+		যদি (op != BRACE_SIMPLE)
 		{
 		    rst.minval = (op == STAR) ? 0 : 1;
 		    rst.maxval = MAX_LIMIT;
 		}
-		else
+		অন্যথা
 		{
 		    rst.minval = bl_minval;
 		    rst.maxval = bl_maxval;
@@ -4368,77 +4368,77 @@ regmatch(
 		// to maxval.  When maxval < minval, try matching at least the
 		// minimal number (since the range is backwards, that's also
 		// maxval!).
-		rst.count = regrepeat(OPERAND(scan), rst.maxval);
-		if (got_int)
+		rst.গুনতি = regrepeat(OPERAND(scan), rst.maxval);
+		যদি (got_int)
 		{
 		    status = RA_FAIL;
-		    break;
+		    ভঙ্গ;
 		}
-		if (rst.minval <= rst.maxval
-			  ? rst.count >= rst.minval : rst.count >= rst.maxval)
+		যদি (rst.minval <= rst.maxval
+			  ? rst.গুনতি >= rst.minval : rst.গুনতি >= rst.maxval)
 		{
 		    // It could match.  Prepare for trying to match what
 		    // follows.  The code is below.  Parameters are stored in
 		    // a regstar_T on the regstack.
-		    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+		    যদি ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
 		    {
 			emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
 			status = RA_FAIL;
 		    }
-		    else if (GA_GROW_FAILS(&regstack, (int)sizeof(regstar_T)))
+		    অন্যথা যদি (GA_GROW_FAILS(&regstack, (পূর্ণাঙ্ক)পরিমাণ(regstar_T)))
 			status = RA_FAIL;
-		    else
+		    অন্যথা
 		    {
-			regstack.ga_len += sizeof(regstar_T);
-			rp = regstack_push(rst.minval <= rst.maxval
+			regstack.ga_len += পরিমাণ(regstar_T);
+			rp = regstack_ঠেলো(rst.minval <= rst.maxval
 					? RS_STAR_LONG : RS_STAR_SHORT, scan);
-			if (rp == NULL)
+			যদি (rp == রিক্ত)
 			    status = RA_FAIL;
-			else
+			অন্যথা
 			{
 			    *(((regstar_T *)rp) - 1) = rst;
 			    status = RA_BREAK;	    // skip the restore bits
 			}
 		    }
 		}
-		else
+		অন্যথা
 		    status = RA_NOMATCH;
 
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case NOMATCH:
-	  case MATCH:
-	  case SUBPAT:
-	    rp = regstack_push(RS_NOMATCH, scan);
-	    if (rp == NULL)
+	  পক্ষ NOMATCH:
+	  পক্ষ MATCH:
+	  পক্ষ SUBPAT:
+	    rp = regstack_ঠেলো(RS_NOMATCH, scan);
+	    যদি (rp == রিক্ত)
 		status = RA_FAIL;
-	    else
+	    অন্যথা
 	    {
 		rp->rs_no = op;
 		reg_save(&rp->rs_un.regsave, &backpos);
 		next = OPERAND(scan);
 		// We continue and handle the result when done.
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case BEHIND:
-	  case NOBEHIND:
+	  পক্ষ BEHIND:
+	  পক্ষ NOBEHIND:
 	    // Need a bit of room to store extra positions.
-	    if ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
+	    যদি ((long)((unsigned)regstack.ga_len >> 10) >= p_mmp)
 	    {
 		emsg(_(e_pattern_uses_more_memory_than_maxmempattern));
 		status = RA_FAIL;
 	    }
-	    else if (GA_GROW_FAILS(&regstack, (int)sizeof(regbehind_T)))
+	    অন্যথা যদি (GA_GROW_FAILS(&regstack, (পূর্ণাঙ্ক)পরিমাণ(regbehind_T)))
 		status = RA_FAIL;
-	    else
+	    অন্যথা
 	    {
-		regstack.ga_len += sizeof(regbehind_T);
-		rp = regstack_push(RS_BEHIND1, scan);
-		if (rp == NULL)
+		regstack.ga_len += পরিমাণ(regbehind_T);
+		rp = regstack_ঠেলো(RS_BEHIND1, scan);
+		যদি (rp == রিক্ত)
 		    status = RA_FAIL;
-		else
+		অন্যথা
 		{
 		    // Need to save the subexpr to be able to restore them
 		    // when there is a match but we don't use it.
@@ -4450,47 +4450,47 @@ regmatch(
 		    // check the behind match by looping.
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case BHPOS:
-	    if (REG_MULTI)
+	  পক্ষ BHPOS:
+	    যদি (REG_MULTI)
 	    {
-		if (behind_pos.rs_u.pos.col != (colnr_T)(rex.input - rex.line)
+		যদি (behind_pos.rs_u.pos.col != (colnr_T)(rex.প্রবেশ - rex.সারি)
 			|| behind_pos.rs_u.pos.lnum != rex.lnum)
 		    status = RA_NOMATCH;
 	    }
-	    else if (behind_pos.rs_u.ptr != rex.input)
+	    অন্যথা যদি (behind_pos.rs_u.ptr != rex.প্রবেশ)
 		status = RA_NOMATCH;
-	    break;
+	    ভঙ্গ;
 
-	  case NEWL:
-	    if ((c != NUL || !REG_MULTI || rex.lnum > rex.reg_maxline
-			     || rex.reg_line_lbr)
-					   && (c != '\n' || !rex.reg_line_lbr))
+	  পক্ষ NEWL:
+	    যদি ((c != NUL || !REG_MULTI || rex.lnum > rex.reg_maxline
+			     || rex.reg_সারি_lbr)
+					   && (c != '\n' || !rex.reg_সারি_lbr))
 		status = RA_NOMATCH;
-	    else if (rex.reg_line_lbr)
+	    অন্যথা যদি (rex.reg_সারি_lbr)
 		ADVANCE_REGINPUT();
-	    else
+	    অন্যথা
 		reg_nextline();
-	    break;
+	    ভঙ্গ;
 
-	  case END:
+	  পক্ষ END:
 	    status = RA_MATCH;	// Success!
-	    break;
+	    ভঙ্গ;
 
-	  default:
+	  স্বভাব:
 	    iemsg(e_corrupted_regexp_program);
 #ifdef DEBUG
 	    printf("Illegal op code %d\n", op);
 #endif
 	    status = RA_FAIL;
-	    break;
+	    ভঙ্গ;
 	  }
 	}
 
 	// If we can't continue sequentially, break the inner loop.
-	if (status != RA_CONT)
-	    break;
+	যদি (status != RA_CONT)
+	    ভঙ্গ;
 
 	// Continue in inner loop, advance to next item.
 	scan = next;
@@ -4499,71 +4499,71 @@ regmatch(
 
     // If there is something on the regstack execute the code for the state.
     // If the state is popped then loop and use the older state.
-    while (regstack.ga_len > 0 && status != RA_FAIL)
+    যাবত্ (regstack.ga_len > 0 && status != RA_FAIL)
     {
-	rp = (regitem_T *)((char *)regstack.ga_data + regstack.ga_len) - 1;
-	switch (rp->rs_state)
+	rp = (regitem_T *)((বর্ণ *)regstack.ga_data + regstack.ga_len) - 1;
+	বিকল্প (rp->rs_state)
 	{
-	  case RS_NOPEN:
+	  পক্ষ RS_NOPEN:
 	    // Result is passed on as-is, simply pop the state.
-	    regstack_pop(&scan);
-	    break;
+	    regstack_বের_করো(&scan);
+	    ভঙ্গ;
 
-	  case RS_MOPEN:
+	  পক্ষ RS_MOPEN:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    যদি (status == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &rex.reg_startpos[rp->rs_no],
 						  &rex.reg_startp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
+	    regstack_বের_করো(&scan);
+	    ভঙ্গ;
 
 #ifdef FEAT_SYN_HL
-	  case RS_ZOPEN:
+	  পক্ষ RS_ZOPEN:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    যদি (status == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &reg_startzpos[rp->rs_no],
 						 &reg_startzp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
+	    regstack_বের_করো(&scan);
+	    ভঙ্গ;
 #endif
 
-	  case RS_MCLOSE:
+	  পক্ষ RS_MCLOSE:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    যদি (status == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &rex.reg_endpos[rp->rs_no],
 						    &rex.reg_endp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
+	    regstack_বের_করো(&scan);
+	    ভঙ্গ;
 
 #ifdef FEAT_SYN_HL
-	  case RS_ZCLOSE:
+	  পক্ষ RS_ZCLOSE:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    যদি (status == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &reg_endzpos[rp->rs_no],
 						   &reg_endzp[rp->rs_no]);
-	    regstack_pop(&scan);
-	    break;
+	    regstack_বের_করো(&scan);
+	    ভঙ্গ;
 #endif
 
-	  case RS_BRANCH:
-	    if (status == RA_MATCH)
+	  পক্ষ RS_BRANCH:
+	    যদি (status == RA_MATCH)
 		// this branch matched, use it
-		regstack_pop(&scan);
-	    else
+		regstack_বের_করো(&scan);
+	    অন্যথা
 	    {
-		if (status != RA_BREAK)
+		যদি (status != RA_BREAK)
 		{
 		    // After a non-matching branch: try next one.
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 		    scan = rp->rs_scan;
 		}
-		if (scan == NULL || OP(scan) != BRANCH)
+		যদি (scan == রিক্ত || OP(scan) != BRANCH)
 		{
 		    // no more branches, didn't find a match
 		    status = RA_NOMATCH;
-		    regstack_pop(&scan);
+		    regstack_বের_করো(&scan);
 		}
-		else
+		অন্যথা
 		{
 		    // Prepare to try a branch.
 		    rp->rs_scan = regnext(scan);
@@ -4571,70 +4571,70 @@ regmatch(
 		    scan = OPERAND(scan);
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case RS_BRCPLX_MORE:
+	  পক্ষ RS_BRCPLX_MORE:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    যদি (status == RA_NOMATCH)
 	    {
 		reg_restore(&rp->rs_un.regsave, &backpos);
-		--brace_count[rp->rs_no];	// decrement match count
+		--brace_গুনতি[rp->rs_no];	// decrement match count
 	    }
-	    regstack_pop(&scan);
-	    break;
+	    regstack_বের_করো(&scan);
+	    ভঙ্গ;
 
-	  case RS_BRCPLX_LONG:
+	  পক্ষ RS_BRCPLX_LONG:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    যদি (status == RA_NOMATCH)
 	    {
 		// There was no match, but we did find enough matches.
 		reg_restore(&rp->rs_un.regsave, &backpos);
-		--brace_count[rp->rs_no];
+		--brace_গুনতি[rp->rs_no];
 		// continue with the items after "\{}"
 		status = RA_CONT;
 	    }
-	    regstack_pop(&scan);
-	    if (status == RA_CONT)
+	    regstack_বের_করো(&scan);
+	    যদি (status == RA_CONT)
 		scan = regnext(scan);
-	    break;
+	    ভঙ্গ;
 
-	  case RS_BRCPLX_SHORT:
+	  পক্ষ RS_BRCPLX_SHORT:
 	    // Pop the state.  Restore pointers when there is no match.
-	    if (status == RA_NOMATCH)
+	    যদি (status == RA_NOMATCH)
 		// There was no match, try to match one more item.
 		reg_restore(&rp->rs_un.regsave, &backpos);
-	    regstack_pop(&scan);
-	    if (status == RA_NOMATCH)
+	    regstack_বের_করো(&scan);
+	    যদি (status == RA_NOMATCH)
 	    {
 		scan = OPERAND(scan);
 		status = RA_CONT;
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case RS_NOMATCH:
+	  পক্ষ RS_NOMATCH:
 	    // Pop the state.  If the operand matches for NOMATCH or
 	    // doesn't match for MATCH/SUBPAT, we fail.  Otherwise backup,
 	    // except for SUBPAT, and continue with the next item.
-	    if (status == (rp->rs_no == NOMATCH ? RA_MATCH : RA_NOMATCH))
+	    যদি (status == (rp->rs_no == NOMATCH ? RA_MATCH : RA_NOMATCH))
 		status = RA_NOMATCH;
-	    else
+	    অন্যথা
 	    {
 		status = RA_CONT;
-		if (rp->rs_no != SUBPAT)	// zero-width
+		যদি (rp->rs_no != SUBPAT)	// zero-width
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 	    }
-	    regstack_pop(&scan);
-	    if (status == RA_CONT)
+	    regstack_বের_করো(&scan);
+	    যদি (status == RA_CONT)
 		scan = regnext(scan);
-	    break;
+	    ভঙ্গ;
 
-	  case RS_BEHIND1:
-	    if (status == RA_NOMATCH)
+	  পক্ষ RS_BEHIND1:
+	    যদি (status == RA_NOMATCH)
 	    {
-		regstack_pop(&scan);
-		regstack.ga_len -= sizeof(regbehind_T);
+		regstack_বের_করো(&scan);
+		regstack.ga_len -= পরিমাণ(regbehind_T);
 	    }
-	    else
+	    অন্যথা
 	    {
 		// The stuff after BEHIND/NOBEHIND matches.  Now try if
 		// the behind part does (not) match before the current
@@ -4659,18 +4659,18 @@ regmatch(
 		reg_restore(&rp->rs_un.regsave, &backpos);
 		scan = OPERAND(rp->rs_scan) + 4;
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case RS_BEHIND2:
+	  পক্ষ RS_BEHIND2:
 	    // Looping for BEHIND / NOBEHIND match.
-	    if (status == RA_MATCH && reg_save_equal(&behind_pos))
+	    যদি (status == RA_MATCH && reg_save_equal(&behind_pos))
 	    {
 		// found a match that ends where "next" started
 		behind_pos = (((regbehind_T *)rp) - 1)->save_behind;
-		if (rp->rs_no == BEHIND)
+		যদি (rp->rs_no == BEHIND)
 		    reg_restore(&(((regbehind_T *)rp) - 1)->save_after,
 								    &backpos);
-		else
+		অন্যথা
 		{
 		    // But we didn't want a match.  Need to restore the
 		    // subexpr, because what follows matched, so they have
@@ -4678,10 +4678,10 @@ regmatch(
 		    status = RA_NOMATCH;
 		    restore_subexpr(((regbehind_T *)rp) - 1);
 		}
-		regstack_pop(&scan);
-		regstack.ga_len -= sizeof(regbehind_T);
+		regstack_বের_করো(&scan);
+		regstack.ga_len -= পরিমাণ(regbehind_T);
 	    }
-	    else
+	    অন্যথা
 	    {
 		long limit;
 
@@ -4689,63 +4689,63 @@ regmatch(
 		// back one character.  May go to previous line once.
 		no = OK;
 		limit = OPERAND_MIN(rp->rs_scan);
-		if (REG_MULTI)
+		যদি (REG_MULTI)
 		{
-		    if (limit > 0
+		    যদি (limit > 0
 			    && ((rp->rs_un.regsave.rs_u.pos.lnum
 						    < behind_pos.rs_u.pos.lnum
-				    ? (colnr_T)STRLEN(rex.line)
+				    ? (colnr_T)STRLEN(rex.সারি)
 				    : behind_pos.rs_u.pos.col)
 				- rp->rs_un.regsave.rs_u.pos.col >= limit))
 			no = FAIL;
-		    else if (rp->rs_un.regsave.rs_u.pos.col == 0)
+		    অন্যথা যদি (rp->rs_un.regsave.rs_u.pos.col == 0)
 		    {
-			if (rp->rs_un.regsave.rs_u.pos.lnum
+			যদি (rp->rs_un.regsave.rs_u.pos.lnum
 					< behind_pos.rs_u.pos.lnum
 				|| reg_getline(
 					--rp->rs_un.regsave.rs_u.pos.lnum)
-								  == NULL)
+								  == রিক্ত)
 			    no = FAIL;
-			else
+			অন্যথা
 			{
 			    reg_restore(&rp->rs_un.regsave, &backpos);
 			    rp->rs_un.regsave.rs_u.pos.col =
-						 (colnr_T)STRLEN(rex.line);
+						 (colnr_T)STRLEN(rex.সারি);
 			}
 		    }
-		    else
+		    অন্যথা
 		    {
-			if (has_mbyte)
+			যদি (has_mbyte)
 			{
-			    char_u *line =
+			    char_u *সারি =
 				  reg_getline(rp->rs_un.regsave.rs_u.pos.lnum);
 
 			    rp->rs_un.regsave.rs_u.pos.col -=
-				(*mb_head_off)(line, line
+				(*mb_head_off)(সারি, সারি
 				    + rp->rs_un.regsave.rs_u.pos.col - 1) + 1;
 			}
-			else
+			অন্যথা
 			    --rp->rs_un.regsave.rs_u.pos.col;
 		    }
 		}
-		else
+		অন্যথা
 		{
-		    if (rp->rs_un.regsave.rs_u.ptr == rex.line)
+		    যদি (rp->rs_un.regsave.rs_u.ptr == rex.সারি)
 			no = FAIL;
-		    else
+		    অন্যথা
 		    {
-			MB_PTR_BACK(rex.line, rp->rs_un.regsave.rs_u.ptr);
-			if (limit > 0 && (long)(behind_pos.rs_u.ptr
+			MB_PTR_BACK(rex.সারি, rp->rs_un.regsave.rs_u.ptr);
+			যদি (limit > 0 && (long)(behind_pos.rs_u.ptr
 				     - rp->rs_un.regsave.rs_u.ptr) > limit)
 			    no = FAIL;
 		    }
 		}
-		if (no == OK)
+		যদি (no == OK)
 		{
 		    // Advanced, prepare for finding match again.
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 		    scan = OPERAND(rp->rs_scan) + 4;
-		    if (status == RA_MATCH)
+		    যদি (status == RA_MATCH)
 		    {
 			// We did match, so subexpr may have been changed,
 			// need to restore them for the next try.
@@ -4753,142 +4753,142 @@ regmatch(
 			restore_subexpr(((regbehind_T *)rp) - 1);
 		    }
 		}
-		else
+		অন্যথা
 		{
 		    // Can't advance.  For NOBEHIND that's a match.
 		    behind_pos = (((regbehind_T *)rp) - 1)->save_behind;
-		    if (rp->rs_no == NOBEHIND)
+		    যদি (rp->rs_no == NOBEHIND)
 		    {
 			reg_restore(&(((regbehind_T *)rp) - 1)->save_after,
 								    &backpos);
 			status = RA_MATCH;
 		    }
-		    else
+		    অন্যথা
 		    {
 			// We do want a proper match.  Need to restore the
 			// subexpr if we had a match, because they may have
 			// been set.
-			if (status == RA_MATCH)
+			যদি (status == RA_MATCH)
 			{
 			    status = RA_NOMATCH;
 			    restore_subexpr(((regbehind_T *)rp) - 1);
 			}
 		    }
-		    regstack_pop(&scan);
-		    regstack.ga_len -= sizeof(regbehind_T);
+		    regstack_বের_করো(&scan);
+		    regstack.ga_len -= পরিমাণ(regbehind_T);
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 
-	  case RS_STAR_LONG:
-	  case RS_STAR_SHORT:
+	  পক্ষ RS_STAR_LONG:
+	  পক্ষ RS_STAR_SHORT:
 	    {
 		regstar_T	    *rst = ((regstar_T *)rp) - 1;
 
-		if (status == RA_MATCH)
+		যদি (status == RA_MATCH)
 		{
-		    regstack_pop(&scan);
-		    regstack.ga_len -= sizeof(regstar_T);
-		    break;
+		    regstack_বের_করো(&scan);
+		    regstack.ga_len -= পরিমাণ(regstar_T);
+		    ভঙ্গ;
 		}
 
 		// Tried once already, restore input pointers.
-		if (status != RA_BREAK)
+		যদি (status != RA_BREAK)
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 
 		// Repeat until we found a position where it could match.
-		for (;;)
+		প্রতি (;;)
 		{
-		    if (status != RA_BREAK)
+		    যদি (status != RA_BREAK)
 		    {
 			// Tried first position already, advance.
-			if (rp->rs_state == RS_STAR_LONG)
+			যদি (rp->rs_state == RS_STAR_LONG)
 			{
 			    // Trying for longest match, but couldn't or
 			    // didn't match -- back up one char.
-			    if (--rst->count < rst->minval)
-				break;
-			    if (rex.input == rex.line)
+			    যদি (--rst->গুনতি < rst->minval)
+				ভঙ্গ;
+			    যদি (rex.প্রবেশ == rex.সারি)
 			    {
 				// backup to last char of previous line
-				if (rex.lnum == 0)
+				যদি (rex.lnum == 0)
 				{
 				    status = RA_NOMATCH;
-				    break;
+				    ভঙ্গ;
 				}
 				--rex.lnum;
-				rex.line = reg_getline(rex.lnum);
+				rex.সারি = reg_getline(rex.lnum);
 				// Just in case regrepeat() didn't count
 				// right.
-				if (rex.line == NULL)
-				    break;
-				rex.input = rex.line + reg_getline_len(rex.lnum);
+				যদি (rex.সারি == রিক্ত)
+				    ভঙ্গ;
+				rex.প্রবেশ = rex.সারি + reg_getline_len(rex.lnum);
 				fast_breakcheck();
 			    }
-			    else
-				MB_PTR_BACK(rex.line, rex.input);
+			    অন্যথা
+				MB_PTR_BACK(rex.সারি, rex.প্রবেশ);
 			}
-			else
+			অন্যথা
 			{
 			    // Range is backwards, use shortest match first.
 			    // Careful: maxval and minval are exchanged!
 			    // Couldn't or didn't match: try advancing one
 			    // char.
-			    if (rst->count == rst->minval
+			    যদি (rst->গুনতি == rst->minval
 				  || regrepeat(OPERAND(rp->rs_scan), 1L) == 0)
-				break;
-			    ++rst->count;
+				ভঙ্গ;
+			    ++rst->গুনতি;
 			}
-			if (got_int)
-			    break;
+			যদি (got_int)
+			    ভঙ্গ;
 		    }
-		    else
+		    অন্যথা
 			status = RA_NOMATCH;
 
 		    // If it could match, try it.
-		    if (rst->nextb == NUL || *rex.input == rst->nextb
-					     || *rex.input == rst->nextb_ic)
+		    যদি (rst->nextb == NUL || *rex.প্রবেশ == rst->nextb
+					     || *rex.প্রবেশ == rst->nextb_ic)
 		    {
 			reg_save(&rp->rs_un.regsave, &backpos);
 			scan = regnext(rp->rs_scan);
 			status = RA_CONT;
-			break;
+			ভঙ্গ;
 		    }
 		}
-		if (status != RA_CONT)
+		যদি (status != RA_CONT)
 		{
 		    // Failed.
-		    regstack_pop(&scan);
-		    regstack.ga_len -= sizeof(regstar_T);
+		    regstack_বের_করো(&scan);
+		    regstack.ga_len -= পরিমাণ(regstar_T);
 		    status = RA_NOMATCH;
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 	}
 
 	// If we want to continue the inner loop or didn't pop a state
 	// continue matching loop
-	if (status == RA_CONT || rp == (regitem_T *)
-			     ((char *)regstack.ga_data + regstack.ga_len) - 1)
-	    break;
+	যদি (status == RA_CONT || rp == (regitem_T *)
+			     ((বর্ণ *)regstack.ga_data + regstack.ga_len) - 1)
+	    ভঙ্গ;
 
 #ifdef FEAT_RELTIME
-	if (bt_did_time_out(timed_out))
+	যদি (bt_did_time_out(timed_out))
 	{
 	    status = RA_FAIL;
-	    break;
+	    ভঙ্গ;
 	}
 #endif
     }
 
     // May need to continue with the inner loop, starting at "scan".
-    if (status == RA_CONT)
-	continue;
+    যদি (status == RA_CONT)
+	অনুবর্ত;
 
     // If the regstack is empty or something failed we are done.
-    if (regstack.ga_len == 0 || status == RA_FAIL)
+    যদি (regstack.ga_len == 0 || status == RA_FAIL)
     {
-	if (scan == NULL)
+	যদি (scan == রিক্ত)
 	{
 	    // We get here only if there's trouble -- normally "case END" is
 	    // the terminating point.
@@ -4897,7 +4897,7 @@ regmatch(
 	    printf("Premature EOL\n");
 #endif
 	}
-	return (status == RA_MATCH);
+	প্রত্যাগম (status == RA_MATCH);
     }
 
   } // End of loop until the regstack is empty.
@@ -4909,65 +4909,65 @@ regmatch(
  * regtry - try match of "prog" with at rex.line["col"].
  * Returns 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    স্থির long
 regtry(
     bt_regprog_T	*prog,
     colnr_T		col,
-    int			*timed_out)	// flag set on timeout or NULL
+    পূর্ণাঙ্ক			*timed_out)	// flag set on timeout or NULL
 {
-    rex.input = rex.line + col;
+    rex.প্রবেশ = rex.সারি + col;
     rex.need_clear_subexpr = TRUE;
 #ifdef FEAT_SYN_HL
     // Clear the external match subpointers if necessary.
     rex.need_clear_zsubexpr = (prog->reghasz == REX_SET);
 #endif
 
-    if (regmatch(prog->program + 1, timed_out) == 0)
-	return 0;
+    যদি (regmatch(prog->program + 1, timed_out) == 0)
+	প্রত্যাগম 0;
 
     cleanup_subexpr();
-    if (REG_MULTI)
+    যদি (REG_MULTI)
     {
-	if (rex.reg_startpos[0].lnum < 0)
+	যদি (rex.reg_startpos[0].lnum < 0)
 	{
 	    rex.reg_startpos[0].lnum = 0;
 	    rex.reg_startpos[0].col = col;
 	}
-	if (rex.reg_endpos[0].lnum < 0)
+	যদি (rex.reg_endpos[0].lnum < 0)
 	{
 	    rex.reg_endpos[0].lnum = rex.lnum;
-	    rex.reg_endpos[0].col = (int)(rex.input - rex.line);
+	    rex.reg_endpos[0].col = (পূর্ণাঙ্ক)(rex.প্রবেশ - rex.সারি);
 	}
-	else
+	অন্যথা
 	    // Use line number of "\ze".
 	    rex.lnum = rex.reg_endpos[0].lnum;
     }
-    else
+    অন্যথা
     {
-	if (rex.reg_startp[0] == NULL)
-	    rex.reg_startp[0] = rex.line + col;
-	if (rex.reg_endp[0] == NULL)
-	    rex.reg_endp[0] = rex.input;
+	যদি (rex.reg_startp[0] == রিক্ত)
+	    rex.reg_startp[0] = rex.সারি + col;
+	যদি (rex.reg_endp[0] == রিক্ত)
+	    rex.reg_endp[0] = rex.প্রবেশ;
     }
 #ifdef FEAT_SYN_HL
     // Package any found \z(...\) matches for export. Default is none.
     unref_extmatch(re_extmatch_out);
-    re_extmatch_out = NULL;
+    re_extmatch_out = রিক্ত;
 
-    if (prog->reghasz == REX_SET)
+    যদি (prog->reghasz == REX_SET)
     {
-	int		i;
+	পূর্ণাঙ্ক		i;
 
 	cleanup_zsubexpr();
 	re_extmatch_out = make_extmatch();
-	if (re_extmatch_out == NULL)
-	    return 0;
-	for (i = 0; i < NSUBEXP; i++)
+	যদি (re_extmatch_out == রিক্ত)
+	    প্রত্যাগম 0;
+	প্রতি (i = 0; i < NSUBEXP; i++)
 	{
-	    if (REG_MULTI)
+	    যদি (REG_MULTI)
 	    {
 		// Only accept single line matches.
-		if (reg_startzpos[i].lnum >= 0
+		যদি (reg_startzpos[i].lnum >= 0
 			&& reg_endzpos[i].lnum == reg_startzpos[i].lnum
 			&& reg_endzpos[i].col >= reg_startzpos[i].col)
 		    re_extmatch_out->matches[i] =
@@ -4975,9 +4975,9 @@ regtry(
 						       + reg_startzpos[i].col,
 				   reg_endzpos[i].col - reg_startzpos[i].col);
 	    }
-	    else
+	    অন্যথা
 	    {
-		if (reg_startzp[i] != NULL && reg_endzp[i] != NULL)
+		যদি (reg_startzp[i] != রিক্ত && reg_endzp[i] != রিক্ত)
 		    re_extmatch_out->matches[i] =
 			    vim_strnsave(reg_startzp[i],
 						reg_endzp[i] - reg_startzp[i]);
@@ -4985,7 +4985,7 @@ regtry(
 	}
     }
 #endif
-    return 1 + rex.lnum;
+    প্রত্যাগম 1 + rex.lnum;
 }
 
 /*
@@ -4993,11 +4993,11 @@ regtry(
  * lines (if "line" is NULL, use reg_getline()).
  * Returns 0 for failure, number of lines contained in the match otherwise.
  */
-    static long
+    স্থির long
 bt_regexec_both(
-    char_u	*line,
+    char_u	*সারি,
     colnr_T	startcol,	// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    পূর্ণাঙ্ক		*timed_out)	// flag set on timeout or NULL
 {
     bt_regprog_T    *prog;
     char_u	    *s;
@@ -5008,30 +5008,30 @@ bt_regexec_both(
     // We allocate *_INITIAL amount of bytes first and then set the grow size
     // to much bigger value to avoid many malloc calls in case of deep regular
     // expressions.
-    if (regstack.ga_data == NULL)
+    যদি (regstack.ga_data == রিক্ত)
     {
 	// Use an item size of 1 byte, since we push different things
 	// onto the regstack.
 	ga_init2(&regstack, 1, REGSTACK_INITIAL);
-	(void)ga_grow(&regstack, REGSTACK_INITIAL);
+	(শূন্য)ga_grow(&regstack, REGSTACK_INITIAL);
 	regstack.ga_growsize = REGSTACK_INITIAL * 8;
     }
 
-    if (backpos.ga_data == NULL)
+    যদি (backpos.ga_data == রিক্ত)
     {
-	ga_init2(&backpos, sizeof(backpos_T), BACKPOS_INITIAL);
-	(void)ga_grow(&backpos, BACKPOS_INITIAL);
+	ga_init2(&backpos, পরিমাণ(backpos_T), BACKPOS_INITIAL);
+	(শূন্য)ga_grow(&backpos, BACKPOS_INITIAL);
 	backpos.ga_growsize = BACKPOS_INITIAL * 8;
     }
 
-    if (REG_MULTI)
+    যদি (REG_MULTI)
     {
 	prog = (bt_regprog_T *)rex.reg_mmatch->regprog;
-	line = reg_getline((linenr_T)0);
+	সারি = reg_getline((linenr_T)0);
 	rex.reg_startpos = rex.reg_mmatch->startpos;
 	rex.reg_endpos = rex.reg_mmatch->endpos;
     }
-    else
+    অন্যথা
     {
 	prog = (bt_regprog_T *)rex.reg_match->regprog;
 	rex.reg_startp = rex.reg_match->startp;
@@ -5039,141 +5039,141 @@ bt_regexec_both(
     }
 
     // Be paranoid...
-    if (prog == NULL || line == NULL)
+    যদি (prog == রিক্ত || সারি == রিক্ত)
     {
 	iemsg(e_null_argument);
-	goto theend;
+	গচ্ছ theend;
     }
 
     // Check validity of program.
-    if (prog_magic_wrong())
-	goto theend;
+    যদি (prog_magic_wrong())
+	গচ্ছ theend;
 
     // If the start column is past the maximum column: no need to try.
-    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
-	goto theend;
+    যদি (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
+	গচ্ছ theend;
 
     // If pattern contains "\c" or "\C": overrule value of rex.reg_ic
-    if (prog->regflags & RF_ICASE)
+    যদি (prog->regflags & RF_ICASE)
 	rex.reg_ic = TRUE;
-    else if (prog->regflags & RF_NOICASE)
+    অন্যথা যদি (prog->regflags & RF_NOICASE)
 	rex.reg_ic = FALSE;
 
     // If pattern contains "\Z" overrule value of rex.reg_icombine
-    if (prog->regflags & RF_ICOMBINE)
+    যদি (prog->regflags & RF_ICOMBINE)
 	rex.reg_icombine = TRUE;
 
     // If there is a "must appear" string, look for it.
-    if (prog->regmust != NULL)
+    যদি (prog->regmust != রিক্ত)
     {
-	int c;
+	পূর্ণাঙ্ক c;
 
-	if (has_mbyte)
+	যদি (has_mbyte)
 	    c = (*mb_ptr2char)(prog->regmust);
-	else
+	অন্যথা
 	    c = *prog->regmust;
-	s = line + col;
+	s = সারি + col;
 
 	// This is used very often, esp. for ":global".  Use three versions of
 	// the loop to avoid overhead of conditions.
-	if (!rex.reg_ic && !has_mbyte)
-	    while ((s = vim_strbyte(s, c)) != NULL)
+	যদি (!rex.reg_ic && !has_mbyte)
+	    যাবত্ ((s = vim_strbyte(s, c)) != রিক্ত)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
-		    break;		// Found it.
+		পূর্ণাঙ্ক len = prog->regmlen;
+		যদি (cstrncmp(s, prog->regmust, &len) == 0)
+		    ভঙ্গ;		// Found it.
 		++s;
 	    }
-	else if (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
-	    while ((s = vim_strchr(s, c)) != NULL)
+	অন্যথা যদি (!rex.reg_ic || (!enc_utf8 && mb_char2len(c) > 1))
+	    যাবত্ ((s = vim_strchr(s, c)) != রিক্ত)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
-		    break;		// Found it.
+		পূর্ণাঙ্ক len = prog->regmlen;
+		যদি (cstrncmp(s, prog->regmust, &len) == 0)
+		    ভঙ্গ;		// Found it.
 		MB_PTR_ADV(s);
 	    }
-	else
-	    while ((s = cstrchr(s, c)) != NULL)
+	অন্যথা
+	    যাবত্ ((s = cstrchr(s, c)) != রিক্ত)
 	    {
-		int len = prog->regmlen;
-		if (cstrncmp(s, prog->regmust, &len) == 0)
-		    break;		// Found it.
+		পূর্ণাঙ্ক len = prog->regmlen;
+		যদি (cstrncmp(s, prog->regmust, &len) == 0)
+		    ভঙ্গ;		// Found it.
 		MB_PTR_ADV(s);
 	    }
-	if (s == NULL)		// Not present.
-	    goto theend;
+	যদি (s == রিক্ত)		// Not present.
+	    গচ্ছ theend;
     }
 
-    rex.line = line;
+    rex.সারি = সারি;
     rex.lnum = 0;
     reg_toolong = FALSE;
 
     // Simplest case: Anchored match need be tried only once.
-    if (prog->reganch)
+    যদি (prog->reganch)
     {
-	int	c;
+	পূর্ণাঙ্ক	c;
 
-	if (has_mbyte)
-	    c = (*mb_ptr2char)(rex.line + col);
-	else
-	    c = rex.line[col];
-	if (prog->regstart == NUL
+	যদি (has_mbyte)
+	    c = (*mb_ptr2char)(rex.সারি + col);
+	অন্যথা
+	    c = rex.সারি[col];
+	যদি (prog->regstart == NUL
 		|| prog->regstart == c
 		|| (rex.reg_ic
 		    && (((enc_utf8 && utf_fold(prog->regstart) == utf_fold(c)))
 			|| (c < 255 && prog->regstart < 255 &&
 			    MB_TOLOWER(prog->regstart) == MB_TOLOWER(c)))))
 	    retval = regtry(prog, col, timed_out);
-	else
+	অন্যথা
 	    retval = 0;
     }
-    else
+    অন্যথা
     {
 	// Messy cases:  unanchored match.
-	while (!got_int)
+	যাবত্ (!got_int)
 	{
-	    if (prog->regstart != NUL)
+	    যদি (prog->regstart != NUL)
 	    {
 		// Skip until the char we know it must start with.
 		// Used often, do some work to avoid call overhead.
-		if (!rex.reg_ic && !has_mbyte)
-		    s = vim_strbyte(rex.line + col, prog->regstart);
-		else
-		    s = cstrchr(rex.line + col, prog->regstart);
-		if (s == NULL)
+		যদি (!rex.reg_ic && !has_mbyte)
+		    s = vim_strbyte(rex.সারি + col, prog->regstart);
+		অন্যথা
+		    s = cstrchr(rex.সারি + col, prog->regstart);
+		যদি (s == রিক্ত)
 		{
 		    retval = 0;
-		    break;
+		    ভঙ্গ;
 		}
-		col = (int)(s - rex.line);
+		col = (পূর্ণাঙ্ক)(s - rex.সারি);
 	    }
 
 	    // Check for maximum column to try.
-	    if (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
+	    যদি (rex.reg_maxcol > 0 && col >= rex.reg_maxcol)
 	    {
 		retval = 0;
-		break;
+		ভঙ্গ;
 	    }
 
 	    retval = regtry(prog, col, timed_out);
-	    if (retval > 0)
-		break;
+	    যদি (retval > 0)
+		ভঙ্গ;
 
 	    // if not currently on the first line, get it again
-	    if (rex.lnum != 0)
+	    যদি (rex.lnum != 0)
 	    {
 		rex.lnum = 0;
-		rex.line = reg_getline((linenr_T)0);
+		rex.সারি = reg_getline((linenr_T)0);
 	    }
-	    if (rex.line[col] == NUL)
-		break;
-	    if (has_mbyte)
-		col += (*mb_ptr2len)(rex.line + col);
-	    else
+	    যদি (rex.সারি[col] == NUL)
+		ভঙ্গ;
+	    যদি (has_mbyte)
+		col += (*mb_ptr2len)(rex.সারি + col);
+	    অন্যথা
 		++col;
 #ifdef FEAT_RELTIME
-	    if (bt_did_time_out(timed_out))
-		break;
+	    যদি (bt_did_time_out(timed_out))
+		ভঙ্গ;
 #endif
 	}
     }
@@ -5181,23 +5181,23 @@ bt_regexec_both(
 theend:
     // Free "reg_tofree" when it's a bit big.
     // Free regstack and backpos if they are bigger than their initial size.
-    if (reg_tofreelen > 400)
+    যদি (reg_tofreelen > 400)
 	VIM_CLEAR(reg_tofree);
-    if (regstack.ga_maxlen > REGSTACK_INITIAL)
+    যদি (regstack.ga_maxlen > REGSTACK_INITIAL)
 	ga_clear(&regstack);
-    if (backpos.ga_maxlen > BACKPOS_INITIAL)
+    যদি (backpos.ga_maxlen > BACKPOS_INITIAL)
 	ga_clear(&backpos);
 
-    if (retval > 0)
+    যদি (retval > 0)
     {
 	// Make sure the end is never before the start.  Can happen when \zs
 	// and \ze are used.
-	if (REG_MULTI)
+	যদি (REG_MULTI)
 	{
 	    lpos_T *start = &rex.reg_mmatch->startpos[0];
 	    lpos_T *end = &rex.reg_mmatch->endpos[0];
 
-	    if (end->lnum < start->lnum
+	    যদি (end->lnum < start->lnum
 			|| (end->lnum == start->lnum && end->col < start->col))
 		rex.reg_mmatch->endpos[0] = rex.reg_mmatch->startpos[0];
 
@@ -5205,9 +5205,9 @@ theend:
 	    // the whole pattern matched.
 	    rex.reg_mmatch->rmm_matchcol = col;
 	}
-	else
+	অন্যথা
 	{
-	    if (rex.reg_match->endp[0] < rex.reg_match->startp[0])
+	    যদি (rex.reg_match->endp[0] < rex.reg_match->startp[0])
 		rex.reg_match->endp[0] = rex.reg_match->startp[0];
 
 	    // startpos[0] may be set by "\zs", also return the column where
@@ -5216,7 +5216,7 @@ theend:
 	}
     }
 
-    return retval;
+    প্রত্যাগম retval;
 }
 
 /*
@@ -5227,24 +5227,24 @@ theend:
  *
  * Returns 0 for failure, number of lines contained in the match otherwise.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 bt_regexec_nl(
     regmatch_T	*rmp,
-    char_u	*line,	// string to match against
+    char_u	*সারি,	// string to match against
     colnr_T	col,	// column to start looking for match
-    int		line_lbr)
+    পূর্ণাঙ্ক		সারি_lbr)
 {
     rex.reg_match = rmp;
-    rex.reg_mmatch = NULL;
+    rex.reg_mmatch = রিক্ত;
     rex.reg_maxline = 0;
-    rex.reg_line_lbr = line_lbr;
+    rex.reg_সারি_lbr = সারি_lbr;
     rex.reg_buf = curbuf;
-    rex.reg_win = NULL;
+    rex.reg_win = রিক্ত;
     rex.reg_ic = rmp->rm_ic;
     rex.reg_icombine = FALSE;
     rex.reg_maxcol = 0;
 
-    return bt_regexec_both(line, col, NULL);
+    প্রত্যাগম bt_regexec_both(সারি, col, রিক্ত);
 }
 
 /*
@@ -5255,32 +5255,32 @@ bt_regexec_nl(
  * Return zero if there is no match.  Return number of lines contained in the
  * match otherwise.
  */
-    static long
+    স্থির long
 bt_regexec_multi(
     regmmatch_T	*rmp,
     win_T	*win,		// window in which to search or NULL
     buf_T	*buf,		// buffer in which to search
     linenr_T	lnum,		// nr of line to start looking for match
     colnr_T	col,		// column to start looking for match
-    int		*timed_out)	// flag set on timeout or NULL
+    পূর্ণাঙ্ক		*timed_out)	// flag set on timeout or NULL
 {
     init_regexec_multi(rmp, win, buf, lnum);
-    return bt_regexec_both(NULL, col, timed_out);
+    প্রত্যাগম bt_regexec_both(রিক্ত, col, timed_out);
 }
 
 /*
  * Compare a number with the operand of RE_LNUM, RE_COL or RE_VCOL.
  */
-    static int
-re_num_cmp(long_u val, char_u *scan)
+    স্থির পূর্ণাঙ্ক
+re_অঙ্ক_cmp(long_u val, char_u *scan)
 {
     long_u  n = OPERAND_MIN(scan);
 
-    if (OPERAND_CMP(scan) == '>')
-	return val > n;
-    if (OPERAND_CMP(scan) == '<')
-	return val < n;
-    return val == n;
+    যদি (OPERAND_CMP(scan) == '>')
+	প্রত্যাগম val > n;
+    যদি (OPERAND_CMP(scan) == '<')
+	প্রত্যাগম val < n;
+    প্রত্যাগম val == n;
 }
 
 #ifdef BT_REGEXP_DUMP
@@ -5288,69 +5288,69 @@ re_num_cmp(long_u val, char_u *scan)
 /*
  * regdump - dump a regexp onto stdout in vaguely comprehensible form
  */
-    static void
+    স্থির শূন্য
 regdump(char_u *pattern, bt_regprog_T *r)
 {
     char_u  *s;
-    int	    op = EXACTLY;	// Arbitrary non-END op.
+    পূর্ণাঙ্ক	    op = EXACTLY;	// Arbitrary non-END op.
     char_u  *next;
-    char_u  *end = NULL;
+    char_u  *end = রিক্ত;
     FILE    *f;
 
 # ifdef BT_REGEXP_LOG
     f = fopen("bt_regexp_log.log", "a");
-# else
+# অন্যথা
     f = stdout;
 # endif
-    if (f == NULL)
-	return;
+    যদি (f == রিক্ত)
+	প্রত্যাগম;
     fprintf(f, "-------------------------------------\n\r\nregcomp(%s):\r\n", pattern);
 
     s = r->program + 1;
     // Loop until we find the END that isn't before a referred next (an END
     // can also appear in a NOMATCH operand).
-    while ((op != END || s <= end) && s < r->program + r->regsz)
+    যাবত্ ((op != END || s <= end) && s < r->program + r->regsz)
     {
 	op = OP(s);
-	fprintf(f, "%2d%s", (int)(s - r->program), regprop(s)); // Where, what.
-	next = (s + 3 <= r->program + r->regsz) ? regnext(s) : NULL;
-	if (next == NULL)	// Next ptr.
+	fprintf(f, "%2d%s", (পূর্ণাঙ্ক)(s - r->program), regprop(s)); // Where, what.
+	next = (s + 3 <= r->program + r->regsz) ? regnext(s) : রিক্ত;
+	যদি (next == রিক্ত)	// Next ptr.
 	    fprintf(f, "(0)");
-	else
-	    fprintf(f, "(%d)", (int)((s - r->program) + (next - s)));
-	if (end < next)
+	অন্যথা
+	    fprintf(f, "(%d)", (পূর্ণাঙ্ক)((s - r->program) + (next - s)));
+	যদি (end < next)
 	    end = next;
-	if (op == BRACE_LIMITS)
+	যদি (op == BRACE_LIMITS)
 	{
 	    // Two ints
 	    fprintf(f, " minval %ld, maxval %ld", OPERAND_MIN(s), OPERAND_MAX(s));
 	    s += 8;
 	}
-	else if (op == BEHIND || op == NOBEHIND)
+	অন্যথা যদি (op == BEHIND || op == NOBEHIND)
 	{
 	    // one int
 	    fprintf(f, " count %ld", OPERAND_MIN(s));
 	    s += 4;
 	}
-	else if (op == RE_LNUM || op == RE_COL || op == RE_VCOL)
+	অন্যথা যদি (op == RE_LNUM || op == RE_COL || op == RE_VCOL)
 	{
 	    // one int plus comparator
 	    fprintf(f, " count %ld", OPERAND_MIN(s));
 	    s += 5;
 	}
 	s += 3;
-	if (op == MULTIBYTECODE)
+	যদি (op == MULTIBYTECODE)
 	{
 	    fprintf(f, " mbc=%d", utf_ptr2char(s));
 	    s += utfc_ptr2len(s);
 	}
-	if (op == ANYOF || op == ANYOF + ADD_NL
+	যদি (op == ANYOF || op == ANYOF + ADD_NL
 		|| op == ANYBUT || op == ANYBUT + ADD_NL
 		|| op == EXACTLY)
 	{
 	    // Literal string, where present.
 	    fprintf(f, "\nxxxxxxxxx\n");
-	    while (*s != NUL && s < r->program + r->regsz)
+	    যাবত্ (*s != NUL && s < r->program + r->regsz)
 	    {
 		fprintf(f, "%c", *s);
 		s += utfc_ptr2len(s);  // advance by full char including combining
@@ -5362,13 +5362,13 @@ regdump(char_u *pattern, bt_regprog_T *r)
     }
 
     // Header fields of interest.
-    if (r->regstart != NUL)
+    যদি (r->regstart != NUL)
 	fprintf(f, "start `%s' 0x%x; ", r->regstart < 256
-		? (char *)transchar(r->regstart)
+		? (বর্ণ *)transchar(r->regstart)
 		: "multibyte", r->regstart);
-    if (r->reganch)
+    যদি (r->reganch)
 	fprintf(f, "anchored; ");
-    if (r->regmust != NULL)
+    যদি (r->regmust != রিক্ত)
 	fprintf(f, "must have \"%s\"", r->regmust);
     fprintf(f, "\r\n");
 
@@ -5382,382 +5382,382 @@ regdump(char_u *pattern, bt_regprog_T *r)
 /*
  * regprop - printable representation of opcode
  */
-    static char_u *
+    স্থির char_u *
 regprop(char_u *op)
 {
-    char	    *p;
-    static char	    buf[50];
-    static size_t   buflen = 0;
+    বর্ণ	    *p;
+    স্থির বর্ণ	    buf[50];
+    স্থির size_t   buflen = 0;
 
     STRCPY(buf, ":");
     buflen = 1;
 
-    switch ((int) OP(op))
+    বিকল্প ((পূর্ণাঙ্ক) OP(op))
     {
-      case BOL:
+      পক্ষ BOL:
 	p = "BOL";
-	break;
-      case EOL:
+	ভঙ্গ;
+      পক্ষ EOL:
 	p = "EOL";
-	break;
-      case RE_BOF:
+	ভঙ্গ;
+      পক্ষ RE_BOF:
 	p = "BOF";
-	break;
-      case RE_EOF:
+	ভঙ্গ;
+      পক্ষ RE_EOF:
 	p = "EOF";
-	break;
-      case CURSOR:
+	ভঙ্গ;
+      পক্ষ CURSOR:
 	p = "CURSOR";
-	break;
-      case RE_VISUAL:
+	ভঙ্গ;
+      পক্ষ RE_VISUAL:
 	p = "RE_VISUAL";
-	break;
-      case RE_LNUM:
+	ভঙ্গ;
+      পক্ষ RE_LNUM:
 	p = "RE_LNUM";
-	break;
-      case RE_MARK:
+	ভঙ্গ;
+      পক্ষ RE_MARK:
 	p = "RE_MARK";
-	break;
-      case RE_COL:
+	ভঙ্গ;
+      পক্ষ RE_COL:
 	p = "RE_COL";
-	break;
-      case RE_VCOL:
+	ভঙ্গ;
+      পক্ষ RE_VCOL:
 	p = "RE_VCOL";
-	break;
-      case BOW:
+	ভঙ্গ;
+      পক্ষ BOW:
 	p = "BOW";
-	break;
-      case EOW:
+	ভঙ্গ;
+      পক্ষ EOW:
 	p = "EOW";
-	break;
-      case ANY:
+	ভঙ্গ;
+      পক্ষ ANY:
 	p = "ANY";
-	break;
-      case ANY + ADD_NL:
+	ভঙ্গ;
+      পক্ষ ANY + ADD_NL:
 	p = "ANY+NL";
-	break;
-      case ANYOF:
+	ভঙ্গ;
+      পক্ষ ANYOF:
 	p = "ANYOF";
-	break;
-      case ANYOF + ADD_NL:
+	ভঙ্গ;
+      পক্ষ ANYOF + ADD_NL:
 	p = "ANYOF+NL";
-	break;
-      case ANYBUT:
+	ভঙ্গ;
+      পক্ষ ANYBUT:
 	p = "ANYBUT";
-	break;
-      case ANYBUT + ADD_NL:
+	ভঙ্গ;
+      পক্ষ ANYBUT + ADD_NL:
 	p = "ANYBUT+NL";
-	break;
-      case IDENT:
+	ভঙ্গ;
+      পক্ষ IDENT:
 	p = "IDENT";
-	break;
-      case IDENT + ADD_NL:
+	ভঙ্গ;
+      পক্ষ IDENT + ADD_NL:
 	p = "IDENT+NL";
-	break;
-      case SIDENT:
+	ভঙ্গ;
+      পক্ষ SIDENT:
 	p = "SIDENT";
-	break;
-      case SIDENT + ADD_NL:
+	ভঙ্গ;
+      পক্ষ SIDENT + ADD_NL:
 	p = "SIDENT+NL";
-	break;
-      case KWORD:
+	ভঙ্গ;
+      পক্ষ KWORD:
 	p = "KWORD";
-	break;
-      case KWORD + ADD_NL:
+	ভঙ্গ;
+      পক্ষ KWORD + ADD_NL:
 	p = "KWORD+NL";
-	break;
-      case SKWORD:
+	ভঙ্গ;
+      পক্ষ SKWORD:
 	p = "SKWORD";
-	break;
-      case SKWORD + ADD_NL:
+	ভঙ্গ;
+      পক্ষ SKWORD + ADD_NL:
 	p = "SKWORD+NL";
-	break;
-      case FNAME:
+	ভঙ্গ;
+      পক্ষ FNAME:
 	p = "FNAME";
-	break;
-      case FNAME + ADD_NL:
+	ভঙ্গ;
+      পক্ষ FNAME + ADD_NL:
 	p = "FNAME+NL";
-	break;
-      case SFNAME:
+	ভঙ্গ;
+      পক্ষ SFNAME:
 	p = "SFNAME";
-	break;
-      case SFNAME + ADD_NL:
+	ভঙ্গ;
+      পক্ষ SFNAME + ADD_NL:
 	p = "SFNAME+NL";
-	break;
-      case PRINT:
+	ভঙ্গ;
+      পক্ষ PRINT:
 	p = "PRINT";
-	break;
-      case PRINT + ADD_NL:
+	ভঙ্গ;
+      পক্ষ PRINT + ADD_NL:
 	p = "PRINT+NL";
-	break;
-      case SPRINT:
+	ভঙ্গ;
+      পক্ষ SPRINT:
 	p = "SPRINT";
-	break;
-      case SPRINT + ADD_NL:
+	ভঙ্গ;
+      পক্ষ SPRINT + ADD_NL:
 	p = "SPRINT+NL";
-	break;
-      case WHITE:
+	ভঙ্গ;
+      পক্ষ WHITE:
 	p = "WHITE";
-	break;
-      case WHITE + ADD_NL:
+	ভঙ্গ;
+      পক্ষ WHITE + ADD_NL:
 	p = "WHITE+NL";
-	break;
-      case NWHITE:
+	ভঙ্গ;
+      পক্ষ NWHITE:
 	p = "NWHITE";
-	break;
-      case NWHITE + ADD_NL:
+	ভঙ্গ;
+      পক্ষ NWHITE + ADD_NL:
 	p = "NWHITE+NL";
-	break;
-      case DIGIT:
+	ভঙ্গ;
+      পক্ষ DIGIT:
 	p = "DIGIT";
-	break;
-      case DIGIT + ADD_NL:
+	ভঙ্গ;
+      পক্ষ DIGIT + ADD_NL:
 	p = "DIGIT+NL";
-	break;
-      case NDIGIT:
+	ভঙ্গ;
+      পক্ষ NDIGIT:
 	p = "NDIGIT";
-	break;
-      case NDIGIT + ADD_NL:
+	ভঙ্গ;
+      পক্ষ NDIGIT + ADD_NL:
 	p = "NDIGIT+NL";
-	break;
-      case HEX:
+	ভঙ্গ;
+      পক্ষ HEX:
 	p = "HEX";
-	break;
-      case HEX + ADD_NL:
+	ভঙ্গ;
+      পক্ষ HEX + ADD_NL:
 	p = "HEX+NL";
-	break;
-      case NHEX:
+	ভঙ্গ;
+      পক্ষ NHEX:
 	p = "NHEX";
-	break;
-      case NHEX + ADD_NL:
+	ভঙ্গ;
+      পক্ষ NHEX + ADD_NL:
 	p = "NHEX+NL";
-	break;
-      case OCTAL:
+	ভঙ্গ;
+      পক্ষ OCTAL:
 	p = "OCTAL";
-	break;
-      case OCTAL + ADD_NL:
+	ভঙ্গ;
+      পক্ষ OCTAL + ADD_NL:
 	p = "OCTAL+NL";
-	break;
-      case NOCTAL:
+	ভঙ্গ;
+      পক্ষ NOCTAL:
 	p = "NOCTAL";
-	break;
-      case NOCTAL + ADD_NL:
+	ভঙ্গ;
+      পক্ষ NOCTAL + ADD_NL:
 	p = "NOCTAL+NL";
-	break;
-      case WORD:
+	ভঙ্গ;
+      পক্ষ WORD:
 	p = "WORD";
-	break;
-      case WORD + ADD_NL:
+	ভঙ্গ;
+      পক্ষ WORD + ADD_NL:
 	p = "WORD+NL";
-	break;
-      case NWORD:
+	ভঙ্গ;
+      পক্ষ NWORD:
 	p = "NWORD";
-	break;
-      case NWORD + ADD_NL:
+	ভঙ্গ;
+      পক্ষ NWORD + ADD_NL:
 	p = "NWORD+NL";
-	break;
-      case HEAD:
+	ভঙ্গ;
+      পক্ষ HEAD:
 	p = "HEAD";
-	break;
-      case HEAD + ADD_NL:
+	ভঙ্গ;
+      পক্ষ HEAD + ADD_NL:
 	p = "HEAD+NL";
-	break;
-      case NHEAD:
+	ভঙ্গ;
+      পক্ষ NHEAD:
 	p = "NHEAD";
-	break;
-      case NHEAD + ADD_NL:
+	ভঙ্গ;
+      পক্ষ NHEAD + ADD_NL:
 	p = "NHEAD+NL";
-	break;
-      case ALPHA:
+	ভঙ্গ;
+      পক্ষ ALPHA:
 	p = "ALPHA";
-	break;
-      case ALPHA + ADD_NL:
+	ভঙ্গ;
+      পক্ষ ALPHA + ADD_NL:
 	p = "ALPHA+NL";
-	break;
-      case NALPHA:
+	ভঙ্গ;
+      পক্ষ NALPHA:
 	p = "NALPHA";
-	break;
-      case NALPHA + ADD_NL:
+	ভঙ্গ;
+      পক্ষ NALPHA + ADD_NL:
 	p = "NALPHA+NL";
-	break;
-      case LOWER:
+	ভঙ্গ;
+      পক্ষ LOWER:
 	p = "LOWER";
-	break;
-      case LOWER + ADD_NL:
+	ভঙ্গ;
+      পক্ষ LOWER + ADD_NL:
 	p = "LOWER+NL";
-	break;
-      case NLOWER:
+	ভঙ্গ;
+      পক্ষ NLOWER:
 	p = "NLOWER";
-	break;
-      case NLOWER + ADD_NL:
+	ভঙ্গ;
+      পক্ষ NLOWER + ADD_NL:
 	p = "NLOWER+NL";
-	break;
-      case UPPER:
+	ভঙ্গ;
+      পক্ষ UPPER:
 	p = "UPPER";
-	break;
-      case UPPER + ADD_NL:
+	ভঙ্গ;
+      পক্ষ UPPER + ADD_NL:
 	p = "UPPER+NL";
-	break;
-      case NUPPER:
+	ভঙ্গ;
+      পক্ষ NUPPER:
 	p = "NUPPER";
-	break;
-      case NUPPER + ADD_NL:
+	ভঙ্গ;
+      পক্ষ NUPPER + ADD_NL:
 	p = "NUPPER+NL";
-	break;
-      case BRANCH:
+	ভঙ্গ;
+      পক্ষ BRANCH:
 	p = "BRANCH";
-	break;
-      case EXACTLY:
+	ভঙ্গ;
+      পক্ষ EXACTLY:
 	p = "EXACTLY";
-	break;
-      case NOTHING:
+	ভঙ্গ;
+      পক্ষ NOTHING:
 	p = "NOTHING";
-	break;
-      case BACK:
+	ভঙ্গ;
+      পক্ষ BACK:
 	p = "BACK";
-	break;
-      case END:
+	ভঙ্গ;
+      পক্ষ END:
 	p = "END";
-	break;
-      case MOPEN + 0:
+	ভঙ্গ;
+      পক্ষ MOPEN + 0:
 	p = "MATCH START";
-	break;
-      case MOPEN + 1:
-      case MOPEN + 2:
-      case MOPEN + 3:
-      case MOPEN + 4:
-      case MOPEN + 5:
-      case MOPEN + 6:
-      case MOPEN + 7:
-      case MOPEN + 8:
-      case MOPEN + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "MOPEN%d", OP(op) - MOPEN);
-	p = NULL;
-	break;
-      case MCLOSE + 0:
+	ভঙ্গ;
+      পক্ষ MOPEN + 1:
+      পক্ষ MOPEN + 2:
+      পক্ষ MOPEN + 3:
+      পক্ষ MOPEN + 4:
+      পক্ষ MOPEN + 5:
+      পক্ষ MOPEN + 6:
+      পক্ষ MOPEN + 7:
+      পক্ষ MOPEN + 8:
+      পক্ষ MOPEN + 9:
+	buflen += vim_snprintf(buf + buflen, পরিমাণ(buf) - buflen, "MOPEN%d", OP(op) - MOPEN);
+	p = রিক্ত;
+	ভঙ্গ;
+      পক্ষ MCLOSE + 0:
 	p = "MATCH END";
-	break;
-      case MCLOSE + 1:
-      case MCLOSE + 2:
-      case MCLOSE + 3:
-      case MCLOSE + 4:
-      case MCLOSE + 5:
-      case MCLOSE + 6:
-      case MCLOSE + 7:
-      case MCLOSE + 8:
-      case MCLOSE + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "MCLOSE%d", OP(op) - MCLOSE);
-	p = NULL;
-	break;
-      case BACKREF + 1:
-      case BACKREF + 2:
-      case BACKREF + 3:
-      case BACKREF + 4:
-      case BACKREF + 5:
-      case BACKREF + 6:
-      case BACKREF + 7:
-      case BACKREF + 8:
-      case BACKREF + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "BACKREF%d", OP(op) - BACKREF);
-	p = NULL;
-	break;
-      case NOPEN:
+	ভঙ্গ;
+      পক্ষ MCLOSE + 1:
+      পক্ষ MCLOSE + 2:
+      পক্ষ MCLOSE + 3:
+      পক্ষ MCLOSE + 4:
+      পক্ষ MCLOSE + 5:
+      পক্ষ MCLOSE + 6:
+      পক্ষ MCLOSE + 7:
+      পক্ষ MCLOSE + 8:
+      পক্ষ MCLOSE + 9:
+	buflen += vim_snprintf(buf + buflen, পরিমাণ(buf) - buflen, "MCLOSE%d", OP(op) - MCLOSE);
+	p = রিক্ত;
+	ভঙ্গ;
+      পক্ষ BACKREF + 1:
+      পক্ষ BACKREF + 2:
+      পক্ষ BACKREF + 3:
+      পক্ষ BACKREF + 4:
+      পক্ষ BACKREF + 5:
+      পক্ষ BACKREF + 6:
+      পক্ষ BACKREF + 7:
+      পক্ষ BACKREF + 8:
+      পক্ষ BACKREF + 9:
+	buflen += vim_snprintf(buf + buflen, পরিমাণ(buf) - buflen, "BACKREF%d", OP(op) - BACKREF);
+	p = রিক্ত;
+	ভঙ্গ;
+      পক্ষ NOPEN:
 	p = "NOPEN";
-	break;
-      case NCLOSE:
+	ভঙ্গ;
+      পক্ষ NCLOSE:
 	p = "NCLOSE";
-	break;
+	ভঙ্গ;
 # ifdef FEAT_SYN_HL
-      case ZOPEN + 1:
-      case ZOPEN + 2:
-      case ZOPEN + 3:
-      case ZOPEN + 4:
-      case ZOPEN + 5:
-      case ZOPEN + 6:
-      case ZOPEN + 7:
-      case ZOPEN + 8:
-      case ZOPEN + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "ZOPEN%d", OP(op) - ZOPEN);
-	p = NULL;
-	break;
-      case ZCLOSE + 1:
-      case ZCLOSE + 2:
-      case ZCLOSE + 3:
-      case ZCLOSE + 4:
-      case ZCLOSE + 5:
-      case ZCLOSE + 6:
-      case ZCLOSE + 7:
-      case ZCLOSE + 8:
-      case ZCLOSE + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "ZCLOSE%d", OP(op) - ZCLOSE);
-	p = NULL;
-	break;
-      case ZREF + 1:
-      case ZREF + 2:
-      case ZREF + 3:
-      case ZREF + 4:
-      case ZREF + 5:
-      case ZREF + 6:
-      case ZREF + 7:
-      case ZREF + 8:
-      case ZREF + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "ZREF%d", OP(op) - ZREF);
-	p = NULL;
-	break;
+      পক্ষ ZOPEN + 1:
+      পক্ষ ZOPEN + 2:
+      পক্ষ ZOPEN + 3:
+      পক্ষ ZOPEN + 4:
+      পক্ষ ZOPEN + 5:
+      পক্ষ ZOPEN + 6:
+      পক্ষ ZOPEN + 7:
+      পক্ষ ZOPEN + 8:
+      পক্ষ ZOPEN + 9:
+	buflen += vim_snprintf(buf + buflen, পরিমাণ(buf) - buflen, "ZOPEN%d", OP(op) - ZOPEN);
+	p = রিক্ত;
+	ভঙ্গ;
+      পক্ষ ZCLOSE + 1:
+      পক্ষ ZCLOSE + 2:
+      পক্ষ ZCLOSE + 3:
+      পক্ষ ZCLOSE + 4:
+      পক্ষ ZCLOSE + 5:
+      পক্ষ ZCLOSE + 6:
+      পক্ষ ZCLOSE + 7:
+      পক্ষ ZCLOSE + 8:
+      পক্ষ ZCLOSE + 9:
+	buflen += vim_snprintf(buf + buflen, পরিমাণ(buf) - buflen, "ZCLOSE%d", OP(op) - ZCLOSE);
+	p = রিক্ত;
+	ভঙ্গ;
+      পক্ষ ZREF + 1:
+      পক্ষ ZREF + 2:
+      পক্ষ ZREF + 3:
+      পক্ষ ZREF + 4:
+      পক্ষ ZREF + 5:
+      পক্ষ ZREF + 6:
+      পক্ষ ZREF + 7:
+      পক্ষ ZREF + 8:
+      পক্ষ ZREF + 9:
+	buflen += vim_snprintf(buf + buflen, পরিমাণ(buf) - buflen, "ZREF%d", OP(op) - ZREF);
+	p = রিক্ত;
+	ভঙ্গ;
 # endif
-      case STAR:
+      পক্ষ STAR:
 	p = "STAR";
-	break;
-      case PLUS:
+	ভঙ্গ;
+      পক্ষ PLUS:
 	p = "PLUS";
-	break;
-      case NOMATCH:
+	ভঙ্গ;
+      পক্ষ NOMATCH:
 	p = "NOMATCH";
-	break;
-      case MATCH:
+	ভঙ্গ;
+      পক্ষ MATCH:
 	p = "MATCH";
-	break;
-      case BEHIND:
+	ভঙ্গ;
+      পক্ষ BEHIND:
 	p = "BEHIND";
-	break;
-      case NOBEHIND:
+	ভঙ্গ;
+      পক্ষ NOBEHIND:
 	p = "NOBEHIND";
-	break;
-      case SUBPAT:
+	ভঙ্গ;
+      পক্ষ SUBPAT:
 	p = "SUBPAT";
-	break;
-      case BRACE_LIMITS:
+	ভঙ্গ;
+      পক্ষ BRACE_LIMITS:
 	p = "BRACE_LIMITS";
-	break;
-      case BRACE_SIMPLE:
+	ভঙ্গ;
+      পক্ষ BRACE_SIMPLE:
 	p = "BRACE_SIMPLE";
-	break;
-      case BRACE_COMPLEX + 0:
-      case BRACE_COMPLEX + 1:
-      case BRACE_COMPLEX + 2:
-      case BRACE_COMPLEX + 3:
-      case BRACE_COMPLEX + 4:
-      case BRACE_COMPLEX + 5:
-      case BRACE_COMPLEX + 6:
-      case BRACE_COMPLEX + 7:
-      case BRACE_COMPLEX + 8:
-      case BRACE_COMPLEX + 9:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "BRACE_COMPLEX%d", OP(op) - BRACE_COMPLEX);
-	p = NULL;
-	break;
-      case MULTIBYTECODE:
+	ভঙ্গ;
+      পক্ষ BRACE_COMPLEX + 0:
+      পক্ষ BRACE_COMPLEX + 1:
+      পক্ষ BRACE_COMPLEX + 2:
+      পক্ষ BRACE_COMPLEX + 3:
+      পক্ষ BRACE_COMPLEX + 4:
+      পক্ষ BRACE_COMPLEX + 5:
+      পক্ষ BRACE_COMPLEX + 6:
+      পক্ষ BRACE_COMPLEX + 7:
+      পক্ষ BRACE_COMPLEX + 8:
+      পক্ষ BRACE_COMPLEX + 9:
+	buflen += vim_snprintf(buf + buflen, পরিমাণ(buf) - buflen, "BRACE_COMPLEX%d", OP(op) - BRACE_COMPLEX);
+	p = রিক্ত;
+	ভঙ্গ;
+      পক্ষ MULTIBYTECODE:
 	p = "MULTIBYTECODE";
-	break;
-      case NEWL:
+	ভঙ্গ;
+      পক্ষ NEWL:
 	p = "NEWL";
-	break;
-      default:
-	buflen += vim_snprintf(buf + buflen, sizeof(buf) - buflen, "corrupt %d", OP(op));
-	p = NULL;
-	break;
+	ভঙ্গ;
+      স্বভাব:
+	buflen += vim_snprintf(buf + buflen, পরিমাণ(buf) - buflen, "corrupt %d", OP(op));
+	p = রিক্ত;
+	ভঙ্গ;
     }
-    if (p != NULL)
-	vim_strncpy((char_u *)buf + buflen, (char_u *)p, sizeof(buf) - buflen - 1);
-    return (char_u *)buf;
+    যদি (p != রিক্ত)
+	vim_strncpy((char_u *)buf + buflen, (char_u *)p, পরিমাণ(buf) - buflen - 1);
+    প্রত্যাগম (char_u *)buf;
 }
 #endif	    // DEBUG

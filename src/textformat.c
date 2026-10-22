@@ -11,9 +11,9 @@
  * textformat.c: text formatting functions
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
-static int	did_add_space = FALSE;	// auto_format() added an extra space
+স্থির পূর্ণাঙ্ক	did_add_space = FALSE;	// auto_format() added an extra space
 					// under the cursor
 
 #define WHITECHAR(cc) (VIM_ISWHITE(cc) && (!enc_utf8 || !utf_iscomposing(utf_ptr2char(ml_get_cursor() + 1))))
@@ -22,12 +22,12 @@ static int	did_add_space = FALSE;	// auto_format() added an extra space
  * Return TRUE if format option 'x' is in effect.
  * Take care of no formatting when 'paste' is set.
  */
-    int
-has_format_option(int x)
+    পূর্ণাঙ্ক
+has_format_option(পূর্ণাঙ্ক x)
 {
-    if (p_paste)
-	return FALSE;
-    return (vim_strchr(curbuf->b_p_fo, x) != NULL);
+    যদি (p_paste)
+	প্রত্যাগম FALSE;
+    প্রত্যাগম (vim_strchr(curbuf->b_p_fo, x) != রিক্ত);
 }
 
 /*
@@ -36,30 +36,30 @@ has_format_option(int x)
  * If the INSCHAR_COM_LIST flag is present, then the value of second_indent
  * will be the comment leader length sent to open_line().
  */
-    void
+    শূন্য
 internal_format(
-    int		textwidth,
-    int		second_indent,
-    int		flags,
-    int		format_only,
-    int		c) // character to be inserted (can be NUL)
+    পূর্ণাঙ্ক		textwidth,
+    পূর্ণাঙ্ক		second_indent,
+    পূর্ণাঙ্ক		flags,
+    পূর্ণাঙ্ক		format_only,
+    পূর্ণাঙ্ক		c) // character to be inserted (can be NUL)
 {
-    int		cc;
-    int		skip_pos;
-    int		save_char = NUL;
-    int		haveto_redraw = FALSE;
-    int		fo_ins_blank = has_format_option(FO_INS_BLANK);
-    int		fo_multibyte = has_format_option(FO_MBYTE_BREAK);
-    int		fo_rigor_tw  = has_format_option(FO_RIGOROUS_TW);
-    int		fo_white_par = has_format_option(FO_WHITE_PAR);
-    int		first_line = TRUE;
+    পূর্ণাঙ্ক		cc;
+    পূর্ণাঙ্ক		skip_pos;
+    পূর্ণাঙ্ক		save_char = NUL;
+    পূর্ণাঙ্ক		haveto_redraw = FALSE;
+    পূর্ণাঙ্ক		fo_ins_blank = has_format_option(FO_INS_BLANK);
+    পূর্ণাঙ্ক		fo_multibyte = has_format_option(FO_MBYTE_BREAK);
+    পূর্ণাঙ্ক		fo_rigor_tw  = has_format_option(FO_RIGOROUS_TW);
+    পূর্ণাঙ্ক		fo_white_par = has_format_option(FO_WHITE_PAR);
+    পূর্ণাঙ্ক		first_সারি = TRUE;
     colnr_T	leader_len;
-    int		no_leader = FALSE;
-    int		do_comments = (flags & INSCHAR_DO_COM);
-    int		safe_tw = trim_to_int(8 * (vimlong_T)textwidth);
+    পূর্ণাঙ্ক		no_leader = FALSE;
+    পূর্ণাঙ্ক		do_comments = (flags & INSCHAR_DO_COM);
+    পূর্ণাঙ্ক		safe_tw = trim_to_int(8 * (vimlong_T)textwidth);
 #ifdef FEAT_LINEBREAK
-    int		has_lbr = curwin->w_p_lbr;
-    int		has_bri = curwin->w_p_bri;
+    পূর্ণাঙ্ক		has_lbr = curwin->w_p_lbr;
+    পূর্ণাঙ্ক		has_bri = curwin->w_p_bri;
 
     // make sure win_lbr_chartabsize() counts correctly
     curwin->w_p_lbr = FALSE;
@@ -68,10 +68,10 @@ internal_format(
 
     // When 'ai' is off we don't want a space under the cursor to be
     // deleted.  Replace it with an 'x' temporarily.
-    if (!curbuf->b_p_ai && !(State & VREPLACE_FLAG))
+    যদি (!curbuf->b_p_ai && !(State & VREPLACE_FLAG))
     {
 	cc = gchar_cursor();
-	if (VIM_ISWHITE(cc))
+	যদি (VIM_ISWHITE(cc))
 	{
 	    save_char = cc;
 	    pchar_cursor('x');
@@ -79,76 +79,76 @@ internal_format(
     }
 
     // Repeat breaking lines, until the current line is not too long.
-    while (!got_int)
+    যাবত্ (!got_int)
     {
-	int	startcol;		// Cursor column at entry
-	int	wantcol;		// column at textwidth border
-	int	foundcol;		// column for start of spaces
-	int	end_foundcol = 0;	// column for start of word
+	পূর্ণাঙ্ক	startcol;		// Cursor column at entry
+	পূর্ণাঙ্ক	wantcol;		// column at textwidth border
+	পূর্ণাঙ্ক	foundcol;		// column for start of spaces
+	পূর্ণাঙ্ক	end_foundcol = 0;	// column for start of word
 	colnr_T	len;
 	colnr_T	virtcol;
-	int	orig_col = 0;
-	char_u	*saved_text = NULL;
+	পূর্ণাঙ্ক	orig_col = 0;
+	char_u	*saved_text = রিক্ত;
 	colnr_T	col;
 	colnr_T	end_col;
-	int	wcc;			// counter for whitespace chars
-	int	did_do_comment = FALSE;
-	int	first_pass;
+	পূর্ণাঙ্ক	wcc;			// counter for whitespace chars
+	পূর্ণাঙ্ক	did_do_comment = FALSE;
+	পূর্ণাঙ্ক	first_pass;
 
 	// Cursor is currently at the end of line. No need to format
 	// if line length is less than textwidth (8 * textwidth for
 	// utf safety)
-	if (curwin->w_cursor.col < safe_tw)
+	যদি (curwin->w_cursor.col < safe_tw)
 	{
 	    virtcol = get_nolist_virtcol()
 		+ char2cells(c != NUL ? c : gchar_cursor());
-	    if (virtcol <= (colnr_T)textwidth)
-		break;
+	    যদি (virtcol <= (colnr_T)textwidth)
+		ভঙ্গ;
 	}
 
-	if (no_leader)
+	যদি (no_leader)
 	    do_comments = FALSE;
-	else if (!(flags & INSCHAR_FORMAT)
+	অন্যথা যদি (!(flags & INSCHAR_FORMAT)
 				       && has_format_option(FO_WRAP_COMS))
 	    do_comments = TRUE;
 
 	// Don't break until after the comment leader
-	if (do_comments)
+	যদি (do_comments)
 	{
-	    char_u *line = ml_get_curline();
+	    char_u *সারি = ml_get_curline();
 
-	    leader_len = get_leader_len(line, NULL, FALSE, TRUE);
-	    if (leader_len == 0 && curbuf->b_p_cin)
+	    leader_len = get_leader_len(সারি, রিক্ত, FALSE, TRUE);
+	    যদি (leader_len == 0 && curbuf->b_p_cin)
 	    {
-		int		comment_start;
+		পূর্ণাঙ্ক		comment_start;
 
 		// Check for a line comment after code.
-		comment_start = check_linecomment(line);
-		if (comment_start != MAXCOL)
+		comment_start = check_linecomment(সারি);
+		যদি (comment_start != MAXCOL)
 		{
 		    leader_len = get_leader_len(
-				      line + comment_start, NULL, FALSE, TRUE);
-		    if (leader_len != 0)
+				      সারি + comment_start, রিক্ত, FALSE, TRUE);
+		    যদি (leader_len != 0)
 			leader_len += comment_start;
 		}
 	    }
 	}
-	else
+	অন্যথা
 	    leader_len = 0;
 
 	// If the line doesn't start with a comment leader, then don't
 	// start one in a following broken line.  Avoids that a %word
 	// moved to the start of the next line causes all following lines
 	// to start with %.
-	if (leader_len == 0)
+	যদি (leader_len == 0)
 	    no_leader = TRUE;
-	if (!(flags & INSCHAR_FORMAT)
+	যদি (!(flags & INSCHAR_FORMAT)
 		&& leader_len == 0
 		&& !has_format_option(FO_WRAP))
 
-	    break;
-	if ((startcol = curwin->w_cursor.col) == 0)
-	    break;
+	    ভঙ্গ;
+	যদি ((startcol = curwin->w_cursor.col) == 0)
+	    ভঙ্গ;
 
 	// find column of textwidth border
 	coladvance((colnr_T)textwidth);
@@ -167,60 +167,60 @@ internal_format(
 
 	// Find position to break at.
 	// Stop at first entered white when 'formatoptions' has 'v'
-	while ((!fo_ins_blank && !has_format_option(FO_INS_VI))
+	যাবত্ ((!fo_ins_blank && !has_format_option(FO_INS_VI))
 		    || (flags & INSCHAR_FORMAT)
 		    || curwin->w_cursor.lnum != Insstart.lnum
 		    || curwin->w_cursor.col >= Insstart.col)
 	{
-	    if (first_pass && c != NUL)
+	    যদি (first_pass && c != NUL)
 	    {
 		cc = c;
 		first_pass = FALSE;
 	    }
-	    else
+	    অন্যথা
 		cc = gchar_cursor();
-	    if (WHITECHAR(cc))
+	    যদি (WHITECHAR(cc))
 	    {
 		// remember position of blank just before text
 		end_col = curwin->w_cursor.col;
 
 		// find start of sequence of blanks
 		wcc = 0;
-		while (curwin->w_cursor.col > 0 && WHITECHAR(cc))
+		যাবত্ (curwin->w_cursor.col > 0 && WHITECHAR(cc))
 		{
 		    dec_cursor();
 		    cc = gchar_cursor();
 
 		    // Increment count of how many whitespace chars in this
 		    // group; we only need to know if it's more than one.
-		    if (wcc < 2)
+		    যদি (wcc < 2)
 			wcc++;
 		}
-		if (curwin->w_cursor.col == 0 && WHITECHAR(cc))
-		    break;		// only spaces in front of text
+		যদি (curwin->w_cursor.col == 0 && WHITECHAR(cc))
+		    ভঙ্গ;		// only spaces in front of text
 
 		// Don't break after a period when 'formatoptions' has 'p' and
 		// there are less than two spaces.
-		if (has_format_option(FO_PERIOD_ABBR) && cc == '.' && wcc < 2)
-		    continue;
+		যদি (has_format_option(FO_PERIOD_ABBR) && cc == '.' && wcc < 2)
+		    অনুবর্ত;
 
 		// Don't break until after the comment leader
-		if (curwin->w_cursor.col < leader_len)
-		    break;
-		if (has_format_option(FO_ONE_LETTER))
+		যদি (curwin->w_cursor.col < leader_len)
+		    ভঙ্গ;
+		যদি (has_format_option(FO_ONE_LETTER))
 		{
 		    // do not break after one-letter words
-		    if (curwin->w_cursor.col == 0)
-			break;	// one-letter word at begin
+		    যদি (curwin->w_cursor.col == 0)
+			ভঙ্গ;	// one-letter word at begin
 		    // do not break "#a b" when 'tw' is 2
-		    if (curwin->w_cursor.col <= leader_len)
-			break;
+		    যদি (curwin->w_cursor.col <= leader_len)
+			ভঙ্গ;
 		    col = curwin->w_cursor.col;
 		    dec_cursor();
 		    cc = gchar_cursor();
 
-		    if (WHITECHAR(cc))
-			continue;	// one-letter, continue
+		    যদি (WHITECHAR(cc))
+			অনুবর্ত;	// one-letter, continue
 		    curwin->w_cursor.col = col;
 		}
 
@@ -228,21 +228,21 @@ internal_format(
 
 		end_foundcol = end_col + 1;
 		foundcol = curwin->w_cursor.col;
-		if (curwin->w_cursor.col <= (colnr_T)wantcol)
-		    break;
+		যদি (curwin->w_cursor.col <= (colnr_T)wantcol)
+		    ভঙ্গ;
 	    }
-	    else if ((cc >= 0x100 || !utf_allow_break_before(cc))
+	    অন্যথা যদি ((cc >= 0x100 || !utf_allow_break_before(cc))
 							       && fo_multibyte)
 	    {
-		int ncc;
-		int allow_break;
+		পূর্ণাঙ্ক ncc;
+		পূর্ণাঙ্ক allow_break;
 
 		// Break after or before a multi-byte character.
-		if (curwin->w_cursor.col != startcol)
+		যদি (curwin->w_cursor.col != startcol)
 		{
 		    // Don't break until after the comment leader
-		    if (curwin->w_cursor.col < leader_len)
-			break;
+		    যদি (curwin->w_cursor.col < leader_len)
+			ভঙ্গ;
 		    col = curwin->w_cursor.col;
 		    inc_cursor();
 		    ncc = gchar_cursor();
@@ -252,18 +252,18 @@ internal_format(
 			|| enc_dbcs;
 
 		    // If we have already checked this position, skip!
-		    if (curwin->w_cursor.col != skip_pos && allow_break)
+		    যদি (curwin->w_cursor.col != skip_pos && allow_break)
 		    {
 			foundcol = curwin->w_cursor.col;
 			end_foundcol = foundcol;
-			if (curwin->w_cursor.col <= (colnr_T)wantcol)
-			    break;
+			যদি (curwin->w_cursor.col <= (colnr_T)wantcol)
+			    ভঙ্গ;
 		    }
 		    curwin->w_cursor.col = col;
 		}
 
-		if (curwin->w_cursor.col == 0)
-		    break;
+		যদি (curwin->w_cursor.col == 0)
+		    ভঙ্গ;
 
 		ncc = cc;
 		col = curwin->w_cursor.col;
@@ -271,11 +271,11 @@ internal_format(
 		dec_cursor();
 		cc = gchar_cursor();
 
-		if (WHITECHAR(cc))
-		    continue;		// break with space
+		যদি (WHITECHAR(cc))
+		    অনুবর্ত;		// break with space
 		// Don't break until after the comment leader.
-		if (curwin->w_cursor.col < leader_len)
-		    break;
+		যদি (curwin->w_cursor.col < leader_len)
+		    ভঙ্গ;
 
 		curwin->w_cursor.col = col;
 		skip_pos = curwin->w_cursor.col;
@@ -285,27 +285,27 @@ internal_format(
 		    || enc_dbcs;
 
 		// Must handle this to respect line break prohibition.
-		if (allow_break)
+		যদি (allow_break)
 		{
 		    foundcol = curwin->w_cursor.col;
 		    end_foundcol = foundcol;
 		}
-		if (curwin->w_cursor.col <= (colnr_T)wantcol)
+		যদি (curwin->w_cursor.col <= (colnr_T)wantcol)
 		{
-		    int ncc_allow_break =
+		    পূর্ণাঙ্ক ncc_allow_break =
 			 (enc_utf8 && utf_allow_break_before(ncc)) || enc_dbcs;
 
-		    if (allow_break)
-			break;
-		    if (!ncc_allow_break && !fo_rigor_tw)
+		    যদি (allow_break)
+			ভঙ্গ;
+		    যদি (!ncc_allow_break && !fo_rigor_tw)
 		    {
 			// Enable at most 1 punct hang outside of textwidth.
-			if (curwin->w_cursor.col == startcol)
+			যদি (curwin->w_cursor.col == startcol)
 			{
 			    // We are inserting a non-breakable char, postpone
 			    // line break check to next insert.
 			    end_foundcol = foundcol = 0;
-			    break;
+			    ভঙ্গ;
 			}
 
 			// Neither cc nor ncc is NUL if we are here, so
@@ -322,26 +322,26 @@ internal_format(
 				(enc_utf8 && utf_allow_break(cc, ncc))
 				|| enc_dbcs;
 
-			if (allow_break)
+			যদি (allow_break)
 			{
 			    // Break only when we are not at end of line.
 			    end_foundcol = foundcol =
 				      ncc == NUL? 0 : curwin->w_cursor.col;
-			    break;
+			    ভঙ্গ;
 			}
 			curwin->w_cursor.col = col;
 		    }
 		}
 	    }
-	    if (curwin->w_cursor.col == 0)
-		break;
+	    যদি (curwin->w_cursor.col == 0)
+		ভঙ্গ;
 	    dec_cursor();
 	}
 
-	if (foundcol == 0)		// no spaces, cannot break line
+	যদি (foundcol == 0)		// no spaces, cannot break line
 	{
 	    curwin->w_cursor.col = startcol;
-	    break;
+	    ভঙ্গ;
 	}
 
 	// Going to break the line, remove any "$" now.
@@ -350,82 +350,82 @@ internal_format(
 	// Offset between cursor position and line break is used by replace
 	// stack functions.  MODE_VREPLACE does not use this, and backspaces
 	// over the text instead.
-	if (State & VREPLACE_FLAG)
+	যদি (State & VREPLACE_FLAG)
 	    orig_col = startcol;	// Will start backspacing from here
-	else
+	অন্যথা
 	    replace_offset = startcol - end_foundcol;
 
 	// adjust startcol for spaces that will be deleted and
 	// characters that will remain on top line
 	curwin->w_cursor.col = foundcol;
-	while ((cc = gchar_cursor(), WHITECHAR(cc))
+	যাবত্ ((cc = gchar_cursor(), WHITECHAR(cc))
 		    && (!fo_white_par || curwin->w_cursor.col < startcol))
 	    inc_cursor();
 	startcol -= curwin->w_cursor.col;
-	if (startcol < 0)
+	যদি (startcol < 0)
 	    startcol = 0;
 
-	if (State & VREPLACE_FLAG)
+	যদি (State & VREPLACE_FLAG)
 	{
 	    // In MODE_VREPLACE state, we will backspace over the text to be
 	    // wrapped, so save a copy now to put on the next line.
 	    saved_text = vim_strnsave(ml_get_cursor(), ml_get_cursor_len());
 	    curwin->w_cursor.col = orig_col;
-	    if (saved_text == NULL)
-		break;	// Can't do it, out of memory
+	    যদি (saved_text == রিক্ত)
+		ভঙ্গ;	// Can't do it, out of memory
 	    saved_text[startcol] = NUL;
 
 	    // Backspace over characters that will move to the next line
-	    if (!fo_white_par)
+	    যদি (!fo_white_par)
 		backspace_until_column(foundcol);
 	}
-	else
+	অন্যথা
 	{
 	    // put cursor after pos. to break line
-	    if (!fo_white_par)
+	    যদি (!fo_white_par)
 		curwin->w_cursor.col = foundcol;
 	}
 
 	// Split the line just before the margin.
 	// Only insert/delete lines, but don't really redraw the window.
-	open_line(FORWARD, OPENLINE_DELSPACES + OPENLINE_MARKFIX
+	open_সারি(FORWARD, OPENLINE_DELSPACES + OPENLINE_MARKFIX
 		+ (fo_white_par ? OPENLINE_KEEPTRAIL : 0)
 		+ (do_comments ? OPENLINE_DO_COM : 0)
 		+ OPENLINE_FORMAT
 		+ ((flags & INSCHAR_COM_LIST) ? OPENLINE_COM_LIST : 0)
 		, ((flags & INSCHAR_COM_LIST) ? second_indent : old_indent),
 		&did_do_comment);
-	if (!(flags & INSCHAR_COM_LIST))
+	যদি (!(flags & INSCHAR_COM_LIST))
 	    old_indent = 0;
 
 	// If a comment leader was inserted, may also do this on a following
 	// line.
-	if (did_do_comment)
+	যদি (did_do_comment)
 	    no_leader = FALSE;
 
 	replace_offset = 0;
-	if (first_line)
+	যদি (first_সারি)
 	{
-	    if (!(flags & INSCHAR_COM_LIST))
+	    যদি (!(flags & INSCHAR_COM_LIST))
 	    {
 		// This section is for auto-wrap of numeric lists.  When not
 		// in insert mode (i.e. format_lines()), the INSCHAR_COM_LIST
 		// flag will be set and open_line() will handle it (as seen
 		// above).  The code here (and in get_number_indent()) will
 		// recognize comments if needed...
-		if (second_indent < 0 && has_format_option(FO_Q_NUMBER))
+		যদি (second_indent < 0 && has_format_option(FO_Q_সংখ্যা))
 		    second_indent =
-				 get_number_indent(curwin->w_cursor.lnum - 1);
-		if (second_indent >= 0)
+				 get_সংখ্যা_indent(curwin->w_cursor.lnum - 1);
+		যদি (second_indent >= 0)
 		{
-		    if (State & VREPLACE_FLAG)
+		    যদি (State & VREPLACE_FLAG)
 			change_indent(INDENT_SET, second_indent,
 							    FALSE, NUL, TRUE);
-		    else
-			if (leader_len > 0 && second_indent - leader_len > 0)
+		    অন্যথা
+			যদি (leader_len > 0 && second_indent - leader_len > 0)
 		    {
-			int i;
-			int padding = second_indent - leader_len;
+			পূর্ণাঙ্ক i;
+			পূর্ণাঙ্ক padding = second_indent - leader_len;
 
 			// We started at the first_line of a numbered list
 			// that has a comment.  the open_line() function has
@@ -433,32 +433,32 @@ internal_format(
 			// the cursor at the end of the split line.  Now we
 			// add the additional whitespace needed after the
 			// comment leader for the numbered list.
-			for (i = 0; i < padding; i++)
+			প্রতি (i = 0; i < padding; i++)
 			    ins_str((char_u *)" ", 1);
 		    }
-		    else
+		    অন্যথা
 		    {
-			(void)set_indent(second_indent, SIN_CHANGED);
+			(শূন্য)set_indent(second_indent, SIN_CHANGED);
 		    }
 		}
 	    }
-	    first_line = FALSE;
+	    first_সারি = FALSE;
 	}
 
-	if (State & VREPLACE_FLAG)
+	যদি (State & VREPLACE_FLAG)
 	{
 	    // In MODE_VREPLACE state we have backspaced over the text to be
 	    // moved, now we re-insert it into the new line.
 	    ins_bytes(saved_text);
 	    vim_free(saved_text);
 	}
-	else
+	অন্যথা
 	{
 	    // Check if cursor is not past the NUL off the line, cindent
 	    // may have added or removed indent.
 	    curwin->w_cursor.col += startcol;
 	    len = ml_get_curline_len();
-	    if (curwin->w_cursor.col > len)
+	    যদি (curwin->w_cursor.col > len)
 		curwin->w_cursor.col = len;
 	}
 
@@ -469,17 +469,17 @@ internal_format(
 	did_si = FALSE;
 	can_si = FALSE;
 	can_si_back = FALSE;
-	line_breakcheck();
+	সারি_breakcheck();
     }
 
-    if (save_char != NUL)		// put back space after cursor
+    যদি (save_char != NUL)		// put back space after cursor
 	pchar_cursor(save_char);
 
 #ifdef FEAT_LINEBREAK
     curwin->w_p_lbr = has_lbr;
     curwin->w_p_bri = has_bri;
 #endif
-    if (!format_only && haveto_redraw)
+    যদি (!format_only && haveto_redraw)
     {
 	update_topline();
 	redraw_curbuf_later(UPD_VALID);
@@ -494,31 +494,31 @@ internal_format(
  * previous line.  A new paragraph starts after a blank line, or when the
  * comment leader changes -- webb.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 fmt_check_par(
     linenr_T	lnum,
-    int		*leader_len,
+    পূর্ণাঙ্ক		*leader_len,
     char_u	**leader_flags,
-    int		do_comments)
+    পূর্ণাঙ্ক		do_comments)
 {
-    char_u	*flags = NULL;	    // init for GCC
+    char_u	*flags = রিক্ত;	    // init for GCC
     char_u	*ptr;
 
     ptr = ml_get(lnum);
-    if (do_comments)
+    যদি (do_comments)
 	*leader_len = get_leader_len(ptr, leader_flags, FALSE, TRUE);
-    else
+    অন্যথা
 	*leader_len = 0;
 
-    if (*leader_len > 0)
+    যদি (*leader_len > 0)
     {
 	// Search for 'e' flag in comment leader flags.
 	flags = *leader_flags;
-	while (*flags && *flags != ':' && *flags != COM_END)
+	যাবত্ (*flags && *flags != ':' && *flags != COM_END)
 	    ++flags;
     }
 
-    return (*skipwhite(ptr + *leader_len) == NUL
+    প্রত্যাগম (*skipwhite(ptr + *leader_len) == NUL
 	    || (*leader_len > 0 && *flags == COM_END)
 	    || startPS(lnum, NUL, FALSE));
 }
@@ -526,16 +526,16 @@ fmt_check_par(
 /*
  * Return TRUE if line "lnum" ends in a white character.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 ends_in_white(linenr_T lnum)
 {
     char_u	*s = ml_get(lnum);
     size_t	l;
 
-    if (*s == NUL)
-	return FALSE;
+    যদি (*s == NUL)
+	প্রত্যাগম FALSE;
     l = ml_get_len(lnum) - 1;
-    return VIM_ISWHITE(s[l]);
+    প্রত্যাগম VIM_ISWHITE(s[l]);
 }
 
 /*
@@ -543,46 +543,46 @@ ends_in_white(linenr_T lnum)
  * the first line.  White-space is ignored.  Note that the whole of
  * 'leader1' must match 'leader2_len' characters from 'leader2' -- webb
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 same_leader(
     linenr_T lnum,
-    int	    leader1_len,
+    পূর্ণাঙ্ক	    leader1_len,
     char_u  *leader1_flags,
-    int	    leader2_len,
+    পূর্ণাঙ্ক	    leader2_len,
     char_u  *leader2_flags)
 {
-    int	    idx1 = 0, idx2 = 0;
+    পূর্ণাঙ্ক	    idx1 = 0, idx2 = 0;
     char_u  *line1;
 
-    if (leader1_len == 0)
-	return (leader2_len == 0);
+    যদি (leader1_len == 0)
+	প্রত্যাগম (leader2_len == 0);
 
     // If first leader has 'f' flag, the lines can be joined only if the
     // second line does not have a leader.
     // If first leader has 'e' flag, the lines can never be joined.
     // If first leader has 's' flag, the lines can only be joined if there is
     // some text after it and the second line has the 'm' flag.
-    if (leader1_flags != NULL)
+    যদি (leader1_flags != রিক্ত)
     {
 	char_u	*p;
 
-	for (p = leader1_flags; *p && *p != ':'; ++p)
+	প্রতি (p = leader1_flags; *p && *p != ':'; ++p)
 	{
-	    if (*p == COM_FIRST)
-		return (leader2_len == 0);
-	    if (*p == COM_END)
-		return FALSE;
-	    if (*p == COM_START)
+	    যদি (*p == COM_FIRST)
+		প্রত্যাগম (leader2_len == 0);
+	    যদি (*p == COM_END)
+		প্রত্যাগম FALSE;
+	    যদি (*p == COM_START)
 	    {
-		int line_len = ml_get_len(lnum);
-		if (line_len <= leader1_len)
-		    return FALSE;
-		if (leader2_flags == NULL || leader2_len == 0)
-		    return FALSE;
-		for (p = leader2_flags; *p && *p != ':'; ++p)
-		    if (*p == COM_MIDDLE)
-			return TRUE;
-		return FALSE;
+		পূর্ণাঙ্ক সারি_len = ml_get_len(lnum);
+		যদি (সারি_len <= leader1_len)
+		    প্রত্যাগম FALSE;
+		যদি (leader2_flags == রিক্ত || leader2_len == 0)
+		    প্রত্যাগম FALSE;
+		প্রতি (p = leader2_flags; *p && *p != ':'; ++p)
+		    যদি (*p == COM_মধ্য)
+			প্রত্যাগম TRUE;
+		প্রত্যাগম FALSE;
 	    }
 	}
     }
@@ -590,68 +590,68 @@ same_leader(
     // Get current line and next line, compare the leaders.
     // The first line has to be saved, only one line can be locked at a time.
     line1 = vim_strnsave(ml_get(lnum), ml_get_len(lnum));
-    if (line1 != NULL)
+    যদি (line1 != রিক্ত)
     {
 	char_u  *line2;
 
-	for (idx1 = 0; VIM_ISWHITE(line1[idx1]); ++idx1)
+	প্রতি (idx1 = 0; VIM_ISWHITE(line1[idx1]); ++idx1)
 	    ;
 	line2 = ml_get(lnum + 1);
-	for (idx2 = 0; idx2 < leader2_len; ++idx2)
+	প্রতি (idx2 = 0; idx2 < leader2_len; ++idx2)
 	{
-	    if (!VIM_ISWHITE(line2[idx2]))
+	    যদি (!VIM_ISWHITE(line2[idx2]))
 	    {
-		if (line1[idx1++] != line2[idx2])
-		    break;
+		যদি (line1[idx1++] != line2[idx2])
+		    ভঙ্গ;
 	    }
-	    else
-		while (VIM_ISWHITE(line1[idx1]))
+	    অন্যথা
+		যাবত্ (VIM_ISWHITE(line1[idx1]))
 		    ++idx1;
 	}
 	vim_free(line1);
     }
-    return (idx2 == leader2_len && idx1 == leader1_len);
+    প্রত্যাগম (idx2 == leader2_len && idx1 == leader1_len);
 }
 
 /*
  * Return TRUE when a paragraph starts in line "lnum".  Return FALSE when the
  * previous line is in the same paragraph.  Used for auto-formatting.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 paragraph_start(linenr_T lnum)
 {
     char_u	*p;
-    int		leader_len = 0;		// leader len of current line
-    char_u	*leader_flags = NULL;	// flags for leader of current line
-    int		next_leader_len;	// leader len of next line
+    পূর্ণাঙ্ক		leader_len = 0;		// leader len of current line
+    char_u	*leader_flags = রিক্ত;	// flags for leader of current line
+    পূর্ণাঙ্ক		next_leader_len;	// leader len of next line
     char_u	*next_leader_flags;	// flags for leader of next line
-    int		do_comments;		// format comments
+    পূর্ণাঙ্ক		do_comments;		// format comments
 
-    if (lnum <= 1)
-	return TRUE;		// start of the file
+    যদি (lnum <= 1)
+	প্রত্যাগম TRUE;		// start of the file
 
     p = ml_get(lnum - 1);
-    if (*p == NUL)
-	return TRUE;		// after empty line
+    যদি (*p == NUL)
+	প্রত্যাগম TRUE;		// after empty line
 
     do_comments = has_format_option(FO_Q_COMS);
-    if (fmt_check_par(lnum - 1, &leader_len, &leader_flags, do_comments))
-	return TRUE;		// after non-paragraph line
+    যদি (fmt_check_par(lnum - 1, &leader_len, &leader_flags, do_comments))
+	প্রত্যাগম TRUE;		// after non-paragraph line
 
-    if (fmt_check_par(lnum, &next_leader_len, &next_leader_flags, do_comments))
-	return TRUE;		// "lnum" is not a paragraph line
+    যদি (fmt_check_par(lnum, &next_leader_len, &next_leader_flags, do_comments))
+	প্রত্যাগম TRUE;		// "lnum" is not a paragraph line
 
-    if (has_format_option(FO_WHITE_PAR) && !ends_in_white(lnum - 1))
-	return TRUE;		// missing trailing space in previous line.
+    যদি (has_format_option(FO_WHITE_PAR) && !ends_in_white(lnum - 1))
+	প্রত্যাগম TRUE;		// missing trailing space in previous line.
 
-    if (has_format_option(FO_Q_NUMBER) && (get_number_indent(lnum) > 0))
-	return TRUE;		// numbered item starts in "lnum".
+    যদি (has_format_option(FO_Q_সংখ্যা) && (get_সংখ্যা_indent(lnum) > 0))
+	প্রত্যাগম TRUE;		// numbered item starts in "lnum".
 
-    if (!same_leader(lnum - 1, leader_len, leader_flags,
+    যদি (!same_leader(lnum - 1, leader_len, leader_flags,
 					  next_leader_len, next_leader_flags))
-	return TRUE;		// change of comment leader.
+	প্রত্যাগম TRUE;		// change of comment leader.
 
-    return FALSE;
+    প্রত্যাগম FALSE;
 }
 
 /*
@@ -661,17 +661,17 @@ paragraph_start(linenr_T lnum)
  * The caller must have saved the cursor line for undo, following ones will be
  * saved here.
  */
-    void
+    শূন্য
 auto_format(
-    int		trailblank,	// when TRUE also format with trailing blank
-    int		prev_line)	// may start in previous line
+    পূর্ণাঙ্ক		trailblank,	// when TRUE also format with trailing blank
+    পূর্ণাঙ্ক		prev_সারি)	// may start in previous line
 {
     pos_T	pos;
     char_u	*old;
-    int		wasatend;
+    পূর্ণাঙ্ক		wasatend;
 
-    if (!has_format_option(FO_AUTO))
-	return;
+    যদি (!has_format_option(FO_AUTO))
+	প্রত্যাগম;
 
     pos = curwin->w_cursor;
     old = ml_get_curline();
@@ -685,20 +685,20 @@ auto_format(
     // Otherwise the line would be broken and when typing another non-white
     // next they are not joined back together.
     wasatend = (pos.col == ml_get_curline_len());
-    if (*old != NUL && !trailblank && wasatend)
+    যদি (*old != NUL && !trailblank && wasatend)
     {
-	int cc;
+	পূর্ণাঙ্ক cc;
 
 	dec_cursor();
 	cc = gchar_cursor();
-	if (!WHITECHAR(cc) && curwin->w_cursor.col > 0
+	যদি (!WHITECHAR(cc) && curwin->w_cursor.col > 0
 					  && has_format_option(FO_ONE_LETTER))
 	    dec_cursor();
 	cc = gchar_cursor();
-	if (WHITECHAR(cc))
+	যদি (WHITECHAR(cc))
 	{
 	    curwin->w_cursor = pos;
-	    return;
+	    প্রত্যাগম;
 	}
 	curwin->w_cursor = pos;
     }
@@ -710,69 +710,69 @@ auto_format(
     // will be inserted adjacent to the space, keeping it protected from
     // being consumed at a line break.  auto_format() will then reformat
     // properly on the next keystroke.
-    if (*old != NUL && !trailblank && !wasatend && pos.col > 0
-	    && (State & MODE_INSERT))
+    যদি (*old != NUL && !trailblank && !wasatend && pos.col > 0
+	    && (State & MODE_ঢোকাও))
     {
-	char_u *line = ml_get_curline();
-	if (WHITECHAR(line[pos.col - 1]))
+	char_u *সারি = ml_get_curline();
+	যদি (WHITECHAR(সারি[pos.col - 1]))
 	{
 	    curwin->w_cursor = pos;
-	    return;
+	    প্রত্যাগম;
 	}
     }
 
     // With the 'c' flag in 'formatoptions' and 't' missing: only format
     // comments.
-    if (has_format_option(FO_WRAP_COMS) && !has_format_option(FO_WRAP)
-				&& get_leader_len(old, NULL, FALSE, TRUE) == 0)
-	return;
+    যদি (has_format_option(FO_WRAP_COMS) && !has_format_option(FO_WRAP)
+				&& get_leader_len(old, রিক্ত, FALSE, TRUE) == 0)
+	প্রত্যাগম;
 
     // May start formatting in a previous line, so that after "x" a word is
     // moved to the previous line if it fits there now.  Only when this is not
     // the start of a paragraph.
-    if (prev_line && !paragraph_start(curwin->w_cursor.lnum))
+    যদি (prev_সারি && !paragraph_start(curwin->w_cursor.lnum))
     {
 	--curwin->w_cursor.lnum;
-	if (u_save_cursor() == FAIL)
-	    return;
+	যদি (u_save_cursor() == FAIL)
+	    প্রত্যাগম;
     }
 
     // Do the formatting and restore the cursor position.  "saved_cursor" will
     // be adjusted for the text formatting.
     saved_cursor = pos;
-    format_lines((linenr_T)-1, FALSE);
+    format_সারিগুলি((linenr_T)-1, FALSE);
     curwin->w_cursor = saved_cursor;
     saved_cursor.lnum = 0;
 
-    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+    যদি (curwin->w_cursor.lnum > curbuf->b_ml.ml_সারি_গুনতি)
     {
 	// "cannot happen"
-	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	curwin->w_cursor.lnum = curbuf->b_ml.ml_সারি_গুনতি;
 	coladvance((colnr_T)MAXCOL);
     }
-    else
+    অন্যথা
 	check_cursor_col();
 
     // Insert mode: If the cursor is now after the end of the line while it
     // previously wasn't, the line was broken.  Because of the rule above we
     // need to add a space when 'w' is in 'formatoptions' to keep a paragraph
     // formatted.
-    if (!wasatend && has_format_option(FO_WHITE_PAR))
+    যদি (!wasatend && has_format_option(FO_WHITE_PAR))
     {
 	char_u	*new = ml_get_curline();
 	colnr_T	len = ml_get_curline_len();
-	if (curwin->w_cursor.col == len)
+	যদি (curwin->w_cursor.col == len)
 	{
 	    char_u *pnew = vim_strnsave(new, len + 2);
-	    if (pnew == NULL)
-		return;
+	    যদি (pnew == রিক্ত)
+		প্রত্যাগম;
 	    pnew[len] = ' ';
 	    pnew[len + 1] = NUL;
 	    ml_replace(curwin->w_cursor.lnum, pnew, FALSE);
 	    // remove the space later
 	    did_add_space = TRUE;
 	}
-	else
+	অন্যথা
 	    // may remove added space
 	    check_auto_format(FALSE);
     }
@@ -785,29 +785,29 @@ auto_format(
  * delete it now.  The space must be under the cursor, just after the insert
  * position.
  */
-    void
+    শূন্য
 check_auto_format(
-    int		end_insert)	    // TRUE when ending Insert mode
+    পূর্ণাঙ্ক		end_ঢোকাও)	    // TRUE when ending Insert mode
 {
-    int		c = ' ';
-    int		cc;
+    পূর্ণাঙ্ক		c = ' ';
+    পূর্ণাঙ্ক		cc;
 
-    if (!did_add_space)
-	return;
+    যদি (!did_add_space)
+	প্রত্যাগম;
 
     cc = gchar_cursor();
-    if (!WHITECHAR(cc))
+    যদি (!WHITECHAR(cc))
 	// Somehow the space was removed already.
 	did_add_space = FALSE;
-    else
+    অন্যথা
     {
-	if (!end_insert)
+	যদি (!end_ঢোকাও)
 	{
 	    inc_cursor();
 	    c = gchar_cursor();
 	    dec_cursor();
 	}
-	if (c != NUL)
+	যদি (c != NUL)
 	{
 	    // The space is no longer at the end of the line, delete it.
 	    del_char(FALSE);
@@ -823,89 +823,89 @@ check_auto_format(
  *	if invalid value, use 0.
  *	Set default to window width (maximum 79) for "gq" operator.
  */
-    int
+    পূর্ণাঙ্ক
 comp_textwidth(
-    int		ff)	// force formatting (for "gq" command)
+    পূর্ণাঙ্ক		ff)	// force formatting (for "gq" command)
 {
-    int		textwidth;
+    পূর্ণাঙ্ক		textwidth;
 
     textwidth = curbuf->b_p_tw;
-    if (textwidth == 0 && curbuf->b_p_wm)
+    যদি (textwidth == 0 && curbuf->b_p_wm)
     {
 	// The width is the window width minus 'wrapmargin' minus all the
 	// things that add to the margin.
 	textwidth = curwin->w_width - curbuf->b_p_wm;
-	if (curbuf == cmdwin_buf)
+	যদি (curbuf == cmdwin_buf)
 	    textwidth -= 1;
 #ifdef FEAT_FOLDING
 	textwidth -= curwin->w_p_fdc;
 #endif
 #ifdef FEAT_SIGNS
-	if (signcolumn_on(curwin))
+	যদি (signcolumn_on(curwin))
 	    textwidth -= 1;
 #endif
-	if (curwin->w_p_nu || curwin->w_p_rnu)
+	যদি (curwin->w_p_nu || curwin->w_p_rnu)
 	    textwidth -= 8;
     }
-    if (textwidth < 0)
+    যদি (textwidth < 0)
 	textwidth = 0;
-    if (ff && textwidth == 0)
+    যদি (ff && textwidth == 0)
     {
 	textwidth = curwin->w_width - 1;
-	if (textwidth > 79)
+	যদি (textwidth > 79)
 	    textwidth = 79;
     }
-    return textwidth;
+    প্রত্যাগম textwidth;
 }
 
 /*
  * Implementation of the format operator 'gq'.
  */
-    void
+    শূন্য
 op_format(
     oparg_T	*oap,
-    int		keep_cursor)		// keep cursor on same text char
+    পূর্ণাঙ্ক		keep_cursor)		// keep cursor on same text char
 {
-    long	old_line_count = curbuf->b_ml.ml_line_count;
+    long	old_সারি_গুনতি = curbuf->b_ml.ml_সারি_গুনতি;
 
     // Place the cursor where the "gq" or "gw" command was given, so that "u"
     // can put it back there.
     curwin->w_cursor = oap->cursor_start;
 
-    if (u_save((linenr_T)(oap->start.lnum - 1),
+    যদি (u_save((linenr_T)(oap->start.lnum - 1),
 				       (linenr_T)(oap->end.lnum + 1)) == FAIL)
-	return;
+	প্রত্যাগম;
     curwin->w_cursor = oap->start;
 
-    if (oap->is_VIsual)
+    যদি (oap->is_VIsual)
 	// When there is no change: need to remove the Visual selection
 	redraw_curbuf_later(UPD_INVERTED);
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    যদি ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	// Set '[ mark at the start of the formatted area
 	curbuf->b_op_start = oap->start;
 
     // For "gw" remember the cursor position and put it back below (adjusted
     // for joined and split lines).
-    if (keep_cursor)
+    যদি (keep_cursor)
 	saved_cursor = oap->cursor_start;
 
-    format_lines(oap->line_count, keep_cursor);
+    format_সারিগুলি(oap->সারি_গুনতি, keep_cursor);
 
     // Leave the cursor at the first non-blank of the last formatted line.
     // If the cursor was moved one line back (e.g. with "Q}") go to the next
     // line, so "." will do the next lines.
-    if (oap->end_adjusted && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+    যদি (oap->end_adjusted && curwin->w_cursor.lnum < curbuf->b_ml.ml_সারি_গুনতি)
 	++curwin->w_cursor.lnum;
     beginline(BL_WHITE | BL_FIX);
-    old_line_count = curbuf->b_ml.ml_line_count - old_line_count;
-    msgmore(old_line_count);
+    old_সারি_গুনতি = curbuf->b_ml.ml_সারি_গুনতি - old_সারি_গুনতি;
+    msgmore(old_সারি_গুনতি);
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    যদি ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	// put '] mark on the end of the formatted area
 	curbuf->b_op_end = curwin->w_cursor;
 
-    if (keep_cursor)
+    যদি (keep_cursor)
     {
 	curwin->w_cursor = saved_cursor;
 	saved_cursor.lnum = 0;
@@ -914,78 +914,78 @@ op_format(
 	check_cursor();
     }
 
-    if (oap->is_VIsual)
+    যদি (oap->is_VIsual)
     {
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_old_cursor_lnum != 0)
+	    যদি (wp->w_old_cursor_lnum != 0)
 	    {
 		// When lines have been inserted or deleted, adjust the end of
 		// the Visual area to be redrawn.
-		if (wp->w_old_cursor_lnum > wp->w_old_visual_lnum)
-		    wp->w_old_cursor_lnum += old_line_count;
-		else
-		    wp->w_old_visual_lnum += old_line_count;
+		যদি (wp->w_old_cursor_lnum > wp->w_old_visual_lnum)
+		    wp->w_old_cursor_lnum += old_সারি_গুনতি;
+		অন্যথা
+		    wp->w_old_visual_lnum += old_সারি_গুনতি;
 	    }
 	}
     }
 }
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Implementation of the format operator 'gq' for when using 'formatexpr'.
  */
-    void
+    শূন্য
 op_formatexpr(oparg_T *oap)
 {
-    if (oap->is_VIsual)
+    যদি (oap->is_VIsual)
 	// When there is no change: need to remove the Visual selection
 	redraw_curbuf_later(UPD_INVERTED);
 
-    if (fex_format(oap->start.lnum, oap->line_count, NUL) != 0)
+    যদি (fex_format(oap->start.lnum, oap->সারি_গুনতি, NUL) != 0)
 	// As documented: when 'formatexpr' returns non-zero fall back to
 	// internal formatting.
 	op_format(oap, FALSE);
 }
 
-    int
+    পূর্ণাঙ্ক
 fex_format(
     linenr_T	lnum,
-    long	count,
-    int		c)	// character to be inserted
+    long	গুনতি,
+    পূর্ণাঙ্ক		c)	// character to be inserted
 {
-    int		use_sandbox = was_set_insecurely(curwin,
+    পূর্ণাঙ্ক		use_sandbox = was_set_insecurely(curwin,
 					    (char_u *)"formatexpr", OPT_LOCAL);
-    int		r;
+    পূর্ণাঙ্ক		r;
     char_u	*fex;
     sctx_T	save_sctx = current_sctx;
 
     // Set v:lnum to the first line number and v:count to the number of lines.
     // Set v:char to the character to be inserted (can be NUL).
     set_vim_var_nr(VV_LNUM, lnum);
-    set_vim_var_nr(VV_COUNT, count);
+    set_vim_var_nr(VV_গুনতি, গুনতি);
     set_vim_var_char(c);
 
     // Make a copy, the option could be changed while calling it.
     fex = vim_strsave(curbuf->b_p_fex);
-    if (fex == NULL)
-	return 0;
+    যদি (fex == রিক্ত)
+	প্রত্যাগম 0;
     current_sctx = curbuf->b_p_script_ctx[BV_FEX];
 
     // Evaluate the function.
-    if (use_sandbox)
+    যদি (use_sandbox)
 	++sandbox;
-    r = (int)eval_to_number(fex, TRUE);
-    if (use_sandbox)
+    r = (পূর্ণাঙ্ক)eval_to_সংখ্যা(fex, TRUE);
+    যদি (use_sandbox)
 	--sandbox;
 
-    set_vim_var_string(VV_CHAR, NULL, -1);
+    set_vim_var_string(VV_CHAR, রিক্ত, -1);
     vim_free(fex);
     current_sctx = save_sctx;
 
-    return r;
+    প্রত্যাগম r;
 }
 #endif
 
@@ -995,36 +995,36 @@ fex_format(
  * Lines after the cursor line are saved for undo, caller must have saved the
  * first line.
  */
-    void
-format_lines(
-    linenr_T	line_count,
-    int		avoid_fex)		// don't use 'formatexpr'
+    শূন্য
+format_সারিগুলি(
+    linenr_T	সারি_গুনতি,
+    পূর্ণাঙ্ক		avoid_fex)		// don't use 'formatexpr'
 {
-    int		max_len;
-    int		is_not_par;		// current line not part of parag.
-    int		next_is_not_par;	// next line not part of paragraph
-    int		is_end_par;		// at end of paragraph
-    int		prev_is_end_par = FALSE;// prev. line not part of parag.
-    int		next_is_start_par = FALSE;
-    int		leader_len = 0;		// leader len of current line
-    int		next_leader_len;	// leader len of next line
-    char_u	*leader_flags = NULL;	// flags for leader of current line
-    char_u	*next_leader_flags = NULL; // flags for leader of next line
-    int		do_comments;		// format comments
-    int		do_comments_list = 0;	// format comments with 'n' or '2'
-    int		advance = TRUE;
-    int		second_indent = -1;	// indent for second line (comment
+    পূর্ণাঙ্ক		max_len;
+    পূর্ণাঙ্ক		is_not_par;		// current line not part of parag.
+    পূর্ণাঙ্ক		next_is_not_par;	// next line not part of paragraph
+    পূর্ণাঙ্ক		is_end_par;		// at end of paragraph
+    পূর্ণাঙ্ক		prev_is_end_par = FALSE;// prev. line not part of parag.
+    পূর্ণাঙ্ক		next_is_start_par = FALSE;
+    পূর্ণাঙ্ক		leader_len = 0;		// leader len of current line
+    পূর্ণাঙ্ক		next_leader_len;	// leader len of next line
+    char_u	*leader_flags = রিক্ত;	// flags for leader of current line
+    char_u	*next_leader_flags = রিক্ত; // flags for leader of next line
+    পূর্ণাঙ্ক		do_comments;		// format comments
+    পূর্ণাঙ্ক		do_comments_list = 0;	// format comments with 'n' or '2'
+    পূর্ণাঙ্ক		advance = TRUE;
+    পূর্ণাঙ্ক		second_indent = -1;	// indent for second line (comment
 					// aware)
-    int		do_second_indent;
-    int		do_number_indent;
-    int		do_trail_white;
-    int		first_par_line = TRUE;
-    int		smd_save;
-    long	count;
-    int		need_set_indent = TRUE;	// set indent of next paragraph
-    linenr_T	first_line = curwin->w_cursor.lnum;
-    int		force_format = FALSE;
-    int		old_State = State;
+    পূর্ণাঙ্ক		do_second_indent;
+    পূর্ণাঙ্ক		do_সংখ্যা_indent;
+    পূর্ণাঙ্ক		do_trail_white;
+    পূর্ণাঙ্ক		first_par_সারি = TRUE;
+    পূর্ণাঙ্ক		smd_save;
+    long	গুনতি;
+    পূর্ণাঙ্ক		need_set_indent = TRUE;	// set indent of next paragraph
+    linenr_T	first_সারি = curwin->w_cursor.lnum;
+    পূর্ণাঙ্ক		force_format = FALSE;
+    পূর্ণাঙ্ক		old_State = State;
 
     // length of a line to force formatting: 3 * 'tw'
     max_len = comp_textwidth(TRUE) * 3;
@@ -1032,26 +1032,26 @@ format_lines(
     // check for 'q', '2', 'n' and 'w' in 'formatoptions'
     do_comments = has_format_option(FO_Q_COMS);
     do_second_indent = has_format_option(FO_Q_SECOND);
-    do_number_indent = has_format_option(FO_Q_NUMBER);
+    do_সংখ্যা_indent = has_format_option(FO_Q_সংখ্যা);
     do_trail_white = has_format_option(FO_WHITE_PAR);
 
     // Get info about the previous and current line.
-    if (curwin->w_cursor.lnum > 1)
+    যদি (curwin->w_cursor.lnum > 1)
 	is_not_par = fmt_check_par(curwin->w_cursor.lnum - 1
 				, &leader_len, &leader_flags, do_comments);
-    else
+    অন্যথা
 	is_not_par = TRUE;
     next_is_not_par = fmt_check_par(curwin->w_cursor.lnum
 			  , &next_leader_len, &next_leader_flags, do_comments);
     is_end_par = (is_not_par || next_is_not_par);
-    if (!is_end_par && do_trail_white)
+    যদি (!is_end_par && do_trail_white)
 	is_end_par = !ends_in_white(curwin->w_cursor.lnum - 1);
 
     curwin->w_cursor.lnum--;
-    for (count = line_count; count != 0 && !got_int; --count)
+    প্রতি (গুনতি = সারি_গুনতি; গুনতি != 0 && !got_int; --গুনতি)
     {
 	// Advance to next paragraph.
-	if (advance)
+	যদি (advance)
 	{
 	    curwin->w_cursor.lnum++;
 	    prev_is_end_par = is_end_par;
@@ -1061,74 +1061,74 @@ format_lines(
 	}
 
 	// The last line to be formatted.
-	if (count == 1 || curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
+	যদি (গুনতি == 1 || curwin->w_cursor.lnum == curbuf->b_ml.ml_সারি_গুনতি)
 	{
 	    next_is_not_par = TRUE;
 	    next_leader_len = 0;
-	    next_leader_flags = NULL;
+	    next_leader_flags = রিক্ত;
 	}
-	else
+	অন্যথা
 	{
 	    next_is_not_par = fmt_check_par(curwin->w_cursor.lnum + 1
 			  , &next_leader_len, &next_leader_flags, do_comments);
-	    if (do_number_indent)
+	    যদি (do_সংখ্যা_indent)
 		next_is_start_par =
-			   (get_number_indent(curwin->w_cursor.lnum + 1) > 0);
+			   (get_সংখ্যা_indent(curwin->w_cursor.lnum + 1) > 0);
 	}
 	advance = TRUE;
 	is_end_par = (is_not_par || next_is_not_par || next_is_start_par);
-	if (!is_end_par && do_trail_white)
+	যদি (!is_end_par && do_trail_white)
 	    is_end_par = !ends_in_white(curwin->w_cursor.lnum);
 
 	// Skip lines that are not in a paragraph.
-	if (is_not_par)
+	যদি (is_not_par)
 	{
-	    if (line_count < 0)
-		break;
+	    যদি (সারি_গুনতি < 0)
+		ভঙ্গ;
 	}
-	else
+	অন্যথা
 	{
 	    // For the first line of a paragraph, check indent of second line.
 	    // Don't do this for comments and empty lines.
-	    if (first_par_line
-		    && (do_second_indent || do_number_indent)
+	    যদি (first_par_সারি
+		    && (do_second_indent || do_সংখ্যা_indent)
 		    && prev_is_end_par
-		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_সারি_গুনতি)
 	    {
-		if (do_second_indent && !LINEEMPTY(curwin->w_cursor.lnum + 1))
+		যদি (do_second_indent && !LINEEMPTY(curwin->w_cursor.lnum + 1))
 		{
-		    if (leader_len == 0 && next_leader_len == 0)
+		    যদি (leader_len == 0 && next_leader_len == 0)
 		    {
 			// no comment found
 			second_indent =
 				   get_indent_lnum(curwin->w_cursor.lnum + 1);
 		    }
-		    else
+		    অন্যথা
 		    {
 			second_indent = next_leader_len;
 			do_comments_list = 1;
 		    }
 		}
-		else if (do_number_indent)
+		অন্যথা যদি (do_সংখ্যা_indent)
 		{
-		    if (leader_len == 0 && next_leader_len == 0)
+		    যদি (leader_len == 0 && next_leader_len == 0)
 		    {
 			// no comment found
 			second_indent =
-				     get_number_indent(curwin->w_cursor.lnum);
+				     get_সংখ্যা_indent(curwin->w_cursor.lnum);
 		    }
-		    else
+		    অন্যথা
 		    {
 			// get_number_indent() is now "comment aware"...
 			second_indent =
-				     get_number_indent(curwin->w_cursor.lnum);
+				     get_সংখ্যা_indent(curwin->w_cursor.lnum);
 			do_comments_list = 1;
 		    }
 		}
 	    }
 
 	    // When the comment leader changes, it's the end of the paragraph.
-	    if (curwin->w_cursor.lnum >= curbuf->b_ml.ml_line_count
+	    যদি (curwin->w_cursor.lnum >= curbuf->b_ml.ml_সারি_গুনতি
 		    || !same_leader(curwin->w_cursor.lnum,
 					leader_len, leader_flags,
 					   next_leader_len, next_leader_flags))
@@ -1136,7 +1136,7 @@ format_lines(
 		// Special case: If the next line starts with a line comment
 		// and this line has a line comment after some text, the
 		// paragraph doesn't really end.
-		if (next_leader_flags == NULL
+		যদি (next_leader_flags == রিক্ত
 			|| STRNCMP(next_leader_flags, "://", 3) != 0
 			|| check_linecomment(ml_get_curline()) == MAXCOL)
 		is_end_par = TRUE;
@@ -1144,44 +1144,44 @@ format_lines(
 
 	    // If we have got to the end of a paragraph, or the line is
 	    // getting long, format it.
-	    if (is_end_par || force_format)
+	    যদি (is_end_par || force_format)
 	    {
-		if (need_set_indent)
+		যদি (need_set_indent)
 		{
-		    int		indent = 0; // amount of indent needed
+		    পূর্ণাঙ্ক		indent = 0; // amount of indent needed
 
 		    // Replace indent in first line of a paragraph with minimal
 		    // number of tabs and spaces, according to current options.
 		    // For the very first formatted line keep the current
 		    // indent.
-		    if (curwin->w_cursor.lnum == first_line)
+		    যদি (curwin->w_cursor.lnum == first_সারি)
 			indent = get_indent();
-		    else if (curbuf->b_p_lisp)
+		    অন্যথা যদি (curbuf->b_p_lisp)
 			indent = get_lisp_indent();
-		    else
+		    অন্যথা
 		    {
-			if (cindent_on())
+			যদি (cindent_on())
 			{
 			    indent =
 #ifdef FEAT_EVAL
-				 *curbuf->b_p_inde != NUL ? get_expr_indent() :
+				 *curbuf->b_p_inde != NUL ? get_রাশিমালা_indent() :
 #endif
 				 get_c_indent();
 			}
-			else
+			অন্যথা
 			    indent = get_indent();
 		    }
-		    (void)set_indent(indent, SIN_CHANGED);
+		    (শূন্য)set_indent(indent, SIN_CHANGED);
 		}
 
 		// put cursor on last non-space
 		State = MODE_NORMAL;	// don't go past end-of-line
 		coladvance((colnr_T)MAXCOL);
-		while (curwin->w_cursor.col && vim_isspace(gchar_cursor()))
+		যাবত্ (curwin->w_cursor.col && vim_isspace(gchar_cursor()))
 		    dec_cursor();
 
 		// do the formatting, without 'showmode'
-		State = MODE_INSERT;	// for open_line()
+		State = MODE_ঢোকাও;	// for open_line()
 		smd_save = p_smd;
 		p_smd = FALSE;
 
@@ -1205,57 +1205,57 @@ format_lines(
 		second_indent = -1;
 		// at end of par.: need to set indent of next par.
 		need_set_indent = is_end_par;
-		if (is_end_par)
+		যদি (is_end_par)
 		{
 		    // When called with a negative line count, break at the
 		    // end of the paragraph.
-		    if (line_count < 0)
-			break;
-		    first_par_line = TRUE;
+		    যদি (সারি_গুনতি < 0)
+			ভঙ্গ;
+		    first_par_সারি = TRUE;
 		}
 		force_format = FALSE;
 	    }
 
 	    // When still in same paragraph, join the lines together.  But
 	    // first delete the leader from the second line.
-	    if (!is_end_par)
+	    যদি (!is_end_par)
 	    {
 		advance = FALSE;
 		curwin->w_cursor.lnum++;
 		curwin->w_cursor.col = 0;
-		if (line_count < 0 && u_save_cursor() == FAIL)
-		    break;
-		if (next_leader_len > 0)
+		যদি (সারি_গুনতি < 0 && u_save_cursor() == FAIL)
+		    ভঙ্গ;
+		যদি (next_leader_len > 0)
 		{
-		    (void)del_bytes((long)next_leader_len, FALSE, FALSE);
+		    (শূন্য)del_bytes((long)next_leader_len, FALSE, FALSE);
 		    mark_col_adjust(curwin->w_cursor.lnum, (colnr_T)0, 0L,
 						    (long)-next_leader_len, 0);
 		}
-		else if (second_indent > 0)  // the "leader" for FO_Q_SECOND
+		অন্যথা যদি (second_indent > 0)  // the "leader" for FO_Q_SECOND
 		{
-		    int indent = getwhitecols_curline();
+		    পূর্ণাঙ্ক indent = getwhitecols_curline();
 
-		    if (indent > 0)
+		    যদি (indent > 0)
 		    {
-			(void)del_bytes(indent, FALSE, FALSE);
+			(শূন্য)del_bytes(indent, FALSE, FALSE);
 			mark_col_adjust(curwin->w_cursor.lnum,
 					     (colnr_T)0, 0L, (long)-indent, 0);
 		    }
 		}
 		curwin->w_cursor.lnum--;
-		if (do_join(2, TRUE, FALSE, FALSE, FALSE) == FAIL)
+		যদি (do_join(2, TRUE, FALSE, FALSE, FALSE) == FAIL)
 		{
 		    beep_flush();
-		    break;
+		    ভঙ্গ;
 		}
-		first_par_line = FALSE;
+		first_par_সারি = FALSE;
 		// If the line is getting long, format it next time
-		if (ml_get_curline_len() > max_len)
+		যদি (ml_get_curline_len() > max_len)
 		    force_format = TRUE;
-		else
+		অন্যথা
 		    force_format = FALSE;
 	    }
 	}
-	line_breakcheck();
+	সারি_breakcheck();
     }
 }

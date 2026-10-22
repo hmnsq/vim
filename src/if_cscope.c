@@ -9,17 +9,17 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
-#if defined(FEAT_CSCOPE)
+#যদি defined(FEAT_CSCOPE)
 
 # include <sys/types.h>
 # include <sys/stat.h>
-# if defined(UNIX)
+# যদি defined(UNIX)
 #  include <sys/wait.h>
 # endif
 
-# if defined (MSWIN)
+# যদি defined (MSWIN)
 #  ifndef WIN32_LEAN_AND_MEAN
 #   define WIN32_LEAN_AND_MEAN
 #  endif
@@ -36,29 +36,29 @@
  * See ":help cscope-find" for the possible queries.
  */
 
-typedef struct {
-    char *  name;
-    int     (*func)(exarg_T *eap);
-    char *  help;
-    char *  usage;
-    int	    cansplit;		// if supports splitting window
+প্রকারনির্দেশ সংরচনা {
+    বর্ণ *  name;
+    পূর্ণাঙ্ক     (*func)(exarg_T *eap);
+    বর্ণ *  help;
+    বর্ণ *  usage;
+    পূর্ণাঙ্ক	    cansplit;		// if supports splitting window
 } cscmd_T;
 
-typedef struct csi {
-    char *	    fname;	// cscope db name
-    char *	    ppath;	// path to prepend (the -P option)
-    char *	    flags;	// additional cscope flags/options (e.g, -p2)
-# if defined(UNIX)
+প্রকারনির্দেশ সংরচনা csi {
+    বর্ণ *	    fname;	// cscope db name
+    বর্ণ *	    ppath;	// path to prepend (the -P option)
+    বর্ণ *	    flags;	// additional cscope flags/options (e.g, -p2)
+# যদি defined(UNIX)
     pid_t	    pid;	// PID of the connected cscope process.
     dev_t	    st_dev;	// ID of dev containing cscope db
     ino_t	    st_ino;	// inode number of cscope db
-# else
-#  if defined(MSWIN)
+# অন্যথা
+#  যদি defined(MSWIN)
     DWORD	    pid;	// PID of the connected cscope process.
     HANDLE	    hProc;	// cscope process handle
     DWORD	    nVolume;	// Volume serial number, instead of st_dev
-    DWORD	    nIndexHigh;	// st_ino has no meaning in the Windows
-    DWORD	    nIndexLow;
+    DWORD	    n_Index_উপরের;	// st_ino has no meaning in the Windows
+    DWORD	    n_Index_নিচের;
 #  endif
 # endif
 
@@ -66,52 +66,52 @@ typedef struct csi {
     FILE *	    to_fp;	// to cscope: FILE.
 } csinfo_T;
 
-typedef enum { Add, Find, Help, Kill, Reset, Show } csid_e;
+প্রকারনির্দেশ গণনা { Add, Find, Help, Kill, Reset, Show } csid_e;
 
-typedef enum {
+প্রকারনির্দেশ গণনা {
     Store,
     Get,
     Free,
     Print
 } mcmd_e;
 
-static int	    cs_add(exarg_T *eap);
-static int	    cs_add_common(char *, char *, char *);
-static int	    cs_check_for_connections(void);
-static int	    cs_check_for_tags(void);
-static int	    cs_cnt_connections(void);
-static int	    cs_create_connection(int i);
+স্থির পূর্ণাঙ্ক	    cs_add(exarg_T *eap);
+স্থির পূর্ণাঙ্ক	    cs_add_common(বর্ণ *, বর্ণ *, বর্ণ *);
+স্থির পূর্ণাঙ্ক	    cs_check_for_connections(শূন্য);
+স্থির পূর্ণাঙ্ক	    cs_check_for_tags(শূন্য);
+স্থির পূর্ণাঙ্ক	    cs_cnt_connections(শূন্য);
+স্থির পূর্ণাঙ্ক	    cs_create_connection(পূর্ণাঙ্ক i);
 # ifdef FEAT_QUICKFIX
-static void	    cs_file_results(FILE *, int *);
+স্থির শূন্য	    cs_file_results(FILE *, পূর্ণাঙ্ক *);
 # endif
-static void	    cs_fill_results(char *, int , int *, char ***,
-			char ***, int *);
-static int	    cs_find(exarg_T *eap);
-static int	    cs_find_common(char *opt, char *pat, int, int, int, char_u *cmdline);
-static int	    cs_help(exarg_T *eap);
-static int	    cs_insert_filelist(char *, char *, char *,
+স্থির শূন্য	    cs_fill_results(বর্ণ *, পূর্ণাঙ্ক , পূর্ণাঙ্ক *, বর্ণ ***,
+			বর্ণ ***, পূর্ণাঙ্ক *);
+স্থির পূর্ণাঙ্ক	    cs_find(exarg_T *eap);
+স্থির পূর্ণাঙ্ক	    cs_find_common(বর্ণ *opt, বর্ণ *pat, পূর্ণাঙ্ক, পূর্ণাঙ্ক, পূর্ণাঙ্ক, char_u *cmdline);
+স্থির পূর্ণাঙ্ক	    cs_help(exarg_T *eap);
+স্থির পূর্ণাঙ্ক	    cs_ঢোকাও_filelist(বর্ণ *, বর্ণ *, বর্ণ *,
 			stat_T *);
-static int	    cs_kill(exarg_T *eap);
-static void	    cs_kill_execute(int, char *);
-static cscmd_T *    cs_lookup_cmd(exarg_T *eap);
-static char *	    cs_make_vim_style_matches(char *, char *,
-			char *, char *);
-static char *	    cs_manage_matches(char **, char **, int, mcmd_e);
-static void	    cs_print_tags_priv(char **, char **, int);
-static int	    cs_read_prompt(int);
-static void	    cs_release_csp(int, int freefnpp);
-static int	    cs_reset(exarg_T *eap);
-static char *	    cs_resolve_file(int, char *);
-static int	    cs_show(exarg_T *eap);
+স্থির পূর্ণাঙ্ক	    cs_kill(exarg_T *eap);
+স্থির শূন্য	    cs_kill_execute(পূর্ণাঙ্ক, বর্ণ *);
+স্থির cscmd_T *    cs_lookup_cmd(exarg_T *eap);
+স্থির বর্ণ *	    cs_make_vim_style_matches(বর্ণ *, বর্ণ *,
+			বর্ণ *, বর্ণ *);
+স্থির বর্ণ *	    cs_manage_matches(বর্ণ **, বর্ণ **, পূর্ণাঙ্ক, mcmd_e);
+স্থির শূন্য	    cs_print_tags_priv(বর্ণ **, বর্ণ **, পূর্ণাঙ্ক);
+স্থির পূর্ণাঙ্ক	    cs_read_prompt(পূর্ণাঙ্ক);
+স্থির শূন্য	    cs_release_csp(পূর্ণাঙ্ক, পূর্ণাঙ্ক freefnpp);
+স্থির পূর্ণাঙ্ক	    cs_reset(exarg_T *eap);
+স্থির বর্ণ *	    cs_resolve_file(পূর্ণাঙ্ক, বর্ণ *);
+স্থির পূর্ণাঙ্ক	    cs_show(exarg_T *eap);
 
 
-static csinfo_T *   csinfo = NULL;
-static int	    csinfo_size = 0;	// number of items allocated in
+স্থির csinfo_T *   csinfo = রিক্ত;
+স্থির পূর্ণাঙ্ক	    csinfo_size = 0;	// number of items allocated in
 					// csinfo[]
 
-static int	    eap_arg_len;    // length of eap->arg, set in
+স্থির পূর্ণাঙ্ক	    eap_arg_len;    // length of eap->arg, set in
 				    // cs_lookup_cmd()
-static cscmd_T	    cs_cmds[] =
+স্থির cscmd_T	    cs_cmds[] =
 {
     { "add",	cs_add,
 		N_("Add a new database"),     "add file|dir [pre-path] [flags]", 0 },
@@ -125,16 +125,16 @@ static cscmd_T	    cs_cmds[] =
 		N_("Reinit all connections"), "reset", 0 },
     { "show",	cs_show,
 		N_("Show connections"),       "show", 0 },
-    { NULL, NULL, NULL, NULL, 0 }
+    { রিক্ত, রিক্ত, রিক্ত, রিক্ত, 0 }
 };
 
-    static void
-cs_usage_msg(csid_e x)
+    স্থির শূন্য
+cs_usage_বার্তা(csid_e x)
 {
-    (void)semsg(_(e_usage_cscope_str), cs_cmds[(int)x].usage);
+    (শূন্য)semsg(_(e_usage_cscope_str), cs_cmds[(পূর্ণাঙ্ক)x].usage);
 }
 
-static enum
+স্থির গণনা
 {
     EXP_CSCOPE_SUBCMD,	// expand ":cscope" sub-commands
     EXP_SCSCOPE_SUBCMD,	// expand ":scscope" sub-commands
@@ -147,67 +147,67 @@ static enum
  * expansion.
  */
     char_u *
-get_cscope_name(expand_T *xp UNUSED, int idx)
+get_cscope_name(expand_T *xp UNUSED, পূর্ণাঙ্ক idx)
 {
-    int		current_idx;
-    int		i;
+    পূর্ণাঙ্ক		current_idx;
+    পূর্ণাঙ্ক		i;
 
-    switch (expand_what)
+    বিকল্প (expand_what)
     {
-    case EXP_CSCOPE_SUBCMD:
+    পক্ষ EXP_CSCOPE_SUBCMD:
 	// Complete with sub-commands of ":cscope":
 	// add, find, help, kill, reset, show
-	return (char_u *)cs_cmds[idx].name;
-    case EXP_SCSCOPE_SUBCMD:
+	প্রত্যাগম (char_u *)cs_cmds[idx].name;
+    পক্ষ EXP_SCSCOPE_SUBCMD:
 	// Complete with sub-commands of ":scscope": same sub-commands as
 	// ":cscope" but skip commands which don't support split windows
-	for (i = 0, current_idx = 0; cs_cmds[i].name != NULL; i++)
-	    if (cs_cmds[i].cansplit)
-		if (current_idx++ == idx)
-		    break;
-	return (char_u *)cs_cmds[i].name;
-    case EXP_CSCOPE_FIND:
+	প্রতি (i = 0, current_idx = 0; cs_cmds[i].name != রিক্ত; i++)
+	    যদি (cs_cmds[i].cansplit)
+		যদি (current_idx++ == idx)
+		    ভঙ্গ;
+	প্রত্যাগম (char_u *)cs_cmds[i].name;
+    পক্ষ EXP_CSCOPE_FIND:
 	{
-	    const char *query_type[] =
+	    ধ্রুব বর্ণ *query_type[] =
 	    {
-		"a", "c", "d", "e", "f", "g", "i", "s", "t", NULL
+		"a", "c", "d", "e", "f", "g", "i", "s", "t", রিক্ত
 	    };
 
 	    // Complete with query type of ":cscope find {query_type}".
 	    // {query_type} can be letters (c, d, ... a) or numbers (0, 1,
 	    // ..., 9) but only complete with letters, since numbers are
 	    // redundant.
-	    return (char_u *)query_type[idx];
+	    প্রত্যাগম (char_u *)query_type[idx];
 	}
-    case EXP_CSCOPE_KILL:
+    পক্ষ EXP_CSCOPE_KILL:
 	{
-	    static char	connection[5];
+	    স্থির বর্ণ	connection[5];
 
 	    // ":cscope kill" accepts connection numbers or partial names of
 	    // the pathname of the cscope database as argument.  Only complete
 	    // with connection numbers. -1 can also be used to kill all
 	    // connections.
-	    for (i = 0, current_idx = 0; i < csinfo_size; i++)
+	    প্রতি (i = 0, current_idx = 0; i < csinfo_size; i++)
 	    {
-		if (csinfo[i].fname == NULL)
-		    continue;
-		if (current_idx++ == idx)
+		যদি (csinfo[i].fname == রিক্ত)
+		    অনুবর্ত;
+		যদি (current_idx++ == idx)
 		{
-		    vim_snprintf(connection, sizeof(connection), "%d", i);
-		    return (char_u *)connection;
+		    vim_snprintf(connection, পরিমাণ(connection), "%d", i);
+		    প্রত্যাগম (char_u *)connection;
 		}
 	    }
-	    return (current_idx == idx && idx > 0) ? (char_u *)"-1" : NULL;
+	    প্রত্যাগম (current_idx == idx && idx > 0) ? (char_u *)"-1" : রিক্ত;
 	}
-    default:
-	return NULL;
+    স্বভাব:
+	প্রত্যাগম রিক্ত;
     }
 }
 
 /*
  * Handle command line completion for :cscope command.
  */
-    void
+    শূন্য
 set_context_in_cscope_cmd(
     expand_T	*xp,
     char_u	*arg,
@@ -221,25 +221,25 @@ set_context_in_cscope_cmd(
     expand_what = (cmdidx == CMD_scscope)
 			? EXP_SCSCOPE_SUBCMD : EXP_CSCOPE_SUBCMD;
 
-    if (*arg == NUL)
-	return;
+    যদি (*arg == NUL)
+	প্রত্যাগম;
 
     // (part of) subcommand already typed
     p = skiptowhite(arg);
-    if (*p == NUL)
-	return;
+    যদি (*p == NUL)
+	প্রত্যাগম;
 
     // past first word
     xp->xp_pattern = skipwhite(p);
-    if (*skiptowhite(xp->xp_pattern) != NUL)
+    যদি (*skiptowhite(xp->xp_pattern) != NUL)
 	xp->xp_context = EXPAND_NOTHING;
-    else if (STRNICMP(arg, "add", p - arg) == 0)
+    অন্যথা যদি (STRNICMP(arg, "add", p - arg) == 0)
 	xp->xp_context = EXPAND_FILES;
-    else if (STRNICMP(arg, "kill", p - arg) == 0)
+    অন্যথা যদি (STRNICMP(arg, "kill", p - arg) == 0)
 	expand_what = EXP_CSCOPE_KILL;
-    else if (STRNICMP(arg, "find", p - arg) == 0)
+    অন্যথা যদি (STRNICMP(arg, "find", p - arg) == 0)
 	expand_what = EXP_CSCOPE_FIND;
-    else
+    অন্যথা
 	xp->xp_context = EXPAND_NOTHING;
 }
 
@@ -247,28 +247,28 @@ set_context_in_cscope_cmd(
  * Find the command, print help if invalid, and then call the corresponding
  * command function.
  */
-    static void
+    স্থির শূন্য
 do_cscope_general(
     exarg_T	*eap,
-    int		make_split UNUSED) // whether to split window
+    পূর্ণাঙ্ক		make_split UNUSED) // whether to split window
 {
     cscmd_T *cmdp;
 
-    if (check_restricted())
-	return;
+    যদি (check_restricted())
+	প্রত্যাগম;
 
-    if ((cmdp = cs_lookup_cmd(eap)) == NULL)
+    যদি ((cmdp = cs_lookup_cmd(eap)) == রিক্ত)
     {
 	cs_help(eap);
-	return;
+	প্রত্যাগম;
     }
 
-    if (make_split)
+    যদি (make_split)
     {
-	if (!cmdp->cansplit)
+	যদি (!cmdp->cansplit)
 	{
-	    (void)msg_puts(_("This cscope command does not support splitting the window.\n"));
-	    return;
+	    (শূন্য)বার্তা_puts(_("This cscope command does not support splitting the window.\n"));
+	    প্রত্যাগম;
 	}
 	postponed_split = -1;
 	postponed_split_flags = cmdmod.cmod_split;
@@ -284,7 +284,7 @@ do_cscope_general(
 /*
  * Implementation of ":cscope" and ":lcscope"
  */
-    void
+    শূন্য
 ex_cscope(exarg_T *eap)
 {
     do_cscope_general(eap, FALSE);
@@ -293,7 +293,7 @@ ex_cscope(exarg_T *eap)
 /*
  * Implementation of ":scscope". Same as ex_cscope(), but splits window, too.
  */
-    void
+    শূন্য
 ex_scscope(exarg_T *eap)
 {
     do_cscope_general(eap, TRUE);
@@ -302,73 +302,73 @@ ex_scscope(exarg_T *eap)
 /*
  * Implementation of ":cstag"
  */
-    void
+    শূন্য
 ex_cstag(exarg_T *eap)
 {
-    int ret = FALSE;
+    পূর্ণাঙ্ক ret = FALSE;
 
-    if (*eap->arg == NUL)
+    যদি (*eap->arg == NUL)
     {
-	(void)emsg(_(e_usage_cstag_ident));
-	return;
+	(শূন্য)emsg(_(e_usage_cstag_ident));
+	প্রত্যাগম;
     }
 
-    switch (p_csto)
+    বিকল্প (p_csto)
     {
-    case 0 :
-	if (cs_check_for_connections())
+    পক্ষ 0 :
+	যদি (cs_check_for_connections())
 	{
-	    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit, FALSE,
+	    ret = cs_find_common("g", (বর্ণ *)(eap->arg), eap->forceit, FALSE,
 						       FALSE, *eap->cmdlinep);
-	    if (ret == FALSE)
+	    যদি (ret == FALSE)
 	    {
 		cs_free_tags();
-		if (msg_col)
-		    msg_putchar('\n');
+		যদি (বার্তা_col)
+		    বার্তা_putchar('\n');
 
-		if (cs_check_for_tags())
+		যদি (cs_check_for_tags())
 		    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
 	    }
 	}
-	else if (cs_check_for_tags())
+	অন্যথা যদি (cs_check_for_tags())
 	{
 	    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
 	}
-	break;
-    case 1 :
-	if (cs_check_for_tags())
+	ভঙ্গ;
+    পক্ষ 1 :
+	যদি (cs_check_for_tags())
 	{
 	    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
-	    if (ret == FALSE)
+	    যদি (ret == FALSE)
 	    {
-		if (msg_col)
-		    msg_putchar('\n');
+		যদি (বার্তা_col)
+		    বার্তা_putchar('\n');
 
-		if (cs_check_for_connections())
+		যদি (cs_check_for_connections())
 		{
-		    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit,
+		    ret = cs_find_common("g", (বর্ণ *)(eap->arg), eap->forceit,
 						FALSE, FALSE, *eap->cmdlinep);
-		    if (ret == FALSE)
+		    যদি (ret == FALSE)
 			cs_free_tags();
 		}
 	    }
 	}
-	else if (cs_check_for_connections())
+	অন্যথা যদি (cs_check_for_connections())
 	{
-	    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit, FALSE,
+	    ret = cs_find_common("g", (বর্ণ *)(eap->arg), eap->forceit, FALSE,
 						       FALSE, *eap->cmdlinep);
-	    if (ret == FALSE)
+	    যদি (ret == FALSE)
 		cs_free_tags();
 	}
-	break;
-    default :
-	break;
+	ভঙ্গ;
+    স্বভাব :
+	ভঙ্গ;
     }
 
-    if (!ret)
+    যদি (!ret)
     {
-	(void)emsg(_(e_cstag_tag_not_founc));
-# if defined(FEAT_QUICKFIX)
+	(শূন্য)emsg(_(e_cstag_tag_not_founc));
+# যদি defined(FEAT_QUICKFIX)
 	g_do_tagpreview = 0;
 # endif
     }
@@ -382,36 +382,36 @@ ex_cstag(exarg_T *eap)
  *
  * returns TRUE if eof, FALSE otherwise
  */
-    int
-cs_fgets(char_u *buf, int size)
+    পূর্ণাঙ্ক
+cs_fgets(char_u *buf, পূর্ণাঙ্ক size)
 {
-    char *p;
+    বর্ণ *p;
 
-    if ((p = cs_manage_matches(NULL, NULL, -1, Get)) == NULL)
-	return TRUE;
+    যদি ((p = cs_manage_matches(রিক্ত, রিক্ত, -1, Get)) == রিক্ত)
+	প্রত্যাগম TRUE;
     vim_strncpy(buf, (char_u *)p, size - 1);
 
-    return FALSE;
+    প্রত্যাগম FALSE;
 }
 
 
 /*
  * Called only from do_tag(), when popping the tag stack.
  */
-    void
-cs_free_tags(void)
+    শূন্য
+cs_free_tags(শূন্য)
 {
-    cs_manage_matches(NULL, NULL, -1, Free);
+    cs_manage_matches(রিক্ত, রিক্ত, -1, Free);
 }
 
 
 /*
  * Called from do_tag().
  */
-    void
-cs_print_tags(void)
+    শূন্য
+cs_print_tags(শূন্য)
 {
-    cs_manage_matches(NULL, NULL, -1, Print);
+    cs_manage_matches(রিক্ত, রিক্ত, -1, Print);
 }
 
 
@@ -442,53 +442,53 @@ cs_print_tags(void)
  *
  *		Note: All string comparisons are case sensitive!
  */
-# if defined(FEAT_EVAL)
-    static int
-cs_connection(int num, char_u *dbpath, char_u *ppath)
+# যদি defined(FEAT_EVAL)
+    স্থির পূর্ণাঙ্ক
+cs_connection(পূর্ণাঙ্ক অঙ্ক, char_u *dbpath, char_u *ppath)
 {
-    int i;
+    পূর্ণাঙ্ক i;
 
-    if (num < 0 || num > 4 || (num > 0 && !dbpath))
-	return FALSE;
+    যদি (অঙ্ক < 0 || অঙ্ক > 4 || (অঙ্ক > 0 && !dbpath))
+	প্রত্যাগম FALSE;
 
-    for (i = 0; i < csinfo_size; i++)
+    প্রতি (i = 0; i < csinfo_size; i++)
     {
-	if (!csinfo[i].fname)
-	    continue;
+	যদি (!csinfo[i].fname)
+	    অনুবর্ত;
 
-	if (num == 0)
-	    return TRUE;
+	যদি (অঙ্ক == 0)
+	    প্রত্যাগম TRUE;
 
-	switch (num)
+	বিকল্প (অঙ্ক)
 	{
-	case 1:
-	    if (strstr(csinfo[i].fname, (char *)dbpath))
-		return TRUE;
-	    break;
-	case 2:
-	    if (strcmp(csinfo[i].fname, (char *)dbpath) == 0)
-		return TRUE;
-	    break;
-	case 3:
-	    if (strstr(csinfo[i].fname, (char *)dbpath)
+	পক্ষ 1:
+	    যদি (strstr(csinfo[i].fname, (বর্ণ *)dbpath))
+		প্রত্যাগম TRUE;
+	    ভঙ্গ;
+	পক্ষ 2:
+	    যদি (strcmp(csinfo[i].fname, (বর্ণ *)dbpath) == 0)
+		প্রত্যাগম TRUE;
+	    ভঙ্গ;
+	পক্ষ 3:
+	    যদি (strstr(csinfo[i].fname, (বর্ণ *)dbpath)
 		    && ((!ppath && !csinfo[i].ppath)
 			|| (ppath
 			    && csinfo[i].ppath
-			    && strstr(csinfo[i].ppath, (char *)ppath))))
-		return TRUE;
-	    break;
-	case 4:
-	    if ((strcmp(csinfo[i].fname, (char *)dbpath) == 0)
+			    && strstr(csinfo[i].ppath, (বর্ণ *)ppath))))
+		প্রত্যাগম TRUE;
+	    ভঙ্গ;
+	পক্ষ 4:
+	    যদি ((strcmp(csinfo[i].fname, (বর্ণ *)dbpath) == 0)
 		    && ((!ppath && !csinfo[i].ppath)
 			|| (ppath
 			    && csinfo[i].ppath
-			    && (strcmp(csinfo[i].ppath, (char *)ppath) == 0))))
-		return TRUE;
-	    break;
+			    && (strcmp(csinfo[i].ppath, (বর্ণ *)ppath) == 0))))
+		প্রত্যাগম TRUE;
+	    ভঙ্গ;
 	}
     }
 
-    return FALSE;
+    প্রত্যাগম FALSE;
 }
 
 # endif
@@ -502,27 +502,27 @@ cs_connection(int num, char_u *dbpath, char_u *ppath)
  * Add cscope database or a directory name (to look for cscope.out)
  * to the cscope connection list.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 cs_add(exarg_T *eap UNUSED)
 {
-    char *fname, *ppath, *flags = NULL;
+    বর্ণ *fname, *ppath, *flags = রিক্ত;
 
-    if ((fname = strtok((char *)NULL, (const char *)" ")) == NULL)
+    যদি ((fname = strtok((বর্ণ *)রিক্ত, (ধ্রুব বর্ণ *)" ")) == রিক্ত)
     {
-	cs_usage_msg(Add);
-	return CSCOPE_FAILURE;
+	cs_usage_বার্তা(Add);
+	প্রত্যাগম CSCOPE_FAILURE;
     }
-    if ((ppath = strtok((char *)NULL, (const char *)" ")) != NULL)
-	flags = strtok((char *)NULL, (const char *)" ");
+    যদি ((ppath = strtok((বর্ণ *)রিক্ত, (ধ্রুব বর্ণ *)" ")) != রিক্ত)
+	flags = strtok((বর্ণ *)রিক্ত, (ধ্রুব বর্ণ *)" ");
 
-    return cs_add_common(fname, ppath, flags);
+    প্রত্যাগম cs_add_common(fname, ppath, flags);
 }
 
-    static void
-cs_stat_emsg(char *fname)
+    স্থির শূন্য
+cs_stat_emsg(বর্ণ *fname)
 {
-    int err = errno;
-    (void)semsg(_(e_stat_str_error_nr), fname, err);
+    পূর্ণাঙ্ক err = errno;
+    (শূন্য)semsg(_(e_stat_str_error_nr), fname, err);
 }
 
 
@@ -531,115 +531,115 @@ cs_stat_emsg(char *fname)
  * cs_add() and cs_reset().  I really don't like to do this, but this
  * routine uses a number of goto statements.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 cs_add_common(
-    char *arg1,	    // filename - may contain environment variables
-    char *arg2,	    // prepend path - may contain environment variables
-    char *flags)
+    বর্ণ *arg1,	    // filename - may contain environment variables
+    বর্ণ *arg2,	    // prepend path - may contain environment variables
+    বর্ণ *flags)
 {
     stat_T	statbuf;
-    int		ret;
-    char	*fname = NULL;
-    char	*fname2 = NULL;
-    char	*ppath = NULL;
-    int		i;
+    পূর্ণাঙ্ক		ret;
+    বর্ণ	*fname = রিক্ত;
+    বর্ণ	*fname2 = রিক্ত;
+    বর্ণ	*ppath = রিক্ত;
+    পূর্ণাঙ্ক		i;
     size_t	len;
     size_t	usedlen = 0;
-    char_u	*fbuf = NULL;
+    char_u	*fbuf = রিক্ত;
 
     // get the filename (arg1), expand it, and try to stat it
-    if ((fname = alloc(MAXPATHL + 1)) == NULL)
-	goto add_err;
+    যদি ((fname = alloc(MAXPATHL + 1)) == রিক্ত)
+	গচ্ছ add_err;
 
     len = expand_env((char_u *)arg1, (char_u *)fname, MAXPATHL);
     fbuf = (char_u *)fname;
-    (void)modify_fname((char_u *)":p", FALSE, &usedlen,
+    (শূন্য)modify_fname((char_u *)":p", FALSE, &usedlen,
 					      (char_u **)&fname, &fbuf, &len);
-    if (fname == NULL)
-	goto add_err;
-    fname = (char *)vim_strnsave((char_u *)fname, len);
+    যদি (fname == রিক্ত)
+	গচ্ছ add_err;
+    fname = (বর্ণ *)vim_strnsave((char_u *)fname, len);
     vim_free(fbuf);
 
     ret = mch_stat(fname, &statbuf);
-    if (ret < 0)
+    যদি (ret < 0)
     {
 staterr:
-	if (p_csverbose)
+	যদি (p_csverbose)
 	    cs_stat_emsg(fname);
-	goto add_err;
+	গচ্ছ add_err;
     }
 
     // get the prepend path (arg2), expand it, and try to stat it
-    if (arg2 != NULL)
+    যদি (arg2 != রিক্ত)
     {
 	stat_T	    statbuf2;
 
-	if ((ppath = alloc(MAXPATHL + 1)) == NULL)
-	    goto add_err;
+	যদি ((ppath = alloc(MAXPATHL + 1)) == রিক্ত)
+	    গচ্ছ add_err;
 
 	expand_env((char_u *)arg2, (char_u *)ppath, MAXPATHL);
 	ret = mch_stat(ppath, &statbuf2);
-	if (ret < 0)
-	    goto staterr;
+	যদি (ret < 0)
+	    গচ্ছ staterr;
     }
 
     // if filename is a directory, append the cscope database name to it
-    if (S_ISDIR(statbuf.st_mode))
+    যদি (S_ISDIR(statbuf.st_mode))
     {
 	fname2 = alloc(STRLEN_LITERAL(CSCOPE_DBFILE) + strlen(fname) + 2);
-	if (fname2 == NULL)
-	    goto add_err;
+	যদি (fname2 == রিক্ত)
+	    গচ্ছ add_err;
 
-	while (fname[strlen(fname)-1] == '/'
+	যাবত্ (fname[strlen(fname)-1] == '/'
 # ifdef MSWIN
 		|| fname[strlen(fname)-1] == '\\'
 # endif
 		)
 	{
 	    fname[strlen(fname)-1] = '\0';
-	    if (fname[0] == '\0')
-		break;
+	    যদি (fname[0] == '\0')
+		ভঙ্গ;
 	}
-	if (fname[0] == '\0')
-	    (void)sprintf(fname2, "/%s", CSCOPE_DBFILE);
-	else
-	    (void)sprintf(fname2, "%s/%s", fname, CSCOPE_DBFILE);
+	যদি (fname[0] == '\0')
+	    (শূন্য)sprintf(fname2, "/%s", CSCOPE_DBFILE);
+	অন্যথা
+	    (শূন্য)sprintf(fname2, "%s/%s", fname, CSCOPE_DBFILE);
 
 	ret = mch_stat(fname2, &statbuf);
-	if (ret < 0)
+	যদি (ret < 0)
 	{
-	    if (p_csverbose)
+	    যদি (p_csverbose)
 		cs_stat_emsg(fname2);
-	    goto add_err;
+	    গচ্ছ add_err;
 	}
 
-	i = cs_insert_filelist(fname2, ppath, flags, &statbuf);
+	i = cs_ঢোকাও_filelist(fname2, ppath, flags, &statbuf);
     }
-    else if (S_ISREG(statbuf.st_mode) || S_ISLNK(statbuf.st_mode))
+    অন্যথা যদি (S_ISREG(statbuf.st_mode) || S_ISLNK(statbuf.st_mode))
     {
-	i = cs_insert_filelist(fname, ppath, flags, &statbuf);
+	i = cs_ঢোকাও_filelist(fname, ppath, flags, &statbuf);
     }
-    else
+    অন্যথা
     {
-	if (p_csverbose)
-	    (void)semsg(_(e_str_is_not_directory_or_valid_cscope_database),
+	যদি (p_csverbose)
+	    (শূন্য)semsg(_(e_str_is_not_directory_or_valid_cscope_database),
 									fname);
-	goto add_err;
+	গচ্ছ add_err;
     }
 
-    if (i != -1)
+    যদি (i != -1)
     {
-	if (cs_create_connection(i) == CSCOPE_FAILURE
+	যদি (cs_create_connection(i) == CSCOPE_FAILURE
 		|| cs_read_prompt(i) == CSCOPE_FAILURE)
 	{
 	    cs_release_csp(i, TRUE);
-	    goto add_err;
+	    গচ্ছ add_err;
 	}
 
-	if (p_csverbose)
+	যদি (p_csverbose)
 	{
-	    msg_clr_eos();
-	    (void)smsg_attr(HL_ATTR(HLF_R),
+	    বার্তা_clr_eos();
+	    (শূন্য)smsg_attr(HL_ATTR(HLF_R),
 			    _("Added cscope database %s"),
 			    csinfo[i].fname);
 	}
@@ -648,48 +648,48 @@ staterr:
     vim_free(fname);
     vim_free(fname2);
     vim_free(ppath);
-    return CSCOPE_SUCCESS;
+    প্রত্যাগম CSCOPE_SUCCESS;
 
 add_err:
     vim_free(fname2);
     vim_free(fname);
     vim_free(ppath);
-    return CSCOPE_FAILURE;
+    প্রত্যাগম CSCOPE_FAILURE;
 }
 
 
-    static int
-cs_check_for_connections(void)
+    স্থির পূর্ণাঙ্ক
+cs_check_for_connections(শূন্য)
 {
-    return (cs_cnt_connections() > 0);
+    প্রত্যাগম (cs_cnt_connections() > 0);
 }
 
 
-    static int
-cs_check_for_tags(void)
+    স্থির পূর্ণাঙ্ক
+cs_check_for_tags(শূন্য)
 {
-    return (p_tags[0] != NUL && curbuf->b_p_tags != NULL);
+    প্রত্যাগম (p_tags[0] != NUL && curbuf->b_p_tags != রিক্ত);
 }
 
 
 /*
  * Count the number of cscope connections.
  */
-    static int
-cs_cnt_connections(void)
+    স্থির পূর্ণাঙ্ক
+cs_cnt_connections(শূন্য)
 {
-    int i;
-    int cnt = 0;
+    পূর্ণাঙ্ক i;
+    পূর্ণাঙ্ক cnt = 0;
 
-    for (i = 0; i < csinfo_size; i++)
-	if (csinfo[i].fname != NULL)
+    প্রতি (i = 0; i < csinfo_size; i++)
+	যদি (csinfo[i].fname != রিক্ত)
 	    cnt++;
-    return cnt;
+    প্রত্যাগম cnt;
 }
 
-    static void
+    স্থির শূন্য
 cs_reading_emsg(
-    int idx)	// connection index
+    পূর্ণাঙ্ক idx)	// connection index
 {
     semsg(_(e_error_reading_cscope_connection_nr), idx);
 }
@@ -698,27 +698,27 @@ cs_reading_emsg(
 /*
  * Count the number of matches for a given cscope connection.
  */
-    static int
-cs_cnt_matches(int idx)
+    স্থির পূর্ণাঙ্ক
+cs_cnt_matches(পূর্ণাঙ্ক idx)
 {
-    char *stok;
-    char *buf;
-    int nlines = 0;
+    বর্ণ *stok;
+    বর্ণ *buf;
+    পূর্ণাঙ্ক nlines = 0;
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return 0;
-    for (;;)
+    যদি (buf == রিক্ত)
+	প্রত্যাগম 0;
+    প্রতি (;;)
     {
-	if (!fgets(buf, CSREAD_BUFSIZE, csinfo[idx].fr_fp))
+	যদি (!fgets(buf, CSREAD_BUFSIZE, csinfo[idx].fr_fp))
 	{
-	    if (feof(csinfo[idx].fr_fp))
+	    যদি (feof(csinfo[idx].fr_fp))
 		errno = EIO;
 
 	    cs_reading_emsg(idx);
 
 	    vim_free(buf);
-	    return -1;
+	    প্রত্যাগম -1;
 	}
 
 	/*
@@ -728,93 +728,93 @@ cs_cnt_matches(int idx)
 	 * Accept "\S*cscope: X lines", also matches "mlcscope".
 	 * Bail out for the "Unable to search" error.
 	 */
-	if (strstr((const char *)buf, "Unable to search database") != NULL)
-	    break;
-	if ((stok = strtok(buf, (const char *)" ")) == NULL)
-	    continue;
-	if (strstr((const char *)stok, "cscope:") == NULL)
-	    continue;
+	যদি (strstr((ধ্রুব বর্ণ *)buf, "Unable to search database") != রিক্ত)
+	    ভঙ্গ;
+	যদি ((stok = strtok(buf, (ধ্রুব বর্ণ *)" ")) == রিক্ত)
+	    অনুবর্ত;
+	যদি (strstr((ধ্রুব বর্ণ *)stok, "cscope:") == রিক্ত)
+	    অনুবর্ত;
 
-	if ((stok = strtok(NULL, (const char *)" ")) == NULL)
-	    continue;
+	যদি ((stok = strtok(রিক্ত, (ধ্রুব বর্ণ *)" ")) == রিক্ত)
+	    অনুবর্ত;
 	nlines = atoi(stok);
-	if (nlines < 0)
+	যদি (nlines < 0)
 	{
 	    nlines = 0;
-	    break;
+	    ভঙ্গ;
 	}
 
-	if ((stok = strtok(NULL, (const char *)" ")) == NULL)
-	    continue;
-	if (strncmp((const char *)stok, "lines", 5))
-	    continue;
+	যদি ((stok = strtok(রিক্ত, (ধ্রুব বর্ণ *)" ")) == রিক্ত)
+	    অনুবর্ত;
+	যদি (strncmp((ধ্রুব বর্ণ *)stok, "lines", 5))
+	    অনুবর্ত;
 
-	break;
+	ভঙ্গ;
     }
 
     vim_free(buf);
-    return nlines;
+    প্রত্যাগম nlines;
 }
 
 
 /*
  * Creates the actual cscope command query from what the user entered.
  */
-    static char *
-cs_create_cmd(char *csoption, char *pattern)
+    স্থির বর্ণ *
+cs_create_cmd(বর্ণ *csoption, বর্ণ *pattern)
 {
-    char *cmd;
-    short search;
-    char *pat;
+    বর্ণ *cmd;
+    short অনুসন্ধান;
+    বর্ণ *pat;
 
-    switch (csoption[0])
+    বিকল্প (csoption[0])
     {
-    case '0' : case 's' :
-	search = 0;
-	break;
-    case '1' : case 'g' :
-	search = 1;
-	break;
-    case '2' : case 'd' :
-	search = 2;
-	break;
-    case '3' : case 'c' :
-	search = 3;
-	break;
-    case '4' : case 't' :
-	search = 4;
-	break;
-    case '6' : case 'e' :
-	search = 6;
-	break;
-    case '7' : case 'f' :
-	search = 7;
-	break;
-    case '8' : case 'i' :
-	search = 8;
-	break;
-    case '9' : case 'a' :
-	search = 9;
-	break;
-    default :
-	(void)emsg(_(e_unknown_cscope_search_type));
-	cs_usage_msg(Find);
-	return NULL;
+    পক্ষ '0' : পক্ষ 's' :
+	অনুসন্ধান = 0;
+	ভঙ্গ;
+    পক্ষ '1' : পক্ষ 'g' :
+	অনুসন্ধান = 1;
+	ভঙ্গ;
+    পক্ষ '2' : পক্ষ 'd' :
+	অনুসন্ধান = 2;
+	ভঙ্গ;
+    পক্ষ '3' : পক্ষ 'c' :
+	অনুসন্ধান = 3;
+	ভঙ্গ;
+    পক্ষ '4' : পক্ষ 't' :
+	অনুসন্ধান = 4;
+	ভঙ্গ;
+    পক্ষ '6' : পক্ষ 'e' :
+	অনুসন্ধান = 6;
+	ভঙ্গ;
+    পক্ষ '7' : পক্ষ 'f' :
+	অনুসন্ধান = 7;
+	ভঙ্গ;
+    পক্ষ '8' : পক্ষ 'i' :
+	অনুসন্ধান = 8;
+	ভঙ্গ;
+    পক্ষ '9' : পক্ষ 'a' :
+	অনুসন্ধান = 9;
+	ভঙ্গ;
+    স্বভাব :
+	(শূন্য)emsg(_(e_unknown_cscope_অনুসন্ধান_type));
+	cs_usage_বার্তা(Find);
+	প্রত্যাগম রিক্ত;
     }
 
     // Skip white space before the pattern, except for text and pattern search,
     // they may want to use the leading white space.
     pat = pattern;
-    if (search != 4 && search != 6)
-	while VIM_ISWHITE(*pat)
+    যদি (অনুসন্ধান != 4 && অনুসন্ধান != 6)
+	যাবত্ VIM_ISWHITE(*pat)
 	    ++pat;
 
-    if ((cmd = alloc(strlen(pat) + 2)) == NULL)
-	return NULL;
+    যদি ((cmd = alloc(strlen(pat) + 2)) == রিক্ত)
+	প্রত্যাগম রিক্ত;
 
-    (void)sprintf(cmd, "%d%s", search, pat);
+    (শূন্য)sprintf(cmd, "%d%s", অনুসন্ধান, pat);
 
-    return cmd;
+    প্রত্যাগম cmd;
 }
 
 
@@ -822,18 +822,18 @@ cs_create_cmd(char *csoption, char *pattern)
  * This piece of code was taken/adapted from nvi.  do we need to add
  * the BSD license notice?
  */
-    static int
-cs_create_connection(int i)
+    স্থির পূর্ণাঙ্ক
+cs_create_connection(পূর্ণাঙ্ক i)
 {
 # ifdef UNIX
-    int		to_cs[2], from_cs[2];
+    পূর্ণাঙ্ক		to_cs[2], from_cs[2];
 # endif
-    int		cmdlen;
-    char	*prog, *cmd, *ppath = NULL;
+    পূর্ণাঙ্ক		cmdlen;
+    বর্ণ	*prog, *cmd, *ppath = রিক্ত;
     size_t	proglen;
 # ifdef MSWIN
-    int		fd;
-    int		len;
+    পূর্ণাঙ্ক		fd;
+    পূর্ণাঙ্ক		len;
     SECURITY_ATTRIBUTES sa;
     PROCESS_INFORMATION pi;
     STARTUPINFO si;
@@ -843,113 +843,113 @@ cs_create_connection(int i)
     BOOL	created;
 # endif
 
-# if defined(UNIX)
+# যদি defined(UNIX)
     /*
      * Cscope reads from to_cs[0] and writes to from_cs[1]; vi reads from
      * from_cs[0] and writes to to_cs[1].
      */
     to_cs[0] = to_cs[1] = from_cs[0] = from_cs[1] = -1;
-    if (pipe(to_cs) < 0 || pipe(from_cs) < 0)
+    যদি (pipe(to_cs) < 0 || pipe(from_cs) < 0)
     {
-	(void)emsg(_(e_could_not_create_cscope_pipes));
+	(শূন্য)emsg(_(e_could_not_create_cscope_pipes));
 err_closing:
-	if (to_cs[0] != -1)
-	    (void)close(to_cs[0]);
-	if (to_cs[1] != -1)
-	    (void)close(to_cs[1]);
-	if (from_cs[0] != -1)
-	    (void)close(from_cs[0]);
-	if (from_cs[1] != -1)
-	    (void)close(from_cs[1]);
-	return CSCOPE_FAILURE;
+	যদি (to_cs[0] != -1)
+	    (শূন্য)close(to_cs[0]);
+	যদি (to_cs[1] != -1)
+	    (শূন্য)close(to_cs[1]);
+	যদি (from_cs[0] != -1)
+	    (শূন্য)close(from_cs[0]);
+	যদি (from_cs[1] != -1)
+	    (শূন্য)close(from_cs[1]);
+	প্রত্যাগম CSCOPE_FAILURE;
     }
 
-    if ((csinfo[i].pid = fork()) == -1)
+    যদি ((csinfo[i].pid = fork()) == -1)
     {
-	(void)emsg(_(e_could_not_fork_for_cscope));
-	goto err_closing;
+	(শূন্য)emsg(_(e_could_not_fork_for_cscope));
+	গচ্ছ err_closing;
     }
-    else if (csinfo[i].pid == 0)	// child: run cscope.
+    অন্যথা যদি (csinfo[i].pid == 0)	// child: run cscope.
     {
-	char **argv = NULL;
+	বর্ণ **argv = রিক্ত;
 
-	if (dup2(to_cs[0], STDIN_FILENO) == -1)
+	যদি (dup2(to_cs[0], STDIN_FILENO) == -1)
 	    PERROR("cs_create_connection 1");
-	if (dup2(from_cs[1], STDOUT_FILENO) == -1)
+	যদি (dup2(from_cs[1], STDOUT_FILENO) == -1)
 	    PERROR("cs_create_connection 2");
-	if (dup2(from_cs[1], STDERR_FILENO) == -1)
+	যদি (dup2(from_cs[1], STDERR_FILENO) == -1)
 	    PERROR("cs_create_connection 3");
 
 	// close unused
-	(void)close(to_cs[1]);
-	(void)close(from_cs[0]);
-# else
+	(শূন্য)close(to_cs[1]);
+	(শূন্য)close(from_cs[0]);
+# অন্যথা
 	// MSWIN
 	// Create pipes to communicate with cscope
-	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+	sa.nLength = পরিমাণ(SECURITY_ATTRIBUTES);
 	sa.bInheritHandle = TRUE;
-	sa.lpSecurityDescriptor = NULL;
+	sa.lpSecurityDescriptor = রিক্ত;
 
-	if (!(pipe_stdin = CreatePipe(&stdin_rd, &stdin_wr, &sa, 0))
+	যদি (!(pipe_stdin = CreatePipe(&stdin_rd, &stdin_wr, &sa, 0))
 		|| !(pipe_stdout = CreatePipe(&stdout_rd, &stdout_wr, &sa, 0)))
 	{
-	    (void)emsg(_(e_could_not_create_cscope_pipes));
+	    (শূন্য)emsg(_(e_could_not_create_cscope_pipes));
 err_closing:
-	    if (pipe_stdin)
+	    যদি (pipe_stdin)
 	    {
 		CloseHandle(stdin_rd);
 		CloseHandle(stdin_wr);
 	    }
-	    if (pipe_stdout)
+	    যদি (pipe_stdout)
 	    {
 		CloseHandle(stdout_rd);
 		CloseHandle(stdout_wr);
 	    }
-	    return CSCOPE_FAILURE;
+	    প্রত্যাগম CSCOPE_FAILURE;
 	}
 # endif
 	// expand the cscope exec for env var's
-	if ((prog = alloc(MAXPATHL + 1)) == NULL)
+	যদি ((prog = alloc(MAXPATHL + 1)) == রিক্ত)
 	{
 # ifdef UNIX
 	    exit(EXIT_FAILURE);
-# else
+# অন্যথা
 	    // MSWIN
-	    goto err_closing;
+	    গচ্ছ err_closing;
 # endif
 	}
 	proglen = expand_env(p_csprg, (char_u *)prog, MAXPATHL);
 
 	// alloc space to hold the cscope command
-	cmdlen = (int)(proglen + strlen(csinfo[i].fname) + 32);
-	if (csinfo[i].ppath)
+	cmdlen = (পূর্ণাঙ্ক)(proglen + strlen(csinfo[i].fname) + 32);
+	যদি (csinfo[i].ppath)
 	{
 	    // expand the prepend path for env var's
-	    if ((ppath = alloc(MAXPATHL + 1)) == NULL)
+	    যদি ((ppath = alloc(MAXPATHL + 1)) == রিক্ত)
 	    {
 		vim_free(prog);
 # ifdef UNIX
 		exit(EXIT_FAILURE);
-# else
+# অন্যথা
 		// MSWIN
-		goto err_closing;
+		গচ্ছ err_closing;
 # endif
 	    }
-	    cmdlen += (int)expand_env((char_u *)csinfo[i].ppath, (char_u *)ppath, MAXPATHL);
+	    cmdlen += (পূর্ণাঙ্ক)expand_env((char_u *)csinfo[i].ppath, (char_u *)ppath, MAXPATHL);
 	}
 
-	if (csinfo[i].flags)
-	    cmdlen += (int)strlen(csinfo[i].flags);
+	যদি (csinfo[i].flags)
+	    cmdlen += (পূর্ণাঙ্ক)strlen(csinfo[i].flags);
 
-	if ((cmd = alloc(cmdlen)) == NULL)
+	যদি ((cmd = alloc(cmdlen)) == রিক্ত)
 	{
 	    vim_free(prog);
 	    vim_free(ppath);
 # ifdef UNIX
 	    exit(EXIT_FAILURE);
-# else
+# অন্যথা
 	    // MSWIN
-	    goto err_closing;
+	    গচ্ছ err_closing;
 # endif
 	}
 
@@ -957,82 +957,82 @@ err_closing:
 # ifdef UNIX
 	{
 	    garray_T	ga_argv;
-	    char	**tok = NULL;
-	    int		tokc = 0;
+	    বর্ণ	**tok = রিক্ত;
+	    পূর্ণাঙ্ক		tokc = 0;
 
-	    ga_init2(&ga_argv, sizeof(char *), 8);
+	    ga_init2(&ga_argv, পরিমাণ(বর্ণ *), 8);
 
 	    // 'cscopeprg' may be multi-word (e.g. "cscope --foo");
 	    // split it into separate argv entries.
-	    if (build_argv_from_string((char_u *)prog, &tok, &tokc) == FAIL)
+	    যদি (build_argv_from_string((char_u *)prog, &tok, &tokc) == FAIL)
 		exit(EXIT_FAILURE);
-	    for (int k = 0; k < tokc; ++k)
+	    প্রতি (পূর্ণাঙ্ক k = 0; k < tokc; ++k)
 	    {
-		if (ga_grow(&ga_argv, 1) == FAIL)
+		যদি (ga_grow(&ga_argv, 1) == FAIL)
 		    exit(EXIT_FAILURE);
-		((char **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
+		((বর্ণ **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
 	    }
 	    VIM_CLEAR(tok);
 
 	    // Literal arguments: "-dl", "-f", fname.
-	    if (ga_grow(&ga_argv, 3) == FAIL)
+	    যদি (ga_grow(&ga_argv, 3) == FAIL)
 		exit(EXIT_FAILURE);
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] =
-				    (char *)vim_strsave((char_u *)"-dl");
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] =
-				    (char *)vim_strsave((char_u *)"-f");
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] =
-				(char *)vim_strsave((char_u *)csinfo[i].fname);
+	    ((বর্ণ **)ga_argv.ga_data)[ga_argv.ga_len++] =
+				    (বর্ণ *)vim_strsave((char_u *)"-dl");
+	    ((বর্ণ **)ga_argv.ga_data)[ga_argv.ga_len++] =
+				    (বর্ণ *)vim_strsave((char_u *)"-f");
+	    ((বর্ণ **)ga_argv.ga_data)[ga_argv.ga_len++] =
+				(বর্ণ *)vim_strsave((char_u *)csinfo[i].fname);
 
 	    // "-P<ppath>" as a single argv entry, if set.
-	    if (ppath != NULL)
+	    যদি (ppath != রিক্ত)
 	    {
 		size_t	plen = STRLEN(ppath) + 3;
-		char	*parg = alloc(plen);
+		বর্ণ	*parg = alloc(plen);
 
-		if (parg == NULL || ga_grow(&ga_argv, 1) == FAIL)
+		যদি (parg == রিক্ত || ga_grow(&ga_argv, 1) == FAIL)
 		    exit(EXIT_FAILURE);
 		vim_snprintf(parg, plen, "-P%s", ppath);
-		((char **)ga_argv.ga_data)[ga_argv.ga_len++] = parg;
+		((বর্ণ **)ga_argv.ga_data)[ga_argv.ga_len++] = parg;
 	    }
 
 	    // 'flags' is intended to be a sequence of cscope tokens
 	    // like "-q -i somefile"; split it the same way as prog.
-	    if (csinfo[i].flags != NULL)
+	    যদি (csinfo[i].flags != রিক্ত)
 	    {
-		if (build_argv_from_string((char_u *)csinfo[i].flags,
+		যদি (build_argv_from_string((char_u *)csinfo[i].flags,
 							&tok, &tokc) == FAIL)
 		    exit(EXIT_FAILURE);
-		for (int k = 0; k < tokc; ++k)
+		প্রতি (পূর্ণাঙ্ক k = 0; k < tokc; ++k)
 		{
-		    if (ga_grow(&ga_argv, 1) == FAIL)
+		    যদি (ga_grow(&ga_argv, 1) == FAIL)
 			exit(EXIT_FAILURE);
-		    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
+		    ((বর্ণ **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
 		}
 		vim_free(tok);
 	    }
 
 	    // NULL-terminate argv.
-	    if (ga_grow(&ga_argv, 1) == FAIL)
+	    যদি (ga_grow(&ga_argv, 1) == FAIL)
 		exit(EXIT_FAILURE);
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len] = NULL;
+	    ((বর্ণ **)ga_argv.ga_data)[ga_argv.ga_len] = রিক্ত;
 
 	    vim_free(prog);
 	    vim_free(ppath);
 	    vim_free(cmd);
 
-#  if defined(HAVE_SETSID) || defined(HAVE_SETPGID)
+#  যদি defined(HAVE_SETSID) || defined(HAVE_SETPGID)
 	    // Change our process group to avoid cscope receiving SIGWINCH.
-#   if defined(HAVE_SETSID)
-	    (void)setsid();
-#   else
-	    if (setpgid(0, 0) == -1)
+#   যদি defined(HAVE_SETSID)
+	    (শূন্য)setsid();
+#   অন্যথা
+	    যদি (setpgid(0, 0) == -1)
 		PERROR(_("cs_create_connection setpgid failed"));
 #   endif
 #  endif
 
-	    argv = (char **)ga_argv.ga_data;
-	    if (argv[0] == NULL || execvp(argv[0], argv) == -1)
+	    argv = (বর্ণ **)ga_argv.ga_data;
+	    যদি (argv[0] == রিক্ত || execvp(argv[0], argv) == -1)
 	    {
 		fprintf(stderr, "%s\n",
 		    _("cs_create_connection exec failed"));
@@ -1043,32 +1043,32 @@ err_closing:
 	    // NOTREACHED
 	}
     }
-    else	// parent.
+    অন্যথা	// parent.
     {
 	/*
 	 * Save the file descriptors for later duplication, and
 	 * reopen as streams.
 	 */
-	if ((csinfo[i].to_fp = fdopen(to_cs[1], "w")) == NULL)
+	যদি ((csinfo[i].to_fp = fdopen(to_cs[1], "w")) == রিক্ত)
 	    PERROR(_("cs_create_connection: fdopen for to_fp failed"));
-	if ((csinfo[i].fr_fp = fdopen(from_cs[0], "r")) == NULL)
+	যদি ((csinfo[i].fr_fp = fdopen(from_cs[0], "r")) == রিক্ত)
 	    PERROR(_("cs_create_connection: fdopen for fr_fp failed"));
 
 	// close unused
-	(void)close(to_cs[0]);
-	(void)close(from_cs[1]);
+	(শূন্য)close(to_cs[0]);
+	(শূন্য)close(from_cs[1]);
     }
-# else
+# অন্যথা
     // MSWIN
     vim_snprintf(cmd, cmdlen, "%s -dl -f %s", prog, csinfo[i].fname);
-    if (csinfo[i].ppath != NULL)
+    যদি (csinfo[i].ppath != রিক্ত)
     {
-	len = (int)STRLEN(cmd);
+	len = (পূর্ণাঙ্ক)STRLEN(cmd);
 	vim_snprintf(cmd + len, cmdlen - len, " -P%s", csinfo[i].ppath);
     }
-    if (csinfo[i].flags != NULL)
+    যদি (csinfo[i].flags != রিক্ত)
     {
-	len = (int)STRLEN(cmd);
+	len = (পূর্ণাঙ্ক)STRLEN(cmd);
 	vim_snprintf(cmd + len, cmdlen - len, " %s", csinfo[i].flags);
     }
     vim_free(ppath);
@@ -1079,17 +1079,17 @@ err_closing:
     si.wShowWindow = SW_HIDE;  // Hide child application window
     si.hStdOutput = stdout_wr;
     si.hStdError  = stdout_wr;
-    si.hStdInput  = stdin_rd;
-    created = CreateProcess(NULL, cmd, NULL, NULL, TRUE, CREATE_NEW_CONSOLE,
-							NULL, NULL, &si, &pi);
+    si.h_Std_প্রবেশ  = stdin_rd;
+    created = CreateProcess(রিক্ত, cmd, রিক্ত, রিক্ত, TRUE, CREATE_NEW_CONSOLE,
+							রিক্ত, রিক্ত, &si, &pi);
     vim_free(prog);
     vim_free(cmd);
 
-    if (!created)
+    যদি (!created)
     {
 	PERROR(_("cs_create_connection exec failed"));
-	(void)emsg(_(e_could_not_spawn_cscope_process));
-	goto err_closing;
+	(শূন্য)emsg(_(e_could_not_spawn_cscope_process));
+	গচ্ছ err_closing;
     }
     // else
     csinfo[i].pid = pi.dwProcessId;
@@ -1097,13 +1097,13 @@ err_closing:
     CloseHandle(pi.hThread);
 
     // TODO - tidy up after failure to create files on pipe handles.
-    if (((fd = _open_osfhandle((intptr_t)stdin_wr,
+    যদি (((fd = _open_osfhandle((intptr_t)stdin_wr,
 						      _O_TEXT|_O_APPEND)) < 0)
-	    || ((csinfo[i].to_fp = _fdopen(fd, "w")) == NULL))
+	    || ((csinfo[i].to_fp = _fdopen(fd, "w")) == রিক্ত))
 	PERROR(_("cs_create_connection: fdopen for to_fp failed"));
-    if (((fd = _open_osfhandle((intptr_t)stdout_rd,
+    যদি (((fd = _open_osfhandle((intptr_t)stdout_rd,
 						      _O_TEXT|_O_RDONLY)) < 0)
-	    || ((csinfo[i].fr_fp = _fdopen(fd, "r")) == NULL))
+	    || ((csinfo[i].fr_fp = _fdopen(fd, "r")) == রিক্ত))
 	PERROR(_("cs_create_connection: fdopen for fr_fp failed"));
 
     // Close handles for file descriptors inherited by the cscope process
@@ -1112,7 +1112,7 @@ err_closing:
 
 # endif // !UNIX
 
-    return CSCOPE_SUCCESS;
+    প্রত্যাগম CSCOPE_SUCCESS;
 }
 
 
@@ -1122,40 +1122,40 @@ err_closing:
  *
  * returns TRUE if we jump to a tag or abort, FALSE if not.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 cs_find(exarg_T *eap)
 {
-    char *opt, *pat;
-    int i;
+    বর্ণ *opt, *pat;
+    পূর্ণাঙ্ক i;
 
-    if (cs_check_for_connections() == FALSE)
+    যদি (cs_check_for_connections() == FALSE)
     {
-	(void)emsg(_(e_no_cscope_connections));
-	return FALSE;
+	(শূন্য)emsg(_(e_no_cscope_connections));
+	প্রত্যাগম FALSE;
     }
 
-    if ((opt = strtok((char *)NULL, (const char *)" ")) == NULL)
+    যদি ((opt = strtok((বর্ণ *)রিক্ত, (ধ্রুব বর্ণ *)" ")) == রিক্ত)
     {
-	cs_usage_msg(Find);
-	return FALSE;
+	cs_usage_বার্তা(Find);
+	প্রত্যাগম FALSE;
     }
 
     pat = opt + strlen(opt) + 1;
-    if (pat >= (char *)eap->arg + eap_arg_len)
+    যদি (pat >= (বর্ণ *)eap->arg + eap_arg_len)
     {
-	cs_usage_msg(Find);
-	return FALSE;
+	cs_usage_বার্তা(Find);
+	প্রত্যাগম FALSE;
     }
 
     /*
      * Let's replace the NULs written by strtok() with spaces - we need the
      * spaces to correctly display the quickfix/location list window's title.
      */
-    for (i = 0; i < eap_arg_len; ++i)
-	if (NUL == eap->arg[i])
+    প্রতি (i = 0; i < eap_arg_len; ++i)
+	যদি (NUL == eap->arg[i])
 	    eap->arg[i] = ' ';
 
-    return cs_find_common(opt, pat, eap->forceit, TRUE,
+    প্রত্যাগম cs_find_common(opt, pat, eap->forceit, TRUE,
 				  eap->cmdidx == CMD_lcscope, *eap->cmdlinep);
 }
 
@@ -1163,76 +1163,76 @@ cs_find(exarg_T *eap)
 /*
  * Common code for cscope find, shared by cs_find() and ex_cstag().
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 cs_find_common(
-    char *opt,
-    char *pat,
-    int forceit,
-    int verbose,
-    int	use_ll UNUSED,
+    বর্ণ *opt,
+    বর্ণ *pat,
+    পূর্ণাঙ্ক forceit,
+    পূর্ণাঙ্ক verbose,
+    পূর্ণাঙ্ক	use_ll UNUSED,
     char_u *cmdline UNUSED)
 {
-    int i;
-    char *cmd;
-    int *nummatches;
-    int totmatches;
+    পূর্ণাঙ্ক i;
+    বর্ণ *cmd;
+    পূর্ণাঙ্ক *nummatches;
+    পূর্ণাঙ্ক totmatches;
 # ifdef FEAT_QUICKFIX
-    char cmdletter;
-    char *qfpos;
+    বর্ণ cmdletter;
+    বর্ণ *qfpos;
 
     // get cmd letter
-    switch (opt[0])
+    বিকল্প (opt[0])
     {
-    case '0' :
+    পক্ষ '0' :
 	cmdletter = 's';
-	break;
-    case '1' :
+	ভঙ্গ;
+    পক্ষ '1' :
 	cmdletter = 'g';
-	break;
-    case '2' :
+	ভঙ্গ;
+    পক্ষ '2' :
 	cmdletter = 'd';
-	break;
-    case '3' :
+	ভঙ্গ;
+    পক্ষ '3' :
 	cmdletter = 'c';
-	break;
-    case '4' :
+	ভঙ্গ;
+    পক্ষ '4' :
 	cmdletter = 't';
-	break;
-    case '6' :
+	ভঙ্গ;
+    পক্ষ '6' :
 	cmdletter = 'e';
-	break;
-    case '7' :
+	ভঙ্গ;
+    পক্ষ '7' :
 	cmdletter = 'f';
-	break;
-    case '8' :
+	ভঙ্গ;
+    পক্ষ '8' :
 	cmdletter = 'i';
-	break;
-    case '9' :
+	ভঙ্গ;
+    পক্ষ '9' :
 	cmdletter = 'a';
-	break;
-    default :
+	ভঙ্গ;
+    স্বভাব :
 	cmdletter = opt[0];
     }
 
-    qfpos = (char *)vim_strchr(p_csqf, cmdletter);
-    if (qfpos != NULL)
+    qfpos = (বর্ণ *)vim_strchr(p_csqf, cmdletter);
+    যদি (qfpos != রিক্ত)
     {
 	qfpos++;
 	// next symbol must be + or -
-	if (strchr(CSQF_FLAGS, *qfpos) == NULL)
+	যদি (strchr(CSQF_FLAGS, *qfpos) == রিক্ত)
 	{
-	    (void)semsg(_(e_invalid_cscopequickfix_flag_chr_for_chr),
+	    (শূন্য)semsg(_(e_invalid_cscopequickfix_flag_chr_for_chr),
 							 *qfpos, *(qfpos - 1));
-	    return FALSE;
+	    প্রত্যাগম FALSE;
 	}
 
-	if (*qfpos != '0'
+	যদি (*qfpos != '0'
 		&& apply_autocmds(EVENT_QUICKFIXCMDPRE, (char_u *)"cscope",
 					       curbuf->b_fname, TRUE, curbuf))
 	{
 #  ifdef FEAT_EVAL
-	    if (aborting())
-		return FALSE;
+	    যদি (aborting())
+		প্রত্যাগম FALSE;
 #  endif
 	}
     }
@@ -1240,80 +1240,80 @@ cs_find_common(
 
     // create the actual command to send to cscope
     cmd = cs_create_cmd(opt, pat);
-    if (cmd == NULL)
-	return FALSE;
+    যদি (cmd == রিক্ত)
+	প্রত্যাগম FALSE;
 
-    nummatches = ALLOC_MULT(int, csinfo_size);
-    if (nummatches == NULL)
+    nummatches = ALLOC_MULT(পূর্ণাঙ্ক, csinfo_size);
+    যদি (nummatches == রিক্ত)
     {
 	vim_free(cmd);
-	return FALSE;
+	প্রত্যাগম FALSE;
     }
 
     // Send query to all open connections, then count the total number
     // of matches so we can alloc all in one swell foop.
-    for (i = 0; i < csinfo_size; i++)
+    প্রতি (i = 0; i < csinfo_size; i++)
 	nummatches[i] = 0;
     totmatches = 0;
-    for (i = 0; i < csinfo_size; i++)
+    প্রতি (i = 0; i < csinfo_size; i++)
     {
-	if (csinfo[i].fname == NULL || csinfo[i].to_fp == NULL)
-	    continue;
+	যদি (csinfo[i].fname == রিক্ত || csinfo[i].to_fp == রিক্ত)
+	    অনুবর্ত;
 
 	// send cmd to cscope
-	(void)fprintf(csinfo[i].to_fp, "%s\n", cmd);
-	(void)fflush(csinfo[i].to_fp);
+	(শূন্য)fprintf(csinfo[i].to_fp, "%s\n", cmd);
+	(শূন্য)fflush(csinfo[i].to_fp);
 
 	nummatches[i] = cs_cnt_matches(i);
 
-	if (nummatches[i] > -1)
+	যদি (nummatches[i] > -1)
 	    totmatches += nummatches[i];
 
-	if (nummatches[i] == 0)
-	    (void)cs_read_prompt(i);
+	যদি (nummatches[i] == 0)
+	    (শূন্য)cs_read_prompt(i);
     }
     vim_free(cmd);
 
-    if (totmatches == 0)
+    যদি (totmatches == 0)
     {
-	if (verbose)
-	    (void)semsg(_(e_no_matches_found_for_cscope_query_str_of_str),
+	যদি (verbose)
+	    (শূন্য)semsg(_(e_no_matches_found_for_cscope_query_str_of_str),
 								     opt, pat);
 	vim_free(nummatches);
-	return FALSE;
+	প্রত্যাগম FALSE;
     }
 
 # ifdef FEAT_QUICKFIX
-    if (qfpos != NULL && *qfpos != '0' && totmatches > 0)
+    যদি (qfpos != রিক্ত && *qfpos != '0' && totmatches > 0)
     {
 	// fill error list
 	FILE	    *f;
 	char_u	    *tmp = vim_tempname('c', TRUE);
-	qf_info_T   *qi = NULL;
-	win_T	    *wp = NULL;
+	qf_info_T   *qi = রিক্ত;
+	win_T	    *wp = রিক্ত;
 
-	if (tmp == NULL)
+	যদি (tmp == রিক্ত)
 	{
 	    vim_free(nummatches);
-	    return FALSE;
+	    প্রত্যাগম FALSE;
 	}
 
-	f = mch_fopen((char *)tmp, "w");
-	if (f == NULL)
+	f = mch_fopen((বর্ণ *)tmp, "w");
+	যদি (f == রিক্ত)
 	    semsg(_(e_cant_open_file_str), tmp);
-	else
+	অন্যথা
 	{
 	    cs_file_results(f, nummatches);
 	    fclose(f);
-	    if (use_ll)	    // Use location list
+	    যদি (use_ll)	    // Use location list
 		wp = curwin;
 	    // '-' starts a new error list
-	    if (qf_init(wp, tmp, (char_u *)"%f%*\\t%l%*\\t%m",
-					  *qfpos == '-', cmdline, NULL) > 0)
+	    যদি (qf_init(wp, tmp, (char_u *)"%f%*\\t%l%*\\t%m",
+					  *qfpos == '-', cmdline, রিক্ত) > 0)
 	    {
-		if (postponed_split != 0)
+		যদি (postponed_split != 0)
 		{
-		    (void)win_split(postponed_split > 0 ? postponed_split : 0,
+		    (শূন্য)win_split(postponed_split > 0 ? postponed_split : 0,
 						       postponed_split_flags);
 		    RESET_BINDING(curwin);
 		    postponed_split = 0;
@@ -1321,12 +1321,12 @@ cs_find_common(
 
 		apply_autocmds(EVENT_QUICKFIXCMDPOST, (char_u *)"cscope",
 					       curbuf->b_fname, TRUE, curbuf);
-		if (use_ll)
+		যদি (use_ll)
 		    /*
 		     * In the location list window, use the displayed location
 		     * list. Otherwise, use the location list for the window.
 		     */
-		    qi = (bt_quickfix(wp->w_buffer) && wp->w_llist_ref != NULL)
+		    qi = (bt_quickfix(wp->w_buffer) && wp->w_llist_ref != রিক্ত)
 			?  wp->w_llist_ref : wp->w_llist;
 		qf_jump(qi, 0, 0, forceit);
 	    }
@@ -1334,24 +1334,24 @@ cs_find_common(
 	mch_remove(tmp);
 	vim_free(tmp);
 	vim_free(nummatches);
-	return TRUE;
+	প্রত্যাগম TRUE;
     }
-    else
+    অন্যথা
 # endif // FEAT_QUICKFIX
     {
-	char **matches = NULL, **contexts = NULL;
-	int matched = 0;
+	বর্ণ **matches = রিক্ত, **contexts = রিক্ত;
+	পূর্ণাঙ্ক matched = 0;
 
 	// read output
 	cs_fill_results(pat, totmatches, nummatches, &matches,
 							 &contexts, &matched);
 	vim_free(nummatches);
-	if (matches == NULL)
-	    return FALSE;
+	যদি (matches == রিক্ত)
+	    প্রত্যাগম FALSE;
 
-	(void)cs_manage_matches(matches, contexts, matched, Store);
+	(শূন্য)cs_manage_matches(matches, contexts, matched, Store);
 
-	return do_tag((char_u *)pat, DT_CSCOPE, 0, forceit, verbose);
+	প্রত্যাগম do_tag((char_u *)pat, DT_CSCOPE, 0, forceit, verbose);
     }
 
 }
@@ -1359,26 +1359,26 @@ cs_find_common(
 /*
  * Print help.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 cs_help(exarg_T *eap UNUSED)
 {
     cscmd_T *cmdp = cs_cmds;
 
-    (void)msg_puts(_("cscope commands:\n"));
-    while (cmdp->name != NULL)
+    (শূন্য)বার্তা_puts(_("cscope commands:\n"));
+    যাবত্ (cmdp->name != রিক্ত)
     {
-	char *help = _(cmdp->help);
-	int  space_cnt = 30 - vim_strsize((char_u *)help);
+	বর্ণ *help = _(cmdp->help);
+	পূর্ণাঙ্ক  space_cnt = 30 - vim_strsize((char_u *)help);
 
 	// Use %*s rather than %30s to ensure proper alignment in utf-8
-	if (space_cnt < 0)
+	যদি (space_cnt < 0)
 	    space_cnt = 0;
-	(void)smsg(_("%-5s: %s%*s (Usage: %s)"),
+	(শূন্য)smsg(_("%-5s: %s%*s (Usage: %s)"),
 				      cmdp->name,
 				      help, space_cnt, " ",
 				      cmdp->usage);
-	if (strcmp(cmdp->name, "find") == 0)
-	    msg_puts(_("\n"
+	যদি (strcmp(cmdp->name, "find") == 0)
+	    বার্তা_puts(_("\n"
 		       "       a: Find assignments to this symbol\n"
 		       "       c: Find functions calling this function\n"
 		       "       d: Find functions called by this function\n"
@@ -1393,101 +1393,101 @@ cs_help(exarg_T *eap UNUSED)
     }
 
     wait_return(TRUE);
-    return 0;
+    প্রত্যাগম 0;
 }
 
 
-    static void
-clear_csinfo(int i)
+    স্থির শূন্য
+clear_csinfo(পূর্ণাঙ্ক i)
 {
-    csinfo[i].fname  = NULL;
-    csinfo[i].ppath  = NULL;
-    csinfo[i].flags  = NULL;
-# if defined(UNIX)
+    csinfo[i].fname  = রিক্ত;
+    csinfo[i].ppath  = রিক্ত;
+    csinfo[i].flags  = রিক্ত;
+# যদি defined(UNIX)
     csinfo[i].st_dev = (dev_t)0;
     csinfo[i].st_ino = (ino_t)0;
-# else
+# অন্যথা
     csinfo[i].nVolume = 0;
-    csinfo[i].nIndexHigh = 0;
-    csinfo[i].nIndexLow = 0;
+    csinfo[i].n_Index_উপরের = 0;
+    csinfo[i].n_Index_নিচের = 0;
 # endif
     csinfo[i].pid    = 0;
-    csinfo[i].fr_fp  = NULL;
-    csinfo[i].to_fp  = NULL;
-# if defined(MSWIN)
-    csinfo[i].hProc = NULL;
+    csinfo[i].fr_fp  = রিক্ত;
+    csinfo[i].to_fp  = রিক্ত;
+# যদি defined(MSWIN)
+    csinfo[i].hProc = রিক্ত;
 # endif
 }
 
 /*
  * Insert a new cscope database filename into the filelist.
  */
-    static int
-cs_insert_filelist(
-    char *fname,
-    char *ppath,
-    char *flags,
+    স্থির পূর্ণাঙ্ক
+cs_ঢোকাও_filelist(
+    বর্ণ *fname,
+    বর্ণ *ppath,
+    বর্ণ *flags,
     stat_T *sb UNUSED)
 {
-    int	    i;
-    int	    j;
+    পূর্ণাঙ্ক	    i;
+    পূর্ণাঙ্ক	    j;
 # ifndef UNIX
     BY_HANDLE_FILE_INFORMATION bhfi;
 
-    switch (win32_fileinfo((char_u *)fname, &bhfi))
+    বিকল্প (win32_fileinfo((char_u *)fname, &bhfi))
     {
-	case FILEINFO_ENC_FAIL:		// enc_to_utf16() failed
-	case FILEINFO_READ_FAIL:	// CreateFile() failed
-	    if (p_csverbose)
+	পক্ষ FILEINFO_ENC_FAIL:		// enc_to_utf16() failed
+	পক্ষ FILEINFO_READ_FAIL:	// CreateFile() failed
+	    যদি (p_csverbose)
 	    {
-		char *cant_msg = _(e_cannot_open_cscope_database_str);
-		char *winmsg = GetWin32Error();
+		বর্ণ *cant_বার্তা = _(e_cannot_open_cscope_database_str);
+		বর্ণ *winmsg = GetWin32Error();
 
-		if (winmsg != NULL)
-		    (void)semsg(cant_msg, winmsg);
-		else
+		যদি (winmsg != রিক্ত)
+		    (শূন্য)semsg(cant_বার্তা, winmsg);
+		অন্যথা
 		    // subst filename if can't get error text
-		    (void)semsg(cant_msg, fname);
+		    (শূন্য)semsg(cant_বার্তা, fname);
 	    }
-	    return -1;
+	    প্রত্যাগম -1;
 
-	case FILEINFO_INFO_FAIL:    // GetFileInformationByHandle() failed
-	    if (p_csverbose)
-		(void)emsg(_(e_cannot_get_cscope_database_information));
-	    return -1;
+	পক্ষ FILEINFO_INFO_FAIL:    // GetFileInformationByHandle() failed
+	    যদি (p_csverbose)
+		(শূন্য)emsg(_(e_cannot_get_cscope_database_information));
+	    প্রত্যাগম -1;
     }
 # endif
 
     i = -1; // can be set to the index of an empty item in csinfo
-    for (j = 0; j < csinfo_size; j++)
+    প্রতি (j = 0; j < csinfo_size; j++)
     {
-	if (csinfo[j].fname != NULL
-# if defined(UNIX)
+	যদি (csinfo[j].fname != রিক্ত
+# যদি defined(UNIX)
 	    && csinfo[j].st_dev == sb->st_dev && csinfo[j].st_ino == sb->st_ino
-# else
+# অন্যথা
 	    // compare pathnames first
 	    && ((fullpathcmp((char_u *)csinfo[j].fname,
 			(char_u *)fname, FALSE, TRUE) & FPC_SAME)
 		// test index file attributes too
-		|| (csinfo[j].nVolume == bhfi.dwVolumeSerialNumber
-		    && csinfo[j].nIndexHigh == bhfi.nFileIndexHigh
-		    && csinfo[j].nIndexLow == bhfi.nFileIndexLow))
+		|| (csinfo[j].nVolume == bhfi.dw_Volume_Serial_সংখ্যা
+		    && csinfo[j].n_Index_উপরের == bhfi.n_File_Index_উপরের
+		    && csinfo[j].n_Index_নিচের == bhfi.n_File_Index_নিচের))
 # endif
 	    )
 	{
-	    if (p_csverbose)
-		(void)emsg(_(e_duplicate_cscope_database_not_added));
-	    return -1;
+	    যদি (p_csverbose)
+		(শূন্য)emsg(_(e_duplicate_cscope_database_not_added));
+	    প্রত্যাগম -1;
 	}
 
-	if (csinfo[j].fname == NULL && i == -1)
+	যদি (csinfo[j].fname == রিক্ত && i == -1)
 	    i = j; // remember first empty entry
     }
 
-    if (i == -1)
+    যদি (i == -1)
     {
 	i = csinfo_size;
-	if (csinfo_size == 0)
+	যদি (csinfo_size == 0)
 	{
 	    // First time allocation: allocate only 1 connection. It should
 	    // be enough for most users.  If more is needed, csinfo will be
@@ -1495,165 +1495,165 @@ cs_insert_filelist(
 	    csinfo_size = 1;
 	    csinfo = ALLOC_CLEAR_ONE(csinfo_T);
 	}
-	else
+	অন্যথা
 	{
 	    csinfo_T *t_csinfo = csinfo;
 
 	    // Reallocate space for more connections.
 	    csinfo_size *= 2;
-	    csinfo = vim_realloc(csinfo, sizeof(csinfo_T)*csinfo_size);
-	    if (csinfo == NULL)
+	    csinfo = vim_realloc(csinfo, পরিমাণ(csinfo_T)*csinfo_size);
+	    যদি (csinfo == রিক্ত)
 	    {
 		// allocation failure, so keep the old infos
 		csinfo = t_csinfo;
 		csinfo_size = i;
-		return -1;
+		প্রত্যাগম -1;
 	    }
 	}
-	if (csinfo == NULL)
-	    return -1;
-	for (j = csinfo_size/2; j < csinfo_size; j++)
+	যদি (csinfo == রিক্ত)
+	    প্রত্যাগম -1;
+	প্রতি (j = csinfo_size/2; j < csinfo_size; j++)
 	    clear_csinfo(j);
     }
 
-    if ((csinfo[i].fname = alloc(strlen(fname)+1)) == NULL)
-	return -1;
+    যদি ((csinfo[i].fname = alloc(strlen(fname)+1)) == রিক্ত)
+	প্রত্যাগম -1;
 
-    vim_strncpy((char_u *)csinfo[i].fname, (char_u *)fname, strlen((const char *)fname));
+    vim_strncpy((char_u *)csinfo[i].fname, (char_u *)fname, strlen((ধ্রুব বর্ণ *)fname));
 
-    if (ppath != NULL)
+    যদি (ppath != রিক্ত)
     {
-	if ((csinfo[i].ppath = alloc(strlen(ppath) + 1)) == NULL)
+	যদি ((csinfo[i].ppath = alloc(strlen(ppath) + 1)) == রিক্ত)
 	{
 	    VIM_CLEAR(csinfo[i].fname);
-	    return -1;
+	    প্রত্যাগম -1;
 	}
-	vim_strncpy((char_u *)csinfo[i].ppath, (char_u *)ppath, strlen((const char *)ppath));
+	vim_strncpy((char_u *)csinfo[i].ppath, (char_u *)ppath, strlen((ধ্রুব বর্ণ *)ppath));
     }
-    else
-	csinfo[i].ppath = NULL;
+    অন্যথা
+	csinfo[i].ppath = রিক্ত;
 
-    if (flags != NULL)
+    যদি (flags != রিক্ত)
     {
-	if ((csinfo[i].flags = alloc(strlen(flags) + 1)) == NULL)
+	যদি ((csinfo[i].flags = alloc(strlen(flags) + 1)) == রিক্ত)
 	{
 	    VIM_CLEAR(csinfo[i].fname);
 	    VIM_CLEAR(csinfo[i].ppath);
-	    return -1;
+	    প্রত্যাগম -1;
 	}
-	vim_strncpy((char_u *)csinfo[i].flags, (char_u *)flags, strlen((const char *)flags));
+	vim_strncpy((char_u *)csinfo[i].flags, (char_u *)flags, strlen((ধ্রুব বর্ণ *)flags));
     }
-    else
-	csinfo[i].flags = NULL;
+    অন্যথা
+	csinfo[i].flags = রিক্ত;
 
-# if defined(UNIX)
+# যদি defined(UNIX)
     csinfo[i].st_dev = sb->st_dev;
     csinfo[i].st_ino = sb->st_ino;
 
-# else
-    csinfo[i].nVolume = bhfi.dwVolumeSerialNumber;
-    csinfo[i].nIndexLow = bhfi.nFileIndexLow;
-    csinfo[i].nIndexHigh = bhfi.nFileIndexHigh;
+# অন্যথা
+    csinfo[i].nVolume = bhfi.dw_Volume_Serial_সংখ্যা;
+    csinfo[i].n_Index_নিচের = bhfi.n_File_Index_নিচের;
+    csinfo[i].n_Index_উপরের = bhfi.n_File_Index_উপরের;
 # endif
-    return i;
+    প্রত্যাগম i;
 }
 
 
 /*
  * Find cscope command in command table.
  */
-    static cscmd_T *
+    স্থির cscmd_T *
 cs_lookup_cmd(exarg_T *eap)
 {
     cscmd_T *cmdp;
-    char *stok;
+    বর্ণ *stok;
     size_t len;
 
-    if (eap->arg == NULL)
-	return NULL;
+    যদি (eap->arg == রিক্ত)
+	প্রত্যাগম রিক্ত;
 
     // Store length of eap->arg before it gets modified by strtok().
-    eap_arg_len = (int)STRLEN(eap->arg);
+    eap_arg_len = (পূর্ণাঙ্ক)STRLEN(eap->arg);
 
-    if ((stok = strtok((char *)(eap->arg), (const char *)" ")) == NULL)
-	return NULL;
+    যদি ((stok = strtok((বর্ণ *)(eap->arg), (ধ্রুব বর্ণ *)" ")) == রিক্ত)
+	প্রত্যাগম রিক্ত;
 
     len = strlen(stok);
-    for (cmdp = cs_cmds; cmdp->name != NULL; ++cmdp)
+    প্রতি (cmdp = cs_cmds; cmdp->name != রিক্ত; ++cmdp)
     {
-	if (strncmp((const char *)(stok), cmdp->name, len) == 0)
-	    return (cmdp);
+	যদি (strncmp((ধ্রুব বর্ণ *)(stok), cmdp->name, len) == 0)
+	    প্রত্যাগম (cmdp);
     }
-    return NULL;
+    প্রত্যাগম রিক্ত;
 }
 
 
 /*
  * Nuke em.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 cs_kill(exarg_T *eap UNUSED)
 {
-    char *stok;
-    int i;
+    বর্ণ *stok;
+    পূর্ণাঙ্ক i;
 
-    if ((stok = strtok((char *)NULL, (const char *)" ")) == NULL)
+    যদি ((stok = strtok((বর্ণ *)রিক্ত, (ধ্রুব বর্ণ *)" ")) == রিক্ত)
     {
-	cs_usage_msg(Kill);
-	return CSCOPE_FAILURE;
+	cs_usage_বার্তা(Kill);
+	প্রত্যাগম CSCOPE_FAILURE;
     }
 
     // only single digit positive and negative integers are allowed
-    if ((strlen(stok) < 2 && VIM_ISDIGIT((int)(stok[0])))
+    যদি ((strlen(stok) < 2 && VIM_ISDIGIT((পূর্ণাঙ্ক)(stok[0])))
 	    || (strlen(stok) < 3 && stok[0] == '-'
-					      && VIM_ISDIGIT((int)(stok[1]))))
+					      && VIM_ISDIGIT((পূর্ণাঙ্ক)(stok[1]))))
 	i = atoi(stok);
-    else
+    অন্যথা
     {
 	// It must be part of a name.  We will try to find a match
 	// within all the names in the csinfo data structure
-	for (i = 0; i < csinfo_size; i++)
+	প্রতি (i = 0; i < csinfo_size; i++)
 	{
-	    if (csinfo[i].fname != NULL && strstr(csinfo[i].fname, stok))
-		break;
+	    যদি (csinfo[i].fname != রিক্ত && strstr(csinfo[i].fname, stok))
+		ভঙ্গ;
 	}
     }
 
-    if ((i != -1) && (i >= csinfo_size || i < -1 || csinfo[i].fname == NULL))
+    যদি ((i != -1) && (i >= csinfo_size || i < -1 || csinfo[i].fname == রিক্ত))
     {
-	if (p_csverbose)
-	    (void)semsg(_(e_cscope_connection_str_not_founc), stok);
+	যদি (p_csverbose)
+	    (শূন্য)semsg(_(e_cscope_connection_str_not_founc), stok);
     }
-    else
+    অন্যথা
     {
-	if (i == -1)
+	যদি (i == -1)
 	{
-	    for (i = 0; i < csinfo_size; i++)
+	    প্রতি (i = 0; i < csinfo_size; i++)
 	    {
-		if (csinfo[i].fname)
+		যদি (csinfo[i].fname)
 		    cs_kill_execute(i, csinfo[i].fname);
 	    }
 	}
-	else
+	অন্যথা
 	    cs_kill_execute(i, stok);
     }
 
-    return 0;
+    প্রত্যাগম 0;
 }
 
 
 /*
  * Actually kills a specific cscope connection.
  */
-    static void
+    স্থির শূন্য
 cs_kill_execute(
-    int i,	    // cscope table index
-    char *cname)    // cscope database name
+    পূর্ণাঙ্ক i,	    // cscope table index
+    বর্ণ *cname)    // cscope database name
 {
-    if (p_csverbose)
+    যদি (p_csverbose)
     {
-	msg_clr_eos();
-	(void)smsg_attr(HL_ATTR(HLF_R) | MSG_HIST,
+	বার্তা_clr_eos();
+	(শূন্য)smsg_attr(HL_ATTR(HLF_R) | বার্তা_HIST,
 			_("cscope connection %s closed"), cname);
     }
     cs_release_csp(i, TRUE);
@@ -1678,12 +1678,12 @@ cs_kill_execute(
  * would still have to be modified to escape all the special regular expression
  * characters to comply with ctags formatting.
  */
-    static char *
+    স্থির বর্ণ *
 cs_make_vim_style_matches(
-    char *fname,
-    char *slno,
-    char *search,
-    char *tagstr)
+    বর্ণ *fname,
+    বর্ণ *slno,
+    বর্ণ *অনুসন্ধান,
+    বর্ণ *tagstr)
 {
     // vim style is ctags:
     //
@@ -1695,27 +1695,27 @@ cs_make_vim_style_matches(
     // buf is used as part of vim's method of handling tags, and
     // (i think) vim frees it when you pop your tags and get replaced
     // by new ones on the tag stack.
-    char *buf;
-    int amt;
+    বর্ণ *buf;
+    পূর্ণাঙ্ক amt;
 
-    if (search != NULL)
+    যদি (অনুসন্ধান != রিক্ত)
     {
-	amt = (int)(strlen(fname) + strlen(slno) + strlen(tagstr) + strlen(search)+6);
-	if ((buf = alloc(amt)) == NULL)
-	    return NULL;
+	amt = (পূর্ণাঙ্ক)(strlen(fname) + strlen(slno) + strlen(tagstr) + strlen(অনুসন্ধান)+6);
+	যদি ((buf = alloc(amt)) == রিক্ত)
+	    প্রত্যাগম রিক্ত;
 
-	(void)sprintf(buf, "%s\t%s\t%s;\"\t%s", tagstr, fname, slno, search);
+	(শূন্য)sprintf(buf, "%s\t%s\t%s;\"\t%s", tagstr, fname, slno, অনুসন্ধান);
     }
-    else
+    অন্যথা
     {
-	amt = (int)(strlen(fname) + strlen(slno) + strlen(tagstr) + 5);
-	if ((buf = alloc(amt)) == NULL)
-	    return NULL;
+	amt = (পূর্ণাঙ্ক)(strlen(fname) + strlen(slno) + strlen(tagstr) + 5);
+	যদি ((buf = alloc(amt)) == রিক্ত)
+	    প্রত্যাগম রিক্ত;
 
-	(void)sprintf(buf, "%s\t%s\t%s;\"", tagstr, fname, slno);
+	(শূন্য)sprintf(buf, "%s\t%s\t%s;\"", tagstr, fname, slno);
     }
 
-    return buf;
+    প্রত্যাগম buf;
 }
 
 
@@ -1735,100 +1735,100 @@ cs_make_vim_style_matches(
  *
  * Print: prints the tags
  */
-    static char *
+    স্থির বর্ণ *
 cs_manage_matches(
-    char **matches,
-    char **contexts,
-    int totmatches,
+    বর্ণ **matches,
+    বর্ণ **contexts,
+    পূর্ণাঙ্ক totmatches,
     mcmd_e cmd)
 {
-    static char **mp = NULL;
-    static char **cp = NULL;
-    static int cnt = -1;
-    static int next = -1;
-    char *p = NULL;
+    স্থির বর্ণ **mp = রিক্ত;
+    স্থির বর্ণ **cp = রিক্ত;
+    স্থির পূর্ণাঙ্ক cnt = -1;
+    স্থির পূর্ণাঙ্ক next = -1;
+    বর্ণ *p = রিক্ত;
 
-    switch (cmd)
+    বিকল্প (cmd)
     {
-    case Store:
-	assert(matches != NULL);
-	assert(totmatches > 0);
-	if (mp != NULL || cp != NULL)
-	    (void)cs_manage_matches(NULL, NULL, -1, Free);
+    পক্ষ Store:
+	প্রতিজ্ঞা(matches != রিক্ত);
+	প্রতিজ্ঞা(totmatches > 0);
+	যদি (mp != রিক্ত || cp != রিক্ত)
+	    (শূন্য)cs_manage_matches(রিক্ত, রিক্ত, -1, Free);
 	mp = matches;
 	cp = contexts;
 	cnt = totmatches;
 	next = 0;
-	break;
-    case Get:
-	if (next >= cnt)
-	    return NULL;
+	ভঙ্গ;
+    পক্ষ Get:
+	যদি (next >= cnt)
+	    প্রত্যাগম রিক্ত;
 
 	p = mp[next];
 	next++;
-	break;
-    case Free:
-	if (mp != NULL)
+	ভঙ্গ;
+    পক্ষ Free:
+	যদি (mp != রিক্ত)
 	{
-	    if (cnt > 0)
-		while (cnt--)
+	    যদি (cnt > 0)
+		যাবত্ (cnt--)
 		{
 		    vim_free(mp[cnt]);
-		    if (cp != NULL)
+		    যদি (cp != রিক্ত)
 			vim_free(cp[cnt]);
 		}
 	    vim_free(mp);
 	    vim_free(cp);
 	}
-	mp = NULL;
-	cp = NULL;
+	mp = রিক্ত;
+	cp = রিক্ত;
 	cnt = 0;
 	next = 0;
-	break;
-    case Print:
+	ভঙ্গ;
+    পক্ষ Print:
 	cs_print_tags_priv(mp, cp, cnt);
-	break;
-    default:	// should not reach here
+	ভঙ্গ;
+    স্বভাব:	// should not reach here
 	iemsg(e_fatal_error_in_cs_manage_matches);
-	return NULL;
+	প্রত্যাগম রিক্ত;
     }
 
-    return p;
+    প্রত্যাগম p;
 }
 
 
 /*
  * Parse cscope output.
  */
-    static char *
+    স্থির বর্ণ *
 cs_parse_results(
-    int cnumber,
-    char *buf,
-    int bufsize,
-    char **context,
-    char **linenumber,
-    char **search)
+    পূর্ণাঙ্ক cnumber,
+    বর্ণ *buf,
+    পূর্ণাঙ্ক bufsize,
+    বর্ণ **context,
+    বর্ণ **linenumber,
+    বর্ণ **অনুসন্ধান)
 {
-    int ch;
-    char *p;
-    char *name;
+    পূর্ণাঙ্ক ch;
+    বর্ণ *p;
+    বর্ণ *name;
 
-    if (fgets(buf, bufsize, csinfo[cnumber].fr_fp) == NULL)
+    যদি (fgets(buf, bufsize, csinfo[cnumber].fr_fp) == রিক্ত)
     {
-	if (feof(csinfo[cnumber].fr_fp))
+	যদি (feof(csinfo[cnumber].fr_fp))
 	    errno = EIO;
 
 	cs_reading_emsg(cnumber);
 
-	return NULL;
+	প্রত্যাগম রিক্ত;
     }
 
     // If the line's too long for the buffer, discard it.
-    if ((p = strchr(buf, '\n')) == NULL)
+    যদি ((p = strchr(buf, '\n')) == রিক্ত)
     {
-	while ((ch = getc(csinfo[cnumber].fr_fp)) != EOF && ch != '\n')
+	যাবত্ ((ch = getc(csinfo[cnumber].fr_fp)) != EOF && ch != '\n')
 	    ;
-	return NULL;
+	প্রত্যাগম রিক্ত;
     }
     *p = '\0';
 
@@ -1837,76 +1837,76 @@ cs_parse_results(
      *
      *	<filename> <context> <line number> <pattern>
      */
-    if ((name = strtok(buf, (const char *)" ")) == NULL)
-	return NULL;
-    if ((*context = strtok(NULL, (const char *)" ")) == NULL)
-	return NULL;
-    if ((*linenumber = strtok(NULL, (const char *)" ")) == NULL)
-	return NULL;
-    *search = *linenumber + strlen(*linenumber) + 1;	// +1 to skip \0
+    যদি ((name = strtok(buf, (ধ্রুব বর্ণ *)" ")) == রিক্ত)
+	প্রত্যাগম রিক্ত;
+    যদি ((*context = strtok(রিক্ত, (ধ্রুব বর্ণ *)" ")) == রিক্ত)
+	প্রত্যাগম রিক্ত;
+    যদি ((*linenumber = strtok(রিক্ত, (ধ্রুব বর্ণ *)" ")) == রিক্ত)
+	প্রত্যাগম রিক্ত;
+    *অনুসন্ধান = *linenumber + strlen(*linenumber) + 1;	// +1 to skip \0
 
     // --- nvi ---
     // If the file is older than the cscope database, that is,
     // the database was built since the file was last modified,
     // or there wasn't a search string, use the line number.
-    if (strcmp(*search, "<unknown>") == 0)
-	*search = NULL;
+    যদি (strcmp(*অনুসন্ধান, "<unknown>") == 0)
+	*অনুসন্ধান = রিক্ত;
 
     name = cs_resolve_file(cnumber, name);
-    return name;
+    প্রত্যাগম name;
 }
 
 # ifdef FEAT_QUICKFIX
 /*
  * Write cscope find results to file.
  */
-    static void
-cs_file_results(FILE *f, int *nummatches_a)
+    স্থির শূন্য
+cs_file_results(FILE *f, পূর্ণাঙ্ক *nummatches_a)
 {
-    int i, j;
-    char *buf;
-    char *search, *slno;
-    char *fullname;
-    char *cntx;
-    char *context;
+    পূর্ণাঙ্ক i, j;
+    বর্ণ *buf;
+    বর্ণ *অনুসন্ধান, *slno;
+    বর্ণ *fullname;
+    বর্ণ *cntx;
+    বর্ণ *context;
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return;
+    যদি (buf == রিক্ত)
+	প্রত্যাগম;
 
-    for (i = 0; i < csinfo_size; i++)
+    প্রতি (i = 0; i < csinfo_size; i++)
     {
-	if (nummatches_a[i] < 1)
-	    continue;
+	যদি (nummatches_a[i] < 1)
+	    অনুবর্ত;
 
-	for (j = 0; j < nummatches_a[i]; j++)
+	প্রতি (j = 0; j < nummatches_a[i]; j++)
 	{
-	   if ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
-			   &slno, &search)) == NULL)
-	       continue;
+	   যদি ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
+			   &slno, &অনুসন্ধান)) == রিক্ত)
+	       অনুবর্ত;
 
 	   context = alloc(strlen(cntx)+5);
-	   if (context == NULL)
+	   যদি (context == রিক্ত)
 	   {
 	       vim_free(fullname);
-	       continue;
+	       অনুবর্ত;
 	   }
 
-	   if (strcmp(cntx, "<global>")==0)
+	   যদি (strcmp(cntx, "<global>")==0)
 	       strcpy(context, "<<global>>");
-	   else
+	   অন্যথা
 	       sprintf(context, "<<%s>>", cntx);
 
-	   if (search == NULL)
+	   যদি (অনুসন্ধান == রিক্ত)
 	       fprintf(f, "%s\t%s\t%s\n", fullname, slno, context);
-	   else
-	       fprintf(f, "%s\t%s\t%s %s\n", fullname, slno, context, search);
+	   অন্যথা
+	       fprintf(f, "%s\t%s\t%s %s\n", fullname, slno, context, অনুসন্ধান);
 
 	   vim_free(context);
 	   vim_free(fullname);
 	} // for all matches
 
-	(void)cs_read_prompt(i);
+	(শূন্য)cs_read_prompt(i);
 
     } // for all cscope connections
     vim_free(buf);
@@ -1918,69 +1918,69 @@ cs_file_results(FILE *f, int *nummatches_a)
  * into ctags format.
  * When there are no matches sets "*matches_p" to NULL.
  */
-    static void
+    স্থির শূন্য
 cs_fill_results(
-    char *tagstr,
-    int totmatches,
-    int *nummatches_a,
-    char ***matches_p,
-    char ***cntxts_p,
-    int *matched)
+    বর্ণ *tagstr,
+    পূর্ণাঙ্ক totmatches,
+    পূর্ণাঙ্ক *nummatches_a,
+    বর্ণ ***matches_p,
+    বর্ণ ***cntxts_p,
+    পূর্ণাঙ্ক *matched)
 {
-    int i, j;
-    char *buf;
-    char *search, *slno;
-    int totsofar = 0;
-    char **matches = NULL;
-    char **cntxts = NULL;
-    char *fullname;
-    char *cntx;
+    পূর্ণাঙ্ক i, j;
+    বর্ণ *buf;
+    বর্ণ *অনুসন্ধান, *slno;
+    পূর্ণাঙ্ক totsofar = 0;
+    বর্ণ **matches = রিক্ত;
+    বর্ণ **cntxts = রিক্ত;
+    বর্ণ *fullname;
+    বর্ণ *cntx;
 
-    assert(totmatches > 0);
+    প্রতিজ্ঞা(totmatches > 0);
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return;
+    যদি (buf == রিক্ত)
+	প্রত্যাগম;
 
-    if ((matches = ALLOC_MULT(char *, totmatches)) == NULL)
-	goto parse_out;
-    if ((cntxts = ALLOC_MULT(char *, totmatches)) == NULL)
-	goto parse_out;
+    যদি ((matches = ALLOC_MULT(বর্ণ *, totmatches)) == রিক্ত)
+	গচ্ছ parse_out;
+    যদি ((cntxts = ALLOC_MULT(বর্ণ *, totmatches)) == রিক্ত)
+	গচ্ছ parse_out;
 
-    for (i = 0; i < csinfo_size; i++)
+    প্রতি (i = 0; i < csinfo_size; i++)
     {
-	if (nummatches_a[i] < 1)
-	    continue;
+	যদি (nummatches_a[i] < 1)
+	    অনুবর্ত;
 
-	for (j = 0; j < nummatches_a[i]; j++)
+	প্রতি (j = 0; j < nummatches_a[i]; j++)
 	{
-	   if ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
-			   &slno, &search)) == NULL)
-		continue;
+	   যদি ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
+			   &slno, &অনুসন্ধান)) == রিক্ত)
+		অনুবর্ত;
 
 	    matches[totsofar] = cs_make_vim_style_matches(fullname, slno,
-							  search, tagstr);
+							  অনুসন্ধান, tagstr);
 
 	    vim_free(fullname);
 
-	    if (strcmp(cntx, "<global>") == 0)
-		cntxts[totsofar] = NULL;
-	    else
+	    যদি (strcmp(cntx, "<global>") == 0)
+		cntxts[totsofar] = রিক্ত;
+	    অন্যথা
 		// note: if vim_strsave returns NULL, then the context
 		// will be "<global>", which is misleading.
-		cntxts[totsofar] = (char *)vim_strsave((char_u *)cntx);
+		cntxts[totsofar] = (বর্ণ *)vim_strsave((char_u *)cntx);
 
-	    if (matches[totsofar] != NULL)
+	    যদি (matches[totsofar] != রিক্ত)
 		totsofar++;
 
 	} // for all matches
 
-	(void)cs_read_prompt(i);
+	(শূন্য)cs_read_prompt(i);
 
     } // for all cscope connections
 
 parse_out:
-    if (totsofar == 0)
+    যদি (totsofar == 0)
     {
 	// No matches, free the arrays and return NULL in "*matches_p".
 	VIM_CLEAR(matches);
@@ -1997,180 +1997,180 @@ parse_out:
 /*
  * get the requested path components
  */
-    static char *
-cs_pathcomponents(char *path)
+    স্থির বর্ণ *
+cs_pathcomponents(বর্ণ *path)
 {
-    int		i;
-    char	*s;
+    পূর্ণাঙ্ক		i;
+    বর্ণ	*s;
 
-    if (p_cspc == 0)
-	return path;
+    যদি (p_cspc == 0)
+	প্রত্যাগম path;
 
     s = path + strlen(path) - 1;
-    for (i = 0; i < p_cspc; ++i)
+    প্রতি (i = 0; i < p_cspc; ++i)
     {
-	while (s > path)
+	যাবত্ (s > path)
 	{
 	   s--;
-	   if (*s == '/'
+	   যদি (*s == '/'
 # ifdef MSWIN
 		|| *s == '\\'
 # endif
 		)
-	      break;
+	      ভঙ্গ;
 	}
     }
-    if ((s > path && *s == '/')
+    যদি ((s > path && *s == '/')
 # ifdef MSWIN
 	|| (s > path && *s == '\\')
 # endif
 	    )
 	++s;
-    return s;
+    প্রত্যাগম s;
 }
 
 /*
  * Called from cs_manage_matches().
  */
-    static void
-cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
+    স্থির শূন্য
+cs_print_tags_priv(বর্ণ **matches, বর্ণ **cntxts, পূর্ণাঙ্ক অঙ্ক_matches)
 {
-    char	*buf = NULL;
-    char	*t_buf;
-    int		bufsize = 0; // Track available bufsize
-    int		newsize = 0;
-    char	*ptag;
-    char	*fname, *lno, *extra, *tbuf;
-    int		i, idx, num;
-    char	*globalcntx = "GLOBAL";
-    char	*cntxformat = " <<%s>>";
-    char	*context;
-    char	*cstag_msg = _("Cscope tag: %s");
-    char	*csfmt_str = "%4d %6s  ";
+    বর্ণ	*buf = রিক্ত;
+    বর্ণ	*t_buf;
+    পূর্ণাঙ্ক		bufsize = 0; // Track available bufsize
+    পূর্ণাঙ্ক		newsize = 0;
+    বর্ণ	*ptag;
+    বর্ণ	*fname, *lno, *extra, *tbuf;
+    পূর্ণাঙ্ক		i, idx, অঙ্ক;
+    বর্ণ	*globalcntx = "GLOBAL";
+    বর্ণ	*cntxformat = " <<%s>>";
+    বর্ণ	*context;
+    বর্ণ	*cstag_বার্তা = _("Cscope tag: %s");
+    বর্ণ	*csfmt_str = "%4d %6s  ";
 
-    assert(num_matches > 0);
+    প্রতিজ্ঞা(অঙ্ক_matches > 0);
 
-    if ((tbuf = alloc(strlen(matches[0]) + 1)) == NULL)
-	return;
+    যদি ((tbuf = alloc(strlen(matches[0]) + 1)) == রিক্ত)
+	প্রত্যাগম;
 
     strcpy(tbuf, matches[0]);
     ptag = strtok(tbuf, "\t");
-    if (ptag == NULL)
+    যদি (ptag == রিক্ত)
     {
 	vim_free(tbuf);
-	return;
+	প্রত্যাগম;
     }
 
-    newsize = (int)(strlen(cstag_msg) + strlen(ptag));
+    newsize = (পূর্ণাঙ্ক)(strlen(cstag_বার্তা) + strlen(ptag));
     buf = alloc(newsize);
-    if (buf != NULL)
+    যদি (buf != রিক্ত)
     {
 	bufsize = newsize;
-	(void)sprintf(buf, cstag_msg, ptag);
-	msg_puts_attr(buf, HL_ATTR(HLF_T));
+	(শূন্য)sprintf(buf, cstag_বার্তা, ptag);
+	বার্তা_puts_attr(buf, HL_ATTR(HLF_T));
     }
 
     vim_free(tbuf);
 
-    msg_puts_attr(_("\n   #   line"), HL_ATTR(HLF_T));    // strlen is 7
-    msg_advance(msg_col + 2);
-    msg_puts_attr(_("filename / context / line\n"), HL_ATTR(HLF_T));
+    বার্তা_puts_attr(_("\n   #   line"), HL_ATTR(HLF_T));    // strlen is 7
+    বার্তা_advance(বার্তা_col + 2);
+    বার্তা_puts_attr(_("filename / context / line\n"), HL_ATTR(HLF_T));
 
-    num = 1;
-    for (i = 0; i < num_matches; i++)
+    অঙ্ক = 1;
+    প্রতি (i = 0; i < অঙ্ক_matches; i++)
     {
 	idx = i;
 
 	// if we really wanted to, we could avoid this malloc and strcpy
 	// by parsing matches[i] on the fly and placing stuff into buf
 	// directly, but that's too much of a hassle
-	if ((tbuf = alloc(strlen(matches[idx]) + 1)) == NULL)
-	    continue;
-	(void)strcpy(tbuf, matches[idx]);
+	যদি ((tbuf = alloc(strlen(matches[idx]) + 1)) == রিক্ত)
+	    অনুবর্ত;
+	(শূন্য)strcpy(tbuf, matches[idx]);
 
-	if (strtok(tbuf, (const char *)"\t") == NULL
-		|| (fname = strtok(NULL, (const char *)"\t")) == NULL
-		|| (lno = strtok(NULL, (const char *)"\t")) == NULL)
+	যদি (strtok(tbuf, (ধ্রুব বর্ণ *)"\t") == রিক্ত
+		|| (fname = strtok(রিক্ত, (ধ্রুব বর্ণ *)"\t")) == রিক্ত
+		|| (lno = strtok(রিক্ত, (ধ্রুব বর্ণ *)"\t")) == রিক্ত)
 	{
 	    vim_free(tbuf);
-	    continue;
+	    অনুবর্ত;
 	}
-	extra = strtok(NULL, (const char *)"\t");
+	extra = strtok(রিক্ত, (ধ্রুব বর্ণ *)"\t");
 
 	lno[strlen(lno)-2] = '\0';  // ignore ;" at the end
 
 	// hopefully 'num' (num of matches) will be less than 10^16
-	newsize = (int)(strlen(csfmt_str) + 16 + strlen(lno));
-	if (bufsize < newsize)
+	newsize = (পূর্ণাঙ্ক)(strlen(csfmt_str) + 16 + strlen(lno));
+	যদি (bufsize < newsize)
 	{
 	    t_buf = buf;
 	    buf = vim_realloc(buf, newsize);
-	    if (buf == NULL)
+	    যদি (buf == রিক্ত)
 	    {
 		bufsize = 0;
 		vim_free(t_buf);
 	    }
-	    else
+	    অন্যথা
 		bufsize = newsize;
 	}
-	if (buf != NULL)
+	যদি (buf != রিক্ত)
 	{
 	    // csfmt_str = "%4d %6s  ";
-	    (void)sprintf(buf, csfmt_str, num, lno);
-	    msg_puts_attr(buf, HL_ATTR(HLF_CM));
+	    (শূন্য)sprintf(buf, csfmt_str, অঙ্ক, lno);
+	    বার্তা_puts_attr(buf, HL_ATTR(HLF_CM));
 	}
-	msg_outtrans_long_attr((char_u *)cs_pathcomponents(fname),
+	বার্তা_outtrans_long_attr((char_u *)cs_pathcomponents(fname),
 							      HL_ATTR(HLF_CM));
 
 	// compute the required space for the context
-	if (cntxts[idx] != NULL)
+	যদি (cntxts[idx] != রিক্ত)
 	    context = cntxts[idx];
-	else
+	অন্যথা
 	    context = globalcntx;
-	newsize = (int)(strlen(context) + strlen(cntxformat));
+	newsize = (পূর্ণাঙ্ক)(strlen(context) + strlen(cntxformat));
 
-	if (bufsize < newsize)
+	যদি (bufsize < newsize)
 	{
 	    t_buf = buf;
 	    buf = vim_realloc(buf, newsize);
-	    if (buf == NULL)
+	    যদি (buf == রিক্ত)
 	    {
 		bufsize = 0;
 		vim_free(t_buf);
 	    }
-	    else
+	    অন্যথা
 		bufsize = newsize;
 	}
-	if (buf != NULL)
+	যদি (buf != রিক্ত)
 	{
-	    (void)sprintf(buf, cntxformat, context);
+	    (শূন্য)sprintf(buf, cntxformat, context);
 
 	    // print the context only if it fits on the same line
-	    if (msg_col + (int)strlen(buf) >= cmdline_width)
-		msg_putchar('\n');
-	    msg_advance(12);
-	    msg_outtrans_long_attr((char_u *)buf, 0);
-	    msg_putchar('\n');
+	    যদি (বার্তা_col + (পূর্ণাঙ্ক)strlen(buf) >= cmdline_width)
+		বার্তা_putchar('\n');
+	    বার্তা_advance(12);
+	    বার্তা_outtrans_long_attr((char_u *)buf, 0);
+	    বার্তা_putchar('\n');
 	}
-	if (extra != NULL)
+	যদি (extra != রিক্ত)
 	{
-	    msg_advance(13);
-	    msg_outtrans_long_attr((char_u *)extra, 0);
+	    বার্তা_advance(13);
+	    বার্তা_outtrans_long_attr((char_u *)extra, 0);
 	}
 
 	vim_free(tbuf); // only after printing extra due to strtok use
 
-	if (msg_col)
-	    msg_putchar('\n');
+	যদি (বার্তা_col)
+	    বার্তা_putchar('\n');
 
 	ui_breakcheck();
-	if (got_int)
+	যদি (got_int)
 	{
 	    got_int = FALSE;	// don't print any more matches
-	    break;
+	    ভঙ্গ;
 	}
 
-	num++;
+	অঙ্ক++;
     } // for all matches
 
     vim_free(buf);
@@ -2180,46 +2180,46 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
 /*
  * Read a cscope prompt (basically, skip over the ">> ").
  */
-    static int
-cs_read_prompt(int i)
+    স্থির পূর্ণাঙ্ক
+cs_read_prompt(পূর্ণাঙ্ক i)
 {
-    int		ch;
-    char	*buf = NULL; // buffer for possible error message from cscope
-    int		bufpos = 0;
-    int		maxlen;
-    static char *eprompt = "Press the RETURN key to continue:";
-    int		epromptlen = (int)strlen(eprompt);
-    int		n;
+    পূর্ণাঙ্ক		ch;
+    বর্ণ	*buf = রিক্ত; // buffer for possible error message from cscope
+    পূর্ণাঙ্ক		bufpos = 0;
+    পূর্ণাঙ্ক		maxlen;
+    স্থির বর্ণ *eprompt = "Press the RETURN key to continue:";
+    পূর্ণাঙ্ক		epromptlen = (পূর্ণাঙ্ক)strlen(eprompt);
+    পূর্ণাঙ্ক		n;
 
     // compute maximum allowed len for Cscope error message
-    char *cs_emsg = _(e_cscope_error_str);
-    maxlen = (int)(IOSIZE - strlen(cs_emsg));
+    বর্ণ *cs_emsg = _(e_cscope_error_str);
+    maxlen = (পূর্ণাঙ্ক)(IOSIZE - strlen(cs_emsg));
 
-    for (;;)
+    প্রতি (;;)
     {
-	while ((ch = getc(csinfo[i].fr_fp)) != EOF && ch != CSCOPE_PROMPT[0])
+	যাবত্ ((ch = getc(csinfo[i].fr_fp)) != EOF && ch != CSCOPE_PROMPT[0])
 	    // if there is room and char is printable
-	    if (bufpos < maxlen - 1 && vim_isprintc(ch))
+	    যদি (bufpos < maxlen - 1 && vim_isprintc(ch))
 	    {
-		if (buf == NULL) // lazy buffer allocation
+		যদি (buf == রিক্ত) // lazy buffer allocation
 		    buf = alloc(maxlen);
-		if (buf != NULL)
+		যদি (buf != রিক্ত)
 		{
 		    // append character to the message
 		    buf[bufpos++] = ch;
 		    buf[bufpos] = NUL;
-		    if (bufpos >= epromptlen
+		    যদি (bufpos >= epromptlen
 			    && strcmp(&buf[bufpos - epromptlen], eprompt) == 0)
 		    {
 			// remove eprompt from buf
 			buf[bufpos - epromptlen] = NUL;
 
 			// print message to user
-			(void)semsg(cs_emsg, buf);
+			(শূন্য)semsg(cs_emsg, buf);
 
 			// send RETURN to cscope
-			(void)putc('\n', csinfo[i].to_fp);
-			(void)fflush(csinfo[i].to_fp);
+			(শূন্য)putc('\n', csinfo[i].to_fp);
+			(শূন্য)fflush(csinfo[i].to_fp);
 
 			// clear buf
 			bufpos = 0;
@@ -2228,42 +2228,42 @@ cs_read_prompt(int i)
 		}
 	    }
 
-	for (n = 0; n < (int)STRLEN_LITERAL(CSCOPE_PROMPT); ++n)
+	প্রতি (n = 0; n < (পূর্ণাঙ্ক)STRLEN_LITERAL(CSCOPE_PROMPT); ++n)
 	{
-	    if (n > 0)
+	    যদি (n > 0)
 		ch = getc(csinfo[i].fr_fp);
-	    if (ch == EOF)
+	    যদি (ch == EOF)
 	    {
-		if (buf != NULL && buf[0] != NUL)
-		    (void)semsg(cs_emsg, buf);
-		else if (p_csverbose)
+		যদি (buf != রিক্ত && buf[0] != NUL)
+		    (শূন্য)semsg(cs_emsg, buf);
+		অন্যথা যদি (p_csverbose)
 		    cs_reading_emsg(i); // don't have additional information
 		cs_release_csp(i, TRUE);
 		vim_free(buf);
-		return CSCOPE_FAILURE;
+		প্রত্যাগম CSCOPE_FAILURE;
 	    }
 
-	    if (ch != CSCOPE_PROMPT[n])
+	    যদি (ch != CSCOPE_PROMPT[n])
 	    {
 		ch = EOF;
-		break;
+		ভঙ্গ;
 	    }
 	}
 
-	if (ch == EOF)
-	    continue;	    // didn't find the prompt
-	break;		    // did find the prompt
+	যদি (ch == EOF)
+	    অনুবর্ত;	    // didn't find the prompt
+	ভঙ্গ;		    // did find the prompt
     }
 
     vim_free(buf);
-    return CSCOPE_SUCCESS;
+    প্রত্যাগম CSCOPE_SUCCESS;
 }
 
-# if defined(UNIX) && defined(SIGALRM)
+# যদি defined(UNIX) && defined(SIGALRM)
 /*
  * Used to catch and ignore SIGALRM below.
  */
-    static void
+    স্থির শূন্য
 sig_handler SIGDEFARG(sigarg)
 {
     // do nothing
@@ -2274,32 +2274,32 @@ sig_handler SIGDEFARG(sigarg)
  * Does the actual free'ing for the cs ptr with an optional flag of whether
  * or not to free the filename.  Called by cs_kill and cs_reset.
  */
-    static void
-cs_release_csp(int i, int freefnpp)
+    স্থির শূন্য
+cs_release_csp(পূর্ণাঙ্ক i, পূর্ণাঙ্ক freefnpp)
 {
     /*
      * Trying to exit normally (not sure whether it is fit to UNIX cscope
      */
-    if (csinfo[i].to_fp != NULL)
+    যদি (csinfo[i].to_fp != রিক্ত)
     {
-	(void)fputs("q\n", csinfo[i].to_fp);
-	(void)fflush(csinfo[i].to_fp);
+	(শূন্য)fputs("q\n", csinfo[i].to_fp);
+	(শূন্য)fflush(csinfo[i].to_fp);
     }
-# if defined(UNIX)
+# যদি defined(UNIX)
     {
-	int waitpid_errno;
-	int pstat;
+	পূর্ণাঙ্ক waitpid_errno;
+	পূর্ণাঙ্ক pstat;
 	pid_t pid;
 
-#  if defined(HAVE_SIGACTION)
-	struct sigaction sa, old;
+#  যদি defined(HAVE_SIGACTION)
+	সংরচনা sigaction sa, old;
 
 	// Use sigaction() to limit the waiting time to two seconds.
 	sigemptyset(&sa.sa_mask);
 	sa.sa_handler = sig_handler;
 #   ifdef SA_NODEFER
 	sa.sa_flags = SA_NODEFER;
-#   else
+#   অন্যথা
 	sa.sa_flags = 0;
 #   endif
 	sigaction(SIGALRM, &sa, &old);
@@ -2311,19 +2311,19 @@ cs_release_csp(int i, int freefnpp)
 
 	// cancel pending alarm if still there and restore signal
 	alarm(0);
-	sigaction(SIGALRM, &old, NULL);
-#  else
-	int waited;
+	sigaction(SIGALRM, &old, রিক্ত);
+#  অন্যথা
+	পূর্ণাঙ্ক waited;
 
 	// Can't use sigaction(), loop for two seconds.  First yield the CPU
 	// to give cscope a chance to exit quickly.
 	sleep(0);
-	for (waited = 0; waited < 40; ++waited)
+	প্রতি (waited = 0; waited < 40; ++waited)
 	{
 	    pid = waitpid(csinfo[i].pid, &pstat, WNOHANG);
 	    waitpid_errno = errno;
-	    if (pid != 0)
-		break;  // break unless the process is still running
+	    যদি (pid != 0)
+		ভঙ্গ;  // break unless the process is still running
 	    mch_delay(50L, 0); // sleep 50 ms
 	}
 #  endif
@@ -2332,12 +2332,12 @@ cs_release_csp(int i, int freefnpp)
 	 * Safety check: If the PID would be zero here, the entire X session
 	 * would be killed.  -1 and 1 are dangerous as well.
 	 */
-	if (pid < 0 && csinfo[i].pid > 1)
+	যদি (pid < 0 && csinfo[i].pid > 1)
 	{
 #  ifdef ECHILD
-	    int alive = TRUE;
+	    পূর্ণাঙ্ক alive = TRUE;
 
-	    if (waitpid_errno == ECHILD)
+	    যদি (waitpid_errno == ECHILD)
 	    {
 		/*
 		 * When using 'vim -g', vim is forked and cscope process is
@@ -2348,44 +2348,44 @@ cs_release_csp(int i, int freefnpp)
 		 * the "q" command, hence giving it a chance to clean up
 		 * its temporary files.
 		 */
-		int waited;
+		পূর্ণাঙ্ক waited;
 
 		sleep(0);
-		for (waited = 0; waited < 40; ++waited)
+		প্রতি (waited = 0; waited < 40; ++waited)
 		{
 		    // Check whether cscope process is still alive
-		    if (kill(csinfo[i].pid, 0) != 0)
+		    যদি (kill(csinfo[i].pid, 0) != 0)
 		    {
 			alive = FALSE; // cscope process no longer exists
-			break;
+			ভঙ্গ;
 		    }
 		    mch_delay(50L, 0); // sleep 50 ms
 		}
 	    }
-	    if (alive)
+	    যদি (alive)
 #  endif
 	    {
 		kill(csinfo[i].pid, SIGKILL);
-		(void)waitpid(csinfo[i].pid, &pstat, 0);
+		(শূন্য)waitpid(csinfo[i].pid, &pstat, 0);
 	    }
 	}
     }
-# else  // !UNIX
-    if (csinfo[i].hProc != NULL)
+# অন্যথা  // !UNIX
+    যদি (csinfo[i].hProc != রিক্ত)
     {
 	// Give cscope a chance to exit normally
-	if (WaitForSingleObject(csinfo[i].hProc, 1000) == WAIT_TIMEOUT)
+	যদি (WaitForSingleObject(csinfo[i].hProc, 1000) == WAIT_TIMEOUT)
 	    TerminateProcess(csinfo[i].hProc, 0);
 	CloseHandle(csinfo[i].hProc);
     }
 # endif
 
-    if (csinfo[i].fr_fp != NULL)
-	(void)fclose(csinfo[i].fr_fp);
-    if (csinfo[i].to_fp != NULL)
-	(void)fclose(csinfo[i].to_fp);
+    যদি (csinfo[i].fr_fp != রিক্ত)
+	(শূন্য)fclose(csinfo[i].fr_fp);
+    যদি (csinfo[i].to_fp != রিক্ত)
+	(শূন্য)fclose(csinfo[i].to_fp);
 
-    if (freefnpp)
+    যদি (freefnpp)
     {
 	vim_free(csinfo[i].fname);
 	vim_free(csinfo[i].ppath);
@@ -2399,50 +2399,50 @@ cs_release_csp(int i, int freefnpp)
 /*
  * Calls cs_kill on all cscope connections then reinits.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 cs_reset(exarg_T *eap UNUSED)
 {
-    char	**dblist = NULL, **pplist = NULL, **fllist = NULL;
-    int	i;
-    char buf[20]; // for sprintf " (#%d)"
+    বর্ণ	**dblist = রিক্ত, **pplist = রিক্ত, **fllist = রিক্ত;
+    পূর্ণাঙ্ক	i;
+    বর্ণ buf[20]; // for sprintf " (#%d)"
 
-    if (csinfo_size == 0)
-	return CSCOPE_SUCCESS;
+    যদি (csinfo_size == 0)
+	প্রত্যাগম CSCOPE_SUCCESS;
 
     // malloc our db and ppath list
-    dblist = ALLOC_MULT(char *, csinfo_size);
-    pplist = ALLOC_MULT(char *, csinfo_size);
-    fllist = ALLOC_MULT(char *, csinfo_size);
-    if (dblist == NULL || pplist == NULL || fllist == NULL)
+    dblist = ALLOC_MULT(বর্ণ *, csinfo_size);
+    pplist = ALLOC_MULT(বর্ণ *, csinfo_size);
+    fllist = ALLOC_MULT(বর্ণ *, csinfo_size);
+    যদি (dblist == রিক্ত || pplist == রিক্ত || fllist == রিক্ত)
     {
 	vim_free(dblist);
 	vim_free(pplist);
 	vim_free(fllist);
-	return CSCOPE_FAILURE;
+	প্রত্যাগম CSCOPE_FAILURE;
     }
 
-    for (i = 0; i < csinfo_size; i++)
+    প্রতি (i = 0; i < csinfo_size; i++)
     {
 	dblist[i] = csinfo[i].fname;
 	pplist[i] = csinfo[i].ppath;
 	fllist[i] = csinfo[i].flags;
-	if (csinfo[i].fname != NULL)
+	যদি (csinfo[i].fname != রিক্ত)
 	    cs_release_csp(i, FALSE);
     }
 
     // rebuild the cscope connection list
-    for (i = 0; i < csinfo_size; i++)
+    প্রতি (i = 0; i < csinfo_size; i++)
     {
-	if (dblist[i] != NULL)
+	যদি (dblist[i] != রিক্ত)
 	{
 	    cs_add_common(dblist[i], pplist[i], fllist[i]);
-	    if (p_csverbose)
+	    যদি (p_csverbose)
 	    {
 		// don't use smsg_attr() because we want to display the
 		// connection number in the same line as
 		// "Added cscope database..."
 		sprintf(buf, " (#%d)", i);
-		msg_puts_attr(buf, HL_ATTR(HLF_R));
+		বার্তা_puts_attr(buf, HL_ATTR(HLF_R));
 	    }
 	}
 	vim_free(dblist[i]);
@@ -2453,9 +2453,9 @@ cs_reset(exarg_T *eap UNUSED)
     vim_free(pplist);
     vim_free(fllist);
 
-    if (p_csverbose)
-	msg_attr(_("All cscope databases reset"), HL_ATTR(HLF_R) | MSG_HIST);
-    return CSCOPE_SUCCESS;
+    যদি (p_csverbose)
+	বার্তা_attr(_("All cscope databases reset"), HL_ATTR(HLF_R) | বার্তা_HIST);
+    প্রত্যাগম CSCOPE_SUCCESS;
 }
 
 
@@ -2468,14 +2468,14 @@ cs_reset(exarg_T *eap UNUSED)
  * ships with Solaris 2.6), the output never has the prefix prepended.
  * Contrast this with my development system (Digital Unix), which does.
  */
-    static char *
-cs_resolve_file(int i, char *name)
+    স্থির বর্ণ *
+cs_resolve_file(পূর্ণাঙ্ক i, বর্ণ *name)
 {
-    char	*fullname;
-    string_T	csdir = {NULL, 0};
+    বর্ণ	*fullname;
+    string_T	csdir = {রিক্ত, 0};
     size_t	namelen;
     size_t	ppathlen = 0;
-    int		len;
+    পূর্ণাঙ্ক		len;
 
     /*
      * Ppath is freed when we destroy the cscope connection.
@@ -2483,31 +2483,31 @@ cs_resolve_file(int i, char *name)
      * copied into the tag buffer used by Vim.
      */
     namelen = STRLEN(name);
-    len = (int)namelen + 2;
-    if (csinfo[i].ppath != NULL)
+    len = (পূর্ণাঙ্ক)namelen + 2;
+    যদি (csinfo[i].ppath != রিক্ত)
     {
 	ppathlen = STRLEN(csinfo[i].ppath);
-	len += (int)ppathlen;
+	len += (পূর্ণাঙ্ক)ppathlen;
     }
-    else if (p_csre && csinfo[i].fname != NULL)
+    অন্যথা যদি (p_csre && csinfo[i].fname != রিক্ত)
     {
 	// If 'cscoperelative' is set and ppath is not set, use cscope.out
 	// path in path resolution.
 	csdir.string = alloc(MAXPATHL);
-	if (csdir.string != NULL)
+	যদি (csdir.string != রিক্ত)
 	{
 	    vim_strncpy(csdir.string, (char_u *)csinfo[i].fname,
 					  gettail((char_u *)csinfo[i].fname)
 						 - (char_u *)csinfo[i].fname);
 	    csdir.length = STRLEN(csdir.string);
-	    len += (int)csdir.length;
+	    len += (পূর্ণাঙ্ক)csdir.length;
 	}
     }
 
     // Note/example: this won't work if the cscope output already starts
     // "../.." and the prefix path is also "../..".  if something like this
     // happens, you are screwed up and need to fix how you're using cscope.
-    if (csinfo[i].ppath != NULL
+    যদি (csinfo[i].ppath != রিক্ত
 	    && (strncmp(name, csinfo[i].ppath, ppathlen) != 0)
 	    && (name[0] != '/')
 # ifdef MSWIN
@@ -2515,70 +2515,70 @@ cs_resolve_file(int i, char *name)
 # endif
        )
     {
-	if ((fullname = alloc(len)) != NULL)
-	    (void)sprintf(fullname, "%s/%s", csinfo[i].ppath, name);
+	যদি ((fullname = alloc(len)) != রিক্ত)
+	    (শূন্য)sprintf(fullname, "%s/%s", csinfo[i].ppath, name);
     }
-    else if (csdir.string != NULL && csinfo[i].fname != NULL && *csdir.string != NUL)
+    অন্যথা যদি (csdir.string != রিক্ত && csinfo[i].fname != রিক্ত && *csdir.string != NUL)
     {
 	string_T    ret;
 
 	// Check for csdir to be non empty to avoid empty path concatenated to
 	// cscope output.
-	fullname = (char *)concat_fnames(csdir.string, csdir.length, (char_u *)name, namelen, TRUE, &ret);
+	fullname = (বর্ণ *)concat_fnames(csdir.string, csdir.length, (char_u *)name, namelen, TRUE, &ret);
     }
-    else
+    অন্যথা
     {
-	fullname = (char *)vim_strnsave((char_u *)name, namelen);
+	fullname = (বর্ণ *)vim_strnsave((char_u *)name, namelen);
     }
 
     vim_free(csdir.string);
-    return fullname;
+    প্রত্যাগম fullname;
 }
 
 
 /*
  * Show all cscope connections.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 cs_show(exarg_T *eap UNUSED)
 {
-    int i;
+    পূর্ণাঙ্ক i;
 
-    if (cs_cnt_connections() == 0)
-	msg_puts(_("no cscope connections\n"));
-    else
+    যদি (cs_cnt_connections() == 0)
+	বার্তা_puts(_("no cscope connections\n"));
+    অন্যথা
     {
-	msg_puts_attr(
+	বার্তা_puts_attr(
 	    _(" # pid    database name                       prepend path\n"),
 	    HL_ATTR(HLF_T));
-	for (i = 0; i < csinfo_size; i++)
+	প্রতি (i = 0; i < csinfo_size; i++)
 	{
-	    if (csinfo[i].fname == NULL)
-		continue;
+	    যদি (csinfo[i].fname == রিক্ত)
+		অনুবর্ত;
 
-	    if (csinfo[i].ppath != NULL)
-		(void)smsg("%2d %-5ld  %-34s  %-32s",
+	    যদি (csinfo[i].ppath != রিক্ত)
+		(শূন্য)smsg("%2d %-5ld  %-34s  %-32s",
 		    i, (long)csinfo[i].pid, csinfo[i].fname, csinfo[i].ppath);
-	    else
-		(void)smsg("%2d %-5ld  %-34s  <none>",
+	    অন্যথা
+		(শূন্য)smsg("%2d %-5ld  %-34s  <none>",
 			   i, (long)csinfo[i].pid, csinfo[i].fname);
 	}
     }
 
     wait_return(FALSE);
-    return CSCOPE_SUCCESS;
+    প্রত্যাগম CSCOPE_SUCCESS;
 }
 
 
 /*
  * Only called when VIM exits to quit any cscope sessions.
  */
-    void
-cs_end(void)
+    শূন্য
+cs_end(শূন্য)
 {
-    int i;
+    পূর্ণাঙ্ক i;
 
-    for (i = 0; i < csinfo_size; i++)
+    প্রতি (i = 0; i < csinfo_size; i++)
 	cs_release_csp(i, TRUE);
     vim_free(csinfo);
     csinfo_size = 0;
@@ -2586,40 +2586,40 @@ cs_end(void)
 
 #endif	// FEAT_CSCOPE
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 
 /*
  * "cscope_connection([{num} , {dbpath} [, {prepend}]])" function
  *
  * Checks the existence of a cscope connection.
  */
-    void
+    শূন্য
 f_cscope_connection(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 # ifdef FEAT_CSCOPE
-    int		num = 0;
-    char_u	*dbpath = NULL;
-    char_u	*prepend = NULL;
+    পূর্ণাঙ্ক		অঙ্ক = 0;
+    char_u	*dbpath = রিক্ত;
+    char_u	*prepend = রিক্ত;
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+    যদি (in_vim9script()
+	    && (check_for_opt_সংখ্যা_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && (check_for_opt_string_arg(argvars, 1) == FAIL
 			|| (argvars[1].v_type != VAR_UNKNOWN
 			    && check_for_opt_string_arg(argvars, 2) == FAIL)))))
-	return;
+	প্রত্যাগম;
 
-    if (argvars[0].v_type != VAR_UNKNOWN
+    যদি (argvars[0].v_type != VAR_UNKNOWN
 	    && argvars[1].v_type != VAR_UNKNOWN)
     {
-	num = (int)tv_get_number(&argvars[0]);
+	অঙ্ক = (পূর্ণাঙ্ক)tv_get_সংখ্যা(&argvars[0]);
 	dbpath = tv_get_string(&argvars[1]);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	যদি (argvars[2].v_type != VAR_UNKNOWN)
 	    prepend = tv_get_string_buf(&argvars[2], buf);
     }
 
-    rettv->vval.v_number = cs_connection(num, dbpath, prepend);
+    rettv->vval.v_সংখ্যা = cs_connection(অঙ্ক, dbpath, prepend);
 # endif
 }
 

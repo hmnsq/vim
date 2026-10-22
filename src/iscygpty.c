@@ -29,14 +29,14 @@
 
 #ifdef _WIN32
 
-#include <ctype.h>
-#include <io.h>
-#include <wchar.h>
-#include <windows.h>
+#অন্তর্ভাব <ctype.h>
+#অন্তর্ভাব <io.h>
+#অন্তর্ভাব <wchar.h>
+#অন্তর্ভাব <windows.h>
 
 #ifdef USE_FILEEXTD
 // VC 7.1 or earlier doesn't support SAL.
-# if !defined(_MSC_VER) || (_MSC_VER < 1400)
+# যদি !defined(_MSC_VER) || (_MSC_VER < 1400)
 #  define __out
 #  define __in
 #  define __in_opt
@@ -45,12 +45,12 @@
 // defunct link: microsoft.com/en-us/download/details.aspx?id=22599
 // Needed for WinXP.
 # include <fileextd.h>
-#else // USE_FILEEXTD
+#অন্যথা // USE_FILEEXTD
 // VC 8 or earlier.
-# if defined(_MSC_VER) && (_MSC_VER < 1500)
+# যদি defined(_MSC_VER) && (_MSC_VER < 1500)
 #  ifdef ENABLE_STUB_IMPL
 #   define STUB_IMPL
-#  else
+#  অন্যথা
 #   error "Win32 FileID API Library is required for VC2005 or earlier."
 #  endif
 # endif
@@ -58,131 +58,131 @@
 
 #ifdef __MINGW32__
 # define UNUSED __attribute__((unused))
-#else
+#অন্যথা
 # define UNUSED
 #endif
 
-#include "iscygpty.h"
+#অন্তর্ভাব "iscygpty.h"
 
 //#define USE_DYNFILEID
 #ifdef USE_DYNFILEID
-typedef BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
+প্রকারনির্দেশ BOOL (WINAPI *pfnGetFileInformationByHandleEx)(
 		HANDLE						hFile,
 		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass,
 		LPVOID						lpFileInformation,
 		DWORD						dwBufferSize);
-static pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = NULL;
+স্থির pfnGetFileInformationByHandleEx pGetFileInformationByHandleEx = রিক্ত;
 
 # ifndef USE_FILEEXTD
-static BOOL WINAPI stub_GetFileInformationByHandleEx(
+স্থির BOOL WINAPI stub_GetFileInformationByHandleEx(
 		HANDLE						hFile UNUSED,
 		FILE_INFO_BY_HANDLE_CLASS	FileInformationClass UNUSED,
 		LPVOID						lpFileInformation UNUSED,
 		DWORD						dwBufferSize UNUSED)
 {
-	return FALSE;
+	প্রত্যাগম FALSE;
 }
 # endif
 
-static void setup_fileid_api(void)
+স্থির শূন্য setup_fileid_api(শূন্য)
 {
-	if (pGetFileInformationByHandleEx != NULL) {
-		return;
+	যদি (pGetFileInformationByHandleEx != রিক্ত) {
+		প্রত্যাগম;
 	}
 	pGetFileInformationByHandleEx = (pfnGetFileInformationByHandleEx)
 		GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")),
 				"GetFileInformationByHandleEx");
-	if (pGetFileInformationByHandleEx == NULL) {
+	যদি (pGetFileInformationByHandleEx == রিক্ত) {
 # ifdef USE_FILEEXTD
 		pGetFileInformationByHandleEx = GetFileInformationByHandleEx;
-# else
+# অন্যথা
 		pGetFileInformationByHandleEx = stub_GetFileInformationByHandleEx;
 # endif
 	}
 }
-#else
+#অন্যথা
 # define pGetFileInformationByHandleEx	GetFileInformationByHandleEx
 # define setup_fileid_api()
 #endif
 
 
 #define is_wprefix(s, prefix) \
-	(wcsncmp((s), (prefix), sizeof(prefix) / sizeof(WCHAR) - 1) == 0)
+	(wcsncmp((s), (prefix), পরিমাণ(prefix) / পরিমাণ(WCHAR) - 1) == 0)
 
 // Check if the fd is a cygwin/msys's pty.
-int is_cygpty(int fd)
+পূর্ণাঙ্ক is_cygpty(পূর্ণাঙ্ক fd)
 {
 #ifdef STUB_IMPL
-	return 0;
-#else
+	প্রত্যাগম 0;
+#অন্যথা
 	HANDLE h;
-	const int size = sizeof(FILE_NAME_INFO) + sizeof(WCHAR) * (MAX_PATH - 1);
+	ধ্রুব পূর্ণাঙ্ক size = পরিমাণ(FILE_NAME_INFO) + পরিমাণ(WCHAR) * (MAX_PATH - 1);
 	FILE_NAME_INFO *nameinfo;
-	WCHAR *p = NULL;
+	WCHAR *p = রিক্ত;
 
 	setup_fileid_api();
 
 	h = (HANDLE) _get_osfhandle(fd);
-	if (h == INVALID_HANDLE_VALUE) {
-		return 0;
+	যদি (h == INVALID_HANDLE_মান) {
+		প্রত্যাগম 0;
 	}
 	// Cygwin/msys's pty is a pipe.
-	if (GetFileType(h) != FILE_TYPE_PIPE) {
-		return 0;
+	যদি (GetFileType(h) != FILE_TYPE_PIPE) {
+		প্রত্যাগম 0;
 	}
-	nameinfo = malloc(size + sizeof(WCHAR));
-	if (nameinfo == NULL) {
-		return 0;
+	nameinfo = malloc(size + পরিমাণ(WCHAR));
+	যদি (nameinfo == রিক্ত) {
+		প্রত্যাগম 0;
 	}
 	// Check the name of the pipe:
 	// "\\{cygwin,msys}-XXXXXXXXXXXXXXXX-ptyN-{from,to}-master"
-	if (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
-		nameinfo->FileName[nameinfo->FileNameLength / sizeof(WCHAR)] = L'\0';
+	যদি (pGetFileInformationByHandleEx(h, FileNameInfo, nameinfo, size)) {
+		nameinfo->FileName[nameinfo->FileNameLength / পরিমাণ(WCHAR)] = L'\0';
 		p = nameinfo->FileName;
-		if (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
+		যদি (is_wprefix(p, L"\\cygwin-")) {		// Cygwin
 			p += 8;
-		} else if (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
+		} অন্যথা যদি (is_wprefix(p, L"\\msys-")) {	// MSYS and MSYS2
 			p += 6;
-		} else {
-			p = NULL;
+		} অন্যথা {
+			p = রিক্ত;
 		}
-		if (p != NULL) {
+		যদি (p != রিক্ত) {
 			// Skip 16-digit hexadecimal.
-			while (*p && iswascii(*p) && isxdigit(*p))
+			যাবত্ (*p && iswascii(*p) && isxdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-pty")) {
+			যদি (is_wprefix(p, L"-pty")) {
 				p += 4;
-			} else {
-				p = NULL;
+			} অন্যথা {
+				p = রিক্ত;
 			}
 		}
-		if (p != NULL) {
+		যদি (p != রিক্ত) {
 			// Skip pty number.
-			while (*p && iswascii(*p) && isdigit(*p))
+			যাবত্ (*p && iswascii(*p) && isdigit(*p))
 				++p;
-			if (is_wprefix(p, L"-from-master")) {
+			যদি (is_wprefix(p, L"-from-master")) {
 				//p += 12;
-			} else if (is_wprefix(p, L"-to-master")) {
+			} অন্যথা যদি (is_wprefix(p, L"-to-master")) {
 				//p += 10;
-			} else {
-				p = NULL;
+			} অন্যথা {
+				p = রিক্ত;
 			}
 		}
 	}
-	free(nameinfo);
-	return (p != NULL);
+	মুক্ত(nameinfo);
+	প্রত্যাগম (p != রিক্ত);
 #endif // STUB_IMPL
 }
 
 // Check if at least one cygwin/msys pty is used.
-int is_cygpty_used(void)
+পূর্ণাঙ্ক is_cygpty_used(শূন্য)
 {
-	int fd, ret = 0;
+	পূর্ণাঙ্ক fd, ret = 0;
 
-	for (fd = 0; fd < 3; fd++) {
+	প্রতি (fd = 0; fd < 3; fd++) {
 		ret |= is_cygpty(fd);
 	}
-	return ret;
+	প্রত্যাগম ret;
 }
 
 #endif // _WIN32

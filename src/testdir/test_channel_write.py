@@ -4,15 +4,15 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-import sys
-import time
+তঃ __future__ আনযন print_function
+আনযন sys
+আনযন time
 
-if __name__ == "__main__":
+যদি __name__ == "__main__":
 
     done = 0
-    while done < 10:
+    যাবত্ done < 10:
         done = done + 1
         print(done)
         sys.stdout.flush()
-        time.sleep(0.05)  # sleep 50 msec
+        time.সুষুপ্তি(0.05)  # sleep 50 msec

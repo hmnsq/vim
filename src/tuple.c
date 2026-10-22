@@ -11,24 +11,24 @@
  * tuple.c: Tuple support functions.
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 
 // Tuple heads for garbage collection.
-static tuple_T		*first_tuple = NULL;	// list of all tuples
+স্থির tuple_T		*first_tuple = রিক্ত;	// list of all tuples
 
-    static void
+    স্থির শূন্য
 tuple_init(tuple_T *tuple)
 {
     // Prepend the tuple to the list of tuples for garbage collection.
-    if (first_tuple != NULL)
+    যদি (first_tuple != রিক্ত)
 	first_tuple->tv_used_prev = tuple;
-    tuple->tv_used_prev = NULL;
+    tuple->tv_used_prev = রিক্ত;
     tuple->tv_used_next = first_tuple;
     first_tuple = tuple;
 
-    ga_init2(&tuple->tv_items, sizeof(typval_T), 20);
+    ga_init2(&tuple->tv_বস্তুসমূহ, পরিমাণ(typval_T), 20);
 }
 
 /*
@@ -36,14 +36,14 @@ tuple_init(tuple_T *tuple)
  * Caller should take care of the reference count.
  */
     tuple_T *
-tuple_alloc(void)
+tuple_alloc(শূন্য)
 {
     tuple_T  *tuple;
 
     tuple = ALLOC_CLEAR_ONE(tuple_T);
-    if (tuple != NULL)
+    যদি (tuple != রিক্ত)
 	tuple_init(tuple);
-    return tuple;
+    প্রত্যাগম tuple;
 }
 
 /*
@@ -53,24 +53,24 @@ tuple_alloc(void)
  * Next tuple_set_item() must be called for each item.
  */
     tuple_T *
-tuple_alloc_with_items(int count)
+tuple_alloc_with_বস্তুসমূহ(পূর্ণাঙ্ক গুনতি)
 {
     tuple_T	*tuple;
 
     tuple = tuple_alloc();
-    if (tuple == NULL)
-	return NULL;
+    যদি (tuple == রিক্ত)
+	প্রত্যাগম রিক্ত;
 
-    if (count <= 0)
-	return tuple;
+    যদি (গুনতি <= 0)
+	প্রত্যাগম tuple;
 
-    if (ga_grow(&tuple->tv_items, count) == FAIL)
+    যদি (ga_grow(&tuple->tv_বস্তুসমূহ, গুনতি) == FAIL)
     {
 	tuple_free(tuple);
-	return NULL;
+	প্রত্যাগম রিক্ত;
     }
 
-    return tuple;
+    প্রত্যাগম tuple;
 }
 
 /*
@@ -79,39 +79,39 @@ tuple_alloc_with_items(int count)
  * The contents of "tv" is copied into the tuple item.
  * Each item must be set exactly once.
  */
-    void
-tuple_set_item(tuple_T *tuple, int idx, typval_T *tv)
+    শূন্য
+tuple_set_item(tuple_T *tuple, পূর্ণাঙ্ক idx, typval_T *tv)
 {
     *TUPLE_ITEM(tuple, idx) = *tv;
-    tuple->tv_items.ga_len++;
+    tuple->tv_বস্তুসমূহ.ga_len++;
 }
 
 /*
  * Allocate an empty tuple for a return value, with reference count set.
  * Returns OK or FAIL.
  */
-    int
+    পূর্ণাঙ্ক
 rettv_tuple_alloc(typval_T *rettv)
 {
     tuple_T	*tuple = tuple_alloc();
 
-    if (tuple == NULL)
-	return FAIL;
+    যদি (tuple == রিক্ত)
+	প্রত্যাগম FAIL;
 
     rettv->v_lock = 0;
     rettv_tuple_set(rettv, tuple);
-    return OK;
+    প্রত্যাগম OK;
 }
 
 /*
  * Set a tuple as the return value.  Increments the reference count.
  */
-    void
+    শূন্য
 rettv_tuple_set(typval_T *rettv, tuple_T *tuple)
 {
     rettv->v_type = VAR_TUPLE;
     rettv->vval.v_tuple = tuple;
-    if (tuple != NULL)
+    যদি (tuple != রিক্ত)
 	++tuple->tv_refcount;
 }
 
@@ -119,28 +119,28 @@ rettv_tuple_set(typval_T *rettv, tuple_T *tuple)
  * Set a new tuple with "count" items as the return value.
  * Returns OK on success and FAIL on allocation failure.
  */
-    int
-rettv_tuple_set_with_items(typval_T *rettv, int count)
+    পূর্ণাঙ্ক
+rettv_tuple_set_with_বস্তুসমূহ(typval_T *rettv, পূর্ণাঙ্ক গুনতি)
 {
     tuple_T *new_tuple;
 
-    new_tuple = tuple_alloc_with_items(count);
-    if (new_tuple == NULL)
-	return FAIL;
+    new_tuple = tuple_alloc_with_বস্তুসমূহ(গুনতি);
+    যদি (new_tuple == রিক্ত)
+	প্রত্যাগম FAIL;
 
     rettv_tuple_set(rettv, new_tuple);
 
-    return OK;
+    প্রত্যাগম OK;
 }
 
 /*
  * Unreference a tuple: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    শূন্য
 tuple_unref(tuple_T *tuple)
 {
-    if (tuple != NULL && --tuple->tv_refcount <= 0)
+    যদি (tuple != রিক্ত && --tuple->tv_refcount <= 0)
 	tuple_free(tuple);
 }
 
@@ -148,13 +148,13 @@ tuple_unref(tuple_T *tuple)
  * Free a tuple, including all non-container items it points to.
  * Ignores the reference count.
  */
-    static void
+    স্থির শূন্য
 tuple_free_contents(tuple_T *tuple)
 {
-    for (int i = 0; i < TUPLE_LEN(tuple); i++)
+    প্রতি (পূর্ণাঙ্ক i = 0; i < TUPLE_LEN(tuple); i++)
 	clear_tv(TUPLE_ITEM(tuple, i));
 
-    ga_clear(&tuple->tv_items);
+    ga_clear(&tuple->tv_বস্তুসমূহ);
 }
 
 /*
@@ -162,14 +162,14 @@ tuple_free_contents(tuple_T *tuple)
  * But don't free a tuple that has a watcher (used in a for loop), these
  * are not referenced anywhere.
  */
-    int
-tuple_free_nonref(int copyID)
+    পূর্ণাঙ্ক
+tuple_free_nonref(পূর্ণাঙ্ক copyID)
 {
     tuple_T	*tt;
-    int		did_free = FALSE;
+    পূর্ণাঙ্ক		did_free = FALSE;
 
-    for (tt = first_tuple; tt != NULL; tt = tt->tv_used_next)
-	if ((tt->tv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+    প্রতি (tt = first_tuple; tt != রিক্ত; tt = tt->tv_used_next)
+	যদি ((tt->tv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	{
 	    // Free the Tuple and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -177,33 +177,33 @@ tuple_free_nonref(int copyID)
 	    tuple_free_contents(tt);
 	    did_free = TRUE;
 	}
-    return did_free;
+    প্রত্যাগম did_free;
 }
 
-    static void
+    স্থির শূন্য
 tuple_free_list(tuple_T  *tuple)
 {
     // Remove the tuple from the list of tuples for garbage collection.
-    if (tuple->tv_used_prev == NULL)
+    যদি (tuple->tv_used_prev == রিক্ত)
 	first_tuple = tuple->tv_used_next;
-    else
+    অন্যথা
 	tuple->tv_used_prev->tv_used_next = tuple->tv_used_next;
-    if (tuple->tv_used_next != NULL)
+    যদি (tuple->tv_used_next != রিক্ত)
 	tuple->tv_used_next->tv_used_prev = tuple->tv_used_prev;
 
     free_type(tuple->tv_type);
     vim_free(tuple);
 }
 
-    void
-tuple_free_items(int copyID)
+    শূন্য
+tuple_free_বস্তুসমূহ(পূর্ণাঙ্ক copyID)
 {
     tuple_T	*tt, *tt_next;
 
-    for (tt = first_tuple; tt != NULL; tt = tt_next)
+    প্রতি (tt = first_tuple; tt != রিক্ত; tt = tt_next)
     {
 	tt_next = tt->tv_used_next;
-	if ((tt->tv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
+	যদি ((tt->tv_copyID & COPYID_MASK) != (copyID & COPYID_MASK))
 	{
 	    // Free the tuple and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -213,11 +213,11 @@ tuple_free_items(int copyID)
     }
 }
 
-    void
+    শূন্য
 tuple_free(tuple_T *tuple)
 {
-    if (in_free_unref_items)
-	return;
+    যদি (in_free_unref_বস্তুসমূহ)
+	প্রত্যাগম;
 
     tuple_free_contents(tuple);
     tuple_free_list(tuple);
@@ -229,41 +229,41 @@ tuple_free(tuple_T *tuple)
     long
 tuple_len(tuple_T *tuple)
 {
-    if (tuple == NULL)
-	return 0L;
-    return tuple->tv_items.ga_len;
+    যদি (tuple == রিক্ত)
+	প্রত্যাগম 0L;
+    প্রত্যাগম tuple->tv_বস্তুসমূহ.ga_len;
 }
 
 /*
  * Return TRUE when two tuples have exactly the same values.
  */
-    int
+    পূর্ণাঙ্ক
 tuple_equal(
     tuple_T	*t1,
     tuple_T	*t2,
-    int		ic)	// ignore case for strings
+    পূর্ণাঙ্ক		ic)	// ignore case for strings
 {
-    if (t1 == t2)
-	return TRUE;
+    যদি (t1 == t2)
+	প্রত্যাগম TRUE;
 
-    int t1_len = tuple_len(t1);
-    int t2_len = tuple_len(t2);
+    পূর্ণাঙ্ক t1_len = tuple_len(t1);
+    পূর্ণাঙ্ক t2_len = tuple_len(t2);
 
-    if (t1_len != t2_len)
-	return FALSE;
+    যদি (t1_len != t2_len)
+	প্রত্যাগম FALSE;
 
-    if (t1_len == 0)
+    যদি (t1_len == 0)
 	// empty and NULL tuples are considered equal
-	return TRUE;
+	প্রত্যাগম TRUE;
 
     // If the tuples "t1" or "t2" is NULL, then it is handled by the length
     // checks above.
 
-    for (int i = 0, j = 0; i < t1_len && j < t2_len; i++, j++)
-	if (!tv_equal(TUPLE_ITEM(t1, i), TUPLE_ITEM(t2, j), ic))
-	    return FALSE;
+    প্রতি (পূর্ণাঙ্ক i = 0, j = 0; i < t1_len && j < t2_len; i++, j++)
+	যদি (!tv_equal(TUPLE_ITEM(t1, i), TUPLE_ITEM(t2, j), ic))
+	    প্রত্যাগম FALSE;
 
-    return TRUE;
+    প্রত্যাগম TRUE;
 }
 
 /*
@@ -274,69 +274,69 @@ tuple_equal(
     typval_T *
 tuple_find(tuple_T *tuple, long n)
 {
-    if (tuple == NULL)
-	return NULL;
+    যদি (tuple == রিক্ত)
+	প্রত্যাগম রিক্ত;
 
     // Negative index is relative to the end.
-    if (n < 0)
+    যদি (n < 0)
 	n = TUPLE_LEN(tuple) + n;
 
     // Check for index out of range.
-    if (n < 0 || n >= TUPLE_LEN(tuple))
-	return NULL;
+    যদি (n < 0 || n >= TUPLE_LEN(tuple))
+	প্রত্যাগম রিক্ত;
 
-    return TUPLE_ITEM(tuple, n);
+    প্রত্যাগম TUPLE_ITEM(tuple, n);
 }
 
-    int
+    পূর্ণাঙ্ক
 tuple_append_tv(tuple_T *tuple, typval_T *tv)
 {
-    if (ga_grow_id(&tuple->tv_items, 1, aid_tuple_append) == FAIL)
-	return FAIL;
+    যদি (ga_grow_id(&tuple->tv_বস্তুসমূহ, 1, aid_tuple_append) == FAIL)
+	প্রত্যাগম FAIL;
 
     tuple_set_item(tuple, TUPLE_LEN(tuple), tv);
 
-    return OK;
+    প্রত্যাগম OK;
 }
 
 /*
  * Concatenate tuples "t1" and "t2" into a new tuple, stored in "tv".
  * Return FAIL when out of memory.
  */
-    int
+    পূর্ণাঙ্ক
 tuple_concat(tuple_T *t1, tuple_T *t2, typval_T *tv)
 {
     tuple_T	*tuple;
 
     // make a copy of the first tuple.
-    if (t1 == NULL)
+    যদি (t1 == রিক্ত)
 	tuple = tuple_alloc();
-    else
+    অন্যথা
 	tuple = tuple_copy(t1, FALSE, TRUE, 0);
-    if (tuple == NULL)
-	return FAIL;
+    যদি (tuple == রিক্ত)
+	প্রত্যাগম FAIL;
 
     tv->v_type = VAR_TUPLE;
     tv->v_lock = 0;
     tv->vval.v_tuple = tuple;
-    if (t1 == NULL)
+    যদি (t1 == রিক্ত)
 	++tuple->tv_refcount;
 
     // append all the items from the second tuple
-    for (int i = 0; i < tuple_len(t2); i++)
+    প্রতি (পূর্ণাঙ্ক i = 0; i < tuple_len(t2); i++)
     {
 	typval_T    new_tv;
 
 	copy_tv(TUPLE_ITEM(t2, i), &new_tv);
 
-	if (tuple_append_tv(tuple, &new_tv) == FAIL)
+	যদি (tuple_append_tv(tuple, &new_tv) == FAIL)
 	{
 	    tuple_free(tuple);
-	    return FAIL;
+	    প্রত্যাগম FAIL;
 	}
     }
 
-    return OK;
+    প্রত্যাগম OK;
 }
 
 /*
@@ -348,78 +348,78 @@ tuple_slice(tuple_T *tuple, long n1, long n2)
 {
     tuple_T	*new_tuple;
 
-    new_tuple = tuple_alloc_with_items(n2 - n1 + 1);
-    if (new_tuple == NULL)
-	return NULL;
+    new_tuple = tuple_alloc_with_বস্তুসমূহ(n2 - n1 + 1);
+    যদি (new_tuple == রিক্ত)
+	প্রত্যাগম রিক্ত;
 
-    for (int i = n1; i <= n2; i++)
+    প্রতি (পূর্ণাঙ্ক i = n1; i <= n2; i++)
     {
 	typval_T    new_tv;
 
 	copy_tv(TUPLE_ITEM(tuple, i), &new_tv);
 
-	if (tuple_append_tv(new_tuple, &new_tv) == FAIL)
+	যদি (tuple_append_tv(new_tuple, &new_tv) == FAIL)
 	{
 	    tuple_free(new_tuple);
-	    return NULL;
+	    প্রত্যাগম রিক্ত;
 	}
     }
 
-    return new_tuple;
+    প্রত্যাগম new_tuple;
 }
 
-    int
+    পূর্ণাঙ্ক
 tuple_slice_or_index(
     tuple_T	*tuple,
-    int		range,
+    পূর্ণাঙ্ক		range,
     varnumber_T	n1_arg,
     varnumber_T	n2_arg,
-    int		exclusive,
+    পূর্ণাঙ্ক		exclusive,
     typval_T	*rettv,
-    int		verbose)
+    পূর্ণাঙ্ক		verbose)
 {
     long	len = tuple_len(tuple);
     varnumber_T	n1 = n1_arg;
     varnumber_T	n2 = n2_arg;
     typval_T	var1;
 
-    if (n1 < 0)
+    যদি (n1 < 0)
 	n1 = len + n1;
-    if (n1 < 0 || n1 >= len)
+    যদি (n1 < 0 || n1 >= len)
     {
 	// For a range we allow invalid values and for legacy script return an
 	// empty tuple, for Vim9 script start at the first item.
 	// A tuple index out of range is an error.
-	if (!range)
+	যদি (!range)
 	{
-	    if (verbose)
+	    যদি (verbose)
 		semsg(_(e_tuple_index_out_of_range_nr), (long)n1_arg);
-	    return FAIL;
+	    প্রত্যাগম FAIL;
 	}
-	if (in_vim9script())
+	যদি (in_vim9script())
 	    n1 = n1 < 0 ? 0 : len;
-	else
+	অন্যথা
 	    n1 = len;
     }
-    if (range)
+    যদি (range)
     {
 	tuple_T	*new_tuple;
 
-	if (n2 < 0)
+	যদি (n2 < 0)
 	    n2 = len + n2;
-	else if (n2 >= len)
+	অন্যথা যদি (n2 >= len)
 	    n2 = len - (exclusive ? 0 : 1);
-	if (exclusive)
+	যদি (exclusive)
 	    --n2;
-	if (n2 < 0 || n2 + 1 < n1)
+	যদি (n2 < 0 || n2 + 1 < n1)
 	    n2 = -1;
 	new_tuple = tuple_slice(tuple, n1, n2);
-	if (new_tuple == NULL)
-	    return FAIL;
+	যদি (new_tuple == রিক্ত)
+	    প্রত্যাগম FAIL;
 	clear_tv(rettv);
 	rettv_tuple_set(rettv, new_tuple);
     }
-    else
+    অন্যথা
     {
 	// copy the item to "var1" to avoid that freeing the tuple makes it
 	// invalid.
@@ -427,7 +427,7 @@ tuple_slice_or_index(
 	clear_tv(rettv);
 	*rettv = var1;
     }
-    return OK;
+    প্রত্যাগম OK;
 }
 
 /*
@@ -437,23 +437,23 @@ tuple_slice_or_index(
  * Returns NULL when out of memory.
  */
     tuple_T *
-tuple_copy(tuple_T *orig, int deep, int top, int copyID)
+tuple_copy(tuple_T *orig, পূর্ণাঙ্ক deep, পূর্ণাঙ্ক শীর্ষ, পূর্ণাঙ্ক copyID)
 {
     tuple_T	*copy;
-    int		idx;
+    পূর্ণাঙ্ক		idx;
 
-    if (orig == NULL)
-	return NULL;
+    যদি (orig == রিক্ত)
+	প্রত্যাগম রিক্ত;
 
-    copy = tuple_alloc_with_items(TUPLE_LEN(orig));
-    if (copy == NULL)
-	return NULL;
+    copy = tuple_alloc_with_বস্তুসমূহ(TUPLE_LEN(orig));
+    যদি (copy == রিক্ত)
+	প্রত্যাগম রিক্ত;
 
-    if (orig->tv_type == NULL || top || deep)
-	copy->tv_type = NULL;
-    else
+    যদি (orig->tv_type == রিক্ত || শীর্ষ || deep)
+	copy->tv_type = রিক্ত;
+    অন্যথা
 	copy->tv_type = alloc_type(orig->tv_type);
-    if (copyID != 0)
+    যদি (copyID != 0)
     {
 	// Do this before adding the items, because one of the items may
 	// refer back to this tuple.
@@ -461,27 +461,27 @@ tuple_copy(tuple_T *orig, int deep, int top, int copyID)
 	orig->tv_copytuple = copy;
     }
 
-    for (idx = 0; idx < TUPLE_LEN(orig) && !got_int; idx++)
+    প্রতি (idx = 0; idx < TUPLE_LEN(orig) && !got_int; idx++)
     {
-	copy->tv_items.ga_len++;
-	if (deep)
+	copy->tv_বস্তুসমূহ.ga_len++;
+	যদি (deep)
 	{
-	    if (item_copy(TUPLE_ITEM(orig, idx), TUPLE_ITEM(copy, idx),
+	    যদি (item_copy(TUPLE_ITEM(orig, idx), TUPLE_ITEM(copy, idx),
 						deep, FALSE, copyID) == FAIL)
-		break;
+		ভঙ্গ;
 	}
-	else
+	অন্যথা
 	    copy_tv(TUPLE_ITEM(orig, idx), TUPLE_ITEM(copy, idx));
     }
 
     ++copy->tv_refcount;
-    if (idx != TUPLE_LEN(orig))
+    যদি (idx != TUPLE_LEN(orig))
     {
 	tuple_unref(copy);
-	copy = NULL;
+	copy = রিক্ত;
     }
 
-    return copy;
+    প্রত্যাগম copy;
 }
 
 /*
@@ -490,82 +490,82 @@ tuple_copy(tuple_T *orig, int deep, int top, int copyID)
  * "rettv" contains the first element.
  * Returns OK or FAIL.
  */
-    int
-eval_tuple(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
+    পূর্ণাঙ্ক
+eval_tuple(char_u **arg, typval_T *rettv, evalarg_T *evalarg, পূর্ণাঙ্ক do_error)
 {
-    int		evaluate = evalarg == NULL ? FALSE
+    পূর্ণাঙ্ক		evaluate = evalarg == রিক্ত ? FALSE
 					 : evalarg->eval_flags & EVAL_EVALUATE;
-    tuple_T	*tuple = NULL;
+    tuple_T	*tuple = রিক্ত;
     typval_T	tv;
-    int		vim9script = in_vim9script();
-    int		had_comma;
+    পূর্ণাঙ্ক		vim9script = in_vim9script();
+    পূর্ণাঙ্ক		had_comma;
 
-    if (check_typval_is_value(rettv) == FAIL)
+    যদি (check_typval_is_মান(rettv) == FAIL)
     {
 	// the first item is not a valid value type
 	clear_tv(rettv);
-	return FAIL;
+	প্রত্যাগম FAIL;
     }
 
-    if (evaluate)
+    যদি (evaluate)
     {
 	tuple = tuple_alloc();
-	if (tuple == NULL)
-	    return FAIL;
+	যদি (tuple == রিক্ত)
+	    প্রত্যাগম FAIL;
 
-	if (rettv->v_type != VAR_UNKNOWN)
+	যদি (rettv->v_type != VAR_UNKNOWN)
 	{
 	    // Add the first item to the tuple from "rettv"
-	    if (tuple_append_tv(tuple, rettv) == FAIL)
-		goto failret;
+	    যদি (tuple_append_tv(tuple, rettv) == FAIL)
+		গচ্ছ failret;
 	    // The first item in "rettv" is added to the tuple.  Set the rettv
 	    // type to unknown, so that the caller doesn't free it.
 	    rettv->v_type = VAR_UNKNOWN;
 	}
     }
 
-    if (**arg == ')')
+    যদি (**arg == ')')
 	// empty tuple
-	goto done;
+	গচ্ছ done;
 
-    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ')')
+    যদি (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ')')
     {
 	semsg(_(e_white_space_required_after_str_str), ",", *arg);
-	goto failret;
+	গচ্ছ failret;
     }
 
     *arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-    while (**arg != ')' && **arg != NUL)
+    যাবত্ (**arg != ')' && **arg != NUL)
     {
-	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
-	    goto failret;
-	if (check_typval_is_value(&tv) == FAIL)
+	যদি (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
+	    গচ্ছ failret;
+	যদি (check_typval_is_মান(&tv) == FAIL)
 	{
-	    if (evaluate)
+	    যদি (evaluate)
 		clear_tv(&tv);
-	    goto failret;
+	    গচ্ছ failret;
 	}
 
-	if (evaluate)
+	যদি (evaluate)
 	{
-	    if (tuple_append_tv(tuple, &tv) == FAIL)
+	    যদি (tuple_append_tv(tuple, &tv) == FAIL)
 	    {
 		clear_tv(&tv);
-		goto failret;
+		গচ্ছ failret;
 	    }
 	}
 
-	if (!vim9script)
+	যদি (!vim9script)
 	    *arg = skipwhite(*arg);
 
 	// the comma must come after the value
 	had_comma = **arg == ',';
-	if (had_comma)
+	যদি (had_comma)
 	{
-	    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ')')
+	    যদি (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ')')
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", *arg);
-		goto failret;
+		গচ্ছ failret;
 	    }
 	    *arg = skipwhite(*arg + 1);
 	}
@@ -573,39 +573,39 @@ eval_tuple(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
 	// The ")" can be on the next line.  But a double quoted string may
 	// follow, not a comment.
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == ')')
-	    break;
+	যদি (**arg == ')')
+	    ভঙ্গ;
 
-	if (!had_comma)
+	যদি (!had_comma)
 	{
-	    if (do_error)
+	    যদি (do_error)
 	    {
-		if (**arg == ',')
+		যদি (**arg == ',')
 		    semsg(_(e_no_white_space_allowed_before_str_str),
 								    ",", *arg);
-		else
+		অন্যথা
 		    semsg(_(e_missing_comma_in_tuple_str), *arg);
 	    }
-	    goto failret;
+	    গচ্ছ failret;
 	}
     }
 
-    if (**arg != ')')
+    যদি (**arg != ')')
     {
-	if (do_error)
+	যদি (do_error)
 	    semsg(_(e_missing_end_of_tuple_rsp_str), *arg);
 failret:
-	if (evaluate)
+	যদি (evaluate)
 	    tuple_free(tuple);
-	return FAIL;
+	প্রত্যাগম FAIL;
     }
 
 done:
     *arg += 1;
-    if (evaluate)
+    যদি (evaluate)
 	rettv_tuple_set(rettv, tuple);
 
-    return OK;
+    প্রত্যাগম OK;
 }
 
 /*
@@ -613,44 +613,44 @@ done:
  * When "check_refcount" is TRUE do not lock a tuple with a reference
  * count larger than 1.
  */
-    void
-tuple_lock(tuple_T *tuple, int deep, int lock, int check_refcount)
+    শূন্য
+tuple_lock(tuple_T *tuple, পূর্ণাঙ্ক deep, পূর্ণাঙ্ক lock, পূর্ণাঙ্ক check_refcount)
 {
-    if (tuple == NULL || (check_refcount && tuple->tv_refcount > 1))
-	return;
+    যদি (tuple == রিক্ত || (check_refcount && tuple->tv_refcount > 1))
+	প্রত্যাগম;
 
-    if (lock)
+    যদি (lock)
 	tuple->tv_lock |= VAR_LOCKED;
-    else
+    অন্যথা
 	tuple->tv_lock &= ~VAR_LOCKED;
 
-    if (deep < 0 || deep > 1)
+    যদি (deep < 0 || deep > 1)
     {
 	// recursive: lock/unlock the items the Tuple contains
-	for (int i = 0; i < TUPLE_LEN(tuple); i++)
+	প্রতি (পূর্ণাঙ্ক i = 0; i < TUPLE_LEN(tuple); i++)
 	    item_lock(TUPLE_ITEM(tuple, i), deep - 1, lock, check_refcount);
     }
 }
 
-typedef struct join_S {
+প্রকারনির্দেশ সংরচনা join_S {
     string_T	s;
     char_u	*tofree;
 } join_T;
 
-    static int
+    স্থির পূর্ণাঙ্ক
 tuple_join_inner(
     garray_T	*gap,		// to store the result in
     tuple_T	*tuple,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID,
+    পূর্ণাঙ্ক		echo_style,
+    পূর্ণাঙ্ক		restore_copyID,
+    পূর্ণাঙ্ক		copyID,
     garray_T	*join_gap)	// to keep each tuple item string
 {
-    int		i;
+    পূর্ণাঙ্ক		i;
     join_T	*p;
-    int		sumlen = 0;
-    int		first = TRUE;
+    পূর্ণাঙ্ক		sumlen = 0;
+    পূর্ণাঙ্ক		first = TRUE;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     string_T	s;
@@ -658,67 +658,67 @@ tuple_join_inner(
     size_t	seplen = 0;
 
     // Stringify each item in the tuple.
-    for (i = 0; i < TUPLE_LEN(tuple) && !got_int; i++)
+    প্রতি (i = 0; i < TUPLE_LEN(tuple) && !got_int; i++)
     {
 	tv = TUPLE_ITEM(tuple, i);
 	s.string = echo_string_core(tv, &tofree, numbuf, copyID,
 				      echo_style, restore_copyID, !echo_style);
-	if (s.string == NULL)
-	    return FAIL;
+	যদি (s.string == রিক্ত)
+	    প্রত্যাগম FAIL;
 
 	s.length = STRLEN(s.string);
-	sumlen += (int)s.length;
+	sumlen += (পূর্ণাঙ্ক)s.length;
 
-	(void)ga_grow(join_gap, 1);
+	(শূন্য)ga_grow(join_gap, 1);
 	p = ((join_T *)join_gap->ga_data) + (join_gap->ga_len++);
-	if (tofree != NULL || s.string != numbuf)
+	যদি (tofree != রিক্ত || s.string != numbuf)
 	{
 	    p->s.string = s.string;
 	    p->s.length = s.length;
 	    p->tofree = tofree;
 	}
-	else
+	অন্যথা
 	{
 	    p->s.string = vim_strnsave(s.string, s.length);
 	    p->s.length = s.length;
 	    p->tofree = p->s.string;
 	}
 
-	line_breakcheck();
-	if (did_echo_string_emsg)  // recursion error, bail out
-	    break;
+	সারি_breakcheck();
+	যদি (did_echo_string_emsg)  // recursion error, bail out
+	    ভঙ্গ;
     }
 
     // Allocate result buffer with its total size, avoid re-allocation and
     // multiple copy operations.  Add 2 for a tailing ')' and NUL.
-    if (join_gap->ga_len > 0)
+    যদি (join_gap->ga_len > 0)
     {
 	seplen = STRLEN(sep);
-	if (join_gap->ga_len >= 2)
-	    sumlen += (int)seplen * (join_gap->ga_len - 1);
+	যদি (join_gap->ga_len >= 2)
+	    sumlen += (পূর্ণাঙ্ক)seplen * (join_gap->ga_len - 1);
     }
-    if (ga_grow(gap, sumlen + 2) == FAIL)
-	return FAIL;
+    যদি (ga_grow(gap, sumlen + 2) == FAIL)
+	প্রত্যাগম FAIL;
 
-    for (i = 0; i < join_gap->ga_len && !got_int; ++i)
+    প্রতি (i = 0; i < join_gap->ga_len && !got_int; ++i)
     {
-	if (first)
+	যদি (first)
 	    first = FALSE;
-	else
+	অন্যথা
 	    ga_concat_len(gap, sep, seplen);
 	p = ((join_T *)join_gap->ga_data) + i;
 
-	if (p->s.string != NULL)
+	যদি (p->s.string != রিক্ত)
 	    ga_concat_len(gap, p->s.string, p->s.length);
-	line_breakcheck();
+	সারি_breakcheck();
     }
 
     // If there is only one item in the tuple, then add the separator after
     // that.
-    if (join_gap->ga_len == 1)
+    যদি (join_gap->ga_len == 1)
 	ga_concat_len(gap, sep, seplen);
 
-    return OK;
+    প্রত্যাগম OK;
 }
 
 /*
@@ -726,39 +726,39 @@ tuple_join_inner(
  * When "echo_style" is TRUE use String as echoed, otherwise as inside a Tuple.
  * Return FAIL or OK.
  */
-    int
+    পূর্ণাঙ্ক
 tuple_join(
     garray_T	*gap,
     tuple_T	*tuple,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID)
+    পূর্ণাঙ্ক		echo_style,
+    পূর্ণাঙ্ক		restore_copyID,
+    পূর্ণাঙ্ক		copyID)
 {
     garray_T	join_ga;
-    int		retval;
+    পূর্ণাঙ্ক		retval;
     join_T	*p;
-    int		i;
+    পূর্ণাঙ্ক		i;
 
-    if (TUPLE_LEN(tuple) < 1)
-	return OK; // nothing to do
-    ga_init2(&join_ga, sizeof(join_T), TUPLE_LEN(tuple));
+    যদি (TUPLE_LEN(tuple) < 1)
+	প্রত্যাগম OK; // nothing to do
+    ga_init2(&join_ga, পরিমাণ(join_T), TUPLE_LEN(tuple));
     retval = tuple_join_inner(gap, tuple, sep, echo_style, restore_copyID,
 							    copyID, &join_ga);
 
-    if (join_ga.ga_data == NULL)
-	return retval;
+    যদি (join_ga.ga_data == রিক্ত)
+	প্রত্যাগম retval;
 
     // Dispose each item in join_ga.
     p = (join_T *)join_ga.ga_data;
-    for (i = 0; i < join_ga.ga_len; ++i)
+    প্রতি (i = 0; i < join_ga.ga_len; ++i)
     {
 	vim_free(p->tofree);
 	++p;
     }
     ga_clear(&join_ga);
 
-    return retval;
+    প্রত্যাগম retval;
 }
 
 /*
@@ -766,55 +766,55 @@ tuple_join(
  * May return NULL.
  */
     char_u *
-tuple2string(typval_T *tv, int copyID, int restore_copyID)
+tuple2string(typval_T *tv, পূর্ণাঙ্ক copyID, পূর্ণাঙ্ক restore_copyID)
 {
     garray_T	ga;
 
-    if (tv->vval.v_tuple == NULL)
-	return NULL;
-    ga_init2(&ga, sizeof(char), 80);
+    যদি (tv->vval.v_tuple == রিক্ত)
+	প্রত্যাগম রিক্ত;
+    ga_init2(&ga, পরিমাণ(বর্ণ), 80);
     ga_append(&ga, '(');
-    if (tuple_join(&ga, tv->vval.v_tuple, (char_u *)", ",
+    যদি (tuple_join(&ga, tv->vval.v_tuple, (char_u *)", ",
 				       FALSE, restore_copyID, copyID) == FAIL)
     {
 	vim_free(ga.ga_data);
-	return NULL;
+	প্রত্যাগম রিক্ত;
     }
     ga_append(&ga, ')');
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    প্রত্যাগম (char_u *)ga.ga_data;
 }
 
 /*
  * Implementation of foreach() for a Tuple.  Apply "expr" to
  * every item in Tuple "tuple" and return the result in "rettv".
  */
-    void
+    শূন্য
 tuple_foreach(
     tuple_T	*tuple,
     filtermap_T	filtermap,
-    typval_T	*expr)
+    typval_T	*রাশিমালা)
 {
-    int		len = tuple_len(tuple);
-    int		rem;
+    পূর্ণাঙ্ক		len = tuple_len(tuple);
+    পূর্ণাঙ্ক		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    set_vim_var_type(VV_চাবি, VAR_সংখ্যা);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_রাশিমালা_get_funccal(রাশিমালা, &newtv);
 
-    for (int idx = 0; idx < len; idx++)
+    প্রতি (পূর্ণাঙ্ক idx = 0; idx < len; idx++)
     {
-	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(TUPLE_ITEM(tuple, idx), expr, filtermap, fc,
+	set_vim_var_nr(VV_চাবি, idx);
+	যদি (filter_map_one(TUPLE_ITEM(tuple, idx), রাশিমালা, filtermap, fc,
 						     &newtv, &rem) == FAIL)
-	    break;
+	    ভঙ্গ;
     }
 
-    if (fc != NULL)
+    যদি (fc != রিক্ত)
 	remove_funccal();
 }
 
@@ -823,63 +823,63 @@ tuple_foreach(
  * "idx". Case is ignored if "ic" is TRUE.
  */
     long
-tuple_count(tuple_T *tuple, typval_T *needle, long idx, int ic)
+tuple_গুনতি(tuple_T *tuple, typval_T *needle, long idx, পূর্ণাঙ্ক ic)
 {
     long	n = 0;
 
-    if (tuple == NULL)
-	return 0;
+    যদি (tuple == রিক্ত)
+	প্রত্যাগম 0;
 
-    int	len = TUPLE_LEN(tuple);
-    if (len == 0)
-	return 0;
+    পূর্ণাঙ্ক	len = TUPLE_LEN(tuple);
+    যদি (len == 0)
+	প্রত্যাগম 0;
 
-    if (idx < 0 || idx >= len)
+    যদি (idx < 0 || idx >= len)
     {
 	semsg(_(e_tuple_index_out_of_range_nr), idx);
-	return 0;
+	প্রত্যাগম 0;
     }
 
-    for (int i = idx; i < len; i++)
+    প্রতি (পূর্ণাঙ্ক i = idx; i < len; i++)
     {
-	if (tv_equal(TUPLE_ITEM(tuple, i), needle, ic))
+	যদি (tv_equal(TUPLE_ITEM(tuple, i), needle, ic))
 	    ++n;
     }
 
-    return n;
+    প্রত্যাগম n;
 }
 
 /*
  * "items(tuple)" function
  * Caller must have already checked that argvars[0] is a tuple.
  */
-    void
+    শূন্য
 tuple2items(typval_T *argvars, typval_T *rettv)
 {
     tuple_T	*tuple = argvars[0].vval.v_tuple;
     varnumber_T	idx;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	প্রত্যাগম;
 
-    if (tuple == NULL)
-	return;  // null tuple behaves like an empty list
+    যদি (tuple == রিক্ত)
+	প্রত্যাগম;  // null tuple behaves like an empty list
 
-    for (idx = 0; idx < TUPLE_LEN(tuple); idx++)
+    প্রতি (idx = 0; idx < TUPLE_LEN(tuple); idx++)
     {
 	list_T	*l = list_alloc();
 
-	if (l == NULL)
-	    break;
+	যদি (l == রিক্ত)
+	    ভঙ্গ;
 
-	if (list_append_list(rettv->vval.v_list, l) == FAIL)
+	যদি (list_append_list(rettv->vval.v_list, l) == FAIL)
 	{
 	    list_free(l);
-	    break;
+	    ভঙ্গ;
 	}
-	if (list_append_number(l, idx) == FAIL
+	যদি (list_append_সংখ্যা(l, idx) == FAIL
 		|| list_append_tv(l, TUPLE_ITEM(tuple, idx)) == FAIL)
-	    break;
+	    ভঙ্গ;
     }
 }
 
@@ -889,23 +889,23 @@ tuple2items(typval_T *argvars, typval_T *rettv)
  *
  * Returns the index where "tv" is present or -1 if it is not found.
  */
-    int
-index_tuple(tuple_T *tuple, typval_T *tv, int start_idx, int ic)
+    পূর্ণাঙ্ক
+index_tuple(tuple_T *tuple, typval_T *tv, পূর্ণাঙ্ক start_idx, পূর্ণাঙ্ক ic)
 {
-    if (start_idx < 0)
+    যদি (start_idx < 0)
     {
 	start_idx = TUPLE_LEN(tuple) + start_idx;
-	if (start_idx < 0)
+	যদি (start_idx < 0)
 	    start_idx = 0;
     }
 
-    for (int idx = start_idx; idx < TUPLE_LEN(tuple); idx++)
+    প্রতি (পূর্ণাঙ্ক idx = start_idx; idx < TUPLE_LEN(tuple); idx++)
     {
-	if (tv_equal(TUPLE_ITEM(tuple, idx), tv, ic))
-	    return idx;
+	যদি (tv_equal(TUPLE_ITEM(tuple, idx), tv, ic))
+	    প্রত্যাগম idx;
     }
 
-    return -1;		// "tv" not found
+    প্রত্যাগম -1;		// "tv" not found
 }
 
 /*
@@ -913,46 +913,46 @@ index_tuple(tuple_T *tuple, typval_T *tv, int start_idx, int ic)
  * 'startidx' and return the index of the item where 'expr' is TRUE.  Returns
  * -1 if 'expr' doesn't evaluate to TRUE for any of the items.
  */
-    int
-indexof_tuple(tuple_T *tuple, long startidx, typval_T *expr)
+    পূর্ণাঙ্ক
+indexof_tuple(tuple_T *tuple, long startidx, typval_T *রাশিমালা)
 {
     long	idx = 0;
-    int		len;
-    int		found;
+    পূর্ণাঙ্ক		len;
+    পূর্ণাঙ্ক		found;
 
-    if (tuple == NULL)
-	return -1;
+    যদি (tuple == রিক্ত)
+	প্রত্যাগম -1;
 
     len = TUPLE_LEN(tuple);
 
-    if (startidx < 0)
+    যদি (startidx < 0)
     {
 	// negative index: index from the end
 	startidx = len + startidx;
-	if (startidx < 0)
+	যদি (startidx < 0)
 	    startidx = 0;
     }
 
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    set_vim_var_type(VV_চাবি, VAR_সংখ্যা);
 
-    int		called_emsg_start = called_emsg;
+    পূর্ণাঙ্ক		called_emsg_start = called_emsg;
 
-    for (idx = startidx; idx < len; idx++)
+    প্রতি (idx = startidx; idx < len; idx++)
     {
-	set_vim_var_nr(VV_KEY, idx);
+	set_vim_var_nr(VV_চাবি, idx);
 	copy_tv(TUPLE_ITEM(tuple, idx), get_vim_var_tv(VV_VAL));
 
-	found = indexof_eval_expr(expr);
+	found = indexof_eval_রাশিমালা(রাশিমালা);
 	clear_tv(get_vim_var_tv(VV_VAL));
 
-	if (found)
-	    return idx;
+	যদি (found)
+	    প্রত্যাগম idx;
 
-	if (called_emsg != called_emsg_start)
-	    return -1;
+	যদি (called_emsg != called_emsg_start)
+	    প্রত্যাগম -1;
     }
 
-    return -1;
+    প্রত্যাগম -1;
 }
 
 /*
@@ -960,57 +960,57 @@ indexof_tuple(tuple_T *tuple, long startidx, typval_T *expr)
  * If an error occurs NULL is returned instead.
  */
     typval_T *
-tuple_max_min(tuple_T *tuple, int domax)
+tuple_max_min(tuple_T *tuple, পূর্ণাঙ্ক domax)
 {
-    typval_T	*tv = NULL;
-    int		res;
+    typval_T	*tv = রিক্ত;
+    পূর্ণাঙ্ক		res;
 
-    if (tuple == NULL || TUPLE_LEN(tuple) == 0)
-	return NULL;
+    যদি (tuple == রিক্ত || TUPLE_LEN(tuple) == 0)
+	প্রত্যাগম রিক্ত;
 
-    for (int idx = 0; idx < TUPLE_LEN(tuple); idx++)
+    প্রতি (পূর্ণাঙ্ক idx = 0; idx < TUPLE_LEN(tuple); idx++)
     {
-	if (tv == NULL)
+	যদি (tv == রিক্ত)
 	    tv = TUPLE_ITEM(tuple, idx);
-	else
+	অন্যথা
 	{
-	    if (typval_compare2(TUPLE_ITEM(tuple, idx), tv,
-		    domax ? EXPR_GREATER : EXPR_SMALLER, FALSE, &res) == FAIL)
-		return NULL;
-	    if (res == OK)
+	    যদি (typval_compare2(TUPLE_ITEM(tuple, idx), tv,
+		    domax ? রাশিমালা_GREATER : রাশিমালা_SMALLER, FALSE, &res) == FAIL)
+		প্রত্যাগম রিক্ত;
+	    যদি (res == OK)
 		tv = TUPLE_ITEM(tuple, idx);
 	}
     }
 
-    return tv;
+    প্রত্যাগম tv;
 }
 
 /*
  * Repeat the tuple "tuple" "n" times and set "rettv" to the new tuple.
  */
-    void
+    শূন্য
 tuple_repeat(tuple_T *tuple, varnumber_T n, typval_T *rettv)
 {
     rettv->v_type = VAR_TUPLE;
-    rettv->vval.v_tuple = NULL;
+    rettv->vval.v_tuple = রিক্ত;
 
-    if (tuple == NULL || TUPLE_LEN(tuple) == 0 || n <= 0)
-	return;
+    যদি (tuple == রিক্ত || TUPLE_LEN(tuple) == 0 || n <= 0)
+	প্রত্যাগম;
 
-    if (check_repeat_count(TUPLE_LEN(tuple), n) == FAIL)
-	return;
+    যদি (check_repeat_গুনতি(TUPLE_LEN(tuple), n) == FAIL)
+	প্রত্যাগম;
 
-    if (rettv_tuple_set_with_items(rettv, TUPLE_LEN(tuple) * (int)n) == FAIL)
-	return;
+    যদি (rettv_tuple_set_with_বস্তুসমূহ(rettv, TUPLE_LEN(tuple) * (পূর্ণাঙ্ক)n) == FAIL)
+	প্রত্যাগম;
 
     tuple_T	*new_tuple = rettv->vval.v_tuple;
-    for (int count = 0; count < (int)n; count++)
+    প্রতি (পূর্ণাঙ্ক গুনতি = 0; গুনতি < (পূর্ণাঙ্ক)n; গুনতি++)
     {
-	for (int idx = 0; idx < TUPLE_LEN(tuple); idx++)
+	প্রতি (পূর্ণাঙ্ক idx = 0; idx < TUPLE_LEN(tuple); idx++)
 	{
 	    copy_tv(TUPLE_ITEM(tuple, idx),
 		    TUPLE_ITEM(new_tuple, TUPLE_LEN(new_tuple)));
-	    new_tuple->tv_items.ga_len++;
+	    new_tuple->tv_বস্তুসমূহ.ga_len++;
 	}
     }
 }
@@ -1018,51 +1018,51 @@ tuple_repeat(tuple_T *tuple, varnumber_T n, typval_T *rettv)
 /*
  * Reverse "tuple" and return the new tuple in "rettv"
  */
-    void
+    শূন্য
 tuple_reverse(tuple_T *tuple, typval_T *rettv)
 {
     rettv->v_type = VAR_TUPLE;
-    rettv->vval.v_tuple = NULL;
+    rettv->vval.v_tuple = রিক্ত;
 
-    int	len = tuple_len(tuple);
+    পূর্ণাঙ্ক	len = tuple_len(tuple);
 
-    if (len == 0)
-	return;
+    যদি (len == 0)
+	প্রত্যাগম;
 
-    if (rettv_tuple_set_with_items(rettv, len) == FAIL)
-	return;
+    যদি (rettv_tuple_set_with_বস্তুসমূহ(rettv, len) == FAIL)
+	প্রত্যাগম;
 
     tuple_T	*new_tuple = rettv->vval.v_tuple;
-    for (int i = 0; i < len; i++)
+    প্রতি (পূর্ণাঙ্ক i = 0; i < len; i++)
 	copy_tv(TUPLE_ITEM(tuple, i), TUPLE_ITEM(new_tuple, len - i - 1));
-    new_tuple->tv_items.ga_len = tuple->tv_items.ga_len;
+    new_tuple->tv_বস্তুসমূহ.ga_len = tuple->tv_বস্তুসমূহ.ga_len;
 }
 
 /*
  * Tuple reduce() function
  */
-    void
-tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
+    শূন্য
+tuple_reduce(typval_T *argvars, typval_T *রাশিমালা, typval_T *rettv)
 {
     tuple_T	*tuple = argvars[0].vval.v_tuple;
-    int		called_emsg_start = called_emsg;
+    পূর্ণাঙ্ক		called_emsg_start = called_emsg;
     typval_T	initial;
-    int		idx = 0;
+    পূর্ণাঙ্ক		idx = 0;
     funccall_T	*fc;
     typval_T	argv[3];
-    int		r;
+    পূর্ণাঙ্ক		r;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    যদি (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (tuple == NULL || TUPLE_LEN(tuple) == 0)
+	যদি (tuple == রিক্ত || TUPLE_LEN(tuple) == 0)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "Tuple");
-	    return;
+	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_মান), "Tuple");
+	    প্রত্যাগম;
 	}
 	initial = *TUPLE_ITEM(tuple, 0);
 	idx = 1;
     }
-    else
+    অন্যথা
     {
 	initial = argvars[2];
 	idx = 0;
@@ -1070,27 +1070,27 @@ tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
 
     copy_tv(&initial, rettv);
 
-    if (tuple == NULL)
-	return;
+    যদি (tuple == রিক্ত)
+	প্রত্যাগম;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_রাশিমালা_get_funccal(রাশিমালা, rettv);
 
-    for ( ; idx < TUPLE_LEN(tuple); idx++)
+    প্রতি ( ; idx < TUPLE_LEN(tuple); idx++)
     {
 	argv[0] = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 	argv[1] = *TUPLE_ITEM(tuple, idx);
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_রাশিমালা_typval(রাশিমালা, TRUE, argv, 2, fc, rettv);
 
 	clear_tv(&argv[0]);
 
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	যদি (r == FAIL || called_emsg != called_emsg_start)
+	    ভঙ্গ;
     }
 
-    if (fc != NULL)
+    যদি (fc != রিক্ত)
 	remove_funccal();
 }
 
@@ -1098,38 +1098,38 @@ tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
  * Returns TRUE if two tuples with types "type1" and "type2" are addable.
  * Otherwise returns FALSE.
  */
-    int
+    পূর্ণাঙ্ক
 check_tuples_addable(type_T *type1, type_T *type2)
 {
-    int	addable = TRUE;
+    পূর্ণাঙ্ক	addable = TRUE;
 
     // If the first operand is a variadic tuple and the second argument is
     // non-variadic, then concatenation is not possible.
-    if ((type1->tt_flags & TTFLAG_VARARGS)
+    যদি ((type1->tt_flags & TTFLAG_VARARGS)
 	    && !(type2->tt_flags & TTFLAG_VARARGS)
 	    && (type2->tt_argcount > 0))
 	addable = FALSE;
 
-    if ((type1->tt_flags & TTFLAG_VARARGS)
+    যদি ((type1->tt_flags & TTFLAG_VARARGS)
 	    && (type2->tt_flags & TTFLAG_VARARGS))
     {
 	// two variadic tuples
-	if (type1->tt_argcount > 1 || type2->tt_argcount > 1)
+	যদি (type1->tt_argcount > 1 || type2->tt_argcount > 1)
 	    // one of the variadic tuple has fixed number of items
 	    addable = FALSE;
-	else if ((type1->tt_argcount == 1 && type2->tt_argcount == 1)
+	অন্যথা যদি ((type1->tt_argcount == 1 && type2->tt_argcount == 1)
 		&& !equal_type(type1->tt_args[0], type2->tt_args[0], 0))
 	    // the tuples have different item types
 	    addable = FALSE;
     }
 
-    if (!addable)
+    যদি (!addable)
     {
 	emsg(_(e_cannot_use_variadic_tuple_in_concatenation));
-	return FAIL;
+	প্রত্যাগম FAIL;
     }
 
-    return OK;
+    প্রত্যাগম OK;
 }
 
 #endif // defined(FEAT_EVAL)

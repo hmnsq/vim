@@ -2,53 +2,53 @@
 // backslash it needs to be doubled.
 // Public domain.
 
-#include <stdio.h>
-#include <string.h>
+#অন্তর্ভাব <stdio.h>
+#অন্তর্ভাব <string.h>
 
 #ifdef _WIN32
 #	include <fcntl.h>
 #	include <io.h>
 #endif
 
-	int
-main(int argc, char **argv)
+	পূর্ণাঙ্ক
+main(পূর্ণাঙ্ক argc, বর্ণ **argv)
 {
-	char buffer[BUFSIZ];
-	char *p;
+	বর্ণ buffer[BUFSIZ];
+	বর্ণ *p;
 
 	// Windows only: put standard input and output into binary mode so that the
 	// line endings in the output match those in the input.
 #ifdef _WIN32
-	_setmode(_fileno(stdin), _O_BINARY);
-	_setmode(_fileno(stdout), _O_BINARY);
+	_setmode(_fileno(stdin), O_দ্বিমিক_2);
+	_setmode(_fileno(stdout), O_দ্বিমিক_2);
 #endif
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	যাবত্ (fgets(buffer, BUFSIZ, stdin) != রিক্ত)
 	{
-		for (p = buffer; *p != 0; p++)
+		প্রতি (p = buffer; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
+			যদি (strncmp(p, "charset=utf-8", 13) == 0
 				|| strncmp(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=CP932", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations.", 24) == 0)
+			অন্যথা যদি (strncmp(p, "# Original translations.", 24) == 0)
 			{
 				p += 24 - 1; // subtracting 1 by considering "p++" in the loop.
 				fputs("# Generated from ja.po, DO NOT EDIT.", stdout);
 			}
-			else if (*(unsigned char *)p == 0x81 && p[1] == '_')
+			অন্যথা যদি (*(unsigned বর্ণ *)p == 0x81 && p[1] == '_')
 			{
 				putchar('\\');
 				++p;
 			}
-			else
+			অন্যথা
 			{
-				if (*p & 0x80)
+				যদি (*p & 0x80)
 				{
 					putchar(*p++);
-					if (*p == '\\')
+					যদি (*p == '\\')
 						putchar(*p);
 				}
 				putchar(*p);

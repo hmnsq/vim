@@ -53,7 +53,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
 #ifdef MSWIN
 
@@ -75,36 +75,36 @@
  * builds linking against msvcrt.dll fall back to the deprecated tzname[]
  * global (mingw-w64 already exposes the POSIX-named tzname[]).
  */
-#if defined(_UCRT) || defined(_MSC_VER)
+#যদি defined(_UCRT) || defined(_MSC_VER)
 # define USE_GET_TZNAME
 #endif
 
 /* Locale tables (English / "C" locale). */
-static const char *const c_day[] = {
+স্থির ধ্রুব বর্ণ *ধ্রুব c_day[] = {
     "Sunday", "Monday", "Tuesday", "Wednesday",
     "Thursday", "Friday", "Saturday"
 };
-static const char *const c_abday[] = {
+স্থির ধ্রুব বর্ণ *ধ্রুব c_abday[] = {
     "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 };
-static const char *const c_mon[] = {
+স্থির ধ্রুব বর্ণ *ধ্রুব c_mon[] = {
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 };
-static const char *const c_abmon[] = {
+স্থির ধ্রুব বর্ণ *ধ্রুব c_abmon[] = {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
-static const char *const c_am_pm[] = { "AM", "PM" };
-static const char c_d_t_fmt[] = "%a %b %e %H:%M:%S %Y";
-static const char c_d_fmt[] = "%m/%d/%y";
-static const char c_t_fmt[] = "%H:%M:%S";
-static const char c_t_fmt_ampm[] = "%I:%M:%S %p";
+স্থির ধ্রুব বর্ণ *ধ্রুব c_am_pm[] = { "AM", "PM" };
+স্থির ধ্রুব বর্ণ c_d_t_fmt[] = "%a %b %e %H:%M:%S %Y";
+স্থির ধ্রুব বর্ণ c_d_fmt[] = "%m/%d/%y";
+স্থির ধ্রুব বর্ণ c_t_fmt[] = "%H:%M:%S";
+স্থির ধ্রুব বর্ণ c_t_fmt_ampm[] = "%I:%M:%S %p";
 
-static const unsigned char *conv_num(const unsigned char *, int *,
-						unsigned int, unsigned int);
-static const unsigned char *find_string(const unsigned char *, int *,
-			const char * const *, const char * const *, int);
+স্থির ধ্রুব unsigned বর্ণ *conv_অঙ্ক(ধ্রুব unsigned বর্ণ *, পূর্ণাঙ্ক *,
+						unsigned পূর্ণাঙ্ক, unsigned পূর্ণাঙ্ক);
+স্থির ধ্রুব unsigned বর্ণ *find_string(ধ্রুব unsigned বর্ণ *, পূর্ণাঙ্ক *,
+			ধ্রুব বর্ণ * ধ্রুব *, ধ্রুব বর্ণ * ধ্রুব *, পূর্ণাঙ্ক);
 
 /*
  * We do not implement alternate representations. However, we always
@@ -112,7 +112,7 @@ static const unsigned char *find_string(const unsigned char *, int *,
  */
 #define ALT_E			0x01
 #define ALT_O			0x02
-#define LEGAL_ALT(x)		{ if (alt_format & ~(x)) return NULL; }
+#define LEGAL_ALT(x)		{ যদি (alt_format & ~(x)) প্রত্যাগম রিক্ত; }
 
 #define S_YEAR			(1 << 0)
 #define S_MON			(1 << 1)
@@ -129,10 +129,10 @@ static const unsigned char *find_string(const unsigned char *, int *,
 #define HAVE_HOUR(s)		(s & S_HOUR)
 
 /* RFC-822/RFC-2822 */
-static const char *const nast[5] = {
+স্থির ধ্রুব বর্ণ *ধ্রুব nast[5] = {
     "EST",    "CST",    "MST",    "PST",    "\0\0\0"
 };
-static const char *const nadt[5] = {
+স্থির ধ্রুব বর্ণ *ধ্রুব nadt[5] = {
     "EDT",    "CDT",    "MDT",    "PDT",    "\0\0\0"
 };
 
@@ -140,7 +140,7 @@ static const char *const nadt[5] = {
  * Table to determine the ordinal date for the start of a month.
  * Ref: http://en.wikipedia.org/wiki/ISO_week_date
  */
-static const int start_of_month[2][13] = {
+স্থির ধ্রুব পূর্ণাঙ্ক start_of_month[2][13] = {
     /* non-leap year */
     { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 },
     /* leap year */
@@ -153,14 +153,14 @@ static const int start_of_month[2][13] = {
  * and its colonies. Ref:
  * http://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week
  */
-    static int
-first_wday_of(int yr)
+    স্থির পূর্ণাঙ্ক
+first_wday_of(পূর্ণাঙ্ক yr)
 {
-    return ((2 * (3 - (yr / 100) % 4)) + (yr % 100) + ((yr % 100) /  4) +
+    প্রত্যাগম ((2 * (3 - (yr / 100) % 4)) + (yr % 100) + ((yr % 100) /  4) +
 	    (isleap(yr) ? 6 : 0) + 1) % 7;
 }
 
-#define delim(p)	((p) == '\0' || isspace((unsigned char)(p)))
+#define delim(p)	((p) == '\0' || isspace((unsigned বর্ণ)(p)))
 
 /*
  * Stub replacing NetBSD's fromzone(): the Windows CRT does not provide
@@ -168,325 +168,325 @@ first_wday_of(int yr)
  * we simply decline to recognize arbitrary timezone names.  The %Z / %z
  * numeric and RFC-822/2822 forms are still handled by the caller.
  */
-    static int
-fromzone(const unsigned char **bp UNUSED, struct tm *tm UNUSED,
-						    int mandatory UNUSED)
+    স্থির পূর্ণাঙ্ক
+fromzone(ধ্রুব unsigned বর্ণ **bp UNUSED, সংরচনা tm *tm UNUSED,
+						    পূর্ণাঙ্ক mandatory UNUSED)
 {
-    return 0;
+    প্রত্যাগম 0;
 }
 
-    char *
-strptime(const char *buf, const char *fmt, struct tm *tm)
+    বর্ণ *
+strptime(ধ্রুব বর্ণ *buf, ধ্রুব বর্ণ *fmt, সংরচনা tm *tm)
 {
-    unsigned char c;
-    const unsigned char *bp, *ep, *zname;
-    int alt_format, i, split_year = 0, neg = 0, state = 0,
+    unsigned বর্ণ c;
+    ধ্রুব unsigned বর্ণ *bp, *ep, *zname;
+    পূর্ণাঙ্ক alt_format, i, split_year = 0, neg = 0, state = 0,
 	day_offset = -1, week_offset = 0, offs, mandatory;
-    const char *new_fmt;
+    ধ্রুব বর্ণ *new_fmt;
 
-    bp = (const unsigned char *)buf;
+    bp = (ধ্রুব unsigned বর্ণ *)buf;
 
-    while (bp != NULL && (c = *fmt++) != '\0')
+    যাবত্ (bp != রিক্ত && (c = *fmt++) != '\0')
     {
 	/* Clear `alternate' modifier prior to new conversion. */
 	alt_format = 0;
 	i = 0;
 
 	/* Eat up white-space. */
-	if (isspace(c))
+	যদি (isspace(c))
 	{
-	    while (isspace(*bp))
+	    যাবত্ (isspace(*bp))
 		bp++;
-	    continue;
+	    অনুবর্ত;
 	}
 
-	if (c != '%')
-	    goto literal;
+	যদি (c != '%')
+	    গচ্ছ literal;
 
 
-again:	switch (c = *fmt++)
+again:	বিকল্প (c = *fmt++)
 	{
-	case '%':	/* "%%" is converted to "%". */
+	পক্ষ '%':	/* "%%" is converted to "%". */
 literal:
-	    if (c != *bp++)
-		return NULL;
+	    যদি (c != *bp++)
+		প্রত্যাগম রিক্ত;
 	    LEGAL_ALT(0);
-	    continue;
+	    অনুবর্ত;
 
 	/*
 	 * "Alternative" modifiers. Just set the appropriate flag
 	 * and start over again.
 	 */
-	case 'E':	/* "%E?" alternative conversion modifier. */
+	পক্ষ 'E':	/* "%E?" alternative conversion modifier. */
 	    LEGAL_ALT(0);
 	    alt_format |= ALT_E;
-	    goto again;
+	    গচ্ছ again;
 
-	case 'O':	/* "%O?" alternative conversion modifier. */
+	পক্ষ 'O':	/* "%O?" alternative conversion modifier. */
 	    LEGAL_ALT(0);
 	    alt_format |= ALT_O;
-	    goto again;
+	    গচ্ছ again;
 
 	/*
 	 * "Complex" conversion rules, implemented through recursion.
 	 */
-	case 'c':	/* Date and time, using the locale's format. */
+	পক্ষ 'c':	/* Date and time, using the locale's format. */
 	    new_fmt = c_d_t_fmt;
 	    state |= S_WDAY | S_MON | S_MDAY | S_YEAR;
-	    goto recurse;
+	    গচ্ছ recurse;
 
-	case 'D':	/* The date as "%m/%d/%y". */
+	পক্ষ 'D':	/* The date as "%m/%d/%y". */
 	    new_fmt = "%m/%d/%y";
 	    LEGAL_ALT(0);
 	    state |= S_MON | S_MDAY | S_YEAR;
-	    goto recurse;
+	    গচ্ছ recurse;
 
-	case 'F':	/* The date as "%Y-%m-%d". */
+	পক্ষ 'F':	/* The date as "%Y-%m-%d". */
 	    new_fmt = "%Y-%m-%d";
 	    LEGAL_ALT(0);
 	    state |= S_MON | S_MDAY | S_YEAR;
-	    goto recurse;
+	    গচ্ছ recurse;
 
-	case 'R':	/* The time as "%H:%M". */
+	পক্ষ 'R':	/* The time as "%H:%M". */
 	    new_fmt = "%H:%M";
 	    LEGAL_ALT(0);
-	    goto recurse;
+	    গচ্ছ recurse;
 
-	case 'r':	/* The time in 12-hour clock representation. */
+	পক্ষ 'r':	/* The time in 12-hour clock representation. */
 	    new_fmt = c_t_fmt_ampm;
 	    LEGAL_ALT(0);
-	    goto recurse;
+	    গচ্ছ recurse;
 
-	case 'T':	/* The time as "%H:%M:%S". */
+	পক্ষ 'T':	/* The time as "%H:%M:%S". */
 	    new_fmt = "%H:%M:%S";
 	    LEGAL_ALT(0);
-	    goto recurse;
+	    গচ্ছ recurse;
 
-	case 'X':	/* The time, using the locale's format. */
+	পক্ষ 'X':	/* The time, using the locale's format. */
 	    new_fmt = c_t_fmt;
-	    goto recurse;
+	    গচ্ছ recurse;
 
-	case 'x':	/* The date, using the locale's format. */
+	পক্ষ 'x':	/* The date, using the locale's format. */
 	    new_fmt = c_d_fmt;
 	    state |= S_MON | S_MDAY | S_YEAR;
 	recurse:
-	    bp = (const unsigned char *)strptime((const char *)bp,
+	    bp = (ধ্রুব unsigned বর্ণ *)strptime((ধ্রুব বর্ণ *)bp,
 							new_fmt, tm);
 	    LEGAL_ALT(ALT_E);
-	    continue;
+	    অনুবর্ত;
 
 	/*
 	 * "Elementary" conversion rules.
 	 */
-	case 'A':	/* The day of week, using the locale's form. */
-	case 'a':
+	পক্ষ 'A':	/* The day of week, using the locale's form. */
+	পক্ষ 'a':
 	    bp = find_string(bp, &tm->tm_wday, c_day, c_abday, 7);
 	    LEGAL_ALT(0);
 	    state |= S_WDAY;
-	    continue;
+	    অনুবর্ত;
 
-	case 'B':	/* The month, using the locale's form. */
-	case 'b':
-	case 'h':
+	পক্ষ 'B':	/* The month, using the locale's form. */
+	পক্ষ 'b':
+	পক্ষ 'h':
 	    bp = find_string(bp, &tm->tm_mon, c_mon, c_abmon, 12);
 	    LEGAL_ALT(0);
 	    state |= S_MON;
-	    continue;
+	    অনুবর্ত;
 
-	case 'C':	/* The century number. */
+	পক্ষ 'C':	/* The century number. */
 	    i = 20;
-	    bp = conv_num(bp, &i, 0, 99);
+	    bp = conv_অঙ্ক(bp, &i, 0, 99);
 
 	    i = i * 100 - TM_YEAR_BASE;
-	    if (split_year)
+	    যদি (split_year)
 		i += tm->tm_year % 100;
 	    split_year = 1;
 	    tm->tm_year = i;
 	    LEGAL_ALT(ALT_E);
 	    state |= S_YEAR;
-	    continue;
+	    অনুবর্ত;
 
-	case 'd':	/* The day of month. */
-	case 'e':
-	    bp = conv_num(bp, &tm->tm_mday, 1, 31);
+	পক্ষ 'd':	/* The day of month. */
+	পক্ষ 'e':
+	    bp = conv_অঙ্ক(bp, &tm->tm_mday, 1, 31);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_MDAY;
-	    continue;
+	    অনুবর্ত;
 
-	case 'k':	/* The hour (24-hour clock representation). */
+	পক্ষ 'k':	/* The hour (24-hour clock representation). */
 	    LEGAL_ALT(0);
 	    /* FALLTHROUGH */
-	case 'H':
-	    bp = conv_num(bp, &tm->tm_hour, 0, 23);
+	পক্ষ 'H':
+	    bp = conv_অঙ্ক(bp, &tm->tm_hour, 0, 23);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_HOUR;
-	    continue;
+	    অনুবর্ত;
 
-	case 'l':	/* The hour (12-hour clock representation). */
+	পক্ষ 'l':	/* The hour (12-hour clock representation). */
 	    LEGAL_ALT(0);
 	    /* FALLTHROUGH */
-	case 'I':
-	    bp = conv_num(bp, &tm->tm_hour, 1, 12);
-	    if (tm->tm_hour == 12)
+	পক্ষ 'I':
+	    bp = conv_অঙ্ক(bp, &tm->tm_hour, 1, 12);
+	    যদি (tm->tm_hour == 12)
 		tm->tm_hour = 0;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_HOUR;
-	    continue;
+	    অনুবর্ত;
 
-	case 'j':	/* The day of year. */
+	পক্ষ 'j':	/* The day of year. */
 	    i = 1;
-	    bp = conv_num(bp, &i, 1, 366);
+	    bp = conv_অঙ্ক(bp, &i, 1, 366);
 	    tm->tm_yday = i - 1;
 	    LEGAL_ALT(0);
 	    state |= S_YDAY;
-	    continue;
+	    অনুবর্ত;
 
-	case 'M':	/* The minute. */
-	    bp = conv_num(bp, &tm->tm_min, 0, 59);
+	পক্ষ 'M':	/* The minute. */
+	    bp = conv_অঙ্ক(bp, &tm->tm_min, 0, 59);
 	    LEGAL_ALT(ALT_O);
-	    continue;
+	    অনুবর্ত;
 
-	case 'm':	/* The month. */
+	পক্ষ 'm':	/* The month. */
 	    i = 1;
-	    bp = conv_num(bp, &i, 1, 12);
+	    bp = conv_অঙ্ক(bp, &i, 1, 12);
 	    tm->tm_mon = i - 1;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_MON;
-	    continue;
+	    অনুবর্ত;
 
-	case 'p':	/* The locale's equivalent of AM/PM. */
-	    bp = find_string(bp, &i, c_am_pm, NULL, 2);
-	    if (HAVE_HOUR(state) && tm->tm_hour > 11)
-		return NULL;
+	পক্ষ 'p':	/* The locale's equivalent of AM/PM. */
+	    bp = find_string(bp, &i, c_am_pm, রিক্ত, 2);
+	    যদি (HAVE_HOUR(state) && tm->tm_hour > 11)
+		প্রত্যাগম রিক্ত;
 	    tm->tm_hour += i * 12;
 	    LEGAL_ALT(0);
-	    continue;
+	    অনুবর্ত;
 
-	case 'S':	/* The seconds. */
-	    bp = conv_num(bp, &tm->tm_sec, 0, 61);
+	পক্ষ 'S':	/* The seconds. */
+	    bp = conv_অঙ্ক(bp, &tm->tm_sec, 0, 61);
 	    LEGAL_ALT(ALT_O);
-	    continue;
+	    অনুবর্ত;
 
-	case 's':	/* seconds since the epoch */
+	পক্ষ 's':	/* seconds since the epoch */
 	    {
-		const time_t TIME_MAX = (time_t)((sizeof(time_t) == 8)
+		ধ্রুব time_t TIME_MAX = (time_t)((পরিমাণ(time_t) == 8)
 					? LLONG_MAX : INT_MAX);
 		time_t sse, d;
 
-		if (*bp < '0' || *bp > '9')
+		যদি (*bp < '0' || *bp > '9')
 		{
-		    bp = NULL;
-		    continue;
+		    bp = রিক্ত;
+		    অনুবর্ত;
 		}
 
 		sse = *bp++ - '0';
-		while (*bp >= '0' && *bp <= '9')
+		যাবত্ (*bp >= '0' && *bp <= '9')
 		{
 		    d = *bp++ - '0';
-		    if (sse > TIME_MAX / 10)
+		    যদি (sse > TIME_MAX / 10)
 		    {
-			bp = NULL;
-			break;
+			bp = রিক্ত;
+			ভঙ্গ;
 		    }
 		    sse *= 10;
-		    if (sse > TIME_MAX - d)
+		    যদি (sse > TIME_MAX - d)
 		    {
-			bp = NULL;
-			break;
+			bp = রিক্ত;
+			ভঙ্গ;
 		    }
 		    sse += d;
 		}
-		if (bp == NULL)
-		    continue;
+		যদি (bp == রিক্ত)
+		    অনুবর্ত;
 
 		{
-		    struct tm *lt = localtime(&sse);
+		    সংরচনা tm *lt = localtime(&sse);
 
-		    if (lt == NULL)
-			bp = NULL;
-		    else
+		    যদি (lt == রিক্ত)
+			bp = রিক্ত;
+		    অন্যথা
 		    {
 			*tm = *lt;
 			state |= S_YDAY | S_WDAY |
 				S_MON | S_MDAY | S_YEAR;
 		    }
 		}
-		continue;
+		অনুবর্ত;
 	    }
 
-	case 'U':	/* The week of year, beginning on sunday. */
-	case 'W':	/* The week of year, beginning on monday. */
+	পক্ষ 'U':	/* The week of year, beginning on sunday. */
+	পক্ষ 'W':	/* The week of year, beginning on monday. */
 	    /*
 	     * This is bogus, as we can not assume any valid
 	     * information present in the tm structure at this
 	     * point to calculate a real value, so save the
 	     * week for now in case it can be used later.
 	     */
-	    bp = conv_num(bp, &i, 0, 53);
+	    bp = conv_অঙ্ক(bp, &i, 0, 53);
 	    LEGAL_ALT(ALT_O);
-	    if (c == 'U')
+	    যদি (c == 'U')
 		day_offset = TM_SUNDAY;
-	    else
+	    অন্যথা
 		day_offset = TM_MONDAY;
 	    week_offset = i;
-	    continue;
+	    অনুবর্ত;
 
-	case 'w':	/* The day of week, beginning on sunday. */
-	    bp = conv_num(bp, &tm->tm_wday, 0, 6);
+	পক্ষ 'w':	/* The day of week, beginning on sunday. */
+	    bp = conv_অঙ্ক(bp, &tm->tm_wday, 0, 6);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_WDAY;
-	    continue;
+	    অনুবর্ত;
 
-	case 'u':	/* The day of week, monday = 1. */
-	    bp = conv_num(bp, &i, 1, 7);
+	পক্ষ 'u':	/* The day of week, monday = 1. */
+	    bp = conv_অঙ্ক(bp, &i, 1, 7);
 	    tm->tm_wday = i % 7;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_WDAY;
-	    continue;
+	    অনুবর্ত;
 
-	case 'g':	/* ISO week year without century (parsed, ignored). */
-	    bp = conv_num(bp, &i, 0, 99);
-	    continue;
+	পক্ষ 'g':	/* ISO week year without century (parsed, ignored). */
+	    bp = conv_অঙ্ক(bp, &i, 0, 99);
+	    অনুবর্ত;
 
-	case 'G':	/* ISO week year with century (parsed, ignored). */
-	    do
+	পক্ষ 'G':	/* ISO week year with century (parsed, ignored). */
+	    কুরু
 		bp++;
-	    while (isdigit(*bp));
-	    continue;
+	    যাবত্ (isdigit(*bp));
+	    অনুবর্ত;
 
-	case 'V':	/* ISO 8601:1988 week number (parsed, ignored). */
-	    bp = conv_num(bp, &i, 1, 53);
-	    continue;
+	পক্ষ 'V':	/* ISO 8601:1988 week number (parsed, ignored). */
+	    bp = conv_অঙ্ক(bp, &i, 1, 53);
+	    অনুবর্ত;
 
-	case 'Y':	/* The year. */
+	পক্ষ 'Y':	/* The year. */
 	    i = TM_YEAR_BASE;	/* just for data sanity... */
-	    bp = conv_num(bp, &i, 0, 9999);
+	    bp = conv_অঙ্ক(bp, &i, 0, 9999);
 	    tm->tm_year = i - TM_YEAR_BASE;
 	    LEGAL_ALT(ALT_E);
 	    state |= S_YEAR;
-	    continue;
+	    অনুবর্ত;
 
-	case 'y':	/* The year within 100 years of the epoch. */
+	পক্ষ 'y':	/* The year within 100 years of the epoch. */
 	    /* LEGAL_ALT(ALT_E | ALT_O); */
-	    bp = conv_num(bp, &i, 0, 99);
+	    bp = conv_অঙ্ক(bp, &i, 0, 99);
 
-	    if (split_year)
+	    যদি (split_year)
 		/* preserve century */
 		i += (tm->tm_year / 100) * 100;
-	    else
+	    অন্যথা
 	    {
 		split_year = 1;
-		if (i <= 68)
+		যদি (i <= 68)
 		    i = i + 2000 - TM_YEAR_BASE;
-		else
+		অন্যথা
 		    i = i + 1900 - TM_YEAR_BASE;
 	    }
 	    tm->tm_year = i;
 	    state |= S_YEAR;
-	    continue;
+	    অনুবর্ত;
 
-	case 'Z':
-	case 'z':
+	পক্ষ 'Z':
+	পক্ষ 'z':
 	    tzset();
 	    mandatory = c == 'z';
 	    /*
@@ -508,71 +508,71 @@ literal:
 	     * Note: J maybe used to denote non-nautical
 	     *       local time
 	     */
-	    if (mandatory)
-		while (isspace(*bp))
+	    যদি (mandatory)
+		যাবত্ (isspace(*bp))
 		    bp++;
 
 	    zname = bp;
-	    switch (*bp++)
+	    বিকল্প (*bp++)
 	    {
-	    case 'G':
-		if (*bp++ != 'M')
-		    goto namedzone;
+	    পক্ষ 'G':
+		যদি (*bp++ != 'M')
+		    গচ্ছ namedzone;
 		/*FALLTHROUGH*/
-	    case 'U':
-		if (*bp++ != 'T')
-		    goto namedzone;
-		else if (!delim(*bp) && *bp++ != 'C')
-		    goto namedzone;
+	    পক্ষ 'U':
+		যদি (*bp++ != 'T')
+		    গচ্ছ namedzone;
+		অন্যথা যদি (!delim(*bp) && *bp++ != 'C')
+		    গচ্ছ namedzone;
 		/*FALLTHROUGH*/
-	    case 'Z':
-		if (!delim(*bp))
-		    goto namedzone;
+	    পক্ষ 'Z':
+		যদি (!delim(*bp))
+		    গচ্ছ namedzone;
 		tm->tm_isdst = 0;
-		continue;
-	    case '+':
+		অনুবর্ত;
+	    পক্ষ '+':
 		neg = 0;
-		break;
-	    case '-':
+		ভঙ্গ;
+	    পক্ষ '-':
 		neg = 1;
-		break;
-	    default:
+		ভঙ্গ;
+	    স্বভাব:
 namedzone:
 		bp = zname;
 
 		/* Nautical / Military style */
-		if (delim(bp[1]) &&
+		যদি (delim(bp[1]) &&
 			((*bp >= 'A' && *bp <= 'I') ||
 			 (*bp >= 'L' && *bp <= 'Y')))
 		{
 		    bp++;
-		    continue;
+		    অনুবর্ত;
 		}
 		/* 'J' is local time */
-		if (delim(bp[1]) && *bp == 'J')
+		যদি (delim(bp[1]) && *bp == 'J')
 		{
 		    bp++;
-		    continue;
+		    অনুবর্ত;
 		}
 
 		/*
 		 * From our 3 letter hard-coded table.
 		 */
-		if (delim(bp[0]) || delim(bp[1]) ||
+		যদি (delim(bp[0]) || delim(bp[1]) ||
 			delim(bp[2]) || !delim(bp[3]))
-		    goto loadzone;
-		ep = find_string(bp, &i, nast, NULL, 4);
-		if (ep != NULL)
+		    গচ্ছ loadzone;
+		ep = find_string(bp, &i, nast, রিক্ত, 4);
+		যদি (ep != রিক্ত)
 		{
 		    bp = ep;
-		    continue;
+		    অনুবর্ত;
 		}
-		ep = find_string(bp, &i, nadt, NULL, 4);
-		if (ep != NULL)
+		ep = find_string(bp, &i, nadt, রিক্ত, 4);
+		যদি (ep != রিক্ত)
 		{
 		    tm->tm_isdst = 1;
 		    bp = ep;
-		    continue;
+		    অনুবর্ত;
 		}
 		/*
 		 * Our current timezone.  Prefer _get_tzname() over the
@@ -581,113 +581,113 @@ namedzone:
 		 */
 #ifdef USE_GET_TZNAME
 		{
-		    char tzbuf[2][32];
-		    const char *tznames[2] = { tzbuf[0], tzbuf[1] };
+		    বর্ণ tzbuf[2][32];
+		    ধ্রুব বর্ণ *tznames[2] = { tzbuf[0], tzbuf[1] };
 		    size_t tzlen;
 
 		    _tzset();
-		    if (_get_tzname(&tzlen, tzbuf[0], sizeof(tzbuf[0]), 0) != 0)
+		    যদি (_get_tzname(&tzlen, tzbuf[0], পরিমাণ(tzbuf[0]), 0) != 0)
 			tzbuf[0][0] = NUL;
-		    if (_get_tzname(&tzlen, tzbuf[1], sizeof(tzbuf[1]), 1) != 0)
+		    যদি (_get_tzname(&tzlen, tzbuf[1], পরিমাণ(tzbuf[1]), 1) != 0)
 			tzbuf[1][0] = NUL;
-		    ep = find_string(bp, &i, tznames, NULL, 2);
+		    ep = find_string(bp, &i, tznames, রিক্ত, 2);
 		}
-#else
+#অন্যথা
 		ep = find_string(bp, &i,
-			(const char *const *)tzname, NULL, 2);
+			(ধ্রুব বর্ণ *ধ্রুব *)tzname, রিক্ত, 2);
 #endif
-		if (ep != NULL)
+		যদি (ep != রিক্ত)
 		{
 		    tm->tm_isdst = i;
 		    bp = ep;
-		    continue;
+		    অনুবর্ত;
 		}
 loadzone:
 		/*
 		 * The hard way, load the zone!
 		 */
-		if (fromzone(&bp, tm, mandatory))
-		    continue;
-		goto out;
+		যদি (fromzone(&bp, tm, mandatory))
+		    অনুবর্ত;
+		গচ্ছ out;
 	    }
 	    offs = 0;
-	    for (i = 0; i < 4; )
+	    প্রতি (i = 0; i < 4; )
 	    {
-		if (isdigit(*bp))
+		যদি (isdigit(*bp))
 		{
 		    offs = offs * 10 + (*bp++ - '0');
 		    i++;
-		    continue;
+		    অনুবর্ত;
 		}
-		if (i == 2 && *bp == ':')
+		যদি (i == 2 && *bp == ':')
 		{
 		    bp++;
-		    continue;
+		    অনুবর্ত;
 		}
-		break;
+		ভঙ্গ;
 	    }
-	    if (isdigit(*bp))
-		goto out;
-	    switch (i)
+	    যদি (isdigit(*bp))
+		গচ্ছ out;
+	    বিকল্প (i)
 	    {
-	    case 2:
+	    পক্ষ 2:
 		offs *= SECSPERHOUR;
-		break;
-	    case 4:
+		ভঙ্গ;
+	    পক্ষ 4:
 		i = offs % 100;
 		offs /= 100;
-		if (i >= SECSPERMIN)
-		    goto out;
+		যদি (i >= SECSPERMIN)
+		    গচ্ছ out;
 		/* Convert minutes into decimal */
 		offs = offs * SECSPERHOUR + i * SECSPERMIN;
-		break;
-	    default:
+		ভঙ্গ;
+	    স্বভাব:
 out:
-		if (mandatory)
-		    return NULL;
+		যদি (mandatory)
+		    প্রত্যাগম রিক্ত;
 		bp = zname;
-		continue;
+		অনুবর্ত;
 	    }
 	    /* ISO 8601 & RFC 3339 limit to 23:59 max */
-	    if (offs >= (HOURSPERDAY * SECSPERHOUR))
-		goto out;
-	    if (neg)
+	    যদি (offs >= (HOURSPERDAY * SECSPERHOUR))
+		গচ্ছ out;
+	    যদি (neg)
 		offs = -offs;
 	    tm->tm_isdst = 0;	/* XXX */
-	    continue;
+	    অনুবর্ত;
 
 	/*
 	 * Miscellaneous conversions.
 	 */
-	case 'n':	/* Any kind of white-space. */
-	case 't':
-	    while (isspace(*bp))
+	পক্ষ 'n':	/* Any kind of white-space. */
+	পক্ষ 't':
+	    যাবত্ (isspace(*bp))
 		bp++;
 	    LEGAL_ALT(0);
-	    continue;
+	    অনুবর্ত;
 
 
-	default:	/* Unknown/unsupported conversion. */
-	    return NULL;
+	স্বভাব:	/* Unknown/unsupported conversion. */
+	    প্রত্যাগম রিক্ত;
 	}
     }
 
-    if (!HAVE_YDAY(state) && HAVE_YEAR(state))
+    যদি (!HAVE_YDAY(state) && HAVE_YEAR(state))
     {
-	if (HAVE_MON(state) && HAVE_MDAY(state))
+	যদি (HAVE_MON(state) && HAVE_MDAY(state))
 	{
 	    /* calculate day of year (ordinal date) */
 	    tm->tm_yday =  start_of_month[isleap_sum(tm->tm_year,
 			    TM_YEAR_BASE)][tm->tm_mon] + (tm->tm_mday - 1);
 	    state |= S_YDAY;
 	}
-	else if (day_offset != -1)
+	অন্যথা যদি (day_offset != -1)
 	{
 	    /*
 	     * Set the date to the first Sunday (or Monday)
 	     * of the specified week of the year.
 	     */
-	    if (!HAVE_WDAY(state))
+	    যদি (!HAVE_WDAY(state))
 	    {
 		tm->tm_wday = day_offset;
 		state |= S_WDAY;
@@ -700,18 +700,18 @@ out:
 	}
     }
 
-    if (HAVE_YDAY(state) && HAVE_YEAR(state))
+    যদি (HAVE_YDAY(state) && HAVE_YEAR(state))
     {
-	int leap;
+	পূর্ণাঙ্ক leap;
 
-	if (!HAVE_MON(state))
+	যদি (!HAVE_MON(state))
 	{
 	    /* calculate month of day of year */
 	    i = 0;
 	    leap = isleap_sum(tm->tm_year, TM_YEAR_BASE);
-	    while (tm->tm_yday >= start_of_month[leap][i])
+	    যাবত্ (tm->tm_yday >= start_of_month[leap][i])
 		i++;
-	    if (i > 12)
+	    যদি (i > 12)
 	    {
 		i = 1;
 		tm->tm_yday -= start_of_month[leap][12];
@@ -721,7 +721,7 @@ out:
 	    state |= S_MON;
 	}
 
-	if (!HAVE_MDAY(state))
+	যদি (!HAVE_MDAY(state))
 	{
 	    /* calculate day of month */
 	    leap = isleap_sum(tm->tm_year, TM_YEAR_BASE);
@@ -730,14 +730,14 @@ out:
 	    state |= S_MDAY;
 	}
 
-	if (!HAVE_WDAY(state))
+	যদি (!HAVE_WDAY(state))
 	{
 	    /* calculate day of week */
 	    i = 0;
 	    week_offset = first_wday_of(tm->tm_year);
-	    while (i++ <= tm->tm_yday)
+	    যাবত্ (i++ <= tm->tm_yday)
 	    {
-		if (week_offset++ >= 6)
+		যদি (week_offset++ >= 6)
 		    week_offset = 0;
 	    }
 	    tm->tm_wday = week_offset;
@@ -745,62 +745,62 @@ out:
 	}
     }
 
-    return (char *)bp;
+    প্রত্যাগম (বর্ণ *)bp;
 }
 
 
-    static const unsigned char *
-conv_num(const unsigned char *buf, int *dest, unsigned int llim,
-						    unsigned int ulim)
+    স্থির ধ্রুব unsigned বর্ণ *
+conv_অঙ্ক(ধ্রুব unsigned বর্ণ *buf, পূর্ণাঙ্ক *dest, unsigned পূর্ণাঙ্ক llim,
+						    unsigned পূর্ণাঙ্ক ulim)
 {
-    unsigned int result = 0;
-    unsigned char ch;
+    unsigned পূর্ণাঙ্ক result = 0;
+    unsigned বর্ণ ch;
 
     /* The limit also determines the number of valid digits. */
-    unsigned int rulim = ulim;
+    unsigned পূর্ণাঙ্ক rulim = ulim;
 
     ch = *buf;
-    if (ch < '0' || ch > '9')
-	return NULL;
+    যদি (ch < '0' || ch > '9')
+	প্রত্যাগম রিক্ত;
 
-    do
+    কুরু
     {
 	result *= 10;
 	result += ch - '0';
 	rulim /= 10;
 	ch = *++buf;
-    } while ((result * 10 <= ulim) && rulim && ch >= '0' && ch <= '9');
+    } যাবত্ ((result * 10 <= ulim) && rulim && ch >= '0' && ch <= '9');
 
-    if (result < llim || result > ulim)
-	return NULL;
+    যদি (result < llim || result > ulim)
+	প্রত্যাগম রিক্ত;
 
     *dest = result;
-    return buf;
+    প্রত্যাগম buf;
 }
 
-    static const unsigned char *
-find_string(const unsigned char *bp, int *tgt, const char *const *n1,
-					    const char *const *n2, int c)
+    স্থির ধ্রুব unsigned বর্ণ *
+find_string(ধ্রুব unsigned বর্ণ *bp, পূর্ণাঙ্ক *tgt, ধ্রুব বর্ণ *ধ্রুব *n1,
+					    ধ্রুব বর্ণ *ধ্রুব *n2, পূর্ণাঙ্ক c)
 {
-    int		i;
+    পূর্ণাঙ্ক		i;
     size_t	len;
 
     /* check full name - then abbreviated ones */
-    for (; n1 != NULL; n1 = n2, n2 = NULL)
+    প্রতি (; n1 != রিক্ত; n1 = n2, n2 = রিক্ত)
     {
-	for (i = 0; i < c; i++, n1++)
+	প্রতি (i = 0; i < c; i++, n1++)
 	{
 	    len = strlen(*n1);
-	    if (STRNICMP(*n1, bp, len) == 0)
+	    যদি (STRNICMP(*n1, bp, len) == 0)
 	    {
 		*tgt = i;
-		return bp + len;
+		প্রত্যাগম bp + len;
 	    }
 	}
     }
 
     /* Nothing matched */
-    return NULL;
+    প্রত্যাগম রিক্ত;
 }
 
 #endif // MSWIN

@@ -25,7 +25,7 @@
  * The current implementation remembers all file names ever used.
  */
 
-#include "vim.h"
+#অন্তর্ভাব "vim.h"
 
 
 #ifdef FEAT_EVAL
@@ -33,59 +33,59 @@
 # define MAX_STL_EVAL_DEPTH 100
 #endif
 
-static void	enter_buffer(buf_T *buf);
-static void	buflist_getfpos(void);
-static char_u	*buflist_match(regmatch_T *rmp, buf_T *buf, int ignore_case);
-static char_u	*fname_match(regmatch_T *rmp, char_u *name, int ignore_case);
+স্থির শূন্য	enter_buffer(buf_T *buf);
+স্থির শূন্য	buflist_getfpos(শূন্য);
+স্থির char_u	*buflist_match(regmatch_T *rmp, buf_T *buf, পূর্ণাঙ্ক ignore_case);
+স্থির char_u	*fname_match(regmatch_T *rmp, char_u *name, পূর্ণাঙ্ক ignore_case);
 #ifdef UNIX
-static buf_T	*buflist_findname_stat(char_u *ffname, stat_T *st);
-static int	otherfile_buf(buf_T *buf, char_u *ffname, stat_T *stp);
-static int	buf_same_ino(buf_T *buf, stat_T *stp);
-#else
-static int	otherfile_buf(buf_T *buf, char_u *ffname);
+স্থির buf_T	*buflist_findname_stat(char_u *ffname, stat_T *st);
+স্থির পূর্ণাঙ্ক	otherfile_buf(buf_T *buf, char_u *ffname, stat_T *stp);
+স্থির পূর্ণাঙ্ক	buf_same_ino(buf_T *buf, stat_T *stp);
+#অন্যথা
+স্থির পূর্ণাঙ্ক	otherfile_buf(buf_T *buf, char_u *ffname);
 #endif
-static int	value_changed(char_u *str, char_u **last);
-#if defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
-static int build_stl_str_hl_local(stl_mode_T mode, win_T *wp,
+স্থির পূর্ণাঙ্ক	মান_changed(char_u *str, char_u **last);
+#যদি defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
+স্থির পূর্ণাঙ্ক build_stl_str_hl_local(stl_mode_T mode, win_T *wp,
 		char_u *out, size_t outlen, char_u **fmt_arg,
-		char_u *opt_name, int opt_scope, int fillchar, int maxwidth,
+		char_u *opt_name, পূর্ণাঙ্ক opt_scope, পূর্ণাঙ্ক fillchar, পূর্ণাঙ্ক maxwidth,
 		stl_hlrec_T **hltab, stl_hlrec_T **tabtab,
-		stl_clickrec_T **clicktab, int *lbreaks, int *carry_hl);
+		stl_clickrec_T **clicktab, পূর্ণাঙ্ক *lbreaks, পূর্ণাঙ্ক *carry_hl);
 #endif
-static int	append_arg_number(win_T *wp, char_u *buf, size_t buflen, int add_file);
-static void	free_buffer(buf_T *);
-static void	free_buffer_stuff(buf_T *buf, int free_options);
-static int	bt_nofileread(buf_T *buf);
-static int	do_buffer_ext(int action, int start, int dir, int count, int flags);
+স্থির পূর্ণাঙ্ক	append_arg_সংখ্যা(win_T *wp, char_u *buf, size_t buflen, পূর্ণাঙ্ক add_file);
+স্থির শূন্য	free_buffer(buf_T *);
+স্থির শূন্য	free_buffer_stuff(buf_T *buf, পূর্ণাঙ্ক free_options);
+স্থির পূর্ণাঙ্ক	bt_nofileread(buf_T *buf);
+স্থির পূর্ণাঙ্ক	do_buffer_ext(পূর্ণাঙ্ক action, পূর্ণাঙ্ক start, পূর্ণাঙ্ক dir, পূর্ণাঙ্ক গুনতি, পূর্ণাঙ্ক flags);
 
 #ifdef UNIX
 # define dev_T dev_t
-#else
+#অন্যথা
 # define dev_T unsigned
 #endif
 
 #define FOR_ALL_BUFS_FROM_LAST(buf) \
-    for ((buf) = lastbuf; (buf) != NULL; (buf) = (buf)->b_prev)
+    প্রতি ((buf) = lastbuf; (buf) != রিক্ত; (buf) = (buf)->b_prev)
 
-#if defined(FEAT_QUICKFIX)
-static char *msg_loclist = N_("[Location List]");
-static char *msg_qflist = N_("[Quickfix List]");
+#যদি defined(FEAT_QUICKFIX)
+স্থির বর্ণ *বার্তা_loclist = N_("[Location List]");
+স্থির বর্ণ *বার্তা_qflist = N_("[Quickfix List]");
 #endif
 
 // Number of times free_buffer() was called.
-static int	buf_free_count = 0;
+স্থির পূর্ণাঙ্ক	buf_free_গুনতি = 0;
 
-static int	top_file_num = 1;	// highest file number
-static garray_T buf_reuse = GA_EMPTY;	// file numbers to recycle
+স্থির পূর্ণাঙ্ক	শীর্ষ_file_অঙ্ক = 1;	// highest file number
+স্থির garray_T buf_reuse = GA_EMPTY;	// file numbers to recycle
 
-    static void
+    স্থির শূন্য
 trigger_undo_ftplugin(buf_T *buf, win_T *win)
 {
     window_layout_lock();
     ++buf->b_locked;
     ++win->w_locked;
     // b:undo_ftplugin may be set, undo it
-    do_cmdline_cmd((char_u*)"if exists('b:undo_ftplugin') | :legacy :exe \
+    do_cmdline_cmd((char_u*)"যদি exists('b:undo_ftplugin') | :legacy :exe \
 	    b:undo_ftplugin | endif");
     --buf->b_locked;
     --win->w_locked;
@@ -95,103 +95,103 @@ trigger_undo_ftplugin(buf_T *buf, win_T *win)
 /*
  * Calculate the percentage that `part` is of the `whole`.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 calc_percentage(long part, long whole)
 {
     // With 32 bit longs and more than 21,474,836 lines multiplying by 100
     // causes an overflow, thus for large numbers divide instead.
-    return (part > 1000000L)
-	? (int)(part / (whole / 100L))
-	: (int)((part * 100L) / whole);
+    প্রত্যাগম (part > 1000000L)
+	? (পূর্ণাঙ্ক)(part / (whole / 100L))
+	: (পূর্ণাঙ্ক)((part * 100L) / whole);
 }
 
 /*
  * Return the highest possible buffer number.
  */
-    int
-get_highest_fnum(void)
+    পূর্ণাঙ্ক
+get_highest_fnum(শূন্য)
 {
-    return top_file_num - 1;
+    প্রত্যাগম শীর্ষ_file_অঙ্ক - 1;
 }
 
 /*
  * Read data from buffer for retrying.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 read_buffer(
-    int		read_stdin,	    // read file from stdin, otherwise fifo
+    পূর্ণাঙ্ক		read_stdin,	    // read file from stdin, otherwise fifo
     exarg_T	*eap,		    // for forced 'ff' and 'fenc' or NULL
-    int		flags)		    // extra flags for readfile()
+    পূর্ণাঙ্ক		flags)		    // extra flags for readfile()
 {
-    int		retval = OK;
-    linenr_T	line_count;
+    পূর্ণাঙ্ক		retval = OK;
+    linenr_T	সারি_গুনতি;
 
     // Read from the buffer which the text is already filled in and append at
     // the end.  This makes it possible to retry when 'fileformat' or
     // 'fileencoding' was guessed wrong.
-    line_count = curbuf->b_ml.ml_line_count;
+    সারি_গুনতি = curbuf->b_ml.ml_সারি_গুনতি;
     retval = readfile(
-	    read_stdin ? NULL : curbuf->b_ffname,
-	    read_stdin ? NULL : curbuf->b_fname,
-	    line_count, (linenr_T)0, (linenr_T)MAXLNUM, eap,
+	    read_stdin ? রিক্ত : curbuf->b_ffname,
+	    read_stdin ? রিক্ত : curbuf->b_fname,
+	    সারি_গুনতি, (linenr_T)0, (linenr_T)MAXLNUM, eap,
 	    flags | READ_BUFFER);
-    if (retval == OK)
+    যদি (retval == OK)
     {
 	// Delete the binary lines.
-	while (--line_count >= 0)
+	যাবত্ (--সারি_গুনতি >= 0)
 	    ml_delete((linenr_T)1);
     }
-    else
+    অন্যথা
     {
 	// Delete the converted lines.
-	while (curbuf->b_ml.ml_line_count > line_count)
-	    ml_delete(line_count);
+	যাবত্ (curbuf->b_ml.ml_সারি_গুনতি > সারি_গুনতি)
+	    ml_delete(সারি_গুনতি);
     }
     // Put the cursor on the first line.
     curwin->w_cursor.lnum = 1;
     curwin->w_cursor.col = 0;
 
-    if (read_stdin)
+    যদি (read_stdin)
     {
 	// Set or reset 'modified' before executing autocommands, so that
 	// it can be changed there.
-	if (!readonlymode && !BUFEMPTY())
+	যদি (!readonlymode && !BUFEMPTY())
 	    changed();
-	else if (retval == OK)
+	অন্যথা যদি (retval == OK)
 	    unchanged(curbuf, FALSE, TRUE);
 
-	if (retval == OK)
+	যদি (retval == OK)
 	{
 #ifdef FEAT_EVAL
-	    apply_autocmds_retval(EVENT_STDINREADPOST, NULL, NULL, FALSE,
+	    apply_autocmds_retval(EVENT_STDINREADPOST, রিক্ত, রিক্ত, FALSE,
 							      curbuf, &retval);
-#else
-	    apply_autocmds(EVENT_STDINREADPOST, NULL, NULL, FALSE, curbuf);
+#অন্যথা
+	    apply_autocmds(EVENT_STDINREADPOST, রিক্ত, রিক্ত, FALSE, curbuf);
 #endif
 	}
     }
-    return retval;
+    প্রত্যাগম retval;
 }
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Ensure buffer "buf" is loaded.  Does not trigger the swap-exists action.
  */
-    void
+    শূন্য
 buffer_ensure_loaded(buf_T *buf)
 {
-    if (buf->b_ml.ml_mfp != NULL)
-	return;
+    যদি (buf->b_ml.ml_mfp != রিক্ত)
+	প্রত্যাগম;
 
     aco_save_T	aco;
 
     // Make sure the buffer is in a window.  If not then skip it.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf == buf)
+    যদি (curbuf == buf)
     {
-	if (swap_exists_action != SEA_READONLY)
+	যদি (swap_exists_action != SEA_READONLY)
 	    swap_exists_action = SEA_NONE;
-	open_buffer(FALSE, NULL, 0);
+	open_buffer(FALSE, রিক্ত, 0);
 	aucmd_restbuf(&aco);
     }
 }
@@ -202,38 +202,38 @@ buffer_ensure_loaded(buf_T *buf)
  * memory.
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    পূর্ণাঙ্ক
 open_buffer(
-    int		read_stdin,	    // read file from stdin
+    পূর্ণাঙ্ক		read_stdin,	    // read file from stdin
     exarg_T	*eap,		    // for forced 'ff' and 'fenc' or NULL
-    int		flags_arg)	    // extra flags for readfile()
+    পূর্ণাঙ্ক		flags_arg)	    // extra flags for readfile()
 {
-    int		flags = flags_arg;
-    int		retval = OK;
+    পূর্ণাঙ্ক		flags = flags_arg;
+    পূর্ণাঙ্ক		retval = OK;
     bufref_T	old_curbuf;
 #ifdef FEAT_SYN_HL
     long	old_tw = curbuf->b_p_tw;
 #endif
-    int		read_fifo = FALSE;
+    পূর্ণাঙ্ক		read_fifo = FALSE;
 
     // The 'readonly' flag is only set when BF_NEVERLOADED is being reset.
     // When re-entering the same buffer, it should not change, because the
     // user may have reset the flag by hand.
-    if (readonlymode && curbuf->b_ffname != NULL
+    যদি (readonlymode && curbuf->b_ffname != রিক্ত
 					&& (curbuf->b_flags & BF_NEVERLOADED))
 	curbuf->b_p_ro = TRUE;
 
-    if (ml_open(curbuf) == FAIL)
+    যদি (ml_open(curbuf) == FAIL)
     {
 	// There MUST be a memfile, otherwise we can't do anything
 	// If we can't create one for the current buffer, take another buffer
 	close_buffer(curwin, curbuf, 0, FALSE, FALSE, FALSE);
 	FOR_ALL_BUFFERS(curbuf)
-	    if (curbuf->b_ml.ml_mfp != NULL)
-		break;
+	    যদি (curbuf->b_ml.ml_mfp != রিক্ত)
+		ভঙ্গ;
 	// If there is no memfile at all, exit.
 	// This is OK, since there are no changes to lose.
-	if (curbuf == NULL)
+	যদি (curbuf == রিক্ত)
 	{
 	    emsg(_(e_cannot_allocate_any_buffer_exiting));
 
@@ -246,14 +246,14 @@ open_buffer(
 	emsg(_(e_cannot_allocate_buffer_using_other_one));
 	enter_buffer(curbuf);
 #ifdef FEAT_SYN_HL
-	if (old_tw != curbuf->b_p_tw)
-	    check_colorcolumn(NULL, curwin);
+	যদি (old_tw != curbuf->b_p_tw)
+	    check_colorcolumn(রিক্ত, curwin);
 #endif
-	return FAIL;
+	প্রত্যাগম FAIL;
     }
 
     // Do not sync this buffer yet, may first want to read the file.
-    if (curbuf->b_ml.ml_mfp != NULL)
+    যদি (curbuf->b_ml.ml_mfp != রিক্ত)
 	curbuf->b_ml.ml_mfp->mf_dirty = MF_DIRTY_YES_NOSYNC;
 
     // The autocommands in readfile() may change the buffer, but only AFTER
@@ -266,87 +266,87 @@ open_buffer(
 
     // A buffer without an actual file should not use the buffer name to read a
     // file.
-    if (bt_nofileread(curbuf))
+    যদি (bt_nofileread(curbuf))
 	flags |= READ_NOFILE;
 
     // Read the file if there is one.
-    if (curbuf->b_ffname != NULL
+    যদি (curbuf->b_ffname != রিক্ত
 #ifdef FEAT_NETBEANS_INTG
 	    && netbeansReadFile
 #endif
        )
     {
-	int old_msg_silent = msg_silent;
+	পূর্ণাঙ্ক old_বার্তা_silent = বার্তা_silent;
 #ifdef UNIX
-	int	save_bin = curbuf->b_p_bin;
-	int perm;
+	পূর্ণাঙ্ক	save_bin = curbuf->b_p_bin;
+	পূর্ণাঙ্ক perm;
 #endif
 #ifdef FEAT_NETBEANS_INTG
-	int oldFire = netbeansFireChanges;
+	পূর্ণাঙ্ক oldFire = netbeansFireChanges;
 
 	netbeansFireChanges = 0;
 #endif
 #ifdef UNIX
 	perm = mch_getperm(curbuf->b_ffname);
-	if (perm >= 0 && (S_ISFIFO(perm)
+	যদি (perm >= 0 && (S_ISFIFO(perm)
 		      || S_ISSOCK(perm)
 # ifdef OPEN_CHR_FILES
 		      || (S_ISCHR(perm) && is_dev_fd_file(curbuf->b_ffname))
 # endif
 		    ))
 		read_fifo = TRUE;
-	if (read_fifo)
+	যদি (read_fifo)
 	    curbuf->b_p_bin = TRUE;
 #endif
-	if (shortmess(SHM_FILEINFO))
-	    msg_silent = 1;
+	যদি (shortmess(SHM_FILEINFO))
+	    বার্তা_silent = 1;
 	retval = readfile(curbuf->b_ffname, curbuf->b_fname,
 		  (linenr_T)0, (linenr_T)0, (linenr_T)MAXLNUM, eap,
 		  flags | READ_NEW | (read_fifo ? READ_FIFO : 0));
 #ifdef UNIX
-	if (read_fifo)
+	যদি (read_fifo)
 	{
 	    curbuf->b_p_bin = save_bin;
-	    if (retval == OK)
+	    যদি (retval == OK)
 		// don't add READ_FIFO here, otherwise we won't be able to
 		// detect the encoding
 		retval = read_buffer(FALSE, eap, flags);
 	}
 #endif
-	msg_silent = old_msg_silent;
+	বার্তা_silent = old_বার্তা_silent;
 #ifdef FEAT_NETBEANS_INTG
 	netbeansFireChanges = oldFire;
 #endif
 	// Help buffer is filtered.
-	if (bt_help(curbuf))
+	যদি (bt_help(curbuf))
 	    fix_help_buffer();
     }
-    else if (read_stdin)
+    অন্যথা যদি (read_stdin)
     {
-	int	save_bin = curbuf->b_p_bin;
+	পূর্ণাঙ্ক	save_bin = curbuf->b_p_bin;
 
 	// First read the text in binary mode into the buffer.
 	// Then read from that same buffer and append at the end.  This makes
 	// it possible to retry when 'fileformat' or 'fileencoding' was
 	// guessed wrong.
 	curbuf->b_p_bin = TRUE;
-	retval = readfile(NULL, NULL, (linenr_T)0,
-		  (linenr_T)0, (linenr_T)MAXLNUM, NULL,
+	retval = readfile(রিক্ত, রিক্ত, (linenr_T)0,
+		  (linenr_T)0, (linenr_T)MAXLNUM, রিক্ত,
 		  flags | (READ_NEW + READ_STDIN));
 	curbuf->b_p_bin = save_bin;
-	if (retval == OK)
+	যদি (retval == OK)
 	    retval = read_buffer(TRUE, eap, flags);
     }
 
     // Can now sync this buffer in ml_sync_all().
-    if (curbuf->b_ml.ml_mfp != NULL
+    যদি (curbuf->b_ml.ml_mfp != রিক্ত
 	    && curbuf->b_ml.ml_mfp->mf_dirty == MF_DIRTY_YES_NOSYNC)
 	curbuf->b_ml.ml_mfp->mf_dirty = MF_DIRTY_YES;
 
     // if first time loading this buffer, init b_chartab[]
-    if (curbuf->b_flags & BF_NEVERLOADED)
+    যদি (curbuf->b_flags & BF_NEVERLOADED)
     {
-	(void)buf_init_chartab(curbuf, FALSE);
+	(শূন্য)buf_init_chartab(curbuf, FALSE);
 	parse_cino(curbuf);
     }
 
@@ -357,14 +357,14 @@ open_buffer(
     // When reading stdin, the buffer contents always needs writing, so set
     // the changed flag.  Unless in readonly mode: "ls | gview -".
     // When interrupted and 'cpoptions' contains 'i' set changed flag.
-    if ((got_int && vim_strchr(p_cpo, CPO_INTMOD) != NULL)
+    যদি ((got_int && vim_strchr(p_cpo, CPO_INTMOD) != রিক্ত)
 		|| curbuf->b_modified_was_set	// autocmd did ":set modified"
 #ifdef FEAT_EVAL
-		|| (aborting() && vim_strchr(p_cpo, CPO_INTMOD) != NULL)
+		|| (aborting() && vim_strchr(p_cpo, CPO_INTMOD) != রিক্ত)
 #endif
        )
 	changed();
-    else if (retval == OK && !read_stdin && !read_fifo)
+    অন্যথা যদি (retval == OK && !read_stdin && !read_fifo)
 	unchanged(curbuf, FALSE, TRUE);
     save_file_ff(curbuf);		// keep this fileformat
 
@@ -376,9 +376,9 @@ open_buffer(
 
     // require "!" to overwrite the file, because it wasn't read completely
 #ifdef FEAT_EVAL
-    if (aborting())
-#else
-    if (got_int)
+    যদি (aborting())
+#অন্যথা
+    যদি (got_int)
 #endif
 	curbuf->b_flags |= BF_READERR;
 
@@ -389,7 +389,7 @@ open_buffer(
 #endif
 
     // need to set w_topline, unless some autocommand already did that.
-    if (!(curwin->w_valid & VALID_TOPLINE))
+    যদি (!(curwin->w_valid & VALID_TOPLINE))
     {
 	curwin->w_topline = 1;
 #ifdef FEAT_DIFF
@@ -397,34 +397,34 @@ open_buffer(
 #endif
     }
 #ifdef FEAT_EVAL
-    apply_autocmds_retval(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf, &retval);
-#else
-    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
+    apply_autocmds_retval(EVENT_BUFENTER, রিক্ত, রিক্ত, FALSE, curbuf, &retval);
+#অন্যথা
+    apply_autocmds(EVENT_BUFENTER, রিক্ত, রিক্ত, FALSE, curbuf);
 #endif
 
-    if (retval != OK)
-	return retval;
+    যদি (retval != OK)
+	প্রত্যাগম retval;
 
     // The autocommands may have changed the current buffer.  Apply the
     // modelines to the correct buffer, if it still exists and is loaded.
-    if (bufref_valid(&old_curbuf) && old_curbuf.br_buf->b_ml.ml_mfp != NULL)
+    যদি (bufref_valid(&old_curbuf) && old_curbuf.br_buf->b_ml.ml_mfp != রিক্ত)
     {
 	aco_save_T	aco;
 
 	// Go to the buffer that was opened, make sure it is in a window.
 	// If not then skip it.
 	aucmd_prepbuf(&aco, old_curbuf.br_buf);
-	if (curbuf == old_curbuf.br_buf)
+	যদি (curbuf == old_curbuf.br_buf)
 	{
 	    do_modelines(0);
 	    curbuf->b_flags &= ~(BF_CHECK_RO | BF_NEVERLOADED);
 
-	    if ((flags & READ_NOWINENTER) == 0)
+	    যদি ((flags & READ_NOWINENTER) == 0)
 #ifdef FEAT_EVAL
-		apply_autocmds_retval(EVENT_BUFWINENTER, NULL, NULL,
+		apply_autocmds_retval(EVENT_BUFWINENTER, রিক্ত, রিক্ত,
 			FALSE, curbuf, &retval);
-#else
-	    apply_autocmds(EVENT_BUFWINENTER, NULL, NULL,
+#অন্যথা
+	    apply_autocmds(EVENT_BUFWINENTER, রিক্ত, রিক্ত,
 		    FALSE, curbuf);
 #endif
 
@@ -433,18 +433,18 @@ open_buffer(
 	}
     }
 
-    return retval;
+    প্রত্যাগম retval;
 }
 
 /*
  * Store "buf" in "bufref" and set the free count.
  */
-    void
+    শূন্য
 set_bufref(bufref_T *bufref, buf_T *buf)
 {
     bufref->br_buf = buf;
-    bufref->br_fnum = buf == NULL ? 0 : buf->b_fnum;
-    bufref->br_buf_free_count = buf_free_count;
+    bufref->br_fnum = buf == রিক্ত ? 0 : buf->b_fnum;
+    bufref->br_buf_free_গুনতি = buf_free_গুনতি;
 }
 
 /*
@@ -454,10 +454,10 @@ set_bufref(bufref_T *bufref, buf_T *buf)
  * Also checks if b_fnum is still the same, a :bwipe followed by :new might get
  * the same allocated memory, but it's a different buffer.
  */
-    int
+    পূর্ণাঙ্ক
 bufref_valid(bufref_T *bufref)
 {
-    return bufref->br_buf_free_count == buf_free_count
+    প্রত্যাগম bufref->br_buf_free_গুনতি == buf_free_গুনতি
 	? TRUE : buf_valid(bufref->br_buf)
 				  && bufref->br_fnum == bufref->br_buf->b_fnum;
 }
@@ -466,7 +466,7 @@ bufref_valid(bufref_T *bufref)
  * Return TRUE if "buf" points to a valid buffer (in the buffer list).
  * This can be slow if there are many buffers, prefer using bufref_valid().
  */
-    int
+    পূর্ণাঙ্ক
 buf_valid(buf_T *buf)
 {
     buf_T	*bp;
@@ -474,30 +474,30 @@ buf_valid(buf_T *buf)
     // Assume that we more often have a recent buffer, start with the last
     // one.
     FOR_ALL_BUFS_FROM_LAST(bp)
-	if (bp == buf)
-	    return TRUE;
-    return FALSE;
+	যদি (bp == buf)
+	    প্রত্যাগম TRUE;
+    প্রত্যাগম FALSE;
 }
 
 /*
  * A hash table used to quickly lookup a buffer by its number.
  */
-static hashtab_T buf_hashtab;
+স্থির hashtab_T buf_hashtab;
 
-    static void
+    স্থির শূন্য
 buf_hashtab_add(buf_T *buf)
 {
-    vim_snprintf((char *)buf->b_key, sizeof(buf->b_key), "%x", buf->b_fnum);
-    if (hash_add(&buf_hashtab, buf->b_key, "create buffer") == FAIL)
+    vim_snprintf((বর্ণ *)buf->b_চাবি, পরিমাণ(buf->b_চাবি), "%x", buf->b_fnum);
+    যদি (hash_add(&buf_hashtab, buf->b_চাবি, "create buffer") == FAIL)
 	emsg(_(e_buffer_cannot_be_registered));
 }
 
-    static void
+    স্থির শূন্য
 buf_hashtab_remove(buf_T *buf)
 {
-    hashitem_T *hi = hash_find(&buf_hashtab, buf->b_key);
+    hashitem_T *hi = hash_find(&buf_hashtab, buf->b_চাবি);
 
-    if (!HASHITEM_EMPTY(hi))
+    যদি (!HASHITEM_EMPTY(hi))
 	hash_remove(&buf_hashtab, hi, "close buffer");
 }
 
@@ -506,34 +506,34 @@ buf_hashtab_remove(buf_T *buf)
  * Give an error message and return FALSE when the buffer is locked or the
  * screen is being redrawn and the buffer is in a window.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 can_unload_buffer(buf_T *buf)
 {
-    int	    can_unload = !buf->b_locked;
+    পূর্ণাঙ্ক	    can_unload = !buf->b_locked;
 
-    if (can_unload && updating_screen)
+    যদি (can_unload && updating_screen)
     {
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_buffer == buf)
+	    যদি (wp->w_buffer == buf)
 	    {
 		can_unload = FALSE;
-		break;
+		ভঙ্গ;
 	    }
     }
     // Don't unload the buffer while it's still being saved
-    if (can_unload && buf->b_saving)
+    যদি (can_unload && buf->b_saving)
 	can_unload = FALSE;
 
-    if (!can_unload)
+    যদি (!can_unload)
     {
-	char_u *fname = buf->b_fname != NULL ? buf->b_fname : buf->b_ffname;
+	char_u *fname = buf->b_fname != রিক্ত ? buf->b_fname : buf->b_ffname;
 
 	semsg(_(e_attempt_to_delete_buffer_that_is_in_use_str),
-				fname != NULL ? fname : (char_u *)"[No Name]");
+				fname != রিক্ত ? fname : (char_u *)"[No Name]");
     }
-    return can_unload;
+    প্রত্যাগম can_unload;
 }
 
 /*
@@ -568,60 +568,60 @@ can_unload_buffer(buf_T *buf)
  *
  * Return TRUE when we got to the end and unloaded "buf".
  */
-    int
+    পূর্ণাঙ্ক
 close_buffer(
     win_T	*win,
     buf_T	*buf,
-    int		action,
-    int		abort_if_last,
-    int		ignore_abort,
-    int		set_context)
+    পূর্ণাঙ্ক		action,
+    পূর্ণাঙ্ক		abort_if_last,
+    পূর্ণাঙ্ক		ignore_abort,
+    পূর্ণাঙ্ক		set_context)
 {
-    int		hiding_buf;
+    পূর্ণাঙ্ক		hiding_buf;
     bufref_T	bufref;
-    int		is_curwin = (curwin != NULL && curwin == win
+    পূর্ণাঙ্ক		is_curwin = (curwin != রিক্ত && curwin == win
 				&& curwin->w_buffer == buf);
     tabpage_T	*the_curtab = curtab;
-    int		unload_buf = (action != 0);
-    int		wipe_buf = (action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
-    int		del_buf = (action == DOBUF_DEL || wipe_buf);
-    int		win_valid = win_valid_any_tab(win);
+    পূর্ণাঙ্ক		unload_buf = (action != 0);
+    পূর্ণাঙ্ক		wipe_buf = (action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
+    পূর্ণাঙ্ক		del_buf = (action == DOBUF_DEL || wipe_buf);
+    পূর্ণাঙ্ক		win_valid = win_valid_any_tab(win);
     // win_valid is FALSE for closing popups, as they're first removed from the
     // window list.  If so, skip some side-effects, but treat win as valid.
     // Shouldn't be possible for autocmds to prematurely free win then, as it's
     // not in the window list.
-    int		closed_popup = win && !win_valid && WIN_IS_POPUP(win);
+    পূর্ণাঙ্ক		closed_popup = win && !win_valid && WIN_IS_POPUP(win);
 
     CHECK_CURBUF;
 
     // Force unloading or deleting when 'bufhidden' says so.
     // The caller must take care of NOT deleting/freeing when 'bufhidden' is
     // "hide" (otherwise we could never free or delete a buffer).
-    if (buf->b_p_bh[0] == 'd')		// 'bufhidden' == "delete"
+    যদি (buf->b_p_bh[0] == 'd')		// 'bufhidden' == "delete"
     {
 	del_buf = TRUE;
 	unload_buf = TRUE;
     }
-    else if (buf->b_p_bh[0] == 'w')	// 'bufhidden' == "wipe"
+    অন্যথা যদি (buf->b_p_bh[0] == 'w')	// 'bufhidden' == "wipe"
     {
 	del_buf = TRUE;
 	unload_buf = TRUE;
 	wipe_buf = TRUE;
     }
-    else if (buf->b_p_bh[0] == 'u')	// 'bufhidden' == "unload"
+    অন্যথা যদি (buf->b_p_bh[0] == 'u')	// 'bufhidden' == "unload"
 	unload_buf = TRUE;
 
 #ifdef FEAT_TERMINAL
     // depending on how we get here b_nwindows may already be zero
-    if (bt_terminal(buf) && (buf->b_nwindows <= 1 || del_buf))
+    যদি (bt_terminal(buf) && (buf->b_nwindows <= 1 || del_buf))
     {
 	CHECK_CURBUF;
-	if (term_job_running(buf->b_term))
+	যদি (term_job_running(buf->b_term))
 	{
-	    if (wipe_buf || unload_buf)
+	    যদি (wipe_buf || unload_buf)
 	    {
-		if (!can_unload_buffer(buf))
-		    return FALSE;
+		যদি (!can_unload_buffer(buf))
+		    প্রত্যাগম FALSE;
 
 		// Wiping out or unloading a terminal buffer kills the job.
 		free_terminal(buf);
@@ -631,21 +631,21 @@ close_buffer(
 		unload_buf = TRUE;
 		wipe_buf = TRUE;
 	    }
-	    else
+	    অন্যথা
 	    {
 		// The job keeps running, hide the buffer.
 		del_buf = FALSE;
 		unload_buf = FALSE;
 	    }
 	}
-	else if (buf->b_p_bh[0] == 'h' && !del_buf)
+	অন্যথা যদি (buf->b_p_bh[0] == 'h' && !del_buf)
 	{
 	    // Hide a terminal buffer.
 	    unload_buf = FALSE;
 	}
-	else
+	অন্যথা
 	{
-	    if (del_buf || unload_buf)
+	    যদি (del_buf || unload_buf)
 	    {
 		// A terminal buffer is wiped out if the job has finished.
 		// We only do this when there's an intention to unload the
@@ -662,16 +662,16 @@ close_buffer(
 
     // Disallow deleting the buffer when it is locked (already being closed or
     // halfway a command that relies on it). Unloading is allowed.
-    if ((del_buf || wipe_buf) && !can_unload_buffer(buf))
-	return FALSE;
+    যদি ((del_buf || wipe_buf) && !can_unload_buffer(buf))
+	প্রত্যাগম FALSE;
 
-    if (set_context && win_valid && win->w_buffer == buf)
+    যদি (set_context && win_valid && win->w_buffer == buf)
     {
 	// Set b_last_cursor when closing the last window for the buffer.
 	// Remember the last cursor position and window options of the buffer.
 	// This used to be only for the current window, but then options like
 	// 'foldmethod' may be lost with a ":only" command.
-	if (buf->b_nwindows == 1)
+	যদি (buf->b_nwindows == 1)
 	    set_last_cursor(win);
 	buflist_setfpos(buf, win,
 		    win->w_cursor.lnum == 1 ? 0 : win->w_cursor.lnum,
@@ -681,47 +681,47 @@ close_buffer(
     set_bufref(&bufref, buf);
 
     // When the buffer is no longer in a window, trigger BufWinLeave
-    if ((win_valid || closed_popup) && win->w_buffer == buf
+    যদি ((win_valid || closed_popup) && win->w_buffer == buf
 	    && buf->b_nwindows == 1)
     {
 	++buf->b_locked;
 	++buf->b_locked_split;
-	if (apply_autocmds(EVENT_BUFWINLEAVE, buf->b_fname, buf->b_fname,
+	যদি (apply_autocmds(EVENT_BUFWINLEAVE, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	{
 	    // Autocommands deleted the buffer.
 aucmd_abort:
 	    emsg(_(e_autocommands_caused_command_to_abort));
-	    return FALSE;
+	    প্রত্যাগম FALSE;
 	}
 	--buf->b_locked;
 	--buf->b_locked_split;
-	if (abort_if_last && one_window())
+	যদি (abort_if_last && one_window())
 	    // Autocommands made this the only window.
-	    goto aucmd_abort;
+	    গচ্ছ aucmd_abort;
 
 	// When the buffer becomes hidden, but is not unloaded, trigger
 	// BufHidden
-	if (!unload_buf)
+	যদি (!unload_buf)
 	{
 	    ++buf->b_locked;
 	    ++buf->b_locked_split;
-	    if (apply_autocmds(EVENT_BUFHIDDEN, buf->b_fname, buf->b_fname,
+	    যদি (apply_autocmds(EVENT_BUFHIDDEN, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		    && !bufref_valid(&bufref))
 		// Autocommands deleted the buffer.
-		goto aucmd_abort;
+		গচ্ছ aucmd_abort;
 	    --buf->b_locked;
 	    --buf->b_locked_split;
-	    if (abort_if_last && one_window())
+	    যদি (abort_if_last && one_window())
 		// Autocommands made this the only window.
-		goto aucmd_abort;
+		গচ্ছ aucmd_abort;
 	}
 #ifdef FEAT_EVAL
 	// autocmds may abort script processing
-	if (!ignore_abort && aborting())
-	    return FALSE;
+	যদি (!ignore_abort && aborting())
+	    প্রত্যাগম FALSE;
 #endif
 	win_valid = win_valid && win_valid_any_tab(win);
     }
@@ -729,7 +729,7 @@ aucmd_abort:
     // If the buffer was in curwin and the window has changed, go back to that
     // window, if it still exists.  This avoids that ":edit x" triggering a
     // "tabnext" BufUnload autocmd leaves a window behind without a buffer.
-    if (is_curwin && curwin != win && win_valid)
+    যদি (is_curwin && curwin != win && win_valid)
     {
 	block_autocmds();
 	goto_tabpage_win(the_curtab, win);
@@ -738,7 +738,7 @@ aucmd_abort:
 
     // When a quickfix buffer is deleted from a window, clear the
     // 'winfixheight' option.
-    if (bt_quickfix(buf) && win_valid && win->w_buffer == buf)
+    যদি (bt_quickfix(buf) && win_valid && win->w_buffer == buf)
 	win->w_p_wfh = FALSE;
 
     // Remember if the buffer may be hidden soon, or is already hidden.
@@ -746,33 +746,33 @@ aucmd_abort:
 	    && win->w_buffer == buf && buf->b_nwindows == 1);
 
 #ifdef FEAT_DIFF
-    if (diffopt_hiddenoff() && !unload_buf && hiding_buf)
+    যদি (diffopt_hiddenoff() && !unload_buf && hiding_buf)
 	diff_buf_delete(buf);	// Clear 'diff' for hidden buffer.
 #endif
 
     // Return when another window is displaying the buffer or when not unloaded.
-    if (!hiding_buf || !unload_buf)
-	return FALSE;
+    যদি (!hiding_buf || !unload_buf)
+	প্রত্যাগম FALSE;
 
     // Always remove the buffer when there is no file name.
-    if (buf->b_ffname == NULL)
+    যদি (buf->b_ffname == রিক্ত)
 	del_buf = TRUE;
 
     // Free all things allocated for this buffer.
     // Also calls the "BufDelete" autocommands when del_buf is TRUE.
     // Abort if nothing was freed, or if autocommands delete the buffer.
-    if (!buf_freeall(buf, (del_buf ? BFA_DEL : 0)
+    যদি (!buf_freeall(buf, (del_buf ? BFA_DEL : 0)
 		   + (wipe_buf ? BFA_WIPE : 0)
 		   + (ignore_abort ? BFA_IGNORE_ABORT : 0)))
-	return FALSE;
+	প্রত্যাগম FALSE;
 
     win_valid = win_valid && win_valid_any_tab(win);
-    if ((win_valid || closed_popup) && win->w_buffer == buf)
+    যদি ((win_valid || closed_popup) && win->w_buffer == buf)
     {
 	// Autocommands may have opened (despite b_locked_split) or closed
 	// windows for this buffer.  Decrement for the close we do here.
 	--buf->b_nwindows;
-	win->w_buffer = NULL;  // make sure we don't use the buffer now
+	win->w_buffer = রিক্ত;  // make sure we don't use the buffer now
     }
 
     /*
@@ -781,9 +781,9 @@ aucmd_abort:
      * wiped out all other buffers (unless when inside free_all_mem() where all
      * buffers need to be freed and autocommands are blocked).
      */
-    if (wipe_buf && buf->b_nwindows <= 0
-			    && (buf->b_prev != NULL || buf->b_next != NULL
-#if defined(EXITFREE)
+    যদি (wipe_buf && buf->b_nwindows <= 0
+			    && (buf->b_prev != রিক্ত || buf->b_next != রিক্ত
+#যদি defined(EXITFREE)
 				|| entered_free_all_mem
 #endif
 				))
@@ -794,32 +794,32 @@ aucmd_abort:
 	FOR_ALL_TAB_WINDOWS(tp, wp)
 	    mark_forget_file(wp, buf->b_fnum);
 
-	if (action == DOBUF_WIPE_REUSE)
+	যদি (action == DOBUF_WIPE_REUSE)
 	{
 	    // we can re-use this buffer number, store it
-	    if (buf_reuse.ga_itemsize == 0)
-		ga_init2(&buf_reuse, sizeof(int), 50);
-	    if (ga_grow(&buf_reuse, 1) == OK)
-		((int *)buf_reuse.ga_data)[buf_reuse.ga_len++] = buf->b_fnum;
+	    যদি (buf_reuse.ga_itemsize == 0)
+		ga_init2(&buf_reuse, পরিমাণ(পূর্ণাঙ্ক), 50);
+	    যদি (ga_grow(&buf_reuse, 1) == OK)
+		((পূর্ণাঙ্ক *)buf_reuse.ga_data)[buf_reuse.ga_len++] = buf->b_fnum;
 	}
-	if (buf->b_sfname != buf->b_ffname)
+	যদি (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
-	    buf->b_sfname = NULL;
+	অন্যথা
+	    buf->b_sfname = রিক্ত;
 	VIM_CLEAR(buf->b_ffname);
-	if (buf->b_prev == NULL)
+	যদি (buf->b_prev == রিক্ত)
 	    firstbuf = buf->b_next;
-	else
+	অন্যথা
 	    buf->b_prev->b_next = buf->b_next;
-	if (buf->b_next == NULL)
+	যদি (buf->b_next == রিক্ত)
 	    lastbuf = buf->b_prev;
-	else
+	অন্যথা
 	    buf->b_next->b_prev = buf->b_prev;
 	free_buffer(buf);
     }
-    else
+    অন্যথা
     {
-	if (del_buf)
+	যদি (del_buf)
 	{
 	    // Free all internal variables and reset option values, to make
 	    // ":bdel" compatible with Vim 5.7.
@@ -832,7 +832,7 @@ aucmd_abort:
 	    buf->b_p_initialized = false;
 	}
 	buf_clear_file(buf);
-	if (del_buf)
+	যদি (del_buf)
 	    buf->b_p_bl = FALSE;
     }
     // NOTE: at this point "curbuf" may be invalid!
@@ -840,17 +840,17 @@ aucmd_abort:
     // When closing curbuf for curwin, is_curwin checks should've ensured
     // autocmds don't switch windows, unless they closed curwin.  Otherwise
     // callers may leave the window open to a NULL buffer!
-    assert(!win_valid || !is_curwin || win == curwin);
-    return TRUE;
+    প্রতিজ্ঞা(!win_valid || !is_curwin || win == curwin);
+    প্রত্যাগম TRUE;
 }
 
 /*
  * Make buffer not contain a file.
  */
-    void
+    শূন্য
 buf_clear_file(buf_T *buf)
 {
-    buf->b_ml.ml_line_count = 1;
+    buf->b_ml.ml_সারি_গুনতি = 1;
     unchanged(buf, TRUE, TRUE);
     buf->b_shortname = false;
     buf->b_p_eof = FALSE;
@@ -859,10 +859,10 @@ buf_clear_file(buf_T *buf)
     buf->b_start_eol = TRUE;
     buf->b_p_bomb = FALSE;
     buf->b_start_bomb = FALSE;
-    buf->b_ml.ml_mfp = NULL;
+    buf->b_ml.ml_mfp = রিক্ত;
     buf->b_ml.ml_flags = ML_EMPTY;		// empty buffer
 #ifdef FEAT_NETBEANS_INTG
-    netbeans_deleted_all_lines(buf);
+    netbeans_deleted_all_সারিগুলি(buf);
 #endif
 }
 
@@ -877,12 +877,12 @@ buf_clear_file(buf_T *buf)
  *
  * Return TRUE when we got to the end.
  */
-    int
-buf_freeall(buf_T *buf, int flags)
+    পূর্ণাঙ্ক
+buf_freeall(buf_T *buf, পূর্ণাঙ্ক flags)
 {
-    int		is_curbuf = (buf == curbuf);
+    পূর্ণাঙ্ক		is_curbuf = (buf == curbuf);
     bufref_T	bufref;
-    int		is_curwin = (curwin != NULL && curwin->w_buffer == buf);
+    পূর্ণাঙ্ক		is_curwin = (curwin != রিক্ত && curwin->w_buffer == buf);
     win_T	*the_curwin = curwin;
     tabpage_T	*the_curtab = curtab;
 
@@ -890,29 +890,29 @@ buf_freeall(buf_T *buf, int flags)
     ++buf->b_locked;
     ++buf->b_locked_split;
     set_bufref(&bufref, buf);
-    if (buf->b_ml.ml_mfp != NULL)
+    যদি (buf->b_ml.ml_mfp != রিক্ত)
     {
-	if (apply_autocmds(EVENT_BUFUNLOAD, buf->b_fname, buf->b_fname,
+	যদি (apply_autocmds(EVENT_BUFUNLOAD, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    প্রত্যাগম FALSE;
     }
-    if ((flags & BFA_DEL) && buf->b_p_bl)
+    যদি ((flags & BFA_DEL) && buf->b_p_bl)
     {
-	if (apply_autocmds(EVENT_BUFDELETE, buf->b_fname, buf->b_fname,
+	যদি (apply_autocmds(EVENT_BUFDELETE, buf->b_fname, buf->b_fname,
 								   FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    প্রত্যাগম FALSE;
     }
-    if (flags & BFA_WIPE)
+    যদি (flags & BFA_WIPE)
     {
-	if (apply_autocmds(EVENT_BUFWIPEOUT, buf->b_fname, buf->b_fname,
+	যদি (apply_autocmds(EVENT_BUFWIPEOUT, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    প্রত্যাগম FALSE;
     }
     --buf->b_locked;
     --buf->b_locked_split;
@@ -920,7 +920,7 @@ buf_freeall(buf_T *buf, int flags)
     // If the buffer was in curwin and the window has changed, go back to that
     // window, if it still exists.  This avoids that ":edit x" triggering a
     // "tabnext" BufUnload autocmd leaves a window behind without a buffer.
-    if (is_curwin && curwin != the_curwin && win_valid_any_tab(the_curwin))
+    যদি (is_curwin && curwin != the_curwin && win_valid_any_tab(the_curwin))
     {
 	block_autocmds();
 	goto_tabpage_win(the_curtab, the_curwin);
@@ -929,21 +929,21 @@ buf_freeall(buf_T *buf, int flags)
 
 #ifdef FEAT_EVAL
     // autocmds may abort script processing
-    if ((flags & BFA_IGNORE_ABORT) == 0 && aborting())
-	return FALSE;
+    যদি ((flags & BFA_IGNORE_ABORT) == 0 && aborting())
+	প্রত্যাগম FALSE;
 #endif
 
     // It's possible that autocommands change curbuf to the one being deleted.
     // This might cause curbuf to be deleted unexpectedly.  But in some cases
     // it's OK to delete the curbuf, because a new one is obtained anyway.
     // Therefore only return if curbuf changed to the deleted buffer.
-    if (buf == curbuf && !is_curbuf)
-	return FALSE;
+    যদি (buf == curbuf && !is_curbuf)
+	প্রত্যাগম FALSE;
 
     // If curbuf, stop Visual mode just before freeing, but after autocmds that
     // may restart it.  May trigger TextYankPost, but with textlock set.
-    if (buf == curbuf && VIsual_active
-#if defined(EXITFREE)
+    যদি (buf == curbuf && VIsual_active
+#যদি defined(EXITFREE)
 	    && !entered_free_all_mem
 #endif
 	    )
@@ -954,7 +954,7 @@ buf_freeall(buf_T *buf, int flags)
 #endif
 #ifdef FEAT_SYN_HL
     // Remove any ownsyntax, unless exiting.
-    if (curwin != NULL && curwin->w_buffer == buf)
+    যদি (curwin != রিক্ত && curwin->w_buffer == buf)
 	reset_synblock(curwin);
 #endif
 
@@ -965,7 +965,7 @@ buf_freeall(buf_T *buf, int flags)
 	tabpage_T	*tp;
 
 	FOR_ALL_TAB_WINDOWS(tp, win)
-	    if (win->w_buffer == buf)
+	    যদি (win->w_buffer == buf)
 		clearFolding(win);
     }
 #endif
@@ -974,8 +974,8 @@ buf_freeall(buf_T *buf, int flags)
     tcl_buffer_free(buf);
 #endif
     ml_close(buf, TRUE);	    // close and delete the memline/memfile
-    buf->b_ml.ml_line_count = 0;    // no lines in buffer
-    if ((flags & BFA_KEEP_UNDO) == 0)
+    buf->b_ml.ml_সারি_গুনতি = 0;    // no lines in buffer
+    যদি ((flags & BFA_KEEP_UNDO) == 0)
 	// free the memory allocated for undo
 	// and reset all undo information
 	u_clearallandblockfree(buf);
@@ -986,17 +986,17 @@ buf_freeall(buf_T *buf, int flags)
     clear_buf_prop_types(buf);
 #endif
     buf->b_flags &= ~BF_READERR;    // a read error is no longer relevant
-    return TRUE;
+    প্রত্যাগম TRUE;
 }
 
 /*
  * Free a buffer structure and the things it contains related to the buffer
  * itself (not the file, that must have been done already).
  */
-    static void
+    স্থির শূন্য
 free_buffer(buf_T *buf)
 {
-    ++buf_free_count;
+    ++buf_free_গুনতি;
     free_buffer_stuff(buf, TRUE);
 #ifdef FEAT_EVAL
     // b:changedtick uses an item in buf_T, remove it now
@@ -1038,49 +1038,49 @@ free_buffer(buf_T *buf)
 
     aubuflocal_remove(buf);
 
-    if (autocmd_busy)
+    যদি (autocmd_busy)
     {
 	// Do not free the buffer structure while autocommands are executing,
 	// it's still needed. Free it when autocmd_busy is reset.
 	buf->b_next = au_pending_free_buf;
 	au_pending_free_buf = buf;
     }
-    else
+    অন্যথা
     {
 	vim_free(buf);
-	if (curbuf == buf)
-	    curbuf = NULL;  // make clear it's not to be used
+	যদি (curbuf == buf)
+	    curbuf = রিক্ত;  // make clear it's not to be used
     }
 }
 
 /*
  * Initializes b:changedtick.
  */
-    static void
+    স্থির শূন্য
 init_changedtick(buf_T *buf)
 {
     dictitem_T *di = (dictitem_T *)&buf->b_ct_di;
 
     di->di_flags = DI_FLAGS_FIX | DI_FLAGS_RO;
-    di->di_tv.v_type = VAR_NUMBER;
+    di->di_tv.v_type = VAR_সংখ্যা;
     di->di_tv.v_lock = VAR_FIXED;
-    di->di_tv.vval.v_number = 0;
+    di->di_tv.vval.v_সংখ্যা = 0;
 
 #ifdef FEAT_EVAL
-    STRCPY(buf->b_ct_di.di_key, "changedtick");
-    (void)dict_add(buf->b_vars, di);
+    STRCPY(buf->b_ct_di.di_চাবি, "changedtick");
+    (শূন্য)dict_add(buf->b_vars, di);
 #endif
 }
 
 /*
  * Free the b_wininfo list for buffer "buf".
  */
-    static void
+    স্থির শূন্য
 clear_wininfo(buf_T *buf)
 {
     wininfo_T	*wip;
 
-    while (buf->b_wininfo != NULL)
+    যাবত্ (buf->b_wininfo != রিক্ত)
     {
 	wip = buf->b_wininfo;
 	buf->b_wininfo = wip->wi_next;
@@ -1091,12 +1091,12 @@ clear_wininfo(buf_T *buf)
 /*
  * Free stuff in the buffer for ":bdel" and when wiping out the buffer.
  */
-    static void
+    স্থির শূন্য
 free_buffer_stuff(
     buf_T	*buf,
-    int		free_options)		// free options as well
+    পূর্ণাঙ্ক		free_options)		// free options as well
 {
-    if (free_options)
+    যদি (free_options)
     {
 	clear_wininfo(buf);		// including window-local options
 	free_buf_options(buf, TRUE);
@@ -1130,10 +1130,10 @@ free_buffer_stuff(
 /*
  * Free one wininfo_T.
  */
-    void
+    শূন্য
 free_wininfo(wininfo_T *wip)
 {
-    if (wip->wi_optset)
+    যদি (wip->wi_optset)
     {
 	clear_winopt(&wip->wi_opt);
 #ifdef FEAT_FOLDING
@@ -1146,42 +1146,42 @@ free_wininfo(wininfo_T *wip)
 /*
  * Go to another buffer.  Handles the result of the ATTENTION dialog.
  */
-    void
+    শূন্য
 goto_buffer(
     exarg_T	*eap,
-    int		start,
-    int		dir,
-    int		count)
+    পূর্ণাঙ্ক		start,
+    পূর্ণাঙ্ক		dir,
+    পূর্ণাঙ্ক		গুনতি)
 {
     bufref_T	old_curbuf;
-    int		save_sea = swap_exists_action;
-    int		skip_help_buf;
+    পূর্ণাঙ্ক		save_sea = swap_exists_action;
+    পূর্ণাঙ্ক		skip_help_buf;
 
-    switch (eap->cmdidx)
+    বিকল্প (eap->cmdidx)
     {
-	case CMD_bnext:
-	case CMD_sbnext:
-	case CMD_bNext:
-	case CMD_bprevious:
-	case CMD_sbNext:
-	case CMD_sbprevious:
+	পক্ষ CMD_bnext:
+	পক্ষ CMD_sbnext:
+	পক্ষ CMD_bNext:
+	পক্ষ CMD_bprevious:
+	পক্ষ CMD_sbNext:
+	পক্ষ CMD_sbprevious:
 	    skip_help_buf = TRUE;
-	    break;
-	default:
+	    ভঙ্গ;
+	স্বভাব:
 	    skip_help_buf = FALSE;
-	    break;
+	    ভঙ্গ;
     }
 
     set_bufref(&old_curbuf, curbuf);
 
-    if (swap_exists_action == SEA_NONE)
+    যদি (swap_exists_action == SEA_NONE)
 	swap_exists_action = SEA_DIALOG;
-    (void)do_buffer_ext(*eap->cmd == 's' ? DOBUF_SPLIT : DOBUF_GOTO, start, dir, count,
+    (শূন্য)do_buffer_ext(*eap->cmd == 's' ? DOBUF_SPLIT : DOBUF_GOTO, start, dir, গুনতি,
 	    (eap->forceit ? DOBUF_FORCEIT : 0) |
 	    (skip_help_buf ? DOBUF_SKIPHELP : 0));
-    if (swap_exists_action == SEA_QUIT && *eap->cmd == 's')
+    যদি (swap_exists_action == SEA_QUIT && *eap->cmd == 's')
     {
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 	cleanup_T   cs;
 
 	// Reset the error/interrupt/exception state here so that
@@ -1194,13 +1194,13 @@ goto_buffer(
 	swap_exists_action = save_sea;
 	swap_exists_did_quit = TRUE;
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
 #endif
     }
-    else
+    অন্যথা
 	handle_swap_exists(&old_curbuf);
 }
 
@@ -1208,10 +1208,10 @@ goto_buffer(
  * Handle the situation of swap_exists_action being set.
  * It is allowed for "old_curbuf" to be NULL or invalid.
  */
-    void
+    শূন্য
 handle_swap_exists(bufref_T *old_curbuf)
 {
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
     cleanup_T	cs;
 #endif
 #ifdef FEAT_SYN_HL
@@ -1219,9 +1219,9 @@ handle_swap_exists(bufref_T *old_curbuf)
 #endif
     buf_T	*buf;
 
-    if (swap_exists_action == SEA_QUIT)
+    যদি (swap_exists_action == SEA_QUIT)
     {
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 	// Reset the error/interrupt/exception state here so that
 	// aborting() returns FALSE when closing a buffer.
 	enter_cleanup(&cs);
@@ -1233,55 +1233,55 @@ handle_swap_exists(bufref_T *old_curbuf)
 	swap_exists_action = SEA_NONE;	// don't want it again
 	swap_exists_did_quit = TRUE;
 	close_buffer(curwin, curbuf, DOBUF_UNLOAD, FALSE, FALSE, TRUE);
-	if (old_curbuf == NULL || !bufref_valid(old_curbuf)
+	যদি (old_curbuf == রিক্ত || !bufref_valid(old_curbuf)
 					      || old_curbuf->br_buf == curbuf)
 	{
 	    // Block autocommands here because curwin->w_buffer may be NULL.
 	    block_autocmds();
-	    buf = buflist_new(NULL, NULL, 1L, BLN_CURBUF | BLN_LISTED);
+	    buf = buflist_new(রিক্ত, রিক্ত, 1L, BLN_CURBUF | BLN_LISTED);
 	    unblock_autocmds();
 	}
-	else
+	অন্যথা
 	    buf = old_curbuf->br_buf;
-	if (buf != NULL)
+	যদি (buf != রিক্ত)
 	{
-	    int old_msg_silent = msg_silent;
+	    পূর্ণাঙ্ক old_বার্তা_silent = বার্তা_silent;
 
-	    if (shortmess(SHM_FILEINFO))
-		msg_silent = 1;  // prevent fileinfo message
+	    যদি (shortmess(SHM_FILEINFO))
+		বার্তা_silent = 1;  // prevent fileinfo message
 	    enter_buffer(buf);
 	    // restore msg_silent, so that the command line will be shown
-	    msg_silent = old_msg_silent;
+	    বার্তা_silent = old_বার্তা_silent;
 
 #ifdef FEAT_SYN_HL
-	    if (old_tw != curbuf->b_p_tw)
-		check_colorcolumn(NULL, curwin);
+	    যদি (old_tw != curbuf->b_p_tw)
+		check_colorcolumn(রিক্ত, curwin);
 #endif
 	}
 	// If "old_curbuf" is NULL we are in big trouble here...
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
 #endif
     }
-    else if (swap_exists_action == SEA_RECOVER)
+    অন্যথা যদি (swap_exists_action == SEA_RECOVER)
     {
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 	// Reset the error/interrupt/exception state here so that
 	// aborting() returns FALSE when closing a buffer.
 	enter_cleanup(&cs);
 #endif
 
 	// User selected Recover at ATTENTION prompt.
-	msg_scroll = TRUE;
+	বার্তা_scroll = TRUE;
 	ml_recover(FALSE);
-	msg_puts("\n");	// don't overwrite the last message
-	cmdline_row = msg_row;
+	বার্তা_puts("\n");	// don't overwrite the last message
+	cmdline_row = বার্তা_row;
 	do_modelines(0);
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
@@ -1294,42 +1294,42 @@ handle_swap_exists(bufref_T *old_curbuf)
  * Make the current buffer empty.
  * Used when it is wiped out and it's the last buffer.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 empty_curbuf(
-    int close_others,
-    int forceit,
-    int action)
+    পূর্ণাঙ্ক close_others,
+    পূর্ণাঙ্ক forceit,
+    পূর্ণাঙ্ক action)
 {
-    int	    retval;
+    পূর্ণাঙ্ক	    retval;
     buf_T   *buf = curbuf;
     bufref_T bufref;
 
-    if (action == DOBUF_UNLOAD)
+    যদি (action == DOBUF_UNLOAD)
     {
 	emsg(_(e_cannot_unload_last_buffer));
-	return FAIL;
+	প্রত্যাগম FAIL;
     }
 
     set_bufref(&bufref, buf);
-    if (close_others)
+    যদি (close_others)
 	// Close any other windows on this buffer, then make it empty.
 	close_windows(buf, TRUE);
 
     setpcmark();
-    retval = do_ecmd(0, NULL, NULL, NULL, ECMD_ONE,
+    retval = do_ecmd(0, রিক্ত, রিক্ত, রিক্ত, ECMD_ONE,
 					  forceit ? ECMD_FORCEIT : 0, curwin);
 
     // do_ecmd() may create a new buffer, then we have to delete
     // the old one.  But do_ecmd() may have done that already, check
     // if the buffer still exists.
-    if (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows == 0)
-	close_buffer(NULL, buf, action, FALSE, FALSE, FALSE);
-    if (!close_others)
+    যদি (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows == 0)
+	close_buffer(রিক্ত, buf, action, FALSE, FALSE, FALSE);
+    যদি (!close_others)
 	need_fileinfo = FALSE;
-    else if (retval == OK && !shortmess(SHM_FILEINFO))
+    অন্যথা যদি (retval == OK && !shortmess(SHM_FILEINFO))
 	// do_ecmd() does not display file info for a new empty buffer.
 	need_fileinfo = TRUE;
-    return retval;
+    প্রত্যাগম retval;
 }
 
 /*
@@ -1349,122 +1349,122 @@ empty_curbuf(
  *
  * Return FAIL or OK.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 do_buffer_ext(
-    int		action,
-    int		start,
-    int		dir,		// FORWARD or BACKWARD
-    int		count,		// buffer number or number of buffers
-    int		flags)		// DOBUF_FORCEIT etc.
+    পূর্ণাঙ্ক		action,
+    পূর্ণাঙ্ক		start,
+    পূর্ণাঙ্ক		dir,		// FORWARD or BACKWARD
+    পূর্ণাঙ্ক		গুনতি,		// buffer number or number of buffers
+    পূর্ণাঙ্ক		flags)		// DOBUF_FORCEIT etc.
 {
     buf_T	*buf;
     buf_T	*bp;
-    int		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
+    পূর্ণাঙ্ক		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
 			|| action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
 
-    switch (start)
+    বিকল্প (start)
     {
-	case DOBUF_FIRST:   buf = firstbuf; break;
-	case DOBUF_LAST:    buf = lastbuf;  break;
-	default:	    buf = curbuf;   break;
+	পক্ষ DOBUF_FIRST:   buf = firstbuf; ভঙ্গ;
+	পক্ষ DOBUF_LAST:    buf = lastbuf;  ভঙ্গ;
+	স্বভাব:	    buf = curbuf;   ভঙ্গ;
     }
-    if (start == DOBUF_MOD)	    // find next modified buffer
+    যদি (start == DOBUF_MOD)	    // find next modified buffer
     {
-	while (count-- > 0)
+	যাবত্ (গুনতি-- > 0)
 	{
-	    do
+	    কুরু
 	    {
 		buf = buf->b_next;
-		if (buf == NULL)
+		যদি (buf == রিক্ত)
 		    buf = firstbuf;
 	    }
-	    while (buf != curbuf && !bufIsChanged(buf));
+	    যাবত্ (buf != curbuf && !bufIsChanged(buf));
 	}
-	if (!bufIsChanged(buf))
+	যদি (!bufIsChanged(buf))
 	{
 	    emsg(_(e_no_modified_buffer_found));
-	    return FAIL;
+	    প্রত্যাগম FAIL;
 	}
     }
-    else if (start == DOBUF_FIRST && count) // find specified buffer number
+    অন্যথা যদি (start == DOBUF_FIRST && গুনতি) // find specified buffer number
     {
-	while (buf != NULL && buf->b_fnum != count)
+	যাবত্ (buf != রিক্ত && buf->b_fnum != গুনতি)
 	    buf = buf->b_next;
     }
-    else
+    অন্যথা
     {
-	int help_only = (flags & DOBUF_SKIPHELP) != 0 && buf->b_help;
+	পূর্ণাঙ্ক help_only = (flags & DOBUF_SKIPHELP) != 0 && buf->b_help;
 
-	bp = NULL;
-	while (count > 0 || (bp != buf && !unload
+	bp = রিক্ত;
+	যাবত্ (গুনতি > 0 || (bp != buf && !unload
 				&& !(help_only ? buf->b_help : buf->b_p_bl)))
 	{
 	    // remember the buffer where we start, we come back there when all
 	    // buffers are unlisted.
-	    if (bp == NULL)
+	    যদি (bp == রিক্ত)
 		bp = buf;
-	    if (dir == FORWARD)
+	    যদি (dir == FORWARD)
 	    {
 		buf = buf->b_next;
-		if (buf == NULL)
+		যদি (buf == রিক্ত)
 		    buf = firstbuf;
 	    }
-	    else
+	    অন্যথা
 	    {
 		buf = buf->b_prev;
-		if (buf == NULL)
+		যদি (buf == রিক্ত)
 		    buf = lastbuf;
 	    }
 	    // Avoid non-help buffers if the starting point was a help buffer
 	    // and vice-versa.
 	    // Don't count unlisted buffers.
-	    if (unload
+	    যদি (unload
 		    || (help_only
 			? buf->b_help
 			: (buf->b_p_bl && ((flags & DOBUF_SKIPHELP) == 0
 							    || !buf->b_help))))
 	    {
-		--count;
-		bp = NULL;	// use this buffer as new starting point
+		--গুনতি;
+		bp = রিক্ত;	// use this buffer as new starting point
 	    }
-	    if (bp == buf)
+	    যদি (bp == buf)
 	    {
 		// back where we started, didn't find anything.
 		emsg(_(e_there_is_no_listed_buffer));
-		return FAIL;
+		প্রত্যাগম FAIL;
 	    }
 	}
     }
 
-    if (buf == NULL)	    // could not find it
+    যদি (buf == রিক্ত)	    // could not find it
     {
-	if (start == DOBUF_FIRST)
+	যদি (start == DOBUF_FIRST)
 	{
 	    // don't warn when deleting
-	    if (!unload)
-		semsg(_(e_buffer_nr_does_not_exist), count);
+	    যদি (!unload)
+		semsg(_(e_buffer_nr_does_not_exist), গুনতি);
 	}
-	else if (dir == FORWARD)
+	অন্যথা যদি (dir == FORWARD)
 	    emsg(_(e_cannot_go_beyond_last_buffer));
-	else
+	অন্যথা
 	    emsg(_(e_cannot_go_before_first_buffer));
-	return FAIL;
+	প্রত্যাগম FAIL;
     }
 #ifdef FEAT_PROP_POPUP
-    if ((flags & DOBUF_NOPOPUP) && bt_popup(buf) && !bt_terminal(buf))
-	return OK;
+    যদি ((flags & DOBUF_NOPOPUP) && bt_popup(buf) && !bt_terminal(buf))
+	প্রত্যাগম OK;
 #endif
-    if (action == DOBUF_GOTO && buf != curbuf
+    যদি (action == DOBUF_GOTO && buf != curbuf
 	    && !check_can_set_curbuf_forceit((flags & DOBUF_FORCEIT) != 0))
 	// disallow navigating to another buffer when 'winfixbuf' is applied
-	return FAIL;
+	প্রত্যাগম FAIL;
 
-    if ((action == DOBUF_GOTO || action == DOBUF_SPLIT)
+    যদি ((action == DOBUF_GOTO || action == DOBUF_SPLIT)
 						  && (buf->b_flags & BF_DUMMY))
     {
 	// disallow navigating to the dummy buffer
-	semsg(_(e_buffer_nr_does_not_exist), count);
-	return FAIL;
+	semsg(_(e_buffer_nr_does_not_exist), গুনতি);
+	প্রত্যাগম FAIL;
     }
 
 #ifdef FEAT_GUI
@@ -1474,85 +1474,85 @@ do_buffer_ext(
     /*
      * delete buffer "buf" from memory and/or the list
      */
-    if (unload)
+    যদি (unload)
     {
-	int	forward;
+	পূর্ণাঙ্ক	forward;
 	bufref_T bufref;
 
-	if (!can_unload_buffer(buf))
-	    return FAIL;
+	যদি (!can_unload_buffer(buf))
+	    প্রত্যাগম FAIL;
 
 	set_bufref(&bufref, buf);
 
 	// When unloading or deleting a buffer that's already unloaded and
 	// unlisted: fail silently.
-	if (action != DOBUF_WIPE && action != DOBUF_WIPE_REUSE
-				   && buf->b_ml.ml_mfp == NULL && !buf->b_p_bl)
-	    return FAIL;
+	যদি (action != DOBUF_WIPE && action != DOBUF_WIPE_REUSE
+				   && buf->b_ml.ml_mfp == রিক্ত && !buf->b_p_bl)
+	    প্রত্যাগম FAIL;
 
-	if ((flags & DOBUF_FORCEIT) == 0 && bufIsChanged(buf))
+	যদি ((flags & DOBUF_FORCEIT) == 0 && bufIsChanged(buf))
 	{
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#যদি defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    যদি ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	    {
 # ifdef FEAT_TERMINAL
-		if (term_job_running(buf->b_term))
+		যদি (term_job_running(buf->b_term))
 		{
-		    if (term_confirm_stop(buf) == FAIL)
-			return FAIL;
+		    যদি (term_confirm_stop(buf) == FAIL)
+			প্রত্যাগম FAIL;
 		}
-		else
+		অন্যথা
 # endif
 		{
 		    dialog_changed(buf, FALSE);
-		    if (!bufref_valid(&bufref))
+		    যদি (!bufref_valid(&bufref))
 			// Autocommand deleted buffer, oops!  It's not changed
 			// now.
-			return FAIL;
+			প্রত্যাগম FAIL;
 		    // If it's still changed fail silently, the dialog already
 		    // mentioned why it fails.
-		    if (bufIsChanged(buf))
-			return FAIL;
+		    যদি (bufIsChanged(buf))
+			প্রত্যাগম FAIL;
 		}
 	    }
-	    else
+	    অন্যথা
 #endif
 	    {
 		no_write_message_buf(buf);
-		return FAIL;
+		প্রত্যাগম FAIL;
 	    }
 	}
 
 	// When closing the current buffer stop Visual mode.
-	if (buf == curbuf && VIsual_active)
+	যদি (buf == curbuf && VIsual_active)
 	    end_visual_mode();
 
 	// If deleting the last (listed) buffer, make it empty.
 	// The last (listed) buffer cannot be unloaded.
 	FOR_ALL_BUFFERS(bp)
-	    if (bp->b_p_bl && bp != buf)
-		break;
-	if (bp == NULL && buf == curbuf)
-	    return empty_curbuf(TRUE, (flags & DOBUF_FORCEIT), action);
+	    যদি (bp->b_p_bl && bp != buf)
+		ভঙ্গ;
+	যদি (bp == রিক্ত && buf == curbuf)
+	    প্রত্যাগম empty_curbuf(TRUE, (flags & DOBUF_FORCEIT), action);
 
 	// If the deleted buffer is the current one, close the current window
 	// (unless it's the only window).  Repeat this so long as we end up in
 	// a window with this buffer.
-	while (buf == curbuf
+	যাবত্ (buf == curbuf
 		   && !(win_locked(curwin) || curwin->w_buffer->b_locked > 0)
-		   && (!ONE_WINDOW || first_tabpage->tp_next != NULL))
+		   && (!ONE_WINDOW || first_tabpage->tp_next != রিক্ত))
 	{
-	    if (win_close(curwin, FALSE) == FAIL)
-		break;
+	    যদি (win_close(curwin, FALSE) == FAIL)
+		ভঙ্গ;
 	}
 
 	// If the buffer to be deleted is not the current one, delete it here.
-	if (buf != curbuf)
+	যদি (buf != curbuf)
 	{
 	    close_windows(buf, FALSE);
-	    if (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows <= 0)
-		    close_buffer(NULL, buf, action, FALSE, FALSE, FALSE);
-	    return OK;
+	    যদি (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows <= 0)
+		    close_buffer(রিক্ত, buf, action, FALSE, FALSE, FALSE);
+	    প্রত্যাগম OK;
 	}
 
 	/*
@@ -1565,190 +1565,190 @@ do_buffer_ext(
 	 * then before the current buffer.
 	 * Finally use any buffer.  Skip buffers that are closing throughout.
 	 */
-	buf = NULL;	// selected buffer
-	bp = NULL;	// used when no loaded buffer found
-	if (au_new_curbuf.br_buf != NULL && bufref_valid(&au_new_curbuf)
+	buf = রিক্ত;	// selected buffer
+	bp = রিক্ত;	// used when no loaded buffer found
+	যদি (au_new_curbuf.br_buf != রিক্ত && bufref_valid(&au_new_curbuf)
 		&& !au_new_curbuf.br_buf->b_locked_split)
 	    buf = au_new_curbuf.br_buf;
-	else if (curwin->w_jumplistlen > 0)
+	অন্যথা যদি (curwin->w_jumplistlen > 0)
 	{
-	    int     jumpidx;
+	    পূর্ণাঙ্ক     jumpidx;
 
 	    jumpidx = curwin->w_jumplistidx - 1;
-	    if (jumpidx < 0)
+	    যদি (jumpidx < 0)
 		jumpidx = curwin->w_jumplistlen - 1;
 
 	    forward = jumpidx;
-	    while (jumpidx != curwin->w_jumplistidx)
+	    যাবত্ (jumpidx != curwin->w_jumplistidx)
 	    {
 		buf = buflist_findnr(curwin->w_jumplist[jumpidx].fmark.fnum);
-		if (buf != NULL)
+		যদি (buf != রিক্ত)
 		{
 		    // Skip current and unlisted bufs.  Also skip a quickfix
 		    // or closing buffer, it might be deleted soon.
-		    if (buf == curbuf || !buf->b_p_bl || bt_quickfix(buf)
+		    যদি (buf == curbuf || !buf->b_p_bl || bt_quickfix(buf)
 			    || buf->b_locked_split)
-			buf = NULL;
-		    else if (buf->b_ml.ml_mfp == NULL)
+			buf = রিক্ত;
+		    অন্যথা যদি (buf->b_ml.ml_mfp == রিক্ত)
 		    {
 			// skip unloaded buf, but may keep it for later
-			if (bp == NULL)
+			যদি (bp == রিক্ত)
 			    bp = buf;
-			buf = NULL;
+			buf = রিক্ত;
 		    }
 		}
-		if (buf != NULL)   // found a valid buffer: stop searching
-		    break;
+		যদি (buf != রিক্ত)   // found a valid buffer: stop searching
+		    ভঙ্গ;
 		// advance to older entry in jump list
-		if (!jumpidx && curwin->w_jumplistidx == curwin->w_jumplistlen)
-		    break;
-		if (--jumpidx < 0)
+		যদি (!jumpidx && curwin->w_jumplistidx == curwin->w_jumplistlen)
+		    ভঙ্গ;
+		যদি (--jumpidx < 0)
 		    jumpidx = curwin->w_jumplistlen - 1;
-		if (jumpidx == forward)		// List exhausted for sure
-		    break;
+		যদি (jumpidx == forward)		// List exhausted for sure
+		    ভঙ্গ;
 	    }
 	}
 
-	if (buf == NULL)	// No previous buffer, Try 2'nd approach
+	যদি (buf == রিক্ত)	// No previous buffer, Try 2'nd approach
 	{
 	    forward = TRUE;
 	    buf = curbuf->b_next;
-	    for (;;)
+	    প্রতি (;;)
 	    {
-		if (buf == NULL)
+		যদি (buf == রিক্ত)
 		{
-		    if (!forward)	// tried both directions
-			break;
+		    যদি (!forward)	// tried both directions
+			ভঙ্গ;
 		    buf = curbuf->b_prev;
 		    forward = FALSE;
-		    continue;
+		    অনুবর্ত;
 		}
 		// in non-help buffer, try to skip help buffers, and vv
-		if (buf->b_help == curbuf->b_help && buf->b_p_bl
+		যদি (buf->b_help == curbuf->b_help && buf->b_p_bl
 			    && !bt_quickfix(buf) && !buf->b_locked_split)
 		{
-		    if (buf->b_ml.ml_mfp != NULL)   // found loaded buffer
-			break;
-		    if (bp == NULL)	// remember unloaded buf for later
+		    যদি (buf->b_ml.ml_mfp != রিক্ত)   // found loaded buffer
+			ভঙ্গ;
+		    যদি (bp == রিক্ত)	// remember unloaded buf for later
 			bp = buf;
 		}
-		if (forward)
+		যদি (forward)
 		    buf = buf->b_next;
-		else
+		অন্যথা
 		    buf = buf->b_prev;
 	    }
 	}
-	if (buf == NULL)	// No loaded buffer, use unloaded one
+	যদি (buf == রিক্ত)	// No loaded buffer, use unloaded one
 	    buf = bp;
-	if (buf == NULL)	// No loaded buffer, find listed one
+	যদি (buf == রিক্ত)	// No loaded buffer, find listed one
 	{
 	    FOR_ALL_BUFFERS(buf)
-		if (buf->b_p_bl && buf != curbuf && !bt_quickfix(buf)
+		যদি (buf->b_p_bl && buf != curbuf && !bt_quickfix(buf)
 			&& !buf->b_locked_split)
-		    break;
+		    ভঙ্গ;
 	}
-	if (buf == NULL)	// Still no buffer, just take one
+	যদি (buf == রিক্ত)	// Still no buffer, just take one
 	{
-	    if (curbuf->b_next != NULL)
+	    যদি (curbuf->b_next != রিক্ত)
 		buf = curbuf->b_next;
-	    else
+	    অন্যথা
 		buf = curbuf->b_prev;
-	    if (bt_quickfix(buf)
-		    || (buf != NULL && buf != curbuf && buf->b_locked_split))
-		buf = NULL;
+	    যদি (bt_quickfix(buf)
+		    || (buf != রিক্ত && buf != curbuf && buf->b_locked_split))
+		buf = রিক্ত;
 	}
     }
 
-    if (buf == NULL)
+    যদি (buf == রিক্ত)
     {
 	// Autocommands must have wiped out all other buffers.  Only option
 	// now is to make the current buffer empty.
-	return empty_curbuf(FALSE, (flags & DOBUF_FORCEIT), action);
+	প্রত্যাগম empty_curbuf(FALSE, (flags & DOBUF_FORCEIT), action);
     }
 
     /*
      * make "buf" the current buffer
      */
     // If 'switchbuf' is set jump to the window containing "buf".
-    if (action == DOBUF_SPLIT && swbuf_goto_win_with_buf(buf) != NULL)
-	return OK;
+    যদি (action == DOBUF_SPLIT && swbuf_goto_win_with_buf(buf) != রিক্ত)
+	প্রত্যাগম OK;
     // Whether splitting or not, don't open a closing buffer in more windows.
-    if (buf != curbuf && buf->b_locked_split)
+    যদি (buf != curbuf && buf->b_locked_split)
     {
 	emsg(_(e_cannot_switch_to_a_closing_buffer));
-	return FAIL;
+	প্রত্যাগম FAIL;
     }
-    if (action == DOBUF_SPLIT && win_split(0, 0) == FAIL) // split window first
-	return FAIL;
+    যদি (action == DOBUF_SPLIT && win_split(0, 0) == FAIL) // split window first
+	প্রত্যাগম FAIL;
 
     // go to current buffer - nothing to do
-    if (buf == curbuf)
-	return OK;
+    যদি (buf == curbuf)
+	প্রত্যাগম OK;
 
     // Check if the current buffer may be abandoned.
-    if (action == DOBUF_GOTO && !can_abandon(curbuf, (flags & DOBUF_FORCEIT)))
+    যদি (action == DOBUF_GOTO && !can_abandon(curbuf, (flags & DOBUF_FORCEIT)))
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#যদি defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	যদি ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	{
 # ifdef FEAT_TERMINAL
-	    if (term_job_running(curbuf->b_term))
+	    যদি (term_job_running(curbuf->b_term))
 	    {
-		if (term_confirm_stop(curbuf) == FAIL)
-		    return FAIL;
+		যদি (term_confirm_stop(curbuf) == FAIL)
+		    প্রত্যাগম FAIL;
 		// Manually kill the terminal here because this command will
 		// hide it otherwise.
 		free_terminal(curbuf);
 	    }
-	    else
+	    অন্যথা
 # endif
 	    {
 		bufref_T bufref;
 
 		set_bufref(&bufref, buf);
 		dialog_changed(curbuf, FALSE);
-		if (!bufref_valid(&bufref))
+		যদি (!bufref_valid(&bufref))
 		    // Autocommand deleted buffer, oops!
-		    return FAIL;
+		    প্রত্যাগম FAIL;
 
-		if (bufIsChanged(curbuf))
+		যদি (bufIsChanged(curbuf))
 		{
 		    no_write_message();
-		    return FAIL;
+		    প্রত্যাগম FAIL;
 		}
 	    }
 	}
-	else
+	অন্যথা
 #endif
 	{
 	    no_write_message();
-	    return FAIL;
+	    প্রত্যাগম FAIL;
 	}
     }
 
     // Go to the other buffer.
     set_curbuf(buf, action);
 
-    if (action == DOBUF_SPLIT)
+    যদি (action == DOBUF_SPLIT)
 	RESET_BINDING(curwin);	// reset 'scrollbind' and 'cursorbind'
 
-#if defined(FEAT_EVAL)
-    if (aborting())	    // autocmds may abort script processing
-	return FAIL;
+#যদি defined(FEAT_EVAL)
+    যদি (aborting())	    // autocmds may abort script processing
+	প্রত্যাগম FAIL;
 #endif
 
-    return OK;
+    প্রত্যাগম OK;
 }
 
-    int
+    পূর্ণাঙ্ক
 do_buffer(
-    int		action,
-    int		start,
-    int		dir,		// FORWARD or BACKWARD
-    int		count,		// buffer number or number of buffers
-    int		forceit)	// TRUE when using !
+    পূর্ণাঙ্ক		action,
+    পূর্ণাঙ্ক		start,
+    পূর্ণাঙ্ক		dir,		// FORWARD or BACKWARD
+    পূর্ণাঙ্ক		গুনতি,		// buffer number or number of buffers
+    পূর্ণাঙ্ক		forceit)	// TRUE when using !
 {
-    return do_buffer_ext(action, start, dir, count,
+    প্রত্যাগম do_buffer_ext(action, start, dir, গুনতি,
 						  forceit ? DOBUF_FORCEIT : 0);
 }
 
@@ -1765,102 +1765,102 @@ do_buffer(
  *
  * Returns error message or NULL
  */
-    char *
+    বর্ণ *
 do_bufdel(
-    int		command,
+    পূর্ণাঙ্ক		command,
     char_u	*arg,		// pointer to extra arguments
-    int		addr_count,
-    int		start_bnr,	// first buffer number in a range
-    int		end_bnr,	// buffer nr or last buffer nr in a range
-    int		forceit)
+    পূর্ণাঙ্ক		addr_গুনতি,
+    পূর্ণাঙ্ক		start_bnr,	// first buffer number in a range
+    পূর্ণাঙ্ক		end_bnr,	// buffer nr or last buffer nr in a range
+    পূর্ণাঙ্ক		forceit)
 {
-    int		do_current = 0;	// delete current buffer?
-    int		deleted = 0;	// number of buffers deleted
-    char	*errormsg = NULL; // return value
-    int		bnr;		// buffer number
+    পূর্ণাঙ্ক		do_current = 0;	// delete current buffer?
+    পূর্ণাঙ্ক		deleted = 0;	// number of buffers deleted
+    বর্ণ	*errormsg = রিক্ত; // return value
+    পূর্ণাঙ্ক		bnr;		// buffer number
     char_u	*p;
 
-    if (addr_count == 0)
+    যদি (addr_গুনতি == 0)
     {
-	(void)do_buffer(command, DOBUF_CURRENT, FORWARD, 0, forceit);
+	(শূন্য)do_buffer(command, DOBUF_CURRENT, FORWARD, 0, forceit);
     }
-    else
+    অন্যথা
     {
-	if (addr_count == 2)
+	যদি (addr_গুনতি == 2)
 	{
-	    if (*arg)		// both range and argument is not allowed
-		return ex_errmsg(e_trailing_characters_str, arg);
+	    যদি (*arg)		// both range and argument is not allowed
+		প্রত্যাগম ex_errmsg(e_trailing_characters_str, arg);
 	    bnr = start_bnr;
 	}
-	else	// addr_count == 1
+	অন্যথা	// addr_count == 1
 	    bnr = end_bnr;
 
-	for ( ;!got_int; ui_breakcheck())
+	প্রতি ( ;!got_int; ui_breakcheck())
 	{
 	    // Delete the current buffer last, otherwise when the
 	    // current buffer is deleted, the next buffer becomes
 	    // the current one and will be loaded, which may then
 	    // also be deleted, etc.
-	    if (bnr == curbuf->b_fnum)
+	    যদি (bnr == curbuf->b_fnum)
 		do_current = bnr;
-	    else if (do_buffer_ext(command, DOBUF_FIRST, FORWARD, bnr,
+	    অন্যথা যদি (do_buffer_ext(command, DOBUF_FIRST, FORWARD, bnr,
 			  DOBUF_NOPOPUP | (forceit ? DOBUF_FORCEIT : 0)) == OK)
 		++deleted;
 
 	    // find next buffer number to delete/unload
-	    if (addr_count == 2)
+	    যদি (addr_গুনতি == 2)
 	    {
-		if (++bnr > end_bnr)
-		    break;
+		যদি (++bnr > end_bnr)
+		    ভঙ্গ;
 	    }
-	    else    // addr_count == 1
+	    অন্যথা    // addr_count == 1
 	    {
 		arg = skipwhite(arg);
-		if (*arg == NUL)
-		    break;
-		if (!VIM_ISDIGIT(*arg))
+		যদি (*arg == NUL)
+		    ভঙ্গ;
+		যদি (!VIM_ISDIGIT(*arg))
 		{
 		    p = skiptowhite_esc(arg);
 		    bnr = buflist_findpat(arg, p,
 			  command == DOBUF_WIPE || command == DOBUF_WIPE_REUSE,
 								FALSE, FALSE);
-		    if (bnr < 0)	    // failed
-			break;
+		    যদি (bnr < 0)	    // failed
+			ভঙ্গ;
 		    arg = p;
 		}
-		else
+		অন্যথা
 		    bnr = getdigits(&arg);
 	    }
 	}
-	if (!got_int && do_current && do_buffer(command, DOBUF_FIRST,
+	যদি (!got_int && do_current && do_buffer(command, DOBUF_FIRST,
 					  FORWARD, do_current, forceit) == OK)
 	    ++deleted;
 
-	if (deleted == 0)
+	যদি (deleted == 0)
 	{
-	    if (command == DOBUF_UNLOAD)
+	    যদি (command == DOBUF_UNLOAD)
 		STRCPY(IObuff, _(e_no_buffers_were_unloaded));
-	    else if (command == DOBUF_DEL)
+	    অন্যথা যদি (command == DOBUF_DEL)
 		STRCPY(IObuff, _(e_no_buffers_were_deleted));
-	    else
+	    অন্যথা
 		STRCPY(IObuff, _(e_no_buffers_were_wiped_out));
-	    errormsg = (char *)IObuff;
+	    errormsg = (বর্ণ *)IObuff;
 	}
-	else if (deleted >= p_report)
+	অন্যথা যদি (deleted >= p_report)
 	{
-	    if (command == DOBUF_UNLOAD)
+	    যদি (command == DOBUF_UNLOAD)
 		smsg(NGETTEXT("%d buffer unloaded",
 			    "%d buffers unloaded", deleted), deleted);
-	    else if (command == DOBUF_DEL)
+	    অন্যথা যদি (command == DOBUF_DEL)
 		smsg(NGETTEXT("%d buffer deleted",
 			    "%d buffers deleted", deleted), deleted);
-	    else
+	    অন্যথা
 		smsg(NGETTEXT("%d buffer wiped out",
 			    "%d buffers wiped out", deleted), deleted);
 	}
     }
 
-    return errormsg;
+    প্রত্যাগম errormsg;
 }
 
 /*
@@ -1873,21 +1873,21 @@ do_bufdel(
  * DOBUF_WIPE	    wipe it out
  * DOBUF_WIPE_REUSE wipe it out and add to "buf_reuse"
  */
-    void
-set_curbuf(buf_T *buf, int action)
+    শূন্য
+set_curbuf(buf_T *buf, পূর্ণাঙ্ক action)
 {
     buf_T	*prevbuf;
-    int		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
+    পূর্ণাঙ্ক		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
 			|| action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
 #ifdef FEAT_SYN_HL
     long	old_tw = curbuf->b_p_tw;
 #endif
     bufref_T	newbufref;
     bufref_T	prevbufref;
-    int		valid;
+    পূর্ণাঙ্ক		valid;
 
     setpcmark();
-    if ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+    যদি ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	curwin->w_alt_fnum = curbuf->b_fnum; // remember alternate file
     buflist_altfpos(curwin);			 // remember curpos
 
@@ -1901,7 +1901,7 @@ set_curbuf(buf_T *buf, int action)
 
     // Autocommands may delete the current buffer and/or the buffer we want to
     // go to.  In those cases don't close the buffer.
-    if (!apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf)
+    যদি (!apply_autocmds(EVENT_BUFLEAVE, রিক্ত, রিক্ত, FALSE, curbuf)
 	    || (bufref_valid(&prevbufref)
 		&& bufref_valid(&newbufref)
 #ifdef FEAT_EVAL
@@ -1910,22 +1910,22 @@ set_curbuf(buf_T *buf, int action)
 	       ))
     {
 #ifdef FEAT_SYN_HL
-	if (prevbuf == curwin->w_buffer)
+	যদি (prevbuf == curwin->w_buffer)
 	    reset_synblock(curwin);
 #endif
-	if (unload)
+	যদি (unload)
 	    close_windows(prevbuf, FALSE);
-#if defined(FEAT_EVAL)
-	if (bufref_valid(&prevbufref) && !aborting())
-#else
-	if (bufref_valid(&prevbufref))
+#যদি defined(FEAT_EVAL)
+	যদি (bufref_valid(&prevbufref) && !aborting())
+#অন্যথা
+	যদি (bufref_valid(&prevbufref))
 #endif
 	{
 	    // Do not sync when in Insert mode and the buffer is open in
 	    // another window, might be a timer doing something in another
 	    // window.
-	    if (prevbuf == curbuf
-		    && ((State & MODE_INSERT) == 0 || curbuf->b_nwindows <= 1))
+	    যদি (prevbuf == curbuf
+		    && ((State & MODE_ঢোকাও) == 0 || curbuf->b_nwindows <= 1))
 		u_sync(FALSE);
 	    close_buffer(curwin, prevbuf,
 		    unload ? action : (action == DOBUF_GOTO
@@ -1938,21 +1938,21 @@ set_curbuf(buf_T *buf, int action)
     // it did ":bunload") or aborted the script processing.
     // If curwin->w_buffer is null, enter_buffer() will make it valid again
     valid = buf_valid(buf);
-    if ((valid && buf != curbuf
+    যদি ((valid && buf != curbuf
 #ifdef FEAT_EVAL
 		&& !aborting()
 #endif
-	) || curwin->w_buffer == NULL)
+	) || curwin->w_buffer == রিক্ত)
     {
 	// If the buffer is not valid but curwin->w_buffer is NULL we must
 	// enter some buffer.  Using the last one is hopefully OK.
-	if (!valid)
+	যদি (!valid)
 	    enter_buffer(lastbuf);
-	else
+	অন্যথা
 	    enter_buffer(buf);
 #ifdef FEAT_SYN_HL
-	if (old_tw != curbuf->b_p_tw)
-	    check_colorcolumn(NULL, curwin);
+	যদি (old_tw != curbuf->b_p_tw)
+	    check_colorcolumn(রিক্ত, curwin);
 #endif
     }
 }
@@ -1962,20 +1962,20 @@ set_curbuf(buf_T *buf, int action)
  * Old curbuf must have been abandoned already!  This also means "curbuf" may
  * be pointing to freed memory.
  */
-    static void
+    স্থির শূন্য
 enter_buffer(buf_T *buf)
 {
     // Stop Visual mode before changing curbuf.  May trigger TextYankPost, but
     // with textlock set.  Assumes curbuf and curwin->w_buffer is valid; if not,
     // buf_freeall() should've done this already!
-    if (VIsual_active
-#if defined(EXITFREE)
+    যদি (VIsual_active
+#যদি defined(EXITFREE)
 	    && !entered_free_all_mem
 #endif
 	    )
 	end_visual_mode();
 
-    if (curwin->w_buffer != NULL)
+    যদি (curwin->w_buffer != রিক্ত)
 	--curwin->w_buffer->b_nwindows;
 
     // Get the buffer in the current window.
@@ -1985,17 +1985,17 @@ enter_buffer(buf_T *buf)
 
     // Copy buffer and window local option values.  Not for a help buffer.
     buf_copy_options(buf, BCO_ENTER | BCO_NOHELP);
-    if (!buf->b_help)
+    যদি (!buf->b_help)
 	get_winopts(buf);
 #ifdef FEAT_FOLDING
-    else
+    অন্যথা
 	// Remove all folds in the window.
 	clearFolding(curwin);
     foldUpdateAll(curwin);	// update folds (later).
 #endif
 
 #ifdef FEAT_DIFF
-    if (curwin->w_p_diff)
+    যদি (curwin->w_p_diff)
 	diff_buf_add(curbuf);
 #endif
 
@@ -2014,41 +2014,41 @@ enter_buffer(buf_T *buf)
     curwin->w_valid = 0;
 
     // Make sure the buffer is loaded.
-    if (curbuf->b_ml.ml_mfp == NULL)	// need to load the file
+    যদি (curbuf->b_ml.ml_mfp == রিক্ত)	// need to load the file
     {
 	// If there is no filetype, allow for detecting one.  Esp. useful for
 	// ":ball" used in an autocommand.  If there already is a filetype we
 	// might prefer to keep it.
-	if (*curbuf->b_p_ft == NUL)
+	যদি (*curbuf->b_p_ft == NUL)
 	    curbuf->b_did_filetype = false;
 
-	open_buffer(FALSE, NULL, 0);
+	open_buffer(FALSE, রিক্ত, 0);
     }
-    else
+    অন্যথা
     {
-	if (!msg_silent && !shortmess(SHM_FILEINFO))
+	যদি (!বার্তা_silent && !shortmess(SHM_FILEINFO))
 	    need_fileinfo = TRUE;	// display file info after redraw
 
 	// check if file changed
-	(void)buf_check_timestamp(curbuf, FALSE);
+	(শূন্য)buf_check_timestamp(curbuf, FALSE);
 
 	curwin->w_topline = 1;
 #ifdef FEAT_DIFF
 	curwin->w_topfill = 0;
 #endif
-	apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
-	apply_autocmds(EVENT_BUFWINENTER, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_BUFENTER, রিক্ত, রিক্ত, FALSE, curbuf);
+	apply_autocmds(EVENT_BUFWINENTER, রিক্ত, রিক্ত, FALSE, curbuf);
     }
 
     // If autocommands did not change the cursor position, restore cursor lnum
     // and possibly cursor col.
-    if (curwin->w_cursor.lnum == 1 && inindent(0))
+    যদি (curwin->w_cursor.lnum == 1 && inindent(0))
 	buflist_getfpos();
 
     check_arg_idx(curwin);		// check for valid arg_idx
     maketitle();
 	// when autocmds didn't change it
-    if (curwin->w_topline == 1 && !curwin->w_topline_was_set)
+    যদি (curwin->w_topline == 1 && !curwin->w_topline_was_set)
 	scroll_cursor_halfway(FALSE, FALSE);	// redisplay at correct position
 
 #ifdef FEAT_NETBEANS_INTG
@@ -2060,14 +2060,14 @@ enter_buffer(buf_T *buf)
     DO_AUTOCHDIR;
 
 #ifdef FEAT_KEYMAP
-    if (curbuf->b_kmap_state & KEYMAP_INIT)
-	(void)keymap_init();
+    যদি (curbuf->b_kmap_state & KEYMAP_INIT)
+	(শূন্য)keymap_init();
 #endif
 #ifdef FEAT_SPELL
     // May need to set the spell language.  Can only do this after the buffer
     // has been properly setup.
-    if (!curbuf->b_help && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
-	(void)parse_spelllang(curwin);
+    যদি (!curbuf->b_help && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
+	(শূন্য)parse_spelllang(curwin);
 #endif
 #ifdef FEAT_VIMINFO
     curbuf->b_last_used = vim_time();
@@ -2076,16 +2076,16 @@ enter_buffer(buf_T *buf)
     redraw_later(UPD_NOT_VALID);
 }
 
-#if defined(FEAT_AUTOCHDIR)
+#যদি defined(FEAT_AUTOCHDIR)
 /*
  * Change to the directory of the current buffer.
  * Don't do this while still starting up.
  */
-    void
-do_autochdir(void)
+    শূন্য
+do_autochdir(শূন্য)
 {
-    if ((starting == 0 || test_autochdir)
-	    && curbuf->b_ffname != NULL
+    যদি ((starting == 0 || test_autochdir)
+	    && curbuf->b_ffname != রিক্ত
 	    && vim_chdirfile(curbuf->b_ffname, "auto") == OK)
     {
 	shorten_fnames(TRUE);
@@ -2094,36 +2094,36 @@ do_autochdir(void)
 }
 #endif
 
-    void
+    শূন্য
 no_write_message_buf(buf_T *buf)
 {
 #ifdef FEAT_TERMINAL
-    if (term_job_running(buf->b_term))
+    যদি (term_job_running(buf->b_term))
 	emsg(_(e_job_still_running_add_bang_to_end_the_job));
-    else
+    অন্যথা
 #endif
 	semsg(_(e_no_write_since_last_change_for_buffer_nr_add_bang_to_override),
 		buf->b_fnum);
 }
 
-    void
-no_write_message(void)
+    শূন্য
+no_write_message(শূন্য)
 {
 #ifdef FEAT_TERMINAL
-    if (term_job_running(curbuf->b_term))
+    যদি (term_job_running(curbuf->b_term))
 	emsg(_(e_job_still_running_add_bang_to_end_the_job));
-    else
+    অন্যথা
 #endif
 	emsg(_(e_no_write_since_last_change_add_bang_to_override));
 }
 
-    void
+    শূন্য
 no_write_message_nobang(buf_T *buf UNUSED)
 {
 #ifdef FEAT_TERMINAL
-    if (term_job_running(buf->b_term))
+    যদি (term_job_running(buf->b_term))
 	emsg(_(e_job_still_running));
-    else
+    অন্যথা
 #endif
 	emsg(_(e_no_write_since_last_change));
 }
@@ -2136,13 +2136,13 @@ no_write_message_nobang(buf_T *buf UNUSED)
  * Return TRUE if the current buffer is empty, unnamed, unmodified and used in
  * only one window.  That means it can be re-used.
  */
-    int
-curbuf_reusable(void)
+    পূর্ণাঙ্ক
+curbuf_reusable(শূন্য)
 {
-    return (curbuf != NULL
-	&& curbuf->b_ffname == NULL
+    প্রত্যাগম (curbuf != রিক্ত
+	&& curbuf->b_ffname == রিক্ত
 	&& curbuf->b_nwindows <= 1
-	&& (curbuf->b_ml.ml_mfp == NULL || BUFEMPTY())
+	&& (curbuf->b_ml.ml_mfp == রিক্ত || BUFEMPTY())
 	&& !bt_quickfix(curbuf)
 	&& !curbufIsChanged());
 }
@@ -2165,7 +2165,7 @@ buflist_new(
     char_u	*ffname_arg,	// full path of fname or relative
     char_u	*sfname_arg,	// short fname or NULL
     linenr_T	lnum,		// preferred cursor line
-    int		flags)		// BLN_ defines
+    পূর্ণাঙ্ক		flags)		// BLN_ defines
 {
     char_u	*ffname = ffname_arg;
     char_u	*sfname = sfname_arg;
@@ -2174,7 +2174,7 @@ buflist_new(
     stat_T	st;
 #endif
 
-    if (top_file_num == 1)
+    যদি (শীর্ষ_file_অঙ্ক == 1)
 	hash_init(&buf_hashtab);
 
     fname_expand(curbuf, &ffname, &sfname);	// will allocate ffname
@@ -2185,41 +2185,41 @@ buflist_new(
 #ifdef UNIX
     // On Unix we can use inode numbers when the file exists.  Works better
     // for hard links.
-    if (sfname == NULL || mch_stat((char *)sfname, &st) < 0)
+    যদি (sfname == রিক্ত || mch_stat((বর্ণ *)sfname, &st) < 0)
 	st.st_dev = (dev_T)-1;
 #endif
-    if (ffname != NULL && !(flags & (BLN_DUMMY | BLN_NEW)) && (buf =
+    যদি (ffname != রিক্ত && !(flags & (BLN_DUMMY | BLN_NEW)) && (buf =
 #ifdef UNIX
 		buflist_findname_stat(ffname, &st)
-#else
+#অন্যথা
 		buflist_findname(ffname)
 #endif
-		) != NULL)
+		) != রিক্ত)
     {
 	vim_free(ffname);
-	if (lnum != 0)
-	    buflist_setfpos(buf, (flags & BLN_NOCURWIN) ? NULL : curwin,
+	যদি (lnum != 0)
+	    buflist_setfpos(buf, (flags & BLN_NOCURWIN) ? রিক্ত : curwin,
 						      lnum, (colnr_T)0, FALSE);
 
-	if ((flags & BLN_NOOPT) == 0)
+	যদি ((flags & BLN_NOOPT) == 0)
 	    // copy the options now, if 'cpo' doesn't have 's' and not done
 	    // already
 	    buf_copy_options(buf, 0);
 
-	if ((flags & BLN_LISTED) && !buf->b_p_bl)
+	যদি ((flags & BLN_LISTED) && !buf->b_p_bl)
 	{
 	    bufref_T bufref;
 
 	    buf->b_p_bl = TRUE;
 	    set_bufref(&bufref, buf);
-	    if (!(flags & BLN_DUMMY))
+	    যদি (!(flags & BLN_DUMMY))
 	    {
-		if (apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, buf)
+		যদি (apply_autocmds(EVENT_BUFADD, রিক্ত, রিক্ত, FALSE, buf)
 			&& !bufref_valid(&bufref))
-		    return NULL;
+		    প্রত্যাগম রিক্ত;
 	    }
 	}
-	return buf;
+	প্রত্যাগম buf;
     }
 
     /*
@@ -2230,8 +2230,8 @@ buflist_new(
      * (A spell file buffer is allocated in spell.c, but that's not a normal
      * buffer.)
      */
-    buf = NULL;
-    if ((flags & BLN_CURBUF) && curbuf_reusable())
+    buf = রিক্ত;
+    যদি ((flags & BLN_CURBUF) && curbuf_reusable())
     {
 	bufref_T bufref;
 
@@ -2242,38 +2242,38 @@ buflist_new(
 	// change curbuf!  If that happens, allocate a new buffer anyway.
 	buf_freeall(buf, BFA_WIPE | BFA_DEL);
 #ifdef FEAT_EVAL
-	if (aborting())		// autocmds may abort script processing
+	যদি (aborting())		// autocmds may abort script processing
 	{
 	    vim_free(ffname);
-	    return NULL;
+	    প্রত্যাগম রিক্ত;
 	}
 #endif
-	if (!bufref_valid(&bufref))
-	    buf = NULL;		// buf was deleted; allocate a new buffer
+	যদি (!bufref_valid(&bufref))
+	    buf = রিক্ত;		// buf was deleted; allocate a new buffer
     }
-    if (buf != curbuf || curbuf == NULL)
+    যদি (buf != curbuf || curbuf == রিক্ত)
     {
 	buf = ALLOC_CLEAR_ONE(buf_T);
-	if (buf == NULL)
+	যদি (buf == রিক্ত)
 	{
 	    vim_free(ffname);
-	    return NULL;
+	    প্রত্যাগম রিক্ত;
 	}
 #ifdef FEAT_EVAL
 	// init b: variables
 	buf->b_vars = dict_alloc_id(aid_newbuf_bvars);
-	if (buf->b_vars == NULL)
+	যদি (buf->b_vars == রিক্ত)
 	{
 	    vim_free(ffname);
 	    vim_free(buf);
-	    return NULL;
+	    প্রত্যাগম রিক্ত;
 	}
 	init_var_dict(buf->b_vars, &buf->b_bufvar, VAR_SCOPE);
 #endif
 	init_changedtick(buf);
     }
 
-    if (ffname != NULL)
+    যদি (ffname != রিক্ত)
     {
 	buf->b_ffname = ffname;
 	buf->b_sfname = vim_strsave(sfname);
@@ -2282,20 +2282,20 @@ buflist_new(
     clear_wininfo(buf);
     buf->b_wininfo = ALLOC_CLEAR_ONE(wininfo_T);
 
-    if ((ffname != NULL && (buf->b_ffname == NULL || buf->b_sfname == NULL))
-	    || buf->b_wininfo == NULL)
+    যদি ((ffname != রিক্ত && (buf->b_ffname == রিক্ত || buf->b_sfname == রিক্ত))
+	    || buf->b_wininfo == রিক্ত)
     {
-	if (buf->b_sfname != buf->b_ffname)
+	যদি (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
-	    buf->b_sfname = NULL;
+	অন্যথা
+	    buf->b_sfname = রিক্ত;
 	VIM_CLEAR(buf->b_ffname);
-	if (buf != curbuf)
+	যদি (buf != curbuf)
 	    free_buffer(buf);
-	return NULL;
+	প্রত্যাগম রিক্ত;
     }
 
-    if (buf == curbuf)
+    যদি (buf == curbuf)
     {
 	free_buffer_stuff(buf, FALSE);	// delete local variables et al.
 
@@ -2308,60 +2308,60 @@ buflist_new(
 	curbuf->b_kmap_state |= KEYMAP_INIT;
 #endif
     }
-    else
+    অন্যথা
     {
 	// put the new buffer at the end of the buffer list
-	buf->b_next = NULL;
-	if (firstbuf == NULL)		// buffer list is empty
+	buf->b_next = রিক্ত;
+	যদি (firstbuf == রিক্ত)		// buffer list is empty
 	{
-	    buf->b_prev = NULL;
+	    buf->b_prev = রিক্ত;
 	    firstbuf = buf;
 	}
-	else				// append new buffer at end of list
+	অন্যথা				// append new buffer at end of list
 	{
 	    lastbuf->b_next = buf;
 	    buf->b_prev = lastbuf;
 	}
 	lastbuf = buf;
 
-	if ((flags & BLN_REUSE) && buf_reuse.ga_len > 0)
+	যদি ((flags & BLN_REUSE) && buf_reuse.ga_len > 0)
 	{
 	    // Recycle a previously used buffer number.  Used for buffers which
 	    // are normally hidden, e.g. in a popup window.  Avoids that the
 	    // buffer number grows rapidly.
 	    --buf_reuse.ga_len;
-	    buf->b_fnum = ((int *)buf_reuse.ga_data)[buf_reuse.ga_len];
+	    buf->b_fnum = ((পূর্ণাঙ্ক *)buf_reuse.ga_data)[buf_reuse.ga_len];
 
 	    // Move buffer to the right place in the buffer list.
-	    while (buf->b_prev != NULL && buf->b_fnum < buf->b_prev->b_fnum)
+	    যাবত্ (buf->b_prev != রিক্ত && buf->b_fnum < buf->b_prev->b_fnum)
 	    {
 		buf_T	*prev = buf->b_prev;
 
 		prev->b_next = buf->b_next;
-		if (prev->b_next != NULL)
+		যদি (prev->b_next != রিক্ত)
 		    prev->b_next->b_prev = prev;
 		buf->b_next = prev;
 		buf->b_prev = prev->b_prev;
-		if (buf->b_prev != NULL)
+		যদি (buf->b_prev != রিক্ত)
 		    buf->b_prev->b_next = buf;
 		prev->b_prev = buf;
-		if (lastbuf == buf)
+		যদি (lastbuf == buf)
 		    lastbuf = prev;
-		if (firstbuf == prev)
+		যদি (firstbuf == prev)
 		    firstbuf = buf;
 	    }
 	}
-	else
-	    buf->b_fnum = top_file_num++;
-	if (top_file_num < 0)		// wrap around (may cause duplicates)
+	অন্যথা
+	    buf->b_fnum = শীর্ষ_file_অঙ্ক++;
+	যদি (শীর্ষ_file_অঙ্ক < 0)		// wrap around (may cause duplicates)
 	{
 	    emsg(_("W14: Warning: List of file names overflow"));
-	    if (emsg_silent == 0 && !in_assert_fails)
+	    যদি (emsg_silent == 0 && !in_assert_fails)
 	    {
 		out_flush();
 		ui_delay(3001L, TRUE);	// make sure it is noticed
 	    }
-	    top_file_num = 1;
+	    শীর্ষ_file_অঙ্ক = 1;
 	}
 	buf_hashtab_add(buf);
 
@@ -2379,9 +2379,9 @@ buflist_new(
 
     buf->b_fname = buf->b_sfname;
 #ifdef UNIX
-    if (st.st_dev == (dev_T)-1)
+    যদি (st.st_dev == (dev_T)-1)
 	buf->b_dev_valid = false;
-    else
+    অন্যথা
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
@@ -2390,13 +2390,13 @@ buflist_new(
 #endif
     buf->b_u_synced = true;
     buf->b_flags = BF_CHECK_RO | BF_NEVERLOADED;
-    if (flags & BLN_DUMMY)
+    যদি (flags & BLN_DUMMY)
 	buf->b_flags |= BF_DUMMY;
     buf_clear_file(buf);
     clrallmarks(buf);			// clear marks
     fmarks_check_names(buf);		// check file marks for this file
     buf->b_p_bl = (flags & BLN_LISTED) ? TRUE : FALSE;	// init 'buflisted'
-    if (!(flags & BLN_DUMMY))
+    যদি (!(flags & BLN_DUMMY))
     {
 	bufref_T bufref;
 
@@ -2404,22 +2404,22 @@ buflist_new(
 	// also split the window with re-using the one empty buffer. This may
 	// result in unexpectedly losing the empty buffer.
 	set_bufref(&bufref, buf);
-	if (apply_autocmds(EVENT_BUFNEW, NULL, NULL, FALSE, buf)
+	যদি (apply_autocmds(EVENT_BUFNEW, রিক্ত, রিক্ত, FALSE, buf)
 		&& !bufref_valid(&bufref))
-	    return NULL;
-	if (flags & BLN_LISTED)
+	    প্রত্যাগম রিক্ত;
+	যদি (flags & BLN_LISTED)
 	{
-	    if (apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, buf)
+	    যদি (apply_autocmds(EVENT_BUFADD, রিক্ত, রিক্ত, FALSE, buf)
 		    && !bufref_valid(&bufref))
-		return NULL;
+		প্রত্যাগম রিক্ত;
 	}
 #ifdef FEAT_EVAL
-	if (aborting())		// autocmds may abort script processing
-	    return NULL;
+	যদি (aborting())		// autocmds may abort script processing
+	    প্রত্যাগম রিক্ত;
 #endif
     }
 
-    return buf;
+    প্রত্যাগম buf;
 }
 
 /*
@@ -2427,12 +2427,12 @@ buflist_new(
  * If "free_p_ff" is TRUE also free 'fileformat', 'buftype' and
  * 'fileencoding'.
  */
-    void
+    শূন্য
 free_buf_options(
     buf_T	*buf,
-    int		free_p_ff)
+    পূর্ণাঙ্ক		free_p_ff)
 {
-    if (free_p_ff)
+    যদি (free_p_ff)
     {
 	clear_string_option(&buf->b_p_fenc);
 	clear_string_option(&buf->b_p_ff);
@@ -2446,27 +2446,27 @@ free_buf_options(
     clear_string_option(&buf->b_p_inex);
 # endif
 #endif
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_inde);
     clear_string_option(&buf->b_p_indk);
 #endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+#যদি defined(FEAT_BEVAL) && defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_bexpr);
 #endif
-#if defined(FEAT_CRYPT)
+#যদি defined(FEAT_CRYPT)
     clear_string_option(&buf->b_p_cm);
 #endif
     clear_string_option(&buf->b_p_fp);
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_fex);
 #endif
 #ifdef FEAT_CRYPT
 # ifdef FEAT_SODIUM
-    if (buf->b_p_key != NULL && *buf->b_p_key != NUL
+    যদি (buf->b_p_চাবি != রিক্ত && *buf->b_p_চাবি != NUL
 			   && crypt_method_is_sodium(crypt_get_method_nr(buf)))
-	crypt_sodium_munlock(buf->b_p_key, STRLEN(buf->b_p_key));
+	crypt_sodium_munlock(buf->b_p_চাবি, STRLEN(buf->b_p_চাবি));
 # endif
-    clear_string_option(&buf->b_p_key);
+    clear_string_option(&buf->b_p_চাবি);
 #endif
     clear_string_option(&buf->b_p_kp);
     clear_string_option(&buf->b_p_mps);
@@ -2496,7 +2496,7 @@ free_buf_options(
     clear_string_option(&buf->b_s.b_p_spc);
     clear_string_option(&buf->b_s.b_p_spf);
     vim_regfree(buf->b_s.b_cap_prog);
-    buf->b_s.b_cap_prog = NULL;
+    buf->b_s.b_cap_prog = রিক্ত;
     clear_string_option(&buf->b_s.b_p_spl);
     clear_string_option(&buf->b_s.b_p_spo);
 #endif
@@ -2519,8 +2519,8 @@ free_buf_options(
     free_callback(&buf->b_ofu_cb);
     clear_string_option(&buf->b_p_tsrfu);
     free_callback(&buf->b_tsrfu_cb);
-    clear_cpt_callbacks(&buf->b_p_cpt_cb, buf->b_p_cpt_count);
-    buf->b_p_cpt_count = 0;
+    clear_cpt_callbacks(&buf->b_p_cpt_cb, buf->b_p_cpt_গুনতি);
+    buf->b_p_cpt_গুনতি = 0;
 #endif
 #ifdef FEAT_QUICKFIX
     clear_string_option(&buf->b_p_gefm);
@@ -2565,71 +2565,71 @@ free_buf_options(
  *
  * Return FAIL for failure, OK for success.
  */
-    int
+    পূর্ণাঙ্ক
 buflist_getfile(
-    int		n,
+    পূর্ণাঙ্ক		n,
     linenr_T	lnum,
-    int		options,
-    int		forceit)
+    পূর্ণাঙ্ক		options,
+    পূর্ণাঙ্ক		forceit)
 {
     buf_T	*buf;
-    win_T	*wp = NULL;
+    win_T	*wp = রিক্ত;
     pos_T	*fpos;
     colnr_T	col;
 
     buf = buflist_findnr(n);
-    if (buf == NULL)
+    যদি (buf == রিক্ত)
     {
-	if ((options & GETF_ALT) && n == 0)
+	যদি ((options & GETF_ALT) && n == 0)
 	    emsg(_(e_no_alternate_file));
-	else
+	অন্যথা
 	    semsg(_(e_buffer_nr_not_found), n);
-	return FAIL;
+	প্রত্যাগম FAIL;
     }
 
     // if alternate file is the current buffer, nothing to do
-    if (buf == curbuf)
-	return OK;
+    যদি (buf == curbuf)
+	প্রত্যাগম OK;
 
-    if (text_or_buf_locked())
-	return FAIL;
+    যদি (text_or_buf_locked())
+	প্রত্যাগম FAIL;
 
     // altfpos may be changed by getfile(), get it now
-    if (lnum == 0)
+    যদি (lnum == 0)
     {
 	fpos = buflist_findfpos(buf);
 	lnum = fpos->lnum;
 	col = fpos->col;
     }
-    else
+    অন্যথা
 	col = 0;
 
-    if (options & GETF_SWITCH)
+    যদি (options & GETF_SWITCH)
     {
 	// If 'switchbuf' is set jump to the window containing "buf".
 	wp = swbuf_goto_win_with_buf(buf);
 
 	// If 'switchbuf' contains "split", "vsplit" or "newtab" and the
 	// current buffer isn't empty: open new tab or window
-	if (wp == NULL && (swb_flags & (SWB_VSPLIT | SWB_SPLIT | SWB_NEWTAB))
+	যদি (wp == রিক্ত && (swb_flags & (SWB_VSPLIT | SWB_SPLIT | SWB_NEWTAB))
 							       && !BUFEMPTY())
 	{
-	    if (swb_flags & SWB_NEWTAB)
+	    যদি (swb_flags & SWB_NEWTAB)
 		tabpage_new();
-	    else if (win_split(0, (swb_flags & SWB_VSPLIT) ? WSP_VERT : 0)
+	    অন্যথা যদি (win_split(0, (swb_flags & SWB_VSPLIT) ? WSP_VERT : 0)
 								      == FAIL)
-		return FAIL;
+		প্রত্যাগম FAIL;
 	    RESET_BINDING(curwin);
 	}
     }
 
     ++RedrawingDisabled;
-    int retval = FAIL;
-    if (GETFILE_SUCCESS(getfile(buf->b_fnum, NULL, NULL,
+    পূর্ণাঙ্ক retval = FAIL;
+    যদি (GETFILE_SUCCESS(getfile(buf->b_fnum, রিক্ত, রিক্ত,
 				     (options & GETF_SETMARK), lnum, forceit)))
     {
 	// cursor is at to BOL and w_cursor.lnum is checked due to getfile()
-	if (!p_sol && col != 0)
+	যদি (!p_sol && col != 0)
 	{
 	    curwin->w_cursor.col = col;
 	    check_cursor_col();
@@ -2639,16 +2639,16 @@ buflist_getfile(
 	retval = OK;
     }
 
-    if (RedrawingDisabled > 0)
+    যদি (RedrawingDisabled > 0)
 	--RedrawingDisabled;
-    return retval;
+    প্রত্যাগম retval;
 }
 
 /*
  * go to the last know line number for the current buffer
  */
-    static void
-buflist_getfpos(void)
+    স্থির শূন্য
+buflist_getfpos(শূন্য)
 {
     pos_T	*fpos;
 
@@ -2657,9 +2657,9 @@ buflist_getfpos(void)
     curwin->w_cursor.lnum = fpos->lnum;
     check_cursor_lnum();
 
-    if (p_sol)
+    যদি (p_sol)
 	curwin->w_cursor.col = 0;
-    else
+    অন্যথা
     {
 	curwin->w_cursor.col = fpos->col;
 	check_cursor_col();
@@ -2676,22 +2676,22 @@ buflist_getfpos(void)
 buflist_findname_exp(char_u *fname)
 {
     char_u	*ffname;
-    buf_T	*buf = NULL;
+    buf_T	*buf = রিক্ত;
 
     // First make the name into a full path name
     ffname = FullName_save(fname,
 #ifdef UNIX
 	    TRUE	    // force expansion, get rid of symbolic links
-#else
+#অন্যথা
 	    FALSE
 #endif
 	    );
-    if (ffname != NULL)
+    যদি (ffname != রিক্ত)
     {
 	buf = buflist_findname(ffname);
 	vim_free(ffname);
     }
-    return buf;
+    প্রত্যাগম buf;
 }
 
 /*
@@ -2706,9 +2706,9 @@ buflist_findname(char_u *ffname)
 #ifdef UNIX
     stat_T	st;
 
-    if (mch_stat((char *)ffname, &st) < 0)
+    যদি (mch_stat((বর্ণ *)ffname, &st) < 0)
 	st.st_dev = (dev_T)-1;
-    return buflist_findname_stat(ffname, &st);
+    প্রত্যাগম buflist_findname_stat(ffname, &st);
 }
 
 /*
@@ -2716,7 +2716,7 @@ buflist_findname(char_u *ffname)
  * twice for the same file.
  * Returns NULL if not found.
  */
-    static buf_T *
+    স্থির buf_T *
 buflist_findname_stat(
     char_u	*ffname,
     stat_T	*stp)
@@ -2726,13 +2726,13 @@ buflist_findname_stat(
 
     // Start at the last buffer, expect to find a match sooner.
     FOR_ALL_BUFS_FROM_LAST(buf)
-	if ((buf->b_flags & BF_DUMMY) == 0 && !otherfile_buf(buf, ffname
+	যদি ((buf->b_flags & BF_DUMMY) == 0 && !otherfile_buf(buf, ffname
 #ifdef UNIX
 		    , stp
 #endif
 		    ))
-	    return buf;
-    return NULL;
+	    প্রত্যাগম buf;
+    প্রত্যাগম রিক্ত;
 }
 
 /*
@@ -2740,34 +2740,34 @@ buflist_findname_stat(
  * Return fnum of the found buffer.
  * Return < 0 for error.
  */
-    int
+    পূর্ণাঙ্ক
 buflist_findpat(
     char_u	*pattern,
     char_u	*pattern_end,	// pointer to first char after pattern
-    int		unlisted,	// find unlisted buffers
-    int		diffmode UNUSED, // find diff-mode buffers only
-    int		curtab_only)	// find buffers in current tab only
+    পূর্ণাঙ্ক		unlisted,	// find unlisted buffers
+    পূর্ণাঙ্ক		diffmode UNUSED, // find diff-mode buffers only
+    পূর্ণাঙ্ক		curtab_only)	// find buffers in current tab only
 {
     buf_T	*buf;
-    int		match = -1;
-    int		find_listed;
+    পূর্ণাঙ্ক		match = -1;
+    পূর্ণাঙ্ক		find_listed;
     char_u	*pat;
     char_u	*patend;
-    int		attempt;
+    পূর্ণাঙ্ক		attempt;
     char_u	*p;
-    int		toggledollar;
+    পূর্ণাঙ্ক		toggledollar;
 
     // "%" is current file, "%%" or "#" is alternate file
-    if ((pattern_end == pattern + 1 && (*pattern == '%' || *pattern == '#'))
+    যদি ((pattern_end == pattern + 1 && (*pattern == '%' || *pattern == '#'))
 	    || (in_vim9script() && pattern_end == pattern + 2
 				    && pattern[0] == '%' && pattern[1] == '%'))
     {
-	if (*pattern == '#' || pattern_end == pattern + 2)
+	যদি (*pattern == '#' || pattern_end == pattern + 2)
 	    match = curwin->w_alt_fnum;
-	else
+	অন্যথা
 	    match = curbuf->b_fnum;
 #ifdef FEAT_DIFF
-	if (diffmode && !diff_mode_buf(buflist_findnr(match)))
+	যদি (diffmode && !diff_mode_buf(buflist_findnr(match)))
 	    match = -1;
 #endif
     }
@@ -2781,90 +2781,90 @@ buflist_findpat(
      * Repeat this for finding an unlisted buffer if there was no matching
      * listed buffer.
      */
-    else
+    অন্যথা
     {
-	pat = file_pat_to_reg_pat(pattern, pattern_end, NULL, FALSE);
-	if (pat == NULL)
-	    return -1;
+	pat = file_pat_to_reg_pat(pattern, pattern_end, রিক্ত, FALSE);
+	যদি (pat == রিক্ত)
+	    প্রত্যাগম -1;
 	patend = pat + STRLEN(pat) - 1;
 	toggledollar = (patend > pat && *patend == '$');
 
 	// First try finding a listed buffer.  If not found and "unlisted"
 	// is TRUE, try finding an unlisted buffer.
 	find_listed = TRUE;
-	for (;;)
+	প্রতি (;;)
 	{
-	    for (attempt = 0; attempt <= 3; ++attempt)
+	    প্রতি (attempt = 0; attempt <= 3; ++attempt)
 	    {
 		regmatch_T	regmatch;
 
 		// may add '^' and '$'
-		if (toggledollar)
+		যদি (toggledollar)
 		    *patend = (attempt < 2) ? NUL : '$'; // add/remove '$'
 		p = pat;
-		if (*p == '^' && !(attempt & 1))	 // add/remove '^'
+		যদি (*p == '^' && !(attempt & 1))	 // add/remove '^'
 		    ++p;
 		regmatch.regprog = vim_regcomp(p, magic_isset() ? RE_MAGIC : 0);
 
 		FOR_ALL_BUFS_FROM_LAST(buf)
 		{
-		    if (regmatch.regprog == NULL)
+		    যদি (regmatch.regprog == রিক্ত)
 		    {
 			// invalid pattern, possibly after switching engine
 			vim_free(pat);
-			return -1;
+			প্রত্যাগম -1;
 		    }
-		    if (buf->b_p_bl == find_listed
+		    যদি (buf->b_p_bl == find_listed
 #ifdef FEAT_DIFF
 			    && (!diffmode || diff_mode_buf(buf))
 #endif
-			    && buflist_match(&regmatch, buf, FALSE) != NULL)
+			    && buflist_match(&regmatch, buf, FALSE) != রিক্ত)
 		    {
-			if (curtab_only)
+			যদি (curtab_only)
 			{
 			    // Ignore the match if the buffer is not open in
 			    // the current tab.
 			    win_T	*wp;
 
 			    FOR_ALL_WINDOWS(wp)
-				if (wp->w_buffer == buf)
-				    break;
-			    if (wp == NULL)
-				continue;
+				যদি (wp->w_buffer == buf)
+				    ভঙ্গ;
+			    যদি (wp == রিক্ত)
+				অনুবর্ত;
 			}
-			if (match >= 0)		// already found a match
+			যদি (match >= 0)		// already found a match
 			{
 			    match = -2;
-			    break;
+			    ভঙ্গ;
 			}
 			match = buf->b_fnum;	// remember first match
 		    }
 		}
 
 		vim_regfree(regmatch.regprog);
-		if (match >= 0)			// found one match
-		    break;
+		যদি (match >= 0)			// found one match
+		    ভঙ্গ;
 	    }
 
 	    // Only search for unlisted buffers if there was no match with
 	    // a listed buffer.
-	    if (!unlisted || !find_listed || match != -1)
-		break;
+	    যদি (!unlisted || !find_listed || match != -1)
+		ভঙ্গ;
 	    find_listed = FALSE;
 	}
 
 	vim_free(pat);
     }
 
-    if (match == -2)
+    যদি (match == -2)
 	semsg(_(e_more_than_one_match_for_str), pattern);
-    else if (match < 0)
+    অন্যথা যদি (match < 0)
 	semsg(_(e_no_matching_buffer_for_str), pattern);
-    return match;
+    প্রত্যাগম match;
 }
 
 #ifdef FEAT_VIMINFO
-typedef struct {
+প্রকারনির্দেশ সংরচনা {
     buf_T   *buf;
     char_u  *match;
 } bufmatch_T;
@@ -2875,234 +2875,234 @@ typedef struct {
  * For command line expansion of ":buf" and ":sbuf".
  * Return OK if matches found, FAIL otherwise.
  */
-    int
+    পূর্ণাঙ্ক
 ExpandBufnames(
     char_u	*pat,
-    int		*num_file,
+    পূর্ণাঙ্ক		*অঙ্ক_file,
     char_u	***file,
-    int		options)
+    পূর্ণাঙ্ক		options)
 {
-    int		count;
+    পূর্ণাঙ্ক		গুনতি;
     buf_T	*buf;
-    int		round;
+    পূর্ণাঙ্ক		round;
     char_u	*p;
-    char_u	*patc = NULL;
+    char_u	*patc = রিক্ত;
 #ifdef FEAT_VIMINFO
-    bufmatch_T	*matches = NULL;
+    bufmatch_T	*matches = রিক্ত;
 #endif
-    int		fuzzy;
-    fuzmatch_str_T  *fuzmatch = NULL;
+    পূর্ণাঙ্ক		fuzzy;
+    fuzmatch_str_T  *fuzmatch = রিক্ত;
     regmatch_T	regmatch;
-    int		score = 0;
-    int		to_free = FALSE;
+    পূর্ণাঙ্ক		score = 0;
+    পূর্ণাঙ্ক		to_free = FALSE;
 
-    *num_file = 0;		    // return values in case of FAIL
-    *file = NULL;
+    *অঙ্ক_file = 0;		    // return values in case of FAIL
+    *file = রিক্ত;
 
 #ifdef FEAT_DIFF
-    if ((options & BUF_DIFF_FILTER) && !curwin->w_p_diff)
-	return FAIL;
+    যদি ((options & BUF_DIFF_FILTER) && !curwin->w_p_diff)
+	প্রত্যাগম FAIL;
 #endif
 
     fuzzy = cmdline_fuzzy_complete(pat);
 
     // Make a copy of "pat" and change "^" to "\(^\|[\/]\)" (if doing regular
     // expression matching)
-    if (!fuzzy)
+    যদি (!fuzzy)
     {
-	if (*pat == '^' && pat[1] != NUL)
+	যদি (*pat == '^' && pat[1] != NUL)
 	{
-	    int  len = (int)STRLEN(pat);
+	    পূর্ণাঙ্ক  len = (পূর্ণাঙ্ক)STRLEN(pat);
 	    patc = alloc(len);
-	    if (patc == NULL)
-		return FAIL;
+	    যদি (patc == রিক্ত)
+		প্রত্যাগম FAIL;
 	    STRNCPY(patc, pat + 1, len - 1);
 	    patc[len - 1] = NUL;
 	    to_free = TRUE;
 	}
-	else if (*pat == '^')
+	অন্যথা যদি (*pat == '^')
 	    patc = (char_u *)"";
-	else
+	অন্যথা
 	    patc = pat;
 	regmatch.regprog = vim_regcomp(patc, RE_MAGIC);
     }
 
     // round == 1: Count the matches.
     // round == 2: Build the array to keep the matches.
-    for (round = 1; round <= 2; ++round)
+    প্রতি (round = 1; round <= 2; ++round)
     {
-	count = 0;
+	গুনতি = 0;
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (!buf->b_p_bl)	// skip unlisted buffers
-		continue;
+	    যদি (!buf->b_p_bl)	// skip unlisted buffers
+		অনুবর্ত;
 #ifdef FEAT_DIFF
-	    if (options & BUF_DIFF_FILTER)
+	    যদি (options & BUF_DIFF_FILTER)
 		// Skip buffers not suitable for
 		// :diffget or :diffput completion.
-		if (buf == curbuf || !diff_mode_buf(buf))
-		    continue;
+		যদি (buf == curbuf || !diff_mode_buf(buf))
+		    অনুবর্ত;
 #endif
 
-	    if (!fuzzy)
+	    যদি (!fuzzy)
 	    {
-		if (regmatch.regprog == NULL)
+		যদি (regmatch.regprog == রিক্ত)
 		{
 		    // invalid pattern, possibly after recompiling
-		    if (to_free)
+		    যদি (to_free)
 			vim_free(patc);
-		    return FAIL;
+		    প্রত্যাগম FAIL;
 		}
 		p = buflist_match(&regmatch, buf, p_wic);
 	    }
-	    else
+	    অন্যথা
 	    {
-		p = NULL;
+		p = রিক্ত;
 		// first try matching with the short file name
-		if ((score = fuzzy_match_str(buf->b_sfname, pat))
+		যদি ((score = fuzzy_match_str(buf->b_sfname, pat))
 			!= FUZZY_SCORE_NONE)
 		    p = buf->b_sfname;
-		if (p == NULL)
+		যদি (p == রিক্ত)
 		{
 		    // next try matching with the full path file name
-		    if ((score = fuzzy_match_str(buf->b_ffname, pat))
+		    যদি ((score = fuzzy_match_str(buf->b_ffname, pat))
 			    != FUZZY_SCORE_NONE)
 			p = buf->b_ffname;
 		}
 	    }
 
-	    if (p == NULL)
-		continue;
+	    যদি (p == রিক্ত)
+		অনুবর্ত;
 
-	    if (round == 1)
+	    যদি (round == 1)
 	    {
-		++count;
-		continue;
+		++গুনতি;
+		অনুবর্ত;
 	    }
 
-	    if (options & WILD_HOME_REPLACE)
+	    যদি (options & WILD_HOME_REPLACE)
 		p = home_replace_save(buf, p);
-	    else
+	    অন্যথা
 		p = vim_strsave(p);
-	    if (p == NULL)
+	    যদি (p == রিক্ত)
 	    {
-		if (fuzzy && round == 2)
-		    fuzmatch_str_free(fuzmatch, count);
-		return FAIL;
+		যদি (fuzzy && round == 2)
+		    fuzmatch_str_free(fuzmatch, গুনতি);
+		প্রত্যাগম FAIL;
 	    }
 
-	    if (!fuzzy)
+	    যদি (!fuzzy)
 	    {
 #ifdef FEAT_VIMINFO
-		if (matches != NULL)
+		যদি (matches != রিক্ত)
 		{
-		    matches[count].buf = buf;
-		    matches[count].match = p;
-		    count++;
+		    matches[গুনতি].buf = buf;
+		    matches[গুনতি].match = p;
+		    গুনতি++;
 		}
-		else
+		অন্যথা
 #endif
-		    (*file)[count++] = p;
+		    (*file)[গুনতি++] = p;
 	    }
-	    else
+	    অন্যথা
 	    {
-		fuzmatch[count].idx = count;
-		fuzmatch[count].str = p;
-		fuzmatch[count].score = score;
-		count++;
+		fuzmatch[গুনতি].idx = গুনতি;
+		fuzmatch[গুনতি].str = p;
+		fuzmatch[গুনতি].score = score;
+		গুনতি++;
 	    }
 	}
-	if (count == 0)	// no match found, break here
-	    break;
-	if (round == 1)
+	যদি (গুনতি == 0)	// no match found, break here
+	    ভঙ্গ;
+	যদি (round == 1)
 	{
-	    if (!fuzzy)
+	    যদি (!fuzzy)
 	    {
-		*file = ALLOC_MULT(char_u *, count);
-		if (*file == NULL)
+		*file = ALLOC_MULT(char_u *, গুনতি);
+		যদি (*file == রিক্ত)
 		{
 		    vim_regfree(regmatch.regprog);
-		    if (to_free)
+		    যদি (to_free)
 			vim_free(patc);
-		    return FAIL;
+		    প্রত্যাগম FAIL;
 		}
 #ifdef FEAT_VIMINFO
-		if (options & WILD_BUFLASTUSED)
-		    matches = ALLOC_MULT(bufmatch_T, count);
+		যদি (options & WILD_BUFLASTUSED)
+		    matches = ALLOC_MULT(bufmatch_T, গুনতি);
 #endif
 	    }
-	    else
+	    অন্যথা
 	    {
-		fuzmatch = ALLOC_MULT(fuzmatch_str_T, count);
-		if (fuzmatch == NULL)
+		fuzmatch = ALLOC_MULT(fuzmatch_str_T, গুনতি);
+		যদি (fuzmatch == রিক্ত)
 		{
-		    *num_file = 0;
-		    *file = NULL;
-		    return FAIL;
+		    *অঙ্ক_file = 0;
+		    *file = রিক্ত;
+		    প্রত্যাগম FAIL;
 		}
 	    }
 	}
     }
 
-    if (!fuzzy)
+    যদি (!fuzzy)
     {
 	vim_regfree(regmatch.regprog);
-	if (to_free)
+	যদি (to_free)
 	    vim_free(patc);
     }
 
-    if (!fuzzy)
+    যদি (!fuzzy)
     {
 #ifdef FEAT_VIMINFO
-	if (matches != NULL)
+	যদি (matches != রিক্ত)
 	{
-	    int i;
-	    if (count > 1)
-		qsort(matches, count, sizeof(bufmatch_T), buf_compare);
+	    পূর্ণাঙ্ক i;
+	    যদি (গুনতি > 1)
+		qsort(matches, গুনতি, পরিমাণ(bufmatch_T), buf_compare);
 	    // if the current buffer is first in the list, place it at the end
-	    if (matches[0].buf == curbuf)
+	    যদি (matches[0].buf == curbuf)
 	    {
-		for (i = 1; i < count; i++)
+		প্রতি (i = 1; i < গুনতি; i++)
 		    (*file)[i-1] = matches[i].match;
-		(*file)[count-1] = matches[0].match;
+		(*file)[গুনতি-1] = matches[0].match;
 	    }
-	    else
+	    অন্যথা
 	    {
-		for (i = 0; i < count; i++)
+		প্রতি (i = 0; i < গুনতি; i++)
 		    (*file)[i] = matches[i].match;
 	    }
 	    vim_free(matches);
 	}
 #endif
     }
-    else
+    অন্যথা
     {
-	if (fuzzymatches_to_strmatches(fuzmatch, file, count, FALSE) == FAIL)
-	    return FAIL;
+	যদি (fuzzymatches_to_strmatches(fuzmatch, file, গুনতি, FALSE) == FAIL)
+	    প্রত্যাগম FAIL;
     }
 
-    *num_file = count;
-    return (count == 0 ? FAIL : OK);
+    *অঙ্ক_file = গুনতি;
+    প্রত্যাগম (গুনতি == 0 ? FAIL : OK);
 }
 
 /*
  * Check for a match on the file name for buffer "buf" with regprog "prog".
  * Note that rmp->regprog may become NULL when switching regexp engine.
  */
-    static char_u *
+    স্থির char_u *
 buflist_match(
     regmatch_T	*rmp,
     buf_T	*buf,
-    int		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
+    পূর্ণাঙ্ক		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
 {
     char_u	*match;
 
     // First try the short file name, then the long file name.
     match = fname_match(rmp, buf->b_sfname, ignore_case);
-    if (match == NULL && rmp->regprog != NULL)
+    যদি (match == রিক্ত && rmp->regprog != রিক্ত)
 	match = fname_match(rmp, buf->b_ffname, ignore_case);
 
-    return match;
+    প্রত্যাগম match;
 }
 
 /*
@@ -3110,53 +3110,53 @@ buflist_match(
  * Note that rmp->regprog may become NULL when switching regexp engine.
  * Return "name" when there is a match, NULL when not.
  */
-    static char_u *
+    স্থির char_u *
 fname_match(
     regmatch_T	*rmp,
     char_u	*name,
-    int		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
+    পূর্ণাঙ্ক		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
 {
-    char_u	*match = NULL;
+    char_u	*match = রিক্ত;
     char_u	*p;
 
     // extra check for valid arguments
-    if (name == NULL || rmp->regprog == NULL)
-	return NULL;
+    যদি (name == রিক্ত || rmp->regprog == রিক্ত)
+	প্রত্যাগম রিক্ত;
 
     // Ignore case when 'fileignorecase' or the argument is set.
     rmp->rm_ic = p_fic || ignore_case;
-    if (vim_regexec(rmp, name, (colnr_T)0))
+    যদি (vim_regexec(rmp, name, (colnr_T)0))
 	match = name;
-    else if (rmp->regprog != NULL)
+    অন্যথা যদি (rmp->regprog != রিক্ত)
     {
 	// Replace $(HOME) with '~' and try matching again.
-	p = home_replace_save(NULL, name);
-	if (p != NULL && vim_regexec(rmp, p, (colnr_T)0))
+	p = home_replace_save(রিক্ত, name);
+	যদি (p != রিক্ত && vim_regexec(rmp, p, (colnr_T)0))
 	    match = name;
 	vim_free(p);
     }
 
-    return match;
+    প্রত্যাগম match;
 }
 
 /*
  * Find a file in the buffer list by buffer number.
  */
     buf_T *
-buflist_findnr(int nr)
+buflist_findnr(পূর্ণাঙ্ক nr)
 {
-    char_u	key[VIM_SIZEOF_INT * 2 + 1];
+    char_u	চাবি[VIM_SIZEOF_INT * 2 + 1];
     hashitem_T	*hi;
 
-    if (nr == 0)
+    যদি (nr == 0)
 	nr = curwin->w_alt_fnum;
-    vim_snprintf((char *)key, sizeof(key), "%x", nr);
-    hi = hash_find(&buf_hashtab, key);
+    vim_snprintf((বর্ণ *)চাবি, পরিমাণ(চাবি), "%x", nr);
+    hi = hash_find(&buf_hashtab, চাবি);
 
-    if (!HASHITEM_EMPTY(hi))
-	return (buf_T *)(hi->hi_key
-			     - ((unsigned)(curbuf->b_key - (char_u *)curbuf)));
-    return NULL;
+    যদি (!HASHITEM_EMPTY(hi))
+	প্রত্যাগম (buf_T *)(hi->hi_চাবি
+			     - ((unsigned)(curbuf->b_চাবি - (char_u *)curbuf)));
+    প্রত্যাগম রিক্ত;
 }
 
 /*
@@ -3167,16 +3167,16 @@ buflist_findnr(int nr)
  */
     char_u *
 buflist_nr2name(
-    int		n,
-    int		fullname,
-    int		helptail)	// for help buffers return tail only
+    পূর্ণাঙ্ক		n,
+    পূর্ণাঙ্ক		fullname,
+    পূর্ণাঙ্ক		helptail)	// for help buffers return tail only
 {
     buf_T	*buf;
 
     buf = buflist_findnr(n);
-    if (buf == NULL)
-	return NULL;
-    return home_replace_save(helptail ? buf : NULL,
+    যদি (buf == রিক্ত)
+	প্রত্যাগম রিক্ত;
+    প্রত্যাগম home_replace_save(helptail ? buf : রিক্ত,
 				     fullname ? buf->b_ffname : buf->b_fname);
 }
 
@@ -3185,39 +3185,39 @@ buflist_nr2name(
  * When "copy_options" is TRUE save the local window option values.
  * When "lnum" is 0 only do the options.
  */
-    void
+    শূন্য
 buflist_setfpos(
     buf_T	*buf,
     win_T	*win,		// may be NULL when using :badd
     linenr_T	lnum,
     colnr_T	col,
-    int		copy_options)
+    পূর্ণাঙ্ক		copy_options)
 {
     wininfo_T	*wip;
 
     FOR_ALL_BUF_WININFO(buf, wip)
-	if (wip->wi_win == win)
-	    break;
-    if (wip == NULL)
+	যদি (wip->wi_win == win)
+	    ভঙ্গ;
+    যদি (wip == রিক্ত)
     {
 	// allocate a new entry
 	wip = ALLOC_CLEAR_ONE(wininfo_T);
-	if (wip == NULL)
-	    return;
+	যদি (wip == রিক্ত)
+	    প্রত্যাগম;
 	wip->wi_win = win;
-	if (lnum == 0)		// set lnum even when it's 0
+	যদি (lnum == 0)		// set lnum even when it's 0
 	    lnum = 1;
     }
-    else
+    অন্যথা
     {
 	// remove the entry from the list
-	if (wip->wi_prev)
+	যদি (wip->wi_prev)
 	    wip->wi_prev->wi_next = wip->wi_next;
-	else
+	অন্যথা
 	    buf->b_wininfo = wip->wi_next;
-	if (wip->wi_next)
+	যদি (wip->wi_next)
 	    wip->wi_next->wi_prev = wip->wi_prev;
-	if (copy_options && wip->wi_optset)
+	যদি (copy_options && wip->wi_optset)
 	{
 	    clear_winopt(&wip->wi_opt);
 #ifdef FEAT_FOLDING
@@ -3225,14 +3225,14 @@ buflist_setfpos(
 #endif
 	}
     }
-    if (lnum != 0)
+    যদি (lnum != 0)
     {
 	wip->wi_fpos.lnum = lnum;
 	wip->wi_fpos.col = col;
     }
-    if (win != NULL)
+    যদি (win != রিক্ত)
 	wip->wi_changelistidx = win->w_changelistidx;
-    if (copy_options && win != NULL)
+    যদি (copy_options && win != রিক্ত)
     {
 	// Save the window-specific option values.
 	copy_winopt(&win->w_onebuf_opt, &wip->wi_opt);
@@ -3246,8 +3246,8 @@ buflist_setfpos(
     // insert the entry in front of the list
     wip->wi_next = buf->b_wininfo;
     buf->b_wininfo = wip;
-    wip->wi_prev = NULL;
-    if (wip->wi_next)
+    wip->wi_prev = রিক্ত;
+    যদি (wip->wi_next)
 	wip->wi_next->wi_prev = wip;
 }
 
@@ -3256,20 +3256,20 @@ buflist_setfpos(
  * Return TRUE when "wip" has 'diff' set and the diff is only for another tab
  * page.  That's because a diff is local to a tab page.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 wininfo_other_tab_diff(wininfo_T *wip)
 {
     win_T	*wp;
 
-    if (!wip->wi_opt.wo_diff)
-	return FALSE;
+    যদি (!wip->wi_opt.wo_diff)
+	প্রত্যাগম FALSE;
 
     FOR_ALL_WINDOWS(wp)
 	// return FALSE when it's a window in the current tab page, thus
 	// the buffer was in diff mode here
-	if (wip->wi_win == wp)
-	    return FALSE;
-    return TRUE;
+	যদি (wip->wi_win == wp)
+	    প্রত্যাগম FALSE;
+    প্রত্যাগম TRUE;
 }
 #endif
 
@@ -3281,25 +3281,25 @@ wininfo_other_tab_diff(wininfo_T *wip)
  * another tab page.
  * Returns NULL when there isn't any info.
  */
-    static wininfo_T *
+    স্থির wininfo_T *
 find_wininfo(
     buf_T	*buf,
-    int		need_options,
-    int		skip_diff_buffer UNUSED)
+    পূর্ণাঙ্ক		need_options,
+    পূর্ণাঙ্ক		skip_diff_buffer UNUSED)
 {
     wininfo_T	*wip;
 
     FOR_ALL_BUF_WININFO(buf, wip)
-	if (wip->wi_win == curwin
+	যদি (wip->wi_win == curwin
 #ifdef FEAT_DIFF
 		&& (!skip_diff_buffer || !wininfo_other_tab_diff(wip))
 #endif
 
 		&& (!need_options || wip->wi_optset))
-	    break;
+	    ভঙ্গ;
 
-    if (wip != NULL)
-	return wip;
+    যদি (wip != রিক্ত)
+	প্রত্যাগম wip;
 
     // If no wininfo for curwin, use the first in the list (that doesn't have
     // 'diff' set and is in another tab page).
@@ -3307,19 +3307,19 @@ find_wininfo(
     // unless the window is editing "buf", so we can copy from the window
     // itself.
 #ifdef FEAT_DIFF
-    if (skip_diff_buffer)
+    যদি (skip_diff_buffer)
     {
 	FOR_ALL_BUF_WININFO(buf, wip)
-	    if (!wininfo_other_tab_diff(wip)
+	    যদি (!wininfo_other_tab_diff(wip)
 		    && (!need_options || wip->wi_optset
-			|| (wip->wi_win != NULL
+			|| (wip->wi_win != রিক্ত
 			    && wip->wi_win->w_buffer == buf)))
-		break;
+		ভঙ্গ;
     }
-    else
+    অন্যথা
 #endif
 	wip = buf->b_wininfo;
-    return wip;
+    প্রত্যাগম wip;
 }
 
 /*
@@ -3328,7 +3328,7 @@ find_wininfo(
  * the most recently used window.  If the values were never set, use the
  * global values for the window.
  */
-    void
+    শূন্য
 get_winopts(buf_T *buf)
 {
     wininfo_T	*wip;
@@ -3339,7 +3339,7 @@ get_winopts(buf_T *buf)
 #endif
 
     wip = find_wininfo(buf, TRUE, TRUE);
-    if (wip != NULL && wip->wi_win != NULL
+    যদি (wip != রিক্ত && wip->wi_win != রিক্ত
 	    && wip->wi_win != curwin && wip->wi_win->w_buffer == buf)
     {
 	// The buffer is currently displayed in the window: use the actual
@@ -3357,7 +3357,7 @@ get_winopts(buf_T *buf)
 	cloneFoldGrowArray(&wp->w_folds, &curwin->w_folds);
 #endif
     }
-    else if (wip != NULL && wip->wi_optset)
+    অন্যথা যদি (wip != রিক্ত && wip->wi_optset)
     {
 	// the buffer was displayed in the current window earlier
 	copy_winopt(&wip->wi_opt, &curwin->w_onebuf_opt);
@@ -3367,22 +3367,22 @@ get_winopts(buf_T *buf)
 	cloneFoldGrowArray(&wip->wi_folds, &curwin->w_folds);
 #endif
     }
-    else
+    অন্যথা
 	copy_winopt(&curwin->w_allbuf_opt, &curwin->w_onebuf_opt);
-    if (wip != NULL)
+    যদি (wip != রিক্ত)
 	curwin->w_changelistidx = wip->wi_changelistidx;
 
 #ifdef FEAT_FOLDING
     // Set 'foldlevel' to 'foldlevelstart' if it's not negative.
-    if (p_fdls >= 0)
+    যদি (p_fdls >= 0)
 	curwin->w_p_fdl = p_fdls;
 #endif
 #ifdef FEAT_STL_OPT
     // Update rendered height for window-local 'statusline'.
-    if (*curwin->w_p_stl != NUL)
+    যদি (*curwin->w_p_stl != NUL)
 	update_stl_rendered_height(curwin);
     // If the effective statuslineopt changed, re-adjust all window heights.
-    if (curwin->w_status_height > 0
+    যদি (curwin->w_status_height > 0
 	    && curwin->w_status_height != statusline_height(curwin))
     {
 	frame_change_statusline_height();
@@ -3391,7 +3391,7 @@ get_winopts(buf_T *buf)
 	// inheritance is resolved here.  frame_change_statusline_height()
 	// redistributes space within the stale fr_height values set during the
 	// split, so the content rows may be unequal.  Re-equalize if needed.
-	if (p_ea)
+	যদি (p_ea)
 	    win_equal(curwin, TRUE, 'v');
     }
 #endif
@@ -3407,13 +3407,13 @@ get_winopts(buf_T *buf)
 buflist_findfpos(buf_T *buf)
 {
     wininfo_T	*wip;
-    static pos_T no_position = {1, 0, 0};
+    স্থির pos_T no_position = {1, 0, 0};
 
     wip = find_wininfo(buf, FALSE, FALSE);
-    if (wip != NULL)
-	return &(wip->wi_fpos);
-    else
-	return &no_position;
+    যদি (wip != রিক্ত)
+	প্রত্যাগম &(wip->wi_fpos);
+    অন্যথা
+	প্রত্যাগম &no_position;
 }
 
 /*
@@ -3422,51 +3422,51 @@ buflist_findfpos(buf_T *buf)
     linenr_T
 buflist_findlnum(buf_T *buf)
 {
-    return buflist_findfpos(buf)->lnum;
+    প্রত্যাগম buflist_findfpos(buf)->lnum;
 }
 
 /*
  * List all known file names (for :files and :buffers command).
  */
-    void
+    শূন্য
 buflist_list(exarg_T *eap)
 {
     buf_T	*buf = firstbuf;
-    int		len;
-    int		i;
-    int		ro_char;
-    int		changed_char;
+    পূর্ণাঙ্ক		len;
+    পূর্ণাঙ্ক		i;
+    পূর্ণাঙ্ক		ro_char;
+    পূর্ণাঙ্ক		changed_char;
 #ifdef FEAT_TERMINAL
-    int		job_running;
-    int		job_none_open;
+    পূর্ণাঙ্ক		job_running;
+    পূর্ণাঙ্ক		job_none_open;
 #endif
 
 #ifdef FEAT_VIMINFO
     garray_T	buflist;
-    buf_T	**buflist_data = NULL, **p;
+    buf_T	**buflist_data = রিক্ত, **p;
 
-    if (vim_strchr(eap->arg, 't'))
+    যদি (vim_strchr(eap->arg, 't'))
     {
-	ga_init2(&buflist, sizeof(buf_T *), 50);
+	ga_init2(&buflist, পরিমাণ(buf_T *), 50);
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (ga_grow(&buflist, 1) == OK)
+	    যদি (ga_grow(&buflist, 1) == OK)
 		((buf_T **)buflist.ga_data)[buflist.ga_len++] = buf;
 	}
 
 	qsort(buflist.ga_data, (size_t)buflist.ga_len,
-		sizeof(buf_T *), buf_compare);
+		পরিমাণ(buf_T *), buf_compare);
 
 	buflist_data = (buf_T **)buflist.ga_data;
 	buf = *buflist_data;
     }
     p = buflist_data;
 
-    for (; buf != NULL && !got_int; buf = buflist_data != NULL
-	    ? (++p < buflist_data + buflist.ga_len ? *p : NULL)
+    প্রতি (; buf != রিক্ত && !got_int; buf = buflist_data != রিক্ত
+	    ? (++p < buflist_data + buflist.ga_len ? *p : রিক্ত)
 	    : buf->b_next)
-#else
-    for (buf = firstbuf; buf != NULL && !got_int; buf = buf->b_next)
+#অন্যথা
+    প্রতি (buf = firstbuf; buf != রিক্ত && !got_int; buf = buf->b_next)
 #endif
     {
 	char_u	*name;
@@ -3476,21 +3476,21 @@ buflist_list(exarg_T *eap)
 	job_none_open = term_none_open(buf->b_term);
 #endif
 	// skip unlisted buffers, unless ! was used
-	if ((!buf->b_p_bl && !eap->forceit && !vim_strchr(eap->arg, 'u'))
+	যদি ((!buf->b_p_bl && !eap->forceit && !vim_strchr(eap->arg, 'u'))
 		|| (vim_strchr(eap->arg, 'u') && buf->b_p_bl)
 		|| (vim_strchr(eap->arg, '+')
 			&& ((buf->b_flags & BF_READERR) || !bufIsChanged(buf)))
 		|| (vim_strchr(eap->arg, 'a')
-			&& (buf->b_ml.ml_mfp == NULL || buf->b_nwindows == 0))
+			&& (buf->b_ml.ml_mfp == রিক্ত || buf->b_nwindows == 0))
 		|| (vim_strchr(eap->arg, 'h')
-			&& (buf->b_ml.ml_mfp == NULL || buf->b_nwindows != 0))
+			&& (buf->b_ml.ml_mfp == রিক্ত || buf->b_nwindows != 0))
 #ifdef FEAT_TERMINAL
 		|| (vim_strchr(eap->arg, 'R')
 			&& (!job_running || (job_running && job_none_open)))
 		|| (vim_strchr(eap->arg, '?')
 			&& (!job_running || (job_running && !job_none_open)))
 		|| (vim_strchr(eap->arg, 'F')
-			&& (job_running || buf->b_term == NULL))
+			&& (job_running || buf->b_term == রিক্ত))
 #endif
 		|| (vim_strchr(eap->arg, '-') && buf->b_p_ma)
 		|| (vim_strchr(eap->arg, '=') && !buf->b_p_ro)
@@ -3498,40 +3498,40 @@ buflist_list(exarg_T *eap)
 		|| (vim_strchr(eap->arg, '%') && buf != curbuf)
 		|| (vim_strchr(eap->arg, '#')
 		      && (buf == curbuf || curwin->w_alt_fnum != buf->b_fnum)))
-	    continue;
+	    অনুবর্ত;
 	name = buf_spname(buf);
-	if (name != NULL)
+	যদি (name != রিক্ত)
 	    vim_strncpy(NameBuff, name, MAXPATHL - 1);
-	else
+	অন্যথা
 	    home_replace(buf, buf->b_fname, NameBuff, MAXPATHL, TRUE);
-	if (message_filtered(NameBuff))
-	    continue;
+	যদি (message_filtered(NameBuff))
+	    অনুবর্ত;
 
 	changed_char = (buf->b_flags & BF_READERR) ? 'x'
 					     : (bufIsChanged(buf) ? '+' : ' ');
 #ifdef FEAT_TERMINAL
-	if (job_running)
+	যদি (job_running)
 	{
-	    if (job_none_open)
+	    যদি (job_none_open)
 		ro_char = '?';
-	    else
+	    অন্যথা
 		ro_char = 'R';
 	    changed_char = ' ';  // bufIsChanged() returns TRUE to avoid
 				 // closing, but it's not actually changed.
 	}
-	else if (buf->b_term != NULL)
+	অন্যথা যদি (buf->b_term != রিক্ত)
 	    ro_char = 'F';
-	else
+	অন্যথা
 #endif
 	    ro_char = !buf->b_p_ma ? '-' : (buf->b_p_ro ? '=' : ' ');
 
-	msg_putchar('\n');
-	len = (int)vim_snprintf_safelen((char *)IObuff, IOSIZE - 20, "%3d%c%c%c%c%c \"%s\"",
+	বার্তা_putchar('\n');
+	len = (পূর্ণাঙ্ক)vim_snprintf_safelen((বর্ণ *)IObuff, IOSIZE - 20, "%3d%c%c%c%c%c \"%s\"",
 		buf->b_fnum,
 		buf->b_p_bl ? ' ' : 'u',
 		buf == curbuf ? '%' :
 			(curwin->w_alt_fnum == buf->b_fnum ? '#' : ' '),
-		buf->b_ml.ml_mfp == NULL ? ' ' :
+		buf->b_ml.ml_mfp == রিক্ত ? ' ' :
 			(buf->b_nwindows == 0 ? 'h' : 'a'),
 		ro_char,
 		changed_char,
@@ -3539,24 +3539,24 @@ buflist_list(exarg_T *eap)
 
 	// put "line 999" in column 40 or after the file name
 	i = 40 - vim_strsize(IObuff);
-	do
+	কুরু
 	    IObuff[len++] = ' ';
-	while (--i > 0 && len < IOSIZE - 18);
+	যাবত্ (--i > 0 && len < IOSIZE - 18);
 #ifdef FEAT_VIMINFO
-	if (vim_strchr(eap->arg, 't') && buf->b_last_used)
+	যদি (vim_strchr(eap->arg, 't') && buf->b_last_used)
 	    add_time(IObuff + len, (size_t)(IOSIZE - len), buf->b_last_used);
-	else
+	অন্যথা
 #endif
-	    vim_snprintf((char *)IObuff + len, (size_t)(IOSIZE - len),
+	    vim_snprintf((বর্ণ *)IObuff + len, (size_t)(IOSIZE - len),
 		    _("line %ld"), buf == curbuf ? curwin->w_cursor.lnum
 					       : (long)buflist_findlnum(buf));
-	msg_outtrans(IObuff);
+	বার্তা_outtrans(IObuff);
 	out_flush();	    // output one line at a time
 	ui_breakcheck();
     }
 
 #ifdef FEAT_VIMINFO
-    if (buflist_data)
+    যদি (buflist_data)
 	ga_clear(&buflist);
 #endif
 }
@@ -3567,22 +3567,22 @@ buflist_list(exarg_T *eap)
  * Used by insert_reg() and cmdline_paste() for '#' register.
  * Return FAIL if not found, OK for success.
  */
-    int
+    পূর্ণাঙ্ক
 buflist_name_nr(
-    int		fnum,
+    পূর্ণাঙ্ক		fnum,
     char_u	**fname,
     linenr_T	*lnum)
 {
     buf_T	*buf;
 
     buf = buflist_findnr(fnum);
-    if (buf == NULL || buf->b_fname == NULL)
-	return FAIL;
+    যদি (buf == রিক্ত || buf->b_fname == রিক্ত)
+	প্রত্যাগম FAIL;
 
     *fname = buf->b_fname;
     *lnum = buflist_findlnum(buf);
 
-    return OK;
+    প্রত্যাগম OK;
 }
 
 /*
@@ -3592,37 +3592,37 @@ buflist_name_nr(
  * Returns FAIL for failure (file name already in use by other buffer)
  *	OK otherwise.
  */
-    int
+    পূর্ণাঙ্ক
 setfname(
     buf_T	*buf,
     char_u	*ffname_arg,
     char_u	*sfname_arg,
-    int		message)	// give message when buffer already exists
+    পূর্ণাঙ্ক		message)	// give message when buffer already exists
 {
     char_u	*ffname = ffname_arg;
     char_u	*sfname = sfname_arg;
-    buf_T	*obuf = NULL;
+    buf_T	*obuf = রিক্ত;
 #ifdef UNIX
     stat_T	st;
 #endif
 
-    if (ffname == NULL || *ffname == NUL)
+    যদি (ffname == রিক্ত || *ffname == NUL)
     {
 	// Removing the name.
-	if (buf->b_sfname != buf->b_ffname)
+	যদি (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
-	    buf->b_sfname = NULL;
+	অন্যথা
+	    buf->b_sfname = রিক্ত;
 	VIM_CLEAR(buf->b_ffname);
 #ifdef UNIX
 	st.st_dev = (dev_T)-1;
 #endif
     }
-    else
+    অন্যথা
     {
 	fname_expand(buf, &ffname, &sfname); // will allocate ffname
-	if (ffname == NULL)		    // out of memory
-	    return FAIL;
+	যদি (ffname == রিক্ত)		    // out of memory
+	    প্রত্যাগম FAIL;
 
 	/*
 	 * If the file name is already used in another buffer:
@@ -3630,48 +3630,48 @@ setfname(
 	 * - if the buffer is not loaded, delete it from the list
 	 */
 #ifdef UNIX
-	if (mch_stat((char *)ffname, &st) < 0)
+	যদি (mch_stat((বর্ণ *)ffname, &st) < 0)
 	    st.st_dev = (dev_T)-1;
 #endif
-	if (!(buf->b_flags & BF_DUMMY))
+	যদি (!(buf->b_flags & BF_DUMMY))
 #ifdef UNIX
 	    obuf = buflist_findname_stat(ffname, &st);
-#else
+#অন্যথা
 	    obuf = buflist_findname(ffname);
 #endif
-	if (obuf != NULL && obuf != buf)
+	যদি (obuf != রিক্ত && obuf != buf)
 	{
 	    win_T	*win;
 	    tabpage_T   *tab;
-	    int		in_use = FALSE;
+	    পূর্ণাঙ্ক		in_use = FALSE;
 
 	    // during startup a window may use a buffer that is not loaded yet
 	    FOR_ALL_TAB_WINDOWS(tab, win)
-		if (win->w_buffer == obuf)
+		যদি (win->w_buffer == obuf)
 		    in_use = TRUE;
 
 	    // it's loaded or used in a window, fail
-	    if (obuf->b_ml.ml_mfp != NULL || in_use)
+	    যদি (obuf->b_ml.ml_mfp != রিক্ত || in_use)
 	    {
-		if (message)
+		যদি (message)
 		    emsg(_(e_buffer_with_this_name_already_exists));
 		vim_free(ffname);
-		return FAIL;
+		প্রত্যাগম FAIL;
 	    }
 	    // delete from the list
-	    close_buffer(NULL, obuf, DOBUF_WIPE, FALSE, FALSE, FALSE);
+	    close_buffer(রিক্ত, obuf, DOBUF_WIPE, FALSE, FALSE, FALSE);
 	}
 	sfname = vim_strsave(sfname);
-	if (ffname == NULL || sfname == NULL)
+	যদি (ffname == রিক্ত || sfname == রিক্ত)
 	{
 	    vim_free(sfname);
 	    vim_free(ffname);
-	    return FAIL;
+	    প্রত্যাগম FAIL;
 	}
 #ifdef USE_FNAME_CASE
 	fname_case(sfname, 0);    // set correct case for short file name
 #endif
-	if (buf->b_sfname != buf->b_ffname)
+	যদি (buf->b_sfname != buf->b_ffname)
 	    vim_free(buf->b_sfname);
 	vim_free(buf->b_ffname);
 	buf->b_ffname = ffname;
@@ -3679,9 +3679,9 @@ setfname(
     }
     buf->b_fname = buf->b_sfname;
 #ifdef UNIX
-    if (st.st_dev == (dev_T)-1)
+    যদি (st.st_dev == (dev_T)-1)
 	buf->b_dev_valid = false;
-    else
+    অন্যথা
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
@@ -3692,27 +3692,27 @@ setfname(
     buf->b_shortname = false;
 
     buf_name_changed(buf);
-    return OK;
+    প্রত্যাগম OK;
 }
 
 /*
  * Crude way of changing the name of a buffer.  Use with care!
  * The name should be relative to the current directory.
  */
-    void
-buf_set_name(int fnum, char_u *name)
+    শূন্য
+buf_set_name(পূর্ণাঙ্ক fnum, char_u *name)
 {
     buf_T	*buf;
 
     buf = buflist_findnr(fnum);
-    if (buf == NULL)
-	return;
+    যদি (buf == রিক্ত)
+	প্রত্যাগম;
 
-    if (buf->b_sfname != buf->b_ffname)
+    যদি (buf->b_sfname != buf->b_ffname)
 	vim_free(buf->b_sfname);
     vim_free(buf->b_ffname);
     buf->b_ffname = vim_strsave(name);
-    buf->b_sfname = NULL;
+    buf->b_sfname = রিক্ত;
     // Allocate ffname and expand into full path.  Also resolves .lnk
     // files on Win32.
     fname_expand(buf, &buf->b_ffname, &buf->b_sfname);
@@ -3723,21 +3723,21 @@ buf_set_name(int fnum, char_u *name)
  * Take care of what needs to be done when the name of buffer "buf" has
  * changed.
  */
-    void
+    শূন্য
 buf_name_changed(buf_T *buf)
 {
     /*
      * If the file name changed, also change the name of the swapfile
      */
-    if (buf->b_ml.ml_mfp != NULL)
+    যদি (buf->b_ml.ml_mfp != রিক্ত)
 	ml_setname(buf);
 
 #ifdef FEAT_TERMINAL
-    if (buf->b_term != NULL)
+    যদি (buf->b_term != রিক্ত)
 	term_clear_status_text(buf->b_term);
 #endif
 
-    if (curwin->w_buffer == buf)
+    যদি (curwin->w_buffer == buf)
 	check_arg_idx(curwin);	// check file name for arg list
     maketitle();		// set window title
     status_redraw_all();	// status lines need to be redrawn
@@ -3761,9 +3761,9 @@ setaltfname(
 
     // Create a buffer.  'buflisted' is not set if it's a new buffer
     buf = buflist_new(ffname, sfname, lnum, 0);
-    if (buf != NULL && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+    যদি (buf != রিক্ত && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	curwin->w_alt_fnum = buf->b_fnum;
-    return buf;
+    প্রত্যাগম buf;
 }
 
 /*
@@ -3772,18 +3772,18 @@ setaltfname(
  */
     char_u  *
 getaltfname(
-    int		errmsg)		// give error message
+    পূর্ণাঙ্ক		errmsg)		// give error message
 {
     char_u	*fname;
     linenr_T	dummy;
 
-    if (buflist_name_nr(0, &fname, &dummy) == FAIL)
+    যদি (buflist_name_nr(0, &fname, &dummy) == FAIL)
     {
-	if (errmsg)
+	যদি (errmsg)
 	    emsg(_(e_no_alternate_file));
-	return NULL;
+	প্রত্যাগম রিক্ত;
     }
-    return fname;
+    প্রত্যাগম fname;
 }
 
 /*
@@ -3792,31 +3792,31 @@ getaltfname(
  *
  * used by qf_init(), main() and doarglist()
  */
-    int
-buflist_add(char_u *fname, int flags)
+    পূর্ণাঙ্ক
+buflist_add(char_u *fname, পূর্ণাঙ্ক flags)
 {
     buf_T	*buf;
 
-    buf = buflist_new(fname, NULL, (linenr_T)0, flags);
-    if (buf != NULL)
-	return buf->b_fnum;
-    return 0;
+    buf = buflist_new(fname, রিক্ত, (linenr_T)0, flags);
+    যদি (buf != রিক্ত)
+	প্রত্যাগম buf->b_fnum;
+    প্রত্যাগম 0;
 }
 
-#if defined(BACKSLASH_IN_FILENAME)
+#যদি defined(BACKSLASH_IN_FILENAME)
 /*
  * Adjust slashes in file names.  Called after 'shellslash' was set.
  */
-    void
-buflist_slash_adjust(void)
+    শূন্য
+buflist_slash_adjust(শূন্য)
 {
     buf_T	*bp;
 
     FOR_ALL_BUFFERS(bp)
     {
-	if (bp->b_ffname != NULL)
+	যদি (bp->b_ffname != রিক্ত)
 	    slash_adjust(bp->b_ffname);
-	if (bp->b_sfname != NULL)
+	যদি (bp->b_sfname != রিক্ত)
 	    slash_adjust(bp->b_sfname);
     }
 }
@@ -3826,7 +3826,7 @@ buflist_slash_adjust(void)
  * Set alternate cursor position for the current buffer and window "win".
  * Also save the local window option values.
  */
-    void
+    শূন্য
 buflist_altfpos(win_T *win)
 {
     buflist_setfpos(curbuf, win, win->w_cursor.lnum, win->w_cursor.col, TRUE);
@@ -3836,17 +3836,17 @@ buflist_altfpos(win_T *win)
  * Return TRUE if 'ffname' is not the same file as current file.
  * Fname must have a full path (expanded by mch_FullName()).
  */
-    int
+    পূর্ণাঙ্ক
 otherfile(char_u *ffname)
 {
-    return otherfile_buf(curbuf, ffname
+    প্রত্যাগম otherfile_buf(curbuf, ffname
 #ifdef UNIX
-	    , NULL
+	    , রিক্ত
 #endif
 	    );
 }
 
-    static int
+    স্থির পূর্ণাঙ্ক
 otherfile_buf(
     buf_T		*buf,
     char_u		*ffname
@@ -3856,18 +3856,18 @@ otherfile_buf(
     )
 {
     // no name is different
-    if (ffname == NULL || *ffname == NUL || buf->b_ffname == NULL)
-	return TRUE;
-    if (fnamecmp(ffname, buf->b_ffname) == 0)
-	return FALSE;
+    যদি (ffname == রিক্ত || *ffname == NUL || buf->b_ffname == রিক্ত)
+	প্রত্যাগম TRUE;
+    যদি (fnamecmp(ffname, buf->b_ffname) == 0)
+	প্রত্যাগম FALSE;
 #ifdef UNIX
     {
 	stat_T	    st;
 
 	// If no stat_T given, get it now
-	if (stp == NULL)
+	যদি (stp == রিক্ত)
 	{
-	    if (!buf->b_dev_valid || mch_stat((char *)ffname, &st) < 0)
+	    যদি (!buf->b_dev_valid || mch_stat((বর্ণ *)ffname, &st) < 0)
 		st.st_dev = (dev_T)-1;
 	    stp = &st;
 	}
@@ -3880,46 +3880,46 @@ otherfile_buf(
 	// dev/ino again when they appear to match, but not when they appear
 	// to be different: Could skip a buffer when it's actually the same
 	// file.
-	if (buf_same_ino(buf, stp))
+	যদি (buf_same_ino(buf, stp))
 	{
 	    buf_setino(buf);
-	    if (buf_same_ino(buf, stp))
-		return FALSE;
+	    যদি (buf_same_ino(buf, stp))
+		প্রত্যাগম FALSE;
 	}
     }
 #endif
-    return TRUE;
+    প্রত্যাগম TRUE;
 }
 
-#if defined(UNIX)
+#যদি defined(UNIX)
 /*
  * Set inode and device number for a buffer.
  * Must always be called when b_fname is changed!.
  */
-    void
+    শূন্য
 buf_setino(buf_T *buf)
 {
     stat_T	st;
 
-    if (buf->b_fname != NULL && mch_stat((char *)buf->b_fname, &st) >= 0)
+    যদি (buf->b_fname != রিক্ত && mch_stat((বর্ণ *)buf->b_fname, &st) >= 0)
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
 	buf->b_ino = st.st_ino;
     }
-    else
+    অন্যথা
 	buf->b_dev_valid = false;
 }
 
 /*
  * Return TRUE if dev/ino in buffer "buf" matches with "stp".
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 buf_same_ino(
     buf_T	*buf,
     stat_T	*stp)
 {
-    return (buf->b_dev_valid
+    প্রত্যাগম (buf->b_dev_valid
 	    && stp->st_dev == buf->b_dev
 	    && stp->st_ino == buf->b_ino);
 }
@@ -3928,37 +3928,37 @@ buf_same_ino(
 /*
  * Print info about the current buffer.
  */
-    void
+    শূন্য
 fileinfo(
-    int fullname,	    // when non-zero print full path
-    int shorthelp,
-    int	dont_truncate)
+    পূর্ণাঙ্ক fullname,	    // when non-zero print full path
+    পূর্ণাঙ্ক shorthelp,
+    পূর্ণাঙ্ক	dont_truncate)
 {
     char_u	*name;
-    char	*buffer;
+    বর্ণ	*buffer;
     size_t	bufferlen = 0;
 
     buffer = alloc(IOSIZE);
-    if (buffer == NULL)
-	return;
+    যদি (buffer == রিক্ত)
+	প্রত্যাগম;
 
-    if (fullname > 1)	    // 2 CTRL-G: include buffer number
+    যদি (fullname > 1)	    // 2 CTRL-G: include buffer number
 	bufferlen = vim_snprintf_safelen(buffer, IOSIZE, "buf %d: ", curbuf->b_fnum);
 
     buffer[bufferlen++] = '"';
 
     name = buf_spname(curbuf);
-    if (name != NULL)
+    যদি (name != রিক্ত)
 	bufferlen += vim_snprintf_safelen(buffer + bufferlen,
 	    IOSIZE - bufferlen, "%s", name);
-    else
+    অন্যথা
     {
-	if (!fullname && curbuf->b_fname != NULL)
+	যদি (!fullname && curbuf->b_fname != রিক্ত)
 	    name = curbuf->b_fname;
-	else
+	অন্যথা
 	    name = curbuf->b_ffname;
-	bufferlen += home_replace(shorthelp ? curbuf : NULL, name,
-	    (char_u *)buffer + bufferlen, IOSIZE - (int)bufferlen, TRUE);
+	bufferlen += home_replace(shorthelp ? curbuf : রিক্ত, name,
+	    (char_u *)buffer + bufferlen, IOSIZE - (পূর্ণাঙ্ক)bufferlen, TRUE);
     }
 
     bufferlen += vim_snprintf_safelen(
@@ -3976,126 +3976,126 @@ fileinfo(
 	(curbufIsChanged() || (curbuf->b_flags & BF_WRITE_MASK) || curbuf->b_p_ro)
 	    ? " " : "");
 
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    যদি (curbuf->b_ml.ml_flags & ML_EMPTY)
 	bufferlen += vim_snprintf_safelen(buffer + bufferlen,
-	    IOSIZE - bufferlen, "%s", _(no_lines_msg));
-    else if (p_ru)
+	    IOSIZE - bufferlen, "%s", _(no_সারিগুলি_বার্তা));
+    অন্যথা যদি (p_ru)
 	// Current line and column are already on the screen -- webb
 	bufferlen += vim_snprintf_safelen(
 	    buffer + bufferlen,
 	    IOSIZE - bufferlen,
-	    NGETTEXT("%ld line --%d%%--", "%ld lines --%d%%--", curbuf->b_ml.ml_line_count),
-	    (long)curbuf->b_ml.ml_line_count,
-	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_line_count));
-    else
+	    NGETTEXT("%ld line --%d%%--", "%ld lines --%d%%--", curbuf->b_ml.ml_সারি_গুনতি),
+	    (long)curbuf->b_ml.ml_সারি_গুনতি,
+	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_সারি_গুনতি));
+    অন্যথা
     {
 	bufferlen += vim_snprintf_safelen(
 	    buffer + bufferlen,
 	    IOSIZE - bufferlen,
 	    _("line %ld of %ld --%d%%-- col "),
 	    (long)curwin->w_cursor.lnum,
-	    (long)curbuf->b_ml.ml_line_count,
-	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_line_count));
+	    (long)curbuf->b_ml.ml_সারি_গুনতি,
+	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_সারি_গুনতি));
 
 	validate_virtcol();
 	bufferlen += col_print((char_u *)buffer + bufferlen, IOSIZE - bufferlen,
-		   (int)curwin->w_cursor.col + 1, (int)curwin->w_virtcol + 1);
+		   (পূর্ণাঙ্ক)curwin->w_cursor.col + 1, (পূর্ণাঙ্ক)curwin->w_virtcol + 1);
     }
 
-    (void)append_arg_number(curwin, (char_u *)buffer + bufferlen,
+    (শূন্য)append_arg_সংখ্যা(curwin, (char_u *)buffer + bufferlen,
 	IOSIZE - bufferlen, !shortmess(SHM_FILE));
 
-    if (dont_truncate)
+    যদি (dont_truncate)
     {
-	int	n;
+	পূর্ণাঙ্ক	n;
 
 	// Temporarily set msg_scroll to avoid the message being truncated.
 	// First call msg_start() to get the message in the right place.
-	msg_start();
-	n = msg_scroll;
-	msg_scroll = TRUE;
-	msg(buffer);
-	msg_scroll = n;
+	বার্তা_start();
+	n = বার্তা_scroll;
+	বার্তা_scroll = TRUE;
+	বার্তা(buffer);
+	বার্তা_scroll = n;
     }
-    else
+    অন্যথা
     {
-	char	*p = msg_trunc_attr(buffer, FALSE, 0);
-	if (restart_edit != 0 || (msg_scrolled && !need_wait_return))
+	বর্ণ	*p = বার্তা_trunc_attr(buffer, FALSE, 0);
+	যদি (restart_edit != 0 || (বার্তা_scrolled && !need_wait_return))
 	    // Need to repeat the message after redrawing when:
 	    // - When restart_edit is set (otherwise there will be a delay
 	    //   before redrawing).
 	    // - When the screen was scrolled but there is no wait-return
 	    //   prompt.
-	    set_keep_msg((char_u *)p, 0);
+	    set_keep_বার্তা((char_u *)p, 0);
     }
 
     vim_free(buffer);
 }
 
-    int
+    পূর্ণাঙ্ক
 col_print(
     char_u  *buf,
     size_t  buflen,
-    int	    col,
-    int	    vcol)
+    পূর্ণাঙ্ক	    col,
+    পূর্ণাঙ্ক	    vcol)
 {
-    if (col == vcol)
-	return (int)vim_snprintf_safelen((char *)buf, buflen, "%d", col);
+    যদি (col == vcol)
+	প্রত্যাগম (পূর্ণাঙ্ক)vim_snprintf_safelen((বর্ণ *)buf, buflen, "%d", col);
 
-    return (int)vim_snprintf_safelen((char *)buf, buflen, "%d-%d", col, vcol);
+    প্রত্যাগম (পূর্ণাঙ্ক)vim_snprintf_safelen((বর্ণ *)buf, buflen, "%d-%d", col, vcol);
 }
 
-static char_u *lasttitle = NULL;
-static char_u *lasticon = NULL;
+স্থির char_u *lasttitle = রিক্ত;
+স্থির char_u *lasticon = রিক্ত;
 
 /*
  * Put the file name in the title bar and icon of the window.
  */
-    void
-maketitle(void)
+    শূন্য
+maketitle(শূন্য)
 {
-    char_u	*title_str = NULL;
-    char_u	*icon_str = NULL;
-    int		mustset;
+    char_u	*title_str = রিক্ত;
+    char_u	*icon_str = রিক্ত;
+    পূর্ণাঙ্ক		mustset;
     char_u	buf[IOSIZE];
     size_t	buflen = 0;
 
-    if (!redrawing())
+    যদি (!redrawing())
     {
 	// Postpone updating the title when 'lazyredraw' is set.
 	need_maketitle = TRUE;
-	return;
+	প্রত্যাগম;
     }
 
     need_maketitle = FALSE;
-    if (!p_title && !p_icon && lasttitle == NULL && lasticon == NULL)
-	return;  // nothing to do
+    যদি (!p_title && !p_icon && lasttitle == রিক্ত && lasticon == রিক্ত)
+	প্রত্যাগম;  // nothing to do
 
-    if (p_title)
+    যদি (p_title)
     {
-	int maxlen = 0;
+	পূর্ণাঙ্ক maxlen = 0;
 
-	if (p_titlelen > 0)
+	যদি (p_titlelen > 0)
 	{
 	    maxlen = p_titlelen * Columns / 100;
-	    if (maxlen < 10)
+	    যদি (maxlen < 10)
 		maxlen = 10;
 	}
 
 	title_str = buf;
-	if (*p_titlestring != NUL)
+	যদি (*p_titlestring != NUL)
 	{
 #ifdef FEAT_STL_OPT
-	    if (stl_syntax & STL_IN_TITLE)
-		build_stl_str_hl(curwin, title_str, sizeof(buf), p_titlestring,
+	    যদি (stl_syntax & STL_IN_TITLE)
+		build_stl_str_hl(curwin, title_str, পরিমাণ(buf), p_titlestring,
 				    (char_u *)"titlestring", 0,
-				    0, maxlen, NULL, NULL, NULL);
-	    else
+				    0, maxlen, রিক্ত, রিক্ত, রিক্ত);
+	    অন্যথা
 #endif
 		title_str = p_titlestring;
 	    buflen = STRLEN(title_str);
 	}
-	else
+	অন্যথা
 	{
 	    char_u  *p;
 
@@ -4106,25 +4106,25 @@ maketitle(void)
 	    // reserve some space for different parts of the title.
 	    // use sizeof() to introduce 'size_t' so we don't have to
 	    // cast sizes to it.
-#define SPACE_FOR_FNAME (sizeof(buf) - 100)
-#define SPACE_FOR_DIR   (sizeof(buf) - 20)
-#define SPACE_FOR_ARGNR (sizeof(buf) - 10)  // at least room for " - VIM"
+#define SPACE_FOR_FNAME (পরিমাণ(buf) - 100)
+#define SPACE_FOR_DIR   (পরিমাণ(buf) - 20)
+#define SPACE_FOR_ARGNR (পরিমাণ(buf) - 10)  // at least room for " - VIM"
 
 	    // file name
-	    if (curbuf->b_fname == NULL)
-		buflen = vim_snprintf_safelen((char *)buf,
+	    যদি (curbuf->b_fname == রিক্ত)
+		buflen = vim_snprintf_safelen((বর্ণ *)buf,
 		    SPACE_FOR_FNAME, "%s", _("[No Name]"));
 #ifdef FEAT_TERMINAL
-	    else if (curbuf->b_term != NULL)
-		buflen = vim_snprintf_safelen((char *)buf,
+	    অন্যথা যদি (curbuf->b_term != রিক্ত)
+		buflen = vim_snprintf_safelen((বর্ণ *)buf,
 		    SPACE_FOR_FNAME, "%s",
 		    term_get_status_text(curbuf->b_term));
 #endif
-	    else
+	    অন্যথা
 	    {
-		buflen = vim_snprintf_safelen((char *)buf,
+		buflen = vim_snprintf_safelen((বর্ণ *)buf,
 		    SPACE_FOR_FNAME, "%s",
-		    ((p = transstr(gettail(curbuf->b_fname))) != NULL)
+		    ((p = transstr(gettail(curbuf->b_fname))) != রিক্ত)
 			? p
 			: (char_u *)"");
 		vim_free(p);
@@ -4132,165 +4132,165 @@ maketitle(void)
 
 	    // flags
 #ifdef FEAT_TERMINAL
-	    if (curbuf->b_term == NULL)
+	    যদি (curbuf->b_term == রিক্ত)
 #endif
 	    {
-		switch (bufIsChanged(curbuf)
+		বিকল্প (bufIsChanged(curbuf)
 			+ (curbuf->b_p_ro * 2)
 			+ (!curbuf->b_p_ma * 4))
 		{
-		    case 1:
+		    পক্ষ 1:
 			// file was modified
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " +");
-			break;
-		    case 2:
+			    (বর্ণ *)buf + buflen,
+			    পরিমাণ(buf) - buflen, " +");
+			ভঙ্গ;
+		    পক্ষ 2:
 			// file is readonly
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " =");
-			break;
-		    case 3:
+			    (বর্ণ *)buf + buflen,
+			    পরিমাণ(buf) - buflen, " =");
+			ভঙ্গ;
+		    পক্ষ 3:
 			// file was modified and is readonly
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " =+");
-			break;
-		    case 4:
-		    case 6:
+			    (বর্ণ *)buf + buflen,
+			    পরিমাণ(buf) - buflen, " =+");
+			ভঙ্গ;
+		    পক্ষ 4:
+		    পক্ষ 6:
 			// file cannot be modified
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " -");
-			break;
-		    case 5:
-		    case 7:
+			    (বর্ণ *)buf + buflen,
+			    পরিমাণ(buf) - buflen, " -");
+			ভঙ্গ;
+		    পক্ষ 5:
+		    পক্ষ 7:
 			// file cannot be modified but was modified
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " -+");
-			break;
-		    default:
-			break;
+			    (বর্ণ *)buf + buflen,
+			    পরিমাণ(buf) - buflen, " -+");
+			ভঙ্গ;
+		    স্বভাব:
+			ভঙ্গ;
 		}
 	    }
 
 	    // path (surrounded by '()')
-	    if (curbuf->b_fname != NULL
+	    যদি (curbuf->b_fname != রিক্ত
 #ifdef FEAT_TERMINAL
-		    && curbuf->b_term == NULL
+		    && curbuf->b_term == রিক্ত
 #endif
 		    )
 	    {
 		// Get path of file, replace home dir with ~
-		buflen += vim_snprintf_safelen((char *)buf + buflen,
-		    sizeof(buf) - buflen, " (");
+		buflen += vim_snprintf_safelen((বর্ণ *)buf + buflen,
+		    পরিমাণ(buf) - buflen, " (");
 
 		home_replace(curbuf, curbuf->b_ffname,
-		    buf + buflen, (int)(SPACE_FOR_DIR - buflen), TRUE);
+		    buf + buflen, (পূর্ণাঙ্ক)(SPACE_FOR_DIR - buflen), TRUE);
 
 #ifdef BACKSLASH_IN_FILENAME
 		// avoid "c:/name" to be reduced to "c"
-		if (SAFE_isalpha(buf[buflen]) && buf[buflen + 1] == ':')
+		যদি (SAFE_isalpha(buf[buflen]) && buf[buflen + 1] == ':')
 		    buflen += 2;			// step over "c:"
 #endif
 
 		// determine if we have a help or normal buffer
 		p = gettail_sep(buf + buflen);
-		if (p == buf + buflen)
+		যদি (p == buf + buflen)
 		{
 		    // help buffer
-		    buflen += vim_snprintf_safelen((char *)buf + buflen,
+		    buflen += vim_snprintf_safelen((বর্ণ *)buf + buflen,
 			SPACE_FOR_DIR - buflen, "%s)", _("help"));
 		}
-		else
+		অন্যথা
 		{
 		    // normal buffer
 
 		    // Translate unprintable chars and concatenate.  Keep some
 		    // room for the server name.  When there is no room (very long
 		    // file name) use (...).
-		    if (buflen < SPACE_FOR_DIR)
+		    যদি (buflen < SPACE_FOR_DIR)
 		    {
 			// remove the file name
 			*p = NUL;
 
-			buflen += vim_snprintf_safelen((char *)buf + buflen,
+			buflen += vim_snprintf_safelen((বর্ণ *)buf + buflen,
 			    SPACE_FOR_DIR - buflen, "%s)",
-			    ((p = transstr(buf + buflen)) != NULL)
+			    ((p = transstr(buf + buflen)) != রিক্ত)
 				? p
 				: (char_u *)"");
 			vim_free(p);
 		    }
-		    else
-			buflen += vim_snprintf_safelen((char *)buf + buflen,
+		    অন্যথা
+			buflen += vim_snprintf_safelen((বর্ণ *)buf + buflen,
 			    SPACE_FOR_ARGNR - buflen, "...)");
 		}
 	    }
 
 	    // argument info
-	    buflen += append_arg_number(curwin, buf + buflen,
+	    buflen += append_arg_সংখ্যা(curwin, buf + buflen,
 		SPACE_FOR_ARGNR - buflen, FALSE);
 
 	    // servername
-	    buflen += vim_snprintf_safelen((char *)buf + buflen,
-		sizeof(buf) - buflen, " - %s",
-#if defined(FEAT_CLIENTSERVER)
-		(serverName != NULL)
+	    buflen += vim_snprintf_safelen((বর্ণ *)buf + buflen,
+		পরিমাণ(buf) - buflen, " - %s",
+#যদি defined(FEAT_CLIENTSERVER)
+		(serverName != রিক্ত)
 		    ? serverName :
 #endif
 		    (char_u *)"VIM");
 
-	    if (maxlen > 0)
+	    যদি (maxlen > 0)
 	    {
 		// make it shorter by removing a bit in the middle
-		if (vim_strsize(buf) > maxlen)
-		    trunc_string(buf, buf, maxlen, sizeof(buf));
+		যদি (vim_strsize(buf) > maxlen)
+		    trunc_string(buf, buf, maxlen, পরিমাণ(buf));
 	    }
 	}
     }
-    mustset = value_changed(title_str, &lasttitle);
+    mustset = মান_changed(title_str, &lasttitle);
 
-    if (p_icon)
+    যদি (p_icon)
     {
 	icon_str = buf;
-	if (*p_iconstring != NUL)
+	যদি (*p_iconstring != NUL)
 	{
 #ifdef FEAT_STL_OPT
-	    if (stl_syntax & STL_IN_ICON)
-		build_stl_str_hl(curwin, icon_str, sizeof(buf), p_iconstring,
-				 (char_u *)"iconstring", 0, 0, 0, NULL, NULL,
-				 NULL);
-	    else
+	    যদি (stl_syntax & STL_IN_ICON)
+		build_stl_str_hl(curwin, icon_str, পরিমাণ(buf), p_iconstring,
+				 (char_u *)"iconstring", 0, 0, 0, রিক্ত, রিক্ত,
+				 রিক্ত);
+	    অন্যথা
 #endif
 		icon_str = p_iconstring;
 	}
-	else
+	অন্যথা
 	{
 	    char_u  *name;
-	    int	    namelen;
+	    পূর্ণাঙ্ক	    namelen;
 
 	    name = buf_spname(curbuf);
-	    if (name == NULL)
+	    যদি (name == রিক্ত)
 		name = gettail(curbuf->b_ffname);
 	    // Truncate name at 100 bytes.
-	    namelen = (int)STRLEN(name);
-	    if (namelen > 100)
+	    namelen = (পূর্ণাঙ্ক)STRLEN(name);
+	    যদি (namelen > 100)
 	    {
 		namelen -= 100;
-		if (has_mbyte)
+		যদি (has_mbyte)
 		    namelen += (*mb_tail_off)(name, name + namelen) + 1;
 		name += namelen;
 	    }
 	    STRCPY(buf, name);
-	    trans_characters(buf, sizeof(buf));
+	    trans_characters(buf, পরিমাণ(buf));
 	}
     }
 
-    mustset |= value_changed(icon_str, &lasticon);
+    mustset |= মান_changed(icon_str, &lasticon);
 
-    if (mustset)
+    যদি (mustset)
 	resettitle();
 }
 
@@ -4299,40 +4299,40 @@ maketitle(void)
  * from "str" if it does.
  * Return TRUE if resettitle() is to be called.
  */
-    static int
-value_changed(char_u *str, char_u **last)
+    স্থির পূর্ণাঙ্ক
+মান_changed(char_u *str, char_u **last)
 {
-    if ((str == NULL) != (*last == NULL)
-	    || (str != NULL && *last != NULL && STRCMP(str, *last) != 0))
+    যদি ((str == রিক্ত) != (*last == রিক্ত)
+	    || (str != রিক্ত && *last != রিক্ত && STRCMP(str, *last) != 0))
     {
 	vim_free(*last);
-	if (str == NULL)
+	যদি (str == রিক্ত)
 	{
-	    *last = NULL;
+	    *last = রিক্ত;
 	    mch_restore_title(
 		  last == &lasttitle ? SAVE_RESTORE_TITLE : SAVE_RESTORE_ICON);
 	}
-	else
+	অন্যথা
 	{
 	    *last = vim_strsave(str);
-	    return TRUE;
+	    প্রত্যাগম TRUE;
 	}
     }
-    return FALSE;
+    প্রত্যাগম FALSE;
 }
 
 /*
  * Put current window title back (used after calling a shell)
  */
-    void
-resettitle(void)
+    শূন্য
+resettitle(শূন্য)
 {
     mch_settitle(lasttitle, lasticon);
 }
 
-#if defined(EXITFREE)
-    void
-free_titles(void)
+#যদি defined(EXITFREE)
+    শূন্য
+free_titles(শূন্য)
 {
     vim_free(lasttitle);
     vim_free(lasticon);
@@ -4340,17 +4340,17 @@ free_titles(void)
 #endif
 
 
-#if defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
+#যদি defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
 
 /*
  * Used for building in the status line.
  */
-typedef struct
+প্রকারনির্দেশ সংরচনা
 {
     char_u	*stl_start;
-    int		stl_minwid;
-    int		stl_maxwid;
-    enum {
+    পূর্ণাঙ্ক		stl_minwid;
+    পূর্ণাঙ্ক		stl_maxwid;
+    গণনা {
 	Normal,
 	Empty,
 	Group,
@@ -4363,13 +4363,13 @@ typedef struct
     char_u	*stl_clickfunc;	// function name for ClickFunc items
 } stl_item_T;
 
-static size_t		stl_items_len = 20; // Initial value, grows as needed.
-static stl_item_T      *stl_items = NULL;
-static int	       *stl_groupitem = NULL;
-static stl_hlrec_T     *stl_hltab = NULL;
-static stl_hlrec_T     *stl_tabtab = NULL;
-static stl_clickrec_T  *stl_clicktab = NULL;
-static int		*stl_separator_locations = NULL;
+স্থির size_t		stl_বস্তুসমূহ_len = 20; // Initial value, grows as needed.
+স্থির stl_item_T      *stl_বস্তুসমূহ = রিক্ত;
+স্থির পূর্ণাঙ্ক	       *stl_groupitem = রিক্ত;
+স্থির stl_hlrec_T     *stl_hltab = রিক্ত;
+স্থির stl_hlrec_T     *stl_tabtab = রিক্ত;
+স্থির stl_clickrec_T  *stl_clicktab = রিক্ত;
+স্থির পূর্ণাঙ্ক		*stl_separator_locations = রিক্ত;
 
 /*
  * Build a string from the status line items in "fmt".
@@ -4385,77 +4385,77 @@ static int		*stl_separator_locations = NULL;
  * If maxwidth is not zero, the string will be filled at any middle marker
  * or truncated if too long, fillchar is used for all whitespace.
  */
-    int
+    পূর্ণাঙ্ক
 build_stl_str_hl(
     win_T	*wp,
     char_u	*out,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	*fmt,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    পূর্ণাঙ্ক		opt_scope,	// scope for "opt_name"
+    পূর্ণাঙ্ক		fillchar,
+    পূর্ণাঙ্ক		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab)	// return: click func regions (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_SINGLE, wp, out, outlen, &fmt,
+    প্রত্যাগম build_stl_str_hl_local(STL_MODE_SINGLE, wp, out, outlen, &fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
-	    NULL, NULL);
+	    রিক্ত, রিক্ত);
 }
 
-    int
+    পূর্ণাঙ্ক
 build_stl_str_hl_mline(
     win_T	*wp,
     char_u	*out,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	**fmt,		// (in/out)
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    পূর্ণাঙ্ক		opt_scope,	// scope for "opt_name"
+    পূর্ণাঙ্ক		fillchar,
+    পূর্ণাঙ্ক		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    পূর্ণাঙ্ক		*carry_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_MULTI, wp, out, outlen, fmt,
+    প্রত্যাগম build_stl_str_hl_local(STL_MODE_MULTI, wp, out, outlen, fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
-	    NULL, carry_hl);
+	    রিক্ত, carry_hl);
 }
 
 # ifdef ENABLE_STL_MODE_MULTI_NL
-    int
+    পূর্ণাঙ্ক
 build_stl_str_hl_mline_nl(
     win_T	*wp,
     char_u	*out,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	**fmt,		// (in/out)
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    পূর্ণাঙ্ক		opt_scope,	// scope for "opt_name"
+    পূর্ণাঙ্ক		fillchar,
+    পূর্ণাঙ্ক		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    পূর্ণাঙ্ক		*carry_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_MULTI_NL, wp, out, outlen, fmt,
+    প্রত্যাগম build_stl_str_hl_local(STL_MODE_MULTI_NL, wp, out, outlen, fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
-	    NULL, carry_hl);
+	    রিক্ত, carry_hl);
 }
 # endif
 
-    int
+    পূর্ণাঙ্ক
 get_stl_rendered_height(
     win_T	*wp,
     char_u	*fmt,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope)	// scope for "opt_name"
+    পূর্ণাঙ্ক		opt_scope)	// scope for "opt_name"
 {
-    int rendered_height = 0;
+    পূর্ণাঙ্ক rendered_height = 0;
     char_u	buf[MAXPATHL] = {0};
 
     // Suppress errors while computing height: expressions (%!expr, %{expr})
@@ -4463,12 +4463,12 @@ get_stl_rendered_height(
     // effects.  Any errors (e.g. E48 in sandbox) will surface properly when
     // the statusline is actually drawn.
     ++emsg_off;
-    (void)build_stl_str_hl_local(STL_MODE_GET_RENDERED_HEIGHT,
-	    wp, buf, sizeof(buf), &fmt,
-	    opt_name, opt_scope, 0, 0, NULL, NULL, NULL, &rendered_height,
-	    NULL);
+    (শূন্য)build_stl_str_hl_local(STL_MODE_GET_RENDERED_HEIGHT,
+	    wp, buf, পরিমাণ(buf), &fmt,
+	    opt_name, opt_scope, 0, 0, রিক্ত, রিক্ত, রিক্ত, &rendered_height,
+	    রিক্ত);
     --emsg_off;
-    return rendered_height;
+    প্রত্যাগম rendered_height;
 }
 
 /*
@@ -4488,7 +4488,7 @@ get_stl_rendered_height(
  * Therefore, layout decisions must be based on the fully evaluated statusline
  * string, not on pre-evaluation parsing.
  */
-static int
+স্থির পূর্ণাঙ্ক
 build_stl_str_hl_local(
     stl_mode_T	mode,
     win_T	*wp,
@@ -4496,14 +4496,14 @@ build_stl_str_hl_local(
     size_t	outlen,		// length of out[]
     char_u	**fmt_arg,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    পূর্ণাঙ্ক		opt_scope,	// scope for "opt_name"
+    পূর্ণাঙ্ক		fillchar,
+    পূর্ণাঙ্ক		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*rendered_height,   // return: stl rendered height (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    পূর্ণাঙ্ক		*rendered_height,   // return: stl rendered height (can be NULL)
+    পূর্ণাঙ্ক		*carry_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
     linenr_T	lnum;
@@ -4511,30 +4511,30 @@ build_stl_str_hl_local(
     size_t	outputlen;	// length of out[] used (excluding the NUL)
     char_u	*p;
     char_u	*s;
-    int		byteval;
+    পূর্ণাঙ্ক		byteval;
 # ifdef FEAT_EVAL
-    int		use_sandbox;
-    int		save_VIsual_active;
+    পূর্ণাঙ্ক		use_sandbox;
+    পূর্ণাঙ্ক		save_VIsual_active;
 # endif
-    int		empty_line;
+    পূর্ণাঙ্ক		empty_সারি;
     long	l;
     long	n;
-    int		prevchar_isflag;
-    int		prevchar_isitem;
-    int		itemisflag;
-    int		fillable;
+    পূর্ণাঙ্ক		prevchar_isflag;
+    পূর্ণাঙ্ক		prevchar_isitem;
+    পূর্ণাঙ্ক		itemisflag;
+    পূর্ণাঙ্ক		fillable;
     char_u	*str;
-    long	num;
-    int		width;
-    int		itemcnt;
-    int		curitem;
-    int		groupdepth;
+    long	অঙ্ক;
+    পূর্ণাঙ্ক		width;
+    পূর্ণাঙ্ক		itemcnt;
+    পূর্ণাঙ্ক		curitem;
+    পূর্ণাঙ্ক		groupdepth;
 # ifdef FEAT_EVAL
-    int		evaldepth;
+    পূর্ণাঙ্ক		evaldepth;
 # endif
-    int		minwid;
-    int		maxwid;
-    int		zeropad;
+    পূর্ণাঙ্ক		minwid;
+    পূর্ণাঙ্ক		maxwid;
+    পূর্ণাঙ্ক		zeropad;
     char_u	base;
     char_u	opt;
 # define TMPLEN 70
@@ -4542,32 +4542,32 @@ build_stl_str_hl_local(
     char_u	*fmt = *fmt_arg;
     char_u	*usefmt = fmt;
     stl_hlrec_T *sp;
-    int		save_redraw_not_allowed = redraw_not_allowed;
-    int		save_KeyTyped = KeyTyped;
+    পূর্ণাঙ্ক		save_redraw_not_allowed = redraw_not_allowed;
+    পূর্ণাঙ্ক		save_চাবি_Typed = চাবি_Typed;
     // TODO: find out why using called_emsg_before makes tests fail, does it
     // matter?
     // int	called_emsg_before = called_emsg;
-    int		did_emsg_before = did_emsg;
-    int		rheight = 1;	// stl rendered height
+    পূর্ণাঙ্ক		did_emsg_before = did_emsg;
+    পূর্ণাঙ্ক		rheight = 1;	// stl rendered height
 
     // When inside update_screen() we do not want redrawing a statusline,
     // ruler, title, etc. to trigger another redraw, it may cause an endless
     // loop.
-    if (updating_screen)
+    যদি (updating_screen)
 	redraw_not_allowed = TRUE;
 
-    if (stl_items == NULL)
+    যদি (stl_বস্তুসমূহ == রিক্ত)
     {
-	stl_items = ALLOC_MULT(stl_item_T, stl_items_len);
-	stl_groupitem = ALLOC_MULT(int, stl_items_len);
+	stl_বস্তুসমূহ = ALLOC_MULT(stl_item_T, stl_বস্তুসমূহ_len);
+	stl_groupitem = ALLOC_MULT(পূর্ণাঙ্ক, stl_বস্তুসমূহ_len);
 
 	// Allocate one more, because the last element is used to indicate the
 	// end of the list.
-	stl_hltab  = ALLOC_MULT(stl_hlrec_T, stl_items_len + 1);
-	stl_tabtab = ALLOC_MULT(stl_hlrec_T, stl_items_len + 1);
-	stl_clicktab = ALLOC_MULT(stl_clickrec_T, stl_items_len + 1);
+	stl_hltab  = ALLOC_MULT(stl_hlrec_T, stl_বস্তুসমূহ_len + 1);
+	stl_tabtab = ALLOC_MULT(stl_hlrec_T, stl_বস্তুসমূহ_len + 1);
+	stl_clicktab = ALLOC_MULT(stl_clickrec_T, stl_বস্তুসমূহ_len + 1);
 
-	stl_separator_locations = ALLOC_MULT(int, stl_items_len);
+	stl_separator_locations = ALLOC_MULT(পূর্ণাঙ্ক, stl_বস্তুসমূহ_len);
     }
 
 # ifdef FEAT_EVAL
@@ -4576,43 +4576,43 @@ build_stl_str_hl_local(
 
     // When the format starts with "%!" then evaluate it as an expression and
     // use the result as the actual format string.
-    if (fmt[0] == '%' && fmt[1] == '!')
+    যদি (fmt[0] == '%' && fmt[1] == '!')
     {
 	typval_T	tv;
 
-	tv.v_type = VAR_NUMBER;
-	tv.vval.v_number = wp->w_id;
+	tv.v_type = VAR_সংখ্যা;
+	tv.vval.v_সংখ্যা = wp->w_id;
 	set_var((char_u *)"g:statusline_winid", &tv, FALSE);
 
 	usefmt = eval_to_string_safe(fmt + 2, use_sandbox, FALSE, FALSE);
-	if (usefmt == NULL)
+	যদি (usefmt == রিক্ত)
 	    usefmt = fmt;
 
 	do_unlet((char_u *)"g:statusline_winid", TRUE);
     }
 # endif
 
-    if (fillchar == 0)
+    যদি (fillchar == 0)
 	fillchar = ' ';
 
     // The cursor in windows other than the current one isn't always
     // up-to-date, esp. because of autocommands and timers.
     lnum = wp->w_cursor.lnum;
-    if (lnum > wp->w_buffer->b_ml.ml_line_count)
+    যদি (lnum > wp->w_buffer->b_ml.ml_সারি_গুনতি)
     {
-	lnum = wp->w_buffer->b_ml.ml_line_count;
+	lnum = wp->w_buffer->b_ml.ml_সারি_গুনতি;
 	wp->w_cursor.lnum = lnum;
     }
 
     // Get line & check if empty (cursorpos will show "0-1").  Note that
     // p will become invalid when getting another buffer line.
     p = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    empty_line = (*p == NUL);
+    empty_সারি = (*p == NUL);
 
     // Get the byte value now, in case we need it below. This is more efficient
     // than making a copy of the line.
     len = ml_get_buf_len(wp->w_buffer, lnum);
-    if (wp->w_cursor.col > len)
+    যদি (wp->w_cursor.col > len)
     {
 	// Line may have changed since checking the cursor column, or the lnum
 	// was adjusted above.
@@ -4620,7 +4620,7 @@ build_stl_str_hl_local(
 	wp->w_cursor.coladd = 0;
 	byteval = 0;
     }
-    else
+    অন্যথা
 	byteval = (*mb_ptr2char)(p + wp->w_cursor.col);
 
     groupdepth = 0;
@@ -4632,80 +4632,80 @@ build_stl_str_hl_local(
 
     // Pre-insert a Highlight item from carry_hl so that %# / %* set on a
     // previous multi-line statusline row continues to apply on this row.
-    if (carry_hl != NULL && *carry_hl != 0)
+    যদি (carry_hl != রিক্ত && *carry_hl != 0)
     {
-	stl_items[curitem].stl_type = Highlight;
-	stl_items[curitem].stl_start = p;
-	stl_items[curitem].stl_minwid = *carry_hl;
-	stl_items[curitem].stl_clickfunc = NULL;
+	stl_বস্তুসমূহ[curitem].stl_type = Highlight;
+	stl_বস্তুসমূহ[curitem].stl_start = p;
+	stl_বস্তুসমূহ[curitem].stl_minwid = *carry_hl;
+	stl_বস্তুসমূহ[curitem].stl_clickfunc = রিক্ত;
 	curitem++;
     }
 
     prevchar_isflag = TRUE;
     prevchar_isitem = FALSE;
-    for (s = usefmt; *s != NUL; )
+    প্রতি (s = usefmt; *s != NUL; )
     {
-	if (curitem == (int)stl_items_len)
+	যদি (curitem == (পূর্ণাঙ্ক)stl_বস্তুসমূহ_len)
 	{
-	    size_t	new_len = stl_items_len * 3 / 2;
+	    size_t	new_len = stl_বস্তুসমূহ_len * 3 / 2;
 
-	    stl_item_T *new_items =
-			  vim_realloc(stl_items, sizeof(stl_item_T) * new_len);
-	    if (new_items == NULL)
-		break;
-	    stl_items = new_items;
+	    stl_item_T *new_বস্তুসমূহ =
+			  vim_realloc(stl_বস্তুসমূহ, পরিমাণ(stl_item_T) * new_len);
+	    যদি (new_বস্তুসমূহ == রিক্ত)
+		ভঙ্গ;
+	    stl_বস্তুসমূহ = new_বস্তুসমূহ;
 
-	    int *new_groupitem =
-			     vim_realloc(stl_groupitem, sizeof(int) * new_len);
-	    if (new_groupitem == NULL)
-		break;
+	    পূর্ণাঙ্ক *new_groupitem =
+			     vim_realloc(stl_groupitem, পরিমাণ(পূর্ণাঙ্ক) * new_len);
+	    যদি (new_groupitem == রিক্ত)
+		ভঙ্গ;
 	    stl_groupitem = new_groupitem;
 
 	    stl_hlrec_T	*new_hlrec = vim_realloc(stl_hltab,
-					  sizeof(stl_hlrec_T) * (new_len + 1));
-	    if (new_hlrec == NULL)
-		break;
+					  পরিমাণ(stl_hlrec_T) * (new_len + 1));
+	    যদি (new_hlrec == রিক্ত)
+		ভঙ্গ;
 	    stl_hltab = new_hlrec;
 	    new_hlrec = vim_realloc(stl_tabtab,
-					  sizeof(stl_hlrec_T) * (new_len + 1));
-	    if (new_hlrec == NULL)
-		break;
+					  পরিমাণ(stl_hlrec_T) * (new_len + 1));
+	    যদি (new_hlrec == রিক্ত)
+		ভঙ্গ;
 	    stl_tabtab = new_hlrec;
 
 	    stl_clickrec_T *new_clickrec = vim_realloc(stl_clicktab,
-				      sizeof(stl_clickrec_T) * (new_len + 1));
-	    if (new_clickrec == NULL)
-		break;
+				      পরিমাণ(stl_clickrec_T) * (new_len + 1));
+	    যদি (new_clickrec == রিক্ত)
+		ভঙ্গ;
 	    stl_clicktab = new_clickrec;
 
-	    int *new_separator_locs = vim_realloc(stl_separator_locations,
-					    sizeof(int) * new_len);
-	    if (new_separator_locs == NULL)
-		break;
+	    পূর্ণাঙ্ক *new_separator_locs = vim_realloc(stl_separator_locations,
+					    পরিমাণ(পূর্ণাঙ্ক) * new_len);
+	    যদি (new_separator_locs == রিক্ত)
+		ভঙ্গ;
 	    stl_separator_locations = new_separator_locs;
 
-	    stl_items_len = new_len;
+	    stl_বস্তুসমূহ_len = new_len;
 	}
 
-	stl_items[curitem].stl_clickfunc = NULL;
+	stl_বস্তুসমূহ[curitem].stl_clickfunc = রিক্ত;
 
-	if (*s != '%')
+	যদি (*s != '%')
 	    prevchar_isflag = prevchar_isitem = FALSE;
 
 	/*
 	 * Handle up to the next '%' or the end.
 	 */
-	while (*s != NUL && *s != '%' && p + 1 < out + outlen)
+	যাবত্ (*s != NUL && *s != '%' && p + 1 < out + outlen)
 # ifdef ENABLE_STL_MODE_MULTI_NL
 	{
-	    if (*s == '\n' || *s == '\r')
+	    যদি (*s == '\n' || *s == '\r')
 	    {
-		if (mode == STL_MODE_MULTI_NL)
+		যদি (mode == STL_MODE_MULTI_NL)
 		{
 		    s++;
-		    goto find_linebreak;
+		    গচ্ছ find_linebreak;
 		}
-		else if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+		অন্যথা যদি (mode == STL_MODE_GET_RENDERED_HEIGHT)
 		    rheight++;
 	    }
 # endif
@@ -4713,154 +4713,154 @@ build_stl_str_hl_local(
 # ifdef ENABLE_STL_MODE_MULTI_NL
 	}
 # endif
-	if (*s == NUL || p + 1 >= out + outlen)
-	    break;
+	যদি (*s == NUL || p + 1 >= out + outlen)
+	    ভঙ্গ;
 
 	/*
 	 * Handle one '%' item.
 	 */
 	s++;
-	if (*s == NUL)  // ignore trailing %
-	    break;
+	যদি (*s == NUL)  // ignore trailing %
+	    ভঙ্গ;
 
-	if (*s == STL_CLICKFUNC)
+	যদি (*s == STL_CLICKFUNC)
 	{
 	    // %[] - end click region
-	    if (s[1] == ']')
+	    যদি (s[1] == ']')
 	    {
-		stl_items[curitem].stl_type = ClickFunc;
-		stl_items[curitem].stl_start = p;
-		stl_items[curitem].stl_minwid = 0;
-		stl_items[curitem].stl_clickfunc = NULL;
+		stl_বস্তুসমূহ[curitem].stl_type = ClickFunc;
+		stl_বস্তুসমূহ[curitem].stl_start = p;
+		stl_বস্তুসমূহ[curitem].stl_minwid = 0;
+		stl_বস্তুসমূহ[curitem].stl_clickfunc = রিক্ত;
 		s += 2;
 		curitem++;
-		continue;
+		অনুবর্ত;
 	    }
 	    // %[FuncName] - start click region
-	    if (ASCII_ISALPHA(s[1]) || s[1] == '_')
+	    যদি (ASCII_ISALPHA(s[1]) || s[1] == '_')
 	    {
 		char_u *rb = vim_strchr(s + 1, ']');
-		if (rb != NULL)
+		যদি (rb != রিক্ত)
 		{
-		    stl_items[curitem].stl_type = ClickFunc;
-		    stl_items[curitem].stl_start = p;
-		    stl_items[curitem].stl_minwid = 0;
-		    stl_items[curitem].stl_clickfunc =
+		    stl_বস্তুসমূহ[curitem].stl_type = ClickFunc;
+		    stl_বস্তুসমূহ[curitem].stl_start = p;
+		    stl_বস্তুসমূহ[curitem].stl_minwid = 0;
+		    stl_বস্তুসমূহ[curitem].stl_clickfunc =
 					  vim_strnsave(s + 1, rb - s - 1);
 		    s = rb + 1;
 		    curitem++;
-		    continue;
+		    অনুবর্ত;
 		}
 	    }
 	}
-	if (*s == STL_LINEBREAK)
+	যদি (*s == STL_LINEBREAK)
 	{
 	    // Plain %@ - line break
-	    if (mode == STL_MODE_MULTI
+	    যদি (mode == STL_MODE_MULTI
 # ifdef ENABLE_STL_MODE_MULTI_NL
 		    || mode == STL_MODE_MULTI_NL
 # endif
 	       )
 	    {
 		s++;
-		break;
+		ভঙ্গ;
 	    }
-	    else if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+	    অন্যথা যদি (mode == STL_MODE_GET_RENDERED_HEIGHT)
 		rheight++;
 	}
-	if (*s == '%')
+	যদি (*s == '%')
 	{
-	    if (p + 1 >= out + outlen)
-		break;
+	    যদি (p + 1 >= out + outlen)
+		ভঙ্গ;
 	    *p++ = *s++;
 	    prevchar_isflag = prevchar_isitem = FALSE;
-	    continue;
+	    অনুবর্ত;
 	}
 	// STL_SEPARATE: Separation between items, filled with white space.
-	if (*s == STL_SEPARATE)
+	যদি (*s == STL_SEPARATE)
 	{
 	    s++;
-	    if (groupdepth > 0)
-		continue;
-	    stl_items[curitem].stl_type = Separate;
-	    stl_items[curitem++].stl_start = p;
-	    continue;
+	    যদি (groupdepth > 0)
+		অনুবর্ত;
+	    stl_বস্তুসমূহ[curitem].stl_type = Separate;
+	    stl_বস্তুসমূহ[curitem++].stl_start = p;
+	    অনুবর্ত;
 	}
-	if (*s == STL_TRUNCMARK)
+	যদি (*s == STL_TRUNCMARK)
 	{
 	    s++;
-	    stl_items[curitem].stl_type = Trunc;
-	    stl_items[curitem++].stl_start = p;
-	    continue;
+	    stl_বস্তুসমূহ[curitem].stl_type = Trunc;
+	    stl_বস্তুসমূহ[curitem++].stl_start = p;
+	    অনুবর্ত;
 	}
-	if (*s == ')')
+	যদি (*s == ')')
 	{
 	    char_u  *t;
 
 	    s++;
-	    if (groupdepth < 1)
-		continue;
+	    যদি (groupdepth < 1)
+		অনুবর্ত;
 	    groupdepth--;
 
-	    t = stl_items[stl_groupitem[groupdepth]].stl_start;
+	    t = stl_বস্তুসমূহ[stl_groupitem[groupdepth]].stl_start;
 	    *p = NUL;
 	    l = vim_strsize(t);
-	    if (curitem > stl_groupitem[groupdepth] + 1
-		    && stl_items[stl_groupitem[groupdepth]].stl_minwid == 0)
+	    যদি (curitem > stl_groupitem[groupdepth] + 1
+		    && stl_বস্তুসমূহ[stl_groupitem[groupdepth]].stl_minwid == 0)
 	    {
-		int group_start_userhl = 0;
-		int group_end_userhl = 0;
+		পূর্ণাঙ্ক group_start_userhl = 0;
+		পূর্ণাঙ্ক group_end_userhl = 0;
 
 		// remove group if all items are empty and highlight group
 		// doesn't change
-		for (n = stl_groupitem[groupdepth] - 1; n >= 0; n--)
+		প্রতি (n = stl_groupitem[groupdepth] - 1; n >= 0; n--)
 		{
-		    if (stl_items[n].stl_type == Highlight)
+		    যদি (stl_বস্তুসমূহ[n].stl_type == Highlight)
 		    {
 			group_start_userhl = group_end_userhl =
-						       stl_items[n].stl_minwid;
-			break;
+						       stl_বস্তুসমূহ[n].stl_minwid;
+			ভঙ্গ;
 		    }
 		}
-		for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+		প্রতি (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
 		{
-		    if (stl_items[n].stl_type == Normal)
-			break;
-		    if (stl_items[n].stl_type == Highlight)
-			group_end_userhl = stl_items[n].stl_minwid;
+		    যদি (stl_বস্তুসমূহ[n].stl_type == Normal)
+			ভঙ্গ;
+		    যদি (stl_বস্তুসমূহ[n].stl_type == Highlight)
+			group_end_userhl = stl_বস্তুসমূহ[n].stl_minwid;
 		}
-		if (n == curitem && group_start_userhl == group_end_userhl)
+		যদি (n == curitem && group_start_userhl == group_end_userhl)
 		{
 		    // empty group
 		    p = t;
 		    l = 0;
-		    for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+		    প্রতি (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
 		    {
 			// do not use the highlighting from the removed group
-			if (stl_items[n].stl_type == Highlight)
-			    stl_items[n].stl_type = Empty;
+			যদি (stl_বস্তুসমূহ[n].stl_type == Highlight)
+			    stl_বস্তুসমূহ[n].stl_type = Empty;
 			// adjust the start position of TabPage to the next
 			// item position
-			if (stl_items[n].stl_type == TabPage)
-			    stl_items[n].stl_start = p;
+			যদি (stl_বস্তুসমূহ[n].stl_type == TabPage)
+			    stl_বস্তুসমূহ[n].stl_start = p;
 		    }
 		}
 	    }
-	    if (l > stl_items[stl_groupitem[groupdepth]].stl_maxwid)
+	    যদি (l > stl_বস্তুসমূহ[stl_groupitem[groupdepth]].stl_maxwid)
 	    {
 		// truncate, remove n bytes of text at the start
-		if (has_mbyte)
+		যদি (has_mbyte)
 		{
 		    // Find the first character that should be included.
 		    n = 0;
-		    while (l >= stl_items[stl_groupitem[groupdepth]].stl_maxwid)
+		    যাবত্ (l >= stl_বস্তুসমূহ[stl_groupitem[groupdepth]].stl_maxwid)
 		    {
 			l -= ptr2cells(t + n);
 			n += (*mb_ptr2len)(t + n);
 		    }
 		}
-		else
-		    n = (long)(p - t) - stl_items[stl_groupitem[groupdepth]]
+		অন্যথা
+		    n = (long)(p - t) - stl_বস্তুসমূহ[stl_groupitem[groupdepth]]
 							       .stl_maxwid + 1;
 
 		*t = '<';
@@ -4868,148 +4868,148 @@ build_stl_str_hl_local(
 		p = p - n + 1;
 
 		// Fill up space left over by half a double-wide char.
-		int minwid_fixed = MIN(stl_items[stl_groupitem[groupdepth]].stl_minwid,
-				       stl_items[stl_groupitem[groupdepth]].stl_maxwid);
-		while (++l < minwid_fixed)
+		পূর্ণাঙ্ক minwid_fixed = MIN(stl_বস্তুসমূহ[stl_groupitem[groupdepth]].stl_minwid,
+				       stl_বস্তুসমূহ[stl_groupitem[groupdepth]].stl_maxwid);
+		যাবত্ (++l < minwid_fixed)
 		    MB_CHAR2BYTES(fillchar, p);
 
 		// correct the start of the items for the truncation
-		for (l = stl_groupitem[groupdepth] + 1; l < curitem; l++)
+		প্রতি (l = stl_groupitem[groupdepth] + 1; l < curitem; l++)
 		{
 		    // Minus one for the leading '<' added above.
-		    stl_items[l].stl_start -= n - 1;
-		    if (stl_items[l].stl_start < t)
-			stl_items[l].stl_start = t;
+		    stl_বস্তুসমূহ[l].stl_start -= n - 1;
+		    যদি (stl_বস্তুসমূহ[l].stl_start < t)
+			stl_বস্তুসমূহ[l].stl_start = t;
 		}
 	    }
-	    else if (abs(stl_items[stl_groupitem[groupdepth]].stl_minwid) > l)
+	    অন্যথা যদি (abs(stl_বস্তুসমূহ[stl_groupitem[groupdepth]].stl_minwid) > l)
 	    {
 		// fill
-		n = stl_items[stl_groupitem[groupdepth]].stl_minwid;
-		int fillchar_len = MB_CHAR2LEN(fillchar);
-		if (n < 0)
+		n = stl_বস্তুসমূহ[stl_groupitem[groupdepth]].stl_minwid;
+		পূর্ণাঙ্ক fillchar_len = MB_CHAR2LEN(fillchar);
+		যদি (n < 0)
 		{
 		    // fill by appending characters
 		    n = 0 - n;
-		    while (l++ < n && p + fillchar_len < out + outlen)
+		    যাবত্ (l++ < n && p + fillchar_len < out + outlen)
 			MB_CHAR2BYTES(fillchar, p);
 		}
-		else
+		অন্যথা
 		{
 		    // fill by inserting characters
 		    n = n - l;
 		    l = n * fillchar_len;
-		    if (p + l >= out + outlen)
+		    যদি (p + l >= out + outlen)
 		    {
 			n = (long)((out + outlen) - p - 1) / fillchar_len;
 			l = n * fillchar_len;
 		    }
 		    mch_memmove(t + l, t, (size_t)(p - t));
 		    p += l;
-		    for ( ; n > 0; n--)
+		    প্রতি ( ; n > 0; n--)
 			MB_CHAR2BYTES(fillchar, t);
-		    for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
-			stl_items[n].stl_start += l;
+		    প্রতি (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+			stl_বস্তুসমূহ[n].stl_start += l;
 		}
 	    }
-	    continue;
+	    অনুবর্ত;
 	}
 	minwid = 0;
 	maxwid = 9999;
 	zeropad = FALSE;
 	l = 1;
-	if (*s == '0')
+	যদি (*s == '0')
 	{
 	    s++;
 	    zeropad = TRUE;
 	}
-	if (*s == '-')
+	যদি (*s == '-')
 	{
 	    s++;
 	    l = -1;
 	}
-	if (VIM_ISDIGIT(*s))
+	যদি (VIM_ISDIGIT(*s))
 	{
-	    minwid = (int)getdigits(&s);
-	    if (minwid < 0)	// overflow
+	    minwid = (পূর্ণাঙ্ক)getdigits(&s);
+	    যদি (minwid < 0)	// overflow
 		minwid = 0;
 	}
-	if (*s == STL_USER_HL)
+	যদি (*s == STL_USER_HL)
 	{
-	    stl_items[curitem].stl_type = Highlight;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid > 9 ? 1 : minwid;
+	    stl_বস্তুসমূহ[curitem].stl_type = Highlight;
+	    stl_বস্তুসমূহ[curitem].stl_start = p;
+	    stl_বস্তুসমূহ[curitem].stl_minwid = minwid > 9 ? 1 : minwid;
 	    s++;
 	    curitem++;
-	    continue;
+	    অনুবর্ত;
 	}
-	if (*s == STL_TABPAGENR || *s == STL_TABCLOSENR)
+	যদি (*s == STL_TABPAGENR || *s == STL_TABCLOSENR)
 	{
-	    if (*s == STL_TABCLOSENR)
+	    যদি (*s == STL_TABCLOSENR)
 	    {
-		if (minwid == 0)
+		যদি (minwid == 0)
 		{
 		    // %X ends the close label, go back to the previously
 		    // define tab label nr.
-		    for (n = curitem - 1; n >= 0; --n)
-			if (stl_items[n].stl_type == TabPage
-					       && stl_items[n].stl_minwid >= 0)
+		    প্রতি (n = curitem - 1; n >= 0; --n)
+			যদি (stl_বস্তুসমূহ[n].stl_type == TabPage
+					       && stl_বস্তুসমূহ[n].stl_minwid >= 0)
 			{
-			    minwid = stl_items[n].stl_minwid;
-			    break;
+			    minwid = stl_বস্তুসমূহ[n].stl_minwid;
+			    ভঙ্গ;
 			}
 		}
-		else
+		অন্যথা
 		    // close nrs are stored as negative values
 		    minwid = - minwid;
 	    }
-	    stl_items[curitem].stl_type = TabPage;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid;
+	    stl_বস্তুসমূহ[curitem].stl_type = TabPage;
+	    stl_বস্তুসমূহ[curitem].stl_start = p;
+	    stl_বস্তুসমূহ[curitem].stl_minwid = minwid;
 	    s++;
 	    curitem++;
-	    continue;
+	    অনুবর্ত;
 	}
-	if (*s == '.')
+	যদি (*s == '.')
 	{
 	    s++;
-	    if (VIM_ISDIGIT(*s))
+	    যদি (VIM_ISDIGIT(*s))
 	    {
-		maxwid = (int)getdigits(&s);
-		if (maxwid <= 0)	// overflow
+		maxwid = (পূর্ণাঙ্ক)getdigits(&s);
+		যদি (maxwid <= 0)	// overflow
 		    maxwid = 50;
 	    }
 	}
 	// Keep the uncapped value for %N[FuncName] click-region IDs; the 50
 	// cap below applies only when minwid is used as a padding width.
-	int raw_minwid = minwid * l;
+	পূর্ণাঙ্ক raw_minwid = minwid * l;
 	minwid = (minwid > 50 ? 50 : minwid) * l;
-	if (*s == '(')
+	যদি (*s == '(')
 	{
 	    stl_groupitem[groupdepth++] = curitem;
-	    stl_items[curitem].stl_type = Group;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid;
-	    stl_items[curitem].stl_maxwid = maxwid;
+	    stl_বস্তুসমূহ[curitem].stl_type = Group;
+	    stl_বস্তুসমূহ[curitem].stl_start = p;
+	    stl_বস্তুসমূহ[curitem].stl_minwid = minwid;
+	    stl_বস্তুসমূহ[curitem].stl_maxwid = maxwid;
 	    s++;
 	    curitem++;
-	    continue;
+	    অনুবর্ত;
 	}
 # ifdef FEAT_EVAL
 	// Denotes end of expanded %{} block
-	if (*s == '}' && evaldepth > 0)
+	যদি (*s == '}' && evaldepth > 0)
 	{
 	    s++;
 	    evaldepth--;
-	    continue;
+	    অনুবর্ত;
 	}
 # endif
-	if (vim_strchr(STL_ALL, *s) == NULL)
+	যদি (vim_strchr(STL_ALL, *s) == রিক্ত)
 	{
-	    if (*s == NUL)  // can happen with "%0"
-		break;
+	    যদি (*s == NUL)  // can happen with "%0"
+		ভঙ্গ;
 	    s++;
-	    continue;
+	    অনুবর্ত;
 	}
 	opt = *s++;
 
@@ -5017,65 +5017,65 @@ build_stl_str_hl_local(
 	base = 'D';
 	itemisflag = FALSE;
 	fillable = TRUE;
-	num = -1;
-	str = NULL;
-	switch (opt)
+	অঙ্ক = -1;
+	str = রিক্ত;
+	বিকল্প (opt)
 	{
-	case STL_FILEPATH:
-	case STL_FULLPATH:
-	case STL_FILENAME:
+	পক্ষ STL_FILEPATH:
+	পক্ষ STL_FULLPATH:
+	পক্ষ STL_FILENAME:
 	{
 	    char_u  *name;
 
 	    fillable = FALSE;	// don't change ' ' to fillchar
 	    name = buf_spname(wp->w_buffer);
-	    if (name != NULL)
+	    যদি (name != রিক্ত)
 		vim_strncpy(NameBuff, name, MAXPATHL - 1);
-	    else
+	    অন্যথা
 	    {
 		char_u	*t = (opt == STL_FULLPATH) ? wp->w_buffer->b_ffname
 					  : wp->w_buffer->b_fname;
 		home_replace(wp->w_buffer, t, NameBuff, MAXPATHL, TRUE);
 	    }
 	    trans_characters(NameBuff, MAXPATHL);
-	    if (opt != STL_FILENAME)
+	    যদি (opt != STL_FILENAME)
 		str = NameBuff;
-	    else
+	    অন্যথা
 		str = gettail(NameBuff);
-	    break;
+	    ভঙ্গ;
 	}
 
-	case STL_VIM_EXPR: // '{'
+	পক্ষ STL_VIM_রাশিমালা: // '{'
 	{
 # ifdef FEAT_EVAL
 	    char_u  *block_start = s - 1;
 # endif
-	    int	    reevaluate = (*s == '%');
+	    পূর্ণাঙ্ক	    reevaluate = (*s == '%');
 	    char_u  *t;
 	    buf_T   *save_curbuf;
 	    win_T   *save_curwin;
 
-	    if (reevaluate)
+	    যদি (reevaluate)
 		s++;
 	    // %0{} keeps the result verbatim
 	    itemisflag = zeropad ? FALSE : TRUE;
 	    t = p;
-	    while ((*s != '}' || (reevaluate && s[-1] != '%'))
+	    যাবত্ ((*s != '}' || (reevaluate && s[-1] != '%'))
 					  && *s != NUL && p + 1 < out + outlen)
 		*p++ = *s++;
-	    if (*s != '}')	// missing '}' or out of space
-		break;
+	    যদি (*s != '}')	// missing '}' or out of space
+		ভঙ্গ;
 	    s++;
-	    if (reevaluate && p > out)
+	    যদি (reevaluate && p > out)
 		p[-1] = NUL; // remove the % at the end of %{% expr %}
-	    else
+	    অন্যথা
 		*p = NUL;
 	    p = t;
 # ifdef FEAT_EVAL
-	    vim_snprintf((char *)buf_tmp, sizeof(buf_tmp),
+	    vim_snprintf((বর্ণ *)buf_tmp, পরিমাণ(buf_tmp),
 							 "%d", curbuf->b_fnum);
 	    set_internal_string_var((char_u *)"g:actual_curbuf", buf_tmp);
-	    vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), "%d", curwin->w_id);
+	    vim_snprintf((বর্ণ *)buf_tmp, পরিমাণ(buf_tmp), "%d", curwin->w_id);
 	    set_internal_string_var((char_u *)"g:actual_curwin", buf_tmp);
 
 	    save_curbuf = curbuf;
@@ -5084,7 +5084,7 @@ build_stl_str_hl_local(
 	    curwin = wp;
 	    curbuf = wp->w_buffer;
 	    // Visual mode is only valid in the current window.
-	    if (curwin != save_curwin)
+	    যদি (curwin != save_curwin)
 		VIsual_active = FALSE;
 
 	    str = eval_to_string_safe(p, use_sandbox, FALSE, FALSE);
@@ -5095,11 +5095,11 @@ build_stl_str_hl_local(
 	    do_unlet((char_u *)"g:actual_curbuf", TRUE);
 	    do_unlet((char_u *)"g:actual_curwin", TRUE);
 
-	    if (!zeropad && str != NULL && *str != NUL)
+	    যদি (!zeropad && str != রিক্ত && *str != NUL)
 	    {
-		if (*skipdigits(str) == NUL)
+		যদি (*skipdigits(str) == NUL)
 		{
-		    num = atoi((char *)str);
+		    অঙ্ক = atoi((বর্ণ *)str);
 		    VIM_CLEAR(str);
 		    itemisflag = FALSE;
 		}
@@ -5107,18 +5107,18 @@ build_stl_str_hl_local(
 
 	    // If the output of the expression needs to be evaluated
 	    // replace the %{} block with the result of evaluation
-	    if (reevaluate && str != NULL && *str != NUL
-		    && strchr((const char *)str, '%') != NULL
+	    যদি (reevaluate && str != রিক্ত && *str != NUL
+		    && strchr((ধ্রুব বর্ণ *)str, '%') != রিক্ত
 		    && evaldepth < MAX_STL_EVAL_DEPTH)
 	    {
 		size_t parsed_usefmt = (size_t)(block_start - usefmt);
-		size_t str_length = strlen((const char *)str);
-		size_t fmt_length = strlen((const char *)s);
+		size_t str_length = strlen((ধ্রুব বর্ণ *)str);
+		size_t fmt_length = strlen((ধ্রুব বর্ণ *)s);
 		size_t new_fmt_len = parsed_usefmt
 						 + str_length + fmt_length + 3;
-		char_u *new_fmt = (char_u *)alloc(new_fmt_len * sizeof(char_u));
+		char_u *new_fmt = (char_u *)alloc(new_fmt_len * পরিমাণ(char_u));
 
-		if (new_fmt != NULL)
+		যদি (new_fmt != রিক্ত)
 		{
 		    char_u *new_fmt_p = new_fmt;
 
@@ -5130,347 +5130,347 @@ build_stl_str_hl_local(
 		    new_fmt_p = (char_u *)memcpy(new_fmt_p , s, fmt_length)
 								      + fmt_length;
 		    *new_fmt_p = 0;
-		    new_fmt_p = NULL;
+		    new_fmt_p = রিক্ত;
 
-		    if (usefmt != fmt)
+		    যদি (usefmt != fmt)
 			vim_free(usefmt);
 		    VIM_CLEAR(str);
 		    usefmt = new_fmt;
 		    s = usefmt + parsed_usefmt;
 		    evaldepth++;
-		    continue;
+		    অনুবর্ত;
 		}
 	    }
 # endif
-	    break;
+	    ভঙ্গ;
 	}
-	case STL_LINE:
-	    num = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY)
+	পক্ষ STL_সারি:
+	    অঙ্ক = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY)
 		  ? 0L : (long)(wp->w_cursor.lnum);
-	    break;
+	    ভঙ্গ;
 
-	case STL_NUMLINES:
-	    num = wp->w_buffer->b_ml.ml_line_count;
-	    break;
+	পক্ষ STL_NUMLINES:
+	    অঙ্ক = wp->w_buffer->b_ml.ml_সারি_গুনতি;
+	    ভঙ্গ;
 
-	case STL_COLUMN:
-	    num = (State & MODE_INSERT) == 0 && empty_line
-					       ? 0 : (int)wp->w_cursor.col + 1;
-	    break;
+	পক্ষ STL_COLUMN:
+	    অঙ্ক = (State & MODE_ঢোকাও) == 0 && empty_সারি
+					       ? 0 : (পূর্ণাঙ্ক)wp->w_cursor.col + 1;
+	    ভঙ্গ;
 
-	case STL_VIRTCOL:
-	case STL_VIRTCOL_ALT:
+	পক্ষ STL_VIRTCOL:
+	পক্ষ STL_VIRTCOL_ALT:
 	{
 	    colnr_T virtcol = wp->w_virtcol + 1;
 
 	    // Don't display %V if it's the same as %c.
-	    if (opt == STL_VIRTCOL_ALT
-		    && (virtcol == (colnr_T)((State & MODE_INSERT) == 0
-			       && empty_line ? 0 : (int)wp->w_cursor.col + 1)))
-		break;
-	    num = (long)virtcol;
-	    break;
+	    যদি (opt == STL_VIRTCOL_ALT
+		    && (virtcol == (colnr_T)((State & MODE_ঢোকাও) == 0
+			       && empty_সারি ? 0 : (পূর্ণাঙ্ক)wp->w_cursor.col + 1)))
+		ভঙ্গ;
+	    অঙ্ক = (long)virtcol;
+	    ভঙ্গ;
 	}
 
-	case STL_PERCENTAGE:
-	    num = calc_percentage((long)wp->w_cursor.lnum, (long)wp->w_buffer->b_ml.ml_line_count);
-	    break;
+	পক্ষ STL_PERCENTAGE:
+	    অঙ্ক = calc_percentage((long)wp->w_cursor.lnum, (long)wp->w_buffer->b_ml.ml_সারি_গুনতি);
+	    ভঙ্গ;
 
-	case STL_ALTPERCENT:
+	পক্ষ STL_ALTPERCENT:
 	    str = buf_tmp;
-	    (void)get_rel_pos(wp, str, TMPLEN);
-	    break;
+	    (শূন্য)get_rel_pos(wp, str, TMPLEN);
+	    ভঙ্গ;
 
-	case STL_SHOWCMD:
-	    if (p_sc && STRCMP(opt_name, p_sloc) == 0)
+	পক্ষ STL_SHOWCMD:
+	    যদি (p_sc && STRCMP(opt_name, p_sloc) == 0)
 		str = showcmd_buf;
-	    break;
+	    ভঙ্গ;
 
-	case STL_ARGLISTSTAT:
+	পক্ষ STL_ARGLISTSTAT:
 	    fillable = FALSE;
 	    buf_tmp[0] = NUL;
-	    if (append_arg_number(wp, buf_tmp, sizeof(buf_tmp), FALSE) > 0)
+	    যদি (append_arg_সংখ্যা(wp, buf_tmp, পরিমাণ(buf_tmp), FALSE) > 0)
 		str = buf_tmp;
-	    break;
+	    ভঙ্গ;
 
-	case STL_KEYMAP:
+	পক্ষ STL_KEYMAP:
 	    fillable = FALSE;
-	    if (get_keymap_str(wp, (char_u *)"<%s>", buf_tmp, TMPLEN) > 0)
+	    যদি (get_keymap_str(wp, (char_u *)"<%s>", buf_tmp, TMPLEN) > 0)
 		str = buf_tmp;
-	    break;
-	case STL_PAGENUM:
-# if defined(FEAT_PRINTER) || defined(FEAT_GUI_TABLINE)
-	    num = printer_page_num;
-# else
-	    num = 0;
+	    ভঙ্গ;
+	পক্ষ STL_PAGENUM:
+# যদি defined(FEAT_PRINTER) || defined(FEAT_GUI_TABLINE)
+	    অঙ্ক = printer_page_অঙ্ক;
+# অন্যথা
+	    অঙ্ক = 0;
 # endif
-	    break;
+	    ভঙ্গ;
 
-	case STL_BUFNO:
-	    num = wp->w_buffer->b_fnum;
-	    break;
+	পক্ষ STL_BUFNO:
+	    অঙ্ক = wp->w_buffer->b_fnum;
+	    ভঙ্গ;
 
-	case STL_OFFSET_X:
+	পক্ষ STL_OFFSET_X:
 	    base = 'X';
 	    // FALLTHROUGH
-	case STL_OFFSET:
+	পক্ষ STL_OFFSET:
 # ifdef FEAT_BYTEOFF
-	    l = ml_find_line_or_offset(wp->w_buffer, wp->w_cursor.lnum, NULL);
-	    num = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY) || l < 0
-		       ? 0L : l + 1 + ((State & MODE_INSERT) == 0 && empty_line
-				? 0 : (int)wp->w_cursor.col);
+	    l = ml_find_সারি_or_offset(wp->w_buffer, wp->w_cursor.lnum, রিক্ত);
+	    অঙ্ক = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY) || l < 0
+		       ? 0L : l + 1 + ((State & MODE_ঢোকাও) == 0 && empty_সারি
+				? 0 : (পূর্ণাঙ্ক)wp->w_cursor.col);
 # endif
-	    break;
+	    ভঙ্গ;
 
-	case STL_BYTEVAL_X:
+	পক্ষ STL_BYTEVAL_X:
 	    base = 'X';
 	    // FALLTHROUGH
-	case STL_BYTEVAL:
-	    num = byteval;
-	    if (num == NL)
-		num = 0;
-	    else if (num == CAR && get_fileformat(wp->w_buffer) == EOL_MAC)
-		num = NL;
-	    break;
+	পক্ষ STL_BYTEVAL:
+	    অঙ্ক = byteval;
+	    যদি (অঙ্ক == NL)
+		অঙ্ক = 0;
+	    অন্যথা যদি (অঙ্ক == CAR && get_fileformat(wp->w_buffer) == EOL_MAC)
+		অঙ্ক = NL;
+	    ভঙ্গ;
 
-	case STL_ROFLAG:
-	case STL_ROFLAG_ALT:
+	পক্ষ STL_ROFLAG:
+	পক্ষ STL_ROFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_buffer->b_p_ro)
+	    যদি (wp->w_buffer->b_p_ro)
 		str = (char_u *)((opt == STL_ROFLAG_ALT) ? ",RO" : _("[RO]"));
-	    break;
+	    ভঙ্গ;
 
-	case STL_HELPFLAG:
-	case STL_HELPFLAG_ALT:
+	পক্ষ STL_HELPFLAG:
+	পক্ষ STL_HELPFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_buffer->b_help)
+	    যদি (wp->w_buffer->b_help)
 		str = (char_u *)((opt == STL_HELPFLAG_ALT) ? ",HLP"
 							       : _("[Help]"));
-	    break;
+	    ভঙ্গ;
 
-	case STL_FILETYPE:
-	    if (*wp->w_buffer->b_p_ft != NUL
+	পক্ষ STL_FILETYPE:
+	    যদি (*wp->w_buffer->b_p_ft != NUL
 		    && STRLEN(wp->w_buffer->b_p_ft) < TMPLEN - 3)
 	    {
-		vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), "[%s]",
+		vim_snprintf((বর্ণ *)buf_tmp, পরিমাণ(buf_tmp), "[%s]",
 							wp->w_buffer->b_p_ft);
 		str = buf_tmp;
 	    }
-	    break;
+	    ভঙ্গ;
 
-	case STL_FILETYPE_ALT:
+	পক্ষ STL_FILETYPE_ALT:
 	    itemisflag = TRUE;
-	    if (*wp->w_buffer->b_p_ft != NUL
+	    যদি (*wp->w_buffer->b_p_ft != NUL
 		    && STRLEN(wp->w_buffer->b_p_ft) < TMPLEN - 2)
 	    {
 		char_u	*t;
 
-		vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), ",%s",
+		vim_snprintf((বর্ণ *)buf_tmp, পরিমাণ(buf_tmp), ",%s",
 							wp->w_buffer->b_p_ft);
-		for (t = buf_tmp; *t != 0; t++)
+		প্রতি (t = buf_tmp; *t != 0; t++)
 		    *t = TOUPPER_LOC(*t);
 		str = buf_tmp;
 	    }
-	    break;
+	    ভঙ্গ;
 
-# if defined(FEAT_QUICKFIX)
-	case STL_PREVIEWFLAG:
-	case STL_PREVIEWFLAG_ALT:
+# যদি defined(FEAT_QUICKFIX)
+	পক্ষ STL_PREVIEWFLAG:
+	পক্ষ STL_PREVIEWFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_p_pvw)
+	    যদি (wp->w_p_pvw)
 		str = (char_u *)((opt == STL_PREVIEWFLAG_ALT) ? ",PRV"
 							    : _("[Preview]"));
-	    break;
+	    ভঙ্গ;
 
-	case STL_QUICKFIX:
-	    if (bt_quickfix(wp->w_buffer))
+	পক্ষ STL_QUICKFIX:
+	    যদি (bt_quickfix(wp->w_buffer))
 		str = (char_u *)(wp->w_llist_ref
-			    ? _(msg_loclist)
-			    : _(msg_qflist));
-	    break;
+			    ? _(বার্তা_loclist)
+			    : _(বার্তা_qflist));
+	    ভঙ্গ;
 # endif
 
-	case STL_MODIFIED:
-	case STL_MODIFIED_ALT:
+	পক্ষ STL_MODIFIED:
+	পক্ষ STL_MODIFIED_ALT:
 	    itemisflag = TRUE;
-	    switch ((opt == STL_MODIFIED_ALT)
+	    বিকল্প ((opt == STL_MODIFIED_ALT)
 		    + bufIsChanged(wp->w_buffer) * 2
 		    + (!wp->w_buffer->b_p_ma) * 4)
 	    {
-		case 2: str = (char_u *)"[+]"; break;
-		case 3: str = (char_u *)",+"; break;
-		case 4: str = (char_u *)"[-]"; break;
-		case 5: str = (char_u *)",-"; break;
-		case 6: str = (char_u *)"[+-]"; break;
-		case 7: str = (char_u *)",+-"; break;
+		পক্ষ 2: str = (char_u *)"[+]"; ভঙ্গ;
+		পক্ষ 3: str = (char_u *)",+"; ভঙ্গ;
+		পক্ষ 4: str = (char_u *)"[-]"; ভঙ্গ;
+		পক্ষ 5: str = (char_u *)",-"; ভঙ্গ;
+		পক্ষ 6: str = (char_u *)"[+-]"; ভঙ্গ;
+		পক্ষ 7: str = (char_u *)",+-"; ভঙ্গ;
 	    }
-	    break;
+	    ভঙ্গ;
 
-	case STL_HIGHLIGHT:
+	পক্ষ STL_HIGHLIGHT:
 	    {
 		char_u  *t = s;
 
-		while (*s != '#' && *s != NUL)
+		যাবত্ (*s != '#' && *s != NUL)
 		    ++s;
-		if (*s == '#')
+		যদি (*s == '#')
 		{
-		    stl_items[curitem].stl_type = Highlight;
-		    stl_items[curitem].stl_start = p;
-		    stl_items[curitem].stl_minwid = -syn_namen2id(t, (int)(s - t));
+		    stl_বস্তুসমূহ[curitem].stl_type = Highlight;
+		    stl_বস্তুসমূহ[curitem].stl_start = p;
+		    stl_বস্তুসমূহ[curitem].stl_minwid = -syn_namen2id(t, (পূর্ণাঙ্ক)(s - t));
 		    curitem++;
 		}
-		if (*s != NUL)
+		যদি (*s != NUL)
 		    ++s;
-		continue;
+		অনুবর্ত;
 	    }
 
-	case STL_CLICKFUNC:
+	পক্ষ STL_CLICKFUNC:
 	    // %N[] - end click region (with minwid, minwid is ignored)
-	    if (*s == ']')
+	    যদি (*s == ']')
 	    {
-		stl_items[curitem].stl_type = ClickFunc;
-		stl_items[curitem].stl_start = p;
-		stl_items[curitem].stl_minwid = 0;
-		stl_items[curitem].stl_clickfunc = NULL;
+		stl_বস্তুসমূহ[curitem].stl_type = ClickFunc;
+		stl_বস্তুসমূহ[curitem].stl_start = p;
+		stl_বস্তুসমূহ[curitem].stl_minwid = 0;
+		stl_বস্তুসমূহ[curitem].stl_clickfunc = রিক্ত;
 		s++;
 		curitem++;
-		continue;
+		অনুবর্ত;
 	    }
 	    // %N[FuncName] with minwid
-	    if (ASCII_ISALPHA(*s) || *s == '_')
+	    যদি (ASCII_ISALPHA(*s) || *s == '_')
 	    {
 		char_u *rb = vim_strchr(s, ']');
-		if (rb != NULL)
+		যদি (rb != রিক্ত)
 		{
-		    stl_items[curitem].stl_type = ClickFunc;
-		    stl_items[curitem].stl_start = p;
+		    stl_বস্তুসমূহ[curitem].stl_type = ClickFunc;
+		    stl_বস্তুসমূহ[curitem].stl_start = p;
 		    // The stl_minwid field is overloaded: it may be the
 		    // "min" part of %<min>.<max> used for padding, or an
 		    // identifier passed to the %N[FuncName] callback.  Store
 		    // the uncapped value so IDs above 50 are preserved.
-		    stl_items[curitem].stl_minwid = raw_minwid;
-		    stl_items[curitem].stl_clickfunc =
+		    stl_বস্তুসমূহ[curitem].stl_minwid = raw_minwid;
+		    stl_বস্তুসমূহ[curitem].stl_clickfunc =
 					      vim_strnsave(s, rb - s);
 		    s = rb + 1;
 		    curitem++;
-		    continue;
+		    অনুবর্ত;
 		}
 	    }
-	    continue;
+	    অনুবর্ত;
 
-	case STL_LINEBREAK:
+	পক্ষ STL_LINEBREAK:
 	    // %N@ - line break (already handled above, fallback)
-	    continue;
+	    অনুবর্ত;
 	}
 
-	stl_items[curitem].stl_start = p;
-	stl_items[curitem].stl_type = Normal;
-	if (str != NULL && *str)
+	stl_বস্তুসমূহ[curitem].stl_start = p;
+	stl_বস্তুসমূহ[curitem].stl_type = Normal;
+	যদি (str != রিক্ত && *str)
 	{
 	    char_u  *t = str;
 
-	    if (itemisflag)
+	    যদি (itemisflag)
 	    {
-		if ((t[0] && t[1])
+		যদি ((t[0] && t[1])
 			&& ((!prevchar_isitem && *t == ',')
 			      || (prevchar_isflag && *t == ' ')))
 		    t++;
 		prevchar_isflag = TRUE;
 	    }
 	    l = vim_strsize(t);
-	    if (l > 0)
+	    যদি (l > 0)
 		prevchar_isitem = TRUE;
-	    if (l > maxwid)
+	    যদি (l > maxwid)
 	    {
-		while (l >= maxwid)
-		    if (has_mbyte)
+		যাবত্ (l >= maxwid)
+		    যদি (has_mbyte)
 		    {
 			l -= ptr2cells(t);
 			t += (*mb_ptr2len)(t);
 		    }
-		    else
+		    অন্যথা
 			l -= byte2cells(*t++);
-		if (p + 1 >= out + outlen)
-		    break;
+		যদি (p + 1 >= out + outlen)
+		    ভঙ্গ;
 		*p++ = '<';
 	    }
-	    if (minwid > 0)
+	    যদি (minwid > 0)
 	    {
-		for (; l < minwid && p + 1 < out + outlen; l++)
+		প্রতি (; l < minwid && p + 1 < out + outlen; l++)
 		{
 		    // Don't put a "-" in front of a digit.
-		    if (l + 1 == minwid && fillchar == '-' && VIM_ISDIGIT(*t))
+		    যদি (l + 1 == minwid && fillchar == '-' && VIM_ISDIGIT(*t))
 			*p++ = ' ';
-		    else
+		    অন্যথা
 			MB_CHAR2BYTES(fillchar, p);
 		}
 		minwid = 0;
 	    }
-	    else
+	    অন্যথা
 		minwid *= -1;
-	    for (; *t && p + 1 < out + outlen; t++)
+	    প্রতি (; *t && p + 1 < out + outlen; t++)
 	    {
 		// Change a space by fillchar, unless fillchar is '-' and a
 		// digit follows.
-		if (fillable && *t == ' '
+		যদি (fillable && *t == ' '
 				&& (!VIM_ISDIGIT(*(t + 1)) || fillchar != '-'))
 		    MB_CHAR2BYTES(fillchar, p);
-		else
+		অন্যথা
 		    *p++ = *t;
 	    }
-	    for (; l < minwid && p + 1 < out + outlen; l++)
+	    প্রতি (; l < minwid && p + 1 < out + outlen; l++)
 		MB_CHAR2BYTES(fillchar, p);
 	}
-	else if (num >= 0)
+	অন্যথা যদি (অঙ্ক >= 0)
 	{
-	    int	    nbase = (base == 'D' ? 10 : (base == 'O' ? 8 : 16));
+	    পূর্ণাঙ্ক	    nbase = (base == 'D' ? 10 : (base == 'O' ? 8 : 16));
 	    char_u  nstr[20];
 	    char_u  *t = nstr;
 
-	    if (p + 20 >= out + outlen)
-		break;		// not sufficient space
+	    যদি (p + 20 >= out + outlen)
+		ভঙ্গ;		// not sufficient space
 	    prevchar_isitem = TRUE;
-	    if (opt == STL_VIRTCOL_ALT)
+	    যদি (opt == STL_VIRTCOL_ALT)
 	    {
 		*t++ = '-';
 		minwid--;
 	    }
 	    *t++ = '%';
-	    if (zeropad)
+	    যদি (zeropad)
 		*t++ = '0';
 	    *t++ = '*';
 	    *t++ = nbase == 16 ? base : (char_u)(nbase == 8 ? 'o' : 'd');
 	    *t = NUL;
 
-	    for (n = num, l = 1; n >= nbase; n /= nbase)
+	    প্রতি (n = অঙ্ক, l = 1; n >= nbase; n /= nbase)
 		l++;
-	    if (opt == STL_VIRTCOL_ALT)
+	    যদি (opt == STL_VIRTCOL_ALT)
 		l++;
 
-	    if (l > maxwid)
+	    যদি (l > maxwid)
 	    {
 		l += 2;
 		n = l - maxwid;
-		while (l-- > maxwid)
-		    num /= nbase;
+		যাবত্ (l-- > maxwid)
+		    অঙ্ক /= nbase;
 		*t++ = '>';
 		*t++ = '%';
 		*t = t[-3];
 		*++t = NUL;
-		p += vim_snprintf_safelen((char *)p, outlen - (p - out),
-		    (char *)nstr, 0, num, n);
+		p += vim_snprintf_safelen((বর্ণ *)p, outlen - (p - out),
+		    (বর্ণ *)nstr, 0, অঙ্ক, n);
 	    }
-	    else
-		p += vim_snprintf_safelen((char *)p, outlen - (p - out),
-		    (char *)nstr, minwid, num);
+	    অন্যথা
+		p += vim_snprintf_safelen((বর্ণ *)p, outlen - (p - out),
+		    (বর্ণ *)nstr, minwid, অঙ্ক);
 	}
-	else
-	    stl_items[curitem].stl_type = Empty;
+	অন্যথা
+	    stl_বস্তুসমূহ[curitem].stl_type = Empty;
 
-	if (num >= 0 || (!itemisflag && str != NULL && *str != NUL))
+	যদি (অঙ্ক >= 0 || (!itemisflag && str != রিক্ত && *str != NUL))
 	    prevchar_isflag = FALSE;	    // Item not NULL, but not a flag
 					    //
-	if (opt == STL_VIM_EXPR)
+	যদি (opt == STL_VIM_রাশিমালা)
 	    vim_free(str);
 	curitem++;
     }
@@ -5483,16 +5483,16 @@ find_linebreak:
 
     // Remember the most recent %# / %* highlight so the next row of a
     // multi-line statusline can resume it.
-    if (carry_hl != NULL)
+    যদি (carry_hl != রিক্ত)
     {
-	int last_hl = 0;
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == Highlight)
-		last_hl = stl_items[l].stl_minwid;
+	পূর্ণাঙ্ক last_hl = 0;
+	প্রতি (l = 0; l < itemcnt; l++)
+	    যদি (stl_বস্তুসমূহ[l].stl_type == Highlight)
+		last_hl = stl_বস্তুসমূহ[l].stl_minwid;
 	*carry_hl = last_hl;
     }
 
-    if (mode == STL_MODE_MULTI
+    যদি (mode == STL_MODE_MULTI
 # ifdef ENABLE_STL_MODE_MULTI_NL
 		    || mode == STL_MODE_MULTI_NL
 # endif
@@ -5506,93 +5506,93 @@ find_linebreak:
 	// "fmt" and shift the remaining format string within "usefmt" for the
 	// caller's next iteration.
 # ifdef FEAT_EVAL
-	if (usefmt != fmt)
+	যদি (usefmt != fmt)
 	    vim_free(fmt);
 # endif
-	size_t fmt_remain_len = strlen((char *)s);
+	size_t fmt_remain_len = strlen((বর্ণ *)s);
 
 	mch_memmove(usefmt, s, fmt_remain_len);
 	usefmt[fmt_remain_len] = NUL;
 	*fmt_arg = usefmt;
     }
-    else
+    অন্যথা
     {
 	// In single-line mode, the caller retains ownership of its buffer.
 	// Free the eval result if "%!" was used.
 # ifdef FEAT_EVAL
-	if (usefmt != fmt)
+	যদি (usefmt != fmt)
 	    vim_free(usefmt);
 # endif
     }
 
-    if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+    যদি (mode == STL_MODE_GET_RENDERED_HEIGHT)
     {
 	// Free click function names that were allocated during parsing.
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == ClickFunc)
-		vim_free(stl_items[l].stl_clickfunc);
-	if (rendered_height != NULL)
+	প্রতি (l = 0; l < itemcnt; l++)
+	    যদি (stl_বস্তুসমূহ[l].stl_type == ClickFunc)
+		vim_free(stl_বস্তুসমূহ[l].stl_clickfunc);
+	যদি (rendered_height != রিক্ত)
 	    *rendered_height = rheight;
-	return 0;
+	প্রত্যাগম 0;
     }
 
     width = vim_strsize(out);
-    if (maxwidth > 0 && width > maxwidth)
+    যদি (maxwidth > 0 && width > maxwidth)
     {
 	// Result is too long, must truncate somewhere.
 	l = 0;
-	if (itemcnt == 0)
+	যদি (itemcnt == 0)
 	    s = out;
-	else
+	অন্যথা
 	{
-	    for ( ; l < itemcnt; l++)
-		if (stl_items[l].stl_type == Trunc)
+	    প্রতি ( ; l < itemcnt; l++)
+		যদি (stl_বস্তুসমূহ[l].stl_type == Trunc)
 		{
 		    // Truncate at %< item.
-		    s = stl_items[l].stl_start;
-		    break;
+		    s = stl_বস্তুসমূহ[l].stl_start;
+		    ভঙ্গ;
 		}
-	    if (l == itemcnt)
+	    যদি (l == itemcnt)
 	    {
 		// No %< item, truncate first item.
-		s = stl_items[0].stl_start;
+		s = stl_বস্তুসমূহ[0].stl_start;
 		l = 0;
 	    }
 	}
 
-	if (width - vim_strsize(s) >= maxwidth)
+	যদি (width - vim_strsize(s) >= maxwidth)
 	{
 	    // Truncation mark is beyond max length
-	    if (has_mbyte)
+	    যদি (has_mbyte)
 	    {
 		s = out;
 		width = 0;
-		for (;;)
+		প্রতি (;;)
 		{
 		    width += ptr2cells(s);
-		    if (width >= maxwidth)
-			break;
+		    যদি (width >= maxwidth)
+			ভঙ্গ;
 		    s += (*mb_ptr2len)(s);
 		}
 		// Fill up for half a double-wide character.
-		while (++width < maxwidth)
+		যাবত্ (++width < maxwidth)
 		    MB_CHAR2BYTES(fillchar, s);
 	    }
-	    else
+	    অন্যথা
 		s = out + maxwidth - 1;
-	    for (l = 0; l < itemcnt; l++)
-		if (stl_items[l].stl_start > s)
-		    break;
+	    প্রতি (l = 0; l < itemcnt; l++)
+		যদি (stl_বস্তুসমূহ[l].stl_start > s)
+		    ভঙ্গ;
 	    itemcnt = l;
 	    *s++ = '>';
 	    *s = NUL;
 	}
-	else
+	অন্যথা
 	{
 	    char_u  *end = out + outputlen;
 
 	    n = 0;
-	    while (width >= maxwidth)
+	    যাবত্ (width >= maxwidth)
 	    {
 		width -= ptr2cells(s + n);
 		n += (*mb_ptr2len)(s + n);
@@ -5603,16 +5603,16 @@ find_linebreak:
 	    *s = '<';
 
 	    --n;	// count the '<'
-	    for (; l < itemcnt; l++)
+	    প্রতি (; l < itemcnt; l++)
 	    {
-		if (stl_items[l].stl_start - n >= s)
-		    stl_items[l].stl_start -= n;
-		else
-		    stl_items[l].stl_start = s;
+		যদি (stl_বস্তুসমূহ[l].stl_start - n >= s)
+		    stl_বস্তুসমূহ[l].stl_start -= n;
+		অন্যথা
+		    stl_বস্তুসমূহ[l].stl_start = s;
 	    }
 
 	    // Fill up for half a double-wide character.
-	    while (++width < maxwidth)
+	    যাবত্ (++width < maxwidth)
 	    {
 		s = end;
 		MB_CHAR2BYTES(fillchar, s);
@@ -5622,46 +5622,46 @@ find_linebreak:
 	}
 	width = maxwidth;
     }
-    else if (width < maxwidth &&
+    অন্যথা যদি (width < maxwidth &&
 	    outputlen + (maxwidth - width) * MB_CHAR2LEN(fillchar) + 1 < outlen)
     {
 	// Find how many separators there are, which we will use when
 	// figuring out how many groups there are.
-	int num_separators = 0;
+	পূর্ণাঙ্ক অঙ্ক_separators = 0;
 
-	for (l = 0; l < itemcnt; l++)
+	প্রতি (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == Separate)
+	    যদি (stl_বস্তুসমূহ[l].stl_type == Separate)
 	    {
 		// Create an array of the start location for each separator
 		// mark.
-		stl_separator_locations[num_separators] = l;
-		num_separators++;
+		stl_separator_locations[অঙ্ক_separators] = l;
+		অঙ্ক_separators++;
 	    }
 	}
 
 	// If we have separated groups, then we deal with it now
-	if (num_separators)
+	যদি (অঙ্ক_separators)
 	{
-	    int standard_spaces;
-	    int final_spaces;
+	    পূর্ণাঙ্ক standard_spaces;
+	    পূর্ণাঙ্ক final_spaces;
 
-	    standard_spaces = (maxwidth - width) / num_separators;
+	    standard_spaces = (maxwidth - width) / অঙ্ক_separators;
 	    final_spaces = (maxwidth - width) -
-					standard_spaces * (num_separators - 1);
-	    for (l = 0; l < num_separators; l++)
+					standard_spaces * (অঙ্ক_separators - 1);
+	    প্রতি (l = 0; l < অঙ্ক_separators; l++)
 	    {
-		int dislocation = (l == (num_separators - 1)) ?
+		পূর্ণাঙ্ক dislocation = (l == (অঙ্ক_separators - 1)) ?
 					final_spaces : standard_spaces;
 		dislocation *= MB_CHAR2LEN(fillchar);
-		char_u *start = stl_items[stl_separator_locations[l]].stl_start;
+		char_u *start = stl_বস্তুসমূহ[stl_separator_locations[l]].stl_start;
 		char_u *seploc = start + dislocation;
 		STRMOVE(seploc, start);
-		for (s = start; s < seploc;)
+		প্রতি (s = start; s < seploc;)
 		    MB_CHAR2BYTES(fillchar, s);
 
-		for (int i = stl_separator_locations[l] + 1; i < itemcnt; i++)
-		    stl_items[i].stl_start += dislocation;
+		প্রতি (পূর্ণাঙ্ক i = stl_separator_locations[l] + 1; i < itemcnt; i++)
+		    stl_বস্তুসমূহ[i].stl_start += dislocation;
 	    }
 
 	    width = maxwidth;
@@ -5669,73 +5669,73 @@ find_linebreak:
     }
 
     // Store the info about highlighting.
-    if (hltab != NULL)
+    যদি (hltab != রিক্ত)
     {
 	*hltab = stl_hltab;
 	sp = stl_hltab;
-	for (l = 0; l < itemcnt; l++)
+	প্রতি (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == Highlight)
+	    যদি (stl_বস্তুসমূহ[l].stl_type == Highlight)
 	    {
-		sp->start = stl_items[l].stl_start;
-		sp->userhl = stl_items[l].stl_minwid;
+		sp->start = stl_বস্তুসমূহ[l].stl_start;
+		sp->userhl = stl_বস্তুসমূহ[l].stl_minwid;
 		sp++;
 	    }
 	}
-	sp->start = NULL;
+	sp->start = রিক্ত;
 	sp->userhl = 0;
     }
 
     // Store the info about tab pages labels.
-    if (tabtab != NULL)
+    যদি (tabtab != রিক্ত)
     {
 	*tabtab = stl_tabtab;
 	sp = stl_tabtab;
-	for (l = 0; l < itemcnt; l++)
+	প্রতি (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == TabPage)
+	    যদি (stl_বস্তুসমূহ[l].stl_type == TabPage)
 	    {
-		sp->start = stl_items[l].stl_start;
-		sp->userhl = stl_items[l].stl_minwid;
+		sp->start = stl_বস্তুসমূহ[l].stl_start;
+		sp->userhl = stl_বস্তুসমূহ[l].stl_minwid;
 		sp++;
 	    }
 	}
-	sp->start = NULL;
+	sp->start = রিক্ত;
 	sp->userhl = 0;
     }
 
     // Store the info about click function regions.
-    if (clicktab != NULL)
+    যদি (clicktab != রিক্ত)
     {
 	stl_clickrec_T *cp;
 
 	*clicktab = stl_clicktab;
 	cp = stl_clicktab;
-	for (l = 0; l < itemcnt; l++)
+	প্রতি (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == ClickFunc)
+	    যদি (stl_বস্তুসমূহ[l].stl_type == ClickFunc)
 	    {
-		cp->start = stl_items[l].stl_start;
-		cp->funcname = stl_items[l].stl_clickfunc;
-		cp->minwid = stl_items[l].stl_minwid;
+		cp->start = stl_বস্তুসমূহ[l].stl_start;
+		cp->funcname = stl_বস্তুসমূহ[l].stl_clickfunc;
+		cp->minwid = stl_বস্তুসমূহ[l].stl_minwid;
 		cp++;
 	    }
 	}
-	cp->start = NULL;
-	cp->funcname = NULL;
+	cp->start = রিক্ত;
+	cp->funcname = রিক্ত;
     }
-    else
+    অন্যথা
     {
 	// Free click function names when caller doesn't need them.
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == ClickFunc)
-		vim_free(stl_items[l].stl_clickfunc);
+	প্রতি (l = 0; l < itemcnt; l++)
+	    যদি (stl_বস্তুসমূহ[l].stl_type == ClickFunc)
+		vim_free(stl_বস্তুসমূহ[l].stl_clickfunc);
     }
 
     redraw_not_allowed = save_redraw_not_allowed;
 
     // A user function may reset KeyTyped, restore it.
-    KeyTyped = save_KeyTyped;
+    চাবি_Typed = save_চাবি_Typed;
 
     // Check for an error.  If there is one the display will be messed up and
     // might loop redrawing.  Avoid that by making the corresponding option
@@ -5743,11 +5743,11 @@ find_linebreak:
     // TODO: find out why using called_emsg_before makes tests fail, does it
     // matter?
     // if (called_emsg > called_emsg_before)
-    if (did_emsg > did_emsg_before)
+    যদি (did_emsg > did_emsg_before)
 	set_string_option_direct(opt_name, -1, (char_u *)"",
 					      OPT_FREE | opt_scope, SID_ERROR);
 
-    return width;
+    প্রত্যাগম width;
 }
 #endif // FEAT_STL_OPT
 
@@ -5755,65 +5755,65 @@ find_linebreak:
  * Get relative cursor position in window into "buf[]", in the localized
  * percentage form like %99, 99%; using "Top", "Bot" or "All" when appropriate.
  */
-    int
+    পূর্ণাঙ্ক
 get_rel_pos(
     win_T	*wp,
     char_u	*buf,
-    int		buflen)
+    পূর্ণাঙ্ক		buflen)
 {
     long	above; // number of lines above window
     long	below; // number of lines below window
 
-    if (buflen < 3) // need at least 3 chars for writing
-	return 0;
+    যদি (buflen < 3) // need at least 3 chars for writing
+	প্রত্যাগম 0;
     above = wp->w_topline - 1;
 #ifdef FEAT_DIFF
     above += diff_check_fill(wp, wp->w_topline) - wp->w_topfill;
-    if (wp->w_topline == 1 && wp->w_topfill >= 1)
+    যদি (wp->w_topline == 1 && wp->w_topfill >= 1)
 	above = 0;  // All buffer lines are displayed and there is an
 		    // indication of filler lines, that can be considered
 		    // seeing all lines.
 #endif
-    below = wp->w_buffer->b_ml.ml_line_count - wp->w_botline + 1;
-    if (below <= 0)
-	return (int)vim_snprintf_safelen((char *)buf, buflen,
+    below = wp->w_buffer->b_ml.ml_সারি_গুনতি - wp->w_botline + 1;
+    যদি (below <= 0)
+	প্রত্যাগম (পূর্ণাঙ্ক)vim_snprintf_safelen((বর্ণ *)buf, buflen,
 	    "%s", (above == 0) ? _("All") : _("Bot"));
 
-    if (above <= 0)
-	return (int)vim_snprintf_safelen((char *)buf, buflen,
+    যদি (above <= 0)
+	প্রত্যাগম (পূর্ণাঙ্ক)vim_snprintf_safelen((বর্ণ *)buf, buflen,
 	    "%s", _("Top"));
 
-    int perc = calc_percentage(above, above + below);
-    char tmp[8];
+    পূর্ণাঙ্ক perc = calc_percentage(above, above + below);
+    বর্ণ tmp[8];
     // localized percentage value
-    vim_snprintf(tmp, sizeof(tmp), _("%d%%"), perc);
-    return (int)vim_snprintf_safelen((char *)buf, buflen, _("%3s"), tmp);
+    vim_snprintf(tmp, পরিমাণ(tmp), _("%d%%"), perc);
+    প্রত্যাগম (পূর্ণাঙ্ক)vim_snprintf_safelen((বর্ণ *)buf, buflen, _("%3s"), tmp);
 }
 
 /*
  * Append (file 2 of 8) to "buf[]", if editing more than one file.
  * Return the number of characters appended.
  */
-    static int
-append_arg_number(
+    স্থির পূর্ণাঙ্ক
+append_arg_সংখ্যা(
     win_T	*wp,
     char_u	*buf,
     size_t	buflen,
-    int		add_file)	// Add "file" before the arg number
+    পূর্ণাঙ্ক		add_file)	// Add "file" before the arg number
 {
-    if (ARGCOUNT <= 1)		// nothing to do
-	return 0;
+    যদি (ARGCOUNT <= 1)		// nothing to do
+	প্রত্যাগম 0;
 
-    char *msg;
-    switch ((wp->w_arg_idx_invalid ? 1 : 0) + (add_file ? 2 : 0))
+    বর্ণ *বার্তা;
+    বিকল্প ((wp->w_arg_idx_invalid ? 1 : 0) + (add_file ? 2 : 0))
     {
-	case 0: msg = _(" (%d of %d)"); break;
-	case 1: msg = _(" ((%d) of %d)"); break;
-	case 2: msg = _(" (file %d of %d)"); break;
-	case 3: msg = _(" (file (%d) of %d)"); break;
+	পক্ষ 0: বার্তা = _(" (%d of %d)"); ভঙ্গ;
+	পক্ষ 1: বার্তা = _(" ((%d) of %d)"); ভঙ্গ;
+	পক্ষ 2: বার্তা = _(" (file %d of %d)"); ভঙ্গ;
+	পক্ষ 3: বার্তা = _(" (file (%d) of %d)"); ভঙ্গ;
     }
 
-    return (int)vim_snprintf_safelen((char *)buf, buflen, msg,
+    প্রত্যাগম (পূর্ণাঙ্ক)vim_snprintf_safelen((বর্ণ *)buf, buflen, বার্তা,
 						  wp->w_arg_idx + 1, ARGCOUNT);
 }
 
@@ -5834,30 +5834,30 @@ fix_fname(char_u  *fname)
      * and provide drive letter for all absolute paths.
      */
 #ifdef UNIX
-    return FullName_save(fname, TRUE);
-#else
-    if (!vim_isAbsName(fname)
-	    || strstr((char *)fname, "..") != NULL
-	    || strstr((char *)fname, "//") != NULL
+    প্রত্যাগম FullName_save(fname, TRUE);
+#অন্যথা
+    যদি (!vim_isAbsName(fname)
+	    || strstr((বর্ণ *)fname, "..") != রিক্ত
+	    || strstr((বর্ণ *)fname, "//") != রিক্ত
 # ifdef BACKSLASH_IN_FILENAME
-	    || strstr((char *)fname, "\\\\") != NULL
+	    || strstr((বর্ণ *)fname, "\\\\") != রিক্ত
 # endif
-# if defined(MSWIN)
-	    || vim_strchr(fname, '~') != NULL
+# যদি defined(MSWIN)
+	    || vim_strchr(fname, '~') != রিক্ত
 	    || fname[0] == '/'
 	    || fname[0] == '\\'
 # endif
 	    )
-	return FullName_save(fname, FALSE);
+	প্রত্যাগম FullName_save(fname, FALSE);
 
     fname = vim_strsave(fname);
 
 # ifdef USE_FNAME_CASE
-    if (fname != NULL)
+    যদি (fname != রিক্ত)
 	fname_case(fname, 0);	// set correct case for file name
 # endif
 
-    return fname;
+    প্রত্যাগম fname;
 #endif
 }
 
@@ -5869,26 +5869,26 @@ fix_fname(char_u  *fname)
  * The "*ffname" and "*sfname" pointer values on call will not be freed.
  * Note that the resulting "*ffname" pointer should be considered not allocated.
  */
-    void
+    শূন্য
 fname_expand(
     buf_T	*buf UNUSED,
     char_u	**ffname,
     char_u	**sfname)
 {
-    if (*ffname == NULL)	    // no file name given, nothing to do
-	return;
-    if (*sfname == NULL)	    // no short file name given, use ffname
+    যদি (*ffname == রিক্ত)	    // no file name given, nothing to do
+	প্রত্যাগম;
+    যদি (*sfname == রিক্ত)	    // no short file name given, use ffname
 	*sfname = *ffname;
     *ffname = fix_fname(*ffname);   // expand to full path
 
 #ifdef FEAT_SHORTCUT
-    if (!buf->b_p_bin)
+    যদি (!buf->b_p_bin)
     {
 	char_u  *rfname;
 
 	// If the file name is a shortcut file, use the file it links to.
 	rfname = mch_resolve_path(*ffname, FALSE);
-	if (rfname != NULL)
+	যদি (rfname != রিক্ত)
 	{
 	    vim_free(*ffname);
 	    *ffname = rfname;
@@ -5901,27 +5901,27 @@ fname_expand(
 /*
  * Open a window for a number of buffers.
  */
-    void
+    শূন্য
 ex_buffer_all(exarg_T *eap)
 {
     buf_T	*buf;
     win_T	*wp, *wpnext;
-    int		split_ret = OK;
-    int		p_ea_save;
-    int		open_wins = 0;
-    int		r;
-    int		count;		// Maximum number of windows to open.
-    int		all;		// When TRUE also load inactive buffers.
-    int		had_tab = cmdmod.cmod_tab;
+    পূর্ণাঙ্ক		split_ret = OK;
+    পূর্ণাঙ্ক		p_ea_save;
+    পূর্ণাঙ্ক		open_wins = 0;
+    পূর্ণাঙ্ক		r;
+    পূর্ণাঙ্ক		গুনতি;		// Maximum number of windows to open.
+    পূর্ণাঙ্ক		all;		// When TRUE also load inactive buffers.
+    পূর্ণাঙ্ক		had_tab = cmdmod.cmod_tab;
     tabpage_T	*tpnext;
 
-    if (eap->addr_count == 0)	// make as many windows as possible
-	count = 9999;
-    else
-	count = eap->line2;	// make as many windows as specified
-    if (eap->cmdidx == CMD_unhide || eap->cmdidx == CMD_sunhide)
+    যদি (eap->addr_গুনতি == 0)	// make as many windows as possible
+	গুনতি = 9999;
+    অন্যথা
+	গুনতি = eap->line2;	// make as many windows as specified
+    যদি (eap->cmdidx == CMD_unhide || eap->cmdidx == CMD_sunhide)
 	all = FALSE;
-    else
+    অন্যথা
 	all = TRUE;
 
     // Stop Visual mode, the cursor and "VIsual" may very well be invalid after
@@ -5938,15 +5938,15 @@ ex_buffer_all(exarg_T *eap)
      * Close superfluous windows (two windows for the same buffer).
      * Also close windows that are not full-width.
      */
-    if (had_tab > 0)
+    যদি (had_tab > 0)
 	goto_tabpage_tp(first_tabpage, TRUE, TRUE);
-    for (;;)
+    প্রতি (;;)
     {
 	tpnext = curtab->tp_next;
-	for (wp = firstwin; wp != NULL; wp = wpnext)
+	প্রতি (wp = firstwin; wp != রিক্ত; wp = wpnext)
 	{
 	    wpnext = wp->w_next;
-	    if ((wp->w_buffer->b_nwindows > 1
+	    যদি ((wp->w_buffer->b_nwindows > 1
 			|| ((cmdmod.cmod_split & WSP_VERT)
 			    ? wp->w_height + wp->w_status_height < Rows - p_ch
 							     - tabline_height()
@@ -5956,21 +5956,21 @@ ex_buffer_all(exarg_T *eap)
 		    && !(win_locked(wp) || wp->w_buffer->b_locked > 0)
 		    && !win_unlisted(wp))
 	    {
-		if (win_close(wp, FALSE) == FAIL)
-		    break;
+		যদি (win_close(wp, FALSE) == FAIL)
+		    ভঙ্গ;
 		// Just in case an autocommand does something strange with
 		// windows: start all over...
 		wpnext = firstwin;
 		tpnext = first_tabpage;
 		open_wins = 0;
 	    }
-	    else
+	    অন্যথা
 		++open_wins;
 	}
 
 	// Without the ":tab" modifier only do the current tab page.
-	if (had_tab == 0 || tpnext == NULL)
-	    break;
+	যদি (had_tab == 0 || tpnext == রিক্ত)
+	    ভঙ্গ;
 	goto_tabpage_tp(tpnext, TRUE, TRUE);
     }
 
@@ -5983,32 +5983,32 @@ ex_buffer_all(exarg_T *eap)
     ++autocmd_no_enter;
     win_enter(lastwin, FALSE);
     ++autocmd_no_leave;
-    for (buf = firstbuf; buf != NULL && open_wins < count; buf = buf->b_next)
+    প্রতি (buf = firstbuf; buf != রিক্ত && open_wins < গুনতি; buf = buf->b_next)
     {
 	// Check if this buffer needs a window
-	if ((!all && buf->b_ml.ml_mfp == NULL) || !buf->b_p_bl)
-	    continue;
+	যদি ((!all && buf->b_ml.ml_mfp == রিক্ত) || !buf->b_p_bl)
+	    অনুবর্ত;
 
-	if (had_tab != 0)
+	যদি (had_tab != 0)
 	{
 	    // With the ":tab" modifier don't move the window.
-	    if (buf->b_nwindows > 0)
+	    যদি (buf->b_nwindows > 0)
 		wp = lastwin;	    // buffer has a window, skip it
-	    else
-		wp = NULL;
+	    অন্যথা
+		wp = রিক্ত;
 	}
-	else
+	অন্যথা
 	{
 	    // Check if this buffer already has a window
 	    FOR_ALL_WINDOWS(wp)
-		if (wp->w_buffer == buf)
-		    break;
+		যদি (wp->w_buffer == buf)
+		    ভঙ্গ;
 	    // If the buffer already has a window, move it
-	    if (wp != NULL)
+	    যদি (wp != রিক্ত)
 		win_move_after(wp, curwin);
 	}
 
-	if (wp == NULL && split_ret == OK)
+	যদি (wp == রিক্ত && split_ret == OK)
 	{
 	    bufref_T	bufref;
 
@@ -6020,21 +6020,21 @@ ex_buffer_all(exarg_T *eap)
 	    split_ret = win_split(0, WSP_ROOM | WSP_BELOW);
 	    ++open_wins;
 	    p_ea = p_ea_save;
-	    if (split_ret == FAIL)
-		continue;
+	    যদি (split_ret == FAIL)
+		অনুবর্ত;
 
 	    // Open the buffer in this window.
 	    swap_exists_action = SEA_DIALOG;
 	    set_curbuf(buf, DOBUF_GOTO);
-	    if (!bufref_valid(&bufref))
+	    যদি (!bufref_valid(&bufref))
 	    {
 		// autocommands deleted the buffer!!!
 		swap_exists_action = SEA_NONE;
-		break;
+		ভঙ্গ;
 	    }
-	    if (swap_exists_action == SEA_QUIT)
+	    যদি (swap_exists_action == SEA_QUIT)
 	    {
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 		cleanup_T   cs;
 
 		// Reset the error/interrupt/exception state here so that
@@ -6048,30 +6048,30 @@ ex_buffer_all(exarg_T *eap)
 		swap_exists_action = SEA_NONE;
 		swap_exists_did_quit = TRUE;
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 		// Restore the error/interrupt/exception state if not
 		// discarded by a new aborting error, interrupt, or uncaught
 		// exception.
 		leave_cleanup(&cs);
 #endif
 	    }
-	    else
-		handle_swap_exists(NULL);
+	    অন্যথা
+		handle_swap_exists(রিক্ত);
 	}
 
 	ui_breakcheck();
-	if (got_int)
+	যদি (got_int)
 	{
-	    (void)vgetc();	// only break the file loading, not the rest
-	    break;
+	    (শূন্য)vgetc();	// only break the file loading, not the rest
+	    ভঙ্গ;
 	}
 #ifdef FEAT_EVAL
 	// Autocommands deleted the buffer or aborted script processing!!!
-	if (aborting())
-	    break;
+	যদি (aborting())
+	    ভঙ্গ;
 #endif
 	// When ":tab" was used open a new tab for a new window repeatedly.
-	if (had_tab > 0 && tabpage_index(NULL) <= p_tpm)
+	যদি (had_tab > 0 && tabpage_index(রিক্ত) <= p_tpm)
 	    cmdmod.cmod_tab = 9999;
     }
     --autocmd_no_enter;
@@ -6081,32 +6081,32 @@ ex_buffer_all(exarg_T *eap)
     /*
      * Close superfluous windows.
      */
-    for (wp = lastwin; open_wins > count; )
+    প্রতি (wp = lastwin; open_wins > গুনতি; )
     {
 	r = (buf_hide(wp->w_buffer) || !bufIsChanged(wp->w_buffer)
 				     || autowrite(wp->w_buffer, FALSE) == OK);
-	if (!win_valid(wp))
+	যদি (!win_valid(wp))
 	{
 	    // BufWrite Autocommands made the window invalid, start over
 	    wp = lastwin;
 	}
-	else if (r)
+	অন্যথা যদি (r)
 	{
 	    win_close(wp, !buf_hide(wp->w_buffer));
 	    --open_wins;
 	    wp = lastwin;
 	}
-	else
+	অন্যথা
 	{
 	    wp = wp->w_prev;
-	    if (wp == NULL)
-		break;
+	    যদি (wp == রিক্ত)
+		ভঙ্গ;
 	}
     }
 }
 
 
-static int  chk_modeline(linenr_T, int);
+স্থির পূর্ণাঙ্ক  chk_modeline(linenr_T, পূর্ণাঙ্ক);
 
 /*
  * do_modelines() - process mode lines for the current file
@@ -6117,73 +6117,73 @@ static int  chk_modeline(linenr_T, int);
  *
  * Returns immediately if the "ml" option isn't set.
  */
-    void
-do_modelines(int flags)
+    শূন্য
+do_modelines(পূর্ণাঙ্ক flags)
 {
     linenr_T	lnum;
-    int		nmlines;
-    static int	entered = 0;
+    পূর্ণাঙ্ক		nmlines;
+    স্থির পূর্ণাঙ্ক	entered = 0;
 
-    if (!curbuf->b_p_ml || (nmlines = (int)p_mls) == 0)
-	return;
+    যদি (!curbuf->b_p_ml || (nmlines = (পূর্ণাঙ্ক)p_mls) == 0)
+	প্রত্যাগম;
 
     // Disallow recursive entry here.  Can happen when executing a modeline
     // triggers an autocommand, which reloads modelines with a ":do".
-    if (entered)
-	return;
+    যদি (entered)
+	প্রত্যাগম;
 
     ++entered;
-    for (lnum = 1; curbuf->b_p_ml && lnum <= curbuf->b_ml.ml_line_count && lnum <= nmlines;
+    প্রতি (lnum = 1; curbuf->b_p_ml && lnum <= curbuf->b_ml.ml_সারি_গুনতি && lnum <= nmlines;
 								       ++lnum)
-	if (chk_modeline(lnum, flags) == FAIL)
+	যদি (chk_modeline(lnum, flags) == FAIL)
 	    nmlines = 0;
 
-    for (lnum = curbuf->b_ml.ml_line_count; curbuf->b_p_ml && lnum > 0 && lnum > nmlines
-		       && lnum > curbuf->b_ml.ml_line_count - nmlines; --lnum)
-	if (chk_modeline(lnum, flags) == FAIL)
+    প্রতি (lnum = curbuf->b_ml.ml_সারি_গুনতি; curbuf->b_p_ml && lnum > 0 && lnum > nmlines
+		       && lnum > curbuf->b_ml.ml_সারি_গুনতি - nmlines; --lnum)
+	যদি (chk_modeline(lnum, flags) == FAIL)
 	    nmlines = 0;
     --entered;
 }
 
-#include "version.h"		// for version number
+#অন্তর্ভাব "version.h"		// for version number
 
 /*
  * chk_modeline() - check a single line for a mode string
  * Return FAIL if an error encountered.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 chk_modeline(
     linenr_T	lnum,
-    int		flags)		// Same as for do_modelines().
+    পূর্ণাঙ্ক		flags)		// Same as for do_modelines().
 {
     char_u	*s;
-    char_u	*line_end;		// point to the end of the line
+    char_u	*সারি_end;		// point to the end of the line
     char_u	*e;
-    int		prev;
-    int		retval = OK;
+    পূর্ণাঙ্ক		prev;
+    পূর্ণাঙ্ক		retval = OK;
     ESTACK_CHECK_DECLARATION;
 
     prev = -1;
     s = ml_get(lnum);
-    line_end = s + ml_get_len(lnum);
-    for (; *s != NUL; ++s)
+    সারি_end = s + ml_get_len(lnum);
+    প্রতি (; *s != NUL; ++s)
     {
-	if (prev == -1 || vim_isspace(prev))
+	যদি (prev == -1 || vim_isspace(prev))
 	{
-	    if ((prev != -1 && STRNCMP(s, "ex:", (size_t)3) == 0)
+	    যদি ((prev != -1 && STRNCMP(s, "ex:", (size_t)3) == 0)
 		    || STRNCMP(s, "vi:", (size_t)3) == 0)
-		break;
+		ভঙ্গ;
 	    // Accept both "vim" and "Vim".
-	    if ((s[0] == 'v' || s[0] == 'V') && s[1] == 'i' && s[2] == 'm')
+	    যদি ((s[0] == 'v' || s[0] == 'V') && s[1] == 'i' && s[2] == 'm')
 	    {
-		int vers;
+		পূর্ণাঙ্ক vers;
 
-		if (s[3] == '<' || s[3] == '=' || s[3] == '>')
+		যদি (s[3] == '<' || s[3] == '=' || s[3] == '>')
 		    e = s + 4;
-		else
+		অন্যথা
 		    e = s + 3;
 		vers = getdigits(&e);
-		if (*e == ':'
+		যদি (*e == ':'
 			&& (s[0] != 'V'
 				  || STRNCMP(skipwhite(e + 1), "set", 3) == 0)
 			&& (s[3] == ':'
@@ -6191,53 +6191,53 @@ chk_modeline(
 			    || (VIM_VERSION_100 < vers && s[3] == '<')
 			    || (VIM_VERSION_100 > vers && s[3] == '>')
 			    || (VIM_VERSION_100 == vers && s[3] == '=')))
-		    break;
+		    ভঙ্গ;
 	    }
 	}
 	prev = *s;
     }
 
-    if (*s)
+    যদি (*s)
     {
 	size_t	len;
 	char_u	*linecopy;		// local copy of any modeline found
-	int	end;
+	পূর্ণাঙ্ক	end;
 
-	do				// skip over "ex:", "vi:" or "vim:"
+	কুরু				// skip over "ex:", "vi:" or "vim:"
 	    ++s;
-	while (s[-1] != ':');
+	যাবত্ (s[-1] != ':');
 
-	len = (size_t)(line_end - s);		// remember the line length
+	len = (size_t)(সারি_end - s);		// remember the line length
 						// so we can restore 'line_end'
 						// after the copy
 	s = linecopy = vim_strnsave(s, len);	// copy the line, it will change
-	if (linecopy == NULL)
-	    return FAIL;
+	যদি (linecopy == রিক্ত)
+	    প্রত্যাগম FAIL;
 
-	line_end = s + len;			// restore 'line_end'
+	সারি_end = s + len;			// restore 'line_end'
 
 	// prepare for emsg()
-	estack_push(ETYPE_MODELINE, (char_u *)"modelines", lnum);
+	estack_ঠেলো(ETYPE_MODELINE, (char_u *)"modelines", lnum);
 	ESTACK_CHECK_SETUP;
 
 	end = FALSE;
-	while (end == FALSE)
+	যাবত্ (end == FALSE)
 	{
 	    s = skipwhite(s);
-	    if (*s == NUL)
-		break;
+	    যদি (*s == NUL)
+		ভঙ্গ;
 
 	    /*
 	     * Find end of set command: ':' or end of line.
 	     * Skip over "\:", replacing it with ":".
 	     */
-	    for (e = s; *e != ':' && *e != NUL; ++e)
-		if (e[0] == '\\' && e[1] == ':')
+	    প্রতি (e = s; *e != ':' && *e != NUL; ++e)
+		যদি (e[0] == '\\' && e[1] == ':')
 		{
-		    mch_memmove(e, e + 1, (size_t)(line_end - (e + 1)) + 1);	// +1 for NUL
-		    --line_end;
+		    mch_memmove(e, e + 1, (size_t)(সারি_end - (e + 1)) + 1);	// +1 for NUL
+		    --সারি_end;
 		}
-	    if (*e == NUL)
+	    যদি (*e == NUL)
 		end = TRUE;
 
 	    /*
@@ -6247,19 +6247,19 @@ chk_modeline(
 	     * "vi:opt opt opt: foo" -- foo interpreted
 	     * Accept "se" for compatibility with Elvis.
 	     */
-	    if (STRNCMP(s, "set ", (size_t)4) == 0
+	    যদি (STRNCMP(s, "set ", (size_t)4) == 0
 		    || STRNCMP(s, "se ", (size_t)3) == 0)
 	    {
-		if (*e != ':')		// no terminating ':'?
-		    break;
+		যদি (*e != ':')		// no terminating ':'?
+		    ভঙ্গ;
 		end = TRUE;
 		s += (*(s + 2) == ' ') ? 3 : 4;
 	    }
 	    *e = NUL;			// truncate the set command
 
-	    if (*s != NUL)		// skip over an empty "::"
+	    যদি (*s != NUL)		// skip over an empty "::"
 	    {
-		int secure_save = secure;
+		পূর্ণাঙ্ক secure_save = secure;
 		sctx_T	save_current_sctx = current_sctx;
 
 		current_sctx.sc_version = 1;
@@ -6276,81 +6276,81 @@ chk_modeline(
 
 		secure = secure_save;
 		current_sctx = save_current_sctx;
-		if (retval == FAIL)		// stop if error found
-		    break;
+		যদি (retval == FAIL)		// stop if error found
+		    ভঙ্গ;
 	    }
-	    s = (e == line_end) ? e : e + 1;	// advance to next part
+	    s = (e == সারি_end) ? e : e + 1;	// advance to next part
 						// careful not to go off the end
 	}
 
 	ESTACK_CHECK_NOW;
-	estack_pop();
+	estack_বের_করো();
 	vim_free(linecopy);
     }
-    return retval;
+    প্রত্যাগম retval;
 }
 
 /*
  * Return TRUE if "buf" is a normal buffer, 'buftype' is empty.
  */
-    int
+    পূর্ণাঙ্ক
 bt_normal(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == NUL;
+    প্রত্যাগম buf != রিক্ত && buf->b_p_bt[0] == NUL;
 }
 
 /*
  * Return TRUE if "buf" is the quickfix buffer.
  */
-    int
+    পূর্ণাঙ্ক
 bt_quickfix(buf_T *buf UNUSED)
 {
 #ifdef FEAT_QUICKFIX
-    return buf != NULL && buf->b_p_bt[0] == 'q';
-#else
-    return FALSE;
+    প্রত্যাগম buf != রিক্ত && buf->b_p_bt[0] == 'q';
+#অন্যথা
+    প্রত্যাগম FALSE;
 #endif
 }
 
 /*
  * Return TRUE if "buf" is a terminal buffer.
  */
-    int
+    পূর্ণাঙ্ক
 bt_terminal(buf_T *buf UNUSED)
 {
-#if defined(FEAT_TERMINAL)
-    return buf != NULL && buf->b_p_bt[0] == 't';
-#else
-    return FALSE;
+#যদি defined(FEAT_TERMINAL)
+    প্রত্যাগম buf != রিক্ত && buf->b_p_bt[0] == 't';
+#অন্যথা
+    প্রত্যাগম FALSE;
 #endif
 }
 
 /*
  * Return TRUE if "buf" is a help buffer.
  */
-    int
+    পূর্ণাঙ্ক
 bt_help(buf_T *buf)
 {
-    return buf != NULL && buf->b_help;
+    প্রত্যাগম buf != রিক্ত && buf->b_help;
 }
 
 /*
  * Return TRUE if "buf" is a prompt buffer.
  */
-    int
+    পূর্ণাঙ্ক
 bt_prompt(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'r';
+    প্রত্যাগম buf != রিক্ত && buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'r';
 }
 
-#if defined(FEAT_PROP_POPUP)
+#যদি defined(FEAT_PROP_POPUP)
 /*
  * Return TRUE if "buf" is a buffer for a popup window.
  */
-    int
+    পূর্ণাঙ্ক
 bt_popup(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt != NULL
+    প্রত্যাগম buf != রিক্ত && buf->b_p_bt != রিক্ত
 	&& buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'o';
 }
 #endif
@@ -6360,10 +6360,10 @@ bt_popup(buf_T *buf)
  * buffer.  This means the buffer name may not be a file name, at least not for
  * writing the buffer.
  */
-    int
+    পূর্ণাঙ্ক
 bt_nofilename(buf_T *buf)
 {
-    return buf != NULL && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
+    প্রত্যাগম buf != রিক্ত && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
 	    || buf->b_p_bt[0] == 'a'
 	    || buf->b_p_bt[0] == 't'
 	    || buf->b_p_bt[0] == 'p');
@@ -6373,23 +6373,23 @@ bt_nofilename(buf_T *buf)
  * Return TRUE if "buf" is a "nofile", "quickfix", "terminal" or "prompt"
  * buffer.  This means the buffer is not to be read from a file.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 bt_nofileread(buf_T *buf)
 {
-    return buf != NULL && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
+    প্রত্যাগম buf != রিক্ত && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
 	    || buf->b_p_bt[0] == 't'
 	    || buf->b_p_bt[0] == 'q'
 	    || buf->b_p_bt[0] == 'p');
 }
 
-#if defined(FEAT_QUICKFIX)
+#যদি defined(FEAT_QUICKFIX)
 /*
  * Return TRUE if "buf" has 'buftype' set to "nofile".
  */
-    int
+    পূর্ণাঙ্ক
 bt_nofile(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f';
+    প্রত্যাগম buf != রিক্ত && buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f';
 }
 #endif
 
@@ -6397,41 +6397,41 @@ bt_nofile(buf_T *buf)
  * Return TRUE if "buf" is a "nowrite", "nofile", "terminal", "prompt", or
  * "popup" buffer.
  */
-    int
+    পূর্ণাঙ্ক
 bt_dontwrite(buf_T *buf)
 {
-    return buf != NULL && (buf->b_p_bt[0] == 'n'
+    প্রত্যাগম buf != রিক্ত && (buf->b_p_bt[0] == 'n'
 		 || buf->b_p_bt[0] == 't'
 		 || buf->b_p_bt[0] == 'p');
 }
 
-    int
-bt_dontwrite_msg(buf_T *buf)
+    পূর্ণাঙ্ক
+bt_dontwrite_বার্তা(buf_T *buf)
 {
-    if (bt_dontwrite(buf))
+    যদি (bt_dontwrite(buf))
     {
 	emsg(_(e_cannot_write_buftype_option_is_set));
-	return TRUE;
+	প্রত্যাগম TRUE;
     }
-    return FALSE;
+    প্রত্যাগম FALSE;
 }
 
 /*
  * Return TRUE if the buffer should be hidden, according to 'hidden', ":hide"
  * and 'bufhidden'.
  */
-    int
+    পূর্ণাঙ্ক
 buf_hide(buf_T *buf)
 {
     // 'bufhidden' overrules 'hidden' and ":hide", check it first
-    switch (buf->b_p_bh[0])
+    বিকল্প (buf->b_p_bh[0])
     {
-	case 'u':		    // "unload"
-	case 'w':		    // "wipe"
-	case 'd': return FALSE;	    // "delete"
-	case 'h': return TRUE;	    // "hide"
+	পক্ষ 'u':		    // "unload"
+	পক্ষ 'w':		    // "wipe"
+	পক্ষ 'd': প্রত্যাগম FALSE;	    // "delete"
+	পক্ষ 'h': প্রত্যাগম TRUE;	    // "hide"
     }
-    return (p_hid || (cmdmod.cmod_flags & CMOD_HIDE));
+    প্রত্যাগম (p_hid || (cmdmod.cmod_flags & CMOD_HIDE));
 }
 
 /*
@@ -6441,46 +6441,46 @@ buf_hide(buf_T *buf)
     char_u *
 buf_spname(buf_T *buf)
 {
-#if defined(FEAT_QUICKFIX)
-    if (bt_quickfix(buf))
+#যদি defined(FEAT_QUICKFIX)
+    যদি (bt_quickfix(buf))
     {
 	/*
 	 * Differentiate between the quickfix and location list buffers using
 	 * the buffer number stored in the global quickfix stack.
 	 */
-	if (buf->b_fnum == qf_stack_get_bufnr())
-	    return (char_u *)_(msg_qflist);
-	else
-	    return (char_u *)_(msg_loclist);
+	যদি (buf->b_fnum == qf_স্তূপ_get_bufnr())
+	    প্রত্যাগম (char_u *)_(বার্তা_qflist);
+	অন্যথা
+	    প্রত্যাগম (char_u *)_(বার্তা_loclist);
     }
 #endif
 
     // There is no _file_ when 'buftype' is "nofile", b_sfname
     // contains the name as specified by the user.
-    if (bt_nofilename(buf))
+    যদি (bt_nofilename(buf))
     {
 #ifdef FEAT_TERMINAL
-	if (buf->b_term != NULL)
-	    return term_get_status_text(buf->b_term);
+	যদি (buf->b_term != রিক্ত)
+	    প্রত্যাগম term_get_status_text(buf->b_term);
 #endif
-	if (buf->b_fname != NULL)
-	    return buf->b_fname;
-	if (buf == cmdwin_buf)
-	    return (char_u *)_("[Command Line]");
+	যদি (buf->b_fname != রিক্ত)
+	    প্রত্যাগম buf->b_fname;
+	যদি (buf == cmdwin_buf)
+	    প্রত্যাগম (char_u *)_("[Command Line]");
 #ifdef FEAT_JOB_CHANNEL
-	if (bt_prompt(buf))
-	    return (char_u *)_("[Prompt]");
+	যদি (bt_prompt(buf))
+	    প্রত্যাগম (char_u *)_("[Prompt]");
 #endif
 #ifdef FEAT_PROP_POPUP
-	if (bt_popup(buf))
-	    return (char_u *)_("[Popup]");
+	যদি (bt_popup(buf))
+	    প্রত্যাগম (char_u *)_("[Popup]");
 #endif
-	return (char_u *)_("[Scratch]");
+	প্রত্যাগম (char_u *)_("[Scratch]");
     }
 
-    if (buf->b_fname == NULL)
-	return buf_get_fname(buf);
-    return NULL;
+    যদি (buf->b_fname == রিক্ত)
+	প্রত্যাগম buf_get_fname(buf);
+    প্রত্যাগম রিক্ত;
 }
 
 /*
@@ -6489,78 +6489,78 @@ buf_spname(buf_T *buf)
     char_u *
 buf_get_fname(buf_T *buf)
 {
-    if (buf->b_fname == NULL)
-	return (char_u *)_("[No Name]");
-    return buf->b_fname;
+    যদি (buf->b_fname == রিক্ত)
+	প্রত্যাগম (char_u *)_("[No Name]");
+    প্রত্যাগম buf->b_fname;
 }
 
 /*
  * Set 'buflisted' for curbuf to "on" and trigger autocommands if it changed.
  */
-    void
-set_buflisted(int on)
+    শূন্য
+set_buflisted(পূর্ণাঙ্ক on)
 {
-    if (on == curbuf->b_p_bl)
-	return;
+    যদি (on == curbuf->b_p_bl)
+	প্রত্যাগম;
 
     curbuf->b_p_bl = on;
-    if (on)
-	apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, curbuf);
-    else
-	apply_autocmds(EVENT_BUFDELETE, NULL, NULL, FALSE, curbuf);
+    যদি (on)
+	apply_autocmds(EVENT_BUFADD, রিক্ত, রিক্ত, FALSE, curbuf);
+    অন্যথা
+	apply_autocmds(EVENT_BUFDELETE, রিক্ত, রিক্ত, FALSE, curbuf);
 }
 
 /*
  * Read the file for "buf" again and check if the contents changed.
  * Return TRUE if it changed or this could not be checked.
  */
-    int
+    পূর্ণাঙ্ক
 buf_contents_changed(buf_T *buf)
 {
     buf_T	*newbuf;
-    int		differ = TRUE;
+    পূর্ণাঙ্ক		differ = TRUE;
     linenr_T	lnum;
     aco_save_T	aco;
     exarg_T	ea;
 
     // Allocate a buffer without putting it in the buffer list.
-    newbuf = buflist_new(NULL, NULL, (linenr_T)1, BLN_DUMMY);
-    if (newbuf == NULL)
-	return TRUE;
+    newbuf = buflist_new(রিক্ত, রিক্ত, (linenr_T)1, BLN_DUMMY);
+    যদি (newbuf == রিক্ত)
+	প্রত্যাগম TRUE;
 
     // Force the 'fileencoding' and 'fileformat' to be equal.
-    if (prep_exarg(&ea, buf) == FAIL)
+    যদি (prep_exarg(&ea, buf) == FAIL)
     {
 	wipe_buffer(newbuf, FALSE);
-	return TRUE;
+	প্রত্যাগম TRUE;
     }
 
     // Set curwin/curbuf to buf and save a few things.
     aucmd_prepbuf(&aco, newbuf);
-    if (curbuf != newbuf)
+    যদি (curbuf != newbuf)
     {
 	// Failed to find a window for "newbuf".
 	wipe_buffer(newbuf, FALSE);
-	return TRUE;
+	প্রত্যাগম TRUE;
     }
 
     // We don't want to trigger autocommands now, they may have nasty
     // side-effects like wiping buffers
     block_autocmds();
-    if (ml_open(curbuf) == OK
+    যদি (ml_open(curbuf) == OK
 	    && readfile(buf->b_ffname, buf->b_fname,
 				  (linenr_T)0, (linenr_T)0, (linenr_T)MAXLNUM,
 					    &ea, READ_NEW | READ_DUMMY) == OK)
     {
 	// compare the two files line by line
-	if (buf->b_ml.ml_line_count == curbuf->b_ml.ml_line_count)
+	যদি (buf->b_ml.ml_সারি_গুনতি == curbuf->b_ml.ml_সারি_গুনতি)
 	{
 	    differ = FALSE;
-	    for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
-		if (STRCMP(ml_get_buf(buf, lnum, FALSE), ml_get(lnum)) != 0)
+	    প্রতি (lnum = 1; lnum <= curbuf->b_ml.ml_সারি_গুনতি; ++lnum)
+		যদি (STRCMP(ml_get_buf(buf, lnum, FALSE), ml_get(lnum)) != 0)
 		{
 		    differ = TRUE;
-		    break;
+		    ভঙ্গ;
 		}
 	}
     }
@@ -6569,12 +6569,12 @@ buf_contents_changed(buf_T *buf)
     // restore curwin/curbuf and a few other things
     aucmd_restbuf(&aco);
 
-    if (curbuf != newbuf)	// safety check
+    যদি (curbuf != newbuf)	// safety check
 	wipe_buffer(newbuf, FALSE);
 
     unblock_autocmds();
 
-    return differ;
+    প্রত্যাগম differ;
 }
 
 /*
@@ -6582,19 +6582,19 @@ buf_contents_changed(buf_T *buf)
  * this buffer.  Call this to wipe out a temp buffer that does not contain any
  * marks.
  */
-    void
+    শূন্য
 wipe_buffer(
     buf_T	*buf,
-    int		aucmd)	    // When TRUE trigger autocommands.
+    পূর্ণাঙ্ক		aucmd)	    // When TRUE trigger autocommands.
 {
-    if (buf->b_fnum == top_file_num - 1)
-	--top_file_num;
+    যদি (buf->b_fnum == শীর্ষ_file_অঙ্ক - 1)
+	--শীর্ষ_file_অঙ্ক;
 
-    if (!aucmd)		    // Don't trigger BufDelete autocommands here.
+    যদি (!aucmd)		    // Don't trigger BufDelete autocommands here.
 	block_autocmds();
 
-    close_buffer(NULL, buf, DOBUF_WIPE, FALSE, TRUE, FALSE);
+    close_buffer(রিক্ত, buf, DOBUF_WIPE, FALSE, TRUE, FALSE);
 
-    if (!aucmd)
+    যদি (!aucmd)
 	unblock_autocmds();
 }

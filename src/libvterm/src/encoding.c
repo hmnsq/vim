@@ -1,57 +1,57 @@
-#include "vterm_internal.h"
+#অন্তর্ভাব "vterm_internal.h"
 
 #define UNICODE_INVALID 0xFFFD
 
-#if defined(DEBUG) && DEBUG > 1
+#যদি defined(DEBUG) && DEBUG > 1
 # define DEBUG_PRINT_UTF8
 #endif
 
-struct UTF8DecoderData {
+সংরচনা UTF8DecoderData {
   // number of bytes remaining in this codepoint
-  int bytes_remaining;
+  পূর্ণাঙ্ক bytes_remaining;
 
   // number of bytes total in this codepoint once it's finished
   // (for detecting overlongs)
-  int bytes_total;
+  পূর্ণাঙ্ক bytes_total;
 
-  int this_cp;
+  পূর্ণাঙ্ক this_cp;
 };
 
-static void init_utf8(VTermEncoding *enc UNUSED, void *data_)
+স্থির শূন্য init_utf8(VTermEncoding *enc UNUSED, শূন্য *data_)
 {
-  struct UTF8DecoderData *data = data_;
+  সংরচনা UTF8DecoderData *data = data_;
 
   data->bytes_remaining = 0;
   data->bytes_total     = 0;
 }
 
-static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
-                        uint32_t cp[], int *cpi, int cplen,
-                        const char bytes[], size_t *pos, size_t bytelen)
+স্থির শূন্য decode_utf8(VTermEncoding *enc UNUSED, শূন্য *data_,
+                        uint32_t cp[], পূর্ণাঙ্ক *cpi, পূর্ণাঙ্ক cplen,
+                        ধ্রুব বর্ণ bytes[], size_t *pos, size_t bytelen)
 {
-  struct UTF8DecoderData *data = data_;
+  সংরচনা UTF8DecoderData *data = data_;
 
 #ifdef DEBUG_PRINT_UTF8
   printf("BEGIN UTF-8\n");
 #endif
 
-  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos];
+  প্রতি(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    unsigned বর্ণ c = bytes[*pos];
 
 #ifdef DEBUG_PRINT_UTF8
     printf(" pos=%zd c=%02x rem=%d\n", *pos, c, data->bytes_remaining);
 #endif
 
-    if(c < 0x20) // C0
-      return;
+    যদি(c < 0x20) // C0
+      প্রত্যাগম;
 
-    else if(c >= 0x20 && c < 0x7f) {
-      if(data->bytes_remaining) {
+    অন্যথা যদি(c >= 0x20 && c < 0x7f) {
+      যদি(data->bytes_remaining) {
         data->bytes_remaining = 0;
         cp[(*cpi)++] = UNICODE_INVALID;
 	// VIM: avoid going over the end
-	if (*cpi >= cplen)
-	  break;
+	যদি (*cpi >= cplen)
+	  ভঙ্গ;
       }
       cp[(*cpi)++] = c;
 #ifdef DEBUG_PRINT_UTF8
@@ -59,43 +59,43 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
 #endif
     }
 
-    else if(c == 0x7f) // DEL
-      return;
+    অন্যথা যদি(c == 0x7f) // DEL
+      প্রত্যাগম;
 
-    else if(c >= 0x80 && c < 0xc0) {
-      if(!data->bytes_remaining) {
+    অন্যথা যদি(c >= 0x80 && c < 0xc0) {
+      যদি(!data->bytes_remaining) {
         cp[(*cpi)++] = UNICODE_INVALID;
-        continue;
+        অনুবর্ত;
       }
 
       data->this_cp <<= 6;
       data->this_cp |= c & 0x3f;
       data->bytes_remaining--;
 
-      if(!data->bytes_remaining) {
+      যদি(!data->bytes_remaining) {
 #ifdef DEBUG_PRINT_UTF8
         printf(" UTF-8 raw char U+%04x bytelen=%d ", data->this_cp, data->bytes_total);
 #endif
         // Check for overlong sequences
-        switch(data->bytes_total) {
-        case 2:
-          if(data->this_cp <  0x0080) data->this_cp = UNICODE_INVALID;
-          break;
-        case 3:
-          if(data->this_cp <  0x0800) data->this_cp = UNICODE_INVALID;
-          break;
-        case 4:
-          if(data->this_cp < 0x10000) data->this_cp = UNICODE_INVALID;
-          break;
-        case 5:
-          if(data->this_cp < 0x200000) data->this_cp = UNICODE_INVALID;
-          break;
-        case 6:
-          if(data->this_cp < 0x4000000) data->this_cp = UNICODE_INVALID;
-          break;
+        বিকল্প(data->bytes_total) {
+        পক্ষ 2:
+          যদি(data->this_cp <  0x0080) data->this_cp = UNICODE_INVALID;
+          ভঙ্গ;
+        পক্ষ 3:
+          যদি(data->this_cp <  0x0800) data->this_cp = UNICODE_INVALID;
+          ভঙ্গ;
+        পক্ষ 4:
+          যদি(data->this_cp < 0x10000) data->this_cp = UNICODE_INVALID;
+          ভঙ্গ;
+        পক্ষ 5:
+          যদি(data->this_cp < 0x200000) data->this_cp = UNICODE_INVALID;
+          ভঙ্গ;
+        পক্ষ 6:
+          যদি(data->this_cp < 0x4000000) data->this_cp = UNICODE_INVALID;
+          ভঙ্গ;
         }
         // Now look for plain invalid ones
-        if((data->this_cp >= 0xD800 && data->this_cp <= 0xDFFF) ||
+        যদি((data->this_cp >= 0xD800 && data->this_cp <= 0xDFFF) ||
            data->this_cp == 0xFFFE ||
            data->this_cp == 0xFFFF)
           data->this_cp = UNICODE_INVALID;
@@ -106,8 +106,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       }
     }
 
-    else if(c >= 0xc0 && c < 0xe0) {
-      if(data->bytes_remaining)
+    অন্যথা যদি(c >= 0xc0 && c < 0xe0) {
+      যদি(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x1f;
@@ -115,8 +115,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 1;
     }
 
-    else if(c >= 0xe0 && c < 0xf0) {
-      if(data->bytes_remaining)
+    অন্যথা যদি(c >= 0xe0 && c < 0xf0) {
+      যদি(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x0f;
@@ -124,8 +124,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 2;
     }
 
-    else if(c >= 0xf0 && c < 0xf8) {
-      if(data->bytes_remaining)
+    অন্যথা যদি(c >= 0xf0 && c < 0xf8) {
+      যদি(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x07;
@@ -133,8 +133,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 3;
     }
 
-    else if(c >= 0xf8 && c < 0xfc) {
-      if(data->bytes_remaining)
+    অন্যথা যদি(c >= 0xf8 && c < 0xfc) {
+      যদি(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x03;
@@ -142,8 +142,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 4;
     }
 
-    else if(c >= 0xfc && c < 0xfe) {
-      if(data->bytes_remaining)
+    অন্যথা যদি(c >= 0xfc && c < 0xfe) {
+      যদি(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x01;
@@ -151,69 +151,69 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 5;
     }
 
-    else {
+    অন্যথা {
       cp[(*cpi)++] = UNICODE_INVALID;
     }
   }
 }
 
-static VTermEncoding encoding_utf8 = {
+স্থির VTermEncoding encoding_utf8 = {
   &init_utf8,  // init
   &decode_utf8 // decode
 };
 
-static void decode_usascii(VTermEncoding *enc UNUSED, void *data UNUSED,
-                           uint32_t cp[], int *cpi, int cplen,
-                           const char bytes[], size_t *pos, size_t bytelen)
+স্থির শূন্য decode_usascii(VTermEncoding *enc UNUSED, শূন্য *data UNUSED,
+                           uint32_t cp[], পূর্ণাঙ্ক *cpi, পূর্ণাঙ্ক cplen,
+                           ধ্রুব বর্ণ bytes[], size_t *pos, size_t bytelen)
 {
-  int is_gr = bytes[*pos] & 0x80;
+  পূর্ণাঙ্ক is_gr = bytes[*pos] & 0x80;
 
-  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos] ^ is_gr;
+  প্রতি(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    unsigned বর্ণ c = bytes[*pos] ^ is_gr;
 
-    if(c < 0x20 || c == 0x7f || c >= 0x80)
-      return;
+    যদি(c < 0x20 || c == 0x7f || c >= 0x80)
+      প্রত্যাগম;
 
     cp[(*cpi)++] = c;
   }
 }
 
-static VTermEncoding encoding_usascii = {
-  NULL,           // init
+স্থির VTermEncoding encoding_usascii = {
+  রিক্ত,           // init
   &decode_usascii // decode
 };
 
-struct StaticTableEncoding {
-  const VTermEncoding enc;
-  const uint32_t chars[128];
+সংরচনা StaticTableEncoding {
+  ধ্রুব VTermEncoding enc;
+  ধ্রুব uint32_t chars[128];
 };
 
-static void decode_table(VTermEncoding *enc, void *data UNUSED,
-                         uint32_t cp[], int *cpi, int cplen,
-                         const char bytes[], size_t *pos, size_t bytelen)
+স্থির শূন্য decode_table(VTermEncoding *enc, শূন্য *data UNUSED,
+                         uint32_t cp[], পূর্ণাঙ্ক *cpi, পূর্ণাঙ্ক cplen,
+                         ধ্রুব বর্ণ bytes[], size_t *pos, size_t bytelen)
 {
-  struct StaticTableEncoding *table = (struct StaticTableEncoding *)enc;
-  int is_gr = bytes[*pos] & 0x80;
+  সংরচনা StaticTableEncoding *table = (সংরচনা StaticTableEncoding *)enc;
+  পূর্ণাঙ্ক is_gr = bytes[*pos] & 0x80;
 
-  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos] ^ is_gr;
+  প্রতি(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    unsigned বর্ণ c = bytes[*pos] ^ is_gr;
 
-    if(c < 0x20 || c == 0x7f || c >= 0x80)
-      return;
+    যদি(c < 0x20 || c == 0x7f || c >= 0x80)
+      প্রত্যাগম;
 
-    if(table->chars[c])
+    যদি(table->chars[c])
       cp[(*cpi)++] = table->chars[c];
-    else
+    অন্যথা
       cp[(*cpi)++] = c;
   }
 }
 
-#include "encoding/DECdrawing.inc"
-#include "encoding/uk.inc"
+#অন্তর্ভাব "encoding/DECdrawing.inc"
+#অন্তর্ভাব "encoding/uk.inc"
 
-static struct {
+স্থির সংরচনা {
   VTermEncodingType type;
-  char designation;
+  বর্ণ designation;
   VTermEncoding *enc;
 }
 encodings[] = {
@@ -221,14 +221,14 @@ encodings[] = {
   { ENC_SINGLE_94, '0', (VTermEncoding*)&encoding_DECdrawing },
   { ENC_SINGLE_94, 'A', (VTermEncoding*)&encoding_uk },
   { ENC_SINGLE_94, 'B', &encoding_usascii },
-  { 0, 0, NULL },
+  { 0, 0, রিক্ত },
 };
 
 /* This ought to be INTERNAL but isn't because it's used by unit testing */
-VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, char designation)
+VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, বর্ণ designation)
 {
-  for(int i = 0; encodings[i].designation; i++)
-    if(encodings[i].type == type && encodings[i].designation == designation)
-      return encodings[i].enc;
-  return NULL;
+  প্রতি(পূর্ণাঙ্ক i = 0; encodings[i].designation; i++)
+    যদি(encodings[i].type == type && encodings[i].designation == designation)
+      প্রত্যাগম encodings[i].enc;
+  প্রত্যাগম রিক্ত;
 }
