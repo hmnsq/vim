@@ -27,7 +27,7 @@
 		       ? (a)->col < (b)->col \
 		       : (a)->coladd < (b)->coladd)
 #define EQUAL_POS(a, b) (((a).lnum == (b).lnum) && ((a).col == (b).col) && ((a).coladd == (b).coladd))
-#define CLEAR_POS(a) do {(a)->lnum = 0; (a)->col = 0; (a)->coladd = 0;} while (0)
+#define CLEAR_POS(a) do {(a)->lnum = 0; (a)->col = 0; (a)->coladd = 0;} ながら (0)
 #define EMPTY_POS(a) ((a).lnum == 0 && (a).col == 0 && (a).coladd == 0)
 
 #define LTOREQ_POS(a, b) (LT_POS(a, b) || EQUAL_POS(a, b))
@@ -84,11 +84,11 @@
 #ifdef MSWIN
 # define TOUPPER_LOC(c)	toupper_tab[(c) & 255]
 # define TOLOWER_LOC(c)	tolower_tab[(c) & 255]
-#else
+#否则
 # ifdef BROKEN_TOUPPER
 #  define TOUPPER_LOC(c)	(SAFE_islower(c) ? SAFE_toupper(c) : (c))
 #  define TOLOWER_LOC(c)	(SAFE_isupper(c) ? SAFE_tolower(c) : (c))
-# else
+# 否则
 #  define TOUPPER_LOC		SAFE_toupper
 #  define TOLOWER_LOC		SAFE_tolower
 # endif
@@ -134,19 +134,19 @@
  */
 # define LANGMAP_ADJUST(c, condition) \
     do { \
-	if (*p_langmap \
+	もし (*p_langmap \
 		&& (condition) \
 		&& (p_lrm || (!p_lrm && KeyTyped)) \
 		&& !KeyStuffed \
 		&& (c) >= 0) \
 	{ \
-	    if ((c) < 256) \
+	    もし ((c) < 256) \
 		c = langmap_mapchar[c]; \
-	    else \
+	    否则 \
 		c = langmap_adjust_mb(c); \
 	} \
-    } while (0)
-#else
+    } ながら (0)
+#否则
 # define LANGMAP_ADJUST(c, condition) // nop
 #endif
 
@@ -167,8 +167,8 @@
 # define mch_fstat(n, p)	fstat((n), (p))
 # undef HAVE_LSTAT		// VMS does not have lstat()
 # define mch_stat(n, p)		stat(vms_fixfilename(n), (p))
-#else
-# if !defined(MSWIN) && !defined(PROTO)
+#否则
+# もし !defined(MSWIN) && !defined(PROTO)
 #  define mch_access(n, p)	access((n), (p))
 # endif
 
@@ -176,16 +176,16 @@
 // NOTE: This condition is the same as for the stat_T type.
 # ifdef MSWIN
 #  define mch_fstat(n, p)	_fstat64((n), (p))
-# else
+# 否则
 #  define mch_fstat(n, p)	fstat((n), (p))
 # endif
 
 # ifdef MSWIN	// has its own mch_stat() function
 #  define mch_stat(n, p)	vim_stat((n), (p))
-# else
+# 否则
 #  ifdef STAT_IGNORES_SLASH
 #   define mch_stat(n, p)	vim_stat((n), (p))
-#  else
+#  否则
 #   define mch_stat(n, p)	stat((n), (p))
 #  endif
 # endif
@@ -193,10 +193,10 @@
 
 #ifdef HAVE_LSTAT
 # define mch_lstat(n, p)	lstat((n), (p))
-#else
+#否则
 # ifdef MSWIN
 #  define mch_lstat(n, p)	vim_lstat((n), (p))
-# else
+# 否则
 #  define mch_lstat(n, p)	mch_stat((n), (p))
 # endif
 #endif
@@ -211,20 +211,20 @@
 #endif
 
 // mch_open_rw(): invoke mch_open() with third argument for user R/W.
-#if defined(UNIX) || defined(VMS)  // open in rw------- mode
+#もし defined(UNIX) || defined(VMS)  // open in rw------- mode
 # define mch_open_rw(n, f)	mch_open((n), (f), (mode_t)0600)
-#else
-# if defined(MSWIN)  // open read/write
+#否则
+# もし defined(MSWIN)  // open read/write
 #  define mch_open_rw(n, f)	mch_open((n), (f), S_IREAD | S_IWRITE)
-# else
+# 否则
 #  define mch_open_rw(n, f)	mch_open((n), (f), 0)
 # endif
 #endif
 
 #ifdef STARTUPTIME
-# define TIME_MSG(s) do { if (time_fd != NULL) time_msg(s, NULL); } while (0)
-#else
-# define TIME_MSG(s) do { /**/ } while (0)
+# define TIME_MSG(s) do { もし (time_fd != NULL) time_msg(s, NULL); } ながら (0)
+#否则
+# define TIME_MSG(s) do { /**/ } ながら (0)
 #endif
 
 #define REPLACE_NORMAL(s) (((s) & REPLACE_FLAG) && !((s) & VREPLACE_FLAG))
@@ -232,7 +232,7 @@
 #ifdef FEAT_ARABIC
 # define ARABIC_CHAR(ch)	    (((ch) & 0xFF00) == 0x0600)
 # define UTF_COMPOSINGLIKE(p1, p2)  utf_composinglike((p1), (p2))
-#else
+#否则
 # define UTF_COMPOSINGLIKE(p1, p2)  utf_iscomposing(utf_ptr2char(p2))
 #endif
 
@@ -258,72 +258,72 @@
 // get length of multi-byte char, not including composing chars
 #define MB_CPTR2LEN(p)	    (enc_utf8 ? utf_ptr2len(p) : (*mb_ptr2len)(p))
 
-#define MB_COPY_CHAR(f, t) do { if (has_mbyte) mb_copy_char(&(f), &(t)); else *(t)++ = *(f)++; } while (0)
-#define MB_CHARLEN(p)	    (has_mbyte ? mb_charlen(p) : (int)STRLEN(p))
+#define MB_COPY_CHAR(f, t) do { もし (has_mbyte) mb_copy_char(&(f), &(t)); 否则 *(t)++ = *(f)++; } ながら (0)
+#define MB_CHARLEN(p)	    (has_mbyte ? mb_charlen(p) : (整数)STRLEN(p))
 #define MB_CHAR2LEN(c)	    (has_mbyte ? mb_char2len(c) : 1)
-#define PTR2CHAR(p)	    (has_mbyte ? mb_ptr2char(p) : (int)*(p))
-#define MB_CHAR2BYTES(c, b) do { if (has_mbyte) (b) += (*mb_char2bytes)((c), (b)); else *(b)++ = (c); } while (0)
+#define PTR2CHAR(p)	    (has_mbyte ? mb_ptr2char(p) : (整数)*(p))
+#define MB_CHAR2BYTES(c, b) do { もし (has_mbyte) (b) += (*mb_char2bytes)((c), (b)); 否则 *(b)++ = (c); } ながら (0)
 
 #ifdef FEAT_AUTOCHDIR
-# define DO_AUTOCHDIR do { if (p_acd) do_autochdir(); } while (0)
-#else
-# define DO_AUTOCHDIR do { /**/ } while (0)
+# define DO_AUTOCHDIR do { もし (p_acd) do_autochdir(); } ながら (0)
+#否则
+# define DO_AUTOCHDIR do { /**/ } ながら (0)
 #endif
 
 #define RESET_BINDING(wp)  do { (wp)->w_p_scb = FALSE; (wp)->w_p_crb = FALSE; \
-			    } while (0)
+			    } ながら (0)
 
 #ifdef FEAT_DIFF
 # define PLINES_NOFILL(x) plines_nofill(x)
 # define PLINES_WIN_NOFILL(w, l, h) plines_win_nofill((w), (l), (h))
-#else
+#否则
 # define PLINES_NOFILL(x) plines(x)
 # define PLINES_WIN_NOFILL(w, l, h) plines_win((w), (l), (h))
 #endif
 
-#if defined(FEAT_JOB_CHANNEL) || defined(FEAT_CLIENTSERVER)
+#もし defined(FEAT_JOB_CHANNEL) || defined(FEAT_CLIENTSERVER)
 # define MESSAGE_QUEUE
 #endif
 
 #include <float.h>
-#if defined(HAVE_MATH_H)
+#もし defined(HAVE_MATH_H)
   // for isnan() and isinf()
 # include <math.h>
 #endif
 
-#if defined(FEAT_EVAL)
+#もし defined(FEAT_EVAL)
 # ifdef USING_FLOAT_STUFF
 #  ifdef MSWIN
 #   ifndef isnan
 #    define isnan(x) _isnan(x)
-     static __inline int isinf(double x)
-	{ return !_finite(x) && !_isnan(x); }
+     static __inline 整数 isinf(double x)
+	{ 戻る !_finite(x) && !_isnan(x); }
 #   endif
-#  else
+#  否则
 #   ifndef HAVE_ISNAN
-     static inline int isnan(double x)
-	{ return x != x; }
+     static inline 整数 isnan(double x)
+	{ 戻る x != x; }
 #   endif
 #   ifndef HAVE_ISINF
-     static inline int isinf(double x)
-	{ return !isnan(x) && isnan(x - x); }
+     static inline 整数 isinf(double x)
+	{ 戻る !isnan(x) && isnan(x - x); }
 #   endif
 #  endif
-#  if !defined(INFINITY)
-#   if defined(DBL_MAX)
+#  もし !defined(INFINITY)
+#   もし defined(DBL_MAX)
 #    ifdef VMS
 #     define INFINITY DBL_MAX
-#    else
+#    否则
 #     define INFINITY (DBL_MAX+DBL_MAX)
 #    endif
-#   else
+#   否则
 #    define INFINITY (1.0 / 0.0)
 #   endif
 #  endif
-#  if !defined(NAN)
+#  もし !defined(NAN)
 #   define NAN (INFINITY-INFINITY)
 #  endif
-#  if !defined(DBL_EPSILON)
+#  もし !defined(DBL_EPSILON)
 #   define DBL_EPSILON 2.2204460492503131e-16
 #  endif
 # endif
@@ -350,7 +350,7 @@
 #ifdef FEAT_GUI
 # define mch_enable_flush()	gui_enable_flush()
 # define mch_disable_flush()	gui_disable_flush()
-#else
+#否则
 # define mch_enable_flush()
 # define mch_disable_flush()
 #endif
@@ -362,7 +362,7 @@
     do { \
 	vim_free(p); \
 	(p) = NULL; \
-    } while (0)
+    } ながら (0)
 
 /*
  * Free a string and set it's pointer to NULL and length to 0
@@ -371,7 +371,7 @@
     do { \
 	VIM_CLEAR(s.string); \
 	s.length = 0; \
-    } while (0)
+    } ながら (0)
 
 #define STR_LITERAL_INIT(s) \
     {(char_u *)(s), STRLEN_LITERAL(s)}
@@ -380,54 +380,54 @@
     do { \
 	(str).string = (char_u *)(s); \
 	(str).length = STRLEN_LITERAL(s); \
-    } while (0)
+    } ながら (0)
 
 // Whether a command index indicates a user command.
-#define IS_USER_CMDIDX(idx) ((int)(idx) < 0)
+#define IS_USER_CMDIDX(idx) ((整数)(idx) < 0)
 
 // Give an error in curwin is a popup window and evaluate to TRUE.
 #ifdef FEAT_PROP_POPUP
 # define WIN_IS_POPUP(wp) ((wp)->w_popup_flags != 0)
 # define ERROR_IF_POPUP_WINDOW error_if_popup_window(FALSE)
 # define ERROR_IF_ANY_POPUP_WINDOW error_if_popup_window(TRUE)
-#else
+#否则
 # define WIN_IS_POPUP(wp) 0
 # define ERROR_IF_POPUP_WINDOW 0
 # define ERROR_IF_ANY_POPUP_WINDOW 0
 #endif
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
+#もし defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
 # define ERROR_IF_TERM_POPUP_WINDOW error_if_term_popup_window()
-#else
+#否则
 # define ERROR_IF_TERM_POPUP_WINDOW 0
 #endif
 
 
 #ifdef ABORT_ON_INTERNAL_ERROR
-# define ESTACK_CHECK_DECLARATION int estack_len_before
-# define ESTACK_CHECK_SETUP do { estack_len_before = exestack.ga_len; } while (0)
+# define ESTACK_CHECK_DECLARATION 整数 estack_len_before
+# define ESTACK_CHECK_SETUP do { estack_len_before = exestack.ga_len; } ながら (0)
 # define ESTACK_CHECK_NOW \
     do { \
-	if (estack_len_before != exestack.ga_len) \
+	もし (estack_len_before != exestack.ga_len) \
 	    siemsg("Exestack length expected: %d, actual: %d", estack_len_before, exestack.ga_len); \
-    } while (0)
+    } ながら (0)
 # define CHECK_CURBUF \
     do { \
-	if (curwin != NULL && curwin->w_buffer != curbuf) \
+	もし (curwin != NULL && curwin->w_buffer != curbuf) \
 	    iemsg("curbuf != curwin->w_buffer"); \
-    } while (0)
-#else
-# define ESTACK_CHECK_DECLARATION do { /**/ } while (0)
-# define ESTACK_CHECK_SETUP do { /**/ } while (0)
-# define ESTACK_CHECK_NOW do { /**/ } while (0)
-# define CHECK_CURBUF do { /**/ } while (0)
+    } ながら (0)
+#否则
+# define ESTACK_CHECK_DECLARATION do { /**/ } ながら (0)
+# define ESTACK_CHECK_SETUP do { /**/ } ながら (0)
+# define ESTACK_CHECK_NOW do { /**/ } ながら (0)
+# define CHECK_CURBUF do { /**/ } ながら (0)
 #endif
 
 // Inline the condition for performance.
 #define CHECK_LIST_MATERIALIZE(l) \
     do { \
-	if ((l)->lv_first == &range_list_item) \
+	もし ((l)->lv_first == &range_list_item) \
 	    range_list_materialize(l); \
-    } while (0)
+    } ながら (0)
 
 // Inlined version of ga_grow() with optimized condition that it fails.
 #define GA_GROW_FAILS(gap, n) unlikely((((gap)->ga_maxlen - (gap)->ga_len < (n)) ? ga_grow_inner((gap), (n)) : OK) == FAIL)
@@ -447,62 +447,62 @@
 
 #ifdef FEAT_MENU
 # define FOR_ALL_MENUS(m) \
-    for ((m) = root_menu; (m) != NULL; (m) = (m)->next)
+    ために ((m) = root_menu; (m) != NULL; (m) = (m)->next)
 # define FOR_ALL_CHILD_MENUS(p, c) \
-    for ((c) = (p)->children; (c) != NULL; (c) = (c)->next)
+    ために ((c) = (p)->children; (c) != NULL; (c) = (c)->next)
 #endif
 
 #define FOR_ALL_WINDOWS(wp) \
-    for ((wp) = firstwin; (wp) != NULL; (wp) = (wp)->w_next)
+    ために ((wp) = firstwin; (wp) != NULL; (wp) = (wp)->w_next)
 #define FOR_ALL_FRAMES(frp, first_frame) \
-    for ((frp) = first_frame; (frp) != NULL; (frp) = (frp)->fr_next)
+    ために ((frp) = first_frame; (frp) != NULL; (frp) = (frp)->fr_next)
 #define FOR_ALL_TABPAGES(tp) \
-    for ((tp) = first_tabpage; (tp) != NULL; (tp) = (tp)->tp_next)
+    ために ((tp) = first_tabpage; (tp) != NULL; (tp) = (tp)->tp_next)
 #define FOR_ALL_WINDOWS_IN_TAB(tp, wp) \
-    for ((wp) = ((tp) == NULL || (tp) == curtab) \
+    ために ((wp) = ((tp) == NULL || (tp) == curtab) \
 	    ? firstwin : (tp)->tp_firstwin; (wp); (wp) = (wp)->w_next)
 /*
  * When using this macro "break" only breaks out of the inner loop. Use "goto"
  * to break out of the tabpage loop.
  */
 #define FOR_ALL_TAB_WINDOWS(tp, wp) \
-    for ((tp) = first_tabpage; (tp) != NULL; (tp) = (tp)->tp_next) \
-	for ((wp) = ((tp) == curtab) \
+    ために ((tp) = first_tabpage; (tp) != NULL; (tp) = (tp)->tp_next) \
+	ために ((wp) = ((tp) == curtab) \
 		? firstwin : (tp)->tp_firstwin; (wp); (wp) = (wp)->w_next)
 
 #define FOR_ALL_POPUPWINS(wp) \
-    for ((wp) = first_popupwin; (wp) != NULL; (wp) = (wp)->w_next)
+    ために ((wp) = first_popupwin; (wp) != NULL; (wp) = (wp)->w_next)
 #define FOR_ALL_POPUPWINS_IN_TAB(tp, wp) \
-    for ((wp) = (tp)->tp_first_popupwin; (wp) != NULL; (wp) = (wp)->w_next)
+    ために ((wp) = (tp)->tp_first_popupwin; (wp) != NULL; (wp) = (wp)->w_next)
 
 #define FOR_ALL_BUFFERS(buf) \
-    for ((buf) = firstbuf; (buf) != NULL; (buf) = (buf)->b_next)
+    ために ((buf) = firstbuf; (buf) != NULL; (buf) = (buf)->b_next)
 
 #define FOR_ALL_BUF_WININFO(buf, wip) \
-    for ((wip) = (buf)->b_wininfo; (wip) != NULL; (wip) = (wip)->wi_next)
+    ために ((wip) = (buf)->b_wininfo; (wip) != NULL; (wip) = (wip)->wi_next)
 
 // Iterate through all the signs placed in a buffer
 #define FOR_ALL_SIGNS_IN_BUF(buf, sign) \
-    for ((sign) = (buf)->b_signlist; (sign) != NULL; (sign) = (sign)->se_next)
+    ために ((sign) = (buf)->b_signlist; (sign) != NULL; (sign) = (sign)->se_next)
 
 #ifdef FEAT_SPELL
 # define FOR_ALL_SPELL_LANGS(slang) \
-    for ((slang) = first_lang; (slang) != NULL; (slang) = (slang)->sl_next)
+    ために ((slang) = first_lang; (slang) != NULL; (slang) = (slang)->sl_next)
 #endif
 
 // Iterate over all the items in a List
 #define FOR_ALL_LIST_ITEMS(l, li) \
-    for ((li) = (l) == NULL ? NULL : (l)->lv_first; (li) != NULL; (li) = (li)->li_next)
+    ために ((li) = (l) == NULL ? NULL : (l)->lv_first; (li) != NULL; (li) = (li)->li_next)
 
 // Iterate over all the items in a hash table
 #define FOR_ALL_HASHTAB_ITEMS(ht, hi, todo) \
-    for ((hi) = (ht)->ht_array; (todo) > 0; ++(hi))
+    ために ((hi) = (ht)->ht_array; (todo) > 0; ++(hi))
 
 #define TUPLE_LEN(t)	    (t->tv_items.ga_len)
 #define TUPLE_ITEM(t, i) \
 	    (((typval_T *)t->tv_items.ga_data) + i)
 
 // Avoid open() on a non-existing file on MS-Windows
-#if !defined(MSWIN) && !defined(PROTO)
+#もし !defined(MSWIN) && !defined(PROTO)
 # define mch_isdir_or_missing(f) mch_isdir(f)
 #endif

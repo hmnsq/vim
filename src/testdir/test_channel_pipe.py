@@ -9,10 +9,10 @@ import os
 import sys
 import time
 
-if __name__ == "__main__":
+もし __name__ == "__main__":
 
-    if len(sys.argv) > 1:
-        if sys.argv[1].startswith("err"):
+    もし len(sys.argv) > 1:
+        もし sys.argv[1].startswith("err"):
             print(sys.argv[1], file=sys.stderr)
             sys.stderr.flush()
         elif sys.argv[1].startswith("incomplete"):
@@ -22,39 +22,39 @@ if __name__ == "__main__":
         elif sys.argv[1].startswith("busy"):
             time.sleep(100)
             sys.exit(0)
-        else:
+        否则:
             print(sys.argv[1])
             sys.stdout.flush()
-            if sys.argv[1].startswith("quit"):
+            もし sys.argv[1].startswith("quit"):
                 sys.exit(0)
 
-    if os.getenv('CI'):
+    もし os.getenv('CI'):
         try:
             import thread_util
             thread_util.set_high_priority()
         except Exception:
             pass
 
-    while True:
+    ながら True:
         typed = sys.stdin.readline()
-        if typed == "":  # EOF -- stop
+        もし typed == "":  # EOF -- stop
             break
-        if typed.startswith("quit"):
+        もし typed.startswith("quit"):
             print("Goodbye!")
             sys.stdout.flush()
             break
-        if typed.startswith("echo "):
+        もし typed.startswith("echo "):
             print(typed[5:-1])
             sys.stdout.flush()
-        if typed.startswith("echosplit "):
-            for part in typed[10:-1].split('|'):
+        もし typed.startswith("echosplit "):
+            ために part in typed[10:-1].split('|'):
                 sys.stdout.write(part)
                 sys.stdout.flush()
                 time.sleep(0.05)
-        if typed.startswith("double "):
+        もし typed.startswith("double "):
             print(typed[7:-1] + "\nAND " + typed[7:-1])
             sys.stdout.flush()
-        if typed.startswith("split "):
+        もし typed.startswith("split "):
             print(typed[6:-1], end='')
             sys.stdout.flush()
             time.sleep(0.05)
@@ -63,13 +63,13 @@ if __name__ == "__main__":
             time.sleep(0.05)
             print(typed[6:-1])
             sys.stdout.flush()
-        if typed.startswith("echoerr "):
+        もし typed.startswith("echoerr "):
             print(typed[8:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("doubleerr "):
+        もし typed.startswith("doubleerr "):
             print(typed[10:-1] + "\nAND " + typed[10:-1], file=sys.stderr)
             sys.stderr.flush()
-        if typed.startswith("XXX"):
+        もし typed.startswith("XXX"):
             print(typed, end='')
             sys.stderr.flush()
             break

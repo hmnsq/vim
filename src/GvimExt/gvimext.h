@@ -11,10 +11,10 @@
  * contact Tianmiao Hu: tianmiao@acm.org.
  */
 
-#if !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
+#もし !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
 #define AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_
 
-#if defined(_MSC_VER) && _MSC_VER > 1000
+#もし defined(_MSC_VER) && _MSC_VER > 1000
 #pragma once
 #endif
 
@@ -34,7 +34,7 @@
 #define INC_OLE2	// MS-Windows, get ole2 from windows.h
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#もし defined(_MSC_VER) && _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
 #endif
@@ -119,18 +119,18 @@ protected:
 	    LPCSTR pszWorkingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int idHWnd);
+	    整数 iShowCmd,
+	    整数 idHWnd);
 
     STDMETHODIMP InvokeSingleGvim(HWND hParent,
 	    LPCWSTR workingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int gvimExtraOptions);
+	    整数 iShowCmd,
+	    整数 gvimExtraOptions);
 
 public:
-    int		 m_cntOfHWnd;
+    整数		 m_cntOfHWnd;
     HWND	 m_hWnd[MAX_HWND];
     CShellExt();
     virtual ~CShellExt();

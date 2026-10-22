@@ -5,47 +5,47 @@
 #include "utf8.h"
 
 // VIM: added
-int vterm_is_modify_other_keys(VTerm *vt)
+整数 vterm_is_modify_other_keys(VTerm *vt)
 {
-  return vt->state->mode.modify_other_keys;
+  戻る vt->state->mode.modify_other_keys;
 }
 
 // VIM: added
-int vterm_is_kitty_keyboard(VTerm *vt)
+整数 vterm_is_kitty_keyboard(VTerm *vt)
 {
-  return vt->state->mode.kitty_keyboard;
+  戻る vt->state->mode.kitty_keyboard;
 }
 
 
 void vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod)
 {
   // VIM: added modifyOtherKeys support
-  if (vterm_is_modify_other_keys(vt) && mod != 0) {
+  もし (vterm_is_modify_other_keys(vt) && mod != 0) {
     vterm_push_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, c);
-    return;
+    戻る;
   }
 
   // VIM: added kitty keyboard protocol support
-  if (vterm_is_kitty_keyboard(vt) && mod != 0) {
+  もし (vterm_is_kitty_keyboard(vt) && mod != 0) {
     vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
-    return;
+    戻る;
   }
 
   /* The shift modifier is never important for Unicode characters
    * apart from Space
    */
-  if(c != ' ')
+  もし(c != ' ')
     mod &= ~VTERM_MOD_SHIFT;
 
-  if(mod == 0) {
+  もし(mod == 0) {
     // Normal text - ignore just shift
     char str[6];
-    int seqlen = fill_utf8(c, str);
+    整数 seqlen = fill_utf8(c, str);
     vterm_push_output_bytes(vt, str, seqlen);
-    return;
+    戻る;
   }
 
-  int needs_CSIu;
+  整数 needs_CSIu;
   switch(c) {
     /* Special Ctrl- letters that can't be represented elsewise */
     case 'i': case 'j': case 'm': case '[':
@@ -65,12 +65,12 @@ void vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod)
   }
 
   /* ALT we can just prefix with ESC; anything else requires CSI u */
-  if(needs_CSIu && (mod & ~VTERM_MOD_ALT)) {
+  もし(needs_CSIu && (mod & ~VTERM_MOD_ALT)) {
     vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
-    return;
+    戻る;
   }
 
-  if(mod & VTERM_MOD_CTRL)
+  もし(mod & VTERM_MOD_CTRL)
     c &= 0x1f;
 
   vterm_push_output_sprintf(vt, "%s%c", mod & VTERM_MOD_ALT ? ESC_S : "", c);
@@ -89,7 +89,7 @@ typedef struct {
     KEYCODE_KEYPAD,
   } type;
   char literal;
-  int csinum;
+  整数 csinum;
 } keycodes_s;
 
 // Order here must be exactly the same as VTermKey enum!
@@ -153,23 +153,23 @@ static keycodes_s keycodes_kp[] = {
 
 void vterm_keyboard_key(VTerm *vt, VTermKey key, VTermModifier mod)
 {
-  if(key == VTERM_KEY_NONE)
-    return;
+  もし(key == VTERM_KEY_NONE)
+    戻る;
 
   keycodes_s k;
-  if(key < VTERM_KEY_FUNCTION_0) {
-    if(key >= sizeof(keycodes)/sizeof(keycodes[0]))
-      return;
+  もし(key < VTERM_KEY_FUNCTION_0) {
+    もし(key >= sizeof(keycodes)/sizeof(keycodes[0]))
+      戻る;
     k = keycodes[key];
   }
-  else if(key >= VTERM_KEY_FUNCTION_0 && key <= VTERM_KEY_FUNCTION_MAX) {
-    if((key - VTERM_KEY_FUNCTION_0) >= sizeof(keycodes_fn)/sizeof(keycodes_fn[0]))
-      return;
+  否则 もし(key >= VTERM_KEY_FUNCTION_0 && key <= VTERM_KEY_FUNCTION_MAX) {
+    もし((key - VTERM_KEY_FUNCTION_0) >= sizeof(keycodes_fn)/sizeof(keycodes_fn[0]))
+      戻る;
     k = keycodes_fn[key - VTERM_KEY_FUNCTION_0];
   }
-  else if(key >= VTERM_KEY_KP_0) {
-    if((key - VTERM_KEY_KP_0) >= sizeof(keycodes_kp)/sizeof(keycodes_kp[0]))
-      return;
+  否则 もし(key >= VTERM_KEY_KP_0) {
+    もし((key - VTERM_KEY_KP_0) >= sizeof(keycodes_kp)/sizeof(keycodes_kp[0]))
+      戻る;
     k = keycodes_kp[key - VTERM_KEY_KP_0];
   }
 
@@ -178,82 +178,82 @@ void vterm_keyboard_key(VTerm *vt, VTermKey key, VTermModifier mod)
     break;
 
   case KEYCODE_TAB:
-    if (vterm_is_kitty_keyboard(vt) && mod != 0)
+    もし (vterm_is_kitty_keyboard(vt) && mod != 0)
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "9;%du", mod+1);
     /* Shift-Tab is CSI Z but plain Tab is 0x09 */
-    else if(mod == VTERM_MOD_SHIFT)
+    否则 もし(mod == VTERM_MOD_SHIFT)
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "Z");
-    else if(mod & VTERM_MOD_SHIFT)
+    否则 もし(mod & VTERM_MOD_SHIFT)
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "1;%dZ", mod+1);
-    else
+    否则
       goto case_LITERAL;
     break;
 
   case KEYCODE_ENTER:
     /* Enter is CRLF in newline mode, but just LF in linefeed */
-    if(vt->state->mode.newline)
+    もし(vt->state->mode.newline)
       vterm_push_output_sprintf(vt, "\r\n");
-    else
+    否则
       goto case_LITERAL;
     break;
 
   case KEYCODE_LITERAL: case_LITERAL:
-    if (vterm_is_modify_other_keys(vt) && mod != 0)
+    もし (vterm_is_modify_other_keys(vt) && mod != 0)
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, k.literal);
-    else if (vterm_is_kitty_keyboard(vt) && mod == 0 && k.literal == '\x1b')
+    否则 もし (vterm_is_kitty_keyboard(vt) && mod == 0 && k.literal == '\x1b')
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%du", k.literal);
-    else if ((vterm_is_kitty_keyboard(vt) && mod != 0)
+    否则 もし ((vterm_is_kitty_keyboard(vt) && mod != 0)
 	|| (mod & (VTERM_MOD_SHIFT|VTERM_MOD_CTRL)))
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", k.literal, mod+1);
-    else
+    否则
       vterm_push_output_sprintf(vt, mod & VTERM_MOD_ALT ? ESC_S "%c" : "%c", k.literal);
     break;
 
   case KEYCODE_SS3: case_SS3:
-    if(mod == 0)
+    もし(mod == 0)
       vterm_push_output_sprintf_ctrl(vt, C1_SS3, "%c", k.literal);
-    else
+    否则
       goto case_CSI;
     break;
 
   case KEYCODE_CSI: case_CSI:
-    if(mod == 0)
+    もし(mod == 0)
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%c", k.literal);
-    else
+    否则
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "1;%d%c", mod + 1, k.literal);
     break;
 
   case KEYCODE_CSINUM:
-    if(mod == 0)
+    もし(mod == 0)
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d%c", k.csinum, k.literal);
-    else
+    否则
       vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%d%c", k.csinum, mod + 1, k.literal);
     break;
 
   case KEYCODE_CSI_CURSOR:
-    if(vt->state->mode.cursor)
+    もし(vt->state->mode.cursor)
       goto case_SS3;
-    else
+    否则
       goto case_CSI;
 
   case KEYCODE_KEYPAD:
-    if(vt->state->mode.keypad) {
+    もし(vt->state->mode.keypad) {
       k.literal = k.csinum;
       goto case_SS3;
     }
-    else
+    否则
       goto case_LITERAL;
   }
 }
 
 void vterm_keyboard_start_paste(VTerm *vt)
 {
-  if(vt->state->mode.bracketpaste)
+  もし(vt->state->mode.bracketpaste)
     vterm_push_output_sprintf_ctrl(vt, C1_CSI, "200~");
 }
 
 void vterm_keyboard_end_paste(VTerm *vt)
 {
-  if(vt->state->mode.bracketpaste)
+  もし(vt->state->mode.bracketpaste)
     vterm_push_output_sprintf_ctrl(vt, C1_CSI, "201~");
 }

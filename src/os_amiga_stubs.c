@@ -25,33 +25,33 @@
  * These are referenced unconditionally from optiondefs.h function pointer
  * tables, but AmigaOS has no X11 input method framework.
  */
-    int
+    整数
 im_get_status(void)
 {
-    return FALSE;
+    戻る FALSE;
 }
 
     void
-im_set_active(int active UNUSED)
+im_set_active(整数 active UNUSED)
 {
 }
 
-    int
-set_ref_in_im_funcs(int copyID UNUSED)
+    整数
+set_ref_in_im_funcs(整数 copyID UNUSED)
 {
-    return 0;
+    戻る 0;
 }
 
     char *
 did_set_imactivatefunc(optset_T *args UNUSED)
 {
-    return NULL;
+    戻る NULL;
 }
 
     char *
 did_set_imstatusfunc(optset_T *args UNUSED)
 {
-    return NULL;
+    戻る NULL;
 }
 
 /*
@@ -59,12 +59,12 @@ did_set_imstatusfunc(optset_T *args UNUSED)
  * os_amiga.c provides most mch_* functions but mch_rmdir() was missing.
  * AmigaDOS DeleteFile() works for empty directories.
  */
-    int
+    整数
 mch_rmdir(char_u *name)
 {
-    if (DeleteFile((STRPTR)name))
-	return 0;
-    return -1;
+    もし (DeleteFile((STRPTR)name))
+	戻る 0;
+    戻る -1;
 }
 
 /*
@@ -79,19 +79,19 @@ mch_rmdir(char_u *name)
     struct passwd *
 getpwuid(uid_t uid UNUSED)
 {
-    return NULL;
+    戻る NULL;
 }
 
     struct group *
 getgrgid(gid_t gid UNUSED)
 {
-    return NULL;
+    戻る NULL;
 }
 
     uid_t
 getuid(void)
 {
-    return 0;
+    戻る 0;
 }
 
 #endif // PROTO

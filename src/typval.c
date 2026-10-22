@@ -13,7 +13,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#もし defined(FEAT_EVAL)
 
 /*
  * Allocate memory for a variable type-value, and make it empty (0 or NULL
@@ -22,7 +22,7 @@
     typval_T *
 alloc_tv(void)
 {
-    return ALLOC_CLEAR_ONE(typval_T);
+    戻る ALLOC_CLEAR_ONE(typval_T);
 }
 
 /*
@@ -36,14 +36,14 @@ alloc_string_tv(char_u *s)
     typval_T	*rettv;
 
     rettv = alloc_tv();
-    if (rettv != NULL)
+    もし (rettv != NULL)
     {
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = s;
     }
-    else
+    否则
 	vim_free(s);
-    return rettv;
+    戻る rettv;
 }
 
 /*
@@ -52,8 +52,8 @@ alloc_string_tv(char_u *s)
     void
 free_tv(typval_T *varp)
 {
-    if (varp == NULL)
-	return;
+    もし (varp == NULL)
+	戻る;
 
     switch (varp->v_type)
     {
@@ -118,8 +118,8 @@ free_tv(typval_T *varp)
     void
 clear_tv(typval_T *varp)
 {
-    if (varp == NULL)
-	return;
+    もし (varp == NULL)
+	戻る;
 
     switch (varp->v_type)
     {
@@ -198,29 +198,29 @@ clear_tv(typval_T *varp)
     void
 init_tv(typval_T *varp)
 {
-    if (varp != NULL)
+    もし (varp != NULL)
 	CLEAR_POINTER(varp);
 }
 
     static varnumber_T
 tv_get_bool_or_number_chk(
 	typval_T    *varp,
-	int	    *denote,
-	int	    want_bool,
-	int	    vim9_string_error) // in Vim9 using a string is an error
+	整数	    *denote,
+	整数	    want_bool,
+	整数	    vim9_string_error) // in Vim9 using a string is an error
 {
     varnumber_T	n = 0L;
 
     switch (varp->v_type)
     {
 	case VAR_NUMBER:
-	    if (in_vim9script() && want_bool && varp->vval.v_number != 0
+	    もし (in_vim9script() && want_bool && varp->vval.v_number != 0
 						   && varp->vval.v_number != 1)
 	    {
 		semsg(_(e_using_number_as_bool_nr), varp->vval.v_number);
 		break;
 	    }
-	    return varp->vval.v_number;
+	    戻る varp->vval.v_number;
 	case VAR_FLOAT:
 	    emsg(_(e_using_float_as_number));
 	    break;
@@ -229,15 +229,15 @@ tv_get_bool_or_number_chk(
 	    emsg(_(e_using_funcref_as_number));
 	    break;
 	case VAR_STRING:
-	    if (vim9_string_error && in_vim9script())
+	    もし (vim9_string_error && in_vim9script())
 	    {
 		emsg_using_string_as(varp, !want_bool);
 		break;
 	    }
-	    if (varp->vval.v_string != NULL)
+	    もし (varp->vval.v_string != NULL)
 		vim_str2nr(varp->vval.v_string, NULL, NULL,
 					 STR2NR_ALL, &n, NULL, 0, FALSE, NULL);
-	    return n;
+	    戻る n;
 	case VAR_LIST:
 	    emsg(_(e_using_list_as_number));
 	    break;
@@ -249,15 +249,15 @@ tv_get_bool_or_number_chk(
 	    break;
 	case VAR_BOOL:
 	case VAR_SPECIAL:
-	    if (!want_bool && in_vim9script())
+	    もし (!want_bool && in_vim9script())
 	    {
-		if (varp->v_type == VAR_BOOL)
+		もし (varp->v_type == VAR_BOOL)
 		    emsg(_(e_using_bool_as_number));
-		else
+		否则
 		    emsg(_(e_using_special_as_number));
 		break;
 	    }
-	    return varp->vval.v_number == VVAL_TRUE ? 1 : 0;
+	    戻る varp->vval.v_number == VVAL_TRUE ? 1 : 0;
 	case VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
 	    emsg(_(e_using_job_as_number));
@@ -277,14 +277,14 @@ tv_get_bool_or_number_chk(
 	    break;
 	case VAR_OBJECT:
 	    {
-		if (varp->vval.v_object == NULL)
+		もし (varp->vval.v_object == NULL)
 		    emsg(_(e_using_object_as_string));
-		else
+		否则
 		{
 		    class_T *cl = varp->vval.v_object->obj_class;
-		    if (cl != NULL && IS_ENUM(cl))
+		    もし (cl != NULL && IS_ENUM(cl))
 			semsg(_(e_using_enum_str_as_number), cl->class_name.string);
-		    else
+		    否则
 			emsg(_(e_using_object_as_number));
 		}
 	    }
@@ -298,11 +298,11 @@ tv_get_bool_or_number_chk(
 	    internal_error_no_abort("tv_get_number(UNKNOWN)");
 	    break;
     }
-    if (denote == NULL)		// useful for values that must be unsigned
+    もし (denote == NULL)		// useful for values that must be unsigned
 	n = -1;
-    else
+    否则
 	*denote = TRUE;
-    return n;
+    戻る n;
 }
 
 /*
@@ -316,9 +316,9 @@ tv_get_bool_or_number_chk(
     varnumber_T
 tv_get_number(typval_T *varp)
 {
-    int		error = FALSE;
+    整数		error = FALSE;
 
-    return tv_get_number_chk(varp, &error);	// return 0L on error
+    戻る tv_get_number_chk(varp, &error);	// return 0L on error
 }
 
 /*
@@ -328,15 +328,15 @@ tv_get_number(typval_T *varp)
     varnumber_T
 tv_to_number(typval_T *varp)
 {
-    int		error = FALSE;
+    整数		error = FALSE;
 
-    return tv_get_bool_or_number_chk(varp, &error, FALSE, FALSE);
+    戻る tv_get_bool_or_number_chk(varp, &error, FALSE, FALSE);
 }
 
     varnumber_T
-tv_get_number_chk(typval_T *varp, int *denote)
+tv_get_number_chk(typval_T *varp, 整数 *denote)
 {
-    return tv_get_bool_or_number_chk(varp, denote, FALSE, TRUE);
+    戻る tv_get_bool_or_number_chk(varp, denote, FALSE, TRUE);
 }
 
 /*
@@ -346,7 +346,7 @@ tv_get_number_chk(typval_T *varp, int *denote)
     varnumber_T
 tv_get_bool(typval_T *varp)
 {
-    return tv_get_bool_or_number_chk(varp, NULL, TRUE, TRUE);
+    戻る tv_get_bool_or_number_chk(varp, NULL, TRUE, TRUE);
 }
 
 /*
@@ -354,20 +354,20 @@ tv_get_bool(typval_T *varp)
  * but in Vim9 script accepts Number and Bool.
  */
     varnumber_T
-tv_get_bool_chk(typval_T *varp, int *denote)
+tv_get_bool_chk(typval_T *varp, 整数 *denote)
 {
-    return tv_get_bool_or_number_chk(varp, denote, TRUE, TRUE);
+    戻る tv_get_bool_or_number_chk(varp, denote, TRUE, TRUE);
 }
 
     static float_T
-tv_get_float_chk(typval_T *varp, int *error)
+tv_get_float_chk(typval_T *varp, 整数 *error)
 {
     switch (varp->v_type)
     {
 	case VAR_NUMBER:
-	    return (float_T)(varp->vval.v_number);
+	    戻る (float_T)(varp->vval.v_number);
 	case VAR_FLOAT:
-	    return varp->vval.v_float;
+	    戻る varp->vval.v_float;
 	case VAR_FUNC:
 	case VAR_PARTIAL:
 	    emsg(_(e_using_funcref_as_float));
@@ -419,354 +419,354 @@ tv_get_float_chk(typval_T *varp, int *error)
 	    internal_error_no_abort("tv_get_float(UNKNOWN)");
 	    break;
     }
-    if (error != NULL)
+    もし (error != NULL)
 	*error = TRUE;
-    return 0;
+    戻る 0;
 }
 
     float_T
 tv_get_float(typval_T *varp)
 {
-    return tv_get_float_chk(varp, NULL);
+    戻る tv_get_float_chk(varp, NULL);
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is unknown
  */
-    int
-check_for_unknown_arg(typval_T *args, int idx)
+    整数
+check_for_unknown_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_UNKNOWN)
+    もし (args[idx].v_type != VAR_UNKNOWN)
     {
 	semsg(_(e_too_many_arguments), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string.
  */
-    int
-check_for_string_arg(typval_T *args, int idx)
+    整数
+check_for_string_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_STRING)
+    もし (args[idx].v_type != VAR_STRING)
     {
 	semsg(_(e_string_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a non-empty string.
  */
-    int
-check_for_nonempty_string_arg(typval_T *args, int idx)
+    整数
+check_for_nonempty_string_arg(typval_T *args, 整数 idx)
 {
-    if (check_for_string_arg(args, idx) == FAIL)
-	return FAIL;
-    if (args[idx].vval.v_string == NULL || *args[idx].vval.v_string == NUL)
+    もし (check_for_string_arg(args, idx) == FAIL)
+	戻る FAIL;
+    もし (args[idx].vval.v_string == NULL || *args[idx].vval.v_string == NUL)
     {
 	semsg(_(e_non_empty_string_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Check for an optional string argument at 'idx'
  */
-    int
-check_for_opt_string_arg(typval_T *args, int idx)
+    整数
+check_for_opt_string_arg(typval_T *args, 整数 idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    戻る (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_string_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a number.
  */
-    int
-check_for_number_arg(typval_T *args, int idx)
+    整数
+check_for_number_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_NUMBER)
+    もし (args[idx].v_type != VAR_NUMBER)
     {
 	semsg(_(e_number_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Check for an optional number argument at 'idx'
  */
-    int
-check_for_opt_number_arg(typval_T *args, int idx)
+    整数
+check_for_opt_number_arg(typval_T *args, 整数 idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    戻る (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_number_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a float or a number.
  */
-    int
-check_for_float_or_nr_arg(typval_T *args, int idx)
+    整数
+check_for_float_or_nr_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_FLOAT && args[idx].v_type != VAR_NUMBER)
+    もし (args[idx].v_type != VAR_FLOAT && args[idx].v_type != VAR_NUMBER)
     {
 	semsg(_(e_float_or_number_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a bool.
  */
-    int
-check_for_bool_arg(typval_T *args, int idx)
+    整数
+check_for_bool_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_BOOL
+    もし (args[idx].v_type != VAR_BOOL
 	    && !(args[idx].v_type == VAR_NUMBER
 		&& (args[idx].vval.v_number == 0
 		    || args[idx].vval.v_number == 1)))
     {
 	semsg(_(e_bool_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a bool or a number.
  */
-    static int
-check_for_bool_or_number_arg(typval_T *args, int idx)
+    static 整数
+check_for_bool_or_number_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_BOOL && args[idx].v_type != VAR_NUMBER)
+    もし (args[idx].v_type != VAR_BOOL && args[idx].v_type != VAR_NUMBER)
     {
 	semsg(_(e_bool_or_number_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Check for an optional bool argument at 'idx'.
  * Return FAIL if the type is wrong.
  */
-    int
-check_for_opt_bool_arg(typval_T *args, int idx)
+    整数
+check_for_opt_bool_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type == VAR_UNKNOWN)
-	return OK;
-    return check_for_bool_arg(args, idx);
+    もし (args[idx].v_type == VAR_UNKNOWN)
+	戻る OK;
+    戻る check_for_bool_arg(args, idx);
 }
 
 /*
  * Check for an optional bool or number argument at 'idx'.
  * Return FAIL if the type is wrong.
  */
-    int
-check_for_opt_bool_or_number_arg(typval_T *args, int idx)
+    整数
+check_for_opt_bool_or_number_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type == VAR_UNKNOWN)
-	return OK;
-    return check_for_bool_or_number_arg(args, idx);
+    もし (args[idx].v_type == VAR_UNKNOWN)
+	戻る OK;
+    戻る check_for_bool_or_number_arg(args, idx);
 }
 
 /*
  * Check for an optional bool or dict argument at 'idx'.
  * Return FAIL if the type is wrong.
  */
-    int
-check_for_opt_bool_or_dict_arg(typval_T *args, int idx)
+    整数
+check_for_opt_bool_or_dict_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type == VAR_UNKNOWN || args[idx].v_type == VAR_DICT)
-	return OK;
-    return check_for_bool_arg(args, idx);
+    もし (args[idx].v_type == VAR_UNKNOWN || args[idx].v_type == VAR_DICT)
+	戻る OK;
+    戻る check_for_bool_arg(args, idx);
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a blob.
  */
-    int
-check_for_blob_arg(typval_T *args, int idx)
+    整数
+check_for_blob_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_BLOB)
+    もし (args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_blob_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list.
  */
-    int
-check_for_list_arg(typval_T *args, int idx)
+    整数
+check_for_list_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_LIST)
+    もし (args[idx].v_type != VAR_LIST)
     {
 	semsg(_(e_list_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a non-NULL list.
  */
-    int
-check_for_nonnull_list_arg(typval_T *args, int idx)
+    整数
+check_for_nonnull_list_arg(typval_T *args, 整数 idx)
 {
-    if (check_for_list_arg(args, idx) == FAIL)
-	return FAIL;
+    もし (check_for_list_arg(args, idx) == FAIL)
+	戻る FAIL;
 
-    if (args[idx].vval.v_list == NULL)
+    もし (args[idx].vval.v_list == NULL)
     {
 	semsg(_(e_non_null_list_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Check for an optional list argument at 'idx'
  */
-    int
-check_for_opt_list_arg(typval_T *args, int idx)
+    整数
+check_for_opt_list_arg(typval_T *args, 整数 idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    戻る (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_list_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a tuple.
  */
-    int
-check_for_tuple_arg(typval_T *args, int idx)
+    整数
+check_for_tuple_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_TUPLE)
+    もし (args[idx].v_type != VAR_TUPLE)
     {
 	semsg(_(e_tuple_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a dict.
  */
-    int
-check_for_dict_arg(typval_T *args, int idx)
+    整数
+check_for_dict_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_DICT)
+    もし (args[idx].v_type != VAR_DICT)
     {
 	semsg(_(e_dict_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a non-NULL dict.
  */
-    int
-check_for_nonnull_dict_arg(typval_T *args, int idx)
+    整数
+check_for_nonnull_dict_arg(typval_T *args, 整数 idx)
 {
-    if (check_for_dict_arg(args, idx) == FAIL)
-	return FAIL;
+    もし (check_for_dict_arg(args, idx) == FAIL)
+	戻る FAIL;
 
-    if (args[idx].vval.v_dict == NULL)
+    もし (args[idx].vval.v_dict == NULL)
     {
 	semsg(_(e_non_null_dict_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Check for an optional dict argument at 'idx'
  */
-    int
-check_for_opt_dict_arg(typval_T *args, int idx)
+    整数
+check_for_opt_dict_arg(typval_T *args, 整数 idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    戻る (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_dict_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Check for an optional non-NULL dict argument at 'idx'
  */
-    int
-check_for_opt_nonnull_dict_arg(typval_T *args, int idx)
+    整数
+check_for_opt_nonnull_dict_arg(typval_T *args, 整数 idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    戻る (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_nonnull_dict_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
+#もし defined(FEAT_JOB_CHANNEL)
 /*
  * Give an error and return FAIL unless "args[idx]" is a channel or a job.
  */
-    int
-check_for_chan_or_job_arg(typval_T *args, int idx)
+    整数
+check_for_chan_or_job_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_CHANNEL && args[idx].v_type != VAR_JOB)
+    もし (args[idx].v_type != VAR_CHANNEL && args[idx].v_type != VAR_JOB)
     {
 	semsg(_(e_chan_or_job_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is an optional channel or a
  * job.
  */
-    int
-check_for_opt_chan_or_job_arg(typval_T *args, int idx)
+    整数
+check_for_opt_chan_or_job_arg(typval_T *args, 整数 idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    戻る (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_chan_or_job_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a job.
  */
-    int
-check_for_job_arg(typval_T *args, int idx)
+    整数
+check_for_job_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_JOB)
+    もし (args[idx].v_type != VAR_JOB)
     {
 	semsg(_(e_job_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Check for an optional job argument at 'idx'.
  */
-    int
-check_for_opt_job_arg(typval_T *args, int idx)
+    整数
+check_for_opt_job_arg(typval_T *args, 整数 idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    戻る (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_job_arg(args, idx) != FAIL) ? OK : FAIL;
 }
-#else
+#否则
 /*
  * Give an error and return FAIL unless "args[idx]" is an optional channel or a
  * job.  Used without the +channel feature, thus only VAR_UNKNOWN is accepted.
  */
-    int
-check_for_opt_chan_or_job_arg(typval_T *args, int idx)
+    整数
+check_for_opt_chan_or_job_arg(typval_T *args, 整数 idx)
 {
-    return args[idx].v_type == VAR_UNKNOWN ? OK : FAIL;
+    戻る args[idx].v_type == VAR_UNKNOWN ? OK : FAIL;
 }
 #endif
 
@@ -774,24 +774,24 @@ check_for_opt_chan_or_job_arg(typval_T *args, int idx)
  * Give an error and return FAIL unless "args[idx]" is a string or
  * a number.
  */
-    int
-check_for_string_or_number_arg(typval_T *args, int idx)
+    整数
+check_for_string_or_number_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_NUMBER)
+    もし (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_NUMBER)
     {
 	semsg(_(e_string_or_number_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Check for an optional string or number argument at 'idx'.
  */
-    int
-check_for_opt_string_or_number_arg(typval_T *args, int idx)
+    整数
+check_for_opt_string_or_number_arg(typval_T *args, 整数 idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    戻る (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_string_or_number_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
@@ -799,19 +799,19 @@ check_for_opt_string_or_number_arg(typval_T *args, int idx)
  * Give an error and return FAIL unless "args[idx]" is a buffer number.
  * Buffer number can be a number or a string.
  */
-    int
-check_for_buffer_arg(typval_T *args, int idx)
+    整数
+check_for_buffer_arg(typval_T *args, 整数 idx)
 {
-    return check_for_string_or_number_arg(args, idx);
+    戻る check_for_string_or_number_arg(args, idx);
 }
 
 /*
  * Check for an optional buffer argument at 'idx'
  */
-    int
-check_for_opt_buffer_arg(typval_T *args, int idx)
+    整数
+check_for_opt_buffer_arg(typval_T *args, 整数 idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    戻る (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_buffer_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
@@ -819,117 +819,117 @@ check_for_opt_buffer_arg(typval_T *args, int idx)
  * Give an error and return FAIL unless "args[idx]" is a line number.
  * Line number can be a number or a string.
  */
-    int
-check_for_lnum_arg(typval_T *args, int idx)
+    整数
+check_for_lnum_arg(typval_T *args, 整数 idx)
 {
-    return check_for_string_or_number_arg(args, idx);
+    戻る check_for_string_or_number_arg(args, idx);
 }
 
 /*
  * Check for an optional line number argument at 'idx'
  */
-    int
-check_for_opt_lnum_arg(typval_T *args, int idx)
+    整数
+check_for_opt_lnum_arg(typval_T *args, 整数 idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    戻る (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_lnum_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string or a blob.
  */
-    int
-check_for_string_or_blob_arg(typval_T *args, int idx)
+    整数
+check_for_string_or_blob_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_BLOB)
+    もし (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_string_or_blob_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string or a list.
  */
-    int
-check_for_string_or_list_arg(typval_T *args, int idx)
+    整数
+check_for_string_or_list_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_LIST)
+    もし (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_LIST)
     {
 	semsg(_(e_string_or_list_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string, a list, a
  * tuple or a blob.
  */
-    int
-check_for_string_or_list_or_tuple_or_blob_arg(typval_T *args, int idx)
+    整数
+check_for_string_or_list_or_tuple_or_blob_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_STRING
+    もし (args[idx].v_type != VAR_STRING
 	    && args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_TUPLE
 	    && args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_string_list_tuple_or_blob_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Check for an optional string or list argument at 'idx'
  */
-    int
-check_for_opt_string_or_list_arg(typval_T *args, int idx)
+    整数
+check_for_opt_string_or_list_arg(typval_T *args, 整数 idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    戻る (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_string_or_list_arg(args, idx) != FAIL) ? OK : FAIL;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string or a dict.
  */
-    int
-check_for_string_or_dict_arg(typval_T *args, int idx)
+    整数
+check_for_string_or_dict_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_DICT)
+    もし (args[idx].v_type != VAR_STRING && args[idx].v_type != VAR_DICT)
     {
 	semsg(_(e_string_or_dict_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string or a number
  * or a list.
  */
-    int
-check_for_string_or_number_or_list_arg(typval_T *args, int idx)
+    整数
+check_for_string_or_number_or_list_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_STRING
+    もし (args[idx].v_type != VAR_STRING
 	    && args[idx].v_type != VAR_NUMBER
 	    && args[idx].v_type != VAR_LIST)
     {
 	semsg(_(e_string_number_or_list_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is an optional string
  * or number or a list
  */
-    int
-check_for_opt_string_or_number_or_list_arg(typval_T *args, int idx)
+    整数
+check_for_opt_string_or_number_or_list_arg(typval_T *args, 整数 idx)
 {
-    return (args[idx].v_type == VAR_UNKNOWN
+    戻る (args[idx].v_type == VAR_UNKNOWN
 	    || check_for_string_or_number_or_list_arg(args, idx)
 							!= FAIL) ? OK : FAIL;
 }
@@ -938,193 +938,193 @@ check_for_opt_string_or_number_or_list_arg(typval_T *args, int idx)
  * Give an error and return FAIL unless "args[idx]" is a string, a number, a
  * list, a tuple or a blob.
  */
-    int
-check_for_repeat_func_arg(typval_T *args, int idx)
+    整数
+check_for_repeat_func_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_STRING
+    もし (args[idx].v_type != VAR_STRING
 	    && args[idx].v_type != VAR_NUMBER
 	    && args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_TUPLE
 	    && args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_repeatable_type_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string, a list, a
  * tuple or a dict.
  */
-    int
-check_for_string_list_tuple_or_dict_arg(typval_T *args, int idx)
+    整数
+check_for_string_list_tuple_or_dict_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_STRING
+    もし (args[idx].v_type != VAR_STRING
 	    && args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_TUPLE
 	    && args[idx].v_type != VAR_DICT)
     {
 	semsg(_(e_string_list_tuple_or_dict_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a string
  * or a function reference.
  */
-    int
-check_for_string_or_func_arg(typval_T *args, int idx)
+    整数
+check_for_string_or_func_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_PARTIAL
+    もし (args[idx].v_type != VAR_PARTIAL
 	    && args[idx].v_type != VAR_FUNC
 	    && args[idx].v_type != VAR_STRING)
     {
 	semsg(_(e_string_or_function_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list or a blob.
  */
-    int
-check_for_list_or_blob_arg(typval_T *args, int idx)
+    整数
+check_for_list_or_blob_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_LIST && args[idx].v_type != VAR_BLOB)
+    もし (args[idx].v_type != VAR_LIST && args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_list_or_blob_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list or a tuple.
  */
-    int
-check_for_list_or_tuple_arg(typval_T *args, int idx)
+    整数
+check_for_list_or_tuple_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_LIST && args[idx].v_type != VAR_TUPLE)
+    もし (args[idx].v_type != VAR_LIST && args[idx].v_type != VAR_TUPLE)
     {
 	semsg(_(e_list_or_tuple_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list, a tuple or a
  * blob.
  */
-    int
-check_for_list_or_tuple_or_blob_arg(typval_T *args, int idx)
+    整数
+check_for_list_or_tuple_or_blob_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_LIST
+    もし (args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_TUPLE
 	    && args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_list_or_tuple_or_blob_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list, a tuple or a
  * dict
  */
-    int
-check_for_list_or_tuple_or_dict_arg(typval_T *args, int idx)
+    整数
+check_for_list_or_tuple_or_dict_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_LIST
+    もし (args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_TUPLE
 	    && args[idx].v_type != VAR_DICT)
     {
 	semsg(_(e_list_or_tuple_or_dict_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list or dict or a
  * blob.
  */
-    int
-check_for_list_or_dict_or_blob_arg(typval_T *args, int idx)
+    整数
+check_for_list_or_dict_or_blob_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_LIST
+    もし (args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_DICT
 	    && args[idx].v_type != VAR_BLOB)
     {
 	semsg(_(e_list_dict_or_blob_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is a list, a tuple, a dict,
  * a blob or a string.
  */
-    int
-check_for_list_tuple_dict_blob_or_string_arg(typval_T *args, int idx)
+    整数
+check_for_list_tuple_dict_blob_or_string_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_LIST
+    もし (args[idx].v_type != VAR_LIST
 	    && args[idx].v_type != VAR_TUPLE
 	    && args[idx].v_type != VAR_DICT
 	    && args[idx].v_type != VAR_BLOB
 	    && args[idx].v_type != VAR_STRING)
     {
 	semsg(_(e_list_tuple_dict_blob_or_string_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is an optional buffer
  * number or a dict.
  */
-    int
-check_for_opt_buffer_or_dict_arg(typval_T *args, int idx)
+    整数
+check_for_opt_buffer_or_dict_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_UNKNOWN
+    もし (args[idx].v_type != VAR_UNKNOWN
 	    && args[idx].v_type != VAR_STRING
 	    && args[idx].v_type != VAR_NUMBER
 	    && args[idx].v_type != VAR_DICT)
     {
 	semsg(_(e_string_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Give an error and return FAIL unless "args[idx]" is an object.
  */
-    int
-check_for_object_arg(typval_T *args, int idx)
+    整数
+check_for_object_arg(typval_T *args, 整数 idx)
 {
-    if (args[idx].v_type != VAR_OBJECT)
+    もし (args[idx].v_type != VAR_OBJECT)
     {
 	semsg(_(e_object_required_for_argument_nr), idx + 1);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Returns TRUE if "tv" is a type alias for a class
  */
-    static int
+    static 整数
 tv_class_alias(typval_T *tv)
 {
-    return tv->v_type == VAR_TYPEALIAS &&
+    戻る tv->v_type == VAR_TYPEALIAS &&
 			tv->vval.v_typealias->ta_type->tt_type == VAR_OBJECT;
 }
 
@@ -1132,18 +1132,18 @@ tv_class_alias(typval_T *tv)
  * Give an error and return FAIL unless "args[idx]" is a class
  * or class typealias.
  */
-    int
-check_for_class_or_typealias_args(typval_T *args, int idx)
+    整数
+check_for_class_or_typealias_args(typval_T *args, 整数 idx)
 {
-    for (int i = idx; args[i].v_type != VAR_UNKNOWN; ++i)
+    ために (整数 i = idx; args[i].v_type != VAR_UNKNOWN; ++i)
     {
-	if (args[i].v_type != VAR_CLASS && !tv_class_alias(&args[idx]))
+	もし (args[i].v_type != VAR_CLASS && !tv_class_alias(&args[idx]))
 	{
 	    semsg(_(e_class_or_typealias_required_for_argument_nr), i + 1);
-	    return FAIL;
+	    戻る FAIL;
 	}
     }
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -1161,7 +1161,7 @@ tv_get_string(typval_T *varp)
 {
     static char_u   mybuf[NUMBUFLEN];
 
-    return tv_get_string_buf(varp, mybuf);
+    戻る tv_get_string_buf(varp, mybuf);
 }
 
 /*
@@ -1174,7 +1174,7 @@ tv_get_string_strict(typval_T *varp)
     char_u	    *res =  tv_get_string_buf_chk_strict(
 						 varp, mybuf, in_vim9script());
 
-    return res != NULL ? res : (char_u *)"";
+    戻る res != NULL ? res : (char_u *)"";
 }
 
     char_u *
@@ -1182,7 +1182,7 @@ tv_get_string_buf(typval_T *varp, char_u *buf)
 {
     char_u	*res = tv_get_string_buf_chk(varp, buf);
 
-    return res != NULL ? res : (char_u *)"";
+    戻る res != NULL ? res : (char_u *)"";
 }
 
 /*
@@ -1193,29 +1193,29 @@ tv_get_string_chk(typval_T *varp)
 {
     static char_u   mybuf[NUMBUFLEN];
 
-    return tv_get_string_buf_chk(varp, mybuf);
+    戻る tv_get_string_buf_chk(varp, mybuf);
 }
 
     char_u *
 tv_get_string_buf_chk(typval_T *varp, char_u *buf)
 {
-    return tv_get_string_buf_chk_strict(varp, buf, FALSE);
+    戻る tv_get_string_buf_chk_strict(varp, buf, FALSE);
 }
 
     char_u *
-tv_get_string_buf_chk_strict(typval_T *varp, char_u *buf, int strict)
+tv_get_string_buf_chk_strict(typval_T *varp, char_u *buf, 整数 strict)
 {
     switch (varp->v_type)
     {
 	case VAR_NUMBER:
-	    if (strict)
+	    もし (strict)
 	    {
 		emsg(_(e_using_number_as_string));
 		break;
 	    }
 	    vim_snprintf((char *)buf, NUMBUFLEN, "%lld",
 					    (varnumber_T)varp->vval.v_number);
-	    return buf;
+	    戻る buf;
 	case VAR_FUNC:
 	case VAR_PARTIAL:
 	    emsg(_(e_using_funcref_as_string));
@@ -1230,21 +1230,21 @@ tv_get_string_buf_chk_strict(typval_T *varp, char_u *buf, int strict)
 	    emsg(_(e_using_dictionary_as_string));
 	    break;
 	case VAR_FLOAT:
-	    if (strict)
+	    もし (strict)
 	    {
 		emsg(_(e_using_float_as_string));
 		break;
 	    }
 	    vim_snprintf((char *)buf, NUMBUFLEN, "%g", varp->vval.v_float);
-	    return buf;
+	    戻る buf;
 	case VAR_STRING:
-	    if (varp->vval.v_string != NULL)
-		return varp->vval.v_string;
-	    return (char_u *)"";
+	    もし (varp->vval.v_string != NULL)
+		戻る varp->vval.v_string;
+	    戻る (char_u *)"";
 	case VAR_BOOL:
 	case VAR_SPECIAL:
 	    STRCPY(buf, get_var_special_name(varp->vval.v_number));
-	    return buf;
+	    戻る buf;
 	case VAR_BLOB:
 	    emsg(_(e_using_blob_as_string));
 	    break;
@@ -1254,36 +1254,36 @@ tv_get_string_buf_chk_strict(typval_T *varp, char_u *buf, int strict)
 	    break;
 	case VAR_OBJECT:
 	    {
-		if (varp->vval.v_object == NULL)
+		もし (varp->vval.v_object == NULL)
 		    emsg(_(e_using_object_as_string));
-		else
+		否则
 		{
 		    class_T *cl = varp->vval.v_object->obj_class;
-		    if (cl != NULL && IS_ENUM(cl))
+		    もし (cl != NULL && IS_ENUM(cl))
 			semsg(_(e_using_enum_str_as_string), cl->class_name.string);
-		    else
+		    否则
 			emsg(_(e_using_object_as_string));
 		}
 	    }
 	    break;
 	case VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    if (in_vim9script())
+	    もし (in_vim9script())
 	    {
 		semsg(_(e_using_invalid_value_as_string_str), "job");
 		break;
 	    }
-	    return job_to_string_buf(varp, buf);
+	    戻る job_to_string_buf(varp, buf);
 #endif
 	    break;
 	case VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    if (in_vim9script())
+	    もし (in_vim9script())
 	    {
 		semsg(_(e_using_invalid_value_as_string_str), "channel");
 		break;
 	    }
-	    return channel_to_string_buf(varp, buf);
+	    戻る channel_to_string_buf(varp, buf);
 #endif
 	    break;
 	case VAR_VOID:
@@ -1296,7 +1296,7 @@ tv_get_string_buf_chk_strict(typval_T *varp, char_u *buf, int strict)
 						  vartype_name(varp->v_type));
 	    break;
     }
-    return NULL;
+    戻る NULL;
 }
 
 /*
@@ -1306,7 +1306,7 @@ tv_get_string_buf_chk_strict(typval_T *varp, char_u *buf, int strict)
     char_u *
 tv_stringify(typval_T *varp, char_u *buf)
 {
-    if (varp->v_type == VAR_LIST
+    もし (varp->v_type == VAR_LIST
 	    || varp->v_type == VAR_DICT
 	    || varp->v_type == VAR_BLOB
 	    || varp->v_type == VAR_FUNC
@@ -1320,9 +1320,9 @@ tv_stringify(typval_T *varp, char_u *buf)
 	tv_get_string_buf(&tmp, buf);
 	clear_tv(varp);
 	*varp = tmp;
-	return tmp.vval.v_string;
+	戻る tmp.vval.v_string;
     }
-    return tv_get_string_buf(varp, buf);
+    戻る tv_get_string_buf(varp, buf);
 }
 
 /*
@@ -1330,33 +1330,33 @@ tv_stringify(typval_T *varp, char_u *buf)
  * Also give an error message, using "name" or _("name") when use_gettext is
  * TRUE.
  */
-    int
-tv_check_lock(typval_T *tv, char_u *name, int use_gettext)
+    整数
+tv_check_lock(typval_T *tv, char_u *name, 整数 use_gettext)
 {
-    int	lock = 0;
+    整数	lock = 0;
 
     switch (tv->v_type)
     {
 	case VAR_BLOB:
-	    if (tv->vval.v_blob != NULL)
+	    もし (tv->vval.v_blob != NULL)
 		lock = tv->vval.v_blob->bv_lock;
 	    break;
 	case VAR_LIST:
-	    if (tv->vval.v_list != NULL)
+	    もし (tv->vval.v_list != NULL)
 		lock = tv->vval.v_list->lv_lock;
 	    break;
 	case VAR_TUPLE:
-	    if (tv->vval.v_tuple != NULL)
+	    もし (tv->vval.v_tuple != NULL)
 		lock = tv->vval.v_tuple->tv_lock;
 	    break;
 	case VAR_DICT:
-	    if (tv->vval.v_dict != NULL)
+	    もし (tv->vval.v_dict != NULL)
 		lock = tv->vval.v_dict->dv_lock;
 	    break;
 	default:
 	    break;
     }
-    return value_check_lock(tv->v_lock, name, use_gettext)
+    戻る value_check_lock(tv->v_lock, name, use_gettext)
 		   || (lock != 0 && value_check_lock(lock, name, use_gettext));
 }
 
@@ -1367,10 +1367,10 @@ tv_check_lock(typval_T *tv, char_u *name, int use_gettext)
  * It is OK for "from" and "to" to point to the same item.  This is used to
  * make a copy later.
  */
-    int
+    整数
 copy_tv(typval_T *from, typval_T *to)
 {
-    int		ret = OK;
+    整数		ret = OK;
 
     to->v_type = from->v_type;
     to->v_lock = 0;
@@ -1387,14 +1387,14 @@ copy_tv(typval_T *from, typval_T *to)
 	case VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
 	    to->vval.v_job = from->vval.v_job;
-	    if (to->vval.v_job != NULL)
+	    もし (to->vval.v_job != NULL)
 		++to->vval.v_job->jv_refcount;
 	    break;
 #endif
 	case VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
 	    to->vval.v_channel = from->vval.v_channel;
-	    if (to->vval.v_channel != NULL)
+	    もし (to->vval.v_channel != NULL)
 		++to->vval.v_channel->ch_refcount;
 	    break;
 #endif
@@ -1412,64 +1412,64 @@ copy_tv(typval_T *from, typval_T *to)
 
 	case VAR_STRING:
 	case VAR_FUNC:
-	    if (from->vval.v_string == NULL)
+	    もし (from->vval.v_string == NULL)
 		to->vval.v_string = NULL;
-	    else
+	    否则
 	    {
 		to->vval.v_string = vim_strsave(from->vval.v_string);
-		if (from->v_type == VAR_FUNC)
+		もし (from->v_type == VAR_FUNC)
 		    func_ref(to->vval.v_string);
 	    }
 	    break;
 	case VAR_PARTIAL:
-	    if (from->vval.v_partial == NULL)
+	    もし (from->vval.v_partial == NULL)
 		to->vval.v_partial = NULL;
-	    else
+	    否则
 	    {
 		to->vval.v_partial = from->vval.v_partial;
 		++to->vval.v_partial->pt_refcount;
 	    }
 	    break;
 	case VAR_BLOB:
-	    if (from->vval.v_blob == NULL)
+	    もし (from->vval.v_blob == NULL)
 		to->vval.v_blob = NULL;
-	    else
+	    否则
 	    {
 		to->vval.v_blob = from->vval.v_blob;
 		++to->vval.v_blob->bv_refcount;
 	    }
 	    break;
 	case VAR_LIST:
-	    if (from->vval.v_list == NULL)
+	    もし (from->vval.v_list == NULL)
 		to->vval.v_list = NULL;
-	    else
+	    否则
 	    {
 		to->vval.v_list = from->vval.v_list;
 		++to->vval.v_list->lv_refcount;
 	    }
 	    break;
 	case VAR_TUPLE:
-	    if (from->vval.v_tuple == NULL)
+	    もし (from->vval.v_tuple == NULL)
 		to->vval.v_tuple = NULL;
-	    else
+	    否则
 	    {
 		to->vval.v_tuple = from->vval.v_tuple;
 		++to->vval.v_tuple->tv_refcount;
 	    }
 	    break;
 	case VAR_DICT:
-	    if (from->vval.v_dict == NULL)
+	    もし (from->vval.v_dict == NULL)
 		to->vval.v_dict = NULL;
-	    else
+	    否则
 	    {
 		to->vval.v_dict = from->vval.v_dict;
 		++to->vval.v_dict->dv_refcount;
 	    }
 	    break;
 	case VAR_TYPEALIAS:
-	    if (from->vval.v_typealias == NULL)
+	    もし (from->vval.v_typealias == NULL)
 		to->vval.v_typealias = NULL;
-	    else
+	    否则
 	    {
 		to->vval.v_typealias = from->vval.v_typealias;
 		++to->vval.v_typealias->ta_refcount;
@@ -1486,90 +1486,90 @@ copy_tv(typval_T *from, typval_T *to)
 	    break;
     }
 
-    return ret;
+    戻る ret;
 }
 
 /*
  * Compare "tv1" and "tv2".
  */
-    int
+    整数
 typval_compare2(
     typval_T	*tv1,	// first operand
     typval_T	*tv2,	// second operand
     exprtype_T	type,	// operator
-    int		ic,	// ignore case
-    int		*res)	// comparison result
+    整数		ic,	// ignore case
+    整数		*res)	// comparison result
 {
     varnumber_T	n1, n2;
-    int		type_is = type == EXPR_IS || type == EXPR_ISNOT;
+    整数		type_is = type == EXPR_IS || type == EXPR_ISNOT;
 
-    if (check_typval_is_value(tv1) == FAIL
+    もし (check_typval_is_value(tv1) == FAIL
 	|| check_typval_is_value(tv2) == FAIL)
-	return FAIL;
-    else if (type_is && tv1->v_type != tv2->v_type)
+	戻る FAIL;
+    否则 もし (type_is && tv1->v_type != tv2->v_type)
     {
 	// For "is" a different type always means FALSE, for "isnot"
 	// it means TRUE.
 	*res = (type == EXPR_ISNOT);
     }
-    else if (((tv1->v_type == VAR_SPECIAL && tv1->vval.v_number == VVAL_NULL)
+    否则 もし (((tv1->v_type == VAR_SPECIAL && tv1->vval.v_number == VVAL_NULL)
 		|| (tv2->v_type == VAR_SPECIAL
 					   && tv2->vval.v_number == VVAL_NULL))
 	    && tv1->v_type != tv2->v_type
 	    && (type == EXPR_EQUAL || type == EXPR_NEQUAL))
     {
 	n1 = typval_compare_null(tv1, tv2);
-	if (n1 == MAYBE)
-	    return FAIL;
-	if (type == EXPR_NEQUAL)
+	もし (n1 == MAYBE)
+	    戻る FAIL;
+	もし (type == EXPR_NEQUAL)
 	    n1 = !n1;
 	*res = n1;
     }
-    else if (tv1->v_type == VAR_BLOB || tv2->v_type == VAR_BLOB)
+    否则 もし (tv1->v_type == VAR_BLOB || tv2->v_type == VAR_BLOB)
     {
-	if (typval_compare_blob(tv1, tv2, type, res) == FAIL)
-	    return FAIL;
+	もし (typval_compare_blob(tv1, tv2, type, res) == FAIL)
+	    戻る FAIL;
     }
-    else if (tv1->v_type == VAR_LIST || tv2->v_type == VAR_LIST)
+    否则 もし (tv1->v_type == VAR_LIST || tv2->v_type == VAR_LIST)
     {
-	if (typval_compare_list(tv1, tv2, type, ic, res) == FAIL)
-	    return FAIL;
+	もし (typval_compare_list(tv1, tv2, type, ic, res) == FAIL)
+	    戻る FAIL;
     }
-    else if (tv1->v_type == VAR_TUPLE || tv2->v_type == VAR_TUPLE)
+    否则 もし (tv1->v_type == VAR_TUPLE || tv2->v_type == VAR_TUPLE)
     {
-	if (typval_compare_tuple(tv1, tv2, type, ic, res) == FAIL)
-	    return FAIL;
+	もし (typval_compare_tuple(tv1, tv2, type, ic, res) == FAIL)
+	    戻る FAIL;
     }
-    else if (tv1->v_type == VAR_OBJECT || tv2->v_type == VAR_OBJECT)
+    否则 もし (tv1->v_type == VAR_OBJECT || tv2->v_type == VAR_OBJECT)
     {
-	if (typval_compare_object(tv1, tv2, type, ic, res) == FAIL)
-	    return FAIL;
+	もし (typval_compare_object(tv1, tv2, type, ic, res) == FAIL)
+	    戻る FAIL;
     }
-    else if (tv1->v_type == VAR_DICT || tv2->v_type == VAR_DICT)
+    否则 もし (tv1->v_type == VAR_DICT || tv2->v_type == VAR_DICT)
     {
-	if (typval_compare_dict(tv1, tv2, type, ic, res) == FAIL)
-	    return FAIL;
+	もし (typval_compare_dict(tv1, tv2, type, ic, res) == FAIL)
+	    戻る FAIL;
     }
-    else if (tv1->v_type == VAR_FUNC || tv2->v_type == VAR_FUNC
+    否则 もし (tv1->v_type == VAR_FUNC || tv2->v_type == VAR_FUNC
 	|| tv1->v_type == VAR_PARTIAL || tv2->v_type == VAR_PARTIAL)
     {
-	if (typval_compare_func(tv1, tv2, type, ic, res) == FAIL)
-	    return FAIL;
+	もし (typval_compare_func(tv1, tv2, type, ic, res) == FAIL)
+	    戻る FAIL;
     }
 
     // If one of the two variables is a float, compare as a float.
     // When using "=~" or "!~", always compare as string.
-    else if ((tv1->v_type == VAR_FLOAT || tv2->v_type == VAR_FLOAT)
+    否则 もし ((tv1->v_type == VAR_FLOAT || tv2->v_type == VAR_FLOAT)
 	    && type != EXPR_MATCH && type != EXPR_NOMATCH)
     {
 	float_T f1, f2;
-	int	error = FALSE;
+	整数	error = FALSE;
 
 	f1 = tv_get_float_chk(tv1, &error);
-	if (!error)
+	もし (!error)
 	    f2 = tv_get_float_chk(tv2, &error);
-	if (error)
-	    return FAIL;
+	もし (error)
+	    戻る FAIL;
 	n1 = FALSE;
 	switch (type)
 	{
@@ -1590,16 +1590,16 @@ typval_compare2(
 
     // If one of the two variables is a number, compare as a number.
     // When using "=~" or "!~", always compare as string.
-    else if ((tv1->v_type == VAR_NUMBER || tv2->v_type == VAR_NUMBER)
+    否则 もし ((tv1->v_type == VAR_NUMBER || tv2->v_type == VAR_NUMBER)
 	    && type != EXPR_MATCH && type != EXPR_NOMATCH)
     {
-	int error = FALSE;
+	整数 error = FALSE;
 
 	n1 = tv_get_number_chk(tv1, &error);
-	if (!error)
+	もし (!error)
 	    n2 = tv_get_number_chk(tv2, &error);
-	if (error)
-	    return FAIL;
+	もし (error)
+	    戻る FAIL;
 	switch (type)
 	{
 	    case EXPR_IS:
@@ -1616,16 +1616,16 @@ typval_compare2(
 	}
 	*res = n1;
     }
-    else if (in_vim9script() && (tv1->v_type == VAR_BOOL
+    否则 もし (in_vim9script() && (tv1->v_type == VAR_BOOL
 				    || tv2->v_type == VAR_BOOL
 				    || (tv1->v_type == VAR_SPECIAL
 					      && tv2->v_type == VAR_SPECIAL)))
     {
-	if (tv1->v_type != tv2->v_type)
+	もし (tv1->v_type != tv2->v_type)
 	{
 	    semsg(_(e_cannot_compare_str_with_str),
 		       vartype_name(tv1->v_type), vartype_name(tv2->v_type));
-	    return FAIL;
+	    戻る FAIL;
 	}
 	n1 = tv1->vval.v_number;
 	n2 = tv2->vval.v_number;
@@ -1638,65 +1638,65 @@ typval_compare2(
 	    default:
 		semsg(_(e_invalid_operation_for_str),
 						   vartype_name(tv1->v_type));
-		return FAIL;
+		戻る FAIL;
 	}
 	*res = n1;
     }
 #ifdef FEAT_JOB_CHANNEL
-    else if (tv1->v_type == tv2->v_type
+    否则 もし (tv1->v_type == tv2->v_type
 	    && (tv1->v_type == VAR_CHANNEL || tv1->v_type == VAR_JOB)
 	    && (type == EXPR_NEQUAL || type == EXPR_EQUAL))
     {
-	if (tv1->v_type == VAR_CHANNEL)
+	もし (tv1->v_type == VAR_CHANNEL)
 	    n1 = tv1->vval.v_channel == tv2->vval.v_channel;
-	else
+	否则
 	    n1 = tv1->vval.v_job == tv2->vval.v_job;
-	if (type == EXPR_NEQUAL)
+	もし (type == EXPR_NEQUAL)
 	    n1 = !n1;
 	*res = n1;
     }
 #endif
-    else
+    否则
     {
-	if (typval_compare_string(tv1, tv2, type, ic, res) == FAIL)
-	    return FAIL;
+	もし (typval_compare_string(tv1, tv2, type, ic, res) == FAIL)
+	    戻る FAIL;
     }
 
-    return OK;
+    戻る OK;
 }
 
 /*
  * Compare "tv1" and "tv2".
  * Put the result in "tv1".  Caller should clear "tv2".
  */
-    int
+    整数
 typval_compare(
     typval_T	*tv1,	// first operand
     typval_T	*tv2,	// second operand
     exprtype_T	type,   // operator
-    int		ic)     // ignore case
+    整数		ic)     // ignore case
 {
-    int res;
+    整数 res;
 
-    if (typval_compare2(tv1, tv2, type, ic, &res) == FAIL)
+    もし (typval_compare2(tv1, tv2, type, ic, &res) == FAIL)
     {
 	clear_tv(tv1);
-	return FAIL;
+	戻る FAIL;
     }
 
     clear_tv(tv1);
-    if (in_vim9script())
+    もし (in_vim9script())
     {
 	tv1->v_type = VAR_BOOL;
 	tv1->vval.v_number = res ? VVAL_TRUE : VVAL_FALSE;
     }
-    else
+    否则
     {
 	tv1->v_type = VAR_NUMBER;
 	tv1->vval.v_number = res;
     }
 
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -1704,40 +1704,40 @@ typval_compare(
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    整数
 typval_compare_list(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    ic,
-	int	    *res)
+	整数	    ic,
+	整数	    *res)
 {
-    int	    val = 0;
+    整数	    val = 0;
 
-    if (type == EXPR_IS || type == EXPR_ISNOT)
+    もし (type == EXPR_IS || type == EXPR_ISNOT)
     {
 	val = (tv1->v_type == tv2->v_type
 				      && tv1->vval.v_list == tv2->vval.v_list);
-	if (type == EXPR_ISNOT)
+	もし (type == EXPR_ISNOT)
 	    val = !val;
     }
-    else if (tv1->v_type != tv2->v_type
+    否则 もし (tv1->v_type != tv2->v_type
 	    || (type != EXPR_EQUAL && type != EXPR_NEQUAL))
     {
-	if (tv1->v_type != tv2->v_type)
+	もし (tv1->v_type != tv2->v_type)
 	    emsg(_(e_can_only_compare_list_with_list));
-	else
+	否则
 	    emsg(_(e_invalid_operation_for_list));
-	return FAIL;
+	戻る FAIL;
     }
-    else
+    否则
     {
 	val = list_equal(tv1->vval.v_list, tv2->vval.v_list, ic);
-	if (type == EXPR_NEQUAL)
+	もし (type == EXPR_NEQUAL)
 	    val = !val;
     }
     *res = val;
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -1745,85 +1745,85 @@ typval_compare_list(
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    整数
 typval_compare_tuple(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    ic,
-	int	    *res)
+	整数	    ic,
+	整数	    *res)
 {
-    int	    val = 0;
+    整数	    val = 0;
 
-    if (type == EXPR_IS || type == EXPR_ISNOT)
+    もし (type == EXPR_IS || type == EXPR_ISNOT)
     {
 	val = (tv1->v_type == tv2->v_type
 			      && tv1->vval.v_tuple == tv2->vval.v_tuple);
-	if (type == EXPR_ISNOT)
+	もし (type == EXPR_ISNOT)
 	    val = !val;
     }
-    else if (tv1->v_type != tv2->v_type
+    否则 もし (tv1->v_type != tv2->v_type
 	    || (type != EXPR_EQUAL && type != EXPR_NEQUAL))
     {
-	if (tv1->v_type != tv2->v_type)
+	もし (tv1->v_type != tv2->v_type)
 	    emsg(_(e_can_only_compare_tuple_with_tuple));
-	else
+	否则
 	    emsg(_(e_invalid_operation_for_tuple));
-	return FAIL;
+	戻る FAIL;
     }
-    else
+    否则
     {
 	val = tuple_equal(tv1->vval.v_tuple, tv2->vval.v_tuple, ic);
-	if (type == EXPR_NEQUAL)
+	もし (type == EXPR_NEQUAL)
 	    val = !val;
     }
     *res = val;
-    return OK;
+    戻る OK;
 }
 
 /*
  * Compare v:null with another type.  Return TRUE if the value is NULL.
  */
-    int
+    整数
 typval_compare_null(typval_T *tv1, typval_T *tv2)
 {
-    if ((tv1->v_type == VAR_SPECIAL && tv1->vval.v_number == VVAL_NULL)
+    もし ((tv1->v_type == VAR_SPECIAL && tv1->vval.v_number == VVAL_NULL)
 	    || (tv2->v_type == VAR_SPECIAL && tv2->vval.v_number == VVAL_NULL))
     {
 	typval_T	*tv = tv1->v_type == VAR_SPECIAL ? tv2 : tv1;
 
 	switch (tv->v_type)
 	{
-	    case VAR_BLOB: return tv->vval.v_blob == NULL;
+	    case VAR_BLOB: 戻る tv->vval.v_blob == NULL;
 #ifdef FEAT_JOB_CHANNEL
-	    case VAR_CHANNEL: return tv->vval.v_channel == NULL;
+	    case VAR_CHANNEL: 戻る tv->vval.v_channel == NULL;
 #endif
 	    // TODO: null_class handling
 	    // case VAR_CLASS: return tv->vval.v_class == NULL;
-	    case VAR_DICT: return tv->vval.v_dict == NULL;
-	    case VAR_FUNC: return tv->vval.v_string == NULL;
+	    case VAR_DICT: 戻る tv->vval.v_dict == NULL;
+	    case VAR_FUNC: 戻る tv->vval.v_string == NULL;
 #ifdef FEAT_JOB_CHANNEL
-	    case VAR_JOB: return tv->vval.v_job == NULL;
+	    case VAR_JOB: 戻る tv->vval.v_job == NULL;
 #endif
-	    case VAR_LIST: return tv->vval.v_list == NULL;
-	    case VAR_TUPLE: return tv->vval.v_tuple == NULL;
-	    case VAR_OBJECT: return tv->vval.v_object == NULL;
-	    case VAR_PARTIAL: return tv->vval.v_partial == NULL;
-	    case VAR_STRING: return tv->vval.v_string == NULL;
+	    case VAR_LIST: 戻る tv->vval.v_list == NULL;
+	    case VAR_TUPLE: 戻る tv->vval.v_tuple == NULL;
+	    case VAR_OBJECT: 戻る tv->vval.v_object == NULL;
+	    case VAR_PARTIAL: 戻る tv->vval.v_partial == NULL;
+	    case VAR_STRING: 戻る tv->vval.v_string == NULL;
 
-	    case VAR_NUMBER: if (!in_vim9script())
-				 return tv->vval.v_number == 0;
+	    case VAR_NUMBER: もし (!in_vim9script())
+				 戻る tv->vval.v_number == 0;
 			     break;
-	    case VAR_FLOAT: if (!in_vim9script())
-				 return tv->vval.v_float == 0.0;
+	    case VAR_FLOAT: もし (!in_vim9script())
+				 戻る tv->vval.v_float == 0.0;
 			     break;
-	    case VAR_TYPEALIAS: return tv->vval.v_typealias == NULL;
+	    case VAR_TYPEALIAS: 戻る tv->vval.v_typealias == NULL;
 	    default: break;
 	}
     }
     // although comparing null with number, float or bool is not very useful
     // we won't give an error
-    return FALSE;
+    戻る FALSE;
 }
 
 /*
@@ -1831,39 +1831,39 @@ typval_compare_null(typval_T *tv1, typval_T *tv2)
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    整数
 typval_compare_blob(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    *res)
+	整数	    *res)
 {
-    int	    val = 0;
+    整数	    val = 0;
 
-    if (type == EXPR_IS || type == EXPR_ISNOT)
+    もし (type == EXPR_IS || type == EXPR_ISNOT)
     {
 	val = (tv1->v_type == tv2->v_type
 			&& tv1->vval.v_blob == tv2->vval.v_blob);
-	if (type == EXPR_ISNOT)
+	もし (type == EXPR_ISNOT)
 	    val = !val;
     }
-    else if (tv1->v_type != tv2->v_type
+    否则 もし (tv1->v_type != tv2->v_type
 	    || (type != EXPR_EQUAL && type != EXPR_NEQUAL))
     {
-	if (tv1->v_type != tv2->v_type)
+	もし (tv1->v_type != tv2->v_type)
 	    emsg(_(e_can_only_compare_blob_with_blob));
-	else
+	否则
 	    emsg(_(e_invalid_operation_for_blob));
-	return FAIL;
+	戻る FAIL;
     }
-    else
+    否则
     {
 	val = blob_equal(tv1->vval.v_blob, tv2->vval.v_blob);
-	if (type == EXPR_NEQUAL)
+	もし (type == EXPR_NEQUAL)
 	    val = !val;
     }
     *res = val;
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -1871,42 +1871,42 @@ typval_compare_blob(
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    整数
 typval_compare_object(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    ic,
-	int	    *res)
+	整数	    ic,
+	整数	    *res)
 {
-    int res_match = type == EXPR_EQUAL || type == EXPR_IS ? TRUE : FALSE;
+    整数 res_match = type == EXPR_EQUAL || type == EXPR_IS ? TRUE : FALSE;
 
-    if (tv1->vval.v_object == NULL && tv2->vval.v_object == NULL)
+    もし (tv1->vval.v_object == NULL && tv2->vval.v_object == NULL)
     {
 	*res = res_match;
-	return OK;
+	戻る OK;
     }
-    if (tv1->vval.v_object == NULL || tv2->vval.v_object == NULL)
+    もし (tv1->vval.v_object == NULL || tv2->vval.v_object == NULL)
     {
 	*res = !res_match;
-	return OK;
+	戻る OK;
     }
 
     object_T *obj1 = tv1->vval.v_object;
     object_T *obj2 = tv2->vval.v_object;
-    if (type == EXPR_IS || type == EXPR_ISNOT)
+    もし (type == EXPR_IS || type == EXPR_ISNOT)
     {
 	*res = obj1 == obj2 ? res_match : !res_match;
-	return OK;
+	戻る OK;
     }
-    else if (tv1->v_type != tv2->v_type)
+    否则 もし (tv1->v_type != tv2->v_type)
     {
 	emsg(_(e_can_only_compare_object_with_object));
-	return FAIL;
+	戻る FAIL;
     }
 
     *res = object_equal(obj1, obj2, ic) ? res_match : !res_match;
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -1914,40 +1914,40 @@ typval_compare_object(
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    整数
 typval_compare_dict(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    ic,
-	int	    *res)
+	整数	    ic,
+	整数	    *res)
 {
-    int	    val;
+    整数	    val;
 
-    if (type == EXPR_IS || type == EXPR_ISNOT)
+    もし (type == EXPR_IS || type == EXPR_ISNOT)
     {
 	val = (tv1->v_type == tv2->v_type
 			&& tv1->vval.v_dict == tv2->vval.v_dict);
-	if (type == EXPR_ISNOT)
+	もし (type == EXPR_ISNOT)
 	    val = !val;
     }
-    else if (tv1->v_type != tv2->v_type
+    否则 もし (tv1->v_type != tv2->v_type
 		|| (type != EXPR_EQUAL && type != EXPR_NEQUAL))
     {
-	if (tv1->v_type != tv2->v_type)
+	もし (tv1->v_type != tv2->v_type)
 	    emsg(_(e_can_only_compare_dictionary_with_dictionary));
-	else
+	否则
 	    emsg(_(e_invalid_operation_for_dictionary));
-	return FAIL;
+	戻る FAIL;
     }
-    else
+    否则
     {
 	val = dict_equal(tv1->vval.v_dict, tv2->vval.v_dict, ic);
-	if (type == EXPR_NEQUAL)
+	もし (type == EXPR_NEQUAL)
 	    val = !val;
     }
     *res = val;
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -1955,44 +1955,44 @@ typval_compare_dict(
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    整数
 typval_compare_func(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    ic,
-	int	    *res)
+	整数	    ic,
+	整数	    *res)
 {
-    int	    val = 0;
+    整数	    val = 0;
 
-    if (type != EXPR_EQUAL && type != EXPR_NEQUAL
+    もし (type != EXPR_EQUAL && type != EXPR_NEQUAL
 	    && type != EXPR_IS && type != EXPR_ISNOT)
     {
 	emsg(_(e_invalid_operation_for_funcrefs));
-	return FAIL;
+	戻る FAIL;
     }
-    if ((tv1->v_type == VAR_PARTIAL && tv1->vval.v_partial == NULL)
+    もし ((tv1->v_type == VAR_PARTIAL && tv1->vval.v_partial == NULL)
 	    || (tv2->v_type == VAR_PARTIAL && tv2->vval.v_partial == NULL))
 	// When both partials are NULL, then they are equal.
 	// Otherwise they are not equal.
 	val = (tv1->vval.v_partial == tv2->vval.v_partial);
-    else if (type == EXPR_IS || type == EXPR_ISNOT)
+    否则 もし (type == EXPR_IS || type == EXPR_ISNOT)
     {
-	if (tv1->v_type == VAR_FUNC && tv2->v_type == VAR_FUNC)
+	もし (tv1->v_type == VAR_FUNC && tv2->v_type == VAR_FUNC)
 	    // strings are considered the same if their value is
 	    // the same
 	    val = tv_equal(tv1, tv2, ic);
-	else if (tv1->v_type == VAR_PARTIAL && tv2->v_type == VAR_PARTIAL)
+	否则 もし (tv1->v_type == VAR_PARTIAL && tv2->v_type == VAR_PARTIAL)
 	    val = (tv1->vval.v_partial == tv2->vval.v_partial);
-	else
+	否则
 	    val = FALSE;
     }
-    else
+    否则
 	val = tv_equal(tv1, tv2, ic);
-    if (type == EXPR_NEQUAL || type == EXPR_ISNOT)
+    もし (type == EXPR_NEQUAL || type == EXPR_ISNOT)
 	val = !val;
     *res = val;
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -2000,34 +2000,34 @@ typval_compare_func(
  * Put the result, false or true, in "res".
  * Return FAIL and give an error message when the comparison can't be done.
  */
-    int
+    整数
 typval_compare_string(
 	typval_T    *tv1,
 	typval_T    *tv2,
 	exprtype_T  type,
-	int	    ic,
-	int	    *res)
+	整数	    ic,
+	整数	    *res)
 {
-    int		i = 0;
-    int		val = FALSE;
+    整数		i = 0;
+    整数		val = FALSE;
     char_u	*s1, *s2;
     char_u	buf1[NUMBUFLEN], buf2[NUMBUFLEN];
 
-    if (in_vim9script()
+    もし (in_vim9script()
 	  && ((tv1->v_type != VAR_STRING && tv1->v_type != VAR_SPECIAL)
 	   || (tv2->v_type != VAR_STRING && tv2->v_type != VAR_SPECIAL)))
     {
 	semsg(_(e_cannot_compare_str_with_str),
 		   vartype_name(tv1->v_type), vartype_name(tv2->v_type));
-	return FAIL;
+	戻る FAIL;
     }
     s1 = tv_get_string_buf(tv1, buf1);
     s2 = tv_get_string_buf(tv2, buf2);
-    if (type != EXPR_MATCH && type != EXPR_NOMATCH)
+    もし (type != EXPR_MATCH && type != EXPR_NOMATCH)
 	i = ic ? MB_STRICMP(s1, s2) : STRCMP(s1, s2);
     switch (type)
     {
-	case EXPR_IS:	    if (in_vim9script())
+	case EXPR_IS:	    もし (in_vim9script())
 			    {
 				// Really check it is the same string, not just
 				// the same value.
@@ -2036,7 +2036,7 @@ typval_compare_string(
 			    }
 			    // FALLTHROUGH
 	case EXPR_EQUAL:    val = (i == 0); break;
-	case EXPR_ISNOT:    if (in_vim9script())
+	case EXPR_ISNOT:    もし (in_vim9script())
 			    {
 				// Really check it is not the same string, not
 				// just a different value.
@@ -2053,14 +2053,14 @@ typval_compare_string(
 	case EXPR_MATCH:
 	case EXPR_NOMATCH:
 		val = pattern_match(s2, s1, ic);
-		if (type == EXPR_NOMATCH)
+		もし (type == EXPR_NOMATCH)
 		    val = !val;
 		break;
 
 	default:  break;  // avoid gcc warning
     }
     *res = val;
-    return OK;
+    戻る OK;
 }
 /*
  * Convert any type to a string, never give an error.
@@ -2068,37 +2068,37 @@ typval_compare_string(
  * Returns an allocated string.
  */
     char_u *
-typval_tostring(typval_T *arg, int quotes)
+typval_tostring(typval_T *arg, 整数 quotes)
 {
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     char_u	*ret = NULL;
 
-    if (arg == NULL)
-	return vim_strsave((char_u *)"(does not exist)");
-    if (!quotes && arg->v_type == VAR_STRING)
+    もし (arg == NULL)
+	戻る vim_strsave((char_u *)"(does not exist)");
+    もし (!quotes && arg->v_type == VAR_STRING)
     {
 	ret = vim_strsave(arg->vval.v_string == NULL ? (char_u *)""
 							 : arg->vval.v_string);
     }
-    else
+    否则
     {
 	ret = tv2string(arg, &tofree, numbuf, 0);
 	// Make a copy if we have a value but it's not in allocated memory.
-	if (ret != NULL && tofree == NULL)
+	もし (ret != NULL && tofree == NULL)
 	    ret = vim_strsave(ret);
     }
-    return ret;
+    戻る ret;
 }
 
 /*
  * Return TRUE if typeval "tv" is locked: Either that value is locked itself
  * or it refers to a List or Dictionary that is locked.
  */
-    int
+    整数
 tv_islocked(typval_T *tv)
 {
-    return (tv->v_lock & VAR_LOCKED)
+    戻る (tv->v_lock & VAR_LOCKED)
 	|| (tv->v_type == VAR_LIST
 		&& tv->vval.v_list != NULL
 		&& (tv->vval.v_list->lv_lock & VAR_LOCKED))
@@ -2110,56 +2110,56 @@ tv_islocked(typval_T *tv)
 		&& (tv->vval.v_dict->dv_lock & VAR_LOCKED));
 }
 
-    static int
+    static 整数
 func_equal(
     typval_T *tv1,
     typval_T *tv2,
-    int	     ic)	    // ignore case
+    整数	     ic)	    // ignore case
 {
     char_u	*s1, *s2;
     dict_T	*d1, *d2;
-    int		a1, a2;
-    int		i;
+    整数		a1, a2;
+    整数		i;
 
     // empty and NULL function name considered the same
     s1 = tv1->v_type == VAR_FUNC ? tv1->vval.v_string
 					   : partial_name(tv1->vval.v_partial);
-    if (s1 != NULL && *s1 == NUL)
+    もし (s1 != NULL && *s1 == NUL)
 	s1 = NULL;
     s2 = tv2->v_type == VAR_FUNC ? tv2->vval.v_string
 					   : partial_name(tv2->vval.v_partial);
-    if (s2 != NULL && *s2 == NUL)
+    もし (s2 != NULL && *s2 == NUL)
 	s2 = NULL;
-    if (s1 == NULL || s2 == NULL)
+    もし (s1 == NULL || s2 == NULL)
     {
-	if (s1 != s2)
-	    return FALSE;
+	もし (s1 != s2)
+	    戻る FALSE;
     }
-    else if (STRCMP(s1, s2) != 0)
-	return FALSE;
+    否则 もし (STRCMP(s1, s2) != 0)
+	戻る FALSE;
 
     // empty dict and NULL dict is different
     d1 = tv1->v_type == VAR_FUNC ? NULL : tv1->vval.v_partial->pt_dict;
     d2 = tv2->v_type == VAR_FUNC ? NULL : tv2->vval.v_partial->pt_dict;
-    if (d1 == NULL || d2 == NULL)
+    もし (d1 == NULL || d2 == NULL)
     {
-	if (d1 != d2)
-	    return FALSE;
+	もし (d1 != d2)
+	    戻る FALSE;
     }
-    else if (!dict_equal(d1, d2, ic))
-	return FALSE;
+    否则 もし (!dict_equal(d1, d2, ic))
+	戻る FALSE;
 
     // empty list and no list considered the same
     a1 = tv1->v_type == VAR_FUNC ? 0 : tv1->vval.v_partial->pt_argc;
     a2 = tv2->v_type == VAR_FUNC ? 0 : tv2->vval.v_partial->pt_argc;
-    if (a1 != a2)
-	return FALSE;
-    for (i = 0; i < a1; ++i)
-	if (!tv_equal(tv1->vval.v_partial->pt_argv + i,
+    もし (a1 != a2)
+	戻る FALSE;
+    ために (i = 0; i < a1; ++i)
+	もし (!tv_equal(tv1->vval.v_partial->pt_argv + i,
 		      tv2->vval.v_partial->pt_argv + i, ic))
-	    return FALSE;
+	    戻る FALSE;
 
-    return TRUE;
+    戻る TRUE;
 }
 
 /*
@@ -2167,17 +2167,17 @@ func_equal(
  * Compares the items just like "==" would compare them, but strings and
  * numbers are different.  Floats and numbers are also different.
  */
-    int
+    整数
 tv_equal(
     typval_T *tv1,
     typval_T *tv2,
-    int	     ic)	    // ignore case
+    整数	     ic)	    // ignore case
 {
     char_u	buf1[NUMBUFLEN], buf2[NUMBUFLEN];
     char_u	*s1, *s2;
-    static int  recursive_cnt = 0;	    // catch recursive loops
-    int		r;
-    static int	tv_equal_recurse_limit;
+    static 整数  recursive_cnt = 0;	    // catch recursive loops
+    整数		r;
+    static 整数	tv_equal_recurse_limit;
 
     // Catch lists and dicts that have an endless loop by limiting
     // recursiveness to a limit.  We guess they are equal then.
@@ -2185,17 +2185,17 @@ tv_equal(
     // Reduce the limit every time running into it. That should work fine for
     // deeply linked structures that are not recursively linked and catch
     // recursiveness quickly.
-    if (recursive_cnt == 0)
+    もし (recursive_cnt == 0)
 	tv_equal_recurse_limit = 1000;
-    if (recursive_cnt >= tv_equal_recurse_limit)
+    もし (recursive_cnt >= tv_equal_recurse_limit)
     {
 	--tv_equal_recurse_limit;
-	return TRUE;
+	戻る TRUE;
     }
 
     // For VAR_FUNC and VAR_PARTIAL compare the function name, bound dict and
     // arguments.
-    if ((tv1->v_type == VAR_FUNC
+    もし ((tv1->v_type == VAR_FUNC
 		|| (tv1->v_type == VAR_PARTIAL && tv1->vval.v_partial != NULL))
 	    && (tv2->v_type == VAR_FUNC
 		|| (tv2->v_type == VAR_PARTIAL && tv2->vval.v_partial != NULL)))
@@ -2203,13 +2203,13 @@ tv_equal(
 	++recursive_cnt;
 	r = func_equal(tv1, tv2, ic);
 	--recursive_cnt;
-	return r;
+	戻る r;
     }
 
-    if (tv1->v_type != tv2->v_type
+    もし (tv1->v_type != tv2->v_type
 	    && ((tv1->v_type != VAR_BOOL && tv1->v_type != VAR_SPECIAL)
 		|| (tv2->v_type != VAR_BOOL && tv2->v_type != VAR_SPECIAL)))
-	return FALSE;
+	戻る FALSE;
 
     switch (tv1->v_type)
     {
@@ -2217,64 +2217,64 @@ tv_equal(
 	    ++recursive_cnt;
 	    r = list_equal(tv1->vval.v_list, tv2->vval.v_list, ic);
 	    --recursive_cnt;
-	    return r;
+	    戻る r;
 
 	case VAR_TUPLE:
 	    ++recursive_cnt;
 	    r = tuple_equal(tv1->vval.v_tuple, tv2->vval.v_tuple, ic);
 	    --recursive_cnt;
-	    return r;
+	    戻る r;
 
 	case VAR_DICT:
 	    ++recursive_cnt;
 	    r = dict_equal(tv1->vval.v_dict, tv2->vval.v_dict, ic);
 	    --recursive_cnt;
-	    return r;
+	    戻る r;
 
 	case VAR_BLOB:
-	    return blob_equal(tv1->vval.v_blob, tv2->vval.v_blob);
+	    戻る blob_equal(tv1->vval.v_blob, tv2->vval.v_blob);
 
 	case VAR_NUMBER:
 	case VAR_BOOL:
 	case VAR_SPECIAL:
-	    return tv1->vval.v_number == tv2->vval.v_number;
+	    戻る tv1->vval.v_number == tv2->vval.v_number;
 
 	case VAR_STRING:
 	    s1 = tv_get_string_buf(tv1, buf1);
 	    s2 = tv_get_string_buf(tv2, buf2);
-	    return ((ic ? MB_STRICMP(s1, s2) : STRCMP(s1, s2)) == 0);
+	    戻る ((ic ? MB_STRICMP(s1, s2) : STRCMP(s1, s2)) == 0);
 
 	case VAR_FLOAT:
-	    return tv1->vval.v_float == tv2->vval.v_float;
+	    戻る tv1->vval.v_float == tv2->vval.v_float;
 	case VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    return tv1->vval.v_job == tv2->vval.v_job;
+	    戻る tv1->vval.v_job == tv2->vval.v_job;
 #endif
 	case VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    return tv1->vval.v_channel == tv2->vval.v_channel;
+	    戻る tv1->vval.v_channel == tv2->vval.v_channel;
 #endif
 	case VAR_INSTR:
-	    return tv1->vval.v_instr == tv2->vval.v_instr;
+	    戻る tv1->vval.v_instr == tv2->vval.v_instr;
 
 	case VAR_CLASS:
 	    // A class only exists once, equality is identity.
-	    return tv1->vval.v_class == tv2->vval.v_class;
+	    戻る tv1->vval.v_class == tv2->vval.v_class;
 
 	case VAR_OBJECT:
 	    ++recursive_cnt;
 	    r = object_equal(tv1->vval.v_object, tv2->vval.v_object, ic);
 	    --recursive_cnt;
-	    return r;
+	    戻る r;
 
 	case VAR_PARTIAL:
-	    return tv1->vval.v_partial == tv2->vval.v_partial;
+	    戻る tv1->vval.v_partial == tv2->vval.v_partial;
 
 	case VAR_FUNC:
-	    return tv1->vval.v_string == tv2->vval.v_string;
+	    戻る tv1->vval.v_string == tv2->vval.v_string;
 
 	case VAR_TYPEALIAS:
-	    return tv1->vval.v_typealias == tv2->vval.v_typealias;
+	    戻る tv1->vval.v_typealias == tv2->vval.v_typealias;
 
 	case VAR_UNKNOWN:
 	case VAR_ANY:
@@ -2284,7 +2284,7 @@ tv_equal(
 
     // VAR_UNKNOWN can be the result of a invalid expression, let's say it
     // does not equal anything, not even itself.
-    return FALSE;
+    戻る FALSE;
 }
 
 /*
@@ -2293,34 +2293,34 @@ tv_equal(
  * "arg" is advanced to character after the option name.
  * Return OK or FAIL.
  */
-    int
+    整数
 eval_option(
     char_u	**arg,
     typval_T	*rettv,	// when NULL, only check if option exists
-    int		evaluate)
+    整数		evaluate)
 {
     char_u	*option_end;
     long	numval;
     char_u	*stringval;
     getoption_T	opt_type;
-    int		c;
-    int		working = (**arg == '+');    // has("+option")
-    int		ret = OK;
-    int		scope;
+    整数		c;
+    整数		working = (**arg == '+');    // has("+option")
+    整数		ret = OK;
+    整数		scope;
 
     // Isolate the option name and find its value.
     option_end = find_option_end(arg, &scope);
-    if (option_end == NULL)
+    もし (option_end == NULL)
     {
-	if (rettv != NULL)
+	もし (rettv != NULL)
 	    semsg(_(e_option_name_missing_str), *arg);
-	return FAIL;
+	戻る FAIL;
     }
 
-    if (!evaluate)
+    もし (!evaluate)
     {
 	*arg = option_end;
-	return OK;
+	戻る OK;
     }
 
     c = *option_end;
@@ -2328,46 +2328,46 @@ eval_option(
     opt_type = get_option_value(*arg, &numval,
 			       rettv == NULL ? NULL : &stringval, NULL, scope);
 
-    if (opt_type == gov_unknown)
+    もし (opt_type == gov_unknown)
     {
-	if (rettv != NULL)
+	もし (rettv != NULL)
 	    semsg(_(e_unknown_option_str), *arg);
 	ret = FAIL;
     }
-    else if (rettv != NULL)
+    否则 もし (rettv != NULL)
     {
 	rettv->v_lock = 0;
-	if (opt_type == gov_hidden_string)
+	もし (opt_type == gov_hidden_string)
 	{
 	    rettv->v_type = VAR_STRING;
 	    rettv->vval.v_string = NULL;
 	}
-	else if (opt_type == gov_hidden_bool || opt_type == gov_hidden_number)
+	否则 もし (opt_type == gov_hidden_bool || opt_type == gov_hidden_number)
 	{
 	    rettv->v_type = in_vim9script() && opt_type == gov_hidden_bool
 						       ? VAR_BOOL : VAR_NUMBER;
 	    rettv->vval.v_number = 0;
 	}
-	else if (opt_type == gov_bool || opt_type == gov_number)
+	否则 もし (opt_type == gov_bool || opt_type == gov_number)
 	{
-	    if (in_vim9script() && opt_type == gov_bool)
+	    もし (in_vim9script() && opt_type == gov_bool)
 	    {
 		rettv->v_type = VAR_BOOL;
 		rettv->vval.v_number = numval ? VVAL_TRUE : VVAL_FALSE;
 	    }
-	    else
+	    否则
 	    {
 		rettv->v_type = VAR_NUMBER;
 		rettv->vval.v_number = numval;
 	    }
 	}
-	else				// string option
+	否则				// string option
 	{
 	    rettv->v_type = VAR_STRING;
 	    rettv->vval.v_string = stringval;
 	}
     }
-    else if (working && (opt_type == gov_hidden_bool
+    否则 もし (working && (opt_type == gov_hidden_bool
 			|| opt_type == gov_hidden_number
 			|| opt_type == gov_hidden_string))
 	ret = FAIL;
@@ -2375,24 +2375,24 @@ eval_option(
     *option_end = c;		    // put back for error messages
     *arg = option_end;
 
-    return ret;
+    戻る ret;
 }
 
 /*
  * Allocate a variable for a number constant.  Also deals with "0z" for blob.
  * Return OK or FAIL.
  */
-    int
+    整数
 eval_number(
 	char_u	    **arg,
 	typval_T    *rettv,
-	int	    evaluate,
-	int	    want_string)
+	整数	    evaluate,
+	整数	    want_string)
 {
-    int		len;
-    int		skip_quotes = !in_old_script(4);
+    整数		len;
+    整数		skip_quotes = !in_old_script(4);
     char_u	*p;
-    int		get_float = FALSE;
+    整数		get_float = FALSE;
 
     // We accept a float when the format matches
     // "[0-9]\+\.[0-9]\+\([eE][+-]\?[0-9]\+\)\?".  This is very
@@ -2401,83 +2401,83 @@ eval_number(
     // omitted.
     // Don't look for a float after the "." operator, so that
     // ":let vers = 1.2.3" doesn't fail.
-    if (**arg == '.')
+    もし (**arg == '.')
 	p = *arg;
-    else
+    否则
     {
 	p = *arg + 1;
-	if (skip_quotes)
-	    for (;;)
+	もし (skip_quotes)
+	    ために (;;)
 	    {
-		if (*p == '\'')
+		もし (*p == '\'')
 		    ++p;
-		if (!vim_isdigit(*p))
+		もし (!vim_isdigit(*p))
 		    break;
 		p = skipdigits(p);
 	    }
-	else
+	否则
 	    p = skipdigits(p);
     }
-    if (!want_string && p[0] == '.' && vim_isdigit(p[1]))
+    もし (!want_string && p[0] == '.' && vim_isdigit(p[1]))
     {
 	get_float = TRUE;
 	p = skipdigits(p + 2);
-	if (*p == 'e' || *p == 'E')
+	もし (*p == 'e' || *p == 'E')
 	{
 	    ++p;
-	    if (*p == '-' || *p == '+')
+	    もし (*p == '-' || *p == '+')
 		++p;
-	    if (!vim_isdigit(*p))
+	    もし (!vim_isdigit(*p))
 		get_float = FALSE;
-	    else
+	    否则
 		p = skipdigits(p + 1);
 	}
-	if (ASCII_ISALPHA(*p) || *p == '.')
+	もし (ASCII_ISALPHA(*p) || *p == '.')
 	    get_float = FALSE;
     }
-    if (get_float)
+    もし (get_float)
     {
 	float_T	f;
 
 	*arg += string2float(*arg, &f, skip_quotes);
-	if (evaluate)
+	もし (evaluate)
 	{
 	    rettv->v_type = VAR_FLOAT;
 	    rettv->vval.v_float = f;
 	}
     }
-    else
-    if (**arg == '0' && ((*arg)[1] == 'z' || (*arg)[1] == 'Z'))
+    否则
+    もし (**arg == '0' && ((*arg)[1] == 'z' || (*arg)[1] == 'Z'))
     {
 	char_u  *bp;
 	blob_T  *blob = NULL;  // init for gcc
 
 	// Blob constant: 0z0123456789abcdef
-	if (evaluate)
+	もし (evaluate)
 	    blob = blob_alloc();
-	for (bp = *arg + 2; vim_isxdigit(bp[0]); bp += 2)
+	ために (bp = *arg + 2; vim_isxdigit(bp[0]); bp += 2)
 	{
-	    if (!vim_isxdigit(bp[1]))
+	    もし (!vim_isxdigit(bp[1]))
 	    {
-		if (blob != NULL)
+		もし (blob != NULL)
 		{
 		    emsg(_(e_blob_literal_should_have_an_even_number_of_hex_characters));
 		    ga_clear(&blob->bv_ga);
 		    VIM_CLEAR(blob);
 		}
-		return FAIL;
+		戻る FAIL;
 	    }
-	    if (blob != NULL)
+	    もし (blob != NULL)
 		ga_append(&blob->bv_ga,
 			     (hex2nr(*bp) << 4) + hex2nr(*(bp+1)));
-	    if (bp[2] == '.' && vim_isxdigit(bp[3]))
+	    もし (bp[2] == '.' && vim_isxdigit(bp[3]))
 		++bp;
 	}
-	if (blob != NULL)
+	もし (blob != NULL)
 	    rettv_blob_set(rettv, blob);
 	*arg = bp;
     }
-    else
+    否则
     {
 	varnumber_T	n;
 
@@ -2485,20 +2485,20 @@ eval_number(
 	vim_str2nr(*arg, NULL, &len, skip_quotes
 		      ? STR2NR_NO_OCT + STR2NR_QUOTE
 		      : STR2NR_ALL, &n, NULL, 0, TRUE, NULL);
-	if (len == 0)
+	もし (len == 0)
 	{
-	    if (evaluate)
+	    もし (evaluate)
 		semsg(_(e_invalid_expression_str), *arg);
-	    return FAIL;
+	    戻る FAIL;
 	}
 	*arg += len;
-	if (evaluate)
+	もし (evaluate)
 	{
 	    rettv->v_type = VAR_NUMBER;
 	    rettv->vval.v_number = n;
 	}
     }
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -2508,78 +2508,78 @@ eval_number(
  * at a single "{".
  * Return OK or FAIL.
  */
-    int
-eval_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
+    整数
+eval_string(char_u **arg, typval_T *rettv, 整数 evaluate, 整数 interpolate)
 {
     char_u	*p;
     char_u	*end;
-    int		extra = interpolate ? 1 : 0;
-    int		off = interpolate ? 0 : 1;
-    int		len;
+    整数		extra = interpolate ? 1 : 0;
+    整数		off = interpolate ? 0 : 1;
+    整数		len;
 
     // Find the end of the string, skipping backslashed characters.
-    for (p = *arg + off; *p != NUL && *p != '"'; MB_PTR_ADV(p))
+    ために (p = *arg + off; *p != NUL && *p != '"'; MB_PTR_ADV(p))
     {
-	if (*p == '\\' && p[1] != NUL)
+	もし (*p == '\\' && p[1] != NUL)
 	{
 	    ++p;
 	    // A "\<x>" form occupies at least 4 characters, and produces up
 	    // to 9 characters (6 for the char and 3 for a modifier):
 	    // reserve space for 5 extra.
-	    if (*p == '<')
+	    もし (*p == '<')
 	    {
-		int		modifiers = 0;
-		int		flags = FSK_KEYCODE | FSK_IN_STRING;
+		整数		modifiers = 0;
+		整数		flags = FSK_KEYCODE | FSK_IN_STRING;
 
 		extra += 5;
 
 		// Skip to the '>' to avoid using '{' inside for string
 		// interpolation.
-		if (p[1] != '*')
+		もし (p[1] != '*')
 		    flags |= FSK_SIMPLIFY;
-		if (find_special_key(&p, &modifiers, flags, NULL) != 0)
+		もし (find_special_key(&p, &modifiers, flags, NULL) != 0)
 		    --p;  // leave "p" on the ">"
 	    }
 	}
-	else if (interpolate && (*p == '{' || *p == '}'))
+	否则 もし (interpolate && (*p == '{' || *p == '}'))
 	{
-	    if (*p == '{' && p[1] != '{') // start of expression
+	    もし (*p == '{' && p[1] != '{') // start of expression
 		break;
 	    ++p;
-	    if (p[-1] == '}' && *p != '}') // single '}' is an error
+	    もし (p[-1] == '}' && *p != '}') // single '}' is an error
 	    {
 		semsg(_(e_stray_closing_curly_str), *arg);
-		return FAIL;
+		戻る FAIL;
 	    }
 	    --extra;  // "{{" becomes "{", "}}" becomes "}"
 	}
     }
 
-    if (*p != '"' && !(interpolate && *p == '{'))
+    もし (*p != '"' && !(interpolate && *p == '{'))
     {
 	semsg(_(e_missing_double_quote_str), *arg);
-	return FAIL;
+	戻る FAIL;
     }
 
     // If only parsing, set *arg and return here
-    if (!evaluate)
+    もし (!evaluate)
     {
 	*arg = p + off;
-	return OK;
+	戻る OK;
     }
 
     // Copy the string into allocated memory, handling backslashed
     // characters.
     rettv->v_type = VAR_STRING;
-    len = (int)(p - *arg + extra);
+    len = (整数)(p - *arg + extra);
     rettv->vval.v_string = alloc(len);
-    if (rettv->vval.v_string == NULL)
-	return FAIL;
+    もし (rettv->vval.v_string == NULL)
+	戻る FAIL;
     end = rettv->vval.v_string;
 
-    for (p = *arg + off; *p != NUL && *p != '"'; )
+    ために (p = *arg + off; *p != NUL && *p != '"'; )
     {
-	if (*p == '\\')
+	もし (*p == '\\')
 	{
 	    switch (*++p)
 	    {
@@ -2594,19 +2594,19 @@ eval_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
 		case 'x':
 		case 'u': // Unicode: "\u0023"
 		case 'U':
-			  if (vim_isxdigit(p[1]))
+			  もし (vim_isxdigit(p[1]))
 			  {
-			      int	n, nr;
-			      int	c = SAFE_toupper(*p);
+			      整数	n, nr;
+			      整数	c = SAFE_toupper(*p);
 
-			      if (c == 'X')
+			      もし (c == 'X')
 				  n = 2;
-			      else if (*p == 'u')
+			      否则 もし (*p == 'u')
 				  n = 4;
-			      else
+			      否则
 				  n = 8;
 			      nr = 0;
-			      while (--n >= 0 && vim_isxdigit(p[1]))
+			      ながら (--n >= 0 && vim_isxdigit(p[1]))
 			      {
 				  ++p;
 				  nr = (nr << 4) + hex2nr(*p);
@@ -2614,9 +2614,9 @@ eval_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
 			      ++p;
 			      // For "\u" store the number according to
 			      // 'encoding'.
-			      if (c != 'X')
+			      もし (c != 'X')
 				  end += (*mb_char2bytes)(nr, end);
-			      else
+			      否则
 				  *end++ = nr;
 			  }
 			  break;
@@ -2630,10 +2630,10 @@ eval_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
 		case '5':
 		case '6':
 		case '7': *end = *p++ - '0';
-			  if (*p >= '0' && *p <= '7')
+			  もし (*p >= '0' && *p <= '7')
 			  {
 			      *end = (*end << 3) + *p++ - '0';
-			      if (*p >= '0' && *p <= '7')
+			      もし (*p >= '0' && *p <= '7')
 				  *end = (*end << 3) + *p++ - '0';
 			  }
 			  ++end;
@@ -2642,15 +2642,15 @@ eval_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
 			  // Special key, e.g.: "\<C-W>"
 		case '<':
 			  {
-			      int flags = FSK_KEYCODE | FSK_IN_STRING;
+			      整数 flags = FSK_KEYCODE | FSK_IN_STRING;
 
-			      if (p[1] != '*')
+			      もし (p[1] != '*')
 				  flags |= FSK_SIMPLIFY;
 			      extra = trans_special(&p, end, flags, FALSE, NULL);
-			      if (extra != 0)
+			      もし (extra != 0)
 			      {
 				  end += extra;
-				  if (end >= rettv->vval.v_string + len)
+				  もし (end >= rettv->vval.v_string + len)
 				      iemsg("eval_string() used more space than allocated");
 				  break;
 			      }
@@ -2661,11 +2661,11 @@ eval_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
 			  break;
 	    }
 	}
-	else
+	否则
 	{
-	    if (interpolate && (*p == '{' || *p == '}'))
+	    もし (interpolate && (*p == '{' || *p == '}'))
 	    {
-		if (*p == '{' && p[1] != '{') // start of expression
+		もし (*p == '{' && p[1] != '{') // start of expression
 		    break;
 		++p;  // reduce "{{" to "{" and "}}" to "}"
 	    }
@@ -2673,11 +2673,11 @@ eval_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
 	}
     }
     *end = NUL;
-    if (*p == '"' && !interpolate)
+    もし (*p == '"' && !interpolate)
 	++p;
     *arg = p;
 
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -2686,78 +2686,78 @@ eval_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
  * Return OK when a "rettv" was set to the string.
  * Return FAIL on error, "rettv" is not set.
  */
-    int
-eval_lit_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
+    整数
+eval_lit_string(char_u **arg, typval_T *rettv, 整数 evaluate, 整数 interpolate)
 {
     char_u	*p;
     char_u	*str;
-    int		reduce = interpolate ? -1 : 0;
-    int		off = interpolate ? 0 : 1;
+    整数		reduce = interpolate ? -1 : 0;
+    整数		off = interpolate ? 0 : 1;
 
     // Find the end of the string, skipping ''.
-    for (p = *arg + off; *p != NUL; MB_PTR_ADV(p))
+    ために (p = *arg + off; *p != NUL; MB_PTR_ADV(p))
     {
-	if (*p == '\'')
+	もし (*p == '\'')
 	{
-	    if (p[1] != '\'')
+	    もし (p[1] != '\'')
 		break;
 	    ++reduce;
 	    ++p;
 	}
-	else if (interpolate)
+	否则 もし (interpolate)
 	{
-	    if (*p == '{')
+	    もし (*p == '{')
 	    {
-		if (p[1] != '{')
+		もし (p[1] != '{')
 		    break;
 		++p;
 		++reduce;
 	    }
-	    else if (*p == '}')
+	    否则 もし (*p == '}')
 	    {
 		++p;
-		if (*p != '}')
+		もし (*p != '}')
 		{
 		    semsg(_(e_stray_closing_curly_str), *arg);
-		    return FAIL;
+		    戻る FAIL;
 		}
 		++reduce;
 	    }
 	}
     }
 
-    if (*p != '\'' && !(interpolate && *p == '{'))
+    もし (*p != '\'' && !(interpolate && *p == '{'))
     {
 	semsg(_(e_missing_single_quote_str), *arg);
-	return FAIL;
+	戻る FAIL;
     }
 
     // If only parsing return after setting "*arg"
-    if (!evaluate)
+    もし (!evaluate)
     {
 	*arg = p + off;
-	return OK;
+	戻る OK;
     }
 
     // Copy the string into allocated memory, handling '' to ' reduction and
     // any expressions.
     str = alloc((p - *arg) - reduce);
-    if (str == NULL)
-	return FAIL;
+    もし (str == NULL)
+	戻る FAIL;
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = str;
 
-    for (p = *arg + off; *p != NUL; )
+    ために (p = *arg + off; *p != NUL; )
     {
-	if (*p == '\'')
+	もし (*p == '\'')
 	{
-	    if (p[1] != '\'')
+	    もし (p[1] != '\'')
 		break;
 	    ++p;
 	}
-	else if (interpolate && (*p == '{' || *p == '}'))
+	否则 もし (interpolate && (*p == '{' || *p == '}'))
 	{
-	    if (*p == '{' && p[1] != '{')
+	    もし (*p == '{' && p[1] != '{')
 		break;
 	    ++p;
 	}
@@ -2766,7 +2766,7 @@ eval_lit_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
     *str = NUL;
     *arg = p + off;
 
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -2774,12 +2774,12 @@ eval_lit_string(char_u **arg, typval_T *rettv, int evaluate, int interpolate)
  * "arg" points to the '$'.  The result is put in "rettv".
  * Returns OK or FAIL.
  */
-    int
-eval_interp_string(char_u **arg, typval_T *rettv, int evaluate)
+    整数
+eval_interp_string(char_u **arg, typval_T *rettv, 整数 evaluate)
 {
     typval_T	tv;
-    int		ret = OK;
-    int		quote;
+    整数		ret = OK;
+    整数		quote;
     garray_T	ga;
     char_u	*p;
 
@@ -2790,30 +2790,30 @@ eval_interp_string(char_u **arg, typval_T *rettv, int evaluate)
     quote = **arg;
     ++*arg;
 
-    for (;;)
+    ために (;;)
     {
 	// Get the string up to the matching quote or to a single '{'.
 	// "arg" is advanced to either the quote or the '{'.
-	if (quote == '"')
+	もし (quote == '"')
 	    ret = eval_string(arg, &tv, evaluate, TRUE);
-	else
+	否则
 	    ret = eval_lit_string(arg, &tv, evaluate, TRUE);
-	if (ret == FAIL)
+	もし (ret == FAIL)
 	    break;
-	if (evaluate)
+	もし (evaluate)
 	{
 	    ga_concat(&ga, tv.vval.v_string);
 	    clear_tv(&tv);
 	}
 
-	if (**arg != '{')
+	もし (**arg != '{')
 	{
 	    // found terminating quote
 	    ++*arg;
 	    break;
 	}
 	p = eval_one_expr_in_str(*arg, &ga, evaluate);
-	if (p == NULL)
+	もし (p == NULL)
 	{
 	    ret = FAIL;
 	    break;
@@ -2822,15 +2822,15 @@ eval_interp_string(char_u **arg, typval_T *rettv, int evaluate)
     }
 
     rettv->v_type = VAR_STRING;
-    if (ret == FAIL || !evaluate || ga_append(&ga, NUL) == FAIL)
+    もし (ret == FAIL || !evaluate || ga_append(&ga, NUL) == FAIL)
     {
 	ga_clear(&ga);
 	rettv->vval.v_string = NULL;
-	return ret;
+	戻る ret;
     }
 
     rettv->vval.v_string = ga.ga_data;
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -2845,9 +2845,9 @@ tv2string(
     typval_T	*tv,
     char_u	**tofree,
     char_u	*numbuf,
-    int		copyID)
+    整数		copyID)
 {
-    return echo_string_core(tv, tofree, numbuf, copyID, FALSE, TRUE, FALSE);
+    戻る echo_string_core(tv, tofree, numbuf, copyID, FALSE, TRUE, FALSE);
 }
 
 /*
@@ -2856,40 +2856,40 @@ tv2string(
  * If the environment variable was not set, silently assume it is empty.
  * Return FAIL if the name is invalid.
  */
-    int
-eval_env_var(char_u **arg, typval_T *rettv, int evaluate)
+    整数
+eval_env_var(char_u **arg, typval_T *rettv, 整数 evaluate)
 {
     char_u	*string = NULL;
-    int		len;
-    int		cc;
+    整数		len;
+    整数		cc;
     char_u	*name;
-    int		mustfree = FALSE;
+    整数		mustfree = FALSE;
 
     ++*arg;
     name = *arg;
     len = get_env_len(arg);
-    if (evaluate)
+    もし (evaluate)
     {
-	if (len == 0)
-	    return FAIL; // invalid empty name
+	もし (len == 0)
+	    戻る FAIL; // invalid empty name
 
 	cc = name[len];
 	name[len] = NUL;
 	// first try vim_getenv(), fast for normal environment vars
 	string = vim_getenv(name, &mustfree);
-	if (string != NULL && *string != NUL)
+	もし (string != NULL && *string != NUL)
 	{
-	    if (!mustfree)
+	    もし (!mustfree)
 		string = vim_strsave(string);
 	}
-	else
+	否则
 	{
-	    if (mustfree)
+	    もし (mustfree)
 		vim_free(string);
 
 	    // next try expanding things like $VIM and ${HOME}
 	    string = expand_env_save(name - 1);
-	    if (string != NULL && *string == '$')
+	    もし (string != NULL && *string == '$')
 		VIM_CLEAR(string);
 	}
 	name[len] = cc;
@@ -2899,7 +2899,7 @@ eval_env_var(char_u **arg, typval_T *rettv, int evaluate)
 	rettv->v_lock = 0;
     }
 
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -2911,22 +2911,22 @@ eval_env_var(char_u **arg, typval_T *rettv, int evaluate)
 tv_get_lnum(typval_T *argvars)
 {
     linenr_T	lnum = -1;
-    int		did_emsg_before = did_emsg;
+    整数		did_emsg_before = did_emsg;
 
-    if (argvars[0].v_type != VAR_STRING || !in_vim9script())
+    もし (argvars[0].v_type != VAR_STRING || !in_vim9script())
 	lnum = (linenr_T)tv_get_number_chk(&argvars[0], NULL);
-    if (lnum <= 0 && did_emsg_before == did_emsg
+    もし (lnum <= 0 && did_emsg_before == did_emsg
 					    && argvars[0].v_type != VAR_NUMBER)
     {
-	int	fnum;
+	整数	fnum;
 	pos_T	*fp;
 
 	// no valid number, try using arg like line()
 	fp = var2fpos(&argvars[0], TRUE, &fnum, FALSE);
-	if (fp != NULL)
+	もし (fp != NULL)
 	    lnum = fp->lnum;
     }
-    return lnum;
+    戻る lnum;
 }
 
 /*
@@ -2937,40 +2937,40 @@ tv_get_lnum(typval_T *argvars)
     linenr_T
 tv_get_lnum_buf(typval_T *argvars, buf_T *buf)
 {
-    if (argvars[0].v_type == VAR_STRING
+    もし (argvars[0].v_type == VAR_STRING
 	    && argvars[0].vval.v_string != NULL
 	    && argvars[0].vval.v_string[0] == '$'
 	    && argvars[0].vval.v_string[1] == NUL
 	    && buf != NULL)
-	return buf->b_ml.ml_line_count;
-    return (linenr_T)tv_get_number_chk(&argvars[0], NULL);
+	戻る buf->b_ml.ml_line_count;
+    戻る (linenr_T)tv_get_number_chk(&argvars[0], NULL);
 }
 
 /*
  * Get buffer by number or pattern.
  */
     buf_T *
-tv_get_buf(typval_T *tv, int curtab_only)
+tv_get_buf(typval_T *tv, 整数 curtab_only)
 {
     char_u	*name = tv->vval.v_string;
     buf_T	*buf;
 
-    if (tv->v_type == VAR_NUMBER)
-	return buflist_findnr((int)tv->vval.v_number);
-    if (tv->v_type != VAR_STRING)
-	return NULL;
-    if (name == NULL || *name == NUL)
-	return curbuf;
-    if (name[0] == '$' && name[1] == NUL)
-	return lastbuf;
+    もし (tv->v_type == VAR_NUMBER)
+	戻る buflist_findnr((整数)tv->vval.v_number);
+    もし (tv->v_type != VAR_STRING)
+	戻る NULL;
+    もし (name == NULL || *name == NUL)
+	戻る curbuf;
+    もし (name[0] == '$' && name[1] == NUL)
+	戻る lastbuf;
 
     buf = buflist_find_by_name(name, curtab_only);
 
     // If not found, try expanding the name, like done for bufexists().
-    if (buf == NULL)
+    もし (buf == NULL)
 	buf = find_buffer(tv);
 
-    return buf;
+    戻る buf;
 }
 
 /*
@@ -2984,30 +2984,30 @@ tv_get_buf_from_arg(typval_T *tv)
     ++emsg_off;
     buf = tv_get_buf(tv, FALSE);
     --emsg_off;
-    if (buf == NULL
+    もし (buf == NULL
 	    && tv->v_type != VAR_NUMBER
 	    && tv->v_type != VAR_STRING)
 	// issue errmsg for type error
 	(void)tv_get_number(tv);
-    return buf;
+    戻る buf;
 }
 
 /*
  * Check that repeating "slen" items "n" times, does not
  * overflow the int used for the resulting length.
  */
-    int
+    整数
 check_repeat_count(varnumber_T slen, varnumber_T n)
 {
     // Use a division so that the multiplication cannot overflow.
-    if (n <= (varnumber_T)INT_MAX / slen)
-	return OK;
+    もし (n <= (varnumber_T)INT_MAX / slen)
+	戻る OK;
 
     char	buf[NUMBUFLEN];
 
     vim_snprintf(buf, sizeof(buf), "%lld", (long long)n);
     semsg(_(e_val_too_large), buf);
-    return FAIL;
+    戻る FAIL;
 }
 
 #endif // FEAT_EVAL

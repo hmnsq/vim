@@ -37,13 +37,13 @@
  * A few linux systems define outfuntype in termcap.h to be used as the third
  * argument for tputs().
  */
-# if defined(VMS) || defined(AMIGA)
-#  define TPUTSFUNCAST (void (*)(unsigned int))
-# else
+# もし defined(VMS) || defined(AMIGA)
+#  define TPUTSFUNCAST (void (*)(unsigned 整数))
+# 否则
 #  ifdef HAVE_OUTFUNTYPE
 #   define TPUTSFUNCAST (outfuntype)
-#  else
-#   define TPUTSFUNCAST (int (*)(int))
+#  否则
+#   define TPUTSFUNCAST (整数 (*)(整数))
 #  endif
 # endif
 #endif
@@ -58,16 +58,16 @@ static void gather_termleader(void);
 #ifdef FEAT_TERMRESPONSE
 static void req_codes_from_term(void);
 static void req_more_codes_from_term(void);
-static void got_code_from_term(char_u *code, int len);
+static void got_code_from_term(char_u *code, 整数 len);
 static void check_for_codes_from_term(void);
 #endif
-static void del_termcode_idx(int idx);
-static int find_term_bykeys(char_u *src, int *len);
-static int term_is_builtin(char_u *name);
-static int term_7to8bit(char_u *p);
+static void del_termcode_idx(整数 idx);
+static 整数 find_term_bykeys(char_u *src, 整数 *len);
+static 整数 term_is_builtin(char_u *name);
+static 整数 term_7to8bit(char_u *p);
 static void accept_modifiers_for_function_keys(void);
 
-#if 0  // Change to 1 to enable ch_log() calls for termresponse debugging.
+#もし 0  // Change to 1 to enable ch_log() calls for termresponse debugging.
 # define DEBUG_TERMRESPONSE
 # define LOG_TR1(str) \
 		ch_log(NULL, "TermResp: %s " str, \
@@ -77,9 +77,9 @@ static void accept_modifiers_for_function_keys(void);
 		ch_log(NULL, "TermResp: %s " fmt, \
 			must_redraw == UPD_NOT_VALID ? "NV" \
 			: must_redraw == UPD_CLEAR ? "CL" : "  ", __VA_ARGS__)
-#else
-# define LOG_TR1(str) do { /**/ } while (0)
-# define LOG_TRN(fmt,...) do { /**/ } while (0)
+#否则
+# define LOG_TR1(str) do { /**/ } ながら (0)
+# define LOG_TRN(fmt,...) do { /**/ } ながら (0)
 #endif
 
 #ifdef HAVE_TGETENT
@@ -107,7 +107,7 @@ typedef struct {
 // Holds state for current OSC response.
 typedef struct
 {
-    int		    processing;	// If we are in the middle of an OSC response
+    整数		    processing;	// If we are in the middle of an OSC response
     char_u	    start_char;	// First char in the OSC response
     garray_T	    buf;	// Buffer holding the OSC response, to be
 				// placed in the "v:termosc" vim var.
@@ -134,15 +134,15 @@ static termrequest_T xcc_status = TERMREQUEST_INIT;
 # ifdef FEAT_TERMINAL
 // Request foreground color report:
 static termrequest_T rfg_status = TERMREQUEST_INIT;
-static int fg_r = 0;
-static int fg_g = 0;
-static int fg_b = 0;
+static 整数 fg_r = 0;
+static 整数 fg_g = 0;
+static 整数 fg_b = 0;
 # endif
 // Background color values from the OSC 11 response, also used by the
 // image backend to flatten RGBA alpha onto the actual terminal background.
-static int bg_r = 255;
-static int bg_g = 255;
-static int bg_b = 255;
+static 整数 bg_r = 255;
+static 整数 bg_g = 255;
+static 整数 bg_b = 255;
 
 // Request background color report:
 static termrequest_T rbg_status = TERMREQUEST_INIT;
@@ -180,7 +180,7 @@ static termrequest_T *all_termrequests[] = {
 // FALSE -> don't output t_8u yet
 // MAYBE -> tried outputting t_8u while FALSE
 // OK    -> can write t_8u
-int write_t_8u_state = FALSE;
+整数 write_t_8u_state = FALSE;
 #endif
 
 #ifdef HAVE_TGETENT
@@ -194,14 +194,14 @@ int write_t_8u_state = FALSE;
 # ifndef HAVE_OSPEED
 #  ifdef OSPEED_EXTERN
 extern short ospeed;
-#  else
+#  否则
 short ospeed;
 #  endif
 # endif
 # ifndef HAVE_UP_BC_PC
 #  ifdef UP_BC_PC_EXTERN
 extern char *UP, *BC, PC;
-#  else
+#  否则
 char *UP, *BC, PC;
 #  endif
 # endif
@@ -211,23 +211,23 @@ char *UP, *BC, PC;
 static char_u *vim_tgetstr(char *s, char_u **pp);
 #endif // HAVE_TGETENT
 
-static int  detected_8bit = FALSE;	// detected 8-bit terminal
+static 整数  detected_8bit = FALSE;	// detected 8-bit terminal
 
-#if (defined(UNIX) || defined(VMS))
-static int focus_state = MAYBE; // TRUE if the Vim window has focus
+#もし (defined(UNIX) || defined(VMS))
+static 整数 focus_state = MAYBE; // TRUE if the Vim window has focus
 #endif
 
 #ifdef FEAT_TERMRESPONSE
 // When the cursor shape was detected these values are used:
 // 1: block, 2: underline, 3: vertical bar
-static int initial_cursor_shape = 0;
+static 整数 initial_cursor_shape = 0;
 
 // The blink flag from the style response may be inverted from the actual
 // blinking state, xterm XORs the flags.
-static int initial_cursor_shape_blink = FALSE;
+static 整数 initial_cursor_shape_blink = FALSE;
 
 // The blink flag from the blinking-cursor mode response
-static int initial_cursor_blink = FALSE;
+static 整数 initial_cursor_blink = FALSE;
 #endif
 
 // 0	Mode is not recognized	not supported
@@ -242,16 +242,16 @@ static int initial_cursor_blink = FALSE;
 //
 // 4	Permanently reset	not supported
 //
-static int sync_output_setting = 0;
+static 整数 sync_output_setting = 0;
 
 // > 0: Currently batching output
 // == 0: No synchronized output
-static int sync_output_state = 0;
+static 整数 sync_output_state = 0;
 
 #ifdef UNIX
 // DEC mode 2048 (in-band window resize events)
 // https://gist.github.com/rockorager/e695fb2924d36b2bcf1fff4a3704bd83
-static int win_resize_setting = 0;
+static 整数 win_resize_setting = 0;
 static bool win_resize_enabled = false;
 #endif
 
@@ -271,7 +271,7 @@ static bool win_resize_enabled = false;
  */
 typedef struct
 {
-    int		bt_entry;   // either a KS_xxx code (>= 0), or a K_xxx code.
+    整数		bt_entry;   // either a KS_xxx code (>= 0), or a K_xxx code.
     char	*bt_string; // value
 } tcap_entry_T;
 
@@ -279,37 +279,37 @@ typedef struct
  * Standard ANSI terminal, default for Unix.
  */
 static tcap_entry_T builtin_ansi[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_AL,	"\033[L"},
+    {(整数)KS_CE,	"\033[K"},
+    {(整数)KS_AL,	"\033[L"},
 #ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
+    {(整数)KS_CAL,	"\033[%p1%dL"},
+#否则
+    {(整数)KS_CAL,	"\033[%dL"},
 #endif
-    {(int)KS_DL,	"\033[M"},
+    {(整数)KS_DL,	"\033[M"},
 #ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
+    {(整数)KS_CDL,	"\033[%p1%dM"},
+#否则
+    {(整数)KS_CDL,	"\033[%dM"},
 #endif
-    {(int)KS_CL,	"\033[H\033[2J"},
-    {(int)KS_ME,	"\033[0m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},		// guessed
-    {(int)KS_LE,	"\b"},
+    {(整数)KS_CL,	"\033[H\033[2J"},
+    {(整数)KS_ME,	"\033[0m"},
+    {(整数)KS_MR,	"\033[7m"},
+    {(整数)KS_MS,	"y"},
+    {(整数)KS_UT,	"y"},		// guessed
+    {(整数)KS_LE,	"\b"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(整数)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#否则
+    {(整数)KS_CM,	"\033[%i%d;%dH"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
+    {(整数)KS_CRI,	"\033[%p1%dC"},
+#否则
+    {(整数)KS_CRI,	"\033[%dC"},
 #endif
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 
 /*
@@ -319,47 +319,47 @@ static tcap_entry_T builtin_ansi[] = {
  *      - keyboard languages (CSI ? 26 n)
  */
 static tcap_entry_T builtin_vt320[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_AL,	"\033[L"},
+    {(整数)KS_CE,	"\033[K"},
+    {(整数)KS_AL,	"\033[L"},
 #ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
+    {(整数)KS_CAL,	"\033[%p1%dL"},
+#否则
+    {(整数)KS_CAL,	"\033[%dL"},
 #endif
-    {(int)KS_DL,	"\033[M"},
+    {(整数)KS_DL,	"\033[M"},
 #ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
+    {(整数)KS_CDL,	"\033[%p1%dM"},
+#否则
+    {(整数)KS_CDL,	"\033[%dM"},
 #endif
-    {(int)KS_CL,	"\033[H\033[2J"},
-    {(int)KS_CD,	"\033[J"},
-    {(int)KS_CCO,	"8"},			// allow 8 colors
-    {(int)KS_ME,	"\033[0m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MD,	"\033[1m"},  // bold mode
-    {(int)KS_SE,	"\033[22m"},// normal mode
-    {(int)KS_UE,	"\033[24m"},// exit underscore mode
-    {(int)KS_US,	"\033[4m"},  // underscore mode
-    {(int)KS_CZH,	"\033[34;43m"},  // italic mode: blue text on yellow
-    {(int)KS_CZR,	"\033[0m"},	    // italic mode end
-    {(int)KS_CAB,	"\033[4%dm"},	    // set background color (ANSI)
-    {(int)KS_CAF,	"\033[3%dm"},	    // set foreground color (ANSI)
-    {(int)KS_CSB,	"\033[102;%dm"},	// set screen background color
-    {(int)KS_CSF,	"\033[101;%dm"},	// set screen foreground color
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},
-    {(int)KS_XN,	"y"},
-    {(int)KS_LE,	"\b"},
+    {(整数)KS_CL,	"\033[H\033[2J"},
+    {(整数)KS_CD,	"\033[J"},
+    {(整数)KS_CCO,	"8"},			// allow 8 colors
+    {(整数)KS_ME,	"\033[0m"},
+    {(整数)KS_MR,	"\033[7m"},
+    {(整数)KS_MD,	"\033[1m"},  // bold mode
+    {(整数)KS_SE,	"\033[22m"},// normal mode
+    {(整数)KS_UE,	"\033[24m"},// exit underscore mode
+    {(整数)KS_US,	"\033[4m"},  // underscore mode
+    {(整数)KS_CZH,	"\033[34;43m"},  // italic mode: blue text on yellow
+    {(整数)KS_CZR,	"\033[0m"},	    // italic mode end
+    {(整数)KS_CAB,	"\033[4%dm"},	    // set background color (ANSI)
+    {(整数)KS_CAF,	"\033[3%dm"},	    // set foreground color (ANSI)
+    {(整数)KS_CSB,	"\033[102;%dm"},	// set screen background color
+    {(整数)KS_CSF,	"\033[101;%dm"},	// set screen foreground color
+    {(整数)KS_MS,	"y"},
+    {(整数)KS_UT,	"y"},
+    {(整数)KS_XN,	"y"},
+    {(整数)KS_LE,	"\b"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(整数)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#否则
+    {(整数)KS_CM,	"\033[%i%d;%dH"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
+    {(整数)KS_CRI,	"\033[%p1%dC"},
+#否则
+    {(整数)KS_CRI,	"\033[%dC"},
 #endif
     {K_UP,		"\033[A"},
     {K_DOWN,		"\033[B"},
@@ -412,24 +412,24 @@ static tcap_entry_T builtin_vt320[] = {
     {K_K9,		"\033Oy"},	// keypad 9
     {K_BS,		"\x7f"},	// for some reason 0177 doesn't work
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 
 /*
  * Ordinary vt52
  */
 static tcap_entry_T builtin_vt52[] = {
-    {(int)KS_CE,	"\033K"},
-    {(int)KS_CD,	"\033J"},
+    {(整数)KS_CE,	"\033K"},
+    {(整数)KS_CD,	"\033J"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033Y%p1%' '%+%c%p2%' '%+%c"},
-#else
-    {(int)KS_CM,	"\033Y%+ %+ "},
+    {(整数)KS_CM,	"\033Y%p1%' '%+%c%p2%' '%+%c"},
+#否则
+    {(整数)KS_CM,	"\033Y%+ %+ "},
 #endif
-    {(int)KS_LE,	"\b"},
-    {(int)KS_SR,	"\033I"},
-    {(int)KS_AL,	"\033L"},
-    {(int)KS_DL,	"\033M"},
+    {(整数)KS_LE,	"\b"},
+    {(整数)KS_SR,	"\033I"},
+    {(整数)KS_AL,	"\033L"},
+    {(整数)KS_DL,	"\033M"},
     {K_UP,		"\033A"},
     {K_DOWN,		"\033B"},
     {K_LEFT,		"\033D"},
@@ -437,109 +437,109 @@ static tcap_entry_T builtin_vt52[] = {
     {K_F1,		"\033P"},
     {K_F2,		"\033Q"},
     {K_F3,		"\033R"},
-    {(int)KS_CL,	"\033H\033J"},
-    {(int)KS_MS,	"y"},
+    {(整数)KS_CL,	"\033H\033J"},
+    {(整数)KS_MS,	"y"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 
 /*
  * Builtin xterm with Vim-specific entries.
  */
 static tcap_entry_T builtin_xterm[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_AL,	"\033[L"},
+    {(整数)KS_CE,	"\033[K"},
+    {(整数)KS_AL,	"\033[L"},
 #ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
+    {(整数)KS_CAL,	"\033[%p1%dL"},
+#否则
+    {(整数)KS_CAL,	"\033[%dL"},
 #endif
-    {(int)KS_DL,	"\033[M"},
+    {(整数)KS_DL,	"\033[M"},
 #ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
+    {(整数)KS_CDL,	"\033[%p1%dM"},
+#否则
+    {(整数)KS_CDL,	"\033[%dM"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CS,	"\033[%i%p1%d;%p2%dr"},
-#else
-    {(int)KS_CS,	"\033[%i%d;%dr"},
+    {(整数)KS_CS,	"\033[%i%p1%d;%p2%dr"},
+#否则
+    {(整数)KS_CS,	"\033[%i%d;%dr"},
 #endif
-    {(int)KS_CL,	"\033[H\033[2J"},
-    {(int)KS_CD,	"\033[J"},
-    {(int)KS_ME,	"\033[m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MD,	"\033[1m"},
-    {(int)KS_UE,	"\033[m"},
-    {(int)KS_US,	"\033[4m"},
-    {(int)KS_STE,	"\033[29m"},
-    {(int)KS_STS,	"\033[9m"},
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},
-    {(int)KS_LE,	"\b"},
-    {(int)KS_VI,	"\033[?25l"},
-    {(int)KS_VE,	"\033[?25h"},
-    {(int)KS_VS,	"\033[?12h"},
-    {(int)KS_CVS,	"\033[?12l"},
+    {(整数)KS_CL,	"\033[H\033[2J"},
+    {(整数)KS_CD,	"\033[J"},
+    {(整数)KS_ME,	"\033[m"},
+    {(整数)KS_MR,	"\033[7m"},
+    {(整数)KS_MD,	"\033[1m"},
+    {(整数)KS_UE,	"\033[m"},
+    {(整数)KS_US,	"\033[4m"},
+    {(整数)KS_STE,	"\033[29m"},
+    {(整数)KS_STS,	"\033[9m"},
+    {(整数)KS_MS,	"y"},
+    {(整数)KS_UT,	"y"},
+    {(整数)KS_LE,	"\b"},
+    {(整数)KS_VI,	"\033[?25l"},
+    {(整数)KS_VE,	"\033[?25h"},
+    {(整数)KS_VS,	"\033[?12h"},
+    {(整数)KS_CVS,	"\033[?12l"},
 #ifdef TERMINFO
-    {(int)KS_CSH,	"\033[%p1%d q"},
-#else
-    {(int)KS_CSH,	"\033[%d q"},
+    {(整数)KS_CSH,	"\033[%p1%d q"},
+#否则
+    {(整数)KS_CSH,	"\033[%d q"},
 #endif
-    {(int)KS_CRC,	"\033[?12$p"},
-    {(int)KS_CRS,	"\033P$q q\033\\"},
+    {(整数)KS_CRC,	"\033[?12$p"},
+    {(整数)KS_CRS,	"\033P$q q\033\\"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(整数)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#否则
+    {(整数)KS_CM,	"\033[%i%d;%dH"},
 #endif
-    {(int)KS_SR,	"\033M"},
+    {(整数)KS_SR,	"\033M"},
 #ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
+    {(整数)KS_CRI,	"\033[%p1%dC"},
+#否则
+    {(整数)KS_CRI,	"\033[%dC"},
 #endif
-    {(int)KS_KS,	"\033[?1h\033="},
-    {(int)KS_KE,	"\033[?1l\033>"},
+    {(整数)KS_KS,	"\033[?1h\033="},
+    {(整数)KS_KE,	"\033[?1l\033>"},
 #ifdef FEAT_XTERM_SAVE
-    {(int)KS_TI,	"\0337\033[?47h"},
-    {(int)KS_TE,	"\033[?47l\0338"},
+    {(整数)KS_TI,	"\0337\033[?47h"},
+    {(整数)KS_TE,	"\033[?47l\0338"},
 #endif
     // These are now under control of the 'keyprotocol' option, see
     // "builtin_mok2".
     // {(int)KS_CTI,	"\033[>4;2m"},
     // {(int)KS_CRK,	"\033[?4m"},
     // {(int)KS_CTE,	"\033[>4;m"},
-    {(int)KS_CIS,	"\033]1;"},
-    {(int)KS_CIE,	"\007"},
-    {(int)KS_TS,	"\033]2;"},
-    {(int)KS_FS,	"\007"},
-    {(int)KS_CSC,	"\033]12;"},
-    {(int)KS_CEC,	"\007"},
+    {(整数)KS_CIS,	"\033]1;"},
+    {(整数)KS_CIE,	"\007"},
+    {(整数)KS_TS,	"\033]2;"},
+    {(整数)KS_FS,	"\007"},
+    {(整数)KS_CSC,	"\033]12;"},
+    {(整数)KS_CEC,	"\007"},
 #ifdef TERMINFO
-    {(int)KS_CWS,	"\033[8;%p1%d;%p2%dt"},
-    {(int)KS_CWP,	"\033[3;%p1%d;%p2%dt"},
-    {(int)KS_CGP,	"\033[13t"},
-#else
-    {(int)KS_CWS,	"\033[8;%d;%dt"},
-    {(int)KS_CWP,	"\033[3;%d;%dt"},
-    {(int)KS_CGP,	"\033[13t"},
+    {(整数)KS_CWS,	"\033[8;%p1%d;%p2%dt"},
+    {(整数)KS_CWP,	"\033[3;%p1%d;%p2%dt"},
+    {(整数)KS_CGP,	"\033[13t"},
+#否则
+    {(整数)KS_CWS,	"\033[8;%d;%dt"},
+    {(整数)KS_CWP,	"\033[3;%d;%dt"},
+    {(整数)KS_CGP,	"\033[13t"},
 #endif
-    {(int)KS_CRV,	"\033[>c"},
-    {(int)KS_CXM,	"\033[?1006;1000%?%p1%{1}%=%th%el%;"},
-    {(int)KS_RFG,	"\033]10;?\007"},
-    {(int)KS_RBG,	"\033]11;?\007"},
-    {(int)KS_U7,	"\033[6n"},
-    {(int)KS_CAU,	"\033[58;5;%dm"},
-    {(int)KS_CBE,	"\033[?2004h"},
-    {(int)KS_CBD,	"\033[?2004l"},
-    {(int)KS_CST,	"\033[22;2t"},
-    {(int)KS_CRT,	"\033[23;2t"},
-    {(int)KS_SSI,	"\033[22;1t"},
-    {(int)KS_SRI,	"\033[23;1t"},
-#if (defined(UNIX) || defined(VMS))
-    {(int)KS_FD,	"\033[?1004l"},
-    {(int)KS_FE,	"\033[?1004h"},
+    {(整数)KS_CRV,	"\033[>c"},
+    {(整数)KS_CXM,	"\033[?1006;1000%?%p1%{1}%=%th%el%;"},
+    {(整数)KS_RFG,	"\033]10;?\007"},
+    {(整数)KS_RBG,	"\033]11;?\007"},
+    {(整数)KS_U7,	"\033[6n"},
+    {(整数)KS_CAU,	"\033[58;5;%dm"},
+    {(整数)KS_CBE,	"\033[?2004h"},
+    {(整数)KS_CBD,	"\033[?2004l"},
+    {(整数)KS_CST,	"\033[22;2t"},
+    {(整数)KS_CRT,	"\033[23;2t"},
+    {(整数)KS_SSI,	"\033[22;1t"},
+    {(整数)KS_SRI,	"\033[23;1t"},
+#もし (defined(UNIX) || defined(VMS))
+    {(整数)KS_FD,	"\033[?1004l"},
+    {(整数)KS_FE,	"\033[?1004h"},
 #endif
 
     {K_UP,		"\033O*A"},
@@ -636,7 +636,7 @@ static tcap_entry_T builtin_xterm[] = {
     {TERMCAP2KEY('F', 'Q'), "\033[57;*~"}, // F36
     {TERMCAP2KEY('F', 'R'), "\033[58;*~"}, // F37
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 
 /*
@@ -645,17 +645,17 @@ static tcap_entry_T builtin_xterm[] = {
  */
 static tcap_entry_T builtin_mok2[] = {
     // t_TI enables modifyOtherKeys level 2
-    {(int)KS_CTI,	"\033[>4;2m"},
+    {(整数)KS_CTI,	"\033[>4;2m"},
 
     // XTQMODKEYS was added in xterm version 377: "CSI ? 4 m" which should
     // return "{lead} > 4 ; Pv m".  Before version 377 we expect it to have no
     // effect.
-    {(int)KS_CRK,	"\033[?4m"},
+    {(整数)KS_CRK,	"\033[?4m"},
 
     // t_TE disables modifyOtherKeys
-    {(int)KS_CTE,	"\033[>4;m"},
+    {(整数)KS_CTE,	"\033[>4;m"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 
 /*
@@ -663,22 +663,22 @@ static tcap_entry_T builtin_mok2[] = {
  */
 static tcap_entry_T builtin_kitty[] = {
     // t_TI enables the kitty keyboard protocol.
-    {(int)KS_CTI,	"\033[=1;1u"},
+    {(整数)KS_CTI,	"\033[=1;1u"},
 
     // t_RK requests the kitty keyboard protocol state
-    {(int)KS_CRK,	"\033[?u"},
+    {(整数)KS_CRK,	"\033[?u"},
 
     // t_TE also disables modifyOtherKeys, because t_TI from xterm may already
     // have been used.
-    {(int)KS_CTE,	"\033[>4;m\033[=0;1u"},
+    {(整数)KS_CTE,	"\033[>4;m\033[=0;1u"},
 
     // t_RF request terminal foreground color
-    {(int)KS_RFG,	"\033]10;?\033\\"},
+    {(整数)KS_RFG,	"\033]10;?\033\\"},
 
     // t_RB request terminal background color
-    {(int)KS_RBG,	"\033]11;?\033\\"},
+    {(整数)KS_RBG,	"\033]11;?\033\\"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 
 #ifdef HAVE_TGETENT
@@ -686,9 +686,9 @@ static tcap_entry_T builtin_kitty[] = {
  * Additions for enabling/disabling synchronized output mode for terminal.
  */
 static tcap_entry_T builtin_sync_output[] = {
-    {(int)KS_BSU,	"\033[?2026h"},
-    {(int)KS_ESU,	"\033[?2026l"},
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_BSU,	"\033[?2026h"},
+    {(整数)KS_ESU,	"\033[?2026l"},
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 #endif
 
@@ -696,7 +696,7 @@ static tcap_entry_T builtin_sync_output[] = {
 /*
  * List of DECRQM modes that Vim supports
  */
-static const int dec_modes[] = {
+static const 整数 dec_modes[] = {
     2026,   // Synchronized output
 # ifdef UNIX
     2048    // In-band terminal resize events
@@ -710,19 +710,19 @@ static const int dec_modes[] = {
  */
 static tcap_entry_T builtin_rgb[] = {
     // These are printf strings, not terminal codes.
-    {(int)KS_8F,	"\033[38;2;%lu;%lu;%lum"},
-    {(int)KS_8B,	"\033[48;2;%lu;%lu;%lum"},
-    {(int)KS_8U,	"\033[58;2;%lu;%lu;%lum"},
+    {(整数)KS_8F,	"\033[38;2;%lu;%lu;%lum"},
+    {(整数)KS_8B,	"\033[48;2;%lu;%lu;%lum"},
+    {(整数)KS_8U,	"\033[58;2;%lu;%lu;%lum"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 #endif
 
 #ifdef HAVE_TGETENT
 static tcap_entry_T special_term[] = {
     // These are printf strings, not terminal codes.
-    {(int)KS_CF,	"\033[%dm"},
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_CF,	"\033[%dm"},
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 #endif
 
@@ -730,77 +730,77 @@ static tcap_entry_T special_term[] = {
  * iris-ansi for Silicon Graphics machines.
  */
 static tcap_entry_T builtin_iris_ansi[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_CD,	"\033[J"},
-    {(int)KS_AL,	"\033[L"},
+    {(整数)KS_CE,	"\033[K"},
+    {(整数)KS_CD,	"\033[J"},
+    {(整数)KS_AL,	"\033[L"},
 #ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
+    {(整数)KS_CAL,	"\033[%p1%dL"},
+#否则
+    {(整数)KS_CAL,	"\033[%dL"},
 #endif
-    {(int)KS_DL,	"\033[M"},
+    {(整数)KS_DL,	"\033[M"},
 #ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
+    {(整数)KS_CDL,	"\033[%p1%dM"},
+#否则
+    {(整数)KS_CDL,	"\033[%dM"},
 #endif
-#if 0	// The scroll region is not working as Vim expects.
+#もし 0	// The scroll region is not working as Vim expects.
 # ifdef TERMINFO
-    {(int)KS_CS,	"\033[%i%p1%d;%p2%dr"},
-# else
-    {(int)KS_CS,	"\033[%i%d;%dr"},
+    {(整数)KS_CS,	"\033[%i%p1%d;%p2%dr"},
+# 否则
+    {(整数)KS_CS,	"\033[%i%d;%dr"},
 # endif
 #endif
-    {(int)KS_CL,	"\033[H\033[2J"},
-    {(int)KS_VE,	"\033[9/y\033[12/y"},	// These aren't documented
-    {(int)KS_VS,	"\033[10/y\033[=1h\033[=2l"}, // These aren't documented
-    {(int)KS_TI,	"\033[=6h"},
-    {(int)KS_TE,	"\033[=6l"},
-    {(int)KS_SE,	"\033[21;27m"},
-    {(int)KS_SO,	"\033[1;7m"},
-    {(int)KS_ME,	"\033[m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MD,	"\033[1m"},
-    {(int)KS_CCO,	"8"},			// allow 8 colors
-    {(int)KS_CZH,	"\033[3m"},		// italic mode on
-    {(int)KS_CZR,	"\033[23m"},		// italic mode off
-    {(int)KS_US,	"\033[4m"},		// underline on
-    {(int)KS_UE,	"\033[24m"},		// underline off
+    {(整数)KS_CL,	"\033[H\033[2J"},
+    {(整数)KS_VE,	"\033[9/y\033[12/y"},	// These aren't documented
+    {(整数)KS_VS,	"\033[10/y\033[=1h\033[=2l"}, // These aren't documented
+    {(整数)KS_TI,	"\033[=6h"},
+    {(整数)KS_TE,	"\033[=6l"},
+    {(整数)KS_SE,	"\033[21;27m"},
+    {(整数)KS_SO,	"\033[1;7m"},
+    {(整数)KS_ME,	"\033[m"},
+    {(整数)KS_MR,	"\033[7m"},
+    {(整数)KS_MD,	"\033[1m"},
+    {(整数)KS_CCO,	"8"},			// allow 8 colors
+    {(整数)KS_CZH,	"\033[3m"},		// italic mode on
+    {(整数)KS_CZR,	"\033[23m"},		// italic mode off
+    {(整数)KS_US,	"\033[4m"},		// underline on
+    {(整数)KS_UE,	"\033[24m"},		// underline off
 #ifdef TERMINFO
-    {(int)KS_CAB,	"\033[4%p1%dm"},    // set background color (ANSI)
-    {(int)KS_CAF,	"\033[3%p1%dm"},    // set foreground color (ANSI)
-    {(int)KS_CSB,	"\033[102;%p1%dm"}, // set screen background color
-    {(int)KS_CSF,	"\033[101;%p1%dm"}, // set screen foreground color
-#else
-    {(int)KS_CAB,	"\033[4%dm"},	    // set background color (ANSI)
-    {(int)KS_CAF,	"\033[3%dm"},	    // set foreground color (ANSI)
-    {(int)KS_CSB,	"\033[102;%dm"},    // set screen background color
-    {(int)KS_CSF,	"\033[101;%dm"},    // set screen foreground color
+    {(整数)KS_CAB,	"\033[4%p1%dm"},    // set background color (ANSI)
+    {(整数)KS_CAF,	"\033[3%p1%dm"},    // set foreground color (ANSI)
+    {(整数)KS_CSB,	"\033[102;%p1%dm"}, // set screen background color
+    {(整数)KS_CSF,	"\033[101;%p1%dm"}, // set screen foreground color
+#否则
+    {(整数)KS_CAB,	"\033[4%dm"},	    // set background color (ANSI)
+    {(整数)KS_CAF,	"\033[3%dm"},	    // set foreground color (ANSI)
+    {(整数)KS_CSB,	"\033[102;%dm"},    // set screen background color
+    {(整数)KS_CSF,	"\033[101;%dm"},    // set screen foreground color
 #endif
-    {(int)KS_MS,	"y"},		// guessed
-    {(int)KS_UT,	"y"},		// guessed
-    {(int)KS_LE,	"\b"},
+    {(整数)KS_MS,	"y"},		// guessed
+    {(整数)KS_UT,	"y"},		// guessed
+    {(整数)KS_LE,	"\b"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(整数)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#否则
+    {(整数)KS_CM,	"\033[%i%d;%dH"},
 #endif
-    {(int)KS_SR,	"\033M"},
+    {(整数)KS_SR,	"\033M"},
 #ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
+    {(整数)KS_CRI,	"\033[%p1%dC"},
+#否则
+    {(整数)KS_CRI,	"\033[%dC"},
 #endif
-    {(int)KS_CIS,	"\033P3.y"},
-    {(int)KS_CIE,	"\234"},    // ST "String Terminator"
-    {(int)KS_TS,	"\033P1.y"},
-    {(int)KS_FS,	"\234"},    // ST "String Terminator"
+    {(整数)KS_CIS,	"\033P3.y"},
+    {(整数)KS_CIE,	"\234"},    // ST "String Terminator"
+    {(整数)KS_TS,	"\033P1.y"},
+    {(整数)KS_FS,	"\234"},    // ST "String Terminator"
 #ifdef TERMINFO
-    {(int)KS_CWS,	"\033[203;%p1%d;%p2%d/y"},
-    {(int)KS_CWP,	"\033[205;%p1%d;%p2%d/y"},
-#else
-    {(int)KS_CWS,	"\033[203;%d;%d/y"},
-    {(int)KS_CWP,	"\033[205;%d;%d/y"},
+    {(整数)KS_CWS,	"\033[203;%p1%d;%p2%d/y"},
+    {(整数)KS_CWP,	"\033[205;%p1%d;%p2%d/y"},
+#否则
+    {(整数)KS_CWS,	"\033[203;%d;%d/y"},
+    {(整数)KS_CWP,	"\033[205;%d;%d/y"},
 #endif
     {K_UP,		"\033[A"},
     {K_DOWN,		"\033[B"},
@@ -840,7 +840,7 @@ static tcap_entry_T builtin_iris_ansi[] = {
     {K_PAGEUP,		"\033[150q"},
     {K_PAGEDOWN,	"\033[154q"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 
 /*
@@ -850,40 +850,40 @@ static tcap_entry_T builtin_iris_ansi[] = {
  * CTRL-arrow is used instead of SHIFT-arrow.
  */
 static tcap_entry_T builtin_pcansi[] = {
-    {(int)KS_DL,	"\033[M"},
-    {(int)KS_AL,	"\033[L"},
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_CL,	"\033[2J"},
-    {(int)KS_ME,	"\033[0m"},
-    {(int)KS_MR,	"\033[5m"},	// reverse: black on lightgrey
-    {(int)KS_MD,	"\033[1m"},	// bold: white text
-    {(int)KS_SE,	"\033[0m"},	// standout end
-    {(int)KS_SO,	"\033[31m"},	// standout: white on blue
-    {(int)KS_CZH,	"\033[34;43m"},	// italic mode: blue text on yellow
-    {(int)KS_CZR,	"\033[0m"},	// italic mode end
-    {(int)KS_US,	"\033[36;41m"},	// underscore mode: cyan text on red
-    {(int)KS_UE,	"\033[0m"},	// underscore mode end
-    {(int)KS_CCO,	"8"},		// allow 8 colors
+    {(整数)KS_DL,	"\033[M"},
+    {(整数)KS_AL,	"\033[L"},
+    {(整数)KS_CE,	"\033[K"},
+    {(整数)KS_CL,	"\033[2J"},
+    {(整数)KS_ME,	"\033[0m"},
+    {(整数)KS_MR,	"\033[5m"},	// reverse: black on lightgrey
+    {(整数)KS_MD,	"\033[1m"},	// bold: white text
+    {(整数)KS_SE,	"\033[0m"},	// standout end
+    {(整数)KS_SO,	"\033[31m"},	// standout: white on blue
+    {(整数)KS_CZH,	"\033[34;43m"},	// italic mode: blue text on yellow
+    {(整数)KS_CZR,	"\033[0m"},	// italic mode end
+    {(整数)KS_US,	"\033[36;41m"},	// underscore mode: cyan text on red
+    {(整数)KS_UE,	"\033[0m"},	// underscore mode end
+    {(整数)KS_CCO,	"8"},		// allow 8 colors
 #ifdef TERMINFO
-    {(int)KS_CAB,	"\033[4%p1%dm"},// set background color
-    {(int)KS_CAF,	"\033[3%p1%dm"},// set foreground color
-#else
-    {(int)KS_CAB,	"\033[4%dm"},	// set background color
-    {(int)KS_CAF,	"\033[3%dm"},	// set foreground color
+    {(整数)KS_CAB,	"\033[4%p1%dm"},// set background color
+    {(整数)KS_CAF,	"\033[3%p1%dm"},// set foreground color
+#否则
+    {(整数)KS_CAB,	"\033[4%dm"},	// set background color
+    {(整数)KS_CAF,	"\033[3%dm"},	// set foreground color
 #endif
-    {(int)KS_OP,	"\033[0m"},	// reset colors
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},		// guessed
-    {(int)KS_LE,	"\b"},
+    {(整数)KS_OP,	"\033[0m"},	// reset colors
+    {(整数)KS_MS,	"y"},
+    {(整数)KS_UT,	"y"},		// guessed
+    {(整数)KS_LE,	"\b"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(整数)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#否则
+    {(整数)KS_CM,	"\033[%i%d;%dH"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
+    {(整数)KS_CRI,	"\033[%p1%dC"},
+#否则
+    {(整数)KS_CRI,	"\033[%dC"},
 #endif
     {K_UP,		"\316H"},
     {K_DOWN,		"\316P"},
@@ -922,7 +922,7 @@ static tcap_entry_T builtin_pcansi[] = {
     {K_PAGEDOWN,	"\316Q"},
     {K_PAGEUP,		"\316I"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 
 /*
@@ -931,65 +931,65 @@ static tcap_entry_T builtin_pcansi[] = {
  * are also translated in os_win32.c.
  */
 static tcap_entry_T builtin_win32[] = {
-    {(int)KS_CE,	"\033|K"},	// clear to end of line
-    {(int)KS_AL,	"\033|L"},	// add new blank line
+    {(整数)KS_CE,	"\033|K"},	// clear to end of line
+    {(整数)KS_AL,	"\033|L"},	// add new blank line
 #ifdef TERMINFO
-    {(int)KS_CAL,	"\033|%p1%dL"},	// add number of new blank lines
-#else
-    {(int)KS_CAL,	"\033|%dL"},	// add number of new blank lines
+    {(整数)KS_CAL,	"\033|%p1%dL"},	// add number of new blank lines
+#否则
+    {(整数)KS_CAL,	"\033|%dL"},	// add number of new blank lines
 #endif
-    {(int)KS_DL,	"\033|M"},	// delete line
+    {(整数)KS_DL,	"\033|M"},	// delete line
 #ifdef TERMINFO
-    {(int)KS_CDL,	"\033|%p1%dM"},	// delete number of lines
-    {(int)KS_CSV,	"\033|%p1%d;%p2%dV"},
-#else
-    {(int)KS_CDL,	"\033|%dM"},	// delete number of lines
-    {(int)KS_CSV,	"\033|%d;%dV"},
+    {(整数)KS_CDL,	"\033|%p1%dM"},	// delete number of lines
+    {(整数)KS_CSV,	"\033|%p1%d;%p2%dV"},
+#否则
+    {(整数)KS_CDL,	"\033|%dM"},	// delete number of lines
+    {(整数)KS_CSV,	"\033|%d;%dV"},
 #endif
-    {(int)KS_CL,	"\033|J"},	// clear screen
-    {(int)KS_CD,	"\033|j"},	// clear to end of display
-    {(int)KS_VI,	"\033|v"},	// cursor invisible
-    {(int)KS_VE,	"\033|V"},	// cursor visible
+    {(整数)KS_CL,	"\033|J"},	// clear screen
+    {(整数)KS_CD,	"\033|j"},	// clear to end of display
+    {(整数)KS_VI,	"\033|v"},	// cursor invisible
+    {(整数)KS_VE,	"\033|V"},	// cursor visible
 
-    {(int)KS_ME,	"\033|0m"},	// normal
-    {(int)KS_MR,	"\033|112m"},	// reverse: black on lightgray
-    {(int)KS_MD,	"\033|15m"},	// bold: white on black
-#if 1
-    {(int)KS_SO,	"\033|31m"},	// standout: white on blue
-    {(int)KS_SE,	"\033|0m"},	// standout end
-#else
-    {(int)KS_SO,	"\033|F"},	// standout: high intensity
-    {(int)KS_SE,	"\033|f"},	// standout end
+    {(整数)KS_ME,	"\033|0m"},	// normal
+    {(整数)KS_MR,	"\033|112m"},	// reverse: black on lightgray
+    {(整数)KS_MD,	"\033|15m"},	// bold: white on black
+#もし 1
+    {(整数)KS_SO,	"\033|31m"},	// standout: white on blue
+    {(整数)KS_SE,	"\033|0m"},	// standout end
+#否则
+    {(整数)KS_SO,	"\033|F"},	// standout: high intensity
+    {(整数)KS_SE,	"\033|f"},	// standout end
 #endif
-    {(int)KS_CZH,	"\033|225m"},	// italic: blue text on yellow
-    {(int)KS_CZR,	"\033|0m"},	// italic end
-    {(int)KS_US,	"\033|67m"},	// underscore: cyan text on red
-    {(int)KS_UE,	"\033|0m"},	// underscore end
-    {(int)KS_CCO,	"16"},		// allow 16 colors
+    {(整数)KS_CZH,	"\033|225m"},	// italic: blue text on yellow
+    {(整数)KS_CZR,	"\033|0m"},	// italic end
+    {(整数)KS_US,	"\033|67m"},	// underscore: cyan text on red
+    {(整数)KS_UE,	"\033|0m"},	// underscore end
+    {(整数)KS_CCO,	"16"},		// allow 16 colors
 #ifdef TERMINFO
-    {(int)KS_CAB,	"\033|%p1%db"},	// set background color
-    {(int)KS_CAF,	"\033|%p1%df"},	// set foreground color
-#else
-    {(int)KS_CAB,	"\033|%db"},	// set background color
-    {(int)KS_CAF,	"\033|%df"},	// set foreground color
+    {(整数)KS_CAB,	"\033|%p1%db"},	// set background color
+    {(整数)KS_CAF,	"\033|%p1%df"},	// set foreground color
+#否则
+    {(整数)KS_CAB,	"\033|%db"},	// set background color
+    {(整数)KS_CAF,	"\033|%df"},	// set foreground color
 #endif
 
-    {(int)KS_MS,	"y"},		// save to move cur in reverse mode
-    {(int)KS_UT,	"y"},
-    {(int)KS_XN,	"y"},
-    {(int)KS_LE,	"\b"},
+    {(整数)KS_MS,	"y"},		// save to move cur in reverse mode
+    {(整数)KS_UT,	"y"},
+    {(整数)KS_XN,	"y"},
+    {(整数)KS_LE,	"\b"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033|%i%p1%d;%p2%dH"}, // cursor motion
-#else
-    {(int)KS_CM,	"\033|%i%d;%dH"}, // cursor motion
+    {(整数)KS_CM,	"\033|%i%p1%d;%p2%dH"}, // cursor motion
+#否则
+    {(整数)KS_CM,	"\033|%i%d;%dH"}, // cursor motion
 #endif
-    {(int)KS_VB,	"\033|B"},	// visual bell
-    {(int)KS_TI,	"\033|S"},	// put terminal in termcap mode
-    {(int)KS_TE,	"\033|E"},	// out of termcap mode
+    {(整数)KS_VB,	"\033|B"},	// visual bell
+    {(整数)KS_TI,	"\033|S"},	// put terminal in termcap mode
+    {(整数)KS_TE,	"\033|E"},	// out of termcap mode
 #ifdef TERMINFO
-    {(int)KS_CS,	"\033|%i%p1%d;%p2%dr"}, // scroll region
-#else
-    {(int)KS_CS,	"\033|%i%d;%dr"}, // scroll region
+    {(整数)KS_CS,	"\033|%i%p1%d;%p2%dr"}, // scroll region
+#否则
+    {(整数)KS_CS,	"\033|%i%d;%dr"}, // scroll region
 #endif
 
     {K_UP,		"\316H"},
@@ -1053,61 +1053,61 @@ static tcap_entry_T builtin_win32[] = {
     {K_BS,		"\316x"},
     {K_S_BS,		"\316y"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 
-#if defined(FEAT_GUI)
+#もし defined(FEAT_GUI)
 /*
  * GUI uses made-up codes, only used inside Vim.
  */
 static tcap_entry_T builtin_gui[] = {
-    {(int)KS_CE,	"\033|$"},
-    {(int)KS_AL,	"\033|i"},
+    {(整数)KS_CE,	"\033|$"},
+    {(整数)KS_AL,	"\033|i"},
 # ifdef TERMINFO
-    {(int)KS_CAL,	"\033|%p1%dI"},
-# else
-    {(int)KS_CAL,	"\033|%dI"},
+    {(整数)KS_CAL,	"\033|%p1%dI"},
+# 否则
+    {(整数)KS_CAL,	"\033|%dI"},
 # endif
-    {(int)KS_DL,	"\033|d"},
+    {(整数)KS_DL,	"\033|d"},
 # ifdef TERMINFO
-    {(int)KS_CDL,	"\033|%p1%dD"},
-    {(int)KS_CS,	"\033|%p1%d;%p2%dR"},
-    {(int)KS_CSV,	"\033|%p1%d;%p2%dV"},
-# else
-    {(int)KS_CDL,	"\033|%dD"},
-    {(int)KS_CS,	"\033|%d;%dR"},
-    {(int)KS_CSV,	"\033|%d;%dV"},
+    {(整数)KS_CDL,	"\033|%p1%dD"},
+    {(整数)KS_CS,	"\033|%p1%d;%p2%dR"},
+    {(整数)KS_CSV,	"\033|%p1%d;%p2%dV"},
+# 否则
+    {(整数)KS_CDL,	"\033|%dD"},
+    {(整数)KS_CS,	"\033|%d;%dR"},
+    {(整数)KS_CSV,	"\033|%d;%dV"},
 # endif
-    {(int)KS_CL,	"\033|C"},
+    {(整数)KS_CL,	"\033|C"},
 			// attributes switched on with 'h', off with * 'H'
-    {(int)KS_ME,	"\033|31H"}, // HL_ALL
-    {(int)KS_MR,	"\033|1h"},   // HL_INVERSE
-    {(int)KS_MD,	"\033|2h"},   // HL_BOLD
-    {(int)KS_SE,	"\033|16H"}, // HL_STANDOUT
-    {(int)KS_SO,	"\033|16h"}, // HL_STANDOUT
-    {(int)KS_UE,	"\033|8H"},   // HL_UNDERLINE
-    {(int)KS_US,	"\033|8h"},   // HL_UNDERLINE
-    {(int)KS_UCE,	"\033|8C"},   // HL_UNDERCURL
-    {(int)KS_UCS,	"\033|8c"},   // HL_UNDERCURL
-    {(int)KS_STE,	"\033|4C"},   // HL_STRIKETHROUGH
-    {(int)KS_STS,	"\033|4c"},   // HL_STRIKETHROUGH
-    {(int)KS_CZR,	"\033|4H"},   // HL_ITALIC
-    {(int)KS_CZH,	"\033|4h"},   // HL_ITALIC
-    {(int)KS_VB,	"\033|f"},
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},
-    {(int)KS_XN,	"y"},
-    {(int)KS_LE,	"\b"},		// cursor-left = BS
-    {(int)KS_ND,	"\014"},	// cursor-right = CTRL-L
+    {(整数)KS_ME,	"\033|31H"}, // HL_ALL
+    {(整数)KS_MR,	"\033|1h"},   // HL_INVERSE
+    {(整数)KS_MD,	"\033|2h"},   // HL_BOLD
+    {(整数)KS_SE,	"\033|16H"}, // HL_STANDOUT
+    {(整数)KS_SO,	"\033|16h"}, // HL_STANDOUT
+    {(整数)KS_UE,	"\033|8H"},   // HL_UNDERLINE
+    {(整数)KS_US,	"\033|8h"},   // HL_UNDERLINE
+    {(整数)KS_UCE,	"\033|8C"},   // HL_UNDERCURL
+    {(整数)KS_UCS,	"\033|8c"},   // HL_UNDERCURL
+    {(整数)KS_STE,	"\033|4C"},   // HL_STRIKETHROUGH
+    {(整数)KS_STS,	"\033|4c"},   // HL_STRIKETHROUGH
+    {(整数)KS_CZR,	"\033|4H"},   // HL_ITALIC
+    {(整数)KS_CZH,	"\033|4h"},   // HL_ITALIC
+    {(整数)KS_VB,	"\033|f"},
+    {(整数)KS_MS,	"y"},
+    {(整数)KS_UT,	"y"},
+    {(整数)KS_XN,	"y"},
+    {(整数)KS_LE,	"\b"},		// cursor-left = BS
+    {(整数)KS_ND,	"\014"},	// cursor-right = CTRL-L
 # ifdef TERMINFO
-    {(int)KS_CM,	"\033|%p1%d;%p2%dM"},
-# else
-    {(int)KS_CM,	"\033|%d;%dM"},
+    {(整数)KS_CM,	"\033|%p1%d;%p2%dM"},
+# 否则
+    {(整数)KS_CM,	"\033|%d;%dM"},
 # endif
 	// there are no key sequences here, the GUI sequences are recognized
 	// in check_termcode()
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 #endif
 
@@ -1115,58 +1115,58 @@ static tcap_entry_T builtin_gui[] = {
  * Amiga console window, default for Amiga.
  */
 static tcap_entry_T builtin_amiga[] = {
-    {(int)KS_CE,	"\033[K"},
-    {(int)KS_CD,	"\033[J"},
-    {(int)KS_AL,	"\033[L"},
+    {(整数)KS_CE,	"\033[K"},
+    {(整数)KS_CD,	"\033[J"},
+    {(整数)KS_AL,	"\033[L"},
 #ifdef TERMINFO
-    {(int)KS_CAL,	"\033[%p1%dL"},
-#else
-    {(int)KS_CAL,	"\033[%dL"},
+    {(整数)KS_CAL,	"\033[%p1%dL"},
+#否则
+    {(整数)KS_CAL,	"\033[%dL"},
 #endif
-    {(int)KS_DL,	"\033[M"},
+    {(整数)KS_DL,	"\033[M"},
 #ifdef TERMINFO
-    {(int)KS_CDL,	"\033[%p1%dM"},
-#else
-    {(int)KS_CDL,	"\033[%dM"},
+    {(整数)KS_CDL,	"\033[%p1%dM"},
+#否则
+    {(整数)KS_CDL,	"\033[%dM"},
 #endif
-    {(int)KS_CL,	"\014"},
-    {(int)KS_VI,	"\033[0 p"},
-    {(int)KS_VE,	"\033[1 p"},
-    {(int)KS_ME,	"\033[0m"},
-    {(int)KS_MR,	"\033[7m"},
-    {(int)KS_MD,	"\033[1m"},
-    {(int)KS_SE,	"\033[0m"},
-    {(int)KS_SO,	"\033[33m"},
-    {(int)KS_US,	"\033[4m"},
-    {(int)KS_UE,	"\033[0m"},
-    {(int)KS_CZH,	"\033[3m"},
-    {(int)KS_CZR,	"\033[0m"},
-#if defined(__amigaos4__) || defined(__MORPHOS__) || defined(__AROS__)
-    {(int)KS_CCO,	"8"},		// allow 8 colors
+    {(整数)KS_CL,	"\014"},
+    {(整数)KS_VI,	"\033[0 p"},
+    {(整数)KS_VE,	"\033[1 p"},
+    {(整数)KS_ME,	"\033[0m"},
+    {(整数)KS_MR,	"\033[7m"},
+    {(整数)KS_MD,	"\033[1m"},
+    {(整数)KS_SE,	"\033[0m"},
+    {(整数)KS_SO,	"\033[33m"},
+    {(整数)KS_US,	"\033[4m"},
+    {(整数)KS_UE,	"\033[0m"},
+    {(整数)KS_CZH,	"\033[3m"},
+    {(整数)KS_CZR,	"\033[0m"},
+#もし defined(__amigaos4__) || defined(__MORPHOS__) || defined(__AROS__)
+    {(整数)KS_CCO,	"8"},		// allow 8 colors
 # ifdef TERMINFO
-    {(int)KS_CAB,	"\033[4%p1%dm"},// set background color
-    {(int)KS_CAF,	"\033[3%p1%dm"},// set foreground color
-# else
-    {(int)KS_CAB,	"\033[4%dm"},	// set background color
-    {(int)KS_CAF,	"\033[3%dm"},	// set foreground color
+    {(整数)KS_CAB,	"\033[4%p1%dm"},// set background color
+    {(整数)KS_CAF,	"\033[3%p1%dm"},// set foreground color
+# 否则
+    {(整数)KS_CAB,	"\033[4%dm"},	// set background color
+    {(整数)KS_CAF,	"\033[3%dm"},	// set foreground color
 # endif
-    {(int)KS_OP,	"\033[m"},	// reset colors
+    {(整数)KS_OP,	"\033[m"},	// reset colors
 #endif
-    {(int)KS_MS,	"y"},
-    {(int)KS_UT,	"y"},		// guessed
-    {(int)KS_LE,	"\b"},
+    {(整数)KS_MS,	"y"},
+    {(整数)KS_UT,	"y"},		// guessed
+    {(整数)KS_LE,	"\b"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(整数)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#否则
+    {(整数)KS_CM,	"\033[%i%d;%dH"},
 #endif
-#if defined(__MORPHOS__)
-    {(int)KS_SR,	"\033M"},
+#もし defined(__MORPHOS__)
+    {(整数)KS_SR,	"\033M"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CRI,	"\033[%p1%dC"},
-#else
-    {(int)KS_CRI,	"\033[%dC"},
+    {(整数)KS_CRI,	"\033[%p1%dC"},
+#否则
+    {(整数)KS_CRI,	"\033[%dC"},
 #endif
     {K_UP,		"\233A"},
     {K_DOWN,		"\233B"},
@@ -1209,122 +1209,122 @@ static tcap_entry_T builtin_amiga[] = {
     {TERMCAP2KEY('#', '3'), "\233\065\060~"},	// shifted insert key
     {TERMCAP2KEY('*', '7'), "\233\065\065~"},	// shifted end key
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 
 /*
  * The most minimal terminal: only clear screen and cursor positioning.
  */
 static tcap_entry_T builtin_dumb[] = {
-    {(int)KS_CL,	"\014"},
+    {(整数)KS_CL,	"\014"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"\033[%i%p1%d;%p2%dH"},
-#else
-    {(int)KS_CM,	"\033[%i%d;%dH"},
+    {(整数)KS_CM,	"\033[%i%p1%d;%p2%dH"},
+#否则
+    {(整数)KS_CM,	"\033[%i%d;%dH"},
 #endif
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 
 /*
  * Terminal used for debugging.
  */
 static tcap_entry_T builtin_debug[] = {
-    {(int)KS_CE,	"[CE]"},
-    {(int)KS_CD,	"[CD]"},
-    {(int)KS_AL,	"[AL]"},
+    {(整数)KS_CE,	"[CE]"},
+    {(整数)KS_CD,	"[CD]"},
+    {(整数)KS_AL,	"[AL]"},
 #ifdef TERMINFO
-    {(int)KS_CAL,	"[CAL%p1%d]"},
-#else
-    {(int)KS_CAL,	"[CAL%d]"},
+    {(整数)KS_CAL,	"[CAL%p1%d]"},
+#否则
+    {(整数)KS_CAL,	"[CAL%d]"},
 #endif
-    {(int)KS_DL,	"[DL]"},
+    {(整数)KS_DL,	"[DL]"},
 #ifdef TERMINFO
-    {(int)KS_CDL,	"[CDL%p1%d]"},
-#else
-    {(int)KS_CDL,	"[CDL%d]"},
-#endif
-#ifdef TERMINFO
-    {(int)KS_CS,	"[%p1%dCS%p2%d]"},
-#else
-    {(int)KS_CS,	"[%dCS%d]"},
+    {(整数)KS_CDL,	"[CDL%p1%d]"},
+#否则
+    {(整数)KS_CDL,	"[CDL%d]"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CSV,	"[%p1%dCSV%p2%d]"},
-#else
-    {(int)KS_CSV,	"[%dCSV%d]"},
+    {(整数)KS_CS,	"[%p1%dCS%p2%d]"},
+#否则
+    {(整数)KS_CS,	"[%dCS%d]"},
 #endif
 #ifdef TERMINFO
-    {(int)KS_CAB,	"[CAB%p1%d]"},
-    {(int)KS_CAF,	"[CAF%p1%d]"},
-    {(int)KS_CSB,	"[CSB%p1%d]"},
-    {(int)KS_CSF,	"[CSF%p1%d]"},
-#else
-    {(int)KS_CAB,	"[CAB%d]"},
-    {(int)KS_CAF,	"[CAF%d]"},
-    {(int)KS_CSB,	"[CSB%d]"},
-    {(int)KS_CSF,	"[CSF%d]"},
+    {(整数)KS_CSV,	"[%p1%dCSV%p2%d]"},
+#否则
+    {(整数)KS_CSV,	"[%dCSV%d]"},
 #endif
-    {(int)KS_CAU,	"[CAU%d]"},
-    {(int)KS_OP,	"[OP]"},
-    {(int)KS_LE,	"[LE]"},
-    {(int)KS_CL,	"[CL]"},
-    {(int)KS_VI,	"[VI]"},
-    {(int)KS_VE,	"[VE]"},
-    {(int)KS_VS,	"[VS]"},
-    {(int)KS_ME,	"[ME]"},
-    {(int)KS_MR,	"[MR]"},
-    {(int)KS_MB,	"[MB]"},
-    {(int)KS_MD,	"[MD]"},
-    {(int)KS_SE,	"[SE]"},
-    {(int)KS_SO,	"[SO]"},
-    {(int)KS_UE,	"[UE]"},
-    {(int)KS_US,	"[US]"},
-    {(int)KS_UCE,	"[UCE]"},
-    {(int)KS_UCS,	"[UCS]"},
-    {(int)KS_USS,	"[USS]"},
-    {(int)KS_DS,	"[DS]"},
-    {(int)KS_CDS,	"[CDS]"},
-    {(int)KS_STE,	"[STE]"},
-    {(int)KS_STS,	"[STS]"},
-    {(int)KS_MS,	"[MS]"},
-    {(int)KS_UT,	"[UT]"},
-    {(int)KS_XN,	"[XN]"},
 #ifdef TERMINFO
-    {(int)KS_CM,	"[%p1%dCM%p2%d]"},
-#else
-    {(int)KS_CM,	"[%dCM%d]"},
+    {(整数)KS_CAB,	"[CAB%p1%d]"},
+    {(整数)KS_CAF,	"[CAF%p1%d]"},
+    {(整数)KS_CSB,	"[CSB%p1%d]"},
+    {(整数)KS_CSF,	"[CSF%p1%d]"},
+#否则
+    {(整数)KS_CAB,	"[CAB%d]"},
+    {(整数)KS_CAF,	"[CAF%d]"},
+    {(整数)KS_CSB,	"[CSB%d]"},
+    {(整数)KS_CSF,	"[CSF%d]"},
 #endif
-    {(int)KS_SR,	"[SR]"},
+    {(整数)KS_CAU,	"[CAU%d]"},
+    {(整数)KS_OP,	"[OP]"},
+    {(整数)KS_LE,	"[LE]"},
+    {(整数)KS_CL,	"[CL]"},
+    {(整数)KS_VI,	"[VI]"},
+    {(整数)KS_VE,	"[VE]"},
+    {(整数)KS_VS,	"[VS]"},
+    {(整数)KS_ME,	"[ME]"},
+    {(整数)KS_MR,	"[MR]"},
+    {(整数)KS_MB,	"[MB]"},
+    {(整数)KS_MD,	"[MD]"},
+    {(整数)KS_SE,	"[SE]"},
+    {(整数)KS_SO,	"[SO]"},
+    {(整数)KS_UE,	"[UE]"},
+    {(整数)KS_US,	"[US]"},
+    {(整数)KS_UCE,	"[UCE]"},
+    {(整数)KS_UCS,	"[UCS]"},
+    {(整数)KS_USS,	"[USS]"},
+    {(整数)KS_DS,	"[DS]"},
+    {(整数)KS_CDS,	"[CDS]"},
+    {(整数)KS_STE,	"[STE]"},
+    {(整数)KS_STS,	"[STS]"},
+    {(整数)KS_MS,	"[MS]"},
+    {(整数)KS_UT,	"[UT]"},
+    {(整数)KS_XN,	"[XN]"},
 #ifdef TERMINFO
-    {(int)KS_CRI,	"[CRI%p1%d]"},
-#else
-    {(int)KS_CRI,	"[CRI%d]"},
+    {(整数)KS_CM,	"[%p1%dCM%p2%d]"},
+#否则
+    {(整数)KS_CM,	"[%dCM%d]"},
 #endif
-    {(int)KS_VB,	"[VB]"},
-    {(int)KS_KS,	"[KS]"},
-    {(int)KS_KE,	"[KE]"},
-    {(int)KS_TI,	"[TI]"},
-    {(int)KS_TE,	"[TE]"},
-    {(int)KS_CIS,	"[CIS]"},
-    {(int)KS_CIE,	"[CIE]"},
-    {(int)KS_CSC,	"[CSC]"},
-    {(int)KS_CEC,	"[CEC]"},
-    {(int)KS_TS,	"[TS]"},
-    {(int)KS_FS,	"[FS]"},
+    {(整数)KS_SR,	"[SR]"},
 #ifdef TERMINFO
-    {(int)KS_CWS,	"[%p1%dCWS%p2%d]"},
-    {(int)KS_CWP,	"[%p1%dCWP%p2%d]"},
-#else
-    {(int)KS_CWS,	"[%dCWS%d]"},
-    {(int)KS_CWP,	"[%dCWP%d]"},
+    {(整数)KS_CRI,	"[CRI%p1%d]"},
+#否则
+    {(整数)KS_CRI,	"[CRI%d]"},
 #endif
-    {(int)KS_CRV,	"[CRV]"},
-    {(int)KS_CXM,	"[CXM]"},
-    {(int)KS_U7,	"[U7]"},
-    {(int)KS_RFG,	"[RFG]"},
-    {(int)KS_RBG,	"[RBG]"},
-    {(int)KS_CF,	"[CF%d]"},
+    {(整数)KS_VB,	"[VB]"},
+    {(整数)KS_KS,	"[KS]"},
+    {(整数)KS_KE,	"[KE]"},
+    {(整数)KS_TI,	"[TI]"},
+    {(整数)KS_TE,	"[TE]"},
+    {(整数)KS_CIS,	"[CIS]"},
+    {(整数)KS_CIE,	"[CIE]"},
+    {(整数)KS_CSC,	"[CSC]"},
+    {(整数)KS_CEC,	"[CEC]"},
+    {(整数)KS_TS,	"[TS]"},
+    {(整数)KS_FS,	"[FS]"},
+#ifdef TERMINFO
+    {(整数)KS_CWS,	"[%p1%dCWS%p2%d]"},
+    {(整数)KS_CWP,	"[%p1%dCWP%p2%d]"},
+#否则
+    {(整数)KS_CWS,	"[%dCWS%d]"},
+    {(整数)KS_CWP,	"[%dCWP%d]"},
+#endif
+    {(整数)KS_CRV,	"[CRV]"},
+    {(整数)KS_CXM,	"[CXM]"},
+    {(整数)KS_U7,	"[U7]"},
+    {(整数)KS_RFG,	"[RFG]"},
+    {(整数)KS_RBG,	"[RBG]"},
+    {(整数)KS_CF,	"[CF%d]"},
     {K_UP,		"[KU]"},
     {K_DOWN,		"[KD]"},
     {K_LEFT,		"[KL]"},
@@ -1414,7 +1414,7 @@ static tcap_entry_T builtin_debug[] = {
     {K_K8,		"[K8]"},
     {K_K9,		"[K9]"},
 
-    {(int)KS_NAME,	NULL}  // end marker
+    {(整数)KS_NAME,	NULL}  // end marker
 };
 
 /*
@@ -1438,7 +1438,7 @@ builtin_tcap_T builtin_terminals[] = {
     {"win32",	    builtin_win32},
 
     // Other systems
-#if defined(FEAT_GUI)
+#もし defined(FEAT_GUI)
     {"gui",	    builtin_gui},
 #endif
     {"amiga",	    builtin_amiga},
@@ -1448,11 +1448,11 @@ builtin_tcap_T builtin_terminals[] = {
     {NULL,	    NULL},  // end marker
 };
 
-#if defined(FEAT_TERMGUICOLORS)
+#もし defined(FEAT_TERMGUICOLORS)
     static guicolor_T
 termgui_mch_get_color(char_u *name)
 {
-    return gui_get_color_cmn(name);
+    戻る gui_get_color_cmn(name);
 }
 
     guicolor_T
@@ -1460,19 +1460,19 @@ termgui_get_color(char_u *name)
 {
     guicolor_T	t;
 
-    if (*name == NUL)
-	return INVALCOLOR;
+    もし (*name == NUL)
+	戻る INVALCOLOR;
     t = termgui_mch_get_color(name);
 
-    if (t == INVALCOLOR)
+    もし (t == INVALCOLOR)
 	semsg(_(e_cannot_allocate_color_str), name);
-    return t;
+    戻る t;
 }
 
     guicolor_T
 termgui_mch_get_rgb(guicolor_T color)
 {
-    return color;
+    戻る color;
 }
 #endif
 
@@ -1487,7 +1487,7 @@ termgui_mch_get_rgb(guicolor_T color)
 # define DEFAULT_TERM	(char_u *)"win32"
 #endif
 
-#if defined(UNIX)
+#もし defined(UNIX)
 # define DEFAULT_TERM	(char_u *)"ansi"
 #endif
 
@@ -1509,12 +1509,12 @@ termgui_mch_get_rgb(guicolor_T color)
  * It is initialized with the default values by parse_builtin_tcap().
  * The values can be changed by setting the option with the same name.
  */
-char_u *(term_strings[(int)KS_LAST + 1]);
+char_u *(term_strings[(整数)KS_LAST + 1]);
 
-static int	need_gather = FALSE;	    // need to fill termleader[]
+static 整数	need_gather = FALSE;	    // need to fill termleader[]
 static char_u	termleader[256 + 1];	    // for check_termcode()
 #ifdef FEAT_TERMRESPONSE
-static int	check_for_codes = FALSE;    // check for key code response
+static 整数	check_for_codes = FALSE;    // check for key code response
 #endif
 
 /*
@@ -1525,8 +1525,8 @@ static int	check_for_codes = FALSE;    // check for key code response
  */
 typedef struct {
     char    *tpr_name;
-    int	    tpr_set_by_termresponse;
-    int	    tpr_status;
+    整数	    tpr_set_by_termresponse;
+    整数	    tpr_status;
 } termprop_T;
 
 // Values for tpr_status.
@@ -1573,9 +1573,9 @@ set_rgb_term_prop(void)
  * response.
  */
     void
-init_term_props(int all)
+init_term_props(整数 all)
 {
-    int i;
+    整数 i;
 
     term_props[TPR_CURSOR_STYLE].tpr_name = "cursor_style";
     term_props[TPR_CURSOR_STYLE].tpr_set_by_termresponse = FALSE;
@@ -1592,26 +1592,26 @@ init_term_props(int all)
     term_props[TPR_RGB].tpr_name = "rgb";
     term_props[TPR_RGB].tpr_set_by_termresponse = FALSE;
 
-    for (i = 0; i < TPR_COUNT; ++i)
-	if (all || term_props[i].tpr_set_by_termresponse)
+    ために (i = 0; i < TPR_COUNT; ++i)
+	もし (all || term_props[i].tpr_set_by_termresponse)
 	    term_props[i].tpr_status = TPR_UNKNOWN;
 
     // Derived from the color count, not reset.
     set_rgb_term_prop();
 }
 
-#if defined(FEAT_EVAL)
+#もし defined(FEAT_EVAL)
     void
 f_terminalprops(typval_T *argvars UNUSED, typval_T *rettv)
 {
 # ifdef FEAT_TERMRESPONSE
-    int i;
+    整数 i;
 # endif
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    もし (rettv_dict_alloc(rettv) == FAIL)
+	戻る;
 # ifdef FEAT_TERMRESPONSE
-    for (i = 0; i < TPR_COUNT; ++i)
+    ために (i = 0; i < TPR_COUNT; ++i)
     {
 	char_u	value[2];
 
@@ -1633,58 +1633,58 @@ f_terminalprops(typval_T *argvars UNUSED, typval_T *rettv)
     static tcap_entry_T *
 find_builtin_term(char_u *term)
 {
-    for (int i = 0; ; ++i)
+    ために (整数 i = 0; ; ++i)
     {
 	char_u *name = (char_u *)builtin_terminals[i].bitc_name;
-	if (name == NULL)  // end marker
+	もし (name == NULL)  // end marker
 	    break;
 #ifdef UNIX
-	if (STRCMP(name, "iris-ansi") == 0 && vim_is_iris(term))
-	    return builtin_terminals[i].bitc_table;
-	if (STRCMP(name, "xterm") == 0 && vim_is_xterm(term))
-	    return builtin_terminals[i].bitc_table;
+	もし (STRCMP(name, "iris-ansi") == 0 && vim_is_iris(term))
+	    戻る builtin_terminals[i].bitc_table;
+	もし (STRCMP(name, "xterm") == 0 && vim_is_xterm(term))
+	    戻る builtin_terminals[i].bitc_table;
 #endif
 #ifdef VMS
-	if (STRCMP(name, "vt320") == 0 && vim_is_vt300(term))
-	    return builtin_terminals[i].bitc_table;
+	もし (STRCMP(name, "vt320") == 0 && vim_is_vt300(term))
+	    戻る builtin_terminals[i].bitc_table;
 #endif
-	if (STRCMP(term, name) == 0)
-	    return builtin_terminals[i].bitc_table;
+	もし (STRCMP(term, name) == 0)
+	    戻る builtin_terminals[i].bitc_table;
     }
-    return NULL;
+    戻る NULL;
 }
 
 /*
  * Apply entries from a builtin termcap.
  */
     static void
-apply_builtin_tcap(char_u *term, tcap_entry_T *entries, int overwrite)
+apply_builtin_tcap(char_u *term, tcap_entry_T *entries, 整数 overwrite)
 {
-    int term_8bit = term_is_8bit(term);
+    整数 term_8bit = term_is_8bit(term);
 
-    for (tcap_entry_T *p = entries;
-	      p->bt_entry != (int)KS_NAME && p->bt_entry != BT_EXTRA_KEYS; ++p)
+    ために (tcap_entry_T *p = entries;
+	      p->bt_entry != (整数)KS_NAME && p->bt_entry != BT_EXTRA_KEYS; ++p)
     {
-	if ((int)p->bt_entry >= 0)	// KS_xx entry
+	もし ((整数)p->bt_entry >= 0)	// KS_xx entry
 	{
 	    // Only set the value if it wasn't set yet or "overwrite" is TRUE.
-	    if (term_strings[p->bt_entry] == NULL
+	    もし (term_strings[p->bt_entry] == NULL
 		    || term_strings[p->bt_entry] == empty_option
 		    || overwrite)
 	    {
 #ifdef FEAT_EVAL
-		int opt_idx = -1;
+		整数 opt_idx = -1;
 #endif
 		// 8bit terminal: use CSI instead of <Esc>[
-		if (term_8bit && term_7to8bit((char_u *)p->bt_string) != 0)
+		もし (term_8bit && term_7to8bit((char_u *)p->bt_string) != 0)
 		{
 		    char_u  *s, *t;
 
 		    s = vim_strsave((char_u *)p->bt_string);
-		    if (s != NULL)
+		    もし (s != NULL)
 		    {
-			for (t = s; *t; ++t)
-			    if (term_7to8bit(t))
+			ために (t = s; *t; ++t)
+			    もし (term_7to8bit(t))
 			    {
 				*t = term_7to8bit(t);
 				STRMOVE(t + 1, t + 2);
@@ -1697,7 +1697,7 @@ apply_builtin_tcap(char_u *term, tcap_entry_T *entries, int overwrite)
 						   &term_strings[p->bt_entry]);
 		    }
 		}
-		else
+		否则
 		{
 		    term_strings[p->bt_entry] = (char_u *)p->bt_string;
 #ifdef FEAT_EVAL
@@ -1709,12 +1709,12 @@ apply_builtin_tcap(char_u *term, tcap_entry_T *entries, int overwrite)
 #endif
 	    }
 	}
-	else
+	否则
 	{
 	    char_u  name[2];
-	    name[0] = KEY2TERMCAP0((int)p->bt_entry);
-	    name[1] = KEY2TERMCAP1((int)p->bt_entry);
-	    if (find_termcode(name) == NULL || overwrite)
+	    name[0] = KEY2TERMCAP0((整数)p->bt_entry);
+	    name[1] = KEY2TERMCAP1((整数)p->bt_entry);
+	    もし (find_termcode(name) == NULL || overwrite)
 		add_termcode(name, (char_u *)p->bt_string, term_8bit);
 	}
     }
@@ -1726,12 +1726,12 @@ apply_builtin_tcap(char_u *term, tcap_entry_T *entries, int overwrite)
     void
 apply_keyprotocol(char_u *term, keyprot_T prot)
 {
-    if (prot == KEYPROTOCOL_KITTY)
+    もし (prot == KEYPROTOCOL_KITTY)
 	apply_builtin_tcap(term, builtin_kitty, TRUE);
-    if (prot == KEYPROTOCOL_MOK2)
+    もし (prot == KEYPROTOCOL_MOK2)
 	apply_builtin_tcap(term, builtin_mok2, TRUE);
 
-    if (prot != KEYPROTOCOL_NONE)
+    もし (prot != KEYPROTOCOL_NONE)
 	// Some function keys may accept modifiers even though the
 	// terminfo/termcap entry does not indicate this.
 	accept_modifiers_for_function_keys();
@@ -1746,7 +1746,7 @@ apply_keyprotocol(char_u *term, keyprot_T prot)
 parse_builtin_tcap(char_u *term)
 {
     tcap_entry_T *entries = find_builtin_term(term);
-    if (entries != NULL)
+    もし (entries != NULL)
 	apply_builtin_tcap(term, entries, FALSE);
 }
 
@@ -1756,19 +1756,19 @@ parse_builtin_tcap(char_u *term)
  * Store it as a string in T_CCO (using nr_colors[]).
  */
     void
-set_color_count(int nr)
+set_color_count(整数 nr)
 {
     char_u	nr_colors[20];		// string for number of colors
 
     t_colors = nr;
-    if (t_colors > 1)
+    もし (t_colors > 1)
 	sprintf((char *)nr_colors, "%d", t_colors);
-    else
+    否则
 	*nr_colors = NUL;
-#if 0
+#もし 0
 # ifdef FEAT_TERMGUICOLORS
     // xterm-direct, enable termguicolors, when it wasn't set yet
-    if (t_colors == 0x1000000 && !p_tgc_set)
+    もし (t_colors == 0x1000000 && !p_tgc_set)
 	set_option_value((char_u *)"termguicolors", 1L, NULL, 0);
 # endif
 #endif
@@ -1779,10 +1779,10 @@ set_color_count(int nr)
  * Set the color count to "val" and redraw if it changed.
  */
     static void
-may_adjust_color_count(int val)
+may_adjust_color_count(整数 val)
 {
-    if (val == t_colors)
-	return;
+    もし (val == t_colors)
+	戻る;
 
     // Nr of colors changed, initialize highlighting and redraw everything.
     // This causes a redraw, which usually clears the message.  Try keeping
@@ -1792,11 +1792,11 @@ may_adjust_color_count(int val)
     init_highlight(TRUE, FALSE);
 #ifdef DEBUG_TERMRESPONSE
     {
-	int r = redraw_asap(UPD_CLEAR);
+	整数 r = redraw_asap(UPD_CLEAR);
 
 	LOG_TRN("Received t_Co, redraw_asap(): %d", r);
     }
-#else
+#否则
     redraw_asap(UPD_CLEAR);
 #endif
 }
@@ -1822,14 +1822,14 @@ static char *(key_names[]) =
 };
 #endif
 
-#if defined(HAVE_TGETENT) || defined(FEAT_TERMGUICOLORS)
+#もし defined(HAVE_TGETENT) || defined(FEAT_TERMGUICOLORS)
 /*
  * Return TRUE if "term_strings[idx]" was not set.
  */
-    static int
+    static 整数
 term_strings_not_set(enum SpecialKey idx)
 {
-    return TERM_STR(idx) == NULL || TERM_STR(idx) == empty_option;
+    戻る TERM_STR(idx) == NULL || TERM_STR(idx) == empty_option;
 }
 #endif
 
@@ -1841,7 +1841,7 @@ term_strings_not_set(enum SpecialKey idx)
  * get their value.
  */
     static void
-get_term_entries(int *height, int *width)
+get_term_entries(整数 *height, 整数 *width)
 {
     static struct {
 		    enum SpecialKey dest; // index in term_strings[]
@@ -1880,16 +1880,16 @@ get_term_entries(int *height, int *width)
 			{KS_CF, "CF"},
 			{(enum SpecialKey)0, NULL}
 		    };
-    int		    i;
+    整数		    i;
     static char_u   tstrbuf[TBUFSZ];
     char_u	    *tp = tstrbuf;
 
     /*
      * get output strings
      */
-    for (i = 0; string_names[i].name != NULL; ++i)
+    ために (i = 0; string_names[i].name != NULL; ++i)
     {
-	if (term_strings_not_set(string_names[i].dest))
+	もし (term_strings_not_set(string_names[i].dest))
 	{
 	    TERM_STR(string_names[i].dest) = TGETSTR(string_names[i].name, &tp);
 # ifdef FEAT_EVAL
@@ -1900,46 +1900,46 @@ get_term_entries(int *height, int *width)
 
     // tgetflag() returns 1 if the flag is present, 0 if not and
     // possibly -1 if the flag doesn't exist.
-    if ((T_MS == NULL || T_MS == empty_option) && tgetflag("ms") > 0)
+    もし ((T_MS == NULL || T_MS == empty_option) && tgetflag("ms") > 0)
 	T_MS = (char_u *)"y";
-    if ((T_XS == NULL || T_XS == empty_option) && tgetflag("xs") > 0)
+    もし ((T_XS == NULL || T_XS == empty_option) && tgetflag("xs") > 0)
 	T_XS = (char_u *)"y";
-    if ((T_XN == NULL || T_XN == empty_option) && tgetflag("xn") > 0)
+    もし ((T_XN == NULL || T_XN == empty_option) && tgetflag("xn") > 0)
 	T_XN = (char_u *)"y";
-    if ((T_DB == NULL || T_DB == empty_option) && tgetflag("db") > 0)
+    もし ((T_DB == NULL || T_DB == empty_option) && tgetflag("db") > 0)
 	T_DB = (char_u *)"y";
-    if ((T_DA == NULL || T_DA == empty_option) && tgetflag("da") > 0)
+    もし ((T_DA == NULL || T_DA == empty_option) && tgetflag("da") > 0)
 	T_DA = (char_u *)"y";
-    if ((T_UT == NULL || T_UT == empty_option) && tgetflag("ut") > 0)
+    もし ((T_UT == NULL || T_UT == empty_option) && tgetflag("ut") > 0)
 	T_UT = (char_u *)"y";
-    if ((T_XON == NULL || T_XON == empty_option) && tgetflag("xo") > 0)
+    もし ((T_XON == NULL || T_XON == empty_option) && tgetflag("xo") > 0)
 	T_XON = (char_u *)"y";
 
     /*
      * get key codes
      */
-    for (i = 0; key_names[i] != NULL; ++i)
-	if (find_termcode((char_u *)key_names[i]) == NULL)
+    ために (i = 0; key_names[i] != NULL; ++i)
+	もし (find_termcode((char_u *)key_names[i]) == NULL)
 	{
 	    char_u *p = TGETSTR(key_names[i], &tp);
 
 	    // if cursor-left == backspace, ignore it (televideo 925)
-	    if (p != NULL
+	    もし (p != NULL
 		    && (*p != Ctrl_H
 			|| key_names[i][0] != 'k'
 			|| key_names[i][1] != 'l'))
 		add_termcode((char_u *)key_names[i], p, FALSE);
 	}
 
-    if (*height == 0)
+    もし (*height == 0)
 	*height = tgetnum("li");
-    if (*width == 0)
+    もし (*width == 0)
 	*width = tgetnum("co");
 
     /*
      * Get number of colors (if not done already).
      */
-    if (term_strings_not_set(KS_CCO))
+    もし (term_strings_not_set(KS_CCO))
     {
 	set_color_count(tgetnum("Co"));
 # ifdef FEAT_EVAL
@@ -1951,7 +1951,7 @@ get_term_entries(int *height, int *width)
     BC = (char *)TGETSTR("bc", &tp);
     UP = (char *)TGETSTR("up", &tp);
     char_u *p = TGETSTR("pc", &tp);
-    if (p != NULL)
+    もし (p != NULL)
 	PC = *p;
 # endif
 }
@@ -1964,7 +1964,7 @@ get_term_entries(int *height, int *width)
 report_term_error(char *error_msg, char_u *term)
 {
     mch_errmsg("\r\n");
-    if (error_msg != NULL)
+    もし (error_msg != NULL)
     {
 	mch_errmsg(error_msg);
 	mch_errmsg("\r\n");
@@ -1974,17 +1974,17 @@ report_term_error(char *error_msg, char_u *term)
     mch_errmsg(_("' not known. Available builtin terminals are:"));
     mch_errmsg("\r\n");
 
-    for (int i = 0; ; ++i)
+    ために (整数 i = 0; ; ++i)
     {
 	char *name = builtin_terminals[i].bitc_name;
-	if (name == NULL)  // end marker
+	もし (name == NULL)  // end marker
 	    break;
 	// Do not mention the "gui" entry, the user won't need to type it.
-	if (STRCMP(name, "gui") != 0)
+	もし (STRCMP(name, "gui") != 0)
 	{
 #ifdef HAVE_TGETENT
 	    mch_errmsg("    builtin_");
-#else
+#否则
 	    mch_errmsg("    ");
 #endif
 	    mch_errmsg(name);
@@ -1993,7 +1993,7 @@ report_term_error(char *error_msg, char_u *term)
     }
     // Output extra 'cmdheight' line breaks to avoid that the following error
     // message overwrites the last terminal name.
-    for (int i = 1; i < p_ch; ++i)
+    ために (整数 i = 1; i < p_ch; ++i)
 	mch_errmsg("\r\n");
 }
 
@@ -2003,11 +2003,11 @@ report_default_term(char_u *term)
     mch_errmsg(_("defaulting to '"));
     mch_errmsg((char *)term);
     mch_errmsg("'\r\n");
-    if (emsg_silent == 0 && !in_assert_fails)
+    もし (emsg_silent == 0 && !in_assert_fails)
     {
 	screen_start();	// don't know where cursor is now
 	out_flush();
-	if (!is_not_a_term())
+	もし (!is_not_a_term())
 	    ui_delay(2007L, TRUE);
     }
 }
@@ -2022,43 +2022,43 @@ report_default_term(char_u *term)
     keyprot_T
 match_keyprotocol(char_u *term)
 {
-    int		len = (int)STRLEN(p_kpc) + 1;
+    整数		len = (整数)STRLEN(p_kpc) + 1;
     char_u	*buf = alloc(len);
-    if (buf == NULL)
-	return KEYPROTOCOL_FAIL;
+    もし (buf == NULL)
+	戻る KEYPROTOCOL_FAIL;
 
     keyprot_T	ret = KEYPROTOCOL_FAIL;
     char_u	*p = p_kpc;
-    while (*p != NUL)
+    ながら (*p != NUL)
     {
 	// Isolate one comma separated item.
 	(void)copy_option_part(&p, buf, len, ",");
 	char_u *colon = vim_strchr(buf, ':');
-	if (colon == NULL || colon == buf || colon[1] == NUL)
+	もし (colon == NULL || colon == buf || colon[1] == NUL)
 	    goto theend;
 	*colon = NUL;
 
 	keyprot_T prot;
 	// Note: Keep this in sync with p_kpc_protocol_values.
-	if (STRCMP(colon + 1, "none") == 0)
+	もし (STRCMP(colon + 1, "none") == 0)
 	    prot = KEYPROTOCOL_NONE;
-	else if (STRCMP(colon + 1, "mok2") == 0)
+	否则 もし (STRCMP(colon + 1, "mok2") == 0)
 	    prot = KEYPROTOCOL_MOK2;
-	else if (STRCMP(colon + 1, "kitty") == 0)
+	否则 もし (STRCMP(colon + 1, "kitty") == 0)
 	    prot = KEYPROTOCOL_KITTY;
-	else
+	否则
 	    goto theend;
 
 	regmatch_T regmatch;
 	CLEAR_FIELD(regmatch);
 	regmatch.rm_ic = TRUE;
 	regmatch.regprog = vim_regcomp(buf, RE_MAGIC);
-	if (regmatch.regprog == NULL)
+	もし (regmatch.regprog == NULL)
 	    goto theend;
 
-	int match = term != NULL && vim_regexec(&regmatch, term, (colnr_T)0);
+	整数 match = term != NULL && vim_regexec(&regmatch, term, (colnr_T)0);
 	vim_regfree(regmatch.regprog);
-	if (match)
+	もし (match)
 	{
 	    ret = prot;
 	    goto theend;
@@ -2071,7 +2071,7 @@ match_keyprotocol(char_u *term)
 
 theend:
     vim_free(buf);
-    return ret;
+    戻る ret;
 }
 
 /*
@@ -2080,25 +2080,25 @@ theend:
  *
  * While doing this, until ttest(), some options may be NULL, be careful.
  */
-    int
+    整数
 set_termname(char_u *term)
 {
 #ifdef HAVE_TGETENT
-    int		builtin_first = p_tbi;
-    int		try;
-    int		termcap_cleared = FALSE;
+    整数		builtin_first = p_tbi;
+    整数		try;
+    整数		termcap_cleared = FALSE;
 #endif
-    int		width = 0, height = 0;
+    整数		width = 0, height = 0;
     char	*error_msg = NULL;
     char_u	*bs_p, *del_p;
 
     // In silect mode (ex -s) we don't use the 'term' option.
-    if (silent_mode)
-	return OK;
+    もし (silent_mode)
+	戻る OK;
 
     detected_8bit = FALSE;		// reset 8-bit detection
 
-    if (term_is_builtin(term))
+    もし (term_is_builtin(term))
     {
 	term += 8;
 #ifdef HAVE_TGETENT
@@ -2117,12 +2117,12 @@ set_termname(char_u *term)
  *     2. try builtin termcap, if both fail default to a builtin terminal
  */
 #ifdef HAVE_TGETENT
-    for (try = builtin_first ? 0 : 1; try < 3; ++try)
+    ために (try = builtin_first ? 0 : 1; try < 3; ++try)
     {
 	/*
 	 * Use external termcap
 	 */
-	if (try == 1)
+	もし (try == 1)
 	{
 	    char_u	    tbuf[TBUFSZ];
 
@@ -2130,9 +2130,9 @@ set_termname(char_u *term)
 	     * If the external termcap does not have a matching entry, try the
 	     * builtin ones.
 	     */
-	    if ((error_msg = invoke_tgetent(tbuf, term)) == NULL)
+	    もし ((error_msg = invoke_tgetent(tbuf, term)) == NULL)
 	    {
-		if (!termcap_cleared)
+		もし (!termcap_cleared)
 		{
 		    clear_termoptions();	// clear old options
 		    termcap_cleared = TRUE;
@@ -2141,7 +2141,7 @@ set_termname(char_u *term)
 		get_term_entries(&height, &width);
 	    }
 	}
-	else	    // try == 0 || try == 2
+	否则	    // try == 0 || try == 2
 #endif // HAVE_TGETENT
 	/*
 	 * Use builtin termcap
@@ -2152,14 +2152,14 @@ set_termname(char_u *term)
 	     * If builtin termcap was already used, there is no need to search
 	     * for the builtin termcap again, quit now.
 	     */
-	    if (try == 2 && builtin_first && termcap_cleared)
+	    もし (try == 2 && builtin_first && termcap_cleared)
 		break;
 #endif
 	    /*
 	     * Search for 'term' in builtin_terminals[].
 	     */
 	    tcap_entry_T *termp = find_builtin_term(term);
-	    if (termp == NULL)	// did not find it
+	    もし (termp == NULL)	// did not find it
 	    {
 #ifdef HAVE_TGETENT
 		/*
@@ -2169,19 +2169,19 @@ set_termname(char_u *term)
 		 * don't complain about not finding the term in the builtin
 		 * termcap.
 		 */
-		if (try == 0)			// try external one
+		もし (try == 0)			// try external one
 		    continue;
-		if (termcap_cleared)		// found in external termcap
+		もし (termcap_cleared)		// found in external termcap
 		    break;
 #endif
 		report_term_error(error_msg, term);
 
 		// when user typed :set term=xxx, quit here
-		if (starting != NO_SCREEN)
+		もし (starting != NO_SCREEN)
 		{
 		    screen_start();	// don't know where cursor is now
 		    wait_return(TRUE);
-		    return FAIL;
+		    戻る FAIL;
 		}
 		term = DEFAULT_TERM;
 		report_default_term(term);
@@ -2191,7 +2191,7 @@ set_termname(char_u *term)
 	    }
 	    out_flush();
 #ifdef HAVE_TGETENT
-	    if (!termcap_cleared)
+	    もし (!termcap_cleared)
 	    {
 #endif
 		clear_termoptions();	    // clear old options
@@ -2202,14 +2202,14 @@ set_termname(char_u *term)
 	    parse_builtin_tcap(term);
 
 #ifdef FEAT_GUI
-	    if (term_is_gui(term))
+	    もし (term_is_gui(term))
 	    {
 		out_flush();
 		gui_init();
 		// If starting the GUI failed, don't do any of the other
 		// things for this terminal
-		if (!gui.in_use)
-		    return FAIL;
+		もし (!gui.in_use)
+		    戻る FAIL;
 # ifdef HAVE_TGETENT
 		break;		// don't try using external termcap
 # endif
@@ -2221,7 +2221,7 @@ set_termname(char_u *term)
 #endif
 
 #ifdef FEAT_GUI
-    if (!gui.in_use)
+    もし (!gui.in_use)
 #endif
     {
 	// Use the 'keyprotocol' option to adjust the t_TE and t_TI
@@ -2234,15 +2234,15 @@ set_termname(char_u *term)
 	// colors.  Since these termcap entries are non-standard anyway and
 	// only used when the user sets 'termguicolors' we might as well add
 	// them.  But not when one of them was already set.
-	if (term_strings_not_set(KS_8F)
+	もし (term_strings_not_set(KS_8F)
 		&& term_strings_not_set(KS_8B)
 		&& term_strings_not_set(KS_8U))
 	    apply_builtin_tcap(term, builtin_rgb, TRUE);
 #endif
 #ifdef HAVE_TGETENT
-	if (term_strings_not_set(KS_CF))
+	もし (term_strings_not_set(KS_CF))
 	    apply_builtin_tcap(term, special_term, TRUE);
-	if (term_strings_not_set(KS_BSU) && term_strings_not_set(KS_ESU))
+	もし (term_strings_not_set(KS_BSU) && term_strings_not_set(KS_ESU))
 	    apply_builtin_tcap(term, builtin_sync_output, TRUE);
 #endif
     }
@@ -2253,14 +2253,14 @@ set_termname(char_u *term)
  * scrolling region.  We just guess here. Only msdos pcterm is known to do it
  * relative.
  */
-    if (STRCMP(term, "pcterm") == 0)
+    もし (STRCMP(term, "pcterm") == 0)
 	T_CCS = (char_u *)"yes";
-    else
+    否则
 	T_CCS = empty_option;
 
     // Special case: "kitty" may not have a "RV" entry in terminfo, but we need
     // to request the version for several other things to work.
-    if (strstr((char *)term, "kitty") != NULL
+    もし (strstr((char *)term, "kitty") != NULL
 					   && (T_CRV == NULL || *T_CRV == NUL))
 	T_CRV = (char_u *)"\033[>c";
 
@@ -2272,7 +2272,7 @@ set_termname(char_u *term)
  * Don't do this when the GUI is active, it uses "t_kb" and "t_kD" directly.
  */
 # ifdef FEAT_GUI
-    if (!gui.in_use)
+    もし (!gui.in_use)
 # endif
 	get_stty();
 #endif
@@ -2286,19 +2286,19 @@ set_termname(char_u *term)
  * directly.
  */
 #ifdef FEAT_GUI
-    if (!gui.in_use)
+    もし (!gui.in_use)
 #endif
     {
 	bs_p = find_termcode((char_u *)"kb");
 	del_p = find_termcode((char_u *)"kD");
-	if (bs_p == NULL || *bs_p == NUL)
+	もし (bs_p == NULL || *bs_p == NUL)
 	    add_termcode((char_u *)"kb", (bs_p = (char_u *)CTRL_H_STR), FALSE);
-	if ((del_p == NULL || *del_p == NUL) &&
+	もし ((del_p == NULL || *del_p == NUL) &&
 					    (bs_p == NULL || *bs_p != DEL))
 	    add_termcode((char_u *)"kD", (char_u *)DEL_STR, FALSE);
     }
 
-#if defined(UNIX) || defined(VMS)
+#もし defined(UNIX) || defined(VMS)
     term_is_xterm = vim_is_xterm(term);
 #endif
 #ifdef FEAT_TERMRESPONSE
@@ -2307,17 +2307,17 @@ set_termname(char_u *term)
     init_term_props(FALSE);
 #endif
 
-#if defined(UNIX) || defined(VMS)
+#もし defined(UNIX) || defined(VMS)
     // If the first number in t_XM is 1006 then the terminal will support SGR
     // mouse reporting.
-    int did_set_ttym = FALSE;
-    if (T_CXM != NULL && *T_CXM != NUL && !option_was_set((char_u *)"ttym"))
+    整数 did_set_ttym = FALSE;
+    もし (T_CXM != NULL && *T_CXM != NUL && !option_was_set((char_u *)"ttym"))
     {
 	char_u *p = T_CXM;
 
-	while (*p != NUL && !VIM_ISDIGIT(*p))
+	ながら (*p != NUL && !VIM_ISDIGIT(*p))
 	    ++p;
-	if (getdigits(&p) == 1006)
+	もし (getdigits(&p) == 1006)
 	{
 	    did_set_ttym = TRUE;
 	    set_option_value_give_err((char_u *)"ttym", 0L, (char_u *)"sgr", 0);
@@ -2332,29 +2332,29 @@ set_termname(char_u *term)
 	char_u	*p = (char_u *)"";
 
 # ifdef FEAT_MOUSE_XTERM
-	if (use_xterm_like_mouse(term))
+	もし (use_xterm_like_mouse(term))
 	{
-	    if (use_xterm_mouse())
+	    もし (use_xterm_mouse())
 		p = NULL;	// keep existing value, might be "xterm2"
-	    else
+	    否则
 		p = (char_u *)"xterm";
 	}
 # endif
-	if (p != NULL && !did_set_ttym)
+	もし (p != NULL && !did_set_ttym)
 	{
 	    set_option_value_give_err((char_u *)"ttym", 0L, p, 0);
 	    // Reset the WAS_SET flag, 'ttymouse' can be set to "sgr" or
 	    // "xterm2" in check_termcode().
 	    reset_option_was_set((char_u *)"ttym");
 	}
-	if (p == NULL
+	もし (p == NULL
 # ifdef FEAT_GUI
 		|| gui.in_use
 # endif
 		)
 	    check_mouse_termcode();	// set mouse termcode anyway
     }
-#else
+#否则
     set_mouse_termcode(KS_MOUSE, (char_u *)"\233M");
 #endif
 
@@ -2382,16 +2382,16 @@ set_termname(char_u *term)
 	need_gather = TRUE;
     }
 #endif
-#if (defined(UNIX) || defined(VMS))
+#もし (defined(UNIX) || defined(VMS))
     // First time after setting 'term' a focus event is always reported.
     focus_state = MAYBE;
 #endif
 
 #ifdef USE_TERM_CONSOLE
     // DEFAULT_TERM indicates that it is the machine console.
-    if (STRCMP(term, DEFAULT_TERM) != 0)
+    もし (STRCMP(term, DEFAULT_TERM) != 0)
 	term_console = FALSE;
-    else
+    否则
     {
 	term_console = TRUE;
 # ifdef AMIGA
@@ -2416,7 +2416,7 @@ set_termname(char_u *term)
      * Don't do this when starting, need to parse the .vimrc first, because it
      * may redefine t_TI etc.
      */
-    if (starting != NO_SCREEN)
+    もし (starting != NO_SCREEN)
     {
 	starttermcap();		// may change terminal mode
 	setmouse();		// may start using the mouse
@@ -2424,21 +2424,21 @@ set_termname(char_u *term)
     }
 
 	// display initial screen after ttest() checking. jw.
-    if (width <= 0 || height <= 0)
+    もし (width <= 0 || height <= 0)
     {
 	// termcap failed to report size
 	// set defaults, in case ui_get_shellsize() also fails
 	width = 80;
-#if defined(MSWIN)
+#もし defined(MSWIN)
 	height = 25;	    // console is often 25 lines
-#else
+#否则
 	height = 24;	    // most terminals are 24 lines
 #endif
     }
     set_shellsize(width, height, FALSE);	// may change Rows
-    if (starting != NO_SCREEN)
+    もし (starting != NO_SCREEN)
     {
-	if (scroll_region)
+	もし (scroll_region)
 	    scroll_region_reset();		// In case Rows changed
 	check_map_keycodes();	// check mappings for terminal codes used
 
@@ -2452,10 +2452,10 @@ set_termname(char_u *term)
 	     */
 	    FOR_ALL_BUFFERS(buf)
 	    {
-		if (curbuf->b_ml.ml_mfp != NULL)
+		もし (curbuf->b_ml.ml_mfp != NULL)
 		{
 		    aucmd_prepbuf(&aco, buf);
-		    if (curbuf == buf)
+		    もし (curbuf == buf)
 		    {
 			apply_autocmds(EVENT_TERMCHANGED, NULL, NULL, FALSE,
 								      curbuf);
@@ -2475,10 +2475,10 @@ set_termname(char_u *term)
     (void)update_image_backend();
 #endif
 
-    return OK;
+    戻る OK;
 }
 
-#if defined(EXITFREE)
+#もし defined(EXITFREE)
 
 # ifdef HAVE_DEL_CURTERM
 #  include <term.h>	    // declares cur_term
@@ -2492,7 +2492,7 @@ set_termname(char_u *term)
 free_cur_term(void)
 {
 # ifdef HAVE_DEL_CURTERM
-    if (cur_term)
+    もし (cur_term)
 	del_curterm(cur_term);
 # endif
 }
@@ -2507,12 +2507,12 @@ free_cur_term(void)
     static char *
 invoke_tgetent(char_u *tbuf, char_u *term)
 {
-    int	    i;
+    整数	    i;
 
     // Note: Valgrind may report a leak here, because the library keeps one
     // buffer around that we can't ever free.
     i = TGETENT(tbuf, term);
-    if (i < 0		    // -1 is always an error
+    もし (i < 0		    // -1 is always an error
 # ifdef TGETENT_ZERO_ERR
 	    || i == 0	    // sometimes zero is also an error
 # endif
@@ -2523,18 +2523,18 @@ invoke_tgetent(char_u *tbuf, char_u *term)
 	// hang.
 	(void)TGETENT(tbuf, "dumb");
 
-	if (i < 0)
+	もし (i < 0)
 # ifdef TGETENT_ZERO_ERR
-	    return _(e_cannot_open_termcap_file);
-	if (i == 0)
+	    戻る _(e_cannot_open_termcap_file);
+	もし (i == 0)
 # endif
 # ifdef TERMINFO
-	    return _(e_terminal_entry_not_found_in_terminfo);
-# else
-	    return _(e_terminal_entry_not_found_in_termcap);
+	    戻る _(e_terminal_entry_not_found_in_terminfo);
+# 否则
+	    戻る _(e_terminal_entry_not_found_in_termcap);
 # endif
     }
-    return NULL;
+    戻る NULL;
 }
 
 /*
@@ -2547,13 +2547,13 @@ vim_tgetstr(char *s, char_u **pp)
     char	*p;
 
     p = tgetstr(s, (char **)pp);
-    if (p == (char *)-1)
+    もし (p == (char *)-1)
 	p = NULL;
-    return (char_u *)p;
+    戻る (char_u *)p;
 }
 #endif // HAVE_TGETENT
 
-#if defined(HAVE_TGETENT) && (defined(UNIX) || defined(VMS) || defined(MACOS_X))
+#もし defined(HAVE_TGETENT) && (defined(UNIX) || defined(VMS) || defined(MACOS_X))
 /*
  * Get Columns and Rows from the termcap. Used after a window signal if the
  * ioctl() fails. It doesn't make sense to call tgetent each time if the "co"
@@ -2567,13 +2567,13 @@ getlinecol(
 {
     char_u	tbuf[TBUFSZ];
 
-    if (T_NAME == NULL || *T_NAME == NUL
+    もし (T_NAME == NULL || *T_NAME == NUL
 	    || invoke_tgetent(tbuf, T_NAME) != NULL)
-	return;
+	戻る;
 
-    if (*cp == 0)
+    もし (*cp == 0)
 	*cp = tgetnum("co");
-    if (*rp == 0)
+    もし (*rp == 0)
 	*rp = tgetnum("li");
 }
 #endif // defined(HAVE_TGETENT) && defined(UNIX)
@@ -2585,15 +2585,15 @@ getlinecol(
  * If force given, replace an existing entry.
  * Return FAIL if the entry was not found, OK if the entry was added.
  */
-    int
-add_termcap_entry(char_u *name, int force)
+    整数
+add_termcap_entry(char_u *name, 整数 force)
 {
     char_u  *term;
-    int	    key;
+    整数	    key;
 #ifdef HAVE_TGETENT
     char_u  *string;
-    int	    i;
-    int	    builtin_first;
+    整数	    i;
+    整数	    builtin_first;
     char_u  tbuf[TBUFSZ];
     char_u  tstrbuf[TBUFSZ];
     char_u  *tp = tstrbuf;
@@ -2605,18 +2605,18 @@ add_termcap_entry(char_u *name, int force)
  * that the GUI can produce.
  */
 #ifdef FEAT_GUI
-    if (gui.in_use || gui.starting)
-	return gui_mch_haskey(name);
+    もし (gui.in_use || gui.starting)
+	戻る gui_mch_haskey(name);
 #endif
 
-    if (!force && find_termcode(name) != NULL)	    // it's already there
-	return OK;
+    もし (!force && find_termcode(name) != NULL)	    // it's already there
+	戻る OK;
 
     term = T_NAME;
-    if (term == NULL || *term == NUL)	    // 'term' not defined yet
-	return FAIL;
+    もし (term == NULL || *term == NUL)	    // 'term' not defined yet
+	戻る FAIL;
 
-    if (term_is_builtin(term))		    // name starts with "builtin_"
+    もし (term_is_builtin(term))		    // name starts with "builtin_"
     {
 	term += 8;
 #ifdef HAVE_TGETENT
@@ -2624,7 +2624,7 @@ add_termcap_entry(char_u *name, int force)
 #endif
     }
 #ifdef HAVE_TGETENT
-    else
+    否则
 	builtin_first = p_tbi;
 #endif
 
@@ -2635,67 +2635,67 @@ add_termcap_entry(char_u *name, int force)
  * builtin termcap first.
  * If 'ttybuiltin' is off, try external termcap first.
  */
-    for (i = 0; i < 2; ++i)
+    ために (i = 0; i < 2; ++i)
     {
-	if ((!builtin_first) == i)
+	もし ((!builtin_first) == i)
 #endif
 	/*
 	 * Search in builtin termcaps
 	 */
 	{
 	    tcap_entry_T *termp = find_builtin_term(term);
-	    if (termp != NULL)	// found it
+	    もし (termp != NULL)	// found it
 	    {
 		key = TERMCAP2KEY(name[0], name[1]);
 		++termp;
-		while (termp->bt_entry != (int)KS_NAME)
+		ながら (termp->bt_entry != (整数)KS_NAME)
 		{
-		    if ((int)termp->bt_entry == key)
+		    もし ((整数)termp->bt_entry == key)
 		    {
 			add_termcode(name, (char_u *)termp->bt_string,
 							  term_is_8bit(term));
-			return OK;
+			戻る OK;
 		    }
 		    ++termp;
 		}
 	    }
 	}
 #ifdef HAVE_TGETENT
-	else
+	否则
 	/*
 	 * Search in external termcap
 	 */
 	{
 	    error_msg = invoke_tgetent(tbuf, term);
-	    if (error_msg == NULL)
+	    もし (error_msg == NULL)
 	    {
 		string = TGETSTR((char *)name, &tp);
-		if (string != NULL && *string != NUL)
+		もし (string != NULL && *string != NUL)
 		{
 		    add_termcode(name, string, FALSE);
-		    return OK;
+		    戻る OK;
 		}
 	    }
 	}
     }
 #endif
 
-    if (SOURCING_NAME == NULL)
+    もし (SOURCING_NAME == NULL)
     {
 #ifdef HAVE_TGETENT
-	if (error_msg != NULL)
+	もし (error_msg != NULL)
 	    emsg(error_msg);
-	else
+	否则
 #endif
 	    semsg(_(e_no_str_entry_in_termcap), name);
     }
-    return FAIL;
+    戻る FAIL;
 }
 
-    static int
+    static 整数
 term_is_builtin(char_u *name)
 {
-    return (STRNCMP(name, "builtin_", (size_t)8) == 0);
+    戻る (STRNCMP(name, "builtin_", (size_t)8) == 0);
 }
 
 /*
@@ -2703,10 +2703,10 @@ term_is_builtin(char_u *name)
  * Assume that the terminal is using 8-bit controls when the name contains
  * "8bit", like in "xterm-8bit".
  */
-    int
+    整数
 term_is_8bit(char_u *name)
 {
-    return (detected_8bit || strstr((char *)name, "8bit") != NULL);
+    戻る (detected_8bit || strstr((char *)name, "8bit") != NULL);
 }
 
 /*
@@ -2715,30 +2715,30 @@ term_is_8bit(char_u *name)
  * <Esc>] -> OSC  <M-C-]>
  * <Esc>O -> <M-C-O>
  */
-    static int
+    static 整数
 term_7to8bit(char_u *p)
 {
-    if (*p != ESC)
-	return 0;
+    もし (*p != ESC)
+	戻る 0;
 
-    if (p[1] == '[')
-	return CSI;
-    else if (p[1] == ']')
-	return OSC;
-    else if (p[1] == 'O')
-	return 0x8f;
-    return 0;
+    もし (p[1] == '[')
+	戻る CSI;
+    否则 もし (p[1] == ']')
+	戻る OSC;
+    否则 もし (p[1] == 'O')
+	戻る 0x8f;
+    戻る 0;
 }
 
-#if defined(FEAT_GUI)
-    int
+#もし defined(FEAT_GUI)
+    整数
 term_is_gui(char_u *name)
 {
-    return (STRCMP(name, "builtin_gui") == 0 || STRCMP(name, "gui") == 0);
+    戻る (STRCMP(name, "builtin_gui") == 0 || STRCMP(name, "gui") == 0);
 }
 #endif
 
-#if !defined(HAVE_TGETENT) || defined(AMIGA)
+#もし !defined(HAVE_TGETENT) || defined(AMIGA)
 
     char_u *
 tltoa(unsigned long i)
@@ -2754,8 +2754,8 @@ tltoa(unsigned long i)
 	*p = (char_u) (i % 10 + '0');
 	i /= 10;
     }
-    while (i > 0 && p > buf);
-    return p;
+    ながら (i > 0 && p > buf);
+    戻る p;
 }
 #endif
 
@@ -2766,17 +2766,17 @@ tltoa(unsigned long i)
  * no padding and we only parse for %i %d and %+char
  */
     static char *
-tgoto(char *cm, int x, int y)
+tgoto(char *cm, 整数 x, 整数 y)
 {
     static char buf[30];
     char *p, *s, *e;
 
-    if (!cm)
-	return "OOPS";
+    もし (!cm)
+	戻る "OOPS";
     e = buf + 29;
-    for (s = buf; s < e && *cm; cm++)
+    ために (s = buf; s < e && *cm; cm++)
     {
-	if (*cm != '%')
+	もし (*cm != '%')
 	{
 	    *s++ = *cm;
 	    continue;
@@ -2786,7 +2786,7 @@ tgoto(char *cm, int x, int y)
 	case 'd':
 	    p = (char *)tltoa((unsigned long)y);
 	    y = x;
-	    while (*p)
+	    ながら (*p)
 		*s++ = *p++;
 	    break;
 	case 'i':
@@ -2801,11 +2801,11 @@ tgoto(char *cm, int x, int y)
 	    *s++ = *cm;
 	    break;
 	default:
-	    return "OOPS";
+	    戻る "OOPS";
 	}
     }
     *s = '\0';
-    return buf;
+    戻る buf;
 }
 
 #endif // HAVE_TGETENT
@@ -2820,14 +2820,14 @@ termcapinit(char_u *name)
 {
     char_u	*term = name;
 
-    if (term != NULL && *term == NUL)
+    もし (term != NULL && *term == NUL)
 	term = NULL;	    // empty name is equal to no name
 
 #ifndef MSWIN
-    if (term == NULL)
+    もし (term == NULL)
 	term = mch_getenv((char_u *)"TERM");
 #endif
-    if (term == NULL || *term == NUL)
+    もし (term == NULL || *term == NUL)
 	term = DEFAULT_TERM;
     set_string_option_direct((char_u *)"term", -1, term, OPT_FREE, 0);
 
@@ -2847,7 +2847,7 @@ termcapinit(char_u *name)
 // add one to allow mch_write() in os_win32.c to append a NUL
 static char_u		out_buf[OUT_SIZE + 1];
 
-static int		out_pos = 0;	// number of chars in out_buf
+static 整数		out_pos = 0;	// number of chars in out_buf
 
 // Since the maximum number of SGR parameters shown as a normal value range is
 // 16, the escape sequence length can be 4 * 16 + lead + tail.
@@ -2859,17 +2859,17 @@ static int		out_pos = 0;	// number of chars in out_buf
     void
 out_flush(void)
 {
-    int	    len;
+    整数	    len;
 
-    if (out_pos == 0)
-	return;
+    もし (out_pos == 0)
+	戻る;
 
     // set out_pos to 0 before ui_write, to avoid recursiveness
     len = out_pos;
     out_pos = 0;
     ui_write(out_buf, len, FALSE);
 #ifdef FEAT_EVAL
-    if (ch_log_output != FALSE)
+    もし (ch_log_output != FALSE)
     {
 	out_buf[len] = NUL;
 	ch_log(NULL, "raw %s output: \"%s\"",
@@ -2878,7 +2878,7 @@ out_flush(void)
 # endif
 		"terminal",
 		out_buf);
-	if (ch_log_output == TRUE)
+	もし (ch_log_output == TRUE)
 	    ch_log_output = FALSE;  // only log once
     }
 #endif
@@ -2890,14 +2890,14 @@ out_flush(void)
  */
     void
 out_flush_cursor(
-    int	    force UNUSED,   // when TRUE, update cursor even when not moved
-    int	    clear_selection UNUSED) // clear selection under cursor
+    整数	    force UNUSED,   // when TRUE, update cursor even when not moved
+    整数	    clear_selection UNUSED) // clear selection under cursor
 {
     mch_disable_flush();
     out_flush();
     mch_enable_flush();
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    もし (gui.in_use)
     {
 	gui_update_cursor(force, clear_selection);
 	gui_may_flush();
@@ -2913,7 +2913,7 @@ out_flush_cursor(
     void
 out_flush_check(void)
 {
-    if (enc_dbcs != 0 && out_pos >= OUT_SIZE - MB_MAXBYTES)
+    もし (enc_dbcs != 0 && out_pos >= OUT_SIZE - MB_MAXBYTES)
 	out_flush();
 }
 
@@ -2937,29 +2937,29 @@ out_trash(void)
     void
 out_char(unsigned c)
 {
-#if defined(UNIX) || defined(VMS) || defined(AMIGA) || defined(MACOS_X)
-    if (c == '\n')	// turn LF into CR-LF (CRMOD doesn't seem to do this)
+#もし defined(UNIX) || defined(VMS) || defined(AMIGA) || defined(MACOS_X)
+    もし (c == '\n')	// turn LF into CR-LF (CRMOD doesn't seem to do this)
 	out_char('\r');
 #endif
 
     out_buf[out_pos++] = c;
 
     // For testing we flush each time.
-    if (out_pos >= OUT_SIZE || p_wd)
+    もし (out_pos >= OUT_SIZE || p_wd)
 	out_flush();
 }
 
 /*
  * Output "c" like out_char(), but don't flush when p_wd is set.
  */
-    static int
-out_char_nf(int c)
+    static 整数
+out_char_nf(整数 c)
 {
     out_buf[out_pos++] = (unsigned)c;
 
-    if (out_pos >= OUT_SIZE)
+    もし (out_pos >= OUT_SIZE)
 	out_flush();
-    return (unsigned)c;
+    戻る (unsigned)c;
 }
 
 /*
@@ -2975,14 +2975,14 @@ out_char_nf(int c)
 out_str_nf(char_u *s)
 {
     // avoid terminal strings being split up
-    if (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
+    もし (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
 	out_flush();
 
-    for (char_u *p = s; *p != NUL; ++p)
+    ために (char_u *p = s; *p != NUL; ++p)
 	out_char_nf(*p);
 
     // For testing we write one string at a time.
-    if (p_wd)
+    もし (p_wd)
 	out_flush();
 }
 
@@ -2995,8 +2995,8 @@ out_str_nf(char_u *s)
     void
 out_str_cf(char_u *s)
 {
-    if (s == NULL || *s == NUL)
-	return;
+    もし (s == NULL || *s == NUL)
+	戻る;
 
 #ifdef HAVE_TGETENT
     char_u *p;
@@ -3004,22 +3004,22 @@ out_str_cf(char_u *s)
 
 #ifdef FEAT_GUI
     // Don't use tputs() when GUI is used, ncurses crashes.
-    if (gui.in_use)
+    もし (gui.in_use)
     {
 	out_str_nf(s);
-	return;
+	戻る;
     }
 #endif
-    if (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
+    もし (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
 	out_flush();
 #ifdef HAVE_TGETENT
-    for (p = s; *s; ++s)
+    ために (p = s; *s; ++s)
     {
 	// flush just before delay command
-	if (*s == '$' && *(s + 1) == '<')
+	もし (*s == '$' && *(s + 1) == '<')
 	{
 	    char_u save_c = *s;
-	    int duration = atoi((char *)s + 2);
+	    整数 duration = atoi((char *)s + 2);
 
 	    *s = NUL;
 	    tputs((char *)p, 1, TPUTSFUNCAST out_char_nf);
@@ -3029,17 +3029,17 @@ out_str_cf(char_u *s)
 	    // Only sleep here if we can limit this happening in
 	    // vim_beep().
 	    p = vim_strchr(s, '>');
-	    if (p == NULL || duration <= 0)
+	    もし (p == NULL || duration <= 0)
 	    {
 		// can't parse the time, don't sleep here
 		p = s;
 	    }
-	    else
+	    否则
 	    {
 		++p;
 		do_sleep(duration, FALSE);
 	    }
-# else
+# 否则
 	    // Rely on the terminal library to sleep.
 	    p = s;
 # endif
@@ -3047,13 +3047,13 @@ out_str_cf(char_u *s)
 	}
     }
     tputs((char *)p, 1, TPUTSFUNCAST out_char_nf);
-#else
-    while (*s)
+#否则
+    ながら (*s)
 	out_char_nf(*s++);
 #endif
 
     // For testing we write one string at a time.
-    if (p_wd)
+    もし (p_wd)
 	out_flush();
 }
 
@@ -3066,29 +3066,29 @@ out_str_cf(char_u *s)
     void
 out_str(char_u *s)
 {
-    if (s == NULL || *s == NUL)
-	return;
+    もし (s == NULL || *s == NUL)
+	戻る;
 
 #ifdef FEAT_GUI
     // Don't use tputs() when GUI is used, ncurses crashes.
-    if (gui.in_use)
+    もし (gui.in_use)
     {
 	out_str_nf(s);
-	return;
+	戻る;
     }
 #endif
     // avoid terminal strings being split up
-    if (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
+    もし (out_pos > OUT_SIZE - MAX_ESC_SEQ_LEN)
 	out_flush();
 #ifdef HAVE_TGETENT
     tputs((char *)s, 1, TPUTSFUNCAST out_char_nf);
-#else
-    while (*s)
+#否则
+    ながら (*s)
 	out_char_nf(*s++);
 #endif
 
     // For testing we write one string at a time.
-    if (p_wd)
+    もし (p_wd)
 	out_flush();
 }
 
@@ -3096,58 +3096,58 @@ out_str(char_u *s)
  * cursor positioning using termcap parser. (jw)
  */
     void
-term_windgoto(int row, int col)
+term_windgoto(整数 row, 整数 col)
 {
     OUT_STR(tgoto((char *)T_CM, col, row));
 }
 
     void
-term_cursor_right(int i)
+term_cursor_right(整数 i)
 {
     OUT_STR(tgoto((char *)T_CRI, 0, i));
 }
 
     void
-term_append_lines(int line_count)
+term_append_lines(整数 line_count)
 {
     OUT_STR(tgoto((char *)T_CAL, 0, line_count));
 }
 
     void
-term_delete_lines(int line_count)
+term_delete_lines(整数 line_count)
 {
     OUT_STR(tgoto((char *)T_CDL, 0, line_count));
 }
 
-#if defined(UNIX) || defined(VMS)
+#もし defined(UNIX) || defined(VMS)
     void
-term_enable_mouse(int enable)
+term_enable_mouse(整数 enable)
 {
-    int on = enable ? 1 : 0;
+    整数 on = enable ? 1 : 0;
     OUT_STR(tgoto((char *)T_CXM, 0, on));
 }
 #endif
 
-#if defined(HAVE_TGETENT)
+#もし defined(HAVE_TGETENT)
     void
-term_set_winpos(int x, int y)
+term_set_winpos(整数 x, 整数 y)
 {
     // Can't handle a negative value here
-    if (x < 0)
+    もし (x < 0)
 	x = 0;
-    if (y < 0)
+    もし (y < 0)
 	y = 0;
     OUT_STR(tgoto((char *)T_CWP, y, x));
 }
 
-# if defined(FEAT_TERMRESPONSE)
+# もし defined(FEAT_TERMRESPONSE)
 /*
  * Return TRUE if we can request the terminal for a response.
  */
-    static int
+    static 整数
 can_get_termresponse(void)
 {
-    return cur_tmode == TMODE_RAW
+    戻る cur_tmode == TMODE_RAW
 	    && termcap_active
 #  ifdef UNIX
 	    && (is_not_a_term() || (isatty(1) && isatty(read_cmd_fd)))
@@ -3168,46 +3168,46 @@ termrequest_sent(termrequest_T *status)
 /*
  * Return TRUE if any of the requests are in STATUS_SENT.
  */
-    static int
+    static 整数
 termrequest_any_pending(void)
 {
-    int	    i;
+    整数	    i;
     time_t  now = time(NULL);
 
-    for (i = 0; all_termrequests[i] != NULL; ++i)
+    ために (i = 0; all_termrequests[i] != NULL; ++i)
     {
-	if (all_termrequests[i]->tr_progress == STATUS_SENT)
+	もし (all_termrequests[i]->tr_progress == STATUS_SENT)
 	{
-	    if (all_termrequests[i]->tr_start > 0 && now > 0
+	    もし (all_termrequests[i]->tr_start > 0 && now > 0
 				    && all_termrequests[i]->tr_start + 2 < now)
 		// Sent the request more than 2 seconds ago and didn't get a
 		// response, assume it failed.
 		all_termrequests[i]->tr_progress = STATUS_FAIL;
-	    else
-		return TRUE;
+	    否则
+		戻る TRUE;
 	}
     }
-    return FALSE;
+    戻る FALSE;
 }
 
-static int winpos_x = -1;
-static int winpos_y = -1;
-static int did_request_winpos = 0;
+static 整数 winpos_x = -1;
+static 整数 winpos_y = -1;
+static 整数 did_request_winpos = 0;
 
-#  if defined(FEAT_EVAL) || defined(FEAT_TERMINAL)
+#  もし defined(FEAT_EVAL) || defined(FEAT_TERMINAL)
 /*
  * Try getting the Vim window position from the terminal.
  * Returns OK or FAIL.
  */
-    int
-term_get_winpos(int *x, int *y, varnumber_T timeout)
+    整数
+term_get_winpos(整数 *x, 整数 *y, varnumber_T timeout)
 {
-    int count = 0;
-    int prev_winpos_x = winpos_x;
-    int prev_winpos_y = winpos_y;
+    整数 count = 0;
+    整数 prev_winpos_x = winpos_x;
+    整数 prev_winpos_y = winpos_y;
 
-    if (*T_CGP == NUL || !can_get_termresponse())
-	return FAIL;
+    もし (*T_CGP == NUL || !can_get_termresponse())
+	戻る FAIL;
     winpos_x = -1;
     winpos_y = -1;
     ++did_request_winpos;
@@ -3216,14 +3216,14 @@ term_get_winpos(int *x, int *y, varnumber_T timeout)
     out_flush();
 
     // Try reading the result for "timeout" msec.
-    while (count++ <= timeout / 10 && !got_int)
+    ながら (count++ <= timeout / 10 && !got_int)
     {
 	(void)vpeekc_nomap();
-	if (winpos_x >= 0 && winpos_y >= 0)
+	もし (winpos_x >= 0 && winpos_y >= 0)
 	{
 	    *x = winpos_x;
 	    *y = winpos_y;
-	    return OK;
+	    戻る OK;
 	}
 	ui_delay(10L, FALSE);
     }
@@ -3232,30 +3232,30 @@ term_get_winpos(int *x, int *y, varnumber_T timeout)
 
     winpos_x = prev_winpos_x;
     winpos_y = prev_winpos_y;
-    if (timeout < 10 && prev_winpos_y >= 0 && prev_winpos_x >= 0)
+    もし (timeout < 10 && prev_winpos_y >= 0 && prev_winpos_x >= 0)
     {
 	// Polling: return previous values if we have them.
 	*x = winpos_x;
 	*y = winpos_y;
-	return OK;
+	戻る OK;
     }
 
-    return FALSE;
+    戻る FALSE;
 }
 #  endif
 # endif
 
     void
-term_set_winsize(int height, int width)
+term_set_winsize(整数 height, 整数 width)
 {
     OUT_STR(tgoto((char *)T_CWS, width, height));
 }
 #endif
 
     void
-term_font(int n)
+term_font(整数 n)
 {
-    if (*T_CFO)
+    もし (*T_CFO)
     {
 	char buf[20];
 	sprintf(buf, (char *)T_CFO, 9 + n);
@@ -3264,18 +3264,18 @@ term_font(int n)
 }
 
     static void
-term_color(char_u *s, int n)
+term_color(char_u *s, 整数 n)
 {
     char	buf[20];
-    int		i = *s == CSI ? 1 : 2;
+    整数		i = *s == CSI ? 1 : 2;
 		// index in s[] just after <Esc>[ or CSI
 
     // Special handling of 16 colors, because termcap can't handle it
     // Also accept "\e[3%dm" for TERMINFO, it is sometimes used
     // Also accept CSI instead of <Esc>[
-    if (n >= 8 && t_colors >= 16
+    もし (n >= 8 && t_colors >= 16
 	      && ((s[0] == ESC && s[1] == '[')
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+#もし defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
 		  || (s[0] == ESC && s[1] == '|')
 #endif
 		  || (s[0] == CSI && (i = 1) == 1))
@@ -3286,11 +3286,11 @@ term_color(char_u *s, int n)
     {
 #ifdef TERMINFO
 	char *format = "%s%s%%p1%%dm";
-#else
+#否则
 	char *format = "%s%s%%dm";
 #endif
 	char *lead = i == 2 ? (
-#if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
+#もし defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
 		    s[1] == '|' ? "\033|" :
 #endif
 		    "\033[") : "\233";
@@ -3300,34 +3300,34 @@ term_color(char_u *s, int n)
 	sprintf(buf, format, lead, tail);
 	OUT_STR(tgoto(buf, 0, n >= 16 ? n : n - 8));
     }
-    else
+    否则
 	OUT_STR(tgoto((char *)s, 0, n));
 }
 
     void
-term_fg_color(int n)
+term_fg_color(整数 n)
 {
     // Use "AF" termcap entry if present, "Sf" entry otherwise
-    if (*T_CAF)
+    もし (*T_CAF)
 	term_color(T_CAF, n);
-    else if (*T_CSF)
+    否则 もし (*T_CSF)
 	term_color(T_CSF, n);
 }
 
     void
-term_bg_color(int n)
+term_bg_color(整数 n)
 {
     // Use "AB" termcap entry if present, "Sb" entry otherwise
-    if (*T_CAB)
+    もし (*T_CAB)
 	term_color(T_CAB, n);
-    else if (*T_CSB)
+    否则 もし (*T_CSB)
 	term_color(T_CSB, n);
 }
 
     void
-term_ul_color(int n)
+term_ul_color(整数 n)
 {
-    if (*T_CAU)
+    もし (*T_CAU)
 	term_color(T_CAU, n);
 }
 
@@ -3346,13 +3346,13 @@ term_ul_color(int n)
     char_u *
 term_bg_default(void)
 {
-#if defined(MSWIN)
+#もし defined(MSWIN)
     // DOS console is nearly always black
-    return (char_u *)"dark";
-#else
+    戻る (char_u *)"dark";
+#否则
     char_u	*p;
 
-    if (STRCMP(T_NAME, "linux") == 0
+    もし (STRCMP(T_NAME, "linux") == 0
 	    || STRCMP(T_NAME, "screen.linux") == 0
 	    || STRNCMP(T_NAME, "cygwin", 6) == 0
 	    || STRNCMP(T_NAME, "putty", 5) == 0
@@ -3360,12 +3360,12 @@ term_bg_default(void)
 		&& (p = vim_strrchr(p, ';')) != NULL
 		&& ((p[1] >= '0' && p[1] <= '6') || p[1] == '8')
 		&& p[2] == NUL))
-	return (char_u *)"dark";
-    return (char_u *)"light";
+	戻る (char_u *)"dark";
+    戻る (char_u *)"light";
 #endif
 }
 
-#if defined(FEAT_TERMGUICOLORS)
+#もし defined(FEAT_TERMGUICOLORS)
 
 # define RED(rgb)   (((long_u)(rgb) >> 16) & 0xFF)
 # define GREEN(rgb) (((long_u)(rgb) >>  8) & 0xFF)
@@ -3377,18 +3377,18 @@ term_rgb_color(char_u *s, guicolor_T rgb)
 # define MAX_COLOR_STR_LEN 100
     char	buf[MAX_COLOR_STR_LEN];
 
-    if (*s == NUL)
-	return;
+    もし (*s == NUL)
+	戻る;
     vim_snprintf(buf, MAX_COLOR_STR_LEN,
 				  (char *)s, RED(rgb), GREEN(rgb), BLUE(rgb));
 # ifdef FEAT_VTP
-    if (use_vtp() && (p_tgc || t_colors >= 256))
+    もし (use_vtp() && (p_tgc || t_colors >= 256))
     {
 	out_flush();
 	buf[1] = '[';
 	vtp_printf(buf);
     }
-    else
+    否则
 # endif
 	OUT_STR(buf);
 }
@@ -3396,14 +3396,14 @@ term_rgb_color(char_u *s, guicolor_T rgb)
     void
 term_fg_rgb_color(guicolor_T rgb)
 {
-    if (rgb != INVALCOLOR)
+    もし (rgb != INVALCOLOR)
 	term_rgb_color(T_8F, rgb);
 }
 
     void
 term_bg_rgb_color(guicolor_T rgb)
 {
-    if (rgb != INVALCOLOR)
+    もし (rgb != INVALCOLOR)
 	term_rgb_color(T_8B, rgb);
 }
 
@@ -3414,15 +3414,15 @@ term_ul_rgb_color(guicolor_T rgb)
     // If the user explicitly sets t_8u then use it.  Otherwise wait for
     // termresponse to be received, which is when t_8u would be set and a
     // redraw is needed if it was used.
-    if (!option_was_set((char_u *)"t_8u") && write_t_8u_state != OK)
+    もし (!option_was_set((char_u *)"t_8u") && write_t_8u_state != OK)
 	write_t_8u_state = MAYBE;
-    else
+    否则
 # endif
 	term_rgb_color(T_8U, rgb);
 }
 #endif
 
-#if defined(UNIX) || defined(VMS) || defined(MACOS_X)
+#もし defined(UNIX) || defined(VMS) || defined(MACOS_X)
 /*
  * Generic function to set window title, using t_ts and t_fs.
  */
@@ -3443,15 +3443,15 @@ term_settitle(char_u *title)
  * popped (restored) later.
  */
     void
-term_push_title(int which)
+term_push_title(整数 which)
 {
-    if ((which & SAVE_RESTORE_TITLE) && T_CST != NULL && *T_CST != NUL)
+    もし ((which & SAVE_RESTORE_TITLE) && T_CST != NULL && *T_CST != NUL)
     {
 	OUT_STR(T_CST);
 	out_flush();
     }
 
-    if ((which & SAVE_RESTORE_ICON) && T_SSI != NULL && *T_SSI != NUL)
+    もし ((which & SAVE_RESTORE_ICON) && T_SSI != NULL && *T_SSI != NUL)
     {
 	OUT_STR(T_SSI);
 	out_flush();
@@ -3462,15 +3462,15 @@ term_push_title(int which)
  * Tell the terminal to pop the title and/or icon.
  */
     void
-term_pop_title(int which)
+term_pop_title(整数 which)
 {
-    if ((which & SAVE_RESTORE_TITLE) && T_CRT != NULL && *T_CRT != NUL)
+    もし ((which & SAVE_RESTORE_TITLE) && T_CRT != NULL && *T_CRT != NUL)
     {
 	OUT_STR(T_CRT);
 	out_flush();
     }
 
-    if ((which & SAVE_RESTORE_ICON) && T_SRI != NULL && *T_SRI != NUL)
+    もし ((which & SAVE_RESTORE_ICON) && T_SRI != NULL && *T_SRI != NUL)
     {
 	OUT_STR(T_SRI);
 	out_flush();
@@ -3483,7 +3483,7 @@ term_pop_title(int which)
  * Replace all entries that are NULL by empty_option
  */
     void
-ttest(int pairs)
+ttest(整数 pairs)
 {
     char_u *env_colors;
 
@@ -3492,38 +3492,38 @@ ttest(int pairs)
     /*
      * MUST have "cm": cursor motion.
      */
-    if (*T_CM == NUL)
+    もし (*T_CM == NUL)
 	emsg(_(e_terminal_capability_cm_required));
 
     /*
      * if "cs" defined, use a scroll region, it's faster.
      */
-    if (*T_CS != NUL)
+    もし (*T_CS != NUL)
 	scroll_region = TRUE;
-    else
+    否则
 	scroll_region = FALSE;
 
-    if (pairs)
+    もし (pairs)
     {
 	/*
 	 * optional pairs
 	 */
 	// TP goes to normal mode for TI (invert) and TB (bold)
-	if (*T_ME == NUL)
+	もし (*T_ME == NUL)
 	    T_ME = T_MR = T_MD = T_MB = empty_option;
-	if (*T_SO == NUL || *T_SE == NUL)
+	もし (*T_SO == NUL || *T_SE == NUL)
 	    T_SO = T_SE = empty_option;
-	if (*T_US == NUL || *T_UE == NUL)
+	もし (*T_US == NUL || *T_UE == NUL)
 	    T_US = T_UE = empty_option;
-	if (*T_CZH == NUL || *T_CZR == NUL)
+	もし (*T_CZH == NUL || *T_CZR == NUL)
 	    T_CZH = T_CZR = empty_option;
 
 	// T_VE is needed even though T_VI is not defined
-	if (*T_VE == NUL)
+	もし (*T_VE == NUL)
 	    T_VI = empty_option;
 
 	// if 'mr' or 'me' is not defined use 'so' and 'se'
-	if (*T_ME == NUL)
+	もし (*T_ME == NUL)
 	{
 	    T_ME = T_SE;
 	    T_MR = T_SO;
@@ -3531,41 +3531,41 @@ ttest(int pairs)
 	}
 
 	// if 'so' or 'se' is not defined use 'mr' and 'me'
-	if (*T_SO == NUL)
+	もし (*T_SO == NUL)
 	{
 	    T_SE = T_ME;
-	    if (*T_MR == NUL)
+	    もし (*T_MR == NUL)
 		T_SO = T_MD;
-	    else
+	    否则
 		T_SO = T_MR;
 	}
 
 	// if 'ZH' or 'ZR' is not defined use 'mr' and 'me'
-	if (*T_CZH == NUL)
+	もし (*T_CZH == NUL)
 	{
 	    T_CZR = T_ME;
-	    if (*T_MR == NUL)
+	    もし (*T_MR == NUL)
 		T_CZH = T_MD;
-	    else
+	    否则
 		T_CZH = T_MR;
 	}
 
 	// "Sb" and "Sf" come in pairs
-	if (*T_CSB == NUL || *T_CSF == NUL)
+	もし (*T_CSB == NUL || *T_CSF == NUL)
 	{
 	    T_CSB = empty_option;
 	    T_CSF = empty_option;
 	}
 
 	// "AB" and "AF" come in pairs
-	if (*T_CAB == NUL || *T_CAF == NUL)
+	もし (*T_CAB == NUL || *T_CAF == NUL)
 	{
 	    T_CAB = empty_option;
 	    T_CAF = empty_option;
 	}
 
 	// if 'Sb' and 'AB' are not defined, reset "Co"
-	if (*T_CSB == NUL && *T_CAB == NUL)
+	もし (*T_CSB == NUL && *T_CAB == NUL)
 	    free_one_termoption(T_CCO);
 
 	// Set 'weirdinvert' according to value of 't_xs'
@@ -3577,22 +3577,22 @@ ttest(int pairs)
     // GUI.
     t_colors = atoi((char *)T_CCO);
 #ifdef FEAT_GUI
-    if (!gui.in_use)
+    もし (!gui.in_use)
 #endif
     {
 	env_colors = mch_getenv((char_u *)"COLORS");
-	if (env_colors != NULL && SAFE_isdigit(*env_colors))
+	もし (env_colors != NULL && SAFE_isdigit(*env_colors))
 	{
-	    int colors = atoi((char *)env_colors);
+	    整数 colors = atoi((char *)env_colors);
 
-	    if (colors != t_colors)
+	    もし (colors != t_colors)
 		set_color_count(colors);
 	}
     }
     set_rgb_term_prop();
 }
 
-#if defined(FEAT_GUI) && (defined(FEAT_MENU) || !defined(USE_ON_FLY_SCROLL))
+#もし defined(FEAT_GUI) && (defined(FEAT_MENU) || !defined(USE_ON_FLY_SCROLL))
 /*
  * Represent the given long_u as individual bytes, with the most significant
  * byte first, and store them in dst.
@@ -3600,10 +3600,10 @@ ttest(int pairs)
     void
 add_long_to_buf(long_u val, char_u *dst)
 {
-    int	    i;
-    int	    shift;
+    整数	    i;
+    整数	    shift;
 
-    for (i = 1; i <= (int)sizeof(long_u); i++)
+    ために (i = 1; i <= (整数)sizeof(long_u); i++)
     {
 	shift = 8 * (sizeof(long_u) - i);
 	dst[i - 1] = (char_u) ((val >> shift) & 0xff);
@@ -3618,24 +3618,24 @@ add_long_to_buf(long_u val, char_u *dst)
  * (between sizeof(long_u) and 2 * sizeof(long_u)), or -1 if not enough bytes
  * were present.
  */
-    static int
+    static 整数
 get_long_from_buf(char_u *buf, long_u *val)
 {
-    int	    len;
+    整数	    len;
     char_u  bytes[sizeof(long_u)];
-    int	    i;
-    int	    shift;
+    整数	    i;
+    整数	    shift;
 
     *val = 0;
-    len = get_bytes_from_buf(buf, bytes, (int)sizeof(long_u));
-    if (len == -1)
-	return -1;
-    for (i = 0; i < (int)sizeof(long_u); i++)
+    len = get_bytes_from_buf(buf, bytes, (整数)sizeof(long_u));
+    もし (len == -1)
+	戻る -1;
+    ために (i = 0; i < (整数)sizeof(long_u); i++)
     {
 	shift = 8 * (sizeof(long_u) - 1 - i);
 	*val += (long_u)bytes[i] << shift;
     }
-    return len;
+    戻る len;
 }
 #endif
 
@@ -3645,36 +3645,36 @@ get_long_from_buf(char_u *buf, long_u *val)
  * from buf (between num_bytes and num_bytes*2), or -1 if not enough bytes were
  * available.
  */
-    int
-get_bytes_from_buf(char_u *buf, char_u *bytes, int num_bytes)
+    整数
+get_bytes_from_buf(char_u *buf, char_u *bytes, 整数 num_bytes)
 {
-    int	    len = 0;
-    int	    i;
+    整数	    len = 0;
+    整数	    i;
     char_u  c;
 
-    for (i = 0; i < num_bytes; i++)
+    ために (i = 0; i < num_bytes; i++)
     {
-	if ((c = buf[len++]) == NUL)
-	    return -1;
-	if (c == K_SPECIAL)
+	もし ((c = buf[len++]) == NUL)
+	    戻る -1;
+	もし (c == K_SPECIAL)
 	{
-	    if (buf[len] == NUL || buf[len + 1] == NUL)	    // cannot happen?
-		return -1;
-	    if (buf[len++] == (int)KS_ZERO)
+	    もし (buf[len] == NUL || buf[len + 1] == NUL)	    // cannot happen?
+		戻る -1;
+	    もし (buf[len++] == (整数)KS_ZERO)
 		c = NUL;
 	    // else it should be KS_SPECIAL; when followed by KE_FILLER c is
 	    // K_SPECIAL, or followed by KE_CSI and c must be CSI.
-	    if (buf[len++] == (int)KE_CSI)
+	    もし (buf[len++] == (整数)KE_CSI)
 		c = CSI;
 	}
-	else if (c == CSI && buf[len] == KS_EXTRA
-					       && buf[len + 1] == (int)KE_CSI)
+	否则 もし (c == CSI && buf[len] == KS_EXTRA
+					       && buf[len + 1] == (整数)KE_CSI)
 	    // CSI is stored as CSI KS_SPECIAL KE_CSI to avoid confusion with
 	    // the start of a special key, see add_to_input_buf_csi().
 	    len += 2;
 	bytes[i] = c;
     }
-    return len;
+    戻る len;
 }
 
 /*
@@ -3685,14 +3685,14 @@ get_bytes_from_buf(char_u *buf, char_u *bytes, int num_bytes)
 check_shellsize(void)
 {
     // need room for one window and command line
-    if (Rows < min_rows_for_all_tabpages())
+    もし (Rows < min_rows_for_all_tabpages())
 	Rows = min_rows_for_all_tabpages();
     limit_screen_size();
 
     // make sure these values are not invalid
-    if (cmdline_row >= Rows)
+    もし (cmdline_row >= Rows)
 	cmdline_row = Rows - 1;
-    if (msg_row >= Rows)
+    もし (msg_row >= Rows)
 	msg_row = Rows - 1;
 }
 
@@ -3702,11 +3702,11 @@ check_shellsize(void)
     void
 limit_screen_size(void)
 {
-    if (Columns < MIN_COLUMNS)
+    もし (Columns < MIN_COLUMNS)
 	Columns = MIN_COLUMNS;
-    else if (Columns > 10000)
+    否则 もし (Columns > 10000)
 	Columns = 10000;
-    if (Rows > 1000)
+    もし (Rows > 1000)
 	Rows = 1000;
 }
 
@@ -3716,25 +3716,25 @@ limit_screen_size(void)
     void
 win_new_shellsize(void)
 {
-    static int	old_Rows = 0;
-    static int	old_Columns = 0;
-    static int	old_coloff = 0;
+    static 整数	old_Rows = 0;
+    static 整数	old_Columns = 0;
+    static 整数	old_coloff = 0;
 
-    if (old_Rows != Rows || old_Columns != COLUMNS_WITHOUT_TPL()
+    もし (old_Rows != Rows || old_Columns != COLUMNS_WITHOUT_TPL()
 	    || old_coloff != TPL_LCOL())
 	ui_new_shellsize();
-    if (old_Columns != COLUMNS_WITHOUT_TPL() || old_coloff != TPL_LCOL())
+    もし (old_Columns != COLUMNS_WITHOUT_TPL() || old_coloff != TPL_LCOL())
     {
 	old_Columns = COLUMNS_WITHOUT_TPL();
 	old_coloff = TPL_LCOL();
 
 	shell_new_columns();
     }
-    if (old_Rows != Rows)
+    もし (old_Rows != Rows)
     {
 	// If 'window' uses the whole screen, keep it using that.
 	// Don't change it when set with "-w size" on the command line.
-	if (p_window == old_Rows - 1
+	もし (p_window == old_Rows - 1
 		    || (old_Rows == 0 && !option_was_set((char_u *)"window")))
 	    p_window = Rows - 1;
 	old_Rows = Rows;
@@ -3742,28 +3742,28 @@ win_new_shellsize(void)
     }
 }
 
-#if defined(FEAT_IMAGE) || defined(FEAT_EVAL)
+#もし defined(FEAT_IMAGE) || defined(FEAT_EVAL)
     void
 update_cell_size(void)
 {
 # ifdef FEAT_GUI
-    if (gui.in_use)
+    もし (gui.in_use)
     {
 	cell_width = gui.char_width;
 	cell_height = gui.char_height;
     }
-    else
+    否则
 # endif
     {
 	struct cellsize cell_sz;
 
 	mch_calc_cell_size(&cell_sz);
-	if (cell_sz.cs_xpixel <= 0 || cell_sz.cs_ypixel <= 0)
+	もし (cell_sz.cs_xpixel <= 0 || cell_sz.cs_ypixel <= 0)
 	{
 	    cell_width = 8;
 	    cell_height = 16;
 	}
-	else
+	否则
 	{
 	    cell_width = cell_sz.cs_xpixel;
 	    cell_height = cell_sz.cs_ypixel;
@@ -3779,7 +3779,7 @@ update_cell_size(void)
     void
 shell_resized(void)
 {
-#if defined(FEAT_IMAGE) || defined(FEAT_EVAL)
+#もし defined(FEAT_IMAGE) || defined(FEAT_EVAL)
     update_cell_size();
 #endif
     set_shellsize(0, 0, FALSE);
@@ -3792,21 +3792,21 @@ shell_resized(void)
     void
 shell_resized_check(void)
 {
-    int		old_Rows = Rows;
-    int		old_Columns = Columns;
+    整数		old_Rows = Rows;
+    整数		old_Columns = Columns;
 
-    if (exiting
+    もし (exiting
 #ifdef FEAT_GUI
 	    // Do not get the size when executing a shell command during
 	    // startup.
 	    || gui.starting
 #endif
 	    )
-	return;
+	戻る;
 
     (void)ui_get_shellsize();
     check_shellsize();
-    if (old_Rows != Rows || old_Columns != Columns)
+    もし (old_Rows != Rows || old_Columns != Columns)
 	shell_resized();
 }
 
@@ -3818,45 +3818,45 @@ shell_resized_check(void)
  * it fails use 'width' and 'height'.
  */
     static void
-set_shellsize_inner(int width, int height, int mustset)
+set_shellsize_inner(整数 width, 整数 height, 整数 mustset)
 {
-    if (updating_screen)
+    もし (updating_screen)
 	// resizing while in update_screen() may cause a crash
-	return;
+	戻る;
 
     // curwin->w_buffer can be NULL when we are closing a window and the
     // buffer (or window) has already been closed and removing a scrollbar
     // causes a resize event. Don't resize then, it will happen after entering
     // another buffer.
-    if (curwin->w_buffer == NULL || curwin->w_lines == NULL)
-	return;
+    もし (curwin->w_buffer == NULL || curwin->w_lines == NULL)
+	戻る;
 
 #ifdef AMIGA
     out_flush();	    // must do this before mch_get_shellsize() for
 			    // some obscure reason
 #endif
 
-    if (mustset || (ui_get_shellsize() == FAIL && height != 0))
+    もし (mustset || (ui_get_shellsize() == FAIL && height != 0))
     {
 	Rows = height;
 	Columns = width;
 	check_shellsize();
 	ui_set_shellsize(mustset);
     }
-    else
+    否则
 	check_shellsize();
 
     // The window layout used to be adjusted here, but it now happens in
     // screenalloc() (also invoked from screenclear()).  That is because the
     // "busy" check above may skip this, but not screenalloc().
 
-    if (State != MODE_ASKMORE && State != MODE_EXTERNCMD
+    もし (State != MODE_ASKMORE && State != MODE_EXTERNCMD
 						      && State != MODE_CONFIRM)
 	screenclear();
-    else
+    否则
 	screen_start();	    // don't know where cursor is now
 
-    if (starting != NO_SCREEN)
+    もし (starting != NO_SCREEN)
     {
 	maketitle();
 
@@ -3873,31 +3873,31 @@ set_shellsize_inner(int width, int height, int mustset)
 	 * Always need to call update_screen() or screenalloc(), to make
 	 * sure Rows/Columns and the size of ScreenLines[] is correct!
 	 */
-	if (State == MODE_ASKMORE || State == MODE_EXTERNCMD
+	もし (State == MODE_ASKMORE || State == MODE_EXTERNCMD
 				     || State == MODE_CONFIRM || exmode_active)
 	{
 	    screenalloc(FALSE);
 	    repeat_message();
 	}
-	else
+	否则
 	{
-	    if (curwin->w_p_scb)
+	    もし (curwin->w_p_scb)
 		do_check_scrollbind(TRUE);
-	    if (State & MODE_CMDLINE)
+	    もし (State & MODE_CMDLINE)
 	    {
 		update_screen(UPD_NOT_VALID);
 		redrawcmdline();
 	    }
-	    else
+	    否则
 	    {
 		update_topline();
-		if (pum_visible())
+		もし (pum_visible())
 		{
 		    redraw_later(UPD_NOT_VALID);
 		    ins_compl_show_pum();
 		}
 		update_screen(UPD_NOT_VALID);
-		if (redrawing())
+		もし (redrawing())
 		    setcursor();
 	    }
 	}
@@ -3907,19 +3907,19 @@ set_shellsize_inner(int width, int height, int mustset)
 }
 
     void
-set_shellsize(int width, int height, int mustset)
+set_shellsize(整数 width, 整数 height, 整数 mustset)
 {
-    static int	busy = FALSE;
-    static int	do_run = FALSE;
+    static 整数	busy = FALSE;
+    static 整数	do_run = FALSE;
 
-    if (width < 0 || height < 0)    // just checking...
-	return;
+    もし (width < 0 || height < 0)    // just checking...
+	戻る;
 
-    if (State == MODE_HITRETURN || State == MODE_SETWSIZE)
+    もし (State == MODE_HITRETURN || State == MODE_SETWSIZE)
     {
 	// postpone the resizing
 	State = MODE_SETWSIZE;
-	return;
+	戻る;
     }
 
     // Avoid recursiveness.  This can happen when setting the window size
@@ -3927,10 +3927,10 @@ set_shellsize(int width, int height, int mustset)
     // very close together.  There needs to be another run then after the
     // current one is done to pick up the latest size.
     do_run = TRUE;
-    if (busy)
-	return;
+    もし (busy)
+	戻る;
 
-    while (do_run)
+    ながら (do_run)
     {
 	do_run = FALSE;
 	busy = TRUE;
@@ -3958,10 +3958,10 @@ out_str_t_TE(void)
     // some situations.
     // The following t_TI is expected to request the state and then
     // modify_otherkeys_state will be set again.
-    if (modify_otherkeys_state == MOKS_ENABLED
+    もし (modify_otherkeys_state == MOKS_ENABLED
 	    || modify_otherkeys_state == MOKS_DISABLED)
 	modify_otherkeys_state = MOKS_DISABLED;
-    else if (modify_otherkeys_state != MOKS_INITIAL)
+    否则 もし (modify_otherkeys_state != MOKS_INITIAL)
 	modify_otherkeys_state = MOKS_AFTER_T_TE;
 
     // When the kitty keyboard protocol is enabled we expect t_TE to disable
@@ -3969,14 +3969,14 @@ out_str_t_TE(void)
     // situations.
     // The following t_TI is expected to request the state and then
     // kitty_protocol_state will be set again.
-    if (kitty_protocol_state == KKPS_ENABLED
+    もし (kitty_protocol_state == KKPS_ENABLED
 	    || kitty_protocol_state == KKPS_DISABLED)
 	kitty_protocol_state = KKPS_DISABLED;
-    else
+    否则
 	kitty_protocol_state = KKPS_AFTER_T_TE;
 }
 
-static int send_t_RK = FALSE;
+static 整数 send_t_RK = FALSE;
 
 /*
  * Output T_TI and setup for what follows.
@@ -3998,10 +3998,10 @@ out_str_t_BE(void)
 {
     char_u *p;
 
-    if (T_BE == NULL || *T_BE == NUL
+    もし (T_BE == NULL || *T_BE == NUL
 	    || (p = find_termcode((char_u *)"PS")) == NULL || *p == NUL
 	    || (p = find_termcode((char_u *)"PE")) == NULL || *p == NUL)
-	return;
+	戻る;
     out_str(T_BE);
 }
 
@@ -4013,7 +4013,7 @@ out_str_t_BE(void)
     void
 may_send_t_RK(void)
 {
-    if (send_t_RK
+    もし (send_t_RK
 	    && !work_pending()
 	    && !ex_normal_busy
 #ifdef FEAT_EVAL
@@ -4036,12 +4036,12 @@ settmode(tmode_T tmode)
 {
 #ifdef FEAT_GUI
     // don't set the term where gvim was started to any mode
-    if (gui.in_use)
-	return;
+    もし (gui.in_use)
+	戻る;
 #endif
 
-    if (!full_screen)
-	return;
+    もし (!full_screen)
+	戻る;
 
     /*
      * When returning after calling a shell cur_tmode is TMODE_UNKNOWN,
@@ -4051,38 +4051,38 @@ settmode(tmode_T tmode)
      * normal again, because that causes problems (logout!) on some
      * machines.
      */
-    if (tmode != cur_tmode)
+    もし (tmode != cur_tmode)
     {
 #ifdef FEAT_TERMRESPONSE
 # ifdef FEAT_GUI
-	if (!gui.in_use && !gui.starting)
+	もし (!gui.in_use && !gui.starting)
 # endif
 	{
 	    // May need to check for T_CRV response and termcodes, it
 	    // doesn't work in Cooked mode, an external program may get
 	    // them.
-	    if (tmode != TMODE_RAW && termrequest_any_pending())
+	    もし (tmode != TMODE_RAW && termrequest_any_pending())
 		(void)vpeekc_nomap();
 	    check_for_codes_from_term();
 	}
 #endif
-	if (tmode != TMODE_RAW)
+	もし (tmode != TMODE_RAW)
 	    mch_setmouse(FALSE);	// switch mouse off
 
 	// Disable bracketed paste and modifyOtherKeys in cooked mode.
 	// Avoid doing this too often, on some terminals the codes are not
 	// handled properly.
-	if (termcap_active && tmode != TMODE_SLEEP
+	もし (termcap_active && tmode != TMODE_SLEEP
 		&& cur_tmode != TMODE_SLEEP)
 	{
 	    MAY_WANT_TO_LOG_THIS;
 
-	    if (tmode != TMODE_RAW)
+	    もし (tmode != TMODE_RAW)
 	    {
 		out_str(T_BD);	// disable bracketed paste mode
 		out_str_t_TE();	// possibly disables modifyOtherKeys
 	    }
-	    else
+	    否则
 	    {
 		out_str_t_BE();	// enable bracketed paste mode (should
 				// be before mch_settmode().
@@ -4092,7 +4092,7 @@ settmode(tmode_T tmode)
 	out_flush();
 	mch_settmode(tmode);	// machine specific function
 	cur_tmode = tmode;
-	if (tmode == TMODE_RAW)
+	もし (tmode == TMODE_RAW)
 	    setmouse();		// may switch mouse on
 	out_flush();
     }
@@ -4104,8 +4104,8 @@ settmode(tmode_T tmode)
     void
 starttermcap(void)
 {
-    if (!full_screen || termcap_active)
-	return;
+    もし (!full_screen || termcap_active)
+	戻る;
 
     MAY_WANT_TO_LOG_THIS;
 
@@ -4114,9 +4114,9 @@ starttermcap(void)
     out_str(T_KS);			// start "keypad transmit" mode
     out_str_t_BE();			// enable bracketed paste mode
 
-#if defined(UNIX) || defined(VMS)
+#もし defined(UNIX) || defined(VMS)
     // Enable xterm's focus reporting mode when 'esckeys' is set.
-    if (p_ek && *T_FE != NUL)
+    もし (p_ek && *T_FE != NUL)
 	out_str(T_FE);
 #endif
 
@@ -4125,13 +4125,13 @@ starttermcap(void)
     screen_start();			// don't know where cursor is now
 #ifdef FEAT_TERMRESPONSE
 # ifdef FEAT_GUI
-    if (!gui.in_use && !gui.starting)
+    もし (!gui.in_use && !gui.starting)
 # endif
     {
 	may_req_termresponse();
 	// Immediately check for a response.  If t_Co changes, we don't
 	// want to redraw with wrong colors first.
-	if (crv_status.tr_progress == STATUS_SENT)
+	もし (crv_status.tr_progress == STATUS_SENT)
 	    check_for_codes_from_term();
     }
 #endif
@@ -4143,16 +4143,16 @@ stoptermcap(void)
     screen_stop_highlight();
     reset_cterm_colors();
 
-    if (!termcap_active)
-	return;
+    もし (!termcap_active)
+	戻る;
 
 #ifdef FEAT_TERMRESPONSE
 # ifdef FEAT_GUI
-    if (!gui.in_use && !gui.starting)
+    もし (!gui.in_use && !gui.starting)
 # endif
     {
 	// May need to discard T_CRV, T_U7 or T_RBG response.
-	if (termrequest_any_pending())
+	もし (termrequest_any_pending())
 	{
 # ifdef UNIX
 	    // Give the terminal a chance to respond.
@@ -4160,7 +4160,7 @@ stoptermcap(void)
 # endif
 # ifdef TCIFLUSH
 	    // Discard data received but not read.
-	    if (exiting)
+	    もし (exiting)
 		tcflush(fileno(stdin), TCIFLUSH);
 # endif
 	}
@@ -4171,9 +4171,9 @@ stoptermcap(void)
 #endif
     MAY_WANT_TO_LOG_THIS;
 
-#if defined(UNIX) || defined(VMS)
+#もし defined(UNIX) || defined(VMS)
     // Disable xterm's focus reporting mode if 'esckeys' is set.
-    if (p_ek && *T_FD != NUL)
+    もし (p_ek && *T_FD != NUL)
 	out_str(T_FD);
 #endif
 
@@ -4189,7 +4189,7 @@ stoptermcap(void)
     // use a separate state.  If we are (or were) using the Kitty keyboard
     // protocol and t_te is not empty (possibly switching screens) then
     // output t_TE both before and after outputting t_te.
-    if (*T_TE != NUL && (kitty_protocol_state == KKPS_ENABLED
+    もし (*T_TE != NUL && (kitty_protocol_state == KKPS_ENABLED
 		|| kitty_protocol_state == KKPS_DISABLED))
 	out_str_t_TE();		// probably disables the kitty keyboard
 				// protocol
@@ -4202,7 +4202,7 @@ stoptermcap(void)
     out_flush();
 }
 
-#if defined(FEAT_TERMRESPONSE)
+#もし defined(FEAT_TERMRESPONSE)
 /*
  * Request version string (for xterm) when needed.
  * Only do this after switching to raw mode, otherwise the result will be
@@ -4220,7 +4220,7 @@ stoptermcap(void)
     void
 may_req_termresponse(void)
 {
-    if (crv_status.tr_progress == STATUS_GET
+    もし (crv_status.tr_progress == STATUS_GET
 	    && can_get_termresponse()
 	    && starting == 0
 	    && *T_CRV != NUL)
@@ -4245,12 +4245,12 @@ may_req_termresponse(void)
     void
 check_terminal_behavior(void)
 {
-    int	    did_send = FALSE;
+    整数	    did_send = FALSE;
 
-    if (!can_get_termresponse() || starting != 0 || *T_U7 == NUL)
-	return;
+    もし (!can_get_termresponse() || starting != 0 || *T_U7 == NUL)
+	戻る;
 
-    if (u7_status.tr_progress == STATUS_GET
+    もし (u7_status.tr_progress == STATUS_GET
 	    && !option_was_set((char_u *)"ambiwidth"))
     {
 	char_u	buf[16];
@@ -4284,7 +4284,7 @@ check_terminal_behavior(void)
 	line_was_clobbered(1);
     }
 
-    if (xcc_status.tr_progress == STATUS_GET && Rows > 2)
+    もし (xcc_status.tr_progress == STATUS_GET && Rows > 2)
     {
 	// 2. Check compatibility with xterm.
 	// We move the cursor to (2, 0), print a test sequence and then query
@@ -4315,7 +4315,7 @@ check_terminal_behavior(void)
 	line_was_clobbered(2);
     }
 
-    if (did_send)
+    もし (did_send)
     {
 	term_windgoto(0, 0);
 
@@ -4336,13 +4336,13 @@ check_terminal_behavior(void)
     void
 may_req_bg_color(void)
 {
-    if (can_get_termresponse() && starting == 0)
+    もし (can_get_termresponse() && starting == 0)
     {
-	int didit = FALSE;
+	整数 didit = FALSE;
 
 # ifdef FEAT_TERMINAL
 	// Only request foreground if t_RF is set.
-	if (rfg_status.tr_progress == STATUS_GET && *T_RFG != NUL)
+	もし (rfg_status.tr_progress == STATUS_GET && *T_RFG != NUL)
 	{
 	    MAY_WANT_TO_LOG_THIS;
 	    LOG_TR1("Sending FG request");
@@ -4353,7 +4353,7 @@ may_req_bg_color(void)
 # endif
 
 	// Only request background if t_RB is set.
-	if (rbg_status.tr_progress == STATUS_GET && *T_RBG != NUL)
+	もし (rbg_status.tr_progress == STATUS_GET && *T_RBG != NUL)
 	{
 	    MAY_WANT_TO_LOG_THIS;
 	    LOG_TR1("Sending BG request");
@@ -4362,7 +4362,7 @@ may_req_bg_color(void)
 	    didit = TRUE;
 	}
 
-	if (didit)
+	もし (didit)
 	{
 	    // check for the characters now, otherwise they might be eaten by
 	    // get_keystroke()
@@ -4377,10 +4377,10 @@ may_req_bg_color(void)
 /*
  * Return TRUE when saving and restoring the screen.
  */
-    int
+    整数
 swapping_screen(void)
 {
-    return (full_screen && *T_TI != NUL);
+    戻る (full_screen && *T_TI != NUL);
 }
 
 /*
@@ -4391,8 +4391,8 @@ swapping_screen(void)
     void
 scroll_start(void)
 {
-    if (*T_VS == NUL || *T_CVS == NUL)
-	return;
+    もし (*T_VS == NUL || *T_CVS == NUL)
+	戻る;
 
     MAY_WANT_TO_LOG_THIS;
     out_str(T_VS);
@@ -4401,10 +4401,10 @@ scroll_start(void)
 }
 
 // True if cursor is not visible
-static int cursor_is_off = FALSE;
+static 整数 cursor_is_off = FALSE;
 
 // True if cursor is not visible due to an ongoing cursor-less sleep
-static int cursor_is_asleep = FALSE;
+static 整数 cursor_is_asleep = FALSE;
 
 /*
  * Enable the cursor without checking if it's already enabled.
@@ -4423,7 +4423,7 @@ cursor_on_force(void)
     void
 cursor_on(void)
 {
-    if (cursor_is_off && !cursor_is_asleep)
+    もし (cursor_is_off && !cursor_is_asleep)
 	cursor_on_force();
 }
 
@@ -4433,7 +4433,7 @@ cursor_on(void)
     void
 cursor_off(void)
 {
-    if (full_screen && !cursor_is_off)
+    もし (full_screen && !cursor_is_off)
     {
 	out_str(T_VI);	    // disable cursor
 	cursor_is_off = TRUE;
@@ -4444,10 +4444,10 @@ cursor_off(void)
 /*
  * Check whether the cursor is invisible due to an ongoing cursor-less sleep
  */
-    int
+    整数
 cursor_is_sleeping(void)
 {
-    return cursor_is_asleep;
+    戻る cursor_is_asleep;
 }
 #endif
 
@@ -4471,64 +4471,64 @@ cursor_unsleep(void)
     cursor_on();
 }
 
-#if defined(CURSOR_SHAPE)
+#もし defined(CURSOR_SHAPE)
 /*
  * Set cursor shape to match Insert or Replace mode.
  */
     void
-term_cursor_mode(int forced)
+term_cursor_mode(整数 forced)
 {
-    static int showing_mode = -1;
+    static 整数 showing_mode = -1;
     char_u *p;
 
     // Only do something when redrawing the screen and we can restore the
     // mode.
-    if (!full_screen || *T_CEI == NUL)
+    もし (!full_screen || *T_CEI == NUL)
     {
 # ifdef FEAT_TERMRESPONSE
-	if (forced && initial_cursor_shape > 0)
+	もし (forced && initial_cursor_shape > 0)
 	    // Restore to initial values.
 	    term_cursor_shape(initial_cursor_shape, initial_cursor_blink);
 # endif
-	return;
+	戻る;
     }
 
-    if ((State & MODE_REPLACE) == MODE_REPLACE)
+    もし ((State & MODE_REPLACE) == MODE_REPLACE)
     {
-	if (forced || showing_mode != MODE_REPLACE)
+	もし (forced || showing_mode != MODE_REPLACE)
 	{
-	    if (*T_CSR != NUL)
+	    もし (*T_CSR != NUL)
 		p = T_CSR;	// Replace mode cursor
-	    else
+	    否则
 		p = T_CSI;	// fall back to Insert mode cursor
-	    if (*p != NUL)
+	    もし (*p != NUL)
 	    {
 		out_str(p);
 		showing_mode = MODE_REPLACE;
 	    }
 	}
     }
-    else if (State & MODE_INSERT)
+    否则 もし (State & MODE_INSERT)
     {
-	if ((forced || showing_mode != MODE_INSERT) && *T_CSI != NUL)
+	もし ((forced || showing_mode != MODE_INSERT) && *T_CSI != NUL)
 	{
 	    out_str(T_CSI);	    // Insert mode cursor
 	    showing_mode = MODE_INSERT;
 	}
     }
-    else if (forced || showing_mode != MODE_NORMAL)
+    否则 もし (forced || showing_mode != MODE_NORMAL)
     {
 	out_str(T_CEI);		    // non-Insert mode cursor
 	showing_mode = MODE_NORMAL;
     }
 }
 
-# if defined(FEAT_TERMINAL)
+# もし defined(FEAT_TERMINAL)
     void
 term_cursor_color(char_u *color)
 {
-    if (*T_CSC == NUL)
-	return;
+    もし (*T_CSC == NUL)
+	戻る;
 
     out_str(T_CSC);		// set cursor color start
     out_str_nf(color);
@@ -4537,15 +4537,15 @@ term_cursor_color(char_u *color)
 }
 # endif
 
-    int
+    整数
 blink_state_is_inverted(void)
 {
 # ifdef FEAT_TERMRESPONSE
-    return rbm_status.tr_progress == STATUS_GOT
+    戻る rbm_status.tr_progress == STATUS_GOT
 	&& rcs_status.tr_progress == STATUS_GOT
 		&& initial_cursor_blink != initial_cursor_shape_blink;
-# else
-    return FALSE;
+# 否则
+    戻る FALSE;
 # endif
 }
 
@@ -4553,29 +4553,29 @@ blink_state_is_inverted(void)
  * "shape": 1 = block, 2 = underline, 3 = vertical bar
  */
     void
-term_cursor_shape(int shape, int blink)
+term_cursor_shape(整数 shape, 整数 blink)
 {
-    if (*T_CSH != NUL)
+    もし (*T_CSH != NUL)
     {
 	OUT_STR(tgoto((char *)T_CSH, 0, shape * 2 - blink));
 	out_flush();
     }
-    else
+    否则
     {
-	int do_blink = blink;
+	整数 do_blink = blink;
 
 	// t_SH is empty: try setting just the blink state.
 	// The blink flags are XORed together, if the initial blinking from
 	// style and shape differs, we need to invert the flag here.
-	if (blink_state_is_inverted())
+	もし (blink_state_is_inverted())
 	    do_blink = !blink;
 
-	if (do_blink && *T_VS != NUL)
+	もし (do_blink && *T_VS != NUL)
 	{
 	    out_str(T_VS);
 	    out_flush();
 	}
-	else if (!do_blink && *T_CVS != NUL)
+	否则 もし (!do_blink && *T_CVS != NUL)
 	{
 	    out_str(T_CVS);
 	    out_flush();
@@ -4591,11 +4591,11 @@ term_cursor_shape(int shape, int blink)
  * the full width of the window, excluding the vertical separator.
  */
     void
-scroll_region_set(win_T *wp, int off)
+scroll_region_set(win_T *wp, 整数 off)
 {
     OUT_STR(tgoto((char *)T_CS, W_WINROW(wp) + wp->w_height - 1,
 							 W_WINROW(wp) + off));
-    if (*T_CSV != NUL && wp->w_width != Columns)
+    もし (*T_CSV != NUL && wp->w_width != Columns)
 	OUT_STR(tgoto((char *)T_CSV, wp->w_wincol + wp->w_width - 1,
 							       wp->w_wincol));
     screen_start();		    // don't know where cursor is now
@@ -4607,9 +4607,9 @@ scroll_region_set(win_T *wp, int off)
     void
 scroll_region_reset(void)
 {
-    OUT_STR(tgoto((char *)T_CS, (int)Rows - 1, 0));
-    if (*T_CSV != NUL)
-	OUT_STR(tgoto((char *)T_CSV, (int)Columns - 1, 0));
+    OUT_STR(tgoto((char *)T_CS, (整数)Rows - 1, 0));
+    もし (*T_CSV != NUL)
+	OUT_STR(tgoto((char *)T_CSV, (整数)Columns - 1, 0));
     screen_start();		    // don't know where cursor is now
 }
 
@@ -4622,19 +4622,19 @@ static struct termcode
 {
     char_u  name[2];	    // termcap name of entry
     char_u  *code;	    // terminal code (in allocated memory)
-    int	    len;	    // STRLEN(code)
-    int	    modlen;	    // length of part before ";*~".
+    整数	    len;	    // STRLEN(code)
+    整数	    modlen;	    // length of part before ";*~".
 } *termcodes = NULL;
 
-static int  tc_max_len = 0; // number of entries that termcodes[] can hold
-static int  tc_len = 0;	    // current number of entries in termcodes[]
+static 整数  tc_max_len = 0; // number of entries that termcodes[] can hold
+static 整数  tc_len = 0;	    // current number of entries in termcodes[]
 
-static int termcode_star(char_u *code, int len);
+static 整数 termcode_star(char_u *code, 整数 len);
 
     void
 clear_termcodes(void)
 {
-    while (tc_len > 0)
+    ながら (tc_len > 0)
 	vim_free(termcodes[--tc_len].code);
     VIM_CLEAR(termcodes);
     tc_max_len = 0;
@@ -4657,16 +4657,16 @@ clear_termcodes(void)
  * Set "termcodes[idx].modlen".
  */
     static void
-adjust_modlen(int idx)
+adjust_modlen(整数 idx)
 {
     termcodes[idx].modlen = 0;
-    int j = termcode_star(termcodes[idx].code, termcodes[idx].len);
-    if (j <= 0)
-	return;
+    整数 j = termcode_star(termcodes[idx].code, termcodes[idx].len);
+    もし (j <= 0)
+	戻る;
 
     termcodes[idx].modlen = termcodes[idx].len - 1 - j;
     // For "CSI[@;X" the "@" is not included in "modlen".
-    if (termcodes[idx].code[termcodes[idx].modlen - 1] == '@')
+    もし (termcodes[idx].code[termcodes[idx].modlen - 1] == '@')
 	--termcodes[idx].modlen;
 }
 
@@ -4678,48 +4678,48 @@ adjust_modlen(int idx)
  * "flags" can also be ATC_FROM_TERM for got_code_from_term().
  */
     void
-add_termcode(char_u *name, char_u *string, int flags)
+add_termcode(char_u *name, char_u *string, 整数 flags)
 {
     struct termcode *new_tc;
-    int		    i, j;
+    整数		    i, j;
     char_u	    *s;
-    int		    len;
+    整数		    len;
 #ifdef FEAT_EVAL
     char	    *action = "Setting";
 #endif
 
-    if (string == NULL || *string == NUL)
+    もし (string == NULL || *string == NUL)
     {
 	del_termcode(name);
-	return;
+	戻る;
     }
 
-#if defined(MSWIN) && !defined(FEAT_GUI)
+#もし defined(MSWIN) && !defined(FEAT_GUI)
     s = vim_strnsave(string, STRLEN(string) + 1);
-#else
+#否则
 # ifdef VIMDLL
-    if (!gui.in_use)
+    もし (!gui.in_use)
 	s = vim_strnsave(string, STRLEN(string) + 1);
-    else
+    否则
 # endif
 	s = vim_strsave(string);
 #endif
-    if (s == NULL)
-	return;
+    もし (s == NULL)
+	戻る;
 
     // Change leading <Esc>[ to CSI, change <Esc>O to <M-O>.
-    if (flags != 0 && flags != ATC_FROM_TERM && term_7to8bit(string) != 0)
+    もし (flags != 0 && flags != ATC_FROM_TERM && term_7to8bit(string) != 0)
     {
 	STRMOVE(s, s + 1);
 	s[0] = term_7to8bit(string);
     }
 
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#もし defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
 # ifdef VIMDLL
-    if (!gui.in_use)
+    もし (!gui.in_use)
 # endif
     {
-	if (s[0] == K_NUL)
+	もし (s[0] == K_NUL)
 	{
 	    STRMOVE(s + 1, s);
 	    s[1] = 3;
@@ -4727,24 +4727,24 @@ add_termcode(char_u *name, char_u *string, int flags)
     }
 #endif
 
-    len = (int)STRLEN(s);
+    len = (整数)STRLEN(s);
 
     need_gather = TRUE;		// need to fill termleader[]
 
     /*
      * need to make space for more entries
      */
-    if (tc_len == tc_max_len)
+    もし (tc_len == tc_max_len)
     {
 	tc_max_len += 20;
 	new_tc = ALLOC_MULT(struct termcode, tc_max_len);
-	if (new_tc == NULL)
+	もし (new_tc == NULL)
 	{
 	    tc_max_len -= 20;
 	    vim_free(s);
-	    return;
+	    戻る;
 	}
-	for (i = 0; i < tc_len; ++i)
+	ために (i = 0; i < tc_len; ++i)
 	    new_tc[i] = termcodes[i];
 	vim_free(termcodes);
 	termcodes = new_tc;
@@ -4755,25 +4755,25 @@ add_termcode(char_u *name, char_u *string, int flags)
      * Look for an existing entry that is alphabetical higher, the new entry
      * is inserted in front of it.
      */
-    for (i = 0; i < tc_len; ++i)
+    ために (i = 0; i < tc_len; ++i)
     {
-	if (termcodes[i].name[0] < name[0])
+	もし (termcodes[i].name[0] < name[0])
 	    continue;
-	if (termcodes[i].name[0] == name[0])
+	もし (termcodes[i].name[0] == name[0])
 	{
-	    if (termcodes[i].name[1] < name[1])
+	    もし (termcodes[i].name[1] < name[1])
 		continue;
 	    /*
 	     * Exact match: May replace old code.
 	     */
-	    if (termcodes[i].name[1] == name[1])
+	    もし (termcodes[i].name[1] == name[1])
 	    {
-		if (flags == ATC_FROM_TERM && (j = termcode_star(
+		もし (flags == ATC_FROM_TERM && (j = termcode_star(
 				    termcodes[i].code, termcodes[i].len)) > 0)
 		{
 		    // Don't replace ESC[123;*X or ESC O*X with another when
 		    // invoked from got_code_from_term().
-		    if (len == termcodes[i].len - j
+		    もし (len == termcodes[i].len - j
 			    && STRNCMP(s, termcodes[i].code, len - 1) == 0
 			    && s[len - 1]
 				   == termcodes[i].code[termcodes[i].len - 1])
@@ -4784,10 +4784,10 @@ add_termcode(char_u *name, char_u *string, int flags)
 							     name[0], name[1]);
 #endif
 			vim_free(s);
-			return;
+			戻る;
 		    }
 		}
-		else
+		否则
 		{
 		    // Replace old code.
 #ifdef FEAT_EVAL
@@ -4806,7 +4806,7 @@ add_termcode(char_u *name, char_u *string, int flags)
 #ifdef FEAT_EVAL
 	action = "Adding";
 #endif
-	for (j = tc_len; j > i; --j)
+	ために (j = tc_len; j > i; --j)
 	    termcodes[j] = termcodes[j - 1];
 	break;
     }
@@ -4835,22 +4835,22 @@ accept_modifiers_for_function_keys(void)
     regmatch.rm_ic = TRUE;
     regmatch.regprog = vim_regcomp((char_u *)"^\033[\\d\\+\\~$", RE_MAGIC);
 
-    for (int i = 0; i < tc_len; ++i)
+    ために (整数 i = 0; i < tc_len; ++i)
     {
-	if (regmatch.regprog == NULL)
-	    return;
+	もし (regmatch.regprog == NULL)
+	    戻る;
 
 	// skip PasteStart and PasteEnd
-	if (termcodes[i].name[0] == 'P'
+	もし (termcodes[i].name[0] == 'P'
 		&& (termcodes[i].name[1] == 'S' || termcodes[i].name[1] == 'E'))
 	    continue;
 
 	char_u *s = termcodes[i].code;
-	if (s != NULL && vim_regexec(&regmatch, s, (colnr_T)0))
+	もし (s != NULL && vim_regexec(&regmatch, s, (colnr_T)0))
 	{
 	    size_t len = STRLEN(s);
 	    char_u *ns = alloc(len + 3);
-	    if (ns != NULL)
+	    もし (ns != NULL)
 	    {
 		mch_memmove(ns, s, len - 1);
 		mch_memmove(ns + len - 1, ";*~", 4);
@@ -4870,75 +4870,75 @@ accept_modifiers_for_function_keys(void)
  * The "X" can be any character.
  * Return 0 if not found, 2 for ;*X and 1 for *X.
  */
-    static int
-termcode_star(char_u *code, int len)
+    static 整数
+termcode_star(char_u *code, 整数 len)
 {
     // Shortest is <M-O>*X.  With ; shortest is <CSI>@;*X
-    if (len >= 3 && code[len - 2] == '*')
+    もし (len >= 3 && code[len - 2] == '*')
     {
-	if (len >= 5 && code[len - 3] == ';')
-	    return 2;
-	else
-	    return 1;
+	もし (len >= 5 && code[len - 3] == ';')
+	    戻る 2;
+	否则
+	    戻る 1;
     }
-    return 0;
+    戻る 0;
 }
 
     char_u  *
 find_termcode(char_u *name)
 {
-    int	    i;
+    整数	    i;
 
-    for (i = 0; i < tc_len; ++i)
-	if (termcodes[i].name[0] == name[0] && termcodes[i].name[1] == name[1])
-	    return termcodes[i].code;
-    return NULL;
+    ために (i = 0; i < tc_len; ++i)
+	もし (termcodes[i].name[0] == name[0] && termcodes[i].name[1] == name[1])
+	    戻る termcodes[i].code;
+    戻る NULL;
 }
 
     char_u *
-get_termcode(int i)
+get_termcode(整数 i)
 {
-    if (i >= tc_len)
-	return NULL;
-    return &termcodes[i].name[0];
+    もし (i >= tc_len)
+	戻る NULL;
+    戻る &termcodes[i].name[0];
 }
 
 /*
  * Returns the length of the terminal code at index 'idx'.
  */
-    int
-get_termcode_len(int idx)
+    整数
+get_termcode_len(整数 idx)
 {
-    return termcodes[idx].len;
+    戻る termcodes[idx].len;
 }
 
     void
 del_termcode(char_u *name)
 {
-    int	    i;
+    整数	    i;
 
-    if (termcodes == NULL)	// nothing there yet
-	return;
+    もし (termcodes == NULL)	// nothing there yet
+	戻る;
 
     need_gather = TRUE;		// need to fill termleader[]
 
-    for (i = 0; i < tc_len; ++i)
-	if (termcodes[i].name[0] == name[0] && termcodes[i].name[1] == name[1])
+    ために (i = 0; i < tc_len; ++i)
+	もし (termcodes[i].name[0] == name[0] && termcodes[i].name[1] == name[1])
 	{
 	    del_termcode_idx(i);
-	    return;
+	    戻る;
 	}
     // not found. Give error message?
 }
 
     static void
-del_termcode_idx(int idx)
+del_termcode_idx(整数 idx)
 {
-    int		i;
+    整数		i;
 
     vim_free(termcodes[idx].code);
     --tc_len;
-    for (i = idx; i < tc_len; ++i)
+    ために (i = idx; i < tc_len; ++i)
 	termcodes[i] = termcodes[i + 1];
 }
 
@@ -4949,16 +4949,16 @@ del_termcode_idx(int idx)
     static void
 switch_to_8bit(void)
 {
-    int		i;
-    int		c;
+    整数		i;
+    整数		c;
 
     // Only need to do something when not already using 8-bit codes.
-    if (!term_is_8bit(T_NAME))
+    もし (!term_is_8bit(T_NAME))
     {
-	for (i = 0; i < tc_len; ++i)
+	ために (i = 0; i < tc_len; ++i)
 	{
 	    c = term_7to8bit(termcodes[i].code);
-	    if (c != 0)
+	    もし (c != 0)
 	    {
 		STRMOVE(termcodes[i].code + 1, termcodes[i].code + 2);
 		termcodes[i].code[0] = c;
@@ -4973,10 +4973,10 @@ switch_to_8bit(void)
 #ifdef CHECK_DOUBLE_CLICK
 static linenr_T orig_topline = 0;
 # ifdef FEAT_DIFF
-static int orig_topfill = 0;
+static 整数 orig_topfill = 0;
 # endif
 #endif
-#if defined(CHECK_DOUBLE_CLICK)
+#もし defined(CHECK_DOUBLE_CLICK)
 /*
  * Checking for double-clicks ourselves.
  * "orig_topline" is used to avoid detecting a double-click when the window
@@ -4999,10 +4999,10 @@ set_mouse_topline(win_T *wp)
  * Returns TRUE if the top line and top fill of window 'wp' matches the saved
  * topline and topfill.
  */
-    int
+    整数
 is_mouse_topline(win_T *wp)
 {
-    return orig_topline == wp->w_topline
+    戻る orig_topline == wp->w_topline
 # ifdef FEAT_DIFF
 	&& orig_topfill == wp->w_topfill
 # endif
@@ -5017,117 +5017,117 @@ is_mouse_topline(win_T *wp)
  * Remove "slen" bytes.
  * Returns FAIL for error.
  */
-    int
+    整数
 put_string_in_typebuf(
-	int	offset,
-	int	slen,
+	整数	offset,
+	整数	slen,
 	char_u	*string,
-	int	new_slen,
+	整数	new_slen,
 	char_u	*buf,
-	int	bufsize,
-	int	*buflen)
+	整数	bufsize,
+	整数	*buflen)
 {
-    int		extra = new_slen - slen;
+    整数		extra = new_slen - slen;
 
     string[new_slen] = NUL;
-    if (buf == NULL)
+    もし (buf == NULL)
     {
-	if (extra < 0)
+	もし (extra < 0)
 	    // remove matched chars, taking care of noremap
 	    del_typebuf(-extra, offset);
-	else if (extra > 0)
+	否则 もし (extra > 0)
 	    // insert the extra space we need
-	    if (ins_typebuf(string + slen, REMAP_YES, offset, FALSE, FALSE)
+	    もし (ins_typebuf(string + slen, REMAP_YES, offset, FALSE, FALSE)
 								       == FAIL)
-		return FAIL;
+		戻る FAIL;
 
 	// Careful: del_typebuf() and ins_typebuf() may have reallocated
 	// typebuf.tb_buf[]!
 	mch_memmove(typebuf.tb_buf + typebuf.tb_off + offset, string,
 							     (size_t)new_slen);
     }
-    else
+    否则
     {
-	if (extra < 0)
+	もし (extra < 0)
 	    // remove matched characters
 	    mch_memmove(buf + offset, buf + offset - extra,
 					   (size_t)(*buflen + offset + extra));
-	else if (extra > 0)
+	否则 もし (extra > 0)
 	{
 	    // Insert the extra space we need.  If there is insufficient
 	    // space return -1.
-	    if (*buflen + extra + new_slen >= bufsize)
-		return FAIL;
+	    もし (*buflen + extra + new_slen >= bufsize)
+		戻る FAIL;
 	    mch_memmove(buf + offset + extra, buf + offset,
 						   (size_t)(*buflen - offset));
 	}
 	mch_memmove(buf + offset, string, (size_t)new_slen);
 	*buflen = *buflen + extra + new_slen;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
  * Decode a modifier number as xterm provides it into MOD_MASK bits.
  */
-    int
-decode_modifiers(int n)
+    整数
+decode_modifiers(整数 n)
 {
-    int	    code = n - 1;
-    int	    modifiers = 0;
+    整数	    code = n - 1;
+    整数	    modifiers = 0;
 
-    if (code & 1)
+    もし (code & 1)
 	modifiers |= MOD_MASK_SHIFT;
-    if (code & 2)
+    もし (code & 2)
 	modifiers |= MOD_MASK_ALT;
-    if (code & 4)
+    もし (code & 4)
 	modifiers |= MOD_MASK_CTRL;
-    if (code & 8)
+    もし (code & 8)
 	modifiers |= MOD_MASK_META;
     // Any further modifiers are silently dropped.
 
-    return modifiers;
+    戻る modifiers;
 }
 
-    static int
-modifiers2keycode(int modifiers, int *key, char_u *string)
+    static 整数
+modifiers2keycode(整数 modifiers, 整数 *key, char_u *string)
 {
-    int new_slen = 0;
+    整数 new_slen = 0;
 
-    if (modifiers == 0)
-	return 0;
+    もし (modifiers == 0)
+	戻る 0;
 
     // Some keys have the modifier included.  Need to handle that here to
     // make mappings work.  This may result in a special key, such as
     // K_S_TAB.
     *key = simplify_key(*key, &modifiers);
-    if (modifiers != 0)
+    もし (modifiers != 0)
     {
 	string[new_slen++] = K_SPECIAL;
-	string[new_slen++] = (int)KS_MODIFIER;
+	string[new_slen++] = (整数)KS_MODIFIER;
 	string[new_slen++] = modifiers;
     }
-    return new_slen;
+    戻る new_slen;
 }
 
 /*
  * Handle a cursor position report.
  */
     static void
-handle_u7_response(int *arg, char_u *tp UNUSED, int csi_len UNUSED)
+handle_u7_response(整数 *arg, char_u *tp UNUSED, 整数 csi_len UNUSED)
 {
-    if (arg[0] == 2 && arg[1] >= 2)
+    もし (arg[0] == 2 && arg[1] >= 2)
     {
 	char *aw = NULL;
 
 	LOG_TRN("Received U7 status: %s", tp);
 	u7_status.tr_progress = STATUS_GOT;
 	did_cursorhold = TRUE;
-	if (arg[1] == 2)
+	もし (arg[1] == 2)
 	    aw = "single";
-	else if (arg[1] == 3)
+	否则 もし (arg[1] == 3)
 	    aw = "double";
-	if (aw != NULL && STRCMP(aw, p_ambw) != 0)
+	もし (aw != NULL && STRCMP(aw, p_ambw) != 0)
 	{
 	    // Setting the option causes a screen redraw. Do
 	    // that right away if possible, keeping any
@@ -5135,11 +5135,11 @@ handle_u7_response(int *arg, char_u *tp UNUSED, int csi_len UNUSED)
 	    set_option_value_give_err((char_u *)"ambw", 0L, (char_u *)aw, 0);
 #ifdef DEBUG_TERMRESPONSE
 	    {
-		int r = redraw_asap(UPD_CLEAR);
+		整数 r = redraw_asap(UPD_CLEAR);
 
 		LOG_TRN("set 'ambiwidth', redraw_asap(): %d", r);
 	    }
-#else
+#否则
 	    redraw_asap(UPD_CLEAR);
 #endif
 #ifdef FEAT_EVAL
@@ -5149,9 +5149,9 @@ handle_u7_response(int *arg, char_u *tp UNUSED, int csi_len UNUSED)
 					(char_u *)"ambiguouswidth", NULL, FALSE, curbuf);
 	}
     }
-    else if (arg[0] == 3)
+    否则 もし (arg[0] == 3)
     {
-	int value;
+	整数 value;
 
 	LOG_TRN("Received compatibility test result: %s", tp);
 	xcc_status.tr_progress = STATUS_GOT;
@@ -5173,11 +5173,11 @@ handle_u7_response(int *arg, char_u *tp UNUSED, int csi_len UNUSED)
  * Rxvt sends "{lead}?1;2c".
  */
     static void
-handle_version_response(int first, int *arg, int argc, char_u *tp)
+handle_version_response(整数 first, 整数 *arg, 整数 argc, char_u *tp)
 {
     // The xterm version.  It is set to zero when it can't be an actual xterm
     // version.
-    int version = arg[1];
+    整数 version = arg[1];
 
     LOG_TRN("Received CRV response: %s", tp);
     crv_status.tr_progress = STATUS_GOT;
@@ -5189,29 +5189,29 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
     init_term_props(
 #ifdef FEAT_EVAL
 	    reset_term_props_on_termresponse
-#else
+#否则
 	    FALSE
 #endif
 	    );
 
     // If this code starts with CSI, you can bet that the
     // terminal uses 8-bit codes.
-    if (tp[0] == CSI)
+    もし (tp[0] == CSI)
 	switch_to_8bit();
 
     // Screen sends 40500.
     // rxvt sends its version number: "20703" is 2.7.3.
     // Ignore it for when the user has set 'term' to xterm,
     // even though it's an rxvt.
-    if (version > 20000)
+    もし (version > 20000)
 	version = 0;
 
     // Figure out more if the response is CSI > 99 ; 99 ; 99 c
-    if (first == '>' && argc == 3)
+    もし (first == '>' && argc == 3)
     {
 	// mintty 2.9.5 sends 77;20905;0c.
 	// (77 is ASCII 'M' for mintty.)
-	if (arg[0] == 77)
+	もし (arg[0] == 77)
 	{
 	    // mintty can do SGR mouse reporting
 	    term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
@@ -5220,7 +5220,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 #ifdef FEAT_TERMRESPONSE
 	// If xterm version >= 141 try to get termcap codes.  For other
 	// terminals the request should be ignored.
-	if (version >= 141 && p_xtermcodes)
+	もし (version >= 141 && p_xtermcodes)
 	{
 	    LOG_TR1("Enable checking for XT codes");
 	    check_for_codes = TRUE;
@@ -5231,59 +5231,59 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 
 	// libvterm sends 0;100;0
 	// Konsole sends 0;115;0 and works the same way
-	if ((version == 100 || version == 115) && arg[0] == 0 && arg[2] == 0)
+	もし ((version == 100 || version == 115) && arg[0] == 0 && arg[2] == 0)
 	{
 	    // If run from Vim $COLORS is set to the number of
 	    // colors the terminal supports.  Otherwise assume
 	    // 256, libvterm supports even more.
-	    if (mch_getenv((char_u *)"COLORS") == NULL)
+	    もし (mch_getenv((char_u *)"COLORS") == NULL)
 		may_adjust_color_count(256);
 	    // Libvterm can handle SGR mouse reporting.
 	    term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
 	}
 
-	if (version == 95)
+	もし (version == 95)
 	{
 	    // Mac Terminal.app sends 1;95;0
 	    //
 	    // Terminal.app doesn't seem to handle DECRQM sequences
 	    // properly, see issue #19852.
-	    if (arg[0] == 1 && arg[2] == 0)
+	    もし (arg[0] == 1 && arg[2] == 0)
 	    {
 		term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
 		term_props[TPR_DECRQM].tpr_status = TPR_NO;
 	    }
 	    // iTerm2 sends 0;95;0
-	    else if (arg[0] == 0 && arg[2] == 0)
+	    否则 もし (arg[0] == 0 && arg[2] == 0)
 	    {
 		// iTerm2 can do SGR mouse reporting
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
 		term_props[TPR_DECRQM].tpr_status = TPR_YES;
 	    }
 	    // old iTerm2 sends 0;95;
-	    else if (arg[0] == 0 && arg[2] == -1)
+	    否则 もし (arg[0] == 0 && arg[2] == -1)
 		term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
 	}
 
 	// screen sends 83;40500;0 83 is 'S' in ASCII.
-	if (arg[0] == 83)
+	もし (arg[0] == 83)
 	{
 	    // screen supports SGR mouse codes since 4.7.0
-	    if (arg[1] >= 40700)
+	    もし (arg[1] >= 40700)
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
-	    else
+	    否则
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_XTERM;
 	}
 
 	// If no recognized terminal has set mouse behavior, assume xterm.
-	if (term_props[TPR_MOUSE].tpr_status == TPR_UNKNOWN)
+	もし (term_props[TPR_MOUSE].tpr_status == TPR_UNKNOWN)
 	{
 	    // Xterm version 277 supports SGR.
 	    // Xterm version >= 95 supports mouse dragging.
-	    if (version >= 277)
+	    もし (version >= 277)
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
-	    else if (version >= 95)
+	    否则 もし (version >= 95)
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_XTERM2;
 	}
 
@@ -5296,17 +5296,17 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// screen sends 83;40500;0
 	// Assuming any version number over 2500 is not an
 	// xterm (without the limit for rxvt and screen).
-	if (arg[1] >= 2500)
+	もし (arg[1] >= 2500)
 	{
 	    term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
 	}
 
-	else if (version == 136 && arg[2] == 0)
+	否则 もし (version == 136 && arg[2] == 0)
 	{
 	    term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
 
 	    // PuTTY sends 0;136;0
-	    if (arg[0] == 0)
+	    もし (arg[0] == 0)
 	    {
 		// supports sgr-like mouse reporting.
 		term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
@@ -5320,7 +5320,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	//     term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
 
 	// Kitty up to 9.x sends 1;400{version};{secondary-version}
-	if (arg[0] == 1 && arg[1] >= 4000 && arg[1] <= 4009)
+	もし (arg[0] == 1 && arg[1] >= 4000 && arg[1] <= 4009)
 	{
 	    term_props[TPR_KITTY].tpr_status = TPR_YES;
 	    term_props[TPR_KITTY].tpr_set_by_termresponse = TRUE;
@@ -5331,7 +5331,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	}
 
 	// foot terminal sends 1;12700;0
-	if (arg[0] == 1 && version == 12700 && arg[2] == 0)
+	もし (arg[0] == 1 && version == 12700 && arg[2] == 0)
 	{
 	    term_props[TPR_MOUSE].tpr_status = TPR_MOUSE_SGR;
 	    term_props[TPR_DECRQM].tpr_status = TPR_YES;
@@ -5341,7 +5341,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// 30600/40500 is a version number of GNU screen. DA2 support is added
 	// on 3.6.  DCS string has a special meaning to GNU screen, but xterm
 	// compatibility checking does not detect GNU screen.
-	if (arg[0] == 83 && arg[1] >= 30600)
+	もし (arg[0] == 83 && arg[1] >= 30600)
 	{
 	    term_props[TPR_CURSOR_STYLE].tpr_status = TPR_NO;
 	    term_props[TPR_CURSOR_BLINK].tpr_status = TPR_NO;
@@ -5353,12 +5353,12 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// Xterm first responded to this request at patch level
 	// 95, so assume anything below 95 is not xterm and hopefully supports
 	// the underline RGB color sequence.
-	if (version < 95)
+	もし (version < 95)
 	    term_props[TPR_UNDERLINE_RGB].tpr_status = TPR_YES;
 
 	// Getting the cursor style is only supported properly by xterm since
 	// version 279 (otherwise it returns 0x18).
-	if (version < 279)
+	もし (version < 279)
 	    term_props[TPR_CURSOR_STYLE].tpr_status = TPR_NO;
 
 	/*
@@ -5370,7 +5370,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// This may cause some flicker.  Alternative would be to set "t_8u"
 	// here if the terminal is expected to support it, but that might
 	// conflict with what was set in the .vimrc.
-	if (term_props[TPR_UNDERLINE_RGB].tpr_status != TPR_YES
+	もし (term_props[TPR_UNDERLINE_RGB].tpr_status != TPR_YES
 			&& *T_8U != NUL
 			&& !option_was_set((char_u *)"t_8u"))
 	{
@@ -5378,7 +5378,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 								  OPT_FREE, 0);
 	}
 #ifdef FEAT_TERMRESPONSE
-	if (*T_8U != NUL && write_t_8u_state == MAYBE)
+	もし (*T_8U != NUL && write_t_8u_state == MAYBE)
 	    // Did skip writing t_8u, a complete redraw is needed.
 	    redraw_later_clear();
 	write_t_8u_state = OK;  // can output t_8u now
@@ -5386,7 +5386,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 
 	// Only set 'ttymouse' automatically if it was not set
 	// by the user already.
-	if (!option_was_set((char_u *)"ttym")
+	もし (!option_was_set((char_u *)"ttym")
 		&& (term_props[TPR_MOUSE].tpr_status == TPR_MOUSE_XTERM2
 		    || term_props[TPR_MOUSE].tpr_status == TPR_MOUSE_SGR))
 	{
@@ -5396,7 +5396,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	}
 
 #ifdef FEAT_TERMRESPONSE
-	int need_flush = FALSE;
+	整数 need_flush = FALSE;
 
 	// Only request the cursor style if t_SH and t_RS are
 	// set. Only supported properly by xterm since version
@@ -5404,7 +5404,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// Only when getting the cursor style was detected to work.
 	// Not for Terminal.app, it can't handle t_RS, it
 	// echoes the characters to the screen.
-	if (rcs_status.tr_progress == STATUS_GET
+	もし (rcs_status.tr_progress == STATUS_GET
 		&& term_props[TPR_CURSOR_STYLE].tpr_status == TPR_YES
 		&& *T_CSH != NUL
 		&& *T_CRS != NUL)
@@ -5420,7 +5420,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// for Gnome terminal, it can't handle t_RC, it
 	// echoes the characters to the screen.
 	// Only when getting the cursor style was detected to work.
-	if (rbm_status.tr_progress == STATUS_GET
+	もし (rbm_status.tr_progress == STATUS_GET
 		&& term_props[TPR_CURSOR_BLINK].tpr_status == TPR_YES
 		&& *T_CRC != NUL)
 	{
@@ -5434,12 +5434,12 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 	// Only request DEC modes via DECRQM when the terminal is known to
 	// handle it.  Not for Apple Terminal.app or GNU screen, they echo
 	// the trailing "p" to the screen.  See issue #19852.
-	if (decrqm_status.tr_progress == STATUS_GET
+	もし (decrqm_status.tr_progress == STATUS_GET
 		&& term_props[TPR_DECRQM].tpr_status == TPR_YES)
 	{
 	    MAY_WANT_TO_LOG_THIS;
 	    LOG_TR1("Sending DECRQM requests");
-	    for (int i = 0; i < (int)ARRAY_LENGTH(dec_modes); i++)
+	    ために (整数 i = 0; i < (整数)ARRAY_LENGTH(dec_modes); i++)
 	    {
 		vim_snprintf((char *)IObuff, IOSIZE, "\033[?%d$p", dec_modes[i]);
 		out_str(IObuff);
@@ -5449,7 +5449,7 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
 
 	}
 
-	if (need_flush)
+	もし (need_flush)
 	    out_flush();
 #endif
     }
@@ -5459,39 +5459,39 @@ handle_version_response(int first, int *arg, int argc, char_u *tp)
  * Add "key" to "buf" and return the number of bytes used.
  * Handles special keys and multi-byte characters.
  */
-    static int
-add_key_to_buf(int key, char_u *buf)
+    static 整数
+add_key_to_buf(整数 key, char_u *buf)
 {
-    int idx = 0;
+    整数 idx = 0;
 
-    if (IS_SPECIAL(key))
+    もし (IS_SPECIAL(key))
     {
 	buf[idx++] = K_SPECIAL;
 	buf[idx++] = KEY2TERMCAP0(key);
 	buf[idx++] = KEY2TERMCAP1(key);
     }
-    else if (has_mbyte)
+    否则 もし (has_mbyte)
 	idx += (*mb_char2bytes)(key, buf + idx);
-    else
+    否则
 	buf[idx++] = key;
-    return idx;
+    戻る idx;
 }
 
 /*
  * Shared between handle_key_with_modifier() and handle_csi_function_key().
  */
-    static int
+    static 整数
 put_key_modifiers_in_typebuf(
-	int	key_arg,
-	int	modifiers_arg,
-	int	csi_len,
-	int	offset,
+	整数	key_arg,
+	整数	modifiers_arg,
+	整数	csi_len,
+	整数	offset,
 	char_u	*buf,
-	int	bufsize,
-	int	*buflen)
+	整数	bufsize,
+	整数	*buflen)
 {
-    int key = key_arg;
-    int modifiers = modifiers_arg;
+    整数 key = key_arg;
+    整数 modifiers = modifiers_arg;
 
     // Some keys need adjustment when the Ctrl modifier is used.
     key = may_adjust_key_for_ctrl(modifiers, key);
@@ -5502,20 +5502,20 @@ put_key_modifiers_in_typebuf(
     // Produce modifiers with K_SPECIAL KS_MODIFIER {mod}
     // worst-case: 3-byte modifier + 4 byte multi-char key + NUL
     char_u string[MAX_KEY_CODE_LEN + 2];
-    int new_slen = modifiers2keycode(modifiers, &key, string);
+    整数 new_slen = modifiers2keycode(modifiers, &key, string);
 
     // reject overlong key that would overflow string
-    if (key > 0x10FFFF)
-	return -1;
+    もし (key > 0x10FFFF)
+	戻る -1;
 
     // Add the bytes for the key.
     new_slen += add_key_to_buf(key, string + new_slen);
 
     string[new_slen] = NUL;
-    if (put_string_in_typebuf(offset, csi_len, string, new_slen,
+    もし (put_string_in_typebuf(offset, csi_len, string, new_slen,
 						 buf, bufsize, buflen) == FAIL)
-	return -1;
-    return new_slen - csi_len + offset;
+	戻る -1;
+    戻る new_slen - csi_len + offset;
 }
 
 /*
@@ -5523,8 +5523,8 @@ put_key_modifiers_in_typebuf(
  *	ESC [ {number} ~
  * Returns the key
  */
-    static int
-parse_csi_f_keys(int arg)
+    static 整数
+parse_csi_f_keys(整数 arg)
 {
     char_u key_name[2] = { 0, 0 };
 
@@ -5543,10 +5543,10 @@ parse_csi_f_keys(int arg)
 	case 23: key_name[0] = 'F'; key_name[1] = '1'; break;  // K_F11
 	case 24: key_name[0] = 'F'; key_name[1] = '2'; break;  // K_F12
     }
-    if (key_name[0])
-	return TERMCAP2KEY(key_name[0], key_name[1]);
+    もし (key_name[0])
+	戻る TERMCAP2KEY(key_name[0], key_name[1]);
     // shouldn't happen
-    return arg;
+    戻る arg;
 }
 
 /*
@@ -5555,16 +5555,16 @@ parse_csi_f_keys(int arg)
  *	{lead}{key};{modifier}u
  * Returns the difference in length.
  */
-    static int
+    static 整数
 handle_key_with_modifier(
-	int	*arg,
-	int	csi_len,
-	int	offset,
+	整数	*arg,
+	整数	csi_len,
+	整数	offset,
 	char_u	*buf,
-	int	bufsize,
-	int	*buflen,
-	int	iskitty,
-	int	trail)
+	整数	bufsize,
+	整数	*buflen,
+	整数	iskitty,
+	整数	trail)
 {
     // Only set seenModifyOtherKeys for the "{lead}27;" code to avoid setting
     // it for terminals using the kitty keyboard protocol.  Xterm sends
@@ -5577,7 +5577,7 @@ handle_key_with_modifier(
     //
     // Do not set seenModifyOtherKeys for kitty, it does send some sequences
     // like this but does not have the modifyOtherKeys feature.
-    if (!iskitty
+    もし (!iskitty
 	    && (kitty_protocol_state == KKPS_INITIAL
 		|| kitty_protocol_state == KKPS_OFF
 		|| kitty_protocol_state == KKPS_AFTER_T_TE)
@@ -5589,23 +5589,23 @@ handle_key_with_modifier(
 	seenModifyOtherKeys = TRUE;
     }
 
-    int key = iskitty ? arg[0] : arg[2];
-    int modifiers = decode_modifiers(arg[1]);
+    整数 key = iskitty ? arg[0] : arg[2];
+    整数 modifiers = decode_modifiers(arg[1]);
 
     // Some terminals do not apply the Shift modifier to the key.  To make
     // mappings consistent we do it here.  TODO: support more keys.
-    if ((modifiers & MOD_MASK_SHIFT) && key >= 'a' && key <= 'z')
+    もし ((modifiers & MOD_MASK_SHIFT) && key >= 'a' && key <= 'z')
 	key += 'A' - 'a';
 
     // Putting Esc in the buffer creates ambiguity, it can be the start of an
     // escape sequence.  Use K_ESC to avoid that.
-    if (key == ESC)
+    もし (key == ESC)
 	key = K_ESC;
 
-    else if (arg[0] >= 11 && arg[0] <= 24 && trail == '~')
+    否则 もし (arg[0] >= 11 && arg[0] <= 24 && trail == '~')
 	key = parse_csi_f_keys(arg[0]);
 
-    return put_key_modifiers_in_typebuf(key, modifiers, csi_len, offset, buf,
+    戻る put_key_modifiers_in_typebuf(key, modifiers, csi_len, offset, buf,
 	    bufsize, buflen);
 }
 
@@ -5615,20 +5615,20 @@ handle_key_with_modifier(
  *	{lead}{key}~
  * Returns the difference in length.
  */
-    static int
+    static 整数
 handle_key_without_modifier(
-	int	*arg,
-	int	csi_len,
-	int	offset,
+	整数	*arg,
+	整数	csi_len,
+	整数	offset,
 	char_u	*buf,
-	int	bufsize,
-	int	*buflen,
-	int	trail)
+	整数	bufsize,
+	整数	*buflen,
+	整数	trail)
 {
     char_u  string[MAX_KEY_CODE_LEN + 1];
-    int	    new_slen;
+    整数	    new_slen;
 
-    if (arg[0] == ESC)
+    もし (arg[0] == ESC)
     {
 	// Putting Esc in the buffer creates ambiguity, it can be the start of
 	// an escape sequence.  Use K_ESC to avoid that.
@@ -5637,21 +5637,21 @@ handle_key_without_modifier(
 	string[2] = KE_ESC;
 	new_slen = 3;
     }
-    else if (arg[0] >= 11 && arg[0] <= 24 && trail == '~')
+    否则 もし (arg[0] >= 11 && arg[0] <= 24 && trail == '~')
     {
-	int key = parse_csi_f_keys(arg[0]);
+	整数 key = parse_csi_f_keys(arg[0]);
 	string[0] = K_SPECIAL;
 	string[1] = KEY2TERMCAP0(key);
 	string[2] = KEY2TERMCAP1(key);
 	new_slen = 3;
     }
-    else
+    否则
 	new_slen = add_key_to_buf(arg[0], string);
 
-    if (put_string_in_typebuf(offset, csi_len, string, new_slen,
+    もし (put_string_in_typebuf(offset, csi_len, string, new_slen,
 						 buf, bufsize, buflen) == FAIL)
-	return -1;
-    return new_slen - csi_len + offset;
+	戻る -1;
+    戻る new_slen - csi_len + offset;
 }
 
 /*
@@ -5660,17 +5660,17 @@ handle_key_without_modifier(
  *	{lead}1;{modifier}[ABCDEFHPQRS]
  * Returns zero when nog recognized, a positive number when recognized.
  */
-    static int
+    static 整数
 handle_csi_function_key(
-	int	argc,
-	int	*arg,
-	int	trail,
-	int	csi_len,
+	整数	argc,
+	整数	*arg,
+	整数	trail,
+	整数	csi_len,
 	char_u	*key_name,
-	int	offset,
+	整数	offset,
 	char_u  *buf,
-	int	bufsize,
-	int	*buflen)
+	整数	bufsize,
+	整数	*buflen)
 {
     key_name[0] = 'k';
     switch (trail)
@@ -5689,14 +5689,14 @@ handle_csi_function_key(
 	case 'R': key_name[1] = '3'; break;  // K_F3
 	case 'S': key_name[1] = '4'; break;  // K_F4
 
-	default: return 0;  // not recognized
+	default: 戻る 0;  // not recognized
     }
 
-    int key = TERMCAP2KEY(key_name[0], key_name[1]);
-    int modifiers = argc == 2 ? decode_modifiers(arg[1]) : 0;
+    整数 key = TERMCAP2KEY(key_name[0], key_name[1]);
+    整数 modifiers = argc == 2 ? decode_modifiers(arg[1]) : 0;
     put_key_modifiers_in_typebuf(key, modifiers,
 					csi_len, offset, buf, bufsize, buflen);
-    return csi_len;
+    戻る csi_len;
 }
 
 /*
@@ -5726,30 +5726,30 @@ handle_csi_function_key(
  *
  * Return 0 for no match, -1 for partial match, > 0 for full match.
  */
-    static int
+    static 整数
 handle_csi(
 	char_u	*tp,
-	int	len,
+	整数	len,
 	char_u	*argp,
-	int	offset,
+	整数	offset,
 	char_u  *buf,
-	int	bufsize,
-	int	*buflen,
+	整数	bufsize,
+	整数	*buflen,
 	char_u	*key_name,
-	int	*slen)
+	整数	*slen)
 {
-    int		first = -1;  // optional char right after {lead}
-    int		trail;	     // char that ends CSI sequence
-    int		arg[3] = {-1, -1, -1};	// argument numbers
-    int		argc = 0;		// number of arguments
+    整数		first = -1;  // optional char right after {lead}
+    整数		trail;	     // char that ends CSI sequence
+    整数		arg[3] = {-1, -1, -1};	// argument numbers
+    整数		argc = 0;		// number of arguments
     char_u	*ap = argp;
-    int		csi_len;
+    整数		csi_len;
 
     // Check for non-digit after CSI.
-    if (!VIM_ISDIGIT(*ap))
+    もし (!VIM_ISDIGIT(*ap))
 	first = *ap++;
 
-    if (first >= 'A' && first <= 'Z')
+    もし (first >= 'A' && first <= 'Z')
     {
 	// If "first" is in [ABCDEFHPQRS] then it is actually the "trail" and
 	// no argument follows.
@@ -5757,71 +5757,71 @@ handle_csi(
 	first = -1;
 	--ap;
     }
-    else
+    否则
     {
 	// Find up to three argument numbers.
-	for (argc = 0; argc < 3; )
+	ために (argc = 0; argc < 3; )
 	{
-	    if (ap >= tp + len)
-		return -1;
-	    if (*ap == ';')
+	    もし (ap >= tp + len)
+		戻る -1;
+	    もし (*ap == ';')
 		arg[argc++] = -1;  // omitted number
-	    else if (VIM_ISDIGIT(*ap))
+	    否则 もし (VIM_ISDIGIT(*ap))
 	    {
 		arg[argc] = 0;
-		for (;;)
+		ために (;;)
 		{
-		    if (ap >= tp + len)
-			return -1;
-		    if (!VIM_ISDIGIT(*ap))
+		    もし (ap >= tp + len)
+			戻る -1;
+		    もし (!VIM_ISDIGIT(*ap))
 			break;
 		    // avoid overflow
-		    if (arg[argc] <= (INT_MAX - 9) / 10)
+		    もし (arg[argc] <= (INT_MAX - 9) / 10)
 			arg[argc] = arg[argc] * 10 + (*ap - '0');
 		    ++ap;
 		}
 		++argc;
 	    }
-	    if (*ap == ';')
+	    もし (*ap == ';')
 		++ap;
-	    else
+	    否则
 		break;
 	}
 
 	// mrxvt has been reported to have "+" in the version. Assume
 	// the escape sequence ends with a letter or one of "{|}~".
-	while (ap < tp + len
+	ながら (ap < tp + len
 		&& !(*ap >= '{' && *ap <= '~')
 		&& !ASCII_ISALPHA(*ap))
 	    ++ap;
-	if (ap >= tp + len)
-	    return -1;
+	もし (ap >= tp + len)
+	    戻る -1;
 	trail = *ap;
     }
 
-    csi_len = (int)(ap - tp) + 1;
+    csi_len = (整数)(ap - tp) + 1;
 
     // Response to XTQMODKEYS: "CSI > 4 ; Pv m" where Pv indicates the
     // modifyOtherKeys level.  Drop similar responses.
-    if (first == '>' && (argc == 1 || argc == 2) && trail == 'm')
+    もし (first == '>' && (argc == 1 || argc == 2) && trail == 'm')
     {
-	if (arg[0] == 4 && argc == 2)
+	もし (arg[0] == 4 && argc == 2)
 	    modify_otherkeys_state = arg[1] == 2 ? MOKS_ENABLED : MOKS_OFF;
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (整数)KS_EXTRA;
+	key_name[1] = (整数)KE_IGNORE;
 	*slen = csi_len;
     }
 
     // Function key starting with CSI:
     //	{lead}[ABCDEFHPQRS]
     //	{lead}1;{modifier}[ABCDEFHPQRS]
-    else if (first == -1 && ASCII_ISUPPER(trail)
+    否则 もし (first == -1 && ASCII_ISUPPER(trail)
 	    && (argc == 0 || (argc == 2 && arg[0] == 1)))
     {
-	int res = handle_csi_function_key(argc, arg, trail,
+	整数 res = handle_csi_function_key(argc, arg, trail,
 			      csi_len, key_name, offset, buf, bufsize, buflen);
-	return res <= 0 ? res : len + res;
+	戻る res <= 0 ? res : len + res;
     }
 
     // Cursor position report: {lead}{row};{col}R
@@ -5829,42 +5829,42 @@ handle_csi(
     // Also when u7_status is not "sent", it may be from a previous Vim that
     // just exited.  But not for <S-F3>, it sends something similar, check for
     // row and column to make sense.
-    else if (first == -1 && argc == 2 && trail == 'R')
+    否则 もし (first == -1 && argc == 2 && trail == 'R')
     {
 	handle_u7_response(arg, tp, csi_len);
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (整数)KS_EXTRA;
+	key_name[1] = (整数)KE_IGNORE;
 	*slen = csi_len;
     }
 
-#if (defined(UNIX) || defined(MSWIN)) \
+#もし (defined(UNIX) || defined(MSWIN)) \
     && (defined(FEAT_IMAGE) || defined(FEAT_EVAL))
     // Response to CSI 14 t or CSI 16 t
-    else if (first == -1 && argc >= 3
+    否则 もし (first == -1 && argc >= 3
 	    && (arg[0] == 4 || arg[0] == 6) && trail == 't')
     {
-	if (arg[0] == 4)
+	もし (arg[0] == 4)
 	{
 	    LOG_TRN("Received CSI 14 t response: %s", tp);
 	    cell_width = arg[2] / Columns;
 	    cell_height = arg[1] / Rows;
 	}
-	else
+	否则
 	{
 	    LOG_TRN("Received CSI 16 t response: %s", tp);
 	    cell_width = arg[2];
 	    cell_height = arg[1];
 	}
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (整数)KS_EXTRA;
+	key_name[1] = (整数)KE_IGNORE;
 	*slen = csi_len;
     }
 #endif
 
     // Primary device attributes (DA1) response
-    else if (first == '?' && trail == 'c')
+    否则 もし (first == '?' && trail == 'c')
     {
 	LOG_TRN("Received DA1 response: %s", tp);
 
@@ -5875,29 +5875,29 @@ handle_csi(
 	apply_autocmds(EVENT_TERMRESPONSEALL,
 					(char_u *)"da1", NULL, FALSE, curbuf);
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (整数)KS_EXTRA;
+	key_name[1] = (整数)KE_IGNORE;
 	*slen = csi_len;
     }
 
     // DECRPM mode 2026 or 2048.
-    else if (first == '?' && trail == 'y' && argc == 2
+    否则 もし (first == '?' && trail == 'y' && argc == 2
 	    && (arg[0] == 2026 || arg[0] == 2048))
     {
-	int setting = arg[1];
+	整数 setting = arg[1];
 
 	*slen = csi_len;
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (整数)KS_EXTRA;
+	key_name[1] = (整数)KE_IGNORE;
 
 #ifdef FEAT_TERMRESPONSE
 	// Mark the DECRQM request as answered so it is not sent again and
 	// stoptermcap() does not wait for it.
-	if (decrqm_status.tr_progress == STATUS_SENT)
+	もし (decrqm_status.tr_progress == STATUS_SENT)
 	    decrqm_status.tr_progress = STATUS_GOT;
 #endif
 
-	if (setting >= 0 && setting <= 4)
+	もし (setting >= 0 && setting <= 4)
 	{
 	    LOG_TRN("Received DECRPM mode %d: %s", arg[0], tp);
 
@@ -5917,30 +5917,30 @@ handle_csi(
 #endif
 	    }
 	}
-	else
+	否则
 	    LOG_TRN("Unknown DECRPM mode %d setting %d", arg[0], setting);
     }
 
 #ifdef UNIX
     // In-band window resize event
-    else if (win_resize_enabled && argc >= 3 && arg[0] == 48)
+    否则 もし (win_resize_enabled && argc >= 3 && arg[0] == 48)
     {
-	int height = arg[1], width = arg[2];
+	整数 height = arg[1], width = arg[2];
 
 	*slen = csi_len;
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (整数)KS_EXTRA;
+	key_name[1] = (整数)KE_IGNORE;
 
 	// Only update if needed. Avoids intro message from disappearing on
 	// startup (due to initial event).
-	if (height != Rows || width != Columns)
+	もし (height != Rows || width != Columns)
 	    set_shellsize(width, height, true);
     }
 #endif
 
     // Version string: Eat it when there is at least one digit and
     // it ends in 'c'
-    else if (*T_CRV != NUL && ap > argp + 1 && trail == 'c')
+    否则 もし (*T_CRV != NUL && ap > argp + 1 && trail == 'c')
     {
 	handle_version_response(first, arg, argc, tp);
 
@@ -5952,8 +5952,8 @@ handle_csi(
 					NULL, NULL, FALSE, curbuf);
 	apply_autocmds(EVENT_TERMRESPONSEALL,
 					(char_u *)"version", NULL, FALSE, curbuf);
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (整数)KS_EXTRA;
+	key_name[1] = (整数)KE_IGNORE;
     }
 
 #ifdef FEAT_TERMRESPONSE
@@ -5962,7 +5962,7 @@ handle_csi(
     // {lead}?12;2$y       not set
     //
     // {lead} can be <Esc>[ or CSI
-    else if (rbm_status.tr_progress == STATUS_SENT
+    否则 もし (rbm_status.tr_progress == STATUS_SENT
 	    && first == '?'
 	    && ap == argp + 6
 	    && arg[0] == 12
@@ -5972,8 +5972,8 @@ handle_csi(
 	initial_cursor_blink = (arg[1] == '1');
 	rbm_status.tr_progress = STATUS_GOT;
 	LOG_TRN("Received cursor blinking mode response: %s", tp);
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (整数)KS_EXTRA;
+	key_name[1] = (整数)KE_IGNORE;
 	*slen = csi_len;
 # ifdef FEAT_EVAL
 	set_vim_var_string(VV_TERMBLINKRESP, tp, *slen);
@@ -5984,15 +5984,15 @@ handle_csi(
 #endif
 
     // Kitty keyboard protocol status response: CSI ? flags u
-    else if (first == '?' && argc == 1 && trail == 'u')
+    否则 もし (first == '?' && argc == 1 && trail == 'u')
     {
 	// The protocol has various "progressive enhancement flags" values, but
 	// we only check for zero and non-zero here.
-	if (arg[0] == '0')
+	もし (arg[0] == '0')
 	{
 	    kitty_protocol_state = KKPS_OFF;
 	}
-	else
+	否则
 	{
 	    kitty_protocol_state = KKPS_ENABLED;
 
@@ -6004,25 +6004,25 @@ handle_csi(
 	    seenModifyOtherKeys = FALSE;
 	}
 
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (整数)KS_EXTRA;
+	key_name[1] = (整数)KE_IGNORE;
 	*slen = csi_len;
     }
 
 #ifdef FEAT_TERMRESPONSE
     // Check for a window position response from the terminal:
     //       {lead}3;{x};{y}t
-    else if (did_request_winpos && argc == 3 && arg[0] == 3
+    否则 もし (did_request_winpos && argc == 3 && arg[0] == 3
 						   && trail == 't')
     {
 	winpos_x = arg[1];
 	winpos_y = arg[2];
 	// got finished code: consume it
-	key_name[0] = (int)KS_EXTRA;
-	key_name[1] = (int)KE_IGNORE;
+	key_name[0] = (整数)KS_EXTRA;
+	key_name[1] = (整数)KE_IGNORE;
 	*slen = csi_len;
 
-	if (--did_request_winpos <= 0)
+	もし (--did_request_winpos <= 0)
 	    winpos_status.tr_progress = STATUS_GOT;
     }
 #endif
@@ -6034,52 +6034,52 @@ handle_csi(
     // Even though we only handle four modifiers and the {modifier} value
     // should be 16 or lower, we accept all modifier values to avoid the raw
     // sequence to be passed through.
-    else if ((arg[0] == 27 && argc == 3 && trail == '~')
+    否则 もし ((arg[0] == 27 && argc == 3 && trail == '~')
 		|| (argc == 2 && (trail == 'u' || trail == '~')))
     {
-	int iskitty = argc == 2 && (trail == 'u' || trail == '~');
-	return len + handle_key_with_modifier(arg, csi_len, offset, buf,
+	整数 iskitty = argc == 2 && (trail == 'u' || trail == '~');
+	戻る len + handle_key_with_modifier(arg, csi_len, offset, buf,
 		bufsize, buflen, iskitty, trail);
     }
 
     // Key without modifier (Kitty sends this for Esc or F3):
     //	{lead}{key}u
     //	{lead}{key}~
-    else if (argc == 1 && (trail == 'u' || trail == '~'))
+    否则 もし (argc == 1 && (trail == 'u' || trail == '~'))
     {
-	return len + handle_key_without_modifier(arg, csi_len, offset, buf,
+	戻る len + handle_key_without_modifier(arg, csi_len, offset, buf,
 		bufsize, buflen, trail);
     }
 
     // else: Unknown CSI sequence.  We could drop it, but then the
     // user can't create a map for it.
-    return 0;
+    戻る 0;
 }
 
 static void
-check_for_color_response(char_u *resp, int len)
+check_for_color_response(char_u *resp, 整数 len)
 {
-    int		i, j;
+    整数		i, j;
     char_u	*argp;
 
     j = 1 + (resp[0] == ESC);
     argp = resp + j;
 
-    if (len >= j + 3 && (argp[0] != '1'
+    もし (len >= j + 3 && (argp[0] != '1'
 			     || (argp[1] != '1' && argp[1] != '0')
 			     || argp[2] != ';'))
 	i = 0; // no match
-    else
+    否则
     {
-	for (i = j; i < len; ++i)
-	    if (resp[i] == '\007' || (resp[0] == OSC ? resp[i] == STERM
+	ために (i = j; i < len; ++i)
+	    もし (resp[i] == '\007' || (resp[0] == OSC ? resp[i] == STERM
 			: (resp[i] == ESC && i + 1 < len && resp[i + 1] == '\\')))
 	    {
-		int is_bg = argp[1] == '1';
-		int is_4digit = i - j >= 21 && resp[j + 11] == '/'
+		整数 is_bg = argp[1] == '1';
+		整数 is_4digit = i - j >= 21 && resp[j + 11] == '/'
 						  && resp[j + 16] == '/';
 
-		if (i - j >= 15 && STRNCMP(resp + j + 3, "rgb:", 4) == 0
+		もし (i - j >= 15 && STRNCMP(resp + j + 3, "rgb:", 4) == 0
 			    && (is_4digit
 				   || (resp[j + 9] == '/' && resp[j + 12] == '/')))
 		{
@@ -6087,13 +6087,13 @@ check_for_color_response(char_u *resp, int len)
 		    char_u *tp_g = resp + j + (is_4digit ? 12 : 10);
 		    char_u *tp_b = resp + j + (is_4digit ? 17 : 13);
 #ifdef FEAT_TERMRESPONSE
-		    int rval, gval, bval;
+		    整数 rval, gval, bval;
 
 		    rval = hexhex2nr(tp_r);
 		    gval = hexhex2nr(tp_g);
 		    bval = hexhex2nr(tp_b);
 #endif
-		    if (is_bg)
+		    もし (is_bg)
 		    {
 			char *new_bg_val = (3 * '6' < *tp_r + *tp_g +
 					     *tp_b) ? "light" : "dark";
@@ -6105,7 +6105,7 @@ check_for_color_response(char_u *resp, int len)
 			bg_g = gval;
 			bg_b = bval;
 #endif
-			if (!option_was_set((char_u *)"bg")
+			もし (!option_was_set((char_u *)"bg")
 				      && STRCMP(p_bg, new_bg_val) != 0)
 			{
 			    // value differs, apply it
@@ -6115,8 +6115,8 @@ check_for_color_response(char_u *resp, int len)
 			    redraw_asap(UPD_CLEAR);
 			}
 		    }
-#if defined(FEAT_TERMRESPONSE) && defined(FEAT_TERMINAL)
-		    else
+#もし defined(FEAT_TERMRESPONSE) && defined(FEAT_TERMINAL)
+		    否则
 		    {
 			LOG_TRN("Received RFG response: r=%d g=%d b=%d", rval, gval, bval);
 			rfg_status.tr_progress = STATUS_GOT;
@@ -6137,7 +6137,7 @@ check_for_color_response(char_u *resp, int len)
 		break;
 	    }
     }
-    if (i == len)
+    もし (i == len)
 	LOG_TR1("not enough characters for RB");
 }
 
@@ -6149,21 +6149,21 @@ static oscstate_T osc_state;
     bool
 in_osc_sequence(void)
 {
-    return osc_state.processing;
+    戻る osc_state.processing;
 }
 
 /*
  * Handles any OSC sequence and places the result in "v:termosc". Returns OK on
  * success and FAIL on failure.
  */
-    static int
-handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
+    static 整数
+handle_osc(char_u *tp, 整数 len, char_u *key_name, 整数 *slen)
 {
     char_u last_char;
 
-    if (!osc_state.processing)
+    もし (!osc_state.processing)
     {
-	int cur;
+	整数 cur;
 
 	LOG_TRN("Received OSC response: %s", (char*)tp);
 	// Check if it is a valid OSC sequence, and consume it. OSC format
@@ -6173,8 +6173,8 @@ handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
 	// <terminator> can be '\007', <Esc>\ or STERM.
 	cur = 1 + (tp[0] == ESC);
 
-	if (len < cur + 1 + (tp[0] != OSC)) // Include terminator as well
-	    return FAIL;
+	もし (len < cur + 1 + (tp[0] != OSC)) // Include terminator as well
+	    戻る FAIL;
 
 	// The whole OSC response may be larger than the typeahead buffer.
 	// To handle this, keep reading data in and out of the typeahead
@@ -6190,22 +6190,22 @@ handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
 	osc_state.start_char = tp[0];
 	last_char = 0;
     }
-    else
+    否则
 	last_char = ((char_u *)osc_state.buf.ga_data)[osc_state.buf.ga_len - 1];
 
-    key_name[0] = (int)KS_EXTRA;
+    key_name[0] = (整数)KS_EXTRA;
 
     // Read data and append to buffer. If we reach a terminator, then
     // finally set the vim var.
-    for (int i = 0; i < len; i++)
-	if (tp[i] == '\007' || (osc_state.start_char == OSC ? tp[i] == STERM
+    ために (整数 i = 0; i < len; i++)
+	もし (tp[i] == '\007' || (osc_state.start_char == OSC ? tp[i] == STERM
 		    : ((tp[i] == ESC && i + 1 < len && tp[i + 1] == '\\')
 			|| (i == 0 && tp[i] == '\\' && last_char == ESC)
 			)))
 	{
 	    osc_state.processing = FALSE;
 
-	    key_name[1] = (int)KE_OSC;
+	    key_name[1] = (整数)KE_OSC;
 
 	    ga_concat_len(&osc_state.buf, tp, i + 1 + (tp[i] == ESC));
 	    ga_append(&osc_state.buf, NUL);
@@ -6219,29 +6219,29 @@ handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
 	    char_u savebg = *p_bg;
 	    apply_autocmds(EVENT_TERMRESPONSEALL, (char_u *)"osc",
 		    NULL, FALSE, curbuf);
-	    if (*p_bg != savebg)
+	    もし (*p_bg != savebg)
 		redraw_asap(UPD_CLEAR);
-	    return OK;
+	    戻る OK;
 	}
 
-    key_name[1] = (int)KE_IGNORE;
+    key_name[1] = (整数)KE_IGNORE;
 
 #ifdef ELAPSED_FUNC
-    if (ELAPSED_FUNC(osc_state.start_tv) >= p_ost)
+    もし (ELAPSED_FUNC(osc_state.start_tv) >= p_ost)
     {
 	semsg(_(e_osc_response_timed_out), osc_state.buf.ga_len,
 		osc_state.buf.ga_data);
 
 	ga_clear(&osc_state.buf);
 	osc_state.processing = FALSE;
-	return FAIL;
+	戻る FAIL;
     }
 #endif
 
     ga_concat(&osc_state.buf, tp);
     *slen = len; // Consume everything
 
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -6263,56 +6263,56 @@ handle_osc(char_u *tp, int len, char_u *key_name, int *slen)
  *
  * Consume any code that starts with "{lead}.+r" or "{lead}.$r".
  */
-    static int
-handle_dcs(char_u *tp, char_u *argp, int len, char_u *key_name, int *slen)
+    static 整数
+handle_dcs(char_u *tp, char_u *argp, 整数 len, char_u *key_name, 整数 *slen)
 {
-    int i, j;
+    整数 i, j;
 
     LOG_TRN("Received DCS response: %s", (char*)tp);
     j = 1 + (tp[0] == ESC);
-    if (len < j + 3)
+    もし (len < j + 3)
 	i = len; // need more chars
-    else if ((argp[1] != '+' && argp[1] != '$')
+    否则 もし ((argp[1] != '+' && argp[1] != '$')
 	    || (argp[2] != 'r' && argp[2] != 'R'))
 	i = 0; // no match
-    else if (argp[1] == '+')
+    否则 もし (argp[1] == '+')
 	// key code response
-	for (i = j; i < len; ++i)
+	ために (i = j; i < len; ++i)
 	{
-	    if ((tp[i] == ESC && i + 1 < len && tp[i + 1] == '\\')
+	    もし ((tp[i] == ESC && i + 1 < len && tp[i + 1] == '\\')
 		    || tp[i] == STERM)
 	    {
 #ifdef FEAT_TERMRESPONSE
 		// handle a key code response, drop a resource response
-		if (i - j >= 3 && argp[2] == 'r')
+		もし (i - j >= 3 && argp[2] == 'r')
 		    got_code_from_term(tp + j, i);
 #endif
-		key_name[0] = (int)KS_EXTRA;
-		key_name[1] = (int)KE_IGNORE;
+		key_name[0] = (整数)KS_EXTRA;
+		key_name[1] = (整数)KE_IGNORE;
 		*slen = i + 1 + (tp[i] == ESC);
 		break;
 	    }
 	}
-    else
+    否则
     {
 	// Probably the cursor shape response.  Make sure that "i"
 	// is equal to "len" when there are not sufficient
 	// characters.
-	for (i = j + 3; i < len; ++i)
+	ために (i = j + 3; i < len; ++i)
 	{
-	    if (i - j == 3 && !SAFE_isdigit(tp[i]))
+	    もし (i - j == 3 && !SAFE_isdigit(tp[i]))
 		break;
-	    if (i - j == 4 && tp[i] != ' ')
+	    もし (i - j == 4 && tp[i] != ' ')
 		break;
-	    if (i - j == 5 && tp[i] != 'q')
+	    もし (i - j == 5 && tp[i] != 'q')
 		break;
-	    if (i - j == 6 && tp[i] != ESC && tp[i] != STERM)
+	    もし (i - j == 6 && tp[i] != ESC && tp[i] != STERM)
 		break;
-	    if ((i - j == 6 && tp[i] == STERM)
+	    もし ((i - j == 6 && tp[i] == STERM)
 		    || (i - j == 7 && tp[i] == '\\'))
 	    {
 #ifdef FEAT_TERMRESPONSE
-		int number = argp[3] - '0';
+		整数 number = argp[3] - '0';
 
 		// 0, 1 = block blink, 2 = block
 		// 3 = underline blink, 4 = underline
@@ -6327,8 +6327,8 @@ handle_dcs(char_u *tp, char_u *argp, int len, char_u *key_name, int *slen)
 #endif
 		LOG_TRN("Received cursor shape response: %s", tp);
 
-		key_name[0] = (int)KS_EXTRA;
-		key_name[1] = (int)KE_IGNORE;
+		key_name[0] = (整数)KS_EXTRA;
+		key_name[1] = (整数)KE_IGNORE;
 		*slen = i + 1;
 #ifdef FEAT_EVAL
 		set_vim_var_string(VV_TERMSTYLERESP, tp, *slen);
@@ -6340,14 +6340,14 @@ handle_dcs(char_u *tp, char_u *argp, int len, char_u *key_name, int *slen)
 	}
     }
 
-    if (i == len)
+    もし (i == len)
     {
 	// These codes arrive many together, each code can be
 	// truncated at any point.
 	LOG_TR1("not enough characters for XT");
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -6363,29 +6363,29 @@ handle_dcs(char_u *tp, char_u *argp, int len, char_u *key_name, int *slen)
  * "buflen" is then the length of the string in buf[] and is updated for
  * inserts and deletes.
  */
-    int
+    整数
 check_termcode(
-    int		max_offset,
+    整数		max_offset,
     char_u	*buf,
-    int		bufsize,
-    int		*buflen)
+    整数		bufsize,
+    整数		*buflen)
 {
     char_u	*tp;
     char_u	*p;
-    int		slen = 0;	// init for GCC
-    int		modslen;
-    int		len;
-    int		retval = 0;
-    int		offset;
+    整数		slen = 0;	// init for GCC
+    整数		modslen;
+    整数		len;
+    整数		retval = 0;
+    整数		offset;
     char_u	key_name[2];
-    int		modifiers;
+    整数		modifiers;
     char_u	*modifiers_start = NULL;
-    int		key;
-    int		new_slen;   // Length of what will replace the termcode
+    整数		key;
+    整数		new_slen;   // Length of what will replace the termcode
     char_u	string[MAX_KEY_CODE_LEN + 1];
-    int		i, j;
-    int		idx = 0;
-    int		cpo_koffset;
+    整数		i, j;
+    整数		idx = 0;
+    整数		cpo_koffset;
 
     cpo_koffset = (vim_strchr(p_cpo, CPO_KOFFSET) != NULL);
 
@@ -6393,7 +6393,7 @@ check_termcode(
      * Speed up the checks for terminal codes by gathering all first bytes
      * used in termleader[].  Often this is just a single <Esc>.
      */
-    if (need_gather)
+    もし (need_gather)
 	gather_termleader();
 
     /*
@@ -6403,18 +6403,18 @@ check_termcode(
      * typebuf.tb_buf[] can become very long.
      * This is used often, KEEP IT FAST!
      */
-    for (offset = 0; offset < max_offset; ++offset)
+    ために (offset = 0; offset < max_offset; ++offset)
     {
-	if (buf == NULL)
+	もし (buf == NULL)
 	{
-	    if (offset >= typebuf.tb_len)
+	    もし (offset >= typebuf.tb_len)
 		break;
 	    tp = typebuf.tb_buf + typebuf.tb_off + offset;
 	    len = typebuf.tb_len - offset;	// length of the input
 	}
-	else
+	否则
 	{
-	    if (offset >= *buflen)
+	    もし (offset >= *buflen)
 		break;
 	    tp = buf + offset;
 	    len = *buflen - offset;
@@ -6424,13 +6424,13 @@ check_termcode(
 	 * Don't check characters after K_SPECIAL, those are already
 	 * translated terminal chars (avoid translating ~@^Hx).
 	 */
-	if (*tp == K_SPECIAL)
+	もし (*tp == K_SPECIAL)
 	{
 	    offset += 2;	// there are always 2 extra characters
 	    continue;
 	}
 
-	if (osc_state.processing)
+	もし (osc_state.processing)
 	{
 	    // Still processing OSC response data, go straight to handler
 	    // function.
@@ -6447,16 +6447,16 @@ check_termcode(
 	 * termcodes start with the same character (ESC or CSI).
 	 */
 	i = *tp;
-	for (p = termleader; *p && *p != i; ++p)
+	ために (p = termleader; *p && *p != i; ++p)
 	    ;
-	if (*p == NUL)
+	もし (*p == NUL)
 	    continue;
 
 	/*
 	 * Skip this position if p_ek is not set and tp[0] is an ESC and we
 	 * are in Insert mode.
 	 */
-	if (*tp == ESC && !p_ek && (State & MODE_INSERT))
+	もし (*tp == ESC && !p_ek && (State & MODE_INSERT))
 	    continue;
 
 	tp[len] = NUL;
@@ -6465,24 +6465,24 @@ check_termcode(
 	modifiers = 0;		// no modifiers yet
 
 #ifdef FEAT_GUI
-	if (gui.in_use)
+	もし (gui.in_use)
 	{
 	    /*
 	     * GUI special key codes are all of the form [CSI xx].
 	     */
-	    if (*tp == CSI)	    // Special key from GUI
+	    もし (*tp == CSI)	    // Special key from GUI
 	    {
-		if (len < 3)
-		    return -1;	    // Shouldn't happen
+		もし (len < 3)
+		    戻る -1;	    // Shouldn't happen
 		slen = 3;
 		key_name[0] = tp[1];
 		key_name[1] = tp[2];
 	    }
 	}
-	else
+	否则
 #endif // FEAT_GUI
 #ifdef MSWIN
-	    if (len >= 3 && tp[0] == CSI && tp[1] == KS_EXTRA
+	    もし (len >= 3 && tp[0] == CSI && tp[1] == KS_EXTRA
 		    && (tp[2] == KE_MOUSEUP
 			|| tp[2] == KE_MOUSEDOWN
 			|| tp[2] == KE_MOUSELEFT
@@ -6496,16 +6496,16 @@ check_termcode(
 	    key_name[0] = tp[1];
 	    key_name[1] = tp[2];
 	}
-	else
+	否则
 #endif
 	{
-	    int  mouse_index_found = -1;
-	    int keypad_index_found = -1;
-	    int keypad_slen_found = 0;
+	    整数  mouse_index_found = -1;
+	    整数 keypad_index_found = -1;
+	    整数 keypad_slen_found = 0;
 
-	    for (idx = 0; idx < tc_len; ++idx)
+	    ために (idx = 0; idx < tc_len; ++idx)
 	    {
-		int     is_keypad = FALSE;
+		整数     is_keypad = FALSE;
 		/*
 		 * Ignore the entry if we are not at the start of
 		 * typebuf.tb_buf[]
@@ -6514,15 +6514,15 @@ check_termcode(
 		 */
 		slen = termcodes[idx].len;
 		modifiers_start = NULL;
-		if (cpo_koffset && offset && len < slen)
+		もし (cpo_koffset && offset && len < slen)
 		    continue;
-		if (STRNCMP(termcodes[idx].code, tp,
+		もし (STRNCMP(termcodes[idx].code, tp,
 				     (size_t)(slen > len ? len : slen)) == 0)
 		{
-		    int	    looks_like_mouse_start = FALSE;
+		    整数	    looks_like_mouse_start = FALSE;
 
-		    if (len < slen)		// got a partial sequence
-			return -1;		// need to get more chars
+		    もし (len < slen)		// got a partial sequence
+			戻る -1;		// need to get more chars
 
 		    /*
 		     * When found a keypad key, check if there is another key
@@ -6530,65 +6530,65 @@ check_termcode(
 		     * found instead of <kHome> when they produce the same
 		     * key code.
 		     */
-		    if (termcodes[idx].name[0] == 'K'
+		    もし (termcodes[idx].name[0] == 'K'
 				       && (VIM_ISDIGIT(termcodes[idx].name[1])
 						|| ASCII_ISUPPER(termcodes[idx].name[1])))
 		    {
 			is_keypad = TRUE;
 			// Only use it when there is no other match.
-			if (keypad_index_found < 0)
+			もし (keypad_index_found < 0)
 			{
 			    keypad_index_found = idx;
 			    keypad_slen_found = slen;
 			}
 		    }
 
-		    if (slen == 2 && len > 2
+		    もし (slen == 2 && len > 2
 			    && termcodes[idx].code[0] == ESC
 			    && termcodes[idx].code[1] == '[')
 		    {
 			// The mouse termcode "ESC [" is also the prefix of
 			// "ESC [ I" (focus gained) and other keys.  Check some
 			// more bytes to find out.
-			if (!SAFE_isdigit(tp[2]))
+			もし (!SAFE_isdigit(tp[2]))
 			{
 			    // ESC [ without number following: Only use it when
 			    // there is no other match.
 			    looks_like_mouse_start = TRUE;
 			}
-			else if (termcodes[idx].name[0] == KS_DEC_MOUSE)
+			否则 もし (termcodes[idx].name[0] == KS_DEC_MOUSE)
 			{
 			    char_u  *nr = tp + 2;
-			    int	    count = 0;
+			    整数	    count = 0;
 
 			    // If a digit is following it could be a key with
 			    // modifier, e.g., ESC [ 1;2P.  Can be confused
 			    // with DEC_MOUSE, which requires four numbers
 			    // following.  If not then it can't be a DEC_MOUSE
 			    // code.
-			    for (;;)
+			    ために (;;)
 			    {
 				++count;
 				(void)getdigits(&nr);
-				if (nr >= tp + len)
-				    return -1;	// partial sequence
-				if (*nr != ';')
+				もし (nr >= tp + len)
+				    戻る -1;	// partial sequence
+				もし (*nr != ';')
 				    break;
 				++nr;
-				if (nr >= tp + len)
-				    return -1;	// partial sequence
+				もし (nr >= tp + len)
+				    戻る -1;	// partial sequence
 			    }
-			    if (count < 4)
+			    もし (count < 4)
 				continue;	// no match
 			}
 		    }
-		    if (looks_like_mouse_start)
+		    もし (looks_like_mouse_start)
 		    {
 			// Only use it when there is no other match.
-			if (mouse_index_found < 0)
+			もし (mouse_index_found < 0)
 			    mouse_index_found = idx;
 		    }
-		    else if (!is_keypad)
+		    否则 もし (!is_keypad)
 		    {
 			key_name[0] = termcodes[idx].name[0];
 			key_name[1] = termcodes[idx].name[1];
@@ -6604,42 +6604,42 @@ check_termcode(
 		 * When there is a modifier the * matches a number.
 		 * When there is no modifier the ;* or * is omitted.
 		 */
-		if (termcodes[idx].modlen > 0 && mouse_index_found < 0)
+		もし (termcodes[idx].modlen > 0 && mouse_index_found < 0)
 		{
 		    modslen = termcodes[idx].modlen;
-		    if (cpo_koffset && offset && len < modslen)
+		    もし (cpo_koffset && offset && len < modslen)
 			continue;
-		    if (STRNCMP(termcodes[idx].code, tp,
+		    もし (STRNCMP(termcodes[idx].code, tp,
 				(size_t)(modslen > len ? len : modslen)) == 0)
 		    {
-			int	    n;
+			整数	    n;
 
-			if (len <= modslen)	// got a partial sequence
-			    return -1;		// need to get more chars
+			もし (len <= modslen)	// got a partial sequence
+			    戻る -1;		// need to get more chars
 
-			if (tp[modslen] == termcodes[idx].code[slen - 1])
+			もし (tp[modslen] == termcodes[idx].code[slen - 1])
 			    // no modifiers
 			    slen = modslen + 1;
-			else if (tp[modslen] != ';' && modslen == slen - 3)
+			否则 もし (tp[modslen] != ';' && modslen == slen - 3)
 			    // no match for "code;*X" with "code;"
 			    continue;
-			else if (termcodes[idx].code[modslen] == '@'
+			否则 もし (termcodes[idx].code[modslen] == '@'
 					 && (tp[modslen] != '1'
 						    || tp[modslen + 1] != ';'))
 			    // no match for "<Esc>[@" with "<Esc>[1;"
 			    continue;
-			else
+			否则
 			{
 			    // Skip over the digits, the final char must
 			    // follow. URXVT can use a negative value, thus
 			    // also accept '-'.
-			    for (j = slen - 2; j < len && (SAFE_isdigit(tp[j])
+			    ために (j = slen - 2; j < len && (SAFE_isdigit(tp[j])
 				       || tp[j] == '-' || tp[j] == ';'); ++j)
 				;
 			    ++j;
-			    if (len < j)	// got a partial sequence
-				return -1;	// need to get more chars
-			    if (tp[j - 1] != termcodes[idx].code[slen - 1])
+			    もし (len < j)	// got a partial sequence
+				戻る -1;	// need to get more chars
+			    もし (tp[j - 1] != termcodes[idx].code[slen - 1])
 				continue;	// no match
 
 			    modifiers_start = tp + slen - 2;
@@ -6650,18 +6650,18 @@ check_termcode(
 
 			    slen = j;
 			}
-			if (termcodes[idx].name[0] == 'K'
+			もし (termcodes[idx].name[0] == 'K'
 					   && (VIM_ISDIGIT(termcodes[idx].name[1])
 						    || ASCII_ISUPPER(termcodes[idx].name[1])))
 			{
 			    is_keypad = TRUE;
-			    if (keypad_index_found < 0)
+			    もし (keypad_index_found < 0)
 			    {
 				keypad_index_found = idx;
 				keypad_slen_found = slen;
 			    }
 			}
-			if (!is_keypad)
+			もし (!is_keypad)
 			{
 			    key_name[0] = termcodes[idx].name[0];
 			    key_name[1] = termcodes[idx].name[1];
@@ -6670,20 +6670,20 @@ check_termcode(
 		    }
 		}
 	    }
-	    if (idx == tc_len && keypad_index_found >= 0)
+	    もし (idx == tc_len && keypad_index_found >= 0)
 	    {
 		key_name[0] = termcodes[keypad_index_found].name[0];
 		key_name[1] = termcodes[keypad_index_found].name[1];
 		slen = keypad_slen_found;
 	    }
-	    else if (idx == tc_len && mouse_index_found >= 0)
+	    否则 もし (idx == tc_len && mouse_index_found >= 0)
 	    {
 		key_name[0] = termcodes[mouse_index_found].name[0];
 		key_name[1] = termcodes[mouse_index_found].name[1];
 	    }
 	}
 
-	if (key_name[0] == NUL
+	もし (key_name[0] == NUL
 	    // Mouse codes of DEC and pterm start with <ESC>[.  When
 	    // detecting the start of these mouse codes they might as well be
 	    // another key code or terminal response.
@@ -6719,29 +6719,29 @@ check_termcode(
 	     *	    {lead}27;{modifier};{key}~
 	     *	    {lead}{key};{modifier}u
 	     */
-	    if (((tp[0] == ESC && len >= 3 && tp[1] == '[')
+	    もし (((tp[0] == ESC && len >= 3 && tp[1] == '[')
 			|| (tp[0] == CSI && len >= 2))
 		    && vim_strchr((char_u *)"0123456789>?ABCDEFHPQRS",
 								*argp) != NULL)
 	    {
-		int resp = handle_csi(tp, len, argp, offset, buf,
+		整数 resp = handle_csi(tp, len, argp, offset, buf,
 					     bufsize, buflen, key_name, &slen);
-		if (resp != 0)
+		もし (resp != 0)
 		{
 #ifdef DEBUG_TERMRESPONSE
-		    if (resp == -1)
+		    もし (resp == -1)
 			LOG_TR1("Not enough characters for CSI sequence");
 #endif
-		    return resp;
+		    戻る resp;
 		}
 	    }
 
 	    // Check for OSC responses from terminal
-	    else if ((tp[0] == ESC && len >= 2 && tp[1] == ']') || tp[0] == OSC)
+	    否则 もし ((tp[0] == ESC && len >= 2 && tp[1] == ']') || tp[0] == OSC)
 	    {
 handle_osc:
-		if (handle_osc(tp, len, key_name, &slen) == FAIL)
-		    return -1;
+		もし (handle_osc(tp, len, key_name, &slen) == FAIL)
+		    戻る -1;
 	    }
 
 	    // Check for key code response from xterm,
@@ -6749,54 +6749,54 @@ handle_osc:
 	    // It would only be needed with this condition:
 	    //	    (check_for_codes || rcs_status.tr_progress == STATUS_SENT)
 	    // Now this is always done so that DCS codes don't mess up things.
-	    else if ((tp[0] == ESC && len >= 2 && tp[1] == 'P') || tp[0] == DCS)
+	    否则 もし ((tp[0] == ESC && len >= 2 && tp[1] == 'P') || tp[0] == DCS)
 	    {
-		if (handle_dcs(tp, argp, len, key_name, &slen) == FAIL)
-		    return -1;
+		もし (handle_dcs(tp, argp, len, key_name, &slen) == FAIL)
+		    戻る -1;
 	    }
 	}
 
-	if (key_name[0] == NUL)
+	もし (key_name[0] == NUL)
 	    continue;	    // No match at this position, try next one
 
 	// We only get here when we have a complete termcode match
 
-#if defined(FEAT_GUI) || defined(MSWIN)
+#もし defined(FEAT_GUI) || defined(MSWIN)
 	/*
 	 * For scroll events from the GUI or MS-Windows console, fetch the
 	 * pointer coordinates so that we know which window to scroll later.
 	 */
-	if (TRUE
-# if defined(FEAT_GUI) && !defined(MSWIN)
+	もし (TRUE
+# もし defined(FEAT_GUI) && !defined(MSWIN)
 		&& gui.in_use
 # endif
-		&& key_name[0] == (int)KS_EXTRA
-		&& (key_name[1] == (int)KE_X1MOUSE
-		    || key_name[1] == (int)KE_X2MOUSE
-		    || key_name[1] == (int)KE_MOUSEMOVE_XY
-		    || key_name[1] == (int)KE_MOUSELEFT
-		    || key_name[1] == (int)KE_MOUSERIGHT
-		    || key_name[1] == (int)KE_MOUSEDOWN
-		    || key_name[1] == (int)KE_MOUSEUP))
+		&& key_name[0] == (整数)KS_EXTRA
+		&& (key_name[1] == (整数)KE_X1MOUSE
+		    || key_name[1] == (整数)KE_X2MOUSE
+		    || key_name[1] == (整数)KE_MOUSEMOVE_XY
+		    || key_name[1] == (整数)KE_MOUSELEFT
+		    || key_name[1] == (整数)KE_MOUSERIGHT
+		    || key_name[1] == (整数)KE_MOUSEDOWN
+		    || key_name[1] == (整数)KE_MOUSEUP))
 	{
 	    char_u	bytes[6];
-	    int		num_bytes = get_bytes_from_buf(tp + slen, bytes, 4);
+	    整数		num_bytes = get_bytes_from_buf(tp + slen, bytes, 4);
 
-	    if (num_bytes == -1)	// not enough coordinates
-		return -1;
+	    もし (num_bytes == -1)	// not enough coordinates
+		戻る -1;
 	    mouse_col = 128 * (bytes[0] - ' ' - 1) + bytes[1] - ' ' - 1;
 	    mouse_row = 128 * (bytes[2] - ' ' - 1) + bytes[3] - ' ' - 1;
 	    slen += num_bytes;
 	    // equal to K_MOUSEMOVE
-	    if (key_name[1] == (int)KE_MOUSEMOVE_XY)
-		key_name[1] = (int)KE_MOUSEMOVE;
+	    もし (key_name[1] == (整数)KE_MOUSEMOVE_XY)
+		key_name[1] = (整数)KE_MOUSEMOVE;
 	}
-	else
+	否则
 #endif
 	/*
 	 * If it is a mouse click, get the coordinates.
 	 */
-	if (key_name[0] == KS_MOUSE
+	もし (key_name[0] == KS_MOUSE
 #ifdef FEAT_MOUSE_GPM
 		|| key_name[0] == KS_GPM_MOUSE
 #endif
@@ -6818,9 +6818,9 @@ handle_osc:
 		|| key_name[0] == KS_SGR_MOUSE
 		|| key_name[0] == KS_SGR_MOUSE_RELEASE)
 	{
-	    if (check_termcode_mouse(tp, &slen, key_name, modifiers_start, idx,
+	    もし (check_termcode_mouse(tp, &slen, key_name, modifiers_start, idx,
 							     &modifiers) == -1)
-		return -1;
+		戻る -1;
 	}
 
 #ifdef FEAT_GUI
@@ -6843,137 +6843,137 @@ handle_osc:
 	 * new value of the scrollbar.
 	 */
 # ifdef FEAT_MENU
-	else if (key_name[0] == (int)KS_MENU)
+	否则 もし (key_name[0] == (整数)KS_MENU)
 	{
 	    long_u	val;
-	    int		num_bytes = get_long_from_buf(tp + slen, &val);
+	    整数		num_bytes = get_long_from_buf(tp + slen, &val);
 
-	    if (num_bytes == -1)
-		return -1;
+	    もし (num_bytes == -1)
+		戻る -1;
 	    current_menu = (vimmenu_T *)val;
 	    slen += num_bytes;
 
 	    // The menu may have been deleted right after it was used, check
 	    // for that.
-	    if (check_menu_pointer(root_menu, current_menu) == FAIL)
+	    もし (check_menu_pointer(root_menu, current_menu) == FAIL)
 	    {
 		key_name[0] = KS_EXTRA;
-		key_name[1] = (int)KE_IGNORE;
+		key_name[1] = (整数)KE_IGNORE;
 	    }
 	}
 # endif
 # ifdef FEAT_GUI_TABLINE
-	else if (key_name[0] == (int)KS_TABLINE)
+	否则 もし (key_name[0] == (整数)KS_TABLINE)
 	{
 	    // Selecting tabline tab or using its menu.
 	    char_u	bytes[6];
-	    int		num_bytes = get_bytes_from_buf(tp + slen, bytes, 1);
+	    整数		num_bytes = get_bytes_from_buf(tp + slen, bytes, 1);
 
-	    if (num_bytes == -1)
-		return -1;
-	    current_tab = (int)bytes[0];
-	    if (current_tab == 255)	// -1 in a byte gives 255
+	    もし (num_bytes == -1)
+		戻る -1;
+	    current_tab = (整数)bytes[0];
+	    もし (current_tab == 255)	// -1 in a byte gives 255
 		current_tab = -1;
 	    slen += num_bytes;
 	}
-	else if (key_name[0] == (int)KS_TABMENU)
+	否则 もし (key_name[0] == (整数)KS_TABMENU)
 	{
 	    // Selecting tabline tab or using its menu.
 	    char_u	bytes[6];
-	    int		num_bytes = get_bytes_from_buf(tp + slen, bytes, 2);
+	    整数		num_bytes = get_bytes_from_buf(tp + slen, bytes, 2);
 
-	    if (num_bytes == -1)
-		return -1;
-	    current_tab = (int)bytes[0];
-	    current_tabmenu = (int)bytes[1];
+	    もし (num_bytes == -1)
+		戻る -1;
+	    current_tab = (整数)bytes[0];
+	    current_tabmenu = (整数)bytes[1];
 	    slen += num_bytes;
 	}
 # endif
 # ifndef USE_ON_FLY_SCROLL
-	else if (key_name[0] == (int)KS_VER_SCROLLBAR)
+	否则 もし (key_name[0] == (整数)KS_VER_SCROLLBAR)
 	{
 	    long_u	val;
 	    char_u	bytes[6];
-	    int		num_bytes;
+	    整数		num_bytes;
 
 	    // Get the last scrollbar event in the queue of the same type
 	    j = 0;
-	    for (i = 0; tp[j] == CSI && tp[j + 1] == KS_VER_SCROLLBAR
+	    ために (i = 0; tp[j] == CSI && tp[j + 1] == KS_VER_SCROLLBAR
 						     && tp[j + 2] != NUL; ++i)
 	    {
 		j += 3;
 		num_bytes = get_bytes_from_buf(tp + j, bytes, 1);
-		if (num_bytes == -1)
+		もし (num_bytes == -1)
 		    break;
-		if (i == 0)
-		    current_scrollbar = (int)bytes[0];
-		else if (current_scrollbar != (int)bytes[0])
+		もし (i == 0)
+		    current_scrollbar = (整数)bytes[0];
+		否则 もし (current_scrollbar != (整数)bytes[0])
 		    break;
 		j += num_bytes;
 		num_bytes = get_long_from_buf(tp + j, &val);
-		if (num_bytes == -1)
+		もし (num_bytes == -1)
 		    break;
 		scrollbar_value = val;
 		j += num_bytes;
 		slen = j;
 	    }
-	    if (i == 0)		// not enough characters to make one
-		return -1;
+	    もし (i == 0)		// not enough characters to make one
+		戻る -1;
 	}
-	else if (key_name[0] == (int)KS_HOR_SCROLLBAR)
+	否则 もし (key_name[0] == (整数)KS_HOR_SCROLLBAR)
 	{
 	    long_u	val;
-	    int		num_bytes;
+	    整数		num_bytes;
 
 	    // Get the last horiz. scrollbar event in the queue
 	    j = 0;
-	    for (i = 0; tp[j] == CSI && tp[j + 1] == KS_HOR_SCROLLBAR
+	    ために (i = 0; tp[j] == CSI && tp[j + 1] == KS_HOR_SCROLLBAR
 						     && tp[j + 2] != NUL; ++i)
 	    {
 		j += 3;
 		num_bytes = get_long_from_buf(tp + j, &val);
-		if (num_bytes == -1)
+		もし (num_bytes == -1)
 		    break;
 		scrollbar_value = val;
 		j += num_bytes;
 		slen = j;
 	    }
-	    if (i == 0)		// not enough characters to make one
-		return -1;
+	    もし (i == 0)		// not enough characters to make one
+		戻る -1;
 	}
 # endif // !USE_ON_FLY_SCROLL
 #endif // FEAT_GUI
 
-#if defined(UNIX) || defined(VMS)
+#もし defined(UNIX) || defined(VMS)
 	/*
 	 * Handle FocusIn/FocusOut event sequences reported by XTerm.
 	 * (CSI I/CSI O)
 	 */
-	if (key_name[0] == KS_EXTRA
+	もし (key_name[0] == KS_EXTRA
 # ifdef FEAT_GUI
 		&& !gui.in_use
 # endif
 	    )
 	{
-	    if (key_name[1] == KE_FOCUSGAINED)
+	    もし (key_name[1] == KE_FOCUSGAINED)
 	    {
-		if (!focus_state)
+		もし (!focus_state)
 		{
 		    ui_focus_change(TRUE);
 		    did_cursorhold = TRUE;
 		    focus_state = TRUE;
 		}
-		key_name[1] = (int)KE_IGNORE;
+		key_name[1] = (整数)KE_IGNORE;
 	    }
-	    else if (key_name[1] == KE_FOCUSLOST)
+	    否则 もし (key_name[1] == KE_FOCUSLOST)
 	    {
-		if (focus_state)
+		もし (focus_state)
 		{
 		    ui_focus_change(FALSE);
 		    did_cursorhold = TRUE;
 		    focus_state = FALSE;
 		}
-		key_name[1] = (int)KE_IGNORE;
+		key_name[1] = (整数)KE_IGNORE;
 	    }
 	}
 #endif
@@ -6989,15 +6989,15 @@ handle_osc:
 	// Finally, add the special key code to our string
 	key_name[0] = KEY2TERMCAP0(key);
 	key_name[1] = KEY2TERMCAP1(key);
-	if (key_name[0] == KS_KEY)
+	もし (key_name[0] == KS_KEY)
 	{
 	    // from ":set <M-b>=xx"
-	    if (has_mbyte)
+	    もし (has_mbyte)
 		new_slen += (*mb_char2bytes)(key_name[1], string + new_slen);
-	    else
+	    否则
 		string[new_slen++] = key_name[1];
 	}
-	else if (osc_state.processing ||
+	否则 もし (osc_state.processing ||
 		(new_slen == 0
 		 && key_name[0] == KS_EXTRA
 		 && key_name[1] == KE_IGNORE))
@@ -7006,34 +7006,34 @@ handle_osc:
 	    // to indicate what happened.
 	    retval = KEYLEN_REMOVED;
 	}
-	else
+	否则
 	{
 	    string[new_slen++] = K_SPECIAL;
 	    string[new_slen++] = key_name[0];
 	    string[new_slen++] = key_name[1];
 	}
-	if (put_string_in_typebuf(offset, slen, string, new_slen,
+	もし (put_string_in_typebuf(offset, slen, string, new_slen,
 						 buf, bufsize, buflen) == FAIL)
-	    return -1;
-	return retval == 0 ? (len + new_slen - slen + offset) : retval;
+	    戻る -1;
+	戻る retval == 0 ? (len + new_slen - slen + offset) : retval;
     }
 
 #ifdef FEAT_TERMRESPONSE
     LOG_TR1("normal character");
 #endif
 
-    return 0;			    // no match found
+    戻る 0;			    // no match found
 }
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_TERMRESPONSE)
+#もし defined(FEAT_TERMINAL) && defined(FEAT_TERMRESPONSE)
 /*
  * Get the text foreground color, if known.
  */
     void
 term_get_fg_color(char_u *r, char_u *g, char_u *b)
 {
-    if (rfg_status.tr_progress != STATUS_GOT)
-	return;
+    もし (rfg_status.tr_progress != STATUS_GOT)
+	戻る;
 
     *r = fg_r;
     *g = fg_g;
@@ -7046,16 +7046,16 @@ term_get_fg_color(char_u *r, char_u *g, char_u *b)
  * Get the text background color, if known.  Returns OK when the OSC 11
  * response has been parsed and *r, *g, *b are populated; FAIL otherwise.
  */
-    int
+    整数
 term_get_bg_color(char_u *r, char_u *g, char_u *b)
 {
-    if (rbg_status.tr_progress != STATUS_GOT)
-	return FAIL;
+    もし (rbg_status.tr_progress != STATUS_GOT)
+	戻る FAIL;
 
     *r = bg_r;
     *g = bg_g;
     *b = bg_b;
-    return OK;
+    戻る OK;
 }
 #endif
 
@@ -7092,17 +7092,17 @@ replace_termcodes(
     char_u	**bufp,
     scid_T	sid_arg UNUSED,	// script ID to use for <SID>,
 				// or 0 to use current_sctx
-    int		flags,
-    int		*did_simplify)
+    整数		flags,
+    整数		*did_simplify)
 {
-    int		i;
-    int		slen;
-    int		key;
+    整数		i;
+    整数		slen;
+    整数		key;
     size_t	dlen = 0;
     char_u	*src;
-    int		do_backslash;	// backslash is a special character
-    int		do_special;	// recognize <> key codes
-    int		do_key_code;	// recognize raw key codes
+    整数		do_backslash;	// backslash is a special character
+    整数		do_special;	// recognize <> key codes
+    整数		do_key_code;	// recognize raw key codes
     char_u	*result;	// buffer for resulting string
     garray_T	ga;
 
@@ -7118,23 +7118,23 @@ replace_termcodes(
      * In the rare case more might be needed ga_grow() must be called again.
      */
     ga_init2(&ga, 1L, 100);
-    if (ga_grow(&ga, (int)(STRLEN(src) * 6 + 1)) == FAIL) // out of memory
+    もし (ga_grow(&ga, (整数)(STRLEN(src) * 6 + 1)) == FAIL) // out of memory
     {
 	*bufp = NULL;
-	return from;
+	戻る from;
     }
     result = ga.ga_data;
 
     /*
      * Check for #n at start only: function key n
      */
-    if ((flags & REPTERM_FROM_PART) && src[0] == '#' && VIM_ISDIGIT(src[1]))
+    もし ((flags & REPTERM_FROM_PART) && src[0] == '#' && VIM_ISDIGIT(src[1]))
     {
 	result[dlen++] = K_SPECIAL;
 	result[dlen++] = 'k';
-	if (src[1] == '0')
+	もし (src[1] == '0')
 	    result[dlen++] = ';';	// #0 is F10 is "k;"
-	else
+	否则
 	    result[dlen++] = src[1];	// #3 is F3 is "k3"
 	src += 2;
     }
@@ -7142,13 +7142,13 @@ replace_termcodes(
     /*
      * Copy each byte from *from to result[dlen]
      */
-    while (*src != NUL)
+    ながら (*src != NUL)
     {
 	/*
 	 * If 'cpoptions' does not contain '<', check for special key codes,
 	 * like "<C-S-LeftMouse>"
 	 */
-	if (do_special && ((flags & REPTERM_DO_LT)
+	もし (do_special && ((flags & REPTERM_DO_LT)
 					      || STRNCMP(src, "<lt>", 4) != 0))
 	{
 #ifdef FEAT_EVAL
@@ -7159,38 +7159,38 @@ replace_termcodes(
 	     * Also change <SID>name.Func to K_SNR <import-script-nr> _Func.
 	     * Only if "name" is recognized as an import.
 	     */
-	    if (STRNICMP(src, "<SID>", 5) == 0)
+	    もし (STRNICMP(src, "<SID>", 5) == 0)
 	    {
-		if (sid_arg < 0 || (sid_arg == 0 && current_sctx.sc_sid <= 0))
+		もし (sid_arg < 0 || (sid_arg == 0 && current_sctx.sc_sid <= 0))
 		    emsg(_(e_using_sid_not_in_script_context));
-		else
+		否则
 		{
 		    char_u  *dot;
 		    long    sid = sid_arg != 0 ? sid_arg : current_sctx.sc_sid;
 
 		    src += 5;
-		    if (in_vim9script()
+		    もし (in_vim9script()
 				       && (dot = vim_strchr(src, '.')) != NULL)
 		    {
 			imported_T *imp = find_imported(src, dot - src, FALSE);
 
-			if (imp != NULL)
+			もし (imp != NULL)
 			{
 			    scriptitem_T    *si = SCRIPT_ITEM(imp->imp_sid);
 			    size_t	    len;
 
 			    src = dot + 1;
-			    if (si->sn_autoload_prefix != NULL)
+			    もし (si->sn_autoload_prefix != NULL)
 			    {
 				// Turn "<SID>name.Func"
 				// into "scriptname#Func".
 				len = STRLEN(si->sn_autoload_prefix);
-				if (ga_grow(&ga,
-				     (int)(STRLEN(src) * 6 + len + 1)) == FAIL)
+				もし (ga_grow(&ga,
+				     (整数)(STRLEN(src) * 6 + len + 1)) == FAIL)
 				{
 				    ga_clear(&ga);
 				    *bufp = NULL;
-				    return from;
+				    戻る from;
 				}
 				result = ga.ga_data;
 				STRCPY(result + dlen, si->sn_autoload_prefix);
@@ -7202,8 +7202,8 @@ replace_termcodes(
 		    }
 
 		    result[dlen++] = K_SPECIAL;
-		    result[dlen++] = (int)KS_EXTRA;
-		    result[dlen++] = (int)KE_SNR;
+		    result[dlen++] = (整数)KS_EXTRA;
+		    result[dlen++] = (整数)KE_SNR;
 		    sprintf((char *)result + dlen, "%ld", sid);
 		    dlen += STRLEN(result + dlen);
 		    result[dlen++] = '_';
@@ -7211,12 +7211,12 @@ replace_termcodes(
 		}
 	    }
 #endif
-	    int fsk_flags = FSK_KEYCODE
+	    整数 fsk_flags = FSK_KEYCODE
 			| ((flags & REPTERM_NO_SIMPLIFY) ? 0 : FSK_SIMPLIFY)
 			| ((flags & REPTERM_FROM_PART) ? FSK_FROM_PART : 0);
 	    slen = trans_special(&src, result + dlen, fsk_flags,
 							   TRUE, did_simplify);
-	    if (slen > 0)
+	    もし (slen > 0)
 	    {
 		dlen += slen;
 		continue;
@@ -7229,11 +7229,11 @@ replace_termcodes(
 	 * Single character codes are NOT replaced (e.g. ^H or DEL), because
 	 * it could be a character in the file.
 	 */
-	if (do_key_code)
+	もし (do_key_code)
 	{
-	    int len;
+	    整数 len;
 	    i = find_term_bykeys(src, &len);
-	    if (i >= 0)
+	    もし (i >= 0)
 	    {
 		result[dlen++] = K_SPECIAL;
 		result[dlen++] = termcodes[i].name[0];
@@ -7245,7 +7245,7 @@ replace_termcodes(
 	}
 
 #ifdef FEAT_EVAL
-	if (do_special)
+	もし (do_special)
 	{
 	    char_u	*p, *s, len;
 
@@ -7254,29 +7254,29 @@ replace_termcodes(
 	     * Replace <LocalLeader> by the value of "maplocalleader".
 	     * If "mapleader" or "maplocalleader" isn't set use a backslash.
 	     */
-	    if (STRNICMP(src, "<Leader>", 8) == 0)
+	    もし (STRNICMP(src, "<Leader>", 8) == 0)
 	    {
 		len = 8;
 		p = get_var_value((char_u *)"g:mapleader");
 	    }
-	    else if (STRNICMP(src, "<LocalLeader>", 13) == 0)
+	    否则 もし (STRNICMP(src, "<LocalLeader>", 13) == 0)
 	    {
 		len = 13;
 		p = get_var_value((char_u *)"g:maplocalleader");
 	    }
-	    else
+	    否则
 	    {
 		len = 0;
 		p = NULL;
 	    }
-	    if (len != 0)
+	    もし (len != 0)
 	    {
 		// Allow up to 8 * 6 characters for "mapleader".
-		if (p == NULL || *p == NUL || STRLEN(p) > 8 * 6)
+		もし (p == NULL || *p == NUL || STRLEN(p) > 8 * 6)
 		    s = (char_u *)"\\";
-		else
+		否则
 		    s = p;
-		while (*s != NUL)
+		ながら (*s != NUL)
 		    result[dlen++] = *s++;
 		src += len;
 		continue;
@@ -7291,40 +7291,40 @@ replace_termcodes(
 	 * If 'cpoptions' does not contain 'B', also accept a backslash.
 	 */
 	key = *src;
-	if (key == Ctrl_V || (do_backslash && key == '\\'))
+	もし (key == Ctrl_V || (do_backslash && key == '\\'))
 	{
 	    ++src;				// skip CTRL-V or backslash
-	    if (*src == NUL)
+	    もし (*src == NUL)
 	    {
-		if (flags & REPTERM_FROM_PART)
+		もし (flags & REPTERM_FROM_PART)
 		    result[dlen++] = key;
 		break;
 	    }
 	}
 
 	// skip multibyte char correctly
-	for (i = (*mb_ptr2len)(src); i > 0; --i)
+	ために (i = (*mb_ptr2len)(src); i > 0; --i)
 	{
 	    /*
 	     * If the character is K_SPECIAL, replace it with K_SPECIAL
 	     * KS_SPECIAL KE_FILLER.
 	     * If compiled with the GUI replace CSI with K_CSI.
 	     */
-	    if (*src == K_SPECIAL)
+	    もし (*src == K_SPECIAL)
 	    {
 		result[dlen++] = K_SPECIAL;
 		result[dlen++] = KS_SPECIAL;
 		result[dlen++] = KE_FILLER;
 	    }
 #ifdef FEAT_GUI
-	    else if (*src == CSI)
+	    否则 もし (*src == CSI)
 	    {
 		result[dlen++] = K_SPECIAL;
 		result[dlen++] = KS_EXTRA;
-		result[dlen++] = (int)KE_CSI;
+		result[dlen++] = (整数)KE_CSI;
 	    }
 #endif
-	    else
+	    否则
 		result[dlen++] = *src;
 	    ++src;
 	}
@@ -7335,37 +7335,37 @@ replace_termcodes(
      * Copy the new string to allocated memory.
      * If this fails, just return from.
      */
-    if ((*bufp = vim_strsave(result)) != NULL)
+    もし ((*bufp = vim_strsave(result)) != NULL)
 	from = *bufp;
     vim_free(result);
-    return from;
+    戻る from;
 }
 
 /*
  * Find a termcode with keys 'src' (must be NUL terminated).
  * Return the index in termcodes[], or -1 if not found.
  */
-    static int
-find_term_bykeys(char_u *src, int *matchlen)
+    static 整数
+find_term_bykeys(char_u *src, 整数 *matchlen)
 {
-    int		i, j;
-    int		len = (int)STRLEN(src);
-    int         found = -1;
+    整数		i, j;
+    整数		len = (整数)STRLEN(src);
+    整数         found = -1;
     // Don't return a match for a single character
-    int         foundlen = 1;
-    int         slen, modslen;
-    int         thislen;
+    整数         foundlen = 1;
+    整数         slen, modslen;
+    整数         thislen;
 
     // Most input bytes cannot start a terminal code.  Reuse the same leader
     // table as check_termcode() to avoid scanning termcodes[] unnecessarily.
-    if (need_gather)
+    もし (need_gather)
 	gather_termleader();
-    if (*src == NUL || vim_strchr(termleader, *src) == NULL)
-	return -1;
+    もし (*src == NUL || vim_strchr(termleader, *src) == NULL)
+	戻る -1;
 
     // find longest match
     // borrows part of check_termcode
-    for (i = 0; i < tc_len; ++i)
+    ために (i = 0; i < tc_len; ++i)
     {
 	slen = termcodes[i].len;
 	modslen = termcodes[i].modlen;
@@ -7378,51 +7378,51 @@ find_term_bykeys(char_u *src, int *matchlen)
 	 * When there is a modifier the * matches a number.
 	 * When there is no modifier the ;* or * is omitted.
 	 */
-	if (modslen > 0)
+	もし (modslen > 0)
 	{
-	    if (len > modslen
+	    もし (len > modslen
 			&& STRNCMP(termcodes[i].code, src, (size_t)modslen) == 0)
 	    {
 		thislen = 0;
 
-		if (src[modslen] == termcodes[i].code[slen - 1])
+		もし (src[modslen] == termcodes[i].code[slen - 1])
 		    // no modifiers
 		    thislen = modslen + 1;
-		else if (src[modslen] != ';' && modslen == slen - 3)
+		否则 もし (src[modslen] != ';' && modslen == slen - 3)
 		    // no match for "code;*X" with "code;"
 		    continue;
-		else if (termcodes[i].code[modslen] == '@'
+		否则 もし (termcodes[i].code[modslen] == '@'
 				&& (src[modslen] != '1'
 					    || src[modslen + 1] != ';'))
 		    // no match for "<Esc>[@" with "<Esc>[1;"
 		    continue;
-		else
+		否则
 		{
 		    // Skip over the digits, the final char must
 		    // follow. URXVT can use a negative value, thus
 		    // also accept '-'.
-		    for (j = slen - 2; j < len && (SAFE_isdigit(src[j])
+		    ために (j = slen - 2; j < len && (SAFE_isdigit(src[j])
 			       || src[j] == '-' || src[j] == ';'); ++j)
 			;
 		    ++j;
-		    if (len < j)	// got a partial sequence
+		    もし (len < j)	// got a partial sequence
 			continue;
-		    if (src[j - 1] != termcodes[i].code[slen - 1])
+		    もし (src[j - 1] != termcodes[i].code[slen - 1])
 			continue;	// no match
 
 		    thislen = j;
 		}
 
-		if (thislen > foundlen)
+		もし (thislen > foundlen)
 		{
 		    found = i;
 		    foundlen = thislen;
 		}
 	    }
 	}
-	else
+	否则
 	{
-	    if (slen > foundlen && len >= slen
+	    もし (slen > foundlen && len >= slen
 			&& STRNCMP(termcodes[i].code, src, (size_t)slen) == 0)
 	    {
 		found = i;
@@ -7431,10 +7431,10 @@ find_term_bykeys(char_u *src, int *matchlen)
 	}
     }
 
-    if (matchlen != NULL && found >= 0)
+    もし (matchlen != NULL && found >= 0)
 	*matchlen = foundlen;
 
-    return found;
+    戻る found;
 }
 
 /*
@@ -7444,37 +7444,37 @@ find_term_bykeys(char_u *src, int *matchlen)
     static void
 gather_termleader(void)
 {
-    int	    i;
-    int	    len = 0;
+    整数	    i;
+    整数	    len = 0;
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    もし (gui.in_use)
 	termleader[len++] = CSI;    // the GUI codes are not in termcodes[]
 #endif
 
     // Querying cell size uses CSI 14 t
-#if defined(MSWIN) && (defined(FEAT_IMAGE) || defined(FEAT_EVAL))
+#もし defined(MSWIN) && (defined(FEAT_IMAGE) || defined(FEAT_EVAL))
 # ifdef FEAT_GUI
-    if (!gui.in_use)
+    もし (!gui.in_use)
 # endif
     {
 	termleader[len++] = ESC;
 # ifdef FEAT_GUI
-	if (!gui.in_use)
+	もし (!gui.in_use)
 # endif
 	    termleader[len++] = CSI;
     }
 #endif
 
 #ifdef FEAT_TERMRESPONSE
-    if (check_for_codes || *T_CRS != NUL)
+    もし (check_for_codes || *T_CRS != NUL)
 	termleader[len++] = DCS;    // the termcode response starts with DCS
 				    // in 8-bit mode
 #endif
     termleader[len] = NUL;
 
-    for (i = 0; i < tc_len; ++i)
-	if (vim_strchr(termleader, termcodes[i].code[0]) == NULL)
+    ために (i = 0; i < tc_len; ++i)
+	もし (vim_strchr(termleader, termcodes[i].code[0]) == NULL)
 	{
 	    termleader[len++] = termcodes[i].code[0];
 	    termleader[len] = NUL;
@@ -7489,26 +7489,26 @@ gather_termleader(void)
  * "flags" can have OPT_ONECOLUMN.
  */
     void
-show_termcodes(int flags)
+show_termcodes(整数 flags)
 {
-    int		col;
-    int		*items;
-    int		item_count;
-    int		run;
-    int		row, rows;
-    int		cols;
-    int		i;
-    int		len;
+    整数		col;
+    整数		*items;
+    整数		item_count;
+    整数		run;
+    整数		row, rows;
+    整数		cols;
+    整数		i;
+    整数		len;
 
 #define INC3 27	    // try to make three columns
 #define INC2 40	    // try to make two columns
 #define GAP 2	    // spaces between columns
 
-    if (tc_len == 0)	    // no terminal codes (must be GUI)
-	return;
-    items = ALLOC_MULT(int, tc_len);
-    if (items == NULL)
-	return;
+    もし (tc_len == 0)	    // no terminal codes (must be GUI)
+	戻る;
+    items = ALLOC_MULT(整数, tc_len);
+    もし (items == NULL)
+	戻る;
 
     // Highlight title
     msg_puts_title(_("\n--- Terminal keys ---"));
@@ -7520,17 +7520,17 @@ show_termcodes(int flags)
      * 3. display the long items (remaining strings)
      * When "flags" has OPT_ONECOLUMN do everything in 3.
      */
-    for (run = (flags & OPT_ONECOLUMN) ? 3 : 1; run <= 3 && !got_int; ++run)
+    ために (run = (flags & OPT_ONECOLUMN) ? 3 : 1; run <= 3 && !got_int; ++run)
     {
 	/*
 	 * collect the items in items[]
 	 */
 	item_count = 0;
-	for (i = 0; i < tc_len; i++)
+	ために (i = 0; i < tc_len; i++)
 	{
 	    len = show_one_termcode(termcodes[i].name,
 						    termcodes[i].code, FALSE);
-	    if ((flags & OPT_ONECOLUMN) ||
+	    もし ((flags & OPT_ONECOLUMN) ||
 		    (len <= INC3 - GAP ? run == 1
 			: len <= INC2 - GAP ? run == 2
 			: run == 3))
@@ -7540,29 +7540,29 @@ show_termcodes(int flags)
 	/*
 	 * display the items
 	 */
-	if (run <= 2)
+	もし (run <= 2)
 	{
 	    cols = (Columns + GAP) / (run == 1 ? INC3 : INC2);
-	    if (cols == 0)
+	    もし (cols == 0)
 		cols = 1;
 	    rows = (item_count + cols - 1) / cols;
 	}
-	else	// run == 3
+	否则	// run == 3
 	    rows = item_count;
-	for (row = 0; row < rows && !got_int; ++row)
+	ために (row = 0; row < rows && !got_int; ++row)
 	{
 	    msg_putchar('\n');			// go to next line
-	    if (got_int)			// 'q' typed in more
+	    もし (got_int)			// 'q' typed in more
 		break;
 	    col = 0;
-	    for (i = row; i < item_count; i += rows)
+	    ために (i = row; i < item_count; i += rows)
 	    {
 		msg_col = col;			// make columns
 		show_one_termcode(termcodes[items[i]].name,
 					      termcodes[items[i]].code, TRUE);
-		if (run == 2)
+		もし (run == 2)
 		    col += INC2;
-		else
+		否则
 		    col += INC3;
 	    }
 	    out_flush();
@@ -7576,20 +7576,20 @@ show_termcodes(int flags)
  * Show one termcode entry.
  * Output goes into IObuff[]
  */
-    int
-show_one_termcode(char_u *name, char_u *code, int printit)
+    整数
+show_one_termcode(char_u *name, char_u *code, 整数 printit)
 {
     char_u	*p;
-    int		len;
+    整数		len;
 
-    if (name[0] > '~')
+    もし (name[0] > '~')
     {
 	IObuff[0] = ' ';
 	IObuff[1] = ' ';
 	IObuff[2] = ' ';
 	IObuff[3] = ' ';
     }
-    else
+    否则
     {
 	IObuff[0] = 't';
 	IObuff[1] = '_';
@@ -7599,39 +7599,39 @@ show_one_termcode(char_u *name, char_u *code, int printit)
     IObuff[4] = ' ';
 
     p = get_special_key_name(TERMCAP2KEY(name[0], name[1]), 0);
-    if (p[1] != 't')
+    もし (p[1] != 't')
 	STRCPY(IObuff + 5, p);
-    else
+    否则
 	IObuff[5] = NUL;
-    len = (int)STRLEN(IObuff);
+    len = (整数)STRLEN(IObuff);
     do
 	IObuff[len++] = ' ';
-    while (len < 17);
+    ながら (len < 17);
     IObuff[len] = NUL;
-    if (code == NULL)
+    もし (code == NULL)
 	len += 4;
-    else
+    否则
 	len += vim_strsize(code);
 
-    if (printit)
+    もし (printit)
     {
 	msg_puts((char *)IObuff);
-	if (code == NULL)
+	もし (code == NULL)
 	    msg_puts("NULL");
-	else
+	否则
 	    msg_outtrans(code);
     }
-    return len;
+    戻る len;
 }
 
-#if defined(FEAT_TERMRESPONSE)
+#もし defined(FEAT_TERMRESPONSE)
 /*
  * For Xterm >= 140 compiled with OPT_TCAP_QUERY: Obtain the actually used
  * termcap codes from the terminal itself.
  * We get them one by one to avoid a very long response string.
  */
-static int xt_index_in = 0;
-static int xt_index_out = 0;
+static 整数 xt_index_in = 0;
+static 整数 xt_index_out = 0;
 
     static void
 req_codes_from_term(void)
@@ -7645,30 +7645,30 @@ req_codes_from_term(void)
 req_more_codes_from_term(void)
 {
     char	buf[32];  // extra size to shut up LGTM
-    int		old_idx = xt_index_out;
+    整数		old_idx = xt_index_out;
 
     // Don't do anything when going to exit.
-    if (exiting)
-	return;
+    もし (exiting)
+	戻る;
 
     // Send up to 10 more requests out than we received.  Avoid sending too
     // many, there can be a buffer overflow somewhere.
-    while (xt_index_out < xt_index_in + 10 && key_names[xt_index_out] != NULL)
+    ながら (xt_index_out < xt_index_in + 10 && key_names[xt_index_out] != NULL)
     {
 	char *key_name = key_names[xt_index_out];
 
 	MAY_WANT_TO_LOG_THIS;
 	LOG_TRN("Requesting XT %d: %s", xt_index_out, key_name);
-	if (key_name[2] != NUL)
+	もし (key_name[2] != NUL)
 	    sprintf(buf, "\033P+q%02x%02x%02x\033\\", key_name[0], key_name[1], key_name[2]);
-	else
+	否则
 	    sprintf(buf, "\033P+q%02x%02x\033\\", key_name[0], key_name[1]);
 	out_str_nf((char_u *)buf);
 	++xt_index_out;
     }
 
     // Send the codes out right away.
-    if (xt_index_out != old_idx)
+    もし (xt_index_out != old_idx)
 	out_flush();
 }
 
@@ -7681,31 +7681,31 @@ req_more_codes_from_term(void)
  * "code" points to the "0" or "1".
  */
     static void
-got_code_from_term(char_u *code, int len)
+got_code_from_term(char_u *code, 整数 len)
 {
 # define XT_LEN 100
     char_u	name[4];
     char_u	str[XT_LEN];
-    int		i;
-    int		j = 0;
-    int		c;
+    整数		i;
+    整数		j = 0;
+    整数		c;
 
     // A '1' means the code is supported, a '0' means it isn't.
     // If it is supported, there must be a '=' following
     // When half the length is > XT_LEN we can't use it.
-    if (code[0] == '1' && (code[7] == '=' || code[9] == '=') && len / 2 < XT_LEN)
+    もし (code[0] == '1' && (code[7] == '=' || code[9] == '=') && len / 2 < XT_LEN)
     {
 	// Get the name from the response and find it in the table.
 	name[0] = hexhex2nr(code + 3);
 	name[1] = hexhex2nr(code + 5);
-	if (code[9] == '=')
+	もし (code[9] == '=')
 	    name[2] = hexhex2nr(code + 7);
-	else
+	否则
 	    name[2] = NUL;
 	name[3] = NUL;
-	for (i = 0; key_names[i] != NULL; ++i)
+	ために (i = 0; key_names[i] != NULL; ++i)
 	{
-	    if (STRCMP(key_names[i], name) == 0)
+	    もし (STRCMP(key_names[i], name) == 0)
 	    {
 		xt_index_in = i;
 		break;
@@ -7714,35 +7714,35 @@ got_code_from_term(char_u *code, int len)
 
 	LOG_TRN("Received XT %d: %s", xt_index_in, (char *)name);
 
-	if (key_names[i] != NULL)
+	もし (key_names[i] != NULL)
 	{
 	    i = (code[7] == '=') ? 8 : 10;
-	    for (; (c = hexhex2nr(code + i)) >= 0; i += 2)
+	    ために (; (c = hexhex2nr(code + i)) >= 0; i += 2)
 		str[j++] = c;
 	    str[j] = NUL;
-	    if (name[0] == 'C' && name[1] == 'o')
+	    もし (name[0] == 'C' && name[1] == 'o')
 	    {
 		// Color count is not a key code.
-		int val = atoi((char *)str);
-# if defined(FEAT_EVAL)
-		if (val == t_colors)
+		整数 val = atoi((char *)str);
+# もし defined(FEAT_EVAL)
+		もし (val == t_colors)
 		    ch_log(NULL, "got_code_from_term(Co): no change (%d)", val);
-		else
+		否则
 		    ch_log(NULL,
 			       "got_code_from_term(Co): changed from %d to %d",
 								t_colors, val);
 # endif
 		may_adjust_color_count(val);
 	    }
-# if 0
+# もし 0
 #  ifdef FEAT_TERMGUICOLORS
 	    // when RGB result comes back, it is supported when the result contains an '='
-	    else if (name[0] == 'R' && name[1] == 'G' && name[2] == 'B' && code[9] == '=')
+	    否则 もし (name[0] == 'R' && name[1] == 'G' && name[2] == 'B' && code[9] == '=')
 	    {
-		int val = atoi((char *)str);
+		整数 val = atoi((char *)str);
 		// only enable it, if termguicolors hasn't been set yet and
 		// there are 8 bits per color channel
-		if (val == 8 && !p_tgc_set)
+		もし (val == 8 && !p_tgc_set)
 		{
 #   ifdef FEAT_EVAL
 		    ch_log(NULL, "got_code_from_term(RGB): xterm-direct colors detected");
@@ -7753,10 +7753,10 @@ got_code_from_term(char_u *code, int len)
 	    }
 #  endif
 # endif
-	    else
+	    否则
 	    {
 		i = find_term_bykeys(str, NULL);
-		if (i >= 0 && name[0] == termcodes[i].name[0]
+		もし (i >= 0 && name[0] == termcodes[i].name[0]
 					    && name[1] == termcodes[i].name[1])
 		{
 		    // Existing entry with the same name and code - skip.
@@ -7765,7 +7765,7 @@ got_code_from_term(char_u *code, int len)
 							     name[0], name[1]);
 # endif
 		}
-		else if (i >= 0 && name[0] == 'K' && VIM_ISDIGIT(name[1]))
+		否则 もし (i >= 0 && name[0] == 'K' && VIM_ISDIGIT(name[1]))
 		{
 		    // Would replace existing entry with keypad key - skip.
 # ifdef FEAT_EVAL
@@ -7773,9 +7773,9 @@ got_code_from_term(char_u *code, int len)
 			    name[0], name[1], termcodes[i].name[0], termcodes[i].name[1], str);
 # endif
 		}
-		else
+		否则
 		{
-		    if (i >= 0)
+		    もし (i >= 0)
 		    {
 			// Delete an existing entry using the same code.
 # ifdef FEAT_EVAL
@@ -7785,7 +7785,7 @@ got_code_from_term(char_u *code, int len)
 			del_termcode_idx(i);
 		    }
 # ifdef FEAT_EVAL
-		    else
+		    否则
 			ch_log(NULL, "got_code_from_term(): Adding entry %c%c with keys %s",
 							name[0], name[1], str);
 # endif
@@ -7809,30 +7809,30 @@ got_code_from_term(char_u *code, int len)
     static void
 check_for_codes_from_term(void)
 {
-    int		c;
+    整数		c;
 
     // If no codes requested or all are answered, no need to wait.
-    if (xt_index_out == 0 || xt_index_out == xt_index_in)
-	return;
+    もし (xt_index_out == 0 || xt_index_out == xt_index_in)
+	戻る;
 
     // Vgetc() will check for and handle any response.
     // Keep calling vpeekc() until we don't get any responses.
     ++no_mapping;
     ++allow_keys;
-    for (;;)
+    ために (;;)
     {
 	c = vpeekc();
-	if (c == NUL)	    // nothing available
+	もし (c == NUL)	    // nothing available
 	    break;
 
 	// If a response is recognized it's replaced with K_IGNORE, must read
 	// it from the input stream.  If there is no K_IGNORE we can't do
 	// anything, break here (there might be some responses further on, but
 	// we don't want to throw away any typed chars).
-	if (c != K_SPECIAL && c != K_IGNORE)
+	もし (c != K_SPECIAL && c != K_IGNORE)
 	    break;
 	c = vgetc();
-	if (c != K_IGNORE)
+	もし (c != K_IGNORE)
 	{
 	    vungetc(c);
 	    break;
@@ -7843,7 +7843,7 @@ check_for_codes_from_term(void)
 }
 #endif
 
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#もし defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
 static char ksme_str[20];
 static char ksmr_str[20];
 static char ksmd_str[20];
@@ -7852,22 +7852,22 @@ static char ksmd_str[20];
  * For Win32 console: update termcap codes for existing console attributes.
  */
     void
-update_tcap(int attr)
+update_tcap(整数 attr)
 {
     sprintf(ksme_str, "\033|%dm", attr);
     sprintf(ksmd_str, "\033|%dm", attr | 0x08);  // FOREGROUND_INTENSITY
     sprintf(ksmr_str, "\033|%dm", ((attr & 0x0F) << 4) | ((attr & 0xF0) >> 4));
 
     tcap_entry_T *p = find_builtin_term(DEFAULT_TERM);
-    if (p == NULL)  // did not find it
-	return;
-    while (p->bt_string != NULL)
+    もし (p == NULL)  // did not find it
+	戻る;
+    ながら (p->bt_string != NULL)
     {
-	if (p->bt_entry == (int)KS_ME)
+	もし (p->bt_entry == (整数)KS_ME)
 	    p->bt_string = &ksme_str[0];
-	else if (p->bt_entry == (int)KS_MR)
+	否则 もし (p->bt_entry == (整数)KS_MR)
 	    p->bt_string = &ksmr_str[0];
-	else if (p->bt_entry == (int)KS_MD)
+	否则 もし (p->bt_entry == (整数)KS_MD)
 	    p->bt_string = &ksmd_str[0];
 	++p;
     }
@@ -7886,7 +7886,7 @@ typedef enum
 
 struct ks_tbl_S
 {
-    int  code;				// value of KS_
+    整数  code;				// value of KS_
     char *vtp;				// code in RGB mode
     char *vtp2;				// code in 256color mode
     char buf[CMODE_LAST][KSSIZE];	// real buffer
@@ -7894,28 +7894,28 @@ struct ks_tbl_S
 
 static struct ks_tbl_S ks_tbl[] =
 {
-    {(int)KS_ME,  "\033|0m",  "\033|0m", {""}},   // normal
-    {(int)KS_MR,  "\033|7m",  "\033|7m", {""}},   // reverse
-    {(int)KS_MD,  "\033|1m",  "\033|1m", {""}},   // bold
-    {(int)KS_SO,  "\033|91m", "\033|91m", {""}},  // standout: bright red text
-    {(int)KS_SE,  "\033|39m", "\033|39m", {""}},  // standout end: default color
-    {(int)KS_CZH, "\033|3m",  "\033|3m", {""}},   // italic
-    {(int)KS_CZR, "\033|0m",  "\033|0m", {""}},   // italic end
-    {(int)KS_US,  "\033|4m",  "\033|4m", {""}},   // underscore
-    {(int)KS_UE,  "\033|24m", "\033|24m", {""}},  // underscore end
+    {(整数)KS_ME,  "\033|0m",  "\033|0m", {""}},   // normal
+    {(整数)KS_MR,  "\033|7m",  "\033|7m", {""}},   // reverse
+    {(整数)KS_MD,  "\033|1m",  "\033|1m", {""}},   // bold
+    {(整数)KS_SO,  "\033|91m", "\033|91m", {""}},  // standout: bright red text
+    {(整数)KS_SE,  "\033|39m", "\033|39m", {""}},  // standout end: default color
+    {(整数)KS_CZH, "\033|3m",  "\033|3m", {""}},   // italic
+    {(整数)KS_CZR, "\033|0m",  "\033|0m", {""}},   // italic end
+    {(整数)KS_US,  "\033|4m",  "\033|4m", {""}},   // underscore
+    {(整数)KS_UE,  "\033|24m", "\033|24m", {""}},  // underscore end
 #  ifdef TERMINFO
-    {(int)KS_CAB, "\033|%p1%db", "\033|%p14%dm", {""}}, // set background color
-    {(int)KS_CAF, "\033|%p1%df", "\033|%p13%dm", {""}}, // set foreground color
-    {(int)KS_CS,  "\033|%p1%d;%p2%dR", "\033|%p1%d;%p2%dR", {""}},
-    {(int)KS_CSV, "\033|%p1%d;%p2%dV", "\033|%p1%d;%p2%dV", {""}},
-#  else
-    {(int)KS_CAB, "\033|%db", "\033|4%dm", {""}}, // set background color
-    {(int)KS_CAF, "\033|%df", "\033|3%dm", {""}}, // set foreground color
-    {(int)KS_CS,  "\033|%d;%dR", "\033|%d;%dR", {""}},
-    {(int)KS_CSV, "\033|%d;%dV", "\033|%d;%dV", {""}},
+    {(整数)KS_CAB, "\033|%p1%db", "\033|%p14%dm", {""}}, // set background color
+    {(整数)KS_CAF, "\033|%p1%df", "\033|%p13%dm", {""}}, // set foreground color
+    {(整数)KS_CS,  "\033|%p1%d;%p2%dR", "\033|%p1%d;%p2%dR", {""}},
+    {(整数)KS_CSV, "\033|%p1%d;%p2%dV", "\033|%p1%d;%p2%dV", {""}},
+#  否则
+    {(整数)KS_CAB, "\033|%db", "\033|4%dm", {""}}, // set background color
+    {(整数)KS_CAF, "\033|%df", "\033|3%dm", {""}}, // set foreground color
+    {(整数)KS_CS,  "\033|%d;%dR", "\033|%d;%dR", {""}},
+    {(整数)KS_CSV, "\033|%d;%dV", "\033|%d;%dV", {""}},
 #  endif
-    {(int)KS_CCO, "256", "256", {""}},	    // colors
-    {(int)KS_NAME, NULL, NULL, {""}}			    // terminator
+    {(整数)KS_CCO, "256", "256", {""}},	    // colors
+    {(整数)KS_NAME, NULL, NULL, {""}}			    // terminator
 };
 
 /*
@@ -7925,18 +7925,18 @@ static struct ks_tbl_S ks_tbl[] =
     static tcap_entry_T *
 find_first_tcap(
     char_u *name,
-    int	    code)
+    整数	    code)
 {
     tcap_entry_T *p = find_builtin_term(name);
-    if (p == NULL)
-	return NULL;
-    while (p->bt_string != NULL)
+    もし (p == NULL)
+	戻る NULL;
+    ながら (p->bt_string != NULL)
     {
-	if (p->bt_entry == code)
-	    return p;
+	もし (p->bt_entry == code)
+	    戻る p;
 	++p;
     }
-    return NULL;
+    戻る NULL;
 }
 # endif
 
@@ -7947,17 +7947,17 @@ find_first_tcap(
 swap_tcap(void)
 {
 # ifdef FEAT_TERMGUICOLORS
-    static int		init_done = FALSE;
+    static 整数		init_done = FALSE;
     static cmode_T	curr_mode;
     struct ks_tbl_S	*ks;
     cmode_T		mode;
 
-    if (!init_done)
+    もし (!init_done)
     {
-	for (ks = ks_tbl; ks->code != (int)KS_NAME; ks++)
+	ために (ks = ks_tbl; ks->code != (整数)KS_NAME; ks++)
 	{
 	    tcap_entry_T *bt = find_first_tcap(DEFAULT_TERM, ks->code);
-	    if (bt != NULL)
+	    もし (bt != NULL)
 	    {
 		// Preserve the original value.
 		STRNCPY(ks->buf[CMODE_INDEXED], bt->bt_string, KSSIZE);
@@ -7971,20 +7971,20 @@ swap_tcap(void)
 	curr_mode = CMODE_INDEXED;
     }
 
-    if (p_tgc)
+    もし (p_tgc)
 	mode = CMODE_RGB;
-    else if (t_colors >= 256)
+    否则 もし (t_colors >= 256)
 	mode = CMODE_256COL;
-    else
+    否则
 	mode = CMODE_INDEXED;
 
-    if (mode == curr_mode)
-	return;
+    もし (mode == curr_mode)
+	戻る;
 
-    for (ks = ks_tbl; ks->code != (int)KS_NAME; ks++)
+    ために (ks = ks_tbl; ks->code != (整数)KS_NAME; ks++)
     {
 	tcap_entry_T *bt = find_first_tcap(DEFAULT_TERM, ks->code);
-	if (bt != NULL)
+	もし (bt != NULL)
 	    bt->bt_string = ks->buf[mode];
     }
 
@@ -7995,12 +7995,12 @@ swap_tcap(void)
 #endif
 
 
-#if (defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))) || defined(FEAT_TERMINAL)
-static const int cube_value[] = {
+#もし (defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))) || defined(FEAT_TERMINAL)
+static const 整数 cube_value[] = {
     0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF
 };
 
-static const int grey_ramp[] = {
+static const 整数 grey_ramp[] = {
     0x08, 0x12, 0x1C, 0x26, 0x30, 0x3A, 0x44, 0x4E, 0x58, 0x62, 0x6C, 0x76,
     0x80, 0x8A, 0x94, 0x9E, 0xA8, 0xB2, 0xBC, 0xC6, 0xD0, 0xDA, 0xE4, 0xEE
 };
@@ -8026,7 +8026,7 @@ static const char_u ansi_table[16][3] = {
   {255, 255, 255}, // white
 };
 
-# if defined(MSWIN)
+# もし defined(MSWIN)
 // Mapping between cterm indices < 16 and their counterpart in the ANSI palette.
 const char_u cterm_ansi_idx[] = {
     0, 4, 2, 6, 1, 5, 3, 7, 8, 12, 10, 14, 9, 13, 11, 15
@@ -8036,16 +8036,16 @@ const char_u cterm_ansi_idx[] = {
 # define ANSI_INDEX_NONE 0
 
     void
-ansi_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
+ansi_color2rgb(整数 nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 {
-    if (nr < 16)
+    もし (nr < 16)
     {
 	*r = ansi_table[nr][0];
 	*g = ansi_table[nr][1];
 	*b = ansi_table[nr][2];
 	*ansi_idx = nr + 1;
     }
-    else
+    否则
     {
 	*r = 0;
 	*g = 0;
@@ -8055,15 +8055,15 @@ ansi_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 }
 
     void
-cterm_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
+cterm_color2rgb(整数 nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 {
-    int idx;
+    整数 idx;
 
-    if (nr < 16)
+    もし (nr < 16)
     {
-# if defined(MSWIN)
+# もし defined(MSWIN)
 	idx = cterm_ansi_idx[nr];
-# else
+# 否则
 	idx = nr;
 # endif
 	*r = ansi_table[idx][0];
@@ -8071,7 +8071,7 @@ cterm_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 	*b = ansi_table[idx][2];
 	*ansi_idx = idx + 1;
     }
-    else if (nr < 232)
+    否则 もし (nr < 232)
     {
 	// 216 color cube
 	idx = nr - 16;
@@ -8080,7 +8080,7 @@ cterm_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 	*b = cube_value[idx      % 6];
 	*ansi_idx = ANSI_INDEX_NONE;
     }
-    else if (nr < 256)
+    否则 もし (nr < 256)
     {
 	// 24 grey scale ramp
 	idx = nr - 232;
@@ -8089,7 +8089,7 @@ cterm_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
 	*b = grey_ramp[idx];
 	*ansi_idx = ANSI_INDEX_NONE;
     }
-    else
+    否则
     {
 	*r = 0;
 	*g = 0;
@@ -8104,48 +8104,48 @@ cterm_color2rgb(int nr, char_u *r, char_u *g, char_u *b, char_u *ansi_idx)
  * Include any modifiers into the key and drop them.
  * Returns "len" adjusted for replaced codes.
  */
-    int
-term_replace_keycodes(char_u *ta_buf, int ta_len, int len_arg)
+    整数
+term_replace_keycodes(char_u *ta_buf, 整数 ta_len, 整数 len_arg)
 {
-    int		len = len_arg;
-    int		i;
-    int		c;
+    整数		len = len_arg;
+    整数		i;
+    整数		c;
 
-    for (i = ta_len; i < ta_len + len; ++i)
+    ために (i = ta_len; i < ta_len + len; ++i)
     {
-	if (ta_buf[i] == CSI && len - i > 3 && ta_buf[i + 1] == KS_MODIFIER)
+	もし (ta_buf[i] == CSI && len - i > 3 && ta_buf[i + 1] == KS_MODIFIER)
 	{
-	    int modifiers = ta_buf[i + 2];
-	    int key = ta_buf[i + 3];
+	    整数 modifiers = ta_buf[i + 2];
+	    整数 key = ta_buf[i + 3];
 
 	    // Try to use the modifier to modify the key.  In any case drop the
 	    // modifier.
 	    mch_memmove(ta_buf + i + 1, ta_buf + i + 4, (size_t)(len - i - 3));
 	    len -= 3;
-	    if (key < 0x80)
+	    もし (key < 0x80)
 		key = merge_modifyOtherKeys(key, &modifiers);
 	    ta_buf[i] = key;
 	}
-	else if (ta_buf[i] == CSI && len - i > 2)
+	否则 もし (ta_buf[i] == CSI && len - i > 2)
 	{
 	    c = TERMCAP2KEY(ta_buf[i + 1], ta_buf[i + 2]);
-	    if (c == K_DEL || c == K_KDEL || c == K_BS)
+	    もし (c == K_DEL || c == K_KDEL || c == K_BS)
 	    {
 		mch_memmove(ta_buf + i + 1, ta_buf + i + 3,
 							(size_t)(len - i - 2));
-		if (c == K_DEL || c == K_KDEL)
+		もし (c == K_DEL || c == K_KDEL)
 		    ta_buf[i] = DEL;
-		else
+		否则
 		    ta_buf[i] = Ctrl_H;
 		len -= 2;
 	    }
 	}
-	else if (ta_buf[i] == '\r')
+	否则 もし (ta_buf[i] == '\r')
 	    ta_buf[i] = '\n';
-	if (has_mbyte)
+	もし (has_mbyte)
 	    i += (*mb_ptr2len_len)(ta_buf + i, ta_len + len - i) - 1;
     }
-    return len;
+    戻る len;
 }
 
 /*
@@ -8177,15 +8177,15 @@ term_set_win_resize(bool state)
 # ifdef FEAT_GUI
     bool    in_gui = gui.in_use;
 
-    if (state && in_gui)
-	return;
+    もし (state && in_gui)
+	戻る;
 # endif
 
-    if (!state || win_resize_setting == 0 || win_resize_setting == 4)
+    もし (!state || win_resize_setting == 0 || win_resize_setting == 4)
     {
 	// Make sure it update internal window size if DEC mode 2048 is
 	// unavailable now.
-	if (win_resize_enabled)
+	もし (win_resize_enabled)
 	{
 	    set_shellsize(0, 0, false);
 	    set_sigwinch_handler();
@@ -8193,10 +8193,10 @@ term_set_win_resize(bool state)
 	}
 	win_resize_enabled = false;
     }
-    else if ((*p_trz == NUL || STRCMP(p_trz, "inband") == 0)
+    否则 もし ((*p_trz == NUL || STRCMP(p_trz, "inband") == 0)
 	    && !win_resize_enabled)
     {
-	if (win_resize_setting == 2)
+	もし (win_resize_setting == 2)
 	    out_str((char_u *)"\033[?2048h");
 # ifdef SIGWINCH
 	mch_signal(SIGWINCH, SIG_DFL);
@@ -8206,14 +8206,14 @@ term_set_win_resize(bool state)
 }
 #endif
 
-    int
+    整数
 sync_output_active(void)
 {
 #ifdef FEAT_GUI
-    if (gui.in_use)
-	return TRUE;
+    もし (gui.in_use)
+	戻る TRUE;
 #endif
-    return p_tsy && (sync_output_setting == 1 || sync_output_setting == 2)
+    戻る p_tsy && (sync_output_setting == 1 || sync_output_setting == 2)
 	&& *T_BSU != NUL && *T_ESU != NUL;
 }
 
@@ -8231,57 +8231,57 @@ sync_output_active(void)
  * out_buf reduces small writes without changing the observable protocol.
  */
     void
-term_set_sync_output(int flags)
+term_set_sync_output(整数 flags)
 {
     bool    allowed;
 #ifdef FEAT_GUI
     bool    in_gui = gui.in_use;
-#else
+#否则
     bool    in_gui = false;
 #endif
 
     allowed = p_tsy && (sync_output_setting == 1 || sync_output_setting == 2);
 
-    if (flags & TERM_SYNC_OUTPUT_FLUSH)
+    もし (flags & TERM_SYNC_OUTPUT_FLUSH)
     {
 	// Tell terminal to display screen contents, then resume batching.
-	if (allowed && !in_gui && sync_output_state > 0 && *T_ESU != NUL &&
+	もし (allowed && !in_gui && sync_output_state > 0 && *T_ESU != NUL &&
 		*T_BSU != NUL)
 	{
 	    out_str_nf(T_ESU);
 	    out_str_nf(T_BSU);
 	    out_flush();
 	}
-	return;
+	戻る;
     }
 
     // Forcibly turn off synchronized output (e.g. 'notermsync')
-    if (flags & TERM_SYNC_OUTPUT_OFF)
+    もし (flags & TERM_SYNC_OUTPUT_OFF)
     {
-	if (sync_output_state > 0 && *T_ESU != NUL)
+	もし (sync_output_state > 0 && *T_ESU != NUL)
 	{
 	    out_str_nf(T_ESU);
 	    out_flush();
 	    sync_output_state = 0;
 	}
-	return;
+	戻る;
     }
 
-    if (!allowed || in_gui || *T_BSU == NUL || *T_ESU == NUL)
-	return;
+    もし (!allowed || in_gui || *T_BSU == NUL || *T_ESU == NUL)
+	戻る;
 
     // Only enable if we aren't already, and only disable if we have reached
     // zero.
-    if (flags & TERM_SYNC_OUTPUT_ENABLE)
+    もし (flags & TERM_SYNC_OUTPUT_ENABLE)
     {
-	if (sync_output_state++ > 0)
-	    return;
+	もし (sync_output_state++ > 0)
+	    戻る;
 	out_str_nf(T_BSU);
     }
-    else if (flags & TERM_SYNC_OUTPUT_DISABLE)
+    否则 もし (flags & TERM_SYNC_OUTPUT_DISABLE)
     {
-	if (sync_output_state == 0 || --sync_output_state > 0)
-	    return;
+	もし (sync_output_state == 0 || --sync_output_state > 0)
+	    戻る;
 	// Flush the output buffer before ending the sync batch so that
 	// all drawing output is sent to the terminal within the
 	// BSU..ESU window.  Without this, the drawing data remaining in
@@ -8289,9 +8289,9 @@ term_set_sync_output(int flags)
 	out_str_nf(T_ESU);
 	out_flush();
     }
-    else
+    否则
     {
 	siemsg("Unknown sync output value %d", flags);
-	return;
+	戻る;
     }
 }

@@ -16,7 +16,7 @@
 #define HAVE_AVAIL_MEM
 
 #ifndef HAVE_CONFIG_H
-# if defined(AZTEC_C) || defined(__amigaos4__)
+# もし defined(AZTEC_C) || defined(__amigaos4__)
 #  define HAVE_STAT_H
 # endif
 # define HAVE_LOCALE_H
@@ -29,7 +29,7 @@
 # define HAVE_SETENV
 # define HAVE_MEMSET
 # define HAVE_QSORT
-# if defined(__DATE__) && defined(__TIME__)
+# もし defined(__DATE__) && defined(__TIME__)
 #  define HAVE_DATE_TIME
 # endif
 
@@ -92,7 +92,7 @@ typedef long off_t;
 // Classic AmigaOS 3.x with GCC/libnix does not provide fchown, fchmod, or
 // ftruncate.  Stub them as no-ops.  (OS4 has these via clib2; MorphOS and
 // AROS provide them in their respective C libraries.)
-#if defined(__GNUC__) && defined(AMIGA) && !defined(__amigaos4__) \
+#もし defined(__GNUC__) && defined(AMIGA) && !defined(__amigaos4__) \
 	&& !defined(__AROS__) && !defined(__MORPHOS__)
 # define fchown(fd, uid, gid) (0)
 # define fchmod(fd, mode) (0)
@@ -210,8 +210,8 @@ typedef long off_t;
 # define DFLT_MAXMEMTOT	0		// decide in set_init
 #endif
 
-#if defined(SASC)
-int setenv(const char *, const char *);
+#もし defined(SASC)
+整数 setenv(const char *, const char *);
 #endif
 
 #define mch_remove(x) remove((char *)(x))

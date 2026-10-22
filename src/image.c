@@ -16,7 +16,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_IMAGE)
+#もし defined(FEAT_IMAGE)
 
 struct
 {
@@ -25,14 +25,14 @@ struct
     struct
     {
 	// Return OK on success and FAIL on failure
-	int (*init)(image_T *);
+	整数 (*init)(image_T *);
 	void (*uninit)(image_T *);
     } image;
 
     struct
     {
 	// Return OK on success and FAIL on failure
-	int (*init)(image_placement_T *);
+	整数 (*init)(image_placement_T *);
 	void (*uninit)(image_placement_T *);
 
 	void (*draw)(image_placement_T *);
@@ -58,12 +58,12 @@ struct
 # ifdef FEAT_GUI_GTK
 #  ifdef USE_GTK4
 	    .blit = false,
-#  else
+#  否则
 	    .blit = true,
 #  endif
 # elif FEAT_GUI_MSWIN
 	    .blit = true,
-# else
+# 否则
 	    .blit = false,
 # endif
 	}
@@ -109,18 +109,18 @@ static image_backend_T image_backend = IMAGE_BACKEND_NONE;
 static image_T *images = NULL;
 // Sorted from highest zindex to lowest zindex
 static image_placement_T    *placements = NULL;
-static int		    n_placements = 0;
+static 整数		    n_placements = 0;
 
-static int shift_top = 0;
-static int shift_bot = 0;
-static int shift = 0;
+static 整数 shift_top = 0;
+static 整数 shift_bot = 0;
+static 整数 shift = 0;
 
 // If > 0, then mark_dirty_region_for_images() will be a no-op
-static int freeze_mark_dirty = 0;
+static 整数 freeze_mark_dirty = 0;
 
-#define FOR_ALL_IMAGES(v) for ((v) = images; (v) != NULL; (v) = (v)->next)
+#define FOR_ALL_IMAGES(v) ために ((v) = images; (v) != NULL; (v) = (v)->next)
 #define FOR_ALL_PLACEMENTS(v) \
-    for ((v) = placements; (v) != NULL; (v) = (v)->next)
+    ために ((v) = placements; (v) != NULL; (v) = (v)->next)
 
 #define IMAGE_FUNC(b, n) (image_backends[b].image.n)
 #define PLACEMENT_FUNC(b, n) (image_backends[b].placement.n)
@@ -147,13 +147,13 @@ uninit_image_state(void)
     static bool
 backend_available(bool msg)
 {
-    if (image_backend == IMAGE_BACKEND_NONE)
+    もし (image_backend == IMAGE_BACKEND_NONE)
     {
-	if (msg)
+	もし (msg)
 	    emsg(_(e_no_image_backend_available));
-	return false;
+	戻る false;
     }
-    return true;
+    戻る true;
 }
 
 /*
@@ -161,23 +161,23 @@ backend_available(bool msg)
  * failure.
  */
     image_T *
-image_new(uint8_t *data, int width, int height, image_format_T fmt)
+image_new(uint8_t *data, 整数 width, 整数 height, image_format_T fmt)
 {
     image_T	    *img;
     static int_u    id;
 
-    if (!backend_available(true))
-	return NULL;
+    もし (!backend_available(true))
+	戻る NULL;
 
     img = ALLOC_CLEAR_ONE(image_T);
-    if (img == NULL)
-	return NULL;
+    もし (img == NULL)
+	戻る NULL;
 
     img->data = vim_memsave(data, (size_t)width * height * fmt);
-    if (img->data == NULL)
+    もし (img->data == NULL)
     {
 	vim_free(img);
-	return NULL;
+	戻る NULL;
     }
 
     img->state = IMAGE_STATE_PRIVATE;
@@ -191,32 +191,32 @@ image_new(uint8_t *data, int width, int height, image_format_T fmt)
 
     img->backend = image_backend;
 
-    if (IMAGE_FUNC(image_backend, init)(img) == FAIL)
+    もし (IMAGE_FUNC(image_backend, init)(img) == FAIL)
     {
 	vim_free(img->data);
 	vim_free(img);
-	return NULL;
+	戻る NULL;
     }
 
-    if (images != NULL)
+    もし (images != NULL)
 	images->prev = img;
     img->next = images;
     images = img;
 
-    return img;
+    戻る img;
 }
 
     static void
 image_free(image_T *img)
 {
-    if (backend_available(false))
+    もし (backend_available(false))
 	IMAGE_FUNC(image_backend, uninit)(img);
 
-    if (img->prev != NULL)
+    もし (img->prev != NULL)
 	img->prev->next = img->next;
-    if (img->next != NULL)
+    もし (img->next != NULL)
 	img->next->prev = img->prev;
-    if (images == img)
+    もし (images == img)
 	images = img->next;
 
     vim_free(img->data);
@@ -230,7 +230,7 @@ image_free(image_T *img)
     void
 image_unref(image_T *img)
 {
-    if (--img->refcount <= 0)
+    もし (--img->refcount <= 0)
 	image_free(img);
 }
 
@@ -242,7 +242,7 @@ image_unref(image_T *img)
 image_ref(image_T *img)
 {
     img->refcount++;
-    return img;
+    戻る img;
 }
 
 /*
@@ -250,10 +250,10 @@ image_ref(image_T *img)
  * covered.
  */
     void
-image_get_cell_dimensions(image_T *img, int *cw, int *ch)
+image_get_cell_dimensions(image_T *img, 整数 *cw, 整数 *ch)
 {
-    int w = PHY2LOG(img->width);
-    int h = PHY2LOG(img->height);
+    整数 w = PHY2LOG(img->width);
+    整数 h = PHY2LOG(img->height);
 
     *cw = (w + cell_width - 1) / cell_width;
     *ch = (h + cell_height - 1) / cell_height;
@@ -264,17 +264,17 @@ image_get_cell_dimensions(image_T *img, int *cw, int *ch)
  * pixels. Pixels that are partially covered are not counted.
  */
     static void
-image_get_cell_dimensions_min(image_T *img, int *cw, int *ch)
+image_get_cell_dimensions_min(image_T *img, 整数 *cw, 整数 *ch)
 {
-    int w = PHY2LOG(img->width);
-    int h = PHY2LOG(img->height);
+    整数 w = PHY2LOG(img->width);
+    整数 h = PHY2LOG(img->height);
 
     *cw = w / cell_width;
     *ch = h / cell_height;
 }
 
     void
-image_get_dimensions(image_T *img, int *w, int *h)
+image_get_dimensions(image_T *img, 整数 *w, 整数 *h)
 {
     *w = img->width;
     *h = img->height;
@@ -284,39 +284,39 @@ image_get_dimensions(image_T *img, int *w, int *h)
  * Replace the current image contents with "data". "data" should be the exact
  * same format, width, and height. Return OK on success and FAIL on failure.
  */
-    int
+    整数
 image_update(image_T *img, uint8_t *data)
 {
-    int w, h;
+    整数 w, h;
 
-    if (!backend_available(true) || img->data == NULL)
-	return FAIL;
+    もし (!backend_available(true) || img->data == NULL)
+	戻る FAIL;
 
     image_get_dimensions(img, &w, &h);
     mch_memmove(img->data, data, (size_t)w * h * img->fmt);
 
     IMAGE_FUNC(image_backend, uninit)(img);
 
-    if (IMAGE_FUNC(image_backend, init)(img) == FAIL)
+    もし (IMAGE_FUNC(image_backend, init)(img) == FAIL)
     {
 	emsg(_(e_out_of_memory));
 	VIM_CLEAR(img->data);
-	return FAIL;
+	戻る FAIL;
     }
 
     img->ver++;
     redraw_all_later(UPD_VALID);
-    return OK;
+    戻る OK;
 }
 
     static void
 image_placement_unlink(image_placement_T *place)
 {
-    if (place->prev != NULL)
+    もし (place->prev != NULL)
 	place->prev->next = place->next;
-    if (place->next != NULL)
+    もし (place->next != NULL)
 	place->next->prev = place->prev;
-    if (placements == place)
+    もし (placements == place)
 	placements = place->next;
     n_placements--;
 }
@@ -328,15 +328,15 @@ image_placement_link(image_placement_T *place)
     image_placement_T *prev = NULL;
 
     // Add placement *before* the placement with the lower zindex.
-    while (p != NULL)
+    ながら (p != NULL)
     {
-	if (place->zindex > p->zindex)
+	もし (place->zindex > p->zindex)
 	    break;
-	else if (place->zindex == p->zindex)
+	否则 もし (place->zindex == p->zindex)
 	{
-	    if (place->use > p->use)
+	    もし (place->use > p->use)
 		break;
-	    if (place->gen < p->gen)
+	    もし (place->gen < p->gen)
 		break;
 	}
 
@@ -347,12 +347,12 @@ image_placement_link(image_placement_T *place)
     place->next = p;
     place->prev = prev;
 
-    if (p != NULL)
+    もし (p != NULL)
 	p->prev = place;
 
-    if (prev != NULL)
+    もし (prev != NULL)
 	prev->next = place;
-    else
+    否则
 	placements = place;
 
     n_placements++;
@@ -383,12 +383,12 @@ image_placement_new(
     image_placement_T	*place;
     static int_u	id = 1; // Kitty placements id must be > 1
 
-    if (!backend_available(!quiet))
-	return NULL;
+    もし (!backend_available(!quiet))
+	戻る NULL;
 
     place = ALLOC_CLEAR_ONE(image_placement_T);
-    if (place == NULL)
-	return NULL;
+    もし (place == NULL)
+	戻る NULL;
 
     place->id = id;
     id += PLACEMENT_ID_INC; // Allocate 1000 free placement ids to be used to
@@ -400,7 +400,7 @@ image_placement_new(
     place->img = img;
     place->flags = IMAGEPF_DIRTY;
 
-    if (img != NULL)
+    もし (img != NULL)
     {
 	place->img_ver = img->ver;
 	place->backend = image_backend;
@@ -413,32 +413,32 @@ image_placement_new(
 	place->crop_box.x2 = place->bounding_box.x2;
 	place->crop_box.y2 = place->bounding_box.y2;
 
-	if (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
+	もし (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
 	{
 	    id -= PLACEMENT_ID_INC;
 	    vim_free(place);
-	    return NULL;
+	    戻る NULL;
 	}
     }
-    else
+    否则
 	place->backend = IMAGE_BACKEND_NONE;
 
     image_placement_link(place);
 
-    return place;
+    戻る place;
 }
 
     static void
 image_placement_clear_int(image_placement_T *place, bool now)
 {
-    if (backend_available(false) && place->img != NULL)
+    もし (backend_available(false) && place->img != NULL)
     {
-	if (place->flags & IMAGEPF_VISIBLE_INIT
+	もし (place->flags & IMAGEPF_VISIBLE_INIT
 		&& PLACEMENT_FUNC(image_backend, blit))
 	    redraw_region(&place->visible_abs, now, true);
 	PLACEMENT_FUNC(image_backend, clear)(place);
 	place->flags |= IMAGEPF_HIDDEN;
-	if (!now && !updating_screen)
+	もし (!now && !updating_screen)
 	    redraw_all_later(UPD_VALID);
     }
 }
@@ -452,34 +452,34 @@ image_placement_clear(image_placement_T *place)
     void
 image_placement_free(image_placement_T *place)
 {
-    if (backend_available(false) && place->backend_data != NULL)
+    もし (backend_available(false) && place->backend_data != NULL)
     {
 	image_placement_clear(place);
 	PLACEMENT_FUNC(image_backend, uninit)(place);
     }
 
-    if (place->flags & IMAGEPF_VISIBLE_INIT)
+    もし (place->flags & IMAGEPF_VISIBLE_INIT)
     {
 	pixman_region32_fini(&place->visible);
 	pixman_region32_fini(&place->visible_abs);
     }
     image_placement_unlink(place);
 
-    if (place->img != NULL)
+    もし (place->img != NULL)
 	image_unref(place->img);
     vim_free(place);
 }
 
     void
-image_placement_set_zindex(image_placement_T *place, int zindex)
+image_placement_set_zindex(image_placement_T *place, 整数 zindex)
 {
     // If image was hidden before, must dirty it so it is fully redrawn again.
-    if (place->flags & IMAGEPF_HIDDEN)
+    もし (place->flags & IMAGEPF_HIDDEN)
 	place->flags |= IMAGEPF_DIRTY;
     place->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->zindex == zindex)
-	return;
+    もし (place->zindex == zindex)
+	戻る;
     place->zindex = zindex;
     place->flags |= IMAGEPF_DIRTY;
 
@@ -492,29 +492,29 @@ image_placement_set_zindex(image_placement_T *place, int zindex)
  * Make sure to also update the bounding box!
  */
     void
-image_placement_set_position(image_placement_T *place, int row, int col)
+image_placement_set_position(image_placement_T *place, 整数 row, 整数 col)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
+    もし (place->flags & IMAGEPF_HIDDEN)
 	place->flags |= IMAGEPF_DIRTY;
     place->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->row == row && place->col == col)
-	return;
+    もし (place->row == row && place->col == col)
+	戻る;
     place->row = row;
     place->col = col;
     place->flags |= IMAGEPF_DIRTY;
 }
 
     void
-image_placement_set_crop(image_placement_T *place, int x, int y, int w, int h)
+image_placement_set_crop(image_placement_T *place, 整数 x, 整数 y, 整数 w, 整数 h)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
+    もし (place->flags & IMAGEPF_HIDDEN)
 	place->flags |= IMAGEPF_DIRTY;
     place->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->crop_box.x1 == x && place->crop_box.y1 == y
+    もし (place->crop_box.x1 == x && place->crop_box.y1 == y
 	    && place->crop_box.x2 == x + w && place->crop_box.y2 == y + h)
-	return;
+	戻る;
 
     place->crop_box.x1 = x;
     place->crop_box.y1 = y;
@@ -527,19 +527,19 @@ image_placement_set_crop(image_placement_T *place, int x, int y, int w, int h)
     void
 image_placement_set_bounding_box(
 	image_placement_T   *place,
-	int		    row,
-	int		    col,
-	int		    row_height,
-	int		    col_width)
+	整数		    row,
+	整数		    col,
+	整数		    row_height,
+	整数		    col_width)
 {
-    if (place->flags & IMAGEPF_HIDDEN)
+    もし (place->flags & IMAGEPF_HIDDEN)
 	place->flags |= IMAGEPF_DIRTY;
     place->flags &= ~IMAGEPF_HIDDEN;
 
-    if (place->bounding_box.x1 == col && place->bounding_box.y1 == row
+    もし (place->bounding_box.x1 == col && place->bounding_box.y1 == row
 	    && place->bounding_box.x2 == col + col_width
 	    && place->bounding_box.y2 == row + row_height)
-	return;
+	戻る;
 
     place->bounding_box.x1 = col;
     place->bounding_box.y1 = row;
@@ -558,15 +558,15 @@ image_placement_set_enable(image_placement_T *place, bool enable)
 {
     bool old = place->flags & IMAGEPF_ENABLED;
 
-    if (enable && !old)
+    もし (enable && !old)
 	place->flags |= IMAGEPF_ENABLED;
-    else if (!enable && old)
+    否则 もし (!enable && old)
     {
 	place->flags &= ~IMAGEPF_ENABLED;
 	image_placement_clear(place);
     }
-    else
-	return;
+    否则
+	戻る;
 
     place->flags |= IMAGEPF_DIRTY;
 }
@@ -579,15 +579,15 @@ image_placement_set_enable(image_placement_T *place, bool enable)
 image_placement_subrect(
 	image_placement_T   *place,
 	pixman_box32_t	    rect,
-	int		    *row,
-	int		    *col,
-	int		    *x,
-	int		    *y,
-	int		    *w,
-	int		    *h,
+	整数		    *row,
+	整数		    *col,
+	整数		    *x,
+	整数		    *y,
+	整数		    *w,
+	整数		    *h,
 	bool		    physical)
 {
-    int iw, ih;
+    整数 iw, ih;
 
     image_get_dimensions(place->img, &iw, &ih);
 
@@ -599,14 +599,14 @@ image_placement_subrect(
     *w = (rect.x2 - rect.x1) * cell_width;
     *h = (rect.y2 - rect.y1) * cell_height;
 
-    if (physical)
+    もし (physical)
     {
 	*x = LOG2PHY(*x);
 	*y = LOG2PHY(*y);
 	*w = LOG2PHY(*w);
 	*h = LOG2PHY(*h);
     }
-    else
+    否则
     {
 	iw = PHY2LOG(iw);
 	ih = PHY2LOG(ih);
@@ -634,41 +634,41 @@ image_placement_subrect(
 redraw_region(pixman_region32_t *region, bool now, bool restore)
 {
     pixman_box32_t  *rects;
-    int		    n_rects;
-    int		    cur_row = screen_cur_row;
-    int		    cur_col = screen_cur_col;
+    整数		    n_rects;
+    整数		    cur_row = screen_cur_row;
+    整数		    cur_col = screen_cur_col;
 
     rects = pixman_region32_rectangles(region, &n_rects);
-    if (rects == NULL)
-	return;
+    もし (rects == NULL)
+	戻る;
 
-    for (int i = 0; i < n_rects; i++)
+    ために (整数 i = 0; i < n_rects; i++)
     {
 	pixman_box32_t rect = rects[i];
 
-	if (now)
+	もし (now)
 	{
 	    // The region may be from before a resize, when the screen was
 	    // bigger.
-	    int height = MIN(rect.y2, screen_Rows) - rect.y1;
-	    int width = MIN(rect.x2, screen_Columns) - rect.x1;
+	    整数 height = MIN(rect.y2, screen_Rows) - rect.y1;
+	    整数 width = MIN(rect.x2, screen_Columns) - rect.x1;
 
 	    // Tip: if you want to debug stale pixels appearing, set "inverse"
 	    // of screen_draw_rectangle() to TRUE.
-	    if (height > 0 && width > 0)
+	    もし (height > 0 && width > 0)
 		screen_draw_rectangle(rect.y1, rect.x1, height, width,
 			FALSE, TRUE);
 	    continue;
 	}
 
-	for (int r = rect.y1; r < rect.y2; r++)
+	ために (整数 r = rect.y1; r < rect.y2; r++)
 	{
-	    if (r >= screen_Rows)
+	    もし (r >= screen_Rows)
 		break;
 
-	    for (int c = rect.x1; c < rect.x2; c++)
+	    ために (整数 c = rect.x1; c < rect.x2; c++)
 	    {
-		if (c >= screen_Columns)
+		もし (c >= screen_Columns)
 		    break;
 
 		ScreenAttrs[LineOffset[r] + c] = (sattr_T)-1;
@@ -676,7 +676,7 @@ redraw_region(pixman_region32_t *region, bool now, bool restore)
 	}
     }
 
-    if (restore)
+    もし (restore)
 	windgoto(cur_row, cur_col);
 }
 
@@ -691,31 +691,31 @@ draw_image_placements(void)
     pixman_region32_t	subtract_region;    // In cells
     pixman_region32_t	dirty_region;	    // In cells
     image_placement_T	**pending_placements;
-    int			pending_len = -1;
+    整数			pending_len = -1;
     // Save current cursor position
-    int			cur_row = screen_cur_row;
-    int			cur_col = screen_cur_col;
+    整数			cur_row = screen_cur_row;
+    整数			cur_col = screen_cur_col;
 
     // Check if all placements have no backing image. If so, then do nothing
     FOR_ALL_PLACEMENTS(place)
-	if (place->img != NULL)
+	もし (place->img != NULL)
 	{
 	    pending_len = 0;
 	    break;
 	}
 
-    if (pending_len == -1)
-	return;
+    もし (pending_len == -1)
+	戻る;
 
-    if (!backend_available(false))
-	return;
+    もし (!backend_available(false))
+	戻る;
 
-    if (n_placements == 0)
-	return;
+    もし (n_placements == 0)
+	戻る;
 
     pending_placements = ALLOC_CLEAR_MULT(image_placement_T *, n_placements);
-    if (pending_placements == NULL)
-	return;
+    もし (pending_placements == NULL)
+	戻る;
 
     pixman_region32_init(&subtract_region);
     pixman_region32_init(&dirty_region);
@@ -739,31 +739,31 @@ draw_image_placements(void)
 	pixman_region32_t   image_region;
 	pixman_region32_t   visible_region;
 
-	int x, y;
+	整数 x, y;
 
-	if (place->flags & IMAGEPF_HIDDEN || !(place->flags & IMAGEPF_ENABLED))
+	もし (place->flags & IMAGEPF_HIDDEN || !(place->flags & IMAGEPF_ENABLED))
 	    // Don't need to clear image placement for non-blit backends,
 	    // because we call image_placement_clear() every time we don't want
 	    // to see the image. Not sure of the side effects if we also clear
 	    // it here...
 	    continue;
 
-	if (img != NULL)
+	もし (img != NULL)
 	{
 	    pixman_region32_t	visible_abs;
-	    int			crop_w, crop_h;
+	    整数			crop_w, crop_h;
 	    bool		cs_changed;
 	    bool		need_redraw;
 
 	    // Processing changed image data failed, skip this image
-	    if (place->img->data == NULL)
+	    もし (place->img->data == NULL)
 	    {
 		image_placement_clear(place);
 		continue;
 	    }
 
 	    // Only apply row shift if image is within the shifted region.
-	    if ((place->bounding_box.y1 >= shift_top
+	    もし ((place->bounding_box.y1 >= shift_top
 			&& place->bounding_box.y2 <= shift_bot)
 		    && place->row_off != shift)
 	    {
@@ -786,7 +786,7 @@ draw_image_placements(void)
 
 	    // Only use parts of the image region within the actual screen.
 	    // "row_off" may offset the image slightly/completely off screen.
-	    if (!pixman_region32_intersect_rect(&image_region, &image_region,
+	    もし (!pixman_region32_intersect_rect(&image_region, &image_region,
 			0, 0, Columns, Rows)
 		    || !pixman_region32_subtract(&visible_region,
 			&image_region, &subtract_region)
@@ -809,7 +809,7 @@ draw_image_placements(void)
 	    // If cell size changed, then the visible regions are invalid pixel
 	    // wise. This prevents backends such as sixel from using cached
 	    // sequences.
-	    if (cs_changed)
+	    もし (cs_changed)
 	    {
 		place->cell_width = cell_width;
 		place->cell_height = cell_height;
@@ -823,7 +823,7 @@ draw_image_placements(void)
 			&& !pixman_region32_equal(&visible_region,
 			    &place->visible));
 
-	    if (place->img_ver != img->ver)
+	    もし (place->img_ver != img->ver)
 	    {
 		// Image data changed
 		need_redraw = true;
@@ -831,7 +831,7 @@ draw_image_placements(void)
 
 		image_placement_clear(place);
 		PLACEMENT_FUNC(image_backend, uninit)(place);
-		if (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
+		もし (PLACEMENT_FUNC(image_backend, init)(place) == FAIL)
 		{
 		    emsg(_(e_out_of_memory));
 		    image_unref(place->img);
@@ -840,13 +840,13 @@ draw_image_placements(void)
 		}
 	    }
 
-	    if (need_redraw)
+	    もし (need_redraw)
 	    {
-		if (place->flags & IMAGEPF_VISIBLE_INIT)
+		もし (place->flags & IMAGEPF_VISIBLE_INIT)
 		    pixman_region32_fini(&place->visible);
 		place->visible = visible_region;
 
-		if (PLACEMENT_FUNC(image_backend, blit))
+		もし (PLACEMENT_FUNC(image_backend, blit))
 		{
 		    // Must redraw the stale regions that will not be composited
 		    // over (for this specific image).
@@ -854,7 +854,7 @@ draw_image_placements(void)
 
 		    pixman_region32_init(&stale_region);
 
-		    if (place->flags & IMAGEPF_VISIBLE_INIT)
+		    もし (place->flags & IMAGEPF_VISIBLE_INIT)
 		    {
 			(void)pixman_region32_subtract(&stale_region,
 				&place->visible_abs, &visible_abs);
@@ -862,7 +862,7 @@ draw_image_placements(void)
 			// Since pixels may be translucent/transparent, we must
 			// redraw the cells behind the image every time, so that
 			// no stale pixels remain from the previous redraw.
-			if (img->fmt == IMAGE_FORMAT_RGBA)
+			もし (img->fmt == IMAGE_FORMAT_RGBA)
 			    (void)pixman_region32_union(&stale_region,
 				    &stale_region, &place->visible_abs);
 		    }
@@ -881,10 +881,10 @@ draw_image_placements(void)
 		    //
 		    // Not needed for RGBA images, because we redraw the visible
 		    // region every time anyways.
-		    if (img->fmt != IMAGE_FORMAT_RGBA)
+		    もし (img->fmt != IMAGE_FORMAT_RGBA)
 		    {
-			int		    min_w, min_h;
-			int		    rect_w, rect_h;
+			整数		    min_w, min_h;
+			整数		    rect_w, rect_h;
 			pixman_region32_t   min_region;
 
 			image_get_cell_dimensions_min(img, &min_w, &min_h);
@@ -894,13 +894,13 @@ draw_image_placements(void)
 			rect_w = min_w - place->crop_box.x1;
 			rect_h = min_h - place->crop_box.y1;
 
-			if (rect_w > 0 && rect_h > 0)
+			もし (rect_w > 0 && rect_h > 0)
 			    // pixman_region32_init_rect() expects a non zero
 			    // width and height (otherwise it outputs error
 			    // message).
 			    pixman_region32_init_rect(&min_region,
 				    x, y, rect_w, rect_h);
-			else
+			否则
 			    pixman_region32_init(&min_region);
 
 			(void)pixman_region32_subtract(&min_region,
@@ -910,7 +910,7 @@ draw_image_placements(void)
 			pixman_region32_fini(&min_region);
 		    }
 
-		    if (place->flags & IMAGEPF_VISIBLE_INIT)
+		    もし (place->flags & IMAGEPF_VISIBLE_INIT)
 			// Also subtract "subtract_region", so we don't
 			// redundantly redraw cells that will have images
 			// painted over them after. Make sure to do this before
@@ -925,7 +925,7 @@ draw_image_placements(void)
 			    &dirty_region, &stale_region);
 		    pixman_region32_fini(&stale_region);
 		}
-		if (place->flags & IMAGEPF_VISIBLE_INIT)
+		もし (place->flags & IMAGEPF_VISIBLE_INIT)
 		    pixman_region32_fini(&place->visible_abs);
 		place->visible_abs = visible_abs;
 
@@ -933,7 +933,7 @@ draw_image_placements(void)
 		place->flags |= IMAGEPF_VISIBLE_INIT;
 		place->flags &= ~IMAGEPF_DIRTY;
 	    }
-	    else
+	    否则
 	    {
 		pixman_region32_fini(&visible_region);
 		pixman_region32_fini(&visible_abs);
@@ -941,7 +941,7 @@ draw_image_placements(void)
 	}
 
 	// If this is last image, no need to union its bounds.
-	if (place->next == NULL)
+	もし (place->next == NULL)
 	    break;
 
 	pixman_region32_union_rect(&subtract_region, &subtract_region,
@@ -956,18 +956,18 @@ draw_image_placements(void)
     redraw_region(&dirty_region, true, false);
     freeze_mark_dirty--;
 
-    if (pending_len > 0)
+    もし (pending_len > 0)
     {
 #ifdef FEAT_GUI
 	// Make sure to flush any output! We write directly to the draw
 	// area/whatever, meaning draw commands outputted before this (as escape
 	// sequences), will still draw over the image surface if we don't flush
 	// now.
-	if (gui.in_use)
+	もし (gui.in_use)
 	    out_flush();
 #endif
 
-	for (int i = 0; i < pending_len; i++)
+	ために (整数 i = 0; i < pending_len; i++)
 	{
 	    PLACEMENT_FUNC(image_backend, draw)(pending_placements[i]);
 	    pending_placements[i]->flags &= ~IMAGEPF_FORCE;
@@ -990,14 +990,14 @@ draw_image_placements(void)
  * blit pixels.
  */
     void
-mark_dirty_region_for_images(int row, int col, int row_height, int col_width)
+mark_dirty_region_for_images(整数 row, 整数 col, 整数 row_height, 整数 col_width)
 {
     image_placement_T	*place;
     pixman_box32_t	rect;
 
-    if (freeze_mark_dirty > 0 || !backend_available(false)
+    もし (freeze_mark_dirty > 0 || !backend_available(false)
 	    || !PLACEMENT_FUNC(image_backend, blit) || n_placements == 0)
-	return;
+	戻る;
 
     rect.x1 = col;
     rect.y1 = row;
@@ -1006,9 +1006,9 @@ mark_dirty_region_for_images(int row, int col, int row_height, int col_width)
 
     FOR_ALL_PLACEMENTS(place)
     {
-	if (place->flags & IMAGEPF_HIDDEN)
+	もし (place->flags & IMAGEPF_HIDDEN)
 	    continue;
-	if (pixman_region32_contains_rectangle(&place->visible_abs, &rect)
+	もし (pixman_region32_contains_rectangle(&place->visible_abs, &rect)
 		== PIXMAN_REGION_OUT)
 	    continue;
 
@@ -1023,7 +1023,7 @@ clear_all_image_placements(void)
 
     FOR_ALL_PLACEMENTS(place)
 	image_placement_clear(place);
-    if (!updating_screen)
+    もし (!updating_screen)
 	redraw_all_later(UPD_VALID);
 }
 
@@ -1032,7 +1032,7 @@ clear_all_image_placements(void)
  * shift rows. Note that this does not queue a screen redraw.
  */
     void
-shift_image_placements(int top, int bot, int amount)
+shift_image_placements(整数 top, 整数 bot, 整数 amount)
 {
     shift_top = top;
     shift_bot = bot;
@@ -1055,9 +1055,9 @@ find_image(int_u id)
     image_T *img;
 
     FOR_ALL_IMAGES(img)
-	if (img->state == IMAGE_STATE_PUBLIC && img->id == id)
-	    return img;
-    return NULL;
+	もし (img->state == IMAGE_STATE_PUBLIC && img->id == id)
+	    戻る img;
+    戻る NULL;
 }
 
 /*
@@ -1073,58 +1073,58 @@ add_image(dict_T *dict, image_T *existing, bool find)
     varnumber_T     n_pixels;
     image_format_T  fmt;
 
-    if (find && dict_has_key(dict, "id"))
+    もし (find && dict_has_key(dict, "id"))
     {
 	image_T *img = find_image((int_u)dict_get_number(dict, "id"));
 
-	if (img == NULL)
-	    return NULL;
-	return image_ref(img);
+	もし (img == NULL)
+	    戻る NULL;
+	戻る image_ref(img);
     }
 
     di = dict_find(dict, (char_u *)"data", -1);
     w = dict_get_number(dict, "width");
     h = dict_get_number(dict, "height");
 
-    if (di == NULL || di->di_tv.v_type != VAR_BLOB || w <= 0 || h <= 0)
+    もし (di == NULL || di->di_tv.v_type != VAR_BLOB || w <= 0 || h <= 0)
     {
 	emsg(_(e_invalid_argument));
-	return NULL;
+	戻る NULL;
     }
 
     // Check for overflow
     n_pixels = w * h;
-    if (w > INT_MAX || h > INT_MAX || n_pixels > INT_MAX)
+    もし (w > INT_MAX || h > INT_MAX || n_pixels > INT_MAX)
     {
 	emsg(_(e_invalid_image_dimensions));
-	return NULL;
+	戻る NULL;
     }
 
     data = di->di_tv.vval.v_blob;
 
-    if (blob_len(data) == n_pixels * 3)
+    もし (blob_len(data) == n_pixels * 3)
 	fmt = IMAGE_FORMAT_RGB;
-    else if (blob_len(data) == n_pixels * 4)
+    否则 もし (blob_len(data) == n_pixels * 4)
 	fmt = IMAGE_FORMAT_RGBA;
-    else
+    否则
     {
 	semsg(_(e_invalid_value_for_argument_str_str), "data",
 		"data length must equal width*height*3 or width*height*4");
-	return NULL;
+	戻る NULL;
     }
 
-    if (existing != NULL)
+    もし (existing != NULL)
     {
-	if (existing->width == w && existing->height == h
+	もし (existing->width == w && existing->height == h
 		&& existing->fmt == fmt)
 	{
-	    if (image_update(existing, data->bv_ga.ga_data) == FAIL)
-		return NULL;
-	    return existing;
+	    もし (image_update(existing, data->bv_ga.ga_data) == FAIL)
+		戻る NULL;
+	    戻る existing;
 	}
     }
 
-    return image_new(data->bv_ga.ga_data, w, h, fmt);
+    戻る image_new(data->bv_ga.ga_data, w, h, fmt);
 }
 
 /*
@@ -1136,21 +1136,21 @@ get_image_info(image_T *img)
 {
     dict_T	*dict;
     blob_T	*blob;
-    int		w, h;
+    整数		w, h;
     dictitem_T	*di;
 
-    if (img->data == NULL)
-	return NULL;
+    もし (img->data == NULL)
+	戻る NULL;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    もし (dict == NULL)
+	戻る NULL;
 
     blob = blob_alloc();
-    if (blob == NULL)
+    もし (blob == NULL)
     {
 	dict_unref(dict);
-	return NULL;
+	戻る NULL;
     }
 
     image_get_dimensions(img, &w, &h);
@@ -1159,21 +1159,21 @@ get_image_info(image_T *img)
 
     di = dictitem_alloc((char_u *)"data");
 
-    if (di != NULL)
+    もし (di != NULL)
     {
 	di->di_tv.v_type = VAR_BLOB;
 	di->di_tv.vval.v_blob = blob;
     }
-    if (di == NULL || dict_add(dict, di) == FAIL)
+    もし (di == NULL || dict_add(dict, di) == FAIL)
     {
-	if (di != NULL)
+	もし (di != NULL)
 	    dictitem_free(di);
 	dict_unref(dict);
 	// No need to unref blob, dictitem_free() will do that.
-	return NULL;
+	戻る NULL;
     }
 
-    if (img->state == IMAGE_STATE_PUBLIC)
+    もし (img->state == IMAGE_STATE_PUBLIC)
 	dict_add_number(dict, "id", img->id);
     dict_add_number(dict, "width", img->width);
     dict_add_number(dict, "height", img->height);
@@ -1183,23 +1183,23 @@ get_image_info(image_T *img)
 
     blob->bv_refcount = 1;
 
-    return dict;
+    戻る dict;
 }
 
-    static int
+    static 整数
 match_imageprotocol(image_backend_T *backend)
 {
-    int		    len = (int)STRLEN(p_ipc) + 1;
+    整数		    len = (整数)STRLEN(p_ipc) + 1;
     char_u	    *buf = alloc(len);
     char_u	    *p = p_ipc;
-    int		    ret = FAIL;
+    整数		    ret = FAIL;
     image_backend_T res = IMAGE_BACKEND_NONE;
     bool	    got = false;
 
-    if (buf == NULL)
-	return FAIL;
+    もし (buf == NULL)
+	戻る FAIL;
 
-    while (*p != NUL)
+    ながら (*p != NUL)
     {
 	char_u		*colon;
 	regmatch_T	regmatch;
@@ -1209,44 +1209,44 @@ match_imageprotocol(image_backend_T *backend)
 	(void)copy_option_part(&p, buf, len, ",");
 
 	colon = vim_strchr(buf, ':');
-	if (colon == NULL || colon == buf || colon[1] == NUL)
+	もし (colon == NULL || colon == buf || colon[1] == NUL)
 	    goto exit;
 
 	*colon = NUL;
 
 	// Note: Keep this in sync with p_ipc_protocol_values.
-	if (STRCMP(colon + 1, "none") == 0)
+	もし (STRCMP(colon + 1, "none") == 0)
 	    prot = IMAGE_BACKEND_NONE;
-	else if (STRCMP(colon + 1, "kitty") == 0)
+	否则 もし (STRCMP(colon + 1, "kitty") == 0)
 	{
 #ifdef FEAT_IMAGE_KITTY
 	    prot = IMAGE_BACKEND_KITTY;
 #endif
 	}
-	else if (STRCMP(colon + 1, "sixel") == 0)
+	否则 もし (STRCMP(colon + 1, "sixel") == 0)
 	{
 #ifdef FEAT_IMAGE_SIXEL
 	    prot = IMAGE_BACKEND_SIXEL;
 #endif
 	}
-	else
+	否则
 	    goto exit;
 
-	if (got)
+	もし (got)
 	    continue;
 
 	CLEAR_FIELD(regmatch);
 	regmatch.rm_ic = TRUE;
 	regmatch.regprog = vim_regcomp(buf, RE_MAGIC);
 
-	if (regmatch.regprog == NULL)
+	もし (regmatch.regprog == NULL)
 	    goto exit;
 
 	bool match = T_NAME != NULL
 	    && vim_regexec(&regmatch, T_NAME, (colnr_T)0);
 
 	vim_regfree(regmatch.regprog);
-	if (match)
+	もし (match)
 	{
 	    // Keep going to catch any errors
 	    res = prot;
@@ -1258,14 +1258,14 @@ match_imageprotocol(image_backend_T *backend)
     *backend = res;
 exit:
     vim_free(buf);
-    return ret;
+    戻る ret;
 }
 
 /*
  * Update the current image backend to use depending on 'imageprotocol' and if
  * GUI is being used. Returns OK on success and FAIL on failure.
  */
-    int
+    整数
 update_image_backend(void)
 {
     image_backend_T new;
@@ -1274,28 +1274,28 @@ update_image_backend(void)
     image_placement_T	*place;
 
     // Always process 'imageprotocol' option to check for errors
-    if (match_imageprotocol(&new) == FAIL)
-	return FAIL;
+    もし (match_imageprotocol(&new) == FAIL)
+	戻る FAIL;
 
 #ifdef FEAT_IMAGE_GUI
-    if (gui.in_use)
+    もし (gui.in_use)
 	new = IMAGE_BACKEND_GUI;
 #endif
 
-    if (image_backend == new)
-	return OK;
+    もし (image_backend == new)
+	戻る OK;
 
     // Must uninit the backends of every image/placement, then init the new
     // backend for each.
     FOR_ALL_IMAGES(img)
     {
-	if (image_backend != IMAGE_BACKEND_NONE && img->data != NULL
+	もし (image_backend != IMAGE_BACKEND_NONE && img->data != NULL
 		&& img->backend_data != NULL)
 	    IMAGE_FUNC(image_backend, uninit)(img);
 	img->backend_data = NULL;
-	if (new != IMAGE_BACKEND_NONE)
+	もし (new != IMAGE_BACKEND_NONE)
 	{
-	    if (IMAGE_FUNC(new, init)(img) == FAIL)
+	    もし (IMAGE_FUNC(new, init)(img) == FAIL)
 		goto fail;
 	    img->backend = new;
 	}
@@ -1303,13 +1303,13 @@ update_image_backend(void)
     FOR_ALL_PLACEMENTS(place)
     {
 	image_placement_clear(place);
-	if (image_backend != IMAGE_BACKEND_NONE
+	もし (image_backend != IMAGE_BACKEND_NONE
 		&& place->img != NULL && place->backend_data != NULL)
 	    PLACEMENT_FUNC(image_backend, uninit)(place);
 	place->backend_data = NULL;
-	if (new != IMAGE_BACKEND_NONE && place->img != NULL)
+	もし (new != IMAGE_BACKEND_NONE && place->img != NULL)
 	{
-	    if (PLACEMENT_FUNC(new, init)(place) == FAIL)
+	    もし (PLACEMENT_FUNC(new, init)(place) == FAIL)
 		goto fail;
 	    place->backend = new;
 	}
@@ -1318,16 +1318,16 @@ update_image_backend(void)
     redraw_all_later(UPD_VALID);
     image_backend = new;
 
-    if (new == IMAGE_BACKEND_NONE)
+    もし (new == IMAGE_BACKEND_NONE)
 	set_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
-    else
+    否则
 	set_vim_var_string(VV_IMAGEBACKEND,
 		(char_u *)image_backends[image_backend].name, -1);
 
-    return OK;
+    戻る OK;
 fail:
     FOR_ALL_IMAGES(img)
-	if (img->backend != IMAGE_BACKEND_NONE)
+	もし (img->backend != IMAGE_BACKEND_NONE)
 	{
 	    IMAGE_FUNC(img->backend, uninit)(img);
 	    img->backend = IMAGE_BACKEND_NONE;
@@ -1335,7 +1335,7 @@ fail:
 
     FOR_ALL_PLACEMENTS(place)
     {
-	if (place->img != NULL && place->backend != IMAGE_BACKEND_NONE)
+	もし (place->img != NULL && place->backend != IMAGE_BACKEND_NONE)
 	{
 	    image_placement_clear(place);
 	    PLACEMENT_FUNC(place->backend, uninit)(place);
@@ -1348,7 +1348,7 @@ fail:
     image_backend = IMAGE_BACKEND_NONE;
     set_vim_var_string(VV_IMAGEBACKEND, (char_u *)"none", -1);
     emsg(_(e_changing_image_backend_failed));
-    return FAIL;
+    戻る FAIL;
 }
 
     void
@@ -1357,13 +1357,13 @@ f_image_add(typval_T *argvars, typval_T *rettv)
     dict_T  *dict;
     image_T *img;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
-	return;
+    もし (check_for_dict_arg(argvars, 0) == FAIL)
+	戻る;
 
     dict = argvars[0].vval.v_dict;
 
     img = add_image(dict, NULL, false);
-    if (img != NULL)
+    もし (img != NULL)
 	img->state = IMAGE_STATE_PUBLIC;
 
     rettv->v_type = VAR_NUMBER;
@@ -1375,17 +1375,17 @@ f_image_discard(typval_T *argvars, typval_T *rettv UNUSED)
 {
     image_T *img;
 
-    if (check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    もし (check_for_number_arg(argvars, 0) == FAIL)
+	戻る;
 
     img = find_image((int_u)argvars[0].vval.v_number);
 
-    if (img != NULL)
+    もし (img != NULL)
     {
 	img->state = IMAGE_STATE_PRIVATE;
 	image_unref(img);
     }
-    else
+    否则
 	semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_number);
 }
 
@@ -1395,34 +1395,34 @@ f_image_info(typval_T *argvars, typval_T *rettv)
     image_T *img;
     dict_T  *dict;
 
-    if (rettv_list_alloc(rettv) == FAIL
+    もし (rettv_list_alloc(rettv) == FAIL
 	    || check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+	戻る;
 
-    if (argvars[0].v_type == VAR_NUMBER)
+    もし (argvars[0].v_type == VAR_NUMBER)
     {
 	img = find_image((int_u)argvars[0].vval.v_number);
-	if (img == NULL)
+	もし (img == NULL)
 	{
 	    semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_number);
-	    return;
+	    戻る;
 	}
 	dict = get_image_info(img);
-	if (dict != NULL && list_append_dict(rettv->vval.v_list, dict) == FAIL)
+	もし (dict != NULL && list_append_dict(rettv->vval.v_list, dict) == FAIL)
 	    dict_unref(dict);
-	return;
+	戻る;
     }
 
     FOR_ALL_IMAGES(img)
     {
-	if (img->state == IMAGE_STATE_PRIVATE)
+	もし (img->state == IMAGE_STATE_PRIVATE)
 	    continue;
 	dict = get_image_info(img);
-	if (dict == NULL
+	もし (dict == NULL
 		|| list_append_dict(rettv->vval.v_list, dict) == FAIL)
 	{
 	    dict_unref(dict);	// NULL-safe
-	    return;
+	    戻る;
 	}
     }
 }

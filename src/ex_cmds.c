@@ -16,10 +16,10 @@
 
 #include <float.h>
 
-static int linelen(int *has_tab);
-static void do_filter(linenr_T line1, linenr_T line2, exarg_T *eap, char_u *cmd, int do_in, int do_out);
-static int not_writing(void);
-static int check_readonly(int *forceit, buf_T *buf);
+static 整数 linelen(整数 *has_tab);
+static void do_filter(linenr_T line1, linenr_T line2, exarg_T *eap, char_u *cmd, 整数 do_in, 整数 do_out);
+static 整数 not_writing(void);
+static 整数 check_readonly(整数 *forceit, buf_T *buf);
 static void delbuf_msg(char_u *name);
 
 /*
@@ -28,75 +28,75 @@ static void delbuf_msg(char_u *name);
     void
 do_ascii(exarg_T *eap UNUSED)
 {
-    int		c;
-    int		cval;
+    整数		c;
+    整数		cval;
     char	buf1[20];
     char	buf2[20];
     char_u	buf3[7];
 #ifdef FEAT_DIGRAPHS
     char_u      *dig;
 #endif
-    int		cc[MAX_MCO];
-    int		ci = 0;
-    int		len;
+    整数		cc[MAX_MCO];
+    整数		ci = 0;
+    整数		len;
 
-    if (enc_utf8)
+    もし (enc_utf8)
 	c = utfc_ptr2char(ml_get_cursor(), cc);
-    else
+    否则
 	c = gchar_cursor();
-    if (c == NUL)
+    もし (c == NUL)
     {
 	msg("NUL");
-	return;
+	戻る;
     }
 
     IObuff[0] = NUL;
-    if (!has_mbyte || (enc_dbcs != 0 && c < 0x100) || c < 0x80)
+    もし (!has_mbyte || (enc_dbcs != 0 && c < 0x100) || c < 0x80)
     {
-	if (c == NL)	    // NUL is stored as NL
+	もし (c == NL)	    // NUL is stored as NL
 	    c = NUL;
-	if (c == CAR && get_fileformat(curbuf) == EOL_MAC)
+	もし (c == CAR && get_fileformat(curbuf) == EOL_MAC)
 	    cval = NL;	    // NL is stored as CR
-	else
+	否则
 	    cval = c;
-	if (vim_isprintc_strict(c) && (c < ' ' || c > '~'))
+	もし (vim_isprintc_strict(c) && (c < ' ' || c > '~'))
 	{
 	    transchar_nonprint(curbuf, buf3, c);
 	    vim_snprintf(buf1, sizeof(buf1), "  <%s>", (char *)buf3);
 	}
-	else
+	否则
 	    buf1[0] = NUL;
-	if (c >= 0x80)
+	もし (c >= 0x80)
 	    vim_snprintf(buf2, sizeof(buf2), "  <M-%s>",
 						 (char *)transchar(c & 0x7f));
-	else
+	否则
 	    buf2[0] = NUL;
 #ifdef FEAT_DIGRAPHS
 	dig = get_digraph_for_char(cval);
-	if (dig != NULL)
+	もし (dig != NULL)
 	    vim_snprintf((char *)IObuff, IOSIZE,
 		_("<%s>%s%s  %d,  Hex %02x,  Oct %03o, Digr %s"),
 			      transchar(c), buf1, buf2, cval, cval, cval, dig);
-	else
+	否则
 #endif
 	    vim_snprintf((char *)IObuff, IOSIZE,
 		_("<%s>%s%s  %d,  Hex %02x,  Octal %03o"),
 				  transchar(c), buf1, buf2, cval, cval, cval);
-	if (enc_utf8)
+	もし (enc_utf8)
 	    c = cc[ci++];
-	else
+	否则
 	    c = 0;
     }
 
     // Repeat for combining characters.
-    while (has_mbyte && (c >= 0x100 || (enc_utf8 && c >= 0x80)))
+    ながら (has_mbyte && (c >= 0x100 || (enc_utf8 && c >= 0x80)))
     {
-	len = (int)STRLEN(IObuff);
+	len = (整数)STRLEN(IObuff);
 	// This assumes every multi-byte char is printable...
-	if (len > 0)
+	もし (len > 0)
 	    IObuff[len++] = ' ';
 	IObuff[len++] = '<';
-	if (enc_utf8 && utf_iscomposing(c)
+	もし (enc_utf8 && utf_iscomposing(c)
 #ifdef USE_GUI
 		&& !gui.in_use
 #endif
@@ -105,22 +105,22 @@ do_ascii(exarg_T *eap UNUSED)
 	len += (*mb_char2bytes)(c, IObuff + len);
 #ifdef FEAT_DIGRAPHS
 	dig = get_digraph_for_char(c);
-	if (dig != NULL)
+	もし (dig != NULL)
 	    vim_snprintf((char *)IObuff + len, IOSIZE - len,
 			c < 0x10000 ? _("> %d, Hex %04x, Oct %o, Digr %s")
 				    : _("> %d, Hex %08x, Oct %o, Digr %s"),
 					c, c, c, dig);
-	else
+	否则
 #endif
 	    vim_snprintf((char *)IObuff + len, IOSIZE - len,
 			 c < 0x10000 ? _("> %d, Hex %04x, Octal %o")
 				     : _("> %d, Hex %08x, Octal %o"),
 				     c, c, c);
-	if (ci == MAX_MCO)
+	もし (ci == MAX_MCO)
 	    break;
-	if (enc_utf8)
+	もし (enc_utf8)
 	    c = cc[ci++];
-	else
+	否则
 	    c = 0;
     }
 
@@ -134,65 +134,65 @@ do_ascii(exarg_T *eap UNUSED)
 ex_align(exarg_T *eap)
 {
     pos_T	save_curpos;
-    int		len;
-    int		indent = 0;
-    int		new_indent;
-    int		has_tab;
-    int		width;
+    整数		len;
+    整数		indent = 0;
+    整数		new_indent;
+    整数		has_tab;
+    整数		width;
 
 #ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl)
+    もし (curwin->w_p_rl)
     {
 	// switch left and right aligning
-	if (eap->cmdidx == CMD_right)
+	もし (eap->cmdidx == CMD_right)
 	    eap->cmdidx = CMD_left;
-	else if (eap->cmdidx == CMD_left)
+	否则 もし (eap->cmdidx == CMD_left)
 	    eap->cmdidx = CMD_right;
     }
 #endif
 
     width = atoi((char *)eap->arg);
     save_curpos = curwin->w_cursor;
-    if (eap->cmdidx == CMD_left)    // width is used for new indent
+    もし (eap->cmdidx == CMD_left)    // width is used for new indent
     {
-	if (width >= 0)
+	もし (width >= 0)
 	    indent = width;
     }
-    else
+    否则
     {
 	/*
 	 * if 'textwidth' set, use it
 	 * else if 'wrapmargin' set, use it
 	 * if invalid value, use 80
 	 */
-	if (width <= 0)
+	もし (width <= 0)
 	    width = curbuf->b_p_tw;
-	if (width == 0 && curbuf->b_p_wm > 0)
+	もし (width == 0 && curbuf->b_p_wm > 0)
 	    width = curwin->w_width - curbuf->b_p_wm;
-	if (width <= 0)
+	もし (width <= 0)
 	    width = 80;
     }
 
-    if (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
-	return;
+    もし (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
+	戻る;
 
-    for (curwin->w_cursor.lnum = eap->line1;
+    ために (curwin->w_cursor.lnum = eap->line1;
 		 curwin->w_cursor.lnum <= eap->line2; ++curwin->w_cursor.lnum)
     {
-	if (eap->cmdidx == CMD_left)		// left align
+	もし (eap->cmdidx == CMD_left)		// left align
 	    new_indent = indent;
-	else
+	否则
 	{
 	    has_tab = FALSE;	// avoid uninit warnings
 	    len = linelen(eap->cmdidx == CMD_right ? &has_tab
 						   : NULL) - get_indent();
 
-	    if (len <= 0)			// skip blank lines
+	    もし (len <= 0)			// skip blank lines
 		continue;
 
-	    if (eap->cmdidx == CMD_center)
+	    もし (eap->cmdidx == CMD_center)
 		new_indent = (width - len) / 2;
-	    else
+	    否则
 	    {
 		new_indent = width - len;	// right align
 
@@ -200,11 +200,11 @@ ex_align(exarg_T *eap)
 		 * Make sure that embedded TABs don't make the text go too far
 		 * to the right.
 		 */
-		if (has_tab)
-		    while (new_indent > 0)
+		もし (has_tab)
+		    ながら (new_indent > 0)
 		    {
 			(void)set_indent(new_indent, 0);
-			if (linelen(NULL) <= width)
+			もし (linelen(NULL) <= width)
 			{
 			    /*
 			     * Now try to move the line as much as possible to
@@ -212,7 +212,7 @@ ex_align(exarg_T *eap)
 			     */
 			    do
 				(void)set_indent(++new_indent, 0);
-			    while (linelen(NULL) <= width);
+			    ながら (linelen(NULL) <= width);
 			    --new_indent;
 			    break;
 			}
@@ -220,7 +220,7 @@ ex_align(exarg_T *eap)
 		    }
 	    }
 	}
-	if (new_indent < 0)
+	もし (new_indent < 0)
 	    new_indent = 0;
 	(void)set_indent(new_indent, 0);		// set indent
     }
@@ -232,36 +232,36 @@ ex_align(exarg_T *eap)
 /*
  * Get the length of the current line, excluding trailing white space.
  */
-    static int
-linelen(int *has_tab)
+    static 整数
+linelen(整数 *has_tab)
 {
     char_u  *line;
     char_u  *first;
     char_u  *last;
-    int	    save;
-    int	    len;
+    整数	    save;
+    整数	    len;
 
     // Get the line.  If it's empty bail out early (could be the empty string
     // for an unloaded buffer).
     line = ml_get_curline();
-    if (*line == NUL)
-	return 0;
+    もし (*line == NUL)
+	戻る 0;
 
     // find the first non-blank character
     first = skipwhite(line);
 
     // find the character after the last non-blank character
-    for (last = first + STRLEN(first);
+    ために (last = first + STRLEN(first);
 				last > first && VIM_ISWHITE(last[-1]); --last)
 	;
     save = *last;
     *last = NUL;
     len = linetabsize_str(line);	// get line length on screen
-    if (has_tab != NULL)		// check for embedded TAB
+    もし (has_tab != NULL)		// check for embedded TAB
 	*has_tab = (vim_strchr(first, TAB) != NULL);
     *last = save;
 
-    return len;
+    戻る len;
 }
 
 // Buffer for two lines used during sorting.  They are allocated to
@@ -269,13 +269,13 @@ linelen(int *has_tab)
 static char_u	*sortbuf1;
 static char_u	*sortbuf2;
 
-static int	sort_lc;	// sort using locale
-static int	sort_ic;	// ignore case
-static int	sort_nr;	// sort on number
-static int	sort_rx;	// sort on regex instead of skipping it
-static int	sort_flt;	// sort on floating number
+static 整数	sort_lc;	// sort using locale
+static 整数	sort_ic;	// ignore case
+static 整数	sort_nr;	// sort on number
+static 整数	sort_rx;	// sort on regex instead of skipping it
+static 整数	sort_flt;	// sort on floating number
 
-static int	sort_abort;	// flag to indicate if sorting has been interrupted
+static 整数	sort_abort;	// flag to indicate if sorting has been interrupted
 
 // Struct to store info to be sorted.
 typedef struct
@@ -290,48 +290,48 @@ typedef struct
 	struct
 	{
 	    varnumber_T	value;		// value if sorting by integer
-	    int is_number;		// TRUE when line contains a number
+	    整数 is_number;		// TRUE when line contains a number
 	} num;
 	float_T value_flt;		// value if sorting by float
     } st_u;
 } sorti_T;
 
-    static int
+    static 整数
 string_compare(const void *s1, const void *s2)
 {
-    if (sort_lc)
-	return strcoll((char *)s1, (char *)s2);
-    return sort_ic ? STRICMP(s1, s2) : STRCMP(s1, s2);
+    もし (sort_lc)
+	戻る strcoll((char *)s1, (char *)s2);
+    戻る sort_ic ? STRICMP(s1, s2) : STRCMP(s1, s2);
 }
 
-    static int
+    static 整数
 sort_compare(const void *s1, const void *s2)
 {
     sorti_T	l1 = *(sorti_T *)s1;
     sorti_T	l2 = *(sorti_T *)s2;
-    int		result = 0;
+    整数		result = 0;
 
     // If the user interrupts, there's no way to stop qsort() immediately, but
     // if we return 0 every time, qsort will assume it's done sorting and
     // exit.
-    if (sort_abort)
-	return 0;
+    もし (sort_abort)
+	戻る 0;
     fast_breakcheck();
-    if (got_int)
+    もし (got_int)
 	sort_abort = TRUE;
 
-    if (sort_nr)
+    もし (sort_nr)
     {
-	if (l1.st_u.num.is_number != l2.st_u.num.is_number)
+	もし (l1.st_u.num.is_number != l2.st_u.num.is_number)
 	    result = l1.st_u.num.is_number > l2.st_u.num.is_number ? 1 : -1;
-	else
+	否则
 	    result = l1.st_u.num.value == l2.st_u.num.value ? 0
 			     : l1.st_u.num.value > l2.st_u.num.value ? 1 : -1;
     }
-    else if (sort_flt)
+    否则 もし (sort_flt)
 	result = l1.st_u.value_flt == l2.st_u.value_flt ? 0
 			     : l1.st_u.value_flt > l2.st_u.value_flt ? 1 : -1;
-    else
+    否则
     {
 	// We need to copy one line into "sortbuf1", because there is no
 	// guarantee that the first pointer becomes invalid when obtaining the
@@ -347,9 +347,9 @@ sort_compare(const void *s1, const void *s2)
     }
 
     // If two lines have the same value, preserve the original line order.
-    if (result == 0)
-	return (int)(l1.lnum - l2.lnum);
-    return result;
+    もし (result == 0)
+	戻る (整数)(l1.lnum - l2.lnum);
+    戻る result;
 }
 
 /*
@@ -359,7 +359,7 @@ sort_compare(const void *s1, const void *s2)
 ex_sort(exarg_T *eap)
 {
     regmatch_T	regmatch;
-    int		len;
+    整数		len;
     linenr_T	lnum;
     long	maxlen = 0;
     sorti_T	*nrs;
@@ -369,98 +369,98 @@ ex_sort(exarg_T *eap)
     char_u	*s;
     char_u	*s2;
     char_u	c;			// temporary character storage
-    int		unique = FALSE;
+    整数		unique = FALSE;
     long	deleted;
     colnr_T	start_col;
     colnr_T	end_col;
-    int		sort_what = 0;
-    int		format_found = 0;
-    int		change_occurred = FALSE; // Buffer contents changed.
+    整数		sort_what = 0;
+    整数		format_found = 0;
+    整数		change_occurred = FALSE; // Buffer contents changed.
 
     // Sorting one line is really quick!
-    if (count <= 1)
-	return;
+    もし (count <= 1)
+	戻る;
 
-    if (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
-	return;
+    もし (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
+	戻る;
     sortbuf1 = NULL;
     sortbuf2 = NULL;
     regmatch.regprog = NULL;
     nrs = ALLOC_MULT(sorti_T, count);
-    if (nrs == NULL)
+    もし (nrs == NULL)
 	goto sortend;
 
     sort_abort = sort_ic = sort_lc = sort_rx = sort_nr = 0;
     sort_flt = 0;
 
-    for (p = eap->arg; *p != NUL; ++p)
+    ために (p = eap->arg; *p != NUL; ++p)
     {
-	if (VIM_ISWHITE(*p))
+	もし (VIM_ISWHITE(*p))
 	    ;
-	else if (*p == 'i')
+	否则 もし (*p == 'i')
 	    sort_ic = TRUE;
-	else if (*p == 'l')
+	否则 もし (*p == 'l')
 	    sort_lc = TRUE;
-	else if (*p == 'r')
+	否则 もし (*p == 'r')
 	    sort_rx = TRUE;
-	else if (*p == 'n')
+	否则 もし (*p == 'n')
 	{
 	    sort_nr = 1;
 	    ++format_found;
 	}
-	else if (*p == 'f')
+	否则 もし (*p == 'f')
 	{
 	    sort_flt = 1;
 	    ++format_found;
 	}
-	else if (*p == 'b')
+	否则 もし (*p == 'b')
 	{
 	    sort_what = STR2NR_BIN + STR2NR_FORCE;
 	    ++format_found;
 	}
-	else if (*p == 'o')
+	否则 もし (*p == 'o')
 	{
 	    sort_what = STR2NR_OCT + STR2NR_FORCE;
 	    ++format_found;
 	}
-	else if (*p == 'x')
+	否则 もし (*p == 'x')
 	{
 	    sort_what = STR2NR_HEX + STR2NR_FORCE;
 	    ++format_found;
 	}
-	else if (*p == 'u')
+	否则 もし (*p == 'u')
 	    unique = TRUE;
-	else if (*p == '"')	// comment start
+	否则 もし (*p == '"')	// comment start
 	    break;
-	else if (eap->nextcmd == NULL && check_nextcmd(p) != NULL)
+	否则 もし (eap->nextcmd == NULL && check_nextcmd(p) != NULL)
 	{
 	    eap->nextcmd = check_nextcmd(p);
 	    break;
 	}
-	else if (!ASCII_ISALPHA(*p) && regmatch.regprog == NULL)
+	否则 もし (!ASCII_ISALPHA(*p) && regmatch.regprog == NULL)
 	{
 	    s = skip_regexp_err(p + 1, *p, TRUE);
-	    if (s == NULL)
+	    もし (s == NULL)
 		goto sortend;
 	    *s = NUL;
 	    // Use last search pattern if sort pattern is empty.
-	    if (s == p + 1)
+	    もし (s == p + 1)
 	    {
-		if (last_search_pat() == NULL)
+		もし (last_search_pat() == NULL)
 		{
 		    emsg(_(e_no_previous_regular_expression));
 		    goto sortend;
 		}
 		regmatch.regprog = vim_regcomp(last_search_pat(), RE_MAGIC);
 	    }
-	    else
+	    否则
 		regmatch.regprog = vim_regcomp(p + 1, RE_MAGIC);
-	    if (regmatch.regprog == NULL)
+	    もし (regmatch.regprog == NULL)
 		goto sortend;
 	    p = s;		// continue after the regexp
 	    regmatch.rm_ic = p_ic;
 	}
-	else
+	否则
 	{
 	    semsg(_(e_invalid_argument_str), p);
 	    goto sortend;
@@ -468,7 +468,7 @@ ex_sort(exarg_T *eap)
     }
 
     // Can only have one of 'n', 'b', 'o' and 'x'.
-    if (format_found > 1)
+    もし (format_found > 1)
     {
 	emsg(_(e_invalid_argument));
 	goto sortend;
@@ -486,30 +486,30 @@ ex_sort(exarg_T *eap)
      * matching and number conversion only has to be done once per line.
      * Also get the longest line length for allocating "sortbuf".
      */
-    for (lnum = eap->line1; lnum <= eap->line2; ++lnum)
+    ために (lnum = eap->line1; lnum <= eap->line2; ++lnum)
     {
 	s = ml_get(lnum);
 	len = ml_get_len(lnum);
-	if (maxlen < len)
+	もし (maxlen < len)
 	    maxlen = len;
 
 	start_col = 0;
 	end_col = len;
-	if (regmatch.regprog != NULL && vim_regexec(&regmatch, s, 0))
+	もし (regmatch.regprog != NULL && vim_regexec(&regmatch, s, 0))
 	{
-	    if (sort_rx)
+	    もし (sort_rx)
 	    {
 		start_col = (colnr_T)(regmatch.startp[0] - s);
 		end_col = (colnr_T)(regmatch.endp[0] - s);
 	    }
-	    else
+	    否则
 		start_col = (colnr_T)(regmatch.endp[0] - s);
 	}
-	else
-	    if (regmatch.regprog != NULL)
+	否则
+	    もし (regmatch.regprog != NULL)
 		end_col = 0;
 
-	if (sort_nr || sort_flt)
+	もし (sort_nr || sort_flt)
 	{
 	    // Make sure vim_str2nr() doesn't read any digits past the end
 	    // of the match, by temporarily terminating the string there
@@ -518,23 +518,23 @@ ex_sort(exarg_T *eap)
 	    *s2 = NUL;
 	    // Sorting on number: Store the number itself.
 	    p = s + start_col;
-	    if (sort_nr)
+	    もし (sort_nr)
 	    {
-		if (sort_what & STR2NR_HEX)
+		もし (sort_what & STR2NR_HEX)
 		    s = skiptohex(p);
-		else if (sort_what & STR2NR_BIN)
+		否则 もし (sort_what & STR2NR_BIN)
 		    s = skiptobin(p);
-		else
+		否则
 		    s = skiptodigit(p);
-		if (s > p && s[-1] == '-')
+		もし (s > p && s[-1] == '-')
 		    --s;  // include preceding negative sign
-		if (*s == NUL)
+		もし (*s == NUL)
 		{
 		    // line without number should sort before any number
 		    nrs[lnum - eap->line1].st_u.num.is_number = FALSE;
 		    nrs[lnum - eap->line1].st_u.num.value = 0;
 		}
-		else
+		否则
 		{
 		    nrs[lnum - eap->line1].st_u.num.is_number = TRUE;
 		    vim_str2nr(s, NULL, NULL, sort_what,
@@ -542,22 +542,22 @@ ex_sort(exarg_T *eap)
 			NULL, 0, FALSE, NULL);
 		}
 	    }
-	    else
+	    否则
 	    {
 		s = skipwhite(p);
-		if (*s == '+')
+		もし (*s == '+')
 		    s = skipwhite(s + 1);
 
-		if (*s == NUL)
+		もし (*s == NUL)
 		    // empty line should sort before any number
 		    nrs[lnum - eap->line1].st_u.value_flt = -DBL_MAX;
-		else
+		否则
 		    nrs[lnum - eap->line1].st_u.value_flt =
 						      strtod((char *)s, NULL);
 	    }
 	    *s2 = c;
 	}
-	else
+	否则
 	{
 	    // Store the column to sort at.
 	    nrs[lnum - eap->line1].st_u.line.start_col_nr = start_col;
@@ -566,69 +566,69 @@ ex_sort(exarg_T *eap)
 
 	nrs[lnum - eap->line1].lnum = lnum;
 
-	if (regmatch.regprog != NULL)
+	もし (regmatch.regprog != NULL)
 	    fast_breakcheck();
-	if (got_int)
+	もし (got_int)
 	    goto sortend;
     }
 
     // Allocate a buffer that can hold the longest line.
     sortbuf1 = alloc(maxlen + 1);
-    if (sortbuf1 == NULL)
+    もし (sortbuf1 == NULL)
 	goto sortend;
     sortbuf2 = alloc(maxlen + 1);
-    if (sortbuf2 == NULL)
+    もし (sortbuf2 == NULL)
 	goto sortend;
 
     // Sort the array of line numbers.  Note: can't be interrupted!
     qsort((void *)nrs, count, sizeof(sorti_T), sort_compare);
 
-    if (sort_abort)
+    もし (sort_abort)
 	goto sortend;
 
     // Insert the lines in the sorted order below the last one.
     lnum = eap->line2;
-    for (i = 0; i < count; ++i)
+    ために (i = 0; i < count; ++i)
     {
 	linenr_T get_lnum = nrs[eap->forceit ? count - i - 1 : i].lnum;
 
 	// If the original line number of the line being placed is not the same
 	// as "lnum" (accounting for offset), we know that the buffer changed.
-	if (get_lnum + ((linenr_T)count - 1) != lnum)
+	もし (get_lnum + ((linenr_T)count - 1) != lnum)
 	    change_occurred = TRUE;
 
 	s = ml_get(get_lnum);
-	if (!unique || i == 0 || string_compare(s, sortbuf1) != 0)
+	もし (!unique || i == 0 || string_compare(s, sortbuf1) != 0)
 	{
 	    // Copy the line into a buffer, it may become invalid in
 	    // ml_append(). And it's needed for "unique".
 	    STRCPY(sortbuf1, s);
-	    if (ml_append(lnum++, sortbuf1, (colnr_T)0, FALSE) == FAIL)
+	    もし (ml_append(lnum++, sortbuf1, (colnr_T)0, FALSE) == FAIL)
 		break;
 	}
 	fast_breakcheck();
-	if (got_int)
+	もし (got_int)
 	    goto sortend;
     }
 
     // delete the original lines if appending worked
-    if (i == count)
-	for (i = 0; i < count; ++i)
+    もし (i == count)
+	ために (i = 0; i < count; ++i)
 	    ml_delete(eap->line1);
-    else
+    否则
 	count = 0;
 
     // Adjust marks for deleted (or added) lines and prepare for displaying.
     deleted = (long)(count - (lnum - eap->line2));
-    if (deleted > 0)
+    もし (deleted > 0)
     {
 	mark_adjust(eap->line2 - deleted, eap->line2, (long)MAXLNUM, -deleted);
 	msgmore(-deleted);
     }
-    else if (deleted < 0)
+    否则 もし (deleted < 0)
 	mark_adjust(eap->line2, MAXLNUM, -deleted, 0L);
 
-    if (change_occurred || deleted != 0)
+    もし (change_occurred || deleted != 0)
 	changed_lines(eap->line1, 0, eap->line2 + 1, -deleted);
 
     curwin->w_cursor.lnum = eap->line1;
@@ -639,7 +639,7 @@ sortend:
     vim_free(sortbuf1);
     vim_free(sortbuf2);
     vim_regfree(regmatch.regprog);
-    if (got_int)
+    もし (got_int)
 	emsg(_(e_interrupted));
 }
 
@@ -650,79 +650,79 @@ sortend:
 ex_uniq(exarg_T *eap)
 {
     regmatch_T	regmatch;
-    int		len;
+    整数		len;
     linenr_T	lnum;
     long	maxlen = 0;
     linenr_T	count = eap->line2 - eap->line1 + 1;
     char_u	*p;
     char_u	*s;
     char_u	save_c = 0;		// temporary character storage
-    int		keep_only_unique = FALSE;
-    int		keep_only_not_unique = eap->forceit ? TRUE : FALSE;
+    整数		keep_only_unique = FALSE;
+    整数		keep_only_not_unique = eap->forceit ? TRUE : FALSE;
     long	deleted = 0;
     colnr_T	start_col;
     colnr_T	end_col;
-    int		change_occurred = FALSE; // Buffer contents changed.
+    整数		change_occurred = FALSE; // Buffer contents changed.
 
     // Uniq one line is really quick!
-    if (count <= 1)
-	return;
+    もし (count <= 1)
+	戻る;
 
-    if (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
-	return;
+    もし (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
+	戻る;
     sortbuf1 = NULL;
     regmatch.regprog = NULL;
 
     sort_abort = sort_ic = sort_lc = sort_rx = sort_nr = 0;
     sort_flt = 0;
 
-    for (p = eap->arg; *p != NUL; ++p)
+    ために (p = eap->arg; *p != NUL; ++p)
     {
-	if (VIM_ISWHITE(*p))
+	もし (VIM_ISWHITE(*p))
 	    ;
-	else if (*p == 'i')
+	否则 もし (*p == 'i')
 	    sort_ic = TRUE;
-	else if (*p == 'l')
+	否则 もし (*p == 'l')
 	    sort_lc = TRUE;
-	else if (*p == 'r')
+	否则 もし (*p == 'r')
 	    sort_rx = TRUE;
-	else if (*p == 'u')
+	否则 もし (*p == 'u')
 	{
 	    // 'u' is only valid when '!' is not given.
-	    if (!keep_only_not_unique)
+	    もし (!keep_only_not_unique)
 		keep_only_unique = TRUE;
 	}
-	else if (*p == '"')	// comment start
+	否则 もし (*p == '"')	// comment start
 	    break;
-	else if (eap->nextcmd == NULL && check_nextcmd(p) != NULL)
+	否则 もし (eap->nextcmd == NULL && check_nextcmd(p) != NULL)
 	{
 	    eap->nextcmd = check_nextcmd(p);
 	    break;
 	}
-	else if (!ASCII_ISALPHA(*p) && regmatch.regprog == NULL)
+	否则 もし (!ASCII_ISALPHA(*p) && regmatch.regprog == NULL)
 	{
 	    s = skip_regexp_err(p + 1, *p, TRUE);
-	    if (s == NULL)
+	    もし (s == NULL)
 		goto uniqend;
 	    *s = NUL;
 	    // Use last search pattern if uniq pattern is empty.
-	    if (s == p + 1)
+	    もし (s == p + 1)
 	    {
-		if (last_search_pat() == NULL)
+		もし (last_search_pat() == NULL)
 		{
 		    emsg(_(e_no_previous_regular_expression));
 		    goto uniqend;
 		}
 		regmatch.regprog = vim_regcomp(last_search_pat(), RE_MAGIC);
 	    }
-	    else
+	    否则
 		regmatch.regprog = vim_regcomp(p + 1, RE_MAGIC);
-	    if (regmatch.regprog == NULL)
+	    もし (regmatch.regprog == NULL)
 		goto uniqend;
 	    p = s;		// continue after the regexp
 	    regmatch.rm_ic = p_ic;
 	}
-	else
+	否则
 	{
 	    semsg(_(e_invalid_argument_str), p);
 	    goto uniqend;
@@ -730,28 +730,28 @@ ex_uniq(exarg_T *eap)
     }
 
     // Find the length of the longest line.
-    for (lnum = eap->line1; lnum <= eap->line2; ++lnum)
+    ために (lnum = eap->line1; lnum <= eap->line2; ++lnum)
     {
 	len = ml_get_len(lnum);
-	if (maxlen < len)
+	もし (maxlen < len)
 	    maxlen = len;
 
-	if (got_int)
+	もし (got_int)
 	    goto uniqend;
     }
 
     // Allocate a buffer that can hold the longest line.
     sortbuf1 = alloc(maxlen + 1);
-    if (sortbuf1 == NULL)
+    もし (sortbuf1 == NULL)
 	goto uniqend;
 
     // Delete lines according to options.
-    int match_continue = FALSE;
-    int next_is_unmatch = FALSE;
-    int is_match;
+    整数 match_continue = FALSE;
+    整数 next_is_unmatch = FALSE;
+    整数 is_match;
     linenr_T done_lnum = eap->line1 - 1;
     linenr_T delete_lnum = 0;
-    for (linenr_T i = 0; i < count; ++i)
+    ために (linenr_T i = 0; i < count; ++i)
     {
 	linenr_T get_lnum = eap->line1 + i;
 
@@ -760,20 +760,20 @@ ex_uniq(exarg_T *eap)
 
 	start_col = 0;
 	end_col = len;
-	if (regmatch.regprog != NULL && vim_regexec(&regmatch, s, 0))
+	もし (regmatch.regprog != NULL && vim_regexec(&regmatch, s, 0))
 	{
-	    if (sort_rx)
+	    もし (sort_rx)
 	    {
 		start_col = (colnr_T)(regmatch.startp[0] - s);
 		end_col = (colnr_T)(regmatch.endp[0] - s);
 	    }
-	    else
+	    否则
 		start_col = (colnr_T)(regmatch.endp[0] - s);
 	}
-	else
-	    if (regmatch.regprog != NULL)
+	否则
+	    もし (regmatch.regprog != NULL)
 		end_col = 0;
-	if (end_col > 0)
+	もし (end_col > 0)
 	{
 	    save_c = s[end_col];
 	    s[end_col] = NUL;
@@ -781,63 +781,63 @@ ex_uniq(exarg_T *eap)
 
 	is_match = i > 0 ? !string_compare(&s[start_col], sortbuf1) : FALSE;
 	delete_lnum = 0;
-	if (next_is_unmatch)
+	もし (next_is_unmatch)
 	{
 	    is_match = FALSE;
 	    next_is_unmatch = FALSE;
 	}
 
-	if (!keep_only_unique && !keep_only_not_unique)
+	もし (!keep_only_unique && !keep_only_not_unique)
 	{
-	    if (is_match)
+	    もし (is_match)
 		delete_lnum = get_lnum;
-	    else
+	    否则
 		STRCPY(sortbuf1, &s[start_col]);
 	}
-	else if (keep_only_not_unique)
+	否则 もし (keep_only_not_unique)
 	{
-	    if (is_match)
+	    もし (is_match)
 	    {
 		done_lnum = get_lnum - 1;
 		delete_lnum = get_lnum;
 		match_continue = TRUE;
 	    }
-	    else
+	    否则
 	    {
-		if (i > 0 && !match_continue && get_lnum - 1 > done_lnum)
+		もし (i > 0 && !match_continue && get_lnum - 1 > done_lnum)
 		{
 		    delete_lnum = get_lnum - 1;
 		    next_is_unmatch = TRUE;
 		}
-		else if (i >= count - 1)
+		否则 もし (i >= count - 1)
 		    delete_lnum = get_lnum;
 		match_continue = FALSE;
 		STRCPY(sortbuf1, &s[start_col]);
 	    }
 	}
-	else // keep_only_unique
+	否则 // keep_only_unique
 	{
-	    if (is_match)
+	    もし (is_match)
 	    {
-		if (!match_continue)
+		もし (!match_continue)
 		    delete_lnum = get_lnum - 1;
-		else
+		否则
 		    delete_lnum = get_lnum;
 		match_continue = TRUE;
 	    }
-	    else
+	    否则
 	    {
-		if (i == 0 && match_continue)
+		もし (i == 0 && match_continue)
 		    delete_lnum = get_lnum;
 		match_continue = FALSE;
 		STRCPY(sortbuf1, &s[start_col]);
 	    }
 	}
 
-	if (end_col > 0)
+	もし (end_col > 0)
 	    s[end_col] = save_c;
 
-	if (delete_lnum > 0)
+	もし (delete_lnum > 0)
 	{
 	    ml_delete(delete_lnum);
 	    i -= get_lnum - delete_lnum + 1;
@@ -847,7 +847,7 @@ ex_uniq(exarg_T *eap)
 	}
 
 	fast_breakcheck();
-	if (got_int)
+	もし (got_int)
 	    goto uniqend;
     }
 
@@ -855,7 +855,7 @@ ex_uniq(exarg_T *eap)
     mark_adjust(eap->line2 - deleted, eap->line2, (long)MAXLNUM, -deleted);
     msgmore(-deleted);
 
-    if (change_occurred)
+    もし (change_occurred)
 	changed_lines(eap->line1, 0, eap->line2 + 1, -deleted);
 
     curwin->w_cursor.lnum = eap->line1;
@@ -864,7 +864,7 @@ ex_uniq(exarg_T *eap)
 uniqend:
     vim_free(sortbuf1);
     vim_regfree(regmatch.regprog);
-    if (got_int)
+    もし (got_int)
 	emsg(_(e_interrupted));
 }
 
@@ -873,7 +873,7 @@ uniqend:
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    整数
 do_move(linenr_T line1, linenr_T line2, linenr_T dest)
 {
     char_u	*str;
@@ -886,24 +886,24 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
     tabpage_T	*tp;
 #endif
 
-    if (dest >= line1 && dest < line2)
+    もし (dest >= line1 && dest < line2)
     {
 	emsg(_(e_cannot_move_range_of_lines_into_itself));
-	return FAIL;
+	戻る FAIL;
     }
 
     // Do nothing if we are not actually moving any lines.  This will prevent
     // the 'modified' flag from being set without cause.
-    if (dest == line1 - 1 || dest == line2)
+    もし (dest == line1 - 1 || dest == line2)
     {
 	// Move the cursor as if lines were moved (see below) to be backwards
 	// compatible.
-	if (dest >= line1)
+	もし (dest >= line1)
 	    curwin->w_cursor.lnum = dest;
-	else
+	否则
 	    curwin->w_cursor.lnum = dest + (line2 - line1) + 1;
 
-	return OK;
+	戻る OK;
     }
 
     num_lines = line2 - line1 + 1;
@@ -912,16 +912,16 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
      * First we copy the old text to its new location -- webb
      * Also copy the flag that ":global" command uses.
      */
-    if (u_save(dest, dest + 1) == FAIL)
-	return FAIL;
-    for (extra = 0, l = line1; l <= line2; l++)
+    もし (u_save(dest, dest + 1) == FAIL)
+	戻る FAIL;
+    ために (extra = 0, l = line1; l <= line2; l++)
     {
 	str = vim_strnsave(ml_get(l + extra), ml_get_len(l + extra));
-	if (str != NULL)
+	もし (str != NULL)
 	{
 	    ml_append(dest + l - line1, str, (colnr_T)0, FALSE);
 	    vim_free(str);
-	    if (dest < line1)
+	    もし (dest < line1)
 		extra++;
 	}
     }
@@ -943,39 +943,39 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
      */
     last_line = curbuf->b_ml.ml_line_count;
     mark_adjust_nofold(line1, line2, last_line - line2, 0L);
-    if (dest >= line2)
+    もし (dest >= line2)
     {
 	mark_adjust_nofold(line2 + 1, dest, -num_lines, 0L);
 #ifdef FEAT_FOLDING
 	FOR_ALL_TAB_WINDOWS(tp, win)
 	{
-	    if (win->w_buffer == curbuf)
+	    もし (win->w_buffer == curbuf)
 		foldMoveRange(&win->w_folds, line1, line2, dest);
 	}
 #endif
-	if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	もし ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	{
 	    curbuf->b_op_start.lnum = dest - num_lines + 1;
 	    curbuf->b_op_end.lnum = dest;
 	}
     }
-    else
+    否则
     {
 	mark_adjust_nofold(dest + 1, line1 - 1, num_lines, 0L);
 #ifdef FEAT_FOLDING
 	FOR_ALL_TAB_WINDOWS(tp, win)
 	{
-	    if (win->w_buffer == curbuf)
+	    もし (win->w_buffer == curbuf)
 		foldMoveRange(&win->w_folds, dest + 1, line1 - 1, line2);
 	}
 #endif
-	if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	もし ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	{
 	    curbuf->b_op_start.lnum = dest + 1;
 	    curbuf->b_op_end.lnum = dest + num_lines;
 	}
     }
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    もし ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	curbuf->b_op_start.col = curbuf->b_op_end.col = 0;
     mark_adjust_nofold(last_line - num_lines + 1, last_line,
 					     -(last_line - dest - extra), 0L);
@@ -983,36 +983,36 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
     /*
      * Now we delete the original text -- webb
      */
-    if (u_save(line1 + extra - 1, line2 + extra + 1) == FAIL)
-	return FAIL;
+    もし (u_save(line1 + extra - 1, line2 + extra + 1) == FAIL)
+	戻る FAIL;
 
-    for (l = line1; l <= line2; l++)
+    ために (l = line1; l <= line2; l++)
 	ml_delete_flags(line1 + extra, ML_DEL_MESSAGE);
 
-    if (!global_busy && num_lines > p_report)
+    もし (!global_busy && num_lines > p_report)
 	smsg(NGETTEXT("%ld line moved", "%ld lines moved", num_lines),
 			(long)num_lines);
 
     /*
      * Leave the cursor on the last of the moved lines.
      */
-    if (dest >= line1)
+    もし (dest >= line1)
 	curwin->w_cursor.lnum = dest;
-    else
+    否则
 	curwin->w_cursor.lnum = dest + (line2 - line1) + 1;
 
-    if (line1 < dest)
+    もし (line1 < dest)
     {
 	dest += num_lines + 1;
 	last_line = curbuf->b_ml.ml_line_count;
-	if (dest > last_line + 1)
+	もし (dest > last_line + 1)
 	    dest = last_line + 1;
 	changed_lines(line1, 0, dest, 0L);
     }
-    else
+    否则
 	changed_lines(dest + 1, 0, line1 + num_lines, 0L);
 
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -1025,7 +1025,7 @@ ex_copy(linenr_T line1, linenr_T line2, linenr_T n)
     char_u	*p;
 
     count = line2 - line1 + 1;
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    もし ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	curbuf->b_op_start.lnum = n + 1;
 	curbuf->b_op_end.lnum = n + count;
@@ -1043,33 +1043,33 @@ ex_copy(linenr_T line1, linenr_T line2, linenr_T n)
      * line1 = start of source (while copying)
      * line2 = end of source (while copying)
      */
-    if (u_save(n, n + 1) == FAIL)
-	return;
+    もし (u_save(n, n + 1) == FAIL)
+	戻る;
 
     curwin->w_cursor.lnum = n;
-    while (line1 <= line2)
+    ながら (line1 <= line2)
     {
 	// need to make a copy because the line will be unlocked within
 	// ml_append()
 	p = vim_strnsave(ml_get(line1), ml_get_len(line1));
-	if (p != NULL)
+	もし (p != NULL)
 	{
 	    ml_append(curwin->w_cursor.lnum, p, (colnr_T)0, FALSE);
 	    vim_free(p);
 	}
 	// situation 2: skip already copied lines
-	if (line1 == n)
+	もし (line1 == n)
 	    line1 = curwin->w_cursor.lnum;
 	++line1;
-	if (curwin->w_cursor.lnum < line1)
+	もし (curwin->w_cursor.lnum < line1)
 	    ++line1;
-	if (curwin->w_cursor.lnum < line2)
+	もし (curwin->w_cursor.lnum < line2)
 	    ++line2;
 	++curwin->w_cursor.lnum;
     }
 
     appended_lines_mark(n, count);
-    if (VIsual_active)
+    もし (VIsual_active)
 	check_pos(curbuf, &VIsual);
 
     msgmore((long)count);
@@ -1077,7 +1077,7 @@ ex_copy(linenr_T line1, linenr_T line2, linenr_T n)
 
 static char_u	*prevcmd = NULL;	// the previous command
 
-#if defined(EXITFREE)
+#もし defined(EXITFREE)
     void
 free_prev_shellcmd(void)
 {
@@ -1089,15 +1089,15 @@ free_prev_shellcmd(void)
  * Check that "prevcmd" is not NULL.  If it is NULL then give an error message
  * and return FALSE.
  */
-    static int
+    static 整数
 prevcmd_is_set(void)
 {
-    if (prevcmd == NULL)
+    もし (prevcmd == NULL)
     {
 	emsg(_(e_no_previous_command));
-	return FALSE;
+	戻る FALSE;
     }
-    return TRUE;
+    戻る TRUE;
 }
 
 /*
@@ -1107,33 +1107,33 @@ prevcmd_is_set(void)
  */
     void
 do_bang(
-    int		addr_count,
+    整数		addr_count,
     exarg_T	*eap,
-    int		forceit,
-    int		do_in,
-    int		do_out)
+    整数		forceit,
+    整数		do_in,
+    整数		do_out)
 {
     char_u		*arg = eap->arg;	// command
     linenr_T		line1 = eap->line1;	// start of range
     linenr_T		line2 = eap->line2;	// end of range
     char_u		*newcmd = NULL;		// the new command
-    int			free_newcmd = FALSE;    // need to free() newcmd
-    int			ins_prevcmd;
+    整数			free_newcmd = FALSE;    // need to free() newcmd
+    整数			ins_prevcmd;
     char_u		*t;
     char_u		*p;
     char_u		*trailarg;
-    int			len;
-    int			scroll_save = msg_scroll;
+    整数			len;
+    整数			scroll_save = msg_scroll;
 
     /*
      * Disallow shell commands for "rvim".
      * Disallow shell commands from .exrc and .vimrc in current directory for
      * security reasons.
      */
-    if (check_restricted() || check_secure())
-	return;
+    もし (check_restricted() || check_secure())
+	戻る;
 
-    if (addr_count == 0)		// :!
+    もし (addr_count == 0)		// :!
     {
 	msg_scroll = FALSE;	    // don't scroll here
 	autowrite_all();
@@ -1150,27 +1150,27 @@ do_bang(
     trailarg = skipwhite(arg);
     do
     {
-	len = (int)STRLEN(trailarg) + 1;
-	if (newcmd != NULL)
-	    len += (int)STRLEN(newcmd);
-	if (ins_prevcmd)
+	len = (整数)STRLEN(trailarg) + 1;
+	もし (newcmd != NULL)
+	    len += (整数)STRLEN(newcmd);
+	もし (ins_prevcmd)
 	{
-	    if (!prevcmd_is_set())
+	    もし (!prevcmd_is_set())
 	    {
 		vim_free(newcmd);
-		return;
+		戻る;
 	    }
-	    len += (int)STRLEN(prevcmd);
+	    len += (整数)STRLEN(prevcmd);
 	}
-	if ((t = alloc(len)) == NULL)
+	もし ((t = alloc(len)) == NULL)
 	{
 	    vim_free(newcmd);
-	    return;
+	    戻る;
 	}
 	*t = NUL;
-	if (newcmd != NULL)
+	もし (newcmd != NULL)
 	    STRCAT(t, newcmd);
-	if (ins_prevcmd)
+	もし (ins_prevcmd)
 	    STRCAT(t, prevcmd);
 	p = t + STRLEN(t);
 	STRCAT(t, trailarg);
@@ -1182,13 +1182,13 @@ do_bang(
 	 * previous command.  "\!" is replaced by "!" (this is vi compatible).
 	 */
 	trailarg = NULL;
-	while (*p)
+	ながら (*p)
 	{
-	    if (*p == '!')
+	    もし (*p == '!')
 	    {
-		if (p > newcmd && p[-1] == '\\')
+		もし (p > newcmd && p[-1] == '\\')
 		    STRMOVE(p - 1, p);
-		else
+		否则
 		{
 		    trailarg = p;
 		    *trailarg++ = NUL;
@@ -1198,21 +1198,21 @@ do_bang(
 	    }
 	    ++p;
 	}
-    } while (trailarg != NULL);
+    } ながら (trailarg != NULL);
 
     // Only set "prevcmd" if there is a command to run, otherwise keep te one
     // we have.
-    if (STRLEN(newcmd) > 0)
+    もし (STRLEN(newcmd) > 0)
     {
 	vim_free(prevcmd);
 	prevcmd = newcmd;
     }
-    else
+    否则
 	free_newcmd = TRUE;
 
-    if (bangredo)	    // put cmd in redo buffer for ! command
+    もし (bangredo)	    // put cmd in redo buffer for ! command
     {
-	if (!prevcmd_is_set())
+	もし (!prevcmd_is_set())
 	    goto theend;
 
 	// If % or # appears in the command, it must have been escaped.
@@ -1220,12 +1220,12 @@ do_bang(
 	// buffername.
 	char_u *cmd = vim_strsave_escaped(prevcmd, (char_u *)"%#");
 
-	if (cmd != NULL)
+	もし (cmd != NULL)
 	{
 	    AppendToRedobuffLit(cmd, -1);
 	    vim_free(cmd);
 	}
-	else
+	否则
 	    AppendToRedobuffLit(prevcmd, -1);
 	AppendToRedobuff((char_u *)"\n");
 	bangredo = FALSE;
@@ -1233,19 +1233,19 @@ do_bang(
     /*
      * Add quotes around the command, for shells that need them.
      */
-    if (*p_shq != NUL)
+    もし (*p_shq != NUL)
     {
-	if (free_newcmd)
+	もし (free_newcmd)
 	    vim_free(newcmd);
 	newcmd = alloc(STRLEN(prevcmd) + 2 * STRLEN(p_shq) + 1);
-	if (newcmd == NULL)
-	    return;
+	もし (newcmd == NULL)
+	    戻る;
 	STRCPY(newcmd, p_shq);
 	STRCAT(newcmd, prevcmd);
 	STRCAT(newcmd, p_shq);
 	free_newcmd = TRUE;
     }
-    if (addr_count == 0)		// :!
+    もし (addr_count == 0)		// :!
     {
 	// echo the command
 	msg_start();
@@ -1257,7 +1257,7 @@ do_bang(
 
 	do_shell(newcmd, 0);
     }
-    else				// :range!
+    否则				// :range!
     {
 	// Careful: This may recursively call do_bang() again! (because of
 	// autocommands)
@@ -1266,7 +1266,7 @@ do_bang(
     }
 
 theend:
-    if (free_newcmd)
+    もし (free_newcmd)
 	vim_free(newcmd);
 }
 
@@ -1291,8 +1291,8 @@ do_filter(
     linenr_T	line2,
     exarg_T	*eap,		// for forced 'ff' and 'fenc'
     char_u	*cmd,
-    int		do_in,
-    int		do_out)
+    整数		do_in,
+    整数		do_out)
 {
     char_u	*itmp = NULL;
     char_u	*otmp = NULL;
@@ -1301,16 +1301,16 @@ do_filter(
     pos_T	cursor_save;
     char_u	*cmd_buf;
     buf_T	*old_curbuf = curbuf;
-    int		shell_flags = 0;
+    整数		shell_flags = 0;
     pos_T	orig_start = curbuf->b_op_start;
     pos_T	orig_end = curbuf->b_op_end;
-    int		save_cmod_flags = cmdmod.cmod_flags;
+    整数		save_cmod_flags = cmdmod.cmod_flags;
 #ifdef FEAT_FILTERPIPE
-    int		stmp = p_stmp;
+    整数		stmp = p_stmp;
 #endif
 
-    if (*cmd == NUL)	    // no filter command
-	return;
+    もし (*cmd == NUL)	    // no filter command
+	戻る;
 
     // Temporarily disable lockmarks since that's needed to propagate changed
     // regions of the buffer for foldUpdate(), linecount, etc.
@@ -1336,29 +1336,29 @@ do_filter(
      * pipe only need to do 3.
      */
 
-    if (do_out)
+    もし (do_out)
 	shell_flags |= SHELL_DOOUT;
 
 #ifdef FEAT_FILTERPIPE
 # ifdef VIMDLL
-    if (!gui.in_use && !gui.starting)
+    もし (!gui.in_use && !gui.starting)
 	stmp = 1;   // Console mode doesn't support filterpipe.
 # endif
 
-    if (!do_in && do_out && !stmp)
+    もし (!do_in && do_out && !stmp)
     {
 	// Use a pipe to fetch stdout of the command, do not use a temp file.
 	shell_flags |= SHELL_READ;
 	curwin->w_cursor.lnum = line2;
     }
-    else if (do_in && !do_out && !stmp)
+    否则 もし (do_in && !do_out && !stmp)
     {
 	// Use a pipe to write stdin of the command, do not use a temp file.
 	shell_flags |= SHELL_WRITE;
 	curbuf->b_op_start.lnum = line1;
 	curbuf->b_op_end.lnum = line2;
     }
-    else if (do_in && do_out && !stmp)
+    否则 もし (do_in && do_out && !stmp)
     {
 	// Use a pipe to write stdin and fetch stdout of the command, do not
 	// use a temp file.
@@ -1367,9 +1367,9 @@ do_filter(
 	curbuf->b_op_end.lnum = line2;
 	curwin->w_cursor.lnum = line2;
     }
-    else
+    否则
 #endif
-	if ((do_in && (itmp = vim_tempname('i', FALSE)) == NULL)
+	もし ((do_in && (itmp = vim_tempname('i', FALSE)) == NULL)
 		|| (do_out && (otmp = vim_tempname('o', FALSE)) == NULL))
 	{
 	    emsg(_(e_cant_get_temp_file_name));
@@ -1381,30 +1381,30 @@ do_filter(
  * Vi also doesn't do this and the messages are not very informative.
  */
     ++no_wait_return;		// don't call wait_return() while busy
-    if (itmp != NULL && buf_write(curbuf, itmp, NULL, line1, line2, eap,
+    もし (itmp != NULL && buf_write(curbuf, itmp, NULL, line1, line2, eap,
 					   FALSE, FALSE, FALSE, TRUE) == FAIL)
     {
 	msg_putchar('\n');		// keep message from buf_write()
 	--no_wait_return;
-#if defined(FEAT_EVAL)
-	if (!aborting())
+#もし defined(FEAT_EVAL)
+	もし (!aborting())
 #endif
 	    // will call wait_return()
 	    (void)semsg(_(e_cant_create_file_str), itmp);
 	goto filterend;
     }
-    if (curbuf != old_curbuf)
+    もし (curbuf != old_curbuf)
 	goto filterend;
 
-    if (!do_out)
+    もし (!do_out)
 	msg_putchar('\n');
 
     // Create the shell command in allocated memory.
     cmd_buf = make_filter_cmd(cmd, itmp, otmp);
-    if (cmd_buf == NULL)
+    もし (cmd_buf == NULL)
 	goto filterend;
 
-    windgoto((int)Rows - 1, cmdline_col_off);
+    windgoto((整数)Rows - 1, cmdline_col_off);
     cursor_on();
 
     /*
@@ -1414,12 +1414,12 @@ do_filter(
      * If do_in is FALSE, this could be something like ":r !cat", which may
      * also mess up the screen, clear it later.
      */
-    if (!do_out || STRCMP(p_srr, ">") == 0 || !do_in)
+    もし (!do_out || STRCMP(p_srr, ">") == 0 || !do_in)
 	redraw_later_clear();
 
-    if (do_out)
+    もし (do_out)
     {
-	if (u_save(line2, (linenr_T)(line2 + 1)) == FAIL)
+	もし (u_save(line2, (linenr_T)(line2 + 1)) == FAIL)
 	{
 	    vim_free(cmd_buf);
 	    goto error;
@@ -1437,7 +1437,7 @@ do_filter(
      * like ":r !cat" hangs.
      * Pass on the SHELL_DOOUT flag when the output is being redirected.
      */
-    if (call_shell(cmd_buf, SHELL_FILTER | SHELL_COOKED | shell_flags))
+    もし (call_shell(cmd_buf, SHELL_FILTER | SHELL_COOKED | shell_flags))
     {
 	redraw_later_clear();
 	wait_return(FALSE);
@@ -1453,15 +1453,15 @@ do_filter(
     ui_breakcheck();
     got_int = FALSE;
 
-    if (do_out)
+    もし (do_out)
     {
-	if (otmp != NULL)
+	もし (otmp != NULL)
 	{
-	    if (readfile(otmp, NULL, line2, (linenr_T)0, (linenr_T)MAXLNUM,
+	    もし (readfile(otmp, NULL, line2, (linenr_T)0, (linenr_T)MAXLNUM,
 						    eap, READ_FILTER) != OK)
 	    {
-#if defined(FEAT_EVAL)
-		if (!aborting())
+#もし defined(FEAT_EVAL)
+		もし (!aborting())
 #endif
 		{
 		    msg_putchar('\n');
@@ -1469,28 +1469,28 @@ do_filter(
 		}
 		goto error;
 	    }
-	    if (curbuf != old_curbuf)
+	    もし (curbuf != old_curbuf)
 		goto filterend;
 	}
 
 	read_linecount = curbuf->b_ml.ml_line_count - read_linecount;
 
-	if (shell_flags & SHELL_READ)
+	もし (shell_flags & SHELL_READ)
 	{
 	    curbuf->b_op_start.lnum = line2 + 1;
 	    curbuf->b_op_end.lnum = curwin->w_cursor.lnum;
 	    appended_lines_mark(line2, read_linecount);
 	}
 
-	if (do_in)
+	もし (do_in)
 	{
-	    if ((cmdmod.cmod_flags & CMOD_KEEPMARKS)
+	    もし ((cmdmod.cmod_flags & CMOD_KEEPMARKS)
 				     || vim_strchr(p_cpo, CPO_REMMARK) == NULL)
 	    {
-		if (read_linecount >= linecount)
+		もし (read_linecount >= linecount)
 		    // move all marks from old lines to new lines
 		    mark_adjust(line1, line2, linecount, 0L);
-		else if (save_cmod_flags & CMOD_LOCKMARKS)
+		否则 もし (save_cmod_flags & CMOD_LOCKMARKS)
 		{
 		    // Move marks from the lines below the new lines down by
 		    // the number of lines lost.
@@ -1500,7 +1500,7 @@ do_filter(
 					       linecount - read_linecount, 0L);
 		    mark_adjust(line1, line2, linecount, 0L);
 		}
-		else
+		否则
 		{
 		    // move marks from old lines to new lines, delete marks
 		    // that are in deleted lines
@@ -1516,14 +1516,14 @@ do_filter(
 	     */
 	    curwin->w_cursor.lnum = line1;
 	    del_lines(linecount, TRUE);
-	    if (read_linecount == 0)
+	    もし (read_linecount == 0)
 	    {
 		// no filter output: clamp '[ and '] to a valid line
 		curbuf->b_op_start.lnum = curbuf->b_op_end.lnum =
 					MIN(line1, curbuf->b_ml.ml_line_count);
 		curbuf->b_op_start.col = curbuf->b_op_end.col = 0;
 	    }
-	    else
+	    否则
 	    {
 		curbuf->b_op_start.lnum -= linecount;	// adjust '[
 		curbuf->b_op_end.lnum -= linecount;	// adjust ']
@@ -1534,7 +1534,7 @@ do_filter(
 	    foldUpdate(curwin, curbuf->b_op_start.lnum, curbuf->b_op_end.lnum);
 #endif
 	}
-	else
+	否则
 	{
 	    /*
 	     * Put cursor on last new line for ":r !cmd".
@@ -1546,21 +1546,21 @@ do_filter(
 	beginline(BL_WHITE | BL_FIX);	    // cursor on first non-blank
 	--no_wait_return;
 
-	if (linecount > p_report)
+	もし (linecount > p_report)
 	{
-	    if (do_in)
+	    もし (do_in)
 	    {
 		vim_snprintf(msg_buf, sizeof(msg_buf),
 				    _("%ld lines filtered"), (long)linecount);
-		if (msg(msg_buf) && !msg_scroll)
+		もし (msg(msg_buf) && !msg_scroll)
 		    // save message to display it after redraw
 		    set_keep_msg((char_u *)msg_buf, 0);
 	    }
-	    else
+	    否则
 		msgmore((long)linecount);
 	}
     }
-    else
+    否则
     {
 error:
 	// put cursor back in same position for ":w !cmd"
@@ -1572,20 +1572,20 @@ error:
 filterend:
 
     cmdmod.cmod_flags = save_cmod_flags;
-    if (curbuf != old_curbuf)
+    もし (curbuf != old_curbuf)
     {
 	--no_wait_return;
 	emsg(_(e_filter_autocommands_must_not_change_current_buffer));
     }
-    else if (cmdmod.cmod_flags & CMOD_LOCKMARKS)
+    否则 もし (cmdmod.cmod_flags & CMOD_LOCKMARKS)
     {
 	curbuf->b_op_start = orig_start;
 	curbuf->b_op_end = orig_end;
     }
 
-    if (itmp != NULL)
+    もし (itmp != NULL)
 	mch_remove(itmp);
-    if (otmp != NULL)
+    もし (otmp != NULL)
 	mch_remove(otmp);
     vim_free(itmp);
     vim_free(otmp);
@@ -1598,38 +1598,38 @@ filterend:
     void
 do_shell(
     char_u	*cmd,
-    int		flags)	// may be SHELL_DOOUT when output is redirected
+    整数		flags)	// may be SHELL_DOOUT when output is redirected
 {
     buf_T	*buf;
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    int		save_nwr;
+#もし !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    整数		save_nwr;
 #endif
 #ifdef MSWIN
-    int		winstart = FALSE;
+    整数		winstart = FALSE;
 #endif
-    int		keep_termcap = !termcap_active;
+    整数		keep_termcap = !termcap_active;
 
     /*
      * Disallow shell commands for "rvim".
      * Disallow shell commands from .exrc and .vimrc in current directory for
      * security reasons.
      */
-    if (check_restricted() || check_secure())
+    もし (check_restricted() || check_secure())
     {
 	msg_end();
-	return;
+	戻る;
     }
 
 #ifdef MSWIN
     /*
      * Check if ":!start" is used.  This implies not stopping termcap mode.
      */
-    if (cmd != NULL)
+    もし (cmd != NULL)
 	keep_termcap = winstart = (STRNICMP(cmd, "start ", 6) == 0);
 
-# if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+# もし defined(FEAT_GUI) && defined(FEAT_TERMINAL)
     // Don't stop termcap mode when using a terminal window for the shell.
-    if (gui.in_use && vim_strchr(p_go, GO_TERMINAL) != NULL)
+    もし (gui.in_use && vim_strchr(p_go, GO_TERMINAL) != NULL)
 	keep_termcap = TRUE;
 # endif
 #endif
@@ -1639,28 +1639,28 @@ do_shell(
      * avoid having to type return below.
      */
     msg_putchar('\r');			// put cursor at start of line
-    if (!autocmd_busy)
+    もし (!autocmd_busy)
     {
-	if (!keep_termcap)
+	もし (!keep_termcap)
 	    stoptermcap();
     }
 #ifdef MSWIN
-    if (!winstart)
+    もし (!winstart)
 #endif
 	msg_putchar('\n');		// may shift screen one line up
 
     // warning message before calling the shell
-    if (p_warn && !autocmd_busy && msg_silent == 0)
+    もし (p_warn && !autocmd_busy && msg_silent == 0)
 	FOR_ALL_BUFFERS(buf)
-	    if (bufIsChangedNotTerm(buf))
+	    もし (bufIsChangedNotTerm(buf))
 	    {
 #ifdef FEAT_GUI_MSWIN
-		if (!keep_termcap)
+		もし (!keep_termcap)
 		    starttermcap();	// don't want a message box here
 #endif
 		msg_puts(_("[No write since last change]\n"));
 #ifdef FEAT_GUI_MSWIN
-		if (!keep_termcap)
+		もし (!keep_termcap)
 		    stoptermcap();
 #endif
 		break;
@@ -1668,7 +1668,7 @@ do_shell(
 
     // This windgoto is required for when the '\n' resulted in a "delete line
     // 1" command to the terminal.
-    if (!swapping_screen())
+    もし (!swapping_screen())
 	windgoto(msg_row, cmdline_col_off + msg_col);
     cursor_on();
     (void)call_shell(cmd, SHELL_COOKED | flags);
@@ -1679,18 +1679,18 @@ do_shell(
      * put the message cursor at the end of the screen, avoids wait_return()
      * to overwrite the text that the external command showed
      */
-    if (!swapping_screen())
+    もし (!swapping_screen())
     {
 	msg_row = Rows - 1;
 	msg_col = 0;
     }
 
-    if (autocmd_busy)
+    もし (autocmd_busy)
     {
-	if (msg_silent == 0)
+	もし (msg_silent == 0)
 	    redraw_later_clear();
     }
-    else
+    否则
     {
 	/*
 	 * For ":sh" there is no need to call wait_return(), just redraw.
@@ -1698,40 +1698,40 @@ do_shell(
 	 * Otherwise there is probably text on the screen that the user wants
 	 * to read before redrawing, so call wait_return().
 	 */
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#もし !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 # ifdef VIMDLL
-	if (!gui.in_use)
+	もし (!gui.in_use)
 # endif
 	{
-	    if (cmd == NULL
+	    もし (cmd == NULL
 # ifdef MSWIN
 		    || (keep_termcap && !need_wait_return)
 # endif
 	       )
 	    {
-		if (msg_silent == 0)
+		もし (msg_silent == 0)
 		    redraw_later_clear();
 		need_wait_return = FALSE;
 	    }
-	    else
+	    否则
 	    {
 		/*
 		 * If we switch screens when starttermcap() is called, we
 		 * really want to wait for "hit return to continue".
 		 */
 		save_nwr = no_wait_return;
-		if (swapping_screen())
+		もし (swapping_screen())
 		    no_wait_return = FALSE;
 		// ":silent" leaves the output of the command on the screen,
 		// except where it cannot be seen there anyway.
-		int redraw = msg_silent == 0 || swapping_screen();
+		整数 redraw = msg_silent == 0 || swapping_screen();
 # ifdef FEAT_GUI
-		if (gui.in_use)
+		もし (gui.in_use)
 		    redraw = TRUE;
 # endif
 # ifdef AMIGA
 		wait_return(term_console ? -1 : redraw); // see below
-# else
+# 否则
 		wait_return(redraw);
 # endif
 		no_wait_return = save_nwr;
@@ -1739,7 +1739,7 @@ do_shell(
 	}
 #endif // FEAT_GUI_MSWIN
 
-	if (!keep_termcap)	// if keep_termcap is TRUE didn't stop termcap
+	もし (!keep_termcap)	// if keep_termcap is TRUE didn't stop termcap
 	    starttermcap();	// start termcap if not done by wait_return()
 
 	/*
@@ -1750,17 +1750,17 @@ do_shell(
 	 * but it saves an extra redraw.
 	 */
 #ifdef AMIGA
-	if (skip_redraw)		// ':' hit in wait_return()
+	もし (skip_redraw)		// ':' hit in wait_return()
 	{
-	    if (msg_silent == 0)
+	    もし (msg_silent == 0)
 		redraw_later_clear();
 	}
-	else if (term_console)
+	否则 もし (term_console)
 	{
 	    OUT_STR("\033[0 q");	// get window size
-	    if (got_int && msg_silent == 0)
+	    もし (got_int && msg_silent == 0)
 		redraw_later_clear();	// if got_int is TRUE, redraw needed
-	    else
+	    否则
 		must_redraw = 0;	// no extra redraw needed
 	}
 #endif
@@ -1772,23 +1772,23 @@ do_shell(
     apply_autocmds(EVENT_SHELLCMDPOST, NULL, NULL, FALSE, curbuf);
 }
 
-#if !defined(UNIX)
+#もし !defined(UNIX)
     static char_u *
 find_pipe(char_u *cmd)
 {
     char_u  *p;
-    int	    inquote = FALSE;
+    整数	    inquote = FALSE;
 
-    for (p = cmd; *p != NUL; ++p)
+    ために (p = cmd; *p != NUL; ++p)
     {
-	if (!inquote && *p == '|')
-	    return p;
-	if (*p == '"')
+	もし (!inquote && *p == '|')
+	    戻る p;
+	もし (*p == '"')
 	    inquote = !inquote;
-	else if (rem_backslash(p))
+	否则 もし (rem_backslash(p))
 	    ++p;
     }
-    return NULL;
+    戻る NULL;
 }
 #endif
 
@@ -1805,21 +1805,21 @@ make_filter_cmd(
 {
     char_u	*buf;
     long_u	len;
-    int		is_powershell = FALSE;
+    整数		is_powershell = FALSE;
 #ifdef UNIX
-    int		is_fish_shell;
+    整数		is_fish_shell;
 #endif
 
     char_u *shell_name = get_isolated_shell_name();
-    if (shell_name == NULL)
-	return NULL;
+    もし (shell_name == NULL)
+	戻る NULL;
 
-#if defined(UNIX)
+#もし defined(UNIX)
     // Account for fish's different syntax for subshells
     is_fish_shell = fnamecmp(shell_name, "fish") == 0;
-    if (is_fish_shell)
+    もし (is_fish_shell)
 	len = (long_u)STRLEN(cmd) + 13;		// "begin; " + "; end" + NUL
-    else
+    否则
 #endif
     {
 	is_powershell = (shell_name[0] == 'p')
@@ -1827,93 +1827,93 @@ make_filter_cmd(
 				|| fnamecmp(shell_name, "powershell.exe") == 0
 				|| fnamecmp(shell_name, "pwsh") == 0
 				|| fnamecmp(shell_name, "pwsh.exe") == 0);
-	if (is_powershell)
+	もし (is_powershell)
 	    len = (long_u)STRLEN(cmd) + 7; // "& { " + " }" + NUL
-	else
+	否则
 	    len = (long_u)STRLEN(cmd) + 3; // "()" + NUL
     }
 
-    if (itmp != NULL)
+    もし (itmp != NULL)
     {
-	if (is_powershell)
+	もし (is_powershell)
 	    // "Get-Content " + " | & "
 	    len += (long_u)STRLEN(itmp) + 17;
-	else
+	否则
 	    len += (long_u)STRLEN(itmp) + 9;	// " { < " + " } "
     }
-    if (otmp != NULL)
+    もし (otmp != NULL)
 	len += (long_u)STRLEN(otmp) + (long_u)STRLEN(p_srr) + 2; // "  "
 
     vim_free(shell_name);
 
     buf = alloc(len);
-    if (buf == NULL)
-	return NULL;
+    もし (buf == NULL)
+	戻る NULL;
 
-    if (is_powershell)
+    もし (is_powershell)
     {
-	if (itmp != NULL)
+	もし (itmp != NULL)
 	    vim_snprintf((char *)buf, len, "& { Get-Content %s | & %s }",
 								itmp, cmd);
-	else
+	否则
 	    vim_snprintf((char *)buf, len, "& { %s }", cmd);
     }
-    else
+    否则
     {
-#if defined(UNIX)
+#もし defined(UNIX)
 	// Put braces around the command (for concatenated commands) when
 	// redirecting input and/or output.
-	if (itmp != NULL || otmp != NULL)
+	もし (itmp != NULL || otmp != NULL)
 	{
-	    if (is_fish_shell)
+	    もし (is_fish_shell)
 		vim_snprintf((char *)buf, len, "begin; %s; end", (char *)cmd);
-	    else
+	    否则
 		vim_snprintf((char *)buf, len, "(%s)", (char *)cmd);
 	}
-	else
+	否则
 	    STRCPY(buf, cmd);
-	if (itmp != NULL)
+	もし (itmp != NULL)
 	{
 	    STRCAT(buf, " < ");
 	    STRCAT(buf, itmp);
 	}
-#else
+#否则
 	// For shells that don't understand braces around commands, at least
 	// allow the use of commands in a pipe.
-	if (*p_sxe != NUL && *p_sxq == '(')
+	もし (*p_sxe != NUL && *p_sxq == '(')
 	{
-	    if (itmp != NULL || otmp != NULL)
+	    もし (itmp != NULL || otmp != NULL)
 		vim_snprintf((char *)buf, len, "(%s)", (char *)cmd);
-	    else
+	    否则
 		STRCPY(buf, cmd);
-	    if (itmp != NULL)
+	    もし (itmp != NULL)
 	    {
 		STRCAT(buf, " < ");
 		STRCAT(buf, itmp);
 	    }
 	}
-	else
+	否则
 	{
 	    STRCPY(buf, cmd);
-	    if (itmp != NULL)
+	    もし (itmp != NULL)
 	    {
 		char_u	*p;
 
 		// If there is a pipe, we have to put the '<' in front of it.
 		// Don't do this when 'shellquote' is not empty, otherwise the
 		// redirection would be inside the quotes.
-		if (*p_shq == NUL)
+		もし (*p_shq == NUL)
 		{
 		    p = find_pipe(buf);
-		    if (p != NULL)
+		    もし (p != NULL)
 			*p = NUL;
 		}
 		STRCAT(buf, " <");	// " < " causes problems on Amiga
 		STRCAT(buf, itmp);
-		if (*p_shq == NUL)
+		もし (*p_shq == NUL)
 		{
 		    p = find_pipe(cmd);
-		    if (p != NULL)
+		    もし (p != NULL)
 		    {
 			// insert a space before the '|' for DOS
 			STRCAT(buf, " ");
@@ -1924,10 +1924,10 @@ make_filter_cmd(
 	}
 #endif
     }
-    if (otmp != NULL)
-	append_redir(buf, (int)len, p_srr, otmp);
+    もし (otmp != NULL)
+	append_redir(buf, (整数)len, p_srr, otmp);
 
-    return buf;
+    戻る buf;
 }
 
 /*
@@ -1940,7 +1940,7 @@ make_filter_cmd(
     void
 append_redir(
     char_u	*buf,
-    int		buflen,
+    整数		buflen,
     char_u	*opt,
     char_u	*fname)
 {
@@ -1949,14 +1949,14 @@ append_redir(
 
     end = buf + STRLEN(buf);
     // find "%s"
-    for (p = opt; (p = vim_strchr(p, '%')) != NULL; ++p)
+    ために (p = opt; (p = vim_strchr(p, '%')) != NULL; ++p)
     {
-	if (p[1] == 's') // found %s
+	もし (p[1] == 's') // found %s
 	    break;
-	if (p[1] == '%') // skip %%
+	もし (p[1] == '%') // skip %%
 	    ++p;
     }
-    if (p != NULL)
+    もし (p != NULL)
     {
 #ifdef MSWIN
 	*end++ = ' '; // not really needed? Not with sh, ksh or bash
@@ -1964,7 +1964,7 @@ append_redir(
 	vim_snprintf((char *)end, (size_t)(buflen - (end - buf)),
 						  (char *)opt, (char *)fname);
     }
-    else
+    否则
 	vim_snprintf((char *)end, (size_t)(buflen - (end - buf)), " %s %s",
 		(char *)opt, (char *)fname);
 }
@@ -1988,12 +1988,12 @@ do_fixdel(exarg_T *eap UNUSED)
     void
 print_line_no_prefix(
     linenr_T	lnum,
-    int		use_number,
-    int		list)
+    整数		use_number,
+    整数		list)
 {
     char	numbuf[30];
 
-    if (curwin->w_p_nu || use_number)
+    もし (curwin->w_p_nu || use_number)
     {
 	vim_snprintf(numbuf, sizeof(numbuf),
 				   "%*ld ", number_width(curwin), (long)lnum);
@@ -2006,19 +2006,19 @@ print_line_no_prefix(
  * Print a text line.  Also in silent mode ("ex -s").
  */
     void
-print_line(linenr_T lnum, int use_number, int list)
+print_line(linenr_T lnum, 整数 use_number, 整数 list)
 {
-    int		save_silent = silent_mode;
+    整数		save_silent = silent_mode;
 
     // apply :filter /pat/
-    if (message_filtered(ml_get(lnum)))
-	return;
+    もし (message_filtered(ml_get(lnum)))
+	戻る;
 
     msg_start();
     silent_mode = FALSE;
     info_message = TRUE;	// use mch_msg(), not mch_errmsg()
     print_line_no_prefix(lnum, use_number, list);
-    if (save_silent)
+    もし (save_silent)
     {
 	msg_putchar('\n');
 	cursor_on();		// msg_start() switches it off
@@ -2028,7 +2028,7 @@ print_line(linenr_T lnum, int use_number, int list)
     info_message = FALSE;
 }
 
-    int
+    整数
 rename_buffer(char_u *new_fname)
 {
     char_u	*fname, *sfname, *xfname;
@@ -2037,11 +2037,11 @@ rename_buffer(char_u *new_fname)
     buf = curbuf;
     apply_autocmds(EVENT_BUFFILEPRE, NULL, NULL, FALSE, curbuf);
     // buffer changed, don't change name now
-    if (buf != curbuf)
-	return FAIL;
+    もし (buf != curbuf)
+	戻る FAIL;
 #ifdef FEAT_EVAL
-    if (aborting())	    // autocmds may abort script processing
-	return FAIL;
+    もし (aborting())	    // autocmds may abort script processing
+	戻る FAIL;
 #endif
     /*
      * The name of the current buffer will be changed.
@@ -2055,17 +2055,17 @@ rename_buffer(char_u *new_fname)
     xfname = curbuf->b_fname;
     curbuf->b_ffname = NULL;
     curbuf->b_sfname = NULL;
-    if (setfname(curbuf, new_fname, NULL, TRUE) == FAIL)
+    もし (setfname(curbuf, new_fname, NULL, TRUE) == FAIL)
     {
 	curbuf->b_ffname = fname;
 	curbuf->b_sfname = sfname;
-	return FAIL;
+	戻る FAIL;
     }
     curbuf->b_flags |= BF_NOTEDITED;
-    if (xfname != NULL && *xfname != NUL)
+    もし (xfname != NULL && *xfname != NUL)
     {
 	buf = buflist_new(fname, xfname, curwin->w_cursor.lnum, 0);
-	if (buf != NULL && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+	もし (buf != NULL && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	    curwin->w_alt_fnum = buf->b_fnum;
     }
     vim_free(fname);
@@ -2074,7 +2074,7 @@ rename_buffer(char_u *new_fname)
 
     // Change directories when the 'acd' option is set.
     DO_AUTOCHDIR;
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -2085,27 +2085,27 @@ ex_file(exarg_T *eap)
 {
     // ":0file" removes the file name.  Check for illegal uses ":3file",
     // "0file name", etc.
-    if (eap->addr_count > 0
+    もし (eap->addr_count > 0
 	    && (*eap->arg != NUL
 		|| eap->line2 > 0
 		|| eap->addr_count > 1))
     {
 	emsg(_(e_invalid_argument));
-	return;
+	戻る;
     }
 
-    if (*eap->arg != NUL || eap->addr_count == 1)
+    もし (*eap->arg != NUL || eap->addr_count == 1)
     {
-	if (rename_buffer(eap->arg) == FAIL)
-	    return;
+	もし (rename_buffer(eap->arg) == FAIL)
+	    戻る;
 	redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#もし defined(FEAT_TABPANEL)
 	redraw_tabpanel = TRUE;
 #endif
     }
 
     // print file name if no argument or 'F' is not in 'shortmess'
-    if (*eap->arg == NUL || !shortmess(SHM_FILEINFO))
+    もし (*eap->arg == NUL || !shortmess(SHM_FILEINFO))
 	fileinfo(FALSE, FALSE, eap->forceit);
 }
 
@@ -2115,7 +2115,7 @@ ex_file(exarg_T *eap)
     void
 ex_update(exarg_T *eap)
 {
-    if (curbufIsChanged())
+    もし (curbufIsChanged())
 	(void)do_write(eap);
 }
 
@@ -2125,29 +2125,29 @@ ex_update(exarg_T *eap)
     void
 ex_write(exarg_T *eap)
 {
-    if (eap->cmdidx == CMD_saveas)
+    もし (eap->cmdidx == CMD_saveas)
     {
 	// :saveas does not take a range, uses all lines.
 	eap->line1 = 1;
 	eap->line2 = curbuf->b_ml.ml_line_count;
     }
 
-    if (eap->usefilter)		// input lines to shell command
+    もし (eap->usefilter)		// input lines to shell command
 	do_bang(1, eap, FALSE, TRUE, FALSE);
-    else
+    否则
 	(void)do_write(eap);
 }
 
 #ifdef UNIX
-    static int
+    static 整数
 check_writable(char_u *fname)
 {
-    if (mch_nodetype(fname) == NODE_OTHER)
+    もし (mch_nodetype(fname) == NODE_OTHER)
     {
 	semsg(_(e_str_is_not_file_or_writable_device), fname);
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 #endif
 
@@ -2159,44 +2159,44 @@ check_writable(char_u *fname)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    整数
 do_write(exarg_T *eap)
 {
-    int		other;
+    整数		other;
     char_u	*fname = NULL;		// init to shut up gcc
     char_u	*ffname;
-    int		retval = FAIL;
+    整数		retval = FAIL;
     char_u	*free_fname = NULL;
 #ifdef FEAT_BROWSE
     char_u	*browse_file = NULL;
 #endif
     buf_T	*alt_buf = NULL;
-    int		name_was_missing;
+    整数		name_was_missing;
 
-    if (not_writing())		// check 'write' option
-	return FAIL;
+    もし (not_writing())		// check 'write' option
+	戻る FAIL;
 
     ffname = eap->arg;
 #ifdef FEAT_BROWSE
-    if ((cmdmod.cmod_flags & CMOD_BROWSE) && !exiting)
+    もし ((cmdmod.cmod_flags & CMOD_BROWSE) && !exiting)
     {
 	browse_file = do_browse(BROWSE_SAVE, (char_u *)_("Save As"), ffname,
 						    NULL, NULL, NULL, curbuf);
-	if (browse_file == NULL)
+	もし (browse_file == NULL)
 	    goto theend;
 	ffname = browse_file;
     }
 #endif
-    if (*ffname == NUL)
+    もし (*ffname == NUL)
     {
-	if (eap->cmdidx == CMD_saveas)
+	もし (eap->cmdidx == CMD_saveas)
 	{
 	    emsg(_(e_argument_required));
 	    goto theend;
 	}
 	other = FALSE;
     }
-    else
+    否则
     {
 	fname = ffname;
 	free_fname = fix_fname(ffname);
@@ -2204,7 +2204,7 @@ do_write(exarg_T *eap)
 	 * When out-of-memory, keep unexpanded file name, because we MUST be
 	 * able to write the file in this situation.
 	 */
-	if (free_fname != NULL)
+	もし (free_fname != NULL)
 	    ffname = free_fname;
 	other = otherfile(ffname);
     }
@@ -2212,14 +2212,14 @@ do_write(exarg_T *eap)
     /*
      * If we have a new file, put its name in the list of alternate file names.
      */
-    if (other)
+    もし (other)
     {
-	if (vim_strchr(p_cpo, CPO_ALTWRITE) != NULL
+	もし (vim_strchr(p_cpo, CPO_ALTWRITE) != NULL
 						 || eap->cmdidx == CMD_saveas)
 	    alt_buf = setaltfname(ffname, fname, (linenr_T)1);
-	else
+	否则
 	    alt_buf = buflist_findname(ffname);
-	if (alt_buf != NULL && alt_buf->b_ml.ml_mfp != NULL)
+	もし (alt_buf != NULL && alt_buf->b_ml.ml_mfp != NULL)
 	{
 	    // Overwriting a file that is loaded in another buffer is not a
 	    // good idea.
@@ -2233,35 +2233,35 @@ do_write(exarg_T *eap)
      * and a file name is required.
      * "nofile" and "nowrite" buffers cannot be written implicitly either.
      */
-    if (!other && (bt_dontwrite_msg(curbuf) || check_fname() == FAIL
+    もし (!other && (bt_dontwrite_msg(curbuf) || check_fname() == FAIL
 #ifdef UNIX
 		|| check_writable(curbuf->b_ffname) == FAIL
 #endif
 		|| check_readonly(&eap->forceit, curbuf)))
 	goto theend;
 
-    if (!other)
+    もし (!other)
     {
 	ffname = curbuf->b_ffname;
 	fname = curbuf->b_fname;
 	/*
 	 * Not writing the whole file is only allowed with '!'.
 	 */
-	if (	   (eap->line1 != 1
+	もし (	   (eap->line1 != 1
 		    || eap->line2 != curbuf->b_ml.ml_line_count)
 		&& !eap->forceit
 		&& !eap->append
 		&& !p_wa)
 	{
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
+#もし defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    もし (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
 	    {
-		if (vim_dialog_yesno(VIM_QUESTION, NULL,
+		もし (vim_dialog_yesno(VIM_QUESTION, NULL,
 			       (char_u *)_("Write partial file?"), 2) != VIM_YES)
 		    goto theend;
 		eap->forceit = TRUE;
 	    }
-	    else
+	    否则
 #endif
 	    {
 		emsg(_(e_use_bang_to_write_partial_buffer));
@@ -2270,18 +2270,18 @@ do_write(exarg_T *eap)
 	}
     }
 
-    if (check_overwrite(eap, curbuf, fname, ffname, other) == OK)
+    もし (check_overwrite(eap, curbuf, fname, ffname, other) == OK)
     {
-	if (eap->cmdidx == CMD_saveas && alt_buf != NULL)
+	もし (eap->cmdidx == CMD_saveas && alt_buf != NULL)
 	{
 	    buf_T	*was_curbuf = curbuf;
 
 	    apply_autocmds(EVENT_BUFFILEPRE, NULL, NULL, FALSE, curbuf);
 	    apply_autocmds(EVENT_BUFFILEPRE, NULL, NULL, FALSE, alt_buf);
 #ifdef FEAT_EVAL
-	    if (curbuf != was_curbuf || aborting())
-#else
-	    if (curbuf != was_curbuf)
+	    もし (curbuf != was_curbuf || aborting())
+#否则
+	    もし (curbuf != was_curbuf)
 #endif
 	    {
 		// buffer changed, don't change name now
@@ -2306,15 +2306,15 @@ do_write(exarg_T *eap)
 
 	    apply_autocmds(EVENT_BUFFILEPOST, NULL, NULL, FALSE, curbuf);
 	    apply_autocmds(EVENT_BUFFILEPOST, NULL, NULL, FALSE, alt_buf);
-	    if (!alt_buf->b_p_bl)
+	    もし (!alt_buf->b_p_bl)
 	    {
 		alt_buf->b_p_bl = TRUE;
 		apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, alt_buf);
 	    }
 #ifdef FEAT_EVAL
-	    if (curbuf != was_curbuf || aborting())
-#else
-	    if (curbuf != was_curbuf)
+	    もし (curbuf != was_curbuf || aborting())
+#否则
+	    もし (curbuf != was_curbuf)
 #endif
 	    {
 		// buffer changed, don't write the file
@@ -2323,9 +2323,9 @@ do_write(exarg_T *eap)
 	    }
 
 	    // If 'filetype' was empty try detecting it now.
-	    if (*curbuf->b_p_ft == NUL)
+	    もし (*curbuf->b_p_ft == NUL)
 	    {
-		if (au_has_group((char_u *)"filetypedetect"))
+		もし (au_has_group((char_u *)"filetypedetect"))
 		    (void)do_doautocmd((char_u *)"filetypedetect BufRead",
 								  TRUE, NULL);
 		do_modelines(0);
@@ -2342,13 +2342,13 @@ do_write(exarg_T *eap)
 				 eap, eap->append, eap->forceit, TRUE, FALSE);
 
 	// After ":saveas fname" reset 'readonly'.
-	if (eap->cmdidx == CMD_saveas)
+	もし (eap->cmdidx == CMD_saveas)
 	{
-	    if (retval == OK)
+	    もし (retval == OK)
 	    {
 		curbuf->b_p_ro = FALSE;
 		redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#もし defined(FEAT_TABPANEL)
 		redraw_tabpanel = TRUE;
 #endif
 	    }
@@ -2356,7 +2356,7 @@ do_write(exarg_T *eap)
 
 	// Change directories when the 'acd' option is set and the file name
 	// got changed or set.
-	if (eap->cmdidx == CMD_saveas || name_was_missing)
+	もし (eap->cmdidx == CMD_saveas || name_was_missing)
 	    DO_AUTOCHDIR;
     }
 
@@ -2365,7 +2365,7 @@ theend:
     vim_free(browse_file);
 #endif
     vim_free(free_fname);
-    return retval;
+    戻る retval;
 }
 
 /*
@@ -2374,14 +2374,14 @@ theend:
  * May set eap->forceit if a dialog says it's OK to overwrite.
  * Return OK if it's OK, FAIL if it is not.
  */
-    int
+    整数
 check_overwrite(
     exarg_T	*eap,
     buf_T	*buf,
     char_u	*fname,	    // file name to be used (can differ from
 			    // buf->ffname)
     char_u	*ffname,    // full path version of fname
-    int		other)	    // writing under other name
+    整数		other)	    // writing under other name
 {
     /*
      * Write to another file or b_flags set or not writing the whole file:
@@ -2391,7 +2391,7 @@ check_overwrite(
      * buf_write() will only allow writing with BufWriteCmd autocommands,
      * so there is no need for an overwrite check.
      */
-    if (       (other
+    もし (       (other
 		|| (!bt_nofilename(buf)
 		    && ((buf->b_flags & BF_NOTEDITED)
 			|| ((buf->b_flags & BF_NEW)
@@ -2400,40 +2400,40 @@ check_overwrite(
 	    && !p_wa
 	    && vim_fexists(ffname))
     {
-	if (!eap->forceit && !eap->append)
+	もし (!eap->forceit && !eap->append)
 	{
 #ifdef UNIX
 	    // with UNIX it is possible to open a directory
-	    if (mch_isdir(ffname))
+	    もし (mch_isdir(ffname))
 	    {
 		semsg(_(e_str_is_directory), ffname);
-		return FAIL;
+		戻る FAIL;
 	    }
 #endif
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
+#もし defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    もし (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
 	    {
 		char_u	buff[DIALOG_MSG_SIZE];
 
 		dialog_msg(buff, _("Overwrite existing file \"%s\"?"), fname);
-		if (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 2) != VIM_YES)
-		    return FAIL;
+		もし (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 2) != VIM_YES)
+		    戻る FAIL;
 		eap->forceit = TRUE;
 	    }
-	    else
+	    否则
 #endif
 	    {
 		emsg(_(e_file_exists));
-		return FAIL;
+		戻る FAIL;
 	    }
 	}
 
 	// For ":w! filename" check that no swap file exists for "filename".
-	if (other && !emsg_silent)
+	もし (other && !emsg_silent)
 	{
 	    char_u	*dir;
 	    char_u	*p;
-	    int		r;
+	    整数		r;
 	    char_u	*swapname;
 
 	    // We only try the first entry in 'directory', without checking if
@@ -2441,54 +2441,54 @@ check_overwrite(
 	    // will probably fail anyway.
 	    // Use 'shortname' of the current buffer, since there is no buffer
 	    // for the written file.
-	    if (*p_dir == NUL)
+	    もし (*p_dir == NUL)
 	    {
 		dir = alloc(5);
-		if (dir == NULL)
-		    return FAIL;
+		もし (dir == NULL)
+		    戻る FAIL;
 		STRCPY(dir, ".");
 	    }
-	    else
+	    否则
 	    {
 		dir = alloc(MAXPATHL);
-		if (dir == NULL)
-		    return FAIL;
+		もし (dir == NULL)
+		    戻る FAIL;
 		p = p_dir;
 		copy_option_part(&p, dir, MAXPATHL, ",");
 	    }
 	    swapname = makeswapname(fname, ffname, curbuf, dir);
 	    vim_free(dir);
 	    r = vim_fexists(swapname);
-	    if (r)
+	    もし (r)
 	    {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-		if (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
+#もし defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+		もし (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
 		{
 		    char_u	buff[DIALOG_MSG_SIZE];
 
 		    dialog_msg(buff,
 			    _("Swap file \"%s\" exists, overwrite anyway?"),
 								    swapname);
-		    if (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 2)
+		    もし (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 2)
 								   != VIM_YES)
 		    {
 			vim_free(swapname);
-			return FAIL;
+			戻る FAIL;
 		    }
 		    eap->forceit = TRUE;
 		}
-		else
+		否则
 #endif
 		{
 		    semsg(_(e_swap_file_exists_str_silent_overrides), swapname);
 		    vim_free(swapname);
-		    return FAIL;
+		    戻る FAIL;
 		}
 	    }
 	    vim_free(swapname);
 	}
     }
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -2497,15 +2497,15 @@ check_overwrite(
     void
 ex_wnext(exarg_T *eap)
 {
-    int		i;
+    整数		i;
 
-    if (eap->cmd[1] == 'n')
-	i = curwin->w_arg_idx + (int)eap->line2;
-    else
-	i = curwin->w_arg_idx - (int)eap->line2;
+    もし (eap->cmd[1] == 'n')
+	i = curwin->w_arg_idx + (整数)eap->line2;
+    否则
+	i = curwin->w_arg_idx - (整数)eap->line2;
     eap->line1 = 1;
     eap->line2 = curbuf->b_ml.ml_line_count;
-    if (do_write(eap) != FAIL)
+    もし (do_write(eap) != FAIL)
 	do_argfile(eap, i);
 }
 
@@ -2516,37 +2516,37 @@ ex_wnext(exarg_T *eap)
 do_wqall(exarg_T *eap)
 {
     buf_T	*buf;
-    int		error = 0;
-    int		save_forceit = eap->forceit;
-    int		save_exiting = exiting;
+    整数		error = 0;
+    整数		save_forceit = eap->forceit;
+    整数		save_exiting = exiting;
 
-    if (eap->cmdidx == CMD_xall || eap->cmdidx == CMD_wqall)
+    もし (eap->cmdidx == CMD_xall || eap->cmdidx == CMD_wqall)
     {
-	if (before_quit_all(eap) == FAIL)
-	    return;
+	もし (before_quit_all(eap) == FAIL)
+	    戻る;
 	exiting = TRUE;
     }
 
     FOR_ALL_BUFFERS(buf)
     {
 #ifdef FEAT_TERMINAL
-	if (exiting && !eap->forceit && term_job_running(buf->b_term))
+	もし (exiting && !eap->forceit && term_job_running(buf->b_term))
 	{
 	    bufref_T	bufref;
 
 	    set_bufref(&bufref, buf);
-	    if (term_try_stop_job(buf) == FAIL)
+	    もし (term_try_stop_job(buf) == FAIL)
 	    {
 		no_write_message_buf(buf);
 		++error;
 	    }
 	    // Stopping the job may have freed the terminal buffer.
-	    else if (!bufref_valid(&bufref))
+	    否则 もし (!bufref_valid(&bufref))
 		buf = firstbuf;
 	}
-	else
+	否则
 #endif
-	if (bufIsChanged(buf) && !bt_dontwrite(buf))
+	もし (bufIsChanged(buf) && !bt_dontwrite(buf))
 	{
 	    /*
 	     * Check if there is a reason the buffer cannot be written:
@@ -2555,44 +2555,44 @@ do_wqall(exarg_T *eap)
 	     * 3. if the 'readonly' is set (even after a dialog)
 	     * 4. if overwriting is allowed (even after a dialog)
 	     */
-	    if (not_writing())
+	    もし (not_writing())
 	    {
 		++error;
 		break;
 	    }
 #ifdef FEAT_BROWSE
 	    // ":browse wall": ask for file name if there isn't one
-	    if (buf->b_ffname == NULL && (cmdmod.cmod_flags & CMOD_BROWSE))
+	    もし (buf->b_ffname == NULL && (cmdmod.cmod_flags & CMOD_BROWSE))
 		browse_save_fname(buf);
 #endif
-	    if (buf->b_ffname == NULL)
+	    もし (buf->b_ffname == NULL)
 	    {
 		semsg(_(e_no_file_name_for_buffer_nr), (long)buf->b_fnum);
 		++error;
 	    }
-	    else if (check_readonly(&eap->forceit, buf)
+	    否则 もし (check_readonly(&eap->forceit, buf)
 		    || check_overwrite(eap, buf, buf->b_fname, buf->b_ffname,
 							       FALSE) == FAIL)
 	    {
 		++error;
 	    }
-	    else
+	    否则
 	    {
 		bufref_T bufref;
 
 		set_bufref(&bufref, buf);
-		if (buf_write_all(buf, eap->forceit) == FAIL)
+		もし (buf_write_all(buf, eap->forceit) == FAIL)
 		    ++error;
 		// an autocommand may have deleted the buffer
-		if (!bufref_valid(&bufref))
+		もし (!bufref_valid(&bufref))
 		    buf = firstbuf;
 	    }
 	    eap->forceit = save_forceit;    // check_overwrite() may set it
 	}
     }
-    if (exiting)
+    もし (exiting)
     {
-	if (!error)
+	もし (!error)
 	    getout(0);		// exit Vim
 	not_exiting(save_exiting);
     }
@@ -2602,13 +2602,13 @@ do_wqall(exarg_T *eap)
  * Check the 'write' option.
  * Return TRUE and give a message when it's not set.
  */
-    static int
+    static 整数
 not_writing(void)
 {
-    if (p_write)
-	return FALSE;
+    もし (p_write)
+	戻る FALSE;
     emsg(_(e_file_not_written_writing_is_disabled_by_write_option));
-    return TRUE;
+    戻る TRUE;
 }
 
 /*
@@ -2616,8 +2616,8 @@ not_writing(void)
  * read-only). Ask for overruling in a dialog. Return TRUE and give an error
  * message when the buffer is readonly.
  */
-    static int
-check_readonly(int *forceit, buf_T *buf)
+    static 整数
+check_readonly(整数 *forceit, buf_T *buf)
 {
     stat_T	st;
 
@@ -2625,42 +2625,42 @@ check_readonly(int *forceit, buf_T *buf)
     // the file exists and permissions are read-only.
     // We will send 0777 to check_file_readonly(), as the "perm" variable is
     // important for device checks but not here.
-    if (!*forceit && (buf->b_p_ro
+    もし (!*forceit && (buf->b_p_ro
 		|| (mch_stat((char *)buf->b_ffname, &st) >= 0
 		    && check_file_readonly(buf->b_ffname, 0777))))
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
+#もし defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	もし ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
 						       && buf->b_fname != NULL)
 	{
 	    char_u	buff[DIALOG_MSG_SIZE];
 
-	    if (buf->b_p_ro)
+	    もし (buf->b_p_ro)
 		dialog_msg(buff, _("'readonly' option is set for \"%s\".\nDo you wish to write anyway?"),
 		    buf->b_fname);
-	    else
+	    否则
 		dialog_msg(buff, _("File permissions of \"%s\" are read-only.\nIt may still be possible to write it.\nDo you wish to try?"),
 		    buf->b_fname);
 
-	    if (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 2) == VIM_YES)
+	    もし (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 2) == VIM_YES)
 	    {
 		// Set forceit, to force the writing of a readonly file
 		*forceit = TRUE;
-		return FALSE;
+		戻る FALSE;
 	    }
-	    else
-		return TRUE;
+	    否则
+		戻る TRUE;
 	}
-	else
+	否则
 #endif
-	if (buf->b_p_ro)
+	もし (buf->b_p_ro)
 	    emsg(_(e_readonly_option_is_set_add_bang_to_override));
-	else
+	否则
 	    semsg(_(e_str_is_read_only_add_bang_to_override), buf->b_fname);
-	return TRUE;
+	戻る TRUE;
     }
 
-    return FALSE;
+    戻る FALSE;
 }
 
 /*
@@ -2674,48 +2674,48 @@ check_readonly(int *forceit, buf_T *buf)
  * GETFILE_SAME_FILE for success
  * GETFILE_OPEN_OTHER for successfully opening another file.
  */
-    int
+    整数
 getfile(
-    int		fnum,
+    整数		fnum,
     char_u	*ffname_arg,
     char_u	*sfname_arg,
-    int		setpm,
+    整数		setpm,
     linenr_T	lnum,
-    int		forceit)
+    整数		forceit)
 {
     char_u	*ffname = ffname_arg;
     char_u	*sfname = sfname_arg;
-    int		other;
-    int		retval;
+    整数		other;
+    整数		retval;
     char_u	*free_me = NULL;
 
-    if (!check_can_set_curbuf_forceit(forceit))
-	return GETFILE_ERROR;
+    もし (!check_can_set_curbuf_forceit(forceit))
+	戻る GETFILE_ERROR;
 
-    if (text_locked())
-	return GETFILE_ERROR;
-    if (curbuf_locked())
-	return GETFILE_ERROR;
+    もし (text_locked())
+	戻る GETFILE_ERROR;
+    もし (curbuf_locked())
+	戻る GETFILE_ERROR;
 
-    if (fnum == 0)
+    もし (fnum == 0)
     {
 					// make ffname full path, set sfname
 	fname_expand(curbuf, &ffname, &sfname);
 	other = otherfile(ffname);
 	free_me = ffname;		// has been allocated, free() later
     }
-    else
+    否则
 	other = (fnum != curbuf->b_fnum);
 
-    if (other)
+    もし (other)
 	++no_wait_return;	    // don't wait for autowrite message
-    if (other && !forceit && curbuf->b_nwindows == 1 && !buf_hide(curbuf)
+    もし (other && !forceit && curbuf->b_nwindows == 1 && !buf_hide(curbuf)
 		   && curbufIsChanged() && autowrite(curbuf, forceit) == FAIL)
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if (p_confirm && p_write)
+#もし defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	もし (p_confirm && p_write)
 	    dialog_changed(curbuf, FALSE);
-	if (curbufIsChanged())
+	もし (curbufIsChanged())
 #endif
 	{
 	    --no_wait_return;
@@ -2724,28 +2724,28 @@ getfile(
 	    goto theend;
 	}
     }
-    if (other)
+    もし (other)
 	--no_wait_return;
-    if (setpm)
+    もし (setpm)
 	setpcmark();
-    if (!other)
+    もし (!other)
     {
-	if (lnum != 0)
+	もし (lnum != 0)
 	    curwin->w_cursor.lnum = lnum;
 	check_cursor_lnum();
 	beginline(BL_SOL | BL_FIX);
 	retval = GETFILE_SAME_FILE;	// it's in the same file
     }
-    else if (do_ecmd(fnum, ffname, sfname, NULL, lnum,
+    否则 もし (do_ecmd(fnum, ffname, sfname, NULL, lnum,
 	     (buf_hide(curbuf) ? ECMD_HIDE : 0) + (forceit ? ECMD_FORCEIT : 0),
 		curwin) == OK)
 	retval = GETFILE_OPEN_OTHER;	// opened another file
-    else
+    否则
 	retval = GETFILE_ERROR;		// error encountered
 
 theend:
     vim_free(free_me);
-    return retval;
+    戻る retval;
 }
 
 /*
@@ -2779,23 +2779,23 @@ theend:
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    整数
 do_ecmd(
-    int		fnum,
+    整数		fnum,
     char_u	*ffname,
     char_u	*sfname,
     exarg_T	*eap,			// can be NULL!
     linenr_T	newlnum,
-    int		flags,
+    整数		flags,
     win_T	*oldwin)
 {
-    int		other_file;		// TRUE if editing another file
-    int		oldbuf;			// TRUE if using existing buffer
-    int		auto_buf = FALSE;	// TRUE if autocommands brought us
+    整数		other_file;		// TRUE if editing another file
+    整数		oldbuf;			// TRUE if using existing buffer
+    整数		auto_buf = FALSE;	// TRUE if autocommands brought us
 					// into the buffer unexpectedly
     char_u	*new_name = NULL;
-#if defined(FEAT_EVAL)
-    int		did_set_swapcommand = FALSE;
+#もし defined(FEAT_EVAL)
+    整数		did_set_swapcommand = FALSE;
 #endif
     buf_T	*buf;
     bufref_T	bufref;
@@ -2805,42 +2805,42 @@ do_ecmd(
     char_u	dot_path[] = ".";
     char_u	*browse_file = NULL;
 #endif
-    int		retval = FAIL;
+    整数		retval = FAIL;
     long	n;
     pos_T	orig_pos;
     linenr_T	topline = 0;
-    int		newcol = -1;
-    int		solcol = -1;
+    整数		newcol = -1;
+    整数		solcol = -1;
     pos_T	*pos;
     char_u	*command = NULL;
 #ifdef FEAT_SPELL
-    int		did_get_winopts = FALSE;
+    整数		did_get_winopts = FALSE;
 #endif
-    int		readfile_flags = 0;
-    int		did_inc_redrawing_disabled = FALSE;
+    整数		readfile_flags = 0;
+    整数		did_inc_redrawing_disabled = FALSE;
     long	*so_ptr = curwin->w_p_so >= 0 ? &curwin->w_p_so : &p_so;
 
 #ifdef FEAT_PROP_POPUP
-    if (ERROR_IF_TERM_POPUP_WINDOW)
-	return FAIL;
+    もし (ERROR_IF_TERM_POPUP_WINDOW)
+	戻る FAIL;
 #endif
 
-    if (eap != NULL)
+    もし (eap != NULL)
 	command = eap->do_ecmd_cmd;
     set_bufref(&old_curbuf, curbuf);
 
-    if (fnum != 0)
+    もし (fnum != 0)
     {
-	if (fnum == curbuf->b_fnum)	// file is already being edited
-	    return OK;			// nothing to do
+	もし (fnum == curbuf->b_fnum)	// file is already being edited
+	    戻る OK;			// nothing to do
 	other_file = TRUE;
     }
-    else
+    否则
     {
 #ifdef FEAT_BROWSE
-	if ((cmdmod.cmod_flags & CMOD_BROWSE) && !exiting)
+	もし ((cmdmod.cmod_flags & CMOD_BROWSE) && !exiting)
 	{
-	    if (
+	    もし (
 # ifdef FEAT_GUI
 		!gui.in_use &&
 # endif
@@ -2848,45 +2848,45 @@ do_ecmd(
 	    {
 		// No browsing supported but we do have the file explorer:
 		// Edit the directory.
-		if (ffname == NULL || !mch_isdir(ffname))
+		もし (ffname == NULL || !mch_isdir(ffname))
 		    ffname = dot_path;
 	    }
-	    else
+	    否则
 	    {
 		browse_file = do_browse(0, (char_u *)_("Edit File"), ffname,
 						    NULL, NULL, NULL, curbuf);
-		if (browse_file == NULL)
+		もし (browse_file == NULL)
 		    goto theend;
 		ffname = browse_file;
 	    }
 	}
 #endif
 	// if no short name given, use ffname for short name
-	if (sfname == NULL)
+	もし (sfname == NULL)
 	    sfname = ffname;
 #ifdef USE_FNAME_CASE
-	if (sfname != NULL)
+	もし (sfname != NULL)
 	    fname_case(sfname, 0);   // set correct case for sfname
 #endif
 
-	if ((flags & (ECMD_ADDBUF | ECMD_ALTBUF))
+	もし ((flags & (ECMD_ADDBUF | ECMD_ALTBUF))
 					 && (ffname == NULL || *ffname == NUL))
 	    goto theend;
 
-	if (ffname == NULL)
+	もし (ffname == NULL)
 	    other_file = TRUE;
 					    // there is no file name
-	else if (*ffname == NUL && curbuf->b_ffname == NULL)
+	否则 もし (*ffname == NUL && curbuf->b_ffname == NULL)
 	    other_file = FALSE;
-	else
+	否则
 	{
-	    if (*ffname == NUL)		    // re-edit with same file name
+	    もし (*ffname == NUL)		    // re-edit with same file name
 	    {
 		ffname = curbuf->b_ffname;
 		sfname = curbuf->b_fname;
 	    }
 	    free_fname = fix_fname(ffname); // may expand to full path name
-	    if (free_fname != NULL)
+	    もし (free_fname != NULL)
 		ffname = free_fname;
 	    other_file = otherfile(ffname);
 	}
@@ -2897,7 +2897,7 @@ do_ecmd(
      * - if we are going to re-edit the same file
      * - or if we are the only window on this file and if ECMD_HIDE is FALSE
      */
-    if (  ((!other_file && !(flags & ECMD_OLDBUF))
+    もし (  ((!other_file && !(flags & ECMD_OLDBUF))
 	    || (curbuf->b_nwindows == 1
 		&& !(flags & (ECMD_HIDE | ECMD_ADDBUF | ECMD_ALTBUF))))
 	&& check_changed(curbuf, (p_awa ? CCGD_AW : 0)
@@ -2905,7 +2905,7 @@ do_ecmd(
 			       | ((flags & ECMD_FORCEIT) ? CCGD_FORCEIT : 0)
 			       | (eap == NULL ? 0 : CCGD_EXCMD)))
     {
-	if (fnum == 0 && other_file && ffname != NULL)
+	もし (fnum == 0 && other_file && ffname != NULL)
 	    (void)setaltfname(ffname, sfname, newlnum < 0 ? 0 : newlnum);
 	goto theend;
     }
@@ -2919,31 +2919,31 @@ do_ecmd(
     reset_VIsual();
 
     // autocommands freed window :(
-    if (oldwin != NULL && !win_valid(oldwin))
+    もし (oldwin != NULL && !win_valid(oldwin))
 	oldwin = NULL;
 
-#if defined(FEAT_EVAL)
-    if ((command != NULL || newlnum > (linenr_T)0)
+#もし defined(FEAT_EVAL)
+    もし ((command != NULL || newlnum > (linenr_T)0)
 	    && *get_vim_var_str(VV_SWAPCOMMAND) == NUL)
     {
 	string_T    val;
 	size_t	    valsize;
 
 	// Set v:swapcommand for the SwapExists autocommands.
-	if (command != NULL)
-	    valsize = (int)STRLEN(command) + 3;
-	else
+	もし (command != NULL)
+	    valsize = (整数)STRLEN(command) + 3;
+	否则
 	    valsize = 30;
 	val.string = alloc(valsize);
-	if (val.string != NULL)
+	もし (val.string != NULL)
 	{
-	    if (command != NULL)
+	    もし (command != NULL)
 		val.length = vim_snprintf_safelen((char *)val.string,
 		    valsize, ":%s\r", command);
-	    else
+	    否则
 		val.length = vim_snprintf_safelen((char *)val.string,
 		    valsize, "%ldG", (long)newlnum);
-	    set_vim_var_string(VV_SWAPCOMMAND, val.string, (int)val.length);
+	    set_vim_var_string(VV_SWAPCOMMAND, val.string, (整数)val.length);
 	    did_set_swapcommand = TRUE;
 	    vim_free(val.string);
 	}
@@ -2954,44 +2954,44 @@ do_ecmd(
      * If we are starting to edit another file, open a (new) buffer.
      * Otherwise we re-use the current buffer.
      */
-    if (other_file)
+    もし (other_file)
     {
-	int prev_alt_fnum = curwin->w_alt_fnum;
+	整数 prev_alt_fnum = curwin->w_alt_fnum;
 
-	if (!(flags & (ECMD_ADDBUF | ECMD_ALTBUF)))
+	もし (!(flags & (ECMD_ADDBUF | ECMD_ALTBUF)))
 	{
-	    if ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+	    もし ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 		curwin->w_alt_fnum = curbuf->b_fnum;
-	    if (oldwin != NULL)
+	    もし (oldwin != NULL)
 		buflist_altfpos(oldwin);
 	}
 
-	if (fnum)
+	もし (fnum)
 	    buf = buflist_findnr(fnum);
-	else
+	否则
 	{
-	    if (flags & (ECMD_ADDBUF | ECMD_ALTBUF))
+	    もし (flags & (ECMD_ADDBUF | ECMD_ALTBUF))
 	    {
 		// Default the line number to zero to avoid that a wininfo item
 		// is added for the current window.
 		linenr_T	tlnum = 0;
 		buf_T		*newbuf;
 
-		if (command != NULL)
+		もし (command != NULL)
 		{
 		    tlnum = atol((char *)command);
-		    if (tlnum <= 0)
+		    もし (tlnum <= 0)
 			tlnum = 1L;
 		}
 		// Add BLN_NOCURWIN to avoid a new wininfo items are associated
 		// with the current window.
 		newbuf = buflist_new(ffname, sfname, tlnum,
 						    BLN_LISTED | BLN_NOCURWIN);
-		if (newbuf != NULL)
+		もし (newbuf != NULL)
 		{
-		    if (flags & ECMD_ALTBUF)
+		    もし (flags & ECMD_ALTBUF)
 			curwin->w_alt_fnum = newbuf->b_fnum;
-		    if (tlnum > 0)
+		    もし (tlnum > 0)
 			newbuf->b_last_cursor.lnum = tlnum;
 		}
 		goto theend;
@@ -3000,45 +3000,45 @@ do_ecmd(
 		    BLN_CURBUF | ((flags & ECMD_SET_HELP) ? 0 : BLN_LISTED));
 
 	    // autocommands may change curwin and curbuf
-	    if (oldwin != NULL)
+	    もし (oldwin != NULL)
 		oldwin = curwin;
 	    set_bufref(&old_curbuf, curbuf);
 	}
-	if (buf == NULL)
+	もし (buf == NULL)
 	    goto theend;
 	// autocommands try to edit a closing buffer, which like splitting, can
 	// result in more windows displaying it; abort
-	if (buf->b_locked_split)
+	もし (buf->b_locked_split)
 	{
 	    emsg(_(e_cannot_switch_to_a_closing_buffer));
 	    goto theend;
 	}
-	if (curwin->w_alt_fnum == buf->b_fnum && prev_alt_fnum != 0)
+	もし (curwin->w_alt_fnum == buf->b_fnum && prev_alt_fnum != 0)
 	    // reusing the buffer, keep the old alternate file
 	    curwin->w_alt_fnum = prev_alt_fnum;
 
-	if (buf->b_ml.ml_mfp == NULL)		// no memfile yet
+	もし (buf->b_ml.ml_mfp == NULL)		// no memfile yet
 	{
 	    oldbuf = FALSE;
 	}
-	else					// existing memfile
+	否则					// existing memfile
 	{
 	    oldbuf = TRUE;
 	    set_bufref(&bufref, buf);
 	    (void)buf_check_timestamp(buf, FALSE);
 	    // Check if autocommands made the buffer invalid or changed the
 	    // current buffer.
-	    if (!bufref_valid(&bufref) || curbuf != old_curbuf.br_buf)
+	    もし (!bufref_valid(&bufref) || curbuf != old_curbuf.br_buf)
 		goto theend;
 #ifdef FEAT_EVAL
-	    if (aborting())	    // autocmds may abort script processing
+	    もし (aborting())	    // autocmds may abort script processing
 		goto theend;
 #endif
 	}
 
 	// May jump to last used line number for a loaded buffer or when asked
 	// for explicitly
-	if ((oldbuf && newlnum == ECMD_LASTL) || newlnum == ECMD_LAST)
+	もし ((oldbuf && newlnum == ECMD_LASTL) || newlnum == ECMD_LAST)
 	{
 	    pos = buflist_findfpos(buf);
 	    newlnum = pos->lnum;
@@ -3051,10 +3051,10 @@ do_ecmd(
 	 * If the current buffer was empty and has no file name, curbuf
 	 * is returned by buflist_new(), nothing to do here.
 	 */
-	if (buf != curbuf)
+	もし (buf != curbuf)
 	{
 	    bufref_T	save_au_new_curbuf;
-	    int		save_cmdwin_type = cmdwin_type;
+	    整数		save_cmdwin_type = cmdwin_type;
 	    win_T	*save_cmdwin_win = cmdwin_win;
 
 	    // Should only be possible to get here if the cmdwin is closed, or
@@ -3076,7 +3076,7 @@ do_ecmd(
 	     * - If we ended up in the new buffer already, need to skip a few
 	     *	 things, set auto_buf.
 	     */
-	    if (buf->b_fname != NULL)
+	    もし (buf->b_fname != NULL)
 		new_name = vim_strsave(buf->b_fname);
 	    save_au_new_curbuf = au_new_curbuf;
 	    set_bufref(&au_new_curbuf, buf);
@@ -3085,7 +3085,7 @@ do_ecmd(
 	    cmdwin_type = save_cmdwin_type;
 	    cmdwin_win = save_cmdwin_win;
 
-	    if (!bufref_valid(&au_new_curbuf))
+	    もし (!bufref_valid(&au_new_curbuf))
 	    {
 		// new buffer has been deleted
 		delbuf_msg(new_name);	// frees new_name
@@ -3093,16 +3093,16 @@ do_ecmd(
 		goto theend;
 	    }
 #ifdef FEAT_EVAL
-	    if (aborting())	    // autocmds may abort script processing
+	    もし (aborting())	    // autocmds may abort script processing
 	    {
 		vim_free(new_name);
 		au_new_curbuf = save_au_new_curbuf;
 		goto theend;
 	    }
 #endif
-	    if (buf == curbuf)		// already in new buffer
+	    もし (buf == curbuf)		// already in new buffer
 		auto_buf = TRUE;
-	    else
+	    否则
 	    {
 		win_T	    *the_curwin = curwin;
 
@@ -3111,7 +3111,7 @@ do_ecmd(
 		++the_curwin->w_locked;
 		++buf->b_locked;
 
-		if (curbuf == old_curbuf.br_buf)
+		もし (curbuf == old_curbuf.br_buf)
 		    buf_copy_options(buf, BCO_ENTER);
 
 		// Close the link to the current buffer. This may set
@@ -3122,13 +3122,13 @@ do_ecmd(
 			 oldwin != NULL);
 
 		// Autocommands may have closed the window.
-		if (win_valid(the_curwin))
+		もし (win_valid(the_curwin))
 		    --the_curwin->w_locked;
 		--buf->b_locked;
 
 #ifdef FEAT_EVAL
 		// autocmds may abort script processing
-		if (aborting() && curwin->w_buffer != NULL)
+		もし (aborting() && curwin->w_buffer != NULL)
 		{
 		    vim_free(new_name);
 		    au_new_curbuf = save_au_new_curbuf;
@@ -3136,33 +3136,33 @@ do_ecmd(
 		}
 #endif
 		// Be careful again, like above.
-		if (!bufref_valid(&au_new_curbuf))
+		もし (!bufref_valid(&au_new_curbuf))
 		{
 		    // New buffer was deleted.  If curwin->w_buffer is NULL, we
 		    // must enter some buffer.  Hopefully the last one is OK.
-		    if (curwin->w_buffer == NULL)
+		    もし (curwin->w_buffer == NULL)
 			buf = lastbuf;
-		    else
+		    否则
 		    {
 			delbuf_msg(new_name);	// frees new_name
 			au_new_curbuf = save_au_new_curbuf;
 			goto theend;
 		    }
 		}
-		if (buf == curbuf)		// already in new buffer
+		もし (buf == curbuf)		// already in new buffer
 		    auto_buf = TRUE;
-		else
+		否则
 		{
 #ifdef FEAT_SYN_HL
 		    /*
 		     * <VN> We could instead free the synblock
 		     * and re-attach to buffer, perhaps.
 		     */
-		    if (curwin->w_buffer == NULL
+		    もし (curwin->w_buffer == NULL
 			    || curwin->w_s == &(curwin->w_buffer->b_s))
 			curwin->w_s = &(buf->b_s);
 #endif
-		    if (curwin->w_buffer != NULL)
+		    もし (curwin->w_buffer != NULL)
 			--curwin->w_buffer->b_nwindows;
 
 		    curwin->w_buffer = buf;
@@ -3170,7 +3170,7 @@ do_ecmd(
 		    ++curbuf->b_nwindows;
 
 		    // Set 'fileformat', 'binary' and 'fenc' when forced.
-		    if (!oldbuf && eap != NULL)
+		    もし (!oldbuf && eap != NULL)
 		    {
 			set_file_options(TRUE, eap);
 			set_forced_fenc(eap);
@@ -3193,9 +3193,9 @@ do_ecmd(
 	curwin->w_pcmark.lnum = 1;
 	curwin->w_pcmark.col = 0;
     }
-    else // !other_file
+    否则 // !other_file
     {
-	if ((flags & (ECMD_ADDBUF | ECMD_ALTBUF)) || check_fname() == FAIL)
+	もし ((flags & (ECMD_ADDBUF | ECMD_ALTBUF)) || check_fname() == FAIL)
 	    goto theend;
 
 	oldbuf = (flags & ECMD_OLDBUF);
@@ -3207,24 +3207,24 @@ do_ecmd(
     did_inc_redrawing_disabled = TRUE;
 
     buf = curbuf;
-    if ((flags & ECMD_SET_HELP) || keep_help_flag)
+    もし ((flags & ECMD_SET_HELP) || keep_help_flag)
     {
 	prepare_help_buffer();
     }
-    else
+    否则
     {
 	// Don't make a buffer listed if it's a help buffer.  Useful when
 	// using CTRL-O to go back to a help file.
-	if (!curbuf->b_help)
+	もし (!curbuf->b_help)
 	    set_buflisted(TRUE);
     }
 
     // If autocommands change buffers under our fingers, forget about
     // editing the file.
-    if (buf != curbuf)
+    もし (buf != curbuf)
 	goto theend;
 #ifdef FEAT_EVAL
-    if (aborting())	    // autocmds may abort script processing
+    もし (aborting())	    // autocmds may abort script processing
 	goto theend;
 #endif
 
@@ -3240,30 +3240,30 @@ do_ecmd(
  *  TRUE	FALSE	    start editing new file, new buffer
  *  TRUE	TRUE	    start editing in existing buffer (nothing to do)
  */
-    if (!other_file && !oldbuf)		// re-use the buffer
+    もし (!other_file && !oldbuf)		// re-use the buffer
     {
 	set_last_cursor(curwin);	// may set b_last_cursor
-	if (newlnum == ECMD_LAST || newlnum == ECMD_LASTL)
+	もし (newlnum == ECMD_LAST || newlnum == ECMD_LASTL)
 	{
 	    newlnum = curwin->w_cursor.lnum;
 	    solcol = curwin->w_cursor.col;
 	}
 	buf = curbuf;
-	if (buf->b_fname != NULL)
+	もし (buf->b_fname != NULL)
 	    new_name = vim_strsave(buf->b_fname);
-	else
+	否则
 	    new_name = NULL;
 	set_bufref(&bufref, buf);
 
 	// If the buffer was used before, store the current contents so that
 	// the reload can be undone.  Do not do this if the (empty) buffer is
 	// being re-used for another file.
-	if (!(curbuf->b_flags & BF_NEVERLOADED)
+	もし (!(curbuf->b_flags & BF_NEVERLOADED)
 		&& (p_ur < 0 || curbuf->b_ml.ml_line_count <= p_ur))
 	{
 	    // Sync first so that this is a separate undo-able action.
 	    u_sync(FALSE);
-	    if (u_savecommon(0, curbuf->b_ml.ml_line_count + 1, 0, TRUE)
+	    もし (u_savecommon(0, curbuf->b_ml.ml_line_count + 1, 0, TRUE)
 								     == FAIL)
 	    {
 		vim_free(new_name);
@@ -3275,12 +3275,12 @@ do_ecmd(
 	    // tell readfile() not to clear or reload undo info
 	    readfile_flags = READ_KEEP_UNDO;
 	}
-	else
+	否则
 	    buf_freeall(curbuf, 0);   // free all things for buffer
 
 	// If autocommands deleted the buffer we were going to re-edit, give
 	// up and jump to the end.
-	if (!bufref_valid(&bufref))
+	もし (!bufref_valid(&bufref))
 	{
 	    delbuf_msg(new_name);	// frees new_name
 	    goto theend;
@@ -3290,10 +3290,10 @@ do_ecmd(
 	// If autocommands change buffers under our fingers, forget about
 	// re-editing the file.  Should do the buf_clear_file(), but perhaps
 	// the autocommands changed the buffer...
-	if (buf != curbuf)
+	もし (buf != curbuf)
 	    goto theend;
 #ifdef FEAT_EVAL
-	if (aborting())	    // autocmds may abort script processing
+	もし (aborting())	    // autocmds may abort script processing
 	    goto theend;
 #endif
 	buf_clear_file(curbuf);
@@ -3309,7 +3309,7 @@ do_ecmd(
 
     // If the file name was changed, reset the not-edit flag so that ":write"
     // works.
-    if (!other_file)
+    もし (!other_file)
 	curbuf->b_flags &= ~BF_NOTEDITED;
 
     /*
@@ -3317,7 +3317,7 @@ do_ecmd(
      */
     check_arg_idx(curwin);
 
-    if (!auto_buf)
+    もし (!auto_buf)
     {
 	/*
 	 * Set cursor and init window before reading the file and executing
@@ -3334,7 +3334,7 @@ do_ecmd(
 	    tabpage_T	    *tp;
 
 	    FOR_ALL_TAB_WINDOWS(tp, win)
-		if (win->w_buffer == curbuf)
+		もし (win->w_buffer == curbuf)
 		    foldUpdateAll(win);
 	}
 #endif
@@ -3348,12 +3348,12 @@ do_ecmd(
 	 */
 	orig_pos = curwin->w_cursor;
 	topline = curwin->w_topline;
-	if (!oldbuf)			    // need to read the file
+	もし (!oldbuf)			    // need to read the file
 	{
 #ifdef FEAT_PROP_POPUP
 	    // Don't use the swap-exists dialog for a popup window, can't edit
 	    // the buffer.
-	    if (WIN_IS_POPUP(curwin))
+	    もし (WIN_IS_POPUP(curwin))
 		curbuf->b_flags |= BF_NO_SEA;
 #endif
 	    swap_exists_action = SEA_DIALOG;
@@ -3362,23 +3362,23 @@ do_ecmd(
 	    /*
 	     * Open the buffer and read the file.
 	     */
-	    if (flags & ECMD_NOWINENTER)
+	    もし (flags & ECMD_NOWINENTER)
 		readfile_flags |= READ_NOWINENTER;
-#if defined(FEAT_EVAL)
-	    if (should_abort(open_buffer(FALSE, eap, readfile_flags)))
+#もし defined(FEAT_EVAL)
+	    もし (should_abort(open_buffer(FALSE, eap, readfile_flags)))
 		retval = FAIL;
-#else
+#否则
 	    (void)open_buffer(FALSE, eap, readfile_flags);
 #endif
 
 #ifdef FEAT_PROP_POPUP
 	    curbuf->b_flags &= ~BF_NO_SEA;
 #endif
-	    if (swap_exists_action == SEA_QUIT)
+	    もし (swap_exists_action == SEA_QUIT)
 		retval = FAIL;
 	    handle_swap_exists(&old_curbuf);
 	}
-	else
+	否则
 	{
 	    // Read the modelines, but only to set window-local options.  Any
 	    // buffer-local options have already been set and may have been
@@ -3387,7 +3387,7 @@ do_ecmd(
 
 	    apply_autocmds_retval(EVENT_BUFENTER, NULL, NULL, FALSE,
 							      curbuf, &retval);
-	    if ((flags & ECMD_NOWINENTER) == 0)
+	    もし ((flags & ECMD_NOWINENTER) == 0)
 		apply_autocmds_retval(EVENT_BUFWINENTER, NULL, NULL, FALSE,
 							      curbuf, &retval);
 	}
@@ -3396,26 +3396,26 @@ do_ecmd(
 	// If autocommands change the cursor position or topline, we should
 	// keep it.  Also when it moves within a line. But not when it moves
 	// to the first non-blank.
-	if (!EQUAL_POS(curwin->w_cursor, orig_pos))
+	もし (!EQUAL_POS(curwin->w_cursor, orig_pos))
 	{
 	    char_u *text = ml_get_curline();
 
-	    if (curwin->w_cursor.lnum != orig_pos.lnum
-		    || curwin->w_cursor.col != (int)(skipwhite(text) - text))
+	    もし (curwin->w_cursor.lnum != orig_pos.lnum
+		    || curwin->w_cursor.col != (整数)(skipwhite(text) - text))
 	    {
 		newlnum = curwin->w_cursor.lnum;
 		newcol = curwin->w_cursor.col;
 	    }
 	}
-	if (curwin->w_topline == topline)
+	もし (curwin->w_topline == topline)
 	    topline = 0;
 
 	// Even when cursor didn't move we need to recompute topline.
 	changed_line_abv_curs();
 
 	maketitle();
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
-	if (WIN_IS_POPUP(curwin) && curwin->w_p_pvw && retval != FAIL)
+#もし defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
+	もし (WIN_IS_POPUP(curwin) && curwin->w_p_pvw && retval != FAIL)
 	    popup_set_title(curwin);
 #endif
     }
@@ -3424,7 +3424,7 @@ do_ecmd(
     // Tell the diff stuff that this buffer is new and/or needs updating.
     // Also needed when re-editing the same buffer, because unloading will
     // have removed it as a diff buffer.
-    if (curwin->w_p_diff)
+    もし (curwin->w_p_diff)
     {
 	diff_buf_add(curbuf);
 	diff_invalidate(curbuf);
@@ -3434,23 +3434,23 @@ do_ecmd(
 #ifdef FEAT_SPELL
     // If the window options were changed may need to set the spell language.
     // Can only do this after the buffer has been properly setup.
-    if (did_get_winopts && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
+    もし (did_get_winopts && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
 	(void)parse_spelllang(curwin);
 #endif
 
-    if (command == NULL)
+    もし (command == NULL)
     {
-	if (newcol >= 0)	// position set by autocommands
+	もし (newcol >= 0)	// position set by autocommands
 	{
 	    curwin->w_cursor.lnum = newlnum;
 	    curwin->w_cursor.col = newcol;
 	    check_cursor();
 	}
-	else if (newlnum > 0)	// line number from caller or old position
+	否则 もし (newlnum > 0)	// line number from caller or old position
 	{
 	    curwin->w_cursor.lnum = newlnum;
 	    check_cursor_lnum();
-	    if (solcol >= 0 && !p_sol)
+	    もし (solcol >= 0 && !p_sol)
 	    {
 		// 'sol' is off: Use last known column.
 		curwin->w_cursor.col = solcol;
@@ -3458,12 +3458,12 @@ do_ecmd(
 		curwin->w_cursor.coladd = 0;
 		curwin->w_set_curswant = true;
 	    }
-	    else
+	    否则
 		beginline(BL_SOL | BL_FIX);
 	}
-	else			// no line number, go to last line in Ex mode
+	否则			// no line number, go to last line in Ex mode
 	{
-	    if (exmode_active)
+	    もし (exmode_active)
 		curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
 	    beginline(BL_WHITE | BL_FIX);
 	}
@@ -3476,21 +3476,21 @@ do_ecmd(
      * Did not read the file, need to show some info about the file.
      * Do this after setting the cursor.
      */
-    if (oldbuf && !auto_buf)
+    もし (oldbuf && !auto_buf)
     {
-	int	msg_scroll_save = msg_scroll;
+	整数	msg_scroll_save = msg_scroll;
 
 	// Obey the 'O' flag in 'cpoptions': overwrite any previous file
 	// message.
-	if (shortmess(SHM_OVERALL) && !exiting && p_verbose == 0)
+	もし (shortmess(SHM_OVERALL) && !exiting && p_verbose == 0)
 	    msg_scroll = FALSE;
-	if (!msg_scroll)	// wait a bit when overwriting an error msg
+	もし (!msg_scroll)	// wait a bit when overwriting an error msg
 	    check_for_delay(FALSE);
 	msg_start();
 	msg_scroll = msg_scroll_save;
 	msg_scrolled_ign = TRUE;
 
-	if (!shortmess(SHM_FILEINFO))
+	もし (!shortmess(SHM_FILEINFO))
 	    fileinfo(FALSE, TRUE, FALSE);
 
 	msg_scrolled_ign = FALSE;
@@ -3500,21 +3500,21 @@ do_ecmd(
     curbuf->b_last_used = vim_time();
 #endif
 
-    if (command != NULL)
+    もし (command != NULL)
 	do_cmdline(command, NULL, NULL, DOCMD_VERBOSE|DOCMD_RANGEOK);
 
 #ifdef FEAT_KEYMAP
-    if (curbuf->b_kmap_state & KEYMAP_INIT)
+    もし (curbuf->b_kmap_state & KEYMAP_INIT)
 	(void)keymap_init();
 #endif
 
-    if (RedrawingDisabled > 0)
+    もし (RedrawingDisabled > 0)
 	--RedrawingDisabled;
     did_inc_redrawing_disabled = FALSE;
-    if (!skip_redraw)
+    もし (!skip_redraw)
     {
 	n = *so_ptr;
-	if (topline == 0 && command == NULL)
+	もし (topline == 0 && command == NULL)
 	    *so_ptr = 9999;		// force cursor halfway the window
 	update_topline();
 	curwin->w_scbind_pos = curwin->w_topline;
@@ -3522,48 +3522,48 @@ do_ecmd(
 	redraw_curbuf_later(UPD_NOT_VALID);	// redraw this buffer later
     }
 
-    if (p_im && (State & MODE_INSERT) == 0)
+    もし (p_im && (State & MODE_INSERT) == 0)
 	need_start_insertmode = TRUE;
 
 #ifdef FEAT_AUTOCHDIR
     // Change directories when the 'acd' option is set and we aren't already in
     // that directory (should already be done above). Expect getcwd() to be
     // faster than calling shorten_fnames() unnecessarily.
-    if (p_acd && curbuf->b_ffname != NULL)
+    もし (p_acd && curbuf->b_ffname != NULL)
     {
 	char_u	curdir[MAXPATHL];
 	char_u	filedir[MAXPATHL];
 
 	vim_strncpy(filedir, curbuf->b_ffname, MAXPATHL - 1);
 	*gettail_sep(filedir) = NUL;
-	if (mch_dirname(curdir, MAXPATHL) != FAIL
+	もし (mch_dirname(curdir, MAXPATHL) != FAIL
 		&& vim_fnamecmp(curdir, filedir) != 0)
 	    do_autochdir();
     }
 #endif
 
-#if defined(FEAT_NETBEANS_INTG)
-    if (curbuf->b_ffname != NULL)
+#もし defined(FEAT_NETBEANS_INTG)
+    もし (curbuf->b_ffname != NULL)
     {
 # ifdef FEAT_NETBEANS_INTG
-	if ((flags & ECMD_SET_HELP) != ECMD_SET_HELP)
+	もし ((flags & ECMD_SET_HELP) != ECMD_SET_HELP)
 	    netbeans_file_opened(curbuf);
 # endif
     }
 #endif
 
 theend:
-    if (did_inc_redrawing_disabled && RedrawingDisabled > 0)
+    もし (did_inc_redrawing_disabled && RedrawingDisabled > 0)
 	--RedrawingDisabled;
-#if defined(FEAT_EVAL)
-    if (did_set_swapcommand)
+#もし defined(FEAT_EVAL)
+    もし (did_set_swapcommand)
 	set_vim_var_string(VV_SWAPCOMMAND, NULL, -1);
 #endif
 #ifdef FEAT_BROWSE
     vim_free(browse_file);
 #endif
     vim_free(free_fname);
-    return retval;
+    戻る retval;
 }
 
     static void
@@ -3576,7 +3576,7 @@ delbuf_msg(char_u *name)
     au_new_curbuf.br_buf_free_count = 0;
 }
 
-static int append_indent = 0;	    // autoindent for first line
+static 整数 append_indent = 0;	    // autoindent for first line
 
 /*
  * Get the next line of text for ":append", ":insert" and ":change": the text
@@ -3584,36 +3584,36 @@ static int append_indent = 0;	    // autoindent for first line
  * the user.  Returns NULL when there is no more.
  */
     static char_u *
-get_append_line(exarg_T *eap, int indent)
+get_append_line(exarg_T *eap, 整数 indent)
 {
     char_u	*theline;
     char_u	*p;
 
-    if (*eap->arg == '|')
+    もし (*eap->arg == '|')
     {
 	// Get the text after the trailing bar.
 	theline = vim_strsave(eap->arg + 1);
 	*eap->arg = NUL;
     }
-    else if (eap->ea_getline == NULL)
+    否则 もし (eap->ea_getline == NULL)
     {
 	// No getline() function, use the lines that follow. This ends
 	// when there is no more.
-	if (eap->nextcmd == NULL)
-	    return NULL;
+	もし (eap->nextcmd == NULL)
+	    戻る NULL;
 	p = vim_strchr(eap->nextcmd, NL);
-	if (p == NULL)
+	もし (p == NULL)
 	    p = eap->nextcmd + STRLEN(eap->nextcmd);
 	theline = vim_strnsave(eap->nextcmd, p - eap->nextcmd);
-	if (*p != NUL)
+	もし (*p != NUL)
 	    ++p;
-	else
+	否则
 	    p = NULL;
 	eap->nextcmd = p;
     }
-    else
+    否则
     {
-	int save_State = State;
+	整数 save_State = State;
 
 	// Set State to avoid the cursor shape to be set to MODE_INSERT
 	// state when getline() returns.
@@ -3625,7 +3625,7 @@ get_append_line(exarg_T *eap, int indent)
 		NUL, eap->cookie, indent, TRUE);
 	State = save_State;
     }
-    return theline;
+    戻る theline;
 }
 
 /*
@@ -3635,86 +3635,86 @@ get_append_line(exarg_T *eap, int indent)
 ex_append(exarg_T *eap)
 {
     char_u	*theline;
-    int		did_undo = FALSE;
+    整数		did_undo = FALSE;
     linenr_T	lnum = eap->line2;
-    int		indent = 0;
+    整数		indent = 0;
     char_u	*p;
-    int		vcol;
-    int		empty = (curbuf->b_ml.ml_flags & ML_EMPTY);
+    整数		vcol;
+    整数		empty = (curbuf->b_ml.ml_flags & ML_EMPTY);
 
 #ifdef FEAT_EVAL
-    if (not_in_vim9(eap, eap->skip) == FAIL)
-	return;
+    もし (not_in_vim9(eap, eap->skip) == FAIL)
+	戻る;
 #endif
-    if (eap->skip)
+    もし (eap->skip)
     {
 	// Not executing the command, only read the lines up to the ".".
-	while ((theline = get_append_line(eap, 0)) != NULL)
+	ながら ((theline = get_append_line(eap, 0)) != NULL)
 	{
-	    int end = theline[0] == '.' && theline[1] == NUL;
+	    整数 end = theline[0] == '.' && theline[1] == NUL;
 
 	    vim_free(theline);
-	    if (end)
+	    もし (end)
 		break;
 	}
-	return;
+	戻る;
     }
 
     // the ! flag toggles autoindent
-    if (eap->forceit)
+    もし (eap->forceit)
 	curbuf->b_p_ai = !curbuf->b_p_ai;
 
     // First autoindent comes from the line we start on
-    if (eap->cmdidx != CMD_change && curbuf->b_p_ai && lnum > 0)
+    もし (eap->cmdidx != CMD_change && curbuf->b_p_ai && lnum > 0)
 	append_indent = get_indent_lnum(lnum);
 
-    if (eap->cmdidx != CMD_append)
+    もし (eap->cmdidx != CMD_append)
 	--lnum;
 
     // when the buffer is empty need to delete the dummy line
-    if (empty && lnum == 1)
+    もし (empty && lnum == 1)
 	lnum = 0;
 
     State = MODE_INSERT;		    // behave like in Insert mode
-    if (curbuf->b_p_iminsert == B_IMODE_LMAP)
+    もし (curbuf->b_p_iminsert == B_IMODE_LMAP)
 	State |= MODE_LANGMAP;
 
-    for (;;)
+    ために (;;)
     {
 	msg_scroll = TRUE;
 	need_wait_return = FALSE;
-	if (curbuf->b_p_ai)
+	もし (curbuf->b_p_ai)
 	{
-	    if (append_indent >= 0)
+	    もし (append_indent >= 0)
 	    {
 		indent = append_indent;
 		append_indent = -1;
 	    }
-	    else if (lnum > 0)
+	    否则 もし (lnum > 0)
 		indent = get_indent_lnum(lnum);
 	}
 	ex_keep_indent = FALSE;
 	theline = get_append_line(eap, indent);
 	lines_left = Rows - 1;
-	if (theline == NULL)
+	もし (theline == NULL)
 	    break;
 
 	// Using ^ CTRL-D in getexmodeline() makes us repeat the indent.
-	if (ex_keep_indent)
+	もし (ex_keep_indent)
 	    append_indent = indent;
 
 	// Look for the "." after automatic indent.
 	vcol = 0;
-	for (p = theline; indent > vcol; ++p)
+	ために (p = theline; indent > vcol; ++p)
 	{
-	    if (*p == ' ')
+	    もし (*p == ' ')
 		++vcol;
-	    else if (*p == TAB)
+	    否则 もし (*p == TAB)
 		vcol += 8 - vcol % 8;
-	    else
+	    否则
 		break;
 	}
-	if ((p[0] == '.' && p[1] == NUL)
+	もし ((p[0] == '.' && p[1] == NUL)
 		|| (!did_undo && u_save(lnum, lnum + 1 + (empty ? 1 : 0))
 								     == FAIL))
 	{
@@ -3723,21 +3723,21 @@ ex_append(exarg_T *eap)
 	}
 
 	// don't use autoindent if nothing was typed.
-	if (p[0] == NUL)
+	もし (p[0] == NUL)
 	    theline[0] = NUL;
 
 	did_undo = TRUE;
 	ml_append(lnum, theline, (colnr_T)0, FALSE);
-	if (empty)
+	もし (empty)
 	    // there are no marks below the inserted lines
 	    appended_lines(lnum, 1L);
-	else
+	否则
 	    appended_lines_mark(lnum, 1L);
 
 	vim_free(theline);
 	++lnum;
 
-	if (empty)
+	もし (empty)
 	{
 	    ml_delete(2L);
 	    empty = FALSE;
@@ -3745,18 +3745,18 @@ ex_append(exarg_T *eap)
     }
     State = MODE_NORMAL;
 
-    if (eap->forceit)
+    もし (eap->forceit)
 	curbuf->b_p_ai = !curbuf->b_p_ai;
 
     // "start" is set to eap->line2+1 unless that position is invalid (when
     // eap->line2 pointed to the end of the buffer and nothing was appended)
     // "end" is set to lnum when something has been appended, otherwise
     // it is the same as "start"  -- Acevedo
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    もし ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	curbuf->b_op_start.lnum = (eap->line2 < curbuf->b_ml.ml_line_count) ?
 	    eap->line2 + 1 : curbuf->b_ml.ml_line_count;
-	if (eap->cmdidx != CMD_append)
+	もし (eap->cmdidx != CMD_append)
 	    --curbuf->b_op_start.lnum;
 	curbuf->b_op_end.lnum = (eap->line2 < lnum)
 					      ? lnum : curbuf->b_op_start.lnum;
@@ -3779,25 +3779,25 @@ ex_change(exarg_T *eap)
     linenr_T	lnum;
 
 #ifdef FEAT_EVAL
-    if (not_in_vim9(eap, eap->skip) == FAIL)
-	return;
+    もし (not_in_vim9(eap, eap->skip) == FAIL)
+	戻る;
 #endif
-    if (eap->skip)
+    もし (eap->skip)
     {
 	ex_append(eap);
-	return;
+	戻る;
     }
-    if (eap->line2 >= eap->line1
+    もし (eap->line2 >= eap->line1
 	    && u_save(eap->line1 - 1, eap->line2 + 1) == FAIL)
-	return;
+	戻る;
 
     // the ! flag toggles autoindent
-    if (eap->forceit ? !curbuf->b_p_ai : curbuf->b_p_ai)
+    もし (eap->forceit ? !curbuf->b_p_ai : curbuf->b_p_ai)
 	append_indent = get_indent_lnum(eap->line1);
 
-    for (lnum = eap->line2; lnum >= eap->line1; --lnum)
+    ために (lnum = eap->line2; lnum >= eap->line1; --lnum)
     {
-	if (curbuf->b_ml.ml_flags & ML_EMPTY)	    // nothing to delete
+	もし (curbuf->b_ml.ml_flags & ML_EMPTY)	    // nothing to delete
 	    break;
 	ml_delete(eap->line1);
     }
@@ -3817,54 +3817,54 @@ ex_z(exarg_T *eap)
     char_u	*x;
     long	bigness;
     char_u	*kind;
-    int		minus = 0;
+    整数		minus = 0;
     linenr_T	start, end, curs, i;
-    int		j;
+    整数		j;
     linenr_T	lnum = eap->line2;
 
     // Vi compatible: ":z!" uses display height, without a count uses
     // 'scroll'
-    if (eap->forceit)
+    もし (eap->forceit)
 	bigness = Rows - 1;
-    else if (!ONE_WINDOW)
+    否则 もし (!ONE_WINDOW)
 	bigness = curwin->w_height - 3;
-    else
+    否则
 	bigness = curwin->w_p_scr * 2;
-    if (bigness < 1)
+    もし (bigness < 1)
 	bigness = 1;
 
     x = eap->arg;
     kind = x;
-    if (*kind == '-' || *kind == '+' || *kind == '='
+    もし (*kind == '-' || *kind == '+' || *kind == '='
 					      || *kind == '^' || *kind == '.')
 	++x;
-    while (*x == '-' || *x == '+')
+    ながら (*x == '-' || *x == '+')
 	++x;
 
-    if (*x != 0)
+    もし (*x != 0)
     {
-	if (!VIM_ISDIGIT(*x))
+	もし (!VIM_ISDIGIT(*x))
 	{
 	    emsg(_(e_non_numeric_argument_to_z));
-	    return;
+	    戻る;
 	}
-	else
+	否则
 	{
 	    bigness = atol((char *)x);
 
 	    // bigness could be < 0 if atol(x) overflows.
-	    if (bigness > 2 * curbuf->b_ml.ml_line_count || bigness < 0)
+	    もし (bigness > 2 * curbuf->b_ml.ml_line_count || bigness < 0)
 		bigness = 2 * curbuf->b_ml.ml_line_count;
 
 	    p_window = bigness;
-	    if (*kind == '=')
+	    もし (*kind == '=')
 		bigness += 2;
 	}
     }
 
     // the number of '-' and '+' multiplies the distance
-    if (*kind == '-' || *kind == '+')
-	for (x = kind + 1; *x == *kind; ++x)
+    もし (*kind == '-' || *kind == '+')
+	ために (x = kind + 1; *x == *kind; ++x)
 	    ;
 
     switch (*kind)
@@ -3896,48 +3896,48 @@ ex_z(exarg_T *eap)
 
 	default:  // '+'
 	    start = lnum;
-	    if (*kind == '+')
+	    もし (*kind == '+')
 		start += bigness * (linenr_T)(x - kind - 1) + 1;
-	    else if (eap->addr_count == 0)
+	    否则 もし (eap->addr_count == 0)
 		++start;
 	    end = start + bigness - 1;
 	    curs = end;
 	    break;
     }
 
-    if (start < 1)
+    もし (start < 1)
 	start = 1;
 
-    if (end > curbuf->b_ml.ml_line_count)
+    もし (end > curbuf->b_ml.ml_line_count)
 	end = curbuf->b_ml.ml_line_count;
 
-    if (curs > curbuf->b_ml.ml_line_count)
+    もし (curs > curbuf->b_ml.ml_line_count)
 	curs = curbuf->b_ml.ml_line_count;
-    else if (curs < 1)
+    否则 もし (curs < 1)
 	curs = 1;
 
-    for (i = start; i <= end; i++)
+    ために (i = start; i <= end; i++)
     {
-	if (minus && i == lnum)
+	もし (minus && i == lnum)
 	{
 	    msg_putchar('\n');
 
-	    for (j = 1; j < Columns; j++)
+	    ために (j = 1; j < Columns; j++)
 		msg_putchar('-');
 	}
 
 	print_line(i, eap->flags & EXFLAG_NR, eap->flags & EXFLAG_LIST);
 
-	if (minus && i == lnum)
+	もし (minus && i == lnum)
 	{
 	    msg_putchar('\n');
 
-	    for (j = 1; j < Columns; j++)
+	    ために (j = 1; j < Columns; j++)
 		msg_putchar('-');
 	}
     }
 
-    if (curwin->w_cursor.lnum != curs)
+    もし (curwin->w_cursor.lnum != curs)
     {
 	curwin->w_cursor.lnum = curs;
 	curwin->w_cursor.col = 0;
@@ -3950,15 +3950,15 @@ ex_z(exarg_T *eap)
  * If so, give an error message and return TRUE.
  * Otherwise, return FALSE.
  */
-    int
+    整数
 check_restricted(void)
 {
-    if (restricted)
+    もし (restricted)
     {
 	emsg(_(e_shell_commands_and_some_functionality_not_allowed_in_rvim));
-	return TRUE;
+	戻る TRUE;
     }
-    return FALSE;
+    戻る FALSE;
 }
 
 /*
@@ -3966,44 +3966,44 @@ check_restricted(void)
  * If so, give an error message and return TRUE.
  * Otherwise, return FALSE.
  */
-    int
+    整数
 check_secure(void)
 {
-    if (secure)
+    もし (secure)
     {
 	secure = 2;
 	emsg(_(e_command_not_allowed_from_vimrc_in_current_dir_or_tag_search));
-	return TRUE;
+	戻る TRUE;
     }
 #ifdef HAVE_SANDBOX
     /*
      * In the sandbox more things are not allowed, including the things
      * disallowed in secure mode.
      */
-    if (sandbox != 0)
+    もし (sandbox != 0)
     {
 	emsg(_(e_not_allowed_in_sandbox));
-	return TRUE;
+	戻る TRUE;
     }
 #endif
-    return FALSE;
+    戻る FALSE;
 }
 
 static char_u	*old_sub = NULL;	// previous substitute pattern
-static int	global_need_beginline;	// call beginline() after ":g"
+static 整数	global_need_beginline;	// call beginline() after ":g"
 
 /*
  * Flags that are kept between calls to :substitute.
  */
 typedef struct {
-    int	do_all;		// do multiple substitutions per line
-    int	do_ask;		// ask for confirmation
-    int	do_count;	// count only
-    int	do_error;	// if false, ignore errors
-    int	do_print;	// print last line with subs.
-    int	do_list;	// list last line with subs.
-    int	do_number;	// list last line with line nr
-    int	do_ic;		// ignore case flag
+    整数	do_all;		// do multiple substitutions per line
+    整数	do_ask;		// ask for confirmation
+    整数	do_count;	// count only
+    整数	do_error;	// if false, ignore errors
+    整数	do_print;	// print last line with subs.
+    整数	do_list;	// list last line with subs.
+    整数	do_number;	// list last line with line nr
+    整数	do_ic;		// ignore case flag
 } subflags_T;
 
 /*
@@ -4011,33 +4011,33 @@ typedef struct {
  * character.
  */
     char_u *
-skip_substitute(char_u *start, int delimiter)
+skip_substitute(char_u *start, 整数 delimiter)
 {
     char_u *p = start;
 
-    while (p[0])
+    ながら (p[0])
     {
-	if (p[0] == delimiter)		// end delimiter found
+	もし (p[0] == delimiter)		// end delimiter found
 	{
 	    *p++ = NUL;			// replace it with a NUL
 	    break;
 	}
-	if (p[0] == '\\' && p[1] != 0)	// skip escaped characters
+	もし (p[0] == '\\' && p[1] != 0)	// skip escaped characters
 	    ++p;
 	MB_PTR_ADV(p);
     }
-    return p;
+    戻る p;
 }
 
-    static int
-check_regexp_delim(int c)
+    static 整数
+check_regexp_delim(整数 c)
 {
-    if (SAFE_isalpha(c))
+    もし (SAFE_isalpha(c))
     {
 	emsg(_(e_regular_expressions_cant_be_delimited_by_letters));
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -4059,18 +4059,18 @@ ex_substitute(exarg_T *eap)
 #ifdef FEAT_EVAL
     subflags_T	subflags_save;
 #endif
-    int		save_do_all;		// remember user specified 'g' flag
-    int		save_do_ask;		// remember user specified 'c' flag
+    整数		save_do_all;		// remember user specified 'g' flag
+    整数		save_do_ask;		// remember user specified 'c' flag
     char_u	*sub = NULL;		// init for GCC
     string_T	pat = {NULL, 0};
-    int		delimiter;
+    整数		delimiter;
     size_t	sublen;
-    int		got_quit = FALSE;
-    int		got_match = FALSE;
-    int		which_pat;
+    整数		got_quit = FALSE;
+    整数		got_match = FALSE;
+    整数		which_pat;
     char_u	*cmd;
     char_u	*p;
-    int		save_State;
+    整数		save_State;
     linenr_T	first_line = 0;		// first changed line
     linenr_T	last_line = 0;		// below last changed line AFTER the
 					// change
@@ -4078,42 +4078,42 @@ ex_substitute(exarg_T *eap)
     linenr_T	line2;
     long	nmatch;			// number of lines in match
     string_T	sub_firstline;		// allocated copy of first sub line
-    int		endcolumn = FALSE;	// cursor in last column when done
+    整数		endcolumn = FALSE;	// cursor in last column when done
     pos_T	old_cursor = curwin->w_cursor;
-    int		start_nsubs;
-    int		keeppatterns = cmdmod.cmod_flags & CMOD_KEEPPATTERNS;
+    整数		start_nsubs;
+    整数		keeppatterns = cmdmod.cmod_flags & CMOD_KEEPPATTERNS;
 #ifdef FEAT_EVAL
-    int		save_ma = 0;
-    int		save_sandbox = 0;
+    整数		save_ma = 0;
+    整数		save_sandbox = 0;
 #endif
 #ifdef FEAT_PROP_POPUP
     textprop_T	*text_props = NULL;
 #endif
 
     cmd = eap->arg;
-    if (!global_busy)
+    もし (!global_busy)
     {
 	sub_nsubs = 0;
 	sub_nlines = 0;
     }
     start_nsubs = sub_nsubs;
 
-    if (eap->cmdidx == CMD_tilde)
+    もし (eap->cmdidx == CMD_tilde)
 	which_pat = RE_LAST;	// use last used regexp
-    else
+    否则
 	which_pat = RE_SUBST;	// use last substitute regexp
 
 				// new pattern and substitution
-    if (eap->cmd[0] == 's' && *cmd != NUL && !VIM_ISWHITE(*cmd)
+    もし (eap->cmd[0] == 's' && *cmd != NUL && !VIM_ISWHITE(*cmd)
 		&& vim_strchr((char_u *)"0123456789cegriIp|\"", *cmd) == NULL)
     {
 	// don't accept alphanumeric for separator
-	if (check_regexp_delim(*cmd) == FAIL)
-	    return;
+	もし (check_regexp_delim(*cmd) == FAIL)
+	    戻る;
 #ifdef FEAT_EVAL
-	if (in_vim9script() && check_global_and_subst(eap->cmd, eap->arg)
+	もし (in_vim9script() && check_global_and_subst(eap->cmd, eap->arg)
 								      == FAIL)
-	    return;
+	    戻る;
 #endif
 
 	/*
@@ -4121,25 +4121,25 @@ ex_substitute(exarg_T *eap)
 	 *  "\/sub/" and "\?sub?" use last used search pattern (almost like
 	 *  //sub/r).  "\&sub&" use last substitute pattern (like //sub/).
 	 */
-	if (*cmd == '\\')
+	もし (*cmd == '\\')
 	{
-	    if (in_vim9script())
+	    もし (in_vim9script())
 	    {
 		emsg(_(e_cannot_use_s_backslash_in_vim9_script));
-		return;
+		戻る;
 	    }
 	    ++cmd;
-	    if (vim_strchr((char_u *)"/?&", *cmd) == NULL)
+	    もし (vim_strchr((char_u *)"/?&", *cmd) == NULL)
 	    {
 		emsg(_(e_backslash_should_be_followed_by));
-		return;
+		戻る;
 	    }
-	    if (*cmd != '&')
+	    もし (*cmd != '&')
 		which_pat = RE_SEARCH;	    // use last '/' pattern
 	    STR_LITERAL_SET(pat, "");	    // empty search pattern
 	    delimiter = *cmd++;		    // remember delimiter character
 	}
-	else		// find the end of the regexp
+	否则		// find the end of the regexp
 	{
 	    which_pat = RE_LAST;	    // use last used regexp
 	    delimiter = *cmd++;		    // remember delimiter character
@@ -4147,7 +4147,7 @@ ex_substitute(exarg_T *eap)
 	    cmd = skip_regexp_ex(cmd, delimiter, magic_isset(),
 							&eap->arg, NULL, NULL);
 	    pat.length = (size_t)(cmd - pat.string);
-	    if (cmd[0] == delimiter)	    // end delimiter found
+	    もし (cmd[0] == delimiter)	    // end delimiter found
 		*cmd++ = NUL;		    // replace it with a NUL
 	}
 
@@ -4158,53 +4158,53 @@ ex_substitute(exarg_T *eap)
 	p = cmd;	    // remember the start of the substitution
 	cmd = skip_substitute(cmd, delimiter);
 	sub = vim_strsave(p);
-	if (sub == NULL)
+	もし (sub == NULL)
 	    // out of memory
-	    return;
+	    戻る;
 
-	if (!eap->skip)
+	もし (!eap->skip)
 	{
 	    // In POSIX vi ":s/pat/%/" uses the previous subst. string.
-	    if (STRCMP(sub, "%") == 0
+	    もし (STRCMP(sub, "%") == 0
 				 && vim_strchr(p_cpo, CPO_SUBPERCENT) != NULL)
 	    {
-		if (old_sub == NULL)	// there is no previous command
+		もし (old_sub == NULL)	// there is no previous command
 		{
 		    emsg(_(e_no_previous_substitute_regular_expression));
 		    vim_free(sub);
-		    return;
+		    戻る;
 		}
 		vim_free(sub);
 		sub = vim_strsave(old_sub);
-		if (sub == NULL)
+		もし (sub == NULL)
 		    // out of memory
-		    return;
+		    戻る;
 	    }
-	    else if (!keeppatterns)
+	    否则 もし (!keeppatterns)
 	    {
 		vim_free(old_sub);
 		old_sub = vim_strsave(sub);
-		if (old_sub == NULL)
+		もし (old_sub == NULL)
 		{
 		    // out of memory
 		    vim_free(sub);
-		    return;
+		    戻る;
 		}
 	    }
 	}
     }
-    else if (!eap->skip)	// use previous pattern and substitution
+    否则 もし (!eap->skip)	// use previous pattern and substitution
     {
-	if (old_sub == NULL)	// there is no previous command
+	もし (old_sub == NULL)	// there is no previous command
 	{
 	    emsg(_(e_no_previous_substitute_regular_expression));
-	    return;
+	    戻る;
 	}
 	pat.string = NULL;		// search_regcomp() will use previous pattern
 	pat.length = 0;
 	sub = vim_strsave(old_sub);
-	if (sub == NULL)
-	    return;
+	もし (sub == NULL)
+	    戻る;
 
 	// Vi compatibility quirk: repeating with ":s" keeps the cursor in the
 	// last column after using "$".
@@ -4215,32 +4215,32 @@ ex_substitute(exarg_T *eap)
     // more efficient.
     // TODO: find a generic solution to make line-joining operations more
     // efficient, avoid allocating a string that grows in size.
-    if (pat.string != NULL && STRCMP(pat.string, "\\n") == 0
+    もし (pat.string != NULL && STRCMP(pat.string, "\\n") == 0
 	    && *sub == NUL
 	    && (*cmd == NUL || (cmd[1] == NUL && (*cmd == 'g' || *cmd == 'l'
 					     || *cmd == 'p' || *cmd == '#'))))
     {
 	linenr_T    joined_lines_count;
 
-	if (eap->skip)
+	もし (eap->skip)
 	{
 	    vim_free(sub);
-	    return;
+	    戻る;
 	}
 	curwin->w_cursor.lnum = eap->line1;
-	if (*cmd == 'l')
+	もし (*cmd == 'l')
 	    eap->flags = EXFLAG_LIST;
-	else if (*cmd == '#')
+	否则 もし (*cmd == '#')
 	    eap->flags = EXFLAG_NR;
-	else if (*cmd == 'p')
+	否则 もし (*cmd == 'p')
 	    eap->flags = EXFLAG_PRINT;
 
 	// The number of lines joined is the number of lines in the range plus
 	// one.  One less when the last line is included.
 	joined_lines_count = eap->line2 - eap->line1 + 1;
-	if (eap->line2 < curbuf->b_ml.ml_line_count)
+	もし (eap->line2 < curbuf->b_ml.ml_line_count)
 	    ++joined_lines_count;
-	if (joined_lines_count > 1)
+	もし (joined_lines_count > 1)
 	{
 	    (void)do_join(joined_lines_count, FALSE, TRUE, FALSE, TRUE);
 	    sub_nsubs = joined_lines_count - 1;
@@ -4249,36 +4249,36 @@ ex_substitute(exarg_T *eap)
 	    ex_may_print(eap);
 	}
 
-	if (!keeppatterns)
+	もし (!keeppatterns)
 	    save_re_pat(RE_SUBST, pat.string, pat.length, magic_isset());
 	// put pattern in history
 	add_to_history(HIST_SEARCH, pat.string, pat.length, TRUE, NUL);
 	vim_free(sub);
 
-	return;
+	戻る;
     }
 
     /*
      * Find trailing options.  When '&' is used, keep old options.
      */
-    if (*cmd == '&')
+    もし (*cmd == '&')
 	++cmd;
-    else
+    否则
     {
 #ifdef FEAT_EVAL
-	if (in_vim9script())
+	もし (in_vim9script())
 	{
 	    // ignore 'gdefault' and 'edcompatible'
 	    subflags.do_all = FALSE;
 	    subflags.do_ask = FALSE;
 	}
-	else
+	否则
 #endif
-	if (!p_ed)
+	もし (!p_ed)
 	{
-	    if (p_gd)		// default is global on
+	    もし (p_gd)		// default is global on
 		subflags.do_all = TRUE;
-	    else
+	    否则
 		subflags.do_all = FALSE;
 	    subflags.do_ask = FALSE;
 	}
@@ -4289,43 +4289,43 @@ ex_substitute(exarg_T *eap)
 	subflags.do_number = FALSE;
 	subflags.do_ic = 0;
     }
-    while (*cmd)
+    ながら (*cmd)
     {
 	/*
 	 * Note that 'g' and 'c' are always inverted, also when p_ed is off.
 	 * 'r' is never inverted.
 	 */
-	if (*cmd == 'g')
+	もし (*cmd == 'g')
 	    subflags.do_all = !subflags.do_all;
-	else if (*cmd == 'c')
+	否则 もし (*cmd == 'c')
 	    subflags.do_ask = !subflags.do_ask;
-	else if (*cmd == 'n')
+	否则 もし (*cmd == 'n')
 	    subflags.do_count = TRUE;
-	else if (*cmd == 'e')
+	否则 もし (*cmd == 'e')
 	    subflags.do_error = !subflags.do_error;
-	else if (*cmd == 'r')	    // use last used regexp
+	否则 もし (*cmd == 'r')	    // use last used regexp
 	    which_pat = RE_LAST;
-	else if (*cmd == 'p')
+	否则 もし (*cmd == 'p')
 	    subflags.do_print = TRUE;
-	else if (*cmd == '#')
+	否则 もし (*cmd == '#')
 	{
 	    subflags.do_print = TRUE;
 	    subflags.do_number = TRUE;
 	}
-	else if (*cmd == 'l')
+	否则 もし (*cmd == 'l')
 	{
 	    subflags.do_print = TRUE;
 	    subflags.do_list = TRUE;
 	}
-	else if (*cmd == 'i')	    // ignore case
+	否则 もし (*cmd == 'i')	    // ignore case
 	    subflags.do_ic = 'i';
-	else if (*cmd == 'I')	    // don't ignore case
+	否则 もし (*cmd == 'I')	    // don't ignore case
 	    subflags.do_ic = 'I';
-	else
+	否则
 	    break;
 	++cmd;
     }
-    if (subflags.do_count)
+    もし (subflags.do_count)
 	subflags.do_ask = FALSE;
 
     save_do_all = subflags.do_all;
@@ -4335,26 +4335,26 @@ ex_substitute(exarg_T *eap)
      * check for a trailing count
      */
     cmd = skipwhite(cmd);
-    if (VIM_ISDIGIT(*cmd))
+    もし (VIM_ISDIGIT(*cmd))
     {
 	i = getdigits(&cmd);
-	if (i <= 0 && !eap->skip && subflags.do_error)
+	もし (i <= 0 && !eap->skip && subflags.do_error)
 	{
 	    emsg(_(e_positive_count_required));
 	    vim_free(sub);
-	    return;
+	    戻る;
 	}
-	else if (i >= INT_MAX)
+	否则 もし (i >= INT_MAX)
 	{
 	    char	buf[20];
 	    vim_snprintf(buf, sizeof(buf), "%ld", i);
 	    semsg(_(e_val_too_large), buf);
 	    vim_free(sub);
-	    return;
+	    戻る;
 	}
 	eap->line1 = eap->line2;
 	eap->line2 += i - 1;
-	if (eap->line2 > curbuf->b_ml.ml_line_count)
+	もし (eap->line2 > curbuf->b_ml.ml_line_count)
 	    eap->line2 = curbuf->b_ml.ml_line_count;
     }
 
@@ -4362,43 +4362,43 @@ ex_substitute(exarg_T *eap)
      * check for trailing command or garbage
      */
     cmd = skipwhite(cmd);
-    if (*cmd && *cmd != '"')	    // if not end-of-line or comment
+    もし (*cmd && *cmd != '"')	    // if not end-of-line or comment
     {
 	set_nextcmd(eap, cmd);
-	if (eap->nextcmd == NULL)
+	もし (eap->nextcmd == NULL)
 	{
 	    semsg(_(e_trailing_characters_str), cmd);
 	    vim_free(sub);
-	    return;
+	    戻る;
 	}
     }
 
-    if (eap->skip)	    // not executing commands, only parsing
+    もし (eap->skip)	    // not executing commands, only parsing
     {
 	vim_free(sub);
-	return;
+	戻る;
     }
 
-    if (!subflags.do_count && !curbuf->b_p_ma)
+    もし (!subflags.do_count && !curbuf->b_p_ma)
     {
 	// Substitution is not allowed in non-'modifiable' buffer
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
 	vim_free(sub);
-	return;
+	戻る;
     }
 
-    if (search_regcomp(pat.string, pat.length, NULL, RE_SUBST, which_pat, SEARCH_HIS, &regmatch) == FAIL)
+    もし (search_regcomp(pat.string, pat.length, NULL, RE_SUBST, which_pat, SEARCH_HIS, &regmatch) == FAIL)
     {
-	if (subflags.do_error)
+	もし (subflags.do_error)
 	    emsg(_(e_invalid_command));
 	vim_free(sub);
-	return;
+	戻る;
     }
 
     // the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase'
-    if (subflags.do_ic == 'i')
+    もし (subflags.do_ic == 'i')
 	regmatch.rmm_ic = TRUE;
-    else if (subflags.do_ic == 'I')
+    否则 もし (subflags.do_ic == 'I')
 	regmatch.rmm_ic = FALSE;
 
     sub_firstline.string = NULL;
@@ -4411,19 +4411,19 @@ ex_substitute(exarg_T *eap)
      * pattern.  We do it here once to avoid it to be replaced over and over
      * again.
      */
-    if (sub[0] == '\\' && sub[1] == '=')
+    もし (sub[0] == '\\' && sub[1] == '=')
     {
 	p = vim_strsave(sub);
 	vim_free(sub);
-	if (p == NULL)
-	    return;
+	もし (p == NULL)
+	    戻る;
 	sub = p;
     }
-    else
+    否则
     {
 	p = regtilde(sub, magic_isset());
 
-	if (p != sub)
+	もし (p != sub)
 	{
 	    vim_free(sub);
 	    sub = p;
@@ -4434,15 +4434,15 @@ ex_substitute(exarg_T *eap)
      * Check for a match on each line.
      */
     line2 = eap->line2;
-    for (lnum = eap->line1; lnum <= line2 && !(got_quit
-#if defined(FEAT_EVAL)
+    ために (lnum = eap->line1; lnum <= line2 && !(got_quit
+#もし defined(FEAT_EVAL)
 		|| aborting()
 #endif
 		); ++lnum)
     {
 	nmatch = vim_regexec_multi(&regmatch, curwin, curbuf, lnum,
 						       (colnr_T)0, NULL);
-	if (nmatch)
+	もし (nmatch)
 	{
 	    colnr_T	copycol;
 	    colnr_T	matchcol;
@@ -4450,19 +4450,19 @@ ex_substitute(exarg_T *eap)
 	    string_T	new_start = {NULL, 0};
 	    size_t	new_start_size = 0;
 	    char_u	*new_end;
-	    int		did_sub = FALSE;
-	    int		lastone;
+	    整数		did_sub = FALSE;
+	    整数		lastone;
 	    size_t	copy_len;
 	    size_t	needed_size;
 	    long	nmatch_tl = 0;	// nr of lines matched below lnum
-	    int		do_again;	// do it again after joining lines
-	    int		skip_match = FALSE;
+	    整数		do_again;	// do it again after joining lines
+	    整数		skip_match = FALSE;
 	    linenr_T	sub_firstlnum;	// nr of first sub line
 	    bool	did_split = false;	// "\r" split the line
 #ifdef FEAT_PROP_POPUP
-	    int		apc_flags = APC_SAVE_FOR_UNDO | APC_SUBSTITUTE;
+	    整数		apc_flags = APC_SAVE_FOR_UNDO | APC_SUBSTITUTE;
 	    colnr_T	total_added =  0;
-	    int		text_prop_count = 0;
+	    整数		text_prop_count = 0;
 #endif
 
 	    /*
@@ -4515,7 +4515,7 @@ ex_substitute(exarg_T *eap)
 	    matchcol = 0;
 
 	    // At first match, remember current cursor position.
-	    if (!got_match)
+	    もし (!got_match)
 	    {
 		setpcmark();
 		got_match = TRUE;
@@ -4529,7 +4529,7 @@ ex_substitute(exarg_T *eap)
 	     * 4. if do_all is set, find next match
 	     * 5. break if there isn't another match in this line
 	     */
-	    for (;;)
+	    ために (;;)
 	    {
 		string_T    tmp;
 		char_u	    *p1;
@@ -4538,7 +4538,7 @@ ex_substitute(exarg_T *eap)
 		// Advance "lnum" to the line where the match starts.  The
 		// match does not start in the first line when there is a line
 		// break before \zs.
-		if (regmatch.startpos[0].lnum > 0)
+		もし (regmatch.startpos[0].lnum > 0)
 		{
 		    lnum += regmatch.startpos[0].lnum;
 		    sub_firstlnum += regmatch.startpos[0].lnum;
@@ -4548,15 +4548,15 @@ ex_substitute(exarg_T *eap)
 
 		// Match might be after the last line for "\n\zs" matching at
 		// the end of the last line.
-		if (lnum > curbuf->b_ml.ml_line_count)
+		もし (lnum > curbuf->b_ml.ml_line_count)
 		    break;
 
-		if (sub_firstline.string == NULL)
+		もし (sub_firstline.string == NULL)
 		{
 		    sub_firstline.length = ml_get_len(sub_firstlnum);
 		    sub_firstline.string =
 			vim_strnsave(ml_get(sub_firstlnum), sub_firstline.length);
-		    if (sub_firstline.string == NULL)
+		    もし (sub_firstline.string == NULL)
 		    {
 			vim_free(new_start.string);
 			goto outofmem;
@@ -4573,20 +4573,20 @@ ex_substitute(exarg_T *eap)
 		 * match.  This reproduces the strange vi behaviour.
 		 * This also catches endless loops.
 		 */
-		if (matchcol == prev_matchcol
+		もし (matchcol == prev_matchcol
 			&& regmatch.endpos[0].lnum == 0
 			&& matchcol == regmatch.endpos[0].col)
 		{
-		    if (sub_firstline.string[matchcol] == NUL)
+		    もし (sub_firstline.string[matchcol] == NUL)
 			// We already were at the end of the line.  Don't look
 			// for a match in this line again.
 			skip_match = TRUE;
-		    else
+		    否则
 		    {
 			 // search for a match at next column
-			if (has_mbyte)
+			もし (has_mbyte)
 			    matchcol += mb_ptr2len(sub_firstline.string + matchcol);
-			else
+			否则
 			    ++matchcol;
 		    }
 		    goto skip;
@@ -4601,13 +4601,13 @@ ex_substitute(exarg_T *eap)
 		 * 2. If do_count is set only increase the counter.
 		 *    If do_ask is set, ask for confirmation.
 		 */
-		if (subflags.do_count)
+		もし (subflags.do_count)
 		{
 		    // For a multi-line match, put matchcol at the NUL at
 		    // the end of the line and set nmatch to one, so that
 		    // we continue looking for a match on the next line.
 		    // Avoids that ":s/\nB\@=//gc" get stuck.
-		    if (nmatch > 1)
+		    もし (nmatch > 1)
 		    {
 			matchcol = (colnr_T)sub_firstline.length;
 			nmatch = 1;
@@ -4618,14 +4618,14 @@ ex_substitute(exarg_T *eap)
 #ifdef FEAT_EVAL
 		    // Skip the substitution, unless an expression is used,
 		    // then it is evaluated in the sandbox.
-		    if (!(sub[0] == '\\' && sub[1] == '='))
+		    もし (!(sub[0] == '\\' && sub[1] == '='))
 #endif
 			goto skip;
 		}
 
-		if (subflags.do_ask)
+		もし (subflags.do_ask)
 		{
-		    int typed = 0;
+		    整数 typed = 0;
 
 		    // change State to MODE_CONFIRM, so that the mouse works
 		    // properly
@@ -4633,20 +4633,20 @@ ex_substitute(exarg_T *eap)
 		    State = MODE_CONFIRM;
 		    setmouse();		// disable mouse in xterm
 		    curwin->w_cursor.col = regmatch.startpos[0].col;
-		    if (curwin->w_p_crb)
+		    もし (curwin->w_p_crb)
 			do_check_cursorbind();
 
 		    // When 'cpoptions' contains "u" don't sync undo when
 		    // asking for confirmation.
-		    if (vim_strchr(p_cpo, CPO_UNDO) != NULL)
+		    もし (vim_strchr(p_cpo, CPO_UNDO) != NULL)
 			++no_u_sync;
 
 		    /*
 		     * Loop until 'y', 'n', 'q', CTRL-E or CTRL-Y typed.
 		     */
-		    while (subflags.do_ask)
+		    ながら (subflags.do_ask)
 		    {
-			if (exmode_active)
+			もし (exmode_active)
 			{
 			    char_u	*resp;
 			    colnr_T	sc, ec;
@@ -4657,54 +4657,54 @@ ex_substitute(exarg_T *eap)
 			    getvcol(curwin, &curwin->w_cursor,
 							   &sc, NULL, NULL, 0);
 			    curwin->w_cursor.col = regmatch.endpos[0].col - 1;
-			    if (curwin->w_cursor.col < 0)
+			    もし (curwin->w_cursor.col < 0)
 				curwin->w_cursor.col = 0;
 			    getvcol(curwin, &curwin->w_cursor,
 							   NULL, NULL, &ec, 0);
 			    curwin->w_cursor.col = regmatch.startpos[0].col;
-			    if (subflags.do_number || curwin->w_p_nu)
+			    もし (subflags.do_number || curwin->w_p_nu)
 			    {
-				int numw = number_width(curwin) + 1;
+				整数 numw = number_width(curwin) + 1;
 				sc += numw;
 				ec += numw;
 			    }
 			    msg_start();
-			    for (i = 0; i < (long)sc; ++i)
+			    ために (i = 0; i < (long)sc; ++i)
 				msg_putchar(' ');
-			    for ( ; i <= (long)ec; ++i)
+			    ために ( ; i <= (long)ec; ++i)
 				msg_putchar('^');
 
 			    resp = getexmodeline('?', NULL, 0, TRUE);
-			    if (resp != NULL)
+			    もし (resp != NULL)
 			    {
 				typed = *resp;
 				vim_free(resp);
 				// When ":normal" runs out of characters we get
 				// an empty line.  Use "q" to get out of the
 				// loop.
-				if (ex_normal_busy && typed == NUL)
+				もし (ex_normal_busy && typed == NUL)
 				    typed = 'q';
 			    }
 			}
-			else
+			否则
 			{
 			    string_T orig_line = {NULL, 0};
-			    int    len_change = 0;
-			    int	   save_p_lz = p_lz;
+			    整数    len_change = 0;
+			    整数	   save_p_lz = p_lz;
 #ifdef FEAT_FOLDING
-			    int save_p_fen = curwin->w_p_fen;
+			    整数 save_p_fen = curwin->w_p_fen;
 
 			    curwin->w_p_fen = FALSE;
 #endif
 			    // Invert the matched string.
 			    // Remove the inversion afterwards.
-			    int save_RedrawingDisabled = RedrawingDisabled;
+			    整数 save_RedrawingDisabled = RedrawingDisabled;
 			    RedrawingDisabled = 0;
 
 			    // avoid calling update_screen() in vgetorpeek()
 			    p_lz = FALSE;
 
-			    if (new_start.string != NULL)
+			    もし (new_start.string != NULL)
 			    {
 				// There already was a substitution, we would
 				// like to show this to the user.  We cannot
@@ -4713,15 +4713,15 @@ ex_substitute(exarg_T *eap)
 				// and change it back afterwards.
 				orig_line.length = ml_get_len(lnum);
 				orig_line.string = vim_strnsave(ml_get(lnum), orig_line.length);
-				if (orig_line.string != NULL)
+				もし (orig_line.string != NULL)
 				{
 				    string_T new_line;
 
 				    new_line.string = concat_str(new_start.string,
 						     sub_firstline.string + copycol);
-				    if (new_line.string == NULL)
+				    もし (new_line.string == NULL)
 					VIM_CLEAR_STRING(orig_line);
-				    else
+				    否则
 				    {
 					new_line.length =
 					    new_start.length + (sub_firstline.length - copycol);
@@ -4731,7 +4731,7 @@ ex_substitute(exarg_T *eap)
 					// deleted characters before the
 					// cursor.
 					len_change =
-					    (int)new_line.length - (int)orig_line.length;
+					    (整数)new_line.length - (整数)orig_line.length;
 					curwin->w_cursor.col += len_change;
 					ml_replace(lnum, new_line.string, FALSE);
 				    }
@@ -4742,7 +4742,7 @@ ex_substitute(exarg_T *eap)
 						  - regmatch.startpos[0].lnum;
 			    search_match_endcol = regmatch.endpos[0].col
 								 + len_change;
-			    if (search_match_lines == 0
+			    もし (search_match_lines == 0
 						   && search_match_endcol == 0)
 				// highlight at least one character for /^/
 				search_match_endcol = 1;
@@ -4757,7 +4757,7 @@ ex_substitute(exarg_T *eap)
 #ifdef FEAT_FOLDING
 			    curwin->w_p_fen = save_p_fen;
 #endif
-			    if (msg_row == Rows - 1)
+			    もし (msg_row == Rows - 1)
 				msg_didout = FALSE;	// avoid a scroll-up
 			    msg_starthere();
 			    i = msg_scroll;
@@ -4790,12 +4790,12 @@ ex_substitute(exarg_T *eap)
 			    p_lz = save_p_lz;
 
 			    // restore the line
-			    if (orig_line.string != NULL)
+			    もし (orig_line.string != NULL)
 				ml_replace(lnum, orig_line.string, FALSE);
 			}
 
 			need_wait_return = FALSE; // no hit-return prompt
-			if (typed == 'q' || typed == ESC || typed == Ctrl_C
+			もし (typed == 'q' || typed == ESC || typed == Ctrl_C
 #ifdef UNIX
 				|| typed == intr_char
 #endif
@@ -4804,47 +4804,47 @@ ex_substitute(exarg_T *eap)
 			    got_quit = TRUE;
 			    break;
 			}
-			if (typed == 'n')
+			もし (typed == 'n')
 			    break;
-			if (typed == 'y')
+			もし (typed == 'y')
 			    break;
-			if (typed == 'l')
+			もし (typed == 'l')
 			{
 			    // last: replace and then stop
 			    subflags.do_all = FALSE;
 			    line2 = lnum;
 			    break;
 			}
-			if (typed == 'a')
+			もし (typed == 'a')
 			{
 			    subflags.do_ask = FALSE;
 			    break;
 			}
-			if (typed == Ctrl_E)
+			もし (typed == Ctrl_E)
 			    scrollup_clamp();
-			else if (typed == Ctrl_Y)
+			否则 もし (typed == Ctrl_Y)
 			    scrolldown_clamp();
 		    }
 		    State = save_State;
 		    setmouse();
-		    if (vim_strchr(p_cpo, CPO_UNDO) != NULL)
+		    もし (vim_strchr(p_cpo, CPO_UNDO) != NULL)
 			--no_u_sync;
 
-		    if (typed == 'n')
+		    もし (typed == 'n')
 		    {
 			// For a multi-line match, put matchcol at the NUL at
 			// the end of the line and set nmatch to one, so that
 			// we continue looking for a match on the next line.
 			// Avoids that ":%s/\nB\@=//gc" and ":%s/\n/,\r/gc"
 			// get stuck when pressing 'n'.
-			if (nmatch > 1)
+			もし (nmatch > 1)
 			{
 			    matchcol = (colnr_T)sub_firstline.length;
 			    skip_match = TRUE;
 			}
 			goto skip;
 		    }
-		    if (got_quit)
+		    もし (got_quit)
 			goto skip;
 		}
 
@@ -4858,7 +4858,7 @@ ex_substitute(exarg_T *eap)
 #ifdef FEAT_EVAL
 		save_ma = curbuf->b_p_ma;
 		save_sandbox = sandbox;
-		if (subflags.do_count)
+		もし (subflags.do_count)
 		{
 		    // prevent accidentally changing the buffer by a function
 		    curbuf->b_p_ma = FALSE;
@@ -4884,7 +4884,7 @@ ex_substitute(exarg_T *eap)
 		// the replacement.
 		// Don't keep flags set by a recursive call.
 		subflags = subflags_save;
-		if (sublen == 0 || aborting() || subflags.do_count)
+		もし (sublen == 0 || aborting() || subflags.do_count)
 		{
 		    curbuf->b_p_ma = save_ma;
 		    sandbox = save_sandbox;
@@ -4894,12 +4894,12 @@ ex_substitute(exarg_T *eap)
 
 		// When the match included the "$" of the last line it may
 		// go beyond the last line of the buffer.
-		if (nmatch > curbuf->b_ml.ml_line_count - sub_firstlnum + 1)
+		もし (nmatch > curbuf->b_ml.ml_line_count - sub_firstlnum + 1)
 		{
 		    nmatch = curbuf->b_ml.ml_line_count - sub_firstlnum + 1;
 		    skip_match = TRUE;
 		    // safety check
-		    if (nmatch < 0)
+		    もし (nmatch < 0)
 			goto skip;
 		}
 
@@ -4910,19 +4910,19 @@ ex_substitute(exarg_T *eap)
 		// - original text after match
 		// Adjust text properties here, since we have all information
 		// needed.
-		if (nmatch == 1)
+		もし (nmatch == 1)
 		{
 		    tmp.string = sub_firstline.string;
 		    tmp.length = sub_firstline.length;
 #ifdef FEAT_PROP_POPUP
-		    if (curbuf->b_has_textprop)
+		    もし (curbuf->b_has_textprop)
 		    {
-			int bytes_added = (int)sublen - 1 - (regmatch.endpos[0].col
+			整数 bytes_added = (整数)sublen - 1 - (regmatch.endpos[0].col
 						   - regmatch.startpos[0].col);
 
 			// When text properties are changed, need to save for
 			// undo first, unless done already.
-			if (adjust_prop_columns(lnum,
+			もし (adjust_prop_columns(lnum,
 					total_added + regmatch.startpos[0].col,
 						       bytes_added, apc_flags))
 			    apc_flags &= ~APC_SAVE_FOR_UNDO;
@@ -4932,16 +4932,16 @@ ex_substitute(exarg_T *eap)
 		    }
 #endif
 		}
-		else
+		否则
 		{
 		    linenr_T	lastlnum = sub_firstlnum + nmatch - 1;
 #ifdef FEAT_PROP_POPUP
-		    if (curbuf->b_has_textprop)
+		    もし (curbuf->b_has_textprop)
 		    {
 			char_u	*prop_start;
 
 			// Props in the first line may be shortened or deleted
-			if (adjust_prop_columns(lnum,
+			もし (adjust_prop_columns(lnum,
 					total_added + regmatch.startpos[0].col,
 						       -MAXCOL, apc_flags))
 			    apc_flags &= ~APC_SAVE_FOR_UNDO;
@@ -4949,7 +4949,7 @@ ex_substitute(exarg_T *eap)
 			    (colnr_T)(sub_firstline.length - regmatch.startpos[0].col);
 
 			// Props in the last line may be moved or deleted
-			if (adjust_prop_columns(lastlnum,
+			もし (adjust_prop_columns(lastlnum,
 					0, -regmatch.endpos[0].col, apc_flags))
 			    // When text properties are changed, need to save
 			    // for undo first, unless done already.
@@ -4959,25 +4959,25 @@ ex_substitute(exarg_T *eap)
 			// later appended to the changed line.
 			text_prop_count = get_text_props(curbuf, lastlnum,
 							   &prop_start, FALSE);
-			if (text_prop_count > 0)
+			もし (text_prop_count > 0)
 			{
 			    // TODO: what when we already did this?
 			    vim_free(text_props);
 			    text_props = ALLOC_MULT(textprop_T,
 							      text_prop_count);
-			    if (text_props != NULL)
+			    もし (text_props != NULL)
 			    {
 				mch_memmove(text_props, prop_start,
 					 text_prop_count * sizeof(textprop_T));
 				// Filter out virtual text and continuation
 				// properties from deleted lines, convert
 				// offsets to pointers, and adjust columns.
-				int wi = 0;
-				for (int pi = 0; pi < text_prop_count; ++pi)
+				整数 wi = 0;
+				ために (整数 pi = 0; pi < text_prop_count; ++pi)
 				{
 				    // Skip virtual text and continuation
 				    // properties from the deleted line.
-				    if (text_props[pi].tp_id < 0
+				    もし (text_props[pi].tp_id < 0
 					    || (text_props[pi].tp_flags
 							& TP_FLAG_CONT_PREV))
 					continue;
@@ -4996,7 +4996,7 @@ ex_substitute(exarg_T *eap)
 		    tmp.length = ml_get_len(lastlnum);
 		    nmatch_tl += nmatch - 1;
 #ifdef FEAT_PROP_POPUP
-		    if (curbuf->b_has_textprop)
+		    もし (curbuf->b_has_textprop)
 			total_added +=
 			    (colnr_T)(tmp.length - regmatch.endpos[0].col);
 #endif
@@ -5006,7 +5006,7 @@ ex_substitute(exarg_T *eap)
 		needed_size = copy_len
 		    + (tmp.length - (size_t)regmatch.endpos[0].col) + sublen + 1;
 
-		if (new_start.string == NULL)
+		もし (new_start.string == NULL)
 		{
 		    /*
 		     * Get some space for a temporary buffer to do the
@@ -5014,12 +5014,12 @@ ex_substitute(exarg_T *eap)
 		     * too many calls to alloc()/free()).
 		     */
 		    new_start_size = needed_size + 50;
-		    if ((new_start.string = alloc_clear(new_start_size)) == NULL)
+		    もし ((new_start.string = alloc_clear(new_start_size)) == NULL)
 			goto outofmem;
 		    *new_start.string = NUL;
 		    new_start.length = 0;
 		}
-		else
+		否则
 		{
 		    /*
 		     * Check if the temporary buffer is long enough to do the
@@ -5027,10 +5027,10 @@ ex_substitute(exarg_T *eap)
 		     * extra to avoid too many calls to alloc()/free()).
 		     */
 		    needed_size += new_start.length;
-		    if (needed_size > new_start_size)
+		    もし (needed_size > new_start_size)
 		    {
 			new_start_size = needed_size + 50;
-			if ((p1 = alloc_clear(new_start_size)) == NULL)
+			もし ((p1 = alloc_clear(new_start_size)) == NULL)
 			{
 			    vim_free(new_start.string);
 			    goto outofmem;
@@ -5051,7 +5051,7 @@ ex_substitute(exarg_T *eap)
 		// new text added here
 		new_end = new_start.string + new_start.length;
 
-		if (new_start_size - copy_len < sublen)
+		もし (new_start_size - copy_len < sublen)
 		    sublen = new_start_size - copy_len - 1;
 
 #ifdef FEAT_EVAL
@@ -5059,10 +5059,10 @@ ex_substitute(exarg_T *eap)
 #endif
 		n = (size_t)vim_regsub_multi(&regmatch,
 		    sub_firstlnum - regmatch.startpos[0].lnum,
-		    sub, new_end, (int)sublen,
+		    sub, new_end, (整数)sublen,
 		    REGSUB_COPY | REGSUB_BACKSLASH | (magic_isset() ? REGSUB_MAGIC : 0));
 
-		if (n > 0)
+		もし (n > 0)
 		    new_start.length += n - 1;	    // remove 1 for the NUL
 
 #ifdef FEAT_EVAL
@@ -5077,35 +5077,35 @@ ex_substitute(exarg_T *eap)
 
 		// For a multi-line match, make a copy of the last matched
 		// line and continue in that one.
-		if (nmatch > 1)
+		もし (nmatch > 1)
 		{
 		    sub_firstlnum += nmatch - 1;
 		    vim_free(sub_firstline.string);
 		    sub_firstline.length = ml_get_len(sub_firstlnum);
 		    sub_firstline.string =
 			vim_strnsave(ml_get(sub_firstlnum), sub_firstline.length);
-		    if (sub_firstline.string == NULL)
+		    もし (sub_firstline.string == NULL)
 		    {
 			vim_free(new_start.string);
 			goto outofmem;
 		    }
 		    // When going beyond the last line, stop substituting.
-		    if (sub_firstlnum <= line2)
+		    もし (sub_firstlnum <= line2)
 			do_again = TRUE;
-		    else
+		    否则
 			subflags.do_all = FALSE;
 		}
 
 		// Remember next character to be copied.
 		copycol = regmatch.endpos[0].col;
 
-		if (skip_match)
+		もし (skip_match)
 		{
 		    // Already hit end of the buffer, sub_firstlnum is one
 		    // less than what it ought to be.
 		    vim_free(sub_firstline.string);
 		    sub_firstline.string = vim_strnsave((char_u *)"", 0);
-		    if (sub_firstline.string == NULL)
+		    もし (sub_firstline.string == NULL)
 		    {
 			vim_free(new_start.string);
 			goto outofmem;
@@ -5122,39 +5122,39 @@ ex_substitute(exarg_T *eap)
 		 * they must be doubled in the string and are halved here.
 		 * That is Vi compatible.
 		 */
-		for (p1 = new_end; *p1; ++p1)
+		ために (p1 = new_end; *p1; ++p1)
 		{
-		    if (p1[0] == '\\' && p1[1] != NUL)  // remove backslash
+		    もし (p1[0] == '\\' && p1[1] != NUL)  // remove backslash
 		    {
 			n = (size_t)(new_start.length - (p1 - new_start.string));
 			mch_memmove(p1, p1 + 1, n + 1);
 			--new_start.length;
 #ifdef FEAT_PROP_POPUP
-			if (curbuf->b_has_textprop)
+			もし (curbuf->b_has_textprop)
 			{
 			    // When text properties are changed, need to save
 			    // for undo first, unless done already.
-			    if (adjust_prop_columns(lnum,
+			    もし (adjust_prop_columns(lnum,
 					(colnr_T)(p1 - new_start.string), -1,
 					apc_flags))
 				apc_flags &= ~APC_SAVE_FOR_UNDO;
 			}
 #endif
 		    }
-		    else if (*p1 == CAR)
+		    否则 もし (*p1 == CAR)
 		    {
-			if (u_inssub(lnum) == OK)   // prepare for undo
+			もし (u_inssub(lnum) == OK)   // prepare for undo
 			{
 			    colnr_T	plen = (colnr_T)(p1 - new_start.string + 1);
 
 			    *p1 = NUL;		    // truncate up to the CR
 			    ml_append(lnum - 1, new_start.string, plen, FALSE);
 			    mark_adjust(lnum + 1, (linenr_T)MAXLNUM, 1L, 0L);
-			    if (subflags.do_ask)
+			    もし (subflags.do_ask)
 				appended_lines(lnum - 1, 1L);
-			    else
+			    否则
 			    {
-				if (first_line == 0)
+				もし (first_line == 0)
 				    first_line = lnum;
 				last_line = lnum + 1;
 			    }
@@ -5176,7 +5176,7 @@ ex_substitute(exarg_T *eap)
 			    p1 = new_start.string - 1;
 			}
 		    }
-		    else if (has_mbyte)
+		    否则 もし (has_mbyte)
 			p1 += (*mb_ptr2len)(p1) - 1;
 		}
 
@@ -5212,7 +5212,7 @@ skip:
 		 * When asking, undo is synced at every match, so a line split
 		 * by "\r" must be replaced in the same undo block.
 		 */
-		if (lastone
+		もし (lastone
 			|| nmatch_tl > 0
 			|| (subflags.do_ask && did_split)
 			|| (nmatch = vim_regexec_multi(&regmatch, curwin,
@@ -5220,7 +5220,7 @@ skip:
 						    matchcol, NULL)) == 0
 			|| regmatch.startpos[0].lnum > 0)
 		{
-		    if (new_start.string != NULL)
+		    もし (new_start.string != NULL)
 		    {
 			/*
 			 * Copy the rest of the line, that didn't match.
@@ -5236,14 +5236,14 @@ skip:
 			prev_matchcol = (colnr_T)(sub_firstline.length
 							      - prev_matchcol);
 
-			if (u_savesub(lnum) != OK)
+			もし (u_savesub(lnum) != OK)
 			    break;
 			ml_replace(lnum, new_start.string, TRUE);
 #ifdef FEAT_PROP_POPUP
-			if (text_props != NULL)
+			もし (text_props != NULL)
 			    add_text_props(lnum, text_props, text_prop_count);
 #endif
-			if (nmatch_tl > 0)
+			もし (nmatch_tl > 0)
 			{
 			    /*
 			     * Matched lines have now been substituted and are
@@ -5252,20 +5252,20 @@ skip:
 			     * it in the buffer.
 			     */
 			    ++lnum;
-			    if (u_savedel(lnum, nmatch_tl) != OK)
+			    もし (u_savedel(lnum, nmatch_tl) != OK)
 				break;
-			    for (i = 0; i < nmatch_tl; ++i)
+			    ために (i = 0; i < nmatch_tl; ++i)
 				ml_delete(lnum);
-			    if (copycol > 0)
+			    もし (copycol > 0)
 				mark_adjust(lnum, lnum + nmatch_tl - 1,
 						   (long)MAXLNUM, -nmatch_tl);
-			    else
+			    否则
 				// The entire last matched line was consumed,
 				// so the first line was effectively replaced
 				// by lines below.
 				mark_adjust(lnum - 1, lnum - 1,
 						   (long)MAXLNUM, -nmatch_tl);
-			    if (subflags.do_ask)
+			    もし (subflags.do_ask)
 				deleted_lines(lnum, nmatch_tl);
 			    --lnum;
 			    line2 -= nmatch_tl; // nr of lines decreases
@@ -5274,11 +5274,11 @@ skip:
 
 			// When asking, undo is saved each time, must also set
 			// changed flag each time.
-			if (subflags.do_ask)
+			もし (subflags.do_ask)
 			    changed_bytes(lnum, 0);
-			else
+			否则
 			{
-			    if (first_line == 0)
+			    もし (first_line == 0)
 				first_line = lnum;
 			    last_line = lnum + 1;
 			}
@@ -5295,19 +5295,19 @@ skip:
 			copycol = 0;
 			did_split = false;
 		    }
-		    if (nmatch == -1 && !lastone)
+		    もし (nmatch == -1 && !lastone)
 			nmatch = vim_regexec_multi(&regmatch, curwin, curbuf,
 					  sub_firstlnum, matchcol, NULL);
 
 		    /*
 		     * 5. break if there isn't another match in this line
 		     */
-		    if (nmatch <= 0)
+		    もし (nmatch <= 0)
 		    {
 			// If the match found didn't start where we were
 			// searching, do the next search in the line where we
 			// found the match.
-			if (nmatch == -1)
+			もし (nmatch == -1)
 			    lnum -= regmatch.startpos[0].lnum;
 			break;
 		    }
@@ -5316,7 +5316,7 @@ skip:
 		line_breakcheck();
 	    }
 
-	    if (did_sub)
+	    もし (did_sub)
 		++sub_nlines;
 	    vim_free(new_start.string);	// for when substitute was cancelled
 	    VIM_CLEAR_STRING(sub_firstline);	// free the copy of the original line
@@ -5325,7 +5325,7 @@ skip:
 	line_breakcheck();
     }
 
-    if (first_line != 0)
+    もし (first_line != 0)
     {
 	// Need to subtract the number of added lines from "last_line" to get
 	// the line number before the change (same as adding the number of
@@ -5342,12 +5342,12 @@ outofmem:
 #endif
 
     // ":s/pat//n" doesn't move the cursor
-    if (subflags.do_count)
+    もし (subflags.do_count)
 	curwin->w_cursor = old_cursor;
 
-    if (sub_nsubs > start_nsubs)
+    もし (sub_nsubs > start_nsubs)
     {
-	if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+	もし ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	{
 	    // Set the '[ and '] marks.
 	    curbuf->b_op_start.lnum = eap->line1;
@@ -5355,37 +5355,37 @@ outofmem:
 	    curbuf->b_op_start.col = curbuf->b_op_end.col = 0;
 	}
 
-	if (!global_busy)
+	もし (!global_busy)
 	{
 	    // when interactive leave cursor on the match
-	    if (!subflags.do_ask)
+	    もし (!subflags.do_ask)
 	    {
-		if (endcolumn)
+		もし (endcolumn)
 		    coladvance((colnr_T)MAXCOL);
-		else
+		否则
 		    beginline(BL_WHITE | BL_FIX);
 	    }
-	    if (!do_sub_msg(subflags.do_count) && subflags.do_ask)
+	    もし (!do_sub_msg(subflags.do_count) && subflags.do_ask)
 		msg("");
 	}
-	else
+	否则
 	    global_need_beginline = TRUE;
-	if (subflags.do_print)
+	もし (subflags.do_print)
 	    print_line(curwin->w_cursor.lnum,
 					 subflags.do_number, subflags.do_list);
     }
-    else if (!global_busy)
+    否则 もし (!global_busy)
     {
-	if (got_int)		// interrupted
+	もし (got_int)		// interrupted
 	    emsg(_(e_interrupted));
-	else if (got_match)	// did find something but nothing substituted
+	否则 もし (got_match)	// did find something but nothing substituted
 	    msg("");
-	else if (subflags.do_error)	// nothing found
+	否则 もし (subflags.do_error)	// nothing found
 	    semsg(_(e_pattern_not_found_str), get_search_pat());
     }
 
 #ifdef FEAT_FOLDING
-    if (subflags.do_ask && hasAnyFolding(curwin))
+    もし (subflags.do_ask && hasAnyFolding(curwin))
 	// Cursor position may require updating
 	changed_window_setting();
 #endif
@@ -5403,9 +5403,9 @@ outofmem:
  * Can also be used after a ":global" command.
  * Return TRUE if a message was given.
  */
-    int
+    整数
 do_sub_msg(
-    int	    count_only)		// used 'n' flag for ":s"
+    整数	    count_only)		// used 'n' flag for ":s"
 {
     /*
      * Only report substitutions when:
@@ -5413,16 +5413,16 @@ do_sub_msg(
      * - command was typed by user, or number of changed lines > 'report'
      * - giving messages is not disabled by 'lazyredraw'
      */
-    if (((sub_nsubs > p_report && (KeyTyped || sub_nlines > 1 || p_report < 1))
+    もし (((sub_nsubs > p_report && (KeyTyped || sub_nlines > 1 || p_report < 1))
 		|| count_only)
 	    && messaging())
     {
 	char	*msg_single;
 	char	*msg_plural;
 
-	if (got_int)
+	もし (got_int)
 	    STRCPY(msg_buf, _("(Interrupted) "));
-	else
+	否则
 	    *msg_buf = NUL;
 
 	msg_single = count_only
@@ -5440,17 +5440,17 @@ do_sub_msg(
 				 NGETTEXT(msg_single, msg_plural, sub_nlines),
 				 sub_nsubs, (long)sub_nlines);
 
-	if (msg(msg_buf))
+	もし (msg(msg_buf))
 	    // save message to display it after redraw
 	    set_keep_msg((char_u *)msg_buf, 0);
-	return TRUE;
+	戻る TRUE;
     }
-    if (got_int)
+    もし (got_int)
     {
 	emsg(_(e_interrupted));
-	return TRUE;
+	戻る TRUE;
     }
-    return FALSE;
+    戻る FALSE;
 }
 
     static void
@@ -5458,9 +5458,9 @@ global_exe_one(char_u *cmd, linenr_T lnum)
 {
     curwin->w_cursor.lnum = lnum;
     curwin->w_cursor.col = 0;
-    if (*cmd == NUL || *cmd == '\n')
+    もし (*cmd == NUL || *cmd == '\n')
 	do_cmdline((char_u *)"p", NULL, NULL, DOCMD_NOWAIT);
-    else
+    否则
 	do_cmdline(cmd, NULL, NULL, DOCMD_NOWAIT);
 }
 
@@ -5484,8 +5484,8 @@ global_exe_one(char_u *cmd, linenr_T lnum)
 ex_global(exarg_T *eap)
 {
     linenr_T	lnum;		// line number according to old situation
-    int		ndone = 0;
-    int		type;		// first char of cmd: 'v' or 'g'
+    整数		ndone = 0;
+    整数		type;		// first char of cmd: 'v' or 'g'
     char_u	*cmd;		// command argument
 
     char_u	delim;		// delimiter, normally '/'
@@ -5493,29 +5493,29 @@ ex_global(exarg_T *eap)
     size_t	patlen;
     char_u	*used_pat;
     regmmatch_T	regmatch;
-    int		match;
-    int		which_pat;
+    整数		match;
+    整数		which_pat;
 
     // When nesting the command works on one line.  This allows for
     // ":g/found/v/notfound/command".
-    if (global_busy && (eap->line1 != 1
+    もし (global_busy && (eap->line1 != 1
 				  || eap->line2 != curbuf->b_ml.ml_line_count))
     {
 	// will increment global_busy to break out of the loop
 	emsg(_(e_cannot_do_global_recursive_with_range));
-	return;
+	戻る;
     }
 
-    if (eap->forceit)		    // ":global!" is like ":vglobal"
+    もし (eap->forceit)		    // ":global!" is like ":vglobal"
 	type = 'v';
-    else
+    否则
 	type = *eap->cmd;
     cmd = eap->arg;
     which_pat = RE_LAST;	    // default: use last used regexp
 
 #ifdef FEAT_EVAL
-    if (in_vim9script() && check_global_and_subst(eap->cmd, eap->arg) == FAIL)
-	return;
+    もし (in_vim9script() && check_global_and_subst(eap->cmd, eap->arg) == FAIL)
+	戻る;
 #endif
 
     /*
@@ -5523,70 +5523,70 @@ ex_global(exarg_T *eap)
      *	"\/" and "\?": use previous search pattern.
      *		 "\&": use previous substitute pattern.
      */
-    if (*cmd == '\\')
+    もし (*cmd == '\\')
     {
 	++cmd;
-	if (vim_strchr((char_u *)"/?&", *cmd) == NULL)
+	もし (vim_strchr((char_u *)"/?&", *cmd) == NULL)
 	{
 	    emsg(_(e_backslash_should_be_followed_by));
-	    return;
+	    戻る;
 	}
-	if (*cmd == '&')
+	もし (*cmd == '&')
 	    which_pat = RE_SUBST;	// use previous substitute pattern
-	else
+	否则
 	    which_pat = RE_SEARCH;	// use previous search pattern
 	++cmd;
 	pat = (char_u *)"";
 	patlen = 0;
     }
-    else if (*cmd == NUL)
+    否则 もし (*cmd == NUL)
     {
 	emsg(_(e_regular_expression_missing_from_global));
-	return;
+	戻る;
     }
-    else if (check_regexp_delim(*cmd) == FAIL)
+    否则 もし (check_regexp_delim(*cmd) == FAIL)
     {
-	return;
+	戻る;
     }
-    else
+    否则
     {
 	delim = *cmd;		// get the delimiter
 	++cmd;			// skip delimiter if there is one
 	pat = cmd;		// remember start of pattern
 	cmd = skip_regexp_ex(cmd, delim, magic_isset(), &eap->arg, NULL, NULL);
-	if (cmd[0] == delim)		    // end delimiter found
+	もし (cmd[0] == delim)		    // end delimiter found
 	    *cmd++ = NUL;		    // replace it with a NUL
 	patlen = STRLEN(pat);
     }
 
-    if (search_regcomp(pat, patlen, &used_pat, RE_BOTH, which_pat, SEARCH_HIS,
+    もし (search_regcomp(pat, patlen, &used_pat, RE_BOTH, which_pat, SEARCH_HIS,
 							    &regmatch) == FAIL)
     {
 	emsg(_(e_invalid_command));
-	return;
+	戻る;
     }
 
-    if (global_busy)
+    もし (global_busy)
     {
 	lnum = curwin->w_cursor.lnum;
 	match = vim_regexec_multi(&regmatch, curwin, curbuf, lnum,
 						       (colnr_T)0, NULL);
-	if ((type == 'g' && match) || (type == 'v' && !match))
+	もし ((type == 'g' && match) || (type == 'v' && !match))
 	    global_exe_one(cmd, lnum);
     }
-    else
+    否则
     {
 	/*
 	 * pass 1: set marks for each (not) matching line
 	 */
-	for (lnum = eap->line1; lnum <= eap->line2 && !got_int; ++lnum)
+	ために (lnum = eap->line1; lnum <= eap->line2 && !got_int; ++lnum)
 	{
 	    // a match on this line?
 	    match = vim_regexec_multi(&regmatch, curwin, curbuf, lnum,
 						       (colnr_T)0, NULL);
-	    if (regmatch.regprog == NULL)
+	    もし (regmatch.regprog == NULL)
 		break;  // re-compiling regprog failed
-	    if ((type == 'g' && match) || (type == 'v' && !match))
+	    もし ((type == 'g' && match) || (type == 'v' && !match))
 	    {
 		ml_setmarked(lnum);
 		ndone++;
@@ -5597,26 +5597,26 @@ ex_global(exarg_T *eap)
 	/*
 	 * pass 2: execute the command for each line that has been marked
 	 */
-	if (got_int)
+	もし (got_int)
 	    msg(_(e_interrupted));
-	else if (ndone == 0)
+	否则 もし (ndone == 0)
 	{
-	    if (type == 'v')
+	    もし (type == 'v')
 	    {
-		if (in_vim9script())
+		もし (in_vim9script())
 		    semsg(_(e_pattern_found_in_every_line_str), used_pat);
-		else
+		否则
 		    smsg(_("Pattern found in every line: %s"), used_pat);
 	    }
-	    else
+	    否则
 	    {
-		if (in_vim9script())
+		もし (in_vim9script())
 		    semsg(_(e_pattern_not_found_str), used_pat);
-		else
+		否则
 		    smsg(_("Pattern not found: %s"), used_pat);
 	    }
 	}
-	else
+	否则
 	{
 #ifdef FEAT_CLIPBOARD_PROVIDER
 	    inc_clip_provider();
@@ -5664,16 +5664,16 @@ global_exe(char_u *cmd)
     global_need_beginline = FALSE;
     global_busy = 1;
     old_lcount = curbuf->b_ml.ml_line_count;
-    while (!got_int && (lnum = ml_firstmarked()) != 0 && global_busy == 1)
+    ながら (!got_int && (lnum = ml_firstmarked()) != 0 && global_busy == 1)
     {
 	global_exe_one(cmd, lnum);
 	ui_breakcheck();
     }
 
     global_busy = 0;
-    if (global_need_beginline)
+    もし (global_need_beginline)
 	beginline(BL_WHITE | BL_FIX);
-    else
+    否则
 	check_cursor();	// cursor may be beyond the end of the line
 
     // the cursor may not have moved in the text but a change in a previous
@@ -5682,14 +5682,14 @@ global_exe(char_u *cmd)
 
     // If it looks like no message was written, allow overwriting the
     // command with the report for number of changes.
-    if (msg_col == 0 && msg_scrolled == 0)
+    もし (msg_col == 0 && msg_scrolled == 0)
 	msg_didout = FALSE;
 
     // If substitutes done, report number of substitutes, otherwise report
     // number of extra or deleted lines.
     // Don't report extra or deleted lines in the edge case where the buffer
     // we are in after execution is different from the buffer we started in.
-    if (!do_sub_msg(FALSE) && curbuf == old_buf)
+    もし (!do_sub_msg(FALSE) && curbuf == old_buf)
 	msgmore(curbuf->b_ml.ml_line_count - old_lcount);
 }
 
@@ -5700,7 +5700,7 @@ global_exe(char_u *cmd)
     char_u *
 get_old_sub(void)
 {
-    return old_sub;
+    戻る old_sub;
 }
 
 /*
@@ -5714,7 +5714,7 @@ set_old_sub(char_u *val)
 }
 #endif // FEAT_VIMINFO
 
-#if defined(EXITFREE)
+#もし defined(EXITFREE)
     void
 free_old_sub(void)
 {
@@ -5722,16 +5722,16 @@ free_old_sub(void)
 }
 #endif
 
-#if defined(FEAT_QUICKFIX)
+#もし defined(FEAT_QUICKFIX)
 /*
  * Set up for a tagpreview.
  * Makes the preview window the current window.
  * Return TRUE when it was created.
  */
-    int
+    整数
 prepare_tagpreview(
-    int		undo_sync,	    // sync undo when leaving the window
-    int		use_previewpopup,   // use popup if 'previewpopup' set
+    整数		undo_sync,	    // sync undo when leaving the window
+    整数		use_previewpopup,   // use popup if 'previewpopup' set
     use_popup_T	use_popup)	    // use other popup window
 {
     win_T	*wp;
@@ -5740,56 +5740,56 @@ prepare_tagpreview(
     need_mouse_correct = TRUE;
 # endif
 
-    if (curwin->w_p_pvw)
-	return FALSE;
+    もし (curwin->w_p_pvw)
+	戻る FALSE;
 
     /*
      * If there is already a preview window open, use that one.
      */
 # ifdef FEAT_PROP_POPUP
-    if (use_previewpopup && *p_pvp != NUL)
+    もし (use_previewpopup && *p_pvp != NUL)
     {
 	wp = popup_find_preview_window();
-	if (wp != NULL)
+	もし (wp != NULL)
 	    popup_set_wantpos_cursor(wp, wp->w_minwidth, NULL);
     }
-    else if (use_popup != USEPOPUP_NONE)
+    否则 もし (use_popup != USEPOPUP_NONE)
     {
 	wp = popup_find_info_window();
-	if (wp != NULL)
+	もし (wp != NULL)
 	{
-	    if (use_popup == USEPOPUP_NORMAL)
+	    もし (use_popup == USEPOPUP_NORMAL)
 		popup_show(wp);
-	    else
+	    否则
 		popup_hide(wp);
 	    // When the popup moves or resizes it may reveal part of
 	    // another window.  TODO: can this be done more efficiently?
 	    redraw_all_later(UPD_NOT_VALID);
 	}
     }
-    else
+    否则
 # endif
     {
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_p_pvw)
+	    もし (wp->w_p_pvw)
 		break;
     }
-    if (wp != NULL)
+    もし (wp != NULL)
     {
 	win_enter(wp, undo_sync);
-	return FALSE;
+	戻る FALSE;
     }
 
     /*
      * There is no preview window open yet.  Create one.
      */
 # ifdef FEAT_PROP_POPUP
-    if ((use_previewpopup && *p_pvp != NUL)
+    もし ((use_previewpopup && *p_pvp != NUL)
 	    || use_popup != USEPOPUP_NONE)
-	return popup_create_preview_window(use_popup != USEPOPUP_NONE);
+	戻る popup_create_preview_window(use_popup != USEPOPUP_NONE);
 # endif
-    if (win_split(g_do_tagpreview > 0 ? g_do_tagpreview : 0, 0) == FAIL)
-	return FALSE;
+    もし (win_split(g_do_tagpreview > 0 ? g_do_tagpreview : 0, 0) == FAIL)
+	戻る FALSE;
     curwin->w_p_pvw = TRUE;
     curwin->w_p_wfh = TRUE;
     RESET_BINDING(curwin);	    // don't take over 'scrollbind'
@@ -5800,7 +5800,7 @@ prepare_tagpreview(
 # ifdef FEAT_FOLDING
     curwin->w_p_fdc = 0;	    // no 'foldcolumn'
 # endif
-    return TRUE;
+    戻る TRUE;
 }
 
 #endif
@@ -5816,20 +5816,20 @@ ex_smile(exarg_T *eap UNUSED)
 	"\5o\4$\1ox\4 \1o\3$\4o\5$\2 \45$\3 \1o\21$x\4 \10$\1\"\4$\3 \42$\5 \4$\10\"x\3 \4\"\7 \4$\4 \1\"\34$\1\"\6 \1o\3$x\16 \1\"\3$\1o\5 \3\"\22$\1\"\2$\1\"\11 \3$x\20 \3$\1o\12 \1\"\2$\2\"\6$\4\"\13 \1o\3$x\21 \4$\1o\40 \1o\3$\1\"x\22 \1\"\4$\1o\6 \1o\6$\1o\1\"\4$\1o\10 \1o\4$x\24 \1\"\5$\2o\5 \2\"\4$\1o\5$\1o\3 \1o\4$\2\"x\27 \2\"\5$\4o\2 \1\"\3$\1o\11$\3\"x\32 \2\"\7$\2o\1 \12$x\42 \4\"\13$x\46 \14$x\47 \12$\1\"x\50 \1\"\3$\4\"x"
     };
     char *p;
-    int n;
-    int i;
+    整数 n;
+    整数 i;
 
     msg_start();
     msg_putchar('\n');
-    for (i = 0; i < 2; ++i)
-	for (p = code[i]; *p != NUL; ++p)
-	    if (*p == 'x')
+    ために (i = 0; i < 2; ++i)
+	ために (p = code[i]; *p != NUL; ++p)
+	    もし (*p == 'x')
 		msg_putchar('\n');
-	    else
-		for (n = *p++; n > 0; --n)
-		    if (*p == 'o' || *p == '$')
+	    否则
+		ために (n = *p++; n > 0; --n)
+		    もし (*p == 'o' || *p == '$')
 			msg_putchar_attr(*p, HL_ATTR(HLF_L));
-		    else
+		    否则
 			msg_putchar(*p);
     msg_clr_eos();
 }
@@ -5841,13 +5841,13 @@ ex_smile(exarg_T *eap UNUSED)
     void
 ex_drop(exarg_T *eap)
 {
-    int		split = FALSE;
+    整数		split = FALSE;
     win_T	*wp;
     buf_T	*buf;
     tabpage_T	*tp;
 
-    if (ERROR_IF_POPUP_WINDOW || ERROR_IF_TERM_POPUP_WINDOW)
-	return;
+    もし (ERROR_IF_POPUP_WINDOW || ERROR_IF_TERM_POPUP_WINDOW)
+	戻る;
 
     /*
      * Check if the first argument is already being edited in a window.  If
@@ -5864,10 +5864,10 @@ ex_drop(exarg_T *eap)
      * editing "foo.pyc" and ".pyc" is in 'wildignore'.  Assume that we
      * already did an error message for this.
      */
-    if (ARGCOUNT == 0)
-	return;
+    もし (ARGCOUNT == 0)
+	戻る;
 
-    if (cmdmod.cmod_tab)
+    もし (cmdmod.cmod_tab)
     {
 	// ":tab drop file ...": open a tab for each argument that isn't
 	// edited in a window yet.  It's like ":tab all" but without closing
@@ -5875,7 +5875,7 @@ ex_drop(exarg_T *eap)
 	ex_all(eap);
 	cmdmod.cmod_tab = 0;
 	ex_rewind(eap);
-	return;
+	戻る;
     }
 
     // ":drop file ...": Edit the first argument.  Jump to an existing
@@ -5885,22 +5885,22 @@ ex_drop(exarg_T *eap)
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	if (wp->w_buffer == buf)
+	もし (wp->w_buffer == buf)
 	{
 	    goto_tabpage_win(tp, wp);
 	    curwin->w_arg_idx = 0;
-	    if (!bufIsChanged(curbuf))
+	    もし (!bufIsChanged(curbuf))
 	    {
-		int save_ar = curbuf->b_p_ar;
+		整数 save_ar = curbuf->b_p_ar;
 
 		// reload the file if it is newer
 		curbuf->b_p_ar = TRUE;
 		buf_check_timestamp(curbuf, FALSE);
 		curbuf->b_p_ar = save_ar;
 	    }
-	    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+	    もし (curbuf->b_ml.ml_flags & ML_EMPTY)
 		ex_rewind(eap);
-	    return;
+	    戻る;
 	}
     }
 
@@ -5910,7 +5910,7 @@ ex_drop(exarg_T *eap)
      * Skip the check if the 'hidden' option is set, as in this case the
      * buffer won't be lost.
      */
-    if (!buf_hide(curbuf))
+    もし (!buf_hide(curbuf))
     {
 	++emsg_off;
 	split = check_changed(curbuf, CCGD_AW | CCGD_EXCMD);
@@ -5918,12 +5918,12 @@ ex_drop(exarg_T *eap)
     }
 
     // Fake a ":sfirst" or ":first" command edit the first argument.
-    if (split)
+    もし (split)
     {
 	eap->cmdidx = CMD_sfirst;
 	eap->cmd[0] = 's';
     }
-    else
+    否则
 	eap->cmdidx = CMD_first;
     ex_rewind(eap);
 }
@@ -5936,9 +5936,9 @@ ex_drop(exarg_T *eap)
  * Return a pointer to the char just past the pattern plus flags.
  */
     char_u *
-skip_vimgrep_pat(char_u *p, char_u **s, int *flags)
+skip_vimgrep_pat(char_u *p, char_u **s, 整数 *flags)
 {
-    return skip_vimgrep_pat_ext(p, s, flags, NULL, NULL);
+    戻る skip_vimgrep_pat_ext(p, s, flags, NULL, NULL);
 }
 
 /*
@@ -5946,19 +5946,19 @@ skip_vimgrep_pat(char_u *p, char_u **s, int *flags)
  * and the pointer to it in "nulp".
  */
     char_u *
-skip_vimgrep_pat_ext(char_u *p, char_u **s, int *flags, char_u **nulp, int *cp)
+skip_vimgrep_pat_ext(char_u *p, char_u **s, 整数 *flags, char_u **nulp, 整数 *cp)
 {
-    int		c;
+    整数		c;
 
-    if (vim_isIDc(*p))
+    もし (vim_isIDc(*p))
     {
 	// ":vimgrep pattern fname"
-	if (s != NULL)
+	もし (s != NULL)
 	    *s = p;
 	p = skiptowhite(p);
-	if (s != NULL && *p != NUL)
+	もし (s != NULL && *p != NUL)
 	{
-	    if (nulp != NULL)
+	    もし (nulp != NULL)
 	    {
 		*nulp = p;
 		*cp = *p;
@@ -5966,20 +5966,20 @@ skip_vimgrep_pat_ext(char_u *p, char_u **s, int *flags, char_u **nulp, int *cp)
 	    *p++ = NUL;
 	}
     }
-    else
+    否则
     {
 	// ":vimgrep /pattern/[g][j] fname"
-	if (s != NULL)
+	もし (s != NULL)
 	    *s = p + 1;
 	c = *p;
 	p = skip_regexp(p + 1, c, TRUE);
-	if (*p != c)
-	    return NULL;
+	もし (*p != c)
+	    戻る NULL;
 
 	// Truncate the pattern.
-	if (s != NULL)
+	もし (s != NULL)
 	{
-	    if (nulp != NULL)
+	    もし (nulp != NULL)
 	    {
 		*nulp = p;
 		*cp = *p;
@@ -5989,24 +5989,24 @@ skip_vimgrep_pat_ext(char_u *p, char_u **s, int *flags, char_u **nulp, int *cp)
 	++p;
 
 	// Find the flags
-	while (*p == 'g' || *p == 'j' || *p == 'f')
+	ながら (*p == 'g' || *p == 'j' || *p == 'f')
 	{
-	    if (flags != NULL)
+	    もし (flags != NULL)
 	    {
-		if (*p == 'g')
+		もし (*p == 'g')
 		    *flags |= VGR_GLOBAL;
-		else if (*p == 'j')
+		否则 もし (*p == 'j')
 		    *flags |= VGR_NOJUMP;
-		else
+		否则
 		    *flags |= VGR_FUZZY;
 	    }
 	    ++p;
 	}
     }
-    return p;
+    戻る p;
 }
 
-#if defined(FEAT_EVAL)
+#もし defined(FEAT_EVAL)
 /*
  * List v:oldfiles in a nice way.
  */
@@ -6015,29 +6015,29 @@ ex_oldfiles(exarg_T *eap UNUSED)
 {
     list_T	*l = get_vim_var_list(VV_OLDFILES);
     listitem_T	*li;
-    int		nr = 0;
+    整数		nr = 0;
     char_u	*fname;
     // for a single filtered match, remember the number
     // so we can jump directly to it without prompting
-    int		matches = -1;
+    整数		matches = -1;
 
-    if (l == NULL)
+    もし (l == NULL)
     {
 	msg(_("No old files"));
-	return;
+	戻る;
     }
 
     msg_start();
     msg_scroll = TRUE;
-    for (li = l->lv_first; li != NULL && !got_int; li = li->li_next)
+    ために (li = l->lv_first; li != NULL && !got_int; li = li->li_next)
     {
 	++nr;
 	fname = tv_get_string(&li->li_tv);
-	if (!message_filtered(fname))
+	もし (!message_filtered(fname))
 	{
-	    if (matches < 0)
+	    もし (matches < 0)
 		matches = nr;
-	    else
+	    否则
 		matches = 0;
 	    msg_outnum((long)nr);
 	    msg_puts(": ");
@@ -6053,25 +6053,25 @@ ex_oldfiles(exarg_T *eap UNUSED)
     got_int = FALSE;
 
 # ifdef FEAT_BROWSE_CMD
-    if (cmdmod.cmod_flags & CMOD_BROWSE)
+    もし (cmdmod.cmod_flags & CMOD_BROWSE)
     {
 	quit_more = FALSE;
 	// we only need to prompt if there is more than 1 match
-	if (matches > 0)
+	もし (matches > 0)
 	{
 	    nr = matches;
 	    // msg_putchar above sets needs_wait_return
 	    need_wait_return = FALSE;
 	}
-	else
+	否则
 	    nr = prompt_for_number(FALSE);
 	msg_starthere();
-	if (nr > 0)
+	もし (nr > 0)
 	{
 	    char_u *p = list_find_str(get_vim_var_list(VV_OLDFILES),
 		    (long)nr);
 
-	    if (p != NULL)
+	    もし (p != NULL)
 	    {
 		p = expand_env_save(p);
 		eap->arg = p;

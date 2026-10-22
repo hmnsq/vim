@@ -37,7 +37,7 @@ bool		    is_reading = false;
  * Like wl_display_flush but always writes all the data in the buffer to the
  * display fd. Returns FAIL on failure and OK on success.
  */
-    int
+    整数
 vwl_connection_flush(vwl_connection_T *self)
 {
 #ifndef HAVE_SELECT
@@ -45,7 +45,7 @@ vwl_connection_flush(vwl_connection_T *self)
 
     fds.fd = self->display.fd;
     fds.events = POLLOUT;
-#else
+#否则
     fd_set	    wfds;
     struct timeval  tv;
 
@@ -53,41 +53,41 @@ vwl_connection_flush(vwl_connection_T *self)
     FD_SET(self->display.fd, &wfds);
 #endif
 
-    if (self->display.proxy == NULL)
-	return FAIL;
+    もし (self->display.proxy == NULL)
+	戻る FAIL;
 
     // Send the requests we have made to the compositor, until we have written
     // all the data. Poll in order to check if the display fd is writable, if
     // not, then wait until it is and continue writing or until we timeout.
-    while (true)
+    ながら (true)
     {
-	int ret = wl_display_flush(self->display.proxy);
+	整数 ret = wl_display_flush(self->display.proxy);
 
-	if (ret == -1 && errno == EAGAIN)
+	もし (ret == -1 && errno == EAGAIN)
 	{
 #ifndef HAVE_SELECT
-	    if (poll(&fds, 1, p_wtm) <= 0)
-#else
+	    もし (poll(&fds, 1, p_wtm) <= 0)
+#否则
 	    tv.tv_sec = p_wtm / 1000;
 	    tv.tv_usec = (p_wtm % 1000) * 1000;
-	    if (select(self->display.fd + 1, NULL, &wfds, NULL, &tv) <= 0)
-		return FAIL;
+	    もし (select(self->display.fd + 1, NULL, &wfds, NULL, &tv) <= 0)
+		戻る FAIL;
 #endif
 	}
-	else if (ret == -1)
-	    return FAIL;
-	else
+	否则 もし (ret == -1)
+	    戻る FAIL;
+	否则
 	    break;
     }
 
-    return OK;
+    戻る OK;
 }
 
 /*
  * Like wl_display_roundtrip but polls the display fd with a timeout. Returns
  * number of events dispatched on success else -1 on failure.
  */
-    int
+    整数
 vwl_connection_dispatch(vwl_connection_T *self)
 {
 #ifndef HAVE_SELECT
@@ -95,7 +95,7 @@ vwl_connection_dispatch(vwl_connection_T *self)
 
     fds.fd = self->display.fd;
     fds.events = POLLIN;
-#else
+#否则
     fd_set	    rfds;
     struct timeval  tv;
 
@@ -103,41 +103,41 @@ vwl_connection_dispatch(vwl_connection_T *self)
     FD_SET(self->display.fd, &rfds);
 #endif
 
-    if (self->display.proxy == NULL)
-	return -1;
+    もし (self->display.proxy == NULL)
+	戻る -1;
 
-    while (wl_display_prepare_read(self->display.proxy) == -1)
+    ながら (wl_display_prepare_read(self->display.proxy) == -1)
 	// Dispatch any queued events so that we can start reading
-	if (wl_display_dispatch_pending(self->display.proxy) == -1)
-	    return -1;
+	もし (wl_display_dispatch_pending(self->display.proxy) == -1)
+	    戻る -1;
 
     // Send any requests before we starting blocking to read display fd
-    if (vwl_connection_flush(self) == FAIL)
+    もし (vwl_connection_flush(self) == FAIL)
     {
 	wl_display_cancel_read(self->display.proxy);
-	return -1;
+	戻る -1;
     }
 
     // Poll until there is data to read from the display fd.
 #ifndef HAVE_SELECT
-    if (poll(&fds, 1, p_wtm) <= 0)
-#else
+    もし (poll(&fds, 1, p_wtm) <= 0)
+#否则
     tv.tv_sec = p_wtm / 1000;
     tv.tv_usec = (p_wtm % 1000) * 1000;
-    if (select(self->display.fd + 1, &rfds, NULL, NULL, &tv) <= 0)
+    もし (select(self->display.fd + 1, &rfds, NULL, NULL, &tv) <= 0)
 #endif
     {
 	wl_display_cancel_read(self->display.proxy);
-	return -1;
+	戻る -1;
     }
 
     // Read events into the queue
-    if (wl_display_read_events(self->display.proxy) == -1)
+    もし (wl_display_read_events(self->display.proxy) == -1)
 	// No need to cancel
-	return -1;
+	戻る -1;
 
     // Dispatch those events (call the handlers associated for each event)
-    return wl_display_dispatch_pending(self->display.proxy);
+    戻る wl_display_dispatch_pending(self->display.proxy);
 }
 
 /*
@@ -159,25 +159,25 @@ static const struct wl_callback_listener vwl_callback_listener = {
  * Like wl_display_roundtrip but polls the display fd with a timeout. Returns
  * FAIL on failure and OK on success.
  */
-    int
+    整数
 vwl_connection_roundtrip(vwl_connection_T *self)
 {
     struct wl_callback	*callback;
-    int			ret;
+    整数			ret;
     bool		done = false;
 #ifdef ELAPSED_FUNC
     elapsed_T		start_tv;
 #endif
 
-    if (self->display.proxy == NULL)
-	return FAIL;
+    もし (self->display.proxy == NULL)
+	戻る FAIL;
 
     // Tell compositor to emit 'done' event after processing all requests we
     // have sent and handling events.
     callback = wl_display_sync(self->display.proxy);
 
-    if (callback == NULL)
-	return FAIL;
+    もし (callback == NULL)
+	戻る FAIL;
 
     wl_callback_add_listener(callback, &vwl_callback_listener, &done);
 
@@ -187,15 +187,15 @@ vwl_connection_roundtrip(vwl_connection_T *self)
 
     // Wait till we get the done event (which will set `done` to TRUE), unless
     // we timeout
-    while (true)
+    ながら (true)
     {
 	ret = vwl_connection_dispatch(self);
 
-	if (done || ret == -1)
+	もし (done || ret == -1)
 	    break;
 
 #ifdef ELAPSED_FUNC
-	if (ELAPSED_FUNC(start_tv) >= p_wtm)
+	もし (ELAPSED_FUNC(start_tv) >= p_wtm)
 	{
 	    ret = -1;
 	    break;
@@ -203,14 +203,14 @@ vwl_connection_roundtrip(vwl_connection_T *self)
 #endif
     }
 
-    if (ret == -1)
+    もし (ret == -1)
     {
-	if (!done)
+	もし (!done)
 	    wl_callback_destroy(callback);
-	return FAIL;
+	戻る FAIL;
     }
 
-    return OK;
+    戻る OK;
 }
 
 /*
@@ -224,8 +224,8 @@ vwl_log_handler(const char *fmt, va_list args)
     char	*prefix = _("wayland protocol error -> ");
     size_t	len	= STRLEN(prefix);
 
-    if (buf == NULL)
-	return;
+    もし (buf == NULL)
+	戻る;
 
     vim_strncpy((char_u*)buf, (char_u*)prefix, len);
     vim_vsnprintf(buf + len, 512 - len, fmt, args);
@@ -290,43 +290,43 @@ wl_registry_listener_event_global(
 {
     vwl_connection_T *ct = data;
 
-    if (STRCMP(interface, wl_seat_interface.name) == 0)
+    もし (STRCMP(interface, wl_seat_interface.name) == 0)
     {
 	struct wl_seat	*seat_proxy = wl_registry_bind(registry, name,
 		&wl_seat_interface, version > 5 ? 5 : version);
 	vwl_seat_T	*seat;
 
-	if (seat_proxy == NULL)
-	    return;
+	もし (seat_proxy == NULL)
+	    戻る;
 
 	seat = ALLOC_CLEAR_ONE(vwl_seat_T);
 
-	if (seat == NULL || ga_grow(&ct->gobjects.seats, 1) == FAIL)
+	もし (seat == NULL || ga_grow(&ct->gobjects.seats, 1) == FAIL)
 	{
 	    vwl_seat_destroy(seat);
-	    return;
+	    戻る;
 	}
 
 	seat->proxy = seat_proxy;
 	wl_seat_add_listener(seat_proxy, &wl_seat_listener, seat);
 
-	if (vwl_connection_roundtrip(ct) == FAIL || seat->label == NULL)
+	もし (vwl_connection_roundtrip(ct) == FAIL || seat->label == NULL)
 	{
 	    vwl_seat_destroy(seat);
-	    return;
+	    戻る;
 	}
 
 	((vwl_seat_T **)ct->gobjects.seats.ga_data)[ct->gobjects.seats.ga_len++]
 	    = seat;
     }
 #ifdef FEAT_WAYLAND_CLIPBOARD
-    else if (STRCMP(interface, zwlr_data_control_manager_v1_interface.name) == 0)
+    否则 もし (STRCMP(interface, zwlr_data_control_manager_v1_interface.name) == 0)
 	ct->gobjects.zwlr_data_control_manager_v1 =
 	    wl_registry_bind(registry, name,
 		    &zwlr_data_control_manager_v1_interface,
 		    version > 2 ? 2 : version);
 
-    else if (STRCMP(interface, ext_data_control_manager_v1_interface.name) == 0)
+    否则 もし (STRCMP(interface, ext_data_control_manager_v1_interface.name) == 0)
 	ct->gobjects.ext_data_control_manager_v1 =
 	    wl_registry_bind(registry, name,
 		    &ext_data_control_manager_v1_interface, 1);
@@ -358,7 +358,7 @@ static void vwl_connection_destroy(vwl_connection_T *self);
 #ifdef FEAT_WAYLAND_CLIPBOARD
 
 # define VWL_DESTROY_GOBJECT(ct, object) \
-    if (ct->gobjects.object != NULL) \
+    もし (ct->gobjects.object != NULL) \
     { \
 	object##_destroy(ct->gobjects.object); \
 	ct->gobjects.object = NULL; \
@@ -374,50 +374,50 @@ vwl_connection_new(const char *display)
 {
     vwl_connection_T	*ct;
 
-    if (wayland_no_connect)
-	return NULL;
+    もし (wayland_no_connect)
+	戻る NULL;
 
     // We will get an error if XDG_RUNTIME_DIR is not set.
-    if (mch_getenv("XDG_RUNTIME_DIR") == NULL)
-	return NULL;
+    もし (mch_getenv("XDG_RUNTIME_DIR") == NULL)
+	戻る NULL;
 
     ct = ALLOC_CLEAR_ONE(vwl_connection_T);
 
-    if (ct == NULL)
-	return NULL;
+    もし (ct == NULL)
+	戻る NULL;
 
     // Must set log handler before we connect display in order to work.
     wl_log_set_handler_client(vwl_log_handler);
 
     ct->display.proxy = wl_display_connect(display);
 
-    if (ct->display.proxy == NULL)
+    もし (ct->display.proxy == NULL)
     {
 	vim_free(ct);
-	return NULL;
+	戻る NULL;
     }
 
     ct->display.fd = wl_display_get_fd(ct->display.proxy);
     ct->registry.proxy = wl_display_get_registry(ct->display.proxy);
 
-    if (ct->registry.proxy == NULL)
+    もし (ct->registry.proxy == NULL)
     {
 	wl_display_disconnect(ct->display.proxy);
 	vim_free(ct);
-	return NULL;
+	戻る NULL;
     }
 
     ga_init2(&ct->gobjects.seats, sizeof(vwl_seat_T *), 1);
 
     wl_registry_add_listener(ct->registry.proxy, &wl_registry_listener, ct);
 
-    if (vwl_connection_roundtrip(ct) == FAIL)
+    もし (vwl_connection_roundtrip(ct) == FAIL)
     {
 	vwl_connection_destroy(ct);
-	return NULL;
+	戻る NULL;
     }
 
-    return ct;
+    戻る ct;
 }
 
 #ifdef FEAT_WAYLAND_CLIPBOARD
@@ -428,14 +428,14 @@ vwl_connection_new(const char *display)
     static void
 vwl_seat_destroy(vwl_seat_T *self)
 {
-    if (self == NULL)
-	return;
-    if (self->proxy != NULL)
+    もし (self == NULL)
+	戻る;
+    もし (self->proxy != NULL)
     {
-	if (wl_seat_get_version(self->proxy) >= 5)
+	もし (wl_seat_get_version(self->proxy) >= 5)
 	    // Helpful for the compositor
 	    wl_seat_release(self->proxy);
-	else
+	否则
 	    wl_seat_destroy(self->proxy);
     }
     vim_free(self->label);
@@ -454,17 +454,17 @@ vwl_connection_destroy(vwl_connection_T *self)
     VWL_DESTROY_GOBJECT(self, zwlr_data_control_manager_v1)
 # endif
 
-    for (int i = 0; i < self->gobjects.seats.ga_len; i++)
+    ために (整数 i = 0; i < self->gobjects.seats.ga_len; i++)
 	vwl_seat_destroy(((vwl_seat_T **)self->gobjects.seats.ga_data)[i]);
     ga_clear(&self->gobjects.seats);
     self->gobjects.seats.ga_len = 0;
 
-    if (self->registry.proxy != NULL)
+    もし (self->registry.proxy != NULL)
     {
 	wl_registry_destroy(self->registry.proxy);
 	self->registry.proxy = NULL;
     }
-    if (self->display.proxy != NULL)
+    もし (self->display.proxy != NULL)
     {
 	wl_display_disconnect(self->display.proxy);
 	self->display.proxy = NULL;
@@ -480,17 +480,17 @@ vwl_connection_destroy(vwl_connection_T *self)
     vwl_seat_T *
 vwl_connection_get_seat(vwl_connection_T *self, const char *label)
 {
-    if ((STRCMP(label, "") == 0 || label == NULL)
+    もし ((STRCMP(label, "") == 0 || label == NULL)
 	    && self->gobjects.seats.ga_len > 0)
-	return ((vwl_seat_T **)self->gobjects.seats.ga_data)[0];
+	戻る ((vwl_seat_T **)self->gobjects.seats.ga_data)[0];
 
-    for (int i = 0; i < self->gobjects.seats.ga_len; i++)
+    ために (整数 i = 0; i < self->gobjects.seats.ga_len; i++)
     {
 	vwl_seat_T *seat = ((vwl_seat_T **)self->gobjects.seats.ga_data)[i];
-	if (STRCMP(seat->label, label) == 0)
-	    return seat;
+	もし (STRCMP(seat->label, label) == 0)
+	    戻る seat;
     }
-    return NULL;
+    戻る NULL;
 }
 
 #endif
@@ -503,19 +503,19 @@ vwl_connection_get_seat(vwl_connection_T *self, const char *label)
     static void
 wayland_set_display(const char *display)
 {
-    if (display == NULL)
+    もし (display == NULL)
 	display = (char*)mch_getenv((char_u*)"WAYLAND_DISPLAY");
-    else if (display == wayland_display_name)
+    否则 もし (display == wayland_display_name)
 	// Don't want to be freeing vwl_display_strname then trying to copy it
 	// after.
 	goto exit;
 
-    if (display == NULL)
+    もし (display == NULL)
 	// $WAYLAND_DISPLAY is not set
 	display = "";
 
     // Leave unchanged if display is empty (but not NULL)
-    if (STRCMP(display, "") != 0)
+    もし (STRCMP(display, "") != 0)
     {
 	vim_free(wayland_display_name);
 	wayland_display_name = (char*)vim_strsave((char_u*)display);
@@ -534,21 +534,21 @@ exit:
  * libwayland). Returns FAIL on failure and OK on
  * success
  */
-    int
+    整数
 wayland_init_connection(const char *display)
 {
     wayland_set_display(display);
 
     wayland_ct = vwl_connection_new(display);
 
-    if (wayland_ct == NULL)
+    もし (wayland_ct == NULL)
 	goto fail;
 
-    return OK;
+    戻る OK;
 fail:
     // Set v:wayland_display to empty string (but not wayland_display_name)
     wayland_set_display("");
-    return FAIL;
+    戻る FAIL;
 }
 
 /*
@@ -557,8 +557,8 @@ fail:
     void
 wayland_uninit_connection(void)
 {
-    if (wayland_ct == NULL)
-	return;
+    もし (wayland_ct == NULL)
+	戻る;
 #ifdef FEAT_WAYLAND_CLIPBOARD
     clip_uninit_wayland();
 #endif
@@ -568,7 +568,7 @@ wayland_uninit_connection(void)
     wayland_set_display("");
 }
 
-static int wayland_ct_restore_count = 0;
+static 整数 wayland_ct_restore_count = 0;
 
 /*
  * Attempts to restore the Wayland display connection.
@@ -577,13 +577,13 @@ static int wayland_ct_restore_count = 0;
 wayland_restore_connection(void)
 {
     // No point in restoring the connection if we are exiting or dying.
-    if (exiting || v_dying || wayland_ct_restore_count <= 0)
+    もし (exiting || v_dying || wayland_ct_restore_count <= 0)
 	wayland_set_display("");
 
     --wayland_ct_restore_count;
     wayland_uninit_connection();
 
-    if (wayland_init_connection(wayland_display_name) == OK)
+    もし (wayland_init_connection(wayland_display_name) == OK)
     {
 #ifdef FEAT_WAYLAND_CLIPBOARD
 	clip_init_wayland();
@@ -595,94 +595,94 @@ wayland_restore_connection(void)
  * Should be called before polling (select or poll) the global Wayland
  * connection display fd. Returns fd on success and -1 on failure.
  */
-    int
+    整数
 wayland_prepare_read(void)
 {
-    if (wayland_ct == NULL)
-	return -1;
+    もし (wayland_ct == NULL)
+	戻る -1;
 
-    if (is_reading)
+    もし (is_reading)
     {
 	wl_display_cancel_read(wayland_ct->display.proxy);
 	is_reading = false;
     }
 
-    while (wl_display_prepare_read(wayland_ct->display.proxy) == -1)
+    ながら (wl_display_prepare_read(wayland_ct->display.proxy) == -1)
 	// Event queue not empty, dispatch the events
-	if (wl_display_dispatch_pending(wayland_ct->display.proxy) == -1)
-	    return -1;
+	もし (wl_display_dispatch_pending(wayland_ct->display.proxy) == -1)
+	    戻る -1;
 
-    if (vwl_connection_flush(wayland_ct) < 0)
+    もし (vwl_connection_flush(wayland_ct) < 0)
     {
 	wl_display_cancel_read(wayland_ct->display.proxy);
-	return -1;
+	戻る -1;
     }
 
     is_reading = true;
 
-    return wayland_ct->display.fd;
+    戻る wayland_ct->display.fd;
 }
 
 /*
  * Catch up on any queued events
  */
-    int
+    整数
 wayland_update(void)
 {
-    if (wayland_ct == NULL)
-	return FAIL;
-    return vwl_connection_roundtrip(wayland_ct);
+    もし (wayland_ct == NULL)
+	戻る FAIL;
+    戻る vwl_connection_roundtrip(wayland_ct);
 }
 
-#if !defined(HAVE_SELECT)
+#もし !defined(HAVE_SELECT)
 
     void
-wayland_poll_check(int revents)
+wayland_poll_check(整数 revents)
 {
-    if (wayland_ct == NULL)
-	return;
+    もし (wayland_ct == NULL)
+	戻る;
 
     is_reading = false;
-    if (revents & POLLIN)
+    もし (revents & POLLIN)
     {
-	if (wl_display_read_events(wayland_ct->display.proxy) != -1)
+	もし (wl_display_read_events(wayland_ct->display.proxy) != -1)
 	{
 	    wl_display_dispatch_pending(wayland_ct->display.proxy);
-	    return;
+	    戻る;
 	}
     }
-    else if (revents & (POLLHUP | POLLERR))
+    否则 もし (revents & (POLLHUP | POLLERR))
 	wl_display_cancel_read(wayland_ct->display.proxy);
-    else
+    否则
     {
 	// Nothing happened
 	wl_display_cancel_read(wayland_ct->display.proxy);
-	return;
+	戻る;
     }
     wayland_restore_connection();
 }
 
 #endif
-#if defined(HAVE_SELECT)
+#もし defined(HAVE_SELECT)
 
     void
 wayland_select_check(bool is_set)
 {
-    if (wayland_ct == NULL)
-	return;
+    もし (wayland_ct == NULL)
+	戻る;
 
     is_reading = false;
-    if (is_set)
+    もし (is_set)
     {
-	if (wl_display_read_events(wayland_ct->display.proxy) != -1)
+	もし (wl_display_read_events(wayland_ct->display.proxy) != -1)
 	    wl_display_dispatch_pending(wayland_ct->display.proxy);
-	else
+	否则
 	{
 	    wl_display_cancel_read(wayland_ct->display.proxy);
 	    wayland_restore_connection();
 	}
     }
-    else
+    否则
 	wl_display_cancel_read(wayland_ct->display.proxy);
 }
 
@@ -696,32 +696,32 @@ ex_wlrestore(exarg_T *eap)
 {
     char *display;
 
-    if (eap->arg == NULL || STRLEN(eap->arg) == 0)
+    もし (eap->arg == NULL || STRLEN(eap->arg) == 0)
 	// Use current display name if none given
 	display = wayland_display_name;
-    else
+    否则
 	display = (char*)eap->arg;
 
     // Return early if shebang is not passed, we are still connected, and if not
     // changing to a new Wayland display.
-    if (!eap->forceit && wayland_ct != NULL &&
+    もし (!eap->forceit && wayland_ct != NULL &&
 	    (display == wayland_display_name ||
 	     (wayland_display_name != NULL &&
 	      STRCMP(wayland_display_name, display) == 0)))
-	return;
+	戻る;
 
 #ifdef FEAT_WAYLAND_CLIPBOARD
-    if (clipmethod == CLIPMETHOD_WAYLAND)
+    もし (clipmethod == CLIPMETHOD_WAYLAND)
     {
 	// Lose any selections we own
-	if (clip_star.owned)
+	もし (clip_star.owned)
 	    clip_lose_selection(&clip_star);
-	if (clip_plus.owned)
+	もし (clip_plus.owned)
 	    clip_lose_selection(&clip_plus);
     }
 #endif
 
-    if (display != NULL)
+    もし (display != NULL)
 	display = (char*)vim_strsave((char_u*)display);
 
     // Will lose any selections we own
@@ -730,7 +730,7 @@ ex_wlrestore(exarg_T *eap)
     // Reset amount of available tries to reconnect the display to 5
     wayland_ct_restore_count = 5;
 
-    if (wayland_init_connection(display) == OK)
+    もし (wayland_init_connection(display) == OK)
     {
 	smsg(_("restoring Wayland display %s"), wayland_display_name);
 
@@ -738,7 +738,7 @@ ex_wlrestore(exarg_T *eap)
 	clip_init_wayland();
 #endif
     }
-    else
+    否则
 	msg(_("failed restoring, lost connection to Wayland display"));
 
     vim_free(display);
@@ -746,7 +746,7 @@ ex_wlrestore(exarg_T *eap)
     choose_clipmethod();
 }
 
-#if defined(FEAT_WAYLAND_CLIPBOARD)
+#もし defined(FEAT_WAYLAND_CLIPBOARD)
 
 /*
  * Get a suitable data device manager from connection. "supported" should be
@@ -764,14 +764,14 @@ vwl_connection_get_data_device_manager(
 
     // Prioritize ext-data-control-v1 over wlr-data-control-unstable-v1 because
     // it is newer.
-    if (self->gobjects.ext_data_control_manager_v1 != NULL)
+    もし (self->gobjects.ext_data_control_manager_v1 != NULL)
     {
 	manager->proxy = self->gobjects.ext_data_control_manager_v1;
 	manager->protocol = VWL_DATA_PROTOCOL_EXT;
 
 	*supported |= (WAYLAND_SELECTION_REGULAR | WAYLAND_SELECTION_PRIMARY);
     }
-    else if (self->gobjects.zwlr_data_control_manager_v1 != NULL)
+    否则 もし (self->gobjects.zwlr_data_control_manager_v1 != NULL)
     {
 	manager->proxy = self->gobjects.zwlr_data_control_manager_v1;
 	manager->protocol = VWL_DATA_PROTOCOL_WLR;
@@ -779,17 +779,17 @@ vwl_connection_get_data_device_manager(
 	*supported |= WAYLAND_SELECTION_REGULAR;
 
 	// Only version 2 or greater supports the primary selection
-	if (zwlr_data_control_manager_v1_get_version(manager->proxy) >= 2)
+	もし (zwlr_data_control_manager_v1_get_version(manager->proxy) >= 2)
 	    *supported |= WAYLAND_SELECTION_PRIMARY;
     }
 
-    if (!(*supported & req_sel))
+    もし (!(*supported & req_sel))
     {
 	vim_free(manager);
-	return NULL;
+	戻る NULL;
     }
 
-    return manager;
+    戻る manager;
 }
 
     vwl_data_device_T *
@@ -811,11 +811,11 @@ vwl_data_device_manager_get_data_device(
 	    break;
 	default:
 	    vim_free(device);
-	    return NULL;
+	    戻る NULL;
     }
     device->protocol = self->protocol;
 
-    return device;
+    戻る device;
 }
 
     vwl_data_source_T *
@@ -835,11 +835,11 @@ vwl_data_device_manager_create_data_source(vwl_data_device_manager_T *self)
 	    break;
 	default:
 	    vim_free(source);
-	    return NULL;
+	    戻る NULL;
     }
     source->protocol = self->protocol;
 
-    return source;
+    戻る source;
 }
 
     static vwl_data_offer_T *
@@ -847,8 +847,8 @@ vwl_data_device_wrap_offer_proxy(vwl_data_device_T *self, void *proxy)
 {
     vwl_data_offer_T *offer = ALLOC_CLEAR_ONE(vwl_data_offer_T);
 
-    if (offer == NULL)
-	return NULL;
+    もし (offer == NULL)
+	戻る NULL;
 
     offer->proxy = proxy;
     offer->protocol = self->protocol;
@@ -859,15 +859,15 @@ vwl_data_device_wrap_offer_proxy(vwl_data_device_T *self, void *proxy)
     // maximum from experience.
     ga_grow(&offer->mime_types, 10);
 
-    return offer;
+    戻る offer;
 }
 
 # define VWL_FUNC_DATA_PROXY_DESTROY(type) \
 	void \
     vwl_data_##type##_destroy(vwl_data_##type##_T *self) \
     { \
-	if (self == NULL) \
-	    return; \
+	もし (self == NULL) \
+	    戻る; \
 	switch (self->protocol) \
 	{ \
 	    case VWL_DATA_PROTOCOL_EXT: \
@@ -888,8 +888,8 @@ VWL_FUNC_DATA_PROXY_DESTROY(source)
     void
 vwl_data_offer_destroy(vwl_data_offer_T *self)
 {
-    if (self == NULL)
-	return;
+    もし (self == NULL)
+	戻る;
     switch (self->protocol)
     {
 	case VWL_DATA_PROTOCOL_EXT:
@@ -911,8 +911,8 @@ vwl_data_offer_destroy(vwl_data_offer_T *self)
 void
 vwl_data_device_manager_discard(vwl_data_device_manager_T *self)
 {
-    if (self == NULL)
-	return;
+    もし (self == NULL)
+	戻る;
     vim_free(self);
 }
 
@@ -1008,7 +1008,7 @@ static const struct zwlr_data_control_device_v1_listener
 	static void \
     source_type##_listener_event_send( \
 	    void *data, struct source_type *source UNUSED, \
-	    const char *mime_type, int fd) \
+	    const char *mime_type, 整数 fd) \
     { \
 	vwl_data_source_T *self = data; \
 	self->listener->send(self->data, self, mime_type, fd); \
@@ -1048,13 +1048,13 @@ static const struct zwlr_data_control_source_v1_listener
 	    const char *mime_type) \
     { \
 	vwl_data_offer_T *self = data; \
-	if (self->listener->offer(self->data, self, mime_type)) \
+	もし (self->listener->offer(self->data, self, mime_type)) \
 	{ \
 	    char *mime = (char *)vim_strsave((char_u *)mime_type); \
-	    if (ga_grow(&self->mime_types, 1) == FAIL) \
+	    もし (ga_grow(&self->mime_types, 1) == FAIL) \
 		vim_free(mime); \
-	    else \
-		if (mime != NULL) \
+	    否则 \
+		もし (mime != NULL) \
 		    ((char **)self->mime_types.ga_data) \
 					[self->mime_types.ga_len++] = mime; \
 	} \
@@ -1079,8 +1079,8 @@ static const struct zwlr_data_control_offer_v1_listener
 	    const vwl_data_##type##_listener_T *listener, \
 	    void *data) \
     { \
-	if (self == NULL) \
-	    return; \
+	もし (self == NULL) \
+	    戻る; \
 	self->data = data; \
 	self->listener = listener; \
 	switch (self->protocol) \
@@ -1115,7 +1115,7 @@ vwl_data_device_set_selection(
 {
     void *proxy = source == NULL ? NULL : source->proxy;
 
-    if (selection == WAYLAND_SELECTION_REGULAR)
+    もし (selection == WAYLAND_SELECTION_REGULAR)
     {
 	switch (self->protocol)
 	{
@@ -1129,7 +1129,7 @@ vwl_data_device_set_selection(
 		break;
 	}
     }
-    else if (selection == WAYLAND_SELECTION_PRIMARY)
+    否则 もし (selection == WAYLAND_SELECTION_PRIMARY)
     {
 	switch (self->protocol)
 	{

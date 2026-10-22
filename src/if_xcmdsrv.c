@@ -14,7 +14,7 @@
 #include "vim.h"
 #include "version.h"
 
-#if (defined(FEAT_CLIENTSERVER) && defined(FEAT_X11))
+#もし (defined(FEAT_CLIENTSERVER) && defined(FEAT_X11))
 
 # ifdef FEAT_X11
 #  include <X11/Intrinsic.h>
@@ -64,8 +64,8 @@
 
 typedef struct PendingCommand
 {
-    int	    serial;	// Serial number expected in result.
-    int	    code;	// Result Code. 0 is OK
+    整数	    serial;	// Serial number expected in result.
+    整数	    code;	// Result Code. 0 is OK
     char_u  *result;	// String result for command (malloc'ed).
 			// NULL means command still pending.
     struct PendingCommand *nextPtr;
@@ -167,7 +167,7 @@ struct ServerReply
 static garray_T serverReply = { 0, 0, 0, 0, 0 };
 enum ServerReplyOp { SROP_Find, SROP_Add, SROP_Delete };
 
-typedef int (*EndCond)(void *);
+typedef 整数 (*EndCond)(void *);
 
 struct x_cmdqueue
 {
@@ -186,24 +186,24 @@ static x_queue_T head = {NULL, 0, NULL, NULL};
  * Forward declarations for procedures defined later in this file:
  */
 
-static Window	LookupName(Display *dpy, char_u *name, int delete, char_u **loose);
-static int	SendInit(Display *dpy);
-static int	DoRegisterName(Display *dpy, char_u *name);
+static Window	LookupName(Display *dpy, char_u *name, 整数 delete, char_u **loose);
+static 整数	SendInit(Display *dpy);
+static 整数	DoRegisterName(Display *dpy, char_u *name);
 static void	DeleteAnyLingerer(Display *dpy, Window w);
-static int	GetRegProp(Display *dpy, char_u **regPropp, long_u *numItemsp, int domsg);
-static int	WaitForPend(void *p);
-static int	WindowValid(Display *dpy, Window w);
-static void	ServerWait(Display *dpy, Window w, EndCond endCond, void *endData, int localLoop, int seconds);
-static int	AppendPropCarefully(Display *display, Window window, Atom property, char_u *value, int length);
-static int	x_error_check(Display *dpy, XErrorEvent *error_event);
-static int	IsSerialName(char_u *name);
+static 整数	GetRegProp(Display *dpy, char_u **regPropp, long_u *numItemsp, 整数 domsg);
+static 整数	WaitForPend(void *p);
+static 整数	WindowValid(Display *dpy, Window w);
+static void	ServerWait(Display *dpy, Window w, EndCond endCond, void *endData, 整数 localLoop, 整数 seconds);
+static 整数	AppendPropCarefully(Display *display, Window window, Atom property, char_u *value, 整数 length);
+static 整数	x_error_check(Display *dpy, XErrorEvent *error_event);
+static 整数	IsSerialName(char_u *name);
 static void	save_in_queue(char_u *buf, long_u len);
 static void	server_parse_message(Display *dpy, char_u *propInfo, long_u numItems);
 
 // Private variables for the "server" functionality
 static Atom	registryProperty = None;
 static Atom	vimProperty = None;
-static int	got_x_error = FALSE;
+static 整数	got_x_error = FALSE;
 
 static char_u	*empty_prop = (char_u *)"";	// empty GetRegProp() result
 
@@ -211,31 +211,31 @@ static char_u	*empty_prop = (char_u *)"";	// empty GetRegProp() result
  * Associate an ASCII name with Vim.  Try real hard to get a unique one.
  * Returns FAIL or OK.
  */
-    int
+    整数
 serverRegisterName(
     Display	*dpy,		// display to register with
     char_u	*name)		// the name that will be used as a base
 {
-    int		i;
-    int		res;
+    整数		i;
+    整数		res;
     char_u	*p = NULL;
 
     res = DoRegisterName(dpy, name);
-    if (res >= 0)
-	return OK;
+    もし (res >= 0)
+	戻る OK;
 
     i = 1;
     do
     {
-	if (res < -1 || i >= 1000)
+	もし (res < -1 || i >= 1000)
 	{
 	    msg_attr(_("Unable to register a command server name"),
 		    HL_ATTR(HLF_W));
-	    return FAIL;
+	    戻る FAIL;
 	}
-	if (p == NULL)
+	もし (p == NULL)
 	    p = alloc(STRLEN(name) + 10);
-	if (p == NULL)
+	もし (p == NULL)
 	{
 	    res = -10;
 	    continue;
@@ -243,14 +243,14 @@ serverRegisterName(
 	sprintf((char *)p, "%s%d", name, i++);
 	res = DoRegisterName(dpy, p);
     }
-    while (res < 0)
+    ながら (res < 0)
 	;
     vim_free(p);
 
-    return OK;
+    戻る OK;
 }
 
-    static int
+    static 整数
 DoRegisterName(Display *dpy, char_u *name)
 {
     Window	w;
@@ -258,10 +258,10 @@ DoRegisterName(Display *dpy, char_u *name)
 # define MAX_NAME_LENGTH 100
     char_u	propInfo[MAX_NAME_LENGTH + 20];
 
-    if (commProperty == None)
+    もし (commProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return -2;
+	もし (SendInit(dpy) < 0)
+	    戻る -2;
     }
 
     /*
@@ -273,11 +273,11 @@ DoRegisterName(Display *dpy, char_u *name)
      */
     XGrabServer(dpy);
     w = LookupName(dpy, name, FALSE, NULL);
-    if (w != (Window)0)
+    もし (w != (Window)0)
     {
 	Status		status;
-	int		dummyInt;
-	unsigned int	dummyUns;
+	整数		dummyInt;
+	unsigned 整数	dummyUns;
 	Window		dummyWin;
 
 	/*
@@ -291,11 +291,11 @@ DoRegisterName(Display *dpy, char_u *name)
 	status = XGetGeometry(dpy, w, &dummyWin, &dummyInt, &dummyInt,
 				  &dummyUns, &dummyUns, &dummyUns, &dummyUns);
 	(void)XSetErrorHandler(old_handler);
-	if (status != Success && w != commWindow)
+	もし (status != Success && w != commWindow)
 	{
 	    XUngrabServer(dpy);
 	    XFlush(dpy);
-	    return -1;
+	    戻る -1;
 	}
 	(void)LookupName(dpy, name, /*delete=*/TRUE, NULL);
     }
@@ -309,22 +309,22 @@ DoRegisterName(Display *dpy, char_u *name)
     XSync(dpy, False);
     (void)XSetErrorHandler(old_handler);
 
-    if (!got_x_error)
+    もし (!got_x_error)
     {
 	size_t	namelen;
 
 	namelen = STRLEN(name);
 # ifdef FEAT_EVAL
-	set_vim_var_string(VV_SEND_SERVER, name, (int)namelen);
+	set_vim_var_string(VV_SEND_SERVER, name, (整数)namelen);
 # endif
 	serverName = vim_strnsave(name, namelen);
 	need_maketitle = TRUE;
-	return 0;
+	戻る 0;
     }
-    return -2;
+    戻る -2;
 }
 
-# if defined(FEAT_GUI)
+# もし defined(FEAT_GUI)
 /*
  * Clean out new ID from registry and set it as comm win.
  * Change any registered window ID.
@@ -340,14 +340,14 @@ serverChangeRegisteredWindow(
 
     // Always call SendInit() here, to make sure commWindow is marked as a Vim
     // window.
-    if (SendInit(dpy) < 0)
-	return;
+    もし (SendInit(dpy) < 0)
+	戻る;
 
     // WARNING: Do not step through this while debugging, it will hangup the X
     // server!
     XGrabServer(dpy);
     DeleteAnyLingerer(dpy, newwin);
-    if (serverName != NULL)
+    もし (serverName != NULL)
     {
 	// Reinsert name if it was already registered
 	(void)LookupName(dpy, serverName, /*delete=*/TRUE, NULL);
@@ -365,7 +365,7 @@ serverChangeRegisteredWindow(
  * Send to an instance of Vim via the X display.
  * Returns 0 for OK, negative for an error.
  */
-    int
+    整数
 serverSendToVim(
     Display	*dpy,			// Where to send.
     char_u	*name,			// Where to send.
@@ -373,35 +373,35 @@ serverSendToVim(
     char_u	**result,		// Result of eval'ed expression
     Window	*server,		// Actual ID of receiving app
     Bool	asExpr,			// Interpret as keystrokes or expr ?
-    int		timeout,		// seconds to wait or zero
+    整数		timeout,		// seconds to wait or zero
     Bool	localLoop,		// Throw away everything but result
-    int		silent)			// don't complain about no server
+    整数		silent)			// don't complain about no server
 {
     Window	    w;
     char_u	    *property;
-    int		    length;
-    int		    res;
-    static int	    serial = 0;	// Running count of sent commands.
+    整数		    length;
+    整数		    res;
+    static 整数	    serial = 0;	// Running count of sent commands.
 				// Used to give each command a
 				// different serial number.
     PendingCommand  pending;
     char_u	    *loosename = NULL;
 
-    if (result != NULL)
+    もし (result != NULL)
 	*result = NULL;
-    if (name == NULL || *name == NUL)
+    もし (name == NULL || *name == NUL)
 	name = (char_u *)"GVIM";    // use a default name
 
-    if (commProperty == None && dpy != NULL && SendInit(dpy) < 0)
-	return -1;
+    もし (commProperty == None && dpy != NULL && SendInit(dpy) < 0)
+	戻る -1;
 
-# if defined(FEAT_EVAL)
+# もし defined(FEAT_EVAL)
     ch_log(NULL, "serverSendToVim(%s, %s)", name, cmd);
 # endif
 
     // Execute locally if no display or target is ourselves
-    if (dpy == NULL || (serverName != NULL && STRICMP(name, serverName) == 0))
-	return sendToLocalVim(cmd, asExpr, result);
+    もし (dpy == NULL || (serverName != NULL && STRICMP(name, serverName) == 0))
+	戻る sendToLocalVim(cmd, asExpr, result);
 
     /*
      * Bind the server name to a communication window.
@@ -411,13 +411,13 @@ serverSendToVim(
      *
      * Delete any lingering names from dead editors.
      */
-    while (TRUE)
+    ながら (TRUE)
     {
 	w = LookupName(dpy, name, FALSE, &loosename);
 	// Check that the window is hot
-	if (w != None)
+	もし (w != None)
 	{
-	    if (!WindowValid(dpy, w))
+	    もし (!WindowValid(dpy, w))
 	    {
 		LookupName(dpy, loosename ? loosename : name,
 			   /*DELETE=*/TRUE, NULL);
@@ -427,15 +427,15 @@ serverSendToVim(
 	}
 	break;
     }
-    if (w == None)
+    もし (w == None)
     {
-	if (!silent)
+	もし (!silent)
 	    semsg(_(e_no_registered_server_named_str), name);
-	return -1;
+	戻る -1;
     }
-    else if (loosename != NULL)
+    否则 もし (loosename != NULL)
 	name = loosename;
-    if (server != NULL)
+    もし (server != NULL)
 	*server = w;
 
     /*
@@ -448,7 +448,7 @@ serverSendToVim(
 
     sprintf((char *)property, "%c%c%c-n %s%c-E %s%c-s %s",
 		      0, asExpr ? 'c' : 'k', 0, name, 0, p_enc, 0, cmd);
-    if (name == loosename)
+    もし (name == loosename)
 	vim_free(loosename);
     // Add a back reference to our comm window
     serial++;
@@ -459,14 +459,14 @@ serverSendToVim(
 
     res = AppendPropCarefully(dpy, w, commProperty, property, length + 1);
     vim_free(property);
-    if (res < 0)
+    もし (res < 0)
     {
 	emsg(_(e_failed_to_send_command_to_destination_program));
-	return -1;
+	戻る -1;
     }
 
-    if (!asExpr) // There is no answer for this - Keys are sent async
-	return 0;
+    もし (!asExpr) // There is no answer for this - Keys are sent async
+	戻る 0;
 
     /*
      * Register the fact that we're waiting for a command to
@@ -486,66 +486,66 @@ serverSendToVim(
      * Unregister the information about the pending command
      * and return the result.
      */
-    if (pendingCommands == &pending)
+    もし (pendingCommands == &pending)
 	pendingCommands = pending.nextPtr;
-    else
+    否则
     {
 	PendingCommand *pcPtr;
 
-	for (pcPtr = pendingCommands; pcPtr != NULL; pcPtr = pcPtr->nextPtr)
-	    if (pcPtr->nextPtr == &pending)
+	ために (pcPtr = pendingCommands; pcPtr != NULL; pcPtr = pcPtr->nextPtr)
+	    もし (pcPtr->nextPtr == &pending)
 	    {
 		pcPtr->nextPtr = pending.nextPtr;
 		break;
 	    }
     }
 
-# if defined(FEAT_EVAL)
+# もし defined(FEAT_EVAL)
     ch_log(NULL, "serverSendToVim() result: %s",
 	    pending.result == NULL ? "NULL" : (char *)pending.result);
 # endif
-    if (result != NULL)
+    もし (result != NULL)
 	*result = pending.result;
-    else
+    否则
 	vim_free(pending.result);
 
-    return pending.code == 0 ? 0 : -1;
+    戻る pending.code == 0 ? 0 : -1;
 }
 
-    static int
+    static 整数
 WaitForPend(void *p)
 {
     PendingCommand *pending = (PendingCommand *) p;
-    return pending->result != NULL;
+    戻る pending->result != NULL;
 }
 
 /*
  * Return TRUE if window "w" exists and has a "Vim" property on it.
  */
-    static int
+    static 整数
 WindowValid(Display *dpy, Window w)
 {
     XErrorHandler   old_handler;
     Atom	    *plist;
-    int		    numProp;
-    int		    i;
+    整数		    numProp;
+    整数		    i;
 
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = 0;
     plist = XListProperties(dpy, w, &numProp);
     XSync(dpy, False);
     XSetErrorHandler(old_handler);
-    if (plist == NULL || got_x_error)
-	return FALSE;
+    もし (plist == NULL || got_x_error)
+	戻る FALSE;
 
-    for (i = 0; i < numProp; i++)
-	if (plist[i] == vimProperty)
+    ために (i = 0; i < numProp; i++)
+	もし (plist[i] == vimProperty)
 	{
 	    XFree(plist);
-	    return TRUE;
+	    戻る TRUE;
 	}
     XFree(plist);
-    return FALSE;
+    戻る FALSE;
 }
 
 /*
@@ -557,8 +557,8 @@ ServerWait(
     Window	w,
     EndCond	endCond,
     void	*endData,
-    int		localLoop,
-    int		seconds)
+    整数		localLoop,
+    整数		seconds)
 {
     time_t	    start;
     time_t	    now;
@@ -571,7 +571,7 @@ ServerWait(
 
     FD_ZERO(&fds);
     FD_SET(ConnectionNumber(dpy), &fds);
-# else
+# 否则
     struct pollfd   fds;
 
     fds.fd = ConnectionNumber(dpy);
@@ -579,18 +579,18 @@ ServerWait(
 # endif
 
     time(&start);
-    while (TRUE)
+    ながら (TRUE)
     {
-	while (XCheckWindowEvent(dpy, commWindow, PropertyChangeMask, &event))
+	ながら (XCheckWindowEvent(dpy, commWindow, PropertyChangeMask, &event))
 	    serverEventProc(dpy, &event, 1);
 	server_parse_messages();
 
-	if (endCond(endData) != 0)
+	もし (endCond(endData) != 0)
 	    break;
-	if (!WindowValid(dpy, w))
+	もし (!WindowValid(dpy, w))
 	    break;
 	time(&now);
-	if (seconds >= 0 && (now - start) >= seconds)
+	もし (seconds >= 0 && (now - start) >= seconds)
 	    break;
 
 # ifdef FEAT_TIMERS
@@ -598,7 +598,7 @@ ServerWait(
 # endif
 
 	// Just look out for the answer without calling back into Vim
-	if (localLoop)
+	もし (localLoop)
 	{
 # ifdef HAVE_SELECT
 	    struct timeval  tv;
@@ -607,16 +607,16 @@ ServerWait(
 	    // time.
 	    tv.tv_sec = 0;
 	    tv.tv_usec =  SEND_MSEC_POLL * 1000;
-	    if (select(FD_SETSIZE, &fds, NULL, NULL, &tv) < 0)
+	    もし (select(FD_SETSIZE, &fds, NULL, NULL, &tv) < 0)
 		break;
-# else
-	    if (poll(&fds, 1, SEND_MSEC_POLL) < 0)
+# 否则
+	    もし (poll(&fds, 1, SEND_MSEC_POLL) < 0)
 		break;
 # endif
 	}
-	else
+	否则
 	{
-	    if (got_int)
+	    もし (got_int)
 		break;
 	    ui_delay((long)UI_MSEC_DELAY, TRUE);
 	    ui_breakcheck();
@@ -641,43 +641,43 @@ serverGetVimNames(Display *dpy)
     int_u	w;
     list_T	*list;
 
-    if (registryProperty == None)
+    もし (registryProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return NULL;
+	もし (SendInit(dpy) < 0)
+	    戻る NULL;
     }
 
     list = list_alloc();
-    if (list == NULL)
-	return NULL;
+    もし (list == NULL)
+	戻る NULL;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, TRUE) == FAIL)
-	return NULL;
+    もし (GetRegProp(dpy, &regProp, &numItems, TRUE) == FAIL)
+	戻る NULL;
 
     /*
      * Scan all of the names out of the property.
      */
-    for (p = regProp; (long_u)(p - regProp) < numItems; p++)
+    ために (p = regProp; (long_u)(p - regProp) < numItems; p++)
     {
 	entry = p;
-	while (*p != 0 && !SAFE_isspace(*p))
+	ながら (*p != 0 && !SAFE_isspace(*p))
 	    p++;
-	if (*p != 0)
+	もし (*p != 0)
 	{
 	    w = None;
 	    sscanf((char *)entry, "%x", &w);
-	    if (WindowValid(dpy, (Window)w))
+	    もし (WindowValid(dpy, (Window)w))
 		list_append_string(list, p + 1, -1);
-	    while (*p != 0)
+	    ながら (*p != 0)
 		p++;
 	}
     }
-    if (regProp != empty_prop)
+    もし (regProp != empty_prop)
 	XFree(regProp);
-    return list;
+    戻る list;
 }
 
 /////////////////////////////////////////////////////////////
@@ -688,20 +688,20 @@ ServerReplyFind(Window w, enum ServerReplyOp op)
 {
     struct ServerReply *p;
     struct ServerReply e;
-    int		i;
+    整数		i;
 
     p = (struct ServerReply *) serverReply.ga_data;
-    for (i = 0; i < serverReply.ga_len; i++, p++)
-	if (p->id == w)
+    ために (i = 0; i < serverReply.ga_len; i++, p++)
+	もし (p->id == w)
 	    break;
-    if (i >= serverReply.ga_len)
+    もし (i >= serverReply.ga_len)
 	p = NULL;
 
-    if (p == NULL && op == SROP_Add)
+    もし (p == NULL && op == SROP_Add)
     {
-	if (serverReply.ga_growsize == 0)
+	もし (serverReply.ga_growsize == 0)
 	    ga_init2(&serverReply, sizeof(struct ServerReply), 1);
-	if (ga_grow(&serverReply, 1) == OK)
+	もし (ga_grow(&serverReply, 1) == OK)
 	{
 	    p = ((struct ServerReply *) serverReply.ga_data)
 		+ serverReply.ga_len;
@@ -711,14 +711,14 @@ ServerReplyFind(Window w, enum ServerReplyOp op)
 	    serverReply.ga_len++;
 	}
     }
-    else if (p != NULL && op == SROP_Delete)
+    否则 もし (p != NULL && op == SROP_Delete)
     {
 	ga_clear(&p->strings);
 	mch_memmove(p, p + 1, (serverReply.ga_len - i - 1) * sizeof(*p));
 	serverReply.ga_len--;
     }
 
-    return p;
+    戻る p;
 }
 
 /*
@@ -731,53 +731,53 @@ serverStrToWin(char_u *str)
     unsigned  id = None;
 
     sscanf((char *)str, "0x%x", &id);
-    if (id == None)
+    もし (id == None)
 	semsg(_(e_invalid_server_id_used_str), str);
 
-    return (Window)id;
+    戻る (Window)id;
 }
 
 /*
  * Send a reply string (notification) to client with id "name".
  * Return -1 if the window is invalid.
  */
-    int
+    整数
 serverSendReply(char_u *name, char_u *str)
 {
     char_u	*property;
-    int		length;
-    int		res;
+    整数		length;
+    整数		res;
     Display	*dpy = X_DISPLAY;
     Window	win = serverStrToWin(name);
 
-    if (commProperty == None)
+    もし (commProperty == None)
     {
-	if (SendInit(dpy) < 0)
-	    return -2;
+	もし (SendInit(dpy) < 0)
+	    戻る -2;
     }
-    if (!WindowValid(dpy, win))
-	return -1;
+    もし (!WindowValid(dpy, win))
+	戻る -1;
 
     length = STRLEN(p_enc) + STRLEN(str) + 14;
-    if ((property = alloc(length + 30)) == NULL)
-	return -1;
+    もし ((property = alloc(length + 30)) == NULL)
+	戻る -1;
 
     sprintf((char *)property, "%cn%c-E %s%c-n %s%c-w %x",
-	    0, 0, p_enc, 0, str, 0, (unsigned int)commWindow);
+	    0, 0, p_enc, 0, str, 0, (unsigned 整数)commWindow);
     // Add length of what "%x" resulted in.
     length += STRLEN(property + length);
     res = AppendPropCarefully(dpy, win, commProperty, property, length + 1);
     vim_free(property);
 
-    return res;
+    戻る res;
 }
 
-    static int
+    static 整数
 WaitForReply(void *p)
 {
     Window  *w = (Window *) p;
 
-    return ServerReplyFind(*w, SROP_Find) != NULL;
+    戻る ServerReplyFind(*w, SROP_Find) != NULL;
 }
 
 /*
@@ -786,60 +786,60 @@ WaitForReply(void *p)
  * Return 0 and the allocated string in "*str" when a reply is available.
  * Return -1 if the window becomes invalid while waiting.
  */
-    int
+    整数
 serverReadReply(
     Display	*dpy,
     Window	win,
     char_u	**str,
-    int		localLoop,
-    int		timeout)
+    整数		localLoop,
+    整数		timeout)
 {
-    int		len;
+    整数		len;
     char_u	*s;
     struct	ServerReply *p;
 
     ServerWait(dpy, win, WaitForReply, &win, localLoop,
 						   timeout > 0 ? timeout : -1);
 
-    if ((p = ServerReplyFind(win, SROP_Find)) != NULL && p->strings.ga_len > 0)
+    もし ((p = ServerReplyFind(win, SROP_Find)) != NULL && p->strings.ga_len > 0)
     {
 	*str = vim_strsave(p->strings.ga_data);
 	len = STRLEN(*str) + 1;
-	if (len < p->strings.ga_len)
+	もし (len < p->strings.ga_len)
 	{
 	    s = (char_u *) p->strings.ga_data;
 	    mch_memmove(s, s + len, p->strings.ga_len - len);
 	    p->strings.ga_len -= len;
 	}
-	else
+	否则
 	{
 	    // Last string read.  Remove from list
 	    ga_clear(&p->strings);
 	    ServerReplyFind(win, SROP_Delete);
 	}
-	return 0;
+	戻る 0;
     }
-    return -1;
+    戻る -1;
 }
 
 /*
  * Check for replies from id (win).
  * Return TRUE and a non-malloc'ed string if there is.  Else return FALSE.
  */
-    int
+    整数
 serverPeekReply(Display *dpy, Window win, char_u **str)
 {
     struct ServerReply *p;
 
-    if ((p = ServerReplyFind(win, SROP_Find)) != NULL && p->strings.ga_len > 0)
+    もし ((p = ServerReplyFind(win, SROP_Find)) != NULL && p->strings.ga_len > 0)
     {
-	if (str != NULL)
+	もし (str != NULL)
 	    *str = p->strings.ga_data;
-	return 1;
+	戻る 1;
     }
-    if (!WindowValid(dpy, win))
-	return -1;
-    return 0;
+    もし (!WindowValid(dpy, win))
+	戻る -1;
+    戻る 0;
 }
 
 
@@ -847,7 +847,7 @@ serverPeekReply(Display *dpy, Window win, char_u **str)
  * Initialize the communication channels for sending commands and receiving
  * results.
  */
-    static int
+    static 整数
 SendInit(Display *dpy)
 {
     XErrorHandler old_handler;
@@ -859,14 +859,14 @@ SendInit(Display *dpy)
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
 
-    if (commProperty == None)
+    もし (commProperty == None)
 	commProperty = XInternAtom(dpy, "Comm", False);
-    if (vimProperty == None)
+    もし (vimProperty == None)
 	vimProperty = XInternAtom(dpy, "Vim", False);
-    if (registryProperty == None)
+    もし (registryProperty == None)
 	registryProperty = XInternAtom(dpy, "VimRegistry", False);
 
-    if (commWindow == None)
+    もし (commWindow == None)
     {
 	commWindow = XCreateSimpleWindow(dpy, XDefaultRootWindow(dpy),
 				getpid(), 0, 10, 10, 0,
@@ -883,12 +883,12 @@ SendInit(Display *dpy)
     // Make window recognizable as a vim window
     XChangeProperty(dpy, commWindow, vimProperty, XA_STRING,
 		    8, PropModeReplace, (char_u *)VIM_VERSION_SHORT,
-			(int)STRLEN_LITERAL(VIM_VERSION_SHORT) + 1);
+			(整数)STRLEN_LITERAL(VIM_VERSION_SHORT) + 1);
 
     XSync(dpy, False);
     (void)XSetErrorHandler(old_handler);
 
-    return got_x_error ? -1 : 0;
+    戻る got_x_error ? -1 : 0;
 }
 
 /*
@@ -907,7 +907,7 @@ SendInit(Display *dpy)
 LookupName(
     Display	*dpy,	    // Display whose registry to check.
     char_u	*name,	    // Name of a server.
-    int		delete,	    // If non-zero, delete info about name.
+    整数		delete,	    // If non-zero, delete info about name.
     char_u	**loose)    // Do another search matching -999 if not found
 			    // Return result here if a match is found
 {
@@ -919,45 +919,45 @@ LookupName(
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
-	return 0;
+    もし (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
+	戻る 0;
 
     /*
      * Scan the property for the desired name.
      */
     returnValue = (int_u)None;
     entry = NULL;	// Not needed, but eliminates compiler warning.
-    for (p = regProp; (long_u)(p - regProp) < numItems; )
+    ために (p = regProp; (long_u)(p - regProp) < numItems; )
     {
 	entry = p;
-	while (*p != 0 && !SAFE_isspace(*p))
+	ながら (*p != 0 && !SAFE_isspace(*p))
 	    p++;
-	if (*p != 0 && STRICMP(name, p + 1) == 0)
+	もし (*p != 0 && STRICMP(name, p + 1) == 0)
 	{
 	    sscanf((char *)entry, "%x", &returnValue);
 	    break;
 	}
-	while (*p != 0)
+	ながら (*p != 0)
 	    p++;
 	p++;
     }
 
-    if (loose != NULL && returnValue == (int_u)None && !IsSerialName(name))
+    もし (loose != NULL && returnValue == (int_u)None && !IsSerialName(name))
     {
-	for (p = regProp; (long_u)(p - regProp) < numItems; )
+	ために (p = regProp; (long_u)(p - regProp) < numItems; )
 	{
 	    entry = p;
-	    while (*p != 0 && !SAFE_isspace(*p))
+	    ながら (*p != 0 && !SAFE_isspace(*p))
 		p++;
-	    if (*p != 0 && IsSerialName(p + 1)
+	    もし (*p != 0 && IsSerialName(p + 1)
 		    && STRNICMP(name, p + 1, STRLEN(name)) == 0)
 	    {
-		if (sscanf((char *)entry, "%x", &returnValue) == 1
+		もし (sscanf((char *)entry, "%x", &returnValue) == 1
 			&& returnValue != (int_u)None)
 		    *loose = vim_strsave(p + 1);
 		break;
 	    }
-	    while (*p != 0)
+	    ながら (*p != 0)
 		p++;
 	    p++;
 	}
@@ -968,25 +968,25 @@ LookupName(
      * remainder of the registry property to overlay the deleted
      * info, then rewrite the property).
      */
-    if (delete && returnValue != (int_u)None)
+    もし (delete && returnValue != (int_u)None)
     {
-	int count;
+	整数 count;
 
-	while (*p != 0)
+	ながら (*p != 0)
 	    p++;
 	p++;
 	count = numItems - (p - regProp);
-	if (count > 0)
+	もし (count > 0)
 	    mch_memmove(entry, p, count);
 	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING,
 			8, PropModeReplace, regProp,
-			(int)(numItems - (p - entry)));
+			(整数)(numItems - (p - entry)));
 	XSync(dpy, False);
     }
 
-    if (regProp != empty_prop)
+    もし (regProp != empty_prop)
 	XFree(regProp);
-    return (Window)returnValue;
+    戻る (Window)returnValue;
 }
 
 /*
@@ -1011,46 +1011,46 @@ DeleteAnyLingerer(
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
-	return;
+    もし (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
+	戻る;
 
     // Scan the property for the window id.
-    for (p = regProp; (long_u)(p - regProp) < numItems; )
+    ために (p = regProp; (long_u)(p - regProp) < numItems; )
     {
-	if (*p != 0)
+	もし (*p != 0)
 	{
 	    sscanf((char *)p, "%x", &wwin);
-	    if ((Window)wwin == win)
+	    もし ((Window)wwin == win)
 	    {
-		int lastHalf;
+		整数 lastHalf;
 
 		// Copy down the remainder to delete entry
 		entry = p;
-		while (*p != 0)
+		ながら (*p != 0)
 		    p++;
 		p++;
 		lastHalf = numItems - (p - regProp);
-		if (lastHalf > 0)
+		もし (lastHalf > 0)
 		    mch_memmove(entry, p, lastHalf);
 		numItems = (entry - regProp) + lastHalf;
 		p = entry;
 		continue;
 	    }
 	}
-	while (*p != 0)
+	ながら (*p != 0)
 	    p++;
 	p++;
     }
 
-    if (entry != NULL)
+    もし (entry != NULL)
     {
 	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty,
 			XA_STRING, 8, PropModeReplace, regProp,
-			(int)(p - regProp));
+			(整数)(p - regProp));
 	XSync(dpy, False);
     }
 
-    if (regProp != empty_prop)
+    もし (regProp != empty_prop)
 	XFree(regProp);
 }
 
@@ -1060,14 +1060,14 @@ DeleteAnyLingerer(
  * exist yet.
  * Return OK when successful.
  */
-    static int
+    static 整数
 GetRegProp(
     Display	*dpy,
     char_u	**regPropp,
     long_u	*numItemsp,
-    int		domsg)		// When TRUE give error message.
+    整数		domsg)		// When TRUE give error message.
 {
-    int		result, actualFormat;
+    整数		result, actualFormat;
     long_u	bytesAfter;
     Atom	actualType;
     XErrorHandler old_handler;
@@ -1084,28 +1084,28 @@ GetRegProp(
 
     XSync(dpy, FALSE);
     (void)XSetErrorHandler(old_handler);
-    if (got_x_error)
-	return FAIL;
+    もし (got_x_error)
+	戻る FAIL;
 
-    if (actualType == None)
+    もし (actualType == None)
     {
 	// No prop yet. Logically equal to the empty list
 	*numItemsp = 0;
 	*regPropp = empty_prop;
-	return OK;
+	戻る OK;
     }
 
     // If the property is improperly formed, then delete it.
-    if (result != Success || actualFormat != 8 || actualType != XA_STRING)
+    もし (result != Success || actualFormat != 8 || actualType != XA_STRING)
     {
-	if (*regPropp != NULL)
+	もし (*regPropp != NULL)
 	    XFree(*regPropp);
 	XDeleteProperty(dpy, RootWindow(dpy, 0), registryProperty);
-	if (domsg)
+	もし (domsg)
 	    emsg(_(e_vim_instance_registry_property_is_badly_formed_deleted));
-	return FAIL;
+	戻る FAIL;
     }
-    return OK;
+    戻る OK;
 }
 
 
@@ -1121,18 +1121,18 @@ GetRegProp(
 serverEventProc(
     Display	*dpy,
     XEvent	*eventPtr,	// Information about event.
-    int		immediate)	// Run event immediately. Should mostly be 0.
+    整数		immediate)	// Run event immediately. Should mostly be 0.
 {
     char_u	*propInfo;
-    int		result, actualFormat;
+    整数		result, actualFormat;
     long_u	numItems, bytesAfter;
     Atom	actualType;
 
-    if (eventPtr != NULL)
+    もし (eventPtr != NULL)
     {
-	if (eventPtr->xproperty.atom != commProperty
+	もし (eventPtr->xproperty.atom != commProperty
 		|| eventPtr->xproperty.state != PropertyNewValue)
-	    return;
+	    戻る;
     }
 
     /*
@@ -1146,15 +1146,15 @@ serverEventProc(
 				&propInfo);
 
     // If the property doesn't exist or is improperly formed then ignore it.
-    if (result != Success || actualType != XA_STRING || actualFormat != 8)
+    もし (result != Success || actualType != XA_STRING || actualFormat != 8)
     {
-	if (propInfo != NULL)
+	もし (propInfo != NULL)
 	    XFree(propInfo);
-	return;
+	戻る;
     }
-    if (immediate)
+    もし (immediate)
 	server_parse_message(dpy, propInfo, numItems);
-    else
+    否则
 	save_in_queue(propInfo, numItems);
 }
 
@@ -1168,12 +1168,12 @@ save_in_queue(char_u *propInfo, long_u len)
     x_queue_T *node;
 
     node = ALLOC_ONE(x_queue_T);
-    if (node == NULL)
-	return;	    // out of memory
+    もし (node == NULL)
+	戻る;	    // out of memory
     node->propInfo = propInfo;
     node->len = len;
 
-    if (head.next == NULL)   // initialize circular queue
+    もし (head.next == NULL)   // initialize circular queue
     {
 	head.next = &head;
 	head.prev = &head;
@@ -1194,9 +1194,9 @@ server_parse_messages(void)
 {
     x_queue_T	*node;
 
-    if (!X_DISPLAY)
-	return; // cannot happen?
-    while (head.next != NULL && head.next != &head)
+    もし (!X_DISPLAY)
+	戻る; // cannot happen?
+    ながら (head.next != NULL && head.next != &head)
     {
 	node = head.next;
 	head.next = node->next;
@@ -1210,10 +1210,10 @@ server_parse_messages(void)
  * Returns a non-zero value if there are clientserver messages waiting
  * int the queue.
  */
-    int
+    整数
 server_waiting(void)
 {
-    return head.next != NULL && head.next != &head;
+    戻る head.next != NULL && head.next != &head;
 }
 
 /*
@@ -1228,10 +1228,10 @@ server_parse_message(
     long_u	numItems)  // The size of propInfo in bytes.
 {
     char_u	*p;
-    int		code;
+    整数		code;
     char_u	*tofree;
 
-# if defined(FEAT_EVAL)
+# もし defined(FEAT_EVAL)
     ch_log(NULL, "server_parse_message() numItems: %ld", numItems);
 # endif
 
@@ -1240,7 +1240,7 @@ server_parse_message(
      * one time;  each iteration through the outer loop handles a
      * single command or result.
      */
-    for (p = propInfo; (long_u)(p - propInfo) < numItems; )
+    ために (p = propInfo; (long_u)(p - propInfo) < numItems; )
     {
 	/*
 	 * Ignore leading NULs; each command or result starts with a
@@ -1248,13 +1248,13 @@ server_parse_message(
 	 * is, we'll be able to tell that a new command/result is
 	 * starting.
 	 */
-	if (*p == 0)
+	もし (*p == 0)
 	{
 	    p++;
 	    continue;
 	}
 
-	if ((*p == 'c' || *p == 'k') && p[1] == 0)
+	もし ((*p == 'c' || *p == 'k') && p[1] == 0)
 	{
 	    Window	resWindow;
 	    char_u	*name, *script, *serial, *end;
@@ -1273,9 +1273,9 @@ server_parse_message(
 	    serial = (char_u *)"";
 	    script = NULL;
 	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    ながら ((long_u)(p - propInfo) < numItems && *p == '-')
 	    {
-# if defined(FEAT_EVAL)
+# もし defined(FEAT_EVAL)
 		ch_log(NULL, "server_parse_message() item: %c, %s", p[-2], p);
 # endif
 		switch (p[1])
@@ -1283,51 +1283,51 @@ server_parse_message(
 		    case 'r':
 			end = skipwhite(p + 2);
 			resWindow = 0;
-			while (vim_isxdigit(*end))
+			ながら (vim_isxdigit(*end))
 			{
 			    resWindow = 16 * resWindow + (long_u)hex2nr(*end);
 			    ++end;
 			}
-			if (end == p + 2 || *end != ' ')
+			もし (end == p + 2 || *end != ' ')
 			    resWindow = None;
-			else
+			否则
 			{
 			    p = serial = end + 1;
 			    clientWindow = resWindow; // Remember in global
 			}
 			break;
 		    case 'n':
-			if (p[2] == ' ')
+			もし (p[2] == ' ')
 			    name = p + 3;
 			break;
 		    case 's':
-			if (p[2] == ' ')
+			もし (p[2] == ' ')
 			    script = p + 3;
 			break;
 		    case 'E':
-			if (p[2] == ' ')
+			もし (p[2] == ' ')
 			    enc = p + 3;
 			break;
 		}
-		while (*p != 0)
+		ながら (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (script == NULL || name == NULL)
+	    もし (script == NULL || name == NULL)
 		continue;
 
-	    if (serverName != NULL && STRICMP(name, serverName) == 0)
+	    もし (serverName != NULL && STRICMP(name, serverName) == 0)
 	    {
 		script = serverConvert(enc, script, &tofree);
-		if (asKeys)
+		もし (asKeys)
 		    server_to_input_buf(script);
-		else
+		否则
 		{
 		    char_u      *res;
 
 		    res = eval_client_expr_to_string(script);
-		    if (resWindow != None)
+		    もし (resWindow != None)
 		    {
 			garray_T    reply;
 
@@ -1339,9 +1339,9 @@ server_parse_message(
 			reply.ga_len = 14 + STRLEN(p_enc) + STRLEN(serial);
 
 			// Evaluate the expression and return the result.
-			if (res != NULL)
+			もし (res != NULL)
 			    ga_concat(&reply, res);
-			else
+			否则
 			{
 			    ga_concat(&reply,
 				   (char_u *)_(e_invalid_expression_received));
@@ -1358,9 +1358,9 @@ server_parse_message(
 		vim_free(tofree);
 	    }
 	}
-	else if (*p == 'r' && p[1] == 0)
+	否则 もし (*p == 'r' && p[1] == 0)
 	{
-	    int		    serial, gotSerial;
+	    整数		    serial, gotSerial;
 	    char_u	    *res;
 	    PendingCommand  *pcPtr;
 	    char_u	    *enc;
@@ -1375,57 +1375,57 @@ server_parse_message(
 	    res = (char_u *)"";
 	    code = 0;
 	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    ながら ((long_u)(p - propInfo) < numItems && *p == '-')
 	    {
 		switch (p[1])
 		{
 		    case 'r':
-			if (p[2] == ' ')
+			もし (p[2] == ' ')
 			    res = p + 3;
 			break;
 		    case 'E':
-			if (p[2] == ' ')
+			もし (p[2] == ' ')
 			    enc = p + 3;
 			break;
 		    case 's':
-			if (sscanf((char *)p + 2, " %d", &serial) == 1)
+			もし (sscanf((char *)p + 2, " %d", &serial) == 1)
 			    gotSerial = 1;
 			break;
 		    case 'c':
-			if (sscanf((char *)p + 2, " %d", &code) != 1)
+			もし (sscanf((char *)p + 2, " %d", &code) != 1)
 			    code = 0;
 			break;
 		}
-		while (*p != 0)
+		ながら (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (!gotSerial)
+	    もし (!gotSerial)
 		continue;
 
 	    /*
 	     * Give the result information to anyone who's
 	     * waiting for it.
 	     */
-	    for (pcPtr = pendingCommands; pcPtr != NULL; pcPtr = pcPtr->nextPtr)
+	    ために (pcPtr = pendingCommands; pcPtr != NULL; pcPtr = pcPtr->nextPtr)
 	    {
-		if (serial != pcPtr->serial || pcPtr->result != NULL)
+		もし (serial != pcPtr->serial || pcPtr->result != NULL)
 		    continue;
 
 		pcPtr->code = code;
 		res = serverConvert(enc, res, &tofree);
-		if (tofree == NULL)
+		もし (tofree == NULL)
 		    res = vim_strsave(res);
 		pcPtr->result = res;
 		break;
 	    }
 	}
-	else if (*p == 'n' && p[1] == 0)
+	否则 もし (*p == 'n' && p[1] == 0)
 	{
 	    Window	win = 0;
-	    unsigned int u;
-	    int		gotWindow;
+	    unsigned 整数 u;
+	    整数		gotWindow;
 	    char_u	*str;
 	    struct	ServerReply *r;
 	    char_u	*enc;
@@ -1438,35 +1438,35 @@ server_parse_message(
 	    gotWindow = 0;
 	    str = (char_u *)"";
 	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    ながら ((long_u)(p - propInfo) < numItems && *p == '-')
 	    {
 		switch (p[1])
 		{
 		    case 'n':
-			if (p[2] == ' ')
+			もし (p[2] == ' ')
 			    str = p + 3;
 			break;
 		    case 'E':
-			if (p[2] == ' ')
+			もし (p[2] == ' ')
 			    enc = p + 3;
 			break;
 		    case 'w':
-			if (sscanf((char *)p + 2, " %x", &u) == 1)
+			もし (sscanf((char *)p + 2, " %x", &u) == 1)
 			{
 			    win = u;
 			    gotWindow = 1;
 			}
 			break;
 		}
-		while (*p != 0)
+		ながら (*p != 0)
 		    p++;
 		p++;
 	    }
 
-	    if (!gotWindow)
+	    もし (!gotWindow)
 		continue;
 	    str = serverConvert(enc, str, &tofree);
-	    if ((r = ServerReplyFind(win, SROP_Add)) != NULL)
+	    もし ((r = ServerReplyFind(win, SROP_Add)) != NULL)
 	    {
 		ga_concat(&(r->strings), str);
 		ga_append(&(r->strings), NUL);
@@ -1474,12 +1474,12 @@ server_parse_message(
 	    {
 		char_u	winstr[30];
 
-		sprintf((char *)winstr, "0x%x", (unsigned int)win);
+		sprintf((char *)winstr, "0x%x", (unsigned 整数)win);
 		apply_autocmds(EVENT_REMOTEREPLY, winstr, str, TRUE, curbuf);
 	    }
 	    vim_free(tofree);
 	}
-	else
+	否则
 	{
 	    /*
 	     * Didn't recognize this thing.  Just skip through the next
@@ -1487,7 +1487,7 @@ server_parse_message(
 	     * Even if we get an 'r'(eply) we will throw it away as we
 	     * never specify (and thus expect) one
 	     */
-	    while (*p != 0)
+	    ながら (*p != 0)
 		p++;
 	    p++;
 	}
@@ -1501,13 +1501,13 @@ server_parse_message(
  * than having Xlib panic.
  * Return: 0 for OK, -1 for error
  */
-    static int
+    static 整数
 AppendPropCarefully(
     Display	*dpy,		// Display on which to operate.
     Window	window,		// Window whose property is to be modified.
     Atom	property,	// Name of property.
     char_u	*value,		// Characters  to append to property.
-    int		length)		// How much to append
+    整数		length)		// How much to append
 {
     XErrorHandler old_handler;
 
@@ -1517,29 +1517,29 @@ AppendPropCarefully(
 					       PropModeAppend, value, length);
     XSync(dpy, False);
     (void) XSetErrorHandler(old_handler);
-    return got_x_error ? -1 : 0;
+    戻る got_x_error ? -1 : 0;
 }
 
 
 /*
  * Another X Error handler, just used to check for errors.
  */
-    static int
+    static 整数
 x_error_check(Display *dpy UNUSED, XErrorEvent *error_event UNUSED)
 {
     got_x_error = TRUE;
-    return 0;
+    戻る 0;
 }
 
 /*
  * Check if "str" looks like it had a serial number appended.
  * Actually just checks if the name ends in a digit.
  */
-    static int
+    static 整数
 IsSerialName(char_u *str)
 {
-    int len = STRLEN(str);
+    整数 len = STRLEN(str);
 
-    return (len > 1 && vim_isdigit(str[len - 1]));
+    戻る (len > 1 && vim_isdigit(str[len - 1]));
 }
 #endif	// FEAT_CLIENTSERVER

@@ -15,36 +15,36 @@ except ImportError:
 def make_dap_message(obj):
     payload = json.dumps(obj).encode("utf-8")
     header = f"Content-Length: {len(payload)}\r\n\r\n".encode("ascii")
-    return header + payload
+    戻る header + payload
 
 
 def parse_messages(buffer):
     messages = []
 
-    while True:
+    ながら True:
         hdr_end = buffer.find(b"\r\n\r\n")
-        if hdr_end == -1:
+        もし hdr_end == -1:
             break
 
         header = buffer[:hdr_end].decode("ascii", errors="ignore")
         content_length = None
 
-        for line in header.split("\r\n"):
-            if line.lower().startswith("content-length:"):
-                content_length = int(line.split(":")[1].strip())
+        ために line in header.split("\r\n"):
+            もし line.lower().startswith("content-length:"):
+                content_length = 整数(line.split(":")[1].strip())
 
-        if content_length is None:
+        もし content_length is None:
             break
 
         total_len = hdr_end + 4 + content_length
-        if len(buffer) < total_len:
+        もし len(buffer) < total_len:
             break  # partial
 
         body = buffer[hdr_end + 4:total_len]
         messages.append(json.loads(body.decode("utf-8")))
         buffer = buffer[total_len:]
 
-    return messages, buffer
+    戻る messages, buffer
 
 
 class DAPHandler(socketserver.BaseRequestHandler):
@@ -77,31 +77,31 @@ class DAPHandler(socketserver.BaseRequestHandler):
     def handle_request(self, msg):
         cmd = msg.get("command")
 
-        if cmd == "initialize":
+        もし cmd == "initialize":
             self.send_response(msg, {
                 "supportsConfigurationDoneRequest": True
             })
             self.send_event("initialized")
-        else:
+        否则:
             self.send_response(msg)
 
-        return True
+        戻る True
 
     def handle(self):
         buffer = b""
 
-        while True:
+        ながら True:
             data = self.request.recv(4096)
-            if not data:
+            もし not data:
                 break
 
             buffer += data
             messages, buffer = parse_messages(buffer)
 
-            for msg in messages:
-                if msg.get("type") == "request":
-                    if not self.handle_request(msg):
-                        return
+            ために msg in messages:
+                もし msg.get("type") == "request":
+                    もし not self.handle_request(msg):
+                        戻る
 
 
 class ThreadedDAPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -111,7 +111,7 @@ def write_port_to_file(port, filename="Xportnr"):
     with open(filename, "w") as f:
         f.write(str(port))
 
-def main():
+def メインページ():
     server = ThreadedDAPServer(("localhost", 0), DAPHandler)
 
     # Get the actual assigned port
@@ -125,11 +125,11 @@ def main():
     thread.start()
 
     try:
-        while thread.is_alive():
+        ながら thread.is_alive():
             thread.join(1)
     except KeyboardInterrupt:
         server.shutdown()
 
-if __name__ == "__main__":
-    main()
+もし __name__ == "__main__":
+    メインページ()
 

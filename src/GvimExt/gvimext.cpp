@@ -62,42 +62,42 @@ getGvimName(char *name, BOOL runtime)
     // HKEY_CURRENT_USER first, then fall back to HKEY_LOCAL_MACHINE if
     // not found.
     name[0] = 0;
-    if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Vim\\Gvim", 0,
+    もし (RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Vim\\Gvim", 0,
 				       KEY_READ, &keyhandle) == ERROR_SUCCESS)
     {
 	hlen = BUFSIZE;
-	if (RegQueryValueEx(keyhandle, "path", 0, NULL, (BYTE *)name, &hlen)
+	もし (RegQueryValueEx(keyhandle, "path", 0, NULL, (BYTE *)name, &hlen)
 							     != ERROR_SUCCESS)
 	    name[0] = 0;
-	else
+	否则
 	    name[hlen] = 0;
 	RegCloseKey(keyhandle);
     }
 
-    if ((name[0] == 0) &&
+    もし ((name[0] == 0) &&
 	    (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
 				       KEY_READ, &keyhandle) == ERROR_SUCCESS))
     {
 	hlen = BUFSIZE;
-	if (RegQueryValueEx(keyhandle, "path", 0, NULL, (BYTE *)name, &hlen)
+	もし (RegQueryValueEx(keyhandle, "path", 0, NULL, (BYTE *)name, &hlen)
 							     != ERROR_SUCCESS)
 	    name[0] = 0;
-	else
+	否则
 	    name[hlen] = 0;
 	RegCloseKey(keyhandle);
     }
 
     // Registry didn't work, use the search path.
-    if (name[0] == 0)
+    もし (name[0] == 0)
 	strcpy(name, searchpath((char *)"gvim.exe"));
 
-    if (!runtime)
+    もし (!runtime)
     {
 	// Only when looking for the executable, not the runtime dir, we can
 	// search for the batch file or a name without a path.
-	if (name[0] == 0)
+	もし (name[0] == 0)
 	    strcpy(name, searchpath((char *)"gvim.bat"));
-	if (name[0] == 0)
+	もし (name[0] == 0)
 	    strcpy(name, "gvim");	// finds gvim.bat or gvim.exe
     }
 }
@@ -126,7 +126,7 @@ FileExists(LPCTSTR szPath)
 {
     DWORD dwAttrib = GetFileAttributes(szPath);
 
-    return (dwAttrib != INVALID_FILE_ATTRIBUTES
+    戻る (dwAttrib != INVALID_FILE_ATTRIBUTES
 	    && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
@@ -138,19 +138,19 @@ FileExists(LPCTSTR szPath)
     static void
 getRuntimeDir(char *buf)
 {
-    int		idx;
+    整数		idx;
 
     getGvimName(buf, TRUE);
-    if (buf[0] == 0)
-	return;
+    もし (buf[0] == 0)
+	戻る;
 
     // When no path found, use the search path to expand it.
-    if (strchr(buf, '/') == NULL && strchr(buf, '\\') == NULL)
+    もし (strchr(buf, '/') == NULL && strchr(buf, '\\') == NULL)
 	strcpy(buf, searchpath(buf));
 
     // remove "gvim.exe" from the end
-    for (idx = (int)strlen(buf) - 1; idx >= 0; idx--)
-	if (buf[idx] == '\\' || buf[idx] == '/')
+    ために (idx = (整数)strlen(buf) - 1; idx >= 0; idx--)
+	もし (buf[idx] == '\\' || buf[idx] == '/')
 	{
 	    buf[++idx] = 0;
 	    break;
@@ -159,41 +159,41 @@ getRuntimeDir(char *buf)
     // Check the existence of defaults.vim
     char *p = buf + idx;
     strcpy(p, "defaults.vim");
-    if (FileExists(buf))
+    もし (FileExists(buf))
     {
 	*p = 0;		// Cut "defaults.vim"
-	return;
+	戻る;
     }
     // Check the existence of vimXX\defaults.vim
     strcpy(p, VIM_VERSION_NODOT "\\" "defaults.vim");
-    if (FileExists(buf))
+    もし (FileExists(buf))
     {
 	p[ARRAY_LENGTH(VIM_VERSION_NODOT)] = 0;	// Cut "defaults.vim"
-	return;
+	戻る;
     }
     // Check the existence of runtime\defaults.vim
     strcpy(p, "runtime" "\\" "defaults.vim");
-    if (FileExists(buf))
+    もし (FileExists(buf))
     {
 	p[ARRAY_LENGTH("runtime")] = 0;		// Cut "defaults.vim"
-	return;
+	戻る;
     }
     // Not found
     buf[0] = 0;
-    return;
+    戻る;
 }
 
     WCHAR *
 utf8_to_utf16(const char *s)
 {
-    int size = MultiByteToWideChar(CP_UTF8, 0, s, -1, NULL, 0);
+    整数 size = MultiByteToWideChar(CP_UTF8, 0, s, -1, NULL, 0);
     WCHAR *buf = (WCHAR *)malloc(size * sizeof(WCHAR));
     MultiByteToWideChar(CP_UTF8, 0, s, -1, buf, size);
-    return buf;
+    戻る buf;
 }
 
     HBITMAP
-IconToBitmap(HICON hIcon, HBRUSH hBackground, int width, int height)
+IconToBitmap(HICON hIcon, HBRUSH hBackground, 整数 width, 整数 height)
 {
     HDC hDC = GetDC(NULL);
     HDC hMemDC = CreateCompatibleDC(hDC);
@@ -210,7 +210,7 @@ IconToBitmap(HICON hIcon, HBRUSH hBackground, int width, int height)
     DeleteDC(hMemDC);
     ReleaseDC(NULL, hDC);
     DestroyIcon(hIcon);
-    return hResultBmp;
+    戻る hResultBmp;
 }
 
 //
@@ -222,7 +222,7 @@ IconToBitmap(HICON hIcon, HBRUSH hBackground, int width, int height)
 # define W(x)	    W_impl(x)
 # define set_gettext_codeset()	    NULL
 # define restore_gettext_codeset(x)
-#else
+#否则
 # define _(x)	    (*dyn_libintl_gettext)(x)
 # define W(x)	    utf8_to_utf16(x)
 # define VIMPACKAGE "vim"
@@ -236,7 +236,7 @@ static char *null_libintl_gettext(const char *);
 static char *null_libintl_textdomain(const char *);
 static char *null_libintl_bindtextdomain(const char *, const char *);
 static char *null_libintl_bind_textdomain_codeset(const char *, const char *);
-static int dyn_libintl_init(char *dir);
+static 整数 dyn_libintl_init(char *dir);
 static void dyn_libintl_end(void);
 
 static HINSTANCE hLibintlDLL = 0;
@@ -252,10 +252,10 @@ static char *(*dyn_libintl_bind_textdomain_codeset)(const char *, const char *)
 // "dir" is the directory where the libintl.dll might be.
 // Return 1 for success, 0 for failure.
 //
-    static int
+    static 整数
 dyn_libintl_init(char *dir)
 {
-    int		i;
+    整数		i;
     static struct
     {
 	char	    *name;
@@ -273,8 +273,8 @@ dyn_libintl_init(char *dir)
     LPWSTR	buf2 = NULL;
 
     // No need to initialize twice.
-    if (hLibintlDLL)
-	return 1;
+    もし (hLibintlDLL)
+	戻る 1;
 
     // Load gettext library from $VIMRUNTIME\GvimExt{64,32} directory.
     // Add the directory to $PATH temporarily.
@@ -282,45 +282,45 @@ dyn_libintl_init(char *dir)
     len2 = MAX_PATH + 1 + len;
     buf = (LPWSTR)malloc(len * sizeof(WCHAR));
     buf2 = (LPWSTR)malloc(len2 * sizeof(WCHAR));
-    if (buf != NULL && buf2 != NULL)
+    もし (buf != NULL && buf2 != NULL)
     {
 	GetEnvironmentVariableW(L"PATH", buf, len);
 # ifdef _WIN64
 	_snwprintf(buf2, len2, L"%S\\GvimExt64;%s", dir, buf);
-# else
+# 否则
 	_snwprintf(buf2, len2, L"%S\\GvimExt32;%s", dir, buf);
 # endif
 	SetEnvironmentVariableW(L"PATH", buf2);
 	hLibintlDLL = LoadLibrary(GETTEXT_DLL);
 # ifdef GETTEXT_DLL_ALT
-	if (!hLibintlDLL)
+	もし (!hLibintlDLL)
 	    hLibintlDLL = LoadLibrary(GETTEXT_DLL_ALT);
 # endif
 	SetEnvironmentVariableW(L"PATH", buf);
     }
     free(buf);
     free(buf2);
-    if (!hLibintlDLL)
-	return 0;
+    もし (!hLibintlDLL)
+	戻る 0;
 
     // Get the addresses of the functions we need.
-    for (i = 0; libintl_entry[i].name != NULL
+    ために (i = 0; libintl_entry[i].name != NULL
 					 && libintl_entry[i].ptr != NULL; ++i)
     {
-	if ((*libintl_entry[i].ptr = GetProcAddress(hLibintlDLL,
+	もし ((*libintl_entry[i].ptr = GetProcAddress(hLibintlDLL,
 					      libintl_entry[i].name)) == NULL)
 	{
 	    dyn_libintl_end();
-	    return 0;
+	    戻る 0;
 	}
     }
-    return 1;
+    戻る 1;
 }
 
     static void
 dyn_libintl_end(void)
 {
-    if (hLibintlDLL)
+    もし (hLibintlDLL)
 	FreeLibrary(hLibintlDLL);
     hLibintlDLL			= NULL;
     dyn_libintl_gettext		= null_libintl_gettext;
@@ -332,25 +332,25 @@ dyn_libintl_end(void)
     static char *
 null_libintl_gettext(const char *msgid)
 {
-    return (char *)msgid;
+    戻る (char *)msgid;
 }
 
     static char *
 null_libintl_textdomain(const char * /* domainname */)
 {
-    return NULL;
+    戻る NULL;
 }
 
     static char *
 null_libintl_bindtextdomain(const char * /* domainname */, const char * /* dirname */)
 {
-    return NULL;
+    戻る NULL;
 }
 
     static char *
 null_libintl_bind_textdomain_codeset(const char * /* domainname */, const char * /* codeset */)
 {
-    return NULL;
+    戻る NULL;
 }
 
 //
@@ -365,10 +365,10 @@ dyn_gettext_load(void)
     // Try to locate the runtime files.  The path is used to find libintl.dll
     // and the vim.mo files.
     getRuntimeDir(szBuff);
-    if (szBuff[0] != 0)
+    もし (szBuff[0] != 0)
     {
 	len = (DWORD)strlen(szBuff);
-	if (dyn_libintl_init(szBuff))
+	もし (dyn_libintl_init(szBuff))
 	{
 	    strcpy(szBuff + len, "lang");
 
@@ -394,7 +394,7 @@ set_gettext_codeset(void)
     prev = _strdup((prev != NULL) ? prev : "char");
     dyn_libintl_bind_textdomain_codeset(VIMPACKAGE, "utf-8");
 
-    return prev;
+    戻る prev;
 }
 
 //
@@ -418,7 +418,7 @@ HINSTANCE g_hmodThisDll = NULL;	// Handle to this DLL itself.
 //---------------------------------------------------------------------------
 // DllMain
 //---------------------------------------------------------------------------
-extern "C" int APIENTRY
+extern "C" 整数 APIENTRY
 DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID  /* lpReserved */)
 {
     switch (dwReason)
@@ -432,14 +432,14 @@ DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID  /* lpReserved */)
 	break;
     }
 
-    return 1;   // ok
+    戻る 1;   // ok
 }
 
     static void
 inc_cRefThisDLL()
 {
 #ifdef FEAT_GETTEXT
-    if (g_cRefThisDll == 0)
+    もし (g_cRefThisDll == 0)
 	dyn_gettext_load();
 #endif
     InterlockedIncrement((LPLONG)&g_cRefThisDll);
@@ -449,9 +449,9 @@ inc_cRefThisDLL()
 dec_cRefThisDLL()
 {
 #ifdef FEAT_GETTEXT
-    if (InterlockedDecrement((LPLONG)&g_cRefThisDll) == 0)
+    もし (InterlockedDecrement((LPLONG)&g_cRefThisDll) == 0)
 	dyn_gettext_free();
-#else
+#否则
     InterlockedDecrement((LPLONG)&g_cRefThisDll);
 #endif
 }
@@ -462,21 +462,21 @@ dec_cRefThisDLL()
 
 STDAPI DllCanUnloadNow(void)
 {
-    return (g_cRefThisDll == 0 ? S_OK : S_FALSE);
+    戻る (g_cRefThisDll == 0 ? S_OK : S_FALSE);
 }
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppvOut)
 {
     *ppvOut = NULL;
 
-    if (IsEqualIID(rclsid, CLSID_ShellExtension))
+    もし (IsEqualIID(rclsid, CLSID_ShellExtension))
     {
 	CShellExtClassFactory *pcf = new CShellExtClassFactory;
 
-	return pcf->QueryInterface(riid, ppvOut);
+	戻る pcf->QueryInterface(riid, ppvOut);
     }
 
-    return CLASS_E_CLASSNOTAVAILABLE;
+    戻る CLASS_E_CLASSNOTAVAILABLE;
 }
 
 CShellExtClassFactory::CShellExtClassFactory()
@@ -498,31 +498,31 @@ STDMETHODIMP CShellExtClassFactory::QueryInterface(REFIID riid,
 
     // any interface on this object is the object pointer
 
-    if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
+    もし (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_IClassFactory))
     {
 	*ppv = (LPCLASSFACTORY)this;
 
 	AddRef();
 
-	return NOERROR;
+	戻る NOERROR;
     }
 
-    return E_NOINTERFACE;
+    戻る E_NOINTERFACE;
 }
 
 STDMETHODIMP_(ULONG) CShellExtClassFactory::AddRef()
 {
-    return InterlockedIncrement((LPLONG)&m_cRef);
+    戻る InterlockedIncrement((LPLONG)&m_cRef);
 }
 
 STDMETHODIMP_(ULONG) CShellExtClassFactory::Release()
 {
-    if (InterlockedDecrement((LPLONG)&m_cRef))
-	return m_cRef;
+    もし (InterlockedDecrement((LPLONG)&m_cRef))
+	戻る m_cRef;
 
     delete this;
 
-    return 0L;
+    戻る 0L;
 }
 
 STDMETHODIMP CShellExtClassFactory::CreateInstance(LPUNKNOWN pUnkOuter,
@@ -533,8 +533,8 @@ STDMETHODIMP CShellExtClassFactory::CreateInstance(LPUNKNOWN pUnkOuter,
 
     // Shell extensions typically don't support aggregation (inheritance)
 
-    if (pUnkOuter)
-	return CLASS_E_NOAGGREGATION;
+    もし (pUnkOuter)
+	戻る CLASS_E_NOAGGREGATION;
 
     // Create the main shell extension object.  The shell will then call
     // QueryInterface with IID_IShellExtInit--this is how shell extensions are
@@ -542,16 +542,16 @@ STDMETHODIMP CShellExtClassFactory::CreateInstance(LPUNKNOWN pUnkOuter,
 
     LPCSHELLEXT pShellExt = new CShellExt();  // create the CShellExt object
 
-    if (NULL == pShellExt)
-	return E_OUTOFMEMORY;
+    もし (NULL == pShellExt)
+	戻る E_OUTOFMEMORY;
 
-    return pShellExt->QueryInterface(riid, ppvObj);
+    戻る pShellExt->QueryInterface(riid, ppvObj);
 }
 
 
 STDMETHODIMP CShellExtClassFactory::LockServer(BOOL  /* fLock */)
 {
-    return NOERROR;
+    戻る NOERROR;
 }
 
 // *********************** CShellExt *************************
@@ -567,12 +567,12 @@ CShellExt::CShellExt()
 
 CShellExt::~CShellExt()
 {
-    if (m_pDataObj)
+    もし (m_pDataObj)
 	m_pDataObj->Release();
 
     dec_cRefThisDLL();
 
-    if (m_hVimIconBitmap)
+    もし (m_hVimIconBitmap)
 	DeleteObject(m_hVimIconBitmap);
 }
 
@@ -580,39 +580,39 @@ STDMETHODIMP CShellExt::QueryInterface(REFIID riid, LPVOID FAR *ppv)
 {
     *ppv = NULL;
 
-    if (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
+    もし (IsEqualIID(riid, IID_IShellExtInit) || IsEqualIID(riid, IID_IUnknown))
     {
 	*ppv = (LPSHELLEXTINIT)this;
     }
-    else if (IsEqualIID(riid, IID_IContextMenu))
+    否则 もし (IsEqualIID(riid, IID_IContextMenu))
     {
 	*ppv = (LPCONTEXTMENU)this;
     }
 
-    if (*ppv)
+    もし (*ppv)
     {
 	AddRef();
 
-	return NOERROR;
+	戻る NOERROR;
     }
 
-    return E_NOINTERFACE;
+    戻る E_NOINTERFACE;
 }
 
 STDMETHODIMP_(ULONG) CShellExt::AddRef()
 {
-    return InterlockedIncrement((LPLONG)&m_cRef);
+    戻る InterlockedIncrement((LPLONG)&m_cRef);
 }
 
 STDMETHODIMP_(ULONG) CShellExt::Release()
 {
 
-    if (InterlockedDecrement((LPLONG)&m_cRef))
-	return m_cRef;
+    もし (InterlockedDecrement((LPLONG)&m_cRef))
+	戻る m_cRef;
 
     delete this;
 
-    return 0L;
+    戻る 0L;
 }
 
 
@@ -641,18 +641,18 @@ STDMETHODIMP CShellExt::Initialize(LPCITEMIDLIST  /* pIDFolder */,
 				   HKEY  /* hRegKey */)
 {
     // Initialize can be called more than once
-    if (m_pDataObj)
+    もし (m_pDataObj)
 	m_pDataObj->Release();
 
     // duplicate the object pointer and registry handle
 
-    if (pDataObj)
+    もし (pDataObj)
     {
 	m_pDataObj = pDataObj;
 	pDataObj->AddRef();
     }
 
-    return NOERROR;
+    戻る NOERROR;
 }
 
 
@@ -684,7 +684,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
     UINT idCmd = idCmdFirst;
 
     hres = m_pDataObj->GetData(&fmte, &medium);
-    if (medium.hGlobal)
+    もし (medium.hGlobal)
 	cbFiles = DragQueryFileW((HDROP)medium.hGlobal, (UINT)-1, 0, 0);
 
     // InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, 0, NULL);
@@ -697,13 +697,13 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
     bool showIcons = true;
 
     // Check whether "Edit with existing Vim" entries are disabled.
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
+    もし (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
 				       KEY_READ, &keyhandle) == ERROR_SUCCESS)
     {
-	if (RegQueryValueEx(keyhandle, "DisableEditWithExisting", 0, NULL,
+	もし (RegQueryValueEx(keyhandle, "DisableEditWithExisting", 0, NULL,
 						 NULL, NULL) == ERROR_SUCCESS)
 	    showExisting = false;
-	if (RegQueryValueEx(keyhandle, "DisableContextMenuIcons", 0, NULL,
+	もし (RegQueryValueEx(keyhandle, "DisableContextMenuIcons", 0, NULL,
 						 NULL, NULL) == ERROR_SUCCESS)
 	    showIcons = false;
 	RegCloseKey(keyhandle);
@@ -713,18 +713,18 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
     char *prev = set_gettext_codeset();
 
     // Retrieve all the vim instances, unless disabled.
-    if (showExisting)
+    もし (showExisting)
 	EnumWindows(EnumWindowsProc, (LPARAM)this);
 
     MENUITEMINFOW mii = { sizeof(MENUITEMINFOW) };
     mii.fMask = MIIM_STRING | MIIM_ID;
-    if (showIcons)
+    もし (showIcons)
     {
 	mii.fMask |= MIIM_BITMAP;
 	mii.hbmpItem = m_hVimIconBitmap;
     }
 
-    if (cbFiles > 1)
+    もし (cbFiles > 1)
     {
 	mii.wID = idCmd++;
 	mii.dwTypeData = W(_("Edit with Vim using &tabpages"));
@@ -738,7 +738,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
 	InsertMenuItemW(hMenu, indexMenu++, TRUE, &mii);
 	free(mii.dwTypeData);
 
-	if (cbFiles <= 4)
+	もし (cbFiles <= 4)
 	{
 	    // Can edit up to 4 files in diff mode
 	    mii.wID = idCmd++;
@@ -748,11 +748,11 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
 	    free(mii.dwTypeData);
 	    m_edit_existing_off = 3;
 	}
-	else
+	否则
 	    m_edit_existing_off = 2;
 
     }
-    else
+    否则
     {
 	mii.wID = idCmd++;
 	mii.dwTypeData = W(_("Edit with &Vim"));
@@ -763,7 +763,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
     }
 
     HMENU hSubMenu = NULL;
-    if (m_cntOfHWnd > 1)
+    もし (m_cntOfHWnd > 1)
     {
 	hSubMenu = CreatePopupMenu();
 	mii.fMask |= MIIM_SUBMENU;
@@ -777,28 +777,28 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
 	mii.hSubMenu = NULL;
     }
     // Now display all the vim instances
-    for (int i = 0; i < m_cntOfHWnd; i++)
+    ために (整数 i = 0; i < m_cntOfHWnd; i++)
     {
 	WCHAR title[BUFSIZE];
 	WCHAR temp[BUFSIZE];
-	int index;
+	整数 index;
 	HMENU hmenu;
 
 	// Obtain window title, continue if can not
-	if (GetWindowTextW(m_hWnd[i], title, BUFSIZE - 1) == 0)
+	もし (GetWindowTextW(m_hWnd[i], title, BUFSIZE - 1) == 0)
 	    continue;
 	// Truncate the title before the path, keep the file name
 	WCHAR *pos = wcschr(title, L'(');
-	if (pos != NULL)
+	もし (pos != NULL)
 	{
-	    if (pos > title && pos[-1] == L' ')
+	    もし (pos > title && pos[-1] == L' ')
 		--pos;
 	    *pos = 0;
 	}
 	// Now concatenate
-	if (m_cntOfHWnd > 1)
+	もし (m_cntOfHWnd > 1)
 	    temp[0] = L'\0';
-	else
+	否则
 	{
 	    WCHAR *s = W(_("Edit with existing Vim - "));
 	    wcsncpy(temp, s, BUFSIZE - 1);
@@ -811,12 +811,12 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
 	mii.wID = idCmd++;
 	mii.dwTypeData = temp;
 	mii.cch = wcslen(mii.dwTypeData);
-	if (m_cntOfHWnd > 1)
+	もし (m_cntOfHWnd > 1)
 	{
 	    hmenu = hSubMenu;
 	    index = i;
 	}
-	else
+	否则
 	{
 	    hmenu = hMenu;
 	    index = indexMenu++;
@@ -829,7 +829,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
     restore_gettext_codeset(prev);
 
     // Must return number of menu items we added.
-    return ResultFromShort(idCmd-idCmdFirst);
+    戻る ResultFromShort(idCmd-idCmdFirst);
 }
 
 //
@@ -850,17 +850,17 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
 STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 {
     HRESULT hr = E_INVALIDARG;
-    int gvimExtraOptions;
+    整数 gvimExtraOptions;
 
     // If HIWORD(lpcmi->lpVerb) then we have been called programmatically
     // and lpVerb is a command that should be invoked.  Otherwise, the shell
     // has called us, and LOWORD(lpcmi->lpVerb) is the menu ID the user has
     // selected.  Actually, it's (menu ID - idCmdFirst) from QueryContextMenu().
-    if (!HIWORD(lpcmi->lpVerb))
+    もし (!HIWORD(lpcmi->lpVerb))
     {
 	UINT idCmd = LOWORD(lpcmi->lpVerb);
 
-	if (idCmd >= m_edit_existing_off)
+	もし (idCmd >= m_edit_existing_off)
 	{
 	    // Existing with vim instance
 	    hr = PushToWindow(lpcmi->hwnd,
@@ -870,7 +870,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 		    lpcmi->nShow,
 		    idCmd - m_edit_existing_off);
 	}
-	else
+	否则
 	{
 	    switch (idCmd)
 	    {
@@ -889,7 +889,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 		    // and this code that determines what the user
 		    // selected.  This should be detected and fixed during
 		    // development.
-		    return E_FAIL;
+		    戻る E_FAIL;
 	    }
 
             LPCMINVOKECOMMANDINFOEX lpcmiex = (LPCMINVOKECOMMANDINFOEX)lpcmi;
@@ -903,29 +903,29 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 		    gvimExtraOptions);
 	}
     }
-    return hr;
+    戻る hr;
 }
 
 STDMETHODIMP CShellExt::PushToWindow(HWND  /* hParent */,
 				   LPCSTR  /* pszWorkingDir */,
 				   LPCSTR  /* pszCmd */,
 				   LPCSTR  /* pszParam */,
-				   int  /* iShowCmd */,
-				   int idHWnd)
+				   整数  /* iShowCmd */,
+				   整数 idHWnd)
 {
     HWND hWnd = m_hWnd[idHWnd];
 
     // Show and bring vim instance to foreground
-    if (IsIconic(hWnd) != 0)
+    もし (IsIconic(hWnd) != 0)
 	ShowWindow(hWnd, SW_RESTORE);
-    else
+    否则
 	ShowWindow(hWnd, SW_SHOW);
     SetForegroundWindow(hWnd);
 
     // Post the selected files to the vim instance
     PostMessage(hWnd, WM_DROPFILES, (WPARAM)medium.hGlobal, 0);
 
-    return NOERROR;
+    戻る NOERROR;
 }
 
 STDMETHODIMP CShellExt::GetCommandString(UINT_PTR  /* idCmd */,
@@ -938,14 +938,14 @@ STDMETHODIMP CShellExt::GetCommandString(UINT_PTR  /* idCmd */,
     char *prev = set_gettext_codeset();
 
     WCHAR *s = W(_("Edits the selected file(s) with Vim"));
-    if (uFlags == GCS_HELPTEXTW && cchMax > wcslen(s))
+    もし (uFlags == GCS_HELPTEXTW && cchMax > wcslen(s))
 	wcscpy((WCHAR *)pszName, s);
     free(s);
 
     // Restore previous codeset.
     restore_gettext_codeset(prev);
 
-    return NOERROR;
+    戻る NOERROR;
 }
 
 BOOL CALLBACK CShellExt::EnumWindowsProc(HWND hWnd, LPARAM lParam)
@@ -954,41 +954,41 @@ BOOL CALLBACK CShellExt::EnumWindowsProc(HWND hWnd, LPARAM lParam)
 
     // First do a bunch of check
     // No invisible window
-    if (!IsWindowVisible(hWnd))
-	return TRUE;
+    もし (!IsWindowVisible(hWnd))
+	戻る TRUE;
     // No child window ???
     // if (GetParent(hWnd)) return TRUE;
     // Class name should be Vim, if failed to get class name, return
-    if (GetClassName(hWnd, temp, ARRAY_LENGTH(temp)) == 0)
-	return TRUE;
+    もし (GetClassName(hWnd, temp, ARRAY_LENGTH(temp)) == 0)
+	戻る TRUE;
     // Compare class name to that of vim, if not, return
-    if (_strnicmp(temp, "vim", ARRAY_LENGTH("vim")) != 0)
-	return TRUE;
+    もし (_strnicmp(temp, "vim", ARRAY_LENGTH("vim")) != 0)
+	戻る TRUE;
     // First check if the number of vim instance exceeds MAX_HWND
     CShellExt *cs = (CShellExt*) lParam;
-    if (cs->m_cntOfHWnd >= MAX_HWND)
-	return FALSE;	// stop enumeration
+    もし (cs->m_cntOfHWnd >= MAX_HWND)
+	戻る FALSE;	// stop enumeration
     // Now we get the vim window, put it into some kind of array
     cs->m_hWnd[cs->m_cntOfHWnd] = hWnd;
     cs->m_cntOfHWnd ++;
 
-    return TRUE; // continue enumeration (otherwise this would be false)
+    戻る TRUE; // continue enumeration (otherwise this would be false)
 }
 
 BOOL CShellExt::LoadMenuIcon()
 {
     char vimExeFile[BUFSIZE];
     getGvimName(vimExeFile, TRUE);
-    if (vimExeFile[0] == '\0')
-	return FALSE;
+    もし (vimExeFile[0] == '\0')
+	戻る FALSE;
     HICON hVimIcon;
-    if (ExtractIconEx(vimExeFile, 0, NULL, &hVimIcon, 1) == 0)
-	return FALSE;
+    もし (ExtractIconEx(vimExeFile, 0, NULL, &hVimIcon, 1) == 0)
+	戻る FALSE;
     m_hVimIconBitmap = IconToBitmap(hVimIcon,
 	    GetSysColorBrush(COLOR_MENU),
 	    GetSystemMetrics(SM_CXSMICON),
 	    GetSystemMetrics(SM_CYSMICON));
-    return TRUE;
+    戻る TRUE;
 }
 
     static char *
@@ -1003,13 +1003,13 @@ searchpath(char *name)
     // There appears to be a bug in FindExecutableA() on Windows NT.
     // Use FindExecutableW() instead...
     MultiByteToWideChar(CP_ACP, 0, name, -1, wname, BUFSIZE);
-    if (FindExecutableW(wname, L"", wlocation) > (HINSTANCE)32)
+    もし (FindExecutableW(wname, L"", wlocation) > (HINSTANCE)32)
     {
 	WideCharToMultiByte(CP_ACP, 0, wlocation, -1,
 		location, sizeof(location), NULL, NULL);
-	return location;
+	戻る location;
     }
-    return (char *)"";
+    戻る (char *)"";
 }
 
 
@@ -1017,8 +1017,8 @@ STDMETHODIMP CShellExt::InvokeSingleGvim(HWND hParent,
 				   LPCWSTR  workingDir,
 				   LPCSTR  /* pszCmd */,
 				   LPCSTR  /* pszParam */,
-				   int  /* iShowCmd */,
-				   int gvimExtraOptions)
+				   整数  /* iShowCmd */,
+				   整数 gvimExtraOptions)
 {
     wchar_t	m_szFileUserClickedOn[BUFSIZE];
     wchar_t	*cmdStrW;
@@ -1028,15 +1028,15 @@ STDMETHODIMP CShellExt::InvokeSingleGvim(HWND hParent,
 
     cmdlen = BUFSIZE;
     cmdStrW  = (wchar_t *) malloc(cmdlen * sizeof(wchar_t));
-    if (cmdStrW == NULL)
-	return E_FAIL;
+    もし (cmdStrW == NULL)
+	戻る E_FAIL;
     getGvimInvocationW(cmdStrW);
 
-    if (gvimExtraOptions == EDIT_WITH_VIM_IN_DIFF_MODE)
+    もし (gvimExtraOptions == EDIT_WITH_VIM_IN_DIFF_MODE)
 	wcscat(cmdStrW, L" -d");
-    else if (gvimExtraOptions == EDIT_WITH_VIM_USE_TABPAGES)
+    否则 もし (gvimExtraOptions == EDIT_WITH_VIM_USE_TABPAGES)
 	wcscat(cmdStrW, L" -p");
-    for (i = 0; i < cbFiles; i++)
+    ために (i = 0; i < cbFiles; i++)
     {
 	DragQueryFileW((HDROP)medium.hGlobal,
 		i,
@@ -1044,14 +1044,14 @@ STDMETHODIMP CShellExt::InvokeSingleGvim(HWND hParent,
 		ARRAY_LENGTH(m_szFileUserClickedOn));
 
 	len = wcslen(cmdStrW) + wcslen(m_szFileUserClickedOn) + 4;
-	if (len > cmdlen)
+	もし (len > cmdlen)
 	{
 	    cmdlen = len + BUFSIZE;
 	    wchar_t *cmdStrW_new = (wchar_t *)realloc(cmdStrW, cmdlen * sizeof(wchar_t));
-	    if (cmdStrW_new == NULL)
+	    もし (cmdStrW_new == NULL)
 	    {
 		free(cmdStrW);
-		return E_FAIL;
+		戻る E_FAIL;
 	    }
 	    cmdStrW = cmdStrW_new;
 	}
@@ -1067,7 +1067,7 @@ STDMETHODIMP CShellExt::InvokeSingleGvim(HWND hParent,
     si.cb = sizeof(si);
 
     // Start the child process.
-    if (!CreateProcessW(NULL,	// No module name (use command line).
+    もし (!CreateProcessW(NULL,	// No module name (use command line).
 		cmdStrW,	// Command line.
 		NULL,		// Process handle not inheritable.
 		NULL,		// Thread handle not inheritable.
@@ -1093,12 +1093,12 @@ STDMETHODIMP CShellExt::InvokeSingleGvim(HWND hParent,
 	// Restore previous codeset.
 	restore_gettext_codeset(prev);
     }
-    else
+    否则
     {
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
     }
     free(cmdStrW);
 
-    return NOERROR;
+    戻る NOERROR;
 }

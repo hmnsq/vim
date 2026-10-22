@@ -15,7 +15,7 @@ def set_output_encoding(enc=None):
       enc -- Encoding name.
              If omitted, locale.getpreferredencoding() is used.
     """
-    if enc is None:
+    もし enc is None:
         enc = locale.getpreferredencoding()
 
     def get_text_writer(fo, **kwargs):
@@ -23,33 +23,33 @@ def set_output_encoding(enc=None):
         kw.setdefault('errors', 'backslashreplace') # use \uXXXX style
         kw.setdefault('closefd', False)
 
-        if sys.version_info[0] < 3:
+        もし sys.version_info[0] < 3:
             # Work around for Python 2.x
             # New line conversion isn't needed here. Done in somewhere else.
             writer = io.open(fo.fileno(), mode='w', newline='', **kw)
             write = writer.write    # save the original write() function
             enc = locale.getpreferredencoding()
             def convwrite(s):
-                if isinstance(s, bytes):
+                もし isinstance(s, bytes):
                     write(s.decode(enc))    # convert to unistr
-                else:
+                否则:
                     write(s)
                 try:
                     writer.flush()  # needed on Windows
                 except IOError:
                     pass
             writer.write = convwrite
-        else:
+        否则:
             writer = io.open(fo.fileno(), mode='w', **kw)
-        return writer
+        戻る writer
 
     sys.stdout = get_text_writer(sys.stdout, encoding=enc)
     sys.stderr = get_text_writer(sys.stderr, encoding=enc)
 
 
-def main():
+def メインページ():
     enc = 'utf-8'
-    if len(sys.argv) > 1:
+    もし len(sys.argv) > 1:
         enc = sys.argv[1]
     set_output_encoding(enc)
 
@@ -63,5 +63,5 @@ def main():
     print('Xfoobar.c(10) : %s (%s)' % (message_tbl[enc], enc))
 
 
-if __name__ == "__main__":
-    main()
+もし __name__ == "__main__":
+    メインページ()

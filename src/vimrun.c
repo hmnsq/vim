@@ -23,15 +23,15 @@
 #endif
 #include <windows.h>
 
-    int
-main(void)
+    整数
+メインページ(void)
 {
     const wchar_t   *p;
     wchar_t	    *cmd;
     size_t	    cmdlen;
-    int		    retval;
-    int		    inquote = 0;
-    int		    silent = 0;
+    整数		    retval;
+    整数		    inquote = 0;
+    整数		    silent = 0;
     HANDLE	    hstdout;
     DWORD	    written;
 
@@ -40,28 +40,28 @@ main(void)
     /*
      * Skip the executable name, which might be in "".
      */
-    while (*p)
+    ながら (*p)
     {
-	if (*p == L'"')
+	もし (*p == L'"')
 	    inquote = !inquote;
-	else if (!inquote && *p == L' ')
+	否则 もし (!inquote && *p == L' ')
 	{
 	    ++p;
 	    break;
 	}
 	++p;
     }
-    while (*p == L' ')
+    ながら (*p == L' ')
 	++p;
 
     /*
      * "-s" argument: don't wait for a key hit.
      */
-    if (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
+    もし (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
     {
 	silent = 1;
 	p += 3;
-	while (*p == L' ')
+	ながら (*p == L' ')
 	    ++p;
     }
 
@@ -74,14 +74,14 @@ main(void)
     // Enclose the command in parentheses.
     cmd = NULL;
     cmdlen = wcslen(p);
-    if (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
+    もし (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
     {
 	cmdlen += 3;
 	cmd = malloc(cmdlen * sizeof(wchar_t));
-	if (cmd == NULL)
+	もし (cmd == NULL)
 	{
 	    perror("vimrun malloc(): ");
-	    return -1;
+	    戻る -1;
 	}
 	_snwprintf(cmd, cmdlen, L"(%s)", p);
 	p = cmd;
@@ -92,22 +92,22 @@ main(void)
      */
     retval = _wsystem(p);
 
-    if (cmd)
+    もし (cmd)
 	free(cmd);
 
-    if (retval == -1)
+    もし (retval == -1)
 	perror("vimrun system(): ");
-    else if (retval != 0)
+    否则 もし (retval != 0)
 	printf("shell returned %d\n", retval);
 
-    if (!silent)
+    もし (!silent)
     {
 	puts("Hit any key to close this window...");
 
-	while (_kbhit())
+	ながら (_kbhit())
 	    (void)_getch();
 	(void)_getch();
     }
 
-    return retval;
+    戻る retval;
 }
