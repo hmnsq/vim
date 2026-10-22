@@ -9,89 +9,89 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
 // define _generic_64 for use in time functions
-#if !defined(VAX)
+#إذا !defined(VAX)
 # include <gen64def.h>
-#else
+#وإلا
 // based on Alpha's gen64def.h; the file is absent on VAX
-typedef struct _generic_64 {
+تعريفنوع بنية _generic_64 {
 # pragma __nomember_alignment
     __union  {				     // You can treat me as...
 	// long long is not available on VAXen
 	// unsigned __int64 gen64$q_quadword; ...a single 64-bit value, or
 
-	unsigned int gen64$l_longword [2];   // ...two 32-bit values, or
-	unsigned short int gen64$w_word [4]; // ...four 16-bit values
+	unsigned صحيح gen64$l_longword [2];   // ...two 32-bit values, or
+	unsigned short صحيح gen64$w_word [4]; // ...four 16-bit values
     } gen64$r_quad_overlay;
 } GENERIC_64;
 #endif
 
-typedef struct
+تعريفنوع بنية
 {
-    char	class;
-    char	type;
+    حرف	class;
+    حرف	type;
     short	width;
-    union
+    اتحاد
     {
-	struct
+	بنية
 	{
-	    char	_basic[3];
-	    char	length;
+	    حرف	_basic[3];
+	    حرف	length;
 	}	y;
-	int	basic;
+	صحيح	basic;
     }	x;
-    int		extended;
+    صحيح		extended;
 }	TT_MODE;
 
-typedef struct
+تعريفنوع بنية
 {
     short	buflen;
     short	itemcode;
-    char	*bufadrs;
-    int		*retlen;
+    حرف	*bufadrs;
+    صحيح		*retlen;
 }	ITEM;
 
-typedef struct
+تعريفنوع بنية
 {
     ITEM	equ;
-    int		nul;
+    صحيح		nul;
 }	ITMLST1;
 
-typedef struct
+تعريفنوع بنية
 {
     ITEM	index;
     ITEM	string;
-    int	nul;
+    صحيح	nul;
 }	ITMLST2;
 
-static TT_MODE	orgmode;
-static short	iochan;			// TTY I/O channel
-static short	iosb[4];		// IO status block
+ساكن TT_MODE	orgmode;
+ساكن short	iochan;			// TTY I/O channel
+ساكن short	iosb[4];		// IO status block
 
-static int vms_match_num = 0;
-static int vms_match_free = 0;
-static char_u **vms_fmatch = NULL;
-static char *Fspec_Rms;		       // rms file spec, passed implicitly between routines
+ساكن صحيح vms_match_رقم = 0;
+ساكن صحيح vms_match_free = 0;
+ساكن char_u **vms_fmatch = عدم;
+ساكن حرف *Fspec_Rms;		       // rms file spec, passed implicitly between routines
 
 
 
-static TT_MODE	get_tty(void);
-static void	set_tty(int row, int col);
+ساكن TT_MODE	get_tty(فراغ);
+ساكن فراغ	set_tty(صحيح row, صحيح col);
 
 #define EXPL_ALLOC_INC 64
 
 #define EQN(S1,S2,LN) (strncmp(S1,S2,LN) == 0)
-#define SKIP_FOLLOWING_SLASHES(Str) do { while (Str[1] == '/') ++Str; } while (0)
+#define SKIP_FOLLOWING_SLASHES(Str) افعل { طالما (Str[1] == '/') ++Str; } طالما (0)
 
 
 /*
  *	vul_desc	vult een descriptor met een string en de lengte
  *			hier van.
  */
-    static void
-vul_desc(DESC *des, char *str)
+    ساكن فراغ
+vul_desc(DESC *des, حرف *str)
 {
     des->dsc$b_dtype = DSC$K_DTYPE_T;
     des->dsc$b_class = DSC$K_CLASS_S;
@@ -102,8 +102,8 @@ vul_desc(DESC *des, char *str)
 /*
  *	vul_item	vult een item met een aantal waarden
  */
-    static void
-vul_item(ITEM *itm, short len, short cod, char *adr, int *ret)
+    ساكن فراغ
+vul_item(ITEM *itm, short len, short cod, حرف *adr, صحيح *ret)
 {
     itm->buflen   = len;
     itm->itemcode = cod;
@@ -111,72 +111,72 @@ vul_item(ITEM *itm, short len, short cod, char *adr, int *ret)
     itm->retlen   = ret;
 }
 
-    void
+    فراغ
 mch_settmode(tmode_T tmode)
 {
-    int	status;
+    صحيح	status;
 
-    if ( tmode == TMODE_RAW )
+    إذا ( tmode == TMODE_RAW )
 	set_tty(0, 0);
-    else
+    وإلا
     {
-	switch (orgmode.width)
+	بدل (orgmode.width)
 	{
-	    case 132:	OUT_STR_NF((char_u *)"\033[?3h\033>");	break;
-	    case 80:	OUT_STR_NF((char_u *)"\033[?3l\033>");	break;
-	    default:	break;
+	    حالة 132:	OUT_STR_NF((char_u *)"\033[?3h\033>");	اكسر;
+	    حالة 80:	OUT_STR_NF((char_u *)"\033[?3l\033>");	اكسر;
+	    افتراضي:	اكسر;
 	}
 	out_flush();
 	status = sys$qiow(0, iochan, IO$_SETMODE, iosb, 0, 0,
-					  &orgmode, sizeof(TT_MODE), 0,0,0,0);
-	if (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
-	    return;
-	(void)sys$dassgn(iochan);
+					  &orgmode, حجم(TT_MODE), 0,0,0,0);
+	إذا (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
+	    أرجع;
+	(فراغ)sys$dassgn(iochan);
 	iochan = 0;
     }
 }
 
-    static void
-set_tty(int row, int col)
+    ساكن فراغ
+set_tty(صحيح row, صحيح col)
 {
-    int		    status;
+    صحيح		    status;
     TT_MODE	    newmode;		// New TTY mode bits
-    static short    first_time = TRUE;
+    ساكن short    first_time = TRUE;
 
-    if (first_time)
+    إذا (first_time)
     {
 	orgmode = get_tty();
 	first_time = FALSE;
     }
     newmode = get_tty();
-    if (col)
+    إذا (col)
 	newmode.width		 = col;
-    if (row)
+    إذا (row)
 	newmode.x.y.length       = row;
     newmode.x.basic		|= (TT$M_NOECHO | TT$M_HOSTSYNC);
     newmode.x.basic		&= ~TT$M_TTSYNC;
     newmode.extended		|= TT2$M_PASTHRU;
     status = sys$qiow(0, iochan, IO$_SETMODE, iosb, 0, 0,
-			  &newmode, sizeof(newmode), 0, 0, 0, 0);
-    if (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
-	return;
+			  &newmode, حجم(newmode), 0, 0, 0, 0);
+    إذا (status!=SS$_NORMAL || (iosb[0]&0xFFFF)!=SS$_NORMAL)
+	أرجع;
 }
 
-    static TT_MODE
-get_tty(void)
+    ساكن TT_MODE
+get_tty(فراغ)
 {
 
-    static $DESCRIPTOR(odsc,"SYS$OUTPUT");   // output descriptor
+    ساكن $DESCRIPTOR(odsc,"SYS$OUTPUT");   // output descriptor
 
-    int		status;
+    صحيح		status;
     TT_MODE	tt_mode;
 
-    if (!iochan)
+    إذا (!iochan)
 	status = sys$assign(&odsc,&iochan,0,0);
 
     status = sys$qiow(0, iochan, IO$_SENSEMODE, iosb, 0, 0,
-		      &tt_mode, sizeof(tt_mode), 0, 0, 0, 0);
-    if (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
+		      &tt_mode, حجم(tt_mode), 0, 0, 0, 0);
+    إذا (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
     {
 	tt_mode.width		= 0;
 	tt_mode.type		= 0;
@@ -185,35 +185,35 @@ get_tty(void)
 	tt_mode.x.y.length	= 0;
 	tt_mode.extended	= 0;
     }
-    return(tt_mode);
+    أرجع(tt_mode);
 }
 
 /*
  * Get the current window size in Rows and Columns.
  */
-    int
-mch_get_shellsize(void)
+    صحيح
+mch_get_shellsize(فراغ)
 {
     TT_MODE	tmode;
 
     tmode = get_tty();			// get size from VMS
     Columns = tmode.width;
     Rows = tmode.x.y.length;
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Try to set the window size to Rows and new_Columns.
  */
-    void
-mch_set_shellsize(void)
+    فراغ
+mch_set_shellsize(فراغ)
 {
     set_tty(Rows, Columns);
-    switch (Columns)
+    بدل (Columns)
     {
-	case 132:	OUT_STR_NF((char_u *)"\033[?3h\033>");	break;
-	case 80:	OUT_STR_NF((char_u *)"\033[?3l\033>");	break;
-	default:	break;
+	حالة 132:	OUT_STR_NF((char_u *)"\033[?3h\033>");	اكسر;
+	حالة 80:	OUT_STR_NF((char_u *)"\033[?3l\033>");	اكسر;
+	افتراضي:	اكسر;
     }
     out_flush();
     screen_start();
@@ -223,100 +223,100 @@ mch_set_shellsize(void)
 mch_getenv(char_u *lognam)
 {
     DESC		d_file_dev, d_lognam  ;
-    static char		buffer[LNM$C_NAMLENGTH+1];
-    char_u		*cp = NULL;
+    ساكن حرف		buffer[LNM$C_NAMLENGTH+1];
+    char_u		*cp = عدم;
     unsigned long	attrib;
-    int			lengte = 0, dum = 0, idx = 0;
+    صحيح			lengte = 0, dum = 0, idx = 0;
     ITMLST2		itmlst;
-    char		*sbuf = NULL;
+    حرف		*sbuf = عدم;
 
-    vul_desc(&d_lognam, (char *)lognam);
+    vul_desc(&d_lognam, (حرف *)lognam);
     vul_desc(&d_file_dev, "LNM$FILE_DEV");
     attrib = LNM$M_CASE_BLIND;
-    vul_item(&itmlst.index, sizeof(int), LNM$_INDEX, (char *)&idx, &dum);
+    vul_item(&itmlst.index, حجم(صحيح), LNM$_INDEX, (حرف *)&idx, &dum);
     vul_item(&itmlst.string, LNM$C_NAMLENGTH, LNM$_STRING, buffer, &lengte);
     itmlst.nul	= 0;
-    if (sys$trnlnm(&attrib, &d_file_dev, &d_lognam, NULL,&itmlst) == SS$_NORMAL)
+    إذا (sys$trnlnm(&attrib, &d_file_dev, &d_lognam, عدم,&itmlst) == SS$_NORMAL)
     {
 	buffer[lengte] = '\0';
-	if (cp = alloc(lengte + 1))
-	    strcpy((char *)cp, buffer);
-	return(cp);
+	إذا (cp = alloc(lengte + 1))
+	    strcpy((حرف *)cp, buffer);
+	أرجع(cp);
     }
-    else if ((sbuf = getenv((char *)lognam)))
+    وإلا إذا ((sbuf = getenv((حرف *)lognam)))
     {
 	lengte = strlen(sbuf) + 1;
 	cp = alloc(lengte);
-	if (cp)
-	    strcpy((char *)cp, sbuf);
-	return cp;
+	إذا (cp)
+	    strcpy((حرف *)cp, sbuf);
+	أرجع cp;
     }
-    else
-	return(NULL);
+    وإلا
+	أرجع(عدم);
 }
 
 /*
  *	mch_setenv	VMS version of setenv()
  */
-    int
-mch_setenv(char *var, char *value, int x)
+    صحيح
+mch_setenv(حرف *var, حرف *قيمة, صحيح x)
 {
-    int		res, dum;
+    صحيح		res, dum;
     long	attrib = 0L;
-    char	acmode = PSL$C_SUPER;	// needs SYSNAM privilege
+    حرف	acmode = PSL$C_SUPER;	// needs SYSNAM privilege
     DESC	tabnam, lognam;
     ITMLST1	itmlst;
 
     vul_desc(&tabnam, "LNM$JOB");
     vul_desc(&lognam, var);
-    vul_item(&itmlst.equ, value ? strlen(value) : 0, value ? LNM$_STRING : 0,
-	    value, &dum);
+    vul_item(&itmlst.equ, قيمة ? strlen(قيمة) : 0, قيمة ? LNM$_STRING : 0,
+	    قيمة, &dum);
     itmlst.nul	= 0;
     res = sys$crelnm(&attrib, &tabnam, &lognam, &acmode, &itmlst);
-    return((res == 1) ? 0 : -1);
+    أرجع((res == 1) ? 0 : -1);
 }
 
-    int
-vms_sys(char *cmd, char *out, char *inp)
+    صحيح
+vms_sys(حرف *cmd, حرف *out, حرف *inp)
 {
     DESC	cdsc, odsc, idsc;
     long	status;
 
-    if (cmd)
+    إذا (cmd)
 	vul_desc(&cdsc, cmd);
-    if (out)
+    إذا (out)
 	vul_desc(&odsc, out);
-    if (inp)
+    إذا (inp)
 	vul_desc(&idsc, inp);
 
-    lib$spawn(cmd ? &cdsc : NULL,		// command string
-	      inp ? &idsc : NULL,		// input file
-	      out ? &odsc : NULL,		// output file
+    lib$spawn(cmd ? &cdsc : عدم,		// command string
+	      inp ? &idsc : عدم,		// input file
+	      out ? &odsc : عدم,		// output file
 	      0, 0, 0, &status, 0, 0, 0, 0, 0, 0);
-    return status;
+    أرجع status;
 }
 
 /*
  * Convert string to lowercase - most often filename
  */
-    char *
-vms_tolower( char *name )
+    حرف *
+vms_tolower( حرف *name )
 {
-    int i,nlen = strlen(name);
-    for (i = 0; i < nlen; i++)
+    صحيح i,nlen = strlen(name);
+    لكل (i = 0; i < nlen; i++)
 	name[i] = TOLOWER_ASC(name[i]);
-    return name;
+    أرجع name;
 }
 
 /*
  * Convert VMS system() or lib$spawn() return code to Unix-like exit value.
  */
-    int
-vms_sys_status(int status)
+    صحيح
+vms_sys_status(صحيح status)
 {
-    if (status != SS$_NORMAL && (status & STS$M_SUCCESS) == 0)
-	return status;		// Command failed.
-    return 0;
+    إذا (status != SS$_NORMAL && (status & STS$M_SUCCESS) == 0)
+	أرجع status;		// Command failed.
+    أرجع 0;
 }
 
 /*
@@ -325,16 +325,16 @@ vms_sys_status(int status)
  *
  * Returns: input length
  */
-    int
-vms_read(char *inbuf, size_t nbytes)
+    صحيح
+vms_read(حرف *inbuf, size_t nbytes)
 {
-    int		status, function, len;
+    صحيح		status, function, len;
     TT_MODE	tt_mode;
     ITEM	itmlst[2];     // terminates on everything
-    static long trm_mask[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
+    ساكن long trm_mask[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
     // whatever happened earlier we need an iochan here
-    if (!iochan)
+    إذا (!iochan)
 	tt_mode = get_tty();
 
     // important: clean the inbuf
@@ -342,15 +342,15 @@ vms_read(char *inbuf, size_t nbytes)
 
     // set up the itemlist for the first read
     vul_item(&itmlst[0], 0, TRM$_MODIFIERS,
-	 (char *)( TRM$M_TM_NOECHO  | TRM$M_TM_NOEDIT	 |
+	 (حرف *)( TRM$M_TM_NOECHO  | TRM$M_TM_NOEDIT	 |
 		   TRM$M_TM_NOFILTR | TRM$M_TM_TRMNOECHO |
 		   TRM$M_TM_NORECALL) , 0);
-    vul_item(&itmlst[1], sizeof(trm_mask), TRM$_TERM, (char *)&trm_mask, 0);
+    vul_item(&itmlst[1], حجم(trm_mask), TRM$_TERM, (حرف *)&trm_mask, 0);
 
     // wait forever for a char
     function = (IO$_READLBLK | IO$M_EXTEND);
     status = sys$qiow(0, iochan, function, &iosb, 0, 0,
-			 inbuf, nbytes-1, 0, 0, &itmlst, sizeof(itmlst));
+			 inbuf, nbytes-1, 0, 0, &itmlst, حجم(itmlst));
     len = strlen(inbuf); // how many chars we got?
 
     // read immediately the rest in the IO queue
@@ -360,7 +360,7 @@ vms_read(char *inbuf, size_t nbytes)
 
     len = strlen(inbuf); // return the total length
 
-    return len;
+    أرجع len;
 }
 
 /*
@@ -370,28 +370,28 @@ vms_read(char *inbuf, size_t nbytes)
  * Returns:  1 - continue finding matches
  *	     0 - stop trying to find any further matches
  */
-    static int
-vms_wproc(char *name, int val)
+    ساكن صحيح
+vms_wproc(حرف *name, صحيح val)
 {
-    int i;
-    static int vms_match_alloced = 0;
+    صحيح i;
+    ساكن صحيح vms_match_alloced = 0;
 
-    if (val == DECC$K_FOREIGN ) // foreign non VMS files are not counting
-	return 1;
+    إذا (val == DECC$K_FOREIGN ) // foreign non VMS files are not counting
+	أرجع 1;
 
     // accept all DECC$K_FILE and DECC$K_DIRECTORY
-    if (vms_match_num == 0)
+    إذا (vms_match_رقم == 0)
     {
 	// first time through, setup some things
-	if (NULL == vms_fmatch)
+	إذا (عدم == vms_fmatch)
 	{
 	    vms_fmatch = ALLOC_MULT(char_u *, EXPL_ALLOC_INC);
-	    if (!vms_fmatch)
-		return 0;
+	    إذا (!vms_fmatch)
+		أرجع 0;
 	    vms_match_alloced = EXPL_ALLOC_INC;
 	    vms_match_free = EXPL_ALLOC_INC;
 	}
-	else
+	وإلا
 	{
 	    // re-use existing space
 	    vms_match_free = vms_match_alloced;
@@ -403,30 +403,30 @@ vms_wproc(char *name, int val)
     name=vms_tolower(name);
 
     // if name already exists, don't add it
-    for (i = 0; i<vms_match_num; i++)
+    لكل (i = 0; i<vms_match_رقم; i++)
     {
-	if (0 == STRCMP((char_u *)name,vms_fmatch[i]))
-	    return 1;
+	إذا (0 == STRCMP((char_u *)name,vms_fmatch[i]))
+	    أرجع 1;
     }
-    if (--vms_match_free == 0)
+    إذا (--vms_match_free == 0)
     {
 	char_u **old_vms_fmatch = vms_fmatch;
 
 	// add more space to store matches
 	vms_match_alloced += EXPL_ALLOC_INC;
 	vms_fmatch = vim_realloc(old_vms_fmatch,
-		sizeof(char **) * vms_match_alloced);
-	if (!vms_fmatch)
+		حجم(حرف **) * vms_match_alloced);
+	إذا (!vms_fmatch)
 	{
 	    vim_free(old_vms_fmatch);
-	    return 0;
+	    أرجع 0;
 	}
 	vms_match_free = EXPL_ALLOC_INC;
     }
-    vms_fmatch[vms_match_num] = vim_strsave((char_u *)name);
+    vms_fmatch[vms_match_رقم] = vim_strsave((char_u *)name);
 
-    ++vms_match_num;
-    return 1;
+    ++vms_match_رقم;
+    أرجع 1;
 }
 
 /*
@@ -442,136 +442,136 @@ vms_wproc(char *name, int val)
  *	file	   pointer to array of pointers to matched file names
  *
  */
-    int
+    صحيح
 mch_expand_wildcards(
-    int		num_pat,
+    صحيح		رقم_pat,
     char_u	**pat,
-    int		*num_file,
+    صحيح		*رقم_file,
     char_u	***file,
-    int		flags)
+    صحيح		flags)
 {
-    int		i, cnt = 0;
+    صحيح		i, cnt = 0;
     char_u	buf[MAXPATHL];
-    char       *result;
-    int		dir;
-    int files_alloced, files_free;
+    حرف       *result;
+    صحيح		dir;
+    صحيح files_alloced, files_free;
 
-    *num_file = 0;			// default: no files found
+    *رقم_file = 0;			// default: no files found
     files_alloced = EXPL_ALLOC_INC;
     files_free = EXPL_ALLOC_INC;
     *file = ALLOC_MULT(char_u *, files_alloced);
-    if (*file == NULL)
+    إذا (*file == عدم)
     {
-	*num_file = 0;
-	return FAIL;
+	*رقم_file = 0;
+	أرجع FAIL;
     }
-    for (i = 0; i < num_pat; i++)
+    لكل (i = 0; i < رقم_pat; i++)
     {
 	// expand environment var or home dir
-	if (vim_strchr(pat[i],'$') || vim_strchr(pat[i],'~'))
+	إذا (vim_strchr(pat[i],'$') || vim_strchr(pat[i],'~'))
 	    expand_env(pat[i],buf,MAXPATHL);
-	else
+	وإلا
 	    STRCPY(buf,pat[i]);
 
-	vms_match_num = 0; // reset collection counter
+	vms_match_رقم = 0; // reset collection counter
 	result = decc$translate_vms(vms_fixfilename(buf));
-	if ( (int) result == 0 || (int) result == -1  )
+	إذا ( (صحيح) result == 0 || (صحيح) result == -1  )
 	{
 	    cnt = 0;
 	}
-	else
+	وإلا
 	{
 	    cnt = decc$to_vms(result, vms_wproc, 1 /*allow wild*/ , (flags & EW_DIR ? 0:1 ) /*allow directory*/) ;
 	}
-	if (cnt > 0)
-	    cnt = vms_match_num;
+	إذا (cnt > 0)
+	    cnt = vms_match_رقم;
 
-	if (cnt < 1)
-	    continue;
+	إذا (cnt < 1)
+	    استمر;
 
-	for (i = 0; i < cnt; i++)
+	لكل (i = 0; i < cnt; i++)
 	{
 	    // files should exist if expanding interactively
-	    if (!(flags & EW_NOTFOUND) && mch_getperm(vms_fmatch[i]) < 0)
-		continue;
+	    إذا (!(flags & EW_NOTFOUND) && mch_getperm(vms_fmatch[i]) < 0)
+		استمر;
 
 	    // do not include directories
 	    dir = (mch_isdir(vms_fmatch[i]));
-	    if (( dir && !(flags & EW_DIR)) || (!dir && !(flags & EW_FILE)))
-		continue;
+	    إذا (( dir && !(flags & EW_DIR)) || (!dir && !(flags & EW_FILE)))
+		استمر;
 
 	    // Skip files that are not executable if we check for that.
-	    if (!dir && (flags & EW_EXEC)
-		 && !mch_can_exe(vms_fmatch[i], NULL, !(flags & EW_SHELLCMD)))
-		continue;
+	    إذا (!dir && (flags & EW_EXEC)
+		 && !mch_can_exe(vms_fmatch[i], عدم, !(flags & EW_SHELLCMD)))
+		استمر;
 
 	    // allocate memory for pointers
-	    if (--files_free < 1)
+	    إذا (--files_free < 1)
 	    {
 		char_u **old_file = *file;
 
 		files_alloced += EXPL_ALLOC_INC;
-		*file = vim_realloc(old_file, sizeof(char_u **) * files_alloced);
-		if (*file == NULL)
+		*file = vim_realloc(old_file, حجم(char_u **) * files_alloced);
+		إذا (*file == عدم)
 		{
 		    vim_free(old_file);
 		    *file = (char_u **)"";
-		    *num_file = 0;
-		    return(FAIL);
+		    *رقم_file = 0;
+		    أرجع(FAIL);
 		}
 		files_free = EXPL_ALLOC_INC;
 	    }
 
-	    (*file)[*num_file++] = vms_fmatch[i];
+	    (*file)[*رقم_file++] = vms_fmatch[i];
 	}
     }
-    return OK;
+    أرجع OK;
 }
 
-    int
-mch_expandpath(garray_T *gap, char_u *path, int flags)
+    صحيح
+mch_expandpath(garray_T *gap, char_u *path, صحيح flags)
 {
-    int		i,cnt = 0;
-    char       *result;
+    صحيح		i,cnt = 0;
+    حرف       *result;
 
-    vms_match_num = 0;
+    vms_match_رقم = 0;
     // the result from the decc$translate_vms needs to be handled
     // otherwise it might create ACCVIO error in decc$to_vms
     result = decc$translate_vms(vms_fixfilename(path));
-    if ( (int) result == 0 || (int) result == -1  )
+    إذا ( (صحيح) result == 0 || (صحيح) result == -1  )
     {
 	cnt = 0;
     }
-    else
+    وإلا
     {
 	cnt = decc$to_vms(result, vms_wproc, 1 /*allow_wild*/, (flags & EW_DIR ? 0:1 ) /*allow directory*/);
     }
-    if (cnt > 0)
-	cnt = vms_match_num;
-    for (i = 0; i < cnt; i++)
+    إذا (cnt > 0)
+	cnt = vms_match_رقم;
+    لكل (i = 0; i < cnt; i++)
     {
-	if (mch_getperm(vms_fmatch[i]) >= 0) // add existing file
+	إذا (mch_getperm(vms_fmatch[i]) >= 0) // add existing file
 	    addfile(gap, vms_fmatch[i], flags);
     }
-    return cnt;
+    أرجع cnt;
 }
 
 /*
  * attempt to translate a mixed unix-vms file specification to pure vms
  */
-    static void
-vms_unix_mixed_filespec(char *in, char *out)
+    ساكن فراغ
+vms_unix_mixed_filespec(حرف *in, حرف *out)
 {
-    char *lastcolon;
-    char *end_of_dir;
-    char ch;
-    int len;
-    char *out_str=out;
+    حرف *lastcolon;
+    حرف *end_of_dir;
+    حرف ch;
+    صحيح len;
+    حرف *out_str=out;
 
     // copy vms filename portion up to last colon
     // (node and/or disk)
     lastcolon = strrchr(in, ':');   // find last colon
-    if (lastcolon != NULL)
+    إذا (lastcolon != عدم)
     {
 	len = lastcolon - in + 1;
 	strncpy(out, in, len);
@@ -579,16 +579,16 @@ vms_unix_mixed_filespec(char *in, char *out)
 	in += len;
     }
 
-    end_of_dir = NULL;	// default: no directory
+    end_of_dir = عدم;	// default: no directory
 
     // start of directory portion
     ch = *in;
-    if ((ch == '[') || (ch == '/') || (ch == '<')) // start of directory(s) ?
+    إذا ((ch == '[') || (ch == '/') || (ch == '<')) // start of directory(s) ?
     {
 	ch = '[';
 	SKIP_FOLLOWING_SLASHES(in);
     }
-    else if (EQN(in, "../", 3))      // Unix parent directory?
+    وإلا إذا (EQN(in, "../", 3))      // Unix parent directory?
     {
 	*out++ = '[';
 	*out++ = '-';
@@ -597,19 +597,19 @@ vms_unix_mixed_filespec(char *in, char *out)
 	in += 2;
 	SKIP_FOLLOWING_SLASHES(in);
     }
-    else
+    وإلا
     {                                // not a special character
-	while (EQN(in, "./", 2))     // Ignore Unix "current dir"
+	طالما (EQN(in, "./", 2))     // Ignore Unix "current dir"
 	{
 	    in += 2;
 	    SKIP_FOLLOWING_SLASHES(in);
     }
-    if (strchr(in, '/') == NULL)     // any more Unix directories ?
+    إذا (strchr(in, '/') == عدم)     // any more Unix directories ?
     {
 	strcpy(out, in);             // No - get rest of the spec
-	return;
+	أرجع;
     }
-    else
+    وإلا
     {
 	*out++ = '[';                // Yes, denote a Vms subdirectory
 	ch = '.';
@@ -623,16 +623,16 @@ vms_unix_mixed_filespec(char *in, char *out)
     *out++ = ch;
     ++in;
 
-    while (*in != '\0')
+    طالما (*in != '\0')
     {
 	ch = *in;
-	if ((ch == ']') || (ch == '/') || (ch == '>') )	// end of (sub)directory ?
+	إذا ((ch == ']') || (ch == '/') || (ch == '>') )	// end of (sub)directory ?
 	{
 	    end_of_dir = out;
 	    ch = '.';
 	    SKIP_FOLLOWING_SLASHES(in);
 	    }
-	else if (EQN(in, "../", 3))     // Unix parent directory?
+	وإلا إذا (EQN(in, "../", 3))     // Unix parent directory?
 	{
 	    *out++ = '-';
 	    end_of_dir = out;
@@ -640,9 +640,9 @@ vms_unix_mixed_filespec(char *in, char *out)
 	    in += 2;
 	    SKIP_FOLLOWING_SLASHES(in);
 	    }
-	else
+	وإلا
 	{
-	    while (EQN(in, "./", 2))    // Ignore Unix "current dir"
+	    طالما (EQN(in, "./", 2))    // Ignore Unix "current dir"
 	    {
 		end_of_dir = out;
 		in += 2;
@@ -658,72 +658,72 @@ vms_unix_mixed_filespec(char *in, char *out)
 
     *out = '\0';            // Terminate output file spec
 
-    if (end_of_dir != NULL) // Terminate directory portion
+    إذا (end_of_dir != عدم) // Terminate directory portion
 	*end_of_dir = ']';
 }
 
 /*
  * for decc$to_vms in vms_fixfilename
  */
-    static int
-vms_fspec_proc(char *fil, int val)
+    ساكن صحيح
+vms_fspec_proc(حرف *fil, صحيح val)
 {
     strcpy(Fspec_Rms,fil);
-    return(1);
+    أرجع(1);
 }
 
 /*
  * change unix and mixed filenames to VMS
  */
-    void *
-vms_fixfilename(void *instring)
+    فراغ *
+vms_fixfilename(فراغ *instring)
 {
-    static char		*buf = NULL;
-    static size_t	buflen = 0;
+    ساكن حرف		*buf = عدم;
+    ساكن size_t	buflen = 0;
     size_t		len;
 
     // get a big-enough buffer
     len = strlen(instring) + 1;
-    if (len > buflen)
+    إذا (len > buflen)
     {
 	buflen = len + 128;
-	buf = vim_realloc(buf, buflen * sizeof(char));
+	buf = vim_realloc(buf, buflen * حجم(حرف));
     }
 
 #ifdef DEBUG
-    char		 *tmpbuf = NULL;
-    tmpbuf = ALLOC_MULT(char, buflen);
+    حرف		 *tmpbuf = عدم;
+    tmpbuf = ALLOC_MULT(حرف, buflen);
     strcpy(tmpbuf, instring);
 #endif
 
     Fspec_Rms = buf;				// for decc$to_vms
 
-    if (strchr(instring,'/') == NULL)
+    إذا (strchr(instring,'/') == عدم)
 	// It is already a VMS file spec
 	strcpy(buf, instring);
-    else if (strchr(instring,'"') == NULL)	// password in the path?
+    وإلا إذا (strchr(instring,'"') == عدم)	// password in the path?
     {
 	// Seems it is a regular file, let guess that it is pure Unix fspec
-	if ( (strchr(instring,'[') == NULL) && (strchr(instring,'<') == NULL) &&
-	     (strchr(instring,']') == NULL) && (strchr(instring,'>') == NULL) &&
-	     (strchr(instring,':') == NULL) )
+	إذا ( (strchr(instring,'[') == عدم) && (strchr(instring,'<') == عدم) &&
+	     (strchr(instring,']') == عدم) && (strchr(instring,'>') == عدم) &&
+	     (strchr(instring,':') == عدم) )
 	{
 	    // It must be a truly unix fspec
 	    decc$to_vms(instring, vms_fspec_proc, 0, 0);
 	}
-	else
+	وإلا
 	{
 	    // It is a mixed fspec
 	    vms_unix_mixed_filespec(instring, buf);
 	}
     }
-    else
+    وإلا
 	// we have a password in the path
 	// decc$ functions can not handle
 	// this is our only hope to resolv
 	vms_unix_mixed_filespec(instring, buf);
 
-    return buf;
+    أرجع buf;
 }
 
 /*
@@ -745,55 +745,55 @@ vms_fixfilename(void *instring)
  * clear.  Currently, many invalid version strings are not treated as
  * version strings.  (More could be.)
  */
-    void
-vms_remove_version(void * fname)
+    فراغ
+vms_remove_version(فراغ * fname)
 {
     char_u	*dp;	        // Dot pointer
     char_u	*rp;            // Right pointer
-    int		done = 0;
-    int		vdigits = 0;
+    صحيح		done = 0;
+    صحيح		vdigits = 0;
 
-    rp = (char_u *)fname+ strlen( (char *)fname)- 1;    // Rightmost char
-    while ((done == 0) && (rp > (char_u *)fname))       // Count digits
+    rp = (char_u *)fname+ strlen( (حرف *)fname)- 1;    // Rightmost char
+    طالما ((done == 0) && (rp > (char_u *)fname))       // Count digits
     {
-	if (isdigit( *rp))
+	إذا (isdigit( *rp))
 	{
 	    vdigits++;
 	    *rp--;
 	}
-	else
+	وإلا
 	{
 	    done = 1;                                   // Quit at non-digit
 	}
     } // while (Count digits)
 
-    if (vdigits  <= 5)                  // If likely version digits, check delimiter
+    إذا (vdigits  <= 5)                  // If likely version digits, check delimiter
     {                                   // (Could check for <= 32767, not just five digits or fewer.)
-	if (*rp == (char_u)';')
+	إذا (*rp == (char_u)';')
 	{
-	    if ((rp >= (char_u *)fname) && (*(rp- 1) != (char_u)'^'))
+	    إذا ((rp >= (char_u *)fname) && (*(rp- 1) != (char_u)'^'))
 	    {                           // Unescaped ";"
 		*rp = '\0';             // Trim off ";nnn"
 	    }
 	}
-	else if (*rp == (char_u)'.')    // Last of multiple dots?
+	وإلا إذا (*rp == (char_u)'.')    // Last of multiple dots?
 	{
-	    if ((rp >= (char_u *)fname) && (*(rp- 1) != '^'))
+	    إذا ((rp >= (char_u *)fname) && (*(rp- 1) != '^'))
 	    {                           // Unescaped dot.  Version requires previous one
 		dp = rp- 1;             // Scan chars before "."
 		done = 0;
-		while ((done == 0) && (dp >= (char_u *)fname))
+		طالما ((done == 0) && (dp >= (char_u *)fname))
 		{
-		    if ((*dp == ']') || (*dp == '>') || (*dp == ':') || (*dp == '/'))
+		    إذا ((*dp == ']') || (*dp == '>') || (*dp == ':') || (*dp == '/'))
 		    {                   // Possible VMS dev:[dir] delimiter (or UNIX "/")
-			if ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
+			إذا ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
 			{               // Unescaped dev:[dir] (or /) delimiter
 			    done = 1;   // No previous dot found in name
 			}
 		    }
-		    else if (*dp == '.')
+		    وإلا إذا (*dp == '.')
 		    {                   // Possible dot delimiter
-			if ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
+			إذا ((dp >= (char_u *)fname) && (*(dp- 1) != '^'))
 			{               // Unescaped dot delimiter
 			    done = 1;   // Previous dot found in name
 			    *rp = '\0'; // Trim off ".nnn"
@@ -806,13 +806,13 @@ vms_remove_version(void * fname)
 	// Else no version found to remove
     } // if (vdigits  <= 5)
 
-    return ;
+    أرجع ;
 }
 
-struct typeahead_st {
+بنية typeahead_st {
     unsigned short numchars;
-    unsigned char  firstchar;
-    unsigned char  reserved0;
+    unsigned حرف  firstchar;
+    unsigned حرف  reserved0;
     unsigned long  reserved1;
 } typeahead;
 
@@ -821,33 +821,33 @@ struct typeahead_st {
  * "msec" == 0 will check for characters once.
  * "msec" == -1 will block until a character is available.
  */
-    int
+    صحيح
 RealWaitForChar(
-    int		fd UNUSED, // always read from iochan
+    صحيح		fd UNUSED, // always read from iochan
     long	msec,
-    int		*check_for_gpm UNUSED,
-    int		*interrupted)
+    صحيح		*check_for_gpm UNUSED,
+    صحيح		*interrupted)
 {
-    int status;
-    struct _generic_64 time_curr;
-    struct _generic_64 time_diff;
-    struct _generic_64 time_out;
-    unsigned int convert_operation = LIB$K_DELTA_SECONDS_F;
-    float sec =(float) msec/1000;
+    صحيح status;
+    بنية _generic_64 time_curr;
+    بنية _generic_64 time_diff;
+    بنية _generic_64 time_out;
+    unsigned صحيح convert_operation = LIB$K_DELTA_SECONDS_F;
+    عائم sec =(عائم) msec/1000;
 
     // make sure the iochan is set
-    if (!iochan)
+    إذا (!iochan)
 	get_tty();
 
-    if (sec > 0)
+    إذا (sec > 0)
     {
 	// time-out specified; convert it to absolute time
 	// sec>0 requirement of lib$cvt[fs]_to_internal_time()
 
 	// get current time (number of 100ns ticks since the VMS Epoch)
 	status = sys$gettim(&time_curr);
-	if (status != SS$_NORMAL)
-	    return 0; // error
+	إذا (status != SS$_NORMAL)
+	    أرجع 0; // error
 	// construct the delta time
 
 /* On all non-VAX hardware architectures, the "CC /FLOAT=option"
@@ -857,85 +857,85 @@ RealWaitForChar(
  * format being used, not the hardware architecture.  Choose the
  * appropriate time conversion function accordingly.
  */
-#if __IEEE_FLOAT
+#إذا __IEEE_FLOAT
 // allow fallback for older Alphas
 # ifdef lib$cvts_to_internal_time
 #  define LIB_CVTX_TO_INTERNAL_TIME lib$cvts_to_internal_time // IEEE
-# else
+# وإلا
 #  define LIB_CVTX_TO_INTERNAL_TIME lib$cvtf_to_internal_time
 # endif
-#else
+#وإلا
 # define LIB_CVTX_TO_INTERNAL_TIME lib$cvtf_to_internal_time // VAX
 #endif // __IEEE_FLOAT CVTS
 
 	status = LIB_CVTX_TO_INTERNAL_TIME(
 		&convert_operation, &sec, &time_diff);
-	if (status != LIB$_NORMAL)
-	    return 0; // error
+	إذا (status != LIB$_NORMAL)
+	    أرجع 0; // error
 	// add them up
 	status = lib$add_times(
 		&time_curr,
 		&time_diff,
 		&time_out);
-	if (status != LIB$_NORMAL)
-	    return 0; // error
+	إذا (status != LIB$_NORMAL)
+	    أرجع 0; // error
     }
 
-    while (TRUE)
+    طالما (TRUE)
     {
 	// select()
 	status = sys$qiow(0, iochan, IO$_SENSEMODE | IO$M_TYPEAHDCNT, iosb,
 		0, 0, &typeahead, 8, 0, 0, 0, 0);
-	if (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
-	    return 0; // error
+	إذا (status != SS$_NORMAL || (iosb[0] & 0xFFFF) != SS$_NORMAL)
+	    أرجع 0; // error
 
-	if (typeahead.numchars)
-	    return 1; // ready to read
+	إذا (typeahead.numchars)
+	    أرجع 1; // ready to read
 
 	// there's nothing to read; what now?
-	if (msec == 0)
+	إذا (msec == 0)
 	{
 	    // immediate time-out; return impatiently
-	    return 0;
+	    أرجع 0;
 	}
-	else if (msec < 0)
+	وإلا إذا (msec < 0)
 	{
 	    // no time-out; wait on indefinitely
-	    return 1; // fakeout to force a wait in vms_read()
+	    أرجع 1; // fakeout to force a wait in vms_read()
 	}
-	else
+	وإلا
 	{
 	    // time-out needs to be checked
 	    status = sys$gettim(&time_curr);
-	    if (status != SS$_NORMAL)
-		return 0; // error
+	    إذا (status != SS$_NORMAL)
+		أرجع 0; // error
 
 	    status = lib$sub_times(
 		    &time_out,
 		    &time_curr,
 		    &time_diff);
-	    if (status != LIB$_NORMAL)
-		return 0; // error, incl. time_diff < 0 (i.e. time-out)
+	    إذا (status != LIB$_NORMAL)
+		أرجع 0; // error, incl. time_diff < 0 (i.e. time-out)
 
 	    // otherwise wait some more
 	}
     }
 }
 
-#if !defined( __VAX) && (__CRTL_VER >= 70301000)
+#إذا !defined( __VAX) && (__CRTL_VER >= 70301000)
 
 # include <stdio.h>
 # include <unixlib.h>
 
 // Structure to hold a DECC$* feature name and its desired value
 
-typedef struct
+تعريفنوع بنية
    {
-   char *name;
-   int value;
+   حرف *name;
+   صحيح قيمة;
    } decc_feat_t;
 
-int vms_init_done = -1;
+صحيح vms_init_done = -1;
 
 decc_feat_t decc_feat_array[] = {
 
@@ -950,7 +950,7 @@ decc_feat_t decc_feat_array[] = {
  { "DECC$EFS_CHARSET", 1 },
 
    // List terminator
- { (char *)NULL, 0 } };
+ { (حرف *)عدم, 0 } };
 
 
 /* LIB$INITIALIZE initialization.
@@ -978,44 +978,44 @@ decc_feat_t decc_feat_array[] = {
  * LIB$INITIALIZE initialization function
  */
 
-static void
-vms_init(void)
+ساكن فراغ
+vms_init(فراغ)
 {
     // Set the global flag to indicate that LIB$INITIALIZE worked
 
     vms_init_done = 1;
 
-    int feat_index;
-    int feat_value;
-    int feat_value_max;
-    int feat_value_min;
-    int i;
-    int sts;
+    صحيح feat_index;
+    صحيح feat_قيمة;
+    صحيح feat_قيمة_max;
+    صحيح feat_قيمة_min;
+    صحيح i;
+    صحيح sts;
 
     // Loop through all items in the decc_feat_array[]
-    for (i = 0; decc_feat_array[i].name != NULL; i++)
+    لكل (i = 0; decc_feat_array[i].name != عدم; i++)
     {
 	// Get the feature index
 	feat_index = decc$feature_get_index(decc_feat_array[i].name);
-	if (feat_index >= 0)
+	إذا (feat_index >= 0)
 	{
 	    // Valid item.  Collect its properties
-	    feat_value = decc$feature_get_value(feat_index, 1);
-	    feat_value_min = decc$feature_get_value(feat_index, 2);
-	    feat_value_max = decc$feature_get_value(feat_index, 3);
+	    feat_قيمة = decc$feature_get_قيمة(feat_index, 1);
+	    feat_قيمة_min = decc$feature_get_قيمة(feat_index, 2);
+	    feat_قيمة_max = decc$feature_get_قيمة(feat_index, 3);
 
-	    if ((decc_feat_array[i].value >= feat_value_min) && (decc_feat_array[i].value <= feat_value_max))
+	    إذا ((decc_feat_array[i].قيمة >= feat_قيمة_min) && (decc_feat_array[i].قيمة <= feat_قيمة_max))
 	    {
 		// Valid value.  Set it if necessary
-		if (feat_value != decc_feat_array[i].value)
-		    sts = decc$feature_set_value(feat_index, 1, decc_feat_array[i].value);
+		إذا (feat_قيمة != decc_feat_array[i].قيمة)
+		    sts = decc$feature_set_قيمة(feat_index, 1, decc_feat_array[i].قيمة);
 	    }
-	    else
+	    وإلا
 		// Invalid DECC feature value
 		printf("INVALID DECC FEATURE VALUE, %d: %d <= %s <= %d.\n",
-			feat_value, feat_value_min, decc_feat_array[i].name, feat_value_max);
+			feat_قيمة, feat_قيمة_min, decc_feat_array[i].name, feat_قيمة_max);
 	}
-	else
+	وإلا
 	    // Invalid DECC feature name
 	    printf("UNKNOWN DECC FEATURE: %s.\n", decc_feat_array[i].name);
     }
@@ -1032,19 +1032,19 @@ vms_init(void)
 # pragma extern_model save
 
 # pragma extern_model strict_refdef "LIB$INITIALIZE" 2, nopic, nowrt
-void (*const x_vms_init)() = vms_init;
+فراغ (*ثابت x_vms_init)() = vms_init;
 
 # pragma extern_model strict_refdef "LIB$INITIALIZ" 2, nopic, nowrt
-const int spare[ 8] = { 0 };
+ثابت صحيح spare[ 8] = { 0 };
 
 # pragma extern_model restore
 
 // Fake reference to ensure loading the LIB$INITIALIZE PSECT
 
 # pragma extern_model save
-int LIB$INITIALIZE(void);
+صحيح LIB$INITIALIZE(فراغ);
 # pragma extern_model strict_refdef
-int dmy_lib$initialize = (int) LIB$INITIALIZE;
+صحيح dmy_lib$initialize = (صحيح) LIB$INITIALIZE;
 # pragma extern_model restore
 
 # pragma standard

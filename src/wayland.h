@@ -14,7 +14,7 @@
 
 #ifdef FEAT_WAYLAND
 
-#include <wayland-client.h>
+#ضمن <wayland-client.h>
 
 #ifdef FEAT_WAYLAND_CLIPBOARD
 # include "auto/wayland/wlr-data-control-unstable-v1.h"
@@ -24,7 +24,7 @@
 #ifdef FEAT_WAYLAND_CLIPBOARD
 
 // Wayland protocols for accessing the selection
-typedef enum {
+تعريفنوع تعداد {
     VWL_DATA_PROTOCOL_NONE,
     VWL_DATA_PROTOCOL_EXT,
     VWL_DATA_PROTOCOL_WLR,
@@ -34,32 +34,32 @@ typedef enum {
 
 // Struct that represents a seat. (Should be accessed via
 // vwl_get_seat()).
-struct vwl_seat_S {
-    struct wl_seat  *proxy;
-    char	    *label;	    // Name of seat as text (e.g. seat0,
+بنية vwl_seat_S {
+    بنية wl_seat  *proxy;
+    حرف	    *label;	    // Name of seat as text (e.g. seat0,
 				    // seat1...).
     uint32_t	    capabilities;   // Bitmask of the capabilities of the seat
 				    // (pointer, keyboard, touch).
 };
 
 // Struct wrapper for a Wayland connection
-struct vwl_connection_S {
-    struct {
-	struct wl_display   *proxy;
-	int		    fd;	// File descriptor for display
+بنية vwl_connection_S {
+    بنية {
+	بنية wl_display   *proxy;
+	صحيح		    fd;	// File descriptor for display
     } display;
 
-    struct {
-	struct wl_registry *proxy;
+    بنية {
+	بنية wl_registry *proxy;
     } registry;
 
     // Global objects
-    struct {
+    بنية {
 	garray_T seats;
 
 #ifdef FEAT_WAYLAND_CLIPBOARD
-	struct zwlr_data_control_manager_v1 *zwlr_data_control_manager_v1;
-	struct ext_data_control_manager_v1  *ext_data_control_manager_v1;
+	بنية zwlr_data_control_manager_v1 *zwlr_data_control_manager_v1;
+	بنية ext_data_control_manager_v1  *ext_data_control_manager_v1;
 #endif
     } gobjects;
 };
@@ -68,34 +68,34 @@ struct vwl_connection_S {
 
 // LISTENER WRAPPERS
 
-struct vwl_data_device_listener_S {
-    void (*data_offer)(void *data,
+بنية vwl_data_device_listener_S {
+    فراغ (*data_offer)(فراغ *data,
 		       vwl_data_device_T *device,
 		       vwl_data_offer_T *offer);
-    void (*selection)(void *data,
+    فراغ (*selection)(فراغ *data,
 		      vwl_data_device_T *device,
 		      vwl_data_offer_T *offer,
 		      wayland_selection_T selection);
 
     // This event is only relevant for data control protocols
-    void (*finished)(void *data, vwl_data_device_T *device);
+    فراغ (*finished)(فراغ *data, vwl_data_device_T *device);
 };
 
-struct vwl_data_source_listener_S {
-    void (*send)(void *data,
+بنية vwl_data_source_listener_S {
+    فراغ (*send)(فراغ *data,
 		 vwl_data_source_T *source,
-		 const char *mime_type,
-		 int fd);
-    void (*cancelled)(void *data, vwl_data_source_T *source);
+		 ثابت حرف *mime_type,
+		 صحيح fd);
+    فراغ (*cancelled)(فراغ *data, vwl_data_source_T *source);
 };
 
-struct vwl_data_offer_listener_S {
+بنية vwl_data_offer_listener_S {
     // Return TRUE to add mime type to internal array in data offer. Note that
     // this is not called for the special Vim mime type
     // (wayland_vim_special_mime), but offer->from_vim is set to true.
     // Additionally when the special mime type is received, any offer events
     // after are ignored.
-    bool (*offer)(void *data, vwl_data_offer_T *offer, const char *mime_type);
+    bool (*offer)(فراغ *data, vwl_data_offer_T *offer, ثابت حرف *mime_type);
 };
 
 // DATA RELATED OBJECT WRAPPERS
@@ -103,39 +103,39 @@ struct vwl_data_offer_listener_S {
 // The `data` member is used to pass other needed stuff around such as a
 // vwl_clipboard_selection_T pointer.
 
-struct vwl_data_offer_S {
-    void			*proxy;
-    void			*data;	    // Should be same as parent data
+بنية vwl_data_offer_S {
+    فراغ			*proxy;
+    فراغ			*data;	    // Should be same as parent data
 					    // device.
     garray_T			mime_types;
 
-    const vwl_data_offer_listener_T *listener;
+    ثابت vwl_data_offer_listener_T *listener;
     vwl_data_protocol_T		    protocol;
 };
 
-struct vwl_data_source_S {
-    void				*proxy;
-    void				*data;
-    const vwl_data_source_listener_T	*listener;
+بنية vwl_data_source_S {
+    فراغ				*proxy;
+    فراغ				*data;
+    ثابت vwl_data_source_listener_T	*listener;
     vwl_data_protocol_T	    protocol;
 };
 
-struct vwl_data_device_S {
-    void				*proxy;
-    void				*data;
+بنية vwl_data_device_S {
+    فراغ				*proxy;
+    فراغ				*data;
     vwl_data_offer_T			*offer;
-    const vwl_data_device_listener_T	*listener;
+    ثابت vwl_data_device_listener_T	*listener;
     vwl_data_protocol_T			protocol;
 };
 
-struct vwl_data_device_manager_S {
-    void		*proxy;
+بنية vwl_data_device_manager_S {
+    فراغ		*proxy;
     vwl_data_protocol_T protocol;
 };
 
 #endif // FEAT_WAYLAND_CLIPBOARD
 
 // Global Wayland connection. Is also set to NULL when the connection is lost.
-extern vwl_connection_T *wayland_ct;
+خارجي vwl_connection_T *wayland_ct;
 
 #endif // FEAT_WAYLAND

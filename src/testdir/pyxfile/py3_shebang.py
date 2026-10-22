@@ -1,4 +1,4 @@
 #!/usr/bin/python3
 
-import sys
+استورد sys
 print(sys.version)
