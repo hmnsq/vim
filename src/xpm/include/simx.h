@@ -39,7 +39,7 @@
 
 #ifdef FOR_MSW
 
-#include "windows.h"			/* MS windows GDI types */
+#அந்தர்பாவ "windows.h"			/* MS windows GDI types */
 
 /*
  * minimal portability layer between ansi and KR C
@@ -47,49 +47,49 @@
 /* this comes from xpm.h, and is here again, to avoid complicated
     includes, since this is included from xpm.h */
 /* these defines get undefed at the end of this file */
-#if __STDC__ || defined(__cplusplus) || defined(c_plusplus)
+#எனில் __STDC__ || defined(__cplusplus) || defined(c_plusplus)
  /* ANSI || C++ */
-#define FUNC(f, t, p) extern t f p
-#define LFUNC(f, t, p) static t f p
-#else /* k&R */
-#define FUNC(f, t, p) extern t f()
-#define LFUNC(f, t, p) static t f()
+#define FUNC(f, t, p) வெளி t f p
+#define LFUNC(f, t, p) நிலையான t f p
+#இல்லையெனில் /* k&R */
+#define FUNC(f, t, p) வெளி t f()
+#define LFUNC(f, t, p) நிலையான t f()
 #endif
 
 
-FUNC(boundCheckingMalloc, void *, (long s));
-FUNC(boundCheckingCalloc, void *, (long num, long s));
-FUNC(boundCheckingRealloc, void *, (void *p, long s));
+FUNC(boundCheckingMalloc, வெறுமை *, (long s));
+FUNC(boundCheckingCalloc, வெறுமை *, (long இலக்கம், long s));
+FUNC(boundCheckingRealloc, வெறுமை *, (வெறுமை *p, long s));
 
 /* define MSW types for X window types,
    I don't know much about MSW, but the following defines do the job */
 
-typedef HDC Display;			/* this should be similar */
-typedef void *Screen;			/* not used */
-typedef void *Visual;			/* not used yet, is for GRAY, COLOR,
+வகைவரை HDC Display;			/* this should be similar */
+வகைவரை வெறுமை *Screen;			/* not used */
+வகைவரை வெறுமை *Visual;			/* not used yet, is for GRAY, COLOR,
 					 * MONO */
 
-typedef void *Colormap;			/* should be COLORPALETTE, not done
+வகைவரை வெறுமை *Colormap;			/* should be COLORPALETTE, not done
 					 * yet */
 
-typedef COLORREF Pixel;
+வகைவரை COLORREF Pixel;
 
 #define PIXEL_ALREADY_TYPEDEFED		/* to let xpm.h know about it */
 
-typedef struct {
+வகைவரை கட்டமைப்பு {
     Pixel pixel;
     BYTE red, green, blue;
 }      XColor;
 
-typedef struct {
+வகைவரை கட்டமைப்பு {
     HBITMAP bitmap;
-    unsigned int width;
-    unsigned int height;
-    unsigned int depth;
+    unsigned முழு width;
+    unsigned முழு height;
+    unsigned முழு depth;
 }      XImage;
 
-#if defined(__cplusplus) || defined(c_plusplus)
-extern "C" {
+#எனில் defined(__cplusplus) || defined(c_plusplus)
+வெளி "C" {
 #endif
 /* some replacements for X... functions */
 
@@ -97,26 +97,26 @@ extern "C" {
     FUNC(XDefaultVisual, Visual *, (Display *display, Screen *screen));
     FUNC(XDefaultScreen, Screen *, (Display *d));
     FUNC(XDefaultColormap, Colormap *, (Display *display, Screen *screen));
-    FUNC(XDefaultDepth, int, (Display *d, Screen *s));
+    FUNC(XDefaultDepth, முழு, (Display *d, Screen *s));
 
 /* color related */
-    FUNC(XParseColor, int, (Display *, Colormap *, char *, XColor *));
-    FUNC(XAllocColor, int, (Display *, Colormap *, XColor *));
-    FUNC(XQueryColors, void, (Display *display, Colormap *colormap,
-			      XColor *xcolors, int ncolors));
-    FUNC(XFreeColors, int, (Display *d, Colormap cmap,
+    FUNC(XParseColor, முழு, (Display *, Colormap *, எழுத்து *, XColor *));
+    FUNC(XAllocColor, முழு, (Display *, Colormap *, XColor *));
+    FUNC(XQueryColors, வெறுமை, (Display *display, Colormap *colormap,
+			      XColor *xcolors, முழு ncolors));
+    FUNC(XFreeColors, முழு, (Display *d, Colormap cmap,
 			    unsigned long pixels[],
-			    int npixels, unsigned long planes));
+			    முழு npixels, unsigned long planes));
 /* XImage */
-    FUNC(XCreateImage, XImage *, (Display *, Visual *, int depth, int format,
-				  int x, int y, int width, int height,
-				  int pad, int foo));
+    FUNC(XCreateImage, XImage *, (Display *, Visual *, முழு depth, முழு format,
+				  முழு x, முழு y, முழு width, முழு height,
+				  முழு pad, முழு foo));
 
 /* free and destroy bitmap */
-    FUNC(XDestroyImage, void /* ? */ , (XImage *));
+    FUNC(XDestroyImage, வெறுமை /* ? */ , (XImage *));
 /* free only, bitmap remains */
-    FUNC(XImageFree, void, (XImage *));
-#if defined(__cplusplus) || defined(c_plusplus)
+    FUNC(XImageFree, வெறுமை, (XImage *));
+#எனில் defined(__cplusplus) || defined(c_plusplus)
 } /* end of extern "C" */
 #endif /* cplusplus */
 
@@ -128,7 +128,7 @@ extern "C" {
 #define False 0
 #endif
 #ifndef Bool
-typedef BOOL Bool;		/* take MSW bool */
+வகைவரை BOOL Bool;		/* take MSW bool */
 #endif
 /* make these local here, simx.c gets the same from xpm.h */
 #undef LFUNC

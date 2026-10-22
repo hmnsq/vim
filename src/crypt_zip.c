@@ -10,9 +10,9 @@
 /*
  * crypt_zip.c: Zip encryption support.
  */
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#if defined(FEAT_CRYPT)
+#எனில் defined(FEAT_CRYPT)
 /*
  * Optional encryption support.
  * Mohsin Ahmed, mosh@sasi.com, 98-09-24
@@ -24,106 +24,106 @@
  */
 
 // Need a type that should be 32 bits. 64 also works but wastes space.
-typedef unsigned int u32_T;	// int is at least 32 bits
+வகைவரை unsigned முழு u32_T;	// int is at least 32 bits
 
 // The state of encryption, referenced by cryptstate_T.
-typedef struct {
-    u32_T keys[3];
+வகைவரை கட்டமைப்பு {
+    u32_T சாவிகள்[3];
 } zip_state_T;
 
 
-static u32_T crc_32_table[256];
+நிலையான u32_T crc_32_table[256];
 
 /*
  * Fill the CRC table, if not done already.
  */
-    static void
-make_crc_tab(void)
+    நிலையான வெறுமை
+make_crc_tab(வெறுமை)
 {
     u32_T	s, t, v;
-    static int	done = FALSE;
+    நிலையான முழு	done = FALSE;
 
-    if (done)
-	return;
-    for (t = 0; t < 256; t++)
+    எனில் (done)
+	திரும்பு;
+    க்கு (t = 0; t < 256; t++)
     {
 	v = t;
-	for (s = 0; s < 8; s++)
+	க்கு (s = 0; s < 8; s++)
 	    v = (v >> 1) ^ ((v & 1) * (u32_T)0xedb88320L);
 	crc_32_table[t] = v;
     }
     done = TRUE;
 }
 
-#define CRC32(c, b) (crc_32_table[((int)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
+#define CRC32(c, b) (crc_32_table[((முழு)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
 
 /*
  * Return the next byte in the pseudo-random sequence.
  */
-#define DECRYPT_BYTE_ZIP(keys, t) \
+#define DECRYPT_BYTE_ZIP(சாவிகள், t) \
 { \
-    short_u temp = (short_u)keys[2] | 2; \
-    t = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
+    short_u temp = (short_u)சாவிகள்[2] | 2; \
+    t = (முழு)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
 }
 
 /*
  * Update the encryption keys with the next byte of plain text.
  */
-#define UPDATE_KEYS_ZIP(keys, c) do { \
-    keys[0] = CRC32(keys[0], (c)); \
-    keys[1] += keys[0] & 0xff; \
-    keys[1] = keys[1] * 134775813L + 1; \
-    keys[2] = CRC32(keys[2], (int)(keys[1] >> 24)); \
-} while (0)
+#define UPDATE_சாவிகள்_ZIP(சாவிகள், c) செய் { \
+    சாவிகள்[0] = CRC32(சாவிகள்[0], (c)); \
+    சாவிகள்[1] += சாவிகள்[0] & 0xff; \
+    சாவிகள்[1] = சாவிகள்[1] * 134775813L + 1; \
+    சாவிகள்[2] = CRC32(சாவிகள்[2], (முழு)(சாவிகள்[1] >> 24)); \
+} போது (0)
 
 /*
  * Initialize for encryption/decryption.
  */
-    int
+    முழு
 crypt_zip_init(
     cryptstate_T    *state,
-    char_u	    *key,
+    char_u	    *சாவி,
     crypt_arg_T     *arg UNUSED)
 {
     char_u	*p;
     zip_state_T	*zs;
 
     zs = ALLOC_ONE(zip_state_T);
-    if (zs == NULL)
-	return FAIL;
+    எனில் (zs == வெற்று)
+	திரும்பு FAIL;
     state->method_state = zs;
 
     make_crc_tab();
-    zs->keys[0] = 305419896L;
-    zs->keys[1] = 591751049L;
-    zs->keys[2] = 878082192L;
-    for (p = key; *p != NUL; ++p)
-	UPDATE_KEYS_ZIP(zs->keys, (int)*p);
+    zs->சாவிகள்[0] = 305419896L;
+    zs->சாவிகள்[1] = 591751049L;
+    zs->சாவிகள்[2] = 878082192L;
+    க்கு (p = சாவி; *p != NUL; ++p)
+	UPDATE_சாவிகள்_ZIP(zs->சாவிகள், (முழு)*p);
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Encrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-    void
+    வெறுமை
 crypt_zip_encode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    முழு		last UNUSED)
 {
     zip_state_T *zs = state->method_state;
     size_t	i;
-    int		ztemp, t;
+    முழு		ztemp, t;
 
-    for (i = 0; i < len; ++i)
+    க்கு (i = 0; i < len; ++i)
     {
 	ztemp = from[i];
-	DECRYPT_BYTE_ZIP(zs->keys, t);
-	UPDATE_KEYS_ZIP(zs->keys, ztemp);
+	DECRYPT_BYTE_ZIP(zs->சாவிகள், t);
+	UPDATE_சாவிகள்_ZIP(zs->சாவிகள், ztemp);
 	to[i] = t ^ ztemp;
     }
 }
@@ -131,23 +131,23 @@ crypt_zip_encode(
 /*
  * Decrypt "from[len]" into "to[len]".
  */
-    void
+    வெறுமை
 crypt_zip_decode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    முழு		last UNUSED)
 {
     zip_state_T *zs = state->method_state;
     size_t	i;
     short_u	temp;
 
-    for (i = 0; i < len; ++i)
+    க்கு (i = 0; i < len; ++i)
     {
-	temp = (short_u)zs->keys[2] | 2;
-	temp = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
-	UPDATE_KEYS_ZIP(zs->keys, to[i] = from[i] ^ temp);
+	temp = (short_u)zs->சாவிகள்[2] | 2;
+	temp = (முழு)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
+	UPDATE_சாவிகள்_ZIP(zs->சாவிகள், to[i] = from[i] ^ temp);
     }
 }
 

@@ -11,29 +11,29 @@
  * PhAttach() is called in os_qnx.c:qnx_init()
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
 #ifdef FEAT_TOOLBAR
 # include <photon/PxImage.h>
 #endif
 
-#if !defined(__QNX__)
+#எனில் !defined(__QNX__)
 // Used when generating prototypes.
-# define PgColor_t	int
-# define PhEvent_t	int
-# define PhPoint_t	int
-# define PtWidget_t	int
+# define PgColor_t	முழு
+# define PhEvent_t	முழு
+# define PhPoint_t	முழு
+# define PtWidget_t	முழு
 # define Pg_BLACK	0
-# define PtCallbackF_t	int
-# define PtCallbackInfo_t int
-# define PhTile_t	int
-# define PtWidget_t	int
-# define PhImage_t	int
+# define PtCallbackF_t	முழு
+# define PtCallbackInfo_t முழு
+# define PhTile_t	முழு
+# define PtWidget_t	முழு
+# define PhImage_t	முழு
 #endif
 
 #define RGB(r, g, b) PgRGB(r, g, b)
 
-#define EVENT_BUFFER_SIZE sizeof(PhEvent_t) + 1000
+#define EVENT_BUFFER_SIZE அளவு(PhEvent_t) + 1000
 
 // Some defines for gui_mch_mousehide()
 #define MOUSE_HIDE		TRUE
@@ -43,33 +43,33 @@
 #undef USE_PANEL_GROUP
 
 #ifdef USE_PANEL_GROUP
-static char	*empty_title = "    ";
-static char	**panel_titles = NULL;
-static ushort_t	num_panels = 0;
-static short pg_margin_left, pg_margin_right, pg_margin_top, pg_margin_bottom;
+நிலையான எழுத்து	*empty_title = "    ";
+நிலையான எழுத்து	**panel_titles = வெற்று;
+நிலையான ushort_t	இலக்கம்_panels = 0;
+நிலையான short pg_margin_இடது, pg_margin_வலது, pg_margin_உச்சி, pg_margin_bottom;
 #endif
 
 #define GUI_PH_MARGIN		4	// Size of the bevel
 
-#define GUI_PH_MOUSE_TYPE		Ph_CURSOR_INSERT
-static PgColor_t gui_ph_mouse_color =	Pg_BLACK;
+#define GUI_PH_MOUSE_TYPE		Ph_CURSOR_செருகு
+நிலையான PgColor_t gui_ph_mouse_color =	Pg_BLACK;
 
-static PhPoint_t    gui_ph_raw_offset;
-static PtWidget_t   *gui_ph_timer_cursor;   // handle cursor blinking
-static PtWidget_t   *gui_ph_timer_timeout;  // used in gui_mch_wait_for_chars
-static short	    is_timeout;		    // Has the timeout occurred?
+நிலையான PhPoint_t    gui_ph_raw_offset;
+நிலையான PtWidget_t   *gui_ph_timer_cursor;   // handle cursor blinking
+நிலையான PtWidget_t   *gui_ph_timer_timeout;  // used in gui_mch_wait_for_chars
+நிலையான short	    is_timeout;		    // Has the timeout occurred?
 
 /*
  * This is set inside the mouse callback for a right mouse
  * button click, and used for the popup menus
  */
-static PhPoint_t    abs_mouse;
+நிலையான PhPoint_t    abs_mouse;
 
 // Try and avoid redraws while a resize is in progress
-static int is_ignore_draw = FALSE;
+நிலையான முழு is_ignore_draw = FALSE;
 
 // Used for converting to/from utf-8 and other charsets
-static struct PxTransCtrl *charset_translate;
+நிலையான கட்டமைப்பு PxTransCtrl *charset_translate;
 
 /*
  * Cursor blink functions.
@@ -79,27 +79,27 @@ static struct PxTransCtrl *charset_translate;
  * BLINK_OFF	blinking, cursor is not shown
  * BLINK_ON	blinking, cursor is shown
  */
-static enum {
+நிலையான எண்ணிக்கை {
     BLINK_NONE,
     BLINK_OFF,
     BLINK_ON
 } blink_state = BLINK_NONE;
 
-static long_u	blink_waittime	= 700;
-static long_u	blink_ontime	= 400;
-static long_u	blink_offtime	= 250;
+நிலையான long_u	blink_waittime	= 700;
+நிலையான long_u	blink_ontime	= 400;
+நிலையான long_u	blink_offtime	= 250;
 
-static struct
+நிலையான கட்டமைப்பு
 {
-    int	    key_sym;
+    முழு	    சாவி_sym;
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_சாவிகள்[] =
 {
     {Pk_Up,	    'k', 'u'},
     {Pk_Down,	    'k', 'd'},
-    {Pk_Left,	    'k', 'l'},
-    {Pk_Right,	    'k', 'r'},
+    {Pk_இடது,	    'k', 'l'},
+    {Pk_வலது,	    'k', 'r'},
 
     {Pk_F1,	    'k', '1'},
     {Pk_F2,	    'k', '2'},
@@ -142,7 +142,7 @@ static struct
 
     {Pk_Help,	    '%', '1'},
     {Pk_BackSpace,  'k', 'b'},
-    {Pk_Insert,	    'k', 'I'},
+    {Pk_செருகு,	    'k', 'I'},
     {Pk_Delete,	    'k', 'D'},
     {Pk_Home,	    'k', 'h'},
     {Pk_End,	    '@', '7'},
@@ -156,7 +156,7 @@ static struct
     {Pk_KP_Multiply,'K', '9'},
     {Pk_KP_Enter,   'K', 'A'},
 
-    {Pk_KP_0,	    KS_EXTRA, KE_KINS}, // Insert
+    {Pk_KP_0,	    KS_EXTRA, KE_KINS}, //செருகு
     {Pk_KP_Decimal, KS_EXTRA, KE_KDEL}, // Delete
 
     {Pk_KP_4,	    'k', 'l'}, // Left
@@ -187,46 +187,46 @@ static struct
 
 ////////////////////////////////////////////////////////////////////////////
 
-static PtCallbackF_t gui_ph_handle_timer_cursor;
-static PtCallbackF_t gui_ph_handle_timer_timeout;
+நிலையான PtCallbackF_t gui_ph_handle_timer_cursor;
+நிலையான PtCallbackF_t gui_ph_handle_timer_timeout;
 
-static PtCallbackF_t gui_ph_handle_window_cb;
+நிலையான PtCallbackF_t gui_ph_handle_window_cb;
 
-static PtCallbackF_t gui_ph_handle_scrollbar;
-static PtCallbackF_t gui_ph_handle_keyboard;
-static PtCallbackF_t gui_ph_handle_mouse;
-static PtCallbackF_t gui_ph_handle_pulldown_menu;
-static PtCallbackF_t gui_ph_handle_menu;
-static PtCallbackF_t gui_ph_handle_focus;	// focus change of text area
+நிலையான PtCallbackF_t gui_ph_handle_scrollbar;
+நிலையான PtCallbackF_t gui_ph_handle_keyboard;
+நிலையான PtCallbackF_t gui_ph_handle_mouse;
+நிலையான PtCallbackF_t gui_ph_handle_pulldown_menu;
+நிலையான PtCallbackF_t gui_ph_handle_menu;
+நிலையான PtCallbackF_t gui_ph_handle_focus;	// focus change of text area
 
-static PtCallbackF_t gui_ph_handle_menu_resize;
+நிலையான PtCallbackF_t gui_ph_handle_menu_resize;
 
 // When a menu is unrealized, give focus back to vimTextArea
-static PtCallbackF_t gui_ph_handle_menu_unrealized;
+நிலையான PtCallbackF_t gui_ph_handle_menu_unrealized;
 
 #ifdef USE_PANEL_GROUP
-static void gui_ph_get_panelgroup_margins(short*, short*, short*, short*);
+நிலையான வெறுமை gui_ph_get_panelgroup_margins(short*, short*, short*, short*);
 #endif
 
-static void gui_ph_draw_start(void);
-static void gui_ph_draw_end(void);
+நிலையான வெறுமை gui_ph_draw_start(வெறுமை);
+நிலையான வெறுமை gui_ph_draw_end(வெறுமை);
 
 // Set the text for the balloon
-static PtWidget_t * gui_ph_show_tooltip(PtWidget_t *window,
+நிலையான PtWidget_t * gui_ph_show_tooltip(PtWidget_t *window,
 			     PtWidget_t *widget,
-			     int position,
-			     char *text,
-			     char *font,
+			     முழு position,
+			     எழுத்து *text,
+			     எழுத்து *font,
 			     PgColor_t fill_color,
 			     PgColor_t text_color);
 
 ////////////////////////////////////////////////////////////////////////////
 
-static PtWidget_t * gui_ph_show_tooltip(PtWidget_t *window,
+நிலையான PtWidget_t * gui_ph_show_tooltip(PtWidget_t *window,
 			     PtWidget_t *widget,
-			     int position,
-			     char *text,
-			     char *font,
+			     முழு position,
+			     எழுத்து *text,
+			     எழுத்து *font,
 			     PgColor_t fill_color,
 			     PgColor_t text_color)
 {
@@ -240,27 +240,27 @@ static PtWidget_t * gui_ph_show_tooltip(PtWidget_t *window,
     // Override the text and position
 
     tooltip = text;
-    if (menu != NULL)
+    எனில் (menu != வெற்று)
     {
-	int index = MENU_INDEX_TIP;
-	if (menu->strings[ index ] != NULL)
+	முழு index = MENU_INDEX_TIP;
+	எனில் (menu->strings[ index ] != வெற்று)
 	    tooltip = menu->strings[ index ];
     }
 
-    return PtInflateBalloon(
+    திரும்பு PtInflateBalloon(
 	    window,
 	    widget,
 	    // Don't put the balloon at the bottom,
 	    // it gets drawn over by gfx done in the PtRaw
-	    Pt_BALLOON_TOP,
+	    Pt_BALLOON_உச்சி,
 	    tooltip,
 	    font,
 	    fill_color,
 	    text_color);
 }
 
-    static void
-gui_ph_resize_container(void)
+    நிலையான வெறுமை
+gui_ph_resize_container(வெறுமை)
 {
     PhArea_t area;
 
@@ -270,10 +270,10 @@ gui_ph_resize_container(void)
     PtSetResource(gui.vimContainer, Pt_ARG_AREA, &area, 0);
 }
 
-    static int
+    நிலையான முழு
 gui_ph_handle_menu_resize(
 	PtWidget_t *widget,
-	void *other,
+	வெறுமை *other,
 	PtCallbackInfo_t *info)
 {
     PtContainerCallback_t *sizes = info->cbdata;
@@ -286,13 +286,13 @@ gui_ph_handle_menu_resize(
     // Because vim treats the toolbar and menubar separately,
     // and here they're lumped together into a PtToolbarGroup,
     // we only need either menu_height or toolbar_height set at once
-    if (gui.menu_is_active)
+    எனில் (gui.menu_is_active)
     {
 	gui.menu_height = height;
 	gui.toolbar_height = 0;
     }
 #ifdef FEAT_TOOLBAR
-    else
+    இல்லையெனில்
 	gui.toolbar_height = height;
 #endif
 
@@ -301,7 +301,7 @@ gui_ph_handle_menu_resize(
 
 #ifdef USE_PANEL_GROUP
     container = gui.vimPanelGroup;
-#else
+#இல்லையெனில்
     container = gui.vimContainer;
 #endif
 
@@ -311,214 +311,214 @@ gui_ph_handle_menu_resize(
 
 #ifdef USE_PANEL_GROUP
     gui_ph_get_panelgroup_margins(
-	    &pg_margin_top, &pg_margin_bottom,
-	    &pg_margin_left, &pg_margin_right);
+	    &pg_margin_உச்சி, &pg_margin_bottom,
+	    &pg_margin_இடது, &pg_margin_வலது);
 #endif
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
 /*
  * Pt_ARG_TIMER_REPEAT isn't used because the on & off times
  * are different
  */
-    static int
+    நிலையான முழு
 gui_ph_handle_timer_cursor(
 	PtWidget_t *widget,
-	void *data,
+	வெறுமை *data,
 	PtCallbackInfo_t *info)
 {
-    if (blink_state == BLINK_ON)
+    எனில் (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
 	PtSetResource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
 		blink_offtime, 0);
     }
-    else
+    இல்லையெனில்
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
 	PtSetResource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
 		blink_ontime, 0);
     }
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
-    static int
+    நிலையான முழு
 gui_ph_handle_timer_timeout(
     PtWidget_t		*widget,
-    void		*data,
+    வெறுமை		*data,
     PtCallbackInfo_t	*info)
 {
     is_timeout = TRUE;
 
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_window_cb(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    நிலையான முழு
+gui_ph_handle_window_cb(PtWidget_t *widget, வெறுமை *data, PtCallbackInfo_t *info)
 {
     PhWindowEvent_t *we = info->cbdata;
     ushort_t *width, *height;
 
-    switch (we->event_f)
+    தேர்வு (we->event_f)
     {
-	case Ph_WM_CLOSE:
+	நிலை Ph_WM_CLOSE:
 	    gui_shell_closed();
-	    break;
+	    நிறுத்து;
 
-	case Ph_WM_FOCUS:
+	நிலை Ph_WM_FOCUS:
 	    // Just in case it's hidden and needs to be shown
 	    gui_mch_mousehide(MOUSE_SHOW);
 
-	    if (we->event_state == Ph_WM_EVSTATE_FOCUS)
+	    எனில் (we->event_state == Ph_WM_EVSTATE_FOCUS)
 	    {
 		gui_focus_change(TRUE);
 		gui_mch_start_blink();
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		gui_focus_change(FALSE);
 		gui_mch_stop_blink(TRUE);
 	    }
-	    break;
+	    நிறுத்து;
 
-	case Ph_WM_RESIZE:
+	நிலை Ph_WM_RESIZE:
 	    PtGetResource(gui.vimWindow, Pt_ARG_WIDTH, &width, 0);
 	    PtGetResource(gui.vimWindow, Pt_ARG_HEIGHT, &height, 0);
 #ifdef USE_PANEL_GROUP
-	    width  -= (pg_margin_left + pg_margin_right);
-	    height -= (pg_margin_top + pg_margin_bottom);
+	    width  -= (pg_margin_இடது + pg_margin_வலது);
+	    height -= (pg_margin_உச்சி + pg_margin_bottom);
 #endif
 	    gui_resize_shell(*width, *height);
 	    gui_set_shellsize(FALSE, FALSE, RESIZE_BOTH);
 	    is_ignore_draw = FALSE;
 	    PtEndFlux(gui.vimContainer);
 	    PtContainerRelease(gui.vimContainer);
-	    break;
+	    நிறுத்து;
 
-	default:
-	    break;
+	இயல்பு:
+	    நிறுத்து;
     }
 
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_scrollbar(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    நிலையான முழு
+gui_ph_handle_scrollbar(PtWidget_t *widget, வெறுமை *data, PtCallbackInfo_t *info)
 {
     PtScrollbarCallback_t *scroll;
     scrollbar_T *sb;
-    int	    value, dragging = FALSE;
+    முழு	    மதிப்பு, dragging = FALSE;
 
     scroll = info->cbdata;
 
     sb = (scrollbar_T *) data;
-    if (sb != NULL)
+    எனில் (sb != வெற்று)
     {
-	value = scroll->position;
-	switch (scroll->action)
+	மதிப்பு = scroll->position;
+	தேர்வு (scroll->action)
 	{
-	    case Pt_SCROLL_DRAGGED:
+	    நிலை Pt_SCROLL_DRAGGED:
 		dragging = TRUE;
-		break;
+		நிறுத்து;
 
-	    case Pt_SCROLL_SET:
+	    நிலை Pt_SCROLL_SET:
 		// FIXME: return straight away here?
-		return Pt_CONTINUE;
-		break;
+		திரும்பு Pt_CONTINUE;
+		நிறுத்து;
 	}
 
-	gui_drag_scrollbar(sb, value, dragging);
+	gui_drag_scrollbar(sb, மதிப்பு, dragging);
     }
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_keyboard(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    நிலையான முழு
+gui_ph_handle_keyboard(PtWidget_t *widget, வெறுமை *data, PtCallbackInfo_t *info)
 {
-    PhKeyEvent_t    *key;
-    unsigned char   string[6];
-    int		    len, i;
-    int		    ch, modifiers;
+    Ph_சாவி_Event_t    *சாவி;
+    unsigned எழுத்து   string[6];
+    முழு		    len, i;
+    முழு		    ch, modifiers;
 
-    key = PhGetData(info->event);
+    சாவி = PhGetData(info->event);
 
     ch = modifiers = len = 0;
 
-    if (p_mh)
+    எனில் (p_mh)
 	gui_mch_mousehide(MOUSE_HIDE);
 
     // We're a good lil photon program, aren't we? yes we are, yeess wee arrr
-    if (key->key_flags & Pk_KF_Compose)
-	return Pt_CONTINUE;
+    எனில் (சாவி->சாவி_flags & Pk_KF_Compose)
+	திரும்பு Pt_CONTINUE;
 
-    if ((key->key_flags & Pk_KF_Cap_Valid) &&
-	    PkIsKeyDown(key->key_flags))
+    எனில் ((சாவி->சாவி_flags & Pk_KF_Cap_Valid) &&
+	    Pk_Is_சாவி_Down(சாவி->சாவி_flags))
     {
 #ifdef FEAT_MENU
 	/*
 	 * Only show the menu if the Alt key is down, and the Shift & Ctrl
 	 * keys aren't down, as well as the other conditions
 	 */
-	if (((key->key_mods & Pk_KM_Alt) &&
-		    !(key->key_mods & Pk_KM_Shift) &&
-		    !(key->key_mods & Pk_KM_Ctrl)) &&
+	எனில் (((சாவி->சாவி_mods & Pk_KM_Alt) &&
+		    !(சாவி->சாவி_mods & Pk_KM_Shift) &&
+		    !(சாவி->சாவி_mods & Pk_KM_Ctrl)) &&
 	    gui.menu_is_active &&
 	    (*p_wak == 'y' ||
 	      (*p_wak == 'm' &&
-		gui_is_menu_shortcut(key->key_cap))))
+		gui_is_menu_shortcut(சாவி->சாவி_cap))))
 	{
 	    // Fallthrough and let photon look for the hotkey
-	    return Pt_CONTINUE;
+	    திரும்பு Pt_CONTINUE;
 	}
 #endif
 
-	for (i = 0; special_keys[i].key_sym != 0; i++)
+	க்கு (i = 0; special_சாவிகள்[i].சாவி_sym != 0; i++)
 	{
-	    if (special_keys[i].key_sym == key->key_cap)
+	    எனில் (special_சாவிகள்[i].சாவி_sym == சாவி->சாவி_cap)
 	    {
 		len = 0;
-		if (special_keys[i].vim_code1 == NUL)
-		    ch = special_keys[i].vim_code0;
-		else
+		எனில் (special_சாவிகள்[i].vim_code1 == NUL)
+		    ch = special_சாவிகள்[i].vim_code0;
+		இல்லையெனில்
 		{
 		    // Detect if a keypad number key has been pressed
 		    // and change the key if Num Lock is on
-		    if (key->key_cap >= Pk_KP_Enter && key->key_cap <= Pk_KP_9
-			    && (key->key_mods & Pk_KM_Num_Lock))
+		    எனில் (சாவி->சாவி_cap >= Pk_KP_Enter && சாவி->சாவி_cap <= Pk_KP_9
+			    && (சாவி->சாவி_mods & Pk_KM_இலக்கம்_Lock))
 		    {
 			// FIXME: For now, just map the key to an ascii value
 			// (see <photon/PkKeyDef.h>)
-			ch = key->key_cap - 0xf080;
+			ch = சாவி->சாவி_cap - 0xf080;
 		    }
-		    else
-			ch = TO_SPECIAL(special_keys[i].vim_code0,
-				special_keys[i].vim_code1);
+		    இல்லையெனில்
+			ch = TO_SPECIAL(special_சாவிகள்[i].vim_code0,
+				special_சாவிகள்[i].vim_code1);
 		}
-		break;
+		நிறுத்து;
 	    }
 	}
 
-	if (key->key_mods & Pk_KM_Ctrl)
+	எனில் (சாவி->சாவி_mods & Pk_KM_Ctrl)
 	    modifiers |= MOD_MASK_CTRL;
-	if (key->key_mods & Pk_KM_Alt)
+	எனில் (சாவி->சாவி_mods & Pk_KM_Alt)
 	    modifiers |= MOD_MASK_ALT;
-	if (key->key_mods & Pk_KM_Shift)
+	எனில் (சாவி->சாவி_mods & Pk_KM_Shift)
 	    modifiers |= MOD_MASK_SHIFT;
 
 	// Is this not a special key?
-	if (special_keys[i].key_sym == 0)
+	எனில் (special_சாவிகள்[i].சாவி_sym == 0)
 	{
-	    ch = PhTo8859_1(key);
-	    if (ch == -1 || (enc_utf8 && ch > 127))
+	    ch = PhTo8859_1(சாவி);
+	    எனில் (ch == -1 || (enc_utf8 && ch > 127))
 	    {
-		len = PhKeyToMb(string, key);
-		if (len > 0)
+		len = Ph_சாவி_To_Mb(string, சாவி);
+		எனில் (len > 0)
 		{
-		    static char buf[6];
-		    int src_taken, dst_made;
-		    if (enc_utf8 != TRUE)
+		    நிலையான எழுத்து buf[6];
+		    முழு src_taken, dst_made;
+		    எனில் (enc_utf8 != TRUE)
 		    {
 			PxTranslateFromUTF(
 				charset_translate,
@@ -529,109 +529,109 @@ gui_ph_handle_keyboard(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
 				6,
 				&dst_made);
 
-			add_to_input_buf(buf, dst_made);
+			add_to_உள்ளீடு_buf(buf, dst_made);
 		    }
-		    else
+		    இல்லையெனில்
 		    {
-			add_to_input_buf(string, len);
+			add_to_உள்ளீடு_buf(string, len);
 		    }
 
-		    return Pt_CONSUME;
+		    திரும்பு Pt_CONSUME;
 		}
 		len = 0;
-		ch = key->key_cap;
-		if (ch < 0xff)
+		ch = சாவி->சாவி_cap;
+		எனில் (ch < 0xff)
 		{
 		    // FIXME: is this the right thing to do?
-		    if (modifiers & MOD_MASK_CTRL)
+		    எனில் (modifiers & MOD_MASK_CTRL)
 		    {
 			modifiers &= ~MOD_MASK_CTRL;
 
-			if ((ch >= 'a' && ch <= 'z') ||
+			எனில் ((ch >= 'a' && ch <= 'z') ||
 				ch == '[' ||
 				ch == ']' ||
 				ch == '\\')
 			    ch = Ctrl_chr(ch);
-			else if (ch == '2')
+			இல்லையெனில் எனில் (ch == '2')
 			    ch = NUL;
-			else if (ch == '6')
+			இல்லையெனில் எனில் (ch == '6')
 			    ch = 0x1e;
-			else if (ch == '-')
+			இல்லையெனில் எனில் (ch == '-')
 			    ch = 0x1f;
-			else
+			இல்லையெனில்
 			    modifiers |= MOD_MASK_CTRL;
 		    }
 
-		    if (modifiers & MOD_MASK_ALT)
+		    எனில் (modifiers & MOD_MASK_ALT)
 		    {
 			ch = Meta(ch);
 			modifiers &= ~MOD_MASK_ALT;
 		    }
 		}
-		else
+		இல்லையெனில்
 		{
-		    return Pt_CONTINUE;
+		    திரும்பு Pt_CONTINUE;
 		}
 	    }
-	    else
+	    இல்லையெனில்
 		modifiers &= ~MOD_MASK_SHIFT;
 	}
 
-	ch = simplify_key(ch, &modifiers);
-	if (modifiers)
+	ch = simplify_சாவி(ch, &modifiers);
+	எனில் (modifiers)
 	{
 	    string[ len++ ] = CSI;
 	    string[ len++ ] = KS_MODIFIER;
 	    string[ len++ ] = modifiers;
 	}
 
-	if (IS_SPECIAL(ch))
+	எனில் (IS_SPECIAL(ch))
 	{
 	    string[ len++ ] = CSI;
 	    string[ len++ ] = K_SECOND(ch);
 	    string[ len++ ] = K_THIRD(ch);
 	}
-	else
+	இல்லையெனில்
 	{
 	    string[ len++ ] = ch;
 	}
 
 	// Check if the key interrupts.
 	{
-	    int int_ch = check_for_interrupt(ch, modifiers);
+	    முழு int_ch = check_for_interrupt(ch, modifiers);
 
-	    if (int_ch != NUL)
+	    எனில் (int_ch != NUL)
 	    {
 		ch = int_ch;
 		string[0] = ch;
 		len = 1;
-		trash_input_buf();
+		trash_உள்ளீடு_buf();
 	    }
 	}
 
-	if (len == 1 && string[0] == CSI)
+	எனில் (len == 1 && string[0] == CSI)
 	{
 	    // Turn CSI into K_CSI.
 	    string[ len++ ] = KS_EXTRA;
 	    string[ len++ ] = KE_CSI;
 	}
 
-	if (len > 0)
+	எனில் (len > 0)
 	{
-	    add_to_input_buf(string, len);
-	    return Pt_CONSUME;
+	    add_to_உள்ளீடு_buf(string, len);
+	    திரும்பு Pt_CONSUME;
 	}
     }
 
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
-    static int
-gui_ph_handle_mouse(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    நிலையான முழு
+gui_ph_handle_mouse(PtWidget_t *widget, வெறுமை *data, PtCallbackInfo_t *info)
 {
     PhPointerEvent_t *pointer;
     PhRect_t	     *pos;
-    int		     button = 0, repeated_click, modifiers = 0x0;
+    முழு		     button = 0, repeated_click, modifiers = 0x0;
     short	     mouse_x, mouse_y;
 
     pointer = PhGetData(info->event);
@@ -646,98 +646,98 @@ gui_ph_handle_mouse(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
     mouse_x = pos->ul.x + gui.border_width;
     mouse_y = pos->ul.y + gui.border_width;
 
-    if (info->event->type == Ph_EV_PTR_MOTION_NOBUTTON)
+    எனில் (info->event->type == Ph_EV_PTR_MOTION_NOBUTTON)
     {
 	gui_mouse_moved(mouse_x, mouse_y);
-	return Pt_CONTINUE;
+	திரும்பு Pt_CONTINUE;
     }
 
-    if (pointer->key_mods & Pk_KM_Shift)
+    எனில் (pointer->சாவி_mods & Pk_KM_Shift)
 	modifiers |= MOUSE_SHIFT;
-    if (pointer->key_mods & Pk_KM_Ctrl)
+    எனில் (pointer->சாவி_mods & Pk_KM_Ctrl)
 	modifiers |= MOUSE_CTRL;
-    if (pointer->key_mods & Pk_KM_Alt)
+    எனில் (pointer->சாவி_mods & Pk_KM_Alt)
 	modifiers |= MOUSE_ALT;
 
     /*
      * FIXME More than one button may be involved, but for
      * now just deal with one
      */
-    if (pointer->buttons & Ph_BUTTON_SELECT)
-	button = MOUSE_LEFT;
+    எனில் (pointer->buttons & Ph_BUTTON_SELECT)
+	button = MOUSE_இடது;
 
-    if (pointer->buttons & Ph_BUTTON_MENU)
+    எனில் (pointer->buttons & Ph_BUTTON_MENU)
     {
-	button = MOUSE_RIGHT;
+	button = MOUSE_வலது;
 	// Need the absolute coordinates for the popup menu
 	abs_mouse.x = pointer->pos.x;
 	abs_mouse.y = pointer->pos.y;
     }
 
-    if (pointer->buttons & Ph_BUTTON_ADJUST)
-	button = MOUSE_MIDDLE;
+    எனில் (pointer->buttons & Ph_BUTTON_ADJUST)
+	button = MOUSE_நடு;
 
     // Catch a real release (not phantom or other releases
-    if (info->event->type == Ph_EV_BUT_RELEASE)
+    எனில் (info->event->type == Ph_EV_BUT_RELEASE)
 	button = MOUSE_RELEASE;
 
-    if (info->event->type & Ph_EV_PTR_MOTION_BUTTON)
+    எனில் (info->event->type & Ph_EV_PTR_MOTION_BUTTON)
 	button = MOUSE_DRAG;
 
-#if 0
+#எனில் 0
     // Vim doesn't use button repeats
-    if (info->event->type & Ph_EV_BUT_REPEAT)
+    எனில் (info->event->type & Ph_EV_BUT_REPEAT)
 	button = MOUSE_DRAG;
 #endif
 
     // Don't do anything if it is one of the phantom mouse release events
-    if ((button != MOUSE_RELEASE) ||
+    எனில் ((button != MOUSE_RELEASE) ||
 	    (info->event->subtype == Ph_EV_RELEASE_REAL))
     {
-	repeated_click = (pointer->click_count >= 2) ? TRUE : FALSE;
+	repeated_click = (pointer->click_மொத்தம் >= 2) ? TRUE : FALSE;
 
 	gui_send_mouse_event(button , mouse_x, mouse_y, repeated_click, modifiers);
     }
 
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
 /*
  * Handle a focus change of the PtRaw widget
  */
-    static int
-gui_ph_handle_focus(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    நிலையான முழு
+gui_ph_handle_focus(PtWidget_t *widget, வெறுமை *data, PtCallbackInfo_t *info)
 {
-    if (info->reason == Pt_CB_LOST_FOCUS)
+    எனில் (info->reason == Pt_CB_LOST_FOCUS)
     {
 	PtRemoveEventHandler(gui.vimTextArea, Ph_EV_PTR_MOTION_NOBUTTON,
-		gui_ph_handle_mouse, NULL);
+		gui_ph_handle_mouse, வெற்று);
 
 	gui_mch_mousehide(MOUSE_SHOW);
     }
-    else
+    இல்லையெனில்
     {
 	PtAddEventHandler(gui.vimTextArea, Ph_EV_PTR_MOTION_NOBUTTON,
-		gui_ph_handle_mouse, NULL);
+		gui_ph_handle_mouse, வெற்று);
     }
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
-    static void
+    நிலையான வெறுமை
 gui_ph_handle_raw_draw(PtWidget_t *widget, PhTile_t *damage)
 {
     PhRect_t	*r;
     PhPoint_t	offset;
     PhPoint_t	translation;
 
-    if (is_ignore_draw == TRUE)
-	return;
+    எனில் (is_ignore_draw == TRUE)
+	திரும்பு;
 
     PtSuperClassDraw(PtBasic, widget, damage);
     PgGetTranslation(&translation);
     PgClearTranslation();
 
-#if 0
+#எனில் 0
     /*
      * This causes some weird problems, with drawing being done from
      * within this raw drawing function (rather than just simple clearing
@@ -750,14 +750,14 @@ gui_ph_handle_raw_draw(PtWidget_t *widget, PhTile_t *damage)
 #endif
 
     PtWidgetOffset(widget, &offset);
-    PhTranslatePoint(&offset, PtWidgetPos(gui.vimTextArea, NULL));
+    PhTranslatePoint(&offset, PtWidgetPos(gui.vimTextArea, வெற்று));
 
-#if 1
+#எனில் 1
     // Redraw individual damage regions
-    if (damage->next != NULL)
+    எனில் (damage->next != வெற்று)
 	damage = damage->next;
 
-    while (damage != NULL)
+    போது (damage != வெற்று)
     {
 	r = &damage->rect;
 	gui_redraw(
@@ -766,7 +766,7 @@ gui_ph_handle_raw_draw(PtWidget_t *widget, PhTile_t *damage)
 		r->lr.y - r->ul.y + 1);
 	damage = damage->next;
     }
-#else
+#இல்லையெனில்
     // Redraw the rectangle that covers all the damaged regions
     r = &damage->rect;
     gui_redraw(
@@ -778,58 +778,58 @@ gui_ph_handle_raw_draw(PtWidget_t *widget, PhTile_t *damage)
     PgSetTranslation(&translation, 0);
 }
 
-    static int
+    நிலையான முழு
 gui_ph_handle_pulldown_menu(
 	PtWidget_t *widget,
-	void *data,
+	வெறுமை *data,
 	PtCallbackInfo_t *info)
 {
-    if (data != NULL)
+    எனில் (data != வெற்று)
     {
 	vimmenu_T *menu = (vimmenu_T *) data;
 
-	PtPositionMenu(menu->submenu_id, NULL);
+	PtPositionMenu(menu->submenu_id, வெற்று);
 	PtRealizeWidget(menu->submenu_id);
     }
 
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
 /*
  * This is used for pulldown/popup menus and also toolbar buttons
  */
-    static int
-gui_ph_handle_menu(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    நிலையான முழு
+gui_ph_handle_menu(PtWidget_t *widget, வெறுமை *data, PtCallbackInfo_t *info)
 {
-    if (data != NULL)
+    எனில் (data != வெற்று)
     {
 	vimmenu_T *menu = (vimmenu_T *) data;
 	gui_menu_cb(menu);
     }
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
 /*
  * Stop focus from disappearing into the menubar...
  */
-    static int
+    நிலையான முழு
 gui_ph_handle_menu_unrealized(
 	PtWidget_t *widget,
-	void *data,
+	வெறுமை *data,
 	PtCallbackInfo_t *info)
 {
-    PtGiveFocus(gui.vimTextArea, NULL);
-    return Pt_CONTINUE;
+    PtGiveFocus(gui.vimTextArea, வெற்று);
+    திரும்பு Pt_CONTINUE;
 }
 
-    static int
+    நிலையான முழு
 gui_ph_handle_window_open(
 	PtWidget_t *widget,
-	void *data,
+	வெறுமை *data,
 	PtCallbackInfo_t *info)
 {
     gui_set_shellsize(FALSE, TRUE, RESIZE_BOTH);
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -840,8 +840,8 @@ gui_ph_handle_window_open(
 /*
  * TODO: Set a clipping rect?
  */
-    static void
-gui_ph_draw_start(void)
+    நிலையான வெறுமை
+gui_ph_draw_start(வெறுமை)
 {
     PhGC_t *gc;
 
@@ -851,13 +851,13 @@ gui_ph_draw_start(void)
     PgClearTranslationCx(gc);
 
     PtWidgetOffset(gui.vimTextArea, &gui_ph_raw_offset);
-    PhTranslatePoint(&gui_ph_raw_offset, PtWidgetPos(gui.vimTextArea, NULL));
+    PhTranslatePoint(&gui_ph_raw_offset, PtWidgetPos(gui.vimTextArea, வெற்று));
 
     PgSetTranslation(&gui_ph_raw_offset, Pg_RELATIVE);
 }
 
-    static void
-gui_ph_draw_end(void)
+    நிலையான வெறுமை
+gui_ph_draw_end(வெறுமை)
 {
     gui_ph_raw_offset.x = -gui_ph_raw_offset.x;
     gui_ph_raw_offset.y = -gui_ph_raw_offset.y;
@@ -865,47 +865,47 @@ gui_ph_draw_end(void)
 }
 
 #ifdef USE_PANEL_GROUP
-    static vimmenu_T *
+    நிலையான vimmenu_T *
 gui_ph_find_buffer_item(char_u *name)
 {
-    vimmenu_T *top_level = root_menu;
-    vimmenu_T *items = NULL;
+    vimmenu_T *உச்சி_level = வேர்_menu;
+    vimmenu_T *பொருட்கள் = வெற்று;
 
-    while (top_level != NULL &&
-	    (STRCMP(top_level->dname, "Buffers") != 0))
-	top_level = top_level->next;
+    போது (உச்சி_level != வெற்று &&
+	    (STRCMP(உச்சி_level->dname, "Buffers") != 0))
+	உச்சி_level = உச்சி_level->next;
 
-    if (top_level != NULL)
+    எனில் (உச்சி_level != வெற்று)
     {
-	items = top_level->children;
+	பொருட்கள் = உச்சி_level->children;
 
-	while (items != NULL &&
-		(STRCMP(items->dname, name) != 0))
-	    items = items->next;
+	போது (பொருட்கள் != வெற்று &&
+		(STRCMP(பொருட்கள்->dname, name) != 0))
+	    பொருட்கள் = பொருட்கள்->next;
     }
-    return items;
+    திரும்பு பொருட்கள்;
 }
 
-    static void
-gui_ph_pg_set_buffer_num(int_u buf_num)
+    நிலையான வெறுமை
+gui_ph_pg_set_buffer_இலக்கம்(int_u buf_இலக்கம்)
 {
-    int i;
-    char search[16];
-    char *mark;
+    முழு i;
+    எழுத்து தேடல்[16];
+    எழுத்து *mark;
 
-    if (gui.vimTextArea == NULL || buf_num == 0)
-	return;
+    எனில் (gui.vimTextArea == வெற்று || buf_இலக்கம் == 0)
+	திரும்பு;
 
-    search[0] = '(';
-    ultoa(buf_num, &search[1], 10);
-    STRCAT(search, ")");
+    தேடல்[0] = '(';
+    ultoa(buf_இலக்கம், &தேடல்[1], 10);
+    STRCAT(தேடல், ")");
 
-    for (i = 0; i < num_panels; i++)
+    க்கு (i = 0; i < இலக்கம்_panels; i++)
     {
 	// find the last "(" in the panel title and see if the buffer
 	// number in the title matches the one we're looking for
 	mark = STRRCHR(panel_titles[ i ], '(');
-	if (mark != NULL && STRCMP(mark, search) == 0)
+	எனில் (mark != வெற்று && STRCMP(mark, தேடல்) == 0)
 	{
 	    PtSetResource(gui.vimPanelGroup, Pt_ARG_PG_CURRENT_INDEX,
 		    i, 0);
@@ -913,132 +913,132 @@ gui_ph_pg_set_buffer_num(int_u buf_num)
     }
 }
 
-    static int
+    நிலையான முழு
 gui_ph_handle_pg_change(
 	PtWidget_t *widget,
-	void *data,
+	வெறுமை *data,
 	PtCallbackInfo_t *info)
 {
     vimmenu_T *menu;
     PtPanelGroupCallback_t *panel;
 
-    if (info->event != NULL)
+    எனில் (info->event != வெற்று)
     {
 	panel = info->cbdata;
-	if (panel->new_panel != NULL)
+	எனில் (panel->new_panel != வெற்று)
 	{
 	    menu = gui_ph_find_buffer_item(panel->new_panel);
-	    if (menu)
+	    எனில் (menu)
 		gui_menu_cb(menu);
 	}
     }
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
-    static void
+    நிலையான வெறுமை
 gui_ph_get_panelgroup_margins(
-	short *top,
+	short *உச்சி,
 	short *bottom,
-	short *left,
-	short *right)
+	short *இடது,
+	short *வலது)
 {
     unsigned short abs_raw_x, abs_raw_y, abs_panel_x, abs_panel_y;
-    const unsigned short *margin_top, *margin_bottom;
-    const unsigned short *margin_left, *margin_right;
+    மாறிலி unsigned short *margin_உச்சி, *margin_bottom;
+    மாறிலி unsigned short *margin_இடது, *margin_வலது;
 
     PtGetAbsPosition(gui.vimTextArea, &abs_raw_x, &abs_raw_y);
     PtGetAbsPosition(gui.vimPanelGroup, &abs_panel_x, &abs_panel_y);
 
-    PtGetResource(gui.vimPanelGroup, Pt_ARG_MARGIN_RIGHT, &margin_right, 0);
+    PtGetResource(gui.vimPanelGroup, Pt_ARG_MARGIN_வலது, &margin_வலது, 0);
     PtGetResource(gui.vimPanelGroup, Pt_ARG_MARGIN_BOTTOM, &margin_bottom, 0);
 
     abs_raw_x -= abs_panel_x;
     abs_raw_y -= abs_panel_y;
 
-    *top    = abs_raw_y;
+    *உச்சி    = abs_raw_y;
     *bottom = *margin_bottom;
 
-    *left  = abs_raw_x;
-    *right = *margin_right;
+    *இடது  = abs_raw_x;
+    *வலது = *margin_வலது;
 }
 
 /*
  * Used for the tabs for PtPanelGroup
  */
-    static int
+    நிலையான முழு
 gui_ph_is_buffer_item(vimmenu_T *menu, vimmenu_T *parent)
 {
-    char *mark;
+    எழுத்து *mark;
 
-    if (STRCMP(parent->dname, "Buffers") == 0)
+    எனில் (STRCMP(parent->dname, "Buffers") == 0)
     {
 	// Look for '(' digits ')'
 	mark = vim_strchr(menu->dname, '(');
-	if (mark != NULL)
+	எனில் (mark != வெற்று)
 	{
 	    mark++;
-	    while (SAFE_isdigit(*mark))
+	    போது (SAFE_isdigit(*mark))
 		mark++;
 
-	    if (*mark == ')')
-		return TRUE;
+	    எனில் (*mark == ')')
+		திரும்பு TRUE;
 	}
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
-    static void
-gui_ph_pg_add_buffer(char *name)
+    நிலையான வெறுமை
+gui_ph_pg_add_buffer(எழுத்து *name)
 {
-    char **new_titles = NULL;
+    எழுத்து **new_titles = வெற்று;
 
-    new_titles = ALLOC_MULT(char *, (num_panels + 1));
-    if (new_titles == NULL)
-	return;
+    new_titles = ALLOC_MULT(எழுத்து *, (இலக்கம்_panels + 1));
+    எனில் (new_titles == வெற்று)
+	திரும்பு;
 
-    if (num_panels > 0)
-	memcpy(new_titles, panel_titles, num_panels * sizeof(char **));
+    எனில் (இலக்கம்_panels > 0)
+	memcpy(new_titles, panel_titles, இலக்கம்_panels * அளவு(எழுத்து **));
 
-    new_titles[ num_panels++ ] = name;
+    new_titles[ இலக்கம்_panels++ ] = name;
 
     PtSetResource(gui.vimPanelGroup, Pt_ARG_PG_PANEL_TITLES, new_titles,
-	    num_panels);
+	    இலக்கம்_panels);
 
     vim_free(panel_titles);
     panel_titles = new_titles;
 }
 
-    static void
-gui_ph_pg_remove_buffer(char *name)
+    நிலையான வெறுமை
+gui_ph_pg_remove_buffer(எழுத்து *name)
 {
-    int i;
-    char **new_titles = NULL;
+    முழு i;
+    எழுத்து **new_titles = வெற்று;
 
     // If there is only 1 panel, we just use the temporary place holder
-    if (num_panels > 1)
+    எனில் (இலக்கம்_panels > 1)
     {
-	new_titles = ALLOC_MULT(char *, num_panels - 1);
-	if (new_titles != NULL)
+	new_titles = ALLOC_MULT(எழுத்து *, இலக்கம்_panels - 1);
+	எனில் (new_titles != வெற்று)
 	{
-	    char **s = new_titles;
+	    எழுத்து **s = new_titles;
 	    // Copy all the titles except the one we're removing
-	    for (i = 0; i < num_panels; i++)
+	    க்கு (i = 0; i < இலக்கம்_panels; i++)
 	    {
-		if (STRCMP(panel_titles[ i ], name) != 0)
+		எனில் (STRCMP(panel_titles[ i ], name) != 0)
 		    *s++ = panel_titles[ i ];
 	    }
-	    num_panels--;
+	    இலக்கம்_panels--;
 
 	    PtSetResource(gui.vimPanelGroup, Pt_ARG_PG_PANEL_TITLES, new_titles,
-		    num_panels);
+		    இலக்கம்_panels);
 
 	    vim_free(panel_titles);
 	    panel_titles = new_titles;
 	}
     }
-    else
+    இல்லையெனில்
     {
-	num_panels--;
+	இலக்கம்_panels--;
 	PtSetResource(gui.vimPanelGroup, Pt_ARG_PG_PANEL_TITLES, &empty_title,
 		1);
 
@@ -1049,49 +1049,49 @@ gui_ph_pg_remove_buffer(char *name)
 /*
  * When a buffer item is deleted from the buffer menu
  */
-    static int
+    நிலையான முழு
 gui_ph_handle_buffer_remove(
 	PtWidget_t *widget,
-	void *data,
+	வெறுமை *data,
 	PtCallbackInfo_t *info)
 {
     vimmenu_T *menu;
 
-    if (data != NULL)
+    எனில் (data != வெற்று)
     {
 	menu = (vimmenu_T *) data;
 	gui_ph_pg_remove_buffer(menu->dname);
     }
 
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 #endif
 
-    static int
-gui_ph_pane_resize(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    நிலையான முழு
+gui_ph_pane_resize(PtWidget_t *widget, வெறுமை *data, PtCallbackInfo_t *info)
 {
-    if (PtWidgetIsRealized(widget))
+    எனில் (PtWidgetIsRealized(widget))
     {
 	is_ignore_draw = TRUE;
 	PtStartFlux(gui.vimContainer);
 	PtContainerHold(gui.vimContainer);
     }
 
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-    void
-gui_ph_encoding_changed(int new_encoding)
+    வெறுமை
+gui_ph_encoding_changed(முழு new_encoding)
 {
     // Default encoding is latin1
-    char *charset = "latin1";
-    int i;
+    எழுத்து *charset = "latin1";
+    முழு i;
 
-    struct {
-	int encoding;
-	char *name;
+    கட்டமைப்பு {
+	முழு encoding;
+	எழுத்து *name;
     } charsets[] = {
 	{ DBCS_JPN, "SHIFT_JIS" },
 	{ DBCS_KOR, "csEUCKR" },
@@ -1099,9 +1099,9 @@ gui_ph_encoding_changed(int new_encoding)
 	{ DBCS_CHS, "gb" }
     };
 
-    for (i = 0; i < ARRAY_LENGTH(charsets); i++)
+    க்கு (i = 0; i < ARRAY_LENGTH(charsets); i++)
     {
-	if (new_encoding == charsets[ i ].encoding)
+	எனில் (new_encoding == charsets[ i ].encoding)
 	    charset = charsets[ i ].name;
     }
 
@@ -1110,27 +1110,27 @@ gui_ph_encoding_changed(int new_encoding)
 
 ////////////////////////////////////////////////////////////////////////////
 
-    void
-gui_mch_prepare(int *argc, char **argv)
+    வெறுமை
+gui_mch_prepare(முழு *argc, எழுத்து **argv)
 {
-    PtInit(NULL);
+    PtInit(வெற்று);
 }
 
-    int
-gui_mch_init(void)
+    முழு
+gui_mch_init(வெறுமை)
 {
     PtArg_t args[10];
-    int	    flags = 0, n = 0;
+    முழு	    flags = 0, n = 0;
 
     PhDim_t	window_size = {100, 100}; // Arbitrary values
     PhPoint_t	pos = {0, 0};
 
     gui.event_buffer = alloc(EVENT_BUFFER_SIZE);
-    if (gui.event_buffer == NULL)
-	return FAIL;
+    எனில் (gui.event_buffer == வெற்று)
+	திரும்பு FAIL;
 
     // Get a translation so we can convert from ISO Latin-1 to UTF
-    charset_translate = PxTranslateSet(NULL, "latin1");
+    charset_translate = PxTranslateSet(வெற்று, "latin1");
 
     // The +2 is for the 1 pixel dark line on each side
     gui.border_offset = gui.border_width = GUI_PH_MARGIN + 2;
@@ -1140,13 +1140,13 @@ gui_mch_init(void)
     PtSetArg(&args[ n++ ], Pt_ARG_WINDOW_NOTIFY_FLAGS, Pt_TRUE,
 	    Ph_WM_CLOSE | Ph_WM_RESIZE | Ph_WM_FOCUS);
     PtSetArg(&args[ n++ ], Pt_ARG_DIM, &window_size, 0);
-    gui.vimWindow = PtCreateWidget(PtWindow, NULL, n, args);
-    if (gui.vimWindow == NULL)
-	return FAIL;
+    gui.vimWindow = PtCreateWidget(PtWindow, வெற்று, n, args);
+    எனில் (gui.vimWindow == வெற்று)
+	திரும்பு FAIL;
 
-    PtAddCallback(gui.vimWindow, Pt_CB_WINDOW, gui_ph_handle_window_cb, NULL);
+    PtAddCallback(gui.vimWindow, Pt_CB_WINDOW, gui_ph_handle_window_cb, வெற்று);
     PtAddCallback(gui.vimWindow, Pt_CB_WINDOW_OPENING,
-	    gui_ph_handle_window_open, NULL);
+	    gui_ph_handle_window_open, வெற்று);
 
     n = 0;
     PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS, Pt_ANCHOR_ALL, Pt_IS_ANCHORED);
@@ -1158,12 +1158,12 @@ gui_mch_init(void)
     PtSetArg(&args[ n++ ], Pt_ARG_PG_PANEL_TITLES, &empty_title, 1);
 
     gui.vimPanelGroup = PtCreateWidget(PtPanelGroup, gui.vimWindow, n, args);
-    if (gui.vimPanelGroup == NULL)
-	return FAIL;
+    எனில் (gui.vimPanelGroup == வெற்று)
+	திரும்பு FAIL;
 
     PtAddCallback(gui.vimPanelGroup, Pt_CB_PG_PANEL_SWITCHING,
-	    gui_ph_handle_pg_change, NULL);
-#else
+	    gui_ph_handle_pg_change, வெற்று);
+#இல்லையெனில்
     // Turn off all edge decorations
     PtSetArg(&args[ n++ ], Pt_ARG_BASIC_FLAGS, Pt_FALSE, Pt_ALL);
     PtSetArg(&args[ n++ ], Pt_ARG_BEVEL_WIDTH, 0, 0);
@@ -1172,10 +1172,10 @@ gui_mch_init(void)
     PtSetArg(&args[ n++ ], Pt_ARG_CONTAINER_FLAGS, Pt_TRUE, Pt_AUTO_EXTENT);
 
     gui.vimContainer = PtCreateWidget(PtPane, gui.vimWindow, n, args);
-    if (gui.vimContainer == NULL)
-	return FAIL;
+    எனில் (gui.vimContainer == வெற்று)
+	திரும்பு FAIL;
 
-    PtAddCallback(gui.vimContainer, Pt_CB_RESIZE, gui_ph_pane_resize, NULL);
+    PtAddCallback(gui.vimContainer, Pt_CB_RESIZE, gui_ph_pane_resize, வெற்று);
 #endif
 
     // Size for the text area is set in gui_mch_set_text_area_pos
@@ -1195,20 +1195,20 @@ gui_mch_init(void)
 #endif
 
     gui.vimTextArea = PtCreateWidget(PtRaw, Pt_DFLT_PARENT, n, args);
-    if (gui.vimTextArea == NULL)
-	return FAIL;
+    எனில் (gui.vimTextArea == வெற்று)
+	திரும்பு FAIL;
 
     // TODO: use PtAddEventHandlers instead?
     // Not using Ph_EV_BUT_REPEAT because vim wouldn't use it anyway
     PtAddEventHandler(gui.vimTextArea,
 	    Ph_EV_BUT_PRESS | Ph_EV_BUT_RELEASE | Ph_EV_PTR_MOTION_BUTTON,
-	    gui_ph_handle_mouse, NULL);
-    PtAddEventHandler(gui.vimTextArea, Ph_EV_KEY,
-	    gui_ph_handle_keyboard, NULL);
+	    gui_ph_handle_mouse, வெற்று);
+    PtAddEventHandler(gui.vimTextArea, Ph_EV_சாவி,
+	    gui_ph_handle_keyboard, வெற்று);
     PtAddCallback(gui.vimTextArea, Pt_CB_GOT_FOCUS,
-	    gui_ph_handle_focus, NULL);
+	    gui_ph_handle_focus, வெற்று);
     PtAddCallback(gui.vimTextArea, Pt_CB_LOST_FOCUS,
-	    gui_ph_handle_focus, NULL);
+	    gui_ph_handle_focus, வெற்று);
 
     /*
      * Now that the text area widget has been created, set up the colours,
@@ -1219,62 +1219,62 @@ gui_mch_init(void)
      * Create the two timers, not as accurate as using the kernel timer
      * functions, but good enough
      */
-    gui_ph_timer_cursor  = PtCreateWidget(PtTimer, gui.vimWindow, 0, NULL);
-    if (gui_ph_timer_cursor == NULL)
-	return FAIL;
+    gui_ph_timer_cursor  = PtCreateWidget(PtTimer, gui.vimWindow, 0, வெற்று);
+    எனில் (gui_ph_timer_cursor == வெற்று)
+	திரும்பு FAIL;
 
-    gui_ph_timer_timeout = PtCreateWidget(PtTimer, gui.vimWindow, 0, NULL);
-    if (gui_ph_timer_timeout == NULL)
-	return FAIL;
+    gui_ph_timer_timeout = PtCreateWidget(PtTimer, gui.vimWindow, 0, வெற்று);
+    எனில் (gui_ph_timer_timeout == வெற்று)
+	திரும்பு FAIL;
 
     PtAddCallback(gui_ph_timer_cursor,  Pt_CB_TIMER_ACTIVATE,
-	    gui_ph_handle_timer_cursor, NULL);
+	    gui_ph_handle_timer_cursor, வெற்று);
     PtAddCallback(gui_ph_timer_timeout, Pt_CB_TIMER_ACTIVATE,
-	    gui_ph_handle_timer_timeout, NULL);
+	    gui_ph_handle_timer_timeout, வெற்று);
 
 #ifdef FEAT_MENU
     n = 0;
     PtSetArg(&args[ n++ ], Pt_ARG_WIDTH, window_size.w, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS, Pt_ANCHOR_LEFT_RIGHT,
+    PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS, Pt_ANCHOR_இடது_வலது,
 	    Pt_IS_ANCHORED);
     gui.vimToolBarGroup = PtCreateWidget(PtToolbarGroup, gui.vimWindow,
 	    n, args);
-    if (gui.vimToolBarGroup == NULL)
-	return FAIL;
+    எனில் (gui.vimToolBarGroup == வெற்று)
+	திரும்பு FAIL;
 
     PtAddCallback(gui.vimToolBarGroup, Pt_CB_RESIZE,
-	    gui_ph_handle_menu_resize, NULL);
+	    gui_ph_handle_menu_resize, வெற்று);
 
     n = 0;
     flags = 0;
     PtSetArg(&args[ n++ ], Pt_ARG_WIDTH, window_size.w, 0);
-    if (! vim_strchr(p_go, GO_MENUS))
+    எனில் (! vim_strchr(p_go, GO_MENUS))
     {
 	flags |= Pt_DELAY_REALIZE;
 	PtSetArg(&args[ n++ ], Pt_ARG_FLAGS, Pt_TRUE, flags);
     }
     gui.vimMenuBar = PtCreateWidget(PtMenuBar, gui.vimToolBarGroup, n, args);
-    if (gui.vimMenuBar == NULL)
-	return FAIL;
+    எனில் (gui.vimMenuBar == வெற்று)
+	திரும்பு FAIL;
 
 # ifdef FEAT_TOOLBAR
     n = 0;
 
     PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS,
-	    Pt_ANCHOR_LEFT_RIGHT |Pt_TOP_ANCHORED_TOP, Pt_IS_ANCHORED);
+	    Pt_ANCHOR_இடது_வலது |Pt_உச்சி_ANCHORED_உச்சி, Pt_IS_ANCHORED);
     PtSetArg(&args[ n++ ], Pt_ARG_RESIZE_FLAGS, Pt_TRUE,
 	    Pt_RESIZE_Y_AS_REQUIRED);
     PtSetArg(&args[ n++ ], Pt_ARG_WIDTH, window_size.w, 0);
 
     flags = Pt_GETS_FOCUS;
-    if (! vim_strchr(p_go, GO_TOOLBAR))
+    எனில் (! vim_strchr(p_go, GO_TOOLBAR))
 	flags |= Pt_DELAY_REALIZE;
 
     PtSetArg(&args[ n++ ], Pt_ARG_FLAGS, Pt_DELAY_REALIZE, flags);
 
     gui.vimToolBar = PtCreateWidget(PtToolbar, gui.vimToolBarGroup, n, args);
-    if (gui.vimToolBar == NULL)
-	return FAIL;
+    எனில் (gui.vimToolBar == வெற்று)
+	திரும்பு FAIL;
 
     /*
      * Size for the toolbar is fetched in gui_mch_show_toolbar, after
@@ -1285,17 +1285,17 @@ gui_mch_init(void)
 
 #endif
 
-    return OK;
+    திரும்பு OK;
 }
 
-    int
-gui_mch_init_check(void)
+    முழு
+gui_mch_init_check(வெறுமை)
 {
-    return (is_photon_available == TRUE) ? OK : FAIL;
+    திரும்பு (is_photon_available == TRUE) ? OK : FAIL;
 }
 
-    int
-gui_mch_open(void)
+    முழு
+gui_mch_open(வெறுமை)
 {
     gui.norm_pixel =  Pg_BLACK;
     gui.back_pixel =  Pg_WHITE;
@@ -1308,18 +1308,18 @@ gui_mch_open(void)
 
     highlight_gui_started();
 
-    if (gui_win_x != -1 && gui_win_y != -1)
+    எனில் (gui_win_x != -1 && gui_win_y != -1)
 	gui_mch_set_winpos(gui_win_x, gui_win_y);
 
-    return (PtRealizeWidget(gui.vimWindow) == 0) ? OK : FAIL;
+    திரும்பு (PtRealizeWidget(gui.vimWindow) == 0) ? OK : FAIL;
 }
 
-    void
-gui_mch_exit(int rc)
+    வெறுமை
+gui_mch_exit(முழு rc)
 {
     PtDestroyWidget(gui.vimWindow);
 
-    PxTranslateSet(charset_translate, NULL);
+    PxTranslateSet(charset_translate, வெற்று);
 
     vim_free(gui.event_buffer);
 
@@ -1335,46 +1335,46 @@ gui_mch_exit(int rc)
  * When no events are available, photon will call this function, working is
  * set to FALSE, and the gui_mch_update loop will exit.
  */
-    static int
-exit_gui_mch_update(void *data)
+    நிலையான முழு
+exit_gui_mch_update(வெறுமை *data)
 {
-    *(int *)data = FALSE;
-    return Pt_END;
+    *(முழு *)data = FALSE;
+    திரும்பு Pt_END;
 }
 
-    void
-gui_mch_update(void)
+    வெறுமை
+gui_mch_update(வெறுமை)
 {
-    int working = TRUE;
+    முழு working = TRUE;
 
-    PtAppAddWorkProc(NULL, exit_gui_mch_update, &working);
-    while ((working == TRUE) && !vim_is_input_buf_full())
+    PtAppAddWorkProc(வெற்று, exit_gui_mch_update, &working);
+    போது ((working == TRUE) && !vim_is_உள்ளீடு_buf_full())
 	PtProcessEvent();
 }
 
-    int
+    முழு
 gui_mch_wait_for_chars(long wtime)
 {
     is_timeout = FALSE;
 
-    if (wtime >= 0)
+    எனில் (wtime >= 0)
 	PtSetResource(gui_ph_timer_timeout, Pt_ARG_TIMER_INITIAL,
 						    wtime == 0 ? 1 : wtime, 0);
 
-    while (1)
+    போது (1)
     {
 	PtProcessEvent();
-	if (input_available())
+	எனில் (உள்ளீடு_available())
 	{
 	    PtSetResource(gui_ph_timer_timeout, Pt_ARG_TIMER_INITIAL, 0, 0);
-	    return OK;
+	    திரும்பு OK;
 	}
-	else if (is_timeout == TRUE)
-	    return FAIL;
+	இல்லையெனில் எனில் (is_timeout == TRUE)
+	    திரும்பு FAIL;
     }
 }
 
-#if defined(FEAT_BROWSE)
+#எனில் defined(FEAT_BROWSE)
 /*
  * Put up a file requester.
  * Returns the selected name in allocated memory, or NULL for Cancel.
@@ -1387,7 +1387,7 @@ gui_mch_wait_for_chars(long wtime)
  */
     char_u *
 gui_mch_browse(
-	int saving,
+	முழு saving,
 	char_u *title,
 	char_u *default_name,
 	char_u *ext,
@@ -1395,17 +1395,17 @@ gui_mch_browse(
 	char_u *filter)
 {
     PtFileSelectionInfo_t file;
-    int	    flags;
+    முழு	    flags;
     char_u  *default_path;
-    char_u  *open_text = NULL;
+    char_u  *open_text = வெற்று;
 
     flags = 0;
     CLEAR_FIELD(file);
 
     default_path = alloc(MAXPATHL + 1 + NAME_MAX + 1);
-    if (default_path != NULL)
+    எனில் (default_path != வெற்று)
     {
-	if (saving == TRUE)
+	எனில் (saving == TRUE)
 	{
 	    // Don't need Pt_FSR_CONFIRM_EXISTING, vim will ask anyway
 	    flags |= Pt_FSR_NO_FCHECK;
@@ -1413,20 +1413,20 @@ gui_mch_browse(
 	}
 
 	// combine the directory and filename into a single path
-	if (initdir == NULL || *initdir == NUL)
+	எனில் (initdir == வெற்று || *initdir == NUL)
 	{
 	    mch_dirname(default_path, MAXPATHL);
 	    initdir = default_path;
 	}
-	else
+	இல்லையெனில்
 	{
 	    STRCPY(default_path, initdir);
 	    initdir = default_path;
 	}
 
-	if (default_name != NULL)
+	எனில் (default_name != வெற்று)
 	{
-	    if (default_path[ STRLEN(default_path) - 1 ] != '/')
+	    எனில் (default_path[ STRLEN(default_path) - 1 ] != '/')
 		STRCAT(default_path, "/");
 
 	    STRCAT(default_path, default_name);
@@ -1435,114 +1435,114 @@ gui_mch_browse(
 	// TODO: add a filter?
 	PtFileSelection(
 		gui.vimWindow,
-		NULL,
+		வெற்று,
 		title,
 		default_path,
-		NULL,
+		வெற்று,
 		open_text,
-		NULL,
-		NULL,
+		வெற்று,
+		வெற்று,
 		&file,
 		flags);
 
 	vim_free(default_path);
 
-	if (file.ret == Pt_FSDIALOG_BTN1)
-	    return vim_strsave(file.path);
+	எனில் (file.ret == Pt_FSDIALOG_BTN1)
+	    திரும்பு vim_strsave(file.path);
     }
-    return NULL;
+    திரும்பு வெற்று;
 }
 #endif
 
-#if defined(FEAT_GUI_DIALOG)
-static PtWidget_t *gui_ph_dialog_text = NULL;
+#எனில் defined(FEAT_GUI_DIALOG)
+நிலையான PtWidget_t *gui_ph_dialog_text = வெற்று;
 
-    static int
-gui_ph_dialog_close(int button, void *data)
+    நிலையான முழு
+gui_ph_dialog_close(முழு button, வெறுமை *data)
 {
     PtModalCtrl_t *modal_ctrl = data;
     char_u *dialog_text, *vim_text;
 
-    if (gui_ph_dialog_text != NULL)
+    எனில் (gui_ph_dialog_text != வெற்று)
     {
 	PtGetResource(gui_ph_dialog_text, Pt_ARG_TEXT_STRING, &dialog_text, 0);
 	PtGetResource(gui_ph_dialog_text, Pt_ARG_POINTER, &vim_text, 0);
 	STRNCPY(vim_text, dialog_text, IOSIZE - 1);
     }
 
-    PtModalUnblock(modal_ctrl, (void *) button);
+    PtModalUnblock(modal_ctrl, (வெறுமை *) button);
 
-    return Pt_TRUE;
+    திரும்பு Pt_TRUE;
 }
 
-    static int
+    நிலையான முழு
 gui_ph_dialog_text_enter(
     PtWidget_t		*widget,
-    void		*data,
+    வெறுமை		*data,
     PtCallbackInfo_t	*info)
 {
-    if (info->reason_subtype == Pt_EDIT_ACTIVATE)
+    எனில் (info->reason_subtype == Pt_EDIT_ACTIVATE)
 	gui_ph_dialog_close(1, data);
-    return Pt_CONTINUE;
+    திரும்பு Pt_CONTINUE;
 }
 
-    static int
-gui_ph_dialog_esc(PtWidget_t *widget, void *data, PtCallbackInfo_t *info)
+    நிலையான முழு
+gui_ph_dialog_esc(PtWidget_t *widget, வெறுமை *data, PtCallbackInfo_t *info)
 {
-    PhKeyEvent_t *key;
+    Ph_சாவி_Event_t *சாவி;
 
-    key = PhGetData(info->event);
-    if ((key->key_flags & Pk_KF_Cap_Valid) && (key->key_cap == Pk_Escape))
+    சாவி = PhGetData(info->event);
+    எனில் ((சாவி->சாவி_flags & Pk_KF_Cap_Valid) && (சாவி->சாவி_cap == Pk_Escape))
     {
 	gui_ph_dialog_close(0, data);
-	return Pt_CONSUME;
+	திரும்பு Pt_CONSUME;
     }
-    return Pt_PROCESS;
+    திரும்பு Pt_PROCESS;
 }
 
-    int
+    முழு
 gui_mch_dialog(
-	int	type,
+	முழு	type,
 	char_u	*title,
 	char_u	*message,
 	char_u	*buttons,
-	int	default_button,
+	முழு	default_button,
 	char_u	*textfield,
-	int	ex_cmd)
+	முழு	ex_cmd)
 {
     char_u	*str;
     char_u	**button_array;
     char_u	*buttons_copy;
 
-    int		button_count;
-    int		i, len;
-    int		dialog_result = -1;
+    முழு		button_மொத்தம்;
+    முழு		i, len;
+    முழு		dialog_result = -1;
 
     // FIXME: the vertical option in guioptions is blatantly ignored
     // FIXME: so is the type
 
-    button_count = len = i = 0;
+    button_மொத்தம் = len = i = 0;
 
-    if (buttons == NULL || *buttons == NUL)
-	return -1;
+    எனில் (buttons == வெற்று || *buttons == NUL)
+	திரும்பு -1;
 
     // There is one less separator than buttons, so bump up the button count
-    button_count = 1;
+    button_மொத்தம் = 1;
 
     // Count string length and number of separators
-    for (str = buttons; *str; str++)
+    க்கு (str = buttons; *str; str++)
     {
 	len++;
-	if (*str == DLG_BUTTON_SEP)
-	    button_count++;
+	எனில் (*str == DLG_BUTTON_SEP)
+	    button_மொத்தம்++;
     }
 
-    if (title == NULL)
+    எனில் (title == வெற்று)
 	title = "Vim";
 
     buttons_copy = alloc(len + 1);
-    button_array = ALLOC_MULT(char_u *, button_count);
-    if (buttons_copy != NULL && button_array != NULL)
+    button_array = ALLOC_MULT(char_u *, button_மொத்தம்);
+    எனில் (buttons_copy != வெற்று && button_array != வெற்று)
     {
 	STRCPY(buttons_copy, buttons);
 
@@ -1551,31 +1551,31 @@ gui_mch_dialog(
 	 * button_array with the pointer to each NUL terminated string
 	 */
 	str = buttons_copy;
-	for (i = 0; i < button_count; i++)
+	க்கு (i = 0; i < button_மொத்தம்; i++)
 	{
 	    button_array[ i ] = str;
-	    for (; *str; str++)
+	    க்கு (; *str; str++)
 	    {
-		if (*str == DLG_BUTTON_SEP)
+		எனில் (*str == DLG_BUTTON_SEP)
 		{
 		    *str++ = NUL;
-		    break;
+		    நிறுத்து;
 		}
 	    }
 	}
 # ifndef FEAT_GUI_TEXTDIALOG
 	dialog_result = PtAlert(
-		gui.vimWindow, NULL,
+		gui.vimWindow, வெற்று,
 		title,
-		NULL,
-		message, NULL,
-		button_count, (const char **) button_array, NULL,
+		வெற்று,
+		message, வெற்று,
+		button_மொத்தம், (மாறிலி எழுத்து **) button_array, வெற்று,
 		default_button, 0, Pt_MODAL);
-# else
+# இல்லையெனில்
 	// Writing the dialog ourselves lets us add extra features, like
 	// trapping the escape key and returning 0 to vim
 	{
-	    int n;
+	    முழு n;
 	    PtArg_t args[5];
 	    PtWidget_t *dialog, *pane;
 	    PtModalCtrl_t modal_ctrl;
@@ -1590,15 +1590,15 @@ gui_mch_dialog(
 	    PtSetArg(&args[n++], Pt_ARG_GROUP_ORIENTATION,
 		    Pt_GROUP_VERTICAL, 0);
 	    PtSetArg(&args[n++], Pt_ARG_GROUP_FLAGS,
-		    Pt_TRUE, Pt_GROUP_NO_KEYS | Pt_GROUP_STRETCH_HORIZONTAL);
+		    Pt_TRUE, Pt_GROUP_NO_சாவிகள் | Pt_GROUP_STRETCH_HORIZONTAL);
 	    PtSetArg(&args[n++], Pt_ARG_CONTAINER_FLAGS, Pt_FALSE, Pt_TRUE);
-	    pane = PtCreateWidget(PtGroup, NULL, n, args);
+	    pane = PtCreateWidget(PtGroup, வெற்று, n, args);
 
 	    n = 0;
 	    PtSetArg(&args[n++], Pt_ARG_TEXT_STRING, message, 0);
 	    PtCreateWidget(PtLabel, pane, n, args);
 
-	    if (textfield != NULL)
+	    எனில் (textfield != வெற்று)
 	    {
 		n = 0;
 		PtSetArg(&args[n++], Pt_ARG_MAX_LENGTH, IOSIZE - 1, 0);
@@ -1612,29 +1612,29 @@ gui_mch_dialog(
 	    di.parent = gui.vimWindow;
 	    di.pane = pane;
 	    di.title = title;
-	    di.buttons = (const char **) button_array;
-	    di.nbtns = button_count;
+	    di.buttons = (மாறிலி எழுத்து **) button_array;
+	    di.nbtns = button_மொத்தம்;
 	    di.def_btn = default_button;
 	    // This is just to give the dialog the close button.
 	    // We check for the Escape key ourselves and return 0
-	    di.esc_btn = button_count;
+	    di.esc_btn = button_மொத்தம்;
 	    di.callback = gui_ph_dialog_close;
 	    di.data = &modal_ctrl;
 
 	    dialog = PtCreateDialog(&di);
-	    PtAddFilterCallback(dialog, Ph_EV_KEY,
+	    PtAddFilterCallback(dialog, Ph_EV_சாவி,
 		    gui_ph_dialog_esc, &modal_ctrl);
 
-	    if (gui_ph_dialog_text != NULL)
-		PtGiveFocus(gui_ph_dialog_text, NULL);
+	    எனில் (gui_ph_dialog_text != வெற்று)
+		PtGiveFocus(gui_ph_dialog_text, வெற்று);
 
 	    // Open dialog, block the vim window and wait for the dialog to close
 	    PtRealizeWidget(dialog);
 	    PtMakeModal(dialog, Ph_CURSOR_NOINPUT, Ph_CURSOR_DEFAULT_COLOR);
-	    dialog_result = (int) PtModalBlock(&modal_ctrl, 0);
+	    dialog_result = (முழு) PtModalBlock(&modal_ctrl, 0);
 
 	    PtDestroyWidget(dialog);
-	    gui_ph_dialog_text = NULL;
+	    gui_ph_dialog_text = வெற்று;
 	}
 # endif
     }
@@ -1642,50 +1642,50 @@ gui_mch_dialog(
     vim_free(button_array);
     vim_free(buttons_copy);
 
-    return dialog_result;
+    திரும்பு dialog_result;
 }
 #endif
 ////////////////////////////////////////////////////////////////////////////
 // window size/position/state
 
-    int
-gui_mch_get_winpos(int *x, int *y)
+    முழு
+gui_mch_get_winpos(முழு *x, முழு *y)
 {
     PhPoint_t *pos;
 
-    pos = PtWidgetPos(gui.vimWindow, NULL);
+    pos = PtWidgetPos(gui.vimWindow, வெற்று);
 
     *x = pos->x;
     *y = pos->y;
 
-    return OK;
+    திரும்பு OK;
 }
 
-    void
-gui_mch_set_winpos(int x, int y)
+    வெறுமை
+gui_mch_set_winpos(முழு x, முழு y)
 {
     PhPoint_t pos = { x, y };
 
     PtSetResource(gui.vimWindow, Pt_ARG_POS, &pos, 0);
 }
 
-    void
-gui_mch_set_shellsize(int width, int height,
-	int min_width, int min_height, int base_width, int base_height,
-	int direction)
+    வெறுமை
+gui_mch_set_shellsize(முழு width, முழு height,
+	முழு min_width, முழு min_height, முழு base_width, முழு base_height,
+	முழு direction)
 {
     PhDim_t window_size = { width, height };
     PhDim_t min_size = { min_width, min_height };
 
 #ifdef USE_PANEL_GROUP
-    window_size.w += pg_margin_left + pg_margin_right;
-    window_size.h += pg_margin_top + pg_margin_bottom;
+    window_size.w += pg_margin_இடது + pg_margin_வலது;
+    window_size.h += pg_margin_உச்சி + pg_margin_bottom;
 #endif
 
     PtSetResource(gui.vimWindow, Pt_ARG_MINIMUM_DIM, &min_size, 0);
     PtSetResource(gui.vimWindow, Pt_ARG_DIM, &window_size, 0);
 
-    if (! PtWidgetIsRealized(gui.vimWindow))
+    எனில் (! PtWidgetIsRealized(gui.vimWindow))
 	gui_ph_resize_container();
 }
 
@@ -1693,20 +1693,20 @@ gui_mch_set_shellsize(int width, int height,
  * Return the amount of screen space that hasn't been allocated (such as
  * by the shelf).
  */
-    void
-gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
+    வெறுமை
+gui_mch_get_screen_dimensions(முழு *screen_w, முழு *screen_h)
 {
     PhRect_t console;
 
     PhWindowQueryVisible(Ph_QUERY_WORKSPACE, 0,
-	    PhInputGroup(NULL), &console);
+	    Ph_உள்ளீடு_Group(வெற்று), &console);
 
     *screen_w = console.lr.x - console.ul.x + 1;
     *screen_h = console.lr.y - console.ul.y + 1;
 }
 
-    void
-gui_mch_iconify(void)
+    வெறுமை
+gui_mch_iconify(வெறுமை)
 {
     PhWindowEvent_t event;
 
@@ -1717,12 +1717,12 @@ gui_mch_iconify(void)
     PtForwardWindowEvent(&event);
 }
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 /*
  * Bring the Vim window to the foreground.
  */
-    void
-gui_mch_set_foreground(void)
+    வெறுமை
+gui_mch_set_foreground(வெறுமை)
 {
     PhWindowEvent_t event;
 
@@ -1734,11 +1734,11 @@ gui_mch_set_foreground(void)
 }
 #endif
 
-    void
+    வெறுமை
 gui_mch_settitle(char_u *title,	char_u *icon)
 {
 #ifdef USE_PANEL_GROUP
-    gui_ph_pg_set_buffer_num(curwin->w_buffer->b_fnum);
+    gui_ph_pg_set_buffer_இலக்கம்(curwin->w_buffer->b_fnum);
 #endif
     PtSetResource(gui.vimWindow, Pt_ARG_WINDOW_TITLE, title, 0);
     // Not sure what to do with the icon text, set balloon text somehow?
@@ -1747,46 +1747,46 @@ gui_mch_settitle(char_u *title,	char_u *icon)
 ////////////////////////////////////////////////////////////////////////////
 // Scrollbar
 
-    void
-gui_mch_set_scrollbar_thumb(scrollbar_T *sb, int val, int size, int max)
+    வெறுமை
+gui_mch_set_scrollbar_thumb(scrollbar_T *sb, முழு val, முழு size, முழு max)
 {
-    int	    n = 0;
+    முழு	    n = 0;
     PtArg_t args[3];
 
     PtSetArg(&args[ n++ ], Pt_ARG_MAXIMUM, max, 0);
     PtSetArg(&args[ n++ ], Pt_ARG_SLIDER_SIZE, size, 0);
-    PtSetArg(&args[ n++ ], Pt_ARG_GAUGE_VALUE, val, 0);
+    PtSetArg(&args[ n++ ], Pt_ARG_GAUGE_மதிப்பு, val, 0);
     PtSetResources(sb->id, n, args);
 }
 
-    void
-gui_mch_set_scrollbar_pos(scrollbar_T *sb, int x, int y, int w, int h)
+    வெறுமை
+gui_mch_set_scrollbar_pos(scrollbar_T *sb, முழு x, முழு y, முழு w, முழு h)
 {
     PhArea_t area = {{ x, y }, { w, h }};
 
     PtSetResource(sb->id, Pt_ARG_AREA, &area, 0);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    முழு
+gui_mch_get_scrollbar_xpadding(வெறுமை)
 {
     // TODO: Calculate the padding for adjust scrollbar position when the
     // Window is maximized.
-    return 0;
+    திரும்பு 0;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    முழு
+gui_mch_get_scrollbar_ypadding(வெறுமை)
 {
     // TODO: Calculate the padding for adjust scrollbar position when the
     // Window is maximized.
-    return 0;
+    திரும்பு 0;
 }
 
-    void
-gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
+    வெறுமை
+gui_mch_create_scrollbar(scrollbar_T *sb, முழு orient)
 {
-    int	    n = 0;
+    முழு	    n = 0;
 //    int	    anchor_flags = 0;
     PtArg_t args[4];
 
@@ -1799,22 +1799,22 @@ gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
     PtSetArg(&args[ n++ ], Pt_ARG_FLAGS, Pt_DELAY_REALIZE,
 	    Pt_DELAY_REALIZE | Pt_GETS_FOCUS);
     PtSetArg(&args[ n++ ], Pt_ARG_SCROLLBAR_FLAGS, Pt_SCROLLBAR_SHOW_ARROWS, 0);
-#if 0
+#எனில் 0
     // Don't need this anchoring for the scrollbars
-    if (orient == SBAR_HORIZ)
+    எனில் (orient == SBAR_HORIZ)
     {
 	anchor_flags = Pt_BOTTOM_ANCHORED_BOTTOM |
-	    Pt_LEFT_ANCHORED_LEFT | Pt_RIGHT_ANCHORED_RIGHT;
+	    Pt_இடது_ANCHORED_இடது | Pt_வலது_ANCHORED_வலது;
     }
-    else
+    இல்லையெனில்
     {
-	anchor_flags = Pt_BOTTOM_ANCHORED_BOTTOM | Pt_TOP_ANCHORED_TOP;
-	if (sb->wp != NULL)
+	anchor_flags = Pt_BOTTOM_ANCHORED_BOTTOM | Pt_உச்சி_ANCHORED_உச்சி;
+	எனில் (sb->wp != வெற்று)
 	{
-	    if (sb == &sb->wp->w_scrollbars[ SBAR_LEFT ])
-		anchor_flags |= Pt_LEFT_ANCHORED_LEFT;
-	    else
-		anchor_flags |= Pt_RIGHT_ANCHORED_RIGHT;
+	    எனில் (sb == &sb->wp->w_scrollbars[ SBAR_இடது ])
+		anchor_flags |= Pt_இடது_ANCHORED_இடது;
+	    இல்லையெனில்
+		anchor_flags |= Pt_வலது_ANCHORED_வலது;
 	}
     }
     PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS, anchor_flags, Pt_IS_ANCHORED);
@@ -1823,44 +1823,44 @@ gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
 	    (orient == SBAR_HORIZ) ? Pt_HORIZONTAL : Pt_VERTICAL, 0);
 #ifdef USE_PANEL_GROUP
     sb->id = PtCreateWidget(PtScrollbar, gui.vimPanelGroup, n, args);
-#else
+#இல்லையெனில்
     sb->id = PtCreateWidget(PtScrollbar, gui.vimContainer, n, args);
 #endif
 
     PtAddCallback(sb->id, Pt_CB_SCROLLBAR_MOVE, gui_ph_handle_scrollbar, sb);
 }
 
-    void
-gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
+    வெறுமை
+gui_mch_enable_scrollbar(scrollbar_T *sb, முழு flag)
 {
-    if (flag != 0)
+    எனில் (flag != 0)
 	PtRealizeWidget(sb->id);
-    else
+    இல்லையெனில்
 	PtUnrealizeWidget(sb->id);
 }
 
-    void
+    வெறுமை
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
     PtDestroyWidget(sb->id);
-    sb->id = NULL;
+    sb->id = வெற்று;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Mouse functions
 
-#if defined(FEAT_MOUSESHAPE)
+#எனில் defined(FEAT_MOUSESHAPE)
 // The last set mouse pointer shape is remembered, to be used when it goes
 // from hidden to not hidden.
-static int last_shape = 0;
+நிலையான முழு last_shape = 0;
 
 // Table for shape IDs.  Keep in sync with the mshape_names[] table in
 // misc2.c!
-static int mshape_ids[] =
+நிலையான முழு mshape_ids[] =
 {
     Ph_CURSOR_POINTER,		// arrow
     Ph_CURSOR_NONE,		// blank
-    Ph_CURSOR_INSERT,		// beam
+    Ph_CURSOR_செருகு,		// beam
     Ph_CURSOR_DRAG_VERTICAL,	// updown
     Ph_CURSOR_DRAG_VERTICAL,	// udsizing
     Ph_CURSOR_DRAG_HORIZONTAL,	// leftright
@@ -1877,74 +1877,74 @@ static int mshape_ids[] =
     Ph_CURSOR_POINTER		// last one
 };
 
-    void
-mch_set_mouse_shape(int shape)
+    வெறுமை
+mch_set_mouse_shape(முழு shape)
 {
-    int	    id;
+    முழு	    id;
 
-    if (!gui.in_use)
-	return;
+    எனில் (!gui.in_use)
+	திரும்பு;
 
-    if (shape == MSHAPE_HIDE || gui.pointer_hidden)
+    எனில் (shape == MSHAPE_HIDE || gui.pointer_hidden)
 	PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_TYPE, Ph_CURSOR_NONE,
 		0);
-    else
+    இல்லையெனில்
     {
-	if (shape >= MSHAPE_NUMBERED)
+	எனில் (shape >= MSHAPE_NUMBERED)
 	    id = Ph_CURSOR_POINTER;
-	else
+	இல்லையெனில்
 	    id = mshape_ids[shape];
 
 	PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_TYPE, id,	0);
     }
-    if (shape != MSHAPE_HIDE)
+    எனில் (shape != MSHAPE_HIDE)
 	last_shape = shape;
 }
 #endif
 
-    void
-gui_mch_mousehide(int hide)
+    வெறுமை
+gui_mch_mousehide(முழு hide)
 {
-    if (gui.pointer_hidden == hide)
-	return;
+    எனில் (gui.pointer_hidden == hide)
+	திரும்பு;
 
     gui.pointer_hidden = hide;
 #ifdef FEAT_MOUSESHAPE
-    if (hide)
+    எனில் (hide)
 	PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_TYPE,
 		Ph_CURSOR_NONE, 0);
-    else
+    இல்லையெனில்
 	mch_set_mouse_shape(last_shape);
-#else
+#இல்லையெனில்
     PtSetResource(gui.vimTextArea, Pt_ARG_CURSOR_TYPE,
 	    (hide == MOUSE_SHOW) ? GUI_PH_MOUSE_TYPE : Ph_CURSOR_NONE,
 	    0);
 #endif
 }
 
-    void
-gui_mch_getmouse(int *x, int *y)
+    வெறுமை
+gui_mch_getmouse(முழு *x, முழு *y)
 {
     PhCursorInfo_t info;
     short ix, iy;
 
     // FIXME: does this return the correct position,
     // with respect to the border?
-    PhQueryCursor(PhInputGroup(NULL), &info);
+    PhQueryCursor(Ph_உள்ளீடு_Group(வெற்று), &info);
     PtGetAbsPosition(gui.vimTextArea , &ix, &iy);
 
     *x = info.pos.x - ix;
     *y = info.pos.y - iy;
 }
 
-    void
-gui_mch_setmouse(int x, int y)
+    வெறுமை
+gui_mch_setmouse(முழு x, முழு y)
 {
     short abs_x, abs_y;
 
     PtGetAbsPosition(gui.vimTextArea, &abs_x, &abs_y);
     // Add the border offset?
-    PhMoveCursorAbs(PhInputGroup(NULL), abs_x + x, abs_y + y);
+    PhMoveCursorAbs(Ph_உள்ளீடு_Group(வெற்று), abs_x + x, abs_y + y);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1956,14 +1956,14 @@ gui_mch_setmouse(int x, int y)
     guicolor_T
 gui_mch_get_rgb(guicolor_T pixel)
 {
-    return (guicolor_T)(PgRGB(PgRedValue(pixel),
-				     PgGreenValue(pixel), PgBlueValue(pixel)));
+    திரும்பு (guicolor_T)(PgRGB(Pg_Red_மதிப்பு(pixel),
+				     Pg_Green_மதிப்பு(pixel), Pg_Blue_மதிப்பு(pixel)));
 }
 
-    void
-gui_mch_new_colors(void)
+    வெறுமை
+gui_mch_new_colors(வெறுமை)
 {
-#if 0 // Don't bother changing the cursor colour
+#எனில் 0 // Don't bother changing the cursor colour
     short color_diff;
 
     /*
@@ -1973,13 +1973,13 @@ gui_mch_new_colors(void)
     color_diff = gui_get_lightness(gui_ph_mouse_color)
 					  - gui_get_lightness(gui.back_pixel);
 
-    if (abs(color_diff) < 64)
+    எனில் (abs(color_diff) < 64)
     {
 	short r, g, b;
 	// not a great algorithm...
-	r = PgRedValue(gui_ph_mouse_color) ^ 255;
-	g = PgGreenValue(gui_ph_mouse_color) ^ 255;
-	b = PgBlueValue(gui_ph_mouse_color) ^ 255;
+	r = Pg_Red_மதிப்பு(gui_ph_mouse_color) ^ 255;
+	g = Pg_Green_மதிப்பு(gui_ph_mouse_color) ^ 255;
+	b = Pg_Blue_மதிப்பு(gui_ph_mouse_color) ^ 255;
 
 # ifndef FEAT_MOUSESHAPE
 	gui_ph_mouse_color = PgRGB(r, g, b);
@@ -2003,34 +2003,34 @@ gui_mch_new_colors(void)
     guicolor_T
 gui_mch_get_color(char_u *name)
 {
-    return gui_get_color_cmn(name);
+    திரும்பு gui_get_color_cmn(name);
 }
 
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(முழு r, முழு g, முழு b)
 {
-    return gui_get_rgb_color_cmn(r, g, b);
+    திரும்பு gui_get_rgb_color_cmn(r, g, b);
 }
 
-    void
+    வெறுமை
 gui_mch_set_fg_color(guicolor_T color)
 {
     PgSetTextColor(color);
 }
 
-    void
+    வெறுமை
 gui_mch_set_bg_color(guicolor_T color)
 {
     PgSetFillColor(color);
 }
 
-    void
+    வெறுமை
 gui_mch_set_sp_color(guicolor_T color)
 {
 }
 
-    void
-gui_mch_invert_rectangle(int row, int col, int nr, int nc)
+    வெறுமை
+gui_mch_invert_rectangle(முழு row, முழு col, முழு nr, முழு nc)
 {
     PhRect_t rect;
 
@@ -2040,9 +2040,9 @@ gui_mch_invert_rectangle(int row, int col, int nr, int nc)
     // FIXME: This has an off by one pixel problem
     rect.lr.x = rect.ul.x + nc * gui.char_width;
     rect.lr.y = rect.ul.y + nr * gui.char_height;
-    if (nc > 0)
+    எனில் (nc > 0)
 	rect.lr.x -= 1;
-    if (nr > 0)
+    எனில் (nr > 0)
 	rect.lr.y -= 1;
 
     DRAW_START;
@@ -2052,8 +2052,8 @@ gui_mch_invert_rectangle(int row, int col, int nr, int nc)
     DRAW_END;
 }
 
-    void
-gui_mch_clear_block(int row1, int col1, int row2, int col2)
+    வெறுமை
+gui_mch_clear_block(முழு row1, முழு col1, முழு row2, முழு col2)
 {
     PhRect_t block = {
 	{ FILL_X(col1), FILL_Y(row1) },
@@ -2066,8 +2066,8 @@ gui_mch_clear_block(int row1, int col1, int row2, int col2)
     DRAW_END;
 }
 
-    void
-gui_mch_clear_all(void)
+    வெறுமை
+gui_mch_clear_all(வெறுமை)
 {
     PhRect_t text_rect = {
 	{ gui.border_width, gui.border_width },
@@ -2075,8 +2075,8 @@ gui_mch_clear_all(void)
 	    Rows * gui.char_height + gui.border_width - 1 }
     };
 
-    if (is_ignore_draw == TRUE)
-	return;
+    எனில் (is_ignore_draw == TRUE)
+	திரும்பு;
 
     DRAW_START;
     gui_mch_set_bg_color(gui.back_pixel);
@@ -2084,78 +2084,78 @@ gui_mch_clear_all(void)
     DRAW_END;
 }
 
-    void
-gui_mch_delete_lines(int row, int num_lines)
+    வெறுமை
+gui_mch_delete_வரிகள்(முழு row, முழு இலக்கம்_வரிகள்)
 {
     PhRect_t    rect;
     PhPoint_t   delta;
 
-    rect.ul.x = FILL_X(gui.scroll_region_left);
-    rect.ul.y = FILL_Y(row + num_lines);
+    rect.ul.x = FILL_X(gui.scroll_region_இடது);
+    rect.ul.y = FILL_Y(row + இலக்கம்_வரிகள்);
 
-    rect.lr.x = FILL_X(gui.scroll_region_right + 1) - 1;
+    rect.lr.x = FILL_X(gui.scroll_region_வலது + 1) - 1;
     rect.lr.y = FILL_Y(gui.scroll_region_bot + 1) - 1;
 
     PtWidgetOffset(gui.vimTextArea, &gui_ph_raw_offset);
-    PhTranslatePoint(&gui_ph_raw_offset, PtWidgetPos(gui.vimTextArea, NULL));
+    PhTranslatePoint(&gui_ph_raw_offset, PtWidgetPos(gui.vimTextArea, வெற்று));
     PhTranslateRect(&rect, &gui_ph_raw_offset);
 
     delta.x = 0;
-    delta.y = -num_lines * gui.char_height;
+    delta.y = -இலக்கம்_வரிகள் * gui.char_height;
 
     PgFlush();
 
     PhBlit(PtWidgetRid(PtFindDisjoint(gui.vimTextArea)), &rect, &delta);
 
     gui_clear_block(
-	gui.scroll_region_bot - num_lines + 1,
-	gui.scroll_region_left,
+	gui.scroll_region_bot - இலக்கம்_வரிகள் + 1,
+	gui.scroll_region_இடது,
 	gui.scroll_region_bot,
-	gui.scroll_region_right);
+	gui.scroll_region_வலது);
 }
 
-    void
-gui_mch_insert_lines(int row, int num_lines)
+    வெறுமை
+gui_mch_செருகு_வரிகள்(முழு row, முழு இலக்கம்_வரிகள்)
 {
     PhRect_t    rect;
     PhPoint_t   delta;
 
-    rect.ul.x = FILL_X(gui.scroll_region_left);
+    rect.ul.x = FILL_X(gui.scroll_region_இடது);
     rect.ul.y = FILL_Y(row);
 
-    rect.lr.x = FILL_X(gui.scroll_region_right + 1) - 1;
-    rect.lr.y = FILL_Y(gui.scroll_region_bot - num_lines + 1) - 1;
+    rect.lr.x = FILL_X(gui.scroll_region_வலது + 1) - 1;
+    rect.lr.y = FILL_Y(gui.scroll_region_bot - இலக்கம்_வரிகள் + 1) - 1;
 
     PtWidgetOffset(gui.vimTextArea, &gui_ph_raw_offset);
-    PhTranslatePoint(&gui_ph_raw_offset, PtWidgetPos(gui.vimTextArea, NULL));
+    PhTranslatePoint(&gui_ph_raw_offset, PtWidgetPos(gui.vimTextArea, வெற்று));
     PhTranslateRect(&rect, &gui_ph_raw_offset);
 
     delta.x = 0;
-    delta.y = num_lines * gui.char_height;
+    delta.y = இலக்கம்_வரிகள் * gui.char_height;
 
     PgFlush();
 
     PhBlit(PtWidgetRid(PtFindDisjoint(gui.vimTextArea)) , &rect, &delta);
 
-    gui_clear_block(row, gui.scroll_region_left,
-	    row + num_lines - 1, gui.scroll_region_right);
+    gui_clear_block(row, gui.scroll_region_இடது,
+	    row + இலக்கம்_வரிகள் - 1, gui.scroll_region_வலது);
 }
 
-    void
-gui_mch_draw_string(int row, int col, char_u *s, int len, int flags)
+    வெறுமை
+gui_mch_draw_string(முழு row, முழு col, char_u *s, முழு len, முழு flags)
 {
-    static char *utf8_buffer = NULL;
-    static int	utf8_len = 0;
+    நிலையான எழுத்து *utf8_buffer = வெற்று;
+    நிலையான முழு	utf8_len = 0;
 
     PhPoint_t	pos = { TEXT_X(col), TEXT_Y(row) };
     PhRect_t	rect;
 
-    if (is_ignore_draw == TRUE)
-	return;
+    எனில் (is_ignore_draw == TRUE)
+	திரும்பு;
 
     DRAW_START;
 
-    if (!(flags & DRAW_TRANSP))
+    எனில் (!(flags & DRAW_TRANSP))
     {
 	PgDrawIRect(
 		FILL_X(col), FILL_Y(row),
@@ -2163,20 +2163,20 @@ gui_mch_draw_string(int row, int col, char_u *s, int len, int flags)
 		Pg_DRAW_FILL);
     }
 
-    if (flags & DRAW_UNDERL)
+    எனில் (flags & DRAW_UNDERL)
 	PgSetUnderline(gui.norm_pixel, Pg_TRANSPARENT, 0);
 
-    if (charset_translate != NULL && enc_utf8 == 0)
+    எனில் (charset_translate != வெற்று && enc_utf8 == 0)
     {
-	int src_taken, dst_made;
+	முழு src_taken, dst_made;
 
 	// Use a static buffer to avoid large amounts of de/allocations
-	if (utf8_len < len)
+	எனில் (utf8_len < len)
 	{
-	    char *new_buffer = realloc(utf8_buffer, len * MB_LEN_MAX);
+	    எழுத்து *new_buffer = realloc(utf8_buffer, len * MB_LEN_MAX);
 
-	    if (new_buffer == NULL)
-		return;
+	    எனில் (new_buffer == வெற்று)
+		திரும்பு;
 	    utf8_buffer = new_buffer;
 	    utf8_len = len;
 	}
@@ -2195,7 +2195,7 @@ gui_mch_draw_string(int row, int col, char_u *s, int len, int flags)
 
     PgDrawText(s, len, &pos, 0);
 
-    if (flags & DRAW_BOLD)
+    எனில் (flags & DRAW_BOLD)
     {
 	// FIXME: try and only calculate these values once...
 	rect.ul.x = FILL_X(col) + 1;
@@ -2203,20 +2203,20 @@ gui_mch_draw_string(int row, int col, char_u *s, int len, int flags)
 	rect.lr.x = FILL_X(col + len) - 1;
 	rect.lr.y = FILL_Y(row + 1) - 1;
 	// PgSetUserClip(NULL) causes the scrollbar to not redraw...
-#if 0
+#எனில் 0
 	pos.x++;
 
 	PgSetUserClip(&rect);
 	PgDrawText(s, len, &pos, 0);
-	PgSetUserClip(NULL);
-#else
+	PgSetUserClip(வெற்று);
+#இல்லையெனில்
 	rect.lr.y -= (p_linespace + 1) / 2;
 	// XXX: DrawTextArea doesn't work with phditto
 	PgDrawTextArea(s, len, &rect, Pg_TEXT_BOTTOM);
 #endif
     }
 
-    if (flags & DRAW_UNDERL)
+    எனில் (flags & DRAW_UNDERL)
 	PgSetUnderline(Pg_TRANSPARENT, Pg_TRANSPARENT, 0);
 
     DRAW_END;
@@ -2225,7 +2225,7 @@ gui_mch_draw_string(int row, int col, char_u *s, int len, int flags)
 ////////////////////////////////////////////////////////////////////////////
 // Cursor
 
-    void
+    வெறுமை
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
     PhRect_t r;
@@ -2243,8 +2243,8 @@ gui_mch_draw_hollow_cursor(guicolor_T color)
     DRAW_END;
 }
 
-    void
-gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
+    வெறுமை
+gui_mch_draw_part_cursor(முழு w, முழு h, guicolor_T color)
 {
     PhRect_t r;
 
@@ -2259,19 +2259,19 @@ gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
     DRAW_END;
 }
 
-    int
-gui_mch_is_blinking(void)
+    முழு
+gui_mch_is_blinking(வெறுமை)
 {
-    return blink_state != BLINK_NONE;
+    திரும்பு blink_state != BLINK_NONE;
 }
 
-    int
-gui_mch_is_blink_off(void)
+    முழு
+gui_mch_is_blink_off(வெறுமை)
 {
-    return blink_state == BLINK_OFF;
+    திரும்பு blink_state == BLINK_OFF;
 }
 
-    void
+    வெறுமை
 gui_mch_set_blinking(long wait, long on, long off)
 {
     blink_waittime = wait;
@@ -2279,11 +2279,11 @@ gui_mch_set_blinking(long wait, long on, long off)
     blink_offtime = off;
 }
 
-    void
-gui_mch_start_blink(void)
+    வெறுமை
+gui_mch_start_blink(வெறுமை)
 {
     // Only turn on the timer on if none of the times are zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    எனில் (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
     {
 	PtSetResource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL,
 		blink_waittime, 0);
@@ -2292,12 +2292,12 @@ gui_mch_start_blink(void)
     }
 }
 
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    வெறுமை
+gui_mch_stop_blink(முழு may_call_gui_update_cursor)
 {
     PtSetResource(gui_ph_timer_cursor, Pt_ARG_TIMER_INITIAL, 0, 0);
 
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    எனில் (blink_state == BLINK_OFF && may_call_gui_update_cursor)
 	gui_update_cursor(TRUE, FALSE);
 
     blink_state = BLINK_NONE;
@@ -2306,14 +2306,14 @@ gui_mch_stop_blink(int may_call_gui_update_cursor)
 ////////////////////////////////////////////////////////////////////////////
 // miscellaneous functions
 
-    void
-gui_mch_beep(void)
+    வெறுமை
+gui_mch_beep(வெறுமை)
 {
     PtBeep();
 }
 
-    void
-gui_mch_flash(int msec)
+    வெறுமை
+gui_mch_flash(முழு msec)
 {
     PgSetFillXORColor(Pg_BLACK, Pg_WHITE);
     PgSetDrawMode(Pg_DRAWMODE_XOR);
@@ -2327,30 +2327,30 @@ gui_mch_flash(int msec)
     gui_mch_flush();
 }
 
-    void
-gui_mch_flush(void)
+    வெறுமை
+gui_mch_flush(வெறுமை)
 {
     PgFlush();
 }
 
-    void
-gui_mch_set_text_area_pos(int x, int y, int w, int h)
+    வெறுமை
+gui_mch_set_text_area_pos(முழு x, முழு y, முழு w, முழு h)
 {
     PhArea_t area = {{x, y}, {w, h}};
 
     PtSetResource(gui.vimTextArea, Pt_ARG_AREA, &area, 0);
 }
 
-    int
+    முழு
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    முழு i;
 
-    for (i = 0; special_keys[i].key_sym != 0; i++)
-	if (name[0] == special_keys[i].vim_code0 &&
-		 name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+    க்கு (i = 0; special_சாவிகள்[i].சாவி_sym != 0; i++)
+	எனில் (name[0] == special_சாவிகள்[i].vim_code0 &&
+		 name[1] == special_சாவிகள்[i].vim_code1)
+	    திரும்பு OK;
+    திரும்பு FAIL;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -2359,7 +2359,7 @@ gui_mch_haskey(char_u *name)
 #ifdef FEAT_TOOLBAR
 # include "toolbar.phi"
 
-static PhImage_t *gui_ph_toolbar_images[] = {
+நிலையான PhImage_t *gui_ph_toolbar_images[] = {
     &tb_new_phi,
     &tb_open_phi,
     &tb_save_phi,
@@ -2393,24 +2393,24 @@ static PhImage_t *gui_ph_toolbar_images[] = {
     &tb_minwidth_phi
 };
 
-static PhImage_t *
+நிலையான PhImage_t *
 gui_ph_toolbar_load_icon(char_u *iconfile)
 {
-    static PhImage_t external_icon;
-    PhImage_t *temp_phi = NULL;
+    நிலையான PhImage_t external_icon;
+    PhImage_t *temp_phi = வெற்று;
 
-    temp_phi = PxLoadImage(iconfile, NULL);
-    if (temp_phi != NULL)
+    temp_phi = PxLoadImage(iconfile, வெற்று);
+    எனில் (temp_phi != வெற்று)
     {
 	// The label widget will free the image/palette/etc. for us when
 	// it's destroyed
 	temp_phi->flags |= Ph_RELEASE_IMAGE_ALL;
-	memcpy(&external_icon, temp_phi, sizeof(external_icon));
-	free(temp_phi);
+	memcpy(&external_icon, temp_phi, அளவு(external_icon));
+	விடுவி(temp_phi);
 
 	temp_phi = &external_icon;
     }
-    return temp_phi;
+    திரும்பு temp_phi;
 }
 
 /*
@@ -2420,48 +2420,48 @@ gui_ph_toolbar_load_icon(char_u *iconfile)
  * (When setting the Pt_ARG_LABEL_IMAGE resource, the contents of the
  * PhImage_t are copied, and the original PhImage_t aren't needed anymore).
  */
-static PhImage_t *
+நிலையான PhImage_t *
 gui_ph_toolbar_find_icon(vimmenu_T *menu)
 {
     char_u full_pathname[ MAXPATHL + 1 ];
-    PhImage_t *icon = NULL;
+    PhImage_t *icon = வெற்று;
 
-    if (menu->icon_builtin == FALSE)
+    எனில் (menu->icon_builtin == FALSE)
     {
-	if (menu->iconfile != NULL)
+	எனில் (menu->iconfile != வெற்று)
 	    // TODO: use gui_find_iconfile()
 	    icon = gui_ph_toolbar_load_icon(menu->iconfile);
 
 	// TODO: Restrict loading to just .png? Search for any format?
-	if ((icon == NULL) &&
+	எனில் ((icon == வெற்று) &&
 	    ((gui_find_bitmap(menu->name, full_pathname, "gif") == OK) ||
 	      (gui_find_bitmap(menu->name, full_pathname, "png") == OK)))
 	    icon = gui_ph_toolbar_load_icon(full_pathname);
 
-	if (icon != NULL)
-	    return icon;
+	எனில் (icon != வெற்று)
+	    திரும்பு icon;
     }
 
-    if (menu->iconidx >= 0 &&
+    எனில் (menu->iconidx >= 0 &&
 	    (menu->iconidx < ARRAY_LENGTH(gui_ph_toolbar_images)))
-	return gui_ph_toolbar_images[menu->iconidx];
+	திரும்பு gui_ph_toolbar_images[menu->iconidx];
 
-    return NULL;
+    திரும்பு வெற்று;
 }
 #endif
 
-#if defined(FEAT_MENU)
-    void
-gui_mch_enable_menu(int flag)
+#எனில் defined(FEAT_MENU)
+    வெறுமை
+gui_mch_enable_menu(முழு flag)
 {
-    if (flag != 0)
+    எனில் (flag != 0)
 	PtRealizeWidget(gui.vimMenuBar);
-    else
+    இல்லையெனில்
 	PtUnrealizeWidget(gui.vimMenuBar);
 }
 
-    void
-gui_mch_set_menu_pos(int x, int y, int w, int h)
+    வெறுமை
+gui_mch_set_menu_pos(முழு x, முழு y, முழு w, முழு h)
 {
     // Nothing
 }
@@ -2469,8 +2469,8 @@ gui_mch_set_menu_pos(int x, int y, int w, int h)
 /*
  * Change the position of a menu button in the parent
  */
-    static void
-gui_ph_position_menu(PtWidget_t *widget, int priority)
+    நிலையான வெறுமை
+gui_ph_position_menu(PtWidget_t *widget, முழு priority)
 {
     PtWidget_t	*traverse;
     vimmenu_T	*menu;
@@ -2480,17 +2480,17 @@ gui_ph_position_menu(PtWidget_t *widget, int priority)
     // Iterate through the list of widgets in traverse, until
     // we find the position we want to insert our widget into
     // TODO: traverse from front to back, possible speedup?
-    while (traverse != NULL)
+    போது (traverse != வெற்று)
     {
 	PtGetResource(traverse, Pt_ARG_POINTER, &menu, 0);
 
-	if (menu != NULL &&
+	எனில் (menu != வெற்று &&
 		priority < menu->priority &&
 		widget != traverse)
 	{
 	    // Insert the widget before the current traverse widget
-	    PtWidgetInsert(widget, traverse, 1);
-	    return;
+	    Pt_Widget_செருகு(widget, traverse, 1);
+	    திரும்பு;
 	}
 
 	traverse = PtWidgetBrotherInFront(traverse);
@@ -2500,24 +2500,24 @@ gui_ph_position_menu(PtWidget_t *widget, int priority)
 /*
  * the index is ignored because it's not useful for our purposes
  */
-    void
-gui_mch_add_menu(vimmenu_T *menu, int index)
+    வெறுமை
+gui_mch_add_menu(vimmenu_T *menu, முழு index)
 {
     vimmenu_T	*parent = menu->parent;
-    char_u	*accel_key;
+    char_u	*accel_சாவி;
     char_u	mnemonic_str[MB_LEN_MAX];
-    int	    n;
+    முழு	    n;
     PtArg_t args[5];
 
-    menu->submenu_id = menu->id = NULL;
+    menu->submenu_id = menu->id = வெற்று;
 
-    if (menu_is_menubar(menu->name))
+    எனில் (menu_is_menubar(menu->name))
     {
 
-	accel_key = vim_strchr(menu->name, '&');
-	if (accel_key != NULL)
+	accel_சாவி = vim_strchr(menu->name, '&');
+	எனில் (accel_சாவி != வெற்று)
 	{
-	    mnemonic_str[0] = accel_key[1];
+	    mnemonic_str[0] = accel_சாவி[1];
 	    mnemonic_str[1] = NUL;
 	}
 
@@ -2525,32 +2525,32 @@ gui_mch_add_menu(vimmenu_T *menu, int index)
 	n = 0;
 	PtSetArg(&args[ n++ ], Pt_ARG_TEXT_STRING, menu->dname, 0);
 	PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_TEXT, menu->actext, 0);
-	if (accel_key != NULL)
-	    PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_KEY, mnemonic_str, 0);
+	எனில் (accel_சாவி != வெற்று)
+	    PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_சாவி, mnemonic_str, 0);
 	PtSetArg(&args[ n++ ], Pt_ARG_POINTER, menu, 0);
 
-	if (parent != NULL)
-	    PtSetArg(&args[ n++ ], Pt_ARG_BUTTON_TYPE, Pt_MENU_RIGHT, 0);
+	எனில் (parent != வெற்று)
+	    PtSetArg(&args[ n++ ], Pt_ARG_BUTTON_TYPE, Pt_MENU_வலது, 0);
 
 	menu->id = PtCreateWidget(PtMenuButton,
-		(parent == NULL) ? gui.vimMenuBar : parent->submenu_id,
+		(parent == வெற்று) ? gui.vimMenuBar : parent->submenu_id,
 		n, args);
 
 	PtAddCallback(menu->id, Pt_CB_ARM, gui_ph_handle_pulldown_menu, menu);
 
 	// Create the actual menu
 	n = 0;
-	if (parent != NULL)
+	எனில் (parent != வெற்று)
 	    PtSetArg(&args[ n++ ], Pt_ARG_MENU_FLAGS, Pt_TRUE, Pt_MENU_CHILD);
 
 	menu->submenu_id = PtCreateWidget(PtMenu, menu->id, n, args);
 
-	if (parent == NULL)
+	எனில் (parent == வெற்று)
 	{
 	    PtAddCallback(menu->submenu_id, Pt_CB_UNREALIZED,
 		    gui_ph_handle_menu_unrealized, menu);
 
-	    if (menu->mnemonic != 0)
+	    எனில் (menu->mnemonic != 0)
 	    {
 		PtAddHotkeyHandler(gui.vimWindow, SAFE_tolower(menu->mnemonic),
 			Pk_KM_Alt, 0, menu, gui_ph_handle_pulldown_menu);
@@ -2560,60 +2560,60 @@ gui_mch_add_menu(vimmenu_T *menu, int index)
 	gui_ph_position_menu(menu->id, menu->priority);
 
 	// Redraw menubar here instead of gui_mch_draw_menubar
-	if (gui.menu_is_active)
+	எனில் (gui.menu_is_active)
 	    PtRealizeWidget(menu->id);
     }
-    else if (menu_is_popup(menu->name))
+    இல்லையெனில் எனில் (menu_is_popup(menu->name))
     {
-	menu->submenu_id = PtCreateWidget(PtMenu, gui.vimWindow, 0, NULL);
+	menu->submenu_id = PtCreateWidget(PtMenu, gui.vimWindow, 0, வெற்று);
 	PtAddCallback(menu->submenu_id, Pt_CB_UNREALIZED,
 		gui_ph_handle_menu_unrealized, menu);
     }
 }
 
-    void
-gui_mch_add_menu_item(vimmenu_T *menu, int index)
+    வெறுமை
+gui_mch_add_menu_item(vimmenu_T *menu, முழு index)
 {
     vimmenu_T	*parent = menu->parent;
-    char_u	*accel_key;
+    char_u	*accel_சாவி;
     char_u	mnemonic_str[MB_LEN_MAX];
-    int	    n;
+    முழு	    n;
     PtArg_t args[13];
 
     n = 0;
     PtSetArg(&args[ n++ ], Pt_ARG_POINTER, menu, 0);
 
 # ifdef FEAT_TOOLBAR
-    if (menu_is_toolbar(parent->name))
+    எனில் (menu_is_toolbar(parent->name))
     {
-	if (menu_is_separator(menu->name))
+	எனில் (menu_is_separator(menu->name))
 	{
 	    PtSetArg(&args[ n++ ], Pt_ARG_SEP_FLAGS,
 		    Pt_SEP_VERTICAL, Pt_SEP_ORIENTATION);
 	    PtSetArg(&args[ n++ ], Pt_ARG_SEP_TYPE, Pt_ETCHED_IN, 0);
 	    PtSetArg(&args[ n++ ], Pt_ARG_ANCHOR_FLAGS,
-		    Pt_TRUE, Pt_ANCHOR_TOP_BOTTOM);
+		    Pt_TRUE, Pt_ANCHOR_உச்சி_BOTTOM);
 	    PtSetArg(&args[ n++ ], Pt_ARG_WIDTH, 2, 0);
 	    menu->id = PtCreateWidget(PtSeparator, gui.vimToolBar, n, args);
 	}
-	else
+	இல்லையெனில்
 	{
-	    if (strstr((const char *) p_toolbar, "text") != NULL)
+	    எனில் (strstr((மாறிலி எழுத்து *) p_toolbar, "text") != வெற்று)
 	    {
 		PtSetArg(&args[ n++ ], Pt_ARG_BALLOON_POSITION,
 			Pt_BALLOON_BOTTOM, 0);
 		PtSetArg(&args[ n++ ], Pt_ARG_TEXT_STRING, menu->dname, 0);
 		PtSetArg(&args[ n++ ], Pt_ARG_TEXT_FONT, "TextFont08", 0);
 	    }
-	    if ((strstr((const char *) p_toolbar, "icons") != NULL) &&
-		    (gui_ph_toolbar_images != NULL))
+	    எனில் ((strstr((மாறிலி எழுத்து *) p_toolbar, "icons") != வெற்று) &&
+		    (gui_ph_toolbar_images != வெற்று))
 	    {
 		PtSetArg(&args[ n++ ], Pt_ARG_LABEL_IMAGE,
 			gui_ph_toolbar_find_icon(menu), 0);
 		PtSetArg(&args[ n++ ], Pt_ARG_LABEL_TYPE, Pt_TEXT_IMAGE, 0);
 		PtSetArg(&args[ n++ ], Pt_ARG_TEXT_IMAGE_SPACING, 0, 0);
 	    }
-	    if (strstr((const char *) p_toolbar, "tooltips") != NULL)
+	    எனில் (strstr((மாறிலி எழுத்து *) p_toolbar, "tooltips") != வெற்று)
 	    {
 		PtSetArg(&args[ n++ ], Pt_ARG_LABEL_BALLOON,
 			gui_ph_show_tooltip, 0);
@@ -2630,27 +2630,27 @@ gui_mch_add_menu_item(vimmenu_T *menu, int index)
 	    PtAddCallback(menu->id, Pt_CB_ACTIVATE, gui_ph_handle_menu, menu);
 	}
 	// Update toolbar if it's open
-	if (PtWidgetIsRealized(gui.vimToolBar))
+	எனில் (PtWidgetIsRealized(gui.vimToolBar))
 	    PtRealizeWidget(menu->id);
     }
-    else
+    இல்லையெனில்
 # endif
-	if (menu_is_separator(menu->name))
+	எனில் (menu_is_separator(menu->name))
     {
 	menu->id = PtCreateWidget(PtSeparator, parent->submenu_id, n, args);
     }
-    else
+    இல்லையெனில்
     {
-	accel_key = vim_strchr(menu->name, '&');
-	if (accel_key != NULL)
+	accel_சாவி = vim_strchr(menu->name, '&');
+	எனில் (accel_சாவி != வெற்று)
 	{
-	    mnemonic_str[0] = accel_key[1];
+	    mnemonic_str[0] = accel_சாவி[1];
 	    mnemonic_str[1] = NUL;
 	}
 
 	PtSetArg(&args[ n++ ], Pt_ARG_TEXT_STRING, menu->dname, 0);
-	if (accel_key != NULL)
-	    PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_KEY, mnemonic_str,
+	எனில் (accel_சாவி != வெற்று)
+	    PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_சாவி, mnemonic_str,
 		    0);
 
 	PtSetArg(&args[ n++ ], Pt_ARG_ACCEL_TEXT, menu->actext, 0);
@@ -2660,7 +2660,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int index)
 	PtAddCallback(menu->id, Pt_CB_ACTIVATE, gui_ph_handle_menu, menu);
 
 # ifdef USE_PANEL_GROUP
-	if (gui_ph_is_buffer_item(menu, parent) == TRUE)
+	எனில் (gui_ph_is_buffer_item(menu, parent) == TRUE)
 	{
 	    PtAddCallback(menu->id, Pt_CB_DESTROYED,
 		    gui_ph_handle_buffer_remove, menu);
@@ -2672,82 +2672,82 @@ gui_mch_add_menu_item(vimmenu_T *menu, int index)
     gui_ph_position_menu(menu->id, menu->priority);
 }
 
-    void
+    வெறுமை
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
-    if (menu->submenu_id != NULL)
+    எனில் (menu->submenu_id != வெற்று)
 	PtDestroyWidget(menu->submenu_id);
-    if (menu->id != NULL)
+    எனில் (menu->id != வெற்று)
 	PtDestroyWidget(menu->id);
 
-    menu->submenu_id = NULL;
-    menu->id = NULL;
+    menu->submenu_id = வெற்று;
+    menu->id = வெற்று;
 }
 
-    void
-gui_mch_menu_grey(vimmenu_T *menu, int grey)
+    வெறுமை
+gui_mch_menu_grey(vimmenu_T *menu, முழு grey)
 {
     long    flags, mask, fields;
 
-    if (menu->id == NULL)
-	return;
+    எனில் (menu->id == வெற்று)
+	திரும்பு;
 
     flags = PtWidgetFlags(menu->id);
-    if (PtWidgetIsClass(menu->id, PtMenuButton) &&
+    எனில் (PtWidgetIsClass(menu->id, PtMenuButton) &&
 	    PtWidgetIsClass(PtWidgetParent(menu->id), PtMenu))
     {
 	fields = Pt_FALSE;
 	mask = Pt_SELECTABLE | Pt_HIGHLIGHTED;
     }
-    else
+    இல்லையெனில்
     {
 	fields = Pt_TRUE;
 	mask = Pt_BLOCKED | Pt_GHOST;
     }
 
-    if (! grey)
+    எனில் (! grey)
 	fields = ~fields;
 
     PtSetResource(menu->id, Pt_ARG_FLAGS, fields,
 	    mask);
 }
 
-    void
-gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
+    வெறுமை
+gui_mch_menu_hidden(vimmenu_T *menu, முழு hidden)
 {
     // TODO: [un]realize the widget?
 }
 
-    void
-gui_mch_draw_menubar(void)
+    வெறுமை
+gui_mch_draw_menubar(வெறுமை)
 {
     // The only time a redraw is needed is when a menu button
     // is added to the menubar, and that is detected and the bar
     // redrawn in gui_mch_add_menu_item
 }
 
-    void
+    வெறுமை
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
     PtSetResource(menu->submenu_id, Pt_ARG_POS, &abs_mouse, 0);
     PtRealizeWidget(menu->submenu_id);
 }
 
-    void
-gui_mch_toggle_tearoffs(int enable)
+    வெறுமை
+gui_mch_toggle_tearoffs(முழு enable)
 {
     // No tearoffs yet
 }
 
 #endif
 
-#if defined(FEAT_TOOLBAR)
-    void
-gui_mch_show_toolbar(int showit)
+#எனில் defined(FEAT_TOOLBAR)
+    வெறுமை
+gui_mch_show_toolbar(முழு showit)
 {
-    if (showit)
+    எனில் (showit)
 	PtRealizeWidget(gui.vimToolBar);
-    else
+    இல்லையெனில்
 	PtUnrealizeWidget(gui.vimToolBar);
 }
 #endif
@@ -2755,7 +2755,7 @@ gui_mch_show_toolbar(int showit)
 ////////////////////////////////////////////////////////////////////////////
 // Fonts
 
-    static GuiFont
+    நிலையான GuiFont
 gui_ph_get_font(
 	char_u	*font_name,
 	int_u	font_flags,
@@ -2770,35 +2770,35 @@ gui_ph_get_font(
     int_u	    style;
 
     font_tag = alloc(MAX_FONT_TAG);
-    if (font_tag != NULL)
+    எனில் (font_tag != வெற்று)
     {
-	if (PfGenerateFontName(font_name, font_flags, font_size,
-		    font_tag) != NULL)
+	எனில் (PfGenerateFontName(font_name, font_flags, font_size,
+		    font_tag) != வெற்று)
 	{
 	    // Enforce some limits on the font used
 	    style = PHFONT_INFO_FIXED;
 
-	    if (enforce & PF_STYLE_BOLD)
+	    எனில் (enforce & PF_STYLE_BOLD)
 		style |= PHFONT_INFO_BOLD;
-	    if (enforce & PF_STYLE_ANTIALIAS)
+	    எனில் (enforce & PF_STYLE_ANTIALIAS)
 		style |= PHFONT_INFO_ALIAS;
-	    if (enforce & PF_STYLE_ITALIC)
+	    எனில் (enforce & PF_STYLE_ITALIC)
 		style |= PHFONT_INFO_ITALIC;
 
 	    PfQueryFontInfo(font_tag, &info);
 
-	    if (info.size == 0)
+	    எனில் (info.size == 0)
 		font_size = 0;
 
 	    // Make sure font size matches, and that the font style
 	    // at least has the bits we're checking for
-	    if (font_size == info.size &&
+	    எனில் (font_size == info.size &&
 		    style == (info.style & style))
-		return (GuiFont)font_tag;
+		திரும்பு (GuiFont)font_tag;
 	}
 	vim_free(font_tag);
     }
-    return NULL;
+    திரும்பு வெற்று;
 }
 
 /*
@@ -2813,7 +2813,7 @@ gui_ph_get_font(
  *
  */
 
-    static int
+    நிலையான முழு
 gui_ph_parse_font_name(
 	char_u *vim_font,
 	char_u **font_name,
@@ -2824,67 +2824,67 @@ gui_ph_parse_font_name(
     int_u   name_len, size;
 
     mark = vim_strchr(vim_font, ':');
-    if (mark == NULL)
+    எனில் (mark == வெற்று)
 	name_len = STRLEN(vim_font);
-    else
+    இல்லையெனில்
 	name_len = (int_u) (mark - vim_font);
 
     *font_name = vim_strnsave(vim_font, name_len);
-    if (*font_name != NULL)
+    எனில் (*font_name != வெற்று)
     {
-	if (mark != NULL)
+	எனில் (mark != வெற்று)
 	{
-	    while (*mark != NUL && *mark++ == ':')
+	    போது (*mark != NUL && *mark++ == ':')
 	    {
-		switch (SAFE_tolower(*mark++))
+		தேர்வு (SAFE_tolower(*mark++))
 		{
-		    case 'a': *font_flags |= PF_STYLE_ANTIALIAS; break;
-		    case 'b': *font_flags |= PF_STYLE_BOLD; break;
-		    case 'i': *font_flags |= PF_STYLE_ITALIC; break;
+		    நிலை 'a': *font_flags |= PF_STYLE_ANTIALIAS; நிறுத்து;
+		    நிலை 'b': *font_flags |= PF_STYLE_BOLD; நிறுத்து;
+		    நிலை 'i': *font_flags |= PF_STYLE_ITALIC; நிறுத்து;
 
-		    case 's':
+		    நிலை 's':
 			size = getdigits(&mark);
 			// Restrict the size to some vague limits
-			if (size < 1 || size > 100)
+			எனில் (size < 1 || size > 100)
 			    size = 8;
 
 			*font_size = size;
-			break;
+			நிறுத்து;
 
-		    default:
-			break;
+		    இயல்பு:
+			நிறுத்து;
 		}
 	    }
 	}
-	return TRUE;
+	திரும்பு TRUE;
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
-    int
-gui_mch_init_font(char_u *vim_font_name, int fontset)
+    முழு
+gui_mch_init_font(char_u *vim_font_name, முழு fontset)
 {
     char_u  *font_tag;
-    char_u  *font_name = NULL;
+    char_u  *font_name = வெற்று;
     int_u   font_flags = 0;
     int_u   font_size  = 12;
 
     FontQueryInfo info;
     PhRect_t extent;
 
-    if (vim_font_name == NULL)
+    எனில் (vim_font_name == வெற்று)
     {
 	// Default font
 	vim_font_name = "PC Terminal";
     }
 
-    if (STRCMP(vim_font_name, "*") == 0)
+    எனில் (STRCMP(vim_font_name, "*") == 0)
     {
-	font_tag = PtFontSelection(gui.vimWindow, NULL, NULL,
-		"pcterm12", -1, PHFONT_FIXED, NULL);
+	font_tag = PtFontSelection(gui.vimWindow, வெற்று, வெற்று,
+		"pcterm12", -1, PHFONT_FIXED, வெற்று);
 
-	if (font_tag == NULL)
-	    return FAIL;
+	எனில் (font_tag == வெற்று)
+	    திரும்பு FAIL;
 
 	gui_mch_free_font(gui.norm_font);
 	gui.norm_font = font_tag;
@@ -2892,17 +2892,17 @@ gui_mch_init_font(char_u *vim_font_name, int fontset)
 	PfQueryFontInfo(font_tag, &info);
 	font_name = vim_strsave(info.font);
     }
-    else
+    இல்லையெனில்
     {
-	if (gui_ph_parse_font_name(vim_font_name, &font_name, &font_flags,
+	எனில் (gui_ph_parse_font_name(vim_font_name, &font_name, &font_flags,
 		    &font_size) == FALSE)
-	    return FAIL;
+	    திரும்பு FAIL;
 
 	font_tag = gui_ph_get_font(font_name, font_flags, font_size, 0);
-	if (font_tag == NULL)
+	எனில் (font_tag == வெற்று)
 	{
 	    vim_free(font_name);
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
 
 	gui_mch_free_font(gui.norm_font);
@@ -2918,21 +2918,21 @@ gui_mch_init_font(char_u *vim_font_name, int fontset)
 	    font_size, PF_STYLE_ITALIC);
 
     // This extent was brought to you by the letter 'g'
-    PfExtentText(&extent, NULL, font_tag, "g", 1);
+    PfExtentText(&extent, வெற்று, font_tag, "g", 1);
 
     gui.char_width = extent.lr.x - extent.ul.x + 1;
     gui.char_height = (- extent.ul.y) + extent.lr.y + 1;
     gui.char_ascent = - extent.ul.y;
 
     vim_free(font_name);
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
-gui_mch_adjust_charheight(void)
+    முழு
+gui_mch_adjust_charheight(வெறுமை)
 {
     FontQueryInfo info;
 
@@ -2941,34 +2941,34 @@ gui_mch_adjust_charheight(void)
     gui.char_height = - info.ascender + info.descender + p_linespace;
     gui.char_ascent = - info.ascender + p_linespace / 2;
 
-    return OK;
+    திரும்பு OK;
 }
 
     GuiFont
-gui_mch_get_font(char_u *vim_font_name, int report_error)
+gui_mch_get_font(char_u *vim_font_name, முழு report_error)
 {
     char_u  *font_name;
     char_u  *font_tag;
     int_u   font_size = 12;
     int_u   font_flags = 0;
 
-    if (gui_ph_parse_font_name(vim_font_name, &font_name, &font_flags,
+    எனில் (gui_ph_parse_font_name(vim_font_name, &font_name, &font_flags,
 		&font_size) != FALSE)
     {
 	font_tag = gui_ph_get_font(font_name, font_flags, font_size, -1);
 	vim_free(font_name);
 
-	if (font_tag != NULL)
-	    return (GuiFont)font_tag;
+	எனில் (font_tag != வெற்று)
+	    திரும்பு (GuiFont)font_tag;
     }
 
-    if (report_error)
+    எனில் (report_error)
 	semsg(_(e_unknown_font_str), vim_font_name);
 
-    return FAIL;
+    திரும்பு FAIL;
 }
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 /*
  * Return the name of font "font" in allocated memory.
  * Don't know how to get the actual name, thus use the provided name.
@@ -2976,19 +2976,19 @@ gui_mch_get_font(char_u *vim_font_name, int report_error)
     char_u *
 gui_mch_get_fontname(GuiFont font, char_u *name)
 {
-    if (name == NULL)
-	return NULL;
-    return vim_strsave(name);
+    எனில் (name == வெற்று)
+	திரும்பு வெற்று;
+    திரும்பு vim_strsave(name);
 }
 #endif
 
-    void
+    வெறுமை
 gui_mch_set_font(GuiFont font)
 {
     PgSetFont(font);
 }
 
-    void
+    வெறுமை
 gui_mch_free_font(GuiFont font)
 {
     vim_free(font);

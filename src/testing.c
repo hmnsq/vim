@@ -11,34 +11,34 @@
  * testing.c: Support for tests.
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 
 /*
  * Prepare "gap" for an assert error and add the sourcing position.
  */
-    static void
+    நிலையான வெறுமை
 prepare_assert_error(garray_T *gap)
 {
     char_u  *sname = estack_sfile(ESTACK_NONE);
 
     ga_init2(gap, 1, 100);
-    if (sname != NULL)
+    எனில் (sname != வெற்று)
     {
 	ga_concat(gap, sname);
-	if (SOURCING_LNUM > 0)
+	எனில் (SOURCING_LNUM > 0)
 	    GA_CONCAT_LITERAL(gap, " ");
     }
-    if (SOURCING_LNUM > 0)
+    எனில் (SOURCING_LNUM > 0)
     {
-	char    buf[NUMBUFLEN];
+	எழுத்து    buf[NUMBUFLEN];
 	size_t	buflen;
 
-	buflen = vim_snprintf_safelen(buf, sizeof(buf), "line %ld", (long)SOURCING_LNUM);
+	buflen = vim_snprintf_safelen(buf, அளவு(buf), "line %ld", (long)SOURCING_LNUM);
 	ga_concat_len(gap, (char_u *)buf, buflen);
     }
-    if (sname != NULL || SOURCING_LNUM > 0)
+    எனில் (sname != வெற்று || SOURCING_LNUM > 0)
 	GA_CONCAT_LITERAL(gap, ": ");
     vim_free(sname);
 }
@@ -47,40 +47,40 @@ prepare_assert_error(garray_T *gap)
  * Append "p[clen]" to "gap", escaping unprintable characters.
  * Changes NL to \n, CR to \r, etc.
  */
-    static void
-ga_concat_esc(garray_T *gap, char_u *p, int clen)
+    நிலையான வெறுமை
+ga_concat_esc(garray_T *gap, char_u *p, முழு clen)
 {
     char_u  buf[NUMBUFLEN];
 
-    if (clen > 1)
+    எனில் (clen > 1)
     {
 	mch_memmove(buf, p, clen);
 	buf[clen] = NUL;
 	ga_concat_len(gap, buf, clen);
-	return;
+	திரும்பு;
     }
 
-    switch (*p)
+    தேர்வு (*p)
     {
-	case BS: GA_CONCAT_LITERAL(gap, "\\b"); break;
-	case ESC: GA_CONCAT_LITERAL(gap, "\\e"); break;
-	case FF: GA_CONCAT_LITERAL(gap, "\\f"); break;
-	case NL: GA_CONCAT_LITERAL(gap, "\\n"); break;
-	case TAB: GA_CONCAT_LITERAL(gap, "\\t"); break;
-	case CAR: GA_CONCAT_LITERAL(gap, "\\r"); break;
-	case '\\': GA_CONCAT_LITERAL(gap, "\\\\"); break;
-	default:
-	   if (*p < ' ' || *p == 0x7f)
+	நிலை BS: GA_CONCAT_LITERAL(gap, "\\b"); நிறுத்து;
+	நிலை ESC: GA_CONCAT_LITERAL(gap, "\\e"); நிறுத்து;
+	நிலை FF: GA_CONCAT_LITERAL(gap, "\\f"); நிறுத்து;
+	நிலை NL: GA_CONCAT_LITERAL(gap, "\\n"); நிறுத்து;
+	நிலை TAB: GA_CONCAT_LITERAL(gap, "\\t"); நிறுத்து;
+	நிலை CAR: GA_CONCAT_LITERAL(gap, "\\r"); நிறுத்து;
+	நிலை '\\': GA_CONCAT_LITERAL(gap, "\\\\"); நிறுத்து;
+	இயல்பு:
+	   எனில் (*p < ' ' || *p == 0x7f)
 	   {
 		size_t	buflen;
 
-		buflen = vim_snprintf_safelen((char *)buf, sizeof(buf),
+		buflen = vim_snprintf_safelen((எழுத்து *)buf, அளவு(buf),
 		    "\\x%02x", *p);
 		ga_concat_len(gap, buf, buflen);
 	   }
-	   else
+	   இல்லையெனில்
 	       ga_append(gap, *p);
-	   break;
+	   நிறுத்து;
     }
 }
 
@@ -88,46 +88,46 @@ ga_concat_esc(garray_T *gap, char_u *p, int clen)
  * Append "str" to "gap", escaping unprintable characters.
  * Changes NL to \n, CR to \r, etc.
  */
-    static void
+    நிலையான வெறுமை
 ga_concat_shorten_esc(garray_T *gap, char_u *str)
 {
     char_u  *p;
     char_u  *s;
-    int	    c;
-    int	    clen;
+    முழு	    c;
+    முழு	    clen;
     char_u  buf[NUMBUFLEN];
     size_t  buflen;
-    int	    same_len;
+    முழு	    same_len;
 
-    if (str == NULL)
+    எனில் (str == வெற்று)
     {
 	GA_CONCAT_LITERAL(gap, "NULL");
-	return;
+	திரும்பு;
     }
 
-    for (p = str; *p != NUL; )
+    க்கு (p = str; *p != NUL; )
     {
 	same_len = 1;
 	s = p;
 	c = mb_cptr2char_adv(&s);
 	clen = s - p;
-	while (*s != NUL && c == mb_ptr2char(s))
+	போது (*s != NUL && c == mb_ptr2char(s))
 	{
 	    ++same_len;
 	    s += clen;
 	}
-	if (same_len > 20)
+	எனில் (same_len > 20)
 	{
 	    GA_CONCAT_LITERAL(gap, "\\[");
 	    ga_concat_esc(gap, p, clen);
 	    GA_CONCAT_LITERAL(gap, " occurs ");
-	    buflen = vim_snprintf_safelen((char *)buf, sizeof(buf),
+	    buflen = vim_snprintf_safelen((எழுத்து *)buf, அளவு(buf),
 		"%d", same_len);
 	    ga_concat_len(gap, buf, buflen);
 	    GA_CONCAT_LITERAL(gap, " times]");
 	    p = s;
 	}
-	else
+	இல்லையெனில்
 	{
 	    ga_concat_esc(gap, p, clen);
 	    p += clen;
@@ -138,10 +138,10 @@ ga_concat_shorten_esc(garray_T *gap, char_u *str)
 /*
  * Fill "gap" with information about an assert error.
  */
-    static void
+    நிலையான வெறுமை
 fill_assert_error(
     garray_T	*gap,
-    typval_T	*opt_msg_tv,
+    typval_T	*opt_செய்தி_tv,
     char_u      *exp_str,
     typval_T	*exp_tv_arg,
     typval_T	*got_tv_arg,
@@ -151,84 +151,84 @@ fill_assert_error(
     char_u	*tofree;
     typval_T	*exp_tv = exp_tv_arg;
     typval_T	*got_tv = got_tv_arg;
-    int		did_copy = FALSE;
-    int		omitted = 0;
+    முழு		did_copy = FALSE;
+    முழு		omitted = 0;
 
-    if (opt_msg_tv->v_type != VAR_UNKNOWN
-	    && !(opt_msg_tv->v_type == VAR_STRING
-		&& (opt_msg_tv->vval.v_string == NULL
-		    || *opt_msg_tv->vval.v_string == NUL)))
+    எனில் (opt_செய்தி_tv->v_type != VAR_UNKNOWN
+	    && !(opt_செய்தி_tv->v_type == VAR_STRING
+		&& (opt_செய்தி_tv->vval.v_string == வெற்று
+		    || *opt_செய்தி_tv->vval.v_string == NUL)))
     {
-	ga_concat(gap, echo_string(opt_msg_tv, &tofree, numbuf, 0));
+	ga_concat(gap, echo_string(opt_செய்தி_tv, &tofree, numbuf, 0));
 	vim_free(tofree);
 	GA_CONCAT_LITERAL(gap, ": ");
     }
 
-    if (atype == ASSERT_MATCH || atype == ASSERT_NOTMATCH)
+    எனில் (atype == ASSERT_MATCH || atype == ASSERT_NOTMATCH)
 	GA_CONCAT_LITERAL(gap, "Pattern ");
-    else if (atype == ASSERT_NOTEQUAL)
+    இல்லையெனில் எனில் (atype == ASSERT_NOTEQUAL)
 	GA_CONCAT_LITERAL(gap, "Expected not equal to ");
-    else
+    இல்லையெனில்
 	GA_CONCAT_LITERAL(gap, "Expected ");
-    if (exp_str == NULL)
+    எனில் (exp_str == வெற்று)
     {
 	// When comparing dictionaries, drop the items that are equal, so that
 	// it's a lot easier to see what differs.
-	if (atype != ASSERT_NOTEQUAL
+	எனில் (atype != ASSERT_NOTEQUAL
 		&& exp_tv->v_type == VAR_DICT && got_tv->v_type == VAR_DICT
-		&& exp_tv->vval.v_dict != NULL && got_tv->vval.v_dict != NULL)
+		&& exp_tv->vval.v_dict != வெற்று && got_tv->vval.v_dict != வெற்று)
 	{
 	    dict_T	*exp_d = exp_tv->vval.v_dict;
 	    dict_T	*got_d = got_tv->vval.v_dict;
 	    hashitem_T	*hi;
 	    dictitem_T	*item2;
-	    int		todo;
+	    முழு		todo;
 
 	    did_copy = TRUE;
 	    exp_tv->vval.v_dict = dict_alloc();
 	    got_tv->vval.v_dict = dict_alloc();
-	    if (exp_tv->vval.v_dict == NULL || got_tv->vval.v_dict == NULL)
+	    எனில் (exp_tv->vval.v_dict == வெற்று || got_tv->vval.v_dict == வெற்று)
 	    {
 		dict_unref(exp_tv->vval.v_dict);
-		exp_tv->vval.v_dict = NULL;
+		exp_tv->vval.v_dict = வெற்று;
 		dict_unref(got_tv->vval.v_dict);
-		got_tv->vval.v_dict = NULL;
-		return;
+		got_tv->vval.v_dict = வெற்று;
+		திரும்பு;
 	    }
 
-	    todo = (int)exp_d->dv_hashtab.ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(&exp_d->dv_hashtab, hi, todo)
+	    todo = (முழு)exp_d->dv_hashtab.ht_used;
+	    FOR_ALL_HASHTAB_பொருட்கள்(&exp_d->dv_hashtab, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		எனில் (!HASHITEM_EMPTY(hi))
 		{
-		    item2 = dict_find(got_d, hi->hi_key, -1);
-		    if (item2 == NULL || !tv_equal(&HI2DI(hi)->di_tv,
+		    item2 = dict_find(got_d, hi->hi_சாவி, -1);
+		    எனில் (item2 == வெற்று || !tv_equal(&HI2DI(hi)->di_tv,
 						  &item2->di_tv, FALSE))
 		    {
 			// item of exp_d not present in got_d or values differ.
 			dict_add_tv(exp_tv->vval.v_dict,
-					(char *)hi->hi_key, &HI2DI(hi)->di_tv);
-			if (item2 != NULL)
+					(எழுத்து *)hi->hi_சாவி, &HI2DI(hi)->di_tv);
+			எனில் (item2 != வெற்று)
 			    dict_add_tv(got_tv->vval.v_dict,
-					    (char *)hi->hi_key, &item2->di_tv);
+					    (எழுத்து *)hi->hi_சாவி, &item2->di_tv);
 		    }
-		    else
+		    இல்லையெனில்
 			++omitted;
 		    --todo;
 		}
 	    }
 
 	    // Add items only present in got_d.
-	    todo = (int)got_d->dv_hashtab.ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(&got_d->dv_hashtab, hi, todo)
+	    todo = (முழு)got_d->dv_hashtab.ht_used;
+	    FOR_ALL_HASHTAB_பொருட்கள்(&got_d->dv_hashtab, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		எனில் (!HASHITEM_EMPTY(hi))
 		{
-		    item2 = dict_find(exp_d, hi->hi_key, -1);
-		    if (item2 == NULL)
+		    item2 = dict_find(exp_d, hi->hi_சாவி, -1);
+		    எனில் (item2 == வெற்று)
 			// item of got_d not present in exp_d
 			dict_add_tv(got_tv->vval.v_dict,
-					(char *)hi->hi_key, &HI2DI(hi)->di_tv);
+					(எழுத்து *)hi->hi_சாவி, &HI2DI(hi)->di_tv);
 		    --todo;
 		}
 	    }
@@ -237,153 +237,153 @@ fill_assert_error(
 	ga_concat_shorten_esc(gap, tv2string(exp_tv, &tofree, numbuf, 0));
 	vim_free(tofree);
     }
-    else
+    இல்லையெனில்
     {
-	if (atype == ASSERT_FAILS)
+	எனில் (atype == ASSERT_FAILS)
 	    GA_CONCAT_LITERAL(gap, "'");
 	ga_concat_shorten_esc(gap, exp_str);
-	if (atype == ASSERT_FAILS)
+	எனில் (atype == ASSERT_FAILS)
 	    GA_CONCAT_LITERAL(gap, "'");
     }
-    if (atype != ASSERT_NOTEQUAL)
+    எனில் (atype != ASSERT_NOTEQUAL)
     {
-	if (atype == ASSERT_MATCH)
+	எனில் (atype == ASSERT_MATCH)
 	    GA_CONCAT_LITERAL(gap, " does not match ");
-	else if (atype == ASSERT_NOTMATCH)
+	இல்லையெனில் எனில் (atype == ASSERT_NOTMATCH)
 	    GA_CONCAT_LITERAL(gap, " does match ");
-	else
+	இல்லையெனில்
 	    GA_CONCAT_LITERAL(gap, " but got ");
 	ga_concat_shorten_esc(gap, tv2string(got_tv, &tofree, numbuf, 0));
 	vim_free(tofree);
 
-	if (omitted != 0)
+	எனில் (omitted != 0)
 	{
-	    char    buf[100];
+	    எழுத்து    buf[100];
 	    size_t  buflen;
 
-	    buflen = vim_snprintf_safelen(buf, sizeof(buf),
+	    buflen = vim_snprintf_safelen(buf, அளவு(buf),
 		" - %d equal item%s omitted", omitted, omitted == 1 ? "" : "s");
 	    ga_concat_len(gap, (char_u *)buf, buflen);
 	}
     }
 
-    if (did_copy)
+    எனில் (did_copy)
     {
 	clear_tv(exp_tv);
 	clear_tv(got_tv);
     }
 }
 
-    static int
+    நிலையான முழு
 assert_equal_common(typval_T *argvars, assert_type_T atype)
 {
     garray_T	ga;
 
-    if (tv_equal(&argvars[0], &argvars[1], FALSE)
+    எனில் (tv_equal(&argvars[0], &argvars[1], FALSE)
 						   != (atype == ASSERT_EQUAL))
     {
 	prepare_assert_error(&ga);
-	fill_assert_error(&ga, &argvars[2], NULL, &argvars[0], &argvars[1],
+	fill_assert_error(&ga, &argvars[2], வெற்று, &argvars[0], &argvars[1],
 								       atype);
 	assert_error(&ga);
 	ga_clear(&ga);
-	return 1;
+	திரும்பு 1;
     }
-    return 0;
+    திரும்பு 0;
 }
 
-    static int
+    நிலையான முழு
 assert_match_common(typval_T *argvars, assert_type_T atype)
 {
     garray_T	ga;
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return 1;
+	திரும்பு 1;
 
     char_u *pat = tv_get_string_buf_chk(&argvars[0], buf1);
     char_u *text = tv_get_string_buf_chk(&argvars[1], buf2);
-    if (pat != NULL && text != NULL
+    எனில் (pat != வெற்று && text != வெற்று
 		 && pattern_match(pat, text, FALSE) != (atype == ASSERT_MATCH))
     {
 	prepare_assert_error(&ga);
-	fill_assert_error(&ga, &argvars[2], NULL, &argvars[0], &argvars[1],
+	fill_assert_error(&ga, &argvars[2], வெற்று, &argvars[0], &argvars[1],
 									atype);
 	assert_error(&ga);
 	ga_clear(&ga);
-	return 1;
+	திரும்பு 1;
     }
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * Common for assert_true() and assert_false().
  * Return non-zero for failure.
  */
-    static int
-assert_bool(typval_T *argvars, int isTrue)
+    நிலையான முழு
+assert_bool(typval_T *argvars, முழு isTrue)
 {
-    int		error = FALSE;
+    முழு		error = FALSE;
     garray_T	ga;
 
-    if (argvars[0].v_type == VAR_BOOL
-	    && argvars[0].vval.v_number == (isTrue ? VVAL_TRUE : VVAL_FALSE))
-	return 0;
-    if (argvars[0].v_type != VAR_NUMBER
-	    || (tv_get_number_chk(&argvars[0], &error) == 0) == isTrue
+    எனில் (argvars[0].v_type == VAR_BOOL
+	    && argvars[0].vval.v_எண் == (isTrue ? VVAL_TRUE : VVAL_FALSE))
+	திரும்பு 0;
+    எனில் (argvars[0].v_type != VAR_எண்
+	    || (tv_get_எண்_chk(&argvars[0], &error) == 0) == isTrue
 	    || error)
     {
 	prepare_assert_error(&ga);
 	fill_assert_error(&ga, &argvars[1],
 		(char_u *)(isTrue ? "True" : "False"),
-		NULL, &argvars[0], ASSERT_OTHER);
+		வெற்று, &argvars[0], ASSERT_OTHER);
 	assert_error(&ga);
 	ga_clear(&ga);
-	return 1;
+	திரும்பு 1;
     }
-    return 0;
+    திரும்பு 0;
 }
 
-    static void
+    நிலையான வெறுமை
 assert_append_cmd_or_arg(garray_T *gap, typval_T *argvars, char_u *cmd)
 {
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
 
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
+    எனில் (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
     {
 	ga_concat(gap, echo_string(&argvars[2], &tofree, numbuf, 0));
 	vim_free(tofree);
     }
-    else
+    இல்லையெனில்
 	ga_concat(gap, cmd);
 }
 
-    static int
-assert_beeps(typval_T *argvars, int no_beep)
+    நிலையான முழு
+assert_beeps(typval_T *argvars, முழு no_beep)
 {
     char_u	*cmd;
     garray_T	ga;
-    int		ret = 0;
+    முழு		ret = 0;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return 0;
+    எனில் (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	திரும்பு 0;
 
     cmd = tv_get_string_chk(&argvars[0]);
     called_vim_beep = FALSE;
     suppress_errthrow = TRUE;
     emsg_silent = FALSE;
     do_cmdline_cmd(cmd);
-    if (no_beep ? called_vim_beep : !called_vim_beep)
+    எனில் (no_beep ? called_vim_beep : !called_vim_beep)
     {
 	prepare_assert_error(&ga);
-	if (no_beep)
+	எனில் (no_beep)
 	    GA_CONCAT_LITERAL(&ga, "command did beep: ");
-	else
+	இல்லையெனில்
 	    GA_CONCAT_LITERAL(&ga, "command did not beep: ");
 	ga_concat(&ga, cmd);
 	assert_error(&ga);
@@ -393,43 +393,43 @@ assert_beeps(typval_T *argvars, int no_beep)
 
     suppress_errthrow = FALSE;
     emsg_on_display = FALSE;
-    return ret;
+    திரும்பு ret;
 }
 
 /*
  * "assert_beeps(cmd)" function
  */
-    void
+    வெறுமை
 f_assert_beeps(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
-    rettv->vval.v_number = assert_beeps(argvars, FALSE);
+    rettv->vval.v_எண் = assert_beeps(argvars, FALSE);
 }
 
 /*
  * "assert_nobeep(cmd)" function
  */
-    void
+    வெறுமை
 f_assert_nobeep(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
-    rettv->vval.v_number = assert_beeps(argvars, TRUE);
+    rettv->vval.v_எண் = assert_beeps(argvars, TRUE);
 }
 
 /*
  * "assert_equal(expected, actual[, msg])" function
  */
-    void
+    வெறுமை
 f_assert_equal(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_equal_common(argvars, ASSERT_EQUAL);
+    rettv->vval.v_எண் = assert_equal_common(argvars, ASSERT_EQUAL);
 }
 
-    static int
+    நிலையான முழு
 assert_equalfile(typval_T *argvars)
 {
     char_u	buf1[NUMBUFLEN];
@@ -438,75 +438,75 @@ assert_equalfile(typval_T *argvars)
     char_u	*fname2 = tv_get_string_buf_chk(&argvars[1], buf2);
     FILE	*fd1;
     FILE	*fd2;
-    char	line1[200];
-    char	line2[200];
-    int		lineidx = 0;
+    எழுத்து	line1[200];
+    எழுத்து	line2[200];
+    முழு		lineidx = 0;
     size_t	IObufflen;
 
-    if (fname1 == NULL || fname2 == NULL)
-	return 0;
+    எனில் (fname1 == வெற்று || fname2 == வெற்று)
+	திரும்பு 0;
 
     IObuff[0] = NUL;
     IObufflen = 0;
-    fd1 = mch_fopen((char *)fname1, READBIN);
-    if (fd1 == NULL)
+    fd1 = mch_fopen((எழுத்து *)fname1, READBIN);
+    எனில் (fd1 == வெற்று)
     {
-	IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
-	    (char *)e_cant_read_file_str, fname1);
+	IObufflen = vim_snprintf_safelen((எழுத்து *)IObuff, IOSIZE,
+	    (எழுத்து *)e_cant_read_file_str, fname1);
     }
-    else
+    இல்லையெனில்
     {
-	fd2 = mch_fopen((char *)fname2, READBIN);
-	if (fd2 == NULL)
+	fd2 = mch_fopen((எழுத்து *)fname2, READBIN);
+	எனில் (fd2 == வெற்று)
 	{
 	    fclose(fd1);
-	    IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
-		(char *)e_cant_read_file_str, fname2);
+	    IObufflen = vim_snprintf_safelen((எழுத்து *)IObuff, IOSIZE,
+		(எழுத்து *)e_cant_read_file_str, fname2);
 	}
-	else
+	இல்லையெனில்
 	{
-	    int	    c1, c2;
-	    long    count = 0;
+	    முழு	    c1, c2;
+	    long    மொத்தம் = 0;
 	    long    linecount = 1;
 
-	    for (;;)
+	    க்கு (;;)
 	    {
 		c1 = fgetc(fd1);
 		c2 = fgetc(fd2);
-		if (c1 == EOF)
+		எனில் (c1 == EOF)
 		{
-		    if (c2 != EOF)
+		    எனில் (c2 != EOF)
 		    {
 			STRCPY(IObuff, "first file is shorter");
 			IObufflen = 21;
 		    }
-		    break;
+		    நிறுத்து;
 		}
-		else if (c2 == EOF)
+		இல்லையெனில் எனில் (c2 == EOF)
 		{
 		    STRCPY(IObuff, "second file is shorter");
 		    IObufflen = 22;
-		    break;
+		    நிறுத்து;
 		}
-		else
+		இல்லையெனில்
 		{
 		    line1[lineidx] = c1;
 		    line2[lineidx] = c2;
 		    ++lineidx;
-		    if (c1 != c2)
+		    எனில் (c1 != c2)
 		    {
-			IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
-			    "difference at byte %ld, line %ld", count, linecount);
-			break;
+			IObufflen = vim_snprintf_safelen((எழுத்து *)IObuff, IOSIZE,
+			    "difference at byte %ld, line %ld", மொத்தம், linecount);
+			நிறுத்து;
 		    }
 		}
-		++count;
-		if (c1 == NL)
+		++மொத்தம்;
+		எனில் (c1 == NL)
 		{
 		    ++linecount;
 		    lineidx = 0;
 		}
-		else if (lineidx + 2 == (int)sizeof(line1))
+		இல்லையெனில் எனில் (lineidx + 2 == (முழு)அளவு(line1))
 		{
 		    mch_memmove(line1, line1 + 100, lineidx - 100);
 		    mch_memmove(line2, line2 + 100, lineidx - 100);
@@ -518,11 +518,11 @@ assert_equalfile(typval_T *argvars)
 	}
     }
 
-    if (IObufflen > 0)
+    எனில் (IObufflen > 0)
     {
 	garray_T	ga;
 	prepare_assert_error(&ga);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	எனில் (argvars[2].v_type != VAR_UNKNOWN)
 	{
 	    char_u	numbuf[NUMBUFLEN];
 	    char_u	*tofree;
@@ -532,13 +532,13 @@ assert_equalfile(typval_T *argvars)
 	    GA_CONCAT_LITERAL(&ga, ": ");
 	}
 	ga_concat_len(&ga, IObuff, IObufflen);
-	if (lineidx > 0)
+	எனில் (lineidx > 0)
 	{
 	    line1[lineidx] = NUL;
 	    line2[lineidx] = NUL;
 	    GA_CONCAT_LITERAL(&ga, " after \"");
 	    ga_concat_len(&ga, (char_u *)line1, lineidx);
-	    if (STRCMP(line1, line2) != 0)
+	    எனில் (STRCMP(line1, line2) != 0)
 	    {
 		GA_CONCAT_LITERAL(&ga, "\" vs \"");
 		ga_concat_len(&ga, (char_u *)line2, lineidx);
@@ -547,91 +547,91 @@ assert_equalfile(typval_T *argvars)
 	}
 	assert_error(&ga);
 	ga_clear(&ga);
-	return 1;
+	திரும்பு 1;
     }
 
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * "assert_equalfile(fname-one, fname-two[, msg])" function
  */
-    void
+    வெறுமை
 f_assert_equalfile(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	திரும்பு;
 
-    rettv->vval.v_number = assert_equalfile(argvars);
+    rettv->vval.v_எண் = assert_equalfile(argvars);
 }
 
 /*
  * "assert_notequal(expected, actual[, msg])" function
  */
-    void
+    வெறுமை
 f_assert_notequal(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_equal_common(argvars, ASSERT_NOTEQUAL);
+    rettv->vval.v_எண் = assert_equal_common(argvars, ASSERT_NOTEQUAL);
 }
 
 /*
  * "assert_exception(string[, msg])" function
  */
-    void
+    வெறுமை
 f_assert_exception(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
     char_u	*error;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     error = tv_get_string_chk(&argvars[0]);
-    if (*get_vim_var_str(VV_EXCEPTION) == NUL)
+    எனில் (*get_vim_var_str(VV_EXCEPTION) == NUL)
     {
 	prepare_assert_error(&ga);
 	GA_CONCAT_LITERAL(&ga, "v:exception is not set");
 	assert_error(&ga);
 	ga_clear(&ga);
-	rettv->vval.v_number = 1;
+	rettv->vval.v_எண் = 1;
     }
-    else if (error != NULL
-	&& strstr((char *)get_vim_var_str(VV_EXCEPTION), (char *)error) == NULL)
+    இல்லையெனில் எனில் (error != வெற்று
+	&& strstr((எழுத்து *)get_vim_var_str(VV_EXCEPTION), (எழுத்து *)error) == வெற்று)
     {
 	prepare_assert_error(&ga);
-	fill_assert_error(&ga, &argvars[1], NULL, &argvars[0],
+	fill_assert_error(&ga, &argvars[1], வெற்று, &argvars[0],
 				  get_vim_var_tv(VV_EXCEPTION), ASSERT_OTHER);
 	assert_error(&ga);
 	ga_clear(&ga);
-	rettv->vval.v_number = 1;
+	rettv->vval.v_எண் = 1;
     }
 }
 
 /*
  * "assert_fails(cmd [, error[, msg]])" function
  */
-    void
+    வெறுமை
 f_assert_fails(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
-    int		save_trylevel = trylevel;
-    int		called_emsg_before = called_emsg;
-    char	*wrong_arg_msg = NULL;
-    char_u	*tofree = NULL;
+    முழு		save_trylevel = trylevel;
+    முழு		called_emsg_before = called_emsg;
+    எழுத்து	*wrong_arg_செய்தி = வெற்று;
+    char_u	*tofree = வெற்று;
 
-    if (check_for_string_or_number_arg(argvars, 0) == FAIL
+    எனில் (check_for_string_or_எண்_arg(argvars, 0) == FAIL
 	    || check_for_opt_string_or_list_arg(argvars, 1) == FAIL
 	    || (argvars[1].v_type != VAR_UNKNOWN
 		&& (argvars[2].v_type != VAR_UNKNOWN
-		    && (check_for_opt_number_arg(argvars, 3) == FAIL
+		    && (check_for_opt_எண்_arg(argvars, 3) == FAIL
 			|| (argvars[3].v_type != VAR_UNKNOWN
 			    && check_for_opt_string_arg(argvars, 4) == FAIL)))))
-	return;
+	திரும்பு;
 
     // trylevel must be zero for a ":throw" command to be considered failed
     trylevel = 0;
@@ -646,62 +646,62 @@ f_assert_fails(typval_T *argvars, typval_T *rettv)
     trylevel = save_trylevel;
     suppress_errthrow = FALSE;
 
-    if (called_emsg == called_emsg_before)
+    எனில் (called_emsg == called_emsg_before)
     {
 	prepare_assert_error(&ga);
 	GA_CONCAT_LITERAL(&ga, "command did not fail: ");
 	assert_append_cmd_or_arg(&ga, argvars, cmd);
 	assert_error(&ga);
 	ga_clear(&ga);
-	rettv->vval.v_number = 1;
+	rettv->vval.v_எண் = 1;
     }
-    else if (argvars[1].v_type != VAR_UNKNOWN)
+    இல்லையெனில் எனில் (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u	buf[NUMBUFLEN];
 	char_u	*expected;
-	char_u	*expected_str = NULL;
-	int	error_found = FALSE;
-	int	error_found_index = 1;
-	char_u	*actual = emsg_assert_fails_msg == NULL ? (char_u *)"[unknown]"
-						       : emsg_assert_fails_msg;
+	char_u	*expected_str = வெற்று;
+	முழு	error_found = FALSE;
+	முழு	error_found_index = 1;
+	char_u	*actual = emsg_assert_fails_செய்தி == வெற்று ? (char_u *)"[unknown]"
+						       : emsg_assert_fails_செய்தி;
 
-	if (argvars[1].v_type == VAR_STRING)
+	எனில் (argvars[1].v_type == VAR_STRING)
 	{
 	    expected = tv_get_string_buf_chk(&argvars[1], buf);
-	    error_found = expected == NULL
-			   || strstr((char *)actual, (char *)expected) == NULL;
+	    error_found = expected == வெற்று
+			   || strstr((எழுத்து *)actual, (எழுத்து *)expected) == வெற்று;
 	}
-	else if (argvars[1].v_type == VAR_LIST)
+	இல்லையெனில் எனில் (argvars[1].v_type == VAR_LIST)
 	{
 	    list_T	*list = argvars[1].vval.v_list;
 	    typval_T	*tv;
 
-	    if (list == NULL || list->lv_len < 1 || list->lv_len > 2)
+	    எனில் (list == வெற்று || list->lv_len < 1 || list->lv_len > 2)
 	    {
-		wrong_arg_msg = e_assert_fails_second_arg;
-		goto theend;
+		wrong_arg_செய்தி = e_assert_fails_second_arg;
+		செல் theend;
 	    }
 	    CHECK_LIST_MATERIALIZE(list);
 	    tv = &list->lv_first->li_tv;
 	    expected = tv_get_string_buf_chk(tv, buf);
-	    if (expected == NULL)
-		goto theend;
-	    if (!pattern_match(expected, actual, FALSE))
+	    எனில் (expected == வெற்று)
+		செல் theend;
+	    எனில் (!pattern_match(expected, actual, FALSE))
 	    {
 		error_found = TRUE;
 		expected_str = expected;
 	    }
-	    else if (list->lv_len == 2)
+	    இல்லையெனில் எனில் (list->lv_len == 2)
 	    {
 		// make a copy, an error in pattern_match() may free it
 		tofree = actual = vim_strsave(get_vim_var_str(VV_ERRMSG));
-		if (actual != NULL)
+		எனில் (actual != வெற்று)
 		{
 		    tv = &list->lv_u.mat.lv_last->li_tv;
 		    expected = tv_get_string_buf_chk(tv, buf);
-		    if (expected == NULL)
-			goto theend;
-		    if (!pattern_match(expected, actual, FALSE))
+		    எனில் (expected == வெற்று)
+			செல் theend;
+		    எனில் (!pattern_match(expected, actual, FALSE))
 		    {
 			error_found = TRUE;
 			expected_str = expected;
@@ -709,34 +709,34 @@ f_assert_fails(typval_T *argvars, typval_T *rettv)
 		}
 	    }
 	}
-	else
+	இல்லையெனில்
 	{
-	    wrong_arg_msg = e_assert_fails_second_arg;
-	    goto theend;
+	    wrong_arg_செய்தி = e_assert_fails_second_arg;
+	    செல் theend;
 	}
 
-	if (!error_found && argvars[2].v_type != VAR_UNKNOWN
+	எனில் (!error_found && argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
 	{
-	    if (argvars[3].v_type != VAR_NUMBER)
+	    எனில் (argvars[3].v_type != VAR_எண்)
 	    {
-		wrong_arg_msg = e_assert_fails_fourth_argument;
-		goto theend;
+		wrong_arg_செய்தி = e_assert_fails_fourth_argument;
+		செல் theend;
 	    }
-	    else if (argvars[3].vval.v_number >= 0
-			 && argvars[3].vval.v_number != emsg_assert_fails_lnum)
+	    இல்லையெனில் எனில் (argvars[3].vval.v_எண் >= 0
+			 && argvars[3].vval.v_எண் != emsg_assert_fails_lnum)
 	    {
 		error_found = TRUE;
 		error_found_index = 3;
 	    }
-	    if (!error_found && argvars[4].v_type != VAR_UNKNOWN)
+	    எனில் (!error_found && argvars[4].v_type != VAR_UNKNOWN)
 	    {
-		if (argvars[4].v_type != VAR_STRING)
+		எனில் (argvars[4].v_type != VAR_STRING)
 		{
-		    wrong_arg_msg = e_assert_fails_fifth_argument;
-		    goto theend;
+		    wrong_arg_செய்தி = e_assert_fails_fifth_argument;
+		    செல் theend;
 		}
-		else if (argvars[4].vval.v_string != NULL
+		இல்லையெனில் எனில் (argvars[4].vval.v_string != வெற்று
 		    && !pattern_match(argvars[4].vval.v_string,
 					     emsg_assert_fails_context, FALSE))
 		{
@@ -746,22 +746,22 @@ f_assert_fails(typval_T *argvars, typval_T *rettv)
 	    }
 	}
 
-	if (error_found)
+	எனில் (error_found)
 	{
 	    typval_T actual_tv;
 
 	    prepare_assert_error(&ga);
-	    if (error_found_index == 3)
+	    எனில் (error_found_index == 3)
 	    {
-		actual_tv.v_type = VAR_NUMBER;
-		actual_tv.vval.v_number = emsg_assert_fails_lnum;
+		actual_tv.v_type = VAR_எண்;
+		actual_tv.vval.v_எண் = emsg_assert_fails_lnum;
 	    }
-	    else if (error_found_index == 4)
+	    இல்லையெனில் எனில் (error_found_index == 4)
 	    {
 		actual_tv.v_type = VAR_STRING;
 		actual_tv.vval.v_string = emsg_assert_fails_context;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		actual_tv.v_type = VAR_STRING;
 		actual_tv.vval.v_string = actual;
@@ -772,7 +772,7 @@ f_assert_fails(typval_T *argvars, typval_T *rettv)
 	    assert_append_cmd_or_arg(&ga, argvars, cmd);
 	    assert_error(&ga);
 	    ga_clear(&ga);
-	    rettv->vval.v_number = 1;
+	    rettv->vval.v_எண் = 1;
 	}
     }
 
@@ -782,36 +782,36 @@ theend:
     in_assert_fails = FALSE;
     did_emsg = FALSE;
     got_int = FALSE;
-    msg_col = 0;
+    செய்தி_col = 0;
     --no_wait_return;
     need_wait_return = FALSE;
     emsg_on_display = FALSE;
-    msg_scrolled = 0;
-    lines_left = Rows;
-    VIM_CLEAR(emsg_assert_fails_msg);
+    செய்தி_scrolled = 0;
+    வரிகள்_இடது = Rows;
+    VIM_CLEAR(emsg_assert_fails_செய்தி);
     vim_free(tofree);
-    set_vim_var_string(VV_ERRMSG, NULL, 0);
-    if (wrong_arg_msg != NULL)
-	emsg(_(wrong_arg_msg));
+    set_vim_var_string(VV_ERRMSG, வெற்று, 0);
+    எனில் (wrong_arg_செய்தி != வெற்று)
+	emsg(_(wrong_arg_செய்தி));
 }
 
 /*
  * "assert_false(actual[, msg])" function
  */
-    void
+    வெறுமை
 f_assert_false(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_bool(argvars, FALSE);
+    rettv->vval.v_எண் = assert_bool(argvars, FALSE);
 }
 
-    static int
+    நிலையான முழு
 assert_inrange(typval_T *argvars)
 {
     garray_T	ga;
-    int		error = FALSE;
+    முழு		error = FALSE;
     char_u	expected_str[200];
 
-    if (argvars[0].v_type == VAR_FLOAT
+    எனில் (argvars[0].v_type == VAR_FLOAT
 	    || argvars[1].v_type == VAR_FLOAT
 	    || argvars[2].v_type == VAR_FLOAT)
     {
@@ -819,137 +819,137 @@ assert_inrange(typval_T *argvars)
 	float_T fupper = tv_get_float(&argvars[1]);
 	float_T factual = tv_get_float(&argvars[2]);
 
-	if (factual < flower || factual > fupper)
+	எனில் (factual < flower || factual > fupper)
 	{
 	    prepare_assert_error(&ga);
-	    vim_snprintf((char *)expected_str, 200, "range %g - %g,",
+	    vim_snprintf((எழுத்து *)expected_str, 200, "range %g - %g,",
 							       flower, fupper);
-	    fill_assert_error(&ga, &argvars[3], expected_str, NULL,
+	    fill_assert_error(&ga, &argvars[3], expected_str, வெற்று,
 						    &argvars[2], ASSERT_OTHER);
 	    assert_error(&ga);
 	    ga_clear(&ga);
-	    return 1;
+	    திரும்பு 1;
 	}
     }
-    else
+    இல்லையெனில்
     {
-	varnumber_T	lower = tv_get_number_chk(&argvars[0], &error);
-	varnumber_T	upper = tv_get_number_chk(&argvars[1], &error);
-	varnumber_T	actual = tv_get_number_chk(&argvars[2], &error);
+	varnumber_T	lower = tv_get_எண்_chk(&argvars[0], &error);
+	varnumber_T	upper = tv_get_எண்_chk(&argvars[1], &error);
+	varnumber_T	actual = tv_get_எண்_chk(&argvars[2], &error);
 
-	if (error)
-	    return 0;
-	if (actual < lower || actual > upper)
+	எனில் (error)
+	    திரும்பு 0;
+	எனில் (actual < lower || actual > upper)
 	{
 	    prepare_assert_error(&ga);
-	    vim_snprintf((char *)expected_str, 200, "range %ld - %ld,",
+	    vim_snprintf((எழுத்து *)expected_str, 200, "range %ld - %ld,",
 						     (long)lower, (long)upper);
-	    fill_assert_error(&ga, &argvars[3], expected_str, NULL,
+	    fill_assert_error(&ga, &argvars[3], expected_str, வெற்று,
 						    &argvars[2], ASSERT_OTHER);
 	    assert_error(&ga);
 	    ga_clear(&ga);
-	    return 1;
+	    திரும்பு 1;
 	}
     }
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * "assert_inrange(lower, upper[, msg])" function
  */
-    void
+    வெறுமை
 f_assert_inrange(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_float_or_nr_arg(argvars, 0) == FAIL
+    எனில் (check_for_float_or_nr_arg(argvars, 0) == FAIL
 	    || check_for_float_or_nr_arg(argvars, 1) == FAIL
 	    || check_for_float_or_nr_arg(argvars, 2) == FAIL
 	    || check_for_opt_string_arg(argvars, 3) == FAIL)
-	return;
+	திரும்பு;
 
-    rettv->vval.v_number = assert_inrange(argvars);
+    rettv->vval.v_எண் = assert_inrange(argvars);
 }
 
 /*
  * "assert_match(pattern, actual[, msg])" function
  */
-    void
+    வெறுமை
 f_assert_match(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_match_common(argvars, ASSERT_MATCH);
+    rettv->vval.v_எண் = assert_match_common(argvars, ASSERT_MATCH);
 }
 
 /*
  * "assert_notmatch(pattern, actual[, msg])" function
  */
-    void
+    வெறுமை
 f_assert_notmatch(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_match_common(argvars, ASSERT_NOTMATCH);
+    rettv->vval.v_எண் = assert_match_common(argvars, ASSERT_NOTMATCH);
 }
 
 /*
  * "assert_report(msg)" function
  */
-    void
+    வெறுமை
 f_assert_report(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     prepare_assert_error(&ga);
     ga_concat(&ga, tv_get_string(&argvars[0]));
     assert_error(&ga);
     ga_clear(&ga);
-    rettv->vval.v_number = 1;
+    rettv->vval.v_எண் = 1;
 }
 
 /*
  * "assert_true(actual[, msg])" function
  */
-    void
+    வெறுமை
 f_assert_true(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = assert_bool(argvars, TRUE);
+    rettv->vval.v_எண் = assert_bool(argvars, TRUE);
 }
 
 /*
  * "test_alloc_fail(id, countdown, repeat)" function
  */
-    void
+    வெறுமை
 f_test_alloc_fail(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_number_arg(argvars, 2) == FAIL))
-	return;
+    எனில் (in_vim9script()
+	    && (check_for_எண்_arg(argvars, 0) == FAIL
+		|| check_for_எண்_arg(argvars, 1) == FAIL
+		|| check_for_எண்_arg(argvars, 2) == FAIL))
+	திரும்பு;
 
-    if (argvars[0].v_type != VAR_NUMBER
-	    || argvars[0].vval.v_number <= 0
-	    || argvars[1].v_type != VAR_NUMBER
-	    || argvars[1].vval.v_number < 0
-	    || argvars[2].v_type != VAR_NUMBER)
+    எனில் (argvars[0].v_type != VAR_எண்
+	    || argvars[0].vval.v_எண் <= 0
+	    || argvars[1].v_type != VAR_எண்
+	    || argvars[1].vval.v_எண் < 0
+	    || argvars[2].v_type != VAR_எண்)
 	emsg(_(e_invalid_argument));
-    else
+    இல்லையெனில்
     {
-	alloc_fail_id = argvars[0].vval.v_number;
-	if (alloc_fail_id >= aid_last)
+	alloc_fail_id = argvars[0].vval.v_எண்;
+	எனில் (alloc_fail_id >= aid_last)
 	    emsg(_(e_invalid_argument));
-	alloc_fail_countdown = argvars[1].vval.v_number;
-	alloc_fail_repeat = argvars[2].vval.v_number;
-	did_outofmem_msg = FALSE;
+	alloc_fail_countdown = argvars[1].vval.v_எண்;
+	alloc_fail_repeat = argvars[2].vval.v_எண்;
+	did_outofmem_செய்தி = FALSE;
     }
 }
 
 /*
  * "test_autochdir()"
  */
-    void
+    வெறுமை
 f_test_autochdir(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-#if defined(FEAT_AUTOCHDIR)
+#எனில் defined(FEAT_AUTOCHDIR)
     test_autochdir = TRUE;
 #endif
 }
@@ -957,26 +957,26 @@ f_test_autochdir(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "test_feedinput()"
  */
-    void
+    வெறுமை
 f_test_feedinput(typval_T *argvars, typval_T *rettv UNUSED)
 {
-#ifdef USE_INPUT_BUF
+#ifdef USE_உள்ளீடு_BUF
     char_u	*val;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     val = tv_get_string_chk(&argvars[0]);
 # ifdef VIMDLL
     // this doesn't work in the console
-    if (!gui.in_use)
-	return;
+    எனில் (!gui.in_use)
+	திரும்பு;
 # endif
 
-    if (val != NULL)
+    எனில் (val != வெற்று)
     {
-	trash_input_buf();
-	add_to_input_buf_csi(val, (int)STRLEN(val));
+	trash_உள்ளீடு_buf();
+	add_to_உள்ளீடு_buf_csi(val, (முழு)STRLEN(val));
     }
 #endif
 }
@@ -984,100 +984,100 @@ f_test_feedinput(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "test_getvalue({name})" function
  */
-    void
+    வெறுமை
 f_test_getvalue(typval_T *argvars, typval_T *rettv)
 {
     char_u *name;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (check_for_string_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     name = tv_get_string(&argvars[0]);
 
-    if (STRCMP(name, (char_u *)"need_fileinfo") == 0)
-	rettv->vval.v_number = need_fileinfo;
-    else
+    எனில் (STRCMP(name, (char_u *)"need_fileinfo") == 0)
+	rettv->vval.v_எண் = need_fileinfo;
+    இல்லையெனில்
 	semsg(_(e_invalid_argument_str), name);
 }
 
 /*
  * "test_option_not_set({name})" function
  */
-    void
+    வெறுமை
 f_test_option_not_set(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u *name = (char_u *)"";
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (check_for_string_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     name = tv_get_string(&argvars[0]);
-    if (reset_option_was_set(name) == FAIL)
+    எனில் (reset_option_was_set(name) == FAIL)
 	semsg(_(e_invalid_argument_str), name);
 }
 
 /*
  * "test_override({name}, {val})" function
  */
-    void
+    வெறுமை
 f_test_override(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u *name = (char_u *)"";
-    int     val;
-    static int save_starting = -1;
+    முழு     val;
+    நிலையான முழு save_starting = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL)
-	return;
+    எனில் (check_for_string_arg(argvars, 0) == FAIL
+		|| check_for_எண்_arg(argvars, 1) == FAIL)
+	திரும்பு;
 
     name = tv_get_string(&argvars[0]);
-    val = (int)tv_get_number(&argvars[1]);
+    val = (முழு)tv_get_எண்(&argvars[1]);
 
-    if (STRCMP(name, (char_u *)"redraw") == 0)
+    எனில் (STRCMP(name, (char_u *)"redraw") == 0)
 	disable_redraw_for_testing = val;
-    else if (STRCMP(name, (char_u *)"redraw_flag") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"redraw_flag") == 0)
 	ignore_redraw_flag_for_testing = val;
-    else if (STRCMP(name, (char_u *)"char_avail") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"char_avail") == 0)
 	disable_char_avail_for_testing = val;
-    else if (STRCMP(name, (char_u *)"starting") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"starting") == 0)
     {
-	if (val)
+	எனில் (val)
 	{
-	    if (save_starting < 0)
+	    எனில் (save_starting < 0)
 		save_starting = starting;
 	    starting = 0;
 	}
-	else
+	இல்லையெனில்
 	{
 	    starting = save_starting;
 	    save_starting = -1;
 	}
     }
-    else if (STRCMP(name, (char_u *)"nfa_fail") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"nfa_fail") == 0)
 	nfa_fail_for_testing = val;
-    else if (STRCMP(name, (char_u *)"syn_idlist_cache") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"syn_idlist_cache") == 0)
 	disable_syn_idlist_cache_for_testing = val;
-    else if (STRCMP(name, (char_u *)"no_query_mouse") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"no_query_mouse") == 0)
 	no_query_mouse_for_testing = val;
-    else if (STRCMP(name, (char_u *)"no_wait_return") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"no_wait_return") == 0)
 	no_wait_return = val;
-    else if (STRCMP(name, (char_u *)"ui_delay") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"ui_delay") == 0)
 	ui_delay_for_testing = val;
-    else if (STRCMP(name, (char_u *)"unreachable") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"unreachable") == 0)
 	ignore_unreachable_code_for_testing = val;
-    else if (STRCMP(name, (char_u *)"term_props") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"term_props") == 0)
 	reset_term_props_on_termresponse = val;
-    else if (STRCMP(name, (char_u *)"vterm_title") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"vterm_title") == 0)
 	disable_vterm_title_for_testing = val;
-    else if (STRCMP(name, (char_u *)"uptime") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"uptime") == 0)
 	override_sysinfo_uptime = val;
-    else if (STRCMP(name, (char_u *)"alloc_lines") == 0)
-	ml_get_alloc_lines = val;
-    else if (STRCMP(name, (char_u *)"autoload") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"alloc_lines") == 0)
+	ml_get_alloc_வரிகள் = val;
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"autoload") == 0)
 	override_autoload = val;
-    else if (STRCMP(name, (char_u *)"defcompile") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"defcompile") == 0)
 	override_defcompile = val;
-    else if (STRCMP(name, (char_u *)"ALL") == 0)
+    இல்லையெனில் எனில் (STRCMP(name, (char_u *)"ALL") == 0)
     {
 	disable_char_avail_for_testing = FALSE;
 	disable_redraw_for_testing = FALSE;
@@ -1089,116 +1089,116 @@ f_test_override(typval_T *argvars, typval_T *rettv UNUSED)
 	reset_term_props_on_termresponse = FALSE;
 	override_sysinfo_uptime = -1;
 	// ml_get_alloc_lines is not reset by "ALL"
-	if (save_starting >= 0)
+	எனில் (save_starting >= 0)
 	{
 	    starting = save_starting;
 	    save_starting = -1;
 	}
     }
-    else
+    இல்லையெனில்
 	semsg(_(e_invalid_argument_str), name);
 }
 
 /*
  * "test_refcount({expr})" function
  */
-    void
+    வெறுமை
 f_test_refcount(typval_T *argvars, typval_T *rettv)
 {
-    int retval = -1;
+    முழு retval = -1;
 
-    switch (argvars[0].v_type)
+    தேர்வு (argvars[0].v_type)
     {
-	case VAR_UNKNOWN:
-	case VAR_ANY:
-	case VAR_VOID:
-	case VAR_NUMBER:
-	case VAR_BOOL:
-	case VAR_FLOAT:
-	case VAR_SPECIAL:
-	case VAR_STRING:
-	case VAR_INSTR:
-	    break;
+	நிலை VAR_UNKNOWN:
+	நிலை VAR_ANY:
+	நிலை VAR_VOID:
+	நிலை VAR_எண்:
+	நிலை VAR_BOOL:
+	நிலை VAR_FLOAT:
+	நிலை VAR_SPECIAL:
+	நிலை VAR_STRING:
+	நிலை VAR_INSTR:
+	    நிறுத்து;
 
-	case VAR_JOB:
+	நிலை VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    if (argvars[0].vval.v_job != NULL)
+	    எனில் (argvars[0].vval.v_job != வெற்று)
 		retval = argvars[0].vval.v_job->jv_refcount - 1;
 #endif
-	    break;
-	case VAR_CHANNEL:
+	    நிறுத்து;
+	நிலை VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    if (argvars[0].vval.v_channel != NULL)
+	    எனில் (argvars[0].vval.v_channel != வெற்று)
 		retval = argvars[0].vval.v_channel->ch_refcount - 1;
 #endif
-	    break;
-	case VAR_FUNC:
-	    if (argvars[0].vval.v_string != NULL)
+	    நிறுத்து;
+	நிலை VAR_FUNC:
+	    எனில் (argvars[0].vval.v_string != வெற்று)
 	    {
 		ufunc_T *fp;
 
 		fp = find_func(argvars[0].vval.v_string, FALSE);
-		if (fp != NULL)
+		எனில் (fp != வெற்று)
 		    retval = fp->uf_refcount;
 	    }
-	    break;
-	case VAR_PARTIAL:
-	    if (argvars[0].vval.v_partial != NULL)
+	    நிறுத்து;
+	நிலை VAR_PARTIAL:
+	    எனில் (argvars[0].vval.v_partial != வெற்று)
 		retval = argvars[0].vval.v_partial->pt_refcount - 1;
-	    break;
-	case VAR_BLOB:
-	    if (argvars[0].vval.v_blob != NULL)
+	    நிறுத்து;
+	நிலை VAR_BLOB:
+	    எனில் (argvars[0].vval.v_blob != வெற்று)
 		retval = argvars[0].vval.v_blob->bv_refcount - 1;
-	    break;
-	case VAR_LIST:
-	    if (argvars[0].vval.v_list != NULL)
+	    நிறுத்து;
+	நிலை VAR_LIST:
+	    எனில் (argvars[0].vval.v_list != வெற்று)
 		retval = argvars[0].vval.v_list->lv_refcount - 1;
-	    break;
-	case VAR_TUPLE:
-	    if (argvars[0].vval.v_tuple != NULL)
+	    நிறுத்து;
+	நிலை VAR_TUPLE:
+	    எனில் (argvars[0].vval.v_tuple != வெற்று)
 		retval = argvars[0].vval.v_tuple->tv_refcount - 1;
-	    break;
-	case VAR_DICT:
-	    if (argvars[0].vval.v_dict != NULL)
+	    நிறுத்து;
+	நிலை VAR_DICT:
+	    எனில் (argvars[0].vval.v_dict != வெற்று)
 		retval = argvars[0].vval.v_dict->dv_refcount - 1;
-	    break;
-	case VAR_CLASS:
-	    if (argvars[0].vval.v_class != NULL)
+	    நிறுத்து;
+	நிலை VAR_CLASS:
+	    எனில் (argvars[0].vval.v_class != வெற்று)
 		retval = argvars[0].vval.v_class->class_refcount - 1;
-	    break;
-	case VAR_OBJECT:
-	    if (argvars[0].vval.v_object != NULL)
+	    நிறுத்து;
+	நிலை VAR_OBJECT:
+	    எனில் (argvars[0].vval.v_object != வெற்று)
 		retval = argvars[0].vval.v_object->obj_refcount - 1;
-	    break;
-	case VAR_TYPEALIAS:
-	    if (argvars[0].vval.v_typealias != NULL)
+	    நிறுத்து;
+	நிலை VAR_TYPEALIAS:
+	    எனில் (argvars[0].vval.v_typealias != வெற்று)
 		retval = argvars[0].vval.v_typealias->ta_refcount - 1;
-	    break;
+	    நிறுத்து;
     }
 
-    rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = retval;
+    rettv->v_type = VAR_எண்;
+    rettv->vval.v_எண் = retval;
 
 }
 
 /*
  * "test_garbagecollect_now()" function
  */
-    void
+    வெறுமை
 f_test_garbagecollect_now(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     // This is dangerous, any Lists and Dicts used internally may be freed
     // while still in use.
-    if (!get_vim_var_nr(VV_TESTING))
+    எனில் (!get_vim_var_nr(VV_TESTING))
 	emsg(_(e_calling_test_garbagecollect_now_while_v_testing_is_not_set));
-    else
+    இல்லையெனில்
 	garbage_collect(TRUE);
 }
 
 /*
  * "test_garbagecollect_soon()" function
  */
-    void
+    வெறுமை
 f_test_garbagecollect_soon(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     may_garbage_collect = TRUE;
@@ -1207,230 +1207,230 @@ f_test_garbagecollect_soon(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 /*
  * "test_ignore_error()" function
  */
-    void
+    வெறுமை
 f_test_ignore_error(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (check_for_string_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     ignore_error_for_testing(tv_get_string(&argvars[0]));
 }
 
-    void
+    வெறுமை
 f_test_null_blob(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_BLOB;
-    rettv->vval.v_blob = NULL;
+    rettv->vval.v_blob = வெற்று;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
+#எனில் defined(FEAT_JOB_CHANNEL)
+    வெறுமை
 f_test_null_channel(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_CHANNEL;
-    rettv->vval.v_channel = NULL;
+    rettv->vval.v_channel = வெற்று;
 }
 #endif
 
-    void
+    வெறுமை
 f_test_null_dict(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv_dict_set(rettv, NULL);
+    rettv_dict_set(rettv, வெற்று);
 }
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
+#எனில் defined(FEAT_JOB_CHANNEL)
+    வெறுமை
 f_test_null_job(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_JOB;
-    rettv->vval.v_job = NULL;
+    rettv->vval.v_job = வெற்று;
 }
 #endif
 
-    void
+    வெறுமை
 f_test_null_list(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv_list_set(rettv, NULL);
+    rettv_list_set(rettv, வெற்று);
 }
 
-    void
+    வெறுமை
 f_test_null_function(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_FUNC;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = வெற்று;
 }
 
-    void
+    வெறுமை
 f_test_null_partial(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_PARTIAL;
-    rettv->vval.v_partial = NULL;
+    rettv->vval.v_partial = வெற்று;
 }
 
-    void
+    வெறுமை
 f_test_null_string(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = வெற்று;
 }
 
-    void
+    வெறுமை
 f_test_null_tuple(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv_tuple_set(rettv, NULL);
+    rettv_tuple_set(rettv, வெற்று);
 }
 
-    void
+    வெறுமை
 f_test_unknown(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_UNKNOWN;
 }
 
-    void
+    வெறுமை
 f_test_void(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_VOID;
 }
 
-    void
+    வெறுமை
 f_test_setmouse(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+    எனில் (in_vim9script()
+	    && (check_for_எண்_arg(argvars, 0) == FAIL
+		|| check_for_எண்_arg(argvars, 1) == FAIL))
+	திரும்பு;
 
-    if (argvars[0].v_type != VAR_NUMBER || argvars[1].v_type != VAR_NUMBER)
+    எனில் (argvars[0].v_type != VAR_எண் || argvars[1].v_type != VAR_எண்)
     {
 	emsg(_(e_invalid_argument));
-	return;
+	திரும்பு;
     }
 
-    mouse_row = (time_t)tv_get_number(&argvars[0]) - 1;
-    mouse_col = (time_t)tv_get_number(&argvars[1]) - 1;
+    mouse_row = (time_t)tv_get_எண்(&argvars[0]) - 1;
+    mouse_col = (time_t)tv_get_எண்(&argvars[1]) - 1;
 }
 
 #ifdef FEAT_GUI
-    static int
+    நிலையான முழு
 test_gui_drop_files(dict_T *args UNUSED)
 {
-# if defined(HAVE_DROP_FILE)
-    int		row;
-    int		col;
+# எனில் defined(HAVE_DROP_FILE)
+    முழு		row;
+    முழு		col;
     int_u	mods;
     char_u	**fnames;
-    int		count = 0;
+    முழு		மொத்தம் = 0;
     typval_T	t;
     list_T	*l;
     listitem_T	*li;
 
-    if (!dict_has_key(args, "files")
-	    || !dict_has_key(args, "row")
-	    || !dict_has_key(args, "col")
-	    || !dict_has_key(args, "modifiers"))
-	return FALSE;
+    எனில் (!dict_has_சாவி(args, "files")
+	    || !dict_has_சாவி(args, "row")
+	    || !dict_has_சாவி(args, "col")
+	    || !dict_has_சாவி(args, "modifiers"))
+	திரும்பு FALSE;
 
-    (void)dict_get_tv(args, "files", &t);
-    row = (int)dict_get_number(args, "row");
-    col = (int)dict_get_number(args, "col");
-    mods = (int)dict_get_number(args, "modifiers");
+    (வெறுமை)dict_get_tv(args, "files", &t);
+    row = (முழு)dict_get_எண்(args, "row");
+    col = (முழு)dict_get_எண்(args, "col");
+    mods = (முழு)dict_get_எண்(args, "modifiers");
 
-    if (t.v_type != VAR_LIST || list_len(t.vval.v_list) == 0)
-	return FALSE;
+    எனில் (t.v_type != VAR_LIST || list_len(t.vval.v_list) == 0)
+	திரும்பு FALSE;
 
     l = t.vval.v_list;
     fnames = ALLOC_MULT(char_u *, list_len(l));
-    if (fnames == NULL)
-	return FALSE;
+    எனில் (fnames == வெற்று)
+	திரும்பு FALSE;
 
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_பொருட்கள்(l, li)
     {
 	// ignore non-string items
-	if (li->li_tv.v_type != VAR_STRING
-		|| li->li_tv.vval.v_string == NULL)
-	    continue;
+	எனில் (li->li_tv.v_type != VAR_STRING
+		|| li->li_tv.vval.v_string == வெற்று)
+	    தொடர்;
 
-	fnames[count] = vim_strsave(li->li_tv.vval.v_string);
-	if (fnames[count] == NULL)
+	fnames[மொத்தம்] = vim_strsave(li->li_tv.vval.v_string);
+	எனில் (fnames[மொத்தம்] == வெற்று)
 	{
-	    while (--count >= 0)
-		vim_free(fnames[count]);
+	    போது (--மொத்தம் >= 0)
+		vim_free(fnames[மொத்தம்]);
 	    vim_free(fnames);
-	    return FALSE;
+	    திரும்பு FALSE;
 	}
-	count++;
+	மொத்தம்++;
     }
 
-    if (count > 0)
-	gui_handle_drop(TEXT_X(col - 1), TEXT_Y(row - 1), mods, fnames, count);
-    else
+    எனில் (மொத்தம் > 0)
+	gui_handle_drop(TEXT_X(col - 1), TEXT_Y(row - 1), mods, fnames, மொத்தம்);
+    இல்லையெனில்
 	vim_free(fnames);
 # endif
 
-    return TRUE;
+    திரும்பு TRUE;
 }
 
-# if defined(FIND_REPLACE_DIALOG)
-    static int
+# எனில் defined(FIND_REPLACE_DIALOG)
+    நிலையான முழு
 test_gui_find_repl(dict_T *args)
 {
-    int		flags;
+    முழு		flags;
     char_u	*find_text;
     char_u	*repl_text;
-    int		forward;
-    int		retval;
+    முழு		forward;
+    முழு		retval;
 
-    if (!dict_has_key(args, "find_text")
-	    || !dict_has_key(args, "repl_text")
-	    || !dict_has_key(args, "flags")
-	    || !dict_has_key(args, "forward"))
-	return FALSE;
+    எனில் (!dict_has_சாவி(args, "find_text")
+	    || !dict_has_சாவி(args, "repl_text")
+	    || !dict_has_சாவி(args, "flags")
+	    || !dict_has_சாவி(args, "forward"))
+	திரும்பு FALSE;
 
     find_text = dict_get_string(args, "find_text", TRUE);
     repl_text = dict_get_string(args, "repl_text", TRUE);
-    flags = (int)dict_get_number(args, "flags");
-    forward = (int)dict_get_number(args, "forward");
+    flags = (முழு)dict_get_எண்(args, "flags");
+    forward = (முழு)dict_get_எண்(args, "forward");
 
     retval = gui_do_findrepl(flags, find_text, repl_text, forward);
     vim_free(find_text);
     vim_free(repl_text);
 
-    return retval;
+    திரும்பு retval;
 }
 # endif
 
-    static int
+    நிலையான முழு
 test_gui_mouse_event(dict_T *args)
 {
-    int		button;
-    int		row;
-    int		col;
-    int		repeated_click;
+    முழு		button;
+    முழு		row;
+    முழு		col;
+    முழு		repeated_click;
     int_u	mods;
-    int		move;
+    முழு		move;
 
-    if (!dict_has_key(args, "row")
-	    || !dict_has_key(args, "col"))
-	return FALSE;
+    எனில் (!dict_has_சாவி(args, "row")
+	    || !dict_has_சாவி(args, "col"))
+	திரும்பு FALSE;
 
     // Note: "move" is optional, requires fewer arguments
-    move = (int)dict_get_bool(args, "move", FALSE);
+    move = (முழு)dict_get_bool(args, "move", FALSE);
 
-    if (!move && (!dict_has_key(args, "button")
-	    || !dict_has_key(args, "multiclick")
-	    || !dict_has_key(args, "modifiers")))
-	return FALSE;
+    எனில் (!move && (!dict_has_சாவி(args, "button")
+	    || !dict_has_சாவி(args, "multiclick")
+	    || !dict_has_சாவி(args, "modifiers")))
+	திரும்பு FALSE;
 
-    row = (int)dict_get_number(args, "row");
-    col = (int)dict_get_number(args, "col");
+    row = (முழு)dict_get_எண்(args, "row");
+    col = (முழு)dict_get_எண்(args, "col");
 
-    if (move)
+    எனில் (move)
     {
-	int pY = row;
-	int pX = col;
+	முழு pY = row;
+	முழு pX = col;
 	// the "move" argument expects row and col coordnates to be in pixels,
 	// unless "cell" is specified and is TRUE.
-	if (dict_get_bool(args, "cell", FALSE))
+	எனில் (dict_get_bool(args, "cell", FALSE))
 	{
 	    // calculate the middle of the character cell
 	    // Note: Cell coordinates are 1-based from Vim script
@@ -1439,11 +1439,11 @@ test_gui_mouse_event(dict_T *args)
 	}
 	gui_mouse_moved(pX, pY);
     }
-    else
+    இல்லையெனில்
     {
-	button = (int)dict_get_number(args, "button");
-	repeated_click = (int)dict_get_number(args, "multiclick");
-	mods = (int)dict_get_number(args, "modifiers");
+	button = (முழு)dict_get_எண்(args, "button");
+	repeated_click = (முழு)dict_get_எண்(args, "multiclick");
+	mods = (முழு)dict_get_எண்(args, "modifiers");
 
 	// Reset the scroll values to known values.
 	// XXX: Remove this when/if the scroll step is made configurable.
@@ -1454,161 +1454,161 @@ test_gui_mouse_event(dict_T *args)
 							repeated_click, mods);
     }
 
-    return TRUE;
+    திரும்பு TRUE;
 }
 
-    static int
+    நிலையான முழு
 test_gui_scrollbar(dict_T *args)
 {
     char_u	*which;
-    long	value;
-    int		dragging;
-    scrollbar_T *sb = NULL;
+    long	மதிப்பு;
+    முழு		dragging;
+    scrollbar_T *sb = வெற்று;
 
-    if (!dict_has_key(args, "which")
-	    || !dict_has_key(args, "value")
-	    || !dict_has_key(args, "dragging"))
-	return FALSE;
+    எனில் (!dict_has_சாவி(args, "which")
+	    || !dict_has_சாவி(args, "value")
+	    || !dict_has_சாவி(args, "dragging"))
+	திரும்பு FALSE;
 
     which = dict_get_string(args, "which", FALSE);
-    value = (long)dict_get_number(args, "value");
-    dragging = (int)dict_get_number(args, "dragging");
+    மதிப்பு = (long)dict_get_எண்(args, "value");
+    dragging = (முழு)dict_get_எண்(args, "dragging");
 
-    if (STRCMP(which, "left") == 0)
-	sb = &curwin->w_scrollbars[SBAR_LEFT];
-    else if (STRCMP(which, "right") == 0)
-	sb = &curwin->w_scrollbars[SBAR_RIGHT];
-    else if (STRCMP(which, "hor") == 0)
+    எனில் (STRCMP(which, "left") == 0)
+	sb = &curwin->w_scrollbars[SBAR_இடது];
+    இல்லையெனில் எனில் (STRCMP(which, "right") == 0)
+	sb = &curwin->w_scrollbars[SBAR_வலது];
+    இல்லையெனில் எனில் (STRCMP(which, "hor") == 0)
 	sb = &gui.bottom_sbar;
-    if (sb == NULL)
+    எனில் (sb == வெற்று)
     {
 	semsg(_(e_invalid_argument_str), which);
-	return FALSE;
+	திரும்பு FALSE;
     }
-    gui_drag_scrollbar(sb, value, dragging);
+    gui_drag_scrollbar(sb, மதிப்பு, dragging);
 # ifndef USE_ON_FLY_SCROLL
     // need to loop through normal_cmd() to handle the scroll events
     exec_normal(FALSE, TRUE, FALSE);
 # endif
 
-    return TRUE;
+    திரும்பு TRUE;
 }
 
-    static int
+    நிலையான முழு
 test_gui_tabline_event(dict_T *args UNUSED)
 {
 # ifdef FEAT_GUI_TABLINE
-    int		tabnr;
+    முழு		tabnr;
 
-    if (!dict_has_key(args, "tabnr"))
-	return FALSE;
+    எனில் (!dict_has_சாவி(args, "tabnr"))
+	திரும்பு FALSE;
 
-    tabnr = (int)dict_get_number(args, "tabnr");
+    tabnr = (முழு)dict_get_எண்(args, "tabnr");
 
-    return send_tabline_event(tabnr);
-# else
-    return FALSE;
+    திரும்பு send_tabline_event(tabnr);
+# இல்லையெனில்
+    திரும்பு FALSE;
 # endif
 }
 
-    static int
+    நிலையான முழு
 test_gui_tabmenu_event(dict_T *args UNUSED)
 {
 # ifdef FEAT_GUI_TABLINE
-    int	tabnr;
-    int	item;
+    முழு	tabnr;
+    முழு	item;
 
-    if (!dict_has_key(args, "tabnr")
-	    || !dict_has_key(args, "item"))
-	return FALSE;
+    எனில் (!dict_has_சாவி(args, "tabnr")
+	    || !dict_has_சாவி(args, "item"))
+	திரும்பு FALSE;
 
-    tabnr = (int)dict_get_number(args, "tabnr");
-    item = (int)dict_get_number(args, "item");
+    tabnr = (முழு)dict_get_எண்(args, "tabnr");
+    item = (முழு)dict_get_எண்(args, "item");
 
     send_tabline_menu_event(tabnr, item);
 # endif
-    return TRUE;
+    திரும்பு TRUE;
 }
 #endif
 
-    void
+    வெறுமை
 f_test_mswin_event(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 #ifdef MSWIN
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_எண் = FALSE;
 
-    if (sandbox != 0)
+    எனில் (sandbox != 0)
     {
 	emsg(_(e_not_allowed_in_sandbox));
-	return;
+	திரும்பு;
     }
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    எனில் (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_dict_arg(argvars, 1) == FAIL
-	    || argvars[1].vval.v_dict == NULL)
-	return;
+	    || argvars[1].vval.v_dict == வெற்று)
+	திரும்பு;
 
     char_u *event = tv_get_string(&argvars[0]);
-    rettv->vval.v_number = test_mswin_event(event, argvars[1].vval.v_dict);
+    rettv->vval.v_எண் = test_mswin_event(event, argvars[1].vval.v_dict);
 
 #endif
 }
 
-    void
+    வெறுமை
 f_test_gui_event(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 #ifdef FEAT_GUI
     char_u	*event;
 
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_எண் = FALSE;
 
-    if (sandbox != 0)
+    எனில் (sandbox != 0)
     {
 	emsg(_(e_not_allowed_in_sandbox));
-	return;
+	திரும்பு;
     }
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    எனில் (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_dict_arg(argvars, 1) == FAIL
-	    || argvars[1].vval.v_dict == NULL)
-	return;
+	    || argvars[1].vval.v_dict == வெற்று)
+	திரும்பு;
 
     event = tv_get_string(&argvars[0]);
-    if (STRCMP(event, "dropfiles") == 0)
-	rettv->vval.v_number = test_gui_drop_files(argvars[1].vval.v_dict);
-# if defined(FIND_REPLACE_DIALOG)
-    else if (STRCMP(event, "findrepl") == 0)
-	rettv->vval.v_number = test_gui_find_repl(argvars[1].vval.v_dict);
+    எனில் (STRCMP(event, "dropfiles") == 0)
+	rettv->vval.v_எண் = test_gui_drop_files(argvars[1].vval.v_dict);
+# எனில் defined(FIND_REPLACE_DIALOG)
+    இல்லையெனில் எனில் (STRCMP(event, "findrepl") == 0)
+	rettv->vval.v_எண் = test_gui_find_repl(argvars[1].vval.v_dict);
 # endif
 # ifdef MSWIN
-    else if (STRCMP(event, "key") == 0 || STRCMP(event, "mouse") == 0 || STRCMP(event, "set_keycode_trans_strategy") == 0)
-	rettv->vval.v_number = test_mswin_event(event, argvars[1].vval.v_dict);
+    இல்லையெனில் எனில் (STRCMP(event, "key") == 0 || STRCMP(event, "mouse") == 0 || STRCMP(event, "set_keycode_trans_strategy") == 0)
+	rettv->vval.v_எண் = test_mswin_event(event, argvars[1].vval.v_dict);
 # endif
-    else if (STRCMP(event, "mouse") == 0)
-	rettv->vval.v_number = test_gui_mouse_event(argvars[1].vval.v_dict);
-    else if (STRCMP(event, "scrollbar") == 0)
-	rettv->vval.v_number = test_gui_scrollbar(argvars[1].vval.v_dict);
-    else if (STRCMP(event, "tabline") == 0)
-	rettv->vval.v_number = test_gui_tabline_event(argvars[1].vval.v_dict);
-    else if (STRCMP(event, "tabmenu") == 0)
-	rettv->vval.v_number = test_gui_tabmenu_event(argvars[1].vval.v_dict);
-    else
+    இல்லையெனில் எனில் (STRCMP(event, "mouse") == 0)
+	rettv->vval.v_எண் = test_gui_mouse_event(argvars[1].vval.v_dict);
+    இல்லையெனில் எனில் (STRCMP(event, "scrollbar") == 0)
+	rettv->vval.v_எண் = test_gui_scrollbar(argvars[1].vval.v_dict);
+    இல்லையெனில் எனில் (STRCMP(event, "tabline") == 0)
+	rettv->vval.v_எண் = test_gui_tabline_event(argvars[1].vval.v_dict);
+    இல்லையெனில் எனில் (STRCMP(event, "tabmenu") == 0)
+	rettv->vval.v_எண் = test_gui_tabmenu_event(argvars[1].vval.v_dict);
+    இல்லையெனில்
     {
 	semsg(_(e_invalid_argument_str), event);
-	return;
+	திரும்பு;
     }
 #endif
 }
 
-    void
+    வெறுமை
 f_test_settime(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_எண்_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
-    time_for_testing = (time_t)tv_get_number(&argvars[0]);
+    time_for_testing = (time_t)tv_get_எண்(&argvars[0]);
 }
 
 #endif // defined(FEAT_EVAL)

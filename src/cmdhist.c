@@ -11,69 +11,69 @@
  * cmdhist.c: Functions for the history of the command-line.
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-static histentry_T *(history[HIST_COUNT]) = {NULL, NULL, NULL, NULL, NULL};
-static int	hisidx[HIST_COUNT] = {-1, -1, -1, -1, -1};  // lastused entry
-static int	hisnum[HIST_COUNT] = {0, 0, 0, 0, 0};
+நிலையான histentry_T *(history[HIST_மொத்தம்]) = {வெற்று, வெற்று, வெற்று, வெற்று, வெற்று};
+நிலையான முழு	hisidx[HIST_மொத்தம்] = {-1, -1, -1, -1, -1};  // lastused entry
+நிலையான முழு	hisnum[HIST_மொத்தம்] = {0, 0, 0, 0, 0};
 		    // identifying (unique) number of newest history entry
-static int	hislen = 0;		// actual length of history tables
+நிலையான முழு	hislen = 0;		// actual length of history tables
 
 /*
  * Return the length of the history tables
  */
-    int
-get_hislen(void)
+    முழு
+get_hislen(வெறுமை)
 {
-    return hislen;
+    திரும்பு hislen;
 }
 
 /*
  * Return a pointer to a specified history table
  */
     histentry_T *
-get_histentry(int hist_type)
+get_histentry(முழு hist_type)
 {
-    return history[hist_type];
+    திரும்பு history[hist_type];
 }
 
-#if defined(FEAT_VIMINFO)
-    void
-set_histentry(int hist_type, histentry_T *entry)
+#எனில் defined(FEAT_VIMINFO)
+    வெறுமை
+set_histentry(முழு hist_type, histentry_T *entry)
 {
     history[hist_type] = entry;
 }
 #endif
 
-    int *
-get_hisidx(int hist_type)
+    முழு *
+get_hisidx(முழு hist_type)
 {
-    return &hisidx[hist_type];
+    திரும்பு &hisidx[hist_type];
 }
 
-#if defined(FEAT_VIMINFO)
-    int *
-get_hisnum(int hist_type)
+#எனில் defined(FEAT_VIMINFO)
+    முழு *
+get_hisnum(முழு hist_type)
 {
-    return &hisnum[hist_type];
+    திரும்பு &hisnum[hist_type];
 }
 #endif
 
 /*
  * Translate a history character to the associated type number.
  */
-    int
-hist_char2type(int c)
+    முழு
+hist_char2type(முழு c)
 {
-    if (c == ':')
-	return HIST_CMD;
-    if (c == '=')
-	return HIST_EXPR;
-    if (c == '@')
-	return HIST_INPUT;
-    if (c == '>')
-	return HIST_DEBUG;
-    return HIST_SEARCH;	    // must be '?' or '/'
+    எனில் (c == ':')
+	திரும்பு HIST_CMD;
+    எனில் (c == '=')
+	திரும்பு HIST_கோவை;
+    எனில் (c == '@')
+	திரும்பு HIST_உள்ளீடு;
+    எனில் (c == '>')
+	திரும்பு HIST_DEBUG;
+    திரும்பு HIST_தேடல்;	    // must be '?' or '/'
 }
 
 /*
@@ -82,14 +82,14 @@ hist_char2type(int c)
  * It is sufficient to give the significant prefix of a history name.
  */
 
-static char *(history_names[]) =
+நிலையான எழுத்து *(history_names[]) =
 {
     "cmd",
     "search",
     "expr",
     "input",
     "debug",
-    NULL
+    வெற்று
 };
 
 /*
@@ -97,103 +97,103 @@ static char *(history_names[]) =
  * arguments of the ":history command.
  */
     char_u *
-get_history_arg(expand_T *xp UNUSED, int idx)
+get_history_arg(expand_T *xp UNUSED, முழு idx)
 {
-    char    *short_names = ":=@>?/";
-    int	    short_names_count = (int)STRLEN(short_names);
-    int	    history_name_count = ARRAY_LENGTH(history_names) - 1;
+    எழுத்து    *short_names = ":=@>?/";
+    முழு	    short_names_மொத்தம் = (முழு)STRLEN(short_names);
+    முழு	    history_name_மொத்தம் = ARRAY_LENGTH(history_names) - 1;
 
-    if (idx < short_names_count)
+    எனில் (idx < short_names_மொத்தம்)
     {
 	xp->xp_buf[0] = (char_u)short_names[idx];
 	xp->xp_buf[1] = NUL;
-	return xp->xp_buf;
+	திரும்பு xp->xp_buf;
     }
-    if (idx < short_names_count + history_name_count)
-	return (char_u *)history_names[idx - short_names_count];
-    if (idx == short_names_count + history_name_count)
-	return (char_u *)"all";
-    return NULL;
+    எனில் (idx < short_names_மொத்தம் + history_name_மொத்தம்)
+	திரும்பு (char_u *)history_names[idx - short_names_மொத்தம்];
+    எனில் (idx == short_names_மொத்தம் + history_name_மொத்தம்)
+	திரும்பு (char_u *)"all";
+    திரும்பு வெற்று;
 }
 
 /*
  * init_history() - Initialize the command line history.
  * Also used to re-allocate the history when the size changes.
  */
-    void
-init_history(void)
+    வெறுமை
+init_history(வெறுமை)
 {
-    int		newlen;	    // new length of history table
+    முழு		newlen;	    // new length of history table
     histentry_T	*temp;
-    int		type;
+    முழு		type;
 
     // If size of history table changed, reallocate it
-    newlen = (int)p_hi;
-    if (newlen == hislen)		// history length didn't change
-	return;
+    newlen = (முழு)p_hi;
+    எனில் (newlen == hislen)		// history length didn't change
+	திரும்பு;
 
     // history length changed
-    for (type = 0; type < HIST_COUNT; ++type)   // adjust the tables
+    க்கு (type = 0; type < HIST_மொத்தம்; ++type)   // adjust the tables
     {
-	if (newlen > 0)
+	எனில் (newlen > 0)
 	{
 	    temp = ALLOC_MULT(histentry_T, newlen);
-	    if (temp == NULL)   // out of memory!
+	    எனில் (temp == வெற்று)   // out of memory!
 	    {
-		if (type == 0)  // first one: just keep the old length
+		எனில் (type == 0)  // first one: just keep the old length
 		{
 		    newlen = hislen;
-		    break;
+		    நிறுத்து;
 		}
 		// Already changed one table, now we can only have zero
 		// length for all tables.
 		newlen = 0;
 		type = -1;
-		continue;
+		தொடர்;
 	    }
 	}
-	else
-	    temp = NULL;
+	இல்லையெனில்
+	    temp = வெற்று;
 
-	if (hisidx[type] < 0)		// there are no entries yet
+	எனில் (hisidx[type] < 0)		// there are no entries yet
 	{
-	    int	i;
+	    முழு	i;
 
-	    for (i = 0; i < newlen; ++i)
+	    க்கு (i = 0; i < newlen; ++i)
 		clear_hist_entry(&temp[i]);
 	}
-	else if (newlen > hislen)	// array becomes bigger
+	இல்லையெனில் எனில் (newlen > hislen)	// array becomes bigger
 	{
-	    int	i;
-	    int	j;
+	    முழு	i;
+	    முழு	j;
 
-	    for (i = 0; i <= hisidx[type]; ++i)
+	    க்கு (i = 0; i <= hisidx[type]; ++i)
 		temp[i] = history[type][i];
 	    j = i;
-	    for ( ; i <= newlen - (hislen - hisidx[type]); ++i)
+	    க்கு ( ; i <= newlen - (hislen - hisidx[type]); ++i)
 		clear_hist_entry(&temp[i]);
-	    for ( ; j < hislen; ++i, ++j)
+	    க்கு ( ; j < hislen; ++i, ++j)
 		temp[i] = history[type][j];
 	}
-	else				// array becomes smaller or 0
+	இல்லையெனில்				// array becomes smaller or 0
 	{
-	    int	i;
-	    int	j;
+	    முழு	i;
+	    முழு	j;
 
 	    j = hisidx[type];
-	    for (i = newlen - 1; ; --i)
+	    க்கு (i = newlen - 1; ; --i)
 	    {
-		if (i >= 0)		// copy newest entries
+		எனில் (i >= 0)		// copy newest entries
 		    temp[i] = history[type][j];
-		else			// remove older entries
+		இல்லையெனில்			// remove older entries
 		{
 		    vim_free(history[type][j].hisstr);
 		    history[type][j].hisstrlen = 0;
 		}
-		if (--j < 0)
+		எனில் (--j < 0)
 		    j = hislen - 1;
-		if (j == hisidx[type])
-		    break;
+		எனில் (j == hisidx[type])
+		    நிறுத்து;
 	    }
 	    hisidx[type] = newlen - 1;
 	}
@@ -203,12 +203,12 @@ init_history(void)
     hislen = newlen;
 }
 
-    void
+    வெறுமை
 clear_hist_entry(histentry_T *hisptr)
 {
     hisptr->hisnum = 0;
     hisptr->viminfo = FALSE;
-    hisptr->hisstr = NULL;
+    hisptr->hisstr = வெற்று;
     hisptr->hisstrlen = 0;
     hisptr->time_set = 0;
 }
@@ -217,51 +217,51 @@ clear_hist_entry(histentry_T *hisptr)
  * Check if command line 'str' is already in history.
  * If 'move_to_front' is TRUE, matching entry is moved to end of history.
  */
-    int
+    முழு
 in_history(
-    int	    type,
+    முழு	    type,
     char_u  *str,
-    int	    move_to_front,	// Move the entry to the front if it exists
-    int	    sep,
-    int	    writing)		// ignore entries read from viminfo
+    முழு	    move_to_front,	// Move the entry to the front if it exists
+    முழு	    sep,
+    முழு	    writing)		// ignore entries read from viminfo
 {
-    int	    i;
-    int	    last_i = -1;
+    முழு	    i;
+    முழு	    last_i = -1;
     char_u  *p;
     size_t  len;
 
-    if (hisidx[type] < 0)
-	return FALSE;
+    எனில் (hisidx[type] < 0)
+	திரும்பு FALSE;
     i = hisidx[type];
-    do
+    செய்
     {
-	if (history[type][i].hisstr == NULL)
-	    return FALSE;
+	எனில் (history[type][i].hisstr == வெற்று)
+	    திரும்பு FALSE;
 
 	// For search history, check that the separator character matches as
 	// well.
 	p = history[type][i].hisstr;
-	if (STRCMP(str, p) == 0
+	எனில் (STRCMP(str, p) == 0
 		&& !(writing && history[type][i].viminfo)
-		&& (type != HIST_SEARCH || sep == p[history[type][i].hisstrlen + 1]))
+		&& (type != HIST_தேடல் || sep == p[history[type][i].hisstrlen + 1]))
 	{
-	    if (!move_to_front)
-		return TRUE;
+	    எனில் (!move_to_front)
+		திரும்பு TRUE;
 	    last_i = i;
-	    break;
+	    நிறுத்து;
 	}
-	if (--i < 0)
+	எனில் (--i < 0)
 	    i = hislen - 1;
-    } while (i != hisidx[type]);
+    } போது (i != hisidx[type]);
 
-    if (last_i < 0)
-	return FALSE;
+    எனில் (last_i < 0)
+	திரும்பு FALSE;
 
     str = history[type][i].hisstr;
     len = history[type][i].hisstrlen;
-    while (i != hisidx[type])
+    போது (i != hisidx[type])
     {
-	if (++i >= hislen)
+	எனில் (++i >= hislen)
 	    i = 0;
 	history[type][last_i] = history[type][i];
 	last_i = i;
@@ -271,7 +271,7 @@ in_history(
     history[type][i].hisstr = str;
     history[type][i].hisstrlen = len;
     history[type][i].time_set = vim_time();
-    return TRUE;
+    திரும்பு TRUE;
 }
 
 /*
@@ -279,80 +279,80 @@ in_history(
  * When "name" is empty, return "cmd" history.
  * Returns -1 for unknown history name.
  */
-    static int
+    நிலையான முழு
 get_histtype(char_u *name)
 {
-    int		i;
-    int		len = (int)STRLEN(name);
+    முழு		i;
+    முழு		len = (முழு)STRLEN(name);
 
     // No argument: use current history.
-    if (len == 0)
-	return hist_char2type(get_cmdline_firstc());
+    எனில் (len == 0)
+	திரும்பு hist_char2type(get_cmdline_firstc());
 
-    for (i = 0; history_names[i] != NULL; ++i)
-	if (STRNICMP(name, history_names[i], len) == 0)
-	    return i;
+    க்கு (i = 0; history_names[i] != வெற்று; ++i)
+	எனில் (STRNICMP(name, history_names[i], len) == 0)
+	    திரும்பு i;
 
-    if (vim_strchr((char_u *)":=@>?/", name[0]) != NULL && name[1] == NUL)
-	return hist_char2type(name[0]);
+    எனில் (vim_strchr((char_u *)":=@>?/", name[0]) != வெற்று && name[1] == NUL)
+	திரும்பு hist_char2type(name[0]);
 
-    return -1;
+    திரும்பு -1;
 }
 
-static int	last_maptick = -1;	// last seen maptick
+நிலையான முழு	last_maptick = -1;	// last seen maptick
 
 /*
  * Add the given string to the given history.  If the string is already in the
  * history then it is moved to the front.  "histype" may be one of he HIST_
  * values.
  */
-    void
+    வெறுமை
 add_to_history(
-    int		histype,
+    முழு		histype,
     char_u	*new_entry,
     size_t	new_entrylen,
-    int		in_map,		// consider maptick when inside a mapping
-    int		sep)		// separator character used (search hist)
+    முழு		in_map,		// consider maptick when inside a mapping
+    முழு		sep)		// separator character used (search hist)
 {
     histentry_T	*hisptr;
 
-    if (hislen == 0)		// no history
-	return;
+    எனில் (hislen == 0)		// no history
+	திரும்பு;
 
-    if ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_SEARCH)
-	return;
+    எனில் ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_தேடல்)
+	திரும்பு;
 
     // Searches inside the same mapping overwrite each other, so that only
     // the last line is kept.  Be careful not to remove a line that was moved
     // down, only lines that were added.
-    if (histype == HIST_SEARCH && in_map)
+    எனில் (histype == HIST_தேடல் && in_map)
     {
-	if (maptick == last_maptick && hisidx[HIST_SEARCH] >= 0)
+	எனில் (maptick == last_maptick && hisidx[HIST_தேடல்] >= 0)
 	{
 	    // Current line is from the same mapping, remove it
-	    hisptr = &history[HIST_SEARCH][hisidx[HIST_SEARCH]];
+	    hisptr = &history[HIST_தேடல்][hisidx[HIST_தேடல்]];
 	    vim_free(hisptr->hisstr);
 	    clear_hist_entry(hisptr);
 	    --hisnum[histype];
-	    if (--hisidx[HIST_SEARCH] < 0)
-		hisidx[HIST_SEARCH] = hislen - 1;
+	    எனில் (--hisidx[HIST_தேடல்] < 0)
+		hisidx[HIST_தேடல்] = hislen - 1;
 	}
 	last_maptick = -1;
     }
 
-    if (in_history(histype, new_entry, TRUE, sep, FALSE))
-	return;
+    எனில் (in_history(histype, new_entry, TRUE, sep, FALSE))
+	திரும்பு;
 
-    if (++hisidx[histype] == hislen)
+    எனில் (++hisidx[histype] == hislen)
 	hisidx[histype] = 0;
     hisptr = &history[histype][hisidx[histype]];
     vim_free(hisptr->hisstr);
 
     // Store the separator after the NUL of the string.
     hisptr->hisstr = vim_strnsave(new_entry, new_entrylen + 2);
-    if (hisptr->hisstr == NULL)
+    எனில் (hisptr->hisstr == வெற்று)
 	hisptr->hisstrlen = 0;
-    else
+    இல்லையெனில்
     {
 	hisptr->hisstr[new_entrylen + 1] = sep;
 	hisptr->hisstrlen = new_entrylen;
@@ -361,24 +361,24 @@ add_to_history(
     hisptr->hisnum = ++hisnum[histype];
     hisptr->viminfo = FALSE;
     hisptr->time_set = vim_time();
-    if (histype == HIST_SEARCH && in_map)
+    எனில் (histype == HIST_தேடல் && in_map)
 	last_maptick = maptick;
 }
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 
 /*
  * Get identifier of newest history entry.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-get_history_idx(int histype)
+    நிலையான முழு
+get_history_idx(முழு histype)
 {
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
+    எனில் (hislen == 0 || histype < 0 || histype >= HIST_மொத்தம்
 		    || hisidx[histype] < 0)
-	return -1;
+	திரும்பு -1;
 
-    return history[histype][hisidx[histype]].hisnum;
+    திரும்பு history[histype][hisidx[histype]].hisnum;
 }
 
 /*
@@ -387,56 +387,56 @@ get_history_idx(int histype)
  *   num < 0: relative position in history wrt newest entry
  * "histype" may be one of the HIST_ values.
  */
-    static int
-calc_hist_idx(int histype, int num)
+    நிலையான முழு
+calc_hist_idx(முழு histype, முழு இலக்கம்)
 {
-    int		i;
+    முழு		i;
     histentry_T	*hist;
-    int		wrapped = FALSE;
+    முழு		wrapped = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
-		    || (i = hisidx[histype]) < 0 || num == 0)
-	return -1;
+    எனில் (hislen == 0 || histype < 0 || histype >= HIST_மொத்தம்
+		    || (i = hisidx[histype]) < 0 || இலக்கம் == 0)
+	திரும்பு -1;
 
     hist = history[histype];
-    if (num > 0)
+    எனில் (இலக்கம் > 0)
     {
-	while (hist[i].hisnum > num)
-	    if (--i < 0)
+	போது (hist[i].hisnum > இலக்கம்)
+	    எனில் (--i < 0)
 	    {
-		if (wrapped)
-		    break;
+		எனில் (wrapped)
+		    நிறுத்து;
 		i += hislen;
 		wrapped = TRUE;
 	    }
-	if (i >= 0 && hist[i].hisnum == num && hist[i].hisstr != NULL)
-	    return i;
+	எனில் (i >= 0 && hist[i].hisnum == இலக்கம் && hist[i].hisstr != வெற்று)
+	    திரும்பு i;
     }
-    else if (-num <= hislen)
+    இல்லையெனில் எனில் (-இலக்கம் <= hislen)
     {
-	i += num + 1;
-	if (i < 0)
+	i += இலக்கம் + 1;
+	எனில் (i < 0)
 	    i += hislen;
-	if (hist[i].hisstr != NULL)
-	    return i;
+	எனில் (hist[i].hisstr != வெற்று)
+	    திரும்பு i;
     }
-    return -1;
+    திரும்பு -1;
 }
 
 /*
  * Clear all entries of a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-clr_history(int histype)
+    நிலையான முழு
+clr_history(முழு histype)
 {
-    int		i;
+    முழு		i;
     histentry_T	*hisptr;
 
-    if (hislen != 0 && histype >= 0 && histype < HIST_COUNT)
+    எனில் (hislen != 0 && histype >= 0 && histype < HIST_மொத்தம்)
     {
 	hisptr = history[histype];
-	for (i = hislen; i--;)
+	க்கு (i = hislen; i--;)
 	{
 	    vim_free(hisptr->hisstr);
 	    clear_hist_entry(hisptr);
@@ -444,161 +444,161 @@ clr_history(int histype)
 	}
 	hisidx[histype] = -1;	// mark history as cleared
 	hisnum[histype] = 0;	// reset identifier counter
-	return OK;
+	திரும்பு OK;
     }
-    return FAIL;
+    திரும்பு FAIL;
 }
 
 /*
  * Remove all entries matching {str} from a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-del_history_entry(int histype, char_u *str)
+    நிலையான முழு
+del_history_entry(முழு histype, char_u *str)
 {
     regmatch_T	regmatch;
     histentry_T	*hisptr;
-    int		idx;
-    int		i;
-    int		last;
-    int		found = FALSE;
+    முழு		idx;
+    முழு		i;
+    முழு		last;
+    முழு		found = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT || *str == NUL
+    எனில் (hislen == 0 || histype < 0 || histype >= HIST_மொத்தம் || *str == NUL
 		|| hisidx[histype] < 0)
-	return FALSE;
+	திரும்பு FALSE;
 
     idx = hisidx[histype];
     regmatch.regprog = vim_regcomp(str, RE_MAGIC + RE_STRING);
-    if (regmatch.regprog == NULL)
-	return FALSE;
+    எனில் (regmatch.regprog == வெற்று)
+	திரும்பு FALSE;
 
     regmatch.rm_ic = FALSE;	// always match case
 
     i = last = idx;
-    do
+    செய்
     {
 	hisptr = &history[histype][i];
-	if (hisptr->hisstr == NULL)
-	    break;
-	if (vim_regexec(&regmatch, hisptr->hisstr, (colnr_T)0))
+	எனில் (hisptr->hisstr == வெற்று)
+	    நிறுத்து;
+	எனில் (vim_regexec(&regmatch, hisptr->hisstr, (colnr_T)0))
 	{
 	    found = TRUE;
 	    vim_free(hisptr->hisstr);
 	    clear_hist_entry(hisptr);
 	}
-	else
+	இல்லையெனில்
 	{
-	    if (i != last)
+	    எனில் (i != last)
 	    {
 		history[histype][last] = *hisptr;
 		clear_hist_entry(hisptr);
 	    }
-	    if (--last < 0)
+	    எனில் (--last < 0)
 		last += hislen;
 	}
-	if (--i < 0)
+	எனில் (--i < 0)
 	    i += hislen;
-    } while (i != idx);
+    } போது (i != idx);
 
-    if (history[histype][idx].hisstr == NULL)
+    எனில் (history[histype][idx].hisstr == வெற்று)
 	hisidx[histype] = -1;
 
     vim_regfree(regmatch.regprog);
-    return found;
+    திரும்பு found;
 }
 
 /*
  * Remove an indexed entry from a history.
  * "histype" may be one of the HIST_ values.
  */
-    static int
-del_history_idx(int histype, int idx)
+    நிலையான முழு
+del_history_idx(முழு histype, முழு idx)
 {
-    int	    i, j;
+    முழு	    i, j;
 
     i = calc_hist_idx(histype, idx);
-    if (i < 0)
-	return FALSE;
+    எனில் (i < 0)
+	திரும்பு FALSE;
     idx = hisidx[histype];
     vim_free(history[histype][i].hisstr);
     history[histype][i].hisstrlen = 0;
 
     // When deleting the last added search string in a mapping, reset
     // last_maptick, so that the last added search string isn't deleted again.
-    if (histype == HIST_SEARCH && maptick == last_maptick && i == idx)
+    எனில் (histype == HIST_தேடல் && maptick == last_maptick && i == idx)
 	last_maptick = -1;
 
-    while (i != idx)
+    போது (i != idx)
     {
 	j = (i + 1) % hislen;
 	history[histype][i] = history[histype][j];
 	i = j;
     }
     clear_hist_entry(&history[histype][i]);
-    if (--i < 0)
+    எனில் (--i < 0)
 	i += hislen;
     hisidx[histype] = i;
-    return TRUE;
+    திரும்பு TRUE;
 }
 
 /*
  * "histadd()" function
  */
-    void
+    வெறுமை
 f_histadd(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		histype;
+    முழு		histype;
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    rettv->vval.v_number = FALSE;
-    if (check_secure())
-	return;
+    rettv->vval.v_எண் = FALSE;
+    எனில் (check_secure())
+	திரும்பு;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    histype = str != NULL ? get_histtype(str) : -1;
-    if (histype < 0)
-	return;
+    histype = str != வெற்று ? get_histtype(str) : -1;
+    எனில் (histype < 0)
+	திரும்பு;
 
     str = tv_get_string_buf(&argvars[1], buf);
-    if (*str == NUL)
-	return;
+    எனில் (*str == NUL)
+	திரும்பு;
 
     init_history();
     add_to_history(histype, str, STRLEN(str), FALSE, NUL);
-    rettv->vval.v_number = TRUE;
+    rettv->vval.v_எண் = TRUE;
 }
 
 /*
  * "histdel()" function
  */
-    void
+    வெறுமை
 f_histdel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    int		n;
+    முழு		n;
     char_u	*str;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_string_or_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_string_or_எண்_arg(argvars, 1) == FAIL))
+	திரும்பு;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    if (str == NULL)
+    எனில் (str == வெற்று)
 	n = 0;
-    else if (argvars[1].v_type == VAR_UNKNOWN)
+    இல்லையெனில் எனில் (argvars[1].v_type == VAR_UNKNOWN)
 	// only one argument: clear entire history
 	n = clr_history(get_histtype(str));
-    else if (argvars[1].v_type == VAR_NUMBER)
+    இல்லையெனில் எனில் (argvars[1].v_type == VAR_எண்)
 	// index given: remove that entry
 	n = del_history_idx(get_histtype(str),
-					  (int)tv_get_number(&argvars[1]));
-    else
+					  (முழு)tv_get_எண்(&argvars[1]));
+    இல்லையெனில்
     {
 	char_u	buf[NUMBUFLEN];
 
@@ -607,41 +607,41 @@ f_histdel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 				      tv_get_string_buf(&argvars[1], buf));
     }
 
-    rettv->vval.v_number = n;
+    rettv->vval.v_எண் = n;
 }
 
 /*
  * "histget()" function
  */
-    void
+    வெறுமை
 f_histget(typval_T *argvars UNUSED, typval_T *rettv)
 {
     char_u  *str;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_எண்_arg(argvars, 1) == FAIL))
+	திரும்பு;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
-    if (str == NULL)
-	rettv->vval.v_string = NULL;
-    else
+    எனில் (str == வெற்று)
+	rettv->vval.v_string = வெற்று;
+    இல்லையெனில்
     {
-	int type;
-	int idx;
+	முழு type;
+	முழு idx;
 
 	type = get_histtype(str);
-	if (argvars[1].v_type == VAR_UNKNOWN)
+	எனில் (argvars[1].v_type == VAR_UNKNOWN)
 	    idx = get_history_idx(type);
-	else
-	    idx = (int)tv_get_number_chk(&argvars[1], NULL);
+	இல்லையெனில்
+	    idx = (முழு)tv_get_எண்_chk(&argvars[1], வெற்று);
 						    // -1 on type error
 
 	idx = calc_hist_idx(type, idx);
-	if (idx < 0)
+	எனில் (idx < 0)
 	    rettv->vval.v_string = vim_strnsave((char_u *)"", 0);
-	else
+	இல்லையெனில்
 	    rettv->vval.v_string = vim_strnsave(history[type][idx].hisstr, history[type][idx].hisstrlen);
     }
     rettv->v_type = VAR_STRING;
@@ -650,55 +650,55 @@ f_histget(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "histnr()" function
  */
-    void
+    வெறுமை
 f_histnr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		i;
+    முழு		i;
     char_u	*histname;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     histname = tv_get_string_chk(&argvars[0]);
-    i = histname == NULL ? HIST_CMD - 1 : get_histtype(histname);
-    if (i >= HIST_CMD && i < HIST_COUNT)
-	rettv->vval.v_number = get_history_idx(i);
-    else
-	rettv->vval.v_number = -1;
+    i = histname == வெற்று ? HIST_CMD - 1 : get_histtype(histname);
+    எனில் (i >= HIST_CMD && i < HIST_மொத்தம்)
+	rettv->vval.v_எண் = get_history_idx(i);
+    இல்லையெனில்
+	rettv->vval.v_எண் = -1;
 }
 #endif // FEAT_EVAL
 
-#if defined(FEAT_CRYPT)
+#எனில் defined(FEAT_CRYPT)
 /*
  * Very specific function to remove the value in ":set key=val" from the
  * history.
  */
-    void
-remove_key_from_history(void)
+    வெறுமை
+remove_சாவி_from_history(வெறுமை)
 {
     char_u	*p_start;
     char_u	*p_end;
     char_u	*p;
-    int		i;
+    முழு		i;
 
     i = hisidx[HIST_CMD];
-    if (i < 0)
-	return;
+    எனில் (i < 0)
+	திரும்பு;
     p_start = history[HIST_CMD][i].hisstr;
-    if (p_start == NULL)
-	return;
+    எனில் (p_start == வெற்று)
+	திரும்பு;
 
     p_end = p_start + history[HIST_CMD][i].hisstrlen;
-    for (p = p_start; *p; ++p)
+    க்கு (p = p_start; *p; ++p)
     {
-	if (STRNCMP(p, "key", 3) == 0 && !SAFE_isalpha(p[3]))
+	எனில் (STRNCMP(p, "key", 3) == 0 && !SAFE_isalpha(p[3]))
 	{
 	    p = vim_strchr(p + 3, '=');
-	    if (p == NULL)
-		break;
+	    எனில் (p == வெற்று)
+		நிறுத்து;
 	    ++p;
-	    for (i = 0; p[i] && !VIM_ISWHITE(p[i]); ++i)
-		if (p[i] == '\\' && p[i + 1])
+	    க்கு (i = 0; p[i] && !VIM_ISWHITE(p[i]); ++i)
+		எனில் (p[i] == '\\' && p[i + 1])
 		    ++i;
 
 	    mch_memmove(p, p + i, (p_end - (p + i)) + 1);	    // +1 for the NUL
@@ -714,99 +714,99 @@ remove_key_from_history(void)
 /*
  * :history command - print a history
  */
-    void
+    வெறுமை
 ex_history(exarg_T *eap)
 {
     histentry_T	*hist;
-    int		histype1 = HIST_CMD;
-    int		histype2 = HIST_CMD;
-    int		hisidx1 = 1;
-    int		hisidx2 = -1;
-    int		idx;
-    int		i, j, k;
+    முழு		histype1 = HIST_CMD;
+    முழு		histype2 = HIST_CMD;
+    முழு		hisidx1 = 1;
+    முழு		hisidx2 = -1;
+    முழு		idx;
+    முழு		i, j, k;
     char_u	*end;
     char_u	*arg = eap->arg;
 
-    if (hislen == 0)
+    எனில் (hislen == 0)
     {
-	msg(_("'history' option is zero"));
-	return;
+	செய்தி(_("'history' option is zero"));
+	திரும்பு;
     }
 
-    if (!(VIM_ISDIGIT(*arg) || *arg == '-' || *arg == ','))
+    எனில் (!(VIM_ISDIGIT(*arg) || *arg == '-' || *arg == ','))
     {
 	end = arg;
-	while (ASCII_ISALPHA(*end)
-		|| vim_strchr((char_u *)":=@>/?", *end) != NULL)
+	போது (ASCII_ISALPHA(*end)
+		|| vim_strchr((char_u *)":=@>/?", *end) != வெற்று)
 	    end++;
 	i = *end;
 	*end = NUL;
 	histype1 = get_histtype(arg);
-	if (histype1 == -1)
+	எனில் (histype1 == -1)
 	{
-	    if (STRNICMP(arg, "all", STRLEN(arg)) == 0)
+	    எனில் (STRNICMP(arg, "all", STRLEN(arg)) == 0)
 	    {
 		histype1 = 0;
-		histype2 = HIST_COUNT-1;
+		histype2 = HIST_மொத்தம்-1;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		*end = i;
 		semsg(_(e_trailing_characters_str), arg);
-		return;
+		திரும்பு;
 	    }
 	}
-	else
+	இல்லையெனில்
 	    histype2 = histype1;
 	*end = i;
     }
-    else
+    இல்லையெனில்
 	end = arg;
-    if (!get_list_range(&end, &hisidx1, &hisidx2) || *end != NUL)
+    எனில் (!get_list_range(&end, &hisidx1, &hisidx2) || *end != NUL)
     {
-	if (*end != NUL)
+	எனில் (*end != NUL)
 	    semsg(_(e_trailing_characters_str), end);
-	else
+	இல்லையெனில்
 	    semsg(_(e_val_too_large), arg);
-	return;
+	திரும்பு;
     }
 
-    for (; !got_int && histype1 <= histype2; ++histype1)
+    க்கு (; !got_int && histype1 <= histype2; ++histype1)
     {
-	vim_snprintf((char *)IObuff, IOSIZE, "\n      #  %s history", history_names[histype1]);
-	msg_puts_title((char *)IObuff);
+	vim_snprintf((எழுத்து *)IObuff, IOSIZE, "\n      #  %s history", history_names[histype1]);
+	செய்தி_puts_title((எழுத்து *)IObuff);
 	idx = hisidx[histype1];
 	hist = history[histype1];
 	j = hisidx1;
 	k = hisidx2;
-	if (j < 0)
+	எனில் (j < 0)
 	    j = (-j > hislen) ? 0 : hist[(hislen + j + idx + 1) % hislen].hisnum;
-	if (k < 0)
+	எனில் (k < 0)
 	    k = (-k > hislen) ? 0 : hist[(hislen + k + idx + 1) % hislen].hisnum;
-	if (idx >= 0 && j <= k)
-	    for (i = idx + 1; !got_int; ++i)
+	எனில் (idx >= 0 && j <= k)
+	    க்கு (i = idx + 1; !got_int; ++i)
 	    {
-		if (i == hislen)
+		எனில் (i == hislen)
 		    i = 0;
-		if (hist[i].hisstr != NULL
+		எனில் (hist[i].hisstr != வெற்று
 			&& hist[i].hisnum >= j && hist[i].hisnum <= k
 			&& !message_filtered(hist[i].hisstr))
 		{
-		    int  len;
+		    முழு  len;
 
-		    msg_putchar('\n');
-		    len = vim_snprintf((char *)IObuff, IOSIZE,
+		    செய்தி_putchar('\n');
+		    len = vim_snprintf((எழுத்து *)IObuff, IOSIZE,
 				"%c%6d  ", i == idx ? '>' : ' ', hist[i].hisnum);
-		    if (vim_strsize(hist[i].hisstr) > (int)Columns - 10)
+		    எனில் (vim_strsize(hist[i].hisstr) > (முழு)Columns - 10)
 			trunc_string(hist[i].hisstr, IObuff + len,
-			     (int)Columns - 10, IOSIZE - (int)len);
-		    else
+			     (முழு)Columns - 10, IOSIZE - (முழு)len);
+		    இல்லையெனில்
 			STRCPY(IObuff + len, hist[i].hisstr);
-		    msg_outtrans(IObuff);
+		    செய்தி_outtrans(IObuff);
 		    out_flush();
 		}
-		if (i == idx)
-		    break;
+		எனில் (i == idx)
+		    நிறுத்து;
 	    }
     }
 }

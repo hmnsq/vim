@@ -5,99 +5,99 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-import json
-import socket
-import sys
-import time
-import threading
+தஃ __future__ இறக்குமதி print_function
+இறக்குமதி json
+இறக்குமதி socket
+இறக்குமதி sys
+இறக்குமதி time
+இறக்குமதி threading
 
-try:
+முயல்:
     # Python 3
-    import socketserver
-except ImportError:
+    இறக்குமதி socketserver
+விதிவிலக்கு ImportError:
     # Python 2
-    import SocketServer as socketserver
+    இறக்குமதி SocketServer இவ socketserver
 
-class TestingRequestHandler(socketserver.BaseRequestHandler):
+வகுப்பு TestingRequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
         print("=== socket opened ===")
-        while True:
-            try:
+        போது உண்மை:
+            முயல்:
                 received = self.request.recv(4096).decode('utf-8')
-            except socket.error:
+            விதிவிலக்கு socket.error:
                 print("=== socket error ===")
-                break
-            except IOError:
+                நிறுத்து
+            விதிவிலக்கு IOError:
                 print("=== socket closed ===")
-                break
-            if received == '':
+                நிறுத்து
+            எனில் received == '':
                 print("=== socket closed ===")
-                break
+                நிறுத்து
             print("received: {0}".format(received))
 
             # We may receive two messages at once. Take the part up to the
             # newline, which should be after the matching "]".
             todo = received
-            while todo != '':
+            போது todo != '':
                 splitidx = todo.find('\n')
-                if splitidx < 0:
+                எனில் splitidx < 0:
                      used = todo
                      todo = ''
-                else:
+                இல்லையெனில்:
                      used = todo[:splitidx]
                      todo = todo[splitidx + 1:]
-                if used != received:
+                எனில் used != received:
                     print("using: {0}".format(used))
 
-                try:
+                முயல்:
                     decoded = json.loads(used)
-                except ValueError:
+                விதிவிலக்கு மதிப்பு_Error:
                     print("json decoding failed")
                     decoded = [-1, '']
 
                 # Send a response if the sequence number is positive.
-                if decoded[0] >= 0:
-                    if decoded[1] == 'hello!':
+                எனில் decoded[0] >= 0:
+                    எனில் decoded[1] == 'hello!':
                         # simply send back a string
                         response = "got it"
-                    elif decoded[1] == 'malformed1':
+                    அல்லதெனில் decoded[1] == 'malformed1':
                         cmd = '["ex",":"]wrong!["ex","smi"]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
                         # Need to wait for Vim to give up, otherwise it
                         # sometimes fails on OS X.
-                        time.sleep(0.2)
-                    elif decoded[1] == 'malformed2':
+                        time.ஸுஷுப்தி(0.2)
+                    அல்லதெனில் decoded[1] == 'malformed2':
                         cmd = '"unterminated string'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
                         # Need to wait for Vim to give up, otherwise the double
                         # quote in the "ok" response terminates the string.
-                        time.sleep(0.2)
-                    elif decoded[1] == 'malformed3':
+                        time.ஸுஷுப்தி(0.2)
+                    அல்லதெனில் decoded[1] == 'malformed3':
                         cmd = '["ex","missing ]"'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
                         # Need to wait for Vim to give up, otherwise the ]
                         # in the "ok" response terminates the list.
-                        time.sleep(0.2)
-                    elif decoded[1] == 'split':
+                        time.ஸுஷுப்தி(0.2)
+                    அல்லதெனில் decoded[1] == 'split':
                         cmd = '["ex","let '
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
-                        time.sleep(0.01)
+                        time.ஸுஷுப்தி(0.01)
                         cmd = 'g:split = 123"]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1].startswith("echo "):
+                    அல்லதெனில் decoded[1].startswith("echo "):
                         # send back the argument
                         response = decoded[1][5:]
-                    elif decoded[1] == 'make change':
+                    அல்லதெனில் decoded[1] == 'make change':
                         # Send two ex commands at the same time, before
                         # replying to the request.
                         cmd = '["ex","call append(\\"$\\",\\"added1\\")"]'
@@ -105,7 +105,7 @@ class TestingRequestHandler(socketserver.BaseRequestHandler):
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'echoerr':
+                    அல்லதெனில் decoded[1] == 'echoerr':
                         cmd = '["ex","echoerr \\\"this is an error\\\""]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
@@ -114,150 +114,150 @@ class TestingRequestHandler(socketserver.BaseRequestHandler):
                         # before the "ch_evalexpr() returns.  Otherwise we are
                         # outside the try/catch when the "ex" command is
                         # handled.
-                        time.sleep(0.02)
-                    elif decoded[1] == 'bad command':
+                        time.ஸுஷுப்தி(0.02)
+                    அல்லதெனில் decoded[1] == 'bad command':
                         cmd = '["ex","foo bar"]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'do normal':
+                    அல்லதெனில் decoded[1] == 'do normal':
                         # Send a normal command.
                         cmd = '["normal","G$s more\u001b"]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'eval-works':
+                    அல்லதெனில் decoded[1] == 'eval-works':
                         # Send an eval request.  We ignore the response.
                         cmd = '["expr","\\"foo\\" . 123", -1]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'eval-special':
+                    அல்லதெனில் decoded[1] == 'eval-special':
                         # Send an eval request.  We ignore the response.
                         cmd = '["expr","\\"foo\x7f\x10\x01bar\\"", -2]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'eval-getline':
+                    அல்லதெனில் decoded[1] == 'eval-getline':
                         # Send an eval request.  We ignore the response.
                         cmd = '["expr","getline(3)", -3]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'eval-fails':
+                    அல்லதெனில் decoded[1] == 'eval-fails':
                         # Send an eval request that will fail.
                         cmd = '["expr","xxx", -4]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'eval-error':
+                    அல்லதெனில் decoded[1] == 'eval-error':
                         # Send an eval request that works but the result can't
                         # be encoded.
                         cmd = '["expr","function(\\"tr\\")", -5]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'eval-bad':
+                    அல்லதெனில் decoded[1] == 'eval-bad':
                         # Send an eval request missing the third argument.
                         cmd = '["expr","xxx"]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'an expr':
+                    அல்லதெனில் decoded[1] == 'an expr':
                         # Send an expr request.
                         cmd = '["expr","setline(\\"$\\", [\\"one\\",\\"two\\",\\"three\\"])"]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'call-func':
+                    அல்லதெனில் decoded[1] == 'call-func':
                         cmd = '["call","MyFunction",[1,2,3], 0]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'redraw':
+                    அல்லதெனில் decoded[1] == 'redraw':
                         cmd = '["redraw",""]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'redraw!':
+                    அல்லதெனில் decoded[1] == 'redraw!':
                         cmd = '["redraw","force"]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'empty-request':
+                    அல்லதெனில் decoded[1] == 'empty-request':
                         cmd = '[]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'eval-result':
+                    அல்லதெனில் decoded[1] == 'eval-result':
                         # Send back the last received eval result.
                         response = last_eval
-                    elif decoded[1] == 'call me':
+                    அல்லதெனில் decoded[1] == 'call me':
                         cmd = '[0,"we called you"]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "ok"
-                    elif decoded[1] == 'call me again':
+                    அல்லதெனில் decoded[1] == 'call me again':
                         cmd = '[0,"we did call you"]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = ""
-                    elif decoded[1] == 'send zero':
+                    அல்லதெனில் decoded[1] == 'send zero':
                         cmd = '[0,"zero index"]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
                         response = "sent zero"
-                    elif decoded[1] == 'close me':
+                    அல்லதெனில் decoded[1] == 'close me':
                         print("closing")
                         self.request.close()
                         response = ""
-                    elif decoded[1] == 'wait a bit':
-                        time.sleep(0.2)
+                    அல்லதெனில் decoded[1] == 'wait a bit':
+                        time.ஸுஷுப்தி(0.2)
                         response = "waited"
-                    elif decoded[1] == '!quit!':
+                    அல்லதெனில் decoded[1] == '!quit!':
                         # we're done
                         self.server.shutdown()
-                        return
-                    elif decoded[1] == '!crash!':
+                        திரும்பு
+                    அல்லதெனில் decoded[1] == '!crash!':
                         # Crash!
                         42 / 0
-                    else:
+                    இல்லையெனில்:
                         response = "what?"
 
-                    if response == "":
+                    எனில் response == "":
                         print("no response")
-                    else:
+                    இல்லையெனில்:
                         encoded = json.dumps([decoded[0], response])
                         print("sending: {0}".format(encoded))
                         self.request.sendall(encoded.encode('utf-8'))
 
                 # Negative numbers are used for "eval" responses.
-                elif decoded[0] < 0:
+                அல்லதெனில் decoded[0] < 0:
                     last_eval = decoded
 
-class ThreadedTCPRequestHandler(TestingRequestHandler):
+வகுப்பு ThreadedTCPRequestHandler(TestingRequestHandler):
     def setup(self):
         self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
-class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+வகுப்பு ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
 def writePortInFile(port):
     # Write the port number in Xportnr, so that the test knows it.
     f = open("Xportnr", "w")
-    f.write("{0}".format(port))
+    f.லிக("{0}".format(port))
     f.close()
 
-def main(host, port, server_class=ThreadedTCPServer):
+def முதன்மை(host, port, server_class=ThreadedTCPServer):
     # Wait half a second before opening the port to test waittime in ch_open().
     # We do want to get the port number, get that first.  We cannot open the
     # socket, guess a port is free.
-    if len(sys.argv) >= 2 and sys.argv[1] == 'delay':
+    எனில் len(sys.argv) >= 2 மற்றும் sys.argv[1] == 'delay':
         port = 13684
         writePortInFile(port)
 
         print("Wait for it...")
-        time.sleep(0.5)
+        time.ஸுஷுப்தி(0.5)
 
     addrs = socket.getaddrinfo(host, port, 0, 0, socket.IPPROTO_TCP)
     # Each addr is a (family, type, proto, canonname, sockaddr) tuple
@@ -269,7 +269,7 @@ def main(host, port, server_class=ThreadedTCPServer):
 
     # Start a thread with the server.  That thread will then start a new thread
     # for each connection.
-    server_thread = threading.Thread(target=server.serve_forever)
+    server_thread = threading.இழை(target=server.serve_forever)
     server_thread.start()
 
     writePortInFile(port)
@@ -278,11 +278,11 @@ def main(host, port, server_class=ThreadedTCPServer):
 
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
-    try:
-        while server_thread.is_alive():
+    முயல்:
+        போது server_thread.is_alive():
             server_thread.join(1)
-    except (KeyboardInterrupt, SystemExit):
+    விதிவிலக்கு (KeyboardInterrupt, SystemExit):
         server.shutdown()
 
-if __name__ == "__main__":
-    main("127.0.0.1", 0)
+எனில் __name__ == "__main__":
+    முதன்மை("127.0.0.1", 0)

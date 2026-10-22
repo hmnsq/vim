@@ -38,9 +38,9 @@
  * in tl_scrollback are no longer used.
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#if defined(FEAT_TERMINAL)
+#எனில் defined(FEAT_TERMINAL)
 
 #ifndef MIN
 # define MIN(x,y) ((x) < (y) ? (x) : (y))
@@ -49,24 +49,24 @@
 # define MAX(x,y) ((x) > (y) ? (x) : (y))
 #endif
 
-#include "libvterm/include/vterm.h"
+#அந்தர்பாவ "libvterm/include/vterm.h"
 
 // This is VTermScreenCell without the characters, thus much smaller.
-typedef struct {
+வகைவரை கட்டமைப்பு {
     VTermScreenCellAttrs	attrs;
-    char			width;
+    எழுத்து			width;
     VTermColor			fg;
     VTermColor			bg;
 } cellattr_T;
 
-typedef struct sb_line_S {
-    int		sb_cols;	// can differ per line
-    int		sb_bytes;	// length in bytes of text
+வகைவரை கட்டமைப்பு sb_வரி_S {
+    முழு		sb_cols;	// can differ per line
+    முழு		sb_bytes;	// length in bytes of text
     cellattr_T	*sb_cells;	// allocated
     cellattr_T	sb_fill_attr;	// for short line
     char_u	*sb_text;	// for tl_scrollback_postponed
     char_u	continuation;
-} sb_line_T;
+} sb_வரி_T;
 
 #ifdef MSWIN
 # ifndef HPCON
@@ -78,7 +78,7 @@ typedef struct sb_line_S {
 # ifndef PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE
 #  define PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE 0x00020016
 # endif
-typedef struct _DYN_STARTUPINFOEXW
+வகைவரை கட்டமைப்பு _DYN_STARTUPINFOEXW
 {
     STARTUPINFOW StartupInfo;
     LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList;
@@ -86,26 +86,26 @@ typedef struct _DYN_STARTUPINFOEXW
 #endif
 
 // typedef term_T in structs.h
-struct terminal_S {
+கட்டமைப்பு terminal_S {
     term_T	*tl_next;
 
     VTerm	*tl_vterm;
     job_T	*tl_job;
     buf_T	*tl_buffer;
-#if defined(FEAT_GUI)
-    int		tl_system;	// when non-zero used for :!cmd output
-    int		tl_toprow;	// row with first line of system terminal
+#எனில் defined(FEAT_GUI)
+    முழு		tl_system;	// when non-zero used for :!cmd output
+    முழு		tl_toprow;	// row with first line of system terminal
 #endif
 
     // Set when setting the size of a vterm, reset after redrawing.
-    int		tl_vterm_size_changed;
+    முழு		tl_vterm_size_changed;
 
-    int		tl_normal_mode; // TRUE: Terminal-Normal mode
-    int		tl_channel_closing;
-    int		tl_channel_closed;
-    int		tl_channel_recently_closed; // still need to handle tl_finish
+    முழு		tl_normal_mode; // TRUE: Terminal-Normal mode
+    முழு		tl_channel_closing;
+    முழு		tl_channel_closed;
+    முழு		tl_channel_recently_closed; // still need to handle tl_finish
 
-    int		tl_finish;
+    முழு		tl_finish;
 #define TL_FINISH_UNSET	    NUL
 #define TL_FINISH_CLOSE	    'c'	// ++close or :terminal without argument
 #define TL_FINISH_NOCLOSE   'n'	// ++noclose
@@ -117,58 +117,58 @@ struct terminal_S {
     char_u	*tl_arg0_cmd;	// To format the status bar
 
 #ifdef MSWIN
-    void	*tl_winpty_config;
-    void	*tl_winpty;
+    வெறுமை	*tl_winpty_config;
+    வெறுமை	*tl_winpty;
 
     HPCON	tl_conpty;
     DYN_STARTUPINFOEXW tl_siex;	// Structure that always needs to be hold
 
     FILE	*tl_out_fd;
 #endif
-#if defined(FEAT_SESSION)
+#எனில் defined(FEAT_SESSION)
     char_u	*tl_command;
 #endif
     char_u	*tl_kill;
 
     // last known vterm size
-    int		tl_rows;
-    int		tl_cols;
+    முழு		tl_rows;
+    முழு		tl_cols;
 
     char_u	*tl_title; // NULL or allocated
     char_u	*tl_status_text; // NULL or allocated
 
     // Range of screen rows to update.  Zero based.
-    int		tl_dirty_row_start; // MAX_ROW if nothing dirty
-    int		tl_dirty_row_end;   // row below last one to update
-    int		tl_dirty_snapshot;  // text updated after making snapshot
+    முழு		tl_dirty_row_start; // MAX_ROW if nothing dirty
+    முழு		tl_dirty_row_end;   // row below last one to update
+    முழு		tl_dirty_snapshot;  // text updated after making snapshot
 #ifdef FEAT_TIMERS
-    int		tl_timer_set;
+    முழு		tl_timer_set;
     proftime_T	tl_timer_due;
 #endif
-    int		tl_postponed_scroll;	// to be scrolled up
+    முழு		tl_postponed_scroll;	// to be scrolled up
 
     garray_T	tl_scrollback;
-    int		tl_scrollback_scrolled;
+    முழு		tl_scrollback_scrolled;
     garray_T	tl_scrollback_postponed;
-    int		tl_scrollback_snapshot;
-    int		tl_buffer_scrolled;
+    முழு		tl_scrollback_snapshot;
+    முழு		tl_buffer_scrolled;
 
     char_u	*tl_highlight_name; // replaces "Terminal"; allocated
 
     cellattr_T	tl_default_color;
 
-    linenr_T	tl_top_diff_rows;   // rows of top diff file or zero
+    linenr_T	tl_உச்சி_diff_rows;   // rows of top diff file or zero
     linenr_T	tl_bot_diff_rows;   // rows of bottom diff file
 
     VTermPos	tl_cursor_pos;
-    int		tl_cursor_visible;
-    int		tl_cursor_blink;
-    int		tl_cursor_shape;  // 1: block, 2: underline, 3: bar
+    முழு		tl_cursor_visible;
+    முழு		tl_cursor_blink;
+    முழு		tl_cursor_shape;  // 1: block, 2: underline, 3: bar
     char_u	*tl_cursor_color; // NULL or allocated
 
     long_u	*tl_palette; // array of 16 colors specified by term_start, can
 			     // be NULL
-    int		tl_using_altscreen;
+    முழு		tl_using_altscreen;
     garray_T	tl_osc_buf;	    // incomplete OSC string
 };
 
@@ -178,74 +178,74 @@ struct terminal_S {
 /*
  * List of all active terminals.
  */
-static term_T *first_term = NULL;
+நிலையான term_T *first_term = வெற்று;
 
 // Terminal active in terminal_loop().
-static term_T *in_terminal_loop = NULL;
+நிலையான term_T *in_terminal_loop = வெற்று;
 
 #ifdef MSWIN
-static BOOL has_winpty = FALSE;
-static BOOL has_conpty = FALSE;
+நிலையான BOOL has_winpty = FALSE;
+நிலையான BOOL has_conpty = FALSE;
 #endif
 
 #define MAX_ROW 999999	    // used for tl_dirty_row_end to update all rows
-#define KEY_BUF_LEN 200
+#define சாவி_BUF_LEN 200
 
 #define FOR_ALL_TERMS(term)	\
-    for ((term) = first_term; (term) != NULL; (term) = (term)->tl_next)
+    க்கு ((term) = first_term; (term) != வெற்று; (term) = (term)->tl_next)
 
 /*
  * Functions with separate implementation for MS-Windows and Unix-like systems.
  */
-static int term_and_job_init(term_T *term, typval_T *argvar, char **argv, jobopt_T *opt, jobopt_T *orig_opt);
-static int create_pty_only(term_T *term, jobopt_T *opt);
-static void term_report_winsize(term_T *term, int rows, int cols);
-static void term_free_vterm(term_T *term);
+நிலையான முழு term_and_job_init(term_T *term, typval_T *argvar, எழுத்து **argv, jobopt_T *opt, jobopt_T *orig_opt);
+நிலையான முழு create_pty_only(term_T *term, jobopt_T *opt);
+நிலையான வெறுமை term_report_winsize(term_T *term, முழு rows, முழு cols);
+நிலையான வெறுமை term_free_vterm(term_T *term);
 #ifdef FEAT_GUI
-static void update_system_term(term_T *term);
+நிலையான வெறுமை update_system_term(term_T *term);
 #endif
 
-static void handle_postponed_scrollback(term_T *term);
+நிலையான வெறுமை handle_postponed_scrollback(term_T *term);
 
 // The character that we know (or assume) that the terminal expects for the
 // backspace key.
-static int term_backspace_char = BS;
+நிலையான முழு term_backspace_char = BS;
 
 // Store the last set and the desired cursor properties, so that we only update
 // them when needed.  Doing it unnecessary may result in flicker.
-static char_u	*last_set_cursor_color = NULL;
-static char_u	*desired_cursor_color = NULL;
-static int	last_set_cursor_shape = -1;
-static int	desired_cursor_shape = -1;
-static int	last_set_cursor_blink = -1;
-static int	desired_cursor_blink = -1;
+நிலையான char_u	*last_set_cursor_color = வெற்று;
+நிலையான char_u	*desired_cursor_color = வெற்று;
+நிலையான முழு	last_set_cursor_shape = -1;
+நிலையான முழு	desired_cursor_shape = -1;
+நிலையான முழு	last_set_cursor_blink = -1;
+நிலையான முழு	desired_cursor_blink = -1;
 
 
 ///////////////////////////////////////
 // 1. Generic code for all systems.
 
-    static int
+    நிலையான முழு
 cursor_color_equal(char_u *lhs_color, char_u *rhs_color)
 {
-    if (lhs_color != NULL && rhs_color != NULL)
-	return STRCMP(lhs_color, rhs_color) == 0;
-    return lhs_color == NULL && rhs_color == NULL;
+    எனில் (lhs_color != வெற்று && rhs_color != வெற்று)
+	திரும்பு STRCMP(lhs_color, rhs_color) == 0;
+    திரும்பு lhs_color == வெற்று && rhs_color == வெற்று;
 }
 
-    static void
+    நிலையான வெறுமை
 cursor_color_copy(char_u **to_color, char_u *from_color)
 {
     // Avoid a free & alloc if the value is already right.
-    if (cursor_color_equal(*to_color, from_color))
-	return;
+    எனில் (cursor_color_equal(*to_color, from_color))
+	திரும்பு;
     vim_free(*to_color);
-    *to_color = (from_color == NULL) ? NULL : vim_strsave(from_color);
+    *to_color = (from_color == வெற்று) ? வெற்று : vim_strsave(from_color);
 }
 
-    static char_u *
+    நிலையான char_u *
 cursor_color_get(char_u *color)
 {
-    return (color == NULL) ? (char_u *)"" : color;
+    திரும்பு (color == வெற்று) ? (char_u *)"" : color;
 }
 
 
@@ -255,89 +255,89 @@ cursor_color_get(char_u *color)
  * Sets "rows" and/or "cols" to zero when it should follow the window size.
  * Return TRUE if the size is the minimum size: "24*80".
  */
-    static int
-parse_termwinsize(win_T *wp, int *rows, int *cols)
+    நிலையான முழு
+parse_termwinsize(win_T *wp, முழு *rows, முழு *cols)
 {
-    int	minsize = FALSE;
+    முழு	minsize = FALSE;
 
     *rows = 0;
     *cols = 0;
 
-    if (*wp->w_p_tws == NUL)
-	return FALSE;
+    எனில் (*wp->w_p_tws == NUL)
+	திரும்பு FALSE;
 
     char_u *p = vim_strchr(wp->w_p_tws, 'x');
 
     // Syntax of value was already checked when it's set.
-    if (p == NULL)
+    எனில் (p == வெற்று)
     {
 	minsize = TRUE;
 	p = vim_strchr(wp->w_p_tws, '*');
     }
-    *rows = atoi((char *)wp->w_p_tws);
-    *cols = atoi((char *)p + 1);
-    if (*rows > VTERM_MAX_ROWS)
+    *rows = atoi((எழுத்து *)wp->w_p_tws);
+    *cols = atoi((எழுத்து *)p + 1);
+    எனில் (*rows > VTERM_MAX_ROWS)
 	*rows = VTERM_MAX_ROWS;
-    if (*cols > VTERM_MAX_COLS)
+    எனில் (*cols > VTERM_MAX_COLS)
 	*cols = VTERM_MAX_COLS;
-    return minsize;
+    திரும்பு minsize;
 }
 
 /*
  * Determine the terminal size from 'termwinsize' and the current window.
  */
-    static void
+    நிலையான வெறுமை
 set_term_and_win_size(term_T *term, jobopt_T *opt)
 {
-    int rows, cols;
-    int	minsize;
+    முழு rows, cols;
+    முழு	minsize;
 
 #ifdef FEAT_GUI
-    if (term->tl_system)
+    எனில் (term->tl_system)
     {
 	// Use the entire screen (excluding the tabpanel area) for the system
 	// commands.  However, it will start at the command line and scroll up
 	// as needed, using tl_toprow.
 	term->tl_rows = Rows;
 	term->tl_cols = topframe->fr_width;
-	return;
+	திரும்பு;
     }
 #endif
     term->tl_rows = curwin->w_height;
     term->tl_cols = curwin->w_width;
 
     minsize = parse_termwinsize(curwin, &rows, &cols);
-    if (minsize)
+    எனில் (minsize)
     {
-	if (term->tl_rows < rows)
+	எனில் (term->tl_rows < rows)
 	    term->tl_rows = rows;
-	if (term->tl_cols < cols)
+	எனில் (term->tl_cols < cols)
 	    term->tl_cols = cols;
     }
-    if ((opt->jo_set2 & JO2_TERM_ROWS))
+    எனில் ((opt->jo_set2 & JO2_TERM_ROWS))
 	term->tl_rows = opt->jo_term_rows;
-    else if (rows != 0)
+    இல்லையெனில் எனில் (rows != 0)
 	term->tl_rows = rows;
-    if ((opt->jo_set2 & JO2_TERM_COLS))
+    எனில் ((opt->jo_set2 & JO2_TERM_COLS))
 	term->tl_cols = opt->jo_term_cols;
-    else if (cols != 0)
+    இல்லையெனில் எனில் (cols != 0)
 	term->tl_cols = cols;
 
-    if (!opt->jo_hidden)
+    எனில் (!opt->jo_hidden)
     {
-	if (term->tl_rows != curwin->w_height)
+	எனில் (term->tl_rows != curwin->w_height)
 	    win_setheight_win(term->tl_rows, curwin);
-	if (term->tl_cols != curwin->w_width)
+	எனில் (term->tl_cols != curwin->w_width)
 	    win_setwidth_win(term->tl_cols, curwin);
 
 	// Set 'winsize' now to avoid a resize at the next redraw.
-	if (!minsize && *curwin->w_p_tws != NUL)
+	எனில் (!minsize && *curwin->w_p_tws != NUL)
 	{
 	    char_u buf[100];
 
-	    vim_snprintf((char *)buf, 100, "%dx%d",
+	    vim_snprintf((எழுத்து *)buf, 100, "%dx%d",
 						 term->tl_rows, term->tl_cols);
-	    set_option_value_give_err((char_u *)"termwinsize",
+	    set_option_மதிப்பு_give_err((char_u *)"termwinsize",
 							   0L, buf, OPT_LOCAL);
 	}
     }
@@ -347,7 +347,7 @@ set_term_and_win_size(term_T *term, jobopt_T *opt)
  * Initialize job options for a terminal job.
  * Caller may overrule some of them.
  */
-    void
+    வெறுமை
 init_job_options(jobopt_T *opt)
 {
     clear_job_options(opt);
@@ -361,13 +361,13 @@ init_job_options(jobopt_T *opt)
 /*
  * Set job options mandatory for a terminal job.
  */
-    static void
-setup_job_options(jobopt_T *opt, int rows, int cols)
+    நிலையான வெறுமை
+setup_job_options(jobopt_T *opt, முழு rows, முழு cols)
 {
 #ifndef MSWIN
     // Win32: Redirecting the job output won't work, thus always connect stdout
     // here.
-    if (!(opt->jo_set & JO_OUT_IO))
+    எனில் (!(opt->jo_set & JO_OUT_IO))
 #endif
     {
 	// Connect stdout to the terminal.
@@ -380,7 +380,7 @@ setup_job_options(jobopt_T *opt, int rows, int cols)
 #ifndef MSWIN
     // Win32: Redirecting the job output won't work, thus always connect stderr
     // here.
-    if (!(opt->jo_set & JO_ERR_IO))
+    எனில் (!(opt->jo_set & JO_ERR_IO))
 #endif
     {
 	// Connect stderr to the terminal.
@@ -391,17 +391,17 @@ setup_job_options(jobopt_T *opt, int rows, int cols)
     }
 
     opt->jo_pty = TRUE;
-    if ((opt->jo_set2 & JO2_TERM_ROWS) == 0)
+    எனில் ((opt->jo_set2 & JO2_TERM_ROWS) == 0)
 	opt->jo_term_rows = rows;
-    if ((opt->jo_set2 & JO2_TERM_COLS) == 0)
+    எனில் ((opt->jo_set2 & JO2_TERM_COLS) == 0)
 	opt->jo_term_cols = cols;
 }
 
 /*
  * Flush messages on channels.
  */
-    static void
-term_flush_messages(void)
+    நிலையான வெறுமை
+term_flush_messages(வெறுமை)
 {
     mch_check_messages();
     parse_queued_messages();
@@ -411,11 +411,11 @@ term_flush_messages(void)
  * Close a terminal buffer (and its window).  Used when creating the terminal
  * fails.
  */
-    static void
+    நிலையான வெறுமை
 term_close_buffer(buf_T *buf, buf_T *old_curbuf)
 {
     free_terminal(buf);
-    if (old_curbuf != NULL)
+    எனில் (old_curbuf != வெற்று)
     {
 	--curbuf->b_nwindows;
 	curbuf = old_curbuf;
@@ -439,44 +439,44 @@ term_close_buffer(buf_T *buf, buf_T *old_curbuf)
     buf_T *
 term_start(
 	typval_T    *argvar,
-	char	    **argv,
+	எழுத்து	    **argv,
 	jobopt_T    *opt,
-	int	    flags)
+	முழு	    flags)
 {
     exarg_T	split_ea;
     win_T	*old_curwin = curwin;
     term_T	*term;
-    buf_T	*old_curbuf = NULL;
-    int		res;
+    buf_T	*old_curbuf = வெற்று;
+    முழு		res;
     buf_T	*newbuf;
-    int		vertical = opt->jo_vertical || (cmdmod.cmod_split & WSP_VERT);
+    முழு		vertical = opt->jo_vertical || (cmdmod.cmod_split & WSP_VERT);
     jobopt_T	orig_opt;  // only partly filled
     pos_T	save_cursor;
 
-    if (check_restricted() || check_secure())
-	return NULL;
-    if (cmdwin_type != 0)
+    எனில் (check_restricted() || check_secure())
+	திரும்பு வெற்று;
+    எனில் (cmdwin_type != 0)
     {
-	emsg(_(e_cannot_open_terminal_from_command_line_window));
-	return NULL;
+	emsg(_(e_cannot_open_terminal_from_command_வரி_window));
+	திரும்பு வெற்று;
     }
 
-    if ((opt->jo_set & (JO_IN_IO + JO_OUT_IO + JO_ERR_IO))
+    எனில் ((opt->jo_set & (JO_IN_IO + JO_OUT_IO + JO_ERR_IO))
 					 == (JO_IN_IO + JO_OUT_IO + JO_ERR_IO)
 	|| (!(opt->jo_set & JO_OUT_IO) && (opt->jo_set & JO_OUT_BUF))
 	|| (!(opt->jo_set & JO_ERR_IO) && (opt->jo_set & JO_ERR_BUF))
-	|| (argvar != NULL
+	|| (argvar != வெற்று
 	    && argvar->v_type == VAR_LIST
-	    && argvar->vval.v_list != NULL
+	    && argvar->vval.v_list != வெற்று
 	    && argvar->vval.v_list->lv_first == &range_list_item))
     {
 	emsg(_(e_invalid_argument));
-	return NULL;
+	திரும்பு வெற்று;
     }
 
     term = ALLOC_CLEAR_ONE(term_T);
-    if (term == NULL)
-	return NULL;
+    எனில் (term == வெற்று)
+	திரும்பு வெற்று;
     term->tl_dirty_row_end = MAX_ROW;
     term->tl_cursor_visible = TRUE;
     term->tl_cursor_shape = VTERM_PROP_CURSORSHAPE_BLOCK;
@@ -484,42 +484,42 @@ term_start(
 #ifdef FEAT_GUI
     term->tl_system = (flags & TERM_START_SYSTEM);
 #endif
-    ga_init2(&term->tl_scrollback, sizeof(sb_line_T), 300);
-    ga_init2(&term->tl_scrollback_postponed, sizeof(sb_line_T), 300);
-    ga_init2(&term->tl_osc_buf, sizeof(char), 300);
+    ga_init2(&term->tl_scrollback, அளவு(sb_வரி_T), 300);
+    ga_init2(&term->tl_scrollback_postponed, அளவு(sb_வரி_T), 300);
+    ga_init2(&term->tl_osc_buf, அளவு(எழுத்து), 300);
 
     setpcmark();
     CLEAR_FIELD(split_ea);
-    if (opt->jo_curwin)
+    எனில் (opt->jo_curwin)
     {
 	// Create a new buffer in the current window.
-	if (!can_abandon(curbuf, flags & TERM_START_FORCEIT))
+	எனில் (!can_abandon(curbuf, flags & TERM_START_FORCEIT))
 	{
 	    no_write_message();
 	    vim_free(term);
-	    return NULL;
+	    திரும்பு வெற்று;
 	}
-	if (do_ecmd(0, NULL, NULL, &split_ea, ECMD_ONE,
+	எனில் (do_ecmd(0, வெற்று, வெற்று, &split_ea, ECMD_ONE,
 		      (buf_hide(curwin->w_buffer) ? ECMD_HIDE : 0)
 			  + ((flags & TERM_START_FORCEIT) ? ECMD_FORCEIT : 0),
 							       curwin) == FAIL)
 	{
 	    vim_free(term);
-	    return NULL;
+	    திரும்பு வெற்று;
 	}
     }
-    else if (opt->jo_hidden || (flags & TERM_START_SYSTEM))
+    இல்லையெனில் எனில் (opt->jo_hidden || (flags & TERM_START_SYSTEM))
     {
 	buf_T *buf;
 
 	// Create a new buffer without a window. Make it the current buffer for
 	// a moment to be able to do the initializations.
-	buf = buflist_new((char_u *)"", NULL, (linenr_T)0,
+	buf = buflist_new((char_u *)"", வெற்று, (linenr_T)0,
 							 BLN_NEW | BLN_LISTED);
-	if (buf == NULL || ml_open(buf) == FAIL)
+	எனில் (buf == வெற்று || ml_open(buf) == FAIL)
 	{
 	    vim_free(term);
-	    return NULL;
+	    திரும்பு வெற்று;
 	}
 	old_curbuf = curbuf;
 	--curbuf->b_nwindows;
@@ -528,50 +528,50 @@ term_start(
 	curwin->w_buffer = buf;
 	++curbuf->b_nwindows;
     }
-    else
+    இல்லையெனில்
     {
 	// Open a new window or tab.
 	split_ea.cmdidx = CMD_new;
 	split_ea.cmd = (char_u *)"new";
 	split_ea.arg = (char_u *)"";
-	if (opt->jo_term_rows > 0 && !vertical)
+	எனில் (opt->jo_term_rows > 0 && !vertical)
 	{
 	    split_ea.line2 = opt->jo_term_rows;
-	    split_ea.addr_count = 1;
+	    split_ea.addr_மொத்தம் = 1;
 	}
-	if (opt->jo_term_cols > 0 && vertical)
+	எனில் (opt->jo_term_cols > 0 && vertical)
 	{
 	    split_ea.line2 = opt->jo_term_cols;
-	    split_ea.addr_count = 1;
+	    split_ea.addr_மொத்தம் = 1;
 	}
 
-	int cmod_split_modified = FALSE;
-	if (vertical)
+	முழு cmod_split_modified = FALSE;
+	எனில் (vertical)
 	{
-	    if (!(cmdmod.cmod_split & WSP_VERT))
+	    எனில் (!(cmdmod.cmod_split & WSP_VERT))
 		cmod_split_modified = TRUE;
 	    cmdmod.cmod_split |= WSP_VERT;
 	}
 	ex_splitview(&split_ea);
-	if (cmod_split_modified)
+	எனில் (cmod_split_modified)
 	    cmdmod.cmod_split &= ~WSP_VERT;
-	if (curwin == old_curwin)
+	எனில் (curwin == old_curwin)
 	{
 	    // split failed
 	    vim_free(term);
-	    return NULL;
+	    திரும்பு வெற்று;
 	}
     }
     term->tl_buffer = curbuf;
     curbuf->b_term = term;
 
-    if (!opt->jo_hidden)
+    எனில் (!opt->jo_hidden)
     {
 	// Only one size was taken care of with :new, do the other one.  With
 	// "curwin" both need to be done.
-	if (opt->jo_term_rows > 0 && (opt->jo_curwin || vertical))
+	எனில் (opt->jo_term_rows > 0 && (opt->jo_curwin || vertical))
 	    win_setheight(opt->jo_term_rows);
-	if (opt->jo_term_cols > 0 && (opt->jo_curwin || !vertical))
+	எனில் (opt->jo_term_cols > 0 && (opt->jo_curwin || !vertical))
 	    win_setwidth(opt->jo_term_cols);
     }
 
@@ -579,55 +579,55 @@ term_start(
     term->tl_next = first_term;
     first_term = term;
 
-    apply_autocmds(EVENT_BUFFILEPRE, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_BUFFILEPRE, வெற்று, வெற்று, FALSE, curbuf);
 
-    if (opt->jo_term_name != NULL)
+    எனில் (opt->jo_term_name != வெற்று)
     {
 	vim_free(curbuf->b_ffname);
 	curbuf->b_ffname = vim_strsave(opt->jo_term_name);
     }
-    else if (argv != NULL)
+    இல்லையெனில் எனில் (argv != வெற்று)
     {
 	vim_free(curbuf->b_ffname);
 	curbuf->b_ffname = vim_strsave((char_u *)"!system");
     }
-    else
+    இல்லையெனில்
     {
-	int	i;
+	முழு	i;
 	size_t	len;
 	char_u	*cmd, *p;
 
-	if (argvar->v_type == VAR_STRING)
+	எனில் (argvar->v_type == VAR_STRING)
 	{
 	    cmd = argvar->vval.v_string;
-	    if (cmd == NULL)
+	    எனில் (cmd == வெற்று)
 		cmd = (char_u *)"";
-	    else if (STRCMP(cmd, "NONE") == 0)
+	    இல்லையெனில் எனில் (STRCMP(cmd, "NONE") == 0)
 		cmd = (char_u *)"pty";
 	}
-	else if (argvar->v_type != VAR_LIST
-		|| argvar->vval.v_list == NULL
+	இல்லையெனில் எனில் (argvar->v_type != VAR_LIST
+		|| argvar->vval.v_list == வெற்று
 		|| argvar->vval.v_list->lv_len == 0
 		|| (cmd = tv_get_string_chk(
-			       &argvar->vval.v_list->lv_first->li_tv)) == NULL)
+			       &argvar->vval.v_list->lv_first->li_tv)) == வெற்று)
 	    cmd = (char_u*)"";
 
 	len = STRLEN(cmd) + 10;
 	p = alloc(len);
 
-	for (i = 0; p != NULL; ++i)
+	க்கு (i = 0; p != வெற்று; ++i)
 	{
 	    // Prepend a ! to the command name to avoid the buffer name equals
 	    // the executable, otherwise ":w!" would overwrite it.
-	    if (i == 0)
-		vim_snprintf((char *)p, len, "!%s", cmd);
-	    else
-		vim_snprintf((char *)p, len, "!%s (%d)", cmd, i);
-	    if (buflist_findname(p) == NULL)
+	    எனில் (i == 0)
+		vim_snprintf((எழுத்து *)p, len, "!%s", cmd);
+	    இல்லையெனில்
+		vim_snprintf((எழுத்து *)p, len, "!%s (%d)", cmd, i);
+	    எனில் (buflist_findname(p) == வெற்று)
 	    {
 		vim_free(curbuf->b_ffname);
 		curbuf->b_ffname = p;
-		break;
+		நிறுத்து;
 	    }
 	}
     }
@@ -635,12 +635,12 @@ term_start(
     curbuf->b_sfname = vim_strsave(curbuf->b_ffname);
     curbuf->b_fname = curbuf->b_ffname;
 
-    apply_autocmds(EVENT_BUFFILEPOST, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_BUFFILEPOST, வெற்று, வெற்று, FALSE, curbuf);
 
-    if (opt->jo_term_opencmd != NULL)
+    எனில் (opt->jo_term_opencmd != வெற்று)
 	term->tl_opencmd = vim_strsave(opt->jo_term_opencmd);
 
-    if (opt->jo_eof_chars != NULL)
+    எனில் (opt->jo_eof_chars != வெற்று)
 	term->tl_eof_chars = vim_strsave(opt->jo_eof_chars);
 
     set_string_option_direct((char_u *)"buftype", -1,
@@ -654,109 +654,109 @@ term_start(
 
     set_term_and_win_size(term, opt);
 #ifdef MSWIN
-    mch_memmove(orig_opt.jo_io, opt->jo_io, sizeof(orig_opt.jo_io));
+    mch_memmove(orig_opt.jo_io, opt->jo_io, அளவு(orig_opt.jo_io));
 #endif
     setup_job_options(opt, term->tl_rows, term->tl_cols);
 
-    if (flags & TERM_START_NOJOB)
-	return curbuf;
+    எனில் (flags & TERM_START_NOJOB)
+	திரும்பு curbuf;
 
-#if defined(FEAT_SESSION)
+#எனில் defined(FEAT_SESSION)
     // Remember the command for the session file.
-    if (opt->jo_term_norestore || argv != NULL)
+    எனில் (opt->jo_term_norestore || argv != வெற்று)
 	term->tl_command = vim_strsave((char_u *)"NONE");
-    else if (argvar->v_type == VAR_STRING)
+    இல்லையெனில் எனில் (argvar->v_type == VAR_STRING)
     {
 	char_u	*cmd = argvar->vval.v_string;
 
-	if (cmd != NULL && STRCMP(cmd, p_sh) != 0)
+	எனில் (cmd != வெற்று && STRCMP(cmd, p_sh) != 0)
 	    term->tl_command = vim_strsave(cmd);
     }
-    else if (argvar->v_type == VAR_LIST
-	    && argvar->vval.v_list != NULL
+    இல்லையெனில் எனில் (argvar->v_type == VAR_LIST
+	    && argvar->vval.v_list != வெற்று
 	    && argvar->vval.v_list->lv_len > 0)
     {
 	garray_T	ga;
 	listitem_T	*item;
 
 	ga_init2(&ga, 1, 100);
-	FOR_ALL_LIST_ITEMS(argvar->vval.v_list, item)
+	FOR_ALL_LIST_பொருட்கள்(argvar->vval.v_list, item)
 	{
 	    char_u *s = tv_get_string_chk(&item->li_tv);
 	    char_u *p;
 
-	    if (s == NULL)
-		break;
+	    எனில் (s == வெற்று)
+		நிறுத்து;
 	    p = vim_strsave_fnameescape(s, VSE_NONE);
-	    if (p == NULL)
-		break;
+	    எனில் (p == வெற்று)
+		நிறுத்து;
 	    ga_concat(&ga, p);
 	    vim_free(p);
 	    ga_append(&ga, ' ');
 	}
-	if (item == NULL)
+	எனில் (item == வெற்று)
 	{
 	    ga_append(&ga, NUL);
 	    term->tl_command = ga.ga_data;
 	}
-	else
+	இல்லையெனில்
 	    ga_clear(&ga);
     }
 #endif
 
-    if (opt->jo_term_kill != NULL)
+    எனில் (opt->jo_term_kill != வெற்று)
     {
 	char_u *p = skiptowhite(opt->jo_term_kill);
 
 	term->tl_kill = vim_strnsave(opt->jo_term_kill, p - opt->jo_term_kill);
     }
 
-    if (opt->jo_term_api != NULL)
+    எனில் (opt->jo_term_api != வெற்று)
     {
 	char_u *p = skiptowhite(opt->jo_term_api);
 
 	term->tl_api = vim_strnsave(opt->jo_term_api, p - opt->jo_term_api);
     }
-    else
+    இல்லையெனில்
 	term->tl_api = vim_strsave((char_u *)"Tapi_");
 
-    if (opt->jo_set2 & JO2_TERM_HIGHLIGHT)
+    எனில் (opt->jo_set2 & JO2_TERM_HIGHLIGHT)
 	term->tl_highlight_name = vim_strsave(opt->jo_term_highlight);
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#எனில் defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // Save the user-defined palette, it is only used in GUI (or 'tgc' is on).
-    if (opt->jo_set2 & JO2_ANSI_COLORS)
+    எனில் (opt->jo_set2 & JO2_ANSI_COLORS)
     {
 	term->tl_palette = ALLOC_MULT(long_u, 16);
-	if (term->tl_palette == NULL)
+	எனில் (term->tl_palette == வெற்று)
 	{
 	    vim_free(term);
-	    return NULL;
+	    திரும்பு வெற்று;
 	}
-	memcpy(term->tl_palette, opt->jo_ansi_colors, sizeof(long_u) * 16);
+	memcpy(term->tl_palette, opt->jo_ansi_colors, அளவு(long_u) * 16);
     }
 #endif
 
     // System dependent: setup the vterm and maybe start the job in it.
-    if (argv == NULL
+    எனில் (argv == வெற்று
 	    && argvar->v_type == VAR_STRING
-	    && argvar->vval.v_string != NULL
+	    && argvar->vval.v_string != வெற்று
 	    && STRCMP(argvar->vval.v_string, "NONE") == 0)
 	res = create_pty_only(term, opt);
-    else
+    இல்லையெனில்
 	res = term_and_job_init(term, argvar, argv, opt, &orig_opt);
 
     newbuf = curbuf;
-    if (res == OK)
+    எனில் (res == OK)
     {
 	// Get and remember the size we ended up with.  Update the pty.
 	vterm_get_size(term->tl_vterm, &term->tl_rows, &term->tl_cols);
 	term_report_winsize(term, term->tl_rows, term->tl_cols);
 #ifdef FEAT_GUI
-	if (term->tl_system)
+	எனில் (term->tl_system)
 	{
 	    // display first line below typed command
-	    term->tl_toprow = msg_row + 1;
+	    term->tl_toprow = செய்தி_row + 1;
 	    term->tl_dirty_row_end = 0;
 	}
 #endif
@@ -765,7 +765,7 @@ term_start(
 	// a deadlock if the job is waiting for Vim to read.
 	channel_set_nonblock(term->tl_job->jv_channel, PART_IN);
 
-	if (old_curbuf != NULL)
+	எனில் (old_curbuf != வெற்று)
 	{
 	    --curbuf->b_nwindows;
 	    curbuf = old_curbuf;
@@ -773,11 +773,11 @@ term_start(
 	    curwin->w_cursor = save_cursor;
 	    ++curbuf->b_nwindows;
 	}
-	else if (vgetc_busy
+	இல்லையெனில் எனில் (vgetc_busy
 #ifdef FEAT_TIMERS
 		|| timer_busy
 #endif
-		|| input_busy)
+		|| உள்ளீடு_busy)
 	{
 	    char_u ignore[4];
 
@@ -791,211 +791,211 @@ term_start(
 	    typebuf_was_filled = TRUE;
 	}
     }
-    else
+    இல்லையெனில்
     {
 	term_close_buffer(curbuf, old_curbuf);
-	return NULL;
+	திரும்பு வெற்று;
     }
 
-    apply_autocmds(EVENT_TERMINALOPEN, NULL, NULL, FALSE, newbuf);
-    if (!opt->jo_hidden && !(flags & TERM_START_SYSTEM))
-	apply_autocmds(EVENT_TERMINALWINOPEN, NULL, NULL, FALSE, newbuf);
-    return newbuf;
+    apply_autocmds(EVENT_TERMINALOPEN, வெற்று, வெற்று, FALSE, newbuf);
+    எனில் (!opt->jo_hidden && !(flags & TERM_START_SYSTEM))
+	apply_autocmds(EVENT_TERMINALWINOPEN, வெற்று, வெற்று, FALSE, newbuf);
+    திரும்பு newbuf;
 }
 
 /*
  * ":terminal": open a terminal window and execute a job in it.
  */
-    void
+    வெறுமை
 ex_terminal(exarg_T *eap)
 {
     typval_T	argvar[2];
     jobopt_T	opt;
-    int		opt_shell = FALSE;
+    முழு		opt_shell = FALSE;
     char_u	*cmd;
-    char_u	*tofree = NULL;
-    int		scroll_save = msg_scroll;
+    char_u	*tofree = வெற்று;
+    முழு		scroll_save = செய்தி_scroll;
 
-    msg_scroll = FALSE;		// don't scroll here
+    செய்தி_scroll = FALSE;		// don't scroll here
     autowrite_all();
-    msg_scroll = scroll_save;
+    செய்தி_scroll = scroll_save;
 
     init_job_options(&opt);
 
     cmd = eap->arg;
-    while (*cmd == '+' && *(cmd + 1) == '+')
+    போது (*cmd == '+' && *(cmd + 1) == '+')
     {
 	char_u  *p, *ep;
 
 	cmd += 2;
 	p = skiptowhite(cmd);
 	ep = vim_strchr(cmd, '=');
-	if (ep != NULL)
+	எனில் (ep != வெற்று)
 	{
-	    if (ep < p)
+	    எனில் (ep < p)
 		p = ep;
-	    else
-		ep = NULL;
+	    இல்லையெனில்
+		ep = வெற்று;
 	}
 
 	// Note: Keep this in sync with get_terminalopt_name.
 
-#define OPTARG_HAS(name) ((int)(p - cmd) == sizeof(name) - 1 \
-				 && STRNICMP(cmd, name, sizeof(name) - 1) == 0)
-	if (OPTARG_HAS("close"))
+#define OPTARG_HAS(name) ((முழு)(p - cmd) == அளவு(name) - 1 \
+				 && STRNICMP(cmd, name, அளவு(name) - 1) == 0)
+	எனில் (OPTARG_HAS("close"))
 	    opt.jo_term_finish = 'c';
-	else if (OPTARG_HAS("noclose"))
+	இல்லையெனில் எனில் (OPTARG_HAS("noclose"))
 	    opt.jo_term_finish = 'n';
-	else if (OPTARG_HAS("open"))
+	இல்லையெனில் எனில் (OPTARG_HAS("open"))
 	    opt.jo_term_finish = 'o';
-	else if (OPTARG_HAS("curwin"))
+	இல்லையெனில் எனில் (OPTARG_HAS("curwin"))
 	    opt.jo_curwin = 1;
-	else if (OPTARG_HAS("hidden"))
+	இல்லையெனில் எனில் (OPTARG_HAS("hidden"))
 	    opt.jo_hidden = 1;
-	else if (OPTARG_HAS("norestore"))
+	இல்லையெனில் எனில் (OPTARG_HAS("norestore"))
 	    opt.jo_term_norestore = 1;
-	else if (OPTARG_HAS("shell"))
+	இல்லையெனில் எனில் (OPTARG_HAS("shell"))
 	    opt_shell = TRUE;
-	else if (OPTARG_HAS("kill") && ep != NULL)
+	இல்லையெனில் எனில் (OPTARG_HAS("kill") && ep != வெற்று)
 	{
 	    opt.jo_set2 |= JO2_TERM_KILL;
 	    opt.jo_term_kill = ep + 1;
 	    p = skiptowhite(cmd);
 	}
-	else if (OPTARG_HAS("api"))
+	இல்லையெனில் எனில் (OPTARG_HAS("api"))
 	{
 	    opt.jo_set2 |= JO2_TERM_API;
-	    if (ep != NULL)
+	    எனில் (ep != வெற்று)
 	    {
 		opt.jo_term_api = ep + 1;
 		p = skiptowhite(cmd);
 	    }
-	    else
-		opt.jo_term_api = NULL;
+	    இல்லையெனில்
+		opt.jo_term_api = வெற்று;
 	}
-	else if (OPTARG_HAS("rows") && ep != NULL && SAFE_isdigit(ep[1]))
+	இல்லையெனில் எனில் (OPTARG_HAS("rows") && ep != வெற்று && SAFE_isdigit(ep[1]))
 	{
 	    opt.jo_set2 |= JO2_TERM_ROWS;
-	    opt.jo_term_rows = atoi((char *)ep + 1);
+	    opt.jo_term_rows = atoi((எழுத்து *)ep + 1);
 	    p = skiptowhite(cmd);
 	}
-	else if (OPTARG_HAS("cols") && ep != NULL && SAFE_isdigit(ep[1]))
+	இல்லையெனில் எனில் (OPTARG_HAS("cols") && ep != வெற்று && SAFE_isdigit(ep[1]))
 	{
 	    opt.jo_set2 |= JO2_TERM_COLS;
-	    opt.jo_term_cols = atoi((char *)ep + 1);
+	    opt.jo_term_cols = atoi((எழுத்து *)ep + 1);
 	    p = skiptowhite(cmd);
 	}
-	else if (OPTARG_HAS("eof") && ep != NULL)
+	இல்லையெனில் எனில் (OPTARG_HAS("eof") && ep != வெற்று)
 	{
-	    char_u *buf = NULL;
-	    char_u *keys;
+	    char_u *buf = வெற்று;
+	    char_u *சாவிகள்;
 
 	    vim_free(opt.jo_eof_chars);
 	    p = skiptowhite(cmd);
 	    *p = NUL;
-	    keys = replace_termcodes(ep + 1, &buf, 0,
-		    REPTERM_FROM_PART | REPTERM_DO_LT | REPTERM_SPECIAL, NULL);
+	    சாவிகள் = replace_termcodes(ep + 1, &buf, 0,
+		    REPTERM_FROM_PART | REPTERM_DO_LT | REPTERM_SPECIAL, வெற்று);
 	    opt.jo_set2 |= JO2_EOF_CHARS;
-	    opt.jo_eof_chars = vim_strsave(keys);
+	    opt.jo_eof_chars = vim_strsave(சாவிகள்);
 	    vim_free(buf);
 	    *p = ' ';
 	}
 #ifdef MSWIN
-	else if ((int)(p - cmd) == 4 && STRNICMP(cmd, "type", 4) == 0
-								 && ep != NULL)
+	இல்லையெனில் எனில் ((முழு)(p - cmd) == 4 && STRNICMP(cmd, "type", 4) == 0
+								 && ep != வெற்று)
 	{
-	    int tty_type = NUL;
+	    முழு tty_type = NUL;
 
 	    p = skiptowhite(cmd);
-	    if (STRNICMP(ep + 1, "winpty", p - (ep + 1)) == 0)
+	    எனில் (STRNICMP(ep + 1, "winpty", p - (ep + 1)) == 0)
 		tty_type = 'w';
-	    else if (STRNICMP(ep + 1, "conpty", p - (ep + 1)) == 0)
+	    இல்லையெனில் எனில் (STRNICMP(ep + 1, "conpty", p - (ep + 1)) == 0)
 		tty_type = 'c';
-	    else
+	    இல்லையெனில்
 	    {
-		semsg(_(e_invalid_value_for_argument_str), "type");
-		goto theend;
+		semsg(_(e_invalid_மதிப்பு_for_argument_str), "type");
+		செல் theend;
 	    }
 	    opt.jo_set2 |= JO2_TTY_TYPE;
 	    opt.jo_tty_type = tty_type;
 	}
 #endif
-	else
+	இல்லையெனில்
 	{
-	    if (*p)
+	    எனில் (*p)
 		*p = NUL;
 	    semsg(_(e_invalid_attribute_str), cmd);
-	    goto theend;
+	    செல் theend;
 	}
 #undef OPTARG_HAS
 	cmd = skipwhite(p);
     }
-    if (*cmd == NUL)
+    எனில் (*cmd == NUL)
     {
 	// Make a copy of 'shell', an autocommand may change the option.
 	tofree = cmd = vim_strsave(p_sh);
 
 	// default to close when the shell exits
-	if (opt.jo_term_finish == NUL)
+	எனில் (opt.jo_term_finish == NUL)
 	    opt.jo_term_finish = TL_FINISH_CLOSE;
     }
 
-    if (eap->addr_count > 0)
+    எனில் (eap->addr_மொத்தம் > 0)
     {
 	// Write lines from current buffer to the job.
-	opt.jo_set |= JO_IN_IO | JO_IN_BUF | JO_IN_TOP | JO_IN_BOT;
+	opt.jo_set |= JO_IN_IO | JO_IN_BUF | JO_IN_உச்சி | JO_IN_BOT;
 	opt.jo_io[PART_IN] = JIO_BUFFER;
 	opt.jo_io_buf[PART_IN] = curbuf->b_fnum;
-	opt.jo_in_top = eap->line1;
+	opt.jo_in_உச்சி = eap->line1;
 	opt.jo_in_bot = eap->line2;
     }
 
-    if (opt_shell && tofree == NULL)
+    எனில் (opt_shell && tofree == வெற்று)
     {
 #ifdef UNIX
-	char	**argv = NULL;
-	char_u	*tofree1 = NULL;
-	char_u	*tofree2 = NULL;
+	எழுத்து	**argv = வெற்று;
+	char_u	*tofree1 = வெற்று;
+	char_u	*tofree2 = வெற்று;
 
 	// :term ++shell command
-	if (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == OK)
-	    term_start(NULL, argv, &opt, eap->forceit ? TERM_START_FORCEIT : 0);
+	எனில் (unix_build_argv(cmd, &argv, &tofree1, &tofree2) == OK)
+	    term_start(வெற்று, argv, &opt, eap->forceit ? TERM_START_FORCEIT : 0);
 	vim_free(argv);
 	vim_free(tofree1);
 	vim_free(tofree2);
-	goto theend;
-#else
+	செல் theend;
+#இல்லையெனில்
 # ifdef MSWIN
 	long_u	    cmdlen = STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
 	char_u	    *newcmd;
 
 	newcmd = alloc(cmdlen);
-	if (newcmd == NULL)
-	    goto theend;
+	எனில் (newcmd == வெற்று)
+	    செல் theend;
 	tofree = newcmd;
-	vim_snprintf((char *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
+	vim_snprintf((எழுத்து *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
 	cmd = newcmd;
-# else
+# இல்லையெனில்
 	emsg(_(e_sorry_plusplusshell_not_supported_on_this_system));
-	goto theend;
+	செல் theend;
 # endif
 #endif
     }
     argvar[0].v_type = VAR_STRING;
     argvar[0].vval.v_string = cmd;
     argvar[1].v_type = VAR_UNKNOWN;
-    term_start(argvar, NULL, &opt, eap->forceit ? TERM_START_FORCEIT : 0);
+    term_start(argvar, வெற்று, &opt, eap->forceit ? TERM_START_FORCEIT : 0);
 
 theend:
     vim_free(tofree);
     vim_free(opt.jo_eof_chars);
 }
 
-    static char_u *
-get_terminalopt_name(expand_T *xp UNUSED, int idx)
+    நிலையான char_u *
+get_terminalopt_name(expand_T *xp UNUSED, முழு idx)
 {
     // Note: Keep this in sync with ex_terminal.
-    static char *(p_termopt_values[]) =
+    நிலையான எழுத்து *(p_termopt_மதிப்புகள்[]) =
     {
 	"close",
 	"noclose",
@@ -1012,18 +1012,18 @@ get_terminalopt_name(expand_T *xp UNUSED, int idx)
 	"api=",
     };
 
-    if (idx < (int)ARRAY_LENGTH(p_termopt_values))
-	return (char_u*)p_termopt_values[idx];
-    return NULL;
+    எனில் (idx < (முழு)ARRAY_LENGTH(p_termopt_மதிப்புகள்))
+	திரும்பு (char_u*)p_termopt_மதிப்புகள்[idx];
+    திரும்பு வெற்று;
 }
 
-    static char_u *
-get_termkill_name(expand_T *xp UNUSED, int idx)
+    நிலையான char_u *
+get_termkill_name(expand_T *xp UNUSED, முழு idx)
 {
     // These are platform-specific values used for job_stop(). They are defined
     // in each platform's mch_signal_job(). Just use a unified auto-complete
     // list for simplicity.
-    static char *(p_termkill_values[]) =
+    நிலையான எழுத்து *(p_termkill_மதிப்புகள்[]) =
     {
 	"term",
 	"hup",
@@ -1033,137 +1033,137 @@ get_termkill_name(expand_T *xp UNUSED, int idx)
 	"winch",
     };
 
-    if (idx < (int)ARRAY_LENGTH(p_termkill_values))
-	return (char_u*)p_termkill_values[idx];
-    return NULL;
+    எனில் (idx < (முழு)ARRAY_LENGTH(p_termkill_மதிப்புகள்))
+	திரும்பு (char_u*)p_termkill_மதிப்புகள்[idx];
+    திரும்பு வெற்று;
 }
 
 /*
  * Command-line expansion for :terminal [options]
  */
-    int
+    முழு
 expand_terminal_opt(
 	char_u	    *pat,
 	expand_T    *xp,
 	regmatch_T  *rmp,
 	char_u	    ***matches,
-	int	    *numMatches)
+	முழு	    *இலக்கம்_Matches)
 {
-    if (xp->xp_pattern > xp->xp_line && *(xp->xp_pattern-1) == '=')
+    எனில் (xp->xp_pattern > xp->xp_வரி && *(xp->xp_pattern-1) == '=')
     {
-	char_u *(*cb)(expand_T *, int) = NULL;
+	char_u *(*cb)(expand_T *, முழு) = வெற்று;
 
 	char_u *name_end = xp->xp_pattern - 1;
-	if (name_end - xp->xp_line >= 4
+	எனில் (name_end - xp->xp_வரி >= 4
 		&& STRNCMP(name_end - 4, "kill", 4) == 0)
 	    cb = get_termkill_name;
 
-	if (cb != NULL)
+	எனில் (cb != வெற்று)
 	{
-	    return ExpandGeneric(
+	    திரும்பு ExpandGeneric(
 		    pat,
 		    xp,
 		    rmp,
 		    matches,
-		    numMatches,
+		    இலக்கம்_Matches,
 		    cb,
 		    FALSE);
 	}
-	return FAIL;
+	திரும்பு FAIL;
     }
-    return ExpandGeneric(
+    திரும்பு ExpandGeneric(
 	    pat,
 	    xp,
 	    rmp,
 	    matches,
-	    numMatches,
+	    இலக்கம்_Matches,
 	    get_terminalopt_name,
 	    FALSE);
 }
 
-#if defined(FEAT_SESSION)
+#எனில் defined(FEAT_SESSION)
 /*
  * Write a :terminal command to the session file to restore the terminal in
  * window "wp".
  * Return FAIL if writing fails.
  */
-    int
+    முழு
 term_write_session(FILE *fd, win_T *wp, hashtab_T *terminal_bufs)
 {
-    const int	bufnr = wp->w_buffer->b_fnum;
+    மாறிலி முழு	bufnr = wp->w_buffer->b_fnum;
     term_T	*term = wp->w_buffer->b_term;
 
-    if (terminal_bufs != NULL && wp->w_buffer->b_nwindows > 1)
+    எனில் (terminal_bufs != வெற்று && wp->w_buffer->b_nwindows > 1)
     {
 	// There are multiple views into this terminal buffer. We don't want to
 	// create the terminal multiple times. If it's the first time, create,
 	// otherwise link to the first buffer.
-	char	    id_as_str[NUMBUFLEN];
+	எழுத்து	    id_as_str[NUMBUFLEN];
 	hashitem_T  *entry;
 
-	vim_snprintf(id_as_str, sizeof(id_as_str), "%d", bufnr);
+	vim_snprintf(id_as_str, அளவு(id_as_str), "%d", bufnr);
 
 	entry = hash_find(terminal_bufs, (char_u *)id_as_str);
-	if (!HASHITEM_EMPTY(entry))
+	எனில் (!HASHITEM_EMPTY(entry))
 	{
 	    // we've already opened this terminal buffer
-	    if (fprintf(fd, "execute 'buffer ' .. term_buf_%d", bufnr) < 0)
-		return FAIL;
-	    return put_eol(fd);
+	    எனில் (fprintf(fd, "execute 'buffer ' .. term_buf_%d", bufnr) < 0)
+		திரும்பு FAIL;
+	    திரும்பு put_eol(fd);
 	}
     }
 
     // Create the terminal and run the command.  This is not without
     // risk, but let's assume the user only creates a session when this
     // will be OK.
-    if (fprintf(fd, "exe ':terminal ++curwin"
+    எனில் (fprintf(fd, "exe ':terminal ++curwin"
 		" ++cols=' .. ((&columns * %d + %ld) / %ld)"
 		" .. ' ++rows=' .. ((&lines * %d + %ld) / %ld) ",
 		term->tl_cols, Columns / 2, Columns,
 		term->tl_rows, Rows / 2, Rows) < 0)
-	return FAIL;
+	திரும்பு FAIL;
 # ifdef MSWIN
-    if (fprintf(fd, ".. ' ++type=%s' ", term->tl_job->jv_tty_type) < 0)
-	return FAIL;
+    எனில் (fprintf(fd, ".. ' ++type=%s' ", term->tl_job->jv_tty_type) < 0)
+	திரும்பு FAIL;
 # endif
-    if (term->tl_command != NULL)
+    எனில் (term->tl_command != வெற்று)
     {
 	char_u *quoted_command = string_quote(term->tl_command, FALSE);
-	if (quoted_command == NULL)
-	    return FAIL;
+	எனில் (quoted_command == வெற்று)
+	    திரும்பு FAIL;
 
-	int ret = fputs(".. ' ' .. ", fd) < 0
-		    || fputs((char *)quoted_command, fd) < 0;
+	முழு ret = fputs(".. ' ' .. ", fd) < 0
+		    || fputs((எழுத்து *)quoted_command, fd) < 0;
 	vim_free(quoted_command);
-	if (ret)
-	    return FAIL;
+	எனில் (ret)
+	    திரும்பு FAIL;
     }
-    if (put_eol(fd) != OK)
-	return FAIL;
+    எனில் (put_eol(fd) != OK)
+	திரும்பு FAIL;
 
-    if (fprintf(fd, "var term_buf_%d: number = bufnr()", bufnr) < 0)
-	return FAIL;
+    எனில் (fprintf(fd, "var term_buf_%d: number = bufnr()", bufnr) < 0)
+	திரும்பு FAIL;
 
-    if (terminal_bufs != NULL && wp->w_buffer->b_nwindows > 1)
+    எனில் (terminal_bufs != வெற்று && wp->w_buffer->b_nwindows > 1)
     {
-	char *hash_key = alloc(NUMBUFLEN);
+	எழுத்து *hash_சாவி = alloc(NUMBUFLEN);
 
-	vim_snprintf(hash_key, NUMBUFLEN, "%d", bufnr);
-	hash_add(terminal_bufs, (char_u *)hash_key, "terminal session");
+	vim_snprintf(hash_சாவி, NUMBUFLEN, "%d", bufnr);
+	hash_add(terminal_bufs, (char_u *)hash_சாவி, "terminal session");
     }
 
-    return put_eol(fd);
+    திரும்பு put_eol(fd);
 }
 
 /*
  * Return TRUE if "buf" has a terminal that should be restored.
  */
-    int
+    முழு
 term_should_restore(buf_T *buf)
 {
     term_T	*term = buf->b_term;
 
-    return term != NULL && (term->tl_command == NULL
+    திரும்பு term != வெற்று && (term->tl_command == வெற்று
 				     || STRCMP(term->tl_command, "NONE") != 0);
 }
 #endif
@@ -1171,22 +1171,22 @@ term_should_restore(buf_T *buf)
 /*
  * Free the scrollback buffer for "term".
  */
-    static void
+    நிலையான வெறுமை
 free_scrollback(term_T *term)
 {
-    int i;
+    முழு i;
 
-    for (i = 0; i < term->tl_scrollback.ga_len; ++i)
-	vim_free(((sb_line_T *)term->tl_scrollback.ga_data + i)->sb_cells);
+    க்கு (i = 0; i < term->tl_scrollback.ga_len; ++i)
+	vim_free(((sb_வரி_T *)term->tl_scrollback.ga_data + i)->sb_cells);
     ga_clear(&term->tl_scrollback);
-    for (i = 0; i < term->tl_scrollback_postponed.ga_len; ++i)
-	vim_free(((sb_line_T *)term->tl_scrollback_postponed.ga_data + i)->sb_cells);
+    க்கு (i = 0; i < term->tl_scrollback_postponed.ga_len; ++i)
+	vim_free(((sb_வரி_T *)term->tl_scrollback_postponed.ga_data + i)->sb_cells);
     ga_clear(&term->tl_scrollback_postponed);
 }
 
 
 // Terminals that need to be freed soon.
-static term_T	*terminals_to_free = NULL;
+நிலையான term_T	*terminals_to_free = வெற்று;
 
 /*
  * Free a terminal and everything it refers to.
@@ -1196,46 +1196,46 @@ static term_T	*terminals_to_free = NULL;
  * because callbacks may wipe out a buffer while the terminal is still
  * referenced.
  */
-    void
+    வெறுமை
 free_terminal(buf_T *buf)
 {
     term_T	*term = buf->b_term;
     term_T	*tp;
 
-    if (term == NULL)
-	return;
+    எனில் (term == வெற்று)
+	திரும்பு;
 
     // Unlink the terminal form the list of terminals.
-    if (first_term == term)
+    எனில் (first_term == term)
 	first_term = term->tl_next;
-    else
-	for (tp = first_term; tp->tl_next != NULL; tp = tp->tl_next)
-	    if (tp->tl_next == term)
+    இல்லையெனில்
+	க்கு (tp = first_term; tp->tl_next != வெற்று; tp = tp->tl_next)
+	    எனில் (tp->tl_next == term)
 	    {
 		tp->tl_next = term->tl_next;
-		break;
+		நிறுத்து;
 	    }
 
-    if (term->tl_job != NULL)
+    எனில் (term->tl_job != வெற்று)
     {
-	if (term->tl_job->jv_status != JOB_ENDED
+	எனில் (term->tl_job->jv_status != JOB_ENDED
 		&& term->tl_job->jv_status != JOB_FINISHED
 		&& term->tl_job->jv_status != JOB_FAILED)
-	    job_stop(term->tl_job, NULL, "kill");
+	    job_stop(term->tl_job, வெற்று, "kill");
 	job_unref(term->tl_job);
     }
     term->tl_next = terminals_to_free;
     terminals_to_free = term;
 
-    buf->b_term = NULL;
-    if (in_terminal_loop == term)
-	in_terminal_loop = NULL;
+    buf->b_term = வெற்று;
+    எனில் (in_terminal_loop == term)
+	in_terminal_loop = வெற்று;
 }
 
-    void
-free_unused_terminals(void)
+    வெறுமை
+free_unused_terminals(வெறுமை)
 {
-    while (terminals_to_free != NULL)
+    போது (terminals_to_free != வெற்று)
     {
 	term_T	    *term = terminals_to_free;
 
@@ -1256,7 +1256,7 @@ free_unused_terminals(void)
 	vim_free(term->tl_eof_chars);
 	vim_free(term->tl_arg0_cmd);
 #ifdef MSWIN
-	if (term->tl_out_fd != NULL)
+	எனில் (term->tl_out_fd != வெற்று)
 	    fclose(term->tl_out_fd);
 #endif
 	vim_free(term->tl_highlight_name);
@@ -1271,46 +1271,46 @@ free_unused_terminals(void)
  * when writing buffer lines to the job it can be another.  This makes it
  * possible to do "1,5term vim -".
  */
-    static ch_part_T
+    நிலையான ch_part_T
 get_tty_part(term_T *term UNUSED)
 {
 #ifdef UNIX
     ch_part_T	parts[3] = {PART_IN, PART_OUT, PART_ERR};
-    int		i;
+    முழு		i;
 
-    for (i = 0; i < 3; ++i)
+    க்கு (i = 0; i < 3; ++i)
     {
-	int fd = term->tl_job->jv_channel->ch_part[parts[i]].ch_fd;
+	முழு fd = term->tl_job->jv_channel->ch_part[parts[i]].ch_fd;
 
-	if (mch_isatty(fd))
-	    return parts[i];
+	எனில் (mch_isatty(fd))
+	    திரும்பு parts[i];
     }
 #endif
-    return PART_IN;
+    திரும்பு PART_IN;
 }
 
 /*
  * Read any vterm output and send it on the channel.
  */
-    static void
+    நிலையான வெறுமை
 term_forward_output(term_T *term)
 {
     VTerm *vterm = term->tl_vterm;
-    char   buf[KEY_BUF_LEN];
-    size_t curlen = vterm_output_read(vterm, buf, KEY_BUF_LEN);
+    எழுத்து   buf[சாவி_BUF_LEN];
+    size_t curlen = vterm_output_read(vterm, buf, சாவி_BUF_LEN);
 
-    if (curlen > 0)
+    எனில் (curlen > 0)
 	channel_send(term->tl_job->jv_channel, get_tty_part(term),
-					     (char_u *)buf, (int)curlen, NULL);
+					     (char_u *)buf, (முழு)curlen, வெற்று);
 }
 
 /*
  * Write job output "msg[len]" to the vterm.
  */
-    static void
-term_write_job_output(term_T *term, char_u *msg_arg, size_t len_arg)
+    நிலையான வெறுமை
+term_write_job_output(term_T *term, char_u *செய்தி_arg, size_t len_arg)
 {
-    char_u	*msg = msg_arg;
+    char_u	*செய்தி = செய்தி_arg;
     size_t	len = len_arg;
     VTerm	*vterm = term->tl_vterm;
     size_t	prevlen = vterm_output_get_buffer_current(vterm);
@@ -1318,73 +1318,73 @@ term_write_job_output(term_T *term, char_u *msg_arg, size_t len_arg)
 
     // Limit the length to 'termwinscroll' * cols * 3 bytes.  Keep the text at
     // the end.
-    if (len > limit)
+    எனில் (len > limit)
     {
-	char_u *p = msg + len - limit;
+	char_u *p = செய்தி + len - limit;
 
-	p -= (*mb_head_off)(msg, p);
-	len -= p - msg;
-	msg = p;
+	p -= (*mb_head_off)(செய்தி, p);
+	len -= p - செய்தி;
+	செய்தி = p;
     }
 
-    vterm_input_write(vterm, (char *)msg, len);
+    vterm_உள்ளீடு_write(vterm, (எழுத்து *)செய்தி, len);
 
     // flush vterm buffer when vterm responded to control sequence
-    if (prevlen != vterm_output_get_buffer_current(vterm))
+    எனில் (prevlen != vterm_output_get_buffer_current(vterm))
 	term_forward_output(term);
 
     // this invokes the damage callbacks
     vterm_screen_flush_damage(vterm_obtain_screen(vterm));
 }
 
-    static void
+    நிலையான வெறுமை
 position_cursor(win_T *wp, VTermPos *pos)
 {
     wp->w_wrow = MIN(pos->row, MAX(0, wp->w_height - 1));
     wp->w_wcol = MIN(pos->col, MAX(0, wp->w_width - 1));
 #ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(wp))
+    எனில் (popup_is_popup(wp))
     {
-	wp->w_wrow += popup_top_extra(wp);
-	wp->w_wcol += popup_left_extra(wp);
+	wp->w_wrow += popup_உச்சி_extra(wp);
+	wp->w_wcol += popup_இடது_extra(wp);
 	wp->w_flags |= WFLAG_WCOL_OFF_ADDED | WFLAG_WROW_OFF_ADDED;
     }
-    else
+    இல்லையெனில்
 	wp->w_flags &= ~(WFLAG_WCOL_OFF_ADDED | WFLAG_WROW_OFF_ADDED);
 #endif
     wp->w_valid |= (VALID_WCOL|VALID_WROW);
 }
 
-    static void
-update_cursor(term_T *term, int redraw)
+    நிலையான வெறுமை
+update_cursor(term_T *term, முழு redraw)
 {
-    if (term->tl_normal_mode)
-	return;
+    எனில் (term->tl_normal_mode)
+	திரும்பு;
 #ifdef FEAT_GUI
-    if (term->tl_system)
+    எனில் (term->tl_system)
 	windgoto(term->tl_cursor_pos.row + term->tl_toprow,
 		firstwin->w_wincol + term->tl_cursor_pos.col);
-    else
+    இல்லையெனில்
 #endif
-    if (!term_job_running(term))
+    எனில் (!term_job_running(term))
 	// avoid the cursor positioned below the last used line
 	setcursor();
-    else
+    இல்லையெனில்
     {
 	// do not use the window cursor position
 	position_cursor(curwin, &curbuf->b_term->tl_cursor_pos);
 	windgoto(W_WINROW(curwin) + curwin->w_wrow,
 		 curwin->w_wincol + curwin->w_wcol);
     }
-    if (redraw)
+    எனில் (redraw)
     {
 	aco_save_T	aco;
 
-	if (term->tl_buffer == curbuf && term->tl_cursor_visible)
+	எனில் (term->tl_buffer == curbuf && term->tl_cursor_visible)
 	    cursor_on();
 	out_flush();
 #ifdef FEAT_GUI
-	if (gui.in_use)
+	எனில் (gui.in_use)
 	{
 	    gui_update_cursor(FALSE, FALSE);
 	    gui_mch_flush();
@@ -1396,7 +1396,7 @@ update_cursor(term_T *term, int redraw)
 
 	// save and restore curwin and curbuf, in case the autocmd changes them
 	aucmd_prepbuf(&aco, curbuf);
-	apply_autocmds(EVENT_TEXTCHANGEDT, NULL, NULL, FALSE, term->tl_buffer);
+	apply_autocmds(EVENT_TEXTCHANGEDT, வெற்று, வெற்று, FALSE, term->tl_buffer);
 	aucmd_restbuf(&aco);
 
 	--term->tl_buffer->b_locked;
@@ -1406,106 +1406,106 @@ update_cursor(term_T *term, int redraw)
 /*
  * Find the location of a scrollbackline in the buffer
  */
-    static void
-scrollbackline_pos_in_buf(term_T *term, int row, linenr_T *lnum, int *start_col, size_t *start_pos)
+    நிலையான வெறுமை
+scrollbackline_pos_in_buf(term_T *term, முழு row, linenr_T *lnum, முழு *start_col, size_t *start_pos)
 {
-    sb_line_T	*lines = (sb_line_T *)term->tl_scrollback.ga_data;
+    sb_வரி_T	*வரிகள் = (sb_வரி_T *)term->tl_scrollback.ga_data;
     linenr_T    calc_lnum = term->tl_buffer_scrolled;
     size_t      calc_pos = 0;
-    int         calc_col = 0;
-    int         i;
+    முழு         calc_col = 0;
+    முழு         i;
 
-    if (row < 0 || row >= term->tl_scrollback.ga_len)
-	return;
+    எனில் (row < 0 || row >= term->tl_scrollback.ga_len)
+	திரும்பு;
 
-    if (row > term->tl_scrollback_scrolled)
+    எனில் (row > term->tl_scrollback_scrolled)
     {
 	// Lookback how far along in the top line we are
-	for (i = term->tl_scrollback_scrolled + 1; i > 0 && lines[i].continuation; --i)
+	க்கு (i = term->tl_scrollback_scrolled + 1; i > 0 && வரிகள்[i].continuation; --i)
 	{
-	    calc_pos += lines[i - 1].sb_bytes;
-	    calc_col += lines[i - 1].sb_cols;
+	    calc_pos += வரிகள்[i - 1].sb_bytes;
+	    calc_col += வரிகள்[i - 1].sb_cols;
 	}
 	i = term->tl_scrollback_scrolled + 1;
 	calc_lnum = term->tl_buffer_scrolled + 1;
 	// Do not count this line's bytes/cols twice
-	if (lines[i].continuation)
+	எனில் (வரிகள்[i].continuation)
 	    ++i;
     }
-    else
+    இல்லையெனில்
     {
 	i = 1;
 	calc_lnum = 1;
     }
 
-    for (; i <= row; ++i)
+    க்கு (; i <= row; ++i)
     {
-	if (!lines[i].continuation)
+	எனில் (!வரிகள்[i].continuation)
 	{
 	    ++calc_lnum;
 	    calc_pos = 0;
 	    calc_col = 0;
 	}
-	else
+	இல்லையெனில்
 	{
-	    calc_pos += lines[i - 1].sb_bytes;
-	    calc_col += lines[i - 1].sb_cols;
+	    calc_pos += வரிகள்[i - 1].sb_bytes;
+	    calc_col += வரிகள்[i - 1].sb_cols;
 	}
     }
 
     *lnum = calc_lnum;
-    if (start_col)
+    எனில் (start_col)
 	*start_col = calc_col;
-    if (start_pos)
+    எனில் (start_pos)
 	*start_pos = calc_pos;
 }
 
 /*
  * Find the location of a buffer line in the scrollback
  */
-    static void
-bufline_pos_in_scrollback(term_T *term, linenr_T lnum, int col, int *row, int *wrapped_col)
+    நிலையான வெறுமை
+bufline_pos_in_scrollback(term_T *term, linenr_T lnum, முழு col, முழு *row, முழு *wrapped_col)
 {
     buf_T	*buf = term->tl_buffer;
-    sb_line_T	*lines = (sb_line_T *)term->tl_scrollback.ga_data;
+    sb_வரி_T	*வரிகள் = (sb_வரி_T *)term->tl_scrollback.ga_data;
     linenr_T    calc_row = term->tl_scrollback_scrolled;
-    int         calc_col = col;
+    முழு         calc_col = col;
     linenr_T    l;
 
-    if (lnum > buf->b_ml.ml_line_count)
-	return;
+    எனில் (lnum > buf->b_ml.ml_வரி_மொத்தம்)
+	திரும்பு;
 
-    if (lnum > term->tl_buffer_scrolled)
+    எனில் (lnum > term->tl_buffer_scrolled)
     {
 	calc_row = term->tl_scrollback_scrolled;
 	l = term->tl_buffer_scrolled + 1;
 
-	while (calc_row < term->tl_scrollback.ga_len && lines[calc_row].continuation)
+	போது (calc_row < term->tl_scrollback.ga_len && வரிகள்[calc_row].continuation)
 	    ++calc_row;
     }
-    else
+    இல்லையெனில்
     {
 	calc_row = 0;
 	l = 1;
     }
 
-    while (calc_row < term->tl_scrollback.ga_len && l < lnum)
+    போது (calc_row < term->tl_scrollback.ga_len && l < lnum)
     {
 	++calc_row;
-	if (!lines[calc_row].continuation)
+	எனில் (!வரிகள்[calc_row].continuation)
 	    ++l;
     }
 
-    while (calc_row + 1 < term->tl_scrollback.ga_len && lines[calc_row + 1].continuation
-	    && calc_col >= lines[calc_row].sb_cols)
+    போது (calc_row + 1 < term->tl_scrollback.ga_len && வரிகள்[calc_row + 1].continuation
+	    && calc_col >= வரிகள்[calc_row].sb_cols)
     {
-	calc_col -= lines[calc_row].sb_cols;
+	calc_col -= வரிகள்[calc_row].sb_cols;
 	++calc_row;
     }
 
-    if (row)
+    எனில் (row)
 	*row = calc_row;
-    if (wrapped_col)
+    எனில் (wrapped_col)
 	*wrapped_col = calc_col;
 }
 
@@ -1513,62 +1513,62 @@ bufline_pos_in_scrollback(term_T *term, linenr_T lnum, int col, int *row, int *w
  * Invoked when "msg" output from a job was received.  Write it to the terminal
  * of "buffer".
  */
-    void
-write_to_term(buf_T *buffer, char_u *msg, channel_T *channel)
+    வெறுமை
+write_to_term(buf_T *buffer, char_u *செய்தி, channel_T *channel)
 {
-    size_t	len = STRLEN(msg);
+    size_t	len = STRLEN(செய்தி);
     term_T	*term = buffer->b_term;
 
 #ifdef MSWIN
     // Win32: Cannot redirect output of the job, intercept it here and write to
     // the file.
-    if (term->tl_out_fd != NULL)
+    எனில் (term->tl_out_fd != வெற்று)
     {
-	ch_log(channel, "Writing %d bytes to output file", (int)len);
-	fwrite(msg, len, 1, term->tl_out_fd);
-	return;
+	ch_log(channel, "Writing %d bytes to output file", (முழு)len);
+	fwrite(செய்தி, len, 1, term->tl_out_fd);
+	திரும்பு;
     }
 #endif
 
-    if (term->tl_vterm == NULL)
+    எனில் (term->tl_vterm == வெற்று)
     {
-	ch_log(channel, "NOT writing %d bytes to terminal", (int)len);
-	return;
+	ch_log(channel, "NOT writing %d bytes to terminal", (முழு)len);
+	திரும்பு;
     }
-    ch_log(channel, "writing %d bytes to terminal", (int)len);
+    ch_log(channel, "writing %d bytes to terminal", (முழு)len);
     cursor_off();
-    term_write_job_output(term, msg, len);
+    term_write_job_output(term, செய்தி, len);
 
 #ifdef FEAT_GUI
-    if (term->tl_system)
+    எனில் (term->tl_system)
     {
 	// show system output, scrolling up the screen as needed
 	update_system_term(term);
 	update_cursor(term, TRUE);
     }
-    else
+    இல்லையெனில்
 #endif
     // In Terminal-Normal mode we are displaying the buffer, not the terminal
     // contents, thus no screen update is needed.
-    if (!term->tl_normal_mode)
+    எனில் (!term->tl_normal_mode)
     {
 	// Don't use update_screen() when editing the command line, it gets
 	// cleared.
 	// TODO: only update once in a while.
 	ch_log(term->tl_job->jv_channel, "updating screen");
-	if (buffer == curbuf && (State & MODE_CMDLINE) == 0)
+	எனில் (buffer == curbuf && (State & MODE_CMDLINE) == 0)
 	{
 	    update_screen(UPD_VALID_NO_UPDATE);
-#if defined(FEAT_TABPANEL)
-	    if (redraw_tabpanel)
+#எனில் defined(FEAT_TABPANEL)
+	    எனில் (redraw_tabpanel)
 		draw_tabpanel();
 #endif
 	    // update_screen() can be slow, check the terminal wasn't closed
 	    // already
-	    if (buffer == curbuf && curbuf->b_term != NULL)
+	    எனில் (buffer == curbuf && curbuf->b_term != வெற்று)
 		update_cursor(curbuf->b_term, TRUE);
 	}
-	else
+	இல்லையெனில்
 	    redraw_after_callback(TRUE, FALSE);
     }
 }
@@ -1576,66 +1576,66 @@ write_to_term(buf_T *buffer, char_u *msg, channel_T *channel)
 /*
  * Send a mouse position and click to the vterm
  */
-    static int
-term_send_mouse(VTerm *vterm, int button, int pressed)
+    நிலையான முழு
+term_send_mouse(VTerm *vterm, முழு button, முழு pressed)
 {
     VTermModifier   mod = VTERM_MOD_NONE;
-    int		    row = mouse_row - W_WINROW(curwin);
-    int		    col = mouse_col - curwin->w_wincol;
+    முழு		    row = mouse_row - W_WINROW(curwin);
+    முழு		    col = mouse_col - curwin->w_wincol;
 
 #ifdef FEAT_PROP_POPUP
-    if (popup_is_popup(curwin))
+    எனில் (popup_is_popup(curwin))
     {
-	row -= popup_top_extra(curwin);
-	col -= popup_left_extra(curwin);
+	row -= popup_உச்சி_extra(curwin);
+	col -= popup_இடது_extra(curwin);
     }
 #endif
     vterm_mouse_move(vterm, row, col, mod);
-    if (button != 0)
+    எனில் (button != 0)
 	vterm_mouse_button(vterm, button, pressed, mod);
-    return TRUE;
+    திரும்பு TRUE;
 }
 
-static int enter_mouse_col = -1;
-static int enter_mouse_row = -1;
+நிலையான முழு enter_mouse_col = -1;
+நிலையான முழு enter_mouse_row = -1;
 
 /*
  * Handle a mouse click, drag or release.
  * Return TRUE when a mouse event is sent to the terminal.
  */
-    static int
-term_mouse_click(VTerm *vterm, int key)
+    நிலையான முழு
+term_mouse_click(VTerm *vterm, முழு சாவி)
 {
-#if defined(FEAT_CLIPBOARD)
+#எனில் defined(FEAT_CLIPBOARD)
     // For modeless selection mouse drag and release events are ignored, unless
     // they are preceded with a mouse down event
-    static int	    ignore_drag_release = TRUE;
+    நிலையான முழு	    ignore_drag_release = TRUE;
     VTermState	    *state;
     VTermMouseState mouse_state;
 
 
     state = vterm_obtain_state(vterm);
-    if (state == NULL)
-	return FALSE;
+    எனில் (state == வெற்று)
+	திரும்பு FALSE;
 
     vterm_state_get_mousestate(state, &mouse_state);
-    if (mouse_state.flags == 0)
+    எனில் (mouse_state.flags == 0)
     {
 	// Terminal is not using the mouse, use modeless selection.
-	switch (key)
+	தேர்வு (சாவி)
 	{
-	case K_LEFTDRAG:
-	case K_LEFTRELEASE:
-	case K_RIGHTDRAG:
-	case K_RIGHTRELEASE:
+	நிலை K_LEFTDRAG:
+	நிலை K_LEFTRELEASE:
+	நிலை K_RIGHTDRAG:
+	நிலை K_RIGHTRELEASE:
 		// Ignore drag and release events when the button-down wasn't
 		// seen before.
-		if (ignore_drag_release)
+		எனில் (ignore_drag_release)
 		{
-		    int save_mouse_col, save_mouse_row;
+		    முழு save_mouse_col, save_mouse_row;
 
-		    if (enter_mouse_col < 0)
-			break;
+		    எனில் (enter_mouse_col < 0)
+			நிறுத்து;
 
 		    // mouse click in the window gave us focus, handle that
 		    // click now
@@ -1643,62 +1643,62 @@ term_mouse_click(VTerm *vterm, int key)
 		    save_mouse_row = mouse_row;
 		    mouse_col = enter_mouse_col;
 		    mouse_row = enter_mouse_row;
-		    clip_modeless(MOUSE_LEFT, TRUE, FALSE);
+		    clip_modeless(MOUSE_இடது, TRUE, FALSE);
 		    mouse_col = save_mouse_col;
 		    mouse_row = save_mouse_row;
 		}
 		// FALLTHROUGH
-	case K_LEFTMOUSE:
-	case K_RIGHTMOUSE:
-		if (key == K_LEFTRELEASE || key == K_RIGHTRELEASE)
+	நிலை K_LEFTMOUSE:
+	நிலை K_RIGHTMOUSE:
+		எனில் (சாவி == K_LEFTRELEASE || சாவி == K_RIGHTRELEASE)
 		    ignore_drag_release = TRUE;
-		else
+		இல்லையெனில்
 		    ignore_drag_release = FALSE;
 		// Should we call mouse_has() here?
-		if (clip_star.available)
+		எனில் (clip_star.available)
 		{
-		    int	    button, is_click, is_drag;
+		    முழு	    button, is_click, is_drag;
 
-		    button = get_mouse_button(KEY2TERMCAP1(key),
+		    button = get_mouse_button(KEY2TERMCAP1(சாவி),
 							 &is_click, &is_drag);
-		    if (mouse_model_popup() && button == MOUSE_LEFT
+		    எனில் (mouse_model_popup() && button == MOUSE_இடது
 					       && (mod_mask & MOD_MASK_SHIFT))
 		    {
 			// Translate shift-left to right button.
-			button = MOUSE_RIGHT;
+			button = MOUSE_வலது;
 			mod_mask &= ~MOD_MASK_SHIFT;
 		    }
 		    clip_modeless(button, is_click, is_drag);
 		}
-		break;
+		நிறுத்து;
 
-	case K_MIDDLEMOUSE:
-		if (clip_star.available)
-		    insert_reg('*', TRUE);
-		break;
+	நிலை K_MIDDLEMOUSE:
+		எனில் (clip_star.available)
+		    செருகு_reg('*', TRUE);
+		நிறுத்து;
 	}
 	enter_mouse_col = -1;
-	return FALSE;
+	திரும்பு FALSE;
     }
 #endif
     enter_mouse_col = -1;
 
-    switch (key)
+    தேர்வு (சாவி)
     {
-	case K_LEFTMOUSE:
-	case K_LEFTMOUSE_NM:	term_send_mouse(vterm, 1, 1); break;
-	case K_LEFTDRAG:	term_send_mouse(vterm, 1, 1); break;
-	case K_LEFTRELEASE:
-	case K_LEFTRELEASE_NM:	term_send_mouse(vterm, 1, 0); break;
-	case K_MOUSEMOVE:	term_send_mouse(vterm, 0, 0); break;
-	case K_MIDDLEMOUSE:	term_send_mouse(vterm, 2, 1); break;
-	case K_MIDDLEDRAG:	term_send_mouse(vterm, 2, 1); break;
-	case K_MIDDLERELEASE:	term_send_mouse(vterm, 2, 0); break;
-	case K_RIGHTMOUSE:	term_send_mouse(vterm, 3, 1); break;
-	case K_RIGHTDRAG:	term_send_mouse(vterm, 3, 1); break;
-	case K_RIGHTRELEASE:	term_send_mouse(vterm, 3, 0); break;
+	நிலை K_LEFTMOUSE:
+	நிலை K_LEFTMOUSE_NM:	term_send_mouse(vterm, 1, 1); நிறுத்து;
+	நிலை K_LEFTDRAG:	term_send_mouse(vterm, 1, 1); நிறுத்து;
+	நிலை K_LEFTRELEASE:
+	நிலை K_LEFTRELEASE_NM:	term_send_mouse(vterm, 1, 0); நிறுத்து;
+	நிலை K_MOUSEMOVE:	term_send_mouse(vterm, 0, 0); நிறுத்து;
+	நிலை K_MIDDLEMOUSE:	term_send_mouse(vterm, 2, 1); நிறுத்து;
+	நிலை K_MIDDLEDRAG:	term_send_mouse(vterm, 2, 1); நிறுத்து;
+	நிலை K_MIDDLERELEASE:	term_send_mouse(vterm, 2, 0); நிறுத்து;
+	நிலை K_RIGHTMOUSE:	term_send_mouse(vterm, 3, 1); நிறுத்து;
+	நிலை K_RIGHTDRAG:	term_send_mouse(vterm, 3, 1); நிறுத்து;
+	நிலை K_RIGHTRELEASE:	term_send_mouse(vterm, 3, 0); நிறுத்து;
     }
-    return TRUE;
+    திரும்பு TRUE;
 }
 
 /*
@@ -1706,179 +1706,179 @@ term_mouse_click(VTerm *vterm, int key)
  * job.
  * Return the number of bytes in "buf".
  */
-    static int
-term_convert_key(term_T *term, int c, int modmask, char *buf)
+    நிலையான முழு
+term_convert_சாவி(term_T *term, முழு c, முழு modmask, எழுத்து *buf)
 {
     VTerm	    *vterm = term->tl_vterm;
-    VTermKey	    key = VTERM_KEY_NONE;
+    VTerm_சாவி	    சாவி = VTERM_சாவி_NONE;
     VTermModifier   mod = VTERM_MOD_NONE;
-    int		    other = FALSE;
+    முழு		    other = FALSE;
 
-    switch (c)
+    தேர்வு (c)
     {
 	// don't use VTERM_KEY_ENTER, it may do an unwanted conversion
 
-	case K_BS:
+	நிலை K_BS:
 #ifdef MSWIN
 	    // In ConPTY, we must use VTERM_KEY_BACKSPACE, otherwise it will
 	    // delete one word, equivalent to Alt+Backspace.
-	    if (term->tl_conpty)
-		key = VTERM_KEY_BACKSPACE;
-	    else
+	    எனில் (term->tl_conpty)
+		சாவி = VTERM_சாவி_BACKSPACE;
+	    இல்லையெனில்
 #endif
 		// don't use VTERM_KEY_BACKSPACE, it always becomes 0x7f DEL
 		c = term_backspace_char;
-	    break;
+	    நிறுத்து;
 
 #ifdef MSWIN
-	case BS:
+	நிலை BS:
 	    // In ConPTY, we must use VTERM_KEY_BACKSPACE, otherwise it will
 	    // delete one word, equivalent to Alt+Backspace.
-	    if (term->tl_conpty)
-		key = VTERM_KEY_BACKSPACE;
-	    break;
+	    எனில் (term->tl_conpty)
+		சாவி = VTERM_சாவி_BACKSPACE;
+	    நிறுத்து;
 #endif
 
-	case ESC:		key = VTERM_KEY_ESCAPE; break;
-	case K_DEL:		key = VTERM_KEY_DEL; break;
-	case K_DOWN:		key = VTERM_KEY_DOWN; break;
-	case K_S_DOWN:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_DOWN; break;
-	case K_END:		key = VTERM_KEY_END; break;
-	case K_S_END:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_END; break;
-	case K_C_END:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_END; break;
-	case K_F10:		key = VTERM_KEY_FUNCTION(10); break;
-	case K_F11:		key = VTERM_KEY_FUNCTION(11); break;
-	case K_F12:		key = VTERM_KEY_FUNCTION(12); break;
-	case K_F1:		key = VTERM_KEY_FUNCTION(1); break;
-	case K_F2:		key = VTERM_KEY_FUNCTION(2); break;
-	case K_F3:		key = VTERM_KEY_FUNCTION(3); break;
-	case K_F4:		key = VTERM_KEY_FUNCTION(4); break;
-	case K_F5:		key = VTERM_KEY_FUNCTION(5); break;
-	case K_F6:		key = VTERM_KEY_FUNCTION(6); break;
-	case K_F7:		key = VTERM_KEY_FUNCTION(7); break;
-	case K_F8:		key = VTERM_KEY_FUNCTION(8); break;
-	case K_F9:		key = VTERM_KEY_FUNCTION(9); break;
-	case K_HOME:		key = VTERM_KEY_HOME; break;
-	case K_S_HOME:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_HOME; break;
-	case K_C_HOME:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_HOME; break;
-	case K_INS:		key = VTERM_KEY_INS; break;
-	case K_K0:		key = VTERM_KEY_KP_0; break;
-	case K_K1:		key = VTERM_KEY_KP_1; break;
-	case K_K2:		key = VTERM_KEY_KP_2; break;
-	case K_K3:		key = VTERM_KEY_KP_3; break;
-	case K_K4:		key = VTERM_KEY_KP_4; break;
-	case K_K5:		key = VTERM_KEY_KP_5; break;
-	case K_K6:		key = VTERM_KEY_KP_6; break;
-	case K_K7:		key = VTERM_KEY_KP_7; break;
-	case K_K8:		key = VTERM_KEY_KP_8; break;
-	case K_K9:		key = VTERM_KEY_KP_9; break;
-	case K_KDEL:		key = VTERM_KEY_DEL; break; // TODO
-	case K_KDIVIDE:		key = VTERM_KEY_KP_DIVIDE; break;
-	case K_KEND:		key = VTERM_KEY_KP_1; break; // TODO
-	case K_KENTER:		key = VTERM_KEY_KP_ENTER; break;
-	case K_KHOME:		key = VTERM_KEY_KP_7; break; // TODO
-	case K_KINS:		key = VTERM_KEY_KP_0; break; // TODO
-	case K_KMINUS:		key = VTERM_KEY_KP_MINUS; break;
-	case K_KMULTIPLY:	key = VTERM_KEY_KP_MULT; break;
-	case K_KPAGEDOWN:	key = VTERM_KEY_KP_3; break; // TODO
-	case K_KPAGEUP:		key = VTERM_KEY_KP_9; break; // TODO
-	case K_KPLUS:		key = VTERM_KEY_KP_PLUS; break;
-	case K_KPOINT:		key = VTERM_KEY_KP_PERIOD; break;
-	case K_LEFT:		key = VTERM_KEY_LEFT; break;
-	case K_S_LEFT:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_LEFT; break;
-	case K_C_LEFT:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_LEFT; break;
-	case K_PAGEDOWN:	key = VTERM_KEY_PAGEDOWN; break;
-	case K_PAGEUP:		key = VTERM_KEY_PAGEUP; break;
-	case K_RIGHT:		key = VTERM_KEY_RIGHT; break;
-	case K_S_RIGHT:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_RIGHT; break;
-	case K_C_RIGHT:		mod = VTERM_MOD_CTRL;
-				key = VTERM_KEY_RIGHT; break;
-	case K_UP:		key = VTERM_KEY_UP; break;
-	case K_S_UP:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_UP; break;
-	case TAB:		key = VTERM_KEY_TAB; break;
-	case K_S_TAB:		mod = VTERM_MOD_SHIFT;
-				key = VTERM_KEY_TAB; break;
+	நிலை ESC:		சாவி = VTERM_சாவி_ESCAPE; நிறுத்து;
+	நிலை K_DEL:		சாவி = VTERM_சாவி_DEL; நிறுத்து;
+	நிலை K_DOWN:		சாவி = VTERM_சாவி_DOWN; நிறுத்து;
+	நிலை K_S_DOWN:		mod = VTERM_MOD_SHIFT;
+				சாவி = VTERM_சாவி_DOWN; நிறுத்து;
+	நிலை K_END:		சாவி = VTERM_சாவி_END; நிறுத்து;
+	நிலை K_S_END:		mod = VTERM_MOD_SHIFT;
+				சாவி = VTERM_சாவி_END; நிறுத்து;
+	நிலை K_C_END:		mod = VTERM_MOD_CTRL;
+				சாவி = VTERM_சாவி_END; நிறுத்து;
+	நிலை K_F10:		சாவி = VTERM_சாவி_FUNCTION(10); நிறுத்து;
+	நிலை K_F11:		சாவி = VTERM_சாவி_FUNCTION(11); நிறுத்து;
+	நிலை K_F12:		சாவி = VTERM_சாவி_FUNCTION(12); நிறுத்து;
+	நிலை K_F1:		சாவி = VTERM_சாவி_FUNCTION(1); நிறுத்து;
+	நிலை K_F2:		சாவி = VTERM_சாவி_FUNCTION(2); நிறுத்து;
+	நிலை K_F3:		சாவி = VTERM_சாவி_FUNCTION(3); நிறுத்து;
+	நிலை K_F4:		சாவி = VTERM_சாவி_FUNCTION(4); நிறுத்து;
+	நிலை K_F5:		சாவி = VTERM_சாவி_FUNCTION(5); நிறுத்து;
+	நிலை K_F6:		சாவி = VTERM_சாவி_FUNCTION(6); நிறுத்து;
+	நிலை K_F7:		சாவி = VTERM_சாவி_FUNCTION(7); நிறுத்து;
+	நிலை K_F8:		சாவி = VTERM_சாவி_FUNCTION(8); நிறுத்து;
+	நிலை K_F9:		சாவி = VTERM_சாவி_FUNCTION(9); நிறுத்து;
+	நிலை K_HOME:		சாவி = VTERM_சாவி_HOME; நிறுத்து;
+	நிலை K_S_HOME:		mod = VTERM_MOD_SHIFT;
+				சாவி = VTERM_சாவி_HOME; நிறுத்து;
+	நிலை K_C_HOME:		mod = VTERM_MOD_CTRL;
+				சாவி = VTERM_சாவி_HOME; நிறுத்து;
+	நிலை K_INS:		சாவி = VTERM_சாவி_INS; நிறுத்து;
+	நிலை K_K0:		சாவி = VTERM_சாவி_KP_0; நிறுத்து;
+	நிலை K_K1:		சாவி = VTERM_சாவி_KP_1; நிறுத்து;
+	நிலை K_K2:		சாவி = VTERM_சாவி_KP_2; நிறுத்து;
+	நிலை K_K3:		சாவி = VTERM_சாவி_KP_3; நிறுத்து;
+	நிலை K_K4:		சாவி = VTERM_சாவி_KP_4; நிறுத்து;
+	நிலை K_K5:		சாவி = VTERM_சாவி_KP_5; நிறுத்து;
+	நிலை K_K6:		சாவி = VTERM_சாவி_KP_6; நிறுத்து;
+	நிலை K_K7:		சாவி = VTERM_சாவி_KP_7; நிறுத்து;
+	நிலை K_K8:		சாவி = VTERM_சாவி_KP_8; நிறுத்து;
+	நிலை K_K9:		சாவி = VTERM_சாவி_KP_9; நிறுத்து;
+	நிலை K_KDEL:		சாவி = VTERM_சாவி_DEL; நிறுத்து; // TODO
+	நிலை K_KDIVIDE:		சாவி = VTERM_சாவி_KP_DIVIDE; நிறுத்து;
+	நிலை K_KEND:		சாவி = VTERM_சாவி_KP_1; நிறுத்து; // TODO
+	நிலை K_KENTER:		சாவி = VTERM_சாவி_KP_ENTER; நிறுத்து;
+	நிலை K_KHOME:		சாவி = VTERM_சாவி_KP_7; நிறுத்து; // TODO
+	நிலை K_KINS:		சாவி = VTERM_சாவி_KP_0; நிறுத்து; // TODO
+	நிலை K_KMINUS:		சாவி = VTERM_சாவி_KP_MINUS; நிறுத்து;
+	நிலை K_KMULTIPLY:	சாவி = VTERM_சாவி_KP_MULT; நிறுத்து;
+	நிலை K_KPAGEDOWN:	சாவி = VTERM_சாவி_KP_3; நிறுத்து; // TODO
+	நிலை K_KPAGEUP:		சாவி = VTERM_சாவி_KP_9; நிறுத்து; // TODO
+	நிலை K_KPLUS:		சாவி = VTERM_சாவி_KP_PLUS; நிறுத்து;
+	நிலை K_KPOINT:		சாவி = VTERM_சாவி_KP_PERIOD; நிறுத்து;
+	நிலை K_இடது:		சாவி = VTERM_சாவி_இடது; நிறுத்து;
+	நிலை K_S_இடது:		mod = VTERM_MOD_SHIFT;
+				சாவி = VTERM_சாவி_இடது; நிறுத்து;
+	நிலை K_C_இடது:		mod = VTERM_MOD_CTRL;
+				சாவி = VTERM_சாவி_இடது; நிறுத்து;
+	நிலை K_PAGEDOWN:	சாவி = VTERM_சாவி_PAGEDOWN; நிறுத்து;
+	நிலை K_PAGEUP:		சாவி = VTERM_சாவி_PAGEUP; நிறுத்து;
+	நிலை K_வலது:		சாவி = VTERM_சாவி_வலது; நிறுத்து;
+	நிலை K_S_வலது:		mod = VTERM_MOD_SHIFT;
+				சாவி = VTERM_சாவி_வலது; நிறுத்து;
+	நிலை K_C_வலது:		mod = VTERM_MOD_CTRL;
+				சாவி = VTERM_சாவி_வலது; நிறுத்து;
+	நிலை K_UP:		சாவி = VTERM_சாவி_UP; நிறுத்து;
+	நிலை K_S_UP:		mod = VTERM_MOD_SHIFT;
+				சாவி = VTERM_சாவி_UP; நிறுத்து;
+	நிலை TAB:		சாவி = VTERM_சாவி_TAB; நிறுத்து;
+	நிலை K_S_TAB:		mod = VTERM_MOD_SHIFT;
+				சாவி = VTERM_சாவி_TAB; நிறுத்து;
 
-	case K_MOUSEUP:		other = term_send_mouse(vterm, 5, 1); break;
-	case K_MOUSEDOWN:	other = term_send_mouse(vterm, 4, 1); break;
-	case K_MOUSELEFT:	other = term_send_mouse(vterm, 7, 1); break;
-	case K_MOUSERIGHT:	other = term_send_mouse(vterm, 6, 1); break;
+	நிலை K_MOUSEUP:		other = term_send_mouse(vterm, 5, 1); நிறுத்து;
+	நிலை K_MOUSEDOWN:	other = term_send_mouse(vterm, 4, 1); நிறுத்து;
+	நிலை K_MOUSELEFT:	other = term_send_mouse(vterm, 7, 1); நிறுத்து;
+	நிலை K_MOUSERIGHT:	other = term_send_mouse(vterm, 6, 1); நிறுத்து;
 
-	case K_LEFTMOUSE:
-	case K_LEFTMOUSE_NM:
-	case K_LEFTDRAG:
-	case K_LEFTRELEASE:
-	case K_LEFTRELEASE_NM:
-	case K_MOUSEMOVE:
-	case K_MIDDLEMOUSE:
-	case K_MIDDLEDRAG:
-	case K_MIDDLERELEASE:
-	case K_RIGHTMOUSE:
-	case K_RIGHTDRAG:
-	case K_RIGHTRELEASE:	if (!term_mouse_click(vterm, c))
-				    return 0;
+	நிலை K_LEFTMOUSE:
+	நிலை K_LEFTMOUSE_NM:
+	நிலை K_LEFTDRAG:
+	நிலை K_LEFTRELEASE:
+	நிலை K_LEFTRELEASE_NM:
+	நிலை K_MOUSEMOVE:
+	நிலை K_MIDDLEMOUSE:
+	நிலை K_MIDDLEDRAG:
+	நிலை K_MIDDLERELEASE:
+	நிலை K_RIGHTMOUSE:
+	நிலை K_RIGHTDRAG:
+	நிலை K_RIGHTRELEASE:	எனில் (!term_mouse_click(vterm, c))
+				    திரும்பு 0;
 				other = TRUE;
-				break;
+				நிறுத்து;
 
-	case K_X1MOUSE:		/* TODO */ return 0;
-	case K_X1DRAG:		/* TODO */ return 0;
-	case K_X1RELEASE:	/* TODO */ return 0;
-	case K_X2MOUSE:		/* TODO */ return 0;
-	case K_X2DRAG:		/* TODO */ return 0;
-	case K_X2RELEASE:	/* TODO */ return 0;
+	நிலை K_X1MOUSE:		/* TODO */ திரும்பு 0;
+	நிலை K_X1DRAG:		/* TODO */ திரும்பு 0;
+	நிலை K_X1RELEASE:	/* TODO */ திரும்பு 0;
+	நிலை K_X2MOUSE:		/* TODO */ திரும்பு 0;
+	நிலை K_X2DRAG:		/* TODO */ திரும்பு 0;
+	நிலை K_X2RELEASE:	/* TODO */ திரும்பு 0;
 
-	case K_IGNORE:		return 0;
-	case K_NOP:		return 0;
-	case K_UNDO:		return 0;
-	case K_HELP:		return 0;
-	case K_XF1:		key = VTERM_KEY_FUNCTION(1); break;
-	case K_XF2:		key = VTERM_KEY_FUNCTION(2); break;
-	case K_XF3:		key = VTERM_KEY_FUNCTION(3); break;
-	case K_XF4:		key = VTERM_KEY_FUNCTION(4); break;
-	case K_SELECT:		return 0;
+	நிலை K_IGNORE:		திரும்பு 0;
+	நிலை K_NOP:		திரும்பு 0;
+	நிலை K_UNDO:		திரும்பு 0;
+	நிலை K_HELP:		திரும்பு 0;
+	நிலை K_XF1:		சாவி = VTERM_சாவி_FUNCTION(1); நிறுத்து;
+	நிலை K_XF2:		சாவி = VTERM_சாவி_FUNCTION(2); நிறுத்து;
+	நிலை K_XF3:		சாவி = VTERM_சாவி_FUNCTION(3); நிறுத்து;
+	நிலை K_XF4:		சாவி = VTERM_சாவி_FUNCTION(4); நிறுத்து;
+	நிலை K_SELECT:		திரும்பு 0;
 #ifdef FEAT_GUI
-	case K_VER_SCROLLBAR:	return 0;
-	case K_HOR_SCROLLBAR:	return 0;
+	நிலை K_VER_SCROLLBAR:	திரும்பு 0;
+	நிலை K_HOR_SCROLLBAR:	திரும்பு 0;
 #endif
 #ifdef FEAT_GUI_TABLINE
-	case K_TABLINE:		return 0;
-	case K_TABMENU:		return 0;
+	நிலை K_TABLINE:		திரும்பு 0;
+	நிலை K_TABMENU:		திரும்பு 0;
 #endif
 #ifdef FEAT_NETBEANS_INTG
-	case K_F21:		key = VTERM_KEY_FUNCTION(21); break;
+	நிலை K_F21:		சாவி = VTERM_சாவி_FUNCTION(21); நிறுத்து;
 #endif
 #ifdef FEAT_DND
-	case K_DROP:		return 0;
+	நிலை K_DROP:		திரும்பு 0;
 #endif
-	case K_CURSORHOLD:	return 0;
-	case K_PS:		vterm_keyboard_start_paste(vterm);
+	நிலை K_CURSORHOLD:	திரும்பு 0;
+	நிலை K_PS:		vterm_keyboard_start_paste(vterm);
 				other = TRUE;
-				break;
-	case K_PE:		vterm_keyboard_end_paste(vterm);
+				நிறுத்து;
+	நிலை K_PE:		vterm_keyboard_end_paste(vterm);
 				other = TRUE;
-				break;
+				நிறுத்து;
     }
 
     // add modifiers for the typed key
-    if (modmask & MOD_MASK_SHIFT)
+    எனில் (modmask & MOD_MASK_SHIFT)
 	mod |= VTERM_MOD_SHIFT;
-    if (modmask & MOD_MASK_CTRL)
+    எனில் (modmask & MOD_MASK_CTRL)
 	mod |= VTERM_MOD_CTRL;
-    if (modmask & (MOD_MASK_ALT | MOD_MASK_META))
+    எனில் (modmask & (MOD_MASK_ALT | MOD_MASK_META))
 	mod |= VTERM_MOD_ALT;
 
     // Ctrl-Shift-i may have the key "I" instead of "i", but for the kitty
     // keyboard protocol should use "i".  Applies to all ascii letters.
-    if (ASCII_ISUPPER(c)
+    எனில் (ASCII_ISUPPER(c)
 	    && vterm_is_kitty_keyboard(vterm)
 	    && mod == (VTERM_MOD_CTRL | VTERM_MOD_SHIFT))
 	c = TOLOWER_ASC(c);
@@ -1888,15 +1888,15 @@ term_convert_key(term_T *term, int c, int modmask, char *buf)
      * - Write keys to vterm: vterm_keyboard_key()
      * - Write output to channel.
      */
-    if (key != VTERM_KEY_NONE)
+    எனில் (சாவி != VTERM_சாவி_NONE)
 	// Special key, let vterm convert it.
-	vterm_keyboard_key(vterm, key, mod);
-    else if (!other)
+	vterm_keyboard_சாவி(vterm, சாவி, mod);
+    இல்லையெனில் எனில் (!other)
 	// Normal character, let vterm convert it.
 	vterm_keyboard_unichar(vterm, c, mod);
 
     // Read back the converted escape sequence.
-    return (int)vterm_output_read(vterm, buf, KEY_BUF_LEN);
+    திரும்பு (முழு)vterm_output_read(vterm, buf, சாவி_BUF_LEN);
 }
 
 /*
@@ -1904,56 +1904,56 @@ term_convert_key(term_T *term, int c, int modmask, char *buf)
  * If "check_job_status" is TRUE update the job status.
  * NOTE: "term" may be freed by callbacks.
  */
-    static int
-term_job_running_check(term_T *term, int check_job_status)
+    நிலையான முழு
+term_job_running_check(term_T *term, முழு check_job_status)
 {
     // Also consider the job finished when the channel is closed, to avoid a
     // race condition when updating the title.
-    if (term == NULL
-	|| term->tl_job == NULL
+    எனில் (term == வெற்று
+	|| term->tl_job == வெற்று
 	|| !channel_is_open(term->tl_job->jv_channel))
-	return FALSE;
+	திரும்பு FALSE;
 
     job_T *job = term->tl_job;
 
     // Careful: Checking the job status may invoke callbacks, which close
     // the buffer and terminate "term".  However, "job" will not be freed
     // yet.
-    if (check_job_status)
+    எனில் (check_job_status)
 	job_status(job);
-    return (job->jv_status == JOB_STARTED
-	    || (job->jv_channel != NULL && job->jv_channel->ch_keep_open));
+    திரும்பு (job->jv_status == JOB_STARTED
+	    || (job->jv_channel != வெற்று && job->jv_channel->ch_keep_open));
 }
 
 /*
  * Return TRUE if the job for "term" is still running.
  */
-    int
+    முழு
 term_job_running(term_T *term)
 {
-    return term_job_running_check(term, FALSE);
+    திரும்பு term_job_running_check(term, FALSE);
 }
 
 /*
  * Return TRUE if the job for "term" is still running, ignoring the job was
  * "NONE".
  */
-    int
+    முழு
 term_job_running_not_none(term_T *term)
 {
-    return term_job_running(term) && !term_none_open(term);
+    திரும்பு term_job_running(term) && !term_none_open(term);
 }
 
 /*
  * Return TRUE if "term" has an active channel and used ":term NONE".
  */
-    int
+    முழு
 term_none_open(term_T *term)
 {
     // Also consider the job finished when the channel is closed, to avoid a
     // race condition when updating the title.
-    return term != NULL
-	&& term->tl_job != NULL
+    திரும்பு term != வெற்று
+	&& term->tl_job != வெற்று
 	&& channel_is_open(term->tl_job->jv_channel)
 	&& term->tl_job->jv_channel->ch_keep_open;
 }
@@ -1963,18 +1963,18 @@ term_none_open(term_T *term)
 // Return OK when the user confirms to kill it.
 // Return FAIL if the user selects otherwise.
 //
-    int
+    முழு
 term_confirm_stop(buf_T *buf)
 {
-    char_u	buff[DIALOG_MSG_SIZE];
-    int	ret;
+    char_u	buff[DIALOG_செய்தி_SIZE];
+    முழு	ret;
 
-    dialog_msg(buff, _("Kill job in \"%s\"?"), buf_get_fname(buf));
-    ret = vim_dialog_yesno(VIM_QUESTION, NULL, buff, 1);
-    if (ret == VIM_YES)
-	return OK;
-    else
-	return FAIL;
+    dialog_செய்தி(buff, _("Kill job in \"%s\"?"), buf_get_fname(buf));
+    ret = vim_dialog_yesno(VIM_QUESTION, வெற்று, buff, 1);
+    எனில் (ret == VIM_YES)
+	திரும்பு OK;
+    இல்லையெனில்
+	திரும்பு FAIL;
 }
 
 /*
@@ -1982,87 +1982,87 @@ term_confirm_stop(buf_T *buf)
  * Return OK when the job finished.
  * Return FAIL when the job is still running.
  */
-    int
+    முழு
 term_try_stop_job(buf_T *buf)
 {
-    int	    count;
-    char    *how = (char *)buf->b_term->tl_kill;
+    முழு	    மொத்தம்;
+    எழுத்து    *how = (எழுத்து *)buf->b_term->tl_kill;
 
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-    if ((how == NULL || *how == NUL)
+#எனில் defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+    எனில் ((how == வெற்று || *how == NUL)
 			  && (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)))
     {
-	if (term_confirm_stop(buf) == OK)
+	எனில் (term_confirm_stop(buf) == OK)
 	    how = "kill";
-	else
-	    return FAIL;
+	இல்லையெனில்
+	    திரும்பு FAIL;
     }
 #endif
-    if (how == NULL || *how == NUL)
-	return FAIL;
+    எனில் (how == வெற்று || *how == NUL)
+	திரும்பு FAIL;
 
-    job_stop(buf->b_term->tl_job, NULL, how);
+    job_stop(buf->b_term->tl_job, வெற்று, how);
 
     // wait for up to a second for the job to die
-    for (count = 0; count < 100; ++count)
+    க்கு (மொத்தம் = 0; மொத்தம் < 100; ++மொத்தம்)
     {
 	job_T *job;
 
 	// buffer, terminal and job may be cleaned up while waiting
-	if (!buf_valid(buf)
-		|| buf->b_term == NULL
-		|| buf->b_term->tl_job == NULL)
-	    return OK;
+	எனில் (!buf_valid(buf)
+		|| buf->b_term == வெற்று
+		|| buf->b_term->tl_job == வெற்று)
+	    திரும்பு OK;
 	job = buf->b_term->tl_job;
 
 	// Call job_status() to update jv_status. It may cause the job to be
 	// cleaned up but it won't be freed.
 	job_status(job);
-	if (job->jv_status >= JOB_ENDED)
-	    return OK;
+	எனில் (job->jv_status >= JOB_ENDED)
+	    திரும்பு OK;
 
 	ui_delay(10L, TRUE);
 	term_flush_messages();
     }
-    return FAIL;
+    திரும்பு FAIL;
 }
 
 /*
  * Add the last line of the scrollback buffer to the buffer in the window.
  */
-    static void
-add_scrollback_line_to_buffer(term_T *term, char_u *text, int len, int append)
+    நிலையான வெறுமை
+add_scrollback_வரி_to_buffer(term_T *term, char_u *text, முழு len, முழு append)
 {
     buf_T	*buf = term->tl_buffer;
-    int		empty = (buf->b_ml.ml_flags & ML_EMPTY);
-    linenr_T	lnum = buf->b_ml.ml_line_count;
+    முழு		empty = (buf->b_ml.ml_flags & ML_EMPTY);
+    linenr_T	lnum = buf->b_ml.ml_வரி_மொத்தம்;
 
 #ifdef MSWIN
     char_u *tmp = text;
-    if (!enc_utf8 && enc_codepage > 0)
+    எனில் (!enc_utf8 && enc_codepage > 0)
     {
-	WCHAR   *ret = NULL;
-	int	length = 0;
+	WCHAR   *ret = வெற்று;
+	முழு	length = 0;
 
-	MultiByteToWideChar_alloc(CP_UTF8, 0, (char*)text, len + 1,
+	MultiByteToWideChar_alloc(CP_UTF8, 0, (எழுத்து*)text, len + 1,
 							   &ret, &length);
-	if (ret != NULL)
+	எனில் (ret != வெற்று)
 	{
 	    WideCharToMultiByte_alloc(enc_codepage, 0,
-				      ret, length, (char **)&text, &len, 0, 0);
+				      ret, length, (எழுத்து **)&text, &len, 0, 0);
 	    vim_free(ret);
 	}
     }
 #endif
 
-    if (append)
+    எனில் (append)
     {
 	char_u *prev_text = ml_get_buf(buf, lnum, FALSE);
 	size_t prev_len = STRLEN(prev_text);
 
 	char_u *both = alloc(len + prev_len + 2);
-	if (both == NULL)
-	    return;
+	எனில் (both == வெற்று)
+	    திரும்பு;
 	vim_strncpy(both, prev_text, prev_len + 1);
 	vim_strncpy(both + prev_len, text, len + 1);
 
@@ -2070,14 +2070,14 @@ add_scrollback_line_to_buffer(term_T *term, char_u *text, int len, int append)
 	ml_replace(lnum, both, FALSE);
 	curbuf = curwin->w_buffer;
     }
-    else
+    இல்லையெனில்
 	ml_append_buf(buf, lnum, text, len + 1, FALSE);
 
 #ifdef MSWIN
-    if (tmp != text)
+    எனில் (tmp != text)
 	vim_free(text);
 #endif
-    if (empty)
+    எனில் (empty)
     {
 	// Delete the empty line that was in the empty buffer.
 	curbuf = buf;
@@ -2086,8 +2086,8 @@ add_scrollback_line_to_buffer(term_T *term, char_u *text, int len, int append)
     }
 }
 
-    static void
-cell2cellattr(const VTermScreenCell *cell, cellattr_T *attr)
+    நிலையான வெறுமை
+cell2cellattr(மாறிலி VTermScreenCell *cell, cellattr_T *attr)
 {
     attr->width = cell->width;
     attr->attrs = cell->attrs;
@@ -2095,12 +2095,12 @@ cell2cellattr(const VTermScreenCell *cell, cellattr_T *attr)
     attr->bg = cell->bg;
 }
 
-    static int
+    நிலையான முழு
 equal_celattr(cellattr_T *a, cellattr_T *b)
 {
     // We only compare the RGB colors, ignoring the ANSI index and type.
     // Thus black set explicitly is equal the background black.
-    return a->fg.red == b->fg.red
+    திரும்பு a->fg.red == b->fg.red
 	&& a->fg.green == b->fg.green
 	&& a->fg.blue == b->fg.blue
 	&& a->bg.red == b->bg.red
@@ -2112,31 +2112,31 @@ equal_celattr(cellattr_T *a, cellattr_T *b)
  * Add an empty scrollback line to "term".  When "lnum" is not zero, add the
  * line at this position.  Otherwise at the end.
  */
-    static int
-add_empty_scrollback(term_T *term, cellattr_T *fill_attr, int lnum)
+    நிலையான முழு
+add_empty_scrollback(term_T *term, cellattr_T *fill_attr, முழு lnum)
 {
-    if (ga_grow(&term->tl_scrollback, 1) == FAIL)
-	return FALSE;
+    எனில் (ga_grow(&term->tl_scrollback, 1) == FAIL)
+	திரும்பு FALSE;
 
-    sb_line_T *line = (sb_line_T *)term->tl_scrollback.ga_data
+    sb_வரி_T *வரி = (sb_வரி_T *)term->tl_scrollback.ga_data
 	+ term->tl_scrollback.ga_len;
 
-    if (lnum > 0)
+    எனில் (lnum > 0)
     {
-	int i;
+	முழு i;
 
-	for (i = 0; i < term->tl_scrollback.ga_len - lnum; ++i)
+	க்கு (i = 0; i < term->tl_scrollback.ga_len - lnum; ++i)
 	{
-	    *line = *(line - 1);
-	    --line;
+	    *வரி = *(வரி - 1);
+	    --வரி;
 	}
     }
-    line->sb_cols = 0;
-    line->sb_bytes = 0;
-    line->sb_cells = NULL;
-    line->sb_fill_attr = *fill_attr;
+    வரி->sb_cols = 0;
+    வரி->sb_bytes = 0;
+    வரி->sb_cells = வெற்று;
+    வரி->sb_fill_attr = *fill_attr;
     ++term->tl_scrollback.ga_len;
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -2144,60 +2144,60 @@ add_empty_scrollback(term_T *term, cellattr_T *fill_attr, int lnum)
  * Used before adding a new scrollback line or updating the buffer for lines
  * displayed in the terminal.
  */
-    static void
+    நிலையான வெறுமை
 cleanup_scrollback(term_T *term)
 {
-    sb_line_T	*line;
+    sb_வரி_T	*வரி;
     garray_T	*gap;
     char_u	*bufline;
     size_t      bufline_length;
 
     curbuf = term->tl_buffer;
     gap = &term->tl_scrollback;
-    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_line_count, FALSE);
+    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_வரி_மொத்தம், FALSE);
     bufline_length = STRLEN(bufline);
-    while (term->tl_scrollback_snapshot && gap->ga_len > 0)
+    போது (term->tl_scrollback_snapshot && gap->ga_len > 0)
     {
-	line = (sb_line_T *)gap->ga_data + gap->ga_len - 1;
-	if (line->sb_bytes < 0 || (size_t)line->sb_bytes > bufline_length)
-	    break;
-	bufline_length -= line->sb_bytes;
-	if (!bufline_length)
+	வரி = (sb_வரி_T *)gap->ga_data + gap->ga_len - 1;
+	எனில் (வரி->sb_bytes < 0 || (size_t)வரி->sb_bytes > bufline_length)
+	    நிறுத்து;
+	bufline_length -= வரி->sb_bytes;
+	எனில் (!bufline_length)
 	{
-	    ml_delete(curbuf->b_ml.ml_line_count);
-	    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_line_count, FALSE);
+	    ml_delete(curbuf->b_ml.ml_வரி_மொத்தம்);
+	    bufline = ml_get_buf(curbuf, curbuf->b_ml.ml_வரி_மொத்தம், FALSE);
 	    bufline_length = STRLEN(bufline);
 	}
-	vim_free(line->sb_cells);
+	vim_free(வரி->sb_cells);
 	--gap->ga_len;
 	--term->tl_scrollback_snapshot;
     }
-    if (bufline_length < STRLEN(bufline))
+    எனில் (bufline_length < STRLEN(bufline))
     {
 	char_u *shortened = vim_strnsave(bufline, bufline_length);
-	ml_replace(curbuf->b_ml.ml_line_count, shortened, FALSE);
+	ml_replace(curbuf->b_ml.ml_வரி_மொத்தம், shortened, FALSE);
     }
     curbuf = curwin->w_buffer;
-    if (curbuf == term->tl_buffer)
+    எனில் (curbuf == term->tl_buffer)
 	check_cursor();
 }
 
 /*
  * Add the current lines of the terminal to scrollback and to the buffer.
  */
-    static void
+    நிலையான வெறுமை
 update_snapshot(term_T *term)
 {
     VTermScreen	    *screen;
     VTermState	    *state;
-    int		    len;
-    int		    lines_skipped = 0;
+    முழு		    len;
+    முழு		    வரிகள்_skipped = 0;
     VTermPos	    pos;
     VTermScreenCell cell;
     cellattr_T	    fill_attr, new_fill_attr;
     cellattr_T	    *p;
 
-    ch_log(term->tl_job == NULL ? NULL : term->tl_job->jv_channel,
+    ch_log(term->tl_job == வெற்று ? வெற்று : term->tl_job->jv_channel,
 				  "Adding terminal window snapshot to buffer");
 
     // First remove the lines that were appended before, they might be
@@ -2207,116 +2207,116 @@ update_snapshot(term_T *term)
     screen = vterm_obtain_screen(term->tl_vterm);
     state = vterm_obtain_state(term->tl_vterm);
     fill_attr = new_fill_attr = term->tl_default_color;
-    for (pos.row = 0; pos.row < term->tl_rows; ++pos.row)
+    க்கு (pos.row = 0; pos.row < term->tl_rows; ++pos.row)
     {
 	len = 0;
-	for (pos.col = 0; pos.col < term->tl_cols; ++pos.col)
-	    if (vterm_screen_get_cell(screen, pos, &cell) != 0
+	க்கு (pos.col = 0; pos.col < term->tl_cols; ++pos.col)
+	    எனில் (vterm_screen_get_cell(screen, pos, &cell) != 0
 						       && cell.chars[0] != NUL)
 	    {
 		len = pos.col + 1;
 		new_fill_attr = term->tl_default_color;
 	    }
-	    else
+	    இல்லையெனில்
 		// Assume the last attr is the filler attr.
 		cell2cellattr(&cell, &new_fill_attr);
 
-	if (len == 0 && equal_celattr(&new_fill_attr, &fill_attr))
-	    ++lines_skipped;
-	else
+	எனில் (len == 0 && equal_celattr(&new_fill_attr, &fill_attr))
+	    ++வரிகள்_skipped;
+	இல்லையெனில்
 	{
-	    while (lines_skipped > 0)
+	    போது (வரிகள்_skipped > 0)
 	    {
 		// Line was skipped, add an empty line.
-		--lines_skipped;
-		if (add_empty_scrollback(term, &fill_attr, 0) == OK)
+		--வரிகள்_skipped;
+		எனில் (add_empty_scrollback(term, &fill_attr, 0) == OK)
 		{
-		    add_scrollback_line_to_buffer(term, (char_u *)"", 0, 0);
+		    add_scrollback_வரி_to_buffer(term, (char_u *)"", 0, 0);
 		    ++term->tl_scrollback_snapshot;
 		}
 	    }
 
-	    if (len == 0)
-		p = NULL;
-	    else
+	    எனில் (len == 0)
+		p = வெற்று;
+	    இல்லையெனில்
 		p = ALLOC_MULT(cellattr_T, len);
-	    if ((p != NULL || len == 0)
+	    எனில் ((p != வெற்று || len == 0)
 				     && ga_grow(&term->tl_scrollback, 1) == OK)
 	    {
 		garray_T    ga;
-		int	    width;
-		const VTermLineInfo *lineinfo;
-		sb_line_T   *line = (sb_line_T *)term->tl_scrollback.ga_data
+		முழு	    width;
+		மாறிலி VTerm_வரி_Info *lineinfo;
+		sb_வரி_T   *வரி = (sb_வரி_T *)term->tl_scrollback.ga_data
 						  + term->tl_scrollback.ga_len;
 
 		lineinfo = vterm_state_get_lineinfo(state, pos.row);
 
 		ga_init2(&ga, 1, 100);
-		for (pos.col = 0; pos.col < len; pos.col += width)
+		க்கு (pos.col = 0; pos.col < len; pos.col += width)
 		{
-		    if (vterm_screen_get_cell(screen, pos, &cell) == 0)
+		    எனில் (vterm_screen_get_cell(screen, pos, &cell) == 0)
 		    {
 			width = 1;
 			CLEAR_POINTER(p + pos.col);
-			if (ga_grow(&ga, 1) == OK)
+			எனில் (ga_grow(&ga, 1) == OK)
 			    ga.ga_len += utf_char2bytes(' ',
 					     (char_u *)ga.ga_data + ga.ga_len);
 		    }
-		    else
+		    இல்லையெனில்
 		    {
 			width = cell.width;
 
 			cell2cellattr(&cell, &p[pos.col]);
-			if (width == 2)
+			எனில் (width == 2)
 			    // second cell of double-width character has the
 			    // same attributes.
 			    p[pos.col + 1] = p[pos.col];
 
 			// Each character can be up to 6 bytes.
-			if (ga_grow(&ga, VTERM_MAX_CHARS_PER_CELL * 6) == OK)
+			எனில் (ga_grow(&ga, VTERM_MAX_CHARS_PER_CELL * 6) == OK)
 			{
-			    int	    i;
-			    int	    c;
+			    முழு	    i;
+			    முழு	    c;
 
-			    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL &&
+			    க்கு (i = 0; i < VTERM_MAX_CHARS_PER_CELL &&
 				    ((c = cell.chars[i]) > 0 || i == 0); ++i)
 				ga.ga_len += utf_char2bytes(c == NUL ? ' ' : c,
 					     (char_u *)ga.ga_data + ga.ga_len);
 			}
 		    }
 		}
-		line->sb_cols = len;
-		line->sb_bytes = ga.ga_len;
-		line->sb_cells = p;
-		line->sb_fill_attr = new_fill_attr;
-		line->continuation = (char_u)lineinfo->continuation;
+		வரி->sb_cols = len;
+		வரி->sb_bytes = ga.ga_len;
+		வரி->sb_cells = p;
+		வரி->sb_fill_attr = new_fill_attr;
+		வரி->continuation = (char_u)lineinfo->continuation;
 		fill_attr = new_fill_attr;
 		++term->tl_scrollback.ga_len;
 		++term->tl_scrollback_snapshot;
 
-		if (ga_grow(&ga, 1) == FAIL)
-		    add_scrollback_line_to_buffer(term, (char_u *)"", 0, 0);
-		else
+		எனில் (ga_grow(&ga, 1) == FAIL)
+		    add_scrollback_வரி_to_buffer(term, (char_u *)"", 0, 0);
+		இல்லையெனில்
 		{
 		    *((char_u *)ga.ga_data + ga.ga_len) = NUL;
-		    add_scrollback_line_to_buffer(term, ga.ga_data, ga.ga_len,
+		    add_scrollback_வரி_to_buffer(term, ga.ga_data, ga.ga_len,
 						  lineinfo->continuation);
 		}
 		ga_clear(&ga);
 	    }
-	    else
+	    இல்லையெனில்
 		vim_free(p);
 	}
     }
 
     // Add trailing empty lines.
-    for (pos.row = term->tl_scrollback.ga_len;
+    க்கு (pos.row = term->tl_scrollback.ga_len;
 	    pos.row < term->tl_scrollback_scrolled + term->tl_cursor_pos.row;
 	    ++pos.row)
     {
-	if (add_empty_scrollback(term, &fill_attr, 0) == OK)
+	எனில் (add_empty_scrollback(term, &fill_attr, 0) == OK)
 	{
-	    add_scrollback_line_to_buffer(term, (char_u *)"", 0, 0);
+	    add_scrollback_வரி_to_buffer(term, (char_u *)"", 0, 0);
 	    ++term->tl_scrollback_snapshot;
 	}
     }
@@ -2332,20 +2332,20 @@ update_snapshot(term_T *term)
  * encountered when using a terminal in a popup window.
  * Return TRUE if "*wp" was set to the next window.
  */
-    static int
-for_all_windows_and_curwin(win_T **wp, int *did_curwin)
+    நிலையான முழு
+for_all_windows_and_curwin(win_T **wp, முழு *did_curwin)
 {
-    if (*wp == NULL)
+    எனில் (*wp == வெற்று)
 	*wp = firstwin;
-    else if ((*wp)->w_next != NULL)
+    இல்லையெனில் எனில் ((*wp)->w_next != வெற்று)
 	*wp = (*wp)->w_next;
-    else if (!*did_curwin)
+    இல்லையெனில் எனில் (!*did_curwin)
 	*wp = curwin;
-    else
-	return FALSE;
-    if (*wp == curwin)
+    இல்லையெனில்
+	திரும்பு FALSE;
+    எனில் (*wp == curwin)
 	*did_curwin = TRUE;
-    return TRUE;
+    திரும்பு TRUE;
 }
 
 /*
@@ -2354,35 +2354,35 @@ for_all_windows_and_curwin(win_T **wp, int *did_curwin)
  * Terminal-Normal mode.
  * When "redraw" is TRUE redraw the windows that show the terminal.
  */
-    void
-may_move_terminal_to_buffer(term_T *term, int redraw)
+    வெறுமை
+may_move_terminal_to_buffer(term_T *term, முழு redraw)
 {
-    if (term->tl_vterm == NULL)
-	return;
+    எனில் (term->tl_vterm == வெற்று)
+	திரும்பு;
 
     // Update the snapshot only if something changes or the buffer does not
     // have all the lines.
-    if (term->tl_dirty_snapshot || term->tl_buffer->b_ml.ml_line_count
+    எனில் (term->tl_dirty_snapshot || term->tl_buffer->b_ml.ml_வரி_மொத்தம்
 					       <= term->tl_buffer_scrolled)
 	update_snapshot(term);
 
-    if (redraw)
+    எனில் (redraw)
     {
-	win_T	    *wp = NULL;
-	int	    did_curwin = FALSE;
+	win_T	    *wp = வெற்று;
+	முழு	    did_curwin = FALSE;
 
-	while (for_all_windows_and_curwin(&wp, &did_curwin))
+	போது (for_all_windows_and_curwin(&wp, &did_curwin))
 	{
-	    if (wp->w_buffer == term->tl_buffer)
+	    எனில் (wp->w_buffer == term->tl_buffer)
 	    {
-		wp->w_cursor.lnum = term->tl_buffer->b_ml.ml_line_count;
+		wp->w_cursor.lnum = term->tl_buffer->b_ml.ml_வரி_மொத்தம்;
 		wp->w_cursor.col = 0;
 		wp->w_valid = 0;
-		if (wp->w_cursor.lnum >= wp->w_height)
+		எனில் (wp->w_cursor.lnum >= wp->w_height)
 		{
 		    linenr_T min_topline = wp->w_cursor.lnum - wp->w_height + 1;
 
-		    if (wp->w_topline < min_topline)
+		    எனில் (wp->w_topline < min_topline)
 			wp->w_topline = min_topline;
 		}
 		redraw_win_later(wp, UPD_NOT_VALID);
@@ -2391,35 +2391,35 @@ may_move_terminal_to_buffer(term_T *term, int redraw)
     }
 }
 
-#if defined(FEAT_TIMERS)
+#எனில் defined(FEAT_TIMERS)
 /*
  * Check if any terminal timer expired.  If so, copy text from the terminal to
  * the buffer.
  * Return the time until the next timer will expire.
  */
-    int
-term_check_timers(int next_due_arg, proftime_T *now)
+    முழு
+term_check_timers(முழு next_due_arg, proftime_T *now)
 {
     term_T  *term;
-    int	    next_due = next_due_arg;
+    முழு	    next_due = next_due_arg;
 
     FOR_ALL_TERMS(term)
     {
-	if (term->tl_timer_set && !term->tl_normal_mode)
+	எனில் (term->tl_timer_set && !term->tl_normal_mode)
 	{
-	    long    this_due = proftime_time_left(&term->tl_timer_due, now);
+	    long    this_due = proftime_time_இடது(&term->tl_timer_due, now);
 
-	    if (this_due <= 1)
+	    எனில் (this_due <= 1)
 	    {
 		term->tl_timer_set = FALSE;
 		may_move_terminal_to_buffer(term, FALSE);
 	    }
-	    else if (next_due == -1 || next_due > this_due)
+	    இல்லையெனில் எனில் (next_due == -1 || next_due > this_due)
 		next_due = this_due;
 	}
     }
 
-    return next_due;
+    திரும்பு next_due;
 }
 #endif
 
@@ -2427,15 +2427,15 @@ term_check_timers(int next_due_arg, proftime_T *now)
  * When "normal_mode" is TRUE set the terminal to Terminal-Normal mode,
  * otherwise end it.
  */
-    static void
-set_terminal_mode(term_T *term, int normal_mode)
+    நிலையான வெறுமை
+set_terminal_mode(term_T *term, முழு normal_mode)
 {
     term->tl_normal_mode = normal_mode;
     may_trigger_modechanged();
-    if (!normal_mode)
+    எனில் (!normal_mode)
 	handle_postponed_scrollback(term);
     VIM_CLEAR(term->tl_status_text);
-    if (term->tl_buffer == curbuf)
+    எனில் (term->tl_buffer == curbuf)
 	maketitle();
 }
 
@@ -2443,11 +2443,11 @@ set_terminal_mode(term_T *term, int normal_mode)
  * Called after the job is finished and Terminal mode is not active:
  * Move the vterm contents into the scrollback buffer and free the vterm.
  */
-    static void
+    நிலையான வெறுமை
 cleanup_vterm(term_T *term)
 {
     set_terminal_mode(term, FALSE);
-    if (term->tl_finish != TL_FINISH_CLOSE)
+    எனில் (term->tl_finish != TL_FINISH_CLOSE)
 	may_move_terminal_to_buffer(term, TRUE);
     term_free_vterm(term);
 }
@@ -2456,12 +2456,12 @@ cleanup_vterm(term_T *term)
  * Switch from Terminal-Job mode to Terminal-Normal mode.
  * Suspends updating the terminal window.
  */
-    static void
-term_enter_normal_mode(void)
+    நிலையான வெறுமை
+term_enter_normal_mode(வெறுமை)
 {
     term_T     *term = curbuf->b_term;
     linenr_T   lnum;
-    int        col;
+    முழு        col;
 
     set_terminal_mode(term, TRUE);
 
@@ -2472,11 +2472,11 @@ term_enter_normal_mode(void)
     // terminal.
     lnum = term->tl_buffer_scrolled + 1 + term->tl_cursor_pos.row;
     col = term->tl_cursor_pos.col;
-    scrollbackline_pos_in_buf(term, term->tl_cursor_pos.row + term->tl_scrollback_scrolled, &lnum, &col, NULL);
+    scrollbackline_pos_in_buf(term, term->tl_cursor_pos.row + term->tl_scrollback_scrolled, &lnum, &col, வெற்று);
 
     curwin->w_cursor.lnum = lnum;
     check_cursor();
-    if (coladvance(col) == FAIL)
+    எனில் (coladvance(col) == FAIL)
 	coladvance(MAXCOL);
     curwin->w_set_curswant = true;
     curwin->w_topline = term->tl_buffer_scrolled + 1;
@@ -2486,30 +2486,30 @@ term_enter_normal_mode(void)
  * Returns TRUE if the current window contains a terminal and we are in
  * Terminal-Normal mode.
  */
-    int
+    முழு
 term_in_normal_mode(buf_T *buf)
 {
     term_T *term = buf->b_term;
 
-    return term != NULL && term->tl_normal_mode;
+    திரும்பு term != வெற்று && term->tl_normal_mode;
 }
 
 /*
  * Switch from Terminal-Normal mode to Terminal-Job mode.
  * Restores updating the terminal window.
  */
-    void
-term_enter_job_mode(void)
+    வெறுமை
+term_enter_job_mode(வெறுமை)
 {
     term_T	*term = curbuf->b_term;
 
     set_terminal_mode(term, FALSE);
 
-    if (term->tl_channel_closed)
+    எனில் (term->tl_channel_closed)
 	cleanup_vterm(term);
     redraw_buf_and_status_later(curbuf, UPD_NOT_VALID);
 #ifdef FEAT_PROP_POPUP
-    if (WIN_IS_POPUP(curwin))
+    எனில் (WIN_IS_POPUP(curwin))
 	redraw_later(UPD_NOT_VALID);
 #endif
 }
@@ -2520,43 +2520,43 @@ term_enter_job_mode(void)
  * vgetc().  Therefore vgetorpeek() will call check_no_reduce_keys() to update
  * "no_reduce_keys" before using it.
  */
-typedef enum {
+வகைவரை எண்ணிக்கை {
     NRKS_NONE,	    // initial value
     NRKS_CHECK,	    // modify_other_keys was off before calling vgetc()
     NRKS_SET,	    // no_reduce_keys was incremented in term_vgetc() or
 		    // check_no_reduce_keys(), must be decremented.
-} reduce_key_state_T;
+} reduce_சாவி_state_T;
 
-static reduce_key_state_T  no_reduce_key_state = NRKS_NONE;
+நிலையான reduce_சாவி_state_T  no_reduce_சாவி_state = NRKS_NONE;
 
 /*
  * Return TRUE if the term is using modifyOtherKeys level 2 or the kitty
  * keyboard protocol.
  */
-    static int
-vterm_using_key_protocol(void)
+    நிலையான முழு
+vterm_using_சாவி_protocol(வெறுமை)
 {
-    return curbuf->b_term != NULL
-	&& curbuf->b_term->tl_vterm != NULL
-	&& (vterm_is_modify_other_keys(curbuf->b_term->tl_vterm)
+    திரும்பு curbuf->b_term != வெற்று
+	&& curbuf->b_term->tl_vterm != வெற்று
+	&& (vterm_is_modify_other_சாவிகள்(curbuf->b_term->tl_vterm)
 		|| vterm_is_kitty_keyboard(curbuf->b_term->tl_vterm));
 }
 
-    void
-check_no_reduce_keys(void)
+    வெறுமை
+check_no_reduce_சாவிகள்(வெறுமை)
 {
-    if (no_reduce_key_state != NRKS_CHECK
-	    || no_reduce_keys >= 1
-	    || curbuf->b_term == NULL
-	    || curbuf->b_term->tl_vterm == NULL)
-	return;
+    எனில் (no_reduce_சாவி_state != NRKS_CHECK
+	    || no_reduce_சாவிகள் >= 1
+	    || curbuf->b_term == வெற்று
+	    || curbuf->b_term->tl_vterm == வெற்று)
+	திரும்பு;
 
-    if (vterm_using_key_protocol())
+    எனில் (vterm_using_சாவி_protocol())
     {
 	// "modify_other_keys" or kitty keyboard protocol was enabled while
 	// waiting.
-	no_reduce_key_state = NRKS_SET;
-	++no_reduce_keys;
+	no_reduce_சாவி_state = NRKS_SET;
+	++no_reduce_சாவிகள்;
     }
 }
 
@@ -2565,11 +2565,11 @@ check_no_reduce_keys(void)
  * Note: while waiting a terminal may be closed and freed if the channel is
  * closed and ++close was used.  This may even happen before we get here.
  */
-    static int
-term_vgetc(void)
+    நிலையான முழு
+term_vgetc(வெறுமை)
 {
-    int c;
-    int save_State = State;
+    முழு c;
+    முழு save_State = State;
 
     State = MODE_TERMINAL;
     got_int = FALSE;
@@ -2577,95 +2577,95 @@ term_vgetc(void)
     ctrl_break_was_pressed = FALSE;
 #endif
 
-    if (vterm_using_key_protocol())
+    எனில் (vterm_using_சாவி_protocol())
     {
-	++no_reduce_keys;
-	no_reduce_key_state = NRKS_SET;
+	++no_reduce_சாவிகள்;
+	no_reduce_சாவி_state = NRKS_SET;
     }
-    else
+    இல்லையெனில்
     {
-	no_reduce_key_state = NRKS_CHECK;
+	no_reduce_சாவி_state = NRKS_CHECK;
     }
 
     c = vgetc();
     got_int = FALSE;
     State = save_State;
 
-    if (no_reduce_key_state == NRKS_SET)
-	--no_reduce_keys;
-    no_reduce_key_state = NRKS_NONE;
+    எனில் (no_reduce_சாவி_state == NRKS_SET)
+	--no_reduce_சாவிகள்;
+    no_reduce_சாவி_state = NRKS_NONE;
 
-    return c;
+    திரும்பு c;
 }
 
-static int	mouse_was_outside = FALSE;
+நிலையான முழு	mouse_was_outside = FALSE;
 
 /*
  * Send key "c" with modifiers "modmask" to terminal.
  * Return FAIL when the key needs to be handled in Normal mode.
  * Return OK when the key was dropped or sent to the terminal.
  */
-    int
-send_keys_to_term(term_T *term, int c, int modmask, int typed)
+    முழு
+send_சாவிகள்_to_term(term_T *term, முழு c, முழு modmask, முழு typed)
 {
-    char	msg[KEY_BUF_LEN];
+    எழுத்து	செய்தி[சாவி_BUF_LEN];
     size_t	len;
-    int		dragging_outside = FALSE;
+    முழு		dragging_outside = FALSE;
 
     // Catch keys that need to be handled as in Normal mode.
-    switch (c)
+    தேர்வு (c)
     {
-	case NUL:
-	case K_ZERO:
-	    if (typed)
+	நிலை NUL:
+	நிலை K_ZERO:
+	    எனில் (typed)
 		stuffcharReadbuff(c);
-	    return FAIL;
+	    திரும்பு FAIL;
 
-	case K_TABLINE:
+	நிலை K_TABLINE:
 	    stuffcharReadbuff(c);
-	    return FAIL;
+	    திரும்பு FAIL;
 
-	case K_IGNORE:
-	case K_CANCEL:  // used for :normal when running out of chars
-	    return FAIL;
+	நிலை K_IGNORE:
+	நிலை K_CANCEL:  // used for :normal when running out of chars
+	    திரும்பு FAIL;
 
-	case K_LEFTDRAG:
-	case K_MIDDLEDRAG:
-	case K_RIGHTDRAG:
-	case K_X1DRAG:
-	case K_X2DRAG:
+	நிலை K_LEFTDRAG:
+	நிலை K_MIDDLEDRAG:
+	நிலை K_RIGHTDRAG:
+	நிலை K_X1DRAG:
+	நிலை K_X2DRAG:
 	    dragging_outside = mouse_was_outside;
 	    // FALLTHROUGH
-	case K_LEFTMOUSE:
-	case K_LEFTMOUSE_NM:
-	case K_LEFTRELEASE:
-	case K_LEFTRELEASE_NM:
-	case K_MOUSEMOVE:
-	case K_MIDDLEMOUSE:
-	case K_MIDDLERELEASE:
-	case K_RIGHTMOUSE:
-	case K_RIGHTRELEASE:
-	case K_X1MOUSE:
-	case K_X1RELEASE:
-	case K_X2MOUSE:
-	case K_X2RELEASE:
+	நிலை K_LEFTMOUSE:
+	நிலை K_LEFTMOUSE_NM:
+	நிலை K_LEFTRELEASE:
+	நிலை K_LEFTRELEASE_NM:
+	நிலை K_MOUSEMOVE:
+	நிலை K_MIDDLEMOUSE:
+	நிலை K_MIDDLERELEASE:
+	நிலை K_RIGHTMOUSE:
+	நிலை K_RIGHTRELEASE:
+	நிலை K_X1MOUSE:
+	நிலை K_X1RELEASE:
+	நிலை K_X2MOUSE:
+	நிலை K_X2RELEASE:
 
-	case K_MOUSEUP:
-	case K_MOUSEDOWN:
-	case K_MOUSELEFT:
-	case K_MOUSERIGHT:
+	நிலை K_MOUSEUP:
+	நிலை K_MOUSEDOWN:
+	நிலை K_MOUSELEFT:
+	நிலை K_MOUSERIGHT:
 	    {
-		int	row = mouse_row;
-		int	col = mouse_col;
+		முழு	row = mouse_row;
+		முழு	col = mouse_col;
 
 #ifdef FEAT_PROP_POPUP
-		if (popup_is_popup(curwin))
+		எனில் (popup_is_popup(curwin))
 		{
-		    row -= popup_top_extra(curwin);
-		    col -= popup_left_extra(curwin);
+		    row -= popup_உச்சி_extra(curwin);
+		    col -= popup_இடது_extra(curwin);
 		}
 #endif
-		if (row < W_WINROW(curwin)
+		எனில் (row < W_WINROW(curwin)
 			|| row >= (W_WINROW(curwin) + curwin->w_height)
 			|| col < curwin->w_wincol
 			|| col >= W_ENDCOL(curwin)
@@ -2673,99 +2673,99 @@ send_keys_to_term(term_T *term, int c, int modmask, int typed)
 		{
 		    // click or scroll outside the current window or on status
 		    // line or vertical separator
-		    if (typed)
+		    எனில் (typed)
 		    {
 			stuffcharReadbuff(c);
 			mouse_was_outside = TRUE;
 		    }
-		    return FAIL;
+		    திரும்பு FAIL;
 		}
 	    }
-	    break;
+	    நிறுத்து;
 
-	case K_COMMAND:
-	case K_SCRIPT_COMMAND:
-	    return do_cmdkey_command(c, 0);
+	நிலை K_COMMAND:
+	நிலை K_SCRIPT_COMMAND:
+	    திரும்பு do_cmdkey_command(c, 0);
     }
-    if (typed)
+    எனில் (typed)
 	mouse_was_outside = FALSE;
 
     // Convert the typed key to a sequence of bytes for the job.
-    len = term_convert_key(term, c, modmask, msg);
-    if (len > 0)
+    len = term_convert_சாவி(term, c, modmask, செய்தி);
+    எனில் (len > 0)
 	// TODO: if FAIL is returned, stop?
 	channel_send(term->tl_job->jv_channel, get_tty_part(term),
-						(char_u *)msg, (int)len, NULL);
+						(char_u *)செய்தி, (முழு)len, வெற்று);
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Handle CTRL-W "": send register contents to the job.
  */
-    static void
-term_paste_register(int prev_c UNUSED)
+    நிலையான வெறுமை
+term_paste_register(முழு prev_c UNUSED)
 {
-    int		c;
+    முழு		c;
     list_T	*l;
     listitem_T	*item;
     long	reglen = 0;
-    int		type;
+    முழு		type;
 
-    if (add_to_showcmd(prev_c))
-    if (add_to_showcmd('"'))
+    எனில் (add_to_showcmd(prev_c))
+    எனில் (add_to_showcmd('"'))
 	out_flush();
 
     c = term_vgetc();
     clear_showcmd();
 
-    if (!term_use_loop())
+    எனில் (!term_use_loop())
 	// job finished while waiting for a character
-	return;
+	திரும்பு;
 
     // CTRL-W "= prompt for expression to evaluate.
-    if (c == '=' && get_expr_register() != '=')
-	return;
-    if (!term_use_loop())
+    எனில் (c == '=' && get_கோவை_register() != '=')
+	திரும்பு;
+    எனில் (!term_use_loop())
 	// job finished while waiting for a character
-	return;
+	திரும்பு;
 
     l = (list_T *)get_reg_contents(c, GREG_LIST);
-    if (l == NULL)
-	return;
+    எனில் (l == வெற்று)
+	திரும்பு;
 
     type = get_reg_type(c, &reglen);
-    FOR_ALL_LIST_ITEMS(l, item)
+    FOR_ALL_LIST_பொருட்கள்(l, item)
     {
 	char_u *s = tv_get_string(&item->li_tv);
 #ifdef MSWIN
 	char_u *tmp = s;
 
-	if (!enc_utf8 && enc_codepage > 0)
+	எனில் (!enc_utf8 && enc_codepage > 0)
 	{
-	    WCHAR   *ret = NULL;
-	    int	length = 0;
+	    WCHAR   *ret = வெற்று;
+	    முழு	length = 0;
 
-	    MultiByteToWideChar_alloc(enc_codepage, 0, (char *)s,
-		    (int)STRLEN(s), &ret, &length);
-	    if (ret != NULL)
+	    MultiByteToWideChar_alloc(enc_codepage, 0, (எழுத்து *)s,
+		    (முழு)STRLEN(s), &ret, &length);
+	    எனில் (ret != வெற்று)
 	    {
 		WideCharToMultiByte_alloc(CP_UTF8, 0,
-			ret, length, (char **)&s, &length, 0, 0);
+			ret, length, (எழுத்து **)&s, &length, 0, 0);
 		vim_free(ret);
 	    }
 	}
 #endif
 	channel_send(curbuf->b_term->tl_job->jv_channel, PART_IN,
-		s, (int)STRLEN(s), NULL);
+		s, (முழு)STRLEN(s), வெற்று);
 #ifdef MSWIN
-	if (tmp != s)
+	எனில் (tmp != s)
 	    vim_free(s);
 #endif
 
-	if (item->li_next != NULL || type == MLINE)
+	எனில் (item->li_next != வெற்று || type == MLINE)
 	    channel_send(curbuf->b_term->tl_job->jv_channel, PART_IN,
-		    (char_u *)"\r", 1, NULL);
+		    (char_u *)"\r", 1, வெற்று);
     }
     list_free(l);
 }
@@ -2774,47 +2774,47 @@ term_paste_register(int prev_c UNUSED)
  * Return TRUE when waiting for a character in the terminal, the cursor of the
  * terminal should be displayed.
  */
-    int
-terminal_is_active(void)
+    முழு
+terminal_is_active(வெறுமை)
 {
-    return in_terminal_loop != NULL;
+    திரும்பு in_terminal_loop != வெற்று;
 }
 
 /*
  * Return the highlight group ID for the terminal and the window.
  */
-    static int
+    நிலையான முழு
 term_get_highlight_id(term_T *term, win_T *wp)
 {
     char_u *name;
 
-    if (wp != NULL && wp->w_hlfwin_id != 0)
+    எனில் (wp != வெற்று && wp->w_hlfwin_id != 0)
 	name = syn_id2name(wp->w_hlfwin_id);
-    else if (term->tl_highlight_name != NULL)
+    இல்லையெனில் எனில் (term->tl_highlight_name != வெற்று)
 	name = term->tl_highlight_name;
-    else
+    இல்லையெனில்
 	name = (char_u*)"Terminal";
 
-    return syn_name2id(name);
+    திரும்பு syn_name2id(name);
 }
 
-#if defined(FEAT_GUI)
+#எனில் defined(FEAT_GUI)
     cursorentry_T *
 term_get_cursor_shape(guicolor_T *fg, guicolor_T *bg)
 {
     term_T		 *term = in_terminal_loop;
-    static cursorentry_T entry;
-    int			 id;
+    நிலையான cursorentry_T entry;
+    முழு			 id;
     guicolor_T		 term_fg = INVALCOLOR;
     guicolor_T		 term_bg = INVALCOLOR;
 
     CLEAR_FIELD(entry);
     entry.shape = entry.mshape =
 	term->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_UNDERLINE ? SHAPE_HOR :
-	term->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_BAR_LEFT ? SHAPE_VER :
+	term->tl_cursor_shape == VTERM_PROP_CURSORSHAPE_BAR_இடது ? SHAPE_VER :
 	SHAPE_BLOCK;
     entry.percentage = 20;
-    if (term->tl_cursor_blink)
+    எனில் (term->tl_cursor_blink)
     {
 	entry.blinkwait = 700;
 	entry.blinkon = 400;
@@ -2823,33 +2823,33 @@ term_get_cursor_shape(guicolor_T *fg, guicolor_T *bg)
 
     // The highlight group overrules the defaults.
     id = term_get_highlight_id(term, curwin);
-    if (id != 0)
+    எனில் (id != 0)
 	syn_id2colors(id, &term_fg, &term_bg);
-    if (term_bg != INVALCOLOR)
+    எனில் (term_bg != INVALCOLOR)
 	*fg = term_bg;
-    else
+    இல்லையெனில்
 	*fg = gui.back_pixel;
 
-    if (term->tl_cursor_color == NULL)
+    எனில் (term->tl_cursor_color == வெற்று)
     {
-	if (term_fg != INVALCOLOR)
+	எனில் (term_fg != INVALCOLOR)
 	    *bg = term_fg;
-	else
+	இல்லையெனில்
 	    *bg = gui.norm_pixel;
     }
-    else
+    இல்லையெனில்
 	*bg = color_name2handle(term->tl_cursor_color);
     entry.name = "n";
     entry.used_for = SHAPE_CURSOR;
 
-    return &entry;
+    திரும்பு &entry;
 }
 #endif
 
-    static void
-may_output_cursor_props(void)
+    நிலையான வெறுமை
+may_output_cursor_props(வெறுமை)
 {
-    if (!cursor_color_equal(last_set_cursor_color, desired_cursor_color)
+    எனில் (!cursor_color_equal(last_set_cursor_color, desired_cursor_color)
 	    || last_set_cursor_shape != desired_cursor_shape
 	    || last_set_cursor_blink != desired_cursor_blink)
     {
@@ -2857,10 +2857,10 @@ may_output_cursor_props(void)
 	last_set_cursor_shape = desired_cursor_shape;
 	last_set_cursor_blink = desired_cursor_blink;
 	term_cursor_color(cursor_color_get(desired_cursor_color));
-	if (desired_cursor_shape == -1 || desired_cursor_blink == -1)
+	எனில் (desired_cursor_shape == -1 || desired_cursor_blink == -1)
 	    // this will restore the initial cursor style, if possible
 	    ui_cursor_shape_forced(TRUE);
-	else
+	இல்லையெனில்
 	    term_cursor_shape(desired_cursor_shape, desired_cursor_blink);
     }
 }
@@ -2868,16 +2868,16 @@ may_output_cursor_props(void)
 /*
  * Set the cursor color and shape, if not last set to these.
  */
-    static void
+    நிலையான வெறுமை
 may_set_cursor_props(term_T *term)
 {
 #ifdef FEAT_GUI
     // For the GUI the cursor properties are obtained with
     // term_get_cursor_shape().
-    if (gui.in_use)
-	return;
+    எனில் (gui.in_use)
+	திரும்பு;
 #endif
-    if (in_terminal_loop == term)
+    எனில் (in_terminal_loop == term)
     {
 	cursor_color_copy(&desired_cursor_color, term->tl_cursor_color);
 	desired_cursor_shape = term->tl_cursor_shape;
@@ -2889,14 +2889,14 @@ may_set_cursor_props(term_T *term)
 /*
  * Reset the desired cursor properties and restore them when needed.
  */
-    static void
-prepare_restore_cursor_props(void)
+    நிலையான வெறுமை
+prepare_restore_cursor_props(வெறுமை)
 {
 #ifdef FEAT_GUI
-    if (gui.in_use)
-	return;
+    எனில் (gui.in_use)
+	திரும்பு;
 #endif
-    cursor_color_copy(&desired_cursor_color, NULL);
+    cursor_color_copy(&desired_cursor_color, வெற்று);
     desired_cursor_shape = -1;
     desired_cursor_blink = -1;
     may_output_cursor_props();
@@ -2907,14 +2907,14 @@ prepare_restore_cursor_props(void)
  * keys to the job.
  * If "check_job_status" is TRUE update the job status.
  */
-    static int
-term_use_loop_check(int check_job_status)
+    நிலையான முழு
+term_use_loop_check(முழு check_job_status)
 {
     term_T *term = curbuf->b_term;
 
-    return term != NULL
+    திரும்பு term != வெற்று
 	&& !term->tl_normal_mode
-	&& term->tl_vterm != NULL
+	&& term->tl_vterm != வெற்று
 	&& term_job_running_check(term, check_job_status);
 }
 
@@ -2922,48 +2922,48 @@ term_use_loop_check(int check_job_status)
  * Returns TRUE if the current window contains a terminal and we are sending
  * keys to the job.
  */
-    int
-term_use_loop(void)
+    முழு
+term_use_loop(வெறுமை)
 {
-    return term_use_loop_check(FALSE);
+    திரும்பு term_use_loop_check(FALSE);
 }
 
 /*
  * Called when entering a window with the mouse.  If this is a terminal window
  * we may want to change state.
  */
-    void
-term_win_entered(void)
+    வெறுமை
+term_win_entered(வெறுமை)
 {
     term_T *term = curbuf->b_term;
 
-    if (term == NULL)
-	return;
+    எனில் (term == வெற்று)
+	திரும்பு;
 
-    if (term_use_loop_check(TRUE))
+    எனில் (term_use_loop_check(TRUE))
     {
 	reset_VIsual_and_resel();
-	if (State & MODE_INSERT)
-	    stop_insert_mode = TRUE;
+	எனில் (State & MODE_செருகு)
+	    stop_செருகு_mode = TRUE;
     }
     mouse_was_outside = FALSE;
     enter_mouse_col = mouse_col;
     enter_mouse_row = mouse_row;
 }
 
-    void
-term_focus_change(int in_focus)
+    வெறுமை
+term_focus_change(முழு in_focus)
 {
     term_T *term = curbuf->b_term;
 
-    if (term == NULL || term->tl_vterm == NULL)
-	return;
+    எனில் (term == வெற்று || term->tl_vterm == வெற்று)
+	திரும்பு;
 
     VTermState	*state = vterm_obtain_state(term->tl_vterm);
 
-    if (in_focus)
+    எனில் (in_focus)
 	vterm_state_focus_in(state);
-    else
+    இல்லையெனில்
 	vterm_state_focus_out(state);
     term_forward_output(term);
 }
@@ -2972,13 +2972,13 @@ term_focus_change(int in_focus)
  * vgetc() may not include CTRL in the key when modify_other_keys is set.
  * Return the Ctrl-key value in that case.
  */
-    static int
-raw_c_to_ctrl(int c)
+    நிலையான முழு
+raw_c_to_ctrl(முழு c)
 {
-    if ((mod_mask & MOD_MASK_CTRL)
+    எனில் ((mod_mask & MOD_MASK_CTRL)
 	    && ((c >= '`' && c <= 0x7f) || (c >= '@' && c <= '_')))
-	return c & 0x1f;
-    return c;
+	திரும்பு c & 0x1f;
+    திரும்பு c;
 }
 
 /*
@@ -2986,15 +2986,15 @@ raw_c_to_ctrl(int c)
  * Also when the Kitty keyboard protocol is used.
  * May set "mod_mask".
  */
-    static int
-ctrl_to_raw_c(int c)
+    நிலையான முழு
+ctrl_to_raw_c(முழு c)
 {
-    if (c < 0x20 && vterm_using_key_protocol())
+    எனில் (c < 0x20 && vterm_using_சாவி_protocol())
     {
 	mod_mask |= MOD_MASK_CTRL;
-	return c + '@';
+	திரும்பு c + '@';
     }
-    return c;
+    திரும்பு c;
 }
 
 /*
@@ -3006,18 +3006,18 @@ ctrl_to_raw_c(int c)
  * Returns OK if a typed character is to be handled in Normal mode, FAIL if
  * the terminal was closed.
  */
-    int
-terminal_loop(int blocking)
+    முழு
+terminal_loop(முழு blocking)
 {
-    int		c;
-    int		raw_c;
-    int		termwinkey = 0;
-    int		ret;
+    முழு		c;
+    முழு		raw_c;
+    முழு		termwinkey = 0;
+    முழு		ret;
 #ifdef UNIX
-    int		tty_fd = curbuf->b_term->tl_job->jv_channel
+    முழு		tty_fd = curbuf->b_term->tl_job->jv_channel
 				 ->ch_part[get_tty_part(curbuf->b_term)].ch_fd;
 #endif
-    int		restore_cursor = FALSE;
+    முழு		restore_cursor = FALSE;
 
     // Remember the terminal we are sending keys to.  However, the terminal
     // might be closed while waiting for a character, e.g. typing "exit" in a
@@ -3025,43 +3025,43 @@ terminal_loop(int blocking)
     // stored reference.
     in_terminal_loop = curbuf->b_term;
 
-    if (*curwin->w_p_twk != NUL)
+    எனில் (*curwin->w_p_twk != NUL)
     {
-	termwinkey = string_to_key(curwin->w_p_twk, TRUE);
-	if (termwinkey == Ctrl_W)
+	termwinkey = string_to_சாவி(curwin->w_p_twk, TRUE);
+	எனில் (termwinkey == Ctrl_W)
 	    termwinkey = 0;
     }
     position_cursor(curwin, &curbuf->b_term->tl_cursor_pos);
     may_set_cursor_props(curbuf->b_term);
 
-    while (blocking || vpeekc_nomap() != NUL)
+    போது (blocking || vpeekc_nomap() != NUL)
     {
 #ifdef FEAT_GUI
-	if (curbuf->b_term != NULL && !curbuf->b_term->tl_system)
+	எனில் (curbuf->b_term != வெற்று && !curbuf->b_term->tl_system)
 #endif
 	    // TODO: skip screen update when handling a sequence of keys.
 	    // Repeat redrawing in case a message is received while redrawing.
-	    while (must_redraw != 0)
-		if (update_screen(0) == FAIL)
-		    break;
-	if (!term_use_loop_check(TRUE) || in_terminal_loop != curbuf->b_term)
+	    போது (must_redraw != 0)
+		எனில் (update_screen(0) == FAIL)
+		    நிறுத்து;
+	எனில் (!term_use_loop_check(TRUE) || in_terminal_loop != curbuf->b_term)
 	    // job finished while redrawing
-	    break;
+	    நிறுத்து;
 
 	update_cursor(curbuf->b_term, FALSE);
 	restore_cursor = TRUE;
 
 	raw_c = term_vgetc();
-	if (!term_use_loop_check(TRUE) || in_terminal_loop != curbuf->b_term)
+	எனில் (!term_use_loop_check(TRUE) || in_terminal_loop != curbuf->b_term)
 	{
 	    // Job finished while waiting for a character.  Push back the
 	    // received character.
-	    if (raw_c != K_IGNORE)
+	    எனில் (raw_c != K_IGNORE)
 		vungetc(raw_c);
-	    break;
+	    நிறுத்து;
 	}
-	if (raw_c == K_IGNORE)
-	    continue;
+	எனில் (raw_c == K_IGNORE)
+	    தொடர்;
 	c = raw_c_to_ctrl(raw_c);
 
 #ifdef UNIX
@@ -3070,12 +3070,12 @@ terminal_loop(int blocking)
 	 * them for every typed character is a bit of overhead, but it's needed
 	 * for the first character typed, e.g. when Vim starts in a shell.
 	 */
-	if (mch_isatty(tty_fd))
+	எனில் (mch_isatty(tty_fd))
 	{
 	    ttyinfo_T info;
 
 	    // Get the current backspace character of the pty.
-	    if (get_tty_info(tty_fd, &info) == OK)
+	    எனில் (get_tty_info(tty_fd, &info) == OK)
 		term_backspace_char = info.backspace;
 	}
 #endif
@@ -3083,22 +3083,22 @@ terminal_loop(int blocking)
 #ifdef MSWIN
 	// On Windows winpty handles CTRL-C, don't send a CTRL_C_EVENT.
 	// Use CTRL-BREAK to kill the job.
-	if (ctrl_break_was_pressed)
+	எனில் (ctrl_break_was_pressed)
 	    mch_signal_job(curbuf->b_term->tl_job, (char_u *)"kill");
 #endif
 	// Was either CTRL-W (termwinkey) or CTRL-\ pressed?
 	// Not in a system terminal.
-	if ((c == (termwinkey == 0 ? Ctrl_W : termwinkey) || c == Ctrl_BSL)
+	எனில் ((c == (termwinkey == 0 ? Ctrl_W : termwinkey) || c == Ctrl_BSL)
 #ifdef FEAT_GUI
 		&& !curbuf->b_term->tl_system
 #endif
 		)
 	{
-	    int	    prev_c = c;
-	    int	    prev_raw_c = raw_c;
-	    int	    prev_mod_mask = mod_mask;
+	    முழு	    prev_c = c;
+	    முழு	    prev_raw_c = raw_c;
+	    முழு	    prev_mod_mask = mod_mask;
 
-	    if (add_to_showcmd(c))
+	    எனில் (add_to_showcmd(c))
 		out_flush();
 
 	    raw_c = term_vgetc();
@@ -3106,54 +3106,54 @@ terminal_loop(int blocking)
 
 	    clear_showcmd();
 
-	    if (!term_use_loop_check(TRUE)
+	    எனில் (!term_use_loop_check(TRUE)
 					 || in_terminal_loop != curbuf->b_term)
 		// job finished while waiting for a character
-		break;
+		நிறுத்து;
 
-	    if (prev_c == Ctrl_BSL)
+	    எனில் (prev_c == Ctrl_BSL)
 	    {
-		if (c == Ctrl_N)
+		எனில் (c == Ctrl_N)
 		{
 		    // CTRL-\ CTRL-N : go to Terminal-Normal mode.
 		    term_enter_normal_mode();
 		    ret = FAIL;
-		    goto theend;
+		    செல் theend;
 		}
 		// Send both keys to the terminal, first one here, second one
 		// below.
-		send_keys_to_term(curbuf->b_term, prev_raw_c, prev_mod_mask,
+		send_சாவிகள்_to_term(curbuf->b_term, prev_raw_c, prev_mod_mask,
 									 TRUE);
 	    }
-	    else if (c == Ctrl_C)
+	    இல்லையெனில் எனில் (c == Ctrl_C)
 	    {
 		// "CTRL-W CTRL-C" or 'termwinkey' CTRL-C: end the job
 		mch_signal_job(curbuf->b_term->tl_job, (char_u *)"kill");
 	    }
-	    else if (c == '.')
+	    இல்லையெனில் எனில் (c == '.')
 	    {
 		// "CTRL-W .": send CTRL-W to the job
 		// "'termwinkey' .": send 'termwinkey' to the job
 		raw_c = ctrl_to_raw_c(termwinkey == 0 ? Ctrl_W : termwinkey);
 	    }
-	    else if (c == Ctrl_BSL)
+	    இல்லையெனில் எனில் (c == Ctrl_BSL)
 	    {
 		// "CTRL-W CTRL-\": send CTRL-\ to the job
 		raw_c = ctrl_to_raw_c(Ctrl_BSL);
 	    }
-	    else if (c == 'N')
+	    இல்லையெனில் எனில் (c == 'N')
 	    {
 		// CTRL-W N : go to Terminal-Normal mode.
 		term_enter_normal_mode();
 		ret = FAIL;
-		goto theend;
+		செல் theend;
 	    }
-	    else if (c == '"')
+	    இல்லையெனில் எனில் (c == '"')
 	    {
 		term_paste_register(prev_c);
-		continue;
+		தொடர்;
 	    }
-	    else if (termwinkey == 0 || c != termwinkey)
+	    இல்லையெனில் எனில் (termwinkey == 0 || c != termwinkey)
 	    {
 		// space for CTRL-W, modifier, multi-byte char and NUL
 		char_u buf[1 + 3 + MB_MAXBYTES + 1];
@@ -3164,56 +3164,56 @@ terminal_loop(int blocking)
 		buf[special_to_buf(c, mod_mask, FALSE, buf + 1) + 1] = NUL;
 		ins_typebuf(buf, REMAP_NONE, 0, TRUE, FALSE);
 		ret = OK;
-		goto theend;
+		செல் theend;
 	    }
 	}
 #ifdef MSWIN
-	if (!enc_utf8 && has_mbyte && raw_c >= 0x80)
+	எனில் (!enc_utf8 && has_mbyte && raw_c >= 0x80)
 	{
 	    WCHAR   wc;
 	    char_u  mb[3];
 
 	    mb[0] = (unsigned)raw_c >> 8;
 	    mb[1] = raw_c;
-	    if (MultiByteToWideChar(GetACP(), 0, (char*)mb, 2, &wc, 1) > 0)
+	    எனில் (MultiByteToWideChar(GetACP(), 0, (எழுத்து*)mb, 2, &wc, 1) > 0)
 		raw_c = wc;
 	}
 #endif
-	if (send_keys_to_term(curbuf->b_term, raw_c, mod_mask, TRUE) != OK)
+	எனில் (send_சாவிகள்_to_term(curbuf->b_term, raw_c, mod_mask, TRUE) != OK)
 	{
-	    if (raw_c == K_MOUSEMOVE)
+	    எனில் (raw_c == K_MOUSEMOVE)
 		// We are sure to come back here, don't reset the cursor color
 		// and shape to avoid flickering.
 		restore_cursor = FALSE;
 
 	    ret = OK;
-	    goto theend;
+	    செல் theend;
 	}
     }
     ret = FAIL;
 
 theend:
-    in_terminal_loop = NULL;
-    if (restore_cursor)
+    in_terminal_loop = வெற்று;
+    எனில் (restore_cursor)
 	prepare_restore_cursor_props();
 
     // Move a snapshot of the screen contents to the buffer, so that completion
     // works in other buffers.
-    if (curbuf->b_term != NULL && !curbuf->b_term->tl_normal_mode)
+    எனில் (curbuf->b_term != வெற்று && !curbuf->b_term->tl_normal_mode)
 	may_move_terminal_to_buffer(curbuf->b_term, FALSE);
 
-    return ret;
+    திரும்பு ret;
 }
 
-    static void
+    நிலையான வெறுமை
 may_toggle_cursor(term_T *term)
 {
-    if (in_terminal_loop != term)
-	return;
+    எனில் (in_terminal_loop != term)
+	திரும்பு;
 
-    if (term->tl_cursor_visible)
+    எனில் (term->tl_cursor_visible)
 	cursor_on();
-    else
+    இல்லையெனில்
 	cursor_off();
 }
 
@@ -3221,22 +3221,22 @@ may_toggle_cursor(term_T *term)
  * Reverse engineer the RGB value into a cterm color index.
  * First color is 1.  Return 0 if no match found (default color).
  */
-    static int
-color2index(VTermColor *color, int fg, int *boldp)
+    நிலையான முழு
+color2index(VTermColor *color, முழு fg, முழு *boldp)
 {
-    int red = color->red;
-    int blue = color->blue;
-    int green = color->green;
+    முழு red = color->red;
+    முழு blue = color->blue;
+    முழு green = color->green;
 
     *boldp = FALSE;
 
-    if (VTERM_COLOR_IS_INVALID(color))
-	return 0;
+    எனில் (VTERM_COLOR_IS_INVALID(color))
+	திரும்பு 0;
 
-    if (VTERM_COLOR_IS_INDEXED(color))
+    எனில் (VTERM_COLOR_IS_INDEXED(color))
     {
 	// Use the color as-is if possible, give up otherwise.
-	if (color->index < t_colors)
+	எனில் (color->index < t_colors)
 	{
 	    uint8_t index = color->index;
 #ifdef MSWIN
@@ -3246,105 +3246,105 @@ color2index(VTermColor *color, int fg, int *boldp)
 	    // be used for this conversion as well.
 	    // Note: If the contents of cterm_ansi_idx change in the future, a
 	    // different table may be needed for this purpose.
-	    if (index < 16)
+	    எனில் (index < 16)
 		index = cterm_ansi_idx[index];
 #endif
-	    return index + 1;
+	    திரும்பு index + 1;
 	}
 	// 8-color terminals can actually display twice as many colors by
 	// setting the high-intensity/bold bit.
-	else if (t_colors == 8 && fg && color->index < 16)
+	இல்லையெனில் எனில் (t_colors == 8 && fg && color->index < 16)
 	{
 	    *boldp = TRUE;
-	    return (color->index & 7) + 1;
+	    திரும்பு (color->index & 7) + 1;
 	}
-	return 0;
+	திரும்பு 0;
     }
 
-    if (t_colors >= 256)
+    எனில் (t_colors >= 256)
     {
-	if (red == blue && red == green)
+	எனில் (red == blue && red == green)
 	{
 	    // 24-color greyscale plus white and black
-	    static int cutoff[23] = {
+	    நிலையான முழு cutoff[23] = {
 		    0x0D, 0x17, 0x21, 0x2B, 0x35, 0x3F, 0x49, 0x53, 0x5D, 0x67,
 		    0x71, 0x7B, 0x85, 0x8F, 0x99, 0xA3, 0xAD, 0xB7, 0xC1, 0xCB,
 		    0xD5, 0xDF, 0xE9};
-	    int i;
+	    முழு i;
 
-	    if (red < 5)
-		return 17; // 00/00/00
-	    if (red > 245) // ff/ff/ff
-		return 232;
-	    for (i = 0; i < 23; ++i)
-		if (red < cutoff[i])
-		    return i + 233;
-	    return 256;
+	    எனில் (red < 5)
+		திரும்பு 17; // 00/00/00
+	    எனில் (red > 245) // ff/ff/ff
+		திரும்பு 232;
+	    க்கு (i = 0; i < 23; ++i)
+		எனில் (red < cutoff[i])
+		    திரும்பு i + 233;
+	    திரும்பு 256;
 	}
 	{
-	    static int cutoff[5] = {0x2F, 0x73, 0x9B, 0xC3, 0xEB};
-	    int ri, gi, bi;
+	    நிலையான முழு cutoff[5] = {0x2F, 0x73, 0x9B, 0xC3, 0xEB};
+	    முழு ri, gi, bi;
 
 	    // 216-color cube
-	    for (ri = 0; ri < 5; ++ri)
-		if (red < cutoff[ri])
-		    break;
-	    for (gi = 0; gi < 5; ++gi)
-		if (green < cutoff[gi])
-		    break;
-	    for (bi = 0; bi < 5; ++bi)
-		if (blue < cutoff[bi])
-		    break;
-	    return 17 + ri * 36 + gi * 6 + bi;
+	    க்கு (ri = 0; ri < 5; ++ri)
+		எனில் (red < cutoff[ri])
+		    நிறுத்து;
+	    க்கு (gi = 0; gi < 5; ++gi)
+		எனில் (green < cutoff[gi])
+		    நிறுத்து;
+	    க்கு (bi = 0; bi < 5; ++bi)
+		எனில் (blue < cutoff[bi])
+		    நிறுத்து;
+	    திரும்பு 17 + ri * 36 + gi * 6 + bi;
 	}
     }
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * Convert Vterm attributes to highlight flags.
  */
-    static int
+    நிலையான முழு
 vtermAttr2hl(VTermScreenCellAttrs *cellattrs)
 {
-    int attr = 0;
+    முழு attr = 0;
 
-    if (cellattrs->bold)
+    எனில் (cellattrs->bold)
 	attr |= HL_BOLD;
-    if (cellattrs->underline)
+    எனில் (cellattrs->underline)
 	attr |= HL_UNDERLINE;
-    if (cellattrs->italic)
+    எனில் (cellattrs->italic)
 	attr |= HL_ITALIC;
-    if (cellattrs->strike)
+    எனில் (cellattrs->strike)
 	attr |= HL_STRIKETHROUGH;
-    if (cellattrs->reverse)
+    எனில் (cellattrs->reverse)
 	attr |= HL_INVERSE;
-    return attr;
+    திரும்பு attr;
 }
 
 /*
  * Store Vterm attributes in "cell" from highlight flags.
  */
-    static void
-hl2vtermAttr(int attr, cellattr_T *cell)
+    நிலையான வெறுமை
+hl2vtermAttr(முழு attr, cellattr_T *cell)
 {
     CLEAR_FIELD(cell->attrs);
-    if (attr & HL_BOLD)
+    எனில் (attr & HL_BOLD)
 	cell->attrs.bold = 1;
-    if (attr & HL_UNDERLINE)
+    எனில் (attr & HL_UNDERLINE)
 	cell->attrs.underline = 1;
-    if (attr & HL_ITALIC)
+    எனில் (attr & HL_ITALIC)
 	cell->attrs.italic = 1;
-    if (attr & HL_STRIKETHROUGH)
+    எனில் (attr & HL_STRIKETHROUGH)
 	cell->attrs.strike = 1;
-    if (attr & HL_INVERSE)
+    எனில் (attr & HL_INVERSE)
 	cell->attrs.reverse = 1;
 }
 
 /*
  * Convert the attributes of a vterm cell into an attribute index.
  */
-    static int
+    நிலையான முழு
 cell2attr(
 	term_T			*term,
 	win_T			*wp,
@@ -3352,41 +3352,41 @@ cell2attr(
 	VTermColor		*cellfg,
 	VTermColor		*cellbg)
 {
-    int attr = vtermAttr2hl(cellattrs);
+    முழு attr = vtermAttr2hl(cellattrs);
     VTermColor *fg = cellfg;
     VTermColor *bg = cellbg;
-    int is_default_fg = VTERM_COLOR_IS_DEFAULT_FG(fg);
-    int is_default_bg = VTERM_COLOR_IS_DEFAULT_BG(bg);
+    முழு is_default_fg = VTERM_COLOR_IS_DEFAULT_FG(fg);
+    முழு is_default_bg = VTERM_COLOR_IS_DEFAULT_BG(bg);
 
-    if (is_default_fg || is_default_bg)
+    எனில் (is_default_fg || is_default_bg)
     {
-	if (wp != NULL && wp->w_hlfwin_id != 0)
+	எனில் (wp != வெற்று && wp->w_hlfwin_id != 0)
 	{
-	    if (is_default_fg)
+	    எனில் (is_default_fg)
 		fg = &wp->w_term_hlfwin.fg;
-	    if (is_default_bg)
+	    எனில் (is_default_bg)
 		bg = &wp->w_term_hlfwin.bg;
 	}
-	else
+	இல்லையெனில்
 	{
-	    if (is_default_fg)
+	    எனில் (is_default_fg)
 		fg = &term->tl_default_color.fg;
-	    if (is_default_bg)
+	    எனில் (is_default_bg)
 		bg = &term->tl_default_color.bg;
 	}
     }
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    எனில் (gui.in_use)
     {
 	guicolor_T guifg = gui_mch_get_rgb_color(fg->red, fg->green, fg->blue);
 	guicolor_T guibg = gui_mch_get_rgb_color(bg->red, bg->green, bg->blue);
-	return get_gui_attr_idx(attr, guifg, guibg);
+	திரும்பு get_gui_attr_idx(attr, guifg, guibg);
     }
-    else
+    இல்லையெனில்
 #endif
 #ifdef FEAT_TERMGUICOLORS
-    if (p_tgc)
+    எனில் (p_tgc)
     {
 	guicolor_T tgcfg = VTERM_COLOR_IS_INVALID(fg)
 	    ? INVALCOLOR
@@ -3394,30 +3394,30 @@ cell2attr(
 	guicolor_T tgcbg = VTERM_COLOR_IS_INVALID(bg)
 	    ? INVALCOLOR
 	    : gui_get_rgb_color_cmn(bg->red, bg->green, bg->blue);
-	return get_tgc_attr_idx(attr, tgcfg, tgcbg);
+	திரும்பு get_tgc_attr_idx(attr, tgcfg, tgcbg);
     }
-    else
+    இல்லையெனில்
 #endif
     {
-	int bold = MAYBE;
-	int ctermfg = color2index(fg, TRUE, &bold);
-	int ctermbg = color2index(bg, FALSE, &bold);
+	முழு bold = MAYBE;
+	முழு ctermfg = color2index(fg, TRUE, &bold);
+	முழு ctermbg = color2index(bg, FALSE, &bold);
 
 	// with 8 colors set the bold attribute to get a bright foreground
-	if (bold == TRUE)
+	எனில் (bold == TRUE)
 	    attr |= HL_BOLD;
 
-	return get_cterm_attr_idx(attr, ctermfg, ctermbg);
+	திரும்பு get_cterm_attr_idx(attr, ctermfg, ctermbg);
     }
-    return 0;
+    திரும்பு 0;
 }
 
-    static void
+    நிலையான வெறுமை
 set_dirty_snapshot(term_T *term)
 {
     term->tl_dirty_snapshot = TRUE;
 #ifdef FEAT_TIMERS
-    if (!term->tl_normal_mode)
+    எனில் (!term->tl_normal_mode)
     {
 	// Update the snapshot after 100 msec of not getting updates.
 	profile_setlimit(100L, &term->tl_timer_due);
@@ -3426,8 +3426,8 @@ set_dirty_snapshot(term_T *term)
 #endif
 }
 
-    static int
-handle_damage(VTermRect rect, void *user)
+    நிலையான முழு
+handle_damage(VTermRect rect, வெறுமை *user)
 {
     term_T *term = (term_T *)user;
 
@@ -3435,50 +3435,50 @@ handle_damage(VTermRect rect, void *user)
     term->tl_dirty_row_end = MAX(term->tl_dirty_row_end, rect.end_row);
     set_dirty_snapshot(term);
     redraw_buf_later(term->tl_buffer, UPD_SOME_VALID);
-    return 1;
+    திரும்பு 1;
 }
 
-    static void
-term_scroll_up(term_T *term, int start_row, int count)
+    நிலையான வெறுமை
+term_scroll_up(term_T *term, முழு start_row, முழு மொத்தம்)
 {
-    win_T		 *wp = NULL;
-    int			 did_curwin = FALSE;
+    win_T		 *wp = வெற்று;
+    முழு			 did_curwin = FALSE;
     VTermColor		 fg, bg;
     VTermScreenCellAttrs attr;
-    int			 clear_attr;
+    முழு			 clear_attr;
 
     CLEAR_FIELD(attr);
 
-    while (for_all_windows_and_curwin(&wp, &did_curwin))
+    போது (for_all_windows_and_curwin(&wp, &did_curwin))
     {
-	if (wp->w_buffer == term->tl_buffer)
+	எனில் (wp->w_buffer == term->tl_buffer)
 	{
 	    // Set the color to clear lines with.
 	    vterm_state_get_default_colors(vterm_obtain_state(term->tl_vterm),
 								     &fg, &bg);
 	    clear_attr = cell2attr(term, wp, &attr, &fg, &bg);
-	    win_del_lines(wp, start_row, count, FALSE, FALSE, clear_attr);
+	    win_del_வரிகள்(wp, start_row, மொத்தம், FALSE, FALSE, clear_attr);
 	}
     }
 }
 
-    static int
-handle_moverect(VTermRect dest, VTermRect src, void *user)
+    நிலையான முழு
+handle_moverect(VTermRect dest, VTermRect src, வெறுமை *user)
 {
     term_T	*term = (term_T *)user;
-    int		count = src.start_row - dest.start_row;
+    முழு		மொத்தம் = src.start_row - dest.start_row;
 
     // Scrolling up is done much more efficiently by deleting lines instead of
     // redrawing the text. But avoid doing this multiple times, postpone until
     // the redraw happens.
-    if (dest.start_col == src.start_col
+    எனில் (dest.start_col == src.start_col
 	    && dest.end_col == src.end_col
 	    && dest.start_row < src.start_row)
     {
-	if (dest.start_row == 0)
-	    term->tl_postponed_scroll += count;
-	else
-	    term_scroll_up(term, dest.start_row, count);
+	எனில் (dest.start_row == 0)
+	    term->tl_postponed_scroll += மொத்தம்;
+	இல்லையெனில்
+	    term_scroll_up(term, dest.start_row, மொத்தம்);
     }
 
     term->tl_dirty_row_start = MIN(term->tl_dirty_row_start, dest.start_row);
@@ -3488,156 +3488,156 @@ handle_moverect(VTermRect dest, VTermRect src, void *user)
     // Note sure if the scrolling will work correctly, let's do a complete
     // redraw later.
     redraw_buf_later(term->tl_buffer, UPD_NOT_VALID);
-    return 1;
+    திரும்பு 1;
 }
 
-    static int
+    நிலையான முழு
 handle_movecursor(
 	VTermPos pos,
 	VTermPos oldpos UNUSED,
-	int visible,
-	void *user)
+	முழு visible,
+	வெறுமை *user)
 {
     term_T	*term = (term_T *)user;
-    win_T	*wp = NULL;
-    int		did_curwin = FALSE;
+    win_T	*wp = வெற்று;
+    முழு		did_curwin = FALSE;
 
     term->tl_cursor_pos = pos;
     term->tl_cursor_visible = visible;
 
-    while (for_all_windows_and_curwin(&wp, &did_curwin))
+    போது (for_all_windows_and_curwin(&wp, &did_curwin))
     {
-	if (wp->w_buffer == term->tl_buffer)
+	எனில் (wp->w_buffer == term->tl_buffer)
 	    position_cursor(wp, &pos);
     }
-    if (term->tl_buffer == curbuf && !term->tl_normal_mode)
+    எனில் (term->tl_buffer == curbuf && !term->tl_normal_mode)
 	// Don't redraw here, it will be done after
 	// vterm_input_write() is finished.
 	update_cursor(term, FALSE);
 
-    return 1;
+    திரும்பு 1;
 }
 
-    static int
+    நிலையான முழு
 handle_settermprop(
 	VTermProp prop,
-	VTermValue *value,
-	void *user)
+	VTerm_மதிப்பு *மதிப்பு,
+	வெறுமை *user)
 {
     term_T	*term = (term_T *)user;
-    char_u	*strval = NULL;
+    char_u	*strval = வெற்று;
 
-    switch (prop)
+    தேர்வு (prop)
     {
-	case VTERM_PROP_TITLE:
-	    if (disable_vterm_title_for_testing)
-		break;
-	    strval = vim_strnsave((char_u *)value->string.str,
-							    value->string.len);
-	    if (strval == NULL)
-		break;
+	நிலை VTERM_PROP_TITLE:
+	    எனில் (disable_vterm_title_for_testing)
+		நிறுத்து;
+	    strval = vim_strnsave((char_u *)மதிப்பு->string.str,
+							    மதிப்பு->string.len);
+	    எனில் (strval == வெற்று)
+		நிறுத்து;
 	    vim_free(term->tl_title);
 	    // a blank title isn't useful, make it empty, so that "running" is
 	    // displayed
-	    if (*skipwhite(strval) == NUL)
-		term->tl_title = NULL;
+	    எனில் (*skipwhite(strval) == NUL)
+		term->tl_title = வெற்று;
 	    // Same as blank
-	    else if (term->tl_arg0_cmd != NULL
+	    இல்லையெனில் எனில் (term->tl_arg0_cmd != வெற்று
 		    && STRNCMP(term->tl_arg0_cmd, strval,
-					  (int)STRLEN(term->tl_arg0_cmd)) == 0)
-		term->tl_title = NULL;
+					  (முழு)STRLEN(term->tl_arg0_cmd)) == 0)
+		term->tl_title = வெற்று;
 	    // Empty corrupted data of winpty
-	    else if (STRNCMP("  - ", strval, 4) == 0)
-		term->tl_title = NULL;
+	    இல்லையெனில் எனில் (STRNCMP("  - ", strval, 4) == 0)
+		term->tl_title = வெற்று;
 #ifdef MSWIN
-	    else if (!enc_utf8 && enc_codepage > 0)
+	    இல்லையெனில் எனில் (!enc_utf8 && enc_codepage > 0)
 	    {
-		WCHAR   *ret = NULL;
-		int	length = 0;
+		WCHAR   *ret = வெற்று;
+		முழு	length = 0;
 
 		MultiByteToWideChar_alloc(CP_UTF8, 0,
-			(char*)value->string.str,
-					(int)value->string.len, &ret, &length);
-		if (ret != NULL)
+			(எழுத்து*)மதிப்பு->string.str,
+					(முழு)மதிப்பு->string.len, &ret, &length);
+		எனில் (ret != வெற்று)
 		{
 		    WideCharToMultiByte_alloc(enc_codepage, 0,
-					ret, length, (char**)&term->tl_title,
+					ret, length, (எழுத்து**)&term->tl_title,
 					&length, 0, 0);
 		    vim_free(ret);
 		}
 	    }
 #endif
-	    else
+	    இல்லையெனில்
 	    {
 		term->tl_title = strval;
-		strval = NULL;
+		strval = வெற்று;
 	    }
 	    VIM_CLEAR(term->tl_status_text);
-	    if (term == curbuf->b_term)
+	    எனில் (term == curbuf->b_term)
 	    {
 		maketitle();
 		curwin->w_redr_status = true;
 	    }
-	    break;
+	    நிறுத்து;
 
-	case VTERM_PROP_CURSORVISIBLE:
-	    term->tl_cursor_visible = value->boolean;
+	நிலை VTERM_PROP_CURSORVISIBLE:
+	    term->tl_cursor_visible = மதிப்பு->boolean;
 	    may_toggle_cursor(term);
 	    out_flush();
-	    break;
+	    நிறுத்து;
 
-	case VTERM_PROP_CURSORBLINK:
-	    term->tl_cursor_blink = value->boolean;
+	நிலை VTERM_PROP_CURSORBLINK:
+	    term->tl_cursor_blink = மதிப்பு->boolean;
 	    may_set_cursor_props(term);
-	    break;
+	    நிறுத்து;
 
-	case VTERM_PROP_CURSORSHAPE:
-	    term->tl_cursor_shape = value->number;
+	நிலை VTERM_PROP_CURSORSHAPE:
+	    term->tl_cursor_shape = மதிப்பு->எண்;
 	    may_set_cursor_props(term);
-	    break;
+	    நிறுத்து;
 
-	case VTERM_PROP_CURSORCOLOR:
-	    strval = vim_strnsave((char_u *)value->string.str,
-							    value->string.len);
-	    if (strval == NULL)
-		break;
+	நிலை VTERM_PROP_CURSORCOLOR:
+	    strval = vim_strnsave((char_u *)மதிப்பு->string.str,
+							    மதிப்பு->string.len);
+	    எனில் (strval == வெற்று)
+		நிறுத்து;
 	    cursor_color_copy(&term->tl_cursor_color, strval);
 	    may_set_cursor_props(term);
-	    break;
+	    நிறுத்து;
 
-	case VTERM_PROP_ALTSCREEN:
+	நிலை VTERM_PROP_ALTSCREEN:
 	    // TODO: do anything else?
-	    term->tl_using_altscreen = value->boolean;
-	    break;
+	    term->tl_using_altscreen = மதிப்பு->boolean;
+	    நிறுத்து;
 
-	default:
-	    break;
+	இயல்பு:
+	    நிறுத்து;
     }
     vim_free(strval);
 
     // Always return 1, otherwise vterm doesn't store the value internally.
-    return 1;
+    திரும்பு 1;
 }
 
 /*
  * The job running in the terminal resized the terminal.
  */
-    static int
-handle_resize(int rows, int cols, void *user)
+    நிலையான முழு
+handle_resize(முழு rows, முழு cols, வெறுமை *user)
 {
     term_T	*term = (term_T *)user;
     win_T	*wp;
 
     term->tl_rows = rows;
     term->tl_cols = cols;
-    if (term->tl_vterm_size_changed)
+    எனில் (term->tl_vterm_size_changed)
 	// Size was set by vterm_set_size(), don't set the window size.
 	term->tl_vterm_size_changed = FALSE;
-    else
+    இல்லையெனில்
     {
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == term->tl_buffer)
+	    எனில் (wp->w_buffer == term->tl_buffer)
 	    {
 		win_setheight_win(rows, wp);
 		win_setwidth_win(cols, wp);
@@ -3645,7 +3645,7 @@ handle_resize(int rows, int cols, void *user)
 	}
 	redraw_buf_later(term->tl_buffer, UPD_NOT_VALID);
     }
-    return 1;
+    திரும்பு 1;
 }
 
 /*
@@ -3654,46 +3654,46 @@ handle_resize(int rows, int cols, void *user)
  * "gap" points to tl_scrollback or tl_scrollback_postponed.
  * "update_buffer" is TRUE when the buffer should be updated.
  */
-    static void
-limit_scrollback(term_T *term, garray_T *gap, int update_buffer)
+    நிலையான வெறுமை
+limit_scrollback(term_T *term, garray_T *gap, முழு update_buffer)
 {
-    if (gap->ga_len < term->tl_buffer->b_p_twsl)
-	return;
+    எனில் (gap->ga_len < term->tl_buffer->b_p_twsl)
+	திரும்பு;
 
-    int	todo = MAX(term->tl_buffer->b_p_twsl / 10,
+    முழு	todo = MAX(term->tl_buffer->b_p_twsl / 10,
 				     gap->ga_len - term->tl_buffer->b_p_twsl);
-    int	i;
-    sb_line_T *sb_lines = (sb_line_T *)gap->ga_data;
+    முழு	i;
+    sb_வரி_T *sb_வரிகள் = (sb_வரி_T *)gap->ga_data;
 
     curbuf = term->tl_buffer;
-    for (i = 0; i < todo; ++i)
+    க்கு (i = 0; i < todo; ++i)
     {
-	if (update_buffer && (!sb_lines[i].continuation || !i))
+	எனில் (update_buffer && (!sb_வரிகள்[i].continuation || !i))
 	{
 	    ml_delete(1);
 	    --term->tl_buffer_scrolled;
 	}
-	vim_free(sb_lines[i].sb_cells);
+	vim_free(sb_வரிகள்[i].sb_cells);
     }
     // Continue until end of wrapped line
-    for (; todo < gap->ga_len && sb_lines[todo].continuation; ++todo)
-	vim_free(sb_lines[todo].sb_cells);
+    க்கு (; todo < gap->ga_len && sb_வரிகள்[todo].continuation; ++todo)
+	vim_free(sb_வரிகள்[todo].sb_cells);
     curbuf = curwin->w_buffer;
 
     gap->ga_len -= todo;
     mch_memmove(gap->ga_data,
-		(sb_line_T *)gap->ga_data + todo,
-		sizeof(sb_line_T) * gap->ga_len);
-    if (update_buffer)
+		(sb_வரி_T *)gap->ga_data + todo,
+		அளவு(sb_வரி_T) * gap->ga_len);
+    எனில் (update_buffer)
     {
 	win_T *curwin_save = curwin;
-	win_T *wp = NULL;
+	win_T *wp = வெற்று;
 
 	term->tl_scrollback_scrolled -= todo;
 
 	FOR_ALL_WINDOWS(wp)
 	{
-	    if (wp->w_buffer == term->tl_buffer)
+	    எனில் (wp->w_buffer == term->tl_buffer)
 	    {
 		curwin = wp;
 		check_cursor();
@@ -3707,21 +3707,21 @@ limit_scrollback(term_T *term, garray_T *gap, int update_buffer)
 /*
  * Handle a line that is pushed off the top of the screen.
  */
-    static int
-handle_pushline(int cols, const VTermScreenCell *cells, int continuation, void *user)
+    நிலையான முழு
+handle_pushline(முழு cols, மாறிலி VTermScreenCell *cells, முழு continuation, வெறுமை *user)
 {
     term_T	*term = (term_T *)user;
     garray_T	*gap;
-    int		update_buffer;
+    முழு		update_buffer;
 
-    if (term->tl_normal_mode)
+    எனில் (term->tl_normal_mode)
     {
 	// In Terminal-Normal mode the user interacts with the buffer, thus we
 	// must not change it. Postpone adding the scrollback lines.
 	gap = &term->tl_scrollback_postponed;
 	update_buffer = FALSE;
     }
-    else
+    இல்லையெனில்
     {
 	// First remove the lines that were appended before, the pushed line
 	// goes above it.
@@ -3732,129 +3732,129 @@ handle_pushline(int cols, const VTermScreenCell *cells, int continuation, void *
 
     limit_scrollback(term, gap, update_buffer);
 
-    if (ga_grow(gap, 1) == FAIL)
-	return 0;
+    எனில் (ga_grow(gap, 1) == FAIL)
+	திரும்பு 0;
 
-    cellattr_T	*p = NULL;
-    int		len = 0;
-    int		i;
-    int		c;
-    int		col;
-    int		text_len;
+    cellattr_T	*p = வெற்று;
+    முழு		len = 0;
+    முழு		i;
+    முழு		c;
+    முழு		col;
+    முழு		text_len;
     char_u		*text;
-    sb_line_T	*line;
+    sb_வரி_T	*வரி;
     garray_T	ga;
     cellattr_T	fill_attr = term->tl_default_color;
 
     // do not store empty cells at the end
-    for (i = 0; i < cols; ++i)
-	if (cells[i].chars[0] != 0)
+    க்கு (i = 0; i < cols; ++i)
+	எனில் (cells[i].chars[0] != 0)
 	    len = i + 1;
-	else
+	இல்லையெனில்
 	    cell2cellattr(&cells[i], &fill_attr);
 
     ga_init2(&ga, 1, 100);
-    if (len > 0)
+    எனில் (len > 0)
 	p = ALLOC_MULT(cellattr_T, len);
-    if (p != NULL)
+    எனில் (p != வெற்று)
     {
-	for (col = 0; col < len; col += cells[col].width)
+	க்கு (col = 0; col < len; col += cells[col].width)
 	{
-	    if (ga_grow(&ga, VTERM_MAX_CHARS_PER_CELL * 4) == FAIL)
+	    எனில் (ga_grow(&ga, VTERM_MAX_CHARS_PER_CELL * 4) == FAIL)
 	    {
 		ga.ga_len = 0;
-		break;
+		நிறுத்து;
 	    }
-	    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL &&
+	    க்கு (i = 0; i < VTERM_MAX_CHARS_PER_CELL &&
 		    ((c = cells[col].chars[i]) > 0 || i == 0); ++i)
 		ga.ga_len += utf_char2bytes(c == NUL ? ' ' : c,
 			(char_u *)ga.ga_data + ga.ga_len);
 	    cell2cellattr(&cells[col], &p[col]);
 	}
     }
-    if (ga_grow(&ga, 1) == FAIL)
+    எனில் (ga_grow(&ga, 1) == FAIL)
     {
-	if (update_buffer)
+	எனில் (update_buffer)
 	    text = (char_u *)"";
-	else
+	இல்லையெனில்
 	    text = vim_strsave((char_u *)"");
 	text_len = 0;
     }
-    else
+    இல்லையெனில்
     {
 	text = ga.ga_data;
 	text_len = ga.ga_len;
 	*(text + text_len) = NUL;
     }
-    if (update_buffer)
-	add_scrollback_line_to_buffer(term, text, text_len, continuation);
+    எனில் (update_buffer)
+	add_scrollback_வரி_to_buffer(term, text, text_len, continuation);
 
-    line = (sb_line_T *)gap->ga_data + gap->ga_len;
-    line->sb_cols = len;
-    line->sb_bytes = text_len;
-    line->sb_cells = p;
-    line->sb_fill_attr = fill_attr;
-    line->continuation = (char_u)continuation;
-    if (update_buffer)
+    வரி = (sb_வரி_T *)gap->ga_data + gap->ga_len;
+    வரி->sb_cols = len;
+    வரி->sb_bytes = text_len;
+    வரி->sb_cells = p;
+    வரி->sb_fill_attr = fill_attr;
+    வரி->continuation = (char_u)continuation;
+    எனில் (update_buffer)
     {
-	line->sb_text = NULL;
+	வரி->sb_text = வெற்று;
 	++term->tl_scrollback_scrolled;
-	if (!continuation)
+	எனில் (!continuation)
 	    ++term->tl_buffer_scrolled;
 	ga_clear(&ga);  // free the text
     }
-    else
+    இல்லையெனில்
     {
-	line->sb_text = text;
+	வரி->sb_text = text;
 	ga_init(&ga);  // text is kept in tl_scrollback_postponed
     }
     ++gap->ga_len;
-    return 0; // ignored
+    திரும்பு 0; // ignored
 }
 
 /*
  * Called when leaving Terminal-Normal mode: deal with any scrollback that was
  * received and stored in tl_scrollback_postponed.
  */
-    static void
+    நிலையான வெறுமை
 handle_postponed_scrollback(term_T *term)
 {
-    int i;
+    முழு i;
 
-    if (term->tl_scrollback_postponed.ga_len == 0)
-	return;
-    ch_log(NULL, "Moving postponed scrollback to scrollback");
+    எனில் (term->tl_scrollback_postponed.ga_len == 0)
+	திரும்பு;
+    ch_log(வெற்று, "Moving postponed scrollback to scrollback");
 
     // First remove the lines that were appended before, the pushed lines go
     // above it.
     cleanup_scrollback(term);
 
-    for (i = 0; i < term->tl_scrollback_postponed.ga_len; ++i)
+    க்கு (i = 0; i < term->tl_scrollback_postponed.ga_len; ++i)
     {
 	char_u		*text;
-	sb_line_T	*pp_line;
-	sb_line_T	*line;
+	sb_வரி_T	*pp_வரி;
+	sb_வரி_T	*வரி;
 
-	if (ga_grow(&term->tl_scrollback, 1) == FAIL)
-	    break;
-	pp_line = (sb_line_T *)term->tl_scrollback_postponed.ga_data + i;
+	எனில் (ga_grow(&term->tl_scrollback, 1) == FAIL)
+	    நிறுத்து;
+	pp_வரி = (sb_வரி_T *)term->tl_scrollback_postponed.ga_data + i;
 
-	text = pp_line->sb_text;
-	if (text == NULL)
+	text = pp_வரி->sb_text;
+	எனில் (text == வெற்று)
 	    text = (char_u *)"";
-	add_scrollback_line_to_buffer(term, text, (int)STRLEN(text), pp_line->continuation);
-	vim_free(pp_line->sb_text);
+	add_scrollback_வரி_to_buffer(term, text, (முழு)STRLEN(text), pp_வரி->continuation);
+	vim_free(pp_வரி->sb_text);
 
-	line = (sb_line_T *)term->tl_scrollback.ga_data
+	வரி = (sb_வரி_T *)term->tl_scrollback.ga_data
 						 + term->tl_scrollback.ga_len;
-	line->sb_cols = pp_line->sb_cols;
-	line->sb_bytes = pp_line->sb_bytes;
-	line->sb_cells = pp_line->sb_cells;
-	line->sb_fill_attr = pp_line->sb_fill_attr;
-	line->sb_text = NULL;
+	வரி->sb_cols = pp_வரி->sb_cols;
+	வரி->sb_bytes = pp_வரி->sb_bytes;
+	வரி->sb_cells = pp_வரி->sb_cells;
+	வரி->sb_fill_attr = pp_வரி->sb_fill_attr;
+	வரி->sb_text = வெற்று;
 	++term->tl_scrollback_scrolled;
 	++term->tl_scrollback.ga_len;
-	if (!pp_line->continuation)
+	எனில் (!pp_வரி->continuation)
 	    ++term->tl_buffer_scrolled;
     }
 
@@ -3865,23 +3865,23 @@ handle_postponed_scrollback(term_T *term)
 /*
  * Called when the terminal wants to ring the system bell.
  */
-    static int
-handle_bell(void *user UNUSED)
+    நிலையான முழு
+handle_bell(வெறுமை *user UNUSED)
 {
     vim_beep(BO_TERM);
-    return 0;
+    திரும்பு 0;
 }
 
-static VTermScreenCallbacks screen_callbacks = {
+நிலையான VTermScreenCallbacks screen_callbacks = {
     handle_damage,		// damage
     handle_moverect,		// moverect
     handle_movecursor,		// movecursor
     handle_settermprop,		// settermprop
     handle_bell,		// bell
     handle_resize,		// resize
-    NULL,			// sb_pushline
-    NULL,			// sb_popline
-    NULL,			// sb_clear
+    வெற்று,			// sb_pushline
+    வெற்று,			// sb_popline
+    வெற்று,			// sb_clear
     handle_pushline	// sb_pushline4
 };
 
@@ -3890,110 +3890,110 @@ static VTermScreenCallbacks screen_callbacks = {
  * Must be called only when updating_screen is FALSE.
  * Returns TRUE when a buffer was closed (list of terminals may have changed).
  */
-    static int
+    நிலையான முழு
 term_after_channel_closed(term_T *term)
 {
     // Unless in Terminal-Normal mode: clear the vterm.
-    if (!term->tl_normal_mode)
+    எனில் (!term->tl_normal_mode)
     {
-	int	fnum = term->tl_buffer->b_fnum;
+	முழு	fnum = term->tl_buffer->b_fnum;
 
 	cleanup_vterm(term);
 
-	if (term->tl_finish == TL_FINISH_CLOSE)
+	எனில் (term->tl_finish == TL_FINISH_CLOSE)
 	{
 	    aco_save_T	aco;
-	    int		do_set_w_locked = term->tl_buffer->b_nwindows == 0;
+	    முழு		do_set_w_locked = term->tl_buffer->b_nwindows == 0;
 #ifdef FEAT_PROP_POPUP
-	    win_T	*pwin = NULL;
+	    win_T	*pwin = வெற்று;
 
 	    // If this was a terminal in a popup window, go back to the
 	    // previous window.
-	    if (popup_is_popup(curwin) && curbuf == term->tl_buffer)
+	    எனில் (popup_is_popup(curwin) && curbuf == term->tl_buffer)
 	    {
 		pwin = curwin;
-		if (win_valid(prevwin))
+		எனில் (win_valid(prevwin))
 		    win_enter(prevwin, FALSE);
 	    }
-	    else
+	    இல்லையெனில்
 #endif
 	    // If this is the last normal window: exit Vim.
-	    if (term->tl_buffer->b_nwindows > 0 && only_one_window())
+	    எனில் (term->tl_buffer->b_nwindows > 0 && only_one_window())
 	    {
 		exarg_T ea;
 
 		CLEAR_FIELD(ea);
 		ex_quit(&ea);
-		return TRUE;
+		திரும்பு TRUE;
 	    }
 
 	    // ++close or term_finish == "close"
-	    ch_log(NULL, "terminal job finished, closing window");
+	    ch_log(வெற்று, "terminal job finished, closing window");
 	    aucmd_prepbuf(&aco, term->tl_buffer);
-	    if (curbuf == term->tl_buffer)
+	    எனில் (curbuf == term->tl_buffer)
 	    {
 		win_T	*wp = curwin;
 
 		// Avoid closing the window if we temporarily use it.
-		if (is_aucmd_win(wp))
+		எனில் (is_aucmd_win(wp))
 		    do_set_w_locked = TRUE;
-		if (do_set_w_locked)
+		எனில் (do_set_w_locked)
 		    ++wp->w_locked;
 		do_bufdel(DOBUF_WIPE, (char_u *)"", 1, fnum, fnum, FALSE);
-		if (do_set_w_locked)
+		எனில் (do_set_w_locked)
 		    --wp->w_locked;
 		aucmd_restbuf(&aco);
 	    }
 #ifdef FEAT_PROP_POPUP
-	    if (pwin != NULL)
+	    எனில் (pwin != வெற்று)
 		popup_close_with_retval(pwin, 0);
 #endif
-	    return TRUE;
+	    திரும்பு TRUE;
 	}
-	if (term->tl_finish == TL_FINISH_OPEN
+	எனில் (term->tl_finish == TL_FINISH_OPEN
 				   && term->tl_buffer->b_nwindows == 0)
 	{
-	    char    *cmd = term->tl_opencmd == NULL
+	    எழுத்து    *cmd = term->tl_opencmd == வெற்று
 				? "botright sbuf %d"
-				: (char *)term->tl_opencmd;
+				: (எழுத்து *)term->tl_opencmd;
 	    size_t  len = strlen(cmd) + 50;
-	    char    *buf = alloc(len);
+	    எழுத்து    *buf = alloc(len);
 
-	    if (buf != NULL)
+	    எனில் (buf != வெற்று)
 	    {
-		ch_log(NULL, "terminal job finished, opening window");
+		ch_log(வெற்று, "terminal job finished, opening window");
 		vim_snprintf(buf, len, cmd, fnum);
 		do_cmdline_cmd((char_u *)buf);
 		vim_free(buf);
 	    }
 	}
-	else
-	    ch_log(NULL, "terminal job finished");
+	இல்லையெனில்
+	    ch_log(வெற்று, "terminal job finished");
     }
 
     redraw_buf_and_status_later(term->tl_buffer, UPD_NOT_VALID);
-    return FALSE;
+    திரும்பு FALSE;
 }
 
-#if defined(FEAT_PROP_POPUP)
+#எனில் defined(FEAT_PROP_POPUP)
 /*
  * If the current window is a terminal in a popup window and the job has
  * finished, close the popup window and to back to the previous window.
  * Otherwise return FAIL.
  */
-    int
-may_close_term_popup(void)
+    முழு
+may_close_term_popup(வெறுமை)
 {
-    if (!popup_is_popup(curwin) || curbuf->b_term == NULL
+    எனில் (!popup_is_popup(curwin) || curbuf->b_term == வெற்று
 				 || term_job_running_not_none(curbuf->b_term))
-	return FAIL;
+	திரும்பு FAIL;
 
     win_T *pwin = curwin;
 
-    if (win_valid(prevwin))
+    எனில் (win_valid(prevwin))
 	win_enter(prevwin, FALSE);
     popup_close_with_retval(pwin, 0);
-    return OK;
+    திரும்பு OK;
 }
 #endif
 
@@ -4001,13 +4001,13 @@ may_close_term_popup(void)
  * Called when a channel is going to be closed, before invoking the close
  * callback.
  */
-    void
+    வெறுமை
 term_channel_closing(channel_T *ch)
 {
     term_T *term;
 
-    for (term = first_term; term != NULL; term = term->tl_next)
-	if (term->tl_job == ch->ch_job && !term->tl_channel_closed)
+    க்கு (term = first_term; term != வெற்று; term = term->tl_next)
+	எனில் (term->tl_job == ch->ch_job && !term->tl_channel_closed)
 	    term->tl_channel_closing = TRUE;
 }
 
@@ -4015,17 +4015,17 @@ term_channel_closing(channel_T *ch)
  * Called when a channel has been closed.
  * If this was a channel for a terminal window then finish it up.
  */
-    void
+    வெறுமை
 term_channel_closed(channel_T *ch)
 {
     term_T *term;
     term_T *next_term;
-    int	    did_one = FALSE;
+    முழு	    did_one = FALSE;
 
-    for (term = first_term; term != NULL; term = next_term)
+    க்கு (term = first_term; term != வெற்று; term = next_term)
     {
 	next_term = term->tl_next;
-	if (term->tl_job == ch->ch_job && !term->tl_channel_closed)
+	எனில் (term->tl_job == ch->ch_job && !term->tl_channel_closed)
 	{
 	    term->tl_channel_closed = TRUE;
 	    did_one = TRUE;
@@ -4033,27 +4033,27 @@ term_channel_closed(channel_T *ch)
 	    VIM_CLEAR(term->tl_title);
 	    VIM_CLEAR(term->tl_status_text);
 #ifdef MSWIN
-	    if (term->tl_out_fd != NULL)
+	    எனில் (term->tl_out_fd != வெற்று)
 	    {
 		fclose(term->tl_out_fd);
-		term->tl_out_fd = NULL;
+		term->tl_out_fd = வெற்று;
 	    }
 #endif
 
-	    if (updating_screen)
+	    எனில் (updating_screen)
 	    {
 		// Cannot open or close windows now.  Can happen when
 		// 'lazyredraw' is set.
 		term->tl_channel_recently_closed = TRUE;
-		continue;
+		தொடர்;
 	    }
 
-	    if (term_after_channel_closed(term))
+	    எனில் (term_after_channel_closed(term))
 		next_term = first_term;
 	}
     }
 
-    if (did_one)
+    எனில் (did_one)
     {
 	redraw_statuslines();
 
@@ -4062,9 +4062,9 @@ term_channel_closed(channel_T *ch)
 	typebuf_was_filled = TRUE;
 
 	term = curbuf->b_term;
-	if (term != NULL)
+	எனில் (term != வெற்று)
 	{
-	    if (term->tl_job == ch->ch_job)
+	    எனில் (term->tl_job == ch->ch_job)
 		maketitle();
 	    update_cursor(term, term->tl_cursor_visible);
 	}
@@ -4075,19 +4075,19 @@ term_channel_closed(channel_T *ch)
  * To be called after resetting updating_screen: handle any terminal where the
  * channel was closed.
  */
-    void
-term_check_channel_closed_recently(void)
+    வெறுமை
+term_check_channel_closed_recently(வெறுமை)
 {
     term_T *term;
     term_T *next_term;
 
-    for (term = first_term; term != NULL; term = next_term)
+    க்கு (term = first_term; term != வெற்று; term = next_term)
     {
 	next_term = term->tl_next;
-	if (term->tl_channel_recently_closed)
+	எனில் (term->tl_channel_recently_closed)
 	{
 	    term->tl_channel_recently_closed = FALSE;
-	    if (term_after_channel_closed(term))
+	    எனில் (term_after_channel_closed(term))
 		// start over, the list may have changed
 		next_term = first_term;
 	}
@@ -4098,97 +4098,97 @@ term_check_channel_closed_recently(void)
  * Fill one screen line from a line of the terminal.
  * Advances "pos" to past the last column.
  */
-    static void
+    நிலையான வெறுமை
 term_line2screenline(
 	term_T		*term,
 	win_T		*wp,
 	VTermScreen	*screen,
 	VTermPos	*pos,
-	int		max_col)
+	முழு		max_col)
 {
-    int off = screen_get_current_line_off();
+    முழு off = screen_get_current_வரி_off();
 
-    for (pos->col = 0; pos->col < max_col; )
+    க்கு (pos->col = 0; pos->col < max_col; )
     {
 	VTermScreenCell cell;
-	int		c;
+	முழு		c;
 
-	if (vterm_screen_get_cell(screen, *pos, &cell) == 0)
+	எனில் (vterm_screen_get_cell(screen, *pos, &cell) == 0)
 	    CLEAR_FIELD(cell);
 
 	c = cell.chars[0];
-	if (c == NUL)
+	எனில் (c == NUL)
 	{
-	    ScreenLines[off] = ' ';
-	    if (enc_utf8)
-		ScreenLinesUC[off] = NUL;
+	    Screen_வரிகள்[off] = ' ';
+	    எனில் (enc_utf8)
+		Screen_வரிகள்_UC[off] = NUL;
 	}
-	else
+	இல்லையெனில்
 	{
-	    if (enc_utf8)
+	    எனில் (enc_utf8)
 	    {
-		int i;
+		முழு i;
 
 		// composing chars
-		for (i = 0; i < Screen_mco
+		க்கு (i = 0; i < Screen_mco
 			      && i + 1 < VTERM_MAX_CHARS_PER_CELL; ++i)
 		{
-		    ScreenLinesC[i][off] = cell.chars[i + 1];
-		    if (cell.chars[i + 1] == 0)
-			break;
+		    Screen_வரிகள்_C[i][off] = cell.chars[i + 1];
+		    எனில் (cell.chars[i + 1] == 0)
+			நிறுத்து;
 		}
-		if (c >= 0x80 || (Screen_mco > 0
-					 && ScreenLinesC[0][off] != 0))
+		எனில் (c >= 0x80 || (Screen_mco > 0
+					 && Screen_வரிகள்_C[0][off] != 0))
 		{
-		    ScreenLines[off] = ' ';
-		    ScreenLinesUC[off] = c;
+		    Screen_வரிகள்[off] = ' ';
+		    Screen_வரிகள்_UC[off] = c;
 		}
-		else
+		இல்லையெனில்
 		{
-		    ScreenLines[off] = c;
-		    ScreenLinesUC[off] = NUL;
+		    Screen_வரிகள்[off] = c;
+		    Screen_வரிகள்_UC[off] = NUL;
 		}
 	    }
 #ifdef MSWIN
-	    else if (has_mbyte && c >= 0x80)
+	    இல்லையெனில் எனில் (has_mbyte && c >= 0x80)
 	    {
 		char_u	mb[MB_MAXBYTES+1];
 		WCHAR	wc = c;
 
-		if (WideCharToMultiByte(GetACP(), 0, &wc, 1,
-					       (char*)mb, 2, 0, 0) > 1)
+		எனில் (WideCharToMultiByte(GetACP(), 0, &wc, 1,
+					       (எழுத்து*)mb, 2, 0, 0) > 1)
 		{
-		    ScreenLines[off] = mb[0];
-		    ScreenLines[off + 1] = mb[1];
+		    Screen_வரிகள்[off] = mb[0];
+		    Screen_வரிகள்[off + 1] = mb[1];
 		    cell.width = mb_ptr2cells(mb);
 		}
-		else
-		    ScreenLines[off] = c;
+		இல்லையெனில்
+		    Screen_வரிகள்[off] = c;
 	    }
 #endif
-	    else
+	    இல்லையெனில்
 		// This will only store the lower byte of "c".
-		ScreenLines[off] = c;
+		Screen_வரிகள்[off] = c;
 	}
 	ScreenAttrs[off] = cell2attr(term, wp, &cell.attrs, &cell.fg,
 								     &cell.bg);
 
 	++pos->col;
 	++off;
-	if (cell.width == 2)
+	எனில் (cell.width == 2)
 	{
 	    // don't set the second byte to NUL for a DBCS encoding, it
 	    // has been set above
-	    if (enc_utf8)
+	    எனில் (enc_utf8)
 	    {
-		ScreenLinesUC[off] = NUL;
-		ScreenLines[off] = NUL;
+		Screen_வரிகள்_UC[off] = NUL;
+		Screen_வரிகள்[off] = NUL;
 	    }
-	    else if (!has_mbyte)
+	    இல்லையெனில் எனில் (!has_mbyte)
 	    {
 		// Can't show a double-width character with a single-byte
 		// 'encoding', just use a space.
-		ScreenLines[off] = ' ';
+		Screen_வரிகள்[off] = ' ';
 		ScreenAttrs[off] = ScreenAttrs[off - 1];
 	    }
 
@@ -4198,46 +4198,46 @@ term_line2screenline(
     }
 }
 
-#if defined(FEAT_GUI)
-    static void
+#எனில் defined(FEAT_GUI)
+    நிலையான வெறுமை
 update_system_term(term_T *term)
 {
     VTermPos	    pos;
     VTermScreen	    *screen;
 
-    if (term->tl_vterm == NULL)
-	return;
+    எனில் (term->tl_vterm == வெற்று)
+	திரும்பு;
     screen = vterm_obtain_screen(term->tl_vterm);
 
     // Scroll up to make more room for terminal lines if needed.
     // Use the cursor position to determine how much to scroll, because
     // ConPTY may damage all rows on initialization even when most are
     // empty, which would cause unnecessary scrolling.
-    while (term->tl_toprow > 0
+    போது (term->tl_toprow > 0
 		  && (Rows - term->tl_toprow) < term->tl_cursor_pos.row + 1)
     {
-	int save_p_more = p_more;
+	முழு save_p_more = p_more;
 
 	p_more = FALSE;
-	msg_row = Rows - 1;
-	msg_puts("\n");
+	செய்தி_row = Rows - 1;
+	செய்தி_puts("\n");
 	p_more = save_p_more;
 	--term->tl_toprow;
     }
 
-    for (pos.row = term->tl_dirty_row_start; pos.row < term->tl_dirty_row_end
+    க்கு (pos.row = term->tl_dirty_row_start; pos.row < term->tl_dirty_row_end
 						  && pos.row < Rows; ++pos.row)
     {
-	if (pos.row < term->tl_rows)
+	எனில் (pos.row < term->tl_rows)
 	{
-	    int max_col = MIN(topframe->fr_width, term->tl_cols);
+	    முழு max_col = MIN(topframe->fr_width, term->tl_cols);
 
-	    term_line2screenline(term, NULL, screen, &pos, max_col);
+	    term_line2screenline(term, வெற்று, screen, &pos, max_col);
 	}
-	else
+	இல்லையெனில்
 	    pos.col = 0;
 
-	screen_line(curwin, term->tl_toprow + pos.row,
+	screen_வரி(curwin, term->tl_toprow + pos.row,
 		firstwin->w_wincol, pos.col, topframe->fr_width, -1, 0);
     }
 
@@ -4251,18 +4251,18 @@ update_system_term(term_T *term)
  * Returns FALSE when there is no terminal running in this window or it is in
  * Terminal-Normal mode.
  */
-    int
+    முழு
 term_do_update_window(win_T *wp)
 {
     term_T	*term = wp->w_buffer->b_term;
 
-    return term != NULL && term->tl_vterm != NULL && !term->tl_normal_mode;
+    திரும்பு term != வெற்று && term->tl_vterm != வெற்று && !term->tl_normal_mode;
 }
 
 /*
  * Called to update a window that contains an active terminal.
  */
-    void
+    வெறுமை
 term_update_window(win_T *wp)
 {
     term_T	*term = wp->w_buffer->b_term;
@@ -4270,9 +4270,9 @@ term_update_window(win_T *wp)
     VTermScreen *screen;
     VTermState	*state;
     VTermPos	pos;
-    int		rows, cols;
-    int		newrows, newcols;
-    int		minsize;
+    முழு		rows, cols;
+    முழு		newrows, newcols;
+    முழு		minsize;
     win_T	*twp;
 
     vterm = term->tl_vterm;
@@ -4281,12 +4281,12 @@ term_update_window(win_T *wp)
 
     // We use UPD_NOT_VALID on a resize or scroll, redraw everything then.
     // With UPD_SOME_VALID only redraw what was marked dirty.
-    if (wp->w_redr_type > UPD_SOME_VALID)
+    எனில் (wp->w_redr_type > UPD_SOME_VALID)
     {
 	term->tl_dirty_row_start = 0;
 	term->tl_dirty_row_end = MAX_ROW;
 
-	if (term->tl_postponed_scroll > 0
+	எனில் (term->tl_postponed_scroll > 0
 			      && term->tl_postponed_scroll < term->tl_rows / 3)
 	    // Scrolling is usually faster than redrawing, when there are only
 	    // a few lines to scroll.
@@ -4302,32 +4302,32 @@ term_update_window(win_T *wp)
 
     newrows = 99999;
     newcols = 99999;
-    for (twp = firstwin; ; twp = twp->w_next)
+    க்கு (twp = firstwin; ; twp = twp->w_next)
     {
 	// Always use curwin, it may be a popup window.
-	win_T *wwp = twp == NULL ? curwin : twp;
+	win_T *wwp = twp == வெற்று ? curwin : twp;
 
 	// When more than one window shows the same terminal, use the
 	// smallest size.
-	if (wwp->w_buffer == term->tl_buffer)
+	எனில் (wwp->w_buffer == term->tl_buffer)
 	{
 	    newrows = MIN(newrows, wwp->w_height);
 	    newcols = MIN(newcols, wwp->w_width);
 	}
-	if (twp == NULL)
-	    break;
+	எனில் (twp == வெற்று)
+	    நிறுத்து;
     }
-    if (newrows == 99999 || newcols == 99999)
-	return; // safety exit
+    எனில் (newrows == 99999 || newcols == 99999)
+	திரும்பு; // safety exit
     newrows = rows == 0 ? newrows : minsize ? MAX(rows, newrows) : rows;
     newcols = cols == 0 ? newcols : minsize ? MAX(cols, newcols) : cols;
 
     // If no cell is visible there is no point in resizing.  Also, vterm can't
     // handle a zero height.
-    if (newrows == 0 || newcols == 0)
-	return;
+    எனில் (newrows == 0 || newcols == 0)
+	திரும்பு;
 
-    if (term->tl_rows != newrows || term->tl_cols != newcols)
+    எனில் (term->tl_rows != newrows || term->tl_cols != newcols)
     {
 	term->tl_vterm_size_changed = TRUE;
 	vterm_set_size(vterm, newrows, newcols);
@@ -4337,7 +4337,7 @@ term_update_window(win_T *wp)
 
 	// Updating the terminal size will cause the snapshot to be cleared.
 	// When not in terminal_loop() we need to restore it.
-	if (term != in_terminal_loop)
+	எனில் (term != in_terminal_loop)
 	    may_move_terminal_to_buffer(term, FALSE);
     }
 
@@ -4345,19 +4345,19 @@ term_update_window(win_T *wp)
     vterm_state_get_cursorpos(state, &pos);
     position_cursor(wp, &pos);
 
-    for (pos.row = term->tl_dirty_row_start; pos.row < term->tl_dirty_row_end
+    க்கு (pos.row = term->tl_dirty_row_start; pos.row < term->tl_dirty_row_end
 					  && pos.row < wp->w_height; ++pos.row)
     {
-	if (pos.row < term->tl_rows)
+	எனில் (pos.row < term->tl_rows)
 	{
-	    int max_col = MIN(wp->w_width, term->tl_cols);
+	    முழு max_col = MIN(wp->w_width, term->tl_cols);
 
 	    term_line2screenline(term, wp, screen, &pos, max_col);
 	}
-	else
+	இல்லையெனில்
 	    pos.col = 0;
 
-	screen_line(wp, wp->w_winrow + pos.row
+	screen_வரி(wp, wp->w_winrow + pos.row
 #ifdef FEAT_MENU
 				+ winbar_height(wp)
 #endif
@@ -4372,14 +4372,14 @@ term_update_window(win_T *wp)
 /*
  * Called after updating all windows: may reset dirty rows.
  */
-    void
+    வெறுமை
 term_did_update_window(win_T *wp)
 {
     term_T	*term = wp->w_buffer->b_term;
 
-    if (term == NULL || term->tl_vterm == NULL || term->tl_normal_mode
+    எனில் (term == வெற்று || term->tl_vterm == வெற்று || term->tl_normal_mode
 						|| wp->w_redr_type != 0)
-	return;
+	திரும்பு;
 
     term->tl_dirty_row_start = MAX_ROW;
     term->tl_dirty_row_end = 0;
@@ -4388,35 +4388,35 @@ term_did_update_window(win_T *wp)
 /*
  * Return TRUE if "wp" is a terminal window where the job has finished.
  */
-    int
+    முழு
 term_is_finished(buf_T *buf)
 {
-    return buf->b_term != NULL && buf->b_term->tl_vterm == NULL;
+    திரும்பு buf->b_term != வெற்று && buf->b_term->tl_vterm == வெற்று;
 }
 
 /*
  * Return TRUE if "wp" is a terminal window where the job has finished or we
  * are in Terminal-Normal mode, thus we show the buffer contents.
  */
-    int
+    முழு
 term_show_buffer(buf_T *buf)
 {
     term_T *term = buf->b_term;
 
-    return term != NULL && (term->tl_vterm == NULL || term->tl_normal_mode);
+    திரும்பு term != வெற்று && (term->tl_vterm == வெற்று || term->tl_normal_mode);
 }
 
 /*
  * The current buffer is going to be changed.  If there is terminal
  * highlighting remove it now.
  */
-    void
-term_change_in_curbuf(void)
+    வெறுமை
+term_change_in_curbuf(வெறுமை)
 {
     term_T *term = curbuf->b_term;
 
-    if (!term_is_finished(curbuf) || term->tl_scrollback.ga_len <= 0)
-	return;
+    எனில் (!term_is_finished(curbuf) || term->tl_scrollback.ga_len <= 0)
+	திரும்பு;
 
     free_scrollback(term);
     redraw_buf_later(term->tl_buffer, UPD_NOT_VALID);
@@ -4431,43 +4431,43 @@ term_change_in_curbuf(void)
  * Get the screen attribute for a position in the buffer.
  * Use a negative "col" to get the filler background color.
  */
-    int
-term_get_attr(win_T *wp, linenr_T lnum, int col)
+    முழு
+term_get_attr(win_T *wp, linenr_T lnum, முழு col)
 {
     buf_T	*buf = wp->w_buffer;
     term_T	*term = buf->b_term;
-    sb_line_T	*line;
+    sb_வரி_T	*வரி;
     cellattr_T	*cellattr;
-    int         sb_line = -1;
-    int         sb_col = col;
+    முழு         sb_வரி = -1;
+    முழு         sb_col = col;
 
-    if (term->tl_scrollback.ga_len)
-	bufline_pos_in_scrollback(term, lnum, col, &sb_line, &sb_col);
+    எனில் (term->tl_scrollback.ga_len)
+	bufline_pos_in_scrollback(term, lnum, col, &sb_வரி, &sb_col);
 
-    if (sb_line < 0)
+    எனில் (sb_வரி < 0)
 	cellattr = &term->tl_default_color;
-    else
+    இல்லையெனில்
     {
-	line = (sb_line_T *)term->tl_scrollback.ga_data + sb_line;
-	if (sb_col < 0 || sb_col >= line->sb_cols)
-	    cellattr = &line->sb_fill_attr;
-	else
-	    cellattr = line->sb_cells + sb_col;
+	வரி = (sb_வரி_T *)term->tl_scrollback.ga_data + sb_வரி;
+	எனில் (sb_col < 0 || sb_col >= வரி->sb_cols)
+	    cellattr = &வரி->sb_fill_attr;
+	இல்லையெனில்
+	    cellattr = வரி->sb_cells + sb_col;
     }
-    return cell2attr(term, wp, &cellattr->attrs, &cellattr->fg, &cellattr->bg);
+    திரும்பு cell2attr(term, wp, &cellattr->attrs, &cellattr->fg, &cellattr->bg);
 }
 
 /*
  * Convert a cterm color number 0 - 255 to RGB.
  * This is compatible with xterm.
  */
-    static void
-cterm_color2vterm(int nr, VTermColor *rgb)
+    நிலையான வெறுமை
+cterm_color2vterm(முழு nr, VTermColor *rgb)
 {
     cterm_color2rgb(nr, &rgb->red, &rgb->green, &rgb->blue, &rgb->index);
-    if (rgb->index == 0)
+    எனில் (rgb->index == 0)
 	rgb->type = VTERM_COLOR_RGB;
-    else
+    இல்லையெனில்
     {
 	rgb->type = VTERM_COLOR_INDEXED;
 	--rgb->index;
@@ -4479,12 +4479,12 @@ cterm_color2vterm(int nr, VTermColor *rgb)
  * Returns TRUE if color is set to "fg" and "bg".
  * Otherwise returns FALSE.
  */
-    static int
-get_vterm_color_from_synid(int id, VTermColor *fg, VTermColor *bg)
+    நிலையான முழு
+get_vterm_color_from_synid(முழு id, VTermColor *fg, VTermColor *bg)
 {
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#எனில் defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // Use the actual color for the GUI and when 'termguicolors' is set.
-    if (0
+    எனில் (0
 # ifdef FEAT_GUI
 	    || gui.in_use
 # endif
@@ -4500,10 +4500,10 @@ get_vterm_color_from_synid(int id, VTermColor *fg, VTermColor *bg)
 	guicolor_T fg_rgb = INVALCOLOR;
 	guicolor_T bg_rgb = INVALCOLOR;
 
-	if (id > 0)
+	எனில் (id > 0)
 	    syn_id2colors(id, &fg_rgb, &bg_rgb);
 
-	if (fg_rgb != INVALCOLOR)
+	எனில் (fg_rgb != INVALCOLOR)
 	{
 	    long_u rgb = GUI_MCH_GET_RGB(fg_rgb);
 	    fg->red = (unsigned)(rgb >> 16);
@@ -4511,10 +4511,10 @@ get_vterm_color_from_synid(int id, VTermColor *fg, VTermColor *bg)
 	    fg->blue = (unsigned)rgb & 255;
 	    fg->type = VTERM_COLOR_RGB | VTERM_COLOR_DEFAULT_FG;
 	}
-	else
+	இல்லையெனில்
 	    fg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
 
-	if (bg_rgb != INVALCOLOR)
+	எனில் (bg_rgb != INVALCOLOR)
 	{
 	    long_u rgb = GUI_MCH_GET_RGB(bg_rgb);
 	    bg->red = (unsigned)(rgb >> 16);
@@ -4522,44 +4522,44 @@ get_vterm_color_from_synid(int id, VTermColor *fg, VTermColor *bg)
 	    bg->blue = (unsigned)rgb & 255;
 	    bg->type = VTERM_COLOR_RGB | VTERM_COLOR_DEFAULT_BG;
 	}
-	else
+	இல்லையெனில்
 	    bg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 
-	return TRUE;
+	திரும்பு TRUE;
     }
-    else
+    இல்லையெனில்
 #endif
-    if (t_colors >= 16)
+    எனில் (t_colors >= 16)
     {
-	int cterm_fg = -1;
-	int cterm_bg = -1;
+	முழு cterm_fg = -1;
+	முழு cterm_bg = -1;
 
-	if (id > 0)
+	எனில் (id > 0)
 	    syn_id2cterm_bg(id, &cterm_fg, &cterm_bg);
 
-	if (cterm_fg >= 0)
+	எனில் (cterm_fg >= 0)
 	{
 	    cterm_color2vterm(cterm_fg, fg);
 	    fg->type |= VTERM_COLOR_DEFAULT_FG;
 	}
-	else
+	இல்லையெனில்
 	    fg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
 
-	if (cterm_bg >= 0)
+	எனில் (cterm_bg >= 0)
 	{
 	    cterm_color2vterm(cterm_bg, bg);
 	    bg->type |= VTERM_COLOR_DEFAULT_BG;
 	}
-	else
+	இல்லையெனில்
 	    bg->type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 
-	return TRUE;
+	திரும்பு TRUE;
     }
 
-    return FALSE;
+    திரும்பு FALSE;
 }
 
-    void
+    வெறுமை
 term_reset_hlfwin(win_T *wp)
 {
     wp->w_term_hlfwin.fg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_FG;
@@ -4569,12 +4569,12 @@ term_reset_hlfwin(win_T *wp)
 /*
  * Cache the color of HLF_WIN.
  */
-    void
+    வெறுமை
 term_update_hlfwin(win_T *wp)
 {
-    int id = wp->w_hlfwin_id;
+    முழு id = wp->w_hlfwin_id;
 
-    if (id == 0 || !get_vterm_color_from_synid(id == -1 ? 0 : id,
+    எனில் (id == 0 || !get_vterm_color_from_synid(id == -1 ? 0 : id,
 		&wp->w_term_hlfwin.fg, &wp->w_term_hlfwin.bg))
 	term_reset_hlfwin(wp);
 }
@@ -4583,25 +4583,25 @@ term_update_hlfwin(win_T *wp)
  * Called when option 'termguicolors' was set,
  * or when any highlight is changed.
  */
-    void
-term_update_hlfwin_all(void)
+    வெறுமை
+term_update_hlfwin_all(வெறுமை)
 {
-    win_T	 *wp = NULL;
-    int		 did_curwin = FALSE;
+    win_T	 *wp = வெற்று;
+    முழு		 did_curwin = FALSE;
 
-    while (for_all_windows_and_curwin(&wp, &did_curwin))
+    போது (for_all_windows_and_curwin(&wp, &did_curwin))
 	term_update_hlfwin(wp);
 }
 
 /*
  * Initialize term->tl_default_color from the environment.
  */
-    void
+    வெறுமை
 term_init_default_colors(term_T *term)
 {
     VTermColor	    *fg, *bg;
-    int		    fgval, bgval;
-    int		    id;
+    முழு		    fgval, bgval;
+    முழு		    id;
 
     CLEAR_FIELD(term->tl_default_color.attrs);
     term->tl_default_color.width = 1;
@@ -4610,12 +4610,12 @@ term_init_default_colors(term_T *term)
 
     // Vterm uses a default black background.  Set it to white when
     // 'background' is "light".
-    if (*p_bg == 'l')
+    எனில் (*p_bg == 'l')
     {
 	fgval = 0;
 	bgval = 255;
     }
-    else
+    இல்லையெனில்
     {
 	fgval = 255;
 	bgval = 0;
@@ -4626,21 +4626,21 @@ term_init_default_colors(term_T *term)
     bg->type = VTERM_COLOR_RGB | VTERM_COLOR_DEFAULT_BG;
 
     // The highlight group overrules the defaults.
-    id = term_get_highlight_id(term, NULL);
+    id = term_get_highlight_id(term, வெற்று);
 
-    if (!get_vterm_color_from_synid(id, fg, bg))
+    எனில் (!get_vterm_color_from_synid(id, fg, bg))
     {
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
-	int tmp;
+#எனில் defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+	முழு tmp;
 #endif
 
 	// In an MS-Windows console we know the normal colors.
-	if (cterm_normal_fg_color > 0)
+	எனில் (cterm_normal_fg_color > 0)
 	{
 	    cterm_color2vterm(cterm_normal_fg_color - 1, fg);
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+#எனில் defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-	    if (!gui.in_use)
+	    எனில் (!gui.in_use)
 # endif
 	    {
 		tmp = fg->red;
@@ -4650,16 +4650,16 @@ term_init_default_colors(term_T *term)
 #endif
 	}
 #ifdef FEAT_TERMRESPONSE
-	else
+	இல்லையெனில்
 	    term_get_fg_color(&fg->red, &fg->green, &fg->blue);
 #endif
 
-	if (cterm_normal_bg_color > 0)
+	எனில் (cterm_normal_bg_color > 0)
 	{
 	    cterm_color2vterm(cterm_normal_bg_color - 1, bg);
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+#எனில் defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-	    if (!gui.in_use)
+	    எனில் (!gui.in_use)
 # endif
 	    {
 		tmp = fg->red;
@@ -4669,21 +4669,21 @@ term_init_default_colors(term_T *term)
 #endif
 	}
 #ifdef FEAT_TERMRESPONSE
-	else
+	இல்லையெனில்
 	    term_get_bg_color(&bg->red, &bg->green, &bg->blue);
 #endif
     }
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#எனில் defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Return TRUE if the user-defined palette (either g:terminal_ansi_colors or the
  * "ansi_colors" argument in term_start()) shall be applied.
  */
-    static int
-term_use_palette(void)
+    நிலையான முழு
+term_use_palette(வெறுமை)
 {
-    if (0
+    எனில் (0
 # ifdef FEAT_GUI
 	    || gui.in_use
 # endif
@@ -4691,20 +4691,20 @@ term_use_palette(void)
 	    || p_tgc
 # endif
        )
-	return TRUE;
-    return FALSE;
+	திரும்பு TRUE;
+    திரும்பு FALSE;
 }
 
 /*
  * Set the 16 ANSI colors from array of RGB values
  */
-    static void
+    நிலையான வெறுமை
 set_vterm_palette(VTerm *vterm, long_u *rgb)
 {
-    int		index = 0;
+    முழு		index = 0;
     VTermState	*state = vterm_obtain_state(vterm);
 
-    for (; index < 16; index++)
+    க்கு (; index < 16; index++)
     {
 	VTermColor	color;
 
@@ -4720,50 +4720,50 @@ set_vterm_palette(VTerm *vterm, long_u *rgb)
 /*
  * Set the ANSI color palette from a list of colors
  */
-    static int
+    நிலையான முழு
 set_ansi_colors_list(VTerm *vterm, list_T *list)
 {
-    int		n = 0;
+    முழு		n = 0;
     long_u	rgb[16];
     listitem_T	*li;
 
-    for (li = list->lv_first; li != NULL && n < 16; li = li->li_next, n++)
+    க்கு (li = list->lv_first; li != வெற்று && n < 16; li = li->li_next, n++)
     {
 	char_u		*color_name;
 	guicolor_T	guicolor;
 
 	color_name = tv_get_string_chk(&li->li_tv);
-	if (color_name == NULL)
-	    return FAIL;
+	எனில் (color_name == வெற்று)
+	    திரும்பு FAIL;
 
 	guicolor = GUI_GET_COLOR(color_name);
-	if (guicolor == INVALCOLOR)
-	    return FAIL;
+	எனில் (guicolor == INVALCOLOR)
+	    திரும்பு FAIL;
 
 	rgb[n] = GUI_MCH_GET_RGB(guicolor);
     }
 
-    if (n != 16 || li != NULL)
-	return FAIL;
+    எனில் (n != 16 || li != வெற்று)
+	திரும்பு FAIL;
 
     set_vterm_palette(vterm, rgb);
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Initialize the ANSI color palette from g:terminal_ansi_colors[0:15]
  */
-    static void
+    நிலையான வெறுமை
 init_vterm_ansi_colors(VTerm *vterm)
 {
-    dictitem_T	*var = find_var((char_u *)"g:terminal_ansi_colors", NULL, TRUE);
+    dictitem_T	*var = find_var((char_u *)"g:terminal_ansi_colors", வெற்று, TRUE);
 
-    if (var == NULL)
-	return;
+    எனில் (var == வெற்று)
+	திரும்பு;
 
-    if (var->di_tv.v_type != VAR_LIST
-	    || var->di_tv.vval.v_list == NULL
+    எனில் (var->di_tv.v_type != VAR_LIST
+	    || var->di_tv.vval.v_list == வெற்று
 	    || var->di_tv.vval.v_list->lv_first == &range_list_item
 	    || set_ansi_colors_list(vterm, var->di_tv.vval.v_list) == FAIL)
 	semsg(_(e_invalid_argument_str), "g:terminal_ansi_colors");
@@ -4774,76 +4774,76 @@ init_vterm_ansi_colors(VTerm *vterm)
  * Handles a "drop" command from the job in the terminal.
  * "item" is the file name, "item->li_next" may have options.
  */
-    static void
+    நிலையான வெறுமை
 handle_drop_command(listitem_T *item)
 {
     char_u	*fname = tv_get_string(&item->li_tv);
     listitem_T	*opt_item = item->li_next;
-    int		bufnr;
+    முழு		bufnr;
     win_T	*wp;
     tabpage_T   *tp;
     exarg_T	ea;
-    char_u	*tofree = NULL;
+    char_u	*tofree = வெற்று;
 
     bufnr = buflist_add(fname, BLN_LISTED | BLN_NOOPT);
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	if (wp->w_buffer->b_fnum == bufnr)
+	எனில் (wp->w_buffer->b_fnum == bufnr)
 	{
 	    // buffer is in a window already, go there
 	    goto_tabpage_win(tp, wp);
-	    return;
+	    திரும்பு;
 	}
     }
 
     CLEAR_FIELD(ea);
 
-    if (opt_item != NULL && opt_item->li_tv.v_type == VAR_DICT
-					&& opt_item->li_tv.vval.v_dict != NULL)
+    எனில் (opt_item != வெற்று && opt_item->li_tv.v_type == VAR_DICT
+					&& opt_item->li_tv.vval.v_dict != வெற்று)
     {
 	dict_T *dict = opt_item->li_tv.vval.v_dict;
 	char_u *p;
 
 	p = dict_get_string(dict, "ff", FALSE);
-	if (p == NULL)
+	எனில் (p == வெற்று)
 	    p = dict_get_string(dict, "fileformat", FALSE);
-	if (p != NULL)
+	எனில் (p != வெற்று)
 	{
-	    if (check_ff_value(p) == FAIL)
-		ch_log(NULL, "Invalid ff argument to drop: %s", p);
-	    else
+	    எனில் (check_ff_மதிப்பு(p) == FAIL)
+		ch_log(வெற்று, "Invalid ff argument to drop: %s", p);
+	    இல்லையெனில்
 		ea.force_ff = *p;
 	}
 	p = dict_get_string(dict, "enc", FALSE);
-	if (p == NULL)
+	எனில் (p == வெற்று)
 	    p = dict_get_string(dict, "encoding", FALSE);
-	if (p != NULL)
+	எனில் (p != வெற்று)
 	{
 	    ea.cmd = alloc(STRLEN(p) + 12);
-	    if (ea.cmd != NULL)
+	    எனில் (ea.cmd != வெற்று)
 	    {
-		sprintf((char *)ea.cmd, "sbuf ++enc=%s", p);
+		sprintf((எழுத்து *)ea.cmd, "sbuf ++enc=%s", p);
 		ea.force_enc = 11;
 		tofree = ea.cmd;
 	    }
 	}
 
 	p = dict_get_string(dict, "bad", FALSE);
-	if (p != NULL)
+	எனில் (p != வெற்று)
 	    get_bad_opt(p, &ea);
 
-	if (dict_has_key(dict, "bin"))
+	எனில் (dict_has_சாவி(dict, "bin"))
 	    ea.force_bin = FORCE_BIN;
-	if (dict_has_key(dict, "binary"))
+	எனில் (dict_has_சாவி(dict, "binary"))
 	    ea.force_bin = FORCE_BIN;
-	if (dict_has_key(dict, "nobin"))
+	எனில் (dict_has_சாவி(dict, "nobin"))
 	    ea.force_bin = FORCE_NOBIN;
-	if (dict_has_key(dict, "nobinary"))
+	எனில் (dict_has_சாவி(dict, "nobinary"))
 	    ea.force_bin = FORCE_NOBIN;
     }
 
     // open in new window, like ":split fname"
-    if (ea.cmd == NULL)
+    எனில் (ea.cmd == வெற்று)
 	ea.cmd = (char_u *)"split";
     ea.arg = fname;
     ea.cmdidx = CMD_split;
@@ -4855,17 +4855,17 @@ handle_drop_command(listitem_T *item)
 /*
  * Return TRUE if "func" starts with "pat" and "pat" isn't empty.
  */
-    static int
+    நிலையான முழு
 is_permitted_term_api(char_u *func, char_u *pat)
 {
-    return pat != NULL && *pat != NUL && STRNICMP(func, pat, STRLEN(pat)) == 0;
+    திரும்பு pat != வெற்று && *pat != NUL && STRNICMP(func, pat, STRLEN(pat)) == 0;
 }
 
 /*
  * Handles a function call from the job running in a terminal.
  * "item" is the function name, "item->li_next" has the arguments.
  */
-    static void
+    நிலையான வெறுமை
 handle_call_command(term_T *term, channel_T *channel, listitem_T *item)
 {
     char_u	*func;
@@ -4873,32 +4873,32 @@ handle_call_command(term_T *term, channel_T *channel, listitem_T *item)
     typval_T	rettv;
     funcexe_T	funcexe;
 
-    if (item->li_next == NULL)
+    எனில் (item->li_next == வெற்று)
     {
 	ch_log(channel, "Missing function arguments for call");
-	return;
+	திரும்பு;
     }
     func = tv_get_string(&item->li_tv);
 
-    if (!is_permitted_term_api(func, term->tl_api))
+    எனில் (!is_permitted_term_api(func, term->tl_api))
     {
 	ch_log(channel, "Unpermitted function: %s", func);
-	return;
+	திரும்பு;
     }
 
-    argvars[0].v_type = VAR_NUMBER;
-    argvars[0].vval.v_number = term->tl_buffer->b_fnum;
+    argvars[0].v_type = VAR_எண்;
+    argvars[0].vval.v_எண் = term->tl_buffer->b_fnum;
     argvars[1] = item->li_next->li_tv;
     CLEAR_FIELD(funcexe);
     funcexe.fe_firstline = 1L;
     funcexe.fe_lastline = 1L;
     funcexe.fe_evaluate = TRUE;
-    if (call_func(func, -1, &rettv, 2, argvars, &funcexe) == OK)
+    எனில் (call_func(func, -1, &rettv, 2, argvars, &funcexe) == OK)
     {
 	clear_tv(&rettv);
 	ch_log(channel, "Function %s called", func);
     }
-    else
+    இல்லையெனில்
 	ch_log(channel, "Calling function %s failed", func);
 }
 
@@ -4910,20 +4910,20 @@ handle_call_command(term_T *term, channel_T *channel, listitem_T *item)
  * UTF-8 bytes. Thus we don't need to deal with invalid UTF-8
  * encoding bytes like 0xfe, 0xff.
  */
-    static size_t
-url_decode(const char *src, const size_t len, char_u *dst)
+    நிலையான size_t
+url_decode(மாறிலி எழுத்து *src, மாறிலி size_t len, char_u *dst)
 {
     size_t i = 0, j = 0;
 
-    while (i < len)
+    போது (i < len)
     {
-	if (src[i] == '%' && i + 2 < len)
+	எனில் (src[i] == '%' && i + 2 < len)
 	{
 	    dst[j] = hexhex2nr((char_u *)&src[i + 1]);
 	    j++;
 	    i += 3;
 	}
-	else
+	இல்லையெனில்
 	{
 	    dst[j] = src[i];
 	    i++;
@@ -4931,7 +4931,7 @@ url_decode(const char *src, const size_t len, char_u *dst)
 	}
     }
     dst[j] = '\0';
-    return j;
+    திரும்பு j;
 }
 
 /*
@@ -4942,25 +4942,25 @@ url_decode(const char *src, const size_t len, char_u *dst)
  * and what VTerm provides via VTermStringFragment is
  * "file://HOSTNAME/CURRENT/DIR"
  */
-    static void
+    நிலையான வெறுமை
 sync_shell_dir(garray_T *gap)
 {
-    int       offset = 7;  // len of "file://" is 7
-    char      *pos = (char *)gap->ga_data + offset;
+    முழு       offset = 7;  // len of "file://" is 7
+    எழுத்து      *pos = (எழுத்து *)gap->ga_data + offset;
     char_u    *new_dir;
 
     // remove HOSTNAME to get PWD
-    while (offset < (int)gap->ga_len && *pos != '/' )
+    போது (offset < (முழு)gap->ga_len && *pos != '/' )
     {
 	++offset;
 	++pos;
     }
 
-    if (offset >= (int)gap->ga_len)
+    எனில் (offset >= (முழு)gap->ga_len)
     {
 	semsg(_(e_failed_to_extract_pwd_from_str_check_your_shell_config),
 								 gap->ga_data);
-	return;
+	திரும்பு;
     }
 
     new_dir = alloc(gap->ga_len - offset + 1);
@@ -4973,52 +4973,52 @@ sync_shell_dir(garray_T *gap)
  * Called by libvterm when it cannot recognize an OSC sequence.
  * We recognize a terminal API command.
  */
-    static int
-parse_osc(int command, VTermStringFragment frag, void *user)
+    நிலையான முழு
+parse_osc(முழு command, VTermStringFragment frag, வெறுமை *user)
 {
     term_T	*term = (term_T *)user;
     js_read_T	reader;
     typval_T	tv;
-    channel_T	*channel = term->tl_job == NULL ? NULL
+    channel_T	*channel = term->tl_job == வெற்று ? வெற்று
 						    : term->tl_job->jv_channel;
     garray_T	*gap = &term->tl_osc_buf;
 
     // We recognize only OSC 5 1 ; {command} and OSC 7 ; {command}
-    if (command != 51 && (command != 7 || !p_asd))
-	return 0;
+    எனில் (command != 51 && (command != 7 || !p_asd))
+	திரும்பு 0;
 
     // Concatenate what was received until the final piece is found.
-    if (ga_grow(gap, (int)frag.len + 1) == FAIL)
+    எனில் (ga_grow(gap, (முழு)frag.len + 1) == FAIL)
     {
 	ga_clear(gap);
-	return 1;
+	திரும்பு 1;
     }
-    mch_memmove((char *)gap->ga_data + gap->ga_len, frag.str, frag.len);
-    gap->ga_len += (int)frag.len;
-    if (!frag.final)
-	return 1;
+    mch_memmove((எழுத்து *)gap->ga_data + gap->ga_len, frag.str, frag.len);
+    gap->ga_len += (முழு)frag.len;
+    எனில் (!frag.final)
+	திரும்பு 1;
 
-    ((char *)gap->ga_data)[gap->ga_len] = 0;
+    ((எழுத்து *)gap->ga_data)[gap->ga_len] = 0;
 
-    if (command == 7)
+    எனில் (command == 7)
     {
 	sync_shell_dir(gap);
 	ga_clear(gap);
-	return 1;
+	திரும்பு 1;
     }
 
     reader.js_buf = gap->ga_data;
-    reader.js_fill = NULL;
+    reader.js_fill = வெற்று;
     reader.js_used = 0;
-    if (json_decode(&reader, &tv, 0) == OK
+    எனில் (json_decode(&reader, &tv, 0) == OK
 	    && tv.v_type == VAR_LIST
-	    && tv.vval.v_list != NULL)
+	    && tv.vval.v_list != வெற்று)
     {
 	listitem_T *item = tv.vval.v_list->lv_first;
 
-	if (item == NULL)
+	எனில் (item == வெற்று)
 	    ch_log(channel, "Missing command");
-	else
+	இல்லையெனில்
 	{
 	    char_u	*cmd = tv_get_string(&item->li_tv);
 
@@ -5027,69 +5027,69 @@ parse_osc(int command, VTermStringFragment frag, void *user)
 	    ++term->tl_buffer->b_locked;
 
 	    item = item->li_next;
-	    if (item == NULL)
+	    எனில் (item == வெற்று)
 		ch_log(channel, "Missing argument for %s", cmd);
-	    else if (STRCMP(cmd, "drop") == 0)
+	    இல்லையெனில் எனில் (STRCMP(cmd, "drop") == 0)
 		handle_drop_command(item);
-	    else if (STRCMP(cmd, "call") == 0)
+	    இல்லையெனில் எனில் (STRCMP(cmd, "call") == 0)
 		handle_call_command(term, channel, item);
-	    else
+	    இல்லையெனில்
 		ch_log(channel, "Invalid command received: %s", cmd);
 	    --term->tl_buffer->b_locked;
 	}
     }
-    else
+    இல்லையெனில்
 	ch_log(channel, "Invalid JSON received");
 
     ga_clear(gap);
     clear_tv(&tv);
-    return 1;
+    திரும்பு 1;
 }
 
 /*
  * Called by libvterm when it cannot recognize a CSI sequence.
  * We recognize the window position report.
  */
-    static int
+    நிலையான முழு
 parse_csi(
-	const char  *leader UNUSED,
-	const long  args[],
-	int	    argcount,
-	const char  *intermed UNUSED,
-	char	    command,
-	void	    *user)
+	மாறிலி எழுத்து  *leader UNUSED,
+	மாறிலி long  args[],
+	முழு	    argcount,
+	மாறிலி எழுத்து  *intermed UNUSED,
+	எழுத்து	    command,
+	வெறுமை	    *user)
 {
     term_T	*term = (term_T *)user;
-    char	buf[100];
-    int		len;
-    int		x = 0;
-    int		y = 0;
+    எழுத்து	buf[100];
+    முழு		len;
+    முழு		x = 0;
+    முழு		y = 0;
     win_T	*wp;
 
     // We recognize only CSI 13 t
-    if (command != 't' || argcount != 1 || args[0] != 13)
-	return 0; // not handled
+    எனில் (command != 't' || argcount != 1 || args[0] != 13)
+	திரும்பு 0; // not handled
 
     // When getting the window position is not possible or it fails it results
     // in zero/zero.
-#if defined(FEAT_GUI) \
+#எனில் defined(FEAT_GUI) \
 	|| (defined(HAVE_TGETENT) && defined(FEAT_TERMRESPONSE)) \
 	|| defined(MSWIN)
-    (void)ui_get_winpos(&x, &y, (varnumber_T)100);
+    (வெறுமை)ui_get_winpos(&x, &y, (varnumber_T)100);
 #endif
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer == term->tl_buffer)
-	    break;
-    if (wp != NULL)
+	எனில் (wp->w_buffer == term->tl_buffer)
+	    நிறுத்து;
+    எனில் (wp != வெற்று)
     {
 #ifdef FEAT_GUI
-	if (gui.in_use)
+	எனில் (gui.in_use)
 	{
 	    x += wp->w_wincol * gui.char_width;
 	    y += W_WINROW(wp) * gui.char_height;
 	}
-	else
+	இல்லையெனில்
 #endif
 	{
 	    // We roughly estimate the position of the terminal window inside
@@ -5101,37 +5101,37 @@ parse_csi(
 
     len = vim_snprintf(buf, 100, "\x1b[3;%d;%dt", x, y);
     channel_send(term->tl_job->jv_channel, get_tty_part(term),
-						     (char_u *)buf, len, NULL);
-    return 1;
+						     (char_u *)buf, len, வெற்று);
+    திரும்பு 1;
 }
 
-static VTermStateFallbacks state_fallbacks = {
-    NULL,		// control
+நிலையான VTermStateFallbacks state_fallbacks = {
+    வெற்று,		// control
     parse_csi,		// csi
     parse_osc,		// osc
-    NULL,		// dcs
-    NULL,		// apc
-    NULL,		// pm
-    NULL		// sos
+    வெற்று,		// dcs
+    வெற்று,		// apc
+    வெற்று,		// pm
+    வெற்று		// sos
 };
 
 /*
  * Use Vim's allocation functions for vterm so profiling works.
  */
-    static void *
-vterm_malloc(size_t size, void *data UNUSED)
+    நிலையான வெறுமை *
+vterm_malloc(size_t size, வெறுமை *data UNUSED)
 {
     // make sure that the length is not zero
-    return alloc_clear(size == 0 ? 1L : size);
+    திரும்பு alloc_clear(size == 0 ? 1L : size);
 }
 
-    static void
-vterm_memfree(void *ptr, void *data UNUSED)
+    நிலையான வெறுமை
+vterm_memfree(வெறுமை *ptr, வெறுமை *data UNUSED)
 {
     vim_free(ptr);
 }
 
-static VTermAllocatorFunctions vterm_allocator = {
+நிலையான VTermAllocatorFunctions vterm_allocator = {
   &vterm_malloc,
   &vterm_memfree
 };
@@ -5140,26 +5140,26 @@ static VTermAllocatorFunctions vterm_allocator = {
  * Create a new vterm and initialize it.
  * Return FAIL when out of memory.
  */
-    static int
-create_vterm(term_T *term, int rows, int cols)
+    நிலையான முழு
+create_vterm(term_T *term, முழு rows, முழு cols)
 {
     VTerm	    *vterm;
     VTermScreen	    *screen;
     VTermState	    *state;
-    VTermValue	    value;
+    VTerm_மதிப்பு	    மதிப்பு;
 
-    vterm = vterm_new_with_allocator(rows, cols, &vterm_allocator, NULL);
+    vterm = vterm_new_with_allocator(rows, cols, &vterm_allocator, வெற்று);
     term->tl_vterm = vterm;
-    if (vterm == NULL)
-	return FAIL;
+    எனில் (vterm == வெற்று)
+	திரும்பு FAIL;
 
     // Allocate screen and state here, so we can bail out if that fails.
     state = vterm_obtain_state(vterm);
     screen = vterm_obtain_screen(vterm);
-    if (state == NULL || screen == NULL)
+    எனில் (state == வெற்று || screen == வெற்று)
     {
 	vterm_free(vterm);
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     vterm_screen_set_callbacks(screen, &screen_callbacks, term);
@@ -5175,7 +5175,7 @@ create_vterm(term_T *term, int rows, int cols)
 	    &term->tl_default_color.fg,
 	    &term->tl_default_color.bg);
 
-    if (t_colors < 16)
+    எனில் (t_colors < 16)
 	// Less than 16 colors: assume that bold means using a bright color for
 	// the foreground color.
 	vterm_state_set_bold_highbright(vterm_obtain_state(vterm), 1);
@@ -5190,29 +5190,29 @@ create_vterm(term_T *term, int rows, int cols)
     // cursor to blink if it's blinking in the xterm.
     // For Windows we respect the system wide setting.
 #ifdef MSWIN
-    if (GetCaretBlinkTime() == INFINITE)
-	value.boolean = 0;
-    else
-	value.boolean = 1;
-#else
-    value.boolean = 0;
+    எனில் (GetCaretBlinkTime() == INFINITE)
+	மதிப்பு.boolean = 0;
+    இல்லையெனில்
+	மதிப்பு.boolean = 1;
+#இல்லையெனில்
+    மதிப்பு.boolean = 0;
 #endif
-    vterm_state_set_termprop(state, VTERM_PROP_CURSORBLINK, &value);
+    vterm_state_set_termprop(state, VTERM_PROP_CURSORBLINK, &மதிப்பு);
     vterm_state_set_unrecognised_fallbacks(state, &state_fallbacks, term);
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Reset the terminal palette to its default value.
  */
-    static void
+    நிலையான வெறுமை
 term_reset_palette(VTerm *vterm)
 {
     VTermState	*state = vterm_obtain_state(vterm);
-    int		index;
+    முழு		index;
 
-    for (index = 0; index < 16; index++)
+    க்கு (index = 0; index < 16; index++)
     {
 	VTermColor	color;
 
@@ -5226,21 +5226,21 @@ term_reset_palette(VTerm *vterm)
     }
 }
 
-    static void
+    நிலையான வெறுமை
 term_update_palette(term_T *term)
 {
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette()
-	    && (term->tl_palette != NULL
-		|| find_var((char_u *)"g:terminal_ansi_colors", NULL, TRUE)
-								      != NULL))
+#எனில் defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    எனில் (term_use_palette()
+	    && (term->tl_palette != வெற்று
+		|| find_var((char_u *)"g:terminal_ansi_colors", வெற்று, TRUE)
+								      != வெற்று))
     {
-	if (term->tl_palette != NULL)
+	எனில் (term->tl_palette != வெற்று)
 	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
+	இல்லையெனில்
 	    init_vterm_ansi_colors(term->tl_vterm);
     }
-    else
+    இல்லையெனில்
 #endif
 	term_reset_palette(term->tl_vterm);
 }
@@ -5248,15 +5248,15 @@ term_update_palette(term_T *term)
 /*
  * Called when option 'termguicolors' is changed.
  */
-    void
-term_update_palette_all(void)
+    வெறுமை
+term_update_palette_all(வெறுமை)
 {
     term_T *term;
 
     FOR_ALL_TERMS(term)
     {
-	if (term->tl_vterm == NULL)
-	    continue;
+	எனில் (term->tl_vterm == வெற்று)
+	    தொடர்;
 	term_update_palette(term);
     }
 }
@@ -5265,15 +5265,15 @@ term_update_palette_all(void)
  * Called when option 'background' or 'termguicolors' was set,
  * or when any highlight is changed.
  */
-    void
-term_update_colors_all(void)
+    வெறுமை
+term_update_colors_all(வெறுமை)
 {
     term_T *term;
 
     FOR_ALL_TERMS(term)
     {
-	if (term->tl_vterm == NULL)
-	    continue;
+	எனில் (term->tl_vterm == வெற்று)
+	    தொடர்;
 	term_init_default_colors(term);
 	vterm_state_set_default_colors(
 		vterm_obtain_state(term->tl_vterm),
@@ -5288,41 +5288,41 @@ term_update_colors_all(void)
     char_u *
 term_get_status_text(term_T *term)
 {
-    if (term->tl_status_text != NULL)
-	return term->tl_status_text;
+    எனில் (term->tl_status_text != வெற்று)
+	திரும்பு term->tl_status_text;
 
     char_u *txt;
     size_t len;
     char_u *fname;
 
-    if (term->tl_normal_mode)
+    எனில் (term->tl_normal_mode)
     {
-	if (term_job_running(term))
+	எனில் (term_job_running(term))
 	    txt = (char_u *)_("Terminal");
-	else
+	இல்லையெனில்
 	    txt = (char_u *)_("Terminal-finished");
     }
-    else if (term->tl_title != NULL)
+    இல்லையெனில் எனில் (term->tl_title != வெற்று)
 	txt = term->tl_title;
-    else if (term_none_open(term))
+    இல்லையெனில் எனில் (term_none_open(term))
 	txt = (char_u *)_("active");
-    else if (term_job_running(term))
+    இல்லையெனில் எனில் (term_job_running(term))
 	txt = (char_u *)_("running");
-    else
+    இல்லையெனில்
 	txt = (char_u *)_("finished");
     fname = buf_get_fname(term->tl_buffer);
     len = 9 + STRLEN(fname) + STRLEN(txt);
     term->tl_status_text = alloc(len);
-    if (term->tl_status_text != NULL)
-	vim_snprintf((char *)term->tl_status_text, len, "%s [%s]",
+    எனில் (term->tl_status_text != வெற்று)
+	vim_snprintf((எழுத்து *)term->tl_status_text, len, "%s [%s]",
 		fname, txt);
-    return term->tl_status_text;
+    திரும்பு term->tl_status_text;
 }
 
 /*
  * Clear the cached value of the status text.
  */
-    void
+    வெறுமை
 term_clear_status_text(term_T *term)
 {
     VIM_CLEAR(term->tl_status_text);
@@ -5331,21 +5331,21 @@ term_clear_status_text(term_T *term)
 /*
  * Mark references in jobs of terminals.
  */
-    int
-set_ref_in_term(int copyID)
+    முழு
+set_ref_in_term(முழு copyID)
 {
-    int		abort = FALSE;
+    முழு		abort = FALSE;
     term_T	*term;
     typval_T	tv;
 
-    for (term = first_term; !abort && term != NULL; term = term->tl_next)
-	if (term->tl_job != NULL)
+    க்கு (term = first_term; !abort && term != வெற்று; term = term->tl_next)
+	எனில் (term->tl_job != வெற்று)
 	{
 	    tv.v_type = VAR_JOB;
 	    tv.vval.v_job = term->tl_job;
-	    abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	    abort = abort || set_ref_in_item(&tv, copyID, வெற்று, வெற்று, வெற்று);
 	}
-    return abort;
+    திரும்பு abort;
 }
 
 /*
@@ -5353,24 +5353,24 @@ set_ref_in_term(int copyID)
  * Returns NULL when the buffer is not for a terminal window and logs a message
  * with "where".
  */
-    static buf_T *
-term_get_buf(typval_T *argvars, char *where)
+    நிலையான buf_T *
+term_get_buf(typval_T *argvars, எழுத்து *where)
 {
     buf_T *buf;
 
     ++emsg_off;
     buf = tv_get_buf(&argvars[0], FALSE);
     --emsg_off;
-    if (buf == NULL || buf->b_term == NULL)
+    எனில் (buf == வெற்று || buf->b_term == வெற்று)
     {
-	(void)tv_get_number(&argvars[0]);    // issue errmsg if type error
-	ch_log(NULL, "%s: invalid buffer argument", where);
-	return NULL;
+	(வெறுமை)tv_get_எண்(&argvars[0]);    // issue errmsg if type error
+	ch_log(வெற்று, "%s: invalid buffer argument", where);
+	திரும்பு வெற்று;
     }
-    return buf;
+    திரும்பு buf;
 }
 
-    static void
+    நிலையான வெறுமை
 clear_cell(VTermScreenCell *cell)
 {
     CLEAR_FIELD(*cell);
@@ -5378,21 +5378,21 @@ clear_cell(VTermScreenCell *cell)
     cell->bg.type = VTERM_COLOR_INVALID | VTERM_COLOR_DEFAULT_BG;
 }
 
-    static void
+    நிலையான வெறுமை
 dump_term_color(FILE *fd, VTermColor *color)
 {
-    int index;
+    முழு index;
 
-    if (VTERM_COLOR_IS_INDEXED(color))
+    எனில் (VTERM_COLOR_IS_INDEXED(color))
 	index = color->index + 1;
-    else if (color->type == 0)
+    இல்லையெனில் எனில் (color->type == 0)
 	// use RGB values
 	index = 255;
-    else
+    இல்லையெனில்
 	// default color
 	index = 0;
     fprintf(fd, "%02x%02x%02x%d",
-	    (int)color->red, (int)color->green, (int)color->blue,
+	    (முழு)color->red, (முழு)color->green, (முழு)color->blue,
 	    index);
 }
 
@@ -5418,14 +5418,14 @@ dump_term_color(FILE *fd, VTermColor *color)
  * Repeating the previous screen cell:
  *    @{count}
  */
-    void
+    வெறுமை
 f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
 {
     buf_T	*buf;
     term_T	*term;
     char_u	*fname;
-    int		max_height = 0;
-    int		max_width = 0;
+    முழு		max_height = 0;
+    முழு		max_width = 0;
     stat_T	st;
     FILE	*fd;
     VTermPos	pos;
@@ -5434,52 +5434,52 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
     VTermState	*state;
     VTermPos	cursor_pos;
 
-    if (check_restricted() || check_secure())
-	return;
+    எனில் (check_restricted() || check_secure())
+	திரும்பு;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_dumpwrite()");
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
     term = buf->b_term;
-    if (term->tl_vterm == NULL)
+    எனில் (term->tl_vterm == வெற்று)
     {
 	emsg(_(e_job_already_finished));
-	return;
+	திரும்பு;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    எனில் (argvars[2].v_type != VAR_UNKNOWN)
     {
 	dict_T *d;
 
-	if (check_for_dict_arg(argvars, 2) == FAIL)
-	    return;
+	எனில் (check_for_dict_arg(argvars, 2) == FAIL)
+	    திரும்பு;
 	d = argvars[2].vval.v_dict;
-	if (d != NULL)
+	எனில் (d != வெற்று)
 	{
-	    max_height = dict_get_number(d, "rows");
-	    max_width = dict_get_number(d, "columns");
+	    max_height = dict_get_எண்(d, "rows");
+	    max_width = dict_get_எண்(d, "columns");
 	}
     }
 
     fname = tv_get_string_chk(&argvars[1]);
-    if (fname == NULL)
-	return;
-    if (mch_stat((char *)fname, &st) >= 0)
+    எனில் (fname == வெற்று)
+	திரும்பு;
+    எனில் (mch_stat((எழுத்து *)fname, &st) >= 0)
     {
 	semsg(_(e_file_exists_str), fname);
-	return;
+	திரும்பு;
     }
 
-    if (*fname == NUL || (fd = mch_fopen((char *)fname, WRITEBIN)) == NULL)
+    எனில் (*fname == NUL || (fd = mch_fopen((எழுத்து *)fname, WRITEBIN)) == வெற்று)
     {
 	semsg(_(e_cant_create_file_str), *fname == NUL ? (char_u *)_("<empty>") : fname);
-	return;
+	திரும்பு;
     }
 
     clear_cell(&prev_cell);
@@ -5488,67 +5488,67 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
     state = vterm_obtain_state(term->tl_vterm);
     vterm_state_get_cursorpos(state, &cursor_pos);
 
-    for (pos.row = 0; (max_height == 0 || pos.row < max_height)
+    க்கு (pos.row = 0; (max_height == 0 || pos.row < max_height)
 					 && pos.row < term->tl_rows; ++pos.row)
     {
-	int		repeat = 0;
+	முழு		repeat = 0;
 
-	for (pos.col = 0; (max_width == 0 || pos.col < max_width)
+	க்கு (pos.col = 0; (max_width == 0 || pos.col < max_width)
 					 && pos.col < term->tl_cols; ++pos.col)
 	{
 	    VTermScreenCell cell;
-	    int		    same_attr;
-	    int		    same_chars = TRUE;
-	    int		    i;
-	    int		    is_cursor_pos = (pos.col == cursor_pos.col
+	    முழு		    same_attr;
+	    முழு		    same_chars = TRUE;
+	    முழு		    i;
+	    முழு		    is_cursor_pos = (pos.col == cursor_pos.col
 						 && pos.row == cursor_pos.row);
 
-	    if (vterm_screen_get_cell(screen, pos, &cell) == 0)
+	    எனில் (vterm_screen_get_cell(screen, pos, &cell) == 0)
 		clear_cell(&cell);
 
-	    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL; ++i)
+	    க்கு (i = 0; i < VTERM_MAX_CHARS_PER_CELL; ++i)
 	    {
-		int c = cell.chars[i];
-		int pc = prev_cell.chars[i];
-		int should_break = c == NUL || pc == NUL;
+		முழு c = cell.chars[i];
+		முழு pc = prev_cell.chars[i];
+		முழு should_break = c == NUL || pc == NUL;
 
 		// For the first character NUL is the same as space.
-		if (i == 0)
+		எனில் (i == 0)
 		{
 		    c = (c == NUL) ? ' ' : c;
 		    pc = (pc == NUL) ? ' ' : pc;
 		}
-		if (c != pc)
+		எனில் (c != pc)
 		    same_chars = FALSE;
-		if (should_break)
-		    break;
+		எனில் (should_break)
+		    நிறுத்து;
 	    }
 	    same_attr = vtermAttr2hl(&cell.attrs)
 					      == vtermAttr2hl(&prev_cell.attrs)
 			&& vterm_color_is_equal(&cell.fg, &prev_cell.fg)
 			&& vterm_color_is_equal(&cell.bg, &prev_cell.bg);
-	    if (same_chars && cell.width == prev_cell.width && same_attr
+	    எனில் (same_chars && cell.width == prev_cell.width && same_attr
 							     && !is_cursor_pos)
 	    {
 		++repeat;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
-		if (repeat > 0)
+		எனில் (repeat > 0)
 		{
 		    fprintf(fd, "@%d", repeat);
 		    repeat = 0;
 		}
 		fputs(is_cursor_pos ? ">" : "|", fd);
 
-		if (cell.chars[0] == NUL)
+		எனில் (cell.chars[0] == NUL)
 		    fputs(" ", fd);
-		else
+		இல்லையெனில்
 		{
 		    char_u	charbuf[10];
-		    int		len;
+		    முழு		len;
 
-		    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL
+		    க்கு (i = 0; i < VTERM_MAX_CHARS_PER_CELL
 						  && cell.chars[i] != NUL; ++i)
 		    {
 			len = utf_char2bytes(cell.chars[i], charbuf);
@@ -5559,30 +5559,30 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
 		// When only the characters differ we don't write anything, the
 		// following "|", "@" or NL will indicate using the same
 		// attributes.
-		if (cell.width != prev_cell.width || !same_attr)
+		எனில் (cell.width != prev_cell.width || !same_attr)
 		{
-		    if (cell.width == 2)
+		    எனில் (cell.width == 2)
 			fputs("*", fd);
-		    else
+		    இல்லையெனில்
 			fputs("+", fd);
 
-		    if (same_attr)
+		    எனில் (same_attr)
 		    {
 			fputs("&", fd);
 		    }
-		    else
+		    இல்லையெனில்
 		    {
 			fprintf(fd, "%d", vtermAttr2hl(&cell.attrs));
-			if (vterm_color_is_equal(&cell.fg, &prev_cell.fg))
+			எனில் (vterm_color_is_equal(&cell.fg, &prev_cell.fg))
 			    fputs("&", fd);
-			else
+			இல்லையெனில்
 			{
 			    fputs("#", fd);
 			    dump_term_color(fd, &cell.fg);
 			}
-			if (vterm_color_is_equal(&cell.bg, &prev_cell.bg))
+			எனில் (vterm_color_is_equal(&cell.bg, &prev_cell.bg))
 			    fputs("&", fd);
-			else
+			இல்லையெனில்
 			{
 			    fputs("#", fd);
 			    dump_term_color(fd, &cell.bg);
@@ -5593,10 +5593,10 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
 		prev_cell = cell;
 	    }
 
-	    if (cell.width == 2)
+	    எனில் (cell.width == 2)
 		++pos.col;
 	}
-	if (repeat > 0)
+	எனில் (repeat > 0)
 	    fprintf(fd, "@%d", repeat);
 	fputs("\n", fd);
     }
@@ -5607,23 +5607,23 @@ f_term_dumpwrite(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * Called when a dump is corrupted.  Put a breakpoint here when debugging.
  */
-    static void
+    நிலையான வெறுமை
 dump_is_corrupt(garray_T *gap)
 {
     GA_CONCAT_LITERAL(gap, "CORRUPT");
 }
 
-    static void
+    நிலையான வெறுமை
 append_cell(garray_T *gap, cellattr_T *cell)
 {
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    எனில் (ga_grow(gap, 1) == FAIL)
+	திரும்பு;
 
     *(((cellattr_T *)gap->ga_data) + gap->ga_len) = *cell;
     ++gap->ga_len;
 }
 
-    static void
+    நிலையான வெறுமை
 clear_cellattr(cellattr_T *cell)
 {
     CLEAR_FIELD(*cell);
@@ -5635,74 +5635,74 @@ clear_cellattr(cellattr_T *cell)
  * Read the dump file from "fd" and append lines to the current buffer.
  * Return the cell width of the longest line.
  */
-    static int
+    நிலையான முழு
 read_dump_file(FILE *fd, VTermPos *cursor_pos)
 {
-    int		    c;
+    முழு		    c;
     garray_T	    ga_text;
     garray_T	    ga_cell;
-    string_T	    prev_char = {NULL, 0};
-    int		    attr = 0;
+    string_T	    prev_char = {வெற்று, 0};
+    முழு		    attr = 0;
     cellattr_T	    cell;
     cellattr_T	    empty_cell;
     term_T	    *term = curbuf->b_term;
-    int		    max_cells = 0;
-    int		    start_row = term->tl_scrollback.ga_len;
+    முழு		    max_cells = 0;
+    முழு		    start_row = term->tl_scrollback.ga_len;
 
     ga_init2(&ga_text, 1, 90);
-    ga_init2(&ga_cell, sizeof(cellattr_T), 90);
+    ga_init2(&ga_cell, அளவு(cellattr_T), 90);
     clear_cellattr(&cell);
     clear_cellattr(&empty_cell);
     cursor_pos->row = -1;
     cursor_pos->col = -1;
 
     c = fgetc(fd);
-    for (;;)
+    க்கு (;;)
     {
-	if (c == EOF)
-	    break;
-	if (c == '\r')
+	எனில் (c == EOF)
+	    நிறுத்து;
+	எனில் (c == '\r')
 	{
 	    // DOS line endings?  Ignore.
 	    c = fgetc(fd);
 	}
-	else if (c == '\n')
+	இல்லையெனில் எனில் (c == '\n')
 	{
 	    // End of a line: append it to the buffer.
-	    if (ga_text.ga_data == NULL)
+	    எனில் (ga_text.ga_data == வெற்று)
 		dump_is_corrupt(&ga_text);
-	    if (ga_grow(&term->tl_scrollback, 1) == OK)
+	    எனில் (ga_grow(&term->tl_scrollback, 1) == OK)
 	    {
-		sb_line_T   *line = (sb_line_T *)term->tl_scrollback.ga_data
+		sb_வரி_T   *வரி = (sb_வரி_T *)term->tl_scrollback.ga_data
 						  + term->tl_scrollback.ga_len;
 
-		if (max_cells < ga_cell.ga_len)
+		எனில் (max_cells < ga_cell.ga_len)
 		    max_cells = ga_cell.ga_len;
-		line->sb_cols = ga_cell.ga_len;
-		line->sb_bytes = ga_text.ga_len;
-		line->sb_cells = ga_cell.ga_data;
-		line->sb_fill_attr = term->tl_default_color;
-		line->continuation = 0;
+		வரி->sb_cols = ga_cell.ga_len;
+		வரி->sb_bytes = ga_text.ga_len;
+		வரி->sb_cells = ga_cell.ga_data;
+		வரி->sb_fill_attr = term->tl_default_color;
+		வரி->continuation = 0;
 		++term->tl_scrollback.ga_len;
 		ga_init(&ga_cell);
 
 		ga_append(&ga_text, NUL);
-		ml_append(curbuf->b_ml.ml_line_count, ga_text.ga_data,
+		ml_append(curbuf->b_ml.ml_வரி_மொத்தம், ga_text.ga_data,
 							ga_text.ga_len, FALSE);
 	    }
-	    else
+	    இல்லையெனில்
 		ga_clear(&ga_cell);
 	    ga_text.ga_len = 0;
 
 	    c = fgetc(fd);
 	}
-	else if (c == '|' || c == '>')
+	இல்லையெனில் எனில் (c == '|' || c == '>')
 	{
-	    int prev_len = ga_text.ga_len;
+	    முழு prev_len = ga_text.ga_len;
 
-	    if (c == '>')
+	    எனில் (c == '>')
 	    {
-		if (cursor_pos->row != -1)
+		எனில் (cursor_pos->row != -1)
 		    dump_is_corrupt(&ga_text);	// duplicate cursor
 		cursor_pos->row = term->tl_scrollback.ga_len - start_row;
 		cursor_pos->col = ga_cell.ga_len;
@@ -5710,50 +5710,50 @@ read_dump_file(FILE *fd, VTermPos *cursor_pos)
 
 	    // normal character(s) followed by "+", "*", "|", "@" or NL
 	    c = fgetc(fd);
-	    if (c != EOF)
+	    எனில் (c != EOF)
 		ga_append(&ga_text, c);
-	    for (;;)
+	    க்கு (;;)
 	    {
 		c = fgetc(fd);
-		if (c == '+' || c == '*' || c == '|' || c == '>' || c == '@'
+		எனில் (c == '+' || c == '*' || c == '|' || c == '>' || c == '@'
 						      || c == EOF || c == '\n')
-		    break;
+		    நிறுத்து;
 		ga_append(&ga_text, c);
 	    }
 
 	    // save the character for repeating it
 	    VIM_CLEAR_STRING(prev_char);
-	    if (ga_text.ga_data != NULL)
+	    எனில் (ga_text.ga_data != வெற்று)
 	    {
 		prev_char.length = (size_t)(ga_text.ga_len - prev_len);
 		prev_char.string = vim_strnsave(
 		    ((char_u *)ga_text.ga_data) + prev_len,
 		    prev_char.length);
-		if (prev_char.string == NULL)
+		எனில் (prev_char.string == வெற்று)
 		    prev_char.length = 0;
 	    }
 
-	    if (c == '@' || c == '|' || c == '>' || c == '\n')
+	    எனில் (c == '@' || c == '|' || c == '>' || c == '\n')
 	    {
 		// use all attributes from previous cell
 	    }
-	    else if (c == '+' || c == '*')
+	    இல்லையெனில் எனில் (c == '+' || c == '*')
 	    {
-		int is_bg;
+		முழு is_bg;
 
 		cell.width = c == '+' ? 1 : 2;
 
 		c = fgetc(fd);
-		if (c == '&')
+		எனில் (c == '&')
 		{
 		    // use same attr as previous cell
 		    c = fgetc(fd);
 		}
-		else if (SAFE_isdigit(c))
+		இல்லையெனில் எனில் (SAFE_isdigit(c))
 		{
 		    // get the decimal attribute
 		    attr = 0;
-		    while (SAFE_isdigit(c))
+		    போது (SAFE_isdigit(c))
 		    {
 			attr = attr * 10 + (c - '0');
 			c = fgetc(fd);
@@ -5761,16 +5761,16 @@ read_dump_file(FILE *fd, VTermPos *cursor_pos)
 		    hl2vtermAttr(attr, &cell);
 
 		    // is_bg == 0: fg, is_bg == 1: bg
-		    for (is_bg = 0; is_bg <= 1; ++is_bg)
+		    க்கு (is_bg = 0; is_bg <= 1; ++is_bg)
 		    {
-			if (c == '&')
+			எனில் (c == '&')
 			{
 			    // use same color as previous cell
 			    c = fgetc(fd);
 			}
-			else if (c == '#')
+			இல்லையெனில் எனில் (c == '#')
 			{
-			    int red, green, blue, index = 0, type;
+			    முழு red, green, blue, index = 0, type;
 
 			    c = fgetc(fd);
 			    red = hex2nr(c);
@@ -5785,30 +5785,30 @@ read_dump_file(FILE *fd, VTermPos *cursor_pos)
 			    c = fgetc(fd);
 			    blue = (blue << 4) + hex2nr(c);
 			    c = fgetc(fd);
-			    if (!SAFE_isdigit(c))
+			    எனில் (!SAFE_isdigit(c))
 				dump_is_corrupt(&ga_text);
-			    while (SAFE_isdigit(c))
+			    போது (SAFE_isdigit(c))
 			    {
 				index = index * 10 + (c - '0');
 				c = fgetc(fd);
 			    }
-			    if (index == 0 || index == 255)
+			    எனில் (index == 0 || index == 255)
 			    {
 				type = VTERM_COLOR_RGB;
-				if (index == 0)
+				எனில் (index == 0)
 				{
-				    if (is_bg)
+				    எனில் (is_bg)
 					type |= VTERM_COLOR_DEFAULT_BG;
-				    else
+				    இல்லையெனில்
 					type |= VTERM_COLOR_DEFAULT_FG;
 				}
 			    }
-			    else
+			    இல்லையெனில்
 			    {
 				type = VTERM_COLOR_INDEXED;
 				index -= 1;
 			    }
-			    if (is_bg)
+			    எனில் (is_bg)
 			    {
 				cell.bg.type = type;
 				cell.bg.red = red;
@@ -5816,7 +5816,7 @@ read_dump_file(FILE *fd, VTermPos *cursor_pos)
 				cell.bg.blue = blue;
 				cell.bg.index = index;
 			    }
-			    else
+			    இல்லையெனில்
 			    {
 				cell.fg.type = type;
 				cell.fg.red = red;
@@ -5825,57 +5825,57 @@ read_dump_file(FILE *fd, VTermPos *cursor_pos)
 				cell.fg.index = index;
 			    }
 			}
-			else
+			இல்லையெனில்
 			    dump_is_corrupt(&ga_text);
 		    }
 		}
-		else
+		இல்லையெனில்
 		    dump_is_corrupt(&ga_text);
 	    }
-	    else
+	    இல்லையெனில்
 		dump_is_corrupt(&ga_text);
 
 	    append_cell(&ga_cell, &cell);
-	    if (cell.width == 2)
+	    எனில் (cell.width == 2)
 		append_cell(&ga_cell, &empty_cell);
 	}
-	else if (c == '@')
+	இல்லையெனில் எனில் (c == '@')
 	{
-	    if (prev_char.string == NULL)
+	    எனில் (prev_char.string == வெற்று)
 		dump_is_corrupt(&ga_text);
-	    else
+	    இல்லையெனில்
 	    {
-		int count = 0;
+		முழு மொத்தம் = 0;
 
 		// repeat previous character, get the count
-		for (;;)
+		க்கு (;;)
 		{
 		    c = fgetc(fd);
-		    if (!SAFE_isdigit(c))
-			break;
-		    count = count * 10 + (c - '0');
+		    எனில் (!SAFE_isdigit(c))
+			நிறுத்து;
+		    மொத்தம் = மொத்தம் * 10 + (c - '0');
 		}
 
-		while (count-- > 0)
+		போது (மொத்தம்-- > 0)
 		{
 		    ga_concat_len(&ga_text, prev_char.string, prev_char.length);
 		    append_cell(&ga_cell, &cell);
 		}
 	    }
 	}
-	else
+	இல்லையெனில்
 	{
 	    dump_is_corrupt(&ga_text);
 	    c = fgetc(fd);
 	}
     }
 
-    if (ga_text.ga_len > 0)
+    எனில் (ga_text.ga_len > 0)
     {
 	// trailing characters after last NL
 	dump_is_corrupt(&ga_text);
 	ga_append(&ga_text, NUL);
-	ml_append(curbuf->b_ml.ml_line_count, ga_text.ga_data,
+	ml_append(curbuf->b_ml.ml_வரி_மொத்தம், ga_text.ga_data,
 							ga_text.ga_len, FALSE);
     }
 
@@ -5883,163 +5883,163 @@ read_dump_file(FILE *fd, VTermPos *cursor_pos)
     ga_clear(&ga_cell);
     vim_free(prev_char.string);
 
-    return max_cells;
+    திரும்பு max_cells;
 }
 
 /*
  * Return an allocated string with at least "text_width" "=" characters and
  * "fname" inserted in the middle.
  */
-    static char_u *
-get_separator(int text_width, char_u *fname)
+    நிலையான char_u *
+get_separator(முழு text_width, char_u *fname)
 {
-    int	    width = MAX(text_width, curwin->w_width);
+    முழு	    width = MAX(text_width, curwin->w_width);
     char_u  *textline;
-    int	    fname_size;
+    முழு	    fname_size;
     char_u  *p = fname;
-    int	    i;
+    முழு	    i;
     size_t  off;
 
     textline = alloc(width + STRLEN(fname) + 1);
-    if (textline == NULL)
-	return NULL;
+    எனில் (textline == வெற்று)
+	திரும்பு வெற்று;
 
     fname_size = vim_strsize(fname);
-    if (fname_size < width - 8)
+    எனில் (fname_size < width - 8)
     {
 	// enough room, don't use the full window width
 	width = MAX(text_width, fname_size + 8);
     }
-    else if (fname_size > width - 8)
+    இல்லையெனில் எனில் (fname_size > width - 8)
     {
 	// full name doesn't fit, use only the tail
 	p = gettail(fname);
 	fname_size = vim_strsize(p);
     }
     // skip characters until the name fits
-    while (fname_size > width - 8)
+    போது (fname_size > width - 8)
     {
 	p += (*mb_ptr2len)(p);
 	fname_size = vim_strsize(p);
     }
 
-    for (i = 0; i < (width - fname_size) / 2 - 1; ++i)
+    க்கு (i = 0; i < (width - fname_size) / 2 - 1; ++i)
 	textline[i] = '=';
     textline[i++] = ' ';
 
     STRCPY(textline + i, p);
     off = STRLEN(textline);
     textline[off] = ' ';
-    for (i = 1; i < (width - fname_size) / 2; ++i)
+    க்கு (i = 1; i < (width - fname_size) / 2; ++i)
 	textline[off + i] = '=';
     textline[off + i] = NUL;
 
-    return textline;
+    திரும்பு textline;
 }
 
 /*
  * Common for "term_dumpdiff()" and "term_dumpload()".
  */
-    static void
-term_load_dump(typval_T *argvars, typval_T *rettv, int do_diff)
+    நிலையான வெறுமை
+term_load_dump(typval_T *argvars, typval_T *rettv, முழு do_diff)
 {
     jobopt_T	opt;
-    buf_T	*buf = NULL;
+    buf_T	*buf = வெற்று;
     char_u	buf1[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
     char_u	*fname1;
-    char_u	*fname2 = NULL;
-    char_u	*fname_tofree = NULL;
+    char_u	*fname2 = வெற்று;
+    char_u	*fname_tofree = வெற்று;
     FILE	*fd1;
-    FILE	*fd2 = NULL;
-    char_u	*textline = NULL;
+    FILE	*fd2 = வெற்று;
+    char_u	*textline = வெற்று;
 
     // First open the files.  If this fails bail out.
     fname1 = tv_get_string_buf_chk(&argvars[0], buf1);
-    if (do_diff)
+    எனில் (do_diff)
 	fname2 = tv_get_string_buf_chk(&argvars[1], buf2);
-    if (fname1 == NULL || (do_diff && fname2 == NULL))
+    எனில் (fname1 == வெற்று || (do_diff && fname2 == வெற்று))
     {
 	emsg(_(e_invalid_argument));
-	return;
+	திரும்பு;
     }
-    fd1 = mch_fopen((char *)fname1, READBIN);
-    if (fd1 == NULL)
+    fd1 = mch_fopen((எழுத்து *)fname1, READBIN);
+    எனில் (fd1 == வெற்று)
     {
 	semsg(_(e_cant_read_file_str), fname1);
-	return;
+	திரும்பு;
     }
-    if (do_diff)
+    எனில் (do_diff)
     {
-	fd2 = mch_fopen((char *)fname2, READBIN);
-	if (fd2 == NULL)
+	fd2 = mch_fopen((எழுத்து *)fname2, READBIN);
+	எனில் (fd2 == வெற்று)
 	{
 	    fclose(fd1);
 	    semsg(_(e_cant_read_file_str), fname2);
-	    return;
+	    திரும்பு;
 	}
     }
 
     init_job_options(&opt);
-    if (argvars[do_diff ? 2 : 1].v_type != VAR_UNKNOWN
+    எனில் (argvars[do_diff ? 2 : 1].v_type != VAR_UNKNOWN
 	    && get_job_options(&argvars[do_diff ? 2 : 1], &opt, 0,
 		    JO2_TERM_NAME + JO2_TERM_COLS + JO2_TERM_ROWS
 		    + JO2_VERTICAL + JO2_CURWIN + JO2_NORESTORE) == FAIL)
-	goto theend;
+	செல் theend;
 
-    if (opt.jo_term_name == NULL)
+    எனில் (opt.jo_term_name == வெற்று)
     {
 	size_t len = STRLEN(fname1) + 12;
 
 	fname_tofree = alloc(len);
-	if (fname_tofree != NULL)
+	எனில் (fname_tofree != வெற்று)
 	{
-	    vim_snprintf((char *)fname_tofree, len, "dump diff %s", fname1);
+	    vim_snprintf((எழுத்து *)fname_tofree, len, "dump diff %s", fname1);
 	    opt.jo_term_name = fname_tofree;
 	}
     }
 
-    if (opt.jo_bufnr_buf != NULL)
+    எனில் (opt.jo_bufnr_buf != வெற்று)
     {
 	win_T *wp = buf_jump_open_win(opt.jo_bufnr_buf);
 
 	// With "bufnr" argument: enter the window with this buffer and make it
 	// empty.
-	if (wp == NULL)
+	எனில் (wp == வெற்று)
 	    semsg(_(e_invalid_argument_str), "bufnr");
-	else
+	இல்லையெனில்
 	{
 	    buf = curbuf;
-	    while (!(curbuf->b_ml.ml_flags & ML_EMPTY))
+	    போது (!(curbuf->b_ml.ml_flags & ML_EMPTY))
 		ml_delete((linenr_T)1);
 	    free_scrollback(curbuf->b_term);
 	    redraw_later(UPD_NOT_VALID);
 	}
     }
-    else
+    இல்லையெனில்
 	// Create a new terminal window.
-	buf = term_start(&argvars[0], NULL, &opt, TERM_START_NOJOB);
+	buf = term_start(&argvars[0], வெற்று, &opt, TERM_START_NOJOB);
 
-    if (buf != NULL && buf->b_term != NULL)
+    எனில் (buf != வெற்று && buf->b_term != வெற்று)
     {
-	int		i;
+	முழு		i;
 	linenr_T	bot_lnum;
 	linenr_T	lnum;
 	term_T		*term = buf->b_term;
-	int		width;
-	int		width2;
+	முழு		width;
+	முழு		width2;
 	VTermPos	cursor_pos1;
 	VTermPos	cursor_pos2;
 
 	term_init_default_colors(term);
 
-	rettv->vval.v_number = buf->b_fnum;
+	rettv->vval.v_எண் = buf->b_fnum;
 
 	// read the files, fill the buffer with the diff
 	width = read_dump_file(fd1, &cursor_pos1);
 
 	// position the cursor
-	if (cursor_pos1.row >= 0)
+	எனில் (cursor_pos1.row >= 0)
 	{
 	    curwin->w_cursor.lnum = cursor_pos1.row + 1;
 	    coladvance(cursor_pos1.col);
@@ -6049,99 +6049,99 @@ term_load_dump(typval_T *argvars, typval_T *rettv, int do_diff)
 	ml_delete(1);
 
 	// For term_dumpload() we are done here.
-	if (!do_diff)
-	    goto theend;
+	எனில் (!do_diff)
+	    செல் theend;
 
-	term->tl_top_diff_rows = curbuf->b_ml.ml_line_count;
+	term->tl_உச்சி_diff_rows = curbuf->b_ml.ml_வரி_மொத்தம்;
 
 	textline = get_separator(width, fname1);
-	if (textline == NULL)
-	    goto theend;
-	if (add_empty_scrollback(term, &term->tl_default_color, 0) == OK)
-	    ml_append(curbuf->b_ml.ml_line_count, textline, 0, FALSE);
+	எனில் (textline == வெற்று)
+	    செல் theend;
+	எனில் (add_empty_scrollback(term, &term->tl_default_color, 0) == OK)
+	    ml_append(curbuf->b_ml.ml_வரி_மொத்தம், textline, 0, FALSE);
 	vim_free(textline);
 
 	textline = get_separator(width, fname2);
-	if (textline == NULL)
-	    goto theend;
-	if (add_empty_scrollback(term, &term->tl_default_color, 0) == OK)
-	    ml_append(curbuf->b_ml.ml_line_count, textline, 0, FALSE);
+	எனில் (textline == வெற்று)
+	    செல் theend;
+	எனில் (add_empty_scrollback(term, &term->tl_default_color, 0) == OK)
+	    ml_append(curbuf->b_ml.ml_வரி_மொத்தம், textline, 0, FALSE);
 	textline[width] = NUL;
 
-	bot_lnum = curbuf->b_ml.ml_line_count;
+	bot_lnum = curbuf->b_ml.ml_வரி_மொத்தம்;
 	width2 = read_dump_file(fd2, &cursor_pos2);
-	if (width2 > width)
+	எனில் (width2 > width)
 	{
 	    vim_free(textline);
 	    textline = alloc(width2 + 1);
-	    if (textline == NULL)
-		goto theend;
+	    எனில் (textline == வெற்று)
+		செல் theend;
 	    width = width2;
 	    textline[width] = NUL;
 	}
-	term->tl_bot_diff_rows = curbuf->b_ml.ml_line_count - bot_lnum;
+	term->tl_bot_diff_rows = curbuf->b_ml.ml_வரி_மொத்தம் - bot_lnum;
 
-	for (lnum = 1; lnum <= term->tl_top_diff_rows; ++lnum)
+	க்கு (lnum = 1; lnum <= term->tl_உச்சி_diff_rows; ++lnum)
 	{
-	    if (lnum + bot_lnum > curbuf->b_ml.ml_line_count)
+	    எனில் (lnum + bot_lnum > curbuf->b_ml.ml_வரி_மொத்தம்)
 	    {
 		// bottom part has fewer rows, fill with "-"
-		for (i = 0; i < width; ++i)
+		க்கு (i = 0; i < width; ++i)
 		    textline[i] = '-';
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		char_u *line1;
 		char_u *line2;
 		char_u *p1;
 		char_u *p2;
-		int	col;
-		sb_line_T   *sb_line = (sb_line_T *)term->tl_scrollback.ga_data;
-		cellattr_T *cellattr1 = (sb_line + lnum - 1)->sb_cells;
-		cellattr_T *cellattr2 = (sb_line + lnum + bot_lnum - 1)
+		முழு	col;
+		sb_வரி_T   *sb_வரி = (sb_வரி_T *)term->tl_scrollback.ga_data;
+		cellattr_T *cellattr1 = (sb_வரி + lnum - 1)->sb_cells;
+		cellattr_T *cellattr2 = (sb_வரி + lnum + bot_lnum - 1)
 								    ->sb_cells;
 
 		// Make a copy, getting the second line will invalidate it.
 		line1 = vim_strsave(ml_get(lnum));
-		if (line1 == NULL)
-		    break;
+		எனில் (line1 == வெற்று)
+		    நிறுத்து;
 		p1 = line1;
 
 		line2 = ml_get(lnum + bot_lnum);
 		p2 = line2;
-		for (col = 0; col < width && *p1 != NUL && *p2 != NUL; ++col)
+		க்கு (col = 0; col < width && *p1 != NUL && *p2 != NUL; ++col)
 		{
-		    int len1 = utfc_ptr2len(p1);
-		    int len2 = utfc_ptr2len(p2);
+		    முழு len1 = utfc_ptr2len(p1);
+		    முழு len2 = utfc_ptr2len(p2);
 
 		    textline[col] = ' ';
-		    if (len1 != len2 || STRNCMP(p1, p2, len1) != 0)
+		    எனில் (len1 != len2 || STRNCMP(p1, p2, len1) != 0)
 			// text differs
 			textline[col] = 'X';
-		    else if (lnum == cursor_pos1.row + 1
+		    இல்லையெனில் எனில் (lnum == cursor_pos1.row + 1
 			    && col == cursor_pos1.col
 			    && (cursor_pos1.row != cursor_pos2.row
 					|| cursor_pos1.col != cursor_pos2.col))
 			// cursor in first but not in second
 			textline[col] = '>';
-		    else if (lnum == cursor_pos2.row + 1
+		    இல்லையெனில் எனில் (lnum == cursor_pos2.row + 1
 			    && col == cursor_pos2.col
 			    && (cursor_pos1.row != cursor_pos2.row
 					|| cursor_pos1.col != cursor_pos2.col))
 			// cursor in second but not in first
 			textline[col] = '<';
-		    else if (cellattr1 != NULL && cellattr2 != NULL)
+		    இல்லையெனில் எனில் (cellattr1 != வெற்று && cellattr2 != வெற்று)
 		    {
-			if ((cellattr1 + col)->width
+			எனில் ((cellattr1 + col)->width
 						   != (cellattr2 + col)->width)
 			    textline[col] = 'w';
-			else if (!vterm_color_is_equal(&(cellattr1 + col)->fg,
+			இல்லையெனில் எனில் (!vterm_color_is_equal(&(cellattr1 + col)->fg,
 						   &(cellattr2 + col)->fg))
 			    textline[col] = 'f';
-			else if (!vterm_color_is_equal(&(cellattr1 + col)->bg,
+			இல்லையெனில் எனில் (!vterm_color_is_equal(&(cellattr1 + col)->bg,
 						   &(cellattr2 + col)->bg))
 			    textline[col] = 'b';
-			else if (vtermAttr2hl(&(cellattr1 + col)->attrs)
+			இல்லையெனில் எனில் (vtermAttr2hl(&(cellattr1 + col)->attrs)
 				  != vtermAttr2hl(&((cellattr2 + col)->attrs)))
 			    textline[col] = 'a';
 		    }
@@ -6150,16 +6150,16 @@ term_load_dump(typval_T *argvars, typval_T *rettv, int do_diff)
 		    // TODO: handle different width
 		}
 
-		while (col < width)
+		போது (col < width)
 		{
-		    if (*p1 == NUL && *p2 == NUL)
+		    எனில் (*p1 == NUL && *p2 == NUL)
 			textline[col] = '?';
-		    else if (*p1 == NUL)
+		    இல்லையெனில் எனில் (*p1 == NUL)
 		    {
 			textline[col] = '+';
 			p2 += utfc_ptr2len(p2);
 		    }
-		    else
+		    இல்லையெனில்
 		    {
 			textline[col] = '-';
 			p1 += utfc_ptr2len(p1);
@@ -6169,20 +6169,20 @@ term_load_dump(typval_T *argvars, typval_T *rettv, int do_diff)
 
 		vim_free(line1);
 	    }
-	    if (add_empty_scrollback(term, &term->tl_default_color,
-						 term->tl_top_diff_rows) == OK)
-		ml_append(term->tl_top_diff_rows + lnum, textline, 0, FALSE);
+	    எனில் (add_empty_scrollback(term, &term->tl_default_color,
+						 term->tl_உச்சி_diff_rows) == OK)
+		ml_append(term->tl_உச்சி_diff_rows + lnum, textline, 0, FALSE);
 	    ++bot_lnum;
 	}
 
-	while (lnum + bot_lnum <= curbuf->b_ml.ml_line_count)
+	போது (lnum + bot_lnum <= curbuf->b_ml.ml_வரி_மொத்தம்)
 	{
 	    // bottom part has more rows, fill with "+"
-	    for (i = 0; i < width; ++i)
+	    க்கு (i = 0; i < width; ++i)
 		textline[i] = '+';
-	    if (add_empty_scrollback(term, &term->tl_default_color,
-						 term->tl_top_diff_rows) == OK)
-		ml_append(term->tl_top_diff_rows + lnum, textline, 0, FALSE);
+	    எனில் (add_empty_scrollback(term, &term->tl_default_color,
+						 term->tl_உச்சி_diff_rows) == OK)
+		ml_append(term->tl_உச்சி_diff_rows + lnum, textline, 0, FALSE);
 	    ++lnum;
 	    ++bot_lnum;
 	}
@@ -6197,7 +6197,7 @@ theend:
     vim_free(textline);
     vim_free(fname_tofree);
     fclose(fd1);
-    if (fd2 != NULL)
+    எனில் (fd2 != வெற்று)
 	fclose(fd2);
 }
 
@@ -6206,47 +6206,47 @@ theend:
  * bottom files.
  * Return FAIL when this is not possible.
  */
-    int
-term_swap_diff(void)
+    முழு
+term_swap_diff(வெறுமை)
 {
     term_T	*term = curbuf->b_term;
-    linenr_T	line_count;
-    linenr_T	top_rows;
+    linenr_T	வரி_மொத்தம்;
+    linenr_T	உச்சி_rows;
     linenr_T	bot_rows;
     linenr_T	bot_start;
     linenr_T	lnum;
     char_u	*p;
-    sb_line_T	*sb_line;
+    sb_வரி_T	*sb_வரி;
 
-    if (term == NULL
+    எனில் (term == வெற்று
 	    || !term_is_finished(curbuf)
-	    || term->tl_top_diff_rows == 0
+	    || term->tl_உச்சி_diff_rows == 0
 	    || term->tl_scrollback.ga_len == 0)
-	return FAIL;
+	திரும்பு FAIL;
 
-    line_count = curbuf->b_ml.ml_line_count;
-    top_rows = term->tl_top_diff_rows;
+    வரி_மொத்தம் = curbuf->b_ml.ml_வரி_மொத்தம்;
+    உச்சி_rows = term->tl_உச்சி_diff_rows;
     bot_rows = term->tl_bot_diff_rows;
-    bot_start = line_count - bot_rows;
-    sb_line = (sb_line_T *)term->tl_scrollback.ga_data;
+    bot_start = வரி_மொத்தம் - bot_rows;
+    sb_வரி = (sb_வரி_T *)term->tl_scrollback.ga_data;
 
     // move lines from top to above the bottom part
-    for (lnum = 1; lnum <= top_rows; ++lnum)
+    க்கு (lnum = 1; lnum <= உச்சி_rows; ++lnum)
     {
 	p = vim_strsave(ml_get(1));
-	if (p == NULL)
-	    return OK;
+	எனில் (p == வெற்று)
+	    திரும்பு OK;
 	ml_append(bot_start, p, 0, FALSE);
 	ml_delete(1);
 	vim_free(p);
     }
 
     // move lines from bottom to the top
-    for (lnum = 1; lnum <= bot_rows; ++lnum)
+    க்கு (lnum = 1; lnum <= bot_rows; ++lnum)
     {
 	p = vim_strsave(ml_get(bot_start + lnum));
-	if (p == NULL)
-	    return OK;
+	எனில் (p == வெற்று)
+	    திரும்பு OK;
 	ml_delete(bot_start + lnum);
 	ml_append(lnum - 1, p, 0, FALSE);
 	vim_free(p);
@@ -6254,73 +6254,73 @@ term_swap_diff(void)
 
     // move top title to bottom
     p = vim_strsave(ml_get(bot_rows + 1));
-    if (p == NULL)
-	return OK;
-    ml_append(line_count - top_rows - 1, p, 0, FALSE);
+    எனில் (p == வெற்று)
+	திரும்பு OK;
+    ml_append(வரி_மொத்தம் - உச்சி_rows - 1, p, 0, FALSE);
     ml_delete(bot_rows + 1);
     vim_free(p);
 
     // move bottom title to top
-    p = vim_strsave(ml_get(line_count - top_rows));
-    if (p == NULL)
-	return OK;
-    ml_delete(line_count - top_rows);
+    p = vim_strsave(ml_get(வரி_மொத்தம் - உச்சி_rows));
+    எனில் (p == வெற்று)
+	திரும்பு OK;
+    ml_delete(வரி_மொத்தம் - உச்சி_rows);
     ml_append(bot_rows, p, 0, FALSE);
     vim_free(p);
 
-    if (top_rows == bot_rows)
+    எனில் (உச்சி_rows == bot_rows)
     {
 	// rows counts are equal, can swap cell properties
-	for (lnum = 0; lnum < top_rows; ++lnum)
+	க்கு (lnum = 0; lnum < உச்சி_rows; ++lnum)
 	{
-	    sb_line_T	temp;
+	    sb_வரி_T	temp;
 
-	    temp = *(sb_line + lnum);
-	    *(sb_line + lnum) = *(sb_line + bot_start + lnum);
-	    *(sb_line + bot_start + lnum) = temp;
+	    temp = *(sb_வரி + lnum);
+	    *(sb_வரி + lnum) = *(sb_வரி + bot_start + lnum);
+	    *(sb_வரி + bot_start + lnum) = temp;
 	}
     }
-    else
+    இல்லையெனில்
     {
-	size_t		size = sizeof(sb_line_T) * term->tl_scrollback.ga_len;
-	sb_line_T	*temp = alloc(size);
+	size_t		size = அளவு(sb_வரி_T) * term->tl_scrollback.ga_len;
+	sb_வரி_T	*temp = alloc(size);
 
 	// need to copy cell properties into temp memory
-	if (temp != NULL)
+	எனில் (temp != வெற்று)
 	{
 	    mch_memmove(temp, term->tl_scrollback.ga_data, size);
 	    mch_memmove(term->tl_scrollback.ga_data,
 		    temp + bot_start,
-		    sizeof(sb_line_T) * bot_rows);
-	    mch_memmove((sb_line_T *)term->tl_scrollback.ga_data + bot_rows,
-		    temp + top_rows,
-		    sizeof(sb_line_T) * (line_count - top_rows - bot_rows));
-	    mch_memmove((sb_line_T *)term->tl_scrollback.ga_data
-						       + line_count - top_rows,
+		    அளவு(sb_வரி_T) * bot_rows);
+	    mch_memmove((sb_வரி_T *)term->tl_scrollback.ga_data + bot_rows,
+		    temp + உச்சி_rows,
+		    அளவு(sb_வரி_T) * (வரி_மொத்தம் - உச்சி_rows - bot_rows));
+	    mch_memmove((sb_வரி_T *)term->tl_scrollback.ga_data
+						       + வரி_மொத்தம் - உச்சி_rows,
 		    temp,
-		    sizeof(sb_line_T) * top_rows);
+		    அளவு(sb_வரி_T) * உச்சி_rows);
 	    vim_free(temp);
 	}
     }
 
-    term->tl_top_diff_rows = bot_rows;
-    term->tl_bot_diff_rows = top_rows;
+    term->tl_உச்சி_diff_rows = bot_rows;
+    term->tl_bot_diff_rows = உச்சி_rows;
 
     update_screen(UPD_NOT_VALID);
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * "term_dumpdiff(filename, filename, options)" function
  */
-    void
+    வெறுமை
 f_term_dumpdiff(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	திரும்பு;
 
     term_load_dump(argvars, rettv, TRUE);
 }
@@ -6328,13 +6328,13 @@ f_term_dumpdiff(typval_T *argvars, typval_T *rettv)
 /*
  * "term_dumpload(filename, options)" function
  */
-    void
+    வெறுமை
 f_term_dumpload(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     term_load_dump(argvars, rettv, FALSE);
 }
@@ -6342,33 +6342,33 @@ f_term_dumpload(typval_T *argvars, typval_T *rettv)
 /*
  * "term_getaltscreen(buf)" function
  */
-    void
+    வெறுமை
 f_term_getaltscreen(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_getaltscreen()");
-    if (buf == NULL)
-	return;
-    rettv->vval.v_number = buf->b_term->tl_using_altscreen;
+    எனில் (buf == வெற்று)
+	திரும்பு;
+    rettv->vval.v_எண் = buf->b_term->tl_using_altscreen;
 }
 
 /*
  * "term_getattr(attr, name)" function
  */
-    void
+    வெறுமை
 f_term_getattr(typval_T *argvars, typval_T *rettv)
 {
-    int	    attr;
+    முழு	    attr;
     size_t  i;
     char_u  *name;
 
-    static struct {
-	char	    *name;
-	int	    attr;
+    நிலையான கட்டமைப்பு {
+	எழுத்து	    *name;
+	முழு	    attr;
     } attrs[] = {
 	{"bold",      HL_BOLD},
 	{"italic",    HL_ITALIC},
@@ -6377,30 +6377,30 @@ f_term_getattr(typval_T *argvars, typval_T *rettv)
 	{"reverse",   HL_INVERSE},
     };
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    எனில் (in_vim9script()
+	    && (check_for_எண்_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
-    attr = tv_get_number(&argvars[0]);
+    attr = tv_get_எண்(&argvars[0]);
     name = tv_get_string_chk(&argvars[1]);
-    if (name == NULL)
-	return;
+    எனில் (name == வெற்று)
+	திரும்பு;
 
-    if (attr > HL_ALL)
+    எனில் (attr > HL_ALL)
 	attr = syn_attr2attr(attr);
-    for (i = 0; i < ARRAY_LENGTH(attrs); ++i)
-	if (STRCMP(name, attrs[i].name) == 0)
+    க்கு (i = 0; i < ARRAY_LENGTH(attrs); ++i)
+	எனில் (STRCMP(name, attrs[i].name) == 0)
 	{
-	    rettv->vval.v_number = (attr & attrs[i].attr) != 0 ? 1 : 0;
-	    break;
+	    rettv->vval.v_எண் = (attr & attrs[i].attr) != 0 ? 1 : 0;
+	    நிறுத்து;
 	}
 }
 
 /*
  * "term_getcursor(buf)" function
  */
-    void
+    வெறுமை
 f_term_getcursor(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
@@ -6408,213 +6408,213 @@ f_term_getcursor(typval_T *argvars, typval_T *rettv)
     list_T	*l;
     dict_T	*d;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    எனில் (rettv_list_alloc(rettv) == FAIL)
+	திரும்பு;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_getcursor()");
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
     term = buf->b_term;
 
     l = rettv->vval.v_list;
-    list_append_number(l, term->tl_cursor_pos.row + 1);
-    list_append_number(l, term->tl_cursor_pos.col + 1);
+    list_append_எண்(l, term->tl_cursor_pos.row + 1);
+    list_append_எண்(l, term->tl_cursor_pos.col + 1);
 
     d = dict_alloc();
-    if (d == NULL)
-	return;
+    எனில் (d == வெற்று)
+	திரும்பு;
 
-    dict_add_number(d, "visible", term->tl_cursor_visible);
-    dict_add_number(d, "blink", blink_state_is_inverted()
+    dict_add_எண்(d, "visible", term->tl_cursor_visible);
+    dict_add_எண்(d, "blink", blink_state_is_inverted()
 	    ? !term->tl_cursor_blink : term->tl_cursor_blink);
-    dict_add_number(d, "shape", term->tl_cursor_shape);
+    dict_add_எண்(d, "shape", term->tl_cursor_shape);
     dict_add_string(d, "color", cursor_color_get(term->tl_cursor_color));
-    if (list_append_dict(l, d) == FAIL)
+    எனில் (list_append_dict(l, d) == FAIL)
 	dict_unref(d);
 }
 
 /*
  * "term_getjob(buf)" function
  */
-    void
+    வெறுமை
 f_term_getjob(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_getjob()");
-    if (buf == NULL)
+    எனில் (buf == வெற்று)
     {
-	if (in_vim9script())
+	எனில் (in_vim9script())
 	{
 	    rettv->v_type = VAR_JOB;
-	    rettv->vval.v_job = NULL;
+	    rettv->vval.v_job = வெற்று;
 	}
-	else
+	இல்லையெனில்
 	{
 	    rettv->v_type = VAR_SPECIAL;
-	    rettv->vval.v_number = VVAL_NULL;
+	    rettv->vval.v_எண் = VVAL_NULL;
 	}
-	return;
+	திரும்பு;
     }
 
     rettv->v_type = VAR_JOB;
     rettv->vval.v_job = buf->b_term->tl_job;
-    if (rettv->vval.v_job != NULL)
+    எனில் (rettv->vval.v_job != வெற்று)
 	++rettv->vval.v_job->jv_refcount;
 }
 
-    static int
-get_row_number(typval_T *tv, term_T *term)
+    நிலையான முழு
+get_row_எண்(typval_T *tv, term_T *term)
 {
-    if (tv->v_type == VAR_STRING
-	    && tv->vval.v_string != NULL
+    எனில் (tv->v_type == VAR_STRING
+	    && tv->vval.v_string != வெற்று
 	    && STRCMP(tv->vval.v_string, ".") == 0)
-	return term->tl_cursor_pos.row;
-    return (int)tv_get_number(tv) - 1;
+	திரும்பு term->tl_cursor_pos.row;
+    திரும்பு (முழு)tv_get_எண்(tv) - 1;
 }
 
 /*
  * "term_getline(buf, row)" function
  */
-    void
+    வெறுமை
 f_term_getline(typval_T *argvars, typval_T *rettv)
 {
     buf_T	    *buf;
     term_T	    *term;
-    int		    row;
+    முழு		    row;
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_getline()");
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
     term = buf->b_term;
-    row = get_row_number(&argvars[1], term);
+    row = get_row_எண்(&argvars[1], term);
 
-    if (term->tl_vterm == NULL)
+    எனில் (term->tl_vterm == வெற்று)
     {
 	linenr_T  lnum = 0;
 	size_t	  offset = 0;
-	int	  sb_row = term->tl_scrollback_scrolled + row;
-	sb_line_T *line;
+	முழு	  sb_row = term->tl_scrollback_scrolled + row;
+	sb_வரி_T *வரி;
 
-	if (sb_row < 0 || sb_row >= term->tl_scrollback.ga_len)
-	    return;
-	line = (sb_line_T *)term->tl_scrollback.ga_data + sb_row;
+	எனில் (sb_row < 0 || sb_row >= term->tl_scrollback.ga_len)
+	    திரும்பு;
+	வரி = (sb_வரி_T *)term->tl_scrollback.ga_data + sb_row;
 
-	scrollbackline_pos_in_buf(term, sb_row, &lnum, NULL, &offset);
+	scrollbackline_pos_in_buf(term, sb_row, &lnum, வெற்று, &offset);
 
 	// vterm is finished, get the text from the buffer
-	if (lnum > 0 && lnum <= buf->b_ml.ml_line_count)
+	எனில் (lnum > 0 && lnum <= buf->b_ml.ml_வரி_மொத்தம்)
 	{
 	    char_u *p = ml_get_buf(buf, lnum, FALSE);
-	    if (STRLEN(p) >= offset + line->sb_bytes)
-		rettv->vval.v_string = vim_strnsave(p + offset, line->sb_bytes);
+	    எனில் (STRLEN(p) >= offset + வரி->sb_bytes)
+		rettv->vval.v_string = vim_strnsave(p + offset, வரி->sb_bytes);
 	}
     }
-    else
+    இல்லையெனில்
     {
 	VTermScreen	*screen = vterm_obtain_screen(term->tl_vterm);
 	VTermRect	rect;
-	int		len;
+	முழு		len;
 	char_u		*p;
 
-	if (row < 0 || row >= term->tl_rows)
-	    return;
+	எனில் (row < 0 || row >= term->tl_rows)
+	    திரும்பு;
 	len = term->tl_cols * MB_MAXBYTES + 1;
 	p = alloc(len);
-	if (p == NULL)
-	    return;
+	எனில் (p == வெற்று)
+	    திரும்பு;
 	rettv->vval.v_string = p;
 
 	rect.start_col = 0;
 	rect.end_col = term->tl_cols;
 	rect.start_row = row;
 	rect.end_row = row + 1;
-	p[vterm_screen_get_text(screen, (char *)p, len, rect)] = NUL;
+	p[vterm_screen_get_text(screen, (எழுத்து *)p, len, rect)] = NUL;
     }
 }
 
 /*
  * "term_getscrolled(buf)" function
  */
-    void
+    வெறுமை
 f_term_getscrolled(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_getscrolled()");
-    if (buf == NULL)
-	return;
-    rettv->vval.v_number = buf->b_term->tl_buffer_scrolled;
+    எனில் (buf == வெற்று)
+	திரும்பு;
+    rettv->vval.v_எண் = buf->b_term->tl_buffer_scrolled;
 }
 
 /*
  * "term_getsize(buf)" function
  */
-    void
+    வெறுமை
 f_term_getsize(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
     list_T	*l;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    எனில் (rettv_list_alloc(rettv) == FAIL)
+	திரும்பு;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_getsize()");
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
 
     l = rettv->vval.v_list;
-    list_append_number(l, buf->b_term->tl_rows);
-    list_append_number(l, buf->b_term->tl_cols);
+    list_append_எண்(l, buf->b_term->tl_rows);
+    list_append_எண்(l, buf->b_term->tl_cols);
 }
 
 /*
  * "term_setsize(buf, rows, cols)" function
  */
-    void
+    வெறுமை
 f_term_setsize(typval_T *argvars, typval_T *rettv UNUSED)
 {
     buf_T	*buf;
     term_T	*term;
     varnumber_T rows, cols;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_எண்_arg(argvars, 1) == FAIL
+		|| check_for_எண்_arg(argvars, 2) == FAIL))
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_setsize()");
-    if (buf == NULL)
+    எனில் (buf == வெற்று)
     {
 	emsg(_(e_not_terminal_buffer));
-	return;
+	திரும்பு;
     }
-    if (buf->b_term->tl_vterm == NULL)
-	return;
+    எனில் (buf->b_term->tl_vterm == வெற்று)
+	திரும்பு;
     term = buf->b_term;
-    rows = tv_get_number(&argvars[1]);
+    rows = tv_get_எண்(&argvars[1]);
     rows = rows <= 0 ? term->tl_rows : rows;
-    cols = tv_get_number(&argvars[2]);
+    cols = tv_get_எண்(&argvars[2]);
     cols = cols <= 0 ? term->tl_cols : cols;
     vterm_set_size(term->tl_vterm, rows, cols);
     // handle_resize() will resize the windows
@@ -6627,7 +6627,7 @@ f_term_setsize(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "term_getstatus(buf)" function
  */
-    void
+    வெறுமை
 f_term_getstatus(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
@@ -6636,19 +6636,19 @@ f_term_getstatus(typval_T *argvars, typval_T *rettv)
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_getstatus()");
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
     term = buf->b_term;
 
-    if (term_job_running(term))
+    எனில் (term_job_running(term))
 	STRCPY(val, "running");
-    else
+    இல்லையெனில்
 	STRCPY(val, "finished");
-    if (term->tl_normal_mode)
+    எனில் (term->tl_normal_mode)
 	STRCAT(val, ",normal");
     rettv->vval.v_string = vim_strsave(val);
 }
@@ -6656,162 +6656,162 @@ f_term_getstatus(typval_T *argvars, typval_T *rettv)
 /*
  * "term_gettitle(buf)" function
  */
-    void
+    வெறுமை
 f_term_gettitle(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_gettitle()");
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
 
-    if (buf->b_term->tl_title != NULL)
+    எனில் (buf->b_term->tl_title != வெற்று)
 	rettv->vval.v_string = vim_strsave(buf->b_term->tl_title);
 }
 
 /*
  * "term_gettty(buf)" function
  */
-    void
+    வெறுமை
 f_term_gettty(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    char_u	*p = NULL;
-    int		num = 0;
+    char_u	*p = வெற்று;
+    முழு		இலக்கம் = 0;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     rettv->v_type = VAR_STRING;
     buf = term_get_buf(argvars, "term_gettty()");
-    if (buf == NULL)
-	return;
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	num = tv_get_bool(&argvars[1]);
+    எனில் (buf == வெற்று)
+	திரும்பு;
+    எனில் (argvars[1].v_type != VAR_UNKNOWN)
+	இலக்கம் = tv_get_bool(&argvars[1]);
 
-    switch (num)
+    தேர்வு (இலக்கம்)
     {
-	case 0:
-	    if (buf->b_term->tl_job != NULL)
+	நிலை 0:
+	    எனில் (buf->b_term->tl_job != வெற்று)
 		p = buf->b_term->tl_job->jv_tty_out;
-	    break;
-	case 1:
-	    if (buf->b_term->tl_job != NULL)
+	    நிறுத்து;
+	நிலை 1:
+	    எனில் (buf->b_term->tl_job != வெற்று)
 		p = buf->b_term->tl_job->jv_tty_in;
-	    break;
-	default:
+	    நிறுத்து;
+	இயல்பு:
 	    semsg(_(e_invalid_argument_str), tv_get_string(&argvars[1]));
-	    return;
+	    திரும்பு;
     }
-    if (p != NULL)
+    எனில் (p != வெற்று)
 	rettv->vval.v_string = vim_strsave(p);
 }
 
 /*
  * "term_list()" function
  */
-    void
+    வெறுமை
 f_term_list(typval_T *argvars UNUSED, typval_T *rettv)
 {
     term_T	*tp;
     list_T	*l;
 
-    if (rettv_list_alloc(rettv) == FAIL || first_term == NULL)
-	return;
+    எனில் (rettv_list_alloc(rettv) == FAIL || first_term == வெற்று)
+	திரும்பு;
 
     l = rettv->vval.v_list;
     FOR_ALL_TERMS(tp)
-	if (tp->tl_buffer != NULL)
-	    if (list_append_number(l,
+	எனில் (tp->tl_buffer != வெற்று)
+	    எனில் (list_append_எண்(l,
 				   (varnumber_T)tp->tl_buffer->b_fnum) == FAIL)
-		return;
+		திரும்பு;
 }
 
 /*
  * "term_scrape(buf, row)" function
  */
-    void
+    வெறுமை
 f_term_scrape(typval_T *argvars, typval_T *rettv)
 {
     buf_T	    *buf;
-    VTermScreen	    *screen = NULL;
+    VTermScreen	    *screen = வெற்று;
     VTermPos	    pos;
     list_T	    *l;
     term_T	    *term;
     char_u	    *p;
-    sb_line_T	    *line;
+    sb_வரி_T	    *வரி;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    எனில் (rettv_list_alloc(rettv) == FAIL)
+	திரும்பு;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_scrape()");
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
     term = buf->b_term;
 
     l = rettv->vval.v_list;
-    pos.row = get_row_number(&argvars[1], term);
+    pos.row = get_row_எண்(&argvars[1], term);
 
-    if (term->tl_vterm != NULL)
+    எனில் (term->tl_vterm != வெற்று)
     {
 	screen = vterm_obtain_screen(term->tl_vterm);
-	if (screen == NULL)  // can't really happen
-	    return;
-	p = NULL;
-	line = NULL;
+	எனில் (screen == வெற்று)  // can't really happen
+	    திரும்பு;
+	p = வெற்று;
+	வரி = வெற்று;
     }
-    else
+    இல்லையெனில்
     {
-	int	  sb_row = term->tl_scrollback_scrolled + pos.row;
+	முழு	  sb_row = term->tl_scrollback_scrolled + pos.row;
 	linenr_T  lnum = 0;
 	size_t	  offset = 0;
 
-	scrollbackline_pos_in_buf(term, sb_row, &lnum, NULL, &offset);
+	scrollbackline_pos_in_buf(term, sb_row, &lnum, வெற்று, &offset);
 
-	if (sb_row >= term->tl_scrollback.ga_len || lnum <= 0 || lnum > buf->b_ml.ml_line_count)
-	    return;
+	எனில் (sb_row >= term->tl_scrollback.ga_len || lnum <= 0 || lnum > buf->b_ml.ml_வரி_மொத்தம்)
+	    திரும்பு;
 
-	line = (sb_line_T *)term->tl_scrollback.ga_data + sb_row;
+	வரி = (sb_வரி_T *)term->tl_scrollback.ga_data + sb_row;
 	p = ml_get_buf(buf, lnum, FALSE);
 
-	if (STRLEN(p) < offset + line->sb_bytes)
-	    return;
+	எனில் (STRLEN(p) < offset + வரி->sb_bytes)
+	    திரும்பு;
 
 	p += offset;
     }
 
-    for (pos.col = 0; pos.col < term->tl_cols; )
+    க்கு (pos.col = 0; pos.col < term->tl_cols; )
     {
 	dict_T		*dcell;
-	int		width;
+	முழு		width;
 	VTermScreenCellAttrs attrs;
 	VTermColor	fg, bg;
 	char_u		rgb[8];
 	size_t		rgblen;
 	char_u		mbs[MB_MAXBYTES * VTERM_MAX_CHARS_PER_CELL + 1];
 	size_t		mbslen;
-	int		i;
+	முழு		i;
 
-	if (screen == NULL)
+	எனில் (screen == வெற்று)
 	{
 	    cellattr_T	*cellattr;
 
 	    // vterm has finished, get the cell from scrollback
-	    if (pos.col >= line->sb_cols)
-		break;
-	    cellattr = line->sb_cells + pos.col;
+	    எனில் (pos.col >= வரி->sb_cols)
+		நிறுத்து;
+	    cellattr = வரி->sb_cells + pos.col;
 	    width = cellattr->width;
 	    attrs = cellattr->attrs;
 	    fg = cellattr->fg;
@@ -6821,19 +6821,19 @@ f_term_scrape(typval_T *argvars, typval_T *rettv)
 	    mbs[mbslen] = NUL;
 	    p += mbslen;
 	}
-	else
+	இல்லையெனில்
 	{
 	    VTermScreenCell cell;
 
-	    if (vterm_screen_get_cell(screen, pos, &cell) == 0)
-		break;
+	    எனில் (vterm_screen_get_cell(screen, pos, &cell) == 0)
+		நிறுத்து;
 
 	    mbslen = 0;
-	    for (i = 0; i < VTERM_MAX_CHARS_PER_CELL; ++i)
+	    க்கு (i = 0; i < VTERM_MAX_CHARS_PER_CELL; ++i)
 	    {
-		if (cell.chars[i] == 0)
-		    break;
-		mbslen += (*utf_char2bytes)((int)cell.chars[i], mbs + mbslen);
+		எனில் (cell.chars[i] == 0)
+		    நிறுத்து;
+		mbslen += (*utf_char2bytes)((முழு)cell.chars[i], mbs + mbslen);
 	    }
 	    mbs[mbslen] = NUL;
 	    width = cell.width;
@@ -6842,29 +6842,29 @@ f_term_scrape(typval_T *argvars, typval_T *rettv)
 	    bg = cell.bg;
 	}
 	dcell = dict_alloc();
-	if (dcell == NULL)
-	    break;
-	if (list_append_dict(l, dcell) == FAIL)
+	எனில் (dcell == வெற்று)
+	    நிறுத்து;
+	எனில் (list_append_dict(l, dcell) == FAIL)
 	{
 	    dict_unref(dcell);
-	    break;
+	    நிறுத்து;
 	}
 
-	dict_add_string_len(dcell, "chars", mbs, (int)mbslen);
+	dict_add_string_len(dcell, "chars", mbs, (முழு)mbslen);
 
-	rgblen = vim_snprintf_safelen((char *)rgb, sizeof(rgb),
+	rgblen = vim_snprintf_safelen((எழுத்து *)rgb, அளவு(rgb),
 	    "#%02x%02x%02x", fg.red, fg.green, fg.blue);
-	dict_add_string_len(dcell, "fg", rgb, (int)rgblen);
-	rgblen = vim_snprintf_safelen((char *)rgb, sizeof(rgb),
+	dict_add_string_len(dcell, "fg", rgb, (முழு)rgblen);
+	rgblen = vim_snprintf_safelen((எழுத்து *)rgb, அளவு(rgb),
 	    "#%02x%02x%02x", bg.red, bg.green, bg.blue);
-	dict_add_string_len(dcell, "bg", rgb, (int)rgblen);
+	dict_add_string_len(dcell, "bg", rgb, (முழு)rgblen);
 
-	dict_add_number(dcell, "attr",
-				      cell2attr(term, NULL, &attrs, &fg, &bg));
-	dict_add_number(dcell, "width", width);
+	dict_add_எண்(dcell, "attr",
+				      cell2attr(term, வெற்று, &attrs, &fg, &bg));
+	dict_add_எண்(dcell, "width", width);
 
 	++pos.col;
-	if (width == 2)
+	எனில் (width == 2)
 	    ++pos.col;
     }
 }
@@ -6872,52 +6872,52 @@ f_term_scrape(typval_T *argvars, typval_T *rettv)
 /*
  * "term_sendkeys(buf, keys)" function
  */
-    void
+    வெறுமை
 f_term_sendkeys(typval_T *argvars, typval_T *rettv UNUSED)
 {
     buf_T	*buf;
-    char_u	*msg;
+    char_u	*செய்தி;
     term_T	*term;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_sendkeys()");
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
 
-    msg = tv_get_string_chk(&argvars[1]);
-    if (msg == NULL)
-	return;
+    செய்தி = tv_get_string_chk(&argvars[1]);
+    எனில் (செய்தி == வெற்று)
+	திரும்பு;
     term = buf->b_term;
-    if (term->tl_vterm == NULL)
-	return;
+    எனில் (term->tl_vterm == வெற்று)
+	திரும்பு;
 
-    while (*msg != NUL)
+    போது (*செய்தி != NUL)
     {
-	int c;
+	முழு c;
 
-	if (*msg == K_SPECIAL && msg[1] != NUL && msg[2] != NUL)
+	எனில் (*செய்தி == K_SPECIAL && செய்தி[1] != NUL && செய்தி[2] != NUL)
 	{
-	    c = TO_SPECIAL(msg[1], msg[2]);
-	    msg += 3;
+	    c = TO_SPECIAL(செய்தி[1], செய்தி[2]);
+	    செய்தி += 3;
 	}
-	else
+	இல்லையெனில்
 	{
-	    c = PTR2CHAR(msg);
-	    msg += MB_CPTR2LEN(msg);
+	    c = PTR2CHAR(செய்தி);
+	    செய்தி += MB_CPTR2LEN(செய்தி);
 	}
-	send_keys_to_term(term, c, 0, FALSE);
+	send_சாவிகள்_to_term(term, c, 0, FALSE);
     }
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#எனில் defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * "term_getansicolors(buf)" function
  */
-    void
+    வெறுமை
 f_term_getansicolors(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
@@ -6925,88 +6925,88 @@ f_term_getansicolors(typval_T *argvars, typval_T *rettv)
     VTermState	*state;
     VTermColor  color;
     char_u	hexbuf[10];
-    int		index;
+    முழு		index;
     list_T	*list;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    எனில் (rettv_list_alloc(rettv) == FAIL)
+	திரும்பு;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_getansicolors()");
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
     term = buf->b_term;
-    if (term->tl_vterm == NULL)
-	return;
+    எனில் (term->tl_vterm == வெற்று)
+	திரும்பு;
 
     list = rettv->vval.v_list;
     state = vterm_obtain_state(term->tl_vterm);
-    for (index = 0; index < 16; index++)
+    க்கு (index = 0; index < 16; index++)
     {
 	size_t	hexbuflen;
 
 	vterm_state_get_palette_color(state, index, &color);
-	hexbuflen = vim_snprintf_safelen((char *)hexbuf, sizeof(hexbuf),
+	hexbuflen = vim_snprintf_safelen((எழுத்து *)hexbuf, அளவு(hexbuf),
 	    "#%02x%02x%02x", color.red, color.green, color.blue);
-	if (list_append_string(list, hexbuf, (int)hexbuflen) == FAIL)
-	    return;
+	எனில் (list_append_string(list, hexbuf, (முழு)hexbuflen) == FAIL)
+	    திரும்பு;
     }
 }
 
 /*
  * "term_setansicolors(buf, list)" function
  */
-    void
+    வெறுமை
 f_term_setansicolors(typval_T *argvars, typval_T *rettv UNUSED)
 {
     buf_T	*buf;
     term_T	*term;
     listitem_T	*li;
-    int		n = 0;
+    முழு		n = 0;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_setansicolors()");
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
     term = buf->b_term;
-    if (term->tl_vterm == NULL)
-	return;
+    எனில் (term->tl_vterm == வெற்று)
+	திரும்பு;
 
-    if (check_for_nonnull_list_arg(argvars, 1) == FAIL)
-	return;
+    எனில் (check_for_nonnull_list_arg(argvars, 1) == FAIL)
+	திரும்பு;
 
-    if (argvars[1].vval.v_list->lv_first == &range_list_item
+    எனில் (argvars[1].vval.v_list->lv_first == &range_list_item
 	    || argvars[1].vval.v_list->lv_len != 16)
     {
-	semsg(_(e_invalid_value_for_argument_str), "\"colors\"");
-	return;
+	semsg(_(e_invalid_மதிப்பு_for_argument_str), "\"colors\"");
+	திரும்பு;
     }
 
-    if (term->tl_palette == NULL)
+    எனில் (term->tl_palette == வெற்று)
 	term->tl_palette = ALLOC_MULT(long_u, 16);
-    if (term->tl_palette == NULL)
-	return;
+    எனில் (term->tl_palette == வெற்று)
+	திரும்பு;
 
-    FOR_ALL_LIST_ITEMS(argvars[1].vval.v_list, li)
+    FOR_ALL_LIST_பொருட்கள்(argvars[1].vval.v_list, li)
     {
 	char_u		*color_name;
 	guicolor_T	guicolor;
 
 	color_name = tv_get_string_chk(&li->li_tv);
-	if (color_name == NULL)
-	    return;
+	எனில் (color_name == வெற்று)
+	    திரும்பு;
 
 	guicolor = GUI_GET_COLOR(color_name);
-	if (guicolor == INVALCOLOR)
+	எனில் (guicolor == INVALCOLOR)
 	{
 	    semsg(_(e_cannot_allocate_color_str), color_name);
-	    return;
+	    திரும்பு;
 	}
 
 	term->tl_palette[n++] = GUI_MCH_GET_RGB(guicolor);
@@ -7019,102 +7019,102 @@ f_term_setansicolors(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "term_setapi(buf, api)" function
  */
-    void
+    வெறுமை
 f_term_setapi(typval_T *argvars, typval_T *rettv UNUSED)
 {
     buf_T	*buf;
     term_T	*term;
     char_u	*api;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_setapi()");
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
     term = buf->b_term;
     vim_free(term->tl_api);
     api = tv_get_string_chk(&argvars[1]);
-    if (api != NULL)
+    எனில் (api != வெற்று)
 	term->tl_api = vim_strsave(api);
-    else
-	term->tl_api = NULL;
+    இல்லையெனில்
+	term->tl_api = வெற்று;
 }
 
 /*
  * "term_setrestore(buf, command)" function
  */
-    void
+    வெறுமை
 f_term_setrestore(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-#if defined(FEAT_SESSION)
+#எனில் defined(FEAT_SESSION)
     buf_T	*buf;
     term_T	*term;
     char_u	*cmd;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_setrestore()");
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
     term = buf->b_term;
     vim_free(term->tl_command);
     cmd = tv_get_string_chk(&argvars[1]);
-    if (cmd != NULL)
+    எனில் (cmd != வெற்று)
 	term->tl_command = vim_strsave(cmd);
-    else
-	term->tl_command = NULL;
+    இல்லையெனில்
+	term->tl_command = வெற்று;
 #endif
 }
 
 /*
  * "term_setkill(buf, how)" function
  */
-    void
+    வெறுமை
 f_term_setkill(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     buf_T	*buf;
     term_T	*term;
     char_u	*how;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_setkill()");
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
     term = buf->b_term;
     vim_free(term->tl_kill);
     how = tv_get_string_chk(&argvars[1]);
-    if (how != NULL)
+    எனில் (how != வெற்று)
 	term->tl_kill = vim_strsave(how);
-    else
-	term->tl_kill = NULL;
+    இல்லையெனில்
+	term->tl_kill = வெற்று;
 }
 
 /*
  * "term_start(command, options)" function
  */
-    void
+    வெறுமை
 f_term_start(typval_T *argvars, typval_T *rettv)
 {
     jobopt_T	opt;
     buf_T	*buf;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     init_job_options(&opt);
-    if (argvars[1].v_type != VAR_UNKNOWN
+    எனில் (argvars[1].v_type != VAR_UNKNOWN
 	    && get_job_options(&argvars[1], &opt,
 		JO_TIMEOUT_ALL + JO_STOPONEXIT
 		    + JO_CALLBACK + JO_OUT_CALLBACK + JO_ERR_CALLBACK
@@ -7124,72 +7124,72 @@ f_term_start(typval_T *argvars, typval_T *rettv)
 		    + JO2_CWD + JO2_ENV + JO2_EOF_CHARS
 		    + JO2_NORESTORE + JO2_TERM_KILL + JO2_TERM_HIGHLIGHT
 		    + JO2_ANSI_COLORS + JO2_TTY_TYPE + JO2_TERM_API) == FAIL)
-	return;
+	திரும்பு;
 
-    buf = term_start(&argvars[0], NULL, &opt, 0);
+    buf = term_start(&argvars[0], வெற்று, &opt, 0);
 
-    if (buf != NULL && buf->b_term != NULL)
-	rettv->vval.v_number = buf->b_fnum;
+    எனில் (buf != வெற்று && buf->b_term != வெற்று)
+	rettv->vval.v_எண் = buf->b_fnum;
 }
 
 /*
  * "term_wait" function
  */
-    void
+    வெறுமை
 f_term_wait(typval_T *argvars, typval_T *rettv UNUSED)
 {
     buf_T	*buf;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_எண்_arg(argvars, 1) == FAIL))
+	திரும்பு;
 
     buf = term_get_buf(argvars, "term_wait()");
-    if (buf == NULL)
-	return;
-    if (buf->b_term->tl_job == NULL)
+    எனில் (buf == வெற்று)
+	திரும்பு;
+    எனில் (buf->b_term->tl_job == வெற்று)
     {
-	ch_log(NULL, "term_wait(): no job to wait for");
-	return;
+	ch_log(வெற்று, "term_wait(): no job to wait for");
+	திரும்பு;
     }
-    if (buf->b_term->tl_job->jv_channel == NULL)
+    எனில் (buf->b_term->tl_job->jv_channel == வெற்று)
 	// channel is closed, nothing to do
-	return;
+	திரும்பு;
 
     // Get the job status, this will detect a job that finished.
-    if (!buf->b_term->tl_job->jv_channel->ch_keep_open
+    எனில் (!buf->b_term->tl_job->jv_channel->ch_keep_open
 	    && STRCMP(job_status(buf->b_term->tl_job), "dead") == 0)
     {
 	// The job is dead, keep reading channel I/O until the channel is
 	// closed. buf->b_term may become NULL if the terminal was closed while
 	// waiting.
-	ch_log(NULL, "term_wait(): waiting for channel to close");
-	while (buf->b_term != NULL && !buf->b_term->tl_channel_closed)
+	ch_log(வெற்று, "term_wait(): waiting for channel to close");
+	போது (buf->b_term != வெற்று && !buf->b_term->tl_channel_closed)
 	{
 	    term_flush_messages();
 
 	    ui_delay(10L, FALSE);
-	    if (!buf_valid(buf))
+	    எனில் (!buf_valid(buf))
 		// If the terminal is closed when the channel is closed the
 		// buffer disappears.
-		break;
-	    if (buf->b_term == NULL || buf->b_term->tl_channel_closing)
+		நிறுத்து;
+	    எனில் (buf->b_term == வெற்று || buf->b_term->tl_channel_closing)
 		// came here from a close callback, only wait one time
-		break;
+		நிறுத்து;
 	}
 
 	term_flush_messages();
     }
-    else
+    இல்லையெனில்
     {
 	long wait = 10L;
 
 	term_flush_messages();
 
 	// Wait for some time for any channel I/O.
-	if (argvars[1].v_type != VAR_UNKNOWN)
-	    wait = tv_get_number(&argvars[1]);
+	எனில் (argvars[1].v_type != VAR_UNKNOWN)
+	    wait = tv_get_எண்(&argvars[1]);
 	ui_delay(wait, TRUE);
 
 	// Flushing messages on channels is hopefully sufficient.
@@ -7202,37 +7202,37 @@ f_term_wait(typval_T *argvars, typval_T *rettv UNUSED)
  * Called when a channel has sent all the lines to a terminal.
  * Send a CTRL-D to mark the end of the text.
  */
-    void
+    வெறுமை
 term_send_eof(channel_T *ch)
 {
     term_T	*term;
 
     FOR_ALL_TERMS(term)
-	if (term->tl_job == ch->ch_job)
+	எனில் (term->tl_job == ch->ch_job)
 	{
-	    if (term->tl_eof_chars != NULL)
+	    எனில் (term->tl_eof_chars != வெற்று)
 	    {
 		channel_send(ch, PART_IN, term->tl_eof_chars,
-					(int)STRLEN(term->tl_eof_chars), NULL);
-		channel_send(ch, PART_IN, (char_u *)"\r", 1, NULL);
+					(முழு)STRLEN(term->tl_eof_chars), வெற்று);
+		channel_send(ch, PART_IN, (char_u *)"\r", 1, வெற்று);
 	    }
 #ifdef MSWIN
-	    else
+	    இல்லையெனில்
 		// Default: CTRL-D
-		channel_send(ch, PART_IN, (char_u *)"\004\r", 2, NULL);
+		channel_send(ch, PART_IN, (char_u *)"\004\r", 2, வெற்று);
 #endif
 	}
 }
 
-#if defined(FEAT_GUI)
+#எனில் defined(FEAT_GUI)
     job_T *
 term_getjob(term_T *term)
 {
-    return term != NULL ? term->tl_job : NULL;
+    திரும்பு term != வெற்று ? term->tl_job : வெற்று;
 }
 #endif
 
-#if defined(MSWIN)
+#எனில் defined(MSWIN)
 
 ///////////////////////////////////////
 // 2. MS-Windows implementation.
@@ -7242,16 +7242,16 @@ HRESULT (WINAPI *pResizePseudoConsole)(HPCON, COORD);
 HRESULT (WINAPI *pClosePseudoConsole)(HPCON);
 BOOL (WINAPI *pInitializeProcThreadAttributeList)(LPPROC_THREAD_ATTRIBUTE_LIST, DWORD, DWORD, PSIZE_T);
 BOOL (WINAPI *pUpdateProcThreadAttribute)(LPPROC_THREAD_ATTRIBUTE_LIST, DWORD, DWORD_PTR, PVOID, SIZE_T, PVOID, PSIZE_T);
-void (WINAPI *pDeleteProcThreadAttributeList)(LPPROC_THREAD_ATTRIBUTE_LIST);
+வெறுமை (WINAPI *pDeleteProcThreadAttributeList)(LPPROC_THREAD_ATTRIBUTE_LIST);
 
-    static int
-dyn_conpty_init(int verbose)
+    நிலையான முழு
+dyn_conpty_init(முழு verbose)
 {
-    static HMODULE	hKerneldll = NULL;
-    int			i;
-    static struct
+    நிலையான HMODULE	hKerneldll = வெற்று;
+    முழு			i;
+    நிலையான கட்டமைப்பு
     {
-	char	*name;
+	எழுத்து	*name;
 	FARPROC	*ptr;
     } conpty_entry[] =
     {
@@ -7264,88 +7264,88 @@ dyn_conpty_init(int verbose)
 				(FARPROC*)&pUpdateProcThreadAttribute},
 	{"DeleteProcThreadAttributeList",
 				(FARPROC*)&pDeleteProcThreadAttributeList},
-	{NULL, NULL}
+	{வெற்று, வெற்று}
     };
 
-    if (!has_conpty_working())
+    எனில் (!has_conpty_working())
     {
-	if (verbose)
+	எனில் (verbose)
 	    emsg(_(e_conpty_is_not_available));
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     // No need to initialize twice.
-    if (hKerneldll)
-	return OK;
+    எனில் (hKerneldll)
+	திரும்பு OK;
 
     hKerneldll = vimLoadLib("kernel32.dll");
-    for (i = 0; conpty_entry[i].name != NULL
-					&& conpty_entry[i].ptr != NULL; ++i)
+    க்கு (i = 0; conpty_entry[i].name != வெற்று
+					&& conpty_entry[i].ptr != வெற்று; ++i)
     {
-	if ((*conpty_entry[i].ptr = (FARPROC)GetProcAddress(hKerneldll,
-						conpty_entry[i].name)) == NULL)
+	எனில் ((*conpty_entry[i].ptr = (FARPROC)GetProcAddress(hKerneldll,
+						conpty_entry[i].name)) == வெற்று)
 	{
-	    if (verbose)
+	    எனில் (verbose)
 		semsg(_(e_could_not_load_library_function_str), conpty_entry[i].name);
-	    hKerneldll = NULL;
-	    return FAIL;
+	    hKerneldll = வெற்று;
+	    திரும்பு FAIL;
 	}
     }
 
-    return OK;
+    திரும்பு OK;
 }
 
-    static int
+    நிலையான முழு
 conpty_term_and_job_init(
 	term_T	    *term,
 	typval_T    *argvar,
-	char	    **argv UNUSED,
+	எழுத்து	    **argv UNUSED,
 	jobopt_T    *opt,
 	jobopt_T    *orig_opt)
 {
-    WCHAR	    *cmd_wchar = NULL;
-    WCHAR	    *cmd_wchar_copy = NULL;
-    WCHAR	    *cwd_wchar = NULL;
-    WCHAR	    *env_wchar = NULL;
-    channel_T	    *channel = NULL;
-    job_T	    *job = NULL;
-    HANDLE	    jo = NULL;
+    WCHAR	    *cmd_wchar = வெற்று;
+    WCHAR	    *cmd_wchar_copy = வெற்று;
+    WCHAR	    *cwd_wchar = வெற்று;
+    WCHAR	    *env_wchar = வெற்று;
+    channel_T	    *channel = வெற்று;
+    job_T	    *job = வெற்று;
+    HANDLE	    jo = வெற்று;
     garray_T	    ga_cmd, ga_env;
-    char_u	    *cmd = NULL;
+    char_u	    *cmd = வெற்று;
     HRESULT	    hr;
     COORD	    consize;
     SIZE_T	    breq;
     PROCESS_INFORMATION proc_info;
-    HANDLE	    i_theirs = NULL;
-    HANDLE	    o_theirs = NULL;
-    HANDLE	    i_ours = NULL;
-    HANDLE	    o_ours = NULL;
-    char	    *errmsg = NULL;
+    HANDLE	    i_theirs = வெற்று;
+    HANDLE	    o_theirs = வெற்று;
+    HANDLE	    i_ours = வெற்று;
+    HANDLE	    o_ours = வெற்று;
+    எழுத்து	    *errmsg = வெற்று;
 
-    ga_init2(&ga_cmd, sizeof(char*), 20);
-    ga_init2(&ga_env, sizeof(char*), 20);
+    ga_init2(&ga_cmd, அளவு(எழுத்து*), 20);
+    ga_init2(&ga_env, அளவு(எழுத்து*), 20);
 
-    if (argvar->v_type == VAR_STRING)
+    எனில் (argvar->v_type == VAR_STRING)
     {
 	cmd = argvar->vval.v_string;
     }
-    else if (argvar->v_type == VAR_LIST)
+    இல்லையெனில் எனில் (argvar->v_type == VAR_LIST)
     {
-	if (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
-	    goto failed;
+	எனில் (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
+	    செல் failed;
 	cmd = ga_cmd.ga_data;
     }
-    if (cmd == NULL || *cmd == NUL)
+    எனில் (cmd == வெற்று || *cmd == NUL)
     {
 	emsg(_(e_invalid_argument));
-	goto failed;
+	செல் failed;
     }
 
     term->tl_arg0_cmd = vim_strsave(cmd);
 
-    cmd_wchar = enc_to_utf16(cmd, NULL);
+    cmd_wchar = enc_to_utf16(cmd, வெற்று);
 
-    if (cmd_wchar != NULL)
+    எனில் (cmd_wchar != வெற்று)
     {
 	// Request by CreateProcessW
 	breq = wcslen(cmd_wchar) + 1 + 1;	// Addition of NUL by API
@@ -7354,86 +7354,86 @@ conpty_term_and_job_init(
     }
 
     ga_clear(&ga_cmd);
-    if (cmd_wchar == NULL)
-	goto failed;
-    if (opt->jo_cwd != NULL)
+    எனில் (cmd_wchar == வெற்று)
+	செல் failed;
+    எனில் (opt->jo_cwd != வெற்று)
     {
-	cwd_wchar = enc_to_utf16(opt->jo_cwd, NULL);
-	if (cwd_wchar == NULL)
-	    goto failed;
+	cwd_wchar = enc_to_utf16(opt->jo_cwd, வெற்று);
+	எனில் (cwd_wchar == வெற்று)
+	    செல் failed;
     }
 
     win32_build_env(opt->jo_env, &ga_env, TRUE);
     env_wchar = ga_env.ga_data;
 
-    if (!CreatePipe(&i_theirs, &i_ours, NULL, 0))
-	goto failed;
-    if (!CreatePipe(&o_ours, &o_theirs, NULL, 0))
-	goto failed;
+    எனில் (!CreatePipe(&i_theirs, &i_ours, வெற்று, 0))
+	செல் failed;
+    எனில் (!CreatePipe(&o_ours, &o_theirs, வெற்று, 0))
+	செல் failed;
 
     consize.X = term->tl_cols;
     consize.Y = term->tl_rows;
     hr = pCreatePseudoConsole(consize, i_theirs, o_theirs, 0,
 							     &term->tl_conpty);
-    if (FAILED(hr))
-	goto failed;
+    எனில் (FAILED(hr))
+	செல் failed;
 
-    term->tl_siex.StartupInfo.cb = sizeof(term->tl_siex);
+    term->tl_siex.StartupInfo.cb = அளவு(term->tl_siex);
 
     // Explicitly invalidate std handles to prevent inheritance of
     // the debugger's stdout (e.g., in Visual Studio debugging sessions),
     // which could cause job output to go to the debugger instead of
     // the intended ConPTY, even with bInheritHandles set to FALSE in CreateProcess.
     term->tl_siex.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
-    term->tl_siex.StartupInfo.hStdInput = INVALID_HANDLE_VALUE;
-    term->tl_siex.StartupInfo.hStdOutput = INVALID_HANDLE_VALUE;
-    term->tl_siex.StartupInfo.hStdError = INVALID_HANDLE_VALUE;
+    term->tl_siex.StartupInfo.h_Std_உள்ளீடு = INVALID_HANDLE_மதிப்பு;
+    term->tl_siex.StartupInfo.hStdOutput = INVALID_HANDLE_மதிப்பு;
+    term->tl_siex.StartupInfo.hStdError = INVALID_HANDLE_மதிப்பு;
 
     // Set up pipe inheritance safely: Vista or later.
-    pInitializeProcThreadAttributeList(NULL, 1, 0, &breq);
+    pInitializeProcThreadAttributeList(வெற்று, 1, 0, &breq);
     term->tl_siex.lpAttributeList = alloc(breq);
-    if (!term->tl_siex.lpAttributeList)
-	goto failed;
-    if (!pInitializeProcThreadAttributeList(term->tl_siex.lpAttributeList, 1,
+    எனில் (!term->tl_siex.lpAttributeList)
+	செல் failed;
+    எனில் (!pInitializeProcThreadAttributeList(term->tl_siex.lpAttributeList, 1,
 								     0, &breq))
-	goto failed;
-    if (!pUpdateProcThreadAttribute(
+	செல் failed;
+    எனில் (!pUpdateProcThreadAttribute(
 	    term->tl_siex.lpAttributeList, 0,
 	    PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE, term->tl_conpty,
-	    sizeof(HPCON), NULL, NULL))
-	goto failed;
+	    அளவு(HPCON), வெற்று, வெற்று))
+	செல் failed;
 
     channel = add_channel();
-    if (channel == NULL)
-	goto failed;
+    எனில் (channel == வெற்று)
+	செல் failed;
 
     job = job_alloc();
-    if (job == NULL)
-	goto failed;
-    if (argvar->v_type == VAR_STRING)
+    எனில் (job == வெற்று)
+	செல் failed;
+    எனில் (argvar->v_type == VAR_STRING)
     {
-	int argc;
+	முழு argc;
 
 	build_argv_from_string(cmd, &job->jv_argv, &argc);
     }
-    else
+    இல்லையெனில்
     {
-	int argc;
+	முழு argc;
 
 	build_argv_from_list(argvar->vval.v_list, &job->jv_argv, &argc);
     }
 
-    if (opt->jo_set & JO_IN_BUF)
+    எனில் (opt->jo_set & JO_IN_BUF)
 	job->jv_in_buf = buflist_findnr(opt->jo_io_buf[PART_IN]);
 
-    if (!CreateProcessW(NULL, cmd_wchar_copy, NULL, NULL, FALSE,
+    எனில் (!CreateProcessW(வெற்று, cmd_wchar_copy, வெற்று, வெற்று, FALSE,
 	    EXTENDED_STARTUPINFO_PRESENT | CREATE_UNICODE_ENVIRONMENT
 	    | CREATE_SUSPENDED | CREATE_DEFAULT_ERROR_MODE,
 	    env_wchar, cwd_wchar,
 	    &term->tl_siex.StartupInfo, &proc_info))
     {
 	errmsg = GetWin32Error();
-	goto failed;
+	செல் failed;
     }
 
     CloseHandle(i_theirs);
@@ -7452,15 +7452,15 @@ conpty_term_and_job_init(
     // from a buffer etc. is finished.
     channel->ch_anonymous_pipe = TRUE;
 
-    jo = CreateJobObject(NULL, NULL);
-    if (jo == NULL)
-	goto failed;
+    jo = CreateJobObject(வெற்று, வெற்று);
+    எனில் (jo == வெற்று)
+	செல் failed;
 
-    if (!AssignProcessToJobObject(jo, proc_info.hProcess))
+    எனில் (!AssignProcessToJobObject(jo, proc_info.hProcess))
     {
 	// Failed, switch the way to terminate process with TerminateProcess.
 	CloseHandle(jo);
-	jo = NULL;
+	jo = வெற்று;
     }
 
     ResumeThread(proc_info.hThread);
@@ -7471,15 +7471,15 @@ conpty_term_and_job_init(
     vim_free(cwd_wchar);
     vim_free(env_wchar);
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	goto failed;
+    எனில் (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
+	செல் failed;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette())
+# எனில் defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    எனில் (term_use_palette())
     {
-	if (term->tl_palette != NULL)
+	எனில் (term->tl_palette != வெற்று)
 	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
+	இல்லையெனில்
 	    init_vterm_ansi_colors(term->tl_vterm);
     }
 # endif
@@ -7498,17 +7498,17 @@ conpty_term_and_job_init(
     // Redirecting stdout and stderr doesn't work at the job level.  Instead
     // open the file here and handle it in.  opt->jo_io was changed in
     // setup_job_options(), use the original flags here.
-    if (orig_opt->jo_io[PART_OUT] == JIO_FILE)
+    எனில் (orig_opt->jo_io[PART_OUT] == JIO_FILE)
     {
 	char_u *fname = opt->jo_io_name[PART_OUT];
 
 	ch_log(channel, "Opening output file %s", fname);
-	term->tl_out_fd = mch_fopen((char *)fname, WRITEBIN);
-	if (term->tl_out_fd == NULL)
+	term->tl_out_fd = mch_fopen((எழுத்து *)fname, WRITEBIN);
+	எனில் (term->tl_out_fd == வெற்று)
 	    semsg(_(e_cant_open_file_str), fname);
     }
 
-    return OK;
+    திரும்பு OK;
 
 failed:
     ga_clear(&ga_cmd);
@@ -7516,42 +7516,42 @@ failed:
     vim_free(cmd_wchar);
     vim_free(cmd_wchar_copy);
     vim_free(cwd_wchar);
-    if (channel != NULL)
+    எனில் (channel != வெற்று)
 	channel_clear(channel);
-    if (job != NULL)
+    எனில் (job != வெற்று)
     {
-	job->jv_channel = NULL;
+	job->jv_channel = வெற்று;
 	job_cleanup(job);
     }
-    term->tl_job = NULL;
-    if (jo != NULL)
+    term->tl_job = வெற்று;
+    எனில் (jo != வெற்று)
 	CloseHandle(jo);
 
-    if (term->tl_siex.lpAttributeList != NULL)
+    எனில் (term->tl_siex.lpAttributeList != வெற்று)
     {
 	pDeleteProcThreadAttributeList(term->tl_siex.lpAttributeList);
 	vim_free(term->tl_siex.lpAttributeList);
     }
-    term->tl_siex.lpAttributeList = NULL;
-    if (o_theirs != NULL)
+    term->tl_siex.lpAttributeList = வெற்று;
+    எனில் (o_theirs != வெற்று)
 	CloseHandle(o_theirs);
-    if (o_ours != NULL)
+    எனில் (o_ours != வெற்று)
 	CloseHandle(o_ours);
-    if (i_ours != NULL)
+    எனில் (i_ours != வெற்று)
 	CloseHandle(i_ours);
-    if (i_theirs != NULL)
+    எனில் (i_theirs != வெற்று)
 	CloseHandle(i_theirs);
-    if (term->tl_conpty != NULL)
+    எனில் (term->tl_conpty != வெற்று)
 	pClosePseudoConsole(term->tl_conpty);
-    term->tl_conpty = NULL;
+    term->tl_conpty = வெற்று;
     // Propagate errors that occur in CreateProcess
-    if (errmsg)
+    எனில் (errmsg)
 	semsg("CreateProcess failed: %s", errmsg);
-    return FAIL;
+    திரும்பு FAIL;
 }
 
-    static void
-conpty_term_report_winsize(term_T *term, int rows, int cols)
+    நிலையான வெறுமை
+conpty_term_report_winsize(term_T *term, முழு rows, முழு cols)
 {
     COORD consize;
 
@@ -7560,58 +7560,58 @@ conpty_term_report_winsize(term_T *term, int rows, int cols)
     pResizePseudoConsole(term->tl_conpty, consize);
 }
 
-    static void
+    நிலையான வெறுமை
 term_free_conpty(term_T *term)
 {
-    if (term->tl_siex.lpAttributeList != NULL)
+    எனில் (term->tl_siex.lpAttributeList != வெற்று)
     {
 	pDeleteProcThreadAttributeList(term->tl_siex.lpAttributeList);
 	vim_free(term->tl_siex.lpAttributeList);
     }
-    term->tl_siex.lpAttributeList = NULL;
-    if (term->tl_conpty != NULL)
+    term->tl_siex.lpAttributeList = வெற்று;
+    எனில் (term->tl_conpty != வெற்று)
 	pClosePseudoConsole(term->tl_conpty);
-    term->tl_conpty = NULL;
+    term->tl_conpty = வெற்று;
 }
 
-    int
-use_conpty(void)
+    முழு
+use_conpty(வெறுமை)
 {
-    return has_conpty;
+    திரும்பு has_conpty;
 }
 
 # define WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN 1ul
 # define WINPTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN 2ull
 # define WINPTY_MOUSE_MODE_FORCE		2
 
-void* (*winpty_config_new)(UINT64, void*);
-void* (*winpty_open)(void*, void*);
-void* (*winpty_spawn_config_new)(UINT64, void*, LPCWSTR, void*, void*, void*);
-BOOL (*winpty_spawn)(void*, void*, HANDLE*, HANDLE*, DWORD*, void*);
-void (*winpty_config_set_mouse_mode)(void*, int);
-void (*winpty_config_set_initial_size)(void*, int, int);
-LPCWSTR (*winpty_conin_name)(void*);
-LPCWSTR (*winpty_conout_name)(void*);
-LPCWSTR (*winpty_conerr_name)(void*);
-void (*winpty_free)(void*);
-void (*winpty_config_free)(void*);
-void (*winpty_spawn_config_free)(void*);
-void (*winpty_error_free)(void*);
-LPCWSTR (*winpty_error_msg)(void*);
-BOOL (*winpty_set_size)(void*, int, int, void*);
-HANDLE (*winpty_agent_process)(void*);
+வெறுமை* (*winpty_config_new)(UINT64, வெறுமை*);
+வெறுமை* (*winpty_open)(வெறுமை*, வெறுமை*);
+வெறுமை* (*winpty_spawn_config_new)(UINT64, வெறுமை*, LPCWSTR, வெறுமை*, வெறுமை*, வெறுமை*);
+BOOL (*winpty_spawn)(வெறுமை*, வெறுமை*, HANDLE*, HANDLE*, DWORD*, வெறுமை*);
+வெறுமை (*winpty_config_set_mouse_mode)(வெறுமை*, முழு);
+வெறுமை (*winpty_config_set_initial_size)(வெறுமை*, முழு, முழு);
+LPCWSTR (*winpty_conin_name)(வெறுமை*);
+LPCWSTR (*winpty_conout_name)(வெறுமை*);
+LPCWSTR (*winpty_conerr_name)(வெறுமை*);
+வெறுமை (*winpty_free)(வெறுமை*);
+வெறுமை (*winpty_config_free)(வெறுமை*);
+வெறுமை (*winpty_spawn_config_free)(வெறுமை*);
+வெறுமை (*winpty_error_free)(வெறுமை*);
+LPCWSTR (*winpty_error_செய்தி)(வெறுமை*);
+BOOL (*winpty_set_size)(வெறுமை*, முழு, முழு, வெறுமை*);
+HANDLE (*winpty_agent_process)(வெறுமை*);
 
 # define WINPTY_DLL "winpty.dll"
 
-static HINSTANCE hWinPtyDLL = NULL;
+நிலையான HINSTANCE hWinPtyDLL = வெற்று;
 
-    static int
-dyn_winpty_init(int verbose)
+    நிலையான முழு
+dyn_winpty_init(முழு verbose)
 {
-    int i;
-    static struct
+    முழு i;
+    நிலையான கட்டமைப்பு
     {
-	char	    *name;
+	எழுத்து	    *name;
 	FARPROC	    *ptr;
     } winpty_entry[] =
     {
@@ -7630,178 +7630,178 @@ dyn_winpty_init(int verbose)
 	{"winpty_spawn", (FARPROC*)&winpty_spawn},
 	{"winpty_spawn_config_free", (FARPROC*)&winpty_spawn_config_free},
 	{"winpty_spawn_config_new", (FARPROC*)&winpty_spawn_config_new},
-	{"winpty_error_msg", (FARPROC*)&winpty_error_msg},
+	{"winpty_error_msg", (FARPROC*)&winpty_error_செய்தி},
 	{"winpty_set_size", (FARPROC*)&winpty_set_size},
 	{"winpty_agent_process", (FARPROC*)&winpty_agent_process},
-	{NULL, NULL}
+	{வெற்று, வெற்று}
     };
 
     // No need to initialize twice.
-    if (hWinPtyDLL)
-	return OK;
+    எனில் (hWinPtyDLL)
+	திரும்பு OK;
     // Load winpty.dll, prefer using the 'winptydll' option, fall back to just
     // winpty.dll.
-    if (*p_winptydll != NUL)
-	hWinPtyDLL = vimLoadLib((char *)p_winptydll);
-    if (!hWinPtyDLL)
+    எனில் (*p_winptydll != NUL)
+	hWinPtyDLL = vimLoadLib((எழுத்து *)p_winptydll);
+    எனில் (!hWinPtyDLL)
 	hWinPtyDLL = vimLoadLib(WINPTY_DLL);
-    if (!hWinPtyDLL)
+    எனில் (!hWinPtyDLL)
     {
-	if (verbose)
+	எனில் (verbose)
 	    semsg(_(e_could_not_load_library_str_str),
 		    (*p_winptydll != NUL ? p_winptydll : (char_u *)WINPTY_DLL),
 		    GetWin32Error());
-	return FAIL;
+	திரும்பு FAIL;
     }
-    for (i = 0; winpty_entry[i].name != NULL
-					 && winpty_entry[i].ptr != NULL; ++i)
+    க்கு (i = 0; winpty_entry[i].name != வெற்று
+					 && winpty_entry[i].ptr != வெற்று; ++i)
     {
-	if ((*winpty_entry[i].ptr = (FARPROC)GetProcAddress(hWinPtyDLL,
-					      winpty_entry[i].name)) == NULL)
+	எனில் ((*winpty_entry[i].ptr = (FARPROC)GetProcAddress(hWinPtyDLL,
+					      winpty_entry[i].name)) == வெற்று)
 	{
-	    if (verbose)
+	    எனில் (verbose)
 		semsg(_(e_could_not_load_library_function_str), winpty_entry[i].name);
-	    hWinPtyDLL = NULL;
-	    return FAIL;
+	    hWinPtyDLL = வெற்று;
+	    திரும்பு FAIL;
 	}
     }
 
-    return OK;
+    திரும்பு OK;
 }
 
-    static int
+    நிலையான முழு
 winpty_term_and_job_init(
 	term_T	    *term,
 	typval_T    *argvar,
-	char	    **argv UNUSED,
+	எழுத்து	    **argv UNUSED,
 	jobopt_T    *opt,
 	jobopt_T    *orig_opt)
 {
-    WCHAR	    *cmd_wchar = NULL;
-    WCHAR	    *cwd_wchar = NULL;
-    WCHAR	    *env_wchar = NULL;
-    channel_T	    *channel = NULL;
-    job_T	    *job = NULL;
+    WCHAR	    *cmd_wchar = வெற்று;
+    WCHAR	    *cwd_wchar = வெற்று;
+    WCHAR	    *env_wchar = வெற்று;
+    channel_T	    *channel = வெற்று;
+    job_T	    *job = வெற்று;
     DWORD	    error;
-    HANDLE	    jo = NULL;
+    HANDLE	    jo = வெற்று;
     HANDLE	    child_process_handle;
     HANDLE	    child_thread_handle;
-    void	    *winpty_err = NULL;
-    void	    *spawn_config = NULL;
+    வெறுமை	    *winpty_err = வெற்று;
+    வெறுமை	    *spawn_config = வெற்று;
     garray_T	    ga_cmd, ga_env;
-    char_u	    *cmd = NULL;
+    char_u	    *cmd = வெற்று;
 
-    ga_init2(&ga_cmd, sizeof(char*), 20);
-    ga_init2(&ga_env, sizeof(char*), 20);
+    ga_init2(&ga_cmd, அளவு(எழுத்து*), 20);
+    ga_init2(&ga_env, அளவு(எழுத்து*), 20);
 
-    if (argvar->v_type == VAR_STRING)
+    எனில் (argvar->v_type == VAR_STRING)
     {
 	cmd = argvar->vval.v_string;
     }
-    else if (argvar->v_type == VAR_LIST)
+    இல்லையெனில் எனில் (argvar->v_type == VAR_LIST)
     {
-	if (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
-	    goto failed;
+	எனில் (win32_build_cmd(argvar->vval.v_list, &ga_cmd) == FAIL)
+	    செல் failed;
 	cmd = ga_cmd.ga_data;
     }
-    if (cmd == NULL || *cmd == NUL)
+    எனில் (cmd == வெற்று || *cmd == NUL)
     {
 	emsg(_(e_invalid_argument));
-	goto failed;
+	செல் failed;
     }
 
     term->tl_arg0_cmd = vim_strsave(cmd);
 
-    cmd_wchar = enc_to_utf16(cmd, NULL);
+    cmd_wchar = enc_to_utf16(cmd, வெற்று);
     ga_clear(&ga_cmd);
-    if (cmd_wchar == NULL)
-	goto failed;
-    if (opt->jo_cwd != NULL)
+    எனில் (cmd_wchar == வெற்று)
+	செல் failed;
+    எனில் (opt->jo_cwd != வெற்று)
     {
-	cwd_wchar = enc_to_utf16(opt->jo_cwd, NULL);
-	if (cwd_wchar == NULL)
-	    goto failed;
+	cwd_wchar = enc_to_utf16(opt->jo_cwd, வெற்று);
+	எனில் (cwd_wchar == வெற்று)
+	    செல் failed;
     }
 
     win32_build_env(opt->jo_env, &ga_env, TRUE);
     env_wchar = ga_env.ga_data;
 
     term->tl_winpty_config = winpty_config_new(0, &winpty_err);
-    if (term->tl_winpty_config == NULL)
-	goto failed;
+    எனில் (term->tl_winpty_config == வெற்று)
+	செல் failed;
 
     winpty_config_set_mouse_mode(term->tl_winpty_config,
 						    WINPTY_MOUSE_MODE_FORCE);
     winpty_config_set_initial_size(term->tl_winpty_config,
 						 term->tl_cols, term->tl_rows);
     term->tl_winpty = winpty_open(term->tl_winpty_config, &winpty_err);
-    if (term->tl_winpty == NULL)
-	goto failed;
+    எனில் (term->tl_winpty == வெற்று)
+	செல் failed;
 
     spawn_config = winpty_spawn_config_new(
 	    WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN |
 		WINPTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN,
-	    NULL,
+	    வெற்று,
 	    cmd_wchar,
 	    cwd_wchar,
 	    env_wchar,
 	    &winpty_err);
-    if (spawn_config == NULL)
-	goto failed;
+    எனில் (spawn_config == வெற்று)
+	செல் failed;
 
     channel = add_channel();
-    if (channel == NULL)
-	goto failed;
+    எனில் (channel == வெற்று)
+	செல் failed;
 
     job = job_alloc();
-    if (job == NULL)
-	goto failed;
-    if (argvar->v_type == VAR_STRING)
+    எனில் (job == வெற்று)
+	செல் failed;
+    எனில் (argvar->v_type == VAR_STRING)
     {
-	int argc;
+	முழு argc;
 
 	build_argv_from_string(cmd, &job->jv_argv, &argc);
     }
-    else
+    இல்லையெனில்
     {
-	int argc;
+	முழு argc;
 
 	build_argv_from_list(argvar->vval.v_list, &job->jv_argv, &argc);
     }
 
-    if (opt->jo_set & JO_IN_BUF)
+    எனில் (opt->jo_set & JO_IN_BUF)
 	job->jv_in_buf = buflist_findnr(opt->jo_io_buf[PART_IN]);
 
-    if (!winpty_spawn(term->tl_winpty, spawn_config, &child_process_handle,
+    எனில் (!winpty_spawn(term->tl_winpty, spawn_config, &child_process_handle,
 	    &child_thread_handle, &error, &winpty_err))
-	goto failed;
+	செல் failed;
 
     channel_set_pipes(channel,
 	(sock_T)CreateFileW(
 	    winpty_conin_name(term->tl_winpty),
-	    GENERIC_WRITE, 0, NULL,
-	    OPEN_EXISTING, 0, NULL),
+	    GENERIC_WRITE, 0, வெற்று,
+	    OPEN_EXISTING, 0, வெற்று),
 	(sock_T)CreateFileW(
 	    winpty_conout_name(term->tl_winpty),
-	    GENERIC_READ, 0, NULL,
-	    OPEN_EXISTING, 0, NULL),
+	    GENERIC_READ, 0, வெற்று,
+	    OPEN_EXISTING, 0, வெற்று),
 	(sock_T)CreateFileW(
 	    winpty_conerr_name(term->tl_winpty),
-	    GENERIC_READ, 0, NULL,
-	    OPEN_EXISTING, 0, NULL));
+	    GENERIC_READ, 0, வெற்று,
+	    OPEN_EXISTING, 0, வெற்று));
 
     // Write lines with CR instead of NL.
     channel->ch_write_text_mode = TRUE;
 
-    jo = CreateJobObject(NULL, NULL);
-    if (jo == NULL)
-	goto failed;
+    jo = CreateJobObject(வெற்று, வெற்று);
+    எனில் (jo == வெற்று)
+	செல் failed;
 
-    if (!AssignProcessToJobObject(jo, child_process_handle))
+    எனில் (!AssignProcessToJobObject(jo, child_process_handle))
     {
 	// Failed, switch the way to terminate process with TerminateProcess.
 	CloseHandle(jo);
-	jo = NULL;
+	jo = வெற்று;
     }
 
     winpty_spawn_config_free(spawn_config);
@@ -7809,15 +7809,15 @@ winpty_term_and_job_init(
     vim_free(cwd_wchar);
     vim_free(env_wchar);
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	goto failed;
+    எனில் (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
+	செல் failed;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette())
+# எனில் defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    எனில் (term_use_palette())
     {
-	if (term->tl_palette != NULL)
+	எனில் (term->tl_palette != வெற்று)
 	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
+	இல்லையெனில்
 	    init_vterm_ansi_colors(term->tl_vterm);
     }
 # endif
@@ -7831,9 +7831,9 @@ winpty_term_and_job_init(
     job->jv_job_object = jo;
     job->jv_status = JOB_STARTED;
     job->jv_tty_in = utf16_to_enc(
-	    (short_u *)winpty_conin_name(term->tl_winpty), NULL);
+	    (short_u *)winpty_conin_name(term->tl_winpty), வெற்று);
     job->jv_tty_out = utf16_to_enc(
-	    (short_u *)winpty_conout_name(term->tl_winpty), NULL);
+	    (short_u *)winpty_conout_name(term->tl_winpty), வெற்று);
     job->jv_tty_type = vim_strsave((char_u *)"winpty");
     ++job->jv_refcount;
     term->tl_job = job;
@@ -7841,54 +7841,54 @@ winpty_term_and_job_init(
     // Redirecting stdout and stderr doesn't work at the job level.  Instead
     // open the file here and handle it in.  opt->jo_io was changed in
     // setup_job_options(), use the original flags here.
-    if (orig_opt->jo_io[PART_OUT] == JIO_FILE)
+    எனில் (orig_opt->jo_io[PART_OUT] == JIO_FILE)
     {
 	char_u *fname = opt->jo_io_name[PART_OUT];
 
 	ch_log(channel, "Opening output file %s", fname);
-	term->tl_out_fd = mch_fopen((char *)fname, WRITEBIN);
-	if (term->tl_out_fd == NULL)
+	term->tl_out_fd = mch_fopen((எழுத்து *)fname, WRITEBIN);
+	எனில் (term->tl_out_fd == வெற்று)
 	    semsg(_(e_cant_open_file_str), fname);
     }
 
-    return OK;
+    திரும்பு OK;
 
 failed:
     ga_clear(&ga_cmd);
     ga_clear(&ga_env);
     vim_free(cmd_wchar);
     vim_free(cwd_wchar);
-    if (spawn_config != NULL)
+    எனில் (spawn_config != வெற்று)
 	winpty_spawn_config_free(spawn_config);
-    if (channel != NULL)
+    எனில் (channel != வெற்று)
 	channel_clear(channel);
-    if (job != NULL)
+    எனில் (job != வெற்று)
     {
-	job->jv_channel = NULL;
+	job->jv_channel = வெற்று;
 	job_cleanup(job);
     }
-    term->tl_job = NULL;
-    if (jo != NULL)
+    term->tl_job = வெற்று;
+    எனில் (jo != வெற்று)
 	CloseHandle(jo);
-    if (term->tl_winpty != NULL)
+    எனில் (term->tl_winpty != வெற்று)
 	winpty_free(term->tl_winpty);
-    term->tl_winpty = NULL;
-    if (term->tl_winpty_config != NULL)
+    term->tl_winpty = வெற்று;
+    எனில் (term->tl_winpty_config != வெற்று)
 	winpty_config_free(term->tl_winpty_config);
-    term->tl_winpty_config = NULL;
-    if (winpty_err != NULL)
+    term->tl_winpty_config = வெற்று;
+    எனில் (winpty_err != வெற்று)
     {
-	char *msg = (char *)utf16_to_enc(
-				(short_u *)winpty_error_msg(winpty_err), NULL);
+	எழுத்து *செய்தி = (எழுத்து *)utf16_to_enc(
+				(short_u *)winpty_error_செய்தி(winpty_err), வெற்று);
 
-	if (msg != NULL)
+	எனில் (செய்தி != வெற்று)
 	{
-	    emsg(msg);
-	    vim_free(msg);
+	    emsg(செய்தி);
+	    vim_free(செய்தி);
 	}
 	winpty_error_free(winpty_err);
     }
-    return FAIL;
+    திரும்பு FAIL;
 }
 
 /*
@@ -7896,105 +7896,105 @@ failed:
  * Store a reference in "term".
  * Return OK or FAIL.
  */
-    static int
+    நிலையான முழு
 term_and_job_init(
 	term_T	    *term,
 	typval_T    *argvar,
-	char	    **argv,
+	எழுத்து	    **argv,
 	jobopt_T    *opt,
 	jobopt_T    *orig_opt)
 {
-    int		    use_winpty = FALSE;
-    int		    use_conpty = FALSE;
-    int		    tty_type = *p_twt;
+    முழு		    use_winpty = FALSE;
+    முழு		    use_conpty = FALSE;
+    முழு		    tty_type = *p_twt;
 
     has_winpty = dyn_winpty_init(FALSE) != FAIL ? TRUE : FALSE;
     has_conpty = dyn_conpty_init(FALSE) != FAIL ? TRUE : FALSE;
 
-    if (!has_winpty && !has_conpty)
+    எனில் (!has_winpty && !has_conpty)
 	// If neither is available give the errors for winpty, since when
 	// conpty is not available it can't be installed either.
-	return dyn_winpty_init(TRUE);
+	திரும்பு dyn_winpty_init(TRUE);
 
-    if (opt->jo_tty_type != NUL)
+    எனில் (opt->jo_tty_type != NUL)
 	tty_type = opt->jo_tty_type;
 
-    if (tty_type == NUL)
+    எனில் (tty_type == NUL)
     {
-	if (has_conpty && (is_conpty_stable() || !has_winpty))
+	எனில் (has_conpty && (is_conpty_stable() || !has_winpty))
 	    use_conpty = TRUE;
-	else if (has_winpty)
+	இல்லையெனில் எனில் (has_winpty)
 	    use_winpty = TRUE;
 	// else: error
     }
-    else if (tty_type == 'w')	// winpty
+    இல்லையெனில் எனில் (tty_type == 'w')	// winpty
     {
-	if (has_winpty)
+	எனில் (has_winpty)
 	    use_winpty = TRUE;
     }
-    else if (tty_type == 'c')	// conpty
+    இல்லையெனில் எனில் (tty_type == 'c')	// conpty
     {
-	if (has_conpty)
+	எனில் (has_conpty)
 	    use_conpty = TRUE;
-	else
-	    return dyn_conpty_init(TRUE);
+	இல்லையெனில்
+	    திரும்பு dyn_conpty_init(TRUE);
     }
 
-    if (use_conpty)
-	return conpty_term_and_job_init(term, argvar, argv, opt, orig_opt);
+    எனில் (use_conpty)
+	திரும்பு conpty_term_and_job_init(term, argvar, argv, opt, orig_opt);
 
-    if (use_winpty)
-	return winpty_term_and_job_init(term, argvar, argv, opt, orig_opt);
+    எனில் (use_winpty)
+	திரும்பு winpty_term_and_job_init(term, argvar, argv, opt, orig_opt);
 
     // error
-    return dyn_winpty_init(TRUE);
+    திரும்பு dyn_winpty_init(TRUE);
 }
 
-    static int
+    நிலையான முழு
 create_pty_only(term_T *term, jobopt_T *options)
 {
-    HANDLE	    hPipeIn = INVALID_HANDLE_VALUE;
-    HANDLE	    hPipeOut = INVALID_HANDLE_VALUE;
-    char	    in_name[80], out_name[80];
-    channel_T	    *channel = NULL;
+    HANDLE	    hPipeIn = INVALID_HANDLE_மதிப்பு;
+    HANDLE	    hPipeOut = INVALID_HANDLE_மதிப்பு;
+    எழுத்து	    in_name[80], out_name[80];
+    channel_T	    *channel = வெற்று;
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	return FAIL;
+    எனில் (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
+	திரும்பு FAIL;
 
-    vim_snprintf(in_name, sizeof(in_name), "\\\\.\\pipe\\vim-%d-in-%d",
+    vim_snprintf(in_name, அளவு(in_name), "\\\\.\\pipe\\vim-%d-in-%d",
 	    GetCurrentProcessId(),
 	    curbuf->b_fnum);
     hPipeIn = CreateNamedPipe(in_name, PIPE_ACCESS_OUTBOUND,
 	    PIPE_TYPE_MESSAGE | PIPE_NOWAIT,
 	    PIPE_UNLIMITED_INSTANCES,
-	    0, 0, NMPWAIT_NOWAIT, NULL);
-    if (hPipeIn == INVALID_HANDLE_VALUE)
-	goto failed;
+	    0, 0, NMPWAIT_NOWAIT, வெற்று);
+    எனில் (hPipeIn == INVALID_HANDLE_மதிப்பு)
+	செல் failed;
 
-    vim_snprintf(out_name, sizeof(out_name), "\\\\.\\pipe\\vim-%d-out-%d",
+    vim_snprintf(out_name, அளவு(out_name), "\\\\.\\pipe\\vim-%d-out-%d",
 	    GetCurrentProcessId(),
 	    curbuf->b_fnum);
     hPipeOut = CreateNamedPipe(out_name, PIPE_ACCESS_INBOUND,
 	    PIPE_TYPE_MESSAGE | PIPE_NOWAIT,
 	    PIPE_UNLIMITED_INSTANCES,
-	    0, 0, 0, NULL);
-    if (hPipeOut == INVALID_HANDLE_VALUE)
-	goto failed;
+	    0, 0, 0, வெற்று);
+    எனில் (hPipeOut == INVALID_HANDLE_மதிப்பு)
+	செல் failed;
 
-    ConnectNamedPipe(hPipeIn, NULL);
-    ConnectNamedPipe(hPipeOut, NULL);
+    ConnectNamedPipe(hPipeIn, வெற்று);
+    ConnectNamedPipe(hPipeOut, வெற்று);
 
     term->tl_job = job_alloc();
-    if (term->tl_job == NULL)
-	goto failed;
+    எனில் (term->tl_job == வெற்று)
+	செல் failed;
     ++term->tl_job->jv_refcount;
 
     // behave like the job is already finished
     term->tl_job->jv_status = JOB_FINISHED;
 
     channel = add_channel();
-    if (channel == NULL)
-	goto failed;
+    எனில் (channel == வெற்று)
+	செல் failed;
     term->tl_job->jv_channel = channel;
     channel->ch_keep_open = TRUE;
     channel->ch_named_pipe = TRUE;
@@ -8007,53 +8007,53 @@ create_pty_only(term_T *term, jobopt_T *options)
     term->tl_job->jv_tty_in = vim_strsave((char_u*)in_name);
     term->tl_job->jv_tty_out = vim_strsave((char_u*)out_name);
 
-    return OK;
+    திரும்பு OK;
 
 failed:
-    if (hPipeIn != NULL)
+    எனில் (hPipeIn != வெற்று)
 	CloseHandle(hPipeIn);
-    if (hPipeOut != NULL)
+    எனில் (hPipeOut != வெற்று)
 	CloseHandle(hPipeOut);
-    return FAIL;
+    திரும்பு FAIL;
 }
 
 /*
  * Free the terminal emulator part of "term".
  */
-    static void
+    நிலையான வெறுமை
 term_free_vterm(term_T *term)
 {
     term_free_conpty(term);
-    if (term->tl_winpty != NULL)
+    எனில் (term->tl_winpty != வெற்று)
 	winpty_free(term->tl_winpty);
-    term->tl_winpty = NULL;
-    if (term->tl_winpty_config != NULL)
+    term->tl_winpty = வெற்று;
+    எனில் (term->tl_winpty_config != வெற்று)
 	winpty_config_free(term->tl_winpty_config);
-    term->tl_winpty_config = NULL;
-    if (term->tl_vterm != NULL)
+    term->tl_winpty_config = வெற்று;
+    எனில் (term->tl_vterm != வெற்று)
 	vterm_free(term->tl_vterm);
-    term->tl_vterm = NULL;
+    term->tl_vterm = வெற்று;
 }
 
 /*
  * Report the size to the terminal.
  */
-    static void
-term_report_winsize(term_T *term, int rows, int cols)
+    நிலையான வெறுமை
+term_report_winsize(term_T *term, முழு rows, முழு cols)
 {
-    if (term->tl_conpty)
+    எனில் (term->tl_conpty)
 	conpty_term_report_winsize(term, rows, cols);
-    if (term->tl_winpty)
-	winpty_set_size(term->tl_winpty, cols, rows, NULL);
+    எனில் (term->tl_winpty)
+	winpty_set_size(term->tl_winpty, cols, rows, வெற்று);
 }
 
-    int
-terminal_enabled(void)
+    முழு
+terminal_enabled(வெறுமை)
 {
-    return dyn_winpty_init(FALSE) == OK || dyn_conpty_init(FALSE) == OK;
+    திரும்பு dyn_winpty_init(FALSE) == OK || dyn_conpty_init(FALSE) == OK;
 }
 
-#else
+#இல்லையெனில்
 
 ///////////////////////////////////////
 // 3. Unix-like implementation.
@@ -8065,87 +8065,87 @@ terminal_enabled(void)
  * When "argv" is not NULL then "argvar" is not used.
  * Return OK or FAIL.
  */
-    static int
+    நிலையான முழு
 term_and_job_init(
 	term_T	    *term,
 	typval_T    *argvar,
-	char	    **argv,
+	எழுத்து	    **argv,
 	jobopt_T    *opt,
 	jobopt_T    *orig_opt UNUSED)
 {
-    term->tl_arg0_cmd = NULL;
+    term->tl_arg0_cmd = வெற்று;
 
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	return FAIL;
+    எனில் (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
+	திரும்பு FAIL;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (term_use_palette())
+# எனில் defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    எனில் (term_use_palette())
     {
-	if (term->tl_palette != NULL)
+	எனில் (term->tl_palette != வெற்று)
 	    set_vterm_palette(term->tl_vterm, term->tl_palette);
-	else
+	இல்லையெனில்
 	    init_vterm_ansi_colors(term->tl_vterm);
     }
 # endif
 
     // This may change a string in "argvar".
     term->tl_job = job_start(argvar, argv, opt, &term->tl_job);
-    if (term->tl_job != NULL)
+    எனில் (term->tl_job != வெற்று)
 	++term->tl_job->jv_refcount;
 
-    return term->tl_job != NULL
-	&& term->tl_job->jv_channel != NULL
+    திரும்பு term->tl_job != வெற்று
+	&& term->tl_job->jv_channel != வெற்று
 	&& term->tl_job->jv_status != JOB_FAILED ? OK : FAIL;
 }
 
-    static int
+    நிலையான முழு
 create_pty_only(term_T *term, jobopt_T *opt)
 {
-    if (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
-	return FAIL;
+    எனில் (create_vterm(term, term->tl_rows, term->tl_cols) == FAIL)
+	திரும்பு FAIL;
 
     term->tl_job = job_alloc();
-    if (term->tl_job == NULL)
-	return FAIL;
+    எனில் (term->tl_job == வெற்று)
+	திரும்பு FAIL;
     ++term->tl_job->jv_refcount;
 
     // behave like the job is already finished
     term->tl_job->jv_status = JOB_FINISHED;
 
-    return mch_create_pty_channel(term->tl_job, opt);
+    திரும்பு mch_create_pty_channel(term->tl_job, opt);
 }
 
 /*
  * Free the terminal emulator part of "term".
  */
-    static void
+    நிலையான வெறுமை
 term_free_vterm(term_T *term)
 {
-    if (term->tl_vterm != NULL)
+    எனில் (term->tl_vterm != வெற்று)
 	vterm_free(term->tl_vterm);
-    term->tl_vterm = NULL;
+    term->tl_vterm = வெற்று;
 }
 
 /*
  * Report the size to the terminal.
  */
-    static void
-term_report_winsize(term_T *term, int rows, int cols)
+    நிலையான வெறுமை
+term_report_winsize(term_T *term, முழு rows, முழு cols)
 {
     // Use an ioctl() to report the new window size to the job.
-    if (term->tl_job == NULL || term->tl_job->jv_channel == NULL)
-	return;
+    எனில் (term->tl_job == வெற்று || term->tl_job->jv_channel == வெற்று)
+	திரும்பு;
 
-    int fd = -1;
-    int part;
+    முழு fd = -1;
+    முழு part;
 
-    for (part = PART_OUT; part < PART_COUNT; ++part)
+    க்கு (part = PART_OUT; part < PART_மொத்தம்; ++part)
     {
 	fd = term->tl_job->jv_channel->ch_part[part].ch_fd;
-	if (mch_isatty(fd))
-	    break;
+	எனில் (mch_isatty(fd))
+	    நிறுத்து;
     }
-    if (part < PART_COUNT && mch_report_winsize(fd, rows, cols) == OK)
+    எனில் (part < PART_மொத்தம் && mch_report_winsize(fd, rows, cols) == OK)
 	mch_signal_job(term->tl_job, (char_u *)"winch");
 }
 

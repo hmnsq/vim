@@ -237,11 +237,11 @@
  *			    few bytes as possible, see offset2bytes())
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#if defined(FEAT_SPELL)
+#எனில் defined(FEAT_SPELL)
 
-#include <time.h>	// for time_t
+#அந்தர்பாவ <time.h>	// for time_t
 
 // Special byte values for <byte>.  Some are only used in the tree for
 // postponed prefixes, some only in the other trees.  This is a bit messy...
@@ -279,7 +279,7 @@
 #define SN_NOBREAK	10	// NOBREAK section
 #define SN_SUGFILE	11	// timestamp for .sug file
 #define SN_REPSAL	12	// REPSAL items section
-#define SN_WORDS	13	// common words
+#define SN_சொற்கள்	13	// common words
 #define SN_NOSPLITSUGS	14	// don't split word for suggestions
 #define SN_INFO		15	// info section
 #define SN_NOCOMPOUNDSUGS 16	// don't compound for suggestions
@@ -296,32 +296,32 @@
 /*
  * Loop through all the siblings of a node (including the node)
  */
-#define FOR_ALL_NODE_SIBLINGS(node, np) \
-    for ((np) = (node); (np) != NULL; (np) = (np)->wn_sibling)
+#define FOR_ALL_முனை_SIBLINGS(முனை, np) \
+    க்கு ((np) = (முனை); (np) != வெற்று; (np) = (np)->wn_sibling)
 
-static int set_spell_finish(spelltab_T	*new_st);
-static int write_spell_prefcond(FILE *fd, garray_T *gap, size_t *fwv);
-static int read_region_section(FILE *fd, slang_T *slang, int len);
-static int read_charflags_section(FILE *fd);
-static int read_prefcond_section(FILE *fd, slang_T *lp);
-static int read_rep_section(FILE *fd, garray_T *gap, short *first);
-static int read_sal_section(FILE *fd, slang_T *slang);
-static int read_words_section(FILE *fd, slang_T *lp, int len);
-static int read_sofo_section(FILE *fd, slang_T *slang);
-static int read_compound(FILE *fd, slang_T *slang, int len);
-static int set_sofo(slang_T *lp, char_u *from, char_u *to);
-static void set_sal_first(slang_T *lp);
-static int *mb_str2wide(char_u *s);
-static int spell_read_tree(FILE *fd, char_u **bytsp, long *bytsp_len, idx_T **idxsp, int prefixtree, int prefixcnt);
-static idx_T read_tree_node(FILE *fd, char_u *byts, idx_T *idxs, int maxidx, idx_T startidx, int prefixtree, int maxprefcondnr, int depth);
-static void set_spell_charflags(char_u *flags, int cnt, char_u *upp);
-static int set_spell_chartab(char_u *fol, char_u *low, char_u *upp);
-static void set_map_str(slang_T *lp, char_u *map);
+நிலையான முழு set_spell_finish(spelltab_T	*new_st);
+நிலையான முழு write_spell_prefcond(FILE *fd, garray_T *gap, size_t *fwv);
+நிலையான முழு read_region_section(FILE *fd, slang_T *slang, முழு len);
+நிலையான முழு read_charflags_section(FILE *fd);
+நிலையான முழு read_prefcond_section(FILE *fd, slang_T *lp);
+நிலையான முழு read_rep_section(FILE *fd, garray_T *gap, short *first);
+நிலையான முழு read_sal_section(FILE *fd, slang_T *slang);
+நிலையான முழு read_சொற்கள்_section(FILE *fd, slang_T *lp, முழு len);
+நிலையான முழு read_sofo_section(FILE *fd, slang_T *slang);
+நிலையான முழு read_compound(FILE *fd, slang_T *slang, முழு len);
+நிலையான முழு set_sofo(slang_T *lp, char_u *from, char_u *to);
+நிலையான வெறுமை set_sal_first(slang_T *lp);
+நிலையான முழு *mb_str2wide(char_u *s);
+நிலையான முழு spell_read_மரம்(FILE *fd, char_u **bytsp, long *bytsp_len, idx_T **idxsp, முழு prefixtree, முழு prefixcnt);
+நிலையான idx_T read_மரம்_முனை(FILE *fd, char_u *byts, idx_T *idxs, முழு maxidx, idx_T startidx, முழு prefixtree, முழு maxprefcondnr, முழு depth);
+நிலையான வெறுமை set_spell_charflags(char_u *flags, முழு cnt, char_u *upp);
+நிலையான முழு set_spell_chartab(char_u *fol, char_u *கீழ், char_u *upp);
+நிலையான வெறுமை set_map_str(slang_T *lp, char_u *map);
 
 
-static char *e_afftrailing = N_("Trailing text in %s line %d: %s");
-static char *e_affname = N_("Affix name too long in %s line %d: %s");
-static char *msg_compressing = N_("Compressing word tree...");
+நிலையான எழுத்து *e_afftrailing = N_("Trailing text in %s line %d: %s");
+நிலையான எழுத்து *e_affname = N_("Affix name too long in %s line %d: %s");
+நிலையான எழுத்து *செய்தி_compressing = N_("Compressing word tree...");
 
 /*
  * Load one spell file and store the info into a slang_T.
@@ -341,82 +341,82 @@ spell_load_file(
     char_u	*fname,
     char_u	*lang,
     slang_T	*old_lp,
-    int		silent)		// no error if file doesn't exist
+    முழு		silent)		// no error if file doesn't exist
 {
     FILE	*fd;
     char_u	buf[VIMSPELLMAGICL];
     char_u	*p;
-    int		i;
-    int		n;
-    int		len;
-    slang_T	*lp = NULL;
-    int		c = 0;
-    int		res;
-    int		did_estack_push = FALSE;
+    முழு		i;
+    முழு		n;
+    முழு		len;
+    slang_T	*lp = வெற்று;
+    முழு		c = 0;
+    முழு		res;
+    முழு		did_estack_தள்ளு = FALSE;
     ESTACK_CHECK_DECLARATION;
 
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    fd = mch_fopen((எழுத்து *)fname, "r");
+    எனில் (fd == வெற்று)
     {
-	if (!silent)
+	எனில் (!silent)
 	    semsg(_(e_cant_open_file_str), fname);
-	else if (p_verbose > 2)
+	இல்லையெனில் எனில் (p_verbose > 2)
 	{
 	    verbose_enter();
-	    smsg((const char *)e_cant_open_file_str, fname);
+	    smsg((மாறிலி எழுத்து *)e_cant_open_file_str, fname);
 	    verbose_leave();
 	}
-	goto endFAIL;
+	செல் endFAIL;
     }
-    if (p_verbose > 2)
+    எனில் (p_verbose > 2)
     {
 	verbose_enter();
 	smsg(_("Reading spell file \"%s\""), fname);
 	verbose_leave();
     }
 
-    if (old_lp == NULL)
+    எனில் (old_lp == வெற்று)
     {
 	lp = slang_alloc(lang);
-	if (lp == NULL)
-	    goto endFAIL;
+	எனில் (lp == வெற்று)
+	    செல் endFAIL;
 
 	// Remember the file name, used to reload the file when it's updated.
 	lp->sl_fname = vim_strsave(fname);
-	if (lp->sl_fname == NULL)
-	    goto endFAIL;
+	எனில் (lp->sl_fname == வெற்று)
+	    செல் endFAIL;
 
 	// Check for .add.spl (_add.spl for VMS).
-	lp->sl_add = strstr((char *)gettail(fname), SPL_FNAME_ADD) != NULL;
+	lp->sl_add = strstr((எழுத்து *)gettail(fname), SPL_FNAME_ADD) != வெற்று;
     }
-    else
+    இல்லையெனில்
 	lp = old_lp;
 
     // Set sourcing_name, so that error messages mention the file name.
-    estack_push(ETYPE_SPELL, fname, 0);
+    estack_தள்ளு(ETYPE_SPELL, fname, 0);
     ESTACK_CHECK_SETUP;
-    did_estack_push = TRUE;
+    did_estack_தள்ளு = TRUE;
 
     /*
      * <HEADER>: <fileID>
      */
-    for (i = 0; i < VIMSPELLMAGICL; ++i)
+    க்கு (i = 0; i < VIMSPELLMAGICL; ++i)
 	buf[i] = (c = getc(fd)) == EOF ? 0 : c;		// <fileID>
-    if (STRNCMP(buf, VIMSPELLMAGIC, VIMSPELLMAGICL) != 0)
+    எனில் (STRNCMP(buf, VIMSPELLMAGIC, VIMSPELLMAGICL) != 0)
     {
 	emsg(_(e_this_does_not_look_like_spell_file));
-	goto endFAIL;
+	செல் endFAIL;
     }
     c = getc(fd);					// <versionnr>
-    if (c < VIMSPELLVERSION)
+    எனில் (c < VIMSPELLVERSION)
     {
 	emsg(_(e_old_spell_file_needs_to_be_updated));
-	goto endFAIL;
+	செல் endFAIL;
     }
-    else if (c > VIMSPELLVERSION)
+    இல்லையெனில் எனில் (c > VIMSPELLVERSION)
     {
 	emsg(_(e_spell_file_is_for_newer_version_of_vim));
-	goto endFAIL;
+	செல் endFAIL;
     }
 
 
@@ -424,225 +424,225 @@ spell_load_file(
      * <SECTIONS>: <section> ... <sectionend>
      * <section>: <sectionID> <sectionflags> <sectionlen> (section contents)
      */
-    for (;;)
+    க்கு (;;)
     {
 	n = getc(fd);			    // <sectionID> or <sectionend>
-	if (n == SN_END)
-	    break;
+	எனில் (n == SN_END)
+	    நிறுத்து;
 	c = getc(fd);					// <sectionflags>
 	len = get4c(fd);				// <sectionlen>
-	if (len < 0)
-	    goto truncerr;
+	எனில் (len < 0)
+	    செல் truncerr;
 
 	res = 0;
-	switch (n)
+	தேர்வு (n)
 	{
-	    case SN_INFO:
+	    நிலை SN_INFO:
 		lp->sl_info = read_string(fd, len);	// <infotext>
-		if (lp->sl_info == NULL)
-		    goto endFAIL;
-		break;
+		எனில் (lp->sl_info == வெற்று)
+		    செல் endFAIL;
+		நிறுத்து;
 
-	    case SN_REGION:
+	    நிலை SN_REGION:
 		res = read_region_section(fd, lp, len);
-		break;
+		நிறுத்து;
 
-	    case SN_CHARFLAGS:
+	    நிலை SN_CHARFLAGS:
 		res = read_charflags_section(fd);
-		break;
+		நிறுத்து;
 
-	    case SN_MIDWORD:
+	    நிலை SN_MIDWORD:
 		lp->sl_midword = read_string(fd, len);	// <midword>
-		if (lp->sl_midword == NULL)
-		    goto endFAIL;
-		break;
+		எனில் (lp->sl_midword == வெற்று)
+		    செல் endFAIL;
+		நிறுத்து;
 
-	    case SN_PREFCOND:
+	    நிலை SN_PREFCOND:
 		res = read_prefcond_section(fd, lp);
-		break;
+		நிறுத்து;
 
-	    case SN_REP:
+	    நிலை SN_REP:
 		res = read_rep_section(fd, &lp->sl_rep, lp->sl_rep_first);
-		break;
+		நிறுத்து;
 
-	    case SN_REPSAL:
+	    நிலை SN_REPSAL:
 		res = read_rep_section(fd, &lp->sl_repsal, lp->sl_repsal_first);
-		break;
+		நிறுத்து;
 
-	    case SN_SAL:
+	    நிலை SN_SAL:
 		res = read_sal_section(fd, lp);
-		break;
+		நிறுத்து;
 
-	    case SN_SOFO:
+	    நிலை SN_SOFO:
 		res = read_sofo_section(fd, lp);
-		break;
+		நிறுத்து;
 
-	    case SN_MAP:
+	    நிலை SN_MAP:
 		p = read_string(fd, len);		// <mapstr>
-		if (p == NULL)
-		    goto endFAIL;
+		எனில் (p == வெற்று)
+		    செல் endFAIL;
 		set_map_str(lp, p);
 		vim_free(p);
-		break;
+		நிறுத்து;
 
-	    case SN_WORDS:
-		res = read_words_section(fd, lp, len);
-		break;
+	    நிலை SN_சொற்கள்:
+		res = read_சொற்கள்_section(fd, lp, len);
+		நிறுத்து;
 
-	    case SN_SUGFILE:
+	    நிலை SN_SUGFILE:
 		lp->sl_sugtime = get8ctime(fd);		// <timestamp>
-		break;
+		நிறுத்து;
 
-	    case SN_NOSPLITSUGS:
+	    நிலை SN_NOSPLITSUGS:
 		lp->sl_nosplitsugs = TRUE;
-		break;
+		நிறுத்து;
 
-	    case SN_NOCOMPOUNDSUGS:
+	    நிலை SN_NOCOMPOUNDSUGS:
 		lp->sl_nocompoundsugs = TRUE;
-		break;
+		நிறுத்து;
 
-	    case SN_COMPOUND:
+	    நிலை SN_COMPOUND:
 		res = read_compound(fd, lp, len);
-		break;
+		நிறுத்து;
 
-	    case SN_NOBREAK:
+	    நிலை SN_NOBREAK:
 		lp->sl_nobreak = TRUE;
-		break;
+		நிறுத்து;
 
-	    case SN_SYLLABLE:
+	    நிலை SN_SYLLABLE:
 		lp->sl_syllable = read_string(fd, len);	// <syllable>
-		if (lp->sl_syllable == NULL)
-		    goto endFAIL;
-		if (init_syl_tab(lp) != OK)
-		    goto endFAIL;
-		break;
+		எனில் (lp->sl_syllable == வெற்று)
+		    செல் endFAIL;
+		எனில் (init_syl_tab(lp) != OK)
+		    செல் endFAIL;
+		நிறுத்து;
 
-	    default:
+	    இயல்பு:
 		// Unsupported section.  When it's required give an error
 		// message.  When it's not required skip the contents.
-		if (c & SNF_REQUIRED)
+		எனில் (c & SNF_REQUIRED)
 		{
 		    emsg(_(e_unsupported_section_in_spell_file));
-		    goto endFAIL;
+		    செல் endFAIL;
 		}
-		while (--len >= 0)
-		    if (getc(fd) < 0)
-			goto truncerr;
-		break;
+		போது (--len >= 0)
+		    எனில் (getc(fd) < 0)
+			செல் truncerr;
+		நிறுத்து;
 	}
 someerror:
-	if (res == SP_FORMERROR)
+	எனில் (res == SP_FORMERROR)
 	{
 	    emsg(_(e_format_error_in_spell_file));
-	    goto endFAIL;
+	    செல் endFAIL;
 	}
-	if (res == SP_TRUNCERROR)
+	எனில் (res == SP_TRUNCERROR)
 	{
 truncerr:
 	    emsg(_(e_truncated_spell_file));
-	    goto endFAIL;
+	    செல் endFAIL;
 	}
-	if (res == SP_OTHERERROR)
-	    goto endFAIL;
+	எனில் (res == SP_OTHERERROR)
+	    செல் endFAIL;
     }
 
     // <LWORDTREE>
-    res = spell_read_tree(fd, &lp->sl_fbyts, &lp->sl_fbyts_len,
+    res = spell_read_மரம்(fd, &lp->sl_fbyts, &lp->sl_fbyts_len,
 						      &lp->sl_fidxs, FALSE, 0);
-    if (res != 0)
-	goto someerror;
+    எனில் (res != 0)
+	செல் someerror;
 
     // <KWORDTREE>
-    res = spell_read_tree(fd, &lp->sl_kbyts, NULL, &lp->sl_kidxs, FALSE, 0);
-    if (res != 0)
-	goto someerror;
+    res = spell_read_மரம்(fd, &lp->sl_kbyts, வெற்று, &lp->sl_kidxs, FALSE, 0);
+    எனில் (res != 0)
+	செல் someerror;
 
     // <PREFIXTREE>
-    res = spell_read_tree(fd, &lp->sl_pbyts, NULL, &lp->sl_pidxs, TRUE,
+    res = spell_read_மரம்(fd, &lp->sl_pbyts, வெற்று, &lp->sl_pidxs, TRUE,
 							    lp->sl_prefixcnt);
-    if (res != 0)
-	goto someerror;
+    எனில் (res != 0)
+	செல் someerror;
 
     // For a new file link it in the list of spell files.
-    if (old_lp == NULL && lang != NULL)
+    எனில் (old_lp == வெற்று && lang != வெற்று)
     {
 	lp->sl_next = first_lang;
 	first_lang = lp;
     }
 
-    goto endOK;
+    செல் endOK;
 
 endFAIL:
-    if (lang != NULL)
+    எனில் (lang != வெற்று)
 	// truncating the name signals the error to spell_load_lang()
 	*lang = NUL;
-    if (lp != NULL && old_lp == NULL)
+    எனில் (lp != வெற்று && old_lp == வெற்று)
 	slang_free(lp);
-    lp = NULL;
+    lp = வெற்று;
 
 endOK:
-    if (fd != NULL)
+    எனில் (fd != வெற்று)
 	fclose(fd);
-    if (did_estack_push)
+    எனில் (did_estack_தள்ளு)
     {
 	ESTACK_CHECK_NOW;
-	estack_pop();
+	estack_எடு();
     }
 
-    return lp;
+    திரும்பு lp;
 }
 
 /*
  * Fill in the wordcount fields for a trie.
  * Returns the total number of words.
  */
-    static void
-tree_count_words(char_u *byts, long byts_len, idx_T *idxs)
+    நிலையான வெறுமை
+மரம்_மொத்தம்_சொற்கள்(char_u *byts, long byts_len, idx_T *idxs)
 {
-    int		depth;
+    முழு		depth;
     idx_T	arridx[MAXWLEN];
-    int		curi[MAXWLEN];
-    int		c;
+    முழு		curi[MAXWLEN];
+    முழு		c;
     idx_T	n;
-    int		wordcount[MAXWLEN];
+    முழு		wordcount[MAXWLEN];
 
     arridx[0] = 0;
     curi[0] = 1;
     wordcount[0] = 0;
     depth = 0;
-    while (depth >= 0 && !got_int)
+    போது (depth >= 0 && !got_int)
     {
-	if (curi[depth] > byts[arridx[depth]])
+	எனில் (curi[depth] > byts[arridx[depth]])
 	{
 	    // Done all bytes at this node, go up one level.
 	    idxs[arridx[depth]] = wordcount[depth];
-	    if (depth > 0)
+	    எனில் (depth > 0)
 		wordcount[depth - 1] += wordcount[depth];
 
 	    --depth;
 	    fast_breakcheck();
 	}
-	else
+	இல்லையெனில்
 	{
 	    // Do one more byte at this node.
 	    n = arridx[depth] + curi[depth];
 	    ++curi[depth];
 
 	    c = byts[n];
-	    if (c == 0)
+	    எனில் (c == 0)
 	    {
 		// End of word, count it.
 		++wordcount[depth];
 
 		// Skip over any other NUL bytes (same word with different
 		// flags).  But don't go over the end.
-		while (n + 1 < byts_len && byts[n + 1] == 0)
+		போது (n + 1 < byts_len && byts[n + 1] == 0)
 		{
 		    ++n;
 		    ++curi[depth];
 		}
 	    }
-	    else if (depth < MAXWLEN - 1)
+	    இல்லையெனில் எனில் (depth < MAXWLEN - 1)
 	    {
 		// Normal char, go one level deeper to count the words.
 		++depth;
@@ -657,28 +657,28 @@ tree_count_words(char_u *byts, long byts_len, idx_T *idxs)
 /*
  * Load the .sug files for languages that have one and weren't loaded yet.
  */
-    void
-suggest_load_files(void)
+    வெறுமை
+suggest_load_files(வெறுமை)
 {
     langp_T	*lp;
-    int		lpi;
+    முழு		lpi;
     slang_T	*slang;
     char_u	*dotp;
     FILE	*fd;
     char_u	buf[MAXWLEN];
-    int		i;
+    முழு		i;
     time_t	timestamp;
-    int		wcount;
-    int		wordnr;
+    முழு		wcount;
+    முழு		wordnr;
     garray_T	ga;
-    int		c;
+    முழு		c;
 
     // Do this for all languages that support sound folding.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    க்கு (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
 	slang = lp->lp_slang;
-	if (slang->sl_sugtime != 0 && !slang->sl_sugloaded)
+	எனில் (slang->sl_sugtime != 0 && !slang->sl_sugloaded)
 	{
 	    // Change ".spl" to ".sug" and open the file.  When the file isn't
 	    // found silently skip it.  Do set "sl_sugloaded" so that we
@@ -686,60 +686,60 @@ suggest_load_files(void)
 	    slang->sl_sugloaded = TRUE;
 
 	    dotp = vim_strrchr(slang->sl_fname, '.');
-	    if (dotp == NULL || fnamecmp(dotp, ".spl") != 0)
-		continue;
+	    எனில் (dotp == வெற்று || fnamecmp(dotp, ".spl") != 0)
+		தொடர்;
 	    STRCPY(dotp, ".sug");
-	    fd = mch_fopen((char *)slang->sl_fname, "r");
-	    if (fd == NULL)
-		goto nextone;
+	    fd = mch_fopen((எழுத்து *)slang->sl_fname, "r");
+	    எனில் (fd == வெற்று)
+		செல் nextone;
 
 	    /*
 	     * <SUGHEADER>: <fileID> <versionnr> <timestamp>
 	     */
-	    for (i = 0; i < VIMSUGMAGICL; ++i)
+	    க்கு (i = 0; i < VIMSUGMAGICL; ++i)
 		buf[i] = (c = getc(fd)) == EOF ? 0 : c;	// <fileID>
-	    if (STRNCMP(buf, VIMSUGMAGIC, VIMSUGMAGICL) != 0)
+	    எனில் (STRNCMP(buf, VIMSUGMAGIC, VIMSUGMAGICL) != 0)
 	    {
 		semsg(_(e_this_does_not_look_like_sug_file_str),
 							     slang->sl_fname);
-		goto nextone;
+		செல் nextone;
 	    }
 	    c = getc(fd);				// <versionnr>
-	    if (c < VIMSUGVERSION)
+	    எனில் (c < VIMSUGVERSION)
 	    {
 		semsg(_(e_old_sug_file_needs_to_be_updated_str),
 							     slang->sl_fname);
-		goto nextone;
+		செல் nextone;
 	    }
-	    else if (c > VIMSUGVERSION)
+	    இல்லையெனில் எனில் (c > VIMSUGVERSION)
 	    {
 		semsg(_(e_sug_file_is_for_newer_version_of_vim_str),
 							     slang->sl_fname);
-		goto nextone;
+		செல் nextone;
 	    }
 
 	    // Check the timestamp, it must be exactly the same as the one in
 	    // the .spl file.  Otherwise the word numbers won't match.
 	    timestamp = get8ctime(fd);			// <timestamp>
-	    if (timestamp != slang->sl_sugtime)
+	    எனில் (timestamp != slang->sl_sugtime)
 	    {
 		semsg(_(e_sug_file_doesnt_match_spl_file_str),
 							     slang->sl_fname);
-		goto nextone;
+		செல் nextone;
 	    }
 
 	    /*
 	     * <SUGWORDTREE>: <wordtree>
 	     * Read the trie with the soundfolded words.
 	     */
-	    if (spell_read_tree(fd, &slang->sl_sbyts, &slang->sl_sbyts_len,
+	    எனில் (spell_read_மரம்(fd, &slang->sl_sbyts, &slang->sl_sbyts_len,
 			&slang->sl_sidxs, FALSE, 0) != 0)
 	    {
 someerror:
 		semsg(_(e_error_while_reading_sug_file_str),
 							     slang->sl_fname);
 		slang_clear_sug(slang);
-		goto nextone;
+		செல் nextone;
 	    }
 
 	    /*
@@ -750,31 +750,31 @@ someerror:
 	     * possible to swap the info and save on memory use.
 	     */
 	    slang->sl_sugbuf = open_spellbuf();
-	    if (slang->sl_sugbuf == NULL)
-		goto someerror;
+	    எனில் (slang->sl_sugbuf == வெற்று)
+		செல் someerror;
 							    // <sugwcount>
 	    wcount = get4c(fd);
-	    if (wcount < 0)
-		goto someerror;
+	    எனில் (wcount < 0)
+		செல் someerror;
 
 	    // Read all the wordnr lists into the buffer, one NUL terminated
 	    // list per line.
 	    ga_init2(&ga, 1, 100);
-	    for (wordnr = 0; wordnr < wcount; ++wordnr)
+	    க்கு (wordnr = 0; wordnr < wcount; ++wordnr)
 	    {
 		ga.ga_len = 0;
-		for (;;)
+		க்கு (;;)
 		{
 		    c = getc(fd);			    // <sugline>
-		    if (c < 0 || ga_grow(&ga, 1) == FAIL)
-			goto someerror;
+		    எனில் (c < 0 || ga_grow(&ga, 1) == FAIL)
+			செல் someerror;
 		    ((char_u *)ga.ga_data)[ga.ga_len++] = c;
-		    if (c == NUL)
-			break;
+		    எனில் (c == NUL)
+			நிறுத்து;
 		}
-		if (ml_append_buf(slang->sl_sugbuf, (linenr_T)wordnr,
+		எனில் (ml_append_buf(slang->sl_sugbuf, (linenr_T)wordnr,
 					 ga.ga_data, ga.ga_len, TRUE) == FAIL)
-		    goto someerror;
+		    செல் someerror;
 	    }
 	    ga_clear(&ga);
 
@@ -782,13 +782,13 @@ someerror:
 	     * Need to put word counts in the word tries, so that we can find
 	     * a word by its number.
 	     */
-	    tree_count_words(slang->sl_fbyts, slang->sl_fbyts_len,
+	    மரம்_மொத்தம்_சொற்கள்(slang->sl_fbyts, slang->sl_fbyts_len,
 		    slang->sl_fidxs);
-	    tree_count_words(slang->sl_sbyts, slang->sl_sbyts_len,
+	    மரம்_மொத்தம்_சொற்கள்(slang->sl_sbyts, slang->sl_sbyts_len,
 		    slang->sl_sidxs);
 
 nextone:
-	    if (fd != NULL)
+	    எனில் (fd != வெற்று)
 		fclose(fd);
 	    STRCPY(dotp, ".spl");
 	}
@@ -803,51 +803,51 @@ nextone:
  * Sets "*cntp" to SP_*ERROR when there is an error, length of the result
  * otherwise.
  */
-    static char_u *
-read_cnt_string(FILE *fd, int cnt_bytes, int *cntp)
+    நிலையான char_u *
+read_cnt_string(FILE *fd, முழு cnt_bytes, முழு *cntp)
 {
-    int		cnt = 0;
-    int		i;
+    முழு		cnt = 0;
+    முழு		i;
     char_u	*str;
 
     // read the length bytes, MSB first
-    for (i = 0; i < cnt_bytes; ++i)
+    க்கு (i = 0; i < cnt_bytes; ++i)
     {
-	int c = getc(fd);
+	முழு c = getc(fd);
 
-	if (c == EOF)
+	எனில் (c == EOF)
 	{
 	    *cntp = SP_TRUNCERROR;
-	    return NULL;
+	    திரும்பு வெற்று;
 	}
 	cnt = (cnt << 8) + (unsigned)c;
     }
     *cntp = cnt;
-    if (cnt == 0)
-	return NULL;	    // nothing to read, return NULL
+    எனில் (cnt == 0)
+	திரும்பு வெற்று;	    // nothing to read, return NULL
 
     str = read_string(fd, cnt);
-    if (str == NULL)
+    எனில் (str == வெற்று)
 	*cntp = SP_OTHERERROR;
-    return str;
+    திரும்பு str;
 }
 
 /*
  * Read SN_REGION: <regionname> ...
  * Return SP_*ERROR flags.
  */
-    static int
-read_region_section(FILE *fd, slang_T *lp, int len)
+    நிலையான முழு
+read_region_section(FILE *fd, slang_T *lp, முழு len)
 {
-    int		i;
-    int		c = 0;
+    முழு		i;
+    முழு		c = 0;
 
-    if (len > MAXREGIONS * 2)
-	return SP_FORMERROR;
-    for (i = 0; i < len; ++i)
+    எனில் (len > MAXREGIONS * 2)
+	திரும்பு SP_FORMERROR;
+    க்கு (i = 0; i < len; ++i)
 	lp->sl_regions[i] = (c = getc(fd)) == EOF ? 0 : c; // <regionname>
     lp->sl_regions[len] = NUL;
-    return c == EOF ? SP_TRUNCERROR : 0;
+    திரும்பு c == EOF ? SP_TRUNCERROR : 0;
 }
 
 /*
@@ -855,274 +855,274 @@ read_region_section(FILE *fd, slang_T *lp, int len)
  *				<folcharslen> <folchars>
  * Return SP_*ERROR flags.
  */
-    static int
+    நிலையான முழு
 read_charflags_section(FILE *fd)
 {
     char_u	*flags;
     char_u	*fol;
-    int		flagslen, follen;
+    முழு		flagslen, follen;
 
     // <charflagslen> <charflags>
     flags = read_cnt_string(fd, 1, &flagslen);
-    if (flagslen < 0)
-	return flagslen;
+    எனில் (flagslen < 0)
+	திரும்பு flagslen;
 
     // <folcharslen> <folchars>
     fol = read_cnt_string(fd, 2, &follen);
-    if (follen < 0)
+    எனில் (follen < 0)
     {
 	vim_free(flags);
-	return follen;
+	திரும்பு follen;
     }
 
     // Set the word-char flags and fill SPELL_ISUPPER() table.
-    if (flags != NULL && fol != NULL)
+    எனில் (flags != வெற்று && fol != வெற்று)
 	set_spell_charflags(flags, flagslen, fol);
 
     vim_free(flags);
     vim_free(fol);
 
     // When <charflagslen> is zero then <fcharlen> must also be zero.
-    if ((flags == NULL) != (fol == NULL))
-	return SP_FORMERROR;
-    return 0;
+    எனில் ((flags == வெற்று) != (fol == வெற்று))
+	திரும்பு SP_FORMERROR;
+    திரும்பு 0;
 }
 
 /*
  * Read SN_PREFCOND section.
  * Return SP_*ERROR flags.
  */
-    static int
+    நிலையான முழு
 read_prefcond_section(FILE *fd, slang_T *lp)
 {
-    int		cnt;
-    int		i;
-    int		n;
-    int		c;
+    முழு		cnt;
+    முழு		i;
+    முழு		n;
+    முழு		c;
     char_u	*p;
     char_u	buf[MAXWLEN + 1];
 
     // <prefcondcnt> <prefcond> ...
     cnt = get2c(fd);					// <prefcondcnt>
-    if (cnt <= 0)
-	return SP_FORMERROR;
+    எனில் (cnt <= 0)
+	திரும்பு SP_FORMERROR;
 
     lp->sl_prefprog = ALLOC_CLEAR_MULT(regprog_T *, cnt);
-    if (lp->sl_prefprog == NULL)
-	return SP_OTHERERROR;
+    எனில் (lp->sl_prefprog == வெற்று)
+	திரும்பு SP_OTHERERROR;
     lp->sl_prefixcnt = cnt;
 
-    for (i = 0; i < cnt; ++i)
+    க்கு (i = 0; i < cnt; ++i)
     {
 	// <prefcond> : <condlen> <condstr>
 	n = getc(fd);					// <condlen>
-	if (n < 0 || n >= MAXWLEN)
-	    return SP_FORMERROR;
+	எனில் (n < 0 || n >= MAXWLEN)
+	    திரும்பு SP_FORMERROR;
 
 	// When <condlen> is zero we have an empty condition.  Otherwise
 	// compile the regexp program used to check for the condition.
-	if (n > 0)
+	எனில் (n > 0)
 	{
 	    buf[0] = '^';	    // always match at one position only
 	    p = buf + 1;
-	    while (n-- > 0)
+	    போது (n-- > 0)
 		*p++ = (c = getc(fd)) == EOF ? 0 : c;	    // <condstr>
-	    if (c == EOF)
-		break;
+	    எனில் (c == EOF)
+		நிறுத்து;
 	    *p = NUL;
 	    lp->sl_prefprog[i] = vim_regcomp(buf, RE_MAGIC + RE_STRING);
 	}
     }
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * Read REP or REPSAL items section from "fd": <repcount> <rep> ...
  * Return SP_*ERROR flags.
  */
-    static int
+    நிலையான முழு
 read_rep_section(FILE *fd, garray_T *gap, short *first)
 {
-    int		cnt;
+    முழு		cnt;
     fromto_T	*ftp;
-    int		i;
+    முழு		i;
 
     cnt = get2c(fd);					// <repcount>
-    if (cnt < 0)
-	return SP_TRUNCERROR;
+    எனில் (cnt < 0)
+	திரும்பு SP_TRUNCERROR;
 
-    if (ga_grow(gap, cnt) == FAIL)
-	return SP_OTHERERROR;
+    எனில் (ga_grow(gap, cnt) == FAIL)
+	திரும்பு SP_OTHERERROR;
 
     // <rep> : <repfromlen> <repfrom> <reptolen> <repto>
-    for (; gap->ga_len < cnt; ++gap->ga_len)
+    க்கு (; gap->ga_len < cnt; ++gap->ga_len)
     {
 	ftp = &((fromto_T *)gap->ga_data)[gap->ga_len];
 	ftp->ft_from = read_cnt_string(fd, 1, &i);
-	if (i < 0)
-	    return i;
-	if (i == 0)
-	    return SP_FORMERROR;
+	எனில் (i < 0)
+	    திரும்பு i;
+	எனில் (i == 0)
+	    திரும்பு SP_FORMERROR;
 	ftp->ft_to = read_cnt_string(fd, 1, &i);
-	if (i <= 0)
+	எனில் (i <= 0)
 	{
 	    vim_free(ftp->ft_from);
-	    if (i < 0)
-		return i;
-	    return SP_FORMERROR;
+	    எனில் (i < 0)
+		திரும்பு i;
+	    திரும்பு SP_FORMERROR;
 	}
     }
 
     // Fill the first-index table.
-    for (i = 0; i < 256; ++i)
+    க்கு (i = 0; i < 256; ++i)
 	first[i] = -1;
-    for (i = 0; i < gap->ga_len; ++i)
+    க்கு (i = 0; i < gap->ga_len; ++i)
     {
 	ftp = &((fromto_T *)gap->ga_data)[i];
-	if (first[*ftp->ft_from] == -1)
+	எனில் (first[*ftp->ft_from] == -1)
 	    first[*ftp->ft_from] = i;
     }
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * Read SN_SAL section: <salflags> <salcount> <sal> ...
  * Return SP_*ERROR flags.
  */
-    static int
+    நிலையான முழு
 read_sal_section(FILE *fd, slang_T *slang)
 {
-    int		i;
-    int		cnt;
+    முழு		i;
+    முழு		cnt;
     garray_T	*gap;
     salitem_T	*smp;
-    int		ccnt;
+    முழு		ccnt;
     char_u	*p;
 
     slang->sl_sofo = FALSE;
 
     i = getc(fd);				// <salflags>
-    if (i & SAL_F0LLOWUP)
+    எனில் (i & SAL_F0LLOWUP)
 	slang->sl_followup = TRUE;
-    if (i & SAL_COLLAPSE)
+    எனில் (i & SAL_COLLAPSE)
 	slang->sl_collapse = TRUE;
-    if (i & SAL_REM_ACCENTS)
+    எனில் (i & SAL_REM_ACCENTS)
 	slang->sl_rem_accents = TRUE;
 
     cnt = get2c(fd);				// <salcount>
-    if (cnt < 0)
-	return SP_TRUNCERROR;
+    எனில் (cnt < 0)
+	திரும்பு SP_TRUNCERROR;
 
     gap = &slang->sl_sal;
-    ga_init2(gap, sizeof(salitem_T), 10);
-    if (ga_grow(gap, cnt + 1) == FAIL)
-	return SP_OTHERERROR;
+    ga_init2(gap, அளவு(salitem_T), 10);
+    எனில் (ga_grow(gap, cnt + 1) == FAIL)
+	திரும்பு SP_OTHERERROR;
 
     // <sal> : <salfromlen> <salfrom> <saltolen> <salto>
-    for (; gap->ga_len < cnt; ++gap->ga_len)
+    க்கு (; gap->ga_len < cnt; ++gap->ga_len)
     {
-	int	c = NUL;
+	முழு	c = NUL;
 
 	smp = &((salitem_T *)gap->ga_data)[gap->ga_len];
 	ccnt = getc(fd);			// <salfromlen>
-	if (ccnt < 0)
-	    return SP_TRUNCERROR;
-	if ((p = alloc(ccnt + 2)) == NULL)
-	    return SP_OTHERERROR;
+	எனில் (ccnt < 0)
+	    திரும்பு SP_TRUNCERROR;
+	எனில் ((p = alloc(ccnt + 2)) == வெற்று)
+	    திரும்பு SP_OTHERERROR;
 	smp->sm_lead = p;
 
 	// Read up to the first special char into sm_lead.
-	for (i = 0; i < ccnt; ++i)
+	க்கு (i = 0; i < ccnt; ++i)
 	{
 	    c = getc(fd);			// <salfrom>
-	    if (vim_strchr((char_u *)"0123456789(-<^$", c) != NULL)
-		break;
+	    எனில் (vim_strchr((char_u *)"0123456789(-<^$", c) != வெற்று)
+		நிறுத்து;
 	    *p++ = c;
 	}
-	smp->sm_leadlen = (int)(p - smp->sm_lead);
+	smp->sm_leadlen = (முழு)(p - smp->sm_lead);
 	*p++ = NUL;
 
 	// Put (abc) chars in sm_oneof, if any.
-	if (c == '(')
+	எனில் (c == '(')
 	{
 	    smp->sm_oneof = p;
-	    for (++i; i < ccnt; ++i)
+	    க்கு (++i; i < ccnt; ++i)
 	    {
 		c = getc(fd);			// <salfrom>
-		if (c == ')')
-		    break;
+		எனில் (c == ')')
+		    நிறுத்து;
 		*p++ = c;
 	    }
 	    *p++ = NUL;
-	    if (++i < ccnt)
+	    எனில் (++i < ccnt)
 		c = getc(fd);
 	}
-	else
-	    smp->sm_oneof = NULL;
+	இல்லையெனில்
+	    smp->sm_oneof = வெற்று;
 
 	// Any following chars go in sm_rules.
 	smp->sm_rules = p;
-	if (i < ccnt)
+	எனில் (i < ccnt)
 	    // store the char we got while checking for end of sm_lead
 	    *p++ = c;
-	for (++i; i < ccnt; ++i)
+	க்கு (++i; i < ccnt; ++i)
 	    *p++ = (c = getc(fd)) == EOF ? 0 : c;	// <salfrom>
 	*p++ = NUL;
 
 	// <saltolen> <salto>
 	smp->sm_to = read_cnt_string(fd, 1, &ccnt);
-	if (ccnt < 0)
+	எனில் (ccnt < 0)
 	{
 	    vim_free(smp->sm_lead);
-	    return ccnt;
+	    திரும்பு ccnt;
 	}
 
-	if (has_mbyte)
+	எனில் (has_mbyte)
 	{
 	    // convert the multi-byte strings to wide char strings
 	    smp->sm_lead_w = mb_str2wide(smp->sm_lead);
 	    smp->sm_leadlen = mb_charlen(smp->sm_lead);
-	    if (smp->sm_oneof == NULL)
-		smp->sm_oneof_w = NULL;
-	    else
+	    எனில் (smp->sm_oneof == வெற்று)
+		smp->sm_oneof_w = வெற்று;
+	    இல்லையெனில்
 		smp->sm_oneof_w = mb_str2wide(smp->sm_oneof);
-	    if (smp->sm_to == NULL)
-		smp->sm_to_w = NULL;
-	    else
+	    எனில் (smp->sm_to == வெற்று)
+		smp->sm_to_w = வெற்று;
+	    இல்லையெனில்
 		smp->sm_to_w = mb_str2wide(smp->sm_to);
-	    if (smp->sm_lead_w == NULL
-		    || (smp->sm_oneof_w == NULL && smp->sm_oneof != NULL)
-		    || (smp->sm_to_w == NULL && smp->sm_to != NULL))
+	    எனில் (smp->sm_lead_w == வெற்று
+		    || (smp->sm_oneof_w == வெற்று && smp->sm_oneof != வெற்று)
+		    || (smp->sm_to_w == வெற்று && smp->sm_to != வெற்று))
 	    {
 		vim_free(smp->sm_lead);
 		vim_free(smp->sm_to);
 		vim_free(smp->sm_lead_w);
 		vim_free(smp->sm_oneof_w);
 		vim_free(smp->sm_to_w);
-		return SP_OTHERERROR;
+		திரும்பு SP_OTHERERROR;
 	    }
 	}
     }
 
-    if (gap->ga_len > 0)
+    எனில் (gap->ga_len > 0)
     {
 	// Add one extra entry to mark the end with an empty sm_lead.  Avoids
 	// that we need to check the index every time.
 	smp = &((salitem_T *)gap->ga_data)[gap->ga_len];
-	if ((p = alloc(1)) == NULL)
-	    return SP_OTHERERROR;
+	எனில் ((p = alloc(1)) == வெற்று)
+	    திரும்பு SP_OTHERERROR;
 	p[0] = NUL;
 	smp->sm_lead = p;
 	smp->sm_leadlen = 0;
-	smp->sm_oneof = NULL;
+	smp->sm_oneof = வெற்று;
 	smp->sm_rules = p;
-	smp->sm_to = NULL;
-	if (has_mbyte)
+	smp->sm_to = வெற்று;
+	எனில் (has_mbyte)
 	{
 	    smp->sm_lead_w = mb_str2wide(smp->sm_lead);
 	    smp->sm_leadlen = 0;
-	    smp->sm_oneof_w = NULL;
-	    smp->sm_to_w = NULL;
+	    smp->sm_oneof_w = வெற்று;
+	    smp->sm_to_w = வெற்று;
 	}
 	++gap->ga_len;
     }
@@ -1130,78 +1130,78 @@ read_sal_section(FILE *fd, slang_T *slang)
     // Fill the first-index table.
     set_sal_first(slang);
 
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * Read SN_WORDS: <word> ...
  * Return SP_*ERROR flags.
  */
-    static int
-read_words_section(FILE *fd, slang_T *lp, int len)
+    நிலையான முழு
+read_சொற்கள்_section(FILE *fd, slang_T *lp, முழு len)
 {
-    int		done = 0;
-    int		i;
-    int		c;
+    முழு		done = 0;
+    முழு		i;
+    முழு		c;
     char_u	word[MAXWLEN];
 
-    while (done < len)
+    போது (done < len)
     {
 	// Read one word at a time.
-	for (i = 0; ; ++i)
+	க்கு (i = 0; ; ++i)
 	{
 	    c = getc(fd);
-	    if (c == EOF)
-		return SP_TRUNCERROR;
+	    எனில் (c == EOF)
+		திரும்பு SP_TRUNCERROR;
 	    word[i] = c;
-	    if (word[i] == NUL)
-		break;
-	    if (i == MAXWLEN - 1)
-		return SP_FORMERROR;
+	    எனில் (word[i] == NUL)
+		நிறுத்து;
+	    எனில் (i == MAXWLEN - 1)
+		திரும்பு SP_FORMERROR;
 	}
 
 	// Init the count to 10.
-	count_common_word(lp, word, -1, 10);
+	மொத்தம்_common_word(lp, word, -1, 10);
 	done += i + 1;
     }
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * SN_SOFO: <sofofromlen> <sofofrom> <sofotolen> <sofoto>
  * Return SP_*ERROR flags.
  */
-    static int
+    நிலையான முழு
 read_sofo_section(FILE *fd, slang_T *slang)
 {
-    int		cnt;
+    முழு		cnt;
     char_u	*from, *to;
-    int		res;
+    முழு		res;
 
     // <sofofromlen> <sofofrom>
     from = read_cnt_string(fd, 2, &cnt);
-    if (cnt < 0)
-	return cnt;
+    எனில் (cnt < 0)
+	திரும்பு cnt;
 
     // <sofotolen> <sofoto>
     to = read_cnt_string(fd, 2, &cnt);
-    if (cnt < 0)
+    எனில் (cnt < 0)
     {
 	vim_free(from);
-	return cnt;
+	திரும்பு cnt;
     }
 
     // Store the info in slang->sl_sal and/or slang->sl_sal_first.
-    if (from != NULL && to != NULL)
+    எனில் (from != வெற்று && to != வெற்று)
 	res = set_sofo(slang, from, to);
-    else if (from != NULL || to != NULL)
+    இல்லையெனில் எனில் (from != வெற்று || to != வெற்று)
 	res = SP_FORMERROR;    // only one of two strings is an error
-    else
+    இல்லையெனில்
 	res = 0;
 
     vim_free(from);
     vim_free(to);
-    return res;
+    திரும்பு res;
 }
 
 /*
@@ -1209,47 +1209,47 @@ read_sofo_section(FILE *fd, slang_T *slang)
  *	<compmax> <compminlen> <compsylmax> <compoptions> <compflags>
  * Returns SP_*ERROR flags.
  */
-    static int
-read_compound(FILE *fd, slang_T *slang, int len)
+    நிலையான முழு
+read_compound(FILE *fd, slang_T *slang, முழு len)
 {
-    int		todo = len;
-    int		c;
-    int		atstart;
+    முழு		todo = len;
+    முழு		c;
+    முழு		atstart;
     char_u	*pat;
     char_u	*pp;
     char_u	*cp;
     char_u	*ap;
     char_u	*crp;
-    int		cnt;
+    முழு		cnt;
     garray_T	*gap;
     size_t	patsize;
     size_t	flagsize;
 
-    if (todo < 2)
-	return SP_FORMERROR;	// need at least two bytes
+    எனில் (todo < 2)
+	திரும்பு SP_FORMERROR;	// need at least two bytes
 
     --todo;
     c = getc(fd);					// <compmax>
-    if (c < 2)
+    எனில் (c < 2)
 	c = MAXWLEN;
     slang->sl_compmax = c;
 
     --todo;
     c = getc(fd);					// <compminlen>
-    if (c < 1)
+    எனில் (c < 1)
 	c = 0;
     slang->sl_compminlen = c;
 
     --todo;
     c = getc(fd);					// <compsylmax>
-    if (c < 1)
+    எனில் (c < 1)
 	c = MAXWLEN;
     slang->sl_compsylmax = c;
 
     c = getc(fd);					// <compoptions>
-    if (c != 0)
+    எனில் (c != 0)
 	ungetc(c, fd);	    // be backwards compatible with Vim 7.0b
-    else
+    இல்லையெனில்
     {
 	--todo;
 	c = getc(fd);	    // only use the lower byte for now
@@ -1258,54 +1258,54 @@ read_compound(FILE *fd, slang_T *slang, int len)
 
 	gap = &slang->sl_comppat;
 	c = get2c(fd);					// <comppatcount>
-	if (c < 0)
-	    return SP_TRUNCERROR;
+	எனில் (c < 0)
+	    திரும்பு SP_TRUNCERROR;
 	todo -= 2;
-	ga_init2(gap, sizeof(char_u *), c);
-	if (ga_grow(gap, c) == OK)
-	    while (--c >= 0)
+	ga_init2(gap, அளவு(char_u *), c);
+	எனில் (ga_grow(gap, c) == OK)
+	    போது (--c >= 0)
 	    {
 		((char_u **)(gap->ga_data))[gap->ga_len++] =
 						  read_cnt_string(fd, 1, &cnt);
 					    // <comppatlen> <comppattext>
-		if (cnt < 0)
-		    return cnt;
+		எனில் (cnt < 0)
+		    திரும்பு cnt;
 		todo -= cnt + 1;
 	    }
     }
-    if (todo < 0)
-	return SP_FORMERROR;
+    எனில் (todo < 0)
+	திரும்பு SP_FORMERROR;
 
     // Turn the COMPOUNDRULE items into a regexp pattern:
     // "a[bc]/a*b+" -> "^\(a[bc]\|a*b\+\)$".
     // Inserting backslashes may double the length, "^\(\)$<Nul>" is 7 bytes.
     // Conversion to utf-8 may double the size.
-    if ((size_t)todo > COMPOUND_MAX_LEN)
-	return SP_FORMERROR;
+    எனில் ((size_t)todo > COMPOUND_MAX_LEN)
+	திரும்பு SP_FORMERROR;
     patsize = (size_t)todo * 2 + 7;
-    if (enc_utf8)
+    எனில் (enc_utf8)
 	patsize += (size_t)todo * 2;
     flagsize = (size_t)todo + 1;
     pat = alloc(patsize);
-    if (pat == NULL)
-	return SP_OTHERERROR;
+    எனில் (pat == வெற்று)
+	திரும்பு SP_OTHERERROR;
 
     // We also need a list of all flags that can appear at the start and one
     // for all flags.
     cp = alloc(flagsize);
-    if (cp == NULL)
+    எனில் (cp == வெற்று)
     {
 	vim_free(pat);
-	return SP_OTHERERROR;
+	திரும்பு SP_OTHERERROR;
     }
     slang->sl_compstartflags = cp;
     *cp = NUL;
 
     ap = alloc(flagsize);
-    if (ap == NULL)
+    எனில் (ap == வெற்று)
     {
 	vim_free(pat);
-	return SP_OTHERERROR;
+	திரும்பு SP_OTHERERROR;
     }
     slang->sl_compallflags = ap;
     *ap = NUL;
@@ -1322,68 +1322,68 @@ read_compound(FILE *fd, slang_T *slang, int len)
     *pp++ = '(';
 
     atstart = 1;
-    while (todo-- > 0)
+    போது (todo-- > 0)
     {
 	c = getc(fd);					// <compflags>
-	if (c == EOF)
+	எனில் (c == EOF)
 	{
 	    vim_free(pat);
-	    return SP_TRUNCERROR;
+	    திரும்பு SP_TRUNCERROR;
 	}
 
 	// Add all flags to "sl_compallflags".
-	if (vim_strchr((char_u *)"?*+[]/", c) == NULL
+	எனில் (vim_strchr((char_u *)"?*+[]/", c) == வெற்று
 		&& !byte_in_str(slang->sl_compallflags, c))
 	{
 	    *ap++ = c;
 	    *ap = NUL;
 	}
 
-	if (atstart != 0)
+	எனில் (atstart != 0)
 	{
 	    // At start of item: copy flags to "sl_compstartflags".  For a
 	    // [abc] item set "atstart" to 2 and copy up to the ']'.
-	    if (c == '[')
+	    எனில் (c == '[')
 		atstart = 2;
-	    else if (c == ']')
+	    இல்லையெனில் எனில் (c == ']')
 		atstart = 0;
-	    else
+	    இல்லையெனில்
 	    {
-		if (!byte_in_str(slang->sl_compstartflags, c))
+		எனில் (!byte_in_str(slang->sl_compstartflags, c))
 		{
 		    *cp++ = c;
 		    *cp = NUL;
 		}
-		if (atstart == 1)
+		எனில் (atstart == 1)
 		    atstart = 0;
 	    }
 	}
 
 	// Copy flag to "sl_comprules", unless we run into a wildcard.
-	if (crp != NULL)
+	எனில் (crp != வெற்று)
 	{
-	    if (c == '?' || c == '+' || c == '*')
+	    எனில் (c == '?' || c == '+' || c == '*')
 	    {
 		VIM_CLEAR(slang->sl_comprules);
-		crp = NULL;
+		crp = வெற்று;
 	    }
-	    else
+	    இல்லையெனில்
 		*crp++ = c;
 	}
 
-	if (c == '/')	    // slash separates two items
+	எனில் (c == '/')	    // slash separates two items
 	{
 	    *pp++ = '\\';
 	    *pp++ = '|';
 	    atstart = 1;
 	}
-	else		    // normal char, "[abc]" and '*' are copied as-is
+	இல்லையெனில்		    // normal char, "[abc]" and '*' are copied as-is
 	{
-	    if (c == '?' || c == '+' || c == '~')
+	    எனில் (c == '?' || c == '+' || c == '~')
 		*pp++ = '\\';	    // "a?" becomes "a\?", "a+" becomes "a\+"
-	    if (enc_utf8)
+	    எனில் (enc_utf8)
 		pp += mb_char2bytes(c, pp);
-	    else
+	    இல்லையெனில்
 		*pp++ = c;
 	}
     }
@@ -1393,153 +1393,153 @@ read_compound(FILE *fd, slang_T *slang, int len)
     *pp++ = '$';
     *pp = NUL;
 
-    if (crp != NULL)
+    எனில் (crp != வெற்று)
 	*crp = NUL;
 
     slang->sl_compprog = vim_regcomp(pat, RE_MAGIC + RE_STRING + RE_STRICT);
     vim_free(pat);
-    if (slang->sl_compprog == NULL)
-	return SP_FORMERROR;
+    எனில் (slang->sl_compprog == வெற்று)
+	திரும்பு SP_FORMERROR;
 
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * Set the SOFOFROM and SOFOTO items in language "lp".
  * Returns SP_*ERROR flags when there is something wrong.
  */
-    static int
+    நிலையான முழு
 set_sofo(slang_T *lp, char_u *from, char_u *to)
 {
-    int		i;
+    முழு		i;
 
     garray_T	*gap;
     char_u	*s;
     char_u	*p;
-    int		c;
-    int		*inp;
+    முழு		c;
+    முழு		*inp;
 
-    if (has_mbyte)
+    எனில் (has_mbyte)
     {
-	free_sal_items(&lp->sl_sal);
+	free_sal_பொருட்கள்(&lp->sl_sal);
 
 	// Use "sl_sal" as an array with 256 pointers to a list of wide
 	// characters.  The index is the low byte of the character.
 	// The list contains from-to pairs with a terminating NUL.
 	// sl_sal_first[] is used for latin1 "from" characters.
 	gap = &lp->sl_sal;
-	ga_init2(gap, sizeof(int *), 1);
-	if (ga_grow(gap, 256) == FAIL)
-	    return SP_OTHERERROR;
-	vim_memset(gap->ga_data, 0, sizeof(int *) * 256);
+	ga_init2(gap, அளவு(முழு *), 1);
+	எனில் (ga_grow(gap, 256) == FAIL)
+	    திரும்பு SP_OTHERERROR;
+	vim_memset(gap->ga_data, 0, அளவு(முழு *) * 256);
 	gap->ga_len = 256;
 	lp->sl_sofo = TRUE;
 
 	// First count the number of items for each list.  Temporarily use
 	// sl_sal_first[] for this.  Reset it first: a preceding SN_SAL section
 	// may have set the entries to -1 via set_sal_first().
-	vim_memset(lp->sl_sal_first, 0, sizeof(salfirst_T) * 256);
-	for (p = from, s = to; *p != NUL && *s != NUL; )
+	vim_memset(lp->sl_sal_first, 0, அளவு(salfirst_T) * 256);
+	க்கு (p = from, s = to; *p != NUL && *s != NUL; )
 	{
 	    c = mb_cptr2char_adv(&p);
 	    MB_CPTR_ADV(s);
-	    if (c >= 256)
+	    எனில் (c >= 256)
 		++lp->sl_sal_first[c & 0xff];
 	}
-	if (*p != NUL || *s != NUL)	    // lengths differ
-	    return SP_FORMERROR;
+	எனில் (*p != NUL || *s != NUL)	    // lengths differ
+	    திரும்பு SP_FORMERROR;
 
 	// Allocate the lists.
-	for (i = 0; i < 256; ++i)
-	    if (lp->sl_sal_first[i] > 0)
+	க்கு (i = 0; i < 256; ++i)
+	    எனில் (lp->sl_sal_first[i] > 0)
 	    {
-		p = alloc(sizeof(int) * (lp->sl_sal_first[i] * 2 + 1));
-		if (p == NULL)
-		    return SP_OTHERERROR;
-		((int **)gap->ga_data)[i] = (int *)p;
-		*(int *)p = 0;
+		p = alloc(அளவு(முழு) * (lp->sl_sal_first[i] * 2 + 1));
+		எனில் (p == வெற்று)
+		    திரும்பு SP_OTHERERROR;
+		((முழு **)gap->ga_data)[i] = (முழு *)p;
+		*(முழு *)p = 0;
 	    }
 
 	// Put the characters up to 255 in sl_sal_first[] the rest in a sl_sal
 	// list.
-	vim_memset(lp->sl_sal_first, 0, sizeof(salfirst_T) * 256);
-	for (p = from, s = to; *p != NUL && *s != NUL; )
+	vim_memset(lp->sl_sal_first, 0, அளவு(salfirst_T) * 256);
+	க்கு (p = from, s = to; *p != NUL && *s != NUL; )
 	{
 	    c = mb_cptr2char_adv(&p);
 	    i = mb_cptr2char_adv(&s);
-	    if (c >= 256)
+	    எனில் (c >= 256)
 	    {
 		// Append the from-to chars at the end of the list with
 		// the low byte.
-		inp = ((int **)gap->ga_data)[c & 0xff];
-		while (*inp != 0)
+		inp = ((முழு **)gap->ga_data)[c & 0xff];
+		போது (*inp != 0)
 		    ++inp;
 		*inp++ = c;		// from char
 		*inp++ = i;		// to char
 		*inp++ = NUL;		// NUL at the end
 	    }
-	    else
+	    இல்லையெனில்
 		// mapping byte to char is done in sl_sal_first[]
 		lp->sl_sal_first[c] = i;
 	}
     }
-    else
+    இல்லையெனில்
     {
 	// mapping bytes to bytes is done in sl_sal_first[]
-	if (STRLEN(from) != STRLEN(to))
-	    return SP_FORMERROR;
+	எனில் (STRLEN(from) != STRLEN(to))
+	    திரும்பு SP_FORMERROR;
 
-	for (i = 0; to[i] != NUL; ++i)
+	க்கு (i = 0; to[i] != NUL; ++i)
 	    lp->sl_sal_first[from[i]] = to[i];
 	lp->sl_sal.ga_len = 1;		// indicates we have soundfolding
 	lp->sl_sofo = TRUE;
     }
 
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * Fill the first-index table for "lp".
  */
-    static void
+    நிலையான வெறுமை
 set_sal_first(slang_T *lp)
 {
     salfirst_T	*sfirst;
-    int		i;
+    முழு		i;
     salitem_T	*smp;
-    int		c;
+    முழு		c;
     garray_T	*gap = &lp->sl_sal;
 
     sfirst = lp->sl_sal_first;
-    for (i = 0; i < 256; ++i)
+    க்கு (i = 0; i < 256; ++i)
 	sfirst[i] = -1;
     smp = (salitem_T *)gap->ga_data;
-    for (i = 0; i < gap->ga_len; ++i)
+    க்கு (i = 0; i < gap->ga_len; ++i)
     {
-	if (has_mbyte)
+	எனில் (has_mbyte)
 	    // Use the lowest byte of the first character.  For latin1 it's
 	    // the character, for other encodings it should differ for most
 	    // characters.
 	    c = *smp[i].sm_lead_w & 0xff;
-	else
+	இல்லையெனில்
 	    c = *smp[i].sm_lead;
-	if (sfirst[c] == -1)
+	எனில் (sfirst[c] == -1)
 	{
 	    sfirst[c] = i;
-	    if (has_mbyte)
+	    எனில் (has_mbyte)
 	    {
-		int		n;
+		முழு		n;
 
 		// Make sure all entries with this byte are following each
 		// other.  Move the ones that are in the wrong position.  Do
 		// keep the same ordering!
-		while (i + 1 < gap->ga_len
+		போது (i + 1 < gap->ga_len
 				       && (*smp[i + 1].sm_lead_w & 0xff) == c)
 		    // Skip over entry with same index byte.
 		    ++i;
 
-		for (n = 1; i + n < gap->ga_len; ++n)
-		    if ((*smp[i + n].sm_lead_w & 0xff) == c)
+		க்கு (n = 1; i + n < gap->ga_len; ++n)
+		    எனில் ((*smp[i + n].sm_lead_w & 0xff) == c)
 		    {
 			salitem_T  tsal;
 
@@ -1549,7 +1549,7 @@ set_sal_first(slang_T *lp)
 			--n;
 			tsal = smp[i + n];
 			mch_memmove(smp + i + 1, smp + i,
-						       sizeof(salitem_T) * n);
+						       அளவு(salitem_T) * n);
 			smp[i] = tsal;
 		    }
 	    }
@@ -1561,21 +1561,21 @@ set_sal_first(slang_T *lp)
  * Turn a multi-byte string into a wide character string.
  * Return it in allocated memory (NULL for out-of-memory)
  */
-    static int *
+    நிலையான முழு *
 mb_str2wide(char_u *s)
 {
-    int		*res;
+    முழு		*res;
     char_u	*p;
-    int		i = 0;
+    முழு		i = 0;
 
-    res = ALLOC_MULT(int, mb_charlen(s) + 1);
-    if (res == NULL)
-	return NULL;
+    res = ALLOC_MULT(முழு, mb_charlen(s) + 1);
+    எனில் (res == வெற்று)
+	திரும்பு வெற்று;
 
-    for (p = s; *p != NUL; )
+    க்கு (p = s; *p != NUL; )
 	res[i++] = mb_ptr2char_adv(&p);
     res[i] = NUL;
-    return res;
+    திரும்பு res;
 }
 
 /*
@@ -1584,55 +1584,55 @@ mb_str2wide(char_u *s)
  * This is skipped when the tree has zero length.
  * Returns zero when OK, SP_ value for an error.
  */
-    static int
-spell_read_tree(
+    நிலையான முழு
+spell_read_மரம்(
     FILE	*fd,
     char_u	**bytsp,
     long	*bytsp_len,
     idx_T	**idxsp,
-    int		prefixtree,	// TRUE for the prefix tree
-    int		prefixcnt)	// when "prefixtree" is TRUE: prefix count
+    முழு		prefixtree,	// TRUE for the prefix tree
+    முழு		prefixcnt)	// when "prefixtree" is TRUE: prefix count
 {
     long	len;
-    int		idx;
+    முழு		idx;
     char_u	*bp;
     idx_T	*ip;
 
     // The tree size was computed when writing the file, so that we can
     // allocate it as one long block. <nodecount>
     len = get4c(fd);
-    if (len < 0)
-	return SP_TRUNCERROR;
-    if ((size_t)len > SIZE_MAX / sizeof(int))
+    எனில் (len < 0)
+	திரும்பு SP_TRUNCERROR;
+    எனில் ((size_t)len > SIZE_MAX / அளவு(முழு))
 	// Invalid length, multiply with sizeof(int) would overflow.
-	return SP_FORMERROR;
-    if (len <= 0)
-	return 0;
+	திரும்பு SP_FORMERROR;
+    எனில் (len <= 0)
+	திரும்பு 0;
 
     // Allocate the byte array.  Zero-initialize so that any position the
     // tree does not visit reads as 0; a stray BY_INDEX shared reference
     // into such a slot then behaves as end-of-word in spellsuggest()
     // instead of consuming an arbitrary heap byte as a siblingcount.
     bp = alloc_clear(len);
-    if (bp == NULL)
-	return SP_OTHERERROR;
+    எனில் (bp == வெற்று)
+	திரும்பு SP_OTHERERROR;
     *bytsp = bp;
-    if (bytsp_len != NULL)
+    எனில் (bytsp_len != வெற்று)
 	*bytsp_len = len;
 
     // Allocate the index array.
-    ip = lalloc_clear(len * sizeof(int), TRUE);
-    if (ip == NULL)
-	return SP_OTHERERROR;
+    ip = lalloc_clear(len * அளவு(முழு), TRUE);
+    எனில் (ip == வெற்று)
+	திரும்பு SP_OTHERERROR;
     *idxsp = ip;
 
     // Recursively read the tree and store it in the array.
-    idx = read_tree_node(fd, bp, ip, len, 0, prefixtree, prefixcnt, 0);
-    if (idx < 0)
-	return idx;
-    if (idx != len)
-	return SP_FORMERROR;
-    return 0;
+    idx = read_மரம்_முனை(fd, bp, ip, len, 0, prefixtree, prefixcnt, 0);
+    எனில் (idx < 0)
+	திரும்பு idx;
+    எனில் (idx != len)
+	திரும்பு SP_FORMERROR;
+    திரும்பு 0;
 }
 
 /*
@@ -1645,109 +1645,109 @@ spell_read_tree(
  * Returns SP_TRUNCERROR if the file is shorter than expected.
  * Returns SP_FORMERROR if there is a format error.
  */
-    static idx_T
-read_tree_node(
+    நிலையான idx_T
+read_மரம்_முனை(
     FILE	*fd,
     char_u	*byts,
     idx_T	*idxs,
-    int		maxidx,		    // size of arrays
+    முழு		maxidx,		    // size of arrays
     idx_T	startidx,	    // current index in "byts" and "idxs"
-    int		prefixtree,	    // TRUE for reading PREFIXTREE
-    int		maxprefcondnr,	    // maximum for <prefcondnr>
-    int		depth)		    // recursion level
+    முழு		prefixtree,	    // TRUE for reading PREFIXTREE
+    முழு		maxprefcondnr,	    // maximum for <prefcondnr>
+    முழு		depth)		    // recursion level
 {
-    int		len;
-    int		i;
-    int		n;
+    முழு		len;
+    முழு		i;
+    முழு		n;
     idx_T	idx = startidx;
-    int		c;
-    int		c2;
+    முழு		c;
+    முழு		c2;
 #define SHARED_MASK	0x8000000
 
     // Bail out on a crafted .spl whose tree recurses beyond the maximum
     // word length: each tree level corresponds to one byte of a word, so
     // any well-formed file has depth <= MAXWLEN.
-    if (depth > MAXWLEN)
-	return SP_FORMERROR;
+    எனில் (depth > MAXWLEN)
+	திரும்பு SP_FORMERROR;
 
     len = getc(fd);					// <siblingcount>
-    if (len <= 0)
-	return SP_TRUNCERROR;
+    எனில் (len <= 0)
+	திரும்பு SP_TRUNCERROR;
 
-    if (len >= maxidx - startidx)
-	return SP_FORMERROR;
+    எனில் (len >= maxidx - startidx)
+	திரும்பு SP_FORMERROR;
     byts[idx++] = len;
 
     // Read the byte values, flag/region bytes and shared indexes.
-    for (i = 1; i <= len; ++i)
+    க்கு (i = 1; i <= len; ++i)
     {
 	c = getc(fd);					// <byte>
-	if (c < 0)
-	    return SP_TRUNCERROR;
-	if (c <= BY_SPECIAL)
+	எனில் (c < 0)
+	    திரும்பு SP_TRUNCERROR;
+	எனில் (c <= BY_SPECIAL)
 	{
-	    if (c == BY_NOFLAGS && !prefixtree)
+	    எனில் (c == BY_NOFLAGS && !prefixtree)
 	    {
 		// No flags, all regions.
 		idxs[idx] = 0;
 		c = 0;
 	    }
-	    else if (c != BY_INDEX)
+	    இல்லையெனில் எனில் (c != BY_INDEX)
 	    {
-		if (prefixtree)
+		எனில் (prefixtree)
 		{
 		    // Read the optional pflags byte, the prefix ID and the
 		    // condition nr.  In idxs[] store the prefix ID in the low
 		    // byte, the condition index shifted up 8 bits, the flags
 		    // shifted up 24 bits.
-		    if (c == BY_FLAGS)
+		    எனில் (c == BY_FLAGS)
 		    {
 			n = getc(fd);			// <pflags>
-			if (n < 0)
-			    return SP_TRUNCERROR;
+			எனில் (n < 0)
+			    திரும்பு SP_TRUNCERROR;
 			c = n << 24;
 		    }
-		    else
+		    இல்லையெனில்
 			c = 0;
 
 		    n = getc(fd);			// <affixID>
-		    if (n < 0)
-			return SP_TRUNCERROR;
+		    எனில் (n < 0)
+			திரும்பு SP_TRUNCERROR;
 		    c |= n;
 
 		    n = get2c(fd);			// <prefcondnr>
-		    if (n < 0 || n >= maxprefcondnr)
-			return SP_FORMERROR;
+		    எனில் (n < 0 || n >= maxprefcondnr)
+			திரும்பு SP_FORMERROR;
 		    c |= (n << 8);
 		}
-		else // c must be BY_FLAGS or BY_FLAGS2
+		இல்லையெனில் // c must be BY_FLAGS or BY_FLAGS2
 		{
 		    // Read flags and optional region and prefix ID.  In
 		    // idxs[] the flags go in the low two bytes, region above
 		    // that and prefix ID above the region.
 		    c2 = c;
 		    c = getc(fd);			// <flags>
-		    if (c < 0)
-			return SP_TRUNCERROR;
-		    if (c2 == BY_FLAGS2)
+		    எனில் (c < 0)
+			திரும்பு SP_TRUNCERROR;
+		    எனில் (c2 == BY_FLAGS2)
 		    {
 			n = getc(fd);			// <flags2>
-			if (n < 0)
-			    return SP_TRUNCERROR;
+			எனில் (n < 0)
+			    திரும்பு SP_TRUNCERROR;
 			c = (n << 8) + c;
 		    }
-		    if (c & WF_REGION)
+		    எனில் (c & WF_REGION)
 		    {
 			n = getc(fd);			// <region>
-			if (n < 0)
-			    return SP_TRUNCERROR;
+			எனில் (n < 0)
+			    திரும்பு SP_TRUNCERROR;
 			c = (n << 16) + c;
 		    }
-		    if (c & WF_AFX)
+		    எனில் (c & WF_AFX)
 		    {
 			n = getc(fd);			// <affixID>
-			if (n < 0)
-			    return SP_TRUNCERROR;
+			எனில் (n < 0)
+			    திரும்பு SP_TRUNCERROR;
 			c = (n << 24) + c;
 		    }
 		}
@@ -1755,12 +1755,12 @@ read_tree_node(
 		idxs[idx] = c;
 		c = 0;
 	    }
-	    else // c == BY_INDEX
+	    இல்லையெனில் // c == BY_INDEX
 	    {
 							// <nodeidx>
 		n = get3c(fd);
-		if (n < 0 || n >= maxidx)
-		    return SP_FORMERROR;
+		எனில் (n < 0 || n >= maxidx)
+		    திரும்பு SP_FORMERROR;
 		idxs[idx] = n + SHARED_MASK;
 		c = getc(fd);				// <xbyte>
 	    }
@@ -1771,41 +1771,41 @@ read_tree_node(
     // Recursively read the children for non-shared siblings.
     // Skip the end-of-word ones (zero byte value) and the shared ones (and
     // remove SHARED_MASK)
-    for (i = 1; i <= len; ++i)
-	if (byts[startidx + i] != 0)
+    க்கு (i = 1; i <= len; ++i)
+	எனில் (byts[startidx + i] != 0)
 	{
-	    if (idxs[startidx + i] & SHARED_MASK)
+	    எனில் (idxs[startidx + i] & SHARED_MASK)
 		idxs[startidx + i] &= ~SHARED_MASK;
-	    else
+	    இல்லையெனில்
 	    {
 		idxs[startidx + i] = idx;
-		idx = read_tree_node(fd, byts, idxs, maxidx, idx,
+		idx = read_மரம்_முனை(fd, byts, idxs, maxidx, idx,
 					prefixtree, maxprefcondnr, depth + 1);
-		if (idx < 0)
-		    break;
+		எனில் (idx < 0)
+		    நிறுத்து;
 	    }
 	}
 
-    return idx;
+    திரும்பு idx;
 }
 
 /*
  * Reload the spell file "fname" if it's loaded.
  */
-    static void
+    நிலையான வெறுமை
 spell_reload_one(
     char_u	*fname,
-    int		added_word)	// invoked through "zg"
+    முழு		added_word)	// invoked through "zg"
 {
     slang_T	*slang;
-    int		didit = FALSE;
+    முழு		didit = FALSE;
 
     FOR_ALL_SPELL_LANGS(slang)
     {
-	if (fullpathcmp(fname, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
+	எனில் (fullpathcmp(fname, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
 	{
 	    slang_clear(slang);
-	    if (spell_load_file(fname, NULL, slang, FALSE) == NULL)
+	    எனில் (spell_load_file(fname, வெற்று, slang, FALSE) == வெற்று)
 		// reloading failed, clear the language
 		slang_clear(slang);
 	    redraw_all_later(UPD_SOME_VALID);
@@ -1815,7 +1815,7 @@ spell_reload_one(
 
     // When "zg" was used and the file wasn't loaded yet, should redo
     // 'spelllang' to load it now.
-    if (added_word && !didit)
+    எனில் (added_word && !didit)
 	parse_spelllang(curwin);
 }
 
@@ -1829,10 +1829,10 @@ spell_reload_one(
 /*
  * Main structure to store the contents of a ".aff" file.
  */
-typedef struct afffile_S
+வகைவரை கட்டமைப்பு afffile_S
 {
     char_u	*af_enc;	// "SET", normalized, alloc'ed string or NULL
-    int		af_flagtype;	// AFT_CHAR, AFT_LONG, AFT_NUM or AFT_CAPLONG
+    முழு		af_flagtype;	// AFT_CHAR, AFT_LONG, AFT_NUM or AFT_CAPLONG
     unsigned	af_rare;	// RARE ID for rare word
     unsigned	af_keepcase;	// KEEPCASE ID for keep-case word
     unsigned	af_bad;		// BAD ID for banned word
@@ -1843,9 +1843,9 @@ typedef struct afffile_S
     unsigned	af_compforbid;	// COMPOUNDFORBIDFLAG ID
     unsigned	af_comppermit;	// COMPOUNDPERMITFLAG ID
     unsigned	af_nosuggest;	// NOSUGGEST ID
-    int		af_pfxpostpone;	// postpone prefixes without chop string and
+    முழு		af_pfxpostpone;	// postpone prefixes without chop string and
 				// without flags
-    int		af_ignoreextra;	// IGNOREEXTRA present
+    முழு		af_ignoreextra;	// IGNOREEXTRA present
     hashtab_T	af_pref;	// hashtable for prefixes, affheader_T
     hashtab_T	af_suff;	// hashtable for suffixes, affheader_T
     hashtab_T	af_comp;	// hashtable for compound flags, compitem_T
@@ -1854,11 +1854,11 @@ typedef struct afffile_S
 #define AFT_CHAR	0	// flags are one character
 #define AFT_LONG	1	// flags are two characters
 #define AFT_CAPLONG	2	// flags are one or two characters
-#define AFT_NUM		3	// flags are numbers, comma separated
+#define AFT_இலக்கம்		3	// flags are numbers, comma separated
 
-typedef struct affentry_S affentry_T;
+வகைவரை கட்டமைப்பு affentry_S affentry_T;
 // Affix entry from ".aff" file.  Used for prefixes and suffixes.
-struct affentry_S
+கட்டமைப்பு affentry_S
 {
     affentry_T	*ae_next;	// next affix with same name/number
     char_u	*ae_chop;	// text to chop off basic word (can be NULL)
@@ -1866,34 +1866,34 @@ struct affentry_S
     char_u	*ae_flags;	// flags on the affix (can be NULL)
     char_u	*ae_cond;	// condition (NULL for ".")
     regprog_T	*ae_prog;	// regexp program for ae_cond or NULL
-    char	ae_compforbid;	// COMPOUNDFORBIDFLAG found
-    char	ae_comppermit;	// COMPOUNDPERMITFLAG found
+    எழுத்து	ae_compforbid;	// COMPOUNDFORBIDFLAG found
+    எழுத்து	ae_comppermit;	// COMPOUNDPERMITFLAG found
 };
 
-#define AH_KEY_LEN 17		// 2 x 8 bytes + NUL
+#define AH_சாவி_LEN 17		// 2 x 8 bytes + NUL
 
 // Affix header from ".aff" file.  Used for af_pref and af_suff.
-typedef struct affheader_S
+வகைவரை கட்டமைப்பு affheader_S
 {
-    char_u	ah_key[AH_KEY_LEN]; // key for hashtab == name of affix
+    char_u	ah_சாவி[AH_சாவி_LEN]; // key for hashtab == name of affix
     unsigned	ah_flag;	// affix name as number, uses "af_flagtype"
-    int		ah_newID;	// prefix ID after renumbering; 0 if not used
-    int		ah_combine;	// suffix may combine with prefix
-    int		ah_follows;	// another affix block should be following
+    முழு		ah_newID;	// prefix ID after renumbering; 0 if not used
+    முழு		ah_combine;	// suffix may combine with prefix
+    முழு		ah_follows;	// another affix block should be following
     affentry_T	*ah_first;	// first affix entry
 } affheader_T;
 
-#define HI2AH(hi)   ((affheader_T *)(hi)->hi_key)
+#define HI2AH(hi)   ((affheader_T *)(hi)->hi_சாவி)
 
 // Flag used in compound items.
-typedef struct compitem_S
+வகைவரை கட்டமைப்பு compitem_S
 {
-    char_u	ci_key[AH_KEY_LEN]; // key for hashtab == name of compound
+    char_u	ci_சாவி[AH_சாவி_LEN]; // key for hashtab == name of compound
     unsigned	ci_flag;	// affix name as number, uses "af_flagtype"
-    int		ci_newID;	// affix ID after renumbering.
+    முழு		ci_newID;	// affix ID after renumbering.
 } compitem_T;
 
-#define HI2CI(hi)   ((compitem_T *)(hi)->hi_key)
+#define HI2CI(hi)   ((compitem_T *)(hi)->hi_சாவி)
 
 /*
  * Structure that is used to store the items in the word tree.  This avoids
@@ -1904,10 +1904,10 @@ typedef struct compitem_S
  * pointer-size boundaries and sizeof(pointer) > sizeof(int) (e.g., Sparc).
  */
 #define  SBLOCKSIZE 16000	// size of sb_data
-typedef struct sblock_S sblock_T;
-struct sblock_S
+வகைவரை கட்டமைப்பு sblock_S sblock_T;
+கட்டமைப்பு sblock_S
 {
-    int		sb_used;	// nr of bytes already in use
+    முழு		sb_used;	// nr of bytes already in use
     sblock_T	*sb_next;	// next block in list
     char_u	sb_data[1];	// data, actually longer
 };
@@ -1915,16 +1915,16 @@ struct sblock_S
 /*
  * A node in the tree.
  */
-typedef struct wordnode_S wordnode_T;
-struct wordnode_S
+வகைவரை கட்டமைப்பு wordnode_S wordnode_T;
+கட்டமைப்பு wordnode_S
 {
-    union   // shared to save space
+    ஒன்றிப்பு   // shared to save space
     {
 	char_u	hashkey[6];	// the hash key, only used while compressing
-	int	index;		// index in written nodes (valid after first
+	முழு	index;		// index in written nodes (valid after first
 				// round)
     } wn_u1;
-    union   // shared to save space
+    ஒன்றிப்பு   // shared to save space
     {
 	wordnode_T *next;	// next node with same hash key
 	wordnode_T *wnode;	// parent node that will write this node
@@ -1932,7 +1932,7 @@ struct wordnode_S
     wordnode_T	*wn_child;	// child (next byte in word)
     wordnode_T  *wn_sibling;	// next sibling (alternate byte in word,
 				// always sorted)
-    int		wn_refs;	// Nr. of references to this node.  Only
+    முழு		wn_refs;	// Nr. of references to this node.  Only
 				// relevant for first node in a list of
 				// siblings, in following siblings it is
 				// always one.
@@ -1947,18 +1947,18 @@ struct wordnode_S
     short	wn_region;	// region mask
 
 #ifdef SPELL_PRINTTREE
-    int		wn_nr;		// sequence nr for printing
+    முழு		wn_nr;		// sequence nr for printing
 #endif
 };
 
 #define WN_MASK	 0xffff		// mask relevant bits of "wn_flags"
 
-#define HI2WN(hi)    (wordnode_T *)((hi)->hi_key)
+#define HI2WN(hi)    (wordnode_T *)((hi)->hi_சாவி)
 
 /*
  * Info used while reading the spell files.
  */
-typedef struct spellinfo_S
+வகைவரை கட்டமைப்பு spellinfo_S
 {
     wordnode_T	*si_foldroot;	// tree with case-folded words
     long	si_foldwcount;	// nr of words in si_foldroot
@@ -1972,28 +1972,28 @@ typedef struct spellinfo_S
 
     sblock_T	*si_blocks;	// memory blocks used
     long	si_blocks_cnt;	// memory blocks allocated
-    int		si_did_emsg;	// TRUE when ran out of memory
+    முழு		si_did_emsg;	// TRUE when ran out of memory
 
     long	si_compress_cnt;    // words to add before lowering
 				    // compression limit
     wordnode_T	*si_first_free; // List of nodes that have been freed during
 				// compression, linked by "wn_child" field.
-    long	si_free_count;	// number of nodes in si_first_free
+    long	si_free_மொத்தம்;	// number of nodes in si_first_free
 #ifdef SPELL_PRINTTREE
-    int		si_wordnode_nr;	// sequence nr for nodes
+    முழு		si_wordnode_nr;	// sequence nr for nodes
 #endif
     buf_T	*si_spellbuf;	// buffer used to store soundfold word table
 
-    int		si_ascii;	// handling only ASCII words
-    int		si_add;		// addition file
-    int		si_clear_chartab;   // when TRUE clear char tables
-    int		si_region;	// region mask
+    முழு		si_ascii;	// handling only ASCII words
+    முழு		si_add;		// addition file
+    முழு		si_clear_chartab;   // when TRUE clear char tables
+    முழு		si_region;	// region mask
     vimconv_T	si_conv;	// for conversion to 'encoding'
-    int		si_memtot;	// runtime memory used
-    int		si_verbose;	// verbose messages
-    int		si_msg_count;	// number of words added since last message
+    முழு		si_memtot;	// runtime memory used
+    முழு		si_verbose;	// verbose messages
+    முழு		si_செய்தி_மொத்தம்;	// number of words added since last message
     char_u	*si_info;	// info text chars or NULL
-    int		si_region_count; // number of regions supported (1 when there
+    முழு		si_region_மொத்தம்; // number of regions supported (1 when there
 				 // are no regions)
     char_u	si_region_name[MAXREGIONS * 2 + 1];
 				// region names; used only if
@@ -2004,20 +2004,20 @@ typedef struct spellinfo_S
     garray_T	si_sal;		// list of fromto_T entries from SAL lines
     char_u	*si_sofofr;	// SOFOFROM text
     char_u	*si_sofoto;	// SOFOTO text
-    int		si_nosugfile;	// NOSUGFILE item found
-    int		si_nosplitsugs;	// NOSPLITSUGS item found
-    int		si_nocompoundsugs; // NOCOMPOUNDSUGS item found
-    int		si_followup;	// soundsalike: ?
-    int		si_collapse;	// soundsalike: ?
+    முழு		si_nosugfile;	// NOSUGFILE item found
+    முழு		si_nosplitsugs;	// NOSPLITSUGS item found
+    முழு		si_nocompoundsugs; // NOCOMPOUNDSUGS item found
+    முழு		si_followup;	// soundsalike: ?
+    முழு		si_collapse;	// soundsalike: ?
     hashtab_T	si_commonwords;	// hashtable for common words
     time_t	si_sugtime;	// timestamp for .sug file
-    int		si_rem_accents;	// soundsalike: remove accents
+    முழு		si_rem_accents;	// soundsalike: remove accents
     garray_T	si_map;		// MAP info concatenated
     char_u	*si_midword;	// MIDWORD chars or NULL
-    int		si_compmax;	// max nr of words for compounding
-    int		si_compminlen;	// minimal length for compounding
-    int		si_compsylmax;	// max nr of syllables for compounding
-    int		si_compoptions;	// COMP_ flags
+    முழு		si_compmax;	// max nr of words for compounding
+    முழு		si_compminlen;	// minimal length for compounding
+    முழு		si_compsylmax;	// max nr of syllables for compounding
+    முழு		si_compoptions;	// COMP_ flags
     garray_T	si_comppat;	// CHECKCOMPOUNDPATTERN items, each stored as
 				// a string
     char_u	*si_compflags;	// flags used for compounding
@@ -2025,44 +2025,44 @@ typedef struct spellinfo_S
     char_u	*si_syllable;	// syllable string
     garray_T	si_prefcond;	// table with conditions for postponed
 				// prefixes, each stored as a string
-    int		si_newprefID;	// current value for ah_newID
-    int		si_newcompID;	// current value for compound ID
+    முழு		si_newprefID;	// current value for ah_newID
+    முழு		si_newcompID;	// current value for compound ID
 } spellinfo_T;
 
-static int is_aff_rule(char_u **items, int itemcnt, char *rulename, int	 mincount);
-static void aff_process_flags(afffile_T *affile, affentry_T *entry);
-static int spell_info_item(char_u *s);
-static unsigned affitem2flag(int flagtype, char_u *item, char_u	*fname, int lnum);
-static unsigned get_affitem(int flagtype, char_u **pp);
-static void process_compflags(spellinfo_T *spin, afffile_T *aff, char_u *compflags);
-static void check_renumber(spellinfo_T *spin);
-static void aff_check_number(int spinval, int affval, char *name);
-static void aff_check_string(char_u *spinval, char_u *affval, char *name);
-static int str_equal(char_u *s1, char_u	*s2);
-static void add_fromto(spellinfo_T *spin, garray_T *gap, char_u	*from, char_u *to);
-static int sal_to_bool(char_u *s);
-static int get_affix_flags(afffile_T *affile, char_u *afflist);
-static int get_pfxlist(afffile_T *affile, char_u *afflist, char_u *store_afflist, int *cntp);
-static int get_compflags(afffile_T *affile, char_u *afflist, char_u *store_afflist, int *cntp);
-static int store_aff_word(spellinfo_T *spin, char_u *word, char_u *afflist, afffile_T *affile, hashtab_T *ht, hashtab_T *xht, int condit, int flags, char_u *pfxlist, int pfxlen);
-static void *getroom(spellinfo_T *spin, size_t len, int align);
-static char_u *getroom_save(spellinfo_T *spin, char_u *s);
-static int store_word(spellinfo_T *spin, char_u *word, int flags, int region, char_u *pfxlist, int need_affix);
-static int tree_add_word(spellinfo_T *spin, char_u *word, wordnode_T *tree, int flags, int region, int affixID);
-static wordnode_T *get_wordnode(spellinfo_T *spin);
-static void free_wordnode(spellinfo_T *spin, wordnode_T *n);
-static void wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name);
-static long node_compress(spellinfo_T *spin, wordnode_T *node, hashtab_T *ht, long *tot);
-static int node_equal(wordnode_T *n1, wordnode_T *n2);
-static void clear_node(wordnode_T *node);
-static int put_node(FILE *fd, wordnode_T *node, int idx, int regionmask, int prefixtree);
-static int sug_filltree(spellinfo_T *spin, slang_T *slang);
-static int sug_maketable(spellinfo_T *spin);
-static int sug_filltable(spellinfo_T *spin, wordnode_T *node, int startwordnr, garray_T *gap);
-static int offset2bytes(int nr, char_u *buf);
-static void sug_write(spellinfo_T *spin, char_u *fname);
-static void spell_message(spellinfo_T *spin, char_u *str);
-static void init_spellfile(void);
+நிலையான முழு is_aff_rule(char_u **பொருட்கள், முழு itemcnt, எழுத்து *rulename, முழு	 mincount);
+நிலையான வெறுமை aff_process_flags(afffile_T *affile, affentry_T *entry);
+நிலையான முழு spell_info_item(char_u *s);
+நிலையான unsigned affitem2flag(முழு flagtype, char_u *item, char_u	*fname, முழு lnum);
+நிலையான unsigned get_affitem(முழு flagtype, char_u **pp);
+நிலையான வெறுமை process_compflags(spellinfo_T *spin, afffile_T *aff, char_u *compflags);
+நிலையான வெறுமை check_renumber(spellinfo_T *spin);
+நிலையான வெறுமை aff_check_எண்(முழு spinval, முழு affval, எழுத்து *name);
+நிலையான வெறுமை aff_check_string(char_u *spinval, char_u *affval, எழுத்து *name);
+நிலையான முழு str_equal(char_u *s1, char_u	*s2);
+நிலையான வெறுமை add_fromto(spellinfo_T *spin, garray_T *gap, char_u	*from, char_u *to);
+நிலையான முழு sal_to_bool(char_u *s);
+நிலையான முழு get_affix_flags(afffile_T *affile, char_u *afflist);
+நிலையான முழு get_pfxlist(afffile_T *affile, char_u *afflist, char_u *store_afflist, முழு *cntp);
+நிலையான முழு get_compflags(afffile_T *affile, char_u *afflist, char_u *store_afflist, முழு *cntp);
+நிலையான முழு store_aff_word(spellinfo_T *spin, char_u *word, char_u *afflist, afffile_T *affile, hashtab_T *ht, hashtab_T *xht, முழு condit, முழு flags, char_u *pfxlist, முழு pfxlen);
+நிலையான வெறுமை *getroom(spellinfo_T *spin, size_t len, முழு align);
+நிலையான char_u *getroom_save(spellinfo_T *spin, char_u *s);
+நிலையான முழு store_word(spellinfo_T *spin, char_u *word, முழு flags, முழு region, char_u *pfxlist, முழு need_affix);
+நிலையான முழு மரம்_add_word(spellinfo_T *spin, char_u *word, wordnode_T *மரம், முழு flags, முழு region, முழு affixID);
+நிலையான wordnode_T *get_wordnode(spellinfo_T *spin);
+நிலையான வெறுமை free_wordnode(spellinfo_T *spin, wordnode_T *n);
+நிலையான வெறுமை wordtree_compress(spellinfo_T *spin, wordnode_T *வேர், எழுத்து *name);
+நிலையான long முனை_compress(spellinfo_T *spin, wordnode_T *முனை, hashtab_T *ht, long *tot);
+நிலையான முழு முனை_equal(wordnode_T *n1, wordnode_T *n2);
+நிலையான வெறுமை clear_முனை(wordnode_T *முனை);
+நிலையான முழு put_முனை(FILE *fd, wordnode_T *முனை, முழு idx, முழு regionmask, முழு prefixtree);
+நிலையான முழு sug_filltree(spellinfo_T *spin, slang_T *slang);
+நிலையான முழு sug_maketable(spellinfo_T *spin);
+நிலையான முழு sug_filltable(spellinfo_T *spin, wordnode_T *முனை, முழு startwordnr, garray_T *gap);
+நிலையான முழு offset2bytes(முழு nr, char_u *buf);
+நிலையான வெறுமை sug_write(spellinfo_T *spin, char_u *fname);
+நிலையான வெறுமை spell_message(spellinfo_T *spin, char_u *str);
+நிலையான வெறுமை init_spellfile(வெறுமை);
 
 // In the postponed prefixes tree wn_flags is used to store the WFP_ flags,
 // but it must be negative to indicate the prefix tree to tree_add_word().
@@ -2079,48 +2079,48 @@ static void init_spellfile(void);
  * Tunable parameters for when the tree is compressed.  Filled from the
  * 'mkspellmem' option.
  */
-static long compress_start = 30000;	// memory / SBLOCKSIZE
-static long compress_inc = 100;		// memory / SBLOCKSIZE
-static long compress_added = 500000;	// word count
+நிலையான long compress_start = 30000;	// memory / SBLOCKSIZE
+நிலையான long compress_inc = 100;		// memory / SBLOCKSIZE
+நிலையான long compress_added = 500000;	// word count
 
 /*
  * Check the 'mkspellmem' option.  Return FAIL if it's wrong.
  * Sets "sps_flags".
  */
-    int
-spell_check_msm(void)
+    முழு
+spell_check_msm(வெறுமை)
 {
     char_u	*p = p_msm;
     long	start = 0;
     long	incr = 0;
     long	added = 0;
 
-    if (!VIM_ISDIGIT(*p))
-	return FAIL;
+    எனில் (!VIM_ISDIGIT(*p))
+	திரும்பு FAIL;
     // block count = (value * 1024) / SBLOCKSIZE (but avoid overflow)
     start = (getdigits(&p) * 10) / (SBLOCKSIZE / 102);
-    if (*p != ',')
-	return FAIL;
+    எனில் (*p != ',')
+	திரும்பு FAIL;
     ++p;
-    if (!VIM_ISDIGIT(*p))
-	return FAIL;
+    எனில் (!VIM_ISDIGIT(*p))
+	திரும்பு FAIL;
     incr = (getdigits(&p) * 102) / (SBLOCKSIZE / 10);
-    if (*p != ',')
-	return FAIL;
+    எனில் (*p != ',')
+	திரும்பு FAIL;
     ++p;
-    if (!VIM_ISDIGIT(*p))
-	return FAIL;
+    எனில் (!VIM_ISDIGIT(*p))
+	திரும்பு FAIL;
     added = getdigits(&p) * 1024;
-    if (*p != NUL)
-	return FAIL;
+    எனில் (*p != NUL)
+	திரும்பு FAIL;
 
-    if (start == 0 || incr == 0 || added == 0 || incr > start)
-	return FAIL;
+    எனில் (start == 0 || incr == 0 || added == 0 || incr > start)
+	திரும்பு FAIL;
 
     compress_start = start;
     compress_inc = incr;
     compress_added = added;
-    return OK;
+    திரும்பு OK;
 }
 
 #ifdef SPELL_PRINTTREE
@@ -2136,90 +2136,90 @@ spell_check_msm(void)
 # define PRINTSOME(l, depth, fmt, a1, a2) vim_snprintf(l + depth * PRINTWIDTH, \
 	    PRINTLINESIZE - PRINTWIDTH * depth, fmt, a1, a2)
 
-static char line1[PRINTLINESIZE];
-static char line2[PRINTLINESIZE];
-static char line3[PRINTLINESIZE];
+நிலையான எழுத்து line1[PRINTLINESIZE];
+நிலையான எழுத்து line2[PRINTLINESIZE];
+நிலையான எழுத்து line3[PRINTLINESIZE];
 
-    static void
-spell_clear_flags(wordnode_T *node)
+    நிலையான வெறுமை
+spell_clear_flags(wordnode_T *முனை)
 {
     wordnode_T	*np;
 
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_முனை_SIBLINGS(முனை, np)
     {
 	np->wn_u1.index = FALSE;
 	spell_clear_flags(np->wn_child);
     }
 }
 
-    static void
-spell_print_node(wordnode_T *node, int depth)
+    நிலையான வெறுமை
+spell_print_முனை(wordnode_T *முனை, முழு depth)
 {
-    if (node->wn_u1.index)
+    எனில் (முனை->wn_u1.index)
     {
 	// Done this node before, print the reference.
-	PRINTSOME(line1, depth, "(%d)", node->wn_nr, 0);
+	PRINTSOME(line1, depth, "(%d)", முனை->wn_nr, 0);
 	PRINTSOME(line2, depth, "    ", 0, 0);
 	PRINTSOME(line3, depth, "    ", 0, 0);
-	msg(line1);
-	msg(line2);
-	msg(line3);
+	செய்தி(line1);
+	செய்தி(line2);
+	செய்தி(line3);
     }
-    else
+    இல்லையெனில்
     {
-	node->wn_u1.index = TRUE;
+	முனை->wn_u1.index = TRUE;
 
-	if (node->wn_byte != NUL)
+	எனில் (முனை->wn_byte != NUL)
 	{
-	    if (node->wn_child != NULL)
-		PRINTSOME(line1, depth, " %c -> ", node->wn_byte, 0);
-	    else
+	    எனில் (முனை->wn_child != வெற்று)
+		PRINTSOME(line1, depth, " %c -> ", முனை->wn_byte, 0);
+	    இல்லையெனில்
 		// Cannot happen?
-		PRINTSOME(line1, depth, " %c ???", node->wn_byte, 0);
+		PRINTSOME(line1, depth, " %c ???", முனை->wn_byte, 0);
 	}
-	else
+	இல்லையெனில்
 	    PRINTSOME(line1, depth, " $    ", 0, 0);
 
-	PRINTSOME(line2, depth, "%d/%d    ", node->wn_nr, node->wn_refs);
+	PRINTSOME(line2, depth, "%d/%d    ", முனை->wn_nr, முனை->wn_refs);
 
-	if (node->wn_sibling != NULL)
+	எனில் (முனை->wn_sibling != வெற்று)
 	    PRINTSOME(line3, depth, " |    ", 0, 0);
-	else
+	இல்லையெனில்
 	    PRINTSOME(line3, depth, "      ", 0, 0);
 
-	if (node->wn_byte == NUL)
+	எனில் (முனை->wn_byte == NUL)
 	{
-	    msg(line1);
-	    msg(line2);
-	    msg(line3);
+	    செய்தி(line1);
+	    செய்தி(line2);
+	    செய்தி(line3);
 	}
 
 	// do the children
-	if (node->wn_byte != NUL && node->wn_child != NULL)
-	    spell_print_node(node->wn_child, depth + 1);
+	எனில் (முனை->wn_byte != NUL && முனை->wn_child != வெற்று)
+	    spell_print_முனை(முனை->wn_child, depth + 1);
 
 	// do the siblings
-	if (node->wn_sibling != NULL)
+	எனில் (முனை->wn_sibling != வெற்று)
 	{
 	    // get rid of all parent details except |
 	    STRCPY(line1, line3);
 	    STRCPY(line2, line3);
-	    spell_print_node(node->wn_sibling, depth);
+	    spell_print_முனை(முனை->wn_sibling, depth);
 	}
     }
 }
 
-    static void
-spell_print_tree(wordnode_T *root)
+    நிலையான வெறுமை
+spell_print_மரம்(wordnode_T *வேர்)
 {
-    if (root == NULL)
-	return;
+    எனில் (வேர் == வெற்று)
+	திரும்பு;
 
     // Clear the "wn_u1.index" fields, used to remember what has been done.
-    spell_clear_flags(root);
+    spell_clear_flags(வேர்);
 
     // Recursively print the tree.
-    spell_print_node(root, 0);
+    spell_print_முனை(வேர், 0);
 }
 #endif // SPELL_PRINTTREE
 
@@ -2227,55 +2227,55 @@ spell_print_tree(wordnode_T *root)
  * Read the affix file "fname".
  * Returns an afffile_T, NULL for complete failure.
  */
-    static afffile_T *
+    நிலையான afffile_T *
 spell_read_aff(spellinfo_T *spin, char_u *fname)
 {
     FILE	*fd;
     afffile_T	*aff;
     char_u	rline[MAXLINELEN];
-    char_u	*line;
-    char_u	*pc = NULL;
+    char_u	*வரி;
+    char_u	*pc = வெற்று;
 #define MAXITEMCNT  30
-    char_u	*(items[MAXITEMCNT]);
-    int		itemcnt;
+    char_u	*(பொருட்கள்[MAXITEMCNT]);
+    முழு		itemcnt;
     char_u	*p;
-    int		lnum = 0;
-    affheader_T	*cur_aff = NULL;
-    int		did_postpone_prefix = FALSE;
-    int		aff_todo = 0;
+    முழு		lnum = 0;
+    affheader_T	*cur_aff = வெற்று;
+    முழு		did_postpone_prefix = FALSE;
+    முழு		aff_todo = 0;
     hashtab_T	*tp;
-    char_u	*low = NULL;
-    char_u	*fol = NULL;
-    char_u	*upp = NULL;
-    int		do_rep;
-    int		do_repsal;
-    int		do_sal;
-    int		do_mapline;
-    int		found_map = FALSE;
+    char_u	*கீழ் = வெற்று;
+    char_u	*fol = வெற்று;
+    char_u	*upp = வெற்று;
+    முழு		do_rep;
+    முழு		do_repsal;
+    முழு		do_sal;
+    முழு		do_mapline;
+    முழு		found_map = FALSE;
     hashitem_T	*hi;
-    int		l;
-    int		compminlen = 0;		// COMPOUNDMIN value
-    int		compsylmax = 0;		// COMPOUNDSYLMAX value
-    int		compoptions = 0;	// COMP_ flags
-    int		compmax = 0;		// COMPOUNDWORDMAX value
-    char_u	*compflags = NULL;	// COMPOUNDFLAG and COMPOUNDRULE
+    முழு		l;
+    முழு		compminlen = 0;		// COMPOUNDMIN value
+    முழு		compsylmax = 0;		// COMPOUNDSYLMAX value
+    முழு		compoptions = 0;	// COMP_ flags
+    முழு		compmax = 0;		// COMPOUNDWORDMAX value
+    char_u	*compflags = வெற்று;	// COMPOUNDFLAG and COMPOUNDRULE
 					// concatenated
-    char_u	*midword = NULL;	// MIDWORD value
-    char_u	*syllable = NULL;	// SYLLABLE value
-    char_u	*sofofrom = NULL;	// SOFOFROM value
-    char_u	*sofoto = NULL;		// SOFOTO value
+    char_u	*midword = வெற்று;	// MIDWORD value
+    char_u	*syllable = வெற்று;	// SYLLABLE value
+    char_u	*sofofrom = வெற்று;	// SOFOFROM value
+    char_u	*sofoto = வெற்று;		// SOFOTO value
 
     /*
      * Open the file.
      */
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    fd = mch_fopen((எழுத்து *)fname, "r");
+    எனில் (fd == வெற்று)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return NULL;
+	திரும்பு வெற்று;
     }
 
-    vim_snprintf((char *)IObuff, IOSIZE, _("Reading affix file %s..."), fname);
+    vim_snprintf((எழுத்து *)IObuff, IOSIZE, _("Reading affix file %s..."), fname);
     spell_message(spin, IObuff);
 
     // Only do REP lines when not done in another .aff file already.
@@ -2293,11 +2293,11 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
     /*
      * Allocate and init the afffile_T structure.
      */
-    aff = (afffile_T *)getroom(spin, sizeof(afffile_T), TRUE);
-    if (aff == NULL)
+    aff = (afffile_T *)getroom(spin, அளவு(afffile_T), TRUE);
+    எனில் (aff == வெற்று)
     {
 	fclose(fd);
-	return NULL;
+	திரும்பு வெற்று;
     }
     hash_init(&aff->af_pref);
     hash_init(&aff->af_suff);
@@ -2306,85 +2306,85 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
     /*
      * Read all the lines in the file one by one.
      */
-    while (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
+    போது (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
     {
-	line_breakcheck();
+	வரி_breakcheck();
 	++lnum;
 
 	// Skip comment lines.
-	if (*rline == '#')
-	    continue;
+	எனில் (*rline == '#')
+	    தொடர்;
 
 	// Convert from "SET" to 'encoding' when needed.
 	vim_free(pc);
-	if (spin->si_conv.vc_type != CONV_NONE)
+	எனில் (spin->si_conv.vc_type != CONV_NONE)
 	{
-	    pc = string_convert(&spin->si_conv, rline, NULL);
-	    if (pc == NULL)
+	    pc = string_convert(&spin->si_conv, rline, வெற்று);
+	    எனில் (pc == வெற்று)
 	    {
 		smsg(_("Conversion failure for word in %s line %d: %s"),
 							   fname, lnum, rline);
-		continue;
+		தொடர்;
 	    }
-	    line = pc;
+	    வரி = pc;
 	}
-	else
+	இல்லையெனில்
 	{
-	    pc = NULL;
-	    line = rline;
+	    pc = வெற்று;
+	    வரி = rline;
 	}
 
 	// Split the line up in white separated items.  Put a NUL after each
 	// item.
 	itemcnt = 0;
-	for (p = line; ; )
+	க்கு (p = வரி; ; )
 	{
-	    while (*p != NUL && *p <= ' ')  // skip white space and CR/NL
+	    போது (*p != NUL && *p <= ' ')  // skip white space and CR/NL
 		++p;
-	    if (*p == NUL)
-		break;
-	    if (itemcnt == MAXITEMCNT)	    // too many items
-		break;
-	    items[itemcnt++] = p;
+	    எனில் (*p == NUL)
+		நிறுத்து;
+	    எனில் (itemcnt == MAXITEMCNT)	    // too many items
+		நிறுத்து;
+	    பொருட்கள்[itemcnt++] = p;
 	    // A few items have arbitrary text argument, don't split them.
-	    if (itemcnt == 2 && spell_info_item(items[0]))
-		while (*p >= ' ' || *p == TAB)    // skip until CR/NL
+	    எனில் (itemcnt == 2 && spell_info_item(பொருட்கள்[0]))
+		போது (*p >= ' ' || *p == TAB)    // skip until CR/NL
 		    ++p;
-	    else
-		while (*p > ' ')    // skip until white space or CR/NL
+	    இல்லையெனில்
+		போது (*p > ' ')    // skip until white space or CR/NL
 		    ++p;
-	    if (*p == NUL)
-		break;
+	    எனில் (*p == NUL)
+		நிறுத்து;
 	    *p++ = NUL;
 	}
 
 	// Handle non-empty lines.
-	if (itemcnt > 0)
+	எனில் (itemcnt > 0)
 	{
-	    if (is_aff_rule(items, itemcnt, "SET", 2) && aff->af_enc == NULL)
+	    எனில் (is_aff_rule(பொருட்கள், itemcnt, "SET", 2) && aff->af_enc == வெற்று)
 	    {
 		// Setup for conversion from "ENC" to 'encoding'.
-		aff->af_enc = enc_canonize(items[1]);
-		if (aff->af_enc != NULL && !spin->si_ascii
+		aff->af_enc = enc_canonize(பொருட்கள்[1]);
+		எனில் (aff->af_enc != வெற்று && !spin->si_ascii
 			&& convert_setup(&spin->si_conv, aff->af_enc,
 							       p_enc) == FAIL)
 		    smsg(_("Conversion in %s not supported: from %s to %s"),
 					       fname, aff->af_enc, p_enc);
 		spin->si_conv.vc_fail = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "FLAG", 2)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "FLAG", 2)
 					      && aff->af_flagtype == AFT_CHAR)
 	    {
-		if (STRCMP(items[1], "long") == 0)
+		எனில் (STRCMP(பொருட்கள்[1], "long") == 0)
 		    aff->af_flagtype = AFT_LONG;
-		else if (STRCMP(items[1], "num") == 0)
-		    aff->af_flagtype = AFT_NUM;
-		else if (STRCMP(items[1], "caplong") == 0)
+		இல்லையெனில் எனில் (STRCMP(பொருட்கள்[1], "num") == 0)
+		    aff->af_flagtype = AFT_இலக்கம்;
+		இல்லையெனில் எனில் (STRCMP(பொருட்கள்[1], "caplong") == 0)
 		    aff->af_flagtype = AFT_CAPLONG;
-		else
+		இல்லையெனில்
 		    smsg(_("Invalid value for FLAG in %s line %d: %s"),
-			    fname, lnum, items[1]);
-		if (aff->af_rare != 0
+			    fname, lnum, பொருட்கள்[1]);
+		எனில் (aff->af_rare != 0
 			|| aff->af_keepcase != 0
 			|| aff->af_bad != 0
 			|| aff->af_needaffix != 0
@@ -2392,291 +2392,291 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			|| aff->af_needcomp != 0
 			|| aff->af_comproot != 0
 			|| aff->af_nosuggest != 0
-			|| compflags != NULL
+			|| compflags != வெற்று
 			|| aff->af_suff.ht_used > 0
 			|| aff->af_pref.ht_used > 0)
 		    smsg(_("FLAG after using flags in %s line %d: %s"),
-			    fname, lnum, items[1]);
+			    fname, lnum, பொருட்கள்[1]);
 	    }
-	    else if (spell_info_item(items[0]))
+	    இல்லையெனில் எனில் (spell_info_item(பொருட்கள்[0]))
 	    {
 		    p = (char_u *)getroom(spin,
-			    (spin->si_info == NULL ? 0 : STRLEN(spin->si_info))
-			    + STRLEN(items[0])
-			    + STRLEN(items[1]) + 3, FALSE);
-		    if (p != NULL)
+			    (spin->si_info == வெற்று ? 0 : STRLEN(spin->si_info))
+			    + STRLEN(பொருட்கள்[0])
+			    + STRLEN(பொருட்கள்[1]) + 3, FALSE);
+		    எனில் (p != வெற்று)
 		    {
-			if (spin->si_info != NULL)
+			எனில் (spin->si_info != வெற்று)
 			{
 			    STRCPY(p, spin->si_info);
 			    STRCAT(p, "\n");
 			}
-			STRCAT(p, items[0]);
+			STRCAT(p, பொருட்கள்[0]);
 			STRCAT(p, " ");
-			STRCAT(p, items[1]);
+			STRCAT(p, பொருட்கள்[1]);
 			spin->si_info = p;
 		    }
 	    }
-	    else if (is_aff_rule(items, itemcnt, "MIDWORD", 2)
-							   && midword == NULL)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "MIDWORD", 2)
+							   && midword == வெற்று)
 	    {
-		midword = getroom_save(spin, items[1]);
+		midword = getroom_save(spin, பொருட்கள்[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "TRY", 2))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "TRY", 2))
 	    {
 		// ignored, we look in the tree for what chars may appear
 	    }
 	    // TODO: remove "RAR" later
-	    else if ((is_aff_rule(items, itemcnt, "RAR", 2)
-			|| is_aff_rule(items, itemcnt, "RARE", 2))
+	    இல்லையெனில் எனில் ((is_aff_rule(பொருட்கள், itemcnt, "RAR", 2)
+			|| is_aff_rule(பொருட்கள், itemcnt, "RARE", 2))
 							 && aff->af_rare == 0)
 	    {
-		aff->af_rare = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_rare = affitem2flag(aff->af_flagtype, பொருட்கள்[1],
 								 fname, lnum);
 	    }
 	    // TODO: remove "KEP" later
-	    else if ((is_aff_rule(items, itemcnt, "KEP", 2)
-			|| is_aff_rule(items, itemcnt, "KEEPCASE", 2))
+	    இல்லையெனில் எனில் ((is_aff_rule(பொருட்கள், itemcnt, "KEP", 2)
+			|| is_aff_rule(பொருட்கள், itemcnt, "KEEPCASE", 2))
 						     && aff->af_keepcase == 0)
 	    {
-		aff->af_keepcase = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_keepcase = affitem2flag(aff->af_flagtype, பொருட்கள்[1],
 								 fname, lnum);
 	    }
-	    else if ((is_aff_rule(items, itemcnt, "BAD", 2)
-			|| is_aff_rule(items, itemcnt, "FORBIDDENWORD", 2))
+	    இல்லையெனில் எனில் ((is_aff_rule(பொருட்கள், itemcnt, "BAD", 2)
+			|| is_aff_rule(பொருட்கள், itemcnt, "FORBIDDENWORD", 2))
 							  && aff->af_bad == 0)
 	    {
-		aff->af_bad = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_bad = affitem2flag(aff->af_flagtype, பொருட்கள்[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NEEDAFFIX", 2)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "NEEDAFFIX", 2)
 						    && aff->af_needaffix == 0)
 	    {
-		aff->af_needaffix = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_needaffix = affitem2flag(aff->af_flagtype, பொருட்கள்[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CIRCUMFIX", 2)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "CIRCUMFIX", 2)
 						    && aff->af_circumfix == 0)
 	    {
-		aff->af_circumfix = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_circumfix = affitem2flag(aff->af_flagtype, பொருட்கள்[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOSUGGEST", 2)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "NOSUGGEST", 2)
 						    && aff->af_nosuggest == 0)
 	    {
-		aff->af_nosuggest = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_nosuggest = affitem2flag(aff->af_flagtype, பொருட்கள்[1],
 								 fname, lnum);
 	    }
-	    else if ((is_aff_rule(items, itemcnt, "NEEDCOMPOUND", 2)
-			|| is_aff_rule(items, itemcnt, "ONLYINCOMPOUND", 2))
+	    இல்லையெனில் எனில் ((is_aff_rule(பொருட்கள், itemcnt, "NEEDCOMPOUND", 2)
+			|| is_aff_rule(பொருட்கள், itemcnt, "ONLYINCOMPOUND", 2))
 						     && aff->af_needcomp == 0)
 	    {
-		aff->af_needcomp = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_needcomp = affitem2flag(aff->af_flagtype, பொருட்கள்[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDROOT", 2)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "COMPOUNDROOT", 2)
 						     && aff->af_comproot == 0)
 	    {
-		aff->af_comproot = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_comproot = affitem2flag(aff->af_flagtype, பொருட்கள்[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDFORBIDFLAG", 2)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "COMPOUNDFORBIDFLAG", 2)
 						   && aff->af_compforbid == 0)
 	    {
-		aff->af_compforbid = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_compforbid = affitem2flag(aff->af_flagtype, பொருட்கள்[1],
 								 fname, lnum);
-		if (aff->af_pref.ht_used > 0)
+		எனில் (aff->af_pref.ht_used > 0)
 		    smsg(_("Defining COMPOUNDFORBIDFLAG after PFX item may give wrong results in %s line %d"),
 			    fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDPERMITFLAG", 2)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "COMPOUNDPERMITFLAG", 2)
 						   && aff->af_comppermit == 0)
 	    {
-		aff->af_comppermit = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_comppermit = affitem2flag(aff->af_flagtype, பொருட்கள்[1],
 								 fname, lnum);
-		if (aff->af_pref.ht_used > 0)
+		எனில் (aff->af_pref.ht_used > 0)
 		    smsg(_("Defining COMPOUNDPERMITFLAG after PFX item may give wrong results in %s line %d"),
 			    fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDFLAG", 2)
-							 && compflags == NULL)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "COMPOUNDFLAG", 2)
+							 && compflags == வெற்று)
 	    {
 		// Turn flag "c" into COMPOUNDRULE compatible string "c+",
 		// "Na" into "Na+", "1234" into "1234+".
-		p = getroom(spin, STRLEN(items[1]) + 2, FALSE);
-		if (p != NULL)
+		p = getroom(spin, STRLEN(பொருட்கள்[1]) + 2, FALSE);
+		எனில் (p != வெற்று)
 		{
-		    STRCPY(p, items[1]);
+		    STRCPY(p, பொருட்கள்[1]);
 		    STRCAT(p, "+");
 		    compflags = p;
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDRULES", 2))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "COMPOUNDRULES", 2))
 	    {
 		// We don't use the count, but do check that it's a number and
 		// not COMPOUNDRULE mistyped.
-		if (atoi((char *)items[1]) == 0)
+		எனில் (atoi((எழுத்து *)பொருட்கள்[1]) == 0)
 		    smsg(_("Wrong COMPOUNDRULES value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, பொருட்கள்[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDRULE", 2))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "COMPOUNDRULE", 2))
 	    {
 		// Don't use the first rule if it is a number.
-		if (compflags != NULL || *skipdigits(items[1]) != NUL)
+		எனில் (compflags != வெற்று || *skipdigits(பொருட்கள்[1]) != NUL)
 		{
 		    // Concatenate this string to previously defined ones,
 		    // using a slash to separate them.
-		    l = (int)STRLEN(items[1]) + 1;
-		    if (compflags != NULL)
-			l += (int)STRLEN(compflags) + 1;
+		    l = (முழு)STRLEN(பொருட்கள்[1]) + 1;
+		    எனில் (compflags != வெற்று)
+			l += (முழு)STRLEN(compflags) + 1;
 		    p = getroom(spin, l, FALSE);
-		    if (p != NULL)
+		    எனில் (p != வெற்று)
 		    {
-			if (compflags != NULL)
+			எனில் (compflags != வெற்று)
 			{
 			    STRCPY(p, compflags);
 			    STRCAT(p, "/");
 			}
-			STRCAT(p, items[1]);
+			STRCAT(p, பொருட்கள்[1]);
 			compflags = p;
 		    }
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDWORDMAX", 2)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "COMPOUNDWORDMAX", 2)
 							      && compmax == 0)
 	    {
-		compmax = atoi((char *)items[1]);
-		if (compmax == 0)
+		compmax = atoi((எழுத்து *)பொருட்கள்[1]);
+		எனில் (compmax == 0)
 		    smsg(_("Wrong COMPOUNDWORDMAX value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, பொருட்கள்[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDMIN", 2)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "COMPOUNDMIN", 2)
 							   && compminlen == 0)
 	    {
-		compminlen = atoi((char *)items[1]);
-		if (compminlen == 0)
+		compminlen = atoi((எழுத்து *)பொருட்கள்[1]);
+		எனில் (compminlen == 0)
 		    smsg(_("Wrong COMPOUNDMIN value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, பொருட்கள்[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDSYLMAX", 2)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "COMPOUNDSYLMAX", 2)
 							   && compsylmax == 0)
 	    {
-		compsylmax = atoi((char *)items[1]);
-		if (compsylmax == 0)
+		compsylmax = atoi((எழுத்து *)பொருட்கள்[1]);
+		எனில் (compsylmax == 0)
 		    smsg(_("Wrong COMPOUNDSYLMAX value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, பொருட்கள்[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDDUP", 1))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "CHECKCOMPOUNDDUP", 1))
 	    {
 		compoptions |= COMP_CHECKDUP;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDREP", 1))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "CHECKCOMPOUNDREP", 1))
 	    {
 		compoptions |= COMP_CHECKREP;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDCASE", 1))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "CHECKCOMPOUNDCASE", 1))
 	    {
 		compoptions |= COMP_CHECKCASE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDTRIPLE", 1))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "CHECKCOMPOUNDTRIPLE", 1))
 	    {
 		compoptions |= COMP_CHECKTRIPLE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDPATTERN", 2))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "CHECKCOMPOUNDPATTERN", 2))
 	    {
-		if (atoi((char *)items[1]) == 0)
+		எனில் (atoi((எழுத்து *)பொருட்கள்[1]) == 0)
 		    smsg(_("Wrong CHECKCOMPOUNDPATTERN value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, பொருட்கள்[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDPATTERN", 3))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "CHECKCOMPOUNDPATTERN", 3))
 	    {
 		garray_T    *gap = &spin->si_comppat;
-		int	    i;
+		முழு	    i;
 
 		// Only add the couple if it isn't already there.
-		for (i = 0; i < gap->ga_len - 1; i += 2)
-		    if (STRCMP(((char_u **)(gap->ga_data))[i], items[1]) == 0
+		க்கு (i = 0; i < gap->ga_len - 1; i += 2)
+		    எனில் (STRCMP(((char_u **)(gap->ga_data))[i], பொருட்கள்[1]) == 0
 			    && STRCMP(((char_u **)(gap->ga_data))[i + 1],
-							       items[2]) == 0)
-			break;
-		if (i >= gap->ga_len && ga_grow(gap, 2) == OK)
+							       பொருட்கள்[2]) == 0)
+			நிறுத்து;
+		எனில் (i >= gap->ga_len && ga_grow(gap, 2) == OK)
 		{
 		    ((char_u **)(gap->ga_data))[gap->ga_len++]
-					       = getroom_save(spin, items[1]);
+					       = getroom_save(spin, பொருட்கள்[1]);
 		    ((char_u **)(gap->ga_data))[gap->ga_len++]
-					       = getroom_save(spin, items[2]);
+					       = getroom_save(spin, பொருட்கள்[2]);
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "SYLLABLE", 2)
-							  && syllable == NULL)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "SYLLABLE", 2)
+							  && syllable == வெற்று)
 	    {
-		syllable = getroom_save(spin, items[1]);
+		syllable = getroom_save(spin, பொருட்கள்[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOBREAK", 1))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "NOBREAK", 1))
 	    {
 		spin->si_nobreak = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOSPLITSUGS", 1))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "NOSPLITSUGS", 1))
 	    {
 		spin->si_nosplitsugs = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOCOMPOUNDSUGS", 1))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "NOCOMPOUNDSUGS", 1))
 	    {
 		spin->si_nocompoundsugs = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOSUGFILE", 1))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "NOSUGFILE", 1))
 	    {
 		spin->si_nosugfile = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "PFXPOSTPONE", 1))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "PFXPOSTPONE", 1))
 	    {
 		aff->af_pfxpostpone = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "IGNOREEXTRA", 1))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "IGNOREEXTRA", 1))
 	    {
 		aff->af_ignoreextra = TRUE;
 	    }
-	    else if ((STRCMP(items[0], "PFX") == 0
-					      || STRCMP(items[0], "SFX") == 0)
+	    இல்லையெனில் எனில் ((STRCMP(பொருட்கள்[0], "PFX") == 0
+					      || STRCMP(பொருட்கள்[0], "SFX") == 0)
 		    && aff_todo == 0
 		    && itemcnt >= 4)
 	    {
-		int	lasti = 4;
-		char_u	key[AH_KEY_LEN];
+		முழு	lasti = 4;
+		char_u	சாவி[AH_சாவி_LEN];
 
-		if (*items[0] == 'P')
+		எனில் (*பொருட்கள்[0] == 'P')
 		    tp = &aff->af_pref;
-		else
+		இல்லையெனில்
 		    tp = &aff->af_suff;
 
 		// Myspell allows the same affix name to be used multiple
 		// times.  The affix files that do this have an undocumented
 		// "S" flag on all but the last block, thus we check for that
 		// and store it in ah_follows.
-		vim_strncpy(key, items[1], AH_KEY_LEN - 1);
-		hi = hash_find(tp, key);
-		if (!HASHITEM_EMPTY(hi))
+		vim_strncpy(சாவி, பொருட்கள்[1], AH_சாவி_LEN - 1);
+		hi = hash_find(tp, சாவி);
+		எனில் (!HASHITEM_EMPTY(hi))
 		{
 		    cur_aff = HI2AH(hi);
-		    if (cur_aff->ah_combine != (*items[2] == 'Y'))
+		    எனில் (cur_aff->ah_combine != (*பொருட்கள்[2] == 'Y'))
 			smsg(_("Different combining flag in continued affix block in %s line %d: %s"),
-						   fname, lnum, items[1]);
-		    if (!cur_aff->ah_follows)
+						   fname, lnum, பொருட்கள்[1]);
+		    எனில் (!cur_aff->ah_follows)
 			smsg(_("Duplicate affix in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, பொருட்கள்[1]);
 		}
-		else
+		இல்லையெனில்
 		{
 		    // New affix letter.
 		    cur_aff = (affheader_T *)getroom(spin,
-						   sizeof(affheader_T), TRUE);
-		    if (cur_aff == NULL)
-			break;
-		    cur_aff->ah_flag = affitem2flag(aff->af_flagtype, items[1],
+						   அளவு(affheader_T), TRUE);
+		    எனில் (cur_aff == வெற்று)
+			நிறுத்து;
+		    cur_aff->ah_flag = affitem2flag(aff->af_flagtype, பொருட்கள்[1],
 								 fname, lnum);
-		    if (cur_aff->ah_flag == 0 || STRLEN(items[1]) >= AH_KEY_LEN)
-			break;
-		    if (cur_aff->ah_flag == aff->af_bad
+		    எனில் (cur_aff->ah_flag == 0 || STRLEN(பொருட்கள்[1]) >= AH_சாவி_LEN)
+			நிறுத்து;
+		    எனில் (cur_aff->ah_flag == aff->af_bad
 			    || cur_aff->ah_flag == aff->af_rare
 			    || cur_aff->ah_flag == aff->af_keepcase
 			    || cur_aff->ah_flag == aff->af_needaffix
@@ -2685,35 +2685,35 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			    || cur_aff->ah_flag == aff->af_needcomp
 			    || cur_aff->ah_flag == aff->af_comproot)
 			smsg(_("Affix also used for BAD/RARE/KEEPCASE/NEEDAFFIX/NEEDCOMPOUND/NOSUGGEST in %s line %d: %s"),
-						       fname, lnum, items[1]);
-		    STRCPY(cur_aff->ah_key, items[1]);
-		    hash_add(tp, cur_aff->ah_key, "spelling");
+						       fname, lnum, பொருட்கள்[1]);
+		    STRCPY(cur_aff->ah_சாவி, பொருட்கள்[1]);
+		    hash_add(tp, cur_aff->ah_சாவி, "spelling");
 
-		    cur_aff->ah_combine = (*items[2] == 'Y');
+		    cur_aff->ah_combine = (*பொருட்கள்[2] == 'Y');
 		}
 
 		// Check for the "S" flag, which apparently means that another
 		// block with the same affix name is following.
-		if (itemcnt > lasti && STRCMP(items[lasti], "S") == 0)
+		எனில் (itemcnt > lasti && STRCMP(பொருட்கள்[lasti], "S") == 0)
 		{
 		    ++lasti;
 		    cur_aff->ah_follows = TRUE;
 		}
-		else
+		இல்லையெனில்
 		    cur_aff->ah_follows = FALSE;
 
 		// Myspell allows extra text after the item, but that might
 		// mean mistakes go unnoticed.  Require a comment-starter.
-		if (itemcnt > lasti && *items[lasti] != '#')
-		    smsg(_(e_afftrailing), fname, lnum, items[lasti]);
+		எனில் (itemcnt > lasti && *பொருட்கள்[lasti] != '#')
+		    smsg(_(e_afftrailing), fname, lnum, பொருட்கள்[lasti]);
 
-		if (STRCMP(items[2], "Y") != 0 && STRCMP(items[2], "N") != 0)
+		எனில் (STRCMP(பொருட்கள்[2], "Y") != 0 && STRCMP(பொருட்கள்[2], "N") != 0)
 		    smsg(_("Expected Y or N in %s line %d: %s"),
-						       fname, lnum, items[2]);
+						       fname, lnum, பொருட்கள்[2]);
 
-		if (*items[0] == 'P' && aff->af_pfxpostpone)
+		எனில் (*பொருட்கள்[0] == 'P' && aff->af_pfxpostpone)
 		{
-		    if (cur_aff->ah_newID == 0)
+		    எனில் (cur_aff->ah_newID == 0)
 		    {
 			// Use a new number in the .spl file later, to be able
 			// to handle multiple .aff files.
@@ -2725,49 +2725,49 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			// the items.
 			did_postpone_prefix = FALSE;
 		    }
-		    else
+		    இல்லையெனில்
 			// Did use the ID in a previous block.
 			did_postpone_prefix = TRUE;
 		}
 
-		aff_todo = atoi((char *)items[3]);
+		aff_todo = atoi((எழுத்து *)பொருட்கள்[3]);
 	    }
-	    else if ((STRCMP(items[0], "PFX") == 0
-					      || STRCMP(items[0], "SFX") == 0)
+	    இல்லையெனில் எனில் ((STRCMP(பொருட்கள்[0], "PFX") == 0
+					      || STRCMP(பொருட்கள்[0], "SFX") == 0)
 		    && aff_todo > 0
-		    && STRCMP(cur_aff->ah_key, items[1]) == 0
+		    && STRCMP(cur_aff->ah_சாவி, பொருட்கள்[1]) == 0
 		    && itemcnt >= 5)
 	    {
 		affentry_T	*aff_entry;
-		int		upper = FALSE;
-		int		lasti = 5;
+		முழு		upper = FALSE;
+		முழு		lasti = 5;
 
 		// Myspell allows extra text after the item, but that might
 		// mean mistakes go unnoticed.  Require a comment-starter,
 		// unless IGNOREEXTRA is used.  Hunspell uses a "-" item.
-		if (itemcnt > lasti
+		எனில் (itemcnt > lasti
 			&& !aff->af_ignoreextra
-			&& *items[lasti] != '#'
-			&& (STRCMP(items[lasti], "-") != 0
+			&& *பொருட்கள்[lasti] != '#'
+			&& (STRCMP(பொருட்கள்[lasti], "-") != 0
 						     || itemcnt != lasti + 1))
-		    smsg(_(e_afftrailing), fname, lnum, items[lasti]);
+		    smsg(_(e_afftrailing), fname, lnum, பொருட்கள்[lasti]);
 
 		// New item for an affix letter.
 		--aff_todo;
 		aff_entry = (affentry_T *)getroom(spin,
-						    sizeof(affentry_T), TRUE);
-		if (aff_entry == NULL)
-		    break;
+						    அளவு(affentry_T), TRUE);
+		எனில் (aff_entry == வெற்று)
+		    நிறுத்து;
 
-		if (STRCMP(items[2], "0") != 0)
-		    aff_entry->ae_chop = getroom_save(spin, items[2]);
-		if (STRCMP(items[3], "0") != 0)
+		எனில் (STRCMP(பொருட்கள்[2], "0") != 0)
+		    aff_entry->ae_chop = getroom_save(spin, பொருட்கள்[2]);
+		எனில் (STRCMP(பொருட்கள்[3], "0") != 0)
 		{
-		    aff_entry->ae_add = getroom_save(spin, items[3]);
+		    aff_entry->ae_add = getroom_save(spin, பொருட்கள்[3]);
 
 		    // Recognize flags on the affix: abcd/XYZ
 		    aff_entry->ae_flags = vim_strchr(aff_entry->ae_add, '/');
-		    if (aff_entry->ae_flags != NULL)
+		    எனில் (aff_entry->ae_flags != வெற்று)
 		    {
 			*aff_entry->ae_flags++ = NUL;
 			aff_process_flags(aff, aff_entry);
@@ -2776,82 +2776,82 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 
 		// Don't use an affix entry with non-ASCII characters when
 		// "spin->si_ascii" is TRUE.
-		if (!spin->si_ascii || !(has_non_ascii(aff_entry->ae_chop)
+		எனில் (!spin->si_ascii || !(has_non_ascii(aff_entry->ae_chop)
 					  || has_non_ascii(aff_entry->ae_add)))
 		{
 		    aff_entry->ae_next = cur_aff->ah_first;
 		    cur_aff->ah_first = aff_entry;
 
-		    if (STRCMP(items[4], ".") != 0)
+		    எனில் (STRCMP(பொருட்கள்[4], ".") != 0)
 		    {
 			char_u	buf[MAXLINELEN];
 
-			aff_entry->ae_cond = getroom_save(spin, items[4]);
+			aff_entry->ae_cond = getroom_save(spin, பொருட்கள்[4]);
 			// Note: this silently truncates the buffer, but this should
 			// not happen in practice
-			if (*items[0] == 'P')
-			    vim_snprintf((char *)buf, sizeof(buf), "^%s", items[4]);
-			else
-			    vim_snprintf((char *)buf, sizeof(buf), "%s$", items[4]);
+			எனில் (*பொருட்கள்[0] == 'P')
+			    vim_snprintf((எழுத்து *)buf, அளவு(buf), "^%s", பொருட்கள்[4]);
+			இல்லையெனில்
+			    vim_snprintf((எழுத்து *)buf, அளவு(buf), "%s$", பொருட்கள்[4]);
 			aff_entry->ae_prog = vim_regcomp(buf,
 					    RE_MAGIC + RE_STRING + RE_STRICT);
-			if (aff_entry->ae_prog == NULL)
+			எனில் (aff_entry->ae_prog == வெற்று)
 			    smsg(_("Broken condition in %s line %d: %s"),
-						       fname, lnum, items[4]);
+						       fname, lnum, பொருட்கள்[4]);
 		    }
 
 		    // For postponed prefixes we need an entry in si_prefcond
 		    // for the condition.  Use an existing one if possible.
 		    // Can't be done for an affix with flags, ignoring
 		    // COMPOUNDFORBIDFLAG and COMPOUNDPERMITFLAG.
-		    if (*items[0] == 'P' && aff->af_pfxpostpone
-					       && aff_entry->ae_flags == NULL)
+		    எனில் (*பொருட்கள்[0] == 'P' && aff->af_pfxpostpone
+					       && aff_entry->ae_flags == வெற்று)
 		    {
 			// When the chop string is one lower-case letter and
 			// the add string ends in the upper-case letter we set
 			// the "upper" flag, clear "ae_chop" and remove the
 			// letters from "ae_add".  The condition must either
 			// be empty or start with the same letter.
-			if (aff_entry->ae_chop != NULL
-				&& aff_entry->ae_add != NULL
+			எனில் (aff_entry->ae_chop != வெற்று
+				&& aff_entry->ae_add != வெற்று
 				&& aff_entry->ae_chop[(*mb_ptr2len)(
 						   aff_entry->ae_chop)] == NUL)
 			{
-			    int		c, c_up;
+			    முழு		c, c_up;
 
 			    c = PTR2CHAR(aff_entry->ae_chop);
 			    c_up = SPELL_TOUPPER(c);
-			    if (c_up != c
-				    && (aff_entry->ae_cond == NULL
+			    எனில் (c_up != c
+				    && (aff_entry->ae_cond == வெற்று
 					|| PTR2CHAR(aff_entry->ae_cond) == c))
 			    {
 				p = aff_entry->ae_add
 						  + STRLEN(aff_entry->ae_add);
 				MB_PTR_BACK(aff_entry->ae_add, p);
-				if (PTR2CHAR(p) == c_up)
+				எனில் (PTR2CHAR(p) == c_up)
 				{
 				    upper = TRUE;
-				    aff_entry->ae_chop = NULL;
+				    aff_entry->ae_chop = வெற்று;
 				    *p = NUL;
 
 				    // The condition is matched with the
 				    // actual word, thus must check for the
 				    // upper-case letter.
-				    if (aff_entry->ae_cond != NULL)
+				    எனில் (aff_entry->ae_cond != வெற்று)
 				    {
 					char_u	buf[MAXLINELEN];
 
-					if (has_mbyte)
+					எனில் (has_mbyte)
 					{
-					    onecap_copy(items[4], buf, TRUE);
+					    onecap_copy(பொருட்கள்[4], buf, TRUE);
 					    aff_entry->ae_cond = getroom_save(
 								   spin, buf);
 					}
-					else
+					இல்லையெனில்
 					    *aff_entry->ae_cond = c_up;
-					if (aff_entry->ae_cond != NULL)
+					எனில் (aff_entry->ae_cond != வெற்று)
 					{
-					    sprintf((char *)buf, "^%s",
+					    sprintf((எழுத்து *)buf, "^%s",
 							  aff_entry->ae_cond);
 					    vim_regfree(aff_entry->ae_prog);
 					    aff_entry->ae_prog = vim_regcomp(
@@ -2862,58 +2862,58 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			    }
 			}
 
-			if (aff_entry->ae_chop == NULL
-					       && aff_entry->ae_flags == NULL)
+			எனில் (aff_entry->ae_chop == வெற்று
+					       && aff_entry->ae_flags == வெற்று)
 			{
-			    int		idx;
+			    முழு		idx;
 			    char_u	**pp;
-			    int		n;
+			    முழு		n;
 
 			    // Find a previously used condition.
-			    for (idx = spin->si_prefcond.ga_len - 1; idx >= 0;
+			    க்கு (idx = spin->si_prefcond.ga_len - 1; idx >= 0;
 									--idx)
 			    {
 				p = ((char_u **)spin->si_prefcond.ga_data)[idx];
-				if (str_equal(p, aff_entry->ae_cond))
-				    break;
+				எனில் (str_equal(p, aff_entry->ae_cond))
+				    நிறுத்து;
 			    }
-			    if (idx < 0 && ga_grow(&spin->si_prefcond, 1) == OK)
+			    எனில் (idx < 0 && ga_grow(&spin->si_prefcond, 1) == OK)
 			    {
 				// Not found, add a new condition.
 				idx = spin->si_prefcond.ga_len++;
 				pp = ((char_u **)spin->si_prefcond.ga_data)
 									+ idx;
-				if (aff_entry->ae_cond == NULL)
-				    *pp = NULL;
-				else
+				எனில் (aff_entry->ae_cond == வெற்று)
+				    *pp = வெற்று;
+				இல்லையெனில்
 				    *pp = getroom_save(spin,
 							  aff_entry->ae_cond);
 			    }
 
 			    // Add the prefix to the prefix tree.
-			    if (aff_entry->ae_add == NULL)
+			    எனில் (aff_entry->ae_add == வெற்று)
 				p = (char_u *)"";
-			    else
+			    இல்லையெனில்
 				p = aff_entry->ae_add;
 
 			    // PFX_FLAGS is a negative number, so that
 			    // tree_add_word() knows this is the prefix tree.
 			    n = PFX_FLAGS;
-			    if (!cur_aff->ah_combine)
+			    எனில் (!cur_aff->ah_combine)
 				n |= WFP_NC;
-			    if (upper)
+			    எனில் (upper)
 				n |= WFP_UP;
-			    if (aff_entry->ae_comppermit)
+			    எனில் (aff_entry->ae_comppermit)
 				n |= WFP_COMPPERMIT;
-			    if (aff_entry->ae_compforbid)
+			    எனில் (aff_entry->ae_compforbid)
 				n |= WFP_COMPFORBID;
-			    tree_add_word(spin, p, spin->si_prefroot, n,
+			    மரம்_add_word(spin, p, spin->si_prefroot, n,
 						      idx, cur_aff->ah_newID);
 			    did_postpone_prefix = TRUE;
 			}
 
 			// Didn't actually use ah_newID, backup si_newprefID.
-			if (aff_todo == 0 && !did_postpone_prefix)
+			எனில் (aff_todo == 0 && !did_postpone_prefix)
 			{
 			    --spin->si_newprefID;
 			    cur_aff->ah_newID = 0;
@@ -2921,138 +2921,138 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 		    }
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "FOL", 2) && fol == NULL)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "FOL", 2) && fol == வெற்று)
 	    {
-		fol = vim_strsave(items[1]);
+		fol = vim_strsave(பொருட்கள்[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "LOW", 2) && low == NULL)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "LOW", 2) && கீழ் == வெற்று)
 	    {
-		low = vim_strsave(items[1]);
+		கீழ் = vim_strsave(பொருட்கள்[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "UPP", 2) && upp == NULL)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "UPP", 2) && upp == வெற்று)
 	    {
-		upp = vim_strsave(items[1]);
+		upp = vim_strsave(பொருட்கள்[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "REP", 2)
-		     || is_aff_rule(items, itemcnt, "REPSAL", 2))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "REP", 2)
+		     || is_aff_rule(பொருட்கள், itemcnt, "REPSAL", 2))
 	    {
 		// Ignore REP/REPSAL count
-		if (!SAFE_isdigit(*items[1]))
+		எனில் (!SAFE_isdigit(*பொருட்கள்[1]))
 		    smsg(_("Expected REP(SAL) count in %s line %d"),
 								 fname, lnum);
 	    }
-	    else if ((STRCMP(items[0], "REP") == 0
-			|| STRCMP(items[0], "REPSAL") == 0)
+	    இல்லையெனில் எனில் ((STRCMP(பொருட்கள்[0], "REP") == 0
+			|| STRCMP(பொருட்கள்[0], "REPSAL") == 0)
 		    && itemcnt >= 3)
 	    {
 		// REP/REPSAL item
 		// Myspell ignores extra arguments, we require it starts with
 		// # to detect mistakes.
-		if (itemcnt > 3 && items[3][0] != '#')
-		    smsg(_(e_afftrailing), fname, lnum, items[3]);
-		if (items[0][3] == 'S' ? do_repsal : do_rep)
+		எனில் (itemcnt > 3 && பொருட்கள்[3][0] != '#')
+		    smsg(_(e_afftrailing), fname, lnum, பொருட்கள்[3]);
+		எனில் (பொருட்கள்[0][3] == 'S' ? do_repsal : do_rep)
 		{
 		    // Replace underscore with space (can't include a space
 		    // directly).
-		    for (p = items[1]; *p != NUL; MB_PTR_ADV(p))
-			if (*p == '_')
+		    க்கு (p = பொருட்கள்[1]; *p != NUL; MB_PTR_ADV(p))
+			எனில் (*p == '_')
 			    *p = ' ';
-		    for (p = items[2]; *p != NUL; MB_PTR_ADV(p))
-			if (*p == '_')
+		    க்கு (p = பொருட்கள்[2]; *p != NUL; MB_PTR_ADV(p))
+			எனில் (*p == '_')
 			    *p = ' ';
-		    add_fromto(spin, items[0][3] == 'S'
+		    add_fromto(spin, பொருட்கள்[0][3] == 'S'
 					 ? &spin->si_repsal
-					 : &spin->si_rep, items[1], items[2]);
+					 : &spin->si_rep, பொருட்கள்[1], பொருட்கள்[2]);
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "MAP", 2))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "MAP", 2))
 	    {
 		// MAP item or count
-		if (!found_map)
+		எனில் (!found_map)
 		{
 		    // First line contains the count.
 		    found_map = TRUE;
-		    if (!SAFE_isdigit(*items[1]))
+		    எனில் (!SAFE_isdigit(*பொருட்கள்[1]))
 			smsg(_("Expected MAP count in %s line %d"),
 								 fname, lnum);
 		}
-		else if (do_mapline)
+		இல்லையெனில் எனில் (do_mapline)
 		{
-		    int		c;
+		    முழு		c;
 
 		    // Check that every character appears only once.
-		    for (p = items[1]; *p != NUL; )
+		    க்கு (p = பொருட்கள்[1]; *p != NUL; )
 		    {
 			c = mb_ptr2char_adv(&p);
-			if ((spin->si_map.ga_len > 0
+			எனில் ((spin->si_map.ga_len > 0
 				    && vim_strchr(spin->si_map.ga_data, c)
-								      != NULL)
-				|| vim_strchr(p, c) != NULL)
+								      != வெற்று)
+				|| vim_strchr(p, c) != வெற்று)
 			    smsg(_("Duplicate character in MAP in %s line %d"),
 								 fname, lnum);
 		    }
 
 		    // We simply concatenate all the MAP strings, separated by
 		    // slashes.
-		    ga_concat(&spin->si_map, items[1]);
+		    ga_concat(&spin->si_map, பொருட்கள்[1]);
 		    ga_append(&spin->si_map, '/');
 		}
 	    }
 	    // Accept "SAL from to" and "SAL from to  #comment".
-	    else if (is_aff_rule(items, itemcnt, "SAL", 3))
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "SAL", 3))
 	    {
-		if (do_sal)
+		எனில் (do_sal)
 		{
 		    // SAL item (sounds-a-like)
 		    // Either one of the known keys or a from-to pair.
-		    if (STRCMP(items[1], "followup") == 0)
-			spin->si_followup = sal_to_bool(items[2]);
-		    else if (STRCMP(items[1], "collapse_result") == 0)
-			spin->si_collapse = sal_to_bool(items[2]);
-		    else if (STRCMP(items[1], "remove_accents") == 0)
-			spin->si_rem_accents = sal_to_bool(items[2]);
-		    else
+		    எனில் (STRCMP(பொருட்கள்[1], "followup") == 0)
+			spin->si_followup = sal_to_bool(பொருட்கள்[2]);
+		    இல்லையெனில் எனில் (STRCMP(பொருட்கள்[1], "collapse_result") == 0)
+			spin->si_collapse = sal_to_bool(பொருட்கள்[2]);
+		    இல்லையெனில் எனில் (STRCMP(பொருட்கள்[1], "remove_accents") == 0)
+			spin->si_rem_accents = sal_to_bool(பொருட்கள்[2]);
+		    இல்லையெனில்
 			// when "to" is "_" it means empty
-			add_fromto(spin, &spin->si_sal, items[1],
-				     STRCMP(items[2], "_") == 0 ? (char_u *)""
-								: items[2]);
+			add_fromto(spin, &spin->si_sal, பொருட்கள்[1],
+				     STRCMP(பொருட்கள்[2], "_") == 0 ? (char_u *)""
+								: பொருட்கள்[2]);
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "SOFOFROM", 2)
-							  && sofofrom == NULL)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "SOFOFROM", 2)
+							  && sofofrom == வெற்று)
 	    {
-		sofofrom = getroom_save(spin, items[1]);
+		sofofrom = getroom_save(spin, பொருட்கள்[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "SOFOTO", 2)
-							    && sofoto == NULL)
+	    இல்லையெனில் எனில் (is_aff_rule(பொருட்கள், itemcnt, "SOFOTO", 2)
+							    && sofoto == வெற்று)
 	    {
-		sofoto = getroom_save(spin, items[1]);
+		sofoto = getroom_save(spin, பொருட்கள்[1]);
 	    }
-	    else if (STRCMP(items[0], "COMMON") == 0)
+	    இல்லையெனில் எனில் (STRCMP(பொருட்கள்[0], "COMMON") == 0)
 	    {
-		int	i;
+		முழு	i;
 
-		for (i = 1; i < itemcnt; ++i)
+		க்கு (i = 1; i < itemcnt; ++i)
 		{
-		    if (HASHITEM_EMPTY(hash_find(&spin->si_commonwords,
-								   items[i])))
+		    எனில் (HASHITEM_EMPTY(hash_find(&spin->si_commonwords,
+								   பொருட்கள்[i])))
 		    {
-			p = vim_strsave(items[i]);
-			if (p == NULL)
-			    break;
+			p = vim_strsave(பொருட்கள்[i]);
+			எனில் (p == வெற்று)
+			    நிறுத்து;
 			hash_add(&spin->si_commonwords, p, "spelling");
 		    }
 		}
 	    }
-	    else
+	    இல்லையெனில்
 		smsg(_("Unrecognized or duplicate item in %s line %d: %s"),
-						       fname, lnum, items[0]);
+						       fname, lnum, பொருட்கள்[0]);
 	}
     }
 
-    if (fol != NULL || low != NULL || upp != NULL)
+    எனில் (fol != வெற்று || கீழ் != வெற்று || upp != வெற்று)
     {
-	if (spin->si_clear_chartab)
+	எனில் (spin->si_clear_chartab)
 	{
 	    // Clear the char type tables, don't want to use any of the
 	    // currently used spell properties.
@@ -3066,74 +3066,74 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 	 * Don't write one for utf-8 either, we use utf_*() and
 	 * mb_get_class(), the list of chars in the file will be incomplete.
 	 */
-	if (!spin->si_ascii && !enc_utf8)
+	எனில் (!spin->si_ascii && !enc_utf8)
 	{
-	    if (fol == NULL || low == NULL || upp == NULL)
+	    எனில் (fol == வெற்று || கீழ் == வெற்று || upp == வெற்று)
 		smsg(_("Missing FOL/LOW/UPP line in %s"), fname);
-	    else
-		(void)set_spell_chartab(fol, low, upp);
+	    இல்லையெனில்
+		(வெறுமை)set_spell_chartab(fol, கீழ், upp);
 	}
 
 	vim_free(fol);
-	vim_free(low);
+	vim_free(கீழ்);
 	vim_free(upp);
     }
 
     // Use compound specifications of the .aff file for the spell info.
-    if (compmax != 0)
+    எனில் (compmax != 0)
     {
-	aff_check_number(spin->si_compmax, compmax, "COMPOUNDWORDMAX");
+	aff_check_எண்(spin->si_compmax, compmax, "COMPOUNDWORDMAX");
 	spin->si_compmax = compmax;
     }
 
-    if (compminlen != 0)
+    எனில் (compminlen != 0)
     {
-	aff_check_number(spin->si_compminlen, compminlen, "COMPOUNDMIN");
+	aff_check_எண்(spin->si_compminlen, compminlen, "COMPOUNDMIN");
 	spin->si_compminlen = compminlen;
     }
 
-    if (compsylmax != 0)
+    எனில் (compsylmax != 0)
     {
-	if (syllable == NULL)
+	எனில் (syllable == வெற்று)
 	    smsg(_("COMPOUNDSYLMAX used without SYLLABLE"));
-	aff_check_number(spin->si_compsylmax, compsylmax, "COMPOUNDSYLMAX");
+	aff_check_எண்(spin->si_compsylmax, compsylmax, "COMPOUNDSYLMAX");
 	spin->si_compsylmax = compsylmax;
     }
 
-    if (compoptions != 0)
+    எனில் (compoptions != 0)
     {
-	aff_check_number(spin->si_compoptions, compoptions, "COMPOUND options");
+	aff_check_எண்(spin->si_compoptions, compoptions, "COMPOUND options");
 	spin->si_compoptions |= compoptions;
     }
 
-    if (compflags != NULL)
+    எனில் (compflags != வெற்று)
 	process_compflags(spin, aff, compflags);
 
     // Check that we didn't use too many renumbered flags.
-    if (spin->si_newcompID < spin->si_newprefID)
+    எனில் (spin->si_newcompID < spin->si_newprefID)
     {
-	if (spin->si_newcompID == 127 || spin->si_newcompID == 255)
-	    msg(_("Too many postponed prefixes"));
-	else if (spin->si_newprefID == 0 || spin->si_newprefID == 127)
-	    msg(_("Too many compound flags"));
-	else
-	    msg(_("Too many postponed prefixes and/or compound flags"));
+	எனில் (spin->si_newcompID == 127 || spin->si_newcompID == 255)
+	    செய்தி(_("Too many postponed prefixes"));
+	இல்லையெனில் எனில் (spin->si_newprefID == 0 || spin->si_newprefID == 127)
+	    செய்தி(_("Too many compound flags"));
+	இல்லையெனில்
+	    செய்தி(_("Too many postponed prefixes and/or compound flags"));
     }
 
-    if (syllable != NULL)
+    எனில் (syllable != வெற்று)
     {
 	aff_check_string(spin->si_syllable, syllable, "SYLLABLE");
 	spin->si_syllable = syllable;
     }
 
-    if (sofofrom != NULL || sofoto != NULL)
+    எனில் (sofofrom != வெற்று || sofoto != வெற்று)
     {
-	if (sofofrom == NULL || sofoto == NULL)
+	எனில் (sofofrom == வெற்று || sofoto == வெற்று)
 	    smsg(_("Missing SOFO%s line in %s"),
-				     sofofrom == NULL ? "FROM" : "TO", fname);
-	else if (spin->si_sal.ga_len > 0)
+				     sofofrom == வெற்று ? "FROM" : "TO", fname);
+	இல்லையெனில் எனில் (spin->si_sal.ga_len > 0)
 	    smsg(_("Both SAL and SOFO lines in %s"), fname);
-	else
+	இல்லையெனில்
 	{
 	    aff_check_string(spin->si_sofofr, sofofrom, "SOFOFROM");
 	    aff_check_string(spin->si_sofoto, sofoto, "SOFOTO");
@@ -3142,7 +3142,7 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 	}
     }
 
-    if (midword != NULL)
+    எனில் (midword != வெற்று)
     {
 	aff_check_string(spin->si_midword, midword, "MIDWORD");
 	spin->si_midword = midword;
@@ -3150,67 +3150,67 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 
     vim_free(pc);
     fclose(fd);
-    return aff;
+    திரும்பு aff;
 }
 
 /*
  * Return TRUE when items[0] equals "rulename", there are "mincount" items or
  * a comment is following after item "mincount".
  */
-    static int
+    நிலையான முழு
 is_aff_rule(
-    char_u	**items,
-    int		itemcnt,
-    char	*rulename,
-    int		mincount)
+    char_u	**பொருட்கள்,
+    முழு		itemcnt,
+    எழுத்து	*rulename,
+    முழு		mincount)
 {
-    return (STRCMP(items[0], rulename) == 0
+    திரும்பு (STRCMP(பொருட்கள்[0], rulename) == 0
 	    && (itemcnt == mincount
-		|| (itemcnt > mincount && items[mincount][0] == '#')));
+		|| (itemcnt > mincount && பொருட்கள்[mincount][0] == '#')));
 }
 
 /*
  * For affix "entry" move COMPOUNDFORBIDFLAG and COMPOUNDPERMITFLAG from
  * ae_flags to ae_comppermit and ae_compforbid.
  */
-    static void
+    நிலையான வெறுமை
 aff_process_flags(afffile_T *affile, affentry_T *entry)
 {
     char_u	*p;
     char_u	*prevp;
     unsigned	flag;
 
-    if (entry->ae_flags != NULL
+    எனில் (entry->ae_flags != வெற்று
 		&& (affile->af_compforbid != 0 || affile->af_comppermit != 0))
     {
-	for (p = entry->ae_flags; *p != NUL; )
+	க்கு (p = entry->ae_flags; *p != NUL; )
 	{
 	    prevp = p;
 	    flag = get_affitem(affile->af_flagtype, &p);
-	    if (flag == affile->af_comppermit || flag == affile->af_compforbid)
+	    எனில் (flag == affile->af_comppermit || flag == affile->af_compforbid)
 	    {
 		STRMOVE(prevp, p);
 		p = prevp;
-		if (flag == affile->af_comppermit)
+		எனில் (flag == affile->af_comppermit)
 		    entry->ae_comppermit = TRUE;
-		else
+		இல்லையெனில்
 		    entry->ae_compforbid = TRUE;
 	    }
-	    if (affile->af_flagtype == AFT_NUM && *p == ',')
+	    எனில் (affile->af_flagtype == AFT_இலக்கம் && *p == ',')
 		++p;
 	}
-	if (*entry->ae_flags == NUL)
-	    entry->ae_flags = NULL;	// nothing left
+	எனில் (*entry->ae_flags == NUL)
+	    entry->ae_flags = வெற்று;	// nothing left
     }
 }
 
 /*
  * Return TRUE if "s" is the name of an info item in the affix file.
  */
-    static int
+    நிலையான முழு
 spell_info_item(char_u *s)
 {
-    return STRCMP(s, "NAME") == 0
+    திரும்பு STRCMP(s, "NAME") == 0
 	|| STRCMP(s, "HOME") == 0
 	|| STRCMP(s, "VERSION") == 0
 	|| STRCMP(s, "AUTHOR") == 0
@@ -3222,33 +3222,33 @@ spell_info_item(char_u *s)
  * Turn an affix flag name into a number, according to the FLAG type.
  * returns zero for failure.
  */
-    static unsigned
+    நிலையான unsigned
 affitem2flag(
-    int		flagtype,
+    முழு		flagtype,
     char_u	*item,
     char_u	*fname,
-    int		lnum)
+    முழு		lnum)
 {
     unsigned	res;
     char_u	*p = item;
 
     res = get_affitem(flagtype, &p);
-    if (res == 0)
+    எனில் (res == 0)
     {
-	if (flagtype == AFT_NUM)
+	எனில் (flagtype == AFT_இலக்கம்)
 	    smsg(_("Flag is not a number in %s line %d: %s"),
 							   fname, lnum, item);
-	else
+	இல்லையெனில்
 	    smsg(_("Illegal flag in %s line %d: %s"),
 							   fname, lnum, item);
     }
-    if (*p != NUL)
+    எனில் (*p != NUL)
     {
 	smsg(_(e_affname), fname, lnum, item);
-	return 0;
+	திரும்பு 0;
     }
 
-    return res;
+    திரும்பு res;
 }
 
 /*
@@ -3256,34 +3256,34 @@ affitem2flag(
  * Returns ZERO_FLAG for "0".
  * Returns zero for an error, still advances the pointer then.
  */
-    static unsigned
-get_affitem(int flagtype, char_u **pp)
+    நிலையான unsigned
+get_affitem(முழு flagtype, char_u **pp)
 {
-    int		res;
+    முழு		res;
 
-    if (flagtype == AFT_NUM)
+    எனில் (flagtype == AFT_இலக்கம்)
     {
-	if (!VIM_ISDIGIT(**pp))
+	எனில் (!VIM_ISDIGIT(**pp))
 	{
 	    ++*pp;	// always advance, avoid getting stuck
-	    return 0;
+	    திரும்பு 0;
 	}
 	res = getdigits(pp);
-	if (res == 0)
+	எனில் (res == 0)
 	    res = ZERO_FLAG;
     }
-    else
+    இல்லையெனில்
     {
 	res = mb_ptr2char_adv(pp);
-	if (flagtype == AFT_LONG || (flagtype == AFT_CAPLONG
+	எனில் (flagtype == AFT_LONG || (flagtype == AFT_CAPLONG
 						 && res >= 'A' && res <= 'Z'))
 	{
-	    if (**pp == NUL)
-		return 0;
+	    எனில் (**pp == NUL)
+		திரும்பு 0;
 	    res = mb_ptr2char_adv(pp) + (res << 16);
 	}
     }
-    return res;
+    திரும்பு res;
 }
 
 /*
@@ -3292,7 +3292,7 @@ get_affitem(int flagtype, char_u **pp)
  * The processing involves changing the affix names to ID numbers, so that
  * they fit in one byte.
  */
-    static void
+    நிலையான வெறுமை
 process_compflags(
     spellinfo_T	*spin,
     afffile_T	*aff,
@@ -3302,22 +3302,22 @@ process_compflags(
     char_u	*prevp;
     unsigned	flag;
     compitem_T	*ci;
-    int		id;
-    int		len;
+    முழு		id;
+    முழு		len;
     char_u	*tp;
-    char_u	key[AH_KEY_LEN];
+    char_u	சாவி[AH_சாவி_LEN];
     hashitem_T	*hi;
 
     // Make room for the old and the new compflags, concatenated with a / in
     // between.  Processing it makes it shorter, but we don't know by how
     // much, thus allocate the maximum.
-    len = (int)STRLEN(compflags) + 1;
-    if (spin->si_compflags != NULL)
-	len += (int)STRLEN(spin->si_compflags) + 1;
+    len = (முழு)STRLEN(compflags) + 1;
+    எனில் (spin->si_compflags != வெற்று)
+	len += (முழு)STRLEN(spin->si_compflags) + 1;
     p = getroom(spin, len, FALSE);
-    if (p == NULL)
-	return;
-    if (spin->si_compflags != NULL)
+    எனில் (p == வெற்று)
+	திரும்பு;
+    எனில் (spin->si_compflags != வெற்று)
     {
 	STRCPY(p, spin->si_compflags);
 	STRCAT(p, "/");
@@ -3325,44 +3325,44 @@ process_compflags(
     spin->si_compflags = p;
     tp = p + STRLEN(p);
 
-    for (p = compflags; *p != NUL; )
+    க்கு (p = compflags; *p != NUL; )
     {
-	if (vim_strchr((char_u *)"/?*+[]", *p) != NULL)
+	எனில் (vim_strchr((char_u *)"/?*+[]", *p) != வெற்று)
 	    // Copy non-flag characters directly.
 	    *tp++ = *p++;
-	else
+	இல்லையெனில்
 	{
 	    // First get the flag number, also checks validity.
 	    prevp = p;
 	    flag = get_affitem(aff->af_flagtype, &p);
-	    if (flag != 0)
+	    எனில் (flag != 0)
 	    {
 		// Find the flag in the hashtable.  If it was used before, use
 		// the existing ID.  Otherwise add a new entry.
-		vim_strncpy(key, prevp, p - prevp);
-		hi = hash_find(&aff->af_comp, key);
-		if (!HASHITEM_EMPTY(hi))
+		vim_strncpy(சாவி, prevp, p - prevp);
+		hi = hash_find(&aff->af_comp, சாவி);
+		எனில் (!HASHITEM_EMPTY(hi))
 		    id = HI2CI(hi)->ci_newID;
-		else
+		இல்லையெனில்
 		{
-		    ci = (compitem_T *)getroom(spin, sizeof(compitem_T), TRUE);
-		    if (ci == NULL)
-			break;
-		    STRCPY(ci->ci_key, key);
+		    ci = (compitem_T *)getroom(spin, அளவு(compitem_T), TRUE);
+		    எனில் (ci == வெற்று)
+			நிறுத்து;
+		    STRCPY(ci->ci_சாவி, சாவி);
 		    ci->ci_flag = flag;
 		    // Avoid using a flag ID that has a special meaning in a
 		    // regexp (also inside []).
-		    do
+		    செய்
 		    {
 			check_renumber(spin);
 			id = spin->si_newcompID--;
-		    } while (vim_strchr((char_u *)"/?*+[]\\-^", id) != NULL);
+		    } போது (vim_strchr((char_u *)"/?*+[]\\-^", id) != வெற்று);
 		    ci->ci_newID = id;
-		    hash_add(&aff->af_comp, ci->ci_key, "spelling");
+		    hash_add(&aff->af_comp, ci->ci_சாவி, "spelling");
 		}
 		*tp++ = id;
 	    }
-	    if (aff->af_flagtype == AFT_NUM && *p == ',')
+	    எனில் (aff->af_flagtype == AFT_இலக்கம் && *p == ',')
 		++p;
 	}
     }
@@ -3376,10 +3376,10 @@ process_compflags(
  * using two bytes for utf-8.  When the 0-127 range is used up go to 128-255.
  * When that is used up an error message is given.
  */
-    static void
+    நிலையான வெறுமை
 check_renumber(spellinfo_T *spin)
 {
-    if (spin->si_newprefID == spin->si_newcompID && spin->si_newcompID < 128)
+    எனில் (spin->si_newprefID == spin->si_newcompID && spin->si_newcompID < 128)
     {
 	spin->si_newprefID = 127;
 	spin->si_newcompID = 255;
@@ -3390,82 +3390,82 @@ check_renumber(spellinfo_T *spin)
  * Append one affix or compound ID to "store_afflist".
  * Returns FAIL when this would overrun the fixed-size buffer.
  */
-    static int
+    நிலையான முழு
 store_afflist_add(
     char_u	*store_afflist,
-    int		*cntp,
-    int		id)
+    முழு		*cntp,
+    முழு		id)
 {
-    if (*cntp >= MAXWLEN - 1)
+    எனில் (*cntp >= MAXWLEN - 1)
     {
 	emsg(_(e_too_many_postponed_prefixes_spell));
-	return FAIL;
+	திரும்பு FAIL;
     }
     store_afflist[(*cntp)++] = id;
     store_afflist[*cntp] = NUL;
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Return TRUE if flag "flag" appears in affix list "afflist".
  */
-    static int
-flag_in_afflist(int flagtype, char_u *afflist, unsigned flag)
+    நிலையான முழு
+flag_in_afflist(முழு flagtype, char_u *afflist, unsigned flag)
 {
     char_u	*p;
     unsigned	n;
 
-    switch (flagtype)
+    தேர்வு (flagtype)
     {
-	case AFT_CHAR:
-	    return vim_strchr(afflist, flag) != NULL;
+	நிலை AFT_CHAR:
+	    திரும்பு vim_strchr(afflist, flag) != வெற்று;
 
-	case AFT_CAPLONG:
-	case AFT_LONG:
-	    for (p = afflist; *p != NUL; )
+	நிலை AFT_CAPLONG:
+	நிலை AFT_LONG:
+	    க்கு (p = afflist; *p != NUL; )
 	    {
 		n = mb_ptr2char_adv(&p);
-		if ((flagtype == AFT_LONG || (n >= 'A' && n <= 'Z'))
+		எனில் ((flagtype == AFT_LONG || (n >= 'A' && n <= 'Z'))
 								 && *p != NUL)
 		    n = mb_ptr2char_adv(&p) + (n << 16);
-		if (n == flag)
-		    return TRUE;
+		எனில் (n == flag)
+		    திரும்பு TRUE;
 	    }
-	    break;
+	    நிறுத்து;
 
-	case AFT_NUM:
-	    for (p = afflist; *p != NUL; )
+	நிலை AFT_இலக்கம்:
+	    க்கு (p = afflist; *p != NUL; )
 	    {
 		n = getdigits(&p);
-		if (n == 0)
+		எனில் (n == 0)
 		    n = ZERO_FLAG;
-		if (n == flag)
-		    return TRUE;
-		if (*p != NUL)	// skip over comma
+		எனில் (n == flag)
+		    திரும்பு TRUE;
+		எனில் (*p != NUL)	// skip over comma
 		    ++p;
 	    }
-	    break;
+	    நிறுத்து;
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 /*
  * Give a warning when "spinval" and "affval" numbers are set and not the same.
  */
-    static void
-aff_check_number(int spinval, int affval, char *name)
+    நிலையான வெறுமை
+aff_check_எண்(முழு spinval, முழு affval, எழுத்து *name)
 {
-    if (spinval != 0 && spinval != affval)
+    எனில் (spinval != 0 && spinval != affval)
 	smsg(_("%s value differs from what is used in another .aff file"), name);
 }
 
 /*
  * Give a warning when "spinval" and "affval" strings are set and not the same.
  */
-    static void
-aff_check_string(char_u *spinval, char_u *affval, char *name)
+    நிலையான வெறுமை
+aff_check_string(char_u *spinval, char_u *affval, எழுத்து *name)
 {
-    if (spinval != NULL && STRCMP(spinval, affval) != 0)
+    எனில் (spinval != வெற்று && STRCMP(spinval, affval) != 0)
 	smsg(_("%s value differs from what is used in another .aff file"), name);
 }
 
@@ -3473,19 +3473,19 @@ aff_check_string(char_u *spinval, char_u *affval, char *name)
  * Return TRUE if strings "s1" and "s2" are equal.  Also consider both being
  * NULL as equal.
  */
-    static int
+    நிலையான முழு
 str_equal(char_u *s1, char_u *s2)
 {
-    if (s1 == NULL || s2 == NULL)
-	return s1 == s2;
-    return STRCMP(s1, s2) == 0;
+    எனில் (s1 == வெற்று || s2 == வெற்று)
+	திரும்பு s1 == s2;
+    திரும்பு STRCMP(s1, s2) == 0;
 }
 
 /*
  * Add a from-to item to "gap".  Used for REP and SAL items.
  * They are stored case-folded.
  */
-    static void
+    நிலையான வெறுமை
 add_fromto(
     spellinfo_T	*spin,
     garray_T	*gap,
@@ -3495,13 +3495,13 @@ add_fromto(
     fromto_T	*ftp;
     char_u	word[MAXWLEN];
 
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    எனில் (ga_grow(gap, 1) == FAIL)
+	திரும்பு;
 
     ftp = ((fromto_T *)gap->ga_data) + gap->ga_len;
-    (void)spell_casefold(curwin, from, (int)STRLEN(from), word, MAXWLEN);
+    (வெறுமை)spell_casefold(curwin, from, (முழு)STRLEN(from), word, MAXWLEN);
     ftp->ft_from = getroom_save(spin, word);
-    (void)spell_casefold(curwin, to, (int)STRLEN(to), word, MAXWLEN);
+    (வெறுமை)spell_casefold(curwin, to, (முழு)STRLEN(to), word, MAXWLEN);
     ftp->ft_to = getroom_save(spin, word);
     ++gap->ga_len;
 }
@@ -3509,42 +3509,42 @@ add_fromto(
 /*
  * Convert a boolean argument in a SAL line to TRUE or FALSE;
  */
-    static int
+    நிலையான முழு
 sal_to_bool(char_u *s)
 {
-    return STRCMP(s, "1") == 0 || STRCMP(s, "true") == 0;
+    திரும்பு STRCMP(s, "1") == 0 || STRCMP(s, "true") == 0;
 }
 
 /*
  * Free the structure filled by spell_read_aff().
  */
-    static void
+    நிலையான வெறுமை
 spell_free_aff(afffile_T *aff)
 {
     hashtab_T	*ht;
     hashitem_T	*hi;
-    int		todo;
+    முழு		todo;
     affheader_T	*ah;
     affentry_T	*ae;
 
     vim_free(aff->af_enc);
 
     // All this trouble to free the "ae_prog" items...
-    for (ht = &aff->af_pref; ; ht = &aff->af_suff)
+    க்கு (ht = &aff->af_pref; ; ht = &aff->af_suff)
     {
-	todo = (int)ht->ht_used;
-	FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	todo = (முழு)ht->ht_used;
+	FOR_ALL_HASHTAB_பொருட்கள்(ht, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    எனில் (!HASHITEM_EMPTY(hi))
 	    {
 		--todo;
 		ah = HI2AH(hi);
-		for (ae = ah->ah_first; ae != NULL; ae = ae->ae_next)
+		க்கு (ae = ah->ah_first; ae != வெற்று; ae = ae->ae_next)
 		    vim_regfree(ae->ae_prog);
 	    }
 	}
-	if (ht == &aff->af_suff)
-	    break;
+	எனில் (ht == &aff->af_suff)
+	    நிறுத்து;
     }
 
     hash_clear(&aff->af_pref);
@@ -3556,160 +3556,160 @@ spell_free_aff(afffile_T *aff)
  * Read dictionary file "fname".
  * Returns OK or FAIL;
  */
-    static int
+    நிலையான முழு
 spell_read_dic(spellinfo_T *spin, char_u *fname, afffile_T *affile)
 {
     hashtab_T	ht;
-    char_u	line[MAXLINELEN];
+    char_u	வரி[MAXLINELEN];
     char_u	*p;
     char_u	*afflist;
     char_u	store_afflist[MAXWLEN];
-    int		pfxlen;
-    int		totlen;
-    int		need_affix;
+    முழு		pfxlen;
+    முழு		totlen;
+    முழு		need_affix;
     char_u	*dw;
     char_u	*pc;
     char_u	*w;
-    int		l;
+    முழு		l;
     hash_T	hash;
     hashitem_T	*hi;
     FILE	*fd;
-    int		lnum = 1;
-    int		non_ascii = 0;
-    int		retval = OK;
+    முழு		lnum = 1;
+    முழு		non_ascii = 0;
+    முழு		retval = OK;
     char_u	message[MAXLINELEN + MAXWLEN];
-    int		flags;
-    int		duplicate = 0;
-    time_T	last_msg_time = 0;
+    முழு		flags;
+    முழு		duplicate = 0;
+    time_T	last_செய்தி_time = 0;
 
     /*
      * Open the file.
      */
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    fd = mch_fopen((எழுத்து *)fname, "r");
+    எனில் (fd == வெற்று)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     // The hashtable is only used to detect duplicated words.
     hash_init(&ht);
 
-    vim_snprintf((char *)IObuff, IOSIZE,
+    vim_snprintf((எழுத்து *)IObuff, IOSIZE,
 				  _("Reading dictionary file %s..."), fname);
     spell_message(spin, IObuff);
 
     // start with a message for the first line
-    spin->si_msg_count = 999999;
+    spin->si_செய்தி_மொத்தம் = 999999;
 
     // Read and ignore the first line: word count.
-    if (vim_fgets(line, MAXLINELEN, fd) || !vim_isdigit(*skipwhite(line)))
-	semsg(_(e_no_word_count_in_str), fname);
+    எனில் (vim_fgets(வரி, MAXLINELEN, fd) || !vim_isdigit(*skipwhite(வரி)))
+	semsg(_(e_no_word_மொத்தம்_in_str), fname);
 
     /*
      * Read all the lines in the file one by one.
      * The words are converted to 'encoding' here, before being added to
      * the hashtable.
      */
-    while (!vim_fgets(line, MAXLINELEN, fd) && !got_int)
+    போது (!vim_fgets(வரி, MAXLINELEN, fd) && !got_int)
     {
-	line_breakcheck();
+	வரி_breakcheck();
 	++lnum;
-	if (line[0] == '#' || line[0] == '/')
-	    continue;	// comment line
+	எனில் (வரி[0] == '#' || வரி[0] == '/')
+	    தொடர்;	// comment line
 
 	// Remove CR, LF and white space from the end.  White space halfway
 	// the word is kept to allow e.g., "et al.".
-	l = (int)STRLEN(line);
-	while (l > 0 && line[l - 1] <= ' ')
+	l = (முழு)STRLEN(வரி);
+	போது (l > 0 && வரி[l - 1] <= ' ')
 	    --l;
-	if (l == 0)
-	    continue;	// empty line
-	line[l] = NUL;
+	எனில் (l == 0)
+	    தொடர்;	// empty line
+	வரி[l] = NUL;
 
 	// Convert from "SET" to 'encoding' when needed.
-	if (spin->si_conv.vc_type != CONV_NONE)
+	எனில் (spin->si_conv.vc_type != CONV_NONE)
 	{
-	    pc = string_convert(&spin->si_conv, line, NULL);
-	    if (pc == NULL)
+	    pc = string_convert(&spin->si_conv, வரி, வெற்று);
+	    எனில் (pc == வெற்று)
 	    {
 		smsg(_("Conversion failure for word in %s line %d: %s"),
-						       fname, lnum, line);
-		continue;
+						       fname, lnum, வரி);
+		தொடர்;
 	    }
 	    w = pc;
 	}
-	else
+	இல்லையெனில்
 	{
-	    pc = NULL;
-	    w = line;
+	    pc = வெற்று;
+	    w = வரி;
 	}
 
 	// Truncate the word at the "/", set "afflist" to what follows.
 	// Replace "\/" by "/" and "\\" by "\".
-	afflist = NULL;
-	for (p = w; *p != NUL; MB_PTR_ADV(p))
+	afflist = வெற்று;
+	க்கு (p = w; *p != NUL; MB_PTR_ADV(p))
 	{
-	    if (*p == '\\' && (p[1] == '\\' || p[1] == '/'))
+	    எனில் (*p == '\\' && (p[1] == '\\' || p[1] == '/'))
 		STRMOVE(p, p + 1);
-	    else if (*p == '/')
+	    இல்லையெனில் எனில் (*p == '/')
 	    {
 		*p = NUL;
 		afflist = p + 1;
-		break;
+		நிறுத்து;
 	    }
 	}
 
 	// Skip non-ASCII words when "spin->si_ascii" is TRUE.
-	if (spin->si_ascii && has_non_ascii(w))
+	எனில் (spin->si_ascii && has_non_ascii(w))
 	{
 	    ++non_ascii;
 	    vim_free(pc);
-	    continue;
+	    தொடர்;
 	}
 
 	// This takes time, print a message every 10000 words, but not more
 	// often than once per second.
-	if (spin->si_verbose && spin->si_msg_count > 10000)
+	எனில் (spin->si_verbose && spin->si_செய்தி_மொத்தம் > 10000)
 	{
-	    spin->si_msg_count = 0;
-	    if (vim_time() > last_msg_time)
+	    spin->si_செய்தி_மொத்தம் = 0;
+	    எனில் (vim_time() > last_செய்தி_time)
 	    {
-		last_msg_time = vim_time();
-		vim_snprintf((char *)message, sizeof(message),
+		last_செய்தி_time = vim_time();
+		vim_snprintf((எழுத்து *)message, அளவு(message),
 			_("line %6d, word %6ld - %s"),
 			   lnum, spin->si_foldwcount + spin->si_keepwcount, w);
-		msg_start();
-		msg_outtrans_long_attr(message, 0);
-		msg_clr_eos();
-		msg_didout = FALSE;
-		msg_col = 0;
+		செய்தி_start();
+		செய்தி_outtrans_long_attr(message, 0);
+		செய்தி_clr_eos();
+		செய்தி_didout = FALSE;
+		செய்தி_col = 0;
 		out_flush();
 	    }
 	}
 
 	// Store the word in the hashtable to be able to find duplicates.
 	dw = getroom_save(spin, w);
-	if (dw == NULL)
+	எனில் (dw == வெற்று)
 	{
 	    retval = FAIL;
 	    vim_free(pc);
-	    break;
+	    நிறுத்து;
 	}
 
 	hash = hash_hash(dw);
 	hi = hash_lookup(&ht, dw, hash);
-	if (!HASHITEM_EMPTY(hi))
+	எனில் (!HASHITEM_EMPTY(hi))
 	{
-	    if (p_verbose > 0)
+	    எனில் (p_verbose > 0)
 		smsg(_("Duplicate word in %s line %d: %s"),
 							     fname, lnum, dw);
-	    else if (duplicate == 0)
+	    இல்லையெனில் எனில் (duplicate == 0)
 		smsg(_("First duplicate word in %s line %d: %s"),
 							     fname, lnum, dw);
 	    ++duplicate;
 	}
-	else
+	இல்லையெனில்
 	    hash_add_item(&ht, hi, dw, hash);
 
 	flags = 0;
@@ -3717,59 +3717,59 @@ spell_read_dic(spellinfo_T *spin, char_u *fname, afffile_T *affile)
 	pfxlen = 0;
 	totlen = 0;
 	need_affix = FALSE;
-	if (afflist != NULL)
+	எனில் (afflist != வெற்று)
 	{
 	    // Extract flags from the affix list.
 	    flags |= get_affix_flags(affile, afflist);
 
-	    if (affile->af_needaffix != 0 && flag_in_afflist(
+	    எனில் (affile->af_needaffix != 0 && flag_in_afflist(
 			  affile->af_flagtype, afflist, affile->af_needaffix))
 		need_affix = TRUE;
 
-	    if (affile->af_pfxpostpone)
+	    எனில் (affile->af_pfxpostpone)
 	    {
 		// Need to store the list of prefix IDs with the word.
-		if (get_pfxlist(affile, afflist, store_afflist, &totlen)
+		எனில் (get_pfxlist(affile, afflist, store_afflist, &totlen)
 								      == FAIL)
 		{
 		    retval = FAIL;
 		    vim_free(pc);
-		    break;
+		    நிறுத்து;
 		}
 		pfxlen = totlen;
 	    }
 
-	    if (spin->si_compflags != NULL)
+	    எனில் (spin->si_compflags != வெற்று)
 	    {
 		// Need to store the list of compound flags with the word.
 		// Concatenate them to the list of prefix IDs.
-		if (get_compflags(affile, afflist, store_afflist, &totlen)
+		எனில் (get_compflags(affile, afflist, store_afflist, &totlen)
 								      == FAIL)
 		{
 		    retval = FAIL;
 		    vim_free(pc);
-		    break;
+		    நிறுத்து;
 		}
 	    }
 	}
 
 	// Add the word to the word tree(s).
-	if (store_word(spin, dw, flags, spin->si_region,
+	எனில் (store_word(spin, dw, flags, spin->si_region,
 					   store_afflist, need_affix) == FAIL)
 	    retval = FAIL;
 
-	if (afflist != NULL)
+	எனில் (afflist != வெற்று)
 	{
 	    // Find all matching suffixes and add the resulting words.
 	    // Additionally do matching prefixes that combine.
-	    if (store_aff_word(spin, dw, afflist, affile,
+	    எனில் (store_aff_word(spin, dw, afflist, affile,
 			   &affile->af_suff, &affile->af_pref,
 			    CONDIT_SUF, flags, store_afflist, pfxlen) == FAIL)
 		retval = FAIL;
 
 	    // Find all matching prefixes and add the resulting words.
-	    if (store_aff_word(spin, dw, afflist, affile,
-			  &affile->af_pref, NULL,
+	    எனில் (store_aff_word(spin, dw, afflist, affile,
+			  &affile->af_pref, வெற்று,
 			    CONDIT_SUF, flags, store_afflist, pfxlen) == FAIL)
 		retval = FAIL;
 	}
@@ -3777,45 +3777,45 @@ spell_read_dic(spellinfo_T *spin, char_u *fname, afffile_T *affile)
 	vim_free(pc);
     }
 
-    if (duplicate > 0)
+    எனில் (duplicate > 0)
 	smsg(_("%d duplicate word(s) in %s"), duplicate, fname);
-    if (spin->si_ascii && non_ascii > 0)
+    எனில் (spin->si_ascii && non_ascii > 0)
 	smsg(_("Ignored %d word(s) with non-ASCII characters in %s"),
 							    non_ascii, fname);
     hash_clear(&ht);
 
     fclose(fd);
-    return retval;
+    திரும்பு retval;
 }
 
 /*
  * Check for affix flags in "afflist" that are turned into word flags.
  * Return WF_ flags.
  */
-    static int
+    நிலையான முழு
 get_affix_flags(afffile_T *affile, char_u *afflist)
 {
-    int		flags = 0;
+    முழு		flags = 0;
 
-    if (affile->af_keepcase != 0 && flag_in_afflist(
+    எனில் (affile->af_keepcase != 0 && flag_in_afflist(
 			   affile->af_flagtype, afflist, affile->af_keepcase))
 	flags |= WF_KEEPCAP | WF_FIXCAP;
-    if (affile->af_rare != 0 && flag_in_afflist(
+    எனில் (affile->af_rare != 0 && flag_in_afflist(
 			       affile->af_flagtype, afflist, affile->af_rare))
 	flags |= WF_RARE;
-    if (affile->af_bad != 0 && flag_in_afflist(
+    எனில் (affile->af_bad != 0 && flag_in_afflist(
 				affile->af_flagtype, afflist, affile->af_bad))
 	flags |= WF_BANNED;
-    if (affile->af_needcomp != 0 && flag_in_afflist(
+    எனில் (affile->af_needcomp != 0 && flag_in_afflist(
 			   affile->af_flagtype, afflist, affile->af_needcomp))
 	flags |= WF_NEEDCOMP;
-    if (affile->af_comproot != 0 && flag_in_afflist(
+    எனில் (affile->af_comproot != 0 && flag_in_afflist(
 			   affile->af_flagtype, afflist, affile->af_comproot))
 	flags |= WF_COMPROOT;
-    if (affile->af_nosuggest != 0 && flag_in_afflist(
+    எனில் (affile->af_nosuggest != 0 && flag_in_afflist(
 			  affile->af_flagtype, afflist, affile->af_nosuggest))
 	flags |= WF_NOSUGGEST;
-    return flags;
+    திரும்பு flags;
 }
 
 /*
@@ -3824,40 +3824,40 @@ get_affix_flags(afffile_T *affile, char_u *afflist)
  * Put the resulting flags in "store_afflist[MAXWLEN]" with a terminating NUL.
  * Returns FAIL when the fixed-size buffer would overflow.
  */
-    static int
+    நிலையான முழு
 get_pfxlist(
     afffile_T	*affile,
     char_u	*afflist,
     char_u	*store_afflist,
-    int		*cntp)
+    முழு		*cntp)
 {
     char_u	*p;
     char_u	*prevp;
-    int		id;
-    char_u	key[AH_KEY_LEN];
+    முழு		id;
+    char_u	சாவி[AH_சாவி_LEN];
     hashitem_T	*hi;
 
-    for (p = afflist; *p != NUL; )
+    க்கு (p = afflist; *p != NUL; )
     {
 	prevp = p;
-	if (get_affitem(affile->af_flagtype, &p) != 0)
+	எனில் (get_affitem(affile->af_flagtype, &p) != 0)
 	{
 	    // A flag is a postponed prefix flag if it appears in "af_pref"
 	    // and its ID is not zero.
-	    vim_strncpy(key, prevp, p - prevp);
-	    hi = hash_find(&affile->af_pref, key);
-	    if (!HASHITEM_EMPTY(hi))
+	    vim_strncpy(சாவி, prevp, p - prevp);
+	    hi = hash_find(&affile->af_pref, சாவி);
+	    எனில் (!HASHITEM_EMPTY(hi))
 	    {
 		id = HI2AH(hi)->ah_newID;
-		if (id != 0 && store_afflist_add(store_afflist, cntp, id) == FAIL)
-		    return FAIL;
+		எனில் (id != 0 && store_afflist_add(store_afflist, cntp, id) == FAIL)
+		    திரும்பு FAIL;
 	    }
 	}
-	if (affile->af_flagtype == AFT_NUM && *p == ',')
+	எனில் (affile->af_flagtype == AFT_இலக்கம் && *p == ',')
 	    ++p;
     }
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -3866,36 +3866,36 @@ get_pfxlist(
  * Puts the flags in "store_afflist[]".
  * Returns FAIL when the fixed-size buffer would overflow.
  */
-    static int
+    நிலையான முழு
 get_compflags(
     afffile_T	*affile,
     char_u	*afflist,
     char_u	*store_afflist,
-    int		*cntp)
+    முழு		*cntp)
 {
     char_u	*p;
     char_u	*prevp;
-    char_u	key[AH_KEY_LEN];
+    char_u	சாவி[AH_சாவி_LEN];
     hashitem_T	*hi;
 
-    for (p = afflist; *p != NUL; )
+    க்கு (p = afflist; *p != NUL; )
     {
 	prevp = p;
-	if (get_affitem(affile->af_flagtype, &p) != 0)
+	எனில் (get_affitem(affile->af_flagtype, &p) != 0)
 	{
 	    // A flag is a compound flag if it appears in "af_comp".
-	    vim_strncpy(key, prevp, p - prevp);
-	    hi = hash_find(&affile->af_comp, key);
-	    if (!HASHITEM_EMPTY(hi)
+	    vim_strncpy(சாவி, prevp, p - prevp);
+	    hi = hash_find(&affile->af_comp, சாவி);
+	    எனில் (!HASHITEM_EMPTY(hi)
 		    && store_afflist_add(store_afflist, cntp,
 					      HI2CI(hi)->ci_newID) == FAIL)
-		return FAIL;
+		திரும்பு FAIL;
 	}
-	if (affile->af_flagtype == AFT_NUM && *p == ',')
+	எனில் (affile->af_flagtype == AFT_இலக்கம் && *p == ',')
 	    ++p;
     }
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -3907,7 +3907,7 @@ get_compflags(
  *
  * Returns FAIL when out of memory.
  */
-    static int
+    நிலையான முழு
 store_aff_word(
     spellinfo_T	*spin,		// spell info
     char_u	*word,		// basic word start
@@ -3915,45 +3915,45 @@ store_aff_word(
     afffile_T	*affile,
     hashtab_T	*ht,
     hashtab_T	*xht,
-    int		condit,		// CONDIT_SUF et al.
-    int		flags,		// flags for the word
+    முழு		condit,		// CONDIT_SUF et al.
+    முழு		flags,		// flags for the word
     char_u	*pfxlist,	// list of prefix IDs
-    int		pfxlen)		// nr of flags in "pfxlist" for prefixes, rest
+    முழு		pfxlen)		// nr of flags in "pfxlist" for prefixes, rest
 				// is compound flags
 {
-    int		todo;
+    முழு		todo;
     hashitem_T	*hi;
     affheader_T	*ah;
     affentry_T	*ae;
     char_u	newword[MAXWLEN];
-    int		retval = OK;
-    int		i, j;
+    முழு		retval = OK;
+    முழு		i, j;
     char_u	*p;
-    int		use_flags;
+    முழு		use_flags;
     char_u	*use_pfxlist;
-    int		use_pfxlen;
-    int		need_affix;
+    முழு		use_pfxlen;
+    முழு		need_affix;
     char_u	store_afflist[MAXWLEN];
     char_u	pfx_pfxlist[MAXWLEN];
     size_t	wordlen = STRLEN(word);
-    int		use_condit;
+    முழு		use_condit;
 
-    todo = (int)ht->ht_used;
-    for (hi = ht->ht_array; todo > 0 && retval == OK; ++hi)
+    todo = (முழு)ht->ht_used;
+    க்கு (hi = ht->ht_array; todo > 0 && retval == OK; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	எனில் (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    ah = HI2AH(hi);
 
 	    // Check that the affix combines, if required, and that the word
 	    // supports this affix.
-	    if (((condit & CONDIT_COMB) == 0 || ah->ah_combine)
+	    எனில் (((condit & CONDIT_COMB) == 0 || ah->ah_combine)
 		    && flag_in_afflist(affile->af_flagtype, afflist,
 								 ah->ah_flag))
 	    {
 		// Loop over all affix entries with this name.
-		for (ae = ah->ah_first; ae != NULL; ae = ae->ae_next)
+		க்கு (ae = ah->ah_first; ae != வெற்று; ae = ae->ae_next)
 		{
 		    // Check the condition.  It's not logical to match case
 		    // here, but it is required for compatibility with
@@ -3965,59 +3965,59 @@ store_aff_word(
 		    // When a previously added affix had CIRCUMFIX this one
 		    // must have it too, if it had not then this one must not
 		    // have one either.
-		    if ((xht != NULL || !affile->af_pfxpostpone
-				|| ae->ae_chop != NULL
-				|| ae->ae_flags != NULL)
-			    && (ae->ae_chop == NULL
+		    எனில் ((xht != வெற்று || !affile->af_pfxpostpone
+				|| ae->ae_chop != வெற்று
+				|| ae->ae_flags != வெற்று)
+			    && (ae->ae_chop == வெற்று
 				|| STRLEN(ae->ae_chop) < wordlen)
-			    && (ae->ae_prog == NULL
+			    && (ae->ae_prog == வெற்று
 				|| vim_regexec_prog(&ae->ae_prog, FALSE,
 							    word, (colnr_T)0))
 			    && (((condit & CONDIT_CFIX) == 0)
 				== ((condit & CONDIT_AFF) == 0
-				    || ae->ae_flags == NULL
+				    || ae->ae_flags == வெற்று
 				    || !flag_in_afflist(affile->af_flagtype,
 					ae->ae_flags, affile->af_circumfix))))
 		    {
 			// Match.  Remove the chop and add the affix.
-			if (xht == NULL)
+			எனில் (xht == வெற்று)
 			{
 			    // prefix: chop/add at the start of the word
-			    if (ae->ae_add == NULL)
+			    எனில் (ae->ae_add == வெற்று)
 				*newword = NUL;
-			    else
+			    இல்லையெனில்
 				vim_strncpy(newword, ae->ae_add, MAXWLEN - 1);
 			    p = word;
-			    if (ae->ae_chop != NULL)
+			    எனில் (ae->ae_chop != வெற்று)
 			    {
 				// Skip chop string.
-				if (has_mbyte)
+				எனில் (has_mbyte)
 				{
 				    i = mb_charlen(ae->ae_chop);
-				    for ( ; i > 0; --i)
+				    க்கு ( ; i > 0; --i)
 					MB_PTR_ADV(p);
 				}
-				else
+				இல்லையெனில்
 				    p += STRLEN(ae->ae_chop);
 			    }
 			    // Note: this silently truncates the buffer, but this should
 			    // not happen in practice
 			    STRNCAT(newword, p, MAXWLEN - STRLEN(newword) - 1);
 			}
-			else
+			இல்லையெனில்
 			{
 			    // suffix: chop/add at the end of the word
 			    vim_strncpy(newword, word, MAXWLEN - 1);
-			    if (ae->ae_chop != NULL)
+			    எனில் (ae->ae_chop != வெற்று)
 			    {
 				// Remove chop string.
 				p = newword + STRLEN(newword);
-				i = (int)MB_CHARLEN(ae->ae_chop);
-				for ( ; i > 0; --i)
+				i = (முழு)MB_CHARLEN(ae->ae_chop);
+				க்கு ( ; i > 0; --i)
 				    MB_PTR_BACK(newword, p);
 				*p = NUL;
 			    }
-			    if (ae->ae_add != NULL)
+			    எனில் (ae->ae_add != வெற்று)
 				// Note: this silently truncates the buffer, but this should
 				// not happen in practice
 				STRNCAT(newword, ae->ae_add, MAXWLEN - STRLEN(newword) - 1);
@@ -4028,12 +4028,12 @@ store_aff_word(
 			use_pfxlen = pfxlen;
 			need_affix = FALSE;
 			use_condit = condit | CONDIT_COMB | CONDIT_AFF;
-			if (ae->ae_flags != NULL)
+			எனில் (ae->ae_flags != வெற்று)
 			{
 			    // Extract flags from the affix list.
 			    use_flags |= get_affix_flags(affile, ae->ae_flags);
 
-			    if (affile->af_needaffix != 0 && flag_in_afflist(
+			    எனில் (affile->af_needaffix != 0 && flag_in_afflist(
 					affile->af_flagtype, ae->ae_flags,
 							affile->af_needaffix))
 				need_affix = TRUE;
@@ -4041,102 +4041,102 @@ store_aff_word(
 			    // When there is a CIRCUMFIX flag the other affix
 			    // must also have it and we don't add the word
 			    // with one affix.
-			    if (affile->af_circumfix != 0 && flag_in_afflist(
+			    எனில் (affile->af_circumfix != 0 && flag_in_afflist(
 					affile->af_flagtype, ae->ae_flags,
 							affile->af_circumfix))
 			    {
 				use_condit |= CONDIT_CFIX;
-				if ((condit & CONDIT_CFIX) == 0)
+				எனில் ((condit & CONDIT_CFIX) == 0)
 				    need_affix = TRUE;
 			    }
 
-			    if (affile->af_pfxpostpone
-						|| spin->si_compflags != NULL)
+			    எனில் (affile->af_pfxpostpone
+						|| spin->si_compflags != வெற்று)
 			    {
-				int listlen = 0;
+				முழு listlen = 0;
 
-				if (affile->af_pfxpostpone)
+				எனில் (affile->af_pfxpostpone)
 				{
 				    // Get prefix IDS from the affix list.
-				    if (get_pfxlist(affile, ae->ae_flags,
+				    எனில் (get_pfxlist(affile, ae->ae_flags,
 						    store_afflist, &listlen)
 								      == FAIL)
 				    {
 					retval = FAIL;
-					break;
+					நிறுத்து;
 				    }
 				    use_pfxlen = listlen;
 				}
-				else
+				இல்லையெனில்
 				    use_pfxlen = 0;
 				use_pfxlist = store_afflist;
 
 				// Combine the prefix IDs. Avoid adding the
 				// same ID twice.
-				for (i = 0; i < pfxlen; ++i)
+				க்கு (i = 0; i < pfxlen; ++i)
 				{
-				    for (j = 0; j < use_pfxlen; ++j)
-					if (pfxlist[i] == use_pfxlist[j])
-					    break;
-				    if (j == use_pfxlen
+				    க்கு (j = 0; j < use_pfxlen; ++j)
+					எனில் (pfxlist[i] == use_pfxlist[j])
+					    நிறுத்து;
+				    எனில் (j == use_pfxlen
 					    && store_afflist_add(use_pfxlist,
 							&listlen, pfxlist[i])
 								      == FAIL)
 				    {
 					retval = FAIL;
-					break;
+					நிறுத்து;
 				    }
 				    use_pfxlen = listlen;
 				}
-				if (retval == FAIL)
-				    break;
+				எனில் (retval == FAIL)
+				    நிறுத்து;
 
-				if (spin->si_compflags != NULL)
+				எனில் (spin->si_compflags != வெற்று)
 				    // Get compound IDS from the affix list.
-				    if (get_compflags(affile, ae->ae_flags,
+				    எனில் (get_compflags(affile, ae->ae_flags,
 						      use_pfxlist, &listlen)
 								      == FAIL)
 				    {
 					retval = FAIL;
-					break;
+					நிறுத்து;
 				    }
-				if (retval == FAIL)
-				    break;
+				எனில் (retval == FAIL)
+				    நிறுத்து;
 
 				// Combine the list of compound flags.
 				// Concatenate them to the prefix IDs list.
 				// Avoid adding the same ID twice.
-				for (i = pfxlen; pfxlist[i] != NUL; ++i)
+				க்கு (i = pfxlen; pfxlist[i] != NUL; ++i)
 				{
-				    for (j = use_pfxlen;
+				    க்கு (j = use_pfxlen;
 						   use_pfxlist[j] != NUL; ++j)
-					if (pfxlist[i] == use_pfxlist[j])
-					    break;
-				    if (use_pfxlist[j] == NUL
+					எனில் (pfxlist[i] == use_pfxlist[j])
+					    நிறுத்து;
+				    எனில் (use_pfxlist[j] == NUL
 					    && store_afflist_add(use_pfxlist,
 							&listlen, pfxlist[i])
 								      == FAIL)
 				    {
 					retval = FAIL;
-					break;
+					நிறுத்து;
 				    }
 				}
-				if (retval == FAIL)
-				    break;
+				எனில் (retval == FAIL)
+				    நிறுத்து;
 			    }
 			}
 
 			// Obey a "COMPOUNDFORBIDFLAG" of the affix: don't
 			// use the compound flags.
-			if (use_pfxlist != NULL && ae->ae_compforbid)
+			எனில் (use_pfxlist != வெற்று && ae->ae_compforbid)
 			{
 			    vim_strncpy(pfx_pfxlist, use_pfxlist, use_pfxlen);
 			    use_pfxlist = pfx_pfxlist;
 			}
 
 			// When there are postponed prefixes...
-			if (spin->si_prefroot != NULL
-				&& spin->si_prefroot->wn_sibling != NULL)
+			எனில் (spin->si_prefroot != வெற்று
+				&& spin->si_prefroot->wn_sibling != வெற்று)
 			{
 			    // ... add a flag to indicate an affix was used.
 			    use_flags |= WF_HAS_AFF;
@@ -4144,33 +4144,33 @@ store_aff_word(
 			    // ... don't use a prefix list if combining
 			    // affixes is not allowed.  But do use the
 			    // compound flags after them.
-			    if (!ah->ah_combine && use_pfxlist != NULL)
+			    எனில் (!ah->ah_combine && use_pfxlist != வெற்று)
 				use_pfxlist += use_pfxlen;
 			}
 
 			// When compounding is supported and there is no
 			// "COMPOUNDPERMITFLAG" then forbid compounding on the
 			// side where the affix is applied.
-			if (spin->si_compflags != NULL && !ae->ae_comppermit)
+			எனில் (spin->si_compflags != வெற்று && !ae->ae_comppermit)
 			{
-			    if (xht != NULL)
+			    எனில் (xht != வெற்று)
 				use_flags |= WF_NOCOMPAFT;
-			    else
+			    இல்லையெனில்
 				use_flags |= WF_NOCOMPBEF;
 			}
 
 			// Store the modified word.
-			if (store_word(spin, newword, use_flags,
+			எனில் (store_word(spin, newword, use_flags,
 						 spin->si_region, use_pfxlist,
 							  need_affix) == FAIL)
 			    retval = FAIL;
 
 			// When added a prefix or a first suffix and the affix
 			// has flags may add a(nother) suffix.  RECURSIVE!
-			if ((condit & CONDIT_SUF) && ae->ae_flags != NULL)
-			    if (store_aff_word(spin, newword, ae->ae_flags,
+			எனில் ((condit & CONDIT_SUF) && ae->ae_flags != வெற்று)
+			    எனில் (store_aff_word(spin, newword, ae->ae_flags,
 					affile, &affile->af_suff, xht,
-					   use_condit & (xht == NULL
+					   use_condit & (xht == வெற்று
 							? ~0 :  ~CONDIT_SUF),
 				      use_flags, use_pfxlist, pfxlen) == FAIL)
 				retval = FAIL;
@@ -4178,17 +4178,17 @@ store_aff_word(
 			// When added a suffix and combining is allowed also
 			// try adding a prefix additionally.  Both for the
 			// word flags and for the affix flags.  RECURSIVE!
-			if (xht != NULL && ah->ah_combine)
+			எனில் (xht != வெற்று && ah->ah_combine)
 			{
-			    if (store_aff_word(spin, newword,
+			    எனில் (store_aff_word(spin, newword,
 					afflist, affile,
-					xht, NULL, use_condit,
+					xht, வெற்று, use_condit,
 					use_flags, use_pfxlist,
 					pfxlen) == FAIL
-				    || (ae->ae_flags != NULL
+				    || (ae->ae_flags != வெற்று
 					&& store_aff_word(spin, newword,
 					    ae->ae_flags, affile,
-					    xht, NULL, use_condit,
+					    xht, வெற்று, use_condit,
 					    use_flags, use_pfxlist,
 					    pfxlen) == FAIL))
 				retval = FAIL;
@@ -4199,190 +4199,190 @@ store_aff_word(
 	}
     }
 
-    return retval;
+    திரும்பு retval;
 }
 
 /*
  * Read a file with a list of words.
  */
-    static int
+    நிலையான முழு
 spell_read_wordfile(spellinfo_T *spin, char_u *fname)
 {
     FILE	*fd;
     long	lnum = 0;
     char_u	rline[MAXLINELEN];
-    char_u	*line;
-    char_u	*pc = NULL;
+    char_u	*வரி;
+    char_u	*pc = வெற்று;
     char_u	*p;
-    int		l;
-    int		retval = OK;
-    int		did_word = FALSE;
-    int		non_ascii = 0;
-    int		flags;
-    int		regionmask;
+    முழு		l;
+    முழு		retval = OK;
+    முழு		did_word = FALSE;
+    முழு		non_ascii = 0;
+    முழு		flags;
+    முழு		regionmask;
 
     /*
      * Open the file.
      */
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    fd = mch_fopen((எழுத்து *)fname, "r");
+    எனில் (fd == வெற்று)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return FAIL;
+	திரும்பு FAIL;
     }
 
-    vim_snprintf((char *)IObuff, IOSIZE, _("Reading word file %s..."), fname);
+    vim_snprintf((எழுத்து *)IObuff, IOSIZE, _("Reading word file %s..."), fname);
     spell_message(spin, IObuff);
 
     /*
      * Read all the lines in the file one by one.
      */
-    while (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
+    போது (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
     {
-	line_breakcheck();
+	வரி_breakcheck();
 	++lnum;
 
 	// Skip comment lines.
-	if (*rline == '#')
-	    continue;
+	எனில் (*rline == '#')
+	    தொடர்;
 
 	// Remove CR, LF and white space from the end.
-	l = (int)STRLEN(rline);
-	while (l > 0 && rline[l - 1] <= ' ')
+	l = (முழு)STRLEN(rline);
+	போது (l > 0 && rline[l - 1] <= ' ')
 	    --l;
-	if (l == 0)
-	    continue;	// empty or blank line
+	எனில் (l == 0)
+	    தொடர்;	// empty or blank line
 	rline[l] = NUL;
 
 	// Convert from "/encoding={encoding}" to 'encoding' when needed.
 	vim_free(pc);
-	if (spin->si_conv.vc_type != CONV_NONE)
+	எனில் (spin->si_conv.vc_type != CONV_NONE)
 	{
-	    pc = string_convert(&spin->si_conv, rline, NULL);
-	    if (pc == NULL)
+	    pc = string_convert(&spin->si_conv, rline, வெற்று);
+	    எனில் (pc == வெற்று)
 	    {
 		smsg(_("Conversion failure for word in %s line %ld: %s"),
 							   fname, lnum, rline);
-		continue;
+		தொடர்;
 	    }
-	    line = pc;
+	    வரி = pc;
 	}
-	else
+	இல்லையெனில்
 	{
-	    pc = NULL;
-	    line = rline;
+	    pc = வெற்று;
+	    வரி = rline;
 	}
 
-	if (*line == '/')
+	எனில் (*வரி == '/')
 	{
-	    ++line;
-	    if (STRNCMP(line, "encoding=", 9) == 0)
+	    ++வரி;
+	    எனில் (STRNCMP(வரி, "encoding=", 9) == 0)
 	    {
-		if (spin->si_conv.vc_type != CONV_NONE)
+		எனில் (spin->si_conv.vc_type != CONV_NONE)
 		    smsg(_("Duplicate /encoding= line ignored in %s line %ld: %s"),
-						       fname, lnum, line - 1);
-		else if (did_word)
+						       fname, lnum, வரி - 1);
+		இல்லையெனில் எனில் (did_word)
 		    smsg(_("/encoding= line after word ignored in %s line %ld: %s"),
-						       fname, lnum, line - 1);
-		else
+						       fname, lnum, வரி - 1);
+		இல்லையெனில்
 		{
 		    char_u	*enc;
 
 		    // Setup for conversion to 'encoding'.
-		    line += 9;
-		    enc = enc_canonize(line);
-		    if (enc != NULL && !spin->si_ascii
+		    வரி += 9;
+		    enc = enc_canonize(வரி);
+		    எனில் (enc != வெற்று && !spin->si_ascii
 			    && convert_setup(&spin->si_conv, enc,
 							       p_enc) == FAIL)
 			smsg(_("Conversion in %s not supported: from %s to %s"),
-							  fname, line, p_enc);
+							  fname, வரி, p_enc);
 		    vim_free(enc);
 		    spin->si_conv.vc_fail = TRUE;
 		}
-		continue;
+		தொடர்;
 	    }
 
-	    if (STRNCMP(line, "regions=", 8) == 0)
+	    எனில் (STRNCMP(வரி, "regions=", 8) == 0)
 	    {
-		if (spin->si_region_count > 1)
+		எனில் (spin->si_region_மொத்தம் > 1)
 		    smsg(_("Duplicate /regions= line ignored in %s line %ld: %s"),
-						       fname, lnum, line);
-		else
+						       fname, lnum, வரி);
+		இல்லையெனில்
 		{
-		    line += 8;
-		    if (STRLEN(line) > MAXREGIONS * 2)
+		    வரி += 8;
+		    எனில் (STRLEN(வரி) > MAXREGIONS * 2)
 			smsg(_("Too many regions in %s line %ld: %s"),
-						       fname, lnum, line);
-		    else
+						       fname, lnum, வரி);
+		    இல்லையெனில்
 		    {
-			spin->si_region_count = (int)STRLEN(line) / 2;
-			STRCPY(spin->si_region_name, line);
+			spin->si_region_மொத்தம் = (முழு)STRLEN(வரி) / 2;
+			STRCPY(spin->si_region_name, வரி);
 
 			// Adjust the mask for a word valid in all regions.
-			spin->si_region = (1 << spin->si_region_count) - 1;
+			spin->si_region = (1 << spin->si_region_மொத்தம்) - 1;
 		    }
 		}
-		continue;
+		தொடர்;
 	    }
 
 	    smsg(_("/ line ignored in %s line %ld: %s"),
-						       fname, lnum, line - 1);
-	    continue;
+						       fname, lnum, வரி - 1);
+	    தொடர்;
 	}
 
 	flags = 0;
 	regionmask = spin->si_region;
 
 	// Check for flags and region after a slash.
-	p = vim_strchr(line, '/');
-	if (p != NULL)
+	p = vim_strchr(வரி, '/');
+	எனில் (p != வெற்று)
 	{
 	    *p++ = NUL;
-	    while (*p != NUL)
+	    போது (*p != NUL)
 	    {
-		if (*p == '=')		// keep-case word
+		எனில் (*p == '=')		// keep-case word
 		    flags |= WF_KEEPCAP | WF_FIXCAP;
-		else if (*p == '!')	// Bad, bad, wicked word.
+		இல்லையெனில் எனில் (*p == '!')	// Bad, bad, wicked word.
 		    flags |= WF_BANNED;
-		else if (*p == '?')	// Rare word.
+		இல்லையெனில் எனில் (*p == '?')	// Rare word.
 		    flags |= WF_RARE;
-		else if (VIM_ISDIGIT(*p)) // region number(s)
+		இல்லையெனில் எனில் (VIM_ISDIGIT(*p)) // region number(s)
 		{
-		    if ((flags & WF_REGION) == 0)   // first one
+		    எனில் ((flags & WF_REGION) == 0)   // first one
 			regionmask = 0;
 		    flags |= WF_REGION;
 
 		    l = *p - '0';
-		    if (l == 0 || l > spin->si_region_count)
+		    எனில் (l == 0 || l > spin->si_region_மொத்தம்)
 		    {
 			smsg(_("Invalid region nr in %s line %ld: %s"),
 							  fname, lnum, p);
-			break;
+			நிறுத்து;
 		    }
 		    regionmask |= 1 << (l - 1);
 		}
-		else
+		இல்லையெனில்
 		{
 		    smsg(_("Unrecognized flags in %s line %ld: %s"),
 							      fname, lnum, p);
-		    break;
+		    நிறுத்து;
 		}
 		++p;
 	    }
 	}
 
 	// Skip non-ASCII words when "spin->si_ascii" is TRUE.
-	if (spin->si_ascii && has_non_ascii(line))
+	எனில் (spin->si_ascii && has_non_ascii(வரி))
 	{
 	    ++non_ascii;
-	    continue;
+	    தொடர்;
 	}
 
 	// Normal word: store it.
-	if (store_word(spin, line, flags, regionmask, NULL, FALSE) == FAIL)
+	எனில் (store_word(spin, வரி, flags, regionmask, வெற்று, FALSE) == FAIL)
 	{
 	    retval = FAIL;
-	    break;
+	    நிறுத்து;
 	}
 	did_word = TRUE;
     }
@@ -4390,14 +4390,14 @@ spell_read_wordfile(spellinfo_T *spin, char_u *fname)
     vim_free(pc);
     fclose(fd);
 
-    if (spin->si_ascii && non_ascii > 0)
+    எனில் (spin->si_ascii && non_ascii > 0)
     {
-	vim_snprintf((char *)IObuff, IOSIZE,
+	vim_snprintf((எழுத்து *)IObuff, IOSIZE,
 		  _("Ignored %d words with non-ASCII characters"), non_ascii);
 	spell_message(spin, IObuff);
     }
 
-    return retval;
+    திரும்பு retval;
 }
 
 /*
@@ -4407,36 +4407,36 @@ spell_read_wordfile(spellinfo_T *spin, char_u *fname)
  * The memory is cleared to all zeros.
  * Returns NULL when out of memory.
  */
-    static void *
+    நிலையான வெறுமை *
 getroom(
     spellinfo_T *spin,
     size_t	len,		// length needed
-    int		align)		// align for pointer
+    முழு		align)		// align for pointer
 {
     char_u	*p;
     sblock_T	*bl = spin->si_blocks;
 
-    if (align && bl != NULL)
+    எனில் (align && bl != வெற்று)
 	// Round size up for alignment.  On some systems structures need to be
 	// aligned to the size of a pointer (e.g., SPARC).
-	bl->sb_used = (bl->sb_used + sizeof(char *) - 1)
-						      & ~(sizeof(char *) - 1);
+	bl->sb_used = (bl->sb_used + அளவு(எழுத்து *) - 1)
+						      & ~(அளவு(எழுத்து *) - 1);
 
-    if (bl == NULL || bl->sb_used + len > SBLOCKSIZE)
+    எனில் (bl == வெற்று || bl->sb_used + len > SBLOCKSIZE)
     {
-	if (len >= SBLOCKSIZE)
-	    bl = NULL;
-	else
+	எனில் (len >= SBLOCKSIZE)
+	    bl = வெற்று;
+	இல்லையெனில்
 	    // Allocate a block of memory. It is not freed until much later.
 	    bl = alloc_clear(offsetof(sblock_T, sb_data) + SBLOCKSIZE + 1);
-	if (bl == NULL)
+	எனில் (bl == வெற்று)
 	{
-	    if (!spin->si_did_emsg)
+	    எனில் (!spin->si_did_emsg)
 	    {
 		emsg(_(e_insufficient_memory_word_list_will_be_incomplete));
 		spin->si_did_emsg = TRUE;
 	    }
-	    return NULL;
+	    திரும்பு வெற்று;
 	}
 	bl->sb_next = spin->si_blocks;
 	spin->si_blocks = bl;
@@ -4445,36 +4445,36 @@ getroom(
     }
 
     p = bl->sb_data + bl->sb_used;
-    bl->sb_used += (int)len;
+    bl->sb_used += (முழு)len;
 
-    return p;
+    திரும்பு p;
 }
 
 /*
  * Make a copy of a string into memory allocated with getroom().
  * Returns NULL when out of memory.
  */
-    static char_u *
+    நிலையான char_u *
 getroom_save(spellinfo_T *spin, char_u *s)
 {
     char_u	*sc;
 
     sc = (char_u *)getroom(spin, STRLEN(s) + 1, FALSE);
-    if (sc != NULL)
+    எனில் (sc != வெற்று)
 	STRCPY(sc, s);
-    return sc;
+    திரும்பு sc;
 }
 
 
 /*
  * Free the list of allocated sblock_T.
  */
-    static void
+    நிலையான வெறுமை
 free_blocks(sblock_T *bl)
 {
     sblock_T	*next;
 
-    while (bl != NULL)
+    போது (bl != வெற்று)
     {
 	next = bl->sb_next;
 	vim_free(bl);
@@ -4486,27 +4486,27 @@ free_blocks(sblock_T *bl)
  * Allocate the root of a word tree.
  * Returns NULL when out of memory.
  */
-    static wordnode_T *
+    நிலையான wordnode_T *
 wordtree_alloc(spellinfo_T *spin)
 {
-    return (wordnode_T *)getroom(spin, sizeof(wordnode_T), TRUE);
+    திரும்பு (wordnode_T *)getroom(spin, அளவு(wordnode_T), TRUE);
 }
 
 /*
  * Return TRUE if "word" contains valid word characters.
  * Control characters and trailing '/' are invalid.  Space is OK.
  */
-    static int
+    நிலையான முழு
 valid_spell_word(char_u *word, char_u *end)
 {
     char_u *p;
 
-    if (enc_utf8 && !utf_valid_string(word, end))
-	return FALSE;
-    for (p = word; *p != NUL && p < end; p += mb_ptr2len(p))
-	if (*p < ' ' || (p[0] == '/' && p[1] == NUL))
-	    return FALSE;
-    return TRUE;
+    எனில் (enc_utf8 && !utf_valid_string(word, end))
+	திரும்பு FALSE;
+    க்கு (p = word; *p != NUL && p < end; p += mb_ptr2len(p))
+	எனில் (*p < ' ' || (p[0] == '/' && p[1] == NUL))
+	    திரும்பு FALSE;
+    திரும்பு TRUE;
 }
 
 /*
@@ -4518,49 +4518,49 @@ valid_spell_word(char_u *word, char_u *end)
  * When "pfxlist" is not NULL store the word for each postponed prefix ID and
  * compound flag.
  */
-    static int
+    நிலையான முழு
 store_word(
     spellinfo_T	*spin,
     char_u	*word,
-    int		flags,		// extra flags, WF_BANNED
-    int		region,		// supported region(s)
+    முழு		flags,		// extra flags, WF_BANNED
+    முழு		region,		// supported region(s)
     char_u	*pfxlist,	// list of prefix IDs or NULL
-    int		need_affix)	// only store word with affix ID
+    முழு		need_affix)	// only store word with affix ID
 {
-    int		len = (int)STRLEN(word);
-    int		ct = captype(word, word + len);
+    முழு		len = (முழு)STRLEN(word);
+    முழு		ct = captype(word, word + len);
     char_u	foldword[MAXWLEN];
-    int		res = OK;
+    முழு		res = OK;
     char_u	*p;
 
     // Avoid adding illegal bytes to the word tree.
-    if (!valid_spell_word(word, word + len))
-	return FAIL;
+    எனில் (!valid_spell_word(word, word + len))
+	திரும்பு FAIL;
 
-    (void)spell_casefold(curwin, word, len, foldword, MAXWLEN);
-    for (p = pfxlist; res == OK; ++p)
+    (வெறுமை)spell_casefold(curwin, word, len, foldword, MAXWLEN);
+    க்கு (p = pfxlist; res == OK; ++p)
     {
-	if (!need_affix || (p != NULL && *p != NUL))
-	    res = tree_add_word(spin, foldword, spin->si_foldroot, ct | flags,
-						  region, p == NULL ? 0 : *p);
-	if (p == NULL || *p == NUL)
-	    break;
+	எனில் (!need_affix || (p != வெற்று && *p != NUL))
+	    res = மரம்_add_word(spin, foldword, spin->si_foldroot, ct | flags,
+						  region, p == வெற்று ? 0 : *p);
+	எனில் (p == வெற்று || *p == NUL)
+	    நிறுத்து;
     }
     ++spin->si_foldwcount;
 
-    if (res == OK && (ct == WF_KEEPCAP || (flags & WF_KEEPCAP)))
+    எனில் (res == OK && (ct == WF_KEEPCAP || (flags & WF_KEEPCAP)))
     {
-	for (p = pfxlist; res == OK; ++p)
+	க்கு (p = pfxlist; res == OK; ++p)
 	{
-	    if (!need_affix || (p != NULL && *p != NUL))
-		res = tree_add_word(spin, word, spin->si_keeproot, flags,
-						  region, p == NULL ? 0 : *p);
-	    if (p == NULL || *p == NUL)
-		break;
+	    எனில் (!need_affix || (p != வெற்று && *p != NUL))
+		res = மரம்_add_word(spin, word, spin->si_keeproot, flags,
+						  region, p == வெற்று ? 0 : *p);
+	    எனில் (p == வெற்று || *p == NUL)
+		நிறுத்து;
 	}
 	++spin->si_keepwcount;
     }
-    return res;
+    திரும்பு res;
 }
 
 /*
@@ -4569,42 +4569,42 @@ store_word(
  * "rare" and "region" is the condition nr.
  * Returns FAIL when out of memory.
  */
-    static int
-tree_add_word(
+    நிலையான முழு
+மரம்_add_word(
     spellinfo_T	*spin,
     char_u	*word,
-    wordnode_T	*root,
-    int		flags,
-    int		region,
-    int		affixID)
+    wordnode_T	*வேர்,
+    முழு		flags,
+    முழு		region,
+    முழு		affixID)
 {
-    wordnode_T	*node = root;
+    wordnode_T	*முனை = வேர்;
     wordnode_T	*np;
     wordnode_T	*copyp, **copyprev;
-    wordnode_T	**prev = NULL;
-    int		i;
+    wordnode_T	**prev = வெற்று;
+    முழு		i;
 
     // Add each byte of the word to the tree, including the NUL at the end.
-    for (i = 0; ; ++i)
+    க்கு (i = 0; ; ++i)
     {
 	// When there is more than one reference to this node we need to make
 	// a copy, so that we can modify it.  Copy the whole list of siblings
 	// (we don't optimize for a partly shared list of siblings).
-	if (node != NULL && node->wn_refs > 1)
+	எனில் (முனை != வெற்று && முனை->wn_refs > 1)
 	{
-	    --node->wn_refs;
+	    --முனை->wn_refs;
 	    copyprev = prev;
-	    FOR_ALL_NODE_SIBLINGS(node, copyp)
+	    FOR_ALL_முனை_SIBLINGS(முனை, copyp)
 	    {
 		// Allocate a new node and copy the info.
 		np = get_wordnode(spin);
-		if (np == NULL)
-		    return FAIL;
+		எனில் (np == வெற்று)
+		    திரும்பு FAIL;
 		np->wn_child = copyp->wn_child;
-		if (np->wn_child != NULL)
+		எனில் (np->wn_child != வெற்று)
 		    ++np->wn_child->wn_refs;	// child gets extra ref
 		np->wn_byte = copyp->wn_byte;
-		if (np->wn_byte == NUL)
+		எனில் (np->wn_byte == NUL)
 		{
 		    np->wn_flags = copyp->wn_flags;
 		    np->wn_region = copyp->wn_region;
@@ -4613,13 +4613,13 @@ tree_add_word(
 
 		// Link the new node in the list, there will be one ref.
 		np->wn_refs = 1;
-		if (copyprev != NULL)
+		எனில் (copyprev != வெற்று)
 		    *copyprev = np;
 		copyprev = &np->wn_sibling;
 
 		// Let "node" point to the head of the copied list.
-		if (copyp == node)
-		    node = np;
+		எனில் (copyp == முனை)
+		    முனை = np;
 	    }
 	}
 
@@ -4627,73 +4627,73 @@ tree_add_word(
 	// on byte value, thus stop searching when a sibling is found with a
 	// higher byte value.  For zero bytes (end of word) the sorting is
 	// done on flags and then on affixID.
-	while (node != NULL
-		&& (node->wn_byte < word[i]
-		    || (node->wn_byte == NUL
+	போது (முனை != வெற்று
+		&& (முனை->wn_byte < word[i]
+		    || (முனை->wn_byte == NUL
 			&& (flags < 0
-			    ? node->wn_affixID < (unsigned)affixID
-			    : (node->wn_flags < (unsigned)(flags & WN_MASK)
-				|| (node->wn_flags == (flags & WN_MASK)
+			    ? முனை->wn_affixID < (unsigned)affixID
+			    : (முனை->wn_flags < (unsigned)(flags & WN_MASK)
+				|| (முனை->wn_flags == (flags & WN_MASK)
 				    && (spin->si_sugtree
-					? (node->wn_region & 0xffff) < region
-					: node->wn_affixID
+					? (முனை->wn_region & 0xffff) < region
+					: முனை->wn_affixID
 						    < (unsigned)affixID)))))))
 	{
-	    prev = &node->wn_sibling;
-	    node = *prev;
+	    prev = &முனை->wn_sibling;
+	    முனை = *prev;
 	}
-	if (node == NULL
-		|| node->wn_byte != word[i]
+	எனில் (முனை == வெற்று
+		|| முனை->wn_byte != word[i]
 		|| (word[i] == NUL
 		    && (flags < 0
 			|| spin->si_sugtree
-			|| node->wn_flags != (flags & WN_MASK)
-			|| node->wn_affixID != affixID)))
+			|| முனை->wn_flags != (flags & WN_MASK)
+			|| முனை->wn_affixID != affixID)))
 	{
 	    // Allocate a new node.
 	    np = get_wordnode(spin);
-	    if (np == NULL)
-		return FAIL;
+	    எனில் (np == வெற்று)
+		திரும்பு FAIL;
 	    np->wn_byte = word[i];
 
 	    // If "node" is NULL this is a new child or the end of the sibling
 	    // list: ref count is one.  Otherwise use ref count of sibling and
 	    // make ref count of sibling one (matters when inserting in front
 	    // of the list of siblings).
-	    if (node == NULL)
+	    எனில் (முனை == வெற்று)
 		np->wn_refs = 1;
-	    else
+	    இல்லையெனில்
 	    {
-		np->wn_refs = node->wn_refs;
-		node->wn_refs = 1;
+		np->wn_refs = முனை->wn_refs;
+		முனை->wn_refs = 1;
 	    }
-	    if (prev != NULL)
+	    எனில் (prev != வெற்று)
 		*prev = np;
-	    np->wn_sibling = node;
-	    node = np;
+	    np->wn_sibling = முனை;
+	    முனை = np;
 	}
 
-	if (word[i] == NUL)
+	எனில் (word[i] == NUL)
 	{
-	    node->wn_flags = flags;
-	    node->wn_region |= region;
-	    node->wn_affixID = affixID;
-	    break;
+	    முனை->wn_flags = flags;
+	    முனை->wn_region |= region;
+	    முனை->wn_affixID = affixID;
+	    நிறுத்து;
 	}
-	prev = &node->wn_child;
-	node = *prev;
+	prev = &முனை->wn_child;
+	முனை = *prev;
     }
 #ifdef SPELL_PRINTTREE
     smsg("Added \"%s\"", word);
-    spell_print_tree(root->wn_sibling);
+    spell_print_மரம்(வேர்->wn_sibling);
 #endif
 
     // count nr of words added since last message
-    ++spin->si_msg_count;
+    ++spin->si_செய்தி_மொத்தம்;
 
-    if (spin->si_compress_cnt > 1)
+    எனில் (spin->si_compress_cnt > 1)
     {
-	if (--spin->si_compress_cnt == 1)
+	எனில் (--spin->si_compress_cnt == 1)
 	    // Did enough words to lower the block count limit.
 	    spin->si_blocks_cnt += compress_inc;
     }
@@ -4711,8 +4711,8 @@ tree_add_word(
      *    maximum word length.
      */
 #ifndef SPELL_COMPRESS_ALWAYS
-    if (spin->si_compress_cnt == 1
-	    ? spin->si_free_count < MAXWLEN
+    எனில் (spin->si_compress_cnt == 1
+	    ? spin->si_free_மொத்தம் < MAXWLEN
 	    : spin->si_blocks_cnt >= compress_start)
 #endif
     {
@@ -4723,13 +4723,13 @@ tree_add_word(
 	spin->si_blocks_cnt -= compress_inc;
 	spin->si_compress_cnt = compress_added;
 
-	if (spin->si_verbose)
+	எனில் (spin->si_verbose)
 	{
-	    msg_start();
-	    msg_puts(_(msg_compressing));
-	    msg_clr_eos();
-	    msg_didout = FALSE;
-	    msg_col = 0;
+	    செய்தி_start();
+	    செய்தி_puts(_(செய்தி_compressing));
+	    செய்தி_clr_eos();
+	    செய்தி_didout = FALSE;
+	    செய்தி_col = 0;
 	    out_flush();
 	}
 
@@ -4738,11 +4738,11 @@ tree_add_word(
 	// compression goes fast.  But when filling the soundfold word tree
 	// there is no keep-case tree.
 	wordtree_compress(spin, spin->si_foldroot, "case-folded");
-	if (affixID >= 0)
+	எனில் (affixID >= 0)
 	    wordtree_compress(spin, spin->si_keeproot, "keep-case");
     }
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -4750,25 +4750,25 @@ tree_add_word(
  * allocate a new one.
  * Returns NULL when out of memory.
  */
-    static wordnode_T *
+    நிலையான wordnode_T *
 get_wordnode(spellinfo_T *spin)
 {
     wordnode_T *n;
 
-    if (spin->si_first_free == NULL)
-	n = (wordnode_T *)getroom(spin, sizeof(wordnode_T), TRUE);
-    else
+    எனில் (spin->si_first_free == வெற்று)
+	n = (wordnode_T *)getroom(spin, அளவு(wordnode_T), TRUE);
+    இல்லையெனில்
     {
 	n = spin->si_first_free;
 	spin->si_first_free = n->wn_child;
 	CLEAR_POINTER(n);
-	--spin->si_free_count;
+	--spin->si_free_மொத்தம்;
     }
 #ifdef SPELL_PRINTTREE
-    if (n != NULL)
+    எனில் (n != வெற்று)
 	n->wn_nr = ++spin->si_wordnode_nr;
 #endif
-    return n;
+    திரும்பு n;
 }
 
 /*
@@ -4777,43 +4777,43 @@ get_wordnode(spellinfo_T *spin)
  * siblings.
  * Returns the number of nodes actually freed.
  */
-    static int
-deref_wordnode(spellinfo_T *spin, wordnode_T *node)
+    நிலையான முழு
+deref_wordnode(spellinfo_T *spin, wordnode_T *முனை)
 {
     wordnode_T	*np;
-    int		cnt = 0;
+    முழு		cnt = 0;
 
-    if (--node->wn_refs == 0)
+    எனில் (--முனை->wn_refs == 0)
     {
-	FOR_ALL_NODE_SIBLINGS(node, np)
+	FOR_ALL_முனை_SIBLINGS(முனை, np)
 	{
-	    if (np->wn_child != NULL)
+	    எனில் (np->wn_child != வெற்று)
 		cnt += deref_wordnode(spin, np->wn_child);
 	    free_wordnode(spin, np);
 	    ++cnt;
 	}
 	++cnt;	    // length field
     }
-    return cnt;
+    திரும்பு cnt;
 }
 
 /*
  * Free a wordnode_T for re-use later.
  * Only the "wn_child" field becomes invalid.
  */
-    static void
+    நிலையான வெறுமை
 free_wordnode(spellinfo_T *spin, wordnode_T *n)
 {
     n->wn_child = spin->si_first_free;
     spin->si_first_free = n;
-    ++spin->si_free_count;
+    ++spin->si_free_மொத்தம்;
 }
 
 /*
  * Compress a tree: find tails that are identical and can be shared.
  */
-    static void
-wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name)
+    நிலையான வெறுமை
+wordtree_compress(spellinfo_T *spin, wordnode_T *வேர், எழுத்து *name)
 {
     hashtab_T	    ht;
     long	    n;
@@ -4822,29 +4822,29 @@ wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name)
 
     // Skip the root itself, it's not actually used.  The first sibling is the
     // start of the tree.
-    if (root->wn_sibling == NULL)
-	return;
+    எனில் (வேர்->wn_sibling == வெற்று)
+	திரும்பு;
 
     hash_init(&ht);
-    n = node_compress(spin, root->wn_sibling, &ht, &tot);
+    n = முனை_compress(spin, வேர்->wn_sibling, &ht, &tot);
 
 #ifndef SPELL_PRINTTREE
-    if (spin->si_verbose || p_verbose > 2)
+    எனில் (spin->si_verbose || p_verbose > 2)
 #endif
     {
-	if (tot > 1000000)
+	எனில் (tot > 1000000)
 	    perc = (tot - n) / (tot / 100);
-	else if (tot == 0)
+	இல்லையெனில் எனில் (tot == 0)
 	    perc = 0;
-	else
+	இல்லையெனில்
 	    perc = (tot - n) * 100 / tot;
-	vim_snprintf((char *)IObuff, IOSIZE,
+	vim_snprintf((எழுத்து *)IObuff, IOSIZE,
 		_("Compressed %s: %ld of %ld nodes; %ld (%ld%%) remaining"),
 		name, n, tot, tot - n, perc);
 	spell_message(spin, IObuff);
     }
 #ifdef SPELL_PRINTTREE
-    spell_print_tree(root->wn_sibling);
+    spell_print_மரம்(வேர்->wn_sibling);
 #endif
     hash_clear(&ht);
 }
@@ -4853,10 +4853,10 @@ wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name)
  * Compress a node, its siblings and its children, depth first.
  * Returns the number of compressed nodes.
  */
-    static long
-node_compress(
+    நிலையான long
+முனை_compress(
     spellinfo_T	*spin,
-    wordnode_T	*node,
+    wordnode_T	*முனை,
     hashtab_T	*ht,
     long	*tot)	    // total count of nodes before compressing,
 			    // incremented while going through the tree
@@ -4876,24 +4876,24 @@ node_compress(
      * Note that with "child" we mean not just the node that is pointed to,
      * but the whole list of siblings of which the child node is the first.
      */
-    for (np = node; np != NULL && !got_int; np = np->wn_sibling)
+    க்கு (np = முனை; np != வெற்று && !got_int; np = np->wn_sibling)
     {
 	++len;
-	if ((child = np->wn_child) != NULL)
+	எனில் ((child = np->wn_child) != வெற்று)
 	{
 	    // Compress the child first.  This fills hashkey.
-	    compressed += node_compress(spin, child, ht, tot);
+	    compressed += முனை_compress(spin, child, ht, tot);
 
 	    // Try to find an identical child.
 	    hash = hash_hash(child->wn_u1.hashkey);
 	    hi = hash_lookup(ht, child->wn_u1.hashkey, hash);
-	    if (!HASHITEM_EMPTY(hi))
+	    எனில் (!HASHITEM_EMPTY(hi))
 	    {
 		// There are children we encountered before with a hash value
 		// identical to the current child.  Now check if there is one
 		// that is really identical.
-		for (tp = HI2WN(hi); tp != NULL; tp = tp->wn_u2.next)
-		    if (node_equal(child, tp))
+		க்கு (tp = HI2WN(hi); tp != வெற்று; tp = tp->wn_u2.next)
+		    எனில் (முனை_equal(child, tp))
 		    {
 			// Found one!  Now use that child in place of the
 			// current one.  This means the current child and all
@@ -4901,9 +4901,9 @@ node_compress(
 			++tp->wn_refs;
 			compressed += deref_wordnode(spin, child);
 			np->wn_child = tp;
-			break;
+			நிறுத்து;
 		    }
-		if (tp == NULL)
+		எனில் (tp == வெற்று)
 		{
 		    // No other child with this hash value equals the child of
 		    // the node, add it to the linked list after the first
@@ -4913,7 +4913,7 @@ node_compress(
 		    tp->wn_u2.next = child;
 		}
 	    }
-	    else
+	    இல்லையெனில்
 		// No other child has this hash value, add it to the
 		// hashtable.
 		hash_add_item(ht, hi, child->wn_u1.hashkey, hash);
@@ -4926,14 +4926,14 @@ node_compress(
      * find a lookalike node.  This must be done after compressing the sibling
      * list, otherwise the hash key would become invalid by the compression.
      */
-    node->wn_u1.hashkey[0] = len;
+    முனை->wn_u1.hashkey[0] = len;
     nr = 0;
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_முனை_SIBLINGS(முனை, np)
     {
-	if (np->wn_byte == NUL)
+	எனில் (np->wn_byte == NUL)
 	    // end node: use wn_flags, wn_region and wn_affixID
 	    n = np->wn_flags + (np->wn_region << 8) + (np->wn_affixID << 16);
-	else
+	இல்லையெனில்
 	    // byte node: use the byte value and the child pointer
 	    n = (unsigned)(np->wn_byte + ((long_u)np->wn_child << 8));
 	nr = nr * 101 + n;
@@ -4941,92 +4941,92 @@ node_compress(
 
     // Avoid NUL bytes, it terminates the hash key.
     n = nr & 0xff;
-    node->wn_u1.hashkey[1] = n == 0 ? 1 : n;
+    முனை->wn_u1.hashkey[1] = n == 0 ? 1 : n;
     n = (nr >> 8) & 0xff;
-    node->wn_u1.hashkey[2] = n == 0 ? 1 : n;
+    முனை->wn_u1.hashkey[2] = n == 0 ? 1 : n;
     n = (nr >> 16) & 0xff;
-    node->wn_u1.hashkey[3] = n == 0 ? 1 : n;
+    முனை->wn_u1.hashkey[3] = n == 0 ? 1 : n;
     n = (nr >> 24) & 0xff;
-    node->wn_u1.hashkey[4] = n == 0 ? 1 : n;
-    node->wn_u1.hashkey[5] = NUL;
+    முனை->wn_u1.hashkey[4] = n == 0 ? 1 : n;
+    முனை->wn_u1.hashkey[5] = NUL;
 
     // Check for CTRL-C pressed now and then.
     veryfast_breakcheck();
 
-    return compressed;
+    திரும்பு compressed;
 }
 
 /*
  * Return TRUE when two nodes have identical siblings and children.
  */
-    static int
-node_equal(wordnode_T *n1, wordnode_T *n2)
+    நிலையான முழு
+முனை_equal(wordnode_T *n1, wordnode_T *n2)
 {
     wordnode_T	*p1;
     wordnode_T	*p2;
 
-    for (p1 = n1, p2 = n2; p1 != NULL && p2 != NULL;
+    க்கு (p1 = n1, p2 = n2; p1 != வெற்று && p2 != வெற்று;
 				     p1 = p1->wn_sibling, p2 = p2->wn_sibling)
-	if (p1->wn_byte != p2->wn_byte
+	எனில் (p1->wn_byte != p2->wn_byte
 		|| (p1->wn_byte == NUL
 		    ? (p1->wn_flags != p2->wn_flags
 			|| p1->wn_region != p2->wn_region
 			|| p1->wn_affixID != p2->wn_affixID)
 		    : (p1->wn_child != p2->wn_child)))
-	    break;
+	    நிறுத்து;
 
-    return p1 == NULL && p2 == NULL;
+    திரும்பு p1 == வெற்று && p2 == வெற்று;
 }
 
-static int rep_compare(const void *s1, const void *s2);
+நிலையான முழு rep_compare(மாறிலி வெறுமை *s1, மாறிலி வெறுமை *s2);
 
 /*
  * Function given to qsort() to sort the REP items on "from" string.
  */
-    static int
-rep_compare(const void *s1, const void *s2)
+    நிலையான முழு
+rep_compare(மாறிலி வெறுமை *s1, மாறிலி வெறுமை *s2)
 {
     fromto_T	*p1 = (fromto_T *)s1;
     fromto_T	*p2 = (fromto_T *)s2;
 
-    return STRCMP(p1->ft_from, p2->ft_from);
+    திரும்பு STRCMP(p1->ft_from, p2->ft_from);
 }
 
 /*
  * Write the Vim .spl file "fname".
  * Return FAIL or OK;
  */
-    static int
+    நிலையான முழு
 write_vim_spell(spellinfo_T *spin, char_u *fname)
 {
     FILE	*fd;
-    int		regionmask;
-    int		round;
-    wordnode_T	*tree;
-    int		nodecount;
-    int		i;
-    int		l;
+    முழு		regionmask;
+    முழு		round;
+    wordnode_T	*மரம்;
+    முழு		nodecount;
+    முழு		i;
+    முழு		l;
     garray_T	*gap;
     fromto_T	*ftp;
     char_u	*p;
-    int		rr;
-    int		retval = OK;
+    முழு		rr;
+    முழு		retval = OK;
     size_t	fwv = 1;  // collect return value of fwrite() to avoid
 			  // warnings from picky compiler
 
-    fd = mch_fopen((char *)fname, "w");
-    if (fd == NULL)
+    fd = mch_fopen((எழுத்து *)fname, "w");
+    எனில் (fd == வெற்று)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     // <HEADER>: <fileID> <versionnr>
 							    // <fileID>
     fwv &= fwrite(VIMSPELLMAGIC, VIMSPELLMAGICL, (size_t)1, fd);
-    if (fwv != (size_t)1)
+    எனில் (fwv != (size_t)1)
 	// Catch first write error, don't try writing more.
-	goto theend;
+	செல் theend;
 
     putc(VIMSPELLVERSION, fd);				    // <versionnr>
 
@@ -5035,29 +5035,29 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
      */
 
     // SN_INFO: <infotext>
-    if (spin->si_info != NULL)
+    எனில் (spin->si_info != வெற்று)
     {
 	putc(SN_INFO, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
-	i = (int)STRLEN(spin->si_info);
+	i = (முழு)STRLEN(spin->si_info);
 	put_bytes(fd, (long_u)i, 4);			// <sectionlen>
 	fwv &= fwrite(spin->si_info, (size_t)i, (size_t)1, fd); // <infotext>
     }
 
     // SN_REGION: <regionname> ...
     // Write the region names only if there is more than one.
-    if (spin->si_region_count > 1)
+    எனில் (spin->si_region_மொத்தம் > 1)
     {
 	putc(SN_REGION, fd);				// <sectionID>
 	putc(SNF_REQUIRED, fd);				// <sectionflags>
-	l = spin->si_region_count * 2;
+	l = spin->si_region_மொத்தம் * 2;
 	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
 	fwv &= fwrite(spin->si_region_name, (size_t)l, (size_t)1, fd);
 							// <regionname> ...
-	regionmask = (1 << spin->si_region_count) - 1;
+	regionmask = (1 << spin->si_region_மொத்தம்) - 1;
     }
-    else
+    இல்லையெனில்
 	regionmask = 0;
 
     // SN_CHARFLAGS: <charflagslen> <charflags> <folcharslen> <folchars>
@@ -5069,32 +5069,32 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     // 'encoding'.
     // Also skip this for an .add.spl file, the main spell file must contain
     // the table (avoids that it conflicts).  File is shorter too.
-    if (!spin->si_ascii && !spin->si_add)
+    எனில் (!spin->si_ascii && !spin->si_add)
     {
 	char_u	folchars[128 * 8];
-	int	flags;
+	முழு	flags;
 
 	putc(SN_CHARFLAGS, fd);				// <sectionID>
 	putc(SNF_REQUIRED, fd);				// <sectionflags>
 
 	// Form the <folchars> string first, we need to know its length.
 	l = 0;
-	for (i = 128; i < 256; ++i)
+	க்கு (i = 128; i < 256; ++i)
 	{
-	    if (has_mbyte)
+	    எனில் (has_mbyte)
 		l += mb_char2bytes(spelltab.st_fold[i], folchars + l);
-	    else
+	    இல்லையெனில்
 		folchars[l++] = spelltab.st_fold[i];
 	}
 	put_bytes(fd, (long_u)(1 + 128 + 2 + l), 4);	// <sectionlen>
 
 	fputc(128, fd);					// <charflagslen>
-	for (i = 128; i < 256; ++i)
+	க்கு (i = 128; i < 256; ++i)
 	{
 	    flags = 0;
-	    if (spelltab.st_isw[i])
+	    எனில் (spelltab.st_isw[i])
 		flags |= CF_WORD;
-	    if (spelltab.st_isu[i])
+	    எனில் (spelltab.st_isu[i])
 		flags |= CF_UPPER;
 	    fputc(flags, fd);				// <charflags>
 	}
@@ -5104,24 +5104,24 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     }
 
     // SN_MIDWORD: <midword>
-    if (spin->si_midword != NULL)
+    எனில் (spin->si_midword != வெற்று)
     {
 	putc(SN_MIDWORD, fd);				// <sectionID>
 	putc(SNF_REQUIRED, fd);				// <sectionflags>
 
-	i = (int)STRLEN(spin->si_midword);
+	i = (முழு)STRLEN(spin->si_midword);
 	put_bytes(fd, (long_u)i, 4);			// <sectionlen>
 	fwv &= fwrite(spin->si_midword, (size_t)i, (size_t)1, fd);
 							// <midword>
     }
 
     // SN_PREFCOND: <prefcondcnt> <prefcond> ...
-    if (spin->si_prefcond.ga_len > 0)
+    எனில் (spin->si_prefcond.ga_len > 0)
     {
 	putc(SN_PREFCOND, fd);				// <sectionID>
 	putc(SNF_REQUIRED, fd);				// <sectionflags>
 
-	l = write_spell_prefcond(NULL, &spin->si_prefcond, &fwv);
+	l = write_spell_prefcond(வெற்று, &spin->si_prefcond, &fwv);
 	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
 
 	write_spell_prefcond(fd, &spin->si_prefcond, &fwv);
@@ -5134,28 +5134,28 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     // round 1: SN_REP section
     // round 2: SN_SAL section (unless SN_SOFO is used)
     // round 3: SN_REPSAL section
-    for (round = 1; round <= 3; ++round)
+    க்கு (round = 1; round <= 3; ++round)
     {
-	if (round == 1)
+	எனில் (round == 1)
 	    gap = &spin->si_rep;
-	else if (round == 2)
+	இல்லையெனில் எனில் (round == 2)
 	{
 	    // Don't write SN_SAL when using a SN_SOFO section
-	    if (spin->si_sofofr != NULL && spin->si_sofoto != NULL)
-		continue;
+	    எனில் (spin->si_sofofr != வெற்று && spin->si_sofoto != வெற்று)
+		தொடர்;
 	    gap = &spin->si_sal;
 	}
-	else
+	இல்லையெனில்
 	    gap = &spin->si_repsal;
 
 	// Don't write the section if there are no items.
-	if (gap->ga_len == 0)
-	    continue;
+	எனில் (gap->ga_len == 0)
+	    தொடர்;
 
 	// Sort the REP/REPSAL items.
-	if (round != 2)
+	எனில் (round != 2)
 	    qsort(gap->ga_data, (size_t)gap->ga_len,
-					       sizeof(fromto_T), rep_compare);
+					       அளவு(fromto_T), rep_compare);
 
 	i = round == 1 ? SN_REP : (round == 2 ? SN_SAL : SN_REPSAL);
 	putc(i, fd);					// <sectionID>
@@ -5165,40 +5165,40 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
 
 	// Compute the length of what follows.
 	l = 2;	    // count <repcount> or <salcount>
-	for (i = 0; i < gap->ga_len; ++i)
+	க்கு (i = 0; i < gap->ga_len; ++i)
 	{
 	    ftp = &((fromto_T *)gap->ga_data)[i];
-	    l += 1 + (int)STRLEN(ftp->ft_from);  // count <*fromlen> and <*from>
-	    l += 1 + (int)STRLEN(ftp->ft_to);    // count <*tolen> and <*to>
+	    l += 1 + (முழு)STRLEN(ftp->ft_from);  // count <*fromlen> and <*from>
+	    l += 1 + (முழு)STRLEN(ftp->ft_to);    // count <*tolen> and <*to>
 	}
-	if (round == 2)
+	எனில் (round == 2)
 	    ++l;	// count <salflags>
 	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
 
-	if (round == 2)
+	எனில் (round == 2)
 	{
 	    i = 0;
-	    if (spin->si_followup)
+	    எனில் (spin->si_followup)
 		i |= SAL_F0LLOWUP;
-	    if (spin->si_collapse)
+	    எனில் (spin->si_collapse)
 		i |= SAL_COLLAPSE;
-	    if (spin->si_rem_accents)
+	    எனில் (spin->si_rem_accents)
 		i |= SAL_REM_ACCENTS;
 	    putc(i, fd);			// <salflags>
 	}
 
 	put_bytes(fd, (long_u)gap->ga_len, 2);	// <repcount> or <salcount>
-	for (i = 0; i < gap->ga_len; ++i)
+	க்கு (i = 0; i < gap->ga_len; ++i)
 	{
 	    // <rep> : <repfromlen> <repfrom> <reptolen> <repto>
 	    // <sal> : <salfromlen> <salfrom> <saltolen> <salto>
 	    ftp = &((fromto_T *)gap->ga_data)[i];
-	    for (rr = 1; rr <= 2; ++rr)
+	    க்கு (rr = 1; rr <= 2; ++rr)
 	    {
 		p = rr == 1 ? ftp->ft_from : ftp->ft_to;
-		l = (int)STRLEN(p);
+		l = (முழு)STRLEN(p);
 		putc(l, fd);
-		if (l > 0)
+		எனில் (l > 0)
 		    fwv &= fwrite(p, l, (size_t)1, fd);
 	    }
 	}
@@ -5207,56 +5207,56 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
 
     // SN_SOFO: <sofofromlen> <sofofrom> <sofotolen> <sofoto>
     // This is for making suggestions, section is not required.
-    if (spin->si_sofofr != NULL && spin->si_sofoto != NULL)
+    எனில் (spin->si_sofofr != வெற்று && spin->si_sofoto != வெற்று)
     {
 	putc(SN_SOFO, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
-	l = (int)STRLEN(spin->si_sofofr);
+	l = (முழு)STRLEN(spin->si_sofofr);
 	put_bytes(fd, (long_u)(l + STRLEN(spin->si_sofoto) + 4), 4);
 							// <sectionlen>
 
 	put_bytes(fd, (long_u)l, 2);			// <sofofromlen>
 	fwv &= fwrite(spin->si_sofofr, l, (size_t)1, fd); // <sofofrom>
 
-	l = (int)STRLEN(spin->si_sofoto);
+	l = (முழு)STRLEN(spin->si_sofoto);
 	put_bytes(fd, (long_u)l, 2);			// <sofotolen>
 	fwv &= fwrite(spin->si_sofoto, l, (size_t)1, fd); // <sofoto>
     }
 
     // SN_WORDS: <word> ...
     // This is for making suggestions, section is not required.
-    if (spin->si_commonwords.ht_used > 0)
+    எனில் (spin->si_commonwords.ht_used > 0)
     {
-	putc(SN_WORDS, fd);				// <sectionID>
+	putc(SN_சொற்கள், fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
 	// round 1: count the bytes
 	// round 2: write the bytes
-	for (round = 1; round <= 2; ++round)
+	க்கு (round = 1; round <= 2; ++round)
 	{
-	    int		todo;
-	    int		len = 0;
+	    முழு		todo;
+	    முழு		len = 0;
 	    hashitem_T	*hi;
 
-	    todo = (int)spin->si_commonwords.ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(&spin->si_commonwords, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+	    todo = (முழு)spin->si_commonwords.ht_used;
+	    FOR_ALL_HASHTAB_பொருட்கள்(&spin->si_commonwords, hi, todo)
+		எனில் (!HASHITEM_EMPTY(hi))
 		{
-		    l = (int)STRLEN(hi->hi_key) + 1;
+		    l = (முழு)STRLEN(hi->hi_சாவி) + 1;
 		    len += l;
-		    if (round == 2)			// <word>
-			fwv &= fwrite(hi->hi_key, (size_t)l, (size_t)1, fd);
+		    எனில் (round == 2)			// <word>
+			fwv &= fwrite(hi->hi_சாவி, (size_t)l, (size_t)1, fd);
 		    --todo;
 		}
-	    if (round == 1)
+	    எனில் (round == 1)
 		put_bytes(fd, (long_u)len, 4);		// <sectionlen>
 	}
     }
 
     // SN_MAP: <mapstr>
     // This is for making suggestions, section is not required.
-    if (spin->si_map.ga_len > 0)
+    எனில் (spin->si_map.ga_len > 0)
     {
 	putc(SN_MAP, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
@@ -5271,23 +5271,23 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     // same time allows for checking that a .sug file that is found matches
     // with this .spl file.  That's because the word numbers must be exactly
     // right.
-    if (!spin->si_nosugfile
+    எனில் (!spin->si_nosugfile
 	    && (spin->si_sal.ga_len > 0
-		     || (spin->si_sofofr != NULL && spin->si_sofoto != NULL)))
+		     || (spin->si_sofofr != வெற்று && spin->si_sofoto != வெற்று)))
     {
 	putc(SN_SUGFILE, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 	put_bytes(fd, (long_u)8, 4);			// <sectionlen>
 
 	// Set si_sugtime and write it to the file.
-	spin->si_sugtime = time(NULL);
+	spin->si_sugtime = time(வெற்று);
 	put_time(fd, spin->si_sugtime);			// <timestamp>
     }
 
     // SN_NOSPLITSUGS: nothing
     // This is used to notify that no suggestions with word splits are to be
     // made.
-    if (spin->si_nosplitsugs)
+    எனில் (spin->si_nosplitsugs)
     {
 	putc(SN_NOSPLITSUGS, fd);			// <sectionID>
 	putc(0, fd);					// <sectionflags>
@@ -5297,7 +5297,7 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     // SN_NOCOMPUNDSUGS: nothing
     // This is used to notify that no suggestions with compounds are to be
     // made.
-    if (spin->si_nocompoundsugs)
+    எனில் (spin->si_nocompoundsugs)
     {
 	putc(SN_NOCOMPOUNDSUGS, fd);			// <sectionID>
 	putc(0, fd);					// <sectionflags>
@@ -5307,14 +5307,14 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     // SN_COMPOUND: compound info.
     // We don't mark it required, when not supported all compound words will
     // be bad words.
-    if (spin->si_compflags != NULL)
+    எனில் (spin->si_compflags != வெற்று)
     {
 	putc(SN_COMPOUND, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
-	l = (int)STRLEN(spin->si_compflags);
-	for (i = 0; i < spin->si_comppat.ga_len; ++i)
-	    l += (int)STRLEN(((char_u **)(spin->si_comppat.ga_data))[i]) + 1;
+	l = (முழு)STRLEN(spin->si_compflags);
+	க்கு (i = 0; i < spin->si_comppat.ga_len; ++i)
+	    l += (முழு)STRLEN(((char_u **)(spin->si_comppat.ga_data))[i]) + 1;
 	put_bytes(fd, (long_u)(l + 7), 4);		// <sectionlen>
 
 	putc(spin->si_compmax, fd);			// <compmax>
@@ -5324,10 +5324,10 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
 	putc(spin->si_compoptions, fd);			// <compoptions>
 	put_bytes(fd, (long_u)spin->si_comppat.ga_len, 2);
 							// <comppatcount>
-	for (i = 0; i < spin->si_comppat.ga_len; ++i)
+	க்கு (i = 0; i < spin->si_comppat.ga_len; ++i)
 	{
 	    p = ((char_u **)(spin->si_comppat.ga_data))[i];
-	    putc((int)STRLEN(p), fd);			// <comppatlen>
+	    putc((முழு)STRLEN(p), fd);			// <comppatlen>
 	    fwv &= fwrite(p, (size_t)STRLEN(p), (size_t)1, fd);
 							// <comppattext>
 	}
@@ -5337,7 +5337,7 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     }
 
     // SN_NOBREAK: NOBREAK flag
-    if (spin->si_nobreak)
+    எனில் (spin->si_nobreak)
     {
 	putc(SN_NOBREAK, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
@@ -5349,12 +5349,12 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     // SN_SYLLABLE: syllable info.
     // We don't mark it required, when not supported syllables will not be
     // counted.
-    if (spin->si_syllable != NULL)
+    எனில் (spin->si_syllable != வெற்று)
     {
 	putc(SN_SYLLABLE, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
-	l = (int)STRLEN(spin->si_syllable);
+	l = (முழு)STRLEN(spin->si_syllable);
 	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
 	fwv &= fwrite(spin->si_syllable, (size_t)l, (size_t)1, fd);
 							// <syllable>
@@ -5368,44 +5368,44 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
      * <LWORDTREE>  <KWORDTREE>  <PREFIXTREE>
      */
     spin->si_memtot = 0;
-    for (round = 1; round <= 3; ++round)
+    க்கு (round = 1; round <= 3; ++round)
     {
-	if (round == 1)
-	    tree = spin->si_foldroot->wn_sibling;
-	else if (round == 2)
-	    tree = spin->si_keeproot->wn_sibling;
-	else
-	    tree = spin->si_prefroot->wn_sibling;
+	எனில் (round == 1)
+	    மரம் = spin->si_foldroot->wn_sibling;
+	இல்லையெனில் எனில் (round == 2)
+	    மரம் = spin->si_keeproot->wn_sibling;
+	இல்லையெனில்
+	    மரம் = spin->si_prefroot->wn_sibling;
 
 	// Clear the index and wnode fields in the tree.
-	clear_node(tree);
+	clear_முனை(மரம்);
 
 	// Count the number of nodes.  Needed to be able to allocate the
 	// memory when reading the nodes.  Also fills in index for shared
 	// nodes.
-	nodecount = put_node(NULL, tree, 0, regionmask, round == 3);
+	nodecount = put_முனை(வெற்று, மரம், 0, regionmask, round == 3);
 
 	// number of nodes in 4 bytes
 	put_bytes(fd, (long_u)nodecount, 4);	// <nodecount>
-	spin->si_memtot += nodecount + nodecount * sizeof(int);
+	spin->si_memtot += nodecount + nodecount * அளவு(முழு);
 
 	// Write the nodes.
-	(void)put_node(fd, tree, 0, regionmask, round == 3);
+	(வெறுமை)put_முனை(fd, மரம், 0, regionmask, round == 3);
     }
 
     // Write another byte to check for errors (file system full).
-    if (putc(0, fd) == EOF)
+    எனில் (putc(0, fd) == EOF)
 	retval = FAIL;
 theend:
-    if (fclose(fd) == EOF)
+    எனில் (fclose(fd) == EOF)
 	retval = FAIL;
 
-    if (fwv != (size_t)1)
+    எனில் (fwv != (size_t)1)
 	retval = FAIL;
-    if (retval == FAIL)
+    எனில் (retval == FAIL)
 	emsg(_(e_error_while_writing));
 
-    return retval;
+    திரும்பு retval;
 }
 
 /*
@@ -5413,19 +5413,19 @@ theend:
  * children.  This is needed because they are a union with other items to save
  * space.
  */
-    static void
-clear_node(wordnode_T *node)
+    நிலையான வெறுமை
+clear_முனை(wordnode_T *முனை)
 {
     wordnode_T	*np;
 
-    if (node != NULL)
-	FOR_ALL_NODE_SIBLINGS(node, np)
+    எனில் (முனை != வெற்று)
+	FOR_ALL_முனை_SIBLINGS(முனை, np)
 	{
 	    np->wn_u1.index = 0;
-	    np->wn_u2.wnode = NULL;
+	    np->wn_u2.wnode = வெற்று;
 
-	    if (np->wn_byte != NUL)
-		clear_node(np->wn_child);
+	    எனில் (np->wn_byte != NUL)
+		clear_முனை(np->wn_child);
 	}
 }
 
@@ -5442,51 +5442,51 @@ clear_node(wordnode_T *node)
  *
  * Returns the number of nodes used.
  */
-    static int
-put_node(
+    நிலையான முழு
+put_முனை(
     FILE	*fd,		// NULL when only counting
-    wordnode_T	*node,
-    int		idx,
-    int		regionmask,
-    int		prefixtree)	// TRUE for PREFIXTREE
+    wordnode_T	*முனை,
+    முழு		idx,
+    முழு		regionmask,
+    முழு		prefixtree)	// TRUE for PREFIXTREE
 {
-    int		newindex = idx;
-    int		siblingcount = 0;
+    முழு		newindex = idx;
+    முழு		siblingcount = 0;
     wordnode_T	*np;
-    int		flags;
+    முழு		flags;
 
     // If "node" is zero the tree is empty.
-    if (node == NULL)
-	return 0;
+    எனில் (முனை == வெற்று)
+	திரும்பு 0;
 
     // Store the index where this node is written.
-    node->wn_u1.index = idx;
+    முனை->wn_u1.index = idx;
 
     // Count the number of siblings.
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_முனை_SIBLINGS(முனை, np)
 	++siblingcount;
 
     // Write the sibling count.
-    if (fd != NULL)
+    எனில் (fd != வெற்று)
 	putc(siblingcount, fd);				// <siblingcount>
 
     // Write each sibling byte and optionally extra info.
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_முனை_SIBLINGS(முனை, np)
     {
-	if (np->wn_byte == 0)
+	எனில் (np->wn_byte == 0)
 	{
-	    if (fd != NULL)
+	    எனில் (fd != வெற்று)
 	    {
 		// For a NUL byte (end of word) write the flags etc.
-		if (prefixtree)
+		எனில் (prefixtree)
 		{
 		    // In PREFIXTREE write the required affixID and the
 		    // associated condition nr (stored in wn_region).  The
 		    // byte value is misused to store the "rare" and "not
 		    // combining" flags
-		    if (np->wn_flags == (short_u)PFX_FLAGS)
+		    எனில் (np->wn_flags == (short_u)PFX_FLAGS)
 			putc(BY_NOFLAGS, fd);		// <byte>
-		    else
+		    இல்லையெனில்
 		    {
 			putc(BY_FLAGS, fd);		// <byte>
 			putc(np->wn_flags, fd);		// <pflags>
@@ -5494,62 +5494,62 @@ put_node(
 		    putc(np->wn_affixID, fd);		// <affixID>
 		    put_bytes(fd, (long_u)np->wn_region, 2); // <prefcondnr>
 		}
-		else
+		இல்லையெனில்
 		{
 		    // For word trees we write the flag/region items.
 		    flags = np->wn_flags;
-		    if (regionmask != 0 && np->wn_region != regionmask)
+		    எனில் (regionmask != 0 && np->wn_region != regionmask)
 			flags |= WF_REGION;
-		    if (np->wn_affixID != 0)
+		    எனில் (np->wn_affixID != 0)
 			flags |= WF_AFX;
-		    if (flags == 0)
+		    எனில் (flags == 0)
 		    {
 			// word without flags or region
 			putc(BY_NOFLAGS, fd);			// <byte>
 		    }
-		    else
+		    இல்லையெனில்
 		    {
-			if (np->wn_flags >= 0x100)
+			எனில் (np->wn_flags >= 0x100)
 			{
 			    putc(BY_FLAGS2, fd);		// <byte>
 			    putc(flags, fd);			// <flags>
 			    putc((unsigned)flags >> 8, fd);	// <flags2>
 			}
-			else
+			இல்லையெனில்
 			{
 			    putc(BY_FLAGS, fd);			// <byte>
 			    putc(flags, fd);			// <flags>
 			}
-			if (flags & WF_REGION)
+			எனில் (flags & WF_REGION)
 			    putc(np->wn_region, fd);		// <region>
-			if (flags & WF_AFX)
+			எனில் (flags & WF_AFX)
 			    putc(np->wn_affixID, fd);		// <affixID>
 		    }
 		}
 	    }
 	}
-	else
+	இல்லையெனில்
 	{
-	    if (np->wn_child->wn_u1.index != 0
-					 && np->wn_child->wn_u2.wnode != node)
+	    எனில் (np->wn_child->wn_u1.index != 0
+					 && np->wn_child->wn_u2.wnode != முனை)
 	    {
 		// The child is written elsewhere, write the reference.
-		if (fd != NULL)
+		எனில் (fd != வெற்று)
 		{
 		    putc(BY_INDEX, fd);			// <byte>
 							// <nodeidx>
 		    put_bytes(fd, (long_u)np->wn_child->wn_u1.index, 3);
 		}
 	    }
-	    else if (np->wn_child->wn_u2.wnode == NULL)
+	    இல்லையெனில் எனில் (np->wn_child->wn_u2.wnode == வெற்று)
 		// We will write the child below and give it an index.
-		np->wn_child->wn_u2.wnode = node;
+		np->wn_child->wn_u2.wnode = முனை;
 
-	    if (fd != NULL)
-		if (putc(np->wn_byte, fd) == EOF) // <byte> or <xbyte>
+	    எனில் (fd != வெற்று)
+		எனில் (putc(np->wn_byte, fd) == EOF) // <byte> or <xbyte>
 		{
 		    emsg(_(e_error_while_writing));
-		    return 0;
+		    திரும்பு 0;
 		}
 	}
     }
@@ -5559,12 +5559,12 @@ put_node(
     newindex += siblingcount + 1;
 
     // Recursively dump the children of each sibling.
-    FOR_ALL_NODE_SIBLINGS(node, np)
-	if (np->wn_byte != 0 && np->wn_child->wn_u2.wnode == node)
-	    newindex = put_node(fd, np->wn_child, newindex, regionmask,
+    FOR_ALL_முனை_SIBLINGS(முனை, np)
+	எனில் (np->wn_byte != 0 && np->wn_child->wn_u2.wnode == முனை)
+	    newindex = put_முனை(fd, np->wn_child, newindex, regionmask,
 								  prefixtree);
 
-    return newindex;
+    திரும்பு newindex;
 }
 
 
@@ -5572,23 +5572,23 @@ put_node(
  * ":mkspell [-ascii] outfile  infile ..."
  * ":mkspell [-ascii] addfile"
  */
-    void
+    வெறுமை
 ex_mkspell(exarg_T *eap)
 {
-    int		fcount;
+    முழு		fcount;
     char_u	**fnames;
     char_u	*arg = eap->arg;
-    int		ascii = FALSE;
+    முழு		ascii = FALSE;
 
-    if (STRNCMP(arg, "-ascii", 6) == 0)
+    எனில் (STRNCMP(arg, "-ascii", 6) == 0)
     {
 	ascii = TRUE;
 	arg = skipwhite(arg + 6);
     }
 
     // Expand all the remaining arguments (e.g., $VIMRUNTIME).
-    if (get_arglist_exp(arg, &fcount, &fnames, FALSE) != OK)
-	return;
+    எனில் (get_arglist_exp(arg, &fcount, &fnames, FALSE) != OK)
+	திரும்பு;
 
     mkspell(fcount, fnames, ascii, eap->forceit, FALSE);
     FreeWild(fcount, fnames);
@@ -5599,13 +5599,13 @@ ex_mkspell(exarg_T *eap)
  * Uses the soundfold info in "spin".
  * Writes the file with the name "wfname", with ".spl" changed to ".sug".
  */
-    static void
+    நிலையான வெறுமை
 spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
 {
-    char_u	*fname = NULL;
-    int		len;
+    char_u	*fname = வெற்று;
+    முழு		len;
     slang_T	*slang;
-    int		free_slang = FALSE;
+    முழு		free_slang = FALSE;
 
     /*
      * Read back the .spl file that was written.  This fills the required
@@ -5615,25 +5615,25 @@ spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
      * It might have been done already by spell_reload_one().
      */
     FOR_ALL_SPELL_LANGS(slang)
-	if (fullpathcmp(wfname, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
-	    break;
-    if (slang == NULL)
+	எனில் (fullpathcmp(wfname, slang->sl_fname, FALSE, TRUE) == FPC_SAME)
+	    நிறுத்து;
+    எனில் (slang == வெற்று)
     {
 	spell_message(spin, (char_u *)_("Reading back spell file..."));
-	slang = spell_load_file(wfname, NULL, NULL, FALSE);
-	if (slang == NULL)
-	    return;
+	slang = spell_load_file(wfname, வெற்று, வெற்று, FALSE);
+	எனில் (slang == வெற்று)
+	    திரும்பு;
 	free_slang = TRUE;
     }
 
     /*
      * Clear the info in "spin" that is used.
      */
-    spin->si_blocks = NULL;
+    spin->si_blocks = வெற்று;
     spin->si_blocks_cnt = 0;
     spin->si_compress_cnt = 0;	    // will stay at 0 all the time
-    spin->si_free_count = 0;
-    spin->si_first_free = NULL;
+    spin->si_free_மொத்தம் = 0;
+    spin->si_first_free = வெற்று;
     spin->si_foldwcount = 0;
 
     /*
@@ -5641,8 +5641,8 @@ spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
      * the soundfold trie.
      */
     spell_message(spin, (char_u *)_("Performing soundfolding..."));
-    if (sug_filltree(spin, slang) == FAIL)
-	goto theend;
+    எனில் (sug_filltree(spin, slang) == FAIL)
+	செல் theend;
 
     /*
      * Create the table which links each soundfold word with a list of the
@@ -5650,16 +5650,16 @@ spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
      * This also removes the wordnr from the NUL byte entries to make
      * compression possible.
      */
-    if (sug_maketable(spin) == FAIL)
-	goto theend;
+    எனில் (sug_maketable(spin) == FAIL)
+	செல் theend;
 
     smsg(_("Number of words after soundfolding: %ld"),
-				 (long)spin->si_spellbuf->b_ml.ml_line_count);
+				 (long)spin->si_spellbuf->b_ml.ml_வரி_மொத்தம்);
 
     /*
      * Compress the soundfold trie.
      */
-    spell_message(spin, (char_u *)_(msg_compressing));
+    spell_message(spin, (char_u *)_(செய்தி_compressing));
     wordtree_compress(spin, spin->si_foldroot, "case-folded");
 
     /*
@@ -5667,17 +5667,17 @@ spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
      * Make the file name by changing ".spl" to ".sug".
      */
     fname = alloc(MAXPATHL);
-    if (fname == NULL)
-	goto theend;
+    எனில் (fname == வெற்று)
+	செல் theend;
     vim_strncpy(fname, wfname, MAXPATHL - 1);
-    len = (int)STRLEN(fname);
+    len = (முழு)STRLEN(fname);
     fname[len - 2] = 'u';
     fname[len - 1] = 'g';
     sug_write(spin, fname);
 
 theend:
     vim_free(fname);
-    if (free_slang)
+    எனில் (free_slang)
 	slang_free(slang);
     free_blocks(spin->si_blocks);
     close_spellbuf(spin->si_spellbuf);
@@ -5686,25 +5686,25 @@ theend:
 /*
  * Build the soundfold trie for language "slang".
  */
-    static int
+    நிலையான முழு
 sug_filltree(spellinfo_T *spin, slang_T *slang)
 {
     char_u	*byts;
     idx_T	*idxs;
-    int		depth;
+    முழு		depth;
     idx_T	arridx[MAXWLEN];
-    int		curi[MAXWLEN];
+    முழு		curi[MAXWLEN];
     char_u	tword[MAXWLEN];
     char_u	tsalword[MAXWLEN];
-    int		c;
+    முழு		c;
     idx_T	n;
-    unsigned	words_done = 0;
-    int		wordcount[MAXWLEN];
+    unsigned	சொற்கள்_done = 0;
+    முழு		wordcount[MAXWLEN];
 
     // We use si_foldroot for the soundfolded trie.
     spin->si_foldroot = wordtree_alloc(spin);
-    if (spin->si_foldroot == NULL)
-	return FAIL;
+    எனில் (spin->si_foldroot == வெற்று)
+	திரும்பு FAIL;
 
     // let tree_add_word() know we're adding to the soundfolded tree
     spin->si_sugtree = TRUE;
@@ -5715,27 +5715,27 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
      */
     byts = slang->sl_fbyts;
     idxs = slang->sl_fidxs;
-    if (byts == NULL || idxs == NULL)
-	return FAIL;
+    எனில் (byts == வெற்று || idxs == வெற்று)
+	திரும்பு FAIL;
 
     arridx[0] = 0;
     curi[0] = 1;
     wordcount[0] = 0;
 
     depth = 0;
-    while (depth >= 0 && !got_int)
+    போது (depth >= 0 && !got_int)
     {
-	if (curi[depth] > byts[arridx[depth]])
+	எனில் (curi[depth] > byts[arridx[depth]])
 	{
 	    // Done all bytes at this node, go up one level.
 	    idxs[arridx[depth]] = wordcount[depth];
-	    if (depth > 0)
+	    எனில் (depth > 0)
 		wordcount[depth - 1] += wordcount[depth];
 
 	    --depth;
-	    line_breakcheck();
+	    வரி_breakcheck();
 	}
-	else
+	இல்லையெனில்
 	{
 
 	    // Do one more byte at this node.
@@ -5743,7 +5743,7 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
 	    ++curi[depth];
 
 	    c = byts[n];
-	    if (c == 0)
+	    எனில் (c == 0)
 	    {
 		// Sound-fold the word.
 		tword[depth] = NUL;
@@ -5751,12 +5751,12 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
 
 		// We use the "flags" field for the MSB of the wordnr,
 		// "region" for the LSB of the wordnr.
-		if (tree_add_word(spin, tsalword, spin->si_foldroot,
-				words_done >> 16, words_done & 0xffff,
+		எனில் (மரம்_add_word(spin, tsalword, spin->si_foldroot,
+				சொற்கள்_done >> 16, சொற்கள்_done & 0xffff,
 							   0) == FAIL)
-		    return FAIL;
+		    திரும்பு FAIL;
 
-		++words_done;
+		++சொற்கள்_done;
 		++wordcount[depth];
 
 		// Reset the block count each time to avoid compression
@@ -5765,13 +5765,13 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
 
 		// Skip over any other NUL bytes (same word with different
 		// flags).  But don't go over the end.
-		while (n + 1 < slang->sl_fbyts_len && byts[n + 1] == 0)
+		போது (n + 1 < slang->sl_fbyts_len && byts[n + 1] == 0)
 		{
 		    ++n;
 		    ++curi[depth];
 		}
 	    }
-	    else if (depth < MAXWLEN - 1)
+	    இல்லையெனில் எனில் (depth < MAXWLEN - 1)
 	    {
 		// Normal char, go one level deeper.
 		tword[depth++] = c;
@@ -5782,9 +5782,9 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
 	}
     }
 
-    smsg(_("Total number of words: %d"), words_done);
+    smsg(_("Total number of words: %d"), சொற்கள்_done);
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -5794,28 +5794,28 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
  * the table efficiently.
  * Returns FAIL when out of memory.
  */
-    static int
+    நிலையான முழு
 sug_maketable(spellinfo_T *spin)
 {
     garray_T	ga;
-    int		res = OK;
+    முழு		res = OK;
 
     // Allocate a buffer, open a memline for it and create the swap file
     // (uses a temp file, not a .swp file).
     spin->si_spellbuf = open_spellbuf();
-    if (spin->si_spellbuf == NULL)
-	return FAIL;
+    எனில் (spin->si_spellbuf == வெற்று)
+	திரும்பு FAIL;
 
     // Use a buffer to store the line info, avoids allocating many small
     // pieces of memory.
     ga_init2(&ga, 1, 100);
 
     // recursively go through the tree
-    if (sug_filltable(spin, spin->si_foldroot->wn_sibling, 0, &ga) == -1)
+    எனில் (sug_filltable(spin, spin->si_foldroot->wn_sibling, 0, &ga) == -1)
 	res = FAIL;
 
     ga_clear(&ga);
-    return res;
+    திரும்பு res;
 }
 
 /*
@@ -5823,28 +5823,28 @@ sug_maketable(spellinfo_T *spin)
  * Returns the wordnr at the start of the node.
  * Returns -1 when out of memory.
  */
-    static int
+    நிலையான முழு
 sug_filltable(
     spellinfo_T	*spin,
-    wordnode_T	*node,
-    int		startwordnr,
+    wordnode_T	*முனை,
+    முழு		startwordnr,
     garray_T	*gap)	    // place to store line of numbers
 {
     wordnode_T	*p, *np;
-    int		wordnr = startwordnr;
-    int		nr;
-    int		prev_nr;
+    முழு		wordnr = startwordnr;
+    முழு		nr;
+    முழு		prev_nr;
 
-    FOR_ALL_NODE_SIBLINGS(node, p)
+    FOR_ALL_முனை_SIBLINGS(முனை, p)
     {
-	if (p->wn_byte == NUL)
+	எனில் (p->wn_byte == NUL)
 	{
 	    gap->ga_len = 0;
 	    prev_nr = 0;
-	    for (np = p; np != NULL && np->wn_byte == NUL; np = np->wn_sibling)
+	    க்கு (np = p; np != வெற்று && np->wn_byte == NUL; np = np->wn_sibling)
 	    {
-		if (ga_grow(gap, 10) == FAIL)
-		    return -1;
+		எனில் (ga_grow(gap, 10) == FAIL)
+		    திரும்பு -1;
 
 		nr = (np->wn_flags << 16) + (np->wn_region & 0xffff);
 		// Compute the offset from the previous nr and store the
@@ -5860,14 +5860,14 @@ sug_filltable(
 	    // add the NUL byte
 	    ((char_u *)gap->ga_data)[gap->ga_len++] = NUL;
 
-	    if (ml_append_buf(spin->si_spellbuf, (linenr_T)wordnr,
+	    எனில் (ml_append_buf(spin->si_spellbuf, (linenr_T)wordnr,
 				     gap->ga_data, gap->ga_len, TRUE) == FAIL)
-		return -1;
+		திரும்பு -1;
 	    ++wordnr;
 
 	    // Remove extra NUL entries, we no longer need them. We don't
 	    // bother freeing the nodes, they won't be reused anyway.
-	    while (p->wn_sibling != NULL && p->wn_sibling->wn_byte == NUL)
+	    போது (p->wn_sibling != வெற்று && p->wn_sibling->wn_byte == NUL)
 		p->wn_sibling = p->wn_sibling->wn_sibling;
 
 	    // Clear the flags on the remaining NUL node, so that compression
@@ -5875,14 +5875,14 @@ sug_filltable(
 	    p->wn_flags = 0;
 	    p->wn_region = 0;
 	}
-	else
+	இல்லையெனில்
 	{
 	    wordnr = sug_filltable(spin, p->wn_child, wordnr, gap);
-	    if (wordnr == -1)
-		return -1;
+	    எனில் (wordnr == -1)
+		திரும்பு -1;
 	}
     }
-    return wordnr;
+    திரும்பு wordnr;
 }
 
 /*
@@ -5890,11 +5890,11 @@ sug_filltable(
  * Similar to utf_char2byters, but use 8 bits in followup bytes and avoid NUL
  * bytes.
  */
-    static int
-offset2bytes(int nr, char_u *buf)
+    நிலையான முழு
+offset2bytes(முழு nr, char_u *buf)
 {
-    int	    rem;
-    int	    b1, b2, b3, b4;
+    முழு	    rem;
+    முழு	    b1, b2, b3, b4;
 
     // Split the number in parts of base 255.  We need to avoid NUL bytes.
     b1 = nr % 255 + 1;
@@ -5904,65 +5904,65 @@ offset2bytes(int nr, char_u *buf)
     b3 = rem % 255 + 1;
     b4 = rem / 255 + 1;
 
-    if (b4 > 1 || b3 > 0x1f)	// 4 bytes
+    எனில் (b4 > 1 || b3 > 0x1f)	// 4 bytes
     {
 	buf[0] = 0xe0 + b4;
 	buf[1] = b3;
 	buf[2] = b2;
 	buf[3] = b1;
-	return 4;
+	திரும்பு 4;
     }
-    if (b3 > 1 || b2 > 0x3f )	// 3 bytes
+    எனில் (b3 > 1 || b2 > 0x3f )	// 3 bytes
     {
 	buf[0] = 0xc0 + b3;
 	buf[1] = b2;
 	buf[2] = b1;
-	return 3;
+	திரும்பு 3;
     }
-    if (b2 > 1 || b1 > 0x7f )	// 2 bytes
+    எனில் (b2 > 1 || b1 > 0x7f )	// 2 bytes
     {
 	buf[0] = 0x80 + b2;
 	buf[1] = b1;
-	return 2;
+	திரும்பு 2;
     }
 				// 1 byte
     buf[0] = b1;
-    return 1;
+    திரும்பு 1;
 }
 
 /*
  * Write the .sug file in "fname".
  */
-    static void
+    நிலையான வெறுமை
 sug_write(spellinfo_T *spin, char_u *fname)
 {
     FILE	*fd;
-    wordnode_T	*tree;
-    int		nodecount;
-    int		wcount;
-    char_u	*line;
+    wordnode_T	*மரம்;
+    முழு		nodecount;
+    முழு		wcount;
+    char_u	*வரி;
     linenr_T	lnum;
-    int		len;
+    முழு		len;
 
     // Create the file.  Note that an existing file is silently overwritten!
-    fd = mch_fopen((char *)fname, "w");
-    if (fd == NULL)
+    fd = mch_fopen((எழுத்து *)fname, "w");
+    எனில் (fd == வெற்று)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return;
+	திரும்பு;
     }
 
-    vim_snprintf((char *)IObuff, IOSIZE,
+    vim_snprintf((எழுத்து *)IObuff, IOSIZE,
 				  _("Writing suggestion file %s..."), fname);
     spell_message(spin, IObuff);
 
     /*
      * <SUGHEADER>: <fileID> <versionnr> <timestamp>
      */
-    if (fwrite(VIMSUGMAGIC, VIMSUGMAGICL, (size_t)1, fd) != 1) // <fileID>
+    எனில் (fwrite(VIMSUGMAGIC, VIMSUGMAGICL, (size_t)1, fd) != 1) // <fileID>
     {
 	emsg(_(e_error_while_writing));
-	goto theend;
+	செல் theend;
     }
     putc(VIMSUGVERSION, fd);				// <versionnr>
 
@@ -5973,47 +5973,47 @@ sug_write(spellinfo_T *spin, char_u *fname)
      * <SUGWORDTREE>
      */
     spin->si_memtot = 0;
-    tree = spin->si_foldroot->wn_sibling;
+    மரம் = spin->si_foldroot->wn_sibling;
 
     // Clear the index and wnode fields in the tree.
-    clear_node(tree);
+    clear_முனை(மரம்);
 
     // Count the number of nodes.  Needed to be able to allocate the
     // memory when reading the nodes.  Also fills in index for shared
     // nodes.
-    nodecount = put_node(NULL, tree, 0, 0, FALSE);
+    nodecount = put_முனை(வெற்று, மரம், 0, 0, FALSE);
 
     // number of nodes in 4 bytes
     put_bytes(fd, (long_u)nodecount, 4);	// <nodecount>
-    spin->si_memtot += nodecount + nodecount * sizeof(int);
+    spin->si_memtot += nodecount + nodecount * அளவு(முழு);
 
     // Write the nodes.
-    (void)put_node(fd, tree, 0, 0, FALSE);
+    (வெறுமை)put_முனை(fd, மரம், 0, 0, FALSE);
 
     /*
      * <SUGTABLE>: <sugwcount> <sugline> ...
      */
-    wcount = spin->si_spellbuf->b_ml.ml_line_count;
+    wcount = spin->si_spellbuf->b_ml.ml_வரி_மொத்தம்;
     put_bytes(fd, (long_u)wcount, 4);	// <sugwcount>
 
-    for (lnum = 1; lnum <= (linenr_T)wcount; ++lnum)
+    க்கு (lnum = 1; lnum <= (linenr_T)wcount; ++lnum)
     {
 	// <sugline>: <sugnr> ... NUL
-	line = ml_get_buf(spin->si_spellbuf, lnum, FALSE);
+	வரி = ml_get_buf(spin->si_spellbuf, lnum, FALSE);
 	len = ml_get_buf_len(spin->si_spellbuf, lnum) + 1;
-	if (fwrite(line, (size_t)len, (size_t)1, fd) == 0)
+	எனில் (fwrite(வரி, (size_t)len, (size_t)1, fd) == 0)
 	{
 	    emsg(_(e_error_while_writing));
-	    goto theend;
+	    செல் theend;
 	}
 	spin->si_memtot += len;
     }
 
     // Write another byte to check for errors.
-    if (putc(0, fd) == EOF)
+    எனில் (putc(0, fd) == EOF)
 	emsg(_(e_error_while_writing));
 
-    vim_snprintf((char *)IObuff, IOSIZE,
+    vim_snprintf((எழுத்து *)IObuff, IOSIZE,
 		 _("Estimated runtime memory use: %d bytes"), spin->si_memtot);
     spell_message(spin, IObuff);
 
@@ -6030,23 +6030,23 @@ theend:
  * Exception: when "fnames[0]" ends in ".add" it's used as the input file name
  * and ".spl" is appended to make the output file name.
  */
-    void
+    வெறுமை
 mkspell(
-    int		fcount,
+    முழு		fcount,
     char_u	**fnames,
-    int		ascii,		    // -ascii argument given
-    int		over_write,	    // overwrite existing output file
-    int		added_word)	    // invoked through "zg"
+    முழு		ascii,		    // -ascii argument given
+    முழு		over_write,	    // overwrite existing output file
+    முழு		added_word)	    // invoked through "zg"
 {
-    char_u	*fname = NULL;
+    char_u	*fname = வெற்று;
     char_u	*wfname;
     char_u	**innames;
-    int		incount;
+    முழு		incount;
     afffile_T	*(afile[MAXREGIONS]);
-    int		i;
-    int		len;
+    முழு		i;
+    முழு		len;
     stat_T	st;
-    int		error = FALSE;
+    முழு		error = FALSE;
     spellinfo_T spin;
 
     CLEAR_FIELD(spin);
@@ -6054,12 +6054,12 @@ mkspell(
     spin.si_ascii = ascii;
     spin.si_followup = TRUE;
     spin.si_rem_accents = TRUE;
-    ga_init2(&spin.si_rep, sizeof(fromto_T), 20);
-    ga_init2(&spin.si_repsal, sizeof(fromto_T), 20);
-    ga_init2(&spin.si_sal, sizeof(fromto_T), 20);
-    ga_init2(&spin.si_map, sizeof(char_u), 100);
-    ga_init2(&spin.si_comppat, sizeof(char_u *), 20);
-    ga_init2(&spin.si_prefcond, sizeof(char_u *), 50);
+    ga_init2(&spin.si_rep, அளவு(fromto_T), 20);
+    ga_init2(&spin.si_repsal, அளவு(fromto_T), 20);
+    ga_init2(&spin.si_sal, அளவு(fromto_T), 20);
+    ga_init2(&spin.si_map, அளவு(char_u), 100);
+    ga_init2(&spin.si_comppat, அளவு(char_u *), 20);
+    ga_init2(&spin.si_prefcond, அளவு(char_u *), 50);
     hash_init(&spin.si_commonwords);
     spin.si_newcompID = 127;	// start compound ID at first maximum
 
@@ -6069,103 +6069,103 @@ mkspell(
     incount = fcount - 1;
 
     wfname = alloc(MAXPATHL);
-    if (wfname == NULL)
-	return;
+    எனில் (wfname == வெற்று)
+	திரும்பு;
 
-    if (fcount >= 1)
+    எனில் (fcount >= 1)
     {
-	len = (int)STRLEN(fnames[0]);
-	if (fcount == 1 && len > 4 && STRCMP(fnames[0] + len - 4, ".add") == 0)
+	len = (முழு)STRLEN(fnames[0]);
+	எனில் (fcount == 1 && len > 4 && STRCMP(fnames[0] + len - 4, ".add") == 0)
 	{
 	    // For ":mkspell path/en.latin1.add" output file is
 	    // "path/en.latin1.add.spl".
 	    incount = 1;
-	    vim_snprintf((char *)wfname, MAXPATHL, "%s.spl", fnames[0]);
+	    vim_snprintf((எழுத்து *)wfname, MAXPATHL, "%s.spl", fnames[0]);
 	}
-	else if (fcount == 1)
+	இல்லையெனில் எனில் (fcount == 1)
 	{
 	    // For ":mkspell path/vim" output file is "path/vim.latin1.spl".
 	    incount = 1;
-	    vim_snprintf((char *)wfname, MAXPATHL, SPL_FNAME_TMPL,
+	    vim_snprintf((எழுத்து *)wfname, MAXPATHL, SPL_FNAME_TMPL,
 		  fnames[0], spin.si_ascii ? (char_u *)"ascii" : spell_enc());
 	}
-	else if (len > 4 && STRCMP(fnames[0] + len - 4, ".spl") == 0)
+	இல்லையெனில் எனில் (len > 4 && STRCMP(fnames[0] + len - 4, ".spl") == 0)
 	{
 	    // Name ends in ".spl", use as the file name.
 	    vim_strncpy(wfname, fnames[0], MAXPATHL - 1);
 	}
-	else
+	இல்லையெனில்
 	    // Name should be language, make the file name from it.
-	    vim_snprintf((char *)wfname, MAXPATHL, SPL_FNAME_TMPL,
+	    vim_snprintf((எழுத்து *)wfname, MAXPATHL, SPL_FNAME_TMPL,
 		  fnames[0], spin.si_ascii ? (char_u *)"ascii" : spell_enc());
 
 	// Check for .ascii.spl.
-	if (strstr((char *)gettail(wfname), SPL_FNAME_ASCII) != NULL)
+	எனில் (strstr((எழுத்து *)gettail(wfname), SPL_FNAME_ASCII) != வெற்று)
 	    spin.si_ascii = TRUE;
 
 	// Check for .add.spl.
-	if (strstr((char *)gettail(wfname), SPL_FNAME_ADD) != NULL)
+	எனில் (strstr((எழுத்து *)gettail(wfname), SPL_FNAME_ADD) != வெற்று)
 	    spin.si_add = TRUE;
     }
 
-    if (incount <= 0)
+    எனில் (incount <= 0)
 	emsg(_(e_invalid_argument));	// need at least output and input names
-    else if (vim_strchr(gettail(wfname), '_') != NULL)
+    இல்லையெனில் எனில் (vim_strchr(gettail(wfname), '_') != வெற்று)
 	emsg(_(e_output_file_name_must_not_have_region_name));
-    else if (incount > MAXREGIONS)
+    இல்லையெனில் எனில் (incount > MAXREGIONS)
 	semsg(_(e_only_up_to_nr_regions_supported), MAXREGIONS);
-    else
+    இல்லையெனில்
     {
 	// Check for overwriting before doing things that may take a lot of
 	// time.
-	if (!over_write && mch_stat((char *)wfname, &st) >= 0)
+	எனில் (!over_write && mch_stat((எழுத்து *)wfname, &st) >= 0)
 	{
 	    emsg(_(e_file_exists));
-	    goto theend;
+	    செல் theend;
 	}
-	if (mch_isdir(wfname))
+	எனில் (mch_isdir(wfname))
 	{
 	    semsg(_(e_str_is_directory), wfname);
-	    goto theend;
+	    செல் theend;
 	}
 
 	fname = alloc(MAXPATHL);
-	if (fname == NULL)
-	    goto theend;
+	எனில் (fname == வெற்று)
+	    செல் theend;
 
 	/*
 	 * Init the aff and dic pointers.
 	 * Get the region names if there are more than 2 arguments.
 	 */
-	for (i = 0; i < incount; ++i)
+	க்கு (i = 0; i < incount; ++i)
 	{
-	    afile[i] = NULL;
+	    afile[i] = வெற்று;
 
-	    if (incount > 1)
+	    எனில் (incount > 1)
 	    {
-		len = (int)STRLEN(innames[i]);
-		if (STRLEN(gettail(innames[i])) < 5
+		len = (முழு)STRLEN(innames[i]);
+		எனில் (STRLEN(gettail(innames[i])) < 5
 						|| innames[i][len - 3] != '_')
 		{
 		    semsg(_(e_invalid_region_in_str), innames[i]);
-		    goto theend;
+		    செல் theend;
 		}
 		spin.si_region_name[i * 2] = TOLOWER_ASC(innames[i][len - 2]);
 		spin.si_region_name[i * 2 + 1] =
 					     TOLOWER_ASC(innames[i][len - 1]);
 	    }
 	}
-	spin.si_region_count = incount;
+	spin.si_region_மொத்தம் = incount;
 
 	spin.si_foldroot = wordtree_alloc(&spin);
 	spin.si_keeproot = wordtree_alloc(&spin);
 	spin.si_prefroot = wordtree_alloc(&spin);
-	if (spin.si_foldroot == NULL
-		|| spin.si_keeproot == NULL
-		|| spin.si_prefroot == NULL)
+	எனில் (spin.si_foldroot == வெற்று
+		|| spin.si_keeproot == வெற்று
+		|| spin.si_prefroot == வெற்று)
 	{
 	    free_blocks(spin.si_blocks);
-	    goto theend;
+	    செல் theend;
 	}
 
 	// When not producing a .add.spl file clear the character table when
@@ -6173,7 +6173,7 @@ mkspell(
 	// one in the .spl file if the .aff file doesn't define one.  That's
 	// better than guessing the contents, the table will match a
 	// previously loaded spell file.
-	if (!spin.si_add)
+	எனில் (!spin.si_add)
 	    spin.si_clear_chartab = TRUE;
 
 	/*
@@ -6181,74 +6181,74 @@ mkspell(
 	 * Text is converted to 'encoding'.
 	 * Words are stored in the case-folded and keep-case trees.
 	 */
-	for (i = 0; i < incount && !error; ++i)
+	க்கு (i = 0; i < incount && !error; ++i)
 	{
 	    spin.si_conv.vc_type = CONV_NONE;
 	    spin.si_region = 1 << i;
 
-	    vim_snprintf((char *)fname, MAXPATHL, "%s.aff", innames[i]);
-	    if (mch_stat((char *)fname, &st) >= 0)
+	    vim_snprintf((எழுத்து *)fname, MAXPATHL, "%s.aff", innames[i]);
+	    எனில் (mch_stat((எழுத்து *)fname, &st) >= 0)
 	    {
 		// Read the .aff file.  Will init "spin->si_conv" based on the
 		// "SET" line.
 		afile[i] = spell_read_aff(&spin, fname);
-		if (afile[i] == NULL)
+		எனில் (afile[i] == வெற்று)
 		    error = TRUE;
-		else
+		இல்லையெனில்
 		{
 		    // Read the .dic file and store the words in the trees.
-		    vim_snprintf((char *)fname, MAXPATHL, "%s.dic",
+		    vim_snprintf((எழுத்து *)fname, MAXPATHL, "%s.dic",
 								  innames[i]);
-		    if (spell_read_dic(&spin, fname, afile[i]) == FAIL)
+		    எனில் (spell_read_dic(&spin, fname, afile[i]) == FAIL)
 			error = TRUE;
 		}
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		// No .aff file, try reading the file as a word list.  Store
 		// the words in the trees.
-		if (spell_read_wordfile(&spin, innames[i]) == FAIL)
+		எனில் (spell_read_wordfile(&spin, innames[i]) == FAIL)
 		    error = TRUE;
 	    }
 
 	    // Free any conversion stuff.
-	    convert_setup(&spin.si_conv, NULL, NULL);
+	    convert_setup(&spin.si_conv, வெற்று, வெற்று);
 	}
 
-	if (spin.si_compflags != NULL && spin.si_nobreak)
-	    msg(_("Warning: both compounding and NOBREAK specified"));
+	எனில் (spin.si_compflags != வெற்று && spin.si_nobreak)
+	    செய்தி(_("Warning: both compounding and NOBREAK specified"));
 
-	if (!error && !got_int)
+	எனில் (!error && !got_int)
 	{
 	    /*
 	     * Combine tails in the tree.
 	     */
-	    spell_message(&spin, (char_u *)_(msg_compressing));
+	    spell_message(&spin, (char_u *)_(செய்தி_compressing));
 	    wordtree_compress(&spin, spin.si_foldroot, "case-folded");
 	    wordtree_compress(&spin, spin.si_keeproot, "keep-case");
 	    wordtree_compress(&spin, spin.si_prefroot, "prefixes");
 	}
 
-	if (!error && !got_int)
+	எனில் (!error && !got_int)
 	{
 	    /*
 	     * Write the info in the spell file.
 	     */
-	    vim_snprintf((char *)IObuff, IOSIZE,
+	    vim_snprintf((எழுத்து *)IObuff, IOSIZE,
 				      _("Writing spell file %s..."), wfname);
 	    spell_message(&spin, IObuff);
 
 	    error = write_vim_spell(&spin, wfname) == FAIL;
 
 	    spell_message(&spin, (char_u *)_("Done!"));
-	    vim_snprintf((char *)IObuff, IOSIZE,
+	    vim_snprintf((எழுத்து *)IObuff, IOSIZE,
 		 _("Estimated runtime memory use: %d bytes"), spin.si_memtot);
 	    spell_message(&spin, IObuff);
 
 	    /*
 	     * If the file is loaded need to reload it.
 	     */
-	    if (!error)
+	    எனில் (!error)
 		spell_reload_one(wfname, added_word);
 	}
 
@@ -6262,8 +6262,8 @@ mkspell(
 	hash_clear_all(&spin.si_commonwords, 0);
 
 	// Free the .aff file structures.
-	for (i = 0; i < incount; ++i)
-	    if (afile[i] != NULL)
+	க்கு (i = 0; i < incount; ++i)
+	    எனில் (afile[i] != வெற்று)
 		spell_free_aff(afile[i]);
 
 	// Free all the bits and pieces at once.
@@ -6273,7 +6273,7 @@ mkspell(
 	 * If there is soundfolding info and no NOSUGFILE item create the
 	 * .sug file with the soundfolded word trie.
 	 */
-	if (spin.si_sugtime != 0 && !error && !got_int)
+	எனில் (spin.si_sugtime != 0 && !error && !got_int)
 	    spell_make_sugfile(&spin, wfname);
 
     }
@@ -6287,16 +6287,16 @@ theend:
  * Display a message for spell file processing when 'verbose' is set or using
  * ":mkspell".  "str" can be IObuff.
  */
-    static void
+    நிலையான வெறுமை
 spell_message(spellinfo_T *spin, char_u *str)
 {
-    if (spin->si_verbose || p_verbose > 2)
+    எனில் (spin->si_verbose || p_verbose > 2)
     {
-	if (!spin->si_verbose)
+	எனில் (!spin->si_verbose)
 	    verbose_enter();
-	msg((char *)str);
+	செய்தி((எழுத்து *)str);
 	out_flush();
-	if (!spin->si_verbose)
+	எனில் (!spin->si_verbose)
 	    verbose_leave();
     }
 }
@@ -6307,151 +6307,151 @@ spell_message(spellinfo_T *spin, char_u *str)
  * ":[count]spellundo  {word}"
  * ":[count]spellrare  {word}"
  */
-    void
+    வெறுமை
 ex_spell(exarg_T *eap)
 {
-    spell_add_word(eap->arg, (int)STRLEN(eap->arg),
+    spell_add_word(eap->arg, (முழு)STRLEN(eap->arg),
 		eap->cmdidx == CMD_spellwrong ? SPELL_ADD_BAD :
 		eap->cmdidx == CMD_spellrare ? SPELL_ADD_RARE : SPELL_ADD_GOOD,
-				   eap->forceit ? 0 : (int)eap->line2,
+				   eap->forceit ? 0 : (முழு)eap->line2,
 				   eap->cmdidx == CMD_spellundo);
 }
 
 /*
  * Add "word[len]" to 'spellfile' as a good, rare or bad word.
  */
-    void
+    வெறுமை
 spell_add_word(
     char_u	*word,
-    int		len,
-    int		what,	    // SPELL_ADD_ values
-    int		idx,	    // "zG" and "zW": zero, otherwise index in
+    முழு		len,
+    முழு		what,	    // SPELL_ADD_ values
+    முழு		idx,	    // "zG" and "zW": zero, otherwise index in
 			    // 'spellfile'
-    int		undo)	    // TRUE for "zug", "zuG", "zuw" and "zuW"
+    முழு		undo)	    // TRUE for "zug", "zuG", "zuw" and "zuW"
 {
-    FILE	*fd = NULL;
-    buf_T	*buf = NULL;
-    int		new_spf = FALSE;
+    FILE	*fd = வெற்று;
+    buf_T	*buf = வெற்று;
+    முழு		new_spf = FALSE;
     char_u	*fname;
-    char_u	*fnamebuf = NULL;
-    char_u	line[MAXWLEN * 2];
+    char_u	*fnamebuf = வெற்று;
+    char_u	வரி[MAXWLEN * 2];
     long	fpos, fpos_next = 0;
-    int		i;
+    முழு		i;
     size_t	linelen;
     char_u	*spf;
 
-    if (!valid_spell_word(word, word + len))
+    எனில் (!valid_spell_word(word, word + len))
     {
 	emsg(_(e_illegal_character_in_word));
-	return;
+	திரும்பு;
     }
 
-    if (idx == 0)	    // use internal wordlist
+    எனில் (idx == 0)	    // use internal wordlist
     {
-	if (int_wordlist == NULL)
+	எனில் (int_wordlist == வெற்று)
 	{
 	    int_wordlist = vim_tempname('s', FALSE);
-	    if (int_wordlist == NULL)
-		return;
+	    எனில் (int_wordlist == வெற்று)
+		திரும்பு;
 	}
 	fname = int_wordlist;
     }
-    else
+    இல்லையெனில்
     {
 	// If 'spellfile' isn't set figure out a good default value.
-	if (*curwin->w_s->b_p_spf == NUL)
+	எனில் (*curwin->w_s->b_p_spf == NUL)
 	{
 	    init_spellfile();
 	    new_spf = TRUE;
 	}
 
-	if (*curwin->w_s->b_p_spf == NUL)
+	எனில் (*curwin->w_s->b_p_spf == NUL)
 	{
 	    semsg(_(e_option_str_is_not_set), "spellfile");
-	    return;
+	    திரும்பு;
 	}
 	fnamebuf = alloc(MAXPATHL);
-	if (fnamebuf == NULL)
-	    return;
+	எனில் (fnamebuf == வெற்று)
+	    திரும்பு;
 
-	for (spf = curwin->w_s->b_p_spf, i = 1; *spf != NUL; ++i)
+	க்கு (spf = curwin->w_s->b_p_spf, i = 1; *spf != NUL; ++i)
 	{
 	    copy_option_part(&spf, fnamebuf, MAXPATHL, ",");
-	    if (i == idx)
-		break;
-	    if (*spf == NUL)
+	    எனில் (i == idx)
+		நிறுத்து;
+	    எனில் (*spf == NUL)
 	    {
 		semsg(_(e_spellfile_does_not_have_nr_entries), idx);
 		vim_free(fnamebuf);
-		return;
+		திரும்பு;
 	    }
 	}
 
 	// Check that the user isn't editing the .add file somewhere.
 	buf = buflist_findname_exp(fnamebuf);
-	if (buf != NULL && buf->b_ml.ml_mfp == NULL)
-	    buf = NULL;
-	if (buf != NULL && bufIsChanged(buf))
+	எனில் (buf != வெற்று && buf->b_ml.ml_mfp == வெற்று)
+	    buf = வெற்று;
+	எனில் (buf != வெற்று && bufIsChanged(buf))
 	{
 	    emsg(_(e_file_is_loaded_in_another_buffer));
 	    vim_free(fnamebuf);
-	    return;
+	    திரும்பு;
 	}
 
 	fname = fnamebuf;
     }
 
-    if (what == SPELL_ADD_BAD || undo)
+    எனில் (what == SPELL_ADD_BAD || undo)
     {
 	// When the word appears as good word we need to remove that one,
 	// since its flags sort before the one with WF_BANNED.
-	fd = mch_fopen((char *)fname, "r");
-	if (fd != NULL)
+	fd = mch_fopen((எழுத்து *)fname, "r");
+	எனில் (fd != வெற்று)
 	{
-	    while (!vim_fgets(line, MAXWLEN * 2, fd))
+	    போது (!vim_fgets(வரி, MAXWLEN * 2, fd))
 	    {
 		fpos = fpos_next;
 		fpos_next = ftell(fd);
-		if (fpos_next < 0)
-		    break;  // should never happen
-		linelen = STRLEN(line);
-		if (linelen >= (size_t)len
-			&& STRNCMP(word, line, len) == 0
-			&& (line[len] == '/' || line[len] < ' '))
+		எனில் (fpos_next < 0)
+		    நிறுத்து;  // should never happen
+		linelen = STRLEN(வரி);
+		எனில் (linelen >= (size_t)len
+			&& STRNCMP(word, வரி, len) == 0
+			&& (வரி[len] == '/' || வரி[len] < ' '))
 		{
 		    // Found duplicate word.  Remove it by writing a '#' at
 		    // the start of the line.  Mixing reading and writing
 		    // doesn't work for all systems, close the file first.
 		    fclose(fd);
-		    fd = mch_fopen((char *)fname, "r+");
-		    if (fd == NULL)
-			break;
-		    if (fseek(fd, fpos, SEEK_SET) == 0)
+		    fd = mch_fopen((எழுத்து *)fname, "r+");
+		    எனில் (fd == வெற்று)
+			நிறுத்து;
+		    எனில் (fseek(fd, fpos, SEEK_SET) == 0)
 		    {
 			fputc('#', fd);
-			if (undo)
+			எனில் (undo)
 			{
-			    home_replace(NULL, fname, NameBuff, MAXPATHL, TRUE);
+			    home_replace(வெற்று, fname, NameBuff, MAXPATHL, TRUE);
 			    smsg(_("Word '%.*s' removed from %s"),
 							 len, word, NameBuff);
 			}
 		    }
-		    if (fseek(fd, fpos_next, SEEK_SET) != 0)
+		    எனில் (fseek(fd, fpos_next, SEEK_SET) != 0)
 		    {
 			PERROR(_("Seek error in spellfile"));
-			break;
+			நிறுத்து;
 		    }
 		}
 	    }
-	    if (fd != NULL)
+	    எனில் (fd != வெற்று)
 		fclose(fd);
 	}
     }
 
-    if (!undo)
+    எனில் (!undo)
     {
-	fd = mch_fopen((char *)fname, "a");
-	if (fd == NULL && new_spf)
+	fd = mch_fopen((எழுத்து *)fname, "a");
+	எனில் (fd == வெற்று && new_spf)
 	{
 	    char_u *p;
 
@@ -6459,43 +6459,43 @@ spell_add_word(
 	    // file.  We may need to create the "spell" directory first.  We
 	    // already checked the runtime directory is writable in
 	    // init_spellfile().
-	    if (!dir_of_file_exists(fname) && (p = gettail_sep(fname)) != fname)
+	    எனில் (!dir_of_file_exists(fname) && (p = gettail_sep(fname)) != fname)
 	    {
-		int c = *p;
+		முழு c = *p;
 
 		// The directory doesn't exist.  Try creating it and opening
 		// the file again.
 		*p = NUL;
 		vim_mkdir(fname, 0755);
 		*p = c;
-		fd = mch_fopen((char *)fname, "a");
+		fd = mch_fopen((எழுத்து *)fname, "a");
 	    }
 	}
 
-	if (fd == NULL)
+	எனில் (fd == வெற்று)
 	    semsg(_(e_cant_open_file_str), fname);
-	else
+	இல்லையெனில்
 	{
-	    if (what == SPELL_ADD_BAD)
+	    எனில் (what == SPELL_ADD_BAD)
 		fprintf(fd, "%.*s/!\n", len, word);
-	    else if (what == SPELL_ADD_RARE)
+	    இல்லையெனில் எனில் (what == SPELL_ADD_RARE)
 		fprintf(fd, "%.*s/?\n", len, word);
-	    else
+	    இல்லையெனில்
 		fprintf(fd, "%.*s\n", len, word);
 	    fclose(fd);
 
-	    home_replace(NULL, fname, NameBuff, MAXPATHL, TRUE);
+	    home_replace(வெற்று, fname, NameBuff, MAXPATHL, TRUE);
 	    smsg(_("Word '%.*s' added to %s"), len, word, NameBuff);
 	}
     }
 
-    if (fd != NULL)
+    எனில் (fd != வெற்று)
     {
 	// Update the .add.spl file.
 	mkspell(1, &fname, FALSE, TRUE, TRUE);
 
 	// If the .add file is edited somewhere, reload it.
-	if (buf != NULL)
+	எனில் (buf != வெற்று)
 	    buf_reload(buf, buf->b_orig_mode, FALSE);
 
 	redraw_all_later(UPD_SOME_VALID);
@@ -6506,30 +6506,30 @@ spell_add_word(
 /*
  * Initialize 'spellfile' for the current buffer.
  */
-    static void
-init_spellfile(void)
+    நிலையான வெறுமை
+init_spellfile(வெறுமை)
 {
     string_T	buf;
     char_u	*fname;
     char_u	*rtp;
     char_u	*lend;
-    int		aspath = FALSE;
+    முழு		aspath = FALSE;
     char_u	*lstart = curbuf->b_s.b_p_spl;
 
-    if (*curwin->w_s->b_p_spl == NUL || curwin->w_s->b_langp.ga_len <= 0)
-	return;
+    எனில் (*curwin->w_s->b_p_spl == NUL || curwin->w_s->b_langp.ga_len <= 0)
+	திரும்பு;
 
     buf.string = alloc(MAXPATHL);
-    if (buf.string == NULL)
-	return;
+    எனில் (buf.string == வெற்று)
+	திரும்பு;
 
     buf.length = 0;
 
     // Find the end of the language name.  Exclude the region.  If there
     // is a path separator remember the start of the tail.
-    for (lend = curwin->w_s->b_p_spl; *lend != NUL
-	    && vim_strchr((char_u *)",._", *lend) == NULL; ++lend)
-	if (vim_ispathsep(*lend))
+    க்கு (lend = curwin->w_s->b_p_spl; *lend != NUL
+	    && vim_strchr((char_u *)",._", *lend) == வெற்று; ++lend)
+	எனில் (vim_ispathsep(*lend))
 	{
 	    aspath = TRUE;
 	    lstart = lend + 1;
@@ -6538,51 +6538,51 @@ init_spellfile(void)
     // Loop over all entries in 'runtimepath'.  Use the first one where we
     // are allowed to write.
     rtp = p_rtp;
-    while (*rtp != NUL)
+    போது (*rtp != NUL)
     {
-	if (aspath)
+	எனில் (aspath)
 	    // Use directory of an entry with path, e.g., for
 	    // "/dir/lg.utf-8.spl" use "/dir".
 	    vim_strncpy(buf.string, curbuf->b_s.b_p_spl,
 		    lstart - curbuf->b_s.b_p_spl - 1);
-	else
+	இல்லையெனில்
 	    // Copy the path from 'runtimepath' to buf[].
 	    buf.length = (size_t)copy_option_part(&rtp, buf.string, MAXPATHL, ",");
-	if (filewritable(buf.string) == 2)
+	எனில் (filewritable(buf.string) == 2)
 	{
 	    // Use the first language name from 'spelllang' and the
 	    // encoding used in the first loaded .spl file.
-	    if (aspath)
+	    எனில் (aspath)
 	    {
 		buf.length = (size_t)(lend - curbuf->b_s.b_p_spl);
 		vim_strncpy(buf.string, curbuf->b_s.b_p_spl, buf.length);
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		// Create the "spell" directory if it doesn't exist yet.
-		buf.length += vim_snprintf_safelen((char *)buf.string + buf.length,
+		buf.length += vim_snprintf_safelen((எழுத்து *)buf.string + buf.length,
 		    MAXPATHL - buf.length, "/spell");
-		if (filewritable(buf.string) != 2)
+		எனில் (filewritable(buf.string) != 2)
 		{
-		    if (vim_mkdir(buf.string, 0755) != 0)
+		    எனில் (vim_mkdir(buf.string, 0755) != 0)
 		    {
 			vim_free(buf.string);
-			return;
+			திரும்பு;
 		    }
 		}
 
-		buf.length += vim_snprintf_safelen((char *)buf.string + buf.length,
-		    MAXPATHL - buf.length, "/%.*s", (int)(lend - lstart), lstart);
+		buf.length += vim_snprintf_safelen((எழுத்து *)buf.string + buf.length,
+		    MAXPATHL - buf.length, "/%.*s", (முழு)(lend - lstart), lstart);
 	    }
 	    fname = LANGP_ENTRY(curwin->w_s->b_langp, 0)
 		->lp_slang->sl_fname;
-	    vim_snprintf((char *)buf.string + buf.length, MAXPATHL - buf.length,
+	    vim_snprintf((எழுத்து *)buf.string + buf.length, MAXPATHL - buf.length,
 		".%s.add",
-		fname != NULL && strstr((char *)gettail(fname), ".ascii.") != NULL
+		fname != வெற்று && strstr((எழுத்து *)gettail(fname), ".ascii.") != வெற்று
 		    ? (char_u *)"ascii" : spell_enc());
-	    set_option_value_give_err((char_u *)"spellfile",
+	    set_option_மதிப்பு_give_err((char_u *)"spellfile",
 		    0L, buf.string, OPT_LOCAL);
-	    break;
+	    நிறுத்து;
 	}
 	aspath = FALSE;
     }
@@ -6595,44 +6595,44 @@ init_spellfile(void)
 /*
  * Set the spell character tables from strings in the affix file.
  */
-    static int
-set_spell_chartab(char_u *fol, char_u *low, char_u *upp)
+    நிலையான முழு
+set_spell_chartab(char_u *fol, char_u *கீழ், char_u *upp)
 {
     // We build the new tables here first, so that we can compare with the
     // previous one.
     spelltab_T	new_st;
-    char_u	*pf = fol, *pl = low, *pu = upp;
-    int		f, l, u;
+    char_u	*pf = fol, *pl = கீழ், *pu = upp;
+    முழு		f, l, u;
 
     clear_spell_chartab(&new_st);
 
-    while (*pf != NUL)
+    போது (*pf != NUL)
     {
-	if (*pl == NUL || *pu == NUL)
+	எனில் (*pl == NUL || *pu == NUL)
 	{
-	    emsg(_(e_format_error_in_affix_file_fol_low_or_upp));
-	    return FAIL;
+	    emsg(_(e_format_error_in_affix_file_fol_கீழ்_or_upp));
+	    திரும்பு FAIL;
 	}
 	f = mb_ptr2char_adv(&pf);
 	l = mb_ptr2char_adv(&pl);
 	u = mb_ptr2char_adv(&pu);
 
 	// Every character that appears is a word character.
-	if (f < 256)
+	எனில் (f < 256)
 	    new_st.st_isw[f] = TRUE;
-	if (l < 256)
+	எனில் (l < 256)
 	    new_st.st_isw[l] = TRUE;
-	if (u < 256)
+	எனில் (u < 256)
 	    new_st.st_isw[u] = TRUE;
 
 	// if "LOW" and "FOL" are not the same the "LOW" char needs
 	// case-folding
-	if (l < 256 && l != f)
+	எனில் (l < 256 && l != f)
 	{
-	    if (f >= 256)
+	    எனில் (f >= 256)
 	    {
-		emsg(_(e_character_in_fol_low_or_upp_is_out_of_range));
-		return FAIL;
+		emsg(_(e_character_in_fol_கீழ்_or_upp_is_out_of_range));
+		திரும்பு FAIL;
 	    }
 	    new_st.st_fold[l] = f;
 	}
@@ -6640,12 +6640,12 @@ set_spell_chartab(char_u *fol, char_u *low, char_u *upp)
 	// if "UPP" and "FOL" are not the same the "UPP" char needs
 	// case-folding, it's upper case and the "UPP" is the upper case of
 	// "FOL" .
-	if (u < 256 && u != f)
+	எனில் (u < 256 && u != f)
 	{
-	    if (f >= 256)
+	    எனில் (f >= 256)
 	    {
-		emsg(_(e_character_in_fol_low_or_upp_is_out_of_range));
-		return FAIL;
+		emsg(_(e_character_in_fol_கீழ்_or_upp_is_out_of_range));
+		திரும்பு FAIL;
 	    }
 	    new_st.st_fold[u] = f;
 	    new_st.st_isu[u] = TRUE;
@@ -6653,141 +6653,141 @@ set_spell_chartab(char_u *fol, char_u *low, char_u *upp)
 	}
     }
 
-    if (*pl != NUL || *pu != NUL)
+    எனில் (*pl != NUL || *pu != NUL)
     {
-	emsg(_(e_format_error_in_affix_file_fol_low_or_upp));
-	return FAIL;
+	emsg(_(e_format_error_in_affix_file_fol_கீழ்_or_upp));
+	திரும்பு FAIL;
     }
 
-    return set_spell_finish(&new_st);
+    திரும்பு set_spell_finish(&new_st);
 }
 
 /*
  * Set the spell character tables from strings in the .spl file.
  */
-    static void
+    நிலையான வெறுமை
 set_spell_charflags(
     char_u	*flags,
-    int		cnt,	    // length of "flags"
+    முழு		cnt,	    // length of "flags"
     char_u	*fol)
 {
     // We build the new tables here first, so that we can compare with the
     // previous one.
     spelltab_T	new_st;
-    int		i;
+    முழு		i;
     char_u	*p = fol;
-    int		c;
+    முழு		c;
 
     clear_spell_chartab(&new_st);
 
-    for (i = 0; i < 128; ++i)
+    க்கு (i = 0; i < 128; ++i)
     {
-	if (i < cnt)
+	எனில் (i < cnt)
 	{
 	    new_st.st_isw[i + 128] = (flags[i] & CF_WORD) != 0;
 	    new_st.st_isu[i + 128] = (flags[i] & CF_UPPER) != 0;
 	}
 
-	if (*p != NUL)
+	எனில் (*p != NUL)
 	{
 	    c = mb_ptr2char_adv(&p);
 	    new_st.st_fold[i + 128] = c;
-	    if (i + 128 != c && new_st.st_isu[i + 128] && c < 256)
+	    எனில் (i + 128 != c && new_st.st_isu[i + 128] && c < 256)
 		new_st.st_upper[c] = i + 128;
 	}
     }
 
-    (void)set_spell_finish(&new_st);
+    (வெறுமை)set_spell_finish(&new_st);
 }
 
-    static int
+    நிலையான முழு
 set_spell_finish(spelltab_T *new_st)
 {
-    int		i;
+    முழு		i;
 
-    if (did_set_spelltab)
+    எனில் (did_set_spelltab)
     {
 	// check that it's the same table
-	for (i = 0; i < 256; ++i)
+	க்கு (i = 0; i < 256; ++i)
 	{
-	    if (spelltab.st_isw[i] != new_st->st_isw[i]
+	    எனில் (spelltab.st_isw[i] != new_st->st_isw[i]
 		    || spelltab.st_isu[i] != new_st->st_isu[i]
 		    || spelltab.st_fold[i] != new_st->st_fold[i]
 		    || spelltab.st_upper[i] != new_st->st_upper[i])
 	    {
 		emsg(_(e_word_characters_differ_between_spell_files));
-		return FAIL;
+		திரும்பு FAIL;
 	    }
 	}
     }
-    else
+    இல்லையெனில்
     {
 	// copy the new spelltab into the one being used
 	spelltab = *new_st;
 	did_set_spelltab = TRUE;
     }
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Write the table with prefix conditions to the .spl file.
  * When "fd" is NULL only count the length of what is written and return it.
  */
-    static int
+    நிலையான முழு
 write_spell_prefcond(FILE *fd, garray_T *gap, size_t *fwv)
 {
-    int		i;
+    முழு		i;
     char_u	*p;
-    int		len;
-    int		totlen;
+    முழு		len;
+    முழு		totlen;
 
-    if (fd != NULL)
+    எனில் (fd != வெற்று)
 	put_bytes(fd, (long_u)gap->ga_len, 2);	    // <prefcondcnt>
 
     totlen = 2 + gap->ga_len; // length of <prefcondcnt> and <condlen> bytes
 
-    for (i = 0; i < gap->ga_len; ++i)
+    க்கு (i = 0; i < gap->ga_len; ++i)
     {
 	// <prefcond> : <condlen> <condstr>
 	p = ((char_u **)gap->ga_data)[i];
-	if (p != NULL)
+	எனில் (p != வெற்று)
 	{
-	    len = (int)STRLEN(p);
-	    if (fd != NULL)
+	    len = (முழு)STRLEN(p);
+	    எனில் (fd != வெற்று)
 	    {
 		fputc(len, fd);
 		*fwv &= fwrite(p, (size_t)len, (size_t)1, fd);
 	    }
 	    totlen += len;
 	}
-	else if (fd != NULL)
+	இல்லையெனில் எனில் (fd != வெற்று)
 	    fputc(0, fd);
     }
 
-    return totlen;
+    திரும்பு totlen;
 }
 
 /*
  * Use map string "map" for languages "lp".
  */
-    static void
+    நிலையான வெறுமை
 set_map_str(slang_T *lp, char_u *map)
 {
     char_u	*p;
-    int		headc = 0;
-    int		c;
-    int		i;
+    முழு		headc = 0;
+    முழு		c;
+    முழு		i;
 
-    if (*map == NUL)
+    எனில் (*map == NUL)
     {
 	lp->sl_has_map = FALSE;
-	return;
+	திரும்பு;
     }
     lp->sl_has_map = TRUE;
 
     // Init the array and hash tables empty.
-    for (i = 0; i < 256; ++i)
+    க்கு (i = 0; i < 256; ++i)
 	lp->sl_map_array[i] = 0;
     hash_init(&lp->sl_map_hash);
 
@@ -6796,39 +6796,39 @@ set_map_str(slang_T *lp, char_u *map)
      * "aaa/bbb/ccc/".  Fill sl_map_array[c] with the character before c and
      * before the same slash.  For characters above 255 sl_map_hash is used.
      */
-    for (p = map; *p != NUL; )
+    க்கு (p = map; *p != NUL; )
     {
 	c = mb_cptr2char_adv(&p);
-	if (c == '/')
+	எனில் (c == '/')
 	    headc = 0;
-	else
+	இல்லையெனில்
 	{
-	    if (headc == 0)
+	    எனில் (headc == 0)
 		 headc = c;
 
 	    // Characters above 255 don't fit in sl_map_array[], put them in
 	    // the hash table.  Each entry is the char, a NUL the headchar and
 	    // a NUL.
-	    if (c >= 256)
+	    எனில் (c >= 256)
 	    {
-		int	    cl = mb_char2len(c);
-		int	    headcl = mb_char2len(headc);
+		முழு	    cl = mb_char2len(c);
+		முழு	    headcl = mb_char2len(headc);
 		char_u	    *b;
 		hash_T	    hash;
 		hashitem_T  *hi;
 
 		b = alloc(cl + headcl + 2);
-		if (b == NULL)
-		    return;
+		எனில் (b == வெற்று)
+		    திரும்பு;
 		mb_char2bytes(c, b);
 		b[cl] = NUL;
 		mb_char2bytes(headc, b + cl + 1);
 		b[cl + 1 + headcl] = NUL;
 		hash = hash_hash(b);
 		hi = hash_lookup(&lp->sl_map_hash, b, hash);
-		if (HASHITEM_EMPTY(hi))
+		எனில் (HASHITEM_EMPTY(hi))
 		    hash_add_item(&lp->sl_map_hash, hi, b, hash);
-		else
+		இல்லையெனில்
 		{
 		    // This should have been checked when generating the .spl
 		    // file.
@@ -6836,7 +6836,7 @@ set_map_str(slang_T *lp, char_u *map)
 		    vim_free(b);
 		}
 	    }
-	    else
+	    இல்லையெனில்
 		lp->sl_map_array[c] = headc;
 	}
     }

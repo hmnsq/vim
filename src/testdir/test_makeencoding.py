@@ -3,10 +3,10 @@
 
 # Test program for :make, :grep and :cgetfile.
 
-from __future__ import print_function, unicode_literals
-import locale
-import io
-import sys
+தஃ __future__ இறக்குமதி print_function, unicode_literals
+இறக்குமதி locale
+இறக்குமதி io
+இறக்குமதி sys
 
 def set_output_encoding(enc=None):
     """Set the encoding of stdout and stderr
@@ -15,41 +15,41 @@ def set_output_encoding(enc=None):
       enc -- Encoding name.
              If omitted, locale.getpreferredencoding() is used.
     """
-    if enc is None:
+    எனில் enc is None:
         enc = locale.getpreferredencoding()
 
     def get_text_writer(fo, **kwargs):
         kw = dict(kwargs)
         kw.setdefault('errors', 'backslashreplace') # use \uXXXX style
-        kw.setdefault('closefd', False)
+        kw.setdefault('closefd', பொய்)
 
-        if sys.version_info[0] < 3:
+        எனில் sys.version_info[0] < 3:
             # Work around for Python 2.x
             # New line conversion isn't needed here. Done in somewhere else.
             writer = io.open(fo.fileno(), mode='w', newline='', **kw)
-            write = writer.write    # save the original write() function
+            லிக = writer.லிக    # save the original write() function
             enc = locale.getpreferredencoding()
             def convwrite(s):
-                if isinstance(s, bytes):
-                    write(s.decode(enc))    # convert to unistr
-                else:
-                    write(s)
-                try:
+                எனில் isinstance(s, bytes):
+                    லிக(s.decode(enc))    # convert to unistr
+                இல்லையெனில்:
+                    லிக(s)
+                முயல்:
                     writer.flush()  # needed on Windows
-                except IOError:
+                விதிவிலக்கு IOError:
                     pass
-            writer.write = convwrite
-        else:
+            writer.லிக = convwrite
+        இல்லையெனில்:
             writer = io.open(fo.fileno(), mode='w', **kw)
-        return writer
+        திரும்பு writer
 
     sys.stdout = get_text_writer(sys.stdout, encoding=enc)
     sys.stderr = get_text_writer(sys.stderr, encoding=enc)
 
 
-def main():
+def முதன்மை():
     enc = 'utf-8'
-    if len(sys.argv) > 1:
+    எனில் len(sys.argv) > 1:
         enc = sys.argv[1]
     set_output_encoding(enc)
 
@@ -63,5 +63,5 @@ def main():
     print('Xfoobar.c(10) : %s (%s)' % (message_tbl[enc], enc))
 
 
-if __name__ == "__main__":
-    main()
+எனில் __name__ == "__main__":
+    முதன்மை()

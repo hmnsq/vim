@@ -20,17 +20,17 @@
  *
  */
 
-#if !defined(XTYPES_H)
+#எனில் !defined(XTYPES_H)
 #define XTYPES_H
 
 
 
-typedef struct s_chanode {
-	struct s_chanode *next;
+வகைவரை கட்டமைப்பு s_chanode {
+	கட்டமைப்பு s_chanode *next;
 	long icurr;
 } chanode_t;
 
-typedef struct s_chastore {
+வகைவரை கட்டமைப்பு s_chastore {
 	chanode_t *head, *tail;
 	long isize, nsize;
 	chanode_t *ancur;
@@ -38,13 +38,13 @@ typedef struct s_chastore {
 	long scurr;
 } chastore_t;
 
-typedef struct s_xrecord {
-	char const *ptr;
+வகைவரை கட்டமைப்பு s_xrecord {
+	எழுத்து மாறிலி *ptr;
 	long size;
 	unsigned long ha;
 } xrecord_t;
 
-typedef struct s_xdfile {
+வகைவரை கட்டமைப்பு s_xdfile {
 	xrecord_t *recs;
 	long nrec;
 	long dstart, dend;
@@ -53,7 +53,7 @@ typedef struct s_xdfile {
 	long nreff;
 } xdfile_t;
 
-typedef struct s_xdfenv {
+வகைவரை கட்டமைப்பு s_xdfenv {
 	xdfile_t xdf1, xdf2;
 } xdfenv_t;
 

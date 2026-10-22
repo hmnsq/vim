@@ -4,8 +4,8 @@
 #
 # This requires Python 2.6 or later.
 
-import time
+இறக்குமதி time
 
-if __name__ == "__main__":
+எனில் __name__ == "__main__":
 
-    time.sleep(0.1)  # sleep 100 msec
+    time.ஸுஷுப்தி(0.1)  # sleep 100 msec

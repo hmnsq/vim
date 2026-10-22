@@ -31,7 +31,7 @@
 # ifdef FEAT_GUI
 #  define NV_VER_SCROLLBAR	nv_ver_scrollbar
 #  define NV_HOR_SCROLLBAR	nv_hor_scrollbar
-# else
+# இல்லையெனில்
 #  define NV_VER_SCROLLBAR nv_error
 #  define NV_HOR_SCROLLBAR nv_error
 # endif
@@ -39,20 +39,20 @@
 # ifdef FEAT_GUI_TABLINE
 #  define NV_TABLINE	nv_tabline
 #  define NV_TABMENU	nv_tabmenu
-# else
+# இல்லையெனில்
 #  define NV_TABLINE	nv_error
 #  define NV_TABMENU	nv_error
 # endif
 
 # ifdef FEAT_NETBEANS_INTG
 #  define NV_NBCMD	nv_nbcmd
-# else
+# இல்லையெனில்
 #  define NV_NBCMD	nv_error
 # endif
 
 # ifdef FEAT_DND
 #  define NV_DROP		nv_drop
-# else
+# இல்லையெனில்
 #  define NV_DROP		nv_error
 # endif
 
@@ -60,7 +60,7 @@
  * Function to be called for a Normal or Visual mode command.
  * The argument is a cmdarg_T.
  */
-typedef void (*nv_func_T)(cmdarg_T *cap);
+வகைவரை வெறுமை (*nv_func_T)(cmdarg_T *cap);
 
 // Values for cmd_flags.
 # define NV_NCH	    0x01	  // may need to get a second char
@@ -91,21 +91,21 @@ typedef void (*nv_func_T)(cmdarg_T *cap);
  * script to generate the nv_cmd_idx[] lookup table.
  * It is faster when all keys from zero to '~' are present.
  */
-static const struct nv_cmd
+நிலையான மாறிலி கட்டமைப்பு nv_cmd
 {
-    int		cmd_char;	// (first) command character
+    முழு		cmd_char;	// (first) command character
     nv_func_T   cmd_func;	// function for this command
     short_u	cmd_flags;	// NV_ flags
     short	cmd_arg;	// value for ca.arg
 } nv_cmds[] =
 
-#else  // DO_DECLARE_NVCMD
+#இல்லையெனில்  // DO_DECLARE_NVCMD
 
 /*
  * Used when creating nv_cmdidxs.h.
  */
 # define NVCMD(a, b, c, d)  a
-static const int nv_cmds[] =
+நிலையான மாறிலி முழு nv_cmds[] =
 
 #endif // DO_DECLARE_NVCMD
 {
@@ -114,7 +114,7 @@ static const int nv_cmds[] =
     NVCMD(Ctrl_B,	nv_page,	NV_STS,			BACKWARD),
     NVCMD(Ctrl_C,	nv_esc,		0,			TRUE),
     NVCMD(Ctrl_D,	nv_halfpage,	0,			0),
-    NVCMD(Ctrl_E,	nv_scroll_line,	0,			TRUE),
+    NVCMD(Ctrl_E,	nv_scroll_வரி,	0,			TRUE),
     NVCMD(Ctrl_F,	nv_page,	NV_STS,			FORWARD),
     NVCMD(Ctrl_G,	nv_ctrlg,	0,			0),
     NVCMD(Ctrl_H,	nv_ctrlh,	0,			0),
@@ -134,14 +134,14 @@ static const int nv_cmds[] =
     NVCMD(Ctrl_V,	nv_visual,	0,			FALSE),
     NVCMD(Ctrl_W,	nv_window,	0,			0),
     NVCMD(Ctrl_X,	nv_addsub,	0,			0),
-    NVCMD(Ctrl_Y,	nv_scroll_line,	0,			FALSE),
+    NVCMD(Ctrl_Y,	nv_scroll_வரி,	0,			FALSE),
     NVCMD(Ctrl_Z,	nv_suspend,	0,			0),
     NVCMD(ESC,		nv_esc,		0,			FALSE),
     NVCMD(Ctrl_BSL,	nv_normal,	NV_NCH_ALW,		0),
     NVCMD(Ctrl_RSB,	nv_ident,	NV_NCW,			0),
     NVCMD(Ctrl_HAT,	nv_hat,		NV_NCW,			0),
     NVCMD(Ctrl__,	nv_error,	0,			0),
-    NVCMD(' ',		nv_right,	0,			0),
+    NVCMD(' ',		nv_வலது,	0,			0),
     NVCMD('!',		nv_operator,	0,			0),
     NVCMD('"',		nv_regname,	NV_NCH_NOP|NV_KEEPREG,	0),
     NVCMD('#',		nv_ident,	0,			0),
@@ -156,7 +156,7 @@ static const int nv_cmds[] =
     NVCMD(',',		nv_csearch,	0,			TRUE),
     NVCMD('-',		nv_up,		0,			TRUE),
     NVCMD('.',		nv_dot,		NV_KEEPREG,		0),
-    NVCMD('/',		nv_search,	0,			FALSE),
+    NVCMD('/',		nv_தேடல்,	0,			FALSE),
     NVCMD('0',		nv_beginline,	0,			0),
     NVCMD('1',		nv_ignore,	0,			0),
     NVCMD('2',		nv_ignore,	0,			0),
@@ -172,7 +172,7 @@ static const int nv_cmds[] =
     NVCMD('<',		nv_operator,	NV_RL,			0),
     NVCMD('=',		nv_operator,	0,			0),
     NVCMD('>',		nv_operator,	NV_RL,			0),
-    NVCMD('?',		nv_search,	0,			FALSE),
+    NVCMD('?',		nv_தேடல்,	0,			FALSE),
     NVCMD('@',		nv_at,		NV_NCH_NOP,		FALSE),
     NVCMD('A',		nv_edit,	0,			0),
     NVCMD('B',		nv_bck_word,	0,			1),
@@ -187,7 +187,7 @@ static const int nv_cmds[] =
     NVCMD('K',		nv_ident,	0,			0),
     NVCMD('L',		nv_scroll,	0,			0),
     NVCMD('M',		nv_scroll,	0,			0),
-    NVCMD('N',		nv_next,	0,			SEARCH_REV),
+    NVCMD('N',		nv_next,	0,			தேடல்_REV),
     NVCMD('O',		nv_open,	0,			0),
     NVCMD('P',		nv_put,		0,			0),
     NVCMD('Q',		nv_exmode,	NV_NCW,			0),
@@ -213,11 +213,11 @@ static const int nv_cmds[] =
     NVCMD('e',		nv_wordcmd,	0,			FALSE),
     NVCMD('f',		nv_csearch,	NV_NCH_ALW|NV_LANG,	FORWARD),
     NVCMD('g',		nv_g_cmd,	NV_NCH_ALW,		FALSE),
-    NVCMD('h',		nv_left,	NV_RL,			0),
+    NVCMD('h',		nv_இடது,	NV_RL,			0),
     NVCMD('i',		nv_edit,	NV_NCH,			0),
     NVCMD('j',		nv_down,	0,			FALSE),
     NVCMD('k',		nv_up,		0,			FALSE),
-    NVCMD('l',		nv_right,	NV_RL,			0),
+    NVCMD('l',		nv_வலது,	NV_RL,			0),
     NVCMD('m',		nv_mark,	NV_NCH_NOP,		0),
     NVCMD('n',		nv_next,	0,			0),
     NVCMD('o',		nv_open,	0,			0),
@@ -241,8 +241,8 @@ static const int nv_cmds[] =
     NVCMD(POUND,	nv_ident,	0,			0),
     NVCMD(K_MOUSEUP,	nv_mousescroll,	0,			MSCR_UP),
     NVCMD(K_MOUSEDOWN,	nv_mousescroll, 0,			MSCR_DOWN),
-    NVCMD(K_MOUSELEFT,	nv_mousescroll, 0,			MSCR_LEFT),
-    NVCMD(K_MOUSERIGHT, nv_mousescroll, 0,			MSCR_RIGHT),
+    NVCMD(K_MOUSELEFT,	nv_mousescroll, 0,			MSCR_இடது),
+    NVCMD(K_MOUSERIGHT, nv_mousescroll, 0,			MSCR_வலது),
     NVCMD(K_LEFTMOUSE,	nv_mouse,	0,			0),
     NVCMD(K_LEFTMOUSE_NM, nv_mouse,	0,			0),
     NVCMD(K_LEFTDRAG,	nv_mouse,	0,			0),
@@ -270,12 +270,12 @@ static const int nv_cmds[] =
     NVCMD(K_S_UP,	nv_page,	NV_SS,			BACKWARD),
     NVCMD(K_DOWN,	nv_down,	NV_SSS|NV_STS,		FALSE),
     NVCMD(K_S_DOWN,	nv_page,	NV_SS,			FORWARD),
-    NVCMD(K_LEFT,	nv_left,	NV_SSS|NV_STS|NV_RL,	0),
-    NVCMD(K_S_LEFT,	nv_bck_word,	NV_SS|NV_RL,		0),
-    NVCMD(K_C_LEFT,	nv_bck_word,	NV_SSS|NV_RL|NV_STS,	1),
-    NVCMD(K_RIGHT,	nv_right,	NV_SSS|NV_STS|NV_RL,	0),
-    NVCMD(K_S_RIGHT,	nv_wordcmd,	NV_SS|NV_RL,		FALSE),
-    NVCMD(K_C_RIGHT,	nv_wordcmd,	NV_SSS|NV_RL|NV_STS,	TRUE),
+    NVCMD(K_இடது,	nv_இடது,	NV_SSS|NV_STS|NV_RL,	0),
+    NVCMD(K_S_இடது,	nv_bck_word,	NV_SS|NV_RL,		0),
+    NVCMD(K_C_இடது,	nv_bck_word,	NV_SSS|NV_RL|NV_STS,	1),
+    NVCMD(K_வலது,	nv_வலது,	NV_SSS|NV_STS|NV_RL,	0),
+    NVCMD(K_S_வலது,	nv_wordcmd,	NV_SS|NV_RL,		FALSE),
+    NVCMD(K_C_வலது,	nv_wordcmd,	NV_SSS|NV_RL|NV_STS,	TRUE),
     NVCMD(K_PAGEUP,	nv_page,	NV_SSS|NV_STS,		BACKWARD),
     NVCMD(K_KPAGEUP,	nv_page,	NV_SSS|NV_STS,		BACKWARD),
     NVCMD(K_PAGEDOWN,	nv_page,	NV_SSS|NV_STS,		FORWARD),

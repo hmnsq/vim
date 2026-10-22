@@ -1,83 +1,83 @@
-#include "vterm_internal.h"
+#அந்தர்பாவ "vterm_internal.h"
 
-#include <stdio.h>
+#அந்தர்பாவ <stdio.h>
 
-#include "utf8.h"
+#அந்தர்பாவ "utf8.h"
 
 // VIM: added
-int vterm_is_modify_other_keys(VTerm *vt)
+முழு vterm_is_modify_other_சாவிகள்(VTerm *vt)
 {
-  return vt->state->mode.modify_other_keys;
+  திரும்பு vt->state->mode.modify_other_சாவிகள்;
 }
 
 // VIM: added
-int vterm_is_kitty_keyboard(VTerm *vt)
+முழு vterm_is_kitty_keyboard(VTerm *vt)
 {
-  return vt->state->mode.kitty_keyboard;
+  திரும்பு vt->state->mode.kitty_keyboard;
 }
 
 
-void vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod)
+வெறுமை vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod)
 {
   // VIM: added modifyOtherKeys support
-  if (vterm_is_modify_other_keys(vt) && mod != 0) {
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, c);
-    return;
+  எனில் (vterm_is_modify_other_சாவிகள்(vt) && mod != 0) {
+    vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, c);
+    திரும்பு;
   }
 
   // VIM: added kitty keyboard protocol support
-  if (vterm_is_kitty_keyboard(vt) && mod != 0) {
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
-    return;
+  எனில் (vterm_is_kitty_keyboard(vt) && mod != 0) {
+    vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
+    திரும்பு;
   }
 
   /* The shift modifier is never important for Unicode characters
    * apart from Space
    */
-  if(c != ' ')
+  எனில்(c != ' ')
     mod &= ~VTERM_MOD_SHIFT;
 
-  if(mod == 0) {
+  எனில்(mod == 0) {
     // Normal text - ignore just shift
-    char str[6];
-    int seqlen = fill_utf8(c, str);
-    vterm_push_output_bytes(vt, str, seqlen);
-    return;
+    எழுத்து str[6];
+    முழு seqlen = fill_utf8(c, str);
+    vterm_தள்ளு_output_bytes(vt, str, seqlen);
+    திரும்பு;
   }
 
-  int needs_CSIu;
-  switch(c) {
+  முழு needs_CSIu;
+  தேர்வு(c) {
     /* Special Ctrl- letters that can't be represented elsewise */
-    case 'i': case 'j': case 'm': case '[':
+    நிலை 'i': நிலை 'j': நிலை 'm': நிலை '[':
       needs_CSIu = 1;
-      break;
+      நிறுத்து;
     /* Ctrl-\ ] ^ _ don't need CSUu */
-    case '\\': case ']': case '^': case '_':
+    நிலை '\\': நிலை ']': நிலை '^': நிலை '_':
       needs_CSIu = 0;
-      break;
+      நிறுத்து;
     /* Shift-space needs CSIu */
-    case ' ':
+    நிலை ' ':
       needs_CSIu = !!(mod & VTERM_MOD_SHIFT);
-      break;
+      நிறுத்து;
     /* All other characters needs CSIu except for letters a-z */
-    default:
+    இயல்பு:
       needs_CSIu = (c < 'a' || c > 'z');
   }
 
   /* ALT we can just prefix with ESC; anything else requires CSI u */
-  if(needs_CSIu && (mod & ~VTERM_MOD_ALT)) {
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
-    return;
+  எனில்(needs_CSIu && (mod & ~VTERM_MOD_ALT)) {
+    vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", c, mod+1);
+    திரும்பு;
   }
 
-  if(mod & VTERM_MOD_CTRL)
+  எனில்(mod & VTERM_MOD_CTRL)
     c &= 0x1f;
 
-  vterm_push_output_sprintf(vt, "%s%c", mod & VTERM_MOD_ALT ? ESC_S : "", c);
+  vterm_தள்ளு_output_sprintf(vt, "%s%c", mod & VTERM_MOD_ALT ? ESC_S : "", c);
 }
 
-typedef struct {
-  enum {
+வகைவரை கட்டமைப்பு {
+  எண்ணிக்கை {
     KEYCODE_NONE,
     KEYCODE_LITERAL,
     KEYCODE_TAB,
@@ -88,12 +88,12 @@ typedef struct {
     KEYCODE_CSINUM,
     KEYCODE_KEYPAD,
   } type;
-  char literal;
-  int csinum;
+  எழுத்து literal;
+  முழு csinum;
 } keycodes_s;
 
 // Order here must be exactly the same as VTermKey enum!
-static keycodes_s keycodes[] = {
+நிலையான keycodes_s keycodes[] = {
   { KEYCODE_NONE,       0, 0 }, // NONE
 
   { KEYCODE_ENTER,      '\r', 0 }, // ENTER
@@ -114,7 +114,7 @@ static keycodes_s keycodes[] = {
   { KEYCODE_CSINUM, '~', 6 },  // PAGEDOWN
 };
 
-static keycodes_s keycodes_fn[] = {
+நிலையான keycodes_s keycodes_fn[] = {
   { KEYCODE_NONE,       0, 0 },   // F0 - shouldn't happen
   { KEYCODE_SS3,	'P', 0 }, // F1
   { KEYCODE_SS3,	'Q', 0 }, // F2
@@ -130,7 +130,7 @@ static keycodes_s keycodes_fn[] = {
   { KEYCODE_CSINUM, '~', 24 }, // F12
 };
 
-static keycodes_s keycodes_kp[] = {
+நிலையான keycodes_s keycodes_kp[] = {
   { KEYCODE_KEYPAD, '0', 'p' }, // KP_0
   { KEYCODE_KEYPAD, '1', 'q' }, // KP_1
   { KEYCODE_KEYPAD, '2', 'r' }, // KP_2
@@ -151,109 +151,109 @@ static keycodes_s keycodes_kp[] = {
   { KEYCODE_KEYPAD, '=', 'X' }, // KP_EQUAL
 };
 
-void vterm_keyboard_key(VTerm *vt, VTermKey key, VTermModifier mod)
+வெறுமை vterm_keyboard_சாவி(VTerm *vt, VTerm_சாவி சாவி, VTermModifier mod)
 {
-  if(key == VTERM_KEY_NONE)
-    return;
+  எனில்(சாவி == VTERM_சாவி_NONE)
+    திரும்பு;
 
   keycodes_s k;
-  if(key < VTERM_KEY_FUNCTION_0) {
-    if(key >= sizeof(keycodes)/sizeof(keycodes[0]))
-      return;
-    k = keycodes[key];
+  எனில்(சாவி < VTERM_சாவி_FUNCTION_0) {
+    எனில்(சாவி >= அளவு(keycodes)/அளவு(keycodes[0]))
+      திரும்பு;
+    k = keycodes[சாவி];
   }
-  else if(key >= VTERM_KEY_FUNCTION_0 && key <= VTERM_KEY_FUNCTION_MAX) {
-    if((key - VTERM_KEY_FUNCTION_0) >= sizeof(keycodes_fn)/sizeof(keycodes_fn[0]))
-      return;
-    k = keycodes_fn[key - VTERM_KEY_FUNCTION_0];
+  இல்லையெனில் எனில்(சாவி >= VTERM_சாவி_FUNCTION_0 && சாவி <= VTERM_சாவி_FUNCTION_MAX) {
+    எனில்((சாவி - VTERM_சாவி_FUNCTION_0) >= அளவு(keycodes_fn)/அளவு(keycodes_fn[0]))
+      திரும்பு;
+    k = keycodes_fn[சாவி - VTERM_சாவி_FUNCTION_0];
   }
-  else if(key >= VTERM_KEY_KP_0) {
-    if((key - VTERM_KEY_KP_0) >= sizeof(keycodes_kp)/sizeof(keycodes_kp[0]))
-      return;
-    k = keycodes_kp[key - VTERM_KEY_KP_0];
+  இல்லையெனில் எனில்(சாவி >= VTERM_சாவி_KP_0) {
+    எனில்((சாவி - VTERM_சாவி_KP_0) >= அளவு(keycodes_kp)/அளவு(keycodes_kp[0]))
+      திரும்பு;
+    k = keycodes_kp[சாவி - VTERM_சாவி_KP_0];
   }
 
-  switch(k.type) {
-  case KEYCODE_NONE:
-    break;
+  தேர்வு(k.type) {
+  நிலை KEYCODE_NONE:
+    நிறுத்து;
 
-  case KEYCODE_TAB:
-    if (vterm_is_kitty_keyboard(vt) && mod != 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "9;%du", mod+1);
+  நிலை KEYCODE_TAB:
+    எனில் (vterm_is_kitty_keyboard(vt) && mod != 0)
+      vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "9;%du", mod+1);
     /* Shift-Tab is CSI Z but plain Tab is 0x09 */
-    else if(mod == VTERM_MOD_SHIFT)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "Z");
-    else if(mod & VTERM_MOD_SHIFT)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "1;%dZ", mod+1);
-    else
-      goto case_LITERAL;
-    break;
+    இல்லையெனில் எனில்(mod == VTERM_MOD_SHIFT)
+      vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "Z");
+    இல்லையெனில் எனில்(mod & VTERM_MOD_SHIFT)
+      vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "1;%dZ", mod+1);
+    இல்லையெனில்
+      செல் case_LITERAL;
+    நிறுத்து;
 
-  case KEYCODE_ENTER:
+  நிலை KEYCODE_ENTER:
     /* Enter is CRLF in newline mode, but just LF in linefeed */
-    if(vt->state->mode.newline)
-      vterm_push_output_sprintf(vt, "\r\n");
-    else
-      goto case_LITERAL;
-    break;
+    எனில்(vt->state->mode.newline)
+      vterm_தள்ளு_output_sprintf(vt, "\r\n");
+    இல்லையெனில்
+      செல் case_LITERAL;
+    நிறுத்து;
 
-  case KEYCODE_LITERAL: case_LITERAL:
-    if (vterm_is_modify_other_keys(vt) && mod != 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, k.literal);
-    else if (vterm_is_kitty_keyboard(vt) && mod == 0 && k.literal == '\x1b')
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%du", k.literal);
-    else if ((vterm_is_kitty_keyboard(vt) && mod != 0)
+  நிலை KEYCODE_LITERAL: case_LITERAL:
+    எனில் (vterm_is_modify_other_சாவிகள்(vt) && mod != 0)
+      vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "27;%d;%d~", mod+1, k.literal);
+    இல்லையெனில் எனில் (vterm_is_kitty_keyboard(vt) && mod == 0 && k.literal == '\x1b')
+      vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "%du", k.literal);
+    இல்லையெனில் எனில் ((vterm_is_kitty_keyboard(vt) && mod != 0)
 	|| (mod & (VTERM_MOD_SHIFT|VTERM_MOD_CTRL)))
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", k.literal, mod+1);
-    else
-      vterm_push_output_sprintf(vt, mod & VTERM_MOD_ALT ? ESC_S "%c" : "%c", k.literal);
-    break;
+      vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "%d;%du", k.literal, mod+1);
+    இல்லையெனில்
+      vterm_தள்ளு_output_sprintf(vt, mod & VTERM_MOD_ALT ? ESC_S "%c" : "%c", k.literal);
+    நிறுத்து;
 
-  case KEYCODE_SS3: case_SS3:
-    if(mod == 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_SS3, "%c", k.literal);
-    else
-      goto case_CSI;
-    break;
+  நிலை KEYCODE_SS3: case_SS3:
+    எனில்(mod == 0)
+      vterm_தள்ளு_output_sprintf_ctrl(vt, C1_SS3, "%c", k.literal);
+    இல்லையெனில்
+      செல் case_CSI;
+    நிறுத்து;
 
-  case KEYCODE_CSI: case_CSI:
-    if(mod == 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%c", k.literal);
-    else
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "1;%d%c", mod + 1, k.literal);
-    break;
+  நிலை KEYCODE_CSI: case_CSI:
+    எனில்(mod == 0)
+      vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "%c", k.literal);
+    இல்லையெனில்
+      vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "1;%d%c", mod + 1, k.literal);
+    நிறுத்து;
 
-  case KEYCODE_CSINUM:
-    if(mod == 0)
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d%c", k.csinum, k.literal);
-    else
-      vterm_push_output_sprintf_ctrl(vt, C1_CSI, "%d;%d%c", k.csinum, mod + 1, k.literal);
-    break;
+  நிலை KEYCODE_CSINUM:
+    எனில்(mod == 0)
+      vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "%d%c", k.csinum, k.literal);
+    இல்லையெனில்
+      vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "%d;%d%c", k.csinum, mod + 1, k.literal);
+    நிறுத்து;
 
-  case KEYCODE_CSI_CURSOR:
-    if(vt->state->mode.cursor)
-      goto case_SS3;
-    else
-      goto case_CSI;
+  நிலை KEYCODE_CSI_CURSOR:
+    எனில்(vt->state->mode.cursor)
+      செல் case_SS3;
+    இல்லையெனில்
+      செல் case_CSI;
 
-  case KEYCODE_KEYPAD:
-    if(vt->state->mode.keypad) {
+  நிலை KEYCODE_KEYPAD:
+    எனில்(vt->state->mode.keypad) {
       k.literal = k.csinum;
-      goto case_SS3;
+      செல் case_SS3;
     }
-    else
-      goto case_LITERAL;
+    இல்லையெனில்
+      செல் case_LITERAL;
   }
 }
 
-void vterm_keyboard_start_paste(VTerm *vt)
+வெறுமை vterm_keyboard_start_paste(VTerm *vt)
 {
-  if(vt->state->mode.bracketpaste)
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "200~");
+  எனில்(vt->state->mode.bracketpaste)
+    vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "200~");
 }
 
-void vterm_keyboard_end_paste(VTerm *vt)
+வெறுமை vterm_keyboard_end_paste(VTerm *vt)
 {
-  if(vt->state->mode.bracketpaste)
-    vterm_push_output_sprintf_ctrl(vt, C1_CSI, "201~");
+  எனில்(vt->state->mode.bracketpaste)
+    vterm_தள்ளு_output_sprintf_ctrl(vt, C1_CSI, "201~");
 }

@@ -1,57 +1,57 @@
-#include "vterm_internal.h"
+#அந்தர்பாவ "vterm_internal.h"
 
 #define UNICODE_INVALID 0xFFFD
 
-#if defined(DEBUG) && DEBUG > 1
+#எனில் defined(DEBUG) && DEBUG > 1
 # define DEBUG_PRINT_UTF8
 #endif
 
-struct UTF8DecoderData {
+கட்டமைப்பு UTF8DecoderData {
   // number of bytes remaining in this codepoint
-  int bytes_remaining;
+  முழு bytes_remaining;
 
   // number of bytes total in this codepoint once it's finished
   // (for detecting overlongs)
-  int bytes_total;
+  முழு bytes_total;
 
-  int this_cp;
+  முழு this_cp;
 };
 
-static void init_utf8(VTermEncoding *enc UNUSED, void *data_)
+நிலையான வெறுமை init_utf8(VTermEncoding *enc UNUSED, வெறுமை *data_)
 {
-  struct UTF8DecoderData *data = data_;
+  கட்டமைப்பு UTF8DecoderData *data = data_;
 
   data->bytes_remaining = 0;
   data->bytes_total     = 0;
 }
 
-static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
-                        uint32_t cp[], int *cpi, int cplen,
-                        const char bytes[], size_t *pos, size_t bytelen)
+நிலையான வெறுமை decode_utf8(VTermEncoding *enc UNUSED, வெறுமை *data_,
+                        uint32_t cp[], முழு *cpi, முழு cplen,
+                        மாறிலி எழுத்து bytes[], size_t *pos, size_t bytelen)
 {
-  struct UTF8DecoderData *data = data_;
+  கட்டமைப்பு UTF8DecoderData *data = data_;
 
 #ifdef DEBUG_PRINT_UTF8
   printf("BEGIN UTF-8\n");
 #endif
 
-  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos];
+  க்கு(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    unsigned எழுத்து c = bytes[*pos];
 
 #ifdef DEBUG_PRINT_UTF8
     printf(" pos=%zd c=%02x rem=%d\n", *pos, c, data->bytes_remaining);
 #endif
 
-    if(c < 0x20) // C0
-      return;
+    எனில்(c < 0x20) // C0
+      திரும்பு;
 
-    else if(c >= 0x20 && c < 0x7f) {
-      if(data->bytes_remaining) {
+    இல்லையெனில் எனில்(c >= 0x20 && c < 0x7f) {
+      எனில்(data->bytes_remaining) {
         data->bytes_remaining = 0;
         cp[(*cpi)++] = UNICODE_INVALID;
 	// VIM: avoid going over the end
-	if (*cpi >= cplen)
-	  break;
+	எனில் (*cpi >= cplen)
+	  நிறுத்து;
       }
       cp[(*cpi)++] = c;
 #ifdef DEBUG_PRINT_UTF8
@@ -59,43 +59,43 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
 #endif
     }
 
-    else if(c == 0x7f) // DEL
-      return;
+    இல்லையெனில் எனில்(c == 0x7f) // DEL
+      திரும்பு;
 
-    else if(c >= 0x80 && c < 0xc0) {
-      if(!data->bytes_remaining) {
+    இல்லையெனில் எனில்(c >= 0x80 && c < 0xc0) {
+      எனில்(!data->bytes_remaining) {
         cp[(*cpi)++] = UNICODE_INVALID;
-        continue;
+        தொடர்;
       }
 
       data->this_cp <<= 6;
       data->this_cp |= c & 0x3f;
       data->bytes_remaining--;
 
-      if(!data->bytes_remaining) {
+      எனில்(!data->bytes_remaining) {
 #ifdef DEBUG_PRINT_UTF8
         printf(" UTF-8 raw char U+%04x bytelen=%d ", data->this_cp, data->bytes_total);
 #endif
         // Check for overlong sequences
-        switch(data->bytes_total) {
-        case 2:
-          if(data->this_cp <  0x0080) data->this_cp = UNICODE_INVALID;
-          break;
-        case 3:
-          if(data->this_cp <  0x0800) data->this_cp = UNICODE_INVALID;
-          break;
-        case 4:
-          if(data->this_cp < 0x10000) data->this_cp = UNICODE_INVALID;
-          break;
-        case 5:
-          if(data->this_cp < 0x200000) data->this_cp = UNICODE_INVALID;
-          break;
-        case 6:
-          if(data->this_cp < 0x4000000) data->this_cp = UNICODE_INVALID;
-          break;
+        தேர்வு(data->bytes_total) {
+        நிலை 2:
+          எனில்(data->this_cp <  0x0080) data->this_cp = UNICODE_INVALID;
+          நிறுத்து;
+        நிலை 3:
+          எனில்(data->this_cp <  0x0800) data->this_cp = UNICODE_INVALID;
+          நிறுத்து;
+        நிலை 4:
+          எனில்(data->this_cp < 0x10000) data->this_cp = UNICODE_INVALID;
+          நிறுத்து;
+        நிலை 5:
+          எனில்(data->this_cp < 0x200000) data->this_cp = UNICODE_INVALID;
+          நிறுத்து;
+        நிலை 6:
+          எனில்(data->this_cp < 0x4000000) data->this_cp = UNICODE_INVALID;
+          நிறுத்து;
         }
         // Now look for plain invalid ones
-        if((data->this_cp >= 0xD800 && data->this_cp <= 0xDFFF) ||
+        எனில்((data->this_cp >= 0xD800 && data->this_cp <= 0xDFFF) ||
            data->this_cp == 0xFFFE ||
            data->this_cp == 0xFFFF)
           data->this_cp = UNICODE_INVALID;
@@ -106,8 +106,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       }
     }
 
-    else if(c >= 0xc0 && c < 0xe0) {
-      if(data->bytes_remaining)
+    இல்லையெனில் எனில்(c >= 0xc0 && c < 0xe0) {
+      எனில்(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x1f;
@@ -115,8 +115,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 1;
     }
 
-    else if(c >= 0xe0 && c < 0xf0) {
-      if(data->bytes_remaining)
+    இல்லையெனில் எனில்(c >= 0xe0 && c < 0xf0) {
+      எனில்(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x0f;
@@ -124,8 +124,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 2;
     }
 
-    else if(c >= 0xf0 && c < 0xf8) {
-      if(data->bytes_remaining)
+    இல்லையெனில் எனில்(c >= 0xf0 && c < 0xf8) {
+      எனில்(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x07;
@@ -133,8 +133,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 3;
     }
 
-    else if(c >= 0xf8 && c < 0xfc) {
-      if(data->bytes_remaining)
+    இல்லையெனில் எனில்(c >= 0xf8 && c < 0xfc) {
+      எனில்(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x03;
@@ -142,8 +142,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 4;
     }
 
-    else if(c >= 0xfc && c < 0xfe) {
-      if(data->bytes_remaining)
+    இல்லையெனில் எனில்(c >= 0xfc && c < 0xfe) {
+      எனில்(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x01;
@@ -151,69 +151,69 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 5;
     }
 
-    else {
+    இல்லையெனில் {
       cp[(*cpi)++] = UNICODE_INVALID;
     }
   }
 }
 
-static VTermEncoding encoding_utf8 = {
+நிலையான VTermEncoding encoding_utf8 = {
   &init_utf8,  // init
   &decode_utf8 // decode
 };
 
-static void decode_usascii(VTermEncoding *enc UNUSED, void *data UNUSED,
-                           uint32_t cp[], int *cpi, int cplen,
-                           const char bytes[], size_t *pos, size_t bytelen)
+நிலையான வெறுமை decode_usascii(VTermEncoding *enc UNUSED, வெறுமை *data UNUSED,
+                           uint32_t cp[], முழு *cpi, முழு cplen,
+                           மாறிலி எழுத்து bytes[], size_t *pos, size_t bytelen)
 {
-  int is_gr = bytes[*pos] & 0x80;
+  முழு is_gr = bytes[*pos] & 0x80;
 
-  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos] ^ is_gr;
+  க்கு(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    unsigned எழுத்து c = bytes[*pos] ^ is_gr;
 
-    if(c < 0x20 || c == 0x7f || c >= 0x80)
-      return;
+    எனில்(c < 0x20 || c == 0x7f || c >= 0x80)
+      திரும்பு;
 
     cp[(*cpi)++] = c;
   }
 }
 
-static VTermEncoding encoding_usascii = {
-  NULL,           // init
+நிலையான VTermEncoding encoding_usascii = {
+  வெற்று,           // init
   &decode_usascii // decode
 };
 
-struct StaticTableEncoding {
-  const VTermEncoding enc;
-  const uint32_t chars[128];
+கட்டமைப்பு StaticTableEncoding {
+  மாறிலி VTermEncoding enc;
+  மாறிலி uint32_t chars[128];
 };
 
-static void decode_table(VTermEncoding *enc, void *data UNUSED,
-                         uint32_t cp[], int *cpi, int cplen,
-                         const char bytes[], size_t *pos, size_t bytelen)
+நிலையான வெறுமை decode_table(VTermEncoding *enc, வெறுமை *data UNUSED,
+                         uint32_t cp[], முழு *cpi, முழு cplen,
+                         மாறிலி எழுத்து bytes[], size_t *pos, size_t bytelen)
 {
-  struct StaticTableEncoding *table = (struct StaticTableEncoding *)enc;
-  int is_gr = bytes[*pos] & 0x80;
+  கட்டமைப்பு StaticTableEncoding *table = (கட்டமைப்பு StaticTableEncoding *)enc;
+  முழு is_gr = bytes[*pos] & 0x80;
 
-  for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos] ^ is_gr;
+  க்கு(; *pos < bytelen && *cpi < cplen; (*pos)++) {
+    unsigned எழுத்து c = bytes[*pos] ^ is_gr;
 
-    if(c < 0x20 || c == 0x7f || c >= 0x80)
-      return;
+    எனில்(c < 0x20 || c == 0x7f || c >= 0x80)
+      திரும்பு;
 
-    if(table->chars[c])
+    எனில்(table->chars[c])
       cp[(*cpi)++] = table->chars[c];
-    else
+    இல்லையெனில்
       cp[(*cpi)++] = c;
   }
 }
 
-#include "encoding/DECdrawing.inc"
-#include "encoding/uk.inc"
+#அந்தர்பாவ "encoding/DECdrawing.inc"
+#அந்தர்பாவ "encoding/uk.inc"
 
-static struct {
+நிலையான கட்டமைப்பு {
   VTermEncodingType type;
-  char designation;
+  எழுத்து designation;
   VTermEncoding *enc;
 }
 encodings[] = {
@@ -221,14 +221,14 @@ encodings[] = {
   { ENC_SINGLE_94, '0', (VTermEncoding*)&encoding_DECdrawing },
   { ENC_SINGLE_94, 'A', (VTermEncoding*)&encoding_uk },
   { ENC_SINGLE_94, 'B', &encoding_usascii },
-  { 0, 0, NULL },
+  { 0, 0, வெற்று },
 };
 
 /* This ought to be INTERNAL but isn't because it's used by unit testing */
-VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, char designation)
+VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, எழுத்து designation)
 {
-  for(int i = 0; encodings[i].designation; i++)
-    if(encodings[i].type == type && encodings[i].designation == designation)
-      return encodings[i].enc;
-  return NULL;
+  க்கு(முழு i = 0; encodings[i].designation; i++)
+    எனில்(encodings[i].type == type && encodings[i].designation == designation)
+      திரும்பு encodings[i].enc;
+  திரும்பு வெற்று;
 }

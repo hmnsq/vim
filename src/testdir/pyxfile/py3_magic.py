@@ -1,4 +1,4 @@
 # requires python 3.x
 
-import sys
+இறக்குமதி sys
 print(sys.version)

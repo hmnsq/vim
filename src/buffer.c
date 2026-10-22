@@ -25,7 +25,7 @@
  * The current implementation remembers all file names ever used.
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
 
 #ifdef FEAT_EVAL
@@ -33,59 +33,59 @@
 # define MAX_STL_EVAL_DEPTH 100
 #endif
 
-static void	enter_buffer(buf_T *buf);
-static void	buflist_getfpos(void);
-static char_u	*buflist_match(regmatch_T *rmp, buf_T *buf, int ignore_case);
-static char_u	*fname_match(regmatch_T *rmp, char_u *name, int ignore_case);
+நிலையான வெறுமை	enter_buffer(buf_T *buf);
+நிலையான வெறுமை	buflist_getfpos(வெறுமை);
+நிலையான char_u	*buflist_match(regmatch_T *rmp, buf_T *buf, முழு ignore_case);
+நிலையான char_u	*fname_match(regmatch_T *rmp, char_u *name, முழு ignore_case);
 #ifdef UNIX
-static buf_T	*buflist_findname_stat(char_u *ffname, stat_T *st);
-static int	otherfile_buf(buf_T *buf, char_u *ffname, stat_T *stp);
-static int	buf_same_ino(buf_T *buf, stat_T *stp);
-#else
-static int	otherfile_buf(buf_T *buf, char_u *ffname);
+நிலையான buf_T	*buflist_findname_stat(char_u *ffname, stat_T *st);
+நிலையான முழு	otherfile_buf(buf_T *buf, char_u *ffname, stat_T *stp);
+நிலையான முழு	buf_same_ino(buf_T *buf, stat_T *stp);
+#இல்லையெனில்
+நிலையான முழு	otherfile_buf(buf_T *buf, char_u *ffname);
 #endif
-static int	value_changed(char_u *str, char_u **last);
-#if defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
-static int build_stl_str_hl_local(stl_mode_T mode, win_T *wp,
+நிலையான முழு	மதிப்பு_changed(char_u *str, char_u **last);
+#எனில் defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
+நிலையான முழு build_stl_str_hl_local(stl_mode_T mode, win_T *wp,
 		char_u *out, size_t outlen, char_u **fmt_arg,
-		char_u *opt_name, int opt_scope, int fillchar, int maxwidth,
+		char_u *opt_name, முழு opt_scope, முழு fillchar, முழு maxwidth,
 		stl_hlrec_T **hltab, stl_hlrec_T **tabtab,
-		stl_clickrec_T **clicktab, int *lbreaks, int *carry_hl);
+		stl_clickrec_T **clicktab, முழு *lbreaks, முழு *carry_hl);
 #endif
-static int	append_arg_number(win_T *wp, char_u *buf, size_t buflen, int add_file);
-static void	free_buffer(buf_T *);
-static void	free_buffer_stuff(buf_T *buf, int free_options);
-static int	bt_nofileread(buf_T *buf);
-static int	do_buffer_ext(int action, int start, int dir, int count, int flags);
+நிலையான முழு	append_arg_எண்(win_T *wp, char_u *buf, size_t buflen, முழு add_file);
+நிலையான வெறுமை	free_buffer(buf_T *);
+நிலையான வெறுமை	free_buffer_stuff(buf_T *buf, முழு free_options);
+நிலையான முழு	bt_nofileread(buf_T *buf);
+நிலையான முழு	do_buffer_ext(முழு action, முழு start, முழு dir, முழு மொத்தம், முழு flags);
 
 #ifdef UNIX
 # define dev_T dev_t
-#else
+#இல்லையெனில்
 # define dev_T unsigned
 #endif
 
 #define FOR_ALL_BUFS_FROM_LAST(buf) \
-    for ((buf) = lastbuf; (buf) != NULL; (buf) = (buf)->b_prev)
+    க்கு ((buf) = lastbuf; (buf) != வெற்று; (buf) = (buf)->b_prev)
 
-#if defined(FEAT_QUICKFIX)
-static char *msg_loclist = N_("[Location List]");
-static char *msg_qflist = N_("[Quickfix List]");
+#எனில் defined(FEAT_QUICKFIX)
+நிலையான எழுத்து *செய்தி_loclist = N_("[Location List]");
+நிலையான எழுத்து *செய்தி_qflist = N_("[Quickfix List]");
 #endif
 
 // Number of times free_buffer() was called.
-static int	buf_free_count = 0;
+நிலையான முழு	buf_free_மொத்தம் = 0;
 
-static int	top_file_num = 1;	// highest file number
-static garray_T buf_reuse = GA_EMPTY;	// file numbers to recycle
+நிலையான முழு	உச்சி_file_இலக்கம் = 1;	// highest file number
+நிலையான garray_T buf_reuse = GA_EMPTY;	// file numbers to recycle
 
-    static void
+    நிலையான வெறுமை
 trigger_undo_ftplugin(buf_T *buf, win_T *win)
 {
     window_layout_lock();
     ++buf->b_locked;
     ++win->w_locked;
     // b:undo_ftplugin may be set, undo it
-    do_cmdline_cmd((char_u*)"if exists('b:undo_ftplugin') | :legacy :exe \
+    do_cmdline_cmd((char_u*)"எனில் exists('b:undo_ftplugin') | :legacy :exe \
 	    b:undo_ftplugin | endif");
     --buf->b_locked;
     --win->w_locked;
@@ -95,103 +95,103 @@ trigger_undo_ftplugin(buf_T *buf, win_T *win)
 /*
  * Calculate the percentage that `part` is of the `whole`.
  */
-    static int
+    நிலையான முழு
 calc_percentage(long part, long whole)
 {
     // With 32 bit longs and more than 21,474,836 lines multiplying by 100
     // causes an overflow, thus for large numbers divide instead.
-    return (part > 1000000L)
-	? (int)(part / (whole / 100L))
-	: (int)((part * 100L) / whole);
+    திரும்பு (part > 1000000L)
+	? (முழு)(part / (whole / 100L))
+	: (முழு)((part * 100L) / whole);
 }
 
 /*
  * Return the highest possible buffer number.
  */
-    int
-get_highest_fnum(void)
+    முழு
+get_highest_fnum(வெறுமை)
 {
-    return top_file_num - 1;
+    திரும்பு உச்சி_file_இலக்கம் - 1;
 }
 
 /*
  * Read data from buffer for retrying.
  */
-    static int
+    நிலையான முழு
 read_buffer(
-    int		read_stdin,	    // read file from stdin, otherwise fifo
+    முழு		read_stdin,	    // read file from stdin, otherwise fifo
     exarg_T	*eap,		    // for forced 'ff' and 'fenc' or NULL
-    int		flags)		    // extra flags for readfile()
+    முழு		flags)		    // extra flags for readfile()
 {
-    int		retval = OK;
-    linenr_T	line_count;
+    முழு		retval = OK;
+    linenr_T	வரி_மொத்தம்;
 
     // Read from the buffer which the text is already filled in and append at
     // the end.  This makes it possible to retry when 'fileformat' or
     // 'fileencoding' was guessed wrong.
-    line_count = curbuf->b_ml.ml_line_count;
+    வரி_மொத்தம் = curbuf->b_ml.ml_வரி_மொத்தம்;
     retval = readfile(
-	    read_stdin ? NULL : curbuf->b_ffname,
-	    read_stdin ? NULL : curbuf->b_fname,
-	    line_count, (linenr_T)0, (linenr_T)MAXLNUM, eap,
+	    read_stdin ? வெற்று : curbuf->b_ffname,
+	    read_stdin ? வெற்று : curbuf->b_fname,
+	    வரி_மொத்தம், (linenr_T)0, (linenr_T)MAXLNUM, eap,
 	    flags | READ_BUFFER);
-    if (retval == OK)
+    எனில் (retval == OK)
     {
 	// Delete the binary lines.
-	while (--line_count >= 0)
+	போது (--வரி_மொத்தம் >= 0)
 	    ml_delete((linenr_T)1);
     }
-    else
+    இல்லையெனில்
     {
 	// Delete the converted lines.
-	while (curbuf->b_ml.ml_line_count > line_count)
-	    ml_delete(line_count);
+	போது (curbuf->b_ml.ml_வரி_மொத்தம் > வரி_மொத்தம்)
+	    ml_delete(வரி_மொத்தம்);
     }
     // Put the cursor on the first line.
     curwin->w_cursor.lnum = 1;
     curwin->w_cursor.col = 0;
 
-    if (read_stdin)
+    எனில் (read_stdin)
     {
 	// Set or reset 'modified' before executing autocommands, so that
 	// it can be changed there.
-	if (!readonlymode && !BUFEMPTY())
+	எனில் (!readonlymode && !BUFEMPTY())
 	    changed();
-	else if (retval == OK)
+	இல்லையெனில் எனில் (retval == OK)
 	    unchanged(curbuf, FALSE, TRUE);
 
-	if (retval == OK)
+	எனில் (retval == OK)
 	{
 #ifdef FEAT_EVAL
-	    apply_autocmds_retval(EVENT_STDINREADPOST, NULL, NULL, FALSE,
+	    apply_autocmds_retval(EVENT_STDINREADPOST, வெற்று, வெற்று, FALSE,
 							      curbuf, &retval);
-#else
-	    apply_autocmds(EVENT_STDINREADPOST, NULL, NULL, FALSE, curbuf);
+#இல்லையெனில்
+	    apply_autocmds(EVENT_STDINREADPOST, வெற்று, வெற்று, FALSE, curbuf);
 #endif
 	}
     }
-    return retval;
+    திரும்பு retval;
 }
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 /*
  * Ensure buffer "buf" is loaded.  Does not trigger the swap-exists action.
  */
-    void
+    வெறுமை
 buffer_ensure_loaded(buf_T *buf)
 {
-    if (buf->b_ml.ml_mfp != NULL)
-	return;
+    எனில் (buf->b_ml.ml_mfp != வெற்று)
+	திரும்பு;
 
     aco_save_T	aco;
 
     // Make sure the buffer is in a window.  If not then skip it.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf == buf)
+    எனில் (curbuf == buf)
     {
-	if (swap_exists_action != SEA_READONLY)
+	எனில் (swap_exists_action != SEA_READONLY)
 	    swap_exists_action = SEA_NONE;
-	open_buffer(FALSE, NULL, 0);
+	open_buffer(FALSE, வெற்று, 0);
 	aucmd_restbuf(&aco);
     }
 }
@@ -202,38 +202,38 @@ buffer_ensure_loaded(buf_T *buf)
  * memory.
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    முழு
 open_buffer(
-    int		read_stdin,	    // read file from stdin
+    முழு		read_stdin,	    // read file from stdin
     exarg_T	*eap,		    // for forced 'ff' and 'fenc' or NULL
-    int		flags_arg)	    // extra flags for readfile()
+    முழு		flags_arg)	    // extra flags for readfile()
 {
-    int		flags = flags_arg;
-    int		retval = OK;
+    முழு		flags = flags_arg;
+    முழு		retval = OK;
     bufref_T	old_curbuf;
 #ifdef FEAT_SYN_HL
     long	old_tw = curbuf->b_p_tw;
 #endif
-    int		read_fifo = FALSE;
+    முழு		read_fifo = FALSE;
 
     // The 'readonly' flag is only set when BF_NEVERLOADED is being reset.
     // When re-entering the same buffer, it should not change, because the
     // user may have reset the flag by hand.
-    if (readonlymode && curbuf->b_ffname != NULL
+    எனில் (readonlymode && curbuf->b_ffname != வெற்று
 					&& (curbuf->b_flags & BF_NEVERLOADED))
 	curbuf->b_p_ro = TRUE;
 
-    if (ml_open(curbuf) == FAIL)
+    எனில் (ml_open(curbuf) == FAIL)
     {
 	// There MUST be a memfile, otherwise we can't do anything
 	// If we can't create one for the current buffer, take another buffer
 	close_buffer(curwin, curbuf, 0, FALSE, FALSE, FALSE);
 	FOR_ALL_BUFFERS(curbuf)
-	    if (curbuf->b_ml.ml_mfp != NULL)
-		break;
+	    எனில் (curbuf->b_ml.ml_mfp != வெற்று)
+		நிறுத்து;
 	// If there is no memfile at all, exit.
 	// This is OK, since there are no changes to lose.
-	if (curbuf == NULL)
+	எனில் (curbuf == வெற்று)
 	{
 	    emsg(_(e_cannot_allocate_any_buffer_exiting));
 
@@ -246,14 +246,14 @@ open_buffer(
 	emsg(_(e_cannot_allocate_buffer_using_other_one));
 	enter_buffer(curbuf);
 #ifdef FEAT_SYN_HL
-	if (old_tw != curbuf->b_p_tw)
-	    check_colorcolumn(NULL, curwin);
+	எனில் (old_tw != curbuf->b_p_tw)
+	    check_colorcolumn(வெற்று, curwin);
 #endif
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     // Do not sync this buffer yet, may first want to read the file.
-    if (curbuf->b_ml.ml_mfp != NULL)
+    எனில் (curbuf->b_ml.ml_mfp != வெற்று)
 	curbuf->b_ml.ml_mfp->mf_dirty = MF_DIRTY_YES_NOSYNC;
 
     // The autocommands in readfile() may change the buffer, but only AFTER
@@ -266,87 +266,87 @@ open_buffer(
 
     // A buffer without an actual file should not use the buffer name to read a
     // file.
-    if (bt_nofileread(curbuf))
+    எனில் (bt_nofileread(curbuf))
 	flags |= READ_NOFILE;
 
     // Read the file if there is one.
-    if (curbuf->b_ffname != NULL
+    எனில் (curbuf->b_ffname != வெற்று
 #ifdef FEAT_NETBEANS_INTG
 	    && netbeansReadFile
 #endif
        )
     {
-	int old_msg_silent = msg_silent;
+	முழு old_செய்தி_silent = செய்தி_silent;
 #ifdef UNIX
-	int	save_bin = curbuf->b_p_bin;
-	int perm;
+	முழு	save_bin = curbuf->b_p_bin;
+	முழு perm;
 #endif
 #ifdef FEAT_NETBEANS_INTG
-	int oldFire = netbeansFireChanges;
+	முழு oldFire = netbeansFireChanges;
 
 	netbeansFireChanges = 0;
 #endif
 #ifdef UNIX
 	perm = mch_getperm(curbuf->b_ffname);
-	if (perm >= 0 && (S_ISFIFO(perm)
+	எனில் (perm >= 0 && (S_ISFIFO(perm)
 		      || S_ISSOCK(perm)
 # ifdef OPEN_CHR_FILES
 		      || (S_ISCHR(perm) && is_dev_fd_file(curbuf->b_ffname))
 # endif
 		    ))
 		read_fifo = TRUE;
-	if (read_fifo)
+	எனில் (read_fifo)
 	    curbuf->b_p_bin = TRUE;
 #endif
-	if (shortmess(SHM_FILEINFO))
-	    msg_silent = 1;
+	எனில் (shortmess(SHM_FILEINFO))
+	    செய்தி_silent = 1;
 	retval = readfile(curbuf->b_ffname, curbuf->b_fname,
 		  (linenr_T)0, (linenr_T)0, (linenr_T)MAXLNUM, eap,
 		  flags | READ_NEW | (read_fifo ? READ_FIFO : 0));
 #ifdef UNIX
-	if (read_fifo)
+	எனில் (read_fifo)
 	{
 	    curbuf->b_p_bin = save_bin;
-	    if (retval == OK)
+	    எனில் (retval == OK)
 		// don't add READ_FIFO here, otherwise we won't be able to
 		// detect the encoding
 		retval = read_buffer(FALSE, eap, flags);
 	}
 #endif
-	msg_silent = old_msg_silent;
+	செய்தி_silent = old_செய்தி_silent;
 #ifdef FEAT_NETBEANS_INTG
 	netbeansFireChanges = oldFire;
 #endif
 	// Help buffer is filtered.
-	if (bt_help(curbuf))
+	எனில் (bt_help(curbuf))
 	    fix_help_buffer();
     }
-    else if (read_stdin)
+    இல்லையெனில் எனில் (read_stdin)
     {
-	int	save_bin = curbuf->b_p_bin;
+	முழு	save_bin = curbuf->b_p_bin;
 
 	// First read the text in binary mode into the buffer.
 	// Then read from that same buffer and append at the end.  This makes
 	// it possible to retry when 'fileformat' or 'fileencoding' was
 	// guessed wrong.
 	curbuf->b_p_bin = TRUE;
-	retval = readfile(NULL, NULL, (linenr_T)0,
-		  (linenr_T)0, (linenr_T)MAXLNUM, NULL,
+	retval = readfile(வெற்று, வெற்று, (linenr_T)0,
+		  (linenr_T)0, (linenr_T)MAXLNUM, வெற்று,
 		  flags | (READ_NEW + READ_STDIN));
 	curbuf->b_p_bin = save_bin;
-	if (retval == OK)
+	எனில் (retval == OK)
 	    retval = read_buffer(TRUE, eap, flags);
     }
 
     // Can now sync this buffer in ml_sync_all().
-    if (curbuf->b_ml.ml_mfp != NULL
+    எனில் (curbuf->b_ml.ml_mfp != வெற்று
 	    && curbuf->b_ml.ml_mfp->mf_dirty == MF_DIRTY_YES_NOSYNC)
 	curbuf->b_ml.ml_mfp->mf_dirty = MF_DIRTY_YES;
 
     // if first time loading this buffer, init b_chartab[]
-    if (curbuf->b_flags & BF_NEVERLOADED)
+    எனில் (curbuf->b_flags & BF_NEVERLOADED)
     {
-	(void)buf_init_chartab(curbuf, FALSE);
+	(வெறுமை)buf_init_chartab(curbuf, FALSE);
 	parse_cino(curbuf);
     }
 
@@ -357,14 +357,14 @@ open_buffer(
     // When reading stdin, the buffer contents always needs writing, so set
     // the changed flag.  Unless in readonly mode: "ls | gview -".
     // When interrupted and 'cpoptions' contains 'i' set changed flag.
-    if ((got_int && vim_strchr(p_cpo, CPO_INTMOD) != NULL)
+    எனில் ((got_int && vim_strchr(p_cpo, CPO_INTMOD) != வெற்று)
 		|| curbuf->b_modified_was_set	// autocmd did ":set modified"
 #ifdef FEAT_EVAL
-		|| (aborting() && vim_strchr(p_cpo, CPO_INTMOD) != NULL)
+		|| (aborting() && vim_strchr(p_cpo, CPO_INTMOD) != வெற்று)
 #endif
        )
 	changed();
-    else if (retval == OK && !read_stdin && !read_fifo)
+    இல்லையெனில் எனில் (retval == OK && !read_stdin && !read_fifo)
 	unchanged(curbuf, FALSE, TRUE);
     save_file_ff(curbuf);		// keep this fileformat
 
@@ -376,9 +376,9 @@ open_buffer(
 
     // require "!" to overwrite the file, because it wasn't read completely
 #ifdef FEAT_EVAL
-    if (aborting())
-#else
-    if (got_int)
+    எனில் (aborting())
+#இல்லையெனில்
+    எனில் (got_int)
 #endif
 	curbuf->b_flags |= BF_READERR;
 
@@ -389,7 +389,7 @@ open_buffer(
 #endif
 
     // need to set w_topline, unless some autocommand already did that.
-    if (!(curwin->w_valid & VALID_TOPLINE))
+    எனில் (!(curwin->w_valid & VALID_TOPLINE))
     {
 	curwin->w_topline = 1;
 #ifdef FEAT_DIFF
@@ -397,34 +397,34 @@ open_buffer(
 #endif
     }
 #ifdef FEAT_EVAL
-    apply_autocmds_retval(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf, &retval);
-#else
-    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
+    apply_autocmds_retval(EVENT_BUFENTER, வெற்று, வெற்று, FALSE, curbuf, &retval);
+#இல்லையெனில்
+    apply_autocmds(EVENT_BUFENTER, வெற்று, வெற்று, FALSE, curbuf);
 #endif
 
-    if (retval != OK)
-	return retval;
+    எனில் (retval != OK)
+	திரும்பு retval;
 
     // The autocommands may have changed the current buffer.  Apply the
     // modelines to the correct buffer, if it still exists and is loaded.
-    if (bufref_valid(&old_curbuf) && old_curbuf.br_buf->b_ml.ml_mfp != NULL)
+    எனில் (bufref_valid(&old_curbuf) && old_curbuf.br_buf->b_ml.ml_mfp != வெற்று)
     {
 	aco_save_T	aco;
 
 	// Go to the buffer that was opened, make sure it is in a window.
 	// If not then skip it.
 	aucmd_prepbuf(&aco, old_curbuf.br_buf);
-	if (curbuf == old_curbuf.br_buf)
+	எனில் (curbuf == old_curbuf.br_buf)
 	{
 	    do_modelines(0);
 	    curbuf->b_flags &= ~(BF_CHECK_RO | BF_NEVERLOADED);
 
-	    if ((flags & READ_NOWINENTER) == 0)
+	    எனில் ((flags & READ_NOWINENTER) == 0)
 #ifdef FEAT_EVAL
-		apply_autocmds_retval(EVENT_BUFWINENTER, NULL, NULL,
+		apply_autocmds_retval(EVENT_BUFWINENTER, வெற்று, வெற்று,
 			FALSE, curbuf, &retval);
-#else
-	    apply_autocmds(EVENT_BUFWINENTER, NULL, NULL,
+#இல்லையெனில்
+	    apply_autocmds(EVENT_BUFWINENTER, வெற்று, வெற்று,
 		    FALSE, curbuf);
 #endif
 
@@ -433,18 +433,18 @@ open_buffer(
 	}
     }
 
-    return retval;
+    திரும்பு retval;
 }
 
 /*
  * Store "buf" in "bufref" and set the free count.
  */
-    void
+    வெறுமை
 set_bufref(bufref_T *bufref, buf_T *buf)
 {
     bufref->br_buf = buf;
-    bufref->br_fnum = buf == NULL ? 0 : buf->b_fnum;
-    bufref->br_buf_free_count = buf_free_count;
+    bufref->br_fnum = buf == வெற்று ? 0 : buf->b_fnum;
+    bufref->br_buf_free_மொத்தம் = buf_free_மொத்தம்;
 }
 
 /*
@@ -454,10 +454,10 @@ set_bufref(bufref_T *bufref, buf_T *buf)
  * Also checks if b_fnum is still the same, a :bwipe followed by :new might get
  * the same allocated memory, but it's a different buffer.
  */
-    int
+    முழு
 bufref_valid(bufref_T *bufref)
 {
-    return bufref->br_buf_free_count == buf_free_count
+    திரும்பு bufref->br_buf_free_மொத்தம் == buf_free_மொத்தம்
 	? TRUE : buf_valid(bufref->br_buf)
 				  && bufref->br_fnum == bufref->br_buf->b_fnum;
 }
@@ -466,7 +466,7 @@ bufref_valid(bufref_T *bufref)
  * Return TRUE if "buf" points to a valid buffer (in the buffer list).
  * This can be slow if there are many buffers, prefer using bufref_valid().
  */
-    int
+    முழு
 buf_valid(buf_T *buf)
 {
     buf_T	*bp;
@@ -474,30 +474,30 @@ buf_valid(buf_T *buf)
     // Assume that we more often have a recent buffer, start with the last
     // one.
     FOR_ALL_BUFS_FROM_LAST(bp)
-	if (bp == buf)
-	    return TRUE;
-    return FALSE;
+	எனில் (bp == buf)
+	    திரும்பு TRUE;
+    திரும்பு FALSE;
 }
 
 /*
  * A hash table used to quickly lookup a buffer by its number.
  */
-static hashtab_T buf_hashtab;
+நிலையான hashtab_T buf_hashtab;
 
-    static void
+    நிலையான வெறுமை
 buf_hashtab_add(buf_T *buf)
 {
-    vim_snprintf((char *)buf->b_key, sizeof(buf->b_key), "%x", buf->b_fnum);
-    if (hash_add(&buf_hashtab, buf->b_key, "create buffer") == FAIL)
+    vim_snprintf((எழுத்து *)buf->b_சாவி, அளவு(buf->b_சாவி), "%x", buf->b_fnum);
+    எனில் (hash_add(&buf_hashtab, buf->b_சாவி, "create buffer") == FAIL)
 	emsg(_(e_buffer_cannot_be_registered));
 }
 
-    static void
+    நிலையான வெறுமை
 buf_hashtab_remove(buf_T *buf)
 {
-    hashitem_T *hi = hash_find(&buf_hashtab, buf->b_key);
+    hashitem_T *hi = hash_find(&buf_hashtab, buf->b_சாவி);
 
-    if (!HASHITEM_EMPTY(hi))
+    எனில் (!HASHITEM_EMPTY(hi))
 	hash_remove(&buf_hashtab, hi, "close buffer");
 }
 
@@ -506,34 +506,34 @@ buf_hashtab_remove(buf_T *buf)
  * Give an error message and return FALSE when the buffer is locked or the
  * screen is being redrawn and the buffer is in a window.
  */
-    static int
+    நிலையான முழு
 can_unload_buffer(buf_T *buf)
 {
-    int	    can_unload = !buf->b_locked;
+    முழு	    can_unload = !buf->b_locked;
 
-    if (can_unload && updating_screen)
+    எனில் (can_unload && updating_screen)
     {
 	win_T	*wp;
 
 	FOR_ALL_WINDOWS(wp)
-	    if (wp->w_buffer == buf)
+	    எனில் (wp->w_buffer == buf)
 	    {
 		can_unload = FALSE;
-		break;
+		நிறுத்து;
 	    }
     }
     // Don't unload the buffer while it's still being saved
-    if (can_unload && buf->b_saving)
+    எனில் (can_unload && buf->b_saving)
 	can_unload = FALSE;
 
-    if (!can_unload)
+    எனில் (!can_unload)
     {
-	char_u *fname = buf->b_fname != NULL ? buf->b_fname : buf->b_ffname;
+	char_u *fname = buf->b_fname != வெற்று ? buf->b_fname : buf->b_ffname;
 
 	semsg(_(e_attempt_to_delete_buffer_that_is_in_use_str),
-				fname != NULL ? fname : (char_u *)"[No Name]");
+				fname != வெற்று ? fname : (char_u *)"[No Name]");
     }
-    return can_unload;
+    திரும்பு can_unload;
 }
 
 /*
@@ -568,60 +568,60 @@ can_unload_buffer(buf_T *buf)
  *
  * Return TRUE when we got to the end and unloaded "buf".
  */
-    int
+    முழு
 close_buffer(
     win_T	*win,
     buf_T	*buf,
-    int		action,
-    int		abort_if_last,
-    int		ignore_abort,
-    int		set_context)
+    முழு		action,
+    முழு		abort_if_last,
+    முழு		ignore_abort,
+    முழு		set_context)
 {
-    int		hiding_buf;
+    முழு		hiding_buf;
     bufref_T	bufref;
-    int		is_curwin = (curwin != NULL && curwin == win
+    முழு		is_curwin = (curwin != வெற்று && curwin == win
 				&& curwin->w_buffer == buf);
     tabpage_T	*the_curtab = curtab;
-    int		unload_buf = (action != 0);
-    int		wipe_buf = (action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
-    int		del_buf = (action == DOBUF_DEL || wipe_buf);
-    int		win_valid = win_valid_any_tab(win);
+    முழு		unload_buf = (action != 0);
+    முழு		wipe_buf = (action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
+    முழு		del_buf = (action == DOBUF_DEL || wipe_buf);
+    முழு		win_valid = win_valid_any_tab(win);
     // win_valid is FALSE for closing popups, as they're first removed from the
     // window list.  If so, skip some side-effects, but treat win as valid.
     // Shouldn't be possible for autocmds to prematurely free win then, as it's
     // not in the window list.
-    int		closed_popup = win && !win_valid && WIN_IS_POPUP(win);
+    முழு		closed_popup = win && !win_valid && WIN_IS_POPUP(win);
 
     CHECK_CURBUF;
 
     // Force unloading or deleting when 'bufhidden' says so.
     // The caller must take care of NOT deleting/freeing when 'bufhidden' is
     // "hide" (otherwise we could never free or delete a buffer).
-    if (buf->b_p_bh[0] == 'd')		// 'bufhidden' == "delete"
+    எனில் (buf->b_p_bh[0] == 'd')		// 'bufhidden' == "delete"
     {
 	del_buf = TRUE;
 	unload_buf = TRUE;
     }
-    else if (buf->b_p_bh[0] == 'w')	// 'bufhidden' == "wipe"
+    இல்லையெனில் எனில் (buf->b_p_bh[0] == 'w')	// 'bufhidden' == "wipe"
     {
 	del_buf = TRUE;
 	unload_buf = TRUE;
 	wipe_buf = TRUE;
     }
-    else if (buf->b_p_bh[0] == 'u')	// 'bufhidden' == "unload"
+    இல்லையெனில் எனில் (buf->b_p_bh[0] == 'u')	// 'bufhidden' == "unload"
 	unload_buf = TRUE;
 
 #ifdef FEAT_TERMINAL
     // depending on how we get here b_nwindows may already be zero
-    if (bt_terminal(buf) && (buf->b_nwindows <= 1 || del_buf))
+    எனில் (bt_terminal(buf) && (buf->b_nwindows <= 1 || del_buf))
     {
 	CHECK_CURBUF;
-	if (term_job_running(buf->b_term))
+	எனில் (term_job_running(buf->b_term))
 	{
-	    if (wipe_buf || unload_buf)
+	    எனில் (wipe_buf || unload_buf)
 	    {
-		if (!can_unload_buffer(buf))
-		    return FALSE;
+		எனில் (!can_unload_buffer(buf))
+		    திரும்பு FALSE;
 
 		// Wiping out or unloading a terminal buffer kills the job.
 		free_terminal(buf);
@@ -631,21 +631,21 @@ close_buffer(
 		unload_buf = TRUE;
 		wipe_buf = TRUE;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		// The job keeps running, hide the buffer.
 		del_buf = FALSE;
 		unload_buf = FALSE;
 	    }
 	}
-	else if (buf->b_p_bh[0] == 'h' && !del_buf)
+	இல்லையெனில் எனில் (buf->b_p_bh[0] == 'h' && !del_buf)
 	{
 	    // Hide a terminal buffer.
 	    unload_buf = FALSE;
 	}
-	else
+	இல்லையெனில்
 	{
-	    if (del_buf || unload_buf)
+	    எனில் (del_buf || unload_buf)
 	    {
 		// A terminal buffer is wiped out if the job has finished.
 		// We only do this when there's an intention to unload the
@@ -662,16 +662,16 @@ close_buffer(
 
     // Disallow deleting the buffer when it is locked (already being closed or
     // halfway a command that relies on it). Unloading is allowed.
-    if ((del_buf || wipe_buf) && !can_unload_buffer(buf))
-	return FALSE;
+    எனில் ((del_buf || wipe_buf) && !can_unload_buffer(buf))
+	திரும்பு FALSE;
 
-    if (set_context && win_valid && win->w_buffer == buf)
+    எனில் (set_context && win_valid && win->w_buffer == buf)
     {
 	// Set b_last_cursor when closing the last window for the buffer.
 	// Remember the last cursor position and window options of the buffer.
 	// This used to be only for the current window, but then options like
 	// 'foldmethod' may be lost with a ":only" command.
-	if (buf->b_nwindows == 1)
+	எனில் (buf->b_nwindows == 1)
 	    set_last_cursor(win);
 	buflist_setfpos(buf, win,
 		    win->w_cursor.lnum == 1 ? 0 : win->w_cursor.lnum,
@@ -681,47 +681,47 @@ close_buffer(
     set_bufref(&bufref, buf);
 
     // When the buffer is no longer in a window, trigger BufWinLeave
-    if ((win_valid || closed_popup) && win->w_buffer == buf
+    எனில் ((win_valid || closed_popup) && win->w_buffer == buf
 	    && buf->b_nwindows == 1)
     {
 	++buf->b_locked;
 	++buf->b_locked_split;
-	if (apply_autocmds(EVENT_BUFWINLEAVE, buf->b_fname, buf->b_fname,
+	எனில் (apply_autocmds(EVENT_BUFWINLEAVE, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	{
 	    // Autocommands deleted the buffer.
 aucmd_abort:
 	    emsg(_(e_autocommands_caused_command_to_abort));
-	    return FALSE;
+	    திரும்பு FALSE;
 	}
 	--buf->b_locked;
 	--buf->b_locked_split;
-	if (abort_if_last && one_window())
+	எனில் (abort_if_last && one_window())
 	    // Autocommands made this the only window.
-	    goto aucmd_abort;
+	    செல் aucmd_abort;
 
 	// When the buffer becomes hidden, but is not unloaded, trigger
 	// BufHidden
-	if (!unload_buf)
+	எனில் (!unload_buf)
 	{
 	    ++buf->b_locked;
 	    ++buf->b_locked_split;
-	    if (apply_autocmds(EVENT_BUFHIDDEN, buf->b_fname, buf->b_fname,
+	    எனில் (apply_autocmds(EVENT_BUFHIDDEN, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		    && !bufref_valid(&bufref))
 		// Autocommands deleted the buffer.
-		goto aucmd_abort;
+		செல் aucmd_abort;
 	    --buf->b_locked;
 	    --buf->b_locked_split;
-	    if (abort_if_last && one_window())
+	    எனில் (abort_if_last && one_window())
 		// Autocommands made this the only window.
-		goto aucmd_abort;
+		செல் aucmd_abort;
 	}
 #ifdef FEAT_EVAL
 	// autocmds may abort script processing
-	if (!ignore_abort && aborting())
-	    return FALSE;
+	எனில் (!ignore_abort && aborting())
+	    திரும்பு FALSE;
 #endif
 	win_valid = win_valid && win_valid_any_tab(win);
     }
@@ -729,7 +729,7 @@ aucmd_abort:
     // If the buffer was in curwin and the window has changed, go back to that
     // window, if it still exists.  This avoids that ":edit x" triggering a
     // "tabnext" BufUnload autocmd leaves a window behind without a buffer.
-    if (is_curwin && curwin != win && win_valid)
+    எனில் (is_curwin && curwin != win && win_valid)
     {
 	block_autocmds();
 	goto_tabpage_win(the_curtab, win);
@@ -738,7 +738,7 @@ aucmd_abort:
 
     // When a quickfix buffer is deleted from a window, clear the
     // 'winfixheight' option.
-    if (bt_quickfix(buf) && win_valid && win->w_buffer == buf)
+    எனில் (bt_quickfix(buf) && win_valid && win->w_buffer == buf)
 	win->w_p_wfh = FALSE;
 
     // Remember if the buffer may be hidden soon, or is already hidden.
@@ -746,33 +746,33 @@ aucmd_abort:
 	    && win->w_buffer == buf && buf->b_nwindows == 1);
 
 #ifdef FEAT_DIFF
-    if (diffopt_hiddenoff() && !unload_buf && hiding_buf)
+    எனில் (diffopt_hiddenoff() && !unload_buf && hiding_buf)
 	diff_buf_delete(buf);	// Clear 'diff' for hidden buffer.
 #endif
 
     // Return when another window is displaying the buffer or when not unloaded.
-    if (!hiding_buf || !unload_buf)
-	return FALSE;
+    எனில் (!hiding_buf || !unload_buf)
+	திரும்பு FALSE;
 
     // Always remove the buffer when there is no file name.
-    if (buf->b_ffname == NULL)
+    எனில் (buf->b_ffname == வெற்று)
 	del_buf = TRUE;
 
     // Free all things allocated for this buffer.
     // Also calls the "BufDelete" autocommands when del_buf is TRUE.
     // Abort if nothing was freed, or if autocommands delete the buffer.
-    if (!buf_freeall(buf, (del_buf ? BFA_DEL : 0)
+    எனில் (!buf_freeall(buf, (del_buf ? BFA_DEL : 0)
 		   + (wipe_buf ? BFA_WIPE : 0)
 		   + (ignore_abort ? BFA_IGNORE_ABORT : 0)))
-	return FALSE;
+	திரும்பு FALSE;
 
     win_valid = win_valid && win_valid_any_tab(win);
-    if ((win_valid || closed_popup) && win->w_buffer == buf)
+    எனில் ((win_valid || closed_popup) && win->w_buffer == buf)
     {
 	// Autocommands may have opened (despite b_locked_split) or closed
 	// windows for this buffer.  Decrement for the close we do here.
 	--buf->b_nwindows;
-	win->w_buffer = NULL;  // make sure we don't use the buffer now
+	win->w_buffer = வெற்று;  // make sure we don't use the buffer now
     }
 
     /*
@@ -781,9 +781,9 @@ aucmd_abort:
      * wiped out all other buffers (unless when inside free_all_mem() where all
      * buffers need to be freed and autocommands are blocked).
      */
-    if (wipe_buf && buf->b_nwindows <= 0
-			    && (buf->b_prev != NULL || buf->b_next != NULL
-#if defined(EXITFREE)
+    எனில் (wipe_buf && buf->b_nwindows <= 0
+			    && (buf->b_prev != வெற்று || buf->b_next != வெற்று
+#எனில் defined(EXITFREE)
 				|| entered_free_all_mem
 #endif
 				))
@@ -794,32 +794,32 @@ aucmd_abort:
 	FOR_ALL_TAB_WINDOWS(tp, wp)
 	    mark_forget_file(wp, buf->b_fnum);
 
-	if (action == DOBUF_WIPE_REUSE)
+	எனில் (action == DOBUF_WIPE_REUSE)
 	{
 	    // we can re-use this buffer number, store it
-	    if (buf_reuse.ga_itemsize == 0)
-		ga_init2(&buf_reuse, sizeof(int), 50);
-	    if (ga_grow(&buf_reuse, 1) == OK)
-		((int *)buf_reuse.ga_data)[buf_reuse.ga_len++] = buf->b_fnum;
+	    எனில் (buf_reuse.ga_itemsize == 0)
+		ga_init2(&buf_reuse, அளவு(முழு), 50);
+	    எனில் (ga_grow(&buf_reuse, 1) == OK)
+		((முழு *)buf_reuse.ga_data)[buf_reuse.ga_len++] = buf->b_fnum;
 	}
-	if (buf->b_sfname != buf->b_ffname)
+	எனில் (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
-	    buf->b_sfname = NULL;
+	இல்லையெனில்
+	    buf->b_sfname = வெற்று;
 	VIM_CLEAR(buf->b_ffname);
-	if (buf->b_prev == NULL)
+	எனில் (buf->b_prev == வெற்று)
 	    firstbuf = buf->b_next;
-	else
+	இல்லையெனில்
 	    buf->b_prev->b_next = buf->b_next;
-	if (buf->b_next == NULL)
+	எனில் (buf->b_next == வெற்று)
 	    lastbuf = buf->b_prev;
-	else
+	இல்லையெனில்
 	    buf->b_next->b_prev = buf->b_prev;
 	free_buffer(buf);
     }
-    else
+    இல்லையெனில்
     {
-	if (del_buf)
+	எனில் (del_buf)
 	{
 	    // Free all internal variables and reset option values, to make
 	    // ":bdel" compatible with Vim 5.7.
@@ -832,7 +832,7 @@ aucmd_abort:
 	    buf->b_p_initialized = false;
 	}
 	buf_clear_file(buf);
-	if (del_buf)
+	எனில் (del_buf)
 	    buf->b_p_bl = FALSE;
     }
     // NOTE: at this point "curbuf" may be invalid!
@@ -840,17 +840,17 @@ aucmd_abort:
     // When closing curbuf for curwin, is_curwin checks should've ensured
     // autocmds don't switch windows, unless they closed curwin.  Otherwise
     // callers may leave the window open to a NULL buffer!
-    assert(!win_valid || !is_curwin || win == curwin);
-    return TRUE;
+    ப்ரதிஜ்ஞா(!win_valid || !is_curwin || win == curwin);
+    திரும்பு TRUE;
 }
 
 /*
  * Make buffer not contain a file.
  */
-    void
+    வெறுமை
 buf_clear_file(buf_T *buf)
 {
-    buf->b_ml.ml_line_count = 1;
+    buf->b_ml.ml_வரி_மொத்தம் = 1;
     unchanged(buf, TRUE, TRUE);
     buf->b_shortname = false;
     buf->b_p_eof = FALSE;
@@ -859,10 +859,10 @@ buf_clear_file(buf_T *buf)
     buf->b_start_eol = TRUE;
     buf->b_p_bomb = FALSE;
     buf->b_start_bomb = FALSE;
-    buf->b_ml.ml_mfp = NULL;
+    buf->b_ml.ml_mfp = வெற்று;
     buf->b_ml.ml_flags = ML_EMPTY;		// empty buffer
 #ifdef FEAT_NETBEANS_INTG
-    netbeans_deleted_all_lines(buf);
+    netbeans_deleted_all_வரிகள்(buf);
 #endif
 }
 
@@ -877,12 +877,12 @@ buf_clear_file(buf_T *buf)
  *
  * Return TRUE when we got to the end.
  */
-    int
-buf_freeall(buf_T *buf, int flags)
+    முழு
+buf_freeall(buf_T *buf, முழு flags)
 {
-    int		is_curbuf = (buf == curbuf);
+    முழு		is_curbuf = (buf == curbuf);
     bufref_T	bufref;
-    int		is_curwin = (curwin != NULL && curwin->w_buffer == buf);
+    முழு		is_curwin = (curwin != வெற்று && curwin->w_buffer == buf);
     win_T	*the_curwin = curwin;
     tabpage_T	*the_curtab = curtab;
 
@@ -890,29 +890,29 @@ buf_freeall(buf_T *buf, int flags)
     ++buf->b_locked;
     ++buf->b_locked_split;
     set_bufref(&bufref, buf);
-    if (buf->b_ml.ml_mfp != NULL)
+    எனில் (buf->b_ml.ml_mfp != வெற்று)
     {
-	if (apply_autocmds(EVENT_BUFUNLOAD, buf->b_fname, buf->b_fname,
+	எனில் (apply_autocmds(EVENT_BUFUNLOAD, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    திரும்பு FALSE;
     }
-    if ((flags & BFA_DEL) && buf->b_p_bl)
+    எனில் ((flags & BFA_DEL) && buf->b_p_bl)
     {
-	if (apply_autocmds(EVENT_BUFDELETE, buf->b_fname, buf->b_fname,
+	எனில் (apply_autocmds(EVENT_BUFDELETE, buf->b_fname, buf->b_fname,
 								   FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    திரும்பு FALSE;
     }
-    if (flags & BFA_WIPE)
+    எனில் (flags & BFA_WIPE)
     {
-	if (apply_autocmds(EVENT_BUFWIPEOUT, buf->b_fname, buf->b_fname,
+	எனில் (apply_autocmds(EVENT_BUFWIPEOUT, buf->b_fname, buf->b_fname,
 								  FALSE, buf)
 		&& !bufref_valid(&bufref))
 	    // autocommands deleted the buffer
-	    return FALSE;
+	    திரும்பு FALSE;
     }
     --buf->b_locked;
     --buf->b_locked_split;
@@ -920,7 +920,7 @@ buf_freeall(buf_T *buf, int flags)
     // If the buffer was in curwin and the window has changed, go back to that
     // window, if it still exists.  This avoids that ":edit x" triggering a
     // "tabnext" BufUnload autocmd leaves a window behind without a buffer.
-    if (is_curwin && curwin != the_curwin && win_valid_any_tab(the_curwin))
+    எனில் (is_curwin && curwin != the_curwin && win_valid_any_tab(the_curwin))
     {
 	block_autocmds();
 	goto_tabpage_win(the_curtab, the_curwin);
@@ -929,21 +929,21 @@ buf_freeall(buf_T *buf, int flags)
 
 #ifdef FEAT_EVAL
     // autocmds may abort script processing
-    if ((flags & BFA_IGNORE_ABORT) == 0 && aborting())
-	return FALSE;
+    எனில் ((flags & BFA_IGNORE_ABORT) == 0 && aborting())
+	திரும்பு FALSE;
 #endif
 
     // It's possible that autocommands change curbuf to the one being deleted.
     // This might cause curbuf to be deleted unexpectedly.  But in some cases
     // it's OK to delete the curbuf, because a new one is obtained anyway.
     // Therefore only return if curbuf changed to the deleted buffer.
-    if (buf == curbuf && !is_curbuf)
-	return FALSE;
+    எனில் (buf == curbuf && !is_curbuf)
+	திரும்பு FALSE;
 
     // If curbuf, stop Visual mode just before freeing, but after autocmds that
     // may restart it.  May trigger TextYankPost, but with textlock set.
-    if (buf == curbuf && VIsual_active
-#if defined(EXITFREE)
+    எனில் (buf == curbuf && VIsual_active
+#எனில் defined(EXITFREE)
 	    && !entered_free_all_mem
 #endif
 	    )
@@ -954,7 +954,7 @@ buf_freeall(buf_T *buf, int flags)
 #endif
 #ifdef FEAT_SYN_HL
     // Remove any ownsyntax, unless exiting.
-    if (curwin != NULL && curwin->w_buffer == buf)
+    எனில் (curwin != வெற்று && curwin->w_buffer == buf)
 	reset_synblock(curwin);
 #endif
 
@@ -965,7 +965,7 @@ buf_freeall(buf_T *buf, int flags)
 	tabpage_T	*tp;
 
 	FOR_ALL_TAB_WINDOWS(tp, win)
-	    if (win->w_buffer == buf)
+	    எனில் (win->w_buffer == buf)
 		clearFolding(win);
     }
 #endif
@@ -974,8 +974,8 @@ buf_freeall(buf_T *buf, int flags)
     tcl_buffer_free(buf);
 #endif
     ml_close(buf, TRUE);	    // close and delete the memline/memfile
-    buf->b_ml.ml_line_count = 0;    // no lines in buffer
-    if ((flags & BFA_KEEP_UNDO) == 0)
+    buf->b_ml.ml_வரி_மொத்தம் = 0;    // no lines in buffer
+    எனில் ((flags & BFA_KEEP_UNDO) == 0)
 	// free the memory allocated for undo
 	// and reset all undo information
 	u_clearallandblockfree(buf);
@@ -986,17 +986,17 @@ buf_freeall(buf_T *buf, int flags)
     clear_buf_prop_types(buf);
 #endif
     buf->b_flags &= ~BF_READERR;    // a read error is no longer relevant
-    return TRUE;
+    திரும்பு TRUE;
 }
 
 /*
  * Free a buffer structure and the things it contains related to the buffer
  * itself (not the file, that must have been done already).
  */
-    static void
+    நிலையான வெறுமை
 free_buffer(buf_T *buf)
 {
-    ++buf_free_count;
+    ++buf_free_மொத்தம்;
     free_buffer_stuff(buf, TRUE);
 #ifdef FEAT_EVAL
     // b:changedtick uses an item in buf_T, remove it now
@@ -1038,49 +1038,49 @@ free_buffer(buf_T *buf)
 
     aubuflocal_remove(buf);
 
-    if (autocmd_busy)
+    எனில் (autocmd_busy)
     {
 	// Do not free the buffer structure while autocommands are executing,
 	// it's still needed. Free it when autocmd_busy is reset.
 	buf->b_next = au_pending_free_buf;
 	au_pending_free_buf = buf;
     }
-    else
+    இல்லையெனில்
     {
 	vim_free(buf);
-	if (curbuf == buf)
-	    curbuf = NULL;  // make clear it's not to be used
+	எனில் (curbuf == buf)
+	    curbuf = வெற்று;  // make clear it's not to be used
     }
 }
 
 /*
  * Initializes b:changedtick.
  */
-    static void
+    நிலையான வெறுமை
 init_changedtick(buf_T *buf)
 {
     dictitem_T *di = (dictitem_T *)&buf->b_ct_di;
 
     di->di_flags = DI_FLAGS_FIX | DI_FLAGS_RO;
-    di->di_tv.v_type = VAR_NUMBER;
+    di->di_tv.v_type = VAR_எண்;
     di->di_tv.v_lock = VAR_FIXED;
-    di->di_tv.vval.v_number = 0;
+    di->di_tv.vval.v_எண் = 0;
 
 #ifdef FEAT_EVAL
-    STRCPY(buf->b_ct_di.di_key, "changedtick");
-    (void)dict_add(buf->b_vars, di);
+    STRCPY(buf->b_ct_di.di_சாவி, "changedtick");
+    (வெறுமை)dict_add(buf->b_vars, di);
 #endif
 }
 
 /*
  * Free the b_wininfo list for buffer "buf".
  */
-    static void
+    நிலையான வெறுமை
 clear_wininfo(buf_T *buf)
 {
     wininfo_T	*wip;
 
-    while (buf->b_wininfo != NULL)
+    போது (buf->b_wininfo != வெற்று)
     {
 	wip = buf->b_wininfo;
 	buf->b_wininfo = wip->wi_next;
@@ -1091,12 +1091,12 @@ clear_wininfo(buf_T *buf)
 /*
  * Free stuff in the buffer for ":bdel" and when wiping out the buffer.
  */
-    static void
+    நிலையான வெறுமை
 free_buffer_stuff(
     buf_T	*buf,
-    int		free_options)		// free options as well
+    முழு		free_options)		// free options as well
 {
-    if (free_options)
+    எனில் (free_options)
     {
 	clear_wininfo(buf);		// including window-local options
 	free_buf_options(buf, TRUE);
@@ -1130,10 +1130,10 @@ free_buffer_stuff(
 /*
  * Free one wininfo_T.
  */
-    void
+    வெறுமை
 free_wininfo(wininfo_T *wip)
 {
-    if (wip->wi_optset)
+    எனில் (wip->wi_optset)
     {
 	clear_winopt(&wip->wi_opt);
 #ifdef FEAT_FOLDING
@@ -1146,42 +1146,42 @@ free_wininfo(wininfo_T *wip)
 /*
  * Go to another buffer.  Handles the result of the ATTENTION dialog.
  */
-    void
+    வெறுமை
 goto_buffer(
     exarg_T	*eap,
-    int		start,
-    int		dir,
-    int		count)
+    முழு		start,
+    முழு		dir,
+    முழு		மொத்தம்)
 {
     bufref_T	old_curbuf;
-    int		save_sea = swap_exists_action;
-    int		skip_help_buf;
+    முழு		save_sea = swap_exists_action;
+    முழு		skip_help_buf;
 
-    switch (eap->cmdidx)
+    தேர்வு (eap->cmdidx)
     {
-	case CMD_bnext:
-	case CMD_sbnext:
-	case CMD_bNext:
-	case CMD_bprevious:
-	case CMD_sbNext:
-	case CMD_sbprevious:
+	நிலை CMD_bnext:
+	நிலை CMD_sbnext:
+	நிலை CMD_bNext:
+	நிலை CMD_bprevious:
+	நிலை CMD_sbNext:
+	நிலை CMD_sbprevious:
 	    skip_help_buf = TRUE;
-	    break;
-	default:
+	    நிறுத்து;
+	இயல்பு:
 	    skip_help_buf = FALSE;
-	    break;
+	    நிறுத்து;
     }
 
     set_bufref(&old_curbuf, curbuf);
 
-    if (swap_exists_action == SEA_NONE)
+    எனில் (swap_exists_action == SEA_NONE)
 	swap_exists_action = SEA_DIALOG;
-    (void)do_buffer_ext(*eap->cmd == 's' ? DOBUF_SPLIT : DOBUF_GOTO, start, dir, count,
+    (வெறுமை)do_buffer_ext(*eap->cmd == 's' ? DOBUF_SPLIT : DOBUF_GOTO, start, dir, மொத்தம்,
 	    (eap->forceit ? DOBUF_FORCEIT : 0) |
 	    (skip_help_buf ? DOBUF_SKIPHELP : 0));
-    if (swap_exists_action == SEA_QUIT && *eap->cmd == 's')
+    எனில் (swap_exists_action == SEA_QUIT && *eap->cmd == 's')
     {
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 	cleanup_T   cs;
 
 	// Reset the error/interrupt/exception state here so that
@@ -1194,13 +1194,13 @@ goto_buffer(
 	swap_exists_action = save_sea;
 	swap_exists_did_quit = TRUE;
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
 #endif
     }
-    else
+    இல்லையெனில்
 	handle_swap_exists(&old_curbuf);
 }
 
@@ -1208,10 +1208,10 @@ goto_buffer(
  * Handle the situation of swap_exists_action being set.
  * It is allowed for "old_curbuf" to be NULL or invalid.
  */
-    void
+    வெறுமை
 handle_swap_exists(bufref_T *old_curbuf)
 {
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
     cleanup_T	cs;
 #endif
 #ifdef FEAT_SYN_HL
@@ -1219,9 +1219,9 @@ handle_swap_exists(bufref_T *old_curbuf)
 #endif
     buf_T	*buf;
 
-    if (swap_exists_action == SEA_QUIT)
+    எனில் (swap_exists_action == SEA_QUIT)
     {
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 	// Reset the error/interrupt/exception state here so that
 	// aborting() returns FALSE when closing a buffer.
 	enter_cleanup(&cs);
@@ -1233,55 +1233,55 @@ handle_swap_exists(bufref_T *old_curbuf)
 	swap_exists_action = SEA_NONE;	// don't want it again
 	swap_exists_did_quit = TRUE;
 	close_buffer(curwin, curbuf, DOBUF_UNLOAD, FALSE, FALSE, TRUE);
-	if (old_curbuf == NULL || !bufref_valid(old_curbuf)
+	எனில் (old_curbuf == வெற்று || !bufref_valid(old_curbuf)
 					      || old_curbuf->br_buf == curbuf)
 	{
 	    // Block autocommands here because curwin->w_buffer may be NULL.
 	    block_autocmds();
-	    buf = buflist_new(NULL, NULL, 1L, BLN_CURBUF | BLN_LISTED);
+	    buf = buflist_new(வெற்று, வெற்று, 1L, BLN_CURBUF | BLN_LISTED);
 	    unblock_autocmds();
 	}
-	else
+	இல்லையெனில்
 	    buf = old_curbuf->br_buf;
-	if (buf != NULL)
+	எனில் (buf != வெற்று)
 	{
-	    int old_msg_silent = msg_silent;
+	    முழு old_செய்தி_silent = செய்தி_silent;
 
-	    if (shortmess(SHM_FILEINFO))
-		msg_silent = 1;  // prevent fileinfo message
+	    எனில் (shortmess(SHM_FILEINFO))
+		செய்தி_silent = 1;  // prevent fileinfo message
 	    enter_buffer(buf);
 	    // restore msg_silent, so that the command line will be shown
-	    msg_silent = old_msg_silent;
+	    செய்தி_silent = old_செய்தி_silent;
 
 #ifdef FEAT_SYN_HL
-	    if (old_tw != curbuf->b_p_tw)
-		check_colorcolumn(NULL, curwin);
+	    எனில் (old_tw != curbuf->b_p_tw)
+		check_colorcolumn(வெற்று, curwin);
 #endif
 	}
 	// If "old_curbuf" is NULL we are in big trouble here...
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
 #endif
     }
-    else if (swap_exists_action == SEA_RECOVER)
+    இல்லையெனில் எனில் (swap_exists_action == SEA_RECOVER)
     {
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 	// Reset the error/interrupt/exception state here so that
 	// aborting() returns FALSE when closing a buffer.
 	enter_cleanup(&cs);
 #endif
 
 	// User selected Recover at ATTENTION prompt.
-	msg_scroll = TRUE;
+	செய்தி_scroll = TRUE;
 	ml_recover(FALSE);
-	msg_puts("\n");	// don't overwrite the last message
-	cmdline_row = msg_row;
+	செய்தி_puts("\n");	// don't overwrite the last message
+	cmdline_row = செய்தி_row;
 	do_modelines(0);
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 	// Restore the error/interrupt/exception state if not discarded by a
 	// new aborting error, interrupt, or uncaught exception.
 	leave_cleanup(&cs);
@@ -1294,42 +1294,42 @@ handle_swap_exists(bufref_T *old_curbuf)
  * Make the current buffer empty.
  * Used when it is wiped out and it's the last buffer.
  */
-    static int
+    நிலையான முழு
 empty_curbuf(
-    int close_others,
-    int forceit,
-    int action)
+    முழு close_others,
+    முழு forceit,
+    முழு action)
 {
-    int	    retval;
+    முழு	    retval;
     buf_T   *buf = curbuf;
     bufref_T bufref;
 
-    if (action == DOBUF_UNLOAD)
+    எனில் (action == DOBUF_UNLOAD)
     {
 	emsg(_(e_cannot_unload_last_buffer));
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     set_bufref(&bufref, buf);
-    if (close_others)
+    எனில் (close_others)
 	// Close any other windows on this buffer, then make it empty.
 	close_windows(buf, TRUE);
 
     setpcmark();
-    retval = do_ecmd(0, NULL, NULL, NULL, ECMD_ONE,
+    retval = do_ecmd(0, வெற்று, வெற்று, வெற்று, ECMD_ONE,
 					  forceit ? ECMD_FORCEIT : 0, curwin);
 
     // do_ecmd() may create a new buffer, then we have to delete
     // the old one.  But do_ecmd() may have done that already, check
     // if the buffer still exists.
-    if (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows == 0)
-	close_buffer(NULL, buf, action, FALSE, FALSE, FALSE);
-    if (!close_others)
+    எனில் (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows == 0)
+	close_buffer(வெற்று, buf, action, FALSE, FALSE, FALSE);
+    எனில் (!close_others)
 	need_fileinfo = FALSE;
-    else if (retval == OK && !shortmess(SHM_FILEINFO))
+    இல்லையெனில் எனில் (retval == OK && !shortmess(SHM_FILEINFO))
 	// do_ecmd() does not display file info for a new empty buffer.
 	need_fileinfo = TRUE;
-    return retval;
+    திரும்பு retval;
 }
 
 /*
@@ -1349,122 +1349,122 @@ empty_curbuf(
  *
  * Return FAIL or OK.
  */
-    static int
+    நிலையான முழு
 do_buffer_ext(
-    int		action,
-    int		start,
-    int		dir,		// FORWARD or BACKWARD
-    int		count,		// buffer number or number of buffers
-    int		flags)		// DOBUF_FORCEIT etc.
+    முழு		action,
+    முழு		start,
+    முழு		dir,		// FORWARD or BACKWARD
+    முழு		மொத்தம்,		// buffer number or number of buffers
+    முழு		flags)		// DOBUF_FORCEIT etc.
 {
     buf_T	*buf;
     buf_T	*bp;
-    int		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
+    முழு		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
 			|| action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
 
-    switch (start)
+    தேர்வு (start)
     {
-	case DOBUF_FIRST:   buf = firstbuf; break;
-	case DOBUF_LAST:    buf = lastbuf;  break;
-	default:	    buf = curbuf;   break;
+	நிலை DOBUF_FIRST:   buf = firstbuf; நிறுத்து;
+	நிலை DOBUF_LAST:    buf = lastbuf;  நிறுத்து;
+	இயல்பு:	    buf = curbuf;   நிறுத்து;
     }
-    if (start == DOBUF_MOD)	    // find next modified buffer
+    எனில் (start == DOBUF_MOD)	    // find next modified buffer
     {
-	while (count-- > 0)
+	போது (மொத்தம்-- > 0)
 	{
-	    do
+	    செய்
 	    {
 		buf = buf->b_next;
-		if (buf == NULL)
+		எனில் (buf == வெற்று)
 		    buf = firstbuf;
 	    }
-	    while (buf != curbuf && !bufIsChanged(buf));
+	    போது (buf != curbuf && !bufIsChanged(buf));
 	}
-	if (!bufIsChanged(buf))
+	எனில் (!bufIsChanged(buf))
 	{
 	    emsg(_(e_no_modified_buffer_found));
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
     }
-    else if (start == DOBUF_FIRST && count) // find specified buffer number
+    இல்லையெனில் எனில் (start == DOBUF_FIRST && மொத்தம்) // find specified buffer number
     {
-	while (buf != NULL && buf->b_fnum != count)
+	போது (buf != வெற்று && buf->b_fnum != மொத்தம்)
 	    buf = buf->b_next;
     }
-    else
+    இல்லையெனில்
     {
-	int help_only = (flags & DOBUF_SKIPHELP) != 0 && buf->b_help;
+	முழு help_only = (flags & DOBUF_SKIPHELP) != 0 && buf->b_help;
 
-	bp = NULL;
-	while (count > 0 || (bp != buf && !unload
+	bp = வெற்று;
+	போது (மொத்தம் > 0 || (bp != buf && !unload
 				&& !(help_only ? buf->b_help : buf->b_p_bl)))
 	{
 	    // remember the buffer where we start, we come back there when all
 	    // buffers are unlisted.
-	    if (bp == NULL)
+	    எனில் (bp == வெற்று)
 		bp = buf;
-	    if (dir == FORWARD)
+	    எனில் (dir == FORWARD)
 	    {
 		buf = buf->b_next;
-		if (buf == NULL)
+		எனில் (buf == வெற்று)
 		    buf = firstbuf;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		buf = buf->b_prev;
-		if (buf == NULL)
+		எனில் (buf == வெற்று)
 		    buf = lastbuf;
 	    }
 	    // Avoid non-help buffers if the starting point was a help buffer
 	    // and vice-versa.
 	    // Don't count unlisted buffers.
-	    if (unload
+	    எனில் (unload
 		    || (help_only
 			? buf->b_help
 			: (buf->b_p_bl && ((flags & DOBUF_SKIPHELP) == 0
 							    || !buf->b_help))))
 	    {
-		--count;
-		bp = NULL;	// use this buffer as new starting point
+		--மொத்தம்;
+		bp = வெற்று;	// use this buffer as new starting point
 	    }
-	    if (bp == buf)
+	    எனில் (bp == buf)
 	    {
 		// back where we started, didn't find anything.
 		emsg(_(e_there_is_no_listed_buffer));
-		return FAIL;
+		திரும்பு FAIL;
 	    }
 	}
     }
 
-    if (buf == NULL)	    // could not find it
+    எனில் (buf == வெற்று)	    // could not find it
     {
-	if (start == DOBUF_FIRST)
+	எனில் (start == DOBUF_FIRST)
 	{
 	    // don't warn when deleting
-	    if (!unload)
-		semsg(_(e_buffer_nr_does_not_exist), count);
+	    எனில் (!unload)
+		semsg(_(e_buffer_nr_does_not_exist), மொத்தம்);
 	}
-	else if (dir == FORWARD)
+	இல்லையெனில் எனில் (dir == FORWARD)
 	    emsg(_(e_cannot_go_beyond_last_buffer));
-	else
+	இல்லையெனில்
 	    emsg(_(e_cannot_go_before_first_buffer));
-	return FAIL;
+	திரும்பு FAIL;
     }
 #ifdef FEAT_PROP_POPUP
-    if ((flags & DOBUF_NOPOPUP) && bt_popup(buf) && !bt_terminal(buf))
-	return OK;
+    எனில் ((flags & DOBUF_NOPOPUP) && bt_popup(buf) && !bt_terminal(buf))
+	திரும்பு OK;
 #endif
-    if (action == DOBUF_GOTO && buf != curbuf
+    எனில் (action == DOBUF_GOTO && buf != curbuf
 	    && !check_can_set_curbuf_forceit((flags & DOBUF_FORCEIT) != 0))
 	// disallow navigating to another buffer when 'winfixbuf' is applied
-	return FAIL;
+	திரும்பு FAIL;
 
-    if ((action == DOBUF_GOTO || action == DOBUF_SPLIT)
+    எனில் ((action == DOBUF_GOTO || action == DOBUF_SPLIT)
 						  && (buf->b_flags & BF_DUMMY))
     {
 	// disallow navigating to the dummy buffer
-	semsg(_(e_buffer_nr_does_not_exist), count);
-	return FAIL;
+	semsg(_(e_buffer_nr_does_not_exist), மொத்தம்);
+	திரும்பு FAIL;
     }
 
 #ifdef FEAT_GUI
@@ -1474,85 +1474,85 @@ do_buffer_ext(
     /*
      * delete buffer "buf" from memory and/or the list
      */
-    if (unload)
+    எனில் (unload)
     {
-	int	forward;
+	முழு	forward;
 	bufref_T bufref;
 
-	if (!can_unload_buffer(buf))
-	    return FAIL;
+	எனில் (!can_unload_buffer(buf))
+	    திரும்பு FAIL;
 
 	set_bufref(&bufref, buf);
 
 	// When unloading or deleting a buffer that's already unloaded and
 	// unlisted: fail silently.
-	if (action != DOBUF_WIPE && action != DOBUF_WIPE_REUSE
-				   && buf->b_ml.ml_mfp == NULL && !buf->b_p_bl)
-	    return FAIL;
+	எனில் (action != DOBUF_WIPE && action != DOBUF_WIPE_REUSE
+				   && buf->b_ml.ml_mfp == வெற்று && !buf->b_p_bl)
+	    திரும்பு FAIL;
 
-	if ((flags & DOBUF_FORCEIT) == 0 && bufIsChanged(buf))
+	எனில் ((flags & DOBUF_FORCEIT) == 0 && bufIsChanged(buf))
 	{
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	    if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#எனில் defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	    எனில் ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	    {
 # ifdef FEAT_TERMINAL
-		if (term_job_running(buf->b_term))
+		எனில் (term_job_running(buf->b_term))
 		{
-		    if (term_confirm_stop(buf) == FAIL)
-			return FAIL;
+		    எனில் (term_confirm_stop(buf) == FAIL)
+			திரும்பு FAIL;
 		}
-		else
+		இல்லையெனில்
 # endif
 		{
 		    dialog_changed(buf, FALSE);
-		    if (!bufref_valid(&bufref))
+		    எனில் (!bufref_valid(&bufref))
 			// Autocommand deleted buffer, oops!  It's not changed
 			// now.
-			return FAIL;
+			திரும்பு FAIL;
 		    // If it's still changed fail silently, the dialog already
 		    // mentioned why it fails.
-		    if (bufIsChanged(buf))
-			return FAIL;
+		    எனில் (bufIsChanged(buf))
+			திரும்பு FAIL;
 		}
 	    }
-	    else
+	    இல்லையெனில்
 #endif
 	    {
 		no_write_message_buf(buf);
-		return FAIL;
+		திரும்பு FAIL;
 	    }
 	}
 
 	// When closing the current buffer stop Visual mode.
-	if (buf == curbuf && VIsual_active)
+	எனில் (buf == curbuf && VIsual_active)
 	    end_visual_mode();
 
 	// If deleting the last (listed) buffer, make it empty.
 	// The last (listed) buffer cannot be unloaded.
 	FOR_ALL_BUFFERS(bp)
-	    if (bp->b_p_bl && bp != buf)
-		break;
-	if (bp == NULL && buf == curbuf)
-	    return empty_curbuf(TRUE, (flags & DOBUF_FORCEIT), action);
+	    எனில் (bp->b_p_bl && bp != buf)
+		நிறுத்து;
+	எனில் (bp == வெற்று && buf == curbuf)
+	    திரும்பு empty_curbuf(TRUE, (flags & DOBUF_FORCEIT), action);
 
 	// If the deleted buffer is the current one, close the current window
 	// (unless it's the only window).  Repeat this so long as we end up in
 	// a window with this buffer.
-	while (buf == curbuf
+	போது (buf == curbuf
 		   && !(win_locked(curwin) || curwin->w_buffer->b_locked > 0)
-		   && (!ONE_WINDOW || first_tabpage->tp_next != NULL))
+		   && (!ONE_WINDOW || first_tabpage->tp_next != வெற்று))
 	{
-	    if (win_close(curwin, FALSE) == FAIL)
-		break;
+	    எனில் (win_close(curwin, FALSE) == FAIL)
+		நிறுத்து;
 	}
 
 	// If the buffer to be deleted is not the current one, delete it here.
-	if (buf != curbuf)
+	எனில் (buf != curbuf)
 	{
 	    close_windows(buf, FALSE);
-	    if (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows <= 0)
-		    close_buffer(NULL, buf, action, FALSE, FALSE, FALSE);
-	    return OK;
+	    எனில் (buf != curbuf && bufref_valid(&bufref) && buf->b_nwindows <= 0)
+		    close_buffer(வெற்று, buf, action, FALSE, FALSE, FALSE);
+	    திரும்பு OK;
 	}
 
 	/*
@@ -1565,190 +1565,190 @@ do_buffer_ext(
 	 * then before the current buffer.
 	 * Finally use any buffer.  Skip buffers that are closing throughout.
 	 */
-	buf = NULL;	// selected buffer
-	bp = NULL;	// used when no loaded buffer found
-	if (au_new_curbuf.br_buf != NULL && bufref_valid(&au_new_curbuf)
+	buf = வெற்று;	// selected buffer
+	bp = வெற்று;	// used when no loaded buffer found
+	எனில் (au_new_curbuf.br_buf != வெற்று && bufref_valid(&au_new_curbuf)
 		&& !au_new_curbuf.br_buf->b_locked_split)
 	    buf = au_new_curbuf.br_buf;
-	else if (curwin->w_jumplistlen > 0)
+	இல்லையெனில் எனில் (curwin->w_jumplistlen > 0)
 	{
-	    int     jumpidx;
+	    முழு     jumpidx;
 
 	    jumpidx = curwin->w_jumplistidx - 1;
-	    if (jumpidx < 0)
+	    எனில் (jumpidx < 0)
 		jumpidx = curwin->w_jumplistlen - 1;
 
 	    forward = jumpidx;
-	    while (jumpidx != curwin->w_jumplistidx)
+	    போது (jumpidx != curwin->w_jumplistidx)
 	    {
 		buf = buflist_findnr(curwin->w_jumplist[jumpidx].fmark.fnum);
-		if (buf != NULL)
+		எனில் (buf != வெற்று)
 		{
 		    // Skip current and unlisted bufs.  Also skip a quickfix
 		    // or closing buffer, it might be deleted soon.
-		    if (buf == curbuf || !buf->b_p_bl || bt_quickfix(buf)
+		    எனில் (buf == curbuf || !buf->b_p_bl || bt_quickfix(buf)
 			    || buf->b_locked_split)
-			buf = NULL;
-		    else if (buf->b_ml.ml_mfp == NULL)
+			buf = வெற்று;
+		    இல்லையெனில் எனில் (buf->b_ml.ml_mfp == வெற்று)
 		    {
 			// skip unloaded buf, but may keep it for later
-			if (bp == NULL)
+			எனில் (bp == வெற்று)
 			    bp = buf;
-			buf = NULL;
+			buf = வெற்று;
 		    }
 		}
-		if (buf != NULL)   // found a valid buffer: stop searching
-		    break;
+		எனில் (buf != வெற்று)   // found a valid buffer: stop searching
+		    நிறுத்து;
 		// advance to older entry in jump list
-		if (!jumpidx && curwin->w_jumplistidx == curwin->w_jumplistlen)
-		    break;
-		if (--jumpidx < 0)
+		எனில் (!jumpidx && curwin->w_jumplistidx == curwin->w_jumplistlen)
+		    நிறுத்து;
+		எனில் (--jumpidx < 0)
 		    jumpidx = curwin->w_jumplistlen - 1;
-		if (jumpidx == forward)		// List exhausted for sure
-		    break;
+		எனில் (jumpidx == forward)		// List exhausted for sure
+		    நிறுத்து;
 	    }
 	}
 
-	if (buf == NULL)	// No previous buffer, Try 2'nd approach
+	எனில் (buf == வெற்று)	// No previous buffer, Try 2'nd approach
 	{
 	    forward = TRUE;
 	    buf = curbuf->b_next;
-	    for (;;)
+	    க்கு (;;)
 	    {
-		if (buf == NULL)
+		எனில் (buf == வெற்று)
 		{
-		    if (!forward)	// tried both directions
-			break;
+		    எனில் (!forward)	// tried both directions
+			நிறுத்து;
 		    buf = curbuf->b_prev;
 		    forward = FALSE;
-		    continue;
+		    தொடர்;
 		}
 		// in non-help buffer, try to skip help buffers, and vv
-		if (buf->b_help == curbuf->b_help && buf->b_p_bl
+		எனில் (buf->b_help == curbuf->b_help && buf->b_p_bl
 			    && !bt_quickfix(buf) && !buf->b_locked_split)
 		{
-		    if (buf->b_ml.ml_mfp != NULL)   // found loaded buffer
-			break;
-		    if (bp == NULL)	// remember unloaded buf for later
+		    எனில் (buf->b_ml.ml_mfp != வெற்று)   // found loaded buffer
+			நிறுத்து;
+		    எனில் (bp == வெற்று)	// remember unloaded buf for later
 			bp = buf;
 		}
-		if (forward)
+		எனில் (forward)
 		    buf = buf->b_next;
-		else
+		இல்லையெனில்
 		    buf = buf->b_prev;
 	    }
 	}
-	if (buf == NULL)	// No loaded buffer, use unloaded one
+	எனில் (buf == வெற்று)	// No loaded buffer, use unloaded one
 	    buf = bp;
-	if (buf == NULL)	// No loaded buffer, find listed one
+	எனில் (buf == வெற்று)	// No loaded buffer, find listed one
 	{
 	    FOR_ALL_BUFFERS(buf)
-		if (buf->b_p_bl && buf != curbuf && !bt_quickfix(buf)
+		எனில் (buf->b_p_bl && buf != curbuf && !bt_quickfix(buf)
 			&& !buf->b_locked_split)
-		    break;
+		    நிறுத்து;
 	}
-	if (buf == NULL)	// Still no buffer, just take one
+	எனில் (buf == வெற்று)	// Still no buffer, just take one
 	{
-	    if (curbuf->b_next != NULL)
+	    எனில் (curbuf->b_next != வெற்று)
 		buf = curbuf->b_next;
-	    else
+	    இல்லையெனில்
 		buf = curbuf->b_prev;
-	    if (bt_quickfix(buf)
-		    || (buf != NULL && buf != curbuf && buf->b_locked_split))
-		buf = NULL;
+	    எனில் (bt_quickfix(buf)
+		    || (buf != வெற்று && buf != curbuf && buf->b_locked_split))
+		buf = வெற்று;
 	}
     }
 
-    if (buf == NULL)
+    எனில் (buf == வெற்று)
     {
 	// Autocommands must have wiped out all other buffers.  Only option
 	// now is to make the current buffer empty.
-	return empty_curbuf(FALSE, (flags & DOBUF_FORCEIT), action);
+	திரும்பு empty_curbuf(FALSE, (flags & DOBUF_FORCEIT), action);
     }
 
     /*
      * make "buf" the current buffer
      */
     // If 'switchbuf' is set jump to the window containing "buf".
-    if (action == DOBUF_SPLIT && swbuf_goto_win_with_buf(buf) != NULL)
-	return OK;
+    எனில் (action == DOBUF_SPLIT && swbuf_goto_win_with_buf(buf) != வெற்று)
+	திரும்பு OK;
     // Whether splitting or not, don't open a closing buffer in more windows.
-    if (buf != curbuf && buf->b_locked_split)
+    எனில் (buf != curbuf && buf->b_locked_split)
     {
 	emsg(_(e_cannot_switch_to_a_closing_buffer));
-	return FAIL;
+	திரும்பு FAIL;
     }
-    if (action == DOBUF_SPLIT && win_split(0, 0) == FAIL) // split window first
-	return FAIL;
+    எனில் (action == DOBUF_SPLIT && win_split(0, 0) == FAIL) // split window first
+	திரும்பு FAIL;
 
     // go to current buffer - nothing to do
-    if (buf == curbuf)
-	return OK;
+    எனில் (buf == curbuf)
+	திரும்பு OK;
 
     // Check if the current buffer may be abandoned.
-    if (action == DOBUF_GOTO && !can_abandon(curbuf, (flags & DOBUF_FORCEIT)))
+    எனில் (action == DOBUF_GOTO && !can_abandon(curbuf, (flags & DOBUF_FORCEIT)))
     {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
-	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
+#எனில் defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+	எனில் ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM)) && p_write)
 	{
 # ifdef FEAT_TERMINAL
-	    if (term_job_running(curbuf->b_term))
+	    எனில் (term_job_running(curbuf->b_term))
 	    {
-		if (term_confirm_stop(curbuf) == FAIL)
-		    return FAIL;
+		எனில் (term_confirm_stop(curbuf) == FAIL)
+		    திரும்பு FAIL;
 		// Manually kill the terminal here because this command will
 		// hide it otherwise.
 		free_terminal(curbuf);
 	    }
-	    else
+	    இல்லையெனில்
 # endif
 	    {
 		bufref_T bufref;
 
 		set_bufref(&bufref, buf);
 		dialog_changed(curbuf, FALSE);
-		if (!bufref_valid(&bufref))
+		எனில் (!bufref_valid(&bufref))
 		    // Autocommand deleted buffer, oops!
-		    return FAIL;
+		    திரும்பு FAIL;
 
-		if (bufIsChanged(curbuf))
+		எனில் (bufIsChanged(curbuf))
 		{
 		    no_write_message();
-		    return FAIL;
+		    திரும்பு FAIL;
 		}
 	    }
 	}
-	else
+	இல்லையெனில்
 #endif
 	{
 	    no_write_message();
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
     }
 
     // Go to the other buffer.
     set_curbuf(buf, action);
 
-    if (action == DOBUF_SPLIT)
+    எனில் (action == DOBUF_SPLIT)
 	RESET_BINDING(curwin);	// reset 'scrollbind' and 'cursorbind'
 
-#if defined(FEAT_EVAL)
-    if (aborting())	    // autocmds may abort script processing
-	return FAIL;
+#எனில் defined(FEAT_EVAL)
+    எனில் (aborting())	    // autocmds may abort script processing
+	திரும்பு FAIL;
 #endif
 
-    return OK;
+    திரும்பு OK;
 }
 
-    int
+    முழு
 do_buffer(
-    int		action,
-    int		start,
-    int		dir,		// FORWARD or BACKWARD
-    int		count,		// buffer number or number of buffers
-    int		forceit)	// TRUE when using !
+    முழு		action,
+    முழு		start,
+    முழு		dir,		// FORWARD or BACKWARD
+    முழு		மொத்தம்,		// buffer number or number of buffers
+    முழு		forceit)	// TRUE when using !
 {
-    return do_buffer_ext(action, start, dir, count,
+    திரும்பு do_buffer_ext(action, start, dir, மொத்தம்,
 						  forceit ? DOBUF_FORCEIT : 0);
 }
 
@@ -1765,102 +1765,102 @@ do_buffer(
  *
  * Returns error message or NULL
  */
-    char *
+    எழுத்து *
 do_bufdel(
-    int		command,
+    முழு		command,
     char_u	*arg,		// pointer to extra arguments
-    int		addr_count,
-    int		start_bnr,	// first buffer number in a range
-    int		end_bnr,	// buffer nr or last buffer nr in a range
-    int		forceit)
+    முழு		addr_மொத்தம்,
+    முழு		start_bnr,	// first buffer number in a range
+    முழு		end_bnr,	// buffer nr or last buffer nr in a range
+    முழு		forceit)
 {
-    int		do_current = 0;	// delete current buffer?
-    int		deleted = 0;	// number of buffers deleted
-    char	*errormsg = NULL; // return value
-    int		bnr;		// buffer number
+    முழு		do_current = 0;	// delete current buffer?
+    முழு		deleted = 0;	// number of buffers deleted
+    எழுத்து	*errormsg = வெற்று; // return value
+    முழு		bnr;		// buffer number
     char_u	*p;
 
-    if (addr_count == 0)
+    எனில் (addr_மொத்தம் == 0)
     {
-	(void)do_buffer(command, DOBUF_CURRENT, FORWARD, 0, forceit);
+	(வெறுமை)do_buffer(command, DOBUF_CURRENT, FORWARD, 0, forceit);
     }
-    else
+    இல்லையெனில்
     {
-	if (addr_count == 2)
+	எனில் (addr_மொத்தம் == 2)
 	{
-	    if (*arg)		// both range and argument is not allowed
-		return ex_errmsg(e_trailing_characters_str, arg);
+	    எனில் (*arg)		// both range and argument is not allowed
+		திரும்பு ex_errmsg(e_trailing_characters_str, arg);
 	    bnr = start_bnr;
 	}
-	else	// addr_count == 1
+	இல்லையெனில்	// addr_count == 1
 	    bnr = end_bnr;
 
-	for ( ;!got_int; ui_breakcheck())
+	க்கு ( ;!got_int; ui_breakcheck())
 	{
 	    // Delete the current buffer last, otherwise when the
 	    // current buffer is deleted, the next buffer becomes
 	    // the current one and will be loaded, which may then
 	    // also be deleted, etc.
-	    if (bnr == curbuf->b_fnum)
+	    எனில் (bnr == curbuf->b_fnum)
 		do_current = bnr;
-	    else if (do_buffer_ext(command, DOBUF_FIRST, FORWARD, bnr,
+	    இல்லையெனில் எனில் (do_buffer_ext(command, DOBUF_FIRST, FORWARD, bnr,
 			  DOBUF_NOPOPUP | (forceit ? DOBUF_FORCEIT : 0)) == OK)
 		++deleted;
 
 	    // find next buffer number to delete/unload
-	    if (addr_count == 2)
+	    எனில் (addr_மொத்தம் == 2)
 	    {
-		if (++bnr > end_bnr)
-		    break;
+		எனில் (++bnr > end_bnr)
+		    நிறுத்து;
 	    }
-	    else    // addr_count == 1
+	    இல்லையெனில்    // addr_count == 1
 	    {
 		arg = skipwhite(arg);
-		if (*arg == NUL)
-		    break;
-		if (!VIM_ISDIGIT(*arg))
+		எனில் (*arg == NUL)
+		    நிறுத்து;
+		எனில் (!VIM_ISDIGIT(*arg))
 		{
 		    p = skiptowhite_esc(arg);
 		    bnr = buflist_findpat(arg, p,
 			  command == DOBUF_WIPE || command == DOBUF_WIPE_REUSE,
 								FALSE, FALSE);
-		    if (bnr < 0)	    // failed
-			break;
+		    எனில் (bnr < 0)	    // failed
+			நிறுத்து;
 		    arg = p;
 		}
-		else
+		இல்லையெனில்
 		    bnr = getdigits(&arg);
 	    }
 	}
-	if (!got_int && do_current && do_buffer(command, DOBUF_FIRST,
+	எனில் (!got_int && do_current && do_buffer(command, DOBUF_FIRST,
 					  FORWARD, do_current, forceit) == OK)
 	    ++deleted;
 
-	if (deleted == 0)
+	எனில் (deleted == 0)
 	{
-	    if (command == DOBUF_UNLOAD)
+	    எனில் (command == DOBUF_UNLOAD)
 		STRCPY(IObuff, _(e_no_buffers_were_unloaded));
-	    else if (command == DOBUF_DEL)
+	    இல்லையெனில் எனில் (command == DOBUF_DEL)
 		STRCPY(IObuff, _(e_no_buffers_were_deleted));
-	    else
+	    இல்லையெனில்
 		STRCPY(IObuff, _(e_no_buffers_were_wiped_out));
-	    errormsg = (char *)IObuff;
+	    errormsg = (எழுத்து *)IObuff;
 	}
-	else if (deleted >= p_report)
+	இல்லையெனில் எனில் (deleted >= p_report)
 	{
-	    if (command == DOBUF_UNLOAD)
+	    எனில் (command == DOBUF_UNLOAD)
 		smsg(NGETTEXT("%d buffer unloaded",
 			    "%d buffers unloaded", deleted), deleted);
-	    else if (command == DOBUF_DEL)
+	    இல்லையெனில் எனில் (command == DOBUF_DEL)
 		smsg(NGETTEXT("%d buffer deleted",
 			    "%d buffers deleted", deleted), deleted);
-	    else
+	    இல்லையெனில்
 		smsg(NGETTEXT("%d buffer wiped out",
 			    "%d buffers wiped out", deleted), deleted);
 	}
     }
 
-    return errormsg;
+    திரும்பு errormsg;
 }
 
 /*
@@ -1873,21 +1873,21 @@ do_bufdel(
  * DOBUF_WIPE	    wipe it out
  * DOBUF_WIPE_REUSE wipe it out and add to "buf_reuse"
  */
-    void
-set_curbuf(buf_T *buf, int action)
+    வெறுமை
+set_curbuf(buf_T *buf, முழு action)
 {
     buf_T	*prevbuf;
-    int		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
+    முழு		unload = (action == DOBUF_UNLOAD || action == DOBUF_DEL
 			|| action == DOBUF_WIPE || action == DOBUF_WIPE_REUSE);
 #ifdef FEAT_SYN_HL
     long	old_tw = curbuf->b_p_tw;
 #endif
     bufref_T	newbufref;
     bufref_T	prevbufref;
-    int		valid;
+    முழு		valid;
 
     setpcmark();
-    if ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+    எனில் ((cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	curwin->w_alt_fnum = curbuf->b_fnum; // remember alternate file
     buflist_altfpos(curwin);			 // remember curpos
 
@@ -1901,7 +1901,7 @@ set_curbuf(buf_T *buf, int action)
 
     // Autocommands may delete the current buffer and/or the buffer we want to
     // go to.  In those cases don't close the buffer.
-    if (!apply_autocmds(EVENT_BUFLEAVE, NULL, NULL, FALSE, curbuf)
+    எனில் (!apply_autocmds(EVENT_BUFLEAVE, வெற்று, வெற்று, FALSE, curbuf)
 	    || (bufref_valid(&prevbufref)
 		&& bufref_valid(&newbufref)
 #ifdef FEAT_EVAL
@@ -1910,22 +1910,22 @@ set_curbuf(buf_T *buf, int action)
 	       ))
     {
 #ifdef FEAT_SYN_HL
-	if (prevbuf == curwin->w_buffer)
+	எனில் (prevbuf == curwin->w_buffer)
 	    reset_synblock(curwin);
 #endif
-	if (unload)
+	எனில் (unload)
 	    close_windows(prevbuf, FALSE);
-#if defined(FEAT_EVAL)
-	if (bufref_valid(&prevbufref) && !aborting())
-#else
-	if (bufref_valid(&prevbufref))
+#எனில் defined(FEAT_EVAL)
+	எனில் (bufref_valid(&prevbufref) && !aborting())
+#இல்லையெனில்
+	எனில் (bufref_valid(&prevbufref))
 #endif
 	{
 	    // Do not sync when in Insert mode and the buffer is open in
 	    // another window, might be a timer doing something in another
 	    // window.
-	    if (prevbuf == curbuf
-		    && ((State & MODE_INSERT) == 0 || curbuf->b_nwindows <= 1))
+	    எனில் (prevbuf == curbuf
+		    && ((State & MODE_செருகு) == 0 || curbuf->b_nwindows <= 1))
 		u_sync(FALSE);
 	    close_buffer(curwin, prevbuf,
 		    unload ? action : (action == DOBUF_GOTO
@@ -1938,21 +1938,21 @@ set_curbuf(buf_T *buf, int action)
     // it did ":bunload") or aborted the script processing.
     // If curwin->w_buffer is null, enter_buffer() will make it valid again
     valid = buf_valid(buf);
-    if ((valid && buf != curbuf
+    எனில் ((valid && buf != curbuf
 #ifdef FEAT_EVAL
 		&& !aborting()
 #endif
-	) || curwin->w_buffer == NULL)
+	) || curwin->w_buffer == வெற்று)
     {
 	// If the buffer is not valid but curwin->w_buffer is NULL we must
 	// enter some buffer.  Using the last one is hopefully OK.
-	if (!valid)
+	எனில் (!valid)
 	    enter_buffer(lastbuf);
-	else
+	இல்லையெனில்
 	    enter_buffer(buf);
 #ifdef FEAT_SYN_HL
-	if (old_tw != curbuf->b_p_tw)
-	    check_colorcolumn(NULL, curwin);
+	எனில் (old_tw != curbuf->b_p_tw)
+	    check_colorcolumn(வெற்று, curwin);
 #endif
     }
 }
@@ -1962,20 +1962,20 @@ set_curbuf(buf_T *buf, int action)
  * Old curbuf must have been abandoned already!  This also means "curbuf" may
  * be pointing to freed memory.
  */
-    static void
+    நிலையான வெறுமை
 enter_buffer(buf_T *buf)
 {
     // Stop Visual mode before changing curbuf.  May trigger TextYankPost, but
     // with textlock set.  Assumes curbuf and curwin->w_buffer is valid; if not,
     // buf_freeall() should've done this already!
-    if (VIsual_active
-#if defined(EXITFREE)
+    எனில் (VIsual_active
+#எனில் defined(EXITFREE)
 	    && !entered_free_all_mem
 #endif
 	    )
 	end_visual_mode();
 
-    if (curwin->w_buffer != NULL)
+    எனில் (curwin->w_buffer != வெற்று)
 	--curwin->w_buffer->b_nwindows;
 
     // Get the buffer in the current window.
@@ -1985,17 +1985,17 @@ enter_buffer(buf_T *buf)
 
     // Copy buffer and window local option values.  Not for a help buffer.
     buf_copy_options(buf, BCO_ENTER | BCO_NOHELP);
-    if (!buf->b_help)
+    எனில் (!buf->b_help)
 	get_winopts(buf);
 #ifdef FEAT_FOLDING
-    else
+    இல்லையெனில்
 	// Remove all folds in the window.
 	clearFolding(curwin);
     foldUpdateAll(curwin);	// update folds (later).
 #endif
 
 #ifdef FEAT_DIFF
-    if (curwin->w_p_diff)
+    எனில் (curwin->w_p_diff)
 	diff_buf_add(curbuf);
 #endif
 
@@ -2014,41 +2014,41 @@ enter_buffer(buf_T *buf)
     curwin->w_valid = 0;
 
     // Make sure the buffer is loaded.
-    if (curbuf->b_ml.ml_mfp == NULL)	// need to load the file
+    எனில் (curbuf->b_ml.ml_mfp == வெற்று)	// need to load the file
     {
 	// If there is no filetype, allow for detecting one.  Esp. useful for
 	// ":ball" used in an autocommand.  If there already is a filetype we
 	// might prefer to keep it.
-	if (*curbuf->b_p_ft == NUL)
+	எனில் (*curbuf->b_p_ft == NUL)
 	    curbuf->b_did_filetype = false;
 
-	open_buffer(FALSE, NULL, 0);
+	open_buffer(FALSE, வெற்று, 0);
     }
-    else
+    இல்லையெனில்
     {
-	if (!msg_silent && !shortmess(SHM_FILEINFO))
+	எனில் (!செய்தி_silent && !shortmess(SHM_FILEINFO))
 	    need_fileinfo = TRUE;	// display file info after redraw
 
 	// check if file changed
-	(void)buf_check_timestamp(curbuf, FALSE);
+	(வெறுமை)buf_check_timestamp(curbuf, FALSE);
 
 	curwin->w_topline = 1;
 #ifdef FEAT_DIFF
 	curwin->w_topfill = 0;
 #endif
-	apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
-	apply_autocmds(EVENT_BUFWINENTER, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_BUFENTER, வெற்று, வெற்று, FALSE, curbuf);
+	apply_autocmds(EVENT_BUFWINENTER, வெற்று, வெற்று, FALSE, curbuf);
     }
 
     // If autocommands did not change the cursor position, restore cursor lnum
     // and possibly cursor col.
-    if (curwin->w_cursor.lnum == 1 && inindent(0))
+    எனில் (curwin->w_cursor.lnum == 1 && inindent(0))
 	buflist_getfpos();
 
     check_arg_idx(curwin);		// check for valid arg_idx
     maketitle();
 	// when autocmds didn't change it
-    if (curwin->w_topline == 1 && !curwin->w_topline_was_set)
+    எனில் (curwin->w_topline == 1 && !curwin->w_topline_was_set)
 	scroll_cursor_halfway(FALSE, FALSE);	// redisplay at correct position
 
 #ifdef FEAT_NETBEANS_INTG
@@ -2060,14 +2060,14 @@ enter_buffer(buf_T *buf)
     DO_AUTOCHDIR;
 
 #ifdef FEAT_KEYMAP
-    if (curbuf->b_kmap_state & KEYMAP_INIT)
-	(void)keymap_init();
+    எனில் (curbuf->b_kmap_state & KEYMAP_INIT)
+	(வெறுமை)keymap_init();
 #endif
 #ifdef FEAT_SPELL
     // May need to set the spell language.  Can only do this after the buffer
     // has been properly setup.
-    if (!curbuf->b_help && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
-	(void)parse_spelllang(curwin);
+    எனில் (!curbuf->b_help && curwin->w_p_spell && *curwin->w_s->b_p_spl != NUL)
+	(வெறுமை)parse_spelllang(curwin);
 #endif
 #ifdef FEAT_VIMINFO
     curbuf->b_last_used = vim_time();
@@ -2076,16 +2076,16 @@ enter_buffer(buf_T *buf)
     redraw_later(UPD_NOT_VALID);
 }
 
-#if defined(FEAT_AUTOCHDIR)
+#எனில் defined(FEAT_AUTOCHDIR)
 /*
  * Change to the directory of the current buffer.
  * Don't do this while still starting up.
  */
-    void
-do_autochdir(void)
+    வெறுமை
+do_autochdir(வெறுமை)
 {
-    if ((starting == 0 || test_autochdir)
-	    && curbuf->b_ffname != NULL
+    எனில் ((starting == 0 || test_autochdir)
+	    && curbuf->b_ffname != வெற்று
 	    && vim_chdirfile(curbuf->b_ffname, "auto") == OK)
     {
 	shorten_fnames(TRUE);
@@ -2094,36 +2094,36 @@ do_autochdir(void)
 }
 #endif
 
-    void
+    வெறுமை
 no_write_message_buf(buf_T *buf)
 {
 #ifdef FEAT_TERMINAL
-    if (term_job_running(buf->b_term))
+    எனில் (term_job_running(buf->b_term))
 	emsg(_(e_job_still_running_add_bang_to_end_the_job));
-    else
+    இல்லையெனில்
 #endif
 	semsg(_(e_no_write_since_last_change_for_buffer_nr_add_bang_to_override),
 		buf->b_fnum);
 }
 
-    void
-no_write_message(void)
+    வெறுமை
+no_write_message(வெறுமை)
 {
 #ifdef FEAT_TERMINAL
-    if (term_job_running(curbuf->b_term))
+    எனில் (term_job_running(curbuf->b_term))
 	emsg(_(e_job_still_running_add_bang_to_end_the_job));
-    else
+    இல்லையெனில்
 #endif
 	emsg(_(e_no_write_since_last_change_add_bang_to_override));
 }
 
-    void
+    வெறுமை
 no_write_message_nobang(buf_T *buf UNUSED)
 {
 #ifdef FEAT_TERMINAL
-    if (term_job_running(buf->b_term))
+    எனில் (term_job_running(buf->b_term))
 	emsg(_(e_job_still_running));
-    else
+    இல்லையெனில்
 #endif
 	emsg(_(e_no_write_since_last_change));
 }
@@ -2136,13 +2136,13 @@ no_write_message_nobang(buf_T *buf UNUSED)
  * Return TRUE if the current buffer is empty, unnamed, unmodified and used in
  * only one window.  That means it can be re-used.
  */
-    int
-curbuf_reusable(void)
+    முழு
+curbuf_reusable(வெறுமை)
 {
-    return (curbuf != NULL
-	&& curbuf->b_ffname == NULL
+    திரும்பு (curbuf != வெற்று
+	&& curbuf->b_ffname == வெற்று
 	&& curbuf->b_nwindows <= 1
-	&& (curbuf->b_ml.ml_mfp == NULL || BUFEMPTY())
+	&& (curbuf->b_ml.ml_mfp == வெற்று || BUFEMPTY())
 	&& !bt_quickfix(curbuf)
 	&& !curbufIsChanged());
 }
@@ -2165,7 +2165,7 @@ buflist_new(
     char_u	*ffname_arg,	// full path of fname or relative
     char_u	*sfname_arg,	// short fname or NULL
     linenr_T	lnum,		// preferred cursor line
-    int		flags)		// BLN_ defines
+    முழு		flags)		// BLN_ defines
 {
     char_u	*ffname = ffname_arg;
     char_u	*sfname = sfname_arg;
@@ -2174,7 +2174,7 @@ buflist_new(
     stat_T	st;
 #endif
 
-    if (top_file_num == 1)
+    எனில் (உச்சி_file_இலக்கம் == 1)
 	hash_init(&buf_hashtab);
 
     fname_expand(curbuf, &ffname, &sfname);	// will allocate ffname
@@ -2185,41 +2185,41 @@ buflist_new(
 #ifdef UNIX
     // On Unix we can use inode numbers when the file exists.  Works better
     // for hard links.
-    if (sfname == NULL || mch_stat((char *)sfname, &st) < 0)
+    எனில் (sfname == வெற்று || mch_stat((எழுத்து *)sfname, &st) < 0)
 	st.st_dev = (dev_T)-1;
 #endif
-    if (ffname != NULL && !(flags & (BLN_DUMMY | BLN_NEW)) && (buf =
+    எனில் (ffname != வெற்று && !(flags & (BLN_DUMMY | BLN_NEW)) && (buf =
 #ifdef UNIX
 		buflist_findname_stat(ffname, &st)
-#else
+#இல்லையெனில்
 		buflist_findname(ffname)
 #endif
-		) != NULL)
+		) != வெற்று)
     {
 	vim_free(ffname);
-	if (lnum != 0)
-	    buflist_setfpos(buf, (flags & BLN_NOCURWIN) ? NULL : curwin,
+	எனில் (lnum != 0)
+	    buflist_setfpos(buf, (flags & BLN_NOCURWIN) ? வெற்று : curwin,
 						      lnum, (colnr_T)0, FALSE);
 
-	if ((flags & BLN_NOOPT) == 0)
+	எனில் ((flags & BLN_NOOPT) == 0)
 	    // copy the options now, if 'cpo' doesn't have 's' and not done
 	    // already
 	    buf_copy_options(buf, 0);
 
-	if ((flags & BLN_LISTED) && !buf->b_p_bl)
+	எனில் ((flags & BLN_LISTED) && !buf->b_p_bl)
 	{
 	    bufref_T bufref;
 
 	    buf->b_p_bl = TRUE;
 	    set_bufref(&bufref, buf);
-	    if (!(flags & BLN_DUMMY))
+	    எனில் (!(flags & BLN_DUMMY))
 	    {
-		if (apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, buf)
+		எனில் (apply_autocmds(EVENT_BUFADD, வெற்று, வெற்று, FALSE, buf)
 			&& !bufref_valid(&bufref))
-		    return NULL;
+		    திரும்பு வெற்று;
 	    }
 	}
-	return buf;
+	திரும்பு buf;
     }
 
     /*
@@ -2230,8 +2230,8 @@ buflist_new(
      * (A spell file buffer is allocated in spell.c, but that's not a normal
      * buffer.)
      */
-    buf = NULL;
-    if ((flags & BLN_CURBUF) && curbuf_reusable())
+    buf = வெற்று;
+    எனில் ((flags & BLN_CURBUF) && curbuf_reusable())
     {
 	bufref_T bufref;
 
@@ -2242,38 +2242,38 @@ buflist_new(
 	// change curbuf!  If that happens, allocate a new buffer anyway.
 	buf_freeall(buf, BFA_WIPE | BFA_DEL);
 #ifdef FEAT_EVAL
-	if (aborting())		// autocmds may abort script processing
+	எனில் (aborting())		// autocmds may abort script processing
 	{
 	    vim_free(ffname);
-	    return NULL;
+	    திரும்பு வெற்று;
 	}
 #endif
-	if (!bufref_valid(&bufref))
-	    buf = NULL;		// buf was deleted; allocate a new buffer
+	எனில் (!bufref_valid(&bufref))
+	    buf = வெற்று;		// buf was deleted; allocate a new buffer
     }
-    if (buf != curbuf || curbuf == NULL)
+    எனில் (buf != curbuf || curbuf == வெற்று)
     {
 	buf = ALLOC_CLEAR_ONE(buf_T);
-	if (buf == NULL)
+	எனில் (buf == வெற்று)
 	{
 	    vim_free(ffname);
-	    return NULL;
+	    திரும்பு வெற்று;
 	}
 #ifdef FEAT_EVAL
 	// init b: variables
 	buf->b_vars = dict_alloc_id(aid_newbuf_bvars);
-	if (buf->b_vars == NULL)
+	எனில் (buf->b_vars == வெற்று)
 	{
 	    vim_free(ffname);
 	    vim_free(buf);
-	    return NULL;
+	    திரும்பு வெற்று;
 	}
 	init_var_dict(buf->b_vars, &buf->b_bufvar, VAR_SCOPE);
 #endif
 	init_changedtick(buf);
     }
 
-    if (ffname != NULL)
+    எனில் (ffname != வெற்று)
     {
 	buf->b_ffname = ffname;
 	buf->b_sfname = vim_strsave(sfname);
@@ -2282,20 +2282,20 @@ buflist_new(
     clear_wininfo(buf);
     buf->b_wininfo = ALLOC_CLEAR_ONE(wininfo_T);
 
-    if ((ffname != NULL && (buf->b_ffname == NULL || buf->b_sfname == NULL))
-	    || buf->b_wininfo == NULL)
+    எனில் ((ffname != வெற்று && (buf->b_ffname == வெற்று || buf->b_sfname == வெற்று))
+	    || buf->b_wininfo == வெற்று)
     {
-	if (buf->b_sfname != buf->b_ffname)
+	எனில் (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
-	    buf->b_sfname = NULL;
+	இல்லையெனில்
+	    buf->b_sfname = வெற்று;
 	VIM_CLEAR(buf->b_ffname);
-	if (buf != curbuf)
+	எனில் (buf != curbuf)
 	    free_buffer(buf);
-	return NULL;
+	திரும்பு வெற்று;
     }
 
-    if (buf == curbuf)
+    எனில் (buf == curbuf)
     {
 	free_buffer_stuff(buf, FALSE);	// delete local variables et al.
 
@@ -2308,60 +2308,60 @@ buflist_new(
 	curbuf->b_kmap_state |= KEYMAP_INIT;
 #endif
     }
-    else
+    இல்லையெனில்
     {
 	// put the new buffer at the end of the buffer list
-	buf->b_next = NULL;
-	if (firstbuf == NULL)		// buffer list is empty
+	buf->b_next = வெற்று;
+	எனில் (firstbuf == வெற்று)		// buffer list is empty
 	{
-	    buf->b_prev = NULL;
+	    buf->b_prev = வெற்று;
 	    firstbuf = buf;
 	}
-	else				// append new buffer at end of list
+	இல்லையெனில்				// append new buffer at end of list
 	{
 	    lastbuf->b_next = buf;
 	    buf->b_prev = lastbuf;
 	}
 	lastbuf = buf;
 
-	if ((flags & BLN_REUSE) && buf_reuse.ga_len > 0)
+	எனில் ((flags & BLN_REUSE) && buf_reuse.ga_len > 0)
 	{
 	    // Recycle a previously used buffer number.  Used for buffers which
 	    // are normally hidden, e.g. in a popup window.  Avoids that the
 	    // buffer number grows rapidly.
 	    --buf_reuse.ga_len;
-	    buf->b_fnum = ((int *)buf_reuse.ga_data)[buf_reuse.ga_len];
+	    buf->b_fnum = ((முழு *)buf_reuse.ga_data)[buf_reuse.ga_len];
 
 	    // Move buffer to the right place in the buffer list.
-	    while (buf->b_prev != NULL && buf->b_fnum < buf->b_prev->b_fnum)
+	    போது (buf->b_prev != வெற்று && buf->b_fnum < buf->b_prev->b_fnum)
 	    {
 		buf_T	*prev = buf->b_prev;
 
 		prev->b_next = buf->b_next;
-		if (prev->b_next != NULL)
+		எனில் (prev->b_next != வெற்று)
 		    prev->b_next->b_prev = prev;
 		buf->b_next = prev;
 		buf->b_prev = prev->b_prev;
-		if (buf->b_prev != NULL)
+		எனில் (buf->b_prev != வெற்று)
 		    buf->b_prev->b_next = buf;
 		prev->b_prev = buf;
-		if (lastbuf == buf)
+		எனில் (lastbuf == buf)
 		    lastbuf = prev;
-		if (firstbuf == prev)
+		எனில் (firstbuf == prev)
 		    firstbuf = buf;
 	    }
 	}
-	else
-	    buf->b_fnum = top_file_num++;
-	if (top_file_num < 0)		// wrap around (may cause duplicates)
+	இல்லையெனில்
+	    buf->b_fnum = உச்சி_file_இலக்கம்++;
+	எனில் (உச்சி_file_இலக்கம் < 0)		// wrap around (may cause duplicates)
 	{
 	    emsg(_("W14: Warning: List of file names overflow"));
-	    if (emsg_silent == 0 && !in_assert_fails)
+	    எனில் (emsg_silent == 0 && !in_assert_fails)
 	    {
 		out_flush();
 		ui_delay(3001L, TRUE);	// make sure it is noticed
 	    }
-	    top_file_num = 1;
+	    உச்சி_file_இலக்கம் = 1;
 	}
 	buf_hashtab_add(buf);
 
@@ -2379,9 +2379,9 @@ buflist_new(
 
     buf->b_fname = buf->b_sfname;
 #ifdef UNIX
-    if (st.st_dev == (dev_T)-1)
+    எனில் (st.st_dev == (dev_T)-1)
 	buf->b_dev_valid = false;
-    else
+    இல்லையெனில்
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
@@ -2390,13 +2390,13 @@ buflist_new(
 #endif
     buf->b_u_synced = true;
     buf->b_flags = BF_CHECK_RO | BF_NEVERLOADED;
-    if (flags & BLN_DUMMY)
+    எனில் (flags & BLN_DUMMY)
 	buf->b_flags |= BF_DUMMY;
     buf_clear_file(buf);
     clrallmarks(buf);			// clear marks
     fmarks_check_names(buf);		// check file marks for this file
     buf->b_p_bl = (flags & BLN_LISTED) ? TRUE : FALSE;	// init 'buflisted'
-    if (!(flags & BLN_DUMMY))
+    எனில் (!(flags & BLN_DUMMY))
     {
 	bufref_T bufref;
 
@@ -2404,22 +2404,22 @@ buflist_new(
 	// also split the window with re-using the one empty buffer. This may
 	// result in unexpectedly losing the empty buffer.
 	set_bufref(&bufref, buf);
-	if (apply_autocmds(EVENT_BUFNEW, NULL, NULL, FALSE, buf)
+	எனில் (apply_autocmds(EVENT_BUFNEW, வெற்று, வெற்று, FALSE, buf)
 		&& !bufref_valid(&bufref))
-	    return NULL;
-	if (flags & BLN_LISTED)
+	    திரும்பு வெற்று;
+	எனில் (flags & BLN_LISTED)
 	{
-	    if (apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, buf)
+	    எனில் (apply_autocmds(EVENT_BUFADD, வெற்று, வெற்று, FALSE, buf)
 		    && !bufref_valid(&bufref))
-		return NULL;
+		திரும்பு வெற்று;
 	}
 #ifdef FEAT_EVAL
-	if (aborting())		// autocmds may abort script processing
-	    return NULL;
+	எனில் (aborting())		// autocmds may abort script processing
+	    திரும்பு வெற்று;
 #endif
     }
 
-    return buf;
+    திரும்பு buf;
 }
 
 /*
@@ -2427,12 +2427,12 @@ buflist_new(
  * If "free_p_ff" is TRUE also free 'fileformat', 'buftype' and
  * 'fileencoding'.
  */
-    void
+    வெறுமை
 free_buf_options(
     buf_T	*buf,
-    int		free_p_ff)
+    முழு		free_p_ff)
 {
-    if (free_p_ff)
+    எனில் (free_p_ff)
     {
 	clear_string_option(&buf->b_p_fenc);
 	clear_string_option(&buf->b_p_ff);
@@ -2446,27 +2446,27 @@ free_buf_options(
     clear_string_option(&buf->b_p_inex);
 # endif
 #endif
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_inde);
     clear_string_option(&buf->b_p_indk);
 #endif
-#if defined(FEAT_BEVAL) && defined(FEAT_EVAL)
+#எனில் defined(FEAT_BEVAL) && defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_bexpr);
 #endif
-#if defined(FEAT_CRYPT)
+#எனில் defined(FEAT_CRYPT)
     clear_string_option(&buf->b_p_cm);
 #endif
     clear_string_option(&buf->b_p_fp);
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
     clear_string_option(&buf->b_p_fex);
 #endif
 #ifdef FEAT_CRYPT
 # ifdef FEAT_SODIUM
-    if (buf->b_p_key != NULL && *buf->b_p_key != NUL
+    எனில் (buf->b_p_சாவி != வெற்று && *buf->b_p_சாவி != NUL
 			   && crypt_method_is_sodium(crypt_get_method_nr(buf)))
-	crypt_sodium_munlock(buf->b_p_key, STRLEN(buf->b_p_key));
+	crypt_sodium_munlock(buf->b_p_சாவி, STRLEN(buf->b_p_சாவி));
 # endif
-    clear_string_option(&buf->b_p_key);
+    clear_string_option(&buf->b_p_சாவி);
 #endif
     clear_string_option(&buf->b_p_kp);
     clear_string_option(&buf->b_p_mps);
@@ -2496,7 +2496,7 @@ free_buf_options(
     clear_string_option(&buf->b_s.b_p_spc);
     clear_string_option(&buf->b_s.b_p_spf);
     vim_regfree(buf->b_s.b_cap_prog);
-    buf->b_s.b_cap_prog = NULL;
+    buf->b_s.b_cap_prog = வெற்று;
     clear_string_option(&buf->b_s.b_p_spl);
     clear_string_option(&buf->b_s.b_p_spo);
 #endif
@@ -2519,8 +2519,8 @@ free_buf_options(
     free_callback(&buf->b_ofu_cb);
     clear_string_option(&buf->b_p_tsrfu);
     free_callback(&buf->b_tsrfu_cb);
-    clear_cpt_callbacks(&buf->b_p_cpt_cb, buf->b_p_cpt_count);
-    buf->b_p_cpt_count = 0;
+    clear_cpt_callbacks(&buf->b_p_cpt_cb, buf->b_p_cpt_மொத்தம்);
+    buf->b_p_cpt_மொத்தம் = 0;
 #endif
 #ifdef FEAT_QUICKFIX
     clear_string_option(&buf->b_p_gefm);
@@ -2565,71 +2565,71 @@ free_buf_options(
  *
  * Return FAIL for failure, OK for success.
  */
-    int
+    முழு
 buflist_getfile(
-    int		n,
+    முழு		n,
     linenr_T	lnum,
-    int		options,
-    int		forceit)
+    முழு		options,
+    முழு		forceit)
 {
     buf_T	*buf;
-    win_T	*wp = NULL;
+    win_T	*wp = வெற்று;
     pos_T	*fpos;
     colnr_T	col;
 
     buf = buflist_findnr(n);
-    if (buf == NULL)
+    எனில் (buf == வெற்று)
     {
-	if ((options & GETF_ALT) && n == 0)
+	எனில் ((options & GETF_ALT) && n == 0)
 	    emsg(_(e_no_alternate_file));
-	else
+	இல்லையெனில்
 	    semsg(_(e_buffer_nr_not_found), n);
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     // if alternate file is the current buffer, nothing to do
-    if (buf == curbuf)
-	return OK;
+    எனில் (buf == curbuf)
+	திரும்பு OK;
 
-    if (text_or_buf_locked())
-	return FAIL;
+    எனில் (text_or_buf_locked())
+	திரும்பு FAIL;
 
     // altfpos may be changed by getfile(), get it now
-    if (lnum == 0)
+    எனில் (lnum == 0)
     {
 	fpos = buflist_findfpos(buf);
 	lnum = fpos->lnum;
 	col = fpos->col;
     }
-    else
+    இல்லையெனில்
 	col = 0;
 
-    if (options & GETF_SWITCH)
+    எனில் (options & GETF_SWITCH)
     {
 	// If 'switchbuf' is set jump to the window containing "buf".
 	wp = swbuf_goto_win_with_buf(buf);
 
 	// If 'switchbuf' contains "split", "vsplit" or "newtab" and the
 	// current buffer isn't empty: open new tab or window
-	if (wp == NULL && (swb_flags & (SWB_VSPLIT | SWB_SPLIT | SWB_NEWTAB))
+	எனில் (wp == வெற்று && (swb_flags & (SWB_VSPLIT | SWB_SPLIT | SWB_NEWTAB))
 							       && !BUFEMPTY())
 	{
-	    if (swb_flags & SWB_NEWTAB)
+	    எனில் (swb_flags & SWB_NEWTAB)
 		tabpage_new();
-	    else if (win_split(0, (swb_flags & SWB_VSPLIT) ? WSP_VERT : 0)
+	    இல்லையெனில் எனில் (win_split(0, (swb_flags & SWB_VSPLIT) ? WSP_VERT : 0)
 								      == FAIL)
-		return FAIL;
+		திரும்பு FAIL;
 	    RESET_BINDING(curwin);
 	}
     }
 
     ++RedrawingDisabled;
-    int retval = FAIL;
-    if (GETFILE_SUCCESS(getfile(buf->b_fnum, NULL, NULL,
+    முழு retval = FAIL;
+    எனில் (GETFILE_SUCCESS(getfile(buf->b_fnum, வெற்று, வெற்று,
 				     (options & GETF_SETMARK), lnum, forceit)))
     {
 	// cursor is at to BOL and w_cursor.lnum is checked due to getfile()
-	if (!p_sol && col != 0)
+	எனில் (!p_sol && col != 0)
 	{
 	    curwin->w_cursor.col = col;
 	    check_cursor_col();
@@ -2639,16 +2639,16 @@ buflist_getfile(
 	retval = OK;
     }
 
-    if (RedrawingDisabled > 0)
+    எனில் (RedrawingDisabled > 0)
 	--RedrawingDisabled;
-    return retval;
+    திரும்பு retval;
 }
 
 /*
  * go to the last know line number for the current buffer
  */
-    static void
-buflist_getfpos(void)
+    நிலையான வெறுமை
+buflist_getfpos(வெறுமை)
 {
     pos_T	*fpos;
 
@@ -2657,9 +2657,9 @@ buflist_getfpos(void)
     curwin->w_cursor.lnum = fpos->lnum;
     check_cursor_lnum();
 
-    if (p_sol)
+    எனில் (p_sol)
 	curwin->w_cursor.col = 0;
-    else
+    இல்லையெனில்
     {
 	curwin->w_cursor.col = fpos->col;
 	check_cursor_col();
@@ -2676,22 +2676,22 @@ buflist_getfpos(void)
 buflist_findname_exp(char_u *fname)
 {
     char_u	*ffname;
-    buf_T	*buf = NULL;
+    buf_T	*buf = வெற்று;
 
     // First make the name into a full path name
     ffname = FullName_save(fname,
 #ifdef UNIX
 	    TRUE	    // force expansion, get rid of symbolic links
-#else
+#இல்லையெனில்
 	    FALSE
 #endif
 	    );
-    if (ffname != NULL)
+    எனில் (ffname != வெற்று)
     {
 	buf = buflist_findname(ffname);
 	vim_free(ffname);
     }
-    return buf;
+    திரும்பு buf;
 }
 
 /*
@@ -2706,9 +2706,9 @@ buflist_findname(char_u *ffname)
 #ifdef UNIX
     stat_T	st;
 
-    if (mch_stat((char *)ffname, &st) < 0)
+    எனில் (mch_stat((எழுத்து *)ffname, &st) < 0)
 	st.st_dev = (dev_T)-1;
-    return buflist_findname_stat(ffname, &st);
+    திரும்பு buflist_findname_stat(ffname, &st);
 }
 
 /*
@@ -2716,7 +2716,7 @@ buflist_findname(char_u *ffname)
  * twice for the same file.
  * Returns NULL if not found.
  */
-    static buf_T *
+    நிலையான buf_T *
 buflist_findname_stat(
     char_u	*ffname,
     stat_T	*stp)
@@ -2726,13 +2726,13 @@ buflist_findname_stat(
 
     // Start at the last buffer, expect to find a match sooner.
     FOR_ALL_BUFS_FROM_LAST(buf)
-	if ((buf->b_flags & BF_DUMMY) == 0 && !otherfile_buf(buf, ffname
+	எனில் ((buf->b_flags & BF_DUMMY) == 0 && !otherfile_buf(buf, ffname
 #ifdef UNIX
 		    , stp
 #endif
 		    ))
-	    return buf;
-    return NULL;
+	    திரும்பு buf;
+    திரும்பு வெற்று;
 }
 
 /*
@@ -2740,34 +2740,34 @@ buflist_findname_stat(
  * Return fnum of the found buffer.
  * Return < 0 for error.
  */
-    int
+    முழு
 buflist_findpat(
     char_u	*pattern,
     char_u	*pattern_end,	// pointer to first char after pattern
-    int		unlisted,	// find unlisted buffers
-    int		diffmode UNUSED, // find diff-mode buffers only
-    int		curtab_only)	// find buffers in current tab only
+    முழு		unlisted,	// find unlisted buffers
+    முழு		diffmode UNUSED, // find diff-mode buffers only
+    முழு		curtab_only)	// find buffers in current tab only
 {
     buf_T	*buf;
-    int		match = -1;
-    int		find_listed;
+    முழு		match = -1;
+    முழு		find_listed;
     char_u	*pat;
     char_u	*patend;
-    int		attempt;
+    முழு		attempt;
     char_u	*p;
-    int		toggledollar;
+    முழு		toggledollar;
 
     // "%" is current file, "%%" or "#" is alternate file
-    if ((pattern_end == pattern + 1 && (*pattern == '%' || *pattern == '#'))
+    எனில் ((pattern_end == pattern + 1 && (*pattern == '%' || *pattern == '#'))
 	    || (in_vim9script() && pattern_end == pattern + 2
 				    && pattern[0] == '%' && pattern[1] == '%'))
     {
-	if (*pattern == '#' || pattern_end == pattern + 2)
+	எனில் (*pattern == '#' || pattern_end == pattern + 2)
 	    match = curwin->w_alt_fnum;
-	else
+	இல்லையெனில்
 	    match = curbuf->b_fnum;
 #ifdef FEAT_DIFF
-	if (diffmode && !diff_mode_buf(buflist_findnr(match)))
+	எனில் (diffmode && !diff_mode_buf(buflist_findnr(match)))
 	    match = -1;
 #endif
     }
@@ -2781,90 +2781,90 @@ buflist_findpat(
      * Repeat this for finding an unlisted buffer if there was no matching
      * listed buffer.
      */
-    else
+    இல்லையெனில்
     {
-	pat = file_pat_to_reg_pat(pattern, pattern_end, NULL, FALSE);
-	if (pat == NULL)
-	    return -1;
+	pat = file_pat_to_reg_pat(pattern, pattern_end, வெற்று, FALSE);
+	எனில் (pat == வெற்று)
+	    திரும்பு -1;
 	patend = pat + STRLEN(pat) - 1;
 	toggledollar = (patend > pat && *patend == '$');
 
 	// First try finding a listed buffer.  If not found and "unlisted"
 	// is TRUE, try finding an unlisted buffer.
 	find_listed = TRUE;
-	for (;;)
+	க்கு (;;)
 	{
-	    for (attempt = 0; attempt <= 3; ++attempt)
+	    க்கு (attempt = 0; attempt <= 3; ++attempt)
 	    {
 		regmatch_T	regmatch;
 
 		// may add '^' and '$'
-		if (toggledollar)
+		எனில் (toggledollar)
 		    *patend = (attempt < 2) ? NUL : '$'; // add/remove '$'
 		p = pat;
-		if (*p == '^' && !(attempt & 1))	 // add/remove '^'
+		எனில் (*p == '^' && !(attempt & 1))	 // add/remove '^'
 		    ++p;
 		regmatch.regprog = vim_regcomp(p, magic_isset() ? RE_MAGIC : 0);
 
 		FOR_ALL_BUFS_FROM_LAST(buf)
 		{
-		    if (regmatch.regprog == NULL)
+		    எனில் (regmatch.regprog == வெற்று)
 		    {
 			// invalid pattern, possibly after switching engine
 			vim_free(pat);
-			return -1;
+			திரும்பு -1;
 		    }
-		    if (buf->b_p_bl == find_listed
+		    எனில் (buf->b_p_bl == find_listed
 #ifdef FEAT_DIFF
 			    && (!diffmode || diff_mode_buf(buf))
 #endif
-			    && buflist_match(&regmatch, buf, FALSE) != NULL)
+			    && buflist_match(&regmatch, buf, FALSE) != வெற்று)
 		    {
-			if (curtab_only)
+			எனில் (curtab_only)
 			{
 			    // Ignore the match if the buffer is not open in
 			    // the current tab.
 			    win_T	*wp;
 
 			    FOR_ALL_WINDOWS(wp)
-				if (wp->w_buffer == buf)
-				    break;
-			    if (wp == NULL)
-				continue;
+				எனில் (wp->w_buffer == buf)
+				    நிறுத்து;
+			    எனில் (wp == வெற்று)
+				தொடர்;
 			}
-			if (match >= 0)		// already found a match
+			எனில் (match >= 0)		// already found a match
 			{
 			    match = -2;
-			    break;
+			    நிறுத்து;
 			}
 			match = buf->b_fnum;	// remember first match
 		    }
 		}
 
 		vim_regfree(regmatch.regprog);
-		if (match >= 0)			// found one match
-		    break;
+		எனில் (match >= 0)			// found one match
+		    நிறுத்து;
 	    }
 
 	    // Only search for unlisted buffers if there was no match with
 	    // a listed buffer.
-	    if (!unlisted || !find_listed || match != -1)
-		break;
+	    எனில் (!unlisted || !find_listed || match != -1)
+		நிறுத்து;
 	    find_listed = FALSE;
 	}
 
 	vim_free(pat);
     }
 
-    if (match == -2)
+    எனில் (match == -2)
 	semsg(_(e_more_than_one_match_for_str), pattern);
-    else if (match < 0)
+    இல்லையெனில் எனில் (match < 0)
 	semsg(_(e_no_matching_buffer_for_str), pattern);
-    return match;
+    திரும்பு match;
 }
 
 #ifdef FEAT_VIMINFO
-typedef struct {
+வகைவரை கட்டமைப்பு {
     buf_T   *buf;
     char_u  *match;
 } bufmatch_T;
@@ -2875,234 +2875,234 @@ typedef struct {
  * For command line expansion of ":buf" and ":sbuf".
  * Return OK if matches found, FAIL otherwise.
  */
-    int
+    முழு
 ExpandBufnames(
     char_u	*pat,
-    int		*num_file,
+    முழு		*இலக்கம்_file,
     char_u	***file,
-    int		options)
+    முழு		options)
 {
-    int		count;
+    முழு		மொத்தம்;
     buf_T	*buf;
-    int		round;
+    முழு		round;
     char_u	*p;
-    char_u	*patc = NULL;
+    char_u	*patc = வெற்று;
 #ifdef FEAT_VIMINFO
-    bufmatch_T	*matches = NULL;
+    bufmatch_T	*matches = வெற்று;
 #endif
-    int		fuzzy;
-    fuzmatch_str_T  *fuzmatch = NULL;
+    முழு		fuzzy;
+    fuzmatch_str_T  *fuzmatch = வெற்று;
     regmatch_T	regmatch;
-    int		score = 0;
-    int		to_free = FALSE;
+    முழு		score = 0;
+    முழு		to_free = FALSE;
 
-    *num_file = 0;		    // return values in case of FAIL
-    *file = NULL;
+    *இலக்கம்_file = 0;		    // return values in case of FAIL
+    *file = வெற்று;
 
 #ifdef FEAT_DIFF
-    if ((options & BUF_DIFF_FILTER) && !curwin->w_p_diff)
-	return FAIL;
+    எனில் ((options & BUF_DIFF_FILTER) && !curwin->w_p_diff)
+	திரும்பு FAIL;
 #endif
 
     fuzzy = cmdline_fuzzy_complete(pat);
 
     // Make a copy of "pat" and change "^" to "\(^\|[\/]\)" (if doing regular
     // expression matching)
-    if (!fuzzy)
+    எனில் (!fuzzy)
     {
-	if (*pat == '^' && pat[1] != NUL)
+	எனில் (*pat == '^' && pat[1] != NUL)
 	{
-	    int  len = (int)STRLEN(pat);
+	    முழு  len = (முழு)STRLEN(pat);
 	    patc = alloc(len);
-	    if (patc == NULL)
-		return FAIL;
+	    எனில் (patc == வெற்று)
+		திரும்பு FAIL;
 	    STRNCPY(patc, pat + 1, len - 1);
 	    patc[len - 1] = NUL;
 	    to_free = TRUE;
 	}
-	else if (*pat == '^')
+	இல்லையெனில் எனில் (*pat == '^')
 	    patc = (char_u *)"";
-	else
+	இல்லையெனில்
 	    patc = pat;
 	regmatch.regprog = vim_regcomp(patc, RE_MAGIC);
     }
 
     // round == 1: Count the matches.
     // round == 2: Build the array to keep the matches.
-    for (round = 1; round <= 2; ++round)
+    க்கு (round = 1; round <= 2; ++round)
     {
-	count = 0;
+	மொத்தம் = 0;
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (!buf->b_p_bl)	// skip unlisted buffers
-		continue;
+	    எனில் (!buf->b_p_bl)	// skip unlisted buffers
+		தொடர்;
 #ifdef FEAT_DIFF
-	    if (options & BUF_DIFF_FILTER)
+	    எனில் (options & BUF_DIFF_FILTER)
 		// Skip buffers not suitable for
 		// :diffget or :diffput completion.
-		if (buf == curbuf || !diff_mode_buf(buf))
-		    continue;
+		எனில் (buf == curbuf || !diff_mode_buf(buf))
+		    தொடர்;
 #endif
 
-	    if (!fuzzy)
+	    எனில் (!fuzzy)
 	    {
-		if (regmatch.regprog == NULL)
+		எனில் (regmatch.regprog == வெற்று)
 		{
 		    // invalid pattern, possibly after recompiling
-		    if (to_free)
+		    எனில் (to_free)
 			vim_free(patc);
-		    return FAIL;
+		    திரும்பு FAIL;
 		}
 		p = buflist_match(&regmatch, buf, p_wic);
 	    }
-	    else
+	    இல்லையெனில்
 	    {
-		p = NULL;
+		p = வெற்று;
 		// first try matching with the short file name
-		if ((score = fuzzy_match_str(buf->b_sfname, pat))
+		எனில் ((score = fuzzy_match_str(buf->b_sfname, pat))
 			!= FUZZY_SCORE_NONE)
 		    p = buf->b_sfname;
-		if (p == NULL)
+		எனில் (p == வெற்று)
 		{
 		    // next try matching with the full path file name
-		    if ((score = fuzzy_match_str(buf->b_ffname, pat))
+		    எனில் ((score = fuzzy_match_str(buf->b_ffname, pat))
 			    != FUZZY_SCORE_NONE)
 			p = buf->b_ffname;
 		}
 	    }
 
-	    if (p == NULL)
-		continue;
+	    எனில் (p == வெற்று)
+		தொடர்;
 
-	    if (round == 1)
+	    எனில் (round == 1)
 	    {
-		++count;
-		continue;
+		++மொத்தம்;
+		தொடர்;
 	    }
 
-	    if (options & WILD_HOME_REPLACE)
+	    எனில் (options & WILD_HOME_REPLACE)
 		p = home_replace_save(buf, p);
-	    else
+	    இல்லையெனில்
 		p = vim_strsave(p);
-	    if (p == NULL)
+	    எனில் (p == வெற்று)
 	    {
-		if (fuzzy && round == 2)
-		    fuzmatch_str_free(fuzmatch, count);
-		return FAIL;
+		எனில் (fuzzy && round == 2)
+		    fuzmatch_str_free(fuzmatch, மொத்தம்);
+		திரும்பு FAIL;
 	    }
 
-	    if (!fuzzy)
+	    எனில் (!fuzzy)
 	    {
 #ifdef FEAT_VIMINFO
-		if (matches != NULL)
+		எனில் (matches != வெற்று)
 		{
-		    matches[count].buf = buf;
-		    matches[count].match = p;
-		    count++;
+		    matches[மொத்தம்].buf = buf;
+		    matches[மொத்தம்].match = p;
+		    மொத்தம்++;
 		}
-		else
+		இல்லையெனில்
 #endif
-		    (*file)[count++] = p;
+		    (*file)[மொத்தம்++] = p;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
-		fuzmatch[count].idx = count;
-		fuzmatch[count].str = p;
-		fuzmatch[count].score = score;
-		count++;
+		fuzmatch[மொத்தம்].idx = மொத்தம்;
+		fuzmatch[மொத்தம்].str = p;
+		fuzmatch[மொத்தம்].score = score;
+		மொத்தம்++;
 	    }
 	}
-	if (count == 0)	// no match found, break here
-	    break;
-	if (round == 1)
+	எனில் (மொத்தம் == 0)	// no match found, break here
+	    நிறுத்து;
+	எனில் (round == 1)
 	{
-	    if (!fuzzy)
+	    எனில் (!fuzzy)
 	    {
-		*file = ALLOC_MULT(char_u *, count);
-		if (*file == NULL)
+		*file = ALLOC_MULT(char_u *, மொத்தம்);
+		எனில் (*file == வெற்று)
 		{
 		    vim_regfree(regmatch.regprog);
-		    if (to_free)
+		    எனில் (to_free)
 			vim_free(patc);
-		    return FAIL;
+		    திரும்பு FAIL;
 		}
 #ifdef FEAT_VIMINFO
-		if (options & WILD_BUFLASTUSED)
-		    matches = ALLOC_MULT(bufmatch_T, count);
+		எனில் (options & WILD_BUFLASTUSED)
+		    matches = ALLOC_MULT(bufmatch_T, மொத்தம்);
 #endif
 	    }
-	    else
+	    இல்லையெனில்
 	    {
-		fuzmatch = ALLOC_MULT(fuzmatch_str_T, count);
-		if (fuzmatch == NULL)
+		fuzmatch = ALLOC_MULT(fuzmatch_str_T, மொத்தம்);
+		எனில் (fuzmatch == வெற்று)
 		{
-		    *num_file = 0;
-		    *file = NULL;
-		    return FAIL;
+		    *இலக்கம்_file = 0;
+		    *file = வெற்று;
+		    திரும்பு FAIL;
 		}
 	    }
 	}
     }
 
-    if (!fuzzy)
+    எனில் (!fuzzy)
     {
 	vim_regfree(regmatch.regprog);
-	if (to_free)
+	எனில் (to_free)
 	    vim_free(patc);
     }
 
-    if (!fuzzy)
+    எனில் (!fuzzy)
     {
 #ifdef FEAT_VIMINFO
-	if (matches != NULL)
+	எனில் (matches != வெற்று)
 	{
-	    int i;
-	    if (count > 1)
-		qsort(matches, count, sizeof(bufmatch_T), buf_compare);
+	    முழு i;
+	    எனில் (மொத்தம் > 1)
+		qsort(matches, மொத்தம், அளவு(bufmatch_T), buf_compare);
 	    // if the current buffer is first in the list, place it at the end
-	    if (matches[0].buf == curbuf)
+	    எனில் (matches[0].buf == curbuf)
 	    {
-		for (i = 1; i < count; i++)
+		க்கு (i = 1; i < மொத்தம்; i++)
 		    (*file)[i-1] = matches[i].match;
-		(*file)[count-1] = matches[0].match;
+		(*file)[மொத்தம்-1] = matches[0].match;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
-		for (i = 0; i < count; i++)
+		க்கு (i = 0; i < மொத்தம்; i++)
 		    (*file)[i] = matches[i].match;
 	    }
 	    vim_free(matches);
 	}
 #endif
     }
-    else
+    இல்லையெனில்
     {
-	if (fuzzymatches_to_strmatches(fuzmatch, file, count, FALSE) == FAIL)
-	    return FAIL;
+	எனில் (fuzzymatches_to_strmatches(fuzmatch, file, மொத்தம், FALSE) == FAIL)
+	    திரும்பு FAIL;
     }
 
-    *num_file = count;
-    return (count == 0 ? FAIL : OK);
+    *இலக்கம்_file = மொத்தம்;
+    திரும்பு (மொத்தம் == 0 ? FAIL : OK);
 }
 
 /*
  * Check for a match on the file name for buffer "buf" with regprog "prog".
  * Note that rmp->regprog may become NULL when switching regexp engine.
  */
-    static char_u *
+    நிலையான char_u *
 buflist_match(
     regmatch_T	*rmp,
     buf_T	*buf,
-    int		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
+    முழு		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
 {
     char_u	*match;
 
     // First try the short file name, then the long file name.
     match = fname_match(rmp, buf->b_sfname, ignore_case);
-    if (match == NULL && rmp->regprog != NULL)
+    எனில் (match == வெற்று && rmp->regprog != வெற்று)
 	match = fname_match(rmp, buf->b_ffname, ignore_case);
 
-    return match;
+    திரும்பு match;
 }
 
 /*
@@ -3110,53 +3110,53 @@ buflist_match(
  * Note that rmp->regprog may become NULL when switching regexp engine.
  * Return "name" when there is a match, NULL when not.
  */
-    static char_u *
+    நிலையான char_u *
 fname_match(
     regmatch_T	*rmp,
     char_u	*name,
-    int		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
+    முழு		ignore_case)  // when TRUE ignore case, when FALSE use 'fic'
 {
-    char_u	*match = NULL;
+    char_u	*match = வெற்று;
     char_u	*p;
 
     // extra check for valid arguments
-    if (name == NULL || rmp->regprog == NULL)
-	return NULL;
+    எனில் (name == வெற்று || rmp->regprog == வெற்று)
+	திரும்பு வெற்று;
 
     // Ignore case when 'fileignorecase' or the argument is set.
     rmp->rm_ic = p_fic || ignore_case;
-    if (vim_regexec(rmp, name, (colnr_T)0))
+    எனில் (vim_regexec(rmp, name, (colnr_T)0))
 	match = name;
-    else if (rmp->regprog != NULL)
+    இல்லையெனில் எனில் (rmp->regprog != வெற்று)
     {
 	// Replace $(HOME) with '~' and try matching again.
-	p = home_replace_save(NULL, name);
-	if (p != NULL && vim_regexec(rmp, p, (colnr_T)0))
+	p = home_replace_save(வெற்று, name);
+	எனில் (p != வெற்று && vim_regexec(rmp, p, (colnr_T)0))
 	    match = name;
 	vim_free(p);
     }
 
-    return match;
+    திரும்பு match;
 }
 
 /*
  * Find a file in the buffer list by buffer number.
  */
     buf_T *
-buflist_findnr(int nr)
+buflist_findnr(முழு nr)
 {
-    char_u	key[VIM_SIZEOF_INT * 2 + 1];
+    char_u	சாவி[VIM_SIZEOF_INT * 2 + 1];
     hashitem_T	*hi;
 
-    if (nr == 0)
+    எனில் (nr == 0)
 	nr = curwin->w_alt_fnum;
-    vim_snprintf((char *)key, sizeof(key), "%x", nr);
-    hi = hash_find(&buf_hashtab, key);
+    vim_snprintf((எழுத்து *)சாவி, அளவு(சாவி), "%x", nr);
+    hi = hash_find(&buf_hashtab, சாவி);
 
-    if (!HASHITEM_EMPTY(hi))
-	return (buf_T *)(hi->hi_key
-			     - ((unsigned)(curbuf->b_key - (char_u *)curbuf)));
-    return NULL;
+    எனில் (!HASHITEM_EMPTY(hi))
+	திரும்பு (buf_T *)(hi->hi_சாவி
+			     - ((unsigned)(curbuf->b_சாவி - (char_u *)curbuf)));
+    திரும்பு வெற்று;
 }
 
 /*
@@ -3167,16 +3167,16 @@ buflist_findnr(int nr)
  */
     char_u *
 buflist_nr2name(
-    int		n,
-    int		fullname,
-    int		helptail)	// for help buffers return tail only
+    முழு		n,
+    முழு		fullname,
+    முழு		helptail)	// for help buffers return tail only
 {
     buf_T	*buf;
 
     buf = buflist_findnr(n);
-    if (buf == NULL)
-	return NULL;
-    return home_replace_save(helptail ? buf : NULL,
+    எனில் (buf == வெற்று)
+	திரும்பு வெற்று;
+    திரும்பு home_replace_save(helptail ? buf : வெற்று,
 				     fullname ? buf->b_ffname : buf->b_fname);
 }
 
@@ -3185,39 +3185,39 @@ buflist_nr2name(
  * When "copy_options" is TRUE save the local window option values.
  * When "lnum" is 0 only do the options.
  */
-    void
+    வெறுமை
 buflist_setfpos(
     buf_T	*buf,
     win_T	*win,		// may be NULL when using :badd
     linenr_T	lnum,
     colnr_T	col,
-    int		copy_options)
+    முழு		copy_options)
 {
     wininfo_T	*wip;
 
     FOR_ALL_BUF_WININFO(buf, wip)
-	if (wip->wi_win == win)
-	    break;
-    if (wip == NULL)
+	எனில் (wip->wi_win == win)
+	    நிறுத்து;
+    எனில் (wip == வெற்று)
     {
 	// allocate a new entry
 	wip = ALLOC_CLEAR_ONE(wininfo_T);
-	if (wip == NULL)
-	    return;
+	எனில் (wip == வெற்று)
+	    திரும்பு;
 	wip->wi_win = win;
-	if (lnum == 0)		// set lnum even when it's 0
+	எனில் (lnum == 0)		// set lnum even when it's 0
 	    lnum = 1;
     }
-    else
+    இல்லையெனில்
     {
 	// remove the entry from the list
-	if (wip->wi_prev)
+	எனில் (wip->wi_prev)
 	    wip->wi_prev->wi_next = wip->wi_next;
-	else
+	இல்லையெனில்
 	    buf->b_wininfo = wip->wi_next;
-	if (wip->wi_next)
+	எனில் (wip->wi_next)
 	    wip->wi_next->wi_prev = wip->wi_prev;
-	if (copy_options && wip->wi_optset)
+	எனில் (copy_options && wip->wi_optset)
 	{
 	    clear_winopt(&wip->wi_opt);
 #ifdef FEAT_FOLDING
@@ -3225,14 +3225,14 @@ buflist_setfpos(
 #endif
 	}
     }
-    if (lnum != 0)
+    எனில் (lnum != 0)
     {
 	wip->wi_fpos.lnum = lnum;
 	wip->wi_fpos.col = col;
     }
-    if (win != NULL)
+    எனில் (win != வெற்று)
 	wip->wi_changelistidx = win->w_changelistidx;
-    if (copy_options && win != NULL)
+    எனில் (copy_options && win != வெற்று)
     {
 	// Save the window-specific option values.
 	copy_winopt(&win->w_onebuf_opt, &wip->wi_opt);
@@ -3246,8 +3246,8 @@ buflist_setfpos(
     // insert the entry in front of the list
     wip->wi_next = buf->b_wininfo;
     buf->b_wininfo = wip;
-    wip->wi_prev = NULL;
-    if (wip->wi_next)
+    wip->wi_prev = வெற்று;
+    எனில் (wip->wi_next)
 	wip->wi_next->wi_prev = wip;
 }
 
@@ -3256,20 +3256,20 @@ buflist_setfpos(
  * Return TRUE when "wip" has 'diff' set and the diff is only for another tab
  * page.  That's because a diff is local to a tab page.
  */
-    static int
+    நிலையான முழு
 wininfo_other_tab_diff(wininfo_T *wip)
 {
     win_T	*wp;
 
-    if (!wip->wi_opt.wo_diff)
-	return FALSE;
+    எனில் (!wip->wi_opt.wo_diff)
+	திரும்பு FALSE;
 
     FOR_ALL_WINDOWS(wp)
 	// return FALSE when it's a window in the current tab page, thus
 	// the buffer was in diff mode here
-	if (wip->wi_win == wp)
-	    return FALSE;
-    return TRUE;
+	எனில் (wip->wi_win == wp)
+	    திரும்பு FALSE;
+    திரும்பு TRUE;
 }
 #endif
 
@@ -3281,25 +3281,25 @@ wininfo_other_tab_diff(wininfo_T *wip)
  * another tab page.
  * Returns NULL when there isn't any info.
  */
-    static wininfo_T *
+    நிலையான wininfo_T *
 find_wininfo(
     buf_T	*buf,
-    int		need_options,
-    int		skip_diff_buffer UNUSED)
+    முழு		need_options,
+    முழு		skip_diff_buffer UNUSED)
 {
     wininfo_T	*wip;
 
     FOR_ALL_BUF_WININFO(buf, wip)
-	if (wip->wi_win == curwin
+	எனில் (wip->wi_win == curwin
 #ifdef FEAT_DIFF
 		&& (!skip_diff_buffer || !wininfo_other_tab_diff(wip))
 #endif
 
 		&& (!need_options || wip->wi_optset))
-	    break;
+	    நிறுத்து;
 
-    if (wip != NULL)
-	return wip;
+    எனில் (wip != வெற்று)
+	திரும்பு wip;
 
     // If no wininfo for curwin, use the first in the list (that doesn't have
     // 'diff' set and is in another tab page).
@@ -3307,19 +3307,19 @@ find_wininfo(
     // unless the window is editing "buf", so we can copy from the window
     // itself.
 #ifdef FEAT_DIFF
-    if (skip_diff_buffer)
+    எனில் (skip_diff_buffer)
     {
 	FOR_ALL_BUF_WININFO(buf, wip)
-	    if (!wininfo_other_tab_diff(wip)
+	    எனில் (!wininfo_other_tab_diff(wip)
 		    && (!need_options || wip->wi_optset
-			|| (wip->wi_win != NULL
+			|| (wip->wi_win != வெற்று
 			    && wip->wi_win->w_buffer == buf)))
-		break;
+		நிறுத்து;
     }
-    else
+    இல்லையெனில்
 #endif
 	wip = buf->b_wininfo;
-    return wip;
+    திரும்பு wip;
 }
 
 /*
@@ -3328,7 +3328,7 @@ find_wininfo(
  * the most recently used window.  If the values were never set, use the
  * global values for the window.
  */
-    void
+    வெறுமை
 get_winopts(buf_T *buf)
 {
     wininfo_T	*wip;
@@ -3339,7 +3339,7 @@ get_winopts(buf_T *buf)
 #endif
 
     wip = find_wininfo(buf, TRUE, TRUE);
-    if (wip != NULL && wip->wi_win != NULL
+    எனில் (wip != வெற்று && wip->wi_win != வெற்று
 	    && wip->wi_win != curwin && wip->wi_win->w_buffer == buf)
     {
 	// The buffer is currently displayed in the window: use the actual
@@ -3357,7 +3357,7 @@ get_winopts(buf_T *buf)
 	cloneFoldGrowArray(&wp->w_folds, &curwin->w_folds);
 #endif
     }
-    else if (wip != NULL && wip->wi_optset)
+    இல்லையெனில் எனில் (wip != வெற்று && wip->wi_optset)
     {
 	// the buffer was displayed in the current window earlier
 	copy_winopt(&wip->wi_opt, &curwin->w_onebuf_opt);
@@ -3367,22 +3367,22 @@ get_winopts(buf_T *buf)
 	cloneFoldGrowArray(&wip->wi_folds, &curwin->w_folds);
 #endif
     }
-    else
+    இல்லையெனில்
 	copy_winopt(&curwin->w_allbuf_opt, &curwin->w_onebuf_opt);
-    if (wip != NULL)
+    எனில் (wip != வெற்று)
 	curwin->w_changelistidx = wip->wi_changelistidx;
 
 #ifdef FEAT_FOLDING
     // Set 'foldlevel' to 'foldlevelstart' if it's not negative.
-    if (p_fdls >= 0)
+    எனில் (p_fdls >= 0)
 	curwin->w_p_fdl = p_fdls;
 #endif
 #ifdef FEAT_STL_OPT
     // Update rendered height for window-local 'statusline'.
-    if (*curwin->w_p_stl != NUL)
+    எனில் (*curwin->w_p_stl != NUL)
 	update_stl_rendered_height(curwin);
     // If the effective statuslineopt changed, re-adjust all window heights.
-    if (curwin->w_status_height > 0
+    எனில் (curwin->w_status_height > 0
 	    && curwin->w_status_height != statusline_height(curwin))
     {
 	frame_change_statusline_height();
@@ -3391,7 +3391,7 @@ get_winopts(buf_T *buf)
 	// inheritance is resolved here.  frame_change_statusline_height()
 	// redistributes space within the stale fr_height values set during the
 	// split, so the content rows may be unequal.  Re-equalize if needed.
-	if (p_ea)
+	எனில் (p_ea)
 	    win_equal(curwin, TRUE, 'v');
     }
 #endif
@@ -3407,13 +3407,13 @@ get_winopts(buf_T *buf)
 buflist_findfpos(buf_T *buf)
 {
     wininfo_T	*wip;
-    static pos_T no_position = {1, 0, 0};
+    நிலையான pos_T no_position = {1, 0, 0};
 
     wip = find_wininfo(buf, FALSE, FALSE);
-    if (wip != NULL)
-	return &(wip->wi_fpos);
-    else
-	return &no_position;
+    எனில் (wip != வெற்று)
+	திரும்பு &(wip->wi_fpos);
+    இல்லையெனில்
+	திரும்பு &no_position;
 }
 
 /*
@@ -3422,51 +3422,51 @@ buflist_findfpos(buf_T *buf)
     linenr_T
 buflist_findlnum(buf_T *buf)
 {
-    return buflist_findfpos(buf)->lnum;
+    திரும்பு buflist_findfpos(buf)->lnum;
 }
 
 /*
  * List all known file names (for :files and :buffers command).
  */
-    void
+    வெறுமை
 buflist_list(exarg_T *eap)
 {
     buf_T	*buf = firstbuf;
-    int		len;
-    int		i;
-    int		ro_char;
-    int		changed_char;
+    முழு		len;
+    முழு		i;
+    முழு		ro_char;
+    முழு		changed_char;
 #ifdef FEAT_TERMINAL
-    int		job_running;
-    int		job_none_open;
+    முழு		job_running;
+    முழு		job_none_open;
 #endif
 
 #ifdef FEAT_VIMINFO
     garray_T	buflist;
-    buf_T	**buflist_data = NULL, **p;
+    buf_T	**buflist_data = வெற்று, **p;
 
-    if (vim_strchr(eap->arg, 't'))
+    எனில் (vim_strchr(eap->arg, 't'))
     {
-	ga_init2(&buflist, sizeof(buf_T *), 50);
+	ga_init2(&buflist, அளவு(buf_T *), 50);
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (ga_grow(&buflist, 1) == OK)
+	    எனில் (ga_grow(&buflist, 1) == OK)
 		((buf_T **)buflist.ga_data)[buflist.ga_len++] = buf;
 	}
 
 	qsort(buflist.ga_data, (size_t)buflist.ga_len,
-		sizeof(buf_T *), buf_compare);
+		அளவு(buf_T *), buf_compare);
 
 	buflist_data = (buf_T **)buflist.ga_data;
 	buf = *buflist_data;
     }
     p = buflist_data;
 
-    for (; buf != NULL && !got_int; buf = buflist_data != NULL
-	    ? (++p < buflist_data + buflist.ga_len ? *p : NULL)
+    க்கு (; buf != வெற்று && !got_int; buf = buflist_data != வெற்று
+	    ? (++p < buflist_data + buflist.ga_len ? *p : வெற்று)
 	    : buf->b_next)
-#else
-    for (buf = firstbuf; buf != NULL && !got_int; buf = buf->b_next)
+#இல்லையெனில்
+    க்கு (buf = firstbuf; buf != வெற்று && !got_int; buf = buf->b_next)
 #endif
     {
 	char_u	*name;
@@ -3476,21 +3476,21 @@ buflist_list(exarg_T *eap)
 	job_none_open = term_none_open(buf->b_term);
 #endif
 	// skip unlisted buffers, unless ! was used
-	if ((!buf->b_p_bl && !eap->forceit && !vim_strchr(eap->arg, 'u'))
+	எனில் ((!buf->b_p_bl && !eap->forceit && !vim_strchr(eap->arg, 'u'))
 		|| (vim_strchr(eap->arg, 'u') && buf->b_p_bl)
 		|| (vim_strchr(eap->arg, '+')
 			&& ((buf->b_flags & BF_READERR) || !bufIsChanged(buf)))
 		|| (vim_strchr(eap->arg, 'a')
-			&& (buf->b_ml.ml_mfp == NULL || buf->b_nwindows == 0))
+			&& (buf->b_ml.ml_mfp == வெற்று || buf->b_nwindows == 0))
 		|| (vim_strchr(eap->arg, 'h')
-			&& (buf->b_ml.ml_mfp == NULL || buf->b_nwindows != 0))
+			&& (buf->b_ml.ml_mfp == வெற்று || buf->b_nwindows != 0))
 #ifdef FEAT_TERMINAL
 		|| (vim_strchr(eap->arg, 'R')
 			&& (!job_running || (job_running && job_none_open)))
 		|| (vim_strchr(eap->arg, '?')
 			&& (!job_running || (job_running && !job_none_open)))
 		|| (vim_strchr(eap->arg, 'F')
-			&& (job_running || buf->b_term == NULL))
+			&& (job_running || buf->b_term == வெற்று))
 #endif
 		|| (vim_strchr(eap->arg, '-') && buf->b_p_ma)
 		|| (vim_strchr(eap->arg, '=') && !buf->b_p_ro)
@@ -3498,40 +3498,40 @@ buflist_list(exarg_T *eap)
 		|| (vim_strchr(eap->arg, '%') && buf != curbuf)
 		|| (vim_strchr(eap->arg, '#')
 		      && (buf == curbuf || curwin->w_alt_fnum != buf->b_fnum)))
-	    continue;
+	    தொடர்;
 	name = buf_spname(buf);
-	if (name != NULL)
+	எனில் (name != வெற்று)
 	    vim_strncpy(NameBuff, name, MAXPATHL - 1);
-	else
+	இல்லையெனில்
 	    home_replace(buf, buf->b_fname, NameBuff, MAXPATHL, TRUE);
-	if (message_filtered(NameBuff))
-	    continue;
+	எனில் (message_filtered(NameBuff))
+	    தொடர்;
 
 	changed_char = (buf->b_flags & BF_READERR) ? 'x'
 					     : (bufIsChanged(buf) ? '+' : ' ');
 #ifdef FEAT_TERMINAL
-	if (job_running)
+	எனில் (job_running)
 	{
-	    if (job_none_open)
+	    எனில் (job_none_open)
 		ro_char = '?';
-	    else
+	    இல்லையெனில்
 		ro_char = 'R';
 	    changed_char = ' ';  // bufIsChanged() returns TRUE to avoid
 				 // closing, but it's not actually changed.
 	}
-	else if (buf->b_term != NULL)
+	இல்லையெனில் எனில் (buf->b_term != வெற்று)
 	    ro_char = 'F';
-	else
+	இல்லையெனில்
 #endif
 	    ro_char = !buf->b_p_ma ? '-' : (buf->b_p_ro ? '=' : ' ');
 
-	msg_putchar('\n');
-	len = (int)vim_snprintf_safelen((char *)IObuff, IOSIZE - 20, "%3d%c%c%c%c%c \"%s\"",
+	செய்தி_putchar('\n');
+	len = (முழு)vim_snprintf_safelen((எழுத்து *)IObuff, IOSIZE - 20, "%3d%c%c%c%c%c \"%s\"",
 		buf->b_fnum,
 		buf->b_p_bl ? ' ' : 'u',
 		buf == curbuf ? '%' :
 			(curwin->w_alt_fnum == buf->b_fnum ? '#' : ' '),
-		buf->b_ml.ml_mfp == NULL ? ' ' :
+		buf->b_ml.ml_mfp == வெற்று ? ' ' :
 			(buf->b_nwindows == 0 ? 'h' : 'a'),
 		ro_char,
 		changed_char,
@@ -3539,24 +3539,24 @@ buflist_list(exarg_T *eap)
 
 	// put "line 999" in column 40 or after the file name
 	i = 40 - vim_strsize(IObuff);
-	do
+	செய்
 	    IObuff[len++] = ' ';
-	while (--i > 0 && len < IOSIZE - 18);
+	போது (--i > 0 && len < IOSIZE - 18);
 #ifdef FEAT_VIMINFO
-	if (vim_strchr(eap->arg, 't') && buf->b_last_used)
+	எனில் (vim_strchr(eap->arg, 't') && buf->b_last_used)
 	    add_time(IObuff + len, (size_t)(IOSIZE - len), buf->b_last_used);
-	else
+	இல்லையெனில்
 #endif
-	    vim_snprintf((char *)IObuff + len, (size_t)(IOSIZE - len),
+	    vim_snprintf((எழுத்து *)IObuff + len, (size_t)(IOSIZE - len),
 		    _("line %ld"), buf == curbuf ? curwin->w_cursor.lnum
 					       : (long)buflist_findlnum(buf));
-	msg_outtrans(IObuff);
+	செய்தி_outtrans(IObuff);
 	out_flush();	    // output one line at a time
 	ui_breakcheck();
     }
 
 #ifdef FEAT_VIMINFO
-    if (buflist_data)
+    எனில் (buflist_data)
 	ga_clear(&buflist);
 #endif
 }
@@ -3567,22 +3567,22 @@ buflist_list(exarg_T *eap)
  * Used by insert_reg() and cmdline_paste() for '#' register.
  * Return FAIL if not found, OK for success.
  */
-    int
+    முழு
 buflist_name_nr(
-    int		fnum,
+    முழு		fnum,
     char_u	**fname,
     linenr_T	*lnum)
 {
     buf_T	*buf;
 
     buf = buflist_findnr(fnum);
-    if (buf == NULL || buf->b_fname == NULL)
-	return FAIL;
+    எனில் (buf == வெற்று || buf->b_fname == வெற்று)
+	திரும்பு FAIL;
 
     *fname = buf->b_fname;
     *lnum = buflist_findlnum(buf);
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -3592,37 +3592,37 @@ buflist_name_nr(
  * Returns FAIL for failure (file name already in use by other buffer)
  *	OK otherwise.
  */
-    int
+    முழு
 setfname(
     buf_T	*buf,
     char_u	*ffname_arg,
     char_u	*sfname_arg,
-    int		message)	// give message when buffer already exists
+    முழு		message)	// give message when buffer already exists
 {
     char_u	*ffname = ffname_arg;
     char_u	*sfname = sfname_arg;
-    buf_T	*obuf = NULL;
+    buf_T	*obuf = வெற்று;
 #ifdef UNIX
     stat_T	st;
 #endif
 
-    if (ffname == NULL || *ffname == NUL)
+    எனில் (ffname == வெற்று || *ffname == NUL)
     {
 	// Removing the name.
-	if (buf->b_sfname != buf->b_ffname)
+	எனில் (buf->b_sfname != buf->b_ffname)
 	    VIM_CLEAR(buf->b_sfname);
-	else
-	    buf->b_sfname = NULL;
+	இல்லையெனில்
+	    buf->b_sfname = வெற்று;
 	VIM_CLEAR(buf->b_ffname);
 #ifdef UNIX
 	st.st_dev = (dev_T)-1;
 #endif
     }
-    else
+    இல்லையெனில்
     {
 	fname_expand(buf, &ffname, &sfname); // will allocate ffname
-	if (ffname == NULL)		    // out of memory
-	    return FAIL;
+	எனில் (ffname == வெற்று)		    // out of memory
+	    திரும்பு FAIL;
 
 	/*
 	 * If the file name is already used in another buffer:
@@ -3630,48 +3630,48 @@ setfname(
 	 * - if the buffer is not loaded, delete it from the list
 	 */
 #ifdef UNIX
-	if (mch_stat((char *)ffname, &st) < 0)
+	எனில் (mch_stat((எழுத்து *)ffname, &st) < 0)
 	    st.st_dev = (dev_T)-1;
 #endif
-	if (!(buf->b_flags & BF_DUMMY))
+	எனில் (!(buf->b_flags & BF_DUMMY))
 #ifdef UNIX
 	    obuf = buflist_findname_stat(ffname, &st);
-#else
+#இல்லையெனில்
 	    obuf = buflist_findname(ffname);
 #endif
-	if (obuf != NULL && obuf != buf)
+	எனில் (obuf != வெற்று && obuf != buf)
 	{
 	    win_T	*win;
 	    tabpage_T   *tab;
-	    int		in_use = FALSE;
+	    முழு		in_use = FALSE;
 
 	    // during startup a window may use a buffer that is not loaded yet
 	    FOR_ALL_TAB_WINDOWS(tab, win)
-		if (win->w_buffer == obuf)
+		எனில் (win->w_buffer == obuf)
 		    in_use = TRUE;
 
 	    // it's loaded or used in a window, fail
-	    if (obuf->b_ml.ml_mfp != NULL || in_use)
+	    எனில் (obuf->b_ml.ml_mfp != வெற்று || in_use)
 	    {
-		if (message)
+		எனில் (message)
 		    emsg(_(e_buffer_with_this_name_already_exists));
 		vim_free(ffname);
-		return FAIL;
+		திரும்பு FAIL;
 	    }
 	    // delete from the list
-	    close_buffer(NULL, obuf, DOBUF_WIPE, FALSE, FALSE, FALSE);
+	    close_buffer(வெற்று, obuf, DOBUF_WIPE, FALSE, FALSE, FALSE);
 	}
 	sfname = vim_strsave(sfname);
-	if (ffname == NULL || sfname == NULL)
+	எனில் (ffname == வெற்று || sfname == வெற்று)
 	{
 	    vim_free(sfname);
 	    vim_free(ffname);
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
 #ifdef USE_FNAME_CASE
 	fname_case(sfname, 0);    // set correct case for short file name
 #endif
-	if (buf->b_sfname != buf->b_ffname)
+	எனில் (buf->b_sfname != buf->b_ffname)
 	    vim_free(buf->b_sfname);
 	vim_free(buf->b_ffname);
 	buf->b_ffname = ffname;
@@ -3679,9 +3679,9 @@ setfname(
     }
     buf->b_fname = buf->b_sfname;
 #ifdef UNIX
-    if (st.st_dev == (dev_T)-1)
+    எனில் (st.st_dev == (dev_T)-1)
 	buf->b_dev_valid = false;
-    else
+    இல்லையெனில்
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
@@ -3692,27 +3692,27 @@ setfname(
     buf->b_shortname = false;
 
     buf_name_changed(buf);
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Crude way of changing the name of a buffer.  Use with care!
  * The name should be relative to the current directory.
  */
-    void
-buf_set_name(int fnum, char_u *name)
+    வெறுமை
+buf_set_name(முழு fnum, char_u *name)
 {
     buf_T	*buf;
 
     buf = buflist_findnr(fnum);
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
 
-    if (buf->b_sfname != buf->b_ffname)
+    எனில் (buf->b_sfname != buf->b_ffname)
 	vim_free(buf->b_sfname);
     vim_free(buf->b_ffname);
     buf->b_ffname = vim_strsave(name);
-    buf->b_sfname = NULL;
+    buf->b_sfname = வெற்று;
     // Allocate ffname and expand into full path.  Also resolves .lnk
     // files on Win32.
     fname_expand(buf, &buf->b_ffname, &buf->b_sfname);
@@ -3723,21 +3723,21 @@ buf_set_name(int fnum, char_u *name)
  * Take care of what needs to be done when the name of buffer "buf" has
  * changed.
  */
-    void
+    வெறுமை
 buf_name_changed(buf_T *buf)
 {
     /*
      * If the file name changed, also change the name of the swapfile
      */
-    if (buf->b_ml.ml_mfp != NULL)
+    எனில் (buf->b_ml.ml_mfp != வெற்று)
 	ml_setname(buf);
 
 #ifdef FEAT_TERMINAL
-    if (buf->b_term != NULL)
+    எனில் (buf->b_term != வெற்று)
 	term_clear_status_text(buf->b_term);
 #endif
 
-    if (curwin->w_buffer == buf)
+    எனில் (curwin->w_buffer == buf)
 	check_arg_idx(curwin);	// check file name for arg list
     maketitle();		// set window title
     status_redraw_all();	// status lines need to be redrawn
@@ -3761,9 +3761,9 @@ setaltfname(
 
     // Create a buffer.  'buflisted' is not set if it's a new buffer
     buf = buflist_new(ffname, sfname, lnum, 0);
-    if (buf != NULL && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
+    எனில் (buf != வெற்று && (cmdmod.cmod_flags & CMOD_KEEPALT) == 0)
 	curwin->w_alt_fnum = buf->b_fnum;
-    return buf;
+    திரும்பு buf;
 }
 
 /*
@@ -3772,18 +3772,18 @@ setaltfname(
  */
     char_u  *
 getaltfname(
-    int		errmsg)		// give error message
+    முழு		errmsg)		// give error message
 {
     char_u	*fname;
     linenr_T	dummy;
 
-    if (buflist_name_nr(0, &fname, &dummy) == FAIL)
+    எனில் (buflist_name_nr(0, &fname, &dummy) == FAIL)
     {
-	if (errmsg)
+	எனில் (errmsg)
 	    emsg(_(e_no_alternate_file));
-	return NULL;
+	திரும்பு வெற்று;
     }
-    return fname;
+    திரும்பு fname;
 }
 
 /*
@@ -3792,31 +3792,31 @@ getaltfname(
  *
  * used by qf_init(), main() and doarglist()
  */
-    int
-buflist_add(char_u *fname, int flags)
+    முழு
+buflist_add(char_u *fname, முழு flags)
 {
     buf_T	*buf;
 
-    buf = buflist_new(fname, NULL, (linenr_T)0, flags);
-    if (buf != NULL)
-	return buf->b_fnum;
-    return 0;
+    buf = buflist_new(fname, வெற்று, (linenr_T)0, flags);
+    எனில் (buf != வெற்று)
+	திரும்பு buf->b_fnum;
+    திரும்பு 0;
 }
 
-#if defined(BACKSLASH_IN_FILENAME)
+#எனில் defined(BACKSLASH_IN_FILENAME)
 /*
  * Adjust slashes in file names.  Called after 'shellslash' was set.
  */
-    void
-buflist_slash_adjust(void)
+    வெறுமை
+buflist_slash_adjust(வெறுமை)
 {
     buf_T	*bp;
 
     FOR_ALL_BUFFERS(bp)
     {
-	if (bp->b_ffname != NULL)
+	எனில் (bp->b_ffname != வெற்று)
 	    slash_adjust(bp->b_ffname);
-	if (bp->b_sfname != NULL)
+	எனில் (bp->b_sfname != வெற்று)
 	    slash_adjust(bp->b_sfname);
     }
 }
@@ -3826,7 +3826,7 @@ buflist_slash_adjust(void)
  * Set alternate cursor position for the current buffer and window "win".
  * Also save the local window option values.
  */
-    void
+    வெறுமை
 buflist_altfpos(win_T *win)
 {
     buflist_setfpos(curbuf, win, win->w_cursor.lnum, win->w_cursor.col, TRUE);
@@ -3836,17 +3836,17 @@ buflist_altfpos(win_T *win)
  * Return TRUE if 'ffname' is not the same file as current file.
  * Fname must have a full path (expanded by mch_FullName()).
  */
-    int
+    முழு
 otherfile(char_u *ffname)
 {
-    return otherfile_buf(curbuf, ffname
+    திரும்பு otherfile_buf(curbuf, ffname
 #ifdef UNIX
-	    , NULL
+	    , வெற்று
 #endif
 	    );
 }
 
-    static int
+    நிலையான முழு
 otherfile_buf(
     buf_T		*buf,
     char_u		*ffname
@@ -3856,18 +3856,18 @@ otherfile_buf(
     )
 {
     // no name is different
-    if (ffname == NULL || *ffname == NUL || buf->b_ffname == NULL)
-	return TRUE;
-    if (fnamecmp(ffname, buf->b_ffname) == 0)
-	return FALSE;
+    எனில் (ffname == வெற்று || *ffname == NUL || buf->b_ffname == வெற்று)
+	திரும்பு TRUE;
+    எனில் (fnamecmp(ffname, buf->b_ffname) == 0)
+	திரும்பு FALSE;
 #ifdef UNIX
     {
 	stat_T	    st;
 
 	// If no stat_T given, get it now
-	if (stp == NULL)
+	எனில் (stp == வெற்று)
 	{
-	    if (!buf->b_dev_valid || mch_stat((char *)ffname, &st) < 0)
+	    எனில் (!buf->b_dev_valid || mch_stat((எழுத்து *)ffname, &st) < 0)
 		st.st_dev = (dev_T)-1;
 	    stp = &st;
 	}
@@ -3880,46 +3880,46 @@ otherfile_buf(
 	// dev/ino again when they appear to match, but not when they appear
 	// to be different: Could skip a buffer when it's actually the same
 	// file.
-	if (buf_same_ino(buf, stp))
+	எனில் (buf_same_ino(buf, stp))
 	{
 	    buf_setino(buf);
-	    if (buf_same_ino(buf, stp))
-		return FALSE;
+	    எனில் (buf_same_ino(buf, stp))
+		திரும்பு FALSE;
 	}
     }
 #endif
-    return TRUE;
+    திரும்பு TRUE;
 }
 
-#if defined(UNIX)
+#எனில் defined(UNIX)
 /*
  * Set inode and device number for a buffer.
  * Must always be called when b_fname is changed!.
  */
-    void
+    வெறுமை
 buf_setino(buf_T *buf)
 {
     stat_T	st;
 
-    if (buf->b_fname != NULL && mch_stat((char *)buf->b_fname, &st) >= 0)
+    எனில் (buf->b_fname != வெற்று && mch_stat((எழுத்து *)buf->b_fname, &st) >= 0)
     {
 	buf->b_dev_valid = true;
 	buf->b_dev = st.st_dev;
 	buf->b_ino = st.st_ino;
     }
-    else
+    இல்லையெனில்
 	buf->b_dev_valid = false;
 }
 
 /*
  * Return TRUE if dev/ino in buffer "buf" matches with "stp".
  */
-    static int
+    நிலையான முழு
 buf_same_ino(
     buf_T	*buf,
     stat_T	*stp)
 {
-    return (buf->b_dev_valid
+    திரும்பு (buf->b_dev_valid
 	    && stp->st_dev == buf->b_dev
 	    && stp->st_ino == buf->b_ino);
 }
@@ -3928,37 +3928,37 @@ buf_same_ino(
 /*
  * Print info about the current buffer.
  */
-    void
+    வெறுமை
 fileinfo(
-    int fullname,	    // when non-zero print full path
-    int shorthelp,
-    int	dont_truncate)
+    முழு fullname,	    // when non-zero print full path
+    முழு shorthelp,
+    முழு	dont_truncate)
 {
     char_u	*name;
-    char	*buffer;
+    எழுத்து	*buffer;
     size_t	bufferlen = 0;
 
     buffer = alloc(IOSIZE);
-    if (buffer == NULL)
-	return;
+    எனில் (buffer == வெற்று)
+	திரும்பு;
 
-    if (fullname > 1)	    // 2 CTRL-G: include buffer number
+    எனில் (fullname > 1)	    // 2 CTRL-G: include buffer number
 	bufferlen = vim_snprintf_safelen(buffer, IOSIZE, "buf %d: ", curbuf->b_fnum);
 
     buffer[bufferlen++] = '"';
 
     name = buf_spname(curbuf);
-    if (name != NULL)
+    எனில் (name != வெற்று)
 	bufferlen += vim_snprintf_safelen(buffer + bufferlen,
 	    IOSIZE - bufferlen, "%s", name);
-    else
+    இல்லையெனில்
     {
-	if (!fullname && curbuf->b_fname != NULL)
+	எனில் (!fullname && curbuf->b_fname != வெற்று)
 	    name = curbuf->b_fname;
-	else
+	இல்லையெனில்
 	    name = curbuf->b_ffname;
-	bufferlen += home_replace(shorthelp ? curbuf : NULL, name,
-	    (char_u *)buffer + bufferlen, IOSIZE - (int)bufferlen, TRUE);
+	bufferlen += home_replace(shorthelp ? curbuf : வெற்று, name,
+	    (char_u *)buffer + bufferlen, IOSIZE - (முழு)bufferlen, TRUE);
     }
 
     bufferlen += vim_snprintf_safelen(
@@ -3976,126 +3976,126 @@ fileinfo(
 	(curbufIsChanged() || (curbuf->b_flags & BF_WRITE_MASK) || curbuf->b_p_ro)
 	    ? " " : "");
 
-    if (curbuf->b_ml.ml_flags & ML_EMPTY)
+    எனில் (curbuf->b_ml.ml_flags & ML_EMPTY)
 	bufferlen += vim_snprintf_safelen(buffer + bufferlen,
-	    IOSIZE - bufferlen, "%s", _(no_lines_msg));
-    else if (p_ru)
+	    IOSIZE - bufferlen, "%s", _(no_வரிகள்_செய்தி));
+    இல்லையெனில் எனில் (p_ru)
 	// Current line and column are already on the screen -- webb
 	bufferlen += vim_snprintf_safelen(
 	    buffer + bufferlen,
 	    IOSIZE - bufferlen,
-	    NGETTEXT("%ld line --%d%%--", "%ld lines --%d%%--", curbuf->b_ml.ml_line_count),
-	    (long)curbuf->b_ml.ml_line_count,
-	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_line_count));
-    else
+	    NGETTEXT("%ld line --%d%%--", "%ld lines --%d%%--", curbuf->b_ml.ml_வரி_மொத்தம்),
+	    (long)curbuf->b_ml.ml_வரி_மொத்தம்,
+	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_வரி_மொத்தம்));
+    இல்லையெனில்
     {
 	bufferlen += vim_snprintf_safelen(
 	    buffer + bufferlen,
 	    IOSIZE - bufferlen,
 	    _("line %ld of %ld --%d%%-- col "),
 	    (long)curwin->w_cursor.lnum,
-	    (long)curbuf->b_ml.ml_line_count,
-	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_line_count));
+	    (long)curbuf->b_ml.ml_வரி_மொத்தம்,
+	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_வரி_மொத்தம்));
 
 	validate_virtcol();
 	bufferlen += col_print((char_u *)buffer + bufferlen, IOSIZE - bufferlen,
-		   (int)curwin->w_cursor.col + 1, (int)curwin->w_virtcol + 1);
+		   (முழு)curwin->w_cursor.col + 1, (முழு)curwin->w_virtcol + 1);
     }
 
-    (void)append_arg_number(curwin, (char_u *)buffer + bufferlen,
+    (வெறுமை)append_arg_எண்(curwin, (char_u *)buffer + bufferlen,
 	IOSIZE - bufferlen, !shortmess(SHM_FILE));
 
-    if (dont_truncate)
+    எனில் (dont_truncate)
     {
-	int	n;
+	முழு	n;
 
 	// Temporarily set msg_scroll to avoid the message being truncated.
 	// First call msg_start() to get the message in the right place.
-	msg_start();
-	n = msg_scroll;
-	msg_scroll = TRUE;
-	msg(buffer);
-	msg_scroll = n;
+	செய்தி_start();
+	n = செய்தி_scroll;
+	செய்தி_scroll = TRUE;
+	செய்தி(buffer);
+	செய்தி_scroll = n;
     }
-    else
+    இல்லையெனில்
     {
-	char	*p = msg_trunc_attr(buffer, FALSE, 0);
-	if (restart_edit != 0 || (msg_scrolled && !need_wait_return))
+	எழுத்து	*p = செய்தி_trunc_attr(buffer, FALSE, 0);
+	எனில் (restart_edit != 0 || (செய்தி_scrolled && !need_wait_return))
 	    // Need to repeat the message after redrawing when:
 	    // - When restart_edit is set (otherwise there will be a delay
 	    //   before redrawing).
 	    // - When the screen was scrolled but there is no wait-return
 	    //   prompt.
-	    set_keep_msg((char_u *)p, 0);
+	    set_keep_செய்தி((char_u *)p, 0);
     }
 
     vim_free(buffer);
 }
 
-    int
+    முழு
 col_print(
     char_u  *buf,
     size_t  buflen,
-    int	    col,
-    int	    vcol)
+    முழு	    col,
+    முழு	    vcol)
 {
-    if (col == vcol)
-	return (int)vim_snprintf_safelen((char *)buf, buflen, "%d", col);
+    எனில் (col == vcol)
+	திரும்பு (முழு)vim_snprintf_safelen((எழுத்து *)buf, buflen, "%d", col);
 
-    return (int)vim_snprintf_safelen((char *)buf, buflen, "%d-%d", col, vcol);
+    திரும்பு (முழு)vim_snprintf_safelen((எழுத்து *)buf, buflen, "%d-%d", col, vcol);
 }
 
-static char_u *lasttitle = NULL;
-static char_u *lasticon = NULL;
+நிலையான char_u *lasttitle = வெற்று;
+நிலையான char_u *lasticon = வெற்று;
 
 /*
  * Put the file name in the title bar and icon of the window.
  */
-    void
-maketitle(void)
+    வெறுமை
+maketitle(வெறுமை)
 {
-    char_u	*title_str = NULL;
-    char_u	*icon_str = NULL;
-    int		mustset;
+    char_u	*title_str = வெற்று;
+    char_u	*icon_str = வெற்று;
+    முழு		mustset;
     char_u	buf[IOSIZE];
     size_t	buflen = 0;
 
-    if (!redrawing())
+    எனில் (!redrawing())
     {
 	// Postpone updating the title when 'lazyredraw' is set.
 	need_maketitle = TRUE;
-	return;
+	திரும்பு;
     }
 
     need_maketitle = FALSE;
-    if (!p_title && !p_icon && lasttitle == NULL && lasticon == NULL)
-	return;  // nothing to do
+    எனில் (!p_title && !p_icon && lasttitle == வெற்று && lasticon == வெற்று)
+	திரும்பு;  // nothing to do
 
-    if (p_title)
+    எனில் (p_title)
     {
-	int maxlen = 0;
+	முழு maxlen = 0;
 
-	if (p_titlelen > 0)
+	எனில் (p_titlelen > 0)
 	{
 	    maxlen = p_titlelen * Columns / 100;
-	    if (maxlen < 10)
+	    எனில் (maxlen < 10)
 		maxlen = 10;
 	}
 
 	title_str = buf;
-	if (*p_titlestring != NUL)
+	எனில் (*p_titlestring != NUL)
 	{
 #ifdef FEAT_STL_OPT
-	    if (stl_syntax & STL_IN_TITLE)
-		build_stl_str_hl(curwin, title_str, sizeof(buf), p_titlestring,
+	    எனில் (stl_syntax & STL_IN_TITLE)
+		build_stl_str_hl(curwin, title_str, அளவு(buf), p_titlestring,
 				    (char_u *)"titlestring", 0,
-				    0, maxlen, NULL, NULL, NULL);
-	    else
+				    0, maxlen, வெற்று, வெற்று, வெற்று);
+	    இல்லையெனில்
 #endif
 		title_str = p_titlestring;
 	    buflen = STRLEN(title_str);
 	}
-	else
+	இல்லையெனில்
 	{
 	    char_u  *p;
 
@@ -4106,25 +4106,25 @@ maketitle(void)
 	    // reserve some space for different parts of the title.
 	    // use sizeof() to introduce 'size_t' so we don't have to
 	    // cast sizes to it.
-#define SPACE_FOR_FNAME (sizeof(buf) - 100)
-#define SPACE_FOR_DIR   (sizeof(buf) - 20)
-#define SPACE_FOR_ARGNR (sizeof(buf) - 10)  // at least room for " - VIM"
+#define SPACE_FOR_FNAME (அளவு(buf) - 100)
+#define SPACE_FOR_DIR   (அளவு(buf) - 20)
+#define SPACE_FOR_ARGNR (அளவு(buf) - 10)  // at least room for " - VIM"
 
 	    // file name
-	    if (curbuf->b_fname == NULL)
-		buflen = vim_snprintf_safelen((char *)buf,
+	    எனில் (curbuf->b_fname == வெற்று)
+		buflen = vim_snprintf_safelen((எழுத்து *)buf,
 		    SPACE_FOR_FNAME, "%s", _("[No Name]"));
 #ifdef FEAT_TERMINAL
-	    else if (curbuf->b_term != NULL)
-		buflen = vim_snprintf_safelen((char *)buf,
+	    இல்லையெனில் எனில் (curbuf->b_term != வெற்று)
+		buflen = vim_snprintf_safelen((எழுத்து *)buf,
 		    SPACE_FOR_FNAME, "%s",
 		    term_get_status_text(curbuf->b_term));
 #endif
-	    else
+	    இல்லையெனில்
 	    {
-		buflen = vim_snprintf_safelen((char *)buf,
+		buflen = vim_snprintf_safelen((எழுத்து *)buf,
 		    SPACE_FOR_FNAME, "%s",
-		    ((p = transstr(gettail(curbuf->b_fname))) != NULL)
+		    ((p = transstr(gettail(curbuf->b_fname))) != வெற்று)
 			? p
 			: (char_u *)"");
 		vim_free(p);
@@ -4132,165 +4132,165 @@ maketitle(void)
 
 	    // flags
 #ifdef FEAT_TERMINAL
-	    if (curbuf->b_term == NULL)
+	    எனில் (curbuf->b_term == வெற்று)
 #endif
 	    {
-		switch (bufIsChanged(curbuf)
+		தேர்வு (bufIsChanged(curbuf)
 			+ (curbuf->b_p_ro * 2)
 			+ (!curbuf->b_p_ma * 4))
 		{
-		    case 1:
+		    நிலை 1:
 			// file was modified
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " +");
-			break;
-		    case 2:
+			    (எழுத்து *)buf + buflen,
+			    அளவு(buf) - buflen, " +");
+			நிறுத்து;
+		    நிலை 2:
 			// file is readonly
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " =");
-			break;
-		    case 3:
+			    (எழுத்து *)buf + buflen,
+			    அளவு(buf) - buflen, " =");
+			நிறுத்து;
+		    நிலை 3:
 			// file was modified and is readonly
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " =+");
-			break;
-		    case 4:
-		    case 6:
+			    (எழுத்து *)buf + buflen,
+			    அளவு(buf) - buflen, " =+");
+			நிறுத்து;
+		    நிலை 4:
+		    நிலை 6:
 			// file cannot be modified
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " -");
-			break;
-		    case 5:
-		    case 7:
+			    (எழுத்து *)buf + buflen,
+			    அளவு(buf) - buflen, " -");
+			நிறுத்து;
+		    நிலை 5:
+		    நிலை 7:
 			// file cannot be modified but was modified
 			buflen += vim_snprintf_safelen(
-			    (char *)buf + buflen,
-			    sizeof(buf) - buflen, " -+");
-			break;
-		    default:
-			break;
+			    (எழுத்து *)buf + buflen,
+			    அளவு(buf) - buflen, " -+");
+			நிறுத்து;
+		    இயல்பு:
+			நிறுத்து;
 		}
 	    }
 
 	    // path (surrounded by '()')
-	    if (curbuf->b_fname != NULL
+	    எனில் (curbuf->b_fname != வெற்று
 #ifdef FEAT_TERMINAL
-		    && curbuf->b_term == NULL
+		    && curbuf->b_term == வெற்று
 #endif
 		    )
 	    {
 		// Get path of file, replace home dir with ~
-		buflen += vim_snprintf_safelen((char *)buf + buflen,
-		    sizeof(buf) - buflen, " (");
+		buflen += vim_snprintf_safelen((எழுத்து *)buf + buflen,
+		    அளவு(buf) - buflen, " (");
 
 		home_replace(curbuf, curbuf->b_ffname,
-		    buf + buflen, (int)(SPACE_FOR_DIR - buflen), TRUE);
+		    buf + buflen, (முழு)(SPACE_FOR_DIR - buflen), TRUE);
 
 #ifdef BACKSLASH_IN_FILENAME
 		// avoid "c:/name" to be reduced to "c"
-		if (SAFE_isalpha(buf[buflen]) && buf[buflen + 1] == ':')
+		எனில் (SAFE_isalpha(buf[buflen]) && buf[buflen + 1] == ':')
 		    buflen += 2;			// step over "c:"
 #endif
 
 		// determine if we have a help or normal buffer
 		p = gettail_sep(buf + buflen);
-		if (p == buf + buflen)
+		எனில் (p == buf + buflen)
 		{
 		    // help buffer
-		    buflen += vim_snprintf_safelen((char *)buf + buflen,
+		    buflen += vim_snprintf_safelen((எழுத்து *)buf + buflen,
 			SPACE_FOR_DIR - buflen, "%s)", _("help"));
 		}
-		else
+		இல்லையெனில்
 		{
 		    // normal buffer
 
 		    // Translate unprintable chars and concatenate.  Keep some
 		    // room for the server name.  When there is no room (very long
 		    // file name) use (...).
-		    if (buflen < SPACE_FOR_DIR)
+		    எனில் (buflen < SPACE_FOR_DIR)
 		    {
 			// remove the file name
 			*p = NUL;
 
-			buflen += vim_snprintf_safelen((char *)buf + buflen,
+			buflen += vim_snprintf_safelen((எழுத்து *)buf + buflen,
 			    SPACE_FOR_DIR - buflen, "%s)",
-			    ((p = transstr(buf + buflen)) != NULL)
+			    ((p = transstr(buf + buflen)) != வெற்று)
 				? p
 				: (char_u *)"");
 			vim_free(p);
 		    }
-		    else
-			buflen += vim_snprintf_safelen((char *)buf + buflen,
+		    இல்லையெனில்
+			buflen += vim_snprintf_safelen((எழுத்து *)buf + buflen,
 			    SPACE_FOR_ARGNR - buflen, "...)");
 		}
 	    }
 
 	    // argument info
-	    buflen += append_arg_number(curwin, buf + buflen,
+	    buflen += append_arg_எண்(curwin, buf + buflen,
 		SPACE_FOR_ARGNR - buflen, FALSE);
 
 	    // servername
-	    buflen += vim_snprintf_safelen((char *)buf + buflen,
-		sizeof(buf) - buflen, " - %s",
-#if defined(FEAT_CLIENTSERVER)
-		(serverName != NULL)
+	    buflen += vim_snprintf_safelen((எழுத்து *)buf + buflen,
+		அளவு(buf) - buflen, " - %s",
+#எனில் defined(FEAT_CLIENTSERVER)
+		(serverName != வெற்று)
 		    ? serverName :
 #endif
 		    (char_u *)"VIM");
 
-	    if (maxlen > 0)
+	    எனில் (maxlen > 0)
 	    {
 		// make it shorter by removing a bit in the middle
-		if (vim_strsize(buf) > maxlen)
-		    trunc_string(buf, buf, maxlen, sizeof(buf));
+		எனில் (vim_strsize(buf) > maxlen)
+		    trunc_string(buf, buf, maxlen, அளவு(buf));
 	    }
 	}
     }
-    mustset = value_changed(title_str, &lasttitle);
+    mustset = மதிப்பு_changed(title_str, &lasttitle);
 
-    if (p_icon)
+    எனில் (p_icon)
     {
 	icon_str = buf;
-	if (*p_iconstring != NUL)
+	எனில் (*p_iconstring != NUL)
 	{
 #ifdef FEAT_STL_OPT
-	    if (stl_syntax & STL_IN_ICON)
-		build_stl_str_hl(curwin, icon_str, sizeof(buf), p_iconstring,
-				 (char_u *)"iconstring", 0, 0, 0, NULL, NULL,
-				 NULL);
-	    else
+	    எனில் (stl_syntax & STL_IN_ICON)
+		build_stl_str_hl(curwin, icon_str, அளவு(buf), p_iconstring,
+				 (char_u *)"iconstring", 0, 0, 0, வெற்று, வெற்று,
+				 வெற்று);
+	    இல்லையெனில்
 #endif
 		icon_str = p_iconstring;
 	}
-	else
+	இல்லையெனில்
 	{
 	    char_u  *name;
-	    int	    namelen;
+	    முழு	    namelen;
 
 	    name = buf_spname(curbuf);
-	    if (name == NULL)
+	    எனில் (name == வெற்று)
 		name = gettail(curbuf->b_ffname);
 	    // Truncate name at 100 bytes.
-	    namelen = (int)STRLEN(name);
-	    if (namelen > 100)
+	    namelen = (முழு)STRLEN(name);
+	    எனில் (namelen > 100)
 	    {
 		namelen -= 100;
-		if (has_mbyte)
+		எனில் (has_mbyte)
 		    namelen += (*mb_tail_off)(name, name + namelen) + 1;
 		name += namelen;
 	    }
 	    STRCPY(buf, name);
-	    trans_characters(buf, sizeof(buf));
+	    trans_characters(buf, அளவு(buf));
 	}
     }
 
-    mustset |= value_changed(icon_str, &lasticon);
+    mustset |= மதிப்பு_changed(icon_str, &lasticon);
 
-    if (mustset)
+    எனில் (mustset)
 	resettitle();
 }
 
@@ -4299,40 +4299,40 @@ maketitle(void)
  * from "str" if it does.
  * Return TRUE if resettitle() is to be called.
  */
-    static int
-value_changed(char_u *str, char_u **last)
+    நிலையான முழு
+மதிப்பு_changed(char_u *str, char_u **last)
 {
-    if ((str == NULL) != (*last == NULL)
-	    || (str != NULL && *last != NULL && STRCMP(str, *last) != 0))
+    எனில் ((str == வெற்று) != (*last == வெற்று)
+	    || (str != வெற்று && *last != வெற்று && STRCMP(str, *last) != 0))
     {
 	vim_free(*last);
-	if (str == NULL)
+	எனில் (str == வெற்று)
 	{
-	    *last = NULL;
+	    *last = வெற்று;
 	    mch_restore_title(
 		  last == &lasttitle ? SAVE_RESTORE_TITLE : SAVE_RESTORE_ICON);
 	}
-	else
+	இல்லையெனில்
 	{
 	    *last = vim_strsave(str);
-	    return TRUE;
+	    திரும்பு TRUE;
 	}
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 /*
  * Put current window title back (used after calling a shell)
  */
-    void
-resettitle(void)
+    வெறுமை
+resettitle(வெறுமை)
 {
     mch_settitle(lasttitle, lasticon);
 }
 
-#if defined(EXITFREE)
-    void
-free_titles(void)
+#எனில் defined(EXITFREE)
+    வெறுமை
+free_titles(வெறுமை)
 {
     vim_free(lasttitle);
     vim_free(lasticon);
@@ -4340,17 +4340,17 @@ free_titles(void)
 #endif
 
 
-#if defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
+#எனில் defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
 
 /*
  * Used for building in the status line.
  */
-typedef struct
+வகைவரை கட்டமைப்பு
 {
     char_u	*stl_start;
-    int		stl_minwid;
-    int		stl_maxwid;
-    enum {
+    முழு		stl_minwid;
+    முழு		stl_maxwid;
+    எண்ணிக்கை {
 	Normal,
 	Empty,
 	Group,
@@ -4363,13 +4363,13 @@ typedef struct
     char_u	*stl_clickfunc;	// function name for ClickFunc items
 } stl_item_T;
 
-static size_t		stl_items_len = 20; // Initial value, grows as needed.
-static stl_item_T      *stl_items = NULL;
-static int	       *stl_groupitem = NULL;
-static stl_hlrec_T     *stl_hltab = NULL;
-static stl_hlrec_T     *stl_tabtab = NULL;
-static stl_clickrec_T  *stl_clicktab = NULL;
-static int		*stl_separator_locations = NULL;
+நிலையான size_t		stl_பொருட்கள்_len = 20; // Initial value, grows as needed.
+நிலையான stl_item_T      *stl_பொருட்கள் = வெற்று;
+நிலையான முழு	       *stl_groupitem = வெற்று;
+நிலையான stl_hlrec_T     *stl_hltab = வெற்று;
+நிலையான stl_hlrec_T     *stl_tabtab = வெற்று;
+நிலையான stl_clickrec_T  *stl_clicktab = வெற்று;
+நிலையான முழு		*stl_separator_locations = வெற்று;
 
 /*
  * Build a string from the status line items in "fmt".
@@ -4385,77 +4385,77 @@ static int		*stl_separator_locations = NULL;
  * If maxwidth is not zero, the string will be filled at any middle marker
  * or truncated if too long, fillchar is used for all whitespace.
  */
-    int
+    முழு
 build_stl_str_hl(
     win_T	*wp,
     char_u	*out,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	*fmt,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    முழு		opt_scope,	// scope for "opt_name"
+    முழு		fillchar,
+    முழு		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab)	// return: click func regions (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_SINGLE, wp, out, outlen, &fmt,
+    திரும்பு build_stl_str_hl_local(STL_MODE_SINGLE, wp, out, outlen, &fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
-	    NULL, NULL);
+	    வெற்று, வெற்று);
 }
 
-    int
+    முழு
 build_stl_str_hl_mline(
     win_T	*wp,
     char_u	*out,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	**fmt,		// (in/out)
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    முழு		opt_scope,	// scope for "opt_name"
+    முழு		fillchar,
+    முழு		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    முழு		*carry_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_MULTI, wp, out, outlen, fmt,
+    திரும்பு build_stl_str_hl_local(STL_MODE_MULTI, wp, out, outlen, fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
-	    NULL, carry_hl);
+	    வெற்று, carry_hl);
 }
 
 # ifdef ENABLE_STL_MODE_MULTI_NL
-    int
+    முழு
 build_stl_str_hl_mline_nl(
     win_T	*wp,
     char_u	*out,		// buffer to write into != NameBuff
     size_t	outlen,		// length of out[]
     char_u	**fmt,		// (in/out)
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    முழு		opt_scope,	// scope for "opt_name"
+    முழு		fillchar,
+    முழு		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    முழு		*carry_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
-    return build_stl_str_hl_local(STL_MODE_MULTI_NL, wp, out, outlen, fmt,
+    திரும்பு build_stl_str_hl_local(STL_MODE_MULTI_NL, wp, out, outlen, fmt,
 	    opt_name, opt_scope, fillchar, maxwidth, hltab, tabtab, clicktab,
-	    NULL, carry_hl);
+	    வெற்று, carry_hl);
 }
 # endif
 
-    int
+    முழு
 get_stl_rendered_height(
     win_T	*wp,
     char_u	*fmt,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope)	// scope for "opt_name"
+    முழு		opt_scope)	// scope for "opt_name"
 {
-    int rendered_height = 0;
+    முழு rendered_height = 0;
     char_u	buf[MAXPATHL] = {0};
 
     // Suppress errors while computing height: expressions (%!expr, %{expr})
@@ -4463,12 +4463,12 @@ get_stl_rendered_height(
     // effects.  Any errors (e.g. E48 in sandbox) will surface properly when
     // the statusline is actually drawn.
     ++emsg_off;
-    (void)build_stl_str_hl_local(STL_MODE_GET_RENDERED_HEIGHT,
-	    wp, buf, sizeof(buf), &fmt,
-	    opt_name, opt_scope, 0, 0, NULL, NULL, NULL, &rendered_height,
-	    NULL);
+    (வெறுமை)build_stl_str_hl_local(STL_MODE_GET_RENDERED_HEIGHT,
+	    wp, buf, அளவு(buf), &fmt,
+	    opt_name, opt_scope, 0, 0, வெற்று, வெற்று, வெற்று, &rendered_height,
+	    வெற்று);
     --emsg_off;
-    return rendered_height;
+    திரும்பு rendered_height;
 }
 
 /*
@@ -4488,7 +4488,7 @@ get_stl_rendered_height(
  * Therefore, layout decisions must be based on the fully evaluated statusline
  * string, not on pre-evaluation parsing.
  */
-static int
+நிலையான முழு
 build_stl_str_hl_local(
     stl_mode_T	mode,
     win_T	*wp,
@@ -4496,14 +4496,14 @@ build_stl_str_hl_local(
     size_t	outlen,		// length of out[]
     char_u	**fmt_arg,
     char_u	*opt_name,      // option name corresponding to "fmt"
-    int		opt_scope,	// scope for "opt_name"
-    int		fillchar,
-    int		maxwidth,
+    முழு		opt_scope,	// scope for "opt_name"
+    முழு		fillchar,
+    முழு		maxwidth,
     stl_hlrec_T **hltab,	// return: HL attributes (can be NULL)
     stl_hlrec_T **tabtab,	// return: tab page nrs (can be NULL)
     stl_clickrec_T **clicktab,	// return: click func regions (can be NULL)
-    int		*rendered_height,   // return: stl rendered height (can be NULL)
-    int		*carry_hl)	// (in/out) %# / %* highlight carried across
+    முழு		*rendered_height,   // return: stl rendered height (can be NULL)
+    முழு		*carry_hl)	// (in/out) %# / %* highlight carried across
 				// line breaks (can be NULL)
 {
     linenr_T	lnum;
@@ -4511,30 +4511,30 @@ build_stl_str_hl_local(
     size_t	outputlen;	// length of out[] used (excluding the NUL)
     char_u	*p;
     char_u	*s;
-    int		byteval;
+    முழு		byteval;
 # ifdef FEAT_EVAL
-    int		use_sandbox;
-    int		save_VIsual_active;
+    முழு		use_sandbox;
+    முழு		save_VIsual_active;
 # endif
-    int		empty_line;
+    முழு		empty_வரி;
     long	l;
     long	n;
-    int		prevchar_isflag;
-    int		prevchar_isitem;
-    int		itemisflag;
-    int		fillable;
+    முழு		prevchar_isflag;
+    முழு		prevchar_isitem;
+    முழு		itemisflag;
+    முழு		fillable;
     char_u	*str;
-    long	num;
-    int		width;
-    int		itemcnt;
-    int		curitem;
-    int		groupdepth;
+    long	இலக்கம்;
+    முழு		width;
+    முழு		itemcnt;
+    முழு		curitem;
+    முழு		groupdepth;
 # ifdef FEAT_EVAL
-    int		evaldepth;
+    முழு		evaldepth;
 # endif
-    int		minwid;
-    int		maxwid;
-    int		zeropad;
+    முழு		minwid;
+    முழு		maxwid;
+    முழு		zeropad;
     char_u	base;
     char_u	opt;
 # define TMPLEN 70
@@ -4542,32 +4542,32 @@ build_stl_str_hl_local(
     char_u	*fmt = *fmt_arg;
     char_u	*usefmt = fmt;
     stl_hlrec_T *sp;
-    int		save_redraw_not_allowed = redraw_not_allowed;
-    int		save_KeyTyped = KeyTyped;
+    முழு		save_redraw_not_allowed = redraw_not_allowed;
+    முழு		save_சாவி_Typed = சாவி_Typed;
     // TODO: find out why using called_emsg_before makes tests fail, does it
     // matter?
     // int	called_emsg_before = called_emsg;
-    int		did_emsg_before = did_emsg;
-    int		rheight = 1;	// stl rendered height
+    முழு		did_emsg_before = did_emsg;
+    முழு		rheight = 1;	// stl rendered height
 
     // When inside update_screen() we do not want redrawing a statusline,
     // ruler, title, etc. to trigger another redraw, it may cause an endless
     // loop.
-    if (updating_screen)
+    எனில் (updating_screen)
 	redraw_not_allowed = TRUE;
 
-    if (stl_items == NULL)
+    எனில் (stl_பொருட்கள் == வெற்று)
     {
-	stl_items = ALLOC_MULT(stl_item_T, stl_items_len);
-	stl_groupitem = ALLOC_MULT(int, stl_items_len);
+	stl_பொருட்கள் = ALLOC_MULT(stl_item_T, stl_பொருட்கள்_len);
+	stl_groupitem = ALLOC_MULT(முழு, stl_பொருட்கள்_len);
 
 	// Allocate one more, because the last element is used to indicate the
 	// end of the list.
-	stl_hltab  = ALLOC_MULT(stl_hlrec_T, stl_items_len + 1);
-	stl_tabtab = ALLOC_MULT(stl_hlrec_T, stl_items_len + 1);
-	stl_clicktab = ALLOC_MULT(stl_clickrec_T, stl_items_len + 1);
+	stl_hltab  = ALLOC_MULT(stl_hlrec_T, stl_பொருட்கள்_len + 1);
+	stl_tabtab = ALLOC_MULT(stl_hlrec_T, stl_பொருட்கள்_len + 1);
+	stl_clicktab = ALLOC_MULT(stl_clickrec_T, stl_பொருட்கள்_len + 1);
 
-	stl_separator_locations = ALLOC_MULT(int, stl_items_len);
+	stl_separator_locations = ALLOC_MULT(முழு, stl_பொருட்கள்_len);
     }
 
 # ifdef FEAT_EVAL
@@ -4576,43 +4576,43 @@ build_stl_str_hl_local(
 
     // When the format starts with "%!" then evaluate it as an expression and
     // use the result as the actual format string.
-    if (fmt[0] == '%' && fmt[1] == '!')
+    எனில் (fmt[0] == '%' && fmt[1] == '!')
     {
 	typval_T	tv;
 
-	tv.v_type = VAR_NUMBER;
-	tv.vval.v_number = wp->w_id;
+	tv.v_type = VAR_எண்;
+	tv.vval.v_எண் = wp->w_id;
 	set_var((char_u *)"g:statusline_winid", &tv, FALSE);
 
 	usefmt = eval_to_string_safe(fmt + 2, use_sandbox, FALSE, FALSE);
-	if (usefmt == NULL)
+	எனில் (usefmt == வெற்று)
 	    usefmt = fmt;
 
 	do_unlet((char_u *)"g:statusline_winid", TRUE);
     }
 # endif
 
-    if (fillchar == 0)
+    எனில் (fillchar == 0)
 	fillchar = ' ';
 
     // The cursor in windows other than the current one isn't always
     // up-to-date, esp. because of autocommands and timers.
     lnum = wp->w_cursor.lnum;
-    if (lnum > wp->w_buffer->b_ml.ml_line_count)
+    எனில் (lnum > wp->w_buffer->b_ml.ml_வரி_மொத்தம்)
     {
-	lnum = wp->w_buffer->b_ml.ml_line_count;
+	lnum = wp->w_buffer->b_ml.ml_வரி_மொத்தம்;
 	wp->w_cursor.lnum = lnum;
     }
 
     // Get line & check if empty (cursorpos will show "0-1").  Note that
     // p will become invalid when getting another buffer line.
     p = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    empty_line = (*p == NUL);
+    empty_வரி = (*p == NUL);
 
     // Get the byte value now, in case we need it below. This is more efficient
     // than making a copy of the line.
     len = ml_get_buf_len(wp->w_buffer, lnum);
-    if (wp->w_cursor.col > len)
+    எனில் (wp->w_cursor.col > len)
     {
 	// Line may have changed since checking the cursor column, or the lnum
 	// was adjusted above.
@@ -4620,7 +4620,7 @@ build_stl_str_hl_local(
 	wp->w_cursor.coladd = 0;
 	byteval = 0;
     }
-    else
+    இல்லையெனில்
 	byteval = (*mb_ptr2char)(p + wp->w_cursor.col);
 
     groupdepth = 0;
@@ -4632,80 +4632,80 @@ build_stl_str_hl_local(
 
     // Pre-insert a Highlight item from carry_hl so that %# / %* set on a
     // previous multi-line statusline row continues to apply on this row.
-    if (carry_hl != NULL && *carry_hl != 0)
+    எனில் (carry_hl != வெற்று && *carry_hl != 0)
     {
-	stl_items[curitem].stl_type = Highlight;
-	stl_items[curitem].stl_start = p;
-	stl_items[curitem].stl_minwid = *carry_hl;
-	stl_items[curitem].stl_clickfunc = NULL;
+	stl_பொருட்கள்[curitem].stl_type = Highlight;
+	stl_பொருட்கள்[curitem].stl_start = p;
+	stl_பொருட்கள்[curitem].stl_minwid = *carry_hl;
+	stl_பொருட்கள்[curitem].stl_clickfunc = வெற்று;
 	curitem++;
     }
 
     prevchar_isflag = TRUE;
     prevchar_isitem = FALSE;
-    for (s = usefmt; *s != NUL; )
+    க்கு (s = usefmt; *s != NUL; )
     {
-	if (curitem == (int)stl_items_len)
+	எனில் (curitem == (முழு)stl_பொருட்கள்_len)
 	{
-	    size_t	new_len = stl_items_len * 3 / 2;
+	    size_t	new_len = stl_பொருட்கள்_len * 3 / 2;
 
-	    stl_item_T *new_items =
-			  vim_realloc(stl_items, sizeof(stl_item_T) * new_len);
-	    if (new_items == NULL)
-		break;
-	    stl_items = new_items;
+	    stl_item_T *new_பொருட்கள் =
+			  vim_realloc(stl_பொருட்கள், அளவு(stl_item_T) * new_len);
+	    எனில் (new_பொருட்கள் == வெற்று)
+		நிறுத்து;
+	    stl_பொருட்கள் = new_பொருட்கள்;
 
-	    int *new_groupitem =
-			     vim_realloc(stl_groupitem, sizeof(int) * new_len);
-	    if (new_groupitem == NULL)
-		break;
+	    முழு *new_groupitem =
+			     vim_realloc(stl_groupitem, அளவு(முழு) * new_len);
+	    எனில் (new_groupitem == வெற்று)
+		நிறுத்து;
 	    stl_groupitem = new_groupitem;
 
 	    stl_hlrec_T	*new_hlrec = vim_realloc(stl_hltab,
-					  sizeof(stl_hlrec_T) * (new_len + 1));
-	    if (new_hlrec == NULL)
-		break;
+					  அளவு(stl_hlrec_T) * (new_len + 1));
+	    எனில் (new_hlrec == வெற்று)
+		நிறுத்து;
 	    stl_hltab = new_hlrec;
 	    new_hlrec = vim_realloc(stl_tabtab,
-					  sizeof(stl_hlrec_T) * (new_len + 1));
-	    if (new_hlrec == NULL)
-		break;
+					  அளவு(stl_hlrec_T) * (new_len + 1));
+	    எனில் (new_hlrec == வெற்று)
+		நிறுத்து;
 	    stl_tabtab = new_hlrec;
 
 	    stl_clickrec_T *new_clickrec = vim_realloc(stl_clicktab,
-				      sizeof(stl_clickrec_T) * (new_len + 1));
-	    if (new_clickrec == NULL)
-		break;
+				      அளவு(stl_clickrec_T) * (new_len + 1));
+	    எனில் (new_clickrec == வெற்று)
+		நிறுத்து;
 	    stl_clicktab = new_clickrec;
 
-	    int *new_separator_locs = vim_realloc(stl_separator_locations,
-					    sizeof(int) * new_len);
-	    if (new_separator_locs == NULL)
-		break;
+	    முழு *new_separator_locs = vim_realloc(stl_separator_locations,
+					    அளவு(முழு) * new_len);
+	    எனில் (new_separator_locs == வெற்று)
+		நிறுத்து;
 	    stl_separator_locations = new_separator_locs;
 
-	    stl_items_len = new_len;
+	    stl_பொருட்கள்_len = new_len;
 	}
 
-	stl_items[curitem].stl_clickfunc = NULL;
+	stl_பொருட்கள்[curitem].stl_clickfunc = வெற்று;
 
-	if (*s != '%')
+	எனில் (*s != '%')
 	    prevchar_isflag = prevchar_isitem = FALSE;
 
 	/*
 	 * Handle up to the next '%' or the end.
 	 */
-	while (*s != NUL && *s != '%' && p + 1 < out + outlen)
+	போது (*s != NUL && *s != '%' && p + 1 < out + outlen)
 # ifdef ENABLE_STL_MODE_MULTI_NL
 	{
-	    if (*s == '\n' || *s == '\r')
+	    எனில் (*s == '\n' || *s == '\r')
 	    {
-		if (mode == STL_MODE_MULTI_NL)
+		எனில் (mode == STL_MODE_MULTI_NL)
 		{
 		    s++;
-		    goto find_linebreak;
+		    செல் find_linebreak;
 		}
-		else if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+		இல்லையெனில் எனில் (mode == STL_MODE_GET_RENDERED_HEIGHT)
 		    rheight++;
 	    }
 # endif
@@ -4713,154 +4713,154 @@ build_stl_str_hl_local(
 # ifdef ENABLE_STL_MODE_MULTI_NL
 	}
 # endif
-	if (*s == NUL || p + 1 >= out + outlen)
-	    break;
+	எனில் (*s == NUL || p + 1 >= out + outlen)
+	    நிறுத்து;
 
 	/*
 	 * Handle one '%' item.
 	 */
 	s++;
-	if (*s == NUL)  // ignore trailing %
-	    break;
+	எனில் (*s == NUL)  // ignore trailing %
+	    நிறுத்து;
 
-	if (*s == STL_CLICKFUNC)
+	எனில் (*s == STL_CLICKFUNC)
 	{
 	    // %[] - end click region
-	    if (s[1] == ']')
+	    எனில் (s[1] == ']')
 	    {
-		stl_items[curitem].stl_type = ClickFunc;
-		stl_items[curitem].stl_start = p;
-		stl_items[curitem].stl_minwid = 0;
-		stl_items[curitem].stl_clickfunc = NULL;
+		stl_பொருட்கள்[curitem].stl_type = ClickFunc;
+		stl_பொருட்கள்[curitem].stl_start = p;
+		stl_பொருட்கள்[curitem].stl_minwid = 0;
+		stl_பொருட்கள்[curitem].stl_clickfunc = வெற்று;
 		s += 2;
 		curitem++;
-		continue;
+		தொடர்;
 	    }
 	    // %[FuncName] - start click region
-	    if (ASCII_ISALPHA(s[1]) || s[1] == '_')
+	    எனில் (ASCII_ISALPHA(s[1]) || s[1] == '_')
 	    {
 		char_u *rb = vim_strchr(s + 1, ']');
-		if (rb != NULL)
+		எனில் (rb != வெற்று)
 		{
-		    stl_items[curitem].stl_type = ClickFunc;
-		    stl_items[curitem].stl_start = p;
-		    stl_items[curitem].stl_minwid = 0;
-		    stl_items[curitem].stl_clickfunc =
+		    stl_பொருட்கள்[curitem].stl_type = ClickFunc;
+		    stl_பொருட்கள்[curitem].stl_start = p;
+		    stl_பொருட்கள்[curitem].stl_minwid = 0;
+		    stl_பொருட்கள்[curitem].stl_clickfunc =
 					  vim_strnsave(s + 1, rb - s - 1);
 		    s = rb + 1;
 		    curitem++;
-		    continue;
+		    தொடர்;
 		}
 	    }
 	}
-	if (*s == STL_LINEBREAK)
+	எனில் (*s == STL_LINEBREAK)
 	{
 	    // Plain %@ - line break
-	    if (mode == STL_MODE_MULTI
+	    எனில் (mode == STL_MODE_MULTI
 # ifdef ENABLE_STL_MODE_MULTI_NL
 		    || mode == STL_MODE_MULTI_NL
 # endif
 	       )
 	    {
 		s++;
-		break;
+		நிறுத்து;
 	    }
-	    else if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+	    இல்லையெனில் எனில் (mode == STL_MODE_GET_RENDERED_HEIGHT)
 		rheight++;
 	}
-	if (*s == '%')
+	எனில் (*s == '%')
 	{
-	    if (p + 1 >= out + outlen)
-		break;
+	    எனில் (p + 1 >= out + outlen)
+		நிறுத்து;
 	    *p++ = *s++;
 	    prevchar_isflag = prevchar_isitem = FALSE;
-	    continue;
+	    தொடர்;
 	}
 	// STL_SEPARATE: Separation between items, filled with white space.
-	if (*s == STL_SEPARATE)
+	எனில் (*s == STL_SEPARATE)
 	{
 	    s++;
-	    if (groupdepth > 0)
-		continue;
-	    stl_items[curitem].stl_type = Separate;
-	    stl_items[curitem++].stl_start = p;
-	    continue;
+	    எனில் (groupdepth > 0)
+		தொடர்;
+	    stl_பொருட்கள்[curitem].stl_type = Separate;
+	    stl_பொருட்கள்[curitem++].stl_start = p;
+	    தொடர்;
 	}
-	if (*s == STL_TRUNCMARK)
+	எனில் (*s == STL_TRUNCMARK)
 	{
 	    s++;
-	    stl_items[curitem].stl_type = Trunc;
-	    stl_items[curitem++].stl_start = p;
-	    continue;
+	    stl_பொருட்கள்[curitem].stl_type = Trunc;
+	    stl_பொருட்கள்[curitem++].stl_start = p;
+	    தொடர்;
 	}
-	if (*s == ')')
+	எனில் (*s == ')')
 	{
 	    char_u  *t;
 
 	    s++;
-	    if (groupdepth < 1)
-		continue;
+	    எனில் (groupdepth < 1)
+		தொடர்;
 	    groupdepth--;
 
-	    t = stl_items[stl_groupitem[groupdepth]].stl_start;
+	    t = stl_பொருட்கள்[stl_groupitem[groupdepth]].stl_start;
 	    *p = NUL;
 	    l = vim_strsize(t);
-	    if (curitem > stl_groupitem[groupdepth] + 1
-		    && stl_items[stl_groupitem[groupdepth]].stl_minwid == 0)
+	    எனில் (curitem > stl_groupitem[groupdepth] + 1
+		    && stl_பொருட்கள்[stl_groupitem[groupdepth]].stl_minwid == 0)
 	    {
-		int group_start_userhl = 0;
-		int group_end_userhl = 0;
+		முழு group_start_userhl = 0;
+		முழு group_end_userhl = 0;
 
 		// remove group if all items are empty and highlight group
 		// doesn't change
-		for (n = stl_groupitem[groupdepth] - 1; n >= 0; n--)
+		க்கு (n = stl_groupitem[groupdepth] - 1; n >= 0; n--)
 		{
-		    if (stl_items[n].stl_type == Highlight)
+		    எனில் (stl_பொருட்கள்[n].stl_type == Highlight)
 		    {
 			group_start_userhl = group_end_userhl =
-						       stl_items[n].stl_minwid;
-			break;
+						       stl_பொருட்கள்[n].stl_minwid;
+			நிறுத்து;
 		    }
 		}
-		for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+		க்கு (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
 		{
-		    if (stl_items[n].stl_type == Normal)
-			break;
-		    if (stl_items[n].stl_type == Highlight)
-			group_end_userhl = stl_items[n].stl_minwid;
+		    எனில் (stl_பொருட்கள்[n].stl_type == Normal)
+			நிறுத்து;
+		    எனில் (stl_பொருட்கள்[n].stl_type == Highlight)
+			group_end_userhl = stl_பொருட்கள்[n].stl_minwid;
 		}
-		if (n == curitem && group_start_userhl == group_end_userhl)
+		எனில் (n == curitem && group_start_userhl == group_end_userhl)
 		{
 		    // empty group
 		    p = t;
 		    l = 0;
-		    for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+		    க்கு (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
 		    {
 			// do not use the highlighting from the removed group
-			if (stl_items[n].stl_type == Highlight)
-			    stl_items[n].stl_type = Empty;
+			எனில் (stl_பொருட்கள்[n].stl_type == Highlight)
+			    stl_பொருட்கள்[n].stl_type = Empty;
 			// adjust the start position of TabPage to the next
 			// item position
-			if (stl_items[n].stl_type == TabPage)
-			    stl_items[n].stl_start = p;
+			எனில் (stl_பொருட்கள்[n].stl_type == TabPage)
+			    stl_பொருட்கள்[n].stl_start = p;
 		    }
 		}
 	    }
-	    if (l > stl_items[stl_groupitem[groupdepth]].stl_maxwid)
+	    எனில் (l > stl_பொருட்கள்[stl_groupitem[groupdepth]].stl_maxwid)
 	    {
 		// truncate, remove n bytes of text at the start
-		if (has_mbyte)
+		எனில் (has_mbyte)
 		{
 		    // Find the first character that should be included.
 		    n = 0;
-		    while (l >= stl_items[stl_groupitem[groupdepth]].stl_maxwid)
+		    போது (l >= stl_பொருட்கள்[stl_groupitem[groupdepth]].stl_maxwid)
 		    {
 			l -= ptr2cells(t + n);
 			n += (*mb_ptr2len)(t + n);
 		    }
 		}
-		else
-		    n = (long)(p - t) - stl_items[stl_groupitem[groupdepth]]
+		இல்லையெனில்
+		    n = (long)(p - t) - stl_பொருட்கள்[stl_groupitem[groupdepth]]
 							       .stl_maxwid + 1;
 
 		*t = '<';
@@ -4868,148 +4868,148 @@ build_stl_str_hl_local(
 		p = p - n + 1;
 
 		// Fill up space left over by half a double-wide char.
-		int minwid_fixed = MIN(stl_items[stl_groupitem[groupdepth]].stl_minwid,
-				       stl_items[stl_groupitem[groupdepth]].stl_maxwid);
-		while (++l < minwid_fixed)
+		முழு minwid_fixed = MIN(stl_பொருட்கள்[stl_groupitem[groupdepth]].stl_minwid,
+				       stl_பொருட்கள்[stl_groupitem[groupdepth]].stl_maxwid);
+		போது (++l < minwid_fixed)
 		    MB_CHAR2BYTES(fillchar, p);
 
 		// correct the start of the items for the truncation
-		for (l = stl_groupitem[groupdepth] + 1; l < curitem; l++)
+		க்கு (l = stl_groupitem[groupdepth] + 1; l < curitem; l++)
 		{
 		    // Minus one for the leading '<' added above.
-		    stl_items[l].stl_start -= n - 1;
-		    if (stl_items[l].stl_start < t)
-			stl_items[l].stl_start = t;
+		    stl_பொருட்கள்[l].stl_start -= n - 1;
+		    எனில் (stl_பொருட்கள்[l].stl_start < t)
+			stl_பொருட்கள்[l].stl_start = t;
 		}
 	    }
-	    else if (abs(stl_items[stl_groupitem[groupdepth]].stl_minwid) > l)
+	    இல்லையெனில் எனில் (abs(stl_பொருட்கள்[stl_groupitem[groupdepth]].stl_minwid) > l)
 	    {
 		// fill
-		n = stl_items[stl_groupitem[groupdepth]].stl_minwid;
-		int fillchar_len = MB_CHAR2LEN(fillchar);
-		if (n < 0)
+		n = stl_பொருட்கள்[stl_groupitem[groupdepth]].stl_minwid;
+		முழு fillchar_len = MB_CHAR2LEN(fillchar);
+		எனில் (n < 0)
 		{
 		    // fill by appending characters
 		    n = 0 - n;
-		    while (l++ < n && p + fillchar_len < out + outlen)
+		    போது (l++ < n && p + fillchar_len < out + outlen)
 			MB_CHAR2BYTES(fillchar, p);
 		}
-		else
+		இல்லையெனில்
 		{
 		    // fill by inserting characters
 		    n = n - l;
 		    l = n * fillchar_len;
-		    if (p + l >= out + outlen)
+		    எனில் (p + l >= out + outlen)
 		    {
 			n = (long)((out + outlen) - p - 1) / fillchar_len;
 			l = n * fillchar_len;
 		    }
 		    mch_memmove(t + l, t, (size_t)(p - t));
 		    p += l;
-		    for ( ; n > 0; n--)
+		    க்கு ( ; n > 0; n--)
 			MB_CHAR2BYTES(fillchar, t);
-		    for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
-			stl_items[n].stl_start += l;
+		    க்கு (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
+			stl_பொருட்கள்[n].stl_start += l;
 		}
 	    }
-	    continue;
+	    தொடர்;
 	}
 	minwid = 0;
 	maxwid = 9999;
 	zeropad = FALSE;
 	l = 1;
-	if (*s == '0')
+	எனில் (*s == '0')
 	{
 	    s++;
 	    zeropad = TRUE;
 	}
-	if (*s == '-')
+	எனில் (*s == '-')
 	{
 	    s++;
 	    l = -1;
 	}
-	if (VIM_ISDIGIT(*s))
+	எனில் (VIM_ISDIGIT(*s))
 	{
-	    minwid = (int)getdigits(&s);
-	    if (minwid < 0)	// overflow
+	    minwid = (முழு)getdigits(&s);
+	    எனில் (minwid < 0)	// overflow
 		minwid = 0;
 	}
-	if (*s == STL_USER_HL)
+	எனில் (*s == STL_USER_HL)
 	{
-	    stl_items[curitem].stl_type = Highlight;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid > 9 ? 1 : minwid;
+	    stl_பொருட்கள்[curitem].stl_type = Highlight;
+	    stl_பொருட்கள்[curitem].stl_start = p;
+	    stl_பொருட்கள்[curitem].stl_minwid = minwid > 9 ? 1 : minwid;
 	    s++;
 	    curitem++;
-	    continue;
+	    தொடர்;
 	}
-	if (*s == STL_TABPAGENR || *s == STL_TABCLOSENR)
+	எனில் (*s == STL_TABPAGENR || *s == STL_TABCLOSENR)
 	{
-	    if (*s == STL_TABCLOSENR)
+	    எனில் (*s == STL_TABCLOSENR)
 	    {
-		if (minwid == 0)
+		எனில் (minwid == 0)
 		{
 		    // %X ends the close label, go back to the previously
 		    // define tab label nr.
-		    for (n = curitem - 1; n >= 0; --n)
-			if (stl_items[n].stl_type == TabPage
-					       && stl_items[n].stl_minwid >= 0)
+		    க்கு (n = curitem - 1; n >= 0; --n)
+			எனில் (stl_பொருட்கள்[n].stl_type == TabPage
+					       && stl_பொருட்கள்[n].stl_minwid >= 0)
 			{
-			    minwid = stl_items[n].stl_minwid;
-			    break;
+			    minwid = stl_பொருட்கள்[n].stl_minwid;
+			    நிறுத்து;
 			}
 		}
-		else
+		இல்லையெனில்
 		    // close nrs are stored as negative values
 		    minwid = - minwid;
 	    }
-	    stl_items[curitem].stl_type = TabPage;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid;
+	    stl_பொருட்கள்[curitem].stl_type = TabPage;
+	    stl_பொருட்கள்[curitem].stl_start = p;
+	    stl_பொருட்கள்[curitem].stl_minwid = minwid;
 	    s++;
 	    curitem++;
-	    continue;
+	    தொடர்;
 	}
-	if (*s == '.')
+	எனில் (*s == '.')
 	{
 	    s++;
-	    if (VIM_ISDIGIT(*s))
+	    எனில் (VIM_ISDIGIT(*s))
 	    {
-		maxwid = (int)getdigits(&s);
-		if (maxwid <= 0)	// overflow
+		maxwid = (முழு)getdigits(&s);
+		எனில் (maxwid <= 0)	// overflow
 		    maxwid = 50;
 	    }
 	}
 	// Keep the uncapped value for %N[FuncName] click-region IDs; the 50
 	// cap below applies only when minwid is used as a padding width.
-	int raw_minwid = minwid * l;
+	முழு raw_minwid = minwid * l;
 	minwid = (minwid > 50 ? 50 : minwid) * l;
-	if (*s == '(')
+	எனில் (*s == '(')
 	{
 	    stl_groupitem[groupdepth++] = curitem;
-	    stl_items[curitem].stl_type = Group;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid;
-	    stl_items[curitem].stl_maxwid = maxwid;
+	    stl_பொருட்கள்[curitem].stl_type = Group;
+	    stl_பொருட்கள்[curitem].stl_start = p;
+	    stl_பொருட்கள்[curitem].stl_minwid = minwid;
+	    stl_பொருட்கள்[curitem].stl_maxwid = maxwid;
 	    s++;
 	    curitem++;
-	    continue;
+	    தொடர்;
 	}
 # ifdef FEAT_EVAL
 	// Denotes end of expanded %{} block
-	if (*s == '}' && evaldepth > 0)
+	எனில் (*s == '}' && evaldepth > 0)
 	{
 	    s++;
 	    evaldepth--;
-	    continue;
+	    தொடர்;
 	}
 # endif
-	if (vim_strchr(STL_ALL, *s) == NULL)
+	எனில் (vim_strchr(STL_ALL, *s) == வெற்று)
 	{
-	    if (*s == NUL)  // can happen with "%0"
-		break;
+	    எனில் (*s == NUL)  // can happen with "%0"
+		நிறுத்து;
 	    s++;
-	    continue;
+	    தொடர்;
 	}
 	opt = *s++;
 
@@ -5017,65 +5017,65 @@ build_stl_str_hl_local(
 	base = 'D';
 	itemisflag = FALSE;
 	fillable = TRUE;
-	num = -1;
-	str = NULL;
-	switch (opt)
+	இலக்கம் = -1;
+	str = வெற்று;
+	தேர்வு (opt)
 	{
-	case STL_FILEPATH:
-	case STL_FULLPATH:
-	case STL_FILENAME:
+	நிலை STL_FILEPATH:
+	நிலை STL_FULLPATH:
+	நிலை STL_FILENAME:
 	{
 	    char_u  *name;
 
 	    fillable = FALSE;	// don't change ' ' to fillchar
 	    name = buf_spname(wp->w_buffer);
-	    if (name != NULL)
+	    எனில் (name != வெற்று)
 		vim_strncpy(NameBuff, name, MAXPATHL - 1);
-	    else
+	    இல்லையெனில்
 	    {
 		char_u	*t = (opt == STL_FULLPATH) ? wp->w_buffer->b_ffname
 					  : wp->w_buffer->b_fname;
 		home_replace(wp->w_buffer, t, NameBuff, MAXPATHL, TRUE);
 	    }
 	    trans_characters(NameBuff, MAXPATHL);
-	    if (opt != STL_FILENAME)
+	    எனில் (opt != STL_FILENAME)
 		str = NameBuff;
-	    else
+	    இல்லையெனில்
 		str = gettail(NameBuff);
-	    break;
+	    நிறுத்து;
 	}
 
-	case STL_VIM_EXPR: // '{'
+	நிலை STL_VIM_கோவை: // '{'
 	{
 # ifdef FEAT_EVAL
 	    char_u  *block_start = s - 1;
 # endif
-	    int	    reevaluate = (*s == '%');
+	    முழு	    reevaluate = (*s == '%');
 	    char_u  *t;
 	    buf_T   *save_curbuf;
 	    win_T   *save_curwin;
 
-	    if (reevaluate)
+	    எனில் (reevaluate)
 		s++;
 	    // %0{} keeps the result verbatim
 	    itemisflag = zeropad ? FALSE : TRUE;
 	    t = p;
-	    while ((*s != '}' || (reevaluate && s[-1] != '%'))
+	    போது ((*s != '}' || (reevaluate && s[-1] != '%'))
 					  && *s != NUL && p + 1 < out + outlen)
 		*p++ = *s++;
-	    if (*s != '}')	// missing '}' or out of space
-		break;
+	    எனில் (*s != '}')	// missing '}' or out of space
+		நிறுத்து;
 	    s++;
-	    if (reevaluate && p > out)
+	    எனில் (reevaluate && p > out)
 		p[-1] = NUL; // remove the % at the end of %{% expr %}
-	    else
+	    இல்லையெனில்
 		*p = NUL;
 	    p = t;
 # ifdef FEAT_EVAL
-	    vim_snprintf((char *)buf_tmp, sizeof(buf_tmp),
+	    vim_snprintf((எழுத்து *)buf_tmp, அளவு(buf_tmp),
 							 "%d", curbuf->b_fnum);
 	    set_internal_string_var((char_u *)"g:actual_curbuf", buf_tmp);
-	    vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), "%d", curwin->w_id);
+	    vim_snprintf((எழுத்து *)buf_tmp, அளவு(buf_tmp), "%d", curwin->w_id);
 	    set_internal_string_var((char_u *)"g:actual_curwin", buf_tmp);
 
 	    save_curbuf = curbuf;
@@ -5084,7 +5084,7 @@ build_stl_str_hl_local(
 	    curwin = wp;
 	    curbuf = wp->w_buffer;
 	    // Visual mode is only valid in the current window.
-	    if (curwin != save_curwin)
+	    எனில் (curwin != save_curwin)
 		VIsual_active = FALSE;
 
 	    str = eval_to_string_safe(p, use_sandbox, FALSE, FALSE);
@@ -5095,11 +5095,11 @@ build_stl_str_hl_local(
 	    do_unlet((char_u *)"g:actual_curbuf", TRUE);
 	    do_unlet((char_u *)"g:actual_curwin", TRUE);
 
-	    if (!zeropad && str != NULL && *str != NUL)
+	    எனில் (!zeropad && str != வெற்று && *str != NUL)
 	    {
-		if (*skipdigits(str) == NUL)
+		எனில் (*skipdigits(str) == NUL)
 		{
-		    num = atoi((char *)str);
+		    இலக்கம் = atoi((எழுத்து *)str);
 		    VIM_CLEAR(str);
 		    itemisflag = FALSE;
 		}
@@ -5107,18 +5107,18 @@ build_stl_str_hl_local(
 
 	    // If the output of the expression needs to be evaluated
 	    // replace the %{} block with the result of evaluation
-	    if (reevaluate && str != NULL && *str != NUL
-		    && strchr((const char *)str, '%') != NULL
+	    எனில் (reevaluate && str != வெற்று && *str != NUL
+		    && strchr((மாறிலி எழுத்து *)str, '%') != வெற்று
 		    && evaldepth < MAX_STL_EVAL_DEPTH)
 	    {
 		size_t parsed_usefmt = (size_t)(block_start - usefmt);
-		size_t str_length = strlen((const char *)str);
-		size_t fmt_length = strlen((const char *)s);
+		size_t str_length = strlen((மாறிலி எழுத்து *)str);
+		size_t fmt_length = strlen((மாறிலி எழுத்து *)s);
 		size_t new_fmt_len = parsed_usefmt
 						 + str_length + fmt_length + 3;
-		char_u *new_fmt = (char_u *)alloc(new_fmt_len * sizeof(char_u));
+		char_u *new_fmt = (char_u *)alloc(new_fmt_len * அளவு(char_u));
 
-		if (new_fmt != NULL)
+		எனில் (new_fmt != வெற்று)
 		{
 		    char_u *new_fmt_p = new_fmt;
 
@@ -5130,347 +5130,347 @@ build_stl_str_hl_local(
 		    new_fmt_p = (char_u *)memcpy(new_fmt_p , s, fmt_length)
 								      + fmt_length;
 		    *new_fmt_p = 0;
-		    new_fmt_p = NULL;
+		    new_fmt_p = வெற்று;
 
-		    if (usefmt != fmt)
+		    எனில் (usefmt != fmt)
 			vim_free(usefmt);
 		    VIM_CLEAR(str);
 		    usefmt = new_fmt;
 		    s = usefmt + parsed_usefmt;
 		    evaldepth++;
-		    continue;
+		    தொடர்;
 		}
 	    }
 # endif
-	    break;
+	    நிறுத்து;
 	}
-	case STL_LINE:
-	    num = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY)
+	நிலை STL_வரி:
+	    இலக்கம் = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY)
 		  ? 0L : (long)(wp->w_cursor.lnum);
-	    break;
+	    நிறுத்து;
 
-	case STL_NUMLINES:
-	    num = wp->w_buffer->b_ml.ml_line_count;
-	    break;
+	நிலை STL_NUMLINES:
+	    இலக்கம் = wp->w_buffer->b_ml.ml_வரி_மொத்தம்;
+	    நிறுத்து;
 
-	case STL_COLUMN:
-	    num = (State & MODE_INSERT) == 0 && empty_line
-					       ? 0 : (int)wp->w_cursor.col + 1;
-	    break;
+	நிலை STL_COLUMN:
+	    இலக்கம் = (State & MODE_செருகு) == 0 && empty_வரி
+					       ? 0 : (முழு)wp->w_cursor.col + 1;
+	    நிறுத்து;
 
-	case STL_VIRTCOL:
-	case STL_VIRTCOL_ALT:
+	நிலை STL_VIRTCOL:
+	நிலை STL_VIRTCOL_ALT:
 	{
 	    colnr_T virtcol = wp->w_virtcol + 1;
 
 	    // Don't display %V if it's the same as %c.
-	    if (opt == STL_VIRTCOL_ALT
-		    && (virtcol == (colnr_T)((State & MODE_INSERT) == 0
-			       && empty_line ? 0 : (int)wp->w_cursor.col + 1)))
-		break;
-	    num = (long)virtcol;
-	    break;
+	    எனில் (opt == STL_VIRTCOL_ALT
+		    && (virtcol == (colnr_T)((State & MODE_செருகு) == 0
+			       && empty_வரி ? 0 : (முழு)wp->w_cursor.col + 1)))
+		நிறுத்து;
+	    இலக்கம் = (long)virtcol;
+	    நிறுத்து;
 	}
 
-	case STL_PERCENTAGE:
-	    num = calc_percentage((long)wp->w_cursor.lnum, (long)wp->w_buffer->b_ml.ml_line_count);
-	    break;
+	நிலை STL_PERCENTAGE:
+	    இலக்கம் = calc_percentage((long)wp->w_cursor.lnum, (long)wp->w_buffer->b_ml.ml_வரி_மொத்தம்);
+	    நிறுத்து;
 
-	case STL_ALTPERCENT:
+	நிலை STL_ALTPERCENT:
 	    str = buf_tmp;
-	    (void)get_rel_pos(wp, str, TMPLEN);
-	    break;
+	    (வெறுமை)get_rel_pos(wp, str, TMPLEN);
+	    நிறுத்து;
 
-	case STL_SHOWCMD:
-	    if (p_sc && STRCMP(opt_name, p_sloc) == 0)
+	நிலை STL_SHOWCMD:
+	    எனில் (p_sc && STRCMP(opt_name, p_sloc) == 0)
 		str = showcmd_buf;
-	    break;
+	    நிறுத்து;
 
-	case STL_ARGLISTSTAT:
+	நிலை STL_ARGLISTSTAT:
 	    fillable = FALSE;
 	    buf_tmp[0] = NUL;
-	    if (append_arg_number(wp, buf_tmp, sizeof(buf_tmp), FALSE) > 0)
+	    எனில் (append_arg_எண்(wp, buf_tmp, அளவு(buf_tmp), FALSE) > 0)
 		str = buf_tmp;
-	    break;
+	    நிறுத்து;
 
-	case STL_KEYMAP:
+	நிலை STL_KEYMAP:
 	    fillable = FALSE;
-	    if (get_keymap_str(wp, (char_u *)"<%s>", buf_tmp, TMPLEN) > 0)
+	    எனில் (get_keymap_str(wp, (char_u *)"<%s>", buf_tmp, TMPLEN) > 0)
 		str = buf_tmp;
-	    break;
-	case STL_PAGENUM:
-# if defined(FEAT_PRINTER) || defined(FEAT_GUI_TABLINE)
-	    num = printer_page_num;
-# else
-	    num = 0;
+	    நிறுத்து;
+	நிலை STL_PAGENUM:
+# எனில் defined(FEAT_PRINTER) || defined(FEAT_GUI_TABLINE)
+	    இலக்கம் = printer_page_இலக்கம்;
+# இல்லையெனில்
+	    இலக்கம் = 0;
 # endif
-	    break;
+	    நிறுத்து;
 
-	case STL_BUFNO:
-	    num = wp->w_buffer->b_fnum;
-	    break;
+	நிலை STL_BUFNO:
+	    இலக்கம் = wp->w_buffer->b_fnum;
+	    நிறுத்து;
 
-	case STL_OFFSET_X:
+	நிலை STL_OFFSET_X:
 	    base = 'X';
 	    // FALLTHROUGH
-	case STL_OFFSET:
+	நிலை STL_OFFSET:
 # ifdef FEAT_BYTEOFF
-	    l = ml_find_line_or_offset(wp->w_buffer, wp->w_cursor.lnum, NULL);
-	    num = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY) || l < 0
-		       ? 0L : l + 1 + ((State & MODE_INSERT) == 0 && empty_line
-				? 0 : (int)wp->w_cursor.col);
+	    l = ml_find_வரி_or_offset(wp->w_buffer, wp->w_cursor.lnum, வெற்று);
+	    இலக்கம் = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY) || l < 0
+		       ? 0L : l + 1 + ((State & MODE_செருகு) == 0 && empty_வரி
+				? 0 : (முழு)wp->w_cursor.col);
 # endif
-	    break;
+	    நிறுத்து;
 
-	case STL_BYTEVAL_X:
+	நிலை STL_BYTEVAL_X:
 	    base = 'X';
 	    // FALLTHROUGH
-	case STL_BYTEVAL:
-	    num = byteval;
-	    if (num == NL)
-		num = 0;
-	    else if (num == CAR && get_fileformat(wp->w_buffer) == EOL_MAC)
-		num = NL;
-	    break;
+	நிலை STL_BYTEVAL:
+	    இலக்கம் = byteval;
+	    எனில் (இலக்கம் == NL)
+		இலக்கம் = 0;
+	    இல்லையெனில் எனில் (இலக்கம் == CAR && get_fileformat(wp->w_buffer) == EOL_MAC)
+		இலக்கம் = NL;
+	    நிறுத்து;
 
-	case STL_ROFLAG:
-	case STL_ROFLAG_ALT:
+	நிலை STL_ROFLAG:
+	நிலை STL_ROFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_buffer->b_p_ro)
+	    எனில் (wp->w_buffer->b_p_ro)
 		str = (char_u *)((opt == STL_ROFLAG_ALT) ? ",RO" : _("[RO]"));
-	    break;
+	    நிறுத்து;
 
-	case STL_HELPFLAG:
-	case STL_HELPFLAG_ALT:
+	நிலை STL_HELPFLAG:
+	நிலை STL_HELPFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_buffer->b_help)
+	    எனில் (wp->w_buffer->b_help)
 		str = (char_u *)((opt == STL_HELPFLAG_ALT) ? ",HLP"
 							       : _("[Help]"));
-	    break;
+	    நிறுத்து;
 
-	case STL_FILETYPE:
-	    if (*wp->w_buffer->b_p_ft != NUL
+	நிலை STL_FILETYPE:
+	    எனில் (*wp->w_buffer->b_p_ft != NUL
 		    && STRLEN(wp->w_buffer->b_p_ft) < TMPLEN - 3)
 	    {
-		vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), "[%s]",
+		vim_snprintf((எழுத்து *)buf_tmp, அளவு(buf_tmp), "[%s]",
 							wp->w_buffer->b_p_ft);
 		str = buf_tmp;
 	    }
-	    break;
+	    நிறுத்து;
 
-	case STL_FILETYPE_ALT:
+	நிலை STL_FILETYPE_ALT:
 	    itemisflag = TRUE;
-	    if (*wp->w_buffer->b_p_ft != NUL
+	    எனில் (*wp->w_buffer->b_p_ft != NUL
 		    && STRLEN(wp->w_buffer->b_p_ft) < TMPLEN - 2)
 	    {
 		char_u	*t;
 
-		vim_snprintf((char *)buf_tmp, sizeof(buf_tmp), ",%s",
+		vim_snprintf((எழுத்து *)buf_tmp, அளவு(buf_tmp), ",%s",
 							wp->w_buffer->b_p_ft);
-		for (t = buf_tmp; *t != 0; t++)
+		க்கு (t = buf_tmp; *t != 0; t++)
 		    *t = TOUPPER_LOC(*t);
 		str = buf_tmp;
 	    }
-	    break;
+	    நிறுத்து;
 
-# if defined(FEAT_QUICKFIX)
-	case STL_PREVIEWFLAG:
-	case STL_PREVIEWFLAG_ALT:
+# எனில் defined(FEAT_QUICKFIX)
+	நிலை STL_PREVIEWFLAG:
+	நிலை STL_PREVIEWFLAG_ALT:
 	    itemisflag = TRUE;
-	    if (wp->w_p_pvw)
+	    எனில் (wp->w_p_pvw)
 		str = (char_u *)((opt == STL_PREVIEWFLAG_ALT) ? ",PRV"
 							    : _("[Preview]"));
-	    break;
+	    நிறுத்து;
 
-	case STL_QUICKFIX:
-	    if (bt_quickfix(wp->w_buffer))
+	நிலை STL_QUICKFIX:
+	    எனில் (bt_quickfix(wp->w_buffer))
 		str = (char_u *)(wp->w_llist_ref
-			    ? _(msg_loclist)
-			    : _(msg_qflist));
-	    break;
+			    ? _(செய்தி_loclist)
+			    : _(செய்தி_qflist));
+	    நிறுத்து;
 # endif
 
-	case STL_MODIFIED:
-	case STL_MODIFIED_ALT:
+	நிலை STL_MODIFIED:
+	நிலை STL_MODIFIED_ALT:
 	    itemisflag = TRUE;
-	    switch ((opt == STL_MODIFIED_ALT)
+	    தேர்வு ((opt == STL_MODIFIED_ALT)
 		    + bufIsChanged(wp->w_buffer) * 2
 		    + (!wp->w_buffer->b_p_ma) * 4)
 	    {
-		case 2: str = (char_u *)"[+]"; break;
-		case 3: str = (char_u *)",+"; break;
-		case 4: str = (char_u *)"[-]"; break;
-		case 5: str = (char_u *)",-"; break;
-		case 6: str = (char_u *)"[+-]"; break;
-		case 7: str = (char_u *)",+-"; break;
+		நிலை 2: str = (char_u *)"[+]"; நிறுத்து;
+		நிலை 3: str = (char_u *)",+"; நிறுத்து;
+		நிலை 4: str = (char_u *)"[-]"; நிறுத்து;
+		நிலை 5: str = (char_u *)",-"; நிறுத்து;
+		நிலை 6: str = (char_u *)"[+-]"; நிறுத்து;
+		நிலை 7: str = (char_u *)",+-"; நிறுத்து;
 	    }
-	    break;
+	    நிறுத்து;
 
-	case STL_HIGHLIGHT:
+	நிலை STL_HIGHLIGHT:
 	    {
 		char_u  *t = s;
 
-		while (*s != '#' && *s != NUL)
+		போது (*s != '#' && *s != NUL)
 		    ++s;
-		if (*s == '#')
+		எனில் (*s == '#')
 		{
-		    stl_items[curitem].stl_type = Highlight;
-		    stl_items[curitem].stl_start = p;
-		    stl_items[curitem].stl_minwid = -syn_namen2id(t, (int)(s - t));
+		    stl_பொருட்கள்[curitem].stl_type = Highlight;
+		    stl_பொருட்கள்[curitem].stl_start = p;
+		    stl_பொருட்கள்[curitem].stl_minwid = -syn_namen2id(t, (முழு)(s - t));
 		    curitem++;
 		}
-		if (*s != NUL)
+		எனில் (*s != NUL)
 		    ++s;
-		continue;
+		தொடர்;
 	    }
 
-	case STL_CLICKFUNC:
+	நிலை STL_CLICKFUNC:
 	    // %N[] - end click region (with minwid, minwid is ignored)
-	    if (*s == ']')
+	    எனில் (*s == ']')
 	    {
-		stl_items[curitem].stl_type = ClickFunc;
-		stl_items[curitem].stl_start = p;
-		stl_items[curitem].stl_minwid = 0;
-		stl_items[curitem].stl_clickfunc = NULL;
+		stl_பொருட்கள்[curitem].stl_type = ClickFunc;
+		stl_பொருட்கள்[curitem].stl_start = p;
+		stl_பொருட்கள்[curitem].stl_minwid = 0;
+		stl_பொருட்கள்[curitem].stl_clickfunc = வெற்று;
 		s++;
 		curitem++;
-		continue;
+		தொடர்;
 	    }
 	    // %N[FuncName] with minwid
-	    if (ASCII_ISALPHA(*s) || *s == '_')
+	    எனில் (ASCII_ISALPHA(*s) || *s == '_')
 	    {
 		char_u *rb = vim_strchr(s, ']');
-		if (rb != NULL)
+		எனில் (rb != வெற்று)
 		{
-		    stl_items[curitem].stl_type = ClickFunc;
-		    stl_items[curitem].stl_start = p;
+		    stl_பொருட்கள்[curitem].stl_type = ClickFunc;
+		    stl_பொருட்கள்[curitem].stl_start = p;
 		    // The stl_minwid field is overloaded: it may be the
 		    // "min" part of %<min>.<max> used for padding, or an
 		    // identifier passed to the %N[FuncName] callback.  Store
 		    // the uncapped value so IDs above 50 are preserved.
-		    stl_items[curitem].stl_minwid = raw_minwid;
-		    stl_items[curitem].stl_clickfunc =
+		    stl_பொருட்கள்[curitem].stl_minwid = raw_minwid;
+		    stl_பொருட்கள்[curitem].stl_clickfunc =
 					      vim_strnsave(s, rb - s);
 		    s = rb + 1;
 		    curitem++;
-		    continue;
+		    தொடர்;
 		}
 	    }
-	    continue;
+	    தொடர்;
 
-	case STL_LINEBREAK:
+	நிலை STL_LINEBREAK:
 	    // %N@ - line break (already handled above, fallback)
-	    continue;
+	    தொடர்;
 	}
 
-	stl_items[curitem].stl_start = p;
-	stl_items[curitem].stl_type = Normal;
-	if (str != NULL && *str)
+	stl_பொருட்கள்[curitem].stl_start = p;
+	stl_பொருட்கள்[curitem].stl_type = Normal;
+	எனில் (str != வெற்று && *str)
 	{
 	    char_u  *t = str;
 
-	    if (itemisflag)
+	    எனில் (itemisflag)
 	    {
-		if ((t[0] && t[1])
+		எனில் ((t[0] && t[1])
 			&& ((!prevchar_isitem && *t == ',')
 			      || (prevchar_isflag && *t == ' ')))
 		    t++;
 		prevchar_isflag = TRUE;
 	    }
 	    l = vim_strsize(t);
-	    if (l > 0)
+	    எனில் (l > 0)
 		prevchar_isitem = TRUE;
-	    if (l > maxwid)
+	    எனில் (l > maxwid)
 	    {
-		while (l >= maxwid)
-		    if (has_mbyte)
+		போது (l >= maxwid)
+		    எனில் (has_mbyte)
 		    {
 			l -= ptr2cells(t);
 			t += (*mb_ptr2len)(t);
 		    }
-		    else
+		    இல்லையெனில்
 			l -= byte2cells(*t++);
-		if (p + 1 >= out + outlen)
-		    break;
+		எனில் (p + 1 >= out + outlen)
+		    நிறுத்து;
 		*p++ = '<';
 	    }
-	    if (minwid > 0)
+	    எனில் (minwid > 0)
 	    {
-		for (; l < minwid && p + 1 < out + outlen; l++)
+		க்கு (; l < minwid && p + 1 < out + outlen; l++)
 		{
 		    // Don't put a "-" in front of a digit.
-		    if (l + 1 == minwid && fillchar == '-' && VIM_ISDIGIT(*t))
+		    எனில் (l + 1 == minwid && fillchar == '-' && VIM_ISDIGIT(*t))
 			*p++ = ' ';
-		    else
+		    இல்லையெனில்
 			MB_CHAR2BYTES(fillchar, p);
 		}
 		minwid = 0;
 	    }
-	    else
+	    இல்லையெனில்
 		minwid *= -1;
-	    for (; *t && p + 1 < out + outlen; t++)
+	    க்கு (; *t && p + 1 < out + outlen; t++)
 	    {
 		// Change a space by fillchar, unless fillchar is '-' and a
 		// digit follows.
-		if (fillable && *t == ' '
+		எனில் (fillable && *t == ' '
 				&& (!VIM_ISDIGIT(*(t + 1)) || fillchar != '-'))
 		    MB_CHAR2BYTES(fillchar, p);
-		else
+		இல்லையெனில்
 		    *p++ = *t;
 	    }
-	    for (; l < minwid && p + 1 < out + outlen; l++)
+	    க்கு (; l < minwid && p + 1 < out + outlen; l++)
 		MB_CHAR2BYTES(fillchar, p);
 	}
-	else if (num >= 0)
+	இல்லையெனில் எனில் (இலக்கம் >= 0)
 	{
-	    int	    nbase = (base == 'D' ? 10 : (base == 'O' ? 8 : 16));
+	    முழு	    nbase = (base == 'D' ? 10 : (base == 'O' ? 8 : 16));
 	    char_u  nstr[20];
 	    char_u  *t = nstr;
 
-	    if (p + 20 >= out + outlen)
-		break;		// not sufficient space
+	    எனில் (p + 20 >= out + outlen)
+		நிறுத்து;		// not sufficient space
 	    prevchar_isitem = TRUE;
-	    if (opt == STL_VIRTCOL_ALT)
+	    எனில் (opt == STL_VIRTCOL_ALT)
 	    {
 		*t++ = '-';
 		minwid--;
 	    }
 	    *t++ = '%';
-	    if (zeropad)
+	    எனில் (zeropad)
 		*t++ = '0';
 	    *t++ = '*';
 	    *t++ = nbase == 16 ? base : (char_u)(nbase == 8 ? 'o' : 'd');
 	    *t = NUL;
 
-	    for (n = num, l = 1; n >= nbase; n /= nbase)
+	    க்கு (n = இலக்கம், l = 1; n >= nbase; n /= nbase)
 		l++;
-	    if (opt == STL_VIRTCOL_ALT)
+	    எனில் (opt == STL_VIRTCOL_ALT)
 		l++;
 
-	    if (l > maxwid)
+	    எனில் (l > maxwid)
 	    {
 		l += 2;
 		n = l - maxwid;
-		while (l-- > maxwid)
-		    num /= nbase;
+		போது (l-- > maxwid)
+		    இலக்கம் /= nbase;
 		*t++ = '>';
 		*t++ = '%';
 		*t = t[-3];
 		*++t = NUL;
-		p += vim_snprintf_safelen((char *)p, outlen - (p - out),
-		    (char *)nstr, 0, num, n);
+		p += vim_snprintf_safelen((எழுத்து *)p, outlen - (p - out),
+		    (எழுத்து *)nstr, 0, இலக்கம், n);
 	    }
-	    else
-		p += vim_snprintf_safelen((char *)p, outlen - (p - out),
-		    (char *)nstr, minwid, num);
+	    இல்லையெனில்
+		p += vim_snprintf_safelen((எழுத்து *)p, outlen - (p - out),
+		    (எழுத்து *)nstr, minwid, இலக்கம்);
 	}
-	else
-	    stl_items[curitem].stl_type = Empty;
+	இல்லையெனில்
+	    stl_பொருட்கள்[curitem].stl_type = Empty;
 
-	if (num >= 0 || (!itemisflag && str != NULL && *str != NUL))
+	எனில் (இலக்கம் >= 0 || (!itemisflag && str != வெற்று && *str != NUL))
 	    prevchar_isflag = FALSE;	    // Item not NULL, but not a flag
 					    //
-	if (opt == STL_VIM_EXPR)
+	எனில் (opt == STL_VIM_கோவை)
 	    vim_free(str);
 	curitem++;
     }
@@ -5483,16 +5483,16 @@ find_linebreak:
 
     // Remember the most recent %# / %* highlight so the next row of a
     // multi-line statusline can resume it.
-    if (carry_hl != NULL)
+    எனில் (carry_hl != வெற்று)
     {
-	int last_hl = 0;
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == Highlight)
-		last_hl = stl_items[l].stl_minwid;
+	முழு last_hl = 0;
+	க்கு (l = 0; l < itemcnt; l++)
+	    எனில் (stl_பொருட்கள்[l].stl_type == Highlight)
+		last_hl = stl_பொருட்கள்[l].stl_minwid;
 	*carry_hl = last_hl;
     }
 
-    if (mode == STL_MODE_MULTI
+    எனில் (mode == STL_MODE_MULTI
 # ifdef ENABLE_STL_MODE_MULTI_NL
 		    || mode == STL_MODE_MULTI_NL
 # endif
@@ -5506,93 +5506,93 @@ find_linebreak:
 	// "fmt" and shift the remaining format string within "usefmt" for the
 	// caller's next iteration.
 # ifdef FEAT_EVAL
-	if (usefmt != fmt)
+	எனில் (usefmt != fmt)
 	    vim_free(fmt);
 # endif
-	size_t fmt_remain_len = strlen((char *)s);
+	size_t fmt_remain_len = strlen((எழுத்து *)s);
 
 	mch_memmove(usefmt, s, fmt_remain_len);
 	usefmt[fmt_remain_len] = NUL;
 	*fmt_arg = usefmt;
     }
-    else
+    இல்லையெனில்
     {
 	// In single-line mode, the caller retains ownership of its buffer.
 	// Free the eval result if "%!" was used.
 # ifdef FEAT_EVAL
-	if (usefmt != fmt)
+	எனில் (usefmt != fmt)
 	    vim_free(usefmt);
 # endif
     }
 
-    if (mode == STL_MODE_GET_RENDERED_HEIGHT)
+    எனில் (mode == STL_MODE_GET_RENDERED_HEIGHT)
     {
 	// Free click function names that were allocated during parsing.
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == ClickFunc)
-		vim_free(stl_items[l].stl_clickfunc);
-	if (rendered_height != NULL)
+	க்கு (l = 0; l < itemcnt; l++)
+	    எனில் (stl_பொருட்கள்[l].stl_type == ClickFunc)
+		vim_free(stl_பொருட்கள்[l].stl_clickfunc);
+	எனில் (rendered_height != வெற்று)
 	    *rendered_height = rheight;
-	return 0;
+	திரும்பு 0;
     }
 
     width = vim_strsize(out);
-    if (maxwidth > 0 && width > maxwidth)
+    எனில் (maxwidth > 0 && width > maxwidth)
     {
 	// Result is too long, must truncate somewhere.
 	l = 0;
-	if (itemcnt == 0)
+	எனில் (itemcnt == 0)
 	    s = out;
-	else
+	இல்லையெனில்
 	{
-	    for ( ; l < itemcnt; l++)
-		if (stl_items[l].stl_type == Trunc)
+	    க்கு ( ; l < itemcnt; l++)
+		எனில் (stl_பொருட்கள்[l].stl_type == Trunc)
 		{
 		    // Truncate at %< item.
-		    s = stl_items[l].stl_start;
-		    break;
+		    s = stl_பொருட்கள்[l].stl_start;
+		    நிறுத்து;
 		}
-	    if (l == itemcnt)
+	    எனில் (l == itemcnt)
 	    {
 		// No %< item, truncate first item.
-		s = stl_items[0].stl_start;
+		s = stl_பொருட்கள்[0].stl_start;
 		l = 0;
 	    }
 	}
 
-	if (width - vim_strsize(s) >= maxwidth)
+	எனில் (width - vim_strsize(s) >= maxwidth)
 	{
 	    // Truncation mark is beyond max length
-	    if (has_mbyte)
+	    எனில் (has_mbyte)
 	    {
 		s = out;
 		width = 0;
-		for (;;)
+		க்கு (;;)
 		{
 		    width += ptr2cells(s);
-		    if (width >= maxwidth)
-			break;
+		    எனில் (width >= maxwidth)
+			நிறுத்து;
 		    s += (*mb_ptr2len)(s);
 		}
 		// Fill up for half a double-wide character.
-		while (++width < maxwidth)
+		போது (++width < maxwidth)
 		    MB_CHAR2BYTES(fillchar, s);
 	    }
-	    else
+	    இல்லையெனில்
 		s = out + maxwidth - 1;
-	    for (l = 0; l < itemcnt; l++)
-		if (stl_items[l].stl_start > s)
-		    break;
+	    க்கு (l = 0; l < itemcnt; l++)
+		எனில் (stl_பொருட்கள்[l].stl_start > s)
+		    நிறுத்து;
 	    itemcnt = l;
 	    *s++ = '>';
 	    *s = NUL;
 	}
-	else
+	இல்லையெனில்
 	{
 	    char_u  *end = out + outputlen;
 
 	    n = 0;
-	    while (width >= maxwidth)
+	    போது (width >= maxwidth)
 	    {
 		width -= ptr2cells(s + n);
 		n += (*mb_ptr2len)(s + n);
@@ -5603,16 +5603,16 @@ find_linebreak:
 	    *s = '<';
 
 	    --n;	// count the '<'
-	    for (; l < itemcnt; l++)
+	    க்கு (; l < itemcnt; l++)
 	    {
-		if (stl_items[l].stl_start - n >= s)
-		    stl_items[l].stl_start -= n;
-		else
-		    stl_items[l].stl_start = s;
+		எனில் (stl_பொருட்கள்[l].stl_start - n >= s)
+		    stl_பொருட்கள்[l].stl_start -= n;
+		இல்லையெனில்
+		    stl_பொருட்கள்[l].stl_start = s;
 	    }
 
 	    // Fill up for half a double-wide character.
-	    while (++width < maxwidth)
+	    போது (++width < maxwidth)
 	    {
 		s = end;
 		MB_CHAR2BYTES(fillchar, s);
@@ -5622,46 +5622,46 @@ find_linebreak:
 	}
 	width = maxwidth;
     }
-    else if (width < maxwidth &&
+    இல்லையெனில் எனில் (width < maxwidth &&
 	    outputlen + (maxwidth - width) * MB_CHAR2LEN(fillchar) + 1 < outlen)
     {
 	// Find how many separators there are, which we will use when
 	// figuring out how many groups there are.
-	int num_separators = 0;
+	முழு இலக்கம்_separators = 0;
 
-	for (l = 0; l < itemcnt; l++)
+	க்கு (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == Separate)
+	    எனில் (stl_பொருட்கள்[l].stl_type == Separate)
 	    {
 		// Create an array of the start location for each separator
 		// mark.
-		stl_separator_locations[num_separators] = l;
-		num_separators++;
+		stl_separator_locations[இலக்கம்_separators] = l;
+		இலக்கம்_separators++;
 	    }
 	}
 
 	// If we have separated groups, then we deal with it now
-	if (num_separators)
+	எனில் (இலக்கம்_separators)
 	{
-	    int standard_spaces;
-	    int final_spaces;
+	    முழு standard_spaces;
+	    முழு final_spaces;
 
-	    standard_spaces = (maxwidth - width) / num_separators;
+	    standard_spaces = (maxwidth - width) / இலக்கம்_separators;
 	    final_spaces = (maxwidth - width) -
-					standard_spaces * (num_separators - 1);
-	    for (l = 0; l < num_separators; l++)
+					standard_spaces * (இலக்கம்_separators - 1);
+	    க்கு (l = 0; l < இலக்கம்_separators; l++)
 	    {
-		int dislocation = (l == (num_separators - 1)) ?
+		முழு dislocation = (l == (இலக்கம்_separators - 1)) ?
 					final_spaces : standard_spaces;
 		dislocation *= MB_CHAR2LEN(fillchar);
-		char_u *start = stl_items[stl_separator_locations[l]].stl_start;
+		char_u *start = stl_பொருட்கள்[stl_separator_locations[l]].stl_start;
 		char_u *seploc = start + dislocation;
 		STRMOVE(seploc, start);
-		for (s = start; s < seploc;)
+		க்கு (s = start; s < seploc;)
 		    MB_CHAR2BYTES(fillchar, s);
 
-		for (int i = stl_separator_locations[l] + 1; i < itemcnt; i++)
-		    stl_items[i].stl_start += dislocation;
+		க்கு (முழு i = stl_separator_locations[l] + 1; i < itemcnt; i++)
+		    stl_பொருட்கள்[i].stl_start += dislocation;
 	    }
 
 	    width = maxwidth;
@@ -5669,73 +5669,73 @@ find_linebreak:
     }
 
     // Store the info about highlighting.
-    if (hltab != NULL)
+    எனில் (hltab != வெற்று)
     {
 	*hltab = stl_hltab;
 	sp = stl_hltab;
-	for (l = 0; l < itemcnt; l++)
+	க்கு (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == Highlight)
+	    எனில் (stl_பொருட்கள்[l].stl_type == Highlight)
 	    {
-		sp->start = stl_items[l].stl_start;
-		sp->userhl = stl_items[l].stl_minwid;
+		sp->start = stl_பொருட்கள்[l].stl_start;
+		sp->userhl = stl_பொருட்கள்[l].stl_minwid;
 		sp++;
 	    }
 	}
-	sp->start = NULL;
+	sp->start = வெற்று;
 	sp->userhl = 0;
     }
 
     // Store the info about tab pages labels.
-    if (tabtab != NULL)
+    எனில் (tabtab != வெற்று)
     {
 	*tabtab = stl_tabtab;
 	sp = stl_tabtab;
-	for (l = 0; l < itemcnt; l++)
+	க்கு (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == TabPage)
+	    எனில் (stl_பொருட்கள்[l].stl_type == TabPage)
 	    {
-		sp->start = stl_items[l].stl_start;
-		sp->userhl = stl_items[l].stl_minwid;
+		sp->start = stl_பொருட்கள்[l].stl_start;
+		sp->userhl = stl_பொருட்கள்[l].stl_minwid;
 		sp++;
 	    }
 	}
-	sp->start = NULL;
+	sp->start = வெற்று;
 	sp->userhl = 0;
     }
 
     // Store the info about click function regions.
-    if (clicktab != NULL)
+    எனில் (clicktab != வெற்று)
     {
 	stl_clickrec_T *cp;
 
 	*clicktab = stl_clicktab;
 	cp = stl_clicktab;
-	for (l = 0; l < itemcnt; l++)
+	க்கு (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == ClickFunc)
+	    எனில் (stl_பொருட்கள்[l].stl_type == ClickFunc)
 	    {
-		cp->start = stl_items[l].stl_start;
-		cp->funcname = stl_items[l].stl_clickfunc;
-		cp->minwid = stl_items[l].stl_minwid;
+		cp->start = stl_பொருட்கள்[l].stl_start;
+		cp->funcname = stl_பொருட்கள்[l].stl_clickfunc;
+		cp->minwid = stl_பொருட்கள்[l].stl_minwid;
 		cp++;
 	    }
 	}
-	cp->start = NULL;
-	cp->funcname = NULL;
+	cp->start = வெற்று;
+	cp->funcname = வெற்று;
     }
-    else
+    இல்லையெனில்
     {
 	// Free click function names when caller doesn't need them.
-	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == ClickFunc)
-		vim_free(stl_items[l].stl_clickfunc);
+	க்கு (l = 0; l < itemcnt; l++)
+	    எனில் (stl_பொருட்கள்[l].stl_type == ClickFunc)
+		vim_free(stl_பொருட்கள்[l].stl_clickfunc);
     }
 
     redraw_not_allowed = save_redraw_not_allowed;
 
     // A user function may reset KeyTyped, restore it.
-    KeyTyped = save_KeyTyped;
+    சாவி_Typed = save_சாவி_Typed;
 
     // Check for an error.  If there is one the display will be messed up and
     // might loop redrawing.  Avoid that by making the corresponding option
@@ -5743,11 +5743,11 @@ find_linebreak:
     // TODO: find out why using called_emsg_before makes tests fail, does it
     // matter?
     // if (called_emsg > called_emsg_before)
-    if (did_emsg > did_emsg_before)
+    எனில் (did_emsg > did_emsg_before)
 	set_string_option_direct(opt_name, -1, (char_u *)"",
 					      OPT_FREE | opt_scope, SID_ERROR);
 
-    return width;
+    திரும்பு width;
 }
 #endif // FEAT_STL_OPT
 
@@ -5755,65 +5755,65 @@ find_linebreak:
  * Get relative cursor position in window into "buf[]", in the localized
  * percentage form like %99, 99%; using "Top", "Bot" or "All" when appropriate.
  */
-    int
+    முழு
 get_rel_pos(
     win_T	*wp,
     char_u	*buf,
-    int		buflen)
+    முழு		buflen)
 {
     long	above; // number of lines above window
     long	below; // number of lines below window
 
-    if (buflen < 3) // need at least 3 chars for writing
-	return 0;
+    எனில் (buflen < 3) // need at least 3 chars for writing
+	திரும்பு 0;
     above = wp->w_topline - 1;
 #ifdef FEAT_DIFF
     above += diff_check_fill(wp, wp->w_topline) - wp->w_topfill;
-    if (wp->w_topline == 1 && wp->w_topfill >= 1)
+    எனில் (wp->w_topline == 1 && wp->w_topfill >= 1)
 	above = 0;  // All buffer lines are displayed and there is an
 		    // indication of filler lines, that can be considered
 		    // seeing all lines.
 #endif
-    below = wp->w_buffer->b_ml.ml_line_count - wp->w_botline + 1;
-    if (below <= 0)
-	return (int)vim_snprintf_safelen((char *)buf, buflen,
+    below = wp->w_buffer->b_ml.ml_வரி_மொத்தம் - wp->w_botline + 1;
+    எனில் (below <= 0)
+	திரும்பு (முழு)vim_snprintf_safelen((எழுத்து *)buf, buflen,
 	    "%s", (above == 0) ? _("All") : _("Bot"));
 
-    if (above <= 0)
-	return (int)vim_snprintf_safelen((char *)buf, buflen,
+    எனில் (above <= 0)
+	திரும்பு (முழு)vim_snprintf_safelen((எழுத்து *)buf, buflen,
 	    "%s", _("Top"));
 
-    int perc = calc_percentage(above, above + below);
-    char tmp[8];
+    முழு perc = calc_percentage(above, above + below);
+    எழுத்து tmp[8];
     // localized percentage value
-    vim_snprintf(tmp, sizeof(tmp), _("%d%%"), perc);
-    return (int)vim_snprintf_safelen((char *)buf, buflen, _("%3s"), tmp);
+    vim_snprintf(tmp, அளவு(tmp), _("%d%%"), perc);
+    திரும்பு (முழு)vim_snprintf_safelen((எழுத்து *)buf, buflen, _("%3s"), tmp);
 }
 
 /*
  * Append (file 2 of 8) to "buf[]", if editing more than one file.
  * Return the number of characters appended.
  */
-    static int
-append_arg_number(
+    நிலையான முழு
+append_arg_எண்(
     win_T	*wp,
     char_u	*buf,
     size_t	buflen,
-    int		add_file)	// Add "file" before the arg number
+    முழு		add_file)	// Add "file" before the arg number
 {
-    if (ARGCOUNT <= 1)		// nothing to do
-	return 0;
+    எனில் (ARGCOUNT <= 1)		// nothing to do
+	திரும்பு 0;
 
-    char *msg;
-    switch ((wp->w_arg_idx_invalid ? 1 : 0) + (add_file ? 2 : 0))
+    எழுத்து *செய்தி;
+    தேர்வு ((wp->w_arg_idx_invalid ? 1 : 0) + (add_file ? 2 : 0))
     {
-	case 0: msg = _(" (%d of %d)"); break;
-	case 1: msg = _(" ((%d) of %d)"); break;
-	case 2: msg = _(" (file %d of %d)"); break;
-	case 3: msg = _(" (file (%d) of %d)"); break;
+	நிலை 0: செய்தி = _(" (%d of %d)"); நிறுத்து;
+	நிலை 1: செய்தி = _(" ((%d) of %d)"); நிறுத்து;
+	நிலை 2: செய்தி = _(" (file %d of %d)"); நிறுத்து;
+	நிலை 3: செய்தி = _(" (file (%d) of %d)"); நிறுத்து;
     }
 
-    return (int)vim_snprintf_safelen((char *)buf, buflen, msg,
+    திரும்பு (முழு)vim_snprintf_safelen((எழுத்து *)buf, buflen, செய்தி,
 						  wp->w_arg_idx + 1, ARGCOUNT);
 }
 
@@ -5834,30 +5834,30 @@ fix_fname(char_u  *fname)
      * and provide drive letter for all absolute paths.
      */
 #ifdef UNIX
-    return FullName_save(fname, TRUE);
-#else
-    if (!vim_isAbsName(fname)
-	    || strstr((char *)fname, "..") != NULL
-	    || strstr((char *)fname, "//") != NULL
+    திரும்பு FullName_save(fname, TRUE);
+#இல்லையெனில்
+    எனில் (!vim_isAbsName(fname)
+	    || strstr((எழுத்து *)fname, "..") != வெற்று
+	    || strstr((எழுத்து *)fname, "//") != வெற்று
 # ifdef BACKSLASH_IN_FILENAME
-	    || strstr((char *)fname, "\\\\") != NULL
+	    || strstr((எழுத்து *)fname, "\\\\") != வெற்று
 # endif
-# if defined(MSWIN)
-	    || vim_strchr(fname, '~') != NULL
+# எனில் defined(MSWIN)
+	    || vim_strchr(fname, '~') != வெற்று
 	    || fname[0] == '/'
 	    || fname[0] == '\\'
 # endif
 	    )
-	return FullName_save(fname, FALSE);
+	திரும்பு FullName_save(fname, FALSE);
 
     fname = vim_strsave(fname);
 
 # ifdef USE_FNAME_CASE
-    if (fname != NULL)
+    எனில் (fname != வெற்று)
 	fname_case(fname, 0);	// set correct case for file name
 # endif
 
-    return fname;
+    திரும்பு fname;
 #endif
 }
 
@@ -5869,26 +5869,26 @@ fix_fname(char_u  *fname)
  * The "*ffname" and "*sfname" pointer values on call will not be freed.
  * Note that the resulting "*ffname" pointer should be considered not allocated.
  */
-    void
+    வெறுமை
 fname_expand(
     buf_T	*buf UNUSED,
     char_u	**ffname,
     char_u	**sfname)
 {
-    if (*ffname == NULL)	    // no file name given, nothing to do
-	return;
-    if (*sfname == NULL)	    // no short file name given, use ffname
+    எனில் (*ffname == வெற்று)	    // no file name given, nothing to do
+	திரும்பு;
+    எனில் (*sfname == வெற்று)	    // no short file name given, use ffname
 	*sfname = *ffname;
     *ffname = fix_fname(*ffname);   // expand to full path
 
 #ifdef FEAT_SHORTCUT
-    if (!buf->b_p_bin)
+    எனில் (!buf->b_p_bin)
     {
 	char_u  *rfname;
 
 	// If the file name is a shortcut file, use the file it links to.
 	rfname = mch_resolve_path(*ffname, FALSE);
-	if (rfname != NULL)
+	எனில் (rfname != வெற்று)
 	{
 	    vim_free(*ffname);
 	    *ffname = rfname;
@@ -5901,27 +5901,27 @@ fname_expand(
 /*
  * Open a window for a number of buffers.
  */
-    void
+    வெறுமை
 ex_buffer_all(exarg_T *eap)
 {
     buf_T	*buf;
     win_T	*wp, *wpnext;
-    int		split_ret = OK;
-    int		p_ea_save;
-    int		open_wins = 0;
-    int		r;
-    int		count;		// Maximum number of windows to open.
-    int		all;		// When TRUE also load inactive buffers.
-    int		had_tab = cmdmod.cmod_tab;
+    முழு		split_ret = OK;
+    முழு		p_ea_save;
+    முழு		open_wins = 0;
+    முழு		r;
+    முழு		மொத்தம்;		// Maximum number of windows to open.
+    முழு		all;		// When TRUE also load inactive buffers.
+    முழு		had_tab = cmdmod.cmod_tab;
     tabpage_T	*tpnext;
 
-    if (eap->addr_count == 0)	// make as many windows as possible
-	count = 9999;
-    else
-	count = eap->line2;	// make as many windows as specified
-    if (eap->cmdidx == CMD_unhide || eap->cmdidx == CMD_sunhide)
+    எனில் (eap->addr_மொத்தம் == 0)	// make as many windows as possible
+	மொத்தம் = 9999;
+    இல்லையெனில்
+	மொத்தம் = eap->line2;	// make as many windows as specified
+    எனில் (eap->cmdidx == CMD_unhide || eap->cmdidx == CMD_sunhide)
 	all = FALSE;
-    else
+    இல்லையெனில்
 	all = TRUE;
 
     // Stop Visual mode, the cursor and "VIsual" may very well be invalid after
@@ -5938,15 +5938,15 @@ ex_buffer_all(exarg_T *eap)
      * Close superfluous windows (two windows for the same buffer).
      * Also close windows that are not full-width.
      */
-    if (had_tab > 0)
+    எனில் (had_tab > 0)
 	goto_tabpage_tp(first_tabpage, TRUE, TRUE);
-    for (;;)
+    க்கு (;;)
     {
 	tpnext = curtab->tp_next;
-	for (wp = firstwin; wp != NULL; wp = wpnext)
+	க்கு (wp = firstwin; wp != வெற்று; wp = wpnext)
 	{
 	    wpnext = wp->w_next;
-	    if ((wp->w_buffer->b_nwindows > 1
+	    எனில் ((wp->w_buffer->b_nwindows > 1
 			|| ((cmdmod.cmod_split & WSP_VERT)
 			    ? wp->w_height + wp->w_status_height < Rows - p_ch
 							     - tabline_height()
@@ -5956,21 +5956,21 @@ ex_buffer_all(exarg_T *eap)
 		    && !(win_locked(wp) || wp->w_buffer->b_locked > 0)
 		    && !win_unlisted(wp))
 	    {
-		if (win_close(wp, FALSE) == FAIL)
-		    break;
+		எனில் (win_close(wp, FALSE) == FAIL)
+		    நிறுத்து;
 		// Just in case an autocommand does something strange with
 		// windows: start all over...
 		wpnext = firstwin;
 		tpnext = first_tabpage;
 		open_wins = 0;
 	    }
-	    else
+	    இல்லையெனில்
 		++open_wins;
 	}
 
 	// Without the ":tab" modifier only do the current tab page.
-	if (had_tab == 0 || tpnext == NULL)
-	    break;
+	எனில் (had_tab == 0 || tpnext == வெற்று)
+	    நிறுத்து;
 	goto_tabpage_tp(tpnext, TRUE, TRUE);
     }
 
@@ -5983,32 +5983,32 @@ ex_buffer_all(exarg_T *eap)
     ++autocmd_no_enter;
     win_enter(lastwin, FALSE);
     ++autocmd_no_leave;
-    for (buf = firstbuf; buf != NULL && open_wins < count; buf = buf->b_next)
+    க்கு (buf = firstbuf; buf != வெற்று && open_wins < மொத்தம்; buf = buf->b_next)
     {
 	// Check if this buffer needs a window
-	if ((!all && buf->b_ml.ml_mfp == NULL) || !buf->b_p_bl)
-	    continue;
+	எனில் ((!all && buf->b_ml.ml_mfp == வெற்று) || !buf->b_p_bl)
+	    தொடர்;
 
-	if (had_tab != 0)
+	எனில் (had_tab != 0)
 	{
 	    // With the ":tab" modifier don't move the window.
-	    if (buf->b_nwindows > 0)
+	    எனில் (buf->b_nwindows > 0)
 		wp = lastwin;	    // buffer has a window, skip it
-	    else
-		wp = NULL;
+	    இல்லையெனில்
+		wp = வெற்று;
 	}
-	else
+	இல்லையெனில்
 	{
 	    // Check if this buffer already has a window
 	    FOR_ALL_WINDOWS(wp)
-		if (wp->w_buffer == buf)
-		    break;
+		எனில் (wp->w_buffer == buf)
+		    நிறுத்து;
 	    // If the buffer already has a window, move it
-	    if (wp != NULL)
+	    எனில் (wp != வெற்று)
 		win_move_after(wp, curwin);
 	}
 
-	if (wp == NULL && split_ret == OK)
+	எனில் (wp == வெற்று && split_ret == OK)
 	{
 	    bufref_T	bufref;
 
@@ -6020,21 +6020,21 @@ ex_buffer_all(exarg_T *eap)
 	    split_ret = win_split(0, WSP_ROOM | WSP_BELOW);
 	    ++open_wins;
 	    p_ea = p_ea_save;
-	    if (split_ret == FAIL)
-		continue;
+	    எனில் (split_ret == FAIL)
+		தொடர்;
 
 	    // Open the buffer in this window.
 	    swap_exists_action = SEA_DIALOG;
 	    set_curbuf(buf, DOBUF_GOTO);
-	    if (!bufref_valid(&bufref))
+	    எனில் (!bufref_valid(&bufref))
 	    {
 		// autocommands deleted the buffer!!!
 		swap_exists_action = SEA_NONE;
-		break;
+		நிறுத்து;
 	    }
-	    if (swap_exists_action == SEA_QUIT)
+	    எனில் (swap_exists_action == SEA_QUIT)
 	    {
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 		cleanup_T   cs;
 
 		// Reset the error/interrupt/exception state here so that
@@ -6048,30 +6048,30 @@ ex_buffer_all(exarg_T *eap)
 		swap_exists_action = SEA_NONE;
 		swap_exists_did_quit = TRUE;
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 		// Restore the error/interrupt/exception state if not
 		// discarded by a new aborting error, interrupt, or uncaught
 		// exception.
 		leave_cleanup(&cs);
 #endif
 	    }
-	    else
-		handle_swap_exists(NULL);
+	    இல்லையெனில்
+		handle_swap_exists(வெற்று);
 	}
 
 	ui_breakcheck();
-	if (got_int)
+	எனில் (got_int)
 	{
-	    (void)vgetc();	// only break the file loading, not the rest
-	    break;
+	    (வெறுமை)vgetc();	// only break the file loading, not the rest
+	    நிறுத்து;
 	}
 #ifdef FEAT_EVAL
 	// Autocommands deleted the buffer or aborted script processing!!!
-	if (aborting())
-	    break;
+	எனில் (aborting())
+	    நிறுத்து;
 #endif
 	// When ":tab" was used open a new tab for a new window repeatedly.
-	if (had_tab > 0 && tabpage_index(NULL) <= p_tpm)
+	எனில் (had_tab > 0 && tabpage_index(வெற்று) <= p_tpm)
 	    cmdmod.cmod_tab = 9999;
     }
     --autocmd_no_enter;
@@ -6081,32 +6081,32 @@ ex_buffer_all(exarg_T *eap)
     /*
      * Close superfluous windows.
      */
-    for (wp = lastwin; open_wins > count; )
+    க்கு (wp = lastwin; open_wins > மொத்தம்; )
     {
 	r = (buf_hide(wp->w_buffer) || !bufIsChanged(wp->w_buffer)
 				     || autowrite(wp->w_buffer, FALSE) == OK);
-	if (!win_valid(wp))
+	எனில் (!win_valid(wp))
 	{
 	    // BufWrite Autocommands made the window invalid, start over
 	    wp = lastwin;
 	}
-	else if (r)
+	இல்லையெனில் எனில் (r)
 	{
 	    win_close(wp, !buf_hide(wp->w_buffer));
 	    --open_wins;
 	    wp = lastwin;
 	}
-	else
+	இல்லையெனில்
 	{
 	    wp = wp->w_prev;
-	    if (wp == NULL)
-		break;
+	    எனில் (wp == வெற்று)
+		நிறுத்து;
 	}
     }
 }
 
 
-static int  chk_modeline(linenr_T, int);
+நிலையான முழு  chk_modeline(linenr_T, முழு);
 
 /*
  * do_modelines() - process mode lines for the current file
@@ -6117,73 +6117,73 @@ static int  chk_modeline(linenr_T, int);
  *
  * Returns immediately if the "ml" option isn't set.
  */
-    void
-do_modelines(int flags)
+    வெறுமை
+do_modelines(முழு flags)
 {
     linenr_T	lnum;
-    int		nmlines;
-    static int	entered = 0;
+    முழு		nmlines;
+    நிலையான முழு	entered = 0;
 
-    if (!curbuf->b_p_ml || (nmlines = (int)p_mls) == 0)
-	return;
+    எனில் (!curbuf->b_p_ml || (nmlines = (முழு)p_mls) == 0)
+	திரும்பு;
 
     // Disallow recursive entry here.  Can happen when executing a modeline
     // triggers an autocommand, which reloads modelines with a ":do".
-    if (entered)
-	return;
+    எனில் (entered)
+	திரும்பு;
 
     ++entered;
-    for (lnum = 1; curbuf->b_p_ml && lnum <= curbuf->b_ml.ml_line_count && lnum <= nmlines;
+    க்கு (lnum = 1; curbuf->b_p_ml && lnum <= curbuf->b_ml.ml_வரி_மொத்தம் && lnum <= nmlines;
 								       ++lnum)
-	if (chk_modeline(lnum, flags) == FAIL)
+	எனில் (chk_modeline(lnum, flags) == FAIL)
 	    nmlines = 0;
 
-    for (lnum = curbuf->b_ml.ml_line_count; curbuf->b_p_ml && lnum > 0 && lnum > nmlines
-		       && lnum > curbuf->b_ml.ml_line_count - nmlines; --lnum)
-	if (chk_modeline(lnum, flags) == FAIL)
+    க்கு (lnum = curbuf->b_ml.ml_வரி_மொத்தம்; curbuf->b_p_ml && lnum > 0 && lnum > nmlines
+		       && lnum > curbuf->b_ml.ml_வரி_மொத்தம் - nmlines; --lnum)
+	எனில் (chk_modeline(lnum, flags) == FAIL)
 	    nmlines = 0;
     --entered;
 }
 
-#include "version.h"		// for version number
+#அந்தர்பாவ "version.h"		// for version number
 
 /*
  * chk_modeline() - check a single line for a mode string
  * Return FAIL if an error encountered.
  */
-    static int
+    நிலையான முழு
 chk_modeline(
     linenr_T	lnum,
-    int		flags)		// Same as for do_modelines().
+    முழு		flags)		// Same as for do_modelines().
 {
     char_u	*s;
-    char_u	*line_end;		// point to the end of the line
+    char_u	*வரி_end;		// point to the end of the line
     char_u	*e;
-    int		prev;
-    int		retval = OK;
+    முழு		prev;
+    முழு		retval = OK;
     ESTACK_CHECK_DECLARATION;
 
     prev = -1;
     s = ml_get(lnum);
-    line_end = s + ml_get_len(lnum);
-    for (; *s != NUL; ++s)
+    வரி_end = s + ml_get_len(lnum);
+    க்கு (; *s != NUL; ++s)
     {
-	if (prev == -1 || vim_isspace(prev))
+	எனில் (prev == -1 || vim_isspace(prev))
 	{
-	    if ((prev != -1 && STRNCMP(s, "ex:", (size_t)3) == 0)
+	    எனில் ((prev != -1 && STRNCMP(s, "ex:", (size_t)3) == 0)
 		    || STRNCMP(s, "vi:", (size_t)3) == 0)
-		break;
+		நிறுத்து;
 	    // Accept both "vim" and "Vim".
-	    if ((s[0] == 'v' || s[0] == 'V') && s[1] == 'i' && s[2] == 'm')
+	    எனில் ((s[0] == 'v' || s[0] == 'V') && s[1] == 'i' && s[2] == 'm')
 	    {
-		int vers;
+		முழு vers;
 
-		if (s[3] == '<' || s[3] == '=' || s[3] == '>')
+		எனில் (s[3] == '<' || s[3] == '=' || s[3] == '>')
 		    e = s + 4;
-		else
+		இல்லையெனில்
 		    e = s + 3;
 		vers = getdigits(&e);
-		if (*e == ':'
+		எனில் (*e == ':'
 			&& (s[0] != 'V'
 				  || STRNCMP(skipwhite(e + 1), "set", 3) == 0)
 			&& (s[3] == ':'
@@ -6191,53 +6191,53 @@ chk_modeline(
 			    || (VIM_VERSION_100 < vers && s[3] == '<')
 			    || (VIM_VERSION_100 > vers && s[3] == '>')
 			    || (VIM_VERSION_100 == vers && s[3] == '=')))
-		    break;
+		    நிறுத்து;
 	    }
 	}
 	prev = *s;
     }
 
-    if (*s)
+    எனில் (*s)
     {
 	size_t	len;
 	char_u	*linecopy;		// local copy of any modeline found
-	int	end;
+	முழு	end;
 
-	do				// skip over "ex:", "vi:" or "vim:"
+	செய்				// skip over "ex:", "vi:" or "vim:"
 	    ++s;
-	while (s[-1] != ':');
+	போது (s[-1] != ':');
 
-	len = (size_t)(line_end - s);		// remember the line length
+	len = (size_t)(வரி_end - s);		// remember the line length
 						// so we can restore 'line_end'
 						// after the copy
 	s = linecopy = vim_strnsave(s, len);	// copy the line, it will change
-	if (linecopy == NULL)
-	    return FAIL;
+	எனில் (linecopy == வெற்று)
+	    திரும்பு FAIL;
 
-	line_end = s + len;			// restore 'line_end'
+	வரி_end = s + len;			// restore 'line_end'
 
 	// prepare for emsg()
-	estack_push(ETYPE_MODELINE, (char_u *)"modelines", lnum);
+	estack_தள்ளு(ETYPE_MODELINE, (char_u *)"modelines", lnum);
 	ESTACK_CHECK_SETUP;
 
 	end = FALSE;
-	while (end == FALSE)
+	போது (end == FALSE)
 	{
 	    s = skipwhite(s);
-	    if (*s == NUL)
-		break;
+	    எனில் (*s == NUL)
+		நிறுத்து;
 
 	    /*
 	     * Find end of set command: ':' or end of line.
 	     * Skip over "\:", replacing it with ":".
 	     */
-	    for (e = s; *e != ':' && *e != NUL; ++e)
-		if (e[0] == '\\' && e[1] == ':')
+	    க்கு (e = s; *e != ':' && *e != NUL; ++e)
+		எனில் (e[0] == '\\' && e[1] == ':')
 		{
-		    mch_memmove(e, e + 1, (size_t)(line_end - (e + 1)) + 1);	// +1 for NUL
-		    --line_end;
+		    mch_memmove(e, e + 1, (size_t)(வரி_end - (e + 1)) + 1);	// +1 for NUL
+		    --வரி_end;
 		}
-	    if (*e == NUL)
+	    எனில் (*e == NUL)
 		end = TRUE;
 
 	    /*
@@ -6247,19 +6247,19 @@ chk_modeline(
 	     * "vi:opt opt opt: foo" -- foo interpreted
 	     * Accept "se" for compatibility with Elvis.
 	     */
-	    if (STRNCMP(s, "set ", (size_t)4) == 0
+	    எனில் (STRNCMP(s, "set ", (size_t)4) == 0
 		    || STRNCMP(s, "se ", (size_t)3) == 0)
 	    {
-		if (*e != ':')		// no terminating ':'?
-		    break;
+		எனில் (*e != ':')		// no terminating ':'?
+		    நிறுத்து;
 		end = TRUE;
 		s += (*(s + 2) == ' ') ? 3 : 4;
 	    }
 	    *e = NUL;			// truncate the set command
 
-	    if (*s != NUL)		// skip over an empty "::"
+	    எனில் (*s != NUL)		// skip over an empty "::"
 	    {
-		int secure_save = secure;
+		முழு secure_save = secure;
 		sctx_T	save_current_sctx = current_sctx;
 
 		current_sctx.sc_version = 1;
@@ -6276,81 +6276,81 @@ chk_modeline(
 
 		secure = secure_save;
 		current_sctx = save_current_sctx;
-		if (retval == FAIL)		// stop if error found
-		    break;
+		எனில் (retval == FAIL)		// stop if error found
+		    நிறுத்து;
 	    }
-	    s = (e == line_end) ? e : e + 1;	// advance to next part
+	    s = (e == வரி_end) ? e : e + 1;	// advance to next part
 						// careful not to go off the end
 	}
 
 	ESTACK_CHECK_NOW;
-	estack_pop();
+	estack_எடு();
 	vim_free(linecopy);
     }
-    return retval;
+    திரும்பு retval;
 }
 
 /*
  * Return TRUE if "buf" is a normal buffer, 'buftype' is empty.
  */
-    int
+    முழு
 bt_normal(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == NUL;
+    திரும்பு buf != வெற்று && buf->b_p_bt[0] == NUL;
 }
 
 /*
  * Return TRUE if "buf" is the quickfix buffer.
  */
-    int
+    முழு
 bt_quickfix(buf_T *buf UNUSED)
 {
 #ifdef FEAT_QUICKFIX
-    return buf != NULL && buf->b_p_bt[0] == 'q';
-#else
-    return FALSE;
+    திரும்பு buf != வெற்று && buf->b_p_bt[0] == 'q';
+#இல்லையெனில்
+    திரும்பு FALSE;
 #endif
 }
 
 /*
  * Return TRUE if "buf" is a terminal buffer.
  */
-    int
+    முழு
 bt_terminal(buf_T *buf UNUSED)
 {
-#if defined(FEAT_TERMINAL)
-    return buf != NULL && buf->b_p_bt[0] == 't';
-#else
-    return FALSE;
+#எனில் defined(FEAT_TERMINAL)
+    திரும்பு buf != வெற்று && buf->b_p_bt[0] == 't';
+#இல்லையெனில்
+    திரும்பு FALSE;
 #endif
 }
 
 /*
  * Return TRUE if "buf" is a help buffer.
  */
-    int
+    முழு
 bt_help(buf_T *buf)
 {
-    return buf != NULL && buf->b_help;
+    திரும்பு buf != வெற்று && buf->b_help;
 }
 
 /*
  * Return TRUE if "buf" is a prompt buffer.
  */
-    int
+    முழு
 bt_prompt(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'r';
+    திரும்பு buf != வெற்று && buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'r';
 }
 
-#if defined(FEAT_PROP_POPUP)
+#எனில் defined(FEAT_PROP_POPUP)
 /*
  * Return TRUE if "buf" is a buffer for a popup window.
  */
-    int
+    முழு
 bt_popup(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt != NULL
+    திரும்பு buf != வெற்று && buf->b_p_bt != வெற்று
 	&& buf->b_p_bt[0] == 'p' && buf->b_p_bt[1] == 'o';
 }
 #endif
@@ -6360,10 +6360,10 @@ bt_popup(buf_T *buf)
  * buffer.  This means the buffer name may not be a file name, at least not for
  * writing the buffer.
  */
-    int
+    முழு
 bt_nofilename(buf_T *buf)
 {
-    return buf != NULL && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
+    திரும்பு buf != வெற்று && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
 	    || buf->b_p_bt[0] == 'a'
 	    || buf->b_p_bt[0] == 't'
 	    || buf->b_p_bt[0] == 'p');
@@ -6373,23 +6373,23 @@ bt_nofilename(buf_T *buf)
  * Return TRUE if "buf" is a "nofile", "quickfix", "terminal" or "prompt"
  * buffer.  This means the buffer is not to be read from a file.
  */
-    static int
+    நிலையான முழு
 bt_nofileread(buf_T *buf)
 {
-    return buf != NULL && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
+    திரும்பு buf != வெற்று && ((buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f')
 	    || buf->b_p_bt[0] == 't'
 	    || buf->b_p_bt[0] == 'q'
 	    || buf->b_p_bt[0] == 'p');
 }
 
-#if defined(FEAT_QUICKFIX)
+#எனில் defined(FEAT_QUICKFIX)
 /*
  * Return TRUE if "buf" has 'buftype' set to "nofile".
  */
-    int
+    முழு
 bt_nofile(buf_T *buf)
 {
-    return buf != NULL && buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f';
+    திரும்பு buf != வெற்று && buf->b_p_bt[0] == 'n' && buf->b_p_bt[2] == 'f';
 }
 #endif
 
@@ -6397,41 +6397,41 @@ bt_nofile(buf_T *buf)
  * Return TRUE if "buf" is a "nowrite", "nofile", "terminal", "prompt", or
  * "popup" buffer.
  */
-    int
+    முழு
 bt_dontwrite(buf_T *buf)
 {
-    return buf != NULL && (buf->b_p_bt[0] == 'n'
+    திரும்பு buf != வெற்று && (buf->b_p_bt[0] == 'n'
 		 || buf->b_p_bt[0] == 't'
 		 || buf->b_p_bt[0] == 'p');
 }
 
-    int
-bt_dontwrite_msg(buf_T *buf)
+    முழு
+bt_dontwrite_செய்தி(buf_T *buf)
 {
-    if (bt_dontwrite(buf))
+    எனில் (bt_dontwrite(buf))
     {
 	emsg(_(e_cannot_write_buftype_option_is_set));
-	return TRUE;
+	திரும்பு TRUE;
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 /*
  * Return TRUE if the buffer should be hidden, according to 'hidden', ":hide"
  * and 'bufhidden'.
  */
-    int
+    முழு
 buf_hide(buf_T *buf)
 {
     // 'bufhidden' overrules 'hidden' and ":hide", check it first
-    switch (buf->b_p_bh[0])
+    தேர்வு (buf->b_p_bh[0])
     {
-	case 'u':		    // "unload"
-	case 'w':		    // "wipe"
-	case 'd': return FALSE;	    // "delete"
-	case 'h': return TRUE;	    // "hide"
+	நிலை 'u':		    // "unload"
+	நிலை 'w':		    // "wipe"
+	நிலை 'd': திரும்பு FALSE;	    // "delete"
+	நிலை 'h': திரும்பு TRUE;	    // "hide"
     }
-    return (p_hid || (cmdmod.cmod_flags & CMOD_HIDE));
+    திரும்பு (p_hid || (cmdmod.cmod_flags & CMOD_HIDE));
 }
 
 /*
@@ -6441,46 +6441,46 @@ buf_hide(buf_T *buf)
     char_u *
 buf_spname(buf_T *buf)
 {
-#if defined(FEAT_QUICKFIX)
-    if (bt_quickfix(buf))
+#எனில் defined(FEAT_QUICKFIX)
+    எனில் (bt_quickfix(buf))
     {
 	/*
 	 * Differentiate between the quickfix and location list buffers using
 	 * the buffer number stored in the global quickfix stack.
 	 */
-	if (buf->b_fnum == qf_stack_get_bufnr())
-	    return (char_u *)_(msg_qflist);
-	else
-	    return (char_u *)_(msg_loclist);
+	எனில் (buf->b_fnum == qf_அடுக்கு_get_bufnr())
+	    திரும்பு (char_u *)_(செய்தி_qflist);
+	இல்லையெனில்
+	    திரும்பு (char_u *)_(செய்தி_loclist);
     }
 #endif
 
     // There is no _file_ when 'buftype' is "nofile", b_sfname
     // contains the name as specified by the user.
-    if (bt_nofilename(buf))
+    எனில் (bt_nofilename(buf))
     {
 #ifdef FEAT_TERMINAL
-	if (buf->b_term != NULL)
-	    return term_get_status_text(buf->b_term);
+	எனில் (buf->b_term != வெற்று)
+	    திரும்பு term_get_status_text(buf->b_term);
 #endif
-	if (buf->b_fname != NULL)
-	    return buf->b_fname;
-	if (buf == cmdwin_buf)
-	    return (char_u *)_("[Command Line]");
+	எனில் (buf->b_fname != வெற்று)
+	    திரும்பு buf->b_fname;
+	எனில் (buf == cmdwin_buf)
+	    திரும்பு (char_u *)_("[Command Line]");
 #ifdef FEAT_JOB_CHANNEL
-	if (bt_prompt(buf))
-	    return (char_u *)_("[Prompt]");
+	எனில் (bt_prompt(buf))
+	    திரும்பு (char_u *)_("[Prompt]");
 #endif
 #ifdef FEAT_PROP_POPUP
-	if (bt_popup(buf))
-	    return (char_u *)_("[Popup]");
+	எனில் (bt_popup(buf))
+	    திரும்பு (char_u *)_("[Popup]");
 #endif
-	return (char_u *)_("[Scratch]");
+	திரும்பு (char_u *)_("[Scratch]");
     }
 
-    if (buf->b_fname == NULL)
-	return buf_get_fname(buf);
-    return NULL;
+    எனில் (buf->b_fname == வெற்று)
+	திரும்பு buf_get_fname(buf);
+    திரும்பு வெற்று;
 }
 
 /*
@@ -6489,78 +6489,78 @@ buf_spname(buf_T *buf)
     char_u *
 buf_get_fname(buf_T *buf)
 {
-    if (buf->b_fname == NULL)
-	return (char_u *)_("[No Name]");
-    return buf->b_fname;
+    எனில் (buf->b_fname == வெற்று)
+	திரும்பு (char_u *)_("[No Name]");
+    திரும்பு buf->b_fname;
 }
 
 /*
  * Set 'buflisted' for curbuf to "on" and trigger autocommands if it changed.
  */
-    void
-set_buflisted(int on)
+    வெறுமை
+set_buflisted(முழு on)
 {
-    if (on == curbuf->b_p_bl)
-	return;
+    எனில் (on == curbuf->b_p_bl)
+	திரும்பு;
 
     curbuf->b_p_bl = on;
-    if (on)
-	apply_autocmds(EVENT_BUFADD, NULL, NULL, FALSE, curbuf);
-    else
-	apply_autocmds(EVENT_BUFDELETE, NULL, NULL, FALSE, curbuf);
+    எனில் (on)
+	apply_autocmds(EVENT_BUFADD, வெற்று, வெற்று, FALSE, curbuf);
+    இல்லையெனில்
+	apply_autocmds(EVENT_BUFDELETE, வெற்று, வெற்று, FALSE, curbuf);
 }
 
 /*
  * Read the file for "buf" again and check if the contents changed.
  * Return TRUE if it changed or this could not be checked.
  */
-    int
+    முழு
 buf_contents_changed(buf_T *buf)
 {
     buf_T	*newbuf;
-    int		differ = TRUE;
+    முழு		differ = TRUE;
     linenr_T	lnum;
     aco_save_T	aco;
     exarg_T	ea;
 
     // Allocate a buffer without putting it in the buffer list.
-    newbuf = buflist_new(NULL, NULL, (linenr_T)1, BLN_DUMMY);
-    if (newbuf == NULL)
-	return TRUE;
+    newbuf = buflist_new(வெற்று, வெற்று, (linenr_T)1, BLN_DUMMY);
+    எனில் (newbuf == வெற்று)
+	திரும்பு TRUE;
 
     // Force the 'fileencoding' and 'fileformat' to be equal.
-    if (prep_exarg(&ea, buf) == FAIL)
+    எனில் (prep_exarg(&ea, buf) == FAIL)
     {
 	wipe_buffer(newbuf, FALSE);
-	return TRUE;
+	திரும்பு TRUE;
     }
 
     // Set curwin/curbuf to buf and save a few things.
     aucmd_prepbuf(&aco, newbuf);
-    if (curbuf != newbuf)
+    எனில் (curbuf != newbuf)
     {
 	// Failed to find a window for "newbuf".
 	wipe_buffer(newbuf, FALSE);
-	return TRUE;
+	திரும்பு TRUE;
     }
 
     // We don't want to trigger autocommands now, they may have nasty
     // side-effects like wiping buffers
     block_autocmds();
-    if (ml_open(curbuf) == OK
+    எனில் (ml_open(curbuf) == OK
 	    && readfile(buf->b_ffname, buf->b_fname,
 				  (linenr_T)0, (linenr_T)0, (linenr_T)MAXLNUM,
 					    &ea, READ_NEW | READ_DUMMY) == OK)
     {
 	// compare the two files line by line
-	if (buf->b_ml.ml_line_count == curbuf->b_ml.ml_line_count)
+	எனில் (buf->b_ml.ml_வரி_மொத்தம் == curbuf->b_ml.ml_வரி_மொத்தம்)
 	{
 	    differ = FALSE;
-	    for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
-		if (STRCMP(ml_get_buf(buf, lnum, FALSE), ml_get(lnum)) != 0)
+	    க்கு (lnum = 1; lnum <= curbuf->b_ml.ml_வரி_மொத்தம்; ++lnum)
+		எனில் (STRCMP(ml_get_buf(buf, lnum, FALSE), ml_get(lnum)) != 0)
 		{
 		    differ = TRUE;
-		    break;
+		    நிறுத்து;
 		}
 	}
     }
@@ -6569,12 +6569,12 @@ buf_contents_changed(buf_T *buf)
     // restore curwin/curbuf and a few other things
     aucmd_restbuf(&aco);
 
-    if (curbuf != newbuf)	// safety check
+    எனில் (curbuf != newbuf)	// safety check
 	wipe_buffer(newbuf, FALSE);
 
     unblock_autocmds();
 
-    return differ;
+    திரும்பு differ;
 }
 
 /*
@@ -6582,19 +6582,19 @@ buf_contents_changed(buf_T *buf)
  * this buffer.  Call this to wipe out a temp buffer that does not contain any
  * marks.
  */
-    void
+    வெறுமை
 wipe_buffer(
     buf_T	*buf,
-    int		aucmd)	    // When TRUE trigger autocommands.
+    முழு		aucmd)	    // When TRUE trigger autocommands.
 {
-    if (buf->b_fnum == top_file_num - 1)
-	--top_file_num;
+    எனில் (buf->b_fnum == உச்சி_file_இலக்கம் - 1)
+	--உச்சி_file_இலக்கம்;
 
-    if (!aucmd)		    // Don't trigger BufDelete autocommands here.
+    எனில் (!aucmd)		    // Don't trigger BufDelete autocommands here.
 	block_autocmds();
 
-    close_buffer(NULL, buf, DOBUF_WIPE, FALSE, TRUE, FALSE);
+    close_buffer(வெற்று, buf, DOBUF_WIPE, FALSE, TRUE, FALSE);
 
-    if (!aucmd)
+    எனில் (!aucmd)
 	unblock_autocmds();
 }

@@ -11,15 +11,15 @@
  * sound.c: functions related making noise
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#if defined(FEAT_SOUND)
+#எனில் defined(FEAT_SOUND)
 
-static long sound_id = 0;
+நிலையான long sound_id = 0;
 
 // soundcb_T is typedef'ed in vim.h
 
-struct soundcb_S
+கட்டமைப்பு soundcb_S
 {
     callback_T snd_callback;
 # ifdef MSWIN
@@ -29,56 +29,56 @@ struct soundcb_S
     soundcb_T *snd_next;
 };
 
-static soundcb_T *first_callback = NULL;
+நிலையான soundcb_T *first_callback = வெற்று;
 
 /*
  * Return TRUE when a sound callback has been created, it may be invoked when
  * the sound finishes playing.  Also see has_sound_callback_in_queue().
  */
-int
-has_any_sound_callback(void)
+முழு
+has_any_sound_callback(வெறுமை)
 {
-    return first_callback != NULL;
+    திரும்பு first_callback != வெற்று;
 }
 
-static soundcb_T *
+நிலையான soundcb_T *
 get_sound_callback(typval_T *arg)
 {
     callback_T callback;
     soundcb_T *soundcb;
 
-    if (arg->v_type == VAR_UNKNOWN)
-        return NULL;
+    எனில் (arg->v_type == VAR_UNKNOWN)
+        திரும்பு வெற்று;
     callback = get_callback(arg);
-    if (callback.cb_name == NULL)
-        return NULL;
+    எனில் (callback.cb_name == வெற்று)
+        திரும்பு வெற்று;
 
     soundcb = ALLOC_ONE(soundcb_T);
-    if (soundcb == NULL)
+    எனில் (soundcb == வெற்று)
     {
         free_callback(&callback);
-        return NULL;
+        திரும்பு வெற்று;
     }
 
     soundcb->snd_next = first_callback;
     first_callback = soundcb;
     set_callback(&soundcb->snd_callback, &callback);
-    return soundcb;
+    திரும்பு soundcb;
 }
 
 /*
  * Call "soundcb" with proper parameters.
  */
-void
-call_sound_callback(soundcb_T *soundcb, long snd_id, int result)
+வெறுமை
+call_sound_callback(soundcb_T *soundcb, long snd_id, முழு result)
 {
     typval_T argv[3];
     typval_T rettv;
 
-    argv[0].v_type = VAR_NUMBER;
-    argv[0].vval.v_number = snd_id;
-    argv[1].v_type = VAR_NUMBER;
-    argv[1].vval.v_number = result;
+    argv[0].v_type = VAR_எண்;
+    argv[0].vval.v_எண் = snd_id;
+    argv[1].v_type = VAR_எண்;
+    argv[1].vval.v_எண் = result;
     argv[2].v_type = VAR_UNKNOWN;
 
     call_callback(&soundcb->snd_callback, -1, &rettv, 2, argv);
@@ -88,65 +88,65 @@ call_sound_callback(soundcb_T *soundcb, long snd_id, int result)
 /*
  * Delete "soundcb" from the list of pending callbacks.
  */
-void
+வெறுமை
 delete_sound_callback(soundcb_T *soundcb)
 {
     soundcb_T *p;
-    soundcb_T *prev = NULL;
+    soundcb_T *prev = வெற்று;
 
-    for (p = first_callback; p != NULL; prev = p, p = p->snd_next)
-        if (p == soundcb)
+    க்கு (p = first_callback; p != வெற்று; prev = p, p = p->snd_next)
+        எனில் (p == soundcb)
         {
-            if (prev == NULL)
+            எனில் (prev == வெற்று)
                 first_callback = p->snd_next;
-            else
+            இல்லையெனில்
                 prev->snd_next = p->snd_next;
             free_callback(&p->snd_callback);
             vim_free(p);
-            break;
+            நிறுத்து;
         }
 }
 
-# if defined(HAVE_CANBERRA)
+# எனில் defined(HAVE_CANBERRA)
 
 /*
  * Sound implementation for Linux/Unix using libcanberra.
  */
 #  include <canberra.h>
 
-static ca_context *context = NULL;
+நிலையான ca_context *context = வெற்று;
 
 // Structure to store info about a sound callback to be invoked soon.
-typedef struct soundcb_queue_S soundcb_queue_T;
+வகைவரை கட்டமைப்பு soundcb_queue_S soundcb_queue_T;
 
-struct soundcb_queue_S
+கட்டமைப்பு soundcb_queue_S
 {
     soundcb_queue_T *scb_next;
     uint32_t scb_id; // ID of the sound
-    int scb_result; // CA_ value
+    முழு scb_result; // CA_ value
     soundcb_T *scb_callback; // function to call
 };
 
 // Queue of callbacks to invoke from the main loop.
-static soundcb_queue_T *callback_queue = NULL;
+நிலையான soundcb_queue_T *callback_queue = வெற்று;
 
 /*
  * Add a callback to the queue of callbacks to invoke later from the main loop.
  * That is because the callback may be called from another thread and invoking
  * another sound function may cause trouble.
  */
-static void
+நிலையான வெறுமை
 sound_callback(ca_context *c UNUSED,
                uint32_t id,
-               int error_code,
-               void *userdata)
+               முழு error_code,
+               வெறுமை *userdata)
 {
     soundcb_T *soundcb = (soundcb_T *)userdata;
     soundcb_queue_T *scb;
 
     scb = ALLOC_ONE(soundcb_queue_T);
-    if (scb == NULL)
-        return;
+    எனில் (scb == வெற்று)
+        திரும்பு;
     scb->scb_next = callback_queue;
     callback_queue = scb;
     scb->scb_id = id;
@@ -161,21 +161,21 @@ sound_callback(ca_context *c UNUSED,
 /*
  * Return TRUE if there is a sound callback to be called.
  */
-int
-has_sound_callback_in_queue(void)
+முழு
+has_sound_callback_in_queue(வெறுமை)
 {
-    return callback_queue != NULL;
+    திரும்பு callback_queue != வெற்று;
 }
 
 /*
  * Invoke queued sound callbacks.
  */
-void
-invoke_sound_callback(void)
+வெறுமை
+invoke_sound_callback(வெறுமை)
 {
     soundcb_queue_T *scb;
 
-    while (callback_queue != NULL)
+    போது (callback_queue != வெற்று)
     {
         scb = callback_queue;
         callback_queue = scb->scb_next;
@@ -188,56 +188,56 @@ invoke_sound_callback(void)
     redraw_after_callback(TRUE, FALSE);
 }
 
-static void
-sound_play_common(typval_T *argvars, typval_T *rettv, int playfile)
+நிலையான வெறுமை
+sound_play_common(typval_T *argvars, typval_T *rettv, முழு playfile)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    எனில் (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        திரும்பு;
 
-    if (context == NULL)
+    எனில் (context == வெற்று)
         ca_context_create(&context);
-    if (context == NULL)
-        return;
+    எனில் (context == வெற்று)
+        திரும்பு;
 
     soundcb_T *soundcb = get_sound_callback(&argvars[1]);
-    int res = CA_ERROR_INVALID;
+    முழு res = CA_ERROR_INVALID;
 
     ++sound_id;
-    if (soundcb == NULL)
+    எனில் (soundcb == வெற்று)
     {
         res = ca_context_play(context, sound_id,
                               playfile ? CA_PROP_MEDIA_FILENAME
                                        : CA_PROP_EVENT_ID,
                               tv_get_string(&argvars[0]),
-                              CA_PROP_CANBERRA_CACHE_CONTROL, "volatile", NULL);
+                              CA_PROP_CANBERRA_CACHE_CONTROL, "volatile", வெற்று);
     }
-    else
+    இல்லையெனில்
     {
-        static ca_proplist *proplist = NULL;
+        நிலையான ca_proplist *proplist = வெற்று;
 
         ca_proplist_create(&proplist);
-        if (proplist != NULL)
+        எனில் (proplist != வெற்று)
         {
-            if (playfile)
+            எனில் (playfile)
                 ca_proplist_sets(proplist, CA_PROP_MEDIA_FILENAME,
-                                 (char *)tv_get_string(&argvars[0]));
-            else
+                                 (எழுத்து *)tv_get_string(&argvars[0]));
+            இல்லையெனில்
                 ca_proplist_sets(proplist, CA_PROP_EVENT_ID,
-                                 (char *)tv_get_string(&argvars[0]));
+                                 (எழுத்து *)tv_get_string(&argvars[0]));
             ca_proplist_sets(proplist, CA_PROP_CANBERRA_CACHE_CONTROL,
                              "volatile");
             res = ca_context_play_full(context, sound_id, proplist,
                                        sound_callback, soundcb);
-            if (res != CA_SUCCESS)
+            எனில் (res != CA_SUCCESS)
                 delete_sound_callback(soundcb);
 
             ca_proplist_destroy(proplist);
         }
     }
-    rettv->vval.v_number = res == CA_SUCCESS ? sound_id : 0;
+    rettv->vval.v_எண் = res == CA_SUCCESS ? sound_id : 0;
 }
 
-void
+வெறுமை
 f_sound_playevent(typval_T *argvars, typval_T *rettv)
 {
     sound_play_common(argvars, rettv, FALSE);
@@ -246,7 +246,7 @@ f_sound_playevent(typval_T *argvars, typval_T *rettv)
 /*
  * implementation of sound_playfile({path} [, {callback}])
  */
-void
+வெறுமை
 f_sound_playfile(typval_T *argvars, typval_T *rettv)
 {
     sound_play_common(argvars, rettv, TRUE);
@@ -255,41 +255,41 @@ f_sound_playfile(typval_T *argvars, typval_T *rettv)
 /*
  * implementation of sound_stop({id})
  */
-void
+வெறுமை
 f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-        return;
+    எனில் (in_vim9script() && check_for_எண்_arg(argvars, 0) == FAIL)
+        திரும்பு;
 
-    if (context != NULL)
-        ca_context_cancel(context, tv_get_number(&argvars[0]));
+    எனில் (context != வெற்று)
+        ca_context_cancel(context, tv_get_எண்(&argvars[0]));
 }
 
 /*
  * implementation of sound_clear()
  */
-void
+வெறுமை
 f_sound_clear(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (context == NULL)
-        return;
+    எனில் (context == வெற்று)
+        திரும்பு;
     ca_context_destroy(context);
-    context = NULL;
+    context = வெற்று;
 }
 
-#  if defined(EXITFREE)
-void
-sound_free(void)
+#  எனில் defined(EXITFREE)
+வெறுமை
+sound_free(வெறுமை)
 {
     soundcb_queue_T *scb;
 
-    if (context != NULL)
+    எனில் (context != வெற்று)
         ca_context_destroy(context);
 
-    while (first_callback != NULL)
+    போது (first_callback != வெற்று)
         delete_sound_callback(first_callback);
 
-    while (callback_queue != NULL)
+    போது (callback_queue != வெற்று)
     {
         scb = callback_queue;
         callback_queue = scb->scb_next;
@@ -305,24 +305,24 @@ sound_free(void)
  * Sound implementation for MS-Windows.
  */
 
-static HWND g_hWndSound = NULL;
+நிலையான HWND g_hWndSound = வெற்று;
 
-static LRESULT CALLBACK
+நிலையான LRESULT CALLBACK
 sound_wndproc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     soundcb_T *p;
 
-    switch (message)
+    தேர்வு (message)
     {
-        case MM_MCINOTIFY:
-            for (p = first_callback; p != NULL; p = p->snd_next)
-                if (p->snd_device_id == (MCIDEVICEID)lParam)
+        நிலை MM_MCINOTIFY:
+            க்கு (p = first_callback; p != வெற்று; p = p->snd_next)
+                எனில் (p->snd_device_id == (MCIDEVICEID)lParam)
                 {
-                    char buf[32];
+                    எழுத்து buf[32];
 
-                    vim_snprintf(buf, sizeof(buf), "close sound%06ld",
+                    vim_snprintf(buf, அளவு(buf), "close sound%06ld",
                                  p->snd_id);
-                    mciSendStringA(buf, NULL, 0, 0);
+                    mciSendStringA(buf, வெற்று, 0, 0);
 
                     long result = wParam == MCI_NOTIFY_SUCCESSFUL ? 0
                                   : wParam == MCI_NOTIFY_ABORTED  ? 1
@@ -332,46 +332,46 @@ sound_wndproc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                     delete_sound_callback(p);
                     redraw_after_callback(TRUE, FALSE);
                 }
-            break;
+            நிறுத்து;
     }
 
-    return DefWindowProc(hwnd, message, wParam, lParam);
+    திரும்பு DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-static HWND
-sound_window(void)
+நிலையான HWND
+sound_window(வெறுமை)
 {
-    if (g_hWndSound == NULL)
+    எனில் (g_hWndSound == வெற்று)
     {
         LPCSTR clazz = "VimSound";
-        WNDCLASS wndclass = { 0, sound_wndproc, 0,    0, g_hinst, NULL, 0,
-                              0, NULL,          clazz };
+        WNDCLASS wndclass = { 0, sound_wndproc, 0,    0, g_hinst, வெற்று, 0,
+                              0, வெற்று,          clazz };
         RegisterClass(&wndclass);
-        g_hWndSound = CreateWindow(clazz, NULL, 0, 0, 0, 0, 0, HWND_MESSAGE,
-                                   NULL, g_hinst, NULL);
+        g_hWndSound = CreateWindow(clazz, வெற்று, 0, 0, 0, 0, 0, HWND_MESSAGE,
+                                   வெற்று, g_hinst, வெற்று);
     }
 
-    return g_hWndSound;
+    திரும்பு g_hWndSound;
 }
 
-void
+வெறுமை
 f_sound_playevent(typval_T *argvars, typval_T *rettv)
 {
     WCHAR *wp;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    எனில் (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        திரும்பு;
 
-    wp = enc_to_utf16(tv_get_string(&argvars[0]), NULL);
-    if (wp == NULL)
-        return;
+    wp = enc_to_utf16(tv_get_string(&argvars[0]), வெற்று);
+    எனில் (wp == வெற்று)
+        திரும்பு;
 
-    if (PlaySoundW(wp, NULL, SND_ASYNC | SND_ALIAS))
-        rettv->vval.v_number = ++sound_id;
-    free(wp);
+    எனில் (PlaySoundW(wp, வெற்று, SND_ASYNC | SND_ALIAS))
+        rettv->vval.v_எண் = ++sound_id;
+    விடுவி(wp);
 }
 
-void
+வெறுமை
 f_sound_playfile(typval_T *argvars, typval_T *rettv)
 {
     long newid = sound_id + 1;
@@ -379,83 +379,83 @@ f_sound_playfile(typval_T *argvars, typval_T *rettv)
     char_u *p, *filename;
     WCHAR *wp;
     soundcb_T *soundcb;
-    char buf[32];
+    எழுத்து buf[32];
     MCIERROR err;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    எனில் (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        திரும்பு;
 
     filename = tv_get_string(&argvars[0]);
 
     len = STRLEN(filename) + 5 + 18 + 2 + 1;
     p = alloc(len);
-    if (p == NULL)
+    எனில் (p == வெற்று)
     {
-        return;
+        திரும்பு;
     }
-    vim_snprintf((char *)p, len, "open \"%s\" alias sound%06ld", filename,
+    vim_snprintf((எழுத்து *)p, len, "open \"%s\" alias sound%06ld", filename,
                  newid);
 
-    wp = enc_to_utf16((char_u *)p, NULL);
-    free(p);
-    if (wp == NULL)
-        return;
+    wp = enc_to_utf16((char_u *)p, வெற்று);
+    விடுவி(p);
+    எனில் (wp == வெற்று)
+        திரும்பு;
 
-    err = mciSendStringW(wp, NULL, 0, sound_window());
-    free(wp);
-    if (err != 0)
-        return;
+    err = mciSendStringW(wp, வெற்று, 0, sound_window());
+    விடுவி(wp);
+    எனில் (err != 0)
+        திரும்பு;
 
-    vim_snprintf(buf, sizeof(buf), "play sound%06ld notify", newid);
-    err = mciSendStringA(buf, NULL, 0, sound_window());
-    if (err != 0)
-        goto failure;
+    vim_snprintf(buf, அளவு(buf), "play sound%06ld notify", newid);
+    err = mciSendStringA(buf, வெற்று, 0, sound_window());
+    எனில் (err != 0)
+        செல் failure;
 
     sound_id = newid;
-    rettv->vval.v_number = sound_id;
+    rettv->vval.v_எண் = sound_id;
 
     soundcb = get_sound_callback(&argvars[1]);
-    if (soundcb != NULL)
+    எனில் (soundcb != வெற்று)
     {
-        vim_snprintf(buf, sizeof(buf), "sound%06ld", newid);
+        vim_snprintf(buf, அளவு(buf), "sound%06ld", newid);
         soundcb->snd_id = newid;
         soundcb->snd_device_id = mciGetDeviceID(buf);
     }
-    return;
+    திரும்பு;
 
 failure:
-    vim_snprintf(buf, sizeof(buf), "close sound%06ld", newid);
-    mciSendStringA(buf, NULL, 0, NULL);
+    vim_snprintf(buf, அளவு(buf), "close sound%06ld", newid);
+    mciSendStringA(buf, வெற்று, 0, வெற்று);
 }
 
-void
+வெறுமை
 f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
     long id;
-    char buf[32];
+    எழுத்து buf[32];
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-        return;
+    எனில் (in_vim9script() && check_for_எண்_arg(argvars, 0) == FAIL)
+        திரும்பு;
 
-    id = tv_get_number(&argvars[0]);
-    vim_snprintf(buf, sizeof(buf), "stop sound%06ld", id);
-    mciSendStringA(buf, NULL, 0, NULL);
+    id = tv_get_எண்(&argvars[0]);
+    vim_snprintf(buf, அளவு(buf), "stop sound%06ld", id);
+    mciSendStringA(buf, வெற்று, 0, வெற்று);
 }
 
-void
+வெறுமை
 f_sound_clear(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    PlaySoundW(NULL, NULL, 0);
-    mciSendStringA("close all", NULL, 0, NULL);
+    PlaySoundW(வெற்று, வெற்று, 0);
+    mciSendStringA("close all", வெற்று, 0, வெற்று);
 }
 
-#  if defined(EXITFREE)
-void
-sound_free(void)
+#  எனில் defined(EXITFREE)
+வெறுமை
+sound_free(வெறுமை)
 {
     CloseWindow(g_hWndSound);
 
-    while (first_callback != NULL)
+    போது (first_callback != வெற்று)
         delete_sound_callback(first_callback);
 }
 #  endif
@@ -463,11 +463,11 @@ sound_free(void)
 # elif defined(MACOS_X_DARWIN)
 
 // Sound implementation for macOS.
-static void
+நிலையான வெறுமை
 sound_play_common(typval_T *argvars, typval_T *rettv, bool playfile)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    எனில் (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        திரும்பு;
 
     char_u *sound_name = tv_get_string(&argvars[0]);
     soundcb_T *soundcb = get_sound_callback(&argvars[1]);
@@ -475,45 +475,45 @@ sound_play_common(typval_T *argvars, typval_T *rettv, bool playfile)
     ++sound_id;
 
     bool play_success = sound_mch_play(sound_name, sound_id, soundcb, playfile);
-    if (!play_success && soundcb)
+    எனில் (!play_success && soundcb)
     {
         delete_sound_callback(soundcb);
     }
-    rettv->vval.v_number = play_success ? sound_id : 0;
+    rettv->vval.v_எண் = play_success ? sound_id : 0;
 }
 
-void
+வெறுமை
 f_sound_playevent(typval_T *argvars, typval_T *rettv)
 {
     sound_play_common(argvars, rettv, false);
 }
 
-void
+வெறுமை
 f_sound_playfile(typval_T *argvars, typval_T *rettv)
 {
     sound_play_common(argvars, rettv, true);
 }
 
-void
+வெறுமை
 f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-        return;
-    sound_mch_stop(tv_get_number(&argvars[0]));
+    எனில் (in_vim9script() && check_for_எண்_arg(argvars, 0) == FAIL)
+        திரும்பு;
+    sound_mch_stop(tv_get_எண்(&argvars[0]));
 }
 
-void
+வெறுமை
 f_sound_clear(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     sound_mch_clear();
 }
 
-#  if defined(EXITFREE)
-void
-sound_free(void)
+#  எனில் defined(EXITFREE)
+வெறுமை
+sound_free(வெறுமை)
 {
     sound_mch_free();
-    while (first_callback != NULL)
+    போது (first_callback != வெற்று)
         delete_sound_callback(first_callback);
 }
 #  endif

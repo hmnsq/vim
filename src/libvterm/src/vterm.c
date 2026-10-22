@@ -1,66 +1,66 @@
 #define DEFINE_INLINES
 
 // vim: set sw=2 :
-#include "vterm_internal.h"
+#அந்தர்பாவ "vterm_internal.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
+#அந்தர்பாவ <stdio.h>
+#அந்தர்பாவ <stdlib.h>
+#அந்தர்பாவ <stdarg.h>
+#அந்தர்பாவ <string.h>
 
-#include "utf8.h"
+#அந்தர்பாவ "utf8.h"
 
 /*****************
  * API functions *
  *****************/
 
-static void *default_malloc(size_t size, void *allocdata UNUSED)
+நிலையான வெறுமை *default_malloc(size_t size, வெறுமை *allocdata UNUSED)
 {
-  void *ptr = malloc(size);
-  if(ptr)
+  வெறுமை *ptr = malloc(size);
+  எனில்(ptr)
     memset(ptr, 0, size);
-  return ptr;
+  திரும்பு ptr;
 }
 
-static void default_free(void *ptr, void *allocdata UNUSED)
+நிலையான வெறுமை default_free(வெறுமை *ptr, வெறுமை *allocdata UNUSED)
 {
-  free(ptr);
+  விடுவி(ptr);
 }
 
-static VTermAllocatorFunctions default_allocator = {
+நிலையான VTermAllocatorFunctions default_allocator = {
   &default_malloc, // malloc
   &default_free // free
 };
 
-VTerm *vterm_new(int rows, int cols)
+VTerm *vterm_new(முழு rows, முழு cols)
 {
-  struct VTermBuilder builder;
-  memset(&builder, 0, sizeof(builder));
+  கட்டமைப்பு VTermBuilder builder;
+  memset(&builder, 0, அளவு(builder));
   builder.rows = rows;
   builder.cols = cols;
-  return vterm_build(&builder);
+  திரும்பு vterm_build(&builder);
 }
 
-VTerm *vterm_new_with_allocator(int rows, int cols, VTermAllocatorFunctions *funcs, void *allocdata)
+VTerm *vterm_new_with_allocator(முழு rows, முழு cols, VTermAllocatorFunctions *funcs, வெறுமை *allocdata)
 {
-  struct VTermBuilder builder;
-  memset(&builder, 0, sizeof(builder));
+  கட்டமைப்பு VTermBuilder builder;
+  memset(&builder, 0, அளவு(builder));
   builder.rows = rows;
   builder.cols = cols;
   builder.allocator = funcs;
   builder.allocdata = allocdata;
-  return vterm_build(&builder);
+  திரும்பு vterm_build(&builder);
 }
 
 /* A handy macro for defaulting values out of builder fields */
 #define DEFAULT(v, def)  ((v) ? (v) : (def))
 
-VTerm *vterm_build(const struct VTermBuilder *builder)
+VTerm *vterm_build(மாறிலி கட்டமைப்பு VTermBuilder *builder)
 {
-  const VTermAllocatorFunctions *allocator = DEFAULT(builder->allocator, &default_allocator);
+  மாறிலி VTermAllocatorFunctions *allocator = DEFAULT(builder->allocator, &default_allocator);
 
   /* Need to bootstrap using the allocator function directly */
-  VTerm *vt = (*allocator->malloc)(sizeof(VTerm), builder->allocdata);
+  VTerm *vt = (*allocator->malloc)(அளவு(VTerm), builder->allocdata);
 
   vt->allocator = allocator;
   vt->allocdata = builder->allocdata;
@@ -70,13 +70,13 @@ VTerm *vterm_build(const struct VTermBuilder *builder)
 
   vt->parser.state = NORMAL;
 
-  vt->parser.callbacks = NULL;
-  vt->parser.cbdata    = NULL;
+  vt->parser.callbacks = வெற்று;
+  vt->parser.cbdata    = வெற்று;
 
   vt->parser.emit_nul  = FALSE;
 
-  vt->outfunc = NULL;
-  vt->outdata = NULL;
+  vt->outfunc = வெற்று;
+  vt->outdata = வெற்று;
 
   vt->outbuffer_len = DEFAULT(builder->outbuffer_len, 4096);
   vt->outbuffer_cur = 0;
@@ -85,25 +85,25 @@ VTerm *vterm_build(const struct VTermBuilder *builder)
   vt->tmpbuffer_len = DEFAULT(builder->tmpbuffer_len, 4096);
   vt->tmpbuffer = vterm_allocator_malloc(vt, vt->tmpbuffer_len);
 
-  if (vt->tmpbuffer == NULL
-      || vt->outbuffer == NULL
-      || vt->tmpbuffer == NULL)
+  எனில் (vt->tmpbuffer == வெற்று
+      || vt->outbuffer == வெற்று
+      || vt->tmpbuffer == வெற்று)
   {
     vterm_allocator_free(vt, vt->outbuffer);
     vterm_allocator_free(vt, vt->tmpbuffer);
     vterm_allocator_free(vt, vt);
-    return NULL;
+    திரும்பு வெற்று;
   }
 
-  return vt;
+  திரும்பு vt;
 }
 
-void vterm_free(VTerm *vt)
+வெறுமை vterm_free(VTerm *vt)
 {
-  if(vt->screen)
+  எனில்(vt->screen)
     vterm_screen_free(vt->screen);
 
-  if(vt->state)
+  எனில்(vt->state)
     vterm_state_free(vt->state);
 
   vterm_allocator_free(vt, vt->outbuffer);
@@ -112,235 +112,235 @@ void vterm_free(VTerm *vt)
   vterm_allocator_free(vt, vt);
 }
 
-INTERNAL void *vterm_allocator_malloc(VTerm *vt, size_t size)
+INTERNAL வெறுமை *vterm_allocator_malloc(VTerm *vt, size_t size)
 {
-  return (*vt->allocator->malloc)(size, vt->allocdata);
+  திரும்பு (*vt->allocator->malloc)(size, vt->allocdata);
 }
 
 /*
  * Free "ptr" unless it is NULL.
  */
-INTERNAL void vterm_allocator_free(VTerm *vt, void *ptr)
+INTERNAL வெறுமை vterm_allocator_free(VTerm *vt, வெறுமை *ptr)
 {
-  if (ptr)
-    (*vt->allocator->free)(ptr, vt->allocdata);
+  எனில் (ptr)
+    (*vt->allocator->விடுவி)(ptr, vt->allocdata);
 }
 
-void vterm_get_size(const VTerm *vt, int *rowsp, int *colsp)
+வெறுமை vterm_get_size(மாறிலி VTerm *vt, முழு *rowsp, முழு *colsp)
 {
-  if(rowsp)
+  எனில்(rowsp)
     *rowsp = vt->rows;
-  if(colsp)
+  எனில்(colsp)
     *colsp = vt->cols;
 }
 
-void vterm_set_size(VTerm *vt, int rows, int cols)
+வெறுமை vterm_set_size(VTerm *vt, முழு rows, முழு cols)
 {
-  if(rows < 1 || cols < 1)
-    return;
+  எனில்(rows < 1 || cols < 1)
+    திரும்பு;
 
   vt->rows = rows;
   vt->cols = cols;
 
-  if(vt->parser.callbacks && vt->parser.callbacks->resize)
+  எனில்(vt->parser.callbacks && vt->parser.callbacks->resize)
     (*vt->parser.callbacks->resize)(rows, cols, vt->parser.cbdata);
 }
 
-int vterm_get_utf8(const VTerm *vt)
+முழு vterm_get_utf8(மாறிலி VTerm *vt)
 {
-  return vt->mode.utf8;
+  திரும்பு vt->mode.utf8;
 }
 
-void vterm_set_utf8(VTerm *vt, int is_utf8)
+வெறுமை vterm_set_utf8(VTerm *vt, முழு is_utf8)
 {
   vt->mode.utf8 = is_utf8;
 }
 
-void vterm_output_set_callback(VTerm *vt, VTermOutputCallback *func, void *user)
+வெறுமை vterm_output_set_callback(VTerm *vt, VTermOutputCallback *func, வெறுமை *user)
 {
   vt->outfunc = func;
   vt->outdata = user;
 }
 
-INTERNAL void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len)
+INTERNAL வெறுமை vterm_தள்ளு_output_bytes(VTerm *vt, மாறிலி எழுத்து *bytes, size_t len)
 {
-  if(vt->outfunc) {
+  எனில்(vt->outfunc) {
     (vt->outfunc)(bytes, len, vt->outdata);
-    return;
+    திரும்பு;
   }
 
-  if(len > vt->outbuffer_len - vt->outbuffer_cur) {
+  எனில்(len > vt->outbuffer_len - vt->outbuffer_cur) {
     DEBUG_LOG("vterm_push_output_bytes(): buffer overflow; dropping output\n");
-    return;
+    திரும்பு;
   }
 
   memcpy(vt->outbuffer + vt->outbuffer_cur, bytes, len);
   vt->outbuffer_cur += len;
 }
 
-INTERNAL void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args)
+INTERNAL வெறுமை vterm_தள்ளு_output_vsprintf(VTerm *vt, மாறிலி எழுத்து *format, va_list args)
 {
   size_t len;
 #ifdef VSNPRINTF
   len = VSNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len, format, args);
-#else
+#இல்லையெனில்
   // When vsnprintf() is not available (C90) fall back to vsprintf().
   // Use the heap-allocated tmpbuffer (default 4096 bytes) instead of a small
   // stack buffer to reduce the risk of overflow.
   len = vsprintf(vt->tmpbuffer, format, args);
-  if (len >= vt->tmpbuffer_len)
+  எனில் (len >= vt->tmpbuffer_len)
     len = vt->tmpbuffer_len - 1;
 #endif
-  vterm_push_output_bytes(vt, vt->tmpbuffer, len);
+  vterm_தள்ளு_output_bytes(vt, vt->tmpbuffer, len);
 }
 
-INTERNAL void vterm_push_output_sprintf(VTerm *vt, const char *format, ...)
+INTERNAL வெறுமை vterm_தள்ளு_output_sprintf(VTerm *vt, மாறிலி எழுத்து *format, ...)
 {
   va_list args;
   va_start(args, format);
-  vterm_push_output_vsprintf(vt, format, args);
+  vterm_தள்ளு_output_vsprintf(vt, format, args);
   va_end(args);
 }
 
-INTERNAL void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...)
+INTERNAL வெறுமை vterm_தள்ளு_output_sprintf_ctrl(VTerm *vt, unsigned எழுத்து ctrl, மாறிலி எழுத்து *fmt, ...)
 {
   size_t cur;
 
-  if(ctrl >= 0x80 && !vt->mode.ctrl8bit)
+  எனில்(ctrl >= 0x80 && !vt->mode.ctrl8bit)
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
         ESC_S "%c", ctrl - 0x40);
-  else
+  இல்லையெனில்
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
         "%c", ctrl);
-  if(cur >= vt->tmpbuffer_len)
-    return;
-  vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+  எனில்(cur >= vt->tmpbuffer_len)
+    திரும்பு;
+  vterm_தள்ளு_output_bytes(vt, vt->tmpbuffer, cur);
 
   va_list args;
   va_start(args, fmt);
-  vterm_push_output_vsprintf(vt, fmt, args);
+  vterm_தள்ளு_output_vsprintf(vt, fmt, args);
   va_end(args);
 }
 
-INTERNAL void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...)
+INTERNAL வெறுமை vterm_தள்ளு_output_sprintf_str(VTerm *vt, unsigned எழுத்து ctrl, முழு term, மாறிலி எழுத்து *fmt, ...)
 {
   size_t cur;
 
-  if(ctrl) {
-    if(ctrl >= 0x80 && !vt->mode.ctrl8bit)
+  எனில்(ctrl) {
+    எனில்(ctrl >= 0x80 && !vt->mode.ctrl8bit)
       cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
           ESC_S "%c", ctrl - 0x40);
-    else
+    இல்லையெனில்
       cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
           "%c", ctrl);
 
-    if(cur >= vt->tmpbuffer_len)
-      return;
-    vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+    எனில்(cur >= vt->tmpbuffer_len)
+      திரும்பு;
+    vterm_தள்ளு_output_bytes(vt, vt->tmpbuffer, cur);
   }
 
   va_list args;
   va_start(args, fmt);
-  vterm_push_output_vsprintf(vt, fmt, args);
+  vterm_தள்ளு_output_vsprintf(vt, fmt, args);
   va_end(args);
 
-  if(term) {
+  எனில்(term) {
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
         vt->mode.ctrl8bit ? "\x9C" : ESC_S "\\"); // ST
-    if(cur >= vt->tmpbuffer_len)
-      return;
-    vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+    எனில்(cur >= vt->tmpbuffer_len)
+      திரும்பு;
+    vterm_தள்ளு_output_bytes(vt, vt->tmpbuffer, cur);
   }
 }
 
-size_t vterm_output_get_buffer_size(const VTerm *vt)
+size_t vterm_output_get_buffer_size(மாறிலி VTerm *vt)
 {
-  return vt->outbuffer_len;
+  திரும்பு vt->outbuffer_len;
 }
 
-size_t vterm_output_get_buffer_current(const VTerm *vt)
+size_t vterm_output_get_buffer_current(மாறிலி VTerm *vt)
 {
-  return vt->outbuffer_cur;
+  திரும்பு vt->outbuffer_cur;
 }
 
-size_t vterm_output_get_buffer_remaining(const VTerm *vt)
+size_t vterm_output_get_buffer_remaining(மாறிலி VTerm *vt)
 {
-  return vt->outbuffer_len - vt->outbuffer_cur;
+  திரும்பு vt->outbuffer_len - vt->outbuffer_cur;
 }
 
-size_t vterm_output_read(VTerm *vt, char *buffer, size_t len)
+size_t vterm_output_read(VTerm *vt, எழுத்து *buffer, size_t len)
 {
-  if(len > vt->outbuffer_cur)
+  எனில்(len > vt->outbuffer_cur)
     len = vt->outbuffer_cur;
 
   memcpy(buffer, vt->outbuffer, len);
 
-  if(len < vt->outbuffer_cur)
+  எனில்(len < vt->outbuffer_cur)
     memmove(vt->outbuffer, vt->outbuffer + len, vt->outbuffer_cur - len);
 
   vt->outbuffer_cur -= len;
 
-  return len;
+  திரும்பு len;
 }
 
-VTermValueType vterm_get_attr_type(VTermAttr attr)
+VTerm_மதிப்பு_Type vterm_get_attr_type(VTermAttr attr)
 {
-  switch(attr) {
-    case VTERM_ATTR_BOLD:       return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_UNDERLINE:  return VTERM_VALUETYPE_INT;
-    case VTERM_ATTR_ITALIC:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_BLINK:      return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_REVERSE:    return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_CONCEAL:    return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_STRIKE:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_FONT:       return VTERM_VALUETYPE_INT;
-    case VTERM_ATTR_FOREGROUND: return VTERM_VALUETYPE_COLOR;
-    case VTERM_ATTR_BACKGROUND: return VTERM_VALUETYPE_COLOR;
-    case VTERM_ATTR_SMALL:      return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_BASELINE:   return VTERM_VALUETYPE_INT;
+  தேர்வு(attr) {
+    நிலை VTERM_ATTR_BOLD:       திரும்பு VTERM_VALUETYPE_BOOL;
+    நிலை VTERM_ATTR_UNDERLINE:  திரும்பு VTERM_VALUETYPE_INT;
+    நிலை VTERM_ATTR_ITALIC:     திரும்பு VTERM_VALUETYPE_BOOL;
+    நிலை VTERM_ATTR_BLINK:      திரும்பு VTERM_VALUETYPE_BOOL;
+    நிலை VTERM_ATTR_REVERSE:    திரும்பு VTERM_VALUETYPE_BOOL;
+    நிலை VTERM_ATTR_CONCEAL:    திரும்பு VTERM_VALUETYPE_BOOL;
+    நிலை VTERM_ATTR_STRIKE:     திரும்பு VTERM_VALUETYPE_BOOL;
+    நிலை VTERM_ATTR_FONT:       திரும்பு VTERM_VALUETYPE_INT;
+    நிலை VTERM_ATTR_FOREGROUND: திரும்பு VTERM_VALUETYPE_COLOR;
+    நிலை VTERM_ATTR_BACKGROUND: திரும்பு VTERM_VALUETYPE_COLOR;
+    நிலை VTERM_ATTR_SMALL:      திரும்பு VTERM_VALUETYPE_BOOL;
+    நிலை VTERM_ATTR_BASELINE:   திரும்பு VTERM_VALUETYPE_INT;
 
-    case VTERM_N_ATTRS: return 0;
+    நிலை VTERM_N_ATTRS: திரும்பு 0;
   }
-  return 0; /* UNREACHABLE */
+  திரும்பு 0; /* UNREACHABLE */
 }
 
-VTermValueType vterm_get_prop_type(VTermProp prop)
+VTerm_மதிப்பு_Type vterm_get_prop_type(VTermProp prop)
 {
-  switch(prop) {
-    case VTERM_PROP_CURSORVISIBLE: return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORBLINK:   return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_ALTSCREEN:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_TITLE:         return VTERM_VALUETYPE_STRING;
-    case VTERM_PROP_ICONNAME:      return VTERM_VALUETYPE_STRING;
-    case VTERM_PROP_REVERSE:       return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORSHAPE:   return VTERM_VALUETYPE_INT;
-    case VTERM_PROP_MOUSE:         return VTERM_VALUETYPE_INT;
-    case VTERM_PROP_FOCUSREPORT:   return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORCOLOR:   return VTERM_VALUETYPE_STRING;
+  தேர்வு(prop) {
+    நிலை VTERM_PROP_CURSORVISIBLE: திரும்பு VTERM_VALUETYPE_BOOL;
+    நிலை VTERM_PROP_CURSORBLINK:   திரும்பு VTERM_VALUETYPE_BOOL;
+    நிலை VTERM_PROP_ALTSCREEN:     திரும்பு VTERM_VALUETYPE_BOOL;
+    நிலை VTERM_PROP_TITLE:         திரும்பு VTERM_VALUETYPE_STRING;
+    நிலை VTERM_PROP_ICONNAME:      திரும்பு VTERM_VALUETYPE_STRING;
+    நிலை VTERM_PROP_REVERSE:       திரும்பு VTERM_VALUETYPE_BOOL;
+    நிலை VTERM_PROP_CURSORSHAPE:   திரும்பு VTERM_VALUETYPE_INT;
+    நிலை VTERM_PROP_MOUSE:         திரும்பு VTERM_VALUETYPE_INT;
+    நிலை VTERM_PROP_FOCUSREPORT:   திரும்பு VTERM_VALUETYPE_BOOL;
+    நிலை VTERM_PROP_CURSORCOLOR:   திரும்பு VTERM_VALUETYPE_STRING;
 
-    case VTERM_N_PROPS: return 0;
+    நிலை VTERM_N_PROPS: திரும்பு 0;
   }
-  return 0; /* UNREACHABLE */
+  திரும்பு 0; /* UNREACHABLE */
 }
 
-void vterm_scroll_rect(VTermRect rect,
-    int downward,
-    int rightward,
-    int (*moverect)(VTermRect src, VTermRect dest, void *user),
-    int (*eraserect)(VTermRect rect, int selective, void *user),
-    void *user)
+வெறுமை vterm_scroll_rect(VTermRect rect,
+    முழு downward,
+    முழு rightward,
+    முழு (*moverect)(VTermRect src, VTermRect dest, வெறுமை *user),
+    முழு (*eraserect)(VTermRect rect, முழு selective, வெறுமை *user),
+    வெறுமை *user)
 {
   VTermRect src;
   VTermRect dest;
 
-  if(abs(downward)  >= rect.end_row - rect.start_row ||
+  எனில்(abs(downward)  >= rect.end_row - rect.start_row ||
      abs(rightward) >= rect.end_col - rect.start_col) {
     /* Scroll more than area; just erase the lot */
     (*eraserect)(rect, 0, user);
-    return;
+    திரும்பு;
   }
 
-  if(rightward >= 0) {
+  எனில்(rightward >= 0) {
     /* rect: [XXX................]
      * src:     [----------------]
      * dest: [----------------]
@@ -350,84 +350,84 @@ void vterm_scroll_rect(VTermRect rect,
     src.start_col  = rect.start_col + rightward;
     src.end_col    = rect.end_col;
   }
-  else {
+  இல்லையெனில் {
     /* rect: [................XXX]
      * src:  [----------------]
      * dest:    [----------------]
      */
-    int leftward = -rightward;
+    முழு leftward = -rightward;
     dest.start_col = rect.start_col + leftward;
     dest.end_col   = rect.end_col;
     src.start_col  = rect.start_col;
     src.end_col    = rect.end_col - leftward;
   }
 
-  if(downward >= 0) {
+  எனில்(downward >= 0) {
     dest.start_row = rect.start_row;
     dest.end_row   = rect.end_row   - downward;
     src.start_row  = rect.start_row + downward;
     src.end_row    = rect.end_row;
   }
-  else {
-    int upward = -downward;
+  இல்லையெனில் {
+    முழு upward = -downward;
     dest.start_row = rect.start_row + upward;
     dest.end_row   = rect.end_row;
     src.start_row  = rect.start_row;
     src.end_row    = rect.end_row - upward;
   }
 
-  if(moverect)
+  எனில்(moverect)
     (*moverect)(dest, src, user);
 
-  if(downward > 0)
+  எனில்(downward > 0)
     rect.start_row = rect.end_row - downward;
-  else if(downward < 0)
+  இல்லையெனில் எனில்(downward < 0)
     rect.end_row = rect.start_row - downward;
 
-  if(rightward > 0)
+  எனில்(rightward > 0)
     rect.start_col = rect.end_col - rightward;
-  else if(rightward < 0)
+  இல்லையெனில் எனில்(rightward < 0)
     rect.end_col = rect.start_col - rightward;
 
   (*eraserect)(rect, 0, user);
 }
 
-void vterm_copy_cells(VTermRect dest,
+வெறுமை vterm_copy_cells(VTermRect dest,
     VTermRect src,
-    void (*copycell)(VTermPos dest, VTermPos src, void *user),
-    void *user)
+    வெறுமை (*copycell)(VTermPos dest, VTermPos src, வெறுமை *user),
+    வெறுமை *user)
 {
-  int downward  = src.start_row - dest.start_row;
-  int rightward = src.start_col - dest.start_col;
+  முழு downward  = src.start_row - dest.start_row;
+  முழு rightward = src.start_col - dest.start_col;
 
-  int init_row, test_row, init_col, test_col;
-  int inc_row, inc_col;
+  முழு init_row, test_row, init_col, test_col;
+  முழு inc_row, inc_col;
 
-  if(downward < 0) {
+  எனில்(downward < 0) {
     init_row = dest.end_row - 1;
     test_row = dest.start_row - 1;
     inc_row = -1;
   }
-  else /* downward >= 0 */ {
+  இல்லையெனில் /* downward >= 0 */ {
     init_row = dest.start_row;
     test_row = dest.end_row;
     inc_row = +1;
   }
 
-  if(rightward < 0) {
+  எனில்(rightward < 0) {
     init_col = dest.end_col - 1;
     test_col = dest.start_col - 1;
     inc_col = -1;
   }
-  else /* rightward >= 0 */ {
+  இல்லையெனில் /* rightward >= 0 */ {
     init_col = dest.start_col;
     test_col = dest.end_col;
     inc_col = +1;
   }
 
   VTermPos pos;
-  for(pos.row = init_row; pos.row != test_row; pos.row += inc_row)
-    for(pos.col = init_col; pos.col != test_col; pos.col += inc_col) {
+  க்கு(pos.row = init_row; pos.row != test_row; pos.row += inc_row)
+    க்கு(pos.col = init_col; pos.col != test_col; pos.col += inc_col) {
       VTermPos srcpos;
       srcpos.row = pos.row + downward;
       srcpos.col = pos.col + rightward;
@@ -435,15 +435,15 @@ void vterm_copy_cells(VTermRect dest,
     }
 }
 
-void vterm_check_version(int major, int minor)
+வெறுமை vterm_check_version(முழு major, முழு minor)
 {
-  if(major != VTERM_VERSION_MAJOR) {
+  எனில்(major != VTERM_VERSION_MAJOR) {
     fprintf(stderr, "libvterm major version mismatch; %d (wants) != %d (library)\n",
         major, VTERM_VERSION_MAJOR);
     exit(1);
   }
 
-  if(minor > VTERM_VERSION_MINOR) {
+  எனில்(minor > VTERM_VERSION_MINOR) {
     fprintf(stderr, "libvterm minor version mismatch; %d (wants) > %d (library)\n",
         minor, VTERM_VERSION_MINOR);
     exit(1);

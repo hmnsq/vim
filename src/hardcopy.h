@@ -14,31 +14,31 @@
 #ifndef HARDCOPY_H
 #define HARDCOPY_H
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#if defined(FEAT_PRINTER)
+#எனில் defined(FEAT_PRINTER)
 
 # define PRCOLOR_BLACK	(long_u)0
 # define PRCOLOR_WHITE	(long_u)0xFFFFFFL
 
-extern int	prt_curr_italic;
-extern int	prt_curr_bold;
-extern int	prt_curr_underline;
-extern long_u	prt_curr_bg;
-extern long_u	prt_curr_fg;
-extern int	prt_page_count;
+வெளி முழு	prt_curr_italic;
+வெளி முழு	prt_curr_bold;
+வெளி முழு	prt_curr_underline;
+வெளி long_u	prt_curr_bg;
+வெளி long_u	prt_curr_fg;
+வெளி முழு	prt_page_மொத்தம்;
 
-# if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
-typedef struct
+# எனில் defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+வகைவரை கட்டமைப்பு
 {
-    char	*name;
-    double	width; // Width and height in points for portrait
-    double	height;
+    எழுத்து	*name;
+    இரட்டை	width; // Width and height in points for portrait
+    இரட்டை	height;
 } prt_mediasize_T;
 
 #  define PRT_MEDIASIZE_LEN  14
 
-extern prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN];
+வெளி prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN];
 # endif
 
 #endif

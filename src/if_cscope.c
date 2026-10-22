@@ -9,17 +9,17 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#if defined(FEAT_CSCOPE)
+#எனில் defined(FEAT_CSCOPE)
 
 # include <sys/types.h>
 # include <sys/stat.h>
-# if defined(UNIX)
+# எனில் defined(UNIX)
 #  include <sys/wait.h>
 # endif
 
-# if defined (MSWIN)
+# எனில் defined (MSWIN)
 #  ifndef WIN32_LEAN_AND_MEAN
 #   define WIN32_LEAN_AND_MEAN
 #  endif
@@ -36,29 +36,29 @@
  * See ":help cscope-find" for the possible queries.
  */
 
-typedef struct {
-    char *  name;
-    int     (*func)(exarg_T *eap);
-    char *  help;
-    char *  usage;
-    int	    cansplit;		// if supports splitting window
+வகைவரை கட்டமைப்பு {
+    எழுத்து *  name;
+    முழு     (*func)(exarg_T *eap);
+    எழுத்து *  help;
+    எழுத்து *  usage;
+    முழு	    cansplit;		// if supports splitting window
 } cscmd_T;
 
-typedef struct csi {
-    char *	    fname;	// cscope db name
-    char *	    ppath;	// path to prepend (the -P option)
-    char *	    flags;	// additional cscope flags/options (e.g, -p2)
-# if defined(UNIX)
+வகைவரை கட்டமைப்பு csi {
+    எழுத்து *	    fname;	// cscope db name
+    எழுத்து *	    ppath;	// path to prepend (the -P option)
+    எழுத்து *	    flags;	// additional cscope flags/options (e.g, -p2)
+# எனில் defined(UNIX)
     pid_t	    pid;	// PID of the connected cscope process.
     dev_t	    st_dev;	// ID of dev containing cscope db
     ino_t	    st_ino;	// inode number of cscope db
-# else
-#  if defined(MSWIN)
+# இல்லையெனில்
+#  எனில் defined(MSWIN)
     DWORD	    pid;	// PID of the connected cscope process.
     HANDLE	    hProc;	// cscope process handle
     DWORD	    nVolume;	// Volume serial number, instead of st_dev
-    DWORD	    nIndexHigh;	// st_ino has no meaning in the Windows
-    DWORD	    nIndexLow;
+    DWORD	    n_Index_உயர்வு;	// st_ino has no meaning in the Windows
+    DWORD	    n_Index_கீழ்;
 #  endif
 # endif
 
@@ -66,52 +66,52 @@ typedef struct csi {
     FILE *	    to_fp;	// to cscope: FILE.
 } csinfo_T;
 
-typedef enum { Add, Find, Help, Kill, Reset, Show } csid_e;
+வகைவரை எண்ணிக்கை { Add, Find, Help, Kill, Reset, Show } csid_e;
 
-typedef enum {
+வகைவரை எண்ணிக்கை {
     Store,
     Get,
     Free,
     Print
 } mcmd_e;
 
-static int	    cs_add(exarg_T *eap);
-static int	    cs_add_common(char *, char *, char *);
-static int	    cs_check_for_connections(void);
-static int	    cs_check_for_tags(void);
-static int	    cs_cnt_connections(void);
-static int	    cs_create_connection(int i);
+நிலையான முழு	    cs_add(exarg_T *eap);
+நிலையான முழு	    cs_add_common(எழுத்து *, எழுத்து *, எழுத்து *);
+நிலையான முழு	    cs_check_for_connections(வெறுமை);
+நிலையான முழு	    cs_check_for_tags(வெறுமை);
+நிலையான முழு	    cs_cnt_connections(வெறுமை);
+நிலையான முழு	    cs_create_connection(முழு i);
 # ifdef FEAT_QUICKFIX
-static void	    cs_file_results(FILE *, int *);
+நிலையான வெறுமை	    cs_file_results(FILE *, முழு *);
 # endif
-static void	    cs_fill_results(char *, int , int *, char ***,
-			char ***, int *);
-static int	    cs_find(exarg_T *eap);
-static int	    cs_find_common(char *opt, char *pat, int, int, int, char_u *cmdline);
-static int	    cs_help(exarg_T *eap);
-static int	    cs_insert_filelist(char *, char *, char *,
+நிலையான வெறுமை	    cs_fill_results(எழுத்து *, முழு , முழு *, எழுத்து ***,
+			எழுத்து ***, முழு *);
+நிலையான முழு	    cs_find(exarg_T *eap);
+நிலையான முழு	    cs_find_common(எழுத்து *opt, எழுத்து *pat, முழு, முழு, முழு, char_u *cmdline);
+நிலையான முழு	    cs_help(exarg_T *eap);
+நிலையான முழு	    cs_செருகு_filelist(எழுத்து *, எழுத்து *, எழுத்து *,
 			stat_T *);
-static int	    cs_kill(exarg_T *eap);
-static void	    cs_kill_execute(int, char *);
-static cscmd_T *    cs_lookup_cmd(exarg_T *eap);
-static char *	    cs_make_vim_style_matches(char *, char *,
-			char *, char *);
-static char *	    cs_manage_matches(char **, char **, int, mcmd_e);
-static void	    cs_print_tags_priv(char **, char **, int);
-static int	    cs_read_prompt(int);
-static void	    cs_release_csp(int, int freefnpp);
-static int	    cs_reset(exarg_T *eap);
-static char *	    cs_resolve_file(int, char *);
-static int	    cs_show(exarg_T *eap);
+நிலையான முழு	    cs_kill(exarg_T *eap);
+நிலையான வெறுமை	    cs_kill_execute(முழு, எழுத்து *);
+நிலையான cscmd_T *    cs_lookup_cmd(exarg_T *eap);
+நிலையான எழுத்து *	    cs_make_vim_style_matches(எழுத்து *, எழுத்து *,
+			எழுத்து *, எழுத்து *);
+நிலையான எழுத்து *	    cs_manage_matches(எழுத்து **, எழுத்து **, முழு, mcmd_e);
+நிலையான வெறுமை	    cs_print_tags_priv(எழுத்து **, எழுத்து **, முழு);
+நிலையான முழு	    cs_read_prompt(முழு);
+நிலையான வெறுமை	    cs_release_csp(முழு, முழு freefnpp);
+நிலையான முழு	    cs_reset(exarg_T *eap);
+நிலையான எழுத்து *	    cs_resolve_file(முழு, எழுத்து *);
+நிலையான முழு	    cs_show(exarg_T *eap);
 
 
-static csinfo_T *   csinfo = NULL;
-static int	    csinfo_size = 0;	// number of items allocated in
+நிலையான csinfo_T *   csinfo = வெற்று;
+நிலையான முழு	    csinfo_size = 0;	// number of items allocated in
 					// csinfo[]
 
-static int	    eap_arg_len;    // length of eap->arg, set in
+நிலையான முழு	    eap_arg_len;    // length of eap->arg, set in
 				    // cs_lookup_cmd()
-static cscmd_T	    cs_cmds[] =
+நிலையான cscmd_T	    cs_cmds[] =
 {
     { "add",	cs_add,
 		N_("Add a new database"),     "add file|dir [pre-path] [flags]", 0 },
@@ -125,16 +125,16 @@ static cscmd_T	    cs_cmds[] =
 		N_("Reinit all connections"), "reset", 0 },
     { "show",	cs_show,
 		N_("Show connections"),       "show", 0 },
-    { NULL, NULL, NULL, NULL, 0 }
+    { வெற்று, வெற்று, வெற்று, வெற்று, 0 }
 };
 
-    static void
-cs_usage_msg(csid_e x)
+    நிலையான வெறுமை
+cs_usage_செய்தி(csid_e x)
 {
-    (void)semsg(_(e_usage_cscope_str), cs_cmds[(int)x].usage);
+    (வெறுமை)semsg(_(e_usage_cscope_str), cs_cmds[(முழு)x].usage);
 }
 
-static enum
+நிலையான எண்ணிக்கை
 {
     EXP_CSCOPE_SUBCMD,	// expand ":cscope" sub-commands
     EXP_SCSCOPE_SUBCMD,	// expand ":scscope" sub-commands
@@ -147,67 +147,67 @@ static enum
  * expansion.
  */
     char_u *
-get_cscope_name(expand_T *xp UNUSED, int idx)
+get_cscope_name(expand_T *xp UNUSED, முழு idx)
 {
-    int		current_idx;
-    int		i;
+    முழு		current_idx;
+    முழு		i;
 
-    switch (expand_what)
+    தேர்வு (expand_what)
     {
-    case EXP_CSCOPE_SUBCMD:
+    நிலை EXP_CSCOPE_SUBCMD:
 	// Complete with sub-commands of ":cscope":
 	// add, find, help, kill, reset, show
-	return (char_u *)cs_cmds[idx].name;
-    case EXP_SCSCOPE_SUBCMD:
+	திரும்பு (char_u *)cs_cmds[idx].name;
+    நிலை EXP_SCSCOPE_SUBCMD:
 	// Complete with sub-commands of ":scscope": same sub-commands as
 	// ":cscope" but skip commands which don't support split windows
-	for (i = 0, current_idx = 0; cs_cmds[i].name != NULL; i++)
-	    if (cs_cmds[i].cansplit)
-		if (current_idx++ == idx)
-		    break;
-	return (char_u *)cs_cmds[i].name;
-    case EXP_CSCOPE_FIND:
+	க்கு (i = 0, current_idx = 0; cs_cmds[i].name != வெற்று; i++)
+	    எனில் (cs_cmds[i].cansplit)
+		எனில் (current_idx++ == idx)
+		    நிறுத்து;
+	திரும்பு (char_u *)cs_cmds[i].name;
+    நிலை EXP_CSCOPE_FIND:
 	{
-	    const char *query_type[] =
+	    மாறிலி எழுத்து *query_type[] =
 	    {
-		"a", "c", "d", "e", "f", "g", "i", "s", "t", NULL
+		"a", "c", "d", "e", "f", "g", "i", "s", "t", வெற்று
 	    };
 
 	    // Complete with query type of ":cscope find {query_type}".
 	    // {query_type} can be letters (c, d, ... a) or numbers (0, 1,
 	    // ..., 9) but only complete with letters, since numbers are
 	    // redundant.
-	    return (char_u *)query_type[idx];
+	    திரும்பு (char_u *)query_type[idx];
 	}
-    case EXP_CSCOPE_KILL:
+    நிலை EXP_CSCOPE_KILL:
 	{
-	    static char	connection[5];
+	    நிலையான எழுத்து	connection[5];
 
 	    // ":cscope kill" accepts connection numbers or partial names of
 	    // the pathname of the cscope database as argument.  Only complete
 	    // with connection numbers. -1 can also be used to kill all
 	    // connections.
-	    for (i = 0, current_idx = 0; i < csinfo_size; i++)
+	    க்கு (i = 0, current_idx = 0; i < csinfo_size; i++)
 	    {
-		if (csinfo[i].fname == NULL)
-		    continue;
-		if (current_idx++ == idx)
+		எனில் (csinfo[i].fname == வெற்று)
+		    தொடர்;
+		எனில் (current_idx++ == idx)
 		{
-		    vim_snprintf(connection, sizeof(connection), "%d", i);
-		    return (char_u *)connection;
+		    vim_snprintf(connection, அளவு(connection), "%d", i);
+		    திரும்பு (char_u *)connection;
 		}
 	    }
-	    return (current_idx == idx && idx > 0) ? (char_u *)"-1" : NULL;
+	    திரும்பு (current_idx == idx && idx > 0) ? (char_u *)"-1" : வெற்று;
 	}
-    default:
-	return NULL;
+    இயல்பு:
+	திரும்பு வெற்று;
     }
 }
 
 /*
  * Handle command line completion for :cscope command.
  */
-    void
+    வெறுமை
 set_context_in_cscope_cmd(
     expand_T	*xp,
     char_u	*arg,
@@ -221,25 +221,25 @@ set_context_in_cscope_cmd(
     expand_what = (cmdidx == CMD_scscope)
 			? EXP_SCSCOPE_SUBCMD : EXP_CSCOPE_SUBCMD;
 
-    if (*arg == NUL)
-	return;
+    எனில் (*arg == NUL)
+	திரும்பு;
 
     // (part of) subcommand already typed
     p = skiptowhite(arg);
-    if (*p == NUL)
-	return;
+    எனில் (*p == NUL)
+	திரும்பு;
 
     // past first word
     xp->xp_pattern = skipwhite(p);
-    if (*skiptowhite(xp->xp_pattern) != NUL)
+    எனில் (*skiptowhite(xp->xp_pattern) != NUL)
 	xp->xp_context = EXPAND_NOTHING;
-    else if (STRNICMP(arg, "add", p - arg) == 0)
+    இல்லையெனில் எனில் (STRNICMP(arg, "add", p - arg) == 0)
 	xp->xp_context = EXPAND_FILES;
-    else if (STRNICMP(arg, "kill", p - arg) == 0)
+    இல்லையெனில் எனில் (STRNICMP(arg, "kill", p - arg) == 0)
 	expand_what = EXP_CSCOPE_KILL;
-    else if (STRNICMP(arg, "find", p - arg) == 0)
+    இல்லையெனில் எனில் (STRNICMP(arg, "find", p - arg) == 0)
 	expand_what = EXP_CSCOPE_FIND;
-    else
+    இல்லையெனில்
 	xp->xp_context = EXPAND_NOTHING;
 }
 
@@ -247,28 +247,28 @@ set_context_in_cscope_cmd(
  * Find the command, print help if invalid, and then call the corresponding
  * command function.
  */
-    static void
+    நிலையான வெறுமை
 do_cscope_general(
     exarg_T	*eap,
-    int		make_split UNUSED) // whether to split window
+    முழு		make_split UNUSED) // whether to split window
 {
     cscmd_T *cmdp;
 
-    if (check_restricted())
-	return;
+    எனில் (check_restricted())
+	திரும்பு;
 
-    if ((cmdp = cs_lookup_cmd(eap)) == NULL)
+    எனில் ((cmdp = cs_lookup_cmd(eap)) == வெற்று)
     {
 	cs_help(eap);
-	return;
+	திரும்பு;
     }
 
-    if (make_split)
+    எனில் (make_split)
     {
-	if (!cmdp->cansplit)
+	எனில் (!cmdp->cansplit)
 	{
-	    (void)msg_puts(_("This cscope command does not support splitting the window.\n"));
-	    return;
+	    (வெறுமை)செய்தி_puts(_("This cscope command does not support splitting the window.\n"));
+	    திரும்பு;
 	}
 	postponed_split = -1;
 	postponed_split_flags = cmdmod.cmod_split;
@@ -284,7 +284,7 @@ do_cscope_general(
 /*
  * Implementation of ":cscope" and ":lcscope"
  */
-    void
+    வெறுமை
 ex_cscope(exarg_T *eap)
 {
     do_cscope_general(eap, FALSE);
@@ -293,7 +293,7 @@ ex_cscope(exarg_T *eap)
 /*
  * Implementation of ":scscope". Same as ex_cscope(), but splits window, too.
  */
-    void
+    வெறுமை
 ex_scscope(exarg_T *eap)
 {
     do_cscope_general(eap, TRUE);
@@ -302,73 +302,73 @@ ex_scscope(exarg_T *eap)
 /*
  * Implementation of ":cstag"
  */
-    void
+    வெறுமை
 ex_cstag(exarg_T *eap)
 {
-    int ret = FALSE;
+    முழு ret = FALSE;
 
-    if (*eap->arg == NUL)
+    எனில் (*eap->arg == NUL)
     {
-	(void)emsg(_(e_usage_cstag_ident));
-	return;
+	(வெறுமை)emsg(_(e_usage_cstag_ident));
+	திரும்பு;
     }
 
-    switch (p_csto)
+    தேர்வு (p_csto)
     {
-    case 0 :
-	if (cs_check_for_connections())
+    நிலை 0 :
+	எனில் (cs_check_for_connections())
 	{
-	    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit, FALSE,
+	    ret = cs_find_common("g", (எழுத்து *)(eap->arg), eap->forceit, FALSE,
 						       FALSE, *eap->cmdlinep);
-	    if (ret == FALSE)
+	    எனில் (ret == FALSE)
 	    {
 		cs_free_tags();
-		if (msg_col)
-		    msg_putchar('\n');
+		எனில் (செய்தி_col)
+		    செய்தி_putchar('\n');
 
-		if (cs_check_for_tags())
+		எனில் (cs_check_for_tags())
 		    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
 	    }
 	}
-	else if (cs_check_for_tags())
+	இல்லையெனில் எனில் (cs_check_for_tags())
 	{
 	    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
 	}
-	break;
-    case 1 :
-	if (cs_check_for_tags())
+	நிறுத்து;
+    நிலை 1 :
+	எனில் (cs_check_for_tags())
 	{
 	    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
-	    if (ret == FALSE)
+	    எனில் (ret == FALSE)
 	    {
-		if (msg_col)
-		    msg_putchar('\n');
+		எனில் (செய்தி_col)
+		    செய்தி_putchar('\n');
 
-		if (cs_check_for_connections())
+		எனில் (cs_check_for_connections())
 		{
-		    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit,
+		    ret = cs_find_common("g", (எழுத்து *)(eap->arg), eap->forceit,
 						FALSE, FALSE, *eap->cmdlinep);
-		    if (ret == FALSE)
+		    எனில் (ret == FALSE)
 			cs_free_tags();
 		}
 	    }
 	}
-	else if (cs_check_for_connections())
+	இல்லையெனில் எனில் (cs_check_for_connections())
 	{
-	    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit, FALSE,
+	    ret = cs_find_common("g", (எழுத்து *)(eap->arg), eap->forceit, FALSE,
 						       FALSE, *eap->cmdlinep);
-	    if (ret == FALSE)
+	    எனில் (ret == FALSE)
 		cs_free_tags();
 	}
-	break;
-    default :
-	break;
+	நிறுத்து;
+    இயல்பு :
+	நிறுத்து;
     }
 
-    if (!ret)
+    எனில் (!ret)
     {
-	(void)emsg(_(e_cstag_tag_not_founc));
-# if defined(FEAT_QUICKFIX)
+	(வெறுமை)emsg(_(e_cstag_tag_not_founc));
+# எனில் defined(FEAT_QUICKFIX)
 	g_do_tagpreview = 0;
 # endif
     }
@@ -382,36 +382,36 @@ ex_cstag(exarg_T *eap)
  *
  * returns TRUE if eof, FALSE otherwise
  */
-    int
-cs_fgets(char_u *buf, int size)
+    முழு
+cs_fgets(char_u *buf, முழு size)
 {
-    char *p;
+    எழுத்து *p;
 
-    if ((p = cs_manage_matches(NULL, NULL, -1, Get)) == NULL)
-	return TRUE;
+    எனில் ((p = cs_manage_matches(வெற்று, வெற்று, -1, Get)) == வெற்று)
+	திரும்பு TRUE;
     vim_strncpy(buf, (char_u *)p, size - 1);
 
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 
 /*
  * Called only from do_tag(), when popping the tag stack.
  */
-    void
-cs_free_tags(void)
+    வெறுமை
+cs_free_tags(வெறுமை)
 {
-    cs_manage_matches(NULL, NULL, -1, Free);
+    cs_manage_matches(வெற்று, வெற்று, -1, Free);
 }
 
 
 /*
  * Called from do_tag().
  */
-    void
-cs_print_tags(void)
+    வெறுமை
+cs_print_tags(வெறுமை)
 {
-    cs_manage_matches(NULL, NULL, -1, Print);
+    cs_manage_matches(வெற்று, வெற்று, -1, Print);
 }
 
 
@@ -442,53 +442,53 @@ cs_print_tags(void)
  *
  *		Note: All string comparisons are case sensitive!
  */
-# if defined(FEAT_EVAL)
-    static int
-cs_connection(int num, char_u *dbpath, char_u *ppath)
+# எனில் defined(FEAT_EVAL)
+    நிலையான முழு
+cs_connection(முழு இலக்கம், char_u *dbpath, char_u *ppath)
 {
-    int i;
+    முழு i;
 
-    if (num < 0 || num > 4 || (num > 0 && !dbpath))
-	return FALSE;
+    எனில் (இலக்கம் < 0 || இலக்கம் > 4 || (இலக்கம் > 0 && !dbpath))
+	திரும்பு FALSE;
 
-    for (i = 0; i < csinfo_size; i++)
+    க்கு (i = 0; i < csinfo_size; i++)
     {
-	if (!csinfo[i].fname)
-	    continue;
+	எனில் (!csinfo[i].fname)
+	    தொடர்;
 
-	if (num == 0)
-	    return TRUE;
+	எனில் (இலக்கம் == 0)
+	    திரும்பு TRUE;
 
-	switch (num)
+	தேர்வு (இலக்கம்)
 	{
-	case 1:
-	    if (strstr(csinfo[i].fname, (char *)dbpath))
-		return TRUE;
-	    break;
-	case 2:
-	    if (strcmp(csinfo[i].fname, (char *)dbpath) == 0)
-		return TRUE;
-	    break;
-	case 3:
-	    if (strstr(csinfo[i].fname, (char *)dbpath)
+	நிலை 1:
+	    எனில் (strstr(csinfo[i].fname, (எழுத்து *)dbpath))
+		திரும்பு TRUE;
+	    நிறுத்து;
+	நிலை 2:
+	    எனில் (strcmp(csinfo[i].fname, (எழுத்து *)dbpath) == 0)
+		திரும்பு TRUE;
+	    நிறுத்து;
+	நிலை 3:
+	    எனில் (strstr(csinfo[i].fname, (எழுத்து *)dbpath)
 		    && ((!ppath && !csinfo[i].ppath)
 			|| (ppath
 			    && csinfo[i].ppath
-			    && strstr(csinfo[i].ppath, (char *)ppath))))
-		return TRUE;
-	    break;
-	case 4:
-	    if ((strcmp(csinfo[i].fname, (char *)dbpath) == 0)
+			    && strstr(csinfo[i].ppath, (எழுத்து *)ppath))))
+		திரும்பு TRUE;
+	    நிறுத்து;
+	நிலை 4:
+	    எனில் ((strcmp(csinfo[i].fname, (எழுத்து *)dbpath) == 0)
 		    && ((!ppath && !csinfo[i].ppath)
 			|| (ppath
 			    && csinfo[i].ppath
-			    && (strcmp(csinfo[i].ppath, (char *)ppath) == 0))))
-		return TRUE;
-	    break;
+			    && (strcmp(csinfo[i].ppath, (எழுத்து *)ppath) == 0))))
+		திரும்பு TRUE;
+	    நிறுத்து;
 	}
     }
 
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 # endif
@@ -502,27 +502,27 @@ cs_connection(int num, char_u *dbpath, char_u *ppath)
  * Add cscope database or a directory name (to look for cscope.out)
  * to the cscope connection list.
  */
-    static int
+    நிலையான முழு
 cs_add(exarg_T *eap UNUSED)
 {
-    char *fname, *ppath, *flags = NULL;
+    எழுத்து *fname, *ppath, *flags = வெற்று;
 
-    if ((fname = strtok((char *)NULL, (const char *)" ")) == NULL)
+    எனில் ((fname = strtok((எழுத்து *)வெற்று, (மாறிலி எழுத்து *)" ")) == வெற்று)
     {
-	cs_usage_msg(Add);
-	return CSCOPE_FAILURE;
+	cs_usage_செய்தி(Add);
+	திரும்பு CSCOPE_FAILURE;
     }
-    if ((ppath = strtok((char *)NULL, (const char *)" ")) != NULL)
-	flags = strtok((char *)NULL, (const char *)" ");
+    எனில் ((ppath = strtok((எழுத்து *)வெற்று, (மாறிலி எழுத்து *)" ")) != வெற்று)
+	flags = strtok((எழுத்து *)வெற்று, (மாறிலி எழுத்து *)" ");
 
-    return cs_add_common(fname, ppath, flags);
+    திரும்பு cs_add_common(fname, ppath, flags);
 }
 
-    static void
-cs_stat_emsg(char *fname)
+    நிலையான வெறுமை
+cs_stat_emsg(எழுத்து *fname)
 {
-    int err = errno;
-    (void)semsg(_(e_stat_str_error_nr), fname, err);
+    முழு err = errno;
+    (வெறுமை)semsg(_(e_stat_str_error_nr), fname, err);
 }
 
 
@@ -531,115 +531,115 @@ cs_stat_emsg(char *fname)
  * cs_add() and cs_reset().  I really don't like to do this, but this
  * routine uses a number of goto statements.
  */
-    static int
+    நிலையான முழு
 cs_add_common(
-    char *arg1,	    // filename - may contain environment variables
-    char *arg2,	    // prepend path - may contain environment variables
-    char *flags)
+    எழுத்து *arg1,	    // filename - may contain environment variables
+    எழுத்து *arg2,	    // prepend path - may contain environment variables
+    எழுத்து *flags)
 {
     stat_T	statbuf;
-    int		ret;
-    char	*fname = NULL;
-    char	*fname2 = NULL;
-    char	*ppath = NULL;
-    int		i;
+    முழு		ret;
+    எழுத்து	*fname = வெற்று;
+    எழுத்து	*fname2 = வெற்று;
+    எழுத்து	*ppath = வெற்று;
+    முழு		i;
     size_t	len;
     size_t	usedlen = 0;
-    char_u	*fbuf = NULL;
+    char_u	*fbuf = வெற்று;
 
     // get the filename (arg1), expand it, and try to stat it
-    if ((fname = alloc(MAXPATHL + 1)) == NULL)
-	goto add_err;
+    எனில் ((fname = alloc(MAXPATHL + 1)) == வெற்று)
+	செல் add_err;
 
     len = expand_env((char_u *)arg1, (char_u *)fname, MAXPATHL);
     fbuf = (char_u *)fname;
-    (void)modify_fname((char_u *)":p", FALSE, &usedlen,
+    (வெறுமை)modify_fname((char_u *)":p", FALSE, &usedlen,
 					      (char_u **)&fname, &fbuf, &len);
-    if (fname == NULL)
-	goto add_err;
-    fname = (char *)vim_strnsave((char_u *)fname, len);
+    எனில் (fname == வெற்று)
+	செல் add_err;
+    fname = (எழுத்து *)vim_strnsave((char_u *)fname, len);
     vim_free(fbuf);
 
     ret = mch_stat(fname, &statbuf);
-    if (ret < 0)
+    எனில் (ret < 0)
     {
 staterr:
-	if (p_csverbose)
+	எனில் (p_csverbose)
 	    cs_stat_emsg(fname);
-	goto add_err;
+	செல் add_err;
     }
 
     // get the prepend path (arg2), expand it, and try to stat it
-    if (arg2 != NULL)
+    எனில் (arg2 != வெற்று)
     {
 	stat_T	    statbuf2;
 
-	if ((ppath = alloc(MAXPATHL + 1)) == NULL)
-	    goto add_err;
+	எனில் ((ppath = alloc(MAXPATHL + 1)) == வெற்று)
+	    செல் add_err;
 
 	expand_env((char_u *)arg2, (char_u *)ppath, MAXPATHL);
 	ret = mch_stat(ppath, &statbuf2);
-	if (ret < 0)
-	    goto staterr;
+	எனில் (ret < 0)
+	    செல் staterr;
     }
 
     // if filename is a directory, append the cscope database name to it
-    if (S_ISDIR(statbuf.st_mode))
+    எனில் (S_ISDIR(statbuf.st_mode))
     {
 	fname2 = alloc(STRLEN_LITERAL(CSCOPE_DBFILE) + strlen(fname) + 2);
-	if (fname2 == NULL)
-	    goto add_err;
+	எனில் (fname2 == வெற்று)
+	    செல் add_err;
 
-	while (fname[strlen(fname)-1] == '/'
+	போது (fname[strlen(fname)-1] == '/'
 # ifdef MSWIN
 		|| fname[strlen(fname)-1] == '\\'
 # endif
 		)
 	{
 	    fname[strlen(fname)-1] = '\0';
-	    if (fname[0] == '\0')
-		break;
+	    எனில் (fname[0] == '\0')
+		நிறுத்து;
 	}
-	if (fname[0] == '\0')
-	    (void)sprintf(fname2, "/%s", CSCOPE_DBFILE);
-	else
-	    (void)sprintf(fname2, "%s/%s", fname, CSCOPE_DBFILE);
+	எனில் (fname[0] == '\0')
+	    (வெறுமை)sprintf(fname2, "/%s", CSCOPE_DBFILE);
+	இல்லையெனில்
+	    (வெறுமை)sprintf(fname2, "%s/%s", fname, CSCOPE_DBFILE);
 
 	ret = mch_stat(fname2, &statbuf);
-	if (ret < 0)
+	எனில் (ret < 0)
 	{
-	    if (p_csverbose)
+	    எனில் (p_csverbose)
 		cs_stat_emsg(fname2);
-	    goto add_err;
+	    செல் add_err;
 	}
 
-	i = cs_insert_filelist(fname2, ppath, flags, &statbuf);
+	i = cs_செருகு_filelist(fname2, ppath, flags, &statbuf);
     }
-    else if (S_ISREG(statbuf.st_mode) || S_ISLNK(statbuf.st_mode))
+    இல்லையெனில் எனில் (S_ISREG(statbuf.st_mode) || S_ISLNK(statbuf.st_mode))
     {
-	i = cs_insert_filelist(fname, ppath, flags, &statbuf);
+	i = cs_செருகு_filelist(fname, ppath, flags, &statbuf);
     }
-    else
+    இல்லையெனில்
     {
-	if (p_csverbose)
-	    (void)semsg(_(e_str_is_not_directory_or_valid_cscope_database),
+	எனில் (p_csverbose)
+	    (வெறுமை)semsg(_(e_str_is_not_directory_or_valid_cscope_database),
 									fname);
-	goto add_err;
+	செல் add_err;
     }
 
-    if (i != -1)
+    எனில் (i != -1)
     {
-	if (cs_create_connection(i) == CSCOPE_FAILURE
+	எனில் (cs_create_connection(i) == CSCOPE_FAILURE
 		|| cs_read_prompt(i) == CSCOPE_FAILURE)
 	{
 	    cs_release_csp(i, TRUE);
-	    goto add_err;
+	    செல் add_err;
 	}
 
-	if (p_csverbose)
+	எனில் (p_csverbose)
 	{
-	    msg_clr_eos();
-	    (void)smsg_attr(HL_ATTR(HLF_R),
+	    செய்தி_clr_eos();
+	    (வெறுமை)smsg_attr(HL_ATTR(HLF_R),
 			    _("Added cscope database %s"),
 			    csinfo[i].fname);
 	}
@@ -648,48 +648,48 @@ staterr:
     vim_free(fname);
     vim_free(fname2);
     vim_free(ppath);
-    return CSCOPE_SUCCESS;
+    திரும்பு CSCOPE_SUCCESS;
 
 add_err:
     vim_free(fname2);
     vim_free(fname);
     vim_free(ppath);
-    return CSCOPE_FAILURE;
+    திரும்பு CSCOPE_FAILURE;
 }
 
 
-    static int
-cs_check_for_connections(void)
+    நிலையான முழு
+cs_check_for_connections(வெறுமை)
 {
-    return (cs_cnt_connections() > 0);
+    திரும்பு (cs_cnt_connections() > 0);
 }
 
 
-    static int
-cs_check_for_tags(void)
+    நிலையான முழு
+cs_check_for_tags(வெறுமை)
 {
-    return (p_tags[0] != NUL && curbuf->b_p_tags != NULL);
+    திரும்பு (p_tags[0] != NUL && curbuf->b_p_tags != வெற்று);
 }
 
 
 /*
  * Count the number of cscope connections.
  */
-    static int
-cs_cnt_connections(void)
+    நிலையான முழு
+cs_cnt_connections(வெறுமை)
 {
-    int i;
-    int cnt = 0;
+    முழு i;
+    முழு cnt = 0;
 
-    for (i = 0; i < csinfo_size; i++)
-	if (csinfo[i].fname != NULL)
+    க்கு (i = 0; i < csinfo_size; i++)
+	எனில் (csinfo[i].fname != வெற்று)
 	    cnt++;
-    return cnt;
+    திரும்பு cnt;
 }
 
-    static void
+    நிலையான வெறுமை
 cs_reading_emsg(
-    int idx)	// connection index
+    முழு idx)	// connection index
 {
     semsg(_(e_error_reading_cscope_connection_nr), idx);
 }
@@ -698,27 +698,27 @@ cs_reading_emsg(
 /*
  * Count the number of matches for a given cscope connection.
  */
-    static int
-cs_cnt_matches(int idx)
+    நிலையான முழு
+cs_cnt_matches(முழு idx)
 {
-    char *stok;
-    char *buf;
-    int nlines = 0;
+    எழுத்து *stok;
+    எழுத்து *buf;
+    முழு nlines = 0;
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return 0;
-    for (;;)
+    எனில் (buf == வெற்று)
+	திரும்பு 0;
+    க்கு (;;)
     {
-	if (!fgets(buf, CSREAD_BUFSIZE, csinfo[idx].fr_fp))
+	எனில் (!fgets(buf, CSREAD_BUFSIZE, csinfo[idx].fr_fp))
 	{
-	    if (feof(csinfo[idx].fr_fp))
+	    எனில் (feof(csinfo[idx].fr_fp))
 		errno = EIO;
 
 	    cs_reading_emsg(idx);
 
 	    vim_free(buf);
-	    return -1;
+	    திரும்பு -1;
 	}
 
 	/*
@@ -728,93 +728,93 @@ cs_cnt_matches(int idx)
 	 * Accept "\S*cscope: X lines", also matches "mlcscope".
 	 * Bail out for the "Unable to search" error.
 	 */
-	if (strstr((const char *)buf, "Unable to search database") != NULL)
-	    break;
-	if ((stok = strtok(buf, (const char *)" ")) == NULL)
-	    continue;
-	if (strstr((const char *)stok, "cscope:") == NULL)
-	    continue;
+	எனில் (strstr((மாறிலி எழுத்து *)buf, "Unable to search database") != வெற்று)
+	    நிறுத்து;
+	எனில் ((stok = strtok(buf, (மாறிலி எழுத்து *)" ")) == வெற்று)
+	    தொடர்;
+	எனில் (strstr((மாறிலி எழுத்து *)stok, "cscope:") == வெற்று)
+	    தொடர்;
 
-	if ((stok = strtok(NULL, (const char *)" ")) == NULL)
-	    continue;
+	எனில் ((stok = strtok(வெற்று, (மாறிலி எழுத்து *)" ")) == வெற்று)
+	    தொடர்;
 	nlines = atoi(stok);
-	if (nlines < 0)
+	எனில் (nlines < 0)
 	{
 	    nlines = 0;
-	    break;
+	    நிறுத்து;
 	}
 
-	if ((stok = strtok(NULL, (const char *)" ")) == NULL)
-	    continue;
-	if (strncmp((const char *)stok, "lines", 5))
-	    continue;
+	எனில் ((stok = strtok(வெற்று, (மாறிலி எழுத்து *)" ")) == வெற்று)
+	    தொடர்;
+	எனில் (strncmp((மாறிலி எழுத்து *)stok, "lines", 5))
+	    தொடர்;
 
-	break;
+	நிறுத்து;
     }
 
     vim_free(buf);
-    return nlines;
+    திரும்பு nlines;
 }
 
 
 /*
  * Creates the actual cscope command query from what the user entered.
  */
-    static char *
-cs_create_cmd(char *csoption, char *pattern)
+    நிலையான எழுத்து *
+cs_create_cmd(எழுத்து *csoption, எழுத்து *pattern)
 {
-    char *cmd;
-    short search;
-    char *pat;
+    எழுத்து *cmd;
+    short தேடல்;
+    எழுத்து *pat;
 
-    switch (csoption[0])
+    தேர்வு (csoption[0])
     {
-    case '0' : case 's' :
-	search = 0;
-	break;
-    case '1' : case 'g' :
-	search = 1;
-	break;
-    case '2' : case 'd' :
-	search = 2;
-	break;
-    case '3' : case 'c' :
-	search = 3;
-	break;
-    case '4' : case 't' :
-	search = 4;
-	break;
-    case '6' : case 'e' :
-	search = 6;
-	break;
-    case '7' : case 'f' :
-	search = 7;
-	break;
-    case '8' : case 'i' :
-	search = 8;
-	break;
-    case '9' : case 'a' :
-	search = 9;
-	break;
-    default :
-	(void)emsg(_(e_unknown_cscope_search_type));
-	cs_usage_msg(Find);
-	return NULL;
+    நிலை '0' : நிலை 's' :
+	தேடல் = 0;
+	நிறுத்து;
+    நிலை '1' : நிலை 'g' :
+	தேடல் = 1;
+	நிறுத்து;
+    நிலை '2' : நிலை 'd' :
+	தேடல் = 2;
+	நிறுத்து;
+    நிலை '3' : நிலை 'c' :
+	தேடல் = 3;
+	நிறுத்து;
+    நிலை '4' : நிலை 't' :
+	தேடல் = 4;
+	நிறுத்து;
+    நிலை '6' : நிலை 'e' :
+	தேடல் = 6;
+	நிறுத்து;
+    நிலை '7' : நிலை 'f' :
+	தேடல் = 7;
+	நிறுத்து;
+    நிலை '8' : நிலை 'i' :
+	தேடல் = 8;
+	நிறுத்து;
+    நிலை '9' : நிலை 'a' :
+	தேடல் = 9;
+	நிறுத்து;
+    இயல்பு :
+	(வெறுமை)emsg(_(e_unknown_cscope_தேடல்_type));
+	cs_usage_செய்தி(Find);
+	திரும்பு வெற்று;
     }
 
     // Skip white space before the pattern, except for text and pattern search,
     // they may want to use the leading white space.
     pat = pattern;
-    if (search != 4 && search != 6)
-	while VIM_ISWHITE(*pat)
+    எனில் (தேடல் != 4 && தேடல் != 6)
+	போது VIM_ISWHITE(*pat)
 	    ++pat;
 
-    if ((cmd = alloc(strlen(pat) + 2)) == NULL)
-	return NULL;
+    எனில் ((cmd = alloc(strlen(pat) + 2)) == வெற்று)
+	திரும்பு வெற்று;
 
-    (void)sprintf(cmd, "%d%s", search, pat);
+    (வெறுமை)sprintf(cmd, "%d%s", தேடல், pat);
 
-    return cmd;
+    திரும்பு cmd;
 }
 
 
@@ -822,18 +822,18 @@ cs_create_cmd(char *csoption, char *pattern)
  * This piece of code was taken/adapted from nvi.  do we need to add
  * the BSD license notice?
  */
-    static int
-cs_create_connection(int i)
+    நிலையான முழு
+cs_create_connection(முழு i)
 {
 # ifdef UNIX
-    int		to_cs[2], from_cs[2];
+    முழு		to_cs[2], from_cs[2];
 # endif
-    int		cmdlen;
-    char	*prog, *cmd, *ppath = NULL;
+    முழு		cmdlen;
+    எழுத்து	*prog, *cmd, *ppath = வெற்று;
     size_t	proglen;
 # ifdef MSWIN
-    int		fd;
-    int		len;
+    முழு		fd;
+    முழு		len;
     SECURITY_ATTRIBUTES sa;
     PROCESS_INFORMATION pi;
     STARTUPINFO si;
@@ -843,113 +843,113 @@ cs_create_connection(int i)
     BOOL	created;
 # endif
 
-# if defined(UNIX)
+# எனில் defined(UNIX)
     /*
      * Cscope reads from to_cs[0] and writes to from_cs[1]; vi reads from
      * from_cs[0] and writes to to_cs[1].
      */
     to_cs[0] = to_cs[1] = from_cs[0] = from_cs[1] = -1;
-    if (pipe(to_cs) < 0 || pipe(from_cs) < 0)
+    எனில் (pipe(to_cs) < 0 || pipe(from_cs) < 0)
     {
-	(void)emsg(_(e_could_not_create_cscope_pipes));
+	(வெறுமை)emsg(_(e_could_not_create_cscope_pipes));
 err_closing:
-	if (to_cs[0] != -1)
-	    (void)close(to_cs[0]);
-	if (to_cs[1] != -1)
-	    (void)close(to_cs[1]);
-	if (from_cs[0] != -1)
-	    (void)close(from_cs[0]);
-	if (from_cs[1] != -1)
-	    (void)close(from_cs[1]);
-	return CSCOPE_FAILURE;
+	எனில் (to_cs[0] != -1)
+	    (வெறுமை)close(to_cs[0]);
+	எனில் (to_cs[1] != -1)
+	    (வெறுமை)close(to_cs[1]);
+	எனில் (from_cs[0] != -1)
+	    (வெறுமை)close(from_cs[0]);
+	எனில் (from_cs[1] != -1)
+	    (வெறுமை)close(from_cs[1]);
+	திரும்பு CSCOPE_FAILURE;
     }
 
-    if ((csinfo[i].pid = fork()) == -1)
+    எனில் ((csinfo[i].pid = fork()) == -1)
     {
-	(void)emsg(_(e_could_not_fork_for_cscope));
-	goto err_closing;
+	(வெறுமை)emsg(_(e_could_not_fork_for_cscope));
+	செல் err_closing;
     }
-    else if (csinfo[i].pid == 0)	// child: run cscope.
+    இல்லையெனில் எனில் (csinfo[i].pid == 0)	// child: run cscope.
     {
-	char **argv = NULL;
+	எழுத்து **argv = வெற்று;
 
-	if (dup2(to_cs[0], STDIN_FILENO) == -1)
+	எனில் (dup2(to_cs[0], STDIN_FILENO) == -1)
 	    PERROR("cs_create_connection 1");
-	if (dup2(from_cs[1], STDOUT_FILENO) == -1)
+	எனில் (dup2(from_cs[1], STDOUT_FILENO) == -1)
 	    PERROR("cs_create_connection 2");
-	if (dup2(from_cs[1], STDERR_FILENO) == -1)
+	எனில் (dup2(from_cs[1], STDERR_FILENO) == -1)
 	    PERROR("cs_create_connection 3");
 
 	// close unused
-	(void)close(to_cs[1]);
-	(void)close(from_cs[0]);
-# else
+	(வெறுமை)close(to_cs[1]);
+	(வெறுமை)close(from_cs[0]);
+# இல்லையெனில்
 	// MSWIN
 	// Create pipes to communicate with cscope
-	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+	sa.nLength = அளவு(SECURITY_ATTRIBUTES);
 	sa.bInheritHandle = TRUE;
-	sa.lpSecurityDescriptor = NULL;
+	sa.lpSecurityDescriptor = வெற்று;
 
-	if (!(pipe_stdin = CreatePipe(&stdin_rd, &stdin_wr, &sa, 0))
+	எனில் (!(pipe_stdin = CreatePipe(&stdin_rd, &stdin_wr, &sa, 0))
 		|| !(pipe_stdout = CreatePipe(&stdout_rd, &stdout_wr, &sa, 0)))
 	{
-	    (void)emsg(_(e_could_not_create_cscope_pipes));
+	    (வெறுமை)emsg(_(e_could_not_create_cscope_pipes));
 err_closing:
-	    if (pipe_stdin)
+	    எனில் (pipe_stdin)
 	    {
 		CloseHandle(stdin_rd);
 		CloseHandle(stdin_wr);
 	    }
-	    if (pipe_stdout)
+	    எனில் (pipe_stdout)
 	    {
 		CloseHandle(stdout_rd);
 		CloseHandle(stdout_wr);
 	    }
-	    return CSCOPE_FAILURE;
+	    திரும்பு CSCOPE_FAILURE;
 	}
 # endif
 	// expand the cscope exec for env var's
-	if ((prog = alloc(MAXPATHL + 1)) == NULL)
+	எனில் ((prog = alloc(MAXPATHL + 1)) == வெற்று)
 	{
 # ifdef UNIX
 	    exit(EXIT_FAILURE);
-# else
+# இல்லையெனில்
 	    // MSWIN
-	    goto err_closing;
+	    செல் err_closing;
 # endif
 	}
 	proglen = expand_env(p_csprg, (char_u *)prog, MAXPATHL);
 
 	// alloc space to hold the cscope command
-	cmdlen = (int)(proglen + strlen(csinfo[i].fname) + 32);
-	if (csinfo[i].ppath)
+	cmdlen = (முழு)(proglen + strlen(csinfo[i].fname) + 32);
+	எனில் (csinfo[i].ppath)
 	{
 	    // expand the prepend path for env var's
-	    if ((ppath = alloc(MAXPATHL + 1)) == NULL)
+	    எனில் ((ppath = alloc(MAXPATHL + 1)) == வெற்று)
 	    {
 		vim_free(prog);
 # ifdef UNIX
 		exit(EXIT_FAILURE);
-# else
+# இல்லையெனில்
 		// MSWIN
-		goto err_closing;
+		செல் err_closing;
 # endif
 	    }
-	    cmdlen += (int)expand_env((char_u *)csinfo[i].ppath, (char_u *)ppath, MAXPATHL);
+	    cmdlen += (முழு)expand_env((char_u *)csinfo[i].ppath, (char_u *)ppath, MAXPATHL);
 	}
 
-	if (csinfo[i].flags)
-	    cmdlen += (int)strlen(csinfo[i].flags);
+	எனில் (csinfo[i].flags)
+	    cmdlen += (முழு)strlen(csinfo[i].flags);
 
-	if ((cmd = alloc(cmdlen)) == NULL)
+	எனில் ((cmd = alloc(cmdlen)) == வெற்று)
 	{
 	    vim_free(prog);
 	    vim_free(ppath);
 # ifdef UNIX
 	    exit(EXIT_FAILURE);
-# else
+# இல்லையெனில்
 	    // MSWIN
-	    goto err_closing;
+	    செல் err_closing;
 # endif
 	}
 
@@ -957,82 +957,82 @@ err_closing:
 # ifdef UNIX
 	{
 	    garray_T	ga_argv;
-	    char	**tok = NULL;
-	    int		tokc = 0;
+	    எழுத்து	**tok = வெற்று;
+	    முழு		tokc = 0;
 
-	    ga_init2(&ga_argv, sizeof(char *), 8);
+	    ga_init2(&ga_argv, அளவு(எழுத்து *), 8);
 
 	    // 'cscopeprg' may be multi-word (e.g. "cscope --foo");
 	    // split it into separate argv entries.
-	    if (build_argv_from_string((char_u *)prog, &tok, &tokc) == FAIL)
+	    எனில் (build_argv_from_string((char_u *)prog, &tok, &tokc) == FAIL)
 		exit(EXIT_FAILURE);
-	    for (int k = 0; k < tokc; ++k)
+	    க்கு (முழு k = 0; k < tokc; ++k)
 	    {
-		if (ga_grow(&ga_argv, 1) == FAIL)
+		எனில் (ga_grow(&ga_argv, 1) == FAIL)
 		    exit(EXIT_FAILURE);
-		((char **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
+		((எழுத்து **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
 	    }
 	    VIM_CLEAR(tok);
 
 	    // Literal arguments: "-dl", "-f", fname.
-	    if (ga_grow(&ga_argv, 3) == FAIL)
+	    எனில் (ga_grow(&ga_argv, 3) == FAIL)
 		exit(EXIT_FAILURE);
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] =
-				    (char *)vim_strsave((char_u *)"-dl");
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] =
-				    (char *)vim_strsave((char_u *)"-f");
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] =
-				(char *)vim_strsave((char_u *)csinfo[i].fname);
+	    ((எழுத்து **)ga_argv.ga_data)[ga_argv.ga_len++] =
+				    (எழுத்து *)vim_strsave((char_u *)"-dl");
+	    ((எழுத்து **)ga_argv.ga_data)[ga_argv.ga_len++] =
+				    (எழுத்து *)vim_strsave((char_u *)"-f");
+	    ((எழுத்து **)ga_argv.ga_data)[ga_argv.ga_len++] =
+				(எழுத்து *)vim_strsave((char_u *)csinfo[i].fname);
 
 	    // "-P<ppath>" as a single argv entry, if set.
-	    if (ppath != NULL)
+	    எனில் (ppath != வெற்று)
 	    {
 		size_t	plen = STRLEN(ppath) + 3;
-		char	*parg = alloc(plen);
+		எழுத்து	*parg = alloc(plen);
 
-		if (parg == NULL || ga_grow(&ga_argv, 1) == FAIL)
+		எனில் (parg == வெற்று || ga_grow(&ga_argv, 1) == FAIL)
 		    exit(EXIT_FAILURE);
 		vim_snprintf(parg, plen, "-P%s", ppath);
-		((char **)ga_argv.ga_data)[ga_argv.ga_len++] = parg;
+		((எழுத்து **)ga_argv.ga_data)[ga_argv.ga_len++] = parg;
 	    }
 
 	    // 'flags' is intended to be a sequence of cscope tokens
 	    // like "-q -i somefile"; split it the same way as prog.
-	    if (csinfo[i].flags != NULL)
+	    எனில் (csinfo[i].flags != வெற்று)
 	    {
-		if (build_argv_from_string((char_u *)csinfo[i].flags,
+		எனில் (build_argv_from_string((char_u *)csinfo[i].flags,
 							&tok, &tokc) == FAIL)
 		    exit(EXIT_FAILURE);
-		for (int k = 0; k < tokc; ++k)
+		க்கு (முழு k = 0; k < tokc; ++k)
 		{
-		    if (ga_grow(&ga_argv, 1) == FAIL)
+		    எனில் (ga_grow(&ga_argv, 1) == FAIL)
 			exit(EXIT_FAILURE);
-		    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
+		    ((எழுத்து **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
 		}
 		vim_free(tok);
 	    }
 
 	    // NULL-terminate argv.
-	    if (ga_grow(&ga_argv, 1) == FAIL)
+	    எனில் (ga_grow(&ga_argv, 1) == FAIL)
 		exit(EXIT_FAILURE);
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len] = NULL;
+	    ((எழுத்து **)ga_argv.ga_data)[ga_argv.ga_len] = வெற்று;
 
 	    vim_free(prog);
 	    vim_free(ppath);
 	    vim_free(cmd);
 
-#  if defined(HAVE_SETSID) || defined(HAVE_SETPGID)
+#  எனில் defined(HAVE_SETSID) || defined(HAVE_SETPGID)
 	    // Change our process group to avoid cscope receiving SIGWINCH.
-#   if defined(HAVE_SETSID)
-	    (void)setsid();
-#   else
-	    if (setpgid(0, 0) == -1)
+#   எனில் defined(HAVE_SETSID)
+	    (வெறுமை)setsid();
+#   இல்லையெனில்
+	    எனில் (setpgid(0, 0) == -1)
 		PERROR(_("cs_create_connection setpgid failed"));
 #   endif
 #  endif
 
-	    argv = (char **)ga_argv.ga_data;
-	    if (argv[0] == NULL || execvp(argv[0], argv) == -1)
+	    argv = (எழுத்து **)ga_argv.ga_data;
+	    எனில் (argv[0] == வெற்று || execvp(argv[0], argv) == -1)
 	    {
 		fprintf(stderr, "%s\n",
 		    _("cs_create_connection exec failed"));
@@ -1043,32 +1043,32 @@ err_closing:
 	    // NOTREACHED
 	}
     }
-    else	// parent.
+    இல்லையெனில்	// parent.
     {
 	/*
 	 * Save the file descriptors for later duplication, and
 	 * reopen as streams.
 	 */
-	if ((csinfo[i].to_fp = fdopen(to_cs[1], "w")) == NULL)
+	எனில் ((csinfo[i].to_fp = fdopen(to_cs[1], "w")) == வெற்று)
 	    PERROR(_("cs_create_connection: fdopen for to_fp failed"));
-	if ((csinfo[i].fr_fp = fdopen(from_cs[0], "r")) == NULL)
+	எனில் ((csinfo[i].fr_fp = fdopen(from_cs[0], "r")) == வெற்று)
 	    PERROR(_("cs_create_connection: fdopen for fr_fp failed"));
 
 	// close unused
-	(void)close(to_cs[0]);
-	(void)close(from_cs[1]);
+	(வெறுமை)close(to_cs[0]);
+	(வெறுமை)close(from_cs[1]);
     }
-# else
+# இல்லையெனில்
     // MSWIN
     vim_snprintf(cmd, cmdlen, "%s -dl -f %s", prog, csinfo[i].fname);
-    if (csinfo[i].ppath != NULL)
+    எனில் (csinfo[i].ppath != வெற்று)
     {
-	len = (int)STRLEN(cmd);
+	len = (முழு)STRLEN(cmd);
 	vim_snprintf(cmd + len, cmdlen - len, " -P%s", csinfo[i].ppath);
     }
-    if (csinfo[i].flags != NULL)
+    எனில் (csinfo[i].flags != வெற்று)
     {
-	len = (int)STRLEN(cmd);
+	len = (முழு)STRLEN(cmd);
 	vim_snprintf(cmd + len, cmdlen - len, " %s", csinfo[i].flags);
     }
     vim_free(ppath);
@@ -1079,17 +1079,17 @@ err_closing:
     si.wShowWindow = SW_HIDE;  // Hide child application window
     si.hStdOutput = stdout_wr;
     si.hStdError  = stdout_wr;
-    si.hStdInput  = stdin_rd;
-    created = CreateProcess(NULL, cmd, NULL, NULL, TRUE, CREATE_NEW_CONSOLE,
-							NULL, NULL, &si, &pi);
+    si.h_Std_உள்ளீடு  = stdin_rd;
+    created = CreateProcess(வெற்று, cmd, வெற்று, வெற்று, TRUE, CREATE_NEW_CONSOLE,
+							வெற்று, வெற்று, &si, &pi);
     vim_free(prog);
     vim_free(cmd);
 
-    if (!created)
+    எனில் (!created)
     {
 	PERROR(_("cs_create_connection exec failed"));
-	(void)emsg(_(e_could_not_spawn_cscope_process));
-	goto err_closing;
+	(வெறுமை)emsg(_(e_could_not_spawn_cscope_process));
+	செல் err_closing;
     }
     // else
     csinfo[i].pid = pi.dwProcessId;
@@ -1097,13 +1097,13 @@ err_closing:
     CloseHandle(pi.hThread);
 
     // TODO - tidy up after failure to create files on pipe handles.
-    if (((fd = _open_osfhandle((intptr_t)stdin_wr,
+    எனில் (((fd = _open_osfhandle((intptr_t)stdin_wr,
 						      _O_TEXT|_O_APPEND)) < 0)
-	    || ((csinfo[i].to_fp = _fdopen(fd, "w")) == NULL))
+	    || ((csinfo[i].to_fp = _fdopen(fd, "w")) == வெற்று))
 	PERROR(_("cs_create_connection: fdopen for to_fp failed"));
-    if (((fd = _open_osfhandle((intptr_t)stdout_rd,
+    எனில் (((fd = _open_osfhandle((intptr_t)stdout_rd,
 						      _O_TEXT|_O_RDONLY)) < 0)
-	    || ((csinfo[i].fr_fp = _fdopen(fd, "r")) == NULL))
+	    || ((csinfo[i].fr_fp = _fdopen(fd, "r")) == வெற்று))
 	PERROR(_("cs_create_connection: fdopen for fr_fp failed"));
 
     // Close handles for file descriptors inherited by the cscope process
@@ -1112,7 +1112,7 @@ err_closing:
 
 # endif // !UNIX
 
-    return CSCOPE_SUCCESS;
+    திரும்பு CSCOPE_SUCCESS;
 }
 
 
@@ -1122,40 +1122,40 @@ err_closing:
  *
  * returns TRUE if we jump to a tag or abort, FALSE if not.
  */
-    static int
+    நிலையான முழு
 cs_find(exarg_T *eap)
 {
-    char *opt, *pat;
-    int i;
+    எழுத்து *opt, *pat;
+    முழு i;
 
-    if (cs_check_for_connections() == FALSE)
+    எனில் (cs_check_for_connections() == FALSE)
     {
-	(void)emsg(_(e_no_cscope_connections));
-	return FALSE;
+	(வெறுமை)emsg(_(e_no_cscope_connections));
+	திரும்பு FALSE;
     }
 
-    if ((opt = strtok((char *)NULL, (const char *)" ")) == NULL)
+    எனில் ((opt = strtok((எழுத்து *)வெற்று, (மாறிலி எழுத்து *)" ")) == வெற்று)
     {
-	cs_usage_msg(Find);
-	return FALSE;
+	cs_usage_செய்தி(Find);
+	திரும்பு FALSE;
     }
 
     pat = opt + strlen(opt) + 1;
-    if (pat >= (char *)eap->arg + eap_arg_len)
+    எனில் (pat >= (எழுத்து *)eap->arg + eap_arg_len)
     {
-	cs_usage_msg(Find);
-	return FALSE;
+	cs_usage_செய்தி(Find);
+	திரும்பு FALSE;
     }
 
     /*
      * Let's replace the NULs written by strtok() with spaces - we need the
      * spaces to correctly display the quickfix/location list window's title.
      */
-    for (i = 0; i < eap_arg_len; ++i)
-	if (NUL == eap->arg[i])
+    க்கு (i = 0; i < eap_arg_len; ++i)
+	எனில் (NUL == eap->arg[i])
 	    eap->arg[i] = ' ';
 
-    return cs_find_common(opt, pat, eap->forceit, TRUE,
+    திரும்பு cs_find_common(opt, pat, eap->forceit, TRUE,
 				  eap->cmdidx == CMD_lcscope, *eap->cmdlinep);
 }
 
@@ -1163,76 +1163,76 @@ cs_find(exarg_T *eap)
 /*
  * Common code for cscope find, shared by cs_find() and ex_cstag().
  */
-    static int
+    நிலையான முழு
 cs_find_common(
-    char *opt,
-    char *pat,
-    int forceit,
-    int verbose,
-    int	use_ll UNUSED,
+    எழுத்து *opt,
+    எழுத்து *pat,
+    முழு forceit,
+    முழு verbose,
+    முழு	use_ll UNUSED,
     char_u *cmdline UNUSED)
 {
-    int i;
-    char *cmd;
-    int *nummatches;
-    int totmatches;
+    முழு i;
+    எழுத்து *cmd;
+    முழு *nummatches;
+    முழு totmatches;
 # ifdef FEAT_QUICKFIX
-    char cmdletter;
-    char *qfpos;
+    எழுத்து cmdletter;
+    எழுத்து *qfpos;
 
     // get cmd letter
-    switch (opt[0])
+    தேர்வு (opt[0])
     {
-    case '0' :
+    நிலை '0' :
 	cmdletter = 's';
-	break;
-    case '1' :
+	நிறுத்து;
+    நிலை '1' :
 	cmdletter = 'g';
-	break;
-    case '2' :
+	நிறுத்து;
+    நிலை '2' :
 	cmdletter = 'd';
-	break;
-    case '3' :
+	நிறுத்து;
+    நிலை '3' :
 	cmdletter = 'c';
-	break;
-    case '4' :
+	நிறுத்து;
+    நிலை '4' :
 	cmdletter = 't';
-	break;
-    case '6' :
+	நிறுத்து;
+    நிலை '6' :
 	cmdletter = 'e';
-	break;
-    case '7' :
+	நிறுத்து;
+    நிலை '7' :
 	cmdletter = 'f';
-	break;
-    case '8' :
+	நிறுத்து;
+    நிலை '8' :
 	cmdletter = 'i';
-	break;
-    case '9' :
+	நிறுத்து;
+    நிலை '9' :
 	cmdletter = 'a';
-	break;
-    default :
+	நிறுத்து;
+    இயல்பு :
 	cmdletter = opt[0];
     }
 
-    qfpos = (char *)vim_strchr(p_csqf, cmdletter);
-    if (qfpos != NULL)
+    qfpos = (எழுத்து *)vim_strchr(p_csqf, cmdletter);
+    எனில் (qfpos != வெற்று)
     {
 	qfpos++;
 	// next symbol must be + or -
-	if (strchr(CSQF_FLAGS, *qfpos) == NULL)
+	எனில் (strchr(CSQF_FLAGS, *qfpos) == வெற்று)
 	{
-	    (void)semsg(_(e_invalid_cscopequickfix_flag_chr_for_chr),
+	    (வெறுமை)semsg(_(e_invalid_cscopequickfix_flag_chr_for_chr),
 							 *qfpos, *(qfpos - 1));
-	    return FALSE;
+	    திரும்பு FALSE;
 	}
 
-	if (*qfpos != '0'
+	எனில் (*qfpos != '0'
 		&& apply_autocmds(EVENT_QUICKFIXCMDPRE, (char_u *)"cscope",
 					       curbuf->b_fname, TRUE, curbuf))
 	{
 #  ifdef FEAT_EVAL
-	    if (aborting())
-		return FALSE;
+	    எனில் (aborting())
+		திரும்பு FALSE;
 #  endif
 	}
     }
@@ -1240,80 +1240,80 @@ cs_find_common(
 
     // create the actual command to send to cscope
     cmd = cs_create_cmd(opt, pat);
-    if (cmd == NULL)
-	return FALSE;
+    எனில் (cmd == வெற்று)
+	திரும்பு FALSE;
 
-    nummatches = ALLOC_MULT(int, csinfo_size);
-    if (nummatches == NULL)
+    nummatches = ALLOC_MULT(முழு, csinfo_size);
+    எனில் (nummatches == வெற்று)
     {
 	vim_free(cmd);
-	return FALSE;
+	திரும்பு FALSE;
     }
 
     // Send query to all open connections, then count the total number
     // of matches so we can alloc all in one swell foop.
-    for (i = 0; i < csinfo_size; i++)
+    க்கு (i = 0; i < csinfo_size; i++)
 	nummatches[i] = 0;
     totmatches = 0;
-    for (i = 0; i < csinfo_size; i++)
+    க்கு (i = 0; i < csinfo_size; i++)
     {
-	if (csinfo[i].fname == NULL || csinfo[i].to_fp == NULL)
-	    continue;
+	எனில் (csinfo[i].fname == வெற்று || csinfo[i].to_fp == வெற்று)
+	    தொடர்;
 
 	// send cmd to cscope
-	(void)fprintf(csinfo[i].to_fp, "%s\n", cmd);
-	(void)fflush(csinfo[i].to_fp);
+	(வெறுமை)fprintf(csinfo[i].to_fp, "%s\n", cmd);
+	(வெறுமை)fflush(csinfo[i].to_fp);
 
 	nummatches[i] = cs_cnt_matches(i);
 
-	if (nummatches[i] > -1)
+	எனில் (nummatches[i] > -1)
 	    totmatches += nummatches[i];
 
-	if (nummatches[i] == 0)
-	    (void)cs_read_prompt(i);
+	எனில் (nummatches[i] == 0)
+	    (வெறுமை)cs_read_prompt(i);
     }
     vim_free(cmd);
 
-    if (totmatches == 0)
+    எனில் (totmatches == 0)
     {
-	if (verbose)
-	    (void)semsg(_(e_no_matches_found_for_cscope_query_str_of_str),
+	எனில் (verbose)
+	    (வெறுமை)semsg(_(e_no_matches_found_for_cscope_query_str_of_str),
 								     opt, pat);
 	vim_free(nummatches);
-	return FALSE;
+	திரும்பு FALSE;
     }
 
 # ifdef FEAT_QUICKFIX
-    if (qfpos != NULL && *qfpos != '0' && totmatches > 0)
+    எனில் (qfpos != வெற்று && *qfpos != '0' && totmatches > 0)
     {
 	// fill error list
 	FILE	    *f;
 	char_u	    *tmp = vim_tempname('c', TRUE);
-	qf_info_T   *qi = NULL;
-	win_T	    *wp = NULL;
+	qf_info_T   *qi = வெற்று;
+	win_T	    *wp = வெற்று;
 
-	if (tmp == NULL)
+	எனில் (tmp == வெற்று)
 	{
 	    vim_free(nummatches);
-	    return FALSE;
+	    திரும்பு FALSE;
 	}
 
-	f = mch_fopen((char *)tmp, "w");
-	if (f == NULL)
+	f = mch_fopen((எழுத்து *)tmp, "w");
+	எனில் (f == வெற்று)
 	    semsg(_(e_cant_open_file_str), tmp);
-	else
+	இல்லையெனில்
 	{
 	    cs_file_results(f, nummatches);
 	    fclose(f);
-	    if (use_ll)	    // Use location list
+	    எனில் (use_ll)	    // Use location list
 		wp = curwin;
 	    // '-' starts a new error list
-	    if (qf_init(wp, tmp, (char_u *)"%f%*\\t%l%*\\t%m",
-					  *qfpos == '-', cmdline, NULL) > 0)
+	    எனில் (qf_init(wp, tmp, (char_u *)"%f%*\\t%l%*\\t%m",
+					  *qfpos == '-', cmdline, வெற்று) > 0)
 	    {
-		if (postponed_split != 0)
+		எனில் (postponed_split != 0)
 		{
-		    (void)win_split(postponed_split > 0 ? postponed_split : 0,
+		    (வெறுமை)win_split(postponed_split > 0 ? postponed_split : 0,
 						       postponed_split_flags);
 		    RESET_BINDING(curwin);
 		    postponed_split = 0;
@@ -1321,12 +1321,12 @@ cs_find_common(
 
 		apply_autocmds(EVENT_QUICKFIXCMDPOST, (char_u *)"cscope",
 					       curbuf->b_fname, TRUE, curbuf);
-		if (use_ll)
+		எனில் (use_ll)
 		    /*
 		     * In the location list window, use the displayed location
 		     * list. Otherwise, use the location list for the window.
 		     */
-		    qi = (bt_quickfix(wp->w_buffer) && wp->w_llist_ref != NULL)
+		    qi = (bt_quickfix(wp->w_buffer) && wp->w_llist_ref != வெற்று)
 			?  wp->w_llist_ref : wp->w_llist;
 		qf_jump(qi, 0, 0, forceit);
 	    }
@@ -1334,24 +1334,24 @@ cs_find_common(
 	mch_remove(tmp);
 	vim_free(tmp);
 	vim_free(nummatches);
-	return TRUE;
+	திரும்பு TRUE;
     }
-    else
+    இல்லையெனில்
 # endif // FEAT_QUICKFIX
     {
-	char **matches = NULL, **contexts = NULL;
-	int matched = 0;
+	எழுத்து **matches = வெற்று, **contexts = வெற்று;
+	முழு matched = 0;
 
 	// read output
 	cs_fill_results(pat, totmatches, nummatches, &matches,
 							 &contexts, &matched);
 	vim_free(nummatches);
-	if (matches == NULL)
-	    return FALSE;
+	எனில் (matches == வெற்று)
+	    திரும்பு FALSE;
 
-	(void)cs_manage_matches(matches, contexts, matched, Store);
+	(வெறுமை)cs_manage_matches(matches, contexts, matched, Store);
 
-	return do_tag((char_u *)pat, DT_CSCOPE, 0, forceit, verbose);
+	திரும்பு do_tag((char_u *)pat, DT_CSCOPE, 0, forceit, verbose);
     }
 
 }
@@ -1359,26 +1359,26 @@ cs_find_common(
 /*
  * Print help.
  */
-    static int
+    நிலையான முழு
 cs_help(exarg_T *eap UNUSED)
 {
     cscmd_T *cmdp = cs_cmds;
 
-    (void)msg_puts(_("cscope commands:\n"));
-    while (cmdp->name != NULL)
+    (வெறுமை)செய்தி_puts(_("cscope commands:\n"));
+    போது (cmdp->name != வெற்று)
     {
-	char *help = _(cmdp->help);
-	int  space_cnt = 30 - vim_strsize((char_u *)help);
+	எழுத்து *help = _(cmdp->help);
+	முழு  space_cnt = 30 - vim_strsize((char_u *)help);
 
 	// Use %*s rather than %30s to ensure proper alignment in utf-8
-	if (space_cnt < 0)
+	எனில் (space_cnt < 0)
 	    space_cnt = 0;
-	(void)smsg(_("%-5s: %s%*s (Usage: %s)"),
+	(வெறுமை)smsg(_("%-5s: %s%*s (Usage: %s)"),
 				      cmdp->name,
 				      help, space_cnt, " ",
 				      cmdp->usage);
-	if (strcmp(cmdp->name, "find") == 0)
-	    msg_puts(_("\n"
+	எனில் (strcmp(cmdp->name, "find") == 0)
+	    செய்தி_puts(_("\n"
 		       "       a: Find assignments to this symbol\n"
 		       "       c: Find functions calling this function\n"
 		       "       d: Find functions called by this function\n"
@@ -1393,101 +1393,101 @@ cs_help(exarg_T *eap UNUSED)
     }
 
     wait_return(TRUE);
-    return 0;
+    திரும்பு 0;
 }
 
 
-    static void
-clear_csinfo(int i)
+    நிலையான வெறுமை
+clear_csinfo(முழு i)
 {
-    csinfo[i].fname  = NULL;
-    csinfo[i].ppath  = NULL;
-    csinfo[i].flags  = NULL;
-# if defined(UNIX)
+    csinfo[i].fname  = வெற்று;
+    csinfo[i].ppath  = வெற்று;
+    csinfo[i].flags  = வெற்று;
+# எனில் defined(UNIX)
     csinfo[i].st_dev = (dev_t)0;
     csinfo[i].st_ino = (ino_t)0;
-# else
+# இல்லையெனில்
     csinfo[i].nVolume = 0;
-    csinfo[i].nIndexHigh = 0;
-    csinfo[i].nIndexLow = 0;
+    csinfo[i].n_Index_உயர்வு = 0;
+    csinfo[i].n_Index_கீழ் = 0;
 # endif
     csinfo[i].pid    = 0;
-    csinfo[i].fr_fp  = NULL;
-    csinfo[i].to_fp  = NULL;
-# if defined(MSWIN)
-    csinfo[i].hProc = NULL;
+    csinfo[i].fr_fp  = வெற்று;
+    csinfo[i].to_fp  = வெற்று;
+# எனில் defined(MSWIN)
+    csinfo[i].hProc = வெற்று;
 # endif
 }
 
 /*
  * Insert a new cscope database filename into the filelist.
  */
-    static int
-cs_insert_filelist(
-    char *fname,
-    char *ppath,
-    char *flags,
+    நிலையான முழு
+cs_செருகு_filelist(
+    எழுத்து *fname,
+    எழுத்து *ppath,
+    எழுத்து *flags,
     stat_T *sb UNUSED)
 {
-    int	    i;
-    int	    j;
+    முழு	    i;
+    முழு	    j;
 # ifndef UNIX
     BY_HANDLE_FILE_INFORMATION bhfi;
 
-    switch (win32_fileinfo((char_u *)fname, &bhfi))
+    தேர்வு (win32_fileinfo((char_u *)fname, &bhfi))
     {
-	case FILEINFO_ENC_FAIL:		// enc_to_utf16() failed
-	case FILEINFO_READ_FAIL:	// CreateFile() failed
-	    if (p_csverbose)
+	நிலை FILEINFO_ENC_FAIL:		// enc_to_utf16() failed
+	நிலை FILEINFO_READ_FAIL:	// CreateFile() failed
+	    எனில் (p_csverbose)
 	    {
-		char *cant_msg = _(e_cannot_open_cscope_database_str);
-		char *winmsg = GetWin32Error();
+		எழுத்து *cant_செய்தி = _(e_cannot_open_cscope_database_str);
+		எழுத்து *winmsg = GetWin32Error();
 
-		if (winmsg != NULL)
-		    (void)semsg(cant_msg, winmsg);
-		else
+		எனில் (winmsg != வெற்று)
+		    (வெறுமை)semsg(cant_செய்தி, winmsg);
+		இல்லையெனில்
 		    // subst filename if can't get error text
-		    (void)semsg(cant_msg, fname);
+		    (வெறுமை)semsg(cant_செய்தி, fname);
 	    }
-	    return -1;
+	    திரும்பு -1;
 
-	case FILEINFO_INFO_FAIL:    // GetFileInformationByHandle() failed
-	    if (p_csverbose)
-		(void)emsg(_(e_cannot_get_cscope_database_information));
-	    return -1;
+	நிலை FILEINFO_INFO_FAIL:    // GetFileInformationByHandle() failed
+	    எனில் (p_csverbose)
+		(வெறுமை)emsg(_(e_cannot_get_cscope_database_information));
+	    திரும்பு -1;
     }
 # endif
 
     i = -1; // can be set to the index of an empty item in csinfo
-    for (j = 0; j < csinfo_size; j++)
+    க்கு (j = 0; j < csinfo_size; j++)
     {
-	if (csinfo[j].fname != NULL
-# if defined(UNIX)
+	எனில் (csinfo[j].fname != வெற்று
+# எனில் defined(UNIX)
 	    && csinfo[j].st_dev == sb->st_dev && csinfo[j].st_ino == sb->st_ino
-# else
+# இல்லையெனில்
 	    // compare pathnames first
 	    && ((fullpathcmp((char_u *)csinfo[j].fname,
 			(char_u *)fname, FALSE, TRUE) & FPC_SAME)
 		// test index file attributes too
-		|| (csinfo[j].nVolume == bhfi.dwVolumeSerialNumber
-		    && csinfo[j].nIndexHigh == bhfi.nFileIndexHigh
-		    && csinfo[j].nIndexLow == bhfi.nFileIndexLow))
+		|| (csinfo[j].nVolume == bhfi.dw_Volume_Serial_எண்
+		    && csinfo[j].n_Index_உயர்வு == bhfi.n_File_Index_உயர்வு
+		    && csinfo[j].n_Index_கீழ் == bhfi.n_File_Index_கீழ்))
 # endif
 	    )
 	{
-	    if (p_csverbose)
-		(void)emsg(_(e_duplicate_cscope_database_not_added));
-	    return -1;
+	    எனில் (p_csverbose)
+		(வெறுமை)emsg(_(e_duplicate_cscope_database_not_added));
+	    திரும்பு -1;
 	}
 
-	if (csinfo[j].fname == NULL && i == -1)
+	எனில் (csinfo[j].fname == வெற்று && i == -1)
 	    i = j; // remember first empty entry
     }
 
-    if (i == -1)
+    எனில் (i == -1)
     {
 	i = csinfo_size;
-	if (csinfo_size == 0)
+	எனில் (csinfo_size == 0)
 	{
 	    // First time allocation: allocate only 1 connection. It should
 	    // be enough for most users.  If more is needed, csinfo will be
@@ -1495,165 +1495,165 @@ cs_insert_filelist(
 	    csinfo_size = 1;
 	    csinfo = ALLOC_CLEAR_ONE(csinfo_T);
 	}
-	else
+	இல்லையெனில்
 	{
 	    csinfo_T *t_csinfo = csinfo;
 
 	    // Reallocate space for more connections.
 	    csinfo_size *= 2;
-	    csinfo = vim_realloc(csinfo, sizeof(csinfo_T)*csinfo_size);
-	    if (csinfo == NULL)
+	    csinfo = vim_realloc(csinfo, அளவு(csinfo_T)*csinfo_size);
+	    எனில் (csinfo == வெற்று)
 	    {
 		// allocation failure, so keep the old infos
 		csinfo = t_csinfo;
 		csinfo_size = i;
-		return -1;
+		திரும்பு -1;
 	    }
 	}
-	if (csinfo == NULL)
-	    return -1;
-	for (j = csinfo_size/2; j < csinfo_size; j++)
+	எனில் (csinfo == வெற்று)
+	    திரும்பு -1;
+	க்கு (j = csinfo_size/2; j < csinfo_size; j++)
 	    clear_csinfo(j);
     }
 
-    if ((csinfo[i].fname = alloc(strlen(fname)+1)) == NULL)
-	return -1;
+    எனில் ((csinfo[i].fname = alloc(strlen(fname)+1)) == வெற்று)
+	திரும்பு -1;
 
-    vim_strncpy((char_u *)csinfo[i].fname, (char_u *)fname, strlen((const char *)fname));
+    vim_strncpy((char_u *)csinfo[i].fname, (char_u *)fname, strlen((மாறிலி எழுத்து *)fname));
 
-    if (ppath != NULL)
+    எனில் (ppath != வெற்று)
     {
-	if ((csinfo[i].ppath = alloc(strlen(ppath) + 1)) == NULL)
+	எனில் ((csinfo[i].ppath = alloc(strlen(ppath) + 1)) == வெற்று)
 	{
 	    VIM_CLEAR(csinfo[i].fname);
-	    return -1;
+	    திரும்பு -1;
 	}
-	vim_strncpy((char_u *)csinfo[i].ppath, (char_u *)ppath, strlen((const char *)ppath));
+	vim_strncpy((char_u *)csinfo[i].ppath, (char_u *)ppath, strlen((மாறிலி எழுத்து *)ppath));
     }
-    else
-	csinfo[i].ppath = NULL;
+    இல்லையெனில்
+	csinfo[i].ppath = வெற்று;
 
-    if (flags != NULL)
+    எனில் (flags != வெற்று)
     {
-	if ((csinfo[i].flags = alloc(strlen(flags) + 1)) == NULL)
+	எனில் ((csinfo[i].flags = alloc(strlen(flags) + 1)) == வெற்று)
 	{
 	    VIM_CLEAR(csinfo[i].fname);
 	    VIM_CLEAR(csinfo[i].ppath);
-	    return -1;
+	    திரும்பு -1;
 	}
-	vim_strncpy((char_u *)csinfo[i].flags, (char_u *)flags, strlen((const char *)flags));
+	vim_strncpy((char_u *)csinfo[i].flags, (char_u *)flags, strlen((மாறிலி எழுத்து *)flags));
     }
-    else
-	csinfo[i].flags = NULL;
+    இல்லையெனில்
+	csinfo[i].flags = வெற்று;
 
-# if defined(UNIX)
+# எனில் defined(UNIX)
     csinfo[i].st_dev = sb->st_dev;
     csinfo[i].st_ino = sb->st_ino;
 
-# else
-    csinfo[i].nVolume = bhfi.dwVolumeSerialNumber;
-    csinfo[i].nIndexLow = bhfi.nFileIndexLow;
-    csinfo[i].nIndexHigh = bhfi.nFileIndexHigh;
+# இல்லையெனில்
+    csinfo[i].nVolume = bhfi.dw_Volume_Serial_எண்;
+    csinfo[i].n_Index_கீழ் = bhfi.n_File_Index_கீழ்;
+    csinfo[i].n_Index_உயர்வு = bhfi.n_File_Index_உயர்வு;
 # endif
-    return i;
+    திரும்பு i;
 }
 
 
 /*
  * Find cscope command in command table.
  */
-    static cscmd_T *
+    நிலையான cscmd_T *
 cs_lookup_cmd(exarg_T *eap)
 {
     cscmd_T *cmdp;
-    char *stok;
+    எழுத்து *stok;
     size_t len;
 
-    if (eap->arg == NULL)
-	return NULL;
+    எனில் (eap->arg == வெற்று)
+	திரும்பு வெற்று;
 
     // Store length of eap->arg before it gets modified by strtok().
-    eap_arg_len = (int)STRLEN(eap->arg);
+    eap_arg_len = (முழு)STRLEN(eap->arg);
 
-    if ((stok = strtok((char *)(eap->arg), (const char *)" ")) == NULL)
-	return NULL;
+    எனில் ((stok = strtok((எழுத்து *)(eap->arg), (மாறிலி எழுத்து *)" ")) == வெற்று)
+	திரும்பு வெற்று;
 
     len = strlen(stok);
-    for (cmdp = cs_cmds; cmdp->name != NULL; ++cmdp)
+    க்கு (cmdp = cs_cmds; cmdp->name != வெற்று; ++cmdp)
     {
-	if (strncmp((const char *)(stok), cmdp->name, len) == 0)
-	    return (cmdp);
+	எனில் (strncmp((மாறிலி எழுத்து *)(stok), cmdp->name, len) == 0)
+	    திரும்பு (cmdp);
     }
-    return NULL;
+    திரும்பு வெற்று;
 }
 
 
 /*
  * Nuke em.
  */
-    static int
+    நிலையான முழு
 cs_kill(exarg_T *eap UNUSED)
 {
-    char *stok;
-    int i;
+    எழுத்து *stok;
+    முழு i;
 
-    if ((stok = strtok((char *)NULL, (const char *)" ")) == NULL)
+    எனில் ((stok = strtok((எழுத்து *)வெற்று, (மாறிலி எழுத்து *)" ")) == வெற்று)
     {
-	cs_usage_msg(Kill);
-	return CSCOPE_FAILURE;
+	cs_usage_செய்தி(Kill);
+	திரும்பு CSCOPE_FAILURE;
     }
 
     // only single digit positive and negative integers are allowed
-    if ((strlen(stok) < 2 && VIM_ISDIGIT((int)(stok[0])))
+    எனில் ((strlen(stok) < 2 && VIM_ISDIGIT((முழு)(stok[0])))
 	    || (strlen(stok) < 3 && stok[0] == '-'
-					      && VIM_ISDIGIT((int)(stok[1]))))
+					      && VIM_ISDIGIT((முழு)(stok[1]))))
 	i = atoi(stok);
-    else
+    இல்லையெனில்
     {
 	// It must be part of a name.  We will try to find a match
 	// within all the names in the csinfo data structure
-	for (i = 0; i < csinfo_size; i++)
+	க்கு (i = 0; i < csinfo_size; i++)
 	{
-	    if (csinfo[i].fname != NULL && strstr(csinfo[i].fname, stok))
-		break;
+	    எனில் (csinfo[i].fname != வெற்று && strstr(csinfo[i].fname, stok))
+		நிறுத்து;
 	}
     }
 
-    if ((i != -1) && (i >= csinfo_size || i < -1 || csinfo[i].fname == NULL))
+    எனில் ((i != -1) && (i >= csinfo_size || i < -1 || csinfo[i].fname == வெற்று))
     {
-	if (p_csverbose)
-	    (void)semsg(_(e_cscope_connection_str_not_founc), stok);
+	எனில் (p_csverbose)
+	    (வெறுமை)semsg(_(e_cscope_connection_str_not_founc), stok);
     }
-    else
+    இல்லையெனில்
     {
-	if (i == -1)
+	எனில் (i == -1)
 	{
-	    for (i = 0; i < csinfo_size; i++)
+	    க்கு (i = 0; i < csinfo_size; i++)
 	    {
-		if (csinfo[i].fname)
+		எனில் (csinfo[i].fname)
 		    cs_kill_execute(i, csinfo[i].fname);
 	    }
 	}
-	else
+	இல்லையெனில்
 	    cs_kill_execute(i, stok);
     }
 
-    return 0;
+    திரும்பு 0;
 }
 
 
 /*
  * Actually kills a specific cscope connection.
  */
-    static void
+    நிலையான வெறுமை
 cs_kill_execute(
-    int i,	    // cscope table index
-    char *cname)    // cscope database name
+    முழு i,	    // cscope table index
+    எழுத்து *cname)    // cscope database name
 {
-    if (p_csverbose)
+    எனில் (p_csverbose)
     {
-	msg_clr_eos();
-	(void)smsg_attr(HL_ATTR(HLF_R) | MSG_HIST,
+	செய்தி_clr_eos();
+	(வெறுமை)smsg_attr(HL_ATTR(HLF_R) | செய்தி_HIST,
 			_("cscope connection %s closed"), cname);
     }
     cs_release_csp(i, TRUE);
@@ -1678,12 +1678,12 @@ cs_kill_execute(
  * would still have to be modified to escape all the special regular expression
  * characters to comply with ctags formatting.
  */
-    static char *
+    நிலையான எழுத்து *
 cs_make_vim_style_matches(
-    char *fname,
-    char *slno,
-    char *search,
-    char *tagstr)
+    எழுத்து *fname,
+    எழுத்து *slno,
+    எழுத்து *தேடல்,
+    எழுத்து *tagstr)
 {
     // vim style is ctags:
     //
@@ -1695,27 +1695,27 @@ cs_make_vim_style_matches(
     // buf is used as part of vim's method of handling tags, and
     // (i think) vim frees it when you pop your tags and get replaced
     // by new ones on the tag stack.
-    char *buf;
-    int amt;
+    எழுத்து *buf;
+    முழு amt;
 
-    if (search != NULL)
+    எனில் (தேடல் != வெற்று)
     {
-	amt = (int)(strlen(fname) + strlen(slno) + strlen(tagstr) + strlen(search)+6);
-	if ((buf = alloc(amt)) == NULL)
-	    return NULL;
+	amt = (முழு)(strlen(fname) + strlen(slno) + strlen(tagstr) + strlen(தேடல்)+6);
+	எனில் ((buf = alloc(amt)) == வெற்று)
+	    திரும்பு வெற்று;
 
-	(void)sprintf(buf, "%s\t%s\t%s;\"\t%s", tagstr, fname, slno, search);
+	(வெறுமை)sprintf(buf, "%s\t%s\t%s;\"\t%s", tagstr, fname, slno, தேடல்);
     }
-    else
+    இல்லையெனில்
     {
-	amt = (int)(strlen(fname) + strlen(slno) + strlen(tagstr) + 5);
-	if ((buf = alloc(amt)) == NULL)
-	    return NULL;
+	amt = (முழு)(strlen(fname) + strlen(slno) + strlen(tagstr) + 5);
+	எனில் ((buf = alloc(amt)) == வெற்று)
+	    திரும்பு வெற்று;
 
-	(void)sprintf(buf, "%s\t%s\t%s;\"", tagstr, fname, slno);
+	(வெறுமை)sprintf(buf, "%s\t%s\t%s;\"", tagstr, fname, slno);
     }
 
-    return buf;
+    திரும்பு buf;
 }
 
 
@@ -1735,100 +1735,100 @@ cs_make_vim_style_matches(
  *
  * Print: prints the tags
  */
-    static char *
+    நிலையான எழுத்து *
 cs_manage_matches(
-    char **matches,
-    char **contexts,
-    int totmatches,
+    எழுத்து **matches,
+    எழுத்து **contexts,
+    முழு totmatches,
     mcmd_e cmd)
 {
-    static char **mp = NULL;
-    static char **cp = NULL;
-    static int cnt = -1;
-    static int next = -1;
-    char *p = NULL;
+    நிலையான எழுத்து **mp = வெற்று;
+    நிலையான எழுத்து **cp = வெற்று;
+    நிலையான முழு cnt = -1;
+    நிலையான முழு next = -1;
+    எழுத்து *p = வெற்று;
 
-    switch (cmd)
+    தேர்வு (cmd)
     {
-    case Store:
-	assert(matches != NULL);
-	assert(totmatches > 0);
-	if (mp != NULL || cp != NULL)
-	    (void)cs_manage_matches(NULL, NULL, -1, Free);
+    நிலை Store:
+	ப்ரதிஜ்ஞா(matches != வெற்று);
+	ப்ரதிஜ்ஞா(totmatches > 0);
+	எனில் (mp != வெற்று || cp != வெற்று)
+	    (வெறுமை)cs_manage_matches(வெற்று, வெற்று, -1, Free);
 	mp = matches;
 	cp = contexts;
 	cnt = totmatches;
 	next = 0;
-	break;
-    case Get:
-	if (next >= cnt)
-	    return NULL;
+	நிறுத்து;
+    நிலை Get:
+	எனில் (next >= cnt)
+	    திரும்பு வெற்று;
 
 	p = mp[next];
 	next++;
-	break;
-    case Free:
-	if (mp != NULL)
+	நிறுத்து;
+    நிலை Free:
+	எனில் (mp != வெற்று)
 	{
-	    if (cnt > 0)
-		while (cnt--)
+	    எனில் (cnt > 0)
+		போது (cnt--)
 		{
 		    vim_free(mp[cnt]);
-		    if (cp != NULL)
+		    எனில் (cp != வெற்று)
 			vim_free(cp[cnt]);
 		}
 	    vim_free(mp);
 	    vim_free(cp);
 	}
-	mp = NULL;
-	cp = NULL;
+	mp = வெற்று;
+	cp = வெற்று;
 	cnt = 0;
 	next = 0;
-	break;
-    case Print:
+	நிறுத்து;
+    நிலை Print:
 	cs_print_tags_priv(mp, cp, cnt);
-	break;
-    default:	// should not reach here
+	நிறுத்து;
+    இயல்பு:	// should not reach here
 	iemsg(e_fatal_error_in_cs_manage_matches);
-	return NULL;
+	திரும்பு வெற்று;
     }
 
-    return p;
+    திரும்பு p;
 }
 
 
 /*
  * Parse cscope output.
  */
-    static char *
+    நிலையான எழுத்து *
 cs_parse_results(
-    int cnumber,
-    char *buf,
-    int bufsize,
-    char **context,
-    char **linenumber,
-    char **search)
+    முழு cnumber,
+    எழுத்து *buf,
+    முழு bufsize,
+    எழுத்து **context,
+    எழுத்து **linenumber,
+    எழுத்து **தேடல்)
 {
-    int ch;
-    char *p;
-    char *name;
+    முழு ch;
+    எழுத்து *p;
+    எழுத்து *name;
 
-    if (fgets(buf, bufsize, csinfo[cnumber].fr_fp) == NULL)
+    எனில் (fgets(buf, bufsize, csinfo[cnumber].fr_fp) == வெற்று)
     {
-	if (feof(csinfo[cnumber].fr_fp))
+	எனில் (feof(csinfo[cnumber].fr_fp))
 	    errno = EIO;
 
 	cs_reading_emsg(cnumber);
 
-	return NULL;
+	திரும்பு வெற்று;
     }
 
     // If the line's too long for the buffer, discard it.
-    if ((p = strchr(buf, '\n')) == NULL)
+    எனில் ((p = strchr(buf, '\n')) == வெற்று)
     {
-	while ((ch = getc(csinfo[cnumber].fr_fp)) != EOF && ch != '\n')
+	போது ((ch = getc(csinfo[cnumber].fr_fp)) != EOF && ch != '\n')
 	    ;
-	return NULL;
+	திரும்பு வெற்று;
     }
     *p = '\0';
 
@@ -1837,76 +1837,76 @@ cs_parse_results(
      *
      *	<filename> <context> <line number> <pattern>
      */
-    if ((name = strtok(buf, (const char *)" ")) == NULL)
-	return NULL;
-    if ((*context = strtok(NULL, (const char *)" ")) == NULL)
-	return NULL;
-    if ((*linenumber = strtok(NULL, (const char *)" ")) == NULL)
-	return NULL;
-    *search = *linenumber + strlen(*linenumber) + 1;	// +1 to skip \0
+    எனில் ((name = strtok(buf, (மாறிலி எழுத்து *)" ")) == வெற்று)
+	திரும்பு வெற்று;
+    எனில் ((*context = strtok(வெற்று, (மாறிலி எழுத்து *)" ")) == வெற்று)
+	திரும்பு வெற்று;
+    எனில் ((*linenumber = strtok(வெற்று, (மாறிலி எழுத்து *)" ")) == வெற்று)
+	திரும்பு வெற்று;
+    *தேடல் = *linenumber + strlen(*linenumber) + 1;	// +1 to skip \0
 
     // --- nvi ---
     // If the file is older than the cscope database, that is,
     // the database was built since the file was last modified,
     // or there wasn't a search string, use the line number.
-    if (strcmp(*search, "<unknown>") == 0)
-	*search = NULL;
+    எனில் (strcmp(*தேடல், "<unknown>") == 0)
+	*தேடல் = வெற்று;
 
     name = cs_resolve_file(cnumber, name);
-    return name;
+    திரும்பு name;
 }
 
 # ifdef FEAT_QUICKFIX
 /*
  * Write cscope find results to file.
  */
-    static void
-cs_file_results(FILE *f, int *nummatches_a)
+    நிலையான வெறுமை
+cs_file_results(FILE *f, முழு *nummatches_a)
 {
-    int i, j;
-    char *buf;
-    char *search, *slno;
-    char *fullname;
-    char *cntx;
-    char *context;
+    முழு i, j;
+    எழுத்து *buf;
+    எழுத்து *தேடல், *slno;
+    எழுத்து *fullname;
+    எழுத்து *cntx;
+    எழுத்து *context;
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
 
-    for (i = 0; i < csinfo_size; i++)
+    க்கு (i = 0; i < csinfo_size; i++)
     {
-	if (nummatches_a[i] < 1)
-	    continue;
+	எனில் (nummatches_a[i] < 1)
+	    தொடர்;
 
-	for (j = 0; j < nummatches_a[i]; j++)
+	க்கு (j = 0; j < nummatches_a[i]; j++)
 	{
-	   if ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
-			   &slno, &search)) == NULL)
-	       continue;
+	   எனில் ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
+			   &slno, &தேடல்)) == வெற்று)
+	       தொடர்;
 
 	   context = alloc(strlen(cntx)+5);
-	   if (context == NULL)
+	   எனில் (context == வெற்று)
 	   {
 	       vim_free(fullname);
-	       continue;
+	       தொடர்;
 	   }
 
-	   if (strcmp(cntx, "<global>")==0)
+	   எனில் (strcmp(cntx, "<global>")==0)
 	       strcpy(context, "<<global>>");
-	   else
+	   இல்லையெனில்
 	       sprintf(context, "<<%s>>", cntx);
 
-	   if (search == NULL)
+	   எனில் (தேடல் == வெற்று)
 	       fprintf(f, "%s\t%s\t%s\n", fullname, slno, context);
-	   else
-	       fprintf(f, "%s\t%s\t%s %s\n", fullname, slno, context, search);
+	   இல்லையெனில்
+	       fprintf(f, "%s\t%s\t%s %s\n", fullname, slno, context, தேடல்);
 
 	   vim_free(context);
 	   vim_free(fullname);
 	} // for all matches
 
-	(void)cs_read_prompt(i);
+	(வெறுமை)cs_read_prompt(i);
 
     } // for all cscope connections
     vim_free(buf);
@@ -1918,69 +1918,69 @@ cs_file_results(FILE *f, int *nummatches_a)
  * into ctags format.
  * When there are no matches sets "*matches_p" to NULL.
  */
-    static void
+    நிலையான வெறுமை
 cs_fill_results(
-    char *tagstr,
-    int totmatches,
-    int *nummatches_a,
-    char ***matches_p,
-    char ***cntxts_p,
-    int *matched)
+    எழுத்து *tagstr,
+    முழு totmatches,
+    முழு *nummatches_a,
+    எழுத்து ***matches_p,
+    எழுத்து ***cntxts_p,
+    முழு *matched)
 {
-    int i, j;
-    char *buf;
-    char *search, *slno;
-    int totsofar = 0;
-    char **matches = NULL;
-    char **cntxts = NULL;
-    char *fullname;
-    char *cntx;
+    முழு i, j;
+    எழுத்து *buf;
+    எழுத்து *தேடல், *slno;
+    முழு totsofar = 0;
+    எழுத்து **matches = வெற்று;
+    எழுத்து **cntxts = வெற்று;
+    எழுத்து *fullname;
+    எழுத்து *cntx;
 
-    assert(totmatches > 0);
+    ப்ரதிஜ்ஞா(totmatches > 0);
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
 
-    if ((matches = ALLOC_MULT(char *, totmatches)) == NULL)
-	goto parse_out;
-    if ((cntxts = ALLOC_MULT(char *, totmatches)) == NULL)
-	goto parse_out;
+    எனில் ((matches = ALLOC_MULT(எழுத்து *, totmatches)) == வெற்று)
+	செல் parse_out;
+    எனில் ((cntxts = ALLOC_MULT(எழுத்து *, totmatches)) == வெற்று)
+	செல் parse_out;
 
-    for (i = 0; i < csinfo_size; i++)
+    க்கு (i = 0; i < csinfo_size; i++)
     {
-	if (nummatches_a[i] < 1)
-	    continue;
+	எனில் (nummatches_a[i] < 1)
+	    தொடர்;
 
-	for (j = 0; j < nummatches_a[i]; j++)
+	க்கு (j = 0; j < nummatches_a[i]; j++)
 	{
-	   if ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
-			   &slno, &search)) == NULL)
-		continue;
+	   எனில் ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
+			   &slno, &தேடல்)) == வெற்று)
+		தொடர்;
 
 	    matches[totsofar] = cs_make_vim_style_matches(fullname, slno,
-							  search, tagstr);
+							  தேடல், tagstr);
 
 	    vim_free(fullname);
 
-	    if (strcmp(cntx, "<global>") == 0)
-		cntxts[totsofar] = NULL;
-	    else
+	    எனில் (strcmp(cntx, "<global>") == 0)
+		cntxts[totsofar] = வெற்று;
+	    இல்லையெனில்
 		// note: if vim_strsave returns NULL, then the context
 		// will be "<global>", which is misleading.
-		cntxts[totsofar] = (char *)vim_strsave((char_u *)cntx);
+		cntxts[totsofar] = (எழுத்து *)vim_strsave((char_u *)cntx);
 
-	    if (matches[totsofar] != NULL)
+	    எனில் (matches[totsofar] != வெற்று)
 		totsofar++;
 
 	} // for all matches
 
-	(void)cs_read_prompt(i);
+	(வெறுமை)cs_read_prompt(i);
 
     } // for all cscope connections
 
 parse_out:
-    if (totsofar == 0)
+    எனில் (totsofar == 0)
     {
 	// No matches, free the arrays and return NULL in "*matches_p".
 	VIM_CLEAR(matches);
@@ -1997,180 +1997,180 @@ parse_out:
 /*
  * get the requested path components
  */
-    static char *
-cs_pathcomponents(char *path)
+    நிலையான எழுத்து *
+cs_pathcomponents(எழுத்து *path)
 {
-    int		i;
-    char	*s;
+    முழு		i;
+    எழுத்து	*s;
 
-    if (p_cspc == 0)
-	return path;
+    எனில் (p_cspc == 0)
+	திரும்பு path;
 
     s = path + strlen(path) - 1;
-    for (i = 0; i < p_cspc; ++i)
+    க்கு (i = 0; i < p_cspc; ++i)
     {
-	while (s > path)
+	போது (s > path)
 	{
 	   s--;
-	   if (*s == '/'
+	   எனில் (*s == '/'
 # ifdef MSWIN
 		|| *s == '\\'
 # endif
 		)
-	      break;
+	      நிறுத்து;
 	}
     }
-    if ((s > path && *s == '/')
+    எனில் ((s > path && *s == '/')
 # ifdef MSWIN
 	|| (s > path && *s == '\\')
 # endif
 	    )
 	++s;
-    return s;
+    திரும்பு s;
 }
 
 /*
  * Called from cs_manage_matches().
  */
-    static void
-cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
+    நிலையான வெறுமை
+cs_print_tags_priv(எழுத்து **matches, எழுத்து **cntxts, முழு இலக்கம்_matches)
 {
-    char	*buf = NULL;
-    char	*t_buf;
-    int		bufsize = 0; // Track available bufsize
-    int		newsize = 0;
-    char	*ptag;
-    char	*fname, *lno, *extra, *tbuf;
-    int		i, idx, num;
-    char	*globalcntx = "GLOBAL";
-    char	*cntxformat = " <<%s>>";
-    char	*context;
-    char	*cstag_msg = _("Cscope tag: %s");
-    char	*csfmt_str = "%4d %6s  ";
+    எழுத்து	*buf = வெற்று;
+    எழுத்து	*t_buf;
+    முழு		bufsize = 0; // Track available bufsize
+    முழு		newsize = 0;
+    எழுத்து	*ptag;
+    எழுத்து	*fname, *lno, *extra, *tbuf;
+    முழு		i, idx, இலக்கம்;
+    எழுத்து	*globalcntx = "GLOBAL";
+    எழுத்து	*cntxformat = " <<%s>>";
+    எழுத்து	*context;
+    எழுத்து	*cstag_செய்தி = _("Cscope tag: %s");
+    எழுத்து	*csfmt_str = "%4d %6s  ";
 
-    assert(num_matches > 0);
+    ப்ரதிஜ்ஞா(இலக்கம்_matches > 0);
 
-    if ((tbuf = alloc(strlen(matches[0]) + 1)) == NULL)
-	return;
+    எனில் ((tbuf = alloc(strlen(matches[0]) + 1)) == வெற்று)
+	திரும்பு;
 
     strcpy(tbuf, matches[0]);
     ptag = strtok(tbuf, "\t");
-    if (ptag == NULL)
+    எனில் (ptag == வெற்று)
     {
 	vim_free(tbuf);
-	return;
+	திரும்பு;
     }
 
-    newsize = (int)(strlen(cstag_msg) + strlen(ptag));
+    newsize = (முழு)(strlen(cstag_செய்தி) + strlen(ptag));
     buf = alloc(newsize);
-    if (buf != NULL)
+    எனில் (buf != வெற்று)
     {
 	bufsize = newsize;
-	(void)sprintf(buf, cstag_msg, ptag);
-	msg_puts_attr(buf, HL_ATTR(HLF_T));
+	(வெறுமை)sprintf(buf, cstag_செய்தி, ptag);
+	செய்தி_puts_attr(buf, HL_ATTR(HLF_T));
     }
 
     vim_free(tbuf);
 
-    msg_puts_attr(_("\n   #   line"), HL_ATTR(HLF_T));    // strlen is 7
-    msg_advance(msg_col + 2);
-    msg_puts_attr(_("filename / context / line\n"), HL_ATTR(HLF_T));
+    செய்தி_puts_attr(_("\n   #   line"), HL_ATTR(HLF_T));    // strlen is 7
+    செய்தி_advance(செய்தி_col + 2);
+    செய்தி_puts_attr(_("filename / context / line\n"), HL_ATTR(HLF_T));
 
-    num = 1;
-    for (i = 0; i < num_matches; i++)
+    இலக்கம் = 1;
+    க்கு (i = 0; i < இலக்கம்_matches; i++)
     {
 	idx = i;
 
 	// if we really wanted to, we could avoid this malloc and strcpy
 	// by parsing matches[i] on the fly and placing stuff into buf
 	// directly, but that's too much of a hassle
-	if ((tbuf = alloc(strlen(matches[idx]) + 1)) == NULL)
-	    continue;
-	(void)strcpy(tbuf, matches[idx]);
+	எனில் ((tbuf = alloc(strlen(matches[idx]) + 1)) == வெற்று)
+	    தொடர்;
+	(வெறுமை)strcpy(tbuf, matches[idx]);
 
-	if (strtok(tbuf, (const char *)"\t") == NULL
-		|| (fname = strtok(NULL, (const char *)"\t")) == NULL
-		|| (lno = strtok(NULL, (const char *)"\t")) == NULL)
+	எனில் (strtok(tbuf, (மாறிலி எழுத்து *)"\t") == வெற்று
+		|| (fname = strtok(வெற்று, (மாறிலி எழுத்து *)"\t")) == வெற்று
+		|| (lno = strtok(வெற்று, (மாறிலி எழுத்து *)"\t")) == வெற்று)
 	{
 	    vim_free(tbuf);
-	    continue;
+	    தொடர்;
 	}
-	extra = strtok(NULL, (const char *)"\t");
+	extra = strtok(வெற்று, (மாறிலி எழுத்து *)"\t");
 
 	lno[strlen(lno)-2] = '\0';  // ignore ;" at the end
 
 	// hopefully 'num' (num of matches) will be less than 10^16
-	newsize = (int)(strlen(csfmt_str) + 16 + strlen(lno));
-	if (bufsize < newsize)
+	newsize = (முழு)(strlen(csfmt_str) + 16 + strlen(lno));
+	எனில் (bufsize < newsize)
 	{
 	    t_buf = buf;
 	    buf = vim_realloc(buf, newsize);
-	    if (buf == NULL)
+	    எனில் (buf == வெற்று)
 	    {
 		bufsize = 0;
 		vim_free(t_buf);
 	    }
-	    else
+	    இல்லையெனில்
 		bufsize = newsize;
 	}
-	if (buf != NULL)
+	எனில் (buf != வெற்று)
 	{
 	    // csfmt_str = "%4d %6s  ";
-	    (void)sprintf(buf, csfmt_str, num, lno);
-	    msg_puts_attr(buf, HL_ATTR(HLF_CM));
+	    (வெறுமை)sprintf(buf, csfmt_str, இலக்கம், lno);
+	    செய்தி_puts_attr(buf, HL_ATTR(HLF_CM));
 	}
-	msg_outtrans_long_attr((char_u *)cs_pathcomponents(fname),
+	செய்தி_outtrans_long_attr((char_u *)cs_pathcomponents(fname),
 							      HL_ATTR(HLF_CM));
 
 	// compute the required space for the context
-	if (cntxts[idx] != NULL)
+	எனில் (cntxts[idx] != வெற்று)
 	    context = cntxts[idx];
-	else
+	இல்லையெனில்
 	    context = globalcntx;
-	newsize = (int)(strlen(context) + strlen(cntxformat));
+	newsize = (முழு)(strlen(context) + strlen(cntxformat));
 
-	if (bufsize < newsize)
+	எனில் (bufsize < newsize)
 	{
 	    t_buf = buf;
 	    buf = vim_realloc(buf, newsize);
-	    if (buf == NULL)
+	    எனில் (buf == வெற்று)
 	    {
 		bufsize = 0;
 		vim_free(t_buf);
 	    }
-	    else
+	    இல்லையெனில்
 		bufsize = newsize;
 	}
-	if (buf != NULL)
+	எனில் (buf != வெற்று)
 	{
-	    (void)sprintf(buf, cntxformat, context);
+	    (வெறுமை)sprintf(buf, cntxformat, context);
 
 	    // print the context only if it fits on the same line
-	    if (msg_col + (int)strlen(buf) >= cmdline_width)
-		msg_putchar('\n');
-	    msg_advance(12);
-	    msg_outtrans_long_attr((char_u *)buf, 0);
-	    msg_putchar('\n');
+	    எனில் (செய்தி_col + (முழு)strlen(buf) >= cmdline_width)
+		செய்தி_putchar('\n');
+	    செய்தி_advance(12);
+	    செய்தி_outtrans_long_attr((char_u *)buf, 0);
+	    செய்தி_putchar('\n');
 	}
-	if (extra != NULL)
+	எனில் (extra != வெற்று)
 	{
-	    msg_advance(13);
-	    msg_outtrans_long_attr((char_u *)extra, 0);
+	    செய்தி_advance(13);
+	    செய்தி_outtrans_long_attr((char_u *)extra, 0);
 	}
 
 	vim_free(tbuf); // only after printing extra due to strtok use
 
-	if (msg_col)
-	    msg_putchar('\n');
+	எனில் (செய்தி_col)
+	    செய்தி_putchar('\n');
 
 	ui_breakcheck();
-	if (got_int)
+	எனில் (got_int)
 	{
 	    got_int = FALSE;	// don't print any more matches
-	    break;
+	    நிறுத்து;
 	}
 
-	num++;
+	இலக்கம்++;
     } // for all matches
 
     vim_free(buf);
@@ -2180,46 +2180,46 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
 /*
  * Read a cscope prompt (basically, skip over the ">> ").
  */
-    static int
-cs_read_prompt(int i)
+    நிலையான முழு
+cs_read_prompt(முழு i)
 {
-    int		ch;
-    char	*buf = NULL; // buffer for possible error message from cscope
-    int		bufpos = 0;
-    int		maxlen;
-    static char *eprompt = "Press the RETURN key to continue:";
-    int		epromptlen = (int)strlen(eprompt);
-    int		n;
+    முழு		ch;
+    எழுத்து	*buf = வெற்று; // buffer for possible error message from cscope
+    முழு		bufpos = 0;
+    முழு		maxlen;
+    நிலையான எழுத்து *eprompt = "Press the RETURN key to continue:";
+    முழு		epromptlen = (முழு)strlen(eprompt);
+    முழு		n;
 
     // compute maximum allowed len for Cscope error message
-    char *cs_emsg = _(e_cscope_error_str);
-    maxlen = (int)(IOSIZE - strlen(cs_emsg));
+    எழுத்து *cs_emsg = _(e_cscope_error_str);
+    maxlen = (முழு)(IOSIZE - strlen(cs_emsg));
 
-    for (;;)
+    க்கு (;;)
     {
-	while ((ch = getc(csinfo[i].fr_fp)) != EOF && ch != CSCOPE_PROMPT[0])
+	போது ((ch = getc(csinfo[i].fr_fp)) != EOF && ch != CSCOPE_PROMPT[0])
 	    // if there is room and char is printable
-	    if (bufpos < maxlen - 1 && vim_isprintc(ch))
+	    எனில் (bufpos < maxlen - 1 && vim_isprintc(ch))
 	    {
-		if (buf == NULL) // lazy buffer allocation
+		எனில் (buf == வெற்று) // lazy buffer allocation
 		    buf = alloc(maxlen);
-		if (buf != NULL)
+		எனில் (buf != வெற்று)
 		{
 		    // append character to the message
 		    buf[bufpos++] = ch;
 		    buf[bufpos] = NUL;
-		    if (bufpos >= epromptlen
+		    எனில் (bufpos >= epromptlen
 			    && strcmp(&buf[bufpos - epromptlen], eprompt) == 0)
 		    {
 			// remove eprompt from buf
 			buf[bufpos - epromptlen] = NUL;
 
 			// print message to user
-			(void)semsg(cs_emsg, buf);
+			(வெறுமை)semsg(cs_emsg, buf);
 
 			// send RETURN to cscope
-			(void)putc('\n', csinfo[i].to_fp);
-			(void)fflush(csinfo[i].to_fp);
+			(வெறுமை)putc('\n', csinfo[i].to_fp);
+			(வெறுமை)fflush(csinfo[i].to_fp);
 
 			// clear buf
 			bufpos = 0;
@@ -2228,42 +2228,42 @@ cs_read_prompt(int i)
 		}
 	    }
 
-	for (n = 0; n < (int)STRLEN_LITERAL(CSCOPE_PROMPT); ++n)
+	க்கு (n = 0; n < (முழு)STRLEN_LITERAL(CSCOPE_PROMPT); ++n)
 	{
-	    if (n > 0)
+	    எனில் (n > 0)
 		ch = getc(csinfo[i].fr_fp);
-	    if (ch == EOF)
+	    எனில் (ch == EOF)
 	    {
-		if (buf != NULL && buf[0] != NUL)
-		    (void)semsg(cs_emsg, buf);
-		else if (p_csverbose)
+		எனில் (buf != வெற்று && buf[0] != NUL)
+		    (வெறுமை)semsg(cs_emsg, buf);
+		இல்லையெனில் எனில் (p_csverbose)
 		    cs_reading_emsg(i); // don't have additional information
 		cs_release_csp(i, TRUE);
 		vim_free(buf);
-		return CSCOPE_FAILURE;
+		திரும்பு CSCOPE_FAILURE;
 	    }
 
-	    if (ch != CSCOPE_PROMPT[n])
+	    எனில் (ch != CSCOPE_PROMPT[n])
 	    {
 		ch = EOF;
-		break;
+		நிறுத்து;
 	    }
 	}
 
-	if (ch == EOF)
-	    continue;	    // didn't find the prompt
-	break;		    // did find the prompt
+	எனில் (ch == EOF)
+	    தொடர்;	    // didn't find the prompt
+	நிறுத்து;		    // did find the prompt
     }
 
     vim_free(buf);
-    return CSCOPE_SUCCESS;
+    திரும்பு CSCOPE_SUCCESS;
 }
 
-# if defined(UNIX) && defined(SIGALRM)
+# எனில் defined(UNIX) && defined(SIGALRM)
 /*
  * Used to catch and ignore SIGALRM below.
  */
-    static void
+    நிலையான வெறுமை
 sig_handler SIGDEFARG(sigarg)
 {
     // do nothing
@@ -2274,32 +2274,32 @@ sig_handler SIGDEFARG(sigarg)
  * Does the actual free'ing for the cs ptr with an optional flag of whether
  * or not to free the filename.  Called by cs_kill and cs_reset.
  */
-    static void
-cs_release_csp(int i, int freefnpp)
+    நிலையான வெறுமை
+cs_release_csp(முழு i, முழு freefnpp)
 {
     /*
      * Trying to exit normally (not sure whether it is fit to UNIX cscope
      */
-    if (csinfo[i].to_fp != NULL)
+    எனில் (csinfo[i].to_fp != வெற்று)
     {
-	(void)fputs("q\n", csinfo[i].to_fp);
-	(void)fflush(csinfo[i].to_fp);
+	(வெறுமை)fputs("q\n", csinfo[i].to_fp);
+	(வெறுமை)fflush(csinfo[i].to_fp);
     }
-# if defined(UNIX)
+# எனில் defined(UNIX)
     {
-	int waitpid_errno;
-	int pstat;
+	முழு waitpid_errno;
+	முழு pstat;
 	pid_t pid;
 
-#  if defined(HAVE_SIGACTION)
-	struct sigaction sa, old;
+#  எனில் defined(HAVE_SIGACTION)
+	கட்டமைப்பு sigaction sa, old;
 
 	// Use sigaction() to limit the waiting time to two seconds.
 	sigemptyset(&sa.sa_mask);
 	sa.sa_handler = sig_handler;
 #   ifdef SA_NODEFER
 	sa.sa_flags = SA_NODEFER;
-#   else
+#   இல்லையெனில்
 	sa.sa_flags = 0;
 #   endif
 	sigaction(SIGALRM, &sa, &old);
@@ -2311,19 +2311,19 @@ cs_release_csp(int i, int freefnpp)
 
 	// cancel pending alarm if still there and restore signal
 	alarm(0);
-	sigaction(SIGALRM, &old, NULL);
-#  else
-	int waited;
+	sigaction(SIGALRM, &old, வெற்று);
+#  இல்லையெனில்
+	முழு waited;
 
 	// Can't use sigaction(), loop for two seconds.  First yield the CPU
 	// to give cscope a chance to exit quickly.
 	sleep(0);
-	for (waited = 0; waited < 40; ++waited)
+	க்கு (waited = 0; waited < 40; ++waited)
 	{
 	    pid = waitpid(csinfo[i].pid, &pstat, WNOHANG);
 	    waitpid_errno = errno;
-	    if (pid != 0)
-		break;  // break unless the process is still running
+	    எனில் (pid != 0)
+		நிறுத்து;  // break unless the process is still running
 	    mch_delay(50L, 0); // sleep 50 ms
 	}
 #  endif
@@ -2332,12 +2332,12 @@ cs_release_csp(int i, int freefnpp)
 	 * Safety check: If the PID would be zero here, the entire X session
 	 * would be killed.  -1 and 1 are dangerous as well.
 	 */
-	if (pid < 0 && csinfo[i].pid > 1)
+	எனில் (pid < 0 && csinfo[i].pid > 1)
 	{
 #  ifdef ECHILD
-	    int alive = TRUE;
+	    முழு alive = TRUE;
 
-	    if (waitpid_errno == ECHILD)
+	    எனில் (waitpid_errno == ECHILD)
 	    {
 		/*
 		 * When using 'vim -g', vim is forked and cscope process is
@@ -2348,44 +2348,44 @@ cs_release_csp(int i, int freefnpp)
 		 * the "q" command, hence giving it a chance to clean up
 		 * its temporary files.
 		 */
-		int waited;
+		முழு waited;
 
 		sleep(0);
-		for (waited = 0; waited < 40; ++waited)
+		க்கு (waited = 0; waited < 40; ++waited)
 		{
 		    // Check whether cscope process is still alive
-		    if (kill(csinfo[i].pid, 0) != 0)
+		    எனில் (kill(csinfo[i].pid, 0) != 0)
 		    {
 			alive = FALSE; // cscope process no longer exists
-			break;
+			நிறுத்து;
 		    }
 		    mch_delay(50L, 0); // sleep 50 ms
 		}
 	    }
-	    if (alive)
+	    எனில் (alive)
 #  endif
 	    {
 		kill(csinfo[i].pid, SIGKILL);
-		(void)waitpid(csinfo[i].pid, &pstat, 0);
+		(வெறுமை)waitpid(csinfo[i].pid, &pstat, 0);
 	    }
 	}
     }
-# else  // !UNIX
-    if (csinfo[i].hProc != NULL)
+# இல்லையெனில்  // !UNIX
+    எனில் (csinfo[i].hProc != வெற்று)
     {
 	// Give cscope a chance to exit normally
-	if (WaitForSingleObject(csinfo[i].hProc, 1000) == WAIT_TIMEOUT)
+	எனில் (WaitForSingleObject(csinfo[i].hProc, 1000) == WAIT_TIMEOUT)
 	    TerminateProcess(csinfo[i].hProc, 0);
 	CloseHandle(csinfo[i].hProc);
     }
 # endif
 
-    if (csinfo[i].fr_fp != NULL)
-	(void)fclose(csinfo[i].fr_fp);
-    if (csinfo[i].to_fp != NULL)
-	(void)fclose(csinfo[i].to_fp);
+    எனில் (csinfo[i].fr_fp != வெற்று)
+	(வெறுமை)fclose(csinfo[i].fr_fp);
+    எனில் (csinfo[i].to_fp != வெற்று)
+	(வெறுமை)fclose(csinfo[i].to_fp);
 
-    if (freefnpp)
+    எனில் (freefnpp)
     {
 	vim_free(csinfo[i].fname);
 	vim_free(csinfo[i].ppath);
@@ -2399,50 +2399,50 @@ cs_release_csp(int i, int freefnpp)
 /*
  * Calls cs_kill on all cscope connections then reinits.
  */
-    static int
+    நிலையான முழு
 cs_reset(exarg_T *eap UNUSED)
 {
-    char	**dblist = NULL, **pplist = NULL, **fllist = NULL;
-    int	i;
-    char buf[20]; // for sprintf " (#%d)"
+    எழுத்து	**dblist = வெற்று, **pplist = வெற்று, **fllist = வெற்று;
+    முழு	i;
+    எழுத்து buf[20]; // for sprintf " (#%d)"
 
-    if (csinfo_size == 0)
-	return CSCOPE_SUCCESS;
+    எனில் (csinfo_size == 0)
+	திரும்பு CSCOPE_SUCCESS;
 
     // malloc our db and ppath list
-    dblist = ALLOC_MULT(char *, csinfo_size);
-    pplist = ALLOC_MULT(char *, csinfo_size);
-    fllist = ALLOC_MULT(char *, csinfo_size);
-    if (dblist == NULL || pplist == NULL || fllist == NULL)
+    dblist = ALLOC_MULT(எழுத்து *, csinfo_size);
+    pplist = ALLOC_MULT(எழுத்து *, csinfo_size);
+    fllist = ALLOC_MULT(எழுத்து *, csinfo_size);
+    எனில் (dblist == வெற்று || pplist == வெற்று || fllist == வெற்று)
     {
 	vim_free(dblist);
 	vim_free(pplist);
 	vim_free(fllist);
-	return CSCOPE_FAILURE;
+	திரும்பு CSCOPE_FAILURE;
     }
 
-    for (i = 0; i < csinfo_size; i++)
+    க்கு (i = 0; i < csinfo_size; i++)
     {
 	dblist[i] = csinfo[i].fname;
 	pplist[i] = csinfo[i].ppath;
 	fllist[i] = csinfo[i].flags;
-	if (csinfo[i].fname != NULL)
+	எனில் (csinfo[i].fname != வெற்று)
 	    cs_release_csp(i, FALSE);
     }
 
     // rebuild the cscope connection list
-    for (i = 0; i < csinfo_size; i++)
+    க்கு (i = 0; i < csinfo_size; i++)
     {
-	if (dblist[i] != NULL)
+	எனில் (dblist[i] != வெற்று)
 	{
 	    cs_add_common(dblist[i], pplist[i], fllist[i]);
-	    if (p_csverbose)
+	    எனில் (p_csverbose)
 	    {
 		// don't use smsg_attr() because we want to display the
 		// connection number in the same line as
 		// "Added cscope database..."
 		sprintf(buf, " (#%d)", i);
-		msg_puts_attr(buf, HL_ATTR(HLF_R));
+		செய்தி_puts_attr(buf, HL_ATTR(HLF_R));
 	    }
 	}
 	vim_free(dblist[i]);
@@ -2453,9 +2453,9 @@ cs_reset(exarg_T *eap UNUSED)
     vim_free(pplist);
     vim_free(fllist);
 
-    if (p_csverbose)
-	msg_attr(_("All cscope databases reset"), HL_ATTR(HLF_R) | MSG_HIST);
-    return CSCOPE_SUCCESS;
+    எனில் (p_csverbose)
+	செய்தி_attr(_("All cscope databases reset"), HL_ATTR(HLF_R) | செய்தி_HIST);
+    திரும்பு CSCOPE_SUCCESS;
 }
 
 
@@ -2468,14 +2468,14 @@ cs_reset(exarg_T *eap UNUSED)
  * ships with Solaris 2.6), the output never has the prefix prepended.
  * Contrast this with my development system (Digital Unix), which does.
  */
-    static char *
-cs_resolve_file(int i, char *name)
+    நிலையான எழுத்து *
+cs_resolve_file(முழு i, எழுத்து *name)
 {
-    char	*fullname;
-    string_T	csdir = {NULL, 0};
+    எழுத்து	*fullname;
+    string_T	csdir = {வெற்று, 0};
     size_t	namelen;
     size_t	ppathlen = 0;
-    int		len;
+    முழு		len;
 
     /*
      * Ppath is freed when we destroy the cscope connection.
@@ -2483,31 +2483,31 @@ cs_resolve_file(int i, char *name)
      * copied into the tag buffer used by Vim.
      */
     namelen = STRLEN(name);
-    len = (int)namelen + 2;
-    if (csinfo[i].ppath != NULL)
+    len = (முழு)namelen + 2;
+    எனில் (csinfo[i].ppath != வெற்று)
     {
 	ppathlen = STRLEN(csinfo[i].ppath);
-	len += (int)ppathlen;
+	len += (முழு)ppathlen;
     }
-    else if (p_csre && csinfo[i].fname != NULL)
+    இல்லையெனில் எனில் (p_csre && csinfo[i].fname != வெற்று)
     {
 	// If 'cscoperelative' is set and ppath is not set, use cscope.out
 	// path in path resolution.
 	csdir.string = alloc(MAXPATHL);
-	if (csdir.string != NULL)
+	எனில் (csdir.string != வெற்று)
 	{
 	    vim_strncpy(csdir.string, (char_u *)csinfo[i].fname,
 					  gettail((char_u *)csinfo[i].fname)
 						 - (char_u *)csinfo[i].fname);
 	    csdir.length = STRLEN(csdir.string);
-	    len += (int)csdir.length;
+	    len += (முழு)csdir.length;
 	}
     }
 
     // Note/example: this won't work if the cscope output already starts
     // "../.." and the prefix path is also "../..".  if something like this
     // happens, you are screwed up and need to fix how you're using cscope.
-    if (csinfo[i].ppath != NULL
+    எனில் (csinfo[i].ppath != வெற்று
 	    && (strncmp(name, csinfo[i].ppath, ppathlen) != 0)
 	    && (name[0] != '/')
 # ifdef MSWIN
@@ -2515,70 +2515,70 @@ cs_resolve_file(int i, char *name)
 # endif
        )
     {
-	if ((fullname = alloc(len)) != NULL)
-	    (void)sprintf(fullname, "%s/%s", csinfo[i].ppath, name);
+	எனில் ((fullname = alloc(len)) != வெற்று)
+	    (வெறுமை)sprintf(fullname, "%s/%s", csinfo[i].ppath, name);
     }
-    else if (csdir.string != NULL && csinfo[i].fname != NULL && *csdir.string != NUL)
+    இல்லையெனில் எனில் (csdir.string != வெற்று && csinfo[i].fname != வெற்று && *csdir.string != NUL)
     {
 	string_T    ret;
 
 	// Check for csdir to be non empty to avoid empty path concatenated to
 	// cscope output.
-	fullname = (char *)concat_fnames(csdir.string, csdir.length, (char_u *)name, namelen, TRUE, &ret);
+	fullname = (எழுத்து *)concat_fnames(csdir.string, csdir.length, (char_u *)name, namelen, TRUE, &ret);
     }
-    else
+    இல்லையெனில்
     {
-	fullname = (char *)vim_strnsave((char_u *)name, namelen);
+	fullname = (எழுத்து *)vim_strnsave((char_u *)name, namelen);
     }
 
     vim_free(csdir.string);
-    return fullname;
+    திரும்பு fullname;
 }
 
 
 /*
  * Show all cscope connections.
  */
-    static int
+    நிலையான முழு
 cs_show(exarg_T *eap UNUSED)
 {
-    int i;
+    முழு i;
 
-    if (cs_cnt_connections() == 0)
-	msg_puts(_("no cscope connections\n"));
-    else
+    எனில் (cs_cnt_connections() == 0)
+	செய்தி_puts(_("no cscope connections\n"));
+    இல்லையெனில்
     {
-	msg_puts_attr(
+	செய்தி_puts_attr(
 	    _(" # pid    database name                       prepend path\n"),
 	    HL_ATTR(HLF_T));
-	for (i = 0; i < csinfo_size; i++)
+	க்கு (i = 0; i < csinfo_size; i++)
 	{
-	    if (csinfo[i].fname == NULL)
-		continue;
+	    எனில் (csinfo[i].fname == வெற்று)
+		தொடர்;
 
-	    if (csinfo[i].ppath != NULL)
-		(void)smsg("%2d %-5ld  %-34s  %-32s",
+	    எனில் (csinfo[i].ppath != வெற்று)
+		(வெறுமை)smsg("%2d %-5ld  %-34s  %-32s",
 		    i, (long)csinfo[i].pid, csinfo[i].fname, csinfo[i].ppath);
-	    else
-		(void)smsg("%2d %-5ld  %-34s  <none>",
+	    இல்லையெனில்
+		(வெறுமை)smsg("%2d %-5ld  %-34s  <none>",
 			   i, (long)csinfo[i].pid, csinfo[i].fname);
 	}
     }
 
     wait_return(FALSE);
-    return CSCOPE_SUCCESS;
+    திரும்பு CSCOPE_SUCCESS;
 }
 
 
 /*
  * Only called when VIM exits to quit any cscope sessions.
  */
-    void
-cs_end(void)
+    வெறுமை
+cs_end(வெறுமை)
 {
-    int i;
+    முழு i;
 
-    for (i = 0; i < csinfo_size; i++)
+    க்கு (i = 0; i < csinfo_size; i++)
 	cs_release_csp(i, TRUE);
     vim_free(csinfo);
     csinfo_size = 0;
@@ -2586,40 +2586,40 @@ cs_end(void)
 
 #endif	// FEAT_CSCOPE
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 
 /*
  * "cscope_connection([{num} , {dbpath} [, {prepend}]])" function
  *
  * Checks the existence of a cscope connection.
  */
-    void
+    வெறுமை
 f_cscope_connection(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 # ifdef FEAT_CSCOPE
-    int		num = 0;
-    char_u	*dbpath = NULL;
-    char_u	*prepend = NULL;
+    முழு		இலக்கம் = 0;
+    char_u	*dbpath = வெற்று;
+    char_u	*prepend = வெற்று;
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+    எனில் (in_vim9script()
+	    && (check_for_opt_எண்_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && (check_for_opt_string_arg(argvars, 1) == FAIL
 			|| (argvars[1].v_type != VAR_UNKNOWN
 			    && check_for_opt_string_arg(argvars, 2) == FAIL)))))
-	return;
+	திரும்பு;
 
-    if (argvars[0].v_type != VAR_UNKNOWN
+    எனில் (argvars[0].v_type != VAR_UNKNOWN
 	    && argvars[1].v_type != VAR_UNKNOWN)
     {
-	num = (int)tv_get_number(&argvars[0]);
+	இலக்கம் = (முழு)tv_get_எண்(&argvars[0]);
 	dbpath = tv_get_string(&argvars[1]);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	எனில் (argvars[2].v_type != VAR_UNKNOWN)
 	    prepend = tv_get_string_buf(&argvars[2], buf);
     }
 
-    rettv->vval.v_number = cs_connection(num, dbpath, prepend);
+    rettv->vval.v_எண் = cs_connection(இலக்கம், dbpath, prepend);
 # endif
 }
 

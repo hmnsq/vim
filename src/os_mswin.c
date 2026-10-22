@@ -13,19 +13,19 @@
  * Routines for Win32.
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#include <sys/types.h>
-#include <limits.h>
+#அந்தர்பாவ <sys/types.h>
+#அந்தர்பாவ <limits.h>
 
-#include <process.h>
-#include <direct.h>
+#அந்தர்பாவ <process.h>
+#அந்தர்பாவ <direct.h>
 
-#if !defined(FEAT_GUI_MSWIN)
+#எனில் !defined(FEAT_GUI_MSWIN)
 # include <shellapi.h>
 #endif
 
-#if defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
+#எனில் defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
 # include <dlgs.h>
 # include <winspool.h>
 # include <commdlg.h>
@@ -35,41 +35,41 @@
 // #define MCH_WRITE_DUMP
 
 #ifdef MCH_WRITE_DUMP
-FILE* fdDump = NULL;
+FILE* fdDump = வெற்று;
 #endif
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-extern char g_szOrigTitle[];
+#எனில் !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+வெளி எழுத்து g_szOrigTitle[];
 #endif
 
 #ifdef FEAT_GUI
-extern HWND s_hwnd;
-#else
-static HWND s_hwnd = 0;	    // console window handle, set by GetConsoleHwnd()
+வெளி HWND s_hwnd;
+#இல்லையெனில்
+நிலையான HWND s_hwnd = 0;	    // console window handle, set by GetConsoleHwnd()
 #endif
 
 #ifdef FEAT_JOB_CHANNEL
-int WSInitialized = FALSE; // WinSock is initialized
+முழு WSInitialized = FALSE; // WinSock is initialized
 #endif
 
 
 /*
  * Save the instance handle of the exe/dll.
  */
-    void
+    வெறுமை
 SaveInst(HINSTANCE hInst)
 {
     g_hinst = hInst;
 }
 
-#if defined(FEAT_GUI_MSWIN)
+#எனில் defined(FEAT_GUI_MSWIN)
 /*
  * GUI version of mch_exit().
  * Shut down and exit with status `r'
  * Careful: mch_exit() may be called before mch_init()!
  */
-    void
-mch_exit_g(int r)
+    வெறுமை
+mch_exit_g(முழு r)
 {
     exiting = TRUE;
 
@@ -81,7 +81,7 @@ mch_exit_g(int r)
     UninitOLE();
 # endif
 # ifdef FEAT_JOB_CHANNEL
-    if (WSInitialized)
+    எனில் (WSInitialized)
     {
 	WSInitialized = FALSE;
 	WSACleanup();
@@ -91,7 +91,7 @@ mch_exit_g(int r)
     dyn_libintl_end();
 # endif
 
-    if (gui.in_use)
+    எனில் (gui.in_use)
 	gui_exit(r);
 
 # ifdef EXITFREE
@@ -107,45 +107,45 @@ mch_exit_g(int r)
 /*
  * Get version number including build number
  */
-typedef BOOL (WINAPI *PfnRtlGetVersion)(LPOSVERSIONINFOW);
+வகைவரை BOOL (WINAPI *PfnRtlGetVersion)(LPOSVERSIONINFOW);
 DWORD win_version;
-    static void
-win_version_init(void)
+    நிலையான வெறுமை
+win_version_init(வெறுமை)
 {
     OSVERSIONINFOW	osver;
     HMODULE		hNtdll;
     PfnRtlGetVersion	pRtlGetVersion;
 
     hNtdll = GetModuleHandle("ntdll.dll");
-    if (hNtdll == NULL)
-	return;
+    எனில் (hNtdll == வெற்று)
+	திரும்பு;
 
     pRtlGetVersion =
 	(PfnRtlGetVersion) GetProcAddress(hNtdll, "RtlGetVersion");
-    if (pRtlGetVersion == NULL)
-	return;
+    எனில் (pRtlGetVersion == வெற்று)
+	திரும்பு;
 
-    osver.dwOSVersionInfoSize = sizeof(OSVERSIONINFOW);
+    osver.dwOSVersionInfoSize = அளவு(OSVERSIONINFOW);
     pRtlGetVersion(&osver);
     win_version = MAKE_VER(min(osver.dwMajorVersion, 0xFF),
 	    min(osver.dwMinorVersion, 0xFF),
-	    min(osver.dwBuildNumber, 0xFFFF));
+	    min(osver.dw_Build_எண், 0xFFFF));
 }
 
 /*
  * Init the tables for toupper() and tolower().
  */
-    void
-mch_early_init(void)
+    வெறுமை
+mch_early_init(வெறுமை)
 {
-    int		i;
+    முழு		i;
 
     win_version_init();
 
     PlatformId();
 
     // Init the tables for toupper() and tolower()
-    for (i = 0; i < 256; ++i)
+    க்கு (i = 0; i < 256; ++i)
 	toupper_tab[i] = tolower_tab[i] = i;
     CharUpperBuff((LPSTR)toupper_tab, 256);
     CharLowerBuff((LPSTR)tolower_tab, 256);
@@ -155,50 +155,50 @@ mch_early_init(void)
 /*
  * Return TRUE if the input comes from a terminal, FALSE otherwise.
  */
-    int
-mch_input_isatty(void)
+    முழு
+mch_உள்ளீடு_isatty(வெறுமை)
 {
 #ifdef FEAT_GUI_MSWIN
 # ifdef VIMDLL
-    if (gui.in_use)
+    எனில் (gui.in_use)
 # endif
-	return TRUE;	    // GUI always has a tty
+	திரும்பு TRUE;	    // GUI always has a tty
 #endif
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    if (isatty(read_cmd_fd))
-	return TRUE;
-    return FALSE;
+#எனில் !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    எனில் (isatty(read_cmd_fd))
+	திரும்பு TRUE;
+    திரும்பு FALSE;
 #endif
 }
 
 /*
  * mch_settitle(): set titlebar of our window
  */
-    void
+    வெறுமை
 mch_settitle(
     char_u *title,
     char_u *icon UNUSED)
 {
 #ifdef FEAT_GUI_MSWIN
 # ifdef VIMDLL
-    if (gui.in_use)
+    எனில் (gui.in_use)
 # endif
     {
 	gui_mch_settitle(title, icon);
-	return;
+	திரும்பு;
     }
 #endif
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    if (title != NULL)
+#எனில் !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    எனில் (title != வெற்று)
     {
-	WCHAR	*wp = enc_to_utf16(title, NULL);
+	WCHAR	*wp = enc_to_utf16(title, வெற்று);
 
-	if (wp == NULL)
-	    return;
+	எனில் (wp == வெற்று)
+	    திரும்பு;
 
 	SetConsoleTitleW(wp);
 	vim_free(wp);
-	return;
+	திரும்பு;
     }
 #endif
 }
@@ -211,12 +211,12 @@ mch_settitle(
  *  SAVE_RESTORE_ICON:  Just restore icon (which we don't have)
  *  SAVE_RESTORE_BOTH:  Restore title and icon (which we don't have)
  */
-    void
-mch_restore_title(int which UNUSED)
+    வெறுமை
+mch_restore_title(முழு which UNUSED)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#எனில் !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 # ifdef VIMDLL
-    if (!gui.in_use)
+    எனில் (!gui.in_use)
 # endif
 	SetConsoleTitle(g_szOrigTitle);
 #endif
@@ -226,20 +226,20 @@ mch_restore_title(int which UNUSED)
 /*
  * Return TRUE if we can restore the title (we can)
  */
-    int
-mch_can_restore_title(void)
+    முழு
+mch_can_restore_title(வெறுமை)
 {
-    return TRUE;
+    திரும்பு TRUE;
 }
 
 
 /*
  * Return TRUE if we can restore the icon title (we can't)
  */
-    int
-mch_can_restore_icon(void)
+    முழு
+mch_can_restore_icon(வெறுமை)
 {
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 
@@ -250,23 +250,23 @@ mch_can_restore_icon(void)
  * When 'shellslash' set do it the other way around.
  * Return OK or FAIL.
  */
-    int
+    முழு
 mch_FullName(
     char_u	*fname,
     char_u	*buf,
-    int		len,
-    int		force UNUSED)
+    முழு		len,
+    முழு		force UNUSED)
 {
-    int		nResult = FAIL;
+    முழு		nResult = FAIL;
     WCHAR	*wname;
     WCHAR	wbuf[MAX_PATH];
-    char_u	*cname = NULL;
+    char_u	*cname = வெற்று;
 
-    wname = enc_to_utf16(fname, NULL);
-    if (wname != NULL && _wfullpath(wbuf, wname, MAX_PATH) != NULL)
+    wname = enc_to_utf16(fname, வெற்று);
+    எனில் (wname != வெற்று && _wfullpath(wbuf, wname, MAX_PATH) != வெற்று)
     {
-	cname = utf16_to_enc((short_u *)wbuf, NULL);
-	if (cname != NULL)
+	cname = utf16_to_enc((short_u *)wbuf, வெற்று);
+	எனில் (cname != வெற்று)
 	{
 	    vim_strncpy(buf, cname, len - 1);
 	    nResult = OK;
@@ -277,18 +277,18 @@ mch_FullName(
 
 #ifdef USE_FNAME_CASE
     fname_case(buf, len);
-#else
+#இல்லையெனில்
     slash_adjust(buf);
 #endif
 
-    return nResult;
+    திரும்பு nResult;
 }
 
 
 /*
  * Return TRUE if "fname" does not depend on the current directory.
  */
-    int
+    முழு
 mch_isFullName(char_u *fname)
 {
     // A name like "d:/foo" and "//server/share" is absolute.  "d:foo" is not.
@@ -296,9 +296,9 @@ mch_isFullName(char_u *fname)
     // Another way to check is to use mch_FullName() and see if the result is
     // the same as the name or mch_FullName() fails.  However, this has quite a
     // bit of overhead, so let's not do that.
-    if (*fname == NUL)
-	return FALSE;
-    return ((ASCII_ISALPHA(fname[0]) && fname[1] == ':'
+    எனில் (*fname == NUL)
+	திரும்பு FALSE;
+    திரும்பு ((ASCII_ISALPHA(fname[0]) && fname[1] == ':'
 				      && (fname[2] == '/' || fname[2] == '\\'))
 	    || (fname[0] == '/' || fname[0] == '\\'));
 }
@@ -313,103 +313,103 @@ mch_isFullName(char_u *fname)
  * When 'shellslash' set do it the other way around.
  * When the path looks like a URL leave it unmodified.
  */
-    void
+    வெறுமை
 slash_adjust(char_u *p)
 {
-    if (path_with_url(p))
-	return;
+    எனில் (path_with_url(p))
+	திரும்பு;
 
-    if (*p == '`')
+    எனில் (*p == '`')
     {
 	size_t len = STRLEN(p);
 
 	// don't replace backslash in backtick quoted strings
-	if (len > 2 && *(p + len - 1) == '`')
-	    return;
+	எனில் (len > 2 && *(p + len - 1) == '`')
+	    திரும்பு;
     }
 
-    while (*p)
+    போது (*p)
     {
-	if (*p == psepcN)
+	எனில் (*p == psepcN)
 	    *p = psepc;
 	MB_PTR_ADV(p);
     }
 }
 
-    static int
-read_reparse_point(const WCHAR *name, char_u *buf, DWORD *buf_len)
+    நிலையான முழு
+read_reparse_point(மாறிலி WCHAR *name, char_u *buf, DWORD *buf_len)
 {
     HANDLE h;
     BOOL ok;
 
     h = CreateFileW(name, FILE_READ_ATTRIBUTES,
-	    FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+	    FILE_SHARE_READ | FILE_SHARE_WRITE, வெற்று,
 	    OPEN_EXISTING,
 	    FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
-	    NULL);
-    if (h == INVALID_HANDLE_VALUE)
-	return FAIL;
+	    வெற்று);
+    எனில் (h == INVALID_HANDLE_மதிப்பு)
+	திரும்பு FAIL;
 
-    ok = DeviceIoControl(h, FSCTL_GET_REPARSE_POINT, NULL, 0, buf, *buf_len,
-	    buf_len, NULL);
+    ok = DeviceIoControl(h, FSCTL_GET_REPARSE_POINT, வெற்று, 0, buf, *buf_len,
+	    buf_len, வெற்று);
     CloseHandle(h);
 
-    return ok ? OK : FAIL;
+    திரும்பு ok ? OK : FAIL;
 }
 
     char_u *
 resolve_appexeclink(char_u *fname)
 {
     DWORD		attr = 0;
-    int			idx;
+    முழு			idx;
     WCHAR		*p, *end, *wname;
     // The buffer size is arbitrarily chosen to be "big enough" (TM), the
     // ceiling should be around 16k.
     char_u		buf[4096];
-    DWORD		buf_len = sizeof(buf);
+    DWORD		buf_len = அளவு(buf);
     REPARSE_DATA_BUFFER *rb = (REPARSE_DATA_BUFFER *)buf;
 
-    wname = enc_to_utf16(fname, NULL);
-    if (wname == NULL)
-	return NULL;
+    wname = enc_to_utf16(fname, வெற்று);
+    எனில் (wname == வெற்று)
+	திரும்பு வெற்று;
 
     attr = GetFileAttributesW(wname);
-    if (attr == INVALID_FILE_ATTRIBUTES ||
+    எனில் (attr == INVALID_FILE_ATTRIBUTES ||
 	    (attr & FILE_ATTRIBUTE_REPARSE_POINT) == 0)
     {
 	vim_free(wname);
-	return NULL;
+	திரும்பு வெற்று;
     }
 
     // The applinks are similar to symlinks but with a huge difference: they can
     // only be executed, any other I/O operation on them is bound to fail with
     // ERROR_FILE_NOT_FOUND even though the file exists.
-    if (read_reparse_point(wname, buf, &buf_len) == FAIL)
+    எனில் (read_reparse_point(wname, buf, &buf_len) == FAIL)
     {
 	vim_free(wname);
-	return NULL;
+	திரும்பு வெற்று;
     }
     vim_free(wname);
 
-    if (rb->ReparseTag != IO_REPARSE_TAG_APPEXECLINK)
-	return NULL;
+    எனில் (rb->ReparseTag != IO_REPARSE_TAG_APPEXECLINK)
+	திரும்பு வெற்று;
 
     // The (undocumented) reparse buffer contains a set of N null-terminated
     // Unicode strings, the application path is stored in the third one.
-    if (rb->AppExecLinkReparseBuffer.StringCount < 3)
-	return NULL;
+    எனில் (rb->AppExecLinkReparseBuffer.String_மொத்தம் < 3)
+	திரும்பு வெற்று;
 
     p = rb->AppExecLinkReparseBuffer.StringList;
-    end = p + rb->ReparseDataLength / sizeof(WCHAR);
-    for (idx = 0; p < end
-	    && idx < (int)rb->AppExecLinkReparseBuffer.StringCount
+    end = p + rb->ReparseDataLength / அளவு(WCHAR);
+    க்கு (idx = 0; p < end
+	    && idx < (முழு)rb->AppExecLinkReparseBuffer.String_மொத்தம்
 	    && idx != 2; )
     {
-	if (*p++ == L'\0')
+	எனில் (*p++ == L'\0')
 	    ++idx;
     }
 
-    return utf16_to_enc(p, NULL);
+    திரும்பு utf16_to_enc(p, வெற்று);
 }
 
 // Use 64-bit stat functions.
@@ -425,18 +425,18 @@ resolve_appexeclink(char_u *fname)
 /*
  * Implements lstat() and stat() that can handle symlinks properly.
  */
-    static int
-mswin_stat_impl(const WCHAR *name, stat_T *stp, const int resolve)
+    நிலையான முழு
+mswin_stat_impl(மாறிலி WCHAR *name, stat_T *stp, மாறிலி முழு resolve)
 {
-    int			n;
-    int			fd;
+    முழு			n;
+    முழு			fd;
     BOOL		is_symlink = FALSE;
     HANDLE		hFind, h;
     DWORD		attr = 0;
     DWORD		flag = 0;
     WIN32_FIND_DATAW    findDataW;
 
-#if 0 && defined(_UCRT)
+#எனில் 0 && defined(_UCRT)
     // This code was disabled because the behavior of MSVC's _wstat (actually
     // _wstat64) for empty symlinks varies depending on the C runtime you link
     // to.
@@ -449,73 +449,73 @@ mswin_stat_impl(const WCHAR *name, stat_T *stp, const int resolve)
     //
     // For more details, see:
     // https://github.com/koron/vc-stat-behavior-verification
-    if (resolve)
+    எனில் (resolve)
 	// Universal CRT can handle symlinks properly.
-	return _wstat(name, stp);
+	திரும்பு _wstat(name, stp);
 #endif
 
     // Only reparse points need a directory query to identify symbolic links.
     // In particular, avoid enumerating the directory for each missing file
     // while searching 'runtimepath'.
     attr = GetFileAttributesW(name);
-    if (attr == INVALID_FILE_ATTRIBUTES)
+    எனில் (attr == INVALID_FILE_ATTRIBUTES)
     {
 	DWORD error = GetLastError();
 
 	// A missing file or path cannot provide stat information.  Other
 	// errors and UNC paths still need the CRT fallback.
-	if ((error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND)
+	எனில் ((error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND)
 		&& !((name[0] == L'\\' || name[0] == L'/')
 		    && (name[1] == L'\\' || name[1] == L'/')))
 	{
 	    errno = ENOENT;
-	    return -1;
+	    திரும்பு -1;
 	}
-	return _wstat(name, stp);
+	திரும்பு _wstat(name, stp);
     }
-    if (!(attr & FILE_ATTRIBUTE_REPARSE_POINT))
-	return _wstat(name, stp);
+    எனில் (!(attr & FILE_ATTRIBUTE_REPARSE_POINT))
+	திரும்பு _wstat(name, stp);
 
     hFind = FindFirstFileW(name, &findDataW);
-    if (hFind != INVALID_HANDLE_VALUE)
+    எனில் (hFind != INVALID_HANDLE_மதிப்பு)
     {
 	attr = findDataW.dwFileAttributes;
-	if ((attr & FILE_ATTRIBUTE_REPARSE_POINT)
+	எனில் ((attr & FILE_ATTRIBUTE_REPARSE_POINT)
 		&& (findDataW.dwReserved0 == IO_REPARSE_TAG_SYMLINK))
 	    is_symlink = TRUE;
 	FindClose(hFind);
     }
 
     // Use the plain old stat() whenever it's possible.
-    if (!is_symlink)
-	return _wstat(name, stp);
+    எனில் (!is_symlink)
+	திரும்பு _wstat(name, stp);
 
-    if (!resolve && is_symlink)
+    எனில் (!resolve && is_symlink)
 	flag = FILE_FLAG_OPEN_REPARSE_POINT;
-    if (attr & FILE_ATTRIBUTE_DIRECTORY)
+    எனில் (attr & FILE_ATTRIBUTE_DIRECTORY)
 	flag |= FILE_FLAG_BACKUP_SEMANTICS;
 
     h = CreateFileW(name, FILE_READ_ATTRIBUTES,
-	    FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, flag,
-	    NULL);
-    if (h == INVALID_HANDLE_VALUE)
-	return -1;
+	    FILE_SHARE_READ | FILE_SHARE_WRITE, வெற்று, OPEN_EXISTING, flag,
+	    வெற்று);
+    எனில் (h == INVALID_HANDLE_மதிப்பு)
+	திரும்பு -1;
 
     fd = _open_osfhandle((intptr_t)h, _O_RDONLY);
-    n = _fstat(fd, (struct _stat *)stp);
-    if ((n == 0) && (attr & FILE_ATTRIBUTE_DIRECTORY))
+    n = _fstat(fd, (கட்டமைப்பு _stat *)stp);
+    எனில் ((n == 0) && (attr & FILE_ATTRIBUTE_DIRECTORY))
 	stp->st_mode = (stp->st_mode & ~S_IFMT) | S_IFDIR;
     _close(fd);
 
-    return n;
+    திரும்பு n;
 }
 
 /*
  * stat() can't handle a trailing '/' or '\', remove it first.
  * When 'resolve' is true behave as lstat() wrt symlinks.
  */
-    static int
-stat_impl(const char *name, stat_T *stp, const int resolve)
+    நிலையான முழு
+stat_impl(மாறிலி எழுத்து *name, stat_T *stp, மாறிலி முழு resolve)
 {
     // WinNT and later can use _MAX_PATH wide characters for a pathname, which
     // means that the maximum pathname is _MAX_PATH * 3 bytes when 'enc' is
@@ -524,70 +524,70 @@ stat_impl(const char *name, stat_T *stp, const int resolve)
     size_t	buflen;
     char_u	*p;
     WCHAR	*wp;
-    int		n;
+    முழு		n;
 
-    vim_strncpy((char_u *)buf, (char_u *)name, sizeof(buf) - 1);
+    vim_strncpy((char_u *)buf, (char_u *)name, அளவு(buf) - 1);
     buflen = STRLEN(buf);
     p = buf + buflen;
-    if (p > buf)
+    எனில் (p > buf)
 	MB_PTR_BACK(buf, p);
 
     // Remove trailing '\\' except root path.
-    if (p > buf && (*p == '\\' || *p == '/') && p[-1] != ':')
+    எனில் (p > buf && (*p == '\\' || *p == '/') && p[-1] != ':')
     {
 	*p = NUL;
 	buflen = (size_t)(p - buf);
     }
 
-    if ((buf[0] == '\\' && buf[1] == '\\') || (buf[0] == '/' && buf[1] == '/'))
+    எனில் ((buf[0] == '\\' && buf[1] == '\\') || (buf[0] == '/' && buf[1] == '/'))
     {
 	// UNC root path must be followed by '\\'.
 	p = vim_strpbrk(buf + 2, (char_u *)"\\/");
-	if (p != NULL)
+	எனில் (p != வெற்று)
 	{
 	    p = vim_strpbrk(p + 1, (char_u *)"\\/");
-	    if (p == NULL)
+	    எனில் (p == வெற்று)
 		STRCPY(buf + buflen, "\\");
 	}
     }
 
-    wp = enc_to_utf16(buf, NULL);
-    if (wp == NULL)
-	return -1;
+    wp = enc_to_utf16(buf, வெற்று);
+    எனில் (wp == வெற்று)
+	திரும்பு -1;
 
     n = mswin_stat_impl(wp, stp, resolve);
     vim_free(wp);
-    return n;
+    திரும்பு n;
 }
 
-    int
-vim_lstat(const char *name, stat_T *stp)
+    முழு
+vim_lstat(மாறிலி எழுத்து *name, stat_T *stp)
 {
-    return stat_impl(name, stp, FALSE);
+    திரும்பு stat_impl(name, stp, FALSE);
 }
 
-    int
-vim_stat(const char *name, stat_T *stp)
+    முழு
+vim_stat(மாறிலி எழுத்து *name, stat_T *stp)
 {
-    return stat_impl(name, stp, TRUE);
+    திரும்பு stat_impl(name, stp, TRUE);
 }
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    void
+#எனில் defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    வெறுமை
 mch_settmode(tmode_T tmode UNUSED)
 {
     // nothing to do
 }
 
-    int
-mch_get_shellsize(void)
+    முழு
+mch_get_shellsize(வெறுமை)
 {
     // never used
-    return OK;
+    திரும்பு OK;
 }
 
-    void
-mch_set_shellsize(void)
+    வெறுமை
+mch_set_shellsize(வெறுமை)
 {
     // never used
 }
@@ -595,14 +595,14 @@ mch_set_shellsize(void)
 /*
  * Rows and/or Columns has changed.
  */
-    void
-mch_new_shellsize(void)
+    வெறுமை
+mch_new_shellsize(வெறுமை)
 {
     // never used
 }
 
-    void
-mch_calc_cell_size(struct cellsize *cs_out UNUSED)
+    வெறுமை
+mch_calc_cell_size(கட்டமைப்பு cellsize *cs_out UNUSED)
 {
     // never used
 }
@@ -612,13 +612,13 @@ mch_calc_cell_size(struct cellsize *cs_out UNUSED)
 /*
  * We have no job control, so fake it by starting a new shell.
  */
-    void
-mch_suspend(void)
+    வெறுமை
+mch_suspend(வெறுமை)
 {
     suspend_shell();
 }
 
-#if defined(USE_MCH_ERRMSG)
+#எனில் defined(USE_MCH_ERRMSG)
 
 # ifdef display_errors
 #  undef display_errors
@@ -627,40 +627,40 @@ mch_suspend(void)
 /*
  * Display the saved error message(s).
  */
-    void
-display_errors(void)
+    வெறுமை
+display_errors(வெறுமை)
 {
 # ifdef FEAT_GUI
     char_u *p;
 
 #  ifdef VIMDLL
-    if (gui.in_use || gui.starting)
+    எனில் (gui.in_use || gui.starting)
 #  endif
     {
-	if (error_ga.ga_data != NULL)
+	எனில் (error_ga.ga_data != வெற்று)
 	{
 	    // avoid putting up a message box with blanks only
-	    for (p = (char_u *)error_ga.ga_data; *p; ++p)
-		if (!SAFE_isspace(*p))
+	    க்கு (p = (char_u *)error_ga.ga_data; *p; ++p)
+		எனில் (!SAFE_isspace(*p))
 		{
 		    // Only use a dialog when not using --gui-dialog-file:
 		    // write text to a file.
-		    if (!gui_dialog_log((char_u *)"Errors", p))
-			(void)gui_mch_dialog(
+		    எனில் (!gui_dialog_log((char_u *)"Errors", p))
+			(வெறுமை)gui_mch_dialog(
 				     gui.starting ? VIM_INFO :
 					     VIM_ERROR,
 				     gui.starting ? (char_u *)_("Message") :
 					     (char_u *)_("Error"),
 					     p, (char_u *)_("&Ok"),
-					1, NULL, FALSE);
-		    break;
+					1, வெற்று, FALSE);
+		    நிறுத்து;
 		}
 	    ga_clear(&error_ga);
 	}
-	return;
+	திரும்பு;
     }
 # endif
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+# எனில் !defined(FEAT_GUI) || defined(VIMDLL)
     FlushFileBuffers(GetStdHandle(STD_ERROR_HANDLE));
 # endif
 }
@@ -671,32 +671,32 @@ display_errors(void)
  * Return TRUE if "p" contain a wildcard that can be expanded by
  * dos_expandpath().
  */
-    int
+    முழு
 mch_has_exp_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    க்கு ( ; *p; MB_PTR_ADV(p))
     {
-	if (vim_strchr((char_u *)"?*[", *p) != NULL
+	எனில் (vim_strchr((char_u *)"?*[", *p) != வெற்று
 		|| (*p == '~' && p[1] != NUL))
-	    return TRUE;
+	    திரும்பு TRUE;
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 /*
  * Return TRUE if "p" contain a wildcard or a "~1" kind of thing (could be a
  * shortened file name).
  */
-    int
+    முழு
 mch_has_wildcard(char_u *p)
 {
-    for ( ; *p; MB_PTR_ADV(p))
+    க்கு ( ; *p; MB_PTR_ADV(p))
     {
-	if (vim_strchr((char_u *)"?*$[`", *p) != NULL
+	எனில் (vim_strchr((char_u *)"?*$[`", *p) != வெற்று
 		|| (*p == '~' && p[1] != NUL))
-	    return TRUE;
+	    திரும்பு TRUE;
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 
@@ -704,99 +704,99 @@ mch_has_wildcard(char_u *p)
  * The normal _chdir() does not change the default drive.  This one does.
  * Returning 0 implies success; -1 implies failure.
  */
-    int
-mch_chdir(char *path)
+    முழு
+mch_chdir(எழுத்து *path)
 {
     WCHAR   *p;
-    int	    n;
+    முழு	    n;
 
-    if (path[0] == NUL)		// just checking...
-	return -1;
+    எனில் (path[0] == NUL)		// just checking...
+	திரும்பு -1;
 
-    if (p_verbose >= 5)
+    எனில் (p_verbose >= 5)
     {
 	verbose_enter();
 	smsg("chdir(%s)", path);
 	verbose_leave();
     }
-    if (SAFE_isalpha(path[0]) && path[1] == ':')	// has a drive name
+    எனில் (SAFE_isalpha(path[0]) && path[1] == ':')	// has a drive name
     {
 	// If we can change to the drive, skip that part of the path.  If we
 	// can't then the current directory may be invalid, try using chdir()
 	// with the whole path.
-	if (_chdrive(TOLOWER_ASC(path[0]) - 'a' + 1) == 0)
+	எனில் (_chdrive(TOLOWER_ASC(path[0]) - 'a' + 1) == 0)
 	    path += 2;
     }
 
-    if (*path == NUL)		// drive name only
-	return 0;
+    எனில் (*path == NUL)		// drive name only
+	திரும்பு 0;
 
-    p = enc_to_utf16((char_u *)path, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_to_utf16((char_u *)path, வெற்று);
+    எனில் (p == வெற்று)
+	திரும்பு -1;
 
     n = _wchdir(p);
     vim_free(p);
-    return n;
+    திரும்பு n;
 }
 
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+#எனில் defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
 /*
  * return non-zero if a character is available
  */
-    int
-mch_char_avail(void)
+    முழு
+mch_char_avail(வெறுமை)
 {
     // never used
-    return TRUE;
+    திரும்பு TRUE;
 }
 
-# if defined(FEAT_TERMINAL)
+# எனில் defined(FEAT_TERMINAL)
 /*
  * Check for any pending input or messages.
  */
-    int
-mch_check_messages(void)
+    முழு
+mch_check_messages(வெறுமை)
 {
     // TODO: check for messages
-    return TRUE;
+    திரும்பு TRUE;
 }
 # endif
 #endif
 
 
-#if defined(FEAT_LIBCALL)
+#எனில் defined(FEAT_LIBCALL)
 /*
  * Call a DLL routine which takes either a string or int param
  * and returns an allocated string.
  * Return OK if it worked, FAIL if not.
  */
-typedef char_u *(*MYSTRPROCSTR)(char_u *);
-typedef int (*MYSTRPROCINT)(char_u *);
-typedef char_u *(*MYINTPROCSTR)(int);
-typedef int (*MYINTPROCINT)(int);
+வகைவரை char_u *(*MYSTRPROCSTR)(char_u *);
+வகைவரை முழு (*MYSTRPROCINT)(char_u *);
+வகைவரை char_u *(*MYINTPROCSTR)(முழு);
+வகைவரை முழு (*MYINTPROCINT)(முழு);
 
 /*
  * Check if a pointer points to a valid NUL terminated string.
  * Return the length of the string, including terminating NUL.
  * Returns 0 for an invalid pointer, 1 for an empty string.
  */
-    static size_t
+    நிலையான size_t
 check_str_len(char_u *str)
 {
     SYSTEM_INFO			si;
     MEMORY_BASIC_INFORMATION	mbi;
     size_t			length = 0;
     size_t			i;
-    const char_u		*p;
+    மாறிலி char_u		*p;
 
     // get page size
     GetSystemInfo(&si);
 
     // get memory information
-    if (!VirtualQuery(str, &mbi, sizeof(mbi)))
-	return 0;
+    எனில் (!VirtualQuery(str, &mbi, அளவு(mbi)))
+	திரும்பு 0;
 
     // pre cast these (typing savers)
     long_u dwStr = (long_u)str;
@@ -808,24 +808,24 @@ check_str_len(char_u *str)
     // get length from str to end of page
     long_u pageLength = si.dwPageSize - (dwStr - strPage);
 
-    for (p = str; !IsBadReadPtr(p, (UINT)pageLength);
+    க்கு (p = str; !IsBadReadPtr(p, (UINT)pageLength);
 	    p += pageLength, pageLength = si.dwPageSize)
-	for (i = 0; i < pageLength; ++i, ++length)
-	    if (p[i] == NUL)
-		return length + 1;
+	க்கு (i = 0; i < pageLength; ++i, ++length)
+	    எனில் (p[i] == NUL)
+		திரும்பு length + 1;
 
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * Passed to do_in_runtimepath() to load a vim.ico file.
  */
-    static void
-mch_icon_load_cb(char_u *fname, void *cookie)
+    நிலையான வெறுமை
+mch_icon_load_cb(char_u *fname, வெறுமை *cookie)
 {
     HANDLE *h = (HANDLE *)cookie;
 
-    *h = LoadImage(NULL,
+    *h = LoadImage(வெற்று,
 		   (LPSTR)fname,
 		   IMAGE_ICON,
 		   64,
@@ -836,10 +836,10 @@ mch_icon_load_cb(char_u *fname, void *cookie)
 /*
  * Try loading an icon file from 'runtimepath'.
  */
-    int
+    முழு
 mch_icon_load(HANDLE *iconp)
 {
-    return do_in_runtimepath((char_u *)"bitmaps/vim.ico",
+    திரும்பு do_in_runtimepath((char_u *)"bitmaps/vim.ico",
 						  0, mch_icon_load_cb, iconp);
 }
 
@@ -847,109 +847,109 @@ mch_icon_load(HANDLE *iconp)
  * Fill the buffer 'buf' with 'len' random bytes.
  * Returns FAIL if the OS PRNG is not available or something went wrong.
  */
-    int
-mch_get_random(char_u *buf, int len)
+    முழு
+mch_get_random(char_u *buf, முழு len)
 {
-    static int		initialized = NOTDONE;
-    static HINSTANCE	hInstLib;
-    static BOOL (WINAPI *pProcessPrng)(PUCHAR, ULONG);
+    நிலையான முழு		initialized = NOTDONE;
+    நிலையான HINSTANCE	hInstLib;
+    நிலையான BOOL (WINAPI *pProcessPrng)(PUCHAR, ULONG);
 
-    if (initialized == NOTDONE)
+    எனில் (initialized == NOTDONE)
     {
 	hInstLib = vimLoadLib("bcryptprimitives.dll");
-	if (hInstLib != NULL)
-	    pProcessPrng = (void *)GetProcAddress(hInstLib, "ProcessPrng");
-	if (hInstLib == NULL || pProcessPrng == NULL)
+	எனில் (hInstLib != வெற்று)
+	    pProcessPrng = (வெறுமை *)GetProcAddress(hInstLib, "ProcessPrng");
+	எனில் (hInstLib == வெற்று || pProcessPrng == வெற்று)
 	{
 	    FreeLibrary(hInstLib);
 	    initialized = FAIL;
 	}
-	else
+	இல்லையெனில்
 	    initialized = OK;
     }
 
-    if (initialized == FAIL)
-	return FAIL;
+    எனில் (initialized == FAIL)
+	திரும்பு FAIL;
 
     // According to the documentation this call cannot fail.
     pProcessPrng(buf, len);
 
-    return OK;
+    திரும்பு OK;
 }
 
-    int
+    முழு
 mch_libcall(
     char_u	*libname,
     char_u	*funcname,
     char_u	*argstring,	// NULL when using a argint
-    int		argint,
+    முழு		argint,
     char_u	**string_result,// NULL when using number_result
-    int		*number_result)
+    முழு		*எண்_result)
 {
     HINSTANCE		hinstLib;
 
     BOOL fRunTimeLinkSuccess = FALSE;
 
     // Get a handle to the DLL module.
-    hinstLib = vimLoadLib((char *)libname);
+    hinstLib = vimLoadLib((எழுத்து *)libname);
 
     // If the handle is valid, try to get the function address.
-    if (hinstLib != NULL)
+    எனில் (hinstLib != வெற்று)
     {
-	char_u	*retval_str = NULL;
-	int	retval_int = 0;
+	char_u	*retval_str = வெற்று;
+	முழு	retval_int = 0;
 	size_t	len;
 
 # ifdef HAVE_TRY_EXCEPT
 	__try
 	{
 # endif
-	if (argstring != NULL)
+	எனில் (argstring != வெற்று)
 	{
 	    // Call with string argument
-	    if (string_result != NULL)
+	    எனில் (string_result != வெற்று)
 	    {
 		MYSTRPROCSTR proc;
 
 		proc = (MYSTRPROCSTR)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		எனில் (proc != வெற்று)
 		{
 		    fRunTimeLinkSuccess = TRUE;
 		    retval_str = proc(argstring);
 		}
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		MYSTRPROCINT proc;
 
 		proc = (MYSTRPROCINT)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		எனில் (proc != வெற்று)
 		{
 		    fRunTimeLinkSuccess = TRUE;
 		    retval_int = proc(argstring);
 		}
 	    }
 	}
-	else
+	இல்லையெனில்
 	{
 	    // Call with number argument
-	    if (string_result != NULL)
+	    எனில் (string_result != வெற்று)
 	    {
 		MYINTPROCSTR proc;
 
 		proc = (MYINTPROCSTR)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		எனில் (proc != வெற்று)
 		{
 		    fRunTimeLinkSuccess = TRUE;
 		    retval_str = proc(argint);
 		}
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		MYINTPROCINT proc;
 
 		proc = (MYINTPROCINT)GetProcAddress(hinstLib, (LPCSTR)funcname);
-		if (proc != NULL)
+		எனில் (proc != வெற்று)
 		{
 		    fRunTimeLinkSuccess = TRUE;
 		    retval_int = proc(argint);
@@ -959,13 +959,13 @@ mch_libcall(
 
 	// Save the string before we free the library.
 	// Assume that a "1" result is an illegal pointer.
-	if (string_result == NULL)
-	    *number_result = retval_int;
-	else if (retval_str != NULL
+	எனில் (string_result == வெற்று)
+	    *எண்_result = retval_int;
+	இல்லையெனில் எனில் (retval_str != வெற்று
 		&& (len = check_str_len(retval_str)) > 0)
 	{
 	    *string_result = alloc(len);
-	    if (*string_result != NULL)
+	    எனில் (*string_result != வெற்று)
 		mch_memmove(*string_result, retval_str, len);
 	}
 
@@ -973,37 +973,37 @@ mch_libcall(
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
 	{
-	    if (GetExceptionCode() == EXCEPTION_STACK_OVERFLOW)
+	    எனில் (GetExceptionCode() == EXCEPTION_அடுக்கு_OVERFLOW)
 		_resetstkoflw();
 	    fRunTimeLinkSuccess = FALSE;
 	}
 # endif
 
 	// Free the DLL module.
-	(void)FreeLibrary(hinstLib);
+	(வெறுமை)FreeLibrary(hinstLib);
     }
 
-    if (!fRunTimeLinkSuccess)
+    எனில் (!fRunTimeLinkSuccess)
     {
 	semsg(_(e_library_call_failed_for_str), funcname);
-	return FAIL;
+	திரும்பு FAIL;
     }
 
-    return OK;
+    திரும்பு OK;
 }
 #endif
 
 /*
  * Debugging helper: expose the MCH_WRITE_DUMP stuff to other modules
  */
-    void
-DumpPutS(const char *psz UNUSED)
+    வெறுமை
+DumpPutS(மாறிலி எழுத்து *psz UNUSED)
 {
 #ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    எனில் (fdDump)
     {
 	fputs(psz, fdDump);
-	if (psz[strlen(psz) - 1] != '\n')
+	எனில் (psz[strlen(psz) - 1] != '\n')
 	    fputc('\n', fdDump);
 	fflush(fdDump);
     }
@@ -1012,9 +1012,9 @@ DumpPutS(const char *psz UNUSED)
 
 #ifdef _DEBUG
 
-void __cdecl
+வெறுமை __cdecl
 Trace(
-    char *pszFormat,
+    எழுத்து *pszFormat,
     ...)
 {
     CHAR szBuff[2048];
@@ -1029,26 +1029,26 @@ Trace(
 
 #endif //_DEBUG
 
-#if !defined(FEAT_GUI) || defined(VIMDLL)
-extern HWND g_hWnd;	// This is in os_win32.c.
+#எனில் !defined(FEAT_GUI) || defined(VIMDLL)
+வெளி HWND g_hWnd;	// This is in os_win32.c.
 
 /*
  * Showing the printer dialog is tricky since we have no GUI
  * window to parent it. The following routines are needed to
  * get the window parenting and Z-order to work properly.
  */
-    static void
-GetConsoleHwnd(void)
+    நிலையான வெறுமை
+GetConsoleHwnd(வெறுமை)
 {
     // Skip if it's already set.
-    if (s_hwnd != 0)
-	return;
+    எனில் (s_hwnd != 0)
+	திரும்பு;
 
     // Window handle may have been found by init code (Windows NT only)
-    if (g_hWnd != 0)
+    எனில் (g_hWnd != 0)
     {
 	s_hwnd = g_hWnd;
-	return;
+	திரும்பு;
     }
 
     s_hwnd = GetConsoleWindow();
@@ -1057,48 +1057,48 @@ GetConsoleHwnd(void)
 /*
  * Console implementation of ":winpos".
  */
-    int
-mch_get_winpos(int *x, int *y)
+    முழு
+mch_get_winpos(முழு *x, முழு *y)
 {
     RECT  rect;
 
     GetConsoleHwnd();
     GetWindowRect(s_hwnd, &rect);
-    *x = rect.left;
-    *y = rect.top;
-    return OK;
+    *x = rect.இடது;
+    *y = rect.உச்சி;
+    திரும்பு OK;
 }
 
 /*
  * Console implementation of ":winpos x y".
  */
-    void
-mch_set_winpos(int x, int y)
+    வெறுமை
+mch_set_winpos(முழு x, முழு y)
 {
     GetConsoleHwnd();
-    SetWindowPos(s_hwnd, NULL, x, y, 0, 0,
+    SetWindowPos(s_hwnd, வெற்று, x, y, 0, 0,
 		 SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 }
 #endif
 
-#if defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
+#எனில் defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT)
 
 //=================================================================
 // Win32 printer stuff
 
-static HFONT		prt_font_handles[2][2][2];
-static PRINTDLGW	prt_dlg;
-static const int	boldface[2] = {FW_REGULAR, FW_BOLD};
-static TEXTMETRIC	prt_tm;
-static int		prt_line_height;
-static int		prt_number_width;
-static int		prt_left_margin;
-static int		prt_right_margin;
-static int		prt_top_margin;
-static char_u		szAppName[] = TEXT("VIM");
-static HWND		hDlgPrint;
-static int		*bUserAbort = NULL;
-static char_u		*prt_name = NULL;
+நிலையான HFONT		prt_font_handles[2][2][2];
+நிலையான PRINTDLGW	prt_dlg;
+நிலையான மாறிலி முழு	boldface[2] = {FW_REGULAR, FW_BOLD};
+நிலையான TEXTMETRIC	prt_tm;
+நிலையான முழு		prt_வரி_height;
+நிலையான முழு		prt_எண்_width;
+நிலையான முழு		prt_இடது_margin;
+நிலையான முழு		prt_வலது_margin;
+நிலையான முழு		prt_உச்சி_margin;
+நிலையான char_u		szAppName[] = TEXT("VIM");
+நிலையான HWND		hDlgPrint;
+நிலையான முழு		*bUserAbort = வெற்று;
+நிலையான char_u		*prt_name = வெற்று;
 
 // Defines which are also in vim.rc.
 # define IDC_BOX1		400
@@ -1106,37 +1106,37 @@ static char_u		*prt_name = NULL;
 # define IDC_PRINTTEXT2		402
 # define IDC_PROGRESS		403
 
-    static BOOL
-vimSetDlgItemText(HWND hDlg, int nIDDlgItem, char_u *s)
+    நிலையான BOOL
+vimSetDlgItemText(HWND hDlg, முழு nIDDlgItem, char_u *s)
 {
     WCHAR   *wp;
     BOOL    ret;
 
-    wp = enc_to_utf16(s, NULL);
-    if (wp == NULL)
-	return FALSE;
+    wp = enc_to_utf16(s, வெற்று);
+    எனில் (wp == வெற்று)
+	திரும்பு FALSE;
 
     ret = SetDlgItemTextW(hDlg, nIDDlgItem, wp);
     vim_free(wp);
-    return ret;
+    திரும்பு ret;
 }
 
 /*
  * Convert BGR to RGB for Windows GDI calls
  */
-    static COLORREF
+    நிலையான COLORREF
 swap_me(COLORREF colorref)
 {
-    int  temp;
-    char *ptr = (char *)&colorref;
+    முழு  temp;
+    எழுத்து *ptr = (எழுத்து *)&colorref;
 
     temp = *(ptr);
     *(ptr ) = *(ptr + 2);
     *(ptr + 2) = temp;
-    return colorref;
+    திரும்பு colorref;
 }
 
-    static INT_PTR CALLBACK
+    நிலையான INT_PTR CALLBACK
 PrintDlgProc(
 	HWND hDlg,
 	UINT message,
@@ -1145,85 +1145,85 @@ PrintDlgProc(
 {
 # ifdef FEAT_GETTEXT
     NONCLIENTMETRICS nm;
-    static HFONT hfont;
+    நிலையான HFONT hfont;
 # endif
 
-    switch (message)
+    தேர்வு (message)
     {
-	case WM_INITDIALOG:
+	நிலை WM_INITDIALOG:
 # ifdef FEAT_GETTEXT
-	    nm.cbSize = sizeof(NONCLIENTMETRICS);
-	    if (SystemParametersInfo(
+	    nm.cbSize = அளவு(NONCLIENTMETRICS);
+	    எனில் (SystemParametersInfo(
 			SPI_GETNONCLIENTMETRICS,
-			sizeof(NONCLIENTMETRICS),
+			அளவு(NONCLIENTMETRICS),
 			&nm,
 			0))
 	    {
-		char buff[MAX_PATH];
-		int i;
+		எழுத்து buff[MAX_PATH];
+		முழு i;
 
 		// Translate the dialog texts
 		hfont = CreateFontIndirect(&nm.lfMessageFont);
-		for (i = IDC_PRINTTEXT1; i <= IDC_PROGRESS; i++)
+		க்கு (i = IDC_PRINTTEXT1; i <= IDC_PROGRESS; i++)
 		{
 		    SendDlgItemMessage(hDlg, i, WM_SETFONT, (WPARAM)hfont, 1);
-		    if (GetDlgItemText(hDlg,i, buff, sizeof(buff)))
+		    எனில் (GetDlgItemText(hDlg,i, buff, அளவு(buff)))
 			vimSetDlgItemText(hDlg,i, (char_u *)_(buff));
 		}
 		SendDlgItemMessage(hDlg, IDCANCEL,
 						WM_SETFONT, (WPARAM)hfont, 1);
-		if (GetDlgItemText(hDlg,IDCANCEL, buff, sizeof(buff)))
+		எனில் (GetDlgItemText(hDlg,IDCANCEL, buff, அளவு(buff)))
 		    vimSetDlgItemText(hDlg,IDCANCEL, (char_u *)_(buff));
 	    }
 # endif
 	    SetWindowText(hDlg, (LPCSTR)szAppName);
-	    if (prt_name != NULL)
+	    எனில் (prt_name != வெற்று)
 	    {
 		vimSetDlgItemText(hDlg, IDC_PRINTTEXT2, (char_u *)prt_name);
 		VIM_CLEAR(prt_name);
 	    }
 	    EnableMenuItem(GetSystemMenu(hDlg, FALSE), SC_CLOSE, MF_GRAYED);
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+# எனில் !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-	    if (!gui.in_use)
+	    எனில் (!gui.in_use)
 #  endif
-		BringWindowToTop(s_hwnd);
+		Bring_Window_To_உச்சி(s_hwnd);
 # endif
-	    return TRUE;
+	    திரும்பு TRUE;
 
-	case WM_COMMAND:
+	நிலை WM_COMMAND:
 	    *bUserAbort = TRUE;
 	    EnableWindow(GetParent(hDlg), TRUE);
 	    DestroyWindow(hDlg);
-	    hDlgPrint = NULL;
+	    hDlgPrint = வெற்று;
 # ifdef FEAT_GETTEXT
 	    DeleteObject(hfont);
 # endif
-	    return TRUE;
+	    திரும்பு TRUE;
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
-    static BOOL CALLBACK
-AbortProc(HDC hdcPrn UNUSED, int iCode UNUSED)
+    நிலையான BOOL CALLBACK
+AbortProc(HDC hdcPrn UNUSED, முழு iCode UNUSED)
 {
-    MSG msg;
+    செய்தி_2 செய்தி;
 
-    while (!*bUserAbort && PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+    போது (!*bUserAbort && PeekMessageW(&செய்தி, வெற்று, 0, 0, PM_REMOVE))
     {
-	if (!hDlgPrint || !IsDialogMessageW(hDlgPrint, &msg))
+	எனில் (!hDlgPrint || !IsDialogMessageW(hDlgPrint, &செய்தி))
 	{
-	    TranslateMessage(&msg);
-	    DispatchMessageW(&msg);
+	    TranslateMessage(&செய்தி);
+	    DispatchMessageW(&செய்தி);
 	}
     }
-    return !*bUserAbort;
+    திரும்பு !*bUserAbort;
 }
 
-    static UINT_PTR CALLBACK
+    நிலையான UINT_PTR CALLBACK
 PrintHookProc(
 	HWND hDlg,	// handle to dialog box
-	UINT uiMsg,	// message identifier
+	UINT ui_செய்தி,	// message identifier
 	WPARAM wParam UNUSED,	// message parameter
 	LPARAM lParam	// message parameter
 	)
@@ -1232,11 +1232,11 @@ PrintHookProc(
     RECT	rc, rcDlg, rcOwner;
     PRINTDLGW	*pPD;
 
-    if (uiMsg != WM_INITDIALOG)
-	return FALSE;
+    எனில் (ui_செய்தி != WM_INITDIALOG)
+	திரும்பு FALSE;
 
     // Get the owner window and dialog box rectangles.
-    if ((hwndOwner = GetParent(hDlg)) == NULL)
+    எனில் ((hwndOwner = GetParent(hDlg)) == வெற்று)
 	hwndOwner = GetDesktopWindow();
 
     GetWindowRect(hwndOwner, &rcOwner);
@@ -1248,17 +1248,17 @@ PrintHookProc(
     // height, and then offset the owner again to discard
     // space taken up by the dialog box.
 
-    OffsetRect(&rcDlg, -rcDlg.left, -rcDlg.top);
-    OffsetRect(&rc, -rc.left, -rc.top);
-    OffsetRect(&rc, -rcDlg.right, -rcDlg.bottom);
+    OffsetRect(&rcDlg, -rcDlg.இடது, -rcDlg.உச்சி);
+    OffsetRect(&rc, -rc.இடது, -rc.உச்சி);
+    OffsetRect(&rc, -rcDlg.வலது, -rcDlg.bottom);
 
     // The new position is the sum of half the remaining
     // space and the owner's original position.
 
     SetWindowPos(hDlg,
-	    HWND_TOP,
-	    rcOwner.left + (rc.right / 2),
-	    rcOwner.top + (rc.bottom / 2),
+	    HWND_உச்சி,
+	    rcOwner.இடது + (rc.வலது / 2),
+	    rcOwner.உச்சி + (rc.bottom / 2),
 	    0, 0,		// ignores size arguments
 	    SWP_NOSIZE);
 
@@ -1267,79 +1267,79 @@ PrintHookProc(
     pPD->nCopies = (WORD)pPD->lCustData;
     SetDlgItemInt( hDlg, edt3, pPD->nCopies, FALSE );
     //  Bring the window to top
-    BringWindowToTop(GetParent(hDlg));
+    Bring_Window_To_உச்சி(GetParent(hDlg));
     SetForegroundWindow(hDlg);
 
-    return FALSE;
+    திரும்பு FALSE;
 }
 
-    void
-mch_print_cleanup(void)
+    வெறுமை
+mch_print_cleanup(வெறுமை)
 {
-    int pifItalic;
-    int pifBold;
-    int pifUnderline;
+    முழு pifItalic;
+    முழு pifBold;
+    முழு pifUnderline;
 
-    for (pifBold = 0; pifBold <= 1; pifBold++)
-	for (pifItalic = 0; pifItalic <= 1; pifItalic++)
-	    for (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
+    க்கு (pifBold = 0; pifBold <= 1; pifBold++)
+	க்கு (pifItalic = 0; pifItalic <= 1; pifItalic++)
+	    க்கு (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
 		DeleteObject(prt_font_handles[pifBold][pifItalic][pifUnderline]);
 
-    if (prt_dlg.hDC != NULL)
+    எனில் (prt_dlg.hDC != வெற்று)
 	DeleteDC(prt_dlg.hDC);
-    if (!*bUserAbort && hDlgPrint != NULL)
+    எனில் (!*bUserAbort && hDlgPrint != வெற்று)
 	SendMessage(hDlgPrint, WM_COMMAND, 0, 0);
 }
 
-    static int
-to_device_units(int idx, int dpi, int physsize, int offset, int def_number)
+    நிலையான முழு
+to_device_units(முழு idx, முழு dpi, முழு physsize, முழு offset, முழு def_எண்)
 {
-    int		ret = 0;
-    int		u;
-    int		nr;
+    முழு		ret = 0;
+    முழு		u;
+    முழு		nr;
 
     u = prt_get_unit(idx);
-    if (u == PRT_UNIT_NONE)
+    எனில் (u == PRT_UNIT_NONE)
     {
 	u = PRT_UNIT_PERC;
-	nr = def_number;
+	nr = def_எண்;
     }
-    else
-	nr = printer_opts[idx].number;
+    இல்லையெனில்
+	nr = printer_opts[idx].எண்;
 
-    switch (u)
+    தேர்வு (u)
     {
-	case PRT_UNIT_PERC:
+	நிலை PRT_UNIT_PERC:
 	    ret = (physsize * nr) / 100;
-	    break;
-	case PRT_UNIT_INCH:
+	    நிறுத்து;
+	நிலை PRT_UNIT_INCH:
 	    ret = (nr * dpi);
-	    break;
-	case PRT_UNIT_MM:
+	    நிறுத்து;
+	நிலை PRT_UNIT_MM:
 	    ret = (nr * 10 * dpi) / 254;
-	    break;
-	case PRT_UNIT_POINT:
+	    நிறுத்து;
+	நிலை PRT_UNIT_POINT:
 	    ret = (nr * 10 * dpi) / 720;
-	    break;
+	    நிறுத்து;
     }
 
-    if (ret < offset)
-	return 0;
-    else
-	return ret - offset;
+    எனில் (ret < offset)
+	திரும்பு 0;
+    இல்லையெனில்
+	திரும்பு ret - offset;
 }
 
-    static int
-prt_get_cpl(void)
+    நிலையான முழு
+prt_get_cpl(வெறுமை)
 {
-    int		hr;
-    int		phyw;
-    int		dvoff;
-    int		rev_offset;
-    int		dpi;
+    முழு		hr;
+    முழு		phyw;
+    முழு		dvoff;
+    முழு		rev_offset;
+    முழு		dpi;
 
     GetTextMetrics(prt_dlg.hDC, &prt_tm);
-    prt_line_height = prt_tm.tmHeight + prt_tm.tmExternalLeading;
+    prt_வரி_height = prt_tm.tmHeight + prt_tm.tmExternalLeading;
 
     hr	    = GetDeviceCaps(prt_dlg.hDC, HORZRES);
     phyw    = GetDeviceCaps(prt_dlg.hDC, PHYSICALWIDTH);
@@ -1348,30 +1348,30 @@ prt_get_cpl(void)
 
     rev_offset = phyw - (dvoff + hr);
 
-    prt_left_margin = to_device_units(OPT_PRINT_LEFT, dpi, phyw, dvoff, 10);
-    if (prt_use_number())
+    prt_இடது_margin = to_device_units(OPT_PRINT_இடது, dpi, phyw, dvoff, 10);
+    எனில் (prt_use_எண்())
     {
-	prt_number_width = PRINT_NUMBER_WIDTH * prt_tm.tmAveCharWidth;
-	prt_left_margin += prt_number_width;
+	prt_எண்_width = PRINT_எண்_WIDTH * prt_tm.tmAveCharWidth;
+	prt_இடது_margin += prt_எண்_width;
     }
-    else
-	prt_number_width = 0;
+    இல்லையெனில்
+	prt_எண்_width = 0;
 
-    prt_right_margin = hr - to_device_units(OPT_PRINT_RIGHT, dpi, phyw,
+    prt_வலது_margin = hr - to_device_units(OPT_PRINT_வலது, dpi, phyw,
 							       rev_offset, 5);
 
-    return (prt_right_margin - prt_left_margin) / prt_tm.tmAveCharWidth;
+    திரும்பு (prt_வலது_margin - prt_இடது_margin) / prt_tm.tmAveCharWidth;
 }
 
-    static int
-prt_get_lpp(void)
+    நிலையான முழு
+prt_get_lpp(வெறுமை)
 {
-    int vr;
-    int phyw;
-    int dvoff;
-    int rev_offset;
-    int	bottom_margin;
-    int	dpi;
+    முழு vr;
+    முழு phyw;
+    முழு dvoff;
+    முழு rev_offset;
+    முழு	bottom_margin;
+    முழு	dpi;
 
     vr	    = GetDeviceCaps(prt_dlg.hDC, VERTRES);
     phyw    = GetDeviceCaps(prt_dlg.hDC, PHYSICALHEIGHT);
@@ -1380,47 +1380,47 @@ prt_get_lpp(void)
 
     rev_offset = phyw - (dvoff + vr);
 
-    prt_top_margin = to_device_units(OPT_PRINT_TOP, dpi, phyw, dvoff, 5);
+    prt_உச்சி_margin = to_device_units(OPT_PRINT_உச்சி, dpi, phyw, dvoff, 5);
 
     // adjust top margin if there is a header
-    prt_top_margin += prt_line_height * prt_header_height();
+    prt_உச்சி_margin += prt_வரி_height * prt_header_height();
 
     bottom_margin = vr - to_device_units(OPT_PRINT_BOT, dpi, phyw,
 							       rev_offset, 5);
 
-    return (bottom_margin - prt_top_margin) / prt_line_height;
+    திரும்பு (bottom_margin - prt_உச்சி_margin) / prt_வரி_height;
 }
 
-    int
-mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
+    முழு
+mch_print_init(prt_settings_T *psettings, char_u *jobname, முழு forceit)
 {
-    static HGLOBAL	stored_dm = NULL;
-    static HGLOBAL	stored_devn = NULL;
-    static int		stored_nCopies = 1;
-    static int		stored_nFlags = 0;
+    நிலையான HGLOBAL	stored_dm = வெற்று;
+    நிலையான HGLOBAL	stored_devn = வெற்று;
+    நிலையான முழு		stored_nCopies = 1;
+    நிலையான முழு		stored_nFlags = 0;
 
     LOGFONTW		fLogFont;
-    int			pifItalic;
-    int			pifBold;
-    int			pifUnderline;
+    முழு			pifItalic;
+    முழு			pifBold;
+    முழு			pifUnderline;
 
     DEVMODEW		*mem;
     DEVNAMES		*devname;
-    int			i;
+    முழு			i;
     DWORD		err;
 
     bUserAbort = &(psettings->user_abort);
     CLEAR_FIELD(prt_dlg);
-    prt_dlg.lStructSize = sizeof(PRINTDLGW);
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+    prt_dlg.lStructSize = அளவு(PRINTDLGW);
+# எனில் !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-    if (!gui.in_use)
+    எனில் (!gui.in_use)
 #  endif
 	GetConsoleHwnd();	    // get value of s_hwnd
 # endif
     prt_dlg.hwndOwner = s_hwnd;
     prt_dlg.Flags = PD_NOPAGENUMS | PD_NOSELECTION | PD_RETURNDC;
-    if (!forceit)
+    எனில் (!forceit)
     {
 	prt_dlg.hDevMode = stored_dm;
 	prt_dlg.hDevNames = stored_devn;
@@ -1437,11 +1437,11 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
      * If bang present, return default printer setup with no dialog
      * never show dialog if we are running over telnet
      */
-    if (forceit
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+    எனில் (forceit
+# எனில் !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
 	    || (!gui.in_use && !term_console)
-#  else
+#  இல்லையெனில்
 	    || !term_console
 #  endif
 # endif
@@ -1452,18 +1452,18 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 	 * MSDN suggests setting the first parameter to WINSPOOL for
 	 * NT, but NULL appears to work just as well.
 	 */
-	if (*p_pdev != NUL)
-	    prt_dlg.hDC = CreateDC(NULL, (LPCSTR)p_pdev, NULL, NULL);
-	else
+	எனில் (*p_pdev != NUL)
+	    prt_dlg.hDC = CreateDC(வெற்று, (LPCSTR)p_pdev, வெற்று, வெற்று);
+	இல்லையெனில்
 	{
 	    prt_dlg.Flags |= PD_RETURNDEFAULT;
-	    if (PrintDlgW(&prt_dlg) == 0)
-		goto init_fail_dlg;
+	    எனில் (PrintDlgW(&prt_dlg) == 0)
+		செல் init_fail_dlg;
 	}
     }
-    else if (PrintDlgW(&prt_dlg) == 0)
-	goto init_fail_dlg;
-    else
+    இல்லையெனில் எனில் (PrintDlgW(&prt_dlg) == 0)
+	செல் init_fail_dlg;
+    இல்லையெனில்
     {
 	/*
 	 * keep the previous driver context
@@ -1474,11 +1474,11 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 	stored_nCopies = prt_dlg.nCopies;
     }
 
-    if (prt_dlg.hDC == NULL)
+    எனில் (prt_dlg.hDC == வெற்று)
     {
 	emsg(_(e_printer_selection_failed));
 	mch_print_cleanup();
-	return FALSE;
+	திரும்பு FALSE;
     }
 
     // Not all printer drivers report the support of color (or grey) in the
@@ -1490,7 +1490,7 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 				   || i > 2 || i == -1);
 
     // Ensure all font styles are baseline aligned
-    SetTextAlign(prt_dlg.hDC, TA_BASELINE|TA_LEFT);
+    SetTextAlign(prt_dlg.hDC, TA_BASELINE|TA_இடது);
 
     /*
      * On some windows systems the nCopies parameter is not
@@ -1498,31 +1498,31 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
      * hDevMode struct.
      */
     mem = (DEVMODEW *)GlobalLock(prt_dlg.hDevMode);
-    if (mem != NULL)
+    எனில் (mem != வெற்று)
     {
-	if (mem->dmCopies != 1)
+	எனில் (mem->dmCopies != 1)
 	    stored_nCopies = mem->dmCopies;
-	if ((mem->dmFields & DM_DUPLEX) && (mem->dmDuplex & ~DMDUP_SIMPLEX))
+	எனில் ((mem->dmFields & DM_DUPLEX) && (mem->dmDuplex & ~DMDUP_SIMPLEX))
 	    psettings->duplex = TRUE;
-	if ((mem->dmFields & DM_COLOR) && (mem->dmColor & DMCOLOR_COLOR))
+	எனில் ((mem->dmFields & DM_COLOR) && (mem->dmColor & DMCOLOR_COLOR))
 	    psettings->has_color = TRUE;
     }
     GlobalUnlock(prt_dlg.hDevMode);
 
     devname = (DEVNAMES *)GlobalLock(prt_dlg.hDevNames);
-    if (devname != 0)
+    எனில் (devname != 0)
     {
 	WCHAR	*wprinter_name = (WCHAR *)devname + devname->wDeviceOffset;
 	WCHAR	*wport_name = (WCHAR *)devname + devname->wOutputOffset;
 	char_u	*text = (char_u *)_("to %s on %s");
-	char_u  *printer_name = utf16_to_enc(wprinter_name, NULL);
-	char_u	*port_name = utf16_to_enc(wport_name, NULL);
+	char_u  *printer_name = utf16_to_enc(wprinter_name, வெற்று);
+	char_u	*port_name = utf16_to_enc(wport_name, வெற்று);
 
-	if (printer_name != NULL && port_name != NULL)
+	எனில் (printer_name != வெற்று && port_name != வெற்று)
 	    prt_name = alloc(STRLEN(printer_name)
 					   + STRLEN(port_name) + STRLEN(text));
-	if (prt_name != NULL)
-	    wsprintf((char *)prt_name, (const char *)text,
+	எனில் (prt_name != வெற்று)
+	    wsprintf((எழுத்து *)prt_name, (மாறிலி எழுத்து *)text,
 		    printer_name, port_name);
 	vim_free(printer_name);
 	vim_free(port_name);
@@ -1533,16 +1533,16 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
      * Initialise the font according to 'printfont'
      */
     CLEAR_FIELD(fLogFont);
-    if (get_logfont(&fLogFont, p_pfn, prt_dlg.hDC, TRUE) == FAIL)
+    எனில் (get_logfont(&fLogFont, p_pfn, prt_dlg.hDC, TRUE) == FAIL)
     {
 	semsg(_(e_unknown_printer_font_str), p_pfn);
 	mch_print_cleanup();
-	return FALSE;
+	திரும்பு FALSE;
     }
 
-    for (pifBold = 0; pifBold <= 1; pifBold++)
-	for (pifItalic = 0; pifItalic <= 1; pifItalic++)
-	    for (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
+    க்கு (pifBold = 0; pifBold <= 1; pifBold++)
+	க்கு (pifItalic = 0; pifItalic <= 1; pifItalic++)
+	    க்கு (pifUnderline = 0; pifUnderline <= 1; pifUnderline++)
 	    {
 		fLogFont.lfWeight =  boldface[pifBold];
 		fLogFont.lfItalic = pifItalic;
@@ -1557,22 +1557,22 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
     /*
      * Fill in the settings struct
      */
-    psettings->chars_per_line = prt_get_cpl();
-    psettings->lines_per_page = prt_get_lpp();
-    if (prt_dlg.Flags & PD_USEDEVMODECOPIESANDCOLLATE)
+    psettings->chars_per_வரி = prt_get_cpl();
+    psettings->வரிகள்_per_page = prt_get_lpp();
+    எனில் (prt_dlg.Flags & PD_USEDEVMODECOPIESANDCOLLATE)
     {
 	psettings->n_collated_copies = (prt_dlg.Flags & PD_COLLATE)
 						    ? prt_dlg.nCopies : 1;
 	psettings->n_uncollated_copies = (prt_dlg.Flags & PD_COLLATE)
 						    ? 1 : prt_dlg.nCopies;
 
-	if (psettings->n_collated_copies == 0)
+	எனில் (psettings->n_collated_copies == 0)
 	    psettings->n_collated_copies = 1;
 
-	if (psettings->n_uncollated_copies == 0)
+	எனில் (psettings->n_uncollated_copies == 0)
 	    psettings->n_uncollated_copies = 1;
     }
-    else
+    இல்லையெனில்
     {
 	psettings->n_collated_copies = 1;
 	psettings->n_uncollated_copies = 1;
@@ -1580,11 +1580,11 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 
     psettings->jobname = jobname;
 
-    return TRUE;
+    திரும்பு TRUE;
 
 init_fail_dlg:
     err = CommDlgExtendedError();
-    if (err)
+    எனில் (err)
     {
 	char_u *buf;
 
@@ -1593,24 +1593,24 @@ init_fail_dlg:
 	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL, err, 0, (LPTSTR)(&buf), 0, NULL);
+		வெற்று, err, 0, (LPTSTR)(&buf), 0, வெற்று);
 	semsg(_(e_print_error_str),
-		buf == NULL ? (char_u *)_("Unknown") : buf);
+		buf == வெற்று ? (char_u *)_("Unknown") : buf);
 	LocalFree((LPVOID)(buf));
     }
-    else
-	msg_clr_eos(); // Maybe canceled
+    இல்லையெனில்
+	செய்தி_clr_eos(); // Maybe canceled
 
     mch_print_cleanup();
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 
-    int
+    முழு
 mch_print_begin(prt_settings_T *psettings)
 {
-    int			ret = 0;
-    char		szBuffer[300];
+    முழு			ret = 0;
+    எழுத்து		szBuffer[300];
     WCHAR		*wp;
 
     hDlgPrint = CreateDialog(g_hinst, TEXT("PrintDlgBox"),
@@ -1619,13 +1619,13 @@ mch_print_begin(prt_settings_T *psettings)
     wsprintf(szBuffer, _("Printing '%s'"), gettail(psettings->jobname));
     vimSetDlgItemText(hDlgPrint, IDC_PRINTTEXT1, (char_u *)szBuffer);
 
-    wp = enc_to_utf16(psettings->jobname, NULL);
-    if (wp != NULL)
+    wp = enc_to_utf16(psettings->jobname, வெற்று);
+    எனில் (wp != வெற்று)
     {
 	DOCINFOW	di;
 
 	CLEAR_FIELD(di);
-	di.cbSize = sizeof(di);
+	di.cbSize = அளவு(di);
 	di.lpszDocName = wp;
 	ret = StartDocW(prt_dlg.hDC, &di);
 	vim_free(wp);
@@ -1634,95 +1634,95 @@ mch_print_begin(prt_settings_T *psettings)
 # ifdef FEAT_GUI
     // Give focus back to main window (when using MDI).
 #  ifdef VIMDLL
-    if (gui.in_use)
+    எனில் (gui.in_use)
 #  endif
 	SetFocus(s_hwnd);
 # endif
 
-    return (ret > 0);
+    திரும்பு (ret > 0);
 }
 
-    void
+    வெறுமை
 mch_print_end(prt_settings_T *psettings UNUSED)
 {
     EndDoc(prt_dlg.hDC);
-    if (!*bUserAbort && hDlgPrint != NULL)
+    எனில் (!*bUserAbort && hDlgPrint != வெற்று)
 	SendMessage(hDlgPrint, WM_COMMAND, 0, 0);
 }
 
-    int
-mch_print_end_page(void)
+    முழு
+mch_print_end_page(வெறுமை)
 {
-    return (EndPage(prt_dlg.hDC) > 0);
+    திரும்பு (EndPage(prt_dlg.hDC) > 0);
 }
 
-    int
-mch_print_begin_page(char_u *msg)
+    முழு
+mch_print_begin_page(char_u *செய்தி)
 {
-    if (msg != NULL)
-	vimSetDlgItemText(hDlgPrint, IDC_PROGRESS, msg);
-    return (StartPage(prt_dlg.hDC) > 0);
+    எனில் (செய்தி != வெற்று)
+	vimSetDlgItemText(hDlgPrint, IDC_PROGRESS, செய்தி);
+    திரும்பு (StartPage(prt_dlg.hDC) > 0);
 }
 
-    int
-mch_print_blank_page(void)
+    முழு
+mch_print_blank_page(வெறுமை)
 {
-    return (mch_print_begin_page(NULL) ? (mch_print_end_page()) : FALSE);
+    திரும்பு (mch_print_begin_page(வெற்று) ? (mch_print_end_page()) : FALSE);
 }
 
-static int prt_pos_x = 0;
-static int prt_pos_y = 0;
+நிலையான முழு prt_pos_x = 0;
+நிலையான முழு prt_pos_y = 0;
 
-    void
-mch_print_start_line(int margin, int page_line)
+    வெறுமை
+mch_print_start_வரி(முழு margin, முழு page_வரி)
 {
-    if (margin)
-	prt_pos_x = -prt_number_width;
-    else
+    எனில் (margin)
+	prt_pos_x = -prt_எண்_width;
+    இல்லையெனில்
 	prt_pos_x = 0;
-    prt_pos_y = page_line * prt_line_height
+    prt_pos_y = page_வரி * prt_வரி_height
 				 + prt_tm.tmAscent + prt_tm.tmExternalLeading;
 }
 
-    int
-mch_print_text_out(char_u *p, int len)
+    முழு
+mch_print_text_out(char_u *p, முழு len)
 {
     SIZE	sz;
     WCHAR	*wp;
-    int		wlen = len;
-    int		ret = FALSE;
+    முழு		wlen = len;
+    முழு		ret = FALSE;
 
     wp = enc_to_utf16(p, &wlen);
-    if (wp == NULL)
-	return FALSE;
+    எனில் (wp == வெற்று)
+	திரும்பு FALSE;
 
-    TextOutW(prt_dlg.hDC, prt_pos_x + prt_left_margin,
-	    prt_pos_y + prt_top_margin, wp, wlen);
+    TextOutW(prt_dlg.hDC, prt_pos_x + prt_இடது_margin,
+	    prt_pos_y + prt_உச்சி_margin, wp, wlen);
     GetTextExtentPoint32W(prt_dlg.hDC, wp, wlen, &sz);
     vim_free(wp);
     prt_pos_x += (sz.cx - prt_tm.tmOverhang);
     // This is wrong when printing spaces for a TAB.
-    if (p[len] != NUL)
+    எனில் (p[len] != NUL)
     {
 	wlen = mb_ptr2len(p + len);
 	wp = enc_to_utf16(p + len, &wlen);
-	if (wp != NULL)
+	எனில் (wp != வெற்று)
 	{
 	    GetTextExtentPoint32W(prt_dlg.hDC, wp, 1, &sz);
-	    ret = (prt_pos_x + prt_left_margin + sz.cx > prt_right_margin);
+	    ret = (prt_pos_x + prt_இடது_margin + sz.cx > prt_வலது_margin);
 	    vim_free(wp);
 	}
     }
-    return ret;
+    திரும்பு ret;
 }
 
-    void
-mch_print_set_font(int iBold, int iItalic, int iUnderline)
+    வெறுமை
+mch_print_set_font(முழு iBold, முழு iItalic, முழு iUnderline)
 {
     SelectObject(prt_dlg.hDC, prt_font_handles[iBold][iItalic][iUnderline]);
 }
 
-    void
+    வெறுமை
 mch_print_set_bg(long_u bgcol)
 {
     SetBkColor(prt_dlg.hDC, GetNearestColor(prt_dlg.hDC,
@@ -1731,13 +1731,13 @@ mch_print_set_bg(long_u bgcol)
      * With a white background we can draw characters transparent, which is
      * good for italic characters that overlap to the next char cell.
      */
-    if (bgcol == 0xffffffUL)
+    எனில் (bgcol == 0xffffffUL)
 	SetBkMode(prt_dlg.hDC, TRANSPARENT);
-    else
+    இல்லையெனில்
 	SetBkMode(prt_dlg.hDC, OPAQUE);
 }
 
-    void
+    வெறுமை
 mch_print_set_fg(long_u fgcol)
 {
     SetTextColor(prt_dlg.hDC, GetNearestColor(prt_dlg.hDC,
@@ -1748,40 +1748,40 @@ mch_print_set_fg(long_u fgcol)
 
 
 
-#if defined(FEAT_SHORTCUT)
+#எனில் defined(FEAT_SHORTCUT)
 # include <shlobj.h>
 
 # define is_path_sep(c)	    ((c) == L'\\' || (c) == L'/')
 
-    static int
+    நிலையான முழு
 is_reparse_point_included(LPCWSTR fname)
 {
     LPCWSTR	p = fname, q;
     WCHAR	buf[MAX_PATH];
     DWORD	attr;
 
-    if (SAFE_isalpha(p[0]) && p[1] == L':' && is_path_sep(p[2]))
+    எனில் (SAFE_isalpha(p[0]) && p[1] == L':' && is_path_sep(p[2]))
 	p += 3;
-    else if (is_path_sep(p[0]) && is_path_sep(p[1]))
+    இல்லையெனில் எனில் (is_path_sep(p[0]) && is_path_sep(p[1]))
 	p += 2;
 
-    while (*p != L'\0')
+    போது (*p != L'\0')
     {
 	q = wcspbrk(p, L"\\/");
-	if (q == NULL)
+	எனில் (q == வெற்று)
 	    p = q = fname + wcslen(fname);
-	else
+	இல்லையெனில்
 	    p = q + 1;
-	if (q - fname >= MAX_PATH)
-	    return FALSE;
+	எனில் (q - fname >= MAX_PATH)
+	    திரும்பு FALSE;
 	wcsncpy(buf, fname, q - fname);
 	buf[q - fname] = L'\0';
 	attr = GetFileAttributesW(buf);
-	if (attr != INVALID_FILE_ATTRIBUTES
+	எனில் (attr != INVALID_FILE_ATTRIBUTES
 		&& (attr & FILE_ATTRIBUTE_REPARSE_POINT) != 0)
-	    return TRUE;
+	    திரும்பு TRUE;
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 /*
@@ -1791,57 +1791,57 @@ is_reparse_point_included(LPCWSTR fname)
     char_u *
 resolve_reparse_point(char_u *fname)
 {
-    HANDLE	    h = INVALID_HANDLE_VALUE;
+    HANDLE	    h = INVALID_HANDLE_மதிப்பு;
     DWORD	    size;
     WCHAR	    *p, *wp;
-    char_u	    *rfname = NULL;
-    WCHAR	    *buff = NULL;
+    char_u	    *rfname = வெற்று;
+    WCHAR	    *buff = வெற்று;
 
-    p = enc_to_utf16(fname, NULL);
-    if (p == NULL)
-	goto fail;
+    p = enc_to_utf16(fname, வெற்று);
+    எனில் (p == வெற்று)
+	செல் fail;
 
-    if (!is_reparse_point_included(p))
+    எனில் (!is_reparse_point_included(p))
     {
 	vim_free(p);
-	goto fail;
+	செல் fail;
     }
 
-    h = CreateFileW(p, 0, 0, NULL, OPEN_EXISTING,
-	    FILE_FLAG_BACKUP_SEMANTICS, NULL);
+    h = CreateFileW(p, 0, 0, வெற்று, OPEN_EXISTING,
+	    FILE_FLAG_BACKUP_SEMANTICS, வெற்று);
     vim_free(p);
 
-    if (h == INVALID_HANDLE_VALUE)
-	goto fail;
+    எனில் (h == INVALID_HANDLE_மதிப்பு)
+	செல் fail;
 
-    size = GetFinalPathNameByHandleW(h, NULL, 0, 0);
-    if (size == 0)
-	goto fail;
+    size = GetFinalPathNameByHandleW(h, வெற்று, 0, 0);
+    எனில் (size == 0)
+	செல் fail;
     buff = ALLOC_MULT(WCHAR, size);
-    if (buff == NULL)
-	goto fail;
-    if (GetFinalPathNameByHandleW(h, buff, size, 0) == 0)
-	goto fail;
+    எனில் (buff == வெற்று)
+	செல் fail;
+    எனில் (GetFinalPathNameByHandleW(h, buff, size, 0) == 0)
+	செல் fail;
 
-    if (wcsncmp(buff, L"\\\\?\\UNC\\", 8) == 0)
+    எனில் (wcsncmp(buff, L"\\\\?\\UNC\\", 8) == 0)
     {
 	buff[6] = L'\\';
 	wp = buff + 6;
     }
-    else if (wcsncmp(buff, L"\\\\?\\", 4) == 0)
+    இல்லையெனில் எனில் (wcsncmp(buff, L"\\\\?\\", 4) == 0)
 	wp = buff + 4;
-    else
+    இல்லையெனில்
 	wp = buff;
 
-    rfname = utf16_to_enc(wp, NULL);
+    rfname = utf16_to_enc(wp, வெற்று);
 
 fail:
-    if (h != INVALID_HANDLE_VALUE)
+    எனில் (h != INVALID_HANDLE_மதிப்பு)
 	CloseHandle(h);
-    if (buff != NULL)
+    எனில் (buff != வெற்று)
 	vim_free(buff);
 
-    return rfname;
+    திரும்பு rfname;
 }
 
 /*
@@ -1849,59 +1849,59 @@ fail:
  * to and return that name in allocated memory.
  * Otherwise NULL is returned.
  */
-    static char_u *
+    நிலையான char_u *
 resolve_shortcut(char_u *fname)
 {
     HRESULT		hr;
-    IShellLink		*psl = NULL;
-    IPersistFile	*ppf = NULL;
+    IShellLink		*psl = வெற்று;
+    IPersistFile	*ppf = வெற்று;
     OLECHAR		wsz[MAX_PATH];
-    char_u		*rfname = NULL;
-    int			len;
-    IShellLinkW		*pslw = NULL;
+    char_u		*rfname = வெற்று;
+    முழு			len;
+    IShellLinkW		*pslw = வெற்று;
     WIN32_FIND_DATAW	ffdw; // we get those free of charge
 
     // Check if the file name ends in ".lnk". Avoid calling
     // CoCreateInstance(), it's quite slow.
-    if (fname == NULL)
-	return rfname;
-    len = (int)STRLEN(fname);
-    if (len <= 4 || STRNICMP(fname + len - 4, ".lnk", 4) != 0)
-	return rfname;
+    எனில் (fname == வெற்று)
+	திரும்பு rfname;
+    len = (முழு)STRLEN(fname);
+    எனில் (len <= 4 || STRNICMP(fname + len - 4, ".lnk", 4) != 0)
+	திரும்பு rfname;
 
-    CoInitialize(NULL);
+    CoInitialize(வெற்று);
 
     // create a link manager object and request its interface
     hr = CoCreateInstance(
-	    &CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER,
-	    &IID_IShellLinkW, (void**)&pslw);
-    if (hr == S_OK)
+	    &CLSID_ShellLink, வெற்று, CLSCTX_INPROC_SERVER,
+	    &IID_IShellLinkW, (வெறுமை**)&pslw);
+    எனில் (hr == S_OK)
     {
-	WCHAR	*p = enc_to_utf16(fname, NULL);
+	WCHAR	*p = enc_to_utf16(fname, வெற்று);
 
-	if (p != NULL)
+	எனில் (p != வெற்று)
 	{
 	    // Get a pointer to the IPersistFile interface.
 	    hr = pslw->lpVtbl->QueryInterface(
-		    pslw, &IID_IPersistFile, (void**)&ppf);
-	    if (hr != S_OK)
-		goto shortcut_errorw;
+		    pslw, &IID_IPersistFile, (வெறுமை**)&ppf);
+	    எனில் (hr != S_OK)
+		செல் shortcut_errorw;
 
 	    // "load" the name and resolve the link
 	    hr = ppf->lpVtbl->Load(ppf, p, STGM_READ);
-	    if (hr != S_OK)
-		goto shortcut_errorw;
-# if 0  // This makes Vim wait a long time if the target does not exist.
-	    hr = pslw->lpVtbl->Resolve(pslw, NULL, SLR_NO_UI);
-	    if (hr != S_OK)
-		goto shortcut_errorw;
+	    எனில் (hr != S_OK)
+		செல் shortcut_errorw;
+# எனில் 0  // This makes Vim wait a long time if the target does not exist.
+	    hr = pslw->lpVtbl->Resolve(pslw, வெற்று, SLR_NO_UI);
+	    எனில் (hr != S_OK)
+		செல் shortcut_errorw;
 # endif
 
 	    // Get the path to the link target.
-	    ZeroMemory(wsz, MAX_PATH * sizeof(WCHAR));
+	    ZeroMemory(wsz, MAX_PATH * அளவு(WCHAR));
 	    hr = pslw->lpVtbl->GetPath(pslw, wsz, MAX_PATH, &ffdw, 0);
-	    if (hr == S_OK && wsz[0] != NUL)
-		rfname = utf16_to_enc(wsz, NULL);
+	    எனில் (hr == S_OK && wsz[0] != NUL)
+		rfname = utf16_to_enc(wsz, வெற்று);
 
 shortcut_errorw:
 	    vim_free(p);
@@ -1909,42 +1909,42 @@ shortcut_errorw:
     }
 
     // Release all interface pointers (both belong to the same object)
-    if (ppf != NULL)
+    எனில் (ppf != வெற்று)
 	ppf->lpVtbl->Release(ppf);
-    if (psl != NULL)
+    எனில் (psl != வெற்று)
 	psl->lpVtbl->Release(psl);
-    if (pslw != NULL)
+    எனில் (pslw != வெற்று)
 	pslw->lpVtbl->Release(pslw);
 
     CoUninitialize();
-    return rfname;
+    திரும்பு rfname;
 }
 
     char_u *
-mch_resolve_path(char_u *fname, int reparse_point)
+mch_resolve_path(char_u *fname, முழு reparse_point)
 {
     char_u  *path = resolve_shortcut(fname);
 
-    if (path == NULL && reparse_point)
+    எனில் (path == வெற்று && reparse_point)
 	path = resolve_reparse_point(fname);
-    return path;
+    திரும்பு path;
 }
 #endif
 
-#if defined(FEAT_EVAL) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#எனில் defined(FEAT_EVAL) && (!defined(FEAT_GUI) || defined(VIMDLL))
 /*
  * Bring ourselves to the foreground.  Does work if the OS doesn't allow it.
  */
-    void
-win32_set_foreground(void)
+    வெறுமை
+win32_set_foreground(வெறுமை)
 {
     GetConsoleHwnd();	    // get value of s_hwnd
-    if (s_hwnd != 0)
+    எனில் (s_hwnd != 0)
 	SetForegroundWindow(s_hwnd);
 }
 #endif
 
-#if defined(FEAT_CLIENTSERVER)
+#எனில் defined(FEAT_CLIENTSERVER)
 /*
  * Client-server code for Vim
  *
@@ -1960,7 +1960,7 @@ win32_set_foreground(void)
 HWND message_window = 0;	    // window that's handling messages
 
 # define VIM_CLASSNAME      "VIM_MESSAGES"
-# define VIM_CLASSNAME_LEN  (sizeof(VIM_CLASSNAME) - 1)
+# define VIM_CLASSNAME_LEN  (அளவு(VIM_CLASSNAME) - 1)
 
 // Timeout for sending a message to another Vim instance.  Normally this works
 // instantly, but it may hang when the other Vim instance is halted.
@@ -1968,28 +1968,28 @@ HWND message_window = 0;	    // window that's handling messages
 
 // Communication is via WM_COPYDATA messages. The message type is sent in
 // the dwData parameter. Types are defined here.
-# define COPYDATA_KEYS		0
+# define COPYDATA_சாவிகள்		0
 # define COPYDATA_REPLY		1
-# define COPYDATA_EXPR		10
+# define COPYDATA_கோவை		10
 # define COPYDATA_RESULT	11
 # define COPYDATA_ERROR_RESULT	12
 # define COPYDATA_ENCODING	20
 
 // This is a structure containing a server HWND and its name.
-struct server_id
+கட்டமைப்பு server_id
 {
     HWND hwnd;
     char_u *name;
 };
 
 // Last received 'encoding' that the client uses.
-static char_u	*client_enc = NULL;
+நிலையான char_u	*client_enc = வெற்று;
 
 /*
  * Tell the other side what encoding we are using.
  * Return -1 if timeout happens.  Other errors are ignored.
  */
-    static int
+    நிலையான முழு
 serverSendEnc(HWND target)
 {
     COPYDATASTRUCT data;
@@ -1997,27 +1997,27 @@ serverSendEnc(HWND target)
     data.dwData = COPYDATA_ENCODING;
     data.cbData = (DWORD)STRLEN(p_enc) + 1;
     data.lpData = p_enc;
-    if (SendMessageTimeout(target, WM_COPYDATA,
+    எனில் (SendMessageTimeout(target, WM_COPYDATA,
 	    (WPARAM)message_window, (LPARAM)&data,
-	    SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, NULL) == 0)
-	return -1;
-    return 0;
+	    SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, வெற்று) == 0)
+	திரும்பு -1;
+    திரும்பு 0;
 }
 
 /*
  * Clean up on exit. This destroys the hidden message window.
  */
-    static void
-CleanUpMessaging(void)
+    நிலையான வெறுமை
+CleanUpMessaging(வெறுமை)
 {
-    if (message_window == 0)
-	return;
+    எனில் (message_window == 0)
+	திரும்பு;
 
     DestroyWindow(message_window);
     message_window = 0;
 }
 
-static int save_reply(HWND server, char_u *reply, int expr);
+நிலையான முழு save_reply(HWND server, char_u *reply, முழு கோவை);
 
 /*
  * The window procedure for the hidden message window.
@@ -2029,10 +2029,10 @@ static int save_reply(HWND server, char_u *reply, int expr);
  * not work in the console version - this basically means those
  * features which allow Vim to act as a server, rather than a client.
  */
-    static LRESULT CALLBACK
-Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+    நிலையான LRESULT CALLBACK
+Messaging_WndProc(HWND hwnd, UINT செய்தி, WPARAM wParam, LPARAM lParam)
 {
-    if (msg == WM_COPYDATA)
+    எனில் (செய்தி == WM_COPYDATA)
     {
 	// This is a message from another Vim. The dwData member of the
 	// COPYDATASTRUCT determines the type of message:
@@ -2058,141 +2058,141 @@ Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	HWND		sender = (HWND)wParam;
 	COPYDATASTRUCT	reply;
 	char_u		*res;
-	int		retval;
+	முழு		retval;
 	DWORD_PTR	dwret = 0;
 	char_u		*str;
 	char_u		*tofree;
 
-	switch (data->dwData)
+	தேர்வு (data->dwData)
 	{
-	case COPYDATA_ENCODING:
+	நிலை COPYDATA_ENCODING:
 	    // Remember the encoding that the client uses.
 	    vim_free(client_enc);
 	    client_enc = enc_canonize((char_u *)data->lpData);
-	    return 1;
+	    திரும்பு 1;
 
-	case COPYDATA_KEYS:
+	நிலை COPYDATA_சாவிகள்:
 	    // Remember who sent this, for <client>
 	    clientWindow = sender;
 
 	    // Add the received keys to the input buffer.
 	    str = serverConvert(client_enc, (char_u *)data->lpData, &tofree);
 # ifdef FEAT_GUI
-	    if (gui.in_use)
+	    எனில் (gui.in_use)
 		// The GUI may get here re-entrantly, so insert the keys later.
-		server_add_input(str);
-	    else
+		server_add_உள்ளீடு(str);
+	    இல்லையெனில்
 # endif
-		server_to_input_buf(str);
+		server_to_உள்ளீடு_buf(str);
 	    vim_free(tofree);
 
 # ifdef FEAT_GUI
 	    // Wake up the main GUI loop.
 #  ifdef VIMDLL
-	    if (gui.in_use)
+	    எனில் (gui.in_use)
 #  endif
-		if (s_hwnd != 0)
+		எனில் (s_hwnd != 0)
 		    PostMessage(s_hwnd, WM_NULL, 0, 0);
 # endif
-	    return 1;
+	    திரும்பு 1;
 
-	case COPYDATA_EXPR:
+	நிலை COPYDATA_கோவை:
 	    // Remember who sent this, for <client>
 	    clientWindow = sender;
 
 	    str = serverConvert(client_enc, (char_u *)data->lpData, &tofree);
-	    res = eval_client_expr_to_string(str);
+	    res = eval_client_கோவை_to_string(str);
 
-	    if (res == NULL)
+	    எனில் (res == வெற்று)
 	    {
-		char	*err = _(e_invalid_expression_received);
+		எழுத்து	*err = _(e_invalid_expression_received);
 		size_t	len = STRLEN(str) + STRLEN(err) + 5;
 
 		res = alloc(len);
-		if (res != NULL)
+		எனில் (res != வெற்று)
 		    reply.cbData = (DWORD)vim_snprintf_safelen(
-			(char *)res, len, "%s: \"%s\"", err, str);
-		else
+			(எழுத்து *)res, len, "%s: \"%s\"", err, str);
+		இல்லையெனில்
 		    reply.cbData = 0;
 		reply.dwData = COPYDATA_ERROR_RESULT;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		reply.cbData = (DWORD)STRLEN(res) + 1;
 		reply.dwData = COPYDATA_RESULT;
 	    }
 	    reply.lpData = res;
 
-	    if (serverSendEnc(sender) < 0)
+	    எனில் (serverSendEnc(sender) < 0)
 		retval = -1;
-	    else
+	    இல்லையெனில்
 	    {
-		if (SendMessageTimeout(sender, WM_COPYDATA,
+		எனில் (SendMessageTimeout(sender, WM_COPYDATA,
 			(WPARAM)message_window, (LPARAM)&reply,
 			SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwret) == 0)
 		    retval = -1;
-		else
-		    retval = (int)dwret;
+		இல்லையெனில்
+		    retval = (முழு)dwret;
 	    }
 	    vim_free(tofree);
 	    vim_free(res);
-	    return retval;
+	    திரும்பு retval;
 
-	case COPYDATA_REPLY:
-	case COPYDATA_RESULT:
-	case COPYDATA_ERROR_RESULT:
-	    if (data->lpData != NULL)
+	நிலை COPYDATA_REPLY:
+	நிலை COPYDATA_RESULT:
+	நிலை COPYDATA_ERROR_RESULT:
+	    எனில் (data->lpData != வெற்று)
 	    {
 		str = serverConvert(client_enc, (char_u *)data->lpData,
 								     &tofree);
-		if (tofree == NULL)
+		எனில் (tofree == வெற்று)
 		    str = vim_strsave(str);
-		if (save_reply(sender, str,
+		எனில் (save_reply(sender, str,
 			   (data->dwData == COPYDATA_REPLY ?  0 :
 			   (data->dwData == COPYDATA_RESULT ? 1 :
 							      2))) == FAIL)
 		    vim_free(str);
-		else if (data->dwData == COPYDATA_REPLY)
+		இல்லையெனில் எனில் (data->dwData == COPYDATA_REPLY)
 		{
 		    char_u	winstr[30];
 
-		    sprintf((char *)winstr, PRINTF_HEX_LONG_U, (long_u)sender);
+		    sprintf((எழுத்து *)winstr, PRINTF_HEX_LONG_U, (long_u)sender);
 		    apply_autocmds(EVENT_REMOTEREPLY, winstr, str,
 								TRUE, curbuf);
 		}
 	    }
-	    return 1;
+	    திரும்பு 1;
 	}
 
-	return 0;
+	திரும்பு 0;
     }
 
-    else if (msg == WM_ACTIVATE && wParam == WA_ACTIVE)
+    இல்லையெனில் எனில் (செய்தி == WM_ACTIVATE && wParam == WA_ACTIVE)
     {
 	// When the message window is activated (brought to the foreground),
 	// this actually applies to the text window.
-# if !defined(FEAT_GUI) || defined(VIMDLL)
+# எனில் !defined(FEAT_GUI) || defined(VIMDLL)
 #  ifdef VIMDLL
-	if (!gui.in_use)
+	எனில் (!gui.in_use)
 #  endif
 	    GetConsoleHwnd();	    // get value of s_hwnd
 # endif
-	if (s_hwnd != 0)
+	எனில் (s_hwnd != 0)
 	{
 	    SetForegroundWindow(s_hwnd);
-	    return 0;
+	    திரும்பு 0;
 	}
     }
 
-    return DefWindowProc(hwnd, msg, wParam, lParam);
+    திரும்பு DefWindowProc(hwnd, செய்தி, wParam, lParam);
 }
 
 /*
  * Initialise the message handling process.  This involves creating a window
  * to handle messages - the window will not be visible.
  */
-    void
-serverInitMessaging(void)
+    வெறுமை
+serverInitMessaging(வெறுமை)
 {
     WNDCLASS wndclass;
 
@@ -2206,10 +2206,10 @@ serverInitMessaging(void)
     wndclass.cbClsExtra = 0;
     wndclass.cbWndExtra = 0;
     wndclass.hInstance = g_hinst;
-    wndclass.hIcon = NULL;
-    wndclass.hCursor = NULL;
-    wndclass.hbrBackground = NULL;
-    wndclass.lpszMenuName = NULL;
+    wndclass.hIcon = வெற்று;
+    wndclass.hCursor = வெற்று;
+    wndclass.hbrBackground = வெற்று;
+    wndclass.lpszMenuName = வெற்று;
     wndclass.lpszClassName = VIM_CLASSNAME;
     RegisterClass(&wndclass);
 
@@ -2219,168 +2219,168 @@ serverInitMessaging(void)
     message_window = CreateWindow(VIM_CLASSNAME, "",
 			 WS_POPUPWINDOW | WS_CAPTION,
 			 CW_USEDEFAULT, CW_USEDEFAULT,
-			 100, 100, NULL, NULL,
-			 g_hinst, NULL);
+			 100, 100, வெற்று, வெற்று,
+			 g_hinst, வெற்று);
 }
 
 // Used by serverSendToVim() to find an alternate server name.
-static char_u *altname_buf_ptr = NULL;
+நிலையான char_u *altname_buf_ptr = வெற்று;
 
 /*
  * Get the title of the window "hwnd", which is the Vim server name, in
  * "name[namelen]" and return the length.
  * Returns zero if window "hwnd" is not a Vim server.
  */
-    static int
-getVimServerName(HWND hwnd, char *name, int namelen)
+    நிலையான முழு
+getVimServerName(HWND hwnd, எழுத்து *name, முழு namelen)
 {
-    int		len;
-    char	buffer[VIM_CLASSNAME_LEN + 1];
+    முழு		len;
+    எழுத்து	buffer[VIM_CLASSNAME_LEN + 1];
 
     // Ignore windows which aren't Vim message windows
-    len = GetClassName(hwnd, buffer, sizeof(buffer));
-    if (len != VIM_CLASSNAME_LEN || STRCMP(buffer, VIM_CLASSNAME) != 0)
-	return 0;
+    len = GetClassName(hwnd, buffer, அளவு(buffer));
+    எனில் (len != VIM_CLASSNAME_LEN || STRCMP(buffer, VIM_CLASSNAME) != 0)
+	திரும்பு 0;
 
     // Get the title of the window
-    return GetWindowText(hwnd, name, namelen);
+    திரும்பு GetWindowText(hwnd, name, namelen);
 }
 
-    static BOOL CALLBACK
+    நிலையான BOOL CALLBACK
 enumWindowsGetServer(HWND hwnd, LPARAM lparam)
 {
-    struct	server_id *id = (struct server_id *)lparam;
-    char	server[MAX_PATH];
+    கட்டமைப்பு	server_id *id = (கட்டமைப்பு server_id *)lparam;
+    எழுத்து	server[MAX_PATH];
 
     // Get the title of the window
-    if (getVimServerName(hwnd, server, sizeof(server)) == 0)
-	return TRUE;
+    எனில் (getVimServerName(hwnd, server, அளவு(server)) == 0)
+	திரும்பு TRUE;
 
     // If this is the server we're looking for, return its HWND
-    if (STRICMP(server, id->name) == 0)
+    எனில் (STRICMP(server, id->name) == 0)
     {
 	id->hwnd = hwnd;
-	return FALSE;
+	திரும்பு FALSE;
     }
 
     // If we are looking for an alternate server, remember this name.
-    if (altname_buf_ptr != NULL)
+    எனில் (altname_buf_ptr != வெற்று)
     {
 	size_t	namelen = STRLEN(id->name);
 
-	if (STRNICMP(server, id->name, namelen) == 0
+	எனில் (STRNICMP(server, id->name, namelen) == 0
 	    && vim_isdigit(server[namelen]))
 	{
 	    STRCPY(altname_buf_ptr, server);
-	    altname_buf_ptr = NULL;	    // don't use another name
+	    altname_buf_ptr = வெற்று;	    // don't use another name
 	}
     }
 
     // Otherwise, keep looking
-    return TRUE;
+    திரும்பு TRUE;
 }
 
-    static BOOL CALLBACK
+    நிலையான BOOL CALLBACK
 enumWindowsGetNames(HWND hwnd, LPARAM lparam)
 {
     list_T	*list = (list_T *)lparam;
-    char	server[MAX_PATH];
+    எழுத்து	server[MAX_PATH];
 
     // Get the title of the window
-    if (getVimServerName(hwnd, server, sizeof(server)) == 0)
-	return TRUE;
+    எனில் (getVimServerName(hwnd, server, அளவு(server)) == 0)
+	திரும்பு TRUE;
 
     list_append_string(list, (char_u *)server, -1);
-    return TRUE;
+    திரும்பு TRUE;
 }
 
-struct enum_windows_s
+கட்டமைப்பு enum_windows_s
 {
     WNDENUMPROC lpEnumFunc;
     LPARAM      lParam;
 };
 
-    static BOOL CALLBACK
+    நிலையான BOOL CALLBACK
 enum_windows_child(HWND hwnd, LPARAM lParam)
 {
-    struct enum_windows_s *ew = (struct enum_windows_s *)lParam;
+    கட்டமைப்பு enum_windows_s *ew = (கட்டமைப்பு enum_windows_s *)lParam;
 
-    return (ew->lpEnumFunc)(hwnd, ew->lParam);
+    திரும்பு (ew->lpEnumFunc)(hwnd, ew->lParam);
 }
 
-    static BOOL CALLBACK
+    நிலையான BOOL CALLBACK
 enum_windows_toplevel(HWND hwnd, LPARAM lParam)
 {
-    struct enum_windows_s *ew = (struct enum_windows_s *)lParam;
+    கட்டமைப்பு enum_windows_s *ew = (கட்டமைப்பு enum_windows_s *)lParam;
 
-    if ((ew->lpEnumFunc)(hwnd, ew->lParam))
-	return TRUE;
-    return EnumChildWindows(hwnd, enum_windows_child, lParam);
+    எனில் ((ew->lpEnumFunc)(hwnd, ew->lParam))
+	திரும்பு TRUE;
+    திரும்பு EnumChildWindows(hwnd, enum_windows_child, lParam);
 }
 
 /*
  * Enumerate all windows including children.
  */
-    static BOOL
+    நிலையான BOOL
 enum_windows(WNDENUMPROC lpEnumFunc, LPARAM lParam)
 {
-    struct enum_windows_s ew;
+    கட்டமைப்பு enum_windows_s ew;
 
     ew.lpEnumFunc = lpEnumFunc;
     ew.lParam = lParam;
-    return EnumWindows(enum_windows_toplevel, (LPARAM)&ew);
+    திரும்பு EnumWindows(enum_windows_toplevel, (LPARAM)&ew);
 }
 
-    static HWND
+    நிலையான HWND
 findServer(char_u *name)
 {
-    struct server_id id;
+    கட்டமைப்பு server_id id;
 
     id.name = name;
     id.hwnd = 0;
 
     enum_windows(enumWindowsGetServer, (LPARAM)(&id));
 
-    return id.hwnd;
+    திரும்பு id.hwnd;
 }
 
-    void
+    வெறுமை
 serverSetName(char_u *name)
 {
     size_t	namelen;
     char_u	*ok_name;
     HWND	hwnd = 0;
-    int		i = 0;
+    முழு		i = 0;
     char_u	*p;
 
     // Leave enough space for a 9-digit suffix to ensure uniqueness!
     namelen = STRLEN(name);
     ok_name = alloc(namelen + 10);
-    if (ok_name == NULL)
-	return;
+    எனில் (ok_name == வெற்று)
+	திரும்பு;
 
     STRCPY(ok_name, name);
     p = ok_name + namelen;
 
-    for (;;)
+    க்கு (;;)
     {
 	// This is inefficient - we're doing an EnumWindows loop for each
 	// possible name. It would be better to grab all names in one go,
 	// and scan the list each time...
 	hwnd = findServer(ok_name);
-	if (hwnd == 0)
-	    break;
+	எனில் (hwnd == 0)
+	    நிறுத்து;
 
 	++i;
-	if (i >= 1000)
-	    break;
+	எனில் (i >= 1000)
+	    நிறுத்து;
 
-	sprintf((char *)p, "%d", i);
+	sprintf((எழுத்து *)p, "%d", i);
     }
 
-    if (hwnd != 0)
+    எனில் (hwnd != 0)
 	vim_free(ok_name);
-    else
+    இல்லையெனில்
     {
 	// Remember the name
 	serverName = ok_name;
@@ -2397,19 +2397,19 @@ serverSetName(char_u *name)
 }
 
     list_T *
-serverGetVimNames(void)
+serverGetVimNames(வெறுமை)
 {
     list_T *list = list_alloc();
 
-    if (list == NULL)
-	return NULL;
+    எனில் (list == வெற்று)
+	திரும்பு வெற்று;
 
     enum_windows(enumWindowsGetNames, (LPARAM)list);
 
-    return list;
+    திரும்பு list;
 }
 
-    int
+    முழு
 serverSendReply(
     char_u	*name,		// Where to send.
     char_u	*reply)		// What to send.
@@ -2422,104 +2422,104 @@ serverSendReply(
     // The "name" argument is a magic cookie obtained from expand("<client>").
     // It should be of the form 0xXXXXX - i.e. a C hex literal, which is the
     // value of the client's message window HWND.
-    sscanf((char *)name, SCANF_HEX_LONG_U, &n);
-    if (n == 0)
-	return -1;
+    sscanf((எழுத்து *)name, SCANF_HEX_LONG_U, &n);
+    எனில் (n == 0)
+	திரும்பு -1;
 
     target = (HWND)n;
-    if (!IsWindow(target))
-	return -1;
+    எனில் (!IsWindow(target))
+	திரும்பு -1;
 
     data.dwData = COPYDATA_REPLY;
     data.cbData = (DWORD)STRLEN(reply) + 1;
     data.lpData = reply;
 
-    if (serverSendEnc(target) < 0)
-	return -1;
-    if (SendMessageTimeout(target, WM_COPYDATA,
+    எனில் (serverSendEnc(target) < 0)
+	திரும்பு -1;
+    எனில் (SendMessageTimeout(target, WM_COPYDATA,
 		(WPARAM)message_window, (LPARAM)&data,
 		SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwret) == 0)
-	return -1;
-    return dwret ? 0 : -1;
+	திரும்பு -1;
+    திரும்பு dwret ? 0 : -1;
 }
 
-    int
+    முழு
 serverSendToVim(
     char_u	 *name,			// Where to send.
     char_u	 *cmd,			// What to send.
     char_u	 **result,		// Result of eval'ed expression
-    void	 *ptarget,		// HWND of server
-    int		 asExpr,		// Expression or keys?
-    int		 timeout,		// timeout in seconds or zero
-    int		 silent)		// don't complain about no server
+    வெறுமை	 *ptarget,		// HWND of server
+    முழு		 as_கோவை,		// Expression or keys?
+    முழு		 timeout,		// timeout in seconds or zero
+    முழு		 silent)		// don't complain about no server
 {
     size_t	namelen;
     HWND	target;
     COPYDATASTRUCT data;
-    char_u	*retval = NULL;
-    int		retcode = 0;
+    char_u	*retval = வெற்று;
+    முழு		retcode = 0;
     DWORD_PTR	dwret = 0;
     char_u	altname_buf[MAX_PATH];
 
     // Execute locally if no display or target is ourselves
-    if (serverName != NULL && STRICMP(name, serverName) == 0)
-	return sendToLocalVim(cmd, asExpr, result);
+    எனில் (serverName != வெற்று && STRICMP(name, serverName) == 0)
+	திரும்பு sendToLocalVim(cmd, as_கோவை, result);
 
     // If the server name does not end in a digit then we look for an
     // alternate name.  e.g. when "name" is GVIM then we may find GVIM2.
     namelen = STRLEN(name);
-    if (namelen > 1 && !vim_isdigit(name[namelen - 1]))
+    எனில் (namelen > 1 && !vim_isdigit(name[namelen - 1]))
 	altname_buf_ptr = altname_buf;
     altname_buf[0] = NUL;
     target = findServer(name);
-    altname_buf_ptr = NULL;
-    if (target == 0 && altname_buf[0] != NUL)
+    altname_buf_ptr = வெற்று;
+    எனில் (target == 0 && altname_buf[0] != NUL)
 	// Use another server name we found.
 	target = findServer(altname_buf);
 
-    if (target == 0)
+    எனில் (target == 0)
     {
-	if (!silent)
+	எனில் (!silent)
 	    semsg(_(e_no_registered_server_named_str), name);
-	return -1;
+	திரும்பு -1;
     }
 
-    if (ptarget)
+    எனில் (ptarget)
 	*(HWND *)ptarget = target;
 
-    data.dwData = asExpr ? COPYDATA_EXPR : COPYDATA_KEYS;
+    data.dwData = as_கோவை ? COPYDATA_கோவை : COPYDATA_சாவிகள்;
     data.cbData = (DWORD)STRLEN(cmd) + 1;
     data.lpData = cmd;
 
-    if (serverSendEnc(target) < 0)
-	return -1;
-    if (SendMessageTimeout(target, WM_COPYDATA,
+    எனில் (serverSendEnc(target) < 0)
+	திரும்பு -1;
+    எனில் (SendMessageTimeout(target, WM_COPYDATA,
 		(WPARAM)message_window, (LPARAM)&data,
 		SMTO_ABORTIFHUNG, SENDMESSAGE_TIMEOUT, &dwret) == 0)
-	return -1;
-    if (dwret == 0)
-	return -1;
+	திரும்பு -1;
+    எனில் (dwret == 0)
+	திரும்பு -1;
 
-    if (asExpr)
+    எனில் (as_கோவை)
 	retval = serverGetReply(target, &retcode, TRUE, TRUE, timeout);
 
-    if (result == NULL)
+    எனில் (result == வெற்று)
 	vim_free(retval);
-    else
+    இல்லையெனில்
 	*result = retval; // Caller assumes responsibility for freeing
 
-    return retcode;
+    திரும்பு retcode;
 }
 
 /*
  * Bring the server to the foreground.
  */
-    void
+    வெறுமை
 serverForeground(char_u *name)
 {
     HWND	target = findServer(name);
 
-    if (target != 0)
+    எனில் (target != 0)
 	SetForegroundWindow(target);
 }
 
@@ -2530,42 +2530,42 @@ serverForeground(char_u *name)
 // We just store the replies in a simple list. When we remove an entry, we
 // move list entries down to fill the gap.
 // The server ID is simply the HWND.
-typedef struct
+வகைவரை கட்டமைப்பு
 {
     HWND	server;		// server window
     char_u	*reply;		// reply string
-    int		expr_result;	// 0 for REPLY, 1 for RESULT 2 for error
+    முழு		கோவை_result;	// 0 for REPLY, 1 for RESULT 2 for error
 } reply_T;
 
-static garray_T reply_list = {0, 0, sizeof(reply_T), 5, 0};
+நிலையான garray_T reply_list = {0, 0, அளவு(reply_T), 5, 0};
 
 # define REPLY_ITEM(i) ((reply_T *)(reply_list.ga_data) + (i))
-# define REPLY_COUNT (reply_list.ga_len)
+# define REPLY_மொத்தம் (reply_list.ga_len)
 
 // Flag which is used to wait for a reply
-static int reply_received = 0;
+நிலையான முழு reply_received = 0;
 
 /*
  * Store a reply.  "reply" must be allocated memory (or NULL).
  */
-    static int
-save_reply(HWND server, char_u *reply, int expr)
+    நிலையான முழு
+save_reply(HWND server, char_u *reply, முழு கோவை)
 {
     reply_T *rep;
 
-    if (ga_grow(&reply_list, 1) == FAIL)
-	return FAIL;
+    எனில் (ga_grow(&reply_list, 1) == FAIL)
+	திரும்பு FAIL;
 
-    rep = REPLY_ITEM(REPLY_COUNT);
+    rep = REPLY_ITEM(REPLY_மொத்தம்);
     rep->server = server;
     rep->reply = reply;
-    rep->expr_result = expr;
-    if (rep->reply == NULL)
-	return FAIL;
+    rep->கோவை_result = கோவை;
+    எனில் (rep->reply == வெற்று)
+	திரும்பு FAIL;
 
-    ++REPLY_COUNT;
+    ++REPLY_மொத்தம்;
     reply_received = 1;
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -2577,119 +2577,119 @@ save_reply(HWND server, char_u *reply, int expr)
  * if "wait" is TRUE block until a message arrives (or the server exits).
  */
     char_u *
-serverGetReply(HWND server, int *expr_res, int remove, int wait, int timeout)
+serverGetReply(HWND server, முழு *கோவை_res, முழு remove, முழு wait, முழு timeout)
 {
-    int		i;
+    முழு		i;
     char_u	*reply;
     reply_T	*rep;
-    int		did_process = FALSE;
+    முழு		did_process = FALSE;
     time_t	start;
     time_t	now;
 
     // When waiting, loop until the message waiting for is received.
     time(&start);
-    for (;;)
+    க்கு (;;)
     {
 	// Reset this here, in case a message arrives while we are going
 	// through the already received messages.
 	reply_received = 0;
 
-	for (i = 0; i < REPLY_COUNT; ++i)
+	க்கு (i = 0; i < REPLY_மொத்தம்; ++i)
 	{
 	    rep = REPLY_ITEM(i);
-	    if (rep->server == server
-		    && ((rep->expr_result != 0) == (expr_res != NULL)))
+	    எனில் (rep->server == server
+		    && ((rep->கோவை_result != 0) == (கோவை_res != வெற்று)))
 	    {
 		// Save the values we've found for later
 		reply = rep->reply;
-		if (expr_res != NULL)
-		    *expr_res = rep->expr_result == 1 ? 0 : -1;
+		எனில் (கோவை_res != வெற்று)
+		    *கோவை_res = rep->கோவை_result == 1 ? 0 : -1;
 
-		if (remove)
+		எனில் (remove)
 		{
 		    // Move the rest of the list down to fill the gap
 		    mch_memmove(rep, rep + 1,
-				     (REPLY_COUNT - i - 1) * sizeof(reply_T));
-		    --REPLY_COUNT;
+				     (REPLY_மொத்தம் - i - 1) * அளவு(reply_T));
+		    --REPLY_மொத்தம்;
 		}
 
 		// Return the reply to the caller, who takes on responsibility
 		// for freeing it if "remove" is TRUE.
-		return reply;
+		திரும்பு reply;
 	    }
 	}
 
 	// If we got here, we didn't find a reply. Return immediately if the
 	// "wait" parameter isn't set.
-	if (!wait)
+	எனில் (!wait)
 	{
 	    // Process pending messages once. Without this, looping on
 	    // remote_peek() would never get the reply.
-	    if (!did_process)
+	    எனில் (!did_process)
 	    {
 		did_process = TRUE;
 		serverProcessPendingMessages();
-		continue;
+		தொடர்;
 	    }
-	    break;
+	    நிறுத்து;
 	}
 
 	// We need to wait for a reply. Enter a message loop until the
 	// "reply_received" flag gets set.
 
 	// Loop until we receive a reply
-	while (reply_received == 0)
+	போது (reply_received == 0)
 	{
 # ifdef FEAT_TIMERS
 	    // TODO: use the return value to decide how long to wait.
 	    check_due_timer();
 # endif
 	    time(&now);
-	    if (timeout > 0 && (now - start) >= timeout)
-		break;
+	    எனில் (timeout > 0 && (now - start) >= timeout)
+		நிறுத்து;
 
 	    // Wait for a SendMessage() call to us.  This could be the reply
 	    // we are waiting for.  Use a timeout of a second, to catch the
 	    // situation that the server died unexpectedly.
-	    MsgWaitForMultipleObjects(0, NULL, TRUE, 1000, QS_ALLINPUT);
+	    செய்தி_Wait_For_Multiple_Objects(0, வெற்று, TRUE, 1000, QS_ALLINPUT);
 
 	    // If the server has died, give up
-	    if (!IsWindow(server))
-		return NULL;
+	    எனில் (!IsWindow(server))
+		திரும்பு வெற்று;
 
 	    serverProcessPendingMessages();
 	}
     }
 
-    return NULL;
+    திரும்பு வெற்று;
 }
 
 /*
  * Process any messages in the Windows message queue.
  */
-    void
-serverProcessPendingMessages(void)
+    வெறுமை
+serverProcessPendingMessages(வெறுமை)
 {
-    MSG msg;
+    செய்தி_2 செய்தி;
 
-    while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+    போது (PeekMessageW(&செய்தி, வெற்று, 0, 0, PM_REMOVE))
     {
-	TranslateMessage(&msg);
-	DispatchMessageW(&msg);
+	TranslateMessage(&செய்தி);
+	DispatchMessageW(&செய்தி);
     }
 }
 
 #endif // FEAT_CLIENTSERVER
 
-#if defined(FEAT_GUI) || (defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT))
+#எனில் defined(FEAT_GUI) || (defined(FEAT_PRINTER) && !defined(FEAT_POSTSCRIPT))
 
-struct charset_pair
+கட்டமைப்பு charset_pair
 {
     string_T	name;
     BYTE	charset;
 };
 
-static struct charset_pair
+நிலையான கட்டமைப்பு charset_pair
 charset_pairs[] =
 {
     {STR_LITERAL_INIT("ANSI"),		ANSI_CHARSET},
@@ -2698,7 +2698,7 @@ charset_pairs[] =
     {STR_LITERAL_INIT("HANGEUL"),	HANGEUL_CHARSET},
     {STR_LITERAL_INIT("OEM"),		OEM_CHARSET},
     {STR_LITERAL_INIT("SHIFTJIS"),	SHIFTJIS_CHARSET},
-    {STR_LITERAL_INIT("SYMBOL"),	SYMBOL_CHARSET},
+    {STR_LITERAL_INIT("SYMBOL"),	குறியீடு_CHARSET},
     {STR_LITERAL_INIT("ARABIC"),	ARABIC_CHARSET},
     {STR_LITERAL_INIT("BALTIC"),	BALTIC_CHARSET},
     {STR_LITERAL_INIT("EASTEUROPE"),	EASTEUROPE_CHARSET},
@@ -2716,13 +2716,13 @@ charset_pairs[] =
 # endif
 };
 
-struct quality_pair
+கட்டமைப்பு quality_pair
 {
     string_T	name;
     DWORD	quality;
 };
 
-static struct quality_pair
+நிலையான கட்டமைப்பு quality_pair
 quality_pairs[] = {
 # ifdef CLEARTYPE_QUALITY
     {STR_LITERAL_INIT("CLEARTYPE"),	CLEARTYPE_QUALITY},
@@ -2746,43 +2746,43 @@ quality_pairs[] = {
  * Convert a charset ID to a name.
  * Return NULL when not recognized.
  */
-    char *
-charset_id2name(int id)
+    எழுத்து *
+charset_id2name(முழு id)
 {
-    int	i;
+    முழு	i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(charset_pairs); ++i)
+    க்கு (i = 0; i < (முழு)ARRAY_LENGTH(charset_pairs); ++i)
     {
-	if ((BYTE)id == charset_pairs[i].charset)
-	    return (char *)charset_pairs[i].name.string;
+	எனில் ((BYTE)id == charset_pairs[i].charset)
+	    திரும்பு (எழுத்து *)charset_pairs[i].name.string;
     }
 
-    return NULL;
+    திரும்பு வெற்று;
 }
 
 /*
  * Convert a quality ID to a name.
  * Return NULL when not recognized.
  */
-    char *
+    எழுத்து *
 quality_id2name(DWORD id)
 {
-    int	i;
+    முழு	i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(quality_pairs); ++i)
+    க்கு (i = 0; i < (முழு)ARRAY_LENGTH(quality_pairs); ++i)
     {
-	if (id == quality_pairs[i].quality)
-	    return (char *)quality_pairs[i].name.string;
+	எனில் (id == quality_pairs[i].quality)
+	    திரும்பு (எழுத்து *)quality_pairs[i].name.string;
     }
 
-    return NULL;
+    திரும்பு வெற்று;
 }
 
 // The default font height in 100% scaling (96dpi).
 // (-16 in 96dpi equates to roughly 12pt)
 # define DEFAULT_FONT_HEIGHT	(-16)
 
-static const LOGFONTW s_lfDefault =
+நிலையான மாறிலி LOGFONTW s_lfDefault =
 {
     DEFAULT_FONT_HEIGHT,
     0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
@@ -2793,7 +2793,7 @@ static const LOGFONTW s_lfDefault =
 
 // This will be initialized when set_default_logfont() is called first time.
 // The value will be based on the system DPI.
-int current_font_height = 0;		// also used in gui_w32.c
+முழு current_font_height = 0;		// also used in gui_w32.c
 
 /*
  * Convert a string representing a point size into pixels. The string should
@@ -2802,84 +2802,84 @@ int current_font_height = 0;		// also used in gui_w32.c
  * character is stored in *end. The flag "vertical" says whether this
  * calculation is for a vertical (height) size or a horizontal (width) one.
  */
-    static int
-points_to_pixels(WCHAR *str, WCHAR **end, int vertical, long_i pprinter_dc)
+    நிலையான முழு
+points_to_pixels(WCHAR *str, WCHAR **end, முழு vertical, long_i pprinter_dc)
 {
-    int		pixels;
-    int		points = 0;
-    int		divisor = 0;
+    முழு		pixels;
+    முழு		points = 0;
+    முழு		வகுஎண் = 0;
     HWND	hwnd = (HWND)0;
     HDC		hdc;
     HDC		printer_dc = (HDC)pprinter_dc;
 
-    while (*str != NUL)
+    போது (*str != NUL)
     {
-	if (*str == L'.' && divisor == 0)
+	எனில் (*str == L'.' && வகுஎண் == 0)
 	{
 	    // Start keeping a divisor, for later
-	    divisor = 1;
+	    வகுஎண் = 1;
 	}
-	else
+	இல்லையெனில்
 	{
-	    if (!VIM_ISDIGIT(*str))
-		break;
+	    எனில் (!VIM_ISDIGIT(*str))
+		நிறுத்து;
 
 	    points *= 10;
 	    points += *str - L'0';
-	    divisor *= 10;
+	    வகுஎண் *= 10;
 	}
 	++str;
     }
 
-    if (divisor == 0)
-	divisor = 1;
+    எனில் (வகுஎண் == 0)
+	வகுஎண் = 1;
 
-    if (printer_dc == NULL)
+    எனில் (printer_dc == வெற்று)
     {
 	hwnd = GetDesktopWindow();
 	hdc = GetWindowDC(hwnd);
     }
-    else
+    இல்லையெனில்
 	hdc = printer_dc;
 
     pixels = MulDiv(points,
 		    GetDeviceCaps(hdc, vertical ? LOGPIXELSY : LOGPIXELSX),
-		    72 * divisor);
+		    72 * வகுஎண்);
 
-    if (printer_dc == NULL)
+    எனில் (printer_dc == வெற்று)
 	ReleaseDC(hwnd, hdc);
 
     *end = str;
-    return pixels;
+    திரும்பு pixels;
 }
 
 /*
  * Convert pixel into point size. This is a reverse of points_to_pixels.
  */
-    static double
-pixels_to_points(int pixels, int vertical, long_i pprinter_dc)
+    நிலையான இரட்டை
+pixels_to_points(முழு pixels, முழு vertical, long_i pprinter_dc)
 {
-    double	points = 0;
+    இரட்டை	points = 0;
     HWND	hwnd = (HWND)0;
     HDC		hdc;
     HDC		printer_dc = (HDC)pprinter_dc;
 
-    if (printer_dc == NULL)
+    எனில் (printer_dc == வெற்று)
     {
 	hwnd = GetDesktopWindow();
 	hdc = GetWindowDC(hwnd);
     }
-    else
+    இல்லையெனில்
 	hdc = printer_dc;
 
     points = pixels * 72.0 / GetDeviceCaps(hdc, vertical ? LOGPIXELSY : LOGPIXELSX);
-    if (printer_dc == NULL)
+    எனில் (printer_dc == வெற்று)
 	ReleaseDC(hwnd, hdc);
 
-    return points;
+    திரும்பு points;
 }
 
-    static int CALLBACK
+    நிலையான முழு CALLBACK
 font_enumproc(
     ENUMLOGFONTW    *elf,
     NEWTEXTMETRICW  *ntm UNUSED,
@@ -2900,27 +2900,27 @@ font_enumproc(
 
 # ifndef FEAT_PROPORTIONAL_FONTS
     // Ignore non-monospace fonts without further ado
-    if ((ntm->tmPitchAndFamily & 1) != 0)
-	return 1;
+    எனில் ((ntm->tmPitchAndFamily & 1) != 0)
+	திரும்பு 1;
 # endif
 
     // Remember this LOGFONTW as a "possible"
     *lf = elf->elfLogFont;
 
     // Terminate the scan as soon as we find an ANSI font
-    if (lf->lfCharSet == ANSI_CHARSET
+    எனில் (lf->lfCharSet == ANSI_CHARSET
 	    || lf->lfCharSet == OEM_CHARSET
 	    || lf->lfCharSet == DEFAULT_CHARSET)
-	return 0;
+	திரும்பு 0;
 
     // Continue the scan - we have a non-ANSI font
-    return 2;
+    திரும்பு 2;
 }
 
-    static int
+    நிலையான முழு
 init_logfont(LOGFONTW *lf)
 {
-    int		n;
+    முழு		n;
     HWND	hwnd = GetDesktopWindow();
     HDC		hdc = GetWindowDC(hwnd);
 
@@ -2932,8 +2932,8 @@ init_logfont(LOGFONTW *lf)
     ReleaseDC(hwnd, hdc);
 
     // If we couldn't find a usable font, return failure
-    if (n == 1)
-	return FAIL;
+    எனில் (n == 1)
+	திரும்பு FAIL;
 
     // Tidy up the rest of the LOGFONTW structure. We set to a basic
     // font - get_logfont() sets bold, italic, etc based on the user's
@@ -2946,14 +2946,14 @@ init_logfont(LOGFONTW *lf)
     lf->lfWeight = FW_NORMAL;
 
     // Return success
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Call back for EnumFontFamiliesW in expand_font_enumproc.
  *
  */
-    static int CALLBACK
+    நிலையான முழு CALLBACK
 expand_font_enumproc(
     ENUMLOGFONTW    *elf,
     NEWTEXTMETRICW  *ntm UNUSED,
@@ -2964,26 +2964,26 @@ expand_font_enumproc(
 
 # ifndef FEAT_PROPORTIONAL_FONTS
     // Ignore non-monospace fonts without further ado
-    if ((ntm->tmPitchAndFamily & 1) != 0)
-	return 1;
+    எனில் ((ntm->tmPitchAndFamily & 1) != 0)
+	திரும்பு 1;
 # endif
 
     // Filter only on ANSI. Otherwise will see a lot of random fonts that we
     // usually don't want.
-    if (lf->lfCharSet != ANSI_CHARSET)
-	return 1;
+    எனில் (lf->lfCharSet != ANSI_CHARSET)
+	திரும்பு 1;
 
-    int (*add_match)(char_u *) = (int (*)(char_u *))lparam;
+    முழு (*add_match)(char_u *) = (முழு (*)(char_u *))lparam;
 
     WCHAR *faceNameW = lf->lfFaceName;
-    char_u *faceName = utf16_to_enc(faceNameW, NULL);
-    if (!faceName)
-	return 0;
+    char_u *faceName = utf16_to_enc(faceNameW, வெற்று);
+    எனில் (!faceName)
+	திரும்பு 0;
 
     add_match(faceName);
     vim_free(faceName);
 
-    return 1;
+    திரும்பு 1;
 }
 
 /*
@@ -2995,51 +2995,51 @@ expand_font_enumproc(
  * handling is done by the GUI code, whereas in Windows it's part of the
  * platform code.
  */
-    void
+    வெறுமை
 gui_mch_expand_font(
     optexpand_T	*args,
-    void	*param UNUSED,
-    int		(*add_match)(char_u *val))
+    வெறுமை	*param UNUSED,
+    முழு		(*add_match)(char_u *val))
 {
     expand_T	    *xp = args->oe_xp;
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    எனில் (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
-	char buf[30];
-	int	i;
+	எழுத்து buf[30];
+	முழு	i;
 
 	// Always fill in with the current font size as first option for
 	// convenience. We simply round to the closest integer for simplicity.
-	int font_height = (int)round(
-		pixels_to_points(-current_font_height, TRUE, (long_i)NULL));
+	முழு font_height = (முழு)round(
+		pixels_to_points(-current_font_height, TRUE, (long_i)வெற்று));
 	vim_snprintf(buf, ARRAY_LENGTH(buf), "h%d", font_height);
 	add_match((char_u *)buf);
 
 	// Note: Keep this in sync with get_logfont(). Don't include 'c' and
 	// 'q' as we fill in all the values below.
-	static char *(p_gfn_win_opt_values[]) = {
+	நிலையான எழுத்து *(p_gfn_win_opt_மதிப்புகள்[]) = {
 	    "h" , "w" , "W" , "b" , "i" , "u" , "s"};
-	for (i = 0; i < (int)ARRAY_LENGTH(p_gfn_win_opt_values); i++)
-	    add_match((char_u *)p_gfn_win_opt_values[i]);
+	க்கு (i = 0; i < (முழு)ARRAY_LENGTH(p_gfn_win_opt_மதிப்புகள்); i++)
+	    add_match((char_u *)p_gfn_win_opt_மதிப்புகள்[i]);
 
-	for (i = 0; i < (int)ARRAY_LENGTH(charset_pairs); ++i)
+	க்கு (i = 0; i < (முழு)ARRAY_LENGTH(charset_pairs); ++i)
 	{
-	    vim_snprintf(buf, sizeof(buf), "c%s", charset_pairs[i].name.string);
+	    vim_snprintf(buf, அளவு(buf), "c%s", charset_pairs[i].name.string);
 	    add_match((char_u *)buf);
 	}
 
-	for (i = 0; i < (int)ARRAY_LENGTH(quality_pairs); ++i)
+	க்கு (i = 0; i < (முழு)ARRAY_LENGTH(quality_pairs); ++i)
 	{
-	    vim_snprintf(buf, sizeof(buf), "q%s", quality_pairs[i].name.string);
+	    vim_snprintf(buf, அளவு(buf), "q%s", quality_pairs[i].name.string);
 	    add_match((char_u *)buf);
 	}
-	return;
+	திரும்பு;
     }
 
     HWND	hwnd = GetDesktopWindow();
     HDC		hdc = GetWindowDC(hwnd);
 
     EnumFontFamiliesW(hdc,
-	    NULL,
+	    வெற்று,
 	    (FONTENUMPROCW)expand_font_enumproc,
 	    (LPARAM)add_match);
 
@@ -3050,54 +3050,54 @@ gui_mch_expand_font(
  * Compare a UTF-16 string and an ASCII string literally.
  * Only works all the code points are inside ASCII range.
  */
-    static int
-utf16ascncmp(const WCHAR *w, const char *p, size_t n)
+    நிலையான முழு
+utf16ascncmp(மாறிலி WCHAR *w, மாறிலி எழுத்து *p, size_t n)
 {
     size_t i;
 
-    for (i = 0; i < n; i++)
+    க்கு (i = 0; i < n; i++)
     {
-	if (w[i] == 0 || w[i] != p[i])
-	    return w[i] - p[i];
+	எனில் (w[i] == 0 || w[i] != p[i])
+	    திரும்பு w[i] - p[i];
     }
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * Equivalent of GetDpiForSystem().
  */
     UINT WINAPI
-vimGetDpiForSystem(void)
+vimGetDpiForSystem(வெறுமை)
 {
     HWND hwnd = GetDesktopWindow();
     HDC hdc = GetWindowDC(hwnd);
     UINT dpi = GetDeviceCaps(hdc, LOGPIXELSY);
     ReleaseDC(hwnd, hdc);
-    return dpi;
+    திரும்பு dpi;
 }
 
 /*
  * Set default logfont based on current language.
  */
-    static void
+    நிலையான வெறுமை
 set_default_logfont(LOGFONTW *lf)
 {
     // Default font name for current language on MS-Windows.
     // If not translated, falls back to "Consolas".
     // This must be a fixed-pitch font.
-    const char *defaultfontname = N_("DefaultFontNameForWindows");
-    char *fontname = _(defaultfontname);
+    மாறிலி எழுத்து *defaultfontname = N_("DefaultFontNameForWindows");
+    எழுத்து *fontname = _(defaultfontname);
 
-    if (STRCMP(fontname, defaultfontname) == 0)
+    எனில் (STRCMP(fontname, defaultfontname) == 0)
 	fontname = "Consolas";
 
     *lf = s_lfDefault;
-    lf->lfHeight = DEFAULT_FONT_HEIGHT * (int)vimGetDpiForSystem() / 96;
-    if (current_font_height == 0)
+    lf->lfHeight = DEFAULT_FONT_HEIGHT * (முழு)vimGetDpiForSystem() / 96;
+    எனில் (current_font_height == 0)
 	current_font_height = lf->lfHeight;
 
-    WCHAR *wfontname = enc_to_utf16((char_u*)fontname, NULL);
-    if (wfontname != NULL)
+    WCHAR *wfontname = enc_to_utf16((char_u*)fontname, வெற்று);
+    எனில் (wfontname != வெற்று)
     {
 	wcscpy_s(lf->lfFaceName, LF_FACESIZE, wfontname);
 	vim_free(wfontname);
@@ -3108,60 +3108,60 @@ set_default_logfont(LOGFONTW *lf)
  * Get font info from "name" into logfont "lf".
  * Return OK for a valid name, FAIL otherwise.
  */
-    int
+    முழு
 get_logfont(
     LOGFONTW	*lf,
     char_u	*name,
     HDC		printer_dc,
-    int		verbose)
+    முழு		verbose)
 {
     WCHAR	*p;
-    int		i;
-    int		ret = FAIL;
-    static LOGFONTW *lastlf = NULL;
+    முழு		i;
+    முழு		ret = FAIL;
+    நிலையான LOGFONTW *lastlf = வெற்று;
     WCHAR	*wname;
 
     set_default_logfont(lf);
-    if (name == NULL)
-	return OK;
+    எனில் (name == வெற்று)
+	திரும்பு OK;
 
-    wname = enc_to_utf16(name, NULL);
-    if (wname == NULL)
-	return FAIL;
+    wname = enc_to_utf16(name, வெற்று);
+    எனில் (wname == வெற்று)
+	திரும்பு FAIL;
 
-    if (wcscmp(wname, L"*") == 0)
+    எனில் (wcscmp(wname, L"*") == 0)
     {
-# if defined(FEAT_GUI_MSWIN)
+# எனில் defined(FEAT_GUI_MSWIN)
 	CHOOSEFONTW	cf;
 	// if name is "*", bring up std font dialog:
 	CLEAR_FIELD(cf);
-	cf.lStructSize = sizeof(cf);
+	cf.lStructSize = அளவு(cf);
 	cf.hwndOwner = s_hwnd;
 	cf.Flags = CF_SCREENFONTS | CF_FIXEDPITCHONLY | CF_INITTOLOGFONTSTRUCT;
-	if (lastlf != NULL)
+	எனில் (lastlf != வெற்று)
 	    *lf = *lastlf;
 	cf.lpLogFont = lf;
 	cf.nFontType = 0 ; //REGULAR_FONTTYPE;
-	if (ChooseFontW(&cf))
+	எனில் (ChooseFontW(&cf))
 	    ret = OK;
 # endif
-	goto theend;
+	செல் theend;
     }
 
     /*
      * Split name up, it could be <name>:h<height>:w<width> etc.
      */
-    for (p = wname; *p && *p != L':'; p++)
+    க்கு (p = wname; *p && *p != L':'; p++)
     {
-	if (p - wname + 1 >= LF_FACESIZE)
-	    goto theend;			// Name too long
+	எனில் (p - wname + 1 >= LF_FACESIZE)
+	    செல் theend;			// Name too long
 	lf->lfFaceName[p - wname] = *p;
     }
-    if (p != wname)
+    எனில் (p != wname)
 	lf->lfFaceName[p - wname] = NUL;
 
     // First set defaults
-    lf->lfHeight = DEFAULT_FONT_HEIGHT * (int)vimGetDpiForSystem() / 96;
+    lf->lfHeight = DEFAULT_FONT_HEIGHT * (முழு)vimGetDpiForSystem() / 96;
     lf->lfWidth = 0;
     lf->lfWeight = FW_NORMAL;
     lf->lfItalic = FALSE;
@@ -3171,143 +3171,143 @@ get_logfont(
     /*
      * If the font can't be found, try replacing '_' by ' '.
      */
-    if (init_logfont(lf) == FAIL)
+    எனில் (init_logfont(lf) == FAIL)
     {
-	int	did_replace = FALSE;
+	முழு	did_replace = FALSE;
 
-	for (i = 0; lf->lfFaceName[i]; ++i)
-	    if (lf->lfFaceName[i] == L'_')
+	க்கு (i = 0; lf->lfFaceName[i]; ++i)
+	    எனில் (lf->lfFaceName[i] == L'_')
 	    {
 		lf->lfFaceName[i] = L' ';
 		did_replace = TRUE;
 	    }
-	if (!did_replace || init_logfont(lf) == FAIL)
-	    goto theend;
+	எனில் (!did_replace || init_logfont(lf) == FAIL)
+	    செல் theend;
     }
 
-    while (*p == L':')
+    போது (*p == L':')
 	p++;
 
     // Set the values found after ':'
-    while (*p)
+    போது (*p)
     {
-	switch (*p++)
+	தேர்வு (*p++)
 	{
 	    // Note: Keep this in sync with gui_mch_expand_font().
-	    case L'h':
+	    நிலை L'h':
 		lf->lfHeight = - points_to_pixels(p, &p, TRUE, (long_i)printer_dc);
-		break;
-	    case L'w':
+		நிறுத்து;
+	    நிலை L'w':
 		lf->lfWidth = points_to_pixels(p, &p, FALSE, (long_i)printer_dc);
-		break;
-	    case L'W':
+		நிறுத்து;
+	    நிலை L'W':
 		lf->lfWeight = wcstol(p, &p, 10);
-		break;
-	    case L'b':
+		நிறுத்து;
+	    நிலை L'b':
 		lf->lfWeight = FW_BOLD;
-		break;
-	    case L'i':
+		நிறுத்து;
+	    நிலை L'i':
 		lf->lfItalic = TRUE;
-		break;
-	    case L'u':
+		நிறுத்து;
+	    நிலை L'u':
 		lf->lfUnderline = TRUE;
-		break;
-	    case L's':
+		நிறுத்து;
+	    நிலை L's':
 		lf->lfStrikeOut = TRUE;
-		break;
-	    case L'c':
-		for (i = 0; i < (int)ARRAY_LENGTH(charset_pairs); ++i)
+		நிறுத்து;
+	    நிலை L'c':
+		க்கு (i = 0; i < (முழு)ARRAY_LENGTH(charset_pairs); ++i)
 		{
-		    if (utf16ascncmp(p, (char *)charset_pairs[i].name.string,
+		    எனில் (utf16ascncmp(p, (எழுத்து *)charset_pairs[i].name.string,
 			    charset_pairs[i].name.length) == 0)
 		    {
 			lf->lfCharSet = charset_pairs[i].charset;
 			p += charset_pairs[i].name.length;
-			break;
+			நிறுத்து;
 		    }
 		}
 
-		if (i == (int)ARRAY_LENGTH(charset_pairs) && verbose)
+		எனில் (i == (முழு)ARRAY_LENGTH(charset_pairs) && verbose)
 		{
-		    char_u *s = utf16_to_enc(p, NULL);
-		    if (s != NULL)
+		    char_u *s = utf16_to_enc(p, வெற்று);
+		    எனில் (s != வெற்று)
 		    {
 			semsg(_(e_illegal_str_name_str_in_font_name_str),
 							   "charset", s, name);
 			vim_free(s);
 		    }
 		}
-		break;
-	    case L'f':
+		நிறுத்து;
+	    நிலை L'f':
 		// Font features (e.g., "fss19=1").
 		// Parsed separately by gui_mch_init_font(); skip here.
-		while (*p && *p != L':')
+		போது (*p && *p != L':')
 		    p++;
-		break;
-	    case L'q':
-		for (i = 0; i < (int)ARRAY_LENGTH(quality_pairs); ++i)
+		நிறுத்து;
+	    நிலை L'q':
+		க்கு (i = 0; i < (முழு)ARRAY_LENGTH(quality_pairs); ++i)
 		{
-		    if (utf16ascncmp(p, (char *)quality_pairs[i].name.string,
+		    எனில் (utf16ascncmp(p, (எழுத்து *)quality_pairs[i].name.string,
 			    quality_pairs[i].name.length) == 0)
 		    {
 			lf->lfQuality = quality_pairs[i].quality;
 			p += quality_pairs[i].name.length;
-			break;
+			நிறுத்து;
 		    }
 		}
 
-		if (i == (int)ARRAY_LENGTH(quality_pairs) && verbose)
+		எனில் (i == (முழு)ARRAY_LENGTH(quality_pairs) && verbose)
 		{
-		    char_u *s = utf16_to_enc(p, NULL);
-		    if (s != NULL)
+		    char_u *s = utf16_to_enc(p, வெற்று);
+		    எனில் (s != வெற்று)
 		    {
 			semsg(_(e_illegal_str_name_str_in_font_name_str),
 							   "quality", s, name);
 			vim_free(s);
 		    }
 		}
-		break;
-	    default:
-		if (verbose)
+		நிறுத்து;
+	    இயல்பு:
+		எனில் (verbose)
 		    semsg(_(e_illegal_char_nr_in_font_name_str), p[-1], name);
-		goto theend;
+		செல் theend;
 	}
-	while (*p == L':')
+	போது (*p == L':')
 	    p++;
     }
     ret = OK;
 
 theend:
     // ron: init lastlf
-    if (ret == OK && printer_dc == NULL)
+    எனில் (ret == OK && printer_dc == வெற்று)
     {
 	vim_free(lastlf);
 	lastlf = ALLOC_ONE(LOGFONTW);
-	if (lastlf != NULL)
-	    mch_memmove(lastlf, lf, sizeof(LOGFONTW));
+	எனில் (lastlf != வெற்று)
+	    mch_memmove(lastlf, lf, அளவு(LOGFONTW));
     }
     vim_free(wname);
 
-    return ret;
+    திரும்பு ret;
 }
 
 #endif // defined(FEAT_GUI) || defined(FEAT_PRINTER)
 
-#if defined(FEAT_JOB_CHANNEL)
+#எனில் defined(FEAT_JOB_CHANNEL)
 /*
  * Initialize the Winsock dll.
  */
-    void
-channel_init_winsock(void)
+    வெறுமை
+channel_init_winsock(வெறுமை)
 {
     WSADATA wsaData;
-    int wsaerr;
+    முழு wsaerr;
 
-    if (WSInitialized)
-	return;
+    எனில் (WSInitialized)
+	திரும்பு;
 
     wsaerr = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (wsaerr == 0)
+    எனில் (wsaerr == 0)
 	WSInitialized = TRUE;
 }
 #endif

@@ -5,34 +5,34 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-from test_channel import ThreadedTCPServer, TestingRequestHandler, \
+தஃ __future__ இறக்குமதி print_function
+தஃ test_channel இறக்குமதி ThreadedTCPServer, TestingRequestHandler, \
     writePortInFile
-import socket
-import threading
-import os
+இறக்குமதி socket
+இறக்குமதி threading
+இறக்குமதி os
 
-try:
+முயல்:
     FileNotFoundError
-except NameError:
+விதிவிலக்கு NameError:
     # Python 2
     FileNotFoundError = (IOError, OSError)
 
-if not hasattr(socket, "AF_UNIX"):
-    raise NotImplementedError("Unix sockets are not supported on this platform")
+எனில் இல்லை hasattr(socket, "AF_UNIX"):
+    எழுப்பு NotImplementedError("Unix sockets are not supported on this platform")
 
-class ThreadedUnixServer(ThreadedTCPServer):
+வகுப்பு ThreadedUnixServer(ThreadedTCPServer):
     address_family = socket.AF_UNIX
 
-class ThreadedUnixRequestHandler(TestingRequestHandler):
+வகுப்பு ThreadedUnixRequestHandler(TestingRequestHandler):
     pass
 
-def main(path):
+def முதன்மை(path):
     server = ThreadedUnixServer(path, ThreadedUnixRequestHandler)
 
     # Start a thread with the server.  That thread will then start a new thread
     # for each connection.
-    server_thread = threading.Thread(target=server.serve_forever)
+    server_thread = threading.இழை(target=server.serve_forever)
     server_thread.start()
 
     # Signal the test harness we're ready, the port value has no meaning.
@@ -42,15 +42,15 @@ def main(path):
 
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
-    try:
-        while server_thread.is_alive():
+    முயல்:
+        போது server_thread.is_alive():
             server_thread.join(1)
-    except (KeyboardInterrupt, SystemExit):
+    விதிவிலக்கு (KeyboardInterrupt, SystemExit):
         server.shutdown()
 
-if __name__ == "__main__":
-    try:
+எனில் __name__ == "__main__":
+    முயல்:
         os.remove("Xtestsocket")
-    except FileNotFoundError:
+    விதிவிலக்கு FileNotFoundError:
         pass
-    main("Xtestsocket")
+    முதன்மை("Xtestsocket")

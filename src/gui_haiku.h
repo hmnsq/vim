@@ -20,32 +20,32 @@
 
 // System classes
 
-struct BMenu;
-struct BMenuItem;
-struct BPictureButton;
+கட்டமைப்பு BMenu;
+கட்டமைப்பு BMenuItem;
+கட்டமைப்பு BPictureButton;
 
 // Our own Vim-related classes
 
-struct VimApp;
-struct VimFormView;
-struct VimTextAreaView;
-struct VimWindow;
-struct VimScrollBar;
+கட்டமைப்பு VimApp;
+கட்டமைப்பு VimFormView;
+கட்டமைப்பு VimTextAreaView;
+கட்டமைப்பு VimWindow;
+கட்டமைப்பு VimScrollBar;
 
 // Locking functions
 
-extern int vim_lock_screen();
-extern void vim_unlock_screen();
+வெளி முழு vim_lock_screen();
+வெளி வெறுமை vim_unlock_screen();
 
 #ifndef __cplusplus
 
-typedef struct BMenu BMenu;
-typedef struct BMenuItem BMenuItem;
-typedef struct BPictureButton BPictureButton;
-typedef struct VimWindow VimWindow;
-typedef struct VimFormView VimFormView;
-typedef struct VimTextAreaView VimTextAreaView;
-typedef struct VimApp VimApp;
-typedef struct VimScrollBar VimScrollBar;
+வகைவரை கட்டமைப்பு BMenu BMenu;
+வகைவரை கட்டமைப்பு BMenuItem BMenuItem;
+வகைவரை கட்டமைப்பு BPictureButton BPictureButton;
+வகைவரை கட்டமைப்பு VimWindow VimWindow;
+வகைவரை கட்டமைப்பு VimFormView VimFormView;
+வகைவரை கட்டமைப்பு VimTextAreaView VimTextAreaView;
+வகைவரை கட்டமைப்பு VimApp VimApp;
+வகைவரை கட்டமைப்பு VimScrollBar VimScrollBar;
 
 #endif

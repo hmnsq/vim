@@ -20,15 +20,15 @@
 #ifndef EnhancedBP_H
 #define EnhancedBP_H
 
-#include <Xm/PushBP.h>
+#அந்தர்பாவ <Xm/PushBP.h>
 
-#include "gui_xmebw.h"
+#அந்தர்பாவ "gui_xmebw.h"
 
 
 /*
  * EnhancedButton class structure.
  */
-typedef struct _XmEnhancedButtonClassPart
+வகைவரை கட்டமைப்பு _XmEnhancedButtonClassPart
 {
     Pixmap stipple_bitmap;
 } XmEnhancedButtonClassPart;
@@ -36,31 +36,31 @@ typedef struct _XmEnhancedButtonClassPart
 /*
  * Full class record declaration for EnhancedButton class.
  */
-typedef struct
+வகைவரை கட்டமைப்பு
 {
     CoreClassPart core_class;
     XmPrimitiveClassPart primitive_class;
     XmLabelClassPart label_class;
-    XmPushButtonClassPart pushbutton_class;
+    Xm_தள்ளு_Button_Class_Part pushbutton_class;
     XmEnhancedButtonClassPart enhancedbutton_class;
 } XmEnhancedButtonClassRec;
 
 
-extern XmEnhancedButtonClassRec xmEnhancedButtonClassRec;
+வெளி XmEnhancedButtonClassRec xmEnhancedButtonClassRec;
 
 /*
  * EnhancedButton instance record.
  */
-typedef struct _XmEnhancedButtonPart
+வகைவரை கட்டமைப்பு _XmEnhancedButtonPart
 {
     // public resources
     String pixmap_data;
     String pixmap_file;
     Dimension spacing;
-    int label_location;
+    முழு label_location;
 
     // private resources
-    int pixmap_depth;
+    முழு pixmap_depth;
     Dimension pixmap_width;
     Dimension pixmap_height;
     Pixmap normal_pixmap;
@@ -68,20 +68,20 @@ typedef struct _XmEnhancedButtonPart
     Pixmap insensitive_pixmap;
     Pixmap highlight_pixmap;
 
-    int doing_setvalues;
-    int doing_destroy;
+    முழு doing_setvalues;
+    முழு doing_destroy;
 } XmEnhancedButtonPart;
 
 
 /*
  * Full instance record declaration.
  */
-typedef struct _XmEnhancedButtonRec
+வகைவரை கட்டமைப்பு _XmEnhancedButtonRec
 {
     CorePart core;
     XmPrimitivePart primitive;
     XmLabelPart label;
-    XmPushButtonPart pushbutton;
+    Xm_தள்ளு_Button_Part pushbutton;
     XmEnhancedButtonPart enhancedbutton;
 } XmEnhancedButtonRec;
 

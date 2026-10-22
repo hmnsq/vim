@@ -41,79 +41,79 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "xinclude.h"
+#அந்தர்பாவ "xinclude.h"
 
 #define MAX_PTR	UINT_MAX
 #define MAX_CNT	UINT_MAX
 
-#define LINE_END(n) (line##n + count##n - 1)
-#define LINE_END_PTR(n) (*line##n + *count##n - 1)
+#define வரி_END(n) (வரி##n + மொத்தம்##n - 1)
+#define வரி_END_PTR(n) (*வரி##n + *மொத்தம்##n - 1)
 
-struct histindex {
-	struct record {
-		unsigned int ptr, cnt;
-		struct record *next;
+கட்டமைப்பு histindex {
+	கட்டமைப்பு record {
+		unsigned முழு ptr, cnt;
+		கட்டமைப்பு record *next;
 	} **records, /* an occurrence */
-	  **line_map; /* map of line to record chain */
+	  **வரி_map; /* map of line to record chain */
 	chastore_t rcha;
-	unsigned int *next_ptrs;
-	unsigned int table_bits,
+	unsigned முழு *next_ptrs;
+	unsigned முழு table_bits,
 		     records_size,
-		     line_map_size;
+		     வரி_map_size;
 
-	unsigned int max_chain_length,
-		     key_shift,
+	unsigned முழு max_chain_length,
+		     சாவி_shift,
 		     ptr_shift;
 
-	unsigned int cnt,
+	unsigned முழு cnt,
 		     has_common;
 
 	xdfenv_t *env;
-	xpparam_t const *xpp;
+	xpparam_t மாறிலி *xpp;
 };
 
-struct region {
-	unsigned int begin1, end1;
-	unsigned int begin2, end2;
+கட்டமைப்பு region {
+	unsigned முழு begin1, end1;
+	unsigned முழு begin2, end2;
 };
 
-#define LINE_MAP(i, a) (i->line_map[(a) - i->ptr_shift])
+#define வரி_MAP(i, a) (i->வரி_map[(a) - i->ptr_shift])
 
 #define NEXT_PTR(index, ptr) \
 	(index->next_ptrs[(ptr) - index->ptr_shift])
 
 #define CNT(index, ptr) \
-	((LINE_MAP(index, ptr))->cnt)
+	((வரி_MAP(index, ptr))->cnt)
 
 #define REC(env, s, l) \
 	(&env->xdf##s.recs[l - 1])
 
-static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
+நிலையான முழு cmp_recs(xrecord_t *r1, xrecord_t *r2)
 {
-	return r1->ha == r2->ha;
+	திரும்பு r1->ha == r2->ha;
 
 }
 
 #define CMP(i, s1, l1, s2, l2) \
 	(cmp_recs(REC(i->env, s1, l1), REC(i->env, s2, l2)))
 
-#define TABLE_HASH(index, side, line) \
-	XDL_HASHLONG((REC(index->env, side, line))->ha, index->table_bits)
+#define TABLE_HASH(index, side, வரி) \
+	XDL_HASHLONG((REC(index->env, side, வரி))->ha, index->table_bits)
 
-static int scanA(struct histindex *index, int line1, int count1)
+நிலையான முழு scanA(கட்டமைப்பு histindex *index, முழு line1, முழு count1)
 {
-	unsigned int ptr, tbl_idx;
-	unsigned int chain_len;
-	struct record **rec_chain, *rec;
+	unsigned முழு ptr, tbl_idx;
+	unsigned முழு chain_len;
+	கட்டமைப்பு record **rec_chain, *rec;
 
-	for (ptr = LINE_END(1); (unsigned int)line1 <= ptr; ptr--) {
+	க்கு (ptr = வரி_END(1); (unsigned முழு)line1 <= ptr; ptr--) {
 		tbl_idx = TABLE_HASH(index, 1, ptr);
 		rec_chain = index->records + tbl_idx;
 		rec = *rec_chain;
 
 		chain_len = 0;
-		while (rec) {
-			if (CMP(index, 1, rec->ptr, 1, ptr)) {
+		போது (rec) {
+			எனில் (CMP(index, 1, rec->ptr, 1, ptr)) {
 				/*
 				 * ptr is identical to another element. Insert
 				 * it onto the front of the existing element
@@ -123,57 +123,57 @@ static int scanA(struct histindex *index, int line1, int count1)
 				rec->ptr = ptr;
 				/* cap rec->cnt at MAX_CNT */
 				rec->cnt = (rec->cnt < MAX_CNT) ? rec->cnt + 1 : rec->cnt;
-				LINE_MAP(index, ptr) = rec;
-				goto continue_scan;
+				வரி_MAP(index, ptr) = rec;
+				செல் continue_scan;
 			}
 
 			rec = rec->next;
 			chain_len++;
 		}
 
-		if (chain_len == index->max_chain_length)
-			return -1;
+		எனில் (chain_len == index->max_chain_length)
+			திரும்பு -1;
 
 		/*
 		 * This is the first time we have ever seen this particular
 		 * element in the sequence. Construct a new chain for it.
 		 */
-		if (!(rec = xdl_cha_alloc(&index->rcha)))
-			return -1;
+		எனில் (!(rec = xdl_cha_alloc(&index->rcha)))
+			திரும்பு -1;
 		rec->ptr = ptr;
 		rec->cnt = 1;
 		rec->next = *rec_chain;
 		*rec_chain = rec;
-		LINE_MAP(index, ptr) = rec;
+		வரி_MAP(index, ptr) = rec;
 
 continue_scan:
 		; /* no op */
 	}
 
-	return 0;
+	திரும்பு 0;
 }
 
-static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
-	int line1, int count1, int line2, int count2)
+நிலையான முழு try_lcs(கட்டமைப்பு histindex *index, கட்டமைப்பு region *lcs, முழு b_ptr,
+	முழு line1, முழு count1, முழு line2, முழு count2)
 {
-	unsigned int b_next = b_ptr + 1;
-	struct record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
-	unsigned int as, ae, bs, be, np, rc;
-	int should_break;
+	unsigned முழு b_next = b_ptr + 1;
+	கட்டமைப்பு record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
+	unsigned முழு as, ae, bs, be, np, rc;
+	முழு should_break;
 
-	for (; rec; rec = rec->next) {
-		if (rec->cnt > index->cnt) {
-			if (!index->has_common)
+	க்கு (; rec; rec = rec->next) {
+		எனில் (rec->cnt > index->cnt) {
+			எனில் (!index->has_common)
 				index->has_common = CMP(index, 1, rec->ptr, 2, b_ptr);
-			continue;
+			தொடர்;
 		}
 
 		as = rec->ptr;
-		if (!CMP(index, 1, as, 2, b_ptr))
-			continue;
+		எனில் (!CMP(index, 1, as, 2, b_ptr))
+			தொடர்;
 
 		index->has_common = 1;
-		for (;;) {
+		க்கு (;;) {
 			should_break = 0;
 			np = NEXT_PTR(index, as);
 			bs = b_ptr;
@@ -181,24 +181,24 @@ static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
 			be = bs;
 			rc = rec->cnt;
 
-			while ((unsigned int)line1 < as && (unsigned int)line2 < bs
+			போது ((unsigned முழு)line1 < as && (unsigned முழு)line2 < bs
 				&& CMP(index, 1, as - 1, 2, bs - 1)) {
 				as--;
 				bs--;
-				if (1 < rc)
+				எனில் (1 < rc)
 					rc = XDL_MIN(rc, CNT(index, as));
 			}
-			while (ae < (unsigned int)LINE_END(1) && be < (unsigned int)LINE_END(2)
+			போது (ae < (unsigned முழு)வரி_END(1) && be < (unsigned முழு)வரி_END(2)
 				&& CMP(index, 1, ae + 1, 2, be + 1)) {
 				ae++;
 				be++;
-				if (1 < rc)
+				எனில் (1 < rc)
 					rc = XDL_MIN(rc, CNT(index, ae));
 			}
 
-			if (b_next <= be)
+			எனில் (b_next <= be)
 				b_next = be + 1;
-			if (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
+			எனில் (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
 				lcs->begin1 = as;
 				lcs->begin2 = bs;
 				lcs->end1 = ae;
@@ -206,165 +206,165 @@ static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
 				index->cnt = rc;
 			}
 
-			if (np == 0)
-				break;
+			எனில் (np == 0)
+				நிறுத்து;
 
-			while (np <= ae) {
+			போது (np <= ae) {
 				np = NEXT_PTR(index, np);
-				if (np == 0) {
+				எனில் (np == 0) {
 					should_break = 1;
-					break;
+					நிறுத்து;
 				}
 			}
 
-			if (should_break)
-				break;
+			எனில் (should_break)
+				நிறுத்து;
 
 			as = np;
 		}
 	}
-	return b_next;
+	திரும்பு b_next;
 }
 
-static int fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+நிலையான முழு fall_back_to_classic_diff(xpparam_t மாறிலி *xpp, xdfenv_t *env,
+		முழு line1, முழு count1, முழு line2, முழு count2)
 {
 	xpparam_t xpparam;
 
-	memset(&xpparam, 0, sizeof(xpparam));
+	memset(&xpparam, 0, அளவு(xpparam));
 	xpparam.flags = xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
 
-	return xdl_fall_back_diff(env, &xpparam,
+	திரும்பு xdl_fall_back_diff(env, &xpparam,
 				  line1, count1, line2, count2);
 }
 
-static inline void free_index(struct histindex *index)
+நிலையான உள்வரி வெறுமை free_index(கட்டமைப்பு histindex *index)
 {
 	xdl_free(index->records);
-	xdl_free(index->line_map);
+	xdl_free(index->வரி_map);
 	xdl_free(index->next_ptrs);
 	xdl_cha_free(&index->rcha);
 }
 
-static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
-		    struct region *lcs,
-		    int line1, int count1, int line2, int count2)
+நிலையான முழு find_lcs(xpparam_t மாறிலி *xpp, xdfenv_t *env,
+		    கட்டமைப்பு region *lcs,
+		    முழு line1, முழு count1, முழு line2, முழு count2)
 {
-	int b_ptr;
-	int ret = -1;
-	struct histindex index;
+	முழு b_ptr;
+	முழு ret = -1;
+	கட்டமைப்பு histindex index;
 
-	memset(&index, 0, sizeof(index));
+	memset(&index, 0, அளவு(index));
 
 	index.env = env;
 	index.xpp = xpp;
 
-	index.records = NULL;
-	index.line_map = NULL;
+	index.records = வெற்று;
+	index.வரி_map = வெற்று;
 	/* in case of early xdl_cha_free() */
-	index.rcha.head = NULL;
+	index.rcha.head = வெற்று;
 
 	index.table_bits = xdl_hashbits(count1);
 	index.records_size = 1 << index.table_bits;
-	if (!XDL_CALLOC_ARRAY(index.records, index.records_size))
-		goto cleanup;
+	எனில் (!XDL_CALLOC_ARRAY(index.records, index.records_size))
+		செல் cleanup;
 
-	index.line_map_size = count1;
-	if (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
-		goto cleanup;
+	index.வரி_map_size = count1;
+	எனில் (!XDL_CALLOC_ARRAY(index.வரி_map, index.வரி_map_size))
+		செல் cleanup;
 
-	if (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
-		goto cleanup;
+	எனில் (!XDL_CALLOC_ARRAY(index.next_ptrs, index.வரி_map_size))
+		செல் cleanup;
 
 	/* lines / 4 + 1 comes from xprepare.c:xdl_prepare_ctx() */
-	if (xdl_cha_init(&index.rcha, sizeof(struct record), count1 / 4 + 1) < 0)
-		goto cleanup;
+	எனில் (xdl_cha_init(&index.rcha, அளவு(கட்டமைப்பு record), count1 / 4 + 1) < 0)
+		செல் cleanup;
 
 	index.ptr_shift = line1;
 	index.max_chain_length = 64;
 
-	if (scanA(&index, line1, count1))
-		goto cleanup;
+	எனில் (scanA(&index, line1, count1))
+		செல் cleanup;
 
 	index.cnt = index.max_chain_length + 1;
 
-	for (b_ptr = line2; b_ptr <= LINE_END(2); )
+	க்கு (b_ptr = line2; b_ptr <= வரி_END(2); )
 		b_ptr = try_lcs(&index, lcs, b_ptr, line1, count1, line2, count2);
 
-	if (index.has_common && index.max_chain_length < index.cnt)
+	எனில் (index.has_common && index.max_chain_length < index.cnt)
 		ret = 1;
-	else
+	இல்லையெனில்
 		ret = 0;
 
 cleanup:
 	free_index(&index);
-	return ret;
+	திரும்பு ret;
 }
 
-static int histogram_diff(xpparam_t const *xpp, xdfenv_t *env,
-	int line1, int count1, int line2, int count2)
+நிலையான முழு histogram_diff(xpparam_t மாறிலி *xpp, xdfenv_t *env,
+	முழு line1, முழு count1, முழு line2, முழு count2)
 {
-	struct region lcs;
-	int lcs_found;
-	int result;
+	கட்டமைப்பு region lcs;
+	முழு lcs_found;
+	முழு result;
 redo:
 	result = -1;
 
-	if (count1 <= 0 && count2 <= 0)
-		return 0;
+	எனில் (count1 <= 0 && count2 <= 0)
+		திரும்பு 0;
 
-	if ((unsigned int)LINE_END(1) >= MAX_PTR)
-		return -1;
+	எனில் ((unsigned முழு)வரி_END(1) >= MAX_PTR)
+		திரும்பு -1;
 
-	if (!count1) {
-		while(count2--)
+	எனில் (!count1) {
+		போது(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
+		திரும்பு 0;
+	} இல்லையெனில் எனில் (!count2) {
+		போது(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+		திரும்பு 0;
 	}
 
-	memset(&lcs, 0, sizeof(lcs));
+	memset(&lcs, 0, அளவு(lcs));
 	lcs_found = find_lcs(xpp, env, &lcs, line1, count1, line2, count2);
-	if (lcs_found < 0)
-		goto out;
-	else if (lcs_found)
+	எனில் (lcs_found < 0)
+		செல் out;
+	இல்லையெனில் எனில் (lcs_found)
 		result = fall_back_to_classic_diff(xpp, env, line1, count1, line2, count2);
-	else {
-		if (lcs.begin1 == 0 && lcs.begin2 == 0) {
-			while (count1--)
+	இல்லையெனில் {
+		எனில் (lcs.begin1 == 0 && lcs.begin2 == 0) {
+			போது (count1--)
 				env->xdf1.changed[line1++ - 1] = true;
-			while (count2--)
+			போது (count2--)
 				env->xdf2.changed[line2++ - 1] = true;
 			result = 0;
-		} else {
+		} இல்லையெனில் {
 			result = histogram_diff(xpp, env,
 						line1, lcs.begin1 - line1,
 						line2, lcs.begin2 - line2);
-			if (result)
-				goto out;
+			எனில் (result)
+				செல் out;
 			/*
 			 * result = histogram_diff(xpp, env,
 			 *            lcs.end1 + 1, LINE_END(1) - lcs.end1,
 			 *            lcs.end2 + 1, LINE_END(2) - lcs.end2);
 			 * but let's optimize tail recursion ourself:
 			*/
-			count1 = LINE_END(1) - lcs.end1;
+			count1 = வரி_END(1) - lcs.end1;
 			line1 = lcs.end1 + 1;
-			count2 = LINE_END(2) - lcs.end2;
+			count2 = வரி_END(2) - lcs.end2;
 			line2 = lcs.end2 + 1;
-			goto redo;
+			செல் redo;
 		}
 	}
 out:
-	return result;
+	திரும்பு result;
 }
 
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env)
+முழு xdl_do_histogram_diff(xpparam_t மாறிலி *xpp, xdfenv_t *env)
 {
-	return histogram_diff(xpp, env,
+	திரும்பு histogram_diff(xpp, env,
 		env->xdf1.dstart + 1, env->xdf1.dend - env->xdf1.dstart + 1,
 		env->xdf2.dstart + 1, env->xdf2.dend - env->xdf2.dstart + 1);
 }

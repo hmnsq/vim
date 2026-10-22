@@ -2,53 +2,53 @@
 // backslash it needs to be doubled.
 // Public domain.
 
-#include <stdio.h>
-#include <string.h>
+#அந்தர்பாவ <stdio.h>
+#அந்தர்பாவ <string.h>
 
 #ifdef _WIN32
 #	include <fcntl.h>
 #	include <io.h>
 #endif
 
-	int
-main(int argc, char **argv)
+	முழு
+முதன்மை(முழு argc, எழுத்து **argv)
 {
-	char buffer[BUFSIZ];
-	char *p;
+	எழுத்து buffer[BUFSIZ];
+	எழுத்து *p;
 
 	// Windows only: put standard input and output into binary mode so that the
 	// line endings in the output match those in the input.
 #ifdef _WIN32
-	_setmode(_fileno(stdin), _O_BINARY);
-	_setmode(_fileno(stdout), _O_BINARY);
+	_setmode(_fileno(stdin), O_இருமம்_2);
+	_setmode(_fileno(stdout), O_இருமம்_2);
 #endif
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	போது (fgets(buffer, BUFSIZ, stdin) != வெற்று)
 	{
-		for (p = buffer; *p != 0; p++)
+		க்கு (p = buffer; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
+			எனில் (strncmp(p, "charset=utf-8", 13) == 0
 				|| strncmp(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=CP932", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations.", 24) == 0)
+			இல்லையெனில் எனில் (strncmp(p, "# Original translations.", 24) == 0)
 			{
 				p += 24 - 1; // subtracting 1 by considering "p++" in the loop.
 				fputs("# Generated from ja.po, DO NOT EDIT.", stdout);
 			}
-			else if (*(unsigned char *)p == 0x81 && p[1] == '_')
+			இல்லையெனில் எனில் (*(unsigned எழுத்து *)p == 0x81 && p[1] == '_')
 			{
 				putchar('\\');
 				++p;
 			}
-			else
+			இல்லையெனில்
 			{
-				if (*p & 0x80)
+				எனில் (*p & 0x80)
 				{
 					putchar(*p++);
-					if (*p == '\\')
+					எனில் (*p == '\\')
 						putchar(*p);
 				}
 				putchar(*p);

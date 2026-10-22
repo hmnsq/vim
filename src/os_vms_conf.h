@@ -3,17 +3,17 @@
  *
  */
 
-#if defined(__VMS) || defined(__vms)
-# if !defined(VMS)
+#எனில் defined(__VMS) || defined(__vms)
+# எனில் !defined(VMS)
 #  define VMS
 # endif
 #endif
 
-#include <decc$types.h>             // Required early for large-file support
+#அந்தர்பாவ <decc$types.h>             // Required early for large-file support
 
 #define CASE_INSENSITIVE_FILENAME   // Open VMS is case insensitive
 #define FNAME_ILLEGAL "|*#?%"       // Illegal characters in a file name
-#define BINARY_FILE_IO              // Use binary fileio
+#define இருமம்_FILE_IO              // Use binary fileio
 #define USE_GETCWD
 #define USE_SYSTEM
 #define XPMATTRIBUTES_TYPE XpmAttributes
@@ -145,14 +145,14 @@
 #define VIM_SIZEOF_INT  4
 #define VIM_SIZEOF_LONG 4
 
-#if __USE_OFF64_T
+#எனில் __USE_OFF64_T
 # define SIZEOF_OFF_T 8
-#else
+#இல்லையெனில்
 # define SIZEOF_OFF_T 4
 #endif
 
 // Hardware specific
-#if defined(__VAX) || defined(VAX)
+#எனில் defined(__VAX) || defined(VAX)
 # undef  HAVE_GETTIMEOFDAY
 # undef  HAVE_USLEEP
 # undef  HAVE_STRCASECMP
@@ -165,7 +165,7 @@
 # define LONG_LONG_MAX  (2147483647)
 # define ULONG_LONG_MAX (4294967295U)
 
-#else // ALPHA, IA64, X86_64
+#இல்லையெனில் // ALPHA, IA64, X86_64
 # define HAVE_GETTIMEOFDAY
 # define HAVE_USLEEP
 # define HAVE_STRCASECMP
@@ -177,12 +177,12 @@
 # define LONG_LONG_MAX  (9223372036854775807)
 # define ULONG_LONG_MAX (18446744073709551615U)
 
-# if defined(__DECC) && (__CRTL_VER >= 80500000) && (__STDC_VERSION__ >= 199901L) /* C99 */
+# எனில் defined(__DECC) && (__CRTL_VER >= 80500000) && (__STDC_VERSION__ >= 199901L) /* C99 */
 #  define HAVE_ISINF
 #  define HAVE_ISNAN
 # endif
 
-# if defined(X86_64)
+# எனில் defined(X86_64)
 #  define HAVE_FSEEKO
 #  define HAVE_STDINT_H
 #  define HAVE_XOS_R_H
@@ -191,7 +191,7 @@
 #endif /* VAX [else] */
 
 // Compiler specific
-#if defined(VAXC) || defined(__VAXC)
+#எனில் defined(VAXC) || defined(__VAXC)
 # undef  HAVE_SELECT
 # undef  HAVE_FCNTL_H
 # undef  HAVE_UNISTD_H
@@ -200,7 +200,7 @@
 # define BROKEN_LOCALE
 # undef  DYNAMIC_ICONV
 # undef	HAVE_STRFTIME
-#else   // DECC
+#இல்லையெனில்   // DECC
 # define HAVE_SELECT
 # define HAVE_FCNTL_H
 # define HAVE_UNISTD_H 1
@@ -211,16 +211,16 @@
 # define HAVE_STRFTIME
 #endif
 
-#if defined(USE_ICONV)
+#எனில் defined(USE_ICONV)
 # define HAVE_ICONV_H
 # define HAVE_ICONV
-#else
+#இல்லையெனில்
 # undef HAVE_ICONV_H
 # undef HAVE_ICONV
 #endif
 
 // GUI support defines
-#if defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_GTK)
+#எனில் defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_GTK)
 # define X_INCLUDE_GRP_H  // To use getgrgid
 # define XUSE_MTSAFE_API
 # define HAVE_X11
@@ -234,7 +234,7 @@
 
 // Define needed types from stdint - older VMS do not have stdint.h
 #ifndef HAVE_STDINT_H
-   typedef unsigned char  uint8_t;
-   typedef unsigned short uint16_t;
-   typedef unsigned int   uint32_t;
+   வகைவரை unsigned எழுத்து  uint8_t;
+   வகைவரை unsigned short uint16_t;
+   வகைவரை unsigned முழு   uint32_t;
 #endif

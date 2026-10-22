@@ -11,22 +11,22 @@
  * list.c: List support and container (List, Dict, Blob) functions.
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 
 // List heads for garbage collection.
-static list_T		*first_list = NULL;	// list of all lists
+நிலையான list_T		*first_list = வெற்று;	// list of all lists
 
 #define FOR_ALL_WATCHERS(l, lw) \
-    for ((lw) = (l)->lv_watch; (lw) != NULL; (lw) = (lw)->lw_next)
+    க்கு ((lw) = (l)->lv_watch; (lw) != வெற்று; (lw) = (lw)->lw_next)
 
-static void list_free_item(list_T *l, listitem_T *item);
+நிலையான வெறுமை list_free_item(list_T *l, listitem_T *item);
 
 /*
  * Add a watcher to a list.
  */
-    void
+    வெறுமை
 list_add_watch(list_T *l, listwatch_T *lw)
 {
     lw->lw_next = l->lv_watch;
@@ -37,7 +37,7 @@ list_add_watch(list_T *l, listwatch_T *lw)
  * Remove a watcher from a list.
  * No warning when it isn't found...
  */
-    void
+    வெறுமை
 list_rem_watch(list_T *l, listwatch_T *lwrem)
 {
     listwatch_T	*lw, **lwp;
@@ -45,10 +45,10 @@ list_rem_watch(list_T *l, listwatch_T *lwrem)
     lwp = &l->lv_watch;
     FOR_ALL_WATCHERS(l, lw)
     {
-	if (lw == lwrem)
+	எனில் (lw == lwrem)
 	{
 	    *lwp = lw->lw_next;
-	    break;
+	    நிறுத்து;
 	}
 	lwp = &lw->lw_next;
     }
@@ -58,23 +58,23 @@ list_rem_watch(list_T *l, listwatch_T *lwrem)
  * Just before removing an item from a list: advance watchers to the next
  * item.
  */
-    static void
+    நிலையான வெறுமை
 list_fix_watch(list_T *l, listitem_T *item)
 {
     listwatch_T	*lw;
 
     FOR_ALL_WATCHERS(l, lw)
-	if (lw->lw_item == item)
+	எனில் (lw->lw_item == item)
 	    lw->lw_item = item->li_next;
 }
 
-    static void
+    நிலையான வெறுமை
 list_init(list_T *l)
 {
     // Prepend the list to the list of lists for garbage collection.
-    if (first_list != NULL)
+    எனில் (first_list != வெற்று)
 	first_list->lv_used_prev = l;
-    l->lv_used_prev = NULL;
+    l->lv_used_prev = வெற்று;
     l->lv_used_next = first_list;
     first_list = l;
 }
@@ -84,14 +84,14 @@ list_init(list_T *l)
  * Caller should take care of the reference count.
  */
     list_T *
-list_alloc(void)
+list_alloc(வெறுமை)
 {
     list_T  *l;
 
     l = ALLOC_CLEAR_ONE(list_T);
-    if (l != NULL)
+    எனில் (l != வெற்று)
 	list_init(l);
-    return l;
+    திரும்பு l;
 }
 
 /*
@@ -101,10 +101,10 @@ list_alloc(void)
 list_alloc_id(alloc_id_T id UNUSED)
 {
 #ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return NULL;
+    எனில் (alloc_fail_id == id && alloc_does_fail(அளவு(list_T)))
+	திரும்பு வெற்று;
 #endif
-    return (list_alloc());
+    திரும்பு (list_alloc());
 }
 
 /*
@@ -114,43 +114,43 @@ list_alloc_id(alloc_id_T id UNUSED)
  * Next list_set_item() must be called for each item.
  */
     list_T *
-list_alloc_with_items(int count)
+list_alloc_with_பொருட்கள்(முழு மொத்தம்)
 {
     list_T	*l;
 
-    if (count > 0
-	    && (size_t)count > (SIZE_MAX - sizeof(list_T)) / sizeof(listitem_T))
-	return NULL;
-    l = (list_T *)alloc_clear(sizeof(list_T) + count * sizeof(listitem_T));
-    if (l == NULL)
-	return NULL;
+    எனில் (மொத்தம் > 0
+	    && (size_t)மொத்தம் > (SIZE_MAX - அளவு(list_T)) / அளவு(listitem_T))
+	திரும்பு வெற்று;
+    l = (list_T *)alloc_clear(அளவு(list_T) + மொத்தம் * அளவு(listitem_T));
+    எனில் (l == வெற்று)
+	திரும்பு வெற்று;
 
     list_init(l);
 
-    if (count <= 0)
-	return l;
+    எனில் (மொத்தம் <= 0)
+	திரும்பு l;
 
     listitem_T	*li = (listitem_T *)(l + 1);
-    int		i;
+    முழு		i;
 
-    l->lv_len = count;
-    l->lv_with_items = count;
+    l->lv_len = மொத்தம்;
+    l->lv_with_பொருட்கள் = மொத்தம்;
     l->lv_first = li;
-    l->lv_u.mat.lv_last = li + count - 1;
-    for (i = 0; i < count; ++i)
+    l->lv_u.mat.lv_last = li + மொத்தம் - 1;
+    க்கு (i = 0; i < மொத்தம்; ++i)
     {
-	if (i == 0)
-	    li->li_prev = NULL;
-	else
+	எனில் (i == 0)
+	    li->li_prev = வெற்று;
+	இல்லையெனில்
 	    li->li_prev = li - 1;
-	if (i == count - 1)
-	    li->li_next = NULL;
-	else
+	எனில் (i == மொத்தம் - 1)
+	    li->li_next = வெற்று;
+	இல்லையெனில்
 	    li->li_next = li + 1;
 	++li;
     }
 
-    return l;
+    திரும்பு l;
 }
 
 /*
@@ -158,8 +158,8 @@ list_alloc_with_items(int count)
  * The contents of "tv" is moved into the list item.
  * Each item must be set exactly once.
  */
-    void
-list_set_item(list_T *l, int idx, typval_T *tv)
+    வெறுமை
+list_set_item(list_T *l, முழு idx, typval_T *tv)
 {
     listitem_T	*li = (listitem_T *)(l + 1) + idx;
 
@@ -170,42 +170,42 @@ list_set_item(list_T *l, int idx, typval_T *tv)
  * Allocate an empty list for a return value, with reference count set.
  * Returns OK or FAIL.
  */
-    int
+    முழு
 rettv_list_alloc(typval_T *rettv)
 {
     list_T	*l = list_alloc();
 
-    if (l == NULL)
-	return FAIL;
+    எனில் (l == வெற்று)
+	திரும்பு FAIL;
 
     rettv->v_lock = 0;
     rettv_list_set(rettv, l);
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Same as rettv_list_alloc() but uses an allocation id for testing.
  */
-    int
+    முழு
 rettv_list_alloc_id(typval_T *rettv, alloc_id_T id UNUSED)
 {
 #ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return FAIL;
+    எனில் (alloc_fail_id == id && alloc_does_fail(அளவு(list_T)))
+	திரும்பு FAIL;
 #endif
-    return rettv_list_alloc(rettv);
+    திரும்பு rettv_list_alloc(rettv);
 }
 
 
 /*
  * Set a list as the return value.  Increments the reference count.
  */
-    void
+    வெறுமை
 rettv_list_set(typval_T *rettv, list_T *l)
 {
     rettv->v_type = VAR_LIST;
     rettv->vval.v_list = l;
-    if (l != NULL)
+    எனில் (l != வெற்று)
 	++l->lv_refcount;
 }
 
@@ -213,10 +213,10 @@ rettv_list_set(typval_T *rettv, list_T *l)
  * Unreference a list: decrement the reference count and free it when it
  * becomes zero.
  */
-    void
+    வெறுமை
 list_unref(list_T *l)
 {
-    if (l != NULL && --l->lv_refcount <= 0)
+    எனில் (l != வெற்று && --l->lv_refcount <= 0)
 	list_free(l);
 }
 
@@ -224,13 +224,13 @@ list_unref(list_T *l)
  * Free a list, including all non-container items it points to.
  * Ignores the reference count.
  */
-    static void
+    நிலையான வெறுமை
 list_free_contents(list_T *l)
 {
     listitem_T *item;
 
-    if (l->lv_first != &range_list_item)
-	for (item = l->lv_first; item != NULL; item = l->lv_first)
+    எனில் (l->lv_first != &range_list_item)
+	க்கு (item = l->lv_first; item != வெற்று; item = l->lv_first)
 	{
 	    // Remove the item before deleting it.
 	    l->lv_first = item->li_next;
@@ -244,15 +244,15 @@ list_free_contents(list_T *l)
  * But don't free a list that has a watcher (used in a for loop), these
  * are not referenced anywhere.
  */
-    int
-list_free_nonref(int copyID)
+    முழு
+list_free_nonref(முழு copyID)
 {
     list_T	*ll;
-    int		did_free = FALSE;
+    முழு		did_free = FALSE;
 
-    for (ll = first_list; ll != NULL; ll = ll->lv_used_next)
-	if ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
-						      && ll->lv_watch == NULL)
+    க்கு (ll = first_list; ll != வெற்று; ll = ll->lv_used_next)
+	எனில் ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
+						      && ll->lv_watch == வெற்று)
 	{
 	    // Free the List and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -260,34 +260,34 @@ list_free_nonref(int copyID)
 	    list_free_contents(ll);
 	    did_free = TRUE;
 	}
-    return did_free;
+    திரும்பு did_free;
 }
 
-    static void
+    நிலையான வெறுமை
 list_free_list(list_T  *l)
 {
     // Remove the list from the list of lists for garbage collection.
-    if (l->lv_used_prev == NULL)
+    எனில் (l->lv_used_prev == வெற்று)
 	first_list = l->lv_used_next;
-    else
+    இல்லையெனில்
 	l->lv_used_prev->lv_used_next = l->lv_used_next;
-    if (l->lv_used_next != NULL)
+    எனில் (l->lv_used_next != வெற்று)
 	l->lv_used_next->lv_used_prev = l->lv_used_prev;
 
     free_type(l->lv_type);
     vim_free(l);
 }
 
-    void
-list_free_items(int copyID)
+    வெறுமை
+list_free_பொருட்கள்(முழு copyID)
 {
     list_T	*ll, *ll_next;
 
-    for (ll = first_list; ll != NULL; ll = ll_next)
+    க்கு (ll = first_list; ll != வெற்று; ll = ll_next)
     {
 	ll_next = ll->lv_used_next;
-	if ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
-						      && ll->lv_watch == NULL)
+	எனில் ((ll->lv_copyID & COPYID_MASK) != (copyID & COPYID_MASK)
+						      && ll->lv_watch == வெற்று)
 	{
 	    // Free the List and ordinary items it contains, but don't recurse
 	    // into Lists and Dictionaries, they will be in the list of dicts
@@ -297,11 +297,11 @@ list_free_items(int copyID)
     }
 }
 
-    void
+    வெறுமை
 list_free(list_T *l)
 {
-    if (in_free_unref_items)
-	return;
+    எனில் (in_free_unref_பொருட்கள்)
+	திரும்பு;
 
     list_free_contents(l);
     list_free_list(l);
@@ -312,20 +312,20 @@ list_free(list_T *l)
  * It is not initialized, don't forget to set v_lock.
  */
     listitem_T *
-listitem_alloc(void)
+listitem_alloc(வெறுமை)
 {
-    return ALLOC_ONE(listitem_T);
+    திரும்பு ALLOC_ONE(listitem_T);
 }
 
 /*
  * Free a list item, unless it was allocated together with the list itself.
  * Does not clear the value.  Does not notify watchers.
  */
-    static void
+    நிலையான வெறுமை
 list_free_item(list_T *l, listitem_T *item)
 {
-    if (l->lv_with_items == 0 || item < (listitem_T *)l
-			   || item >= (listitem_T *)(l + 1) + l->lv_with_items)
+    எனில் (l->lv_with_பொருட்கள் == 0 || item < (listitem_T *)l
+			   || item >= (listitem_T *)(l + 1) + l->lv_with_பொருட்கள்)
 	vim_free(item);
 }
 
@@ -333,7 +333,7 @@ list_free_item(list_T *l, listitem_T *item)
  * Free a list item, unless it was allocated together with the list itself.
  * Also clears the value.  Does not notify watchers.
  */
-    void
+    வெறுமை
 listitem_free(list_T *l, listitem_T *item)
 {
     clear_tv(&item->li_tv);
@@ -343,7 +343,7 @@ listitem_free(list_T *l, listitem_T *item)
 /*
  * Remove a list item from a List and free it.  Also clears the value.
  */
-    void
+    வெறுமை
 listitem_remove(list_T *l, listitem_T *item)
 {
     vimlist_remove(l, item, item);
@@ -356,41 +356,41 @@ listitem_remove(list_T *l, listitem_T *item)
     long
 list_len(list_T *l)
 {
-    if (l == NULL)
-	return 0L;
-    return l->lv_len;
+    எனில் (l == வெற்று)
+	திரும்பு 0L;
+    திரும்பு l->lv_len;
 }
 
 /*
  * Return TRUE when two lists have exactly the same values.
  */
-    int
+    முழு
 list_equal(
     list_T	*l1,
     list_T	*l2,
-    int		ic)	// ignore case for strings
+    முழு		ic)	// ignore case for strings
 {
     listitem_T	*item1, *item2;
 
-    if (l1 == l2)
-	return TRUE;
-    if (list_len(l1) != list_len(l2))
-	return FALSE;
-    if (list_len(l1) == 0)
+    எனில் (l1 == l2)
+	திரும்பு TRUE;
+    எனில் (list_len(l1) != list_len(l2))
+	திரும்பு FALSE;
+    எனில் (list_len(l1) == 0)
 	// empty and NULL list are considered equal
-	return TRUE;
-    if (l1 == NULL || l2 == NULL)
-	return FALSE;
+	திரும்பு TRUE;
+    எனில் (l1 == வெற்று || l2 == வெற்று)
+	திரும்பு FALSE;
 
     CHECK_LIST_MATERIALIZE(l1);
     CHECK_LIST_MATERIALIZE(l2);
 
-    for (item1 = l1->lv_first, item2 = l2->lv_first;
-	    item1 != NULL && item2 != NULL;
+    க்கு (item1 = l1->lv_first, item2 = l2->lv_first;
+	    item1 != வெற்று && item2 != வெற்று;
 			       item1 = item1->li_next, item2 = item2->li_next)
-	if (!tv_equal(&item1->li_tv, &item2->li_tv, ic))
-	    return FALSE;
-    return item1 == NULL && item2 == NULL;
+	எனில் (!tv_equal(&item1->li_tv, &item2->li_tv, ic))
+	    திரும்பு FALSE;
+    திரும்பு item1 == வெற்று && item2 == வெற்று;
 }
 
 /*
@@ -404,54 +404,54 @@ list_find(list_T *l, long n)
     listitem_T	*item;
     long	idx;
 
-    if (l == NULL)
-	return NULL;
+    எனில் (l == வெற்று)
+	திரும்பு வெற்று;
 
     // Negative index is relative to the end.
-    if (n < 0)
+    எனில் (n < 0)
 	n = l->lv_len + n;
 
     // Check for index out of range.
-    if (n < 0 || n >= l->lv_len)
-	return NULL;
+    எனில் (n < 0 || n >= l->lv_len)
+	திரும்பு வெற்று;
 
     CHECK_LIST_MATERIALIZE(l);
 
     // range_list_materialize may reset l->lv_len
-    if (n >= l->lv_len)
-	return NULL;
+    எனில் (n >= l->lv_len)
+	திரும்பு வெற்று;
 
     // When there is a cached index may start search from there.
-    if (l->lv_u.mat.lv_idx_item != NULL)
+    எனில் (l->lv_u.mat.lv_idx_item != வெற்று)
     {
-	if (n < l->lv_u.mat.lv_idx / 2)
+	எனில் (n < l->lv_u.mat.lv_idx / 2)
 	{
 	    // closest to the start of the list
 	    item = l->lv_first;
 	    idx = 0;
 	}
-	else if (n > (l->lv_u.mat.lv_idx + l->lv_len) / 2)
+	இல்லையெனில் எனில் (n > (l->lv_u.mat.lv_idx + l->lv_len) / 2)
 	{
 	    // closest to the end of the list
 	    item = l->lv_u.mat.lv_last;
 	    idx = l->lv_len - 1;
 	}
-	else
+	இல்லையெனில்
 	{
 	    // closest to the cached index
 	    item = l->lv_u.mat.lv_idx_item;
 	    idx = l->lv_u.mat.lv_idx;
 	}
     }
-    else
+    இல்லையெனில்
     {
-	if (n < l->lv_len / 2)
+	எனில் (n < l->lv_len / 2)
 	{
 	    // closest to the start of the list
 	    item = l->lv_first;
 	    idx = 0;
 	}
-	else
+	இல்லையெனில்
 	{
 	    // closest to the end of the list
 	    item = l->lv_u.mat.lv_last;
@@ -459,13 +459,13 @@ list_find(list_T *l, long n)
 	}
     }
 
-    while (n > idx)
+    போது (n > idx)
     {
 	// search forward
 	item = item->li_next;
 	++idx;
     }
-    while (n < idx)
+    போது (n < idx)
     {
 	// search backward
 	item = item->li_prev;
@@ -476,7 +476,7 @@ list_find(list_T *l, long n)
     l->lv_u.mat.lv_idx = idx;
     l->lv_u.mat.lv_idx_item = item;
 
-    return item;
+    திரும்பு item;
 }
 
 /*
@@ -486,38 +486,38 @@ list_find(list_T *l, long n)
 list_find_nr(
     list_T	*l,
     long	idx,
-    int		*errorp)	// set to TRUE when something wrong
+    முழு		*errorp)	// set to TRUE when something wrong
 {
     listitem_T	*li;
 
-    if (l != NULL && l->lv_first == &range_list_item)
+    எனில் (l != வெற்று && l->lv_first == &range_list_item)
     {
 	long	    n = idx;
 
 	// not materialized range() list: compute the value.
 	// Negative index is relative to the end.
-	if (n < 0)
+	எனில் (n < 0)
 	    n = l->lv_len + n;
 
 	// Check for index out of range.
-	if (n < 0 || n >= l->lv_len)
+	எனில் (n < 0 || n >= l->lv_len)
 	{
-	    if (errorp != NULL)
+	    எனில் (errorp != வெற்று)
 		*errorp = TRUE;
-	    return -1L;
+	    திரும்பு -1L;
 	}
 
-	return l->lv_u.nonmat.lv_start + n * l->lv_u.nonmat.lv_stride;
+	திரும்பு l->lv_u.nonmat.lv_start + n * l->lv_u.nonmat.lv_stride;
     }
 
     li = list_find(l, idx);
-    if (li == NULL)
+    எனில் (li == வெற்று)
     {
-	if (errorp != NULL)
+	எனில் (errorp != வெற்று)
 	    *errorp = TRUE;
-	return -1L;
+	திரும்பு -1L;
     }
-    return (long)tv_get_number_chk(&li->li_tv, errorp);
+    திரும்பு (long)tv_get_எண்_chk(&li->li_tv, errorp);
 }
 
 /*
@@ -529,12 +529,12 @@ list_find_str(list_T *l, long idx)
     listitem_T	*li;
 
     li = list_find(l, idx - 1);
-    if (li == NULL)
+    எனில் (li == வெற்று)
     {
 	semsg(_(e_list_index_out_of_range_nr), idx);
-	return NULL;
+	திரும்பு வெற்று;
     }
-    return tv_get_string(&li->li_tv);
+    திரும்பு tv_get_string(&li->li_tv);
 }
 
 /*
@@ -546,15 +546,15 @@ list_find_index(list_T *l, long *idx)
 {
     listitem_T *li = list_find(l, *idx);
 
-    if (li != NULL)
-	return li;
+    எனில் (li != வெற்று)
+	திரும்பு li;
 
-    if (*idx < 0)
+    எனில் (*idx < 0)
     {
 	*idx = 0;
 	li = list_find(l, *idx);
     }
-    return li;
+    திரும்பு li;
 }
 
 /*
@@ -567,113 +567,113 @@ list_idx_of_item(list_T *l, listitem_T *item)
     long	idx = 0;
     listitem_T	*li;
 
-    if (l == NULL)
-	return -1;
+    எனில் (l == வெற்று)
+	திரும்பு -1;
     CHECK_LIST_MATERIALIZE(l);
     idx = 0;
-    for (li = l->lv_first; li != NULL && li != item; li = li->li_next)
+    க்கு (li = l->lv_first; li != வெற்று && li != item; li = li->li_next)
 	++idx;
-    if (li == NULL)
-	return -1;
-    return idx;
+    எனில் (li == வெற்று)
+	திரும்பு -1;
+    திரும்பு idx;
 }
 
 /*
  * Append item "item" to the end of list "l".
  */
-    void
+    வெறுமை
 list_append(list_T *l, listitem_T *item)
 {
     CHECK_LIST_MATERIALIZE(l);
-    if (l->lv_u.mat.lv_last == NULL)
+    எனில் (l->lv_u.mat.lv_last == வெற்று)
     {
 	// empty list
 	l->lv_first = item;
-	item->li_prev = NULL;
+	item->li_prev = வெற்று;
     }
-    else
+    இல்லையெனில்
     {
 	l->lv_u.mat.lv_last->li_next = item;
 	item->li_prev = l->lv_u.mat.lv_last;
     }
     l->lv_u.mat.lv_last = item;
     ++l->lv_len;
-    item->li_next = NULL;
+    item->li_next = வெற்று;
 }
 
 /*
  * Append typval_T "tv" to the end of list "l".  "tv" is copied.
  * Return FAIL when out of memory or the type is wrong.
  */
-    int
+    முழு
 list_append_tv(list_T *l, typval_T *tv)
 {
     listitem_T	*li;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL
+    எனில் (l->lv_type != வெற்று && l->lv_type->tt_member != வெற்று
 		&& check_typval_arg_type(l->lv_type->tt_member, tv,
-							      NULL, 0) == FAIL)
-	return FAIL;
+							      வெற்று, 0) == FAIL)
+	திரும்பு FAIL;
     li = listitem_alloc();
-    if (li == NULL)
-	return FAIL;
+    எனில் (li == வெற்று)
+	திரும்பு FAIL;
     copy_tv(tv, &li->li_tv);
     list_append(l, li);
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * As list_append_tv() but move the value instead of copying it.
  * Return FAIL when out of memory.
  */
-    static int
+    நிலையான முழு
 list_append_tv_move(list_T *l, typval_T *tv)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    எனில் (li == வெற்று)
+	திரும்பு FAIL;
     li->li_tv = *tv;
     list_append(l, li);
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Add a dictionary to a list.  Used by getqflist().
  * Return FAIL when out of memory.
  */
-    int
+    முழு
 list_append_dict(list_T *list, dict_T *dict)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    எனில் (li == வெற்று)
+	திரும்பு FAIL;
     li->li_tv.v_type = VAR_DICT;
     li->li_tv.v_lock = 0;
     li->li_tv.vval.v_dict = dict;
     list_append(list, li);
     ++dict->dv_refcount;
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Append list2 to list1.
  * Return FAIL when out of memory.
  */
-    int
+    முழு
 list_append_list(list_T *list1, list_T *list2)
 {
     listitem_T	*li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    எனில் (li == வெற்று)
+	திரும்பு FAIL;
     li->li_tv.v_type = VAR_LIST;
     li->li_tv.v_lock = 0;
     li->li_tv.vval.v_list = list2;
     list_append(list1, li);
     ++list2->lv_refcount;
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -681,41 +681,41 @@ list_append_list(list_T *list1, list_T *list2)
  * When "len" >= 0 use "str[len]".
  * Returns FAIL when out of memory.
  */
-    int
-list_append_string(list_T *l, char_u *str, int len)
+    முழு
+list_append_string(list_T *l, char_u *str, முழு len)
 {
     listitem_T *li = listitem_alloc();
 
-    if (li == NULL)
-	return FAIL;
+    எனில் (li == வெற்று)
+	திரும்பு FAIL;
     list_append(l, li);
     li->li_tv.v_type = VAR_STRING;
     li->li_tv.v_lock = 0;
-    if (str == NULL)
-	li->li_tv.vval.v_string = NULL;
-    else if ((li->li_tv.vval.v_string = (len >= 0 ? vim_strnsave(str, len)
-						 : vim_strsave(str))) == NULL)
-	return FAIL;
-    return OK;
+    எனில் (str == வெற்று)
+	li->li_tv.vval.v_string = வெற்று;
+    இல்லையெனில் எனில் ((li->li_tv.vval.v_string = (len >= 0 ? vim_strnsave(str, len)
+						 : vim_strsave(str))) == வெற்று)
+	திரும்பு FAIL;
+    திரும்பு OK;
 }
 
 /*
  * Append "n" to list "l".
  * Returns FAIL when out of memory.
  */
-    int
-list_append_number(list_T *l, varnumber_T n)
+    முழு
+list_append_எண்(list_T *l, varnumber_T n)
 {
     listitem_T	*li;
 
     li = listitem_alloc();
-    if (li == NULL)
-	return FAIL;
-    li->li_tv.v_type = VAR_NUMBER;
+    எனில் (li == வெற்று)
+	திரும்பு FAIL;
+    li->li_tv.v_type = VAR_எண்;
     li->li_tv.v_lock = 0;
-    li->li_tv.vval.v_number = n;
+    li->li_tv.vval.v_எண் = n;
     list_append(l, li);
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -723,44 +723,44 @@ list_append_number(list_T *l, varnumber_T n)
  * If "item" is NULL append at the end.
  * Return FAIL when out of memory or the type is wrong.
  */
-    int
-list_insert_tv(list_T *l, typval_T *tv, listitem_T *item)
+    முழு
+list_செருகு_tv(list_T *l, typval_T *tv, listitem_T *item)
 {
     listitem_T	*ni;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL
+    எனில் (l->lv_type != வெற்று && l->lv_type->tt_member != வெற்று
 		&& check_typval_arg_type(l->lv_type->tt_member, tv,
-							      NULL, 0) == FAIL)
-	return FAIL;
+							      வெற்று, 0) == FAIL)
+	திரும்பு FAIL;
     ni = listitem_alloc();
-    if (ni == NULL)
-	return FAIL;
+    எனில் (ni == வெற்று)
+	திரும்பு FAIL;
     copy_tv(tv, &ni->li_tv);
-    list_insert(l, ni, item);
-    return OK;
+    list_செருகு(l, ni, item);
+    திரும்பு OK;
 }
 
-    void
-list_insert(list_T *l, listitem_T *ni, listitem_T *item)
+    வெறுமை
+list_செருகு(list_T *l, listitem_T *ni, listitem_T *item)
 {
     CHECK_LIST_MATERIALIZE(l);
-    if (item == NULL)
+    எனில் (item == வெற்று)
 	// Append new item at end of list.
 	list_append(l, ni);
-    else
+    இல்லையெனில்
     {
 	// Insert new item before existing item.
 	ni->li_prev = item->li_prev;
 	ni->li_next = item;
-	if (item->li_prev == NULL)
+	எனில் (item->li_prev == வெற்று)
 	{
 	    l->lv_first = ni;
 	    ++l->lv_u.mat.lv_idx;
 	}
-	else
+	இல்லையெனில்
 	{
 	    item->li_prev->li_next = ni;
-	    l->lv_u.mat.lv_idx_item = NULL;
+	    l->lv_u.mat.lv_idx_item = வெற்று;
 	}
 	item->li_prev = ni;
 	++l->lv_len;
@@ -772,58 +772,58 @@ list_insert(list_T *l, listitem_T *ni, listitem_T *item)
  * adding a new element to a List in Vim9script by using the current list
  * length as the index.
  */
-    static int
+    நிலையான முழு
 list_append_new_item(list_T *l)
 {
     typval_T	tv;
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+    எனில் (l->lv_type != வெற்று && l->lv_type->tt_member != வெற்று)
 	tv.v_type = l->lv_type->tt_member->tt_type;
-    else
-	tv.v_type = VAR_NUMBER;
+    இல்லையெனில்
+	tv.v_type = VAR_எண்;
     tv.v_lock = 0;
 
-    switch (tv.v_type)
+    தேர்வு (tv.v_type)
     {
-	case VAR_BOOL: tv.vval.v_number = VVAL_FALSE; break;
-	case VAR_SPECIAL: tv.vval.v_number = 0; break;
-	case VAR_NUMBER: tv.vval.v_number = 0; break;
-	case VAR_FLOAT: tv.vval.v_float = 0; break;
-	case VAR_STRING: tv.vval.v_string = NULL; break;
-	case VAR_BLOB: tv.vval.v_blob = blob_alloc(); break;
-	case VAR_FUNC: tv.vval.v_string = NULL; break;
-	case VAR_PARTIAL: tv.vval.v_partial = NULL; break;
-	case VAR_LIST: tv.vval.v_list = list_alloc(); break;
-	case VAR_DICT: tv.vval.v_dict = dict_alloc(); break;
+	நிலை VAR_BOOL: tv.vval.v_எண் = VVAL_FALSE; நிறுத்து;
+	நிலை VAR_SPECIAL: tv.vval.v_எண் = 0; நிறுத்து;
+	நிலை VAR_எண்: tv.vval.v_எண் = 0; நிறுத்து;
+	நிலை VAR_FLOAT: tv.vval.v_float = 0; நிறுத்து;
+	நிலை VAR_STRING: tv.vval.v_string = வெற்று; நிறுத்து;
+	நிலை VAR_BLOB: tv.vval.v_blob = blob_alloc(); நிறுத்து;
+	நிலை VAR_FUNC: tv.vval.v_string = வெற்று; நிறுத்து;
+	நிலை VAR_PARTIAL: tv.vval.v_partial = வெற்று; நிறுத்து;
+	நிலை VAR_LIST: tv.vval.v_list = list_alloc(); நிறுத்து;
+	நிலை VAR_DICT: tv.vval.v_dict = dict_alloc(); நிறுத்து;
 #ifdef FEAT_JOB_CHANNEL
-	case VAR_JOB: tv.vval.v_job = NULL; break;
-	case VAR_CHANNEL: tv.vval.v_channel = NULL; break;
+	நிலை VAR_JOB: tv.vval.v_job = வெற்று; நிறுத்து;
+	நிலை VAR_CHANNEL: tv.vval.v_channel = வெற்று; நிறுத்து;
 #endif
-	case VAR_CLASS:
-	    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+	நிலை VAR_CLASS:
+	    எனில் (l->lv_type != வெற்று && l->lv_type->tt_member != வெற்று)
 		tv.vval.v_class = l->lv_type->tt_member->tt_class;
-	    else
-		tv.vval.v_class = NULL;
-	    break;
-	case VAR_OBJECT:
-	    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+	    இல்லையெனில்
+		tv.vval.v_class = வெற்று;
+	    நிறுத்து;
+	நிலை VAR_OBJECT:
+	    எனில் (l->lv_type != வெற்று && l->lv_type->tt_member != வெற்று)
 		tv.vval.v_object =
 		    alloc_object(l->lv_type->tt_member->tt_class);
-	    else
-		tv.vval.v_object = NULL;
-	    break;
-	case VAR_TYPEALIAS: tv.vval.v_typealias = NULL; break;
-	case VAR_TUPLE: tv.vval.v_tuple = tuple_alloc(); break;
-	default:
-	    tv.v_type = VAR_NUMBER;
-	    tv.vval.v_number = 0;
-	    break;
+	    இல்லையெனில்
+		tv.vval.v_object = வெற்று;
+	    நிறுத்து;
+	நிலை VAR_TYPEALIAS: tv.vval.v_typealias = வெற்று; நிறுத்து;
+	நிலை VAR_TUPLE: tv.vval.v_tuple = tuple_alloc(); நிறுத்து;
+	இயல்பு:
+	    tv.v_type = VAR_எண்;
+	    tv.vval.v_எண் = 0;
+	    நிறுத்து;
     }
 
-    if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
+    எனில் (l->lv_type != வெற்று && l->lv_type->tt_member != வெற்று)
 	set_tv_type(&tv, l->lv_type->tt_member);
 
-    return list_append_tv(l, &tv);
+    திரும்பு list_append_tv(l, &tv);
 }
 
 /*
@@ -832,29 +832,29 @@ list_append_new_item(list_T *l)
  * Return NULL if there is no such item.
  */
     listitem_T *
-check_range_index_one(list_T *l, long *n1, int can_append, int quiet)
+check_range_index_one(list_T *l, long *n1, முழு can_append, முழு quiet)
 {
     long	orig_n1 = *n1;
     listitem_T	*li = list_find_index(l, n1);
 
-    if (li != NULL)
-	return li;
+    எனில் (li != வெற்று)
+	திரும்பு li;
 
     // Vim9: Allow for adding an item at the end.
-    if (can_append && in_vim9script()
+    எனில் (can_append && in_vim9script()
 	    && *n1 == l->lv_len && l->lv_lock == 0)
     {
-	if (list_append_new_item(l) == FAIL)
-	    return NULL;
+	எனில் (list_append_new_item(l) == FAIL)
+	    திரும்பு வெற்று;
 	li = list_find_index(l, n1);
     }
-    if (li == NULL)
+    எனில் (li == வெற்று)
     {
-	if (!quiet)
+	எனில் (!quiet)
 	    semsg(_(e_list_index_out_of_range_nr), orig_n1);
-	return NULL;
+	திரும்பு வெற்று;
     }
-    return li;
+    திரும்பு li;
 }
 
 /*
@@ -863,37 +863,37 @@ check_range_index_one(list_T *l, long *n1, int can_append, int quiet)
  * "li1" is the item for item "n1".
  * Return OK or FAIL.
  */
-    int
+    முழு
 check_range_index_two(
 	list_T	    *l,
 	long	    *n1,
 	listitem_T  *li1,
 	long	    *n2,
-	int	    quiet)
+	முழு	    quiet)
 {
-    if (*n2 < 0)
+    எனில் (*n2 < 0)
     {
 	listitem_T	*ni = list_find(l, *n2);
 
-	if (ni == NULL)
+	எனில் (ni == வெற்று)
 	{
-	    if (!quiet)
+	    எனில் (!quiet)
 		semsg(_(e_list_index_out_of_range_nr), *n2);
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
 	*n2 = list_idx_of_item(l, ni);
     }
 
     // Check that n2 isn't before n1.
-    if (*n1 < 0)
+    எனில் (*n1 < 0)
 	*n1 = list_idx_of_item(l, li1);
-    if (*n2 < *n1)
+    எனில் (*n2 < *n1)
     {
-	if (!quiet)
+	எனில் (!quiet)
 	    semsg(_(e_list_index_out_of_range_nr), *n2);
-	return FAIL;
+	திரும்பு FAIL;
     }
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -905,13 +905,13 @@ check_range_index_two(
  * "varname" is used for error messages.
  * Returns OK or FAIL.
  */
-    int
+    முழு
 list_assign_range(
 	list_T	    *dest,
 	list_T	    *src,
 	long	    idx1_arg,
 	long	    idx2,
-	int	    empty_idx2,
+	முழு	    empty_idx2,
 	char_u	    *op,
 	char_u	    *varname)
 {
@@ -920,70 +920,70 @@ list_assign_range(
     long	idx1 = idx1_arg;
     listitem_T	*first_li = list_find_index(dest, &idx1);
     long	idx;
-    type_T	*member_type = NULL;
+    type_T	*member_type = வெற்று;
 
     // Check whether any of the list items is locked before making any changes.
     idx = idx1;
     dest_li = first_li;
-    for (src_li = src->lv_first; src_li != NULL && dest_li != NULL; )
+    க்கு (src_li = src->lv_first; src_li != வெற்று && dest_li != வெற்று; )
     {
-	if (value_check_lock(dest_li->li_tv.v_lock, varname, FALSE))
-	    return FAIL;
+	எனில் (மதிப்பு_check_lock(dest_li->li_tv.v_lock, varname, FALSE))
+	    திரும்பு FAIL;
 	src_li = src_li->li_next;
-	if (src_li == NULL || (!empty_idx2 && idx2 == idx))
-	    break;
+	எனில் (src_li == வெற்று || (!empty_idx2 && idx2 == idx))
+	    நிறுத்து;
 	dest_li = dest_li->li_next;
 	++idx;
     }
 
-    if (in_vim9script() && dest->lv_type != NULL
-					   && dest->lv_type->tt_member != NULL)
+    எனில் (in_vim9script() && dest->lv_type != வெற்று
+					   && dest->lv_type->tt_member != வெற்று)
 	member_type = dest->lv_type->tt_member;
 
     // Assign the List values to the list items.
     idx = idx1;
     dest_li = first_li;
-    for (src_li = src->lv_first; src_li != NULL; )
+    க்கு (src_li = src->lv_first; src_li != வெற்று; )
     {
-	if (op != NULL && *op != '=')
+	எனில் (op != வெற்று && *op != '=')
 	    tv_op(&dest_li->li_tv, &src_li->li_tv, op);
-	else
+	இல்லையெனில்
 	{
-	    if (member_type != NULL
+	    எனில் (member_type != வெற்று
 		    && check_typval_arg_type(member_type, &src_li->li_tv,
-							      NULL, 0) == FAIL)
-		return FAIL;
+							      வெற்று, 0) == FAIL)
+		திரும்பு FAIL;
 	    clear_tv(&dest_li->li_tv);
 	    copy_tv(&src_li->li_tv, &dest_li->li_tv);
 	}
 	src_li = src_li->li_next;
-	if (src_li == NULL || (!empty_idx2 && idx2 == idx))
-	    break;
-	if (dest_li->li_next == NULL)
+	எனில் (src_li == வெற்று || (!empty_idx2 && idx2 == idx))
+	    நிறுத்து;
+	எனில் (dest_li->li_next == வெற்று)
 	{
 	    // Need to add an empty item.
-	    if (list_append_number(dest, 0) == FAIL)
+	    எனில் (list_append_எண்(dest, 0) == FAIL)
 	    {
-		src_li = NULL;
-		break;
+		src_li = வெற்று;
+		நிறுத்து;
 	    }
 	}
 	dest_li = dest_li->li_next;
 	++idx;
     }
-    if (src_li != NULL)
+    எனில் (src_li != வெற்று)
     {
-	emsg(_(e_list_value_has_more_items_than_targets));
-	return FAIL;
+	emsg(_(e_list_மதிப்பு_has_more_பொருட்கள்_than_targets));
+	திரும்பு FAIL;
     }
-    if (empty_idx2
-	    ? (dest_li != NULL && dest_li->li_next != NULL)
+    எனில் (empty_idx2
+	    ? (dest_li != வெற்று && dest_li->li_next != வெற்று)
 	    : idx != idx2)
     {
-	emsg(_(e_list_value_does_not_have_enough_items));
-	return FAIL;
+	emsg(_(e_list_மதிப்பு_does_not_have_enough_பொருட்கள்));
+	திரும்பு FAIL;
     }
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -992,41 +992,41 @@ list_assign_range(
  * It does nothing if "maxdepth" is 0.
  * Returns FAIL when out of memory.
  */
-    static void
+    நிலையான வெறுமை
 list_flatten(list_T *list, listitem_T *first, long maxitems, long maxdepth)
 {
     listitem_T	*item;
-    int		done = 0;
+    முழு		done = 0;
 
-    if (maxdepth == 0)
-	return;
+    எனில் (maxdepth == 0)
+	திரும்பு;
     CHECK_LIST_MATERIALIZE(list);
-    if (first == NULL)
+    எனில் (first == வெற்று)
 	item = list->lv_first;
-    else
+    இல்லையெனில்
 	item = first;
 
-    while (item != NULL && done < maxitems)
+    போது (item != வெற்று && done < maxitems)
     {
 	listitem_T	*next = item->li_next;
 
 	fast_breakcheck();
-	if (got_int)
-	    return;
+	எனில் (got_int)
+	    திரும்பு;
 
-	if (item->li_tv.v_type == VAR_LIST)
+	எனில் (item->li_tv.v_type == VAR_LIST)
 	{
 	    list_T	*itemlist = item->li_tv.vval.v_list;
 
 	    vimlist_remove(list, item, item);
-	    if (list_extend(list, itemlist, next) == FAIL)
+	    எனில் (list_extend(list, itemlist, next) == FAIL)
 	    {
 		list_free_item(list, item);
-		return;
+		திரும்பு;
 	    }
 
-	    if (maxdepth > 0)
-		list_flatten(list, item->li_prev == NULL
+	    எனில் (maxdepth > 0)
+		list_flatten(list, item->li_prev == வெற்று
 				     ? list->lv_first : item->li_prev->li_next,
 				itemlist->lv_len, maxdepth - 1);
 	    clear_tv(&item->li_tv);
@@ -1041,81 +1041,81 @@ list_flatten(list_T *list, listitem_T *first, long maxitems, long maxdepth)
 /*
  * "flatten()" and "flattennew()" functions
  */
-    static void
-flatten_common(typval_T *argvars, typval_T *rettv, int make_copy)
+    நிலையான வெறுமை
+flatten_common(typval_T *argvars, typval_T *rettv, முழு make_copy)
 {
     list_T  *l;
     long    maxdepth;
-    int	    error = FALSE;
+    முழு	    error = FALSE;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_எண்_arg(argvars, 1) == FAIL))
+	திரும்பு;
 
-    if (argvars[0].v_type != VAR_LIST)
+    எனில் (argvars[0].v_type != VAR_LIST)
     {
 	semsg(_(e_argument_of_str_must_be_list), "flatten()");
-	return;
+	திரும்பு;
     }
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    எனில் (argvars[1].v_type == VAR_UNKNOWN)
 	maxdepth = 999999;
-    else
+    இல்லையெனில்
     {
-	maxdepth = (long)tv_get_number_chk(&argvars[1], &error);
-	if (error)
-	    return;
-	if (maxdepth < 0)
+	maxdepth = (long)tv_get_எண்_chk(&argvars[1], &error);
+	எனில் (error)
+	    திரும்பு;
+	எனில் (maxdepth < 0)
 	{
-	    emsg(_(e_maxdepth_must_be_non_negative_number));
-	    return;
+	    emsg(_(e_maxdepth_must_be_non_negative_எண்));
+	    திரும்பு;
 	}
     }
 
     l = argvars[0].vval.v_list;
     rettv->v_type = VAR_LIST;
     rettv->vval.v_list = l;
-    if (l == NULL)
-	return;
+    எனில் (l == வெற்று)
+	திரும்பு;
 
-    if (make_copy)
+    எனில் (make_copy)
     {
 	l = list_copy(l, FALSE, TRUE, get_copyID());
 	rettv->vval.v_list = l;
-	if (l == NULL)
-	    return;
+	எனில் (l == வெற்று)
+	    திரும்பு;
 	// The type will change.
 	free_type(l->lv_type);
-	l->lv_type = NULL;
+	l->lv_type = வெற்று;
     }
-    else
+    இல்லையெனில்
     {
-	if (value_check_lock(l->lv_lock,
+	எனில் (மதிப்பு_check_lock(l->lv_lock,
 				     (char_u *)N_("flatten() argument"), TRUE))
-	    return;
+	    திரும்பு;
 	++l->lv_refcount;
     }
 
-    list_flatten(l, NULL, l->lv_len, maxdepth);
+    list_flatten(l, வெற்று, l->lv_len, maxdepth);
 }
 
 /*
  * "flatten(list[, {maxdepth}])" function
  */
-    void
+    வெறுமை
 f_flatten(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script())
+    எனில் (in_vim9script())
 	emsg(_(e_cannot_use_flatten_in_vim9_script));
-    else
+    இல்லையெனில்
 	flatten_common(argvars, rettv, FALSE);
 }
 
 /*
  * "flattennew(list[, {maxdepth}])" function
  */
-    void
+    வெறுமை
 f_flattennew(typval_T *argvars, typval_T *rettv)
 {
     flatten_common(argvars, rettv, TRUE);
@@ -1125,34 +1125,34 @@ f_flattennew(typval_T *argvars, typval_T *rettv)
  * "items(list)" function
  * Caller must have already checked that argvars[0] is a List.
  */
-    void
+    வெறுமை
 list2items(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
     listitem_T	*li;
     varnumber_T	idx;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (l == NULL)
-	return;  // null list behaves like an empty list
+    எனில் (rettv_list_alloc(rettv) == FAIL)
+	திரும்பு;
+    எனில் (l == வெற்று)
+	திரும்பு;  // null list behaves like an empty list
 
     // TODO: would be more efficient to not materialize the argument
     CHECK_LIST_MATERIALIZE(l);
-    for (idx = 0, li = l->lv_first; li != NULL; li = li->li_next, ++idx)
+    க்கு (idx = 0, li = l->lv_first; li != வெற்று; li = li->li_next, ++idx)
     {
 	list_T	    *l2 = list_alloc();
 
-	if (l2 == NULL)
-	    break;
-	if (list_append_list(rettv->vval.v_list, l2) == FAIL)
+	எனில் (l2 == வெற்று)
+	    நிறுத்து;
+	எனில் (list_append_list(rettv->vval.v_list, l2) == FAIL)
 	{
 	    list_free(l2);
-	    break;
+	    நிறுத்து;
 	}
-	if (list_append_number(l2, idx) == FAIL
+	எனில் (list_append_எண்(l2, idx) == FAIL
 		|| list_append_tv(l2, &li->li_tv) == FAIL)
-	    break;
+	    நிறுத்து;
     }
 }
 
@@ -1160,35 +1160,35 @@ list2items(typval_T *argvars, typval_T *rettv)
  * "items(string)" function
  * Caller must have already checked that argvars[0] is a String.
  */
-    void
+    வெறுமை
 string2items(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p = argvars[0].vval.v_string;
     varnumber_T idx;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
-    if (p == NULL)
-	return;  // null string behaves like an empty string
+    எனில் (rettv_list_alloc(rettv) == FAIL)
+	திரும்பு;
+    எனில் (p == வெற்று)
+	திரும்பு;  // null string behaves like an empty string
 
-    for (idx = 0; *p != NUL; ++idx)
+    க்கு (idx = 0; *p != NUL; ++idx)
     {
-	int	    len = mb_ptr2len(p);
+	முழு	    len = mb_ptr2len(p);
 	list_T	    *l2;
 
-	if (len == 0)
-	    break;
+	எனில் (len == 0)
+	    நிறுத்து;
 	l2 = list_alloc();
-	if (l2 == NULL)
-	    break;
-	if (list_append_list(rettv->vval.v_list, l2) == FAIL)
+	எனில் (l2 == வெற்று)
+	    நிறுத்து;
+	எனில் (list_append_list(rettv->vval.v_list, l2) == FAIL)
 	{
 	    list_free(l2);
-	    break;
+	    நிறுத்து;
 	}
-	if (list_append_number(l2, idx) == FAIL
+	எனில் (list_append_எண்(l2, idx) == FAIL
 		|| list_append_string(l2, p, len) == FAIL)
-	    break;
+	    நிறுத்து;
 	p += len;
     }
 }
@@ -1198,16 +1198,16 @@ string2items(typval_T *argvars, typval_T *rettv)
  * If "bef" is NULL append at the end, otherwise insert before this item.
  * Returns FAIL when out of memory.
  */
-    int
+    முழு
 list_extend(list_T *l1, list_T *l2, listitem_T *bef)
 {
     listitem_T	*item;
-    int		todo;
+    முழு		todo;
     listitem_T	*bef_prev;
 
     // NULL list is equivalent to an empty list: nothing to do.
-    if (l2 == NULL || l2->lv_len == 0)
-	return OK;
+    எனில் (l2 == வெற்று || l2->lv_len == 0)
+	திரும்பு OK;
 
     todo = l2->lv_len;
     CHECK_LIST_MATERIALIZE(l1);
@@ -1216,55 +1216,55 @@ list_extend(list_T *l1, list_T *l2, listitem_T *bef)
     // When exending a list with itself, at some point we run into the item
     // that was before "bef" and need to skip over the already inserted items
     // to "bef".
-    bef_prev = bef == NULL ? NULL : bef->li_prev;
+    bef_prev = bef == வெற்று ? வெற்று : bef->li_prev;
 
     // We also quit the loop when we have inserted the original item count of
     // the list, avoid a hang when we extend a list with itself.
-    for (item = l2->lv_first; item != NULL && --todo >= 0;
+    க்கு (item = l2->lv_first; item != வெற்று && --todo >= 0;
 				 item = item == bef_prev ? bef : item->li_next)
-	if (list_insert_tv(l1, &item->li_tv, bef) == FAIL)
-	    return FAIL;
-    return OK;
+	எனில் (list_செருகு_tv(l1, &item->li_tv, bef) == FAIL)
+	    திரும்பு FAIL;
+    திரும்பு OK;
 }
 
 /*
  * Concatenate lists "l1" and "l2" into a new list, stored in "tv".
  * Return FAIL when out of memory.
  */
-    int
+    முழு
 list_concat(list_T *l1, list_T *l2, typval_T *tv)
 {
     list_T	*l;
-    int		len1 = l1 == NULL ? 0 : l1->lv_len;
-    int		len2 = l2 == NULL ? 0 : l2->lv_len;
+    முழு		len1 = l1 == வெற்று ? 0 : l1->lv_len;
+    முழு		len2 = l2 == வெற்று ? 0 : l2->lv_len;
     long	totallen = (long)len1 + (long)len2;
-    int		i;
+    முழு		i;
     listitem_T	*item;
 
-    if (totallen == 0)
+    எனில் (totallen == 0)
     {
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	எனில் (l == வெற்று)
+	    திரும்பு FAIL;
 	++l->lv_refcount;
 	tv->v_type = VAR_LIST;
 	tv->v_lock = 0;
 	tv->vval.v_list = l;
-	return OK;
+	திரும்பு OK;
     }
-    if (totallen > INT_MAX)
-	return FAIL;
+    எனில் (totallen > INT_MAX)
+	திரும்பு FAIL;
 
     // allocate all items at once for efficiency
-    l = list_alloc_with_items((int)totallen);
-    if (l == NULL)
-	return FAIL;
+    l = list_alloc_with_பொருட்கள்((முழு)totallen);
+    எனில் (l == வெற்று)
+	திரும்பு FAIL;
 
     i = 0;
-    if (len1 > 0)
+    எனில் (len1 > 0)
     {
 	CHECK_LIST_MATERIALIZE(l1);
-	for (item = l1->lv_first; item != NULL && !got_int;
+	க்கு (item = l1->lv_first; item != வெற்று && !got_int;
 		item = item->li_next)
 	{
 	    typval_T new_tv;
@@ -1273,10 +1273,10 @@ list_concat(list_T *l1, list_T *l2, typval_T *tv)
 	    list_set_item(l, i++, &new_tv);
 	}
     }
-    if (len2 > 0)
+    எனில் (len2 > 0)
     {
 	CHECK_LIST_MATERIALIZE(l2);
-	for (item = l2->lv_first; item != NULL && !got_int;
+	க்கு (item = l2->lv_first; item != வெற்று && !got_int;
 		item = item->li_next)
 	{
 	    typval_T new_tv;
@@ -1290,7 +1290,7 @@ list_concat(list_T *l1, list_T *l2, typval_T *tv)
     tv->v_type = VAR_LIST;
     tv->v_lock = 0;
     tv->vval.v_list = l;
-    return OK;
+    திரும்பு OK;
 }
 
     list_T *
@@ -1298,114 +1298,114 @@ list_slice(list_T *ol, long n1, long n2)
 {
     listitem_T	*item;
     list_T	*l;
-    long	count;
+    long	மொத்தம்;
     long	idx;
 
-    if (n2 < n1)
-	return list_alloc();
-    if (n1 > INT_MAX - (n2 - n1) - 1)
-	return NULL;
-    count = n2 - n1 + 1;
+    எனில் (n2 < n1)
+	திரும்பு list_alloc();
+    எனில் (n1 > INT_MAX - (n2 - n1) - 1)
+	திரும்பு வெற்று;
+    மொத்தம் = n2 - n1 + 1;
 
     // The length is known, so allocate the list and all items at once.
-    l = list_alloc_with_items((int)count);
-    if (l == NULL)
-	return NULL;
+    l = list_alloc_with_பொருட்கள்((முழு)மொத்தம்);
+    எனில் (l == வெற்று)
+	திரும்பு வெற்று;
 
     item = list_find(ol, n1);
-    for (idx = 0; idx < count; ++idx)
+    க்கு (idx = 0; idx < மொத்தம்; ++idx)
     {
 	typval_T	new_tv;
 
 	// "item" is NULL when materializing "ol" stopped early.
-	if (item == NULL)
+	எனில் (item == வெற்று)
 	{
 	    list_free(l);
-	    return NULL;
+	    திரும்பு வெற்று;
 	}
 
 	copy_tv(&item->li_tv, &new_tv);
-	list_set_item(l, (int)idx, &new_tv);
+	list_set_item(l, (முழு)idx, &new_tv);
 	item = item->li_next;
     }
-    return l;
+    திரும்பு l;
 }
 
-    int
+    முழு
 list_slice_or_index(
 	    list_T	*list,
-	    int		range,
+	    முழு		range,
 	    varnumber_T	n1_arg,
 	    varnumber_T	n2_arg,
-	    int		exclusive,
+	    முழு		exclusive,
 	    typval_T	*rettv,
-	    int		verbose)
+	    முழு		verbose)
 {
     long	len = list_len(list);
     varnumber_T	n1 = n1_arg;
     varnumber_T	n2 = n2_arg;
     typval_T	var1;
 
-    if (n1 < 0)
+    எனில் (n1 < 0)
 	n1 = len + n1;
-    if (n1 < 0 || n1 >= len)
+    எனில் (n1 < 0 || n1 >= len)
     {
 	// For a range we allow invalid values and for legacy script return an
 	// empty list, for Vim9 script start at the first item.
 	// A list index out of range is an error.
-	if (!range)
+	எனில் (!range)
 	{
-	    if (verbose)
+	    எனில் (verbose)
 		semsg(_(e_list_index_out_of_range_nr), (long)n1_arg);
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
-	if (in_vim9script())
+	எனில் (in_vim9script())
 	    n1 = n1 < 0 ? 0 : len;
-	else
+	இல்லையெனில்
 	    n1 = len;
     }
-    if (range)
+    எனில் (range)
     {
 	list_T	*l;
 
-	if (n2 < 0)
+	எனில் (n2 < 0)
 	    n2 = len + n2;
-	else if (n2 >= len)
+	இல்லையெனில் எனில் (n2 >= len)
 	    n2 = len - (exclusive ? 0 : 1);
-	if (exclusive)
+	எனில் (exclusive)
 	    --n2;
-	if (n2 < 0 || n2 + 1 < n1)
+	எனில் (n2 < 0 || n2 + 1 < n1)
 	    n2 = -1;
 	l = list_slice(list, n1, n2);
-	if (l == NULL)
-	    return FAIL;
+	எனில் (l == வெற்று)
+	    திரும்பு FAIL;
 	clear_tv(rettv);
 	rettv_list_set(rettv, l);
     }
-    else
+    இல்லையெனில்
     {
 	// copy the item to "var1" to avoid that freeing the list makes it
 	// invalid.
 	long index = n1;
 	listitem_T *li = check_range_index_one(list, &index, TRUE, TRUE);
-	if (li == NULL)
-	    return FAIL;
+	எனில் (li == வெற்று)
+	    திரும்பு FAIL;
 	copy_tv(&li->li_tv, &var1);
 
 	// If "var1" is a List and the List item type is not set, then set it
 	// from the declared list item type.
-	if (in_vim9script() && var1.v_type == VAR_LIST
-					&& var1.vval.v_list != NULL
-					&& var1.vval.v_list->lv_type == NULL)
+	எனில் (in_vim9script() && var1.v_type == VAR_LIST
+					&& var1.vval.v_list != வெற்று
+					&& var1.vval.v_list->lv_type == வெற்று)
 	{
-	    if (list->lv_type != NULL && list->lv_type->tt_member != NULL)
+	    எனில் (list->lv_type != வெற்று && list->lv_type->tt_member != வெற்று)
 		set_tv_type(&var1, list->lv_type->tt_member);
 	}
 
 	clear_tv(rettv);
 	*rettv = var1;
     }
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -1415,54 +1415,54 @@ list_slice_or_index(
  * Returns NULL when out of memory.
  */
     list_T *
-list_copy(list_T *orig, int deep, int top, int copyID)
+list_copy(list_T *orig, முழு deep, முழு உச்சி, முழு copyID)
 {
     list_T	*copy;
     listitem_T	*item;
-    int		idx = 0;
+    முழு		idx = 0;
 
-    if (orig == NULL)
-	return NULL;
+    எனில் (orig == வெற்று)
+	திரும்பு வெற்று;
 
     // The length is known, so allocate the list and all items at once.
     CHECK_LIST_MATERIALIZE(orig);
-    copy = list_alloc_with_items(orig->lv_len);
-    if (copy == NULL)
-	return NULL;
+    copy = list_alloc_with_பொருட்கள்(orig->lv_len);
+    எனில் (copy == வெற்று)
+	திரும்பு வெற்று;
 
-    if (orig->lv_type == NULL || top || deep)
-	copy->lv_type = NULL;
-    else
+    எனில் (orig->lv_type == வெற்று || உச்சி || deep)
+	copy->lv_type = வெற்று;
+    இல்லையெனில்
 	copy->lv_type = alloc_type(orig->lv_type);
-    if (copyID != 0)
+    எனில் (copyID != 0)
     {
 	// Do this before adding the items, because one of the items may
 	// refer back to this list.
 	orig->lv_copyID = copyID;
 	orig->lv_copylist = copy;
     }
-    for (item = orig->lv_first; item != NULL && !got_int;
+    க்கு (item = orig->lv_first; item != வெற்று && !got_int;
 	    item = item->li_next)
     {
 	typval_T	new_tv;
 
-	if (deep)
+	எனில் (deep)
 	{
-	    if (item_copy(&item->li_tv, &new_tv, deep, FALSE, copyID) == FAIL)
-		break;
+	    எனில் (item_copy(&item->li_tv, &new_tv, deep, FALSE, copyID) == FAIL)
+		நிறுத்து;
 	}
-	else
+	இல்லையெனில்
 	    copy_tv(&item->li_tv, &new_tv);
 	list_set_item(copy, idx++, &new_tv);
     }
     ++copy->lv_refcount;
-    if (item != NULL)
+    எனில் (item != வெற்று)
     {
 	list_unref(copy);
-	copy = NULL;
+	copy = வெற்று;
     }
 
-    return copy;
+    திரும்பு copy;
 }
 
 /*
@@ -1471,7 +1471,7 @@ list_copy(list_T *orig, int deep, int top, int copyID)
  * This used to be called list_remove, but that conflicts with a Sun header
  * file.
  */
-    void
+    வெறுமை
 vimlist_remove(list_T *l, listitem_T *item, listitem_T *item2)
 {
     listitem_T	*ip;
@@ -1479,23 +1479,23 @@ vimlist_remove(list_T *l, listitem_T *item, listitem_T *item2)
     CHECK_LIST_MATERIALIZE(l);
 
     // notify watchers
-    for (ip = item; ip != NULL; ip = ip->li_next)
+    க்கு (ip = item; ip != வெற்று; ip = ip->li_next)
     {
 	--l->lv_len;
 	list_fix_watch(l, ip);
-	if (ip == item2)
-	    break;
+	எனில் (ip == item2)
+	    நிறுத்து;
     }
 
-    if (item2->li_next == NULL)
+    எனில் (item2->li_next == வெற்று)
 	l->lv_u.mat.lv_last = item->li_prev;
-    else
+    இல்லையெனில்
 	item2->li_next->li_prev = item->li_prev;
-    if (item->li_prev == NULL)
+    எனில் (item->li_prev == வெற்று)
 	l->lv_first = item2->li_next;
-    else
+    இல்லையெனில்
 	item->li_prev->li_next = item2->li_next;
-    l->lv_u.mat.lv_idx_item = NULL;
+    l->lv_u.mat.lv_idx_item = வெற்று;
 }
 
 /*
@@ -1503,46 +1503,46 @@ vimlist_remove(list_T *l, listitem_T *item, listitem_T *item2)
  * May return NULL.
  */
     char_u *
-list2string(typval_T *tv, int copyID, int restore_copyID)
+list2string(typval_T *tv, முழு copyID, முழு restore_copyID)
 {
     garray_T	ga;
 
-    if (tv->vval.v_list == NULL)
-	return NULL;
-    ga_init2(&ga, sizeof(char), 80);
+    எனில் (tv->vval.v_list == வெற்று)
+	திரும்பு வெற்று;
+    ga_init2(&ga, அளவு(எழுத்து), 80);
     ga_append(&ga, '[');
     CHECK_LIST_MATERIALIZE(tv->vval.v_list);
-    if (list_join(&ga, tv->vval.v_list, (char_u *)", ",
+    எனில் (list_join(&ga, tv->vval.v_list, (char_u *)", ",
 				       FALSE, restore_copyID, copyID) == FAIL)
     {
 	vim_free(ga.ga_data);
-	return NULL;
+	திரும்பு வெற்று;
     }
     ga_append(&ga, ']');
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    திரும்பு (char_u *)ga.ga_data;
 }
 
-typedef struct join_S {
+வகைவரை கட்டமைப்பு join_S {
     string_T	s;
     char_u	*tofree;
 } join_T;
 
-    static int
+    நிலையான முழு
 list_join_inner(
     garray_T	*gap,		// to store the result in
     list_T	*l,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID,
+    முழு		echo_style,
+    முழு		restore_copyID,
+    முழு		copyID,
     garray_T	*join_gap)	// to keep each list item string
 {
-    int		i;
+    முழு		i;
     join_T	*p;
     long	sumlen = 0;
-    int		first = TRUE;
-    int		prev_lock;
+    முழு		first = TRUE;
+    முழு		prev_lock;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
     listitem_T	*item;
@@ -1554,64 +1554,64 @@ list_join_inner(
     // Lock the list, the string() method of an object item could remove the
     // item the loop is standing on.
     prev_lock = l->lv_lock;
-    if (l->lv_lock == 0)
+    எனில் (l->lv_lock == 0)
 	l->lv_lock = VAR_LOCKED;
-    for (item = l->lv_first; item != NULL && !got_int; item = item->li_next)
+    க்கு (item = l->lv_first; item != வெற்று && !got_int; item = item->li_next)
     {
 	s.string = echo_string_core(&item->li_tv, &tofree, numbuf, copyID,
 				      echo_style, restore_copyID, !echo_style);
-	if (s.string == NULL)
+	எனில் (s.string == வெற்று)
 	{
 	    l->lv_lock = prev_lock;
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
 
 	s.length = STRLEN(s.string);
 	sumlen += (long)s.length;
 
-	(void)ga_grow(join_gap, 1);
+	(வெறுமை)ga_grow(join_gap, 1);
 	p = ((join_T *)join_gap->ga_data) + (join_gap->ga_len++);
-	if (tofree != NULL || s.string != numbuf)
+	எனில் (tofree != வெற்று || s.string != numbuf)
 	{
 	    p->s.string = s.string;
 	    p->s.length = s.length;
 	    p->tofree = tofree;
 	}
-	else
+	இல்லையெனில்
 	{
 	    p->s.string = vim_strnsave(s.string, s.length);
 	    p->s.length = s.length;
 	    p->tofree = p->s.string;
 	}
 
-	line_breakcheck();
-	if (did_echo_string_emsg)  // recursion error, bail out
-	    break;
+	வரி_breakcheck();
+	எனில் (did_echo_string_emsg)  // recursion error, bail out
+	    நிறுத்து;
     }
     l->lv_lock = prev_lock;
 
     // Allocate result buffer with its total size, avoid re-allocation and
     // multiple copy operations.  Add 2 for a tailing ']' and NUL.
     seplen = STRLEN(sep);
-    if (join_gap->ga_len >= 2)
+    எனில் (join_gap->ga_len >= 2)
 	sumlen += (long)seplen * (join_gap->ga_len - 1);
-    if (sumlen > INT_MAX - 2 || ga_grow(gap, (int)sumlen + 2) == FAIL)
-	return FAIL;
+    எனில் (sumlen > INT_MAX - 2 || ga_grow(gap, (முழு)sumlen + 2) == FAIL)
+	திரும்பு FAIL;
 
-    for (i = 0; i < join_gap->ga_len && !got_int; ++i)
+    க்கு (i = 0; i < join_gap->ga_len && !got_int; ++i)
     {
-	if (first)
+	எனில் (first)
 	    first = FALSE;
-	else
+	இல்லையெனில்
 	    ga_concat_len(gap, sep, seplen);
 	p = ((join_T *)join_gap->ga_data) + i;
 
-	if (p->s.string != NULL)
+	எனில் (p->s.string != வெற்று)
 	    ga_concat_len(gap, p->s.string, p->s.length);
-	line_breakcheck();
+	வரி_breakcheck();
     }
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -1619,45 +1619,45 @@ list_join_inner(
  * When "echo_style" is TRUE use String as echoed, otherwise as inside a List.
  * Return FAIL or OK.
  */
-    int
+    முழு
 list_join(
     garray_T	*gap,
     list_T	*l,
     char_u	*sep,
-    int		echo_style,
-    int		restore_copyID,
-    int		copyID)
+    முழு		echo_style,
+    முழு		restore_copyID,
+    முழு		copyID)
 {
     garray_T	join_ga;
-    int		retval;
+    முழு		retval;
     join_T	*p;
-    int		i;
+    முழு		i;
 
-    if (l->lv_len < 1)
-	return OK; // nothing to do
-    ga_init2(&join_ga, sizeof(join_T), l->lv_len);
+    எனில் (l->lv_len < 1)
+	திரும்பு OK; // nothing to do
+    ga_init2(&join_ga, அளவு(join_T), l->lv_len);
     retval = list_join_inner(gap, l, sep, echo_style, restore_copyID,
 							    copyID, &join_ga);
 
-    if (join_ga.ga_data == NULL)
-	return retval;
+    எனில் (join_ga.ga_data == வெற்று)
+	திரும்பு retval;
 
     // Dispose each item in join_ga.
     p = (join_T *)join_ga.ga_data;
-    for (i = 0; i < join_ga.ga_len; ++i)
+    க்கு (i = 0; i < join_ga.ga_len; ++i)
     {
 	vim_free(p->tofree);
 	++p;
     }
     ga_clear(&join_ga);
 
-    return retval;
+    திரும்பு retval;
 }
 
 /*
  * "join()" function
  */
-    void
+    வெறுமை
 f_join(typval_T *argvars, typval_T *rettv)
 {
     garray_T	ga;
@@ -1665,32 +1665,32 @@ f_join(typval_T *argvars, typval_T *rettv)
 
     rettv->v_type = VAR_STRING;
 
-    if (check_for_list_or_tuple_arg(argvars, 0) == FAIL
+    எனில் (check_for_list_or_tuple_arg(argvars, 0) == FAIL
 	    || check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+	திரும்பு;
 
-    if ((argvars[0].v_type == VAR_LIST && argvars[0].vval.v_list == NULL)
+    எனில் ((argvars[0].v_type == VAR_LIST && argvars[0].vval.v_list == வெற்று)
 	    || (argvars[0].v_type == VAR_TUPLE
-		&& argvars[0].vval.v_tuple == NULL))
-	return;
+		&& argvars[0].vval.v_tuple == வெற்று))
+	திரும்பு;
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    எனில் (argvars[1].v_type == VAR_UNKNOWN)
 	sep = (char_u *)" ";
-    else
+    இல்லையெனில்
 	sep = tv_get_string_chk(&argvars[1]);
 
-    if (sep != NULL)
+    எனில் (sep != வெற்று)
     {
-	ga_init2(&ga, sizeof(char), 80);
-	if (argvars[0].v_type == VAR_LIST)
+	ga_init2(&ga, அளவு(எழுத்து), 80);
+	எனில் (argvars[0].v_type == VAR_LIST)
 	    list_join(&ga, argvars[0].vval.v_list, sep, TRUE, FALSE, 0);
-	else
+	இல்லையெனில்
 	    tuple_join(&ga, argvars[0].vval.v_tuple, sep, TRUE, FALSE, 0);
 	ga_append(&ga, NUL);
 	rettv->vval.v_string = (char_u *)ga.ga_data;
     }
-    else
-	rettv->vval.v_string = NULL;
+    இல்லையெனில்
+	rettv->vval.v_string = வெற்று;
 }
 
 /*
@@ -1698,59 +1698,59 @@ f_join(typval_T *argvars, typval_T *rettv)
  * "*arg" points to the "[".
  * Return OK or FAIL.
  */
-    int
-eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
+    முழு
+eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, முழு do_error)
 {
-    int		evaluate = evalarg == NULL ? FALSE
+    முழு		evaluate = evalarg == வெற்று ? FALSE
 					 : evalarg->eval_flags & EVAL_EVALUATE;
-    list_T	*l = NULL;
+    list_T	*l = வெற்று;
     typval_T	tv;
     listitem_T	*item;
-    int		vim9script = in_vim9script();
-    int		had_comma;
+    முழு		vim9script = in_vim9script();
+    முழு		had_comma;
 
-    if (evaluate)
+    எனில் (evaluate)
     {
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	எனில் (l == வெற்று)
+	    திரும்பு FAIL;
     }
 
     *arg = skipwhite_and_linebreak(*arg + 1, evalarg);
-    while (**arg != ']' && **arg != NUL)
+    போது (**arg != ']' && **arg != NUL)
     {
-	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
-	    goto failret;
-	if (check_typval_is_value(&tv) == FAIL)
+	எனில் (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
+	    செல் failret;
+	எனில் (check_typval_is_மதிப்பு(&tv) == FAIL)
 	{
-	    if (evaluate)
+	    எனில் (evaluate)
 		clear_tv(&tv);
-	    goto failret;
+	    செல் failret;
 	}
-	if (evaluate)
+	எனில் (evaluate)
 	{
 	    item = listitem_alloc();
-	    if (item != NULL)
+	    எனில் (item != வெற்று)
 	    {
 		item->li_tv = tv;
 		item->li_tv.v_lock = 0;
 		list_append(l, item);
 	    }
-	    else
+	    இல்லையெனில்
 		clear_tv(&tv);
 	}
 	// Legacy Vim script allowed a space before the comma.
-	if (!vim9script)
+	எனில் (!vim9script)
 	    *arg = skipwhite(*arg);
 
 	// the comma must come after the value
 	had_comma = **arg == ',';
-	if (had_comma)
+	எனில் (had_comma)
 	{
-	    if (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ']')
+	    எனில் (vim9script && !IS_WHITE_NL_OR_NUL((*arg)[1]) && (*arg)[1] != ']')
 	    {
 		semsg(_(e_white_space_required_after_str_str), ",", *arg);
-		goto failret;
+		செல் failret;
 	    }
 	    *arg = skipwhite(*arg + 1);
 	}
@@ -1758,108 +1758,108 @@ eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
 	// The "]" can be on the next line.  But a double quoted string may
 	// follow, not a comment.
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
-	if (**arg == ']')
-	    break;
+	எனில் (**arg == ']')
+	    நிறுத்து;
 
-	if (!had_comma)
+	எனில் (!had_comma)
 	{
-	    if (do_error)
+	    எனில் (do_error)
 	    {
-		if (**arg == ',')
+		எனில் (**arg == ',')
 		    semsg(_(e_no_white_space_allowed_before_str_str),
 								    ",", *arg);
-		else
+		இல்லையெனில்
 		    semsg(_(e_missing_comma_in_list_str), *arg);
 	    }
-	    goto failret;
+	    செல் failret;
 	}
     }
 
-    if (**arg != ']')
+    எனில் (**arg != ']')
     {
-	if (do_error)
+	எனில் (do_error)
 	    semsg(_(e_missing_end_of_list_rsb_str), *arg);
 failret:
-	if (evaluate)
+	எனில் (evaluate)
 	    list_free(l);
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     *arg += 1;
-    if (evaluate)
+    எனில் (evaluate)
 	rettv_list_set(rettv, l);
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Write "list" of strings to file "fd".
  */
-    int
-write_list(FILE *fd, list_T *list, int binary)
+    முழு
+write_list(FILE *fd, list_T *list, முழு இருமம்)
 {
     listitem_T	*li;
-    int		c;
-    int		ret = OK;
+    முழு		c;
+    முழு		ret = OK;
     char_u	*s;
 
     CHECK_LIST_MATERIALIZE(list);
-    FOR_ALL_LIST_ITEMS(list, li)
+    FOR_ALL_LIST_பொருட்கள்(list, li)
     {
-	for (s = tv_get_string(&li->li_tv); *s != NUL; ++s)
+	க்கு (s = tv_get_string(&li->li_tv); *s != NUL; ++s)
 	{
-	    if (*s == '\n')
+	    எனில் (*s == '\n')
 		c = putc(NUL, fd);
-	    else
+	    இல்லையெனில்
 		c = putc(*s, fd);
-	    if (c == EOF)
+	    எனில் (c == EOF)
 	    {
 		ret = FAIL;
-		break;
+		நிறுத்து;
 	    }
 	}
-	if (!binary || li->li_next != NULL)
-	    if (putc('\n', fd) == EOF)
+	எனில் (!இருமம் || li->li_next != வெற்று)
+	    எனில் (putc('\n', fd) == EOF)
 	    {
 		ret = FAIL;
-		break;
+		நிறுத்து;
 	    }
-	if (ret == FAIL)
+	எனில் (ret == FAIL)
 	{
 	    emsg(_(e_error_while_writing));
-	    break;
+	    நிறுத்து;
 	}
     }
-    return ret;
+    திரும்பு ret;
 }
 
 /*
  * Initialize a static list with 10 items.
  */
-    void
+    வெறுமை
 init_static_list(staticList10_T *sl)
 {
     list_T  *l = &sl->sl_list;
-    int	    i;
+    முழு	    i;
 
     CLEAR_POINTER(sl);
-    l->lv_first = &sl->sl_items[0];
-    l->lv_u.mat.lv_last = &sl->sl_items[9];
+    l->lv_first = &sl->sl_பொருட்கள்[0];
+    l->lv_u.mat.lv_last = &sl->sl_பொருட்கள்[9];
     l->lv_refcount = DO_NOT_FREE_CNT;
     l->lv_lock = VAR_FIXED;
     sl->sl_list.lv_len = 10;
 
-    for (i = 0; i < 10; ++i)
+    க்கு (i = 0; i < 10; ++i)
     {
-	listitem_T *li = &sl->sl_items[i];
+	listitem_T *li = &sl->sl_பொருட்கள்[i];
 
-	if (i == 0)
-	    li->li_prev = NULL;
-	else
+	எனில் (i == 0)
+	    li->li_prev = வெற்று;
+	இல்லையெனில்
 	    li->li_prev = li - 1;
-	if (i == 9)
-	    li->li_next = NULL;
-	else
+	எனில் (i == 9)
+	    li->li_next = வெற்று;
+	இல்லையெனில்
 	    li->li_next = li + 1;
     }
 }
@@ -1867,62 +1867,62 @@ init_static_list(staticList10_T *sl)
 /*
  * "list2str()" function
  */
-    void
+    வெறுமை
 f_list2str(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
     listitem_T	*li;
     garray_T	ga;
-    int		utf8 = FALSE;
+    முழு		utf8 = FALSE;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = வெற்று;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (check_for_list_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     l = argvars[0].vval.v_list;
-    if (l == NULL)
-	return;  // empty list results in empty string
+    எனில் (l == வெற்று)
+	திரும்பு;  // empty list results in empty string
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+    எனில் (argvars[1].v_type != VAR_UNKNOWN)
+	utf8 = (முழு)tv_get_bool_chk(&argvars[1], வெற்று);
 
     CHECK_LIST_MATERIALIZE(l);
     ga_init2(&ga, 1, 80);
-    if (has_mbyte || utf8)
+    எனில் (has_mbyte || utf8)
     {
 	char_u	buf[MB_MAXBYTES + 1];
-	int	(*char2bytes)(int, char_u *);
+	முழு	(*char2bytes)(முழு, char_u *);
 
-	if (utf8 || enc_utf8)
+	எனில் (utf8 || enc_utf8)
 	    char2bytes = utf_char2bytes;
-	else
+	இல்லையெனில்
 	    char2bytes = mb_char2bytes;
 
-	FOR_ALL_LIST_ITEMS(l, li)
+	FOR_ALL_LIST_பொருட்கள்(l, li)
 	{
 	    size_t  buflen;
 
-	    buflen = (size_t)(*char2bytes)(tv_get_number(&li->li_tv), buf);
+	    buflen = (size_t)(*char2bytes)(tv_get_எண்(&li->li_tv), buf);
 	    buf[buflen] = NUL;
 	    ga_concat_len(&ga, buf, buflen);
 	}
 	ga_append(&ga, NUL);
     }
-    else
+    இல்லையெனில்
     {
 	long len = (long)list_len(l) + 1;
 
-	if (len <= INT_MAX && ga_grow(&ga, (int)len) == OK)
+	எனில் (len <= INT_MAX && ga_grow(&ga, (முழு)len) == OK)
 	{
-	    FOR_ALL_LIST_ITEMS(l, li)
-		ga_append(&ga, tv_get_number(&li->li_tv));
+	    FOR_ALL_LIST_பொருட்கள்(l, li)
+		ga_append(&ga, tv_get_எண்(&li->li_tv));
 	    ga_append(&ga, NUL);
 	}
     }
@@ -1934,7 +1934,7 @@ f_list2str(typval_T *argvars, typval_T *rettv)
 /*
  * "list2tuple()" function
  */
-    void
+    வெறுமை
 f_list2tuple(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
@@ -1942,49 +1942,49 @@ f_list2tuple(typval_T *argvars, typval_T *rettv)
     tuple_T	*tuple;
 
     rettv->v_type = VAR_TUPLE;
-    rettv->vval.v_tuple = NULL;
+    rettv->vval.v_tuple = வெற்று;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (check_for_list_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     l = argvars[0].vval.v_list;
-    if (l == NULL)
-	return;  // empty list results in empty tuple
+    எனில் (l == வெற்று)
+	திரும்பு;  // empty list results in empty tuple
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (rettv_tuple_set_with_items(rettv, list_len(l)) == FAIL)
-	return;
+    எனில் (rettv_tuple_set_with_பொருட்கள்(rettv, list_len(l)) == FAIL)
+	திரும்பு;
 
     tuple = rettv->vval.v_tuple;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_பொருட்கள்(l, li)
     {
 	copy_tv(&li->li_tv, TUPLE_ITEM(tuple, TUPLE_LEN(tuple)));
-	tuple->tv_items.ga_len++;
+	tuple->tv_பொருட்கள்.ga_len++;
     }
 }
 
 /*
  * "tuple2list()" function
  */
-    void
+    வெறுமை
 f_tuple2list(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
     tuple_T	*tuple;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    எனில் (rettv_list_alloc(rettv) == FAIL)
+	திரும்பு;
 
-    if (check_for_tuple_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (check_for_tuple_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
     tuple = argvars[0].vval.v_tuple;
-    if (tuple == NULL)
-	return;  // empty tuple results in empty list
+    எனில் (tuple == வெற்று)
+	திரும்பு;  // empty tuple results in empty list
 
     l = rettv->vval.v_list;
-    for (int i = 0; i < tuple_len(tuple); i++)
+    க்கு (முழு i = 0; i < tuple_len(tuple); i++)
 	list_append_tv(l, TUPLE_ITEM(tuple, i));
 }
 
@@ -1992,142 +1992,142 @@ f_tuple2list(typval_T *argvars, typval_T *rettv)
  * Remove item argvars[1] from List argvars[0]. If argvars[2] is supplied, then
  * remove the range of items from argvars[1] to argvars[2] (inclusive).
  */
-    static void
+    நிலையான வெறுமை
 list_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
 {
     list_T	*l;
     listitem_T	*item, *item2;
     listitem_T	*li;
-    int		error = FALSE;
+    முழு		error = FALSE;
     long	idx;
     long	end;
-    int		cnt = 0;
+    முழு		cnt = 0;
     list_T	*rl;
 
-    if ((l = argvars[0].vval.v_list) == NULL
-			     || value_check_lock(l->lv_lock, arg_errmsg, TRUE))
-	return;
+    எனில் ((l = argvars[0].vval.v_list) == வெற்று
+			     || மதிப்பு_check_lock(l->lv_lock, arg_errmsg, TRUE))
+	திரும்பு;
 
-    idx = (long)tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;		// type error: do nothing, errmsg already given
+    idx = (long)tv_get_எண்_chk(&argvars[1], &error);
+    எனில் (error)
+	திரும்பு;		// type error: do nothing, errmsg already given
 
-    if ((item = list_find(l, idx)) == NULL)
+    எனில் ((item = list_find(l, idx)) == வெற்று)
     {
 	semsg(_(e_list_index_out_of_range_nr), idx);
-	return;
+	திரும்பு;
     }
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    எனில் (argvars[2].v_type == VAR_UNKNOWN)
     {
 	// Remove one item, return its value.
 	vimlist_remove(l, item, item);
 	*rettv = item->li_tv;
 	list_free_item(l, item);
-	return;
+	திரும்பு;
     }
 
     // Remove range of items, return list with values.
-    end = (long)tv_get_number_chk(&argvars[2], &error);
-    if (error)
-	return;		// type error: do nothing
+    end = (long)tv_get_எண்_chk(&argvars[2], &error);
+    எனில் (error)
+	திரும்பு;		// type error: do nothing
 
-    if ((item2 = list_find(l, end)) == NULL)
+    எனில் ((item2 = list_find(l, end)) == வெற்று)
     {
 	semsg(_(e_list_index_out_of_range_nr), end);
-	return;
+	திரும்பு;
     }
 
-    for (li = item; li != NULL; li = li->li_next)
+    க்கு (li = item; li != வெற்று; li = li->li_next)
     {
 	++cnt;
-	if (li == item2)
-	    break;
+	எனில் (li == item2)
+	    நிறுத்து;
     }
-    if (li == NULL)  // didn't find "item2" after "item"
+    எனில் (li == வெற்று)  // didn't find "item2" after "item"
     {
 	emsg(_(e_invalid_range));
-	return;
+	திரும்பு;
     }
 
     vimlist_remove(l, item, item2);
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    எனில் (rettv_list_alloc(rettv) == FAIL)
+	திரும்பு;
 
     rl = rettv->vval.v_list;
 
-    if (l->lv_with_items > 0)
+    எனில் (l->lv_with_பொருட்கள் > 0)
     {
 	// need to copy the list items and move the value
-	while (item != NULL)
+	போது (item != வெற்று)
 	{
 	    li = listitem_alloc();
-	    if (li == NULL)
-		return;
+	    எனில் (li == வெற்று)
+		திரும்பு;
 	    li->li_tv = item->li_tv;
 	    init_tv(&item->li_tv);
 	    list_append(rl, li);
-	    if (item == item2)
-		break;
+	    எனில் (item == item2)
+		நிறுத்து;
 	    item = item->li_next;
 	}
     }
-    else
+    இல்லையெனில்
     {
 	rl->lv_first = item;
 	rl->lv_u.mat.lv_last = item2;
-	item->li_prev = NULL;
-	item2->li_next = NULL;
+	item->li_prev = வெற்று;
+	item2->li_next = வெற்று;
 	rl->lv_len = cnt;
     }
 }
 
-static int item_compare(const void *s1, const void *s2);
-static int item_compare2(const void *s1, const void *s2);
+நிலையான முழு item_compare(மாறிலி வெறுமை *s1, மாறிலி வெறுமை *s2);
+நிலையான முழு item_compare2(மாறிலி வெறுமை *s1, மாறிலி வெறுமை *s2);
 
 // struct used in the array that's given to qsort()
-typedef struct
+வகைவரை கட்டமைப்பு
 {
     listitem_T	*item;
-    int		idx;
+    முழு		idx;
     // Sort key precomputed once per item for the numeric compare modes.
     // Only valid when sortinfo->item_compare_keys_ready is set (the sort()
     // path); uniq() passes a bare listitem_T pointer and must not read this.
-    union {
+    ஒன்றிப்பு {
 	varnumber_T	inum;	// for "N"
-	double		fnum;	// for "n" and "f"
-    } key;
+	இரட்டை		fnum;	// for "n" and "f"
+    } சாவி;
 } sortItem_T;
 
 // struct storing information about current sort
-typedef struct
+வகைவரை கட்டமைப்பு
 {
-    int		item_compare_ic;
-    int		item_compare_lc;
-    int		item_compare_numeric;
-    int		item_compare_numbers;
-    int		item_compare_float;
+    முழு		item_compare_ic;
+    முழு		item_compare_lc;
+    முழு		item_compare_numeric;
+    முழு		item_compare_numbers;
+    முழு		item_compare_float;
     char_u	*item_compare_func;
     partial_T	*item_compare_partial;
     dict_T	*item_compare_selfdict;
-    int		item_compare_func_err;
-    int		item_compare_keep_zero;
-    int		item_compare_keys_ready;  // ptrs[].key is precomputed
+    முழு		item_compare_func_err;
+    முழு		item_compare_keep_zero;
+    முழு		item_compare_சாவிகள்_ready;  // ptrs[].key is precomputed
 } sortinfo_T;
-static sortinfo_T	*sortinfo = NULL;
+நிலையான sortinfo_T	*sortinfo = வெற்று;
 #define ITEM_COMPARE_FAIL 999
 
 /*
  * Compare functions for f_sort() and f_uniq() below.
  */
-    static int
-item_compare(const void *s1, const void *s2)
+    நிலையான முழு
+item_compare(மாறிலி வெறுமை *s1, மாறிலி வெறுமை *s2)
 {
     sortItem_T  *si1, *si2;
     typval_T	*tv1, *tv2;
     char_u	*p1, *p2;
-    char_u	*tofree1 = NULL, *tofree2 = NULL;
-    int		res;
+    char_u	*tofree1 = வெற்று, *tofree2 = வெற்று;
+    முழு		res;
     char_u	numbuf1[NUMBUFLEN];
     char_u	numbuf2[NUMBUFLEN];
 
@@ -2136,109 +2136,109 @@ item_compare(const void *s1, const void *s2)
     tv1 = &si1->item->li_tv;
     tv2 = &si2->item->li_tv;
 
-    if (sortinfo->item_compare_numbers)
+    எனில் (sortinfo->item_compare_numbers)
     {
-	varnumber_T	v1 = sortinfo->item_compare_keys_ready
-					? si1->key.inum : tv_to_number(tv1);
-	varnumber_T	v2 = sortinfo->item_compare_keys_ready
-					? si2->key.inum : tv_to_number(tv2);
+	varnumber_T	v1 = sortinfo->item_compare_சாவிகள்_ready
+					? si1->சாவி.inum : tv_to_எண்(tv1);
+	varnumber_T	v2 = sortinfo->item_compare_சாவிகள்_ready
+					? si2->சாவி.inum : tv_to_எண்(tv2);
 
-	return v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
+	திரும்பு v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
     }
 
-    if (sortinfo->item_compare_float)
+    எனில் (sortinfo->item_compare_float)
     {
-	float_T	v1 = sortinfo->item_compare_keys_ready
-					? si1->key.fnum : tv_get_float(tv1);
-	float_T	v2 = sortinfo->item_compare_keys_ready
-					? si2->key.fnum : tv_get_float(tv2);
+	float_T	v1 = sortinfo->item_compare_சாவிகள்_ready
+					? si1->சாவி.fnum : tv_get_float(tv1);
+	float_T	v2 = sortinfo->item_compare_சாவிகள்_ready
+					? si2->சாவி.fnum : tv_get_float(tv2);
 
-	return v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
+	திரும்பு v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
     }
 
-    if (sortinfo->item_compare_numeric && sortinfo->item_compare_keys_ready)
+    எனில் (sortinfo->item_compare_numeric && sortinfo->item_compare_சாவிகள்_ready)
     {
-	double	n1 = si1->key.fnum;
-	double	n2 = si2->key.fnum;
+	இரட்டை	n1 = si1->சாவி.fnum;
+	இரட்டை	n2 = si2->சாவி.fnum;
 
 	res = n1 == n2 ? 0 : n1 > n2 ? 1 : -1;
-	if (res == 0 && !sortinfo->item_compare_keep_zero)
+	எனில் (res == 0 && !sortinfo->item_compare_keep_zero)
 	    res = si1->idx > si2->idx ? 1 : -1;
-	return res;
+	திரும்பு res;
     }
 
     // tv2string() puts quotes around a string and allocates memory.  Don't do
     // that for string variables. Use a single quote when comparing with a
     // non-string to do what the docs promise.
-    if (tv1->v_type == VAR_STRING)
+    எனில் (tv1->v_type == VAR_STRING)
     {
-	if (tv2->v_type != VAR_STRING || sortinfo->item_compare_numeric)
+	எனில் (tv2->v_type != VAR_STRING || sortinfo->item_compare_numeric)
 	    p1 = (char_u *)"'";
-	else
+	இல்லையெனில்
 	    p1 = tv1->vval.v_string;
     }
-    else
+    இல்லையெனில்
 	p1 = tv2string(tv1, &tofree1, numbuf1, 0);
-    if (tv2->v_type == VAR_STRING)
+    எனில் (tv2->v_type == VAR_STRING)
     {
-	if (tv1->v_type != VAR_STRING || sortinfo->item_compare_numeric)
+	எனில் (tv1->v_type != VAR_STRING || sortinfo->item_compare_numeric)
 	    p2 = (char_u *)"'";
-	else
+	இல்லையெனில்
 	    p2 = tv2->vval.v_string;
     }
-    else
+    இல்லையெனில்
 	p2 = tv2string(tv2, &tofree2, numbuf2, 0);
-    if (p1 == NULL)
+    எனில் (p1 == வெற்று)
 	p1 = (char_u *)"";
-    if (p2 == NULL)
+    எனில் (p2 == வெற்று)
 	p2 = (char_u *)"";
-    if (!sortinfo->item_compare_numeric)
+    எனில் (!sortinfo->item_compare_numeric)
     {
-	if (sortinfo->item_compare_lc)
-	    res = strcoll((char *)p1, (char *)p2);
-	else
+	எனில் (sortinfo->item_compare_lc)
+	    res = strcoll((எழுத்து *)p1, (எழுத்து *)p2);
+	இல்லையெனில்
 	    res = sortinfo->item_compare_ic ? STRICMP(p1, p2): STRCMP(p1, p2);
     }
-    else
+    இல்லையெனில்
     {
-	double n1, n2;
-	n1 = strtod((char *)p1, (char **)&p1);
-	n2 = strtod((char *)p2, (char **)&p2);
+	இரட்டை n1, n2;
+	n1 = strtod((எழுத்து *)p1, (எழுத்து **)&p1);
+	n2 = strtod((எழுத்து *)p2, (எழுத்து **)&p2);
 	res = n1 == n2 ? 0 : n1 > n2 ? 1 : -1;
     }
 
     // When the result would be zero, compare the item indexes.  Makes the
     // sort stable.
-    if (res == 0 && !sortinfo->item_compare_keep_zero)
+    எனில் (res == 0 && !sortinfo->item_compare_keep_zero)
 	res = si1->idx > si2->idx ? 1 : -1;
 
     vim_free(tofree1);
     vim_free(tofree2);
-    return res;
+    திரும்பு res;
 }
 
-    static int
-item_compare2(const void *s1, const void *s2)
+    நிலையான முழு
+item_compare2(மாறிலி வெறுமை *s1, மாறிலி வெறுமை *s2)
 {
     sortItem_T  *si1, *si2;
-    int		res;
+    முழு		res;
     typval_T	rettv;
     typval_T	argv[3];
     char_u	*func_name;
     partial_T	*partial = sortinfo->item_compare_partial;
     funcexe_T	funcexe;
-    int		did_emsg_before = did_emsg;
+    முழு		did_emsg_before = did_emsg;
 
     // shortcut after failure in previous call; compare all items equal
-    if (sortinfo->item_compare_func_err)
-	return 0;
+    எனில் (sortinfo->item_compare_func_err)
+	திரும்பு 0;
 
     si1 = (sortItem_T *)s1;
     si2 = (sortItem_T *)s2;
 
-    if (partial == NULL)
+    எனில் (partial == வெற்று)
 	func_name = sortinfo->item_compare_func;
-    else
+    இல்லையெனில்
 	func_name = partial_name(partial);
 
     // Copy the values.  This is needed to be able to set v_lock to VAR_FIXED
@@ -2255,74 +2255,74 @@ item_compare2(const void *s1, const void *s2)
     clear_tv(&argv[0]);
     clear_tv(&argv[1]);
 
-    if (res == FAIL || did_emsg > did_emsg_before)
+    எனில் (res == FAIL || did_emsg > did_emsg_before)
 	res = ITEM_COMPARE_FAIL;
-    else
+    இல்லையெனில்
     {
 	varnumber_T	n;
 
-	n = tv_get_number_chk(&rettv, &sortinfo->item_compare_func_err);
+	n = tv_get_எண்_chk(&rettv, &sortinfo->item_compare_func_err);
 	res = (n > 0) ? 1 : (n < 0) ? -1 : 0;
     }
-    if (sortinfo->item_compare_func_err)
+    எனில் (sortinfo->item_compare_func_err)
 	res = ITEM_COMPARE_FAIL;  // return value has wrong type
     clear_tv(&rettv);
 
     // When the result would be zero, compare the pointers themselves.  Makes
     // the sort stable.
-    if (res == 0 && !sortinfo->item_compare_keep_zero)
+    எனில் (res == 0 && !sortinfo->item_compare_keep_zero)
 	res = si1->idx > si2->idx ? 1 : -1;
 
-    return res;
+    திரும்பு res;
 }
 
 /*
  * Precompute the numeric sort key of each item.  Only for the builtin numeric
  * compare modes; each key is computed exactly as item_compare() would have.
  */
-    static void
-sort_compute_keys(sortItem_T *ptrs, long len, sortinfo_T *info)
+    நிலையான வெறுமை
+sort_compute_சாவிகள்(sortItem_T *ptrs, long len, sortinfo_T *info)
 {
     long	i;
 
-    if (info->item_compare_numbers)
+    எனில் (info->item_compare_numbers)
     {
-	for (i = 0; i < len; ++i)
-	    ptrs[i].key.inum = tv_to_number(&ptrs[i].item->li_tv);
+	க்கு (i = 0; i < len; ++i)
+	    ptrs[i].சாவி.inum = tv_to_எண்(&ptrs[i].item->li_tv);
     }
-    else if (info->item_compare_float)
+    இல்லையெனில் எனில் (info->item_compare_float)
     {
-	for (i = 0; i < len; ++i)
-	    ptrs[i].key.fnum = tv_get_float(&ptrs[i].item->li_tv);
+	க்கு (i = 0; i < len; ++i)
+	    ptrs[i].சாவி.fnum = tv_get_float(&ptrs[i].item->li_tv);
     }
-    else // info->item_compare_numeric
+    இல்லையெனில் // info->item_compare_numeric
     {
-	for (i = 0; i < len; ++i)
+	க்கு (i = 0; i < len; ++i)
 	{
 	    typval_T	*tv = &ptrs[i].item->li_tv;
 
 	    // A string is compared as a single quote in numeric mode, which
 	    // strtod() reads as 0.
-	    if (tv->v_type == VAR_STRING)
-		ptrs[i].key.fnum = 0.0;
-	    else
+	    எனில் (tv->v_type == VAR_STRING)
+		ptrs[i].சாவி.fnum = 0.0;
+	    இல்லையெனில்
 	    {
 		char_u	numbuf[NUMBUFLEN];
-		char_u	*tofree = NULL;
+		char_u	*tofree = வெற்று;
 		char_u	*p = tv2string(tv, &tofree, numbuf, 0);
 
-		ptrs[i].key.fnum = p == NULL ? 0.0 : strtod((char *)p, NULL);
+		ptrs[i].சாவி.fnum = p == வெற்று ? 0.0 : strtod((எழுத்து *)p, வெற்று);
 		vim_free(tofree);
 	    }
 	}
     }
-    info->item_compare_keys_ready = TRUE;
+    info->item_compare_சாவிகள்_ready = TRUE;
 }
 
 /*
  * sort() List "l"
  */
-    static void
+    நிலையான வெறுமை
 do_sort(list_T *l, sortinfo_T *info)
 {
     long	len;
@@ -2334,11 +2334,11 @@ do_sort(list_T *l, sortinfo_T *info)
 
     // Make an array with each entry pointing to an item in the List.
     ptrs = ALLOC_MULT(sortItem_T, len);
-    if (ptrs == NULL)
-	return;
+    எனில் (ptrs == வெற்று)
+	திரும்பு;
 
     // sort(): ptrs will be the list to sort
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_பொருட்கள்(l, li)
     {
 	ptrs[i].item = li;
 	ptrs[i].idx = i;
@@ -2347,33 +2347,33 @@ do_sort(list_T *l, sortinfo_T *info)
 
     info->item_compare_func_err = FALSE;
     info->item_compare_keep_zero = FALSE;
-    info->item_compare_keys_ready = FALSE;
+    info->item_compare_சாவிகள்_ready = FALSE;
 
-    if (info->item_compare_func == NULL && info->item_compare_partial == NULL
+    எனில் (info->item_compare_func == வெற்று && info->item_compare_partial == வெற்று
 	    && (info->item_compare_numbers || info->item_compare_float
 						|| info->item_compare_numeric))
-	sort_compute_keys(ptrs, len, info);
+	sort_compute_சாவிகள்(ptrs, len, info);
     // test the compare function
-    if ((info->item_compare_func != NULL
-		|| info->item_compare_partial != NULL)
-	    && item_compare2((void *)&ptrs[0], (void *)&ptrs[1])
+    எனில் ((info->item_compare_func != வெற்று
+		|| info->item_compare_partial != வெற்று)
+	    && item_compare2((வெறுமை *)&ptrs[0], (வெறுமை *)&ptrs[1])
 	    == ITEM_COMPARE_FAIL)
 	emsg(_(e_sort_compare_function_failed));
-    else
+    இல்லையெனில்
     {
 	// Sort the array with item pointers.
-	qsort((void *)ptrs, (size_t)len, sizeof(sortItem_T),
-		info->item_compare_func == NULL
-		&& info->item_compare_partial == NULL
+	qsort((வெறுமை *)ptrs, (size_t)len, அளவு(sortItem_T),
+		info->item_compare_func == வெற்று
+		&& info->item_compare_partial == வெற்று
 		? item_compare : item_compare2);
 
-	if (!info->item_compare_func_err)
+	எனில் (!info->item_compare_func_err)
 	{
 	    // Clear the List and append the items in sorted order.
 	    l->lv_first = l->lv_u.mat.lv_last
-		= l->lv_u.mat.lv_idx_item = NULL;
+		= l->lv_u.mat.lv_idx_item = வெற்று;
 	    l->lv_len = 0;
-	    for (i = 0; i < len; ++i)
+	    க்கு (i = 0; i < len; ++i)
 		list_append(l, ptrs[i].item);
 	}
     }
@@ -2384,51 +2384,51 @@ do_sort(list_T *l, sortinfo_T *info)
 /*
  * uniq() List "l"
  */
-    static void
+    நிலையான வெறுமை
 do_uniq(list_T *l, sortinfo_T *info)
 {
     long	len;
     sortItem_T	*ptrs;
     long	i = 0;
     listitem_T	*li;
-    int	(*item_compare_func_ptr)(const void *, const void *);
+    முழு	(*item_compare_func_ptr)(மாறிலி வெறுமை *, மாறிலி வெறுமை *);
 
     len = list_len(l);
 
     // Make an array with each entry pointing to an item in the List.
     ptrs = ALLOC_MULT(sortItem_T, len);
-    if (ptrs == NULL)
-	return;
+    எனில் (ptrs == வெற்று)
+	திரும்பு;
 
     // f_uniq(): ptrs will be a stack of items to remove
     info->item_compare_func_err = FALSE;
     info->item_compare_keep_zero = TRUE;
-    item_compare_func_ptr = info->item_compare_func != NULL
-	|| info->item_compare_partial != NULL
+    item_compare_func_ptr = info->item_compare_func != வெற்று
+	|| info->item_compare_partial != வெற்று
 	? item_compare2 : item_compare;
 
-    for (li = l->lv_first; li != NULL && li->li_next != NULL;
+    க்கு (li = l->lv_first; li != வெற்று && li->li_next != வெற்று;
 	    li = li->li_next)
     {
-	if (item_compare_func_ptr((void *)&li, (void *)&li->li_next)
+	எனில் (item_compare_func_ptr((வெறுமை *)&li, (வெறுமை *)&li->li_next)
 		== 0)
 	    ptrs[i++].item = li;
-	if (info->item_compare_func_err)
+	எனில் (info->item_compare_func_err)
 	{
 	    emsg(_(e_uniq_compare_function_failed));
-	    break;
+	    நிறுத்து;
 	}
     }
 
-    if (!info->item_compare_func_err)
+    எனில் (!info->item_compare_func_err)
     {
-	while (--i >= 0)
+	போது (--i >= 0)
 	{
 	    li = ptrs[i].item->li_next;
 	    ptrs[i].item->li_next = li->li_next;
-	    if (li->li_next != NULL)
+	    எனில் (li->li_next != வெற்று)
 		li->li_next->li_prev = ptrs[i].item;
-	    else
+	    இல்லையெனில்
 		l->lv_u.mat.lv_last = ptrs[i].item;
 	    list_fix_watch(l, li);
 	    listitem_free(l, li);
@@ -2443,7 +2443,7 @@ do_uniq(list_T *l, sortinfo_T *info)
  * Parse the optional arguments supplied to the sort() or uniq() function and
  * return the values in "info".
  */
-    static int
+    நிலையான முழு
 parse_sort_uniq_args(typval_T *argvars, sortinfo_T *info)
 {
     info->item_compare_ic = FALSE;
@@ -2451,110 +2451,110 @@ parse_sort_uniq_args(typval_T *argvars, sortinfo_T *info)
     info->item_compare_numeric = FALSE;
     info->item_compare_numbers = FALSE;
     info->item_compare_float = FALSE;
-    info->item_compare_func = NULL;
-    info->item_compare_partial = NULL;
-    info->item_compare_selfdict = NULL;
-    info->item_compare_keys_ready = FALSE;
+    info->item_compare_func = வெற்று;
+    info->item_compare_partial = வெற்று;
+    info->item_compare_selfdict = வெற்று;
+    info->item_compare_சாவிகள்_ready = FALSE;
 
-    if (argvars[1].v_type == VAR_UNKNOWN)
-	return OK;
+    எனில் (argvars[1].v_type == VAR_UNKNOWN)
+	திரும்பு OK;
 
     // optional second argument: {func}
-    if (argvars[1].v_type == VAR_FUNC)
+    எனில் (argvars[1].v_type == VAR_FUNC)
 	info->item_compare_func = argvars[1].vval.v_string;
-    else if (argvars[1].v_type == VAR_PARTIAL)
+    இல்லையெனில் எனில் (argvars[1].v_type == VAR_PARTIAL)
 	info->item_compare_partial = argvars[1].vval.v_partial;
-    else
+    இல்லையெனில்
     {
-	int	    error = FALSE;
-	int	    nr = 0;
+	முழு	    error = FALSE;
+	முழு	    nr = 0;
 
-	if (argvars[1].v_type == VAR_NUMBER)
+	எனில் (argvars[1].v_type == VAR_எண்)
 	{
-	    nr = tv_get_number_chk(&argvars[1], &error);
-	    if (error)
-		return FAIL;
-	    if (nr == 1)
+	    nr = tv_get_எண்_chk(&argvars[1], &error);
+	    எனில் (error)
+		திரும்பு FAIL;
+	    எனில் (nr == 1)
 		info->item_compare_ic = TRUE;
 	}
-	if (nr != 1)
+	எனில் (nr != 1)
 	{
-	    if (argvars[1].v_type != VAR_NUMBER)
+	    எனில் (argvars[1].v_type != VAR_எண்)
 		info->item_compare_func = tv_get_string(&argvars[1]);
-	    else if (nr != 0)
+	    இல்லையெனில் எனில் (nr != 0)
 	    {
 		emsg(_(e_invalid_argument));
-		return FAIL;
+		திரும்பு FAIL;
 	    }
 	}
-	if (info->item_compare_func != NULL)
+	எனில் (info->item_compare_func != வெற்று)
 	{
-	    if (*info->item_compare_func == NUL)
+	    எனில் (*info->item_compare_func == NUL)
 	    {
 		// empty string means default sort
-		info->item_compare_func = NULL;
+		info->item_compare_func = வெற்று;
 	    }
-	    else if (STRCMP(info->item_compare_func, "n") == 0)
+	    இல்லையெனில் எனில் (STRCMP(info->item_compare_func, "n") == 0)
 	    {
-		info->item_compare_func = NULL;
+		info->item_compare_func = வெற்று;
 		info->item_compare_numeric = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "N") == 0)
+	    இல்லையெனில் எனில் (STRCMP(info->item_compare_func, "N") == 0)
 	    {
-		info->item_compare_func = NULL;
+		info->item_compare_func = வெற்று;
 		info->item_compare_numbers = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "f") == 0)
+	    இல்லையெனில் எனில் (STRCMP(info->item_compare_func, "f") == 0)
 	    {
-		info->item_compare_func = NULL;
+		info->item_compare_func = வெற்று;
 		info->item_compare_float = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "i") == 0)
+	    இல்லையெனில் எனில் (STRCMP(info->item_compare_func, "i") == 0)
 	    {
-		info->item_compare_func = NULL;
+		info->item_compare_func = வெற்று;
 		info->item_compare_ic = TRUE;
 	    }
-	    else if (STRCMP(info->item_compare_func, "l") == 0)
+	    இல்லையெனில் எனில் (STRCMP(info->item_compare_func, "l") == 0)
 	    {
-		info->item_compare_func = NULL;
+		info->item_compare_func = வெற்று;
 		info->item_compare_lc = TRUE;
 	    }
 	}
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    எனில் (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// optional third argument: {dict}
-	if (check_for_dict_arg(argvars, 2) == FAIL)
-	    return FAIL;
+	எனில் (check_for_dict_arg(argvars, 2) == FAIL)
+	    திரும்பு FAIL;
 	info->item_compare_selfdict = argvars[2].vval.v_dict;
     }
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * "sort()" or "uniq()" function
  */
-    static void
-do_sort_uniq(typval_T *argvars, typval_T *rettv, int sort)
+    நிலையான வெறுமை
+do_sort_uniq(typval_T *argvars, typval_T *rettv, முழு sort)
 {
     list_T	*l;
     sortinfo_T	*old_sortinfo;
     sortinfo_T	info;
     long	len;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && (check_for_string_or_func_arg(argvars, 1) == FAIL
 			      || check_for_opt_dict_arg(argvars, 2) == FAIL))))
-	return;
+	திரும்பு;
 
-    if (argvars[0].v_type != VAR_LIST)
+    எனில் (argvars[0].v_type != VAR_LIST)
     {
 	semsg(_(e_argument_of_str_must_be_list), sort ? "sort()" : "uniq()");
-	return;
+	திரும்பு;
     }
 
     // Pointer to current info struct used in compare function. Save and
@@ -2563,25 +2563,25 @@ do_sort_uniq(typval_T *argvars, typval_T *rettv, int sort)
     sortinfo = &info;
 
     l = argvars[0].vval.v_list;
-    if (l != NULL && value_check_lock(l->lv_lock,
+    எனில் (l != வெற்று && மதிப்பு_check_lock(l->lv_lock,
 		(char_u *)(sort ? N_("sort() argument") : N_("uniq() argument")),
 		TRUE))
-	goto theend;
+	செல் theend;
     rettv_list_set(rettv, l);
-    if (l == NULL)
-	goto theend;
+    எனில் (l == வெற்று)
+	செல் theend;
     CHECK_LIST_MATERIALIZE(l);
 
     len = list_len(l);
-    if (len <= 1)
-	goto theend;	// short list sorts pretty quickly
+    எனில் (len <= 1)
+	செல் theend;	// short list sorts pretty quickly
 
-    if (parse_sort_uniq_args(argvars, &info) == FAIL)
-	goto theend;
+    எனில் (parse_sort_uniq_args(argvars, &info) == FAIL)
+	செல் theend;
 
-    if (sort)
+    எனில் (sort)
 	do_sort(l, &info);
-    else
+    இல்லையெனில்
 	do_uniq(l, &info);
 
 theend:
@@ -2591,7 +2591,7 @@ theend:
 /*
  * "sort({list})" function
  */
-    void
+    வெறுமை
 f_sort(typval_T *argvars, typval_T *rettv)
 {
     do_sort_uniq(argvars, rettv, TRUE);
@@ -2600,7 +2600,7 @@ f_sort(typval_T *argvars, typval_T *rettv)
 /*
  * "uniq({list})" function
  */
-    void
+    வெறுமை
 f_uniq(typval_T *argvars, typval_T *rettv)
 {
     do_sort_uniq(argvars, rettv, FALSE);
@@ -2610,221 +2610,221 @@ f_uniq(typval_T *argvars, typval_T *rettv)
  * Handle one item for map(), filter(), foreach().
  * Sets v:val to "tv".  Caller must set v:key.
  */
-    int
+    முழு
 filter_map_one(
 	typval_T	*tv,	    // original value
-	typval_T	*expr,	    // callback
+	typval_T	*கோவை,	    // callback
 	filtermap_T	filtermap,
 	funccall_T	*fc,	    // from eval_expr_get_funccal()
 	typval_T	*newtv,	    // for map() and mapnew(): new value
-	int		*remp)	    // for filter(): remove flag
+	முழு		*remp)	    // for filter(): remove flag
 {
     typval_T	argv[3];
-    int		retval = FAIL;
+    முழு		retval = FAIL;
 
     copy_tv(tv, get_vim_var_tv(VV_VAL));
 
     newtv->v_type = VAR_UNKNOWN;
-    if (filtermap == FILTERMAP_FOREACH && expr->v_type == VAR_STRING)
+    எனில் (filtermap == FILTERMAP_FOREACH && கோவை->v_type == VAR_STRING)
     {
 	// foreach() is not limited to an expression
-	do_cmdline_cmd(expr->vval.v_string);
-	if (!did_emsg)
+	do_cmdline_cmd(கோவை->vval.v_string);
+	எனில் (!did_emsg)
 	    retval = OK;
-	goto theend;
+	செல் theend;
     }
 
-    argv[0] = *get_vim_var_tv(VV_KEY);
+    argv[0] = *get_vim_var_tv(VV_சாவி);
     argv[1] = *get_vim_var_tv(VV_VAL);
-    if (eval_expr_typval(expr, FALSE, argv, 2, fc, newtv) == FAIL)
-	goto theend;
-    if (filtermap == FILTERMAP_FILTER)
+    எனில் (eval_கோவை_typval(கோவை, FALSE, argv, 2, fc, newtv) == FAIL)
+	செல் theend;
+    எனில் (filtermap == FILTERMAP_FILTER)
     {
-	int	    error = FALSE;
+	முழு	    error = FALSE;
 
 	// filter(): when expr is zero remove the item
-	if (in_vim9script())
+	எனில் (in_vim9script())
 	    *remp = !tv_get_bool_chk(newtv, &error);
-	else
-	    *remp = (tv_get_number_chk(newtv, &error) == 0);
+	இல்லையெனில்
+	    *remp = (tv_get_எண்_chk(newtv, &error) == 0);
 	clear_tv(newtv);
 	// On type error, nothing has been removed; return FAIL to stop the
 	// loop.  The error message was given by tv_get_number_chk().
-	if (error)
-	    goto theend;
+	எனில் (error)
+	    செல் theend;
     }
-    else if (filtermap == FILTERMAP_FOREACH)
+    இல்லையெனில் எனில் (filtermap == FILTERMAP_FOREACH)
 	clear_tv(newtv);
     retval = OK;
 theend:
     clear_tv(get_vim_var_tv(VV_VAL));
-    return retval;
+    திரும்பு retval;
 }
 
 /*
  * Implementation of map(), filter(), foreach() for a List.  Apply "expr" to
  * every item in List "l" and return the result in "rettv".
  */
-    static void
+    நிலையான வெறுமை
 list_filter_map(
 	list_T		*l,
 	filtermap_T	filtermap,
 	type_T		*argtype,
-	char		*func_name,
+	எழுத்து		*func_name,
 	char_u		*arg_errmsg,
-	typval_T	*expr,
+	typval_T	*கோவை,
 	typval_T	*rettv)
 {
-    int		prev_lock;
-    list_T	*l_ret = NULL;
-    int		idx = 0;
-    int		rem;
+    முழு		prev_lock;
+    list_T	*l_ret = வெற்று;
+    முழு		idx = 0;
+    முழு		rem;
     listitem_T	*li, *nli;
     typval_T	newtv;
     funccall_T	*fc;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    எனில் (filtermap == FILTERMAP_MAPNEW)
     {
 	rettv->v_type = VAR_LIST;
-	rettv->vval.v_list = NULL;
+	rettv->vval.v_list = வெற்று;
     }
-    if (l == NULL || (filtermap == FILTERMAP_FILTER
-			    && value_check_lock(l->lv_lock, arg_errmsg, TRUE)))
-	return;
+    எனில் (l == வெற்று || (filtermap == FILTERMAP_FILTER
+			    && மதிப்பு_check_lock(l->lv_lock, arg_errmsg, TRUE)))
+	திரும்பு;
 
     prev_lock = l->lv_lock;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    எனில் (filtermap == FILTERMAP_MAPNEW)
     {
-	if (rettv_list_alloc(rettv) == FAIL)
-	    return;
+	எனில் (rettv_list_alloc(rettv) == FAIL)
+	    திரும்பு;
 	l_ret = rettv->vval.v_list;
     }
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    set_vim_var_type(VV_சாவி, VAR_எண்);
 
-    if (l->lv_lock == 0)
+    எனில் (l->lv_lock == 0)
 	l->lv_lock = VAR_LOCKED;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_கோவை_get_funccal(கோவை, &newtv);
 
-    if (l->lv_first == &range_list_item)
+    எனில் (l->lv_first == &range_list_item)
     {
 	varnumber_T	val = l->lv_u.nonmat.lv_start;
-	int		len = l->lv_len;
-	int		stride = l->lv_u.nonmat.lv_stride;
+	முழு		len = l->lv_len;
+	முழு		stride = l->lv_u.nonmat.lv_stride;
 
 	// List from range(): loop over the numbers
 	// NOTE: foreach() returns the range_list_item
-	if (filtermap != FILTERMAP_MAPNEW && filtermap != FILTERMAP_FOREACH)
+	எனில் (filtermap != FILTERMAP_MAPNEW && filtermap != FILTERMAP_FOREACH)
 	{
-	    l->lv_first = NULL;
-	    l->lv_u.mat.lv_last = NULL;
+	    l->lv_first = வெற்று;
+	    l->lv_u.mat.lv_last = வெற்று;
 	    l->lv_len = 0;
-	    l->lv_u.mat.lv_idx_item = NULL;
+	    l->lv_u.mat.lv_idx_item = வெற்று;
 	}
 
-	for (idx = 0; idx < len; ++idx)
+	க்கு (idx = 0; idx < len; ++idx)
 	{
 	    typval_T tv;
 
-	    tv.v_type = VAR_NUMBER;
+	    tv.v_type = VAR_எண்;
 	    tv.v_lock = 0;
-	    tv.vval.v_number = val;
-	    set_vim_var_nr(VV_KEY, idx);
-	    if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL)
-		break;
-	    if (did_emsg)
+	    tv.vval.v_எண் = val;
+	    set_vim_var_nr(VV_சாவி, idx);
+	    எனில் (filter_map_one(&tv, கோவை, filtermap, fc, &newtv, &rem) == FAIL)
+		நிறுத்து;
+	    எனில் (did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		நிறுத்து;
 	    }
-	    if (filtermap != FILTERMAP_FOREACH)
+	    எனில் (filtermap != FILTERMAP_FOREACH)
 	    {
-		if (filtermap != FILTERMAP_FILTER)
+		எனில் (filtermap != FILTERMAP_FILTER)
 		{
-		    if (filtermap == FILTERMAP_MAP && argtype != NULL
+		    எனில் (filtermap == FILTERMAP_MAP && argtype != வெற்று
 			&& check_typval_arg_type(
 						 argtype->tt_member, &newtv,
 						 func_name, 0) == FAIL)
 		    {
 			clear_tv(&newtv);
-			break;
+			நிறுத்து;
 		    }
 		    // map(), mapnew(): always append the new value to the
 		    // list
-		    if (list_append_tv_move(filtermap == FILTERMAP_MAP
+		    எனில் (list_append_tv_move(filtermap == FILTERMAP_MAP
 					    ? l : l_ret, &newtv) == FAIL)
-			break;
+			நிறுத்து;
 		}
-		else if (!rem)
+		இல்லையெனில் எனில் (!rem)
 		{
 		    // filter(): append the list item value when not rem
-		    if (list_append_tv_move(l, &tv) == FAIL)
-			break;
+		    எனில் (list_append_tv_move(l, &tv) == FAIL)
+			நிறுத்து;
 		}
 	    }
 
 	    val += stride;
 	}
     }
-    else
+    இல்லையெனில்
     {
 	// Materialized list: loop over the items
-	for (li = l->lv_first; li != NULL; li = nli)
+	க்கு (li = l->lv_first; li != வெற்று; li = nli)
 	{
-	    if (filtermap == FILTERMAP_MAP && value_check_lock(
+	    எனில் (filtermap == FILTERMAP_MAP && மதிப்பு_check_lock(
 			li->li_tv.v_lock, arg_errmsg, TRUE))
-		break;
+		நிறுத்து;
 	    nli = li->li_next;
-	    set_vim_var_nr(VV_KEY, idx);
-	    if (filter_map_one(&li->li_tv, expr, filtermap, fc,
+	    set_vim_var_nr(VV_சாவி, idx);
+	    எனில் (filter_map_one(&li->li_tv, கோவை, filtermap, fc,
 							 &newtv, &rem) == FAIL)
-		break;
-	    if (did_emsg)
+		நிறுத்து;
+	    எனில் (did_emsg)
 	    {
 		clear_tv(&newtv);
-		break;
+		நிறுத்து;
 	    }
-	    if (filtermap == FILTERMAP_MAP)
+	    எனில் (filtermap == FILTERMAP_MAP)
 	    {
-		if (argtype != NULL && check_typval_arg_type(
+		எனில் (argtype != வெற்று && check_typval_arg_type(
 			    argtype->tt_member, &newtv, func_name, 0) == FAIL)
 		{
 		    clear_tv(&newtv);
-		    break;
+		    நிறுத்து;
 		}
 		// map(): replace the list item value
 		clear_tv(&li->li_tv);
 		newtv.v_lock = 0;
 		li->li_tv = newtv;
 	    }
-	    else if (filtermap == FILTERMAP_MAPNEW)
+	    இல்லையெனில் எனில் (filtermap == FILTERMAP_MAPNEW)
 	    {
 		// mapnew(): append the list item value
-		if (list_append_tv_move(l_ret, &newtv) == FAIL)
-		    break;
+		எனில் (list_append_tv_move(l_ret, &newtv) == FAIL)
+		    நிறுத்து;
 	    }
-	    else if (filtermap == FILTERMAP_FILTER && rem)
+	    இல்லையெனில் எனில் (filtermap == FILTERMAP_FILTER && rem)
 		    listitem_remove(l, li);
 	    ++idx;
 	}
     }
 
     l->lv_lock = prev_lock;
-    if (fc != NULL)
+    எனில் (fc != வெற்று)
 	remove_funccal();
 }
 
 /*
  * Implementation of map(), filter() and foreach().
  */
-    static void
+    நிலையான வெறுமை
 filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 {
-    typval_T	*expr;
-    char	*func_name = filtermap == FILTERMAP_MAP ? "map()"
+    typval_T	*கோவை;
+    எழுத்து	*func_name = filtermap == FILTERMAP_MAP ? "map()"
 				  : filtermap == FILTERMAP_MAPNEW ? "mapnew()"
 				  : filtermap == FILTERMAP_FILTER ? "filter()"
 				  : "foreach()";
@@ -2835,84 +2835,84 @@ filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 				       : filtermap == FILTERMAP_FILTER
 						      ? N_("filter() argument")
 						   : N_("foreach() argument"));
-    int		save_did_emsg;
-    type_T	*type = NULL;
+    முழு		save_did_emsg;
+    type_T	*type = வெற்று;
 
     // map(), filter(), foreach() return the first argument, also on failure.
-    if (filtermap != FILTERMAP_MAPNEW && argvars[0].v_type != VAR_STRING)
+    எனில் (filtermap != FILTERMAP_MAPNEW && argvars[0].v_type != VAR_STRING)
 	copy_tv(&argvars[0], rettv);
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_list_tuple_dict_blob_or_string_arg(argvars, 0)
 								== FAIL))
-	return;
+	திரும்பு;
 
-    if (argvars[0].v_type == VAR_TUPLE && filtermap != FILTERMAP_FOREACH)
+    எனில் (argvars[0].v_type == VAR_TUPLE && filtermap != FILTERMAP_FOREACH)
     {
 	semsg(_(e_cannot_use_tuple_with_function_str), func_name);
-	return;
+	திரும்பு;
     }
 
-    if (filtermap == FILTERMAP_MAP && in_vim9script())
+    எனில் (filtermap == FILTERMAP_MAP && in_vim9script())
     {
 	// Check that map() does not change the declared type of the list or
 	// dict.
-	if (argvars[0].v_type == VAR_DICT && argvars[0].vval.v_dict != NULL)
+	எனில் (argvars[0].v_type == VAR_DICT && argvars[0].vval.v_dict != வெற்று)
 	    type = argvars[0].vval.v_dict->dv_type;
-	else if (argvars[0].v_type == VAR_LIST
-					     && argvars[0].vval.v_list != NULL)
+	இல்லையெனில் எனில் (argvars[0].v_type == VAR_LIST
+					     && argvars[0].vval.v_list != வெற்று)
 	    type = argvars[0].vval.v_list->lv_type;
     }
 
-    if (argvars[0].v_type != VAR_BLOB
+    எனில் (argvars[0].v_type != VAR_BLOB
 	    && argvars[0].v_type != VAR_LIST
 	    && argvars[0].v_type != VAR_TUPLE
 	    && argvars[0].v_type != VAR_DICT
 	    && argvars[0].v_type != VAR_STRING)
     {
-	char *msg;
+	எழுத்து *செய்தி;
 
-	if (filtermap == FILTERMAP_FOREACH)
-	    msg = e_argument_of_str_must_be_list_tuple_string_dictionary_or_blob;
-	else
-	    msg = e_argument_of_str_must_be_list_string_dictionary_or_blob;
-	semsg(_(msg), func_name);
-	return;
+	எனில் (filtermap == FILTERMAP_FOREACH)
+	    செய்தி = e_argument_of_str_must_be_list_tuple_string_dictionary_or_blob;
+	இல்லையெனில்
+	    செய்தி = e_argument_of_str_must_be_list_string_dictionary_or_blob;
+	semsg(_(செய்தி), func_name);
+	திரும்பு;
     }
 
     // On type errors, the preceding call has already displayed an error
     // message.  Avoid a misleading error message for an empty string that
     // was not passed as argument.
-    expr = &argvars[1];
-    if (expr->v_type == VAR_UNKNOWN)
-	return;
+    கோவை = &argvars[1];
+    எனில் (கோவை->v_type == VAR_UNKNOWN)
+	திரும்பு;
 
     typval_T	save_val;
-    typval_T	save_key;
+    typval_T	save_சாவி;
 
     prepare_vimvar(VV_VAL, &save_val);
-    prepare_vimvar(VV_KEY, &save_key);
+    prepare_vimvar(VV_சாவி, &save_சாவி);
 
     // We reset "did_emsg" to be able to detect whether an error
     // occurred during evaluation of the expression.
     save_did_emsg = did_emsg;
     did_emsg = FALSE;
 
-    if (argvars[0].v_type == VAR_DICT)
+    எனில் (argvars[0].v_type == VAR_DICT)
 	dict_filter_map(argvars[0].vval.v_dict, filtermap, type, func_name,
-						      arg_errmsg, expr, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
-	blob_filter_map(argvars[0].vval.v_blob, filtermap, expr,
+						      arg_errmsg, கோவை, rettv);
+    இல்லையெனில் எனில் (argvars[0].v_type == VAR_BLOB)
+	blob_filter_map(argvars[0].vval.v_blob, filtermap, கோவை,
 							    arg_errmsg, rettv);
-    else if (argvars[0].v_type == VAR_STRING)
-	string_filter_map(tv_get_string(&argvars[0]), filtermap, expr, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
-	tuple_foreach(argvars[0].vval.v_tuple, filtermap, expr);
-    else // argvars[0].v_type == VAR_LIST
+    இல்லையெனில் எனில் (argvars[0].v_type == VAR_STRING)
+	string_filter_map(tv_get_string(&argvars[0]), filtermap, கோவை, rettv);
+    இல்லையெனில் எனில் (argvars[0].v_type == VAR_TUPLE)
+	tuple_foreach(argvars[0].vval.v_tuple, filtermap, கோவை);
+    இல்லையெனில் // argvars[0].v_type == VAR_LIST
 	list_filter_map(argvars[0].vval.v_list, filtermap, type, func_name,
-						      arg_errmsg, expr, rettv);
+						      arg_errmsg, கோவை, rettv);
 
-    restore_vimvar(VV_KEY, &save_key);
+    restore_vimvar(VV_சாவி, &save_சாவி);
     restore_vimvar(VV_VAL, &save_val);
 
     did_emsg |= save_did_emsg;
@@ -2921,7 +2921,7 @@ filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 /*
  * "filter()" function
  */
-    void
+    வெறுமை
 f_filter(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_FILTER);
@@ -2930,7 +2930,7 @@ f_filter(typval_T *argvars, typval_T *rettv)
 /*
  * "map()" function
  */
-    void
+    வெறுமை
 f_map(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_MAP);
@@ -2939,7 +2939,7 @@ f_map(typval_T *argvars, typval_T *rettv)
 /*
  * "mapnew()" function
  */
-    void
+    வெறுமை
 f_mapnew(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_MAPNEW);
@@ -2948,7 +2948,7 @@ f_mapnew(typval_T *argvars, typval_T *rettv)
 /*
  * "foreach()" function
  */
-    void
+    வெறுமை
 f_foreach(typval_T *argvars, typval_T *rettv)
 {
     filter_map(argvars, rettv, FILTERMAP_FOREACH);
@@ -2957,17 +2957,17 @@ f_foreach(typval_T *argvars, typval_T *rettv)
 /*
  * "add(list, item)" function
  */
-    static void
+    நிலையான வெறுமை
 list_add(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
 
-    if (l == NULL)
+    எனில் (l == வெற்று)
     {
-	if (in_vim9script())
+	எனில் (in_vim9script())
 	    emsg(_(e_cannot_add_to_null_list));
     }
-    else if (!value_check_lock(l->lv_lock,
+    இல்லையெனில் எனில் (!மதிப்பு_check_lock(l->lv_lock,
 		(char_u *)N_("add() argument"), TRUE)
 	    && list_append_tv(l, &argvars[1]) == OK)
     {
@@ -2978,22 +2978,22 @@ list_add(typval_T *argvars, typval_T *rettv)
 /*
  * "add(object, item)" function
  */
-    void
+    வெறுமை
 f_add(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = 1; // Default: Failed
+    rettv->vval.v_எண் = 1; // Default: Failed
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
-		    && check_for_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_எண்_arg(argvars, 1) == FAIL)))
+	திரும்பு;
 
-    if (argvars[0].v_type == VAR_LIST)
+    எனில் (argvars[0].v_type == VAR_LIST)
 	list_add(argvars, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
+    இல்லையெனில் எனில் (argvars[0].v_type == VAR_BLOB)
 	blob_add(argvars, rettv);
-    else
+    இல்லையெனில்
 	emsg(_(e_list_or_blob_required));
 }
 
@@ -3001,89 +3001,89 @@ f_add(typval_T *argvars, typval_T *rettv)
  * Count the number of times item "needle" occurs in List "l" starting at index
  * "idx". Case is ignored if "ic" is TRUE.
  */
-    static long
-list_count(list_T *l, typval_T *needle, long idx, int ic)
+    நிலையான long
+list_மொத்தம்(list_T *l, typval_T *needle, long idx, முழு ic)
 {
     long	n = 0;
     listitem_T	*li;
 
-    if (l == NULL)
-	return 0;
+    எனில் (l == வெற்று)
+	திரும்பு 0;
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (list_len(l) == 0)
-	return 0;
+    எனில் (list_len(l) == 0)
+	திரும்பு 0;
 
     li = list_find(l, idx);
-    if (li == NULL)
+    எனில் (li == வெற்று)
     {
 	semsg(_(e_list_index_out_of_range_nr), idx);
-	return 0;
+	திரும்பு 0;
     }
 
-    for ( ; li != NULL; li = li->li_next)
-	if (tv_equal(&li->li_tv, needle, ic))
+    க்கு ( ; li != வெற்று; li = li->li_next)
+	எனில் (tv_equal(&li->li_tv, needle, ic))
 	    ++n;
 
-    return n;
+    திரும்பு n;
 }
 
 /*
  * "count()" function
  */
-    void
-f_count(typval_T *argvars, typval_T *rettv)
+    வெறுமை
+f_மொத்தம்(typval_T *argvars, typval_T *rettv)
 {
     long	n = 0;
-    int		ic = FALSE;
-    int		error = FALSE;
+    முழு		ic = FALSE;
+    முழு		error = FALSE;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_list_tuple_or_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 3) == FAIL)))
-	return;
+		    && check_for_opt_எண்_arg(argvars, 3) == FAIL)))
+	திரும்பு;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
-	ic = (int)tv_get_bool_chk(&argvars[2], &error);
+    எனில் (argvars[2].v_type != VAR_UNKNOWN)
+	ic = (முழு)tv_get_bool_chk(&argvars[2], &error);
 
-    if (!error && argvars[0].v_type == VAR_STRING)
-	n = string_count(argvars[0].vval.v_string,
+    எனில் (!error && argvars[0].v_type == VAR_STRING)
+	n = string_மொத்தம்(argvars[0].vval.v_string,
 					tv_get_string_chk(&argvars[1]), ic);
-    else if (!error && argvars[0].v_type == VAR_LIST)
+    இல்லையெனில் எனில் (!error && argvars[0].v_type == VAR_LIST)
     {
 	long idx = 0;
 
-	if (argvars[2].v_type != VAR_UNKNOWN
+	எனில் (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
-	    idx = (long)tv_get_number_chk(&argvars[3], &error);
-	if (!error)
-	    n = list_count(argvars[0].vval.v_list, &argvars[1], idx, ic);
+	    idx = (long)tv_get_எண்_chk(&argvars[3], &error);
+	எனில் (!error)
+	    n = list_மொத்தம்(argvars[0].vval.v_list, &argvars[1], idx, ic);
     }
-    else if (!error && argvars[0].v_type == VAR_TUPLE)
+    இல்லையெனில் எனில் (!error && argvars[0].v_type == VAR_TUPLE)
     {
 	long idx = 0;
 
-	if (argvars[2].v_type != VAR_UNKNOWN
+	எனில் (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
-	    idx = (long)tv_get_number_chk(&argvars[3], &error);
-	if (!error)
-	    n = tuple_count(argvars[0].vval.v_tuple, &argvars[1], idx, ic);
+	    idx = (long)tv_get_எண்_chk(&argvars[3], &error);
+	எனில் (!error)
+	    n = tuple_மொத்தம்(argvars[0].vval.v_tuple, &argvars[1], idx, ic);
     }
-    else if (!error && argvars[0].v_type == VAR_DICT)
+    இல்லையெனில் எனில் (!error && argvars[0].v_type == VAR_DICT)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN
+	எனில் (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
 	    emsg(_(e_invalid_argument));
-	else
-	    n = dict_count(argvars[0].vval.v_dict, &argvars[1], ic);
+	இல்லையெனில்
+	    n = dict_மொத்தம்(argvars[0].vval.v_dict, &argvars[1], ic);
     }
-    else if (!error)
+    இல்லையெனில் எனில் (!error)
 	semsg(_(e_argument_of_str_must_be_list_string_or_dictionary),
 								    "count()");
-    rettv->vval.v_number = n;
+    rettv->vval.v_எண் = n;
 }
 
 /*
@@ -3091,76 +3091,76 @@ f_count(typval_T *argvars, typval_T *rettv)
  * argvars[3] and return the resulting list in "rettv".  "is_new" is TRUE for
  * extendnew().
  */
-    static void
+    நிலையான வெறுமை
 list_extend_func(
 	typval_T	*argvars,
 	type_T		*type,
-	char		*func_name,
+	எழுத்து		*func_name,
 	char_u		*arg_errmsg,
-	int		is_new,
+	முழு		is_new,
 	typval_T	*rettv)
 {
     list_T	*l1, *l2;
     listitem_T	*item;
     long	before;
-    int		error = FALSE;
+    முழு		error = FALSE;
 
     l1 = argvars[0].vval.v_list;
-    if (l1 == NULL)
+    எனில் (l1 == வெற்று)
     {
 	emsg(_(e_cannot_extend_null_list));
-	return;
+	திரும்பு;
     }
-    if (is_new || !value_check_lock(l1->lv_lock, arg_errmsg, TRUE))
+    எனில் (is_new || !மதிப்பு_check_lock(l1->lv_lock, arg_errmsg, TRUE))
     {
-	if (is_new)
+	எனில் (is_new)
 	{
 	    l1 = list_copy(l1, FALSE, TRUE, get_copyID());
-	    if (l1 == NULL)
-		return;
+	    எனில் (l1 == வெற்று)
+		திரும்பு;
 	}
 
 	l2 = argvars[1].vval.v_list;
-	if (l2 == NULL)
-	    goto theend;
+	எனில் (l2 == வெற்று)
+	    செல் theend;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	எனில் (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    before = (long)tv_get_number_chk(&argvars[2], &error);
-	    if (error)
-		goto cleanup;		// type error; errmsg already given
-	    if (before == l1->lv_len)
-		item = NULL;
-	    else
+	    before = (long)tv_get_எண்_chk(&argvars[2], &error);
+	    எனில் (error)
+		செல் cleanup;		// type error; errmsg already given
+	    எனில் (before == l1->lv_len)
+		item = வெற்று;
+	    இல்லையெனில்
 	    {
 		item = list_find(l1, before);
-		if (item == NULL)
+		எனில் (item == வெற்று)
 		{
 		    semsg(_(e_list_index_out_of_range_nr), before);
-		    goto cleanup;
+		    செல் cleanup;
 		}
 	    }
 	}
-	else
-	    item = NULL;
-	if (type != NULL && check_typval_arg_type(
+	இல்லையெனில்
+	    item = வெற்று;
+	எனில் (type != வெற்று && check_typval_arg_type(
 		    type, &argvars[1], func_name, 2) == FAIL)
-	    goto cleanup;
+	    செல் cleanup;
 	list_extend(l1, l2, item);
 
 theend:
-	if (is_new)
+	எனில் (is_new)
 	{
 	    rettv->v_type = VAR_LIST;
 	    rettv->vval.v_list = l1;
 	    rettv->v_lock = FALSE;
 	}
-	else
+	இல்லையெனில்
 	    copy_tv(&argvars[0], rettv);
-	return;
+	திரும்பு;
 
 cleanup:
-	if (is_new)
+	எனில் (is_new)
 	    list_unref(l1);
     }
 }
@@ -3168,31 +3168,31 @@ cleanup:
 /*
  * "extend()" or "extendnew()" function.  "is_new" is TRUE for extendnew().
  */
-    static void
-extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, int is_new)
+    நிலையான வெறுமை
+extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, முழு is_new)
 {
-    type_T	*type = NULL;
-    char	*func_name = is_new ? "extendnew()" : "extend()";
+    type_T	*type = வெற்று;
+    எழுத்து	*func_name = is_new ? "extendnew()" : "extend()";
 
-    if (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_LIST)
+    எனில் (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_LIST)
     {
 	// Check that extend() does not change the type of the list if it was
 	// declared.
-	if (!is_new && in_vim9script() && argvars[0].vval.v_list != NULL)
+	எனில் (!is_new && in_vim9script() && argvars[0].vval.v_list != வெற்று)
 	    type = argvars[0].vval.v_list->lv_type;
 	list_extend_func(argvars, type, func_name, arg_errmsg, is_new, rettv);
     }
-    else if (argvars[0].v_type == VAR_DICT && argvars[1].v_type == VAR_DICT)
+    இல்லையெனில் எனில் (argvars[0].v_type == VAR_DICT && argvars[1].v_type == VAR_DICT)
     {
 	// Check that extend() does not change the type of the dict if it was
 	// declared.
-	if (!is_new && in_vim9script() && argvars[0].vval.v_dict != NULL)
+	எனில் (!is_new && in_vim9script() && argvars[0].vval.v_dict != வெற்று)
 	    type = argvars[0].vval.v_dict->dv_type;
 	dict_extend_func(argvars, type, func_name, arg_errmsg, is_new, rettv);
     }
-    else if (argvars[0].v_type == VAR_BLOB && argvars[1].v_type == VAR_BLOB)
+    இல்லையெனில் எனில் (argvars[0].v_type == VAR_BLOB && argvars[1].v_type == VAR_BLOB)
 	blob_extend_func(argvars, arg_errmsg, is_new, rettv);
-    else
+    இல்லையெனில்
 	semsg(_(e_argument_of_str_must_be_list_dictionary_or_blob), func_name);
 }
 
@@ -3201,7 +3201,7 @@ extend(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg, int is_new)
  * "extend(dict, dict [, action])" function
  * "extend(blob, blob [, idx])" function
  */
-    void
+    வெறுமை
 f_extend(typval_T *argvars, typval_T *rettv)
 {
     char_u      *errmsg = (char_u *)N_("extend() argument");
@@ -3214,7 +3214,7 @@ f_extend(typval_T *argvars, typval_T *rettv)
  * "extendnew(dict, dict [, action])" function
  * "extendnew(blob, blob [, idx])" function
  */
-    void
+    வெறுமை
 f_extendnew(typval_T *argvars, typval_T *rettv)
 {
     char_u      *errmsg = (char_u *)N_("extendnew() argument");
@@ -3222,43 +3222,43 @@ f_extendnew(typval_T *argvars, typval_T *rettv)
     extend(argvars, rettv, errmsg, TRUE);
 }
 
-    static void
-list_insert_func(typval_T *argvars, typval_T *rettv)
+    நிலையான வெறுமை
+list_செருகு_func(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
     long	before = 0;
     listitem_T	*item;
-    int		error = FALSE;
+    முழு		error = FALSE;
 
-    if (l == NULL)
+    எனில் (l == வெற்று)
     {
-	if (in_vim9script())
+	எனில் (in_vim9script())
 	    emsg(_(e_cannot_add_to_null_list));
-	return;
+	திரும்பு;
     }
 
-    if (value_check_lock(l->lv_lock, (char_u *)N_("insert() argument"), TRUE))
-	return;
+    எனில் (மதிப்பு_check_lock(l->lv_lock, (char_u *)N_("insert() argument"), TRUE))
+	திரும்பு;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
-	before = (long)tv_get_number_chk(&argvars[2], &error);
-    if (error)
-	return;		// type error; errmsg already given
+    எனில் (argvars[2].v_type != VAR_UNKNOWN)
+	before = (long)tv_get_எண்_chk(&argvars[2], &error);
+    எனில் (error)
+	திரும்பு;		// type error; errmsg already given
 
-    if (before == l->lv_len)
-	item = NULL;
-    else
+    எனில் (before == l->lv_len)
+	item = வெற்று;
+    இல்லையெனில்
     {
 	item = list_find(l, before);
-	if (item == NULL)
+	எனில் (item == வெற்று)
 	{
 	    semsg(_(e_list_index_out_of_range_nr), before);
-	    l = NULL;
+	    l = வெற்று;
 	}
     }
-    if (l != NULL)
+    எனில் (l != வெற்று)
     {
-	(void)list_insert_tv(l, &argvars[1], item);
+	(வெறுமை)list_செருகு_tv(l, &argvars[1], item);
 	copy_tv(&argvars[0], rettv);
     }
 }
@@ -3266,63 +3266,63 @@ list_insert_func(typval_T *argvars, typval_T *rettv)
 /*
  * "insert()" function
  */
-    void
-f_insert(typval_T *argvars, typval_T *rettv)
+    வெறுமை
+f_செருகு(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
-		    && check_for_number_arg(argvars, 1) == FAIL)
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		    && check_for_எண்_arg(argvars, 1) == FAIL)
+		|| check_for_opt_எண்_arg(argvars, 2) == FAIL))
+	திரும்பு;
 
-    if (argvars[0].v_type == VAR_BLOB)
-	blob_insert_func(argvars, rettv);
-    else if (argvars[0].v_type != VAR_LIST)
+    எனில் (argvars[0].v_type == VAR_BLOB)
+	blob_செருகு_func(argvars, rettv);
+    இல்லையெனில் எனில் (argvars[0].v_type != VAR_LIST)
 	semsg(_(e_argument_of_str_must_be_list_or_blob), "insert()");
-    else
-	list_insert_func(argvars, rettv);
+    இல்லையெனில்
+	list_செருகு_func(argvars, rettv);
 }
 
 /*
  * "remove()" function
  */
-    void
+    வெறுமை
 f_remove(typval_T *argvars, typval_T *rettv)
 {
     char_u	*arg_errmsg = (char_u *)N_("remove() argument");
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_list_or_dict_or_blob_arg(argvars, 0) == FAIL
 		|| ((argvars[0].v_type == VAR_LIST
 			|| argvars[0].v_type == VAR_BLOB)
-		    && (check_for_number_arg(argvars, 1) == FAIL
-			|| check_for_opt_number_arg(argvars, 2) == FAIL))
+		    && (check_for_எண்_arg(argvars, 1) == FAIL
+			|| check_for_opt_எண்_arg(argvars, 2) == FAIL))
 		|| (argvars[0].v_type == VAR_DICT
-		    && check_for_string_or_number_arg(argvars, 1) == FAIL)))
-	return;
+		    && check_for_string_or_எண்_arg(argvars, 1) == FAIL)))
+	திரும்பு;
 
-    if (argvars[0].v_type == VAR_DICT)
+    எனில் (argvars[0].v_type == VAR_DICT)
 	dict_remove(argvars, rettv, arg_errmsg);
-    else if (argvars[0].v_type == VAR_BLOB)
+    இல்லையெனில் எனில் (argvars[0].v_type == VAR_BLOB)
 	blob_remove(argvars, rettv, arg_errmsg);
-    else if (argvars[0].v_type == VAR_LIST)
+    இல்லையெனில் எனில் (argvars[0].v_type == VAR_LIST)
 	list_remove(argvars, rettv, arg_errmsg);
-    else
+    இல்லையெனில்
 	semsg(_(e_argument_of_str_must_be_list_dictionary_or_blob), "remove()");
 }
 
-    static void
+    நிலையான வெறுமை
 list_reverse(list_T *l, typval_T *rettv)
 {
     listitem_T	*li, *ni;
 
     rettv_list_set(rettv, l);
-    if (l != NULL
-	    && !value_check_lock(l->lv_lock,
+    எனில் (l != வெற்று
+	    && !மதிப்பு_check_lock(l->lv_lock,
 		(char_u *)N_("reverse() argument"), TRUE))
     {
-	if (l->lv_first == &range_list_item)
+	எனில் (l->lv_first == &range_list_item)
 	{
 	    varnumber_T new_start = l->lv_u.nonmat.lv_start
 		+ ((varnumber_T)l->lv_len - 1) * l->lv_u.nonmat.lv_stride;
@@ -3330,12 +3330,12 @@ list_reverse(list_T *l, typval_T *rettv)
 		- (l->lv_u.nonmat.lv_end - l->lv_u.nonmat.lv_start);
 	    l->lv_u.nonmat.lv_start = new_start;
 	    l->lv_u.nonmat.lv_stride = -l->lv_u.nonmat.lv_stride;
-	    return;
+	    திரும்பு;
 	}
 	li = l->lv_u.mat.lv_last;
-	l->lv_first = l->lv_u.mat.lv_last = NULL;
+	l->lv_first = l->lv_u.mat.lv_last = வெற்று;
 	l->lv_len = 0;
-	while (li != NULL)
+	போது (li != வெற்று)
 	{
 	    ni = li->li_prev;
 	    list_append(l, li);
@@ -3348,25 +3348,25 @@ list_reverse(list_T *l, typval_T *rettv)
 /*
  * "reverse({list})" function
  */
-    void
+    வெறுமை
 f_reverse(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    எனில் (argvars[0].v_type == VAR_BLOB)
 	blob_reverse(argvars[0].vval.v_blob, rettv);
-    else if (argvars[0].v_type == VAR_STRING)
+    இல்லையெனில் எனில் (argvars[0].v_type == VAR_STRING)
     {
 	rettv->v_type = VAR_STRING;
-	if (argvars[0].vval.v_string != NULL)
+	எனில் (argvars[0].vval.v_string != வெற்று)
 	    rettv->vval.v_string = reverse_text(argvars[0].vval.v_string);
-	else
-	    rettv->vval.v_string = NULL;
+	இல்லையெனில்
+	    rettv->vval.v_string = வெற்று;
     }
-    else if (argvars[0].v_type == VAR_LIST)
+    இல்லையெனில் எனில் (argvars[0].v_type == VAR_LIST)
 	list_reverse(argvars[0].vval.v_list, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    இல்லையெனில் எனில் (argvars[0].v_type == VAR_TUPLE)
 	tuple_reverse(argvars[0].vval.v_tuple, rettv);
 }
 
@@ -3375,97 +3375,97 @@ f_reverse(typval_T *argvars, typval_T *rettv)
  * starting with the optional initial value argvars[2] and return the result in
  * "rettv".
  */
-    static void
+    நிலையான வெறுமை
 list_reduce(
 	typval_T	*argvars,
-	typval_T	*expr,
+	typval_T	*கோவை,
 	typval_T	*rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
-    listitem_T  *li = NULL;
-    int		range_list;
-    int		range_idx = 0;
+    listitem_T  *li = வெற்று;
+    முழு		range_list;
+    முழு		range_idx = 0;
     varnumber_T	range_val = 0;
     typval_T	initial;
     typval_T	argv[3];
-    int		r;
-    int		called_emsg_start = called_emsg;
-    int		prev_locked;
+    முழு		r;
+    முழு		called_emsg_start = called_emsg;
+    முழு		prev_locked;
     funccall_T	*fc;
 
     // Using reduce on a range() uses "range_idx" and "range_val".
-    range_list = l != NULL && l->lv_first == &range_list_item;
-    if (range_list)
+    range_list = l != வெற்று && l->lv_first == &range_list_item;
+    எனில் (range_list)
 	range_val = l->lv_u.nonmat.lv_start;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    எனில் (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (l == NULL || l->lv_len == 0)
+	எனில் (l == வெற்று || l->lv_len == 0)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "List");
-	    return;
+	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_மதிப்பு), "List");
+	    திரும்பு;
 	}
-	if (range_list)
+	எனில் (range_list)
 	{
-	    initial.v_type = VAR_NUMBER;
-	    initial.vval.v_number = range_val;
+	    initial.v_type = VAR_எண்;
+	    initial.vval.v_எண் = range_val;
 	    range_val += l->lv_u.nonmat.lv_stride;
 	    range_idx = 1;
 	}
-	else
+	இல்லையெனில்
 	{
 	    initial = l->lv_first->li_tv;
 	    li = l->lv_first->li_next;
 	}
     }
-    else
+    இல்லையெனில்
     {
 	initial = argvars[2];
-	if (l != NULL && !range_list)
+	எனில் (l != வெற்று && !range_list)
 	    li = l->lv_first;
     }
     copy_tv(&initial, rettv);
 
-    if (l == NULL)
-	return;
+    எனில் (l == வெற்று)
+	திரும்பு;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_கோவை_get_funccal(கோவை, rettv);
 
     prev_locked = l->lv_lock;
     l->lv_lock = VAR_FIXED;  // disallow the list changing here
 
-    while (range_list ? range_idx < l->lv_len : li != NULL)
+    போது (range_list ? range_idx < l->lv_len : li != வெற்று)
     {
 	argv[0] = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
-	if (range_list)
+	எனில் (range_list)
 	{
-	    argv[1].v_type = VAR_NUMBER;
-	    argv[1].vval.v_number = range_val;
+	    argv[1].v_type = VAR_எண்;
+	    argv[1].vval.v_எண் = range_val;
 	}
-	else
+	இல்லையெனில்
 	    argv[1] = li->li_tv;
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_கோவை_typval(கோவை, TRUE, argv, 2, fc, rettv);
 
-	if (argv[0].v_type != VAR_NUMBER && argv[0].v_type != VAR_UNKNOWN)
+	எனில் (argv[0].v_type != VAR_எண் && argv[0].v_type != VAR_UNKNOWN)
 	    clear_tv(&argv[0]);
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	எனில் (r == FAIL || called_emsg != called_emsg_start)
+	    நிறுத்து;
 
 	// advance to the next item
-	if (range_list)
+	எனில் (range_list)
 	{
 	    range_val += l->lv_u.nonmat.lv_stride;
 	    ++range_idx;
 	}
-	else
+	இல்லையெனில்
 	    li = li->li_next;
     }
 
-    if (fc != NULL)
+    எனில் (fc != வெற்று)
 	remove_funccal();
 
     l->lv_lock = prev_locked;
@@ -3477,59 +3477,59 @@ list_reduce(
  * "reduce(blob, { accumulator, element -> value } [, initial])"
  * "reduce(string, { accumulator, element -> value } [, initial])"
  */
-    void
+    வெறுமை
 f_reduce(typval_T *argvars, typval_T *rettv)
 {
     char_u	*func_name;
 
-    if (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (check_for_string_or_list_or_tuple_or_blob_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
-    if (argvars[1].v_type == VAR_FUNC)
+    எனில் (argvars[1].v_type == VAR_FUNC)
 	func_name = argvars[1].vval.v_string;
-    else if (argvars[1].v_type == VAR_PARTIAL)
+    இல்லையெனில் எனில் (argvars[1].v_type == VAR_PARTIAL)
 	func_name = partial_name(argvars[1].vval.v_partial);
-    else
+    இல்லையெனில்
 	func_name = tv_get_string_strict(&argvars[1]);
-    if (func_name == NULL || *func_name == NUL)
+    எனில் (func_name == வெற்று || *func_name == NUL)
     {
 	emsg(_(e_missing_function_argument));
-	return;
+	திரும்பு;
     }
 
-    if (argvars[0].v_type == VAR_LIST)
+    எனில் (argvars[0].v_type == VAR_LIST)
 	list_reduce(argvars, &argvars[1], rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    இல்லையெனில் எனில் (argvars[0].v_type == VAR_TUPLE)
 	tuple_reduce(argvars, &argvars[1], rettv);
-    else if (argvars[0].v_type == VAR_STRING)
+    இல்லையெனில் எனில் (argvars[0].v_type == VAR_STRING)
 	string_reduce(argvars, &argvars[1], rettv);
-    else
+    இல்லையெனில்
 	blob_reduce(argvars, &argvars[1], rettv);
 }
 
 /*
  * slice() function
  */
-    void
+    வெறுமை
 f_slice(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && ((argvars[0].v_type != VAR_STRING
 		    && argvars[0].v_type != VAR_LIST
 		    && argvars[0].v_type != VAR_TUPLE
 		    && argvars[0].v_type != VAR_BLOB
 		    && check_for_list_arg(argvars, 0) == FAIL)
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_எண்_arg(argvars, 1) == FAIL
+		|| check_for_opt_எண்_arg(argvars, 2) == FAIL))
+	திரும்பு;
 
-    if (check_can_index(&argvars[0], TRUE, FALSE) != OK)
-	return;
+    எனில் (check_can_index(&argvars[0], TRUE, FALSE) != OK)
+	திரும்பு;
 
     copy_tv(argvars, rettv);
     eval_index_inner(rettv, TRUE, argvars + 1,
-	    argvars[2].v_type == VAR_UNKNOWN ? NULL : argvars + 2,
-	    TRUE, NULL, 0, FALSE);
+	    argvars[2].v_type == VAR_UNKNOWN ? வெற்று : argvars + 2,
+	    TRUE, வெற்று, 0, FALSE);
 }
 
 #endif // defined(FEAT_EVAL)

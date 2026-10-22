@@ -30,24 +30,24 @@
 #ifndef _MSC_VER
 # include <unistd.h>
 #endif
-#include <malloc.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
+#அந்தர்பாவ <malloc.h>
+#அந்தர்பாவ <stdio.h>
+#அந்தர்பாவ <stdlib.h>
+#அந்தர்பாவ <string.h>
+#அந்தர்பாவ <fcntl.h>
 
 #ifdef _WIN32
 # define sysconf(x) -1
 #endif
 
-void usage(void)
+வெறுமை usage(வெறுமை)
 {
 	fprintf(stderr,
 "tee usage:\n\
 \ttee [-a] file ... file_n\n\
 \n\
 \t-a\tappend to files instead of truncating\n\
-\nTee reads its input, and writes to each of the specified files,\n\
+\nTee reads its உள்ளீடு, and writes to each of the specified files,\n\
 as well as to the standard output.\n\
 \n\
 This version supplied with Vim 4.2 to make ':make' possible.\n\
@@ -61,49 +61,49 @@ For a more complete and stable version, consider getting\n\
  * We could use fgets, but I want to be able to handle binary blubber.
  */
 
-int
-myfread(char *buf, int elsize /*ignored*/, int max, FILE *fp)
+முழு
+myfread(எழுத்து *buf, முழு elsize /*ignored*/, முழு max, FILE *fp)
 {
-	int	c;
-	int	n = 0;
+	முழு	c;
+	முழு	n = 0;
 
-	while ((n < max) && ((c = getchar()) != EOF))
+	போது ((n < max) && ((c = getchar()) != EOF))
 	{
 		*(buf++) = c;
 		n++;
-		if (c == '\n' || c == '\r')
-			break;
+		எனில் (c == '\n' || c == '\r')
+			நிறுத்து;
 	}
-	return n;
+	திரும்பு n;
 }
 
 
-int
-main(int argc, char *argv[])
+முழு
+முதன்மை(முழு argc, எழுத்து *argv[])
 {
-	int	append = 0;
+	முழு	append = 0;
 	size_t	numfiles;
-	int	maxfiles;
+	முழு	maxfiles;
 	FILE	**filepointers;
-	int	i;
-	char	buf[BUFSIZ];
-	int	n;
-	int	optind = 1;
+	முழு	i;
+	எழுத்து	buf[BUFSIZ];
+	முழு	n;
+	முழு	optind = 1;
 
-	for (i = 1; i < argc; i++)
+	க்கு (i = 1; i < argc; i++)
 	{
-		if (argv[i][0] != '-')
-			break;
-		if (!strcmp(argv[i], "-a"))
+		எனில் (argv[i][0] != '-')
+			நிறுத்து;
+		எனில் (!strcmp(argv[i], "-a"))
 			append++;
-		else
+		இல்லையெனில்
 			usage();
 		optind++;
 	}
 
 	numfiles = argc - optind;
 
-	if (numfiles == 0)
+	எனில் (numfiles == 0)
 	{
 		fprintf(stderr, "doesn't make much sense using tee without any file name arguments...\n");
 		usage();
@@ -111,53 +111,53 @@ main(int argc, char *argv[])
 	}
 
 	maxfiles = sysconf(_SC_OPEN_MAX);	/* or fill in 10 or so */
-	if (maxfiles < 0)
+	எனில் (maxfiles < 0)
 		maxfiles = 10;
-	if (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
+	எனில் (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
 	{
 		fprintf(stderr, "Sorry, there is a limit of max %d files.\n", maxfiles - 3);
 		exit(1);
 	}
-	filepointers = calloc(numfiles, sizeof(FILE *));
-	if (filepointers == NULL)
+	filepointers = calloc(numfiles, அளவு(FILE *));
+	எனில் (filepointers == வெற்று)
 	{
 		fprintf(stderr, "Error allocating memory for %ld files\n",
 															   (long)numfiles);
 		exit(1);
 	}
-	for (i = 0; i < numfiles; i++)
+	க்கு (i = 0; i < numfiles; i++)
 	{
 		filepointers[i] = fopen(argv[i+optind], append ? "ab" : "wb");
-		if (filepointers[i] == NULL)
+		எனில் (filepointers[i] == வெற்று)
 		{
 			fprintf(stderr, "Can't open \"%s\"\n", argv[i+optind]);
 			exit(1);
 		}
 	}
 #ifdef _WIN32
-	setmode(fileno(stdin),  O_BINARY);
+	setmode(fileno(stdin),  O_இருமம்);
 	fflush(stdout);	/* needed for _fsetmode(stdout) */
-	setmode(fileno(stdout),  O_BINARY);
+	setmode(fileno(stdout),  O_இருமம்);
 #endif
 
-	while ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
+	போது ((n = myfread(buf, அளவு(எழுத்து), அளவு(buf), stdin)) > 0)
 	{
-		fwrite(buf, sizeof(char), n, stdout);
+		fwrite(buf, அளவு(எழுத்து), n, stdout);
 		fflush(stdout);
-		for (i = 0; i < numfiles; i++)
+		க்கு (i = 0; i < numfiles; i++)
 		{
-			if (filepointers[i] &&
-			     fwrite(buf, sizeof(char), n, filepointers[i]) != n)
+			எனில் (filepointers[i] &&
+			     fwrite(buf, அளவு(எழுத்து), n, filepointers[i]) != n)
 			{
 				fprintf(stderr, "Error writing to file \"%s\"\n", argv[i+optind]);
 				fclose(filepointers[i]);
-				filepointers[i] = NULL;
+				filepointers[i] = வெற்று;
 			}
 		}
 	}
-	for (i = 0; i < numfiles; i++)
+	க்கு (i = 0; i < numfiles; i++)
 	{
-		if (filepointers[i])
+		எனில் (filepointers[i])
 			fclose(filepointers[i]);
 	}
 

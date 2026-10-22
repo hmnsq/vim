@@ -11,22 +11,22 @@
  * map.c: Code for mappings and abbreviations.
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
 /*
  * List used for abbreviations.
  */
-static mapblock_T	*first_abbr = NULL; // first entry in abbrlist
+நிலையான mapblock_T	*first_abbr = வெற்று; // first entry in abbrlist
 
 /*
  * Each mapping is put in one of the 256 hash lists, to speed up finding it.
  */
-static mapblock_T	*(maphash[256]);
-static int		maphash_valid = FALSE;
+நிலையான mapblock_T	*(maphash[256]);
+நிலையான முழு		maphash_valid = FALSE;
 
 // When non-zero then no mappings can be added or removed.  Prevents mappings
 // to change while listing them.
-static int		map_locked = 0;
+நிலையான முழு		map_locked = 0;
 
 /*
  * Make a hash value for a mapping.
@@ -41,34 +41,34 @@ static int		map_locked = 0;
  * Get the start of the hashed map list for "state" and first character "c".
  */
     mapblock_T *
-get_maphash_list(int state, int c)
+get_maphash_list(முழு state, முழு c)
 {
-    return maphash[MAP_HASH(state, c)];
+    திரும்பு maphash[MAP_HASH(state, c)];
 }
 
 /*
  * Get the buffer-local hashed map list for "state" and first character "c".
  */
     mapblock_T *
-get_buf_maphash_list(int state, int c)
+get_buf_maphash_list(முழு state, முழு c)
 {
-    return curbuf->b_maphash[MAP_HASH(state, c)];
+    திரும்பு curbuf->b_maphash[MAP_HASH(state, c)];
 }
 
-    int
-is_maphash_valid(void)
+    முழு
+is_maphash_valid(வெறுமை)
 {
-    return maphash_valid;
+    திரும்பு maphash_valid;
 }
 
 /*
  * Initialize maphash[] for first use.
  */
-    static void
-validate_maphash(void)
+    நிலையான வெறுமை
+validate_maphash(வெறுமை)
 {
-    if (maphash_valid)
-	return;
+    எனில் (maphash_valid)
+	திரும்பு;
 
     CLEAR_FIELD(maphash);
     maphash_valid = TRUE;
@@ -78,15 +78,15 @@ validate_maphash(void)
  * Delete one entry from the abbrlist or maphash[].
  * "mpp" is a pointer to the m_next field of the PREVIOUS entry!
  */
-    static void
+    நிலையான வெறுமை
 map_free(mapblock_T **mpp)
 {
     mapblock_T	*mp;
 
     mp = *mpp;
-    vim_free(mp->m_keys);
-    if (mp->m_alt != NULL)
-	mp->m_alt->m_alt = NULL;
+    vim_free(mp->m_சாவிகள்);
+    எனில் (mp->m_alt != வெற்று)
+	mp->m_alt->m_alt = வெற்று;
     vim_free(mp->m_str);
     vim_free(mp->m_orig_str);
     *mpp = mp->m_next;
@@ -100,292 +100,292 @@ map_free(mapblock_T **mpp)
  * Return characters to represent the map mode in an allocated string.
  * Returns NULL when out of memory.
  */
-    static char_u *
-map_mode_to_chars(int mode)
+    நிலையான char_u *
+map_mode_to_chars(முழு mode)
 {
     garray_T    mapmode;
 
     ga_init2(&mapmode, 1, 7);
 
-    if ((mode & (MODE_INSERT | MODE_CMDLINE)) == (MODE_INSERT | MODE_CMDLINE))
+    எனில் ((mode & (MODE_செருகு | MODE_CMDLINE)) == (MODE_செருகு | MODE_CMDLINE))
 	ga_append(&mapmode, '!');			// :map!
-    else if (mode & MODE_INSERT)
+    இல்லையெனில் எனில் (mode & MODE_செருகு)
 	ga_append(&mapmode, 'i');			// :imap
-    else if (mode & MODE_LANGMAP)
+    இல்லையெனில் எனில் (mode & MODE_LANGMAP)
 	ga_append(&mapmode, 'l');			// :lmap
-    else if (mode & MODE_CMDLINE)
+    இல்லையெனில் எனில் (mode & MODE_CMDLINE)
 	ga_append(&mapmode, 'c');			// :cmap
-    else if ((mode
+    இல்லையெனில் எனில் ((mode
 		 & (MODE_NORMAL | MODE_VISUAL | MODE_SELECT | MODE_OP_PENDING))
 		== (MODE_NORMAL | MODE_VISUAL | MODE_SELECT | MODE_OP_PENDING))
 	ga_append(&mapmode, ' ');			// :map
-    else
+    இல்லையெனில்
     {
-	if (mode & MODE_NORMAL)
+	எனில் (mode & MODE_NORMAL)
 	    ga_append(&mapmode, 'n');			// :nmap
-	if (mode & MODE_OP_PENDING)
+	எனில் (mode & MODE_OP_PENDING)
 	    ga_append(&mapmode, 'o');			// :omap
-	if (mode & MODE_TERMINAL)
+	எனில் (mode & MODE_TERMINAL)
 	    ga_append(&mapmode, 't');			// :tmap
-	if ((mode & (MODE_VISUAL | MODE_SELECT)) == (MODE_VISUAL | MODE_SELECT))
+	எனில் ((mode & (MODE_VISUAL | MODE_SELECT)) == (MODE_VISUAL | MODE_SELECT))
 	    ga_append(&mapmode, 'v');			// :vmap
-	else
+	இல்லையெனில்
 	{
-	    if (mode & MODE_VISUAL)
+	    எனில் (mode & MODE_VISUAL)
 		ga_append(&mapmode, 'x');		// :xmap
-	    if (mode & MODE_SELECT)
+	    எனில் (mode & MODE_SELECT)
 		ga_append(&mapmode, 's');		// :smap
 	}
     }
 
     ga_append(&mapmode, NUL);
-    return (char_u *)mapmode.ga_data;
+    திரும்பு (char_u *)mapmode.ga_data;
 }
 
 /*
  * Output a line for one mapping.
  */
-    static void
+    நிலையான வெறுமை
 showmap(
     mapblock_T	*mp,
-    int		local)	    // TRUE for buffer-local map
+    முழு		local)	    // TRUE for buffer-local map
 {
-    int		len = 1;
+    முழு		len = 1;
     char_u	*mapchars;
 
-    if (message_filtered(mp->m_keys) && message_filtered(mp->m_str))
-	return;
+    எனில் (message_filtered(mp->m_சாவிகள்) && message_filtered(mp->m_str))
+	திரும்பு;
 
     // Prevent mappings to be cleared while at the more prompt.
     // Must jump to "theend" instead of returning.
     ++map_locked;
 
-    if (msg_didout || msg_silent != 0)
+    எனில் (செய்தி_didout || செய்தி_silent != 0)
     {
-	msg_putchar('\n');
-	if (got_int)	    // 'q' typed at MORE prompt
-	    goto theend;
+	செய்தி_putchar('\n');
+	எனில் (got_int)	    // 'q' typed at MORE prompt
+	    செல் theend;
     }
 
     mapchars = map_mode_to_chars(mp->m_mode);
-    if (mapchars != NULL)
+    எனில் (mapchars != வெற்று)
     {
-	msg_puts((char *)mapchars);
-	len = (int)STRLEN(mapchars);
+	செய்தி_puts((எழுத்து *)mapchars);
+	len = (முழு)STRLEN(mapchars);
 	vim_free(mapchars);
     }
 
-    while (++len <= 3)
-	msg_putchar(' ');
+    போது (++len <= 3)
+	செய்தி_putchar(' ');
 
     // Display the LHS.  Get length of what we write.
-    len = msg_outtrans_special(mp->m_keys, TRUE, 0);
-    do
+    len = செய்தி_outtrans_special(mp->m_சாவிகள், TRUE, 0);
+    செய்
     {
-	msg_putchar(' ');		// pad with blanks
+	செய்தி_putchar(' ');		// pad with blanks
 	++len;
-    } while (len < 12);
+    } போது (len < 12);
 
-    if (mp->m_noremap == REMAP_NONE)
-	msg_puts_attr("*", HL_ATTR(HLF_8));
-    else if (mp->m_noremap == REMAP_SCRIPT)
-	msg_puts_attr("&", HL_ATTR(HLF_8));
-    else
-	msg_putchar(' ');
+    எனில் (mp->m_noremap == REMAP_NONE)
+	செய்தி_puts_attr("*", HL_ATTR(HLF_8));
+    இல்லையெனில் எனில் (mp->m_noremap == REMAP_SCRIPT)
+	செய்தி_puts_attr("&", HL_ATTR(HLF_8));
+    இல்லையெனில்
+	செய்தி_putchar(' ');
 
-    if (local)
-	msg_putchar('@');
-    else
-	msg_putchar(' ');
+    எனில் (local)
+	செய்தி_putchar('@');
+    இல்லையெனில்
+	செய்தி_putchar(' ');
 
     // Use FALSE below if we only want things like <Up> to show up as such on
     // the rhs, and not M-x etc, TRUE gets both -- webb
-    if (*mp->m_str == NUL)
-	msg_puts_attr("<Nop>", HL_ATTR(HLF_8));
-    else
-	msg_outtrans_special(mp->m_str, FALSE, 0);
+    எனில் (*mp->m_str == NUL)
+	செய்தி_puts_attr("<Nop>", HL_ATTR(HLF_8));
+    இல்லையெனில்
+	செய்தி_outtrans_special(mp->m_str, FALSE, 0);
 #ifdef FEAT_EVAL
-    if (p_verbose > 0)
-	last_set_msg(mp->m_script_ctx);
+    எனில் (p_verbose > 0)
+	last_set_செய்தி(mp->m_script_ctx);
 #endif
-    msg_clr_eos();
+    செய்தி_clr_eos();
     out_flush();			// show one line at a time
 
 theend:
     --map_locked;
 }
 
-    static mapblock_T *
+    நிலையான mapblock_T *
 map_add(
 	mapblock_T  **map_table,
 	mapblock_T  **abbr_table,
-	char_u	    *keys,
+	char_u	    *சாவிகள்,
 	char_u	    *rhs,
 	char_u	    *orig_rhs,
-	int	    noremap,
-	int	    nowait,
-	int	    silent,
-	int	    mode,
-	int	    is_abbr,
+	முழு	    noremap,
+	முழு	    nowait,
+	முழு	    silent,
+	முழு	    mode,
+	முழு	    is_abbr,
 #ifdef FEAT_EVAL
-	int	    expr,
+	முழு	    கோவை,
 	scid_T	    sid,	    // 0 to use current_sctx
-	int	    scriptversion,
+	முழு	    scriptversion,
 	linenr_T    lnum,
 #endif
-	int	    simplified)
+	முழு	    simplified)
 {
     mapblock_T	*mp = ALLOC_CLEAR_ONE(mapblock_T);
 
-    if (mp == NULL)
-	return NULL;
+    எனில் (mp == வெற்று)
+	திரும்பு வெற்று;
 
     // If CTRL-C has been mapped, don't always use it for Interrupting.
-    if (*keys == Ctrl_C)
+    எனில் (*சாவிகள் == Ctrl_C)
     {
-	if (map_table == curbuf->b_maphash)
+	எனில் (map_table == curbuf->b_maphash)
 	    curbuf->b_mapped_ctrl_c |= mode;
-	else
+	இல்லையெனில்
 	    mapped_ctrl_c |= mode;
     }
 
-    mp->m_keys = vim_strsave(keys);
+    mp->m_சாவிகள் = vim_strsave(சாவிகள்);
     mp->m_str = vim_strsave(rhs);
     mp->m_orig_str = vim_strsave(orig_rhs);
-    if (mp->m_keys == NULL || mp->m_str == NULL)
+    எனில் (mp->m_சாவிகள் == வெற்று || mp->m_str == வெற்று)
     {
-	vim_free(mp->m_keys);
+	vim_free(mp->m_சாவிகள்);
 	vim_free(mp->m_str);
 	vim_free(mp->m_orig_str);
 	vim_free(mp);
-	return NULL;
+	திரும்பு வெற்று;
     }
-    mp->m_keylen = (int)STRLEN(mp->m_keys);
+    mp->m_keylen = (முழு)STRLEN(mp->m_சாவிகள்);
     mp->m_noremap = noremap;
     mp->m_nowait = nowait;
     mp->m_silent = silent;
     mp->m_mode = mode;
     mp->m_simplified = simplified;
 #ifdef FEAT_EVAL
-    mp->m_expr = expr;
-    if (sid != 0)
+    mp->m_கோவை = கோவை;
+    எனில் (sid != 0)
     {
 	mp->m_script_ctx.sc_sid = sid;
 	mp->m_script_ctx.sc_lnum = lnum;
 	mp->m_script_ctx.sc_version = scriptversion;
     }
-    else
+    இல்லையெனில்
     {
 	mp->m_script_ctx = current_sctx;
-	if (cmdmod.cmod_flags & CMOD_LEGACY)
+	எனில் (cmdmod.cmod_flags & CMOD_LEGACY)
 	    mp->m_script_ctx.sc_version = 1;
 	mp->m_script_ctx.sc_lnum += SOURCING_LNUM;
     }
 #endif
 
     // add the new entry in front of the abbrlist or maphash[] list
-    if (is_abbr)
+    எனில் (is_abbr)
     {
 	mp->m_next = *abbr_table;
 	*abbr_table = mp;
     }
-    else
+    இல்லையெனில்
     {
-	int n = MAP_HASH(mp->m_mode, mp->m_keys[0]);
+	முழு n = MAP_HASH(mp->m_mode, mp->m_சாவிகள்[0]);
 
 	mp->m_next = map_table[n];
 	map_table[n] = mp;
     }
-    return mp;
+    திரும்பு mp;
 }
 
 /*
  * List mappings.  When "haskey" is FALSE all mappings, otherwise mappings that
  * match "keys[keys_len]".
  */
-    static void
+    நிலையான வெறுமை
 list_mappings(
-	int	keyround,
-	int	abbrev,
-	int	haskey,
-	char_u	*keys,
-	int	keys_len,
-	int	mode,
-	int	*did_local)
+	முழு	keyround,
+	முழு	abbrev,
+	முழு	haskey,
+	char_u	*சாவிகள்,
+	முழு	சாவிகள்_len,
+	முழு	mode,
+	முழு	*did_local)
 {
     // Prevent mappings to be cleared while at the more prompt.
     ++map_locked;
 
-    if (p_verbose > 0 && keyround == 1)
+    எனில் (p_verbose > 0 && keyround == 1)
     {
-	if (seenModifyOtherKeys)
-	    msg_puts(_("Seen modifyOtherKeys: true\n"));
+	எனில் (seen_Modify_Other_சாவிகள்)
+	    செய்தி_puts(_("Seen modifyOtherKeys: true\n"));
 
-	if (modify_otherkeys_state != MOKS_INITIAL)
+	எனில் (modify_otherkeys_state != MOKS_INITIAL)
 	{
-	    char *name = _("Unknown");
-	    switch (modify_otherkeys_state)
+	    எழுத்து *name = _("Unknown");
+	    தேர்வு (modify_otherkeys_state)
 	    {
-		case MOKS_INITIAL: break;
-		case MOKS_OFF: name = _("Off"); break;
-		case MOKS_ENABLED: name = _("On"); break;
-		case MOKS_DISABLED: name = _("Disabled"); break;
-		case MOKS_AFTER_T_TE: name = _("Cleared"); break;
+		நிலை MOKS_INITIAL: நிறுத்து;
+		நிலை MOKS_OFF: name = _("Off"); நிறுத்து;
+		நிலை MOKS_ENABLED: name = _("On"); நிறுத்து;
+		நிலை MOKS_DISABLED: name = _("Disabled"); நிறுத்து;
+		நிலை MOKS_AFTER_T_TE: name = _("Cleared"); நிறுத்து;
 	    }
 
-	    char buf[200];
-	    vim_snprintf(buf, sizeof(buf),
+	    எழுத்து buf[200];
+	    vim_snprintf(buf, அளவு(buf),
 				    _("modifyOtherKeys detected: %s\n"), name);
-	    msg_puts(buf);
+	    செய்தி_puts(buf);
 	}
 
-	if (kitty_protocol_state != KKPS_INITIAL)
+	எனில் (kitty_protocol_state != KKPS_INITIAL)
 	{
-	    char *name = _("Unknown");
-	    switch (kitty_protocol_state)
+	    எழுத்து *name = _("Unknown");
+	    தேர்வு (kitty_protocol_state)
 	    {
-		case KKPS_INITIAL: break;
-		case KKPS_OFF: name = _("Off"); break;
-		case KKPS_ENABLED: name = _("On"); break;
-		case KKPS_DISABLED: name = _("Disabled"); break;
-		case KKPS_AFTER_T_TE: name = _("Cleared"); break;
+		நிலை KKPS_INITIAL: நிறுத்து;
+		நிலை KKPS_OFF: name = _("Off"); நிறுத்து;
+		நிலை KKPS_ENABLED: name = _("On"); நிறுத்து;
+		நிலை KKPS_DISABLED: name = _("Disabled"); நிறுத்து;
+		நிலை KKPS_AFTER_T_TE: name = _("Cleared"); நிறுத்து;
 	    }
 
-	    char buf[200];
-	    vim_snprintf(buf, sizeof(buf),
+	    எழுத்து buf[200];
+	    vim_snprintf(buf, அளவு(buf),
 				     _("Kitty keyboard protocol: %s\n"), name);
-	    msg_puts(buf);
+	    செய்தி_puts(buf);
 	}
     }
 
     // need to loop over all global hash lists
-    for (int hash = 0; hash < 256 && !got_int; ++hash)
+    க்கு (முழு hash = 0; hash < 256 && !got_int; ++hash)
     {
 	mapblock_T	*mp;
 
-	if (abbrev)
+	எனில் (abbrev)
 	{
-	    if (hash != 0)	// there is only one abbreviation list
-		break;
+	    எனில் (hash != 0)	// there is only one abbreviation list
+		நிறுத்து;
 	    mp = curbuf->b_first_abbr;
 	}
-	else
+	இல்லையெனில்
 	    mp = curbuf->b_maphash[hash];
-	for ( ; mp != NULL && !got_int; mp = mp->m_next)
+	க்கு ( ; mp != வெற்று && !got_int; mp = mp->m_next)
 	{
 	    // check entries with the same mode
-	    if (!mp->m_simplified && (mp->m_mode & mode) != 0)
+	    எனில் (!mp->m_simplified && (mp->m_mode & mode) != 0)
 	    {
-		if (!haskey)		    // show all entries
+		எனில் (!haskey)		    // show all entries
 		{
 		    showmap(mp, TRUE);
 		    *did_local = TRUE;
 		}
-		else
+		இல்லையெனில்
 		{
-		    int n = mp->m_keylen;
-		    if (STRNCMP(mp->m_keys, keys,
-				   (size_t)(n < keys_len ? n : keys_len)) == 0)
+		    முழு n = mp->m_keylen;
+		    எனில் (STRNCMP(mp->m_சாவிகள், சாவிகள்,
+				   (size_t)(n < சாவிகள்_len ? n : சாவிகள்_len)) == 0)
 		    {
 			showmap(mp, TRUE);
 			*did_local = TRUE;
@@ -441,121 +441,121 @@ list_mappings(
  *	  4 for out of mem
  *	  5 for entry not unique
  */
-    int
+    முழு
 do_map(
-    int		maptype,
+    முழு		maptype,
     char_u	*arg,
-    int		mode,
-    int		abbrev)		// not a mapping but an abbreviation
+    முழு		mode,
+    முழு		abbrev)		// not a mapping but an abbreviation
 {
-    char_u	*keys;
+    char_u	*சாவிகள்;
     mapblock_T	*mp, **mpp;
-    mapblock_T	*mp_result[2] = {NULL, NULL};
+    mapblock_T	*mp_result[2] = {வெற்று, வெற்று};
     char_u	*rhs;
     char_u	*p;
-    int		n;
-    int		len = 0;	// init for GCC
-    int		hasarg;
-    int		haskey;
-    int		do_print;
-    int		keyround;
-    char_u	*keys_buf = NULL;
-    char_u	*alt_keys_buf = NULL;
-    char_u	*arg_buf = NULL;
-    int		retval = 0;
-    int		do_backslash;
+    முழு		n;
+    முழு		len = 0;	// init for GCC
+    முழு		hasarg;
+    முழு		haskey;
+    முழு		do_print;
+    முழு		keyround;
+    char_u	*சாவிகள்_buf = வெற்று;
+    char_u	*alt_சாவிகள்_buf = வெற்று;
+    char_u	*arg_buf = வெற்று;
+    முழு		retval = 0;
+    முழு		do_backslash;
     mapblock_T	**abbr_table;
     mapblock_T	**map_table;
-    int		unique = FALSE;
-    int		nowait = FALSE;
-    int		silent = FALSE;
-    int		special = FALSE;
+    முழு		unique = FALSE;
+    முழு		nowait = FALSE;
+    முழு		silent = FALSE;
+    முழு		special = FALSE;
 #ifdef FEAT_EVAL
-    int		expr = FALSE;
+    முழு		கோவை = FALSE;
 #endif
-    int		did_simplify = FALSE;
-    int		unmap_lhs_only = FALSE;
-    int		noremap;
+    முழு		did_simplify = FALSE;
+    முழு		unmap_lhs_only = FALSE;
+    முழு		noremap;
     char_u      *orig_rhs;
 
-    keys = arg;
+    சாவிகள் = arg;
     map_table = maphash;
     abbr_table = &first_abbr;
 
-    if (maptype == MAPTYPE_UNMAP_LHS)
+    எனில் (maptype == MAPTYPE_UNMAP_LHS)
     {
 	unmap_lhs_only = TRUE;
 	maptype = MAPTYPE_UNMAP;
     }
 
     // For ":noremap" don't remap, otherwise do remap.
-    if (maptype == MAPTYPE_NOREMAP)
+    எனில் (maptype == MAPTYPE_NOREMAP)
 	noremap = REMAP_NONE;
-    else
+    இல்லையெனில்
 	noremap = REMAP_YES;
 
     // Accept <buffer>, <nowait>, <silent>, <expr> <script> and <unique> in
     // any order.
-    for (;;)
+    க்கு (;;)
     {
 	// Check for "<buffer>": mapping local to buffer.
-	if (STRNCMP(keys, "<buffer>", 8) == 0)
+	எனில் (STRNCMP(சாவிகள், "<buffer>", 8) == 0)
 	{
-	    keys = skipwhite(keys + 8);
+	    சாவிகள் = skipwhite(சாவிகள் + 8);
 	    map_table = curbuf->b_maphash;
 	    abbr_table = &curbuf->b_first_abbr;
-	    continue;
+	    தொடர்;
 	}
 
 	// Check for "<nowait>": don't wait for more characters.
-	if (STRNCMP(keys, "<nowait>", 8) == 0)
+	எனில் (STRNCMP(சாவிகள், "<nowait>", 8) == 0)
 	{
-	    keys = skipwhite(keys + 8);
+	    சாவிகள் = skipwhite(சாவிகள் + 8);
 	    nowait = TRUE;
-	    continue;
+	    தொடர்;
 	}
 
 	// Check for "<silent>": don't echo commands.
-	if (STRNCMP(keys, "<silent>", 8) == 0)
+	எனில் (STRNCMP(சாவிகள், "<silent>", 8) == 0)
 	{
-	    keys = skipwhite(keys + 8);
+	    சாவிகள் = skipwhite(சாவிகள் + 8);
 	    silent = TRUE;
-	    continue;
+	    தொடர்;
 	}
 
 	// Check for "<special>": accept special keys in <>
-	if (STRNCMP(keys, "<special>", 9) == 0)
+	எனில் (STRNCMP(சாவிகள், "<special>", 9) == 0)
 	{
-	    keys = skipwhite(keys + 9);
+	    சாவிகள் = skipwhite(சாவிகள் + 9);
 	    special = TRUE;
-	    continue;
+	    தொடர்;
 	}
 
 #ifdef FEAT_EVAL
 	// Check for "<script>": remap script-local mappings only
-	if (STRNCMP(keys, "<script>", 8) == 0)
+	எனில் (STRNCMP(சாவிகள், "<script>", 8) == 0)
 	{
-	    keys = skipwhite(keys + 8);
+	    சாவிகள் = skipwhite(சாவிகள் + 8);
 	    noremap = REMAP_SCRIPT;
-	    continue;
+	    தொடர்;
 	}
 
 	// Check for "<expr>": {rhs} is an expression.
-	if (STRNCMP(keys, "<expr>", 6) == 0)
+	எனில் (STRNCMP(சாவிகள், "<expr>", 6) == 0)
 	{
-	    keys = skipwhite(keys + 6);
-	    expr = TRUE;
-	    continue;
+	    சாவிகள் = skipwhite(சாவிகள் + 6);
+	    கோவை = TRUE;
+	    தொடர்;
 	}
 #endif
 	// Check for "<unique>": don't overwrite an existing mapping.
-	if (STRNCMP(keys, "<unique>", 8) == 0)
+	எனில் (STRNCMP(சாவிகள், "<unique>", 8) == 0)
 	{
-	    keys = skipwhite(keys + 8);
+	    சாவிகள் = skipwhite(சாவிகள் + 8);
 	    unique = TRUE;
-	    continue;
+	    தொடர்;
 	}
-	break;
+	நிறுத்து;
     }
 
     validate_maphash();
@@ -563,29 +563,29 @@ do_map(
     // Find end of keys and skip CTRL-Vs (and backslashes) in it.
     // Accept backslash like CTRL-V when 'cpoptions' does not contain 'B'.
     // with :unmap white space is included in the keys, no argument possible.
-    p = keys;
-    do_backslash = (vim_strchr(p_cpo, CPO_BSLASH) == NULL);
-    while (*p && (maptype == MAPTYPE_UNMAP || !VIM_ISWHITE(*p)))
+    p = சாவிகள்;
+    do_backslash = (vim_strchr(p_cpo, CPO_BSLASH) == வெற்று);
+    போது (*p && (maptype == MAPTYPE_UNMAP || !VIM_ISWHITE(*p)))
     {
-	if ((p[0] == Ctrl_V || (do_backslash && p[0] == '\\')) &&
+	எனில் ((p[0] == Ctrl_V || (do_backslash && p[0] == '\\')) &&
 								  p[1] != NUL)
 	    ++p;		// skip CTRL-V or backslash
 	++p;
     }
-    if (*p != NUL)
+    எனில் (*p != NUL)
 	*p++ = NUL;
 
     p = skipwhite(p);
     rhs = p;
     hasarg = (*rhs != NUL);
-    haskey = (*keys != NUL);
+    haskey = (*சாவிகள் != NUL);
     do_print = !haskey || (maptype != MAPTYPE_UNMAP && !hasarg);
 
     // check for :unmap without argument
-    if (maptype == MAPTYPE_UNMAP && !haskey)
+    எனில் (maptype == MAPTYPE_UNMAP && !haskey)
     {
 	retval = 1;
-	goto theend;
+	செல் theend;
     }
 
     // If mapping has been given as ^V<C_UP> say, then replace the term codes
@@ -597,161 +597,161 @@ do_map(
     // If something like <C-H> is simplified to 0x08 then mark it as simplified
     // and also add an entry with a modifier, which will work when using a key
     // protocol.
-    if (haskey)
+    எனில் (haskey)
     {
-	char_u	*new_keys;
-	int	flags = REPTERM_FROM_PART | REPTERM_DO_LT;
+	char_u	*new_சாவிகள்;
+	முழு	flags = REPTERM_FROM_PART | REPTERM_DO_LT;
 
-	if (special)
+	எனில் (special)
 	    flags |= REPTERM_SPECIAL;
-	new_keys = replace_termcodes(keys, &keys_buf, 0, flags, &did_simplify);
-	if (did_simplify)
-	    (void)replace_termcodes(keys, &alt_keys_buf, 0,
-					    flags | REPTERM_NO_SIMPLIFY, NULL);
-	keys = new_keys;
+	new_சாவிகள் = replace_termcodes(சாவிகள், &சாவிகள்_buf, 0, flags, &did_simplify);
+	எனில் (did_simplify)
+	    (வெறுமை)replace_termcodes(சாவிகள், &alt_சாவிகள்_buf, 0,
+					    flags | REPTERM_NO_SIMPLIFY, வெற்று);
+	சாவிகள் = new_சாவிகள்;
     }
     orig_rhs = rhs;
-    if (hasarg)
+    எனில் (hasarg)
     {
-	if (STRICMP(rhs, "<nop>") == 0)	    // "<Nop>" means nothing
+	எனில் (STRICMP(rhs, "<nop>") == 0)	    // "<Nop>" means nothing
 	    rhs = (char_u *)"";
-	else
+	இல்லையெனில்
 	    rhs = replace_termcodes(rhs, &arg_buf, 0,
-			REPTERM_DO_LT | (special ? REPTERM_SPECIAL : 0), NULL);
+			REPTERM_DO_LT | (special ? REPTERM_SPECIAL : 0), வெற்று);
     }
 
     /*
      * The following is done twice if we have two versions of keys:
      * "alt_keys_buf" is not NULL.
      */
-    for (keyround = 1; keyround <= 2; ++keyround)
+    க்கு (keyround = 1; keyround <= 2; ++keyround)
     {
-	int	did_it = FALSE;
-	int	did_local = FALSE;
-	int	keyround1_simplified = keyround == 1 && did_simplify;
-	int	round;
-	int	num_rounds;
+	முழு	did_it = FALSE;
+	முழு	did_local = FALSE;
+	முழு	keyround1_simplified = keyround == 1 && did_simplify;
+	முழு	round;
+	முழு	இலக்கம்_rounds;
 
-	if (keyround == 2)
+	எனில் (keyround == 2)
 	{
-	    if (alt_keys_buf == NULL)
-		break;
-	    keys = alt_keys_buf;
+	    எனில் (alt_சாவிகள்_buf == வெற்று)
+		நிறுத்து;
+	    சாவிகள் = alt_சாவிகள்_buf;
 	}
-	else if (alt_keys_buf != NULL && do_print)
+	இல்லையெனில் எனில் (alt_சாவிகள்_buf != வெற்று && do_print)
 	    // when printing always use the not-simplified map
-	    keys = alt_keys_buf;
+	    சாவிகள் = alt_சாவிகள்_buf;
 
 	// check arguments and translate function keys
-	if (haskey)
+	எனில் (haskey)
 	{
-	    len = (int)STRLEN(keys);
-	    if (len > MAXMAPLEN)	// maximum length of MAXMAPLEN chars
+	    len = (முழு)STRLEN(சாவிகள்);
+	    எனில் (len > MAXMAPLEN)	// maximum length of MAXMAPLEN chars
 	    {
 		retval = 1;
-		goto theend;
+		செல் theend;
 	    }
 
-	    if (abbrev && maptype != MAPTYPE_UNMAP)
+	    எனில் (abbrev && maptype != MAPTYPE_UNMAP)
 	    {
 		// If an abbreviation ends in a keyword character, the
 		// rest must be all keyword-char or all non-keyword-char.
 		// Otherwise we won't be able to find the start of it in a
 		// vi-compatible way.
-		if (has_mbyte)
+		எனில் (has_mbyte)
 		{
-		    int		first, last;
-		    int		same = -1;
-		    char_u	keys_unescaped[MAXMAPLEN + 1];
-		    size_t	keys_unescaped_len;
+		    முழு		first, last;
+		    முழு		same = -1;
+		    char_u	சாவிகள்_unescaped[MAXMAPLEN + 1];
+		    size_t	சாவிகள்_unescaped_len;
 
-		    mch_memmove(keys_unescaped, keys, (size_t)(len + 1));
-		    keys_unescaped_len = vim_unescape_csi(keys_unescaped);
-		    p = keys_unescaped;
+		    mch_memmove(சாவிகள்_unescaped, சாவிகள், (size_t)(len + 1));
+		    சாவிகள்_unescaped_len = vim_unescape_csi(சாவிகள்_unescaped);
+		    p = சாவிகள்_unescaped;
 
 		    first = vim_iswordp(p);
 		    last = first;
 		    MB_PTR_ADV(p);
 		    n = 1;
-		    while (p < keys_unescaped + keys_unescaped_len)
+		    போது (p < சாவிகள்_unescaped + சாவிகள்_unescaped_len)
 		    {
 			++n;			// nr of (multi-byte) chars
 			last = vim_iswordp(p);	// type of last char
-			if (same == -1 && last != first)
+			எனில் (same == -1 && last != first)
 			    same = n - 1;	// count of same char type
 			MB_PTR_ADV(p);
 		    }
-		    if (last && n > 2 && same >= 0 && same < n - 1)
+		    எனில் (last && n > 2 && same >= 0 && same < n - 1)
 		    {
 			retval = 1;
-			goto theend;
+			செல் theend;
 		    }
 		}
-		else if (vim_iswordc(keys[len - 1]))
+		இல்லையெனில் எனில் (vim_iswordc(சாவிகள்[len - 1]))
 		    // ends in keyword char
-		    for (n = 0; n < len - 2; ++n)
-			if (vim_iswordc(keys[n]) != vim_iswordc(keys[len - 2]))
+		    க்கு (n = 0; n < len - 2; ++n)
+			எனில் (vim_iswordc(சாவிகள்[n]) != vim_iswordc(சாவிகள்[len - 2]))
 			{
 			    retval = 1;
-			    goto theend;
+			    செல் theend;
 			}
 		// An abbreviation cannot contain white space.
-		for (n = 0; n < len; ++n)
-		    if (VIM_ISWHITE(keys[n]))
+		க்கு (n = 0; n < len; ++n)
+		    எனில் (VIM_ISWHITE(சாவிகள்[n]))
 		    {
 			retval = 1;
-			goto theend;
+			செல் theend;
 		    }
 	    }
 	}
 
-	if (haskey && hasarg && abbrev)	// if we will add an abbreviation
+	எனில் (haskey && hasarg && abbrev)	// if we will add an abbreviation
 	    no_abbr = FALSE;		// reset flag that indicates there are
 					// no abbreviations
 
-	if (do_print)
-	    msg_start();
+	எனில் (do_print)
+	    செய்தி_start();
 
 	// Check if a new local mapping wasn't already defined globally.
-	if (unique && map_table == curbuf->b_maphash
+	எனில் (unique && map_table == curbuf->b_maphash
 			       && haskey && hasarg && maptype != MAPTYPE_UNMAP)
 	{
 	    // need to loop over all global hash lists
-	    for (int hash = 0; hash < 256 && !got_int; ++hash)
+	    க்கு (முழு hash = 0; hash < 256 && !got_int; ++hash)
 	    {
-		if (abbrev)
+		எனில் (abbrev)
 		{
-		    if (hash != 0)	// there is only one abbreviation list
-			break;
+		    எனில் (hash != 0)	// there is only one abbreviation list
+			நிறுத்து;
 		    mp = first_abbr;
 		}
-		else
+		இல்லையெனில்
 		    mp = maphash[hash];
-		for ( ; mp != NULL && !got_int; mp = mp->m_next)
+		க்கு ( ; mp != வெற்று && !got_int; mp = mp->m_next)
 		{
 		    // check entries with the same mode
-		    if ((mp->m_mode & mode) != 0
+		    எனில் ((mp->m_mode & mode) != 0
 			    && mp->m_keylen == len
-			    && STRNCMP(mp->m_keys, keys, (size_t)len) == 0)
+			    && STRNCMP(mp->m_சாவிகள், சாவிகள், (size_t)len) == 0)
 		    {
-			if (abbrev)
+			எனில் (abbrev)
 			    semsg(
 			       _(e_global_abbreviation_already_exists_for_str),
-				    mp->m_keys);
-			else
+				    mp->m_சாவிகள்);
+			இல்லையெனில்
 			    semsg(_(e_global_mapping_already_exists_for_str),
-				    mp->m_keys);
+				    mp->m_சாவிகள்);
 			retval = 5;
-			goto theend;
+			செல் theend;
 		    }
 		}
 	    }
 	}
 
 	// When listing global mappings, also list buffer-local ones here.
-	if (map_table != curbuf->b_maphash && !hasarg
+	எனில் (map_table != curbuf->b_maphash && !hasarg
 						   && maptype != MAPTYPE_UNMAP)
-	    list_mappings(keyround, abbrev, haskey, keys, len,
+	    list_mappings(keyround, abbrev, haskey, சாவிகள், len,
 							     mode, &did_local);
 
 	// Find an entry in the maphash[] list that matches.
@@ -760,113 +760,113 @@ do_map(
 	// an entry with a matching 'to' part. This was done to allow
 	// ":ab foo bar" to be unmapped by typing ":unab foo", where "foo" will
 	// be replaced by "bar" because of the abbreviation.
-	num_rounds = maptype == MAPTYPE_UNMAP && !unmap_lhs_only ? 2 : 1;
-	for (round = 0; round < num_rounds && !did_it && !got_int; ++round)
+	இலக்கம்_rounds = maptype == MAPTYPE_UNMAP && !unmap_lhs_only ? 2 : 1;
+	க்கு (round = 0; round < இலக்கம்_rounds && !did_it && !got_int; ++round)
 	{
 	    // need to loop over all hash lists
-	    for (int hash = 0; hash < 256 && !got_int; ++hash)
+	    க்கு (முழு hash = 0; hash < 256 && !got_int; ++hash)
 	    {
-		if (abbrev)
+		எனில் (abbrev)
 		{
-		    if (hash > 0)	// there is only one abbreviation list
-			break;
+		    எனில் (hash > 0)	// there is only one abbreviation list
+			நிறுத்து;
 		    mpp = abbr_table;
 		}
-		else
+		இல்லையெனில்
 		    mpp = &(map_table[hash]);
-		for (mp = *mpp; mp != NULL && !got_int; mp = *mpp)
+		க்கு (mp = *mpp; mp != வெற்று && !got_int; mp = *mpp)
 		{
 
-		    if ((mp->m_mode & mode) == 0)
+		    எனில் ((mp->m_mode & mode) == 0)
 		    {
 			// skip entries with wrong mode
 			mpp = &(mp->m_next);
-			continue;
+			தொடர்;
 		    }
-		    if (!haskey)	// show all entries
+		    எனில் (!haskey)	// show all entries
 		    {
-			if (!mp->m_simplified)
+			எனில் (!mp->m_simplified)
 			{
 			    showmap(mp, map_table != maphash);
 			    did_it = TRUE;
 			}
 		    }
-		    else	// do we have a match?
+		    இல்லையெனில்	// do we have a match?
 		    {
-			if (round)	// second round: Try unmap "rhs" string
+			எனில் (round)	// second round: Try unmap "rhs" string
 			{
-			    n = (int)STRLEN(mp->m_str);
+			    n = (முழு)STRLEN(mp->m_str);
 			    p = mp->m_str;
 			}
-			else
+			இல்லையெனில்
 			{
 			    n = mp->m_keylen;
-			    p = mp->m_keys;
+			    p = mp->m_சாவிகள்;
 			}
-			if (STRNCMP(p, keys, (size_t)(n < len ? n : len)) == 0)
+			எனில் (STRNCMP(p, சாவிகள், (size_t)(n < len ? n : len)) == 0)
 			{
-			    if (maptype == MAPTYPE_UNMAP)
+			    எனில் (maptype == MAPTYPE_UNMAP)
 			    {
 				// Delete entry.
 				// Only accept a full match.  For abbreviations
 				// we ignore trailing space when matching with
 				// the "lhs", since an abbreviation can't have
 				// trailing space.
-				if (n != len && (!abbrev || round || n > len
-					       || *skipwhite(keys + n) != NUL))
+				எனில் (n != len && (!abbrev || round || n > len
+					       || *skipwhite(சாவிகள் + n) != NUL))
 				{
 				    mpp = &(mp->m_next);
-				    continue;
+				    தொடர்;
 				}
 				// In keyround for simplified keys, don't unmap
 				// a mapping without m_simplified flag.
-				if (keyround1_simplified && !mp->m_simplified)
-				    break;
+				எனில் (keyround1_simplified && !mp->m_simplified)
+				    நிறுத்து;
 				// We reset the indicated mode bits. If nothing
 				// is left the entry is deleted below.
 				mp->m_mode &= ~mode;
 				did_it = TRUE;	// remember we did something
 			    }
-			    else if (!hasarg)	// show matching entry
+			    இல்லையெனில் எனில் (!hasarg)	// show matching entry
 			    {
-				if (!mp->m_simplified)
+				எனில் (!mp->m_simplified)
 				{
 				    showmap(mp, map_table != maphash);
 				    did_it = TRUE;
 				}
 			    }
-			    else if (n != len)	// new entry is ambiguous
+			    இல்லையெனில் எனில் (n != len)	// new entry is ambiguous
 			    {
 				mpp = &(mp->m_next);
-				continue;
+				தொடர்;
 			    }
-			    else if (unique)
+			    இல்லையெனில் எனில் (unique)
 			    {
-				if (abbrev)
+				எனில் (abbrev)
 				    semsg(
 				      _(e_abbreviation_already_exists_for_str),
 					    p);
-				else
+				இல்லையெனில்
 				    semsg(_(e_mapping_already_exists_for_str),
 					    p);
 				retval = 5;
-				goto theend;
+				செல் theend;
 			    }
-			    else
+			    இல்லையெனில்
 			    {
 				// new rhs for existing entry
 				mp->m_mode &= ~mode;	// remove mode bits
-				if (mp->m_mode == 0 && !did_it) // reuse entry
+				எனில் (mp->m_mode == 0 && !did_it) // reuse entry
 				{
 				    char_u *newstr = vim_strsave(rhs);
 
-				    if (newstr == NULL)
+				    எனில் (newstr == வெற்று)
 				    {
 					retval = 4;		// no mem
-					goto theend;
+					செல் theend;
 				    }
-				    if (mp->m_alt != NULL)
-					mp->m_alt = mp->m_alt->m_alt = NULL;
+				    எனில் (mp->m_alt != வெற்று)
+					mp->m_alt = mp->m_alt->m_alt = வெற்று;
 				    vim_free(mp->m_str);
 				    mp->m_str = newstr;
 				    vim_free(mp->m_orig_str);
@@ -877,9 +877,9 @@ do_map(
 				    mp->m_mode = mode;
 				    mp->m_simplified = keyround1_simplified;
 #ifdef FEAT_EVAL
-				    mp->m_expr = expr;
+				    mp->m_கோவை = கோவை;
 				    mp->m_script_ctx = current_sctx;
-				    if (cmdmod.cmod_flags & CMOD_LEGACY)
+				    எனில் (cmdmod.cmod_flags & CMOD_LEGACY)
 					mp->m_script_ctx.sc_version = 1;
 				    mp->m_script_ctx.sc_lnum += SOURCING_LNUM;
 #endif
@@ -887,22 +887,22 @@ do_map(
 				    did_it = TRUE;
 				}
 			    }
-			    if (mp->m_mode == 0)  // entry can be deleted
+			    எனில் (mp->m_mode == 0)  // entry can be deleted
 			    {
 				map_free(mpp);
-				continue;	// continue with *mpp
+				தொடர்;	// continue with *mpp
 			    }
 
 			    // May need to put this entry into another hash
 			    // list.
-			    int new_hash = MAP_HASH(mp->m_mode, mp->m_keys[0]);
-			    if (!abbrev && new_hash != hash)
+			    முழு new_hash = MAP_HASH(mp->m_mode, mp->m_சாவிகள்[0]);
+			    எனில் (!abbrev && new_hash != hash)
 			    {
 				*mpp = mp->m_next;
 				mp->m_next = map_table[new_hash];
 				map_table[new_hash] = mp;
 
-				continue;	// continue with *mpp
+				தொடர்;	// continue with *mpp
 			    }
 			}
 		    }
@@ -911,131 +911,131 @@ do_map(
 	    }
 	}
 
-	if (maptype == MAPTYPE_UNMAP)
+	எனில் (maptype == MAPTYPE_UNMAP)
 	{
 	    // delete entry
-	    if (!did_it)
+	    எனில் (!did_it)
 	    {
-		if (!keyround1_simplified)
+		எனில் (!keyround1_simplified)
 		    retval = 2;		// no match
 	    }
-	    else if (*keys == Ctrl_C)
+	    இல்லையெனில் எனில் (*சாவிகள் == Ctrl_C)
 	    {
 		// If CTRL-C has been unmapped, reuse it for Interrupting.
-		if (map_table == curbuf->b_maphash)
+		எனில் (map_table == curbuf->b_maphash)
 		    curbuf->b_mapped_ctrl_c &= ~mode;
-		else
+		இல்லையெனில்
 		    mapped_ctrl_c &= ~mode;
 	    }
-	    continue;
+	    தொடர்;
 	}
 
-	if (!haskey || !hasarg)
+	எனில் (!haskey || !hasarg)
 	{
 	    // print entries
-	    if (!did_it && !did_local)
+	    எனில் (!did_it && !did_local)
 	    {
-		if (abbrev)
-		    msg(_("No abbreviation found"));
-		else
-		    msg(_("No mapping found"));
+		எனில் (abbrev)
+		    செய்தி(_("No abbreviation found"));
+		இல்லையெனில்
+		    செய்தி(_("No mapping found"));
 	    }
-	    goto theend;    // listing finished
+	    செல் theend;    // listing finished
 	}
 
-	if (did_it)
-	    continue;	// have added the new entry already
+	எனில் (did_it)
+	    தொடர்;	// have added the new entry already
 
 	// Get here when adding a new entry to the maphash[] list or abbrlist.
-	mp_result[keyround - 1] = map_add(map_table, abbr_table, keys,
+	mp_result[keyround - 1] = map_add(map_table, abbr_table, சாவிகள்,
 		    rhs, orig_rhs, noremap, nowait, silent, mode, abbrev,
 #ifdef FEAT_EVAL
-		    expr, /* sid */ 0, /* scriptversion */ 0, /* lnum */ 0,
+		    கோவை, /* sid */ 0, /* scriptversion */ 0, /* lnum */ 0,
 #endif
 		    keyround1_simplified);
-	if (mp_result[keyround - 1] == NULL)
+	எனில் (mp_result[keyround - 1] == வெற்று)
 	{
 	    retval = 4;	    // no mem
-	    goto theend;
+	    செல் theend;
 	}
     }
 
-    if (mp_result[0] != NULL && mp_result[1] != NULL)
+    எனில் (mp_result[0] != வெற்று && mp_result[1] != வெற்று)
     {
 	mp_result[0]->m_alt = mp_result[1];
 	mp_result[1]->m_alt = mp_result[0];
     }
 
 theend:
-    vim_free(keys_buf);
-    vim_free(alt_keys_buf);
+    vim_free(சாவிகள்_buf);
+    vim_free(alt_சாவிகள்_buf);
     vim_free(arg_buf);
-    return retval;
+    திரும்பு retval;
 }
 
 /*
  * Get the mapping mode from the command name.
  */
-    static int
-get_map_mode(char_u **cmdp, int forceit)
+    நிலையான முழு
+get_map_mode(char_u **cmdp, முழு forceit)
 {
     char_u	*p;
-    int		modec;
-    int		mode;
+    முழு		modec;
+    முழு		mode;
 
     p = *cmdp;
     modec = *p++;
-    if (modec == 'i')
-	mode = MODE_INSERT;				// :imap
-    else if (modec == 'l')
+    எனில் (modec == 'i')
+	mode = MODE_செருகு;				// :imap
+    இல்லையெனில் எனில் (modec == 'l')
 	mode = MODE_LANGMAP;				// :lmap
-    else if (modec == 'c')
+    இல்லையெனில் எனில் (modec == 'c')
 	mode = MODE_CMDLINE;				// :cmap
-    else if (modec == 'n' && *p != 'o')		    // avoid :noremap
+    இல்லையெனில் எனில் (modec == 'n' && *p != 'o')		    // avoid :noremap
 	mode = MODE_NORMAL;				// :nmap
-    else if (modec == 'v')
+    இல்லையெனில் எனில் (modec == 'v')
 	mode = MODE_VISUAL | MODE_SELECT;		// :vmap
-    else if (modec == 'x')
+    இல்லையெனில் எனில் (modec == 'x')
 	mode = MODE_VISUAL;				// :xmap
-    else if (modec == 's')
+    இல்லையெனில் எனில் (modec == 's')
 	mode = MODE_SELECT;			// :smap
-    else if (modec == 'o')
+    இல்லையெனில் எனில் (modec == 'o')
 	mode = MODE_OP_PENDING;			// :omap
-    else if (modec == 't')
+    இல்லையெனில் எனில் (modec == 't')
 	mode = MODE_TERMINAL;			// :tmap
-    else
+    இல்லையெனில்
     {
 	--p;
-	if (forceit)
-	    mode = MODE_INSERT | MODE_CMDLINE;		// :map !
-	else
+	எனில் (forceit)
+	    mode = MODE_செருகு | MODE_CMDLINE;		// :map !
+	இல்லையெனில்
 	    mode = MODE_VISUAL | MODE_SELECT | MODE_NORMAL | MODE_OP_PENDING;
 							// :map
     }
 
     *cmdp = p;
-    return mode;
+    திரும்பு mode;
 }
 
 /*
  * Clear all mappings (":mapclear") or abbreviations (":abclear").
  * "abbr" should be FALSE for mappings, TRUE for abbreviations.
  */
-    static void
+    நிலையான வெறுமை
 map_clear(
     char_u	*cmdp,
     char_u	*arg,
-    int		forceit,
-    int		abbr)
+    முழு		forceit,
+    முழு		abbr)
 {
-    int		mode;
-    int		local;
+    முழு		mode;
+    முழு		local;
 
     local = (STRCMP(arg, "<buffer>") == 0);
-    if (!local && *arg != NUL)
+    எனில் (!local && *arg != NUL)
     {
 	emsg(_(e_invalid_argument));
-	return;
+	திரும்பு;
     }
 
     mode = get_map_mode(&cmdp, forceit);
@@ -1046,81 +1046,81 @@ map_clear(
  * If "map_locked" is set then give an error and return TRUE.
  * Otherwise return FALSE.
  */
-    static int
-is_map_locked(void)
+    நிலையான முழு
+is_map_locked(வெறுமை)
 {
-    if (map_locked > 0)
+    எனில் (map_locked > 0)
     {
 	emsg(_(e_cannot_change_mappings_while_listing));
-	return TRUE;
+	திரும்பு TRUE;
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 /*
  * Clear all mappings in "mode".
  */
-    void
+    வெறுமை
 map_clear_mode(
     buf_T	*buf,		// buffer for local mappings
-    int		mode,		// mode in which to delete
-    int		local,		// TRUE for buffer-local mappings
-    int		abbr)		// TRUE for abbreviations
+    முழு		mode,		// mode in which to delete
+    முழு		local,		// TRUE for buffer-local mappings
+    முழு		abbr)		// TRUE for abbreviations
 {
     mapblock_T	*mp, **mpp;
-    int		hash;
-    int		new_hash;
+    முழு		hash;
+    முழு		new_hash;
 
-    if (is_map_locked())
-	return;
+    எனில் (is_map_locked())
+	திரும்பு;
 
     validate_maphash();
 
-    for (hash = 0; hash < 256; ++hash)
+    க்கு (hash = 0; hash < 256; ++hash)
     {
-	if (abbr)
+	எனில் (abbr)
 	{
-	    if (hash > 0)	// there is only one abbrlist
-		break;
-	    if (local)
+	    எனில் (hash > 0)	// there is only one abbrlist
+		நிறுத்து;
+	    எனில் (local)
 		mpp = &buf->b_first_abbr;
-	    else
+	    இல்லையெனில்
 		mpp = &first_abbr;
 	}
-	else
+	இல்லையெனில்
 	{
-	    if (local)
+	    எனில் (local)
 		mpp = &buf->b_maphash[hash];
-	    else
+	    இல்லையெனில்
 		mpp = &maphash[hash];
 	}
-	while (*mpp != NULL)
+	போது (*mpp != வெற்று)
 	{
 	    mp = *mpp;
-	    if (mp->m_mode & mode)
+	    எனில் (mp->m_mode & mode)
 	    {
 		mp->m_mode &= ~mode;
-		if (mp->m_mode == 0) // entry can be deleted
+		எனில் (mp->m_mode == 0) // entry can be deleted
 		{
 		    map_free(mpp);
-		    continue;
+		    தொடர்;
 		}
 		// May need to put this entry into another hash list.
-		new_hash = MAP_HASH(mp->m_mode, mp->m_keys[0]);
-		if (!abbr && new_hash != hash)
+		new_hash = MAP_HASH(mp->m_mode, mp->m_சாவிகள்[0]);
+		எனில் (!abbr && new_hash != hash)
 		{
 		    *mpp = mp->m_next;
-		    if (local)
+		    எனில் (local)
 		    {
 			mp->m_next = buf->b_maphash[new_hash];
 			buf->b_maphash[new_hash] = mp;
 		    }
-		    else
+		    இல்லையெனில்
 		    {
 			mp->m_next = maphash[new_hash];
 			maphash[new_hash] = mp;
 		    }
-		    continue;		// continue with *mpp
+		    தொடர்;		// continue with *mpp
 		}
 	    }
 	    mpp = &(mp->m_next);
@@ -1128,30 +1128,30 @@ map_clear_mode(
     }
 }
 
-#if defined(FEAT_EVAL)
-    int
+#எனில் defined(FEAT_EVAL)
+    முழு
 mode_str2flags(char_u *modechars)
 {
-    int		mode = 0;
+    முழு		mode = 0;
 
-    if (vim_strchr(modechars, 'n') != NULL)
+    எனில் (vim_strchr(modechars, 'n') != வெற்று)
 	mode |= MODE_NORMAL;
-    if (vim_strchr(modechars, 'v') != NULL)
+    எனில் (vim_strchr(modechars, 'v') != வெற்று)
 	mode |= MODE_VISUAL | MODE_SELECT;
-    if (vim_strchr(modechars, 'x') != NULL)
+    எனில் (vim_strchr(modechars, 'x') != வெற்று)
 	mode |= MODE_VISUAL;
-    if (vim_strchr(modechars, 's') != NULL)
+    எனில் (vim_strchr(modechars, 's') != வெற்று)
 	mode |= MODE_SELECT;
-    if (vim_strchr(modechars, 'o') != NULL)
+    எனில் (vim_strchr(modechars, 'o') != வெற்று)
 	mode |= MODE_OP_PENDING;
-    if (vim_strchr(modechars, 'i') != NULL)
-	mode |= MODE_INSERT;
-    if (vim_strchr(modechars, 'l') != NULL)
+    எனில் (vim_strchr(modechars, 'i') != வெற்று)
+	mode |= MODE_செருகு;
+    எனில் (vim_strchr(modechars, 'l') != வெற்று)
 	mode |= MODE_LANGMAP;
-    if (vim_strchr(modechars, 'c') != NULL)
+    எனில் (vim_strchr(modechars, 'c') != வெற்று)
 	mode |= MODE_CMDLINE;
 
-    return mode;
+    திரும்பு mode;
 }
 
 /*
@@ -1159,19 +1159,19 @@ mode_str2flags(char_u *modechars)
  * Recognize termcap codes in "str".
  * Also checks mappings local to the current buffer.
  */
-    int
-map_to_exists(char_u *str, char_u *modechars, int abbr)
+    முழு
+map_to_exists(char_u *str, char_u *modechars, முழு abbr)
 {
     char_u	*rhs;
     char_u	*buf;
-    int		retval;
+    முழு		retval;
 
-    rhs = replace_termcodes(str, &buf, 0, REPTERM_DO_LT, NULL);
+    rhs = replace_termcodes(str, &buf, 0, REPTERM_DO_LT, வெற்று);
 
     retval = map_to_exists_mode(rhs, mode_str2flags(modechars), abbr);
     vim_free(buf);
 
-    return retval;
+    திரும்பு retval;
 }
 #endif
 
@@ -1179,54 +1179,54 @@ map_to_exists(char_u *str, char_u *modechars, int abbr)
  * Return TRUE if a map exists that has "str" in the rhs for mode "mode".
  * Also checks mappings local to the current buffer.
  */
-    int
-map_to_exists_mode(char_u *rhs, int mode, int abbr)
+    முழு
+map_to_exists_mode(char_u *rhs, முழு mode, முழு abbr)
 {
     mapblock_T	*mp;
-    int		hash;
-    int		exp_buffer = FALSE;
+    முழு		hash;
+    முழு		exp_buffer = FALSE;
 
     validate_maphash();
 
     // Do it twice: once for global maps and once for local maps.
-    for (;;)
+    க்கு (;;)
     {
-	for (hash = 0; hash < 256; ++hash)
+	க்கு (hash = 0; hash < 256; ++hash)
 	{
-	    if (abbr)
+	    எனில் (abbr)
 	    {
-		if (hash > 0)		// there is only one abbr list
-		    break;
-		if (exp_buffer)
+		எனில் (hash > 0)		// there is only one abbr list
+		    நிறுத்து;
+		எனில் (exp_buffer)
 		    mp = curbuf->b_first_abbr;
-		else
+		இல்லையெனில்
 		    mp = first_abbr;
 	    }
-	    else if (exp_buffer)
+	    இல்லையெனில் எனில் (exp_buffer)
 		mp = curbuf->b_maphash[hash];
-	    else
+	    இல்லையெனில்
 		mp = maphash[hash];
-	    for (; mp; mp = mp->m_next)
+	    க்கு (; mp; mp = mp->m_next)
 	    {
-		if ((mp->m_mode & mode)
-			&& strstr((char *)mp->m_str, (char *)rhs) != NULL)
-		    return TRUE;
+		எனில் ((mp->m_mode & mode)
+			&& strstr((எழுத்து *)mp->m_str, (எழுத்து *)rhs) != வெற்று)
+		    திரும்பு TRUE;
 	    }
 	}
-	if (exp_buffer)
-	    break;
+	எனில் (exp_buffer)
+	    நிறுத்து;
 	exp_buffer = TRUE;
     }
 
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 /*
  * Used below when expanding mapping/abbreviation names.
  */
-static int	expand_mapmodes = 0;
-static int	expand_isabbrev = 0;
-static int	expand_buffer = FALSE;
+நிலையான முழு	expand_mapmodes = 0;
+நிலையான முழு	expand_isabbrev = 0;
+நிலையான முழு	expand_buffer = FALSE;
 
 /*
  * Translate an internal mapping/abbreviation representation into the
@@ -1242,65 +1242,65 @@ static int	expand_buffer = FALSE;
  *
  * Returns NULL when there is a problem.
  */
-    static char_u *
+    நிலையான char_u *
 translate_mapping(char_u *str)
 {
     garray_T	ga;
-    int		c;
-    int		modifiers;
-    int		cpo_bslash;
-    int		cpo_special;
+    முழு		c;
+    முழு		modifiers;
+    முழு		cpo_bslash;
+    முழு		cpo_special;
 
     ga_init(&ga);
     ga.ga_itemsize = 1;
     ga.ga_growsize = 40;
 
-    cpo_bslash = (vim_strchr(p_cpo, CPO_BSLASH) != NULL);
-    cpo_special = (vim_strchr(p_cpo, CPO_SPECI) != NULL);
+    cpo_bslash = (vim_strchr(p_cpo, CPO_BSLASH) != வெற்று);
+    cpo_special = (vim_strchr(p_cpo, CPO_SPECI) != வெற்று);
 
-    for (; *str; ++str)
+    க்கு (; *str; ++str)
     {
 	c = *str;
-	if (c == K_SPECIAL && str[1] != NUL && str[2] != NUL)
+	எனில் (c == K_SPECIAL && str[1] != NUL && str[2] != NUL)
 	{
 	    modifiers = 0;
-	    if (str[1] == KS_MODIFIER)
+	    எனில் (str[1] == KS_MODIFIER)
 	    {
 		str++;
 		modifiers = *++str;
 		c = *++str;
 	    }
-	    if (c == K_SPECIAL && str[1] != NUL && str[2] != NUL)
+	    எனில் (c == K_SPECIAL && str[1] != NUL && str[2] != NUL)
 	    {
-		if (cpo_special)
+		எனில் (cpo_special)
 		{
 		    ga_clear(&ga);
-		    return NULL;
+		    திரும்பு வெற்று;
 		}
 		c = TO_SPECIAL(str[1], str[2]);
-		if (c == K_ZERO)	// display <Nul> as ^@
+		எனில் (c == K_ZERO)	// display <Nul> as ^@
 		    c = NUL;
 		str += 2;
 	    }
-	    if (IS_SPECIAL(c) || modifiers)	// special key
+	    எனில் (IS_SPECIAL(c) || modifiers)	// special key
 	    {
-		if (cpo_special)
+		எனில் (cpo_special)
 		{
 		    ga_clear(&ga);
-		    return NULL;
+		    திரும்பு வெற்று;
 		}
-		ga_concat(&ga, get_special_key_name(c, modifiers));
-		continue; // for (str)
+		ga_concat(&ga, get_special_சாவி_name(c, modifiers));
+		தொடர்; // for (str)
 	    }
 	}
-	if (c == ' ' || c == '\t' || c == Ctrl_J || c == Ctrl_V
+	எனில் (c == ' ' || c == '\t' || c == Ctrl_J || c == Ctrl_V
 	    || (c == '<' && !cpo_special) || (c == '\\' && !cpo_bslash))
 	    ga_append(&ga, cpo_bslash ? Ctrl_V : '\\');
-	if (c)
+	எனில் (c)
 	    ga_append(&ga, c);
     }
     ga_append(&ga, NUL);
-    return (char_u *)(ga.ga_data);
+    திரும்பு (char_u *)(ga.ga_data);
 }
 
 /*
@@ -1312,73 +1312,73 @@ set_context_in_map_cmd(
     expand_T	*xp,
     char_u	*cmd,
     char_u	*arg,
-    int		forceit,	// TRUE if '!' given
-    int		isabbrev,	// TRUE if abbreviation
-    int		isunmap,	// TRUE if unmap/unabbrev command
+    முழு		forceit,	// TRUE if '!' given
+    முழு		isabbrev,	// TRUE if abbreviation
+    முழு		isunmap,	// TRUE if unmap/unabbrev command
     cmdidx_T	cmdidx)
 {
-    if (forceit && cmdidx != CMD_map && cmdidx != CMD_unmap)
+    எனில் (forceit && cmdidx != CMD_map && cmdidx != CMD_unmap)
 	xp->xp_context = EXPAND_NOTHING;
-    else
+    இல்லையெனில்
     {
-	if (isunmap)
+	எனில் (isunmap)
 	    expand_mapmodes = get_map_mode(&cmd, forceit || isabbrev);
-	else
+	இல்லையெனில்
 	{
-	    expand_mapmodes = MODE_INSERT | MODE_CMDLINE;
-	    if (!isabbrev)
+	    expand_mapmodes = MODE_செருகு | MODE_CMDLINE;
+	    எனில் (!isabbrev)
 		expand_mapmodes += MODE_VISUAL | MODE_SELECT | MODE_NORMAL
 							     | MODE_OP_PENDING;
 	}
 	expand_isabbrev = isabbrev;
 	xp->xp_context = EXPAND_MAPPINGS;
 	expand_buffer = FALSE;
-	for (;;)
+	க்கு (;;)
 	{
-	    if (STRNCMP(arg, "<buffer>", 8) == 0)
+	    எனில் (STRNCMP(arg, "<buffer>", 8) == 0)
 	    {
 		expand_buffer = TRUE;
 		arg = skipwhite(arg + 8);
-		continue;
+		தொடர்;
 	    }
-	    if (STRNCMP(arg, "<unique>", 8) == 0)
+	    எனில் (STRNCMP(arg, "<unique>", 8) == 0)
 	    {
 		arg = skipwhite(arg + 8);
-		continue;
+		தொடர்;
 	    }
-	    if (STRNCMP(arg, "<nowait>", 8) == 0)
+	    எனில் (STRNCMP(arg, "<nowait>", 8) == 0)
 	    {
 		arg = skipwhite(arg + 8);
-		continue;
+		தொடர்;
 	    }
-	    if (STRNCMP(arg, "<silent>", 8) == 0)
+	    எனில் (STRNCMP(arg, "<silent>", 8) == 0)
 	    {
 		arg = skipwhite(arg + 8);
-		continue;
+		தொடர்;
 	    }
-	    if (STRNCMP(arg, "<special>", 9) == 0)
+	    எனில் (STRNCMP(arg, "<special>", 9) == 0)
 	    {
 		arg = skipwhite(arg + 9);
-		continue;
+		தொடர்;
 	    }
 #ifdef FEAT_EVAL
-	    if (STRNCMP(arg, "<script>", 8) == 0)
+	    எனில் (STRNCMP(arg, "<script>", 8) == 0)
 	    {
 		arg = skipwhite(arg + 8);
-		continue;
+		தொடர்;
 	    }
-	    if (STRNCMP(arg, "<expr>", 6) == 0)
+	    எனில் (STRNCMP(arg, "<expr>", 6) == 0)
 	    {
 		arg = skipwhite(arg + 6);
-		continue;
+		தொடர்;
 	    }
 #endif
-	    break;
+	    நிறுத்து;
 	}
 	xp->xp_pattern = arg;
     }
 
-    return NULL;
+    திரும்பு வெற்று;
 }
 
 /*
@@ -1386,157 +1386,157 @@ set_context_in_map_cmd(
  * For command line expansion of ":[un]map" and ":[un]abbrev" in all modes.
  * Return OK if matches found, FAIL otherwise.
  */
-    int
+    முழு
 ExpandMappings(
     char_u	*pat,
     regmatch_T	*regmatch,
-    int		*numMatches,
+    முழு		*இலக்கம்_Matches,
     char_u	***matches)
 {
     mapblock_T	*mp;
     garray_T	ga;
-    int		hash;
-    int		count;
+    முழு		hash;
+    முழு		மொத்தம்;
     char_u	*p;
-    int		i;
-    int		fuzzy;
-    int		match;
-    int		score = 0;
+    முழு		i;
+    முழு		fuzzy;
+    முழு		match;
+    முழு		score = 0;
     fuzmatch_str_T  *fuzmatch;
 
     fuzzy = cmdline_fuzzy_complete(pat);
 
     validate_maphash();
 
-    *numMatches = 0;		    // return values in case of FAIL
-    *matches = NULL;
+    *இலக்கம்_Matches = 0;		    // return values in case of FAIL
+    *matches = வெற்று;
 
-    if (!fuzzy)
-	ga_init2(&ga, sizeof(char *), 3);
-    else
-	ga_init2(&ga, sizeof(fuzmatch_str_T), 3);
+    எனில் (!fuzzy)
+	ga_init2(&ga, அளவு(எழுத்து *), 3);
+    இல்லையெனில்
+	ga_init2(&ga, அளவு(fuzmatch_str_T), 3);
 
     // First search in map modifier arguments
-    for (i = 0; i < 7; ++i)
+    க்கு (i = 0; i < 7; ++i)
     {
-	if (i == 0)
+	எனில் (i == 0)
 	    p = (char_u *)"<silent>";
-	else if (i == 1)
+	இல்லையெனில் எனில் (i == 1)
 	    p = (char_u *)"<unique>";
 #ifdef FEAT_EVAL
-	else if (i == 2)
+	இல்லையெனில் எனில் (i == 2)
 	    p = (char_u *)"<script>";
-	else if (i == 3)
+	இல்லையெனில் எனில் (i == 3)
 	    p = (char_u *)"<expr>";
 #endif
-	else if (i == 4 && !expand_buffer)
+	இல்லையெனில் எனில் (i == 4 && !expand_buffer)
 	    p = (char_u *)"<buffer>";
-	else if (i == 5)
+	இல்லையெனில் எனில் (i == 5)
 	    p = (char_u *)"<nowait>";
-	else if (i == 6)
+	இல்லையெனில் எனில் (i == 6)
 	    p = (char_u *)"<special>";
-	else
-	    continue;
+	இல்லையெனில்
+	    தொடர்;
 
-	if (!fuzzy)
+	எனில் (!fuzzy)
 	    match = vim_regexec(regmatch, p, (colnr_T)0);
-	else
+	இல்லையெனில்
 	{
 	    score = fuzzy_match_str(p, pat);
 	    match = (score != FUZZY_SCORE_NONE);
 	}
 
-	if (!match)
-	    continue;
+	எனில் (!match)
+	    தொடர்;
 
-	if (ga_grow(&ga, 1) == FAIL)
-	    break;
+	எனில் (ga_grow(&ga, 1) == FAIL)
+	    நிறுத்து;
 
-	if (fuzzy)
+	எனில் (fuzzy)
 	{
 	    fuzmatch = &((fuzmatch_str_T *)ga.ga_data)[ga.ga_len];
 	    fuzmatch->idx = ga.ga_len;
 	    fuzmatch->str = vim_strsave(p);
 	    fuzmatch->score = score;
 	}
-	else
+	இல்லையெனில்
 	    ((char_u **)ga.ga_data)[ga.ga_len] = vim_strsave(p);
 	++ga.ga_len;
     }
 
-    for (hash = 0; hash < 256; ++hash)
+    க்கு (hash = 0; hash < 256; ++hash)
     {
-	if (expand_isabbrev)
+	எனில் (expand_isabbrev)
 	{
-	    if (hash > 0)	// only one abbrev list
-		break; // for (hash)
+	    எனில் (hash > 0)	// only one abbrev list
+		நிறுத்து; // for (hash)
 	    mp = first_abbr;
 	}
-	else if (expand_buffer)
+	இல்லையெனில் எனில் (expand_buffer)
 	    mp = curbuf->b_maphash[hash];
-	else
+	இல்லையெனில்
 	    mp = maphash[hash];
-	for (; mp; mp = mp->m_next)
+	க்கு (; mp; mp = mp->m_next)
 	{
-	    if (mp->m_simplified || !(mp->m_mode & expand_mapmodes))
-		continue;
+	    எனில் (mp->m_simplified || !(mp->m_mode & expand_mapmodes))
+		தொடர்;
 
-	    p = translate_mapping(mp->m_keys);
-	    if (p == NULL)
-		continue;
+	    p = translate_mapping(mp->m_சாவிகள்);
+	    எனில் (p == வெற்று)
+		தொடர்;
 
-	    if (!fuzzy)
+	    எனில் (!fuzzy)
 		match = vim_regexec(regmatch, p, (colnr_T)0);
-	    else
+	    இல்லையெனில்
 	    {
 		score = fuzzy_match_str(p, pat);
 		match = (score != FUZZY_SCORE_NONE);
 	    }
 
-	    if (!match)
+	    எனில் (!match)
 	    {
 		vim_free(p);
-		continue;
+		தொடர்;
 	    }
 
-	    if (ga_grow(&ga, 1) == FAIL)
+	    எனில் (ga_grow(&ga, 1) == FAIL)
 	    {
 		vim_free(p);
-		break;
+		நிறுத்து;
 	    }
 
-	    if (fuzzy)
+	    எனில் (fuzzy)
 	    {
 		fuzmatch = &((fuzmatch_str_T *)ga.ga_data)[ga.ga_len];
 		fuzmatch->idx = ga.ga_len;
 		fuzmatch->str = p;
 		fuzmatch->score = score;
 	    }
-	    else
+	    இல்லையெனில்
 		((char_u **)ga.ga_data)[ga.ga_len] = p;
 
 	    ++ga.ga_len;
 	} // for (mp)
     } // for (hash)
 
-    if (ga.ga_len == 0)
-	return FAIL;
+    எனில் (ga.ga_len == 0)
+	திரும்பு FAIL;
 
-    if (!fuzzy)
+    எனில் (!fuzzy)
     {
 	*matches = ga.ga_data;
-	*numMatches = ga.ga_len;
+	*இலக்கம்_Matches = ga.ga_len;
     }
-    else
+    இல்லையெனில்
     {
-	if (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
+	எனில் (fuzzymatches_to_strmatches(ga.ga_data, matches, ga.ga_len,
 							FALSE) == FAIL)
-	    return FAIL;
-	*numMatches = ga.ga_len;
+	    திரும்பு FAIL;
+	*இலக்கம்_Matches = ga.ga_len;
     }
 
-    count = *numMatches;
-    if (count > 1)
+    மொத்தம் = *இலக்கம்_Matches;
+    எனில் (மொத்தம் > 1)
     {
 	char_u	**ptr1;
 	char_u	**ptr2;
@@ -1544,28 +1544,28 @@ ExpandMappings(
 
 	// Sort the matches
 	// Fuzzy matching already sorts the matches
-	if (!fuzzy)
-	    sort_strings(*matches, count);
+	எனில் (!fuzzy)
+	    sort_strings(*matches, மொத்தம்);
 
 	// Remove multiple entries
 	ptr1 = *matches;
 	ptr2 = ptr1 + 1;
-	ptr3 = ptr1 + count;
+	ptr3 = ptr1 + மொத்தம்;
 
-	while (ptr2 < ptr3)
+	போது (ptr2 < ptr3)
 	{
-	    if (STRCMP(*ptr1, *ptr2) != 0)
+	    எனில் (STRCMP(*ptr1, *ptr2) != 0)
 		*++ptr1 = *ptr2++;
-	    else
+	    இல்லையெனில்
 	    {
 		vim_free(*ptr2++);
-		count--;
+		மொத்தம்--;
 	    }
 	}
     }
 
-    *numMatches = count;
-    return (count == 0 ? FAIL : OK);
+    *இலக்கம்_Matches = மொத்தம்;
+    திரும்பு (மொத்தம் == 0 ? FAIL : OK);
 }
 
 /*
@@ -1586,108 +1586,108 @@ ExpandMappings(
  *
  * return TRUE if there is an abbreviation, FALSE if not
  */
-    int
+    முழு
 check_abbr(
-    int		c,
+    முழு		c,
     char_u	*ptr,
-    int		col,
-    int		mincol)
+    முழு		col,
+    முழு		mincol)
 {
-    int		len;
-    int		scol;		// starting column of the abbr.
-    int		j;
+    முழு		len;
+    முழு		scol;		// starting column of the abbr.
+    முழு		j;
     char_u	*s;
     char_u	tb[MB_MAXBYTES + 4];
     mapblock_T	*mp;
     mapblock_T	*mp2;
-    int		clen = 0;	// length in characters
-    int		is_id = TRUE;
-    int		vim_abbr;
+    முழு		clen = 0;	// length in characters
+    முழு		is_id = TRUE;
+    முழு		vim_abbr;
 
-    if (typebuf.tb_no_abbr_cnt)	// abbrev. are not recursive
-	return FALSE;
+    எனில் (typebuf.tb_no_abbr_cnt)	// abbrev. are not recursive
+	திரும்பு FALSE;
 
     // no remapping implies no abbreviation, except for CTRL-]
-    if (noremap_keys() && c != Ctrl_RSB)
-	return FALSE;
+    எனில் (noremap_சாவிகள்() && c != Ctrl_RSB)
+	திரும்பு FALSE;
 
     // Check for word before the cursor: If it ends in a keyword char all
     // chars before it must be keyword chars or non-keyword chars, but not
     // white space. If it ends in a non-keyword char we accept any characters
     // before it except white space.
-    if (col == 0)				// cannot be an abbr.
-	return FALSE;
+    எனில் (col == 0)				// cannot be an abbr.
+	திரும்பு FALSE;
 
-    if (has_mbyte)
+    எனில் (has_mbyte)
     {
 	char_u *p;
 
 	p = mb_prevptr(ptr, ptr + col);
-	if (!vim_iswordp(p))
+	எனில் (!vim_iswordp(p))
 	    vim_abbr = TRUE;			// Vim added abbr.
-	else
+	இல்லையெனில்
 	{
 	    vim_abbr = FALSE;			// vi compatible abbr.
-	    if (p > ptr)
+	    எனில் (p > ptr)
 		is_id = vim_iswordp(mb_prevptr(ptr, p));
 	}
 	clen = 1;
-	while (p > ptr + mincol)
+	போது (p > ptr + mincol)
 	{
 	    p = mb_prevptr(ptr, p);
-	    if (vim_isspace(*p) || (!vim_abbr && is_id != vim_iswordp(p)))
+	    எனில் (vim_isspace(*p) || (!vim_abbr && is_id != vim_iswordp(p)))
 	    {
 		p += (*mb_ptr2len)(p);
-		break;
+		நிறுத்து;
 	    }
 	    ++clen;
 	}
-	scol = (int)(p - ptr);
+	scol = (முழு)(p - ptr);
     }
-    else
+    இல்லையெனில்
     {
-	if (!vim_iswordc(ptr[col - 1]))
+	எனில் (!vim_iswordc(ptr[col - 1]))
 	    vim_abbr = TRUE;			// Vim added abbr.
-	else
+	இல்லையெனில்
 	{
 	    vim_abbr = FALSE;			// vi compatible abbr.
-	    if (col > 1)
+	    எனில் (col > 1)
 		is_id = vim_iswordc(ptr[col - 2]);
 	}
-	for (scol = col - 1; scol > 0 && !vim_isspace(ptr[scol - 1])
+	க்கு (scol = col - 1; scol > 0 && !vim_isspace(ptr[scol - 1])
 		&& (vim_abbr || is_id == vim_iswordc(ptr[scol - 1])); --scol)
 	    ;
     }
 
-    if (scol < mincol)
+    எனில் (scol < mincol)
 	scol = mincol;
-    if (scol < col)		// there is a word in front of the cursor
+    எனில் (scol < col)		// there is a word in front of the cursor
     {
 	ptr += scol;
 	len = col - scol;
 	mp = curbuf->b_first_abbr;
 	mp2 = first_abbr;
-	if (mp == NULL)
+	எனில் (mp == வெற்று)
 	{
 	    mp = mp2;
-	    mp2 = NULL;
+	    mp2 = வெற்று;
 	}
-	for ( ; mp; mp->m_next == NULL
-				  ? (mp = mp2, mp2 = NULL) : (mp = mp->m_next))
+	க்கு ( ; mp; mp->m_next == வெற்று
+				  ? (mp = mp2, mp2 = வெற்று) : (mp = mp->m_next))
 	{
-	    int		qlen = mp->m_keylen;
-	    char_u	*q = mp->m_keys;
-	    int		match;
+	    முழு		qlen = mp->m_keylen;
+	    char_u	*q = mp->m_சாவிகள்;
+	    முழு		match;
 
-	    if (vim_strbyte(mp->m_keys, K_SPECIAL) != NULL)
+	    எனில் (vim_strbyte(mp->m_சாவிகள், K_SPECIAL) != வெற்று)
 	    {
-		char_u *qe = vim_strsave(mp->m_keys);
+		char_u *qe = vim_strsave(mp->m_சாவிகள்);
 
 		// might have CSI escaped mp->m_keys
-		if (qe != NULL)
+		எனில் (qe != வெற்று)
 		{
 		    q = qe;
-		    qlen = (int)vim_unescape_csi(q);
+		    qlen = (முழு)vim_unescape_csi(q);
 		}
 	    }
 
@@ -1695,17 +1695,17 @@ check_abbr(
 	    match =    (mp->m_mode & State)
 		    && qlen == len
 		    && STRNCMP(q, ptr, (size_t)len) == 0;
-	    if (q != mp->m_keys)
+	    எனில் (q != mp->m_சாவிகள்)
 		vim_free(q);
-	    if (match)
-		break;
+	    எனில் (match)
+		நிறுத்து;
 	}
-	if (mp != NULL)
+	எனில் (mp != வெற்று)
 	{
-	    int	noremap;
-	    int silent;
+	    முழு	noremap;
+	    முழு silent;
 #ifdef FEAT_EVAL
-	    int expr;
+	    முழு கோவை;
 #endif
 
 	    // Found a match:
@@ -1720,80 +1720,80 @@ check_abbr(
 	    // Character CTRL-] is treated specially - it completes the
 	    // abbreviation, but is not inserted into the input stream.
 	    j = 0;
-	    if (c != Ctrl_RSB)
+	    எனில் (c != Ctrl_RSB)
 	    {
 					// special key code, split up
-		if (IS_SPECIAL(c) || c == K_SPECIAL)
+		எனில் (IS_SPECIAL(c) || c == K_SPECIAL)
 		{
 		    tb[j++] = K_SPECIAL;
 		    tb[j++] = K_SECOND(c);
 		    tb[j++] = K_THIRD(c);
 		}
-		else
+		இல்லையெனில்
 		{
-		    if (c < ABBR_OFF && (c < ' ' || c > '~'))
+		    எனில் (c < ABBR_OFF && (c < ' ' || c > '~'))
 			tb[j++] = Ctrl_V;	// special char needs CTRL-V
-		    if (has_mbyte)
+		    எனில் (has_mbyte)
 		    {
-			int	newlen;
+			முழு	newlen;
 			char_u	*escaped;
 
 			// if ABBR_OFF has been added, remove it here
-			if (c >= ABBR_OFF)
+			எனில் (c >= ABBR_OFF)
 			    c -= ABBR_OFF;
 			newlen = (*mb_char2bytes)(c, tb + j);
 			tb[j + newlen] = NUL;
 			// Need to escape K_SPECIAL.
 			escaped = vim_strsave_escape_csi(tb + j);
-			if (escaped != NULL)
+			எனில் (escaped != வெற்று)
 			{
-			    newlen = (int)STRLEN(escaped);
+			    newlen = (முழு)STRLEN(escaped);
 			    mch_memmove(tb + j, escaped, newlen);
 			    j += newlen;
 			    vim_free(escaped);
 			}
 		    }
-		    else
+		    இல்லையெனில்
 			tb[j++] = c;
 		}
 		tb[j] = NUL;
 					// insert the last typed char
-		(void)ins_typebuf(tb, 1, 0, TRUE, mp->m_silent);
+		(வெறுமை)ins_typebuf(tb, 1, 0, TRUE, mp->m_silent);
 	    }
 
 	    // copy values here, calling eval_map_expr() may make "mp" invalid!
 	    noremap = mp->m_noremap;
 	    silent = mp->m_silent;
 #ifdef FEAT_EVAL
-	    expr = mp->m_expr;
+	    கோவை = mp->m_கோவை;
 
-	    if (expr)
-		s = eval_map_expr(mp, c);
-	    else
+	    எனில் (கோவை)
+		s = eval_map_கோவை(mp, c);
+	    இல்லையெனில்
 #endif
 		s = mp->m_str;
-	    if (s != NULL)
+	    எனில் (s != வெற்று)
 	    {
 					// insert the to string
-		(void)ins_typebuf(s, noremap, 0, TRUE, silent);
+		(வெறுமை)ins_typebuf(s, noremap, 0, TRUE, silent);
 					// no abbrev. for these chars
-		typebuf.tb_no_abbr_cnt += (int)STRLEN(s) + j + 1;
+		typebuf.tb_no_abbr_cnt += (முழு)STRLEN(s) + j + 1;
 #ifdef FEAT_EVAL
-		if (expr)
+		எனில் (கோவை)
 		    vim_free(s);
 #endif
 	    }
 
 	    tb[0] = Ctrl_H;
 	    tb[1] = NUL;
-	    if (has_mbyte)
+	    எனில் (has_mbyte)
 		len = clen;	// Delete characters instead of bytes
-	    while (len-- > 0)		// delete the from string
-		(void)ins_typebuf(tb, 1, 0, TRUE, silent);
-	    return TRUE;
+	    போது (len-- > 0)		// delete the from string
+		(வெறுமை)ins_typebuf(tb, 1, 0, TRUE, silent);
+	    திரும்பு TRUE;
 	}
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 #ifdef FEAT_EVAL
@@ -1803,25 +1803,25 @@ check_abbr(
  * Careful: after this "mp" will be invalid if the mapping was deleted.
  */
     char_u *
-eval_map_expr(
+eval_map_கோவை(
     mapblock_T	*mp,
-    int		c)	    // NUL or typed character for abbreviation
+    முழு		c)	    // NUL or typed character for abbreviation
 {
     char_u	*res;
     char_u	*p;
-    char_u	*expr;
+    char_u	*கோவை;
     pos_T	save_cursor;
-    int		save_msg_col;
-    int		save_msg_row;
+    முழு		save_செய்தி_col;
+    முழு		save_செய்தி_row;
     scid_T	save_sctx_sid = current_sctx.sc_sid;
-    int		save_sctx_version = current_sctx.sc_version;
+    முழு		save_sctx_version = current_sctx.sc_version;
 
     // Remove escaping of CSI, because "str" is in a format to be used as
     // typeahead.
-    expr = vim_strsave(mp->m_str);
-    if (expr == NULL)
-	return NULL;
-    vim_unescape_csi(expr);
+    கோவை = vim_strsave(mp->m_str);
+    எனில் (கோவை == வெற்று)
+	திரும்பு வெற்று;
+    vim_unescape_csi(கோவை);
 
     // Forbid changing text or using ":normal" to avoid most of the bad side
     // effects.  Also restore the cursor position.
@@ -1829,33 +1829,33 @@ eval_map_expr(
     ++ex_normal_lock;
     set_vim_var_char(c);  // set v:char to the typed character
     save_cursor = curwin->w_cursor;
-    save_msg_col = msg_col;
-    save_msg_row = msg_row;
+    save_செய்தி_col = செய்தி_col;
+    save_செய்தி_row = செய்தி_row;
 
     current_sctx.sc_version = mp->m_script_ctx.sc_version;
-    if (mp->m_script_ctx.sc_version == SCRIPT_VERSION_VIM9)
+    எனில் (mp->m_script_ctx.sc_version == SCRIPT_VERSION_VIM9)
 	current_sctx.sc_sid = mp->m_script_ctx.sc_sid;
 
     // Note: the evaluation may make "mp" invalid.
-    p = eval_to_string(expr, FALSE, FALSE);
+    p = eval_to_string(கோவை, FALSE, FALSE);
 
     --textlock;
     --ex_normal_lock;
     curwin->w_cursor = save_cursor;
-    msg_col = save_msg_col;
-    msg_row = save_msg_row;
+    செய்தி_col = save_செய்தி_col;
+    செய்தி_row = save_செய்தி_row;
     current_sctx.sc_sid = save_sctx_sid;
     current_sctx.sc_version = save_sctx_version;
 
-    vim_free(expr);
+    vim_free(கோவை);
 
-    if (p == NULL)
-	return NULL;
+    எனில் (p == வெற்று)
+	திரும்பு வெற்று;
     // Escape CSI in the result to be able to use the string as typeahead.
     res = vim_strsave_escape_csi(p);
     vim_free(p);
 
-    return res;
+    திரும்பு res;
 }
 #endif
 
@@ -1874,13 +1874,13 @@ vim_strsave_escape_csi(char_u *p)
     // illegal utf-8 byte:
     // 0xc0 -> 0xc3 0x80 -> 0xc3 K_SPECIAL KS_SPECIAL KE_FILLER
     res = alloc(STRLEN(p) * 4 + 1);
-    if (res == NULL)
-	return NULL;
+    எனில் (res == வெற்று)
+	திரும்பு வெற்று;
 
     d = res;
-    for (s = p; *s != NUL; )
+    க்கு (s = p; *s != NUL; )
     {
-	if ((s[0] == K_SPECIAL
+	எனில் ((s[0] == K_SPECIAL
 #ifdef FEAT_GUI
 		    || (gui.in_use && s[0] == CSI)
 #endif
@@ -1891,7 +1891,7 @@ vim_strsave_escape_csi(char_u *p)
 	    *d++ = *s++;
 	    *d++ = *s++;
 	}
-	else
+	இல்லையெனில்
 	{
 	    // Add character, possibly multi-byte to destination, escaping
 	    // CSI and K_SPECIAL. Be careful, it can be an illegal byte!
@@ -1901,7 +1901,7 @@ vim_strsave_escape_csi(char_u *p)
     }
     *d = NUL;
 
-    return res;
+    திரும்பு res;
 }
 
 /*
@@ -1914,31 +1914,31 @@ vim_unescape_csi(char_u *p)
 {
     char_u	*s = p, *d = p;
 
-    while (*s != NUL)
+    போது (*s != NUL)
     {
-	if (s[0] == K_SPECIAL && s[1] == KS_SPECIAL && s[2] == KE_FILLER)
+	எனில் (s[0] == K_SPECIAL && s[1] == KS_SPECIAL && s[2] == KE_FILLER)
 	{
 	    *d++ = K_SPECIAL;
 	    s += 3;
 	}
-	else if ((s[0] == K_SPECIAL || s[0] == CSI)
-				   && s[1] == KS_EXTRA && s[2] == (int)KE_CSI)
+	இல்லையெனில் எனில் ((s[0] == K_SPECIAL || s[0] == CSI)
+				   && s[1] == KS_EXTRA && s[2] == (முழு)KE_CSI)
 	{
 	    *d++ = CSI;
 	    s += 3;
 	}
-	else
+	இல்லையெனில்
 	    *d++ = *s++;
     }
     *d = NUL;
-    return (size_t)(d - p);
+    திரும்பு (size_t)(d - p);
 }
 
 /*
  * Write map commands for the current mappings to an .exrc file.
  * Return FAIL on error, OK otherwise.
  */
-    int
+    முழு
 makemap(
     FILE	*fd,
     buf_T	*buf)	    // buffer for local mappings or NULL
@@ -1946,54 +1946,54 @@ makemap(
     mapblock_T	*mp;
     char_u	c1, c2, c3;
     char_u	*p;
-    char	*cmd;
-    int		abbr;
-    int		hash;
-    int		did_cpo = FALSE;
-    int		i;
+    எழுத்து	*cmd;
+    முழு		abbr;
+    முழு		hash;
+    முழு		did_cpo = FALSE;
+    முழு		i;
 
     validate_maphash();
 
     // Do the loop twice: Once for mappings, once for abbreviations.
     // Then loop over all map hash lists.
-    for (abbr = 0; abbr < 2; ++abbr)
-	for (hash = 0; hash < 256; ++hash)
+    க்கு (abbr = 0; abbr < 2; ++abbr)
+	க்கு (hash = 0; hash < 256; ++hash)
 	{
-	    if (abbr)
+	    எனில் (abbr)
 	    {
-		if (hash > 0)		// there is only one abbr list
-		    break;
-		if (buf != NULL)
+		எனில் (hash > 0)		// there is only one abbr list
+		    நிறுத்து;
+		எனில் (buf != வெற்று)
 		    mp = buf->b_first_abbr;
-		else
+		இல்லையெனில்
 		    mp = first_abbr;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
-		if (buf != NULL)
+		எனில் (buf != வெற்று)
 		    mp = buf->b_maphash[hash];
-		else
+		இல்லையெனில்
 		    mp = maphash[hash];
 	    }
 
-	    for ( ; mp; mp = mp->m_next)
+	    க்கு ( ; mp; mp = mp->m_next)
 	    {
 		// simplified map blocks are not created explicitly
-		if (mp->m_simplified)
-		    continue;
+		எனில் (mp->m_simplified)
+		    தொடர்;
 
 		// skip script-local mappings
-		if (mp->m_noremap == REMAP_SCRIPT)
-		    continue;
+		எனில் (mp->m_noremap == REMAP_SCRIPT)
+		    தொடர்;
 
 		// skip mappings that contain a <SNR> (script-local thing),
 		// they probably don't work when loaded again
-		for (p = mp->m_str; *p != NUL; ++p)
-		    if (p[0] == K_SPECIAL && p[1] == KS_EXTRA
-						       && p[2] == (int)KE_SNR)
-			break;
-		if (*p != NUL)
-		    continue;
+		க்கு (p = mp->m_str; *p != NUL; ++p)
+		    எனில் (p[0] == K_SPECIAL && p[1] == KS_EXTRA
+						       && p[2] == (முழு)KE_SNR)
+			நிறுத்து;
+		எனில் (*p != NUL)
+		    தொடர்;
 
 		// It's possible to create a mapping and then ":unmap" certain
 		// modes.  We recreate this here by mapping the individual
@@ -2001,154 +2001,154 @@ makemap(
 		c1 = NUL;
 		c2 = NUL;
 		c3 = NUL;
-		if (abbr)
+		எனில் (abbr)
 		    cmd = "abbr";
-		else
+		இல்லையெனில்
 		    cmd = "map";
-		switch (mp->m_mode)
+		தேர்வு (mp->m_mode)
 		{
-		    case MODE_NORMAL | MODE_VISUAL | MODE_SELECT
+		    நிலை MODE_NORMAL | MODE_VISUAL | MODE_SELECT
 							     | MODE_OP_PENDING:
-			break;
-		    case MODE_NORMAL:
+			நிறுத்து;
+		    நிலை MODE_NORMAL:
 			c1 = 'n';
-			break;
-		    case MODE_VISUAL:
+			நிறுத்து;
+		    நிலை MODE_VISUAL:
 			c1 = 'x';
-			break;
-		    case MODE_SELECT:
+			நிறுத்து;
+		    நிலை MODE_SELECT:
 			c1 = 's';
-			break;
-		    case MODE_OP_PENDING:
+			நிறுத்து;
+		    நிலை MODE_OP_PENDING:
 			c1 = 'o';
-			break;
-		    case MODE_NORMAL | MODE_VISUAL:
+			நிறுத்து;
+		    நிலை MODE_NORMAL | MODE_VISUAL:
 			c1 = 'n';
 			c2 = 'x';
-			break;
-		    case MODE_NORMAL | MODE_SELECT:
+			நிறுத்து;
+		    நிலை MODE_NORMAL | MODE_SELECT:
 			c1 = 'n';
 			c2 = 's';
-			break;
-		    case MODE_NORMAL | MODE_OP_PENDING:
+			நிறுத்து;
+		    நிலை MODE_NORMAL | MODE_OP_PENDING:
 			c1 = 'n';
 			c2 = 'o';
-			break;
-		    case MODE_VISUAL | MODE_SELECT:
+			நிறுத்து;
+		    நிலை MODE_VISUAL | MODE_SELECT:
 			c1 = 'v';
-			break;
-		    case MODE_VISUAL | MODE_OP_PENDING:
+			நிறுத்து;
+		    நிலை MODE_VISUAL | MODE_OP_PENDING:
 			c1 = 'x';
 			c2 = 'o';
-			break;
-		    case MODE_SELECT | MODE_OP_PENDING:
+			நிறுத்து;
+		    நிலை MODE_SELECT | MODE_OP_PENDING:
 			c1 = 's';
 			c2 = 'o';
-			break;
-		    case MODE_NORMAL | MODE_VISUAL | MODE_SELECT:
+			நிறுத்து;
+		    நிலை MODE_NORMAL | MODE_VISUAL | MODE_SELECT:
 			c1 = 'n';
 			c2 = 'v';
-			break;
-		    case MODE_NORMAL | MODE_VISUAL | MODE_OP_PENDING:
+			நிறுத்து;
+		    நிலை MODE_NORMAL | MODE_VISUAL | MODE_OP_PENDING:
 			c1 = 'n';
 			c2 = 'x';
 			c3 = 'o';
-			break;
-		    case MODE_NORMAL | MODE_SELECT | MODE_OP_PENDING:
+			நிறுத்து;
+		    நிலை MODE_NORMAL | MODE_SELECT | MODE_OP_PENDING:
 			c1 = 'n';
 			c2 = 's';
 			c3 = 'o';
-			break;
-		    case MODE_VISUAL | MODE_SELECT | MODE_OP_PENDING:
+			நிறுத்து;
+		    நிலை MODE_VISUAL | MODE_SELECT | MODE_OP_PENDING:
 			c1 = 'v';
 			c2 = 'o';
-			break;
-		    case MODE_CMDLINE | MODE_INSERT:
-			if (!abbr)
+			நிறுத்து;
+		    நிலை MODE_CMDLINE | MODE_செருகு:
+			எனில் (!abbr)
 			    cmd = "map!";
-			break;
-		    case MODE_CMDLINE:
+			நிறுத்து;
+		    நிலை MODE_CMDLINE:
 			c1 = 'c';
-			break;
-		    case MODE_INSERT:
+			நிறுத்து;
+		    நிலை MODE_செருகு:
 			c1 = 'i';
-			break;
-		    case MODE_LANGMAP:
+			நிறுத்து;
+		    நிலை MODE_LANGMAP:
 			c1 = 'l';
-			break;
-		    case MODE_TERMINAL:
+			நிறுத்து;
+		    நிலை MODE_TERMINAL:
 			c1 = 't';
-			break;
-		    default:
+			நிறுத்து;
+		    இயல்பு:
 			iemsg(e_makemap_illegal_mode);
-			return FAIL;
+			திரும்பு FAIL;
 		}
-		do	// do this twice if c2 is set, 3 times with c3
+		செய்	// do this twice if c2 is set, 3 times with c3
 		{
 		    // When outputting <> form, need to make sure that 'cpo'
 		    // is set to the Vim default.
-		    if (!did_cpo)
+		    எனில் (!did_cpo)
 		    {
-			if (*mp->m_str == NUL)		// will use <Nop>
+			எனில் (*mp->m_str == NUL)		// will use <Nop>
 			    did_cpo = TRUE;
-			else
-			    for (i = 0; i < 2; ++i)
-				for (p = (i ? mp->m_str : mp->m_keys); *p; ++p)
-				    if (*p == K_SPECIAL || *p == NL)
+			இல்லையெனில்
+			    க்கு (i = 0; i < 2; ++i)
+				க்கு (p = (i ? mp->m_str : mp->m_சாவிகள்); *p; ++p)
+				    எனில் (*p == K_SPECIAL || *p == NL)
 					did_cpo = TRUE;
-			if (did_cpo)
+			எனில் (did_cpo)
 			{
-			    if (fprintf(fd, "cpo_save = &cpo") < 0
+			    எனில் (fprintf(fd, "cpo_save = &cpo") < 0
 				    || put_eol(fd) < 0
 				    || fprintf(fd, "set cpo&vim") < 0
 				    || put_eol(fd) < 0)
-				return FAIL;
+				திரும்பு FAIL;
 			}
 		    }
 #ifdef FEAT_EVAL
 		    // If it is not vim9 use legacy
-		    if (mp->m_expr && mp->m_script_ctx.sc_version < SCRIPT_VERSION_VIM9
+		    எனில் (mp->m_கோவை && mp->m_script_ctx.sc_version < SCRIPT_VERSION_VIM9
 			    && fputs("legacy ", fd) < 0)
-			return FAIL;
+			திரும்பு FAIL;
 #endif
-		    if (c1 && putc(c1, fd) < 0)
-			return FAIL;
-		    if (mp->m_noremap != REMAP_YES && fprintf(fd, "nore") < 0)
-			return FAIL;
-		    if (fputs(cmd, fd) < 0)
-			return FAIL;
-		    if (buf != NULL && fputs(" <buffer>", fd) < 0)
-			return FAIL;
-		    if (mp->m_nowait && fputs(" <nowait>", fd) < 0)
-			return FAIL;
-		    if (mp->m_silent && fputs(" <silent>", fd) < 0)
-			return FAIL;
+		    எனில் (c1 && putc(c1, fd) < 0)
+			திரும்பு FAIL;
+		    எனில் (mp->m_noremap != REMAP_YES && fprintf(fd, "nore") < 0)
+			திரும்பு FAIL;
+		    எனில் (fputs(cmd, fd) < 0)
+			திரும்பு FAIL;
+		    எனில் (buf != வெற்று && fputs(" <buffer>", fd) < 0)
+			திரும்பு FAIL;
+		    எனில் (mp->m_nowait && fputs(" <nowait>", fd) < 0)
+			திரும்பு FAIL;
+		    எனில் (mp->m_silent && fputs(" <silent>", fd) < 0)
+			திரும்பு FAIL;
 #ifdef FEAT_EVAL
-		    if (mp->m_noremap == REMAP_SCRIPT
+		    எனில் (mp->m_noremap == REMAP_SCRIPT
 						 && fputs("<script>", fd) < 0)
-			return FAIL;
-		    if (mp->m_expr && fputs(" <expr>", fd) < 0)
-			return FAIL;
+			திரும்பு FAIL;
+		    எனில் (mp->m_கோவை && fputs(" <expr>", fd) < 0)
+			திரும்பு FAIL;
 #endif
 
-		    if (       putc(' ', fd) < 0
-			    || put_escstr(fd, mp->m_keys, 0) == FAIL
+		    எனில் (       putc(' ', fd) < 0
+			    || put_escstr(fd, mp->m_சாவிகள், 0) == FAIL
 			    || putc(' ', fd) < 0
 			    || put_escstr(fd, mp->m_str, 1) == FAIL
 			    || put_eol(fd) < 0)
-			return FAIL;
+			திரும்பு FAIL;
 		    c1 = c2;
 		    c2 = c3;
 		    c3 = NUL;
-		} while (c1 != NUL);
+		} போது (c1 != NUL);
 	    }
 	}
 
-    if (did_cpo)
-	if (fprintf(fd, "&cpo = cpo_save") < 0
+    எனில் (did_cpo)
+	எனில் (fprintf(fd, "&cpo = cpo_save") < 0
 		|| put_eol(fd) < 0)
-	    return FAIL;
-    return OK;
+	    திரும்பு FAIL;
+    திரும்பு OK;
 }
 
 /*
@@ -2157,44 +2157,44 @@ makemap(
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-put_escstr(FILE *fd, char_u *strstart, int what)
+    முழு
+put_escstr(FILE *fd, char_u *strstart, முழு what)
 {
     char_u	*str = strstart;
-    int		c;
-    int		modifiers;
+    முழு		c;
+    முழு		modifiers;
 
     // :map xx <Nop>
-    if (*str == NUL && what == 1)
+    எனில் (*str == NUL && what == 1)
     {
-	if (fprintf(fd, "<Nop>") < 0)
-	    return FAIL;
-	return OK;
+	எனில் (fprintf(fd, "<Nop>") < 0)
+	    திரும்பு FAIL;
+	திரும்பு OK;
     }
 
-    for ( ; *str != NUL; ++str)
+    க்கு ( ; *str != NUL; ++str)
     {
 	char_u	*p;
 
 	// Check for a multi-byte character, which may contain escaped
 	// K_SPECIAL and CSI bytes
 	p = mb_unescape(&str);
-	if (p != NULL)
+	எனில் (p != வெற்று)
 	{
-	    while (*p != NUL)
-		if (fputc(*p++, fd) < 0)
-		    return FAIL;
+	    போது (*p != NUL)
+		எனில் (fputc(*p++, fd) < 0)
+		    திரும்பு FAIL;
 	    --str;
-	    continue;
+	    தொடர்;
 	}
 
 	c = *str;
 	// Special key codes have to be translated to be able to make sense
 	// when they are read back.
-	if (c == K_SPECIAL && what != 2)
+	எனில் (c == K_SPECIAL && what != 2)
 	{
 	    modifiers = 0;
-	    if (str[1] == KS_MODIFIER)
+	    எனில் (str[1] == KS_MODIFIER)
 	    {
 		modifiers = str[2];
 		str += 3;
@@ -2202,43 +2202,43 @@ put_escstr(FILE *fd, char_u *strstart, int what)
 		// Modifiers can be applied too to multi-byte characters.
 		p = mb_unescape(&str);
 
-		if (p == NULL)
+		எனில் (p == வெற்று)
 		    c = *str;
-		else
+		இல்லையெனில்
 		{
 		    // retrieve codepoint (character number) from unescaped string
 		    c = (*mb_ptr2char)(p);
 		    --str;
 		}
 	    }
-	    if (c == K_SPECIAL)
+	    எனில் (c == K_SPECIAL)
 	    {
 		c = TO_SPECIAL(str[1], str[2]);
 		str += 2;
 	    }
-	    if (IS_SPECIAL(c) || modifiers)	// special key
+	    எனில் (IS_SPECIAL(c) || modifiers)	// special key
 	    {
-		if (fputs((char *)get_special_key_name(c, modifiers), fd) < 0)
-		    return FAIL;
-		continue;
+		எனில் (fputs((எழுத்து *)get_special_சாவி_name(c, modifiers), fd) < 0)
+		    திரும்பு FAIL;
+		தொடர்;
 	    }
 	}
 
 	// A '\n' in a map command should be written as <NL>.
 	// A '\n' in a set command should be written as \^V^J.
-	if (c == NL)
+	எனில் (c == NL)
 	{
-	    if (what == 2)
+	    எனில் (what == 2)
 	    {
-		if (fprintf(fd, "\\\026\n") < 0)
-		    return FAIL;
+		எனில் (fprintf(fd, "\\\026\n") < 0)
+		    திரும்பு FAIL;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
-		if (fprintf(fd, "<NL>") < 0)
-		    return FAIL;
+		எனில் (fprintf(fd, "<NL>") < 0)
+		    திரும்பு FAIL;
 	    }
-	    continue;
+	    தொடர்;
 	}
 
 	// Some characters have to be escaped with CTRL-V to
@@ -2250,90 +2250,90 @@ put_escstr(FILE *fd, char_u *strstart, int what)
 	// A '<' has to be escaped with a CTRL-V to prevent it being
 	// interpreted as the start of a special key name.
 	// A space in the lhs of a :map needs a CTRL-V.
-	if (what == 2 && (VIM_ISWHITE(c) || c == '"' || c == '\\'))
+	எனில் (what == 2 && (VIM_ISWHITE(c) || c == '"' || c == '\\'))
 	{
-	    if (putc('\\', fd) < 0)
-		return FAIL;
+	    எனில் (putc('\\', fd) < 0)
+		திரும்பு FAIL;
 	}
-	else if (c < ' ' || c > '~' || c == '|'
+	இல்லையெனில் எனில் (c < ' ' || c > '~' || c == '|'
 		|| (what == 0 && c == ' ')
 		|| (what == 1 && str == strstart && c == ' ')
 		|| (what != 2 && c == '<'))
 	{
-	    if (putc(Ctrl_V, fd) < 0)
-		return FAIL;
+	    எனில் (putc(Ctrl_V, fd) < 0)
+		திரும்பு FAIL;
 	}
-	if (putc(c, fd) < 0)
-	    return FAIL;
+	எனில் (putc(c, fd) < 0)
+	    திரும்பு FAIL;
     }
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Check all mappings for the presence of special key codes.
  * Used after ":set term=xxx".
  */
-    void
-check_map_keycodes(void)
+    வெறுமை
+check_map_keycodes(வெறுமை)
 {
     mapblock_T	*mp;
     char_u	*p;
-    int		i;
+    முழு		i;
     char_u	buf[3];
-    int		abbr;
-    int		hash;
+    முழு		abbr;
+    முழு		hash;
     buf_T	*bp;
     ESTACK_CHECK_DECLARATION;
 
     validate_maphash();
     // avoids giving error messages
-    estack_push(ETYPE_INTERNAL, (char_u *)"mappings", 0);
+    estack_தள்ளு(ETYPE_INTERNAL, (char_u *)"mappings", 0);
     ESTACK_CHECK_SETUP;
 
     // Do this once for each buffer, and then once for global
     // mappings/abbreviations with bp == NULL
-    for (bp = firstbuf; ; bp = bp->b_next)
+    க்கு (bp = firstbuf; ; bp = bp->b_next)
     {
 	// Do the loop twice: Once for mappings, once for abbreviations.
 	// Then loop over all map hash lists.
-	for (abbr = 0; abbr <= 1; ++abbr)
-	    for (hash = 0; hash < 256; ++hash)
+	க்கு (abbr = 0; abbr <= 1; ++abbr)
+	    க்கு (hash = 0; hash < 256; ++hash)
 	    {
-		if (abbr)
+		எனில் (abbr)
 		{
-		    if (hash)	    // there is only one abbr list
-			break;
-		    if (bp != NULL)
+		    எனில் (hash)	    // there is only one abbr list
+			நிறுத்து;
+		    எனில் (bp != வெற்று)
 			mp = bp->b_first_abbr;
-		    else
+		    இல்லையெனில்
 			mp = first_abbr;
 		}
-		else
+		இல்லையெனில்
 		{
-		    if (bp != NULL)
+		    எனில் (bp != வெற்று)
 			mp = bp->b_maphash[hash];
-		    else
+		    இல்லையெனில்
 			mp = maphash[hash];
 		}
-		for ( ; mp != NULL; mp = mp->m_next)
+		க்கு ( ; mp != வெற்று; mp = mp->m_next)
 		{
-		    for (i = 0; i <= 1; ++i)	// do this twice
+		    க்கு (i = 0; i <= 1; ++i)	// do this twice
 		    {
-			if (i == 0)
-			    p = mp->m_keys;	// once for the "from" part
-			else
+			எனில் (i == 0)
+			    p = mp->m_சாவிகள்;	// once for the "from" part
+			இல்லையெனில்
 			    p = mp->m_str;	// and once for the "to" part
-			while (*p)
+			போது (*p)
 			{
-			    if (*p == K_SPECIAL)
+			    எனில் (*p == K_SPECIAL)
 			    {
 				++p;
-				if (*p < 128)   // for "normal" tcap entries
+				எனில் (*p < 128)   // for "normal" tcap entries
 				{
 				    buf[0] = p[0];
 				    buf[1] = p[1];
 				    buf[2] = NUL;
-				    (void)add_termcap_entry(buf, FALSE);
+				    (வெறுமை)add_termcap_entry(buf, FALSE);
 				}
 				++p;
 			    }
@@ -2342,14 +2342,14 @@ check_map_keycodes(void)
 		    }
 		}
 	    }
-	if (bp == NULL)
-	    break;
+	எனில் (bp == வெற்று)
+	    நிறுத்து;
     }
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_எடு();
 }
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 /*
  * Check the string "keys" against the lhs of all mappings.
  * Return pointer to rhs of mapping (mapblock->m_str).
@@ -2357,292 +2357,292 @@ check_map_keycodes(void)
  */
     char_u *
 check_map(
-    char_u	*keys,
-    int		mode,
-    int		exact,		// require exact match
-    int		ign_mod,	// ignore preceding modifier
-    int		abbr,		// do abbreviations
+    char_u	*சாவிகள்,
+    முழு		mode,
+    முழு		exact,		// require exact match
+    முழு		ign_mod,	// ignore preceding modifier
+    முழு		abbr,		// do abbreviations
     mapblock_T	**mp_ptr,	// return: pointer to mapblock or NULL
-    int		*local_ptr)	// return: buffer-local mapping or NULL
+    முழு		*local_ptr)	// return: buffer-local mapping or NULL
 {
-    int		hash;
-    int		len, minlen;
+    முழு		hash;
+    முழு		len, minlen;
     mapblock_T	*mp;
     char_u	*s;
-    int		local;
+    முழு		local;
 
     validate_maphash();
 
-    len = (int)STRLEN(keys);
-    for (local = 1; local >= 0; --local)
+    len = (முழு)STRLEN(சாவிகள்);
+    க்கு (local = 1; local >= 0; --local)
 	// loop over all hash lists
-	for (hash = 0; hash < 256; ++hash)
+	க்கு (hash = 0; hash < 256; ++hash)
 	{
-	    if (abbr)
+	    எனில் (abbr)
 	    {
-		if (hash > 0)		// there is only one list.
-		    break;
-		if (local)
+		எனில் (hash > 0)		// there is only one list.
+		    நிறுத்து;
+		எனில் (local)
 		    mp = curbuf->b_first_abbr;
-		else
+		இல்லையெனில்
 		    mp = first_abbr;
 	    }
-	    else if (local)
+	    இல்லையெனில் எனில் (local)
 		mp = curbuf->b_maphash[hash];
-	    else
+	    இல்லையெனில்
 		mp = maphash[hash];
-	    for ( ; mp != NULL; mp = mp->m_next)
+	    க்கு ( ; mp != வெற்று; mp = mp->m_next)
 	    {
 		// skip entries with wrong mode, wrong length and not matching
 		// ones
-		if ((mp->m_mode & mode) && (!exact || mp->m_keylen == len))
+		எனில் ((mp->m_mode & mode) && (!exact || mp->m_keylen == len))
 		{
-		    if (len > mp->m_keylen)
+		    எனில் (len > mp->m_keylen)
 			minlen = mp->m_keylen;
-		    else
+		    இல்லையெனில்
 			minlen = len;
-		    s = mp->m_keys;
-		    if (ign_mod && s[0] == K_SPECIAL && s[1] == KS_MODIFIER
+		    s = mp->m_சாவிகள்;
+		    எனில் (ign_mod && s[0] == K_SPECIAL && s[1] == KS_MODIFIER
 							       && s[2] != NUL)
 		    {
 			s += 3;
-			if (len > mp->m_keylen - 3)
+			எனில் (len > mp->m_keylen - 3)
 			    minlen = mp->m_keylen - 3;
 		    }
-		    if (STRNCMP(s, keys, minlen) == 0)
+		    எனில் (STRNCMP(s, சாவிகள், minlen) == 0)
 		    {
-			if (mp_ptr != NULL)
+			எனில் (mp_ptr != வெற்று)
 			    *mp_ptr = mp;
-			if (local_ptr != NULL)
+			எனில் (local_ptr != வெற்று)
 			    *local_ptr = local;
-			return mp->m_str;
+			திரும்பு mp->m_str;
 		    }
 		}
 	    }
 	}
 
-    return NULL;
+    திரும்பு வெற்று;
 }
 
 /*
  * "hasmapto()" function
  */
-    void
+    வெறுமை
 f_hasmapto(typval_T *argvars, typval_T *rettv)
 {
     char_u	*name;
     char_u	*mode;
     char_u	buf[NUMBUFLEN];
-    int		abbr = FALSE;
+    முழு		abbr = FALSE;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	திரும்பு;
 
     name = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    எனில் (argvars[1].v_type == VAR_UNKNOWN)
 	mode = (char_u *)"nvo";
-    else
+    இல்லையெனில்
     {
 	mode = tv_get_string_buf(&argvars[1], buf);
-	if (argvars[2].v_type != VAR_UNKNOWN)
-	    abbr = (int)tv_get_bool(&argvars[2]);
+	எனில் (argvars[2].v_type != VAR_UNKNOWN)
+	    abbr = (முழு)tv_get_bool(&argvars[2]);
     }
 
-    if (map_to_exists(name, mode, abbr))
-	rettv->vval.v_number = TRUE;
-    else
-	rettv->vval.v_number = FALSE;
+    எனில் (map_to_exists(name, mode, abbr))
+	rettv->vval.v_எண் = TRUE;
+    இல்லையெனில்
+	rettv->vval.v_எண் = FALSE;
 }
 
 /*
  * Fill in the empty dictionary with items as defined by maparg builtin.
  */
-    static void
+    நிலையான வெறுமை
 mapblock2dict(
 	mapblock_T  *mp,
 	dict_T	    *dict,
 	char_u	    *lhsrawalt,	    // may be NULL
-	int	    buffer_local,   // false if not buffer local mapping
-	int	    abbr)	    // true if abbreviation
+	முழு	    buffer_local,   // false if not buffer local mapping
+	முழு	    abbr)	    // true if abbreviation
 {
-    char_u	    *lhs = str2special_save(mp->m_keys, TRUE, FALSE);
+    char_u	    *lhs = str2special_save(mp->m_சாவிகள், TRUE, FALSE);
     char_u	    *mapmode = map_mode_to_chars(mp->m_mode);
 
     dict_add_string(dict, "lhs", lhs);
     vim_free(lhs);
-    dict_add_string(dict, "lhsraw", mp->m_keys);
-    if (lhsrawalt)
+    dict_add_string(dict, "lhsraw", mp->m_சாவிகள்);
+    எனில் (lhsrawalt)
 	// Also add the value for the simplified entry.
 	dict_add_string(dict, "lhsrawalt", lhsrawalt);
     dict_add_string(dict, "rhs", mp->m_orig_str);
-    dict_add_number(dict, "noremap", mp->m_noremap ? 1L : 0L);
-    dict_add_number(dict, "script", mp->m_noremap == REMAP_SCRIPT
+    dict_add_எண்(dict, "noremap", mp->m_noremap ? 1L : 0L);
+    dict_add_எண்(dict, "script", mp->m_noremap == REMAP_SCRIPT
 		    ? 1L : 0L);
-    dict_add_number(dict, "expr", mp->m_expr ? 1L : 0L);
-    dict_add_number(dict, "silent", mp->m_silent ? 1L : 0L);
-    dict_add_number(dict, "sid", (long)mp->m_script_ctx.sc_sid);
-    dict_add_number(dict, "scriptversion",
+    dict_add_எண்(dict, "expr", mp->m_கோவை ? 1L : 0L);
+    dict_add_எண்(dict, "silent", mp->m_silent ? 1L : 0L);
+    dict_add_எண்(dict, "sid", (long)mp->m_script_ctx.sc_sid);
+    dict_add_எண்(dict, "scriptversion",
 		    (long)mp->m_script_ctx.sc_version);
-    dict_add_number(dict, "lnum", (long)mp->m_script_ctx.sc_lnum);
-    dict_add_number(dict, "buffer", (long)buffer_local);
-    dict_add_number(dict, "nowait", mp->m_nowait ? 1L : 0L);
+    dict_add_எண்(dict, "lnum", (long)mp->m_script_ctx.sc_lnum);
+    dict_add_எண்(dict, "buffer", (long)buffer_local);
+    dict_add_எண்(dict, "nowait", mp->m_nowait ? 1L : 0L);
     dict_add_string(dict, "mode", mapmode);
-    dict_add_number(dict, "abbr", abbr ? 1L : 0L);
-    dict_add_number(dict, "mode_bits", mp->m_mode);
+    dict_add_எண்(dict, "abbr", abbr ? 1L : 0L);
+    dict_add_எண்(dict, "mode_bits", mp->m_mode);
 
     vim_free(mapmode);
 }
 
-    static void
-get_maparg(typval_T *argvars, typval_T *rettv, int exact)
+    நிலையான வெறுமை
+get_maparg(typval_T *argvars, typval_T *rettv, முழு exact)
 {
-    char_u	*keys;
-    char_u	*keys_simplified;
+    char_u	*சாவிகள்;
+    char_u	*சாவிகள்_simplified;
     char_u	*which;
     char_u	buf[NUMBUFLEN];
-    char_u	*keys_buf = NULL;
-    char_u	*alt_keys_buf = NULL;
-    int		did_simplify = FALSE;
+    char_u	*சாவிகள்_buf = வெற்று;
+    char_u	*alt_சாவிகள்_buf = வெற்று;
+    முழு		did_simplify = FALSE;
     char_u	*rhs;
-    int		mode;
-    int		abbr = FALSE;
-    int		get_dict = FALSE;
-    mapblock_T	*mp = NULL;
-    int		buffer_local;
-    int		flags = REPTERM_FROM_PART | REPTERM_DO_LT;
+    முழு		mode;
+    முழு		abbr = FALSE;
+    முழு		get_dict = FALSE;
+    mapblock_T	*mp = வெற்று;
+    முழு		buffer_local;
+    முழு		flags = REPTERM_FROM_PART | REPTERM_DO_LT;
 
     // return empty string for failure
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = வெற்று;
 
-    keys = tv_get_string(&argvars[0]);
-    if (*keys == NUL)
-	return;
+    சாவிகள் = tv_get_string(&argvars[0]);
+    எனில் (*சாவிகள் == NUL)
+	திரும்பு;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    எனில் (argvars[1].v_type != VAR_UNKNOWN)
     {
 	which = tv_get_string_buf_chk(&argvars[1], buf);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	எனில் (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    abbr = (int)tv_get_bool(&argvars[2]);
-	    if (argvars[3].v_type != VAR_UNKNOWN)
-		get_dict = (int)tv_get_bool(&argvars[3]);
+	    abbr = (முழு)tv_get_bool(&argvars[2]);
+	    எனில் (argvars[3].v_type != VAR_UNKNOWN)
+		get_dict = (முழு)tv_get_bool(&argvars[3]);
 	}
     }
-    else
+    இல்லையெனில்
 	which = (char_u *)"";
-    if (which == NULL)
-	return;
+    எனில் (which == வெற்று)
+	திரும்பு;
 
     mode = get_map_mode(&which, 0);
 
-    keys_simplified = replace_termcodes(keys, &keys_buf, 0, flags,
+    சாவிகள்_simplified = replace_termcodes(சாவிகள், &சாவிகள்_buf, 0, flags,
 								&did_simplify);
-    rhs = check_map(keys_simplified, mode, exact, FALSE, abbr,
+    rhs = check_map(சாவிகள்_simplified, mode, exact, FALSE, abbr,
 							   &mp, &buffer_local);
-    if (did_simplify)
+    எனில் (did_simplify)
     {
 	// When the lhs is being simplified the not-simplified keys are
 	// preferred for printing, like in do_map().
-	(void)replace_termcodes(keys, &alt_keys_buf, 0,
-					flags | REPTERM_NO_SIMPLIFY, NULL);
-	rhs = check_map(alt_keys_buf, mode, exact, FALSE, abbr, &mp,
+	(வெறுமை)replace_termcodes(சாவிகள், &alt_சாவிகள்_buf, 0,
+					flags | REPTERM_NO_SIMPLIFY, வெற்று);
+	rhs = check_map(alt_சாவிகள்_buf, mode, exact, FALSE, abbr, &mp,
 								&buffer_local);
     }
 
-    if (!get_dict)
+    எனில் (!get_dict)
     {
 	// Return a string.
-	if (rhs != NULL)
+	எனில் (rhs != வெற்று)
 	{
-	    if (*rhs == NUL)
+	    எனில் (*rhs == NUL)
 		rettv->vval.v_string = vim_strsave((char_u *)"<Nop>");
-	    else
+	    இல்லையெனில்
 		rettv->vval.v_string = str2special_save(rhs, FALSE, FALSE);
 	}
 
     }
-    else if (rettv_dict_alloc(rettv) == OK && rhs != NULL)
+    இல்லையெனில் எனில் (rettv_dict_alloc(rettv) == OK && rhs != வெற்று)
 	mapblock2dict(mp, rettv->vval.v_dict,
-			  did_simplify ? keys_simplified : NULL,
+			  did_simplify ? சாவிகள்_simplified : வெற்று,
 			  buffer_local, abbr);
 
-    vim_free(keys_buf);
-    vim_free(alt_keys_buf);
+    vim_free(சாவிகள்_buf);
+    vim_free(alt_சாவிகள்_buf);
 }
 
 /*
  * "maplist()" function
  */
-    void
+    வெறுமை
 f_maplist(typval_T *argvars UNUSED, typval_T *rettv)
 {
     dict_T	*d;
     mapblock_T	*mp;
-    int		buffer_local;
-    char_u	*keys_buf;
-    int		did_simplify;
-    int		hash;
+    முழு		buffer_local;
+    char_u	*சாவிகள்_buf;
+    முழு		did_simplify;
+    முழு		hash;
     char_u	*lhs;
-    const int	flags = REPTERM_FROM_PART | REPTERM_DO_LT;
-    int		abbr = FALSE;
+    மாறிலி முழு	flags = REPTERM_FROM_PART | REPTERM_DO_LT;
+    முழு		abbr = FALSE;
 
-    if (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    எனில் (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
+	திரும்பு;
+    எனில் (argvars[0].v_type != VAR_UNKNOWN)
 	abbr = tv_get_bool(&argvars[0]);
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    எனில் (rettv_list_alloc(rettv) == FAIL)
+	திரும்பு;
 
     validate_maphash();
 
     // Do it twice: once for global maps and once for local maps.
-    for (buffer_local = 0; buffer_local <= 1; ++buffer_local)
+    க்கு (buffer_local = 0; buffer_local <= 1; ++buffer_local)
     {
-	for (hash = 0; hash < 256; ++hash)
+	க்கு (hash = 0; hash < 256; ++hash)
 	{
-	    if (abbr)
+	    எனில் (abbr)
 	    {
-		if (hash > 0)		// there is only one abbr list
-		    break;
-		if (buffer_local)
+		எனில் (hash > 0)		// there is only one abbr list
+		    நிறுத்து;
+		எனில் (buffer_local)
 		    mp = curbuf->b_first_abbr;
-		else
+		இல்லையெனில்
 		    mp = first_abbr;
 	    }
-	    else if (buffer_local)
+	    இல்லையெனில் எனில் (buffer_local)
 		mp = curbuf->b_maphash[hash];
-	    else
+	    இல்லையெனில்
 		mp = maphash[hash];
-	    for (; mp; mp = mp->m_next)
+	    க்கு (; mp; mp = mp->m_next)
 	    {
-		if (mp->m_simplified)
-		    continue;
-		if ((d = dict_alloc()) == NULL)
-		    return;
-		if (list_append_dict(rettv->vval.v_list, d) == FAIL)
+		எனில் (mp->m_simplified)
+		    தொடர்;
+		எனில் ((d = dict_alloc()) == வெற்று)
+		    திரும்பு;
+		எனில் (list_append_dict(rettv->vval.v_list, d) == FAIL)
 		{
 		    dict_unref(d);
-		    return;
+		    திரும்பு;
 		}
 
-		keys_buf = NULL;
+		சாவிகள்_buf = வெற்று;
 		did_simplify = FALSE;
 
-		lhs = str2special_save(mp->m_keys, TRUE, FALSE);
-		(void)replace_termcodes(lhs, &keys_buf, 0, flags,
+		lhs = str2special_save(mp->m_சாவிகள், TRUE, FALSE);
+		(வெறுமை)replace_termcodes(lhs, &சாவிகள்_buf, 0, flags,
 								&did_simplify);
 		vim_free(lhs);
 
 		mapblock2dict(mp, d,
-				 did_simplify ? keys_buf : NULL,
+				 did_simplify ? சாவிகள்_buf : வெற்று,
 				 buffer_local, abbr);
-		vim_free(keys_buf);
+		vim_free(சாவிகள்_buf);
 	    }
 	}
     }
@@ -2651,17 +2651,17 @@ f_maplist(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "maparg()" function
  */
-    void
+    வெறுமை
 f_maparg(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && (check_for_opt_bool_arg(argvars, 2) == FAIL
 			|| (argvars[2].v_type != VAR_UNKNOWN
 			    && check_for_opt_bool_arg(argvars, 3) == FAIL)))))
-		return;
+		திரும்பு;
 
     get_maparg(argvars, rettv, TRUE);
 }
@@ -2669,15 +2669,15 @@ f_maparg(typval_T *argvars, typval_T *rettv)
 /*
  * "mapcheck()" function
  */
-    void
+    வெறுமை
 f_mapcheck(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	திரும்பு;
 
     get_maparg(argvars, rettv, FALSE);
 }
@@ -2687,124 +2687,124 @@ f_mapcheck(typval_T *argvars, typval_T *rettv)
  * It may contain multiple characters, eg "nox", or "!", or ' '
  * Return 0 if there is an error.
  */
-    static int
-get_map_mode_string(char_u *mode_string, int abbr)
+    நிலையான முழு
+get_map_mode_string(char_u *mode_string, முழு abbr)
 {
     char_u	*p = mode_string;
-    int		mode = 0;
-    int		tmode;
-    int		modec;
-    const int	MASK_V = MODE_VISUAL | MODE_SELECT;
-    const int	MASK_MAP = MODE_VISUAL | MODE_SELECT | MODE_NORMAL
+    முழு		mode = 0;
+    முழு		tmode;
+    முழு		modec;
+    மாறிலி முழு	MASK_V = MODE_VISUAL | MODE_SELECT;
+    மாறிலி முழு	MASK_MAP = MODE_VISUAL | MODE_SELECT | MODE_NORMAL
 							     | MODE_OP_PENDING;
-    const int	MASK_BANG = MODE_INSERT | MODE_CMDLINE;
+    மாறிலி முழு	MASK_BANG = MODE_செருகு | MODE_CMDLINE;
 
-    if (*p == NUL)
+    எனில் (*p == NUL)
 	p = (char_u *)" ";	// compatibility
-    while ((modec = *p++))
+    போது ((modec = *p++))
     {
-	switch (modec)
+	தேர்வு (modec)
 	{
-	    case 'i': tmode = MODE_INSERT;	break;
-	    case 'l': tmode = MODE_LANGMAP;	break;
-	    case 'c': tmode = MODE_CMDLINE;	break;
-	    case 'n': tmode = MODE_NORMAL;	break;
-	    case 'x': tmode = MODE_VISUAL;	break;
-	    case 's': tmode = MODE_SELECT;	break;
-	    case 'o': tmode = MODE_OP_PENDING;	break;
-	    case 't': tmode = MODE_TERMINAL;	break;
-	    case 'v': tmode = MASK_V;		break;
-	    case '!': tmode = MASK_BANG;	break;
-	    case ' ': tmode = MASK_MAP;		break;
-	    default:
-		      return 0; // error, unknown mode character
+	    நிலை 'i': tmode = MODE_செருகு;	நிறுத்து;
+	    நிலை 'l': tmode = MODE_LANGMAP;	நிறுத்து;
+	    நிலை 'c': tmode = MODE_CMDLINE;	நிறுத்து;
+	    நிலை 'n': tmode = MODE_NORMAL;	நிறுத்து;
+	    நிலை 'x': tmode = MODE_VISUAL;	நிறுத்து;
+	    நிலை 's': tmode = MODE_SELECT;	நிறுத்து;
+	    நிலை 'o': tmode = MODE_OP_PENDING;	நிறுத்து;
+	    நிலை 't': tmode = MODE_TERMINAL;	நிறுத்து;
+	    நிலை 'v': tmode = MASK_V;		நிறுத்து;
+	    நிலை '!': tmode = MASK_BANG;	நிறுத்து;
+	    நிலை ' ': tmode = MASK_MAP;		நிறுத்து;
+	    இயல்பு:
+		      திரும்பு 0; // error, unknown mode character
 	}
 	mode |= tmode;
     }
-    if ((abbr && (mode & ~MASK_BANG) != 0)
+    எனில் ((abbr && (mode & ~MASK_BANG) != 0)
 	|| (!abbr && (mode & (mode-1)) != 0 // more than one bit set
 	    && (
 		// false if multiple bits set in mode and mode is fully
 		// contained in one mask
 		!(((mode & MASK_BANG) != 0 && (mode & ~MASK_BANG) == 0)
 		    || ((mode & MASK_MAP) != 0 && (mode & ~MASK_MAP) == 0)))))
-	return 0;
+	திரும்பு 0;
 
-    return mode;
+    திரும்பு mode;
 }
 
 /*
  * "mapset()" function
  */
-    void
+    வெறுமை
 f_mapset(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u	*which;
-    int		mode;
+    முழு		mode;
     char_u	buf[NUMBUFLEN];
-    int		is_abbr;
+    முழு		is_abbr;
     dict_T	*d;
     char_u	*lhs;
     char_u	*lhsraw;
     char_u	*lhsrawalt;
     char_u	*rhs;
     char_u	*orig_rhs;
-    char_u	*arg_buf = NULL;
-    int		noremap;
-    int		expr;
-    int		silent;
-    int		buffer;
+    char_u	*arg_buf = வெற்று;
+    முழு		noremap;
+    முழு		கோவை;
+    முழு		silent;
+    முழு		buffer;
     scid_T	sid;
-    int		scriptversion;
+    முழு		scriptversion;
     linenr_T	lnum;
     mapblock_T	**map_table = maphash;
     mapblock_T  **abbr_table = &first_abbr;
-    int		nowait;
+    முழு		nowait;
     char_u	*arg;
-    int		dict_only;
-    mapblock_T	*mp_result[2] = {NULL, NULL};
+    முழு		dict_only;
+    mapblock_T	*mp_result[2] = {வெற்று, வெற்று};
 
-    if (check_secure())
-	return;
+    எனில் (check_secure())
+	திரும்பு;
 
     // If first arg is a dict, then that's the only arg permitted.
     dict_only = argvars[0].v_type == VAR_DICT;
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_or_dict_arg(argvars, 0) == FAIL
 		|| (dict_only && check_for_unknown_arg(argvars, 1) == FAIL)
 		|| (!dict_only
 		    && (check_for_string_arg(argvars, 0) == FAIL
 			|| check_for_bool_arg(argvars, 1) == FAIL
 			|| check_for_dict_arg(argvars, 2) == FAIL))))
-	return;
+	திரும்பு;
 
-    if (dict_only)
+    எனில் (dict_only)
     {
 	d = argvars[0].vval.v_dict;
 	which = dict_get_string(d, "mode", FALSE);
 	is_abbr = dict_get_bool(d, "abbr", -1);
-	if (which == NULL || is_abbr < 0)
+	எனில் (which == வெற்று || is_abbr < 0)
 	{
 	    emsg(_(e_entries_missing_in_mapset_dict_argument));
-	    return;
+	    திரும்பு;
 	}
     }
-    else
+    இல்லையெனில்
     {
 	which = tv_get_string_buf_chk(&argvars[0], buf);
-	if (which == NULL)
-	    return;
-	is_abbr = (int)tv_get_bool(&argvars[1]);
+	எனில் (which == வெற்று)
+	    திரும்பு;
+	is_abbr = (முழு)tv_get_bool(&argvars[1]);
 
-	if (check_for_dict_arg(argvars, 2) == FAIL)
-	    return;
+	எனில் (check_for_dict_arg(argvars, 2) == FAIL)
+	    திரும்பு;
 	d = argvars[2].vval.v_dict;
     }
     mode = get_map_mode_string(which, is_abbr);
-    if (mode == 0)
+    எனில் (mode == 0)
     {
 	semsg(_(e_illegal_map_mode_string_str), which);
-	return;
+	திரும்பு;
     }
 
 
@@ -2813,64 +2813,64 @@ f_mapset(typval_T *argvars, typval_T *rettv UNUSED)
     lhsraw = dict_get_string(d, "lhsraw", FALSE);
     lhsrawalt = dict_get_string(d, "lhsrawalt", FALSE);
     rhs = dict_get_string(d, "rhs", FALSE);
-    if (lhs == NULL || lhsraw == NULL || rhs == NULL)
+    எனில் (lhs == வெற்று || lhsraw == வெற்று || rhs == வெற்று)
     {
 	emsg(_(e_entries_missing_in_mapset_dict_argument));
-	return;
+	திரும்பு;
     }
     orig_rhs = rhs;
 
-    noremap = dict_get_number(d, "noremap") ? REMAP_NONE: 0;
-    if (dict_get_number(d, "script") != 0)
+    noremap = dict_get_எண்(d, "noremap") ? REMAP_NONE: 0;
+    எனில் (dict_get_எண்(d, "script") != 0)
 	noremap = REMAP_SCRIPT;
-    expr = dict_get_number(d, "expr") != 0;
-    silent = dict_get_number(d, "silent") != 0;
-    sid = dict_get_number(d, "sid");
-    scriptversion = dict_get_number(d, "scriptversion");
-    lnum = dict_get_number(d, "lnum");
-    buffer = dict_get_number(d, "buffer");
-    nowait = dict_get_number(d, "nowait") != 0;
+    கோவை = dict_get_எண்(d, "expr") != 0;
+    silent = dict_get_எண்(d, "silent") != 0;
+    sid = dict_get_எண்(d, "sid");
+    scriptversion = dict_get_எண்(d, "scriptversion");
+    lnum = dict_get_எண்(d, "lnum");
+    buffer = dict_get_எண்(d, "buffer");
+    nowait = dict_get_எண்(d, "nowait") != 0;
     // mode from the dict is not used
 
-    if (STRICMP(rhs, "<nop>") == 0)	// "<Nop>" means nothing
+    எனில் (STRICMP(rhs, "<nop>") == 0)	// "<Nop>" means nothing
 	rhs = (char_u *)"";
-    else
+    இல்லையெனில்
 	rhs = replace_termcodes(rhs, &arg_buf, sid,
-					REPTERM_DO_LT | REPTERM_SPECIAL, NULL);
+					REPTERM_DO_LT | REPTERM_SPECIAL, வெற்று);
 
-    if (buffer)
+    எனில் (buffer)
     {
 	map_table = curbuf->b_maphash;
 	abbr_table = &curbuf->b_first_abbr;
     }
 
     // Delete any existing mapping for this lhs and mode.
-    if (buffer)
+    எனில் (buffer)
     {
 	arg = alloc(STRLEN(lhs) + STRLEN("<buffer>") + 1);
-	if (arg == NULL)
-	    return;
+	எனில் (arg == வெற்று)
+	    திரும்பு;
 	STRCPY(arg, "<buffer>");
 	STRCPY(arg + 8, lhs);
     }
-    else
+    இல்லையெனில்
     {
 	arg = vim_strsave(lhs);
-	if (arg == NULL)
-	    return;
+	எனில் (arg == வெற்று)
+	    திரும்பு;
     }
     do_map(MAPTYPE_UNMAP_LHS, arg, mode, is_abbr);
     vim_free(arg);
 
     mp_result[0] = map_add(map_table, abbr_table, lhsraw, rhs, orig_rhs,
-			    noremap, nowait, silent, mode, is_abbr, expr, sid,
+			    noremap, nowait, silent, mode, is_abbr, கோவை, sid,
 			    scriptversion, lnum, 0);
-    if (lhsrawalt != NULL)
+    எனில் (lhsrawalt != வெற்று)
 	mp_result[1] = map_add(map_table, abbr_table, lhsrawalt, rhs, orig_rhs,
-			    noremap, nowait, silent, mode, is_abbr, expr, sid,
+			    noremap, nowait, silent, mode, is_abbr, கோவை, sid,
 			    scriptversion, lnum, 1);
 
-    if (mp_result[0] != NULL && mp_result[1] != NULL)
+    எனில் (mp_result[0] != வெற்று && mp_result[1] != வெற்று)
     {
 	mp_result[0]->m_alt = mp_result[1];
 	mp_result[1]->m_alt = mp_result[0];
@@ -2881,27 +2881,27 @@ f_mapset(typval_T *argvars, typval_T *rettv UNUSED)
 #endif
 
 
-#if defined(MSWIN) || defined(MACOS_X)
+#எனில் defined(MSWIN) || defined(MACOS_X)
 
 # define VIS_SEL	(MODE_VISUAL | MODE_SELECT)	// abbreviation
 
 /*
  * Default mappings for some often used keys.
  */
-struct initmap
+கட்டமைப்பு initmap
 {
     char_u	*arg;
-    int		mode;
+    முழு		mode;
 };
 
 # ifdef FEAT_GUI_MSWIN
 // Use the Windows (CUA) keybindings. (GUI)
-static struct initmap initmappings[] =
+நிலையான கட்டமைப்பு initmap initmappings[] =
 {
 	// paste, copy and cut
 	{(char_u *)"<S-Insert> \"*P", MODE_NORMAL},
 	{(char_u *)"<S-Insert> \"-d\"*P", VIS_SEL},
-	{(char_u *)"<S-Insert> <C-R><C-O>*", MODE_INSERT | MODE_CMDLINE},
+	{(char_u *)"<S-Insert> <C-R><C-O>*", MODE_செருகு | MODE_CMDLINE},
 	{(char_u *)"<C-Insert> \"*y", VIS_SEL},
 	{(char_u *)"<S-Del> \"*d", VIS_SEL},
 	{(char_u *)"<C-Del> \"*d", VIS_SEL},
@@ -2910,28 +2910,28 @@ static struct initmap initmappings[] =
 };
 # endif
 
-# if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+# எனில் defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
 // Use the Windows (CUA) keybindings. (Console)
-static struct initmap cinitmappings[] =
+நிலையான கட்டமைப்பு initmap cinitmappings[] =
 {
 	{(char_u *)"\316w <C-Home>", MODE_NORMAL | VIS_SEL},
-	{(char_u *)"\316w <C-Home>", MODE_INSERT | MODE_CMDLINE},
+	{(char_u *)"\316w <C-Home>", MODE_செருகு | MODE_CMDLINE},
 	{(char_u *)"\316u <C-End>", MODE_NORMAL | VIS_SEL},
-	{(char_u *)"\316u <C-End>", MODE_INSERT | MODE_CMDLINE},
+	{(char_u *)"\316u <C-End>", MODE_செருகு | MODE_CMDLINE},
 
 	// paste, copy and cut
 #  ifdef FEAT_CLIPBOARD
 	{(char_u *)"\316\324 \"*P", MODE_NORMAL},   // SHIFT-Insert is "*P
 	{(char_u *)"\316\324 \"-d\"*P", VIS_SEL},   // SHIFT-Insert is "-d"*P
-	{(char_u *)"\316\324 \022\017*", MODE_INSERT},  // SHIFT-Insert is ^R^O*
+	{(char_u *)"\316\324 \022\017*", MODE_செருகு},  // SHIFT-Insert is ^R^O*
 	{(char_u *)"\316\325 \"*y", VIS_SEL},	    // CTRL-Insert is "*y
 	{(char_u *)"\316\327 \"*d", VIS_SEL},	    // SHIFT-Del is "*d
 	{(char_u *)"\316\330 \"*d", VIS_SEL},	    // CTRL-Del is "*d
 	{(char_u *)"\030 \"*d", VIS_SEL},	    // CTRL-X is "*d
-#  else
+#  இல்லையெனில்
 	{(char_u *)"\316\324 P", MODE_NORMAL},	    // SHIFT-Insert is P
 	{(char_u *)"\316\324 \"-dP", VIS_SEL},	    // SHIFT-Insert is "-dP
-	{(char_u *)"\316\324 \022\017\"", MODE_INSERT}, // SHIFT-Insert is ^R^O"
+	{(char_u *)"\316\324 \022\017\"", MODE_செருகு}, // SHIFT-Insert is ^R^O"
 	{(char_u *)"\316\325 y", VIS_SEL},	    // CTRL-Insert is y
 	{(char_u *)"\316\327 d", VIS_SEL},	    // SHIFT-Del is d
 	{(char_u *)"\316\330 d", VIS_SEL},	    // CTRL-Del is d
@@ -2939,14 +2939,14 @@ static struct initmap cinitmappings[] =
 };
 # endif
 
-# if defined(MACOS_X)
-static struct initmap initmappings[] =
+# எனில் defined(MACOS_X)
+நிலையான கட்டமைப்பு initmap initmappings[] =
 {
 	// Use the Standard MacOS binding.
 	// paste, copy and cut
 	{(char_u *)"<D-v> \"*P", MODE_NORMAL},
 	{(char_u *)"<D-v> \"-d\"*P", VIS_SEL},
-	{(char_u *)"<D-v> <C-R>*", MODE_INSERT | MODE_CMDLINE},
+	{(char_u *)"<D-v> <C-R>*", MODE_செருகு | MODE_CMDLINE},
 	{(char_u *)"<D-c> \"*y", VIS_SEL},
 	{(char_u *)"<D-x> \"*d", VIS_SEL},
 	{(char_u *)"<Backspace> \"-d", VIS_SEL},
@@ -2959,23 +2959,23 @@ static struct initmap initmappings[] =
 /*
  * Set up default mappings.
  */
-    void
-init_mappings(void)
+    வெறுமை
+init_mappings(வெறுமை)
 {
-#if defined(MSWIN) || defined(MACOS_X)
-    int		i;
+#எனில் defined(MSWIN) || defined(MACOS_X)
+    முழு		i;
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+# எனில் defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 #  ifdef VIMDLL
-    if (!gui.starting)
+    எனில் (!gui.starting)
 #  endif
     {
-	for (i = 0; i < (int)ARRAY_LENGTH(cinitmappings); ++i)
+	க்கு (i = 0; i < (முழு)ARRAY_LENGTH(cinitmappings); ++i)
 	    add_map(cinitmappings[i].arg, cinitmappings[i].mode, FALSE);
     }
 # endif
-# if defined(FEAT_GUI_MSWIN) || defined(MACOS_X)
-    for (i = 0; i < (int)ARRAY_LENGTH(initmappings); ++i)
+# எனில் defined(FEAT_GUI_MSWIN) || defined(MACOS_X)
+    க்கு (i = 0; i < (முழு)ARRAY_LENGTH(initmappings); ++i)
 	add_map(initmappings[i].arg, initmappings[i].mode, FALSE);
 # endif
 #endif
@@ -2986,23 +2986,23 @@ init_mappings(void)
  * When "nore" is TRUE use MAPTYPE_NOREMAP.
  * Need to put string in allocated memory, because do_map() will modify it.
  */
-    void
-add_map(char_u *map, int mode, int nore)
+    வெறுமை
+add_map(char_u *map, முழு mode, முழு nore)
 {
     char_u	*s;
     char_u	*cpo_save = p_cpo;
 
     p_cpo = empty_option;	// Allow <> notation
     s = vim_strsave(map);
-    if (s != NULL)
+    எனில் (s != வெற்று)
     {
-	(void)do_map(nore ? MAPTYPE_NOREMAP : MAPTYPE_MAP, s, mode, FALSE);
+	(வெறுமை)do_map(nore ? MAPTYPE_NOREMAP : MAPTYPE_MAP, s, mode, FALSE);
 	vim_free(s);
     }
     p_cpo = cpo_save;
 }
 
-#if defined(FEAT_LANGMAP)
+#எனில் defined(FEAT_LANGMAP)
 /*
  * Any character has an equivalent 'langmap' character.  This is used for
  * keyboards that have a special language mode that sends characters above
@@ -3017,49 +3017,49 @@ add_map(char_u *map, int mode, int nore)
  *
  * Use growarray for 'langmap' chars >= 256
  */
-typedef struct
+வகைவரை கட்டமைப்பு
 {
-    int	    from;
-    int     to;
+    முழு	    from;
+    முழு     to;
 } langmap_entry_T;
 
-static garray_T langmap_mapga;
+நிலையான garray_T langmap_mapga;
 
 /*
  * Search for an entry in "langmap_mapga" for "from".  If found set the "to"
  * field.  If not found insert a new entry at the appropriate location.
  */
-    static void
-langmap_set_entry(int from, int to)
+    நிலையான வெறுமை
+langmap_set_entry(முழு from, முழு to)
 {
     langmap_entry_T *entries = (langmap_entry_T *)(langmap_mapga.ga_data);
-    int		    a = 0;
-    int		    b = langmap_mapga.ga_len;
+    முழு		    a = 0;
+    முழு		    b = langmap_mapga.ga_len;
 
     // Do a binary search for an existing entry.
-    while (a != b)
+    போது (a != b)
     {
-	int i = (a + b) / 2;
-	int d = entries[i].from - from;
+	முழு i = (a + b) / 2;
+	முழு d = entries[i].from - from;
 
-	if (d == 0)
+	எனில் (d == 0)
 	{
 	    entries[i].to = to;
-	    return;
+	    திரும்பு;
 	}
-	if (d < 0)
+	எனில் (d < 0)
 	    a = i + 1;
-	else
+	இல்லையெனில்
 	    b = i;
     }
 
-    if (ga_grow(&langmap_mapga, 1) == FAIL)
-	return;  // out of memory
+    எனில் (ga_grow(&langmap_mapga, 1) == FAIL)
+	திரும்பு;  // out of memory
 
     // insert new entry at position "a"
     entries = (langmap_entry_T *)(langmap_mapga.ga_data) + a;
     mch_memmove(entries + 1, entries,
-			(langmap_mapga.ga_len - a) * sizeof(langmap_entry_T));
+			(langmap_mapga.ga_len - a) * அளவு(langmap_entry_T));
     ++langmap_mapga.ga_len;
     entries[0].from = from;
     entries[0].to = to;
@@ -3068,161 +3068,161 @@ langmap_set_entry(int from, int to)
 /*
  * Apply 'langmap' to multi-byte character "c" and return the result.
  */
-    int
-langmap_adjust_mb(int c)
+    முழு
+langmap_adjust_mb(முழு c)
 {
     langmap_entry_T *entries = (langmap_entry_T *)(langmap_mapga.ga_data);
-    int a = 0;
-    int b = langmap_mapga.ga_len;
+    முழு a = 0;
+    முழு b = langmap_mapga.ga_len;
 
-    while (a != b)
+    போது (a != b)
     {
-	int i = (a + b) / 2;
-	int d = entries[i].from - c;
+	முழு i = (a + b) / 2;
+	முழு d = entries[i].from - c;
 
-	if (d == 0)
-	    return entries[i].to;  // found matching entry
-	if (d < 0)
+	எனில் (d == 0)
+	    திரும்பு entries[i].to;  // found matching entry
+	எனில் (d < 0)
 	    a = i + 1;
-	else
+	இல்லையெனில்
 	    b = i;
     }
-    return c;  // no entry found, return "c" unmodified
+    திரும்பு c;  // no entry found, return "c" unmodified
 }
 
-    void
-langmap_init(void)
+    வெறுமை
+langmap_init(வெறுமை)
 {
-    int i;
+    முழு i;
 
-    for (i = 0; i < 256; i++)
+    க்கு (i = 0; i < 256; i++)
 	langmap_mapchar[i] = i;	 // we init with a one-to-one map
-    ga_init2(&langmap_mapga, sizeof(langmap_entry_T), 8);
+    ga_init2(&langmap_mapga, அளவு(langmap_entry_T), 8);
 }
 
 /*
  * Called when langmap option is set; the language map can be
  * changed at any time!
  */
-    char *
+    எழுத்து *
 did_set_langmap(optset_T *args UNUSED)
 {
     char_u  *p;
     char_u  *p2;
-    int	    from, to;
+    முழு	    from, to;
 
     ga_clear(&langmap_mapga);		    // clear the previous map first
     langmap_init();			    // back to one-to-one map
 
-    for (p = p_langmap; p[0] != NUL; )
+    க்கு (p = p_langmap; p[0] != NUL; )
     {
-	for (p2 = p; p2[0] != NUL && p2[0] != ',' && p2[0] != ';';
+	க்கு (p2 = p; p2[0] != NUL && p2[0] != ',' && p2[0] != ';';
 							       MB_PTR_ADV(p2))
 	{
-	    if (p2[0] == '\\' && p2[1] != NUL)
+	    எனில் (p2[0] == '\\' && p2[1] != NUL)
 		++p2;
 	}
-	if (p2[0] == ';')
+	எனில் (p2[0] == ';')
 	    ++p2;	    // abcd;ABCD form, p2 points to A
-	else
-	    p2 = NULL;	    // aAbBcCdD form, p2 is NULL
-	while (p[0])
+	இல்லையெனில்
+	    p2 = வெற்று;	    // aAbBcCdD form, p2 is NULL
+	போது (p[0])
 	{
-	    if (p[0] == ',')
+	    எனில் (p[0] == ',')
 	    {
 		++p;
-		break;
+		நிறுத்து;
 	    }
-	    if (p[0] == '\\' && p[1] != NUL)
+	    எனில் (p[0] == '\\' && p[1] != NUL)
 		++p;
 	    from = (*mb_ptr2char)(p);
 	    to = NUL;
-	    if (p2 == NULL)
+	    எனில் (p2 == வெற்று)
 	    {
 		MB_PTR_ADV(p);
-		if (p[0] != ',')
+		எனில் (p[0] != ',')
 		{
-		    if (p[0] == '\\')
+		    எனில் (p[0] == '\\')
 			++p;
 		    to = (*mb_ptr2char)(p);
 		}
 	    }
-	    else
+	    இல்லையெனில்
 	    {
-		if (p2[0] != ',')
+		எனில் (p2[0] != ',')
 		{
-		    if (p2[0] == '\\')
+		    எனில் (p2[0] == '\\')
 			++p2;
 		    to = (*mb_ptr2char)(p2);
 		}
 	    }
-	    if (to == NUL)
+	    எனில் (to == NUL)
 	    {
 		sprintf(args->os_errbuf,
 			_(e_langmap_matching_character_missing_for_str),
 			transchar(from));
-		return args->os_errbuf;
+		திரும்பு args->os_errbuf;
 	    }
 
-	    if (from >= 256)
+	    எனில் (from >= 256)
 		langmap_set_entry(from, to);
-	    else
+	    இல்லையெனில்
 		langmap_mapchar[from & 255] = to;
 
 	    // Advance to next pair
 	    MB_PTR_ADV(p);
-	    if (p2 != NULL)
+	    எனில் (p2 != வெற்று)
 	    {
 		MB_PTR_ADV(p2);
-		if (*p == ';')
+		எனில் (*p == ';')
 		{
 		    p = p2;
-		    if (p[0] != NUL)
+		    எனில் (p[0] != NUL)
 		    {
-			if (p[0] != ',')
+			எனில் (p[0] != ',')
 			{
 			    vim_snprintf(args->os_errbuf, args->os_errbuflen,
 				    _(e_langmap_extra_characters_after_semicolon_str),
 				    p);
-			    return args->os_errbuf;
+			    திரும்பு args->os_errbuf;
 			}
 			++p;
 		    }
-		    break;
+		    நிறுத்து;
 		}
 	    }
 	}
     }
 
-    return NULL;
+    திரும்பு வெற்று;
 }
 #endif
 
-    static void
-do_exmap(exarg_T *eap, int isabbrev)
+    நிலையான வெறுமை
+do_exmap(exarg_T *eap, முழு isabbrev)
 {
-    int	    mode;
+    முழு	    mode;
     char_u  *cmdp;
 
     cmdp = eap->cmd;
     mode = get_map_mode(&cmdp, eap->forceit || isabbrev);
 
-    switch (do_map(*cmdp == 'n' ? MAPTYPE_NOREMAP
+    தேர்வு (do_map(*cmdp == 'n' ? MAPTYPE_NOREMAP
 				: *cmdp == 'u' ? MAPTYPE_UNMAP : MAPTYPE_MAP,
 						    eap->arg, mode, isabbrev))
     {
-	case 1: emsg(_(e_invalid_argument));
-		break;
-	case 2: emsg((isabbrev ? _(e_no_such_abbreviation)
+	நிலை 1: emsg(_(e_invalid_argument));
+		நிறுத்து;
+	நிலை 2: emsg((isabbrev ? _(e_no_such_abbreviation)
 						      : _(e_no_such_mapping)));
-		break;
+		நிறுத்து;
     }
 }
 
 /*
  * ":abbreviate" and friends.
  */
-    void
+    வெறுமை
 ex_abbreviate(exarg_T *eap)
 {
     do_exmap(eap, TRUE);	// almost the same as mapping
@@ -3231,16 +3231,16 @@ ex_abbreviate(exarg_T *eap)
 /*
  * ":map" and friends.
  */
-    void
+    வெறுமை
 ex_map(exarg_T *eap)
 {
     // If we are sourcing .exrc or .vimrc in current directory we
     // print the mappings for security reasons.
-    if (secure)
+    எனில் (secure)
     {
 	secure = 2;
-	msg_outtrans(eap->cmd);
-	msg_putchar('\n');
+	செய்தி_outtrans(eap->cmd);
+	செய்தி_putchar('\n');
     }
     do_exmap(eap, FALSE);
 }
@@ -3248,7 +3248,7 @@ ex_map(exarg_T *eap)
 /*
  * ":unmap" and friends.
  */
-    void
+    வெறுமை
 ex_unmap(exarg_T *eap)
 {
     do_exmap(eap, FALSE);
@@ -3257,7 +3257,7 @@ ex_unmap(exarg_T *eap)
 /*
  * ":mapclear" and friends.
  */
-    void
+    வெறுமை
 ex_mapclear(exarg_T *eap)
 {
     map_clear(eap->cmd, eap->arg, eap->forceit, FALSE);
@@ -3266,7 +3266,7 @@ ex_mapclear(exarg_T *eap)
 /*
  * ":abclear" and friends.
  */
-    void
+    வெறுமை
 ex_abclear(exarg_T *eap)
 {
     map_clear(eap->cmd, eap->arg, TRUE, TRUE);

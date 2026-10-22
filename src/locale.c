@@ -11,36 +11,36 @@
  * locale.c: functions for language/locale configuration
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#if (defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
+#எனில் (defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
 	&& (defined(FEAT_EVAL) || defined(FEAT_MULTI_LANG))
 # define HAVE_GET_LOCALE_VAL
-    static char_u *
-get_locale_val(int what)
+    நிலையான char_u *
+get_locale_val(முழு what)
 {
     char_u	*loc;
 
     // Obtain the locale value from the libraries.
-    loc = (char_u *)setlocale(what, NULL);
+    loc = (char_u *)setlocale(what, வெற்று);
 
 # ifdef MSWIN
-    if (loc != NULL)
+    எனில் (loc != வெற்று)
     {
 	char_u	*p;
 
 	// setocale() returns something like "LC_COLLATE=<name>;LC_..." when
 	// one of the values (e.g., LC_CTYPE) differs.
 	p = vim_strchr(loc, '=');
-	if (p != NULL)
+	எனில் (p != வெற்று)
 	{
 	    loc = ++p;
-	    while (*p != NUL)	// remove trailing newline
+	    போது (*p != NUL)	// remove trailing newline
 	    {
-		if (*p < ' ' || *p == ';')
+		எனில் (*p < ' ' || *p == ';')
 		{
 		    *p = NUL;
-		    break;
+		    நிறுத்து;
 		}
 		++p;
 	    }
@@ -48,7 +48,7 @@ get_locale_val(int what)
     }
 # endif
 
-    return loc;
+    திரும்பு loc;
 }
 #endif
 
@@ -59,11 +59,11 @@ get_locale_val(int what)
  * gettext expects "de".  Try to translate one into another here for a few
  * supported languages.
  */
-    static char_u *
+    நிலையான char_u *
 gettext_lang(char_u *name)
 {
-    int		i;
-    static char *(mtable[]) = {
+    முழு		i;
+    நிலையான எழுத்து *(mtable[]) = {
 			"afrikaans",	"af",
 			"czech",	"cs",
 			"dutch",	"nl",
@@ -82,24 +82,24 @@ gettext_lang(char_u *name)
 			"ukrainian",	"uk",
 			"chinese_china", "zh_CN",
 			"chinese_taiwan", "zh_TW",
-			NULL};
+			வெற்று};
 
-    for (i = 0; mtable[i] != NULL; i += 2)
-	if (STRNICMP(mtable[i], name, STRLEN(mtable[i])) == 0)
-	    return (char_u *)mtable[i + 1];
-    return name;
+    க்கு (i = 0; mtable[i] != வெற்று; i += 2)
+	எனில் (STRNICMP(mtable[i], name, STRLEN(mtable[i])) == 0)
+	    திரும்பு (char_u *)mtable[i + 1];
+    திரும்பு name;
 }
 #endif
 
-#if defined(FEAT_MULTI_LANG)
+#எனில் defined(FEAT_MULTI_LANG)
 /*
  * Return TRUE when "lang" starts with a valid language name.
  * Rejects NULL, empty string, "C", "C.UTF-8" and others.
  */
-    static int
+    நிலையான முழு
 is_valid_mess_lang(char_u *lang)
 {
-    return lang != NULL && ASCII_ISALPHA(lang[0]) && ASCII_ISALPHA(lang[1]);
+    திரும்பு lang != வெற்று && ASCII_ISALPHA(lang[0]) && ASCII_ISALPHA(lang[1]);
 }
 
 /*
@@ -107,84 +107,84 @@ is_valid_mess_lang(char_u *lang)
  * 'helplang'.  May return NULL or an empty string.
  */
     char_u *
-get_mess_lang(void)
+get_mess_lang(வெறுமை)
 {
     char_u *p;
 
 # ifdef HAVE_GET_LOCALE_VAL
-#  if defined(LC_MESSAGES)
+#  எனில் defined(LC_MESSAGES)
     p = get_locale_val(LC_MESSAGES);
-#  else
+#  இல்லையெனில்
     // This is necessary for Win32, where LC_MESSAGES is not defined and $LANG
     // may be set to the LCID number.  $LANG holds the display language, see
     // set_init_lang_env().  Otherwise LC_COLLATE is the best guess, LC_TIME
     // and LC_MONETARY may be set differently for a Japanese working in the US.
     p = mch_getenv((char_u *)"LANG");
-    if (!is_valid_mess_lang(p))
+    எனில் (!is_valid_mess_lang(p))
 	p = get_locale_val(LC_COLLATE);
 #  endif
-# else
+# இல்லையெனில்
     p = mch_getenv((char_u *)"LC_ALL");
-    if (!is_valid_mess_lang(p))
+    எனில் (!is_valid_mess_lang(p))
     {
 	p = mch_getenv((char_u *)"LC_MESSAGES");
-	if (!is_valid_mess_lang(p))
+	எனில் (!is_valid_mess_lang(p))
 	    p = mch_getenv((char_u *)"LANG");
     }
 # endif
 # ifdef MSWIN
     p = gettext_lang(p);
 # endif
-    return is_valid_mess_lang(p) ? p : NULL;
+    திரும்பு is_valid_mess_lang(p) ? p : வெற்று;
 }
 #endif
 
 // Complicated #if; matches with where get_mess_env() is used below.
-#if (defined(FEAT_EVAL) && !((defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
+#எனில் (defined(FEAT_EVAL) && !((defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
 	    && defined(LC_MESSAGES))) \
 	|| ((defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
 		&& !defined(LC_MESSAGES))
 /*
  * Get the language used for messages from the environment.
  */
-    static char_u *
-get_mess_env(void)
+    நிலையான char_u *
+get_mess_env(வெறுமை)
 {
     char_u	*p;
 
     p = mch_getenv((char_u *)"LC_ALL");
-    if (p != NULL && *p != NUL)
-	return p;
+    எனில் (p != வெற்று && *p != NUL)
+	திரும்பு p;
 
     p = mch_getenv((char_u *)"LC_MESSAGES");
-    if (p != NULL && *p != NUL)
-	return p;
+    எனில் (p != வெற்று && *p != NUL)
+	திரும்பு p;
 
     p = mch_getenv((char_u *)"LANG");
-    if (p != NULL && VIM_ISDIGIT(*p))
-	p = NULL;		// ignore something like "1043"
+    எனில் (p != வெற்று && VIM_ISDIGIT(*p))
+	p = வெற்று;		// ignore something like "1043"
 # ifdef HAVE_GET_LOCALE_VAL
-    if (p == NULL || *p == NUL)
+    எனில் (p == வெற்று || *p == NUL)
 	p = get_locale_val(LC_CTYPE);
 # endif
-    return p;
+    திரும்பு p;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 
 /*
  * Set the "v:lang" variable according to the current locale setting.
  * Also do "v:lc_time"and "v:ctype".
  */
-    void
-set_lang_var(void)
+    வெறுமை
+set_lang_var(வெறுமை)
 {
     char_u	*loc;
 
 # ifdef HAVE_GET_LOCALE_VAL
     loc = get_locale_val(LC_CTYPE);
-# else
+# இல்லையெனில்
     // setlocale() not supported: use the default value
     loc = (char_u *)"C";
 # endif
@@ -192,9 +192,9 @@ set_lang_var(void)
 
     // When LC_MESSAGES isn't defined use the value from $LC_MESSAGES, fall
     // back to LC_CTYPE if it's empty.
-# if defined(HAVE_GET_LOCALE_VAL) && defined(LC_MESSAGES)
+# எனில் defined(HAVE_GET_LOCALE_VAL) && defined(LC_MESSAGES)
     loc = get_locale_val(LC_MESSAGES);
-# else
+# இல்லையெனில்
     loc = get_mess_env();
 # endif
     set_vim_var_string(VV_LANG, loc, -1);
@@ -206,7 +206,7 @@ set_lang_var(void)
 
 # ifdef HAVE_GET_LOCALE_VAL
     loc = get_locale_val(LC_COLLATE);
-# else
+# இல்லையெனில்
     // setlocale() not supported: use the default value
     loc = (char_u *)"C";
 # endif
@@ -214,12 +214,12 @@ set_lang_var(void)
 }
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#எனில் defined(HAVE_LOCALE_H) || defined(X_LOCALE)
 /*
  * Setup to use the current locale (for ctype() and many other things).
  */
-    void
-init_locale(void)
+    வெறுமை
+init_locale(வெறுமை)
 {
     setlocale(LC_ALL, "");
 
@@ -227,7 +227,7 @@ init_locale(void)
     // Tell Gtk not to change our locale settings.
     gtk_disable_setlocale();
 # endif
-# if defined(LC_NUMERIC)
+# எனில் defined(LC_NUMERIC)
     // Make sure strtod() uses a decimal point, not a comma.
     setlocale(LC_NUMERIC, "C");
 # endif
@@ -241,7 +241,7 @@ init_locale(void)
 
 # ifdef FEAT_GETTEXT
     {
-	int	mustfree = FALSE;
+	முழு	mustfree = FALSE;
 	char_u	*p;
 
 #  ifdef DYNAMIC_GETTEXT
@@ -251,12 +251,12 @@ init_locale(void)
 	// expand_env() doesn't work yet, because g_chartab[] is not
 	// initialized yet, call vim_getenv() directly
 	p = vim_getenv((char_u *)"VIMRUNTIME", &mustfree);
-	if (p != NULL && *p != NUL)
+	எனில் (p != வெற்று && *p != NUL)
 	{
-	    vim_snprintf((char *)NameBuff, MAXPATHL, "%s/lang", p);
-	    bindtextdomain(VIMPACKAGE, (char *)NameBuff);
+	    vim_snprintf((எழுத்து *)NameBuff, MAXPATHL, "%s/lang", p);
+	    bindtextdomain(VIMPACKAGE, (எழுத்து *)NameBuff);
 	}
-	if (mustfree)
+	எனில் (mustfree)
 	    vim_free(p);
 	textdomain(VIMPACKAGE);
     }
@@ -266,17 +266,17 @@ init_locale(void)
 /*
  * ":language":  Set the language (locale).
  */
-    void
+    வெறுமை
 ex_language(exarg_T *eap)
 {
-    char	*loc;
+    எழுத்து	*loc;
     char_u	*p;
     char_u	*name;
-    int		what = LC_ALL;
-    char	*whatstr = "";
+    முழு		what = LC_ALL;
+    எழுத்து	*whatstr = "";
 # ifdef LC_MESSAGES
 #  define VIM_LC_MESSAGES LC_MESSAGES
-# else
+# இல்லையெனில்
 #  define VIM_LC_MESSAGES 6789
 # endif
 
@@ -286,27 +286,27 @@ ex_language(exarg_T *eap)
     // Allow abbreviation, but require at least 3 characters to avoid
     // confusion with a two letter language name "me" or "ct".
     p = skiptowhite(eap->arg);
-    if ((*p == NUL || VIM_ISWHITE(*p)) && p - eap->arg >= 3)
+    எனில் ((*p == NUL || VIM_ISWHITE(*p)) && p - eap->arg >= 3)
     {
-	if (STRNICMP(eap->arg, "messages", p - eap->arg) == 0)
+	எனில் (STRNICMP(eap->arg, "messages", p - eap->arg) == 0)
 	{
 	    what = VIM_LC_MESSAGES;
 	    name = skipwhite(p);
 	    whatstr = "messages ";
 	}
-	else if (STRNICMP(eap->arg, "ctype", p - eap->arg) == 0)
+	இல்லையெனில் எனில் (STRNICMP(eap->arg, "ctype", p - eap->arg) == 0)
 	{
 	    what = LC_CTYPE;
 	    name = skipwhite(p);
 	    whatstr = "ctype ";
 	}
-	else if (STRNICMP(eap->arg, "time", p - eap->arg) == 0)
+	இல்லையெனில் எனில் (STRNICMP(eap->arg, "time", p - eap->arg) == 0)
 	{
 	    what = LC_TIME;
 	    name = skipwhite(p);
 	    whatstr = "time ";
 	}
-	else if (STRNICMP(eap->arg, "collate", p - eap->arg) == 0)
+	இல்லையெனில் எனில் (STRNICMP(eap->arg, "collate", p - eap->arg) == 0)
 	{
 	    what = LC_COLLATE;
 	    name = skipwhite(p);
@@ -314,57 +314,57 @@ ex_language(exarg_T *eap)
 	}
     }
 
-    if (*name == NUL)
+    எனில் (*name == NUL)
     {
 # ifndef LC_MESSAGES
-	if (what == VIM_LC_MESSAGES)
+	எனில் (what == VIM_LC_MESSAGES)
 	    p = get_mess_env();
-	else
+	இல்லையெனில்
 # endif
-	    p = (char_u *)setlocale(what, NULL);
-	if (p == NULL || *p == NUL)
+	    p = (char_u *)setlocale(what, வெற்று);
+	எனில் (p == வெற்று || *p == NUL)
 	    p = (char_u *)"Unknown";
 	smsg(_("Current %slanguage: \"%s\""), whatstr, p);
     }
-    else
+    இல்லையெனில்
     {
 # ifndef LC_MESSAGES
-	if (what == VIM_LC_MESSAGES)
+	எனில் (what == VIM_LC_MESSAGES)
 	    loc = "";
-	else
+	இல்லையெனில்
 # endif
 	{
-	    loc = setlocale(what, (char *)name);
-# if defined(LC_NUMERIC)
+	    loc = setlocale(what, (எழுத்து *)name);
+# எனில் defined(LC_NUMERIC)
 	    // Make sure strtod() uses a decimal point, not a comma.
 	    setlocale(LC_NUMERIC, "C");
 # endif
 	}
-	if (loc == NULL)
+	எனில் (loc == வெற்று)
 	    semsg(_(e_cannot_set_language_to_str), name);
-	else
+	இல்லையெனில்
 	{
-# ifdef HAVE_NL_MSG_CAT_CNTR
+# ifdef HAVE_NL_செய்தி_CAT_CNTR
 	    // Need to do this for GNU gettext, otherwise cached translations
 	    // will be used again.
-	    extern int _nl_msg_cat_cntr;
+	    வெளி முழு nl_செய்தி_cat_cntr;
 
-	    ++_nl_msg_cat_cntr;
+	    ++nl_செய்தி_cat_cntr;
 # elif defined(DYNAMIC_GETTEXT)
 	    // Same thing when gettext is loaded at runtime.
-	    if (dyn_libintl_nl_msg_cat_cntr != NULL)
-		++*dyn_libintl_nl_msg_cat_cntr;
+	    எனில் (dyn_libintl_nl_செய்தி_cat_cntr != வெற்று)
+		++*dyn_libintl_nl_செய்தி_cat_cntr;
 # endif
 	    // Reset $LC_ALL, otherwise it would overrule everything.
 	    vim_setenv((char_u *)"LC_ALL", (char_u *)"");
 
-	    if (what != LC_TIME && what != LC_COLLATE)
+	    எனில் (what != LC_TIME && what != LC_COLLATE)
 	    {
 		// Tell gettext() what to translate to.  It apparently doesn't
 		// use the currently effective locale.  Also do this when
 		// FEAT_GETTEXT isn't defined, so that shell commands use this
 		// value.
-		if (what == LC_ALL)
+		எனில் (what == LC_ALL)
 		{
 		    vim_setenv((char_u *)"LANG", name);
 # ifdef MSWIN
@@ -374,12 +374,12 @@ ex_language(exarg_T *eap)
 		    setlocale(LC_CTYPE, "C");
 # endif
 		}
-		if (what != LC_CTYPE)
+		எனில் (what != LC_CTYPE)
 		{
 		    char_u	*mname;
 # ifdef MSWIN
 		    mname = gettext_lang(name);
-# else
+# இல்லையெனில்
 		    mname = name;
 # endif
 		    // Clear $LANGUAGE because GNU gettext uses it.
@@ -400,16 +400,16 @@ ex_language(exarg_T *eap)
     }
 }
 
-static char_u	**locales = NULL;	// Array of all available locales
+நிலையான char_u	**locales = வெற்று;	// Array of all available locales
 
-static int	did_init_locales = FALSE;
+நிலையான முழு	did_init_locales = FALSE;
 
 /*
  * Return an array of strings for all available locales + NULL for the
  * last element.  Return NULL in case of error.
  */
-    static char_u **
-find_locales(void)
+    நிலையான char_u **
+find_locales(வெறுமை)
 {
     garray_T	locales_ga;
     char_u	*loc;
@@ -422,110 +422,110 @@ find_locales(void)
     // doesn't work we won't have completion.
 # ifndef MSWIN
     locale_list = get_cmd_output((char_u *)"locale -a",
-						    NULL, SHELL_SILENT, NULL);
-# else
+						    வெற்று, SHELL_SILENT, வெற்று);
+# இல்லையெனில்
     // Find all available locales by examining the directories in
     // $VIMRUNTIME/lang/
     {
-	int		options = WILD_SILENT|WILD_USE_NL|WILD_KEEP_ALL;
+	முழு		options = WILD_SILENT|WILD_USE_NL|WILD_KEEP_ALL;
 	expand_T	xpc;
 	char_u		*p;
 
 	ExpandInit(&xpc);
 	xpc.xp_context = EXPAND_DIRECTORIES;
 	locale_list = ExpandOne(&xpc, (char_u *)"$VIMRUNTIME/lang/*",
-						      NULL, options, WILD_ALL);
+						      வெற்று, options, WILD_ALL);
 	ExpandCleanup(&xpc);
-	if (locale_list == NULL)
+	எனில் (locale_list == வெற்று)
 	    // Add a dummy input, that will be skipped lated but we need to
 	    // have something in locale_list so that the C locale is added at
 	    // the end.
 	    locale_list = vim_strsave((char_u *)".\n");
 	p = locale_list;
 	// find the last directory delimiter
-	while (p != NULL && *p != NUL)
+	போது (p != வெற்று && *p != NUL)
 	{
-	    if (*p == '\n')
-		break;
-	    if (*p == '\\')
+	    எனில் (*p == '\n')
+		நிறுத்து;
+	    எனில் (*p == '\\')
 		len = p - locale_list;
 	    p++;
 	}
     }
 # endif
-    if (locale_list == NULL)
-	return NULL;
-    ga_init2(&locales_ga, sizeof(char_u *), 20);
+    எனில் (locale_list == வெற்று)
+	திரும்பு வெற்று;
+    ga_init2(&locales_ga, அளவு(char_u *), 20);
 
     // Transform locale_list string where each locale is separated by "\n"
     // into an array of locale strings.
-    loc = (char_u *)strtok((char *)locale_list, "\n");
+    loc = (char_u *)strtok((எழுத்து *)locale_list, "\n");
 
-    while (loc != NULL)
+    போது (loc != வெற்று)
     {
-	int ignore = FALSE;
+	முழு ignore = FALSE;
 
 # ifdef MSWIN
-	if (len > 0)
+	எனில் (len > 0)
 	    loc += len + 1;
 	// skip locales with a dot (which indicates the charset)
-	if (vim_strchr(loc, '.') != NULL)
+	எனில் (vim_strchr(loc, '.') != வெற்று)
 	    ignore = TRUE;
 # endif
-	if (!ignore)
+	எனில் (!ignore)
 	{
-	    if (ga_grow(&locales_ga, 1) == FAIL)
-		break;
+	    எனில் (ga_grow(&locales_ga, 1) == FAIL)
+		நிறுத்து;
 
 	    loc = vim_strsave(loc);
-	    if (loc == NULL)
-		break;
+	    எனில் (loc == வெற்று)
+		நிறுத்து;
 
 	    ((char_u **)locales_ga.ga_data)[locales_ga.ga_len++] = loc;
 	}
-	loc = (char_u *)strtok(NULL, "\n");
+	loc = (char_u *)strtok(வெற்று, "\n");
     }
 
 # ifdef MSWIN
     // Add the C locale
-    if (ga_grow(&locales_ga, 1) == OK)
+    எனில் (ga_grow(&locales_ga, 1) == OK)
 	((char_u **)locales_ga.ga_data)[locales_ga.ga_len++] =
 						    vim_strsave((char_u *)"C");
 # endif
 
     vim_free(locale_list);
-    if (ga_grow(&locales_ga, 1) == FAIL)
+    எனில் (ga_grow(&locales_ga, 1) == FAIL)
     {
 	ga_clear(&locales_ga);
-	return NULL;
+	திரும்பு வெற்று;
     }
-    ((char_u **)locales_ga.ga_data)[locales_ga.ga_len] = NULL;
-    return (char_u **)locales_ga.ga_data;
+    ((char_u **)locales_ga.ga_data)[locales_ga.ga_len] = வெற்று;
+    திரும்பு (char_u **)locales_ga.ga_data;
 }
 
 /*
  * Lazy initialization of all available locales.
  */
-    static void
-init_locales(void)
+    நிலையான வெறுமை
+init_locales(வெறுமை)
 {
-    if (did_init_locales)
-	return;
+    எனில் (did_init_locales)
+	திரும்பு;
 
     did_init_locales = TRUE;
     locales = find_locales();
 }
 
-# if defined(EXITFREE)
-    void
-free_locales(void)
+# எனில் defined(EXITFREE)
+    வெறுமை
+free_locales(வெறுமை)
 {
-    int			i;
+    முழு			i;
 
-    if (locales == NULL)
-	return;
+    எனில் (locales == வெற்று)
+	திரும்பு;
 
-    for (i = 0; locales[i] != NULL; i++)
+    க்கு (i = 0; locales[i] != வெற்று; i++)
 	vim_free(locales[i]);
     VIM_CLEAR(locales);
 }
@@ -536,33 +536,33 @@ free_locales(void)
  * ":language" command.
  */
     char_u *
-get_lang_arg(expand_T *xp UNUSED, int idx)
+get_lang_arg(expand_T *xp UNUSED, முழு idx)
 {
-    if (idx == 0)
-	return (char_u *)"messages";
-    if (idx == 1)
-	return (char_u *)"ctype";
-    if (idx == 2)
-	return (char_u *)"time";
-    if (idx == 3)
-	return (char_u *)"collate";
+    எனில் (idx == 0)
+	திரும்பு (char_u *)"messages";
+    எனில் (idx == 1)
+	திரும்பு (char_u *)"ctype";
+    எனில் (idx == 2)
+	திரும்பு (char_u *)"time";
+    எனில் (idx == 3)
+	திரும்பு (char_u *)"collate";
 
     init_locales();
-    if (locales == NULL)
-	return NULL;
-    return locales[idx - 4];
+    எனில் (locales == வெற்று)
+	திரும்பு வெற்று;
+    திரும்பு locales[idx - 4];
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the available locales.
  */
     char_u *
-get_locales(expand_T *xp UNUSED, int idx)
+get_locales(expand_T *xp UNUSED, முழு idx)
 {
     init_locales();
-    if (locales == NULL)
-	return NULL;
-    return locales[idx];
+    எனில் (locales == வெற்று)
+	திரும்பு வெற்று;
+    திரும்பு locales[idx];
 }
 
 #endif

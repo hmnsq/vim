@@ -11,61 +11,61 @@
  * viminfo.c: viminfo related functions
  */
 
-#include "vim.h"
-#include "version.h"
+#அந்தர்பாவ "vim.h"
+#அந்தர்பாவ "version.h"
 
 /*
  * Structure used for reading from the viminfo file.
  */
-typedef struct
+வகைவரை கட்டமைப்பு
 {
-    char_u	*vir_line;	// text of the current line
+    char_u	*vir_வரி;	// text of the current line
     FILE	*vir_fd;	// file descriptor
     vimconv_T	vir_conv;	// encoding conversion
-    int		vir_version;	// viminfo version detected or -1
+    முழு		vir_version;	// viminfo version detected or -1
     garray_T	vir_barlines;	// lines starting with |
 } vir_T;
 
-typedef enum {
+வகைவரை எண்ணிக்கை {
     BVAL_NR,
     BVAL_STRING,
     BVAL_EMPTY
 } btype_T;
 
-typedef struct {
+வகைவரை கட்டமைப்பு {
     btype_T	bv_type;
     long	bv_nr;
     char_u	*bv_string;
     char_u	*bv_tofree;	// free later when not NULL
-    int		bv_len;		// length of bv_string
-    int		bv_allocated;	// bv_string was allocated
+    முழு		bv_len;		// length of bv_string
+    முழு		bv_allocated;	// bv_string was allocated
 } bval_T;
 
-#if defined(FEAT_VIMINFO)
+#எனில் defined(FEAT_VIMINFO)
 
-static int  viminfo_errcnt;
+நிலையான முழு  viminfo_errcnt;
 
 /*
  * Find the parameter represented by the given character (eg ''', ':', '"', or
  * '/') in the 'viminfo' option and return a pointer to the string after it.
  * Return NULL if the parameter is not specified in the string.
  */
-    static char_u *
-find_viminfo_parameter(int type)
+    நிலையான char_u *
+find_viminfo_parameter(முழு type)
 {
     char_u  *p;
 
-    for (p = p_viminfo; *p; ++p)
+    க்கு (p = p_viminfo; *p; ++p)
     {
-	if (*p == type)
-	    return p + 1;
-	if (*p == 'n')		    // 'n' is always the last one
-	    break;
+	எனில் (*p == type)
+	    திரும்பு p + 1;
+	எனில் (*p == 'n')		    // 'n' is always the last one
+	    நிறுத்து;
 	p = vim_strchr(p, ',');	    // skip until next ','
-	if (p == NULL)		    // hit the end without finding parameter
-	    break;
+	எனில் (p == வெற்று)		    // hit the end without finding parameter
+	    நிறுத்து;
     }
-    return NULL;
+    திரும்பு வெற்று;
 }
 
 /*
@@ -75,15 +75,15 @@ find_viminfo_parameter(int type)
  * If the parameter is not specified in the string or there is no following
  * number, return -1.
  */
-    int
-get_viminfo_parameter(int type)
+    முழு
+get_viminfo_parameter(முழு type)
 {
     char_u  *p;
 
     p = find_viminfo_parameter(type);
-    if (p != NULL && VIM_ISDIGIT(*p))
-	return atoi((char *)p);
-    return -1;
+    எனில் (p != வெற்று && VIM_ISDIGIT(*p))
+	திரும்பு atoi((எழுத்து *)p);
+    திரும்பு -1;
 }
 
 /*
@@ -94,48 +94,48 @@ get_viminfo_parameter(int type)
  * expand environment variables.
  * Returns an allocated string.  NULL when out of memory.
  */
-    static char_u *
+    நிலையான char_u *
 viminfo_filename(char_u *file)
 {
-    if (file == NULL || *file == NUL)
+    எனில் (file == வெற்று || *file == NUL)
     {
 	size_t  len;
 
-	if (*p_viminfofile != NUL)
+	எனில் (*p_viminfofile != NUL)
 	    file = p_viminfofile;
-	else if ((file = find_viminfo_parameter('n')) == NULL || *file == NUL)
+	இல்லையெனில் எனில் ((file = find_viminfo_parameter('n')) == வெற்று || *file == NUL)
 	{
 #ifdef VIMINFO_FILE2
 # ifdef VMS
-	    if (mch_getenv((char_u *)"SYS$LOGIN") == NULL)
-# else
+	    எனில் (mch_getenv((char_u *)"SYS$LOGIN") == வெற்று)
+# இல்லையெனில்
 #  ifdef MSWIN
 	    // Use $VIM only if $HOME is the default "C:/".
-	    if (STRCMP(vim_getenv((char_u *)"HOME", NULL), "C:/") == 0
-		    && mch_getenv((char_u *)"HOME") == NULL)
-#  else
-	    if (mch_getenv((char_u *)"HOME") == NULL)
+	    எனில் (STRCMP(vim_getenv((char_u *)"HOME", வெற்று), "C:/") == 0
+		    && mch_getenv((char_u *)"HOME") == வெற்று)
+#  இல்லையெனில்
+	    எனில் (mch_getenv((char_u *)"HOME") == வெற்று)
 #  endif
 # endif
 	    {
 		// don't use $VIM when not available.
 		expand_env((char_u *)"$VIM", NameBuff, MAXPATHL);
-		if (STRCMP("$VIM", NameBuff) != 0)  // $VIM was expanded
+		எனில் (STRCMP("$VIM", NameBuff) != 0)  // $VIM was expanded
 		    file = (char_u *)VIMINFO_FILE2;
-		else
+		இல்லையெனில்
 		    file = (char_u *)VIMINFO_FILE;
 	    }
-	    else
+	    இல்லையெனில்
 #endif
 		file = (char_u *)VIMINFO_FILE;
 	}
 	len = expand_env(file, NameBuff, MAXPATHL);
 	file = NameBuff;
 
-	return vim_strnsave(file, len);
+	திரும்பு vim_strnsave(file, len);
     }
 
-    return vim_strsave(file);
+    திரும்பு vim_strsave(file);
 }
 
 /*
@@ -148,16 +148,16 @@ viminfo_filename(char_u *file)
  * - write " CTRL-V <length> \n " in first line
  * - write " < <string> \n "	  in second line
  */
-    static void
+    நிலையான வெறுமை
 viminfo_writestring(FILE *fd, char_u *p)
 {
-    int		c;
+    முழு		c;
     char_u	*s;
-    int		len = 0;
+    முழு		len = 0;
 
-    for (s = p; *s != NUL; ++s)
+    க்கு (s = p; *s != NUL; ++s)
     {
-	if (*s == Ctrl_V || *s == '\n')
+	எனில் (*s == Ctrl_V || *s == '\n')
 	    ++len;
 	++len;
     }
@@ -166,15 +166,15 @@ viminfo_writestring(FILE *fd, char_u *p)
     // line.  Take into account that some room is needed for what comes before
     // the string (e.g., variable name).  Add something to the length for the
     // '<', NL and trailing NUL.
-    if (len > LSIZE / 2)
+    எனில் (len > LSIZE / 2)
 	fprintf(fd, "\026%d\n<", len + 3);
 
-    while ((c = *p++) != NUL)
+    போது ((c = *p++) != NUL)
     {
-	if (c == Ctrl_V || c == '\n')
+	எனில் (c == Ctrl_V || c == '\n')
 	{
 	    putc(Ctrl_V, fd);
-	    if (c == '\n')
+	    எனில் (c == '\n')
 		c = 'n';
 	}
 	putc(c, fd);
@@ -187,49 +187,49 @@ viminfo_writestring(FILE *fd, char_u *p)
  * Breaks the line in less than LSIZE pieces when needed.
  * Returns remaining characters in the line.
  */
-    static int
-barline_writestring(FILE *fd, char_u *s, int remaining_start)
+    நிலையான முழு
+barline_writestring(FILE *fd, char_u *s, முழு remaining_start)
 {
     char_u *p;
-    int	    remaining = remaining_start;
-    int	    len = 2;
+    முழு	    remaining = remaining_start;
+    முழு	    len = 2;
 
     // Count the number of characters produced, including quotes.
-    for (p = s; *p != NUL; ++p)
+    க்கு (p = s; *p != NUL; ++p)
     {
-	if (*p == NL)
+	எனில் (*p == NL)
 	    len += 2;
-	else if (*p == '"' || *p == '\\')
+	இல்லையெனில் எனில் (*p == '"' || *p == '\\')
 	    len += 2;
-	else
+	இல்லையெனில்
 	    ++len;
     }
-    if (len > remaining - 2)
+    எனில் (len > remaining - 2)
     {
 	fprintf(fd, ">%d\n|<", len);
 	remaining = LSIZE - 20;
     }
 
     putc('"', fd);
-    for (p = s; *p != NUL; ++p)
+    க்கு (p = s; *p != NUL; ++p)
     {
-	if (*p == NL)
+	எனில் (*p == NL)
 	{
 	    putc('\\', fd);
 	    putc('n', fd);
 	    --remaining;
 	}
-	else if (*p == '"' || *p == '\\')
+	இல்லையெனில் எனில் (*p == '"' || *p == '\\')
 	{
 	    putc('\\', fd);
 	    putc(*p, fd);
 	    --remaining;
 	}
-	else
+	இல்லையெனில்
 	    putc(*p, fd);
 	--remaining;
 
-	if (remaining < 3)
+	எனில் (remaining < 3)
 	{
 	    putc('\n', fd);
 	    putc('|', fd);
@@ -239,7 +239,7 @@ barline_writestring(FILE *fd, char_u *s, int remaining_start)
 	}
     }
     putc('"', fd);
-    return remaining - 2;
+    திரும்பு remaining - 2;
 }
 
 /*
@@ -252,82 +252,82 @@ barline_writestring(FILE *fd, char_u *s, int remaining_start)
  *
  * Return the string in allocated memory (NULL when out of memory).
  */
-    static char_u *
+    நிலையான char_u *
 viminfo_readstring(
     vir_T	*virp,
-    int		off,		    // offset for virp->vir_line
-    int		convert)	    // convert the string
+    முழு		off,		    // offset for virp->vir_line
+    முழு		convert)	    // convert the string
 {
-    char_u	*retval = NULL;
+    char_u	*retval = வெற்று;
     char_u	*s, *d;
     long	len;
 
-    if (virp->vir_line[off] == Ctrl_V && vim_isdigit(virp->vir_line[off + 1]))
+    எனில் (virp->vir_வரி[off] == Ctrl_V && vim_isdigit(virp->vir_வரி[off + 1]))
     {
-	len = atol((char *)virp->vir_line + off + 1);
-	if (len > 1 && len < 1000000)
+	len = atol((எழுத்து *)virp->vir_வரி + off + 1);
+	எனில் (len > 1 && len < 1000000)
 	    retval = lalloc(len, TRUE);
-	if (retval == NULL)
+	எனில் (retval == வெற்று)
 	{
 	    // Invalid length, line too long, out of memory?  Skip next line.
-	    (void)vim_fgets(virp->vir_line, 10, virp->vir_fd);
-	    return NULL;
+	    (வெறுமை)vim_fgets(virp->vir_வரி, 10, virp->vir_fd);
+	    திரும்பு வெற்று;
 	}
-	(void)vim_fgets(retval, (int)len, virp->vir_fd);
+	(வெறுமை)vim_fgets(retval, (முழு)len, virp->vir_fd);
 	s = retval + 1;	    // Skip the leading '<'
     }
-    else
+    இல்லையெனில்
     {
-	retval = vim_strsave(virp->vir_line + off);
-	if (retval == NULL)
-	    return NULL;
+	retval = vim_strsave(virp->vir_வரி + off);
+	எனில் (retval == வெற்று)
+	    திரும்பு வெற்று;
 	s = retval;
     }
 
     // Change CTRL-V CTRL-V to CTRL-V and CTRL-V n to \n in-place.
     d = retval;
-    while (*s != NUL && *s != '\n')
+    போது (*s != NUL && *s != '\n')
     {
-	if (s[0] == Ctrl_V && s[1] != NUL)
+	எனில் (s[0] == Ctrl_V && s[1] != NUL)
 	{
-	    if (s[1] == 'n')
+	    எனில் (s[1] == 'n')
 		*d++ = '\n';
-	    else
+	    இல்லையெனில்
 		*d++ = Ctrl_V;
 	    s += 2;
 	}
-	else
+	இல்லையெனில்
 	    *d++ = *s++;
     }
     *d = NUL;
 
-    if (convert && virp->vir_conv.vc_type != CONV_NONE && *retval != NUL)
+    எனில் (convert && virp->vir_conv.vc_type != CONV_NONE && *retval != NUL)
     {
-	d = string_convert(&virp->vir_conv, retval, NULL);
-	if (d != NULL)
+	d = string_convert(&virp->vir_conv, retval, வெற்று);
+	எனில் (d != வெற்று)
 	{
 	    vim_free(retval);
 	    retval = d;
 	}
     }
 
-    return retval;
+    திரும்பு retval;
 }
 
 /*
  * Read a line from the viminfo file.
  * Returns TRUE for end-of-file;
  */
-    static int
+    நிலையான முழு
 viminfo_readline(vir_T *virp)
 {
-    return vim_fgets(virp->vir_line, LSIZE, virp->vir_fd);
+    திரும்பு vim_fgets(virp->vir_வரி, LSIZE, virp->vir_fd);
 }
 
-    static int
+    நிலையான முழு
 read_viminfo_bufferlist(
     vir_T	*virp,
-    int		writing)
+    முழு		writing)
 {
     char_u	*tab;
     linenr_T	lnum;
@@ -340,23 +340,23 @@ read_viminfo_bufferlist(
     xline = viminfo_readstring(virp, 1, FALSE);
 
     // don't read in if there are files on the command-line or if writing:
-    if (xline != NULL && !writing && ARGCOUNT == 0
-				       && find_viminfo_parameter('%') != NULL)
+    எனில் (xline != வெற்று && !writing && ARGCOUNT == 0
+				       && find_viminfo_parameter('%') != வெற்று)
     {
 	// Format is: <fname> Tab <lnum> Tab <col>.
 	// Watch out for a Tab in the file name, work from the end.
 	lnum = 0;
 	col = 0;
 	tab = vim_strrchr(xline, '\t');
-	if (tab != NULL)
+	எனில் (tab != வெற்று)
 	{
 	    *tab++ = '\0';
-	    col = (colnr_T)atoi((char *)tab);
+	    col = (colnr_T)atoi((எழுத்து *)tab);
 	    tab = vim_strrchr(xline, '\t');
-	    if (tab != NULL)
+	    எனில் (tab != வெற்று)
 	    {
 		*tab++ = '\0';
-		lnum = atol((char *)tab);
+		lnum = atol((எழுத்து *)tab);
 	    }
 	}
 
@@ -366,7 +366,7 @@ read_viminfo_bufferlist(
 	sfname = shorten_fname1(NameBuff);
 
 	buf = buflist_new(NameBuff, sfname, (linenr_T)0, BLN_LISTED);
-	if (buf != NULL)	// just in case...
+	எனில் (buf != வெற்று)	// just in case...
 	{
 	    buf->b_last_cursor.lnum = lnum;
 	    buf->b_last_cursor.col = col;
@@ -375,59 +375,59 @@ read_viminfo_bufferlist(
     }
     vim_free(xline);
 
-    return viminfo_readline(virp);
+    திரும்பு viminfo_readline(virp);
 }
 
 /*
  * Return TRUE if "name" is on removable media (depending on 'viminfo').
  */
-    static int
+    நிலையான முழு
 removable(char_u *name)
 {
     char_u  *p;
     char_u  part[51];
-    int	    part_len;
-    int	    retval = FALSE;
+    முழு	    part_len;
+    முழு	    retval = FALSE;
 
-    name = home_replace_save(NULL, name);
-    if (name == NULL)
-	return FALSE;
-    for (p = p_viminfo; *p; )
+    name = home_replace_save(வெற்று, name);
+    எனில் (name == வெற்று)
+	திரும்பு FALSE;
+    க்கு (p = p_viminfo; *p; )
     {
-	part_len = copy_option_part(&p, part, sizeof(part), ", ");
-	if (part[0] == 'r')
+	part_len = copy_option_part(&p, part, அளவு(part), ", ");
+	எனில் (part[0] == 'r')
 	{
-	    if (MB_STRNICMP(part + 1, name, part_len - 1) == 0)
+	    எனில் (MB_STRNICMP(part + 1, name, part_len - 1) == 0)
 	    {
 		retval = TRUE;
-		break;
+		நிறுத்து;
 	    }
 	}
     }
     vim_free(name);
-    return retval;
+    திரும்பு retval;
 }
 
-    static void
+    நிலையான வெறுமை
 write_viminfo_bufferlist(FILE *fp)
 {
     buf_T	*buf;
     win_T	*win;
     tabpage_T	*tp;
-    char_u	*line;
-    int		max_buffers;
+    char_u	*வரி;
+    முழு		max_buffers;
 
-    if (find_viminfo_parameter('%') == NULL)
-	return;
+    எனில் (find_viminfo_parameter('%') == வெற்று)
+	திரும்பு;
 
     // Without a number -1 is returned: do all buffers.
     max_buffers = get_viminfo_parameter('%');
 
     // Allocate room for the file name, lnum and col.
-#define LINE_BUF_LEN (MAXPATHL + 40)
-    line = alloc(LINE_BUF_LEN);
-    if (line == NULL)
-	return;
+#define வரி_BUF_LEN (MAXPATHL + 40)
+    வரி = alloc(வரி_BUF_LEN);
+    எனில் (வரி == வெற்று)
+	திரும்பு;
 
     FOR_ALL_TAB_WINDOWS(tp, win)
 	set_last_cursor(win);
@@ -437,93 +437,93 @@ write_viminfo_bufferlist(FILE *fp)
     {
 	size_t	linelen;
 
-	if (buf->b_fname == NULL
+	எனில் (buf->b_fname == வெற்று
 		|| !buf->b_p_bl
 		|| bt_quickfix(buf)
 		|| bt_terminal(buf)
 		|| removable(buf->b_ffname))
-	    continue;
+	    தொடர்;
 
-	if (max_buffers-- == 0)
-	    break;
+	எனில் (max_buffers-- == 0)
+	    நிறுத்து;
 	putc('%', fp);
-	linelen = home_replace(NULL, buf->b_ffname, line, MAXPATHL, TRUE);
-	vim_snprintf((char *)line + linelen, LINE_BUF_LEN - linelen, "\t%ld\t%d",
+	linelen = home_replace(வெற்று, buf->b_ffname, வரி, MAXPATHL, TRUE);
+	vim_snprintf((எழுத்து *)வரி + linelen, வரி_BUF_LEN - linelen, "\t%ld\t%d",
 			(long)buf->b_last_cursor.lnum,
 			buf->b_last_cursor.col);
-	viminfo_writestring(fp, line);
+	viminfo_writestring(fp, வரி);
     }
-    vim_free(line);
+    vim_free(வரி);
 }
 
 /*
  * Buffers for history read from a viminfo file.  Only valid while reading.
  */
-static histentry_T *viminfo_history[HIST_COUNT] =
-					       {NULL, NULL, NULL, NULL, NULL};
-static int	viminfo_hisidx[HIST_COUNT] = {0, 0, 0, 0, 0};
-static int	viminfo_hislen[HIST_COUNT] = {0, 0, 0, 0, 0};
-static int	viminfo_add_at_front = FALSE;
+நிலையான histentry_T *viminfo_history[HIST_மொத்தம்] =
+					       {வெற்று, வெற்று, வெற்று, வெற்று, வெற்று};
+நிலையான முழு	viminfo_hisidx[HIST_மொத்தம்] = {0, 0, 0, 0, 0};
+நிலையான முழு	viminfo_hislen[HIST_மொத்தம்] = {0, 0, 0, 0, 0};
+நிலையான முழு	viminfo_add_at_front = FALSE;
 
 /*
  * Translate a history type number to the associated character.
  */
-    static int
+    நிலையான முழு
 hist_type2char(
-    int	    type,
-    int	    use_question)	    // use '?' instead of '/'
+    முழு	    type,
+    முழு	    use_question)	    // use '?' instead of '/'
 {
-    if (type == HIST_CMD)
-	return ':';
-    if (type == HIST_SEARCH)
+    எனில் (type == HIST_CMD)
+	திரும்பு ':';
+    எனில் (type == HIST_தேடல்)
     {
-	if (use_question)
-	    return '?';
-	else
-	    return '/';
+	எனில் (use_question)
+	    திரும்பு '?';
+	இல்லையெனில்
+	    திரும்பு '/';
     }
-    if (type == HIST_EXPR)
-	return '=';
-    return '@';
+    எனில் (type == HIST_கோவை)
+	திரும்பு '=';
+    திரும்பு '@';
 }
 
 /*
  * Prepare for reading the history from the viminfo file.
  * This allocates history arrays to store the read history lines.
  */
-    static void
-prepare_viminfo_history(int asklen, int writing)
+    நிலையான வெறுமை
+prepare_viminfo_history(முழு asklen, முழு writing)
 {
-    int	    i;
-    int	    num;
-    int	    type;
-    int	    len;
-    int	    hislen;
+    முழு	    i;
+    முழு	    இலக்கம்;
+    முழு	    type;
+    முழு	    len;
+    முழு	    hislen;
 
     init_history();
     hislen = get_hislen();
     viminfo_add_at_front = (asklen != 0 && !writing);
-    if (asklen > hislen)
+    எனில் (asklen > hislen)
 	asklen = hislen;
 
-    for (type = 0; type < HIST_COUNT; ++type)
+    க்கு (type = 0; type < HIST_மொத்தம்; ++type)
     {
 	histentry_T *histentry = get_histentry(type);
 
 	// Count the number of empty spaces in the history list.  Entries read
 	// from viminfo previously are also considered empty.  If there are
 	// more spaces available than we request, then fill them up.
-	for (i = 0, num = 0; i < hislen; i++)
-	    if (histentry[i].hisstr == NULL || histentry[i].viminfo)
-		num++;
+	க்கு (i = 0, இலக்கம் = 0; i < hislen; i++)
+	    எனில் (histentry[i].hisstr == வெற்று || histentry[i].viminfo)
+		இலக்கம்++;
 	len = asklen;
-	if (num > len)
-	    len = num;
-	if (len <= 0)
-	    viminfo_history[type] = NULL;
-	else
+	எனில் (இலக்கம் > len)
+	    len = இலக்கம்;
+	எனில் (len <= 0)
+	    viminfo_history[type] = வெற்று;
+	இல்லையெனில்
 	    viminfo_history[type] = LALLOC_MULT(histentry_T, len);
-	if (viminfo_history[type] == NULL)
+	எனில் (viminfo_history[type] == வெற்று)
 	    len = 0;
 	viminfo_hislen[type] = len;
 	viminfo_hisidx[type] = 0;
@@ -534,36 +534,36 @@ prepare_viminfo_history(int asklen, int writing)
  * Accept a line from the viminfo, store it in the history array when it's
  * new.
  */
-    static int
-read_viminfo_history(vir_T *virp, int writing)
+    நிலையான முழு
+read_viminfo_history(vir_T *virp, முழு writing)
 {
-    int		type;
+    முழு		type;
     long_u	len;
-    char_u	*val = NULL;
+    char_u	*val = வெற்று;
     char_u	*p;
 
-    type = hist_char2type(virp->vir_line[0]);
-    if (viminfo_hisidx[type] >= viminfo_hislen[type])
-	goto done;
+    type = hist_char2type(virp->vir_வரி[0]);
+    எனில் (viminfo_hisidx[type] >= viminfo_hislen[type])
+	செல் done;
 
     val = viminfo_readstring(virp, 1, TRUE);
-    if (val == NULL || *val == NUL)
-	goto done;
+    எனில் (val == வெற்று || *val == NUL)
+	செல் done;
 
-    int sep = (*val == ' ' ? NUL : *val);
+    முழு sep = (*val == ' ' ? NUL : *val);
 
-    if (in_history(type, val + (type == HIST_SEARCH), viminfo_add_at_front,
+    எனில் (in_history(type, val + (type == HIST_தேடல்), viminfo_add_at_front,
 								sep, writing))
-	goto done;
+	செல் done;
 
     // Need to re-allocate to append the separator byte.
     len = STRLEN(val);
-    if (type == HIST_SEARCH)
+    எனில் (type == HIST_தேடல்)
     {
 	p = alloc((size_t)len + 1);	    // +1 for the NUL. val already
 					    // includes the separator.
-	if (p == NULL)
-	    goto done;
+	எனில் (p == வெற்று)
+	    செல் done;
 
 	// Search entry: Move the separator from the first
 	// column to after the NUL.
@@ -571,11 +571,11 @@ read_viminfo_history(vir_T *virp, int writing)
 	p[len] = sep;
 	--len;				    // take into account the shortened string
     }
-    else
+    இல்லையெனில்
     {
 	p = alloc((size_t)len + 2);	    // +1 for NUL and +1 for separator
-	if (p == NULL)
-	    goto done;
+	எனில் (p == வெற்று)
+	    செல் done;
 
 	// Not a search entry: No separator in the viminfo
 	// file, add a NUL separator.
@@ -591,78 +591,78 @@ read_viminfo_history(vir_T *virp, int writing)
 
 done:
     vim_free(val);
-    return viminfo_readline(virp);
+    திரும்பு viminfo_readline(virp);
 }
 
 /*
  * Accept a new style history line from the viminfo, store it in the history
  * array when it's new.
  */
-    static void
+    நிலையான வெறுமை
 handle_viminfo_history(
-	garray_T    *values,
-	int	    writing)
+	garray_T    *மதிப்புகள்,
+	முழு	    writing)
 {
-    int		type;
+    முழு		type;
     long_u	len;
     char_u	*val;
     char_u	*p;
-    bval_T	*vp = (bval_T *)values->ga_data;
+    bval_T	*vp = (bval_T *)மதிப்புகள்->ga_data;
 
     // Check the format:
     // |{bartype},{histtype},{timestamp},{separator},"text"
-    if (values->ga_len < 4
+    எனில் (மதிப்புகள்->ga_len < 4
 	    || vp[0].bv_type != BVAL_NR
 	    || vp[1].bv_type != BVAL_NR
 	    || (vp[2].bv_type != BVAL_NR && vp[2].bv_type != BVAL_EMPTY)
 	    || vp[3].bv_type != BVAL_STRING)
-	return;
+	திரும்பு;
 
     type = vp[0].bv_nr;
-    if (type >= HIST_COUNT)
-	return;
+    எனில் (type >= HIST_மொத்தம்)
+	திரும்பு;
 
-    if (viminfo_hisidx[type] >= viminfo_hislen[type])
-	return;
+    எனில் (viminfo_hisidx[type] >= viminfo_hislen[type])
+	திரும்பு;
 
     val = vp[3].bv_string;
-    if (val == NULL || *val == NUL)
-	return;
+    எனில் (val == வெற்று || *val == NUL)
+	திரும்பு;
 
-    int sep = type == HIST_SEARCH && vp[2].bv_type == BVAL_NR
+    முழு sep = type == HIST_தேடல் && vp[2].bv_type == BVAL_NR
 							? vp[2].bv_nr : NUL;
-    int idx;
-    int overwrite = FALSE;
+    முழு idx;
+    முழு overwrite = FALSE;
 
-    if (in_history(type, val, viminfo_add_at_front, sep, writing))
-	return;
+    எனில் (in_history(type, val, viminfo_add_at_front, sep, writing))
+	திரும்பு;
 
     // If lines were written by an older Vim we need to avoid
     // getting duplicates. See if the entry already exists.
-    for (idx = 0; idx < viminfo_hisidx[type]; ++idx)
+    க்கு (idx = 0; idx < viminfo_hisidx[type]; ++idx)
     {
 	p = viminfo_history[type][idx].hisstr;
 	len = viminfo_history[type][idx].hisstrlen;
-	if (STRCMP(val, p) == 0
-		&& (type != HIST_SEARCH || sep == p[len + 1]))
+	எனில் (STRCMP(val, p) == 0
+		&& (type != HIST_தேடல் || sep == p[len + 1]))
 	{
 	    overwrite = TRUE;
-	    break;
+	    நிறுத்து;
 	}
     }
 
-    if (!overwrite)
+    எனில் (!overwrite)
     {
 	// Need to re-allocate to append the separator byte.
 	len = vp[3].bv_len;
 	p = alloc(len + 2);
     }
-    else
+    இல்லையெனில்
 	len = 0; // for picky compilers
-    if (p != NULL)
+    எனில் (p != வெற்று)
     {
 	viminfo_history[type][idx].time_set = vp[1].bv_nr;
-	if (!overwrite)
+	எனில் (!overwrite)
 	{
 	    mch_memmove(p, val, (size_t)len + 1);
 	    // Put the separator after the NUL.
@@ -679,127 +679,127 @@ handle_viminfo_history(
 /*
  * Concatenate history lines from viminfo after the lines typed in this Vim.
  */
-    static void
-concat_history(int type)
+    நிலையான வெறுமை
+concat_history(முழு type)
 {
-    int		idx;
-    int		i;
-    int		hislen = get_hislen();
+    முழு		idx;
+    முழு		i;
+    முழு		hislen = get_hislen();
     histentry_T *histentry = get_histentry(type);
-    int		*hisidx = get_hisidx(type);
-    int		*hisnum = get_hisnum(type);
+    முழு		*hisidx = get_hisidx(type);
+    முழு		*hisnum = get_hisnum(type);
 
     idx = *hisidx + viminfo_hisidx[type];
-    if (idx >= hislen)
+    எனில் (idx >= hislen)
 	idx -= hislen;
-    else if (idx < 0)
+    இல்லையெனில் எனில் (idx < 0)
 	idx = hislen - 1;
-    if (viminfo_add_at_front)
+    எனில் (viminfo_add_at_front)
 	*hisidx = idx;
-    else
+    இல்லையெனில்
     {
-	if (*hisidx == -1)
+	எனில் (*hisidx == -1)
 	    *hisidx = hislen - 1;
-	do
+	செய்
 	{
-	    if (histentry[idx].hisstr != NULL || histentry[idx].viminfo)
-		break;
-	    if (++idx == hislen)
+	    எனில் (histentry[idx].hisstr != வெற்று || histentry[idx].viminfo)
+		நிறுத்து;
+	    எனில் (++idx == hislen)
 		idx = 0;
-	} while (idx != *hisidx);
-	if (idx != *hisidx && --idx < 0)
+	} போது (idx != *hisidx);
+	எனில் (idx != *hisidx && --idx < 0)
 	    idx = hislen - 1;
     }
-    for (i = 0; i < viminfo_hisidx[type]; i++)
+    க்கு (i = 0; i < viminfo_hisidx[type]; i++)
     {
 	vim_free(histentry[idx].hisstr);
 	histentry[idx].hisstr = viminfo_history[type][i].hisstr;
 	histentry[idx].hisstrlen = viminfo_history[type][i].hisstrlen;
 	histentry[idx].viminfo = TRUE;
 	histentry[idx].time_set = viminfo_history[type][i].time_set;
-	if (--idx < 0)
+	எனில் (--idx < 0)
 	    idx = hislen - 1;
     }
     idx += 1;
     idx %= hislen;
-    for (i = 0; i < viminfo_hisidx[type]; i++)
+    க்கு (i = 0; i < viminfo_hisidx[type]; i++)
     {
 	histentry[idx++].hisnum = ++*hisnum;
 	idx %= hislen;
     }
 }
 
-    static int
-sort_hist(const void *s1, const void *s2)
+    நிலையான முழு
+sort_hist(மாறிலி வெறுமை *s1, மாறிலி வெறுமை *s2)
 {
     histentry_T *p1 = *(histentry_T **)s1;
     histentry_T *p2 = *(histentry_T **)s2;
 
-    if (p1->time_set < p2->time_set) return -1;
-    if (p1->time_set > p2->time_set) return 1;
-    return 0;
+    எனில் (p1->time_set < p2->time_set) திரும்பு -1;
+    எனில் (p1->time_set > p2->time_set) திரும்பு 1;
+    திரும்பு 0;
 }
 
 /*
  * Merge history lines from viminfo and lines typed in this Vim based on the
  * timestamp;
  */
-    static void
-merge_history(int type)
+    நிலையான வெறுமை
+merge_history(முழு type)
 {
-    int		max_len;
+    முழு		max_len;
     histentry_T **tot_hist;
     histentry_T *new_hist;
-    int		i;
-    int		len;
-    int		hislen = get_hislen();
+    முழு		i;
+    முழு		len;
+    முழு		hislen = get_hislen();
     histentry_T *histentry = get_histentry(type);
-    int		*hisidx = get_hisidx(type);
-    int		*hisnum = get_hisnum(type);
+    முழு		*hisidx = get_hisidx(type);
+    முழு		*hisnum = get_hisnum(type);
 
     // Make one long list with all entries.
     max_len = hislen + viminfo_hisidx[type];
     tot_hist = ALLOC_MULT(histentry_T *, max_len);
     new_hist = ALLOC_MULT(histentry_T, hislen);
-    if (tot_hist == NULL || new_hist == NULL)
+    எனில் (tot_hist == வெற்று || new_hist == வெற்று)
     {
 	vim_free(tot_hist);
 	vim_free(new_hist);
-	return;
+	திரும்பு;
     }
-    for (i = 0; i < viminfo_hisidx[type]; i++)
+    க்கு (i = 0; i < viminfo_hisidx[type]; i++)
 	tot_hist[i] = &viminfo_history[type][i];
     len = i;
-    for (i = 0; i < hislen; i++)
-	if (histentry[i].hisstr != NULL)
+    க்கு (i = 0; i < hislen; i++)
+	எனில் (histentry[i].hisstr != வெற்று)
 	    tot_hist[len++] = &histentry[i];
 
     // Sort the list on timestamp.
-    qsort((void *)tot_hist, (size_t)len, sizeof(histentry_T *), sort_hist);
+    qsort((வெறுமை *)tot_hist, (size_t)len, அளவு(histentry_T *), sort_hist);
 
     // Keep the newest ones.
-    for (i = 0; i < hislen; i++)
+    க்கு (i = 0; i < hislen; i++)
     {
-	if (i < len)
+	எனில் (i < len)
 	{
 	    new_hist[i] = *tot_hist[i];
-	    tot_hist[i]->hisstr = NULL;
+	    tot_hist[i]->hisstr = வெற்று;
 	    tot_hist[i]->hisstrlen = 0;
-	    if (new_hist[i].hisnum == 0)
+	    எனில் (new_hist[i].hisnum == 0)
 		new_hist[i].hisnum = ++*hisnum;
 	}
-	else
+	இல்லையெனில்
 	    clear_hist_entry(&new_hist[i]);
     }
     *hisidx = (i < len ? i : len) - 1;
 
     // Free what is not kept.
-    for (i = 0; i < viminfo_hisidx[type]; i++)
+    க்கு (i = 0; i < viminfo_hisidx[type]; i++)
     {
 	vim_free(viminfo_history[type][i].hisstr);
 	viminfo_history[type][i].hisstrlen = 0;
     }
-    for (i = 0; i < hislen; i++)
+    க்கு (i = 0; i < hislen; i++)
     {
 	vim_free(histentry[i].hisstr);
 	histentry[i].hisstrlen = 0;
@@ -812,20 +812,20 @@ merge_history(int type)
 /*
  * Finish reading history lines from viminfo.  Not used when writing viminfo.
  */
-    static void
+    நிலையான வெறுமை
 finish_viminfo_history(vir_T *virp)
 {
-    int	type;
-    int merge = virp->vir_version >= VIMINFO_VERSION_WITH_HISTORY;
+    முழு	type;
+    முழு merge = virp->vir_version >= VIMINFO_VERSION_WITH_HISTORY;
 
-    for (type = 0; type < HIST_COUNT; ++type)
+    க்கு (type = 0; type < HIST_மொத்தம்; ++type)
     {
-	if (get_histentry(type) == NULL)
-	    continue;
+	எனில் (get_histentry(type) == வெற்று)
+	    தொடர்;
 
-	if (merge)
+	எனில் (merge)
 	    merge_history(type);
-	else
+	இல்லையெனில்
 	    concat_history(type);
 
 	VIM_CLEAR(viminfo_history[type]);
@@ -839,76 +839,76 @@ finish_viminfo_history(vir_T *virp)
  * file, data is in viminfo_history[].
  * When "merge" is FALSE just write all history lines.  Used for ":wviminfo!".
  */
-    static void
-write_viminfo_history(FILE *fp, int merge)
+    நிலையான வெறுமை
+write_viminfo_history(FILE *fp, முழு merge)
 {
-    int	    i;
-    int	    type;
-    int	    num_saved;
-    int     round;
-    int	    hislen;
+    முழு	    i;
+    முழு	    type;
+    முழு	    இலக்கம்_saved;
+    முழு     round;
+    முழு	    hislen;
 
     init_history();
     hislen = get_hislen();
-    if (hislen == 0)
-	return;
-    for (type = 0; type < HIST_COUNT; ++type)
+    எனில் (hislen == 0)
+	திரும்பு;
+    க்கு (type = 0; type < HIST_மொத்தம்; ++type)
     {
 	histentry_T *histentry = get_histentry(type);
-	int	    *hisidx = get_hisidx(type);
+	முழு	    *hisidx = get_hisidx(type);
 
-	num_saved = get_viminfo_parameter(hist_type2char(type, FALSE));
-	if (num_saved == 0)
-	    continue;
-	if (num_saved < 0)  // Use default
-	    num_saved = hislen;
+	இலக்கம்_saved = get_viminfo_parameter(hist_type2char(type, FALSE));
+	எனில் (இலக்கம்_saved == 0)
+	    தொடர்;
+	எனில் (இலக்கம்_saved < 0)  // Use default
+	    இலக்கம்_saved = hislen;
 	fprintf(fp, _("\n# %s History (newest to oldest):\n"),
 			    type == HIST_CMD ? _("Command Line") :
-			    type == HIST_SEARCH ? _("Search String") :
-			    type == HIST_EXPR ? _("Expression") :
-			    type == HIST_INPUT ? _("Input Line") :
+			    type == HIST_தேடல் ? _("Search String") :
+			    type == HIST_கோவை ? _("Expression") :
+			    type == HIST_உள்ளீடு ? _("Input Line") :
 					_("Debug Line"));
-	if (num_saved > hislen)
-	    num_saved = hislen;
+	எனில் (இலக்கம்_saved > hislen)
+	    இலக்கம்_saved = hislen;
 
 	// Merge typed and viminfo history:
 	// round 1: history of typed commands.
 	// round 2: history from recently read viminfo.
-	for (round = 1; round <= 2; ++round)
+	க்கு (round = 1; round <= 2; ++round)
 	{
-	    if (round == 1)
+	    எனில் (round == 1)
 		// start at newest entry, somewhere in the list
 		i = *hisidx;
-	    else if (viminfo_hisidx[type] > 0)
+	    இல்லையெனில் எனில் (viminfo_hisidx[type] > 0)
 		// start at newest entry, first in the list
 		i = 0;
-	    else
+	    இல்லையெனில்
 		// empty list
 		i = -1;
-	    if (i >= 0)
-		while (num_saved > 0
+	    எனில் (i >= 0)
+		போது (இலக்கம்_saved > 0
 			&& !(round == 2 && i >= viminfo_hisidx[type]))
 		{
 		    char_u  *p;
 		    size_t  plen;
 		    time_t  timestamp;
-		    int	    c = NUL;
+		    முழு	    c = NUL;
 
-		    if (round == 1)
+		    எனில் (round == 1)
 		    {
 			p = histentry[i].hisstr;
 			plen = histentry[i].hisstrlen;
 			timestamp = histentry[i].time_set;
 		    }
-		    else
+		    இல்லையெனில்
 		    {
-			if (viminfo_history[type] == NULL)
+			எனில் (viminfo_history[type] == வெற்று)
 			{
-			    p = NULL;
+			    p = வெற்று;
 			    plen = 0;
 			    timestamp = 0;
 			}
-			else
+			இல்லையெனில்
 			{
 			    p = viminfo_history[type][i].hisstr;
 			    plen = viminfo_history[type][i].hisstrlen;
@@ -916,15 +916,15 @@ write_viminfo_history(FILE *fp, int merge)
 			}
 		    }
 
-		    if (p != NULL && (round == 2
+		    எனில் (p != வெற்று && (round == 2
 				       || !merge
 				       || !histentry[i].viminfo))
 		    {
-			--num_saved;
+			--இலக்கம்_saved;
 			fputc(hist_type2char(type, TRUE), fp);
 			// For the search history: put the separator in the
 			// second column; use a space if there isn't one.
-			if (type == HIST_SEARCH)
+			எனில் (type == HIST_தேடல்)
 			{
 			    c = p[plen + 1];
 			    putc(c == NUL ? ' ' : c, fp);
@@ -932,13 +932,13 @@ write_viminfo_history(FILE *fp, int merge)
 			viminfo_writestring(fp, p);
 
 			{
-			    char    cbuf[NUMBUFLEN];
+			    எழுத்து    cbuf[NUMBUFLEN];
 
 			    // New style history with a bar line. Format:
 			    // |{bartype},{histtype},{timestamp},{separator},"text"
-			    if (c == NUL)
+			    எனில் (c == NUL)
 				cbuf[0] = NUL;
-			    else
+			    இல்லையெனில்
 				sprintf(cbuf, "%d", c);
 			    fprintf(fp, "|%d,%d,%ld,%s,", BARTYPE_HISTORY,
 						 type, (long)timestamp, cbuf);
@@ -946,24 +946,24 @@ write_viminfo_history(FILE *fp, int merge)
 			    putc('\n', fp);
 			}
 		    }
-		    if (round == 1)
+		    எனில் (round == 1)
 		    {
 			// Decrement index, loop around and stop when back at
 			// the start.
-			if (--i < 0)
+			எனில் (--i < 0)
 			    i = hislen - 1;
-			if (i == *hisidx)
-			    break;
+			எனில் (i == *hisidx)
+			    நிறுத்து;
 		    }
-		    else
+		    இல்லையெனில்
 		    {
 			// Increment index. Stop at the end in the while.
 			++i;
 		    }
 		}
 	}
-	for (i = 0; i < viminfo_hisidx[type]; ++i)
-	    if (viminfo_history[type] != NULL)
+	க்கு (i = 0; i < viminfo_hisidx[type]; ++i)
+	    எனில் (viminfo_history[type] != வெற்று)
 	    {
 		vim_free(viminfo_history[type][i].hisstr);
 		viminfo_history[type][i].hisstrlen = 0;
@@ -973,26 +973,26 @@ write_viminfo_history(FILE *fp, int merge)
     }
 }
 
-    static void
+    நிலையான வெறுமை
 write_viminfo_barlines(vir_T *virp, FILE *fp_out)
 {
-    int		i;
+    முழு		i;
     garray_T	*gap = &virp->vir_barlines;
-    int		seen_useful = FALSE;
-    char	*line;
+    முழு		seen_useful = FALSE;
+    எழுத்து	*வரி;
 
-    if (gap->ga_len <= 0)
-	return;
+    எனில் (gap->ga_len <= 0)
+	திரும்பு;
 
     fputs(_("\n# Bar lines, copied verbatim:\n"), fp_out);
 
     // Skip over continuation lines until seeing a useful line.
-    for (i = 0; i < gap->ga_len; ++i)
+    க்கு (i = 0; i < gap->ga_len; ++i)
     {
-	line = ((char **)(gap->ga_data))[i];
-	if (seen_useful || line[1] != '<')
+	வரி = ((எழுத்து **)(gap->ga_data))[i];
+	எனில் (seen_useful || வரி[1] != '<')
 	{
-	    fputs(line, fp_out);
+	    fputs(வரி, fp_out);
 	    seen_useful = TRUE;
 	}
     }
@@ -1003,37 +1003,37 @@ write_viminfo_barlines(vir_T *virp, FILE *fp_out)
  * Add each decoded value to "values".
  * Returns TRUE if the next line is to be read after using the parsed values.
  */
-    static int
-barline_parse(vir_T *virp, char_u *text, garray_T *values)
+    நிலையான முழு
+barline_parse(vir_T *virp, char_u *text, garray_T *மதிப்புகள்)
 {
     char_u  *p = text;
-    char_u  *nextp = NULL;
-    char_u  *buf = NULL;
-    bval_T  *value;
-    int	    i;
-    int	    allocated = FALSE;
-    int	    eof;
+    char_u  *nextp = வெற்று;
+    char_u  *buf = வெற்று;
+    bval_T  *மதிப்பு;
+    முழு	    i;
+    முழு	    allocated = FALSE;
+    முழு	    eof;
     char_u  *sconv;
-    int	    converted;
+    முழு	    converted;
 
-    while (*p == ',')
+    போது (*p == ',')
     {
 	++p;
-	if (ga_grow(values, 1) == FAIL)
-	    break;
-	value = (bval_T *)(values->ga_data) + values->ga_len;
+	எனில் (ga_grow(மதிப்புகள், 1) == FAIL)
+	    நிறுத்து;
+	மதிப்பு = (bval_T *)(மதிப்புகள்->ga_data) + மதிப்புகள்->ga_len;
 
-	if (*p == '>')
+	எனில் (*p == '>')
 	{
 	    // Need to read a continuation line.  Put strings in allocated
 	    // memory, because virp->vir_line is overwritten.
-	    if (!allocated)
+	    எனில் (!allocated)
 	    {
-		for (i = 0; i < values->ga_len; ++i)
+		க்கு (i = 0; i < மதிப்புகள்->ga_len; ++i)
 		{
-		    bval_T  *vp = (bval_T *)(values->ga_data) + i;
+		    bval_T  *vp = (bval_T *)(மதிப்புகள்->ga_data) + i;
 
-		    if (vp->bv_type == BVAL_STRING && !vp->bv_allocated)
+		    எனில் (vp->bv_type == BVAL_STRING && !vp->bv_allocated)
 		    {
 			vp->bv_string = vim_strnsave(vp->bv_string, vp->bv_len);
 			vp->bv_allocated = TRUE;
@@ -1042,7 +1042,7 @@ barline_parse(vir_T *virp, char_u *text, garray_T *values)
 		allocated = TRUE;
 	    }
 
-	    if (vim_isdigit(p[1]))
+	    எனில் (vim_isdigit(p[1]))
 	    {
 		size_t len;
 		size_t todo;
@@ -1057,162 +1057,162 @@ barline_parse(vir_T *virp, char_u *text, garray_T *values)
 		++p;
 		len = getdigits(&p);
 		buf = alloc(len + 1);
-		if (buf == NULL)
-		    return TRUE;
+		எனில் (buf == வெற்று)
+		    திரும்பு TRUE;
 		p = buf;
-		for (todo = len; todo > 0; todo -= n)
+		க்கு (todo = len; todo > 0; todo -= n)
 		{
 		    eof = viminfo_readline(virp);
-		    if (eof || virp->vir_line[0] != '|'
-						  || virp->vir_line[1] != '<')
+		    எனில் (eof || virp->vir_வரி[0] != '|'
+						  || virp->vir_வரி[1] != '<')
 		    {
 			// File was truncated or garbled. Read another line if
 			// this one starts with '|'.
 			vim_free(buf);
-			return eof || virp->vir_line[0] == '|';
+			திரும்பு eof || virp->vir_வரி[0] == '|';
 		    }
 		    // Get length of text, excluding |< and NL chars.
-		    n = STRLEN(virp->vir_line);
-		    while (n > 2 && (virp->vir_line[n - 1] == NL
-					     || virp->vir_line[n - 1] == CAR))
+		    n = STRLEN(virp->vir_வரி);
+		    போது (n > 2 && (virp->vir_வரி[n - 1] == NL
+					     || virp->vir_வரி[n - 1] == CAR))
 			--n;
 		    n -= 2;
-		    if (n > todo)
+		    எனில் (n > todo)
 		    {
 			// more values follow after the string
-			nextp = virp->vir_line + 2 + todo;
+			nextp = virp->vir_வரி + 2 + todo;
 			n = todo;
 		    }
-		    mch_memmove(p, virp->vir_line + 2, n);
+		    mch_memmove(p, virp->vir_வரி + 2, n);
 		    p += n;
 		}
 		*p = NUL;
 		p = buf;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		// Line ending in ">" continues in the next line:
 		//     |{bartype},{lots of values},>
 		//     |<{value},{value}
 		eof = viminfo_readline(virp);
-		if (eof || virp->vir_line[0] != '|'
-					      || virp->vir_line[1] != '<')
+		எனில் (eof || virp->vir_வரி[0] != '|'
+					      || virp->vir_வரி[1] != '<')
 		    // File was truncated or garbled. Read another line if
 		    // this one starts with '|'.
-		    return eof || virp->vir_line[0] == '|';
-		p = virp->vir_line + 2;
+		    திரும்பு eof || virp->vir_வரி[0] == '|';
+		p = virp->vir_வரி + 2;
 	    }
 	}
 
-	if (SAFE_isdigit(*p))
+	எனில் (SAFE_isdigit(*p))
 	{
-	    value->bv_type = BVAL_NR;
-	    value->bv_nr = getdigits(&p);
-	    ++values->ga_len;
+	    மதிப்பு->bv_type = BVAL_NR;
+	    மதிப்பு->bv_nr = getdigits(&p);
+	    ++மதிப்புகள்->ga_len;
 	}
-	else if (*p == '"')
+	இல்லையெனில் எனில் (*p == '"')
 	{
-	    int	    len = 0;
+	    முழு	    len = 0;
 	    char_u  *s = p;
 
 	    // Unescape special characters in-place.
 	    ++p;
-	    while (*p != '"')
+	    போது (*p != '"')
 	    {
-		if (*p == NL || *p == NUL)
-		    return TRUE;  // syntax error, drop the value
-		if (*p == '\\')
+		எனில் (*p == NL || *p == NUL)
+		    திரும்பு TRUE;  // syntax error, drop the value
+		எனில் (*p == '\\')
 		{
 		    ++p;
-		    if (*p == 'n')
+		    எனில் (*p == 'n')
 			s[len++] = '\n';
-		    else
+		    இல்லையெனில்
 			s[len++] = *p;
 		    ++p;
 		}
-		else
+		இல்லையெனில்
 		    s[len++] = *p++;
 	    }
 	    ++p;
 	    s[len] = NUL;
 
 	    converted = FALSE;
-	    value->bv_tofree = NULL;
-	    if (virp->vir_conv.vc_type != CONV_NONE && *s != NUL)
+	    மதிப்பு->bv_tofree = வெற்று;
+	    எனில் (virp->vir_conv.vc_type != CONV_NONE && *s != NUL)
 	    {
-		sconv = string_convert(&virp->vir_conv, s, NULL);
-		if (sconv != NULL)
+		sconv = string_convert(&virp->vir_conv, s, வெற்று);
+		எனில் (sconv != வெற்று)
 		{
-		    if (s == buf)
+		    எனில் (s == buf)
 			// the converted string is stored in bv_string and
 			// freed later, also need to free "buf" later
-			value->bv_tofree = buf;
+			மதிப்பு->bv_tofree = buf;
 		    s = sconv;
-		    len = (int)STRLEN(s);
+		    len = (முழு)STRLEN(s);
 		    converted = TRUE;
 		}
 	    }
 
 	    // Need to copy in allocated memory if the string wasn't allocated
 	    // above and we did allocate before, thus vir_line may change.
-	    if (s != buf && allocated && !converted)
+	    எனில் (s != buf && allocated && !converted)
 		s = vim_strnsave(s, len);
-	    value->bv_string = s;
-	    value->bv_type = BVAL_STRING;
-	    value->bv_len = len;
-	    value->bv_allocated = allocated || converted;
-	    ++values->ga_len;
-	    if (nextp != NULL)
+	    மதிப்பு->bv_string = s;
+	    மதிப்பு->bv_type = BVAL_STRING;
+	    மதிப்பு->bv_len = len;
+	    மதிப்பு->bv_allocated = allocated || converted;
+	    ++மதிப்புகள்->ga_len;
+	    எனில் (nextp != வெற்று)
 	    {
 		// values following a long string
 		p = nextp;
-		nextp = NULL;
+		nextp = வெற்று;
 	    }
 	}
-	else if (*p == ',')
+	இல்லையெனில் எனில் (*p == ',')
 	{
-	    value->bv_type = BVAL_EMPTY;
-	    ++values->ga_len;
+	    மதிப்பு->bv_type = BVAL_EMPTY;
+	    ++மதிப்புகள்->ga_len;
 	}
-	else
-	    break;
+	இல்லையெனில்
+	    நிறுத்து;
     }
-    return TRUE;
+    திரும்பு TRUE;
 }
 
-    static void
+    நிலையான வெறுமை
 write_viminfo_version(FILE *fp_out)
 {
     fprintf(fp_out, "# Viminfo version\n|%d,%d\n\n",
 					    BARTYPE_VERSION, VIMINFO_VERSION);
 }
 
-    static int
-no_viminfo(void)
+    நிலையான முழு
+no_viminfo(வெறுமை)
 {
     // "vim -i NONE" does not read or write a viminfo file
-    return STRCMP(p_viminfofile, "NONE") == 0;
+    திரும்பு STRCMP(p_viminfofile, "NONE") == 0;
 }
 
 /*
  * Report an error for reading a viminfo file.
  * Count the number of errors.	When there are more than 10, return TRUE.
  */
-    static int
-viminfo_error(char *errnum, char *message, char_u *line)
+    நிலையான முழு
+viminfo_error(எழுத்து *errnum, எழுத்து *message, char_u *வரி)
 {
-    vim_snprintf((char *)IObuff, IOSIZE, _("%sviminfo: %s in line: "),
+    vim_snprintf((எழுத்து *)IObuff, IOSIZE, _("%sviminfo: %s in line: "),
 							     errnum, message);
-    STRNCAT(IObuff, line, IOSIZE - STRLEN(IObuff) - 1);
-    if (IObuff[STRLEN(IObuff) - 1] == '\n')
+    STRNCAT(IObuff, வரி, IOSIZE - STRLEN(IObuff) - 1);
+    எனில் (IObuff[STRLEN(IObuff) - 1] == '\n')
 	IObuff[STRLEN(IObuff) - 1] = NUL;
-    emsg((char *)IObuff);
-    if (++viminfo_errcnt >= 10)
+    emsg((எழுத்து *)IObuff);
+    எனில் (++viminfo_errcnt >= 10)
     {
 	emsg(_(e_viminfo_too_many_errors_skipping_rest_of_file));
-	return TRUE;
+	திரும்பு TRUE;
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 /*
@@ -1220,99 +1220,99 @@ viminfo_error(char *errnum, char *message, char_u *line)
  * 'encoding'.  If different and the 'c' flag is in 'viminfo', setup for
  * conversion of text with iconv() in viminfo_readstring().
  */
-    static int
+    நிலையான முழு
 viminfo_encoding(vir_T *virp)
 {
     char_u	*p;
-    int		i;
+    முழு		i;
 
-    if (get_viminfo_parameter('c') != 0)
+    எனில் (get_viminfo_parameter('c') != 0)
     {
-	p = vim_strchr(virp->vir_line, '=');
-	if (p != NULL)
+	p = vim_strchr(virp->vir_வரி, '=');
+	எனில் (p != வெற்று)
 	{
 	    // remove trailing newline
 	    ++p;
-	    for (i = 0; vim_isprintc(p[i]); ++i)
+	    க்கு (i = 0; vim_isprintc(p[i]); ++i)
 		;
 	    p[i] = NUL;
 
 	    convert_setup(&virp->vir_conv, p, p_enc);
 	}
     }
-    return viminfo_readline(virp);
+    திரும்பு viminfo_readline(virp);
 }
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 /*
  * Restore global vars that start with a capital from the viminfo file
  */
-    static int
-read_viminfo_varlist(vir_T *virp, int writing)
+    நிலையான முழு
+read_viminfo_varlist(vir_T *virp, முழு writing)
 {
     char_u	*tab;
-    int		type = VAR_NUMBER;
+    முழு		type = VAR_எண்;
     typval_T	tv;
     funccal_entry_T funccal_entry;
 
-    if (!writing && (find_viminfo_parameter('!') != NULL))
+    எனில் (!writing && (find_viminfo_parameter('!') != வெற்று))
     {
-	tab = vim_strchr(virp->vir_line + 1, '\t');
-	if (tab != NULL)
+	tab = vim_strchr(virp->vir_வரி + 1, '\t');
+	எனில் (tab != வெற்று)
 	{
 	    *tab++ = '\0';	// isolate the variable name
-	    switch (*tab)
+	    தேர்வு (*tab)
 	    {
-		case 'S': type = VAR_STRING; break;
-		case 'F': type = VAR_FLOAT; break;
-		case 'D': type = VAR_DICT; break;
-		case 'L': type = VAR_LIST; break;
-		case 'B': type = VAR_BLOB; break;
-		case 'X': type = VAR_SPECIAL; break;
-		case 'T': type = VAR_TUPLE; break;
+		நிலை 'S': type = VAR_STRING; நிறுத்து;
+		நிலை 'F': type = VAR_FLOAT; நிறுத்து;
+		நிலை 'D': type = VAR_DICT; நிறுத்து;
+		நிலை 'L': type = VAR_LIST; நிறுத்து;
+		நிலை 'B': type = VAR_BLOB; நிறுத்து;
+		நிலை 'X': type = VAR_SPECIAL; நிறுத்து;
+		நிலை 'T': type = VAR_TUPLE; நிறுத்து;
 	    }
 
 	    tab = vim_strchr(tab, '\t');
-	    if (tab != NULL)
+	    எனில் (tab != வெற்று)
 	    {
 		tv.v_type = type;
-		if (type == VAR_STRING || type == VAR_DICT
+		எனில் (type == VAR_STRING || type == VAR_DICT
 			|| type == VAR_LIST || type == VAR_BLOB
 			|| type == VAR_TUPLE)
 		    tv.vval.v_string = viminfo_readstring(virp,
-				       (int)(tab - virp->vir_line + 1), TRUE);
-		else if (type == VAR_FLOAT)
-		    (void)string2float(tab + 1, &tv.vval.v_float, FALSE);
-		else
+				       (முழு)(tab - virp->vir_வரி + 1), TRUE);
+		இல்லையெனில் எனில் (type == VAR_FLOAT)
+		    (வெறுமை)string2float(tab + 1, &tv.vval.v_float, FALSE);
+		இல்லையெனில்
 		{
-		    tv.vval.v_number = atol((char *)tab + 1);
-		    if (type == VAR_SPECIAL && (tv.vval.v_number == VVAL_FALSE
-					     || tv.vval.v_number == VVAL_TRUE))
+		    tv.vval.v_எண் = atol((எழுத்து *)tab + 1);
+		    எனில் (type == VAR_SPECIAL && (tv.vval.v_எண் == VVAL_FALSE
+					     || tv.vval.v_எண் == VVAL_TRUE))
 			tv.v_type = VAR_BOOL;
 		}
-		if (type == VAR_DICT || type == VAR_LIST || type == VAR_TUPLE)
+		எனில் (type == VAR_DICT || type == VAR_LIST || type == VAR_TUPLE)
 		{
-		    typval_T *etv = eval_expr(tv.vval.v_string, NULL);
+		    typval_T *etv = eval_கோவை(tv.vval.v_string, வெற்று);
 
-		    if (etv == NULL)
+		    எனில் (etv == வெற்று)
 			// Failed to parse back the dict or list, use it as a
 			// string.
 			tv.v_type = VAR_STRING;
-		    else
+		    இல்லையெனில்
 		    {
 			vim_free(tv.vval.v_string);
 			tv = *etv;
 			vim_free(etv);
 		    }
 		}
-		else if (type == VAR_BLOB)
+		இல்லையெனில் எனில் (type == VAR_BLOB)
 		{
 		    blob_T *blob = string2blob(tv.vval.v_string);
 
-		    if (blob == NULL)
+		    எனில் (blob == வெற்று)
 			// Failed to parse back the blob, use it as a string.
 			tv.v_type = VAR_STRING;
-		    else
+		    இல்லையெனில்
 		    {
 			vim_free(tv.vval.v_string);
 			tv.v_type = VAR_BLOB;
@@ -1322,127 +1322,127 @@ read_viminfo_varlist(vir_T *virp, int writing)
 
 		// when in a function use global variables
 		save_funccal(&funccal_entry);
-		set_var(virp->vir_line + 1, &tv, FALSE);
+		set_var(virp->vir_வரி + 1, &tv, FALSE);
 		restore_funccal();
 
-		if (tv.v_type == VAR_STRING)
+		எனில் (tv.v_type == VAR_STRING)
 		    vim_free(tv.vval.v_string);
-		else if (tv.v_type == VAR_DICT || tv.v_type == VAR_LIST ||
+		இல்லையெனில் எனில் (tv.v_type == VAR_DICT || tv.v_type == VAR_LIST ||
 			tv.v_type == VAR_BLOB)
 		    clear_tv(&tv);
 	    }
 	}
     }
 
-    return viminfo_readline(virp);
+    திரும்பு viminfo_readline(virp);
 }
 
 /*
  * Write global vars that start with a capital to the viminfo file
  */
-    static void
+    நிலையான வெறுமை
 write_viminfo_varlist(FILE *fp)
 {
     hashtab_T	*gvht = get_globvar_ht();
     hashitem_T	*hi;
     dictitem_T	*this_var;
-    int		todo;
-    char	*s = "";
+    முழு		todo;
+    எழுத்து	*s = "";
     char_u	*p;
     char_u	*tofree;
     char_u	numbuf[NUMBUFLEN];
 
-    if (find_viminfo_parameter('!') == NULL)
-	return;
+    எனில் (find_viminfo_parameter('!') == வெற்று)
+	திரும்பு;
 
     fputs(_("\n# global variables:\n"), fp);
 
-    todo = (int)gvht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(gvht, hi, todo)
+    todo = (முழு)gvht->ht_used;
+    FOR_ALL_HASHTAB_பொருட்கள்(gvht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	எனில் (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    this_var = HI2DI(hi);
-	    if (var_flavour(this_var->di_key) == VAR_FLAVOUR_VIMINFO)
+	    எனில் (var_flavour(this_var->di_சாவி) == VAR_FLAVOUR_VIMINFO)
 	    {
-		switch (this_var->di_tv.v_type)
+		தேர்வு (this_var->di_tv.v_type)
 		{
-		    case VAR_STRING:  s = "STR"; break;
-		    case VAR_NUMBER:  s = "NUM"; break;
-		    case VAR_FLOAT:   s = "FLO"; break;
-		    case VAR_DICT:
+		    நிலை VAR_STRING:  s = "STR"; நிறுத்து;
+		    நிலை VAR_எண்:  s = "NUM"; நிறுத்து;
+		    நிலை VAR_FLOAT:   s = "FLO"; நிறுத்து;
+		    நிலை VAR_DICT:
 			  {
 			      dict_T	*di = this_var->di_tv.vval.v_dict;
-			      int	copyID = get_copyID();
+			      முழு	copyID = get_copyID();
 
 			      s = "DIC";
-			      if (di != NULL && !set_ref_in_ht(
-					 &di->dv_hashtab, copyID, NULL, NULL)
+			      எனில் (di != வெற்று && !set_ref_in_ht(
+					 &di->dv_hashtab, copyID, வெற்று, வெற்று)
 				      && di->dv_copyID == copyID)
 				  // has a circular reference, can't turn the
 				  // value into a string
-				  continue;
-			      break;
+				  தொடர்;
+			      நிறுத்து;
 			  }
-		    case VAR_LIST:
+		    நிலை VAR_LIST:
 			  {
 			      list_T	*l = this_var->di_tv.vval.v_list;
-			      int	copyID = get_copyID();
+			      முழு	copyID = get_copyID();
 
 			      s = "LIS";
-			      if (l != NULL && !set_ref_in_list_items(
-						       l, copyID, NULL, NULL)
+			      எனில் (l != வெற்று && !set_ref_in_list_பொருட்கள்(
+						       l, copyID, வெற்று, வெற்று)
 				      && l->lv_copyID == copyID)
 				  // has a circular reference, can't turn the
 				  // value into a string
-				  continue;
-			      break;
+				  தொடர்;
+			      நிறுத்து;
 			  }
-		    case VAR_TUPLE:
+		    நிலை VAR_TUPLE:
 			  {
 			      tuple_T	*tuple = this_var->di_tv.vval.v_tuple;
-			      int	copyID = get_copyID();
+			      முழு	copyID = get_copyID();
 
 			      s = "TUP";
-			      if (tuple != NULL && !set_ref_in_tuple_items(
-					       tuple, copyID, NULL, NULL)
+			      எனில் (tuple != வெற்று && !set_ref_in_tuple_பொருட்கள்(
+					       tuple, copyID, வெற்று, வெற்று)
 				      && tuple->tv_copyID == copyID)
 				  // has a circular reference, can't turn the
 				  // value into a string
-				  continue;
-			      break;
+				  தொடர்;
+			      நிறுத்து;
 			  }
-		    case VAR_BLOB:    s = "BLO"; break;
-		    case VAR_BOOL:    s = "XPL"; break;  // backwards compat.
-		    case VAR_SPECIAL: s = "XPL"; break;
+		    நிலை VAR_BLOB:    s = "BLO"; நிறுத்து;
+		    நிலை VAR_BOOL:    s = "XPL"; நிறுத்து;  // backwards compat.
+		    நிலை VAR_SPECIAL: s = "XPL"; நிறுத்து;
 
-		    case VAR_UNKNOWN:
-		    case VAR_ANY:
-		    case VAR_VOID:
-		    case VAR_FUNC:
-		    case VAR_PARTIAL:
-		    case VAR_JOB:
-		    case VAR_CHANNEL:
-		    case VAR_INSTR:
-		    case VAR_CLASS:
-		    case VAR_OBJECT:
-		    case VAR_TYPEALIAS:
-				      continue;
+		    நிலை VAR_UNKNOWN:
+		    நிலை VAR_ANY:
+		    நிலை VAR_VOID:
+		    நிலை VAR_FUNC:
+		    நிலை VAR_PARTIAL:
+		    நிலை VAR_JOB:
+		    நிலை VAR_CHANNEL:
+		    நிலை VAR_INSTR:
+		    நிலை VAR_CLASS:
+		    நிலை VAR_OBJECT:
+		    நிலை VAR_TYPEALIAS:
+				      தொடர்;
 		}
-		fprintf(fp, "!%s\t%s\t", this_var->di_key, s);
-		if (this_var->di_tv.v_type == VAR_BOOL
+		fprintf(fp, "!%s\t%s\t", this_var->di_சாவி, s);
+		எனில் (this_var->di_tv.v_type == VAR_BOOL
 				      || this_var->di_tv.v_type == VAR_SPECIAL)
 		{
 		    // do not use "v:true" but "1"
-		    sprintf((char *)numbuf, "%ld",
-					  (long)this_var->di_tv.vval.v_number);
+		    sprintf((எழுத்து *)numbuf, "%ld",
+					  (long)this_var->di_tv.vval.v_எண்);
 		    p = numbuf;
-		    tofree = NULL;
+		    tofree = வெற்று;
 		}
-		else
+		இல்லையெனில்
 		    p = echo_string(&this_var->di_tv, &tofree, numbuf, 0);
-		if (p != NULL)
+		எனில் (p != வெற்று)
 		    viminfo_writestring(fp, p);
 		vim_free(tofree);
 	    }
@@ -1451,21 +1451,21 @@ write_viminfo_varlist(FILE *fp)
 }
 #endif // FEAT_EVAL
 
-    static int
-read_viminfo_sub_string(vir_T *virp, int force)
+    நிலையான முழு
+read_viminfo_sub_string(vir_T *virp, முழு force)
 {
-    if (force || get_old_sub() == NULL)
+    எனில் (force || get_old_sub() == வெற்று)
 	set_old_sub(viminfo_readstring(virp, 1, TRUE));
-    return viminfo_readline(virp);
+    திரும்பு viminfo_readline(virp);
 }
 
-    static void
+    நிலையான வெறுமை
 write_viminfo_sub_string(FILE *fp)
 {
     char_u *old_sub = get_old_sub();
 
-    if (get_viminfo_parameter('/') == 0 || old_sub == NULL)
-	return;
+    எனில் (get_viminfo_parameter('/') == 0 || old_sub == வெற்று)
+	திரும்பு;
 
     fputs(_("\n# Last Substitute String:\n$"), fp);
     viminfo_writestring(fp, old_sub);
@@ -1475,19 +1475,19 @@ write_viminfo_sub_string(FILE *fp)
  * Functions relating to reading/writing the search pattern from viminfo
  */
 
-    static int
-read_viminfo_search_pattern(vir_T *virp, int force, int writing)
+    நிலையான முழு
+read_viminfo_தேடல்_pattern(vir_T *virp, முழு force, முழு writing)
 {
     char_u	*lp;
-    int		idx = -1;
-    int		magic = FALSE;
-    int		no_scs = FALSE;
-    int		off_line = FALSE;
-    int		off_end = 0;
+    முழு		idx = -1;
+    முழு		magic = FALSE;
+    முழு		no_scs = FALSE;
+    முழு		off_வரி = FALSE;
+    முழு		off_end = 0;
     long	off = 0;
-    int		setlast = FALSE;
-#ifdef FEAT_SEARCH_EXTRA
-    static int	hlsearch_on = FALSE;
+    முழு		setlast = FALSE;
+#ifdef FEAT_தேடல்_EXTRA
+    நிலையான முழு	hlsearch_on = FALSE;
 #endif
     char_u	*val;
     spat_T	*spat;
@@ -1505,53 +1505,53 @@ read_viminfo_search_pattern(vir_T *virp, int force, int writing)
     // <off>: decimal, offset
     // <last>: '~' last used pattern
     // <which>: '/' search pat, '&' subst. pat
-    lp = virp->vir_line;
-    if (lp[0] == '~' && (lp[1] == 'm' || lp[1] == 'M'))	// new line type
+    lp = virp->vir_வரி;
+    எனில் (lp[0] == '~' && (lp[1] == 'm' || lp[1] == 'M'))	// new line type
     {
-	if (lp[1] == 'M')		// magic on
+	எனில் (lp[1] == 'M')		// magic on
 	    magic = TRUE;
-	if (lp[2] == 's')
+	எனில் (lp[2] == 's')
 	    no_scs = TRUE;
-	if (lp[3] == 'L')
-	    off_line = TRUE;
-	if (lp[4] == 'E')
-	    off_end = SEARCH_END;
+	எனில் (lp[3] == 'L')
+	    off_வரி = TRUE;
+	எனில் (lp[4] == 'E')
+	    off_end = தேடல்_END;
 	lp += 5;
 	off = getdigits(&lp);
     }
-    if (lp[0] == '~')		// use this pattern for last-used pattern
+    எனில் (lp[0] == '~')		// use this pattern for last-used pattern
     {
 	setlast = TRUE;
 	lp++;
     }
-    if (lp[0] == '/')
-	idx = RE_SEARCH;
-    else if (lp[0] == '&')
+    எனில் (lp[0] == '/')
+	idx = RE_தேடல்;
+    இல்லையெனில் எனில் (lp[0] == '&')
 	idx = RE_SUBST;
-#ifdef FEAT_SEARCH_EXTRA
-    else if (lp[0] == 'h')	// ~h: 'hlsearch' highlighting off
+#ifdef FEAT_தேடல்_EXTRA
+    இல்லையெனில் எனில் (lp[0] == 'h')	// ~h: 'hlsearch' highlighting off
 	hlsearch_on = FALSE;
-    else if (lp[0] == 'H')	// ~H: 'hlsearch' highlighting on
+    இல்லையெனில் எனில் (lp[0] == 'H')	// ~H: 'hlsearch' highlighting on
 	hlsearch_on = TRUE;
 #endif
-    if (idx >= 0)
+    எனில் (idx >= 0)
     {
 	spat = get_spat(idx);
-	if (force || spat->pat == NULL)
+	எனில் (force || spat->pat == வெற்று)
 	{
-	    val = viminfo_readstring(virp, (int)(lp - virp->vir_line + 1),
+	    val = viminfo_readstring(virp, (முழு)(lp - virp->vir_வரி + 1),
 									TRUE);
-	    if (val != NULL)
+	    எனில் (val != வெற்று)
 	    {
-		if (!writing)
+		எனில் (!writing)
 		{
-		    set_last_search_pat(val, idx, magic, setlast);
+		    set_last_தேடல்_pat(val, idx, magic, setlast);
 		    spat->no_scs = no_scs;
-		    spat->off.line = off_line;
+		    spat->off.வரி = off_வரி;
 		    spat->off.end = off_end;
 		    spat->off.off = off;
-#ifdef FEAT_SEARCH_EXTRA
-		    if (setlast)
+#ifdef FEAT_தேடல்_EXTRA
+		    எனில் (setlast)
 			set_no_hlsearch(!hlsearch_on);
 #endif
 		}
@@ -1559,26 +1559,26 @@ read_viminfo_search_pattern(vir_T *virp, int force, int writing)
 	    }
 	}
     }
-    return viminfo_readline(virp);
+    திரும்பு viminfo_readline(virp);
 }
 
-    static void
+    நிலையான வெறுமை
 wvsp_one(
     FILE	*fp,	// file to write to
-    int		idx,	// spats[] index
-    char	*s,	// search pat
-    int		sc)	// dir char
+    முழு		idx,	// spats[] index
+    எழுத்து	*s,	// search pat
+    முழு		sc)	// dir char
 {
     spat_T	*spat = get_spat(idx);
-    if (spat->pat == NULL)
-	return;
+    எனில் (spat->pat == வெற்று)
+	திரும்பு;
 
     fprintf(fp, _("\n# Last %sSearch Pattern:\n~"), s);
     // off.dir is not stored, it's reset to forward
     fprintf(fp, "%c%c%c%c%ld%s%c",
 	    spat->magic    ? 'M' : 'm',	// magic
 	    spat->no_scs   ? 's' : 'S',	// smartcase
-	    spat->off.line ? 'L' : 'l',	// line offset
+	    spat->off.வரி ? 'L' : 'l',	// line offset
 	    spat->off.end  ? 'E' : 'e',	// offset from end
 	    spat->off.off,			// offset
 	    get_spat_last_idx() == idx ? "~" : "",	// last used pat
@@ -1586,17 +1586,17 @@ wvsp_one(
     viminfo_writestring(fp, spat->pat);
 }
 
-    static void
-write_viminfo_search_pattern(FILE *fp)
+    நிலையான வெறுமை
+write_viminfo_தேடல்_pattern(FILE *fp)
 {
-    if (get_viminfo_parameter('/') == 0)
-	return;
+    எனில் (get_viminfo_parameter('/') == 0)
+	திரும்பு;
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_தேடல்_EXTRA
     fprintf(fp, "\n# hlsearch on (H) or off (h):\n~%c",
-	    (no_hlsearch || find_viminfo_parameter('h') != NULL) ? 'h' : 'H');
+	    (no_hlsearch || find_viminfo_parameter('h') != வெற்று) ? 'h' : 'H');
 #endif
-    wvsp_one(fp, RE_SEARCH, "", '/');
+    wvsp_one(fp, RE_தேடல், "", '/');
     wvsp_one(fp, RE_SUBST, _("Substitute "), '&');
 }
 
@@ -1604,7 +1604,7 @@ write_viminfo_search_pattern(FILE *fp)
  * Functions relating to reading/writing registers from viminfo
  */
 
-static yankreg_T *y_read_regs = NULL;
+நிலையான yankreg_T *y_read_regs = வெற்று;
 
 #define REG_PREVIOUS 1
 #define REG_EXEC 2
@@ -1612,135 +1612,135 @@ static yankreg_T *y_read_regs = NULL;
 /*
  * Prepare for reading viminfo registers when writing viminfo later.
  */
-    static void
-prepare_viminfo_registers(void)
+    நிலையான வெறுமை
+prepare_viminfo_registers(வெறுமை)
 {
-    y_read_regs = ALLOC_CLEAR_MULT(yankreg_T, NUM_REGISTERS);
+    y_read_regs = ALLOC_CLEAR_MULT(yankreg_T, இலக்கம்_REGISTERS);
 }
 
-    static void
-finish_viminfo_registers(void)
+    நிலையான வெறுமை
+finish_viminfo_registers(வெறுமை)
 {
-    int		i;
-    int		j;
+    முழு		i;
+    முழு		j;
 
-    if (y_read_regs == NULL)
-	return;
+    எனில் (y_read_regs == வெற்று)
+	திரும்பு;
 
-    for (i = 0; i < NUM_REGISTERS; ++i)
-	if (y_read_regs[i].y_array != NULL)
+    க்கு (i = 0; i < இலக்கம்_REGISTERS; ++i)
+	எனில் (y_read_regs[i].y_array != வெற்று)
 	{
-	    for (j = 0; j < y_read_regs[i].y_size; j++)
+	    க்கு (j = 0; j < y_read_regs[i].y_size; j++)
 		vim_free(y_read_regs[i].y_array[j].string);
 	    vim_free(y_read_regs[i].y_array);
 	}
     VIM_CLEAR(y_read_regs);
 }
 
-    static int
-read_viminfo_register(vir_T *virp, int force)
+    நிலையான முழு
+read_viminfo_register(vir_T *virp, முழு force)
 {
-    int		eof;
-    int		do_it = TRUE;
-    int		size;
-    int		limit;
-    int		i;
-    int		set_prev = FALSE;
+    முழு		eof;
+    முழு		do_it = TRUE;
+    முழு		size;
+    முழு		limit;
+    முழு		i;
+    முழு		set_prev = FALSE;
     char_u	*str;
-    string_T	*array = NULL;
-    int		new_type = MCHAR; // init to shut up compiler
+    string_T	*array = வெற்று;
+    முழு		new_type = MCHAR; // init to shut up compiler
     colnr_T	new_width = 0; // init to shut up compiler
     yankreg_T	*y_current_p;
 
     // We only get here (hopefully) if line[0] == '"'
-    str = virp->vir_line + 1;
+    str = virp->vir_வரி + 1;
 
     // If the line starts with "" this is the y_previous register.
-    if (*str == '"')
+    எனில் (*str == '"')
     {
 	set_prev = TRUE;
 	str++;
     }
 
-    if (!ASCII_ISALNUM(*str) && *str != '-')
+    எனில் (!ASCII_ISALNUM(*str) && *str != '-')
     {
-	if (viminfo_error("E577: ", _(e_illegal_register_name), virp->vir_line))
-	    return TRUE;	// too many errors, pretend end-of-file
+	எனில் (viminfo_error("E577: ", _(e_illegal_register_name), virp->vir_வரி))
+	    திரும்பு TRUE;	// too many errors, pretend end-of-file
 	do_it = FALSE;
     }
     get_yank_register(*str++, FALSE);
     y_current_p = get_y_current();
-    if (!force && y_current_p->y_array != NULL)
+    எனில் (!force && y_current_p->y_array != வெற்று)
 	do_it = FALSE;
 
-    if (*str == '@')
+    எனில் (*str == '@')
     {
 	// "x@: register x used for @@
-	if (force || get_execreg_lastc() == NUL)
+	எனில் (force || get_execreg_lastc() == NUL)
 	    set_execreg_lastc(str[-1]);
     }
 
     size = 0;
     limit = 100;	// Optimized for registers containing <= 100 lines
-    if (do_it)
+    எனில் (do_it)
     {
 	// Build the new register in array[].
 	// y_array is kept as-is until done.
 	// The "do_it" flag is reset when something is wrong, in which case
 	// array[] needs to be freed.
-	if (set_prev)
+	எனில் (set_prev)
 	    set_y_previous(y_current_p);
 	array = ALLOC_MULT(string_T, limit);
 	str = skipwhite(skiptowhite(str));
-	if (STRNCMP(str, "CHAR", 4) == 0)
+	எனில் (STRNCMP(str, "CHAR", 4) == 0)
 	    new_type = MCHAR;
-	else if (STRNCMP(str, "BLOCK", 5) == 0)
+	இல்லையெனில் எனில் (STRNCMP(str, "BLOCK", 5) == 0)
 	    new_type = MBLOCK;
-	else
+	இல்லையெனில்
 	    new_type = MLINE;
 	// get the block width; if it's missing we get a zero, which is OK
 	str = skipwhite(skiptowhite(str));
 	new_width = getdigits(&str);
     }
 
-    while (!(eof = viminfo_readline(virp))
-		    && (virp->vir_line[0] == TAB || virp->vir_line[0] == '<'))
+    போது (!(eof = viminfo_readline(virp))
+		    && (virp->vir_வரி[0] == TAB || virp->vir_வரி[0] == '<'))
     {
-	if (do_it)
+	எனில் (do_it)
 	{
-	    if (size == limit)
+	    எனில் (size == limit)
 	    {
 		string_T *new_array = (string_T *)
-				    alloc((size_t)limit * 2 * sizeof(string_T));
+				    alloc((size_t)limit * 2 * அளவு(string_T));
 
-		if (new_array == NULL)
+		எனில் (new_array == வெற்று)
 		{
 		    do_it = FALSE;
-		    break;
+		    நிறுத்து;
 		}
-		for (i = 0; i < limit; i++)
+		க்கு (i = 0; i < limit; i++)
 		    new_array[i] = array[i];
 		vim_free(array);
 		array = new_array;
 		limit *= 2;
 	    }
 	    str = viminfo_readstring(virp, 1, TRUE);
-	    if (str != NULL)
+	    எனில் (str != வெற்று)
 	    {
 		array[size].string = str;
 		array[size].length = STRLEN(str);
 		++size;
 	    }
-	    else
+	    இல்லையெனில்
 		// error, don't store the result
 		do_it = FALSE;
 	}
     }
 
-    if (do_it)
+    எனில் (do_it)
     {
 	// free y_array[]
-	for (i = 0; i < y_current_p->y_size; i++)
+	க்கு (i = 0; i < y_current_p->y_size; i++)
 	    vim_free(y_current_p->y_array[i].string);
 	vim_free(y_current_p->y_array);
 
@@ -1748,21 +1748,21 @@ read_viminfo_register(vir_T *virp, int force)
 	y_current_p->y_width = new_width;
 	y_current_p->y_size = size;
 	y_current_p->y_time_set = 0;
-	if (size == 0)
+	எனில் (size == 0)
 	{
-	    y_current_p->y_array = NULL;
+	    y_current_p->y_array = வெற்று;
 	}
-	else
+	இல்லையெனில்
 	{
 	    // Move the lines from array[] to y_array[].
 	    y_current_p->y_array = ALLOC_MULT(string_T, size);
-	    for (i = 0; i < size; i++)
+	    க்கு (i = 0; i < size; i++)
 	    {
-		if (y_current_p->y_array == NULL)
+		எனில் (y_current_p->y_array == வெற்று)
 		{
 		    VIM_CLEAR_STRING(array[i]);
 		}
-		else
+		இல்லையெனில்
 		{
 		    y_current_p->y_array[i].string = array[i].string;
 		    y_current_p->y_array[i].length = array[i].length;
@@ -1770,113 +1770,113 @@ read_viminfo_register(vir_T *virp, int force)
 	    }
 	}
     }
-    else
+    இல்லையெனில்
     {
 	// Free array[] if it was filled.
-	for (i = 0; i < size; i++)
+	க்கு (i = 0; i < size; i++)
 	    vim_free(array[i].string);
     }
     vim_free(array);
 
-    return eof;
+    திரும்பு eof;
 }
 
 /*
  * Accept a new style register line from the viminfo, store it when it's new.
  */
-    static void
-handle_viminfo_register(garray_T *values, int force)
+    நிலையான வெறுமை
+handle_viminfo_register(garray_T *மதிப்புகள், முழு force)
 {
-    bval_T	*vp = (bval_T *)values->ga_data;
-    int		flags;
-    int		name;
-    int		type;
-    int		linecount;
-    int		width;
+    bval_T	*vp = (bval_T *)மதிப்புகள்->ga_data;
+    முழு		flags;
+    முழு		name;
+    முழு		type;
+    முழு		linecount;
+    முழு		width;
     time_t	timestamp;
     yankreg_T	*y_ptr;
     yankreg_T	*y_regs_p = get_y_regs();
-    int		i;
+    முழு		i;
 
     // Check the format:
     // |{bartype},{flags},{name},{type},
     //      {linecount},{width},{timestamp},"line1","line2"
-    if (values->ga_len < 6
+    எனில் (மதிப்புகள்->ga_len < 6
 	    || vp[0].bv_type != BVAL_NR
 	    || vp[1].bv_type != BVAL_NR
 	    || vp[2].bv_type != BVAL_NR
 	    || vp[3].bv_type != BVAL_NR
 	    || vp[4].bv_type != BVAL_NR
 	    || vp[5].bv_type != BVAL_NR)
-	return;
+	திரும்பு;
     flags = vp[0].bv_nr;
     name = vp[1].bv_nr;
-    if (name < 0 || name >= NUM_REGISTERS)
-	return;
+    எனில் (name < 0 || name >= இலக்கம்_REGISTERS)
+	திரும்பு;
     type = vp[2].bv_nr;
-    if (type != MCHAR && type != MLINE && type != MBLOCK)
-	return;
+    எனில் (type != MCHAR && type != MLINE && type != MBLOCK)
+	திரும்பு;
     linecount = vp[3].bv_nr;
-    if (values->ga_len < 6 + linecount)
-	return;
+    எனில் (மதிப்புகள்->ga_len < 6 + linecount)
+	திரும்பு;
     width = vp[4].bv_nr;
-    if (width < 0)
-	return;
+    எனில் (width < 0)
+	திரும்பு;
 
-    if (y_read_regs != NULL)
+    எனில் (y_read_regs != வெற்று)
 	// Reading viminfo for merging and writing.  Store the register
 	// content, don't update the current registers.
 	y_ptr = &y_read_regs[name];
-    else
+    இல்லையெனில்
 	y_ptr = &y_regs_p[name];
 
     // Do not overwrite unless forced or the timestamp is newer.
     timestamp = (time_t)vp[5].bv_nr;
-    if (y_ptr->y_array != NULL && !force
+    எனில் (y_ptr->y_array != வெற்று && !force
 			 && (timestamp == 0 || y_ptr->y_time_set > timestamp))
-	return;
+	திரும்பு;
 
-    if (y_ptr->y_array != NULL)
-	for (i = 0; i < y_ptr->y_size; i++)
+    எனில் (y_ptr->y_array != வெற்று)
+	க்கு (i = 0; i < y_ptr->y_size; i++)
 	    vim_free(y_ptr->y_array[i].string);
     vim_free(y_ptr->y_array);
 
-    if (y_read_regs == NULL)
+    எனில் (y_read_regs == வெற்று)
     {
-	if (flags & REG_PREVIOUS)
+	எனில் (flags & REG_PREVIOUS)
 	    set_y_previous(y_ptr);
-	if ((flags & REG_EXEC) && (force || get_execreg_lastc() == NUL))
+	எனில் ((flags & REG_EXEC) && (force || get_execreg_lastc() == NUL))
 	    set_execreg_lastc(get_register_name(name));
     }
     y_ptr->y_type = type;
     y_ptr->y_width = width;
     y_ptr->y_size = linecount;
     y_ptr->y_time_set = timestamp;
-    if (linecount == 0)
+    எனில் (linecount == 0)
     {
-	y_ptr->y_array = NULL;
-	return;
+	y_ptr->y_array = வெற்று;
+	திரும்பு;
     }
     y_ptr->y_array = ALLOC_MULT(string_T, linecount);
-    if (y_ptr->y_array == NULL)
+    எனில் (y_ptr->y_array == வெற்று)
     {
 	y_ptr->y_size = 0; // ensure object state is consistent
-	return;
+	திரும்பு;
     }
-    for (i = 0; i < linecount; i++)
+    க்கு (i = 0; i < linecount; i++)
     {
-	if (vp[i + 6].bv_allocated)
+	எனில் (vp[i + 6].bv_allocated)
 	{
 	    y_ptr->y_array[i].string = vp[i + 6].bv_string;
 	    y_ptr->y_array[i].length = vp[i + 6].bv_len;
-	    vp[i + 6].bv_string = NULL;
+	    vp[i + 6].bv_string = வெற்று;
 	}
-	else if (vp[i + 6].bv_type != BVAL_STRING)
+	இல்லையெனில் எனில் (vp[i + 6].bv_type != BVAL_STRING)
 	{
-	    free(y_ptr->y_array);
-	    y_ptr->y_array = NULL;
+	    விடுவி(y_ptr->y_array);
+	    y_ptr->y_array = வெற்று;
 	}
-	else
+	இல்லையெனில்
 	{
 	    y_ptr->y_array[i].string = vim_strnsave(vp[i + 6].bv_string, vp[i + 6].bv_len);
 	    y_ptr->y_array[i].length = vp[i + 6].bv_len;
@@ -1884,15 +1884,15 @@ handle_viminfo_register(garray_T *values, int force)
     }
 }
 
-    static void
+    நிலையான வெறுமை
 write_viminfo_registers(FILE *fp)
 {
-    int		i, j;
+    முழு		i, j;
     char_u	*type;
     char_u	c;
-    int		num_lines;
-    int		max_num_lines;
-    int		max_kbyte;
+    முழு		இலக்கம்_வரிகள்;
+    முழு		max_இலக்கம்_வரிகள்;
+    முழு		max_kbyte;
     long	len;
     yankreg_T	*y_ptr;
     yankreg_T	*y_regs_p = get_y_regs();
@@ -1900,108 +1900,108 @@ write_viminfo_registers(FILE *fp)
     fputs(_("\n# Registers:\n"), fp);
 
     // Get '<' value, use old '"' value if '<' is not found.
-    max_num_lines = get_viminfo_parameter('<');
-    if (max_num_lines < 0)
-	max_num_lines = get_viminfo_parameter('"');
-    if (max_num_lines == 0)
-	return;
+    max_இலக்கம்_வரிகள் = get_viminfo_parameter('<');
+    எனில் (max_இலக்கம்_வரிகள் < 0)
+	max_இலக்கம்_வரிகள் = get_viminfo_parameter('"');
+    எனில் (max_இலக்கம்_வரிகள் == 0)
+	திரும்பு;
     max_kbyte = get_viminfo_parameter('s');
-    if (max_kbyte == 0)
-	return;
+    எனில் (max_kbyte == 0)
+	திரும்பு;
 
-    for (i = 0; i < NUM_REGISTERS; i++)
+    க்கு (i = 0; i < இலக்கம்_REGISTERS; i++)
     {
-#if defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
+#எனில் defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
 	// Skip '*'/'+' register, we don't want them back next time
-	if (i == STAR_REGISTER || i == PLUS_REGISTER || i == REAL_PLUS_REGISTER)
-	    continue;
+	எனில் (i == STAR_REGISTER || i == PLUS_REGISTER || i == REAL_PLUS_REGISTER)
+	    தொடர்;
 #endif
 #ifdef FEAT_DND
 	// Neither do we want the '~' register
-	if (i == TILDE_REGISTER)
-	    continue;
+	எனில் (i == TILDE_REGISTER)
+	    தொடர்;
 #endif
 	// When reading viminfo for merging and writing: Use the register from
 	// viminfo if it's newer.
-	if (y_read_regs != NULL
-		&& y_read_regs[i].y_array != NULL
-		&& (y_regs_p[i].y_array == NULL ||
+	எனில் (y_read_regs != வெற்று
+		&& y_read_regs[i].y_array != வெற்று
+		&& (y_regs_p[i].y_array == வெற்று ||
 			    y_read_regs[i].y_time_set > y_regs_p[i].y_time_set))
 	    y_ptr = &y_read_regs[i];
-	else if (y_regs_p[i].y_array == NULL)
-	    continue;
-	else
+	இல்லையெனில் எனில் (y_regs_p[i].y_array == வெற்று)
+	    தொடர்;
+	இல்லையெனில்
 	    y_ptr = &y_regs_p[i];
 
 	// Skip empty registers.
-	num_lines = y_ptr->y_size;
-	if (num_lines == 0
-		|| (num_lines == 1 && y_ptr->y_type == MCHAR
+	இலக்கம்_வரிகள் = y_ptr->y_size;
+	எனில் (இலக்கம்_வரிகள் == 0
+		|| (இலக்கம்_வரிகள் == 1 && y_ptr->y_type == MCHAR
 					&& *y_ptr->y_array[0].string == NUL))
-	    continue;
+	    தொடர்;
 
-	if (max_kbyte > 0)
+	எனில் (max_kbyte > 0)
 	{
 	    // Skip register if there is more text than the maximum size.
 	    len = 0;
-	    for (j = 0; j < num_lines; j++)
+	    க்கு (j = 0; j < இலக்கம்_வரிகள்; j++)
 		len += (long)y_ptr->y_array[j].length + 1L;
-	    if (len > (long)max_kbyte * 1024L)
-		continue;
+	    எனில் (len > (long)max_kbyte * 1024L)
+		தொடர்;
 	}
 
-	switch (y_ptr->y_type)
+	தேர்வு (y_ptr->y_type)
 	{
-	    case MLINE:
+	    நிலை MLINE:
 		type = (char_u *)"LINE";
-		break;
-	    case MCHAR:
+		நிறுத்து;
+	    நிலை MCHAR:
 		type = (char_u *)"CHAR";
-		break;
-	    case MBLOCK:
+		நிறுத்து;
+	    நிலை MBLOCK:
 		type = (char_u *)"BLOCK";
-		break;
-	    default:
+		நிறுத்து;
+	    இயல்பு:
 		semsg(_(e_unknown_register_type_nr), y_ptr->y_type);
 		type = (char_u *)"LINE";
-		break;
+		நிறுத்து;
 	}
-	if (get_y_previous() == &y_regs_p[i])
+	எனில் (get_y_previous() == &y_regs_p[i])
 	    fprintf(fp, "\"");
 	c = get_register_name(i);
 	fprintf(fp, "\"%c", c);
-	if (c == get_execreg_lastc())
+	எனில் (c == get_execreg_lastc())
 	    fprintf(fp, "@");
-	fprintf(fp, "\t%s\t%d\n", type, (int)y_ptr->y_width);
+	fprintf(fp, "\t%s\t%d\n", type, (முழு)y_ptr->y_width);
 
 	// If max_num_lines < 0, then we save ALL the lines in the register
-	if (max_num_lines > 0 && num_lines > max_num_lines)
-	    num_lines = max_num_lines;
-	for (j = 0; j < num_lines; j++)
+	எனில் (max_இலக்கம்_வரிகள் > 0 && இலக்கம்_வரிகள் > max_இலக்கம்_வரிகள்)
+	    இலக்கம்_வரிகள் = max_இலக்கம்_வரிகள்;
+	க்கு (j = 0; j < இலக்கம்_வரிகள்; j++)
 	{
 	    putc('\t', fp);
 	    viminfo_writestring(fp, y_ptr->y_array[j].string);
 	}
 
 	{
-	    int	    flags = 0;
-	    int	    remaining;
+	    முழு	    flags = 0;
+	    முழு	    remaining;
 
 	    // New style with a bar line. Format:
 	    // |{bartype},{flags},{name},{type},
 	    //      {linecount},{width},{timestamp},"line1","line2"
 	    // flags: REG_PREVIOUS - register is y_previous
 	    //	      REG_EXEC - used for @@
-	    if (get_y_previous() == &y_regs_p[i])
+	    எனில் (get_y_previous() == &y_regs_p[i])
 		flags |= REG_PREVIOUS;
-	    if (c == get_execreg_lastc())
+	    எனில் (c == get_execreg_lastc())
 		flags |= REG_EXEC;
 	    fprintf(fp, "|%d,%d,%d,%d,%d,%d,%ld", BARTYPE_REGISTER, flags,
-		    i, y_ptr->y_type, num_lines, (int)y_ptr->y_width,
+		    i, y_ptr->y_type, இலக்கம்_வரிகள், (முழு)y_ptr->y_width,
 		    (long)y_ptr->y_time_set);
 	    // 11 chars for type/flags/name/type, 3 * 20 for numbers
 	    remaining = LSIZE - 71;
-	    for (j = 0; j < num_lines; j++)
+	    க்கு (j = 0; j < இலக்கம்_வரிகள்; j++)
 	    {
 		putc(',', fp);
 		--remaining;
@@ -2017,24 +2017,24 @@ write_viminfo_registers(FILE *fp)
  * Functions relating to reading/writing marks from viminfo
  */
 
-static xfmark_T *vi_namedfm = NULL;
-static xfmark_T *vi_jumplist = NULL;
-static int vi_jumplist_len = 0;
+நிலையான xfmark_T *vi_namedfm = வெற்று;
+நிலையான xfmark_T *vi_jumplist = வெற்று;
+நிலையான முழு vi_jumplist_len = 0;
 
-    static void
-write_one_mark(FILE *fp_out, int c, pos_T *pos)
+    நிலையான வெறுமை
+write_one_mark(FILE *fp_out, முழு c, pos_T *pos)
 {
-    if (pos->lnum != 0)
-	fprintf(fp_out, "\t%c\t%ld\t%d\n", c, (long)pos->lnum, (int)pos->col);
+    எனில் (pos->lnum != 0)
+	fprintf(fp_out, "\t%c\t%ld\t%d\n", c, (long)pos->lnum, (முழு)pos->col);
 }
 
-    static void
+    நிலையான வெறுமை
 write_buffer_marks(buf_T *buf, FILE *fp_out)
 {
-    int		i;
+    முழு		i;
     pos_T	pos;
 
-    home_replace(NULL, buf->b_ffname, IObuff, IOSIZE, TRUE);
+    home_replace(வெற்று, buf->b_ffname, IObuff, IOSIZE, TRUE);
     fprintf(fp_out, "\n> ");
     viminfo_writestring(fp_out, IObuff);
 
@@ -2045,27 +2045,27 @@ write_buffer_marks(buf_T *buf, FILE *fp_out)
     write_one_mark(fp_out, '*', &pos);
 
     write_one_mark(fp_out, '"', &buf->b_last_cursor);
-    write_one_mark(fp_out, '^', &buf->b_last_insert);
+    write_one_mark(fp_out, '^', &buf->b_last_செருகு);
     write_one_mark(fp_out, '.', &buf->b_last_change);
     // changelist positions are stored oldest first
-    for (i = 0; i < buf->b_changelistlen; ++i)
+    க்கு (i = 0; i < buf->b_changelistlen; ++i)
     {
 	// skip duplicates
-	if (i == 0 || !EQUAL_POS(buf->b_changelist[i - 1],
+	எனில் (i == 0 || !EQUAL_POS(buf->b_changelist[i - 1],
 							 buf->b_changelist[i]))
 	    write_one_mark(fp_out, '+', &buf->b_changelist[i]);
     }
-    for (i = 0; i < NMARKS; i++)
+    க்கு (i = 0; i < NMARKS; i++)
 	write_one_mark(fp_out, 'a' + i, &buf->b_namedm[i]);
 }
 
 /*
  * Return TRUE if marks for "buf" should not be written.
  */
-    static int
+    நிலையான முழு
 skip_for_viminfo(buf_T *buf)
 {
-    return bt_terminal(buf) || removable(buf->b_ffname);
+    திரும்பு bt_terminal(buf) || removable(buf->b_ffname);
 }
 
 /*
@@ -2073,12 +2073,12 @@ skip_for_viminfo(buf_T *buf)
  * When "buflist" is not NULL fill it with the buffers for which marks are to
  * be written.
  */
-    static void
+    நிலையான வெறுமை
 write_viminfo_marks(FILE *fp_out, garray_T *buflist)
 {
     buf_T	*buf;
-    int		is_mark_set;
-    int		i;
+    முழு		is_mark_set;
+    முழு		i;
     win_T	*win;
     tabpage_T	*tp;
 
@@ -2091,50 +2091,50 @@ write_viminfo_marks(FILE *fp_out, garray_T *buflist)
     {
 	// Only write something if buffer has been loaded and at least one
 	// mark is set.
-	if (buf->b_marks_read)
+	எனில் (buf->b_marks_read)
 	{
-	    if (buf->b_last_cursor.lnum != 0)
+	    எனில் (buf->b_last_cursor.lnum != 0)
 		is_mark_set = TRUE;
-	    else
+	    இல்லையெனில்
 	    {
 		is_mark_set = FALSE;
-		for (i = 0; i < NMARKS; i++)
-		    if (buf->b_namedm[i].lnum != 0)
+		க்கு (i = 0; i < NMARKS; i++)
+		    எனில் (buf->b_namedm[i].lnum != 0)
 		    {
 			is_mark_set = TRUE;
-			break;
+			நிறுத்து;
 		    }
 	    }
-	    if (is_mark_set && buf->b_ffname != NULL
+	    எனில் (is_mark_set && buf->b_ffname != வெற்று
 		      && buf->b_ffname[0] != NUL
 		      && !skip_for_viminfo(buf))
 	    {
-		if (buflist == NULL)
+		எனில் (buflist == வெற்று)
 		    write_buffer_marks(buf, fp_out);
-		else if (ga_grow(buflist, 1) == OK)
+		இல்லையெனில் எனில் (ga_grow(buflist, 1) == OK)
 		    ((buf_T **)buflist->ga_data)[buflist->ga_len++] = buf;
 	    }
 	}
     }
 }
 
-    static void
+    நிலையான வெறுமை
 write_one_filemark(
     FILE	*fp,
     xfmark_T	*fm,
-    int		c1,
-    int		c2)
+    முழு		c1,
+    முழு		c2)
 {
     char_u	*name;
 
-    if (fm->fmark.mark.lnum == 0)	// not set
-	return;
+    எனில் (fm->fmark.mark.lnum == 0)	// not set
+	திரும்பு;
 
-    if (fm->fmark.fnum != 0)		// there is a buffer
+    எனில் (fm->fmark.fnum != 0)		// there is a buffer
 	name = buflist_nr2name(fm->fmark.fnum, TRUE, FALSE);
-    else
+    இல்லையெனில்
 	name = fm->fname;		// use name from .viminfo
-    if (name != NULL && *name != NUL)
+    எனில் (name != வெற்று && *name != NUL)
     {
 	fprintf(fp, "%c%c  %ld  %ld  ", c1, c2, (long)fm->fmark.mark.lnum,
 						    (long)fm->fmark.mark.col);
@@ -2149,33 +2149,33 @@ write_one_filemark(
 	putc('\n', fp);
     }
 
-    if (fm->fmark.fnum != 0)
+    எனில் (fm->fmark.fnum != 0)
 	vim_free(name);
 }
 
-    static void
+    நிலையான வெறுமை
 write_viminfo_filemarks(FILE *fp)
 {
-    int		i;
+    முழு		i;
     char_u	*name;
     buf_T	*buf;
     xfmark_T	*namedfm_p = get_namedfm();
     xfmark_T	*fm;
-    int		vi_idx;
-    int		idx;
+    முழு		vi_idx;
+    முழு		idx;
 
-    if (get_viminfo_parameter('f') == 0)
-	return;
+    எனில் (get_viminfo_parameter('f') == 0)
+	திரும்பு;
 
     fputs(_("\n# File marks:\n"), fp);
 
     // Write the filemarks 'A - 'Z
-    for (i = 0; i < NMARKS; i++)
+    க்கு (i = 0; i < NMARKS; i++)
     {
-	if (vi_namedfm != NULL
+	எனில் (vi_namedfm != வெற்று
 			&& (vi_namedfm[i].time_set > namedfm_p[i].time_set))
 	    fm = &vi_namedfm[i];
-	else
+	இல்லையெனில்
 	    fm = &namedfm_p[i];
 	write_one_filemark(fp, fm, '\'', i + 'A');
     }
@@ -2184,35 +2184,35 @@ write_viminfo_filemarks(FILE *fp)
     // That one, or else the last one is deleted.
     // Move '0 to '1, '1 to '2, etc. until the matching one or '9
     // Set the '0 mark to current cursor position.
-    if (curbuf->b_ffname != NULL && !skip_for_viminfo(curbuf))
+    எனில் (curbuf->b_ffname != வெற்று && !skip_for_viminfo(curbuf))
     {
 	name = buflist_nr2name(curbuf->b_fnum, TRUE, FALSE);
-	for (i = NMARKS; i < NMARKS + EXTRA_MARKS - 1; ++i)
-	    if (namedfm_p[i].fmark.mark.lnum == curwin->w_cursor.lnum
-		    && (namedfm_p[i].fname == NULL
+	க்கு (i = NMARKS; i < NMARKS + EXTRA_MARKS - 1; ++i)
+	    எனில் (namedfm_p[i].fmark.mark.lnum == curwin->w_cursor.lnum
+		    && (namedfm_p[i].fname == வெற்று
 			    ? namedfm_p[i].fmark.fnum == curbuf->b_fnum
-			    : (name != NULL
+			    : (name != வெற்று
 				    && STRCMP(name, namedfm_p[i].fname) == 0)))
-		break;
+		நிறுத்து;
 	vim_free(name);
 
 	vim_free(namedfm_p[i].fname);
-	for ( ; i > NMARKS; --i)
+	க்கு ( ; i > NMARKS; --i)
 	    namedfm_p[i] = namedfm_p[i - 1];
 	namedfm_p[NMARKS].fmark.mark = curwin->w_cursor;
 	namedfm_p[NMARKS].fmark.fnum = curbuf->b_fnum;
-	namedfm_p[NMARKS].fname = NULL;
+	namedfm_p[NMARKS].fname = வெற்று;
 	namedfm_p[NMARKS].time_set = vim_time();
     }
 
     // Write the filemarks '0 - '9.  Newest (highest timestamp) first.
     vi_idx = NMARKS;
     idx = NMARKS;
-    for (i = NMARKS; i < NMARKS + EXTRA_MARKS; i++)
+    க்கு (i = NMARKS; i < NMARKS + EXTRA_MARKS; i++)
     {
-	xfmark_T *vi_fm = vi_namedfm != NULL ? &vi_namedfm[vi_idx] : NULL;
+	xfmark_T *vi_fm = vi_namedfm != வெற்று ? &vi_namedfm[vi_idx] : வெற்று;
 
-	if (vi_fm != NULL
+	எனில் (vi_fm != வெற்று
 		&& vi_fm->fmark.mark.lnum != 0
 		&& (vi_fm->time_set > namedfm_p[idx].time_set
 		    || namedfm_p[idx].fmark.mark.lnum == 0))
@@ -2220,16 +2220,16 @@ write_viminfo_filemarks(FILE *fp)
 	    fm = vi_fm;
 	    ++vi_idx;
 	}
-	else
+	இல்லையெனில்
 	{
 	    fm = &namedfm_p[idx++];
-	    if (vi_fm != NULL
+	    எனில் (vi_fm != வெற்று
 		  && vi_fm->fmark.mark.lnum == fm->fmark.mark.lnum
 		  && vi_fm->time_set == fm->time_set
 		  && ((vi_fm->fmark.fnum != 0
 			  && vi_fm->fmark.fnum == fm->fmark.fnum)
-		      || (vi_fm->fname != NULL
-			  && fm->fname != NULL
+		      || (vi_fm->fname != வெற்று
+			  && fm->fname != வெற்று
 			  && STRCMP(vi_fm->fname, fm->fname) == 0)))
 		++vi_idx;  // skip duplicate
 	}
@@ -2242,24 +2242,24 @@ write_viminfo_filemarks(FILE *fp)
     cleanup_jumplist(curwin, FALSE);
     vi_idx = 0;
     idx = curwin->w_jumplistlen - 1;
-    for (i = 0; i < JUMPLISTSIZE; ++i)
+    க்கு (i = 0; i < JUMPLISTSIZE; ++i)
     {
 	xfmark_T	*vi_fm;
 
-	fm = idx >= 0 ? &curwin->w_jumplist[idx] : NULL;
-	vi_fm = (vi_jumplist != NULL && vi_idx < vi_jumplist_len)
-					? &vi_jumplist[vi_idx] : NULL;
-	if (fm == NULL && vi_fm == NULL)
-	    break;
-	if (fm == NULL || (vi_fm != NULL && fm->time_set < vi_fm->time_set))
+	fm = idx >= 0 ? &curwin->w_jumplist[idx] : வெற்று;
+	vi_fm = (vi_jumplist != வெற்று && vi_idx < vi_jumplist_len)
+					? &vi_jumplist[vi_idx] : வெற்று;
+	எனில் (fm == வெற்று && vi_fm == வெற்று)
+	    நிறுத்து;
+	எனில் (fm == வெற்று || (vi_fm != வெற்று && fm->time_set < vi_fm->time_set))
 	{
 	    fm = vi_fm;
 	    ++vi_idx;
 	}
-	else
+	இல்லையெனில்
 	    --idx;
-	if (fm->fmark.fnum == 0
-		|| ((buf = buflist_findnr(fm->fmark.fnum)) != NULL
+	எனில் (fm->fmark.fnum == 0
+		|| ((buf = buflist_findnr(fm->fmark.fnum)) != வெற்று
 		    && !skip_for_viminfo(buf)))
 	    write_one_filemark(fp, fm, '-', '\'');
     }
@@ -2268,15 +2268,15 @@ write_viminfo_filemarks(FILE *fp)
 /*
  * Compare functions for qsort() below, that compares b_last_used.
  */
-    int
-buf_compare(const void *s1, const void *s2)
+    முழு
+buf_compare(மாறிலி வெறுமை *s1, மாறிலி வெறுமை *s2)
 {
     buf_T *buf1 = *(buf_T **)s1;
     buf_T *buf2 = *(buf_T **)s2;
 
-    if (buf1->b_last_used == buf2->b_last_used)
-	return 0;
-    return buf1->b_last_used > buf2->b_last_used ? -1 : 1;
+    எனில் (buf1->b_last_used == buf2->b_last_used)
+	திரும்பு 0;
+    திரும்பு buf1->b_last_used > buf2->b_last_used ? -1 : 1;
 }
 
 /*
@@ -2286,240 +2286,240 @@ buf_compare(const void *s1, const void *s2)
  * fp_out == NULL && (flags & VIF_ONLY_CURBUF): bail out after curbuf marks
  * fp_out == NULL && (flags & VIF_GET_OLDFILES | VIF_FORCEIT): fill v:oldfiles
  */
-    static void
+    நிலையான வெறுமை
 copy_viminfo_marks(
     vir_T	*virp,
     FILE	*fp_out,
     garray_T	*buflist,
-    int		eof,
-    int		flags)
+    முழு		eof,
+    முழு		flags)
 {
-    char_u	*line = virp->vir_line;
+    char_u	*வரி = virp->vir_வரி;
     buf_T	*buf;
-    int		num_marked_files;
-    int		load_marks;
-    int		copy_marks_out;
+    முழு		இலக்கம்_marked_files;
+    முழு		load_marks;
+    முழு		copy_marks_out;
     char_u	*str;
-    int		i;
+    முழு		i;
     char_u	*p;
     char_u	*name_buf;
     pos_T	pos;
 #ifdef FEAT_EVAL
-    list_T	*list = NULL;
+    list_T	*list = வெற்று;
 #endif
-    int		count = 0;
-    int		buflist_used = 0;
-    buf_T	*buflist_buf = NULL;
+    முழு		மொத்தம் = 0;
+    முழு		buflist_used = 0;
+    buf_T	*buflist_buf = வெற்று;
 
-    if ((name_buf = alloc(LSIZE)) == NULL)
-	return;
+    எனில் ((name_buf = alloc(LSIZE)) == வெற்று)
+	திரும்பு;
     *name_buf = NUL;
 
-    if (fp_out != NULL && buflist->ga_len > 0)
+    எனில் (fp_out != வெற்று && buflist->ga_len > 0)
     {
 	// Sort the list of buffers on b_last_used.
 	qsort(buflist->ga_data, (size_t)buflist->ga_len,
-						sizeof(buf_T *), buf_compare);
+						அளவு(buf_T *), buf_compare);
 	buflist_buf = ((buf_T **)buflist->ga_data)[0];
     }
 
 #ifdef FEAT_EVAL
-    if (fp_out == NULL && (flags & (VIF_GET_OLDFILES | VIF_FORCEIT)))
+    எனில் (fp_out == வெற்று && (flags & (VIF_GET_OLDFILES | VIF_FORCEIT)))
     {
 	list = list_alloc();
-	if (list != NULL)
+	எனில் (list != வெற்று)
 	    set_vim_var_list(VV_OLDFILES, list);
     }
 #endif
 
-    num_marked_files = get_viminfo_parameter('\'');
-    while (!eof && (count < num_marked_files || fp_out == NULL))
+    இலக்கம்_marked_files = get_viminfo_parameter('\'');
+    போது (!eof && (மொத்தம் < இலக்கம்_marked_files || fp_out == வெற்று))
     {
-	if (line[0] != '>')
+	எனில் (வரி[0] != '>')
 	{
-	    if (line[0] != '\n' && line[0] != '\r' && line[0] != '#')
+	    எனில் (வரி[0] != '\n' && வரி[0] != '\r' && வரி[0] != '#')
 	    {
-		if (viminfo_error("E576: ", _(e_nonr_missing_gt), line))
-		    break;	// too many errors, return now
+		எனில் (viminfo_error("E576: ", _(e_nonr_missing_gt), வரி))
+		    நிறுத்து;	// too many errors, return now
 	    }
-	    eof = vim_fgets(line, LSIZE, virp->vir_fd);
-	    continue;		// Skip this dud line
+	    eof = vim_fgets(வரி, LSIZE, virp->vir_fd);
+	    தொடர்;		// Skip this dud line
 	}
 
 	// Handle long line and translate escaped characters.
 	// Find file name, set str to start.
 	// Ignore leading and trailing white space.
-	str = skipwhite(line + 1);
-	str = viminfo_readstring(virp, (int)(str - virp->vir_line), FALSE);
-	if (str == NULL)
-	    continue;
+	str = skipwhite(வரி + 1);
+	str = viminfo_readstring(virp, (முழு)(str - virp->vir_வரி), FALSE);
+	எனில் (str == வெற்று)
+	    தொடர்;
 	p = str + STRLEN(str);
-	while (p != str && (*p == NUL || vim_isspace(*p)))
+	போது (p != str && (*p == NUL || vim_isspace(*p)))
 	    p--;
-	if (*p)
+	எனில் (*p)
 	    p++;
 	*p = NUL;
 
 #ifdef FEAT_EVAL
-	if (list != NULL)
+	எனில் (list != வெற்று)
 	    list_append_string(list, str, -1);
 #endif
 
 	// If fp_out == NULL, load marks for current buffer.
 	// If fp_out != NULL, copy marks for buffers not in buflist.
 	load_marks = copy_marks_out = FALSE;
-	if (fp_out == NULL)
+	எனில் (fp_out == வெற்று)
 	{
-	    if ((flags & VIF_WANT_MARKS) && curbuf->b_ffname != NULL)
+	    எனில் ((flags & VIF_WANT_MARKS) && curbuf->b_ffname != வெற்று)
 	    {
-		if (*name_buf == NUL)	    // only need to do this once
-		    home_replace(NULL, curbuf->b_ffname, name_buf, LSIZE, TRUE);
-		if (fnamecmp(str, name_buf) == 0)
+		எனில் (*name_buf == NUL)	    // only need to do this once
+		    home_replace(வெற்று, curbuf->b_ffname, name_buf, LSIZE, TRUE);
+		எனில் (fnamecmp(str, name_buf) == 0)
 		    load_marks = TRUE;
 	    }
 	}
-	else // fp_out != NULL
+	இல்லையெனில் // fp_out != NULL
 	{
 	    // This is slow if there are many buffers!!
 	    FOR_ALL_BUFFERS(buf)
-		if (buf->b_ffname != NULL)
+		எனில் (buf->b_ffname != வெற்று)
 		{
-		    home_replace(NULL, buf->b_ffname, name_buf, LSIZE, TRUE);
-		    if (fnamecmp(str, name_buf) == 0)
-			break;
+		    home_replace(வெற்று, buf->b_ffname, name_buf, LSIZE, TRUE);
+		    எனில் (fnamecmp(str, name_buf) == 0)
+			நிறுத்து;
 		}
 
 	    // Copy marks if the buffer has not been loaded.
-	    if (buf == NULL || !buf->b_marks_read)
+	    எனில் (buf == வெற்று || !buf->b_marks_read)
 	    {
-		int	did_read_line = FALSE;
+		முழு	did_read_வரி = FALSE;
 
-		if (buflist_buf != NULL)
+		எனில் (buflist_buf != வெற்று)
 		{
 		    // Read the next line.  If it has the "*" mark compare the
 		    // time stamps.  Write entries from "buflist" that are
 		    // newer.
-		    if (!viminfo_readline(virp) && line[0] == TAB)
+		    எனில் (!viminfo_readline(virp) && வரி[0] == TAB)
 		    {
-			did_read_line = TRUE;
-			if (line[1] == '*')
+			did_read_வரி = TRUE;
+			எனில் (வரி[1] == '*')
 			{
 			    long	ltime;
 
-			    sscanf((char *)line + 2, "%ld ", &ltime);
-			    while ((time_T)ltime < buflist_buf->b_last_used)
+			    sscanf((எழுத்து *)வரி + 2, "%ld ", &ltime);
+			    போது ((time_T)ltime < buflist_buf->b_last_used)
 			    {
 				write_buffer_marks(buflist_buf, fp_out);
-				if (++count >= num_marked_files)
-				    break;
-				if (++buflist_used == buflist->ga_len)
+				எனில் (++மொத்தம் >= இலக்கம்_marked_files)
+				    நிறுத்து;
+				எனில் (++buflist_used == buflist->ga_len)
 				{
-				    buflist_buf = NULL;
-				    break;
+				    buflist_buf = வெற்று;
+				    நிறுத்து;
 				}
 				buflist_buf =
 				   ((buf_T **)buflist->ga_data)[buflist_used];
 			    }
 			}
-			else
+			இல்லையெனில்
 			{
 			    // No timestamp, must be written by an older Vim.
 			    // Assume all remaining buffers are older than
 			    // ours.
-			    while (count < num_marked_files
+			    போது (மொத்தம் < இலக்கம்_marked_files
 					    && buflist_used < buflist->ga_len)
 			    {
 				buflist_buf = ((buf_T **)buflist->ga_data)
 							     [buflist_used++];
 				write_buffer_marks(buflist_buf, fp_out);
-				++count;
+				++மொத்தம்;
 			    }
-			    buflist_buf = NULL;
+			    buflist_buf = வெற்று;
 			}
 
-			if (count >= num_marked_files)
+			எனில் (மொத்தம் >= இலக்கம்_marked_files)
 			{
 			    vim_free(str);
-			    break;
+			    நிறுத்து;
 			}
 		    }
 		}
 
 		fputs("\n> ", fp_out);
 		viminfo_writestring(fp_out, str);
-		if (did_read_line)
-		    fputs((char *)line, fp_out);
+		எனில் (did_read_வரி)
+		    fputs((எழுத்து *)வரி, fp_out);
 
-		count++;
+		மொத்தம்++;
 		copy_marks_out = TRUE;
 	    }
 	}
 	vim_free(str);
 
 	pos.coladd = 0;
-	while (!(eof = viminfo_readline(virp)) && line[0] == TAB)
+	போது (!(eof = viminfo_readline(virp)) && வரி[0] == TAB)
 	{
-	    if (load_marks)
+	    எனில் (load_marks)
 	    {
-		if (line[1] != NUL)
+		எனில் (வரி[1] != NUL)
 		{
 		    unsigned u;
 
-		    sscanf((char *)line + 2, "%ld %u", &pos.lnum, &u);
+		    sscanf((எழுத்து *)வரி + 2, "%ld %u", &pos.lnum, &u);
 		    pos.col = u;
-		    switch (line[1])
+		    தேர்வு (வரி[1])
 		    {
-			case '"': curbuf->b_last_cursor = pos; break;
-			case '^': curbuf->b_last_insert = pos; break;
-			case '.': curbuf->b_last_change = pos; break;
-			case '+':
+			நிலை '"': curbuf->b_last_cursor = pos; நிறுத்து;
+			நிலை '^': curbuf->b_last_செருகு = pos; நிறுத்து;
+			நிலை '.': curbuf->b_last_change = pos; நிறுத்து;
+			நிலை '+':
 				  // changelist positions are stored oldest
 				  // first
-				  if (curbuf->b_changelistlen == JUMPLISTSIZE)
+				  எனில் (curbuf->b_changelistlen == JUMPLISTSIZE)
 				      // list is full, remove oldest entry
 				      mch_memmove(curbuf->b_changelist,
 					    curbuf->b_changelist + 1,
-					    sizeof(pos_T) * (JUMPLISTSIZE - 1));
-				  else
+					    அளவு(pos_T) * (JUMPLISTSIZE - 1));
+				  இல்லையெனில்
 				      ++curbuf->b_changelistlen;
 				  curbuf->b_changelist[
 					   curbuf->b_changelistlen - 1] = pos;
-				  break;
+				  நிறுத்து;
 
 				  // Using the line number for the last-used
 				  // timestamp.
-			case '*': curbuf->b_last_used = pos.lnum; break;
+			நிலை '*': curbuf->b_last_used = pos.lnum; நிறுத்து;
 
-			default:  if ((i = line[1] - 'a') >= 0 && i < NMARKS)
+			இயல்பு:  எனில் ((i = வரி[1] - 'a') >= 0 && i < NMARKS)
 				      curbuf->b_namedm[i] = pos;
 		    }
 		}
 	    }
-	    else if (copy_marks_out)
-		fputs((char *)line, fp_out);
+	    இல்லையெனில் எனில் (copy_marks_out)
+		fputs((எழுத்து *)வரி, fp_out);
 	}
 
-	if (load_marks)
+	எனில் (load_marks)
 	{
 	    win_T	*wp;
 
 	    FOR_ALL_WINDOWS(wp)
 	    {
-		if (wp->w_buffer == curbuf)
+		எனில் (wp->w_buffer == curbuf)
 		    wp->w_changelistidx = curbuf->b_changelistlen;
 	    }
-	    if (flags & VIF_ONLY_CURBUF)
-		break;
+	    எனில் (flags & VIF_ONLY_CURBUF)
+		நிறுத்து;
 	}
     }
 
-    if (fp_out != NULL)
+    எனில் (fp_out != வெற்று)
 	// Write any remaining entries from buflist.
-	while (count < num_marked_files && buflist_used < buflist->ga_len)
+	போது (மொத்தம் < இலக்கம்_marked_files && buflist_used < buflist->ga_len)
 	{
 	    buflist_buf = ((buf_T **)buflist->ga_data)[buflist_used++];
 	    write_buffer_marks(buflist_buf, fp_out);
-	    ++count;
+	    ++மொத்தம்;
 	}
 
     vim_free(name_buf);
@@ -2529,55 +2529,55 @@ copy_viminfo_marks(
  * Read marks for the current buffer from the viminfo file, when we support
  * buffer marks and the buffer has a name.
  */
-    void
-check_marks_read(void)
+    வெறுமை
+check_marks_read(வெறுமை)
 {
-    if (!curbuf->b_marks_read && get_viminfo_parameter('\'') > 0
-						  && curbuf->b_ffname != NULL)
-	read_viminfo(NULL, VIF_WANT_MARKS | VIF_ONLY_CURBUF);
+    எனில் (!curbuf->b_marks_read && get_viminfo_parameter('\'') > 0
+						  && curbuf->b_ffname != வெற்று)
+	read_viminfo(வெற்று, VIF_WANT_MARKS | VIF_ONLY_CURBUF);
 
     // Always set b_marks_read; needed when 'viminfo' is changed to include
     // the ' parameter after opening a buffer.
     curbuf->b_marks_read = true;
 }
 
-    static int
-read_viminfo_filemark(vir_T *virp, int force)
+    நிலையான முழு
+read_viminfo_filemark(vir_T *virp, முழு force)
 {
     char_u	*str;
     xfmark_T	*namedfm_p = get_namedfm();
     xfmark_T	*fm;
-    int		i;
+    முழு		i;
 
     // We only get here if line[0] == '\'' or '-'.
     // Illegal mark names are ignored (for future expansion).
-    str = virp->vir_line + 1;
-    if (*str <= 127
-	    && ((*virp->vir_line == '\''
+    str = virp->vir_வரி + 1;
+    எனில் (*str <= 127
+	    && ((*virp->vir_வரி == '\''
 				       && (VIM_ISDIGIT(*str) || SAFE_isupper(*str)))
-	     || (*virp->vir_line == '-' && *str == '\'')))
+	     || (*virp->vir_வரி == '-' && *str == '\'')))
     {
-	if (*str == '\'')
+	எனில் (*str == '\'')
 	{
 	    // If the jumplist isn't full insert fmark as oldest entry
-	    if (curwin->w_jumplistlen == JUMPLISTSIZE)
-		fm = NULL;
-	    else
+	    எனில் (curwin->w_jumplistlen == JUMPLISTSIZE)
+		fm = வெற்று;
+	    இல்லையெனில்
 	    {
-		for (i = curwin->w_jumplistlen; i > 0; --i)
+		க்கு (i = curwin->w_jumplistlen; i > 0; --i)
 		    curwin->w_jumplist[i] = curwin->w_jumplist[i - 1];
 		++curwin->w_jumplistidx;
 		++curwin->w_jumplistlen;
 		fm = &curwin->w_jumplist[0];
 		fm->fmark.mark.lnum = 0;
-		fm->fname = NULL;
+		fm->fname = வெற்று;
 	    }
 	}
-	else if (VIM_ISDIGIT(*str))
+	இல்லையெனில் எனில் (VIM_ISDIGIT(*str))
 	    fm = &namedfm_p[*str - '0' + NMARKS];
-	else
+	இல்லையெனில்
 	    fm = &namedfm_p[*str - 'A'];
-	if (fm != NULL && (fm->fmark.mark.lnum == 0 || force))
+	எனில் (fm != வெற்று && (fm->fmark.mark.lnum == 0 || force))
 	{
 	    str = skipwhite(str + 1);
 	    fm->fmark.mark.lnum = getdigits(&str);
@@ -2587,39 +2587,39 @@ read_viminfo_filemark(vir_T *virp, int force)
 	    fm->fmark.fnum = 0;
 	    str = skipwhite(str);
 	    vim_free(fm->fname);
-	    fm->fname = viminfo_readstring(virp, (int)(str - virp->vir_line),
+	    fm->fname = viminfo_readstring(virp, (முழு)(str - virp->vir_வரி),
 								       FALSE);
 	    fm->time_set = 0;
 	}
     }
-    return vim_fgets(virp->vir_line, LSIZE, virp->vir_fd);
+    திரும்பு vim_fgets(virp->vir_வரி, LSIZE, virp->vir_fd);
 }
 
 /*
  * Prepare for reading viminfo marks when writing viminfo later.
  */
-    static void
-prepare_viminfo_marks(void)
+    நிலையான வெறுமை
+prepare_viminfo_marks(வெறுமை)
 {
     vi_namedfm = ALLOC_CLEAR_MULT(xfmark_T, NMARKS + EXTRA_MARKS);
     vi_jumplist = ALLOC_CLEAR_MULT(xfmark_T, JUMPLISTSIZE);
     vi_jumplist_len = 0;
 }
 
-    static void
-finish_viminfo_marks(void)
+    நிலையான வெறுமை
+finish_viminfo_marks(வெறுமை)
 {
-    int		i;
+    முழு		i;
 
-    if (vi_namedfm != NULL)
+    எனில் (vi_namedfm != வெற்று)
     {
-	for (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
+	க்கு (i = 0; i < NMARKS + EXTRA_MARKS; ++i)
 	    vim_free(vi_namedfm[i].fname);
 	VIM_CLEAR(vi_namedfm);
     }
-    if (vi_jumplist != NULL)
+    எனில் (vi_jumplist != வெற்று)
     {
-	for (i = 0; i < vi_jumplist_len; ++i)
+	க்கு (i = 0; i < vi_jumplist_len; ++i)
 	    vim_free(vi_jumplist[i].fname);
 	VIM_CLEAR(vi_jumplist);
     }
@@ -2628,132 +2628,132 @@ finish_viminfo_marks(void)
 /*
  * Accept a new style mark line from the viminfo, store it when it's new.
  */
-    static void
-handle_viminfo_mark(garray_T *values, int force)
+    நிலையான வெறுமை
+handle_viminfo_mark(garray_T *மதிப்புகள், முழு force)
 {
-    bval_T	*vp = (bval_T *)values->ga_data;
-    int		name;
+    bval_T	*vp = (bval_T *)மதிப்புகள்->ga_data;
+    முழு		name;
     linenr_T	lnum;
     colnr_T	col;
     time_t	timestamp;
-    xfmark_T	*fm = NULL;
+    xfmark_T	*fm = வெற்று;
 
     // Check the format:
     // |{bartype},{name},{lnum},{col},{timestamp},{filename}
-    if (values->ga_len < 5
+    எனில் (மதிப்புகள்->ga_len < 5
 	    || vp[0].bv_type != BVAL_NR
 	    || vp[1].bv_type != BVAL_NR
 	    || vp[2].bv_type != BVAL_NR
 	    || vp[3].bv_type != BVAL_NR
 	    || vp[4].bv_type != BVAL_STRING)
-	return;
+	திரும்பு;
 
     name = vp[0].bv_nr;
-    if (name != '\'' && !VIM_ISDIGIT(name) && !ASCII_ISUPPER(name))
-	return;
+    எனில் (name != '\'' && !VIM_ISDIGIT(name) && !ASCII_ISUPPER(name))
+	திரும்பு;
     lnum = vp[1].bv_nr;
     col = vp[2].bv_nr;
-    if (lnum <= 0 || col < 0)
-	return;
+    எனில் (lnum <= 0 || col < 0)
+	திரும்பு;
     timestamp = (time_t)vp[3].bv_nr;
 
-    if (name == '\'')
+    எனில் (name == '\'')
     {
-	if (vi_jumplist != NULL)
+	எனில் (vi_jumplist != வெற்று)
 	{
-	    if (vi_jumplist_len < JUMPLISTSIZE)
+	    எனில் (vi_jumplist_len < JUMPLISTSIZE)
 		fm = &vi_jumplist[vi_jumplist_len++];
 	}
-	else
+	இல்லையெனில்
 	{
-	    int idx;
-	    int i;
+	    முழு idx;
+	    முழு i;
 
 	    // If we have a timestamp insert it in the right place.
-	    if (timestamp != 0)
+	    எனில் (timestamp != 0)
 	    {
-		for (idx = curwin->w_jumplistlen - 1; idx >= 0; --idx)
-		    if (curwin->w_jumplist[idx].time_set < timestamp)
+		க்கு (idx = curwin->w_jumplistlen - 1; idx >= 0; --idx)
+		    எனில் (curwin->w_jumplist[idx].time_set < timestamp)
 		    {
 			++idx;
-			break;
+			நிறுத்து;
 		    }
 		// idx cannot be zero now
-		if (idx < 0 && curwin->w_jumplistlen < JUMPLISTSIZE)
+		எனில் (idx < 0 && curwin->w_jumplistlen < JUMPLISTSIZE)
 		    // insert as the oldest entry
 		    idx = 0;
 	    }
-	    else if (curwin->w_jumplistlen < JUMPLISTSIZE)
+	    இல்லையெனில் எனில் (curwin->w_jumplistlen < JUMPLISTSIZE)
 		// insert as oldest entry
 		idx = 0;
-	    else
+	    இல்லையெனில்
 		idx = -1;
 
-	    if (idx >= 0)
+	    எனில் (idx >= 0)
 	    {
-		if (curwin->w_jumplistlen == JUMPLISTSIZE)
+		எனில் (curwin->w_jumplistlen == JUMPLISTSIZE)
 		{
 		    // Drop the oldest entry.
 		    --idx;
 		    vim_free(curwin->w_jumplist[0].fname);
-		    for (i = 0; i < idx; ++i)
+		    க்கு (i = 0; i < idx; ++i)
 			curwin->w_jumplist[i] = curwin->w_jumplist[i + 1];
 		}
-		else
+		இல்லையெனில்
 		{
 		    // Move newer entries forward.
-		    for (i = curwin->w_jumplistlen; i > idx; --i)
+		    க்கு (i = curwin->w_jumplistlen; i > idx; --i)
 			curwin->w_jumplist[i] = curwin->w_jumplist[i - 1];
 		    ++curwin->w_jumplistidx;
 		    ++curwin->w_jumplistlen;
 		}
 		fm = &curwin->w_jumplist[idx];
 		fm->fmark.mark.lnum = 0;
-		fm->fname = NULL;
+		fm->fname = வெற்று;
 		fm->time_set = 0;
 	    }
 	}
     }
-    else
+    இல்லையெனில்
     {
-	int		idx;
+	முழு		idx;
 	xfmark_T	*namedfm_p = get_namedfm();
 
-	if (VIM_ISDIGIT(name))
+	எனில் (VIM_ISDIGIT(name))
 	{
-	    if (vi_namedfm != NULL)
+	    எனில் (vi_namedfm != வெற்று)
 		idx = name - '0' + NMARKS;
-	    else
+	    இல்லையெனில்
 	    {
-		int i;
+		முழு i;
 
 		// Do not use the name from the viminfo file, insert in time
 		// order.
-		for (idx = NMARKS; idx < NMARKS + EXTRA_MARKS; ++idx)
-		    if (namedfm_p[idx].time_set < timestamp)
-			break;
-		if (idx == NMARKS + EXTRA_MARKS)
+		க்கு (idx = NMARKS; idx < NMARKS + EXTRA_MARKS; ++idx)
+		    எனில் (namedfm_p[idx].time_set < timestamp)
+			நிறுத்து;
+		எனில் (idx == NMARKS + EXTRA_MARKS)
 		    // All existing entries are newer.
-		    return;
+		    திரும்பு;
 		i = NMARKS + EXTRA_MARKS - 1;
 
 		vim_free(namedfm_p[i].fname);
-		for ( ; i > idx; --i)
+		க்கு ( ; i > idx; --i)
 		    namedfm_p[i] = namedfm_p[i - 1];
-		namedfm_p[idx].fname = NULL;
+		namedfm_p[idx].fname = வெற்று;
 	    }
 	}
-	else
+	இல்லையெனில்
 	    idx = name - 'A';
-	if (vi_namedfm != NULL)
+	எனில் (vi_namedfm != வெற்று)
 	    fm = &vi_namedfm[idx];
-	else
+	இல்லையெனில்
 	    fm = &namedfm_p[idx];
     }
 
-    if (fm != NULL)
+    எனில் (fm != வெற்று)
     {
-	if (vi_namedfm != NULL || fm->fmark.mark.lnum == 0
+	எனில் (vi_namedfm != வெற்று || fm->fmark.mark.lnum == 0
 					  || fm->time_set < timestamp || force)
 	{
 	    fm->fmark.mark.lnum = lnum;
@@ -2761,27 +2761,27 @@ handle_viminfo_mark(garray_T *values, int force)
 	    fm->fmark.mark.coladd = 0;
 	    fm->fmark.fnum = 0;
 	    vim_free(fm->fname);
-	    if (vp[4].bv_allocated)
+	    எனில் (vp[4].bv_allocated)
 	    {
 		fm->fname = vp[4].bv_string;
-		vp[4].bv_string = NULL;
+		vp[4].bv_string = வெற்று;
 	    }
-	    else
+	    இல்லையெனில்
 		fm->fname = vim_strsave(vp[4].bv_string);
 	    fm->time_set = timestamp;
 	}
     }
 }
 
-    static int
-read_viminfo_barline(vir_T *virp, int got_encoding, int force, int writing)
+    நிலையான முழு
+read_viminfo_barline(vir_T *virp, முழு got_encoding, முழு force, முழு writing)
 {
-    char_u	*p = virp->vir_line + 1;
-    int		bartype;
-    garray_T	values;
+    char_u	*p = virp->vir_வரி + 1;
+    முழு		bartype;
+    garray_T	மதிப்புகள்;
     bval_T	*vp;
-    int		i;
-    int		read_next = TRUE;
+    முழு		i;
+    முழு		read_next = TRUE;
 
     // The format is: |{bartype},{value},...
     // For a very long string:
@@ -2791,64 +2791,64 @@ read_viminfo_barline(vir_T *virp, int got_encoding, int force, int writing)
     // For a long line not using a string
     //     |{bartype},{lots of values},>
     //     |<{value},{value}
-    if (*p == '<')
+    எனில் (*p == '<')
     {
 	// Continuation line of an unrecognized item.
-	if (writing)
-	    ga_copy_string(&virp->vir_barlines, virp->vir_line);
+	எனில் (writing)
+	    ga_copy_string(&virp->vir_barlines, virp->vir_வரி);
     }
-    else
+    இல்லையெனில்
     {
-	ga_init2(&values, sizeof(bval_T), 20);
+	ga_init2(&மதிப்புகள், அளவு(bval_T), 20);
 	bartype = getdigits(&p);
-	switch (bartype)
+	தேர்வு (bartype)
 	{
-	    case BARTYPE_VERSION:
+	    நிலை BARTYPE_VERSION:
 		// Only use the version when it comes before the encoding.
 		// If it comes later it was copied by a Vim version that
 		// doesn't understand the version.
-		if (!got_encoding)
+		எனில் (!got_encoding)
 		{
-		    read_next = barline_parse(virp, p, &values);
-		    vp = (bval_T *)values.ga_data;
-		    if (values.ga_len > 0 && vp->bv_type == BVAL_NR)
+		    read_next = barline_parse(virp, p, &மதிப்புகள்);
+		    vp = (bval_T *)மதிப்புகள்.ga_data;
+		    எனில் (மதிப்புகள்.ga_len > 0 && vp->bv_type == BVAL_NR)
 			virp->vir_version = vp->bv_nr;
 		}
-		break;
+		நிறுத்து;
 
-	    case BARTYPE_HISTORY:
-		read_next = barline_parse(virp, p, &values);
-		handle_viminfo_history(&values, writing);
-		break;
+	    நிலை BARTYPE_HISTORY:
+		read_next = barline_parse(virp, p, &மதிப்புகள்);
+		handle_viminfo_history(&மதிப்புகள், writing);
+		நிறுத்து;
 
-	    case BARTYPE_REGISTER:
-		read_next = barline_parse(virp, p, &values);
-		handle_viminfo_register(&values, force);
-		break;
+	    நிலை BARTYPE_REGISTER:
+		read_next = barline_parse(virp, p, &மதிப்புகள்);
+		handle_viminfo_register(&மதிப்புகள், force);
+		நிறுத்து;
 
-	    case BARTYPE_MARK:
-		read_next = barline_parse(virp, p, &values);
-		handle_viminfo_mark(&values, force);
-		break;
+	    நிலை BARTYPE_MARK:
+		read_next = barline_parse(virp, p, &மதிப்புகள்);
+		handle_viminfo_mark(&மதிப்புகள், force);
+		நிறுத்து;
 
-	    default:
+	    இயல்பு:
 		// copy unrecognized line (for future use)
-		if (writing)
-		    ga_copy_string(&virp->vir_barlines, virp->vir_line);
+		எனில் (writing)
+		    ga_copy_string(&virp->vir_barlines, virp->vir_வரி);
 	}
-	for (i = 0; i < values.ga_len; ++i)
+	க்கு (i = 0; i < மதிப்புகள்.ga_len; ++i)
 	{
-	    vp = (bval_T *)values.ga_data + i;
-	    if (vp->bv_type == BVAL_STRING && vp->bv_allocated)
+	    vp = (bval_T *)மதிப்புகள்.ga_data + i;
+	    எனில் (vp->bv_type == BVAL_STRING && vp->bv_allocated)
 		vim_free(vp->bv_string);
 	    vim_free(vp->bv_tofree);
 	}
-	ga_clear(&values);
+	ga_clear(&மதிப்புகள்);
     }
 
-    if (read_next)
-	return viminfo_readline(virp);
-    return FALSE;
+    எனில் (read_next)
+	திரும்பு viminfo_readline(virp);
+    திரும்பு FALSE;
 }
 
 /*
@@ -2856,136 +2856,136 @@ read_viminfo_barline(vir_T *virp, int got_encoding, int force, int writing)
  * first part of the viminfo file which contains everything but the marks that
  * are local to a file.  Returns TRUE when end-of-file is reached. -- webb
  */
-    static int
+    நிலையான முழு
 read_viminfo_up_to_marks(
     vir_T	*virp,
-    int		forceit,
-    int		writing)
+    முழு		forceit,
+    முழு		writing)
 {
-    int		eof;
+    முழு		eof;
     buf_T	*buf;
-    int		got_encoding = FALSE;
+    முழு		got_encoding = FALSE;
 
     prepare_viminfo_history(forceit ? 9999 : 0, writing);
 
     eof = viminfo_readline(virp);
-    while (!eof && virp->vir_line[0] != '>')
+    போது (!eof && virp->vir_வரி[0] != '>')
     {
-	switch (virp->vir_line[0])
+	தேர்வு (virp->vir_வரி[0])
 	{
 		// Characters reserved for future expansion, ignored now
-	    case '+': // "+40 /path/dir file", for running vim without args
-	    case '^': // to be defined
-	    case '<': // long line - ignored
+	    நிலை '+': // "+40 /path/dir file", for running vim without args
+	    நிலை '^': // to be defined
+	    நிலை '<': // long line - ignored
 		// A comment or empty line.
-	    case NUL:
-	    case '\r':
-	    case '\n':
-	    case '#':
+	    நிலை NUL:
+	    நிலை '\r':
+	    நிலை '\n':
+	    நிலை '#':
 		eof = viminfo_readline(virp);
-		break;
-	    case '|':
+		நிறுத்து;
+	    நிலை '|':
 		eof = read_viminfo_barline(virp, got_encoding,
 							    forceit, writing);
-		break;
-	    case '*': // "*encoding=value"
+		நிறுத்து;
+	    நிலை '*': // "*encoding=value"
 		got_encoding = TRUE;
 		eof = viminfo_encoding(virp);
-		break;
-	    case '!': // global variable
+		நிறுத்து;
+	    நிலை '!': // global variable
 #ifdef FEAT_EVAL
 		eof = read_viminfo_varlist(virp, writing);
-#else
+#இல்லையெனில்
 		eof = viminfo_readline(virp);
 #endif
-		break;
-	    case '%': // entry for buffer list
+		நிறுத்து;
+	    நிலை '%': // entry for buffer list
 		eof = read_viminfo_bufferlist(virp, writing);
-		break;
-	    case '"':
+		நிறுத்து;
+	    நிலை '"':
 		// When registers are in bar lines skip the old style register
 		// lines.
-		if (virp->vir_version < VIMINFO_VERSION_WITH_REGISTERS)
+		எனில் (virp->vir_version < VIMINFO_VERSION_WITH_REGISTERS)
 		    eof = read_viminfo_register(virp, forceit);
-		else
-		    do
+		இல்லையெனில்
+		    செய்
 		    {
 			eof = viminfo_readline(virp);
-		    } while (!eof && (virp->vir_line[0] == TAB
-						|| virp->vir_line[0] == '<'));
-		break;
-	    case '/':	    // Search string
-	    case '&':	    // Substitute search string
-	    case '~':	    // Last search string, followed by '/' or '&'
-		eof = read_viminfo_search_pattern(virp, forceit, writing);
-		break;
-	    case '$':
+		    } போது (!eof && (virp->vir_வரி[0] == TAB
+						|| virp->vir_வரி[0] == '<'));
+		நிறுத்து;
+	    நிலை '/':	    // Search string
+	    நிலை '&':	    // Substitute search string
+	    நிலை '~':	    // Last search string, followed by '/' or '&'
+		eof = read_viminfo_தேடல்_pattern(virp, forceit, writing);
+		நிறுத்து;
+	    நிலை '$':
 		eof = read_viminfo_sub_string(virp, forceit);
-		break;
-	    case ':':
-	    case '?':
-	    case '=':
-	    case '@':
+		நிறுத்து;
+	    நிலை ':':
+	    நிலை '?':
+	    நிலை '=':
+	    நிலை '@':
 		// When history is in bar lines skip the old style history
 		// lines.
-		if (virp->vir_version < VIMINFO_VERSION_WITH_HISTORY)
+		எனில் (virp->vir_version < VIMINFO_VERSION_WITH_HISTORY)
 		    eof = read_viminfo_history(virp, writing);
-		else
+		இல்லையெனில்
 		    eof = viminfo_readline(virp);
-		break;
-	    case '-':
-	    case '\'':
+		நிறுத்து;
+	    நிலை '-':
+	    நிலை '\'':
 		// When file marks are in bar lines skip the old style lines.
-		if (virp->vir_version < VIMINFO_VERSION_WITH_MARKS)
+		எனில் (virp->vir_version < VIMINFO_VERSION_WITH_MARKS)
 		    eof = read_viminfo_filemark(virp, forceit);
-		else
+		இல்லையெனில்
 		    eof = viminfo_readline(virp);
-		break;
-	    default:
-		if (viminfo_error("E575: ", _(e_illegal_starting_char),
-			    virp->vir_line))
+		நிறுத்து;
+	    இயல்பு:
+		எனில் (viminfo_error("E575: ", _(e_illegal_starting_char),
+			    virp->vir_வரி))
 		    eof = TRUE;
-		else
+		இல்லையெனில்
 		    eof = viminfo_readline(virp);
-		break;
+		நிறுத்து;
 	}
     }
 
     // Finish reading history items.
-    if (!writing)
+    எனில் (!writing)
 	finish_viminfo_history(virp);
 
     // Change file names to buffer numbers for fmarks.
     FOR_ALL_BUFFERS(buf)
 	fmarks_check_names(buf);
 
-    return eof;
+    திரும்பு eof;
 }
 
 /*
  * do_viminfo() -- Should only be called from read_viminfo() & write_viminfo().
  */
-    static void
-do_viminfo(FILE *fp_in, FILE *fp_out, int flags)
+    நிலையான வெறுமை
+do_viminfo(FILE *fp_in, FILE *fp_out, முழு flags)
 {
-    int		eof = FALSE;
+    முழு		eof = FALSE;
     vir_T	vir;
-    int		merge = FALSE;
-    int		do_copy_marks = FALSE;
+    முழு		merge = FALSE;
+    முழு		do_copy_marks = FALSE;
     garray_T	buflist;
 
-    if ((vir.vir_line = alloc(LSIZE)) == NULL)
-	return;
+    எனில் ((vir.vir_வரி = alloc(LSIZE)) == வெற்று)
+	திரும்பு;
     vir.vir_fd = fp_in;
     vir.vir_conv.vc_type = CONV_NONE;
-    ga_init2(&vir.vir_barlines, sizeof(char_u *), 100);
+    ga_init2(&vir.vir_barlines, அளவு(char_u *), 100);
     vir.vir_version = -1;
 
-    if (fp_in != NULL)
+    எனில் (fp_in != வெற்று)
     {
-	if (flags & VIF_WANT_INFO)
+	எனில் (flags & VIF_WANT_INFO)
 	{
-	    if (fp_out != NULL)
+	    எனில் (fp_out != வெற்று)
 	    {
 		// Registers and marks are read and kept separate from what
 		// this Vim is using.  They are merged when writing.
@@ -2994,20 +2994,20 @@ do_viminfo(FILE *fp_in, FILE *fp_out, int flags)
 	    }
 
 	    eof = read_viminfo_up_to_marks(&vir,
-					 flags & VIF_FORCEIT, fp_out != NULL);
+					 flags & VIF_FORCEIT, fp_out != வெற்று);
 	    merge = TRUE;
 	}
-	else if (flags != 0)
+	இல்லையெனில் எனில் (flags != 0)
 	    // Skip info, find start of marks
-	    while (!(eof = viminfo_readline(&vir))
-		    && vir.vir_line[0] != '>')
+	    போது (!(eof = viminfo_readline(&vir))
+		    && vir.vir_வரி[0] != '>')
 		;
 
 	do_copy_marks = (flags & (VIF_WANT_MARKS | VIF_ONLY_CURBUF
 					    | VIF_GET_OLDFILES | VIF_FORCEIT));
     }
 
-    if (fp_out != NULL)
+    எனில் (fp_out != வெற்று)
     {
 	// Write the info:
 	fprintf(fp_out, _("# This viminfo file was generated by Vim %s.\n"),
@@ -3016,7 +3016,7 @@ do_viminfo(FILE *fp_in, FILE *fp_out, int flags)
 	write_viminfo_version(fp_out);
 	fputs(_("# Value of 'encoding' when this file was written\n"), fp_out);
 	fprintf(fp_out, "*encoding=%s\n\n", p_enc);
-	write_viminfo_search_pattern(fp_out);
+	write_viminfo_தேடல்_pattern(fp_out);
 	write_viminfo_sub_string(fp_out);
 	write_viminfo_history(fp_out, merge);
 	write_viminfo_registers(fp_out);
@@ -3029,21 +3029,21 @@ do_viminfo(FILE *fp_in, FILE *fp_out, int flags)
 	write_viminfo_bufferlist(fp_out);
 	write_viminfo_barlines(&vir, fp_out);
 
-	if (do_copy_marks)
-	    ga_init2(&buflist, sizeof(buf_T *), 50);
-	write_viminfo_marks(fp_out, do_copy_marks ? &buflist : NULL);
+	எனில் (do_copy_marks)
+	    ga_init2(&buflist, அளவு(buf_T *), 50);
+	write_viminfo_marks(fp_out, do_copy_marks ? &buflist : வெற்று);
     }
 
-    if (do_copy_marks)
+    எனில் (do_copy_marks)
     {
 	copy_viminfo_marks(&vir, fp_out, &buflist, eof, flags);
-	if (fp_out != NULL)
+	எனில் (fp_out != வெற்று)
 	    ga_clear(&buflist);
     }
 
-    vim_free(vir.vir_line);
-    if (vir.vir_conv.vc_type != CONV_NONE)
-	convert_setup(&vir.vir_conv, NULL, NULL);
+    vim_free(vir.vir_வரி);
+    எனில் (vir.vir_conv.vc_type != CONV_NONE)
+	convert_setup(&vir.vir_conv, வெற்று, வெற்று);
     ga_clear_strings(&vir.vir_barlines);
 }
 
@@ -3051,24 +3051,24 @@ do_viminfo(FILE *fp_in, FILE *fp_out, int flags)
  * read_viminfo() -- Read the viminfo file.  Registers etc. which are already
  * set are not over-written unless "flags" includes VIF_FORCEIT. -- webb
  */
-    int
+    முழு
 read_viminfo(
     char_u	*file,	    // file name or NULL to use default name
-    int		flags)	    // VIF_WANT_INFO et al.
+    முழு		flags)	    // VIF_WANT_INFO et al.
 {
     FILE	*fp;
     char_u	*fname;
     stat_T	st;		// mch_stat() of existing viminfo file
 
-    if (no_viminfo())
-	return FAIL;
+    எனில் (no_viminfo())
+	திரும்பு FAIL;
 
     fname = viminfo_filename(file);	// get file name in allocated buffer
-    if (fname == NULL)
-	return FAIL;
-    fp = mch_fopen((char *)fname, READBIN);
+    எனில் (fname == வெற்று)
+	திரும்பு FAIL;
+    fp = mch_fopen((எழுத்து *)fname, READBIN);
 
-    if (p_verbose > 0)
+    எனில் (p_verbose > 0)
     {
 	verbose_enter();
 	smsg(_("Reading viminfo file \"%s\"%s%s%s%s"),
@@ -3076,24 +3076,24 @@ read_viminfo(
 		(flags & VIF_WANT_INFO) ? _(" info") : "",
 		(flags & VIF_WANT_MARKS) ? _(" marks") : "",
 		(flags & VIF_GET_OLDFILES) ? _(" oldfiles") : "",
-		fp == NULL ? _(" FAILED") : "");
+		fp == வெற்று ? _(" FAILED") : "");
 	verbose_leave();
     }
 
     vim_free(fname);
-    if (fp == NULL)
-	return FAIL;
-    if (mch_fstat(fileno(fp), &st) < 0 || S_ISDIR(st.st_mode))
+    எனில் (fp == வெற்று)
+	திரும்பு FAIL;
+    எனில் (mch_fstat(fileno(fp), &st) < 0 || S_ISDIR(st.st_mode))
     {
 	fclose(fp);
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     viminfo_errcnt = 0;
-    do_viminfo(fp, NULL, flags);
+    do_viminfo(fp, வெற்று, flags);
 
     fclose(fp);
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -3103,64 +3103,64 @@ read_viminfo(
  * If "forceit" is TRUE, then the old file is not read in, and only internal
  * info is written to the file.
  */
-    void
-write_viminfo(char_u *file, int forceit)
+    வெறுமை
+write_viminfo(char_u *file, முழு forceit)
 {
     char_u	*fname;
-    FILE	*fp_in = NULL;	// input viminfo file, if any
-    FILE	*fp_out = NULL;	// output viminfo file
-    char_u	*tempname = NULL;	// name of temp viminfo file
+    FILE	*fp_in = வெற்று;	// input viminfo file, if any
+    FILE	*fp_out = வெற்று;	// output viminfo file
+    char_u	*tempname = வெற்று;	// name of temp viminfo file
     stat_T	st_new;		// mch_stat() of potential new file
     stat_T	st_old;		// mch_stat() of existing viminfo file
-#if defined(UNIX) || defined(VMS)
+#எனில் defined(UNIX) || defined(VMS)
     mode_t	umask_save;
 #endif
 #ifdef UNIX
-    int		shortname = FALSE;	// use 8.3 file name
+    முழு		shortname = FALSE;	// use 8.3 file name
 #endif
 #ifdef MSWIN
-    int		hidden = FALSE;
+    முழு		hidden = FALSE;
 #endif
 
-    if (no_viminfo())
-	return;
+    எனில் (no_viminfo())
+	திரும்பு;
 
     fname = viminfo_filename(file);	// may set to default if NULL
-    if (fname == NULL)
-	return;
+    எனில் (fname == வெற்று)
+	திரும்பு;
 
-    fp_in = mch_fopen((char *)fname, READBIN);
-    if (fp_in == NULL)
+    fp_in = mch_fopen((எழுத்து *)fname, READBIN);
+    எனில் (fp_in == வெற்று)
     {
-	int fd;
+	முழு fd;
 
 	// if it does exist, but we can't read it, don't try writing
-	if (mch_stat((char *)fname, &st_new) == 0)
-	    goto end;
+	எனில் (mch_stat((எழுத்து *)fname, &st_new) == 0)
+	    செல் end;
 
 	// Create the new .viminfo non-accessible for others, because it may
 	// contain text from non-accessible documents. It is up to the user to
 	// widen access (e.g. to a group). This may also fail if there is a
 	// race condition, then just give up.
-	fd = mch_open((char *)fname,
+	fd = mch_open((எழுத்து *)fname,
 			    O_CREAT|O_EXTRA|O_EXCL|O_WRONLY|O_NOFOLLOW, 0600);
-	if (fd < 0)
-	    goto end;
+	எனில் (fd < 0)
+	    செல் end;
 	fp_out = fdopen(fd, WRITEBIN);
     }
-    else
+    இல்லையெனில்
     {
 	// There is an existing viminfo file.  Create a temporary file to
 	// write the new viminfo into, in the same directory as the
 	// existing viminfo file, which will be renamed once all writing is
 	// successful.
-	if (mch_fstat(fileno(fp_in), &st_old) < 0
+	எனில் (mch_fstat(fileno(fp_in), &st_old) < 0
 		|| S_ISDIR(st_old.st_mode)
 #ifdef UNIX
 		// For Unix we check the owner of the file.  It's not very nice
 		// to overwrite a user's viminfo file after a "su root", with a
 		// viminfo file that the user can't read.
-		|| (getuid() != ROOT_UID
+		|| (getuid() != வேர்_UID
 		    && !(st_old.st_uid == getuid()
 			    ? (st_old.st_mode & 0200)
 			    : (st_old.st_gid == getgid()
@@ -3169,13 +3169,13 @@ write_viminfo(char_u *file, int forceit)
 #endif
 		)
 	{
-	    int	tt = msg_didany;
+	    முழு	tt = செய்தி_didany;
 
 	    // avoid a wait_return() for this message, it's annoying
 	    semsg(_(e_viminfo_file_is_not_writable_str), fname);
-	    msg_didany = tt;
+	    செய்தி_didany = tt;
 	    fclose(fp_in);
-	    goto end;
+	    செல் end;
 	}
 #ifdef MSWIN
 	// Get the file attributes of the existing viminfo file.
@@ -3188,65 +3188,65 @@ write_viminfo(char_u *file, int forceit)
 	// stat() and open().  Use mch_open() with O_EXCL to avoid that.
 	// May try twice: Once normal and once with shortname set, just in
 	// case somebody puts his viminfo file in an 8.3 filesystem.
-	for (;;)
+	க்கு (;;)
 	{
-	    int		next_char = 'z';
+	    முழு		next_char = 'z';
 	    char_u	*wp;
 
 	    tempname = buf_modname(
 #ifdef UNIX
 				    shortname,
-#else
+#இல்லையெனில்
 				    FALSE,
 #endif
 				    fname,
 #ifdef VMS
 				    (char_u *)"-tmp",
-#else
+#இல்லையெனில்
 				    (char_u *)".tmp",
 #endif
 				    FALSE);
-	    if (tempname == NULL)		// out of memory
-		break;
+	    எனில் (tempname == வெற்று)		// out of memory
+		நிறுத்து;
 
 	    // Try a series of names.  Change one character, just before
 	    // the extension.  This should also work for an 8.3
 	    // file name, when after adding the extension it still is
 	    // the same file as the original.
 	    wp = tempname + STRLEN(tempname) - 5;
-	    if (wp < gettail(tempname))	    // empty file name?
+	    எனில் (wp < gettail(tempname))	    // empty file name?
 		wp = gettail(tempname);
-	    for (;;)
+	    க்கு (;;)
 	    {
 		// Check if tempfile already exists.  Never overwrite an
 		// existing file!
-		if (mch_stat((char *)tempname, &st_new) == 0)
+		எனில் (mch_stat((எழுத்து *)tempname, &st_new) == 0)
 		{
 #ifdef UNIX
 		    // Check if tempfile is same as original file.  May happen
 		    // when modname() gave the same file back.  E.g.  silly
 		    // link, or file name-length reached.  Try again with
 		    // shortname set.
-		    if (!shortname && st_new.st_dev == st_old.st_dev
+		    எனில் (!shortname && st_new.st_dev == st_old.st_dev
 						&& st_new.st_ino == st_old.st_ino)
 		    {
 			VIM_CLEAR(tempname);
 			shortname = TRUE;
-			break;
+			நிறுத்து;
 		    }
 #endif
 		}
-		else
+		இல்லையெனில்
 		{
 		    // Try creating the file exclusively.  This may fail if
 		    // another Vim tries to do it at the same time.
 #ifdef VMS
 		    // fdopen() fails for some reason
 		    umask_save = umask(077);
-		    fp_out = mch_fopen((char *)tempname, WRITEBIN);
-		    (void)umask(umask_save);
-#else
-		    int	fd;
+		    fp_out = mch_fopen((எழுத்து *)tempname, WRITEBIN);
+		    (வெறுமை)umask(umask_save);
+#இல்லையெனில்
+		    முழு	fd;
 
 		    // Use mch_open() to be able to use O_NOFOLLOW and set file
 		    // protection:
@@ -3255,86 +3255,86 @@ write_viminfo(char_u *file, int forceit)
 		    // Others: r&w for user only.
 # ifdef UNIX
 		    umask_save = umask(0);
-		    fd = mch_open((char *)tempname,
+		    fd = mch_open((எழுத்து *)tempname,
 			    O_CREAT|O_EXTRA|O_EXCL|O_WRONLY|O_NOFOLLOW,
-					(int)((st_old.st_mode & 0777) | 0600));
-		    (void)umask(umask_save);
-# else
-		    fd = mch_open((char *)tempname,
+					(முழு)((st_old.st_mode & 0777) | 0600));
+		    (வெறுமை)umask(umask_save);
+# இல்லையெனில்
+		    fd = mch_open((எழுத்து *)tempname,
 			     O_CREAT|O_EXTRA|O_EXCL|O_WRONLY|O_NOFOLLOW, 0600);
 # endif
-		    if (fd < 0)
+		    எனில் (fd < 0)
 		    {
-			fp_out = NULL;
+			fp_out = வெற்று;
 # ifdef EEXIST
 			// Avoid trying lots of names while the problem is lack
 			// of permission, only retry if the file already
 			// exists.
-			if (errno != EEXIST)
-			    break;
+			எனில் (errno != EEXIST)
+			    நிறுத்து;
 # endif
 		    }
-		    else
+		    இல்லையெனில்
 			fp_out = fdopen(fd, WRITEBIN);
 #endif // VMS
-		    if (fp_out != NULL)
-			break;
+		    எனில் (fp_out != வெற்று)
+			நிறுத்து;
 		}
 
 		// Assume file exists, try again with another name.
-		if (next_char == 'a' - 1)
+		எனில் (next_char == 'a' - 1)
 		{
 		    // They all exist?  Must be something wrong! Don't write
 		    // the viminfo file then.
 		    semsg(_(e_too_many_viminfo_temp_files_like_str), tempname);
-		    break;
+		    நிறுத்து;
 		}
 		*wp = next_char;
 		--next_char;
 	    }
 
-	    if (tempname != NULL)
-		break;
+	    எனில் (tempname != வெற்று)
+		நிறுத்து;
 	    // continue if shortname was set
 	}
 
-#if defined(UNIX) && defined(HAVE_FCHOWN)
-	if (tempname != NULL && fp_out != NULL)
+#எனில் defined(UNIX) && defined(HAVE_FCHOWN)
+	எனில் (tempname != வெற்று && fp_out != வெற்று)
 	{
 		stat_T	tmp_st;
 
 	    // Make sure the original owner can read/write the tempfile and
 	    // otherwise preserve permissions, making sure the group matches.
-	    if (mch_stat((char *)tempname, &tmp_st) >= 0)
+	    எனில் (mch_stat((எழுத்து *)tempname, &tmp_st) >= 0)
 	    {
-		if (st_old.st_uid != tmp_st.st_uid)
+		எனில் (st_old.st_uid != tmp_st.st_uid)
 		    // Changing the owner might fail, in which case the
 		    // file will now be owned by the current user, oh well.
 		    vim_ignored = fchown(fileno(fp_out), st_old.st_uid, -1);
-		if (st_old.st_gid != tmp_st.st_gid
+		எனில் (st_old.st_gid != tmp_st.st_gid
 			&& fchown(fileno(fp_out), -1, st_old.st_gid) == -1)
 		    // can't set the group to what it should be, remove
 		    // group permissions
-		    (void)mch_setperm(tempname, 0600);
+		    (வெறுமை)mch_setperm(tempname, 0600);
 	    }
-	    else
+	    இல்லையெனில்
 		// can't stat the file, set conservative permissions
-		(void)mch_setperm(tempname, 0600);
+		(வெறுமை)mch_setperm(tempname, 0600);
 	}
 #endif
     }
 
     // Check if the new viminfo file can be written to.
-    if (fp_out == NULL)
+    எனில் (fp_out == வெற்று)
     {
 	semsg(_(e_cant_write_viminfo_file_str),
-		       (fp_in == NULL || tempname == NULL) ? fname : tempname);
-	if (fp_in != NULL)
+		       (fp_in == வெற்று || tempname == வெற்று) ? fname : tempname);
+	எனில் (fp_in != வெற்று)
 	    fclose(fp_in);
-	goto end;
+	செல் end;
     }
 
-    if (p_verbose > 0)
+    எனில் (p_verbose > 0)
     {
 	verbose_enter();
 	smsg(_("Writing viminfo file \"%s\""), fname);
@@ -3344,29 +3344,29 @@ write_viminfo(char_u *file, int forceit)
     viminfo_errcnt = 0;
     do_viminfo(fp_in, fp_out, forceit ? 0 : (VIF_WANT_INFO | VIF_WANT_MARKS));
 
-    if (fclose(fp_out) == EOF)
+    எனில் (fclose(fp_out) == EOF)
 	++viminfo_errcnt;
 
-    if (fp_in != NULL)
+    எனில் (fp_in != வெற்று)
     {
 	fclose(fp_in);
 
 	// In case of an error keep the original viminfo file.  Otherwise
 	// rename the newly written file.  Give an error if that fails.
-	if (viminfo_errcnt == 0)
+	எனில் (viminfo_errcnt == 0)
 	{
-	    if (vim_rename(tempname, fname) == -1)
+	    எனில் (vim_rename(tempname, fname) == -1)
 	    {
 		++viminfo_errcnt;
 		semsg(_(e_cant_rename_viminfo_file_to_str), fname);
 	    }
 #ifdef MSWIN
 	    // If the viminfo file was hidden then also hide the new file.
-	    else if (hidden)
+	    இல்லையெனில் எனில் (hidden)
 		mch_hide(fname);
 #endif
 	}
-	if (viminfo_errcnt > 0)
+	எனில் (viminfo_errcnt > 0)
 	    mch_remove(tempname);
     }
 
@@ -3378,22 +3378,22 @@ end:
 /*
  * ":rviminfo" and ":wviminfo".
  */
-    void
+    வெறுமை
 ex_viminfo(
     exarg_T	*eap)
 {
     char_u	*save_viminfo;
 
     save_viminfo = p_viminfo;
-    if (*p_viminfo == NUL)
+    எனில் (*p_viminfo == NUL)
 	p_viminfo = (char_u *)"'100";
-    if (eap->cmdidx == CMD_rviminfo)
+    எனில் (eap->cmdidx == CMD_rviminfo)
     {
-	if (read_viminfo(eap->arg, VIF_WANT_INFO | VIF_WANT_MARKS
+	எனில் (read_viminfo(eap->arg, VIF_WANT_INFO | VIF_WANT_MARKS
 				  | (eap->forceit ? VIF_FORCEIT : 0)) == FAIL)
 	    emsg(_(e_cannot_open_viminfo_file_for_reading));
     }
-    else
+    இல்லையெனில்
 	write_viminfo(eap->arg, eap->forceit);
     p_viminfo = save_viminfo;
 }

@@ -28,9 +28,9 @@
  * Stand-Alone	- unicode form-B isolated
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#if defined(FEAT_ARABIC)
+#எனில் defined(FEAT_ARABIC)
 
 // Unicode values for Arabic characters.
 #define a_HAMZA				0x0621
@@ -98,7 +98,7 @@
 #define a_s_LAM_ALEF			0xfefb
 #define a_f_LAM_ALEF			0xfefc
 
-static struct achar {
+நிலையான கட்டமைப்பு achar {
     unsigned c;
     unsigned isolated;
     unsigned initial;
@@ -167,153 +167,153 @@ static struct achar {
  * Find the struct achar pointer to the given Arabic char.
  * Returns NULL if not found.
  */
-    static struct achar *
-find_achar(int c)
+    நிலையான கட்டமைப்பு achar *
+find_achar(முழு c)
 {
-    int h, m, l;
+    முழு h, m, l;
 
     // using binary search to find c
     h = ARRAY_LENGTH(achars);
     l = 0;
-    while (l < h)
+    போது (l < h)
     {
 	m = (h + l) / 2;
-	if (achars[m].c == (unsigned)c)
-	    return &achars[m];
-	if ((unsigned)c < achars[m].c)
+	எனில் (achars[m].c == (unsigned)c)
+	    திரும்பு &achars[m];
+	எனில் ((unsigned)c < achars[m].c)
 	    h = m;
-	else
+	இல்லையெனில்
 	    l = m + 1;
     }
-    return NULL;
+    திரும்பு வெற்று;
 }
 
 /*
  * Change shape - from Combination (2 char) to an Isolated
  */
-    static int
-chg_c_laa2i(int hid_c)
+    நிலையான முழு
+chg_c_laa2i(முழு hid_c)
 {
-    int tempc;
+    முழு tempc;
 
-    switch (hid_c)
+    தேர்வு (hid_c)
     {
-	case a_ALEF_MADDA:
+	நிலை a_ALEF_MADDA:
 	    tempc = a_s_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    நிறுத்து;
+	நிலை a_ALEF_HAMZA_ABOVE:
 	    tempc = a_s_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
+	    நிறுத்து;
+	நிலை a_ALEF_HAMZA_BELOW:
 	    tempc = a_s_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    நிறுத்து;
+	நிலை a_ALEF:
 	    tempc = a_s_LAM_ALEF;
-	    break;
-	default:
+	    நிறுத்து;
+	இயல்பு:
 	    tempc = 0;
     }
 
-    return tempc;
+    திரும்பு tempc;
 }
 
 /*
  * Change shape - from Combination-Isolated to Final
  */
-    static int
-chg_c_laa2f(int hid_c)
+    நிலையான முழு
+chg_c_laa2f(முழு hid_c)
 {
-    int tempc;
+    முழு tempc;
 
-    switch (hid_c)
+    தேர்வு (hid_c)
     {
-	case a_ALEF_MADDA:
+	நிலை a_ALEF_MADDA:
 	    tempc = a_f_LAM_ALEF_MADDA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_ABOVE:
+	    நிறுத்து;
+	நிலை a_ALEF_HAMZA_ABOVE:
 	    tempc = a_f_LAM_ALEF_HAMZA_ABOVE;
-	    break;
-	case a_ALEF_HAMZA_BELOW:
+	    நிறுத்து;
+	நிலை a_ALEF_HAMZA_BELOW:
 	    tempc = a_f_LAM_ALEF_HAMZA_BELOW;
-	    break;
-	case a_ALEF:
+	    நிறுத்து;
+	நிலை a_ALEF:
 	    tempc = a_f_LAM_ALEF;
-	    break;
-	default:
+	    நிறுத்து;
+	இயல்பு:
 	    tempc = 0;
     }
 
-    return tempc;
+    திரும்பு tempc;
 }
 
 /*
  * Returns whether it is possible to join the given letters
  */
-    static int
-can_join(int c1, int c2)
+    நிலையான முழு
+can_join(முழு c1, முழு c2)
 {
-    struct achar *a1 = find_achar(c1);
-    struct achar *a2 = find_achar(c2);
+    கட்டமைப்பு achar *a1 = find_achar(c1);
+    கட்டமைப்பு achar *a2 = find_achar(c2);
 
-    return a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
+    திரும்பு a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
 }
 
 /*
  * Check whether we are dealing with a character that could be regarded as an
  * Arabic combining character, need to check the character before this.
  */
-    int
-arabic_maycombine(int two)
+    முழு
+arabic_maycombine(முழு two)
 {
-    if (p_arshape && !p_tbidi)
-	return (two == a_ALEF_MADDA
+    எனில் (p_arshape && !p_tbidi)
+	திரும்பு (two == a_ALEF_MADDA
 		    || two == a_ALEF_HAMZA_ABOVE
 		    || two == a_ALEF_HAMZA_BELOW
 		    || two == a_ALEF);
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 /*
  * Check whether we are dealing with Arabic combining characters.
  * Note: these are NOT really composing characters!
  */
-    int
+    முழு
 arabic_combine(
-    int		one,	    // first character
-    int		two)	    // character just after "one"
+    முழு		one,	    // first character
+    முழு		two)	    // character just after "one"
 {
-    if (one == a_LAM)
-	return arabic_maycombine(two);
-    return FALSE;
+    எனில் (one == a_LAM)
+	திரும்பு arabic_maycombine(two);
+    திரும்பு FALSE;
 }
 
 /*
  * A_is_iso returns true if 'c' is an Arabic ISO-8859-6 character
  *		(alphabet/number/punctuation)
  */
-    static int
-A_is_iso(int c)
+    நிலையான முழு
+A_is_iso(முழு c)
 {
-    return find_achar(c) != NULL;
+    திரும்பு find_achar(c) != வெற்று;
 }
 
 /*
  * A_is_ok returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  */
-    static int
-A_is_ok(int c)
+    நிலையான முழு
+A_is_ok(முழு c)
 {
-    return (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
+    திரும்பு (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
 }
 
 /*
  * A_is_valid returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  *		with some exceptions/exclusions
  */
-    static int
-A_is_valid(int c)
+    நிலையான முழு
+A_is_valid(முழு c)
 {
-    return (A_is_ok(c) && c != a_HAMZA);
+    திரும்பு (A_is_ok(c) && c != a_HAMZA);
 }
 
 /*
@@ -325,63 +325,63 @@ A_is_valid(int c)
  *		     (not shaped)
  * in:     "next_c"  is the next character (not shaped).
  */
-    int
+    முழு
 arabic_shape(
-    int		c,
-    int		*ccp,
-    int		*c1p,
-    int		prev_c,
-    int		prev_c1,
-    int		next_c)
+    முழு		c,
+    முழு		*ccp,
+    முழு		*c1p,
+    முழு		prev_c,
+    முழு		prev_c1,
+    முழு		next_c)
 {
-    int		curr_c;
-    int		curr_laa;
-    int		prev_laa;
+    முழு		curr_c;
+    முழு		curr_laa;
+    முழு		prev_laa;
 
     // Deal only with Arabic characters, pass back all others
-    if (!A_is_ok(c))
-	return c;
+    எனில் (!A_is_ok(c))
+	திரும்பு c;
 
     curr_laa = arabic_combine(c, *c1p);
     prev_laa = arabic_combine(prev_c, prev_c1);
 
-    if (curr_laa)
+    எனில் (curr_laa)
     {
-	if (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
+	எனில் (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
 	    curr_c = chg_c_laa2f(*c1p);
-	else
+	இல்லையெனில்
 	    curr_c = chg_c_laa2i(*c1p);
 
 	// Remove the composing character
 	*c1p = 0;
     }
-    else
+    இல்லையெனில்
     {
-	struct achar *curr_a = find_achar(c);
-	int backward_combine = !prev_laa && can_join(prev_c, c);
-	int forward_combine = can_join(c, next_c);
+	கட்டமைப்பு achar *curr_a = find_achar(c);
+	முழு backward_combine = !prev_laa && can_join(prev_c, c);
+	முழு forward_combine = can_join(c, next_c);
 
-	if (backward_combine)
+	எனில் (backward_combine)
 	{
-	    if (forward_combine)
+	    எனில் (forward_combine)
 		curr_c = curr_a->medial;
-	    else
+	    இல்லையெனில்
 		curr_c = curr_a->final;
 	}
-	else
+	இல்லையெனில்
 	{
-	    if (forward_combine)
+	    எனில் (forward_combine)
 		curr_c = curr_a->initial;
-	    else
+	    இல்லையெனில்
 		curr_c = curr_a->isolated;
 	}
     }
 
     // Character missing from the table means using original character.
-    if (curr_c == NUL)
+    எனில் (curr_c == NUL)
 	curr_c = c;
 
-    if (curr_c != c && ccp != NULL)
+    எனில் (curr_c != c && ccp != வெற்று)
     {
 	char_u buf[MB_MAXBYTES + 1];
 
@@ -391,6 +391,6 @@ arabic_shape(
     }
 
     // Return the shaped character
-    return curr_c;
+    திரும்பு curr_c;
 }
 #endif // FEAT_ARABIC

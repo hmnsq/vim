@@ -15,17 +15,17 @@
  * https://www.cairographics.org/manual/cairo-PDF-Surfaces.html#cairo-pdf-surface-set-size
  */
 
-#include "vim.h"
-#include "version.h"
+#அந்தர்பாவ "vim.h"
+#அந்தர்பாவ "version.h"
 
 #ifdef FEAT_PRINT_PANGO
 
-#include "hardcopy.h"
+#அந்தர்பாவ "hardcopy.h"
 
-#include <cairo/cairo-ps.h>
-#include <cairo/cairo-pdf.h>
-#include <pango/pango.h>
-#include <pango/pangocairo.h>
+#அந்தர்பாவ <cairo/cairo-ps.h>
+#அந்தர்பாவ <cairo/cairo-pdf.h>
+#அந்தர்பாவ <pango/pango.h>
+#அந்தர்பாவ <pango/pangocairo.h>
 
 #define PRINT_DPI 72.0
 
@@ -33,10 +33,10 @@
 #define PRT_DRAW_ITALIC 2
 #define PRT_DRAW_UNDERLINE 4
 
-#define GET_Y(l) (pctx.top_margin + (l) * pctx.char_height)
+#define GET_Y(l) (pctx.உச்சி_margin + (l) * pctx.char_height)
 #define GET_TEXT_Y(l) (GET_Y(l) + pctx.char_ascent)
 
-typedef enum
+வகைவரை எண்ணிக்கை
 {
     PRT_FORMAT_PS,  // Postscript
     PRT_FORMAT_PDF, // PDF
@@ -45,7 +45,7 @@ typedef enum
 /*
  * Global state for printing
  */
-static struct
+நிலையான கட்டமைப்பு
 {
     // Cairo surface to draw on. Note that surface is scaled in points (1/72 of
     // an inch), for all formats.
@@ -57,7 +57,7 @@ static struct
 
     char_u *filename;
 
-    int media;
+    முழு media;
     bool portrait;
     bool collate;
     bool duplex;
@@ -65,26 +65,26 @@ static struct
 
     prt_format_T format;
 
-    double char_width;
-    double char_ascent;
-    double char_height;
-    double line_spacing;
-    double ul_pos;
-    double ul_thickness;
+    இரட்டை char_width;
+    இரட்டை char_ascent;
+    இரட்டை char_height;
+    இரட்டை வரி_spacing;
+    இரட்டை ul_pos;
+    இரட்டை ul_thickness;
 
-    double page_width;
-    double page_height;
+    இரட்டை page_width;
+    இரட்டை page_height;
 
-    double left_margin;
-    double right_margin;
-    double top_margin;
-    double bottom_margin;
+    இரட்டை இடது_margin;
+    இரட்டை வலது_margin;
+    இரட்டை உச்சி_margin;
+    இரட்டை bottom_margin;
 
-    double number_width;
+    இரட்டை எண்_width;
 
     // Current position to draw from
-    double cur_x;
-    int cur_line;
+    இரட்டை cur_x;
+    முழு cur_வரி;
     long_u cur_fg;
     long_u cur_bg;
 
@@ -95,7 +95,7 @@ static struct
 #endif
 } pctx;
 
-static const char *print_formats[] = {
+நிலையான மாறிலி எழுத்து *print_formats[] = {
     [PRT_FORMAT_PS] = "postscript",
     [PRT_FORMAT_PDF] = "pdf",
 };
@@ -104,141 +104,141 @@ static const char *print_formats[] = {
  * Convert the margin specified in "idx" to device units. "physsize" is the size
  * (width or height).
  */
-    static double
-to_device_units(int idx, double physsize, int def_number)
+    நிலையான இரட்டை
+to_device_units(முழு idx, இரட்டை physsize, முழு def_எண்)
 {
-    float	ret;
-    int		u;
-    int		nr;
+    தசம	ret;
+    முழு		u;
+    முழு		nr;
 
     u = prt_get_unit(idx);
-    if (u == PRT_UNIT_NONE)
+    எனில் (u == PRT_UNIT_NONE)
     {
 	u = PRT_UNIT_PERC;
-	nr = def_number;
+	nr = def_எண்;
     }
-    else
-	nr = printer_opts[idx].number;
+    இல்லையெனில்
+	nr = printer_opts[idx].எண்;
 
-    switch (u)
+    தேர்வு (u)
     {
-	case PRT_UNIT_INCH:
+	நிலை PRT_UNIT_INCH:
 	    ret = (nr * PRINT_DPI);
-	    break;
-	case PRT_UNIT_MM:
+	    நிறுத்து;
+	நிலை PRT_UNIT_MM:
 	    ret = (nr * PRINT_DPI) / 25.4;
-	    break;
-	case PRT_UNIT_POINT:
-	    ret = (double)nr;
-	    break;
-	case PRT_UNIT_PERC:
-	default:
+	    நிறுத்து;
+	நிலை PRT_UNIT_POINT:
+	    ret = (இரட்டை)nr;
+	    நிறுத்து;
+	நிலை PRT_UNIT_PERC:
+	இயல்பு:
 	    ret = physsize * (nr / 100.0);
-	    break;
+	    நிறுத்து;
     }
 
-    return ret;
+    திரும்பு ret;
 }
 
 /*
  * Calculate margins for given width and height from printoptions settings.
  */
-    static void
+    நிலையான வெறுமை
 get_page_margins(
-	double	width,
-	double	height,
-	double	*left,
-	double	*right,
-	double	*top,
-	double	*bottom)
+	இரட்டை	width,
+	இரட்டை	height,
+	இரட்டை	*இடது,
+	இரட்டை	*வலது,
+	இரட்டை	*உச்சி,
+	இரட்டை	*bottom)
 {
-    *left = to_device_units(OPT_PRINT_LEFT, width, 10);
-    *right = width - to_device_units(OPT_PRINT_RIGHT, width, 5);
+    *இடது = to_device_units(OPT_PRINT_இடது, width, 10);
+    *வலது = width - to_device_units(OPT_PRINT_வலது, width, 5);
 
-    *top = to_device_units(OPT_PRINT_TOP, height, 5);
+    *உச்சி = to_device_units(OPT_PRINT_உச்சி, height, 5);
     *bottom = height - to_device_units(OPT_PRINT_BOT, height, 5);
 }
 
 /*
  * Get characters per line (excluding margins).
  */
-    static int
-get_cpl(void)
+    நிலையான முழு
+get_cpl(வெறுமை)
 {
-    if (prt_use_number())
+    எனில் (prt_use_எண்())
     {
-	pctx.number_width = PRINT_NUMBER_WIDTH * pctx.char_width;
-	pctx.left_margin += pctx.number_width;
+	pctx.எண்_width = PRINT_எண்_WIDTH * pctx.char_width;
+	pctx.இடது_margin += pctx.எண்_width;
     }
-    else
-	pctx.number_width = 0.0;
+    இல்லையெனில்
+	pctx.எண்_width = 0.0;
 
-    return (int)((pctx.right_margin - pctx.left_margin) / pctx.char_width);
+    திரும்பு (முழு)((pctx.வலது_margin - pctx.இடது_margin) / pctx.char_width);
 }
 
 /*
  * Get number of lines of text that fit on a page (excluding the header).
  */
-    static int
-get_lpp(void)
+    நிலையான முழு
+get_lpp(வெறுமை)
 {
-    int lpp;
+    முழு lpp;
 
     // Calculate lpp
-    lpp = (int)((pctx.bottom_margin - pctx.top_margin) / pctx.char_height);
+    lpp = (முழு)((pctx.bottom_margin - pctx.உச்சி_margin) / pctx.char_height);
 
     // Adjust top margin if there is a header
-    pctx.top_margin += pctx.char_height * prt_header_height();
+    pctx.உச்சி_margin += pctx.char_height * prt_header_height();
 
-    return lpp - prt_header_height();
+    திரும்பு lpp - prt_header_height();
 }
 
 /*
  * Get the font description from the given name. Returns NULL on failure.
  */
-    static PangoFontDescription *
+    நிலையான PangoFontDescription *
 get_font(char_u *name)
 {
     PangoFontDescription *font;
 
-    if (name == NULL)
-	return NULL;
+    எனில் (name == வெற்று)
+	திரும்பு வெற்று;
 
-    font = pango_font_description_from_string((const char *)name);
-    if (font == NULL)
+    font = pango_font_description_from_string((மாறிலி எழுத்து *)name);
+    எனில் (font == வெற்று)
     {
 	semsg(_(e_unknown_printer_font_str), name);
-	return NULL;
+	திரும்பு வெற்று;
     }
 
     // Ensure a size is set
-    if (pango_font_description_get_size(font) <= 0)
+    எனில் (pango_font_description_get_size(font) <= 0)
 	pango_font_description_set_size(font, 10 * PANGO_SCALE);
 
-    return font;
+    திரும்பு font;
 }
 
-    int
+    முழு
 mch_print_init(
 	prt_settings_T  *psettings,
 	char_u		*jobname,
-	int		forceit UNUSED)
+	முழு		forceit UNUSED)
 {
     char_u	*paper_name;
-    int		paper_strlen;
+    முழு		paper_strlen;
     bool	portrait;
-    int		media;
-    char_u	*filename = NULL;
+    முழு		media;
+    char_u	*filename = வெற்று;
 #ifdef USE_GTK4_PRINT_DIALOG
     bool	dialog = false;
 
-    if (gui.in_use && !forceit && psettings->outfile == NULL)
+    எனில் (gui.in_use && !forceit && psettings->outfile == வெற்று)
     {
 	filename = gui_gtk4_print_dialog(psettings, jobname,
 		&pctx.page_width, &pctx.page_height);
 
-	if (filename == NULL)
-	    return FAIL;
+	எனில் (filename == வெற்று)
+	    திரும்பு FAIL;
 	dialog = true;
     }
 #endif
@@ -248,106 +248,106 @@ mch_print_init(
     // Let GTK handle stuff when using dialog. Not sure if our postscript DSC
     // comments can interfere with dialog settings, but don't add them...
 #ifdef USE_GTK4_PRINT_DIALOG
-    if (!dialog)
+    எனில் (!dialog)
 #endif
     {
 	// Get paper type to use
 	portrait = (!printer_opts[OPT_PRINT_PORTRAIT].present ||
 		TOLOWER_ASC(printer_opts[OPT_PRINT_PORTRAIT].string[0]) == 'y');
 	pctx.portrait = portrait;
-	if (printer_opts[OPT_PRINT_PAPER].present)
+	எனில் (printer_opts[OPT_PRINT_PAPER].present)
 	{
 	    paper_name = printer_opts[OPT_PRINT_PAPER].string;
 	    paper_strlen = printer_opts[OPT_PRINT_PAPER].strlen;
 	}
-	else
+	இல்லையெனில்
 	{
 	    paper_name = (char_u *)"A4";
 	    paper_strlen = 2;
 	}
 
 	// Set width and height using given paper type
-	for (media = 0; media < (int)PRT_MEDIASIZE_LEN; ++media)
-	    if ((int)STRLEN(prt_mediasize[media].name) == paper_strlen
+	க்கு (media = 0; media < (முழு)PRT_MEDIASIZE_LEN; ++media)
+	    எனில் ((முழு)STRLEN(prt_mediasize[media].name) == paper_strlen
 		    && STRNICMP(prt_mediasize[media].name,
 			paper_name, paper_strlen) == 0)
-		break;
-	if (media == PRT_MEDIASIZE_LEN)
+		நிறுத்து;
+	எனில் (media == PRT_MEDIASIZE_LEN)
 	    media = 0;
 	pctx.media = media;
 
-	if (portrait)
+	எனில் (portrait)
 	{
 	    pctx.page_width = prt_mediasize[media].width;
 	    pctx.page_height = prt_mediasize[media].height;
 	}
-	else
+	இல்லையெனில்
 	{
 	    pctx.page_width = prt_mediasize[media].height;
 	    pctx.page_height = prt_mediasize[media].width;
 	}
 
-	if (printer_opts[OPT_PRINT_FORMAT].present)
+	எனில் (printer_opts[OPT_PRINT_FORMAT].present)
 	{
-	    for (int i = 0; i < (int)ARRAY_LENGTH(print_formats); i++)
-		if (STRNCMP(printer_opts[OPT_PRINT_FORMAT].string,
+	    க்கு (முழு i = 0; i < (முழு)ARRAY_LENGTH(print_formats); i++)
+		எனில் (STRNCMP(printer_opts[OPT_PRINT_FORMAT].string,
 			    print_formats[i],
 			    printer_opts[OPT_PRINT_FORMAT].strlen) == 0)
 		{
 		    pctx.format = i;
-		    break;
+		    நிறுத்து;
 		}
 	}
     }
     psettings->user_abort = FALSE;
 
 #ifdef USE_GTK4_PRINT_DIALOG
-    if (dialog)
+    எனில் (dialog)
 	// Always use PDF for dialog
 	pctx.format = PRT_FORMAT_PDF;
 #endif
 
-    if (filename == NULL)
+    எனில் (filename == வெற்று)
     {
 	// If the user didn't specify a file name, use a temp file.
-	if (psettings->outfile == NULL)
+	எனில் (psettings->outfile == வெற்று)
 	{
 	    filename = vim_tempname('p', TRUE);
-	    if (filename == NULL)
+	    எனில் (filename == வெற்று)
 	    {
 		emsg(_(e_cant_get_temp_file_name));
-		return FAIL;
+		திரும்பு FAIL;
 	    }
 	}
-	else
+	இல்லையெனில்
 	    filename = expand_env_save(psettings->outfile);
     }
 
     // If using dialog, then always use PDF
-    if (pctx.format == PRT_FORMAT_PS)
-	pctx.surface = cairo_ps_surface_create((const char *)filename,
+    எனில் (pctx.format == PRT_FORMAT_PS)
+	pctx.surface = cairo_ps_surface_create((மாறிலி எழுத்து *)filename,
 		pctx.page_width, pctx.page_height);
-    else
-	pctx.surface = cairo_pdf_surface_create((const char *)filename,
+    இல்லையெனில்
+	pctx.surface = cairo_pdf_surface_create((மாறிலி எழுத்து *)filename,
 		pctx.page_width, pctx.page_height);
 
     pctx.filename = (char_u *)filename;
 
-    if (cairo_surface_status(pctx.surface) != CAIRO_STATUS_SUCCESS)
+    எனில் (cairo_surface_status(pctx.surface) != CAIRO_STATUS_SUCCESS)
     {
 	emsg(_(e_cant_open_postscript_output_file));
 	mch_print_cleanup();
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     pctx.cr = cairo_create(pctx.surface);
     pctx.text_context = pango_cairo_create_context(pctx.cr);
     pctx.font = get_font(p_pfn);
 
-    if (pctx.font == NULL)
+    எனில் (pctx.font == வெற்று)
     {
 	mch_print_cleanup();
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     pango_context_set_font_description(pctx.text_context, pctx.font);
@@ -358,34 +358,34 @@ mch_print_init(
     {
 	PangoLayout	    *layout;
 	PangoFontMetrics    *metrics;
-	int		    ascent;
-	int		    descent;
+	முழு		    ascent;
+	முழு		    descent;
 
 	layout = pango_layout_new(pctx.text_context);
 	pango_layout_set_font_description(layout, pctx.font);
 
 	metrics = pango_context_get_metrics(
-		pango_layout_get_context(layout), pctx.font, NULL);
+		pango_layout_get_context(layout), pctx.font, வெற்று);
 
 	pctx.char_width =
-	    (double)pango_font_metrics_get_approximate_char_width(metrics)
+	    (இரட்டை)pango_font_metrics_get_approximate_char_width(metrics)
 	    / PANGO_SCALE;
 
 	ascent = pango_font_metrics_get_ascent(metrics);
 	descent = pango_font_metrics_get_descent(metrics);
 
-	pctx.char_ascent = (double)ascent / PANGO_SCALE;
-	pctx.char_height = (double)(ascent + descent) / PANGO_SCALE;
+	pctx.char_ascent = (இரட்டை)ascent / PANGO_SCALE;
+	pctx.char_height = (இரட்டை)(ascent + descent) / PANGO_SCALE;
 
-	pctx.line_spacing = (double)
+	pctx.வரி_spacing = (இரட்டை)
 	    (pango_font_metrics_get_height(metrics) - (ascent + descent))
 	    / PANGO_SCALE;
 
 	pctx.ul_pos =
-	    (double)pango_font_metrics_get_underline_position(metrics)
+	    (இரட்டை)pango_font_metrics_get_underline_position(metrics)
 	    / PANGO_SCALE;
 	pctx.ul_thickness =
-	    (double)pango_font_metrics_get_underline_thickness(metrics)
+	    (இரட்டை)pango_font_metrics_get_underline_thickness(metrics)
 	    / PANGO_SCALE;
 
 	pango_font_metrics_unref(metrics);
@@ -394,21 +394,21 @@ mch_print_init(
 
     // Calculate margins
     {
-	double  left;
-	double	right;
-	double	top;
-	double	bottom;
+	இரட்டை  இடது;
+	இரட்டை	வலது;
+	இரட்டை	உச்சி;
+	இரட்டை	bottom;
 
-	get_page_margins(pctx.page_width, pctx.page_height, &left, &right, &top,
+	get_page_margins(pctx.page_width, pctx.page_height, &இடது, &வலது, &உச்சி,
 		&bottom);
-	pctx.left_margin = left;
-	pctx.right_margin = right;
-	pctx.top_margin = top;
+	pctx.இடது_margin = இடது;
+	pctx.வலது_margin = வலது;
+	pctx.உச்சி_margin = உச்சி;
 	pctx.bottom_margin = bottom;
     }
 
-    psettings->chars_per_line = get_cpl();
-    psettings->lines_per_page = get_lpp();
+    psettings->chars_per_வரி = get_cpl();
+    psettings->வரிகள்_per_page = get_lpp();
 
     // Postscript handles collating pages, don't let Vim handle it. This means
     // we don't need to worry about the "jobsplit" value in 'printoptions'
@@ -418,7 +418,7 @@ mch_print_init(
     psettings->jobname = jobname;
 
 #ifdef USE_GTK4_PRINT_DIALOG
-    if (!dialog)
+    எனில் (!dialog)
 #endif
     {
 	pctx.collate = (!printer_opts[OPT_PRINT_COLLATE].present ||
@@ -427,14 +427,14 @@ mch_print_init(
 	pctx.duplex = TRUE;
 	pctx.tumble = FALSE;
 	psettings->duplex = TRUE;
-	if (printer_opts[OPT_PRINT_DUPLEX].present)
+	எனில் (printer_opts[OPT_PRINT_DUPLEX].present)
 	{
-	    if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
+	    எனில் (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
 	    {
 		pctx.duplex = FALSE;
 		psettings->duplex = 0;
 	    }
-	    else if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short",
+	    இல்லையெனில் எனில் (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short",
 			5) == 0)
 		pctx.tumble = TRUE;
 	}
@@ -444,34 +444,34 @@ mch_print_init(
     pctx.dialog = dialog;
 #endif
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Emit a DSC comment, "fmt" may be NULL to indicate no arguments.
  */
-    static void
-emit_dsc_comment(char *comment, char *fmt, ...)
+    நிலையான வெறுமை
+emit_dsc_comment(எழுத்து *comment, எழுத்து *fmt, ...)
 {
-    static char buf[257];
+    நிலையான எழுத்து buf[257];
 
     va_list ap;
-    int	    len = sizeof(buf);
-    int	    o;
-    char    *s = buf;
+    முழு	    len = அளவு(buf);
+    முழு	    o;
+    எழுத்து    *s = buf;
 
-    if (fmt == NULL)
+    எனில் (fmt == வெற்று)
     {
 	o = vim_snprintf(s, len, "%%%%%s", comment);
-	goto exit;
+	செல் exit;
     }
-    else
+    இல்லையெனில்
 	o = vim_snprintf(s, len, "%%%%%s: ", comment);
 
     len -= o;
     s += o;
-    if (len <= 0)
-	return;
+    எனில் (len <= 0)
+	திரும்பு;
 
     va_start(ap, fmt);
     vim_vsnprintf(s, len, fmt, ap);
@@ -481,26 +481,26 @@ exit:
     cairo_ps_surface_dsc_comment(pctx.surface, buf);
 }
 
-    int
+    முழு
 mch_print_begin(prt_settings_T *psettings)
 {
-    char user[256];
+    எழுத்து user[256];
 
     pctx.cur_x = 0.0;
-    pctx.cur_line = 0;
+    pctx.cur_வரி = 0;
     pctx.draw_flags = 0;
 
 #ifdef USE_GTK4_PRINT_DIALOG
-    if (pctx.dialog)
-	return TRUE;
+    எனில் (pctx.dialog)
+	திரும்பு TRUE;
 #endif
 
-    if (!get_user_name((char_u *)user, sizeof(user)))
+    எனில் (!get_user_name((char_u *)user, அளவு(user)))
 	STRCPY(user, "Unknown");
 
-    if (pctx.format == PRT_FORMAT_PS)
+    எனில் (pctx.format == PRT_FORMAT_PS)
     {
-	emit_dsc_comment("Title", (char *)psettings->jobname);
+	emit_dsc_comment("Title", (எழுத்து *)psettings->jobname);
 	emit_dsc_comment("For", user);
 	emit_dsc_comment("Orientation",
 		pctx.portrait ? "Portrait" : "Landscape");
@@ -519,98 +519,98 @@ mch_print_begin(prt_settings_T *psettings)
 		psettings->do_syntax ? "color" : "");
 
 	// In defaults section (defaults for every page)
-	emit_dsc_comment("BeginDefaults", NULL);
+	emit_dsc_comment("BeginDefaults", வெற்று);
 	emit_dsc_comment("PageMedia", prt_mediasize[pctx.media].name);
-	emit_dsc_comment("EndDefaults", NULL);
+	emit_dsc_comment("EndDefaults", வெற்று);
     }
-    else if (pctx.format == PRT_FORMAT_PDF)
+    இல்லையெனில் எனில் (pctx.format == PRT_FORMAT_PDF)
     {
 	char_u *str = (char_u *)user;
 
-	if (output_conv.vc_type != CONV_NONE)
-	    str = string_convert(&output_conv, str, NULL);
+	எனில் (output_conv.vc_type != CONV_NONE)
+	    str = string_convert(&output_conv, str, வெற்று);
 
 	cairo_pdf_surface_set_metadata(pctx.surface,
-		CAIRO_PDF_METADATA_AUTHOR, (char *)str);
-	if (output_conv.vc_type != CONV_NONE)
+		CAIRO_PDF_METADATA_AUTHOR, (எழுத்து *)str);
+	எனில் (output_conv.vc_type != CONV_NONE)
 	    vim_free(str);
 
 	str = psettings->jobname;
-	if (output_conv.vc_type != CONV_NONE)
-	    str = string_convert(&output_conv, str, NULL);
+	எனில் (output_conv.vc_type != CONV_NONE)
+	    str = string_convert(&output_conv, str, வெற்று);
 	cairo_pdf_surface_set_metadata(pctx.surface,
-		CAIRO_PDF_METADATA_TITLE, (char *)str);
-	if (output_conv.vc_type != CONV_NONE)
+		CAIRO_PDF_METADATA_TITLE, (எழுத்து *)str);
+	எனில் (output_conv.vc_type != CONV_NONE)
 	    vim_free(str);
 
 	cairo_pdf_surface_set_metadata(pctx.surface,
 		CAIRO_PDF_METADATA_CREATOR, VIM_VERSION_LONG);
     }
 
-    return TRUE;
+    திரும்பு TRUE;
 }
 
-    void
+    வெறுமை
 mch_print_end(prt_settings_T *psettings)
 {
     // Make sure surface flushes to file or stream
     cairo_surface_finish(pctx.surface);
 
-    if (psettings->outfile == NULL && !got_int && !psettings->user_abort
-	    && pctx.filename != NULL
+    எனில் (psettings->outfile == வெற்று && !got_int && !psettings->user_abort
+	    && pctx.filename != வெற்று
 #ifdef USE_GTK4_PRINT_DIALOG
 	    && !pctx.dialog
 #endif
        )
     {
-	msg(_("Sending to printer..."));
+	செய்தி(_("Sending to printer..."));
 
 	// Not printing to a file: use 'printexpr' to print the file.
-	if (eval_printexpr(pctx.filename, psettings->arguments) == FAIL)
+	எனில் (eval_printexpr(pctx.filename, psettings->arguments) == FAIL)
 	    emsg(_(e_failed_to_print_postscript_file));
-	else
-	    msg(_("Print job sent."));
+	இல்லையெனில்
+	    செய்தி(_("Print job sent."));
     }
 
     mch_print_cleanup();
 }
 
-    int
-mch_print_end_page(void)
+    முழு
+mch_print_end_page(வெறுமை)
 {
     cairo_show_page(pctx.cr);
-    return TRUE;
+    திரும்பு TRUE;
 }
 
 /*
  * Do nothing because we create a new page for the cairo surface at the end of
  * every page.
  */
-    int
+    முழு
 mch_print_begin_page(char_u *str UNUSED)
 {
-    return TRUE;
+    திரும்பு TRUE;
 }
 
-    int
-mch_print_blank_page(void)
+    முழு
+mch_print_blank_page(வெறுமை)
 {
     mch_print_end_page();
-    return TRUE;
+    திரும்பு TRUE;
 }
 
-    void
-mch_print_start_line(int margin, int page_line)
+    வெறுமை
+mch_print_start_வரி(முழு margin, முழு page_வரி)
 {
-    pctx.cur_x = pctx.left_margin;
-    if (margin)
-	pctx.cur_x -= pctx.number_width;
+    pctx.cur_x = pctx.இடது_margin;
+    எனில் (margin)
+	pctx.cur_x -= pctx.எண்_width;
 
-    pctx.cur_line = page_line;
+    pctx.cur_வரி = page_வரி;
 }
 
-    static void
-long_to_rgb(long_u c, double *r, double *g, double *b)
+    நிலையான வெறுமை
+long_to_rgb(long_u c, இரட்டை *r, இரட்டை *g, இரட்டை *b)
 {
     *r = ((c >> 16) & 0xFF) / 255.0;
     *g = ((c >> 8) & 0xFF) / 255.0;
@@ -621,86 +621,86 @@ long_to_rgb(long_u c, double *r, double *g, double *b)
  * Don't use PangoLayout for rendering the text, so that we can handle the
  * positioning and sizing ourselves.
  */
-    int
-mch_print_text_out(char_u *textp, int len)
+    முழு
+mch_print_text_out(char_u *textp, முழு len)
 {
     PangoAttrList	*attr_list;
     GList		*item_list;
     PangoGlyphString	*glyphs;
     char_u		*str;
-    double		r, g, b;
-    double		width = 0;
-    double		next_x;
+    இரட்டை		r, g, b;
+    இரட்டை		width = 0;
+    இரட்டை		next_x;
 
     // Always convert to UTF-8, Pango expects that
-    if (output_conv.vc_type == CONV_NONE)
+    எனில் (output_conv.vc_type == CONV_NONE)
 	str = textp;
-    else
+    இல்லையெனில்
 	str = string_convert(&output_conv, textp, &len);
 
-    if (str == NULL)
-	return TRUE;
+    எனில் (str == வெற்று)
+	திரும்பு TRUE;
 
     attr_list = pango_attr_list_new();
 
-#define INSERT_PANGO_ATTR(Attribute, AttrList, Start, End)  \
+#define செருகு_PANGO_ATTR(Attribute, AttrList, Start, End)  \
     G_STMT_START{					    \
 	PangoAttribute *tmp_attr_;			    \
 	tmp_attr_ = (Attribute);			    \
 	tmp_attr_->start_index = (Start);		    \
 	tmp_attr_->end_index = (End);			    \
-	pango_attr_list_insert((AttrList), tmp_attr_);	    \
+	pango_attr_list_செருகு((AttrList), tmp_attr_);	    \
     }G_STMT_END
 
     // Underline attribute does not work with pango_itemize().
-    if ((pctx.draw_flags & PRT_DRAW_BOLD))
-	INSERT_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
+    எனில் ((pctx.draw_flags & PRT_DRAW_BOLD))
+	செருகு_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
 		attr_list, 0, len);
-    if (pctx.draw_flags & PRT_DRAW_ITALIC)
-	INSERT_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
+    எனில் (pctx.draw_flags & PRT_DRAW_ITALIC)
+	செருகு_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
 		attr_list, 0, len);
 
-#undef INSERT_PANGO_ATTR
+#undef செருகு_PANGO_ATTR
 
     item_list = pango_itemize(pctx.text_context,
-	    (const char *)str, 0, len, attr_list, NULL);
+	    (மாறிலி எழுத்து *)str, 0, len, attr_list, வெற்று);
     pango_attr_list_unref(attr_list);
 
     glyphs = pango_glyph_string_new();
 
     // Loop is probably unnecessary, because "str" represents a single character.
     // Do it anyways to be sure.
-    while (item_list != NULL)
+    போது (item_list != வெற்று)
     {
 	PangoItem   *item;
-	double	    o;
+	இரட்டை	    o;
 
 	item = (PangoItem *)item_list->data;
 	item_list = g_list_delete_link(item_list, item_list);
 
-	pango_shape_full((const char *)str + item->offset, item->length,
-		(const char *)str, len, &item->analysis, glyphs);
+	pango_shape_full((மாறிலி எழுத்து *)str + item->offset, item->length,
+		(மாறிலி எழுத்து *)str, len, &item->analysis, glyphs);
 
 	// Benefit of directly getting the width instead of deriving it from the
 	// char width and number of cells, is that non-monospace fonts look
 	// better.
-	o = (double)pango_glyph_string_get_width(glyphs) / PANGO_SCALE;
+	o = (இரட்டை)pango_glyph_string_get_width(glyphs) / PANGO_SCALE;
 
 	// Draw background color (only if different). Cannot batch bg color,
 	// because then we would overwrite glyphs.
-	if (pctx.cur_bg != PRCOLOR_WHITE)
+	எனில் (pctx.cur_bg != PRCOLOR_WHITE)
 	{
 	    long_to_rgb(pctx.cur_bg, &r, &g, &b);
 	    cairo_set_source_rgb(pctx.cr, r, g, b);
 	    cairo_rectangle(pctx.cr, pctx.cur_x + width,
-		    GET_Y(pctx.cur_line) - pctx.line_spacing, o, pctx.char_height);
+		    GET_Y(pctx.cur_வரி) - pctx.வரி_spacing, o, pctx.char_height);
 	    cairo_fill(pctx.cr);
 	}
 
 	// Draw actual text
 	long_to_rgb(pctx.cur_fg, &r, &g, &b);
 	cairo_set_source_rgb(pctx.cr, r, g, b);
-	cairo_move_to(pctx.cr, pctx.cur_x + width, GET_TEXT_Y(pctx.cur_line));
+	cairo_move_to(pctx.cr, pctx.cur_x + width, GET_TEXT_Y(pctx.cur_வரி));
 	pango_cairo_show_glyph_string(pctx.cr, item->analysis.font, glyphs);
 
 	pango_item_free(item);
@@ -708,15 +708,15 @@ mch_print_text_out(char_u *textp, int len)
     }
 
     // Draw underline if needed
-    if (pctx.draw_flags & PRT_DRAW_UNDERLINE)
+    எனில் (pctx.draw_flags & PRT_DRAW_UNDERLINE)
     {
-	double y = GET_TEXT_Y(pctx.cur_line) - pctx.ul_pos;
+	இரட்டை y = GET_TEXT_Y(pctx.cur_வரி) - pctx.ul_pos;
 
 	long_to_rgb(pctx.cur_fg, &r, &g, &b);
 	cairo_set_source_rgb(pctx.cr, r, g, b);
-	cairo_set_line_width(pctx.cr, pctx.ul_thickness);
+	cairo_set_வரி_width(pctx.cr, pctx.ul_thickness);
 	cairo_move_to(pctx.cr, pctx.cur_x, y);
-	cairo_line_to(pctx.cr, pctx.cur_x + width, y);
+	cairo_வரி_to(pctx.cr, pctx.cur_x + width, y);
 	cairo_stroke(pctx.cr);
     }
 
@@ -726,34 +726,34 @@ mch_print_text_out(char_u *textp, int len)
 
     next_x = pctx.cur_x + pctx.char_width;
 
-    if (output_conv.vc_type != CONV_NONE)
+    எனில் (output_conv.vc_type != CONV_NONE)
 	vim_free(str);
 
     // Use epsilon when comparing floating point
-    return (next_x > pctx.right_margin) &&
-	((next_x - pctx.right_margin) > (pctx.right_margin * 1e-5));
+    திரும்பு (next_x > pctx.வலது_margin) &&
+	((next_x - pctx.வலது_margin) > (pctx.வலது_margin * 1e-5));
 }
 
-    void
-mch_print_set_font(int bold, int italic, int underline)
+    வெறுமை
+mch_print_set_font(முழு bold, முழு italic, முழு underline)
 {
     pctx.draw_flags = 0;
 
-    if (bold)
+    எனில் (bold)
 	pctx.draw_flags |= PRT_DRAW_BOLD;
-    if (italic)
+    எனில் (italic)
 	pctx.draw_flags |= PRT_DRAW_ITALIC;
-    if (underline)
+    எனில் (underline)
 	pctx.draw_flags |= PRT_DRAW_UNDERLINE;
 }
 
-    void
+    வெறுமை
 mch_print_set_bg(long_u bgcol)
 {
     pctx.cur_bg = bgcol;
 }
 
-    void
+    வெறுமை
 mch_print_set_fg(long_u fgcol)
 {
     // Probably can just call cairo_set_source_rgba() here but defer it later to
@@ -761,8 +761,8 @@ mch_print_set_fg(long_u fgcol)
     pctx.cur_fg = fgcol;
 }
 
-    void
-mch_print_cleanup(void)
+    வெறுமை
+mch_print_cleanup(வெறுமை)
 {
     g_clear_pointer(&pctx.cr, cairo_destroy);
     g_clear_pointer(&pctx.surface, cairo_surface_destroy);
@@ -771,7 +771,7 @@ mch_print_cleanup(void)
 
 #ifdef USE_GTK4_PRINT_DIALOG
     // If using dialog, defer the temp file deletion later
-    if (pctx.dialog)
+    எனில் (pctx.dialog)
 	gui_gtk4_print_finish();
 #endif
 

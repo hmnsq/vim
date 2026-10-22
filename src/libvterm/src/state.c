@@ -1,19 +1,19 @@
-#include "vterm_internal.h"
+#அந்தர்பாவ "vterm_internal.h"
 
-#include <stdio.h>
-#include <string.h>
+#அந்தர்பாவ <stdio.h>
+#அந்தர்பாவ <string.h>
 
 #define strneq(a,b,n) (strncmp(a,b,n)==0)
 
-#if defined(DEBUG) && DEBUG > 1
+#எனில் defined(DEBUG) && DEBUG > 1
 # define DEBUG_GLYPH_COMBINE
 #endif
 
-static int on_resize(int rows, int cols, void *user);
+நிலையான முழு on_resize(முழு rows, முழு cols, வெறுமை *user);
 
 /* Some convenient wrappers to make callback functions easier */
 
-static void putglyph(VTermState *state, const uint32_t chars[], int width, VTermPos pos)
+நிலையான வெறுமை putglyph(VTermState *state, மாறிலி uint32_t chars[], முழு width, VTermPos pos)
 {
   VTermGlyphInfo info;
 
@@ -23,48 +23,48 @@ static void putglyph(VTermState *state, const uint32_t chars[], int width, VTerm
   info.dwl = state->lineinfo[pos.row].doublewidth;
   info.dhl = state->lineinfo[pos.row].doubleheight;
 
-  if(state->callbacks && state->callbacks->putglyph)
-    if((*state->callbacks->putglyph)(&info, pos, state->cbdata))
-      return;
+  எனில்(state->callbacks && state->callbacks->putglyph)
+    எனில்((*state->callbacks->putglyph)(&info, pos, state->cbdata))
+      திரும்பு;
 
   DEBUG_LOG3("libvterm: Unhandled putglyph U+%04x at (%d,%d)\n", chars[0], pos.col, pos.row);
 }
 
-static void updatecursor(VTermState *state, VTermPos *oldpos, int cancel_phantom)
+நிலையான வெறுமை updatecursor(VTermState *state, VTermPos *oldpos, முழு cancel_phantom)
 {
-  if(state->pos.col == oldpos->col && state->pos.row == oldpos->row)
-    return;
+  எனில்(state->pos.col == oldpos->col && state->pos.row == oldpos->row)
+    திரும்பு;
 
-  if(cancel_phantom)
+  எனில்(cancel_phantom)
     state->at_phantom = 0;
 
-  if(state->callbacks && state->callbacks->movecursor)
-    if((*state->callbacks->movecursor)(state->pos, *oldpos, state->mode.cursor_visible, state->cbdata))
-      return;
+  எனில்(state->callbacks && state->callbacks->movecursor)
+    எனில்((*state->callbacks->movecursor)(state->pos, *oldpos, state->mode.cursor_visible, state->cbdata))
+      திரும்பு;
 }
 
-static void erase(VTermState *state, VTermRect rect, int selective)
+நிலையான வெறுமை erase(VTermState *state, VTermRect rect, முழு selective)
 {
-  if(rect.end_col == state->cols) {
-    int row;
+  எனில்(rect.end_col == state->cols) {
+    முழு row;
     /* If we're erasing the final cells of any lines, cancel the continuation
      * marker on the subsequent line
      */
-    for(row = rect.start_row + 1; row < rect.end_row + 1 && row < state->rows; row++)
+    க்கு(row = rect.start_row + 1; row < rect.end_row + 1 && row < state->rows; row++)
       state->lineinfo[row].continuation = 0;
   }
 
-  if(state->callbacks && state->callbacks->erase)
-    if((*state->callbacks->erase)(rect, selective, state->cbdata))
-      return;
+  எனில்(state->callbacks && state->callbacks->erase)
+    எனில்((*state->callbacks->erase)(rect, selective, state->cbdata))
+      திரும்பு;
 }
 
-static VTermState *vterm_state_new(VTerm *vt)
+நிலையான VTermState *vterm_state_new(VTerm *vt)
 {
-  VTermState *state = vterm_allocator_malloc(vt, sizeof(VTermState));
+  VTermState *state = vterm_allocator_malloc(vt, அளவு(VTermState));
 
-  if (state == NULL)
-    return NULL;
+  எனில் (state == வெற்று)
+    திரும்பு வெற்று;
   state->vt = vt;
 
   state->rows = vt->rows;
@@ -76,92 +76,92 @@ static VTermState *vterm_state_new(VTerm *vt)
 
   state->mouse_protocol = MOUSE_X10;
 
-  state->callbacks = NULL;
-  state->cbdata    = NULL;
+  state->callbacks = வெற்று;
+  state->cbdata    = வெற்று;
   state->callbacks_has_premove = 0;
 
-  state->selection.callbacks = NULL;
-  state->selection.user      = NULL;
-  state->selection.buffer    = NULL;
+  state->selection.callbacks = வெற்று;
+  state->selection.user      = வெற்று;
+  state->selection.buffer    = வெற்று;
 
   vterm_state_newpen(state);
 
   state->bold_is_highbright = 0;
 
   state->combine_chars_size = 16;
-  state->combine_chars = vterm_allocator_malloc(state->vt, state->combine_chars_size * sizeof(state->combine_chars[0]));
+  state->combine_chars = vterm_allocator_malloc(state->vt, state->combine_chars_size * அளவு(state->combine_chars[0]));
 
   state->tabstops = vterm_allocator_malloc(state->vt, (state->cols + 7) / 8);
 
-  state->lineinfos[BUFIDX_PRIMARY]   = vterm_allocator_malloc(state->vt, state->rows * sizeof(VTermLineInfo));
+  state->lineinfos[BUFIDX_PRIMARY]   = vterm_allocator_malloc(state->vt, state->rows * அளவு(VTerm_வரி_Info));
   /* TODO: Make an 'enable' function */
-  state->lineinfos[BUFIDX_ALTSCREEN] = vterm_allocator_malloc(state->vt, state->rows * sizeof(VTermLineInfo));
+  state->lineinfos[BUFIDX_ALTSCREEN] = vterm_allocator_malloc(state->vt, state->rows * அளவு(VTerm_வரி_Info));
   state->lineinfo = state->lineinfos[BUFIDX_PRIMARY];
 
   state->encoding_utf8.enc = vterm_lookup_encoding(ENC_UTF8, 'u');
-  if(state->encoding_utf8.enc->init)
+  எனில்(state->encoding_utf8.enc->init)
     (*state->encoding_utf8.enc->init)(state->encoding_utf8.enc, state->encoding_utf8.data);
 
-  return state;
+  திரும்பு state;
 }
 
-INTERNAL void vterm_state_free(VTermState *state)
+INTERNAL வெறுமை vterm_state_free(VTermState *state)
 {
   vterm_allocator_free(state->vt, state->tabstops);
   vterm_allocator_free(state->vt, state->lineinfos[BUFIDX_PRIMARY]);
-  if(state->lineinfos[BUFIDX_ALTSCREEN])
+  எனில்(state->lineinfos[BUFIDX_ALTSCREEN])
     vterm_allocator_free(state->vt, state->lineinfos[BUFIDX_ALTSCREEN]);
   vterm_allocator_free(state->vt, state->combine_chars);
   vterm_allocator_free(state->vt, state);
 }
 
-static void scroll(VTermState *state, VTermRect rect, int downward, int rightward)
+நிலையான வெறுமை scroll(VTermState *state, VTermRect rect, முழு downward, முழு rightward)
 {
-  int rows;
-  int cols;
-  if(!downward && !rightward)
-    return;
+  முழு rows;
+  முழு cols;
+  எனில்(!downward && !rightward)
+    திரும்பு;
 
   // A degenerate rectangle makes "rows" or "cols" below negative, which
   // inverts the clamping of "downward" and "rightward" and results in a
   // negative height being passed to memmove().  This happens when a scroll
   // region survives a resize that made the terminal smaller.
-  if(rect.end_row <= rect.start_row || rect.end_col <= rect.start_col)
-    return;
+  எனில்(rect.end_row <= rect.start_row || rect.end_col <= rect.start_col)
+    திரும்பு;
 
   rows = rect.end_row - rect.start_row;
-  if(downward > rows)
+  எனில்(downward > rows)
     downward = rows;
-  else if(downward < -rows)
+  இல்லையெனில் எனில்(downward < -rows)
     downward = -rows;
 
   cols = rect.end_col - rect.start_col;
-  if(rightward > cols)
+  எனில்(rightward > cols)
     rightward = cols;
-  else if(rightward < -cols)
+  இல்லையெனில் எனில்(rightward < -cols)
     rightward = -cols;
 
-  if(state->callbacks_has_premove && state->callbacks && state->callbacks->premove) {
+  எனில்(state->callbacks_has_premove && state->callbacks && state->callbacks->premove) {
     // TODO: technically this logic is wrong if both downward != 0 and rightward != 0
 
     /* Work out what subsection of the destination area is about to be destroyed */
-    if(downward > 0)
+    எனில்(downward > 0)
       /* about to destroy the top */
       (*state->callbacks->premove)((VTermRect){
           .start_row = rect.start_row, .end_row = rect.start_row + downward,
           .start_col = rect.start_col, .end_col = rect.end_col}, state->cbdata);
-    else if(downward < 0)
+    இல்லையெனில் எனில்(downward < 0)
       /* about to destroy the bottom */
       (*state->callbacks->premove)((VTermRect){
           .start_row = rect.end_row + downward, .end_row = rect.end_row,
           .start_col = rect.start_col,          .end_col = rect.end_col}, state->cbdata);
 
-    if(rightward > 0)
+    எனில்(rightward > 0)
       /* about to destroy the left */
       (*state->callbacks->premove)((VTermRect){
           .start_row = rect.start_row, .end_row = rect.end_row,
           .start_col = rect.start_col, .end_col = rect.start_col + rightward}, state->cbdata);
-    else if(rightward < 0)
+    இல்லையெனில் எனில்(rightward < 0)
       /* about to destroy the right */
       (*state->callbacks->premove)((VTermRect){
           .start_row = rect.start_row,           .end_row = rect.end_row,
@@ -169,57 +169,57 @@ static void scroll(VTermState *state, VTermRect rect, int downward, int rightwar
   }
 
   // Update lineinfo if full line
-  if(rect.start_col == 0 && rect.end_col == state->cols && rightward == 0) {
-    int height = rect.end_row - rect.start_row - abs(downward);
-    int row;
-    VTermLineInfo zeroLineInfo = {0x0};
+  எனில்(rect.start_col == 0 && rect.end_col == state->cols && rightward == 0) {
+    முழு height = rect.end_row - rect.start_row - abs(downward);
+    முழு row;
+    VTerm_வரி_Info zero_வரி_Info = {0x0};
 
-    if(downward > 0) {
+    எனில்(downward > 0) {
       memmove(state->lineinfo + rect.start_row,
               state->lineinfo + rect.start_row + downward,
-              height * sizeof(state->lineinfo[0]));
-      for(row = rect.end_row - downward; row < rect.end_row; row++)
-        state->lineinfo[row] = zeroLineInfo;
+              height * அளவு(state->lineinfo[0]));
+      க்கு(row = rect.end_row - downward; row < rect.end_row; row++)
+        state->lineinfo[row] = zero_வரி_Info;
     }
-    else {
+    இல்லையெனில் {
       memmove(state->lineinfo + rect.start_row - downward,
               state->lineinfo + rect.start_row,
-              height * sizeof(state->lineinfo[0]));
-      for(row = rect.start_row; row < rect.start_row - downward; row++)
-        state->lineinfo[row] = zeroLineInfo;
+              height * அளவு(state->lineinfo[0]));
+      க்கு(row = rect.start_row; row < rect.start_row - downward; row++)
+        state->lineinfo[row] = zero_வரி_Info;
     }
   }
 
-  if(state->callbacks && state->callbacks->scrollrect)
-    if((*state->callbacks->scrollrect)(rect, downward, rightward, state->cbdata))
-      return;
+  எனில்(state->callbacks && state->callbacks->scrollrect)
+    எனில்((*state->callbacks->scrollrect)(rect, downward, rightward, state->cbdata))
+      திரும்பு;
 
-  if(state->callbacks)
+  எனில்(state->callbacks)
     vterm_scroll_rect(rect, downward, rightward,
         state->callbacks->moverect, state->callbacks->erase, state->cbdata);
 }
 
-static void linefeed(VTermState *state)
+நிலையான வெறுமை linefeed(VTermState *state)
 {
-  if(state->pos.row == SCROLLREGION_BOTTOM(state) - 1) {
+  எனில்(state->pos.row == SCROLLREGION_BOTTOM(state) - 1) {
     VTermRect rect;
-    rect.start_row = state->scrollregion_top;
+    rect.start_row = state->scrollregion_உச்சி;
     rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.start_col = SCROLLREGION_இடது(state);
+    rect.end_col   = SCROLLREGION_வலது(state);
 
     scroll(state, rect, 1, 0);
   }
-  else if(state->pos.row < state->rows-1)
+  இல்லையெனில் எனில்(state->pos.row < state->rows-1)
     state->pos.row++;
 }
 
-static void grow_combine_buffer(VTermState *state)
+நிலையான வெறுமை grow_combine_buffer(VTermState *state)
 {
   size_t    new_size = state->combine_chars_size * 2;
-  uint32_t *new_chars = vterm_allocator_malloc(state->vt, new_size * sizeof(new_chars[0]));
+  uint32_t *new_chars = vterm_allocator_malloc(state->vt, new_size * அளவு(new_chars[0]));
 
-  memcpy(new_chars, state->combine_chars, state->combine_chars_size * sizeof(new_chars[0]));
+  memcpy(new_chars, state->combine_chars, state->combine_chars_size * அளவு(new_chars[0]));
 
   vterm_allocator_free(state->vt, state->combine_chars);
 
@@ -227,54 +227,54 @@ static void grow_combine_buffer(VTermState *state)
   state->combine_chars_size = new_size;
 }
 
-static void set_col_tabstop(VTermState *state, int col)
+நிலையான வெறுமை set_col_tabstop(VTermState *state, முழு col)
 {
-  unsigned char mask = 1 << (col & 7);
+  unsigned எழுத்து mask = 1 << (col & 7);
   state->tabstops[col >> 3] |= mask;
 }
 
-static void clear_col_tabstop(VTermState *state, int col)
+நிலையான வெறுமை clear_col_tabstop(VTermState *state, முழு col)
 {
-  unsigned char mask = 1 << (col & 7);
+  unsigned எழுத்து mask = 1 << (col & 7);
   state->tabstops[col >> 3] &= ~mask;
 }
 
-static int is_col_tabstop(VTermState *state, int col)
+நிலையான முழு is_col_tabstop(VTermState *state, முழு col)
 {
-  unsigned char mask = 1 << (col & 7);
-  return state->tabstops[col >> 3] & mask;
+  unsigned எழுத்து mask = 1 << (col & 7);
+  திரும்பு state->tabstops[col >> 3] & mask;
 }
 
-static int is_cursor_in_scrollregion(const VTermState *state)
+நிலையான முழு is_cursor_in_scrollregion(மாறிலி VTermState *state)
 {
-  if(state->pos.row < state->scrollregion_top ||
+  எனில்(state->pos.row < state->scrollregion_உச்சி ||
      state->pos.row >= SCROLLREGION_BOTTOM(state))
-    return 0;
-  if(state->pos.col < SCROLLREGION_LEFT(state) ||
-     state->pos.col >= SCROLLREGION_RIGHT(state))
-    return 0;
+    திரும்பு 0;
+  எனில்(state->pos.col < SCROLLREGION_இடது(state) ||
+     state->pos.col >= SCROLLREGION_வலது(state))
+    திரும்பு 0;
 
-  return 1;
+  திரும்பு 1;
 }
 
-static void tab(VTermState *state, int count, int direction)
+நிலையான வெறுமை tab(VTermState *state, முழு மொத்தம், முழு direction)
 {
-  while(count > 0) {
-    if(direction > 0) {
-      if(state->pos.col >= THISROWWIDTH(state)-1)
-        return;
+  போது(மொத்தம் > 0) {
+    எனில்(direction > 0) {
+      எனில்(state->pos.col >= THISROWWIDTH(state)-1)
+        திரும்பு;
 
       state->pos.col++;
     }
-    else if(direction < 0) {
-      if(state->pos.col < 1)
-        return;
+    இல்லையெனில் எனில்(direction < 0) {
+      எனில்(state->pos.col < 1)
+        திரும்பு;
 
       state->pos.col--;
     }
 
-    if(is_col_tabstop(state, state->pos.col))
-      count--;
+    எனில்(is_col_tabstop(state, state->pos.col))
+      மொத்தம்--;
   }
 }
 
@@ -285,101 +285,101 @@ static void tab(VTermState *state, int count, int direction)
 #define DWL_ON  1
 
 #define DHL_OFF    0
-#define DHL_TOP    1
+#define DHL_உச்சி    1
 #define DHL_BOTTOM 2
 
-static void set_lineinfo(VTermState *state, int row, int force, int dwl, int dhl)
+நிலையான வெறுமை set_lineinfo(VTermState *state, முழு row, முழு force, முழு dwl, முழு dhl)
 {
-  VTermLineInfo info = state->lineinfo[row];
+  VTerm_வரி_Info info = state->lineinfo[row];
 
-  if(dwl == DWL_OFF)
+  எனில்(dwl == DWL_OFF)
     info.doublewidth = DWL_OFF;
-  else if(dwl == DWL_ON)
+  இல்லையெனில் எனில்(dwl == DWL_ON)
     info.doublewidth = DWL_ON;
   // else -1 to ignore
 
-  if(dhl == DHL_OFF)
+  எனில்(dhl == DHL_OFF)
     info.doubleheight = DHL_OFF;
-  else if(dhl == DHL_TOP)
-    info.doubleheight = DHL_TOP;
-  else if(dhl == DHL_BOTTOM)
+  இல்லையெனில் எனில்(dhl == DHL_உச்சி)
+    info.doubleheight = DHL_உச்சி;
+  இல்லையெனில் எனில்(dhl == DHL_BOTTOM)
     info.doubleheight = DHL_BOTTOM;
 
-  if((state->callbacks &&
+  எனில்((state->callbacks &&
       state->callbacks->setlineinfo &&
       (*state->callbacks->setlineinfo)(row, &info, state->lineinfo + row, state->cbdata))
       || force)
     state->lineinfo[row] = info;
 }
 
-static int on_text(const char bytes[], size_t len, void *user)
+நிலையான முழு on_text(மாறிலி எழுத்து bytes[], size_t len, வெறுமை *user)
 {
   VTermState *state = user;
-  int npoints = 0;
+  முழு npoints = 0;
   size_t eaten = 0;
   VTermEncodingInstance *encoding;
-  int i = 0;
+  முழு i = 0;
 
   VTermPos oldpos = state->pos;
 
   // We'll have at most len codepoints, plus one from a previous incomplete
   // sequence.
   uint32_t *codepoints = (uint32_t *)(state->vt->tmpbuffer);
-  size_t maxpoints = (state->vt->tmpbuffer_len) / sizeof(uint32_t);
+  size_t maxpoints = (state->vt->tmpbuffer_len) / அளவு(uint32_t);
 
   encoding =
     state->gsingle_set     ? &state->encoding[state->gsingle_set] :
     !(bytes[eaten] & 0x80) ? &state->encoding[state->gl_set] :
     state->vt->mode.utf8   ? &state->encoding_utf8 :
                              &state->encoding[state->gr_set];
-  if (encoding->enc == state->encoding_utf8.enc)
+  எனில் (encoding->enc == state->encoding_utf8.enc)
     encoding = &state->encoding_utf8;  // Only use one UTF-8 encoding state.
 
   (*encoding->enc->decode)(encoding->enc, encoding->data,
-      codepoints, &npoints, state->gsingle_set ? 1 : (int)maxpoints,
+      codepoints, &npoints, state->gsingle_set ? 1 : (முழு)maxpoints,
       bytes, &eaten, len);
 
   /* There's a chance an encoding (e.g. UTF-8) hasn't found enough bytes yet
    * for even a single codepoint
    */
-  if(!npoints)
+  எனில்(!npoints)
   {
-    return (int)eaten;
+    திரும்பு (முழு)eaten;
   }
 
-  if(state->gsingle_set && npoints)
+  எனில்(state->gsingle_set && npoints)
     state->gsingle_set = 0;
 
   /* This is a combining char. that needs to be merged with the previous
    * glyph output */
-  if(vterm_unicode_is_combining(codepoints[i])) {
+  எனில்(vterm_unicode_is_combining(codepoints[i])) {
     /* See if the cursor has moved since */
-    if(state->pos.row == state->combine_pos.row && state->pos.col == state->combine_pos.col + state->combine_width) {
+    எனில்(state->pos.row == state->combine_pos.row && state->pos.col == state->combine_pos.col + state->combine_width) {
 #ifdef DEBUG_GLYPH_COMBINE
-      int printpos;
+      முழு printpos;
       printf("DEBUG: COMBINING SPLIT GLYPH of chars {");
-      for(printpos = 0; state->combine_chars[printpos]; printpos++)
+      க்கு(printpos = 0; state->combine_chars[printpos]; printpos++)
         printf("U+%04x ", state->combine_chars[printpos]);
       printf("} + {");
 #endif
 
       /* Find where we need to append these combining chars */
-      int saved_i = 0;
-      while(state->combine_chars[saved_i])
+      முழு saved_i = 0;
+      போது(state->combine_chars[saved_i])
         saved_i++;
 
       /* Add extra ones */
-      while(i < npoints && vterm_unicode_is_combining(codepoints[i])) {
-        if(saved_i >= (int)state->combine_chars_size)
+      போது(i < npoints && vterm_unicode_is_combining(codepoints[i])) {
+        எனில்(saved_i >= (முழு)state->combine_chars_size)
           grow_combine_buffer(state);
         state->combine_chars[saved_i++] = codepoints[i++];
       }
-      if(saved_i >= (int)state->combine_chars_size)
+      எனில்(saved_i >= (முழு)state->combine_chars_size)
         grow_combine_buffer(state);
       state->combine_chars[saved_i] = 0;
 
 #ifdef DEBUG_GLYPH_COMBINE
-      for(; state->combine_chars[printpos]; printpos++)
+      க்கு(; state->combine_chars[printpos]; printpos++)
         printf("U+%04x ", state->combine_chars[printpos]);
       printf("}\n");
 #endif
@@ -387,71 +387,71 @@ static int on_text(const char bytes[], size_t len, void *user)
       /* Now render it */
       putglyph(state, state->combine_chars, state->combine_width, state->combine_pos);
     }
-    else {
+    இல்லையெனில் {
       DEBUG_LOG("libvterm: TODO: Skip over split char+combining\n");
     }
   }
 
-  for(; i < npoints; i++) {
+  க்கு(; i < npoints; i++) {
     // Try to find combining characters following this
-    int glyph_starts = i;
-    int glyph_ends;
-    int width = 0;
+    முழு glyph_starts = i;
+    முழு glyph_ends;
+    முழு width = 0;
 
-    for(glyph_ends = i + 1;
+    க்கு(glyph_ends = i + 1;
         (glyph_ends < npoints) && (glyph_ends < glyph_starts + VTERM_MAX_CHARS_PER_CELL);
         glyph_ends++)
-      if(!vterm_unicode_is_combining(codepoints[glyph_ends]))
-        break;
+      எனில்(!vterm_unicode_is_combining(codepoints[glyph_ends]))
+        நிறுத்து;
 
-    uint32_t *chars = vterm_allocator_malloc(state->vt, (VTERM_MAX_CHARS_PER_CELL + 1) * sizeof(uint32_t));
-    if (chars == NULL)
-      break;
+    uint32_t *chars = vterm_allocator_malloc(state->vt, (VTERM_MAX_CHARS_PER_CELL + 1) * அளவு(uint32_t));
+    எனில் (chars == வெற்று)
+      நிறுத்து;
 
-    for( ; i < glyph_ends; i++) {
-      int this_width;
-      if(vterm_get_special_pty_type() == 2) {
+    க்கு( ; i < glyph_ends; i++) {
+      முழு this_width;
+      எனில்(vterm_get_special_pty_type() == 2) {
         state->vt->in_backspace -= (state->vt->in_backspace > 0) ? 1 : 0;
-        if(state->vt->in_backspace == 1)
+        எனில்(state->vt->in_backspace == 1)
           codepoints[i] = 0; // codepoints under this condition must be 0
       }
       chars[i - glyph_starts] = codepoints[i];
       this_width = vterm_unicode_width(codepoints[i]);
 #ifdef DEBUG
-      if(this_width < 0) {
+      எனில்(this_width < 0) {
         fprintf(stderr, "Text with negative-width codepoint U+%04x\n", codepoints[i]);
         abort();
       }
 #endif
-      if (i == glyph_starts || this_width > width)
+      எனில் (i == glyph_starts || this_width > width)
 	width = this_width;  // TODO: should be += ?
     }
 
-    if (width < 0)
+    எனில் (width < 0)
       width = 0;
 
-    while(i < npoints && vterm_unicode_is_combining(codepoints[i]))
+    போது(i < npoints && vterm_unicode_is_combining(codepoints[i]))
       i++;
 
     chars[glyph_ends - glyph_starts] = 0;
     i--;
 
 #ifdef DEBUG_GLYPH_COMBINE
-    int printpos;
+    முழு printpos;
     printf("DEBUG: COMBINED GLYPH of %d chars {", glyph_ends - glyph_starts);
-    for(printpos = 0; printpos < glyph_ends - glyph_starts; printpos++)
+    க்கு(printpos = 0; printpos < glyph_ends - glyph_starts; printpos++)
       printf("U+%04x ", chars[printpos]);
     printf("}, onscreen width %d\n", width);
 #endif
 
-    if(state->at_phantom || state->pos.col + width > THISROWWIDTH(state)) {
+    எனில்(state->at_phantom || state->pos.col + width > THISROWWIDTH(state)) {
       linefeed(state);
       state->pos.col = 0;
       state->at_phantom = 0;
       state->lineinfo[state->pos.row].continuation = 1;
     }
 
-    if(state->mode.insert) {
+    எனில்(state->mode.செருகு) {
       // TODO: This will be a little inefficient for large bodies of text, as
       // it'll have to 'ICH' effectively before every glyph. We should scan
       // ahead and ICH as many times as required
@@ -465,27 +465,27 @@ static int on_text(const char bytes[], size_t len, void *user)
 
     putglyph(state, chars, width, state->pos);
 
-    if(i == npoints - 1) {
+    எனில்(i == npoints - 1) {
       /* End of the buffer. Save the chars in case we have to combine with
        * more on the next call */
-      int save_i;
-      for(save_i = 0; chars[save_i]; save_i++) {
-        if(save_i >= (int)state->combine_chars_size)
+      முழு save_i;
+      க்கு(save_i = 0; chars[save_i]; save_i++) {
+        எனில்(save_i >= (முழு)state->combine_chars_size)
           grow_combine_buffer(state);
         state->combine_chars[save_i] = chars[save_i];
       }
-      if(save_i >= (int)state->combine_chars_size)
+      எனில்(save_i >= (முழு)state->combine_chars_size)
         grow_combine_buffer(state);
       state->combine_chars[save_i] = 0;
       state->combine_width = width;
       state->combine_pos = state->pos;
     }
 
-    if(state->pos.col + width >= THISROWWIDTH(state)) {
-      if(state->mode.autowrap)
+    எனில்(state->pos.col + width >= THISROWWIDTH(state)) {
+      எனில்(state->mode.autowrap)
         state->at_phantom = 1;
     }
-    else {
+    இல்லையெனில் {
       state->pos.col += width;
     }
     vterm_allocator_free(state->vt, chars);
@@ -494,7 +494,7 @@ static int on_text(const char bytes[], size_t len, void *user)
   updatecursor(state, &oldpos, 0);
 
 #ifdef DEBUG
-  if(state->pos.row < 0 || state->pos.row >= state->rows ||
+  எனில்(state->pos.row < 0 || state->pos.row >= state->rows ||
      state->pos.col < 0 || state->pos.col >= state->cols) {
     fprintf(stderr, "Position out of bounds after text: (%d,%d)\n",
         state->pos.row, state->pos.col);
@@ -502,10 +502,10 @@ static int on_text(const char bytes[], size_t len, void *user)
   }
 #endif
 
-  return (int)eaten;
+  திரும்பு (முழு)eaten;
 }
 
-static int on_control(unsigned char control, void *user)
+நிலையான முழு on_control(unsigned எழுத்து control, வெறுமை *user)
 {
   VTermState *state = user;
 
@@ -517,94 +517,94 @@ static int on_control(unsigned char control, void *user)
   VTermPos leadpos = state->pos;
   leadpos.col -= (leadpos.col >= 2 ? 2 : 0);
 
-  switch(control) {
-  case 0x07: // BEL - ECMA-48 8.3.3
-    if(state->callbacks && state->callbacks->bell)
+  தேர்வு(control) {
+  நிலை 0x07: // BEL - ECMA-48 8.3.3
+    எனில்(state->callbacks && state->callbacks->bell)
       (*state->callbacks->bell)(state->cbdata);
-    break;
+    நிறுத்து;
 
-  case 0x08: // BS - ECMA-48 8.3.5
-    if(state->pos.col > 0)
+  நிலை 0x08: // BS - ECMA-48 8.3.5
+    எனில்(state->pos.col > 0)
       state->pos.col--;
-    if(vterm_get_special_pty_type() == 2) {
+    எனில்(vterm_get_special_pty_type() == 2) {
       // In 2 cell letters, go back 2 cells
       vterm_screen_get_cell(state->vt->screen, leadpos, &cell);
-      if(vterm_unicode_width(cell.chars[0]) == 2)
+      எனில்(vterm_unicode_width(cell.chars[0]) == 2)
         state->pos.col--;
     }
-    break;
+    நிறுத்து;
 
-  case 0x09: // HT - ECMA-48 8.3.60
+  நிலை 0x09: // HT - ECMA-48 8.3.60
     tab(state, 1, +1);
-    break;
+    நிறுத்து;
 
-  case 0x0a: // LF - ECMA-48 8.3.74
-  case 0x0b: // VT
-  case 0x0c: // FF
+  நிலை 0x0a: // LF - ECMA-48 8.3.74
+  நிலை 0x0b: // VT
+  நிலை 0x0c: // FF
     linefeed(state);
-    if(state->mode.newline)
+    எனில்(state->mode.newline)
       state->pos.col = 0;
-    break;
+    நிறுத்து;
 
-  case 0x0d: // CR - ECMA-48 8.3.15
+  நிலை 0x0d: // CR - ECMA-48 8.3.15
     state->pos.col = 0;
-    break;
+    நிறுத்து;
 
-  case 0x0e: // LS1 - ECMA-48 8.3.76
+  நிலை 0x0e: // LS1 - ECMA-48 8.3.76
     state->gl_set = 1;
-    break;
+    நிறுத்து;
 
-  case 0x0f: // LS0 - ECMA-48 8.3.75
+  நிலை 0x0f: // LS0 - ECMA-48 8.3.75
     state->gl_set = 0;
-    break;
+    நிறுத்து;
 
-  case 0x84: // IND - DEPRECATED but implemented for completeness
+  நிலை 0x84: // IND - DEPRECATED but implemented for completeness
     linefeed(state);
-    break;
+    நிறுத்து;
 
-  case 0x85: // NEL - ECMA-48 8.3.86
+  நிலை 0x85: // NEL - ECMA-48 8.3.86
     linefeed(state);
     state->pos.col = 0;
-    break;
+    நிறுத்து;
 
-  case 0x88: // HTS - ECMA-48 8.3.62
+  நிலை 0x88: // HTS - ECMA-48 8.3.62
     set_col_tabstop(state, state->pos.col);
-    break;
+    நிறுத்து;
 
-  case 0x8d: // RI - ECMA-48 8.3.104
-    if(state->pos.row == state->scrollregion_top) {
+  நிலை 0x8d: // RI - ECMA-48 8.3.104
+    எனில்(state->pos.row == state->scrollregion_உச்சி) {
       VTermRect rect;
-      rect.start_row = state->scrollregion_top;
+      rect.start_row = state->scrollregion_உச்சி;
       rect.end_row   = SCROLLREGION_BOTTOM(state);
-      rect.start_col = SCROLLREGION_LEFT(state);
-      rect.end_col   = SCROLLREGION_RIGHT(state);
+      rect.start_col = SCROLLREGION_இடது(state);
+      rect.end_col   = SCROLLREGION_வலது(state);
 
       scroll(state, rect, -1, 0);
     }
-    else if(state->pos.row > 0)
+    இல்லையெனில் எனில்(state->pos.row > 0)
         state->pos.row--;
-    break;
+    நிறுத்து;
 
-  case 0x8e: // SS2 - ECMA-48 8.3.141
+  நிலை 0x8e: // SS2 - ECMA-48 8.3.141
     state->gsingle_set = 2;
-    break;
+    நிறுத்து;
 
-  case 0x8f: // SS3 - ECMA-48 8.3.142
+  நிலை 0x8f: // SS3 - ECMA-48 8.3.142
     state->gsingle_set = 3;
-    break;
+    நிறுத்து;
 
-  default:
-    if(state->fallbacks && state->fallbacks->control)
-      if((*state->fallbacks->control)(control, state->fbdata))
-        return 1;
+  இயல்பு:
+    எனில்(state->fallbacks && state->fallbacks->control)
+      எனில்((*state->fallbacks->control)(control, state->fbdata))
+        திரும்பு 1;
 
-    return 0;
+    திரும்பு 0;
   }
 
   updatecursor(state, &oldpos, 1);
 
 #ifdef DEBUG
-  if(state->pos.row < 0 || state->pos.row >= state->rows ||
+  எனில்(state->pos.row < 0 || state->pos.row >= state->rows ||
      state->pos.col < 0 || state->pos.col >= state->cols) {
     fprintf(stderr, "Position out of bounds after Ctrl %02x: (%d,%d)\n",
         control, state->pos.row, state->pos.col);
@@ -612,34 +612,34 @@ static int on_control(unsigned char control, void *user)
   }
 #endif
 
-  return 1;
+  திரும்பு 1;
 }
 
-static int settermprop_bool(VTermState *state, VTermProp prop, int v)
+நிலையான முழு settermprop_bool(VTermState *state, VTermProp prop, முழு v)
 {
-  VTermValue val;
+  VTerm_மதிப்பு val;
   val.boolean = v;
-  return vterm_state_set_termprop(state, prop, &val);
+  திரும்பு vterm_state_set_termprop(state, prop, &val);
 }
 
-static int settermprop_int(VTermState *state, VTermProp prop, int v)
+நிலையான முழு settermprop_int(VTermState *state, VTermProp prop, முழு v)
 {
-  VTermValue val;
-  val.number = v;
-  return vterm_state_set_termprop(state, prop, &val);
+  VTerm_மதிப்பு val;
+  val.எண் = v;
+  திரும்பு vterm_state_set_termprop(state, prop, &val);
 }
 
-static int settermprop_string(VTermState *state, VTermProp prop, VTermStringFragment frag)
+நிலையான முழு settermprop_string(VTermState *state, VTermProp prop, VTermStringFragment frag)
 {
-  VTermValue val;
+  VTerm_மதிப்பு val;
 
   val.string = frag;
-  return vterm_state_set_termprop(state, prop, &val);
+  திரும்பு vterm_state_set_termprop(state, prop, &val);
 }
 
-static void savecursor(VTermState *state, int save)
+நிலையான வெறுமை savecursor(VTermState *state, முழு save)
 {
-  if(save) {
+  எனில்(save) {
     state->saved.pos = state->pos;
     state->saved.mode.cursor_visible = state->mode.cursor_visible;
     state->saved.mode.cursor_blink   = state->mode.cursor_blink;
@@ -647,7 +647,7 @@ static void savecursor(VTermState *state, int save)
 
     vterm_state_savepen(state, 1);
   }
-  else {
+  இல்லையெனில் {
     VTermPos oldpos = state->pos;
 
     state->pos = state->saved.pos;
@@ -662,470 +662,470 @@ static void savecursor(VTermState *state, int save)
   }
 }
 
-static int on_escape(const char *bytes, size_t len, void *user)
+நிலையான முழு on_escape(மாறிலி எழுத்து *bytes, size_t len, வெறுமை *user)
 {
   VTermState *state = user;
 
   /* Easier to decode this from the first byte, even though the final
    * byte terminates it
    */
-  switch(bytes[0]) {
-  case ' ':
-    if(len != 2)
-      return 0;
+  தேர்வு(bytes[0]) {
+  நிலை ' ':
+    எனில்(len != 2)
+      திரும்பு 0;
 
-    switch(bytes[1]) {
-      case 'F': // S7C1T
+    தேர்வு(bytes[1]) {
+      நிலை 'F': // S7C1T
         state->vt->mode.ctrl8bit = 0;
-        break;
+        நிறுத்து;
 
-      case 'G': // S8C1T
+      நிலை 'G': // S8C1T
         state->vt->mode.ctrl8bit = 1;
-        break;
+        நிறுத்து;
 
-      default:
-        return 0;
+      இயல்பு:
+        திரும்பு 0;
     }
-    return 2;
+    திரும்பு 2;
 
-  case '#':
-    if(len != 2)
-      return 0;
+  நிலை '#':
+    எனில்(len != 2)
+      திரும்பு 0;
 
-    switch(bytes[1]) {
-      case '3': // DECDHL top
-        if(state->mode.leftrightmargin)
-          break;
-        set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_TOP);
-        break;
+    தேர்வு(bytes[1]) {
+      நிலை '3': // DECDHL top
+        எனில்(state->mode.leftrightmargin)
+          நிறுத்து;
+        set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_உச்சி);
+        நிறுத்து;
 
-      case '4': // DECDHL bottom
-        if(state->mode.leftrightmargin)
-          break;
+      நிலை '4': // DECDHL bottom
+        எனில்(state->mode.leftrightmargin)
+          நிறுத்து;
         set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_BOTTOM);
-        break;
+        நிறுத்து;
 
-      case '5': // DECSWL
-        if(state->mode.leftrightmargin)
-          break;
+      நிலை '5': // DECSWL
+        எனில்(state->mode.leftrightmargin)
+          நிறுத்து;
         set_lineinfo(state, state->pos.row, NO_FORCE, DWL_OFF, DHL_OFF);
-        break;
+        நிறுத்து;
 
-      case '6': // DECDWL
-        if(state->mode.leftrightmargin)
-          break;
+      நிலை '6': // DECDWL
+        எனில்(state->mode.leftrightmargin)
+          நிறுத்து;
         set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_OFF);
-        break;
+        நிறுத்து;
 
-      case '8': // DECALN
+      நிலை '8': // DECALN
       {
         VTermPos pos;
         uint32_t E[] = { 'E', 0 };
-        for(pos.row = 0; pos.row < state->rows; pos.row++)
-          for(pos.col = 0; pos.col < ROWWIDTH(state, pos.row); pos.col++)
+        க்கு(pos.row = 0; pos.row < state->rows; pos.row++)
+          க்கு(pos.col = 0; pos.col < ROWWIDTH(state, pos.row); pos.col++)
             putglyph(state, E, 1, pos);
-        break;
+        நிறுத்து;
       }
 
-      default:
-        return 0;
+      இயல்பு:
+        திரும்பு 0;
     }
-    return 2;
+    திரும்பு 2;
 
-  case '(': case ')': case '*': case '+': // SCS
-    if(len != 2)
-      return 0;
+  நிலை '(': நிலை ')': நிலை '*': நிலை '+': // SCS
+    எனில்(len != 2)
+      திரும்பு 0;
 
     {
-      int setnum = bytes[0] - 0x28;
+      முழு setnum = bytes[0] - 0x28;
       VTermEncoding *newenc = vterm_lookup_encoding(ENC_SINGLE_94, bytes[1]);
 
-      if(newenc) {
+      எனில்(newenc) {
         state->encoding[setnum].enc = newenc;
 
-        if(newenc->init)
+        எனில்(newenc->init)
           (*newenc->init)(newenc, state->encoding[setnum].data);
       }
     }
 
-    return 2;
+    திரும்பு 2;
 
-  case '7': // DECSC
+  நிலை '7': // DECSC
     savecursor(state, 1);
-    return 1;
+    திரும்பு 1;
 
-  case '8': // DECRC
+  நிலை '8': // DECRC
     savecursor(state, 0);
-    return 1;
+    திரும்பு 1;
 
-  case '<': // Ignored by VT100. Used in VT52 mode to switch up to VT100
-    return 1;
+  நிலை '<': // Ignored by VT100. Used in VT52 mode to switch up to VT100
+    திரும்பு 1;
 
-  case '=': // DECKPAM
+  நிலை '=': // DECKPAM
     state->mode.keypad = 1;
-    return 1;
+    திரும்பு 1;
 
-  case '>': // DECKPNM
+  நிலை '>': // DECKPNM
     state->mode.keypad = 0;
-    return 1;
+    திரும்பு 1;
 
-  case 'c': // RIS - ECMA-48 8.3.105
+  நிலை 'c': // RIS - ECMA-48 8.3.105
   {
     VTermPos oldpos = state->pos;
     vterm_state_reset(state, 1);
-    if(state->callbacks && state->callbacks->movecursor)
+    எனில்(state->callbacks && state->callbacks->movecursor)
       (*state->callbacks->movecursor)(state->pos, oldpos, state->mode.cursor_visible, state->cbdata);
-    return 1;
+    திரும்பு 1;
   }
 
-  case 'n': // LS2 - ECMA-48 8.3.78
+  நிலை 'n': // LS2 - ECMA-48 8.3.78
     state->gl_set = 2;
-    return 1;
+    திரும்பு 1;
 
-  case 'o': // LS3 - ECMA-48 8.3.80
+  நிலை 'o': // LS3 - ECMA-48 8.3.80
     state->gl_set = 3;
-    return 1;
+    திரும்பு 1;
 
-  case '~': // LS1R - ECMA-48 8.3.77
+  நிலை '~': // LS1R - ECMA-48 8.3.77
     state->gr_set = 1;
-    return 1;
+    திரும்பு 1;
 
-  case '}': // LS2R - ECMA-48 8.3.79
+  நிலை '}': // LS2R - ECMA-48 8.3.79
     state->gr_set = 2;
-    return 1;
+    திரும்பு 1;
 
-  case '|': // LS3R - ECMA-48 8.3.81
+  நிலை '|': // LS3R - ECMA-48 8.3.81
     state->gr_set = 3;
-    return 1;
+    திரும்பு 1;
 
-  default:
-    return 0;
+  இயல்பு:
+    திரும்பு 0;
   }
 }
 
-static void set_mode(VTermState *state, int num, int val)
+நிலையான வெறுமை set_mode(VTermState *state, முழு இலக்கம், முழு val)
 {
-  switch(num) {
-  case 4: // IRM - ECMA-48 7.2.10
-    state->mode.insert = val;
-    break;
+  தேர்வு(இலக்கம்) {
+  நிலை 4: // IRM - ECMA-48 7.2.10
+    state->mode.செருகு = val;
+    நிறுத்து;
 
-  case 20: // LNM - ANSI X3.4-1977
+  நிலை 20: // LNM - ANSI X3.4-1977
     state->mode.newline = val;
-    break;
+    நிறுத்து;
 
-  default:
-    DEBUG_LOG1("libvterm: Unknown mode %d\n", num);
-    return;
+  இயல்பு:
+    DEBUG_LOG1("libvterm: Unknown mode %d\n", இலக்கம்);
+    திரும்பு;
   }
 }
 
-static void set_dec_mode(VTermState *state, int num, int val)
+நிலையான வெறுமை set_dec_mode(VTermState *state, முழு இலக்கம், முழு val)
 {
-  switch(num) {
-  case 1:
+  தேர்வு(இலக்கம்) {
+  நிலை 1:
     state->mode.cursor = val;
-    break;
+    நிறுத்து;
 
-  case 5: // DECSCNM - screen mode
+  நிலை 5: // DECSCNM - screen mode
     settermprop_bool(state, VTERM_PROP_REVERSE, val);
-    break;
+    நிறுத்து;
 
-  case 6: // DECOM - origin mode
+  நிலை 6: // DECOM - origin mode
     {
       VTermPos oldpos = state->pos;
       state->mode.origin = val;
-      state->pos.row = state->mode.origin ? state->scrollregion_top : 0;
-      state->pos.col = state->mode.origin ? SCROLLREGION_LEFT(state) : 0;
+      state->pos.row = state->mode.origin ? state->scrollregion_உச்சி : 0;
+      state->pos.col = state->mode.origin ? SCROLLREGION_இடது(state) : 0;
       updatecursor(state, &oldpos, 1);
     }
-    break;
+    நிறுத்து;
 
-  case 7:
+  நிலை 7:
     state->mode.autowrap = val;
-    break;
+    நிறுத்து;
 
-  case 12:
+  நிலை 12:
     settermprop_bool(state, VTERM_PROP_CURSORBLINK, val);
-    break;
+    நிறுத்து;
 
-  case 25:
+  நிலை 25:
     settermprop_bool(state, VTERM_PROP_CURSORVISIBLE, val);
-    break;
+    நிறுத்து;
 
-  case 69: // DECVSSM - vertical split screen mode
+  நிலை 69: // DECVSSM - vertical split screen mode
            // DECLRMM - left/right margin mode
     state->mode.leftrightmargin = val;
-    if(val) {
-      int row;
+    எனில்(val) {
+      முழு row;
 
       // Setting DECVSSM must clear doublewidth/doubleheight state of every line
-      for(row = 0; row < state->rows; row++)
+      க்கு(row = 0; row < state->rows; row++)
         set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
     }
 
-    break;
+    நிறுத்து;
 
-  case 1000:
-  case 1002:
-  case 1003:
+  நிலை 1000:
+  நிலை 1002:
+  நிலை 1003:
     settermprop_int(state, VTERM_PROP_MOUSE,
         !val          ? VTERM_PROP_MOUSE_NONE  :
-        (num == 1000) ? VTERM_PROP_MOUSE_CLICK :
-        (num == 1002) ? VTERM_PROP_MOUSE_DRAG  :
+        (இலக்கம் == 1000) ? VTERM_PROP_MOUSE_CLICK :
+        (இலக்கம் == 1002) ? VTERM_PROP_MOUSE_DRAG  :
                         VTERM_PROP_MOUSE_MOVE);
-    break;
+    நிறுத்து;
 
-  case 1004:
+  நிலை 1004:
     settermprop_bool(state, VTERM_PROP_FOCUSREPORT, val);
     state->mode.report_focus = val;
-    break;
+    நிறுத்து;
 
-  case 1005:
+  நிலை 1005:
     state->mouse_protocol = val ? MOUSE_UTF8 : MOUSE_X10;
-    break;
+    நிறுத்து;
 
-  case 1006:
+  நிலை 1006:
     state->mouse_protocol = val ? MOUSE_SGR : MOUSE_X10;
-    break;
+    நிறுத்து;
 
-  case 1015:
+  நிலை 1015:
     state->mouse_protocol = val ? MOUSE_RXVT : MOUSE_X10;
-    break;
+    நிறுத்து;
 
-  case 1047:
+  நிலை 1047:
     settermprop_bool(state, VTERM_PROP_ALTSCREEN, val);
-    break;
+    நிறுத்து;
 
-  case 1048:
+  நிலை 1048:
     savecursor(state, val);
-    break;
+    நிறுத்து;
 
-  case 1049:
+  நிலை 1049:
     settermprop_bool(state, VTERM_PROP_ALTSCREEN, val);
     savecursor(state, val);
-    break;
+    நிறுத்து;
 
-  case 2004:
+  நிலை 2004:
     state->mode.bracketpaste = val;
-    break;
+    நிறுத்து;
 
-  default:
-    DEBUG_LOG1("libvterm: Unknown DEC mode %d\n", num);
-    return;
+  இயல்பு:
+    DEBUG_LOG1("libvterm: Unknown DEC mode %d\n", இலக்கம்);
+    திரும்பு;
   }
 }
 
-static void request_dec_mode(VTermState *state, int num)
+நிலையான வெறுமை request_dec_mode(VTermState *state, முழு இலக்கம்)
 {
-  int reply;
+  முழு reply;
 
-  switch(num) {
-    case 1:
+  தேர்வு(இலக்கம்) {
+    நிலை 1:
       reply = state->mode.cursor;
-      break;
+      நிறுத்து;
 
-    case 5:
+    நிலை 5:
       reply = state->mode.screen;
-      break;
+      நிறுத்து;
 
-    case 6:
+    நிலை 6:
       reply = state->mode.origin;
-      break;
+      நிறுத்து;
 
-    case 7:
+    நிலை 7:
       reply = state->mode.autowrap;
-      break;
+      நிறுத்து;
 
-    case 12:
+    நிலை 12:
       reply = state->mode.cursor_blink;
-      break;
+      நிறுத்து;
 
-    case 25:
+    நிலை 25:
       reply = state->mode.cursor_visible;
-      break;
+      நிறுத்து;
 
-    case 69:
+    நிலை 69:
       reply = state->mode.leftrightmargin;
-      break;
+      நிறுத்து;
 
-    case 1000:
+    நிலை 1000:
       reply = state->mouse_flags == MOUSE_WANT_CLICK;
-      break;
+      நிறுத்து;
 
-    case 1002:
+    நிலை 1002:
       reply = state->mouse_flags == (MOUSE_WANT_CLICK|MOUSE_WANT_DRAG);
-      break;
+      நிறுத்து;
 
-    case 1003:
+    நிலை 1003:
       reply = state->mouse_flags == (MOUSE_WANT_CLICK|MOUSE_WANT_MOVE);
-      break;
+      நிறுத்து;
 
-    case 1004:
+    நிலை 1004:
       reply = state->mode.report_focus;
-      break;
+      நிறுத்து;
 
-    case 1005:
+    நிலை 1005:
       reply = state->mouse_protocol == MOUSE_UTF8;
-      break;
+      நிறுத்து;
 
-    case 1006:
+    நிலை 1006:
       reply = state->mouse_protocol == MOUSE_SGR;
-      break;
+      நிறுத்து;
 
-    case 1015:
+    நிலை 1015:
       reply = state->mouse_protocol == MOUSE_RXVT;
-      break;
+      நிறுத்து;
 
-    case 1047:
+    நிலை 1047:
       reply = state->mode.alt_screen;
-      break;
+      நிறுத்து;
 
-    case 2004:
+    நிலை 2004:
       reply = state->mode.bracketpaste;
-      break;
+      நிறுத்து;
 
-    default:
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", num, 0);
-      return;
+    இயல்பு:
+      vterm_தள்ளு_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", இலக்கம், 0);
+      திரும்பு;
   }
 
-  vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", num, reply ? 1 : 2);
+  vterm_தள்ளு_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", இலக்கம், reply ? 1 : 2);
 }
 
-static void request_version_string(VTermState *state)
+நிலையான வெறுமை request_version_string(VTermState *state)
 {
-  vterm_push_output_sprintf_str(state->vt, C1_DCS, TRUE, ">|libvterm(%d.%d)",
+  vterm_தள்ளு_output_sprintf_str(state->vt, C1_DCS, TRUE, ">|libvterm(%d.%d)",
       VTERM_VERSION_MAJOR, VTERM_VERSION_MINOR);
 }
 
-static int on_csi(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user)
+நிலையான முழு on_csi(மாறிலி எழுத்து *leader, மாறிலி long args[], முழு argcount, மாறிலி எழுத்து *intermed, எழுத்து command, வெறுமை *user)
 {
   VTermState *state = user;
-  int leader_byte = 0;
-  int intermed_byte = 0;
-  int cancel_phantom = 1;
+  முழு leader_byte = 0;
+  முழு intermed_byte = 0;
+  முழு cancel_phantom = 1;
   VTermPos oldpos = state->pos;
-  int handled = 1;
+  முழு handled = 1;
 
   // Some temporaries for later code
-  int count, val;
-  int row, col;
+  முழு மொத்தம், val;
+  முழு row, col;
   VTermRect rect;
-  int selective;
+  முழு selective;
 
-  if(leader && leader[0]) {
-    if(leader[1]) // longer than 1 char
-      return 0;
+  எனில்(leader && leader[0]) {
+    எனில்(leader[1]) // longer than 1 char
+      திரும்பு 0;
 
-    switch(leader[0]) {
-    case '?':
-    case '>':
-    case '<':
+    தேர்வு(leader[0]) {
+    நிலை '?':
+    நிலை '>':
+    நிலை '<':
       leader_byte = leader[0];
-      break;
-    default:
-      return 0;
+      நிறுத்து;
+    இயல்பு:
+      திரும்பு 0;
     }
   }
 
-  if(intermed && intermed[0]) {
-    if(intermed[1]) // longer than 1 char
-      return 0;
+  எனில்(intermed && intermed[0]) {
+    எனில்(intermed[1]) // longer than 1 char
+      திரும்பு 0;
 
-    switch(intermed[0]) {
-    case ' ':
-    case '!':
-    case '"':
-    case '$':
-    case '\'':
+    தேர்வு(intermed[0]) {
+    நிலை ' ':
+    நிலை '!':
+    நிலை '"':
+    நிலை '$':
+    நிலை '\'':
       intermed_byte = intermed[0];
-      break;
-    default:
-      return 0;
+      நிறுத்து;
+    இயல்பு:
+      திரும்பு 0;
     }
   }
 
   oldpos = state->pos;
 
-#define LBOUND(v,min) if((v) < (min)) (v) = (min)
-#define UBOUND(v,max) if((v) > (max)) (v) = (max)
+#define LBOUND(v,min) எனில்((v) < (min)) (v) = (min)
+#define UBOUND(v,max) எனில்((v) > (max)) (v) = (max)
 
 #define LEADER(l,b) ((l << 8) | b)
 #define INTERMED(i,b) ((i << 16) | b)
 
-  switch(intermed_byte << 16 | leader_byte << 8 | command) {
-  case 0x40: // ICH - ECMA-48 8.3.64
-    count = CSI_ARG_COUNT(args[0]);
+  தேர்வு(intermed_byte << 16 | leader_byte << 8 | command) {
+  நிலை 0x40: // ICH - ECMA-48 8.3.64
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    எனில்(!is_cursor_in_scrollregion(state))
+      நிறுத்து;
 
     rect.start_row = state->pos.row;
     rect.end_row   = state->pos.row + 1;
     rect.start_col = state->pos.col;
-    if(state->mode.leftrightmargin)
-      rect.end_col = SCROLLREGION_RIGHT(state);
-    else
+    எனில்(state->mode.leftrightmargin)
+      rect.end_col = SCROLLREGION_வலது(state);
+    இல்லையெனில்
       rect.end_col = THISROWWIDTH(state);
 
-    scroll(state, rect, 0, -count);
+    scroll(state, rect, 0, -மொத்தம்);
 
-    break;
+    நிறுத்து;
 
-  case 0x41: // CUU - ECMA-48 8.3.22
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.row -= count;
+  நிலை 0x41: // CUU - ECMA-48 8.3.22
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
+    state->pos.row -= மொத்தம்;
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x42: // CUD - ECMA-48 8.3.19
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.row += count;
+  நிலை 0x42: // CUD - ECMA-48 8.3.19
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
+    state->pos.row += மொத்தம்;
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x43: // CUF - ECMA-48 8.3.20
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col += count;
+  நிலை 0x43: // CUF - ECMA-48 8.3.20
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
+    state->pos.col += மொத்தம்;
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x44: // CUB - ECMA-48 8.3.18
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col -= count;
+  நிலை 0x44: // CUB - ECMA-48 8.3.18
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
+    state->pos.col -= மொத்தம்;
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x45: // CNL - ECMA-48 8.3.12
-    count = CSI_ARG_COUNT(args[0]);
+  நிலை 0x45: // CNL - ECMA-48 8.3.12
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
     state->pos.col = 0;
-    state->pos.row += count;
+    state->pos.row += மொத்தம்;
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x46: // CPL - ECMA-48 8.3.13
-    count = CSI_ARG_COUNT(args[0]);
+  நிலை 0x46: // CPL - ECMA-48 8.3.13
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
     state->pos.col = 0;
-    state->pos.row -= count;
+    state->pos.row -= மொத்தம்;
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x47: // CHA - ECMA-48 8.3.9
+  நிலை 0x47: // CHA - ECMA-48 8.3.9
     val = CSI_ARG_OR(args[0], 1);
     state->pos.col = val-1;
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x48: // CUP - ECMA-48 8.3.21
+  நிலை 0x48: // CUP - ECMA-48 8.3.21
     row = CSI_ARG_OR(args[0], 1);
     col = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? 1 : CSI_ARG(args[1]);
     // zero-based
-    if(vterm_get_special_pty_type() == 2) {
+    எனில்(vterm_get_special_pty_type() == 2) {
       // Fix a sequence that is not correct right now
-      if(state->pos.row == row - 1) {
-        int cnt, ptr = 0;
-        for(cnt = 0; cnt < col - 1; ++cnt) {
+      எனில்(state->pos.row == row - 1) {
+        முழு cnt, ptr = 0;
+        க்கு(cnt = 0; cnt < col - 1; ++cnt) {
 	  VTermPos p;
 	  VTermScreenCell c0, c1;
 	  p.row = row - 1;
@@ -1143,581 +1143,581 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     }
     state->pos.row = row-1;
     state->pos.col = col-1;
-    if(state->mode.origin) {
-      state->pos.row += state->scrollregion_top;
-      state->pos.col += SCROLLREGION_LEFT(state);
+    எனில்(state->mode.origin) {
+      state->pos.row += state->scrollregion_உச்சி;
+      state->pos.col += SCROLLREGION_இடது(state);
     }
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x49: // CHT - ECMA-48 8.3.10
-    count = CSI_ARG_COUNT(args[0]);
-    tab(state, count, +1);
-    break;
+  நிலை 0x49: // CHT - ECMA-48 8.3.10
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
+    tab(state, மொத்தம், +1);
+    நிறுத்து;
 
-  case 0x4a: // ED - ECMA-48 8.3.39
-  case LEADER('?', 0x4a): // DECSED - Selective Erase in Display
+  நிலை 0x4a: // ED - ECMA-48 8.3.39
+  நிலை LEADER('?', 0x4a): // DECSED - Selective Erase in Display
     selective = (leader_byte == '?');
-    switch(CSI_ARG(args[0])) {
-    case CSI_ARG_MISSING:
-    case 0:
+    தேர்வு(CSI_ARG(args[0])) {
+    நிலை CSI_ARG_MISSING:
+    நிலை 0:
       rect.start_row = state->pos.row; rect.end_row = state->pos.row + 1;
       rect.start_col = state->pos.col; rect.end_col = state->cols;
-      if(rect.end_col > rect.start_col)
+      எனில்(rect.end_col > rect.start_col)
         erase(state, rect, selective);
 
       rect.start_row = state->pos.row + 1; rect.end_row = state->rows;
       rect.start_col = 0;
-      for(row = rect.start_row; row < rect.end_row; row++)
+      க்கு(row = rect.start_row; row < rect.end_row; row++)
 	set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
-      if(rect.end_row > rect.start_row)
+      எனில்(rect.end_row > rect.start_row)
         erase(state, rect, selective);
-      break;
+      நிறுத்து;
 
-    case 1:
+    நிலை 1:
       rect.start_row = 0; rect.end_row = state->pos.row;
       rect.start_col = 0; rect.end_col = state->cols;
-      for(row = rect.start_row; row < rect.end_row; row++)
+      க்கு(row = rect.start_row; row < rect.end_row; row++)
 	set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
-      if(rect.end_col > rect.start_col)
+      எனில்(rect.end_col > rect.start_col)
         erase(state, rect, selective);
 
       rect.start_row = state->pos.row; rect.end_row = state->pos.row + 1;
                           rect.end_col = state->pos.col + 1;
-      if(rect.end_row > rect.start_row)
+      எனில்(rect.end_row > rect.start_row)
         erase(state, rect, selective);
-      break;
+      நிறுத்து;
 
-    case 2:
+    நிலை 2:
       rect.start_row = 0; rect.end_row = state->rows;
       rect.start_col = 0; rect.end_col = state->cols;
-      for(row = rect.start_row; row < rect.end_row; row++)
+      க்கு(row = rect.start_row; row < rect.end_row; row++)
 	set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
       erase(state, rect, selective);
-      break;
+      நிறுத்து;
 
-    case 3:
-      if(state->callbacks && state->callbacks->sb_clear)
-        if((*state->callbacks->sb_clear)(state->cbdata))
-          return 1;
-      break;
+    நிலை 3:
+      எனில்(state->callbacks && state->callbacks->sb_clear)
+        எனில்((*state->callbacks->sb_clear)(state->cbdata))
+          திரும்பு 1;
+      நிறுத்து;
     }
-    break;
+    நிறுத்து;
 
-  case 0x4b: // EL - ECMA-48 8.3.41
-  case LEADER('?', 0x4b): // DECSEL - Selective Erase in Line
+  நிலை 0x4b: // EL - ECMA-48 8.3.41
+  நிலை LEADER('?', 0x4b): // DECSEL - Selective Erase in Line
     selective = (leader_byte == '?');
     rect.start_row = state->pos.row;
     rect.end_row   = state->pos.row + 1;
 
-    switch(CSI_ARG(args[0])) {
-    case CSI_ARG_MISSING:
-    case 0:
-      rect.start_col = state->pos.col; rect.end_col = THISROWWIDTH(state); break;
-    case 1:
-      rect.start_col = 0; rect.end_col = state->pos.col + 1; break;
-    case 2:
-      rect.start_col = 0; rect.end_col = THISROWWIDTH(state); break;
-    default:
-      return 0;
+    தேர்வு(CSI_ARG(args[0])) {
+    நிலை CSI_ARG_MISSING:
+    நிலை 0:
+      rect.start_col = state->pos.col; rect.end_col = THISROWWIDTH(state); நிறுத்து;
+    நிலை 1:
+      rect.start_col = 0; rect.end_col = state->pos.col + 1; நிறுத்து;
+    நிலை 2:
+      rect.start_col = 0; rect.end_col = THISROWWIDTH(state); நிறுத்து;
+    இயல்பு:
+      திரும்பு 0;
     }
 
-    if(rect.end_col > rect.start_col)
+    எனில்(rect.end_col > rect.start_col)
       erase(state, rect, selective);
 
-    break;
+    நிறுத்து;
 
-  case 0x4c: // IL - ECMA-48 8.3.67
-    count = CSI_ARG_COUNT(args[0]);
+  நிலை 0x4c: // IL - ECMA-48 8.3.67
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
-
-    rect.start_row = state->pos.row;
-    rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
-
-    scroll(state, rect, -count, 0);
-
-    break;
-
-  case 0x4d: // DL - ECMA-48 8.3.32
-    count = CSI_ARG_COUNT(args[0]);
-
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    எனில்(!is_cursor_in_scrollregion(state))
+      நிறுத்து;
 
     rect.start_row = state->pos.row;
     rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.start_col = SCROLLREGION_இடது(state);
+    rect.end_col   = SCROLLREGION_வலது(state);
 
-    scroll(state, rect, count, 0);
+    scroll(state, rect, -மொத்தம், 0);
 
-    break;
+    நிறுத்து;
 
-  case 0x50: // DCH - ECMA-48 8.3.26
-    count = CSI_ARG_COUNT(args[0]);
+  நிலை 0x4d: // DL - ECMA-48 8.3.32
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    எனில்(!is_cursor_in_scrollregion(state))
+      நிறுத்து;
+
+    rect.start_row = state->pos.row;
+    rect.end_row   = SCROLLREGION_BOTTOM(state);
+    rect.start_col = SCROLLREGION_இடது(state);
+    rect.end_col   = SCROLLREGION_வலது(state);
+
+    scroll(state, rect, மொத்தம், 0);
+
+    நிறுத்து;
+
+  நிலை 0x50: // DCH - ECMA-48 8.3.26
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
+
+    எனில்(!is_cursor_in_scrollregion(state))
+      நிறுத்து;
 
     rect.start_row = state->pos.row;
     rect.end_row   = state->pos.row + 1;
     rect.start_col = state->pos.col;
-    if(state->mode.leftrightmargin)
-      rect.end_col = SCROLLREGION_RIGHT(state);
-    else
+    எனில்(state->mode.leftrightmargin)
+      rect.end_col = SCROLLREGION_வலது(state);
+    இல்லையெனில்
       rect.end_col = THISROWWIDTH(state);
 
-    scroll(state, rect, 0, count);
+    scroll(state, rect, 0, மொத்தம்);
 
-    break;
+    நிறுத்து;
 
-  case 0x53: // SU - ECMA-48 8.3.147
-    count = CSI_ARG_COUNT(args[0]);
+  நிலை 0x53: // SU - ECMA-48 8.3.147
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
 
-    rect.start_row = state->scrollregion_top;
+    rect.start_row = state->scrollregion_உச்சி;
     rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.start_col = SCROLLREGION_இடது(state);
+    rect.end_col   = SCROLLREGION_வலது(state);
 
-    scroll(state, rect, count, 0);
+    scroll(state, rect, மொத்தம், 0);
 
-    break;
+    நிறுத்து;
 
-  case 0x54: // SD - ECMA-48 8.3.113
-    count = CSI_ARG_COUNT(args[0]);
+  நிலை 0x54: // SD - ECMA-48 8.3.113
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
 
-    rect.start_row = state->scrollregion_top;
+    rect.start_row = state->scrollregion_உச்சி;
     rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.start_col = SCROLLREGION_இடது(state);
+    rect.end_col   = SCROLLREGION_வலது(state);
 
-    scroll(state, rect, -count, 0);
+    scroll(state, rect, -மொத்தம், 0);
 
-    break;
+    நிறுத்து;
 
-  case 0x58: // ECH - ECMA-48 8.3.38
-    count = CSI_ARG_COUNT(args[0]);
+  நிலை 0x58: // ECH - ECMA-48 8.3.38
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
 
     rect.start_row = state->pos.row;
     rect.end_row   = state->pos.row + 1;
     rect.start_col = state->pos.col;
-    rect.end_col   = state->pos.col + count;
+    rect.end_col   = state->pos.col + மொத்தம்;
     UBOUND(rect.end_col, THISROWWIDTH(state));
 
     erase(state, rect, 0);
-    break;
+    நிறுத்து;
 
-  case 0x5a: // CBT - ECMA-48 8.3.7
-    count = CSI_ARG_COUNT(args[0]);
-    tab(state, count, -1);
-    break;
+  நிலை 0x5a: // CBT - ECMA-48 8.3.7
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
+    tab(state, மொத்தம், -1);
+    நிறுத்து;
 
-  case 0x60: // HPA - ECMA-48 8.3.57
+  நிலை 0x60: // HPA - ECMA-48 8.3.57
     col = CSI_ARG_OR(args[0], 1);
     state->pos.col = col-1;
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x61: // HPR - ECMA-48 8.3.59
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col += count;
+  நிலை 0x61: // HPR - ECMA-48 8.3.59
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
+    state->pos.col += மொத்தம்;
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x62: { // REP - ECMA-48 8.3.103
-    const int row_width = THISROWWIDTH(state);
+  நிலை 0x62: { // REP - ECMA-48 8.3.103
+    மாறிலி முழு row_width = THISROWWIDTH(state);
 
     // ECMA-48 repeats the preceding graphic character; when none was
     // printed yet "combine_width" is zero and the loop below would never
     // advance the cursor.  Ignore the control then, like xterm does.
-    if(state->combine_width < 1)
-      break;
+    எனில்(state->combine_width < 1)
+      நிறுத்து;
 
-    count = CSI_ARG_COUNT(args[0]);
-    col = state->pos.col + count;
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
+    col = state->pos.col + மொத்தம்;
     UBOUND(col, row_width);
-    while (state->pos.col < col) {
+    போது (state->pos.col < col) {
       putglyph(state, state->combine_chars, state->combine_width, state->pos);
       state->pos.col += state->combine_width;
     }
-    if (state->pos.col + state->combine_width >= row_width) {
-      if (state->mode.autowrap) {
+    எனில் (state->pos.col + state->combine_width >= row_width) {
+      எனில் (state->mode.autowrap) {
         state->at_phantom = 1;
         cancel_phantom = 0;
       }
     }
-    break;
+    நிறுத்து;
   }
 
-  case 0x63: // DA - ECMA-48 8.3.24
+  நிலை 0x63: // DA - ECMA-48 8.3.24
     val = CSI_ARG_OR(args[0], 0);
-    if(val == 0)
+    எனில்(val == 0)
       // DEC VT100 response
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?1;2c");
-    break;
+      vterm_தள்ளு_output_sprintf_ctrl(state->vt, C1_CSI, "?1;2c");
+    நிறுத்து;
 
-  case LEADER('>', 0x63): // DEC secondary Device Attributes
+  நிலை LEADER('>', 0x63): // DEC secondary Device Attributes
     // This returns xterm version number 100.
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, ">%d;%d;%dc", 0, 100, 0);
-    break;
+    vterm_தள்ளு_output_sprintf_ctrl(state->vt, C1_CSI, ">%d;%d;%dc", 0, 100, 0);
+    நிறுத்து;
 
-  case 0x64: // VPA - ECMA-48 8.3.158
+  நிலை 0x64: // VPA - ECMA-48 8.3.158
     row = CSI_ARG_OR(args[0], 1);
     state->pos.row = row-1;
-    if(state->mode.origin)
-      state->pos.row += state->scrollregion_top;
+    எனில்(state->mode.origin)
+      state->pos.row += state->scrollregion_உச்சி;
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x65: // VPR - ECMA-48 8.3.160
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.row += count;
+  நிலை 0x65: // VPR - ECMA-48 8.3.160
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
+    state->pos.row += மொத்தம்;
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x66: // HVP - ECMA-48 8.3.63
+  நிலை 0x66: // HVP - ECMA-48 8.3.63
     row = CSI_ARG_OR(args[0], 1);
     col = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? 1 : CSI_ARG(args[1]);
     // zero-based
     state->pos.row = row-1;
     state->pos.col = col-1;
-    if(state->mode.origin) {
-      state->pos.row += state->scrollregion_top;
-      state->pos.col += SCROLLREGION_LEFT(state);
+    எனில்(state->mode.origin) {
+      state->pos.row += state->scrollregion_உச்சி;
+      state->pos.col += SCROLLREGION_இடது(state);
     }
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x67: // TBC - ECMA-48 8.3.154
+  நிலை 0x67: // TBC - ECMA-48 8.3.154
     val = CSI_ARG_OR(args[0], 0);
 
-    switch(val) {
-    case 0:
+    தேர்வு(val) {
+    நிலை 0:
       clear_col_tabstop(state, state->pos.col);
-      break;
-    case 3:
-    case 5:
-      for(col = 0; col < state->cols; col++)
+      நிறுத்து;
+    நிலை 3:
+    நிலை 5:
+      க்கு(col = 0; col < state->cols; col++)
         clear_col_tabstop(state, col);
-      break;
-    case 1:
-    case 2:
-    case 4:
-      break;
+      நிறுத்து;
+    நிலை 1:
+    நிலை 2:
+    நிலை 4:
+      நிறுத்து;
     /* TODO: 1, 2 and 4 aren't meaningful yet without line tab stops */
-    default:
-      return 0;
+    இயல்பு:
+      திரும்பு 0;
     }
-    break;
+    நிறுத்து;
 
-  case 0x68: // SM - ECMA-48 8.3.125
-    if(!CSI_ARG_IS_MISSING(args[0]))
+  நிலை 0x68: // SM - ECMA-48 8.3.125
+    எனில்(!CSI_ARG_IS_MISSING(args[0]))
       set_mode(state, CSI_ARG(args[0]), 1);
-    break;
+    நிறுத்து;
 
-  case LEADER('?', 0x68): // DEC private mode set
-    for(int i = 0; i < argcount; i++) {
-      if(!CSI_ARG_IS_MISSING(args[i]))
+  நிலை LEADER('?', 0x68): // DEC private mode set
+    க்கு(முழு i = 0; i < argcount; i++) {
+      எனில்(!CSI_ARG_IS_MISSING(args[i]))
         set_dec_mode(state, CSI_ARG(args[i]), 1);
     }
-    break;
+    நிறுத்து;
 
-  case 0x6a: // HPB - ECMA-48 8.3.58
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col -= count;
+  நிலை 0x6a: // HPB - ECMA-48 8.3.58
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
+    state->pos.col -= மொத்தம்;
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x6b: // VPB - ECMA-48 8.3.159
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.row -= count;
+  நிலை 0x6b: // VPB - ECMA-48 8.3.159
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
+    state->pos.row -= மொத்தம்;
     state->at_phantom = 0;
-    break;
+    நிறுத்து;
 
-  case 0x6c: // RM - ECMA-48 8.3.106
-    if(!CSI_ARG_IS_MISSING(args[0]))
+  நிலை 0x6c: // RM - ECMA-48 8.3.106
+    எனில்(!CSI_ARG_IS_MISSING(args[0]))
       set_mode(state, CSI_ARG(args[0]), 0);
-    break;
+    நிறுத்து;
 
-  case LEADER('?', 0x6c): // DEC private mode reset
-    for(int i = 0; i < argcount; i++) {
-      if(!CSI_ARG_IS_MISSING(args[i]))
+  நிலை LEADER('?', 0x6c): // DEC private mode reset
+    க்கு(முழு i = 0; i < argcount; i++) {
+      எனில்(!CSI_ARG_IS_MISSING(args[i]))
         set_dec_mode(state, CSI_ARG(args[i]), 0);
     }
-    break;
+    நிறுத்து;
 
-  case 0x6d: // SGR - ECMA-48 8.3.117
+  நிலை 0x6d: // SGR - ECMA-48 8.3.117
     vterm_state_setpen(state, args, argcount);
-    break;
+    நிறுத்து;
 
-  case LEADER('?', 0x6d): // DECSGR and XTQMODKEYS
+  நிலை LEADER('?', 0x6d): // DECSGR and XTQMODKEYS
     // CSI ? 4 m  XTQMODKEYS: request modifyOtherKeys level
-    if (argcount == 1 && CSI_ARG(args[0]) == 4)
+    எனில் (argcount == 1 && CSI_ARG(args[0]) == 4)
     {
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, ">4;%dm",
-					state->mode.modify_other_keys ? 2 : 0);
-      break;
+      vterm_தள்ளு_output_sprintf_ctrl(state->vt, C1_CSI, ">4;%dm",
+					state->mode.modify_other_சாவிகள் ? 2 : 0);
+      நிறுத்து;
     }
 
     /* No actual DEC terminal recognised these, but some printers did. These
      * are alternative ways to request subscript/superscript/off
      */
-    for(int argi = 0; argi < argcount; argi++) {
+    க்கு(முழு argi = 0; argi < argcount; argi++) {
       long arg;
-      switch(arg = CSI_ARG(args[argi])) {
-        case 4: // Superscript on
+      தேர்வு(arg = CSI_ARG(args[argi])) {
+        நிலை 4: // Superscript on
           arg = 73;
           vterm_state_setpen(state, &arg, 1);
-          break;
-        case 5: // Subscript on
+          நிறுத்து;
+        நிலை 5: // Subscript on
           arg = 74;
           vterm_state_setpen(state, &arg, 1);
-          break;
-        case 24: // Super+subscript off
+          நிறுத்து;
+        நிலை 24: // Super+subscript off
           arg = 75;
           vterm_state_setpen(state, &arg, 1);
-          break;
+          நிறுத்து;
       }
     }
-    break;
+    நிறுத்து;
 
-  case LEADER('>', 0x6d): // CSI > 4 ; Pv m   xterm resource modifyOtherKeys
-    if (argcount == 2 && CSI_ARG(args[0]) == 4)
+  நிலை LEADER('>', 0x6d): // CSI > 4 ; Pv m   xterm resource modifyOtherKeys
+    எனில் (argcount == 2 && CSI_ARG(args[0]) == 4)
     {
       // can't have both modify_other_keys and kitty_keyboard
       state->mode.kitty_keyboard = 0;
 
-      state->mode.modify_other_keys = CSI_ARG(args[1]) == 2;
+      state->mode.modify_other_சாவிகள் = CSI_ARG(args[1]) == 2;
     }
-    break;
+    நிறுத்து;
 
-  case LEADER('>', 0x75): // CSI > 1 u  enable kitty keyboard protocol
-    if (argcount == 1 && CSI_ARG(args[0]) == 1)
+  நிலை LEADER('>', 0x75): // CSI > 1 u  enable kitty keyboard protocol
+    எனில் (argcount == 1 && CSI_ARG(args[0]) == 1)
     {
       // can't have both modify_other_keys and kitty_keyboard
-      state->mode.modify_other_keys = 0;
+      state->mode.modify_other_சாவிகள் = 0;
 
       state->mode.kitty_keyboard = 1;
     }
-    break;
+    நிறுத்து;
 
-  case LEADER('<', 0x75): // CSI < u  disable kitty keyboard protocol
-    if (argcount <= 1)
+  நிலை LEADER('<', 0x75): // CSI < u  disable kitty keyboard protocol
+    எனில் (argcount <= 1)
       state->mode.kitty_keyboard = 0;
-    break;
+    நிறுத்து;
 
-  case LEADER('?', 0x75): // CSI ? u  request kitty keyboard protocol state
-    if (argcount <= 1)
+  நிலை LEADER('?', 0x75): // CSI ? u  request kitty keyboard protocol state
+    எனில் (argcount <= 1)
       // TODO: this only uses the values zero and one.  The protocol specifies
       // more values, the progressive enhancement flags.
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?%du",
+      vterm_தள்ளு_output_sprintf_ctrl(state->vt, C1_CSI, "?%du",
 						   state->mode.kitty_keyboard);
-    break;
+    நிறுத்து;
 
-  case 0x6e: // DSR - ECMA-48 8.3.35
-  case LEADER('?', 0x6e): // DECDSR
+  நிலை 0x6e: // DSR - ECMA-48 8.3.35
+  நிலை LEADER('?', 0x6e): // DECDSR
     val = CSI_ARG_OR(args[0], 0);
 
     {
-      char *qmark = (leader_byte == '?') ? "?" : "";
+      எழுத்து *qmark = (leader_byte == '?') ? "?" : "";
 
-      switch(val) {
-      case 0: case 1: case 2: case 3: case 4:
+      தேர்வு(val) {
+      நிலை 0: நிலை 1: நிலை 2: நிலை 3: நிலை 4:
         // ignore - these are replies
-        break;
-      case 5:
-        vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "%s0n", qmark);
-        break;
-      case 6: // CPR - cursor position report
-        vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "%s%d;%dR", qmark, state->pos.row + 1, state->pos.col + 1);
-        break;
+        நிறுத்து;
+      நிலை 5:
+        vterm_தள்ளு_output_sprintf_ctrl(state->vt, C1_CSI, "%s0n", qmark);
+        நிறுத்து;
+      நிலை 6: // CPR - cursor position report
+        vterm_தள்ளு_output_sprintf_ctrl(state->vt, C1_CSI, "%s%d;%dR", qmark, state->pos.row + 1, state->pos.col + 1);
+        நிறுத்து;
       }
     }
-    break;
+    நிறுத்து;
 
 
-  case INTERMED('!', 0x70): // DECSTR - DEC soft terminal reset
+  நிலை INTERMED('!', 0x70): // DECSTR - DEC soft terminal reset
     vterm_state_reset(state, 0);
-    break;
+    நிறுத்து;
 
-  case LEADER('?', INTERMED('$', 0x70)):
+  நிலை LEADER('?', INTERMED('$', 0x70)):
     request_dec_mode(state, CSI_ARG(args[0]));
-    break;
+    நிறுத்து;
 
-  case LEADER('>', 0x71): // XTVERSION - xterm query version string
+  நிலை LEADER('>', 0x71): // XTVERSION - xterm query version string
     request_version_string(state);
-    break;
+    நிறுத்து;
 
-  case INTERMED(' ', 0x71): // DECSCUSR - DEC set cursor shape
+  நிலை INTERMED(' ', 0x71): // DECSCUSR - DEC set cursor shape
     val = CSI_ARG_OR(args[0], 1);
 
-    switch(val) {
-    case 0: case 1:
+    தேர்வு(val) {
+    நிலை 0: நிலை 1:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 1);
       settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BLOCK);
-      break;
-    case 2:
+      நிறுத்து;
+    நிலை 2:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 0);
       settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BLOCK);
-      break;
-    case 3:
+      நிறுத்து;
+    நிலை 3:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 1);
       settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_UNDERLINE);
-      break;
-    case 4:
+      நிறுத்து;
+    நிலை 4:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 0);
       settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_UNDERLINE);
-      break;
-    case 5:
+      நிறுத்து;
+    நிலை 5:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 1);
-      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BAR_LEFT);
-      break;
-    case 6:
+      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BAR_இடது);
+      நிறுத்து;
+    நிலை 6:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 0);
-      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BAR_LEFT);
-      break;
+      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BAR_இடது);
+      நிறுத்து;
     }
 
-    break;
+    நிறுத்து;
 
-  case INTERMED('"', 0x71): // DECSCA - DEC select character protection attribute
+  நிலை INTERMED('"', 0x71): // DECSCA - DEC select character protection attribute
     val = CSI_ARG_OR(args[0], 0);
 
-    switch(val) {
-    case 0: case 2:
+    தேர்வு(val) {
+    நிலை 0: நிலை 2:
       state->protected_cell = 0;
-      break;
-    case 1:
+      நிறுத்து;
+    நிலை 1:
       state->protected_cell = 1;
-      break;
+      நிறுத்து;
     }
 
-    break;
+    நிறுத்து;
 
-  case 0x72: // DECSTBM - DEC custom
-    state->scrollregion_top = CSI_ARG_OR(args[0], 1) - 1;
+  நிலை 0x72: // DECSTBM - DEC custom
+    state->scrollregion_உச்சி = CSI_ARG_OR(args[0], 1) - 1;
     state->scrollregion_bottom = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? -1 : CSI_ARG(args[1]);
-    LBOUND(state->scrollregion_top, 0);
-    UBOUND(state->scrollregion_top, state->rows);
+    LBOUND(state->scrollregion_உச்சி, 0);
+    UBOUND(state->scrollregion_உச்சி, state->rows);
     LBOUND(state->scrollregion_bottom, -1);
-    if(state->scrollregion_top == 0 && state->scrollregion_bottom == state->rows)
+    எனில்(state->scrollregion_உச்சி == 0 && state->scrollregion_bottom == state->rows)
       state->scrollregion_bottom = -1;
-    else
+    இல்லையெனில்
       UBOUND(state->scrollregion_bottom, state->rows);
 
-    if(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
+    எனில்(SCROLLREGION_BOTTOM(state) <= state->scrollregion_உச்சி) {
       // Invalid
-      state->scrollregion_top    = 0;
+      state->scrollregion_உச்சி    = 0;
       state->scrollregion_bottom = -1;
     }
 
     // Setting the scrolling region restores the cursor to the home position
     state->pos.row = 0;
     state->pos.col = 0;
-    if(state->mode.origin) {
-      state->pos.row += state->scrollregion_top;
-      state->pos.col += SCROLLREGION_LEFT(state);
+    எனில்(state->mode.origin) {
+      state->pos.row += state->scrollregion_உச்சி;
+      state->pos.col += SCROLLREGION_இடது(state);
     }
 
-    break;
+    நிறுத்து;
 
-  case 0x73: // DECSLRM - DEC custom
+  நிலை 0x73: // DECSLRM - DEC custom
     // Always allow setting these margins, just they won't take effect without DECVSSM
-    state->scrollregion_left = CSI_ARG_OR(args[0], 1) - 1;
-    state->scrollregion_right = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? -1 : CSI_ARG(args[1]);
-    LBOUND(state->scrollregion_left, 0);
-    UBOUND(state->scrollregion_left, state->cols);
-    LBOUND(state->scrollregion_right, -1);
-    if(state->scrollregion_left == 0 && state->scrollregion_right == state->cols)
-      state->scrollregion_right = -1;
-    else
-      UBOUND(state->scrollregion_right, state->cols);
+    state->scrollregion_இடது = CSI_ARG_OR(args[0], 1) - 1;
+    state->scrollregion_வலது = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? -1 : CSI_ARG(args[1]);
+    LBOUND(state->scrollregion_இடது, 0);
+    UBOUND(state->scrollregion_இடது, state->cols);
+    LBOUND(state->scrollregion_வலது, -1);
+    எனில்(state->scrollregion_இடது == 0 && state->scrollregion_வலது == state->cols)
+      state->scrollregion_வலது = -1;
+    இல்லையெனில்
+      UBOUND(state->scrollregion_வலது, state->cols);
 
-    if(state->scrollregion_right > -1 &&
-       state->scrollregion_right <= state->scrollregion_left) {
+    எனில்(state->scrollregion_வலது > -1 &&
+       state->scrollregion_வலது <= state->scrollregion_இடது) {
       // Invalid
-      state->scrollregion_left  = 0;
-      state->scrollregion_right = -1;
+      state->scrollregion_இடது  = 0;
+      state->scrollregion_வலது = -1;
     }
 
     // Setting the scrolling region restores the cursor to the home position
     state->pos.row = 0;
     state->pos.col = 0;
-    if(state->mode.origin) {
-      state->pos.row += state->scrollregion_top;
-      state->pos.col += SCROLLREGION_LEFT(state);
+    எனில்(state->mode.origin) {
+      state->pos.row += state->scrollregion_உச்சி;
+      state->pos.col += SCROLLREGION_இடது(state);
     }
 
-    break;
+    நிறுத்து;
 
-  case 0x74:
-    switch(CSI_ARG(args[0])) {
-      case 8: // CSI 8 ; rows ; cols t  set size
-        if (argcount == 3 &&
+  நிலை 0x74:
+    தேர்வு(CSI_ARG(args[0])) {
+      நிலை 8: // CSI 8 ; rows ; cols t  set size
+        எனில் (argcount == 3 &&
             !CSI_ARG_IS_MISSING(args[1]) && !CSI_ARG_IS_MISSING(args[2]) &&
             CSI_ARG(args[1]) > 0 && CSI_ARG(args[2]) > 0)
 	  on_resize(CSI_ARG(args[1]), CSI_ARG(args[2]), state);
-	break;
-      default:
+	நிறுத்து;
+      இயல்பு:
 	handled = 0;
-	break;
+	நிறுத்து;
     }
-    break;
+    நிறுத்து;
 
-  case INTERMED('\'', 0x7D): // DECIC
-    count = CSI_ARG_COUNT(args[0]);
+  நிலை INTERMED('\'', 0x7D): // DECIC
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    எனில்(!is_cursor_in_scrollregion(state))
+      நிறுத்து;
 
-    rect.start_row = state->scrollregion_top;
+    rect.start_row = state->scrollregion_உச்சி;
     rect.end_row   = SCROLLREGION_BOTTOM(state);
     rect.start_col = state->pos.col;
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.end_col   = SCROLLREGION_வலது(state);
 
-    scroll(state, rect, 0, -count);
+    scroll(state, rect, 0, -மொத்தம்);
 
-    break;
+    நிறுத்து;
 
-  case INTERMED('\'', 0x7E): // DECDC
-    count = CSI_ARG_COUNT(args[0]);
+  நிலை INTERMED('\'', 0x7E): // DECDC
+    மொத்தம் = CSI_ARG_மொத்தம்(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    எனில்(!is_cursor_in_scrollregion(state))
+      நிறுத்து;
 
-    rect.start_row = state->scrollregion_top;
+    rect.start_row = state->scrollregion_உச்சி;
     rect.end_row   = SCROLLREGION_BOTTOM(state);
     rect.start_col = state->pos.col;
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.end_col   = SCROLLREGION_வலது(state);
 
-    scroll(state, rect, 0, count);
+    scroll(state, rect, 0, மொத்தம்);
 
-    break;
+    நிறுத்து;
 
-  default:
+  இயல்பு:
     handled = 0;
-    break;
+    நிறுத்து;
   }
 
-  if (!handled) {
-    if(state->fallbacks && state->fallbacks->csi)
-      if((*state->fallbacks->csi)(leader, args, argcount, intermed, command, state->fbdata))
-        return 1;
+  எனில் (!handled) {
+    எனில்(state->fallbacks && state->fallbacks->csi)
+      எனில்((*state->fallbacks->csi)(leader, args, argcount, intermed, command, state->fbdata))
+        திரும்பு 1;
 
-    return 0;
+    திரும்பு 0;
   }
 
-  if(state->mode.origin) {
-    LBOUND(state->pos.row, state->scrollregion_top);
+  எனில்(state->mode.origin) {
+    LBOUND(state->pos.row, state->scrollregion_உச்சி);
     UBOUND(state->pos.row, SCROLLREGION_BOTTOM(state)-1);
-    LBOUND(state->pos.col, SCROLLREGION_LEFT(state));
-    UBOUND(state->pos.col, SCROLLREGION_RIGHT(state)-1);
+    LBOUND(state->pos.col, SCROLLREGION_இடது(state));
+    UBOUND(state->pos.col, SCROLLREGION_வலது(state)-1);
   }
-  else {
+  இல்லையெனில் {
     LBOUND(state->pos.row, 0);
     UBOUND(state->pos.row, state->rows-1);
     LBOUND(state->pos.col, 0);
@@ -1727,189 +1727,189 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
   updatecursor(state, &oldpos, cancel_phantom);
 
 #ifdef DEBUG
-  if(state->pos.row < 0 || state->pos.row >= state->rows ||
+  எனில்(state->pos.row < 0 || state->pos.row >= state->rows ||
      state->pos.col < 0 || state->pos.col >= state->cols) {
     fprintf(stderr, "Position out of bounds after CSI %c: (%d,%d)\n",
         command, state->pos.row, state->pos.col);
     abort();
   }
 
-  if(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
+  எனில்(SCROLLREGION_BOTTOM(state) <= state->scrollregion_உச்சி) {
     fprintf(stderr, "Scroll region height out of bounds after CSI %c: %d <= %d\n",
-        command, SCROLLREGION_BOTTOM(state), state->scrollregion_top);
+        command, SCROLLREGION_BOTTOM(state), state->scrollregion_உச்சி);
     abort();
   }
 
-  if(SCROLLREGION_RIGHT(state) <= SCROLLREGION_LEFT(state)) {
+  எனில்(SCROLLREGION_வலது(state) <= SCROLLREGION_இடது(state)) {
     fprintf(stderr, "Scroll region width out of bounds after CSI %c: %d <= %d\n",
-        command, SCROLLREGION_RIGHT(state), SCROLLREGION_LEFT(state));
+        command, SCROLLREGION_வலது(state), SCROLLREGION_இடது(state));
     abort();
   }
 #endif
 
-  return 1;
+  திரும்பு 1;
 }
 
-static char base64_one(uint8_t b)
+நிலையான எழுத்து base64_one(uint8_t b)
 {
-  if(b < 26)
-    return 'A' + b;
-  else if(b < 52)
-    return 'a' + b - 26;
-  else if(b < 62)
-    return '0' + b - 52;
-  else if(b == 62)
-    return '+';
-  else if(b == 63)
-    return '/';
-  return 0;
+  எனில்(b < 26)
+    திரும்பு 'A' + b;
+  இல்லையெனில் எனில்(b < 52)
+    திரும்பு 'a' + b - 26;
+  இல்லையெனில் எனில்(b < 62)
+    திரும்பு '0' + b - 52;
+  இல்லையெனில் எனில்(b == 62)
+    திரும்பு '+';
+  இல்லையெனில் எனில்(b == 63)
+    திரும்பு '/';
+  திரும்பு 0;
 }
 
-static uint8_t unbase64one(char c)
+நிலையான uint8_t unbase64one(எழுத்து c)
 {
-  if(c >= 'A' && c <= 'Z')
-    return c - 'A';
-  else if(c >= 'a' && c <= 'z')
-    return c - 'a' + 26;
-  else if(c >= '0' && c <= '9')
-    return c - '0' + 52;
-  else if(c == '+')
-    return 62;
-  else if(c == '/')
-    return 63;
+  எனில்(c >= 'A' && c <= 'Z')
+    திரும்பு c - 'A';
+  இல்லையெனில் எனில்(c >= 'a' && c <= 'z')
+    திரும்பு c - 'a' + 26;
+  இல்லையெனில் எனில்(c >= '0' && c <= '9')
+    திரும்பு c - '0' + 52;
+  இல்லையெனில் எனில்(c == '+')
+    திரும்பு 62;
+  இல்லையெனில் எனில்(c == '/')
+    திரும்பு 63;
 
-  return 0xFF;
+  திரும்பு 0xFF;
 }
 
-static void osc_selection(VTermState *state, VTermStringFragment frag)
+நிலையான வெறுமை osc_selection(VTermState *state, VTermStringFragment frag)
 {
-  if(frag.initial) {
+  எனில்(frag.initial) {
     state->tmp.selection.mask = 0;
     state->tmp.selection.state = SELECTION_INITIAL;
   }
 
-  while(!state->tmp.selection.state && frag.len) {
+  போது(!state->tmp.selection.state && frag.len) {
     /* Parse selection parameter */
-    switch(frag.str[0]) {
-      case 'c':
+    தேர்வு(frag.str[0]) {
+      நிலை 'c':
         state->tmp.selection.mask |= VTERM_SELECTION_CLIPBOARD;
-        break;
-      case 'p':
+        நிறுத்து;
+      நிலை 'p':
         state->tmp.selection.mask |= VTERM_SELECTION_PRIMARY;
-        break;
-      case 'q':
+        நிறுத்து;
+      நிலை 'q':
         state->tmp.selection.mask |= VTERM_SELECTION_SECONDARY;
-        break;
-      case 's':
+        நிறுத்து;
+      நிலை 's':
         state->tmp.selection.mask |= VTERM_SELECTION_SELECT;
-        break;
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
+        நிறுத்து;
+      நிலை '0':
+      நிலை '1':
+      நிலை '2':
+      நிலை '3':
+      நிலை '4':
+      நிலை '5':
+      நிலை '6':
+      நிலை '7':
         state->tmp.selection.mask |= (VTERM_SELECTION_CUT0 << (frag.str[0] - '0'));
-        break;
+        நிறுத்து;
 
-      case ';':
+      நிலை ';':
         state->tmp.selection.state = SELECTION_SELECTED;
-        if(!state->tmp.selection.mask)
+        எனில்(!state->tmp.selection.mask)
           state->tmp.selection.mask = VTERM_SELECTION_SELECT|VTERM_SELECTION_CUT0;
-        break;
+        நிறுத்து;
     }
 
     frag.str++;
     frag.len--;
   }
 
-  if(!frag.len) {
+  எனில்(!frag.len) {
     /* Clear selection if we're already finished but didn't do anything */
-    if(frag.final && state->selection.callbacks->set) {
+    எனில்(frag.final && state->selection.callbacks->set) {
       (*state->selection.callbacks->set)(state->tmp.selection.mask, (VTermStringFragment){
-              .str     = NULL,
+              .str     = வெற்று,
               .len     = 0,
               .initial = state->tmp.selection.state != SELECTION_SET,
               .final   = TRUE,
             }, state->selection.user);
     }
-    return;
+    திரும்பு;
   }
 
-  if(state->tmp.selection.state == SELECTION_SELECTED) {
-    if(frag.str[0] == '?') {
+  எனில்(state->tmp.selection.state == SELECTION_SELECTED) {
+    எனில்(frag.str[0] == '?') {
       state->tmp.selection.state = SELECTION_QUERY;
     }
-    else {
+    இல்லையெனில் {
       state->tmp.selection.state = SELECTION_SET_INITIAL;
       state->tmp.selection.recvpartial = 0;
     }
   }
 
-  if(state->tmp.selection.state == SELECTION_QUERY) {
-    if(state->selection.callbacks->query)
+  எனில்(state->tmp.selection.state == SELECTION_QUERY) {
+    எனில்(state->selection.callbacks->query)
       (*state->selection.callbacks->query)(state->tmp.selection.mask, state->selection.user);
-    return;
+    திரும்பு;
   }
 
-  if(state->tmp.selection.state == SELECTION_INVALID)
-    return;
+  எனில்(state->tmp.selection.state == SELECTION_INVALID)
+    திரும்பு;
 
-  if(state->selection.callbacks->set) {
+  எனில்(state->selection.callbacks->set) {
     size_t bufcur = 0;
-    char *buffer = state->selection.buffer;
+    எழுத்து *buffer = state->selection.buffer;
 
     uint32_t x = 0; /* Current decoding value */
-    int n = 0;      /* Number of sextets consumed */
+    முழு n = 0;      /* Number of sextets consumed */
 
-    if(state->tmp.selection.recvpartial) {
+    எனில்(state->tmp.selection.recvpartial) {
       n = state->tmp.selection.recvpartial >> 24;
       x = state->tmp.selection.recvpartial & 0x03FFFF; /* could be up to 18 bits of state in here */
 
       state->tmp.selection.recvpartial = 0;
     }
 
-    while((state->selection.buflen - bufcur) >= 3 && frag.len) {
-      if(frag.str[0] == '=') {
-        if(n == 2) {
+    போது((state->selection.buflen - bufcur) >= 3 && frag.len) {
+      எனில்(frag.str[0] == '=') {
+        எனில்(n == 2) {
           buffer[0] = (x >> 4) & 0xFF;
           buffer += 1, bufcur += 1;
         }
-        if(n == 3) {
+        எனில்(n == 3) {
           buffer[0] = (x >> 10) & 0xFF;
           buffer[1] = (x >>  2) & 0xFF;
           buffer += 2, bufcur += 2;
         }
 
-        while(frag.len && frag.str[0] == '=')
+        போது(frag.len && frag.str[0] == '=')
           frag.str++, frag.len--;
 
         n = 0;
       }
-      else {
+      இல்லையெனில் {
         uint8_t b = unbase64one(frag.str[0]);
-        if(b == 0xFF) {
+        எனில்(b == 0xFF) {
           DEBUG_LOG1("base64decode bad input %02X\n", (uint8_t)frag.str[0]);
 
           state->tmp.selection.state = SELECTION_INVALID;
-          if(state->selection.callbacks->set) {
+          எனில்(state->selection.callbacks->set) {
             (*state->selection.callbacks->set)(state->tmp.selection.mask, (VTermStringFragment){
-                .str     = NULL,
+                .str     = வெற்று,
                 .len     = 0,
                 .initial = TRUE,
                 .final   = TRUE,
                 }, state->selection.user);
           }
-          break;
+          நிறுத்து;
         }
 
         x = (x << 6) | b;
         n++;
         frag.str++, frag.len--;
 
-        if(n == 4) {
+        எனில்(n == 4) {
           buffer[0] = (x >> 16) & 0xFF;
           buffer[1] = (x >>  8) & 0xFF;
           buffer[2] = (x >>  0) & 0xFF;
@@ -1920,8 +1920,8 @@ static void osc_selection(VTermState *state, VTermStringFragment frag)
         }
       }
 
-      if(!frag.len || (state->selection.buflen - bufcur) < 3) {
-        if(bufcur) {
+      எனில்(!frag.len || (state->selection.buflen - bufcur) < 3) {
+        எனில்(bufcur) {
 	  VTermStringFragment setfrag = {
 	    state->selection.buffer, // str
 	    bufcur, // len
@@ -1938,237 +1938,237 @@ static void osc_selection(VTermState *state, VTermStringFragment frag)
       }
     }
 
-    if(n)
+    எனில்(n)
       state->tmp.selection.recvpartial = (n << 24) | x;
   }
 }
 
-static int on_osc(int command, VTermStringFragment frag, void *user)
+நிலையான முழு on_osc(முழு command, VTermStringFragment frag, வெறுமை *user)
 {
   VTermState *state = user;
 
-  switch(command) {
-    case 0:
+  தேர்வு(command) {
+    நிலை 0:
       settermprop_string(state, VTERM_PROP_ICONNAME, frag);
       settermprop_string(state, VTERM_PROP_TITLE, frag);
-      return 1;
+      திரும்பு 1;
 
-    case 1:
+    நிலை 1:
       settermprop_string(state, VTERM_PROP_ICONNAME, frag);
-      return 1;
+      திரும்பு 1;
 
-    case 2:
+    நிலை 2:
       settermprop_string(state, VTERM_PROP_TITLE, frag);
-      return 1;
+      திரும்பு 1;
 
-    case 10:
+    நிலை 10:
       {
         // request foreground color: <Esc>]10;?<0x07>
-        int red = state->default_fg.red;
-        int blue = state->default_fg.blue;
-        int green = state->default_fg.green;
-        vterm_push_output_sprintf_ctrl(state->vt, C1_OSC, "10;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
-        return 1;
+        முழு red = state->default_fg.red;
+        முழு blue = state->default_fg.blue;
+        முழு green = state->default_fg.green;
+        vterm_தள்ளு_output_sprintf_ctrl(state->vt, C1_OSC, "10;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
+        திரும்பு 1;
       }
 
-    case 11:
+    நிலை 11:
       {
 	// request background color: <Esc>]11;?<0x07>
-	int red = state->default_bg.red;
-	int blue = state->default_bg.blue;
-	int green = state->default_bg.green;
-	vterm_push_output_sprintf_ctrl(state->vt, C1_OSC, "11;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
-	return 1;
+	முழு red = state->default_bg.red;
+	முழு blue = state->default_bg.blue;
+	முழு green = state->default_bg.green;
+	vterm_தள்ளு_output_sprintf_ctrl(state->vt, C1_OSC, "11;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
+	திரும்பு 1;
       }
-    case 12:
+    நிலை 12:
       settermprop_string(state, VTERM_PROP_CURSORCOLOR, frag);
-      return 1;
+      திரும்பு 1;
 
-    case 52:
-      if(state->selection.callbacks)
+    நிலை 52:
+      எனில்(state->selection.callbacks)
         osc_selection(state, frag);
 
-      return 1;
+      திரும்பு 1;
 
-    default:
-      if(state->fallbacks && state->fallbacks->osc)
-        if((*state->fallbacks->osc)(command, frag, state->fbdata))
-          return 1;
+    இயல்பு:
+      எனில்(state->fallbacks && state->fallbacks->osc)
+        எனில்((*state->fallbacks->osc)(command, frag, state->fbdata))
+          திரும்பு 1;
   }
 
-  return 0;
+  திரும்பு 0;
 }
 
-static void request_status_string(VTermState *state, VTermStringFragment frag)
+நிலையான வெறுமை request_status_string(VTermState *state, VTermStringFragment frag)
 {
   VTerm *vt = state->vt;
 
-  char *tmp = state->tmp.decrqss;
+  எழுத்து *tmp = state->tmp.decrqss;
 
-  if(frag.initial)
+  எனில்(frag.initial)
     tmp[0] = tmp[1] = tmp[2] = tmp[3] = 0;
 
   size_t i = 0;
-  while(i < sizeof(state->tmp.decrqss)-1 && tmp[i])
+  போது(i < அளவு(state->tmp.decrqss)-1 && tmp[i])
     i++;
-  while(i < sizeof(state->tmp.decrqss)-1 && frag.len--)
+  போது(i < அளவு(state->tmp.decrqss)-1 && frag.len--)
     tmp[i++] = (frag.str++)[0];
   tmp[i] = 0;
 
-  if(!frag.final)
-    return;
+  எனில்(!frag.final)
+    திரும்பு;
 
-  switch(tmp[0] | tmp[1]<<8 | tmp[2]<<16) {
-    case 'm': {
+  தேர்வு(tmp[0] | tmp[1]<<8 | tmp[2]<<16) {
+    நிலை 'm': {
       // Query SGR
       long args[20];
-      int argc = vterm_state_getpen(state, args, sizeof(args)/sizeof(args[0]));
+      முழு argc = vterm_state_getpen(state, args, அளவு(args)/அளவு(args[0]));
       size_t cur = 0;
 
       cur += SNPRINTF(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
           vt->mode.ctrl8bit ? "\x90" "1$r" : ESC_S "P" "1$r"); // DCS 1$r ...
-      if(cur >= vt->tmpbuffer_len)
-        return;
+      எனில்(cur >= vt->tmpbuffer_len)
+        திரும்பு;
 
-      for(int argi = 0; argi < argc; argi++) {
+      க்கு(முழு argi = 0; argi < argc; argi++) {
         cur += SNPRINTF(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
             argi == argc - 1             ? "%ld" :
             CSI_ARG_HAS_MORE(args[argi]) ? "%ld:" :
                                            "%ld;",
             CSI_ARG(args[argi]));
-        if(cur >= vt->tmpbuffer_len)
-          return;
+        எனில்(cur >= vt->tmpbuffer_len)
+          திரும்பு;
       }
 
       cur += SNPRINTF(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
           vt->mode.ctrl8bit ? "m" "\x9C" : "m" ESC_S "\\"); // ... m ST
-      if(cur >= vt->tmpbuffer_len)
-        return;
+      எனில்(cur >= vt->tmpbuffer_len)
+        திரும்பு;
 
-      vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
-      return;
+      vterm_தள்ளு_output_bytes(vt, vt->tmpbuffer, cur);
+      திரும்பு;
     }
 
-    case 'r':
+    நிலை 'r':
       // Query DECSTBM
-      vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
-          "1$r%d;%dr", state->scrollregion_top+1, SCROLLREGION_BOTTOM(state));
-      return;
+      vterm_தள்ளு_output_sprintf_str(vt, C1_DCS, TRUE,
+          "1$r%d;%dr", state->scrollregion_உச்சி+1, SCROLLREGION_BOTTOM(state));
+      திரும்பு;
 
-    case 's':
+    நிலை 's':
       // Query DECSLRM
-      vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
-          "1$r%d;%ds", SCROLLREGION_LEFT(state)+1, SCROLLREGION_RIGHT(state));
-      return;
+      vterm_தள்ளு_output_sprintf_str(vt, C1_DCS, TRUE,
+          "1$r%d;%ds", SCROLLREGION_இடது(state)+1, SCROLLREGION_வலது(state));
+      திரும்பு;
 
-    case ' '|('q'<<8): {
+    நிலை ' '|('q'<<8): {
       // Query DECSCUSR
-      int reply;
-      switch(state->mode.cursor_shape) {
-        case VTERM_PROP_CURSORSHAPE_BLOCK:     reply = 2; break;
-        case VTERM_PROP_CURSORSHAPE_UNDERLINE: reply = 4; break;
-	default: /* VTERM_PROP_CURSORSHAPE_BAR_LEFT */ reply = 6; break;
+      முழு reply;
+      தேர்வு(state->mode.cursor_shape) {
+        நிலை VTERM_PROP_CURSORSHAPE_BLOCK:     reply = 2; நிறுத்து;
+        நிலை VTERM_PROP_CURSORSHAPE_UNDERLINE: reply = 4; நிறுத்து;
+	இயல்பு: /* VTERM_PROP_CURSORSHAPE_BAR_LEFT */ reply = 6; நிறுத்து;
       }
-      if(state->mode.cursor_blink)
+      எனில்(state->mode.cursor_blink)
         reply--;
-      vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
+      vterm_தள்ளு_output_sprintf_str(vt, C1_DCS, TRUE,
           "1$r%d q", reply);
-      return;
+      திரும்பு;
     }
 
-    case '\"'|('q'<<8):
+    நிலை '\"'|('q'<<8):
       // Query DECSCA
-      vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
+      vterm_தள்ளு_output_sprintf_str(vt, C1_DCS, TRUE,
           "1$r%d\"q", state->protected_cell ? 1 : 2);
-      return;
+      திரும்பு;
   }
 
-  vterm_push_output_sprintf_str(state->vt, C1_DCS, TRUE, "0$r");
+  vterm_தள்ளு_output_sprintf_str(state->vt, C1_DCS, TRUE, "0$r");
 }
 
-static int on_dcs(const char *command, size_t commandlen, VTermStringFragment frag, void *user)
+நிலையான முழு on_dcs(மாறிலி எழுத்து *command, size_t commandlen, VTermStringFragment frag, வெறுமை *user)
 {
   VTermState *state = user;
 
-  if(commandlen == 2 && strneq(command, "$q", 2)) {
+  எனில்(commandlen == 2 && strneq(command, "$q", 2)) {
     request_status_string(state, frag);
-    return 1;
+    திரும்பு 1;
   }
-  else if(state->fallbacks && state->fallbacks->dcs)
-    if((*state->fallbacks->dcs)(command, commandlen, frag, state->fbdata))
-      return 1;
+  இல்லையெனில் எனில்(state->fallbacks && state->fallbacks->dcs)
+    எனில்((*state->fallbacks->dcs)(command, commandlen, frag, state->fbdata))
+      திரும்பு 1;
 
-  DEBUG_LOG2("libvterm: Unhandled DCS %.*s\n", (int)commandlen, command);
-  return 0;
+  DEBUG_LOG2("libvterm: Unhandled DCS %.*s\n", (முழு)commandlen, command);
+  திரும்பு 0;
 }
 
-static int on_apc(VTermStringFragment frag, void *user)
+நிலையான முழு on_apc(VTermStringFragment frag, வெறுமை *user)
 {
   VTermState *state = user;
 
-  if(state->fallbacks && state->fallbacks->apc)
-    if((*state->fallbacks->apc)(frag, state->fbdata))
-      return 1;
+  எனில்(state->fallbacks && state->fallbacks->apc)
+    எனில்((*state->fallbacks->apc)(frag, state->fbdata))
+      திரும்பு 1;
 
   /* No DEBUG_LOG because all APCs are unhandled */
-  return 0;
+  திரும்பு 0;
 }
 
-static int on_pm(VTermStringFragment frag, void *user)
+நிலையான முழு on_pm(VTermStringFragment frag, வெறுமை *user)
 {
   VTermState *state = user;
 
-  if(state->fallbacks && state->fallbacks->pm)
-    if((*state->fallbacks->pm)(frag, state->fbdata))
-      return 1;
+  எனில்(state->fallbacks && state->fallbacks->pm)
+    எனில்((*state->fallbacks->pm)(frag, state->fbdata))
+      திரும்பு 1;
 
   /* No DEBUG_LOG because all PMs are unhandled */
-  return 0;
+  திரும்பு 0;
 }
 
-static int on_sos(VTermStringFragment frag, void *user)
+நிலையான முழு on_sos(VTermStringFragment frag, வெறுமை *user)
 {
   VTermState *state = user;
 
-  if(state->fallbacks && state->fallbacks->sos)
-    if((*state->fallbacks->sos)(frag, state->fbdata))
-      return 1;
+  எனில்(state->fallbacks && state->fallbacks->sos)
+    எனில்((*state->fallbacks->sos)(frag, state->fbdata))
+      திரும்பு 1;
 
   /* No DEBUG_LOG because all SOSs are unhandled */
-  return 0;
+  திரும்பு 0;
 }
 
-static int on_resize(int rows, int cols, void *user)
+நிலையான முழு on_resize(முழு rows, முழு cols, வெறுமை *user)
 {
   VTermState *state = user;
   VTermPos oldpos = state->pos;
 
-  if (cols > VTERM_MAX_COLS)
+  எனில் (cols > VTERM_MAX_COLS)
     cols = VTERM_MAX_COLS;
 
-  if (rows > VTERM_MAX_ROWS)
+  எனில் (rows > VTERM_MAX_ROWS)
     rows = VTERM_MAX_ROWS;
 
-  if(cols != state->cols) {
-    unsigned char *newtabstops = vterm_allocator_malloc(state->vt, (cols + 7) / 8);
-    if (newtabstops == NULL)
-      return 0;
+  எனில்(cols != state->cols) {
+    unsigned எழுத்து *newtabstops = vterm_allocator_malloc(state->vt, (cols + 7) / 8);
+    எனில் (newtabstops == வெற்று)
+      திரும்பு 0;
 
     /* TODO: This can all be done much more efficiently bytewise */
-    int col;
-    for(col = 0; col < state->cols && col < cols; col++) {
-      unsigned char mask = 1 << (col & 7);
-      if(state->tabstops[col >> 3] & mask)
+    முழு col;
+    க்கு(col = 0; col < state->cols && col < cols; col++) {
+      unsigned எழுத்து mask = 1 << (col & 7);
+      எனில்(state->tabstops[col >> 3] & mask)
         newtabstops[col >> 3] |= mask;
-      else
+      இல்லையெனில்
         newtabstops[col >> 3] &= ~mask;
       }
 
-    for( ; col < cols; col++) {
-      unsigned char mask = 1 << (col & 7);
-      if(col % 8 == 0)
+    க்கு( ; col < cols; col++) {
+      unsigned எழுத்து mask = 1 << (col & 7);
+      எனில்(col % 8 == 0)
         newtabstops[col >> 3] |= mask;
-      else
+      இல்லையெனில்
         newtabstops[col >> 3] &= ~mask;
     }
 
@@ -2179,24 +2179,24 @@ static int on_resize(int rows, int cols, void *user)
   state->rows = rows;
   state->cols = cols;
 
-  if(state->scrollregion_bottom > -1)
+  எனில்(state->scrollregion_bottom > -1)
     UBOUND(state->scrollregion_bottom, state->rows);
-  if(state->scrollregion_right > -1)
-    UBOUND(state->scrollregion_right, state->cols);
+  எனில்(state->scrollregion_வலது > -1)
+    UBOUND(state->scrollregion_வலது, state->cols);
 
   // The near edges need clamping as well, otherwise a scroll region that
   // was set before the terminal was made smaller can start past the last
   // row or column.  Drop a region that no longer makes sense, just like
   // DECSTBM and DECSLRM do when it is set.
-  UBOUND(state->scrollregion_top, state->rows);
-  UBOUND(state->scrollregion_left, state->cols);
-  if(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
-    state->scrollregion_top = 0;
+  UBOUND(state->scrollregion_உச்சி, state->rows);
+  UBOUND(state->scrollregion_இடது, state->cols);
+  எனில்(SCROLLREGION_BOTTOM(state) <= state->scrollregion_உச்சி) {
+    state->scrollregion_உச்சி = 0;
     state->scrollregion_bottom = -1;
   }
-  if(SCROLLREGION_RIGHT(state) <= state->scrollregion_left) {
-    state->scrollregion_left = 0;
-    state->scrollregion_right = -1;
+  எனில்(SCROLLREGION_வலது(state) <= state->scrollregion_இடது) {
+    state->scrollregion_இடது = 0;
+    state->scrollregion_வலது = -1;
   }
 
   VTermStateFields fields;
@@ -2204,29 +2204,29 @@ static int on_resize(int rows, int cols, void *user)
   fields.lineinfos[0] = state->lineinfos[0];
   fields.lineinfos[1] = state->lineinfos[1];
 
-  if(state->callbacks && state->callbacks->resize) {
+  எனில்(state->callbacks && state->callbacks->resize) {
     (*state->callbacks->resize)(rows, cols, &fields, state->cbdata);
     state->pos = fields.pos;
 
     state->lineinfos[0] = fields.lineinfos[0];
     state->lineinfos[1] = fields.lineinfos[1];
   }
-  else {
-    if(rows != state->rows) {
-      for(int bufidx = BUFIDX_PRIMARY; bufidx <= BUFIDX_ALTSCREEN; bufidx++) {
-        VTermLineInfo *oldlineinfo = state->lineinfos[bufidx];
-        if(!oldlineinfo)
-          continue;
+  இல்லையெனில் {
+    எனில்(rows != state->rows) {
+      க்கு(முழு bufidx = BUFIDX_PRIMARY; bufidx <= BUFIDX_ALTSCREEN; bufidx++) {
+        VTerm_வரி_Info *oldlineinfo = state->lineinfos[bufidx];
+        எனில்(!oldlineinfo)
+          தொடர்;
 
-        VTermLineInfo *newlineinfo = vterm_allocator_malloc(state->vt, rows * sizeof(VTermLineInfo));
+        VTerm_வரி_Info *newlineinfo = vterm_allocator_malloc(state->vt, rows * அளவு(VTerm_வரி_Info));
 
-        int row;
-        for(row = 0; row < state->rows && row < rows; row++) {
+        முழு row;
+        க்கு(row = 0; row < state->rows && row < rows; row++) {
           newlineinfo[row] = oldlineinfo[row];
         }
 
-        for( ; row < rows; row++) {
-          newlineinfo[row] = (VTermLineInfo){
+        க்கு( ; row < rows; row++) {
+          newlineinfo[row] = (VTerm_வரி_Info){
             .doublewidth = 0,
           };
         }
@@ -2239,26 +2239,26 @@ static int on_resize(int rows, int cols, void *user)
 
   state->lineinfo = state->lineinfos[state->mode.alt_screen ? BUFIDX_ALTSCREEN : BUFIDX_PRIMARY];
 
-  if(state->at_phantom && state->pos.col < cols-1) {
+  எனில்(state->at_phantom && state->pos.col < cols-1) {
     state->at_phantom = 0;
     state->pos.col++;
   }
 
-  if(state->pos.row < 0)
+  எனில்(state->pos.row < 0)
     state->pos.row = 0;
-  if(state->pos.row >= rows)
+  எனில்(state->pos.row >= rows)
     state->pos.row = rows - 1;
-  if(state->pos.col < 0)
+  எனில்(state->pos.col < 0)
     state->pos.col = 0;
-  if(state->pos.col >= cols)
+  எனில்(state->pos.col >= cols)
     state->pos.col = cols - 1;
 
   updatecursor(state, &oldpos, 1);
 
-  return 1;
+  திரும்பு 1;
 }
 
-static const VTermParserCallbacks parser_callbacks = {
+நிலையான மாறிலி VTermParserCallbacks parser_callbacks = {
   on_text, // text
   on_control, // control
   on_escape, // escape
@@ -2277,30 +2277,30 @@ static const VTermParserCallbacks parser_callbacks = {
  */
 VTermState *vterm_obtain_state(VTerm *vt)
 {
-  if(vt->state)
-    return vt->state;
+  எனில்(vt->state)
+    திரும்பு vt->state;
 
   VTermState *state = vterm_state_new(vt);
-  if (state == NULL)
-    return NULL;
+  எனில் (state == வெற்று)
+    திரும்பு வெற்று;
   vt->state = state;
 
   vterm_parser_set_callbacks(vt, &parser_callbacks, state);
 
-  return state;
+  திரும்பு state;
 }
 
-void vterm_state_reset(VTermState *state, int hard)
+வெறுமை vterm_state_reset(VTermState *state, முழு hard)
 {
-  state->scrollregion_top = 0;
+  state->scrollregion_உச்சி = 0;
   state->scrollregion_bottom = -1;
-  state->scrollregion_left = 0;
-  state->scrollregion_right = -1;
+  state->scrollregion_இடது = 0;
+  state->scrollregion_வலது = -1;
 
   state->mode.keypad          = 0;
   state->mode.cursor          = 0;
   state->mode.autowrap        = 1;
-  state->mode.insert          = 0;
+  state->mode.செருகு          = 0;
   state->mode.newline         = 0;
   state->mode.alt_screen      = 0;
   state->mode.origin          = 0;
@@ -2312,16 +2312,16 @@ void vterm_state_reset(VTermState *state, int hard)
 
   state->vt->mode.ctrl8bit   = 0;
 
-  for(int col = 0; col < state->cols; col++)
-    if(col % 8 == 0)
+  க்கு(முழு col = 0; col < state->cols; col++)
+    எனில்(col % 8 == 0)
       set_col_tabstop(state, col);
-    else
+    இல்லையெனில்
       clear_col_tabstop(state, col);
 
-  for(int row = 0; row < state->rows; row++)
+  க்கு(முழு row = 0; row < state->rows; row++)
     set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
 
-  if(state->callbacks && state->callbacks->initpen)
+  எனில்(state->callbacks && state->callbacks->initpen)
     (*state->callbacks->initpen)(state->cbdata);
 
   vterm_state_resetpen(state);
@@ -2330,9 +2330,9 @@ void vterm_state_reset(VTermState *state, int hard)
       vterm_lookup_encoding(ENC_UTF8,      'u') :
       vterm_lookup_encoding(ENC_SINGLE_94, 'B');
 
-  for(int i = 0; i < 4; i++) {
+  க்கு(முழு i = 0; i < 4; i++) {
     state->encoding[i].enc = default_enc;
-    if(default_enc->init)
+    எனில்(default_enc->init)
       (*default_enc->init)(default_enc, state->encoding[i].data);
   }
 
@@ -2347,7 +2347,7 @@ void vterm_state_reset(VTermState *state, int hard)
   settermprop_bool(state, VTERM_PROP_CURSORBLINK,   1);
   settermprop_int (state, VTERM_PROP_CURSORSHAPE,   VTERM_PROP_CURSORSHAPE_BLOCK);
 
-  if(hard) {
+  எனில்(hard) {
     state->pos.row = 0;
     state->pos.col = 0;
     state->at_phantom = 0;
@@ -2359,12 +2359,12 @@ void vterm_state_reset(VTermState *state, int hard)
   }
 }
 
-void vterm_state_get_cursorpos(const VTermState *state, VTermPos *cursorpos)
+வெறுமை vterm_state_get_cursorpos(மாறிலி VTermState *state, VTermPos *cursorpos)
 {
   *cursorpos = state->pos;
 }
 
-void vterm_state_get_mousestate(const VTermState *state, VTermMouseState *mousestate)
+வெறுமை vterm_state_get_mousestate(மாறிலி VTermState *state, VTermMouseState *mousestate)
 {
   mousestate->pos.col = state->mouse_col;
   mousestate->pos.row = state->mouse_row;
@@ -2372,125 +2372,125 @@ void vterm_state_get_mousestate(const VTermState *state, VTermMouseState *mouses
   mousestate->flags = state->mouse_flags;
 }
 
-void vterm_state_set_callbacks(VTermState *state, const VTermStateCallbacks *callbacks, void *user)
+வெறுமை vterm_state_set_callbacks(VTermState *state, மாறிலி VTermStateCallbacks *callbacks, வெறுமை *user)
 {
-  if(callbacks) {
+  எனில்(callbacks) {
     state->callbacks = callbacks;
     state->cbdata = user;
 
-    if(state->callbacks && state->callbacks->initpen)
+    எனில்(state->callbacks && state->callbacks->initpen)
       (*state->callbacks->initpen)(state->cbdata);
   }
-  else {
-    state->callbacks = NULL;
-    state->cbdata = NULL;
+  இல்லையெனில் {
+    state->callbacks = வெற்று;
+    state->cbdata = வெற்று;
   }
 }
 
-void vterm_state_callbacks_has_premove(VTermState *state)
+வெறுமை vterm_state_callbacks_has_premove(VTermState *state)
 {
   state->callbacks_has_premove = 1;
 }
 
-void *vterm_state_get_cbdata(VTermState *state)
+வெறுமை *vterm_state_get_cbdata(VTermState *state)
 {
-  return state->cbdata;
+  திரும்பு state->cbdata;
 }
 
-void vterm_state_set_unrecognised_fallbacks(VTermState *state, const VTermStateFallbacks *fallbacks, void *user)
+வெறுமை vterm_state_set_unrecognised_fallbacks(VTermState *state, மாறிலி VTermStateFallbacks *fallbacks, வெறுமை *user)
 {
-  if(fallbacks) {
+  எனில்(fallbacks) {
     state->fallbacks = fallbacks;
     state->fbdata = user;
   }
-  else {
-    state->fallbacks = NULL;
-    state->fbdata = NULL;
+  இல்லையெனில் {
+    state->fallbacks = வெற்று;
+    state->fbdata = வெற்று;
   }
 }
 
-void *vterm_state_get_unrecognised_fbdata(VTermState *state)
+வெறுமை *vterm_state_get_unrecognised_fbdata(VTermState *state)
 {
-  return state->fbdata;
+  திரும்பு state->fbdata;
 }
 
-int vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val)
+முழு vterm_state_set_termprop(VTermState *state, VTermProp prop, VTerm_மதிப்பு *val)
 {
   /* Only store the new value of the property if usercode said it was happy.
    * This is especially important for altscreen switching */
-  if(state->callbacks && state->callbacks->settermprop)
-    if(!(*state->callbacks->settermprop)(prop, val, state->cbdata))
-      return 0;
+  எனில்(state->callbacks && state->callbacks->settermprop)
+    எனில்(!(*state->callbacks->settermprop)(prop, val, state->cbdata))
+      திரும்பு 0;
 
-  switch(prop) {
-  case VTERM_PROP_TITLE:
-  case VTERM_PROP_ICONNAME:
-  case VTERM_PROP_CURSORCOLOR:
+  தேர்வு(prop) {
+  நிலை VTERM_PROP_TITLE:
+  நிலை VTERM_PROP_ICONNAME:
+  நிலை VTERM_PROP_CURSORCOLOR:
     // we don't store these, just transparently pass through
-    return 1;
-  case VTERM_PROP_CURSORVISIBLE:
+    திரும்பு 1;
+  நிலை VTERM_PROP_CURSORVISIBLE:
     state->mode.cursor_visible = val->boolean;
-    return 1;
-  case VTERM_PROP_CURSORBLINK:
+    திரும்பு 1;
+  நிலை VTERM_PROP_CURSORBLINK:
     state->mode.cursor_blink = val->boolean;
-    return 1;
-  case VTERM_PROP_CURSORSHAPE:
-    state->mode.cursor_shape = val->number;
-    return 1;
-  case VTERM_PROP_REVERSE:
+    திரும்பு 1;
+  நிலை VTERM_PROP_CURSORSHAPE:
+    state->mode.cursor_shape = val->எண்;
+    திரும்பு 1;
+  நிலை VTERM_PROP_REVERSE:
     state->mode.screen = val->boolean;
-    return 1;
-  case VTERM_PROP_ALTSCREEN:
+    திரும்பு 1;
+  நிலை VTERM_PROP_ALTSCREEN:
     state->mode.alt_screen = val->boolean;
     state->lineinfo = state->lineinfos[state->mode.alt_screen ? BUFIDX_ALTSCREEN : BUFIDX_PRIMARY];
-    if(state->mode.alt_screen) {
+    எனில்(state->mode.alt_screen) {
       VTermRect rect = {0, 0, 0, 0};
       rect.end_row = state->rows;
       rect.end_col = state->cols;
       erase(state, rect, 0);
     }
-    return 1;
-  case VTERM_PROP_MOUSE:
+    திரும்பு 1;
+  நிலை VTERM_PROP_MOUSE:
     state->mouse_flags = 0;
-    if(val->number)
+    எனில்(val->எண்)
       state->mouse_flags |= MOUSE_WANT_CLICK;
-    if(val->number == VTERM_PROP_MOUSE_DRAG)
+    எனில்(val->எண் == VTERM_PROP_MOUSE_DRAG)
       state->mouse_flags |= MOUSE_WANT_DRAG;
-    if(val->number == VTERM_PROP_MOUSE_MOVE)
+    எனில்(val->எண் == VTERM_PROP_MOUSE_MOVE)
       state->mouse_flags |= MOUSE_WANT_MOVE;
-    return 1;
-  case VTERM_PROP_FOCUSREPORT:
+    திரும்பு 1;
+  நிலை VTERM_PROP_FOCUSREPORT:
     state->mode.report_focus = val->boolean;
-    return 1;
+    திரும்பு 1;
 
-  case VTERM_N_PROPS:
-    return 0;
+  நிலை VTERM_N_PROPS:
+    திரும்பு 0;
   }
 
-  return 0;
+  திரும்பு 0;
 }
 
-void vterm_state_focus_in(VTermState *state)
+வெறுமை vterm_state_focus_in(VTermState *state)
 {
-  if(state->mode.report_focus)
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "I");
+  எனில்(state->mode.report_focus)
+    vterm_தள்ளு_output_sprintf_ctrl(state->vt, C1_CSI, "I");
 }
 
-void vterm_state_focus_out(VTermState *state)
+வெறுமை vterm_state_focus_out(VTermState *state)
 {
-  if(state->mode.report_focus)
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "O");
+  எனில்(state->mode.report_focus)
+    vterm_தள்ளு_output_sprintf_ctrl(state->vt, C1_CSI, "O");
 }
 
-const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row)
+மாறிலி VTerm_வரி_Info *vterm_state_get_lineinfo(மாறிலி VTermState *state, முழு row)
 {
-  return state->lineinfo + row;
+  திரும்பு state->lineinfo + row;
 }
 
-void vterm_state_set_selection_callbacks(VTermState *state, const VTermSelectionCallbacks *callbacks, void *user,
-    char *buffer, size_t buflen)
+வெறுமை vterm_state_set_selection_callbacks(VTermState *state, மாறிலி VTermSelectionCallbacks *callbacks, வெறுமை *user,
+    எழுத்து *buffer, size_t buflen)
 {
-  if(buflen && !buffer)
+  எனில்(buflen && !buffer)
     buffer = vterm_allocator_malloc(state->vt, buflen);
 
   state->selection.callbacks = callbacks;
@@ -2499,43 +2499,43 @@ void vterm_state_set_selection_callbacks(VTermState *state, const VTermSelection
   state->selection.buflen    = buflen;
 }
 
-void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTermStringFragment frag)
+வெறுமை vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTermStringFragment frag)
 {
   VTerm *vt = state->vt;
 
-  if(frag.initial) {
+  எனில்(frag.initial) {
     /* TODO: support sending more than one mask bit */
-    static char selection_chars[] = "cpqs";
-    int idx;
-    for(idx = 0; idx < 4; idx++)
-      if(mask & (1 << idx))
-        break;
+    நிலையான எழுத்து selection_chars[] = "cpqs";
+    முழு idx;
+    க்கு(idx = 0; idx < 4; idx++)
+      எனில்(mask & (1 << idx))
+        நிறுத்து;
 
-    vterm_push_output_sprintf_str(vt, C1_OSC, FALSE, "52;%c;", selection_chars[idx]);
+    vterm_தள்ளு_output_sprintf_str(vt, C1_OSC, FALSE, "52;%c;", selection_chars[idx]);
 
     state->tmp.selection.sendpartial = 0;
   }
 
-  if(frag.len) {
+  எனில்(frag.len) {
     size_t bufcur = 0;
-    char *buffer = state->selection.buffer;
+    எழுத்து *buffer = state->selection.buffer;
 
     uint32_t x = 0;
-    int n = 0;
+    முழு n = 0;
 
-    if(state->tmp.selection.sendpartial) {
+    எனில்(state->tmp.selection.sendpartial) {
       n = state->tmp.selection.sendpartial >> 24;
       x = state->tmp.selection.sendpartial & 0xFFFFFF;
 
       state->tmp.selection.sendpartial = 0;
     }
 
-    while((state->selection.buflen - bufcur) >= 4 && frag.len) {
+    போது((state->selection.buflen - bufcur) >= 4 && frag.len) {
       x = (x << 8) | frag.str[0];
       n++;
       frag.str++, frag.len--;
 
-      if(n == 3) {
+      எனில்(n == 3) {
         buffer[0] = base64_one((x >> 18) & 0x3F);
         buffer[1] = base64_one((x >> 12) & 0x3F);
         buffer[2] = base64_one((x >>  6) & 0x3F);
@@ -2546,24 +2546,24 @@ void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTer
         n = 0;
       }
 
-      if(!frag.len || (state->selection.buflen - bufcur) < 4) {
-        if(bufcur)
-          vterm_push_output_bytes(vt, state->selection.buffer, bufcur);
+      எனில்(!frag.len || (state->selection.buflen - bufcur) < 4) {
+        எனில்(bufcur)
+          vterm_தள்ளு_output_bytes(vt, state->selection.buffer, bufcur);
 
         buffer = state->selection.buffer;
         bufcur = 0;
       }
     }
 
-    if(n)
+    எனில்(n)
       state->tmp.selection.sendpartial = (n << 24) | x;
   }
 
-  if(frag.final) {
-    if(state->tmp.selection.sendpartial) {
-      int n      = state->tmp.selection.sendpartial >> 24;
+  எனில்(frag.final) {
+    எனில்(state->tmp.selection.sendpartial) {
+      முழு n      = state->tmp.selection.sendpartial >> 24;
       uint32_t x = state->tmp.selection.sendpartial & 0xFFFFFF;
-      char *buffer = state->selection.buffer;
+      எழுத்து *buffer = state->selection.buffer;
 
       /* n is either 1 or 2 now */
       x <<= (n == 1) ? 16 : 8;
@@ -2573,9 +2573,9 @@ void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTer
       buffer[2] = (n == 1) ? '=' : base64_one((x >>  6) & 0x3F);
       buffer[3] = '=';
 
-      vterm_push_output_sprintf_str(vt, 0, TRUE, "%.*s", 4, buffer);
+      vterm_தள்ளு_output_sprintf_str(vt, 0, TRUE, "%.*s", 4, buffer);
     }
-    else
-      vterm_push_output_sprintf_str(vt, 0, TRUE, "");
+    இல்லையெனில்
+      vterm_தள்ளு_output_sprintf_str(vt, 0, TRUE, "");
   }
 }

@@ -11,10 +11,10 @@
  * contact Tianmiao Hu: tianmiao@acm.org.
  */
 
-#if !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
+#எனில் !defined(AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_)
 #define AFX_STDAFX_H__3389658B_AD83_11D3_9C1E_0090278BBD99__INCLUDED_
 
-#if defined(_MSC_VER) && _MSC_VER > 1000
+#எனில் defined(_MSC_VER) && _MSC_VER > 1000
 #pragma once
 #endif
 
@@ -34,15 +34,15 @@
 #define INC_OLE2	// MS-Windows, get ole2 from windows.h
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if defined(_MSC_VER) && _MSC_VER >= 1400
+#எனில் defined(_MSC_VER) && _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
 #endif
 
-#include <windows.h>
-#include <windowsx.h>
-#include <shlobj.h>
-#include <wchar.h>
+#அந்தர்பாவ <windows.h>
+#அந்தர்பாவ <windowsx.h>
+#அந்தர்பாவ <shlobj.h>
+#அந்தர்பாவ <wchar.h>
 
 #define ResultFromShort(i)  ResultFromScode(MAKE_SCODE(SEVERITY_SUCCESS, 0, (USHORT)(i)))
 
@@ -50,7 +50,7 @@
 //
 #pragma data_seg(".text")
 #define INITGUID
-#include <initguid.h>
+#அந்தர்பாவ <initguid.h>
 
 //
 // The class ID of this Shell extension class.
@@ -78,14 +78,14 @@
 DEFINE_GUID(CLSID_ShellExtension, 0x51eee242, 0xad87, 0x11d3, 0x9c, 0x1e, 0x0, 0x90, 0x27, 0x8b, 0xbd, 0x99);
 
 // this class factory object creates context menu handlers for windows 32 shell
-class CShellExtClassFactory : public IClassFactory
+class CShellExtClassFactory : பொது IClassFactory
 {
-protected:
+பாதுகாக்கப்பட்ட:
     ULONG	m_cRef;
 
-public:
+பொது:
     CShellExtClassFactory();
-    virtual ~CShellExtClassFactory();
+    மெய்நிகர் ~CShellExtClassFactory();
 
     //IUnknown members
     STDMETHODIMP		QueryInterface(REFIID, LPVOID FAR *);
@@ -96,44 +96,44 @@ public:
     STDMETHODIMP		CreateInstance(LPUNKNOWN, REFIID, LPVOID FAR *);
     STDMETHODIMP		LockServer(BOOL);
 };
-typedef CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
+வகைவரை CShellExtClassFactory *LPCSHELLEXTCLASSFACTORY;
 #define MAX_HWND 100
 
 // this is the actual OLE Shell context menu handler
-class CShellExt : public IContextMenu,
+class CShellExt : பொது IContextMenu,
 			 IShellExtInit
 {
-private:
+தனிப்பட்ட:
     BOOL LoadMenuIcon();
 
-protected:
+பாதுகாக்கப்பட்ட:
     ULONG	 m_cRef;
     LPDATAOBJECT m_pDataObj;
     UINT	 m_edit_existing_off;
     HBITMAP	 m_hVimIconBitmap;
 
     // For some reason, this callback must be static
-    static BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam);
+    நிலையான BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam);
 
-    STDMETHODIMP PushToWindow(HWND hParent,
+    STDMETHODIMP தள்ளு_To_Window(HWND hParent,
 	    LPCSTR pszWorkingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int idHWnd);
+	    முழு iShowCmd,
+	    முழு idHWnd);
 
     STDMETHODIMP InvokeSingleGvim(HWND hParent,
 	    LPCWSTR workingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
-	    int iShowCmd,
-	    int gvimExtraOptions);
+	    முழு iShowCmd,
+	    முழு gvimExtraOptions);
 
-public:
-    int		 m_cntOfHWnd;
+பொது:
+    முழு		 m_cntOfHWnd;
     HWND	 m_hWnd[MAX_HWND];
     CShellExt();
-    virtual ~CShellExt();
+    மெய்நிகர் ~CShellExt();
 
     //IUnknown members
     STDMETHODIMP QueryInterface(REFIID, LPVOID FAR *);
@@ -158,10 +158,10 @@ public:
     //IShellExtInit methods
     STDMETHODIMP Initialize(LPCITEMIDLIST pIDFolder,
 	    LPDATAOBJECT pDataObj,
-	    HKEY hKeyID);
+	    HKEY h_சாவி_ID);
 };
 
-typedef CShellExt *LPCSHELLEXT;
+வகைவரை CShellExt *LPCSHELLEXT;
 #pragma data_seg()
 
 #endif

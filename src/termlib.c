@@ -10,26 +10,26 @@
 
 // TERMLIB: Terminal independent database.
 
-#include "vim.h"
-#include "termlib.pro"
+#அந்தர்பாவ "vim.h"
+#அந்தர்பாவ "termlib.pro"
 
-#if !defined(AMIGA) && !defined(VMS)
+#எனில் !defined(AMIGA) && !defined(VMS)
 # include <sgtty.h>
 #endif
 
-static int  getent(char *, char *, FILE *, int);
-static int  nextent(char *, FILE *, int);
-static int  _match(char *, char *);
-static char *_addfmt(char *, char *, int);
-static char *_find(char *, char *);
+நிலையான முழு  getent(எழுத்து *, எழுத்து *, FILE *, முழு);
+நிலையான முழு  nextent(எழுத்து *, FILE *, முழு);
+நிலையான முழு  _match(எழுத்து *, எழுத்து *);
+நிலையான எழுத்து *_addfmt(எழுத்து *, எழுத்து *, முழு);
+நிலையான எழுத்து *_find(எழுத்து *, எழுத்து *);
 
 /*
  * Global variables for termlib
  */
 
-char	*tent;		      // Pointer to terminal entry, set by tgetent
-char	PC = 0;		      // Pad character, default NULL
-char	*UP = 0, *BC = 0;     // Pointers to UP and BC strings from database
+எழுத்து	*tent;		      // Pointer to terminal entry, set by tgetent
+எழுத்து	PC = 0;		      // Pad character, default NULL
+எழுத்து	*UP = 0, *BC = 0;     // Pointers to UP and BC strings from database
 short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 
 /*
@@ -56,151 +56,151 @@ short	ospeed;		      // Baud rate (1-16, 1=300, 16=19200), as in stty
 #ifndef TERMCAPFILE
 # ifdef AMIGA
 #  define TERMCAPFILE "s:termcap"
-# else
+# இல்லையெனில்
 #  ifdef VMS
 #   define TERMCAPFILE "VIMRUNTIME:termcap"
-#  else
+#  இல்லையெனில்
 #   define TERMCAPFILE "/etc/termcap"
 #  endif
 # endif
 #endif
 
-    int
+    முழு
 tgetent(
-    char    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
-    char    *term)		// Name of terminal
+    எழுத்து    *tbuf,		// Buffer to hold termcap entry, TBUFSZ bytes max
+    எழுத்து    *term)		// Name of terminal
 {
-    char    tcbuf[32];		// Temp buffer to handle
-    char    *tcptr = tcbuf;	// extended entries
-    char    *tcap = TERMCAPFILE; // Default termcap file
-    char    *tmp;
+    எழுத்து    tcbuf[32];		// Temp buffer to handle
+    எழுத்து    *tcptr = tcbuf;	// extended entries
+    எழுத்து    *tcap = TERMCAPFILE; // Default termcap file
+    எழுத்து    *tmp;
     FILE    *termcap;
-    int	    retval = 0;
-    int	    len;
+    முழு	    retval = 0;
+    முழு	    len;
 
-    if ((tmp = (char *)mch_getenv((char_u *)"TERMCAP")) != NULL)
+    எனில் ((tmp = (எழுத்து *)mch_getenv((char_u *)"TERMCAP")) != வெற்று)
     {
-	if (*tmp == '/')		// TERMCAP = name of termcap file
+	எனில் (*tmp == '/')		// TERMCAP = name of termcap file
 	{
 	    tcap = tmp ;
-#if defined(AMIGA)
+#எனில் defined(AMIGA)
 	    // Convert /usr/share/lib/termcap to usr:share/lib/termcap
 	    tcap++;
 	    tmp = strchr(tcap, '/');
-	    if (tmp)
+	    எனில் (tmp)
 		*tmp = ':';
 #endif
 	}
-	else				// TERMCAP = termcap entry itself
+	இல்லையெனில்				// TERMCAP = termcap entry itself
 	{
-	    int tlen = strlen(term);
+	    முழு tlen = strlen(term);
 
-	    while (*tmp && *tmp != ':')		// Check if TERM matches
+	    போது (*tmp && *tmp != ':')		// Check if TERM matches
 	    {
-		char *nexttmp;
+		எழுத்து *nexttmp;
 
-		while (*tmp == '|')
+		போது (*tmp == '|')
 		    tmp++;
 		nexttmp  = _find(tmp, ":|");	// Rhialto
-		if (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
+		எனில் (tmp+tlen == nexttmp && _match(tmp, term) == tlen)
 		{
 		    vim_strncpy(tbuf, tmp, TBUFSZ - 1);
 		    tent = tbuf;
-		    return 1;
+		    திரும்பு 1;
 		}
-		else
+		இல்லையெனில்
 		    tmp = nexttmp;
 	    }
 	}
     }
-    if (!(termcap = mch_fopen(tcap, "r")))
+    எனில் (!(termcap = mch_fopen(tcap, "r")))
     {
 	vim_strncpy(tbuf, tcap, TBUFSZ - 1);
-	return -1;
+	திரும்பு -1;
     }
 
     len = 0;
-    while (getent(tbuf + len, term, termcap, TBUFSZ - len))
+    போது (getent(tbuf + len, term, termcap, TBUFSZ - len))
     {
 	tcptr = tcbuf;				// Rhialto
-	if ((term = tgetstr("tc", &tcptr)))	// extended entry
+	எனில் ((term = tgetstr("tc", &tcptr)))	// extended entry
 	{
 	    rewind(termcap);
 	    len = strlen(tbuf);
 	}
-	else
+	இல்லையெனில்
 	{
 	    retval = 1;
 	    tent = tbuf;	// reset it back to the beginning
-	    break;
+	    நிறுத்து;
 	}
     }
     fclose(termcap);
-    return retval;
+    திரும்பு retval;
 }
 
-    static int
-getent(char *tbuf, char *term, FILE *termcap, int buflen)
+    நிலையான முழு
+getent(எழுத்து *tbuf, எழுத்து *term, FILE *termcap, முழு buflen)
 {
-    char    *tptr;
-    int	    tlen = strlen(term);
+    எழுத்து    *tptr;
+    முழு	    tlen = strlen(term);
 
-    while (nextent(tbuf, termcap, buflen))	// For each possible entry
+    போது (nextent(tbuf, termcap, buflen))	// For each possible entry
     {
 	tptr = tbuf;
-	while (*tptr && *tptr != ':')		// : terminates name field
+	போது (*tptr && *tptr != ':')		// : terminates name field
 	{
-	    char    *nexttptr;
+	    எழுத்து    *nexttptr;
 
-	    while (*tptr == '|')		// | separates names
+	    போது (*tptr == '|')		// | separates names
 		tptr++;
 	    nexttptr = _find(tptr, ":|");	// Rhialto
-	    if (tptr + tlen == nexttptr &&
+	    எனில் (tptr + tlen == nexttptr &&
 		_match(tptr, term) == tlen)	// FOUND!
 	    {
 		tent = tbuf;
-		return 1;
+		திரும்பு 1;
 	    }
-	    else				// Look for next name
+	    இல்லையெனில்				// Look for next name
 		tptr = nexttptr;
 	}
     }
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * Read 1 entry from TERMCAP file.
  */
-    static int
-nextent(char *tbuf, FILE *termcap, int buflen)
+    நிலையான முழு
+nextent(எழுத்து *tbuf, FILE *termcap, முழு buflen)
 {
-    char *lbuf = tbuf;				// lbuf=line buffer
+    எழுத்து *lbuf = tbuf;				// lbuf=line buffer
 				// read lines straight into buffer
 
-    while (lbuf < tbuf+buflen &&		// There's room and
-	  fgets(lbuf, (int)(tbuf+buflen-lbuf), termcap)) // another line
+    போது (lbuf < tbuf+buflen &&		// There's room and
+	  fgets(lbuf, (முழு)(tbuf+buflen-lbuf), termcap)) // another line
     {
-	int llen = strlen(lbuf);
+	முழு llen = strlen(lbuf);
 
-	if (*lbuf == '#')			// eat comments
-	    continue;
-	if (lbuf[-1] == ':' &&			// and whitespace
+	எனில் (*lbuf == '#')			// eat comments
+	    தொடர்;
+	எனில் (lbuf[-1] == ':' &&			// and whitespace
 	    lbuf[0] == '\t' &&
 	    lbuf[1] == ':')
 	{
 	    STRMOVE(lbuf, lbuf + 2);
 	    llen -= 2;
 	}
-	if (lbuf[llen-2] == '\\')		// and continuations
+	எனில் (lbuf[llen-2] == '\\')		// and continuations
 	    lbuf += llen-2;
-	else
+	இல்லையெனில்
 	{
 	    lbuf[llen-1]=0;			// no continuation, return
-	    return 1;
+	    திரும்பு 1;
 	}
     }
 
-    return 0;					// ran into end of file
+    திரும்பு 0;					// ran into end of file
 }
 
 /*
@@ -214,12 +214,12 @@ nextent(char *tbuf, FILE *termcap, int buflen)
  * Returned values: 1 for success, 0 for failure.
  */
 
-    int
-tgetflag(char *id)
+    முழு
+tgetflag(எழுத்து *id)
 {
-    char    buf[256], *ptr = buf;
+    எழுத்து    buf[256], *ptr = buf;
 
-    return tgetstr(id, &ptr) ? 1 : 0;
+    திரும்பு tgetstr(id, &ptr) ? 1 : 0;
 }
 
 /*
@@ -232,16 +232,16 @@ tgetflag(char *id)
  * Returned values: -1 for failure, else numerical value.
  */
 
-    int
-tgetnum(char *id)
+    முழு
+tgetnum(எழுத்து *id)
 {
-    char *ptr, buf[256];
+    எழுத்து *ptr, buf[256];
     ptr = buf;
 
-    if (tgetstr(id, &ptr))
-	return atoi(buf);
-    else
-	return 0;
+    எனில் (tgetstr(id, &ptr))
+	திரும்பு atoi(buf);
+    இல்லையெனில்
+	திரும்பு 0;
 }
 
 /*
@@ -271,92 +271,92 @@ tgetnum(char *id)
  *
  */
 
-    char *
-tgetstr(char *id, char **buf)
+    எழுத்து *
+tgetstr(எழுத்து *id, எழுத்து **buf)
 {
-    int		len = strlen(id);
-    char	*tmp=tent;
-    char	*hold;
-    int		i;
+    முழு		len = strlen(id);
+    எழுத்து	*tmp=tent;
+    எழுத்து	*hold;
+    முழு		i;
 
-    do
+    செய்
     {
 	tmp = _find(tmp, ":");			// For each field
-	while (*tmp == ':')			// skip empty fields
+	போது (*tmp == ':')			// skip empty fields
 	    tmp++;
-	if (!*tmp)
-	    break;
+	எனில் (!*tmp)
+	    நிறுத்து;
 
-	if (_match(id, tmp) == len)
+	எனில் (_match(id, tmp) == len)
 	{
 	    tmp += len;				// find '=' '@' or '#'
-	    if (*tmp == '@')			// :xx@: entry for tc
-		return 0;			// deleted entry
+	    எனில் (*tmp == '@')			// :xx@: entry for tc
+		திரும்பு 0;			// deleted entry
 	    hold= *buf;
-	    while (*++tmp && *tmp != ':')	// not at end of field
+	    போது (*++tmp && *tmp != ':')	// not at end of field
 		{
-		switch(*tmp)
+		தேர்வு(*tmp)
 		{
-		case '\\':			// Expand escapes here
-		    switch(*++tmp)
+		நிலை '\\':			// Expand escapes here
+		    தேர்வு(*++tmp)
 		    {
-		    case 0:			// ignore backslashes
+		    நிலை 0:			// ignore backslashes
 			tmp--;			// at end of entry
-			break;			// shouldn't happen
-		    case 'e':
-		    case 'E':			// ESC
+			நிறுத்து;			// shouldn't happen
+		    நிலை 'e':
+		    நிலை 'E':			// ESC
 			*(*buf)++ = ESC;
-			break;
-		    case 'n':			// \n
+			நிறுத்து;
+		    நிலை 'n':			// \n
 			*(*buf)++ = '\n';
-			break;
-		    case 'r':			// \r
+			நிறுத்து;
+		    நிலை 'r':			// \r
 			*(*buf)++ = '\r';
-			break;
-		    case 't':			// \t
+			நிறுத்து;
+		    நிலை 't':			// \t
 			*(*buf)++ = '\t';
-			break;
-		    case 'b':			// \b
+			நிறுத்து;
+		    நிலை 'b':			// \b
 			*(*buf)++ = '\b';
-			break;
-		    case 'f':			// \f
+			நிறுத்து;
+		    நிலை 'f':			// \f
 			*(*buf)++ = '\f';
-			break;
-		    case '0':			// \nnn
-		    case '1':
-		    case '2':
-		    case '3':
-		    case '4':
-		    case '5':
-		    case '6':
-		    case '7':
-		    case '8':
-		    case '9':
+			நிறுத்து;
+		    நிலை '0':			// \nnn
+		    நிலை '1':
+		    நிலை '2':
+		    நிலை '3':
+		    நிலை '4':
+		    நிலை '5':
+		    நிலை '6':
+		    நிலை '7':
+		    நிலை '8':
+		    நிலை '9':
 			**buf = 0;
 			    // get up to three digits
-			for (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
+			க்கு (i = 0; i < 3 && VIM_ISDIGIT(*tmp); ++i)
 			    **buf = **buf * 8 + *tmp++ - '0';
 			(*buf)++;
 			tmp--;
-			break;
-		    default:			// \x, for all other x
+			நிறுத்து;
+		    இயல்பு:			// \x, for all other x
 			*(*buf)++= *tmp;
 		    }
-		    break;
-		case '^':			// control characters
+		    நிறுத்து;
+		நிலை '^':			// control characters
 		    ++tmp;
 		    *(*buf)++ = Ctrl_chr(*tmp);
-		    break;
-		default:
+		    நிறுத்து;
+		இயல்பு:
 		    *(*buf)++ = *tmp;
 		}
 	    }
 	    *(*buf)++ = 0;
-	    return hold;
+	    திரும்பு hold;
 	}
-    } while (*tmp);
+    } போது (*tmp);
 
-    return 0;
+    திரும்பு 0;
 }
 
 /*
@@ -385,132 +385,132 @@ tgetstr(char *id, char **buf)
  *	%D	 reverse coding (x-2*(x%16)), no output.
  */
 
-    char *
+    எழுத்து *
 tgoto(
-    char    *cm,				// cm string, from termcap
-    int	    col,				// column, x position
-    int	    line)				// line, y position
+    எழுத்து    *cm,				// cm string, from termcap
+    முழு	    col,				// column, x position
+    முழு	    வரி)				// line, y position
 {
-    char    gx, gy,				// x, y
+    எழுத்து    gx, gy,				// x, y
 	*ptr,					// pointer in 'cm'
 	reverse = 0,				// reverse flag
 	*bufp,					// pointer in returned string
 	addup = 0,				// add upline
 	addbak = 0,				// add backup
 	c;
-    static char buffer[32];
+    நிலையான எழுத்து buffer[32];
 
-    if (!cm)
-	return "OOPS";				// Kludge, but standard
+    எனில் (!cm)
+	திரும்பு "OOPS";				// Kludge, but standard
 
     bufp = buffer;
     ptr = cm;
 
-    while (*ptr)
+    போது (*ptr)
     {
-	if ((c = *ptr++) != '%')		// normal char
+	எனில் ((c = *ptr++) != '%')		// normal char
 	{
 	    *bufp++ = c;
 	}
-	else
+	இல்லையெனில்
 	{				// % escape
-	    switch(c = *ptr++)
+	    தேர்வு(c = *ptr++)
 	    {
-	    case 'd':				// decimal
-		bufp = _addfmt(bufp, "%d", line);
-		line = col;
-		break;
-	    case '2':				// 2 digit decimal
-		bufp = _addfmt(bufp, "%02d", line);
-		line = col;
-		break;
-	    case '3':				// 3 digit decimal
-		bufp = _addfmt(bufp, "%03d", line);
-		line = col;
-		break;
-	    case '>':				// %>xy: if >x, add y
+	    நிலை 'd':				// decimal
+		bufp = _addfmt(bufp, "%d", வரி);
+		வரி = col;
+		நிறுத்து;
+	    நிலை '2':				// 2 digit decimal
+		bufp = _addfmt(bufp, "%02d", வரி);
+		வரி = col;
+		நிறுத்து;
+	    நிலை '3':				// 3 digit decimal
+		bufp = _addfmt(bufp, "%03d", வரி);
+		வரி = col;
+		நிறுத்து;
+	    நிலை '>':				// %>xy: if >x, add y
 		gx = *ptr++;
 		gy = *ptr++;
-		if (col>gx) col += gy;
-		if (line>gx) line += gy;
-		break;
-	    case '+':				// %+c: add c
-		line += *ptr++;
-	    case '.':				// print x/y
-		if (line == '\t' ||		// these are
-		   line == '\n' ||		// chars that
-		   line == '\004' ||		// UNIX hates
-		   line == '\0')
+		எனில் (col>gx) col += gy;
+		எனில் (வரி>gx) வரி += gy;
+		நிறுத்து;
+	    நிலை '+':				// %+c: add c
+		வரி += *ptr++;
+	    நிலை '.':				// print x/y
+		எனில் (வரி == '\t' ||		// these are
+		   வரி == '\n' ||		// chars that
+		   வரி == '\004' ||		// UNIX hates
+		   வரி == '\0')
 		{
-		    line++;			// so go to next pos
-		    if (reverse == (line == col))
+		    வரி++;			// so go to next pos
+		    எனில் (reverse == (வரி == col))
 			addup=1;		// and mark UP
-		    else
+		    இல்லையெனில்
 			addbak=1;		// or BC
 		}
-		*bufp++=line;
-		line = col;
-		break;
-	    case 'r':				// r: reverse
-		gx = line;
-		line = col;
+		*bufp++=வரி;
+		வரி = col;
+		நிறுத்து;
+	    நிலை 'r':				// r: reverse
+		gx = வரி;
+		வரி = col;
 		col = gx;
 		reverse = 1;
-		break;
-	    case 'i':			// increment (1-origin screen)
+		நிறுத்து;
+	    நிலை 'i':			// increment (1-origin screen)
 		col++;
-		line++;
-		break;
-	    case '%':				// %%=% literally
+		வரி++;
+		நிறுத்து;
+	    நிலை '%':				// %%=% literally
 		*bufp++='%';
-		break;
-	    case 'n':				// magic DM2500 code
-		line ^= 0140;
+		நிறுத்து;
+	    நிலை 'n':				// magic DM2500 code
+		வரி ^= 0140;
 		col ^= 0140;
-		break;
-	    case 'B':				// bcd encoding
-		line = line/10<<4+line%10;
+		நிறுத்து;
+	    நிலை 'B':				// bcd encoding
+		வரி = வரி/10<<4+வரி%10;
 		col = col/10<<4+col%10;
-		break;
-	    case 'D':				// magic Delta Data code
-		line = line-2*(line&15);
+		நிறுத்து;
+	    நிலை 'D':				// magic Delta Data code
+		வரி = வரி-2*(வரி&15);
 		col = col-2*(col&15);
-		break;
-	    default:				// Unknown escape
-		return "OOPS";
+		நிறுத்து;
+	    இயல்பு:				// Unknown escape
+		திரும்பு "OOPS";
 	    }
 	}
     }
 
-    if (addup)					// add upline
-	if (UP)
+    எனில் (addup)					// add upline
+	எனில் (UP)
 	{
 	    ptr=UP;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    போது (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    எனில் (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    போது (*ptr)
 		*bufp++ = *ptr++;
 	}
 
-    if (addbak)					// add backspace
-	if (BC)
+    எனில் (addbak)					// add backspace
+	எனில் (BC)
 	{
 	    ptr=BC;
-	    while (VIM_ISDIGIT(*ptr) || *ptr == '.')
+	    போது (VIM_ISDIGIT(*ptr) || *ptr == '.')
 		ptr++;
-	    if (*ptr == '*')
+	    எனில் (*ptr == '*')
 		ptr++;
-	    while (*ptr)
+	    போது (*ptr)
 		*bufp++ = *ptr++;
 	}
-	else
+	இல்லையெனில்
 	    *bufp++='\b';
 
     *bufp = 0;
 
-    return(buffer);
+    திரும்பு(buffer);
 }
 
 /*
@@ -539,49 +539,49 @@ long _bauds[16]={
     600,    1200,   1800,   2400,
     4800,   9600,   19200,  19200 };
 
-    int
+    முழு
 tputs(
-    char *cp,				// string to print
-    int affcnt,				// Number of lines affected
-    void (*outc)(unsigned int))		// routine to output 1 character
+    எழுத்து *cp,				// string to print
+    முழு affcnt,				// Number of lines affected
+    வெறுமை (*outc)(unsigned முழு))		// routine to output 1 character
 {
     long    frac,			// 10^(#digits after decimal point)
 	counter,			// digits
-	atol(const char *);
+	atol(மாறிலி எழுத்து *);
 
-    if (VIM_ISDIGIT(*cp))
+    எனில் (VIM_ISDIGIT(*cp))
     {
 	counter = 0;
 	frac = 1000;
-	while (VIM_ISDIGIT(*cp))
+	போது (VIM_ISDIGIT(*cp))
 	    counter = counter * 10L + (long)(*cp++ - '0');
-	if (*cp == '.')
-	    while (VIM_ISDIGIT(*++cp))
+	எனில் (*cp == '.')
+	    போது (VIM_ISDIGIT(*++cp))
 	    {
 		counter = counter * 10L + (long)(*cp++ - '0');
 		frac = frac * 10;
 	    }
-	if (*cp!='*')			// multiply by affected lines
+	எனில் (*cp!='*')			// multiply by affected lines
 	{
-	    if (affcnt>1) affcnt = 1;
+	    எனில் (affcnt>1) affcnt = 1;
 	}
-	else
+	இல்லையெனில்
 	    cp++;
 
 	// Calculate number of characters for padding counter/frac ms delay
-	if (ospeed)
+	எனில் (ospeed)
 	    counter = (counter * _bauds[ospeed] * (long)affcnt) / frac;
 
-	while (*cp)			// output string
+	போது (*cp)			// output string
 	    (*outc)(*cp++);
-	if (ospeed)
-	    while (counter--)		// followed by pad characters
+	எனில் (ospeed)
+	    போது (counter--)		// followed by pad characters
 		(*outc)(PC);
     }
-    else
-	while (*cp)
+    இல்லையெனில்
+	போது (*cp)
 	    (*outc)(*cp++);
-    return 0;
+    திரும்பு 0;
 }
 
 /*
@@ -590,45 +590,45 @@ tputs(
  * Purpose: Utility routines for TERMLIB functions.
  * Returns length of text common to s1 and s2.
  */
-    static int
-_match(char *s1, char *s2)
+    நிலையான முழு
+_match(எழுத்து *s1, எழுத்து *s2)
 {
-    int i = 0;
+    முழு i = 0;
 
-    while (s1[i] && s1[i] == s2[i])
+    போது (s1[i] && s1[i] == s2[i])
 	i++;
 
-    return i;
+    திரும்பு i;
 }
 
 /*
  * finds next c in s that's a member of set, returns pointer
  */
-    static char *
-_find(char *s, char *set)
+    நிலையான எழுத்து *
+_find(எழுத்து *s, எழுத்து *set)
 {
-    for (; *s; s++)
+    க்கு (; *s; s++)
     {
-	char	*ptr = set;
+	எழுத்து	*ptr = set;
 
-	while (*ptr && *s != *ptr)
+	போது (*ptr && *s != *ptr)
 	    ptr++;
 
-	if (*ptr)
-	    return s;
+	எனில் (*ptr)
+	    திரும்பு s;
     }
 
-    return s;
+    திரும்பு s;
 }
 
 /*
  * add val to buf according to format fmt
  */
-    static char *
-_addfmt(char *buf, char *fmt, int val)
+    நிலையான எழுத்து *
+_addfmt(எழுத்து *buf, எழுத்து *fmt, முழு val)
 {
     sprintf(buf, fmt, val);
-    while (*buf)
+    போது (*buf)
 	buf++;
-    return buf;
+    திரும்பு buf;
 }

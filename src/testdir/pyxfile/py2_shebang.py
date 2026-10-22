@@ -1,4 +1,4 @@
 #!/usr/bin/python2
 
-import sys
+இறக்குமதி sys
 print(sys.version)

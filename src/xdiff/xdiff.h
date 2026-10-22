@@ -20,11 +20,11 @@
  *
  */
 
-#if !defined(XDIFF_H)
+#எனில் !defined(XDIFF_H)
 #define XDIFF_H
 
 #ifdef __cplusplus
-extern "C" {
+வெளி "C" {
 #endif /* #ifdef __cplusplus */
 
 /* xpparm_t.flags */
@@ -39,7 +39,7 @@ extern "C" {
 			      XDF_IGNORE_WHITESPACE_AT_EOL | \
 			      XDF_IGNORE_CR_AT_EOL)
 
-#define XDF_IGNORE_BLANK_LINES (1 << 7)
+#define XDF_IGNORE_BLANK_வரிகள் (1 << 7)
 
 #define XDF_PATIENCE_DIFF (1 << 14)
 #define XDF_HISTOGRAM_DIFF (1 << 15)
@@ -68,61 +68,61 @@ extern "C" {
 #define XDL_MERGE_DIFF3 1
 #define XDL_MERGE_ZEALOUS_DIFF3 2
 
-typedef struct s_mmfile {
-	char *ptr;
+வகைவரை கட்டமைப்பு s_mmfile {
+	எழுத்து *ptr;
 	long size;
 } mmfile_t;
 
-typedef struct s_mmbuffer {
-	char *ptr;
+வகைவரை கட்டமைப்பு s_mmbuffer {
+	எழுத்து *ptr;
 	long size;
 } mmbuffer_t;
 
-typedef struct s_xpparam {
+வகைவரை கட்டமைப்பு s_xpparam {
 	unsigned long flags;
 
 	/* -I<regex> */
- #if 0  // unused by Vim
+ #எனில் 0  // unused by Vim
 	regex_t **ignore_regex;
 	size_t ignore_regex_nr;
 #endif
 
 	/* See Documentation/diff-options.adoc. */
-	char **anchors;
+	எழுத்து **anchors;
 	size_t anchors_nr;
 } xpparam_t;
 
-typedef struct s_xdemitcb {
-	void *priv;
-	int (*out_hunk)(void *,
+வகைவரை கட்டமைப்பு s_xdemitcb {
+	வெறுமை *priv;
+	முழு (*out_hunk)(வெறுமை *,
 			long old_begin, long old_nr,
 			long new_begin, long new_nr,
-			const char *func, long funclen);
-	int (*out_line)(void *, mmbuffer_t *, int);
+			மாறிலி எழுத்து *func, long funclen);
+	முழு (*out_வரி)(வெறுமை *, mmbuffer_t *, முழு);
 } xdemitcb_t;
 
-typedef long (*find_func_t)(const char *line, long line_len, char *buffer, long buffer_size, void *priv);
+வகைவரை long (*find_func_t)(மாறிலி எழுத்து *வரி, long வரி_len, எழுத்து *buffer, long buffer_size, வெறுமை *priv);
 
-typedef int (*xdl_emit_hunk_consume_func_t)(long start_a, long count_a,
-					    long start_b, long count_b,
-					    void *cb_data);
+வகைவரை முழு (*xdl_emit_hunk_consume_func_t)(long start_a, long மொத்தம்_a,
+					    long start_b, long மொத்தம்_b,
+					    வெறுமை *cb_data);
 
-typedef struct s_xdemitconf {
+வகைவரை கட்டமைப்பு s_xdemitconf {
 	long ctxlen;
 	long interhunkctxlen;
 	unsigned long flags;
 	find_func_t find_func;
-	void *find_func_priv;
+	வெறுமை *find_func_priv;
 	xdl_emit_hunk_consume_func_t hunk_func;
 } xdemitconf_t;
 
-typedef struct s_bdiffparam {
+வகைவரை கட்டமைப்பு s_bdiffparam {
 	long bsize;
 } bdiffparam_t;
 
 #ifdef VMS
 # include "[]vim.h"
-#else
+#இல்லையெனில்
 # include "../vim.h"
 #endif
 
@@ -131,27 +131,27 @@ typedef struct s_bdiffparam {
 #define xdl_free(ptr) vim_free(ptr)
 #define xdl_realloc(ptr,x) vim_realloc((ptr),(x))
 
-void *xdl_mmfile_first(mmfile_t *mmf, long *size);
+வெறுமை *xdl_mmfile_first(mmfile_t *mmf, long *size);
 long xdl_mmfile_size(mmfile_t *mmf);
 
-int xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
-	     xdemitconf_t const *xecfg, xdemitcb_t *ecb);
+முழு xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t மாறிலி *xpp,
+	     xdemitconf_t மாறிலி *xecfg, xdemitcb_t *ecb);
 
-typedef struct s_xmparam {
+வகைவரை கட்டமைப்பு s_xmparam {
 	xpparam_t xpp;
-	int marker_size;
-	int level;
-	int favor;
-	int style;
-	const char *ancestor;	/* label for orig */
-	const char *file1;	/* label for mf1 */
-	const char *file2;	/* label for mf2 */
+	முழு marker_size;
+	முழு level;
+	முழு favor;
+	முழு style;
+	மாறிலி எழுத்து *ancestor;	/* label for orig */
+	மாறிலி எழுத்து *file1;	/* label for mf1 */
+	மாறிலி எழுத்து *file2;	/* label for mf2 */
 } xmparam_t;
 
 #define DEFAULT_CONFLICT_MARKER_SIZE 7
 
-int xdl_merge(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
-		xmparam_t const *xmp, mmbuffer_t *result);
+முழு xdl_merge(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
+		xmparam_t மாறிலி *xmp, mmbuffer_t *result);
 
 #ifdef __cplusplus
 }

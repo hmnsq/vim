@@ -7,39 +7,39 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#if defined(FEAT_IMAGE_KITTY)
+#எனில் defined(FEAT_IMAGE_KITTY)
 
-typedef struct
+வகைவரை கட்டமைப்பு
 {
     bool transmitted; // If image data has been transmitted to terminal
 } image_kitty_T;
 
-typedef struct
+வகைவரை கட்டமைப்பு
 {
-    int n_ids; // Number of placements ids used for previous redraw
+    முழு n_ids; // Number of placements ids used for previous redraw
 } image_placement_kitty_T;
 
-    int
+    முழு
 image_kitty_init(image_T *img)
 {
     image_kitty_T *ctx = ALLOC_CLEAR_ONE(image_kitty_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    எனில் (ctx == வெற்று)
+	திரும்பு FAIL;
 
     img->backend_data = ctx;
-    return OK;
+    திரும்பு OK;
 }
 
-    void
+    வெறுமை
 image_kitty_uninit(image_T *img)
 {
-    if (((image_kitty_T *)img->backend_data)->transmitted)
+    எனில் (((image_kitty_T *)img->backend_data)->transmitted)
     {
 	// Delete image data from terminal
-	vim_snprintf((char *)IObuff, IOSIZE,
+	vim_snprintf((எழுத்து *)IObuff, IOSIZE,
 		"\033_Ga=d,d=I,i=%d,q=2\033\\", img->id);
 
 	out_str((char_u *)IObuff);
@@ -48,19 +48,19 @@ image_kitty_uninit(image_T *img)
     vim_free(img->backend_data);
 }
 
-    int
+    முழு
 image_placement_kitty_init(image_placement_T *place)
 {
     image_placement_kitty_T *ctx = ALLOC_CLEAR_ONE(image_placement_kitty_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    எனில் (ctx == வெற்று)
+	திரும்பு FAIL;
 
     place->backend_data = ctx;
-    return OK;
+    திரும்பு OK;
 }
 
-    void
+    வெறுமை
 image_placement_kitty_uninit(image_placement_T *place)
 {
     vim_free(place->backend_data);
@@ -69,37 +69,37 @@ image_placement_kitty_uninit(image_placement_T *place)
 /*
  * Transmit image data to terminal if it hasn't already been done.
  */
-    static void
+    நிலையான வெறுமை
 transmit_image(image_T *img)
 {
-    static char buf[4096 + 3]; // Extra bytes for NUL and terminator
+    நிலையான எழுத்து buf[4096 + 3]; // Extra bytes for NUL and terminator
 
     int_u   off = 0;
     int_u   sz;
     bool    first = true;
-    int	    width, height;
+    முழு	    width, height;
 
-    if (likely(((image_kitty_T *)img->backend_data)->transmitted))
-	return;
+    எனில் (likely(((image_kitty_T *)img->backend_data)->transmitted))
+	திரும்பு;
 
     image_get_dimensions(img, &width, &height);
     sz = img->fmt * width * height;
 
-    while (off < sz)
+    போது (off < sz)
     {
 	int_u chunk_sz = MIN(4096 * 3 / 4, sz - off);
 	bool more = off + chunk_sz < sz;
 	long encoded;
 
-	if (unlikely(first))
+	எனில் (unlikely(first))
 	{
-	    vim_snprintf(buf, sizeof(buf),
+	    vim_snprintf(buf, அளவு(buf),
 		    "\033_Ga=t,i=%d,f=%d,s=%u,v=%u,m=%d,q=2;", img->id,
 		    img->fmt * 8, width, height, more);
 	    first = false;
 	}
-	else
-	    vim_snprintf(buf, sizeof(buf), "\033_Gm=%d;", more);
+	இல்லையெனில்
+	    vim_snprintf(buf, அளவு(buf), "\033_Gm=%d;", more);
 	out_str((char_u *)buf);
 
 	encoded = base64_encode_buf((char_u *)buf, img->data + off, chunk_sz);
@@ -116,41 +116,41 @@ transmit_image(image_T *img)
     out_flush();
 }
 
-    static void
-clear_placement(int id, int place_id)
+    நிலையான வெறுமை
+clear_placement(முழு id, முழு place_id)
 {
-    vim_snprintf((char *)IObuff, IOSIZE,
+    vim_snprintf((எழுத்து *)IObuff, IOSIZE,
 	    "\033_Ga=d,d=i,i=%d,p=%d,q=2\033\\", id, place_id);
 
     out_str((char_u *)IObuff);
 }
 
-    void
+    வெறுமை
 image_placement_kitty_draw(image_placement_T *place)
 {
     image_T		    *img = place->img;
     image_placement_kitty_T *ctx = place->backend_data;
     pixman_box32_t	    *rects;
-    int			    n_rects;
+    முழு			    n_rects;
 
     rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (n_rects > PLACEMENT_ID_INC)
-	return;
+    எனில் (n_rects > PLACEMENT_ID_INC)
+	திரும்பு;
 
     transmit_image(img);
 
-    if (rects == NULL)
+    எனில் (rects == வெற்று)
 	// Not sure if this can happen...
-	return;
+	திரும்பு;
 
-    for (int i = 0; i < n_rects; i++)
+    க்கு (முழு i = 0; i < n_rects; i++)
     {
 	pixman_box32_t rect = rects[i];
 
-	int rect_id = place->id + i; // The placement id of each rect is
+	முழு rect_id = place->id + i; // The placement id of each rect is
 				     // "place->id + i".
-	int row, col;
-	int x, y, w, h;
+	முழு row, col;
+	முழு x, y, w, h;
 
 	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, false);
 
@@ -172,7 +172,7 @@ image_placement_kitty_draw(image_placement_T *place)
 	// On kitty terminal it seems to scroll the terminal, messing up the
 	// screen.
 	vim_snprintf(
-		(char *)IObuff, IOSIZE,
+		(எழுத்து *)IObuff, IOSIZE,
 		"\033_Ga=p,i=%d,p=%d,x=%u,y=%u,w=%u,h=%u,z=0,q=2,C=1\033\\",
 		img->id, rect_id,
 		x, y, w, h);
@@ -184,21 +184,21 @@ image_placement_kitty_draw(image_placement_T *place)
     }
 
     // Clear all placements that have not been reused.
-    for (int i = n_rects; i < ctx->n_ids; i++)
+    க்கு (முழு i = n_rects; i < ctx->n_ids; i++)
 	clear_placement(img->id, place->id + i);
 
     ctx->n_ids = n_rects;
 }
 
-    void
+    வெறுமை
 image_placement_kitty_clear(image_placement_T *place)
 {
     image_placement_kitty_T *ctx = place->backend_data;
 
-    if (ctx->n_ids == 0)
-	return;
+    எனில் (ctx->n_ids == 0)
+	திரும்பு;
 
-    for (int i = 0; i < ctx->n_ids; i++)
+    க்கு (முழு i = 0; i < ctx->n_ids; i++)
 	clear_placement(place->img->id, place->id + i);
     out_flush();
     ctx->n_ids = 0;

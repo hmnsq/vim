@@ -17,40 +17,40 @@
  * The 'scrolloff' option makes this a bit complicated.
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-static void redraw_for_cursorline(win_T *wp);
-static int scrolljump_value(void);
-static int check_top_offset(void);
-static void curs_rows(win_T *wp);
+நிலையான வெறுமை redraw_for_cursorline(win_T *wp);
+நிலையான முழு scrolljump_மதிப்பு(வெறுமை);
+நிலையான முழு check_உச்சி_offset(வெறுமை);
+நிலையான வெறுமை curs_rows(win_T *wp);
 
-typedef struct
+வகைவரை கட்டமைப்பு
 {
     linenr_T	    lnum;	// line number
 #ifdef FEAT_DIFF
-    int		    fill;	// filler lines
+    முழு		    fill;	// filler lines
 #endif
-    int		    height;	// height of added line
+    முழு		    height;	// height of added line
 } lineoff_T;
 
-static void topline_back(lineoff_T *lp);
-static void botline_forw(lineoff_T *lp);
+நிலையான வெறுமை topline_back(lineoff_T *lp);
+நிலையான வெறுமை botline_forw(lineoff_T *lp);
 
 /*
  * Get the number of screen lines skipped with "wp->w_skipcol".
  */
-    static int
+    நிலையான முழு
 adjust_plines_for_skipcol(win_T *wp)
 {
-    if (wp->w_skipcol == 0)
-	return 0;
+    எனில் (wp->w_skipcol == 0)
+	திரும்பு 0;
 
-    int width = wp->w_width - win_col_off(wp);
-    int w2 = width + win_col_off2(wp);
-    if (wp->w_skipcol >= width && w2 > 0)
-	return (wp->w_skipcol - width) / w2 + 1;
+    முழு width = wp->w_width - win_col_off(wp);
+    முழு w2 = width + win_col_off2(wp);
+    எனில் (wp->w_skipcol >= width && w2 > 0)
+	திரும்பு (wp->w_skipcol - width) / w2 + 1;
 
-    return 0;
+    திரும்பு 0;
 }
 
 /*
@@ -58,38 +58,38 @@ adjust_plines_for_skipcol(win_T *wp)
  * whether it is the first line, whether w_skipcol is non-zero and limiting to
  * the window height.
  */
-    int
-plines_correct_topline(win_T *wp, linenr_T lnum, int limit_winheight)
+    முழு
+plines_correct_topline(win_T *wp, linenr_T lnum, முழு limit_winheight)
 {
-    int n;
+    முழு n;
 #ifdef FEAT_DIFF
-    if (lnum == wp->w_topline)
+    எனில் (lnum == wp->w_topline)
 	n = plines_win_nofill(wp, lnum, FALSE) + wp->w_topfill;
-    else
+    இல்லையெனில்
 #endif
 	n = plines_win(wp, lnum, FALSE);
-    if (lnum == wp->w_topline)
+    எனில் (lnum == wp->w_topline)
 	n -= adjust_plines_for_skipcol(wp);
-    if (limit_winheight && n > wp->w_height)
+    எனில் (limit_winheight && n > wp->w_height)
 	n = wp->w_height;
-    return n;
+    திரும்பு n;
 }
 
 /*
  * Compute wp->w_botline for the current wp->w_topline.  Can be called after
  * wp->w_topline changed.
  */
-    static void
+    நிலையான வெறுமை
 comp_botline(win_T *wp)
 {
-    int		n;
+    முழு		n;
     linenr_T	lnum;
-    int		done;
-    int		i = 0;
-    int		use_cache;
+    முழு		done;
+    முழு		i = 0;
+    முழு		use_cache;
 #ifdef FEAT_FOLDING
     linenr_T    last;
-    int		folded;
+    முழு		folded;
 #endif
 
     /*
@@ -114,70 +114,70 @@ comp_botline(win_T *wp)
 #ifdef FEAT_DIFF
 		    && !wp->w_p_diff
 #endif
-		    && wp->w_lines_valid > 0
-		    && wp->w_lines[0].wl_lnum <= wp->w_topline;
+		    && wp->w_வரிகள்_valid > 0
+		    && wp->w_வரிகள்[0].wl_lnum <= wp->w_topline;
 
-    if (wp->w_valid & VALID_CROW)
+    எனில் (wp->w_valid & VALID_CROW)
     {
 	lnum = wp->w_cursor.lnum;
 	done = wp->w_cline_row;
     }
-    else
+    இல்லையெனில்
     {
 	lnum = wp->w_topline;
 	done = 0;
     }
 
     // Find the w_lines[] entry for the starting line.
-    if (use_cache)
-	while (i < wp->w_lines_valid && wp->w_lines[i].wl_lnum < lnum)
+    எனில் (use_cache)
+	போது (i < wp->w_வரிகள்_valid && wp->w_வரிகள்[i].wl_lnum < lnum)
 	    ++i;
 
-    for ( ; lnum <= wp->w_buffer->b_ml.ml_line_count; ++i)
+    க்கு ( ; lnum <= wp->w_buffer->b_ml.ml_வரி_மொத்தம்; ++i)
     {
-	int	valid = FALSE;
+	முழு	valid = FALSE;
 
 #ifdef FEAT_FOLDING
 	last = lnum;
 	folded = FALSE;
 #endif
 	// Try to use the size from the previous redraw.
-	if (use_cache && i < wp->w_lines_valid)
+	எனில் (use_cache && i < wp->w_வரிகள்_valid)
 	{
-	    if (wp->w_lines[i].wl_lnum < lnum || !wp->w_lines[i].wl_valid)
-		continue;		// skip changed or deleted lines
-	    if (wp->w_lines[i].wl_lnum == lnum)
+	    எனில் (wp->w_வரிகள்[i].wl_lnum < lnum || !wp->w_வரிகள்[i].wl_valid)
+		தொடர்;		// skip changed or deleted lines
+	    எனில் (wp->w_வரிகள்[i].wl_lnum == lnum)
 		valid = TRUE;
-	    else // wl_lnum > lnum
+	    இல்லையெனில் // wl_lnum > lnum
 		--i;			// hold at inserted lines
 	}
 
 	// The cache is not used with 'smoothscroll' or in diff mode, so here
 	// wl_size holds the same height as plines_correct_topline().
-	if (valid)
+	எனில் (valid)
 	{
-	    n = wp->w_lines[i].wl_size;
+	    n = wp->w_வரிகள்[i].wl_size;
 #ifdef FEAT_FOLDING
-	    folded = wp->w_lines[i].wl_folded;
-	    last = wp->w_lines[i].wl_lastlnum;
+	    folded = wp->w_வரிகள்[i].wl_folded;
+	    last = wp->w_வரிகள்[i].wl_lastlnum;
 #endif
 	}
-	else
+	இல்லையெனில்
 	{
 #ifdef FEAT_FOLDING
-	    if (hasFoldingWin(wp, lnum, NULL, &last, TRUE, NULL))
+	    எனில் (hasFoldingWin(wp, lnum, வெற்று, &last, TRUE, வெற்று))
 	    {
 		n = 1;
 		folded = TRUE;
 	    }
-	    else
+	    இல்லையெனில்
 #endif
 		n = plines_correct_topline(wp, lnum, TRUE);
 	}
-	if (
+	எனில் (
 #ifdef FEAT_FOLDING
 		lnum <= wp->w_cursor.lnum && last >= wp->w_cursor.lnum
-#else
+#இல்லையெனில்
 		lnum == wp->w_cursor.lnum
 #endif
 	   )
@@ -190,12 +190,12 @@ comp_botline(win_T *wp)
 	    redraw_for_cursorline(wp);
 	    wp->w_valid |= (VALID_CROW|VALID_CHEIGHT);
 	}
-	if (done + n > wp->w_height)
-	    break;
+	எனில் (done + n > wp->w_height)
+	    நிறுத்து;
 	done += n;
 #ifdef FEAT_FOLDING
 	lnum = last + 1;
-#else
+#இல்லையெனில்
 	++lnum;
 #endif
     }
@@ -211,10 +211,10 @@ comp_botline(win_T *wp)
  * Redraw when w_cline_row changes and 'relativenumber' or 'cursorline' is
  * set.
  */
-    static void
+    நிலையான வெறுமை
 redraw_for_cursorline(win_T *wp)
 {
-    if ((wp->w_p_rnu
+    எனில் ((wp->w_p_rnu
 #ifdef FEAT_SYN_HL
 		|| wp->w_p_cul
 #endif
@@ -232,17 +232,17 @@ redraw_for_cursorline(win_T *wp)
  * Redraw when w_virtcol changes and 'cursorcolumn' is set or 'cursorlineopt'
  * contains "screenline".
  */
-    static void
+    நிலையான வெறுமை
 redraw_for_cursorcolumn(win_T *wp)
 {
-    if ((wp->w_valid & VALID_VIRTCOL) == 0 && !pum_visible())
+    எனில் ((wp->w_valid & VALID_VIRTCOL) == 0 && !pum_visible())
     {
 	// When 'cursorcolumn' is set need to redraw with UPD_SOME_VALID.
-	if (wp->w_p_cuc)
+	எனில் (wp->w_p_cuc)
 	    redraw_win_later(wp, UPD_SOME_VALID);
 	// When 'cursorlineopt' contains "screenline" need to redraw with
 	// UPD_VALID.
-	else if (wp->w_p_cul && (wp->w_p_culopt_flags & CULOPT_SCRLINE))
+	இல்லையெனில் எனில் (wp->w_p_cul && (wp->w_p_culopt_flags & CULOPT_SCRLINE))
 	    redraw_win_later(wp, UPD_VALID);
     }
 }
@@ -252,7 +252,7 @@ redraw_for_cursorcolumn(win_T *wp)
  * Set wp->w_virtcol to a value ("vcol") that is already valid.
  * Handles redrawing if wp->w_virtcol was previously invalid.
  */
-    void
+    வெறுமை
 set_valid_virtcol(win_T *wp, colnr_T vcol)
 {
     wp->w_virtcol = vcol;
@@ -270,49 +270,49 @@ set_valid_virtcol(win_T *wp, colnr_T vcol)
  * Returns the number of columns of overlap with buffer text, excluding the
  * extra padding on the ledge.
  */
-    int
-sms_marker_overlap(win_T *wp, int extra2)
+    முழு
+sms_marker_overlap(win_T *wp, முழு extra2)
 {
-    if (extra2 == -1)
+    எனில் (extra2 == -1)
 	extra2 = win_col_off(wp) - win_col_off2(wp);
-#if defined(FEAT_LINEBREAK)
+#எனில் defined(FEAT_LINEBREAK)
     // There is no marker overlap when in showbreak mode, thus no need to
     // account for it.  See wlv_screen_line().
-    if (*get_showbreak_value(wp) != NUL)
-	return 0;
+    எனில் (*get_showbreak_மதிப்பு(wp) != NUL)
+	திரும்பு 0;
 #endif
     // Overlap when 'list' and 'listchars' "precedes" are set is 1.
-    if (wp->w_p_list && wp->w_lcs_chars.prec)
-	return 1;
+    எனில் (wp->w_p_list && wp->w_lcs_chars.prec)
+	திரும்பு 1;
 
-    return extra2 > 3 ? 0 : 3 - extra2;
+    திரும்பு extra2 > 3 ? 0 : 3 - extra2;
 }
 
 /*
  * Calculates the skipcol offset for window "wp" given how many
  * physical lines we want to scroll down.
  */
-    static int
-skipcol_from_plines(win_T *wp, int plines_off)
+    நிலையான முழு
+skipcol_from_plines(win_T *wp, முழு plines_off)
 {
-    int width1 = wp->w_width - win_col_off(wp);
+    முழு width1 = wp->w_width - win_col_off(wp);
 
-    int skipcol = 0;
-    if (plines_off > 0)
+    முழு skipcol = 0;
+    எனில் (plines_off > 0)
 	skipcol += width1;
-    if (plines_off > 1)
+    எனில் (plines_off > 1)
 	skipcol += (width1 + win_col_off2(wp)) * (plines_off - 1);
-    return skipcol;
+    திரும்பு skipcol;
 }
 
 /*
  * Set curwin->w_skipcol to zero and redraw later if needed.
  */
-    static void
-reset_skipcol(void)
+    நிலையான வெறுமை
+reset_skipcol(வெறுமை)
 {
-    if (curwin->w_skipcol == 0)
-	return;
+    எனில் (curwin->w_skipcol == 0)
+	திரும்பு;
 
     curwin->w_skipcol = 0;
 
@@ -326,11 +326,11 @@ reset_skipcol(void)
  * Update curwin->w_topline and redraw if necessary.
  * Used to update the screen before printing a message.
  */
-    void
-update_topline_redraw(void)
+    வெறுமை
+update_topline_redraw(வெறுமை)
 {
     update_topline();
-    if (must_redraw)
+    எனில் (must_redraw)
 	update_screen(0);
 }
 
@@ -339,79 +339,79 @@ update_topline_redraw(void)
  * This only applies to automatic cursor visibility correction.
  * For now 'scrolloffpad' is treated as boolean: 0 disables, > 0 enables.
  */
-    static bool
-use_scrolloffpad(void)
+    நிலையான bool
+use_scrolloffpad(வெறுமை)
 {
-    return get_scrolloff_value() > 0 && get_scrolloffpad_value() > 0;
+    திரும்பு get_scrolloff_மதிப்பு() > 0 && get_scrolloffpad_மதிப்பு() > 0;
 }
 
 /*
  * Return TRUE when there are not enough real buffer lines below "lnum" to
  * satisfy the requested "so" context.
  */
-    static bool
+    நிலையான bool
 scrolloffpad_eof_pressure(linenr_T lnum, long so)
 {
-    if (!use_scrolloffpad() || so <= 0)
-	return false;
+    எனில் (!use_scrolloffpad() || so <= 0)
+	திரும்பு false;
 
     // Use subtraction to avoid signed overflow in "lnum + so".
-    return lnum > curbuf->b_ml.ml_line_count - so;
+    திரும்பு lnum > curbuf->b_ml.ml_வரி_மொத்தம் - so;
 }
 
 /*
  * Update curwin->w_topline to move the cursor onto the screen.
  */
-    void
-update_topline(void)
+    வெறுமை
+update_topline(வெறுமை)
 {
-    long	line_count;
-    int		halfheight;
-    int		n;
+    long	வரி_மொத்தம்;
+    முழு		halfheight;
+    முழு		n;
 #ifdef FEAT_FOLDING
     linenr_T	lnum;
 #endif
-    int		check_topline = FALSE;
-    int		check_botline = FALSE;
+    முழு		check_topline = FALSE;
+    முழு		check_botline = FALSE;
     long	*so_ptr = curwin->w_p_so >= 0 ? &curwin->w_p_so : &p_so;
-    int		save_so = *so_ptr;
+    முழு		save_so = *so_ptr;
     bool	eof_pressure;
 
     // Cursor is updated instead when this is TRUE for 'splitkeep'.
-    if (skip_update_topline)
-	return;
+    எனில் (skip_update_topline)
+	திரும்பு;
 
     // If there is no valid screen and when the window height is zero just use
     // the cursor line.
-    if (!screen_valid(TRUE) || curwin->w_height == 0)
+    எனில் (!screen_valid(TRUE) || curwin->w_height == 0)
     {
 	check_cursor_lnum();
 	curwin->w_topline = curwin->w_cursor.lnum;
 	curwin->w_botline = curwin->w_topline;
 	curwin->w_scbind_pos = 1;
-	return;
+	திரும்பு;
     }
 
     check_cursor_moved(curwin);
-    if (curwin->w_valid & VALID_TOPLINE)
-	return;
+    எனில் (curwin->w_valid & VALID_TOPLINE)
+	திரும்பு;
 
     // When dragging with the mouse, don't scroll that quickly
-    if (mouse_dragging > 0)
+    எனில் (mouse_dragging > 0)
 	*so_ptr = mouse_dragging - 1;
     eof_pressure = scrolloffpad_eof_pressure(curwin->w_cursor.lnum, *so_ptr);
 
     linenr_T old_topline = curwin->w_topline;
 #ifdef FEAT_DIFF
-    int old_topfill = curwin->w_topfill;
+    முழு old_topfill = curwin->w_topfill;
 #endif
 
     /*
      * If the buffer is empty, always set topline to 1.
      */
-    if (BUFEMPTY())		// special case - file is empty
+    எனில் (BUFEMPTY())		// special case - file is empty
     {
-	if (curwin->w_topline != 1)
+	எனில் (curwin->w_topline != 1)
 	    redraw_later(UPD_NOT_VALID);
 	curwin->w_topline = 1;
 	curwin->w_botline = 2;
@@ -424,85 +424,85 @@ update_topline(void)
      * If the cursor is above or near the top of the window, scroll the window
      * to show the line the cursor is in, with 'scrolloff' context.
      */
-    else
+    இல்லையெனில்
     {
-	if (curwin->w_topline > 1 || curwin->w_skipcol > 0)
+	எனில் (curwin->w_topline > 1 || curwin->w_skipcol > 0)
 	{
 	    // If the cursor is above topline, scrolling is always needed.
 	    // If the cursor is far below topline and there is no folding,
 	    // scrolling down is never needed.
-	    if (curwin->w_cursor.lnum < curwin->w_topline)
+	    எனில் (curwin->w_cursor.lnum < curwin->w_topline)
 		check_topline = TRUE;
-	    else if (check_top_offset())
+	    இல்லையெனில் எனில் (check_உச்சி_offset())
 		check_topline = TRUE;
-	    else if (curwin->w_skipcol > 0
+	    இல்லையெனில் எனில் (curwin->w_skipcol > 0
 				 && curwin->w_cursor.lnum == curwin->w_topline)
 	    {
 		colnr_T vcol;
-		int overlap;
+		முழு overlap;
 
 		// Check that the cursor position is visible.  Add columns for
 		// the marker displayed in the top-left if needed.
-		getvvcol(curwin, &curwin->w_cursor, &vcol, NULL, NULL, 0);
+		getvvcol(curwin, &curwin->w_cursor, &vcol, வெற்று, வெற்று, 0);
 		overlap = sms_marker_overlap(curwin, -1);
-		if (curwin->w_skipcol + overlap > vcol)
+		எனில் (curwin->w_skipcol + overlap > vcol)
 		    check_topline = TRUE;
 	    }
 	}
 #ifdef FEAT_DIFF
 	    // Check if there are more filler lines than allowed.
-	if (!check_topline && curwin->w_topfill > diff_check_fill(curwin,
+	எனில் (!check_topline && curwin->w_topfill > diff_check_fill(curwin,
 							   curwin->w_topline))
 	    check_topline = TRUE;
 #endif
 
-	if (check_topline)
+	எனில் (check_topline)
 	{
 	    halfheight = curwin->w_height / 2 - 1;
-	    if (halfheight < 2)
+	    எனில் (halfheight < 2)
 		halfheight = 2;
 
 #ifdef FEAT_FOLDING
-	    if (hasAnyFolding(curwin))
+	    எனில் (hasAnyFolding(curwin))
 	    {
 		// Count the number of logical lines between the cursor and
 		// topline + scrolloff (approximation of how much will be
 		// scrolled).
 		n = 0;
-		for (lnum = curwin->w_cursor.lnum;
+		க்கு (lnum = curwin->w_cursor.lnum;
 				    lnum < curwin->w_topline + *so_ptr; ++lnum)
 		{
 		    ++n;
 		    // stop at end of file or when we know we are far off
-		    if (lnum >= curbuf->b_ml.ml_line_count || n >= halfheight)
-			break;
-		    (void)hasFolding(lnum, NULL, &lnum);
+		    எனில் (lnum >= curbuf->b_ml.ml_வரி_மொத்தம் || n >= halfheight)
+			நிறுத்து;
+		    (வெறுமை)hasFolding(lnum, வெற்று, &lnum);
 		}
 	    }
-	    else
+	    இல்லையெனில்
 #endif
 		n = curwin->w_topline + *so_ptr - curwin->w_cursor.lnum;
 
 	    // If we weren't very close to begin with, we scroll to put the
 	    // cursor in the middle of the window.  Otherwise put the cursor
 	    // near the top of the window.
-	    int min_scroll = scrolljump_value();
-	    if (eof_pressure)
+	    முழு min_scroll = scrolljump_மதிப்பு();
+	    எனில் (eof_pressure)
 		scroll_cursor_halfway(TRUE, TRUE);
-	    else if (n >= halfheight && min_scroll < halfheight)
+	    இல்லையெனில் எனில் (n >= halfheight && min_scroll < halfheight)
 		scroll_cursor_halfway(FALSE, FALSE);
-	    else
+	    இல்லையெனில்
 	    {
-		scroll_cursor_top(min_scroll, FALSE);
+		scroll_cursor_உச்சி(min_scroll, FALSE);
 		check_botline = TRUE;
 	    }
 	}
 
-	else
+	இல்லையெனில்
 	{
 #ifdef FEAT_FOLDING
 	    // Make sure topline is the first line of a fold.
-	    (void)hasFolding(curwin->w_topline, &curwin->w_topline, NULL);
+	    (வெறுமை)hasFolding(curwin->w_topline, &curwin->w_topline, வெற்று);
 #endif
 	    check_botline = TRUE;
 	}
@@ -516,16 +516,16 @@ update_topline(void)
      * cases, but we don't want to spend (a lot of) time recomputing w_botline
      * for every small change.
      */
-    if (check_botline)
+    எனில் (check_botline)
     {
-	if (!(curwin->w_valid & VALID_BOTLINE_AP))
+	எனில் (!(curwin->w_valid & VALID_BOTLINE_AP))
 	    validate_botline();
 
-	if (curwin->w_botline <= curbuf->b_ml.ml_line_count || use_scrolloffpad())
+	எனில் (curwin->w_botline <= curbuf->b_ml.ml_வரி_மொத்தம் || use_scrolloffpad())
 	{
-	    if (curwin->w_cursor.lnum < curwin->w_botline)
+	    எனில் (curwin->w_cursor.lnum < curwin->w_botline)
 	    {
-		if (((long)curwin->w_cursor.lnum
+		எனில் (((long)curwin->w_cursor.lnum
 					   >= (long)curwin->w_botline - *so_ptr
 #ifdef FEAT_FOLDING
 			|| hasAnyFolding(curwin)
@@ -541,14 +541,14 @@ update_topline(void)
 		    loff.lnum = curwin->w_cursor.lnum;
 #ifdef FEAT_FOLDING
 		    // In a fold go to its last line.
-		    (void)hasFolding(loff.lnum, NULL, &loff.lnum);
+		    (வெறுமை)hasFolding(loff.lnum, வெற்று, &loff.lnum);
 #endif
 #ifdef FEAT_DIFF
 		    loff.fill = 0;
 		    n += curwin->w_filler_rows;
 #endif
 		    loff.height = 0;
-		    while (loff.lnum < curwin->w_botline
+		    போது (loff.lnum < curwin->w_botline
 #ifdef FEAT_DIFF
 			    && (loff.lnum + 1 < curwin->w_botline
 							     || loff.fill == 0)
@@ -556,49 +556,49 @@ update_topline(void)
 			    )
 		    {
 			n += loff.height;
-			if (n >= *so_ptr)
-			    break;
+			எனில் (n >= *so_ptr)
+			    நிறுத்து;
 			botline_forw(&loff);
 		    }
-		    if (n >= *so_ptr && !eof_pressure)
+		    எனில் (n >= *so_ptr && !eof_pressure)
 			// sufficient context, no need to scroll
 			check_botline = FALSE;
 		}
-		else
+		இல்லையெனில்
 		    // sufficient context, no need to scroll
 		    check_botline = FALSE;
 	    }
-	    if (check_botline)
+	    எனில் (check_botline)
 	    {
 #ifdef FEAT_FOLDING
-		if (hasAnyFolding(curwin))
+		எனில் (hasAnyFolding(curwin))
 		{
 		    // Count the number of logical lines between the cursor and
 		    // botline - scrolloff (approximation of how much will be
 		    // scrolled).
-		    line_count = 0;
-		    for (lnum = curwin->w_cursor.lnum;
+		    வரி_மொத்தம் = 0;
+		    க்கு (lnum = curwin->w_cursor.lnum;
 				   lnum >= curwin->w_botline - *so_ptr; --lnum)
 		    {
-			++line_count;
+			++வரி_மொத்தம்;
 			// stop at end of file or when we know we are far off
-			if (lnum <= 0 || line_count > curwin->w_height + 1)
-			    break;
-			(void)hasFolding(lnum, &lnum, NULL);
+			எனில் (lnum <= 0 || வரி_மொத்தம் > curwin->w_height + 1)
+			    நிறுத்து;
+			(வெறுமை)hasFolding(lnum, &lnum, வெற்று);
 		    }
 		}
-		else
+		இல்லையெனில்
 #endif
-		    line_count = curwin->w_cursor.lnum - curwin->w_botline
+		    வரி_மொத்தம் = curwin->w_cursor.lnum - curwin->w_botline
 								 + 1 + *so_ptr;
-		if (line_count <= curwin->w_height + 1)
+		எனில் (வரி_மொத்தம் <= curwin->w_height + 1)
 		{
-		    if (eof_pressure)
+		    எனில் (eof_pressure)
 			scroll_cursor_halfway(TRUE, TRUE);
-		    else
-			scroll_cursor_bot(scrolljump_value(), FALSE);
+		    இல்லையெனில்
+			scroll_cursor_bot(scrolljump_மதிப்பு(), FALSE);
 		}
-		else
+		இல்லையெனில்
 		    scroll_cursor_halfway(eof_pressure, eof_pressure);
 	    }
 	}
@@ -608,7 +608,7 @@ update_topline(void)
     /*
      * Need to redraw when topline changed.
      */
-    if (curwin->w_topline != old_topline
+    எனில் (curwin->w_topline != old_topline
 #ifdef FEAT_DIFF
 	    || curwin->w_topfill != old_topfill
 #endif
@@ -618,13 +618,13 @@ update_topline(void)
 	redraw_later(UPD_VALID);
 
 	// When 'smoothscroll' is not set, should reset w_skipcol.
-	if (!curwin->w_p_sms)
+	எனில் (!curwin->w_p_sms)
 	    reset_skipcol();
-	else if (curwin->w_skipcol != 0)
+	இல்லையெனில் எனில் (curwin->w_skipcol != 0)
 	    redraw_later(UPD_SOME_VALID);
 
 	// May need to set w_skipcol when cursor in w_topline.
-	if (curwin->w_cursor.lnum == curwin->w_topline)
+	எனில் (curwin->w_cursor.lnum == curwin->w_topline)
 	    validate_cursor();
     }
 
@@ -636,26 +636,26 @@ update_topline(void)
  * When 'scrolljump' is positive use it as-is.
  * When 'scrolljump' is negative use it as a percentage of the window height.
  */
-    static int
-scrolljump_value(void)
+    நிலையான முழு
+scrolljump_மதிப்பு(வெறுமை)
 {
-    if (p_sj >= 0)
-	return (int)p_sj;
-    return (curwin->w_height * -p_sj) / 100;
+    எனில் (p_sj >= 0)
+	திரும்பு (முழு)p_sj;
+    திரும்பு (curwin->w_height * -p_sj) / 100;
 }
 
 /*
  * Return TRUE when there are not 'scrolloff' lines above the cursor for the
  * current window.
  */
-    static int
-check_top_offset(void)
+    நிலையான முழு
+check_உச்சி_offset(வெறுமை)
 {
     lineoff_T	loff;
-    int		n;
-    long	so = get_scrolloff_value();
+    முழு		n;
+    long	so = get_scrolloff_மதிப்பு();
 
-    if (curwin->w_cursor.lnum < curwin->w_topline + so
+    எனில் (curwin->w_cursor.lnum < curwin->w_topline + so
 #ifdef FEAT_FOLDING
 		    || hasAnyFolding(curwin)
 #endif
@@ -665,33 +665,33 @@ check_top_offset(void)
 #ifdef FEAT_DIFF
 	loff.fill = 0;
 	n = curwin->w_topfill;	    // always have this context
-#else
+#இல்லையெனில்
 	n = 0;
 #endif
 	// Count the visible screen lines above the cursor line.
-	while (n < so)
+	போது (n < so)
 	{
 	    topline_back(&loff);
 	    // Stop when included a line above the window.
-	    if (loff.lnum < curwin->w_topline
+	    எனில் (loff.lnum < curwin->w_topline
 #ifdef FEAT_DIFF
 		    || (loff.lnum == curwin->w_topline && loff.fill > 0)
 #endif
 		    )
-		break;
+		நிறுத்து;
 	    n += loff.height;
 	}
-	if (n < so)
-	    return TRUE;
+	எனில் (n < so)
+	    திரும்பு TRUE;
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 /*
  * Update w_curswant.
  */
-    void
-update_curswant_force(void)
+    வெறுமை
+update_curswant_force(வெறுமை)
 {
     validate_virtcol();
     curwin->w_curswant = curwin->w_virtcol
@@ -705,20 +705,20 @@ update_curswant_force(void)
 /*
  * Update w_curswant if w_set_curswant is set.
  */
-    void
-update_curswant(void)
+    வெறுமை
+update_curswant(வெறுமை)
 {
-    if (curwin->w_set_curswant)
+    எனில் (curwin->w_set_curswant)
 	update_curswant_force();
 }
 
 /*
  * Check if the cursor has moved.  Set the w_valid flag accordingly.
  */
-    void
+    வெறுமை
 check_cursor_moved(win_T *wp)
 {
-    if (wp->w_cursor.lnum != wp->w_valid_cursor.lnum)
+    எனில் (wp->w_cursor.lnum != wp->w_valid_cursor.lnum)
     {
 	wp->w_valid &= ~(VALID_WROW|VALID_WCOL|VALID_VIRTCOL
 				      |VALID_CHEIGHT|VALID_CROW|VALID_TOPLINE
@@ -727,7 +727,7 @@ check_cursor_moved(win_T *wp)
 	wp->w_valid_leftcol = wp->w_leftcol;
 	wp->w_valid_skipcol = wp->w_skipcol;
     }
-    else if (wp->w_skipcol != wp->w_valid_skipcol)
+    இல்லையெனில் எனில் (wp->w_skipcol != wp->w_valid_skipcol)
     {
 	wp->w_valid &= ~(VALID_WROW|VALID_WCOL|VALID_VIRTCOL
 				      |VALID_CHEIGHT|VALID_CROW
@@ -736,7 +736,7 @@ check_cursor_moved(win_T *wp)
 	wp->w_valid_leftcol = wp->w_leftcol;
 	wp->w_valid_skipcol = wp->w_skipcol;
     }
-    else if (wp->w_cursor.col != wp->w_valid_cursor.col
+    இல்லையெனில் எனில் (wp->w_cursor.col != wp->w_valid_cursor.col
 	     || wp->w_leftcol != wp->w_valid_leftcol
 	     || wp->w_cursor.coladd != wp->w_valid_cursor.coladd)
     {
@@ -752,33 +752,33 @@ check_cursor_moved(win_T *wp)
  * the cursor position, botline and topline to be recomputed and the window to
  * be redrawn.  E.g, when changing the 'wrap' option or folding.
  */
-    void
-changed_window_setting(void)
+    வெறுமை
+changed_window_setting(வெறுமை)
 {
     changed_window_setting_win(curwin);
 }
 
-    void
+    வெறுமை
 changed_window_setting_win(win_T *wp)
 {
-    wp->w_lines_valid = 0;
-    changed_line_abv_curs_win(wp);
+    wp->w_வரிகள்_valid = 0;
+    changed_வரி_abv_curs_win(wp);
     wp->w_valid &= ~(VALID_BOTLINE|VALID_BOTLINE_AP|VALID_TOPLINE);
     redraw_win_later(wp, UPD_NOT_VALID);
 }
 
-#if defined(FEAT_PROP_POPUP)
+#எனில் defined(FEAT_PROP_POPUP)
 /*
  * Call changed_window_setting_win() for every window containing "buf".
  */
-    void
+    வெறுமை
 changed_window_setting_buf(buf_T *buf)
 {
     tabpage_T	*tp;
     win_T	*wp;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if (wp->w_buffer == buf)
+	எனில் (wp->w_buffer == buf)
 	    changed_window_setting_win(wp);
 }
 #endif
@@ -786,8 +786,8 @@ changed_window_setting_buf(buf_T *buf)
 /*
  * Call changed_window_setting_win() for every window.
  */
-    void
-changed_window_setting_all(void)
+    வெறுமை
+changed_window_setting_all(வெறுமை)
 {
     tabpage_T	*tp;
     win_T	*wp;
@@ -799,7 +799,7 @@ changed_window_setting_all(void)
 /*
  * Set wp->w_topline to a certain number.
  */
-    void
+    வெறுமை
 set_topline(win_T *wp, linenr_T lnum)
 {
 #ifdef FEAT_DIFF
@@ -808,16 +808,16 @@ set_topline(win_T *wp, linenr_T lnum)
 
 #ifdef FEAT_FOLDING
     // go to first of folded lines
-    (void)hasFoldingWin(wp, lnum, &lnum, NULL, TRUE, NULL);
+    (வெறுமை)hasFoldingWin(wp, lnum, &lnum, வெற்று, TRUE, வெற்று);
 #endif
     // Approximate the value of w_botline
     wp->w_botline += lnum - wp->w_topline;
-    if (wp->w_botline > wp->w_buffer->b_ml.ml_line_count + 1)
-	wp->w_botline = wp->w_buffer->b_ml.ml_line_count + 1;
+    எனில் (wp->w_botline > wp->w_buffer->b_ml.ml_வரி_மொத்தம் + 1)
+	wp->w_botline = wp->w_buffer->b_ml.ml_வரி_மொத்தம் + 1;
     wp->w_topline = lnum;
     wp->w_topline_was_set = true;
 #ifdef FEAT_DIFF
-    if (lnum != prev_topline)
+    எனில் (lnum != prev_topline)
 	// Keep the filler lines when the topline didn't change.
 	wp->w_topfill = 0;
 #endif
@@ -833,14 +833,14 @@ set_topline(win_T *wp, linenr_T lnum)
  * requiring updating w_topline.  That may also invalidate w_crow.
  * Need to take care of w_botline separately!
  */
-    void
-changed_cline_bef_curs(void)
+    வெறுமை
+changed_cline_bef_curs(வெறுமை)
 {
     curwin->w_valid &= ~(VALID_WROW|VALID_WCOL|VALID_VIRTCOL|VALID_CROW
 						|VALID_CHEIGHT|VALID_TOPLINE);
 }
 
-    void
+    வெறுமை
 changed_cline_bef_curs_win(win_T *wp)
 {
     wp->w_valid &= ~(VALID_WROW|VALID_WCOL|VALID_VIRTCOL|VALID_CROW
@@ -852,32 +852,32 @@ changed_cline_bef_curs_win(win_T *wp)
  * the cursor have changed.
  * Need to take care of w_botline separately!
  */
-    void
-changed_line_abv_curs(void)
+    வெறுமை
+changed_வரி_abv_curs(வெறுமை)
 {
     curwin->w_valid &= ~(VALID_WROW|VALID_WCOL|VALID_VIRTCOL|VALID_CROW
 						|VALID_CHEIGHT|VALID_TOPLINE);
 }
 
-    void
-changed_line_abv_curs_win(win_T *wp)
+    வெறுமை
+changed_வரி_abv_curs_win(win_T *wp)
 {
     wp->w_valid &= ~(VALID_WROW|VALID_WCOL|VALID_VIRTCOL|VALID_CROW
 						|VALID_CHEIGHT|VALID_TOPLINE);
 }
 
-#if defined(FEAT_PROP_POPUP)
+#எனில் defined(FEAT_PROP_POPUP)
 /*
  * Display of line has changed for "buf", invalidate cursor position and
  * w_botline.
  */
-    void
-changed_line_display_buf(buf_T *buf)
+    வெறுமை
+changed_வரி_display_buf(buf_T *buf)
 {
     win_T *wp;
 
     FOR_ALL_WINDOWS(wp)
-	if (wp->w_buffer == buf)
+	எனில் (wp->w_buffer == buf)
 	    wp->w_valid &= ~(VALID_WROW|VALID_WCOL|VALID_VIRTCOL
 				|VALID_CROW|VALID_CHEIGHT
 				|VALID_TOPLINE|VALID_BOTLINE|VALID_BOTLINE_AP);
@@ -887,8 +887,8 @@ changed_line_display_buf(buf_T *buf)
 /*
  * Make sure the value of curwin->w_botline is valid.
  */
-    void
-validate_botline(void)
+    வெறுமை
+validate_botline(வெறுமை)
 {
     validate_botline_win(curwin);
 }
@@ -896,29 +896,29 @@ validate_botline(void)
 /*
  * Make sure the value of wp->w_botline is valid.
  */
-    void
+    வெறுமை
 validate_botline_win(win_T *wp)
 {
-    if (!(wp->w_valid & VALID_BOTLINE))
+    எனில் (!(wp->w_valid & VALID_BOTLINE))
 	comp_botline(wp);
 }
 
 /*
  * Mark curwin->w_botline as invalid (because of some change in the buffer).
  */
-    void
-invalidate_botline(void)
+    வெறுமை
+invalidate_botline(வெறுமை)
 {
     curwin->w_valid &= ~(VALID_BOTLINE|VALID_BOTLINE_AP);
 }
 
-    void
+    வெறுமை
 invalidate_botline_win(win_T *wp)
 {
     wp->w_valid &= ~(VALID_BOTLINE|VALID_BOTLINE_AP);
 }
 
-    void
+    வெறுமை
 approximate_botline_win(
     win_T	*wp)
 {
@@ -928,11 +928,11 @@ approximate_botline_win(
 /*
  * Return TRUE if curwin->w_wrow and curwin->w_wcol are valid.
  */
-    int
-cursor_valid(void)
+    முழு
+cursor_valid(வெறுமை)
 {
     check_cursor_moved(curwin);
-    return ((curwin->w_valid & (VALID_WROW|VALID_WCOL)) ==
+    திரும்பு ((curwin->w_valid & (VALID_WROW|VALID_WCOL)) ==
 						      (VALID_WROW|VALID_WCOL));
 }
 
@@ -940,28 +940,28 @@ cursor_valid(void)
  * Validate cursor position.  Makes sure w_wrow and w_wcol are valid.
  * w_topline must be valid, you may need to call update_topline() first!
  */
-    void
-validate_cursor(void)
+    வெறுமை
+validate_cursor(வெறுமை)
 {
     check_cursor_lnum();
     check_cursor_moved(curwin);
-    if ((curwin->w_valid & (VALID_WCOL|VALID_WROW)) != (VALID_WCOL|VALID_WROW))
+    எனில் ((curwin->w_valid & (VALID_WCOL|VALID_WROW)) != (VALID_WCOL|VALID_WROW))
 	curs_columns(TRUE);
 }
 
-#if defined(FEAT_GUI)
+#எனில் defined(FEAT_GUI)
 /*
  * validate w_cline_row.
  */
-    void
-validate_cline_row(void)
+    வெறுமை
+validate_cline_row(வெறுமை)
 {
     /*
      * First make sure that w_topline is valid (after moving the cursor).
      */
     update_topline();
     check_cursor_moved(curwin);
-    if (!(curwin->w_valid & VALID_CROW))
+    எனில் (!(curwin->w_valid & VALID_CROW))
 	curs_rows(curwin);
 }
 #endif
@@ -970,46 +970,46 @@ validate_cline_row(void)
  * Compute wp->w_cline_row and wp->w_cline_height, based on the current value
  * of wp->w_topline.
  */
-    static void
+    நிலையான வெறுமை
 curs_rows(win_T *wp)
 {
     linenr_T	lnum;
-    int		i;
-    int		all_invalid;
-    int		valid;
+    முழு		i;
+    முழு		all_invalid;
+    முழு		valid;
 #ifdef FEAT_FOLDING
-    long	fold_count;
+    long	fold_மொத்தம்;
 #endif
 
     // Check if wp->w_lines[].wl_size is invalid
     all_invalid = (!redrawing()
-			|| wp->w_lines_valid == 0
-			|| wp->w_lines[0].wl_lnum > wp->w_topline);
+			|| wp->w_வரிகள்_valid == 0
+			|| wp->w_வரிகள்[0].wl_lnum > wp->w_topline);
     i = 0;
     wp->w_cline_row = 0;
-    for (lnum = wp->w_topline; lnum < wp->w_cursor.lnum; ++i)
+    க்கு (lnum = wp->w_topline; lnum < wp->w_cursor.lnum; ++i)
     {
 	valid = FALSE;
-	if (!all_invalid && i < wp->w_lines_valid)
+	எனில் (!all_invalid && i < wp->w_வரிகள்_valid)
 	{
-	    if (wp->w_lines[i].wl_lnum < lnum || !wp->w_lines[i].wl_valid)
-		continue;		// skip changed or deleted lines
-	    if (wp->w_lines[i].wl_lnum == lnum)
+	    எனில் (wp->w_வரிகள்[i].wl_lnum < lnum || !wp->w_வரிகள்[i].wl_valid)
+		தொடர்;		// skip changed or deleted lines
+	    எனில் (wp->w_வரிகள்[i].wl_lnum == lnum)
 	    {
 #ifdef FEAT_FOLDING
 		// Check for newly inserted lines below this row, in which
 		// case we need to check for folded lines.
-		if (!wp->w_buffer->b_mod_set
-			|| wp->w_lines[i].wl_lastlnum < wp->w_cursor.lnum
-			|| wp->w_buffer->b_mod_top
-					     > wp->w_lines[i].wl_lastlnum + 1)
+		எனில் (!wp->w_buffer->b_mod_set
+			|| wp->w_வரிகள்[i].wl_lastlnum < wp->w_cursor.lnum
+			|| wp->w_buffer->b_mod_உச்சி
+					     > wp->w_வரிகள்[i].wl_lastlnum + 1)
 #endif
 		valid = TRUE;
 	    }
-	    else if (wp->w_lines[i].wl_lnum > lnum)
+	    இல்லையெனில் எனில் (wp->w_வரிகள்[i].wl_lnum > lnum)
 		--i;			// hold at inserted lines
 	}
-	if (valid
+	எனில் (valid
 	       && (lnum != wp->w_topline || (wp->w_skipcol == 0
 #ifdef FEAT_DIFF
 					    && !wp->w_p_diff
@@ -1017,27 +1017,27 @@ curs_rows(win_T *wp)
 	       )))
 	{
 #ifdef FEAT_FOLDING
-	    lnum = wp->w_lines[i].wl_lastlnum + 1;
+	    lnum = wp->w_வரிகள்[i].wl_lastlnum + 1;
 	    // Cursor inside folded lines, don't count this row
-	    if (lnum > wp->w_cursor.lnum)
-		break;
-#else
+	    எனில் (lnum > wp->w_cursor.lnum)
+		நிறுத்து;
+#இல்லையெனில்
 	    ++lnum;
 #endif
-	    wp->w_cline_row += wp->w_lines[i].wl_size;
+	    wp->w_cline_row += wp->w_வரிகள்[i].wl_size;
 	}
-	else
+	இல்லையெனில்
 	{
 #ifdef FEAT_FOLDING
-	    fold_count = foldedCount(wp, lnum, NULL);
-	    if (fold_count)
+	    fold_மொத்தம் = folded_மொத்தம்(wp, lnum, வெற்று);
+	    எனில் (fold_மொத்தம்)
 	    {
-		lnum += fold_count;
-		if (lnum > wp->w_cursor.lnum)
-		    break;
+		lnum += fold_மொத்தம்;
+		எனில் (lnum > wp->w_cursor.lnum)
+		    நிறுத்து;
 		++wp->w_cline_row;
 	    }
-	    else
+	    இல்லையெனில்
 #endif
 	    {
 		wp->w_cline_row += plines_correct_topline(wp, lnum, TRUE);
@@ -1047,40 +1047,40 @@ curs_rows(win_T *wp)
     }
 
     check_cursor_moved(wp);
-    if (!(wp->w_valid & VALID_CHEIGHT))
+    எனில் (!(wp->w_valid & VALID_CHEIGHT))
     {
-	if (all_invalid
-		|| i == wp->w_lines_valid
-		|| (i < wp->w_lines_valid
-		    && (!wp->w_lines[i].wl_valid
-			|| wp->w_lines[i].wl_lnum != wp->w_cursor.lnum)))
+	எனில் (all_invalid
+		|| i == wp->w_வரிகள்_valid
+		|| (i < wp->w_வரிகள்_valid
+		    && (!wp->w_வரிகள்[i].wl_valid
+			|| wp->w_வரிகள்[i].wl_lnum != wp->w_cursor.lnum)))
 	{
 #ifdef FEAT_DIFF
-	    if (wp->w_cursor.lnum == wp->w_topline)
+	    எனில் (wp->w_cursor.lnum == wp->w_topline)
 		wp->w_cline_height = plines_win_nofill(wp, wp->w_cursor.lnum,
 							TRUE) + wp->w_topfill;
-	    else
+	    இல்லையெனில்
 #endif
 		wp->w_cline_height = plines_win(wp, wp->w_cursor.lnum, TRUE);
 #ifdef FEAT_FOLDING
 	    wp->w_cline_folded = hasFoldingWin(wp, wp->w_cursor.lnum,
-						      NULL, NULL, TRUE, NULL);
+						      வெற்று, வெற்று, TRUE, வெற்று);
 #endif
 	}
-	else if (i > wp->w_lines_valid)
+	இல்லையெனில் எனில் (i > wp->w_வரிகள்_valid)
 	{
 	    // a line that is too long to fit on the last screen line
 	    wp->w_cline_height = 0;
 #ifdef FEAT_FOLDING
 	    wp->w_cline_folded = hasFoldingWin(wp, wp->w_cursor.lnum,
-						      NULL, NULL, TRUE, NULL);
+						      வெற்று, வெற்று, TRUE, வெற்று);
 #endif
 	}
-	else
+	இல்லையெனில்
 	{
-	    wp->w_cline_height = wp->w_lines[i].wl_size;
+	    wp->w_cline_height = wp->w_வரிகள்[i].wl_size;
 #ifdef FEAT_FOLDING
-	    wp->w_cline_folded = wp->w_lines[i].wl_folded;
+	    wp->w_cline_folded = wp->w_வரிகள்[i].wl_folded;
 #endif
 	}
     }
@@ -1092,8 +1092,8 @@ curs_rows(win_T *wp)
 /*
  * Validate curwin->w_virtcol only.
  */
-    void
-validate_virtcol(void)
+    வெறுமை
+validate_virtcol(வெறுமை)
 {
     validate_virtcol_win(curwin);
 }
@@ -1101,18 +1101,18 @@ validate_virtcol(void)
 /*
  * Validate wp->w_virtcol only.
  */
-    void
+    வெறுமை
 validate_virtcol_win(win_T *wp)
 {
     check_cursor_moved(wp);
 
-    if (wp->w_valid & VALID_VIRTCOL)
-	return;
+    எனில் (wp->w_valid & VALID_VIRTCOL)
+	திரும்பு;
 
 #ifdef FEAT_PROP_POPUP
     wp->w_virtcol_first_char = 0;
 #endif
-    getvvcol(wp, &wp->w_cursor, NULL, &(wp->w_virtcol), NULL,
+    getvvcol(wp, &wp->w_cursor, வெற்று, &(wp->w_virtcol), வெற்று,
 							 GETVCOL_FOR_VIRTCOL);
 #ifdef FEAT_SYN_HL
     redraw_for_cursorcolumn(wp);
@@ -1123,23 +1123,23 @@ validate_virtcol_win(win_T *wp)
 /*
  * Validate curwin->w_cline_height only.
  */
-    void
-validate_cheight(void)
+    வெறுமை
+validate_cheight(வெறுமை)
 {
     check_cursor_moved(curwin);
 
-    if (curwin->w_valid & VALID_CHEIGHT)
-	return;
+    எனில் (curwin->w_valid & VALID_CHEIGHT)
+	திரும்பு;
 
 #ifdef FEAT_DIFF
-    if (curwin->w_cursor.lnum == curwin->w_topline)
+    எனில் (curwin->w_cursor.lnum == curwin->w_topline)
 	curwin->w_cline_height = plines_nofill(curwin->w_cursor.lnum)
 	    + curwin->w_topfill;
-    else
+    இல்லையெனில்
 #endif
 	curwin->w_cline_height = plines(curwin->w_cursor.lnum);
 #ifdef FEAT_FOLDING
-    curwin->w_cline_folded = hasFolding(curwin->w_cursor.lnum, NULL, NULL);
+    curwin->w_cline_folded = hasFolding(curwin->w_cursor.lnum, வெற்று, வெற்று);
 #endif
     curwin->w_valid |= VALID_CHEIGHT;
 }
@@ -1147,17 +1147,17 @@ validate_cheight(void)
 /*
  * Validate w_wcol and w_virtcol only.
  */
-    void
-validate_cursor_col(void)
+    வெறுமை
+validate_cursor_col(வெறுமை)
 {
     colnr_T off;
     colnr_T col;
-    int     width;
+    முழு     width;
 
     validate_virtcol();
 
-    if (curwin->w_valid & VALID_WCOL)
-	return;
+    எனில் (curwin->w_valid & VALID_WCOL)
+	திரும்பு;
 
     col = curwin->w_virtcol;
     off = curwin_col_off();
@@ -1165,14 +1165,14 @@ validate_cursor_col(void)
     width = curwin->w_width - off + curwin_col_off2();
 
     // long line wrapping, adjust curwin->w_wrow
-    if (curwin->w_p_wrap
+    எனில் (curwin->w_p_wrap
 	    && col >= (colnr_T)curwin->w_width
 	    && width > 0)
 	// use same formula as what is used in curs_columns()
 	col -= ((col - curwin->w_width) / width + 1) * width;
-    if (col > (int)curwin->w_leftcol)
+    எனில் (col > (முழு)curwin->w_leftcol)
 	col -= curwin->w_leftcol;
-    else
+    இல்லையெனில்
 	col = 0;
     curwin->w_wcol = col;
 
@@ -1186,10 +1186,10 @@ validate_cursor_col(void)
  * Compute offset of a window, occupied by absolute or relative line number,
  * fold column and sign column (these don't move when scrolling horizontally).
  */
-    int
+    முழு
 win_col_off(win_T *wp)
 {
-    return (((wp->w_p_nu || wp->w_p_rnu) ? number_width(wp) + 1 : 0)
+    திரும்பு (((wp->w_p_nu || wp->w_p_rnu) ? எண்_width(wp) + 1 : 0)
 	    + (wp != cmdwin_win ? 0 : 1)
 #ifdef FEAT_FOLDING
 	    + wp->w_p_fdc
@@ -1200,10 +1200,10 @@ win_col_off(win_T *wp)
 	   );
 }
 
-    int
-curwin_col_off(void)
+    முழு
+curwin_col_off(வெறுமை)
 {
-    return win_col_off(curwin);
+    திரும்பு win_col_off(curwin);
 }
 
 /*
@@ -1211,18 +1211,18 @@ curwin_col_off(void)
  * wrapped line.  It's positive if 'number' or 'relativenumber' is on and 'n'
  * is in 'cpoptions'.
  */
-    int
+    முழு
 win_col_off2(win_T *wp)
 {
-    if ((wp->w_p_nu || wp->w_p_rnu) && vim_strchr(p_cpo, CPO_NUMCOL) != NULL)
-	return number_width(wp) + 1;
-    return 0;
+    எனில் ((wp->w_p_nu || wp->w_p_rnu) && vim_strchr(p_cpo, CPO_NUMCOL) != வெற்று)
+	திரும்பு எண்_width(wp) + 1;
+    திரும்பு 0;
 }
 
-    int
-curwin_col_off2(void)
+    முழு
+curwin_col_off2(வெறுமை)
 {
-    return win_col_off2(curwin);
+    திரும்பு win_col_off2(curwin);
 }
 
 /*
@@ -1230,24 +1230,24 @@ curwin_col_off2(void)
  * Also updates curwin->w_wrow and curwin->w_cline_row.
  * Also updates curwin->w_leftcol.
  */
-    void
+    வெறுமை
 curs_columns(
-    int		may_scroll)	// when TRUE, may scroll horizontally
+    முழு		may_scroll)	// when TRUE, may scroll horizontally
 {
     long	diff;
-    int		extra;		// offset for first screen line
-    long	off_left, off_right;
-    int		n;
-    int		p_lines;
-    int		width1;		// text width for first screen line
-    int		width2 = 0;	// text width for second and later screen line
-    int		new_leftcol;
+    முழு		extra;		// offset for first screen line
+    long	off_இடது, off_வலது;
+    முழு		n;
+    முழு		p_வரிகள்;
+    முழு		width1;		// text width for first screen line
+    முழு		width2 = 0;	// text width for second and later screen line
+    முழு		new_leftcol;
     colnr_T	startcol;
     colnr_T	endcol;
     colnr_T	prev_skipcol;
-    long	so = get_scrolloff_value();
-    long	siso = get_sidescrolloff_value();
-    int		did_sub_skipcol = FALSE;
+    long	so = get_scrolloff_மதிப்பு();
+    long	siso = get_sidescrolloff_மதிப்பு();
+    முழு		did_sub_skipcol = FALSE;
 
     /*
      * First make sure that w_topline is valid (after moving the cursor).
@@ -1257,7 +1257,7 @@ curs_columns(
     /*
      * Next make sure that w_cline_row is valid.
      */
-    if (!(curwin->w_valid & VALID_CROW))
+    எனில் (!(curwin->w_valid & VALID_CROW))
 	curs_rows(curwin);
 
 #ifdef FEAT_PROP_POPUP
@@ -1269,16 +1269,16 @@ curs_columns(
      * Compute the number of virtual columns.
      */
 #ifdef FEAT_FOLDING
-    if (curwin->w_cline_folded)
+    எனில் (curwin->w_cline_folded)
 	// In a folded line the cursor is always in the first column
 	startcol = curwin->w_virtcol = endcol = curwin->w_leftcol;
-    else
+    இல்லையெனில்
 #endif
 	getvvcol(curwin, &curwin->w_cursor, &startcol,
 			 &(curwin->w_virtcol), &endcol, GETVCOL_FOR_VIRTCOL);
 
     // remove '$' from change command when cursor moves onto it
-    if (startcol > dollar_vcol)
+    எனில் (startcol > dollar_vcol)
 	dollar_vcol = -1;
 
     extra = curwin_col_off();
@@ -1291,31 +1291,31 @@ curs_columns(
     curwin->w_wrow = curwin->w_cline_row;
 
     width1 = curwin->w_width - extra;
-    if (width1 <= 0)
+    எனில் (width1 <= 0)
     {
 	// No room for text, put cursor in last char of window.
 	// If not wrapping, the last non-empty line.
 	curwin->w_wcol = curwin->w_width - 1;
-	if (curwin->w_p_wrap)
+	எனில் (curwin->w_p_wrap)
 	    curwin->w_wrow = curwin->w_height - 1;
-	else
+	இல்லையெனில்
 	    curwin->w_wrow = curwin->w_height - 1 - curwin->w_empty_rows;
     }
-    else if (curwin->w_p_wrap && curwin->w_width != 0)
+    இல்லையெனில் எனில் (curwin->w_p_wrap && curwin->w_width != 0)
     {
 	width2 = width1 + curwin_col_off2();
 
 	// skip columns that are not visible
-	if (curwin->w_cursor.lnum == curwin->w_topline
+	எனில் (curwin->w_cursor.lnum == curwin->w_topline
 		&& curwin->w_skipcol > 0
 		&& curwin->w_wcol >= curwin->w_skipcol)
 	{
 	    // Deduct by multiples of width2.  This allows the long line
 	    // wrapping formula below to correctly calculate the w_wcol value
 	    // when wrapping.
-	    if (curwin->w_skipcol <= width1)
+	    எனில் (curwin->w_skipcol <= width1)
 		curwin->w_wcol -= width2;
-	    else
+	    இல்லையெனில்
 		curwin->w_wcol -= width2
 			       * (((curwin->w_skipcol - width1) / width2) + 1);
 
@@ -1323,7 +1323,7 @@ curs_columns(
 	}
 
 	// long line wrapping, adjust curwin->w_wrow
-	if (curwin->w_wcol >= curwin->w_width)
+	எனில் (curwin->w_wcol >= curwin->w_width)
 	{
 	    // this same formula is used in validate_cursor_col()
 	    n = (curwin->w_wcol - curwin->w_width) / width2 + 1;
@@ -1335,17 +1335,17 @@ curs_columns(
     // No line wrapping: compute curwin->w_leftcol if scrolling is on and line
     // is not folded.
     // If scrolling is off, curwin->w_leftcol is assumed to be 0
-    else if (may_scroll
+    இல்லையெனில் எனில் (may_scroll
 #ifdef FEAT_FOLDING
 	    && !curwin->w_cline_folded
 #endif
 	    )
     {
 #ifdef FEAT_PROP_POPUP
-	if (curwin->w_virtcol_first_char > 0)
+	எனில் (curwin->w_virtcol_first_char > 0)
 	{
-	    int cols = (curwin->w_width - extra);
-	    int rows = cols > 0 ? curwin->w_virtcol_first_char / cols : 1;
+	    முழு cols = (curwin->w_width - extra);
+	    முழு rows = cols > 0 ? curwin->w_virtcol_first_char / cols : 1;
 
 	    // each "above" text prop shifts the text one row down
 	    curwin->w_wrow += rows;
@@ -1360,31 +1360,31 @@ curs_columns(
 	 * If we get closer to the edge than 'sidescrolloff', scroll a little
 	 * extra.
 	 */
-	off_left = startcol - curwin->w_leftcol - siso;
-	off_right = endcol - curwin->w_leftcol - (curwin->w_width - siso) + 1;
-	if (off_left < 0 || off_right > 0)
+	off_இடது = startcol - curwin->w_leftcol - siso;
+	off_வலது = endcol - curwin->w_leftcol - (curwin->w_width - siso) + 1;
+	எனில் (off_இடது < 0 || off_வலது > 0)
 	{
-	    if (off_left < 0)
-		diff = -off_left;
-	    else
-		diff = off_right;
+	    எனில் (off_இடது < 0)
+		diff = -off_இடது;
+	    இல்லையெனில்
+		diff = off_வலது;
 
 	    // When far off or not enough room on either side, put cursor in
 	    // middle of window.
-	    if (p_ss == 0 || diff >= width1 / 2 || off_right >= off_left)
+	    எனில் (p_ss == 0 || diff >= width1 / 2 || off_வலது >= off_இடது)
 		new_leftcol = curwin->w_wcol - extra - width1 / 2;
-	    else
+	    இல்லையெனில்
 	    {
-		if (diff < p_ss)
+		எனில் (diff < p_ss)
 		    diff = p_ss;
-		if (off_left < 0)
-		    new_leftcol = curwin->w_leftcol - (int)diff;
-		else
-		    new_leftcol = curwin->w_leftcol + (int)diff;
+		எனில் (off_இடது < 0)
+		    new_leftcol = curwin->w_leftcol - (முழு)diff;
+		இல்லையெனில்
+		    new_leftcol = curwin->w_leftcol + (முழு)diff;
 	    }
-	    if (new_leftcol < 0)
+	    எனில் (new_leftcol < 0)
 		new_leftcol = 0;
-	    if (new_leftcol != (int)curwin->w_leftcol)
+	    எனில் (new_leftcol != (முழு)curwin->w_leftcol)
 	    {
 		curwin->w_leftcol = new_leftcol;
 		// screen has to be redrawn with new curwin->w_leftcol
@@ -1393,31 +1393,31 @@ curs_columns(
 	}
 	curwin->w_wcol -= curwin->w_leftcol;
     }
-    else if (curwin->w_wcol > (int)curwin->w_leftcol)
+    இல்லையெனில் எனில் (curwin->w_wcol > (முழு)curwin->w_leftcol)
 	curwin->w_wcol -= curwin->w_leftcol;
-    else
+    இல்லையெனில்
 	curwin->w_wcol = 0;
 
 #ifdef FEAT_DIFF
     // Skip over filler lines.  At the top use w_topfill, there
     // may be some filler lines above the window.
-    if (curwin->w_cursor.lnum == curwin->w_topline)
+    எனில் (curwin->w_cursor.lnum == curwin->w_topline)
 	curwin->w_wrow += curwin->w_topfill;
-    else
+    இல்லையெனில்
 	curwin->w_wrow += diff_check_fill(curwin, curwin->w_cursor.lnum);
 #endif
 
     prev_skipcol = curwin->w_skipcol;
 
-    p_lines = 0;
+    p_வரிகள் = 0;
 
-    if ((curwin->w_wrow >= curwin->w_height
+    எனில் ((curwin->w_wrow >= curwin->w_height
 		|| ((prev_skipcol > 0
 			|| curwin->w_wrow + so >= curwin->w_height)
-		    && (p_lines =
+		    && (p_வரிகள் =
 #ifdef FEAT_DIFF
 			plines_win_nofill
-#else
+#இல்லையெனில்
 			plines_win
 #endif
 			(curwin, curwin->w_cursor.lnum, FALSE))
@@ -1434,65 +1434,65 @@ curs_columns(
 	// 2: Less than 'scrolloff' lines below
 	// 3: both of them
 	extra = 0;
-	if (curwin->w_skipcol + so * width2 > curwin->w_virtcol)
+	எனில் (curwin->w_skipcol + so * width2 > curwin->w_virtcol)
 	    extra = 1;
 	// Compute last display line of the buffer line that we want at the
 	// bottom of the window.
-	if (p_lines == 0)
-	    p_lines = plines_win(curwin, curwin->w_cursor.lnum, FALSE);
-	--p_lines;
-	if (p_lines > curwin->w_wrow + so)
+	எனில் (p_வரிகள் == 0)
+	    p_வரிகள் = plines_win(curwin, curwin->w_cursor.lnum, FALSE);
+	--p_வரிகள்;
+	எனில் (p_வரிகள் > curwin->w_wrow + so)
 	    n = curwin->w_wrow + so;
-	else
-	    n = p_lines;
-	if ((colnr_T)n >= curwin->w_height + curwin->w_skipcol / width2 - so)
+	இல்லையெனில்
+	    n = p_வரிகள்;
+	எனில் ((colnr_T)n >= curwin->w_height + curwin->w_skipcol / width2 - so)
 	    extra += 2;
 
-	if (extra == 3 || curwin->w_height <= so * 2)
+	எனில் (extra == 3 || curwin->w_height <= so * 2)
 	{
 	    // not enough room for 'scrolloff', put cursor in the middle
 	    n = curwin->w_virtcol / width2;
-	    if (n > curwin->w_height / 2)
+	    எனில் (n > curwin->w_height / 2)
 		n -= curwin->w_height / 2;
-	    else
+	    இல்லையெனில்
 		n = 0;
 	    // don't skip more than necessary
-	    if (n > p_lines - curwin->w_height + 1)
-		n = p_lines - curwin->w_height + 1;
-	    if (n > 0)
+	    எனில் (n > p_வரிகள் - curwin->w_height + 1)
+		n = p_வரிகள் - curwin->w_height + 1;
+	    எனில் (n > 0)
 		curwin->w_skipcol = width1 + (n - 1) * width2;
-	    else
+	    இல்லையெனில்
 		curwin->w_skipcol = 0;
 	}
-	else if (extra == 1)
+	இல்லையெனில் எனில் (extra == 1)
 	{
 	    // less than 'scrolloff' lines above, decrease skipcol
 	    extra = (curwin->w_skipcol + so * width2 - curwin->w_virtcol
 				     + width2 - 1) / width2;
-	    if (extra > 0)
+	    எனில் (extra > 0)
 	    {
-		if ((colnr_T)(extra * width2) > curwin->w_skipcol)
+		எனில் ((colnr_T)(extra * width2) > curwin->w_skipcol)
 		    extra = curwin->w_skipcol / width2;
 		curwin->w_skipcol -= extra * width2;
 	    }
 	}
-	else if (extra == 2)
+	இல்லையெனில் எனில் (extra == 2)
 	{
 	    // less than 'scrolloff' lines below, increase skipcol
 	    endcol = (n - curwin->w_height + 1) * width2;
-	    while (endcol > curwin->w_virtcol)
+	    போது (endcol > curwin->w_virtcol)
 		endcol -= width2;
-	    if (endcol > curwin->w_skipcol)
+	    எனில் (endcol > curwin->w_skipcol)
 		curwin->w_skipcol = endcol;
 	}
 
 	// adjust w_wrow for the changed w_skipcol
-	if (did_sub_skipcol)
+	எனில் (did_sub_skipcol)
 	    curwin->w_wrow -= (curwin->w_skipcol - prev_skipcol) / width2;
-	else
+	இல்லையெனில்
 	    curwin->w_wrow -= curwin->w_skipcol / width2;
 
-	if (curwin->w_wrow >= curwin->w_height)
+	எனில் (curwin->w_wrow >= curwin->w_height)
 	{
 	    // small window, make sure cursor is in it
 	    extra = curwin->w_wrow - curwin->w_height + 1;
@@ -1500,28 +1500,28 @@ curs_columns(
 	    curwin->w_wrow -= extra;
 	}
 
-	extra = ((int)prev_skipcol - (int)curwin->w_skipcol) / width2;
-	if (extra > 0)
-	    win_ins_lines(curwin, 0, extra, FALSE, FALSE);
-	else if (extra < 0)
-	    win_del_lines(curwin, 0, -extra, FALSE, FALSE, 0);
+	extra = ((முழு)prev_skipcol - (முழு)curwin->w_skipcol) / width2;
+	எனில் (extra > 0)
+	    win_ins_வரிகள்(curwin, 0, extra, FALSE, FALSE);
+	இல்லையெனில் எனில் (extra < 0)
+	    win_del_வரிகள்(curwin, 0, -extra, FALSE, FALSE, 0);
     }
-    else if (!curwin->w_p_sms)
+    இல்லையெனில் எனில் (!curwin->w_p_sms)
 	curwin->w_skipcol = 0;
-    if (prev_skipcol != curwin->w_skipcol)
+    எனில் (prev_skipcol != curwin->w_skipcol)
 	redraw_later(UPD_SOME_VALID);
 
 #ifdef FEAT_SYN_HL
     redraw_for_cursorcolumn(curwin);
 #endif
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
-    if (popup_is_popup(curwin) && curbuf->b_term != NULL)
+#எனில் defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
+    எனில் (popup_is_popup(curwin) && curbuf->b_term != வெற்று)
     {
-	curwin->w_wrow += popup_top_extra(curwin);
-	curwin->w_wcol += popup_left_extra(curwin);
+	curwin->w_wrow += popup_உச்சி_extra(curwin);
+	curwin->w_wcol += popup_இடது_extra(curwin);
 	curwin->w_flags |= WFLAG_WCOL_OFF_ADDED + WFLAG_WROW_OFF_ADDED;
     }
-    else
+    இல்லையெனில்
 	curwin->w_flags &= ~(WFLAG_WCOL_OFF_ADDED + WFLAG_WROW_OFF_ADDED);
 #endif
 
@@ -1533,33 +1533,33 @@ curs_columns(
     curwin->w_valid |= VALID_WCOL|VALID_WROW|VALID_VIRTCOL;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_PROP_POPUP)
+#எனில் defined(FEAT_EVAL) || defined(FEAT_PROP_POPUP)
 /*
  * Compute the screen position of text character at "pos" in window "wp"
  * The resulting values are one-based, zero when character is not visible.
  */
-    void
+    வெறுமை
 textpos2screenpos(
 	win_T	*wp,
 	pos_T	*pos,
-	int	*rowp,	// screen row
-	int	*scolp,	// start screen column
-	int	*ccolp,	// cursor screen column
-	int	*ecolp)	// end screen column
+	முழு	*rowp,	// screen row
+	முழு	*scolp,	// start screen column
+	முழு	*ccolp,	// cursor screen column
+	முழு	*ecolp)	// end screen column
 {
     colnr_T	scol = 0, ccol = 0, ecol = 0;
-    int		row = 0;
+    முழு		row = 0;
     colnr_T	coloff = 0;
 
-    if (pos->lnum >= wp->w_topline && pos->lnum <= wp->w_botline)
+    எனில் (pos->lnum >= wp->w_topline && pos->lnum <= wp->w_botline)
     {
 	colnr_T	    col;
-	int	    width;
+	முழு	    width;
 	linenr_T    lnum = pos->lnum;
 # ifdef FEAT_FOLDING
-	int	    is_folded;
+	முழு	    is_folded;
 
-	is_folded = hasFoldingWin(wp, lnum, &lnum, NULL, TRUE, NULL);
+	is_folded = hasFoldingWin(wp, lnum, &lnum, வெற்று, TRUE, வெற்று);
 # endif
 	row = plines_m_win(wp, wp->w_topline, lnum - 1, INT_MAX);
 	// "row" should be the screen line where line "lnum" begins, which can
@@ -1574,12 +1574,12 @@ textpos2screenpos(
 
 	colnr_T	off = win_col_off(wp);
 # ifdef FEAT_FOLDING
-	if (is_folded)
+	எனில் (is_folded)
 	{
 	    row += W_WINROW(wp) + 1;
 	    coloff = wp->w_wincol + 1 + off;
 	}
-	else
+	இல்லையெனில்
 # endif
 	{
 	    getvcol(wp, pos, &scol, &ccol, &ecol, 0);
@@ -1590,24 +1590,24 @@ textpos2screenpos(
 	    width = wp->w_width - off + win_col_off2(wp);
 
 	    // long line wrapping, adjust row
-	    if (wp->w_p_wrap
+	    எனில் (wp->w_p_wrap
 		    && col >= (colnr_T)wp->w_width
 		    && width > 0)
 	    {
 		// use same formula as what is used in curs_columns()
-		int rowoff = ((col - wp->w_width) / width + 1);
+		முழு rowoff = ((col - wp->w_width) / width + 1);
 		col -= rowoff * width;
 		row += rowoff;
 	    }
 	    col -= wp->w_leftcol;
-	    if (col >= wp->w_width)
+	    எனில் (col >= wp->w_width)
 		col = -1;
-	    if (col >= 0 && row >= 0 && row < wp->w_height)
+	    எனில் (col >= 0 && row >= 0 && row < wp->w_height)
 	    {
 		coloff = col - scol + wp->w_wincol + 1;
 		row += W_WINROW(wp) + 1;
 	    }
-	    else
+	    இல்லையெனில்
 		// character is out of the window
 		row = scol = ccol = ecol = 0;
 	}
@@ -1617,11 +1617,11 @@ textpos2screenpos(
     *ccolp = ccol + coloff;
     *ecolp = ecol + coloff;
 # ifdef FEAT_RIGHTLEFT
-    if (wp->w_p_rl && row > 0)
+    எனில் (wp->w_p_rl && row > 0)
     {
 	// With 'rightleft' the cursor is on the leftmost cell of the
 	// character, which comes last in reading order.
-	int endoff = *ecolp - wp->w_wincol - 1;
+	முழு endoff = *ecolp - wp->w_wincol - 1;
 
 	*ccolp = wp->w_wincol + wp->w_width - endoff;
     }
@@ -1629,49 +1629,49 @@ textpos2screenpos(
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 /*
  * "screenpos({winid}, {lnum}, {col})" function
  */
-    void
+    வெறுமை
 f_screenpos(typval_T *argvars UNUSED, typval_T *rettv)
 {
     dict_T	*dict;
     win_T	*wp;
     pos_T	pos;
-    int		row = 0;
-    int		scol = 0, ccol = 0, ecol = 0;
+    முழு		row = 0;
+    முழு		scol = 0, ccol = 0, ecol = 0;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    எனில் (rettv_dict_alloc(rettv) == FAIL)
+	திரும்பு;
     dict = rettv->vval.v_dict;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_number_arg(argvars, 2) == FAIL))
-	return;
+    எனில் (in_vim9script()
+	    && (check_for_எண்_arg(argvars, 0) == FAIL
+		|| check_for_எண்_arg(argvars, 1) == FAIL
+		|| check_for_எண்_arg(argvars, 2) == FAIL))
+	திரும்பு;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
-	return;
+    எனில் (wp == வெற்று)
+	திரும்பு;
 
-    pos.lnum = tv_get_number(&argvars[1]);
-    if (pos.lnum > wp->w_buffer->b_ml.ml_line_count)
+    pos.lnum = tv_get_எண்(&argvars[1]);
+    எனில் (pos.lnum > wp->w_buffer->b_ml.ml_வரி_மொத்தம்)
     {
-	semsg(_(e_invalid_line_number_nr), pos.lnum);
-	return;
+	semsg(_(e_invalid_வரி_எண்_nr), pos.lnum);
+	திரும்பு;
     }
-    pos.col = tv_get_number(&argvars[2]) - 1;
-    if (pos.col < 0)
+    pos.col = tv_get_எண்(&argvars[2]) - 1;
+    எனில் (pos.col < 0)
 	pos.col = 0;
     pos.coladd = 0;
     textpos2screenpos(wp, &pos, &row, &scol, &ccol, &ecol);
 
-    dict_add_number(dict, "row", row);
-    dict_add_number(dict, "col", scol);
-    dict_add_number(dict, "curscol", ccol);
-    dict_add_number(dict, "endcol", ecol);
+    dict_add_எண்(dict, "row", row);
+    dict_add_எண்(dict, "col", scol);
+    dict_add_எண்(dict, "curscol", ccol);
+    dict_add_எண்(dict, "endcol", ecol);
 }
 
 /*
@@ -1679,54 +1679,54 @@ f_screenpos(typval_T *argvars UNUSED, typval_T *rettv)
  * is one.  For a multibyte character, the column number of the first byte is
  * returned.
  */
-    static int
-virtcol2col(win_T *wp, linenr_T lnum, int vcol)
+    நிலையான முழு
+virtcol2col(win_T *wp, linenr_T lnum, முழு vcol)
 {
-    int		offset = vcol2col(wp, lnum, vcol - 1, NULL);
-    char_u	*line = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    char_u	*p = line + offset;
+    முழு		offset = vcol2col(wp, lnum, vcol - 1, வெற்று);
+    char_u	*வரி = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    char_u	*p = வரி + offset;
 
-    if (*p == NUL)
+    எனில் (*p == NUL)
     {
-	if (p == line)  // empty line
-	    return 0;
+	எனில் (p == வரி)  // empty line
+	    திரும்பு 0;
 	// Move to the first byte of the last char.
-	MB_PTR_BACK(line, p);
+	MB_PTR_BACK(வரி, p);
     }
-    return (int)(p - line + 1);
+    திரும்பு (முழு)(p - வரி + 1);
 }
 
 /*
  * "virtcol2col({winid}, {lnum}, {col})" function
  */
-    void
+    வெறுமை
 f_virtcol2col(typval_T *argvars UNUSED, typval_T *rettv)
 {
     win_T	*wp;
     linenr_T	lnum;
-    int		screencol;
-    int		error = FALSE;
+    முழு		screencol;
+    முழு		error = FALSE;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_எண் = -1;
 
-    if (check_for_number_arg(argvars, 0) == FAIL
-	    || check_for_number_arg(argvars, 1) == FAIL
-	    || check_for_number_arg(argvars, 2) == FAIL)
-	return;
+    எனில் (check_for_எண்_arg(argvars, 0) == FAIL
+	    || check_for_எண்_arg(argvars, 1) == FAIL
+	    || check_for_எண்_arg(argvars, 2) == FAIL)
+	திரும்பு;
 
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
-	return;
+    எனில் (wp == வெற்று)
+	திரும்பு;
 
-    lnum = tv_get_number_chk(&argvars[1], &error);
-    if (error || lnum < 0 || lnum > wp->w_buffer->b_ml.ml_line_count)
-	return;
+    lnum = tv_get_எண்_chk(&argvars[1], &error);
+    எனில் (error || lnum < 0 || lnum > wp->w_buffer->b_ml.ml_வரி_மொத்தம்)
+	திரும்பு;
 
-    screencol = tv_get_number_chk(&argvars[2], &error);
-    if (error || screencol < 0)
-	return;
+    screencol = tv_get_எண்_chk(&argvars[2], &error);
+    எனில் (error || screencol < 0)
+	திரும்பு;
 
-    rettv->vval.v_number = virtcol2col(wp, lnum, screencol);
+    rettv->vval.v_எண் = virtcol2col(wp, lnum, screencol);
 }
 #endif
 
@@ -1734,54 +1734,54 @@ f_virtcol2col(typval_T *argvars UNUSED, typval_T *rettv)
  * Make sure the cursor is in the visible part of the topline after scrolling
  * the screen with 'smoothscroll'.
  */
-static void cursor_correct_sms(void)
+நிலையான வெறுமை cursor_correct_sms(வெறுமை)
 {
-    if (!curwin->w_p_sms || !curwin->w_p_wrap
+    எனில் (!curwin->w_p_sms || !curwin->w_p_wrap
 	|| curwin->w_cursor.lnum != curwin->w_topline)
-	return;
+	திரும்பு;
 
-    long    so = get_scrolloff_value();
-    int	    width1 = curwin->w_width - curwin_col_off();
-    int	    width2 = width1 + curwin_col_off2();
-    int	    so_cols = so == 0 ? 0 : width1 + (so - 1) * width2;
-    int	    space_cols = (curwin->w_height - 1) * width2;
-    int	    overlap, top, bot;
-    int	    size = so == 0 ? 0 : linetabsize_eol(curwin, curwin->w_topline);
+    long    so = get_scrolloff_மதிப்பு();
+    முழு	    width1 = curwin->w_width - curwin_col_off();
+    முழு	    width2 = width1 + curwin_col_off2();
+    முழு	    so_cols = so == 0 ? 0 : width1 + (so - 1) * width2;
+    முழு	    space_cols = (curwin->w_height - 1) * width2;
+    முழு	    overlap, உச்சி, bot;
+    முழு	    size = so == 0 ? 0 : linetabsize_eol(curwin, curwin->w_topline);
 
-    if (curwin->w_topline == 1 && curwin->w_skipcol == 0)
+    எனில் (curwin->w_topline == 1 && curwin->w_skipcol == 0)
 	so_cols = 0;               // Ignore 'scrolloff' at top of buffer.
-    else if (so_cols > space_cols / 2)
+    இல்லையெனில் எனில் (so_cols > space_cols / 2)
 	so_cols = space_cols / 2;  // Not enough room: put cursor in the middle.
 
     // Not enough screen lines in topline: ignore 'scrolloff'.
-    while (so_cols > size && so_cols - width2 >= width1 && width1 > 0)
+    போது (so_cols > size && so_cols - width2 >= width1 && width1 > 0)
 	so_cols -= width2;
-    if (so_cols >= width1 && so_cols > size)
+    எனில் (so_cols >= width1 && so_cols > size)
 	so_cols -= width1;
 
     overlap = curwin->w_skipcol == 0 ? 0
 			: sms_marker_overlap(curwin, curwin->w_width - width2);
     // If we have non-zero scrolloff, ignore marker overlap.
-    top = curwin->w_skipcol + (so_cols != 0 ? so_cols : overlap);
+    உச்சி = curwin->w_skipcol + (so_cols != 0 ? so_cols : overlap);
     bot = curwin->w_skipcol + width1 + (curwin->w_height - 1) * width2
 								    - so_cols;
     validate_virtcol();
     colnr_T col = curwin->w_virtcol;
 
-    if (col < top)
+    எனில் (col < உச்சி)
     {
-	if (col < width1)
+	எனில் (col < width1)
 	    col += width1;
-	while (width2 > 0 && col < top)
+	போது (width2 > 0 && col < உச்சி)
 	    col += width2;
     }
-    else
-	while (width2 > 0 && col >= bot)
+    இல்லையெனில்
+	போது (width2 > 0 && col >= bot)
 	    col -= width2;
 
-    if (col != curwin->w_virtcol)
+    எனில் (col != curwin->w_virtcol)
     {
-	int rc;
+	முழு rc;
 
 	curwin->w_curswant = col;
 	rc = coladvance(curwin->w_curswant);
@@ -1789,11 +1789,11 @@ static void cursor_correct_sms(void)
 	// moving the cursor they need to be recomputed
 	curwin->w_valid &=
 	    ~(VALID_WROW|VALID_WCOL|VALID_CHEIGHT|VALID_CROW|VALID_VIRTCOL);
-	if (rc == FAIL && curwin->w_skipcol > 0
-		&& curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+	எனில் (rc == FAIL && curwin->w_skipcol > 0
+		&& curwin->w_cursor.lnum < curbuf->b_ml.ml_வரி_மொத்தம்)
 	{
 	    validate_virtcol();
-	    if (curwin->w_virtcol < curwin->w_skipcol + overlap)
+	    எனில் (curwin->w_virtcol < curwin->w_skipcol + overlap)
 	    {
 		// Cursor still not visible: move it to the next line instead.
 		curwin->w_cursor.lnum++;
@@ -1809,21 +1809,21 @@ static void cursor_correct_sms(void)
 /*
  * Scroll "count" lines up or down, and redraw.
  */
-    void
-scroll_redraw(int up, long count)
+    வெறுமை
+scroll_redraw(முழு up, long மொத்தம்)
 {
     linenr_T	prev_topline = curwin->w_topline;
-    int		prev_skipcol = curwin->w_skipcol;
+    முழு		prev_skipcol = curwin->w_skipcol;
 #ifdef FEAT_DIFF
-    int		prev_topfill = curwin->w_topfill;
+    முழு		prev_topfill = curwin->w_topfill;
 #endif
     linenr_T	prev_lnum = curwin->w_cursor.lnum;
 
-    if (up)
-	scrollup(count, TRUE);
-    else
-	scrolldown(count, TRUE);
-    if (get_scrolloff_value() > 0)
+    எனில் (up)
+	scrollup(மொத்தம், TRUE);
+    இல்லையெனில்
+	scrolldown(மொத்தம், TRUE);
+    எனில் (get_scrolloff_மதிப்பு() > 0)
     {
 	// Adjust the cursor position for 'scrolloff'.  Mark w_topline as
 	// valid, otherwise the screen jumps back at the end of the file.
@@ -1834,25 +1834,25 @@ scroll_redraw(int up, long count)
 	// If moved back to where we were, at least move the cursor, otherwise
 	// we get stuck at one position.  Don't move the cursor up if the
 	// first line of the buffer is already on the screen
-	while (curwin->w_topline == prev_topline
+	போது (curwin->w_topline == prev_topline
 		&& curwin->w_skipcol == prev_skipcol
 #ifdef FEAT_DIFF
 		&& curwin->w_topfill == prev_topfill
 #endif
 		)
 	{
-	    if (up)
+	    எனில் (up)
 	    {
-		if (curwin->w_cursor.lnum > prev_lnum
+		எனில் (curwin->w_cursor.lnum > prev_lnum
 			|| cursor_down(1L, FALSE) == FAIL)
-		    break;
+		    நிறுத்து;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
-		if (curwin->w_cursor.lnum < prev_lnum
+		எனில் (curwin->w_cursor.lnum < prev_lnum
 			|| prev_topline == 1L
 			|| cursor_up(1L, FALSE) == FAIL)
-		    break;
+		    நிறுத்து;
 	    }
 	    // Mark w_topline as valid, otherwise the screen jumps back at the
 	    // end of the file.
@@ -1862,7 +1862,7 @@ scroll_redraw(int up, long count)
     }
 
     cursor_correct_sms();
-    if (curwin->w_cursor.lnum != prev_lnum)
+    எனில் (curwin->w_cursor.lnum != prev_lnum)
 	coladvance(curwin->w_curswant);
     redraw_later(UPD_VALID);
 }
@@ -1870,19 +1870,19 @@ scroll_redraw(int up, long count)
 /*
  * Scroll the current window down by "line_count" logical lines.  "CTRL-Y"
  */
-    void
+    வெறுமை
 scrolldown(
-    long	line_count,
-    int		byfold UNUSED)	// TRUE: count a closed fold as one line
+    long	வரி_மொத்தம்,
+    முழு		byfold UNUSED)	// TRUE: count a closed fold as one line
 {
     long	done = 0;	// total # of physical lines done
-    int		wrow;
-    int		moved = FALSE;
-    int		do_sms = curwin->w_p_wrap && curwin->w_p_sms;
-    int		width1 = 0;
-    int		width2 = 0;
+    முழு		wrow;
+    முழு		moved = FALSE;
+    முழு		do_sms = curwin->w_p_wrap && curwin->w_p_sms;
+    முழு		width1 = 0;
+    முழு		width2 = 0;
 
-    if (do_sms)
+    எனில் (do_sms)
     {
 	width1 = curwin->w_width - curwin_col_off();
 	width2 = width1 + curwin_col_off2();
@@ -1892,36 +1892,36 @@ scrolldown(
     linenr_T	first;
 
     // Make sure w_topline is at the first of a sequence of folded lines.
-    (void)hasFolding(curwin->w_topline, &curwin->w_topline, NULL);
+    (வெறுமை)hasFolding(curwin->w_topline, &curwin->w_topline, வெற்று);
 #endif
     validate_cursor();		// w_wrow needs to be valid
-    for (int todo = line_count; todo > 0; --todo)
+    க்கு (முழு todo = வரி_மொத்தம்; todo > 0; --todo)
     {
 #ifdef FEAT_DIFF
-	if (curwin->w_topfill < diff_check_fill(curwin, curwin->w_topline)
+	எனில் (curwin->w_topfill < diff_check_fill(curwin, curwin->w_topline)
 		&& curwin->w_topfill < curwin->w_height - 1)
 	{
 	    ++curwin->w_topfill;
 	    ++done;
 	}
-	else
+	இல்லையெனில்
 #endif
 	{
 	    // break when at the very top
-	    if (curwin->w_topline == 1
+	    எனில் (curwin->w_topline == 1
 				   && (!do_sms || curwin->w_skipcol < width1))
-		break;
-	    if (do_sms && curwin->w_skipcol >= width1)
+		நிறுத்து;
+	    எனில் (do_sms && curwin->w_skipcol >= width1)
 	    {
 		// scroll a screen line down
-		if (curwin->w_skipcol >= width1 + width2)
+		எனில் (curwin->w_skipcol >= width1 + width2)
 		    curwin->w_skipcol -= width2;
-		else
+		இல்லையெனில்
 		    curwin->w_skipcol -= width1;
 		redraw_later(UPD_NOT_VALID);
 		++done;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		// scroll a text line down
 		--curwin->w_topline;
@@ -1931,33 +1931,33 @@ scrolldown(
 #endif
 #ifdef FEAT_FOLDING
 		// A sequence of folded lines only counts for one logical line
-		if (hasFolding(curwin->w_topline, &first, NULL))
+		எனில் (hasFolding(curwin->w_topline, &first, வெற்று))
 		{
 		    ++done;
-		    if (!byfold)
+		    எனில் (!byfold)
 			todo -= curwin->w_topline - first - 1;
 		    curwin->w_botline -= curwin->w_topline - first;
 		    curwin->w_topline = first;
 		}
-		else
+		இல்லையெனில்
 #endif
-		if (do_sms)
+		எனில் (do_sms)
 		{
-		    int size = linetabsize_eol(curwin, curwin->w_topline);
-		    if (size > width1)
+		    முழு size = linetabsize_eol(curwin, curwin->w_topline);
+		    எனில் (size > width1)
 		    {
 			curwin->w_skipcol = width1;
 			size -= width1;
 			redraw_later(UPD_NOT_VALID);
 		    }
-		    while (size > width2)
+		    போது (size > width2)
 		    {
 			curwin->w_skipcol += width2;
 			size -= width2;
 		    }
 		    ++done;
 		}
-		else
+		இல்லையெனில்
 		    done += PLINES_NOFILL(curwin->w_topline);
 	    }
 	}
@@ -1968,7 +1968,7 @@ scrolldown(
     curwin->w_cline_row += done;	// keep w_cline_row updated
 
 #ifdef FEAT_DIFF
-    if (curwin->w_cursor.lnum == curwin->w_topline)
+    எனில் (curwin->w_cursor.lnum == curwin->w_topline)
 	curwin->w_cline_row = 0;
     check_topfill(curwin, TRUE);
 #endif
@@ -1978,32 +1978,32 @@ scrolldown(
      * and move the cursor onto the displayed part of the window.
      */
     wrow = curwin->w_wrow;
-    if (curwin->w_p_wrap && curwin->w_width != 0)
+    எனில் (curwin->w_p_wrap && curwin->w_width != 0)
     {
 	validate_virtcol();
 	validate_cheight();
 	wrow += curwin->w_cline_height - 1 -
 	    curwin->w_virtcol / curwin->w_width;
     }
-    while (wrow >= curwin->w_height && curwin->w_cursor.lnum > 1)
+    போது (wrow >= curwin->w_height && curwin->w_cursor.lnum > 1)
     {
 #ifdef FEAT_FOLDING
-	if (hasFolding(curwin->w_cursor.lnum, &first, NULL))
+	எனில் (hasFolding(curwin->w_cursor.lnum, &first, வெற்று))
 	{
 	    --wrow;
-	    if (first == 1)
+	    எனில் (first == 1)
 		curwin->w_cursor.lnum = 1;
-	    else
+	    இல்லையெனில்
 		curwin->w_cursor.lnum = first - 1;
 	}
-	else
+	இல்லையெனில்
 #endif
 	    wrow -= plines(curwin->w_cursor.lnum--);
 	curwin->w_valid &=
 	      ~(VALID_WROW|VALID_WCOL|VALID_CHEIGHT|VALID_CROW|VALID_VIRTCOL);
 	moved = TRUE;
     }
-    if (moved)
+    எனில் (moved)
     {
 #ifdef FEAT_FOLDING
 	// Move cursor to first line of closed fold.
@@ -2011,21 +2011,21 @@ scrolldown(
 #endif
 	coladvance(curwin->w_curswant);
     }
-    if (curwin->w_cursor.lnum < curwin->w_topline)
+    எனில் (curwin->w_cursor.lnum < curwin->w_topline)
 	curwin->w_cursor.lnum = curwin->w_topline;
 }
 
 /*
  * Scroll the current window up by "line_count" logical lines.  "CTRL-E"
  */
-    void
+    வெறுமை
 scrollup(
-    long	line_count,
-    int		byfold UNUSED)	// TRUE: count a closed fold as one line
+    long	வரி_மொத்தம்,
+    முழு		byfold UNUSED)	// TRUE: count a closed fold as one line
 {
-    int		do_sms = curwin->w_p_wrap && curwin->w_p_sms;
+    முழு		do_sms = curwin->w_p_wrap && curwin->w_p_sms;
 
-    if (do_sms
+    எனில் (do_sms
 #ifdef FEAT_FOLDING
 	    || (byfold && hasAnyFolding(curwin))
 #endif
@@ -2034,58 +2034,58 @@ scrollup(
 #endif
        )
     {
-	int	    width1 = curwin->w_width - curwin_col_off();
-	int	    width2 = width1 + curwin_col_off2();
-	int	    size = 0;
+	முழு	    width1 = curwin->w_width - curwin_col_off();
+	முழு	    width2 = width1 + curwin_col_off2();
+	முழு	    size = 0;
 	colnr_T	    prev_skipcol = curwin->w_skipcol;
 
-	if (do_sms)
+	எனில் (do_sms)
 	    size = linetabsize_eol(curwin, curwin->w_topline);
 
 	// diff mode: first consume "topfill"
 	// 'smoothscroll': increase "w_skipcol" until it goes over the end of
 	// the line, then advance to the next line.
 	// folding: count each sequence of folded lines as one logical line.
-	for (int todo = line_count; todo > 0; --todo)
+	க்கு (முழு todo = வரி_மொத்தம்; todo > 0; --todo)
 	{
 #ifdef FEAT_DIFF
-	    if (curwin->w_topfill > 0)
+	    எனில் (curwin->w_topfill > 0)
 		--curwin->w_topfill;
-	    else
+	    இல்லையெனில்
 #endif
 	    {
 		linenr_T lnum = curwin->w_topline;
 
 #ifdef FEAT_FOLDING
-		if (byfold)
+		எனில் (byfold)
 		    // for a closed fold: go to the last line in the fold
-		    (void)hasFolding(lnum, NULL, &lnum);
+		    (வெறுமை)hasFolding(lnum, வெற்று, &lnum);
 #endif
-		if (lnum == curwin->w_topline && do_sms)
+		எனில் (lnum == curwin->w_topline && do_sms)
 		{
 		    // 'smoothscroll': increase "w_skipcol" until it goes over
 		    // the end of the line, then advance to the next line.
-		    int add = curwin->w_skipcol > 0 ? width2 : width1;
+		    முழு add = curwin->w_skipcol > 0 ? width2 : width1;
 		    curwin->w_skipcol += add;
-		    if (curwin->w_skipcol >= size)
+		    எனில் (curwin->w_skipcol >= size)
 		    {
-			if (lnum == curbuf->b_ml.ml_line_count)
+			எனில் (lnum == curbuf->b_ml.ml_வரி_மொத்தம்)
 			{
 			    // at the last screen line, can't scroll further
 			    curwin->w_skipcol -= add;
-			    break;
+			    நிறுத்து;
 			}
 			++lnum;
 		    }
 		}
-		else
+		இல்லையெனில்
 		{
-		    if (lnum >= curbuf->b_ml.ml_line_count)
-			break;
+		    எனில் (lnum >= curbuf->b_ml.ml_வரி_மொத்தம்)
+			நிறுத்து;
 		    ++lnum;
 		}
 
-		if (lnum > curwin->w_topline)
+		எனில் (lnum > curwin->w_topline)
 		{
 		    // approximate w_botline
 		    curwin->w_botline += lnum - curwin->w_topline;
@@ -2094,40 +2094,40 @@ scrollup(
 		    curwin->w_topfill = diff_check_fill(curwin, lnum);
 #endif
 		    curwin->w_skipcol = 0;
-		    if (todo > 1 && do_sms)
+		    எனில் (todo > 1 && do_sms)
 			size = linetabsize_eol(curwin, curwin->w_topline);
 		}
 	    }
 	}
 
-	if (prev_skipcol > 0 || curwin->w_skipcol > 0)
+	எனில் (prev_skipcol > 0 || curwin->w_skipcol > 0)
 	    // need to redraw more, because wl_size of the (new) topline may
 	    // now be invalid
 	    redraw_later(UPD_NOT_VALID);
     }
-    else
+    இல்லையெனில்
     {
-	curwin->w_topline += line_count;
-	curwin->w_botline += line_count;	// approximate w_botline
+	curwin->w_topline += வரி_மொத்தம்;
+	curwin->w_botline += வரி_மொத்தம்;	// approximate w_botline
     }
 
-    if (curwin->w_topline > curbuf->b_ml.ml_line_count)
-	curwin->w_topline = curbuf->b_ml.ml_line_count;
-    if (curwin->w_botline > curbuf->b_ml.ml_line_count + 1)
-	curwin->w_botline = curbuf->b_ml.ml_line_count + 1;
+    எனில் (curwin->w_topline > curbuf->b_ml.ml_வரி_மொத்தம்)
+	curwin->w_topline = curbuf->b_ml.ml_வரி_மொத்தம்;
+    எனில் (curwin->w_botline > curbuf->b_ml.ml_வரி_மொத்தம் + 1)
+	curwin->w_botline = curbuf->b_ml.ml_வரி_மொத்தம் + 1;
 
 #ifdef FEAT_DIFF
     check_topfill(curwin, FALSE);
 #endif
 
 #ifdef FEAT_FOLDING
-    if (hasAnyFolding(curwin))
+    எனில் (hasAnyFolding(curwin))
 	// Make sure w_topline is at the first of a sequence of folded lines.
-	(void)hasFolding(curwin->w_topline, &curwin->w_topline, NULL);
+	(வெறுமை)hasFolding(curwin->w_topline, &curwin->w_topline, வெற்று);
 #endif
 
     curwin->w_valid &= ~(VALID_WROW|VALID_CROW|VALID_BOTLINE);
-    if (curwin->w_cursor.lnum < curwin->w_topline)
+    எனில் (curwin->w_cursor.lnum < curwin->w_topline)
     {
 	curwin->w_cursor.lnum = curwin->w_topline;
 	curwin->w_valid &=
@@ -2140,27 +2140,27 @@ scrollup(
  * Called after changing the cursor column: make sure that curwin->w_skipcol is
  * valid for 'smoothscroll'.
  */
-    void
-adjust_skipcol(void)
+    வெறுமை
+adjust_skipcol(வெறுமை)
 {
-    if (!curwin->w_p_wrap
+    எனில் (!curwin->w_p_wrap
 	    || !curwin->w_p_sms
 	    || curwin->w_cursor.lnum != curwin->w_topline)
-	return;
+	திரும்பு;
 
-    int	    width1 = curwin->w_width - curwin_col_off();
-    if (width1 <= 0)
-	return;  // no text will be displayed
+    முழு	    width1 = curwin->w_width - curwin_col_off();
+    எனில் (width1 <= 0)
+	திரும்பு;  // no text will be displayed
 
-    int	    width2 = width1 + curwin_col_off2();
-    long    so = get_scrolloff_value();
-    int	    scrolloff_cols = so == 0 ? 0 : width1 + (so - 1) * width2;
-    int	    scrolled = FALSE;
-    int	    row = 0;
-    int	    overlap, col;
+    முழு	    width2 = width1 + curwin_col_off2();
+    long    so = get_scrolloff_மதிப்பு();
+    முழு	    scrolloff_cols = so == 0 ? 0 : width1 + (so - 1) * width2;
+    முழு	    scrolled = FALSE;
+    முழு	    row = 0;
+    முழு	    overlap, col;
 
     validate_cheight();
-    if (curwin->w_cline_height == curwin->w_height
+    எனில் (curwin->w_cline_height == curwin->w_height
 	    // w_cline_height may be capped at w_height, check there aren't
 	    // actually more lines.
 	    && plines_win(curwin, curwin->w_cursor.lnum, FALSE)
@@ -2168,60 +2168,60 @@ adjust_skipcol(void)
     {
 	// the line just fits in the window, don't scroll
 	reset_skipcol();
-	return;
+	திரும்பு;
     }
 
     validate_virtcol();
     overlap = sms_marker_overlap(curwin, curwin->w_width - width2);
-    while (curwin->w_skipcol > 0
+    போது (curwin->w_skipcol > 0
 	    && curwin->w_virtcol < curwin->w_skipcol + overlap + scrolloff_cols)
     {
 	// scroll a screen line down
-	if (curwin->w_skipcol >= width1 + width2)
+	எனில் (curwin->w_skipcol >= width1 + width2)
 	    curwin->w_skipcol -= width2;
-	else
+	இல்லையெனில்
 	    curwin->w_skipcol -= width1;
 	scrolled = TRUE;
     }
-    if (scrolled)
+    எனில் (scrolled)
     {
 	validate_virtcol();
 	redraw_later(UPD_NOT_VALID);
-	return;  // don't scroll in the other direction now
+	திரும்பு;  // don't scroll in the other direction now
     }
 
     col = curwin->w_virtcol + scrolloff_cols;
 
     // Avoid adjusting for 'scrolloff' beyond the text line height.
-    if (scrolloff_cols > 0)
+    எனில் (scrolloff_cols > 0)
     {
-	int size = linetabsize_eol(curwin, curwin->w_topline);
+	முழு size = linetabsize_eol(curwin, curwin->w_topline);
 	size = width1 + width2 * ((size - width1 + width2 - 1) / width2);
-	while (col > size)
+	போது (col > size)
 	    col -= width2;
     }
     col -= curwin->w_skipcol;
 
-    if (col >= width1)
+    எனில் (col >= width1)
     {
 	col -= width1;
 	++row;
     }
-    if (col > width2)
+    எனில் (col > width2)
     {
 	row += col / width2;
 	// col may no longer be used, but make
 	// sure it is correct anyhow, just in case
 	col = col % width2;
     }
-    if (row >= curwin->w_height)
+    எனில் (row >= curwin->w_height)
     {
-	if (curwin->w_skipcol == 0)
+	எனில் (curwin->w_skipcol == 0)
 	{
 	    curwin->w_skipcol += width1;
 	    --row;
 	}
-	if (row >= curwin->w_height)
+	எனில் (row >= curwin->w_height)
 	    curwin->w_skipcol += (row - curwin->w_height) * width2;
 	redraw_later(UPD_NOT_VALID);
     }
@@ -2231,28 +2231,28 @@ adjust_skipcol(void)
 /*
  * Don't end up with too many filler lines in the window.
  */
-    void
+    வெறுமை
 check_topfill(
     win_T	*wp,
-    int		down)	// when TRUE scroll down when not enough space
+    முழு		down)	// when TRUE scroll down when not enough space
 {
-    int		n;
+    முழு		n;
 
-    if (wp->w_topfill <= 0)
-	return;
+    எனில் (wp->w_topfill <= 0)
+	திரும்பு;
 
     n = plines_win_nofill(wp, wp->w_topline, TRUE);
-    if (wp->w_topfill + n > wp->w_height)
+    எனில் (wp->w_topfill + n > wp->w_height)
     {
-	if (down && wp->w_topline > 1)
+	எனில் (down && wp->w_topline > 1)
 	{
 	    --wp->w_topline;
 	    wp->w_topfill = 0;
 	}
-	else
+	இல்லையெனில்
 	{
 	    wp->w_topfill = wp->w_height - n;
-	    if (wp->w_topfill < 0)
+	    எனில் (wp->w_topfill < 0)
 		wp->w_topfill = 0;
 	}
     }
@@ -2263,21 +2263,21 @@ check_topfill(
  * Scroll the screen one line down, but don't do it if it would move the
  * cursor off the screen.
  */
-    void
-scrolldown_clamp(void)
+    வெறுமை
+scrolldown_clamp(வெறுமை)
 {
-    int		end_row;
+    முழு		end_row;
 #ifdef FEAT_DIFF
-    int		can_fill = (curwin->w_topfill
+    முழு		can_fill = (curwin->w_topfill
 				< diff_check_fill(curwin, curwin->w_topline));
 #endif
 
-    if (curwin->w_topline <= 1
+    எனில் (curwin->w_topline <= 1
 #ifdef FEAT_DIFF
 	    && !can_fill
 #endif
 	    )
-	return;
+	திரும்பு;
 
     validate_cursor();	    // w_wrow needs to be valid
 
@@ -2288,38 +2288,38 @@ scrolldown_clamp(void)
      */
     end_row = curwin->w_wrow;
 #ifdef FEAT_DIFF
-    if (can_fill)
+    எனில் (can_fill)
 	++end_row;
-    else
+    இல்லையெனில்
 	end_row += plines_nofill(curwin->w_topline - 1);
-#else
+#இல்லையெனில்
     end_row += plines(curwin->w_topline - 1);
 #endif
-    if (curwin->w_p_wrap && curwin->w_width != 0)
+    எனில் (curwin->w_p_wrap && curwin->w_width != 0)
     {
 	validate_cheight();
 	validate_virtcol();
 	end_row += curwin->w_cline_height - 1 -
 	    curwin->w_virtcol / curwin->w_width;
     }
-    if (end_row < curwin->w_height - get_scrolloff_value())
+    எனில் (end_row < curwin->w_height - get_scrolloff_மதிப்பு())
     {
 #ifdef FEAT_DIFF
-	if (can_fill)
+	எனில் (can_fill)
 	{
 	    ++curwin->w_topfill;
 	    check_topfill(curwin, TRUE);
 	}
-	else
+	இல்லையெனில்
 	{
 	    --curwin->w_topline;
 	    curwin->w_topfill = 0;
 	}
-#else
+#இல்லையெனில்
 	--curwin->w_topline;
 #endif
 #ifdef FEAT_FOLDING
-	(void)hasFolding(curwin->w_topline, &curwin->w_topline, NULL);
+	(வெறுமை)hasFolding(curwin->w_topline, &curwin->w_topline, வெற்று);
 #endif
 	--curwin->w_botline;	    // approximate w_botline
 	curwin->w_valid &= ~(VALID_WROW|VALID_CROW|VALID_BOTLINE);
@@ -2330,17 +2330,17 @@ scrolldown_clamp(void)
  * Scroll the screen one line up, but don't do it if it would move the cursor
  * off the screen.
  */
-    void
-scrollup_clamp(void)
+    வெறுமை
+scrollup_clamp(வெறுமை)
 {
-    int	    start_row;
+    முழு	    start_row;
 
-    if (curwin->w_topline == curbuf->b_ml.ml_line_count
+    எனில் (curwin->w_topline == curbuf->b_ml.ml_வரி_மொத்தம்
 #ifdef FEAT_DIFF
 	    && curwin->w_topfill == 0
 #endif
 	    )
-	return;
+	திரும்பு;
 
     validate_cursor();	    // w_wrow needs to be valid
 
@@ -2352,24 +2352,24 @@ scrollup_clamp(void)
 #ifdef FEAT_DIFF
     start_row = curwin->w_wrow - plines_nofill(curwin->w_topline)
 							  - curwin->w_topfill;
-#else
+#இல்லையெனில்
     start_row = curwin->w_wrow - plines(curwin->w_topline);
 #endif
-    if (curwin->w_p_wrap && curwin->w_width != 0)
+    எனில் (curwin->w_p_wrap && curwin->w_width != 0)
     {
 	validate_virtcol();
 	start_row -= curwin->w_virtcol / curwin->w_width;
     }
-    if (start_row >= get_scrolloff_value())
+    எனில் (start_row >= get_scrolloff_மதிப்பு())
     {
 #ifdef FEAT_DIFF
-	if (curwin->w_topfill > 0)
+	எனில் (curwin->w_topfill > 0)
 	    --curwin->w_topfill;
-	else
+	இல்லையெனில்
 #endif
 	{
 #ifdef FEAT_FOLDING
-	    (void)hasFolding(curwin->w_topline, NULL, &curwin->w_topline);
+	    (வெறுமை)hasFolding(curwin->w_topline, வெற்று, &curwin->w_topline);
 #endif
 	    ++curwin->w_topline;
 	}
@@ -2384,39 +2384,39 @@ scrollup_clamp(void)
  * Returns the height of the added line in "lp->height".
  * Lines above the first one are incredibly high: MAXCOL.
  */
-    static void
+    நிலையான வெறுமை
 topline_back_winheight(
     lineoff_T	*lp,
-    int		winheight)	// when TRUE limit to window height
+    முழு		winheight)	// when TRUE limit to window height
 {
 #ifdef FEAT_DIFF
-    if (lp->fill < diff_check_fill(curwin, lp->lnum))
+    எனில் (lp->fill < diff_check_fill(curwin, lp->lnum))
     {
 	// Add a filler line.
 	++lp->fill;
 	lp->height = 1;
     }
-    else
+    இல்லையெனில்
 #endif
     {
 	--lp->lnum;
 #ifdef FEAT_DIFF
 	lp->fill = 0;
 #endif
-	if (lp->lnum < 1)
+	எனில் (lp->lnum < 1)
 	    lp->height = MAXCOL;
-	else
+	இல்லையெனில்
 #ifdef FEAT_FOLDING
-	    if (hasFolding(lp->lnum, &lp->lnum, NULL))
+	    எனில் (hasFolding(lp->lnum, &lp->lnum, வெற்று))
 	    // Add a closed fold
 	    lp->height = 1;
-	else
+	இல்லையெனில்
 #endif
 	    lp->height = PLINES_WIN_NOFILL(curwin, lp->lnum, winheight);
     }
 }
 
-    static void
+    நிலையான வெறுமை
 topline_back(lineoff_T *lp)
 {
     topline_back_winheight(lp, TRUE);
@@ -2429,33 +2429,33 @@ topline_back(lineoff_T *lp)
  * Returns the height of the added line in "lp->height".
  * Lines below the last one are incredibly high.
  */
-    static void
+    நிலையான வெறுமை
 botline_forw(lineoff_T *lp)
 {
 #ifdef FEAT_DIFF
-    if (lp->fill < diff_check_fill(curwin, lp->lnum + 1))
+    எனில் (lp->fill < diff_check_fill(curwin, lp->lnum + 1))
     {
 	// Add a filler line.
 	++lp->fill;
 	lp->height = 1;
     }
-    else
+    இல்லையெனில்
 #endif
     {
 	++lp->lnum;
 #ifdef FEAT_DIFF
 	lp->fill = 0;
 #endif
-	if (lp->lnum > curbuf->b_ml.ml_line_count)
+	எனில் (lp->lnum > curbuf->b_ml.ml_வரி_மொத்தம்)
 	    lp->height = MAXCOL;
-	else
+	இல்லையெனில்
 #ifdef FEAT_FOLDING
-	    if (hasFolding(lp->lnum, NULL, &lp->lnum))
+	    எனில் (hasFolding(lp->lnum, வெற்று, &lp->lnum))
 	    {
 		// Add a closed fold.
 		lp->height = 1;
 	    }
-	    else
+	    இல்லையெனில்
 #endif
 	    lp->height = PLINES_NOFILL(lp->lnum);
     }
@@ -2466,24 +2466,24 @@ botline_forw(lineoff_T *lp)
  * Scroll at least "min_scroll" lines.
  * If "always" is TRUE, always set topline (for "zt").
  */
-    void
-scroll_cursor_top(int min_scroll, int always)
+    வெறுமை
+scroll_cursor_உச்சி(முழு min_scroll, முழு always)
 {
-    int		scrolled = 0;
-    int		extra = 0;
-    int		used;
-    int		i;
-    linenr_T	top;		// just above displayed lines
+    முழு		scrolled = 0;
+    முழு		extra = 0;
+    முழு		used;
+    முழு		i;
+    linenr_T	உச்சி;		// just above displayed lines
     linenr_T	bot;		// just below displayed lines
     linenr_T	old_topline = curwin->w_topline;
-    int		old_skipcol = curwin->w_skipcol;
+    முழு		old_skipcol = curwin->w_skipcol;
 #ifdef FEAT_DIFF
     linenr_T	old_topfill = curwin->w_topfill;
 #endif
     linenr_T	new_topline;
-    int		off = get_scrolloff_value();
+    முழு		off = get_scrolloff_மதிப்பு();
 
-    if (mouse_dragging > 0)
+    எனில் (mouse_dragging > 0)
 	off = mouse_dragging - 1;
 
     /*
@@ -2495,22 +2495,22 @@ scroll_cursor_top(int min_scroll, int always)
      */
     validate_cheight();
     used = curwin->w_cline_height; // includes filler lines above
-    if (curwin->w_cursor.lnum < curwin->w_topline)
+    எனில் (curwin->w_cursor.lnum < curwin->w_topline)
 	scrolled = used;
 
 #ifdef FEAT_FOLDING
-    if (hasFolding(curwin->w_cursor.lnum, &top, &bot))
+    எனில் (hasFolding(curwin->w_cursor.lnum, &உச்சி, &bot))
     {
-	--top;
+	--உச்சி;
 	++bot;
     }
-    else
+    இல்லையெனில்
 #endif
     {
-	top = curwin->w_cursor.lnum - 1;
+	உச்சி = curwin->w_cursor.lnum - 1;
 	bot = curwin->w_cursor.lnum + 1;
     }
-    new_topline = top + 1;
+    new_topline = உச்சி + 1;
 
 #ifdef FEAT_DIFF
     // "used" already contains the number of filler lines above, don't add it
@@ -2523,40 +2523,40 @@ scroll_cursor_top(int min_scroll, int always)
      * Check if the lines from "top" to "bot" fit in the window.  If they do,
      * set new_topline and advance "top" and "bot" to include more lines.
      */
-    while (top > 0)
+    போது (உச்சி > 0)
     {
 #ifdef FEAT_FOLDING
-	if (hasFolding(top, &top, NULL))
+	எனில் (hasFolding(உச்சி, &உச்சி, வெற்று))
 	    // count one logical line for a sequence of folded lines
 	    i = 1;
-	else
+	இல்லையெனில்
 #endif
-	    i = PLINES_NOFILL(top);
-	if (top < curwin->w_topline)
+	    i = PLINES_NOFILL(உச்சி);
+	எனில் (உச்சி < curwin->w_topline)
 	    scrolled += i;
 
 	// If scrolling is needed, scroll at least 'sj' lines.
-	if ((new_topline >= curwin->w_topline || scrolled > min_scroll)
+	எனில் ((new_topline >= curwin->w_topline || scrolled > min_scroll)
 		&& extra >= off)
-	    break;
+	    நிறுத்து;
 
 	used += i;
-	if (extra + i <= off && bot < curbuf->b_ml.ml_line_count)
+	எனில் (extra + i <= off && bot < curbuf->b_ml.ml_வரி_மொத்தம்)
 	{
 #ifdef FEAT_FOLDING
-	    if (hasFolding(bot, NULL, &bot))
+	    எனில் (hasFolding(bot, வெற்று, &bot))
 		// count one logical line for a sequence of folded lines
 		++used;
-	    else
+	    இல்லையெனில்
 #endif
 		used += plines(bot);
 	}
-	if (used > curwin->w_height)
-	    break;
+	எனில் (used > curwin->w_height)
+	    நிறுத்து;
 
 	extra += i;
-	new_topline = top;
-	--top;
+	new_topline = உச்சி;
+	--உச்சி;
 	++bot;
     }
 
@@ -2565,53 +2565,53 @@ scroll_cursor_top(int min_scroll, int always)
      * This makes sure we get the same position when using "k" and "j"
      * in a small window.
      */
-    if (used > curwin->w_height)
+    எனில் (used > curwin->w_height)
 	scroll_cursor_halfway(FALSE, FALSE);
-    else
+    இல்லையெனில்
     {
 	/*
 	 * If "always" is FALSE, only adjust topline to a lower value, higher
 	 * value may happen with wrapping lines.
 	 */
-	if (new_topline < curwin->w_topline || always)
+	எனில் (new_topline < curwin->w_topline || always)
 	    curwin->w_topline = new_topline;
-	if (curwin->w_topline > curwin->w_cursor.lnum)
+	எனில் (curwin->w_topline > curwin->w_cursor.lnum)
 	    curwin->w_topline = curwin->w_cursor.lnum;
 #ifdef FEAT_DIFF
 	curwin->w_topfill = diff_check_fill(curwin, curwin->w_topline);
-	if (curwin->w_topfill > 0 && extra > off)
+	எனில் (curwin->w_topfill > 0 && extra > off)
 	{
 	    curwin->w_topfill -= extra - off;
-	    if (curwin->w_topfill < 0)
+	    எனில் (curwin->w_topfill < 0)
 		curwin->w_topfill = 0;
 	}
 	check_topfill(curwin, FALSE);
 #endif
-	if (curwin->w_topline != old_topline)
+	எனில் (curwin->w_topline != old_topline)
 	    reset_skipcol();
-	else if (curwin->w_topline == curwin->w_cursor.lnum)
+	இல்லையெனில் எனில் (curwin->w_topline == curwin->w_cursor.lnum)
 	{
 	    validate_virtcol();
-	    if (curwin->w_skipcol >= curwin->w_virtcol)
+	    எனில் (curwin->w_skipcol >= curwin->w_virtcol)
 	    {
 		// Skip up to the screen line the cursor is in, so that the
 		// position in the line is kept.
-		int	width1 = curwin->w_width - curwin_col_off();
-		int	width2 = width1 + curwin_col_off2();
-		int	plines_off = 0;
-		int	skipcol;
+		முழு	width1 = curwin->w_width - curwin_col_off();
+		முழு	width2 = width1 + curwin_col_off2();
+		முழு	plines_off = 0;
+		முழு	skipcol;
 
-		if (width2 > 0 && curwin->w_virtcol >= (colnr_T)width1)
+		எனில் (width2 > 0 && curwin->w_virtcol >= (colnr_T)width1)
 		    plines_off = (curwin->w_virtcol - width1) / width2 + 1;
 		skipcol = skipcol_from_plines(curwin, plines_off);
-		if (skipcol != curwin->w_skipcol)
+		எனில் (skipcol != curwin->w_skipcol)
 		{
 		    curwin->w_skipcol = skipcol;
 		    redraw_later(UPD_SOME_VALID);
 		}
 	    }
 	}
-	if (curwin->w_topline != old_topline
+	எனில் (curwin->w_topline != old_topline
 		|| curwin->w_skipcol != old_skipcol
 #ifdef FEAT_DIFF
 		|| curwin->w_topfill != old_topfill
@@ -2627,24 +2627,24 @@ scroll_cursor_top(int min_scroll, int always)
  * Set w_empty_rows and w_filler_rows for window "wp", having used up "used"
  * screen lines for text lines.
  */
-    void
-set_empty_rows(win_T *wp, int used)
+    வெறுமை
+set_empty_rows(win_T *wp, முழு used)
 {
 #ifdef FEAT_DIFF
     wp->w_filler_rows = 0;
 #endif
-    if (used == 0)
+    எனில் (used == 0)
 	wp->w_empty_rows = 0;	// single line that doesn't fit
-    else
+    இல்லையெனில்
     {
 	wp->w_empty_rows = wp->w_height - used;
 #ifdef FEAT_DIFF
-	if (wp->w_botline <= wp->w_buffer->b_ml.ml_line_count)
+	எனில் (wp->w_botline <= wp->w_buffer->b_ml.ml_வரி_மொத்தம்)
 	{
 	    wp->w_filler_rows = diff_check_fill(wp, wp->w_botline);
-	    if (wp->w_empty_rows > wp->w_filler_rows)
+	    எனில் (wp->w_empty_rows > wp->w_filler_rows)
 		wp->w_empty_rows -= wp->w_filler_rows;
-	    else
+	    இல்லையெனில்
 	    {
 		wp->w_filler_rows = wp->w_empty_rows;
 		wp->w_empty_rows = 0;
@@ -2660,57 +2660,57 @@ set_empty_rows(win_T *wp, int used)
  * If "set_topbot" is TRUE, set topline and botline first (for "zb").
  * This is messy stuff!!!
  */
-    void
-scroll_cursor_bot(int min_scroll, int set_topbot)
+    வெறுமை
+scroll_cursor_bot(முழு min_scroll, முழு set_topbot)
 {
-    int		used;
-    int		scrolled = 0;
-    int		extra = 0;
-    int		i;
-    linenr_T	line_count;
+    முழு		used;
+    முழு		scrolled = 0;
+    முழு		extra = 0;
+    முழு		i;
+    linenr_T	வரி_மொத்தம்;
     linenr_T	old_topline = curwin->w_topline;
-    int		old_skipcol = curwin->w_skipcol;
+    முழு		old_skipcol = curwin->w_skipcol;
     lineoff_T	loff;
     lineoff_T	boff;
 #ifdef FEAT_DIFF
-    int		old_topfill = curwin->w_topfill;
-    int		fill_below_window;
+    முழு		old_topfill = curwin->w_topfill;
+    முழு		fill_below_window;
 #endif
     linenr_T	old_botline = curwin->w_botline;
     linenr_T	old_valid = curwin->w_valid;
-    int		old_empty_rows = curwin->w_empty_rows;
+    முழு		old_empty_rows = curwin->w_empty_rows;
     linenr_T	cln;		    // Cursor Line Number
-    long	so = get_scrolloff_value();
-    int		do_sms = curwin->w_p_wrap && curwin->w_p_sms;
+    long	so = get_scrolloff_மதிப்பு();
+    முழு		do_sms = curwin->w_p_wrap && curwin->w_p_sms;
 
     cln = curwin->w_cursor.lnum;
-    if (set_topbot)
+    எனில் (set_topbot)
     {
 	used = 0;
 	linenr_T cln_last = cln;
 #ifdef FEAT_FOLDING
-	(void)hasFolding(cln, NULL, &cln_last);
+	(வெறுமை)hasFolding(cln, வெற்று, &cln_last);
 #endif
 	curwin->w_botline = cln_last + 1;
 	loff.lnum = cln_last + 1;
 #ifdef FEAT_DIFF
 	loff.fill = 0;
 #endif
-	while (TRUE)
+	போது (TRUE)
 	{
 	    topline_back_winheight(&loff, FALSE);
-	    if (loff.height == MAXCOL)
-		break;
-	    if (used + loff.height > curwin->w_height)
+	    எனில் (loff.height == MAXCOL)
+		நிறுத்து;
+	    எனில் (used + loff.height > curwin->w_height)
 	    {
-		if (do_sms)
+		எனில் (do_sms)
 		{
 		    // 'smoothscroll' and 'wrap' are set.  The above line is
 		    // too long to show in its entirety, so we show just a part
 		    // of it.
-		    if (used < curwin->w_height)
+		    எனில் (used < curwin->w_height)
 		    {
-			int plines_offset = used + loff.height
+			முழு plines_offset = used + loff.height
 							    - curwin->w_height;
 			used = curwin->w_height;
 #ifdef FEAT_DIFF
@@ -2721,7 +2721,7 @@ scroll_cursor_bot(int min_scroll, int set_topbot)
 							curwin, plines_offset);
 		    }
 		}
-		break;
+		நிறுத்து;
 	    }
 #ifdef FEAT_DIFF
 	    curwin->w_topfill = loff.fill;
@@ -2732,7 +2732,7 @@ scroll_cursor_bot(int min_scroll, int set_topbot)
 
 	set_empty_rows(curwin, used);
 	curwin->w_valid |= VALID_BOTLINE|VALID_BOTLINE_AP;
-	if (curwin->w_topline != old_topline
+	எனில் (curwin->w_topline != old_topline
 #ifdef FEAT_DIFF
 		|| curwin->w_topfill != old_topfill
 #endif
@@ -2740,71 +2740,71 @@ scroll_cursor_bot(int min_scroll, int set_topbot)
 		|| curwin->w_skipcol != 0)
 	{
 	    curwin->w_valid &= ~(VALID_WROW|VALID_CROW);
-	    if (curwin->w_skipcol != old_skipcol)
+	    எனில் (curwin->w_skipcol != old_skipcol)
 		redraw_later(UPD_NOT_VALID);
-	    else
+	    இல்லையெனில்
 		reset_skipcol();
 	}
     }
-    else
+    இல்லையெனில்
 	validate_botline();
 
     // The lines of the cursor line itself are always used.
 #ifdef FEAT_DIFF
     used = plines_nofill(cln);
-#else
+#இல்லையெனில்
     validate_cheight();
     used = curwin->w_cline_height;
 #endif
 
-    if (do_sms && (dy_flags & DY_LASTLINE))
+    எனில் (do_sms && (dy_flags & DY_LASTLINE))
     {
 	// The rest of the cursor line may be cut off at the bottom.
-	int upto_cursor = plines_win_col(curwin, cln, curwin->w_cursor.col);
+	முழு upto_cursor = plines_win_col(curwin, cln, curwin->w_cursor.col);
 
-	if (upto_cursor < used)
+	எனில் (upto_cursor < used)
 	    used = upto_cursor;
     }
 
     // If the cursor is on or below botline, we will at least scroll by the
     // height of the cursor line, which is "used".  Correct for empty lines,
     // which are really part of botline.
-    if (cln >= curwin->w_botline)
+    எனில் (cln >= curwin->w_botline)
     {
 	scrolled = used;
-	if (cln == curwin->w_botline)
+	எனில் (cln == curwin->w_botline)
 	    scrolled -= curwin->w_empty_rows;
-	if (do_sms)
+	எனில் (do_sms)
 	{
 	    // 'smoothscroll' and 'wrap' are set.
 	    // Calculate how many screen lines the current top line of window
 	    // occupies. If it is occupying more than the entire window, we
 	    // need to scroll the additional clipped lines to scroll past the
 	    // top line before we can move on to the other lines.
-	    int top_plines =
+	    முழு உச்சி_plines =
 #ifdef FEAT_DIFF
 			    plines_win_nofill
-#else
+#இல்லையெனில்
 			    plines_win
 #endif
 					(curwin, curwin->w_topline, FALSE);
-	    int width1 = curwin->w_width - curwin_col_off();
+	    முழு width1 = curwin->w_width - curwin_col_off();
 
-	    if (width1 > 0)
+	    எனில் (width1 > 0)
 	    {
-		int width2 = width1 + curwin_col_off2();
-		int skip_lines = 0;
+		முழு width2 = width1 + curwin_col_off2();
+		முழு skip_வரிகள் = 0;
 
 		// A similar formula is used in curs_columns().
-		if (curwin->w_skipcol > width1)
-		    skip_lines += (curwin->w_skipcol - width1) / width2 + 1;
-		else if (curwin->w_skipcol > 0)
-		    skip_lines = 1;
+		எனில் (curwin->w_skipcol > width1)
+		    skip_வரிகள் += (curwin->w_skipcol - width1) / width2 + 1;
+		இல்லையெனில் எனில் (curwin->w_skipcol > 0)
+		    skip_வரிகள் = 1;
 
-		top_plines -= skip_lines;
-		if (top_plines > curwin->w_height)
+		உச்சி_plines -= skip_வரிகள்;
+		எனில் (உச்சி_plines > curwin->w_height)
 		{
-		    scrolled += (top_plines - curwin->w_height);
+		    scrolled += (உச்சி_plines - curwin->w_height);
 		}
 	    }
 	}
@@ -2818,7 +2818,7 @@ scroll_cursor_bot(int min_scroll, int set_topbot)
      * - lines between botline and cursor have been counted
      */
 #ifdef FEAT_FOLDING
-    if (!hasFolding(curwin->w_cursor.lnum, &loff.lnum, &boff.lnum))
+    எனில் (!hasFolding(curwin->w_cursor.lnum, &loff.lnum, &boff.lnum))
 #endif
     {
 	loff.lnum = cln;
@@ -2831,31 +2831,31 @@ scroll_cursor_bot(int min_scroll, int set_topbot)
 						      - curwin->w_filler_rows;
 #endif
 
-    while (loff.lnum > 1)
+    போது (loff.lnum > 1)
     {
 	// Stop when scrolled nothing or at least "min_scroll", found "extra"
 	// context for 'scrolloff' and counted all lines below the window.
-	if ((((scrolled <= 0 || scrolled >= min_scroll)
+	எனில் ((((scrolled <= 0 || scrolled >= min_scroll)
 		    && extra >= (mouse_dragging > 0 ? mouse_dragging - 1 : so))
-		    || boff.lnum + 1 > curbuf->b_ml.ml_line_count)
+		    || boff.lnum + 1 > curbuf->b_ml.ml_வரி_மொத்தம்)
 		&& loff.lnum <= curwin->w_botline
 #ifdef FEAT_DIFF
 		&& (loff.lnum < curwin->w_botline
 		    || loff.fill >= fill_below_window)
 #endif
 		)
-	    break;
+	    நிறுத்து;
 
 	linenr_T loff_lnum_before = loff.lnum;
 	// Add one line above
 	topline_back(&loff);
-	if (loff.height == MAXCOL)
+	எனில் (loff.height == MAXCOL)
 	    used = MAXCOL;
-	else
+	இல்லையெனில்
 	    used += loff.height;
-	if (used > curwin->w_height)
-	    break;
-	if (loff.lnum >= curwin->w_botline
+	எனில் (used > curwin->w_height)
+	    நிறுத்து;
+	எனில் (loff.lnum >= curwin->w_botline
 #ifdef FEAT_DIFF
 		&& (loff.lnum > curwin->w_botline
 		    || loff.fill <= fill_below_window)
@@ -2864,24 +2864,24 @@ scroll_cursor_bot(int min_scroll, int set_topbot)
 	{
 	    // Count screen lines that are below the window.
 	    scrolled += loff.height;
-	    if (loff.lnum == curwin->w_botline
+	    எனில் (loff.lnum == curwin->w_botline
 		    && loff_lnum_before > curwin->w_botline)
 		scrolled -= curwin->w_empty_rows;
 	}
 
-	if (boff.lnum < curbuf->b_ml.ml_line_count)
+	எனில் (boff.lnum < curbuf->b_ml.ml_வரி_மொத்தம்)
 	{
 	    linenr_T boff_lnum_before = boff.lnum;
 	    // Add one line below
 	    botline_forw(&boff);
 	    used += boff.height;
-	    if (used > curwin->w_height)
-		break;
-	    if (extra < ( mouse_dragging > 0 ? mouse_dragging - 1 : so)
+	    எனில் (used > curwin->w_height)
+		நிறுத்து;
+	    எனில் (extra < ( mouse_dragging > 0 ? mouse_dragging - 1 : so)
 		    || scrolled < min_scroll)
 	    {
 		extra += boff.height;
-		if (boff.lnum >= curwin->w_botline
+		எனில் (boff.lnum >= curwin->w_botline
 #ifdef FEAT_DIFF
 			|| (boff.lnum + 1 == curwin->w_botline
 			    && boff.fill > curwin->w_filler_rows)
@@ -2890,7 +2890,7 @@ scroll_cursor_bot(int min_scroll, int set_topbot)
 		{
 		    // Count screen lines that are below the window.
 		    scrolled += boff.height;
-		    if (boff.lnum >= curwin->w_botline
+		    எனில் (boff.lnum >= curwin->w_botline
 			    && boff_lnum_before < curwin->w_botline)
 			scrolled -= curwin->w_empty_rows;
 		}
@@ -2899,27 +2899,27 @@ scroll_cursor_bot(int min_scroll, int set_topbot)
     }
 
     // curwin->w_empty_rows is larger, no need to scroll
-    if (scrolled <= 0)
-	line_count = 0;
+    எனில் (scrolled <= 0)
+	வரி_மொத்தம் = 0;
     // more than a screenfull, don't scroll but redraw
-    else if (used > curwin->w_height)
-	line_count = used;
+    இல்லையெனில் எனில் (used > curwin->w_height)
+	வரி_மொத்தம் = used;
     // scroll minimal number of lines
-    else
+    இல்லையெனில்
     {
-	line_count = 0;
+	வரி_மொத்தம் = 0;
 #ifdef FEAT_DIFF
 	boff.fill = curwin->w_topfill;
 #endif
 	boff.lnum = curwin->w_topline - 1;
-	for (i = 0; i < scrolled && boff.lnum < curwin->w_botline; )
+	க்கு (i = 0; i < scrolled && boff.lnum < curwin->w_botline; )
 	{
 	    botline_forw(&boff);
 	    i += boff.height;
-	    ++line_count;
+	    ++வரி_மொத்தம்;
 	}
-	if (i < scrolled)	// below curwin->w_botline, don't scroll
-	    line_count = 9999;
+	எனில் (i < scrolled)	// below curwin->w_botline, don't scroll
+	    வரி_மொத்தம் = 9999;
     }
 
     /*
@@ -2927,14 +2927,14 @@ scroll_cursor_bot(int min_scroll, int set_topbot)
      * Otherwise put it at 1/2 of the screen.
      */
     bool eof_pressure = scrolloffpad_eof_pressure(cln, so);
-    if (line_count >= curwin->w_height && line_count > min_scroll)
+    எனில் (வரி_மொத்தம் >= curwin->w_height && வரி_மொத்தம் > min_scroll)
 	scroll_cursor_halfway(eof_pressure, TRUE);
-    else if (line_count > 0)
+    இல்லையெனில் எனில் (வரி_மொத்தம் > 0)
     {
-	if (do_sms)
+	எனில் (do_sms)
 	    scrollup(scrolled, TRUE);  // TODO
-	else
-	    scrollup(line_count, TRUE);
+	இல்லையெனில்
+	    scrollup(வரி_மொத்தம், TRUE);
     }
 
     /*
@@ -2942,7 +2942,7 @@ scroll_cursor_bot(int min_scroll, int set_topbot)
      * (we changed them).
      * If topline did change, update_screen() will set botline.
      */
-    if (curwin->w_topline == old_topline
+    எனில் (curwin->w_topline == old_topline
 	    && curwin->w_skipcol == old_skipcol
 	    && set_topbot)
     {
@@ -2953,7 +2953,7 @@ scroll_cursor_bot(int min_scroll, int set_topbot)
     curwin->w_valid |= VALID_TOPLINE;
 
     // Make sure cursor is still visible after adjusting skipcol for "zb".
-    if (set_topbot)
+    எனில் (set_topbot)
 	cursor_correct_sms();
 }
 
@@ -2961,17 +2961,17 @@ scroll_cursor_bot(int min_scroll, int set_topbot)
  * Recompute topline to put the cursor halfway the window
  * If "atend" is TRUE, also put it halfway at the end of the file.
  */
-    void
-scroll_cursor_halfway(int atend, int prefer_above)
+    வெறுமை
+scroll_cursor_halfway(முழு atend, முழு prefer_above)
 {
-    int		above = 0;
+    முழு		above = 0;
     linenr_T	topline;
     colnr_T	skipcol = 0;
 #ifdef FEAT_DIFF
-    int		topfill = 0;
+    முழு		topfill = 0;
 #endif
-    int		below = 0;
-    int		used;
+    முழு		below = 0;
+    முழு		used;
     lineoff_T	loff;
     lineoff_T	boff;
 #ifdef FEAT_DIFF
@@ -2984,49 +2984,49 @@ scroll_cursor_halfway(int atend, int prefer_above)
 #endif
     loff.lnum = boff.lnum = curwin->w_cursor.lnum;
 #ifdef FEAT_FOLDING
-    (void)hasFolding(loff.lnum, &loff.lnum, &boff.lnum);
+    (வெறுமை)hasFolding(loff.lnum, &loff.lnum, &boff.lnum);
 #endif
 #ifdef FEAT_DIFF
     used = plines_nofill(loff.lnum);
     loff.fill = 0;
     boff.fill = 0;
-#else
+#இல்லையெனில்
     used = plines(loff.lnum);
 #endif
     topline = loff.lnum;
 
-    int want_height;
-    int do_sms = curwin->w_p_wrap && curwin->w_p_sms;
-    if (do_sms)
+    முழு want_height;
+    முழு do_sms = curwin->w_p_wrap && curwin->w_p_sms;
+    எனில் (do_sms)
     {
 	// 'smoothscroll' and 'wrap' are set
-	if (atend)
+	எனில் (atend)
 	{
 	    want_height = (curwin->w_height - used) / 2;
 	    used = 0;
 	}
-	else
+	இல்லையெனில்
 	    want_height = curwin->w_height;
     }
 
-    while (topline > 1)
+    போது (topline > 1)
     {
 	// If using smoothscroll, we can precisely scroll to the
 	// exact point where the cursor is halfway down the screen.
-	if (do_sms)
+	எனில் (do_sms)
 	{
 	    topline_back_winheight(&loff, FALSE);
-	    if (loff.height == MAXCOL)
-		break;
+	    எனில் (loff.height == MAXCOL)
+		நிறுத்து;
 	    used += loff.height;
-	    if (!atend && boff.lnum < curbuf->b_ml.ml_line_count)
+	    எனில் (!atend && boff.lnum < curbuf->b_ml.ml_வரி_மொத்தம்)
 	    {
 		botline_forw(&boff);
 		used += boff.height;
 	    }
-	    if (used > want_height)
+	    எனில் (used > want_height)
 	    {
-		if (used - loff.height < want_height)
+		எனில் (used - loff.height < want_height)
 		{
 		    topline = loff.lnum;
 #ifdef FEAT_DIFF
@@ -3034,13 +3034,13 @@ scroll_cursor_halfway(int atend, int prefer_above)
 #endif
 		    skipcol = skipcol_from_plines(curwin, used - want_height);
 		}
-		break;
+		நிறுத்து;
 	    }
 	    topline = loff.lnum;
 #ifdef FEAT_DIFF
 	    topfill = loff.fill;
 #endif
-	    continue;
+	    தொடர்;
 	}
 
 	// If not using smoothscroll, we have to iteratively find how many
@@ -3050,45 +3050,45 @@ scroll_cursor_halfway(int atend, int prefer_above)
 
 	// Depending on "prefer_above" we add a line above or below first.
 	// Loop twice to avoid duplicating code.
-	int done = FALSE;
-	for (int round = 1; round <= 2; ++round)
+	முழு done = FALSE;
+	க்கு (முழு round = 1; round <= 2; ++round)
 	{
-	    if (prefer_above ? (round == 2 && below < above)
+	    எனில் (prefer_above ? (round == 2 && below < above)
 			     : (round == 1 && below <= above))
 	    {
 		// add a line below the cursor
-		if (boff.lnum < curbuf->b_ml.ml_line_count)
+		எனில் (boff.lnum < curbuf->b_ml.ml_வரி_மொத்தம்)
 		{
 		    botline_forw(&boff);
 		    used += boff.height;
-		    if (used > curwin->w_height)
+		    எனில் (used > curwin->w_height)
 		    {
 			done = TRUE;
-			break;
+			நிறுத்து;
 		    }
 		    below += boff.height;
 		}
-		else
+		இல்லையெனில்
 		{
 		    ++below;	    // count a "~" line
-		    if (atend)
+		    எனில் (atend)
 			++used;
 		}
 	    }
 
-	    if (prefer_above ? (round == 1 && below >= above)
+	    எனில் (prefer_above ? (round == 1 && below >= above)
 			     : (round == 1 && below > above))
 	    {
 		// add a line above the cursor
 		topline_back(&loff);
-		if (loff.height == MAXCOL)
+		எனில் (loff.height == MAXCOL)
 		    used = MAXCOL;
-		else
+		இல்லையெனில்
 		    used += loff.height;
-		if (used > curwin->w_height)
+		எனில் (used > curwin->w_height)
 		{
 		    done = TRUE;
-		    break;
+		    நிறுத்து;
 		}
 		above += loff.height;
 		topline = loff.lnum;
@@ -3097,31 +3097,31 @@ scroll_cursor_halfway(int atend, int prefer_above)
 #endif
 	    }
 	}
-	if (done)
-	    break;
+	எனில் (done)
+	    நிறுத்து;
     }
 
 #ifdef FEAT_FOLDING
-    if (!hasFolding(topline, &curwin->w_topline, NULL))
+    எனில் (!hasFolding(topline, &curwin->w_topline, வெற்று))
 #endif
     {
-	if (curwin->w_topline != topline
+	எனில் (curwin->w_topline != topline
 		|| skipcol != 0
 		|| curwin->w_skipcol != 0)
 	{
 	    curwin->w_topline = topline;
-	    if (skipcol != 0)
+	    எனில் (skipcol != 0)
 	    {
 		curwin->w_skipcol = skipcol;
 		redraw_later(UPD_NOT_VALID);
 	    }
-	    else if (do_sms)
+	    இல்லையெனில் எனில் (do_sms)
 		reset_skipcol();
 	}
     }
 #ifdef FEAT_DIFF
     curwin->w_topfill = topfill;
-    if (old_topline > curwin->w_topline + curwin->w_height)
+    எனில் (old_topline > curwin->w_topline + curwin->w_height)
 	curwin->w_botfill = false;
     check_topfill(curwin, FALSE);
 #endif
@@ -3135,17 +3135,17 @@ scroll_cursor_halfway(int atend, int prefer_above)
  * If not possible, put it at the same position as scroll_cursor_halfway().
  * When called topline must be valid!
  */
-    void
-cursor_correct(void)
+    வெறுமை
+cursor_correct(வெறுமை)
 {
-    int		above = 0;	    // screen lines above topline
+    முழு		above = 0;	    // screen lines above topline
     linenr_T	topline;
-    int		below = 0;	    // screen lines below botline
+    முழு		below = 0;	    // screen lines below botline
     linenr_T	botline;
-    int		above_wanted, below_wanted;
+    முழு		above_wanted, below_wanted;
     linenr_T	cln;		    // Cursor Line Number
-    int		max_off;
-    long	so = get_scrolloff_value();
+    முழு		max_off;
+    long	so = get_scrolloff_மதிப்பு();
 
     /*
      * How many lines we would like to have above/below the cursor depends on
@@ -3153,27 +3153,27 @@ cursor_correct(void)
      */
     above_wanted = so;
     below_wanted = so;
-    if (mouse_dragging > 0)
+    எனில் (mouse_dragging > 0)
     {
 	above_wanted = mouse_dragging - 1;
 	below_wanted = mouse_dragging - 1;
     }
-    if (curwin->w_topline == 1)
+    எனில் (curwin->w_topline == 1)
     {
 	above_wanted = 0;
 	max_off = curwin->w_height / 2;
-	if (below_wanted > max_off)
+	எனில் (below_wanted > max_off)
 	    below_wanted = max_off;
     }
     validate_botline();
-    if (curwin->w_botline == curbuf->b_ml.ml_line_count + 1
+    எனில் (curwin->w_botline == curbuf->b_ml.ml_வரி_மொத்தம் + 1
 	    && mouse_dragging == 0)
     {
 	// Missing context below EOF must not move the cursor up.  Automatic
 	// scrolling handles the centering for 'scrolloffpad'.
 	below_wanted = 0;
 	max_off = (curwin->w_height - 1) / 2;
-	if (above_wanted > max_off)
+	எனில் (above_wanted > max_off)
 	    above_wanted = max_off;
     }
 
@@ -3182,13 +3182,13 @@ cursor_correct(void)
      * return now.
      */
     cln = curwin->w_cursor.lnum;
-    if (cln >= curwin->w_topline + above_wanted
+    எனில் (cln >= curwin->w_topline + above_wanted
 	    && cln < curwin->w_botline - below_wanted
 #ifdef FEAT_FOLDING
 	    && !hasAnyFolding(curwin)
 #endif
 	    )
-	return;
+	திரும்பு;
 
     /*
      * Narrow down the area where the cursor can be put by taking lines from
@@ -3203,47 +3203,47 @@ cursor_correct(void)
     above = curwin->w_topfill;
     below = curwin->w_filler_rows;
 #endif
-    while ((above < above_wanted || below < below_wanted) && topline < botline)
+    போது ((above < above_wanted || below < below_wanted) && topline < botline)
     {
-	if (below < below_wanted && (below <= above || above >= above_wanted))
+	எனில் (below < below_wanted && (below <= above || above >= above_wanted))
 	{
 #ifdef FEAT_FOLDING
-	    if (hasFolding(botline, &botline, NULL))
+	    எனில் (hasFolding(botline, &botline, வெற்று))
 		++below;
-	    else
+	    இல்லையெனில்
 #endif
 		below += plines(botline);
 	    --botline;
 	}
-	if (above < above_wanted && (above < below || below >= below_wanted))
+	எனில் (above < above_wanted && (above < below || below >= below_wanted))
 	{
 #ifdef FEAT_FOLDING
-	    if (hasFolding(topline, NULL, &topline))
+	    எனில் (hasFolding(topline, வெற்று, &topline))
 		++above;
-	    else
+	    இல்லையெனில்
 #endif
 		above += PLINES_NOFILL(topline);
 #ifdef FEAT_DIFF
 	    // Count filler lines below this line as context.
-	    if (topline < botline)
+	    எனில் (topline < botline)
 		above += diff_check_fill(curwin, topline + 1);
 #endif
 	    ++topline;
 	}
     }
-    if (topline == botline || botline == 0)
+    எனில் (topline == botline || botline == 0)
 	curwin->w_cursor.lnum = topline;
-    else if (topline > botline)
+    இல்லையெனில் எனில் (topline > botline)
 	curwin->w_cursor.lnum = botline;
-    else
+    இல்லையெனில்
     {
-	if (cln < topline && curwin->w_topline > 1)
+	எனில் (cln < topline && curwin->w_topline > 1)
 	{
 	    curwin->w_cursor.lnum = topline;
 	    curwin->w_valid &=
 			    ~(VALID_WROW|VALID_WCOL|VALID_CHEIGHT|VALID_CROW);
 	}
-	if (cln > botline && curwin->w_botline <= curbuf->b_ml.ml_line_count)
+	எனில் (cln > botline && curwin->w_botline <= curbuf->b_ml.ml_வரி_மொத்தம்)
 	{
 	    curwin->w_cursor.lnum = botline;
 	    curwin->w_valid &=
@@ -3266,54 +3266,54 @@ cursor_correct(void)
  *  -------------              l3 second text line
  *  l3                            etc.
  */
-static int get_scroll_overlap(int dir)
+நிலையான முழு get_scroll_overlap(முழு dir)
 {
     lineoff_T loff;
-    int	    min_height = curwin->w_height - 2;
+    முழு	    min_height = curwin->w_height - 2;
 
     validate_botline();
-    if ((dir == BACKWARD && curwin->w_topline == 1)
-	|| (dir == FORWARD && curwin->w_botline > curbuf->b_ml.ml_line_count))
-	return min_height + 2;  // no overlap, still handle 'smoothscroll'
+    எனில் ((dir == BACKWARD && curwin->w_topline == 1)
+	|| (dir == FORWARD && curwin->w_botline > curbuf->b_ml.ml_வரி_மொத்தம்))
+	திரும்பு min_height + 2;  // no overlap, still handle 'smoothscroll'
 
     loff.lnum = dir == FORWARD ? curwin->w_botline : curwin->w_topline - 1;
 #ifdef FEAT_DIFF
     loff.fill = diff_check_fill(curwin, loff.lnum + (dir == BACKWARD))
 		- (dir == FORWARD ? curwin->w_filler_rows : curwin->w_topfill);
     loff.height = loff.fill > 0 ? 1 : plines_nofill(loff.lnum);
-#else
+#இல்லையெனில்
     loff.height = plines(loff.lnum);
 #endif
 
-    int h1 = loff.height;
-    if (h1 > min_height)
-	return min_height + 2;  // no overlap
-    if (dir == FORWARD)
+    முழு h1 = loff.height;
+    எனில் (h1 > min_height)
+	திரும்பு min_height + 2;  // no overlap
+    எனில் (dir == FORWARD)
 	topline_back(&loff);
-    else
+    இல்லையெனில்
 	botline_forw(&loff);
 
-    int h2 = loff.height;
-    if (h2 == MAXCOL || h2 + h1 > min_height)
-	return min_height + 2;  // no overlap
-    if (dir == FORWARD)
+    முழு h2 = loff.height;
+    எனில் (h2 == MAXCOL || h2 + h1 > min_height)
+	திரும்பு min_height + 2;  // no overlap
+    எனில் (dir == FORWARD)
 	topline_back(&loff);
-    else
+    இல்லையெனில்
 	botline_forw(&loff);
 
-    int h3 = loff.height;
-    if (h3 == MAXCOL || h3 + h2 > min_height)
-	return min_height + 2;  // no overlap
-    if (dir == FORWARD)
+    முழு h3 = loff.height;
+    எனில் (h3 == MAXCOL || h3 + h2 > min_height)
+	திரும்பு min_height + 2;  // no overlap
+    எனில் (dir == FORWARD)
 	topline_back(&loff);
-    else
+    இல்லையெனில்
 	botline_forw(&loff);
 
-    int h4 = loff.height;
-    if (h4 == MAXCOL || h4 + h3 + h2 > min_height || h3 + h2 + h1 > min_height)
-	return min_height + 1;  // 1 line overlap
-    else
-	return min_height;      // 2 lines overlap
+    முழு h4 = loff.height;
+    எனில் (h4 == MAXCOL || h4 + h3 + h2 > min_height || h3 + h2 + h1 > min_height)
+	திரும்பு min_height + 1;  // 1 line overlap
+    இல்லையெனில்
+	திரும்பு min_height;      // 2 lines overlap
 }
 
 /*
@@ -3321,40 +3321,40 @@ static int get_scroll_overlap(int dir)
  * when scrolling happened. Adjust "curscount" for scrolling different amount of
  * lines when 'smoothscroll' is disabled.
  */
-static int scroll_with_sms(int dir, long count, long *curscount)
+நிலையான முழு scroll_with_sms(முழு dir, long மொத்தம், long *curscount)
 {
-    int		prev_sms = curwin->w_p_sms;
+    முழு		prev_sms = curwin->w_p_sms;
     colnr_T	prev_skipcol = curwin->w_skipcol;
     linenr_T	prev_topline = curwin->w_topline;
 #ifdef FEAT_DIFF
-    int		prev_topfill = curwin->w_topfill;
+    முழு		prev_topfill = curwin->w_topfill;
 #endif
 
     curwin->w_p_sms = TRUE;
-    scroll_redraw(dir == FORWARD, count);
+    scroll_redraw(dir == FORWARD, மொத்தம்);
 
     // Not actually smoothscrolling but ended up with partially visible line.
     // Continue scrolling until skipcol is zero.
-    if (!prev_sms && curwin->w_skipcol > 0)
+    எனில் (!prev_sms && curwin->w_skipcol > 0)
     {
-	int fixdir = dir;
+	முழு fixdir = dir;
 	// Reverse the scroll direction when topline already changed. One line
 	// extra for scrolling backward so that consuming skipcol is symmetric.
-	if (labs(curwin->w_topline - prev_topline) > (dir == BACKWARD))
+	எனில் (labs(curwin->w_topline - prev_topline) > (dir == BACKWARD))
 	    fixdir = dir * -1;
 
-	int width1 = curwin->w_width - curwin_col_off();
-	int width2 = width1 + curwin_col_off2();
-	count = 1 + (curwin->w_skipcol - width1 - 1) / width2;
-	if (fixdir == FORWARD)
-	    count = 1 + (linetabsize_eol(curwin, curwin->w_topline)
+	முழு width1 = curwin->w_width - curwin_col_off();
+	முழு width2 = width1 + curwin_col_off2();
+	மொத்தம் = 1 + (curwin->w_skipcol - width1 - 1) / width2;
+	எனில் (fixdir == FORWARD)
+	    மொத்தம் = 1 + (linetabsize_eol(curwin, curwin->w_topline)
 			    - curwin->w_skipcol - width1 + width2 - 1) / width2;
-	scroll_redraw(fixdir == FORWARD, count);
-	*curscount += count * (fixdir == dir ? 1 : -1);
+	scroll_redraw(fixdir == FORWARD, மொத்தம்);
+	*curscount += மொத்தம் * (fixdir == dir ? 1 : -1);
     }
     curwin->w_p_sms = prev_sms;
 
-    return curwin->w_topline != prev_topline
+    திரும்பு curwin->w_topline != prev_topline
 #ifdef FEAT_DIFF
 	|| curwin->w_topfill != prev_topfill
 #endif
@@ -3368,11 +3368,11 @@ static int scroll_with_sms(int dir, long count, long *curscount)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
-pagescroll(int dir, long count, int half)
+    முழு
+pagescroll(முழு dir, long மொத்தம், முழு half)
 {
-    int		did_move = FALSE;
-    int		buflen = curbuf->b_ml.ml_line_count;
+    முழு		did_move = FALSE;
+    முழு		buflen = curbuf->b_ml.ml_வரி_மொத்தம்;
     colnr_T	prev_col = curwin->w_cursor.col;
     colnr_T	prev_curswant = curwin->w_curswant;
     linenr_T	prev_lnum = curwin->w_cursor.lnum;
@@ -3380,55 +3380,55 @@ pagescroll(int dir, long count, int half)
     cmdarg_T	ca = { 0 };
     ca.oap = &oa;
 
-    if (half)
+    எனில் (half)
     {
 	// Scroll [count], 'scroll' or current window height lines.
-	if (count)
-	    curwin->w_p_scr = MIN(curwin->w_height, count);
-	count = MIN(curwin->w_height, curwin->w_p_scr);
+	எனில் (மொத்தம்)
+	    curwin->w_p_scr = MIN(curwin->w_height, மொத்தம்);
+	மொத்தம் = MIN(curwin->w_height, curwin->w_p_scr);
 
-	long curscount = count;
+	long curscount = மொத்தம்;
 	// Adjust count so as to not reveal end of buffer lines.
-	if (dir == FORWARD
-		    && (curwin->w_topline + curwin->w_height + count > buflen
+	எனில் (dir == FORWARD
+		    && (curwin->w_topline + curwin->w_height + மொத்தம் > buflen
 #ifdef FEAT_FOLDING
 							|| hasAnyFolding(curwin)
 #endif
 	   ))
 	{
-	    int n = plines_correct_topline(curwin, curwin->w_topline, FALSE);
-	    if (n - count < curwin->w_height && curwin->w_topline < buflen)
+	    முழு n = plines_correct_topline(curwin, curwin->w_topline, FALSE);
+	    எனில் (n - மொத்தம் < curwin->w_height && curwin->w_topline < buflen)
 		n += plines_m_win(curwin, curwin->w_topline + 1, buflen,
-						    curwin->w_height + count);
-	    if (n < curwin->w_height + count)
-		count = n - curwin->w_height;
+						    curwin->w_height + மொத்தம்);
+	    எனில் (n < curwin->w_height + மொத்தம்)
+		மொத்தம் = n - curwin->w_height;
 	}
 
 	// (Try to) scroll the window unless already at the end of the buffer.
-	if (count > 0)
+	எனில் (மொத்தம் > 0)
 	{
-	    did_move = scroll_with_sms(dir, count, &curscount);
+	    did_move = scroll_with_sms(dir, மொத்தம், &curscount);
 	    curwin->w_cursor.lnum = prev_lnum;
 	    curwin->w_cursor.col = prev_col;
 	    curwin->w_curswant = prev_curswant;
 	}
 
 	// Move the cursor the same amount of screen lines.
-	if (curwin->w_p_wrap)
+	எனில் (curwin->w_p_wrap)
 	    nv_screengo(&oa, dir, curscount);
-	else if (dir == FORWARD)
+	இல்லையெனில் எனில் (dir == FORWARD)
 	    cursor_down_inner(curwin, curscount);
-	else
+	இல்லையெனில்
 	    cursor_up_inner(curwin, curscount);
     }
-    else
+    இல்லையெனில்
     {
 	// Scroll [count] times 'window' or current window height lines.
-	count *= ((ONE_WINDOW && p_window > 0 && p_window < Rows - 1) ?
+	மொத்தம் *= ((ONE_WINDOW && p_window > 0 && p_window < Rows - 1) ?
 				MAX(1, p_window - 2) : get_scroll_overlap(dir));
-	did_move = scroll_with_sms(dir, count, &count);
+	did_move = scroll_with_sms(dir, மொத்தம், &மொத்தம்);
 
-	if (did_move)
+	எனில் (did_move)
 	{
 	    // Place cursor at top or bottom of window.
 	    validate_botline();
@@ -3440,7 +3440,7 @@ pagescroll(int dir, long count, int half)
 	}
     }
 
-    if (get_scrolloff_value() > 0)
+    எனில் (get_scrolloff_மதிப்பு() > 0)
 	cursor_correct();
 #ifdef FEAT_FOLDING
     // Move cursor to first line of closed fold.
@@ -3451,44 +3451,44 @@ pagescroll(int dir, long count, int half)
 	|| prev_lnum != curwin->w_cursor.lnum;
 
     // Error if both the viewport and cursor did not change.
-    if (!did_move)
+    எனில் (!did_move)
 	beep_flush();
-    else if (!curwin->w_p_sms)
+    இல்லையெனில் எனில் (!curwin->w_p_sms)
 	beginline(BL_SOL | BL_FIX);
-    else if (p_sol)
+    இல்லையெனில் எனில் (p_sol)
 	nv_g_home_m_cmd(&ca);
 
-    return did_move ? OK : FAIL;
+    திரும்பு did_move ? OK : FAIL;
 }
 
-    void
-do_check_cursorbind(void)
+    வெறுமை
+do_check_cursorbind(வெறுமை)
 {
-    static win_T	*prev_curwin = NULL;
-    static buf_T	*prev_curbuf = NULL;
-    static varnumber_T	prev_changedtick = 0;
-    static pos_T	prev_cursor = {0, 0, 0};
+    நிலையான win_T	*prev_curwin = வெற்று;
+    நிலையான buf_T	*prev_curbuf = வெற்று;
+    நிலையான varnumber_T	prev_changedtick = 0;
+    நிலையான pos_T	prev_cursor = {0, 0, 0};
 
     // Nothing to do when the cursor didn't move and the text didn't change.
     // After a change the corresponding line in a diff may be different.
-    if (curwin == prev_curwin && curbuf == prev_curbuf
+    எனில் (curwin == prev_curwin && curbuf == prev_curbuf
 	    && CHANGEDTICK(curbuf) == prev_changedtick
 	    && EQUAL_POS(curwin->w_cursor, prev_cursor))
-	return;
+	திரும்பு;
     prev_curwin = curwin;
     prev_curbuf = curbuf;
     prev_changedtick = CHANGEDTICK(curbuf);
     prev_cursor = curwin->w_cursor;
 
-    linenr_T	line = curwin->w_cursor.lnum;
+    linenr_T	வரி = curwin->w_cursor.lnum;
     colnr_T	col = curwin->w_cursor.col;
     colnr_T	coladd = curwin->w_cursor.coladd;
     colnr_T	curswant = curwin->w_curswant;
-    int		set_curswant = curwin->w_set_curswant;
+    முழு		set_curswant = curwin->w_set_curswant;
     win_T	*old_curwin = curwin;
     buf_T	*old_curbuf = curbuf;
-    int		old_VIsual_select = VIsual_select;
-    int		old_VIsual_active = VIsual_active;
+    முழு		old_VIsual_select = VIsual_select;
+    முழு		old_VIsual_active = VIsual_active;
 
     /*
      * loop through the cursorbound windows
@@ -3498,15 +3498,15 @@ do_check_cursorbind(void)
     {
 	curbuf = curwin->w_buffer;
 	// skip original window and windows with 'nocursorbind'
-	if (curwin != old_curwin && curwin->w_p_crb)
+	எனில் (curwin != old_curwin && curwin->w_p_crb)
 	{
 #ifdef FEAT_DIFF
-	    if (curwin->w_p_diff)
+	    எனில் (curwin->w_p_diff)
 		curwin->w_cursor.lnum =
-				 diff_get_corresponding_line(old_curbuf, line);
-	    else
+				 diff_get_corresponding_வரி(old_curbuf, வரி);
+	    இல்லையெனில்
 #endif
-		curwin->w_cursor.lnum = line;
+		curwin->w_cursor.lnum = வரி;
 	    curwin->w_cursor.col = col;
 	    curwin->w_cursor.coladd = coladd;
 	    curwin->w_curswant = curswant;
@@ -3514,23 +3514,23 @@ do_check_cursorbind(void)
 
 	    // Make sure the cursor is in a valid position.  Temporarily set
 	    // "restart_edit" to allow the cursor to be beyond the EOL.
-	    int restart_edit_save = restart_edit;
+	    முழு restart_edit_save = restart_edit;
 	    restart_edit = 'a';
 	    check_cursor();
 
 	    // Avoid a scroll here for the cursor position, 'scrollbind' is
 	    // more important.
-	    if (!curwin->w_p_scb)
+	    எனில் (!curwin->w_p_scb)
 		validate_cursor();
 
 	    restart_edit = restart_edit_save;
 	    // Correct cursor for multi-byte character.
-	    if (has_mbyte)
+	    எனில் (has_mbyte)
 		mb_adjust_cursor();
 	    redraw_later(UPD_VALID);
 
 	    // Only scroll when 'scrollbind' hasn't done this.
-	    if (!curwin->w_p_scb)
+	    எனில் (!curwin->w_p_scb)
 		update_topline();
 	    curwin->w_redr_status = true;
 	}

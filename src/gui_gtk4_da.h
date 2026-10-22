@@ -10,30 +10,30 @@
 #ifndef GUI_GTK4_DRAW_AREA_H
 #define GUI_GTK4_DRAW_AREA_H
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#include <gtk/gtk.h>
+#அந்தர்பாவ <gtk/gtk.h>
 
 #define VIM_TYPE_DRAW_AREA (vim_draw_area_get_type())
 G_DECLARE_FINAL_TYPE(VimDrawArea, vim_draw_area, VIM, DRAW_AREA, GtkWidget)
 
-GtkWidget *vim_draw_area_new(void);
-void vim_draw_area_set_size(VimDrawArea *self, int rows, int cols);
-int vim_draw_area_draw_string(VimDrawArea *self, int row, int col, char_u *s, int len, int flags);
-void vim_draw_area_clear_block(VimDrawArea *self, int row1, int col1, int row2, int col2);
-void vim_draw_area_clear(VimDrawArea *self);
-void vim_draw_area_move_block(VimDrawArea *self, int to, int row1, int row2, int col1, int col2);
-void vim_draw_area_set_cursor(VimDrawArea *self, int w, int h);
-void vim_draw_area_invert_block(VimDrawArea *self, int row, int col, int nrows, int ncols);
-#if defined(FEAT_SIGN_ICONS)
-void vim_draw_area_add_sign(VimDrawArea *self, GdkTexture *sign, int row, int col, int width, int height);
+GtkWidget *vim_draw_area_new(வெறுமை);
+வெறுமை vim_draw_area_set_size(VimDrawArea *self, முழு rows, முழு cols);
+முழு vim_draw_area_draw_string(VimDrawArea *self, முழு row, முழு col, char_u *s, முழு len, முழு flags);
+வெறுமை vim_draw_area_clear_block(VimDrawArea *self, முழு row1, முழு col1, முழு row2, முழு col2);
+வெறுமை vim_draw_area_clear(VimDrawArea *self);
+வெறுமை vim_draw_area_move_block(VimDrawArea *self, முழு to, முழு row1, முழு row2, முழு col1, முழு col2);
+வெறுமை vim_draw_area_set_cursor(VimDrawArea *self, முழு w, முழு h);
+வெறுமை vim_draw_area_invert_block(VimDrawArea *self, முழு row, முழு col, முழு nrows, முழு ncols);
+#எனில் defined(FEAT_SIGN_ICONS)
+வெறுமை vim_draw_area_add_sign(VimDrawArea *self, GdkTexture *sign, முழு row, முழு col, முழு width, முழு height);
 #endif
 #ifdef FEAT_NETBEANS_INTG
-void vim_draw_area_add_multisign(VimDrawArea *self, cairo_surface_t *surf, int row, int col, int width, int height);
+வெறுமை vim_draw_area_add_multisign(VimDrawArea *self, cairo_surface_t *surf, முழு row, முழு col, முழு width, முழு height);
 #endif
 #ifdef FEAT_IMAGE_GUI
-void vim_draw_area_add_external(VimDrawArea *self, GskRenderNode *node);
-void vim_draw_area_remove_external(VimDrawArea *self, GskRenderNode *node);
+வெறுமை vim_draw_area_add_external(VimDrawArea *self, Gsk_Render_முனை *முனை);
+வெறுமை vim_draw_area_remove_external(VimDrawArea *self, Gsk_Render_முனை *முனை);
 #endif
 
 #endif

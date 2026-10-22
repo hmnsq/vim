@@ -11,7 +11,7 @@
  * insexpand.c: functions for Insert mode completion
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
 /*
  * Definitions used for CTRL-X submode.
@@ -23,7 +23,7 @@
 #define CTRL_X_NORMAL		0  // CTRL-N CTRL-P completion, default
 #define CTRL_X_NOT_DEFINED_YET	1
 #define CTRL_X_SCROLL		2
-#define CTRL_X_WHOLE_LINE	3
+#define CTRL_X_WHOLE_வரி	3
 #define CTRL_X_FILES		4
 #define CTRL_X_TAGS		(5 + CTRL_X_WANT_IDENT)
 #define CTRL_X_PATH_PATTERNS	(6 + CTRL_X_WANT_IDENT)
@@ -35,25 +35,25 @@
 #define CTRL_X_FUNCTION	12
 #define CTRL_X_OMNI		13
 #define CTRL_X_SPELL		14
-#define CTRL_X_LOCAL_MSG	15	// only used in "ctrl_x_msgs"
+#define CTRL_X_LOCAL_செய்தி	15	// only used in "ctrl_x_msgs"
 #define CTRL_X_EVAL		16	// for builtin function complete()
 #define CTRL_X_CMDLINE_CTRL_X	17	// CTRL-X typed in CTRL_X_CMDLINE
 #define CTRL_X_REGISTER	18	// complete words from registers
 
-#define CTRL_X_MSG(i) ctrl_x_msgs[(i) & ~CTRL_X_WANT_IDENT]
+#define CTRL_X_செய்தி(i) ctrl_x_msgs[(i) & ~CTRL_X_WANT_IDENT]
 
 // Message for CTRL-X mode, index is ctrl_x_mode.
-static char *ctrl_x_msgs[] =
+நிலையான எழுத்து *ctrl_x_msgs[] =
 {
     N_(" Keyword completion (^N^P)"), // CTRL_X_NORMAL, ^P/^N compl.
     N_(" ^X mode (^]^D^E^F^I^K^L^N^O^P^Rs^U^V^Y)"),
-    NULL, // CTRL_X_SCROLL: depends on state
+    வெற்று, // CTRL_X_SCROLL: depends on state
     N_(" Whole line completion (^L^N^P)"),
     N_(" File name completion (^F^N^P)"),
     N_(" Tag completion (^]^N^P)"),
     N_(" Path pattern completion (^N^P)"),
     N_(" Definition completion (^D^N^P)"),
-    NULL, // CTRL_X_FINISHED
+    வெற்று, // CTRL_X_FINISHED
     N_(" Dictionary completion (^K^N^P)"),
     N_(" Thesaurus completion (^T^N^P)"),
     N_(" Command-line completion (^V^N^P)"),
@@ -61,13 +61,13 @@ static char *ctrl_x_msgs[] =
     N_(" Omni completion (^O^N^P)"),
     N_(" Spelling suggestion (^S^N^P)"),
     N_(" Keyword Local completion (^N^P)"),
-    NULL,   // CTRL_X_EVAL doesn't use msg.
+    வெற்று,   // CTRL_X_EVAL doesn't use msg.
     N_(" Command-line completion (^V^N^P)"),
     N_(" Register completion (^N^P)"),
 };
 
-#if defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
-static string_T ctrl_x_mode_names[] = {
+#எனில் defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
+நிலையான string_T ctrl_x_mode_names[] = {
     STR_LITERAL_INIT("keyword"),
     STR_LITERAL_INIT("ctrl_x"),
     STR_LITERAL_INIT("scroll"),
@@ -83,7 +83,7 @@ static string_T ctrl_x_mode_names[] = {
     STR_LITERAL_INIT("function"),
     STR_LITERAL_INIT("omni"),
     STR_LITERAL_INIT("spell"),
-    {NULL, 0},		    // CTRL_X_LOCAL_MSG is only used in "ctrl_x_msgs"
+    {வெற்று, 0},		    // CTRL_X_LOCAL_MSG is only used in "ctrl_x_msgs"
     STR_LITERAL_INIT("eval"),
     STR_LITERAL_INIT("cmdline"),
     STR_LITERAL_INIT("register"),
@@ -93,27 +93,27 @@ static string_T ctrl_x_mode_names[] = {
 /*
  * Structure used to store one match for insert completion.
  */
-typedef struct compl_S compl_T;
-struct compl_S
+வகைவரை கட்டமைப்பு compl_S compl_T;
+கட்டமைப்பு compl_S
 {
     compl_T	*cp_next;
     compl_T	*cp_prev;
     compl_T	*cp_match_next;		// matched next compl_T
     string_T	cp_str;			// matched text
-    char_u	*(cp_text[CPT_COUNT]);	// text for the menu
+    char_u	*(cp_text[CPT_மொத்தம்]);	// text for the menu
 #ifdef FEAT_EVAL
     typval_T	cp_user_data;
 #endif
     char_u	*cp_fname;		// file containing the match, allocated when
 					// cp_flags has CP_FREE_FNAME
-    int		cp_flags;		// CP_ values
-    int		cp_number;		// sequence number
-    int		cp_order;		// list position when first scored
-    int		cp_score;		// fuzzy match score or proximity score
-    int		cp_in_match_array;	// collected by compl_match_array
-    int		cp_user_abbr_hl_id;	// highlight group ID for abbr
-    int		cp_user_kind_hl_id;	// highlight group ID for kind
-    int		cp_cpt_source_idx;	// index of this match's source in 'cpt' option
+    முழு		cp_flags;		// CP_ values
+    முழு		cp_எண்;		// sequence number
+    முழு		cp_order;		// list position when first scored
+    முழு		cp_score;		// fuzzy match score or proximity score
+    முழு		cp_in_match_array;	// collected by compl_match_array
+    முழு		cp_user_abbr_hl_id;	// highlight group ID for abbr
+    முழு		cp_user_kind_hl_id;	// highlight group ID for kind
+    முழு		cp_cpt_source_idx;	// index of this match's source in 'cpt' option
 };
 
 // values for cp_flags
@@ -132,117 +132,117 @@ struct compl_S
  * ins_compl_get_exp(), when new matches are added to the list.
  * "compl_old_match" points to previous "compl_curr_match".
  */
-static compl_T    *compl_first_match = NULL;
-static compl_T    *compl_curr_match = NULL;
-static compl_T    *compl_shown_match = NULL;
-static compl_T    *compl_old_match = NULL;
+நிலையான compl_T    *compl_first_match = வெற்று;
+நிலையான compl_T    *compl_curr_match = வெற்று;
+நிலையான compl_T    *compl_shown_match = வெற்று;
+நிலையான compl_T    *compl_old_match = வெற்று;
 
 // Hashtab with the strings of the matches in the list above, except the
 // original-text entries.  Each entry owns a copy of the string and counts
 // the matches with that string, so that when matches were added with "adup"
 // the entry remains until the last match with the string is removed.
-typedef struct
+வகைவரை கட்டமைப்பு
 {
-    int	    cse_count;	// number of matches with this string
+    முழு	    cse_மொத்தம்;	// number of matches with this string
     char_u  cse_str[1];	// the string, actually longer
 } complstr_T;
 
-#define CSE_OFF		((int)offsetof(complstr_T, cse_str))
-#define HI2CSE(hi)	((complstr_T *)((hi)->hi_key - CSE_OFF))
+#define CSE_OFF		((முழு)offsetof(complstr_T, cse_str))
+#define HI2CSE(hi)	((complstr_T *)((hi)->hi_சாவி - CSE_OFF))
 
-static hashtab_T  compl_strings_ht;
+நிலையான hashtab_T  compl_strings_ht;
 
 /*
  * Count the string of a new match in the duplicate-check hashtab.
  * "hash" is the hash of "str" when it is not zero.
  */
-    static void
+    நிலையான வெறுமை
 compl_strings_add(char_u *str, size_t len, hash_T hash)
 {
     hashitem_T	*hi;
     complstr_T	*entry;
 
-    if (compl_strings_ht.ht_array == NULL)
+    எனில் (compl_strings_ht.ht_array == வெற்று)
 	hash_init(&compl_strings_ht);
-    if (hash == 0)
+    எனில் (hash == 0)
 	hash = hash_hash(str);
     hi = hash_lookup(&compl_strings_ht, str, hash);
-    if (HASHITEM_EMPTY(hi))
+    எனில் (HASHITEM_EMPTY(hi))
     {
 	entry = alloc(CSE_OFF + len + 1);
-	if (entry == NULL)
+	எனில் (entry == வெற்று)
 	    // Out of memory: the duplicate check degrades, an equal string
 	    // added later is not recognized as a duplicate.
-	    return;
-	entry->cse_count = 1;
+	    திரும்பு;
+	entry->cse_மொத்தம் = 1;
 	vim_strncpy(entry->cse_str, str, len);
-	if (hash_add_item(&compl_strings_ht, hi, entry->cse_str, hash)
+	எனில் (hash_add_item(&compl_strings_ht, hi, entry->cse_str, hash)
 								      == FAIL)
 	    vim_free(entry);
     }
-    else
-	++HI2CSE(hi)->cse_count;
+    இல்லையெனில்
+	++HI2CSE(hi)->cse_மொத்தம்;
 }
 
 // list used to store the compl_T which have the max score
-static compl_T	  **compl_best_matches = NULL;
-static int	  compl_num_bests = 0;
+நிலையான compl_T	  **compl_best_matches = வெற்று;
+நிலையான முழு	  compl_இலக்கம்_bests = 0;
 
 // After using a cursor key <Enter> selects a match in the popup menu,
 // otherwise it inserts a line break.
-static int	  compl_enter_selects = FALSE;
+நிலையான முழு	  compl_enter_selects = FALSE;
 
 // When "compl_leader" is not NULL only matches that start with this string
 // are used.
-static string_T	  compl_leader = {NULL, 0};
+நிலையான string_T	  compl_leader = {வெற்று, 0};
 
-static int	  compl_get_longest = FALSE;	// put longest common string
+நிலையான முழு	  compl_get_longest = FALSE;	// put longest common string
 						// in compl_leader
 
 // This flag is FALSE when no match is selected (by ^N/^P) or the match was
 // edited or using the longest common string.
-static int	  compl_used_match;
+நிலையான முழு	  compl_used_match;
 
 // didn't finish finding completions.
-static int	  compl_was_interrupted = FALSE;
+நிலையான முழு	  compl_was_interrupted = FALSE;
 
 // Set when character typed while looking for matches and it means we should
 // stop looking for matches.
-static int	  compl_interrupted = FALSE;
+நிலையான முழு	  compl_interrupted = FALSE;
 
-static int	  compl_restarting = FALSE;	// don't insert match
+நிலையான முழு	  compl_restarting = FALSE;	// don't insert match
 
 // When the first completion is done "compl_started" is set.  When it's
 // FALSE the word to be completed must be located.
-static int	  compl_started = FALSE;
+நிலையான முழு	  compl_started = FALSE;
 
 // Which Ctrl-X mode are we in?
-static int	  ctrl_x_mode = CTRL_X_NORMAL;
+நிலையான முழு	  ctrl_x_mode = CTRL_X_NORMAL;
 
-static int	  compl_matches = 0;	    // number of completion matches
-static string_T	  compl_pattern = {NULL, 0};	 // search pattern for matching items
+நிலையான முழு	  compl_matches = 0;	    // number of completion matches
+நிலையான string_T	  compl_pattern = {வெற்று, 0};	 // search pattern for matching items
 #ifdef FEAT_COMPL_FUNC
-static string_T	  cpt_compl_pattern = {NULL, 0}; // pattern returned by func in 'cpt'
+நிலையான string_T	  cpt_compl_pattern = {வெற்று, 0}; // pattern returned by func in 'cpt'
 #endif
-static int	  compl_direction = FORWARD;
-static int	  compl_shows_dir = FORWARD;
-static int	  compl_pending = 0;	    // > 1 for postponed CTRL-N
-static pos_T	  compl_startpos;
+நிலையான முழு	  compl_direction = FORWARD;
+நிலையான முழு	  compl_shows_dir = FORWARD;
+நிலையான முழு	  compl_pending = 0;	    // > 1 for postponed CTRL-N
+நிலையான pos_T	  compl_startpos;
 // Length in bytes of the text being completed (this is deleted to be replaced
 // by the match.)
-static int	  compl_length = 0;
-static linenr_T	  compl_lnum = 0;           // lnum where the completion start
-static colnr_T	  compl_col = 0;	    // column where the text starts
+நிலையான முழு	  compl_length = 0;
+நிலையான linenr_T	  compl_lnum = 0;           // lnum where the completion start
+நிலையான colnr_T	  compl_col = 0;	    // column where the text starts
 					    // that is being completed
-static colnr_T	  compl_ins_end_col = 0;
-static colnr_T	  compl_longest_end_col = 0;  // end of 'longest' inserted text
-static string_T	  compl_orig_text = {NULL, 0};  // text as it was before
+நிலையான colnr_T	  compl_ins_end_col = 0;
+நிலையான colnr_T	  compl_longest_end_col = 0;  // end of 'longest' inserted text
+நிலையான string_T	  compl_orig_text = {வெற்று, 0};  // text as it was before
 					    // completion started
-static int	  compl_cont_mode = 0;
-static expand_T	  compl_xp;
+நிலையான முழு	  compl_cont_mode = 0;
+நிலையான expand_T	  compl_xp;
 
-static win_T	  *compl_curr_win = NULL;  // win where completion is active
-static buf_T	  *compl_curr_buf = NULL;  // buf where completion is active
+நிலையான win_T	  *compl_curr_win = வெற்று;  // win where completion is active
+நிலையான buf_T	  *compl_curr_buf = வெற்று;  // buf where completion is active
 
 #define COMPL_INITIAL_TIMEOUT_MS    80
 // Autocomplete uses a decaying timeout: starting from COMPL_INITIAL_TIMEOUT_MS,
@@ -252,32 +252,32 @@ static buf_T	  *compl_curr_buf = NULL;  // buf where completion is active
 // Special case: when 'complete' contains "F" or "o" (function sources), a
 // longer fixed timeout is used (COMPL_FUNC_TIMEOUT_MS or
 // COMPL_FUNC_TIMEOUT_NON_KW_MS). - girish
-static int	  compl_autocomplete = FALSE;	    // whether autocompletion is active
-static bool	  compl_autostarted = false;	    // Vim started this completion
-static bool	  compl_autostart_pending = false;  // the trigger armed one
-static bool	  compl_autocomplete_pending = false;
+நிலையான முழு	  compl_autocomplete = FALSE;	    // whether autocompletion is active
+நிலையான bool	  compl_autostarted = false;	    // Vim started this completion
+நிலையான bool	  compl_autostart_pending = false;  // the trigger armed one
+நிலையான bool	  compl_autocomplete_pending = false;
 #ifdef ELAPSED_FUNC
-static elapsed_T  compl_autocomplete_start_tv;	    // when the delay was armed
+நிலையான elapsed_T  compl_autocomplete_start_tv;	    // when the delay was armed
 #endif
-static int	  compl_timeout_ms = COMPL_INITIAL_TIMEOUT_MS;
-static int	  compl_time_slice_expired = FALSE; // time budget exceeded for current source
-static int	  compl_from_nonkeyword = FALSE;    // completion started from non-keyword
-static int	  compl_hi_on_autocompl_longest = FALSE;    // apply "PreInsert" highlight
+நிலையான முழு	  compl_timeout_ms = COMPL_INITIAL_TIMEOUT_MS;
+நிலையான முழு	  compl_time_slice_expired = FALSE; // time budget exceeded for current source
+நிலையான முழு	  compl_from_nonkeyword = FALSE;    // completion started from non-keyword
+நிலையான முழு	  compl_hi_on_autocompl_longest = FALSE;    // apply "PreInsert" highlight
 
 // Halve the current completion timeout, simulating exponential decay.
 #define COMPL_MIN_TIMEOUT_MS	5
 #define DECAY_COMPL_TIMEOUT() \
-    do { \
-	if (compl_timeout_ms > COMPL_MIN_TIMEOUT_MS) \
+    செய் { \
+	எனில் (compl_timeout_ms > COMPL_MIN_TIMEOUT_MS) \
 	    compl_timeout_ms /= 2; \
-    } while (0)
+    } போது (0)
 
 // Timeout values for F{func}, F and o values in 'complete'
 #define COMPL_FUNC_TIMEOUT_MS		300
 #define COMPL_FUNC_TIMEOUT_NON_KW_MS	1000
 
 // List of flags for method of completion.
-static int	  compl_cont_status = 0;
+நிலையான முழு	  compl_cont_status = 0;
 #define CONT_ADDING	1	// "normal" or "adding" expansion
 #define CONT_INTRPT	(2 + 4)	// a ^X interrupted the current expansion
 				// it's set only iff N_ADDS is set
@@ -289,93 +289,93 @@ static int	  compl_cont_status = 0;
 #define CONT_LOCAL	32	// for ctrl_x_mode 0, ^X^P/^X^N do a local
 				// expansion, (eg use complete=.)
 
-static int	  compl_opt_refresh_always = FALSE;
-static int	  compl_opt_suppress_empty = FALSE;
+நிலையான முழு	  compl_opt_refresh_always = FALSE;
+நிலையான முழு	  compl_opt_suppress_empty = FALSE;
 
-static int	  compl_selected_item = -1;
+நிலையான முழு	  compl_selected_item = -1;
 
-static int	  *compl_fuzzy_scores;
+நிலையான முழு	  *compl_fuzzy_scores;
 
 // Define the structure for completion source (in 'cpt' option) information
-typedef struct cpt_source_T
+வகைவரை கட்டமைப்பு cpt_source_T
 {
-    int	cs_refresh_always;  // Whether 'refresh:always' is set for func
-    int	cs_startcol;	    // Start column returned by func
-    int	cs_max_matches;	    // Max items to display from this source
+    முழு	cs_refresh_always;  // Whether 'refresh:always' is set for func
+    முழு	cs_startcol;	    // Start column returned by func
+    முழு	cs_max_matches;	    // Max items to display from this source
 #ifdef ELAPSED_FUNC
     elapsed_T	compl_start_tv;	    // Timestamp when match collection starts
 #endif
     char_u  cs_flag;	    // flag indicating the type of source
 } cpt_source_T;
 
-static cpt_source_T *cpt_sources_array; // Pointer to the array of completion sources
-static int	    cpt_sources_count;  // Total number of completion sources specified in the 'cpt' option
-static int	    cpt_sources_index = -1;  // Index of the current completion source being expanded
+நிலையான cpt_source_T *cpt_sources_array; // Pointer to the array of completion sources
+நிலையான முழு	    cpt_sources_மொத்தம்;  // Total number of completion sources specified in the 'cpt' option
+நிலையான முழு	    cpt_sources_index = -1;  // Index of the current completion source being expanded
 
 // "compl_match_array" points the currently displayed list of entries in the
 // popup menu.  It is NULL when there is no popup menu.
-static pumitem_T *compl_match_array = NULL;
-static int compl_match_arraysize;
+நிலையான pumitem_T *compl_match_array = வெற்று;
+நிலையான முழு compl_match_arraysize;
 
-static int ins_compl_add(char_u *str, int len, char_u *fname, char_u **cptext, typval_T *user_data, int cdir, int flags, int adup, int *user_hl, int score);
-static void ins_compl_longest_match(compl_T *match);
-static void ins_compl_del_pum(void);
-static void ins_compl_files(int count, char_u **files, int thesaurus, int flags, regmatch_T *regmatch, char_u *buf, int *dir);
-static void ins_compl_free(void);
-static int  ins_compl_need_restart(void);
-static void ins_compl_new_leader(void);
-static int  get_compl_len(void);
-static void ins_compl_restart(void);
-static void ins_compl_set_original_text(char_u *str, size_t len);
-static void ins_compl_fixRedoBufForLeader(char_u *ptr_arg);
-#if defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
-static void ins_compl_add_list(list_T *list);
-static void ins_compl_add_dict(dict_T *dict);
-static int get_userdefined_compl_info(colnr_T curs_col, callback_T *cb, int *startcol);
-static void get_cpt_func_completion_matches(callback_T *cb);
-static callback_T *get_callback_if_cpt_func(char_u *p, int idx);
-static void fill_complete_info_dict(dict_T *di, compl_T *match, int add_match);
+நிலையான முழு ins_compl_add(char_u *str, முழு len, char_u *fname, char_u **cptext, typval_T *user_data, முழு cdir, முழு flags, முழு adup, முழு *user_hl, முழு score);
+நிலையான வெறுமை ins_compl_longest_match(compl_T *match);
+நிலையான வெறுமை ins_compl_del_pum(வெறுமை);
+நிலையான வெறுமை ins_compl_files(முழு மொத்தம், char_u **files, முழு thesaurus, முழு flags, regmatch_T *regmatch, char_u *buf, முழு *dir);
+நிலையான வெறுமை ins_compl_free(வெறுமை);
+நிலையான முழு  ins_compl_need_restart(வெறுமை);
+நிலையான வெறுமை ins_compl_new_leader(வெறுமை);
+நிலையான முழு  get_compl_len(வெறுமை);
+நிலையான வெறுமை ins_compl_restart(வெறுமை);
+நிலையான வெறுமை ins_compl_set_original_text(char_u *str, size_t len);
+நிலையான வெறுமை ins_compl_fixRedoBufForLeader(char_u *ptr_arg);
+#எனில் defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
+நிலையான வெறுமை ins_compl_add_list(list_T *list);
+நிலையான வெறுமை ins_compl_add_dict(dict_T *dict);
+நிலையான முழு get_userdefined_compl_info(colnr_T curs_col, callback_T *cb, முழு *startcol);
+நிலையான வெறுமை get_cpt_func_completion_matches(callback_T *cb);
+நிலையான callback_T *get_callback_if_cpt_func(char_u *p, முழு idx);
+நிலையான வெறுமை fill_complete_info_dict(dict_T *di, compl_T *match, முழு add_match);
 #endif
-static int setup_cpt_sources(void);
-static int is_cpt_func_refresh_always(void);
-static void cpt_sources_clear(void);
-static void cpt_compl_refresh(void);
-static int  ins_compl_key2dir(int c);
-static int  ins_compl_pum_key(int c);
-static int  ins_compl_key2count(int c);
-static void show_pum(int prev_w_wrow, int prev_w_leftcol);
-static unsigned  quote_meta(char_u *dest, char_u *str, int len);
-static int ins_compl_has_multiple(void);
-static void ins_compl_expand_multiple(char_u *str);
-static void ins_compl_longest_insert(char_u *prefix);
-static void ins_compl_make_linear(void);
-static int ins_compl_make_cyclic(void);
+நிலையான முழு setup_cpt_sources(வெறுமை);
+நிலையான முழு is_cpt_func_refresh_always(வெறுமை);
+நிலையான வெறுமை cpt_sources_clear(வெறுமை);
+நிலையான வெறுமை cpt_compl_refresh(வெறுமை);
+நிலையான முழு  ins_compl_key2dir(முழு c);
+நிலையான முழு  ins_compl_pum_சாவி(முழு c);
+நிலையான முழு  ins_compl_key2count(முழு c);
+நிலையான வெறுமை show_pum(முழு prev_w_wrow, முழு prev_w_leftcol);
+நிலையான unsigned  quote_meta(char_u *dest, char_u *str, முழு len);
+நிலையான முழு ins_compl_has_multiple(வெறுமை);
+நிலையான வெறுமை ins_compl_expand_multiple(char_u *str);
+நிலையான வெறுமை ins_compl_longest_செருகு(char_u *prefix);
+நிலையான வெறுமை ins_compl_make_linear(வெறுமை);
+நிலையான முழு ins_compl_make_cyclic(வெறுமை);
 
 #ifdef FEAT_SPELL
-static void spell_back_to_badword(void);
-static int  spell_bad_len = 0;	// length of located bad word
+நிலையான வெறுமை spell_back_to_badword(வெறுமை);
+நிலையான முழு  spell_bad_len = 0;	// length of located bad word
 #endif
 
 /*
  * CTRL-X pressed in Insert mode.
  */
-    void
-ins_ctrl_x(void)
+    வெறுமை
+ins_ctrl_x(வெறுமை)
 {
-    if (!ctrl_x_mode_cmdline())
+    எனில் (!ctrl_x_mode_cmdline())
     {
 	// if the next ^X<> won't ADD nothing, then reset compl_cont_status
-	if (compl_cont_status & CONT_N_ADDS)
+	எனில் (compl_cont_status & CONT_N_ADDS)
 	    compl_cont_status |= CONT_INTRPT;
-	else
+	இல்லையெனில்
 	    compl_cont_status = 0;
 	// We're not sure which CTRL-X mode it will be yet
 	ctrl_x_mode = CTRL_X_NOT_DEFINED_YET;
-	edit_submode = (char_u *)_(CTRL_X_MSG(ctrl_x_mode));
-	edit_submode_pre = NULL;
+	edit_submode = (char_u *)_(CTRL_X_செய்தி(ctrl_x_mode));
+	edit_submode_pre = வெற்று;
 	showmode();
     }
-    else
+    இல்லையெனில்
 	// CTRL-X in CTRL-X CTRL-V mode behaves differently to make CTRL-X
 	// CTRL-V look like CTRL-N
 	ctrl_x_mode = CTRL_X_CMDLINE_CTRL_X;
@@ -386,95 +386,95 @@ ins_ctrl_x(void)
 /*
  * Functions to check the current CTRL-X mode.
  */
-int ctrl_x_mode_none(void)
-    { return ctrl_x_mode == 0; }
-int ctrl_x_mode_normal(void)
-    { return ctrl_x_mode == CTRL_X_NORMAL; }
-int ctrl_x_mode_scroll(void)
-    { return ctrl_x_mode == CTRL_X_SCROLL; }
-int ctrl_x_mode_whole_line(void)
-    { return ctrl_x_mode == CTRL_X_WHOLE_LINE; }
-int ctrl_x_mode_files(void)
-    { return ctrl_x_mode == CTRL_X_FILES; }
-int ctrl_x_mode_tags(void)
-    { return ctrl_x_mode == CTRL_X_TAGS; }
-int ctrl_x_mode_path_patterns(void)
-    { return ctrl_x_mode == CTRL_X_PATH_PATTERNS; }
-int ctrl_x_mode_path_defines(void)
-    { return ctrl_x_mode == CTRL_X_PATH_DEFINES; }
-int ctrl_x_mode_dictionary(void)
-    { return ctrl_x_mode == CTRL_X_DICTIONARY; }
-int ctrl_x_mode_thesaurus(void)
-    { return ctrl_x_mode == CTRL_X_THESAURUS; }
-int ctrl_x_mode_cmdline(void)
-    { return ctrl_x_mode == CTRL_X_CMDLINE
+முழு ctrl_x_mode_none(வெறுமை)
+    { திரும்பு ctrl_x_mode == 0; }
+முழு ctrl_x_mode_normal(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_NORMAL; }
+முழு ctrl_x_mode_scroll(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_SCROLL; }
+முழு ctrl_x_mode_whole_வரி(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_WHOLE_வரி; }
+முழு ctrl_x_mode_files(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_FILES; }
+முழு ctrl_x_mode_tags(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_TAGS; }
+முழு ctrl_x_mode_path_patterns(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_PATH_PATTERNS; }
+முழு ctrl_x_mode_path_defines(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_PATH_DEFINES; }
+முழு ctrl_x_mode_dictionary(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_DICTIONARY; }
+முழு ctrl_x_mode_thesaurus(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_THESAURUS; }
+முழு ctrl_x_mode_cmdline(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_CMDLINE
 		|| ctrl_x_mode == CTRL_X_CMDLINE_CTRL_X; }
-int ctrl_x_mode_function(void)
-    { return ctrl_x_mode == CTRL_X_FUNCTION; }
-int ctrl_x_mode_omni(void)
-    { return ctrl_x_mode == CTRL_X_OMNI; }
-int ctrl_x_mode_spell(void)
-    { return ctrl_x_mode == CTRL_X_SPELL; }
-int ctrl_x_mode_eval(void)
-    { return ctrl_x_mode == CTRL_X_EVAL; }
-int ctrl_x_mode_line_or_eval(void)
-    { return ctrl_x_mode == CTRL_X_WHOLE_LINE || ctrl_x_mode == CTRL_X_EVAL; }
-int ctrl_x_mode_register(void)
-    { return ctrl_x_mode == CTRL_X_REGISTER; }
+முழு ctrl_x_mode_function(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_FUNCTION; }
+முழு ctrl_x_mode_omni(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_OMNI; }
+முழு ctrl_x_mode_spell(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_SPELL; }
+முழு ctrl_x_mode_eval(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_EVAL; }
+முழு ctrl_x_mode_வரி_or_eval(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_WHOLE_வரி || ctrl_x_mode == CTRL_X_EVAL; }
+முழு ctrl_x_mode_register(வெறுமை)
+    { திரும்பு ctrl_x_mode == CTRL_X_REGISTER; }
 
 /*
  * Whether other than default completion has been selected.
  */
-    int
-ctrl_x_mode_not_default(void)
+    முழு
+ctrl_x_mode_not_default(வெறுமை)
 {
-    return ctrl_x_mode != CTRL_X_NORMAL;
+    திரும்பு ctrl_x_mode != CTRL_X_NORMAL;
 }
 
 /*
  * Whether CTRL-X was typed without a following character,
  * not including when in CTRL-X CTRL-V mode.
  */
-    int
-ctrl_x_mode_not_defined_yet(void)
+    முழு
+ctrl_x_mode_not_defined_yet(வெறுமை)
 {
-    return ctrl_x_mode == CTRL_X_NOT_DEFINED_YET;
+    திரும்பு ctrl_x_mode == CTRL_X_NOT_DEFINED_YET;
 }
 
 /*
  * Return TRUE if currently in "normal" or "adding" insert completion matches
  * state
  */
-    int
-compl_status_adding(void)
+    முழு
+compl_status_adding(வெறுமை)
 {
-    return compl_cont_status & CONT_ADDING;
+    திரும்பு compl_cont_status & CONT_ADDING;
 }
 
 /*
  * Return TRUE if the completion pattern includes start of line, just for
  * word-wise expansion.
  */
-    int
-compl_status_sol(void)
+    முழு
+compl_status_sol(வெறுமை)
 {
-    return compl_cont_status & CONT_SOL;
+    திரும்பு compl_cont_status & CONT_SOL;
 }
 
 /*
  * Return TRUE if ^X^P/^X^N will do a local completion (i.e. use complete=.)
  */
-    int
-compl_status_local(void)
+    முழு
+compl_status_local(வெறுமை)
 {
-    return compl_cont_status & CONT_LOCAL;
+    திரும்பு compl_cont_status & CONT_LOCAL;
 }
 
 /*
  * Clear the completion status flags
  */
-    void
-compl_status_clear(void)
+    வெறுமை
+compl_status_clear(வெறுமை)
 {
     compl_cont_status = 0;
 }
@@ -482,37 +482,37 @@ compl_status_clear(void)
 /*
  * Return TRUE if completion is using the forward direction matches
  */
-    static int
-compl_dir_forward(void)
+    நிலையான முழு
+compl_dir_forward(வெறுமை)
 {
-    return compl_direction == FORWARD;
+    திரும்பு compl_direction == FORWARD;
 }
 
 /*
  * Return TRUE if currently showing forward completion matches
  */
-    static int
-compl_shows_dir_forward(void)
+    நிலையான முழு
+compl_shows_dir_forward(வெறுமை)
 {
-    return compl_shows_dir == FORWARD;
+    திரும்பு compl_shows_dir == FORWARD;
 }
 
 /*
  * Return TRUE if currently showing backward completion matches
  */
-    static int
-compl_shows_dir_backward(void)
+    நிலையான முழு
+compl_shows_dir_backward(வெறுமை)
 {
-    return compl_shows_dir == BACKWARD;
+    திரும்பு compl_shows_dir == BACKWARD;
 }
 
 /*
  * Return TRUE if the 'dictionary' or 'thesaurus' option can be used.
  */
-    int
-has_compl_option(int dict_opt)
+    முழு
+has_compl_option(முழு dict_opt)
 {
-    if (dict_opt ? (*curbuf->b_p_dict == NUL && *p_dict == NUL
+    எனில் (dict_opt ? (*curbuf->b_p_dict == NUL && *p_dict == NUL
 #ifdef FEAT_SPELL
 							&& !curwin->w_p_spell
 #endif
@@ -524,120 +524,120 @@ has_compl_option(int dict_opt)
 		   ))
     {
 	ctrl_x_mode = CTRL_X_NORMAL;
-	edit_submode = NULL;
-	msg_attr(dict_opt ? _("'dictionary' option is empty")
+	edit_submode = வெற்று;
+	செய்தி_attr(dict_opt ? _("'dictionary' option is empty")
 			  : _("'thesaurus' option is empty"),
 							      HL_ATTR(HLF_E));
-	if (emsg_silent == 0 && !in_assert_fails)
+	எனில் (emsg_silent == 0 && !in_assert_fails)
 	{
 	    vim_beep(BO_COMPL);
 	    setcursor();
 	    out_flush();
 #ifdef FEAT_EVAL
-	    if (!get_vim_var_nr(VV_TESTING))
+	    எனில் (!get_vim_var_nr(VV_TESTING))
 #endif
 		ui_delay(2004L, FALSE);
 	}
-	return FALSE;
+	திரும்பு FALSE;
     }
-    return TRUE;
+    திரும்பு TRUE;
 }
 
 /*
  * Is the character "c" a valid key to go to or keep us in CTRL-X mode?
  * This depends on the current mode.
  */
-    int
-vim_is_ctrl_x_key(int c)
+    முழு
+vim_is_ctrl_x_சாவி(முழு c)
 {
     // Accept <PageUp> and <PageDown> if the popup menu is visible.
-    if (ins_compl_pum_key(c))
-	return TRUE;
+    எனில் (ins_compl_pum_சாவி(c))
+	திரும்பு TRUE;
 
-    switch (ctrl_x_mode)
+    தேர்வு (ctrl_x_mode)
     {
-	case 0:		    // Not in any CTRL-X mode
-	    return (c == Ctrl_N || c == Ctrl_P || c == Ctrl_X);
-	case CTRL_X_NOT_DEFINED_YET:
-	case CTRL_X_CMDLINE_CTRL_X:
-	    return (   c == Ctrl_X || c == Ctrl_Y || c == Ctrl_E
+	நிலை 0:		    // Not in any CTRL-X mode
+	    திரும்பு (c == Ctrl_N || c == Ctrl_P || c == Ctrl_X);
+	நிலை CTRL_X_NOT_DEFINED_YET:
+	நிலை CTRL_X_CMDLINE_CTRL_X:
+	    திரும்பு (   c == Ctrl_X || c == Ctrl_Y || c == Ctrl_E
 		    || c == Ctrl_L || c == Ctrl_F || c == Ctrl_RSB
 		    || c == Ctrl_I || c == Ctrl_D || c == Ctrl_P
 		    || c == Ctrl_N || c == Ctrl_T || c == Ctrl_V
 		    || c == Ctrl_Q || c == Ctrl_U || c == Ctrl_O
 		    || c == Ctrl_S || c == Ctrl_K || c == 's'
 		    || c == Ctrl_Z || c == Ctrl_R);
-	case CTRL_X_SCROLL:
-	    return (c == Ctrl_Y || c == Ctrl_E);
-	case CTRL_X_WHOLE_LINE:
-	    return (c == Ctrl_L || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_FILES:
-	    return (c == Ctrl_F || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_DICTIONARY:
-	    return (c == Ctrl_K || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_THESAURUS:
-	    return (c == Ctrl_T || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_TAGS:
-	    return (c == Ctrl_RSB || c == Ctrl_P || c == Ctrl_N);
+	நிலை CTRL_X_SCROLL:
+	    திரும்பு (c == Ctrl_Y || c == Ctrl_E);
+	நிலை CTRL_X_WHOLE_வரி:
+	    திரும்பு (c == Ctrl_L || c == Ctrl_P || c == Ctrl_N);
+	நிலை CTRL_X_FILES:
+	    திரும்பு (c == Ctrl_F || c == Ctrl_P || c == Ctrl_N);
+	நிலை CTRL_X_DICTIONARY:
+	    திரும்பு (c == Ctrl_K || c == Ctrl_P || c == Ctrl_N);
+	நிலை CTRL_X_THESAURUS:
+	    திரும்பு (c == Ctrl_T || c == Ctrl_P || c == Ctrl_N);
+	நிலை CTRL_X_TAGS:
+	    திரும்பு (c == Ctrl_RSB || c == Ctrl_P || c == Ctrl_N);
 #ifdef FEAT_FIND_ID
-	case CTRL_X_PATH_PATTERNS:
-	    return (c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_PATH_DEFINES:
-	    return (c == Ctrl_D || c == Ctrl_P || c == Ctrl_N);
+	நிலை CTRL_X_PATH_PATTERNS:
+	    திரும்பு (c == Ctrl_P || c == Ctrl_N);
+	நிலை CTRL_X_PATH_DEFINES:
+	    திரும்பு (c == Ctrl_D || c == Ctrl_P || c == Ctrl_N);
 #endif
-	case CTRL_X_CMDLINE:
-	    return (c == Ctrl_V || c == Ctrl_Q || c == Ctrl_P || c == Ctrl_N
+	நிலை CTRL_X_CMDLINE:
+	    திரும்பு (c == Ctrl_V || c == Ctrl_Q || c == Ctrl_P || c == Ctrl_N
 		    || c == Ctrl_X);
 #ifdef FEAT_COMPL_FUNC
-	case CTRL_X_FUNCTION:
-	    return (c == Ctrl_U || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_OMNI:
-	    return (c == Ctrl_O || c == Ctrl_P || c == Ctrl_N);
+	நிலை CTRL_X_FUNCTION:
+	    திரும்பு (c == Ctrl_U || c == Ctrl_P || c == Ctrl_N);
+	நிலை CTRL_X_OMNI:
+	    திரும்பு (c == Ctrl_O || c == Ctrl_P || c == Ctrl_N);
 #endif
-	case CTRL_X_SPELL:
-	    return (c == Ctrl_S || c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_EVAL:
-	    return (c == Ctrl_P || c == Ctrl_N);
-	case CTRL_X_REGISTER:
-	    return (c == Ctrl_R || c == Ctrl_P || c == Ctrl_N);
+	நிலை CTRL_X_SPELL:
+	    திரும்பு (c == Ctrl_S || c == Ctrl_P || c == Ctrl_N);
+	நிலை CTRL_X_EVAL:
+	    திரும்பு (c == Ctrl_P || c == Ctrl_N);
+	நிலை CTRL_X_REGISTER:
+	    திரும்பு (c == Ctrl_R || c == Ctrl_P || c == Ctrl_N);
     }
     internal_error("vim_is_ctrl_x_key()");
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 /*
  * Return TRUE if "match" is the original text when the completion began.
  */
-    static int
+    நிலையான முழு
 match_at_original_text(compl_T *match)
 {
-    return match->cp_flags & CP_ORIGINAL_TEXT;
+    திரும்பு match->cp_flags & CP_ORIGINAL_TEXT;
 }
 
 /*
  * Returns TRUE if "match" is the first match in the completion list.
  */
-    static int
+    நிலையான முழு
 is_first_match(compl_T *match)
 {
-    return match == compl_first_match;
+    திரும்பு match == compl_first_match;
 }
 
 /*
  * Return the entry holding the original text, NULL if not found.
  * It is the first item, or the last one for backward completion.
  */
-    static compl_T *
-find_original_text_match(void)
+    நிலையான compl_T *
+find_original_text_match(வெறுமை)
 {
-    if (compl_first_match == NULL)
-	return NULL;
-    if (match_at_original_text(compl_first_match))
-	return compl_first_match;
-    if (compl_first_match->cp_prev != NULL
+    எனில் (compl_first_match == வெற்று)
+	திரும்பு வெற்று;
+    எனில் (match_at_original_text(compl_first_match))
+	திரும்பு compl_first_match;
+    எனில் (compl_first_match->cp_prev != வெற்று
 	    && match_at_original_text(compl_first_match->cp_prev))
-	return compl_first_match->cp_prev;
-    return NULL;
+	திரும்பு compl_first_match->cp_prev;
+    திரும்பு வெற்று;
 }
 
 /*
@@ -645,105 +645,105 @@ find_original_text_match(void)
  * completed.  Used to decide whether to abandon complete mode when the menu
  * is visible.
  */
-    int
-ins_compl_accept_char(int c)
+    முழு
+ins_compl_accept_char(முழு c)
 {
-    if (compl_autocomplete && compl_from_nonkeyword)
-	return FALSE;
+    எனில் (compl_autocomplete && compl_from_nonkeyword)
+	திரும்பு FALSE;
 
-    if (ctrl_x_mode & CTRL_X_WANT_IDENT)
+    எனில் (ctrl_x_mode & CTRL_X_WANT_IDENT)
 	// When expanding an identifier only accept identifier chars.
-	return vim_isIDc(c);
+	திரும்பு vim_isIDc(c);
 
-    switch (ctrl_x_mode)
+    தேர்வு (ctrl_x_mode)
     {
-	case CTRL_X_FILES:
+	நிலை CTRL_X_FILES:
 	    // When expanding file name only accept file name chars. But not
 	    // path separators, so that "proto/<Tab>" expands files in
 	    // "proto", not "proto/" as a whole
-	    return vim_isfilec(c) && !vim_ispathsep(c);
+	    திரும்பு vim_isfilec(c) && !vim_ispathsep(c);
 
-	case CTRL_X_CMDLINE:
-	case CTRL_X_CMDLINE_CTRL_X:
-	case CTRL_X_OMNI:
+	நிலை CTRL_X_CMDLINE:
+	நிலை CTRL_X_CMDLINE_CTRL_X:
+	நிலை CTRL_X_OMNI:
 	    // Command line and Omni completion can work with just about any
 	    // printable character, but do stop at white space.
-	    return vim_isprintc(c) && !VIM_ISWHITE(c);
+	    திரும்பு vim_isprintc(c) && !VIM_ISWHITE(c);
 
-	case CTRL_X_WHOLE_LINE:
+	நிலை CTRL_X_WHOLE_வரி:
 	    // For while line completion a space can be part of the line.
-	    return vim_isprintc(c);
+	    திரும்பு vim_isprintc(c);
     }
-    return vim_iswordc(c);
+    திரும்பு vim_iswordc(c);
 }
 
 /*
  * Get the completed text by inferring the case of the originally typed text.
  * If the result is in allocated memory "tofree" is set to it.
  */
-    static char_u *
+    நிலையான char_u *
 ins_compl_infercase_gettext(
     char_u  *str,
-    int	    char_len,
-    int	    compl_char_len,
-    int	    min_len,
+    முழு	    char_len,
+    முழு	    compl_char_len,
+    முழு	    min_len,
     char_u  **tofree)
 {
-    int		*wca;			// Wide character array.
+    முழு		*wca;			// Wide character array.
     char_u	*p;
-    int		i, c;
-    int		has_lower = FALSE;
-    int		was_letter = FALSE;
+    முழு		i, c;
+    முழு		has_lower = FALSE;
+    முழு		was_letter = FALSE;
     garray_T	gap;
 
     IObuff[0] = NUL;
 
     // Allocate wide character array for the completion and fill it.
-    wca = ALLOC_MULT(int, char_len);
-    if (wca == NULL)
-	return IObuff;
+    wca = ALLOC_MULT(முழு, char_len);
+    எனில் (wca == வெற்று)
+	திரும்பு IObuff;
 
     p = str;
-    for (i = 0; i < char_len; ++i)
+    க்கு (i = 0; i < char_len; ++i)
     {
-	if (has_mbyte)
+	எனில் (has_mbyte)
 	    wca[i] = mb_ptr2char_adv(&p);
-	else
+	இல்லையெனில்
 	    wca[i] = *(p++);
     }
 
     // Rule 1: Were any chars converted to lower?
     p = compl_orig_text.string;
-    for (i = 0; i < min_len; ++i)
+    க்கு (i = 0; i < min_len; ++i)
     {
 	c = has_mbyte ? mb_ptr2char_adv(&p) : *(p++);
-	if (MB_ISLOWER(c))
+	எனில் (MB_ISLOWER(c))
 	{
 	    has_lower = TRUE;
-	    if (MB_ISUPPER(wca[i]))
+	    எனில் (MB_ISUPPER(wca[i]))
 	    {
 		// Rule 1 is satisfied.
-		for (i = compl_char_len; i < char_len; ++i)
+		க்கு (i = compl_char_len; i < char_len; ++i)
 		    wca[i] = MB_TOLOWER(wca[i]);
-		break;
+		நிறுத்து;
 	    }
 	}
     }
 
     // Rule 2: No lower case, 2nd consecutive letter converted to
     // upper case.
-    if (!has_lower)
+    எனில் (!has_lower)
     {
 	p = compl_orig_text.string;
-	for (i = 0; i < min_len; ++i)
+	க்கு (i = 0; i < min_len; ++i)
 	{
 	    c = has_mbyte ? mb_ptr2char_adv(&p) : *(p++);
-	    if (was_letter && MB_ISUPPER(c) && MB_ISLOWER(wca[i]))
+	    எனில் (was_letter && MB_ISUPPER(c) && MB_ISLOWER(wca[i]))
 	    {
 		// Rule 2 is satisfied.
-		for (i = compl_char_len; i < char_len; ++i)
+		க்கு (i = compl_char_len; i < char_len; ++i)
 		    wca[i] = MB_TOUPPER(wca[i]);
-		break;
+		நிறுத்து;
 	    }
 	    was_letter = MB_ISLOWER(c) || MB_ISUPPER(c);
 	}
@@ -751,12 +751,12 @@ ins_compl_infercase_gettext(
 
     // Copy the original case of the part we typed.
     p = compl_orig_text.string;
-    for (i = 0; i < min_len; ++i)
+    க்கு (i = 0; i < min_len; ++i)
     {
 	c = has_mbyte ? mb_ptr2char_adv(&p) : *(p++);
-	if (MB_ISLOWER(c))
+	எனில் (MB_ISLOWER(c))
 	    wca[i] = MB_TOLOWER(wca[i]);
-	else if (MB_ISUPPER(c))
+	இல்லையெனில் எனில் (MB_ISUPPER(c))
 	    wca[i] = MB_TOUPPER(wca[i]);
     }
 
@@ -764,55 +764,55 @@ ins_compl_infercase_gettext(
     p = IObuff;
     i = 0;
     ga_init2(&gap, 1, 500);
-    while (i < char_len)
+    போது (i < char_len)
     {
-	if (gap.ga_data != NULL)
+	எனில் (gap.ga_data != வெற்று)
 	{
-	    if (ga_grow(&gap, 10) == FAIL)
+	    எனில் (ga_grow(&gap, 10) == FAIL)
 	    {
 		ga_clear(&gap);
 		vim_free(wca);
-		return (char_u *)"[failed]";
+		திரும்பு (char_u *)"[failed]";
 	    }
 	    p = (char_u *)gap.ga_data + gap.ga_len;
-	    if (has_mbyte)
+	    எனில் (has_mbyte)
 		gap.ga_len += (*mb_char2bytes)(wca[i++], p);
-	    else
+	    இல்லையெனில்
 	    {
 		*p = wca[i++];
 		++gap.ga_len;
 	    }
 	}
-	else if ((p - IObuff) + 6 >= IOSIZE)
+	இல்லையெனில் எனில் ((p - IObuff) + 6 >= IOSIZE)
 	{
 	    // Multi-byte characters can occupy up to five bytes more than
 	    // ASCII characters, and we also need one byte for NUL, so when
 	    // getting to six bytes from the edge of IObuff switch to using a
 	    // growarray.  Add the character in the next round.
-	    if (ga_grow(&gap, IOSIZE) == FAIL)
+	    எனில் (ga_grow(&gap, IOSIZE) == FAIL)
 	    {
 		vim_free(wca);
-		return (char_u *)"[failed]";
+		திரும்பு (char_u *)"[failed]";
 	    }
 	    *p = NUL;
 	    STRCPY(gap.ga_data, IObuff);
-	    gap.ga_len = (int)(p - IObuff);
+	    gap.ga_len = (முழு)(p - IObuff);
 	}
-	else if (has_mbyte)
+	இல்லையெனில் எனில் (has_mbyte)
 	    p += (*mb_char2bytes)(wca[i++], p);
-	else
+	இல்லையெனில்
 	    *(p++) = wca[i++];
     }
     vim_free(wca);
 
-    if (gap.ga_data != NULL)
+    எனில் (gap.ga_data != வெற்று)
     {
 	*tofree = gap.ga_data;
-	return gap.ga_data;
+	திரும்பு gap.ga_data;
     }
 
     *p = NUL;
-    return IObuff;
+    திரும்பு IObuff;
 }
 
 /*
@@ -821,57 +821,57 @@ ins_compl_infercase_gettext(
  * text is inferred, ie this tries to work out what case you probably wanted
  * the rest of the word to be in -- webb
  */
-    int
+    முழு
 ins_compl_add_infercase(
     char_u	*str_arg,
-    int		len,
-    int		icase,
+    முழு		len,
+    முழு		icase,
     char_u	*fname,
-    int		dir,
-    int		cont_s_ipos,  // next ^X<> will set initial_pos
-    int		score)
+    முழு		dir,
+    முழு		cont_s_ipos,  // next ^X<> will set initial_pos
+    முழு		score)
 {
     char_u	*str = str_arg;
     char_u	*p;
-    int		char_len;		// count multi-byte characters
-    int		compl_char_len;
-    int		min_len;
-    int		flags = 0;
-    int		res;
-    char_u	*tofree = NULL;
+    முழு		char_len;		// count multi-byte characters
+    முழு		compl_char_len;
+    முழு		min_len;
+    முழு		flags = 0;
+    முழு		res;
+    char_u	*tofree = வெற்று;
 
-    if (p_ic && curbuf->b_p_inf && len > 0)
+    எனில் (p_ic && curbuf->b_p_inf && len > 0)
     {
 	// Infer case of completed part.
 
 	// Find actual length of completion.
-	if (has_mbyte)
+	எனில் (has_mbyte)
 	{
 	    p = str;
 	    char_len = 0;
-	    while (*p != NUL)
+	    போது (*p != NUL)
 	    {
 		MB_PTR_ADV(p);
 		++char_len;
 	    }
 	}
-	else
+	இல்லையெனில்
 	{
 	    char_len = len;
 	}
 
 	// Find actual length of original text.
-	if (has_mbyte)
+	எனில் (has_mbyte)
 	{
 	    p = compl_orig_text.string;
 	    compl_char_len = 0;
-	    while (*p != NUL)
+	    போது (*p != NUL)
 	    {
 		MB_PTR_ADV(p);
 		++compl_char_len;
 	    }
 	}
-	else
+	இல்லையெனில்
 	{
 	    compl_char_len = compl_length;
 	}
@@ -883,52 +883,52 @@ ins_compl_add_infercase(
 	str = ins_compl_infercase_gettext(str, char_len,
 					  compl_char_len, min_len, &tofree);
     }
-    if (cont_s_ipos)
+    எனில் (cont_s_ipos)
 	flags |= CP_CONT_S_IPOS;
-    if (icase)
+    எனில் (icase)
 	flags |= CP_ICASE;
 
-    res = ins_compl_add(str, len, fname, NULL, NULL, dir, flags, FALSE, NULL, score);
+    res = ins_compl_add(str, len, fname, வெற்று, வெற்று, dir, flags, FALSE, வெற்று, score);
     vim_free(tofree);
-    return res;
+    திரும்பு res;
 }
 
 /*
  * Check if fuzzy matching is enabled
  */
-    static int
-cot_fuzzy(void)
+    நிலையான முழு
+cot_fuzzy(வெறுமை)
 {
-    return (get_cot_flags() & COT_FUZZY) != 0 && !ctrl_x_mode_thesaurus();
+    திரும்பு (get_cot_flags() & COT_FUZZY) != 0 && !ctrl_x_mode_thesaurus();
 }
 
 /*
  * Returns TRUE if matches should be sorted based on proximity to the cursor.
  */
-    static int
-is_nearest_active(void)
+    நிலையான முழு
+is_nearest_active(வெறுமை)
 {
-    return (compl_autocomplete || (get_cot_flags() & COT_NEAREST))
+    திரும்பு (compl_autocomplete || (get_cot_flags() & COT_NEAREST))
 	&& !cot_fuzzy();
 }
 
 /*
  * TRUE if a match is selected (even if it is not inserted).
  */
-    int
-ins_compl_is_match_selected(void)
+    முழு
+ins_compl_is_match_selected(வெறுமை)
 {
-    return compl_shown_match != NULL && !is_first_match(compl_shown_match);
+    திரும்பு compl_shown_match != வெற்று && !is_first_match(compl_shown_match);
 }
 
 /*
  * Returns TRUE if autocomplete is active and the pre-insert effect targets the
  * longest prefix.
  */
-    int
-ins_compl_preinsert_longest(void)
+    முழு
+ins_compl_preinsert_longest(வெறுமை)
 {
-    return compl_autocomplete
+    திரும்பு compl_autocomplete
 	&& (get_cot_flags() & (COT_LONGEST | COT_PREINSERT | COT_FUZZY))
 		== COT_LONGEST;
 }
@@ -953,81 +953,81 @@ ins_compl_preinsert_longest(void)
  * NOTDONE, otherwise add it to the list and return OK.  If there is an error,
  * maybe because alloc() returns NULL, then FAIL is returned.
  */
-    static int
+    நிலையான முழு
 ins_compl_add(
     char_u	*str,
-    int		len,
+    முழு		len,
     char_u	*fname,
     char_u	**cptext,	    // extra text for popup menu or NULL
     typval_T	*user_data UNUSED,  // "user_data" entry or NULL
-    int		cdir,
-    int		flags_arg,
-    int		adup,		    // accept duplicate match
-    int		*user_hl,           // user abbr/kind hlattr
-    int		score)
+    முழு		cdir,
+    முழு		flags_arg,
+    முழு		adup,		    // accept duplicate match
+    முழு		*user_hl,           // user abbr/kind hlattr
+    முழு		score)
 {
     compl_T	*match, *current, *prev;
-    int		dir = (cdir == 0 ? compl_direction : cdir);
-    int		flags = flags_arg;
-    int		inserted = FALSE;
-    char_u	*new_str = NULL;
+    முழு		dir = (cdir == 0 ? compl_direction : cdir);
+    முழு		flags = flags_arg;
+    முழு		inserted = FALSE;
+    char_u	*new_str = வெற்று;
     hash_T	str_hash = 0;	    // hash of the match string, when not 0
 
-    if (flags & CP_FAST)
+    எனில் (flags & CP_FAST)
 	fast_breakcheck();
-    else
+    இல்லையெனில்
 	ui_breakcheck();
-    if (got_int)
-	return FAIL;
-    if (len < 0)
-	len = (int)STRLEN(str);
+    எனில் (got_int)
+	திரும்பு FAIL;
+    எனில் (len < 0)
+	len = (முழு)STRLEN(str);
 
     // If the same match is already present, don't add it.
-    if (compl_first_match != NULL && !adup && compl_strings_ht.ht_used > 0)
+    எனில் (compl_first_match != வெற்று && !adup && compl_strings_ht.ht_used > 0)
     {
 	// The key must be NUL terminated.
 	char_u	    keybuf[128];
-	char_u	    *key;
+	char_u	    *சாவி;
 	hashitem_T  *hi;
 
-	if (len < (int)sizeof(keybuf))
+	எனில் (len < (முழு)அளவு(keybuf))
 	{
 	    mch_memmove(keybuf, str, (size_t)len);
 	    keybuf[len] = NUL;
-	    key = keybuf;
+	    சாவி = keybuf;
 	}
-	else
+	இல்லையெனில்
 	{
 	    new_str = vim_strnsave(str, len);
-	    if (new_str == NULL)
-		return FAIL;
-	    key = new_str;
+	    எனில் (new_str == வெற்று)
+		திரும்பு FAIL;
+	    சாவி = new_str;
 	}
-	str_hash = hash_hash(key);
-	hi = hash_lookup(&compl_strings_ht, key, str_hash);
-	if (!HASHITEM_EMPTY(hi))
+	str_hash = hash_hash(சாவி);
+	hi = hash_lookup(&compl_strings_ht, சாவி, str_hash);
+	எனில் (!HASHITEM_EMPTY(hi))
 	{
-	    if (is_nearest_active() && score > 0)
+	    எனில் (is_nearest_active() && score > 0)
 	    {
 		// The duplicate may need its score updated, scan the
 		// matches to find it.
 		match = compl_first_match;
-		do
+		செய்
 		{
-		    if (!match_at_original_text(match)
+		    எனில் (!match_at_original_text(match)
 			    && STRNCMP(match->cp_str.string, str, len) == 0
-			    && ((int)match->cp_str.length <= len
+			    && ((முழு)match->cp_str.length <= len
 					  || match->cp_str.string[len] == NUL))
 		    {
-			if (score < match->cp_score)
+			எனில் (score < match->cp_score)
 			    match->cp_score = score;
-			break;
+			நிறுத்து;
 		    }
 		    match = match->cp_next;
-		} while (match != NULL && !is_first_match(match));
+		} போது (match != வெற்று && !is_first_match(match));
 	    }
 	    vim_free(new_str);
-	    return NOTDONE;
+	    திரும்பு NOTDONE;
 	}
     }
 
@@ -1037,17 +1037,17 @@ ins_compl_add(
     // Allocate a new match structure.
     // Copy the values to the new match structure.
     match = ALLOC_CLEAR_ONE(compl_T);
-    if (match == NULL)
+    எனில் (match == வெற்று)
     {
 	vim_free(new_str);
-	return FAIL;
+	திரும்பு FAIL;
     }
-    match->cp_number = flags & CP_ORIGINAL_TEXT ? 0 : -1;
+    match->cp_எண் = flags & CP_ORIGINAL_TEXT ? 0 : -1;
     match->cp_order = -1;
-    if (new_str == NULL && (new_str = vim_strnsave(str, len)) == NULL)
+    எனில் (new_str == வெற்று && (new_str = vim_strnsave(str, len)) == வெற்று)
     {
 	vim_free(match);
-	return FAIL;
+	திரும்பு FAIL;
     }
     match->cp_str.string = new_str;
     match->cp_str.length = len;
@@ -1056,64 +1056,64 @@ ins_compl_add(
     // - compl_curr_match->cp_fname if it is a string equal to fname.
     // - a copy of fname, CP_FREE_FNAME is set to free later THE allocated mem.
     // - NULL otherwise.	--Acevedo
-    if (fname != NULL
-	    && compl_curr_match != NULL
-	    && compl_curr_match->cp_fname != NULL
+    எனில் (fname != வெற்று
+	    && compl_curr_match != வெற்று
+	    && compl_curr_match->cp_fname != வெற்று
 	    && STRCMP(fname, compl_curr_match->cp_fname) == 0)
 	match->cp_fname = compl_curr_match->cp_fname;
-    else if (fname != NULL)
+    இல்லையெனில் எனில் (fname != வெற்று)
     {
 	match->cp_fname = vim_strsave(fname);
 	flags |= CP_FREE_FNAME;
     }
-    else
-	match->cp_fname = NULL;
+    இல்லையெனில்
+	match->cp_fname = வெற்று;
     match->cp_flags = flags;
     match->cp_user_abbr_hl_id = user_hl ? user_hl[0] : 0;
     match->cp_user_kind_hl_id = user_hl ? user_hl[1] : 0;
     match->cp_score = score;
     match->cp_cpt_source_idx = cpt_sources_index;
 
-    if (cptext != NULL)
+    எனில் (cptext != வெற்று)
     {
-	for (int i = 0; i < CPT_COUNT; ++i)
+	க்கு (முழு i = 0; i < CPT_மொத்தம்; ++i)
 	{
-	    if (cptext[i] != NULL && *cptext[i] != NUL)
+	    எனில் (cptext[i] != வெற்று && *cptext[i] != NUL)
 		match->cp_text[i] = vim_strsave(cptext[i]);
 	}
     }
 #ifdef FEAT_EVAL
-    if (user_data != NULL)
+    எனில் (user_data != வெற்று)
 	match->cp_user_data = *user_data;
 #endif
 
     // Link the new match structure after (FORWARD) or before (BACKWARD) the
     // current match in the list of matches .
-    if (compl_first_match == NULL)
-	match->cp_next = match->cp_prev = NULL;
-    else if (cot_fuzzy() && score != FUZZY_SCORE_NONE && compl_get_longest)
+    எனில் (compl_first_match == வெற்று)
+	match->cp_next = match->cp_prev = வெற்று;
+    இல்லையெனில் எனில் (cot_fuzzy() && score != FUZZY_SCORE_NONE && compl_get_longest)
     {
 	current = compl_first_match->cp_next;
 	prev = compl_first_match;
 	inserted = FALSE;
 	// The direction is ignored when using longest and fuzzy match, because
 	// matches are inserted and sorted by score.
-	while (current != NULL && current != compl_first_match)
+	போது (current != வெற்று && current != compl_first_match)
 	{
-	    if (current->cp_score < score)
+	    எனில் (current->cp_score < score)
 	    {
 		match->cp_next = current;
 		match->cp_prev = current->cp_prev;
-		if (current->cp_prev)
+		எனில் (current->cp_prev)
 		    current->cp_prev->cp_next = match;
 		current->cp_prev = match;
 		inserted = TRUE;
-		break;
+		நிறுத்து;
 	    }
 	    prev = current;
 	    current = current->cp_next;
 	}
-	if (!inserted)
+	எனில் (!inserted)
 	{
 	    prev->cp_next = match;
 	    match->cp_prev = prev;
@@ -1121,85 +1121,85 @@ ins_compl_add(
 	    compl_first_match->cp_prev = match;
 	}
     }
-    else if (dir == FORWARD)
+    இல்லையெனில் எனில் (dir == FORWARD)
     {
 	match->cp_next = compl_curr_match->cp_next;
 	match->cp_prev = compl_curr_match;
     }
-    else	// BACKWARD
+    இல்லையெனில்	// BACKWARD
     {
 	match->cp_next = compl_curr_match;
 	match->cp_prev = compl_curr_match->cp_prev;
     }
-    if (match->cp_next)
+    எனில் (match->cp_next)
 	match->cp_next->cp_prev = match;
-    if (match->cp_prev)
+    எனில் (match->cp_prev)
 	match->cp_prev->cp_next = match;
-    else	// if there's nothing before, it is the first match
+    இல்லையெனில்	// if there's nothing before, it is the first match
 	compl_first_match = match;
     compl_curr_match = match;
 
-    if (!match_at_original_text(match))
+    எனில் (!match_at_original_text(match))
 	compl_strings_add(match->cp_str.string, match->cp_str.length,
 								    str_hash);
 
     // Find the longest common string if still doing that.
-    if (compl_get_longest && (flags & CP_ORIGINAL_TEXT) == 0 && !cot_fuzzy()
+    எனில் (compl_get_longest && (flags & CP_ORIGINAL_TEXT) == 0 && !cot_fuzzy()
 	    && !ins_compl_preinsert_longest() && !ctrl_x_mode_thesaurus())
 	ins_compl_longest_match(match);
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Return TRUE if "str[len]" matches with match->cp_str, considering
  * match->cp_flags.
  */
-    static int
-ins_compl_equal(compl_T *match, char_u *str, int len)
+    நிலையான முழு
+ins_compl_equal(compl_T *match, char_u *str, முழு len)
 {
-    if (match->cp_flags & CP_EQUAL)
-	return TRUE;
-    if (match->cp_flags & CP_ICASE)
-	return STRNICMP(match->cp_str.string, str, (size_t)len) == 0;
-    return STRNCMP(match->cp_str.string, str, (size_t)len) == 0;
+    எனில் (match->cp_flags & CP_EQUAL)
+	திரும்பு TRUE;
+    எனில் (match->cp_flags & CP_ICASE)
+	திரும்பு STRNICMP(match->cp_str.string, str, (size_t)len) == 0;
+    திரும்பு STRNCMP(match->cp_str.string, str, (size_t)len) == 0;
 }
 
 /*
  * Like ins_compl_equal(), but ignore case in the 'longest'-inserted part of
  * the leader, so CTRL-N and CTRL-P filter the same way.
  */
-    static int
-ins_compl_equal_sc(compl_T *match, char_u *str, int len)
+    நிலையான முழு
+ins_compl_equal_sc(compl_T *match, char_u *str, முழு len)
 {
-    int	typed = compl_length;
-    int	longest_end = (compl_get_longest && compl_longest_end_col > compl_col)
-			    ? (int)(compl_longest_end_col - compl_col) : typed;
+    முழு	typed = compl_length;
+    முழு	longest_end = (compl_get_longest && compl_longest_end_col > compl_col)
+			    ? (முழு)(compl_longest_end_col - compl_col) : typed;
 
-    if ((match->cp_flags & (CP_EQUAL | CP_ICASE)) || longest_end <= typed)
-	return ins_compl_equal(match, str, len);
+    எனில் ((match->cp_flags & (CP_EQUAL | CP_ICASE)) || longest_end <= typed)
+	திரும்பு ins_compl_equal(match, str, len);
 
-    if ((int)match->cp_str.length < len)
-	return FALSE;
+    எனில் ((முழு)match->cp_str.length < len)
+	திரும்பு FALSE;
 
-    for (int i = 0; i < len; ++i)
+    க்கு (முழு i = 0; i < len; ++i)
     {
-	if (i >= typed && i < longest_end
+	எனில் (i >= typed && i < longest_end
 		? TOLOWER_LOC(match->cp_str.string[i]) != TOLOWER_LOC(str[i])
 		: match->cp_str.string[i] != str[i])
-	    return FALSE;
+	    திரும்பு FALSE;
     }
-    return TRUE;
+    திரும்பு TRUE;
 }
 
 /*
  * when len is -1 mean use whole length of p otherwise part of p
  */
-    static void
-ins_compl_insert_bytes(char_u *p, int len)
+    நிலையான வெறுமை
+ins_compl_செருகு_bytes(char_u *p, முழு len)
 {
-    if (len == -1)
-	len = (int)STRLEN(p);
+    எனில் (len == -1)
+	len = (முழு)STRLEN(p);
     ins_bytes_len(p, len);
     compl_ins_end_col = curwin->w_cursor.col;
 }
@@ -1208,18 +1208,18 @@ ins_compl_insert_bytes(char_u *p, int len)
  * Get current completion leader
  */
     char_u *
-ins_compl_leader(void)
+ins_compl_leader(வெறுமை)
 {
-    return compl_leader.string != NULL ? compl_leader.string : compl_orig_text.string;
+    திரும்பு compl_leader.string != வெற்று ? compl_leader.string : compl_orig_text.string;
 }
 
 /*
  * Get current completion leader length
  */
-    static size_t
-ins_compl_leader_len(void)
+    நிலையான size_t
+ins_compl_leader_len(வெறுமை)
 {
-    return compl_leader.string != NULL ? compl_leader.length : compl_orig_text.length;
+    திரும்பு compl_leader.string != வெற்று ? compl_leader.length : compl_orig_text.length;
 }
 
 /*
@@ -1227,41 +1227,41 @@ ins_compl_leader_len(void)
  * column range. If it is, it returns a special highlight attribute.
  * -1 means normal item.
  */
-    int
-ins_compl_col_range_attr(linenr_T lnum, int col)
+    முழு
+ins_compl_col_range_attr(linenr_T lnum, முழு col)
 {
-    int	    start_col;
-    int	    has_preinsert = ins_compl_has_preinsert()
+    முழு	    start_col;
+    முழு	    has_preinsert = ins_compl_has_preinsert()
 			|| ins_compl_preinsert_longest();
-    int	    attr;
+    முழு	    attr;
 
-    if (cot_fuzzy()
+    எனில் (cot_fuzzy()
 	    || (!compl_hi_on_autocompl_longest && ins_compl_preinsert_longest())
 	    || (attr = syn_name2attr(has_preinsert
 		    ? (char_u *)"PreInsert" : (char_u *)"ComplMatchIns")) == 0)
-	return -1;
+	திரும்பு -1;
 
-    start_col = compl_col + (int)ins_compl_leader_len();
-    if (!ins_compl_has_multiple())
-	return (col >= start_col && col < compl_ins_end_col) ? attr : -1;
+    start_col = compl_col + (முழு)ins_compl_leader_len();
+    எனில் (!ins_compl_has_multiple())
+	திரும்பு (col >= start_col && col < compl_ins_end_col) ? attr : -1;
 
     // Multiple lines
-    if ((lnum == compl_lnum && col >= start_col && col < MAXCOL) ||
+    எனில் ((lnum == compl_lnum && col >= start_col && col < MAXCOL) ||
 	(lnum > compl_lnum && lnum < curwin->w_cursor.lnum) ||
 	(lnum == curwin->w_cursor.lnum && col <= compl_ins_end_col))
-	return attr;
+	திரும்பு attr;
 
-    return -1;
+    திரும்பு -1;
 }
 
 /*
  * Returns TRUE if the current completion string contains newline characters,
  * indicating it's a multi-line completion.
  */
-    static int
-ins_compl_has_multiple(void)
+    நிலையான முழு
+ins_compl_has_multiple(வெறுமை)
 {
-    return vim_strchr(compl_shown_match->cp_str.string, '\n') != NULL;
+    திரும்பு vim_strchr(compl_shown_match->cp_str.string, '\n') != வெற்று;
 }
 
 /*
@@ -1269,86 +1269,86 @@ ins_compl_has_multiple(void)
  * completion, i.e. between the starting line (compl_lnum) and current cursor
  * line. Always returns FALSE for single-line completions.
  */
-    int
+    முழு
 ins_compl_lnum_in_range(linenr_T lnum)
 {
-    if (!ins_compl_has_multiple())
-	return FALSE;
-    return lnum >= compl_lnum && lnum <= curwin->w_cursor.lnum;
+    எனில் (!ins_compl_has_multiple())
+	திரும்பு FALSE;
+    திரும்பு lnum >= compl_lnum && lnum <= curwin->w_cursor.lnum;
 }
 
 /*
  * Reduce the longest common string for match "match".
  */
-    static void
+    நிலையான வெறுமை
 ins_compl_longest_match(compl_T *match)
 {
     char_u	*p, *s;
-    int		c1, c2;
-    int		had_match;
+    முழு		c1, c2;
+    முழு		had_match;
 
-    if (compl_leader.string == NULL)
+    எனில் (compl_leader.string == வெற்று)
     {
 	// First match, use it as a whole.
 	compl_leader.string = vim_strnsave(match->cp_str.string, match->cp_str.length);
-	if (compl_leader.string == NULL)
-	    return;
+	எனில் (compl_leader.string == வெற்று)
+	    திரும்பு;
 
 	compl_leader.length = match->cp_str.length;
 	had_match = (curwin->w_cursor.col > compl_col);
-	ins_compl_longest_insert(compl_leader.string);
+	ins_compl_longest_செருகு(compl_leader.string);
 
 	// When the match isn't there (to avoid matching itself) remove it
 	// again after redrawing.
-	if (!had_match)
+	எனில் (!had_match)
 	    ins_compl_delete();
 	compl_used_match = FALSE;
 
-	return;
+	திரும்பு;
     }
 
     // Reduce the text if this match differs from compl_leader.
     p = compl_leader.string;
     s = match->cp_str.string;
-    while (*p != NUL)
+    போது (*p != NUL)
     {
-	if (has_mbyte)
+	எனில் (has_mbyte)
 	{
 	    c1 = mb_ptr2char(p);
 	    c2 = mb_ptr2char(s);
 	}
-	else
+	இல்லையெனில்
 	{
 	    c1 = *p;
 	    c2 = *s;
 	}
-	if ((match->cp_flags & CP_ICASE)
+	எனில் ((match->cp_flags & CP_ICASE)
 		? (MB_TOLOWER(c1) != MB_TOLOWER(c2)) : (c1 != c2))
-	    break;
-	if (has_mbyte)
+	    நிறுத்து;
+	எனில் (has_mbyte)
 	{
 	    MB_PTR_ADV(p);
 	    MB_PTR_ADV(s);
 	}
-	else
+	இல்லையெனில்
 	{
 	    ++p;
 	    ++s;
 	}
     }
 
-    if (*p != NUL)
+    எனில் (*p != NUL)
     {
 	// Leader was shortened, need to change the inserted text.
 	*p = NUL;
 	compl_leader.length = (size_t)(p - compl_leader.string);
 
 	had_match = (curwin->w_cursor.col > compl_col);
-	ins_compl_longest_insert(compl_leader.string);
+	ins_compl_longest_செருகு(compl_leader.string);
 
 	// When the match isn't there (to avoid matching itself) remove it
 	// again after redrawing.
-	if (!had_match)
+	எனில் (!had_match)
 	    ins_compl_delete();
     }
 
@@ -1359,107 +1359,107 @@ ins_compl_longest_match(compl_T *match)
  * Add an array of matches to the list of matches.
  * Frees matches[].
  */
-    static void
+    நிலையான வெறுமை
 ins_compl_add_matches(
-    int		num_matches,
+    முழு		இலக்கம்_matches,
     char_u	**matches,
-    int		icase)
+    முழு		icase)
 {
-    int		add_r = OK;
-    int		dir = compl_direction;
+    முழு		add_r = OK;
+    முழு		dir = compl_direction;
 
-    for (int i = 0; i < num_matches && add_r != FAIL; i++)
+    க்கு (முழு i = 0; i < இலக்கம்_matches && add_r != FAIL; i++)
     {
-	add_r = ins_compl_add(matches[i], -1, NULL, NULL, NULL, dir,
-		CP_FAST | (icase ? CP_ICASE : 0), FALSE, NULL,
+	add_r = ins_compl_add(matches[i], -1, வெற்று, வெற்று, வெற்று, dir,
+		CP_FAST | (icase ? CP_ICASE : 0), FALSE, வெற்று,
 		FUZZY_SCORE_NONE);
-	if (add_r == OK)
+	எனில் (add_r == OK)
 	    // if dir was BACKWARD then honor it just once
 	    dir = FORWARD;
     }
-    FreeWild(num_matches, matches);
+    FreeWild(இலக்கம்_matches, matches);
 }
 
 /*
  * Make the completion list cyclic.
  * Return the number of matches (excluding the original).
  */
-    static int
-ins_compl_make_cyclic(void)
+    நிலையான முழு
+ins_compl_make_cyclic(வெறுமை)
 {
     compl_T *match;
-    int	    count = 0;
+    முழு	    மொத்தம் = 0;
 
-    if (compl_first_match == NULL)
-	return 0;
+    எனில் (compl_first_match == வெற்று)
+	திரும்பு 0;
 
     // Find the end of the list.
     match = compl_first_match;
     // there's always an entry for the compl_orig_text, it doesn't count.
-    while (match->cp_next != NULL && !is_first_match(match->cp_next))
+    போது (match->cp_next != வெற்று && !is_first_match(match->cp_next))
     {
 	match = match->cp_next;
-	++count;
+	++மொத்தம்;
     }
     match->cp_next = compl_first_match;
     compl_first_match->cp_prev = match;
 
-    return count;
+    திரும்பு மொத்தம்;
 }
 
 /*
  * Return whether there currently is a shown match.
  */
-    int
-ins_compl_has_shown_match(void)
+    முழு
+ins_compl_has_shown_match(வெறுமை)
 {
-    return compl_shown_match == NULL
+    திரும்பு compl_shown_match == வெற்று
 	|| compl_shown_match != compl_shown_match->cp_next;
 }
 
 /*
  * Return whether the shown match is long enough.
  */
-    int
-ins_compl_long_shown_match(void)
+    முழு
+ins_compl_long_shown_match(வெறுமை)
 {
-    return (int)compl_shown_match->cp_str.length
+    திரும்பு (முழு)compl_shown_match->cp_str.length
 					    > curwin->w_cursor.col - compl_col;
 }
 
 /*
  * Get the local or global value of 'completeopt' flags.
  */
-    unsigned int
-get_cot_flags(void)
+    unsigned முழு
+get_cot_flags(வெறுமை)
 {
-    return curbuf->b_cot_flags != 0 ? curbuf->b_cot_flags : cot_flags;
+    திரும்பு curbuf->b_cot_flags != 0 ? curbuf->b_cot_flags : cot_flags;
 }
 
 /*
  * Update the screen and when there is any scrolling remove the popup menu.
  */
-    static void
-ins_compl_upd_pum(void)
+    நிலையான வெறுமை
+ins_compl_upd_pum(வெறுமை)
 {
-    if (compl_match_array == NULL)
-	return;
+    எனில் (compl_match_array == வெற்று)
+	திரும்பு;
 
-    int h = curwin->w_cline_height;
+    முழு h = curwin->w_cline_height;
     // Update the screen later, before drawing the popup menu over it.
     pum_call_update_screen();
-    if (h != curwin->w_cline_height)
+    எனில் (h != curwin->w_cline_height)
 	ins_compl_del_pum();
 }
 
 /*
  * Remove any popup menu.
  */
-    static void
-ins_compl_del_pum(void)
+    நிலையான வெறுமை
+ins_compl_del_pum(வெறுமை)
 {
-    if (compl_match_array == NULL)
-	return;
+    எனில் (compl_match_array == வெற்று)
+	திரும்பு;
 
     pum_undisplay();
     VIM_CLEAR(compl_match_array);
@@ -1468,80 +1468,80 @@ ins_compl_del_pum(void)
 /*
  * Return TRUE if the popup menu should be displayed.
  */
-    int
-pum_wanted(void)
+    முழு
+pum_wanted(வெறுமை)
 {
     // 'completeopt' must contain "menu" or "menuone"
-    return (get_cot_flags() & COT_ANY_MENU) != 0 || compl_autocomplete;
+    திரும்பு (get_cot_flags() & COT_ANY_MENU) != 0 || compl_autocomplete;
 }
 
 /*
  * Return TRUE if there are two or more matches to be shown in the popup menu.
  * One if 'completopt' contains "menuone".
  */
-    static int
-pum_enough_matches(void)
+    நிலையான முழு
+pum_enough_matches(வெறுமை)
 {
     compl_T     *compl;
-    int		i = 0;
+    முழு		i = 0;
 
     // Don't display the popup menu if there are no matches or there is only
     // one (ignoring the original text).
     compl = compl_first_match;
-    do
+    செய்
     {
-	if (compl == NULL || (!match_at_original_text(compl) && ++i == 2))
-	    break;
+	எனில் (compl == வெற்று || (!match_at_original_text(compl) && ++i == 2))
+	    நிறுத்து;
 	compl = compl->cp_next;
-    } while (!is_first_match(compl));
+    } போது (!is_first_match(compl));
 
-    if ((get_cot_flags() & COT_MENUONE) || compl_autocomplete)
-	return (i >= 1);
-    return (i >= 2);
+    எனில் ((get_cot_flags() & COT_MENUONE) || compl_autocomplete)
+	திரும்பு (i >= 1);
+    திரும்பு (i >= 2);
 }
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 /*
  * Allocate Dict for the completed item.
  * { word, abbr, menu, kind, info }
  */
-    static dict_T *
+    நிலையான dict_T *
 ins_compl_dict_alloc(compl_T *match)
 {
     dict_T *dict = dict_alloc_lock(VAR_FIXED);
 
-    if (dict == NULL)
-	return NULL;
+    எனில் (dict == வெற்று)
+	திரும்பு வெற்று;
     fill_complete_info_dict(dict, match, FALSE);
-    return dict;
+    திரும்பு dict;
 }
 
 /*
  * Trigger the CompleteChanged autocmd event. Invoked each time the Insert mode
  * completion menu is changed.
  */
-    static void
-trigger_complete_changed_event(int cur)
+    நிலையான வெறுமை
+trigger_complete_changed_event(முழு cur)
 {
     dict_T	    *v_event;
     dict_T	    *item;
-    static int	    recursive = FALSE;
+    நிலையான முழு	    recursive = FALSE;
     save_v_event_T  save_v_event;
 
-    if (recursive)
-	return;
+    எனில் (recursive)
+	திரும்பு;
 
     item = cur < 0 ? dict_alloc() : ins_compl_dict_alloc(compl_curr_match);
-    if (item == NULL)
-	return;
+    எனில் (item == வெற்று)
+	திரும்பு;
     v_event = get_v_event(&save_v_event);
     dict_add_dict(v_event, "completed_item", item);
     pum_set_event_info(v_event);
-    dict_set_items_ro(v_event);
+    dict_set_பொருட்கள்_ro(v_event);
 
     recursive = TRUE;
     textlock++;
-    apply_autocmds(EVENT_COMPLETECHANGED, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_COMPLETECHANGED, வெற்று, வெற்று, FALSE, curbuf);
     textlock--;
     recursive = FALSE;
 
@@ -1552,50 +1552,50 @@ trigger_complete_changed_event(int cur)
 /*
  * Helper functions for mergesort_list().
  */
-    static void*
-cp_get_next(void *node)
+    நிலையான வெறுமை*
+cp_get_next(வெறுமை *முனை)
 {
-    return ((compl_T*)node)->cp_next;
+    திரும்பு ((compl_T*)முனை)->cp_next;
 }
 
-    static void
-cp_set_next(void *node, void *next)
+    நிலையான வெறுமை
+cp_set_next(வெறுமை *முனை, வெறுமை *next)
 {
-    ((compl_T*)node)->cp_next = (compl_T*)next;
+    ((compl_T*)முனை)->cp_next = (compl_T*)next;
 }
 
-    static void*
-cp_get_prev(void* node)
+    நிலையான வெறுமை*
+cp_get_prev(வெறுமை* முனை)
 {
-    return ((compl_T*)node)->cp_prev;
+    திரும்பு ((compl_T*)முனை)->cp_prev;
 }
 
-    static void
-cp_set_prev(void* node, void* prev)
+    நிலையான வெறுமை
+cp_set_prev(வெறுமை* முனை, வெறுமை* prev)
 {
-    ((compl_T*)node)->cp_prev = (compl_T*)prev;
+    ((compl_T*)முனை)->cp_prev = (compl_T*)prev;
 }
 
-    static int
-cp_compare_fuzzy(const void* a, const void* b)
+    நிலையான முழு
+cp_compare_fuzzy(மாறிலி வெறுமை* a, மாறிலி வெறுமை* b)
 {
-    int score_a = ((compl_T*)a)->cp_score;
-    int score_b = ((compl_T*)b)->cp_score;
+    முழு score_a = ((compl_T*)a)->cp_score;
+    முழு score_b = ((compl_T*)b)->cp_score;
 
-    if (score_a != score_b)
-	return (score_b > score_a) ? 1 : -1;
+    எனில் (score_a != score_b)
+	திரும்பு (score_b > score_a) ? 1 : -1;
 
-    return ((compl_T *)a)->cp_order - ((compl_T *)b)->cp_order;
+    திரும்பு ((compl_T *)a)->cp_order - ((compl_T *)b)->cp_order;
 }
 
-    static int
-cp_compare_nearest(const void* a, const void* b)
+    நிலையான முழு
+cp_compare_nearest(மாறிலி வெறுமை* a, மாறிலி வெறுமை* b)
 {
-    int score_a = ((compl_T*)a)->cp_score;
-    int score_b = ((compl_T*)b)->cp_score;
-    if (score_a == FUZZY_SCORE_NONE || score_b == FUZZY_SCORE_NONE)
-	return 0;
-    return (score_a > score_b) ? 1 : (score_a < score_b) ? -1 : 0;
+    முழு score_a = ((compl_T*)a)->cp_score;
+    முழு score_b = ((compl_T*)b)->cp_score;
+    எனில் (score_a == FUZZY_SCORE_NONE || score_b == FUZZY_SCORE_NONE)
+	திரும்பு 0;
+    திரும்பு (score_a > score_b) ? 1 : (score_a < score_b) ? -1 : 0;
 }
 
 /*
@@ -1603,26 +1603,26 @@ cp_compare_nearest(const void* a, const void* b)
  * startcol to compl_col) to the given source string. Stores the result in
  * dest. Returns OK or FAIL.
  */
-    static int
-prepend_startcol_text(string_T *dest, string_T *src, int startcol)
+    நிலையான முழு
+prepend_startcol_text(string_T *dest, string_T *src, முழு startcol)
 {
-    int prepend_len = compl_col - startcol;
-    int new_length = prepend_len + (int)src->length;
+    முழு prepend_len = compl_col - startcol;
+    முழு new_length = prepend_len + (முழு)src->length;
 
     dest->length = (size_t)new_length;
     dest->string = alloc(new_length + 1);  // +1 for NUL
-    if (dest->string == NULL)
+    எனில் (dest->string == வெற்று)
     {
 	dest->length = 0;
-	return FAIL;
+	திரும்பு FAIL;
     }
 
-    char_u	*line = ml_get(curwin->w_cursor.lnum);
+    char_u	*வரி = ml_get(curwin->w_cursor.lnum);
 
-    mch_memmove(dest->string, line + startcol, prepend_len);
+    mch_memmove(dest->string, வரி + startcol, prepend_len);
     mch_memmove(dest->string + prepend_len, src->string, src->length);
     dest->string[new_length] = NUL;
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -1630,26 +1630,26 @@ prepend_startcol_text(string_T *dest, string_T *src, int startcol)
  * startcol. If the source's startcol is before compl_col, prepends text from
  * the buffer line to the original compl_leader.
  */
-    static string_T *
-get_leader_for_startcol(compl_T *match, int cached)
+    நிலையான string_T *
+get_leader_for_startcol(compl_T *match, முழு cached)
 {
-    static string_T adjusted_leader = {NULL, 0};
+    நிலையான string_T adjusted_leader = {வெற்று, 0};
 
-    if (match == NULL)
+    எனில் (match == வெற்று)
     {
 	VIM_CLEAR_STRING(adjusted_leader);
-	return NULL;
+	திரும்பு வெற்று;
     }
 
-    if (cpt_sources_array == NULL)
-	goto theend;
+    எனில் (cpt_sources_array == வெற்று)
+	செல் theend;
 
-    int	cpt_idx = match->cp_cpt_source_idx;
-    if (cpt_idx < 0)
-	goto theend;
-    int	startcol = cpt_sources_array[cpt_idx].cs_startcol;
+    முழு	cpt_idx = match->cp_cpt_source_idx;
+    எனில் (cpt_idx < 0)
+	செல் theend;
+    முழு	startcol = cpt_sources_array[cpt_idx].cs_startcol;
 
-    if (compl_leader.string == NULL)
+    எனில் (compl_leader.string == வெற்று)
     {
 	// When leader is not set (e.g. 'autocomplete' first fires before
 	// compl_leader is initialised), fall back to compl_orig_text for
@@ -1657,129 +1657,129 @@ get_leader_for_startcol(compl_T *match, int cached)
 	// compl_col carry pre-compl_col text and must not be compared with
 	// compl_orig_text, so return &compl_leader (NULL string) to signal
 	// "pass through" (no prefix filter).
-	if (startcol < 0 || startcol >= compl_col)
-	    return &compl_orig_text;
-	return &compl_leader;  // pass through (startcol < compl_col)
+	எனில் (startcol < 0 || startcol >= compl_col)
+	    திரும்பு &compl_orig_text;
+	திரும்பு &compl_leader;  // pass through (startcol < compl_col)
     }
 
-    if (compl_col <= 0)
-	goto theend;
+    எனில் (compl_col <= 0)
+	செல் theend;
 
-    if (startcol >= 0 && startcol < compl_col)
+    எனில் (startcol >= 0 && startcol < compl_col)
     {
-	int prepend_len = compl_col - startcol;
-	int new_length = prepend_len + (int)compl_leader.length;
-	if (cached && (size_t)new_length == adjusted_leader.length
-		&& adjusted_leader.string != NULL)
-	    return &adjusted_leader;
+	முழு prepend_len = compl_col - startcol;
+	முழு new_length = prepend_len + (முழு)compl_leader.length;
+	எனில் (cached && (size_t)new_length == adjusted_leader.length
+		&& adjusted_leader.string != வெற்று)
+	    திரும்பு &adjusted_leader;
 
 	VIM_CLEAR_STRING(adjusted_leader);
-	if (prepend_startcol_text(&adjusted_leader, &compl_leader,
+	எனில் (prepend_startcol_text(&adjusted_leader, &compl_leader,
 		    startcol) != OK)
-	    goto theend;
+	    செல் theend;
 
-	return &adjusted_leader;
+	திரும்பு &adjusted_leader;
     }
 theend:
-    return &compl_leader;
+    திரும்பு &compl_leader;
 }
 
 /*
  * Set fuzzy score for completion matches.
  */
-    static void
-set_fuzzy_score(void)
+    நிலையான வெறுமை
+set_fuzzy_score(வெறுமை)
 {
     compl_T *compl;
     char_u  *pattern;
-    int	    use_leader;
+    முழு	    use_leader;
 
-    if (compl_first_match == NULL)
-	return;
+    எனில் (compl_first_match == வெற்று)
+	திரும்பு;
 
     /* Determine the pattern to match against */
-    use_leader = (compl_leader.string != NULL && compl_leader.length > 0);
-    if (!use_leader)
+    use_leader = (compl_leader.string != வெற்று && compl_leader.length > 0);
+    எனில் (!use_leader)
     {
-	if (compl_orig_text.string == NULL || compl_orig_text.length == 0)
-	    return;
+	எனில் (compl_orig_text.string == வெற்று || compl_orig_text.length == 0)
+	    திரும்பு;
 	pattern = compl_orig_text.string;
     }
-    else
+    இல்லையெனில்
     {
 	/* Clear the leader cache once before the loop */
-	(void)get_leader_for_startcol(NULL, TRUE);
-	pattern = NULL;  /* Will be computed per-completion */
+	(வெறுமை)get_leader_for_startcol(வெற்று, TRUE);
+	pattern = வெற்று;  /* Will be computed per-completion */
     }
 
     /* Score all completion matches */
-    int next = 0;
+    முழு next = 0;
     compl = compl_first_match;
-    do
+    செய்
     {
-	if (compl->cp_order < 0)
+	எனில் (compl->cp_order < 0)
 	    compl->cp_order = next;
 	next = MAX(next, compl->cp_order + 1);
 
-	if (use_leader)
+	எனில் (use_leader)
 	    pattern = get_leader_for_startcol(compl, TRUE)->string;
 
 	compl->cp_score = fuzzy_match_str(compl->cp_str.string, pattern);
 	compl = compl->cp_next;
-    } while (compl != NULL && !is_first_match(compl));
+    } போது (compl != வெற்று && !is_first_match(compl));
 }
 
 /*
  * Sort completion matches, leaving the entry with the original text in place.
  */
-    static void
-sort_compl_match_list(int (*compare)(const void *, const void *))
+    நிலையான வெறுமை
+sort_compl_match_list(முழு (*compare)(மாறிலி வெறுமை *, மாறிலி வெறுமை *))
 {
     compl_T	*orig_text;
 
-    if (!compl_first_match || is_first_match(compl_first_match->cp_next))
-	return;
+    எனில் (!compl_first_match || is_first_match(compl_first_match->cp_next))
+	திரும்பு;
 
     orig_text = find_original_text_match();
-    if (orig_text == NULL)
-	return;
+    எனில் (orig_text == வெற்று)
+	திரும்பு;
 
     ins_compl_make_linear();
-    if (orig_text == compl_first_match)
+    எனில் (orig_text == compl_first_match)
     {
-	compl_first_match->cp_next->cp_prev = NULL;
+	compl_first_match->cp_next->cp_prev = வெற்று;
 	compl_first_match->cp_next = mergesort_list(compl_first_match->cp_next,
 		cp_get_next, cp_set_next, cp_get_prev, cp_set_prev, compare);
 	compl_first_match->cp_next->cp_prev = compl_first_match;
     }
-    else
+    இல்லையெனில்
     {
 	compl_T	*tail;
 
-	orig_text->cp_prev->cp_next = NULL;
+	orig_text->cp_prev->cp_next = வெற்று;
 	compl_first_match = mergesort_list(compl_first_match, cp_get_next,
 		cp_set_next, cp_get_prev, cp_set_prev, compare);
 	tail = compl_first_match;
-	while (tail->cp_next != NULL)
+	போது (tail->cp_next != வெற்று)
 	    tail = tail->cp_next;
 	tail->cp_next = orig_text;
 	orig_text->cp_prev = tail;
     }
-    (void)ins_compl_make_cyclic();
+    (வெறுமை)ins_compl_make_cyclic();
 }
 
 /*
  * Return the attribute for highlight group "hl_id", -1 when it has none.
  */
-    static int
-get_user_highlight_attr(int hl_id)
+    நிலையான முழு
+get_user_highlight_attr(முழு hl_id)
 {
-    int	    attr;
+    முழு	    attr;
 
-    if (hl_id <= 0)
-	return -1;
+    எனில் (hl_id <= 0)
+	திரும்பு -1;
     attr = syn_id2attr(hl_id);
-    return attr > 0 ? attr : -1;
+    திரும்பு attr > 0 ? attr : -1;
 }
 
 /*
@@ -1787,23 +1787,23 @@ get_user_highlight_attr(int hl_id)
  * Returns the popup menu entry that should be selected. Returns -1 if nothing
  * should be selected.
  */
-    static int
-ins_compl_build_pum(void)
+    நிலையான முழு
+ins_compl_build_pum(வெறுமை)
 {
     compl_T     *compl;
-    compl_T     *shown_compl = NULL;
-    int		did_find_shown_match = FALSE;
-    int		shown_match_ok = FALSE;
-    int		i = 0;
-    int		cur = -1;
-    int		compl_no_select = (get_cot_flags() & COT_NOSELECT) != 0
+    compl_T     *shown_compl = வெற்று;
+    முழு		did_find_shown_match = FALSE;
+    முழு		shown_match_ok = FALSE;
+    முழு		i = 0;
+    முழு		cur = -1;
+    முழு		compl_no_select = (get_cot_flags() & COT_NOSELECT) != 0
 		    || (compl_autocomplete && !ins_compl_has_preinsert());
-    compl_T	*match_head = NULL;
-    compl_T	*match_tail = NULL;
-    compl_T	*match_next = NULL;
-    int		*match_count = NULL;
-    int		is_forward = compl_shows_dir_forward();
-    int		is_cpt_completion = (cpt_sources_array != NULL);
+    compl_T	*match_head = வெற்று;
+    compl_T	*match_tail = வெற்று;
+    compl_T	*match_next = வெற்று;
+    முழு		*match_மொத்தம் = வெற்று;
+    முழு		is_forward = compl_shows_dir_forward();
+    முழு		is_cpt_completion = (cpt_sources_array != வெற்று);
     string_T	*leader;
 
     // Need to build the popup menu list.
@@ -1811,26 +1811,26 @@ ins_compl_build_pum(void)
 
     // If the current match is the original text don't find the first
     // match after it, don't highlight anything.
-    if (match_at_original_text(compl_shown_match))
+    எனில் (match_at_original_text(compl_shown_match))
 	shown_match_ok = TRUE;
 
-    if (compl_leader.string != NULL
+    எனில் (compl_leader.string != வெற்று
 	    && STRCMP(compl_leader.string, compl_orig_text.string) == 0
 	    && shown_match_ok == FALSE)
 	compl_shown_match = compl_no_select ? compl_first_match
 					    : compl_first_match->cp_next;
 
-    if (is_cpt_completion)
+    எனில் (is_cpt_completion)
     {
-	match_count = ALLOC_CLEAR_MULT(int, cpt_sources_count);
-	if (match_count == NULL)
-	    return -1;
+	match_மொத்தம் = ALLOC_CLEAR_MULT(முழு, cpt_sources_மொத்தம்);
+	எனில் (match_மொத்தம் == வெற்று)
+	    திரும்பு -1;
     }
 
-    (void)get_leader_for_startcol(NULL, TRUE); // Clear the cache
+    (வெறுமை)get_leader_for_startcol(வெற்று, TRUE); // Clear the cache
 
     compl = compl_first_match;
-    do
+    செய்
     {
 	compl->cp_in_match_array = FALSE;
 
@@ -1838,40 +1838,40 @@ ins_compl_build_pum(void)
 
 	// Apply 'smartcase': judge case from compl_orig_text, not the leader
 	// which 'longest' may fill with uppercase the user never typed.
-	if (ctrl_x_mode_normal() && !p_inf && compl_orig_text.string
+	எனில் (ctrl_x_mode_normal() && !p_inf && compl_orig_text.string
 		&& !ignorecase(compl_orig_text.string) && !cot_fuzzy())
 	    compl->cp_flags &= ~CP_ICASE;
 
-	if (!match_at_original_text(compl)
-		&& (leader->string == NULL
+	எனில் (!match_at_original_text(compl)
+		&& (leader->string == வெற்று
 		    || ins_compl_equal_sc(compl, leader->string,
-			(int)leader->length)
+			(முழு)leader->length)
 		    || (cot_fuzzy() && compl->cp_score != FUZZY_SCORE_NONE)))
 	{
 	    // Limit number of items from each source if max_items is set.
-	    int match_limit_exceeded = FALSE;
-	    int cur_source = compl->cp_cpt_source_idx;
-	    if (is_forward && cur_source != -1 && is_cpt_completion)
+	    முழு match_limit_exceeded = FALSE;
+	    முழு cur_source = compl->cp_cpt_source_idx;
+	    எனில் (is_forward && cur_source != -1 && is_cpt_completion)
 	    {
-		match_count[cur_source]++;
-		int max_matches = cpt_sources_array[cur_source].cs_max_matches;
-		if (max_matches > 0 && match_count[cur_source] > max_matches)
+		match_மொத்தம்[cur_source]++;
+		முழு max_matches = cpt_sources_array[cur_source].cs_max_matches;
+		எனில் (max_matches > 0 && match_மொத்தம்[cur_source] > max_matches)
 		    match_limit_exceeded = TRUE;
 	    }
 
-	    if (!match_limit_exceeded)
+	    எனில் (!match_limit_exceeded)
 	    {
 		++compl_match_arraysize;
 		compl->cp_in_match_array = TRUE;
-		if (match_head == NULL)
+		எனில் (match_head == வெற்று)
 		    match_head = compl;
-		else
+		இல்லையெனில்
 		    match_tail->cp_match_next = compl;
 		match_tail = compl;
 
-		if (!shown_match_ok && !cot_fuzzy())
+		எனில் (!shown_match_ok && !cot_fuzzy())
 		{
-		    if (compl == compl_shown_match || did_find_shown_match)
+		    எனில் (compl == compl_shown_match || did_find_shown_match)
 		    {
 			// This item is the shown match or this is the
 			// first displayed item after the shown match.
@@ -1879,18 +1879,18 @@ ins_compl_build_pum(void)
 			did_find_shown_match = TRUE;
 			shown_match_ok = TRUE;
 		    }
-		    else
+		    இல்லையெனில்
 			// Remember this displayed match for when the
 			// shown match is just below it.
 			shown_compl = compl;
 		    cur = i;
 		}
-		else if (cot_fuzzy())
+		இல்லையெனில் எனில் (cot_fuzzy())
 		{
-		    if (i == 0)
+		    எனில் (i == 0)
 			shown_compl = compl;
 
-		    if (!shown_match_ok && compl == compl_shown_match)
+		    எனில் (!shown_match_ok && compl == compl_shown_match)
 		    {
 			cur = i;
 			shown_match_ok = TRUE;
@@ -1900,16 +1900,16 @@ ins_compl_build_pum(void)
 	    }
 	}
 
-	if (compl == compl_shown_match && !cot_fuzzy())
+	எனில் (compl == compl_shown_match && !cot_fuzzy())
 	{
 	    did_find_shown_match = TRUE;
 
 	    // When the original text is the shown match don't set
 	    // compl_shown_match.
-	    if (match_at_original_text(compl))
+	    எனில் (match_at_original_text(compl))
 		shown_match_ok = TRUE;
 
-	    if (!shown_match_ok && shown_compl != NULL)
+	    எனில் (!shown_match_ok && shown_compl != வெற்று)
 	    {
 		// The shown match isn't displayed, set it to the
 		// previously displayed match.
@@ -1918,14 +1918,14 @@ ins_compl_build_pum(void)
 	    }
 	}
 	compl = compl->cp_next;
-    } while (compl != NULL && !is_first_match(compl));
+    } போது (compl != வெற்று && !is_first_match(compl));
 
-    vim_free(match_count);
+    vim_free(match_மொத்தம்);
 
-    if (compl_match_arraysize == 0)
-	return -1;
+    எனில் (compl_match_arraysize == 0)
+	திரும்பு -1;
 
-    if (cot_fuzzy() && !compl_no_select && !shown_match_ok)
+    எனில் (cot_fuzzy() && !compl_no_select && !shown_match_ok)
     {
 	compl_shown_match = shown_compl;
 	shown_match_ok = TRUE;
@@ -1933,14 +1933,14 @@ ins_compl_build_pum(void)
     }
 
     compl_match_array = ALLOC_CLEAR_MULT(pumitem_T, compl_match_arraysize);
-    if (compl_match_array == NULL)
-	return -1;
+    எனில் (compl_match_array == வெற்று)
+	திரும்பு -1;
 
     compl = match_head;
     i = 0;
-    while (compl != NULL)
+    போது (compl != வெற்று)
     {
-	compl_match_array[i].pum_text = compl->cp_text[CPT_ABBR] != NULL
+	compl_match_array[i].pum_text = compl->cp_text[CPT_ABBR] != வெற்று
 			    ? compl->cp_text[CPT_ABBR] : compl->cp_str.string;
 	compl_match_array[i].pum_kind = compl->cp_text[CPT_KIND];
 	compl_match_array[i].pum_info = compl->cp_text[CPT_INFO];
@@ -1949,62 +1949,62 @@ ins_compl_build_pum(void)
 			get_user_highlight_attr(compl->cp_user_abbr_hl_id);
 	compl_match_array[i].pum_user_kind_hlattr =
 			get_user_highlight_attr(compl->cp_user_kind_hl_id);
-	compl_match_array[i++].pum_extra = compl->cp_text[CPT_MENU] != NULL
+	compl_match_array[i++].pum_extra = compl->cp_text[CPT_MENU] != வெற்று
 			    ? compl->cp_text[CPT_MENU] : compl->cp_fname;
 	match_next = compl->cp_match_next;
-	compl->cp_match_next = NULL;
+	compl->cp_match_next = வெற்று;
 	compl = match_next;
     }
 
-    if (!shown_match_ok)    // no displayed match at all
+    எனில் (!shown_match_ok)    // no displayed match at all
 	cur = -1;
 
-    return cur;
+    திரும்பு cur;
 }
 
 /*
  * Show the popup menu for the list of matches.
  * Also adjusts "compl_shown_match" to an entry that is actually displayed.
  */
-    void
-ins_compl_show_pum(void)
+    வெறுமை
+ins_compl_show_pum(வெறுமை)
 {
-    int		i;
-    int		cur = -1;
+    முழு		i;
+    முழு		cur = -1;
     colnr_T	col;
 
-    if (!pum_wanted() || !pum_enough_matches())
-	return;
+    எனில் (!pum_wanted() || !pum_enough_matches())
+	திரும்பு;
 
     // Avoid redrawing the screen under a pum that stays in place.
-    if (!pum_redraw_in_same_position())
+    எனில் (!pum_redraw_in_same_position())
 	pum_call_update_screen();
 
-    if (compl_match_array == NULL)
+    எனில் (compl_match_array == வெற்று)
 	// Need to build the popup menu list.
 	cur = ins_compl_build_pum();
-    else
+    இல்லையெனில்
     {
 	// popup menu already exists, only need to find the current item.
-	for (i = 0; i < compl_match_arraysize; ++i)
+	க்கு (i = 0; i < compl_match_arraysize; ++i)
 	{
-	    if (compl_match_array[i].pum_text == compl_shown_match->cp_str.string
+	    எனில் (compl_match_array[i].pum_text == compl_shown_match->cp_str.string
 		    || compl_match_array[i].pum_text
 				      == compl_shown_match->cp_text[CPT_ABBR])
 	    {
 		cur = i;
-		break;
+		நிறுத்து;
 	    }
 	}
     }
 
-    if (compl_match_array == NULL)
+    எனில் (compl_match_array == வெற்று)
     {
 #ifdef FEAT_EVAL
-	if (compl_started && has_completechanged())
+	எனில் (compl_started && has_completechanged())
 	    trigger_complete_changed_event(cur);
 #endif
-	return;
+	திரும்பு;
     }
 
     // In Replace mode when a $ is displayed at the end of the line only
@@ -2016,7 +2016,7 @@ ins_compl_show_pum(void)
     col = curwin->w_cursor.col;
     curwin->w_cursor.col = compl_col;
     validate_cursor_col();
-    int pum_wcol = curwin->w_wcol;
+    முழு pum_wcol = curwin->w_wcol;
     curwin->w_cursor.col = col;
     validate_cursor_col();
     compl_selected_item = cur;
@@ -2026,11 +2026,11 @@ ins_compl_show_pum(void)
     pum_display(compl_match_array, compl_match_arraysize, cur, pum_wcol);
 
     // After adding leader, set the current match to shown match.
-    if (compl_started && compl_curr_match != compl_shown_match)
+    எனில் (compl_started && compl_curr_match != compl_shown_match)
 	compl_curr_match = compl_shown_match;
 
 #ifdef FEAT_EVAL
-    if (has_completechanged())
+    எனில் (has_completechanged())
 	trigger_complete_changed_event(cur);
 #endif
 }
@@ -2042,121 +2042,121 @@ ins_compl_show_pum(void)
  * Add any identifiers that match the given pattern "pat" in the list of
  * dictionary files "dict_start" to the list of completions.
  */
-    static void
+    நிலையான வெறுமை
 ins_compl_dictionaries(
     char_u	*dict_start,
     char_u	*pat,
-    int		flags,		// DICT_FIRST and/or DICT_EXACT
-    int		thesaurus)	// Thesaurus completion
+    முழு		flags,		// DICT_FIRST and/or DICT_EXACT
+    முழு		thesaurus)	// Thesaurus completion
 {
     char_u	*dict = dict_start;
     char_u	*ptr;
     char_u	*buf;
     regmatch_T	regmatch;
     char_u	**files;
-    int		count;
-    int		save_p_scs;
-    int		dir = compl_direction;
+    முழு		மொத்தம்;
+    முழு		save_p_scs;
+    முழு		dir = compl_direction;
 
-    if (*dict == NUL)
+    எனில் (*dict == NUL)
     {
 #ifdef FEAT_SPELL
 	// When 'dictionary' is empty and spell checking is enabled use
 	// "spell".
-	if (!thesaurus && curwin->w_p_spell)
+	எனில் (!thesaurus && curwin->w_p_spell)
 	    dict = (char_u *)"spell";
-	else
+	இல்லையெனில்
 #endif
-	    return;
+	    திரும்பு;
     }
 
     buf = alloc(LSIZE);
-    if (buf == NULL)
-	return;
-    regmatch.regprog = NULL;	// so that we can goto theend
+    எனில் (buf == வெற்று)
+	திரும்பு;
+    regmatch.regprog = வெற்று;	// so that we can goto theend
 
     // If 'infercase' is set, don't use 'smartcase' here
     save_p_scs = p_scs;
-    if (curbuf->b_p_inf)
+    எனில் (curbuf->b_p_inf)
 	p_scs = FALSE;
 
     // When invoked to match whole lines for CTRL-X CTRL-L adjust the pattern
     // to only match at the start of a line.  Otherwise just match the
     // pattern. Also need to double backslashes.
-    if (ctrl_x_mode_line_or_eval())
+    எனில் (ctrl_x_mode_வரி_or_eval())
     {
 	char_u *pat_esc = vim_strsave_escaped(pat, (char_u *)"\\");
 
-	if (pat_esc == NULL)
-	    goto theend;
+	எனில் (pat_esc == வெற்று)
+	    செல் theend;
 	size_t len = STRLEN(pat_esc) + 10;
 	ptr = alloc(len);
-	if (ptr == NULL)
+	எனில் (ptr == வெற்று)
 	{
 	    vim_free(pat_esc);
-	    goto theend;
+	    செல் theend;
 	}
-	vim_snprintf((char *)ptr, len, "^\\s*\\zs\\V%s", pat_esc);
+	vim_snprintf((எழுத்து *)ptr, len, "^\\s*\\zs\\V%s", pat_esc);
 	regmatch.regprog = vim_regcomp(ptr, RE_MAGIC);
 	vim_free(pat_esc);
 	vim_free(ptr);
     }
-    else
+    இல்லையெனில்
     {
 	regmatch.regprog = vim_regcomp(pat, magic_isset() ? RE_MAGIC : 0);
-	if (regmatch.regprog == NULL)
-	    goto theend;
+	எனில் (regmatch.regprog == வெற்று)
+	    செல் theend;
     }
 
     // ignore case depends on 'ignorecase', 'smartcase' and "pat"
     regmatch.rm_ic = ignorecase(pat);
-    while (*dict != NUL && !got_int && !compl_interrupted)
+    போது (*dict != NUL && !got_int && !compl_interrupted)
     {
 	// copy one dictionary file name into buf
-	if (flags == DICT_EXACT)
+	எனில் (flags == DICT_EXACT)
 	{
-	    count = 1;
+	    மொத்தம் = 1;
 	    files = &dict;
 	}
-	else
+	இல்லையெனில்
 	{
 	    // Expand wildcards in the dictionary name, but do not allow
 	    // backticks (for security, the 'dict' option may have been set in
 	    // a modeline).
 	    copy_option_part(&dict, buf, LSIZE, ",");
 #ifdef FEAT_SPELL
-	    if (!thesaurus && STRCMP(buf, "spell") == 0)
-		count = -1;
-	    else
+	    எனில் (!thesaurus && STRCMP(buf, "spell") == 0)
+		மொத்தம் = -1;
+	    இல்லையெனில்
 #endif
-		if (vim_strchr(buf, '`') != NULL
-		    || expand_wildcards(1, &buf, &count, &files,
+		எனில் (vim_strchr(buf, '`') != வெற்று
+		    || expand_wildcards(1, &buf, &மொத்தம், &files,
 						     EW_FILE|EW_SILENT) != OK)
-		count = 0;
+		மொத்தம் = 0;
 	}
 
 #ifdef FEAT_SPELL
-	if (count == -1)
+	எனில் (மொத்தம் == -1)
 	{
 	    // Complete from active spelling.  Skip "\<" in the pattern, we
 	    // don't use it as a RE.
-	    if (pat[0] == '\\' && pat[1] == '<')
+	    எனில் (pat[0] == '\\' && pat[1] == '<')
 		ptr = pat + 2;
-	    else
+	    இல்லையெனில்
 		ptr = pat;
 	    spell_dump_compl(ptr, regmatch.rm_ic, &dir, 0);
 	}
-	else
+	இல்லையெனில்
 #endif
-	    if (count > 0)	// avoid warning for using "files" uninit
+	    எனில் (மொத்தம் > 0)	// avoid warning for using "files" uninit
 	{
-	    ins_compl_files(count, files, thesaurus, flags, &regmatch, buf,
+	    ins_compl_files(மொத்தம், files, thesaurus, flags, &regmatch, buf,
 		    &dir);
-	    if (flags != DICT_EXACT)
-		FreeWild(count, files);
+	    எனில் (flags != DICT_EXACT)
+		FreeWild(மொத்தம், files);
 	}
-	if (flags != 0)
-	    break;
+	எனில் (flags != 0)
+	    நிறுத்து;
     }
 
 theend:
@@ -2169,160 +2169,160 @@ theend:
  * Add all the words in the line "*buf_arg" from the thesaurus file "fname"
  * skipping the word at 'skip_word'.  Returns OK on success.
  */
-    static int
-thesaurus_add_words_in_line(
+    நிலையான முழு
+thesaurus_add_சொற்கள்_in_வரி(
     char_u	*fname,
     char_u	**buf_arg,
-    int		dir,
+    முழு		dir,
     char_u	*skip_word)
 {
-    int		status = OK;
+    முழு		status = OK;
     char_u	*ptr;
     char_u	*wstart;
 
     // Add the other matches on the line
     ptr = *buf_arg;
-    while (!got_int)
+    போது (!got_int)
     {
 	// Find start of the next word.  Skip white
 	// space and punctuation.
 	ptr = find_word_start(ptr);
-	if (*ptr == NUL || *ptr == NL)
-	    break;
+	எனில் (*ptr == NUL || *ptr == NL)
+	    நிறுத்து;
 	wstart = ptr;
 
 	// Find end of the word.
-	if (has_mbyte)
+	எனில் (has_mbyte)
 	    // Japanese words may have characters in
 	    // different classes, only separate words
 	    // with single-byte non-word characters.
-	    while (*ptr != NUL)
+	    போது (*ptr != NUL)
 	    {
-		int l = (*mb_ptr2len)(ptr);
+		முழு l = (*mb_ptr2len)(ptr);
 
-		if (l < 2 && !vim_iswordc(*ptr))
-		    break;
+		எனில் (l < 2 && !vim_iswordc(*ptr))
+		    நிறுத்து;
 		ptr += l;
 	    }
-	else
+	இல்லையெனில்
 	    ptr = find_word_end(ptr);
 
 	// Add the word. Skip the regexp match.
-	if (wstart != skip_word)
+	எனில் (wstart != skip_word)
 	{
-	    status = ins_compl_add_infercase(wstart, (int)(ptr - wstart), p_ic,
+	    status = ins_compl_add_infercase(wstart, (முழு)(ptr - wstart), p_ic,
 		    fname, dir, FALSE, FUZZY_SCORE_NONE);
-	    if (status == FAIL)
-		break;
+	    எனில் (status == FAIL)
+		நிறுத்து;
 	}
     }
 
     *buf_arg = ptr;
-    return status;
+    திரும்பு status;
 }
 
 /*
  * Process "count" dictionary/thesaurus "files" and add the text matching
  * "regmatch".
  */
-    static void
+    நிலையான வெறுமை
 ins_compl_files(
-    int		count,
+    முழு		மொத்தம்,
     char_u	**files,
-    int		thesaurus,
-    int		flags,
+    முழு		thesaurus,
+    முழு		flags,
     regmatch_T	*regmatch,
     char_u	*buf,
-    int		*dir)
+    முழு		*dir)
 {
     char_u	*ptr;
-    int		i;
+    முழு		i;
     FILE	*fp;
-    int		add_r;
-    char_u	*leader = NULL;
-    int		leader_len = 0;
-    int		score = 0;
-    int		len = 0;
-    char_u	*line_end = NULL;
+    முழு		add_r;
+    char_u	*leader = வெற்று;
+    முழு		leader_len = 0;
+    முழு		score = 0;
+    முழு		len = 0;
+    char_u	*வரி_end = வெற்று;
 
-    if (cot_fuzzy())
+    எனில் (cot_fuzzy())
     {
 	leader = ins_compl_leader();
-	leader_len = (int)ins_compl_leader_len();
+	leader_len = (முழு)ins_compl_leader_len();
     }
 
-    for (i = 0; i < count && !got_int && !ins_compl_interrupted(); i++)
+    க்கு (i = 0; i < மொத்தம் && !got_int && !ins_compl_interrupted(); i++)
     {
-	fp = mch_fopen((char *)files[i], "r");  // open dictionary file
-	if (flags != DICT_EXACT && !shortmess(SHM_COMPLETIONSCAN)
+	fp = mch_fopen((எழுத்து *)files[i], "r");  // open dictionary file
+	எனில் (flags != DICT_EXACT && !shortmess(SHM_COMPLETIONSCAN)
 		&& !compl_autocomplete)
 	{
-	    msg_hist_off = TRUE;	// reset in msg_trunc_attr()
-	    vim_snprintf((char *)IObuff, IOSIZE,
-			      _("Scanning dictionary: %s"), (char *)files[i]);
-	    (void)msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+	    செய்தி_hist_off = TRUE;	// reset in msg_trunc_attr()
+	    vim_snprintf((எழுத்து *)IObuff, IOSIZE,
+			      _("Scanning dictionary: %s"), (எழுத்து *)files[i]);
+	    (வெறுமை)செய்தி_trunc_attr((எழுத்து *)IObuff, TRUE, HL_ATTR(HLF_R));
 	}
 
-	if (fp == NULL)
-	    continue;
+	எனில் (fp == வெற்று)
+	    தொடர்;
 
 	// Read dictionary file line by line.
 	// Check each line for a match.
-	while (!got_int && !ins_compl_interrupted()
+	போது (!got_int && !ins_compl_interrupted()
 	       && !vim_fgets(buf, LSIZE, fp))
 	{
 	    ptr = buf;
-	    if (cot_fuzzy() && leader_len > 0)
+	    எனில் (cot_fuzzy() && leader_len > 0)
 	    {
-		line_end = find_line_end(ptr);
-		while (ptr < line_end)
+		வரி_end = find_வரி_end(ptr);
+		போது (ptr < வரி_end)
 		{
-		    if (fuzzy_match_str_in_line(&ptr, leader, &len, NULL, &score))
+		    எனில் (fuzzy_match_str_in_வரி(&ptr, leader, &len, வெற்று, &score))
 		    {
-			char_u *end_ptr = ctrl_x_mode_line_or_eval()
-					? find_line_end(ptr) : find_word_end(ptr);
-			add_r = ins_compl_add_infercase(ptr, (int)(end_ptr - ptr),
+			char_u *end_ptr = ctrl_x_mode_வரி_or_eval()
+					? find_வரி_end(ptr) : find_word_end(ptr);
+			add_r = ins_compl_add_infercase(ptr, (முழு)(end_ptr - ptr),
 					    p_ic, files[i], *dir, FALSE, score);
-			if (add_r == FAIL)
-			    break;
+			எனில் (add_r == FAIL)
+			    நிறுத்து;
 			ptr = end_ptr;  // start from next word
-			if (compl_get_longest && ctrl_x_mode_normal()
+			எனில் (compl_get_longest && ctrl_x_mode_normal()
 				&& compl_first_match->cp_next
 				&& score == compl_first_match->cp_next->cp_score)
-			    compl_num_bests++;
+			    compl_இலக்கம்_bests++;
 		    }
 		}
 	    }
-	    else if (regmatch != NULL)
+	    இல்லையெனில் எனில் (regmatch != வெற்று)
 	    {
-		while (vim_regexec(regmatch, buf, (colnr_T)(ptr - buf)))
+		போது (vim_regexec(regmatch, buf, (colnr_T)(ptr - buf)))
 		{
 		    ptr = regmatch->startp[0];
-		    ptr = ctrl_x_mode_line_or_eval() ? find_line_end(ptr)
+		    ptr = ctrl_x_mode_வரி_or_eval() ? find_வரி_end(ptr)
 						    : find_word_end(ptr);
 		    add_r = ins_compl_add_infercase(regmatch->startp[0],
-			    (int)(ptr - regmatch->startp[0]),
+			    (முழு)(ptr - regmatch->startp[0]),
 			    p_ic, files[i], *dir, FALSE, FUZZY_SCORE_NONE);
-		    if (thesaurus)
+		    எனில் (thesaurus)
 		    {
 			// For a thesaurus, add all the words in the line
 			ptr = buf;
-			add_r = thesaurus_add_words_in_line(files[i], &ptr, *dir,
+			add_r = thesaurus_add_சொற்கள்_in_வரி(files[i], &ptr, *dir,
 							    regmatch->startp[0]);
 		    }
-		    if (add_r == OK)
+		    எனில் (add_r == OK)
 			// if dir was BACKWARD then honor it just once
 			*dir = FORWARD;
-		    else if (add_r == FAIL)
-			break;
+		    இல்லையெனில் எனில் (add_r == FAIL)
+			நிறுத்து;
 		    // avoid expensive call to vim_regexec() when at end
 		    // of line
-		    if (*ptr == '\n' || got_int)
-			break;
+		    எனில் (*ptr == '\n' || got_int)
+			நிறுத்து;
 		}
 	    }
-	    line_breakcheck();
-	    ins_compl_check_keys(50, FALSE);
+	    வரி_breakcheck();
+	    ins_compl_check_சாவிகள்(50, FALSE);
 	}
 	fclose(fp);
     }
@@ -2335,17 +2335,17 @@ ins_compl_files(
     char_u *
 find_word_start(char_u *ptr)
 {
-    if (has_mbyte)
+    எனில் (has_mbyte)
     {
-	while (*ptr != NUL && *ptr != '\n' && mb_get_class(ptr) <= 1)
+	போது (*ptr != NUL && *ptr != '\n' && mb_get_class(ptr) <= 1)
 	    ptr += (*mb_ptr2len)(ptr);
     }
-    else
+    இல்லையெனில்
     {
-	while (*ptr != NUL && *ptr != '\n' && !vim_iswordc(*ptr))
+	போது (*ptr != NUL && *ptr != '\n' && !vim_iswordc(*ptr))
 	    ++ptr;
     }
-    return ptr;
+    திரும்பு ptr;
 }
 
 /*
@@ -2355,21 +2355,21 @@ find_word_start(char_u *ptr)
     char_u *
 find_word_end(char_u *ptr)
 {
-    if (has_mbyte)
+    எனில் (has_mbyte)
     {
-	int start_class = mb_get_class(ptr);
-	if (start_class > 1)
-	    while (*ptr != NUL)
+	முழு start_class = mb_get_class(ptr);
+	எனில் (start_class > 1)
+	    போது (*ptr != NUL)
 	    {
 		ptr += (*mb_ptr2len)(ptr);
-		if (mb_get_class(ptr) != start_class)
-		    break;
+		எனில் (mb_get_class(ptr) != start_class)
+		    நிறுத்து;
 	    }
     }
-    else
-	while (vim_iswordc(*ptr))
+    இல்லையெனில்
+	போது (vim_iswordc(*ptr))
 	    ++ptr;
-    return ptr;
+    திரும்பு ptr;
 }
 
 /*
@@ -2377,33 +2377,33 @@ find_word_end(char_u *ptr)
  * Returns a pointer to just after the line.
  */
     char_u *
-find_line_end(char_u *ptr)
+find_வரி_end(char_u *ptr)
 {
     char_u *s = ptr + STRLEN(ptr);
-    while (s > ptr && (s[-1] == CAR || s[-1] == NL))
+    போது (s > ptr && (s[-1] == CAR || s[-1] == NL))
 	--s;
-    return s;
+    திரும்பு s;
 }
 
 /*
  * Free a completion item in the list
  */
-    static void
+    நிலையான வெறுமை
 ins_compl_item_free(compl_T *match)
 {
     // Uncount the match string in the duplicate-check hashtab; the entry is
     // only removed with its last match.  The hashtab is empty when it was
     // already cleared as a whole by ins_compl_free().
-    if (compl_strings_ht.ht_used > 0 && match->cp_str.string != NULL
+    எனில் (compl_strings_ht.ht_used > 0 && match->cp_str.string != வெற்று
 					   && !match_at_original_text(match))
     {
 	hashitem_T *hi = hash_find(&compl_strings_ht, match->cp_str.string);
 
-	if (!HASHITEM_EMPTY(hi))
+	எனில் (!HASHITEM_EMPTY(hi))
 	{
 	    complstr_T *entry = HI2CSE(hi);
 
-	    if (--entry->cse_count <= 0)
+	    எனில் (--entry->cse_மொத்தம் <= 0)
 	    {
 		hash_remove(&compl_strings_ht, hi, "completion match");
 		vim_free(entry);
@@ -2412,9 +2412,9 @@ ins_compl_item_free(compl_T *match)
     }
     VIM_CLEAR_STRING(match->cp_str);
     // several entries may use the same fname, free it just once.
-    if (match->cp_flags & CP_FREE_FNAME)
+    எனில் (match->cp_flags & CP_FREE_FNAME)
 	vim_free(match->cp_fname);
-    for (int i = 0; i < CPT_COUNT; ++i)
+    க்கு (முழு i = 0; i < CPT_மொத்தம்; ++i)
 	vim_free(match->cp_text[i]);
 #ifdef FEAT_EVAL
     clear_tv(&match->cp_user_data);
@@ -2425,16 +2425,16 @@ ins_compl_item_free(compl_T *match)
 /*
  * Free the list of completions
  */
-    static void
-ins_compl_free(void)
+    நிலையான வெறுமை
+ins_compl_free(வெறுமை)
 {
     compl_T *match;
 
     VIM_CLEAR_STRING(compl_pattern);
     VIM_CLEAR_STRING(compl_leader);
 
-    if (compl_first_match == NULL)
-	return;
+    எனில் (compl_first_match == வெற்று)
+	திரும்பு;
 
     ins_compl_del_pum();
     pum_clear();
@@ -2445,22 +2445,22 @@ ins_compl_free(void)
     hash_init(&compl_strings_ht);
 
     compl_curr_match = compl_first_match;
-    do
+    செய்
     {
 	match = compl_curr_match;
 	compl_curr_match = compl_curr_match->cp_next;
 	ins_compl_item_free(match);
-    } while (compl_curr_match != NULL && !is_first_match(compl_curr_match));
-    compl_first_match = compl_curr_match = NULL;
-    compl_shown_match = NULL;
-    compl_old_match = NULL;
+    } போது (compl_curr_match != வெற்று && !is_first_match(compl_curr_match));
+    compl_first_match = compl_curr_match = வெற்று;
+    compl_shown_match = வெற்று;
+    compl_old_match = வெற்று;
 }
 
 /*
  * Reset/clear the completion state.
  */
-    void
-ins_compl_clear(void)
+    வெறுமை
+ins_compl_clear(வெறுமை)
 {
     compl_cont_status = 0;
     compl_started = FALSE;
@@ -2468,18 +2468,18 @@ ins_compl_clear(void)
     compl_selected_item = -1;
     compl_ins_end_col = 0;
     compl_longest_end_col = 0;
-    compl_curr_win = NULL;
-    compl_curr_buf = NULL;
+    compl_curr_win = வெற்று;
+    compl_curr_buf = வெற்று;
     VIM_CLEAR_STRING(compl_pattern);
     VIM_CLEAR_STRING(compl_leader);
-    edit_submode_extra = NULL;
+    edit_submode_extra = வெற்று;
     VIM_CLEAR_STRING(compl_orig_text);
     compl_enter_selects = FALSE;
     cpt_sources_clear();
     compl_autocomplete = FALSE;
     compl_from_nonkeyword = FALSE;
     compl_autostarted = false;
-    compl_num_bests = 0;
+    compl_இலக்கம்_bests = 0;
 #ifdef FEAT_EVAL
     // clear v:completed_item
     set_vim_var_dict(VV_COMPLETED_ITEM, dict_alloc_lock(VAR_FIXED));
@@ -2489,19 +2489,19 @@ ins_compl_clear(void)
 /*
  * Return TRUE when Insert completion is active.
  */
-    int
-ins_compl_active(void)
+    முழு
+ins_compl_active(வெறுமை)
 {
-    return compl_started;
+    திரும்பு compl_started;
 }
 
 /*
  * Return True when wp is the actual completion window
  */
-    int
+    முழு
 ins_compl_win_active(win_T *wp)
 {
-    return ins_compl_active() && wp == compl_curr_win
+    திரும்பு ins_compl_active() && wp == compl_curr_win
 	&& wp->w_buffer == compl_curr_buf;
 }
 
@@ -2509,17 +2509,17 @@ ins_compl_win_active(win_T *wp)
  * Selected one of the matches.  When FALSE, the match was either edited or
  * using the longest common string.
  */
-    int
-ins_compl_used_match(void)
+    முழு
+ins_compl_used_match(வெறுமை)
 {
-    return compl_used_match;
+    திரும்பு compl_used_match;
 }
 
 /*
  * Initialize get longest common string.
  */
-    void
-ins_compl_init_get_longest(void)
+    வெறுமை
+ins_compl_init_get_longest(வெறுமை)
 {
     compl_get_longest = FALSE;
 }
@@ -2527,51 +2527,51 @@ ins_compl_init_get_longest(void)
 /*
  * Returns TRUE when insert completion is interrupted.
  */
-    int
-ins_compl_interrupted(void)
+    முழு
+ins_compl_interrupted(வெறுமை)
 {
-    return compl_interrupted || compl_time_slice_expired;
+    திரும்பு compl_interrupted || compl_time_slice_expired;
 }
 
 /*
  * Returns TRUE if the <Enter> key selects a match in the completion popup
  * menu.
  */
-    int
-ins_compl_enter_selects(void)
+    முழு
+ins_compl_enter_selects(வெறுமை)
 {
-    return compl_enter_selects;
+    திரும்பு compl_enter_selects;
 }
 
 /*
  * Return the column where the text starts that is being completed
  */
     colnr_T
-ins_compl_col(void)
+ins_compl_col(வெறுமை)
 {
-    return compl_col;
+    திரும்பு compl_col;
 }
 
 /*
  * Return the length in bytes of the text being completed
  */
-    int
-ins_compl_len(void)
+    முழு
+ins_compl_len(வெறுமை)
 {
-    return compl_length;
+    திரும்பு compl_length;
 }
 
 /*
  * Return TRUE when the 'completeopt' "preinsert" flag is in effect,
  * otherwise return FALSE.
  */
-    int
-ins_compl_has_preinsert(void)
+    முழு
+ins_compl_has_preinsert(வெறுமை)
 {
-    int cur_cot_flags = get_cot_flags();
-    if (compl_autocomplete && p_ic && !p_inf)
-	return FALSE;
-    return !compl_autocomplete
+    முழு cur_cot_flags = get_cot_flags();
+    எனில் (compl_autocomplete && p_ic && !p_inf)
+	திரும்பு FALSE;
+    திரும்பு !compl_autocomplete
 	? (cur_cot_flags & (COT_PREINSERT | COT_FUZZY | COT_MENUONE))
 		== (COT_PREINSERT | COT_MENUONE)
 	: (cur_cot_flags & (COT_PREINSERT | COT_FUZZY)) == COT_PREINSERT;
@@ -2581,13 +2581,13 @@ ins_compl_has_preinsert(void)
  * Returns TRUE if the pre-insert effect is valid and the cursor is within
  * the `compl_ins_end_col` range.
  */
-    int
-ins_compl_preinsert_effect(void)
+    முழு
+ins_compl_preinsert_effect(வெறுமை)
 {
-    if (!ins_compl_has_preinsert() && !ins_compl_preinsert_longest())
-	return FALSE;
+    எனில் (!ins_compl_has_preinsert() && !ins_compl_preinsert_longest())
+	திரும்பு FALSE;
 
-    return curwin->w_cursor.col < compl_ins_end_col;
+    திரும்பு curwin->w_cursor.col < compl_ins_end_col;
 }
 
 /*
@@ -2596,65 +2596,65 @@ ins_compl_preinsert_effect(void)
  * Returns the character to be used, NUL if the work is done and another char
  * to be got from the user.
  */
-    int
-ins_compl_bs(void)
+    முழு
+ins_compl_bs(வெறுமை)
 {
-    char_u	*line;
+    char_u	*வரி;
     char_u	*p;
 
-    if (ins_compl_preinsert_effect())
+    எனில் (ins_compl_preinsert_effect())
 	ins_compl_delete();
 
-    line = ml_get_curline();
-    p = line + curwin->w_cursor.col;
-    MB_PTR_BACK(line, p);
+    வரி = ml_get_curline();
+    p = வரி + curwin->w_cursor.col;
+    MB_PTR_BACK(வரி, p);
 
     // Stop completion when the whole word was deleted.  For Omni completion
     // allow the word to be deleted, we won't match everything.
     // Respect the 'backspace' option.
-    if ((int)(p - line) - (int)compl_col < 0
-	    || ((int)(p - line) - (int)compl_col == 0 && !ctrl_x_mode_omni())
+    எனில் ((முழு)(p - வரி) - (முழு)compl_col < 0
+	    || ((முழு)(p - வரி) - (முழு)compl_col == 0 && !ctrl_x_mode_omni())
 	    || ctrl_x_mode_eval()
-	    || (!can_bs(BS_START) && (int)(p - line) - (int)compl_col
+	    || (!can_bs(BS_START) && (முழு)(p - வரி) - (முழு)compl_col
 							- compl_length < 0))
-	return K_BS;
+	திரும்பு K_BS;
 
     // Deleted more than what was used to find matches or didn't finish
     // finding all matches: need to look for matches all over again.
-    if (curwin->w_cursor.col <= compl_col + compl_length
+    எனில் (curwin->w_cursor.col <= compl_col + compl_length
 						  || ins_compl_need_restart())
 	ins_compl_restart();
 
     VIM_CLEAR_STRING(compl_leader);
-    compl_leader.length = (size_t)((p - line) - compl_col);
-    compl_leader.string = vim_strnsave(line + compl_col, compl_leader.length);
-    if (compl_leader.string == NULL)
+    compl_leader.length = (size_t)((p - வரி) - compl_col);
+    compl_leader.string = vim_strnsave(வரி + compl_col, compl_leader.length);
+    எனில் (compl_leader.string == வெற்று)
     {
 	compl_leader.length = 0;
-	return K_BS;
+	திரும்பு K_BS;
     }
 
     // Clear selection if a menu item is currently selected in autocompletion
-    if (compl_autocomplete && compl_first_match && !ins_compl_has_preinsert())
+    எனில் (compl_autocomplete && compl_first_match && !ins_compl_has_preinsert())
 	compl_shown_match = compl_first_match;
 
     ins_compl_new_leader();
-    if (compl_shown_match != NULL)
+    எனில் (compl_shown_match != வெற்று)
 	// Make sure current match is not a hidden item.
 	compl_curr_match = compl_shown_match;
-    return NUL;
+    திரும்பு NUL;
 }
 
 /*
  * Return TRUE when we need to find matches again, ins_compl_restart() is to
  * be called.
  */
-    static int
-ins_compl_need_restart(void)
+    நிலையான முழு
+ins_compl_need_restart(வெறுமை)
 {
     // Return TRUE if we didn't complete finding matches or when the
     // 'completefunc' returned "always" in the "refresh" dictionary item.
-    return compl_was_interrupted
+    திரும்பு compl_was_interrupted
 	|| ((ctrl_x_mode_function() || ctrl_x_mode_omni())
 						  && compl_opt_refresh_always);
 }
@@ -2662,32 +2662,32 @@ ins_compl_need_restart(void)
 /*
  * Return TRUE if 'autocomplete' option is set
  */
-    int
-ins_compl_has_autocomplete(void)
+    முழு
+ins_compl_has_autocomplete(வெறுமை)
 {
     // Use buffer-local setting if defined (>= 0), otherwise use global
-    return curbuf->b_p_ac >= 0 ? curbuf->b_p_ac : p_ac;
+    திரும்பு curbuf->b_p_ac >= 0 ? curbuf->b_p_ac : p_ac;
 }
 
 /*
  * Calculate fuzzy score and sort completion matches unless sorting is disabled.
  */
-    static void
-ins_compl_fuzzy_sort(void)
+    நிலையான வெறுமை
+ins_compl_fuzzy_sort(வெறுமை)
 {
-    int	    cur_cot_flags = get_cot_flags();
+    முழு	    cur_cot_flags = get_cot_flags();
 
     // Set the fuzzy score in cp_score and sort
     set_fuzzy_score();
-    if (!(cur_cot_flags & COT_NOSORT))
+    எனில் (!(cur_cot_flags & COT_NOSORT))
     {
 	sort_compl_match_list(cp_compare_fuzzy);
 	// Reset the shown item since sorting reorders items
-	if ((cur_cot_flags & (COT_NOINSERT | COT_NOSELECT)) == COT_NOINSERT)
+	எனில் ((cur_cot_flags & (COT_NOINSERT | COT_NOSELECT)) == COT_NOINSERT)
 	{
-	    int none_selected = compl_shown_match == (compl_shows_dir_forward()
+	    முழு none_selected = compl_shown_match == (compl_shows_dir_forward()
 		    ? compl_first_match : compl_first_match->cp_prev);
-	    if (!none_selected)
+	    எனில் (!none_selected)
 		compl_shown_match
 		    = (!compl_autocomplete && compl_shows_dir_forward())
 		    ? compl_first_match->cp_next : compl_first_match;
@@ -2700,26 +2700,26 @@ ins_compl_fuzzy_sort(void)
  * Show the popup menu with a different set of matches.
  * May also search for matches again if the previous search was interrupted.
  */
-    static void
-ins_compl_new_leader(void)
+    நிலையான வெறுமை
+ins_compl_new_leader(வெறுமை)
 {
-    int	    save_w_wrow = curwin->w_wrow;
-    int	    save_w_leftcol = curwin->w_leftcol;
+    முழு	    save_w_wrow = curwin->w_wrow;
+    முழு	    save_w_leftcol = curwin->w_leftcol;
 
     ins_compl_del_pum();
     ins_compl_delete();
-    ins_compl_insert_bytes(compl_leader.string + get_compl_len(), -1);
+    ins_compl_செருகு_bytes(compl_leader.string + get_compl_len(), -1);
     compl_used_match = FALSE;
 
-    if (compl_started)
+    எனில் (compl_started)
     {
 	ins_compl_set_original_text(compl_leader.string, compl_leader.length);
-	if (is_cpt_func_refresh_always())
+	எனில் (is_cpt_func_refresh_always())
 	    cpt_compl_refresh();
-	if (cot_fuzzy())
+	எனில் (cot_fuzzy())
 	    ins_compl_fuzzy_sort();
     }
-    else
+    இல்லையெனில்
     {
 #ifdef FEAT_SPELL
 	spell_bad_len = 0;	// need to redetect bad word
@@ -2729,7 +2729,7 @@ ins_compl_new_leader(void)
 	// "compl_restarting" to avoid that the first match is inserted.
 	pum_call_update_screen();
 #ifdef FEAT_GUI
-	if (gui.in_use)
+	எனில் (gui.in_use)
 	{
 	    // Show the cursor after the match, not after the redrawn text.
 	    setcursor();
@@ -2739,11 +2739,11 @@ ins_compl_new_leader(void)
 	save_w_wrow = curwin->w_wrow;
 	save_w_leftcol = curwin->w_leftcol;
 	compl_restarting = TRUE;
-	if (ins_compl_has_autocomplete())
+	எனில் (ins_compl_has_autocomplete())
 	    ins_compl_enable_autocomplete();
-	else
+	இல்லையெனில்
 	    compl_autocomplete = FALSE;
-	if (ins_complete(Ctrl_N, FALSE) == FAIL)
+	எனில் (ins_complete(Ctrl_N, FALSE) == FAIL)
 	    compl_cont_status = 0;
 	compl_restarting = FALSE;
     }
@@ -2753,78 +2753,78 @@ ins_compl_new_leader(void)
     // Show the popup menu with a different set of matches.  With
     // 'autocompletedelay' the menu is already visible here, so update it
     // immediately rather than re-arming the delay, like a zero delay does.
-    if (!compl_interrupted)
+    எனில் (!compl_interrupted)
 	show_pum(save_w_wrow, save_w_leftcol);
 
     // Don't let Enter select the original text when there is no popup menu.
-    if (compl_match_array == NULL)
+    எனில் (compl_match_array == வெற்று)
 	compl_enter_selects = FALSE;
-    else if (ins_compl_has_preinsert() && compl_leader.length > 0)
-	ins_compl_insert(TRUE, FALSE);
-    else if (compl_started && ins_compl_preinsert_longest()
+    இல்லையெனில் எனில் (ins_compl_has_preinsert() && compl_leader.length > 0)
+	ins_compl_செருகு(TRUE, FALSE);
+    இல்லையெனில் எனில் (compl_started && ins_compl_preinsert_longest()
 	    && compl_leader.length > 0 && !ins_compl_preinsert_effect())
-	ins_compl_insert(TRUE, TRUE);
+	ins_compl_செருகு(TRUE, TRUE);
 }
 
 /*
  * Return the length of the completion, from the completion start column to
  * the cursor column.  Making sure it never goes below zero.
  */
-    static int
-get_compl_len(void)
+    நிலையான முழு
+get_compl_len(வெறுமை)
 {
-    int off = (int)curwin->w_cursor.col - (int)compl_col;
-    return MAX(0, off);
+    முழு off = (முழு)curwin->w_cursor.col - (முழு)compl_col;
+    திரும்பு MAX(0, off);
 }
 
 /*
  * Append one character to the match leader.  May reduce the number of
  * matches.
  */
-    void
-ins_compl_addleader(int c)
+    வெறுமை
+ins_compl_addleader(முழு c)
 {
-    int	    cc;
+    முழு	    cc;
 
-    if (ins_compl_preinsert_effect())
+    எனில் (ins_compl_preinsert_effect())
 	ins_compl_delete();
 
-    if (stop_arrow() == FAIL)
-	return;
-    if (has_mbyte && (cc = (*mb_char2len)(c)) > 1)
+    எனில் (stop_arrow() == FAIL)
+	திரும்பு;
+    எனில் (has_mbyte && (cc = (*mb_char2len)(c)) > 1)
     {
 	char_u	buf[MB_MAXBYTES + 1];
 
 	(*mb_char2bytes)(c, buf);
 	buf[cc] = NUL;
 	ins_char_bytes(buf, cc);
-	if (compl_opt_refresh_always)
+	எனில் (compl_opt_refresh_always)
 	    AppendToRedobuff(buf);
     }
-    else
+    இல்லையெனில்
     {
 	ins_char(c);
-	if (compl_opt_refresh_always)
+	எனில் (compl_opt_refresh_always)
 	    AppendCharToRedobuff(c);
     }
 
     // If we didn't complete finding matches we must search again.
-    if (ins_compl_need_restart())
+    எனில் (ins_compl_need_restart())
 	ins_compl_restart();
 
     // When 'always' is set, don't reset compl_leader. While completing,
     // cursor doesn't point to the original position, changing compl_leader
     // would break redo.
-    if (!compl_opt_refresh_always)
+    எனில் (!compl_opt_refresh_always)
     {
 	VIM_CLEAR_STRING(compl_leader);
 	compl_leader.length = (size_t)(curwin->w_cursor.col - compl_col);
 	compl_leader.string = vim_strnsave(ml_get_curline() + compl_col,
 		compl_leader.length);
-	if (compl_leader.string == NULL)
+	எனில் (compl_leader.string == வெற்று)
 	{
 	    compl_leader.length = 0;
-	    return;
+	    திரும்பு;
 	}
 
 	ins_compl_new_leader();
@@ -2835,8 +2835,8 @@ ins_compl_addleader(int c)
  * Setup for finding completions again without leaving CTRL-X mode.  Used when
  * BS or a key was typed while still searching for matches.
  */
-    static void
-ins_compl_restart(void)
+    நிலையான வெறுமை
+ins_compl_restart(வெறுமை)
 {
     ins_compl_free();
     compl_started = FALSE;
@@ -2847,25 +2847,25 @@ ins_compl_restart(void)
     compl_autocomplete = FALSE;
     compl_from_nonkeyword = FALSE;
     compl_autostarted = false;
-    compl_num_bests = 0;
+    compl_இலக்கம்_bests = 0;
 }
 
 /*
  * Set the first match, the original text.
  */
-    static void
+    நிலையான வெறுமை
 ins_compl_set_original_text(char_u *str, size_t len)
 {
     compl_T	*match = find_original_text_match();
     char_u	*p;
 
     // Replace the original text entry.
-    if (match == NULL)
-	return;
+    எனில் (match == வெற்று)
+	திரும்பு;
 
     p = vim_strnsave(str, len);
-    if (p == NULL)
-	return;
+    எனில் (p == வெற்று)
+	திரும்பு;
 
     VIM_CLEAR_STRING(match->cp_str);
     match->cp_str.string = p;
@@ -2876,40 +2876,40 @@ ins_compl_set_original_text(char_u *str, size_t len)
  * Append one character to the match leader.  May reduce the number of
  * matches.
  */
-    void
-ins_compl_addfrommatch(void)
+    வெறுமை
+ins_compl_addfrommatch(வெறுமை)
 {
     char_u	*p;
-    int		len = (int)curwin->w_cursor.col - (int)compl_col;
-    int		c;
+    முழு		len = (முழு)curwin->w_cursor.col - (முழு)compl_col;
+    முழு		c;
 
     p = compl_shown_match->cp_str.string;
-    if ((int)compl_shown_match->cp_str.length <= len)   // the match is too short
+    எனில் ((முழு)compl_shown_match->cp_str.length <= len)   // the match is too short
     {
 	size_t	plen;
 	compl_T	*cp;
 
 	// When still at the original match use the first entry that matches
 	// the leader.
-	if (!match_at_original_text(compl_shown_match))
-	    return;
+	எனில் (!match_at_original_text(compl_shown_match))
+	    திரும்பு;
 
-	p = NULL;
+	p = வெற்று;
 	plen = 0;
-	for (cp = compl_shown_match->cp_next; cp != NULL
+	க்கு (cp = compl_shown_match->cp_next; cp != வெற்று
 		&& !is_first_match(cp); cp = cp->cp_next)
 	{
-	    if (compl_leader.string == NULL
+	    எனில் (compl_leader.string == வெற்று
 		    || ins_compl_equal(cp, compl_leader.string,
-			(int)compl_leader.length))
+			(முழு)compl_leader.length))
 	    {
 		p = cp->cp_str.string;
 		plen = cp->cp_str.length;
-		break;
+		நிறுத்து;
 	    }
 	}
-	if (p == NULL || (int)plen <= len)
-	    return;
+	எனில் (p == வெற்று || (முழு)plen <= len)
+	    திரும்பு;
     }
     p += len;
     c = PTR2CHAR(p);
@@ -2922,59 +2922,59 @@ ins_compl_addfrommatch(void)
  * compl_cont_mode and compl_cont_status.
  * Returns TRUE when the character is not to be inserted.
  */
-    static int
-set_ctrl_x_mode(int c)
+    நிலையான முழு
+set_ctrl_x_mode(முழு c)
 {
-    int	    retval = FALSE;
+    முழு	    retval = FALSE;
 
-    switch (c)
+    தேர்வு (c)
     {
-	case Ctrl_E:
-	case Ctrl_Y:
+	நிலை Ctrl_E:
+	நிலை Ctrl_Y:
 	    // scroll the window one line up or down
 	    ctrl_x_mode = CTRL_X_SCROLL;
-	    if (!(State & REPLACE_FLAG))
+	    எனில் (!(State & REPLACE_FLAG))
 		edit_submode = (char_u *)_(" (insert) Scroll (^E/^Y)");
-	    else
+	    இல்லையெனில்
 		edit_submode = (char_u *)_(" (replace) Scroll (^E/^Y)");
-	    edit_submode_pre = NULL;
+	    edit_submode_pre = வெற்று;
 	    showmode();
-	    break;
-	case Ctrl_L:
+	    நிறுத்து;
+	நிலை Ctrl_L:
 	    // complete whole line
-	    ctrl_x_mode = CTRL_X_WHOLE_LINE;
-	    break;
-	case Ctrl_F:
+	    ctrl_x_mode = CTRL_X_WHOLE_வரி;
+	    நிறுத்து;
+	நிலை Ctrl_F:
 	    // complete filenames
 	    ctrl_x_mode = CTRL_X_FILES;
-	    break;
-	case Ctrl_K:
+	    நிறுத்து;
+	நிலை Ctrl_K:
 	    // complete words from a dictionary
 	    ctrl_x_mode = CTRL_X_DICTIONARY;
-	    break;
-	case Ctrl_R:
+	    நிறுத்து;
+	நிலை Ctrl_R:
 	    // When CTRL-R is followed by '=', don't trigger register completion
 	    // This allows expressions like <C-R>=func()<CR> to work normally
-	    if (vpeekc() == '=')
-		break;
+	    எனில் (vpeekc() == '=')
+		நிறுத்து;
 	    ctrl_x_mode = CTRL_X_REGISTER;
-	    break;
-	case Ctrl_T:
+	    நிறுத்து;
+	நிலை Ctrl_T:
 	    // complete words from a thesaurus
 	    ctrl_x_mode = CTRL_X_THESAURUS;
-	    break;
+	    நிறுத்து;
 #ifdef FEAT_COMPL_FUNC
-	case Ctrl_U:
+	நிலை Ctrl_U:
 	    // user defined completion
 	    ctrl_x_mode = CTRL_X_FUNCTION;
-	    break;
-	case Ctrl_O:
+	    நிறுத்து;
+	நிலை Ctrl_O:
 	    // omni completion
 	    ctrl_x_mode = CTRL_X_OMNI;
-	    break;
+	    நிறுத்து;
 #endif
-	case 's':
-	case Ctrl_S:
+	நிலை 's':
+	நிலை Ctrl_S:
 	    // complete spelling suggestions
 	    ctrl_x_mode = CTRL_X_SPELL;
 #ifdef FEAT_SPELL
@@ -2982,36 +2982,36 @@ set_ctrl_x_mode(int c)
 	    spell_back_to_badword();
 	    --emsg_off;
 #endif
-	    break;
-	case Ctrl_RSB:
+	    நிறுத்து;
+	நிலை Ctrl_RSB:
 	    // complete tag names
 	    ctrl_x_mode = CTRL_X_TAGS;
-	    break;
+	    நிறுத்து;
 #ifdef FEAT_FIND_ID
-	case Ctrl_I:
-	case K_S_TAB:
+	நிலை Ctrl_I:
+	நிலை K_S_TAB:
 	    // complete keywords from included files
 	    ctrl_x_mode = CTRL_X_PATH_PATTERNS;
-	    break;
-	case Ctrl_D:
+	    நிறுத்து;
+	நிலை Ctrl_D:
 	    // complete definitions from included files
 	    ctrl_x_mode = CTRL_X_PATH_DEFINES;
-	    break;
+	    நிறுத்து;
 #endif
-	case Ctrl_V:
-	case Ctrl_Q:
+	நிலை Ctrl_V:
+	நிலை Ctrl_Q:
 	    // complete vim commands
 	    ctrl_x_mode = CTRL_X_CMDLINE;
-	    break;
-	case Ctrl_Z:
+	    நிறுத்து;
+	நிலை Ctrl_Z:
 	    // stop completion
 	    ctrl_x_mode = CTRL_X_NORMAL;
-	    edit_submode = NULL;
+	    edit_submode = வெற்று;
 	    showmode();
 	    retval = TRUE;
-	    break;
-	case Ctrl_P:
-	case Ctrl_N:
+	    நிறுத்து;
+	நிலை Ctrl_P:
+	நிலை Ctrl_N:
 	    // ^X^P means LOCAL expansion if nothing interrupted (eg we
 	    // just started ^X mode, or there were enough ^X's to cancel
 	    // the previous mode, say ^X^F^X^X^P or ^P^X^X^X^P, see below)
@@ -3019,12 +3019,12 @@ set_ctrl_x_mode(int c)
 	    // ^X^F^X^P or ^P^X^X^P, see below)
 	    // nothing changes if interrupting mode 0, (eg, the flag
 	    // doesn't change when going to ADDING mode  -- Acevedo
-	    if (!(compl_cont_status & CONT_INTRPT))
+	    எனில் (!(compl_cont_status & CONT_INTRPT))
 		compl_cont_status |= CONT_LOCAL;
-	    else if (compl_cont_mode != 0)
+	    இல்லையெனில் எனில் (compl_cont_mode != 0)
 		compl_cont_status &= ~CONT_LOCAL;
 	    // FALLTHROUGH
-	default:
+	இயல்பு:
 	    // If we have typed at least 2 ^X's... for modes != 0, we set
 	    // compl_cont_status = 0 (eg, as if we had just started ^X
 	    // mode).
@@ -3035,47 +3035,47 @@ set_ctrl_x_mode(int c)
 	    // 'complete' and local ^P expansions respectively.
 	    // In mode 0 an extra ^X is needed since ^X^P goes to ADDING
 	    // mode  -- Acevedo
-	    if (c == Ctrl_X)
+	    எனில் (c == Ctrl_X)
 	    {
-		if (compl_cont_mode != 0)
+		எனில் (compl_cont_mode != 0)
 		    compl_cont_status = 0;
-		else
+		இல்லையெனில்
 		    compl_cont_mode = CTRL_X_NOT_DEFINED_YET;
 	    }
 	    ctrl_x_mode = CTRL_X_NORMAL;
-	    edit_submode = NULL;
+	    edit_submode = வெற்று;
 	    showmode();
-	    break;
+	    நிறுத்து;
     }
 
-    return retval;
+    திரும்பு retval;
 }
 
 /*
  * Trigger CompleteDone event and adds relevant information to v:event
  */
-    static void
-trigger_complete_done_event(int mode UNUSED, string_T *word UNUSED)
+    நிலையான வெறுமை
+trigger_complete_done_event(முழு mode UNUSED, string_T *word UNUSED)
 {
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
     save_v_event_T	save_v_event;
     dict_T		*v_event = get_v_event(&save_v_event);
     string_T		*mode_str;
 
-    if (word == NULL || word->string == NULL)
-	(void)dict_add_string_len(v_event, "complete_word", (char_u *)"", 0);
-    else
-	(void)dict_add_string_len(v_event, "complete_word", word->string, (int)word->length);
+    எனில் (word == வெற்று || word->string == வெற்று)
+	(வெறுமை)dict_add_string_len(v_event, "complete_word", (char_u *)"", 0);
+    இல்லையெனில்
+	(வெறுமை)dict_add_string_len(v_event, "complete_word", word->string, (முழு)word->length);
 
     mode_str = &ctrl_x_mode_names[mode & ~CTRL_X_WANT_IDENT];
-    (void)dict_add_string_len(v_event, "complete_type",
-	(mode_str->string == NULL) ? (char_u *)"" : mode_str->string, (int)mode_str->length);
+    (வெறுமை)dict_add_string_len(v_event, "complete_type",
+	(mode_str->string == வெற்று) ? (char_u *)"" : mode_str->string, (முழு)mode_str->length);
 
-    dict_set_items_ro(v_event);
+    dict_set_பொருட்கள்_ro(v_event);
 #endif
     ins_apply_autocmds(EVENT_COMPLETEDONE);
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
     restore_v_event(v_event, &save_v_event);
 #endif
 }
@@ -3083,22 +3083,22 @@ trigger_complete_done_event(int mode UNUSED, string_T *word UNUSED)
 /*
  * Stop insert completion mode
  */
-    static int
-ins_compl_stop(int c, int prev_mode, int retval)
+    நிலையான முழு
+ins_compl_stop(முழு c, முழு prev_mode, முழு retval)
 {
-    int		want_cindent;
-    string_T	word = {NULL, 0};
+    முழு		want_cindent;
+    string_T	word = {வெற்று, 0};
 
     // Remove pre-inserted text when present.
-    if (ins_compl_preinsert_effect() && ins_compl_win_active(curwin))
+    எனில் (ins_compl_preinsert_effect() && ins_compl_win_active(curwin))
 	ins_compl_delete();
 
     // Get here when we have finished typing a sequence of ^N and
     // ^P or other completion characters in CTRL-X mode.  Free up
     // memory that was used, and make sure we can redo the insert.
-    if (compl_curr_match != NULL || compl_leader.string != NULL || c == Ctrl_E)
+    எனில் (compl_curr_match != வெற்று || compl_leader.string != வெற்று || c == Ctrl_E)
     {
-	char_u	*ptr = NULL;
+	char_u	*ptr = வெற்று;
 
 	// If any of the original typed text has been changed, eg when
 	// ignorecase is set, we must add back-spaces to the redo
@@ -3106,7 +3106,7 @@ ins_compl_stop(int c, int prev_mode, int retval)
 	// of the original text that has changed.
 	// When using the longest match, edited the match or used
 	// CTRL-E then don't use the current match.
-	if (compl_curr_match != NULL && compl_used_match && c != Ctrl_E)
+	எனில் (compl_curr_match != வெற்று && compl_used_match && c != Ctrl_E)
 	    ptr = compl_curr_match->cp_str.string;
 	ins_compl_fixRedoBufForLeader(ptr);
     }
@@ -3115,26 +3115,26 @@ ins_compl_stop(int c, int prev_mode, int retval)
 
     // When completing whole lines: fix indent for 'cindent'.
     // Otherwise, break line if it's too long.
-    if (compl_cont_mode == CTRL_X_WHOLE_LINE)
+    எனில் (compl_cont_mode == CTRL_X_WHOLE_வரி)
     {
 	// re-indent the current line
-	if (want_cindent)
+	எனில் (want_cindent)
 	{
-	    do_c_expr_indent();
+	    do_c_கோவை_indent();
 	    want_cindent = FALSE;	// don't do it again
 	}
     }
-    else if (!compl_autocomplete || compl_used_match)
+    இல்லையெனில் எனில் (!compl_autocomplete || compl_used_match)
     {
-	int prev_col = curwin->w_cursor.col;
+	முழு prev_col = curwin->w_cursor.col;
 
 	// put the cursor on the last char, for 'tw' formatting
-	if (prev_col > 0)
+	எனில் (prev_col > 0)
 	    dec_cursor();
 	// only format when something was inserted
-	if (!arrow_used && !ins_need_undo_get() && c != Ctrl_E)
+	எனில் (!arrow_used && !ins_need_undo_get() && c != Ctrl_E)
 	    insertchar(NUL, 0, -1);
-	if (prev_col > 0
+	எனில் (prev_col > 0
 		&& ml_get_curline()[curwin->w_cursor.col] != NUL)
 	    inc_cursor();
     }
@@ -3142,43 +3142,43 @@ ins_compl_stop(int c, int prev_mode, int retval)
     // If the popup menu is displayed pressing CTRL-Y means accepting
     // the selection without inserting anything.  When
     // compl_enter_selects is set the Enter key does the same.
-    if ((c == Ctrl_Y || (compl_enter_selects
+    எனில் ((c == Ctrl_Y || (compl_enter_selects
 		    && (c == CAR || c == K_KENTER || c == NL)))
 	    && pum_visible())
     {
 	word.string = vim_strnsave(compl_shown_match->cp_str.string,
 	    compl_shown_match->cp_str.length);
-	if (word.string == NULL)
+	எனில் (word.string == வெற்று)
 	    word.length = 0;
-	else
+	இல்லையெனில்
 	    word.length = compl_shown_match->cp_str.length;
 	retval = TRUE;
     }
 
     // CTRL-E means completion is Ended, go back to the typed text.
     // but only do this, if the Popup is still visible
-    if (c == Ctrl_E)
+    எனில் (c == Ctrl_E)
     {
-	char_u *p = NULL;
+	char_u *p = வெற்று;
 	size_t	plen = 0;
 
 	ins_compl_delete();
-	if (compl_leader.string != NULL)
+	எனில் (compl_leader.string != வெற்று)
 	{
 	    p = compl_leader.string;
 	    plen = compl_leader.length;
 	}
-	else if (compl_first_match != NULL)
+	இல்லையெனில் எனில் (compl_first_match != வெற்று)
 	{
 	    p = compl_orig_text.string;
 	    plen = compl_orig_text.length;
 	}
-	if (p != NULL)
+	எனில் (p != வெற்று)
 	{
-	    int	    compl_len = get_compl_len();
+	    முழு	    compl_len = get_compl_len();
 
-	    if ((int)plen > compl_len)
-		ins_compl_insert_bytes(p + compl_len, (int)plen - compl_len);
+	    எனில் ((முழு)plen > compl_len)
+		ins_compl_செருகு_bytes(p + compl_len, (முழு)plen - compl_len);
 	}
 	retval = TRUE;
     }
@@ -3194,43 +3194,43 @@ ins_compl_stop(int c, int prev_mode, int retval)
     ins_compl_free();
     compl_started = FALSE;
     compl_matches = 0;
-    if (!shortmess(SHM_COMPLETIONMENU))
-	msg_clr_cmdline();	// necessary for "noshowmode"
+    எனில் (!shortmess(SHM_COMPLETIONMENU))
+	செய்தி_clr_cmdline();	// necessary for "noshowmode"
     ctrl_x_mode = CTRL_X_NORMAL;
     compl_enter_selects = FALSE;
-    if (edit_submode != NULL)
+    எனில் (edit_submode != வெற்று)
     {
-	edit_submode = NULL;
+	edit_submode = வெற்று;
 	showmode();
     }
     compl_autocomplete = FALSE;
     compl_from_nonkeyword = FALSE;
     compl_autostarted = false;
-    compl_num_bests = 0;
+    compl_இலக்கம்_bests = 0;
     compl_ins_end_col = 0;
 
-    if (c == Ctrl_C && cmdwin_type != 0)
+    எனில் (c == Ctrl_C && cmdwin_type != 0)
 	// Avoid the popup menu remains displayed when leaving the
 	// command line window.
 	update_screen(0);
     // Indent now if a key was typed that is in 'cinkeys'.
-    if (want_cindent && in_cinkeys(KEY_COMPLETE, ' ', inindent(0)))
-	do_c_expr_indent();
+    எனில் (want_cindent && in_cinkeys(சாவி_COMPLETE, ' ', inindent(0)))
+	do_c_கோவை_indent();
     // Trigger the CompleteDone event to give scripts a chance to act
     // upon the end of completion.
     trigger_complete_done_event(prev_mode, &word);
     vim_free(word.string);
 
-    return retval;
+    திரும்பு retval;
 }
 
 /*
  * Cancel completion.
  */
-    int
-ins_compl_cancel(void)
+    முழு
+ins_compl_cancel(வெறுமை)
 {
-    return ins_compl_stop(' ', ctrl_x_mode, TRUE);
+    திரும்பு ins_compl_stop(' ', ctrl_x_mode, TRUE);
 }
 
 /*
@@ -3238,30 +3238,30 @@ ins_compl_cancel(void)
  * Called just after typing a character in Insert mode.
  * Returns TRUE when the character is not to be inserted;
  */
-    int
-ins_compl_prep(int c)
+    முழு
+ins_compl_prep(முழு c)
 {
-    int	    retval = FALSE;
-    int	    prev_mode = ctrl_x_mode;
+    முழு	    retval = FALSE;
+    முழு	    prev_mode = ctrl_x_mode;
 
     // Forget any previous 'special' messages if this is actually
     // a ^X mode key - bar ^R, in which case we wait to see what it gives us.
-    if (c != Ctrl_R && vim_is_ctrl_x_key(c))
-	edit_submode_extra = NULL;
+    எனில் (c != Ctrl_R && vim_is_ctrl_x_சாவி(c))
+	edit_submode_extra = வெற்று;
 
     // Ignore end of Select mode mapping and mouse scroll/movement.
-    if (c == K_SELECT || c == K_MOUSEDOWN || c == K_MOUSEUP
+    எனில் (c == K_SELECT || c == K_MOUSEDOWN || c == K_MOUSEUP
 	    || c == K_MOUSELEFT || c == K_MOUSERIGHT || c == K_MOUSEMOVE
 	    || c == K_COMMAND || c == K_SCRIPT_COMMAND)
-	return retval;
+	திரும்பு retval;
 
 #ifdef FEAT_PROP_POPUP
     // Ignore mouse events in a popup window
-    if (is_mouse_key(c))
+    எனில் (is_mouse_சாவி(c))
     {
 	// Ignore drag and release events, the position does not need to be in
 	// the popup and it may have just closed.
-	if (c == K_LEFTRELEASE
+	எனில் (c == K_LEFTRELEASE
 		|| c == K_LEFTRELEASE_NM
 		|| c == K_MIDDLERELEASE
 		|| c == K_RIGHTRELEASE
@@ -3272,32 +3272,32 @@ ins_compl_prep(int c)
 		|| c == K_RIGHTDRAG
 		|| c == K_X1DRAG
 		|| c == K_X2DRAG)
-	    return retval;
-	if (popup_visible)
+	    திரும்பு retval;
+	எனில் (popup_visible)
 	{
-	    int	    row = mouse_row;
-	    int	    col = mouse_col;
+	    முழு	    row = mouse_row;
+	    முழு	    col = mouse_col;
 	    win_T   *wp = mouse_find_win(&row, &col, FIND_POPUP);
 
-	    if (wp != NULL && WIN_IS_POPUP(wp))
-		return retval;
+	    எனில் (wp != வெற்று && WIN_IS_POPUP(wp))
+		திரும்பு retval;
 	}
     }
 #endif
 
-    if (ctrl_x_mode == CTRL_X_CMDLINE_CTRL_X && c != Ctrl_X)
+    எனில் (ctrl_x_mode == CTRL_X_CMDLINE_CTRL_X && c != Ctrl_X)
     {
-	if (c == Ctrl_V || c == Ctrl_Q || c == Ctrl_Z || ins_compl_pum_key(c)
-		|| !vim_is_ctrl_x_key(c))
+	எனில் (c == Ctrl_V || c == Ctrl_Q || c == Ctrl_Z || ins_compl_pum_சாவி(c)
+		|| !vim_is_ctrl_x_சாவி(c))
 	{
 	    // Not starting another completion mode.
 	    ctrl_x_mode = CTRL_X_CMDLINE;
 
 	    // CTRL-X CTRL-Z should stop completion without inserting anything
-	    if (c == Ctrl_Z)
+	    எனில் (c == Ctrl_Z)
 		retval = TRUE;
 	}
-	else
+	இல்லையெனில்
 	{
 	    ctrl_x_mode = CTRL_X_CMDLINE;
 
@@ -3309,55 +3309,55 @@ ins_compl_prep(int c)
     }
 
     // Set "compl_get_longest" when finding the first matches.
-    if (ctrl_x_mode_not_defined_yet()
+    எனில் (ctrl_x_mode_not_defined_yet()
 			   || (ctrl_x_mode_normal() && !compl_started))
     {
 	compl_get_longest = (get_cot_flags() & COT_LONGEST);
 	compl_used_match = TRUE;
     }
 
-    if (ctrl_x_mode_not_defined_yet())
+    எனில் (ctrl_x_mode_not_defined_yet())
 	// We have just typed CTRL-X and aren't quite sure which CTRL-X mode
 	// it will be yet.  Now we decide.
 	retval = set_ctrl_x_mode(c);
-    else if (ctrl_x_mode_not_default())
+    இல்லையெனில் எனில் (ctrl_x_mode_not_default())
     {
 	// We're already in CTRL-X mode, do we stay in it?
-	if (c != Ctrl_R && !vim_is_ctrl_x_key(c))
+	எனில் (c != Ctrl_R && !vim_is_ctrl_x_சாவி(c))
 	{
 	    ctrl_x_mode = ctrl_x_mode_scroll() ? CTRL_X_NORMAL : CTRL_X_FINISHED;
-	    edit_submode = NULL;
+	    edit_submode = வெற்று;
 	}
 	showmode();
     }
 
-    if (compl_started || ctrl_x_mode == CTRL_X_FINISHED)
+    எனில் (compl_started || ctrl_x_mode == CTRL_X_FINISHED)
     {
 	// Show error message from attempted keyword completion (probably
 	// 'Pattern not found') until another key is hit, then go back to
 	// showing what mode we are in.
 	showmode();
-	if ((ctrl_x_mode_normal() && c != Ctrl_N && c != Ctrl_P
-				       && c != Ctrl_R && !ins_compl_pum_key(c))
+	எனில் ((ctrl_x_mode_normal() && c != Ctrl_N && c != Ctrl_P
+				       && c != Ctrl_R && !ins_compl_pum_சாவி(c))
 		|| ctrl_x_mode == CTRL_X_FINISHED)
 	    retval = ins_compl_stop(c, prev_mode, retval);
     }
-    else if (ctrl_x_mode == CTRL_X_LOCAL_MSG)
+    இல்லையெனில் எனில் (ctrl_x_mode == CTRL_X_LOCAL_செய்தி)
 	// Trigger the CompleteDone event to give scripts a chance to act
 	// upon the (possibly failed) completion.
-	trigger_complete_done_event(ctrl_x_mode, NULL);
+	trigger_complete_done_event(ctrl_x_mode, வெற்று);
 
     may_trigger_modechanged();
 
     // reset continue_* if we left expansion-mode, if we stay they'll be
     // (re)set properly in ins_complete()
-    if (c != Ctrl_R && !vim_is_ctrl_x_key(c))
+    எனில் (c != Ctrl_R && !vim_is_ctrl_x_சாவி(c))
     {
 	compl_cont_status = 0;
 	compl_cont_mode = 0;
     }
 
-    return retval;
+    திரும்பு retval;
 }
 
 /*
@@ -3365,35 +3365,35 @@ ins_compl_prep(int c)
  * text.  This inserts backspaces and appends the changed text.
  * "ptr" is the known leader text or NUL.
  */
-    static void
+    நிலையான வெறுமை
 ins_compl_fixRedoBufForLeader(char_u *ptr_arg)
 {
-    int	    len = 0;
+    முழு	    len = 0;
     char_u  *p;
     char_u  *ptr = ptr_arg;
 
-    if (ptr == NULL)
+    எனில் (ptr == வெற்று)
     {
-	if (compl_leader.string != NULL)
+	எனில் (compl_leader.string != வெற்று)
 	    ptr = compl_leader.string;
-	else
-	    return;  // nothing to do
+	இல்லையெனில்
+	    திரும்பு;  // nothing to do
     }
-    if (compl_orig_text.string != NULL)
+    எனில் (compl_orig_text.string != வெற்று)
     {
 	p = compl_orig_text.string;
 	// Find length of common prefix between original text and new completion
-	while (p[len] != NUL && p[len] == ptr[len])
+	போது (p[len] != NUL && p[len] == ptr[len])
 	    len++;
 	// Adjust length to not break inside a multi-byte character
-	if (len > 0)
+	எனில் (len > 0)
 	    len -= (*mb_head_off)(p, p + len);
 	// Add backspace characters for each remaining character in
 	// original text
-	for (p += len; *p != NUL; MB_PTR_ADV(p))
+	க்கு (p += len; *p != NUL; MB_PTR_ADV(p))
 	    AppendCharToRedobuff(K_BS);
     }
-    if (ptr != NULL)
+    எனில் (ptr != வெற்று)
 	AppendToRedobuffLit(ptr + len, -1);
 }
 
@@ -3405,100 +3405,100 @@ ins_compl_fixRedoBufForLeader(char_u *ptr_arg)
  *
  * Returns the buffer to scan, if any, otherwise returns curbuf -- Acevedo
  */
-    static buf_T *
-ins_compl_next_buf(buf_T *buf, int flag)
+    நிலையான buf_T *
+ins_compl_next_buf(buf_T *buf, முழு flag)
 {
-    static win_T    *wp = NULL;
-    int		    skip_buffer;
+    நிலையான win_T    *wp = வெற்று;
+    முழு		    skip_buffer;
 
-    if (flag == 'w')		// just windows
+    எனில் (flag == 'w')		// just windows
     {
-	if (buf == curbuf || !win_valid(wp))
+	எனில் (buf == curbuf || !win_valid(wp))
 	    // first call for this flag/expansion or window was closed
 	    wp = curwin;
 
-	while (TRUE)
+	போது (TRUE)
 	{
 	    // Move to next window (wrap to first window if at the end)
-	    wp = (wp->w_next != NULL) ? wp->w_next : firstwin;
+	    wp = (wp->w_next != வெற்று) ? wp->w_next : firstwin;
 	    // Break if we're back at start or found an unscanned buffer
-	    if (wp == curwin || !wp->w_buffer->b_scanned)
-		break;
+	    எனில் (wp == curwin || !wp->w_buffer->b_scanned)
+		நிறுத்து;
 	}
 	buf = wp->w_buffer;
     }
-    else
+    இல்லையெனில்
     {
 	// 'b' (just loaded buffers), 'u' (just non-loaded buffers) or 'U'
 	// (unlisted buffers)
 	// When completing whole lines skip unloaded buffers.
-	while (TRUE)
+	போது (TRUE)
 	{
 	    // Move to next buffer (wrap to first buffer if at the end)
-	    buf = (buf->b_next != NULL) ? buf->b_next : firstbuf;
+	    buf = (buf->b_next != வெற்று) ? buf->b_next : firstbuf;
 	    // Break if we're back at start buffer
-	    if (buf == curbuf)
-		break;
+	    எனில் (buf == curbuf)
+		நிறுத்து;
 
 	    // Check buffer conditions based on flag
-	    if (flag == 'U')
+	    எனில் (flag == 'U')
 		skip_buffer = buf->b_p_bl;
-	    else
+	    இல்லையெனில்
 		skip_buffer = !buf->b_p_bl ||
-		    (buf->b_ml.ml_mfp == NULL) != (flag == 'u');
+		    (buf->b_ml.ml_mfp == வெற்று) != (flag == 'u');
 
 	    // Break if we found a buffer that matches our criteria
-	    if (!skip_buffer && !buf->b_scanned)
-		break;
+	    எனில் (!skip_buffer && !buf->b_scanned)
+		நிறுத்து;
 	}
     }
-    return buf;
+    திரும்பு buf;
 }
 
 /*
  * Count the number of entries in the 'complete' option value "cpt".
  * Each non-empty, comma-separated segment is counted as one entry.
  */
-    static int
-get_cpt_sources_count(char_u *cpt)
+    நிலையான முழு
+get_cpt_sources_மொத்தம்(char_u *cpt)
 {
     char_u  dummy[LSIZE];
-    int	    count = 0;
+    முழு	    மொத்தம் = 0;
     char_u  *p;
 
-    for (p = cpt; *p != NUL; )
+    க்கு (p = cpt; *p != NUL; )
     {
-	while (*p == ',' || *p == ' ')
+	போது (*p == ',' || *p == ' ')
 	    p++;  // Skip delimiters
 
-	if (*p != NUL)
+	எனில் (*p != NUL)
 	{
-	    (void)copy_option_part(&p, dummy, LSIZE, ",");  // Advance p
-	    count++;
+	    (வெறுமை)copy_option_part(&p, dummy, LSIZE, ",");  // Advance p
+	    மொத்தம்++;
 	}
     }
 
-    return count;
+    திரும்பு மொத்தம்;
 }
 
 #ifdef FEAT_COMPL_FUNC
 
 # ifdef FEAT_EVAL
-static callback_T cfu_cb;	    // 'completefunc' callback function
-static callback_T ofu_cb;	    // 'omnifunc' callback function
-static callback_T tsrfu_cb;	    // 'thesaurusfunc' callback function
-static callback_T *cpt_cb;	    // Callback functions associated with F{func}
-static int	  cpt_cb_count;	    // Number of cpt callbacks
+நிலையான callback_T cfu_cb;	    // 'completefunc' callback function
+நிலையான callback_T ofu_cb;	    // 'omnifunc' callback function
+நிலையான callback_T tsrfu_cb;	    // 'thesaurusfunc' callback function
+நிலையான callback_T *cpt_cb;	    // Callback functions associated with F{func}
+நிலையான முழு	  cpt_cb_மொத்தம்;	    // Number of cpt callbacks
 # endif
 
 /*
  * Copy a global callback function to a buffer local callback.
  */
-    static void
+    நிலையான வெறுமை
 copy_global_to_buflocal_cb(callback_T *globcb, callback_T *bufcb)
 {
     free_callback(bufcb);
-    if (globcb->cb_name != NULL && *globcb->cb_name != NUL)
+    எனில் (globcb->cb_name != வெற்று && *globcb->cb_name != NUL)
 	copy_callback(bufcb, globcb);
 }
 
@@ -3508,29 +3508,29 @@ copy_global_to_buflocal_cb(callback_T *globcb, callback_T *bufcb)
  * name of a function (string), or function(<name>) or funcref(<name>) or a
  * lambda expression.
  */
-    char *
+    எழுத்து *
 did_set_completefunc(optset_T *args)
 {
-    int	retval;
+    முழு	retval;
 
-    if (args->os_flags & OPT_LOCAL)
+    எனில் (args->os_flags & OPT_LOCAL)
 	retval = option_set_callback_func(args->os_newval.string,
 							    &curbuf->b_cfu_cb);
-    else
+    இல்லையெனில்
     {
 	retval = option_set_callback_func(args->os_newval.string, &cfu_cb);
-	if (retval == OK && !(args->os_flags & OPT_GLOBAL))
+	எனில் (retval == OK && !(args->os_flags & OPT_GLOBAL))
 	    set_buflocal_cfu_callback(curbuf);
     }
 
-    return retval == FAIL ? e_invalid_argument : NULL;
+    திரும்பு retval == FAIL ? e_invalid_argument : வெற்று;
 }
 
 /*
  * Copy the global 'completefunc' callback function to the buffer-local
  * 'completefunc' callback for "buf".
  */
-    void
+    வெறுமை
 set_buflocal_cfu_callback(buf_T *buf UNUSED)
 {
 # ifdef FEAT_EVAL
@@ -3544,29 +3544,29 @@ set_buflocal_cfu_callback(buf_T *buf UNUSED)
  * name of a function (string), or function(<name>) or funcref(<name>) or a
  * lambda expression.
  */
-    char *
+    எழுத்து *
 did_set_omnifunc(optset_T *args)
 {
-    int	retval;
+    முழு	retval;
 
-    if (args->os_flags & OPT_LOCAL)
+    எனில் (args->os_flags & OPT_LOCAL)
 	retval = option_set_callback_func(args->os_newval.string,
 							    &curbuf->b_ofu_cb);
-    else
+    இல்லையெனில்
     {
 	retval = option_set_callback_func(args->os_newval.string, &ofu_cb);
-	if (retval == OK && !(args->os_flags & OPT_GLOBAL))
+	எனில் (retval == OK && !(args->os_flags & OPT_GLOBAL))
 	    set_buflocal_ofu_callback(curbuf);
     }
 
-    return retval == FAIL ? e_invalid_argument : NULL;
+    திரும்பு retval == FAIL ? e_invalid_argument : வெற்று;
 }
 
 /*
  * Copy the global 'omnifunc' callback function to the buffer-local 'omnifunc'
  * callback for "buf".
  */
-    void
+    வெறுமை
 set_buflocal_ofu_callback(buf_T *buf UNUSED)
 {
 # ifdef FEAT_EVAL
@@ -3577,13 +3577,13 @@ set_buflocal_ofu_callback(buf_T *buf UNUSED)
 /*
  * Free an array of 'complete' F{func} callbacks and set the pointer to NULL.
  */
-    void
-clear_cpt_callbacks(callback_T **callbacks, int count)
+    வெறுமை
+clear_cpt_callbacks(callback_T **callbacks, முழு மொத்தம்)
 {
-    if (callbacks == NULL || *callbacks == NULL)
-	return;
+    எனில் (callbacks == வெற்று || *callbacks == வெற்று)
+	திரும்பு;
 
-    for (int i = 0; i < count; i++)
+    க்கு (முழு i = 0; i < மொத்தம்; i++)
 	free_callback(&(*callbacks)[i]);
 
     VIM_CLEAR(*callbacks);
@@ -3593,40 +3593,40 @@ clear_cpt_callbacks(callback_T **callbacks, int count)
  * Copies a list of callback_T structs from src to *dest, clearing any existing
  * entries and allocating memory for the destination.
  */
-    static int
-copy_cpt_callbacks(callback_T **dest, int *dest_cnt, callback_T *src, int cnt)
+    நிலையான முழு
+copy_cpt_callbacks(callback_T **dest, முழு *dest_cnt, callback_T *src, முழு cnt)
 {
     clear_cpt_callbacks(dest, *dest_cnt);
     *dest_cnt = 0;
 
-    if (cnt == 0)
-	return OK;
+    எனில் (cnt == 0)
+	திரும்பு OK;
 
     *dest = ALLOC_CLEAR_MULT(callback_T, cnt);
-    if (*dest == NULL)
-	return FAIL;
+    எனில் (*dest == வெற்று)
+	திரும்பு FAIL;
 
     *dest_cnt = cnt;
 
-    for (int i = 0; i < cnt; i++)
-	if (src[i].cb_name != NULL && *(src[i].cb_name) != NUL)
+    க்கு (முழு i = 0; i < cnt; i++)
+	எனில் (src[i].cb_name != வெற்று && *(src[i].cb_name) != NUL)
 	    copy_callback(&(*dest)[i], &src[i]);
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Copy global 'complete' F{func} callbacks into the given buffer's local
  * callback array. Clears any existing buffer-local callbacks first.
  */
-    void
+    வெறுமை
 set_buflocal_cpt_callbacks(buf_T *buf UNUSED)
 {
 # ifdef FEAT_EVAL
-    if (buf == NULL)
-	return;
-    (void)copy_cpt_callbacks(&buf->b_p_cpt_cb, &buf->b_p_cpt_count, cpt_cb,
-	    cpt_cb_count);
+    எனில் (buf == வெற்று)
+	திரும்பு;
+    (வெறுமை)copy_cpt_callbacks(&buf->b_p_cpt_cb, &buf->b_p_cpt_மொத்தம், cpt_cb,
+	    cpt_cb_மொத்தம்);
 # endif
 }
 
@@ -3638,81 +3638,81 @@ set_buflocal_cpt_callbacks(buf_T *buf UNUSED)
  * index.  Any previous array in "*cbp" is cleared.
  * Returns FAIL when out of memory.
  */
-    static int
-parse_cpt_callbacks(char_u *cpt, callback_T **cbp, int *cnt)
+    நிலையான முழு
+parse_cpt_callbacks(char_u *cpt, callback_T **cbp, முழு *cnt)
 {
     char_u  buf[LSIZE];
     char_u  *p;
-    int	    idx = 0;
-    int	    slen;
-    int	    count;
+    முழு	    idx = 0;
+    முழு	    slen;
+    முழு	    மொத்தம்;
 
     clear_cpt_callbacks(cbp, *cnt);
     *cnt = 0;
 
-    count = get_cpt_sources_count(cpt);
-    if (count == 0)
-	return OK;
+    மொத்தம் = get_cpt_sources_மொத்தம்(cpt);
+    எனில் (மொத்தம் == 0)
+	திரும்பு OK;
 
-    *cbp = ALLOC_CLEAR_MULT(callback_T, count);
-    if (*cbp == NULL)
-	return FAIL;
-    *cnt = count;
+    *cbp = ALLOC_CLEAR_MULT(callback_T, மொத்தம்);
+    எனில் (*cbp == வெற்று)
+	திரும்பு FAIL;
+    *cnt = மொத்தம்;
 
-    for (p = cpt; *p != NUL; )
+    க்கு (p = cpt; *p != NUL; )
     {
-	while (*p == ',' || *p == ' ')
+	போது (*p == ',' || *p == ' ')
 	    p++; // Skip delimiters
 
-	if (*p != NUL)
+	எனில் (*p != NUL)
 	{
 	    slen = copy_option_part(&p, buf, LSIZE, ","); // Advance p
-	    if (slen > 0 && buf[0] == 'F' && buf[1] != NUL)
+	    எனில் (slen > 0 && buf[0] == 'F' && buf[1] != NUL)
 	    {
 		char_u	*caret = vim_strchr(buf, '^');
 
-		if (caret != NULL)
+		எனில் (caret != வெற்று)
 		    *caret = NUL;
 
-		if (option_set_callback_func(buf + 1, &(*cbp)[idx]) != OK)
-		    (*cbp)[idx].cb_name = NULL;
+		எனில் (option_set_callback_func(buf + 1, &(*cbp)[idx]) != OK)
+		    (*cbp)[idx].cb_name = வெற்று;
 	    }
 	    idx++;
 	}
     }
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Parse 'complete' option and initialize F{func} callbacks.
  * Frees any existing callbacks and allocates new ones.
  */
-    int
+    முழு
 set_cpt_callbacks(optset_T *args)
 {
-    int	    opt_flags = args->os_flags;
+    முழு	    opt_flags = args->os_flags;
 
-    if (curbuf == NULL)
-	return FAIL;
+    எனில் (curbuf == வெற்று)
+	திரும்பு FAIL;
 
     // ":setglobal" does not change the buffer-local option value
-    if (!(opt_flags & OPT_GLOBAL)
+    எனில் (!(opt_flags & OPT_GLOBAL)
 	    && parse_cpt_callbacks(curbuf->b_p_cpt, &curbuf->b_p_cpt_cb,
-				   &curbuf->b_p_cpt_count) != OK)
-	return FAIL;
+				   &curbuf->b_p_cpt_மொத்தம்) != OK)
+	திரும்பு FAIL;
 
     // ":setlocal" does not change the global option value
-    if (opt_flags & OPT_LOCAL)
-	return OK;
+    எனில் (opt_flags & OPT_LOCAL)
+	திரும்பு OK;
 
     // Cache the callbacks for the global value
-    if (opt_flags & OPT_GLOBAL)
-	return parse_cpt_callbacks(p_cpt, &cpt_cb, &cpt_cb_count);
+    எனில் (opt_flags & OPT_GLOBAL)
+	திரும்பு parse_cpt_callbacks(p_cpt, &cpt_cb, &cpt_cb_மொத்தம்);
 
     // set case
-    return copy_cpt_callbacks(&cpt_cb, &cpt_cb_count, curbuf->b_p_cpt_cb,
-			      curbuf->b_p_cpt_count);
+    திரும்பு copy_cpt_callbacks(&cpt_cb, &cpt_cb_மொத்தம், curbuf->b_p_cpt_cb,
+			      curbuf->b_p_cpt_மொத்தம்);
 }
 
 /*
@@ -3721,90 +3721,90 @@ set_cpt_callbacks(optset_T *args)
  * name of a function (string), or function(<name>) or funcref(<name>) or a
  * lambda expression.
  */
-    char *
+    எழுத்து *
 did_set_thesaurusfunc(optset_T *args UNUSED)
 {
-    int	retval;
+    முழு	retval;
 
-    if (args->os_flags & OPT_LOCAL)
+    எனில் (args->os_flags & OPT_LOCAL)
 	// buffer-local option set
 	retval = option_set_callback_func(curbuf->b_p_tsrfu,
 							&curbuf->b_tsrfu_cb);
-    else
+    இல்லையெனில்
     {
 	// global option set
 	retval = option_set_callback_func(p_tsrfu, &tsrfu_cb);
 	// when using :set, free the local callback
-	if (!(args->os_flags & OPT_GLOBAL))
+	எனில் (!(args->os_flags & OPT_GLOBAL))
 	    free_callback(&curbuf->b_tsrfu_cb);
     }
 
-    return retval == FAIL ? e_invalid_argument : NULL;
+    திரும்பு retval == FAIL ? e_invalid_argument : வெற்று;
 }
 
 /*
  * Mark "copyID" references in an array of F{func} callbacks so that they are
  * not garbage collected.
  */
-    int
-set_ref_in_cpt_callbacks(callback_T *callbacks, int count, int copyID)
+    முழு
+set_ref_in_cpt_callbacks(callback_T *callbacks, முழு மொத்தம், முழு copyID)
 {
-    int	abort = FALSE;
+    முழு	abort = FALSE;
 
-    if (callbacks == NULL)
-	return FALSE;
+    எனில் (callbacks == வெற்று)
+	திரும்பு FALSE;
 
-    for (int i = 0; i < count; i++)
+    க்கு (முழு i = 0; i < மொத்தம்; i++)
 	abort = abort || set_ref_in_callback(&callbacks[i], copyID);
-    return abort;
+    திரும்பு abort;
 }
 
 /*
  * Mark the global 'completefunc' 'omnifunc' and 'thesaurusfunc' callbacks with
  * "copyID" so that they are not garbage collected.
  */
-    int
-set_ref_in_insexpand_funcs(int copyID)
+    முழு
+set_ref_in_insexpand_funcs(முழு copyID)
 {
-    int abort = set_ref_in_callback(&cfu_cb, copyID);
+    முழு abort = set_ref_in_callback(&cfu_cb, copyID);
     abort = abort || set_ref_in_callback(&ofu_cb, copyID);
     abort = abort || set_ref_in_callback(&tsrfu_cb, copyID);
-    abort = abort || set_ref_in_cpt_callbacks(cpt_cb, cpt_cb_count, copyID);
+    abort = abort || set_ref_in_cpt_callbacks(cpt_cb, cpt_cb_மொத்தம், copyID);
 
-    return abort;
+    திரும்பு abort;
 }
 
 /*
  * Get the user-defined completion function name for completion "type"
  */
-    static char_u *
-get_complete_funcname(int type)
+    நிலையான char_u *
+get_complete_funcname(முழு type)
 {
-    switch (type)
+    தேர்வு (type)
     {
-	case CTRL_X_FUNCTION:
-	    return curbuf->b_p_cfu;
-	case CTRL_X_OMNI:
-	    return curbuf->b_p_ofu;
-	case CTRL_X_THESAURUS:
-	    return *curbuf->b_p_tsrfu == NUL ? p_tsrfu : curbuf->b_p_tsrfu;
-	default:
-	    return (char_u *)"";
+	நிலை CTRL_X_FUNCTION:
+	    திரும்பு curbuf->b_p_cfu;
+	நிலை CTRL_X_OMNI:
+	    திரும்பு curbuf->b_p_ofu;
+	நிலை CTRL_X_THESAURUS:
+	    திரும்பு *curbuf->b_p_tsrfu == NUL ? p_tsrfu : curbuf->b_p_tsrfu;
+	இயல்பு:
+	    திரும்பு (char_u *)"";
     }
 }
 
 /*
  * Get the callback to use for insert mode completion.
  */
-    static callback_T *
-get_insert_callback(int type)
+    நிலையான callback_T *
+get_செருகு_callback(முழு type)
 {
-    if (type == CTRL_X_FUNCTION)
-	return &curbuf->b_cfu_cb;
-    if (type == CTRL_X_OMNI)
-	return &curbuf->b_ofu_cb;
+    எனில் (type == CTRL_X_FUNCTION)
+	திரும்பு &curbuf->b_cfu_cb;
+    எனில் (type == CTRL_X_OMNI)
+	திரும்பு &curbuf->b_ofu_cb;
     // CTRL_X_THESAURUS
-    return (*curbuf->b_p_tsrfu != NUL) ? &curbuf->b_tsrfu_cb : &tsrfu_cb;
+    திரும்பு (*curbuf->b_p_tsrfu != NUL) ? &curbuf->b_tsrfu_cb : &tsrfu_cb;
 }
 
 /*
@@ -3814,35 +3814,35 @@ get_insert_callback(int type)
  * Callback function "cb" is set if triggered by a function in the 'cpt'
  * option; otherwise, it is NULL.
  */
-    static void
-expand_by_function(int type, char_u *base, callback_T *cb)
+    நிலையான வெறுமை
+expand_by_function(முழு type, char_u *base, callback_T *cb)
 {
-    list_T      *matchlist = NULL;
-    dict_T	*matchdict = NULL;
+    list_T      *matchlist = வெற்று;
+    dict_T	*matchdict = வெற்று;
     typval_T	args[3];
     char_u	*funcname;
     pos_T	pos;
     typval_T	rettv;
-    int		save_State = State;
-    int		retval;
-    int		is_cpt_function = (cb != NULL);
-    int		use_sandbox = is_cpt_function
+    முழு		save_State = State;
+    முழு		retval;
+    முழு		is_cpt_function = (cb != வெற்று);
+    முழு		use_sandbox = is_cpt_function
 			    && was_set_insecurely(curwin,
 					(char_u *)"complete", OPT_LOCAL);
 
-    if (!is_cpt_function)
+    எனில் (!is_cpt_function)
     {
 	funcname = get_complete_funcname(type);
-	if (*funcname == NUL)
-	    return;
-	cb = get_insert_callback(type);
+	எனில் (*funcname == NUL)
+	    திரும்பு;
+	cb = get_செருகு_callback(type);
     }
 
     // Call 'completefunc' to obtain the list of matches.
-    args[0].v_type = VAR_NUMBER;
-    args[0].vval.v_number = 0;
+    args[0].v_type = VAR_எண்;
+    args[0].vval.v_எண் = 0;
     args[1].v_type = VAR_STRING;
-    args[1].vval.v_string = base != NULL ? base : (char_u *)"";
+    args[1].vval.v_string = base != வெற்று ? base : (char_u *)"";
     args[2].v_type = VAR_UNKNOWN;
 
     pos = curwin->w_cursor;
@@ -3850,32 +3850,32 @@ expand_by_function(int type, char_u *base, callback_T *cb)
     // switching to another window, it should not be needed and may end up in
     // Insert mode in another buffer.
     ++textlock;
-    if (use_sandbox)
+    எனில் (use_sandbox)
 	++sandbox;
 
     retval = call_callback(cb, 0, &rettv, 2, args);
-    if (use_sandbox)
+    எனில் (use_sandbox)
 	--sandbox;
 
     // Call a function, which returns a list or dict.
-    if (retval == OK)
+    எனில் (retval == OK)
     {
-	switch (rettv.v_type)
+	தேர்வு (rettv.v_type)
 	{
-	    case VAR_LIST:
+	    நிலை VAR_LIST:
 		matchlist = rettv.vval.v_list;
-		break;
-	    case VAR_DICT:
+		நிறுத்து;
+	    நிலை VAR_DICT:
 		matchdict = rettv.vval.v_dict;
-		break;
-	    case VAR_SPECIAL:
-		if (rettv.vval.v_number == VVAL_NONE)
+		நிறுத்து;
+	    நிலை VAR_SPECIAL:
+		எனில் (rettv.vval.v_எண் == VVAL_NONE)
 		    compl_opt_suppress_empty = TRUE;
 		// FALLTHROUGH
-	    default:
+	    இயல்பு:
 		// TODO: Give error message?
 		clear_tv(&rettv);
-		break;
+		நிறுத்து;
 	}
     }
     --textlock;
@@ -3883,36 +3883,36 @@ expand_by_function(int type, char_u *base, callback_T *cb)
     curwin->w_cursor = pos;	// restore the cursor position
     check_cursor();  // make sure cursor position is valid, just in case
     validate_cursor();
-    if (!EQUAL_POS(curwin->w_cursor, pos))
+    எனில் (!EQUAL_POS(curwin->w_cursor, pos))
     {
 	emsg(_(e_complete_function_deleted_text));
-	goto theend;
+	செல் theend;
     }
 
-    if (matchlist != NULL)
+    எனில் (matchlist != வெற்று)
 	ins_compl_add_list(matchlist);
-    else if (matchdict != NULL)
+    இல்லையெனில் எனில் (matchdict != வெற்று)
 	ins_compl_add_dict(matchdict);
 
 theend:
     // Restore State, it might have been changed.
     State = save_State;
 
-    if (matchdict != NULL)
+    எனில் (matchdict != வெற்று)
 	dict_unref(matchdict);
-    if (matchlist != NULL)
+    எனில் (matchlist != வெற்று)
 	list_unref(matchlist);
 }
 #endif // FEAT_COMPL_FUNC
 
-#if defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
+#எனில் defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
 
-    static inline int
+    நிலையான உள்வரி முழு
 get_user_highlight_id(char_u *hlname)
 {
-    if (hlname != NULL && *hlname != NUL)
-	return syn_check_group(hlname, (int)STRLEN(hlname));
-    return 0;
+    எனில் (hlname != வெற்று && *hlname != NUL)
+	திரும்பு syn_check_group(hlname, (முழு)STRLEN(hlname));
+    திரும்பு 0;
 }
 /*
  * Add a match to the list of matches from a typeval_T.
@@ -3921,22 +3921,22 @@ get_user_highlight_id(char_u *hlname)
  * maybe because alloc() returns NULL, then FAIL is returned.
  * When "fast" is TRUE use fast_breakcheck() instead of ui_breakcheck().
  */
-    static int
-ins_compl_add_tv(typval_T *tv, int dir, int fast)
+    நிலையான முழு
+ins_compl_add_tv(typval_T *tv, முழு dir, முழு fast)
 {
     char_u	*word;
-    int		dup = FALSE;
-    int		empty = FALSE;
-    int		flags = fast ? CP_FAST : 0;
-    char_u	*(cptext[CPT_COUNT]);
+    முழு		dup = FALSE;
+    முழு		empty = FALSE;
+    முழு		flags = fast ? CP_FAST : 0;
+    char_u	*(cptext[CPT_மொத்தம்]);
     typval_T	user_data;
-    int		status;
+    முழு		status;
     char_u	*user_abbr_hlname;
     char_u	*user_kind_hlname;
-    int		user_hl[2] = { 0, 0 };
+    முழு		user_hl[2] = { 0, 0 };
 
     user_data.v_type = VAR_UNKNOWN;
-    if (tv->v_type == VAR_DICT && tv->vval.v_dict != NULL)
+    எனில் (tv->v_type == VAR_DICT && tv->vval.v_dict != வெற்று)
     {
 	word = dict_get_string(tv->vval.v_dict, "word", FALSE);
 	cptext[CPT_ABBR] = dict_get_string(tv->vval.v_dict, "abbr", FALSE);
@@ -3951,79 +3951,79 @@ ins_compl_add_tv(typval_T *tv, int dir, int fast)
 	user_hl[1] = get_user_highlight_id(user_kind_hlname);
 
 	dict_get_tv(tv->vval.v_dict, "user_data", &user_data);
-	if (dict_get_string(tv->vval.v_dict, "icase", FALSE) != NULL
-				  && dict_get_number(tv->vval.v_dict, "icase"))
+	எனில் (dict_get_string(tv->vval.v_dict, "icase", FALSE) != வெற்று
+				  && dict_get_எண்(tv->vval.v_dict, "icase"))
 	    flags |= CP_ICASE;
-	if (dict_get_string(tv->vval.v_dict, "dup", FALSE) != NULL)
-	    dup = dict_get_number(tv->vval.v_dict, "dup");
-	if (dict_get_string(tv->vval.v_dict, "empty", FALSE) != NULL)
-	    empty = dict_get_number(tv->vval.v_dict, "empty");
-	if (dict_get_string(tv->vval.v_dict, "equal", FALSE) != NULL
-				  && dict_get_number(tv->vval.v_dict, "equal"))
+	எனில் (dict_get_string(tv->vval.v_dict, "dup", FALSE) != வெற்று)
+	    dup = dict_get_எண்(tv->vval.v_dict, "dup");
+	எனில் (dict_get_string(tv->vval.v_dict, "empty", FALSE) != வெற்று)
+	    empty = dict_get_எண்(tv->vval.v_dict, "empty");
+	எனில் (dict_get_string(tv->vval.v_dict, "equal", FALSE) != வெற்று
+				  && dict_get_எண்(tv->vval.v_dict, "equal"))
 	    flags |= CP_EQUAL;
     }
-    else
+    இல்லையெனில்
     {
 	word = tv_get_string_chk(tv);
 	CLEAR_FIELD(cptext);
     }
-    if (word == NULL || (!empty && *word == NUL))
+    எனில் (word == வெற்று || (!empty && *word == NUL))
     {
 	clear_tv(&user_data);
-	return FAIL;
+	திரும்பு FAIL;
     }
-    status = ins_compl_add(word, -1, NULL, cptext,
+    status = ins_compl_add(word, -1, வெற்று, cptext,
 	    &user_data, dir, flags, dup, user_hl, FUZZY_SCORE_NONE);
-    if (status != OK)
+    எனில் (status != OK)
 	clear_tv(&user_data);
-    return status;
+    திரும்பு status;
 }
 
 /*
  * Add completions from a list.
  */
-    static void
+    நிலையான வெறுமை
 ins_compl_add_list(list_T *list)
 {
     listitem_T	*li;
-    int		dir = compl_direction;
+    முழு		dir = compl_direction;
 
     // Go through the List with matches and add each of them.
     CHECK_LIST_MATERIALIZE(list);
-    FOR_ALL_LIST_ITEMS(list, li)
+    FOR_ALL_LIST_பொருட்கள்(list, li)
     {
-	if (ins_compl_add_tv(&li->li_tv, dir, TRUE) == OK)
+	எனில் (ins_compl_add_tv(&li->li_tv, dir, TRUE) == OK)
 	    // if dir was BACKWARD then honor it just once
 	    dir = FORWARD;
-	else if (did_emsg)
-	    break;
+	இல்லையெனில் எனில் (did_emsg)
+	    நிறுத்து;
     }
 }
 
 /*
  * Add completions from a dict.
  */
-    static void
+    நிலையான வெறுமை
 ins_compl_add_dict(dict_T *dict)
 {
     dictitem_T	*di_refresh;
-    dictitem_T	*di_words;
+    dictitem_T	*di_சொற்கள்;
 
     // Check for optional "refresh" item.
     compl_opt_refresh_always = FALSE;
     di_refresh = dict_find(dict, (char_u *)"refresh", 7);
-    if (di_refresh != NULL && di_refresh->di_tv.v_type == VAR_STRING)
+    எனில் (di_refresh != வெற்று && di_refresh->di_tv.v_type == VAR_STRING)
     {
 	char_u	*v = di_refresh->di_tv.vval.v_string;
 
-	if (v != NULL && STRCMP(v, (char_u *)"always") == 0)
+	எனில் (v != வெற்று && STRCMP(v, (char_u *)"always") == 0)
 	    compl_opt_refresh_always = TRUE;
     }
 
     // Add completions from a "words" list.
-    di_words = dict_find(dict, (char_u *)"words", 5);
-    if (di_words != NULL && di_words->di_tv.v_type == VAR_LIST)
-	ins_compl_add_list(di_words->di_tv.vval.v_list);
+    di_சொற்கள் = dict_find(dict, (char_u *)"words", 5);
+    எனில் (di_சொற்கள் != வெற்று && di_சொற்கள்->di_tv.v_type == VAR_LIST)
+	ins_compl_add_list(di_சொற்கள்->di_tv.vval.v_list);
 }
 
 /*
@@ -4031,45 +4031,45 @@ ins_compl_add_dict(dict_T *dict)
  * "startcol" is where the matched text starts (1 is first column).
  * "list" is the list of matches.
  */
-    static void
+    நிலையான வெறுமை
 set_completion(colnr_T startcol, list_T *list)
 {
-    int save_w_wrow = curwin->w_wrow;
-    int save_w_leftcol = curwin->w_leftcol;
-    int flags = CP_ORIGINAL_TEXT;
-    unsigned int cur_cot_flags = get_cot_flags();
-    int compl_longest = (cur_cot_flags & COT_LONGEST) != 0;
-    int compl_no_insert = (cur_cot_flags & COT_NOINSERT) != 0;
-    int compl_no_select = (cur_cot_flags & COT_NOSELECT) != 0;
+    முழு save_w_wrow = curwin->w_wrow;
+    முழு save_w_leftcol = curwin->w_leftcol;
+    முழு flags = CP_ORIGINAL_TEXT;
+    unsigned முழு cur_cot_flags = get_cot_flags();
+    முழு compl_longest = (cur_cot_flags & COT_LONGEST) != 0;
+    முழு compl_no_செருகு = (cur_cot_flags & COT_NOINSERT) != 0;
+    முழு compl_no_select = (cur_cot_flags & COT_NOSELECT) != 0;
 
     // If already doing completions stop it.
-    if (compl_started || ctrl_x_mode_not_default())
+    எனில் (compl_started || ctrl_x_mode_not_default())
 	ins_compl_prep(' ');
     ins_compl_clear();
     ins_compl_free();
     compl_get_longest = compl_longest;
 
     compl_direction = FORWARD;
-    if (startcol > curwin->w_cursor.col)
+    எனில் (startcol > curwin->w_cursor.col)
 	startcol = curwin->w_cursor.col;
     compl_col = startcol;
     compl_lnum = curwin->w_cursor.lnum;
-    compl_length = (int)curwin->w_cursor.col - (int)startcol;
+    compl_length = (முழு)curwin->w_cursor.col - (முழு)startcol;
     // compl_pattern doesn't need to be set
     compl_orig_text.string = vim_strnsave(ml_get_curline() + compl_col,
 							(size_t)compl_length);
-    if (p_ic)
+    எனில் (p_ic)
 	flags |= CP_ICASE;
-    if (compl_orig_text.string == NULL)
+    எனில் (compl_orig_text.string == வெற்று)
     {
 	compl_orig_text.length = 0;
-	return;
+	திரும்பு;
     }
     compl_orig_text.length = (size_t)compl_length;
-    if (ins_compl_add(compl_orig_text.string,
-			(int)compl_orig_text.length, NULL, NULL, NULL, 0,
-			flags | CP_FAST, FALSE, NULL, FUZZY_SCORE_NONE) != OK)
-	return;
+    எனில் (ins_compl_add(compl_orig_text.string,
+			(முழு)compl_orig_text.length, வெற்று, வெற்று, வெற்று, 0,
+			flags | CP_FAST, FALSE, வெற்று, FUZZY_SCORE_NONE) != OK)
+	திரும்பு;
 
     ctrl_x_mode = CTRL_X_EVAL;
 
@@ -4080,20 +4080,20 @@ set_completion(colnr_T startcol, list_T *list)
     compl_cont_status = 0;
 
     compl_curr_match = compl_first_match;
-    int no_select = compl_no_select || compl_longest;
-    if (compl_no_insert || no_select)
+    முழு no_select = compl_no_select || compl_longest;
+    எனில் (compl_no_செருகு || no_select)
     {
 	ins_complete(K_DOWN, FALSE);
-	if (no_select)
+	எனில் (no_select)
 	    // Down/Up has no real effect.
 	    ins_complete(K_UP, FALSE);
     }
-    else
+    இல்லையெனில்
 	ins_complete(Ctrl_N, FALSE);
-    compl_enter_selects = compl_no_insert;
+    compl_enter_selects = compl_no_செருகு;
 
     // Lazily show the popup menu, unless we got interrupted.
-    if (!compl_interrupted)
+    எனில் (!compl_interrupted)
 	show_pum(save_w_wrow, save_w_leftcol);
     may_trigger_modechanged();
     out_flush();
@@ -4102,29 +4102,29 @@ set_completion(colnr_T startcol, list_T *list)
 /*
  * "complete()" function
  */
-    void
+    வெறுமை
 f_complete(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    எனில் (in_vim9script()
+	    && (check_for_எண்_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
-    if ((State & MODE_INSERT) == 0)
+    எனில் ((State & MODE_செருகு) == 0)
     {
-	emsg(_(e_complete_can_only_be_used_in_insert_mode));
-	return;
+	emsg(_(e_complete_can_only_be_used_in_செருகு_mode));
+	திரும்பு;
     }
 
     // Check for undo allowed here, because if something was already inserted
     // the line was already saved for undo and this check isn't done.
-    if (!undo_allowed())
-	return;
+    எனில் (!undo_allowed())
+	திரும்பு;
 
-    if (check_for_nonnull_list_arg(argvars, 1) != FAIL)
+    எனில் (check_for_nonnull_list_arg(argvars, 1) != FAIL)
     {
-	int startcol = (int)tv_get_number_chk(&argvars[0], NULL);
-	if (startcol > 0)
+	முழு startcol = (முழு)tv_get_எண்_chk(&argvars[0], வெற்று);
+	எனில் (startcol > 0)
 	    set_completion(startcol - 1, argvars[1].vval.v_list);
     }
 }
@@ -4132,26 +4132,26 @@ f_complete(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "complete_add()" function
  */
-    void
+    வெறுமை
 f_complete_add(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_or_dict_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_string_or_dict_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
-    rettv->vval.v_number = ins_compl_add_tv(&argvars[0], 0, FALSE);
+    rettv->vval.v_எண் = ins_compl_add_tv(&argvars[0], 0, FALSE);
 }
 
 /*
  * "complete_check()" function
  */
-    void
+    வெறுமை
 f_complete_check(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int save_RedrawingDisabled = RedrawingDisabled;
+    முழு save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
-    ins_compl_check_keys(0, TRUE);
-    rettv->vval.v_number = ins_compl_interrupted();
+    ins_compl_check_சாவிகள்(0, TRUE);
+    rettv->vval.v_எண் = ins_compl_interrupted();
 
     RedrawingDisabled = save_RedrawingDisabled;
 }
@@ -4159,18 +4159,18 @@ f_complete_check(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * Return Insert completion mode name string
  */
-    static void
+    நிலையான வெறுமை
 ins_compl_mode(string_T *ret)
 {
-    if (ctrl_x_mode_not_defined_yet() || ctrl_x_mode_scroll() || compl_started)
+    எனில் (ctrl_x_mode_not_defined_yet() || ctrl_x_mode_scroll() || compl_started)
     {
 	string_T    *mode;
 
 	mode = &ctrl_x_mode_names[ctrl_x_mode & ~CTRL_X_WANT_IDENT];
-	ret->string = (mode->string == NULL) ? (char_u *)"" : mode->string;
+	ret->string = (mode->string == வெற்று) ? (char_u *)"" : mode->string;
 	ret->length = mode->length;
     }
-    else
+    இல்லையெனில்
     {
 	ret->string = (char_u *)"";
 	ret->length = 0;
@@ -4181,52 +4181,52 @@ ins_compl_mode(string_T *ret)
  * Assign the sequence number to all the completion matches which don't have
  * one assigned yet.
  */
-    static void
-ins_compl_update_sequence_numbers(void)
+    நிலையான வெறுமை
+ins_compl_update_sequence_numbers(வெறுமை)
 {
-    int		number = 0;
+    முழு		எண் = 0;
     compl_T	*match;
 
-    if (compl_dir_forward())
+    எனில் (compl_dir_forward())
     {
 	// Search backwards for the first valid (!= -1) number.
 	// This should normally succeed already at the first loop
 	// cycle, so it's fast!
-	for (match = compl_curr_match->cp_prev; match != NULL
+	க்கு (match = compl_curr_match->cp_prev; match != வெற்று
 		&& !is_first_match(match); match = match->cp_prev)
-	    if (match->cp_number != -1)
+	    எனில் (match->cp_எண் != -1)
 	    {
-		number = match->cp_number;
-		break;
+		எண் = match->cp_எண்;
+		நிறுத்து;
 	    }
-	if (match != NULL)
+	எனில் (match != வெற்று)
 	    // go up and assign all numbers which are not assigned yet
-	    for (match = match->cp_next;
-		    match != NULL && match->cp_number == -1;
+	    க்கு (match = match->cp_next;
+		    match != வெற்று && match->cp_எண் == -1;
 					   match = match->cp_next)
-		match->cp_number = ++number;
+		match->cp_எண் = ++எண்;
     }
-    else // BACKWARD
+    இல்லையெனில் // BACKWARD
     {
 	// Search forwards (upwards) for the first valid (!= -1)
 	// number.  This should normally succeed already at the
 	// first loop cycle, so it's fast!
-	for (match = compl_curr_match->cp_next; match != NULL
+	க்கு (match = compl_curr_match->cp_next; match != வெற்று
 		&& !is_first_match(match); match = match->cp_next)
 	{
-	    if (match->cp_number != -1)
+	    எனில் (match->cp_எண் != -1)
 	    {
-		number = match->cp_number;
-		break;
+		எண் = match->cp_எண்;
+		நிறுத்து;
 	    }
 	}
-	if (match != NULL)
+	எனில் (match != வெற்று)
 	{
 	    // go down and assign all numbers which are not assigned yet
-	    for (match = match->cp_prev; match
-		    && match->cp_number == -1;
+	    க்கு (match = match->cp_prev; match
+		    && match->cp_எண் == -1;
 					   match = match->cp_prev)
-		match->cp_number = ++number;
+		match->cp_எண் = ++எண்;
 	}
     }
 }
@@ -4234,164 +4234,164 @@ ins_compl_update_sequence_numbers(void)
 /*
  * Fill the dict of complete_info
  */
-    static void
-fill_complete_info_dict(dict_T *di, compl_T *match, int add_match)
+    நிலையான வெறுமை
+fill_complete_info_dict(dict_T *di, compl_T *match, முழு add_match)
 {
-    dict_add_string_len(di, "word", match->cp_str.string, (int)match->cp_str.length);
+    dict_add_string_len(di, "word", match->cp_str.string, (முழு)match->cp_str.length);
     dict_add_string(di, "abbr", match->cp_text[CPT_ABBR]);
     dict_add_string(di, "menu", match->cp_text[CPT_MENU]);
     dict_add_string(di, "kind", match->cp_text[CPT_KIND]);
     dict_add_string(di, "info", match->cp_text[CPT_INFO]);
     dict_add_string(di, "abbr_hlgroup", syn_id2name(match->cp_user_abbr_hl_id));
     dict_add_string(di, "kind_hlgroup", syn_id2name(match->cp_user_kind_hl_id));
-    if (add_match)
+    எனில் (add_match)
 	dict_add_bool(di, "match", match->cp_in_match_array);
-    if (match->cp_user_data.v_type == VAR_UNKNOWN)
+    எனில் (match->cp_user_data.v_type == VAR_UNKNOWN)
 	// Add an empty string for backwards compatibility
 	dict_add_string_len(di, "user_data", (char_u *)"", 0);
-    else
+    இல்லையெனில்
 	dict_add_tv(di, "user_data", &match->cp_user_data);
 }
 
 /*
  * Get complete information
  */
-    static void
+    நிலையான வெறுமை
 get_complete_info(list_T *what_list, dict_T *retdict)
 {
-    int		ret = OK;
+    முழு		ret = OK;
     listitem_T	*item;
 # define CI_WHAT_MODE		    0x01
 # define CI_WHAT_PUM_VISIBLE	    0x02
-# define CI_WHAT_ITEMS		    0x04
+# define CI_WHAT_பொருட்கள்		    0x04
 # define CI_WHAT_SELECTED	    0x08
 # define CI_WHAT_COMPLETED	    0x10
 # define CI_WHAT_MATCHES	    0x20
 # define CI_WHAT_PREINSERTED_TEXT   0x40
 # define CI_WHAT_AUTO		    0x80
 # define CI_WHAT_ALL		    0xff
-    int		what_flag;
+    முழு		what_flag;
 
-    if (what_list == NULL)
+    எனில் (what_list == வெற்று)
 	what_flag = CI_WHAT_ALL
 	    & ~(CI_WHAT_MATCHES | CI_WHAT_COMPLETED | CI_WHAT_AUTO);
-    else
+    இல்லையெனில்
     {
 	what_flag = 0;
 	CHECK_LIST_MATERIALIZE(what_list);
-	FOR_ALL_LIST_ITEMS(what_list, item)
+	FOR_ALL_LIST_பொருட்கள்(what_list, item)
 	{
 	    char_u *what = tv_get_string(&item->li_tv);
 
-	    if (STRCMP(what, "mode") == 0)
+	    எனில் (STRCMP(what, "mode") == 0)
 		what_flag |= CI_WHAT_MODE;
-	    else if (STRCMP(what, "pum_visible") == 0)
+	    இல்லையெனில் எனில் (STRCMP(what, "pum_visible") == 0)
 		what_flag |= CI_WHAT_PUM_VISIBLE;
-	    else if (STRCMP(what, "items") == 0)
-		what_flag |= CI_WHAT_ITEMS;
-	    else if (STRCMP(what, "selected") == 0)
+	    இல்லையெனில் எனில் (STRCMP(what, "items") == 0)
+		what_flag |= CI_WHAT_பொருட்கள்;
+	    இல்லையெனில் எனில் (STRCMP(what, "selected") == 0)
 		what_flag |= CI_WHAT_SELECTED;
-	    else if (STRCMP(what, "completed") == 0)
+	    இல்லையெனில் எனில் (STRCMP(what, "completed") == 0)
 		what_flag |= CI_WHAT_COMPLETED;
-	    else if (STRCMP(what, "preinserted_text") == 0)
+	    இல்லையெனில் எனில் (STRCMP(what, "preinserted_text") == 0)
 		what_flag |= CI_WHAT_PREINSERTED_TEXT;
-	    else if (STRCMP(what, "matches") == 0)
+	    இல்லையெனில் எனில் (STRCMP(what, "matches") == 0)
 		what_flag |= CI_WHAT_MATCHES;
-	    else if (STRCMP(what, "auto") == 0)
+	    இல்லையெனில் எனில் (STRCMP(what, "auto") == 0)
 		what_flag |= CI_WHAT_AUTO;
 	}
     }
 
-    if (ret == OK && (what_flag & CI_WHAT_MODE))
+    எனில் (ret == OK && (what_flag & CI_WHAT_MODE))
     {
 	string_T    mode;
 
 	ins_compl_mode(&mode);
-	ret = dict_add_string_len(retdict, "mode", mode.string, (int)mode.length);
+	ret = dict_add_string_len(retdict, "mode", mode.string, (முழு)mode.length);
     }
 
-    if (ret == OK && (what_flag & CI_WHAT_PUM_VISIBLE))
-	ret = dict_add_number(retdict, "pum_visible", pum_visible());
+    எனில் (ret == OK && (what_flag & CI_WHAT_PUM_VISIBLE))
+	ret = dict_add_எண்(retdict, "pum_visible", pum_visible());
 
-    if (ret == OK && (what_flag & CI_WHAT_AUTO))
-	ret = dict_add_number(retdict, "auto", compl_autostarted);
+    எனில் (ret == OK && (what_flag & CI_WHAT_AUTO))
+	ret = dict_add_எண்(retdict, "auto", compl_autostarted);
 
-    if (ret == OK && (what_flag & CI_WHAT_PREINSERTED_TEXT))
+    எனில் (ret == OK && (what_flag & CI_WHAT_PREINSERTED_TEXT))
     {
-	char_u	*line = ml_get_curline();
-	int	len = compl_ins_end_col - curwin->w_cursor.col;
+	char_u	*வரி = ml_get_curline();
+	முழு	len = compl_ins_end_col - curwin->w_cursor.col;
 
 	ret = dict_add_string_len(retdict, "preinserted_text",
-		(len > 0) ? line + curwin->w_cursor.col : (char_u *)"", (len > 0) ? len : 0);
+		(len > 0) ? வரி + curwin->w_cursor.col : (char_u *)"", (len > 0) ? len : 0);
     }
 
-    if (ret == OK && (what_flag & (CI_WHAT_ITEMS | CI_WHAT_SELECTED
+    எனில் (ret == OK && (what_flag & (CI_WHAT_பொருட்கள் | CI_WHAT_SELECTED
 				    | CI_WHAT_MATCHES | CI_WHAT_COMPLETED)))
     {
-	list_T	    *li = NULL;
+	list_T	    *li = வெற்று;
 	dict_T	    *di;
 	compl_T     *match;
-	int         selected_idx = -1;
-	int	    has_items = what_flag & CI_WHAT_ITEMS;
-	int	    has_matches = what_flag & CI_WHAT_MATCHES;
-	int	    has_completed = what_flag & CI_WHAT_COMPLETED;
+	முழு         selected_idx = -1;
+	முழு	    has_பொருட்கள் = what_flag & CI_WHAT_பொருட்கள்;
+	முழு	    has_matches = what_flag & CI_WHAT_MATCHES;
+	முழு	    has_completed = what_flag & CI_WHAT_COMPLETED;
 
-	if (has_items || has_matches)
+	எனில் (has_பொருட்கள் || has_matches)
 	{
 	    li = list_alloc();
-	    if (li == NULL)
-		return;
-	    ret = dict_add_list(retdict, (has_matches && !has_items)
+	    எனில் (li == வெற்று)
+		திரும்பு;
+	    ret = dict_add_list(retdict, (has_matches && !has_பொருட்கள்)
 						? "matches" : "items", li);
-	    if (ret == FAIL)
+	    எனில் (ret == FAIL)
 		list_unref(li);
 	}
-	if (ret == OK && what_flag & CI_WHAT_SELECTED)
-	    if (compl_curr_match != NULL && compl_curr_match->cp_number == -1)
+	எனில் (ret == OK && what_flag & CI_WHAT_SELECTED)
+	    எனில் (compl_curr_match != வெற்று && compl_curr_match->cp_எண் == -1)
 		ins_compl_update_sequence_numbers();
-	if (ret == OK && compl_first_match != NULL)
+	எனில் (ret == OK && compl_first_match != வெற்று)
 	{
-	    int list_idx = 0;
+	    முழு list_idx = 0;
 	    match = compl_first_match;
-	    do
+	    செய்
 	    {
-		if (!match_at_original_text(match))
+		எனில் (!match_at_original_text(match))
 		{
-		    if (has_items
+		    எனில் (has_பொருட்கள்
 			    || (has_matches && match->cp_in_match_array))
 		    {
 			di = dict_alloc();
-			if (di == NULL)
-			    return;
+			எனில் (di == வெற்று)
+			    திரும்பு;
 			ret = list_append_dict(li, di);
-			if (ret != OK)
+			எனில் (ret != OK)
 			{
 			    dict_unref(di);
-			    return;
+			    திரும்பு;
 			}
-			fill_complete_info_dict(di, match, has_matches && has_items);
+			fill_complete_info_dict(di, match, has_matches && has_பொருட்கள்);
 		    }
-		    if (compl_curr_match != NULL
-			    && compl_curr_match->cp_number == match->cp_number)
+		    எனில் (compl_curr_match != வெற்று
+			    && compl_curr_match->cp_எண் == match->cp_எண்)
 			selected_idx = list_idx;
-		    if (!has_matches || match->cp_in_match_array)
+		    எனில் (!has_matches || match->cp_in_match_array)
 			list_idx++;
 		}
 		match = match->cp_next;
 	    }
-	    while (match != NULL && !is_first_match(match));
+	    போது (match != வெற்று && !is_first_match(match));
 	}
-	if (ret == OK && (what_flag & CI_WHAT_SELECTED))
-	    ret = dict_add_number(retdict, "selected", selected_idx);
+	எனில் (ret == OK && (what_flag & CI_WHAT_SELECTED))
+	    ret = dict_add_எண்(retdict, "selected", selected_idx);
 
-	if (ret == OK && selected_idx != -1 && has_completed)
+	எனில் (ret == OK && selected_idx != -1 && has_completed)
 	{
 	    di = dict_alloc();
-	    if (di == NULL)
-		return;
+	    எனில் (di == வெற்று)
+		திரும்பு;
 	    fill_complete_info_dict(di, compl_curr_match, FALSE);
 	    ret = dict_add_dict(retdict, "completed", di);
-	    if (ret == FAIL)
+	    எனில் (ret == FAIL)
 		dict_unref(di);
 	}
     }
@@ -4400,21 +4400,21 @@ get_complete_info(list_T *what_list, dict_T *retdict)
 /*
  * "complete_info()" function
  */
-    void
+    வெறுமை
 f_complete_info(typval_T *argvars, typval_T *rettv)
 {
-    list_T	*what_list = NULL;
+    list_T	*what_list = வெற்று;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    எனில் (rettv_dict_alloc(rettv) == FAIL)
+	திரும்பு;
 
-    if (in_vim9script() && check_for_opt_list_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_opt_list_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    எனில் (argvars[0].v_type != VAR_UNKNOWN)
     {
-	if (check_for_list_arg(argvars, 0) == FAIL)
-	    return;
+	எனில் (check_for_list_arg(argvars, 0) == FAIL)
+	    திரும்பு;
 	what_list = argvars[0].vval.v_list;
     }
     get_complete_info(what_list, rettv->vval.v_dict);
@@ -4424,36 +4424,36 @@ f_complete_info(typval_T *argvars, typval_T *rettv)
 /*
  * Returns TRUE when using a user-defined function for thesaurus completion.
  */
-    static int
-thesaurus_func_complete(int type UNUSED)
+    நிலையான முழு
+thesaurus_func_complete(முழு type UNUSED)
 {
 #ifdef FEAT_COMPL_FUNC
-    return type == CTRL_X_THESAURUS
+    திரும்பு type == CTRL_X_THESAURUS
 		&& (*curbuf->b_p_tsrfu != NUL || *p_tsrfu != NUL);
-#else
-    return FALSE;
+#இல்லையெனில்
+    திரும்பு FALSE;
 #endif
 }
 
 /*
  * Check if 'cpt' list index can be advanced to the next completion source.
  */
-    static int
+    நிலையான முழு
 may_advance_cpt_index(char_u *cpt)
 {
     char_u  *p = cpt;
 
-    if (cpt_sources_index == -1)
-	return FALSE;
-    while (*p == ',' || *p == ' ') // Skip delimiters
+    எனில் (cpt_sources_index == -1)
+	திரும்பு FALSE;
+    போது (*p == ',' || *p == ' ') // Skip delimiters
 	p++;
-    return (*p != NUL);
+    திரும்பு (*p != NUL);
 }
 
 /*
  * Return value of process_next_cpt_value()
  */
-enum
+எண்ணிக்கை
 {
     INS_COMPL_CPT_OK = 1,
     INS_COMPL_CPT_CONT,
@@ -4464,19 +4464,19 @@ enum
  * state information used for getting the next set of insert completion
  * matches.
  */
-typedef struct
+வகைவரை கட்டமைப்பு
 {
     char_u	*e_cpt_copy;		// copy of 'complete'
     char_u	*e_cpt;			// current entry in "e_cpt_copy"
     buf_T	*ins_buf;		// buffer being scanned
     pos_T	*cur_match_pos;		// current match position
     pos_T	prev_match_pos;		// previous match position
-    int		set_match_pos;		// save first_match_pos/last_match_pos
+    முழு		set_match_pos;		// save first_match_pos/last_match_pos
     pos_T	first_match_pos;	// first match position
     pos_T	last_match_pos;		// last match position
-    int		found_all;		// found all matches of a certain type.
+    முழு		found_all;		// found all matches of a certain type.
     char_u	*dict;			// dictionary file to search
-    int		dict_f;			// "dict" is an exact file name or not
+    முழு		dict_f;			// "dict" is an exact file name or not
     callback_T	*func_cb;		// callback of function in 'cpt' option
 } ins_compl_next_state_T;
 
@@ -4500,37 +4500,37 @@ typedef struct
  * the "st->e_cpt" option value and process the next matching source.
  * Returns INS_COMPL_CPT_END if all the values in "st->e_cpt" are processed.
  */
-    static int
-process_next_cpt_value(
+    நிலையான முழு
+process_next_cpt_மதிப்பு(
 	ins_compl_next_state_T *st,
-	int		*compl_type_arg,
+	முழு		*compl_type_arg,
 	pos_T		*start_match_pos,
-	int		fuzzy_collect,
-	int		*advance_cpt_idx)
+	முழு		fuzzy_collect,
+	முழு		*advance_cpt_idx)
 {
-    int	    compl_type = -1;
-    int	    status = INS_COMPL_CPT_OK;
-    int	    skip_source = compl_autocomplete && compl_from_nonkeyword;
+    முழு	    compl_type = -1;
+    முழு	    status = INS_COMPL_CPT_OK;
+    முழு	    skip_source = compl_autocomplete && compl_from_nonkeyword;
 
     st->found_all = FALSE;
     *advance_cpt_idx = FALSE;
 
-    while (*st->e_cpt == ',' || *st->e_cpt == ' ')
+    போது (*st->e_cpt == ',' || *st->e_cpt == ' ')
 	st->e_cpt++;
 
-    if (*st->e_cpt == '.' && !curbuf->b_scanned && !skip_source
+    எனில் (*st->e_cpt == '.' && !curbuf->b_scanned && !skip_source
 	    && !compl_time_slice_expired)
     {
 	st->ins_buf = curbuf;
 	st->first_match_pos = *start_match_pos;
 	// Move the cursor back one character so that ^N can match the
 	// word immediately after the cursor.
-	if (ctrl_x_mode_normal() && (!fuzzy_collect && dec(&st->first_match_pos) < 0))
+	எனில் (ctrl_x_mode_normal() && (!fuzzy_collect && dec(&st->first_match_pos) < 0))
 	{
 	    // Move the cursor to after the last character in the
 	    // buffer, so that word at start of buffer is found
 	    // correctly.
-	    st->first_match_pos.lnum = st->ins_buf->b_ml.ml_line_count;
+	    st->first_match_pos.lnum = st->ins_buf->b_ml.ml_வரி_மொத்தம்;
 	    st->first_match_pos.col = ml_get_len(st->first_match_pos.lnum);
 	}
 	st->last_match_pos = st->first_match_pos;
@@ -4540,105 +4540,105 @@ process_next_cpt_value(
 	// wrap and come back there a second time.
 	st->set_match_pos = TRUE;
     }
-    else if (!skip_source && !compl_time_slice_expired
-	    && vim_strchr((char_u *)"buwU", *st->e_cpt) != NULL
+    இல்லையெனில் எனில் (!skip_source && !compl_time_slice_expired
+	    && vim_strchr((char_u *)"buwU", *st->e_cpt) != வெற்று
 	    && (st->ins_buf = ins_compl_next_buf(
 					   st->ins_buf, *st->e_cpt)) != curbuf)
     {
 	// Scan a buffer, but not the current one.
-	if (st->ins_buf->b_ml.ml_mfp != NULL)   // loaded buffer
+	எனில் (st->ins_buf->b_ml.ml_mfp != வெற்று)   // loaded buffer
 	{
 	    compl_started = TRUE;
 	    st->first_match_pos.col = st->last_match_pos.col = 0;
-	    st->first_match_pos.lnum = st->ins_buf->b_ml.ml_line_count + 1;
+	    st->first_match_pos.lnum = st->ins_buf->b_ml.ml_வரி_மொத்தம் + 1;
 	    st->last_match_pos.lnum = 0;
 	    compl_type = 0;
 	}
-	else	// unloaded buffer, scan like dictionary
+	இல்லையெனில்	// unloaded buffer, scan like dictionary
 	{
 	    st->found_all = TRUE;
-	    if (st->ins_buf->b_fname == NULL)
+	    எனில் (st->ins_buf->b_fname == வெற்று)
 	    {
 		status = INS_COMPL_CPT_CONT;
-		goto done;
+		செல் done;
 	    }
 	    compl_type = CTRL_X_DICTIONARY;
 	    st->dict = st->ins_buf->b_fname;
 	    st->dict_f = DICT_EXACT;
 	}
-	if (!shortmess(SHM_COMPLETIONSCAN) && !compl_autocomplete)
+	எனில் (!shortmess(SHM_COMPLETIONSCAN) && !compl_autocomplete)
 	{
-	    msg_hist_off = TRUE;	// reset in msg_trunc_attr()
-	    vim_snprintf((char *)IObuff, IOSIZE, _("Scanning: %s"),
-		    st->ins_buf->b_fname == NULL
+	    செய்தி_hist_off = TRUE;	// reset in msg_trunc_attr()
+	    vim_snprintf((எழுத்து *)IObuff, IOSIZE, _("Scanning: %s"),
+		    st->ins_buf->b_fname == வெற்று
 			? buf_spname(st->ins_buf)
-			: st->ins_buf->b_sfname == NULL
+			: st->ins_buf->b_sfname == வெற்று
 			    ? st->ins_buf->b_fname
 			    : st->ins_buf->b_sfname);
-	    (void)msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+	    (வெறுமை)செய்தி_trunc_attr((எழுத்து *)IObuff, TRUE, HL_ATTR(HLF_R));
 	}
     }
-    else if (*st->e_cpt == NUL)
+    இல்லையெனில் எனில் (*st->e_cpt == NUL)
 	status = INS_COMPL_CPT_END;
-    else
+    இல்லையெனில்
     {
-	if (ctrl_x_mode_line_or_eval())
+	எனில் (ctrl_x_mode_வரி_or_eval())
 	    compl_type = -1;
 #ifdef FEAT_COMPL_FUNC
-	else if (*st->e_cpt == 'F' || *st->e_cpt == 'o')
+	இல்லையெனில் எனில் (*st->e_cpt == 'F' || *st->e_cpt == 'o')
 	{
 	    compl_type = CTRL_X_FUNCTION;
 	    st->func_cb = get_callback_if_cpt_func(st->e_cpt, cpt_sources_index);
-	    if (!st->func_cb)
+	    எனில் (!st->func_cb)
 		compl_type = -1;
 	}
 #endif
-	else if (!skip_source)
+	இல்லையெனில் எனில் (!skip_source)
 	{
-	    if (*st->e_cpt == 'k' || *st->e_cpt == 's')
+	    எனில் (*st->e_cpt == 'k' || *st->e_cpt == 's')
 	    {
-		if (*st->e_cpt == 'k')
+		எனில் (*st->e_cpt == 'k')
 		    compl_type = CTRL_X_DICTIONARY;
-		else
+		இல்லையெனில்
 		    compl_type = CTRL_X_THESAURUS;
-		if (*++st->e_cpt != ',' && *st->e_cpt != NUL)
+		எனில் (*++st->e_cpt != ',' && *st->e_cpt != NUL)
 		{
 		    st->dict = st->e_cpt;
 		    st->dict_f = DICT_FIRST;
 		}
 	    }
 #ifdef FEAT_FIND_ID
-	    else if (*st->e_cpt == 'i')
+	    இல்லையெனில் எனில் (*st->e_cpt == 'i')
 		compl_type = CTRL_X_PATH_PATTERNS;
-	    else if (*st->e_cpt == 'd')
+	    இல்லையெனில் எனில் (*st->e_cpt == 'd')
 		compl_type = CTRL_X_PATH_DEFINES;
 #endif
-	    else if (*st->e_cpt == ']' || *st->e_cpt == 't')
+	    இல்லையெனில் எனில் (*st->e_cpt == ']' || *st->e_cpt == 't')
 	    {
 		compl_type = CTRL_X_TAGS;
-		if (!shortmess(SHM_COMPLETIONSCAN) && !compl_autocomplete)
+		எனில் (!shortmess(SHM_COMPLETIONSCAN) && !compl_autocomplete)
 		{
-		    msg_hist_off = TRUE;	// reset in msg_trunc_attr()
-		    vim_snprintf((char *)IObuff, IOSIZE, _("Scanning tags."));
-		    (void)msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+		    செய்தி_hist_off = TRUE;	// reset in msg_trunc_attr()
+		    vim_snprintf((எழுத்து *)IObuff, IOSIZE, _("Scanning tags."));
+		    (வெறுமை)செய்தி_trunc_attr((எழுத்து *)IObuff, TRUE, HL_ATTR(HLF_R));
 		}
 	    }
-	    else
+	    இல்லையெனில்
 		compl_type = -1;
 	}
 
 	// in any case e_cpt is advanced to the next entry
-	(void)copy_option_part(&st->e_cpt, IObuff, IOSIZE, ",");
+	(வெறுமை)copy_option_part(&st->e_cpt, IObuff, IOSIZE, ",");
 	*advance_cpt_idx = may_advance_cpt_index(st->e_cpt);
 
 	st->found_all = TRUE;
-	if (compl_type == -1)
+	எனில் (compl_type == -1)
 	    status = INS_COMPL_CPT_CONT;
     }
 
 done:
     *compl_type_arg = compl_type;
-    return status;
+    திரும்பு status;
 }
 
 #ifdef FEAT_FIND_ID
@@ -4646,11 +4646,11 @@ done:
  * Get the next set of identifiers or defines matching "compl_pattern" in
  * included files.
  */
-    static void
-get_next_include_file_completion(int compl_type)
+    நிலையான வெறுமை
+get_next_include_file_completion(முழு compl_type)
 {
     find_pattern_in_path(compl_pattern.string, compl_direction,
-	    (int)compl_pattern.length, FALSE, FALSE,
+	    (முழு)compl_pattern.length, FALSE, FALSE,
 	    (compl_type == CTRL_X_PATH_DEFINES
 	     && !(compl_cont_status & CONT_SOL))
 	    ? FIND_DEFINE : FIND_ANY, 1L, ACTION_EXPAND,
@@ -4662,33 +4662,33 @@ get_next_include_file_completion(int compl_type)
  * Get the next set of words matching "compl_pattern" in dictionary or
  * thesaurus files.
  */
-    static void
-get_next_dict_tsr_completion(int compl_type, char_u *dict, int dict_f)
+    நிலையான வெறுமை
+get_next_dict_tsr_completion(முழு compl_type, char_u *dict, முழு dict_f)
 {
 #ifdef FEAT_COMPL_FUNC
-    if (thesaurus_func_complete(compl_type))
-	expand_by_function(compl_type, compl_pattern.string, NULL);
-    else
+    எனில் (thesaurus_func_complete(compl_type))
+	expand_by_function(compl_type, compl_pattern.string, வெற்று);
+    இல்லையெனில்
 #endif
 	ins_compl_dictionaries(
-		dict != NULL ? dict
+		dict != வெற்று ? dict
 		: (compl_type == CTRL_X_THESAURUS
 		    ? (*curbuf->b_p_tsr == NUL ? p_tsr : curbuf->b_p_tsr)
 		    : (*curbuf->b_p_dict == NUL ? p_dict : curbuf->b_p_dict)),
 		compl_pattern.string,
-		dict != NULL ? dict_f : 0,
+		dict != வெற்று ? dict_f : 0,
 		compl_type == CTRL_X_THESAURUS);
 }
 
 /*
  * Get the next set of tag names matching "compl_pattern".
  */
-    static void
-get_next_tag_completion(void)
+    நிலையான வெறுமை
+get_next_tag_completion(வெறுமை)
 {
-    int		save_p_ic;
+    முழு		save_p_ic;
     char_u	**matches;
-    int		num_matches;
+    முழு		இலக்கம்_matches;
 
     // set p_ic according to p_ic, p_scs and pat for find_tags().
     save_p_ic = p_ic;
@@ -4697,11 +4697,11 @@ get_next_tag_completion(void)
     // Find up to TAG_MANY matches.  Avoids that an enormous number
     // of matches is found when compl_pattern is empty
     g_tag_at_cursor = TRUE;
-    if (find_tags(compl_pattern.string, &num_matches, &matches,
+    எனில் (find_tags(compl_pattern.string, &இலக்கம்_matches, &matches,
 		TAG_REGEXP | TAG_NAMES | TAG_NOIC | TAG_INS_COMP
 		| (ctrl_x_mode_not_default() ? TAG_VERBOSE : 0),
-		TAG_MANY, curbuf->b_ffname) == OK && num_matches > 0)
-	ins_compl_add_matches(num_matches, matches, p_ic);
+		TAG_MANY, curbuf->b_ffname) == OK && இலக்கம்_matches > 0)
+	ins_compl_add_matches(இலக்கம்_matches, matches, p_ic);
     g_tag_at_cursor = FALSE;
     p_ic = save_p_ic;
 }
@@ -4709,25 +4709,25 @@ get_next_tag_completion(void)
 /*
  * Compare function for qsort
  */
-    static int
-compare_scores(const void *a, const void *b)
+    நிலையான முழு
+compare_scores(மாறிலி வெறுமை *a, மாறிலி வெறுமை *b)
 {
-    int idx_a = *(const int *)a;
-    int idx_b = *(const int *)b;
-    int score_a = compl_fuzzy_scores[idx_a];
-    int score_b = compl_fuzzy_scores[idx_b];
-    return score_a == score_b ? (idx_a == idx_b ? 0 : (idx_a < idx_b ? -1 : 1))
+    முழு idx_a = *(மாறிலி முழு *)a;
+    முழு idx_b = *(மாறிலி முழு *)b;
+    முழு score_a = compl_fuzzy_scores[idx_a];
+    முழு score_b = compl_fuzzy_scores[idx_b];
+    திரும்பு score_a == score_b ? (idx_a == idx_b ? 0 : (idx_a < idx_b ? -1 : 1))
 			: (score_a > score_b ? -1 : 1);
 }
 
 /*
  * insert prefix with redraw
  */
-    static void
-ins_compl_longest_insert(char_u *prefix)
+    நிலையான வெறுமை
+ins_compl_longest_செருகு(char_u *prefix)
 {
     ins_compl_delete();
-    ins_compl_insert_bytes(prefix + get_compl_len(), -1);
+    ins_compl_செருகு_bytes(prefix + get_compl_len(), -1);
     compl_longest_end_col = curwin->w_cursor.col;
     ins_redraw(FALSE);
 }
@@ -4736,49 +4736,49 @@ ins_compl_longest_insert(char_u *prefix)
  * Calculate the longest common prefix among the best fuzzy matches
  * stored in compl_best_matches, and insert it as the longest.
  */
-    static void
-fuzzy_longest_match(void)
+    நிலையான வெறுமை
+fuzzy_longest_match(வெறுமை)
 {
-    char_u	*prefix = NULL;
-    int		prefix_len = 0;
-    int		i = 0;
-    int		j = 0;
-    char_u	*match_str = NULL;
-    char_u	*prefix_ptr = NULL;
-    char_u	*match_ptr = NULL;
-    char_u	*leader = NULL;
+    char_u	*prefix = வெற்று;
+    முழு		prefix_len = 0;
+    முழு		i = 0;
+    முழு		j = 0;
+    char_u	*match_str = வெற்று;
+    char_u	*prefix_ptr = வெற்று;
+    char_u	*match_ptr = வெற்று;
+    char_u	*leader = வெற்று;
     size_t	leader_len = 0;
-    compl_T	*compl = NULL;
-    int		more_candidates = FALSE;
-    compl_T	*nn_compl = NULL;
+    compl_T	*compl = வெற்று;
+    முழு		more_candidates = FALSE;
+    compl_T	*nn_compl = வெற்று;
 
-    if (compl_num_bests == 0)
-	return;
+    எனில் (compl_இலக்கம்_bests == 0)
+	திரும்பு;
 
     nn_compl = compl_first_match->cp_next->cp_next;
-    if (nn_compl && nn_compl != compl_first_match)
+    எனில் (nn_compl && nn_compl != compl_first_match)
 	more_candidates = TRUE;
 
-    compl = ctrl_x_mode_whole_line() ? compl_first_match
+    compl = ctrl_x_mode_whole_வரி() ? compl_first_match
 				    : compl_first_match->cp_next;
-    if (compl_num_bests == 1)
+    எனில் (compl_இலக்கம்_bests == 1)
     {
 	// no more candidates insert the match str
-	if (!more_candidates)
+	எனில் (!more_candidates)
 	{
-	    ins_compl_longest_insert(compl->cp_str.string);
-	    compl_num_bests = 0;
+	    ins_compl_longest_செருகு(compl->cp_str.string);
+	    compl_இலக்கம்_bests = 0;
 	}
-	compl_num_bests = 0;
-	return;
+	compl_இலக்கம்_bests = 0;
+	திரும்பு;
     }
 
-    if ((size_t)compl_num_bests > SIZE_MAX / sizeof(compl_T *))
-	return;
-    compl_best_matches = (compl_T **)alloc(compl_num_bests * sizeof(compl_T *));
-    if (compl_best_matches == NULL)
-	return;
-    while (compl != NULL && i < compl_num_bests)
+    எனில் ((size_t)compl_இலக்கம்_bests > SIZE_MAX / அளவு(compl_T *))
+	திரும்பு;
+    compl_best_matches = (compl_T **)alloc(compl_இலக்கம்_bests * அளவு(compl_T *));
+    எனில் (compl_best_matches == வெற்று)
+	திரும்பு;
+    போது (compl != வெற்று && i < compl_இலக்கம்_bests)
     {
 	compl_best_matches[i] = compl;
 	compl = compl->cp_next;
@@ -4786,26 +4786,26 @@ fuzzy_longest_match(void)
     }
 
     prefix = compl_best_matches[0]->cp_str.string;
-    prefix_len = (int)compl_best_matches[0]->cp_str.length;
+    prefix_len = (முழு)compl_best_matches[0]->cp_str.length;
 
-    for (i = 1; i < compl_num_bests; i++)
+    க்கு (i = 1; i < compl_இலக்கம்_bests; i++)
     {
 	match_str = compl_best_matches[i]->cp_str.string;
 	prefix_ptr = prefix;
 	match_ptr = match_str;
 	j = 0;
 
-	while (j < prefix_len && *match_ptr != NUL && *prefix_ptr != NUL)
+	போது (j < prefix_len && *match_ptr != NUL && *prefix_ptr != NUL)
 	{
-	    if (STRNCMP(prefix_ptr, match_ptr, mb_ptr2len(prefix_ptr)) != 0)
-		break;
+	    எனில் (STRNCMP(prefix_ptr, match_ptr, mb_ptr2len(prefix_ptr)) != 0)
+		நிறுத்து;
 
 	    MB_PTR_ADV(prefix_ptr);
 	    MB_PTR_ADV(match_ptr);
 	    j++;
 	}
 
-	if (j > 0)
+	எனில் (j > 0)
 	    prefix_len = j;
     }
 
@@ -4813,94 +4813,94 @@ fuzzy_longest_match(void)
     leader_len = ins_compl_leader_len();
 
     // skip non-consecutive prefixes
-    if (leader_len > 0 && STRNCMP(prefix, leader, leader_len) != 0)
-	goto end;
+    எனில் (leader_len > 0 && STRNCMP(prefix, leader, leader_len) != 0)
+	செல் end;
 
     prefix = vim_strnsave(prefix, prefix_len);
-    if (prefix != NULL)
+    எனில் (prefix != வெற்று)
     {
-	ins_compl_longest_insert(prefix);
+	ins_compl_longest_செருகு(prefix);
 	vim_free(prefix);
     }
 
 end:
     vim_free(compl_best_matches);
-    compl_best_matches = NULL;
-    compl_num_bests = 0;
+    compl_best_matches = வெற்று;
+    compl_இலக்கம்_bests = 0;
 }
 
 /*
  * Get the next set of filename matching "compl_pattern".
  */
-    static void
-get_next_filename_completion(void)
+    நிலையான வெறுமை
+get_next_filename_completion(வெறுமை)
 {
     char_u	**matches;
-    int		num_matches;
+    முழு		இலக்கம்_matches;
     char_u	*ptr;
     garray_T	fuzzy_indices;
-    int		i;
-    int		score;
+    முழு		i;
+    முழு		score;
     char_u	*leader = ins_compl_leader();
     size_t	leader_len = ins_compl_leader_len();
-    int		in_fuzzy_collect = (cot_fuzzy() && leader_len > 0);
-    int		*fuzzy_indices_data;
-    char_u	*last_sep = NULL;
-    int		need_collect_bests = in_fuzzy_collect && compl_get_longest;
-    int		max_score = 0;
-    int		current_score = 0;
-    int		dir = compl_direction;
+    முழு		in_fuzzy_collect = (cot_fuzzy() && leader_len > 0);
+    முழு		*fuzzy_indices_data;
+    char_u	*last_sep = வெற்று;
+    முழு		need_collect_bests = in_fuzzy_collect && compl_get_longest;
+    முழு		max_score = 0;
+    முழு		current_score = 0;
+    முழு		dir = compl_direction;
 
 #ifdef BACKSLASH_IN_FILENAME
-    char pathsep = (curbuf->b_p_csl[0] == 's') ?
+    எழுத்து pathsep = (curbuf->b_p_csl[0] == 's') ?
 	'/' : (curbuf->b_p_csl[0] == 'b') ? '\\' : PATHSEP;
-#else
-    char pathsep = PATHSEP;
+#இல்லையெனில்
+    எழுத்து pathsep = PATHSEP;
 #endif
 
-    if (in_fuzzy_collect)
+    எனில் (in_fuzzy_collect)
     {
 #ifdef BACKSLASH_IN_FILENAME
-	if (curbuf->b_p_csl[0] == 's')
+	எனில் (curbuf->b_p_csl[0] == 's')
 	{
-	    for (i = 0; i < (int)leader_len; i++)
+	    க்கு (i = 0; i < (முழு)leader_len; i++)
 	    {
-		if (leader[i] == '\\')
+		எனில் (leader[i] == '\\')
 		    leader[i] = '/';
 	    }
 	}
-	else if (curbuf->b_p_csl[0] == 'b')
+	இல்லையெனில் எனில் (curbuf->b_p_csl[0] == 'b')
 	{
-	    for (i = 0; i < (int)leader_len; i++)
+	    க்கு (i = 0; i < (முழு)leader_len; i++)
 	    {
-		if (leader[i] == '/')
+		எனில் (leader[i] == '/')
 		    leader[i] = '\\';
 	    }
 	}
 #endif
 	last_sep = vim_strrchr(leader, pathsep);
-	if (last_sep == NULL)
+	எனில் (last_sep == வெற்று)
 	{
 	    // No path separator or separator is the last character,
 	    // fuzzy match the whole leader
 	    VIM_CLEAR_STRING(compl_pattern);
 	    compl_pattern.string = vim_strnsave((char_u *)"*", 1);
-	    if (compl_pattern.string == NULL)
-		return;
+	    எனில் (compl_pattern.string == வெற்று)
+		திரும்பு;
 	    compl_pattern.length = 1;
 	}
-	else if (*(last_sep + 1) == '\0')
+	இல்லையெனில் எனில் (*(last_sep + 1) == '\0')
 	    in_fuzzy_collect = FALSE;
-	else
+	இல்லையெனில்
 	{
 	    // Split leader into path and file parts
-	    int path_len = last_sep - leader + 1;
+	    முழு path_len = last_sep - leader + 1;
 	    char_u  *path_with_wildcard;
 
 	    path_with_wildcard = alloc(path_len + 2);
-	    if (path_with_wildcard != NULL)
+	    எனில் (path_with_wildcard != வெற்று)
 	    {
-		vim_snprintf((char *)path_with_wildcard, path_len + 2, "%*.*s*", path_len, path_len, leader);
+		vim_snprintf((எழுத்து *)path_with_wildcard, path_len + 2, "%*.*s*", path_len, path_len, leader);
 		VIM_CLEAR_STRING(compl_pattern);
 		compl_pattern.string = path_with_wildcard;
 		compl_pattern.length = path_len + 1;
@@ -4912,23 +4912,23 @@ get_next_filename_completion(void)
 	}
     }
 
-    if (expand_wildcards(1, &compl_pattern.string, &num_matches, &matches,
+    எனில் (expand_wildcards(1, &compl_pattern.string, &இலக்கம்_matches, &matches,
 		EW_FILE|EW_DIR|EW_ADDSLASH|EW_SILENT) != OK)
-	return;
+	திரும்பு;
 
     // May change home directory back to "~".
-    tilde_replace(compl_pattern.string, num_matches, matches);
+    tilde_replace(compl_pattern.string, இலக்கம்_matches, matches);
 #ifdef BACKSLASH_IN_FILENAME
-    if (curbuf->b_p_csl[0] != NUL)
+    எனில் (curbuf->b_p_csl[0] != NUL)
     {
-	for (i = 0; i < num_matches; ++i)
+	க்கு (i = 0; i < இலக்கம்_matches; ++i)
 	{
 	    ptr = matches[i];
-	    while (*ptr != NUL)
+	    போது (*ptr != NUL)
 	    {
-		if (curbuf->b_p_csl[0] == 's' && *ptr == '\\')
+		எனில் (curbuf->b_p_csl[0] == 's' && *ptr == '\\')
 		    *ptr = '/';
-		else if (curbuf->b_p_csl[0] == 'b' && *ptr == '/')
+		இல்லையெனில் எனில் (curbuf->b_p_csl[0] == 'b' && *ptr == '/')
 		    *ptr = '\\';
 		ptr += (*mb_ptr2len)(ptr);
 	    }
@@ -4936,20 +4936,20 @@ get_next_filename_completion(void)
     }
 #endif
 
-    if (in_fuzzy_collect)
+    எனில் (in_fuzzy_collect)
     {
-	ga_init2(&fuzzy_indices, sizeof(int), 10);
-	compl_fuzzy_scores = (int *)alloc(sizeof(int) * num_matches);
+	ga_init2(&fuzzy_indices, அளவு(முழு), 10);
+	compl_fuzzy_scores = (முழு *)alloc(அளவு(முழு) * இலக்கம்_matches);
 
-	for (i = 0; i < num_matches; i++)
+	க்கு (i = 0; i < இலக்கம்_matches; i++)
 	{
 	    ptr = matches[i];
 	    score = fuzzy_match_str(ptr, leader);
-	    if (score != FUZZY_SCORE_NONE)
+	    எனில் (score != FUZZY_SCORE_NONE)
 	    {
-		if (ga_grow(&fuzzy_indices, 1) == OK)
+		எனில் (ga_grow(&fuzzy_indices, 1) == OK)
 		{
-		    ((int *)fuzzy_indices.ga_data)[fuzzy_indices.ga_len] = i;
+		    ((முழு *)fuzzy_indices.ga_data)[fuzzy_indices.ga_len] = i;
 		    compl_fuzzy_scores[i] = score;
 		    fuzzy_indices.ga_len++;
 		}
@@ -4957,104 +4957,104 @@ get_next_filename_completion(void)
 	}
 
 	// prevent qsort from deref NULL pointer
-	if (fuzzy_indices.ga_len > 0)
+	எனில் (fuzzy_indices.ga_len > 0)
 	{
-	    char_u	*match = NULL;
-	    fuzzy_indices_data = (int *)fuzzy_indices.ga_data;
-	    qsort(fuzzy_indices_data, fuzzy_indices.ga_len, sizeof(int), compare_scores);
+	    char_u	*match = வெற்று;
+	    fuzzy_indices_data = (முழு *)fuzzy_indices.ga_data;
+	    qsort(fuzzy_indices_data, fuzzy_indices.ga_len, அளவு(முழு), compare_scores);
 
-	    for (i = 0; i < fuzzy_indices.ga_len; ++i)
+	    க்கு (i = 0; i < fuzzy_indices.ga_len; ++i)
 	    {
 		match = matches[fuzzy_indices_data[i]];
 		current_score = compl_fuzzy_scores[fuzzy_indices_data[i]];
-		if (ins_compl_add(match, -1, NULL, NULL, NULL, dir,
+		எனில் (ins_compl_add(match, -1, வெற்று, வெற்று, வெற்று, dir,
 			CP_FAST | ((p_fic || p_wic) ? CP_ICASE : 0),
-			FALSE, NULL, current_score) == OK)
+			FALSE, வெற்று, current_score) == OK)
 		    dir = FORWARD;
 
-		if (need_collect_bests)
+		எனில் (need_collect_bests)
 		{
-		    if (i == 0 || current_score == max_score)
+		    எனில் (i == 0 || current_score == max_score)
 		    {
-			compl_num_bests++;
+			compl_இலக்கம்_bests++;
 			max_score = current_score;
 		    }
 		}
 	    }
 
-	    FreeWild(num_matches, matches);
+	    FreeWild(இலக்கம்_matches, matches);
 	}
-	else if (leader_len > 0)
+	இல்லையெனில் எனில் (leader_len > 0)
 	{
-	    FreeWild(num_matches, matches);
-	    num_matches = 0;
+	    FreeWild(இலக்கம்_matches, matches);
+	    இலக்கம்_matches = 0;
 	}
 
 	vim_free(compl_fuzzy_scores);
 	ga_clear(&fuzzy_indices);
 
-	if (compl_num_bests > 0 && compl_get_longest)
+	எனில் (compl_இலக்கம்_bests > 0 && compl_get_longest)
 	    fuzzy_longest_match();
-	return;
+	திரும்பு;
     }
 
-    if (num_matches > 0)
-	ins_compl_add_matches(num_matches, matches, p_fic || p_wic);
+    எனில் (இலக்கம்_matches > 0)
+	ins_compl_add_matches(இலக்கம்_matches, matches, p_fic || p_wic);
 }
 
 /*
  * Get the next set of command-line completions matching "compl_pattern".
  */
-    static void
-get_next_cmdline_completion(void)
+    நிலையான வெறுமை
+get_next_cmdline_completion(வெறுமை)
 {
     char_u	**matches;
-    int		num_matches;
+    முழு		இலக்கம்_matches;
 
-    if (expand_cmdline(&compl_xp, compl_pattern.string,
-		(int)compl_pattern.length, &num_matches, &matches) == EXPAND_OK)
+    எனில் (expand_cmdline(&compl_xp, compl_pattern.string,
+		(முழு)compl_pattern.length, &இலக்கம்_matches, &matches) == EXPAND_OK)
     {
-	int		add_r = OK;
-	int		dir = compl_direction;
+	முழு		add_r = OK;
+	முழு		dir = compl_direction;
 
-	for (int i = 0; i < num_matches && add_r != FAIL; i++)
+	க்கு (முழு i = 0; i < இலக்கம்_matches && add_r != FAIL; i++)
 	{
-	    char_u	*(cptext[CPT_COUNT]) = {NULL, NULL, NULL, NULL};
+	    char_u	*(cptext[CPT_மொத்தம்]) = {வெற்று, வெற்று, வெற்று, வெற்று};
 
-	    if (compl_xp.xp_files_abbr != NULL)
+	    எனில் (compl_xp.xp_files_abbr != வெற்று)
 		cptext[CPT_ABBR] = compl_xp.xp_files_abbr[i];
-	    if (compl_xp.xp_files_kind != NULL)
+	    எனில் (compl_xp.xp_files_kind != வெற்று)
 		cptext[CPT_KIND] = compl_xp.xp_files_kind[i];
-	    if (compl_xp.xp_files_menu != NULL)
+	    எனில் (compl_xp.xp_files_menu != வெற்று)
 		cptext[CPT_MENU] = compl_xp.xp_files_menu[i];
-	    if (compl_xp.xp_files_info != NULL)
+	    எனில் (compl_xp.xp_files_info != வெற்று)
 		cptext[CPT_INFO] = compl_xp.xp_files_info[i];
 
-	    add_r = ins_compl_add(matches[i], -1, NULL, cptext, NULL, dir,
-		    CP_FAST, FALSE, NULL, FUZZY_SCORE_NONE);
-	    if (add_r == OK)
+	    add_r = ins_compl_add(matches[i], -1, வெற்று, cptext, வெற்று, dir,
+		    CP_FAST, FALSE, வெற்று, FUZZY_SCORE_NONE);
+	    எனில் (add_r == OK)
 		// if dir was BACKWARD then honor it just once
 		dir = FORWARD;
 	}
-	FreeWild(num_matches, matches);
-	free_xp_files_extra(&compl_xp, num_matches);
+	FreeWild(இலக்கம்_matches, matches);
+	free_xp_files_extra(&compl_xp, இலக்கம்_matches);
     }
 }
 
 /*
  * Get the next set of spell suggestions matching "compl_pattern".
  */
-    static void
+    நிலையான வெறுமை
 get_next_spell_completion(linenr_T lnum UNUSED)
 {
 #ifdef FEAT_SPELL
     char_u	**matches;
-    int		num_matches;
+    முழு		இலக்கம்_matches;
 
-    num_matches = expand_spelling(lnum, compl_pattern.string, &matches);
-    if (num_matches > 0)
-	ins_compl_add_matches(num_matches, matches, p_ic);
-    else
+    இலக்கம்_matches = expand_spelling(lnum, compl_pattern.string, &matches);
+    எனில் (இலக்கம்_matches > 0)
+	ins_compl_add_matches(இலக்கம்_matches, matches, p_ic);
+    இல்லையெனில்
 	vim_free(matches);
 #endif
 }
@@ -5063,57 +5063,57 @@ get_next_spell_completion(linenr_T lnum UNUSED)
  * Return the next word or line from buffer "ins_buf" at position
  * "cur_match_pos" for completion.  The length of the match is set in "len".
  */
-    static char_u *
-ins_compl_get_next_word_or_line(
+    நிலையான char_u *
+ins_compl_get_next_word_or_வரி(
 	buf_T	*ins_buf,		// buffer being scanned
 	pos_T	*cur_match_pos,		// current match position
-	int	*match_len,
-	int	*cont_s_ipos)		// next ^X<> will set initial_pos
+	முழு	*match_len,
+	முழு	*cont_s_ipos)		// next ^X<> will set initial_pos
 {
     char_u	*ptr;
-    int		len;
+    முழு		len;
 
     *match_len = 0;
     ptr = ml_get_buf(ins_buf, cur_match_pos->lnum, FALSE) +
 	cur_match_pos->col;
-    len = (int)ml_get_buf_len(ins_buf, cur_match_pos->lnum) - cur_match_pos->col;
-    if (ctrl_x_mode_line_or_eval())
+    len = (முழு)ml_get_buf_len(ins_buf, cur_match_pos->lnum) - cur_match_pos->col;
+    எனில் (ctrl_x_mode_வரி_or_eval())
     {
-	if (compl_status_adding())
+	எனில் (compl_status_adding())
 	{
-	    if (cur_match_pos->lnum >= ins_buf->b_ml.ml_line_count)
-		return NULL;
+	    எனில் (cur_match_pos->lnum >= ins_buf->b_ml.ml_வரி_மொத்தம்)
+		திரும்பு வெற்று;
 	    ptr = ml_get_buf(ins_buf, cur_match_pos->lnum + 1, FALSE);
 	    len = ml_get_buf_len(ins_buf, cur_match_pos->lnum + 1);
-	    if (!p_paste)
+	    எனில் (!p_paste)
 	    {
 		char_u	*tmp_ptr = ptr;
 
 		ptr = skipwhite(tmp_ptr);
-		len -= (int)(ptr - tmp_ptr);
+		len -= (முழு)(ptr - tmp_ptr);
 	    }
 	}
     }
-    else
+    இல்லையெனில்
     {
 	char_u	*tmp_ptr = ptr;
 
-	if (compl_status_adding() && compl_length <= len)
+	எனில் (compl_status_adding() && compl_length <= len)
 	{
 	    tmp_ptr += compl_length;
 	    // Skip if already inside a word.
-	    if (vim_iswordp(tmp_ptr))
-		return NULL;
+	    எனில் (vim_iswordp(tmp_ptr))
+		திரும்பு வெற்று;
 	    // Find start of next word.
 	    tmp_ptr = find_word_start(tmp_ptr);
 	}
 	// Find end of this word.
 	tmp_ptr = find_word_end(tmp_ptr);
-	len = (int)(tmp_ptr - ptr);
+	len = (முழு)(tmp_ptr - ptr);
 
-	if (compl_status_adding() && len == compl_length)
+	எனில் (compl_status_adding() && len == compl_length)
 	{
-	    if (cur_match_pos->lnum < ins_buf->b_ml.ml_line_count)
+	    எனில் (cur_match_pos->lnum < ins_buf->b_ml.ml_வரி_மொத்தம்)
 	    {
 		// Try next line, if any. the new word will be
 		// "join" as if the normal command "J" was used.
@@ -5127,38 +5127,38 @@ ins_compl_get_next_word_or_line(
 		tmp_ptr = find_word_start(tmp_ptr);
 		// Find end of next word.
 		tmp_ptr = find_word_end(tmp_ptr);
-		if (tmp_ptr > ptr)
+		எனில் (tmp_ptr > ptr)
 		{
-		    if (*ptr != ')' && IObuff[len - 1] != TAB)
+		    எனில் (*ptr != ')' && IObuff[len - 1] != TAB)
 		    {
-			if (IObuff[len - 1] != ' ')
+			எனில் (IObuff[len - 1] != ' ')
 			    IObuff[len++] = ' ';
 			// IObuf =~ "\k.* ", thus len >= 2
-			if (p_js
+			எனில் (p_js
 				&& (IObuff[len - 2] == '.'
 				    || (vim_strchr(p_cpo, CPO_JOINSP)
-					== NULL
+					== வெற்று
 					&& (IObuff[len - 2] == '?'
 					    || IObuff[len - 2] == '!'))))
 			    IObuff[len++] = ' ';
 		    }
 		    // copy as much as possible of the new word
-		    if (tmp_ptr - ptr >= IOSIZE - len)
+		    எனில் (tmp_ptr - ptr >= IOSIZE - len)
 			tmp_ptr = ptr + IOSIZE - len - 1;
 		    STRNCPY(IObuff + len, ptr, tmp_ptr - ptr);
-		    len += (int)(tmp_ptr - ptr);
+		    len += (முழு)(tmp_ptr - ptr);
 		    *cont_s_ipos = TRUE;
 		}
 		IObuff[len] = NUL;
 		ptr = IObuff;
 	    }
-	    if (len == compl_length)
-		return NULL;
+	    எனில் (len == compl_length)
+		திரும்பு வெற்று;
 	}
     }
 
     *match_len = len;
-    return ptr;
+    திரும்பு ptr;
 }
 
 /*
@@ -5170,24 +5170,24 @@ ins_compl_get_next_word_or_line(
  * "st->last_match_pos".
  * Returns OK if a new next match is found, otherwise returns FAIL.
  */
-    static int
+    நிலையான முழு
 get_next_default_completion(ins_compl_next_state_T *st, pos_T *start_pos)
 {
-    int		found_new_match = FAIL;
-    int		save_p_scs;
-    int		save_p_ws;
-    int		looped_around = FALSE;
-    char_u	*ptr = NULL;
-    int		len = 0;
-    int		in_fuzzy_collect = !compl_status_adding()
+    முழு		found_new_match = FAIL;
+    முழு		save_p_scs;
+    முழு		save_p_ws;
+    முழு		looped_around = FALSE;
+    char_u	*ptr = வெற்று;
+    முழு		len = 0;
+    முழு		in_fuzzy_collect = !compl_status_adding()
 			&& cot_fuzzy() && compl_length > 0;
     char_u	*leader = ins_compl_leader();
-    int		score = FUZZY_SCORE_NONE;
-    int		in_curbuf = st->ins_buf == curbuf;
+    முழு		score = FUZZY_SCORE_NONE;
+    முழு		in_curbuf = st->ins_buf == curbuf;
 
     // If 'infercase' is set, don't use 'smartcase' here
     save_p_scs = p_scs;
-    if (st->ins_buf->b_p_inf)
+    எனில் (st->ins_buf->b_p_inf)
 	p_scs = FALSE;
 
     //	Buffers other than curbuf are scanned from the beginning or the
@@ -5195,34 +5195,34 @@ get_next_default_completion(ins_compl_next_state_T *st, pos_T *start_pos)
     //	buffer is a good idea, on the other hand, we always set
     //	wrapscan for curbuf to avoid missing matches -- Acevedo,Webb
     save_p_ws = p_ws;
-    if (!in_curbuf)
+    எனில் (!in_curbuf)
 	p_ws = FALSE;
-    else if (*st->e_cpt == '.')
+    இல்லையெனில் எனில் (*st->e_cpt == '.')
 	p_ws = TRUE;
     looped_around = FALSE;
-    for (;;)
+    க்கு (;;)
     {
-	int	cont_s_ipos = FALSE;
+	முழு	cont_s_ipos = FALSE;
 
-	++msg_silent;  // Don't want messages for wrapscan.
+	++செய்தி_silent;  // Don't want messages for wrapscan.
 
-	if (in_fuzzy_collect)
+	எனில் (in_fuzzy_collect)
 	{
-	    found_new_match = search_for_fuzzy_match(st->ins_buf,
+	    found_new_match = தேடல்_for_fuzzy_match(st->ins_buf,
 			    st->cur_match_pos, leader, compl_direction,
 			    start_pos, &len, &ptr, &score);
 	}
 	// ctrl_x_mode_line_or_eval() || word-wise search that
 	// has added a word that was at the beginning of the line
-	else if (ctrl_x_mode_whole_line() || ctrl_x_mode_eval() || (compl_cont_status & CONT_SOL))
-	    found_new_match = search_for_exact_line(st->ins_buf,
+	இல்லையெனில் எனில் (ctrl_x_mode_whole_வரி() || ctrl_x_mode_eval() || (compl_cont_status & CONT_SOL))
+	    found_new_match = தேடல்_for_exact_வரி(st->ins_buf,
 			    st->cur_match_pos, compl_direction, compl_pattern.string);
-	else
-	    found_new_match = searchit(NULL, st->ins_buf, st->cur_match_pos,
-				NULL, compl_direction, compl_pattern.string, (int)compl_pattern.length,
-				1L, SEARCH_KEEP + SEARCH_NFMSG, RE_LAST, NULL);
-	--msg_silent;
-	if (!compl_started || st->set_match_pos)
+	இல்லையெனில்
+	    found_new_match = searchit(வெற்று, st->ins_buf, st->cur_match_pos,
+				வெற்று, compl_direction, compl_pattern.string, (முழு)compl_pattern.length,
+				1L, தேடல்_KEEP + தேடல்_NFMSG, RE_LAST, வெற்று);
+	--செய்தி_silent;
+	எனில் (!compl_started || st->set_match_pos)
 	{
 	    // set "compl_started" even on fail
 	    compl_started = TRUE;
@@ -5230,69 +5230,69 @@ get_next_default_completion(ins_compl_next_state_T *st, pos_T *start_pos)
 	    st->last_match_pos = *st->cur_match_pos;
 	    st->set_match_pos = FALSE;
 	}
-	else if (st->first_match_pos.lnum == st->last_match_pos.lnum
+	இல்லையெனில் எனில் (st->first_match_pos.lnum == st->last_match_pos.lnum
 		&& st->first_match_pos.col == st->last_match_pos.col)
 	{
 	    found_new_match = FAIL;
 	}
-	else if (compl_dir_forward()
+	இல்லையெனில் எனில் (compl_dir_forward()
 		&& (st->prev_match_pos.lnum > st->cur_match_pos->lnum
 		    || (st->prev_match_pos.lnum == st->cur_match_pos->lnum
 			&& st->prev_match_pos.col >= st->cur_match_pos->col)))
 	{
-	    if (looped_around)
+	    எனில் (looped_around)
 		found_new_match = FAIL;
-	    else
+	    இல்லையெனில்
 		looped_around = TRUE;
 	}
-	else if (!compl_dir_forward()
+	இல்லையெனில் எனில் (!compl_dir_forward()
 		&& (st->prev_match_pos.lnum < st->cur_match_pos->lnum
 		    || (st->prev_match_pos.lnum == st->cur_match_pos->lnum
 			&& st->prev_match_pos.col <= st->cur_match_pos->col)))
 	{
-	    if (looped_around)
+	    எனில் (looped_around)
 		found_new_match = FAIL;
-	    else
+	    இல்லையெனில்
 		looped_around = TRUE;
 	}
 	st->prev_match_pos = *st->cur_match_pos;
-	if (found_new_match == FAIL)
-	    break;
+	எனில் (found_new_match == FAIL)
+	    நிறுத்து;
 
 	// when ADDING, the text before the cursor matches, skip it
-	if (compl_status_adding() && in_curbuf
+	எனில் (compl_status_adding() && in_curbuf
 		&& start_pos->lnum == st->cur_match_pos->lnum
 		&& start_pos->col  == st->cur_match_pos->col)
-	    continue;
+	    தொடர்;
 
-	if (!in_fuzzy_collect)
-	    ptr = ins_compl_get_next_word_or_line(st->ins_buf,
+	எனில் (!in_fuzzy_collect)
+	    ptr = ins_compl_get_next_word_or_வரி(st->ins_buf,
 		    st->cur_match_pos, &len, &cont_s_ipos);
-	if (ptr == NULL || (ins_compl_has_preinsert()
+	எனில் (ptr == வெற்று || (ins_compl_has_preinsert()
 		    && STRCMP(ptr, ins_compl_leader()) == 0))
-	    continue;
+	    தொடர்;
 
-	if (is_nearest_active() && in_curbuf)
+	எனில் (is_nearest_active() && in_curbuf)
 	{
 	    score = st->cur_match_pos->lnum - curwin->w_cursor.lnum;
-	    if (score < 0)
+	    எனில் (score < 0)
 		score = -score;
 	}
 
-	if (ins_compl_add_infercase(ptr, len, p_ic,
-			in_curbuf ? NULL : st->ins_buf->b_sfname,
+	எனில் (ins_compl_add_infercase(ptr, len, p_ic,
+			in_curbuf ? வெற்று : st->ins_buf->b_sfname,
 			0, cont_s_ipos, score) != NOTDONE)
 	{
-	    if (in_fuzzy_collect && score == compl_first_match->cp_next->cp_score)
-		compl_num_bests++;
+	    எனில் (in_fuzzy_collect && score == compl_first_match->cp_next->cp_score)
+		compl_இலக்கம்_bests++;
 	    found_new_match = OK;
-	    break;
+	    நிறுத்து;
 	}
     }
     p_scs = save_p_scs;
     p_ws = save_p_ws;
 
-    return found_new_match;
+    திரும்பு found_new_match;
 }
 
 #ifdef FEAT_COMPL_FUNC
@@ -5301,28 +5301,28 @@ get_next_default_completion(ins_compl_next_state_T *st, pos_T *start_pos)
  * user-defined function in the 'complete' option.
  * The "idx" parameter is used for indexing callback entries.
  */
-    static callback_T *
-get_callback_if_cpt_func(char_u *p, int idx)
+    நிலையான callback_T *
+get_callback_if_cpt_func(char_u *p, முழு idx)
 {
-    if (*p == 'o')
-	return &curbuf->b_ofu_cb;
+    எனில் (*p == 'o')
+	திரும்பு &curbuf->b_ofu_cb;
 
-    if (*p == 'F')
+    எனில் (*p == 'F')
     {
-	if (*++p != ',' && *p != NUL)
+	எனில் (*++p != ',' && *p != NUL)
 	{
 	    // 'F{func}' case
-	    if (curbuf->b_p_cpt_cb == NULL
-		    || idx < 0 || idx >= curbuf->b_p_cpt_count)
-		return NULL;
-	    return curbuf->b_p_cpt_cb[idx].cb_name != NULL
-		? &curbuf->b_p_cpt_cb[idx] : NULL;
+	    எனில் (curbuf->b_p_cpt_cb == வெற்று
+		    || idx < 0 || idx >= curbuf->b_p_cpt_மொத்தம்)
+		திரும்பு வெற்று;
+	    திரும்பு curbuf->b_p_cpt_cb[idx].cb_name != வெற்று
+		? &curbuf->b_p_cpt_cb[idx] : வெற்று;
 	}
-	else
-	    return &curbuf->b_cfu_cb; // 'cfu'
+	இல்லையெனில்
+	    திரும்பு &curbuf->b_cfu_cb; // 'cfu'
     }
 
-    return NULL;
+    திரும்பு வெற்று;
 }
 #endif
 
@@ -5330,110 +5330,110 @@ get_callback_if_cpt_func(char_u *p, int idx)
  * Get completion matches from register contents.
  * Extracts words from all available registers and adds them to the completion list.
  */
-    static void
-get_register_completion(void)
+    நிலையான வெறுமை
+get_register_completion(வெறுமை)
 {
-    int		dir = compl_direction;
-    yankreg_T	*reg = NULL;
-    void	*reg_ptr = NULL;
-    int		adding_mode = compl_status_adding();
+    முழு		dir = compl_direction;
+    yankreg_T	*reg = வெற்று;
+    வெறுமை	*reg_ptr = வெற்று;
+    முழு		adding_mode = compl_status_adding();
 
-    for (int i = 0; i < NUM_REGISTERS; i++)
+    க்கு (முழு i = 0; i < இலக்கம்_REGISTERS; i++)
     {
-	int regname = 0;
-	if (i == 0)
+	முழு regname = 0;
+	எனில் (i == 0)
 	    regname = '"';    // unnamed register
-	else if (i < 10)
+	இல்லையெனில் எனில் (i < 10)
 	    regname = '0' + i;
-	else if (i == DELETION_REGISTER)
+	இல்லையெனில் எனில் (i == DELETION_REGISTER)
 	    regname = '-';
 #ifdef FEAT_CLIPBOARD
-	else if (i == STAR_REGISTER)
+	இல்லையெனில் எனில் (i == STAR_REGISTER)
 	    regname = '*';
-	else if (i == PLUS_REGISTER)
+	இல்லையெனில் எனில் (i == PLUS_REGISTER)
 	    regname = '+';
 #endif
-	else
+	இல்லையெனில்
 	    regname = 'a' + i - 10;
 
 	// Skip invalid or black hole register
-	if (!valid_yank_reg(regname, FALSE) || regname == '_')
-	    continue;
+	எனில் (!valid_yank_reg(regname, FALSE) || regname == '_')
+	    தொடர்;
 
 	reg_ptr = get_register(regname, FALSE);
-	if (reg_ptr == NULL)
-	    continue;
+	எனில் (reg_ptr == வெற்று)
+	    தொடர்;
 
 	reg = (yankreg_T *)reg_ptr;
 
-	for (int j = 0; j < reg->y_size; j++)
+	க்கு (முழு j = 0; j < reg->y_size; j++)
 	{
 	    char_u *str = reg->y_array[j].string;
-	    if (str == NULL)
-		continue;
+	    எனில் (str == வெற்று)
+		தொடர்;
 
-	    if (adding_mode)
+	    எனில் (adding_mode)
 	    {
-		int str_len = (int)STRLEN(str);
-		if (str_len == 0)
-		    continue;
+		முழு str_len = (முழு)STRLEN(str);
+		எனில் (str_len == 0)
+		    தொடர்;
 
-		if (!compl_orig_text.string
+		எனில் (!compl_orig_text.string
 			|| (p_ic ? STRNICMP(str, compl_orig_text.string,
 					    compl_orig_text.length) == 0
 				: STRNCMP(str, compl_orig_text.string,
 					    compl_orig_text.length) == 0))
 		{
-		    if (ins_compl_add_infercase(str, str_len, p_ic, NULL,
+		    எனில் (ins_compl_add_infercase(str, str_len, p_ic, வெற்று,
 				dir, FALSE, FUZZY_SCORE_NONE) == OK)
 			dir = FORWARD;
 		}
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		// Calculate the safe end of string to avoid null byte issues
 		char_u *str_end = str + STRLEN(str);
 		char_u *p = str;
 
 		// Safely iterate through the string
-		while (p < str_end && *p != NUL)
+		போது (p < str_end && *p != NUL)
 		{
 		    char_u *old_p = p;
 		    p = find_word_start(p);
-		    if (p >= str_end || *p == NUL)
-			break;
+		    எனில் (p >= str_end || *p == NUL)
+			நிறுத்து;
 
 		    char_u *word_end = find_word_end(p);
 
-		    if (word_end <= p)
+		    எனில் (word_end <= p)
 		    {
-			if (has_mbyte)
+			எனில் (has_mbyte)
 			    word_end = p + (*mb_ptr2len)(p);
-			else
+			இல்லையெனில்
 			    word_end = p + 1;
 		    }
 
-		    if (word_end > str_end)
+		    எனில் (word_end > str_end)
 			word_end = str_end;
 
-		    int len = (int)(word_end - p);
-		    if (len > 0 && (!compl_orig_text.string
+		    முழு len = (முழு)(word_end - p);
+		    எனில் (len > 0 && (!compl_orig_text.string
 				|| (p_ic ? STRNICMP(p, compl_orig_text.string,
 						    compl_orig_text.length) == 0
 					: STRNCMP(p, compl_orig_text.string,
 						    compl_orig_text.length) == 0)))
 		    {
-			if (ins_compl_add_infercase(p, len, p_ic, NULL,
+			எனில் (ins_compl_add_infercase(p, len, p_ic, வெற்று,
 				    dir, FALSE, FUZZY_SCORE_NONE) == OK)
 			    dir = FORWARD;
 		    }
 
 		    p = word_end;
 
-		    if (p <= old_p)
+		    எனில் (p <= old_p)
 		    {
 			p = old_p + 1;
-			if (has_mbyte && p < str_end)
+			எனில் (has_mbyte && p < str_end)
 			    p = old_p + (*mb_ptr2len)(old_p);
 		    }
 		}
@@ -5449,171 +5449,171 @@ get_register_completion(void)
  * get the next set of completion matches for "type".
  * Returns TRUE if a new match is found. Otherwise returns FALSE.
  */
-    static int
-get_next_completion_match(int type, ins_compl_next_state_T *st, pos_T *ini)
+    நிலையான முழு
+get_next_completion_match(முழு type, ins_compl_next_state_T *st, pos_T *ini)
 {
-    int	found_new_match = FALSE;
+    முழு	found_new_match = FALSE;
 
-    switch (type)
+    தேர்வு (type)
     {
-	case -1:
-	    break;
+	நிலை -1:
+	    நிறுத்து;
 #ifdef FEAT_FIND_ID
-	case CTRL_X_PATH_PATTERNS:
-	case CTRL_X_PATH_DEFINES:
+	நிலை CTRL_X_PATH_PATTERNS:
+	நிலை CTRL_X_PATH_DEFINES:
 	    get_next_include_file_completion(type);
-	    break;
+	    நிறுத்து;
 #endif
 
-	case CTRL_X_DICTIONARY:
-	case CTRL_X_THESAURUS:
+	நிலை CTRL_X_DICTIONARY:
+	நிலை CTRL_X_THESAURUS:
 	    get_next_dict_tsr_completion(type, st->dict, st->dict_f);
-	    st->dict = NULL;
-	    break;
+	    st->dict = வெற்று;
+	    நிறுத்து;
 
-	case CTRL_X_TAGS:
+	நிலை CTRL_X_TAGS:
 	    get_next_tag_completion();
-	    break;
+	    நிறுத்து;
 
-	case CTRL_X_FILES:
+	நிலை CTRL_X_FILES:
 	    get_next_filename_completion();
-	    break;
+	    நிறுத்து;
 
-	case CTRL_X_CMDLINE:
-	case CTRL_X_CMDLINE_CTRL_X:
+	நிலை CTRL_X_CMDLINE:
+	நிலை CTRL_X_CMDLINE_CTRL_X:
 	    get_next_cmdline_completion();
-	    break;
+	    நிறுத்து;
 
 #ifdef FEAT_COMPL_FUNC
-	case CTRL_X_FUNCTION:
-	    if (ctrl_x_mode_normal())  // Invoked by a func in 'cpt' option
+	நிலை CTRL_X_FUNCTION:
+	    எனில் (ctrl_x_mode_normal())  // Invoked by a func in 'cpt' option
 		get_cpt_func_completion_matches(st->func_cb);
-	    else
-		expand_by_function(type, compl_pattern.string, NULL);
-	    break;
-	case CTRL_X_OMNI:
-	    expand_by_function(type, compl_pattern.string, NULL);
-	    break;
+	    இல்லையெனில்
+		expand_by_function(type, compl_pattern.string, வெற்று);
+	    நிறுத்து;
+	நிலை CTRL_X_OMNI:
+	    expand_by_function(type, compl_pattern.string, வெற்று);
+	    நிறுத்து;
 #endif
 
-	case CTRL_X_SPELL:
+	நிலை CTRL_X_SPELL:
 	    get_next_spell_completion(st->first_match_pos.lnum);
-	    break;
+	    நிறுத்து;
 
-	case CTRL_X_REGISTER:
+	நிலை CTRL_X_REGISTER:
 	    get_register_completion();
-	    break;
+	    நிறுத்து;
 
-	default:	// normal ^P/^N and ^X^L
+	இயல்பு:	// normal ^P/^N and ^X^L
 	    found_new_match = get_next_default_completion(st, ini);
-	    if (found_new_match == FAIL && st->ins_buf == curbuf)
+	    எனில் (found_new_match == FAIL && st->ins_buf == curbuf)
 		st->found_all = TRUE;
     }
 
     // check if compl_curr_match has changed, (e.g. other type of
     // expansion added something)
-    if (type != 0 && compl_curr_match != compl_old_match)
+    எனில் (type != 0 && compl_curr_match != compl_old_match)
 	found_new_match = OK;
 
-    return found_new_match;
+    திரும்பு found_new_match;
 }
 
 /*
  * Strips carets followed by numbers. This suffix typically represents the
  * max_matches setting.
  */
-    static void
+    நிலையான வெறுமை
 strip_caret_numbers_in_place(char_u *str)
 {
-    char_u  *read = str, *write = str, *p;
+    char_u  *பட = str, *லிக = str, *p;
 
-    if (str == NULL)
-	return;
+    எனில் (str == வெற்று)
+	திரும்பு;
 
-    while (*read)
+    போது (*பட)
     {
-	if (*read == '^')
+	எனில் (*பட == '^')
 	{
-	    p = read + 1;
-	    while (vim_isdigit(*p))
+	    p = பட + 1;
+	    போது (vim_isdigit(*p))
 		p++;
-	    if ((*p == ',' || *p == '\0') && p != read + 1)
+	    எனில் ((*p == ',' || *p == '\0') && p != பட + 1)
 	    {
-		read = p;
-		continue;
+		பட = p;
+		தொடர்;
 	    }
-	    else
-		*write++ = *read++;
+	    இல்லையெனில்
+		*லிக++ = *பட++;
 	}
-	else
-	    *write++ = *read++;
+	இல்லையெனில்
+	    *லிக++ = *பட++;
     }
-    *write = '\0';
+    *லிக = '\0';
 }
 
 /*
  * Call functions specified in the 'cpt' option with findstart=1,
  * and retrieve the startcol.
  */
-    static int
-prepare_cpt_compl_funcs(void)
+    நிலையான முழு
+prepare_cpt_compl_funcs(வெறுமை)
 {
 #ifdef FEAT_COMPL_FUNC
     char_u	*cpt;
     char_u	*p;
-    callback_T	*cb = NULL;
-    int		idx = 0;
-    int		startcol;
+    callback_T	*cb = வெற்று;
+    முழு		idx = 0;
+    முழு		startcol;
 
     // Make a copy of 'cpt' in case the buffer gets wiped out
     cpt = vim_strsave(curbuf->b_p_cpt);
-    if (cpt == NULL)
-	return FAIL;
+    எனில் (cpt == வெற்று)
+	திரும்பு FAIL;
     strip_caret_numbers_in_place(cpt);
 
-    for (p = cpt; *p;)
+    க்கு (p = cpt; *p;)
     {
-	while (*p == ',' || *p == ' ') // Skip delimiters
+	போது (*p == ',' || *p == ' ') // Skip delimiters
 	    p++;
-	if (*p == NUL)
-	    break;
+	எனில் (*p == NUL)
+	    நிறுத்து;
 
 	cb = get_callback_if_cpt_func(p, idx);
-	if (cb)
+	எனில் (cb)
 	{
-	    if (get_userdefined_compl_info(curwin->w_cursor.col, cb, &startcol)
+	    எனில் (get_userdefined_compl_info(curwin->w_cursor.col, cb, &startcol)
 		    == FAIL)
 	    {
-		if (startcol == -3)
+		எனில் (startcol == -3)
 		    cpt_sources_array[idx].cs_refresh_always = FALSE;
-		else
+		இல்லையெனில்
 		    startcol = -2;
 	    }
-	    else if (startcol < 0 || startcol > curwin->w_cursor.col)
+	    இல்லையெனில் எனில் (startcol < 0 || startcol > curwin->w_cursor.col)
 		startcol = curwin->w_cursor.col;
 	    cpt_sources_array[idx].cs_startcol = startcol;
 	}
-	else
+	இல்லையெனில்
 	    cpt_sources_array[idx].cs_startcol = -3;
 
-	(void)copy_option_part(&p, IObuff, IOSIZE, ","); // Advance p
+	(வெறுமை)copy_option_part(&p, IObuff, IOSIZE, ","); // Advance p
 	idx++;
     }
 
     vim_free(cpt);
-    return OK;
+    திரும்பு OK;
 #endif
-    return FAIL;
+    திரும்பு FAIL;
 }
 
 /*
  * Start the timer for the current completion source.
  */
-    static void
-compl_source_start_timer(int source_idx UNUSED)
+    நிலையான வெறுமை
+compl_source_start_timer(முழு source_idx UNUSED)
 {
 #ifdef ELAPSED_FUNC
-    if (compl_autocomplete || p_cto > 0)
+    எனில் (compl_autocomplete || p_cto > 0)
     {
 	ELAPSED_INIT(cpt_sources_array[source_idx].compl_start_tv);
 	compl_time_slice_expired = FALSE;
@@ -5624,18 +5624,18 @@ compl_source_start_timer(int source_idx UNUSED)
 /*
  * Safely advance the cpt_sources_index by one.
  */
-    static int
-advance_cpt_sources_index_safe(void)
+    நிலையான முழு
+advance_cpt_sources_index_safe(வெறுமை)
 {
-    if (cpt_sources_index >= 0 && cpt_sources_index < cpt_sources_count - 1)
+    எனில் (cpt_sources_index >= 0 && cpt_sources_index < cpt_sources_மொத்தம் - 1)
     {
 	cpt_sources_index++;
-	return OK;
+	திரும்பு OK;
     }
 #ifdef FEAT_EVAL
     semsg(_(e_list_index_out_of_range_nr), cpt_sources_index);
 #endif
-    return FAIL;
+    திரும்பு FAIL;
 }
 
 /*
@@ -5647,26 +5647,26 @@ advance_cpt_sources_index_safe(void)
  * This may return before finding all the matches.
  * Return the total number of matches or -1 if still unknown -- Acevedo
  */
-    static int
+    நிலையான முழு
 ins_compl_get_exp(pos_T *ini)
 {
-    static ins_compl_next_state_T   st;
-    static int			    st_cleared = FALSE;
-    int		match_count;
-    int		found_new_match;
-    int		type = ctrl_x_mode;
-    int		may_advance_cpt_idx = FALSE;
+    நிலையான ins_compl_next_state_T   st;
+    நிலையான முழு			    st_cleared = FALSE;
+    முழு		match_மொத்தம்;
+    முழு		found_new_match;
+    முழு		type = ctrl_x_mode;
+    முழு		may_advance_cpt_idx = FALSE;
     pos_T	start_pos = *ini;
-    int		normal_mode_strict = FALSE;
+    முழு		normal_mode_strict = FALSE;
     long	compl_timeout_save = 0;
 
-    if (!compl_started)
+    எனில் (!compl_started)
     {
 	buf_T *buf;
 
 	FOR_ALL_BUFFERS(buf)
 	    buf->b_scanned = false;
-	if (!st_cleared)
+	எனில் (!st_cleared)
 	{
 	    CLEAR_FIELD(st);
 	    st_cleared = TRUE;
@@ -5678,30 +5678,30 @@ ins_compl_get_exp(pos_T *ini)
 	st.e_cpt_copy = vim_strsave((compl_cont_status & CONT_LOCAL)
 					    ? (char_u *)"." : curbuf->b_p_cpt);
 	strip_caret_numbers_in_place(st.e_cpt_copy);
-	st.e_cpt = st.e_cpt_copy == NULL ? (char_u *)"" : st.e_cpt_copy;
+	st.e_cpt = st.e_cpt_copy == வெற்று ? (char_u *)"" : st.e_cpt_copy;
 
 	// In large buffers, timeout may miss nearby matches — search above cursor
-#define LOOKBACK_LINE_COUNT	1000
-	if (compl_autocomplete && is_nearest_active())
+#define LOOKBACK_வரி_மொத்தம்	1000
+	எனில் (compl_autocomplete && is_nearest_active())
 	{
-	    start_pos.lnum = MAX(1, start_pos.lnum - LOOKBACK_LINE_COUNT);
+	    start_pos.lnum = MAX(1, start_pos.lnum - LOOKBACK_வரி_மொத்தம்);
 	    start_pos.col = 0;
 	}
 	st.last_match_pos = st.first_match_pos = start_pos;
     }
-    else if (st.ins_buf != curbuf && !buf_valid(st.ins_buf))
+    இல்லையெனில் எனில் (st.ins_buf != curbuf && !buf_valid(st.ins_buf))
 	st.ins_buf = curbuf;  // In case the buffer was wiped out.
 
     compl_old_match = compl_curr_match;	// remember the last current match
     st.cur_match_pos = (compl_dir_forward())
 				    ? &st.last_match_pos : &st.first_match_pos;
 
-    normal_mode_strict = ctrl_x_mode_normal() && !ctrl_x_mode_line_or_eval()
-	&& !(compl_cont_status & CONT_LOCAL) && cpt_sources_array != NULL;
-    if (normal_mode_strict)
+    normal_mode_strict = ctrl_x_mode_normal() && !ctrl_x_mode_வரி_or_eval()
+	&& !(compl_cont_status & CONT_LOCAL) && cpt_sources_array != வெற்று;
+    எனில் (normal_mode_strict)
     {
 	cpt_sources_index = 0;
-	if (compl_autocomplete || p_cto > 0)
+	எனில் (compl_autocomplete || p_cto > 0)
 	{
 	    compl_source_start_timer(0);
 	    compl_time_slice_expired = FALSE;
@@ -5712,7 +5712,7 @@ ins_compl_get_exp(pos_T *ini)
     }
 
     // For ^N/^P loop over all the flags/windows/buffers in 'complete'.
-    for (;;)
+    க்கு (;;)
     {
 	found_new_match = FAIL;
 	st.set_match_pos = FALSE;
@@ -5720,27 +5720,27 @@ ins_compl_get_exp(pos_T *ini)
 	// For ^N/^P pick a new entry from e_cpt if compl_started is off,
 	// or if found_all says this entry is done.  For ^X^L only use the
 	// entries from 'complete' that look in loaded buffers.
-	if ((ctrl_x_mode_normal() || ctrl_x_mode_line_or_eval())
+	எனில் ((ctrl_x_mode_normal() || ctrl_x_mode_வரி_or_eval())
 					&& (!compl_started || st.found_all))
 	{
-	    int status = process_next_cpt_value(&st, &type, &start_pos,
+	    முழு status = process_next_cpt_மதிப்பு(&st, &type, &start_pos,
 		    cot_fuzzy(), &may_advance_cpt_idx);
 
-	    if (status == INS_COMPL_CPT_END)
-		break;
-	    if (status == INS_COMPL_CPT_CONT)
+	    எனில் (status == INS_COMPL_CPT_END)
+		நிறுத்து;
+	    எனில் (status == INS_COMPL_CPT_CONT)
 	    {
-		if (may_advance_cpt_idx)
+		எனில் (may_advance_cpt_idx)
 		{
-		    if (!advance_cpt_sources_index_safe())
-			break;
+		    எனில் (!advance_cpt_sources_index_safe())
+			நிறுத்து;
 		    compl_source_start_timer(cpt_sources_index);
 		}
-		continue;
+		தொடர்;
 	    }
 	}
 
-	if (normal_mode_strict && type == CTRL_X_FUNCTION
+	எனில் (normal_mode_strict && type == CTRL_X_FUNCTION
 		&& (compl_autocomplete || p_cto > 0))
 	{
 	    // LSP servers may sporadically take >1s to respond (e.g., while
@@ -5758,108 +5758,108 @@ ins_compl_get_exp(pos_T *ini)
 
 	// If complete() was called then compl_pattern has been reset.  The
 	// following won't work then, bail out.
-	if (compl_pattern.string == NULL)
-	    break;
+	எனில் (compl_pattern.string == வெற்று)
+	    நிறுத்து;
 
-	if (may_advance_cpt_idx)
+	எனில் (may_advance_cpt_idx)
 	{
-	    if (!advance_cpt_sources_index_safe())
-		break;
+	    எனில் (!advance_cpt_sources_index_safe())
+		நிறுத்து;
 	    compl_source_start_timer(cpt_sources_index);
 	}
 
 	// break the loop for specialized modes (use 'complete' just for the
 	// generic ctrl_x_mode == CTRL_X_NORMAL) or when we've found a new
 	// match
-	if ((ctrl_x_mode_not_default() && !ctrl_x_mode_line_or_eval())
+	எனில் ((ctrl_x_mode_not_default() && !ctrl_x_mode_வரி_or_eval())
 						|| found_new_match != FAIL)
 	{
-	    if (got_int)
-		break;
+	    எனில் (got_int)
+		நிறுத்து;
 	    // Fill the popup menu as soon as possible.
-	    if (type != -1)
-		ins_compl_check_keys(0, FALSE);
+	    எனில் (type != -1)
+		ins_compl_check_சாவிகள்(0, FALSE);
 
-	    if ((ctrl_x_mode_not_default()
-			&& !ctrl_x_mode_line_or_eval()) || compl_interrupted)
-		break;
+	    எனில் ((ctrl_x_mode_not_default()
+			&& !ctrl_x_mode_வரி_or_eval()) || compl_interrupted)
+		நிறுத்து;
 	    compl_started = compl_time_slice_expired ? FALSE : TRUE;
 	}
-	else
+	இல்லையெனில்
 	{
 	    // Mark a buffer scanned when it has been scanned completely
-	    if (buf_valid(st.ins_buf) && (type == 0 || type == CTRL_X_PATH_PATTERNS))
+	    எனில் (buf_valid(st.ins_buf) && (type == 0 || type == CTRL_X_PATH_PATTERNS))
 		st.ins_buf->b_scanned = true;
 
 	    compl_started = FALSE;
 	}
 
 	// Restore the timeout after collecting matches from function source
-	if (normal_mode_strict && type == CTRL_X_FUNCTION
+	எனில் (normal_mode_strict && type == CTRL_X_FUNCTION
 		&& (compl_autocomplete || p_cto > 0))
 	    compl_timeout_ms = compl_timeout_save;
 
 	// For `^P` completion, reset `compl_curr_match` to the head to avoid
 	// mixing matches from different sources.
-	if (!compl_dir_forward())
-	    while (compl_curr_match->cp_prev
+	எனில் (!compl_dir_forward())
+	    போது (compl_curr_match->cp_prev
 		    && !match_at_original_text(compl_curr_match->cp_prev))
 		compl_curr_match = compl_curr_match->cp_prev;
     }
     cpt_sources_index = -1;
     compl_started = TRUE;
 
-    if ((ctrl_x_mode_normal() || ctrl_x_mode_line_or_eval())
+    எனில் ((ctrl_x_mode_normal() || ctrl_x_mode_வரி_or_eval())
 	    && *st.e_cpt == NUL)		// Got to end of 'complete'
 	found_new_match = FAIL;
 
-    match_count = -1;		// total of matches, unknown
-    if (found_new_match == FAIL || (ctrl_x_mode_not_default()
-		&& !ctrl_x_mode_line_or_eval()))
-	match_count = ins_compl_make_cyclic();
+    match_மொத்தம் = -1;		// total of matches, unknown
+    எனில் (found_new_match == FAIL || (ctrl_x_mode_not_default()
+		&& !ctrl_x_mode_வரி_or_eval()))
+	match_மொத்தம் = ins_compl_make_cyclic();
 
-    if (cot_fuzzy() && compl_get_longest && compl_num_bests > 0)
+    எனில் (cot_fuzzy() && compl_get_longest && compl_இலக்கம்_bests > 0)
 	fuzzy_longest_match();
 
-    if (compl_old_match != NULL)
+    எனில் (compl_old_match != வெற்று)
     {
 	// If several matches were added (FORWARD) or the search failed and has
 	// just been made cyclic then we have to move compl_curr_match to the
 	// next or previous entry (if any) -- Acevedo
 	compl_curr_match = compl_dir_forward() ? compl_old_match->cp_next
 						    : compl_old_match->cp_prev;
-	if (compl_curr_match == NULL)
+	எனில் (compl_curr_match == வெற்று)
 	    compl_curr_match = compl_old_match;
     }
     may_trigger_modechanged();
 
-    if (match_count > 0 && !ctrl_x_mode_spell())
+    எனில் (match_மொத்தம் > 0 && !ctrl_x_mode_spell())
     {
-	if (is_nearest_active() && !ins_compl_has_preinsert())
+	எனில் (is_nearest_active() && !ins_compl_has_preinsert())
 	    sort_compl_match_list(cp_compare_nearest);
 
-	if (cot_fuzzy() && ins_compl_leader_len() > 0)
+	எனில் (cot_fuzzy() && ins_compl_leader_len() > 0)
 	    ins_compl_fuzzy_sort();
     }
 
-    return match_count;
+    திரும்பு match_மொத்தம்;
 }
 
 /*
  * Update "compl_shown_match" to the actually shown match, it may differ when
  * "compl_leader" is used to omit some of the matches.
  */
-    static void
-ins_compl_update_shown_match(void)
+    நிலையான வெறுமை
+ins_compl_update_shown_match(வெறுமை)
 {
     string_T	*leader;
 
-    (void)get_leader_for_startcol(NULL, TRUE); // Clear the cache
+    (வெறுமை)get_leader_for_startcol(வெற்று, TRUE); // Clear the cache
     leader = get_leader_for_startcol(compl_shown_match, TRUE);
 
-    while (!ins_compl_equal(compl_shown_match,
-		leader->string, (int)leader->length)
-	    && compl_shown_match->cp_next != NULL
+    போது (!ins_compl_equal(compl_shown_match,
+		leader->string, (முழு)leader->length)
+	    && compl_shown_match->cp_next != வெற்று
 	    && !is_first_match(compl_shown_match->cp_next))
     {
 	compl_shown_match = compl_shown_match->cp_next;
@@ -5868,15 +5868,15 @@ ins_compl_update_shown_match(void)
 
     // If we didn't find it searching forward, and compl_shows_dir is
     // backward, find the last match.
-    if (compl_shows_dir_backward()
+    எனில் (compl_shows_dir_backward()
 	    && !ins_compl_equal(compl_shown_match,
-		leader->string, (int)leader->length)
-	    && (compl_shown_match->cp_next == NULL
+		leader->string, (முழு)leader->length)
+	    && (compl_shown_match->cp_next == வெற்று
 		|| is_first_match(compl_shown_match->cp_next)))
     {
-	while (!ins_compl_equal(compl_shown_match,
-		    leader->string, (int)leader->length)
-		&& compl_shown_match->cp_prev != NULL
+	போது (!ins_compl_equal(compl_shown_match,
+		    leader->string, (முழு)leader->length)
+		&& compl_shown_match->cp_prev != வெற்று
 		&& !is_first_match(compl_shown_match->cp_prev))
 	{
 	    compl_shown_match = compl_shown_match->cp_prev;
@@ -5888,59 +5888,59 @@ ins_compl_update_shown_match(void)
 /*
  * Delete the old text being completed.
  */
-    void
-ins_compl_delete(void)
+    வெறுமை
+ins_compl_delete(வெறுமை)
 {
     // In insert mode: Delete the typed part.
     // In replace mode: Put the old characters back, if any.
-    int col = compl_col + (compl_status_adding() ? compl_length : 0);
-    string_T	remaining = {NULL, 0};
-    int	    orig_col;
+    முழு col = compl_col + (compl_status_adding() ? compl_length : 0);
+    string_T	remaining = {வெற்று, 0};
+    முழு	    orig_col;
 
-    if (ins_compl_preinsert_effect())
+    எனில் (ins_compl_preinsert_effect())
     {
-	col += (int)ins_compl_leader_len();
+	col += (முழு)ins_compl_leader_len();
 	curwin->w_cursor.col = compl_ins_end_col;
     }
 
-    if (curwin->w_cursor.lnum > compl_lnum)
+    எனில் (curwin->w_cursor.lnum > compl_lnum)
     {
-	if (curwin->w_cursor.col < ml_get_curline_len())
+	எனில் (curwin->w_cursor.col < ml_get_curline_len())
 	{
-	    char_u *line = ml_get_cursor();
+	    char_u *வரி = ml_get_cursor();
 	    remaining.length = ml_get_cursor_len();
-	    remaining.string = vim_strnsave(line, remaining.length);
-	    if (remaining.string == NULL)
-		return;
+	    remaining.string = vim_strnsave(வரி, remaining.length);
+	    எனில் (remaining.string == வெற்று)
+		திரும்பு;
 	}
-	while (curwin->w_cursor.lnum > compl_lnum)
+	போது (curwin->w_cursor.lnum > compl_lnum)
 	{
-	    if (ml_delete(curwin->w_cursor.lnum) == FAIL)
+	    எனில் (ml_delete(curwin->w_cursor.lnum) == FAIL)
 	    {
-		if (remaining.string)
+		எனில் (remaining.string)
 		    vim_free(remaining.string);
-		return;
+		திரும்பு;
 	    }
-	    deleted_lines_mark(curwin->w_cursor.lnum, 1L);
+	    deleted_வரிகள்_mark(curwin->w_cursor.lnum, 1L);
 	    curwin->w_cursor.lnum--;
 	}
 	// move cursor to end of line
 	curwin->w_cursor.col = ml_get_curline_len();
     }
 
-    if ((int)curwin->w_cursor.col > col)
+    எனில் ((முழு)curwin->w_cursor.col > col)
     {
-	if (stop_arrow() == FAIL)
+	எனில் (stop_arrow() == FAIL)
 	{
-	    if (remaining.string)
+	    எனில் (remaining.string)
 		vim_free(remaining.string);
-	    return;
+	    திரும்பு;
 	}
 	backspace_until_column(col);
 	compl_ins_end_col = curwin->w_cursor.col;
     }
 
-    if (remaining.string != NULL)
+    எனில் (remaining.string != வெற்று)
     {
 	orig_col = curwin->w_cursor.col;
 	ins_str(remaining.string, remaining.length);
@@ -5960,31 +5960,31 @@ ins_compl_delete(void)
  * Insert a completion string that contains newlines.
  * The string is split and inserted line by line.
  */
-    static void
+    நிலையான வெறுமை
 ins_compl_expand_multiple(char_u *str)
 {
     char_u	*start = str;
     char_u	*curr = str;
-    int		base_indent = get_indent();
+    முழு		base_indent = get_indent();
 
-    while (*curr != NUL)
+    போது (*curr != NUL)
     {
-	if (*curr == '\n')
+	எனில் (*curr == '\n')
 	{
 	    // Insert the text chunk before newline
-	    if (curr > start)
-		ins_char_bytes(start, (int)(curr - start));
+	    எனில் (curr > start)
+		ins_char_bytes(start, (முழு)(curr - start));
 
 	    // Handle newline
-	    open_line(FORWARD, OPENLINE_KEEPTRAIL | OPENLINE_FORCE_INDENT, base_indent, NULL);
+	    open_வரி(FORWARD, OPENLINE_KEEPTRAIL | OPENLINE_FORCE_INDENT, base_indent, வெற்று);
 	    start = curr + 1;
 	}
 	curr++;
     }
 
     // Handle remaining text after last newline (if any)
-    if (curr > start)
-	ins_char_bytes(start, (int)(curr - start));
+    எனில் (curr > start)
+	ins_char_bytes(start, (முழு)(curr - start));
 
     compl_ins_end_col = curwin->w_cursor.col;
 }
@@ -5996,72 +5996,72 @@ ins_compl_expand_multiple(char_u *str)
  * If "curbuf_only" is TRUE, restrict matches to the current buffer
  * ('.' source in 'complete').
  */
-    static char_u *
-find_common_prefix(size_t *prefix_len, int curbuf_only)
+    நிலையான char_u *
+find_common_prefix(size_t *prefix_len, முழு curbuf_only)
 {
     compl_T     *compl;
-    int		*match_count;
-    char_u	*first = NULL;
-    int		len = -1;
-    int		is_cpt_completion = (cpt_sources_array != NULL);
+    முழு		*match_மொத்தம்;
+    char_u	*first = வெற்று;
+    முழு		len = -1;
+    முழு		is_cpt_completion = (cpt_sources_array != வெற்று);
 
-    if (!is_cpt_completion)
-	return NULL;
+    எனில் (!is_cpt_completion)
+	திரும்பு வெற்று;
 
-    match_count = ALLOC_CLEAR_MULT(int, cpt_sources_count);
-    if (match_count == NULL)
-	return NULL;
+    match_மொத்தம் = ALLOC_CLEAR_MULT(முழு, cpt_sources_மொத்தம்);
+    எனில் (match_மொத்தம் == வெற்று)
+	திரும்பு வெற்று;
 
-    (void)get_leader_for_startcol(NULL, TRUE); // Clear the cache
+    (வெறுமை)get_leader_for_startcol(வெற்று, TRUE); // Clear the cache
 
     compl = compl_first_match;
-    do
+    செய்
     {
 	string_T *leader = get_leader_for_startcol(compl, TRUE);
 
 	// Apply 'smartcase' behavior during normal mode
-	if (ctrl_x_mode_normal() && !p_inf && compl_orig_text.string
+	எனில் (ctrl_x_mode_normal() && !p_inf && compl_orig_text.string
 		&& !ignorecase(compl_orig_text.string))
 	    compl->cp_flags &= ~CP_ICASE;
 
-	if (!match_at_original_text(compl)
-		&& (leader->string == NULL
+	எனில் (!match_at_original_text(compl)
+		&& (leader->string == வெற்று
 		    || ins_compl_equal_sc(compl, leader->string,
-			(int)leader->length)))
+			(முழு)leader->length)))
 	{
 	    // Limit number of items from each source if max_items is set.
-	    int match_limit_exceeded = FALSE;
-	    int cur_source = compl->cp_cpt_source_idx;
+	    முழு match_limit_exceeded = FALSE;
+	    முழு cur_source = compl->cp_cpt_source_idx;
 
-	    if (cur_source != -1)
+	    எனில் (cur_source != -1)
 	    {
-		match_count[cur_source]++;
-		int max_matches = cpt_sources_array[cur_source].cs_max_matches;
-		if (max_matches > 0 && match_count[cur_source] > max_matches)
+		match_மொத்தம்[cur_source]++;
+		முழு max_matches = cpt_sources_array[cur_source].cs_max_matches;
+		எனில் (max_matches > 0 && match_மொத்தம்[cur_source] > max_matches)
 		    match_limit_exceeded = TRUE;
 	    }
 
-	    if (!match_limit_exceeded && (!curbuf_only
+	    எனில் (!match_limit_exceeded && (!curbuf_only
 			|| (cur_source != -1
 			    && cpt_sources_array[cur_source].cs_flag == '.')))
 	    {
-		if (first == NULL && STRNCMP(ins_compl_leader(),
+		எனில் (first == வெற்று && STRNCMP(ins_compl_leader(),
 			    compl->cp_str.string, ins_compl_leader_len()) == 0)
 		{
 		    first = compl->cp_str.string;
-		    len = (int)STRLEN(first);
+		    len = (முழு)STRLEN(first);
 		}
-		else if (first != NULL)
+		இல்லையெனில் எனில் (first != வெற்று)
 		{
-		    int j = 0;  // count in bytes
+		    முழு j = 0;  // count in bytes
 		    char_u *s1 = first;
 		    char_u *s2 = compl->cp_str.string;
 
-		    while (j < len && *s1 != NUL && *s2 != NUL)
+		    போது (j < len && *s1 != NUL && *s2 != NUL)
 		    {
-			if (MB_BYTE2LEN(*s1) != MB_BYTE2LEN(*s2)
+			எனில் (MB_BYTE2LEN(*s1) != MB_BYTE2LEN(*s2)
 				|| memcmp(s1, s2, MB_BYTE2LEN(*s1)) != 0)
-			    break;
+			    நிறுத்து;
 
 			j += MB_BYTE2LEN(*s1);
 			MB_PTR_ADV(s1);
@@ -6069,38 +6069,38 @@ find_common_prefix(size_t *prefix_len, int curbuf_only)
 		    }
 		    len = j;
 
-		    if (len == 0)
-			break;
+		    எனில் (len == 0)
+			நிறுத்து;
 		}
 	    }
 	}
 	compl = compl->cp_next;
-    } while (compl != NULL && !is_first_match(compl));
+    } போது (compl != வெற்று && !is_first_match(compl));
 
-    vim_free(match_count);
+    vim_free(match_மொத்தம்);
 
-    if (len > (int)ins_compl_leader_len())
+    எனில் (len > (முழு)ins_compl_leader_len())
     {
 	// Avoid inserting text that duplicates the text already present
 	// after the cursor.
-	if (len == (int)STRLEN(first))
+	எனில் (len == (முழு)STRLEN(first))
 	{
-	    char_u *line = ml_get_curline();
-	    char_u *p = line + curwin->w_cursor.col;
-	    if (p && !IS_WHITE_OR_NUL(*p))
+	    char_u *வரி = ml_get_curline();
+	    char_u *p = வரி + curwin->w_cursor.col;
+	    எனில் (p && !IS_WHITE_OR_NUL(*p))
 	    {
 		char_u *end = find_word_end(p);
-		int text_len = end - p;
-		if (text_len > 0
-			&& text_len < (len - (int)ins_compl_leader_len())
+		முழு text_len = end - p;
+		எனில் (text_len > 0
+			&& text_len < (len - (முழு)ins_compl_leader_len())
 			&& STRNCMP(first + len - text_len, p, text_len) == 0)
 		    len -= text_len;
 	    }
 	}
 	*prefix_len = (size_t)len;
-	return first;
+	திரும்பு first;
     }
-    return NULL;
+    திரும்பு வெற்று;
 }
 
 /*
@@ -6110,23 +6110,23 @@ find_common_prefix(size_t *prefix_len, int curbuf_only)
  * When "insert_prefix" is TRUE the longest common prefix is inserted instead
  * of shown match.
  */
-    void
-ins_compl_insert(int move_cursor, int insert_prefix)
+    வெறுமை
+ins_compl_செருகு(முழு move_cursor, முழு செருகு_prefix)
 {
-    int		compl_len = get_compl_len();
-    int		preinsert = ins_compl_has_preinsert();
+    முழு		compl_len = get_compl_len();
+    முழு		preinsert = ins_compl_has_preinsert();
     char_u	*cp_str = compl_shown_match->cp_str.string;
     size_t	cp_str_len = compl_shown_match->cp_str.length;
     size_t	leader_len = ins_compl_leader_len();
     char_u	*has_multiple = vim_strchr(cp_str, '\n');
 
-    if (insert_prefix)
+    எனில் (செருகு_prefix)
     {
 	cp_str = find_common_prefix(&cp_str_len, FALSE);
-	if (cp_str == NULL)
+	எனில் (cp_str == வெற்று)
 	{
 	    cp_str = find_common_prefix(&cp_str_len, TRUE);
-	    if (cp_str == NULL)
+	    எனில் (cp_str == வெற்று)
 	    {
 		cp_str = compl_shown_match->cp_str.string;
 		cp_str_len = compl_shown_match->cp_str.length;
@@ -6136,16 +6136,16 @@ ins_compl_insert(int move_cursor, int insert_prefix)
     // Since completion sources may provide matches with varying start
     // positions, insert only the portion of the match that corresponds to the
     // intended replacement range.
-    else if (cpt_sources_array != NULL)
+    இல்லையெனில் எனில் (cpt_sources_array != வெற்று)
     {
-	int	cpt_idx = compl_shown_match->cp_cpt_source_idx;
-	if (cpt_idx >= 0 && compl_col >= 0)
+	முழு	cpt_idx = compl_shown_match->cp_cpt_source_idx;
+	எனில் (cpt_idx >= 0 && compl_col >= 0)
 	{
-	    int	startcol = cpt_sources_array[cpt_idx].cs_startcol;
-	    if (startcol >= 0 && startcol < (int)compl_col)
+	    முழு	startcol = cpt_sources_array[cpt_idx].cs_startcol;
+	    எனில் (startcol >= 0 && startcol < (முழு)compl_col)
 	    {
-		int skip = (int)compl_col - startcol;
-		if ((size_t)skip <= cp_str_len)
+		முழு skip = (முழு)compl_col - startcol;
+		எனில் ((size_t)skip <= cp_str_len)
 		{
 		    cp_str_len -= skip;
 		    cp_str += skip;
@@ -6156,22 +6156,22 @@ ins_compl_insert(int move_cursor, int insert_prefix)
 
     // Make sure we don't go over the end of the string, this can happen with
     // illegal bytes.
-    if (compl_len < (int)cp_str_len)
+    எனில் (compl_len < (முழு)cp_str_len)
     {
-	if (has_multiple)
+	எனில் (has_multiple)
 	    ins_compl_expand_multiple(cp_str + compl_len);
-	else
+	இல்லையெனில்
 	{
-	    ins_compl_insert_bytes(cp_str + compl_len,
-		    insert_prefix ? (int)cp_str_len - compl_len : -1);
-	    if ((preinsert || insert_prefix) && move_cursor)
+	    ins_compl_செருகு_bytes(cp_str + compl_len,
+		    செருகு_prefix ? (முழு)cp_str_len - compl_len : -1);
+	    எனில் ((preinsert || செருகு_prefix) && move_cursor)
 		curwin->w_cursor.col -= (colnr_T)(cp_str_len - leader_len);
 	}
     }
-    if (match_at_original_text(compl_shown_match)
-	    || (preinsert && !insert_prefix))
+    எனில் (match_at_original_text(compl_shown_match)
+	    || (preinsert && !செருகு_prefix))
 	compl_used_match = FALSE;
-    else
+    இல்லையெனில்
 	compl_used_match = TRUE;
 #ifdef FEAT_EVAL
     {
@@ -6180,43 +6180,43 @@ ins_compl_insert(int move_cursor, int insert_prefix)
 	set_vim_var_dict(VV_COMPLETED_ITEM, dict);
     }
 #endif
-    compl_hi_on_autocompl_longest = insert_prefix && move_cursor;
+    compl_hi_on_autocompl_longest = செருகு_prefix && move_cursor;
 }
 
 /*
  * show the file name for the completion match (if any).  Truncate the file
  * name to avoid a wait for return.
  */
-    static void
-ins_compl_show_filename(void)
+    நிலையான வெறுமை
+ins_compl_show_filename(வெறுமை)
 {
-    char	*lead = _("match in file");
-    int		space = sc_col - vim_strsize((char_u *)lead) - 2;
+    எழுத்து	*lead = _("match in file");
+    முழு		space = sc_col - vim_strsize((char_u *)lead) - 2;
     char_u	*s;
     char_u	*e;
 
-    if (space <= 0)
-	return;
+    எனில் (space <= 0)
+	திரும்பு;
 
     // We need the tail that fits.  With double-byte encoding going
     // back from the end is very slow, thus go from the start and keep
     // the text that fits in "space" between "s" and "e".
-    for (s = e = compl_shown_match->cp_fname; *e != NUL; MB_PTR_ADV(e))
+    க்கு (s = e = compl_shown_match->cp_fname; *e != NUL; MB_PTR_ADV(e))
     {
 	space -= ptr2cells(e);
-	while (space < 0)
+	போது (space < 0)
 	{
 	    space += ptr2cells(s);
 	    MB_PTR_ADV(s);
 	}
     }
-    if (!compl_autocomplete)
+    எனில் (!compl_autocomplete)
     {
-	msg_hist_off = TRUE;
-	vim_snprintf((char *)IObuff, IOSIZE, "%s %s%s", lead,
+	செய்தி_hist_off = TRUE;
+	vim_snprintf((எழுத்து *)IObuff, IOSIZE, "%s %s%s", lead,
 		s > compl_shown_match->cp_fname ? "<" : "", s);
-	msg((char *)IObuff);
-	msg_hist_off = FALSE;
+	செய்தி((எழுத்து *)IObuff);
+	செய்தி_hist_off = FALSE;
 	redraw_cmdline = FALSE;	    // don't overwrite!
     }
 }
@@ -6227,17 +6227,17 @@ ins_compl_show_filename(void)
  * 'cp_in_match_array' is set, indicating that the match is also present
  * in 'compl_match_array'.
  */
-    static compl_T *
-find_next_match_in_menu(void)
+    நிலையான compl_T *
+find_next_match_in_menu(வெறுமை)
 {
-    int	    is_forward = compl_shows_dir_forward();
+    முழு	    is_forward = compl_shows_dir_forward();
     compl_T *match = compl_shown_match;
 
-    do
+    செய்
 	match = is_forward ? match->cp_next : match->cp_prev;
-    while (match->cp_next && !match->cp_in_match_array
+    போது (match->cp_next && !match->cp_in_match_array
 	    && !match_at_original_text(match));
-    return match;
+    திரும்பு match;
 }
 
 /*
@@ -6253,114 +6253,114 @@ find_next_match_in_menu(void)
  *
  * Returns OK on success and -1 if the number of matches are unknown.
  */
-    static int
+    நிலையான முழு
 find_next_completion_match(
-	int	allow_get_expansion,
-	int	todo,		// repeat completion this many times
-	int	advance,
-	int	*num_matches)
+	முழு	allow_get_expansion,
+	முழு	todo,		// repeat completion this many times
+	முழு	advance,
+	முழு	*இலக்கம்_matches)
 {
-    int		found_end = FALSE;
-    compl_T	*found_compl = NULL;
-    unsigned int cur_cot_flags = get_cot_flags();
-    int		compl_no_select = (cur_cot_flags & COT_NOSELECT) != 0
+    முழு		found_end = FALSE;
+    compl_T	*found_compl = வெற்று;
+    unsigned முழு cur_cot_flags = get_cot_flags();
+    முழு		compl_no_select = (cur_cot_flags & COT_NOSELECT) != 0
 		    || (compl_autocomplete && !ins_compl_has_preinsert());
     string_T	*leader;
 
 
-    while (--todo >= 0)
+    போது (--todo >= 0)
     {
-	if (compl_shows_dir_forward() && compl_shown_match->cp_next != NULL)
+	எனில் (compl_shows_dir_forward() && compl_shown_match->cp_next != வெற்று)
 	{
-	    if (compl_match_array != NULL)
+	    எனில் (compl_match_array != வெற்று)
 		compl_shown_match = find_next_match_in_menu();
-	    else
+	    இல்லையெனில்
 		compl_shown_match = compl_shown_match->cp_next;
-	    found_end = (compl_first_match != NULL
+	    found_end = (compl_first_match != வெற்று
 		    && (is_first_match(compl_shown_match->cp_next)
 			|| is_first_match(compl_shown_match)));
 	}
-	else if (compl_shows_dir_backward()
-		&& compl_shown_match->cp_prev != NULL)
+	இல்லையெனில் எனில் (compl_shows_dir_backward()
+		&& compl_shown_match->cp_prev != வெற்று)
 	{
 	    found_end = is_first_match(compl_shown_match);
-	    if (compl_match_array != NULL)
+	    எனில் (compl_match_array != வெற்று)
 		compl_shown_match = find_next_match_in_menu();
-	    else
+	    இல்லையெனில்
 		compl_shown_match = compl_shown_match->cp_prev;
 	    found_end |= is_first_match(compl_shown_match);
 	}
-	else
+	இல்லையெனில்
 	{
-	    if (!allow_get_expansion)
+	    எனில் (!allow_get_expansion)
 	    {
-		if (advance)
+		எனில் (advance)
 		{
-		    if (compl_shows_dir_backward())
+		    எனில் (compl_shows_dir_backward())
 			compl_pending -= todo + 1;
-		    else
+		    இல்லையெனில்
 			compl_pending += todo + 1;
 		}
-		return -1;
+		திரும்பு -1;
 	    }
 
-	    if (!compl_no_select && advance)
+	    எனில் (!compl_no_select && advance)
 	    {
-		if (compl_shows_dir_backward())
+		எனில் (compl_shows_dir_backward())
 		    --compl_pending;
-		else
+		இல்லையெனில்
 		    ++compl_pending;
 	    }
 
 	    // Find matches.
-	    *num_matches = ins_compl_get_exp(&compl_startpos);
+	    *இலக்கம்_matches = ins_compl_get_exp(&compl_startpos);
 
 	    // handle any pending completions
-	    while (compl_pending != 0 && compl_direction == compl_shows_dir
+	    போது (compl_pending != 0 && compl_direction == compl_shows_dir
 		    && advance)
 	    {
-		if (compl_pending > 0 && compl_shown_match->cp_next != NULL)
+		எனில் (compl_pending > 0 && compl_shown_match->cp_next != வெற்று)
 		{
 		    compl_shown_match = compl_shown_match->cp_next;
 		    --compl_pending;
 		}
-		else if (compl_pending < 0 && compl_shown_match->cp_prev != NULL)
+		இல்லையெனில் எனில் (compl_pending < 0 && compl_shown_match->cp_prev != வெற்று)
 		{
 		    compl_shown_match = compl_shown_match->cp_prev;
 		    ++compl_pending;
 		}
-		else
-		    break;
+		இல்லையெனில்
+		    நிறுத்து;
 	    }
 	    found_end = FALSE;
 	}
 
 	leader = get_leader_for_startcol(compl_shown_match, FALSE);
 
-	if (!match_at_original_text(compl_shown_match)
-		&& leader->string != NULL
+	எனில் (!match_at_original_text(compl_shown_match)
+		&& leader->string != வெற்று
 		&& !ins_compl_equal(compl_shown_match,
-		    leader->string, (int)leader->length)
+		    leader->string, (முழு)leader->length)
 		&& !(cot_fuzzy()
 		    && compl_shown_match->cp_score != FUZZY_SCORE_NONE))
 	    ++todo;
-	else
+	இல்லையெனில்
 	    // Remember a matching item.
 	    found_compl = compl_shown_match;
 
 	// Stop at the end of the list when we found a usable match.
-	if (found_end)
+	எனில் (found_end)
 	{
-	    if (found_compl != NULL)
+	    எனில் (found_compl != வெற்று)
 	    {
 		compl_shown_match = found_compl;
-		break;
+		நிறுத்து;
 	    }
 	    todo = 1;	    // use first usable match after wrapping around
 	}
     }
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -6379,45 +6379,45 @@ find_next_completion_match(
  * "allow_get_expansion" TRUE, which calls ins_compl_get_exp(), which in turn
  * calls this function with "allow_get_expansion" FALSE.
  */
-    static int
+    நிலையான முழு
 ins_compl_next(
-    int	    allow_get_expansion,
-    int	    count,		// repeat completion this many times; should
+    முழு	    allow_get_expansion,
+    முழு	    மொத்தம்,		// repeat completion this many times; should
 				// be at least 1
-    int	    insert_match)	// Insert the newly selected match
+    முழு	    செருகு_match)	// Insert the newly selected match
 {
-    int	    num_matches = -1;
-    int	    todo = count;
-    int	    advance;
-    int	    started = compl_started;
+    முழு	    இலக்கம்_matches = -1;
+    முழு	    todo = மொத்தம்;
+    முழு	    advance;
+    முழு	    started = compl_started;
     buf_T   *orig_curbuf = curbuf;
-    unsigned int cur_cot_flags = get_cot_flags();
-    int	    compl_no_insert = (cur_cot_flags & COT_NOINSERT) != 0
+    unsigned முழு cur_cot_flags = get_cot_flags();
+    முழு	    compl_no_செருகு = (cur_cot_flags & COT_NOINSERT) != 0
 		    || (compl_autocomplete && !ins_compl_has_preinsert());
-    int	    compl_preinsert = ins_compl_has_preinsert();
+    முழு	    compl_preinsert = ins_compl_has_preinsert();
 
     // When user complete function return -1 for findstart which is next
     // time of 'always', compl_shown_match become NULL.
-    if (compl_shown_match == NULL)
-	return -1;
+    எனில் (compl_shown_match == வெற்று)
+	திரும்பு -1;
 
-    if (compl_leader.string != NULL
+    எனில் (compl_leader.string != வெற்று
 	    && !match_at_original_text(compl_shown_match)
 	    && !cot_fuzzy())
 	// Update "compl_shown_match" to the actually shown match
 	ins_compl_update_shown_match();
 
-    if (allow_get_expansion && insert_match
+    எனில் (allow_get_expansion && செருகு_match
 	    && (!compl_get_longest || compl_used_match))
 	// Delete old text to be replaced
 	ins_compl_delete();
 
     // When finding the longest common text we stick at the original text,
     // don't let CTRL-N or CTRL-P move to the first match.
-    advance = count != 1 || !allow_get_expansion || !compl_get_longest;
+    advance = மொத்தம் != 1 || !allow_get_expansion || !compl_get_longest;
 
     // When restarting the search don't insert the first match either.
-    if (compl_restarting)
+    எனில் (compl_restarting)
     {
 	advance = FALSE;
 	compl_restarting = FALSE;
@@ -6425,49 +6425,49 @@ ins_compl_next(
 
     // Repeat this for when <PageUp> or <PageDown> is typed.  But don't wrap
     // around.
-    if (find_next_completion_match(allow_get_expansion, todo, advance,
-							&num_matches) == -1)
-	return -1;
+    எனில் (find_next_completion_match(allow_get_expansion, todo, advance,
+							&இலக்கம்_matches) == -1)
+	திரும்பு -1;
 
-    if (curbuf != orig_curbuf)
+    எனில் (curbuf != orig_curbuf)
     {
 	// In case some completion function switched buffer, don't want to
 	// insert the completion elsewhere.
-	return -1;
+	திரும்பு -1;
     }
 
     // Insert the text of the new completion, or the compl_leader.
-    if (!started && ins_compl_preinsert_longest())
-	ins_compl_insert(TRUE, TRUE);
-    else if (compl_no_insert && !started && !compl_preinsert)
+    எனில் (!started && ins_compl_preinsert_longest())
+	ins_compl_செருகு(TRUE, TRUE);
+    இல்லையெனில் எனில் (compl_no_செருகு && !started && !compl_preinsert)
     {
-	ins_compl_insert_bytes(compl_orig_text.string + get_compl_len(), -1);
+	ins_compl_செருகு_bytes(compl_orig_text.string + get_compl_len(), -1);
 	compl_used_match = FALSE;
     }
-    else if (insert_match)
+    இல்லையெனில் எனில் (செருகு_match)
     {
-	if (!compl_get_longest || compl_used_match)
+	எனில் (!compl_get_longest || compl_used_match)
 	{
-	    int preinsert_longest = ins_compl_preinsert_longest()
+	    முழு preinsert_longest = ins_compl_preinsert_longest()
 		&& match_at_original_text(compl_shown_match); // none selected
-	    ins_compl_insert(compl_preinsert || preinsert_longest,
+	    ins_compl_செருகு(compl_preinsert || preinsert_longest,
 		    preinsert_longest);
 	}
-	else
-	    ins_compl_insert_bytes(compl_leader.string + get_compl_len(), -1);
+	இல்லையெனில்
+	    ins_compl_செருகு_bytes(compl_leader.string + get_compl_len(), -1);
     }
-    else
+    இல்லையெனில்
 	compl_used_match = FALSE;
 
-    if (!allow_get_expansion)
+    எனில் (!allow_get_expansion)
     {
 	// may undisplay the popup menu first
 	ins_compl_upd_pum();
 
-	if (pum_enough_matches())
+	எனில் (pum_enough_matches())
 	    // Will display the popup menu, don't redraw yet to avoid flicker.
 	    pum_call_update_screen();
-	else
+	இல்லையெனில்
 	    // Not showing the popup menu yet, redraw to show the user what was
 	    // inserted.
 	    update_screen(0);
@@ -6475,7 +6475,7 @@ ins_compl_next(
 	// display the updated popup menu
 	ins_compl_show_pum();
 #ifdef FEAT_GUI
-	if (gui.in_use)
+	எனில் (gui.in_use)
 	{
 	    // Show the cursor after the match, not after the redrawn text.
 	    setcursor();
@@ -6490,32 +6490,32 @@ ins_compl_next(
 
     // Enter will select a match when the match wasn't inserted and the popup
     // menu is visible.
-    if (compl_no_insert && !started
+    எனில் (compl_no_செருகு && !started
 				 && !match_at_original_text(compl_shown_match))
 	compl_enter_selects = TRUE;
-    else
-	compl_enter_selects = !insert_match && compl_match_array != NULL;
+    இல்லையெனில்
+	compl_enter_selects = !செருகு_match && compl_match_array != வெற்று;
 
     // Show the file name for the match (if any)
-    if (compl_shown_match->cp_fname != NULL)
+    எனில் (compl_shown_match->cp_fname != வெற்று)
 	ins_compl_show_filename();
 
-    return num_matches;
+    திரும்பு இலக்கம்_matches;
 }
 
 /*
  * Check if the current completion source exceeded its timeout. If so, stop
  * collecting, and halve the timeout.
  */
-    static void
-check_elapsed_time(void)
+    நிலையான வெறுமை
+check_elapsed_time(வெறுமை)
 {
 #ifdef ELAPSED_FUNC
     elapsed_T	*start_tv
 	= &cpt_sources_array[cpt_sources_index].compl_start_tv;
     long	elapsed_ms = ELAPSED_FUNC(*start_tv);
 
-    if (elapsed_ms > compl_timeout_ms)
+    எனில் (elapsed_ms > compl_timeout_ms)
     {
 	compl_time_slice_expired = TRUE;
 	DECAY_COMPL_TIMEOUT();
@@ -6532,27 +6532,27 @@ check_elapsed_time(void)
  * "in_compl_func" is TRUE when called from complete_check(), don't set
  * compl_curr_match.
  */
-    void
-ins_compl_check_keys(int frequency, int in_compl_func)
+    வெறுமை
+ins_compl_check_சாவிகள்(முழு frequency, முழு in_compl_func)
 {
-    static int	count = 0;
-    int		c;
+    நிலையான முழு	மொத்தம் = 0;
+    முழு		c;
 
     // Don't check when reading keys from a script, :normal or feedkeys().
     // That would break the test scripts.  But do check for keys when called
     // from complete_check().
-    if (!in_compl_func && (using_script() || ex_normal_busy))
-	return;
+    எனில் (!in_compl_func && (using_script() || ex_normal_busy))
+	திரும்பு;
 
     // Only do this at regular intervals
-    if (++count < frequency)
-	return;
-    count = 0;
+    எனில் (++மொத்தம் < frequency)
+	திரும்பு;
+    மொத்தம் = 0;
 
     // Check for a typed key.  Do use mappings, otherwise vim_is_ctrl_x_key()
     // can't do its work correctly.
     c = vpeekc_any();
-    if (c != NUL
+    எனில் (c != NUL
 #ifdef FEAT_EVAL
 	    // If test_override("char_avail", 1) was called, ignore characters
 	    // waiting in the typeahead buffer.
@@ -6560,23 +6560,23 @@ ins_compl_check_keys(int frequency, int in_compl_func)
 #endif
        )
     {
-	if (vim_is_ctrl_x_key(c) && c != Ctrl_X && c != Ctrl_R)
+	எனில் (vim_is_ctrl_x_சாவி(c) && c != Ctrl_X && c != Ctrl_R)
 	{
 	    c = safe_vgetc();	// Eat the character
 	    compl_shows_dir = ins_compl_key2dir(c);
-	    (void)ins_compl_next(FALSE, ins_compl_key2count(c),
+	    (வெறுமை)ins_compl_next(FALSE, ins_compl_key2count(c),
 				      c != K_UP && c != K_DOWN);
 	}
-	else
+	இல்லையெனில்
 	{
 	    // Need to get the character to have KeyTyped set.  We'll put it
 	    // back with vungetc() below.  But skip K_IGNORE.
 	    c = safe_vgetc();
-	    if (c != K_IGNORE)
+	    எனில் (c != K_IGNORE)
 	    {
 		// Typed keys that get mapped lose KeyTyped. Still let
 		// complete_check() interrupt, except during @r replay.
-		if (c != Ctrl_R && (KeyTyped
+		எனில் (c != Ctrl_R && (சாவி_Typed
 			    || (in_compl_func && reg_executing == 0)))
 		    compl_interrupted = TRUE;
 
@@ -6584,26 +6584,26 @@ ins_compl_check_keys(int frequency, int in_compl_func)
 	    }
 	}
     }
-    else
+    இல்லையெனில்
     {
-	int normal_mode_strict = ctrl_x_mode_normal()
-	    && !ctrl_x_mode_line_or_eval() && !(compl_cont_status & CONT_LOCAL)
-	    && cpt_sources_array != NULL && cpt_sources_index >= 0;
-	if (normal_mode_strict && (compl_autocomplete || p_cto > 0))
+	முழு normal_mode_strict = ctrl_x_mode_normal()
+	    && !ctrl_x_mode_வரி_or_eval() && !(compl_cont_status & CONT_LOCAL)
+	    && cpt_sources_array != வெற்று && cpt_sources_index >= 0;
+	எனில் (normal_mode_strict && (compl_autocomplete || p_cto > 0))
 	    check_elapsed_time();
     }
 
-    if (compl_pending
+    எனில் (compl_pending
 	    && !got_int
 	    && !(cot_flags & (COT_NOINSERT | COT_FUZZY))
 	    && (!compl_autocomplete || ins_compl_has_preinsert()))
     {
 	// Insert the first match immediately and advance compl_shown_match,
 	// before finding other matches.
-	int todo = compl_pending > 0 ? compl_pending : -compl_pending;
+	முழு todo = compl_pending > 0 ? compl_pending : -compl_pending;
 
 	compl_pending = 0;
-	(void)ins_compl_next(FALSE, todo, TRUE);
+	(வெறுமை)ins_compl_next(FALSE, todo, TRUE);
     }
 }
 
@@ -6611,23 +6611,23 @@ ins_compl_check_keys(int frequency, int in_compl_func)
  * Decide the direction of Insert mode complete from the key typed.
  * Returns BACKWARD or FORWARD.
  */
-    static int
-ins_compl_key2dir(int c)
+    நிலையான முழு
+ins_compl_key2dir(முழு c)
 {
-    if (c == Ctrl_P || c == Ctrl_L
+    எனில் (c == Ctrl_P || c == Ctrl_L
 	    || c == K_PAGEUP || c == K_KPAGEUP || c == K_S_UP || c == K_UP)
-	return BACKWARD;
-    return FORWARD;
+	திரும்பு BACKWARD;
+    திரும்பு FORWARD;
 }
 
 /*
  * Return TRUE for keys that are used for completion only when the popup menu
  * is visible.
  */
-    static int
-ins_compl_pum_key(int c)
+    நிலையான முழு
+ins_compl_pum_சாவி(முழு c)
 {
-    return pum_visible() && (c == K_PAGEUP || c == K_KPAGEUP || c == K_S_UP
+    திரும்பு pum_visible() && (c == K_PAGEUP || c == K_KPAGEUP || c == K_S_UP
 		     || c == K_PAGEDOWN || c == K_KPAGEDOWN || c == K_S_DOWN
 		     || c == K_UP || c == K_DOWN);
 }
@@ -6636,39 +6636,39 @@ ins_compl_pum_key(int c)
  * Decide the number of completions to move forward.
  * Returns 1 for most keys, height of the popup menu for page-up/down keys.
  */
-    static int
-ins_compl_key2count(int c)
+    நிலையான முழு
+ins_compl_key2count(முழு c)
 {
-    if (ins_compl_pum_key(c) && c != K_UP && c != K_DOWN)
+    எனில் (ins_compl_pum_சாவி(c) && c != K_UP && c != K_DOWN)
     {
-	int h = pum_get_height();
-	if (h > 3)
+	முழு h = pum_get_height();
+	எனில் (h > 3)
 	    h -= 2; // keep some context
-	return h;
+	திரும்பு h;
     }
-    return 1;
+    திரும்பு 1;
 }
 
 /*
  * Return TRUE if completion with "c" should insert the match, FALSE if only
  * to change the currently selected completion.
  */
-    static int
-ins_compl_use_match(int c)
+    நிலையான முழு
+ins_compl_use_match(முழு c)
 {
-    switch (c)
+    தேர்வு (c)
     {
-	case K_UP:
-	case K_DOWN:
-	case K_PAGEDOWN:
-	case K_KPAGEDOWN:
-	case K_S_DOWN:
-	case K_PAGEUP:
-	case K_KPAGEUP:
-	case K_S_UP:
-	    return FALSE;
+	நிலை K_UP:
+	நிலை K_DOWN:
+	நிலை K_PAGEDOWN:
+	நிலை K_KPAGEDOWN:
+	நிலை K_S_DOWN:
+	நிலை K_PAGEUP:
+	நிலை K_KPAGEUP:
+	நிலை K_S_UP:
+	    திரும்பு FALSE;
     }
-    return TRUE;
+    திரும்பு TRUE;
 }
 
 /*
@@ -6677,154 +6677,154 @@ ins_compl_use_match(int c)
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  * Uses the global variables: compl_cont_status and ctrl_x_mode
  */
-    static int
-get_normal_compl_info(char_u *line, int startcol, colnr_T curs_col)
+    நிலையான முழு
+get_normal_compl_info(char_u *வரி, முழு startcol, colnr_T curs_col)
 {
-    if ((compl_cont_status & CONT_SOL) || ctrl_x_mode_path_defines())
+    எனில் ((compl_cont_status & CONT_SOL) || ctrl_x_mode_path_defines())
     {
-	if (!compl_status_adding())
+	எனில் (!compl_status_adding())
 	{
-	    while (--startcol >= 0 && vim_isIDc(line[startcol]))
+	    போது (--startcol >= 0 && vim_isIDc(வரி[startcol]))
 		;
 	    compl_col += ++startcol;
 	    compl_length = curs_col - startcol;
 	}
-	if (p_ic)
+	எனில் (p_ic)
 	{
-	    compl_pattern.string = str_foldcase(line + compl_col,
-		    compl_length, NULL, 0);
-	    if (compl_pattern.string == NULL)
+	    compl_pattern.string = str_foldcase(வரி + compl_col,
+		    compl_length, வெற்று, 0);
+	    எனில் (compl_pattern.string == வெற்று)
 	    {
 		compl_pattern.length = 0;
-		return FAIL;
+		திரும்பு FAIL;
 	    }
 	    compl_pattern.length = STRLEN(compl_pattern.string);
 	}
-	else
+	இல்லையெனில்
 	{
-	    compl_pattern.string = vim_strnsave(line + compl_col, (size_t)compl_length);
-	    if (compl_pattern.string == NULL)
+	    compl_pattern.string = vim_strnsave(வரி + compl_col, (size_t)compl_length);
+	    எனில் (compl_pattern.string == வெற்று)
 	    {
 		compl_pattern.length = 0;
-		return FAIL;
+		திரும்பு FAIL;
 	    }
 	    compl_pattern.length = (size_t)compl_length;
 	}
     }
-    else if (compl_status_adding())
+    இல்லையெனில் எனில் (compl_status_adding())
     {
 	char_u	    *prefix = (char_u *)"\\<";
 	size_t	    prefixlen = STRLEN_LITERAL("\\<");
 	size_t	    n;
 
-	if (!vim_iswordp(line + compl_col)
+	எனில் (!vim_iswordp(வரி + compl_col)
 		|| (compl_col > 0
-		    && (vim_iswordp(mb_prevptr(line, line + compl_col)))))
+		    && (vim_iswordp(mb_prevptr(வரி, வரி + compl_col)))))
 	{
 	    prefix = (char_u *)"";
 	    prefixlen = 0;
 	}
 
 	// we need up to 2 extra chars for the prefix
-	n = quote_meta(NULL, line + compl_col, compl_length) + prefixlen;
+	n = quote_meta(வெற்று, வரி + compl_col, compl_length) + prefixlen;
 	compl_pattern.string = alloc(n);
-	if (compl_pattern.string == NULL)
+	எனில் (compl_pattern.string == வெற்று)
 	{
 	    compl_pattern.length = 0;
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
-	STRCPY((char *)compl_pattern.string, prefix);
-	(void)quote_meta(compl_pattern.string + prefixlen,
-		line + compl_col, compl_length);
+	STRCPY((எழுத்து *)compl_pattern.string, prefix);
+	(வெறுமை)quote_meta(compl_pattern.string + prefixlen,
+		வரி + compl_col, compl_length);
 	compl_pattern.length = n - 1;
     }
-    else if (--startcol < 0
-	    || !vim_iswordp(mb_prevptr(line, line + startcol + 1)))
+    இல்லையெனில் எனில் (--startcol < 0
+	    || !vim_iswordp(mb_prevptr(வரி, வரி + startcol + 1)))
     {
 	size_t	len = STRLEN_LITERAL("\\<\\k\\k");
 
 	// Match any word of at least two chars
 	compl_pattern.string = vim_strnsave((char_u *)"\\<\\k\\k", len);
-	if (compl_pattern.string == NULL)
+	எனில் (compl_pattern.string == வெற்று)
 	{
 	    compl_pattern.length = 0;
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
 	compl_pattern.length = len;
 	compl_col += curs_col;
 	compl_length = 0;
 	compl_from_nonkeyword = TRUE;
     }
-    else
+    இல்லையெனில்
     {
 	// Search the point of change class of multibyte character
 	// or not a word single byte character backward.
-	if (has_mbyte)
+	எனில் (has_mbyte)
 	{
-	    int base_class;
-	    int head_off;
+	    முழு base_class;
+	    முழு head_off;
 
-	    startcol -= (*mb_head_off)(line, line + startcol);
-	    base_class = mb_get_class(line + startcol);
-	    while (--startcol >= 0)
+	    startcol -= (*mb_head_off)(வரி, வரி + startcol);
+	    base_class = mb_get_class(வரி + startcol);
+	    போது (--startcol >= 0)
 	    {
-		head_off = (*mb_head_off)(line, line + startcol);
-		if (base_class != mb_get_class(line + startcol
+		head_off = (*mb_head_off)(வரி, வரி + startcol);
+		எனில் (base_class != mb_get_class(வரி + startcol
 			    - head_off))
-		    break;
+		    நிறுத்து;
 		startcol -= head_off;
 	    }
 	}
-	else
+	இல்லையெனில்
 	{
-	    while (--startcol >= 0 && vim_iswordc(line[startcol]))
+	    போது (--startcol >= 0 && vim_iswordc(வரி[startcol]))
 		;
 	}
 
 	compl_col += ++startcol;
-	compl_length = (int)curs_col - startcol;
-	if (compl_length == 1)
+	compl_length = (முழு)curs_col - startcol;
+	எனில் (compl_length == 1)
 	{
 	    // Only match word with at least two chars -- webb
 	    // there's no need to call quote_meta,
 	    // alloc(7) is enough  -- Acevedo
 	    compl_pattern.string = alloc(7);
-	    if (compl_pattern.string == NULL)
+	    எனில் (compl_pattern.string == வெற்று)
 	    {
 		compl_pattern.length = 0;
-		return FAIL;
+		திரும்பு FAIL;
 	    }
-	    STRCPY((char *)compl_pattern.string, "\\<");
-	    (void)quote_meta(compl_pattern.string + 2, line + compl_col, 1);
-	    STRCAT((char *)compl_pattern.string, "\\k");
+	    STRCPY((எழுத்து *)compl_pattern.string, "\\<");
+	    (வெறுமை)quote_meta(compl_pattern.string + 2, வரி + compl_col, 1);
+	    STRCAT((எழுத்து *)compl_pattern.string, "\\k");
 	    compl_pattern.length = STRLEN(compl_pattern.string);
 	}
-	else
+	இல்லையெனில்
 	{
-	    size_t  n = quote_meta(NULL, line + compl_col, compl_length) + 2;
+	    size_t  n = quote_meta(வெற்று, வரி + compl_col, compl_length) + 2;
 
 	    compl_pattern.string = alloc(n);
-	    if (compl_pattern.string == NULL)
+	    எனில் (compl_pattern.string == வெற்று)
 	    {
 		compl_pattern.length = 0;
-		return FAIL;
+		திரும்பு FAIL;
 	    }
-	    STRCPY((char *)compl_pattern.string, "\\<");
-	    (void)quote_meta(compl_pattern.string + 2, line + compl_col,
+	    STRCPY((எழுத்து *)compl_pattern.string, "\\<");
+	    (வெறுமை)quote_meta(compl_pattern.string + 2, வரி + compl_col,
 		    compl_length);
 	    compl_pattern.length = n - 1;
 	}
     }
 
     // Call functions in 'complete' with 'findstart=1'
-    if (ctrl_x_mode_normal() && !(compl_cont_status & CONT_LOCAL))
+    எனில் (ctrl_x_mode_normal() && !(compl_cont_status & CONT_LOCAL))
     {
 	// ^N completion, not complete() or ^X^N
-	if (setup_cpt_sources() == FAIL || prepare_cpt_compl_funcs() == FAIL)
-	    return FAIL;
+	எனில் (setup_cpt_sources() == FAIL || prepare_cpt_compl_funcs() == FAIL)
+	    திரும்பு FAIL;
     }
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -6832,99 +6832,99 @@ get_normal_compl_info(char_u *line, int startcol, colnr_T curs_col)
  * complete() function.
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  */
-    static int
-get_wholeline_compl_info(char_u *line, colnr_T curs_col)
+    நிலையான முழு
+get_wholeline_compl_info(char_u *வரி, colnr_T curs_col)
 {
-    compl_col = (colnr_T)getwhitecols(line);
-    compl_length = (int)curs_col - (int)compl_col;
-    if (compl_length < 0)	// cursor in indent: empty pattern
+    compl_col = (colnr_T)getwhitecols(வரி);
+    compl_length = (முழு)curs_col - (முழு)compl_col;
+    எனில் (compl_length < 0)	// cursor in indent: empty pattern
 	compl_length = 0;
-    if (p_ic)
+    எனில் (p_ic)
     {
-	compl_pattern.string = str_foldcase(line + compl_col, compl_length,
-		NULL, 0);
-	if (compl_pattern.string == NULL)
+	compl_pattern.string = str_foldcase(வரி + compl_col, compl_length,
+		வெற்று, 0);
+	எனில் (compl_pattern.string == வெற்று)
 	{
 	    compl_pattern.length = 0;
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
 	compl_pattern.length = STRLEN(compl_pattern.string);
     }
-    else
+    இல்லையெனில்
     {
-	compl_pattern.string = vim_strnsave(line + compl_col, (size_t)compl_length);
-	if (compl_pattern.string == NULL)
+	compl_pattern.string = vim_strnsave(வரி + compl_col, (size_t)compl_length);
+	எனில் (compl_pattern.string == வெற்று)
 	{
 	    compl_pattern.length = 0;
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
 	compl_pattern.length = (size_t)compl_length;
     }
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Get the pattern, column and length for filename completion.
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  */
-    static int
-get_filename_compl_info(char_u *line, int startcol, colnr_T curs_col)
+    நிலையான முழு
+get_filename_compl_info(char_u *வரி, முழு startcol, colnr_T curs_col)
 {
     // Go back to just before the first filename character.
-    if (startcol > 0)
+    எனில் (startcol > 0)
     {
-	char_u	*p = line + startcol;
+	char_u	*p = வரி + startcol;
 
-	MB_PTR_BACK(line, p);
-	while (p > line && vim_isfilec(PTR2CHAR(p)))
-	    MB_PTR_BACK(line, p);
-	if (p == line && vim_isfilec(PTR2CHAR(p)))
+	MB_PTR_BACK(வரி, p);
+	போது (p > வரி && vim_isfilec(PTR2CHAR(p)))
+	    MB_PTR_BACK(வரி, p);
+	எனில் (p == வரி && vim_isfilec(PTR2CHAR(p)))
 	    startcol = 0;
-	else
-	    startcol = (int)(p - line) + 1;
+	இல்லையெனில்
+	    startcol = (முழு)(p - வரி) + 1;
     }
 
     compl_col += startcol;
-    compl_length = (int)curs_col - startcol;
-    compl_pattern.string = addstar(line + compl_col, compl_length, EXPAND_FILES);
-    if (compl_pattern.string == NULL)
+    compl_length = (முழு)curs_col - startcol;
+    compl_pattern.string = addstar(வரி + compl_col, compl_length, EXPAND_FILES);
+    எனில் (compl_pattern.string == வெற்று)
     {
 	compl_pattern.length = 0;
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     compl_pattern.length = STRLEN(compl_pattern.string);
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Get the pattern, column and length for command-line completion.
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  */
-    static int
-get_cmdline_compl_info(char_u *line, colnr_T curs_col)
+    நிலையான முழு
+get_cmdline_compl_info(char_u *வரி, colnr_T curs_col)
 {
-    compl_pattern.string = vim_strnsave(line, curs_col);
-    if (compl_pattern.string == NULL)
+    compl_pattern.string = vim_strnsave(வரி, curs_col);
+    எனில் (compl_pattern.string == வெற்று)
     {
 	compl_pattern.length = 0;
-	return FAIL;
+	திரும்பு FAIL;
     }
     compl_pattern.length = curs_col;
     set_cmd_context(&compl_xp, compl_pattern.string,
-	    (int)compl_pattern.length, curs_col, FALSE);
-    if (compl_xp.xp_context == EXPAND_UNSUCCESSFUL
+	    (முழு)compl_pattern.length, curs_col, FALSE);
+    எனில் (compl_xp.xp_context == EXPAND_UNSUCCESSFUL
 	    || compl_xp.xp_context == EXPAND_NOTHING)
 	// No completion possible, use an empty pattern to get a
 	// "pattern not found" message.
 	compl_col = curs_col;
-    else
-	compl_col = (int)(compl_xp.xp_pattern - compl_pattern.string);
+    இல்லையெனில்
+	compl_col = (முழு)(compl_xp.xp_pattern - compl_pattern.string);
     compl_length = curs_col - compl_col;
 
-    return OK;
+    திரும்பு OK;
 }
 
 #ifdef FEAT_COMPL_FUNC
@@ -6932,46 +6932,46 @@ get_cmdline_compl_info(char_u *line, colnr_T curs_col)
  * Set global variables related to completion:
  * compl_col, compl_length, compl_pattern, and cpt_compl_pattern.
  */
-    static int
+    நிலையான முழு
 set_compl_globals(
-    int		startcol UNUSED,
+    முழு		startcol UNUSED,
     colnr_T	curs_col UNUSED,
-    int		is_cpt_compl UNUSED)
+    முழு		is_cpt_compl UNUSED)
 {
-    if (is_cpt_compl)
+    எனில் (is_cpt_compl)
     {
 	VIM_CLEAR_STRING(cpt_compl_pattern);
-	if (startcol < compl_col)
-	    return prepend_startcol_text(&cpt_compl_pattern, &compl_orig_text,
+	எனில் (startcol < compl_col)
+	    திரும்பு prepend_startcol_text(&cpt_compl_pattern, &compl_orig_text,
 		    startcol);
-	else
+	இல்லையெனில்
 	{
 	    cpt_compl_pattern.string = vim_strnsave(compl_orig_text.string,
 		    compl_orig_text.length);
 	    cpt_compl_pattern.length = compl_orig_text.length;
 	}
     }
-    else
+    இல்லையெனில்
     {
-	if (startcol < 0 || startcol > curs_col)
+	எனில் (startcol < 0 || startcol > curs_col)
 	    startcol = curs_col;
 
 	// Re-obtain line in case it has changed
-	char_u	*line = ml_get(curwin->w_cursor.lnum);
-	int	len = curs_col - startcol;
+	char_u	*வரி = ml_get(curwin->w_cursor.lnum);
+	முழு	len = curs_col - startcol;
 
-	compl_pattern.string = vim_strnsave(line + startcol, (size_t)len);
-	if (compl_pattern.string == NULL)
+	compl_pattern.string = vim_strnsave(வரி + startcol, (size_t)len);
+	எனில் (compl_pattern.string == வெற்று)
 	{
 	    compl_pattern.length = 0;
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
 	compl_pattern.length = (size_t)len;
 	compl_col = startcol;
 	compl_length = len;
     }
 
-    return OK;
+    திரும்பு OK;
 }
 #endif
 
@@ -6983,52 +6983,52 @@ set_compl_globals(
  * option; otherwise, it is NULL.
  * "startcol", when not NULL, contains the column returned by function.
  */
-    static int
+    நிலையான முழு
 get_userdefined_compl_info(
     colnr_T	curs_col UNUSED,
     callback_T	*cb UNUSED,
-    int		*startcol UNUSED)
+    முழு		*startcol UNUSED)
 {
-    int		ret = FAIL;
+    முழு		ret = FAIL;
 
 #ifdef FEAT_COMPL_FUNC
     // Call user defined function 'completefunc' with "a:findstart"
     // set to 1 to obtain the length of text to use for completion.
     typval_T	args[3];
-    int		col;
-    char_u	*funcname = NULL;
+    முழு		col;
+    char_u	*funcname = வெற்று;
     pos_T	pos;
-    int		save_State = State;
-    int		is_cpt_function = (cb != NULL);
-    int		use_sandbox = is_cpt_function
+    முழு		save_State = State;
+    முழு		is_cpt_function = (cb != வெற்று);
+    முழு		use_sandbox = is_cpt_function
 			    && was_set_insecurely(curwin,
 					(char_u *)"complete", OPT_LOCAL);
 
-    if (!is_cpt_function)
+    எனில் (!is_cpt_function)
     {
 	// Call 'completefunc' or 'omnifunc' or 'thesaurusfunc' and get pattern
 	// length as a string
 	funcname = get_complete_funcname(ctrl_x_mode);
-	if (*funcname == NUL)
+	எனில் (*funcname == NUL)
 	{
 	    semsg(_(e_option_str_is_not_set), ctrl_x_mode_function()
 		    ? "completefunc" : "omnifunc");
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
-	cb = get_insert_callback(ctrl_x_mode);
+	cb = get_செருகு_callback(ctrl_x_mode);
     }
 
-    args[0].v_type = VAR_NUMBER;
-    args[0].vval.v_number = 1;
+    args[0].v_type = VAR_எண்;
+    args[0].vval.v_எண் = 1;
     args[1].v_type = VAR_STRING;
     args[1].vval.v_string = (char_u *)"";
     args[2].v_type = VAR_UNKNOWN;
     pos = curwin->w_cursor;
     ++textlock;
-    if (use_sandbox)
+    எனில் (use_sandbox)
 	++sandbox;
     col = call_callback_retnr(cb, 2, args);
-    if (use_sandbox)
+    எனில் (use_sandbox)
 	--sandbox;
     --textlock;
 
@@ -7036,31 +7036,31 @@ get_userdefined_compl_info(
     curwin->w_cursor = pos;	// restore the cursor position
     check_cursor();  // make sure cursor position is valid, just in case
     validate_cursor();
-    if (!EQUAL_POS(curwin->w_cursor, pos))
+    எனில் (!EQUAL_POS(curwin->w_cursor, pos))
     {
 	emsg(_(e_complete_function_deleted_text));
-	return FAIL;
+	திரும்பு FAIL;
     }
 
-    if (startcol != NULL)
+    எனில் (startcol != வெற்று)
 	*startcol = col;
 
     // Return value -2 means the user complete function wants to cancel the
     // complete without an error, do the same if the function did not execute
     // successfully.
-    if (col == -2 || aborting())
-	return FAIL;
+    எனில் (col == -2 || aborting())
+	திரும்பு FAIL;
 
     // Return value -3 does the same as -2 and leaves CTRL-X mode.
-    if (col == -3)
+    எனில் (col == -3)
     {
-	if (is_cpt_function)
-	    return FAIL;
+	எனில் (is_cpt_function)
+	    திரும்பு FAIL;
 	ctrl_x_mode = CTRL_X_NORMAL;
-	edit_submode = NULL;
-	if (!shortmess(SHM_COMPLETIONMENU))
-	    msg_clr_cmdline();
-	return FAIL;
+	edit_submode = வெற்று;
+	எனில் (!shortmess(SHM_COMPLETIONMENU))
+	    செய்தி_clr_cmdline();
+	திரும்பு FAIL;
     }
 
     // Reset extended parameters of completion, when starting new
@@ -7071,7 +7071,7 @@ get_userdefined_compl_info(
     ret = !is_cpt_function ? set_compl_globals(col, curs_col, FALSE) : OK;
 #endif
 
-    return ret;
+    திரும்பு ret;
 }
 
 /*
@@ -7079,42 +7079,42 @@ get_userdefined_compl_info(
  * Sets the global variables: compl_col, compl_length and compl_pattern.
  * Uses the global variable: spell_bad_len
  */
-    static int
-get_spell_compl_info(int startcol UNUSED, colnr_T curs_col UNUSED)
+    நிலையான முழு
+get_spell_compl_info(முழு startcol UNUSED, colnr_T curs_col UNUSED)
 {
-    int		ret = FAIL;
+    முழு		ret = FAIL;
 #ifdef FEAT_SPELL
-    char_u	*line = NULL;
+    char_u	*வரி = வெற்று;
 
-    if (spell_bad_len > 0)
+    எனில் (spell_bad_len > 0)
 	compl_col = curs_col - spell_bad_len;
-    else
+    இல்லையெனில்
 	compl_col = spell_word_start(startcol);
 
-    if (compl_col >= (colnr_T)startcol)
+    எனில் (compl_col >= (colnr_T)startcol)
     {
 	compl_length = 0;
 	compl_col = curs_col;
     }
-    else
+    இல்லையெனில்
     {
 	spell_expand_check_cap(compl_col);
-	compl_length = (int)curs_col - compl_col;
+	compl_length = (முழு)curs_col - compl_col;
     }
     // Need to obtain "line" again, it may have become invalid.
-    line = ml_get(curwin->w_cursor.lnum);
-    compl_pattern.string = vim_strnsave(line + compl_col, (size_t)compl_length);
-    if (compl_pattern.string == NULL)
+    வரி = ml_get(curwin->w_cursor.lnum);
+    compl_pattern.string = vim_strnsave(வரி + compl_col, (size_t)compl_length);
+    எனில் (compl_pattern.string == வெற்று)
     {
 	compl_pattern.length = 0;
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     compl_pattern.length = (size_t)compl_length;
     ret = OK;
 #endif
 
-    return ret;
+    திரும்பு ret;
 }
 
 /*
@@ -7125,49 +7125,49 @@ get_spell_compl_info(int startcol UNUSED, colnr_T curs_col UNUSED)
  * become invalid and needs to be fetched again.
  * Returns OK on success.
  */
-    static int
-compl_get_info(char_u *line, int startcol, colnr_T curs_col, int *line_invalid)
+    நிலையான முழு
+compl_get_info(char_u *வரி, முழு startcol, colnr_T curs_col, முழு *வரி_invalid)
 {
-    if (ctrl_x_mode_normal() || ctrl_x_mode_register()
+    எனில் (ctrl_x_mode_normal() || ctrl_x_mode_register()
 	    || (ctrl_x_mode & CTRL_X_WANT_IDENT
 		&& !thesaurus_func_complete(ctrl_x_mode)))
     {
-	if (get_normal_compl_info(line, startcol, curs_col) != OK)
-	    return FAIL;
-	*line_invalid = TRUE; // 'cpt' func may have invalidated "line"
+	எனில் (get_normal_compl_info(வரி, startcol, curs_col) != OK)
+	    திரும்பு FAIL;
+	*வரி_invalid = TRUE; // 'cpt' func may have invalidated "line"
     }
-    else if (ctrl_x_mode_line_or_eval())
+    இல்லையெனில் எனில் (ctrl_x_mode_வரி_or_eval())
     {
-	return get_wholeline_compl_info(line, curs_col);
+	திரும்பு get_wholeline_compl_info(வரி, curs_col);
     }
-    else if (ctrl_x_mode_files())
+    இல்லையெனில் எனில் (ctrl_x_mode_files())
     {
-	return get_filename_compl_info(line, startcol, curs_col);
+	திரும்பு get_filename_compl_info(வரி, startcol, curs_col);
     }
-    else if (ctrl_x_mode == CTRL_X_CMDLINE)
+    இல்லையெனில் எனில் (ctrl_x_mode == CTRL_X_CMDLINE)
     {
-	return get_cmdline_compl_info(line, curs_col);
+	திரும்பு get_cmdline_compl_info(வரி, curs_col);
     }
-    else if (ctrl_x_mode_function() || ctrl_x_mode_omni()
+    இல்லையெனில் எனில் (ctrl_x_mode_function() || ctrl_x_mode_omni()
 	    || thesaurus_func_complete(ctrl_x_mode))
     {
-	if (get_userdefined_compl_info(curs_col, NULL, NULL) != OK)
-	    return FAIL;
-	*line_invalid = TRUE;	// "line" may have become invalid
+	எனில் (get_userdefined_compl_info(curs_col, வெற்று, வெற்று) != OK)
+	    திரும்பு FAIL;
+	*வரி_invalid = TRUE;	// "line" may have become invalid
     }
-    else if (ctrl_x_mode_spell())
+    இல்லையெனில் எனில் (ctrl_x_mode_spell())
     {
-	if (get_spell_compl_info(startcol, curs_col) == FAIL)
-	    return FAIL;
-	*line_invalid = TRUE;	// "line" may have become invalid
+	எனில் (get_spell_compl_info(startcol, curs_col) == FAIL)
+	    திரும்பு FAIL;
+	*வரி_invalid = TRUE;	// "line" may have become invalid
     }
-    else
+    இல்லையெனில்
     {
 	internal_error("ins_complete()");
-	return FAIL;
+	திரும்பு FAIL;
     }
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -7180,126 +7180,126 @@ compl_get_info(char_u *line, int startcol, colnr_T curs_col, int *line_invalid)
  * was longer than 'tw').  if SOL is set then skip the previous pattern, a word
  * at the beginning of the line has been inserted, we'll look for that.
  */
-    static void
-ins_compl_continue_search(char_u *line)
+    நிலையான வெறுமை
+ins_compl_continue_தேடல்(char_u *வரி)
 {
     // it is a continued search
     compl_cont_status &= ~CONT_INTRPT;	// remove INTRPT
-    if (ctrl_x_mode_normal() || ctrl_x_mode_path_patterns()
+    எனில் (ctrl_x_mode_normal() || ctrl_x_mode_path_patterns()
 						|| ctrl_x_mode_path_defines())
     {
-	if (compl_startpos.lnum != curwin->w_cursor.lnum)
+	எனில் (compl_startpos.lnum != curwin->w_cursor.lnum)
 	{
 	    // line (probably) wrapped, set compl_startpos to the
 	    // first non_blank in the line, if it is not a wordchar
 	    // include it to get a better pattern, but then we don't
 	    // want the "\\<" prefix, check it below
-	    compl_col = (colnr_T)getwhitecols(line);
+	    compl_col = (colnr_T)getwhitecols(வரி);
 	    compl_startpos.col = compl_col;
 	    compl_startpos.lnum = curwin->w_cursor.lnum;
 	    compl_cont_status &= ~CONT_SOL;   // clear SOL if present
 	}
-	else
+	இல்லையெனில்
 	{
 	    // S_IPOS was set when we inserted a word that was at the
 	    // beginning of the line, which means that we'll go to SOL
 	    // mode but first we need to redefine compl_startpos
-	    if (compl_cont_status & CONT_S_IPOS)
+	    எனில் (compl_cont_status & CONT_S_IPOS)
 	    {
 		compl_cont_status |= CONT_SOL;
 		compl_startpos.col = (colnr_T)(skipwhite(
-			    line + compl_length
-			    + compl_startpos.col) - line);
+			    வரி + compl_length
+			    + compl_startpos.col) - வரி);
 	    }
 	    compl_col = compl_startpos.col;
 	}
-	compl_length = curwin->w_cursor.col - (int)compl_col;
+	compl_length = curwin->w_cursor.col - (முழு)compl_col;
 	// IObuff is used to add a "word from the next line" would we
 	// have enough space?  just being paranoid
 #define	MIN_SPACE 75
-	if (compl_length > (IOSIZE - MIN_SPACE))
+	எனில் (compl_length > (IOSIZE - MIN_SPACE))
 	{
 	    compl_cont_status &= ~CONT_SOL;
 	    compl_length = (IOSIZE - MIN_SPACE);
 	    compl_col = curwin->w_cursor.col - compl_length;
 	}
 	compl_cont_status |= CONT_ADDING | CONT_N_ADDS;
-	if (compl_length < 1)
+	எனில் (compl_length < 1)
 	    compl_cont_status &= CONT_LOCAL;
     }
-    else if (ctrl_x_mode_line_or_eval() || ctrl_x_mode_register())
+    இல்லையெனில் எனில் (ctrl_x_mode_வரி_or_eval() || ctrl_x_mode_register())
 	compl_cont_status = CONT_ADDING | CONT_N_ADDS;
-    else
+    இல்லையெனில்
 	compl_cont_status = 0;
 }
 
 /*
  * start insert mode completion
  */
-    static int
-ins_compl_start(void)
+    நிலையான முழு
+ins_compl_start(வெறுமை)
 {
-    char_u	*line = NULL;
-    int		startcol = 0;	    // column where searched text starts
+    char_u	*வரி = வெற்று;
+    முழு		startcol = 0;	    // column where searched text starts
     colnr_T	curs_col;	    // cursor column
-    int		line_invalid = FALSE;
-    int		save_did_ai = did_ai;
-    int		flags = CP_ORIGINAL_TEXT;
+    முழு		வரி_invalid = FALSE;
+    முழு		save_did_ai = did_ai;
+    முழு		flags = CP_ORIGINAL_TEXT;
 
     // First time we hit ^N or ^P (in a row, I mean)
     did_ai = FALSE;
     did_si = FALSE;
     can_si = FALSE;
     can_si_back = FALSE;
-    if (stop_arrow() == FAIL)
+    எனில் (stop_arrow() == FAIL)
     {
 	did_ai = save_did_ai;
-	return FAIL;
+	திரும்பு FAIL;
     }
 
-    line = ml_get(curwin->w_cursor.lnum);
+    வரி = ml_get(curwin->w_cursor.lnum);
     curs_col = curwin->w_cursor.col;
     compl_pending = 0;
     compl_lnum = curwin->w_cursor.lnum;
 
-    if ((compl_cont_status & CONT_INTRPT) == CONT_INTRPT
+    எனில் ((compl_cont_status & CONT_INTRPT) == CONT_INTRPT
 	    && compl_cont_mode == ctrl_x_mode)
 	// this same ctrl-x_mode was interrupted previously. Continue the
 	// completion.
-	ins_compl_continue_search(line);
-    else
+	ins_compl_continue_தேடல்(வரி);
+    இல்லையெனில்
 	compl_cont_status &= CONT_LOCAL;
 
-    if (!compl_status_adding())	// normal expansion
+    எனில் (!compl_status_adding())	// normal expansion
     {
 	compl_cont_mode = ctrl_x_mode;
-	if (ctrl_x_mode_not_default())
+	எனில் (ctrl_x_mode_not_default())
 	    // Remove LOCAL if ctrl_x_mode != CTRL_X_NORMAL
 	    compl_cont_status = 0;
 	compl_cont_status |= CONT_N_ADDS;
 	compl_startpos = curwin->w_cursor;
-	startcol = (int)curs_col;
+	startcol = (முழு)curs_col;
 	compl_col = 0;
     }
 
     // Work out completion pattern and original text -- webb
-    if (compl_get_info(line, startcol, curs_col, &line_invalid) == FAIL)
+    எனில் (compl_get_info(வரி, startcol, curs_col, &வரி_invalid) == FAIL)
     {
-	if (ctrl_x_mode_function() || ctrl_x_mode_omni()
+	எனில் (ctrl_x_mode_function() || ctrl_x_mode_omni()
 				|| thesaurus_func_complete(ctrl_x_mode))
 	    // restore did_ai, so that adding comment leader works
 	    did_ai = save_did_ai;
-	return FAIL;
+	திரும்பு FAIL;
     }
     // If "line" was changed while getting completion info get it again.
-    if (line_invalid)
-	line = ml_get(curwin->w_cursor.lnum);
+    எனில் (வரி_invalid)
+	வரி = ml_get(curwin->w_cursor.lnum);
 
-    if (compl_status_adding())
+    எனில் (compl_status_adding())
     {
-	if (!shortmess(SHM_COMPLETIONMENU))
+	எனில் (!shortmess(SHM_COMPLETIONMENU))
 	    edit_submode_pre = (char_u *)_(" Adding");
-	if (ctrl_x_mode_line_or_eval())
+	எனில் (ctrl_x_mode_வரி_or_eval())
 	{
 	    // Insert a new line, keep indentation but ignore 'comments'.
 	    char_u *old = curbuf->b_p_com;
@@ -7314,65 +7314,65 @@ ins_compl_start(void)
 	    compl_lnum = curwin->w_cursor.lnum;
 	}
     }
-    else
+    இல்லையெனில்
     {
-	edit_submode_pre = NULL;
+	edit_submode_pre = வெற்று;
 	compl_startpos.col = compl_col;
     }
 
-    if (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
+    எனில் (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
     {
-	if (compl_cont_status & CONT_LOCAL)
-	    edit_submode = (char_u *)_(ctrl_x_msgs[CTRL_X_LOCAL_MSG]);
-	else
-	    edit_submode = (char_u *)_(CTRL_X_MSG(ctrl_x_mode));
+	எனில் (compl_cont_status & CONT_LOCAL)
+	    edit_submode = (char_u *)_(ctrl_x_msgs[CTRL_X_LOCAL_செய்தி]);
+	இல்லையெனில்
+	    edit_submode = (char_u *)_(CTRL_X_செய்தி(ctrl_x_mode));
     }
 
     // If any of the original typed text has been changed we need to fix
     // the redo buffer.
-    ins_compl_fixRedoBufForLeader(NULL);
+    ins_compl_fixRedoBufForLeader(வெற்று);
 
     // Always add completion for the original text.
     VIM_CLEAR_STRING(compl_orig_text);
     compl_orig_text.length = (size_t)compl_length;
-    compl_orig_text.string = vim_strnsave(line + compl_col, (size_t)compl_length);
-    if (p_ic)
+    compl_orig_text.string = vim_strnsave(வரி + compl_col, (size_t)compl_length);
+    எனில் (p_ic)
 	flags |= CP_ICASE;
-    if (compl_orig_text.string == NULL
+    எனில் (compl_orig_text.string == வெற்று
 	    || ins_compl_add(compl_orig_text.string,
-		(int)compl_orig_text.length,
-		NULL, NULL, NULL, 0, flags, FALSE, NULL, FUZZY_SCORE_NONE) != OK)
+		(முழு)compl_orig_text.length,
+		வெற்று, வெற்று, வெற்று, 0, flags, FALSE, வெற்று, FUZZY_SCORE_NONE) != OK)
     {
 	VIM_CLEAR_STRING(compl_pattern);
 	VIM_CLEAR_STRING(compl_orig_text);
 	did_ai = save_did_ai;
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     // showmode might reset the internal line pointers, so it must
     // be called before line = ml_get(), or when this address is no
     // longer needed.  -- Acevedo.
-    if (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
+    எனில் (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
     {
 	edit_submode_extra = (char_u *)_("-- Searching...");
-	edit_submode_highl = HLF_COUNT;
+	edit_submode_highl = HLF_மொத்தம்;
 	showmode();
-	edit_submode_extra = NULL;
+	edit_submode_extra = வெற்று;
 	out_flush();
     }
 
     did_ai = save_did_ai;
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * display the completion status message
  */
-    static void
-ins_compl_show_statusmsg(void)
+    நிலையான வெறுமை
+ins_compl_show_statusmsg(வெறுமை)
 {
     // we found no match if the list has only the "compl_orig_text"-entry
-    if (is_first_match(compl_first_match->cp_next))
+    எனில் (is_first_match(compl_first_match->cp_next))
     {
 	edit_submode_extra = compl_status_adding() && compl_length > 1
 				? (char_u *)_("Hit end of paragraph")
@@ -7380,74 +7380,74 @@ ins_compl_show_statusmsg(void)
 	edit_submode_highl = HLF_E;
     }
 
-    if (edit_submode_extra == NULL)
+    எனில் (edit_submode_extra == வெற்று)
     {
-	if (match_at_original_text(compl_curr_match))
+	எனில் (match_at_original_text(compl_curr_match))
 	{
 	    edit_submode_extra = (char_u *)_("Back at original");
 	    edit_submode_highl = HLF_W;
 	}
-	else if (compl_cont_status & CONT_S_IPOS)
+	இல்லையெனில் எனில் (compl_cont_status & CONT_S_IPOS)
 	{
 	    edit_submode_extra = (char_u *)_("Word from other line");
-	    edit_submode_highl = HLF_COUNT;
+	    edit_submode_highl = HLF_மொத்தம்;
 	}
-	else if (compl_curr_match->cp_next == compl_curr_match->cp_prev)
+	இல்லையெனில் எனில் (compl_curr_match->cp_next == compl_curr_match->cp_prev)
 	{
 	    edit_submode_extra = (char_u *)_("The only match");
-	    edit_submode_highl = HLF_COUNT;
-	    compl_curr_match->cp_number = 1;
+	    edit_submode_highl = HLF_மொத்தம்;
+	    compl_curr_match->cp_எண் = 1;
 	}
-	else
+	இல்லையெனில்
 	{
-#if defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
+#எனில் defined(FEAT_COMPL_FUNC) || defined(FEAT_EVAL)
 	    // Update completion sequence number when needed.
-	    if (compl_curr_match->cp_number == -1)
+	    எனில் (compl_curr_match->cp_எண் == -1)
 		ins_compl_update_sequence_numbers();
 #endif
 	    // The match should always have a sequence number now, this is
 	    // just a safety check.
-	    if (compl_curr_match->cp_number != -1)
+	    எனில் (compl_curr_match->cp_எண் != -1)
 	    {
 		// Space for 10 text chars. + 2x10-digit no.s = 31.
 		// Translations may need more than twice that.
-		static char_u match_ref[81];
+		நிலையான char_u match_ref[81];
 
-		if (compl_matches > 0)
-		    vim_snprintf((char *)match_ref, sizeof(match_ref),
+		எனில் (compl_matches > 0)
+		    vim_snprintf((எழுத்து *)match_ref, அளவு(match_ref),
 			    _("match %d of %d"),
-			    compl_curr_match->cp_number, compl_matches);
-		else
-		    vim_snprintf((char *)match_ref, sizeof(match_ref),
+			    compl_curr_match->cp_எண், compl_matches);
+		இல்லையெனில்
+		    vim_snprintf((எழுத்து *)match_ref, அளவு(match_ref),
 			    _("match %d"),
-			    compl_curr_match->cp_number);
+			    compl_curr_match->cp_எண்);
 		edit_submode_extra = match_ref;
 		edit_submode_highl = HLF_R;
-		if (dollar_vcol >= 0)
+		எனில் (dollar_vcol >= 0)
 		    curs_columns(FALSE);
 	    }
 	}
     }
 
     // Show a message about what (completion) mode we're in.
-    if (!compl_opt_suppress_empty)
+    எனில் (!compl_opt_suppress_empty)
     {
 	showmode();
-	if (!shortmess(SHM_COMPLETIONMENU))
+	எனில் (!shortmess(SHM_COMPLETIONMENU))
 	{
-	    if (edit_submode_extra != NULL)
+	    எனில் (edit_submode_extra != வெற்று)
 	    {
-		if (!p_smd)
+		எனில் (!p_smd)
 		{
-		    msg_hist_off = TRUE;
-		    msg_attr((char *)edit_submode_extra,
-			    edit_submode_highl < HLF_COUNT
+		    செய்தி_hist_off = TRUE;
+		    செய்தி_attr((எழுத்து *)edit_submode_extra,
+			    edit_submode_highl < HLF_மொத்தம்
 			    ? HL_ATTR(edit_submode_highl) : 0);
-		    msg_hist_off = FALSE;
+		    செய்தி_hist_off = FALSE;
 		}
 	    }
-	    else
-		msg_clr_cmdline();	// necessary for "noshowmode"
+	    இல்லையெனில்
+		செய்தி_clr_cmdline();	// necessary for "noshowmode"
 	}
     }
 }
@@ -7457,69 +7457,69 @@ ins_compl_show_statusmsg(void)
  * Called when character "c" was typed, which has a meaning for completion.
  * Returns OK if completion was done, FAIL if something failed (out of mem).
  */
-    int
-ins_complete(int c, int enable_pum)
+    முழு
+ins_complete(முழு c, முழு enable_pum)
 {
-    int		n;
-    int		save_w_wrow;
-    int		save_w_leftcol;
-    int		insert_match;
-    int		no_matches_found;
+    முழு		n;
+    முழு		save_w_wrow;
+    முழு		save_w_leftcol;
+    முழு		செருகு_match;
+    முழு		no_matches_found;
 
     compl_direction = ins_compl_key2dir(c);
-    insert_match = ins_compl_use_match(c);
+    செருகு_match = ins_compl_use_match(c);
 
-    if (!compl_started)
+    எனில் (!compl_started)
     {
 	// Only what the automatic trigger armed counts as started by Vim.
 	compl_autostarted = compl_autostart_pending;
 	compl_autostart_pending = false;
-	if (ins_compl_start() == FAIL)
-	    return FAIL;
+	எனில் (ins_compl_start() == FAIL)
+	    திரும்பு FAIL;
     }
-    else if (insert_match && stop_arrow() == FAIL)
-	return FAIL;
+    இல்லையெனில் எனில் (செருகு_match && stop_arrow() == FAIL)
+	திரும்பு FAIL;
 
     compl_curr_win = curwin;
     compl_curr_buf = curwin->w_buffer;
     compl_shown_match = compl_curr_match;
     compl_shows_dir = compl_direction;
-    compl_num_bests = 0;
+    compl_இலக்கம்_bests = 0;
 
     // Find next match (and following matches).
     save_w_wrow = curwin->w_wrow;
     save_w_leftcol = curwin->w_leftcol;
-    n = ins_compl_next(TRUE, ins_compl_key2count(c), insert_match);
+    n = ins_compl_next(TRUE, ins_compl_key2count(c), செருகு_match);
 
     // Reset autocompletion timer expiry flag
-    if (compl_autocomplete)
+    எனில் (compl_autocomplete)
 	compl_time_slice_expired = FALSE;
 
     // may undisplay the popup menu
     ins_compl_upd_pum();
 
-    if (n > 1)		// all matches have been found
+    எனில் (n > 1)		// all matches have been found
 	compl_matches = n;
     compl_curr_match = compl_shown_match;
     compl_direction = compl_shows_dir;
 
     // Eat the ESC that vgetc() returns after a CTRL-C to avoid leaving Insert
     // mode.
-    if (got_int && !global_busy)
+    எனில் (got_int && !global_busy)
     {
-	(void)vgetc();
+	(வெறுமை)vgetc();
 	got_int = FALSE;
     }
 
     // we found no match if the list has only the "compl_orig_text"-entry
     no_matches_found = is_first_match(compl_first_match->cp_next);
-    if (no_matches_found)
+    எனில் (no_matches_found)
     {
 	// remove N_ADDS flag, so next ^X<> won't try to go to ADDING mode,
 	// because we couldn't expand anything at first place, but if we used
 	// ^P, ^N, ^X^I or ^X^D we might want to add-expand a single-char-word
 	// (such as M in M'exico) if not tried already.  -- Acevedo
-	if (compl_length > 1
+	எனில் (compl_length > 1
 		|| compl_status_adding()
 		|| (ctrl_x_mode_not_default()
 		    && !ctrl_x_mode_path_patterns()
@@ -7527,29 +7527,29 @@ ins_complete(int c, int enable_pum)
 	    compl_cont_status &= ~CONT_N_ADDS;
     }
 
-    if (compl_curr_match->cp_flags & CP_CONT_S_IPOS)
+    எனில் (compl_curr_match->cp_flags & CP_CONT_S_IPOS)
 	compl_cont_status |= CONT_S_IPOS;
-    else
+    இல்லையெனில்
 	compl_cont_status &= ~CONT_S_IPOS;
 
-    if (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
+    எனில் (!shortmess(SHM_COMPLETIONMENU) && !compl_autocomplete)
 	ins_compl_show_statusmsg();
 
     // Show the popup menu, unless we got interrupted.
-    if (enable_pum && !compl_interrupted)
+    எனில் (enable_pum && !compl_interrupted)
 	show_pum(save_w_wrow, save_w_leftcol);
 
     compl_was_interrupted = compl_interrupted;
     compl_interrupted = FALSE;
 
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * Enable autocompletion
  */
-    void
-ins_compl_enable_autocomplete(void)
+    வெறுமை
+ins_compl_enable_autocomplete(வெறுமை)
 {
 #ifdef ELAPSED_FUNC
     compl_autocomplete = TRUE;
@@ -7560,8 +7560,8 @@ ins_compl_enable_autocomplete(void)
 /*
  * Disable autocompletion
  */
-    void
-ins_compl_disable_autocomplete(void)
+    வெறுமை
+ins_compl_disable_autocomplete(வெறுமை)
 {
     compl_autocomplete = FALSE;
 }
@@ -7570,8 +7570,8 @@ ins_compl_disable_autocomplete(void)
  * Remember that Vim is about to start a completion by itself, rather than
  * because a key was typed to ask for one.
  */
-    void
-ins_compl_arm_autostart(void)
+    வெறுமை
+ins_compl_arm_autostart(வெறுமை)
 {
     compl_autostart_pending = true;
 }
@@ -7579,8 +7579,8 @@ ins_compl_arm_autostart(void)
 /*
  * Forget what the automatic trigger armed, another key was typed since.
  */
-    void
-ins_compl_disarm_autostart(void)
+    வெறுமை
+ins_compl_disarm_autostart(வெறுமை)
 {
     compl_autostart_pending = false;
 }
@@ -7590,24 +7590,24 @@ ins_compl_disarm_autostart(void)
  * Return true when the popup should be deferred, false to trigger it now.
  */
     bool
-ins_compl_arm_autocomplete_delay(void)
+ins_compl_arm_autocomplete_delay(வெறுமை)
 {
 #ifdef ELAPSED_FUNC
-    if (p_acl > 0)
+    எனில் (p_acl > 0)
     {
 	ELAPSED_INIT(compl_autocomplete_start_tv);
 	compl_autocomplete_pending = true;
-	return true;
+	திரும்பு true;
     }
 #endif
-    return false;
+    திரும்பு false;
 }
 
 /*
  * Clear the pending 'autocompletedelay' state.
  */
-    void
-ins_compl_clear_autocomplete_delay(void)
+    வெறுமை
+ins_compl_clear_autocomplete_delay(வெறுமை)
 {
     compl_autocomplete_pending = false;
 }
@@ -7616,38 +7616,38 @@ ins_compl_clear_autocomplete_delay(void)
  * Return true while waiting for 'autocompletedelay' to expire.
  */
     bool
-ins_compl_autocomplete_pending(void)
+ins_compl_autocomplete_pending(வெறுமை)
 {
-    return compl_autocomplete_pending;
+    திரும்பு compl_autocomplete_pending;
 }
 
 /*
  * Return the time in msec since the 'autocompletedelay' was armed.
  */
     long
-ins_compl_autocomplete_elapsed(void)
+ins_compl_autocomplete_elapsed(வெறுமை)
 {
 #ifdef ELAPSED_FUNC
-    return ELAPSED_FUNC(compl_autocomplete_start_tv);
-#else
-    return 0;
+    திரும்பு ELAPSED_FUNC(compl_autocomplete_start_tv);
+#இல்லையெனில்
+    திரும்பு 0;
 #endif
 }
 
 /*
  * Remove (if needed) and show the popup menu
  */
-    static void
-show_pum(int prev_w_wrow, int prev_w_leftcol)
+    நிலையான வெறுமை
+show_pum(முழு prev_w_wrow, முழு prev_w_leftcol)
 {
     // RedrawingDisabled may be set when invoked through complete().
-    int save_RedrawingDisabled = RedrawingDisabled;
+    முழு save_RedrawingDisabled = RedrawingDisabled;
     RedrawingDisabled = 0;
 
     // If the cursor moved or the display scrolled we need to remove the pum
     // first.
     setcursor();
-    if (prev_w_wrow != curwin->w_wrow || prev_w_leftcol != curwin->w_leftcol)
+    எனில் (prev_w_wrow != curwin->w_wrow || prev_w_leftcol != curwin->w_leftcol)
 	ins_compl_del_pum();
 
     ins_compl_show_pum();
@@ -7662,68 +7662,68 @@ show_pum(int prev_w_wrow, int prev_w_leftcol)
  * a backslash) the metachars, and dest would be NUL terminated.
  * Returns the length (needed) of dest
  */
-    static unsigned
-quote_meta(char_u *dest, char_u *src, int len)
+    நிலையான unsigned
+quote_meta(char_u *dest, char_u *src, முழு len)
 {
     unsigned	m = (unsigned)len + 1;  // one extra for the NUL
 
-    for ( ; --len >= 0; src++)
+    க்கு ( ; --len >= 0; src++)
     {
-	switch (*src)
+	தேர்வு (*src)
 	{
-	    case '.':
-	    case '*':
-	    case '[':
-		if (ctrl_x_mode_dictionary() || ctrl_x_mode_thesaurus())
-		    break;
+	    நிலை '.':
+	    நிலை '*':
+	    நிலை '[':
+		எனில் (ctrl_x_mode_dictionary() || ctrl_x_mode_thesaurus())
+		    நிறுத்து;
 		// FALLTHROUGH
-	    case '~':
-		if (!magic_isset())	// quote these only if magic is set
-		    break;
+	    நிலை '~':
+		எனில் (!magic_isset())	// quote these only if magic is set
+		    நிறுத்து;
 		// FALLTHROUGH
-	    case '\\':
-		if (ctrl_x_mode_dictionary() || ctrl_x_mode_thesaurus())
-		    break;
+	    நிலை '\\':
+		எனில் (ctrl_x_mode_dictionary() || ctrl_x_mode_thesaurus())
+		    நிறுத்து;
 		// FALLTHROUGH
-	    case '^':		// currently it's not needed.
-	    case '$':
+	    நிலை '^':		// currently it's not needed.
+	    நிலை '$':
 		m++;
-		if (dest != NULL)
+		எனில் (dest != வெற்று)
 		    *dest++ = '\\';
-		break;
+		நிறுத்து;
 	}
-	if (dest != NULL)
+	எனில் (dest != வெற்று)
 	    *dest++ = *src;
 	// Copy remaining bytes of a multibyte character.
-	if (has_mbyte)
+	எனில் (has_mbyte)
 	{
-	    int mb_len = (*mb_ptr2len)(src) - 1;
-	    if (mb_len > 0 && len >= mb_len)
-		for (int i = 0; i < mb_len; ++i)
+	    முழு mb_len = (*mb_ptr2len)(src) - 1;
+	    எனில் (mb_len > 0 && len >= mb_len)
+		க்கு (முழு i = 0; i < mb_len; ++i)
 		{
 		    --len;
 		    ++src;
-		    if (dest != NULL)
+		    எனில் (dest != வெற்று)
 			*dest++ = *src;
 		}
 	}
     }
-    if (dest != NULL)
+    எனில் (dest != வெற்று)
 	*dest = NUL;
 
-    return m;
+    திரும்பு m;
 }
 
-#if defined(EXITFREE)
-    void
-free_insexpand_stuff(void)
+#எனில் defined(EXITFREE)
+    வெறுமை
+free_insexpand_stuff(வெறுமை)
 {
     VIM_CLEAR_STRING(compl_orig_text);
 # ifdef FEAT_EVAL
     free_callback(&cfu_cb);
     free_callback(&ofu_cb);
     free_callback(&tsrfu_cb);
-    clear_cpt_callbacks(&cpt_cb, cpt_cb_count);
+    clear_cpt_callbacks(&cpt_cb, cpt_cb_மொத்தம்);
 # endif
 }
 #endif
@@ -7733,13 +7733,13 @@ free_insexpand_stuff(void)
  * Called when starting CTRL_X_SPELL mode: Move backwards to a previous badly
  * spelled word, if there is one.
  */
-    static void
-spell_back_to_badword(void)
+    நிலையான வெறுமை
+spell_back_to_badword(வெறுமை)
 {
     pos_T	tpos = curwin->w_cursor;
 
-    spell_bad_len = spell_move_to(curwin, BACKWARD, SMT_ALL, TRUE, NULL);
-    if (curwin->w_cursor.col != tpos.col)
+    spell_bad_len = spell_move_to(curwin, BACKWARD, SMT_ALL, TRUE, வெற்று);
+    எனில் (curwin->w_cursor.col != tpos.col)
 	start_arrow(&tpos);
 }
 #endif
@@ -7747,86 +7747,86 @@ spell_back_to_badword(void)
 /*
  * Reset the info associated with completion sources.
  */
-    static void
-cpt_sources_clear(void)
+    நிலையான வெறுமை
+cpt_sources_clear(வெறுமை)
 {
     VIM_CLEAR(cpt_sources_array);
     cpt_sources_index = -1;
-    cpt_sources_count = 0;
+    cpt_sources_மொத்தம் = 0;
 }
 
 /*
  * Setup completion sources.
  */
-    static int
-setup_cpt_sources(void)
+    நிலையான முழு
+setup_cpt_sources(வெறுமை)
 {
     char_u  buf[LSIZE];
-    int	    slen;
-    int	    idx = 0;
-    int	    count;
+    முழு	    slen;
+    முழு	    idx = 0;
+    முழு	    மொத்தம்;
     char_u  *p;
 
     cpt_sources_clear();
 
-    count = get_cpt_sources_count(curbuf->b_p_cpt);
-    if (count == 0)
-	return OK;
+    மொத்தம் = get_cpt_sources_மொத்தம்(curbuf->b_p_cpt);
+    எனில் (மொத்தம் == 0)
+	திரும்பு OK;
 
-    cpt_sources_array = ALLOC_CLEAR_MULT(cpt_source_T, count);
-    if (cpt_sources_array == NULL)
-	return FAIL;
+    cpt_sources_array = ALLOC_CLEAR_MULT(cpt_source_T, மொத்தம்);
+    எனில் (cpt_sources_array == வெற்று)
+	திரும்பு FAIL;
 
-    for (p = curbuf->b_p_cpt; *p;)
+    க்கு (p = curbuf->b_p_cpt; *p;)
     {
-	while (*p == ',' || *p == ' ') // Skip delimiters
+	போது (*p == ',' || *p == ' ') // Skip delimiters
 	    p++;
-	if (*p) // If not end of string, count this segment
+	எனில் (*p) // If not end of string, count this segment
 	{
 	    cpt_sources_array[idx].cs_flag = *p;
 	    slen = copy_option_part(&p, buf, LSIZE, ","); // Advance p
-	    if (slen > 0)
+	    எனில் (slen > 0)
 	    {
 		char_u	*caret = vim_strchr(buf, '^');
-		if (caret != NULL)
+		எனில் (caret != வெற்று)
 		    cpt_sources_array[idx].cs_max_matches
-			= atoi((char *)caret + 1);
+			= atoi((எழுத்து *)caret + 1);
 	    }
 	    idx++;
 	}
     }
 
-    cpt_sources_count = count;
-    return OK;
+    cpt_sources_மொத்தம் = மொத்தம்;
+    திரும்பு OK;
 }
 
 /*
  * Return TRUE if any of the completion sources have 'refresh' set to 'always'.
  */
-    static int
-is_cpt_func_refresh_always(void)
+    நிலையான முழு
+is_cpt_func_refresh_always(வெறுமை)
 {
 #ifdef FEAT_COMPL_FUNC
-    for (int i = 0; i < cpt_sources_count; i++)
-	if (cpt_sources_array[i].cs_refresh_always)
-	    return TRUE;
+    க்கு (முழு i = 0; i < cpt_sources_மொத்தம்; i++)
+	எனில் (cpt_sources_array[i].cs_refresh_always)
+	    திரும்பு TRUE;
 #endif
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 /*
  * Make the completion list non-cyclic.
  */
-    static void
-ins_compl_make_linear(void)
+    நிலையான வெறுமை
+ins_compl_make_linear(வெறுமை)
 {
     compl_T *m;
 
-    if (compl_first_match == NULL || compl_first_match->cp_prev == NULL)
-	return;
+    எனில் (compl_first_match == வெற்று || compl_first_match->cp_prev == வெற்று)
+	திரும்பு;
     m = compl_first_match->cp_prev;
-    m->cp_next = NULL;
-    compl_first_match->cp_prev = NULL;
+    m->cp_next = வெற்று;
+    compl_first_match->cp_prev = வெற்று;
 }
 
 /*
@@ -7834,58 +7834,58 @@ ins_compl_make_linear(void)
  * cpt_sources_index) from the completion list.
  */
 #ifdef FEAT_COMPL_FUNC
-    static void
-remove_old_matches(void)
+    நிலையான வெறுமை
+remove_old_matches(வெறுமை)
 {
     compl_T *current;
-    int	    shown_match_removed = FALSE;
-    int	    forward = (compl_first_match->cp_cpt_source_idx < 0);
+    முழு	    shown_match_removed = FALSE;
+    முழு	    forward = (compl_first_match->cp_cpt_source_idx < 0);
 
-    if (cpt_sources_index < 0)
-	return;
+    எனில் (cpt_sources_index < 0)
+	திரும்பு;
 
     compl_direction = forward ? FORWARD : BACKWARD;
     compl_shows_dir = compl_direction;
 
     // When 'fuzzy' is enabled, items are not ordered by their original source
     // order (cpt_sources_index). So, remove items one by one.
-    for (current = compl_first_match; current != NULL; )
+    க்கு (current = compl_first_match; current != வெற்று; )
     {
-	if (current->cp_cpt_source_idx == cpt_sources_index)
+	எனில் (current->cp_cpt_source_idx == cpt_sources_index)
 	{
 	    compl_T *to_delete = current;
 
-	    if (!shown_match_removed && compl_shown_match == current)
+	    எனில் (!shown_match_removed && compl_shown_match == current)
 		shown_match_removed = TRUE;
 
 	    current = current->cp_next;
 
-	    if (to_delete == compl_first_match)  // node to remove is at head
+	    எனில் (to_delete == compl_first_match)  // node to remove is at head
 	    {
 		compl_first_match = to_delete->cp_next;
-		compl_first_match->cp_prev = NULL;
+		compl_first_match->cp_prev = வெற்று;
 	    }
-	    else if (to_delete->cp_next == NULL) // node to remove is at tail
-		to_delete->cp_prev->cp_next = NULL;
-	    else // node is in the moddle
+	    இல்லையெனில் எனில் (to_delete->cp_next == வெற்று) // node to remove is at tail
+		to_delete->cp_prev->cp_next = வெற்று;
+	    இல்லையெனில் // node is in the moddle
 	    {
 		to_delete->cp_prev->cp_next = to_delete->cp_next;
 		to_delete->cp_next->cp_prev = to_delete->cp_prev;
 	    }
 	    ins_compl_item_free(to_delete);
 	}
-	else
+	இல்லையெனில்
 	    current = current->cp_next;
     }
 
     // Re-assign compl_shown_match if necessary
-    if (shown_match_removed)
+    எனில் (shown_match_removed)
     {
-	if (forward)
+	எனில் (forward)
 	    compl_shown_match = compl_first_match;
-	else
+	இல்லையெனில்
 	{  // Last node will have the prefix that is being completed
-	    for (current = compl_first_match; current->cp_next != NULL;
+	    க்கு (current = compl_first_match; current->cp_next != வெற்று;
 		    current = current->cp_next)
 		;
 	    compl_shown_match = current;
@@ -7894,16 +7894,16 @@ remove_old_matches(void)
 
     // Re-assign compl_curr_match
     compl_curr_match = compl_first_match;
-    for (current = compl_first_match; current != NULL; )
+    க்கு (current = compl_first_match; current != வெற்று; )
     {
-	if ((forward ? current->cp_cpt_source_idx < cpt_sources_index
+	எனில் ((forward ? current->cp_cpt_source_idx < cpt_sources_index
 		    : current->cp_cpt_source_idx > cpt_sources_index))
 	{
 	    compl_curr_match = forward ? current : current->cp_next;
 	    current = current->cp_next;
 	}
-	else
-	    break;
+	இல்லையெனில்
+	    நிறுத்து;
     }
 }
 #endif
@@ -7913,26 +7913,26 @@ remove_old_matches(void)
  * 'refresh:always' flag.
  */
 #ifdef FEAT_COMPL_FUNC
-    static void
+    நிலையான வெறுமை
 get_cpt_func_completion_matches(callback_T *cb UNUSED)
 {
     cpt_source_T    *cpt_src = &cpt_sources_array[cpt_sources_index];
-    int		    startcol = cpt_src->cs_startcol;
+    முழு		    startcol = cpt_src->cs_startcol;
 
-    if (startcol == -2 || startcol == -3)
-	return;
+    எனில் (startcol == -2 || startcol == -3)
+	திரும்பு;
 
-    if (set_compl_globals(startcol, curwin->w_cursor.col, TRUE) == OK)
+    எனில் (set_compl_globals(startcol, curwin->w_cursor.col, TRUE) == OK)
     {
 	// Insert the leader string (previously removed) before expansion.
 	// This prevents flicker when `func` (e.g. an LSP client) is slow and
 	// calls 'sleep', which triggers out_flush().
-	if (!cpt_src->cs_refresh_always)
-	    ins_compl_insert_bytes(ins_compl_leader(), -1);
+	எனில் (!cpt_src->cs_refresh_always)
+	    ins_compl_செருகு_bytes(ins_compl_leader(), -1);
 
 	expand_by_function(0, cpt_compl_pattern.string, cb);
 
-	if (!cpt_src->cs_refresh_always)
+	எனில் (!cpt_src->cs_refresh_always)
 	    ins_compl_delete();
 
 	cpt_src->cs_refresh_always = compl_opt_refresh_always;
@@ -7945,14 +7945,14 @@ get_cpt_func_completion_matches(callback_T *cb UNUSED)
  * Retrieve completion matches from functions in the 'cpt' option where the
  * 'refresh:always' flag is set.
  */
-    static void
-cpt_compl_refresh(void)
+    நிலையான வெறுமை
+cpt_compl_refresh(வெறுமை)
 {
 #ifdef FEAT_COMPL_FUNC
     char_u	*cpt;
     char_u	*p;
-    callback_T	*cb = NULL;
-    int		startcol, ret;
+    callback_T	*cb = வெற்று;
+    முழு		startcol, ret;
 
     // Make the completion list linear (non-cyclic)
     ins_compl_make_linear();
@@ -7961,33 +7961,33 @@ cpt_compl_refresh(void)
     strip_caret_numbers_in_place(cpt);
 
     cpt_sources_index = 0;
-    for (p = cpt; *p;)
+    க்கு (p = cpt; *p;)
     {
-	while (*p == ',' || *p == ' ') // Skip delimiters
+	போது (*p == ',' || *p == ' ') // Skip delimiters
 	    p++;
-	if (*p == NUL)
-	    break;
+	எனில் (*p == NUL)
+	    நிறுத்து;
 
-	if (cpt_sources_array[cpt_sources_index].cs_refresh_always)
+	எனில் (cpt_sources_array[cpt_sources_index].cs_refresh_always)
 	{
 	    cb = get_callback_if_cpt_func(p, cpt_sources_index);
-	    if (cb)
+	    எனில் (cb)
 	    {
 		remove_old_matches();
 		ret = get_userdefined_compl_info(curwin->w_cursor.col, cb,
 			&startcol);
-		if (ret == FAIL)
+		எனில் (ret == FAIL)
 		{
-		    if (startcol == -3)
+		    எனில் (startcol == -3)
 			cpt_sources_array[cpt_sources_index].cs_refresh_always
 			    = FALSE;
-		    else
+		    இல்லையெனில்
 			startcol = -2;
 		}
-		else if (startcol < 0 || startcol > curwin->w_cursor.col)
+		இல்லையெனில் எனில் (startcol < 0 || startcol > curwin->w_cursor.col)
 		    startcol = curwin->w_cursor.col;
 		cpt_sources_array[cpt_sources_index].cs_startcol = startcol;
-		if (ret == OK)
+		எனில் (ret == OK)
 		{
 		    compl_source_start_timer(cpt_sources_index);
 		    get_cpt_func_completion_matches(cb);
@@ -7995,9 +7995,9 @@ cpt_compl_refresh(void)
 	    }
 	}
 
-	(void)copy_option_part(&p, IObuff, IOSIZE, ","); // Advance p
-	if (may_advance_cpt_index(p))
-	    (void)advance_cpt_sources_index_safe();
+	(வெறுமை)copy_option_part(&p, IObuff, IOSIZE, ","); // Advance p
+	எனில் (may_advance_cpt_index(p))
+	    (வெறுமை)advance_cpt_sources_index_safe();
     }
     cpt_sources_index = -1;
 
@@ -8010,9 +8010,9 @@ cpt_compl_refresh(void)
 /*
  * "preinserted()" function
  */
-    void
+    வெறுமை
 f_preinserted(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (ins_compl_preinsert_effect())
-	rettv->vval.v_number = 1;
+    எனில் (ins_compl_preinsert_effect())
+	rettv->vval.v_எண் = 1;
 }

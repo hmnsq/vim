@@ -13,121 +13,121 @@
  */
 
 #undef NDEBUG
-#include <assert.h>
+#அந்தர்பாவ <assert.h>
 
 // Must include main.c because it contains much more than just main()
 #define NO_VIM_MAIN
-#include "main.c"
+#அந்தர்பாவ "main.c"
 
 // This file has to be included because the tested functions are static
-#include "memfile.c"
+#அந்தர்பாவ "memfile.c"
 
-#define index_to_key(i) ((i) ^ 15167)
-#define TEST_COUNT 50000
+#define index_to_சாவி(i) ((i) ^ 15167)
+#define TEST_மொத்தம் 50000
 
 /*
  * Test mf_hash_*() functions.
  */
-    static void
-test_mf_hash(void)
+    நிலையான வெறுமை
+test_mf_hash(வெறுமை)
 {
     mf_hashtab_T   ht;
     mf_hashitem_T  *item;
-    blocknr_T      key;
+    blocknr_T      சாவி;
     long_u	   i;
-    long_u	   num_buckets;
+    long_u	   இலக்கம்_buckets;
 
     mf_hash_init(&ht);
 
     // insert some items and check invariants
-    for (i = 0; i < TEST_COUNT; i++)
+    க்கு (i = 0; i < TEST_மொத்தம்; i++)
     {
-	assert(ht.mht_count == i);
+	ப்ரதிஜ்ஞா(ht.mht_மொத்தம் == i);
 
 	// check that number of buckets is a power of 2
-	num_buckets = ht.mht_mask + 1;
-	assert(num_buckets > 0 && (num_buckets & (num_buckets - 1)) == 0);
+	இலக்கம்_buckets = ht.mht_mask + 1;
+	ப்ரதிஜ்ஞா(இலக்கம்_buckets > 0 && (இலக்கம்_buckets & (இலக்கம்_buckets - 1)) == 0);
 
 	// check load factor
-	assert(ht.mht_count <= (num_buckets << MHT_LOG_LOAD_FACTOR));
+	ப்ரதிஜ்ஞா(ht.mht_மொத்தம் <= (இலக்கம்_buckets << MHT_LOG_LOAD_FACTOR));
 
-	if (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
+	எனில் (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
 	{
 	    // first expansion shouldn't have occurred yet
-	    assert(num_buckets == MHT_INIT_SIZE);
-	    assert(ht.mht_buckets == ht.mht_small_buckets);
+	    ப்ரதிஜ்ஞா(இலக்கம்_buckets == MHT_INIT_SIZE);
+	    ப்ரதிஜ்ஞா(ht.mht_buckets == ht.mht_small_buckets);
 	}
-	else
+	இல்லையெனில்
 	{
-	    assert(num_buckets > MHT_INIT_SIZE);
-	    assert(ht.mht_buckets != ht.mht_small_buckets);
+	    ப்ரதிஜ்ஞா(இலக்கம்_buckets > MHT_INIT_SIZE);
+	    ப்ரதிஜ்ஞா(ht.mht_buckets != ht.mht_small_buckets);
 	}
 
-	key = index_to_key(i);
-	assert(mf_hash_find(&ht, key) == NULL);
+	சாவி = index_to_சாவி(i);
+	ப்ரதிஜ்ஞா(mf_hash_find(&ht, சாவி) == வெற்று);
 
 	// allocate and add new item
 	item = LALLOC_CLEAR_ONE(mf_hashitem_T);
-	assert(item != NULL);
-	item->mhi_key = key;
+	ப்ரதிஜ்ஞா(item != வெற்று);
+	item->mhi_சாவி = சாவி;
 	mf_hash_add_item(&ht, item);
 
-	assert(mf_hash_find(&ht, key) == item);
+	ப்ரதிஜ்ஞா(mf_hash_find(&ht, சாவி) == item);
 
-	if (ht.mht_mask + 1 != num_buckets)
+	எனில் (ht.mht_mask + 1 != இலக்கம்_buckets)
 	{
 	    // hash table was expanded
-	    assert(ht.mht_mask + 1 == num_buckets * MHT_GROWTH_FACTOR);
-	    assert(i + 1 == (num_buckets << MHT_LOG_LOAD_FACTOR));
+	    ப்ரதிஜ்ஞா(ht.mht_mask + 1 == இலக்கம்_buckets * MHT_GROWTH_FACTOR);
+	    ப்ரதிஜ்ஞா(i + 1 == (இலக்கம்_buckets << MHT_LOG_LOAD_FACTOR));
 	}
     }
 
     // check presence of inserted items
-    for (i = 0; i < TEST_COUNT; i++)
+    க்கு (i = 0; i < TEST_மொத்தம்; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
-	assert(item != NULL);
-	assert(item->mhi_key == key);
+	சாவி = index_to_சாவி(i);
+	item = mf_hash_find(&ht, சாவி);
+	ப்ரதிஜ்ஞா(item != வெற்று);
+	ப்ரதிஜ்ஞா(item->mhi_சாவி == சாவி);
     }
 
     // delete some items
-    for (i = 0; i < TEST_COUNT; i++)
+    க்கு (i = 0; i < TEST_மொத்தம்; i++)
     {
-	if (i % 100 < 70)
+	எனில் (i % 100 < 70)
 	{
-	    key = index_to_key(i);
-	    item = mf_hash_find(&ht, key);
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    சாவி = index_to_சாவி(i);
+	    item = mf_hash_find(&ht, சாவி);
+	    ப்ரதிஜ்ஞா(item != வெற்று);
+	    ப்ரதிஜ்ஞா(item->mhi_சாவி == சாவி);
 
 	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    ப்ரதிஜ்ஞா(mf_hash_find(&ht, சாவி) == வெற்று);
 
 	    mf_hash_add_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == item);
+	    ப்ரதிஜ்ஞா(mf_hash_find(&ht, சாவி) == item);
 
 	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    ப்ரதிஜ்ஞா(mf_hash_find(&ht, சாவி) == வெற்று);
 
 	    vim_free(item);
 	}
     }
 
     // check again
-    for (i = 0; i < TEST_COUNT; i++)
+    க்கு (i = 0; i < TEST_மொத்தம்; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
+	சாவி = index_to_சாவி(i);
+	item = mf_hash_find(&ht, சாவி);
 
-	if (i % 100 < 70)
+	எனில் (i % 100 < 70)
 	{
-	    assert(item == NULL);
+	    ப்ரதிஜ்ஞா(item == வெற்று);
 	}
-	else
+	இல்லையெனில்
 	{
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    ப்ரதிஜ்ஞா(item != வெற்று);
+	    ப்ரதிஜ்ஞா(item->mhi_சாவி == சாவி);
 	}
     }
 
@@ -135,9 +135,9 @@ test_mf_hash(void)
     mf_hash_free_all(&ht);
 }
 
-    int
-main(void)
+    முழு
+முதன்மை(வெறுமை)
 {
     test_mf_hash();
-    return 0;
+    திரும்பு 0;
 }

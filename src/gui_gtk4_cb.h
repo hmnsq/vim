@@ -10,13 +10,13 @@
 #ifndef GUI_GTK4_CB_H
 #define GUI_GTK4_CB_H
 
-#include "vim.h"
-#include <gtk/gtk.h>
+#அந்தர்பாவ "vim.h"
+#அந்தர்பாவ <gtk/gtk.h>
 
 #define VIM_TYPE_CONTENT_PROVIDER (vim_content_provider_get_type())
 G_DECLARE_FINAL_TYPE(VimContentProvider, vim_content_provider, VIM, CONTENT_PROVIDER, GdkContentProvider)
 
-extern const char *supported_mimes[];
+வெளி மாறிலி எழுத்து *supported_mimes[];
 
 GdkContentProvider *vim_content_provider_new(Clipboard_T *cbd);
 

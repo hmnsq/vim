@@ -8,39 +8,39 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#include <Xm/Form.h>
-#include <Xm/RowColumn.h>
-#include <Xm/PushB.h>
-#include <Xm/Text.h>
-#include <Xm/TextF.h>
-#include <Xm/Separator.h>
-#include <Xm/Label.h>
-#include <Xm/CascadeB.h>
-#include <Xm/ScrollBar.h>
-#include <Xm/MenuShell.h>
-#include <Xm/DrawingA.h>
-#if (XmVersion >= 1002)
+#அந்தர்பாவ <Xm/Form.h>
+#அந்தர்பாவ <Xm/RowColumn.h>
+#அந்தர்பாவ <Xm/PushB.h>
+#அந்தர்பாவ <Xm/Text.h>
+#அந்தர்பாவ <Xm/TextF.h>
+#அந்தர்பாவ <Xm/Separator.h>
+#அந்தர்பாவ <Xm/Label.h>
+#அந்தர்பாவ <Xm/CascadeB.h>
+#அந்தர்பாவ <Xm/ScrollBar.h>
+#அந்தர்பாவ <Xm/MenuShell.h>
+#அந்தர்பாவ <Xm/DrawingA.h>
+#எனில் (XmVersion >= 1002)
 # include <Xm/RepType.h>
 #endif
-#include <Xm/Frame.h>
-#include <Xm/LabelG.h>
-#include <Xm/ToggleBG.h>
-#include <Xm/SeparatoG.h>
-#include <Xm/XmP.h>
+#அந்தர்பாவ <Xm/Frame.h>
+#அந்தர்பாவ <Xm/LabelG.h>
+#அந்தர்பாவ <Xm/ToggleBG.h>
+#அந்தர்பாவ <Xm/SeparatoG.h>
+#அந்தர்பாவ <Xm/XmP.h>
 
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
-#include <X11/StringDefs.h>
-#include <X11/Intrinsic.h>
+#அந்தர்பாவ <X11/keysym.h>
+#அந்தர்பாவ <X11/Xatom.h>
+#அந்தர்பாவ <X11/StringDefs.h>
+#அந்தர்பாவ <X11/Intrinsic.h>
 #ifdef HAVE_X11_XPM_H
-# if defined(VMS)
+# எனில் defined(VMS)
 #  include <xpm.h>
-# else
+# இல்லையெனில்
 #  include <X11/xpm.h>
 # endif
-#else
+#இல்லையெனில்
 # ifdef HAVE_XM_XPMP_H
 #  include <Xm/XpmP.h>
 # endif
@@ -49,9 +49,9 @@
 # include <Xm/Notebook.h>
 #endif
 
-#include "gui_xmebw.h"	// for our Enhanced Button Widget
+#அந்தர்பாவ "gui_xmebw.h"	// for our Enhanced Button Widget
 
-#if defined(FEAT_GUI_DIALOG) && defined(HAVE_XPM)
+#எனில் defined(FEAT_GUI_DIALOG) && defined(HAVE_XPM)
 # include "../pixmaps/alert.xpm"
 # include "../pixmaps/error.xpm"
 # include "../pixmaps/generic.xpm"
@@ -61,38 +61,38 @@
 
 #define MOTIF_POPUP
 
-extern Widget vimShell;
+வெளி Widget vimShell;
 
-static Widget vimForm;
-static Widget textAreaForm;
+நிலையான Widget vimForm;
+நிலையான Widget textAreaForm;
 Widget textArea;
 #ifdef FEAT_TOOLBAR
-static Widget toolBarFrame;
-static Widget toolBar;
+நிலையான Widget toolBarFrame;
+நிலையான Widget toolBar;
 #endif
 #ifdef FEAT_GUI_TABLINE
-static Widget	tabLine;
-static Widget	tabLine_menu = 0;
-static int	showing_tabline = 0;
+நிலையான Widget	tab_வரி;
+நிலையான Widget	tab_வரி_menu = 0;
+நிலையான முழு	showing_tabline = 0;
 #endif
 #ifdef FEAT_MENU
-# if (XmVersion >= 1002)
+# எனில் (XmVersion >= 1002)
 // remember the last set value for the tearoff item
-static int tearoff_val = (int)XmTEAR_OFF_ENABLED;
+நிலையான முழு tearoff_val = (முழு)XmTEAR_OFF_ENABLED;
 # endif
-static Widget menuBar;
+நிலையான Widget menuBar;
 #endif
 
 #ifdef FEAT_TOOLBAR
-static void reset_focus(void);
+நிலையான வெறுமை reset_focus(வெறுமை);
 #endif
 
-static void gui_motif_menu_colors(Widget id);
-static void gui_motif_scroll_colors(Widget id);
+நிலையான வெறுமை gui_motif_menu_colors(Widget id);
+நிலையான வெறுமை gui_motif_scroll_colors(Widget id);
 
-#if (XmVersion >= 1002)
+#எனில் (XmVersion >= 1002)
 # define STRING_TAG  XmFONTLIST_DEFAULT_TAG
-#else
+#இல்லையெனில்
 # define STRING_TAG  XmSTRING_DEFAULT_CHARSET
 #endif
 
@@ -100,23 +100,23 @@ static void gui_motif_scroll_colors(Widget id);
  * Call-back routines.
  */
 
-    static void
+    நிலையான வெறுமை
 scroll_cb(Widget w UNUSED, XtPointer client_data, XtPointer call_data)
 {
     scrollbar_T *sb;
-    long	value;
-    int		dragging;
+    long	மதிப்பு;
+    முழு		dragging;
 
     sb = gui_find_scrollbar((long)client_data);
 
-    value = ((XmScrollBarCallbackStruct *)call_data)->value;
+    மதிப்பு = ((XmScrollBarCallbackStruct *)call_data)->மதிப்பு;
     dragging = (((XmScrollBarCallbackStruct *)call_data)->reason ==
-							      (int)XmCR_DRAG);
-    gui_drag_scrollbar(sb, value, dragging);
+							      (முழு)XmCR_DRAG);
+    gui_drag_scrollbar(sb, மதிப்பு, dragging);
 }
 
 #ifdef FEAT_GUI_TABLINE
-    static void
+    நிலையான வெறுமை
 tabline_cb(
     Widget	w UNUSED,
     XtPointer	client_data UNUSED,
@@ -125,11 +125,11 @@ tabline_cb(
     XmNotebookCallbackStruct *nptr;
 
     nptr = (XmNotebookCallbackStruct *)call_data;
-    if (nptr->reason != (int)XmCR_NONE)
-	send_tabline_event(nptr->page_number);
+    எனில் (nptr->reason != (முழு)XmCR_NONE)
+	send_tabline_event(nptr->page_எண்);
 }
 
-    static void
+    நிலையான வெறுமை
 tabline_button_cb(
     Widget	w,
     XtPointer	client_data UNUSED,
@@ -137,53 +137,53 @@ tabline_button_cb(
 {
     XtPointer	cmd, tab_idx;
 
-    XtVaGetValues(w, XmNuserData, &cmd, NULL);
-    XtVaGetValues(tabLine_menu, XmNuserData, &tab_idx, NULL);
+    Xt_Va_Get_மதிப்புகள்(w, XmNuserData, &cmd, வெற்று);
+    Xt_Va_Get_மதிப்புகள்(tab_வரி_menu, XmNuserData, &tab_idx, வெற்று);
 
-    send_tabline_menu_event((int)(long)tab_idx, (int)(long)cmd);
+    send_tabline_menu_event((முழு)(long)tab_idx, (முழு)(long)cmd);
 }
 
 /*
  * Tabline single mouse click timeout handler
  */
-    static void
+    நிலையான வெறுமை
 motif_tabline_timer_cb (
     XtPointer		timed_out,
     XtIntervalId	*interval_id UNUSED)
 {
-    *((int *)timed_out) = TRUE;
+    *((முழு *)timed_out) = TRUE;
 }
 
 /*
  * check if the tabline tab scroller is clicked
  */
-    static int
+    நிலையான முழு
 tabline_scroller_clicked(
-    char		*scroller_name,
+    எழுத்து		*scroller_name,
     XButtonPressedEvent *event)
 {
     Widget	tab_scroll_w;
     Position	pos_x, pos_y;
     Dimension	width, height;
 
-    tab_scroll_w = XtNameToWidget(tabLine, scroller_name);
-    if (tab_scroll_w != (Widget)0)
+    tab_scroll_w = XtNameToWidget(tab_வரி, scroller_name);
+    எனில் (tab_scroll_w != (Widget)0)
     {
-	XtVaGetValues(tab_scroll_w, XmNx, &pos_x, XmNy, &pos_y, XmNwidth,
-		      &width, XmNheight, &height, NULL);
-	if (pos_x >= 0)
+	Xt_Va_Get_மதிப்புகள்(tab_scroll_w, XmNx, &pos_x, XmNy, &pos_y, XmNwidth,
+		      &width, XmNheight, &height, வெற்று);
+	எனில் (pos_x >= 0)
 	{
 	    // Tab scroller (next) is visible
-	    if (event->x >= pos_x && event->x <= pos_x + width
+	    எனில் (event->x >= pos_x && event->x <= pos_x + width
 		    && event->y >= pos_y && event->y <= pos_y + height)
 		// Clicked on the scroller
-		return TRUE;
+		திரும்பு TRUE;
 	}
     }
-    return FALSE;
+    திரும்பு FALSE;
 }
 
-    static void
+    நிலையான வெறுமை
 tabline_menu_cb(
     Widget	w,
     XtPointer	closure UNUSED,
@@ -192,21 +192,21 @@ tabline_menu_cb(
 {
     Widget			tab_w;
     XButtonPressedEvent		*event;
-    int				tab_idx = 0;
+    முழு				tab_idx = 0;
     WidgetList			children;
-    Cardinal			numChildren;
-    static XtIntervalId		timer = (XtIntervalId)0;
-    static int			timed_out = TRUE;
+    Cardinal			இலக்கம்_Children;
+    நிலையான XtIntervalId		timer = (XtIntervalId)0;
+    நிலையான முழு			timed_out = TRUE;
 
     event = (XButtonPressedEvent *)e;
 
-    if (event->button == Button1)
+    எனில் (event->button == Button1)
     {
-	if (tabline_scroller_clicked("MajorTabScrollerNext", event)
+	எனில் (tabline_scroller_clicked("MajorTabScrollerNext", event)
 	    || tabline_scroller_clicked("MajorTabScrollerPrevious", event))
-	    return;
+	    திரும்பு;
 
-	if (!timed_out)
+	எனில் (!timed_out)
 	{
 	    XtRemoveTimeOut(timer);
 	    timed_out = TRUE;
@@ -216,7 +216,7 @@ tabline_menu_cb(
 	     */
 	    send_tabline_menu_event(0, TABLINE_MENU_NEW);
 	}
-	else
+	இல்லையெனில்
 	{
 	    /*
 	     * Single click on the tabline gutter, start a timer to check
@@ -226,53 +226,53 @@ tabline_menu_cb(
 				    motif_tabline_timer_cb, &timed_out);
 	    timed_out = FALSE;
 	}
-	return;
+	திரும்பு;
     }
 
-    if (event->button == Button2)
+    எனில் (event->button == Button2)
     {
 	// Middle mouse click on tabpage label closes that tab.
-	XtVaGetValues(tabLine_menu, XmNuserData, &tab_idx, NULL);
-	send_tabline_menu_event(tab_idx, (int)TABLINE_MENU_CLOSE);
-	return;
+	Xt_Va_Get_மதிப்புகள்(tab_வரி_menu, XmNuserData, &tab_idx, வெற்று);
+	send_tabline_menu_event(tab_idx, (முழு)TABLINE_MENU_CLOSE);
+	திரும்பு;
     }
 
-    if (event->button != Button3)
-	return;
+    எனில் (event->button != Button3)
+	திரும்பு;
 
     // When ignoring events don't show the menu.
-    if (hold_gui_events || cmdwin_type != 0)
-	return;
+    எனில் (hold_gui_events || cmdwin_type != 0)
+	திரும்பு;
 
-    if (event->subwindow != None)
+    எனில் (event->subwindow != None)
     {
 	tab_w = XtWindowToWidget(XtDisplay(w), event->subwindow);
 	// LINTED: avoid warning: dubious operation on enum
-	if (tab_w != (Widget)0 && XmIsPushButton(tab_w))
-	    XtVaGetValues(tab_w, XmNpageNumber, &tab_idx, NULL);
+	எனில் (tab_w != (Widget)0 && Xm_Is_தள்ளு_Button(tab_w))
+	    Xt_Va_Get_மதிப்புகள்(tab_w, Xm_Npage_எண், &tab_idx, வெற்று);
     }
 
-    XtVaSetValues(tabLine_menu, XmNuserData, (XtPointer)(long)tab_idx, NULL);
-    XtVaGetValues(tabLine_menu, XmNchildren, &children, XmNnumChildren,
-		  &numChildren, NULL);
-    XtManageChildren(children, numChildren);
-    XmMenuPosition(tabLine_menu, (XButtonPressedEvent *)e) ;
-    XtManageChild(tabLine_menu);
+    Xt_Va_Set_மதிப்புகள்(tab_வரி_menu, XmNuserData, (XtPointer)(long)tab_idx, வெற்று);
+    Xt_Va_Get_மதிப்புகள்(tab_வரி_menu, XmNchildren, &children, XmNnumChildren,
+		  &இலக்கம்_Children, வெற்று);
+    XtManageChildren(children, இலக்கம்_Children);
+    XmMenuPosition(tab_வரி_menu, (XButtonPressedEvent *)e) ;
+    XtManageChild(tab_வரி_menu);
 }
 
-    static void
-tabline_balloon_cb(BalloonEval *beval, int state UNUSED)
+    நிலையான வெறுமை
+tabline_balloon_cb(BalloonEval *beval, முழு state UNUSED)
 {
-    int		nr;
+    முழு		nr;
     tabpage_T	*tp;
 
-    if (beval->target == (Widget)0)
-	return;
+    எனில் (beval->target == (Widget)0)
+	திரும்பு;
 
-    XtVaGetValues(beval->target, XmNpageNumber, &nr, NULL);
+    Xt_Va_Get_மதிப்புகள்(beval->target, Xm_Npage_எண், &nr, வெற்று);
     tp = find_tabpage(nr);
-    if (tp == NULL)
-	return;
+    எனில் (tp == வெற்று)
+	திரும்பு;
 
     get_tabline_label(tp, TRUE);
     gui_mch_post_balloon(beval, NameBuff);
@@ -289,25 +289,25 @@ tabline_balloon_cb(BalloonEval *beval, int state UNUSED)
  * By Marcin Dalecki.
  */
 
-#include <Xm/XmP.h>
-#include <Xm/LabelP.h>
+#அந்தர்பாவ <Xm/XmP.h>
+#அந்தர்பாவ <Xm/LabelP.h>
 
-static XtExposeProc old_label_expose = NULL;
+நிலையான XtExposeProc old_label_expose = வெற்று;
 
-    static void
+    நிலையான வெறுமை
 label_expose(Widget _w, XEvent *_event, Region _region)
 {
     GC		    insensitiveGC;
     XmLabelWidget   lw = (XmLabelWidget)_w;
-    unsigned char   label_type = (int)XmSTRING;
+    unsigned எழுத்து   label_type = (முழு)XmSTRING;
 
-    XtVaGetValues(_w, XmNlabelType, &label_type, (XtPointer)0);
+    Xt_Va_Get_மதிப்புகள்(_w, XmNlabelType, &label_type, (XtPointer)0);
 
-    if (XtIsSensitive(_w) || label_type != (int)XmSTRING)
+    எனில் (XtIsSensitive(_w) || label_type != (முழு)XmSTRING)
 	(*old_label_expose)(_w, _event, _region);
-    else
+    இல்லையெனில்
     {
-	XGCValues   values;
+	XGCValues   மதிப்புகள்;
 	XtGCMask    mask;
 	XtGCMask    dynamic;
 	XFontStruct *fs;
@@ -319,51 +319,51 @@ label_expose(Widget _w, XEvent *_event, Region _region)
 
 	mask = GCForeground | GCBackground | GCGraphicsExposures;
 	dynamic = GCClipMask | GCClipXOrigin | GCClipYOrigin;
-	values.graphics_exposures = False;
+	மதிப்புகள்.graphics_exposures = False;
 
-	if (fs != 0)
+	எனில் (fs != 0)
 	{
 	    mask |= GCFont;
-	    values.font = fs->fid;
+	    மதிப்புகள்.font = fs->fid;
 	}
 
-	if (lw->primitive.top_shadow_pixmap != None
-		&& lw->primitive.top_shadow_pixmap != XmUNSPECIFIED_PIXMAP)
+	எனில் (lw->primitive.உச்சி_shadow_pixmap != None
+		&& lw->primitive.உச்சி_shadow_pixmap != XmUNSPECIFIED_PIXMAP)
 	{
 	    mask |= GCFillStyle | GCTile;
-	    values.fill_style = FillTiled;
-	    values.tile = lw->primitive.top_shadow_pixmap;
+	    மதிப்புகள்.fill_style = FillTiled;
+	    மதிப்புகள்.tile = lw->primitive.உச்சி_shadow_pixmap;
 	}
 
 	lw->label.TextRect.x += 1;
 	lw->label.TextRect.y += 1;
-	if (lw->label._acc_text != 0)
+	எனில் (lw->label._acc_text != 0)
 	{
 	    lw->label.acc_TextRect.x += 1;
 	    lw->label.acc_TextRect.y += 1;
 	}
 
-	values.foreground = lw->primitive.top_shadow_color;
-	values.background = lw->core.background_pixel;
+	மதிப்புகள்.foreground = lw->primitive.உச்சி_shadow_color;
+	மதிப்புகள்.background = lw->core.background_pixel;
 
 	lw->label.insensitive_GC = XtAllocateGC((Widget)lw, 0, mask,
-					       &values, dynamic, (XtGCMask)0);
+					       &மதிப்புகள், dynamic, (XtGCMask)0);
 	(*old_label_expose)(_w, _event, _region);
 	XtReleaseGC(_w, lw->label.insensitive_GC);
 
 	lw->label.TextRect.x -= 1;
 	lw->label.TextRect.y -= 1;
-	if (lw->label._acc_text != 0)
+	எனில் (lw->label._acc_text != 0)
 	{
 	    lw->label.acc_TextRect.x -= 1;
 	    lw->label.acc_TextRect.y -= 1;
 	}
 
-	values.foreground = lw->primitive.bottom_shadow_color;
-	values.background = lw->core.background_pixel;
+	மதிப்புகள்.foreground = lw->primitive.bottom_shadow_color;
+	மதிப்புகள்.background = lw->core.background_pixel;
 
 	lw->label.insensitive_GC = XtAllocateGC((Widget) lw, 0, mask,
-					       &values, dynamic, (XtGCMask)0);
+					       &மதிப்புகள், dynamic, (XtGCMask)0);
 	(*old_label_expose)(_w, _event, _region);
 	XtReleaseGC(_w, lw->label.insensitive_GC);
 
@@ -374,20 +374,20 @@ label_expose(Widget _w, XEvent *_event, Region _region)
 /*
  * Create all the motif widgets necessary.
  */
-    void
-gui_x11_create_widgets(void)
+    வெறுமை
+gui_x11_create_widgets(வெறுமை)
 {
 #ifdef FEAT_GUI_TABLINE
     Widget	button, scroller;
     Arg		args[10];
-    int		n;
+    முழு		n;
     XmString	xms;
 #endif
 
     /*
      * Install the 3D shade effect drawing routines.
      */
-    if (old_label_expose == NULL)
+    எனில் (old_label_expose == வெற்று)
     {
 	old_label_expose = xmLabelWidgetClass->core_class.expose;
 	xmLabelWidgetClass->core_class.expose = label_expose;
@@ -401,12 +401,12 @@ gui_x11_create_widgets(void)
     /*
      * Install the tearOffModel resource converter.
      */
-#if (XmVersion >= 1002)
+#எனில் (XmVersion >= 1002)
     XmRepTypeInstallTearOffModelConverter();
 #endif
 
     // Make sure the "Quit" menu entry of the window manager is ignored
-    XtVaSetValues(vimShell, XmNdeleteResponse, XmDO_NOTHING, NULL);
+    Xt_Va_Set_மதிப்புகள்(vimShell, XmNdeleteResponse, XmDO_NOTHING, வெற்று);
 
     vimForm = XtVaCreateManagedWidget("vimForm",
 	xmFormWidgetClass, vimShell,
@@ -416,15 +416,15 @@ gui_x11_create_widgets(void)
 	XmNmarginWidth, 0,
 	XmNmarginHeight, 0,
 	XmNresizePolicy, XmRESIZE_ANY,
-	NULL);
+	வெற்று);
     gui_motif_menu_colors(vimForm);
 
 #ifdef FEAT_MENU
     {
 	Arg al[7]; // Make sure there is enough room for arguments!
-	int ac = 0;
+	முழு ac = 0;
 
-# if (XmVersion >= 1002)
+# எனில் (XmVersion >= 1002)
 	XtSetArg(al[ac], XmNtearOffModel, tearoff_val); ac++;
 # endif
 	XtSetArg(al[ac], XmNleftAttachment,  XmATTACH_FORM); ac++;
@@ -453,7 +453,7 @@ gui_x11_create_widgets(void)
 	XmNmarginWidth, 0,
 	XmNleftAttachment, XmATTACH_FORM,
 	XmNrightAttachment, XmATTACH_FORM,
-	NULL);
+	வெற்று);
     gui_motif_menu_colors(toolBarFrame);
 
     toolBar = XtVaCreateManagedWidget("toolBar",
@@ -470,7 +470,7 @@ gui_x11_create_widgets(void)
 	XmNmarginHeight, 0,
 	XmNmarginWidth, 0,
 	XmNadjustLast, True,
-	NULL);
+	வெற்று);
     gui_motif_menu_colors(toolBar);
 
 #endif
@@ -481,18 +481,18 @@ gui_x11_create_widgets(void)
     XtSetArg(args[n], XmNbindingType, XmNONE); n++;
     XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
     XtSetArg(args[n], XmNbackPageSize, XmNONE); n++;
-    XtSetArg(args[n], XmNbackPageNumber, 0); n++;
-    XtSetArg(args[n], XmNbackPagePlacement, XmTOP_RIGHT); n++;
+    XtSetArg(args[n], Xm_Nback_Page_எண், 0); n++;
+    XtSetArg(args[n], XmNbackPagePlacement, Xm_உச்சி_வலது); n++;
     XtSetArg(args[n], XmNmajorTabSpacing, 0); n++;
     XtSetArg(args[n], XmNshadowThickness, 0); n++;
     XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
     XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
-    tabLine = XmCreateNotebook(vimForm, "Vim tabline", args, n);
+    tab_வரி = XmCreateNotebook(vimForm, "Vim tabline", args, n);
 
-    XtAddCallback(tabLine, XmNpageChangedCallback, (XtCallbackProc)tabline_cb,
-			NULL);
-    XtAddEventHandler(tabLine, ButtonPressMask, False,
-			(XtEventHandler)tabline_menu_cb, NULL);
+    XtAddCallback(tab_வரி, XmNpageChangedCallback, (XtCallbackProc)tabline_cb,
+			வெற்று);
+    XtAddEventHandler(tab_வரி, ButtonPressMask, False,
+			(XtEventHandler)tabline_menu_cb, வெற்று);
 
     gui.tabline_height = TABLINE_HEIGHT;
 
@@ -503,42 +503,42 @@ gui_x11_create_widgets(void)
      * managed by the Notebook widget and the notebook widget geometry
      * is adjusted to account for the minor scroller widgets.
      */
-    scroller = XtNameToWidget(tabLine, "MinorTabScrollerNext");
-    XtVaSetValues(scroller, XmNwidth, 0, XmNresizable, False,
-		  XmNtraversalOn, False, NULL);
-    scroller = XtNameToWidget(tabLine, "MinorTabScrollerPrevious");
-    XtVaSetValues(scroller, XmNwidth, 0, XmNresizable, False,
-		  XmNtraversalOn, False, NULL);
+    scroller = XtNameToWidget(tab_வரி, "MinorTabScrollerNext");
+    Xt_Va_Set_மதிப்புகள்(scroller, XmNwidth, 0, XmNresizable, False,
+		  XmNtraversalOn, False, வெற்று);
+    scroller = XtNameToWidget(tab_வரி, "MinorTabScrollerPrevious");
+    Xt_Va_Set_மதிப்புகள்(scroller, XmNwidth, 0, XmNresizable, False,
+		  XmNtraversalOn, False, வெற்று);
 
     // Create the tabline popup menu
-    tabLine_menu = XmCreatePopupMenu(tabLine, "tabline popup", NULL, 0);
+    tab_வரி_menu = XmCreatePopupMenu(tab_வரி, "tabline popup", வெற்று, 0);
 
     // Add the buttons to the tabline popup menu
     n = 0;
     XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_CLOSE); n++;
-    xms = XmStringCreate((char *)"Close tab", STRING_TAG);
+    xms = XmStringCreate((எழுத்து *)"Close tab", STRING_TAG);
     XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "Close", args, n);
+    button = Xm_Create_தள்ளு_Button(tab_வரி_menu, "Close", args, n);
     XtAddCallback(button, XmNactivateCallback,
-		  (XtCallbackProc)tabline_button_cb, NULL);
+		  (XtCallbackProc)tabline_button_cb, வெற்று);
     XmStringFree(xms);
 
     n = 0;
     XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_NEW); n++;
-    xms = XmStringCreate((char *)"New Tab", STRING_TAG);
+    xms = XmStringCreate((எழுத்து *)"New Tab", STRING_TAG);
     XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "New Tab", args, n);
+    button = Xm_Create_தள்ளு_Button(tab_வரி_menu, "New Tab", args, n);
     XtAddCallback(button, XmNactivateCallback,
-		  (XtCallbackProc)tabline_button_cb, NULL);
+		  (XtCallbackProc)tabline_button_cb, வெற்று);
     XmStringFree(xms);
 
     n = 0;
     XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_OPEN); n++;
-    xms = XmStringCreate((char *)"Open tab...", STRING_TAG);
+    xms = XmStringCreate((எழுத்து *)"Open tab...", STRING_TAG);
     XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "Open tab...", args, n);
+    button = Xm_Create_தள்ளு_Button(tab_வரி_menu, "Open tab...", args, n);
     XtAddCallback(button, XmNactivateCallback,
-		  (XtCallbackProc)tabline_button_cb, NULL);
+		  (XtCallbackProc)tabline_button_cb, வெற்று);
     XmStringFree(xms);
 #endif
 
@@ -551,7 +551,7 @@ gui_x11_create_widgets(void)
 	XmNmarginWidth, 0,
 	XmNmarginHeight, 0,
 	XmNresizePolicy, XmRESIZE_ANY,
-	NULL);
+	வெற்று);
     gui_motif_scroll_colors(textAreaForm);
 
     textArea = XtVaCreateManagedWidget("textArea",
@@ -570,7 +570,7 @@ gui_x11_create_widgets(void)
 	XmNborderWidth, 0,
 	XmNhighlightThickness, 0,
 	XmNshadowThickness, 0,
-	NULL);
+	வெற்று);
 
     /*
      * Install the callbacks.
@@ -584,21 +584,21 @@ gui_x11_create_widgets(void)
 /*
  * Called when the GUI is not going to start after all.
  */
-    void
-gui_x11_destroy_widgets(void)
+    வெறுமை
+gui_x11_destroy_widgets(வெறுமை)
 {
-    textArea = NULL;
+    textArea = வெற்று;
 #ifdef FEAT_MENU
-    menuBar = NULL;
+    menuBar = வெற்று;
 #endif
 }
 
-    void
+    வெறுமை
 gui_mch_set_text_area_pos(
-    int	    x UNUSED,
-    int	    y UNUSED,
-    int	    w UNUSED,
-    int	    h UNUSED)
+    முழு	    x UNUSED,
+    முழு	    y UNUSED,
+    முழு	    w UNUSED,
+    முழு	    h UNUSED)
 {
 #ifdef FEAT_TOOLBAR
     // Give keyboard focus to the textArea instead of the toolbar.
@@ -606,46 +606,46 @@ gui_mch_set_text_area_pos(
 #endif
 }
 
-    void
-gui_x11_set_back_color(void)
+    வெறுமை
+gui_x11_set_back_color(வெறுமை)
 {
-    if (textArea != NULL)
-#if (XmVersion >= 1002)
+    எனில் (textArea != வெற்று)
+#எனில் (XmVersion >= 1002)
 	XmChangeColor(textArea, gui.back_pixel);
-#else
-	XtVaSetValues(textArea,
+#இல்லையெனில்
+	Xt_Va_Set_மதிப்புகள்(textArea,
 		  XmNbackground, gui.back_pixel,
-		  NULL);
+		  வெற்று);
 #endif
 }
 
 /*
  * Manage dialog centered on pointer.
  */
-    void
+    வெறுமை
 manage_centered(Widget dialog_child)
 {
     Widget shell = XtParent(dialog_child);
-    Window root, child;
-    unsigned int mask;
-    unsigned int width, height, border_width, depth;
-    int x, y, win_x, win_y, maxX, maxY;
+    Window வேர், child;
+    unsigned முழு mask;
+    unsigned முழு width, height, border_width, depth;
+    முழு x, y, win_x, win_y, maxX, maxY;
     Boolean mappedWhenManaged;
 
     // Temporarily set value of XmNmappedWhenManaged
     // to stop the dialog from popping up right away
-    XtVaGetValues(shell, XmNmappedWhenManaged, &mappedWhenManaged, NULL);
-    XtVaSetValues(shell, XmNmappedWhenManaged, False, NULL);
+    Xt_Va_Get_மதிப்புகள்(shell, XmNmappedWhenManaged, &mappedWhenManaged, வெற்று);
+    Xt_Va_Set_மதிப்புகள்(shell, XmNmappedWhenManaged, False, வெற்று);
 
     XtManageChild(dialog_child);
 
     // Get the pointer position (x, y)
-    XQueryPointer(XtDisplay(shell), XtWindow(shell), &root, &child,
+    XQueryPointer(XtDisplay(shell), XtWindow(shell), &வேர், &child,
 		  &x, &y, &win_x, &win_y, &mask);
 
     // Translate the pointer position (x, y) into a position for the new
     // window that will place the pointer at its center
-    XGetGeometry(XtDisplay(shell), XtWindow(shell), &root, &win_x, &win_y,
+    XGetGeometry(XtDisplay(shell), XtWindow(shell), &வேர், &win_x, &win_y,
 		 &width, &height, &border_width, &depth);
     width += 2 * border_width;
     height += 2 * border_width;
@@ -655,26 +655,26 @@ manage_centered(Widget dialog_child)
     // Ensure that the dialog remains on screen
     maxX = XtScreen(shell)->width - width;
     maxY = XtScreen(shell)->height - height;
-    if (x < 0)
+    எனில் (x < 0)
 	x = 0;
-    if (x > maxX)
+    எனில் (x > maxX)
 	x = maxX;
-    if (y < 0)
+    எனில் (y < 0)
 	y = 0;
-    if (y > maxY)
+    எனில் (y > maxY)
 	y = maxY;
 
     // Set desired window position in the DialogShell
-    XtVaSetValues(shell, XmNx, x, XmNy, y, NULL);
+    Xt_Va_Set_மதிப்புகள்(shell, XmNx, x, XmNy, y, வெற்று);
 
     // Map the widget
     XtMapWidget(shell);
 
     // Restore the value of XmNmappedWhenManaged
-    XtVaSetValues(shell, XmNmappedWhenManaged, mappedWhenManaged, NULL);
+    Xt_Va_Set_மதிப்புகள்(shell, XmNmappedWhenManaged, mappedWhenManaged, வெற்று);
 }
 
-#if defined(FEAT_MENU) || defined(FEAT_GUI_DIALOG)
+#எனில் defined(FEAT_MENU) || defined(FEAT_GUI_DIALOG)
 
 /*
  * Encapsulate the way an XmFontList is created.
@@ -684,22 +684,22 @@ gui_motif_create_fontlist(XFontStruct *font)
 {
     XmFontList font_list;
 
-# if (XmVersion <= 1001)
+# எனில் (XmVersion <= 1001)
     // Motif 1.1 method
     font_list = XmFontListCreate(font, STRING_TAG);
-# else
+# இல்லையெனில்
     // Motif 1.2 method
     XmFontListEntry font_list_entry;
 
     font_list_entry = XmFontListEntryCreate(STRING_TAG, XmFONT_IS_FONT,
 					    (XtPointer)font);
-    font_list = XmFontListAppendEntry(NULL, font_list_entry);
+    font_list = XmFontListAppendEntry(வெற்று, font_list_entry);
     XmFontListEntryFree(&font_list_entry);
 # endif
-    return font_list;
+    திரும்பு font_list;
 }
 
-# if ((XmVersion > 1001) && defined(FEAT_XFONTSET))
+# எனில் ((XmVersion > 1001) && defined(FEAT_XFONTSET))
     XmFontList
 gui_motif_fontset2fontlist(XFontSet *fontset)
 {
@@ -711,132 +711,132 @@ gui_motif_fontset2fontlist(XFontSet *fontset)
     font_list_entry = XmFontListEntryCreate(STRING_TAG,
 					    XmFONT_IS_FONTSET,
 					    (XtPointer)*fontset);
-    font_list = XmFontListAppendEntry(NULL, font_list_entry);
+    font_list = XmFontListAppendEntry(வெற்று, font_list_entry);
     XmFontListEntryFree(&font_list_entry);
-    return font_list;
+    திரும்பு font_list;
 }
 # endif
 
 #endif
 
-#if defined(FEAT_MENU)
+#எனில் defined(FEAT_MENU)
 /*
  * Menu stuff.
  */
 
-static void gui_motif_add_actext(vimmenu_T *menu);
-# if (XmVersion >= 1002)
-static void toggle_tearoff(Widget wid);
-static void gui_mch_recurse_tearoffs(vimmenu_T *menu);
+நிலையான வெறுமை gui_motif_add_actext(vimmenu_T *menu);
+# எனில் (XmVersion >= 1002)
+நிலையான வெறுமை toggle_tearoff(Widget wid);
+நிலையான வெறுமை gui_mch_recurse_tearoffs(vimmenu_T *menu);
 # endif
-static void submenu_change(vimmenu_T *mp, int colors);
+நிலையான வெறுமை submenu_change(vimmenu_T *mp, முழு colors);
 
-static void do_set_mnemonics(int enable);
-static int menu_enabled = TRUE;
+நிலையான வெறுமை do_set_mnemonics(முழு enable);
+நிலையான முழு menu_enabled = TRUE;
 
-    void
-gui_mch_enable_menu(int flag)
+    வெறுமை
+gui_mch_enable_menu(முழு flag)
 {
-    if (flag)
+    எனில் (flag)
     {
 	XtManageChild(menuBar);
 # ifdef FEAT_TOOLBAR
-	if (XtIsManaged(XtParent(toolBar)))
+	எனில் (XtIsManaged(XtParent(toolBar)))
 	{
 	    // toolBar is attached to top form
-	    XtVaSetValues(XtParent(toolBar),
+	    Xt_Va_Set_மதிப்புகள்(XtParent(toolBar),
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, menuBar,
-		NULL);
+		வெற்று);
 #  ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    எனில் (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_மதிப்புகள்(tab_வரி,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      வெற்று);
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_வரி,
+			      வெற்று);
 	    }
-	    else
+	    இல்லையெனில்
 #  endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
+			      வெற்று);
 	}
-	else
+	இல்லையெனில்
 # endif
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    எனில் (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_மதிப்புகள்(tab_வரி,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      வெற்று);
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_வரி,
+			      வெற்று);
 	    }
-	    else
+	    இல்லையெனில்
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
+			      வெற்று);
 	}
     }
-    else
+    இல்லையெனில்
     {
 	XtUnmanageChild(menuBar);
 # ifdef FEAT_TOOLBAR
-	if (XtIsManaged(XtParent(toolBar)))
+	எனில் (XtIsManaged(XtParent(toolBar)))
 	{
-	    XtVaSetValues(XtParent(toolBar),
+	    Xt_Va_Set_மதிப்புகள்(XtParent(toolBar),
 		XmNtopAttachment, XmATTACH_FORM,
-		NULL);
+		வெற்று);
 #  ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    எனில் (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_மதிப்புகள்(tab_வரி,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      வெற்று);
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_வரி,
+			      வெற்று);
 	    }
-	    else
+	    இல்லையெனில்
 #  endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
+			      வெற்று);
 	}
-	else
+	இல்லையெனில்
 # endif
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    எனில் (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_மதிப்புகள்(tab_வரி,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      வெற்று);
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_வரி,
+			      வெற்று);
 	    }
-	    else
+	    இல்லையெனில்
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
+			      வெற்று);
 	}
     }
 
@@ -845,54 +845,54 @@ gui_mch_enable_menu(int flag)
 /*
  * Enable or disable mnemonics for the toplevel menus.
  */
-    void
-gui_motif_set_mnemonics(int enable)
+    வெறுமை
+gui_motif_set_mnemonics(முழு enable)
 {
     /*
      * Don't enable menu mnemonics when the menu bar is disabled, LessTif
      * crashes when using a mnemonic then.
      */
-    if (!menu_enabled)
+    எனில் (!menu_enabled)
 	enable = FALSE;
     do_set_mnemonics(enable);
 }
 
-    static void
-do_set_mnemonics(int enable)
+    நிலையான வெறுமை
+do_set_mnemonics(முழு enable)
 {
     vimmenu_T	*menu;
 
     FOR_ALL_MENUS(menu)
-	if (menu->id != (Widget)0)
-	    XtVaSetValues(menu->id,
+	எனில் (menu->id != (Widget)0)
+	    Xt_Va_Set_மதிப்புகள்(menu->id,
 		    XmNmnemonic, enable ? menu->mnemonic : NUL,
-		    NULL);
+		    வெற்று);
 }
 
-    void
-gui_mch_add_menu(vimmenu_T *menu, int idx)
+    வெறுமை
+gui_mch_add_menu(vimmenu_T *menu, முழு idx)
 {
     XmString	label;
     Widget	shell;
     vimmenu_T	*parent = menu->parent;
 
 # ifdef MOTIF_POPUP
-    if (menu_is_popup(menu->name))
+    எனில் (menu_is_popup(menu->name))
     {
 	Arg arg[2];
-	int n = 0;
+	முழு n = 0;
 
 	// Only create the popup menu when it's actually used, otherwise there
 	// is a delay when using the right mouse button.
-#  if (XmVersion <= 1002)
-	if (mouse_model_popup())
+#  எனில் (XmVersion <= 1002)
+	எனில் (mouse_model_popup())
 #  endif
 	{
-	    if (gui.menu_bg_pixel != INVALCOLOR)
+	    எனில் (gui.menu_bg_pixel != INVALCOLOR)
 	    {
 		XtSetArg(arg[0], XmNbackground, gui.menu_bg_pixel); n++;
 	    }
-	    if (gui.menu_fg_pixel != INVALCOLOR)
+	    எனில் (gui.menu_fg_pixel != INVALCOLOR)
 	    {
 		XtSetArg(arg[1], XmNforeground, gui.menu_fg_pixel); n++;
 	    }
@@ -900,39 +900,39 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 								      arg, n);
 	    menu->id = (Widget)0;
 	}
-	return;
+	திரும்பு;
     }
 # endif
 
-    if (!menu_is_menubar(menu->name)
-	    || (parent != NULL && parent->submenu_id == (Widget)0))
-	return;
+    எனில் (!menu_is_menubar(menu->name)
+	    || (parent != வெற்று && parent->submenu_id == (Widget)0))
+	திரும்பு;
 
-    label = XmStringCreate((char *)menu->dname, STRING_TAG);
-    if (label == NULL)
-	return;
+    label = XmStringCreate((எழுத்து *)menu->dname, STRING_TAG);
+    எனில் (label == வெற்று)
+	திரும்பு;
     menu->id = XtVaCreateWidget("subMenu",
 	    xmCascadeButtonWidgetClass,
-	    (parent == NULL) ? menuBar : parent->submenu_id,
+	    (parent == வெற்று) ? menuBar : parent->submenu_id,
 	    XmNlabelString, label,
 	    XmNmnemonic, p_wak[0] == 'n' ? NUL : menu->mnemonic,
-# if (XmVersion >= 1002)
+# எனில் (XmVersion >= 1002)
 	    // submenu: count the tearoff item (needed for LessTif)
-	    XmNpositionIndex, idx + (parent != NULL
-			   && tearoff_val == (int)XmTEAR_OFF_ENABLED ? 1 : 0),
+	    XmNpositionIndex, idx + (parent != வெற்று
+			   && tearoff_val == (முழு)XmTEAR_OFF_ENABLED ? 1 : 0),
 # endif
-	    NULL);
+	    வெற்று);
     XmStringFree(label);
 
-    if (menu->id == (Widget)0)		// failed
-	return;
+    எனில் (menu->id == (Widget)0)		// failed
+	திரும்பு;
 
     // The "Help" menu is a special case, and should be placed at the far
     // right hand side of the menu-bar.  It's recognized by its high priority.
-    if (parent == NULL && menu->priority >= 9999)
-	XtVaSetValues(menuBar,
+    எனில் (parent == வெற்று && menu->priority >= 9999)
+	Xt_Va_Set_மதிப்புகள்(menuBar,
 		XmNmenuHelpWidget, menu->id,
-		NULL);
+		வெற்று);
 
     gui_motif_menu_colors(menu->id);
     gui_motif_menu_fontlist(menu->id);
@@ -944,29 +944,29 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 	xmMenuShellWidgetClass, menu->id,
 	XmNwidth, 1,
 	XmNheight, 1,
-	NULL);
+	வெற்று);
     gui_motif_menu_colors(shell);
     menu->submenu_id = XtVaCreateWidget("rowColumnMenu",
 	xmRowColumnWidgetClass, shell,
 	XmNrowColumnType, XmMENU_PULLDOWN,
-	NULL);
+	வெற்று);
     gui_motif_menu_colors(menu->submenu_id);
 
-    if (menu->submenu_id == (Widget)0)		// failed
-	return;
+    எனில் (menu->submenu_id == (Widget)0)		// failed
+	திரும்பு;
 
-# if (XmVersion >= 1002)
+# எனில் (XmVersion >= 1002)
     // Set the colors for the tear off widget
     toggle_tearoff(menu->submenu_id);
 # endif
 
-    XtVaSetValues(menu->id,
+    Xt_Va_Set_மதிப்புகள்(menu->id,
 	XmNsubMenuId, menu->submenu_id,
-	NULL);
+	வெற்று);
 
     // When we add a top-level item to the menu bar, we can figure out how
     // high the menu bar should be.
-    if (parent == NULL)
+    எனில் (parent == வெற்று)
 	gui_mch_compute_menu_height(menu->id);
 }
 
@@ -974,59 +974,59 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 /*
  * Add mnemonic and accelerator text to a menu button.
  */
-    static void
+    நிலையான வெறுமை
 gui_motif_add_actext(vimmenu_T *menu)
 {
     XmString	label;
 
     // Add accelerator text, if there is one
-    if (menu->actext == NULL || menu->id == (Widget)0)
-	return;
+    எனில் (menu->actext == வெற்று || menu->id == (Widget)0)
+	திரும்பு;
 
-    label = XmStringCreate((char *)menu->actext, STRING_TAG);
-    if (label == NULL)
-	return;
-    XtVaSetValues(menu->id, XmNacceleratorText, label, NULL);
+    label = XmStringCreate((எழுத்து *)menu->actext, STRING_TAG);
+    எனில் (label == வெற்று)
+	திரும்பு;
+    Xt_Va_Set_மதிப்புகள்(menu->id, XmNacceleratorText, label, வெற்று);
     XmStringFree(label);
 }
 
-    void
-gui_mch_toggle_tearoffs(int enable)
+    வெறுமை
+gui_mch_toggle_tearoffs(முழு enable)
 {
-# if (XmVersion >= 1002)
-    if (enable)
-	tearoff_val = (int)XmTEAR_OFF_ENABLED;
-    else
-	tearoff_val = (int)XmTEAR_OFF_DISABLED;
+# எனில் (XmVersion >= 1002)
+    எனில் (enable)
+	tearoff_val = (முழு)XmTEAR_OFF_ENABLED;
+    இல்லையெனில்
+	tearoff_val = (முழு)XmTEAR_OFF_DISABLED;
     toggle_tearoff(menuBar);
-    gui_mch_recurse_tearoffs(root_menu);
+    gui_mch_recurse_tearoffs(வேர்_menu);
 # endif
 }
 
-# if (XmVersion >= 1002)
+# எனில் (XmVersion >= 1002)
 /*
  * Set the tearoff for one menu widget on or off, and set the color of the
  * tearoff widget.
  */
-    static void
+    நிலையான வெறுமை
 toggle_tearoff(Widget wid)
 {
     Widget	w;
 
-    XtVaSetValues(wid, XmNtearOffModel, tearoff_val, NULL);
-    if (tearoff_val == (int)XmTEAR_OFF_ENABLED
+    Xt_Va_Set_மதிப்புகள்(wid, XmNtearOffModel, tearoff_val, வெற்று);
+    எனில் (tearoff_val == (முழு)XmTEAR_OFF_ENABLED
 	    && (w = XmGetTearOffControl(wid)) != (Widget)0)
 	gui_motif_menu_colors(w);
 }
 
-    static void
+    நிலையான வெறுமை
 gui_mch_recurse_tearoffs(vimmenu_T *menu)
 {
-    while (menu != NULL)
+    போது (menu != வெற்று)
     {
-	if (!menu_is_popup(menu->name))
+	எனில் (!menu_is_popup(menu->name))
 	{
-	    if (menu->submenu_id != (Widget)0)
+	    எனில் (menu->submenu_id != (Widget)0)
 		toggle_tearoff(menu->submenu_id);
 	    gui_mch_recurse_tearoffs(menu->children);
 	}
@@ -1035,13 +1035,13 @@ gui_mch_recurse_tearoffs(vimmenu_T *menu)
 }
 # endif
 
-    int
-gui_mch_text_area_extra_height(void)
+    முழு
+gui_mch_text_area_extra_height(வெறுமை)
 {
     Dimension	shadowHeight;
 
-    XtVaGetValues(textAreaForm, XmNshadowThickness, &shadowHeight, NULL);
-    return shadowHeight;
+    Xt_Va_Get_மதிப்புகள்(textAreaForm, XmNshadowThickness, &shadowHeight, வெற்று);
+    திரும்பு shadowHeight;
 }
 
 /*
@@ -1049,37 +1049,37 @@ gui_mch_text_area_extra_height(void)
  * We need to check all the items for their position and height, for the case
  * there are several rows, and/or some characters extend higher or lower.
  */
-    void
+    வெறுமை
 gui_mch_compute_menu_height(
     Widget	id)		    // can be NULL when deleting menu
 {
     Dimension	y, maxy;
     Dimension	margin, shadow;
     vimmenu_T	*mp;
-    static Dimension	height = 21;	// normal height of a menu item
+    நிலையான Dimension	height = 21;	// normal height of a menu item
 
     /*
      * Get the height of the new item, before managing it, because it will
      * still reflect the font size.  After managing it depends on the menu
      * height, which is what we just wanted to get!.
      */
-    if (id != (Widget)0)
-	XtVaGetValues(id, XmNheight, &height, NULL);
+    எனில் (id != (Widget)0)
+	Xt_Va_Get_மதிப்புகள்(id, XmNheight, &height, வெற்று);
 
     // Find any menu Widget, to be able to call XtManageChild()
-    else
+    இல்லையெனில்
 	FOR_ALL_MENUS(mp)
-	    if (mp->id != (Widget)0 && menu_is_menubar(mp->name))
+	    எனில் (mp->id != (Widget)0 && menu_is_menubar(mp->name))
 	    {
 		id = mp->id;
-		break;
+		நிறுத்து;
 	    }
 
     /*
      * Now manage the menu item, to make them all be positioned (makes an
      * extra row when needed, removes it when not needed).
      */
-    if (id != (Widget)0)
+    எனில் (id != (Widget)0)
 	XtManageChild(id);
 
     /*
@@ -1088,18 +1088,18 @@ gui_mch_compute_menu_height(
     maxy = 0;
     FOR_ALL_MENUS(mp)
     {
-	if (mp->id != (Widget)0 && menu_is_menubar(mp->name))
+	எனில் (mp->id != (Widget)0 && menu_is_menubar(mp->name))
 	{
-	    XtVaGetValues(mp->id, XmNy, &y, NULL);
-	    if (y > maxy)
+	    Xt_Va_Get_மதிப்புகள்(mp->id, XmNy, &y, வெற்று);
+	    எனில் (y > maxy)
 		maxy = y;
 	}
     }
 
-    XtVaGetValues(menuBar,
+    Xt_Va_Get_மதிப்புகள்(menuBar,
 	XmNmarginHeight, &margin,
 	XmNshadowThickness, &shadow,
-	NULL);
+	வெற்று);
 
     /*
      * This computation is the result of trial-and-error:
@@ -1116,8 +1116,8 @@ gui_mch_compute_menu_height(
     // Somehow the menu bar doesn't resize automatically.  Set it here,
     // even though this is a catch 22.  Don't do this when starting up,
     // somehow the menu gets very high then.
-    if (gui.shell_created)
-	XtVaSetValues(menuBar, XmNheight, gui.menu_height, NULL);
+    எனில் (gui.shell_created)
+	Xt_Va_Set_மதிப்புகள்(menuBar, XmNheight, gui.menu_height, வெற்று);
 }
 
 # ifdef FEAT_TOOLBAR
@@ -1127,16 +1127,16 @@ gui_mch_compute_menu_height(
  */
 #  include "gui_x11_pm.h"
 
-static char **get_toolbar_pixmap(vimmenu_T *menu, char **fname);
+நிலையான எழுத்து **get_toolbar_pixmap(vimmenu_T *menu, எழுத்து **fname);
 
 /*
  * Read an Xpm file.  Return OK or FAIL.
  */
-    static int
+    நிலையான முழு
 check_xpm(char_u *path)
 {
     XpmAttributes attrs;
-    int		status;
+    முழு		status;
     Pixmap	mask;
     Pixmap	map;
 
@@ -1144,13 +1144,13 @@ check_xpm(char_u *path)
 
     // Create the "sensitive" pixmap
     status = XpmReadFileToPixmap(gui.dpy,
-	    RootWindow(gui.dpy, DefaultScreen(gui.dpy)),
-	    (char *)path, &map, &mask, &attrs);
+	    வேர்_Window(gui.dpy, DefaultScreen(gui.dpy)),
+	    (எழுத்து *)path, &map, &mask, &attrs);
     XpmFreeAttributes(&attrs);
 
-    if (status == XpmSuccess)
-	return OK;
-    return FAIL;
+    எனில் (status == XpmSuccess)
+	திரும்பு OK;
+    திரும்பு FAIL;
 }
 
 
@@ -1160,103 +1160,103 @@ check_xpm(char_u *path)
  * (in allocated memory).
  * Return a blank pixmap if it fails.
  */
-    static char **
-get_toolbar_pixmap(vimmenu_T *menu, char **fname)
+    நிலையான எழுத்து **
+get_toolbar_pixmap(vimmenu_T *menu, எழுத்து **fname)
 {
     char_u	buf[MAXPATHL];		// buffer storing expanded pathname
-    char	**xpm = NULL;		// xpm array
-    int		res;
+    எழுத்து	**xpm = வெற்று;		// xpm array
+    முழு		res;
 
-    *fname = NULL;
+    *fname = வெற்று;
     buf[0] = NUL;			// start with NULL path
 
-    if (menu->iconfile != NULL)
+    எனில் (menu->iconfile != வெற்று)
     {
 	// Use the "icon="  argument.
 	gui_find_iconfile(menu->iconfile, buf, "xpm");
 	res = check_xpm(buf);
 
 	// If it failed, try using the menu name.
-	if (res == FAIL && gui_find_bitmap(menu->name, buf, "xpm") == OK)
+	எனில் (res == FAIL && gui_find_bitmap(menu->name, buf, "xpm") == OK)
 	    res = check_xpm(buf);
-	if (res == OK)
+	எனில் (res == OK)
 	{
-	    *fname = (char *)vim_strsave(buf);
-	    return tb_blank_xpm;
+	    *fname = (எழுத்து *)vim_strsave(buf);
+	    திரும்பு tb_blank_xpm;
 	}
     }
 
-    if (menu->icon_builtin || gui_find_bitmap(menu->name, buf, "xpm") == FAIL)
+    எனில் (menu->icon_builtin || gui_find_bitmap(menu->name, buf, "xpm") == FAIL)
     {
-	if (menu->iconidx >= 0 && menu->iconidx
-	       < (int)(sizeof(built_in_pixmaps) / sizeof(built_in_pixmaps[0])))
+	எனில் (menu->iconidx >= 0 && menu->iconidx
+	       < (முழு)(அளவு(built_in_pixmaps) / அளவு(built_in_pixmaps[0])))
 	    xpm = built_in_pixmaps[menu->iconidx];
-	else
+	இல்லையெனில்
 	    xpm = tb_blank_xpm;
     }
 
-    return xpm;
+    திரும்பு xpm;
 }
 
 /*
  * Add arguments for the toolbar pixmap to a menu item.
  */
-    static int
-add_pixmap_args(vimmenu_T *menu, Arg *args, int n)
+    நிலையான முழு
+add_pixmap_args(vimmenu_T *menu, Arg *args, முழு n)
 {
     vim_free(menu->xpm_fname);
     menu->xpm = get_toolbar_pixmap(menu, &menu->xpm_fname);
-    if (menu->xpm == NULL)
+    எனில் (menu->xpm == வெற்று)
     {
 	XtSetArg(args[n], XmNlabelType, XmSTRING); n++;
     }
-    else
+    இல்லையெனில்
     {
-	if (menu->xpm_fname != NULL)
+	எனில் (menu->xpm_fname != வெற்று)
 	{
 	    XtSetArg(args[n], XmNpixmapFile, menu->xpm_fname); n++;
 	}
 	XtSetArg(args[n], XmNpixmapData, menu->xpm); n++;
 	XtSetArg(args[n], XmNlabelLocation, XmBOTTOM); n++;
     }
-    return n;
+    திரும்பு n;
 }
 # endif // FEAT_TOOLBAR
 
-    void
-gui_mch_add_menu_item(vimmenu_T *menu, int idx)
+    வெறுமை
+gui_mch_add_menu_item(vimmenu_T *menu, முழு idx)
 {
     XmString	label;
     vimmenu_T	*parent = menu->parent;
 
-# if (XmVersion <= 1002)
+# எனில் (XmVersion <= 1002)
     // Don't add Popup menu items when the popup menu isn't used.
-    if (menu_is_child_of_popup(menu) && !mouse_model_popup())
-	return;
+    எனில் (menu_is_child_of_popup(menu) && !mouse_model_popup())
+	திரும்பு;
 # endif
 
 # ifdef FEAT_TOOLBAR
-    if (menu_is_toolbar(parent->name))
+    எனில் (menu_is_toolbar(parent->name))
     {
 	WidgetClass	type;
-	XmString	xms = NULL;    // fallback label if pixmap not found
-	int		n;
+	XmString	xms = வெற்று;    // fallback label if pixmap not found
+	முழு		n;
 	Arg		args[18];
 
 	n = 0;
-	if (menu_is_separator(menu->name))
+	எனில் (menu_is_separator(menu->name))
 	{
-	    char	*cp;
+	    எழுத்து	*cp;
 	    Dimension	wid;
 
 	    /*
 	     * A separator has the format "-sep%d[:%d]-". The optional :%d is
 	     * a width specifier. If no width is specified then we choose one.
 	     */
-	    cp = (char *)vim_strchr(menu->name, ':');
-	    if (cp != NULL)
+	    cp = (எழுத்து *)vim_strchr(menu->name, ':');
+	    எனில் (cp != வெற்று)
 		wid = (Dimension)atoi(++cp);
-	    else
+	    இல்லையெனில்
 		wid = 4;
 
 	    type = xmSeparatorWidgetClass;
@@ -1265,7 +1265,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
 	    XtSetArg(args[n], XmNseparatorType, XmSHADOW_ETCHED_IN); n++;
 	}
-	else
+	இல்லையெனில்
 	{
 	    // Without shadows one can't sense whatever the button has been
 	    // pressed or not! However we want to save a bit of space...
@@ -1277,7 +1277,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    XtSetArg(args[n], XmNtraversalOn, False); n++;
 	    // Set the label here, so that we can switch between icons/text
 	    // by changing the XmNlabelType resource.
-	    xms = XmStringCreate((char *)menu->dname, STRING_TAG);
+	    xms = XmStringCreate((எழுத்து *)menu->dname, STRING_TAG);
 	    XtSetArg(args[n], XmNlabelString, xms); n++;
 
 	    n = add_pixmap_args(menu, args, n);
@@ -1286,19 +1286,19 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	}
 
 	XtSetArg(args[n], XmNpositionIndex, idx); n++;
-	if (menu->id == NULL)
+	எனில் (menu->id == வெற்று)
 	{
-	    menu->id = XtCreateManagedWidget((char *)menu->dname,
+	    menu->id = XtCreateManagedWidget((எழுத்து *)menu->dname,
 			type, toolBar, args, n);
-	    if (menu->id != NULL && type == xmEnhancedButtonWidgetClass)
+	    எனில் (menu->id != வெற்று && type == xmEnhancedButtonWidgetClass)
 	    {
 		XtAddCallback(menu->id,
 			XmNactivateCallback, gui_x11_menu_cb, menu);
 	    }
 	}
-	else
-	    XtSetValues(menu->id, args, n);
-	if (xms != NULL)
+	இல்லையெனில்
+	    Xt_Set_மதிப்புகள்(menu->id, args, n);
+	எனில் (xms != வெற்று)
 	    XmStringFree(xms);
 
 #  ifdef FEAT_BEVAL_GUI
@@ -1306,55 +1306,55 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 #  endif
 
 	menu->parent = parent;
-	menu->submenu_id = NULL;
+	menu->submenu_id = வெற்று;
 	// When adding first item to toolbar it might have to be enabled .
-	if (!XtIsManaged(XtParent(toolBar))
-		    && vim_strchr(p_go, GO_TOOLBAR) != NULL)
+	எனில் (!XtIsManaged(XtParent(toolBar))
+		    && vim_strchr(p_go, GO_TOOLBAR) != வெற்று)
 	    gui_mch_show_toolbar(TRUE);
 	gui.toolbar_height = gui_mch_compute_toolbar_height();
-	return;
+	திரும்பு;
     } // toolbar menu item
 # endif
 
     // No parent, must be a non-menubar menu
-    if (parent->submenu_id == (Widget)0)
-	return;
+    எனில் (parent->submenu_id == (Widget)0)
+	திரும்பு;
 
     menu->submenu_id = (Widget)0;
 
     // Add menu separator
-    if (menu_is_separator(menu->name))
+    எனில் (menu_is_separator(menu->name))
     {
 	menu->id = XtVaCreateWidget("subMenu",
 		xmSeparatorGadgetClass, parent->submenu_id,
-# if (XmVersion >= 1002)
+# எனில் (XmVersion >= 1002)
 		// count the tearoff item (needed for LessTif)
-		XmNpositionIndex, idx + (tearoff_val == (int)XmTEAR_OFF_ENABLED
+		XmNpositionIndex, idx + (tearoff_val == (முழு)XmTEAR_OFF_ENABLED
 								     ? 1 : 0),
 # endif
-		NULL);
+		வெற்று);
 	gui_motif_menu_colors(menu->id);
-	return;
+	திரும்பு;
     }
 
-    label = XmStringCreate((char *)menu->dname, STRING_TAG);
-    if (label == NULL)
-	return;
+    label = XmStringCreate((எழுத்து *)menu->dname, STRING_TAG);
+    எனில் (label == வெற்று)
+	திரும்பு;
     menu->id = XtVaCreateWidget("subMenu",
-	xmPushButtonWidgetClass, parent->submenu_id,
+	xm_தள்ளு_Button_Widget_Class, parent->submenu_id,
 	XmNlabelString, label,
 	XmNmnemonic, menu->mnemonic,
-# if (XmVersion >= 1002)
+# எனில் (XmVersion >= 1002)
 	// count the tearoff item (needed for LessTif)
-	XmNpositionIndex, idx + (tearoff_val == (int)XmTEAR_OFF_ENABLED
+	XmNpositionIndex, idx + (tearoff_val == (முழு)XmTEAR_OFF_ENABLED
 								     ? 1 : 0),
 # endif
-	NULL);
+	வெற்று);
     gui_motif_menu_colors(menu->id);
     gui_motif_menu_fontlist(menu->id);
     XmStringFree(label);
 
-    if (menu->id != (Widget)0)
+    எனில் (menu->id != (Widget)0)
     {
 	XtAddCallback(menu->id, XmNactivateCallback, gui_x11_menu_cb,
 		(XtPointer)menu);
@@ -1363,35 +1363,35 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
     }
 }
 
-# if (XmVersion <= 1002)
+# எனில் (XmVersion <= 1002)
 /*
  * This function will destroy/create the popup menus dynamically,
  * according to the value of 'mousemodel'.
  * This will fix the "right mouse button freeze" that occurs when
  * there exists a popup menu but it isn't managed.
  */
-    void
+    வெறுமை
 gui_motif_update_mousemodel(vimmenu_T *menu)
 {
-    int		idx = 0;
+    முழு		idx = 0;
 
     // When GUI hasn't started the menus have not been created.
-    if (!gui.in_use)
-	return;
+    எனில் (!gui.in_use)
+	திரும்பு;
 
-    while (menu)
+    போது (menu)
     {
-      if (menu->children != NULL)
+      எனில் (menu->children != வெற்று)
       {
-	  if (menu_is_popup(menu->name))
+	  எனில் (menu_is_popup(menu->name))
 	  {
-	      if (mouse_model_popup())
+	      எனில் (mouse_model_popup())
 	      {
 		  // Popup menu will be used.  Create the popup menus.
 		  gui_mch_add_menu(menu, idx);
 		  gui_motif_update_mousemodel(menu->children);
 	      }
-	      else
+	      இல்லையெனில்
 	      {
 		  // Popup menu will not be used.  Destroy the popup menus.
 		  gui_motif_update_mousemodel(menu->children);
@@ -1399,11 +1399,11 @@ gui_motif_update_mousemodel(vimmenu_T *menu)
 	      }
 	  }
       }
-      else if (menu_is_child_of_popup(menu))
+      இல்லையெனில் எனில் (menu_is_child_of_popup(menu))
       {
-	  if (mouse_model_popup())
+	  எனில் (mouse_model_popup())
 	      gui_mch_add_menu_item(menu, idx);
-	  else
+	  இல்லையெனில்
 	      gui_mch_destroy_menu(menu);
       }
       menu = menu->next;
@@ -1412,34 +1412,34 @@ gui_motif_update_mousemodel(vimmenu_T *menu)
 }
 # endif
 
-    void
-gui_mch_new_menu_colors(void)
+    வெறுமை
+gui_mch_new_menu_colors(வெறுமை)
 {
-    if (menuBar == (Widget)0)
-	return;
+    எனில் (menuBar == (Widget)0)
+	திரும்பு;
     gui_motif_menu_colors(menuBar);
 # ifdef FEAT_TOOLBAR
     gui_motif_menu_colors(toolBarFrame);
     gui_motif_menu_colors(toolBar);
 # endif
 
-    submenu_change(root_menu, TRUE);
+    submenu_change(வேர்_menu, TRUE);
 }
 
-    void
-gui_mch_new_menu_font(void)
+    வெறுமை
+gui_mch_new_menu_font(வெறுமை)
 {
-    if (menuBar == (Widget)0)
-	return;
-    submenu_change(root_menu, FALSE);
+    எனில் (menuBar == (Widget)0)
+	திரும்பு;
+    submenu_change(வேர்_menu, FALSE);
     {
 	Dimension   height;
 	Position w, h;
 
-	XtVaGetValues(menuBar, XmNheight, &height, NULL);
+	Xt_Va_Get_மதிப்புகள்(menuBar, XmNheight, &height, வெற்று);
 	gui.menu_height = height;
 
-	XtVaGetValues(vimShell, XtNwidth, &w, XtNheight, &h, NULL);
+	Xt_Va_Get_மதிப்புகள்(vimShell, XtNwidth, &w, XtNheight, &h, வெற்று);
 	gui_resize_shell(w, h
 # ifdef FEAT_XIM
 		- xim_get_status_area_height()
@@ -1450,105 +1450,105 @@ gui_mch_new_menu_font(void)
     ui_new_shellsize();
 }
 
-# if defined(FEAT_BEVAL_GUI)
-    void
-gui_mch_new_tooltip_font(void)
+# எனில் defined(FEAT_BEVAL_GUI)
+    வெறுமை
+gui_mch_new_tooltip_font(வெறுமை)
 {
 #  ifdef FEAT_TOOLBAR
     vimmenu_T   *menu;
 
-    if (toolBar == (Widget)0)
-	return;
+    எனில் (toolBar == (Widget)0)
+	திரும்பு;
 
     menu = gui_find_menu((char_u *)"ToolBar");
-    if (menu != NULL)
+    எனில் (menu != வெற்று)
 	submenu_change(menu, FALSE);
 #  endif
 }
 
-    void
-gui_mch_new_tooltip_colors(void)
+    வெறுமை
+gui_mch_new_tooltip_colors(வெறுமை)
 {
 #  ifdef FEAT_TOOLBAR
     vimmenu_T   *toolbar;
 
-    if (toolBar == (Widget)0)
-	return;
+    எனில் (toolBar == (Widget)0)
+	திரும்பு;
 
     toolbar = gui_find_menu((char_u *)"ToolBar");
-    if (toolbar != NULL)
+    எனில் (toolbar != வெற்று)
 	submenu_change(toolbar, TRUE);
 #  endif
 }
 # endif
 
-    static void
+    நிலையான வெறுமை
 submenu_change(
     vimmenu_T	*menu,
-    int		colors)		// TRUE for colors, FALSE for font
+    முழு		colors)		// TRUE for colors, FALSE for font
 {
     vimmenu_T	*mp;
 
-    for (mp = menu; mp != NULL; mp = mp->next)
+    க்கு (mp = menu; mp != வெற்று; mp = mp->next)
     {
-	if (mp->id != (Widget)0)
+	எனில் (mp->id != (Widget)0)
 	{
-	    if (colors)
+	    எனில் (colors)
 	    {
 		gui_motif_menu_colors(mp->id);
 # ifdef FEAT_TOOLBAR
 		// For a toolbar item: Free the pixmap and allocate a new one,
 		// so that the background color is right.
-		if (mp->xpm != NULL)
+		எனில் (mp->xpm != வெற்று)
 		{
-		    int		n = 0;
+		    முழு		n = 0;
 		    Arg		args[18];
 
 		    n = add_pixmap_args(mp, args, n);
-		    XtSetValues(mp->id, args, n);
+		    Xt_Set_மதிப்புகள்(mp->id, args, n);
 		}
 #  ifdef FEAT_BEVAL_GUI
 		// If we have a tooltip, then we need to change its font
-		if (mp->tip != NULL)
+		எனில் (mp->tip != வெற்று)
 		{
 		    Arg args[2];
 
 		    args[0].name = XmNbackground;
-		    args[0].value = gui.tooltip_bg_pixel;
+		    args[0].மதிப்பு = gui.tooltip_bg_pixel;
 		    args[1].name = XmNforeground;
-		    args[1].value = gui.tooltip_fg_pixel;
-		    XtSetValues(mp->tip->balloonLabel, &args[0], XtNumber(args));
+		    args[1].மதிப்பு = gui.tooltip_fg_pixel;
+		    Xt_Set_மதிப்புகள்(mp->tip->balloonLabel, &args[0], Xt_எண்(args));
 		}
 #  endif
 # endif
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		gui_motif_menu_fontlist(mp->id);
 # ifdef FEAT_BEVAL_GUI
 		// If we have a tooltip, then we need to change its font
-		if (mp->tip != NULL)
+		எனில் (mp->tip != வெற்று)
 		{
 		    Arg args[1];
 
 		    args[0].name = XmNfontList;
-		    args[0].value = (XtArgVal)gui_motif_fontset2fontlist(
+		    args[0].மதிப்பு = (XtArgVal)gui_motif_fontset2fontlist(
 						    &gui.tooltip_fontset);
-		    XtSetValues(mp->tip->balloonLabel, &args[0], XtNumber(args));
+		    Xt_Set_மதிப்புகள்(mp->tip->balloonLabel, &args[0], Xt_எண்(args));
 		}
 # endif
 	    }
 	}
 
-	if (mp->children != NULL)
+	எனில் (mp->children != வெற்று)
 	{
-# if (XmVersion >= 1002)
+# எனில் (XmVersion >= 1002)
 	    // Set the colors/font for the tear off widget
-	    if (mp->submenu_id != (Widget)0)
+	    எனில் (mp->submenu_id != (Widget)0)
 	    {
-		if (colors)
+		எனில் (colors)
 		    gui_motif_menu_colors(mp->submenu_id);
-		else
+		இல்லையெனில்
 		    gui_motif_menu_fontlist(mp->submenu_id);
 		toggle_tearoff(mp->submenu_id);
 	    }
@@ -1562,26 +1562,26 @@ submenu_change(
 /*
  * Destroy the machine specific menu widget.
  */
-    void
+    வெறுமை
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
     // Please be sure to destroy the parent widget first (i.e. menu->id).
     // On the other hand, problems have been reported that the submenu must be
     // deleted first...
-    if (menu->submenu_id != (Widget)0)
+    எனில் (menu->submenu_id != (Widget)0)
     {
 	XtDestroyWidget(menu->submenu_id);
 	menu->submenu_id = (Widget)0;
     }
 
-    if (menu->id == (Widget)0)
-	return;
+    எனில் (menu->id == (Widget)0)
+	திரும்பு;
 
     Widget	    parent;
 
     parent = XtParent(menu->id);
-# if defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
-    if (parent == toolBar && menu->tip != NULL)
+# எனில் defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
+    எனில் (parent == toolBar && menu->tip != வெற்று)
     {
 	// We try to destroy this before the actual menu, because there are
 	// callbacks, etc. that will be unregistered during the tooltip
@@ -1592,29 +1592,29 @@ gui_mch_destroy_menu(vimmenu_T *menu)
 	// deallocated by Xt, and unknown behaviour will ensue (probably
 	// a core dump).
 	gui_mch_destroy_beval_area(menu->tip);
-	menu->tip = NULL;
+	menu->tip = வெற்று;
     }
 # endif
     XtDestroyWidget(menu->id);
     menu->id = (Widget)0;
-    if (parent == menuBar)
+    எனில் (parent == menuBar)
 	gui_mch_compute_menu_height((Widget)0);
 # ifdef FEAT_TOOLBAR
-    else if (parent == toolBar)
+    இல்லையெனில் எனில் (parent == toolBar)
     {
-	Cardinal    num_children;
+	Cardinal    இலக்கம்_children;
 
 	// When removing last toolbar item, don't display the toolbar.
-	XtVaGetValues(toolBar, XmNnumChildren, &num_children, NULL);
-	if (num_children == 0)
+	Xt_Va_Get_மதிப்புகள்(toolBar, XmNnumChildren, &இலக்கம்_children, வெற்று);
+	எனில் (இலக்கம்_children == 0)
 	    gui_mch_show_toolbar(FALSE);
-	else
+	இல்லையெனில்
 	    gui.toolbar_height = gui_mch_compute_toolbar_height();
     }
 # endif
 }
 
-    void
+    வெறுமை
 gui_mch_show_popupmenu(vimmenu_T *menu UNUSED)
 {
 # ifdef MOTIF_POPUP
@@ -1628,11 +1628,11 @@ gui_mch_show_popupmenu(vimmenu_T *menu UNUSED)
 /*
  * Set the menu and scrollbar colors to their default values.
  */
-    void
-gui_mch_def_colors(void)
+    வெறுமை
+gui_mch_def_colors(வெறுமை)
 {
-    if (!gui.in_use)
-	return;
+    எனில் (!gui.in_use)
+	திரும்பு;
 
     gui.menu_fg_pixel = gui_get_color((char_u *)gui.rsrc_menu_fg_name);
     gui.menu_bg_pixel = gui_get_color((char_u *)gui.rsrc_menu_bg_name);
@@ -1651,202 +1651,202 @@ gui_mch_def_colors(void)
  * Scrollbar stuff.
  */
 
-    void
+    வெறுமை
 gui_mch_set_scrollbar_thumb(
     scrollbar_T *sb,
     long	val,
     long	size,
     long	max)
 {
-    if (sb->id != (Widget)0)
-	XtVaSetValues(sb->id,
+    எனில் (sb->id != (Widget)0)
+	Xt_Va_Set_மதிப்புகள்(sb->id,
 		  XmNvalue, val,
 		  XmNsliderSize, size,
 		  XmNpageIncrement, (size > 2 ? size - 2 : 1),
 		  XmNmaximum, max + 1,	    // Motif has max one past the end
-		  NULL);
+		  வெற்று);
 }
 
-    void
+    வெறுமை
 gui_mch_set_scrollbar_pos(
     scrollbar_T *sb,
-    int		x,
-    int		y,
-    int		w,
-    int		h)
+    முழு		x,
+    முழு		y,
+    முழு		w,
+    முழு		h)
 {
-    if (sb->id == (Widget)0)
-	return;
+    எனில் (sb->id == (Widget)0)
+	திரும்பு;
 
-    if (sb->type == SBAR_LEFT || sb->type == SBAR_RIGHT)
+    எனில் (sb->type == SBAR_இடது || sb->type == SBAR_வலது)
     {
-	if (y == 0)
+	எனில் (y == 0)
 	    h -= gui.border_offset;
-	else
+	இல்லையெனில்
 	    y -= gui.border_offset;
-	XtVaSetValues(sb->id,
+	Xt_Va_Set_மதிப்புகள்(sb->id,
 		XmNtopOffset, y,
 		XmNbottomOffset, -y - h,
 		XmNwidth, w,
-		NULL);
+		வெற்று);
     }
-    else
-	XtVaSetValues(sb->id,
+    இல்லையெனில்
+	Xt_Va_Set_மதிப்புகள்(sb->id,
 		XmNtopOffset, y,
 		XmNleftOffset, x,
-		XmNrightOffset, gui.which_scrollbars[SBAR_RIGHT]
+		XmNrightOffset, gui.which_scrollbars[SBAR_வலது]
 						     ? gui.scrollbar_width : 0,
 		XmNheight, h,
-		NULL);
+		வெற்று);
     XtManageChild(sb->id);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    முழு
+gui_mch_get_scrollbar_xpadding(வெறுமை)
 {
-    int xpad;
+    முழு xpad;
     Dimension tw, ww;
     Position  tx;
 
-    XtVaGetValues(textArea, XtNwidth, &tw, XtNx, &tx, NULL);
-    XtVaGetValues(vimShell, XtNwidth, &ww, NULL);
+    Xt_Va_Get_மதிப்புகள்(textArea, XtNwidth, &tw, XtNx, &tx, வெற்று);
+    Xt_Va_Get_மதிப்புகள்(vimShell, XtNwidth, &ww, வெற்று);
     xpad = ww - tw - tx - gui.scrollbar_width;
-    return (xpad < 0) ? 0 : xpad;
+    திரும்பு (xpad < 0) ? 0 : xpad;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    முழு
+gui_mch_get_scrollbar_ypadding(வெறுமை)
 {
-    int ypad;
+    முழு ypad;
     Dimension th, wh;
     Position  ty;
 
-    XtVaGetValues(textArea, XtNheight, &th, XtNy, &ty, NULL);
-    XtVaGetValues(vimShell, XtNheight, &wh, NULL);
+    Xt_Va_Get_மதிப்புகள்(textArea, XtNheight, &th, XtNy, &ty, வெற்று);
+    Xt_Va_Get_மதிப்புகள்(vimShell, XtNheight, &wh, வெற்று);
     ypad = wh - th - ty - gui.scrollbar_height;
-    return (ypad < 0) ? 0 : ypad;
+    திரும்பு (ypad < 0) ? 0 : ypad;
 }
 
-    void
-gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
+    வெறுமை
+gui_mch_enable_scrollbar(scrollbar_T *sb, முழு flag)
 {
     Arg		args[16];
-    int		n;
+    முழு		n;
 
-    if (sb->id == (Widget)0)
-	return;
+    எனில் (sb->id == (Widget)0)
+	திரும்பு;
 
     n = 0;
-    if (flag)
+    எனில் (flag)
     {
-	switch (sb->type)
+	தேர்வு (sb->type)
 	{
-	    case SBAR_LEFT:
+	    நிலை SBAR_இடது:
 		XtSetArg(args[n], XmNleftOffset, gui.scrollbar_width); n++;
-		break;
+		நிறுத்து;
 
-	    case SBAR_RIGHT:
+	    நிலை SBAR_வலது:
 		XtSetArg(args[n], XmNrightOffset, gui.scrollbar_width); n++;
-		break;
+		நிறுத்து;
 
-	    case SBAR_BOTTOM:
+	    நிலை SBAR_BOTTOM:
 		XtSetArg(args[n], XmNbottomOffset, gui.scrollbar_height);n++;
-		break;
+		நிறுத்து;
 	}
-	XtSetValues(textArea, args, n);
+	Xt_Set_மதிப்புகள்(textArea, args, n);
 	XtManageChild(sb->id);
     }
-    else
+    இல்லையெனில்
     {
-	if (!gui.which_scrollbars[sb->type])
+	எனில் (!gui.which_scrollbars[sb->type])
 	{
 	    // The scrollbars of this type are all disabled, adjust the
 	    // textArea attachment offset.
-	    switch (sb->type)
+	    தேர்வு (sb->type)
 	    {
-		case SBAR_LEFT:
+		நிலை SBAR_இடது:
 		    XtSetArg(args[n], XmNleftOffset, 0); n++;
-		    break;
+		    நிறுத்து;
 
-		case SBAR_RIGHT:
+		நிலை SBAR_வலது:
 		    XtSetArg(args[n], XmNrightOffset, 0); n++;
-		    break;
+		    நிறுத்து;
 
-		case SBAR_BOTTOM:
+		நிலை SBAR_BOTTOM:
 		    XtSetArg(args[n], XmNbottomOffset, 0);n++;
-		    break;
+		    நிறுத்து;
 	    }
-	    XtSetValues(textArea, args, n);
+	    Xt_Set_மதிப்புகள்(textArea, args, n);
 	}
 	XtUnmanageChild(sb->id);
     }
 }
 
-    void
+    வெறுமை
 gui_mch_create_scrollbar(
     scrollbar_T *sb,
-    int		orient)	// SBAR_VERT or SBAR_HORIZ
+    முழு		orient)	// SBAR_VERT or SBAR_HORIZ
 {
     Arg		args[16];
-    int		n = 0;
+    முழு		n = 0;
 
     XtSetArg(args[n], XmNminimum, 0); n++;
     XtSetArg(args[n], XmNorientation,
 	    (orient == SBAR_VERT) ? XmVERTICAL : XmHORIZONTAL); n++;
 
-    switch (sb->type)
+    தேர்வு (sb->type)
     {
-	case SBAR_LEFT:
+	நிலை SBAR_இடது:
 	    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
 	    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNwidth, gui.scrollbar_width); n++;
-	    break;
+	    நிறுத்து;
 
-	case SBAR_RIGHT:
+	நிலை SBAR_வலது:
 	    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
 	    XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNwidth, gui.scrollbar_width); n++;
-	    break;
+	    நிறுத்து;
 
-	case SBAR_BOTTOM:
+	நிலை SBAR_BOTTOM:
 	    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNheight, gui.scrollbar_height); n++;
-	    break;
+	    நிறுத்து;
     }
 
     sb->id = XtCreateWidget("scrollBar",
 	    xmScrollBarWidgetClass, textAreaForm, args, n);
-    if (sb->id == (Widget)0)
-	return;
+    எனில் (sb->id == (Widget)0)
+	திரும்பு;
 
     gui_mch_set_scrollbar_colors(sb);
     XtAddCallback(sb->id, XmNvalueChangedCallback,
 	    scroll_cb, (XtPointer)sb->ident);
     XtAddCallback(sb->id, XmNdragCallback,
 	    scroll_cb, (XtPointer)sb->ident);
-    XtAddEventHandler(sb->id, KeyPressMask, FALSE, gui_x11_key_hit_cb,
+    XtAddEventHandler(sb->id, சாவி_Press_Mask, FALSE, gui_x11_சாவி_hit_cb,
 	    (XtPointer)0);
 }
 
-    void
+    வெறுமை
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
-    if (sb->id != (Widget)0)
+    எனில் (sb->id != (Widget)0)
 	XtDestroyWidget(sb->id);
 }
 
-    void
+    வெறுமை
 gui_mch_set_scrollbar_colors(scrollbar_T *sb)
 {
-    if (sb->id != (Widget)0)
+    எனில் (sb->id != (Widget)0)
     {
-	if (gui.scroll_bg_pixel != INVALCOLOR)
+	எனில் (gui.scroll_bg_pixel != INVALCOLOR)
 	{
-#if (XmVersion>=1002)
+#எனில் (XmVersion>=1002)
 	    // This should not only set the through color but also adjust
 	    // related colors, such as shadows.
 	    XmChangeColor(sb->id, gui.scroll_bg_pixel);
@@ -1854,20 +1854,20 @@ gui_mch_set_scrollbar_colors(scrollbar_T *sb)
 
 	    // Set the through color directly, in case XmChangeColor() decided
 	    // to change it.
-	    XtVaSetValues(sb->id,
+	    Xt_Va_Set_மதிப்புகள்(sb->id,
 		    XmNtroughColor, gui.scroll_bg_pixel,
-		    NULL);
+		    வெற்று);
 	}
 
-	if (gui.scroll_fg_pixel != INVALCOLOR)
-	    XtVaSetValues(sb->id,
+	எனில் (gui.scroll_fg_pixel != INVALCOLOR)
+	    Xt_Va_Set_மதிப்புகள்(sb->id,
 		    XmNforeground, gui.scroll_fg_pixel,
 		    XmNbackground, gui.scroll_fg_pixel,
-		    NULL);
+		    வெற்று);
     }
 
     // This is needed for the rectangle below the vertical scrollbars.
-    if (sb == &gui.bottom_sbar && textAreaForm != (Widget)0)
+    எனில் (sb == &gui.bottom_sbar && textAreaForm != (Widget)0)
 	gui_motif_scroll_colors(textAreaForm);
 }
 
@@ -1876,9 +1876,9 @@ gui_mch_set_scrollbar_colors(scrollbar_T *sb)
  */
 
     Window
-gui_x11_get_wid(void)
+gui_x11_get_wid(வெறுமை)
 {
-    return(XtWindow(textArea));
+    திரும்பு(XtWindow(textArea));
 }
 
 /*
@@ -1887,65 +1887,65 @@ gui_x11_get_wid(void)
  * keyboard focus.  If the mnemonic is on a label, look in the userData field
  * of the label to see if it points to another widget, and give that the focus.
  */
-    static void
-do_mnemonic(Widget w, unsigned int keycode)
+    நிலையான வெறுமை
+do_mnemonic(Widget w, unsigned முழு keycode)
 {
     WidgetList	    children;
-    int		    numChildren, i;
+    முழு		    இலக்கம்_Children, i;
     Boolean	    isMenu;
-    KeySym	    mnemonic = '\0';
-    char	    mneString[2];
+    சாவி_Sym	    mnemonic = '\0';
+    எழுத்து	    mneString[2];
     Widget	    userData;
-    unsigned char   rowColType;
+    unsigned எழுத்து   rowColType;
 
-    if (XtIsComposite(w))
+    எனில் (XtIsComposite(w))
     {
-	if (XtClass(w) == xmRowColumnWidgetClass)
+	எனில் (XtClass(w) == xmRowColumnWidgetClass)
 	{
-	    XtVaGetValues(w, XmNrowColumnType, &rowColType, NULL);
-	    isMenu = (rowColType != (unsigned char)XmWORK_AREA);
+	    Xt_Va_Get_மதிப்புகள்(w, XmNrowColumnType, &rowColType, வெற்று);
+	    isMenu = (rowColType != (unsigned எழுத்து)XmWORK_AREA);
 	}
-	else
+	இல்லையெனில்
 	    isMenu = False;
-	if (!isMenu)
+	எனில் (!isMenu)
 	{
-	    XtVaGetValues(w, XmNchildren, &children, XmNnumChildren,
-			  &numChildren, NULL);
-	    for (i = 0; i < numChildren; i++)
+	    Xt_Va_Get_மதிப்புகள்(w, XmNchildren, &children, XmNnumChildren,
+			  &இலக்கம்_Children, வெற்று);
+	    க்கு (i = 0; i < இலக்கம்_Children; i++)
 		do_mnemonic(children[i], keycode);
 	}
     }
-    else
+    இல்லையெனில்
     {
-	XtVaGetValues(w, XmNmnemonic, &mnemonic, NULL);
-	if (mnemonic != '\0')
+	Xt_Va_Get_மதிப்புகள்(w, XmNmnemonic, &mnemonic, வெற்று);
+	எனில் (mnemonic != '\0')
 	{
 	    mneString[0] = mnemonic;
 	    mneString[1] = '\0';
-	    if (XKeysymToKeycode(XtDisplay(XtParent(w)),
+	    எனில் (XKeysymToKeycode(XtDisplay(XtParent(w)),
 				       XStringToKeysym(mneString)) == keycode)
 	    {
-		if (XtClass(w) == xmLabelWidgetClass
+		எனில் (XtClass(w) == xmLabelWidgetClass
 			|| XtClass(w) == xmLabelGadgetClass)
 		{
-		    XtVaGetValues(w, XmNuserData, &userData, NULL);
-		    if (userData != NULL && XtIsWidget(userData))
+		    Xt_Va_Get_மதிப்புகள்(w, XmNuserData, &userData, வெற்று);
+		    எனில் (userData != வெற்று && XtIsWidget(userData))
 			XmProcessTraversal(userData, XmTRAVERSE_CURRENT);
 		}
-		else
+		இல்லையெனில்
 		{
-		    XKeyPressedEvent keyEvent;
+		    XKeyPressedEvent சாவி_Event;
 
 		    XmProcessTraversal(w, XmTRAVERSE_CURRENT);
 
-		    CLEAR_FIELD(keyEvent);
-		    keyEvent.type = KeyPress;
-		    keyEvent.serial = 1;
-		    keyEvent.send_event = True;
-		    keyEvent.display = XtDisplay(w);
-		    keyEvent.window = XtWindow(w);
-		    XtCallActionProc(w, "Activate", (XEvent *) & keyEvent,
-								     NULL, 0);
+		    CLEAR_FIELD(சாவி_Event);
+		    சாவி_Event.type = சாவி_Press;
+		    சாவி_Event.serial = 1;
+		    சாவி_Event.send_event = True;
+		    சாவி_Event.display = XtDisplay(w);
+		    சாவி_Event.window = XtWindow(w);
+		    XtCallActionProc(w, "Activate", (XEvent *) & சாவி_Event,
+								     வெற்று, 0);
 		}
 	    }
 	}
@@ -1955,7 +1955,7 @@ do_mnemonic(Widget w, unsigned int keycode)
 /*
  * Callback routine for dialog mnemonic processing.
  */
-    static void
+    நிலையான வெறுமை
 mnemonic_event(
 	Widget	    w,
 	XtPointer   call_data UNUSED,
@@ -1971,41 +1971,41 @@ mnemonic_event(
  * a passive grab to the dialog widget for the mnemonic character, thus
  * directing mnemonic events to the dialog widget.
  */
-    static void
+    நிலையான வெறுமை
 add_mnemonic_grabs(Widget dialog, Widget w)
 {
-    char	    mneString[2];
+    எழுத்து	    mneString[2];
     WidgetList	    children;
-    int		    numChildren, i;
+    முழு		    இலக்கம்_Children, i;
     Boolean	    isMenu;
-    KeySym	    mnemonic = '\0';
-    unsigned char   rowColType;
+    சாவி_Sym	    mnemonic = '\0';
+    unsigned எழுத்து   rowColType;
 
-    if (XtIsComposite(w))
+    எனில் (XtIsComposite(w))
     {
-	if (XtClass(w) == xmRowColumnWidgetClass)
+	எனில் (XtClass(w) == xmRowColumnWidgetClass)
 	{
-	    XtVaGetValues(w, XmNrowColumnType, &rowColType, NULL);
-	    isMenu = (rowColType != (unsigned char)XmWORK_AREA);
+	    Xt_Va_Get_மதிப்புகள்(w, XmNrowColumnType, &rowColType, வெற்று);
+	    isMenu = (rowColType != (unsigned எழுத்து)XmWORK_AREA);
 	}
-	else
+	இல்லையெனில்
 	    isMenu = False;
-	if (!isMenu)
+	எனில் (!isMenu)
 	{
-	    XtVaGetValues(w, XmNchildren, &children, XmNnumChildren,
-							  &numChildren, NULL);
-	    for (i = 0; i < numChildren; i++)
+	    Xt_Va_Get_மதிப்புகள்(w, XmNchildren, &children, XmNnumChildren,
+							  &இலக்கம்_Children, வெற்று);
+	    க்கு (i = 0; i < இலக்கம்_Children; i++)
 		add_mnemonic_grabs(dialog, children[i]);
 	}
     }
-    else
+    இல்லையெனில்
     {
-	XtVaGetValues(w, XmNmnemonic, &mnemonic, NULL);
-	if (mnemonic != '\0')
+	Xt_Va_Get_மதிப்புகள்(w, XmNmnemonic, &mnemonic, வெற்று);
+	எனில் (mnemonic != '\0')
 	{
 	    mneString[0] = mnemonic;
 	    mneString[1] = '\0';
-	    XtGrabKey(dialog, XKeysymToKeycode(XtDisplay(dialog),
+	    Xt_Grab_சாவி(dialog, XKeysymToKeycode(XtDisplay(dialog),
 						  XStringToKeysym(mneString)),
 		    Mod1Mask, True, GrabModeAsync, GrabModeAsync);
 	}
@@ -2021,75 +2021,75 @@ add_mnemonic_grabs(Widget dialog, Widget w)
  * the appropriate label and set the XmNuserData resource of the label to the
  * widget to get the focus when the mnemonic is typed.
  */
-    static void
+    நிலையான வெறுமை
 activate_dialog_mnemonics(Widget dialog)
 {
-    if (!dialog)
-	return;
+    எனில் (!dialog)
+	திரும்பு;
 
-    XtAddEventHandler(dialog, KeyPressMask, False,
-			   (XtEventHandler) mnemonic_event, (XtPointer) NULL);
+    XtAddEventHandler(dialog, சாவி_Press_Mask, False,
+			   (XtEventHandler) mnemonic_event, (XtPointer) வெற்று);
     add_mnemonic_grabs(dialog, dialog);
 }
 
 /*
  * Removes the event handler and key-grabs for dialog mnemonic handling.
  */
-    static void
+    நிலையான வெறுமை
 suppress_dialog_mnemonics(Widget dialog)
 {
-    if (!dialog)
-	return;
+    எனில் (!dialog)
+	திரும்பு;
 
-    XtUngrabKey(dialog, AnyKey, Mod1Mask);
-    XtRemoveEventHandler(dialog, KeyPressMask, False,
-			   (XtEventHandler) mnemonic_event, (XtPointer) NULL);
+    Xt_Ungrab_சாவி(dialog, Any_சாவி, Mod1Mask);
+    XtRemoveEventHandler(dialog, சாவி_Press_Mask, False,
+			   (XtEventHandler) mnemonic_event, (XtPointer) வெற்று);
 }
 
-#if defined(FEAT_BROWSE) || defined(FEAT_GUI_DIALOG)
+#எனில் defined(FEAT_BROWSE) || defined(FEAT_GUI_DIALOG)
 /*
  * Use the 'guifont' or 'guifontset' as a fontlist for a dialog widget.
  */
-    static void
+    நிலையான வெறுமை
 set_fontlist(Widget id)
 {
     XmFontList fl;
 
 # ifdef FONTSET_ALWAYS
-    if (gui.fontset != NOFONTSET)
+    எனில் (gui.fontset != NOFONTSET)
     {
 	fl = gui_motif_fontset2fontlist((XFontSet *)&gui.fontset);
-	if (fl != NULL)
+	எனில் (fl != வெற்று)
 	{
-	    if (XtIsManaged(id))
+	    எனில் (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_மதிப்புகள்(id, XmNfontList, fl, வெற்று);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    இல்லையெனில்
+		Xt_Va_Set_மதிப்புகள்(id, XmNfontList, fl, வெற்று);
 	    XmFontListFree(fl);
 	}
     }
-# else
-    if (gui.norm_font != NOFONT)
+# இல்லையெனில்
+    எனில் (gui.norm_font != NOFONT)
     {
 	fl = gui_motif_create_fontlist((XFontStruct *)gui.norm_font);
-	if (fl != NULL)
+	எனில் (fl != வெற்று)
 	{
-	    if (XtIsManaged(id))
+	    எனில் (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_மதிப்புகள்(id, XmNfontList, fl, வெற்று);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    இல்லையெனில்
+		Xt_Va_Set_மதிப்புகள்(id, XmNfontList, fl, வெற்று);
 	    XmFontListFree(fl);
 	}
     }
@@ -2097,7 +2097,7 @@ set_fontlist(Widget id)
 }
 #endif
 
-#if defined(FEAT_BROWSE)
+#எனில் defined(FEAT_BROWSE)
 
 /*
  * file selector related stuff
@@ -2106,19 +2106,19 @@ set_fontlist(Widget id)
 # include <Xm/FileSB.h>
 # include <Xm/XmStrDefs.h>
 
-typedef struct dialog_callback_arg
+வகைவரை கட்டமைப்பு dialog_callback_arg
 {
-    char *  args;   // not used right now
-    int	    id;
+    எழுத்து *  args;   // not used right now
+    முழு	    id;
 } dcbarg_T;
 
-static Widget dialog_wgt;
-static char *browse_fname = NULL;
-static XmStringCharSet charset = (XmStringCharSet) XmSTRING_DEFAULT_CHARSET;
+நிலையான Widget dialog_wgt;
+நிலையான எழுத்து *browse_fname = வெற்று;
+நிலையான XmStringCharSet charset = (XmStringCharSet) XmSTRING_DEFAULT_CHARSET;
 				// used to set up XmStrings
 
-static void DialogCancelCB(Widget, XtPointer, XtPointer);
-static void DialogAcceptCB(Widget, XtPointer, XtPointer);
+நிலையான வெறுமை DialogCancelCB(Widget, XtPointer, XtPointer);
+நிலையான வெறுமை DialogAcceptCB(Widget, XtPointer, XtPointer);
 
 /*
  * This function is used to translate the predefined label text of the
@@ -2129,29 +2129,29 @@ static void DialogAcceptCB(Widget, XtPointer, XtPointer);
  * - equalize the messages between different GUI implementations as far as
  * possible.
  */
-    static void
-set_predefined_label(Widget parent, String name, char *new_label)
+    நிலையான வெறுமை
+set_predefined_label(Widget parent, String name, எழுத்து *new_label)
 {
     XmString	str;
     Widget	w;
     char_u	*p, *next;
-    KeySym	mnemonic = NUL;
+    சாவி_Sym	mnemonic = NUL;
 
     w = XtNameToWidget(parent, name);
 
-    if (!w)
-	return;
+    எனில் (!w)
+	திரும்பு;
 
     p = vim_strsave((char_u *)new_label);
-    if (p == NULL)
-	return;
-    for (next = p; *next; ++next)
+    எனில் (p == வெற்று)
+	திரும்பு;
+    க்கு (next = p; *next; ++next)
     {
-	if (*next == DLG_HOTKEY_CHAR)
+	எனில் (*next == DLG_HOTKEY_CHAR)
 	{
-	    int len = STRLEN(next);
+	    முழு len = STRLEN(next);
 
-	    if (len > 0)
+	    எனில் (len > 0)
 	    {
 		mch_memmove(next, next + 1, len);
 		mnemonic = next[0];
@@ -2159,28 +2159,28 @@ set_predefined_label(Widget parent, String name, char *new_label)
 	}
     }
 
-    str = XmStringCreate((char *)p, STRING_TAG);
+    str = XmStringCreate((எழுத்து *)p, STRING_TAG);
     vim_free(p);
 
-    if (str != NULL)
+    எனில் (str != வெற்று)
     {
-	XtVaSetValues(w,
+	Xt_Va_Set_மதிப்புகள்(w,
 		XmNlabelString, str,
 		XmNmnemonic, mnemonic,
-		NULL);
+		வெற்று);
 	XmStringFree(str);
     }
     gui_motif_menu_fontlist(w);
 }
 
-    static void
+    நிலையான வெறுமை
 set_predefined_fontlist(Widget parent, String name)
 {
     Widget w;
     w = XtNameToWidget(parent, name);
 
-    if (!w)
-	return;
+    எனில் (!w)
+	திரும்பு;
 
     set_fontlist(w);
 }
@@ -2191,7 +2191,7 @@ set_predefined_fontlist(Widget parent, String name)
  */
     char_u *
 gui_mch_browse(
-    int		saving UNUSED,	// select file to write
+    முழு		saving UNUSED,	// select file to write
     char_u	*title,		// title for the window
     char_u	*dflt,		// default name
     char_u	*ext UNUSED,	// not used (extension added)
@@ -2201,23 +2201,23 @@ gui_mch_browse(
     char_u	dirbuf[MAXPATHL];
     char_u	dfltbuf[MAXPATHL];
     char_u	*pattern;
-    char_u	*tofree = NULL;
+    char_u	*tofree = வெற்று;
 
     // There a difference between the resource name and value, Therefore, we
     // avoid to (ab-)use the (maybe internationalized!) dialog title as a
     // dialog name.
 
-    dialog_wgt = XmCreateFileSelectionDialog(vimShell, "browseDialog", NULL, 0);
+    dialog_wgt = XmCreateFileSelectionDialog(vimShell, "browseDialog", வெற்று, 0);
 
-    if (initdir == NULL || *initdir == NUL)
+    எனில் (initdir == வெற்று || *initdir == NUL)
     {
 	mch_dirname(dirbuf, MAXPATHL);
 	initdir = dirbuf;
     }
 
-    if (dflt == NULL)
+    எனில் (dflt == வெற்று)
 	dflt = (char_u *)"";
-    else if (STRLEN(initdir) + STRLEN(dflt) + 2 < MAXPATHL)
+    இல்லையெனில் எனில் (STRLEN(initdir) + STRLEN(dflt) + 2 < MAXPATHL)
     {
 	// The default selection should be the full path, "dflt" is only the
 	// file name.
@@ -2229,36 +2229,36 @@ gui_mch_browse(
 
     // Can only use one pattern for a file name.  Get the first pattern out of
     // the filter.  An empty pattern means everything matches.
-    if (filter == NULL)
+    எனில் (filter == வெற்று)
 	pattern = (char_u *)"";
-    else
+    இல்லையெனில்
     {
 	char_u	*s, *p;
 
 	s = filter;
-	for (p = filter; *p != NUL; ++p)
+	க்கு (p = filter; *p != NUL; ++p)
 	{
-	    if (*p == '\t')	// end of description, start of pattern
+	    எனில் (*p == '\t')	// end of description, start of pattern
 		s = p + 1;
-	    if (*p == ';' || *p == '\n')	// end of (first) pattern
-		break;
+	    எனில் (*p == ';' || *p == '\n')	// end of (first) pattern
+		நிறுத்து;
 	}
 	pattern = vim_strnsave(s, p - s);
 	tofree = pattern;
-	if (pattern == NULL)
+	எனில் (pattern == வெற்று)
 	    pattern = (char_u *)"";
     }
 
-    XtVaSetValues(dialog_wgt,
+    Xt_Va_Set_மதிப்புகள்(dialog_wgt,
 	XtVaTypedArg,
-	    XmNdirectory, XmRString, (char *)initdir, STRLEN(initdir) + 1,
+	    XmNdirectory, XmRString, (எழுத்து *)initdir, STRLEN(initdir) + 1,
 	XtVaTypedArg,
-	    XmNdirSpec,	XmRString, (char *)dflt, STRLEN(dflt) + 1,
+	    XmNdirSpec,	XmRString, (எழுத்து *)dflt, STRLEN(dflt) + 1,
 	XtVaTypedArg,
-	    XmNpattern,	XmRString, (char *)pattern, STRLEN(pattern) + 1,
+	    XmNpattern,	XmRString, (எழுத்து *)pattern, STRLEN(pattern) + 1,
 	XtVaTypedArg,
-	    XmNdialogTitle, XmRString, (char *)title, STRLEN(title) + 1,
-	NULL);
+	    XmNdialogTitle, XmRString, (எழுத்து *)title, STRLEN(title) + 1,
+	வெற்று);
 
     set_predefined_label(dialog_wgt, "Apply", _("&Filter"));
     set_predefined_label(dialog_wgt, "Cancel", _("&Cancel"));
@@ -2275,32 +2275,32 @@ gui_mch_browse(
     set_predefined_fontlist(dialog_wgt, "ItemsListSW.ItemsList");
 
     gui_motif_menu_colors(dialog_wgt);
-    if (gui.scroll_bg_pixel != INVALCOLOR)
-	XtVaSetValues(dialog_wgt, XmNtroughColor, gui.scroll_bg_pixel, NULL);
+    எனில் (gui.scroll_bg_pixel != INVALCOLOR)
+	Xt_Va_Set_மதிப்புகள்(dialog_wgt, XmNtroughColor, gui.scroll_bg_pixel, வெற்று);
 
     XtAddCallback(dialog_wgt, XmNokCallback, DialogAcceptCB, (XtPointer)0);
     XtAddCallback(dialog_wgt, XmNcancelCallback, DialogCancelCB, (XtPointer)0);
     // We have no help in this window, so hide help button
     XtUnmanageChild(XmFileSelectionBoxGetChild(dialog_wgt,
-					(unsigned char)XmDIALOG_HELP_BUTTON));
+					(unsigned எழுத்து)XmDIALOG_HELP_BUTTON));
 
     manage_centered(dialog_wgt);
     activate_dialog_mnemonics(dialog_wgt);
 
     // sit in a loop until the dialog box has gone away
-    do
+    செய்
     {
 	XtAppProcessEvent(XtWidgetToApplicationContext(dialog_wgt),
-	    (XtInputMask)XtIMAll);
-    } while (XtIsManaged(dialog_wgt));
+	    (Xt_உள்ளீடு_Mask)XtIMAll);
+    } போது (XtIsManaged(dialog_wgt));
 
     suppress_dialog_mnemonics(dialog_wgt);
     XtDestroyWidget(dialog_wgt);
     vim_free(tofree);
 
-    if (browse_fname == NULL)
-	return NULL;
-    return vim_strsave((char_u *)browse_fname);
+    எனில் (browse_fname == வெற்று)
+	திரும்பு வெற்று;
+    திரும்பு vim_strsave((char_u *)browse_fname);
 }
 
 /*
@@ -2312,16 +2312,16 @@ gui_mch_browse(
 /*
  * Process callback from Dialog cancel actions.
  */
-    static void
+    நிலையான வெறுமை
 DialogCancelCB(
     Widget	w UNUSED,		//  widget id
     XtPointer	client_data UNUSED,	//  data from application
     XtPointer	call_data UNUSED)	//  data from widget class
 {
-    if (browse_fname != NULL)
+    எனில் (browse_fname != வெற்று)
     {
 	XtFree(browse_fname);
-	browse_fname = NULL;
+	browse_fname = வெற்று;
     }
     XtUnmanageChild(dialog_wgt);
 }
@@ -2329,7 +2329,7 @@ DialogCancelCB(
 /*
  * Process callback from Dialog actions.
  */
-    static void
+    நிலையான வெறுமை
 DialogAcceptCB(
     Widget	w UNUSED,		//  widget id
     XtPointer	client_data UNUSED,	//  data from application
@@ -2337,15 +2337,15 @@ DialogAcceptCB(
 {
     XmFileSelectionBoxCallbackStruct *fcb;
 
-    if (browse_fname != NULL)
+    எனில் (browse_fname != வெற்று)
     {
 	XtFree(browse_fname);
-	browse_fname = NULL;
+	browse_fname = வெற்று;
     }
     fcb = (XmFileSelectionBoxCallbackStruct *)call_data;
 
     // get the filename from the file selection box
-    XmStringGetLtoR(fcb->value, charset, &browse_fname);
+    XmStringGetLtoR(fcb->மதிப்பு, charset, &browse_fname);
 
     // popdown the file selection box
     XtUnmanageChild(dialog_wgt);
@@ -2353,69 +2353,69 @@ DialogAcceptCB(
 
 #endif // FEAT_BROWSE
 
-#if defined(FEAT_GUI_DIALOG)
+#எனில் defined(FEAT_GUI_DIALOG)
 
-static int	dialogStatus;
+நிலையான முழு	dialogStatus;
 
 /*
  * Callback function for the textfield.  When CR is hit this works like
  * hitting the "OK" button, ESC like "Cancel".
  */
-    static void
+    நிலையான வெறுமை
 keyhit_callback(
     Widget		w,
     XtPointer		client_data UNUSED,
     XEvent		*event,
     Boolean		*cont UNUSED)
 {
-    char	buf[2];
-    KeySym	key_sym;
+    எழுத்து	buf[2];
+    சாவி_Sym	சாவி_sym;
 
-    if (XLookupString(&(event->xkey), buf, 2, &key_sym, NULL) == 1)
+    எனில் (XLookupString(&(event->xkey), buf, 2, &சாவி_sym, வெற்று) == 1)
     {
-	if (*buf == CAR)
+	எனில் (*buf == CAR)
 	    dialogStatus = 1;
-	else if (*buf == ESC)
+	இல்லையெனில் எனில் (*buf == ESC)
 	    dialogStatus = 2;
     }
-    if ((key_sym == XK_Left || key_sym == XK_Right)
+    எனில் ((சாவி_sym == XK_இடது || சாவி_sym == XK_வலது)
 	    && !(event->xkey.state & ShiftMask))
 	XmTextFieldClearSelection(w, XtLastTimestampProcessed(gui.dpy));
 }
 
-    static void
+    நிலையான வெறுமை
 butproc(
     Widget	w UNUSED,
     XtPointer	client_data,
     XtPointer	call_data UNUSED)
 {
-    dialogStatus = (int)(long)client_data + 1;
+    dialogStatus = (முழு)(long)client_data + 1;
 }
 
 # ifdef HAVE_XPM
 
-    static Widget
+    நிலையான Widget
 create_pixmap_label(
     Widget	parent,
     String	name,
-    char	**data,
+    எழுத்து	**data,
     ArgList	args,
     Cardinal	arg)
 {
     Widget		label;
     Display		*dsp;
     Screen		*scr;
-    int			depth;
+    முழு			depth;
     Pixmap		pixmap = 0;
     XpmAttributes	attr;
     Boolean		rs;
-    XpmColorSymbol	color[5] =
+    Xpm_Color_குறியீடு	color[5] =
     {
-	{"none", NULL, 0},
-	{"iconColor1", NULL, 0},
-	{"bottomShadowColor", NULL, 0},
-	{"topShadowColor", NULL, 0},
-	{"selectColor", NULL, 0}
+	{"none", வெற்று, 0},
+	{"iconColor1", வெற்று, 0},
+	{"bottomShadowColor", வெற்று, 0},
+	{"topShadowColor", வெற்று, 0},
+	{"selectColor", வெற்று, 0}
     };
 
     label = XmCreateLabelGadget(parent, name, args, arg);
@@ -2427,7 +2427,7 @@ create_pixmap_label(
      */
     dsp = XtDisplayOfObject(label);
     scr = XtScreenOfObject(label);
-    XtVaGetValues(XtIsSubclass(label, coreWidgetClass)
+    Xt_Va_Get_மதிப்புகள்(XtIsSubclass(label, coreWidgetClass)
 	    ?  label : XtParent(label),
 		  XmNdepth, &depth,
 		  XmNbackground, &color[0].pixel,
@@ -2435,95 +2435,95 @@ create_pixmap_label(
 		  XmNbottomShadowColor, &color[2].pixel,
 		  XmNtopShadowColor, &color[3].pixel,
 		  XmNhighlight, &color[4].pixel,
-		  NULL);
+		  வெற்று);
 
     attr.valuemask = XpmColorSymbols | XpmCloseness | XpmDepth;
     attr.colorsymbols = color;
     attr.numsymbols = 5;
     attr.closeness = 65535;
     attr.depth = depth;
-    XpmCreatePixmapFromData(dsp, RootWindowOfScreen(scr),
-		    data, &pixmap, NULL, &attr);
+    XpmCreatePixmapFromData(dsp, வேர்_Window_Of_Screen(scr),
+		    data, &pixmap, வெற்று, &attr);
 
-    XtVaGetValues(label, XmNrecomputeSize, &rs, NULL);
-    XtVaSetValues(label, XmNrecomputeSize, True, NULL);
-    XtVaSetValues(label,
+    Xt_Va_Get_மதிப்புகள்(label, XmNrecomputeSize, &rs, வெற்று);
+    Xt_Va_Set_மதிப்புகள்(label, XmNrecomputeSize, True, வெற்று);
+    Xt_Va_Set_மதிப்புகள்(label,
 	    XmNlabelType, XmPIXMAP,
 	    XmNlabelPixmap, pixmap,
-	    NULL);
-    XtVaSetValues(label, XmNrecomputeSize, rs, NULL);
+	    வெற்று);
+    Xt_Va_Set_மதிப்புகள்(label, XmNrecomputeSize, rs, வெற்று);
 
-    return label;
+    திரும்பு label;
 }
 # endif
 
-    int
+    முழு
 gui_mch_dialog(
-    int		type UNUSED,
+    முழு		type UNUSED,
     char_u	*title,
     char_u	*message,
     char_u	*button_names,
-    int		dfltbutton,
+    முழு		dfltbutton,
     char_u	*textfield,		// buffer of size IOSIZE
-    int		ex_cmd UNUSED)
+    முழு		ex_cmd UNUSED)
 {
     char_u		*buts;
     char_u		*p, *next;
     XtAppContext	app;
     XmString		label;
-    int			butcount;
+    முழு			butcount;
     Widget		w;
-    Widget		dialogform = NULL;
-    Widget		form = NULL;
-    Widget		dialogtextfield = NULL;
+    Widget		dialogform = வெற்று;
+    Widget		form = வெற்று;
+    Widget		dialogtextfield = வெற்று;
     Widget		*buttons;
-    Widget		sep_form = NULL;
+    Widget		sep_form = வெற்று;
     Boolean		vertical;
-    Widget		separator = NULL;
-    int			n;
+    Widget		separator = வெற்று;
+    முழு			n;
     Arg			args[6];
 # ifdef HAVE_XPM
-    char		**icon_data = NULL;
-    Widget		dialogpixmap = NULL;
+    எழுத்து		**icon_data = வெற்று;
+    Widget		dialogpixmap = வெற்று;
 # endif
 
-    if (title == NULL)
+    எனில் (title == வெற்று)
 	title = (char_u *)_("Vim dialog");
 
     // if our pointer is currently hidden, then we should show it.
     gui_mch_mousehide(FALSE);
 
-    dialogform = XmCreateFormDialog(vimShell, (char *)"dialog", NULL, 0);
+    dialogform = XmCreateFormDialog(vimShell, (எழுத்து *)"dialog", வெற்று, 0);
 
     // Check 'v' flag in 'guioptions': vertical button placement.
-    vertical = (vim_strchr(p_go, GO_VERTICAL) != NULL);
+    vertical = (vim_strchr(p_go, GO_VERTICAL) != வெற்று);
 
     // Set the title of the Dialog window
-    label = XmStringCreateSimple((char *)title);
-    if (label == NULL)
-	return -1;
-    XtVaSetValues(dialogform,
+    label = XmStringCreateSimple((எழுத்து *)title);
+    எனில் (label == வெற்று)
+	திரும்பு -1;
+    Xt_Va_Set_மதிப்புகள்(dialogform,
 	    XmNdialogTitle, label,
 	    XmNhorizontalSpacing, 4,
 	    XmNverticalSpacing, vertical ? 0 : 4,
-	    NULL);
+	    வெற்று);
     XmStringFree(label);
 
     // make a copy, so that we can insert NULs
     buts = vim_strsave(button_names);
-    if (buts == NULL)
-	return -1;
+    எனில் (buts == வெற்று)
+	திரும்பு -1;
 
     // Count the number of buttons and allocate buttons[].
     butcount = 1;
-    for (p = buts; *p; ++p)
-	if (*p == DLG_BUTTON_SEP)
+    க்கு (p = buts; *p; ++p)
+	எனில் (*p == DLG_BUTTON_SEP)
 	    ++butcount;
     buttons = ALLOC_MULT(Widget, butcount);
-    if (buttons == NULL)
+    எனில் (buttons == வெற்று)
     {
 	vim_free(buts);
-	return -1;
+	திரும்பு -1;
     }
 
     /*
@@ -2531,60 +2531,60 @@ gui_mch_dialog(
      */
     sep_form = (Widget) 0;
     p = buts;
-    for (butcount = 0; *p; ++butcount)
+    க்கு (butcount = 0; *p; ++butcount)
     {
-	KeySym mnemonic = NUL;
+	சாவி_Sym mnemonic = NUL;
 
-	for (next = p; *next; ++next)
+	க்கு (next = p; *next; ++next)
 	{
-	    if (*next == DLG_HOTKEY_CHAR)
+	    எனில் (*next == DLG_HOTKEY_CHAR)
 	    {
-		int len = STRLEN(next);
+		முழு len = STRLEN(next);
 
-		if (len > 0)
+		எனில் (len > 0)
 		{
 		    mch_memmove(next, next + 1, len);
 		    mnemonic = next[0];
 		}
 	    }
-	    if (*next == DLG_BUTTON_SEP)
+	    எனில் (*next == DLG_BUTTON_SEP)
 	    {
 		*next++ = NUL;
-		break;
+		நிறுத்து;
 	    }
 	}
-	label = XmStringCreate(_((char *)p), STRING_TAG);
-	if (label == NULL)
-	    break;
+	label = XmStringCreate(_((எழுத்து *)p), STRING_TAG);
+	எனில் (label == வெற்று)
+	    நிறுத்து;
 
 	buttons[butcount] = XtVaCreateManagedWidget("button",
-		xmPushButtonWidgetClass, dialogform,
+		xm_தள்ளு_Button_Widget_Class, dialogform,
 		XmNlabelString, label,
 		XmNmnemonic, mnemonic,
 		XmNbottomAttachment, XmATTACH_FORM,
 		XmNbottomOffset, 4,
 		XmNshowAsDefault, butcount == dfltbutton - 1,
 		XmNdefaultButtonShadowThickness, 1,
-		NULL);
+		வெற்று);
 	XmStringFree(label);
 	gui_motif_menu_fontlist(buttons[butcount]);
 
 	// Layout properly.
 
-	if (butcount > 0)
+	எனில் (butcount > 0)
 	{
-	    if (vertical)
-		XtVaSetValues(buttons[butcount],
+	    எனில் (vertical)
+		Xt_Va_Set_மதிப்புகள்(buttons[butcount],
 			XmNtopWidget, buttons[butcount - 1],
-			NULL);
-	    else
+			வெற்று);
+	    இல்லையெனில்
 	    {
-		if (*next == NUL)
+		எனில் (*next == NUL)
 		{
-		    XtVaSetValues(buttons[butcount],
+		    Xt_Va_Set_மதிப்புகள்(buttons[butcount],
 			    XmNrightAttachment, XmATTACH_FORM,
 			    XmNrightOffset, 4,
-			    NULL);
+			    வெற்று);
 
 		    // fill in a form as invisible separator
 		    sep_form = XtVaCreateWidget("separatorForm",
@@ -2595,26 +2595,26 @@ gui_mch_dialog(
 			    XmNrightWidget, buttons[butcount],
 			    XmNbottomAttachment, XmATTACH_FORM,
 			    XmNbottomOffset, 4,
-			    NULL);
+			    வெற்று);
 		    XtManageChild(sep_form);
 		}
-		else
+		இல்லையெனில்
 		{
-		    XtVaSetValues(buttons[butcount],
+		    Xt_Va_Set_மதிப்புகள்(buttons[butcount],
 			    XmNleftAttachment, XmATTACH_WIDGET,
 			    XmNleftWidget, buttons[butcount - 1],
-			    NULL);
+			    வெற்று);
 		}
 	    }
 	}
-	else if (!vertical)
+	இல்லையெனில் எனில் (!vertical)
 	{
-	    if (*next == NUL)
+	    எனில் (*next == NUL)
 	    {
-		XtVaSetValues(buttons[0],
+		Xt_Va_Set_மதிப்புகள்(buttons[0],
 			XmNrightAttachment, XmATTACH_FORM,
 			XmNrightOffset, 4,
-			NULL);
+			வெற்று);
 
 		// fill in a form as invisible separator
 		sep_form = XtVaCreateWidget("separatorForm",
@@ -2625,14 +2625,14 @@ gui_mch_dialog(
 			XmNrightWidget, buttons[0],
 			XmNbottomAttachment, XmATTACH_FORM,
 			XmNbottomOffset, 4,
-			NULL);
+			வெற்று);
 		XtManageChild(sep_form);
 	    }
-	    else
-		XtVaSetValues(buttons[0],
+	    இல்லையெனில்
+		Xt_Va_Set_மதிப்புகள்(buttons[0],
 			XmNleftAttachment, XmATTACH_FORM,
 			XmNleftOffset, 4,
-			NULL);
+			வெற்று);
 	}
 
 	XtAddCallback(buttons[butcount], XmNactivateCallback,
@@ -2642,7 +2642,7 @@ gui_mch_dialog(
     vim_free(buts);
 
     separator = (Widget) 0;
-    if (butcount > 0)
+    எனில் (butcount > 0)
     {
 	// Create the separator for beauty.
 	n = 0;
@@ -2656,28 +2656,28 @@ gui_mch_dialog(
 	XtManageChild(separator);
     }
 
-    if (textfield != NULL)
+    எனில் (textfield != வெற்று)
     {
 	dialogtextfield = XtVaCreateWidget("textField",
 		xmTextFieldWidgetClass, dialogform,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
-	if (butcount > 0)
-	    XtVaSetValues(dialogtextfield,
+		வெற்று);
+	எனில் (butcount > 0)
+	    Xt_Va_Set_மதிப்புகள்(dialogtextfield,
 		    XmNbottomAttachment, XmATTACH_WIDGET,
 		    XmNbottomWidget, separator,
-		    NULL);
-	else
-	    XtVaSetValues(dialogtextfield,
+		    வெற்று);
+	இல்லையெனில்
+	    Xt_Va_Set_மதிப்புகள்(dialogtextfield,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    வெற்று);
 
 	set_fontlist(dialogtextfield);
-	XmTextFieldSetString(dialogtextfield, (char *)textfield);
+	XmTextFieldSetString(dialogtextfield, (எழுத்து *)textfield);
 	XtManageChild(dialogtextfield);
-	XtAddEventHandler(dialogtextfield, KeyPressMask, False,
-			    (XtEventHandler)keyhit_callback, (XtPointer)NULL);
+	XtAddEventHandler(dialogtextfield, சாவி_Press_Mask, False,
+			    (XtEventHandler)keyhit_callback, (XtPointer)வெற்று);
     }
 
     // Form holding both message and pixmap labels
@@ -2686,29 +2686,29 @@ gui_mch_dialog(
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_FORM,
-	    NULL);
+	    வெற்று);
     XtManageChild(form);
 
 # ifdef HAVE_XPM
     // Add a pixmap, left of the message.
-    switch (type)
+    தேர்வு (type)
     {
-	case VIM_GENERIC:
+	நிலை VIM_GENERIC:
 	    icon_data = generic_xpm;
-	    break;
-	case VIM_ERROR:
+	    நிறுத்து;
+	நிலை VIM_ERROR:
 	    icon_data = error_xpm;
-	    break;
-	case VIM_WARNING:
+	    நிறுத்து;
+	நிலை VIM_WARNING:
 	    icon_data = alert_xpm;
-	    break;
-	case VIM_INFO:
+	    நிறுத்து;
+	நிலை VIM_INFO:
 	    icon_data = info_xpm;
-	    break;
-	case VIM_QUESTION:
+	    நிறுத்து;
+	நிலை VIM_QUESTION:
 	    icon_data = quest_xpm;
-	    break;
-	default:
+	    நிறுத்து;
+	இயல்பு:
 	    icon_data = generic_xpm;
     }
 
@@ -2730,11 +2730,11 @@ gui_mch_dialog(
     // properly localized string, we use LtoR here. The symptom is that the
     // string is not shown properly in multiple lines as it does in native
     // Motif.
-    label = XmStringCreateLtoR((char *)message, STRING_TAG);
-    if (label == NULL)
+    label = XmStringCreateLtoR((எழுத்து *)message, STRING_TAG);
+    எனில் (label == வெற்று)
     {
 	vim_free(buttons);
-	return -1;
+	திரும்பு -1;
     }
     w = XtVaCreateManagedWidget("dialogMessage",
 				xmLabelGadgetClass, form,
@@ -2745,7 +2745,7 @@ gui_mch_dialog(
 # ifdef HAVE_XPM
 				XmNleftAttachment, XmATTACH_WIDGET,
 				XmNleftWidget, dialogpixmap,
-# else
+# இல்லையெனில்
 				XmNleftAttachment, XmATTACH_FORM,
 # endif
 				XmNleftOffset, 8,
@@ -2753,46 +2753,46 @@ gui_mch_dialog(
 				XmNrightOffset, 8,
 				XmNbottomAttachment, XmATTACH_FORM,
 				XmNbottomOffset, 8,
-				NULL);
+				வெற்று);
     XmStringFree(label);
     set_fontlist(w);
 
-    if (textfield != NULL)
+    எனில் (textfield != வெற்று)
     {
-	XtVaSetValues(form,
+	Xt_Va_Set_மதிப்புகள்(form,
 		XmNbottomAttachment, XmATTACH_WIDGET,
 		XmNbottomWidget, dialogtextfield,
-		NULL);
+		வெற்று);
     }
-    else
+    இல்லையெனில்
     {
-	if (butcount > 0)
-	    XtVaSetValues(form,
+	எனில் (butcount > 0)
+	    Xt_Va_Set_மதிப்புகள்(form,
 		    XmNbottomAttachment, XmATTACH_WIDGET,
 		    XmNbottomWidget, separator,
-		    NULL);
-	else
-	    XtVaSetValues(form,
+		    வெற்று);
+	இல்லையெனில்
+	    Xt_Va_Set_மதிப்புகள்(form,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    வெற்று);
     }
 
-    if (dfltbutton < 1)
+    எனில் (dfltbutton < 1)
 	dfltbutton = 1;
-    if (dfltbutton > butcount)
+    எனில் (dfltbutton > butcount)
 	dfltbutton = butcount;
-    XtVaSetValues(dialogform,
-	    XmNdefaultButton, buttons[dfltbutton - 1], NULL);
-    if (textfield != NULL)
-	XtVaSetValues(dialogform, XmNinitialFocus, dialogtextfield, NULL);
-    else
-	XtVaSetValues(dialogform, XmNinitialFocus, buttons[dfltbutton - 1],
-									NULL);
+    Xt_Va_Set_மதிப்புகள்(dialogform,
+	    XmNdefaultButton, buttons[dfltbutton - 1], வெற்று);
+    எனில் (textfield != வெற்று)
+	Xt_Va_Set_மதிப்புகள்(dialogform, XmNinitialFocus, dialogtextfield, வெற்று);
+    இல்லையெனில்
+	Xt_Va_Set_மதிப்புகள்(dialogform, XmNinitialFocus, buttons[dfltbutton - 1],
+									வெற்று);
 
     manage_centered(dialogform);
     activate_dialog_mnemonics(dialogform);
 
-    if (textfield != NULL && *textfield != NUL)
+    எனில் (textfield != வெற்று && *textfield != NUL)
     {
 	// This only works after the textfield has been realised.
 	XmTextFieldSetSelection(dialogtextfield,
@@ -2806,95 +2806,95 @@ gui_mch_dialog(
 
     // Loop until a button is pressed or the dialog is killed somehow.
     dialogStatus = -1;
-    for (;;)
+    க்கு (;;)
     {
-	XtAppProcessEvent(app, (XtInputMask)XtIMAll);
-	if (dialogStatus >= 0 || !XtIsManaged(dialogform))
-	    break;
+	XtAppProcessEvent(app, (Xt_உள்ளீடு_Mask)XtIMAll);
+	எனில் (dialogStatus >= 0 || !XtIsManaged(dialogform))
+	    நிறுத்து;
     }
 
     vim_free(buttons);
 
-    if (textfield != NULL)
+    எனில் (textfield != வெற்று)
     {
 	p = (char_u *)XmTextGetString(dialogtextfield);
-	if (p == NULL || dialogStatus < 0)
+	எனில் (p == வெற்று || dialogStatus < 0)
 	    *textfield = NUL;
-	else
+	இல்லையெனில்
 	    vim_strncpy(textfield, p, IOSIZE - 1);
-	XtFree((char *)p);
+	XtFree((எழுத்து *)p);
     }
 
     suppress_dialog_mnemonics(dialogform);
     XtDestroyWidget(dialogform);
 
-    return dialogStatus;
+    திரும்பு dialogStatus;
 }
 #endif // FEAT_GUI_DIALOG
 
-#if defined(FEAT_TOOLBAR)
-    void
-gui_mch_show_toolbar(int showit)
+#எனில் defined(FEAT_TOOLBAR)
+    வெறுமை
+gui_mch_show_toolbar(முழு showit)
 {
-    Cardinal	numChildren;	    // how many children toolBar has
+    Cardinal	இலக்கம்_Children;	    // how many children toolBar has
 
-    if (toolBar == (Widget)0)
-	return;
-    XtVaGetValues(toolBar, XmNnumChildren, &numChildren, NULL);
-    if (showit && numChildren > 0)
+    எனில் (toolBar == (Widget)0)
+	திரும்பு;
+    Xt_Va_Get_மதிப்புகள்(toolBar, XmNnumChildren, &இலக்கம்_Children, வெற்று);
+    எனில் (showit && இலக்கம்_Children > 0)
     {
 	// Assume that we want to show the toolbar if p_toolbar contains
 	// valid option settings, therefore p_toolbar must not be NULL.
 	WidgetList  children;
 
-	XtVaGetValues(toolBar, XmNchildren, &children, NULL);
+	Xt_Va_Get_மதிப்புகள்(toolBar, XmNchildren, &children, வெற்று);
 	{
-	    void    (*action)(BalloonEval *);
-	    int	    text = 0;
+	    வெறுமை    (*action)(BalloonEval *);
+	    முழு	    text = 0;
 
-	    if (strstr((const char *)p_toolbar, "tooltips"))
+	    எனில் (strstr((மாறிலி எழுத்து *)p_toolbar, "tooltips"))
 		action = &gui_mch_enable_beval_area;
-	    else
+	    இல்லையெனில்
 		action = &gui_mch_disable_beval_area;
-	    if (strstr((const char *)p_toolbar, "text"))
+	    எனில் (strstr((மாறிலி எழுத்து *)p_toolbar, "text"))
 		text = 1;
-	    else if (strstr((const char *)p_toolbar, "icons"))
+	    இல்லையெனில் எனில் (strstr((மாறிலி எழுத்து *)p_toolbar, "icons"))
 		text = -1;
-	    if (text != 0)
+	    எனில் (text != 0)
 	    {
 		vimmenu_T   *toolbar;
 		vimmenu_T   *cur;
 
 		FOR_ALL_MENUS(toolbar)
-		    if (menu_is_toolbar(toolbar->dname))
-			break;
+		    எனில் (menu_is_toolbar(toolbar->dname))
+			நிறுத்து;
 		// Assumption: toolbar is NULL if there is no toolbar,
 		//	       otherwise it contains the toolbar menu structure.
 		//
 		// Assumption: "numChildren" == the number of items in the list
 		//	       of items beginning with toolbar->children.
-		if (toolbar)
+		எனில் (toolbar)
 		{
-		    for (cur = toolbar->children; cur; cur = cur->next)
+		    க்கு (cur = toolbar->children; cur; cur = cur->next)
 		    {
 			Arg	    args[1];
-			int	    n = 0;
+			முழு	    n = 0;
 
 			// Enable/Disable tooltip (OK to enable while
 			// currently enabled).
-			if (cur->tip != NULL)
+			எனில் (cur->tip != வெற்று)
 			    (*action)(cur->tip);
-			if (!menu_is_separator(cur->name))
+			எனில் (!menu_is_separator(cur->name))
 			{
-			    if (text == 1 || cur->xpm == NULL)
+			    எனில் (text == 1 || cur->xpm == வெற்று)
 			    {
 				XtSetArg(args[n], XmNlabelType, XmSTRING);
 				++n;
 			    }
-			    if (cur->id != NULL)
+			    எனில் (cur->id != வெற்று)
 			    {
 				XtUnmanageChild(cur->id);
-				XtSetValues(cur->id, args, n);
+				Xt_Set_மதிப்புகள்(cur->id, args, n);
 				XtManageChild(cur->id);
 			    }
 			}
@@ -2905,75 +2905,75 @@ gui_mch_show_toolbar(int showit)
 	gui.toolbar_height = gui_mch_compute_toolbar_height();
 	XtManageChild(XtParent(toolBar));
 # ifdef FEAT_GUI_TABLINE
-	if (showing_tabline)
+	எனில் (showing_tabline)
 	{
-	    XtVaSetValues(tabLine,
+	    Xt_Va_Set_மதிப்புகள்(tab_வரி,
 			  XmNtopAttachment, XmATTACH_WIDGET,
 			  XmNtopWidget, XtParent(toolBar),
-			  NULL);
-	    XtVaSetValues(textAreaForm,
+			  வெற்று);
+	    Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			  XmNtopAttachment, XmATTACH_WIDGET,
-			  XmNtopWidget, tabLine,
-			  NULL);
+			  XmNtopWidget, tab_வரி,
+			  வெற்று);
 	}
-	else
+	இல்லையெனில்
 # endif
-	    XtVaSetValues(textAreaForm,
+	    Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			  XmNtopAttachment, XmATTACH_WIDGET,
 			  XmNtopWidget, XtParent(toolBar),
-			  NULL);
-	if (XtIsManaged(menuBar))
-	    XtVaSetValues(XtParent(toolBar),
+			  வெற்று);
+	எனில் (XtIsManaged(menuBar))
+	    Xt_Va_Set_மதிப்புகள்(XtParent(toolBar),
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, menuBar,
-		    NULL);
-	else
-	    XtVaSetValues(XtParent(toolBar),
+		    வெற்று);
+	இல்லையெனில்
+	    Xt_Va_Set_மதிப்புகள்(XtParent(toolBar),
 		    XmNtopAttachment, XmATTACH_FORM,
-		    NULL);
+		    வெற்று);
     }
-    else
+    இல்லையெனில்
     {
 	gui.toolbar_height = 0;
-	if (XtIsManaged(menuBar))
+	எனில் (XtIsManaged(menuBar))
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    எனில் (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_மதிப்புகள்(tab_வரி,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      வெற்று);
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_வரி,
+			      வெற்று);
 	    }
-	    else
+	    இல்லையெனில்
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
+			      வெற்று);
 	}
-	else
+	இல்லையெனில்
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    எனில் (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_மதிப்புகள்(tab_வரி,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      வெற்று);
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_வரி,
+			      வெற்று);
 	    }
-	    else
+	    இல்லையெனில்
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
+			      வெற்று);
 	}
 
 	XtUnmanageChild(XtParent(toolBar));
@@ -2986,61 +2986,61 @@ gui_mch_show_toolbar(int showit)
  * such that the user can type page up/down etc. and have the
  * input go to the editor window, not the button
  */
-    static void
-reset_focus(void)
+    நிலையான வெறுமை
+reset_focus(வெறுமை)
 {
-    if (textArea != NULL)
+    எனில் (textArea != வெற்று)
 	XmProcessTraversal(textArea, XmTRAVERSE_CURRENT);
 }
 
-    int
-gui_mch_compute_toolbar_height(void)
+    முழு
+gui_mch_compute_toolbar_height(வெறுமை)
 {
     Dimension	borders;
     Dimension	height;		    // total Toolbar height
     Dimension	whgt;		    // height of each widget
     WidgetList	children;	    // list of toolBar's children
-    Cardinal	numChildren;	    // how many children toolBar has
-    int		i;
+    Cardinal	இலக்கம்_Children;	    // how many children toolBar has
+    முழு		i;
 
     borders = 0;
     height = 0;
-    if (toolBar != (Widget)0 && toolBarFrame != (Widget)0)
+    எனில் (toolBar != (Widget)0 && toolBarFrame != (Widget)0)
     {				    // get height of XmFrame parent
 	Dimension	fst;
 	Dimension	fmh;
 	Dimension	tst;
 	Dimension	tmh;
 
-	XtVaGetValues(toolBarFrame,
+	Xt_Va_Get_மதிப்புகள்(toolBarFrame,
 		XmNshadowThickness, &fst,
 		XmNmarginHeight, &fmh,
-		NULL);
+		வெற்று);
 	borders += fst + fmh;
-	XtVaGetValues(toolBar,
+	Xt_Va_Get_மதிப்புகள்(toolBar,
 		XmNshadowThickness, &tst,
 		XmNmarginHeight, &tmh,
 		XmNchildren, &children,
-		XmNnumChildren, &numChildren, NULL);
+		XmNnumChildren, &இலக்கம்_Children, வெற்று);
 	borders += tst + tmh;
-	for (i = 0; i < (int)numChildren; i++)
+	க்கு (i = 0; i < (முழு)இலக்கம்_Children; i++)
 	{
 	    whgt = 0;
-	    XtVaGetValues(children[i], XmNheight, &whgt, NULL);
-	    if (height < whgt)
+	    Xt_Va_Get_மதிப்புகள்(children[i], XmNheight, &whgt, வெற்று);
+	    எனில் (height < whgt)
 		height = whgt;
 	}
     }
 # ifdef LESSTIF_VERSION
     // Hack: When starting up we get wrong dimensions.
-    if (height < 10)
+    எனில் (height < 10)
 	height = 24;
 # endif
 
-    return (int)(height + (borders << 1));
+    திரும்பு (முழு)(height + (borders << 1));
 }
 
-    void
+    வெறுமை
 motif_get_toolbar_colors(
     Pixel       *bgp,
     Pixel       *fgp,
@@ -3048,75 +3048,75 @@ motif_get_toolbar_colors(
     Pixel       *tsp,
     Pixel       *hsp)
 {
-    XtVaGetValues(toolBar,
+    Xt_Va_Get_மதிப்புகள்(toolBar,
 	    XmNbackground, bgp,
 	    XmNforeground, fgp,
 	    XmNbottomShadowColor, bsp,
 	    XmNtopShadowColor, tsp,
 	    XmNhighlightColor, hsp,
-	    NULL);
+	    வெற்று);
 }
 #endif
 
-#if defined(FEAT_GUI_TABLINE)
+#எனில் defined(FEAT_GUI_TABLINE)
 /*
  * Show or hide the tabline.
  */
-    void
-gui_mch_show_tabline(int showit)
+    வெறுமை
+gui_mch_show_tabline(முழு showit)
 {
-    if (tabLine == (Widget)0)
-	return;
+    எனில் (tab_வரி == (Widget)0)
+	திரும்பு;
 
-    if (!showit != !showing_tabline)
+    எனில் (!showit != !showing_tabline)
     {
-	if (showit)
+	எனில் (showit)
 	{
-	    XtManageChild(tabLine);
-	    XtUnmanageChild(XtNameToWidget(tabLine, "PageScroller"));
-	    XtUnmanageChild(XtNameToWidget(tabLine, "MinorTabScrollerNext"));
-	    XtUnmanageChild(XtNameToWidget(tabLine,
+	    XtManageChild(tab_வரி);
+	    XtUnmanageChild(XtNameToWidget(tab_வரி, "PageScroller"));
+	    XtUnmanageChild(XtNameToWidget(tab_வரி, "MinorTabScrollerNext"));
+	    XtUnmanageChild(XtNameToWidget(tab_வரி,
 					   "MinorTabScrollerPrevious"));
 # ifdef FEAT_MENU
 #  ifdef FEAT_TOOLBAR
-	    if (XtIsManaged(XtParent(toolBar)))
-		XtVaSetValues(tabLine,
+	    எனில் (XtIsManaged(XtParent(toolBar)))
+		Xt_Va_Set_மதிப்புகள்(tab_வரி,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, XtParent(toolBar), NULL);
-	    else
+			      XmNtopWidget, XtParent(toolBar), வெற்று);
+	    இல்லையெனில்
 #  endif
-		if (XtIsManaged(menuBar))
-		XtVaSetValues(tabLine,
+		எனில் (XtIsManaged(menuBar))
+		Xt_Va_Set_மதிப்புகள்(tab_வரி,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, menuBar, NULL);
-	    else
+			      XmNtopWidget, menuBar, வெற்று);
+	    இல்லையெனில்
 # endif
-		XtVaSetValues(tabLine,
-			      XmNtopAttachment, XmATTACH_FORM, NULL);
-	    XtVaSetValues(textAreaForm,
+		Xt_Va_Set_மதிப்புகள்(tab_வரி,
+			      XmNtopAttachment, XmATTACH_FORM, வெற்று);
+	    Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			  XmNtopAttachment, XmATTACH_WIDGET,
-			  XmNtopWidget, tabLine,
-			  NULL);
+			  XmNtopWidget, tab_வரி,
+			  வெற்று);
 	}
-	else
+	இல்லையெனில்
 	{
-	    XtUnmanageChild(tabLine);
+	    XtUnmanageChild(tab_வரி);
 # ifdef FEAT_MENU
 #  ifdef FEAT_TOOLBAR
-	    if (XtIsManaged(XtParent(toolBar)))
-		XtVaSetValues(textAreaForm,
+	    எனில் (XtIsManaged(XtParent(toolBar)))
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, XtParent(toolBar), NULL);
-	    else
+			      XmNtopWidget, XtParent(toolBar), வெற்று);
+	    இல்லையெனில்
 #  endif
-		if (XtIsManaged(menuBar))
-		XtVaSetValues(textAreaForm,
+		எனில் (XtIsManaged(menuBar))
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, menuBar, NULL);
-	    else
+			      XmNtopWidget, menuBar, வெற்று);
+	    இல்லையெனில்
 # endif
-		XtVaSetValues(textAreaForm,
-			      XmNtopAttachment, XmATTACH_FORM, NULL);
+		Xt_Va_Set_மதிப்புகள்(textAreaForm,
+			      XmNtopAttachment, XmATTACH_FORM, வெற்று);
 	}
 	showing_tabline = showit;
     }
@@ -3125,41 +3125,41 @@ gui_mch_show_tabline(int showit)
 /*
  * Return TRUE when tabline is displayed.
  */
-    int
-gui_mch_showing_tabline(void)
+    முழு
+gui_mch_showing_tabline(வெறுமை)
 {
-    return tabLine != (Widget)0 && showing_tabline;
+    திரும்பு tab_வரி != (Widget)0 && showing_tabline;
 }
 
 /*
  * Update the labels of the tabline.
  */
-    void
-gui_mch_update_tabline(void)
+    வெறுமை
+gui_mch_update_tabline(வெறுமை)
 {
     tabpage_T		*tp;
-    int			nr = 1, n;
+    முழு			nr = 1, n;
     Arg			args[10];
-    int			curtabidx = 0, currentpage;
+    முழு			curtabidx = 0, currentpage;
     Widget		tab;
     XmNotebookPageInfo	page_info;
     XmNotebookPageStatus page_status;
-    int			last_page, tab_count;
+    முழு			last_page, tab_மொத்தம்;
     XmString		label_str;
-    char		*label_cstr;
+    எழுத்து		*label_cstr;
     BalloonEval		*beval;
 
-    if (tabLine == (Widget)0)
-	return;
+    எனில் (tab_வரி == (Widget)0)
+	திரும்பு;
 
     // Add a label for each tab page.  They all contain the same text area.
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr)
+    க்கு (tp = first_tabpage; tp != வெற்று; tp = tp->tp_next, ++nr)
     {
-	if (tp == curtab)
+	எனில் (tp == curtab)
 	    curtabidx = nr;
 
-	page_status = XmNotebookGetPageInfo(tabLine, nr, &page_info);
-	if (page_status == XmPAGE_INVALID
+	page_status = XmNotebookGetPageInfo(tab_வரி, nr, &page_info);
+	எனில் (page_status == XmPAGE_INVALID
 		|| page_info.major_tab_widget == (Widget)0)
 	{
 	    // Add the tab
@@ -3169,28 +3169,28 @@ gui_mch_update_tabline(void)
 	    XtSetArg(args[n], XmNalignment, XmALIGNMENT_BEGINNING); n++;
 	    XtSetArg(args[n], XmNhighlightThickness, 1); n++;
 	    XtSetArg(args[n], XmNshadowThickness , 1); n++;
-	    tab = XmCreatePushButton(tabLine, "-Empty-", args, n);
+	    tab = Xm_Create_தள்ளு_Button(tab_வரி, "-Empty-", args, n);
 	    XtManageChild(tab);
-	    beval = gui_mch_create_beval_area(tab, NULL, tabline_balloon_cb,
-									NULL);
-	    XtVaSetValues(tab, XmNuserData, beval, NULL);
+	    beval = gui_mch_create_beval_area(tab, வெற்று, tabline_balloon_cb,
+									வெற்று);
+	    Xt_Va_Set_மதிப்புகள்(tab, XmNuserData, beval, வெற்று);
 	}
-	else
+	இல்லையெனில்
 	    tab = page_info.major_tab_widget;
 
-	XtVaSetValues(tab, XmNpageNumber, nr, NULL);
+	Xt_Va_Set_மதிப்புகள்(tab, Xm_Npage_எண், nr, வெற்று);
 
 	/*
 	 * Change the label text only if it is different
 	 */
-	XtVaGetValues(tab, XmNlabelString, &label_str, NULL);
-	if (XmStringGetLtoR(label_str, XmSTRING_DEFAULT_CHARSET, &label_cstr))
+	Xt_Va_Get_மதிப்புகள்(tab, XmNlabelString, &label_str, வெற்று);
+	எனில் (XmStringGetLtoR(label_str, XmSTRING_DEFAULT_CHARSET, &label_cstr))
 	{
 	    get_tabline_label(tp, FALSE);
-	    if (STRCMP(label_cstr, NameBuff) != 0)
+	    எனில் (STRCMP(label_cstr, NameBuff) != 0)
 	    {
-		XtVaSetValues(tab, XtVaTypedArg, XmNlabelString, XmRString,
-			      NameBuff, STRLEN(NameBuff) + 1, NULL);
+		Xt_Va_Set_மதிப்புகள்(tab, XtVaTypedArg, XmNlabelString, XmRString,
+			      NameBuff, STRLEN(NameBuff) + 1, வெற்று);
 		/*
 		 * Force a resize of the tab label button
 		 */
@@ -3201,19 +3201,19 @@ gui_mch_update_tabline(void)
 	}
     }
 
-    tab_count = nr - 1;
+    tab_மொத்தம் = nr - 1;
 
-    XtVaGetValues(tabLine, XmNlastPageNumber, &last_page, NULL);
+    Xt_Va_Get_மதிப்புகள்(tab_வரி, Xm_Nlast_Page_எண், &last_page, வெற்று);
 
     // Remove any old labels.
-    while (nr <= last_page)
+    போது (nr <= last_page)
     {
-	if (XmNotebookGetPageInfo(tabLine, nr, &page_info) != XmPAGE_INVALID
-	    && page_info.page_number == nr
+	எனில் (XmNotebookGetPageInfo(tab_வரி, nr, &page_info) != XmPAGE_INVALID
+	    && page_info.page_எண் == nr
 	    && page_info.major_tab_widget != (Widget)0)
 	{
-	    XtVaGetValues(page_info.major_tab_widget, XmNuserData, &beval, NULL);
-	    if (beval != NULL)
+	    Xt_Va_Get_மதிப்புகள்(page_info.major_tab_widget, XmNuserData, &beval, வெற்று);
+	    எனில் (beval != வெற்று)
 		gui_mch_destroy_beval_area(beval);
 	    XtUnmanageChild(page_info.major_tab_widget);
 	    XtDestroyWidget(page_info.major_tab_widget);
@@ -3221,108 +3221,108 @@ gui_mch_update_tabline(void)
 	nr++;
     }
 
-    XtVaSetValues(tabLine, XmNlastPageNumber, tab_count, NULL);
+    Xt_Va_Set_மதிப்புகள்(tab_வரி, Xm_Nlast_Page_எண், tab_மொத்தம், வெற்று);
 
-    XtVaGetValues(tabLine, XmNcurrentPageNumber, &currentpage, NULL);
-    if (currentpage != curtabidx)
-	XtVaSetValues(tabLine, XmNcurrentPageNumber, curtabidx, NULL);
+    Xt_Va_Get_மதிப்புகள்(tab_வரி, Xm_Ncurrent_Page_எண், &currentpage, வெற்று);
+    எனில் (currentpage != curtabidx)
+	Xt_Va_Set_மதிப்புகள்(tab_வரி, Xm_Ncurrent_Page_எண், curtabidx, வெற்று);
 }
 
 /*
  * Set the current tab to "nr".  First tab is 1.
  */
-    void
-gui_mch_set_curtab(int nr)
+    வெறுமை
+gui_mch_set_curtab(முழு nr)
 {
-    int		currentpage;
+    முழு		currentpage;
 
-    if (tabLine == (Widget)0)
-	return;
+    எனில் (tab_வரி == (Widget)0)
+	திரும்பு;
 
-    XtVaGetValues(tabLine, XmNcurrentPageNumber, &currentpage, NULL);
-    if (currentpage != nr)
-	XtVaSetValues(tabLine, XmNcurrentPageNumber, nr, NULL);
+    Xt_Va_Get_மதிப்புகள்(tab_வரி, Xm_Ncurrent_Page_எண், &currentpage, வெற்று);
+    எனில் (currentpage != nr)
+	Xt_Va_Set_மதிப்புகள்(tab_வரி, Xm_Ncurrent_Page_எண், nr, வெற்று);
 }
 #endif
 
 /*
  * Set the colors of Widget "id" to the menu colors.
  */
-    static void
+    நிலையான வெறுமை
 gui_motif_menu_colors(Widget id)
 {
-    if (gui.menu_bg_pixel != INVALCOLOR)
-#if (XmVersion >= 1002)
+    எனில் (gui.menu_bg_pixel != INVALCOLOR)
+#எனில் (XmVersion >= 1002)
 	XmChangeColor(id, gui.menu_bg_pixel);
-#else
-	XtVaSetValues(id, XmNbackground, gui.menu_bg_pixel, NULL);
+#இல்லையெனில்
+	Xt_Va_Set_மதிப்புகள்(id, XmNbackground, gui.menu_bg_pixel, வெற்று);
 #endif
-    if (gui.menu_fg_pixel != INVALCOLOR)
-	XtVaSetValues(id, XmNforeground, gui.menu_fg_pixel, NULL);
+    எனில் (gui.menu_fg_pixel != INVALCOLOR)
+	Xt_Va_Set_மதிப்புகள்(id, XmNforeground, gui.menu_fg_pixel, வெற்று);
 }
 
 /*
  * Set the colors of Widget "id" to the scrollbar colors.
  */
-    static void
+    நிலையான வெறுமை
 gui_motif_scroll_colors(Widget id)
 {
-    if (gui.scroll_bg_pixel != INVALCOLOR)
-#if (XmVersion >= 1002)
+    எனில் (gui.scroll_bg_pixel != INVALCOLOR)
+#எனில் (XmVersion >= 1002)
 	XmChangeColor(id, gui.scroll_bg_pixel);
-#else
-	XtVaSetValues(id, XmNbackground, gui.scroll_bg_pixel, NULL);
+#இல்லையெனில்
+	Xt_Va_Set_மதிப்புகள்(id, XmNbackground, gui.scroll_bg_pixel, வெற்று);
 #endif
-    if (gui.scroll_fg_pixel != INVALCOLOR)
-	XtVaSetValues(id, XmNforeground, gui.scroll_fg_pixel, NULL);
+    எனில் (gui.scroll_fg_pixel != INVALCOLOR)
+	Xt_Va_Set_மதிப்புகள்(id, XmNforeground, gui.scroll_fg_pixel, வெற்று);
 }
 
 /*
  * Set the fontlist for Widget "id" to use gui.menu_fontset or gui.menu_font.
  */
-    void
+    வெறுமை
 gui_motif_menu_fontlist(Widget id UNUSED)
 {
 #ifdef FEAT_MENU
 # ifdef FONTSET_ALWAYS
-    if (gui.menu_fontset != NOFONTSET)
+    எனில் (gui.menu_fontset != NOFONTSET)
     {
 	XmFontList fl;
 
 	fl = gui_motif_fontset2fontlist((XFontSet *)&gui.menu_fontset);
-	if (fl != NULL)
+	எனில் (fl != வெற்று)
 	{
-	    if (XtIsManaged(id))
+	    எனில் (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_மதிப்புகள்(id, XmNfontList, fl, வெற்று);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    இல்லையெனில்
+		Xt_Va_Set_மதிப்புகள்(id, XmNfontList, fl, வெற்று);
 	    XmFontListFree(fl);
 	}
     }
-# else
-    if (gui.menu_font != NOFONT)
+# இல்லையெனில்
+    எனில் (gui.menu_font != NOFONT)
     {
 	XmFontList fl;
 
 	fl = gui_motif_create_fontlist((XFontStruct *)gui.menu_font);
-	if (fl != NULL)
+	எனில் (fl != வெற்று)
 	{
-	    if (XtIsManaged(id))
+	    எனில் (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_மதிப்புகள்(id, XmNfontList, fl, வெற்று);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    இல்லையெனில்
+		Xt_Va_Set_மதிப்புகள்(id, XmNfontList, fl, வெற்று);
 	    XmFontListFree(fl);
 	}
     }
@@ -3335,7 +3335,7 @@ gui_motif_menu_fontlist(Widget id UNUSED)
  * We don't create it twice for the sake of speed.
  */
 
-typedef struct _SharedFindReplace
+வகைவரை கட்டமைப்பு _SharedFindReplace
 {
     Widget dialog;	// the main dialog widget
     Widget wword;	// 'Exact match' check button
@@ -3352,10 +3352,10 @@ typedef struct _SharedFindReplace
     Widget cancel;
 } SharedFindReplace;
 
-static SharedFindReplace find_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-static SharedFindReplace repl_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+நிலையான SharedFindReplace find_widgets = {வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று};
+நிலையான SharedFindReplace repl_widgets = {வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று, வெற்று};
 
-    static void
+    நிலையான வெறுமை
 find_replace_destroy_callback(
     Widget	w UNUSED,
     XtPointer	client_data,
@@ -3363,12 +3363,12 @@ find_replace_destroy_callback(
 {
     SharedFindReplace *cd = (SharedFindReplace *)client_data;
 
-    if (cd != NULL)
+    எனில் (cd != வெற்று)
        // suppress_dialog_mnemonics(cd->dialog);
 	cd->dialog = (Widget)0;
 }
 
-    static void
+    நிலையான வெறுமை
 find_replace_dismiss_callback(
     Widget	w UNUSED,
     XtPointer	client_data,
@@ -3376,11 +3376,11 @@ find_replace_dismiss_callback(
 {
     SharedFindReplace *cd = (SharedFindReplace *)client_data;
 
-    if (cd != NULL)
+    எனில் (cd != வெற்று)
 	XtUnmanageChild(cd->dialog);
 }
 
-    static void
+    நிலையான வெறுமை
 entry_activate_callback(
     Widget	w UNUSED,
     XtPointer	client_data,
@@ -3389,20 +3389,20 @@ entry_activate_callback(
     XmProcessTraversal((Widget)client_data, XmTRAVERSE_CURRENT);
 }
 
-    static void
+    நிலையான வெறுமை
 find_replace_callback(
     Widget	w UNUSED,
     XtPointer	client_data,
     XtPointer	call_data UNUSED)
 {
     long_u	flags = (long_u)client_data;
-    char	*find_text, *repl_text;
+    எழுத்து	*find_text, *repl_text;
     Boolean	direction_down = TRUE;
     Boolean	wword;
     Boolean	mcase;
     SharedFindReplace *sfr;
 
-    if (flags == FRD_UNDO)
+    எனில் (flags == FRD_UNDO)
     {
 	char_u	*save_cpo = p_cpo;
 
@@ -3411,77 +3411,77 @@ find_replace_callback(
 	u_undo(1);
 	p_cpo = save_cpo;
 	gui_update_screen();
-	return;
+	திரும்பு;
     }
 
     // Get the search/replace strings from the dialog
-    if (flags == FRD_FINDNEXT)
+    எனில் (flags == FRD_FINDNEXT)
     {
-	repl_text = NULL;
+	repl_text = வெற்று;
 	sfr = &find_widgets;
     }
-    else
+    இல்லையெனில்
     {
 	repl_text = XmTextFieldGetString(repl_widgets.with);
 	sfr = &repl_widgets;
     }
     find_text = XmTextFieldGetString(sfr->what);
-    XtVaGetValues(sfr->down, XmNset, &direction_down, NULL);
-    XtVaGetValues(sfr->wword, XmNset, &wword, NULL);
-    XtVaGetValues(sfr->mcase, XmNset, &mcase, NULL);
-    if (wword)
+    Xt_Va_Get_மதிப்புகள்(sfr->down, XmNset, &direction_down, வெற்று);
+    Xt_Va_Get_மதிப்புகள்(sfr->wword, XmNset, &wword, வெற்று);
+    Xt_Va_Get_மதிப்புகள்(sfr->mcase, XmNset, &mcase, வெற்று);
+    எனில் (wword)
 	flags |= FRD_WHOLE_WORD;
-    if (mcase)
+    எனில் (mcase)
 	flags |= FRD_MATCH_CASE;
 
-    (void)gui_do_findrepl((int)flags, (char_u *)find_text, (char_u *)repl_text,
+    (வெறுமை)gui_do_findrepl((முழு)flags, (char_u *)find_text, (char_u *)repl_text,
 							      direction_down);
 
-    if (find_text != NULL)
+    எனில் (find_text != வெற்று)
 	XtFree(find_text);
-    if (repl_text != NULL)
+    எனில் (repl_text != வெற்று)
 	XtFree(repl_text);
 }
 
-    static void
+    நிலையான வெறுமை
 find_replace_keypress(
     Widget		w UNUSED,
     SharedFindReplace	*frdp,
     XKeyEvent		*event,
     Boolean		*b UNUSED)
 {
-    KeySym keysym;
+    சாவி_Sym keysym;
 
-    if (frdp == NULL)
-	return;
+    எனில் (frdp == வெற்று)
+	திரும்பு;
 
     keysym = XLookupKeysym(event, 0);
 
     // the scape key pops the whole dialog down
-    if (keysym == XK_Escape)
+    எனில் (keysym == XK_Escape)
 	XtUnmanageChild(frdp->dialog);
 }
 
-    static void
-set_label(Widget w, char *label)
+    நிலையான வெறுமை
+set_label(Widget w, எழுத்து *label)
 {
     XmString	str;
     char_u	*p, *next;
-    KeySym	mnemonic = NUL;
+    சாவி_Sym	mnemonic = NUL;
 
-    if (!w)
-	return;
+    எனில் (!w)
+	திரும்பு;
 
     p = vim_strsave((char_u *)label);
-    if (p == NULL)
-	return;
-    for (next = p; *next; ++next)
+    எனில் (p == வெற்று)
+	திரும்பு;
+    க்கு (next = p; *next; ++next)
     {
-	if (*next == DLG_HOTKEY_CHAR)
+	எனில் (*next == DLG_HOTKEY_CHAR)
 	{
-	    int len = STRLEN(next);
+	    முழு len = STRLEN(next);
 
-	    if (len > 0)
+	    எனில் (len > 0)
 	    {
 		mch_memmove(next, next + 1, len);
 		mnemonic = next[0];
@@ -3489,33 +3489,33 @@ set_label(Widget w, char *label)
 	}
     }
 
-    str = XmStringCreateSimple((char *)p);
+    str = XmStringCreateSimple((எழுத்து *)p);
     vim_free(p);
-    if (str)
+    எனில் (str)
     {
-	XtVaSetValues(w,
+	Xt_Va_Set_மதிப்புகள்(w,
 		XmNlabelString, str,
 		XmNmnemonic, mnemonic,
-		NULL);
+		வெற்று);
 	XmStringFree(str);
     }
     gui_motif_menu_fontlist(w);
 }
 
-    static void
-find_replace_dialog_create(char_u *arg, int do_replace)
+    நிலையான வெறுமை
+find_replace_dialog_create(char_u *arg, முழு do_replace)
 {
     SharedFindReplace	*frdp;
     Widget		separator;
-    Widget		input_form;
+    Widget		உள்ளீடு_form;
     Widget		button_form;
     Widget		toggle_form;
     Widget		frame;
     XmString		str;
-    int			n;
+    முழு			n;
     Arg			args[6];
-    int			wword = FALSE;
-    int			mcase = !p_ic;
+    முழு			wword = FALSE;
+    முழு			mcase = !p_ic;
     Dimension		width;
     Dimension		widest;
     char_u		*entry_text;
@@ -3526,31 +3526,31 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     entry_text = get_find_dialog_text(arg, &wword, &mcase);
 
     // If the dialog already exists, just raise it.
-    if (frdp->dialog)
+    எனில் (frdp->dialog)
     {
 	gui_motif_synch_fonts();
 
 	// If the window is already up, just pop it to the top
-	if (XtIsManaged(frdp->dialog))
+	எனில் (XtIsManaged(frdp->dialog))
 	    XMapRaised(XtDisplay(frdp->dialog),
 					    XtWindow(XtParent(frdp->dialog)));
-	else
+	இல்லையெனில்
 	    XtManageChild(frdp->dialog);
 	XtPopup(XtParent(frdp->dialog), XtGrabNone);
 	XmProcessTraversal(frdp->what, XmTRAVERSE_CURRENT);
 
-	if (entry_text != NULL)
-	    XmTextFieldSetString(frdp->what, (char *)entry_text);
+	எனில் (entry_text != வெற்று)
+	    XmTextFieldSetString(frdp->what, (எழுத்து *)entry_text);
 	vim_free(entry_text);
 
-	XtVaSetValues(frdp->wword, XmNset, wword, NULL);
-	return;
+	Xt_Va_Set_மதிப்புகள்(frdp->wword, XmNset, wword, வெற்று);
+	திரும்பு;
     }
 
     // Create a fresh new dialog window
-    if (do_replace)
+    எனில் (do_replace)
 	 str = XmStringCreateSimple(_("VIM - Search and Replace..."));
-    else
+    இல்லையெனில்
 	 str = XmStringCreateSimple(_("VIM - Search..."));
 
     n = 0;
@@ -3571,63 +3571,63 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNtopOffset, 4,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNbottomOffset, 4,
-	    NULL);
+	    வெற்று);
 
     frdp->find = XtVaCreateManagedWidget("findButton",
-	    xmPushButtonWidgetClass, button_form,
+	    xm_தள்ளு_Button_Widget_Class, button_form,
 	    XmNsensitive, True,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
-	    NULL);
+	    வெற்று);
     set_label(frdp->find, _("Find &Next"));
 
     XtAddCallback(frdp->find, XmNactivateCallback,
 	    find_replace_callback,
 	    (do_replace ? (XtPointer)FRD_R_FINDNEXT : (XtPointer)FRD_FINDNEXT));
 
-    if (do_replace)
+    எனில் (do_replace)
     {
 	frdp->replace = XtVaCreateManagedWidget("replaceButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_தள்ளு_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->find,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
+		வெற்று);
 	set_label(frdp->replace, _("&Replace"));
 	XtAddCallback(frdp->replace, XmNactivateCallback,
 		find_replace_callback, (XtPointer)FRD_REPLACE);
 
 	frdp->all = XtVaCreateManagedWidget("replaceAllButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_தள்ளு_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->replace,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
+		வெற்று);
 	set_label(frdp->all, _("Replace &All"));
 	XtAddCallback(frdp->all, XmNactivateCallback,
 		find_replace_callback, (XtPointer)FRD_REPLACEALL);
 
 	frdp->undo = XtVaCreateManagedWidget("undoButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_தள்ளு_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->all,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
+		வெற்று);
 	set_label(frdp->undo, _("&Undo"));
 	XtAddCallback(frdp->undo, XmNactivateCallback,
 		find_replace_callback, (XtPointer)FRD_UNDO);
     }
 
     frdp->cancel = XtVaCreateManagedWidget("closeButton",
-	    xmPushButtonWidgetClass, button_form,
+	    xm_தள்ளு_Button_Widget_Class, button_form,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNbottomAttachment, XmATTACH_FORM,
-	    NULL);
+	    வெற்று);
     set_label(frdp->cancel, _("&Cancel"));
     XtAddCallback(frdp->cancel, XmNactivateCallback,
 	    find_replace_dismiss_callback, frdp);
@@ -3645,7 +3645,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     separator = XmCreateSeparatorGadget(frdp->dialog, "separator", args, n);
     XtManageChild(separator);
 
-    input_form = XtVaCreateWidget("inputForm",
+    உள்ளீடு_form = XtVaCreateWidget("inputForm",
 	    xmFormWidgetClass,	frdp->dialog,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNleftOffset, 4,
@@ -3654,7 +3654,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNrightOffset, 4,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNtopOffset, 4,
-	    NULL);
+	    வெற்று);
 
     {
 	Widget label_what;
@@ -3662,47 +3662,47 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 
 	str = XmStringCreateSimple(_("Find what:"));
 	label_what = XtVaCreateManagedWidget("whatLabel",
-		xmLabelGadgetClass, input_form,
+		xmLabelGadgetClass, உள்ளீடு_form,
 		XmNlabelString, str,
 		XmNleftAttachment,	XmATTACH_FORM,
 		XmNtopAttachment, XmATTACH_FORM,
 		XmNtopOffset, 4,
-		NULL);
+		வெற்று);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(label_what);
 
 	frdp->what = XtVaCreateManagedWidget("whatText",
-		xmTextFieldWidgetClass, input_form,
+		xmTextFieldWidgetClass, உள்ளீடு_form,
 		XmNtopAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
 		XmNleftAttachment, XmATTACH_FORM,
-		NULL);
+		வெற்று);
 
-	if (do_replace)
+	எனில் (do_replace)
 	{
 	    frdp->with = XtVaCreateManagedWidget("withText",
-		    xmTextFieldWidgetClass,	input_form,
+		    xmTextFieldWidgetClass,	உள்ளீடு_form,
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, frdp->what,
 		    XmNtopOffset, 4,
 		    XmNleftAttachment, XmATTACH_FORM,
 		    XmNrightAttachment, XmATTACH_FORM,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    வெற்று);
 
 	    XtAddCallback(frdp->with, XmNactivateCallback,
 		    find_replace_callback, (XtPointer) FRD_R_FINDNEXT);
 
 	    str = XmStringCreateSimple(_("Replace with:"));
 	    label_with = XtVaCreateManagedWidget("withLabel",
-		    xmLabelGadgetClass, input_form,
+		    xmLabelGadgetClass, உள்ளீடு_form,
 		    XmNlabelString, str,
 		    XmNleftAttachment, XmATTACH_FORM,
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, frdp->what,
 		    XmNtopOffset, 4,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    வெற்று);
 	    XmStringFree(str);
 	    gui_motif_menu_fontlist(label_with);
 
@@ -3712,12 +3712,12 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	     */
 	    XtAddCallback(frdp->what, XmNactivateCallback,
 		    entry_activate_callback, frdp->with);
-	    XtAddEventHandler(frdp->with, KeyPressMask, False,
+	    XtAddEventHandler(frdp->with, சாவி_Press_Mask, False,
 			    (XtEventHandler)find_replace_keypress,
 			    (XtPointer) frdp);
 
 	}
-	else
+	இல்லையெனில்
 	{
 	    /*
 	     * Make the entry activation do the search.
@@ -3725,29 +3725,29 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XtAddCallback(frdp->what, XmNactivateCallback,
 		    find_replace_callback, (XtPointer)FRD_FINDNEXT);
 	}
-	XtAddEventHandler(frdp->what, KeyPressMask, False,
+	XtAddEventHandler(frdp->what, சாவி_Press_Mask, False,
 			    (XtEventHandler)find_replace_keypress,
 			    (XtPointer)frdp);
 
 	// Get the maximum width between the label widgets and line them up.
 	n = 0;
 	XtSetArg(args[n], XmNwidth, &width); n++;
-	XtGetValues(label_what, args, n);
+	Xt_Get_மதிப்புகள்(label_what, args, n);
 	widest = width;
-	if (do_replace)
+	எனில் (do_replace)
 	{
-	    XtGetValues(label_with, args, n);
-	    if (width > widest)
+	    Xt_Get_மதிப்புகள்(label_with, args, n);
+	    எனில் (width > widest)
 		widest = width;
 	}
 
-	XtVaSetValues(frdp->what, XmNleftOffset, widest, NULL);
-	if (do_replace)
-	    XtVaSetValues(frdp->with, XmNleftOffset, widest, NULL);
+	Xt_Va_Set_மதிப்புகள்(frdp->what, XmNleftOffset, widest, வெற்று);
+	எனில் (do_replace)
+	    Xt_Va_Set_மதிப்புகள்(frdp->with, XmNleftOffset, widest, வெற்று);
 
     }
 
-    XtManageChild(input_form);
+    XtManageChild(உள்ளீடு_form);
 
     {
 	Widget radio_box;
@@ -3756,13 +3756,13 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	frame = XtVaCreateWidget("directionFrame",
 		xmFrameWidgetClass, frdp->dialog,
 		XmNtopAttachment, XmATTACH_WIDGET,
-		XmNtopWidget, input_form,
+		XmNtopWidget, உள்ளீடு_form,
 		XmNtopOffset, 4,
 		XmNbottomAttachment, XmATTACH_FORM,
 		XmNbottomOffset, 4,
 		XmNrightAttachment, XmATTACH_OPPOSITE_WIDGET,
-		XmNrightWidget, input_form,
-		NULL);
+		XmNrightWidget, உள்ளீடு_form,
+		வெற்று);
 
 	str = XmStringCreateSimple(_("Direction"));
 	w = XtVaCreateManagedWidget("directionFrameLabel",
@@ -3770,19 +3770,19 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 		XmNlabelString, str,
 		XmNchildHorizontalAlignment, XmALIGNMENT_BEGINNING,
 		XmNchildType, XmFRAME_TITLE_CHILD,
-		NULL);
+		வெற்று);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(w);
 
 	radio_box = XmCreateRadioBox(frame, "radioBox",
-		(ArgList)NULL, 0);
+		(ArgList)வெற்று, 0);
 
 	str = XmStringCreateSimple( _("Up"));
 	frdp->up = XtVaCreateManagedWidget("upRadioButton",
 		xmToggleButtonGadgetClass, radio_box,
 		XmNlabelString, str,
 		XmNset, False,
-		NULL);
+		வெற்று);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(frdp->up);
 
@@ -3791,7 +3791,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 		xmToggleButtonGadgetClass, radio_box,
 		XmNlabelString, str,
 		XmNset, True,
-		NULL);
+		வெற்று);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(frdp->down);
 
@@ -3807,11 +3807,11 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNrightWidget, frame,
 	    XmNrightOffset, 4,
 	    XmNtopAttachment, XmATTACH_WIDGET,
-	    XmNtopWidget, input_form,
+	    XmNtopWidget, உள்ளீடு_form,
 	    XmNtopOffset, 4,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNbottomOffset, 4,
-	    NULL);
+	    வெற்று);
 
     str = XmStringCreateSimple(_("Match whole word only"));
     frdp->wword = XtVaCreateManagedWidget("wordToggle",
@@ -3822,7 +3822,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNleftOffset, 4,
 	    XmNset, wword,
-	    NULL);
+	    வெற்று);
     XmStringFree(str);
 
     str = XmStringCreateSimple(_("Match case"));
@@ -3835,15 +3835,15 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNtopWidget, frdp->wword,
 	    XmNtopOffset, 4,
 	    XmNset, mcase,
-	    NULL);
+	    வெற்று);
     XmStringFree(str);
     gui_motif_menu_fontlist(frdp->wword);
     gui_motif_menu_fontlist(frdp->mcase);
 
     XtManageChild(toggle_form);
 
-    if (entry_text != NULL)
-	XmTextFieldSetString(frdp->what, (char *)entry_text);
+    எனில் (entry_text != வெற்று)
+	XmTextFieldSetString(frdp->what, (எழுத்து *)entry_text);
     vim_free(entry_text);
 
     gui_motif_synch_fonts();
@@ -3853,21 +3853,21 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     XmProcessTraversal(frdp->what, XmTRAVERSE_CURRENT);
 }
 
-   void
+   வெறுமை
 gui_mch_find_dialog(exarg_T *eap)
 {
-    if (!gui.in_use)
-	return;
+    எனில் (!gui.in_use)
+	திரும்பு;
 
     find_replace_dialog_create(eap->arg, FALSE);
 }
 
 
-    void
+    வெறுமை
 gui_mch_replace_dialog(exarg_T *eap)
 {
-    if (!gui.in_use)
-	return;
+    எனில் (!gui.in_use)
+	திரும்பு;
 
     find_replace_dialog_create(eap->arg, TRUE);
 }
@@ -3878,31 +3878,31 @@ gui_mch_replace_dialog(exarg_T *eap)
  * If you don't understand why this should be needed, please try to
  * search for "pi\xea\xb6\xe6" in iso8859-2.
  */
-    void
-gui_motif_synch_fonts(void)
+    வெறுமை
+gui_motif_synch_fonts(வெறுமை)
 {
     SharedFindReplace *frdp;
-    int		    do_replace;
+    முழு		    do_replace;
     XFontStruct	    *font;
     XmFontList	    font_list;
 
     // FIXME: Unless we find out how to create a XmFontList from a XFontSet,
     // we just give up here on font synchronization.
     font = (XFontStruct *)gui.norm_font;
-    if (font == NULL)
-	return;
+    எனில் (font == வெற்று)
+	திரும்பு;
 
     font_list = gui_motif_create_fontlist(font);
 
     // OK this loop is a bit tricky...
-    for (do_replace = 0; do_replace <= 1; ++do_replace)
+    க்கு (do_replace = 0; do_replace <= 1; ++do_replace)
     {
 	frdp = (do_replace) ? (&repl_widgets) : (&find_widgets);
-	if (frdp->dialog)
+	எனில் (frdp->dialog)
 	{
-	    XtVaSetValues(frdp->what, XmNfontList, font_list, NULL);
-	    if (do_replace)
-		XtVaSetValues(frdp->with, XmNfontList, font_list, NULL);
+	    Xt_Va_Set_மதிப்புகள்(frdp->what, XmNfontList, font_list, வெற்று);
+	    எனில் (do_replace)
+		Xt_Va_Set_மதிப்புகள்(frdp->with, XmNfontList, font_list, வெற்று);
 	}
     }
 

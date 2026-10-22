@@ -10,42 +10,42 @@
 /*
  * misc2.c: Various functions.
  */
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-static char_u	*username = NULL; // cached result of mch_get_user_name()
+நிலையான char_u	*username = வெற்று; // cached result of mch_get_user_name()
 
-static int coladvance2(pos_T *pos, int addspaces, int finetune, colnr_T wcol);
+நிலையான முழு coladvance2(pos_T *pos, முழு addspaces, முழு finetune, colnr_T wcol);
 
 /*
  * Return TRUE if in the current mode we need to use virtual.
  */
-    int
-virtual_active(void)
+    முழு
+virtual_active(வெறுமை)
 {
-    unsigned int cur_ve_flags = get_ve_flags();
+    unsigned முழு cur_ve_flags = get_ve_flags();
 
-    if (cur_ve_flags == VE_ALL
-	    || ((cur_ve_flags & VE_INSERT) && (State & MODE_INSERT)))
-	return TRUE;
+    எனில் (cur_ve_flags == VE_ALL
+	    || ((cur_ve_flags & VE_செருகு) && (State & MODE_செருகு)))
+	திரும்பு TRUE;
 
     // While an operator is being executed we return "virtual_op", because
     // VIsual_active has already been reset, thus we can't check for "block"
     // being used.
-    if (virtual_op != MAYBE)
-	return virtual_op;
-    return (cur_ve_flags & VE_BLOCK) && VIsual_active && VIsual_mode == Ctrl_V;
+    எனில் (virtual_op != MAYBE)
+	திரும்பு virtual_op;
+    திரும்பு (cur_ve_flags & VE_BLOCK) && VIsual_active && VIsual_mode == Ctrl_V;
 }
 
 /*
  * Get the screen position of the cursor.
  */
-    int
-getviscol(void)
+    முழு
+getviscol(வெறுமை)
 {
     colnr_T	x;
 
-    getvvcol(curwin, &curwin->w_cursor, &x, NULL, NULL, GETVCOL_NO_ABOVE);
-    return (int)x;
+    getvvcol(curwin, &curwin->w_cursor, &x, வெற்று, வெற்று, GETVCOL_NO_ABOVE);
+    திரும்பு (முழு)x;
 }
 
 /*
@@ -53,23 +53,23 @@ getviscol(void)
  * cursor in that column.
  * The caller must have saved the cursor line for undo!
  */
-    int
+    முழு
 coladvance_force(colnr_T wcol)
 {
-    int rc = coladvance2(&curwin->w_cursor, TRUE, FALSE, wcol);
+    முழு rc = coladvance2(&curwin->w_cursor, TRUE, FALSE, wcol);
 
-    if (wcol == MAXCOL)
+    எனில் (wcol == MAXCOL)
 	curwin->w_valid &= ~VALID_VIRTCOL;
-    else
+    இல்லையெனில்
 	// Virtcol is valid
 	set_valid_virtcol(curwin, wcol);
-    return rc;
+    திரும்பு rc;
 }
 
 /*
  * Get the screen position of character col with a coladd in the cursor line.
  */
-    int
+    முழு
 getviscol2(colnr_T col, colnr_T coladd)
 {
     colnr_T	x;
@@ -78,8 +78,8 @@ getviscol2(colnr_T col, colnr_T coladd)
     pos.lnum = curwin->w_cursor.lnum;
     pos.col = col;
     pos.coladd = coladd;
-    getvvcol(curwin, &pos, &x, NULL, NULL, GETVCOL_NO_ABOVE);
-    return (int)x;
+    getvvcol(curwin, &pos, &x, வெற்று, வெற்று, GETVCOL_NO_ABOVE);
+    திரும்பு (முழு)x;
 }
 
 /*
@@ -91,17 +91,17 @@ getviscol2(colnr_T col, colnr_T coladd)
  *
  * return OK if desired column is reached, FAIL if not
  */
-    int
+    முழு
 coladvance(colnr_T wantcol)
 {
-    int rc = getvpos(&curwin->w_cursor, wantcol);
+    முழு rc = getvpos(&curwin->w_cursor, wantcol);
 
-    if (wantcol == MAXCOL || rc == FAIL)
+    எனில் (wantcol == MAXCOL || rc == FAIL)
 	curwin->w_valid &= ~VALID_VIRTCOL;
-    else if (*ml_get_cursor() != TAB)
+    இல்லையெனில் எனில் (*ml_get_cursor() != TAB)
 	// Virtcol is valid when not on a TAB
 	set_valid_virtcol(curwin, wantcol);
-    return rc;
+    திரும்பு rc;
 }
 
 /*
@@ -109,67 +109,67 @@ coladvance(colnr_T wantcol)
  * "wantcol".
  * return OK if desired column is reached, FAIL if not
  */
-    int
+    முழு
 getvpos(pos_T *pos, colnr_T wantcol)
 {
-    return coladvance2(pos, FALSE, virtual_active(), wantcol);
+    திரும்பு coladvance2(pos, FALSE, virtual_active(), wantcol);
 }
 
-    static int
+    நிலையான முழு
 coladvance2(
     pos_T	*pos,
-    int		addspaces,	// change the text to achieve our goal?
-    int		finetune,	// change char offset for the exact column
+    முழு		addspaces,	// change the text to achieve our goal?
+    முழு		finetune,	// change char offset for the exact column
     colnr_T	wcol_arg)	// column to move to (can be negative)
 {
     colnr_T	wcol = wcol_arg;
-    int		idx;
-    char_u	*line;
-    int		linelen;
+    முழு		idx;
+    char_u	*வரி;
+    முழு		linelen;
     colnr_T	col = 0;
-    int		csize = 0;
-    int		one_more;
+    முழு		csize = 0;
+    முழு		one_more;
 #ifdef FEAT_LINEBREAK
-    int		head = 0;
+    முழு		head = 0;
 #endif
 
-    one_more = (State & MODE_INSERT)
+    one_more = (State & MODE_செருகு)
 		    || restart_edit != NUL
 		    || (VIsual_active && *p_sel != 'o')
 		    || ((get_ve_flags() & VE_ONEMORE) && wcol < MAXCOL);
-    line = ml_get_buf(curbuf, pos->lnum, FALSE);
+    வரி = ml_get_buf(curbuf, pos->lnum, FALSE);
     linelen = ml_get_buf_len(curbuf, pos->lnum);
 
-    if (wcol >= MAXCOL)
+    எனில் (wcol >= MAXCOL)
     {
 	    idx = linelen - 1 + one_more;
 	    col = wcol;
 
-	    if ((addspaces || finetune) && !VIsual_active)
+	    எனில் ((addspaces || finetune) && !VIsual_active)
 	    {
 		curwin->w_curswant = linetabsize_no_outer(curwin, pos->lnum)
 								   + one_more;
-		if (curwin->w_curswant > 0)
+		எனில் (curwin->w_curswant > 0)
 		    --curwin->w_curswant;
 	    }
     }
-    else
+    இல்லையெனில்
     {
-	int		width = curwin->w_width - win_col_off(curwin);
+	முழு		width = curwin->w_width - win_col_off(curwin);
 	chartabsize_T	cts;
 
-	if (finetune
+	எனில் (finetune
 		&& curwin->w_p_wrap
 		&& curwin->w_width != 0
 		&& wcol >= (colnr_T)width
 		&& width > 0)
 	{
 	    csize = linetabsize_no_outer_eol(curwin, pos->lnum);
-	    if (csize > 0)
+	    எனில் (csize > 0)
 		csize--;
 
-	    if (wcol / width > (colnr_T)csize / width
-		    && ((State & MODE_INSERT) == 0 || (int)wcol > csize + 1))
+	    எனில் (wcol / width > (colnr_T)csize / width
+		    && ((State & MODE_செருகு) == 0 || (முழு)wcol > csize + 1))
 	    {
 		// In case of line wrapping don't move the cursor beyond the
 		// right screen edge.  In Insert mode allow going just beyond
@@ -179,23 +179,23 @@ coladvance2(
 	    }
 	}
 
-	init_chartabsize_arg(&cts, curwin, pos->lnum, 0, line, line);
+	init_chartabsize_arg(&cts, curwin, pos->lnum, 0, வரி, வரி);
 #ifdef FEAT_PROP_POPUP
 	cts.cts_no_above = true;
 #endif
-	while (cts.cts_vcol <= wcol && *cts.cts_ptr != NUL)
+	போது (cts.cts_vcol <= wcol && *cts.cts_ptr != NUL)
 	{
 	    // Count a tab for what it's worth (if list mode not on)
 #ifdef FEAT_LINEBREAK
-	    csize = win_lbr_chartabsize(&cts, &head, NULL);
+	    csize = win_lbr_chartabsize(&cts, &head, வெற்று);
 	    MB_PTR_ADV(cts.cts_ptr);
-#else
+#இல்லையெனில்
 	    csize = lbr_chartabsize_adv(&cts);
 #endif
 	    cts.cts_vcol += csize;
 	}
 	col = cts.cts_vcol;
-	idx = (int)(cts.cts_ptr - line);
+	idx = (முழு)(cts.cts_ptr - வரி);
 	clear_chartabsize_arg(&cts);
 
 	/*
@@ -204,7 +204,7 @@ coladvance2(
 	 * a line has the correct indexing.  The one_more comparison
 	 * replaces an explicit add of one_more later on.
 	 */
-	if (col > wcol || (!virtual_active() && one_more == 0))
+	எனில் (col > wcol || (!virtual_active() && one_more == 0))
 	{
 	    idx -= 1;
 #ifdef FEAT_LINEBREAK
@@ -214,7 +214,7 @@ coladvance2(
 	    col -= csize;
 	}
 
-	if (virtual_active()
+	எனில் (virtual_active()
 		&& addspaces
 		&& wcol >= 0
 		&& ((col != wcol && col != wcol + 1) || csize > 1))
@@ -222,20 +222,20 @@ coladvance2(
 	    // 'virtualedit' is set: The difference between wcol and col is
 	    // filled with spaces.
 
-	    if (line[idx] == NUL)
+	    எனில் (வரி[idx] == NUL)
 	    {
 		// Append spaces
-		int	correct = wcol - col;
+		முழு	correct = wcol - col;
 		char_u	*newline = alloc(idx + correct + 1);
-		int	t;
+		முழு	t;
 
-		if (newline == NULL)
-		    return FAIL;
+		எனில் (newline == வெற்று)
+		    திரும்பு FAIL;
 
-		for (t = 0; t < idx; ++t)
-		    newline[t] = line[t];
+		க்கு (t = 0; t < idx; ++t)
+		    newline[t] = வரி[t];
 
-		for (t = 0; t < correct; ++t)
+		க்கு (t = 0; t < correct; ++t)
 		    newline[t + idx] = ' ';
 
 		newline[idx + correct] = NUL;
@@ -245,27 +245,27 @@ coladvance2(
 		idx += correct;
 		col = wcol;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		// Break a tab
-		int	correct = wcol - col - csize + 1; // negative!!
+		முழு	correct = wcol - col - csize + 1; // negative!!
 		char_u	*newline;
-		int	t, s = 0;
-		int	v;
+		முழு	t, s = 0;
+		முழு	v;
 
-		if (-correct > csize)
-		    return FAIL;
+		எனில் (-correct > csize)
+		    திரும்பு FAIL;
 
 		newline = alloc(linelen + csize);
-		if (newline == NULL)
-		    return FAIL;
+		எனில் (newline == வெற்று)
+		    திரும்பு FAIL;
 
-		for (t = 0; t < linelen; t++)
+		க்கு (t = 0; t < linelen; t++)
 		{
-		    if (t != idx)
-			newline[s++] = line[t];
-		    else
-			for (v = 0; v < csize; v++)
+		    எனில் (t != idx)
+			newline[s++] = வரி[t];
+		    இல்லையெனில்
+			க்கு (v = 0; v < csize; v++)
 			    newline[s++] = ' ';
 		}
 
@@ -279,32 +279,32 @@ coladvance2(
 	}
     }
 
-    if (idx < 0)
+    எனில் (idx < 0)
 	pos->col = 0;
-    else
+    இல்லையெனில்
 	pos->col = idx;
 
     pos->coladd = 0;
 
-    if (finetune)
+    எனில் (finetune)
     {
-	if (wcol == MAXCOL)
+	எனில் (wcol == MAXCOL)
 	{
 	    // The width of the last character is used to set coladd.
-	    if (!one_more)
+	    எனில் (!one_more)
 	    {
 		colnr_T	    scol, ecol;
 
-		getvcol(curwin, pos, &scol, NULL, &ecol, 0);
+		getvcol(curwin, pos, &scol, வெற்று, &ecol, 0);
 		pos->coladd = ecol - scol;
 	    }
 	}
-	else
+	இல்லையெனில்
 	{
-	    int b = (int)wcol - (int)col;
+	    முழு b = (முழு)wcol - (முழு)col;
 
 	    // The difference between wcol and col is used to set coladd.
-	    if (b > 0 && b < (MAXCOL - 2 * curwin->w_width))
+	    எனில் (b > 0 && b < (MAXCOL - 2 * curwin->w_width))
 		pos->coladd = b;
 
 	    col += b;
@@ -312,21 +312,21 @@ coladvance2(
     }
 
     // prevent from moving onto a trail byte
-    if (has_mbyte)
+    எனில் (has_mbyte)
 	mb_adjustpos(curbuf, pos);
 
-    if (wcol < 0 || col < wcol)
-	return FAIL;
-    return OK;
+    எனில் (wcol < 0 || col < wcol)
+	திரும்பு FAIL;
+    திரும்பு OK;
 }
 
 /*
  * Increment the cursor position.  See inc() for return values.
  */
-    int
-inc_cursor(void)
+    முழு
+inc_cursor(வெறுமை)
 {
-    return inc(&curwin->w_cursor);
+    திரும்பு inc(&curwin->w_cursor);
 }
 
 /*
@@ -336,50 +336,50 @@ inc_cursor(void)
  * Return -1 when at the end of file.
  * Return 0 otherwise.
  */
-    int
+    முழு
 inc(pos_T *lp)
 {
     char_u  *p;
 
     // when searching position may be set to end of a line
-    if (lp->col != MAXCOL)
+    எனில் (lp->col != MAXCOL)
     {
 	p = ml_get_pos(lp);
-	if (*p != NUL)	// still within line, move to next char (may be NUL)
+	எனில் (*p != NUL)	// still within line, move to next char (may be NUL)
 	{
-	    if (has_mbyte)
+	    எனில் (has_mbyte)
 	    {
-		int l = (*mb_ptr2len)(p);
+		முழு l = (*mb_ptr2len)(p);
 
 		lp->col += l;
-		return ((p[l] != NUL) ? 0 : 2);
+		திரும்பு ((p[l] != NUL) ? 0 : 2);
 	    }
 	    lp->col++;
 	    lp->coladd = 0;
-	    return ((p[1] != NUL) ? 0 : 2);
+	    திரும்பு ((p[1] != NUL) ? 0 : 2);
 	}
     }
-    if (lp->lnum != curbuf->b_ml.ml_line_count)     // there is a next line
+    எனில் (lp->lnum != curbuf->b_ml.ml_வரி_மொத்தம்)     // there is a next line
     {
 	lp->col = 0;
 	lp->lnum++;
 	lp->coladd = 0;
-	return 1;
+	திரும்பு 1;
     }
-    return -1;
+    திரும்பு -1;
 }
 
 /*
  * incl(lp): same as inc(), but skip the NUL at the end of non-empty lines
  */
-    int
+    முழு
 incl(pos_T *lp)
 {
-    int	    r;
+    முழு	    r;
 
-    if ((r = inc(lp)) >= 1 && lp->col)
+    எனில் ((r = inc(lp)) >= 1 && lp->col)
 	r = inc(lp);
-    return r;
+    திரும்பு r;
 }
 
 /*
@@ -388,66 +388,66 @@ incl(pos_T *lp)
  * Decrement the line pointer 'p' crossing line boundaries as necessary.
  * Return 1 when crossing a line, -1 when at start of file, 0 otherwise.
  */
-    int
-dec_cursor(void)
+    முழு
+dec_cursor(வெறுமை)
 {
-    return dec(&curwin->w_cursor);
+    திரும்பு dec(&curwin->w_cursor);
 }
 
-    int
+    முழு
 dec(pos_T *lp)
 {
     char_u	*p;
 
     lp->coladd = 0;
-    if (lp->col == MAXCOL)
+    எனில் (lp->col == MAXCOL)
     {
 	// past end of line
 	p = ml_get(lp->lnum);
 	lp->col = ml_get_len(lp->lnum);
-	if (has_mbyte)
+	எனில் (has_mbyte)
 	    lp->col -= (*mb_head_off)(p, p + lp->col);
-	return 0;
+	திரும்பு 0;
     }
 
-    if (lp->col > 0)
+    எனில் (lp->col > 0)
     {
 	// still within line
 	lp->col--;
-	if (has_mbyte)
+	எனில் (has_mbyte)
 	{
 	    p = ml_get(lp->lnum);
 	    lp->col -= (*mb_head_off)(p, p + lp->col);
 	}
-	return 0;
+	திரும்பு 0;
     }
 
-    if (lp->lnum > 1)
+    எனில் (lp->lnum > 1)
     {
 	// there is a prior line
 	lp->lnum--;
 	p = ml_get(lp->lnum);
 	lp->col = ml_get_len(lp->lnum);
-	if (has_mbyte)
+	எனில் (has_mbyte)
 	    lp->col -= (*mb_head_off)(p, p + lp->col);
-	return 1;
+	திரும்பு 1;
     }
 
     // at start of file
-    return -1;
+    திரும்பு -1;
 }
 
 /*
  * decl(lp): same as dec(), but skip the NUL at the end of non-empty lines
  */
-    int
+    முழு
 decl(pos_T *lp)
 {
-    int	    r;
+    முழு	    r;
 
-    if ((r = dec(lp)) == 1 && lp->col)
+    எனில் ((r = dec(lp)) == 1 && lp->col)
 	r = dec(lp);
-    return r;
+    திரும்பு r;
 }
 
 /*
@@ -464,28 +464,28 @@ get_cursor_rel_lnum(
     linenr_T	retval = 0;
 
 #ifdef FEAT_FOLDING
-    if (hasAnyFolding(wp))
+    எனில் (hasAnyFolding(wp))
     {
-	if (lnum > cursor)
+	எனில் (lnum > cursor)
 	{
-	    while (lnum > cursor)
+	    போது (lnum > cursor)
 	    {
-		(void)hasFoldingWin(wp, lnum, &lnum, NULL, TRUE, NULL);
+		(வெறுமை)hasFoldingWin(wp, lnum, &lnum, வெற்று, TRUE, வெற்று);
 		// if lnum and cursor are in the same fold,
 		// now lnum <= cursor
-		if (lnum > cursor)
+		எனில் (lnum > cursor)
 		    retval++;
 		lnum--;
 	    }
 	}
-	else if (lnum < cursor)
+	இல்லையெனில் எனில் (lnum < cursor)
 	{
-	    while (lnum < cursor)
+	    போது (lnum < cursor)
 	    {
-		(void)hasFoldingWin(wp, lnum, NULL, &lnum, TRUE, NULL);
+		(வெறுமை)hasFoldingWin(wp, lnum, வெற்று, &lnum, TRUE, வெற்று);
 		// if lnum and cursor are in the same fold,
 		// now lnum >= cursor
-		if (lnum < cursor)
+		எனில் (lnum < cursor)
 		    retval--;
 		lnum++;
 	    }
@@ -493,29 +493,29 @@ get_cursor_rel_lnum(
 	// else if (lnum == cursor)
 	//     retval = 0;
     }
-    else
+    இல்லையெனில்
 #endif
 	retval = lnum - cursor;
 
-    return retval;
+    திரும்பு retval;
 }
 
 /*
  * Make sure "pos.lnum" and "pos.col" are valid in "buf".
  * This allows for the col to be on the NUL byte.
  */
-    void
+    வெறுமை
 check_pos(buf_T *buf, pos_T *pos)
 {
     colnr_T len;
 
-    if (pos->lnum > buf->b_ml.ml_line_count)
-	pos->lnum = buf->b_ml.ml_line_count;
+    எனில் (pos->lnum > buf->b_ml.ml_வரி_மொத்தம்)
+	pos->lnum = buf->b_ml.ml_வரி_மொத்தம்;
 
-    if (pos->col > 0)
+    எனில் (pos->col > 0)
     {
 	len = ml_get_buf_len(buf, pos->lnum);
-	if (pos->col > len)
+	எனில் (pos->col > len)
 	    pos->col = len;
     }
 }
@@ -523,28 +523,28 @@ check_pos(buf_T *buf, pos_T *pos)
 /*
  * Make sure curwin->w_cursor.lnum is valid.
  */
-    void
-check_cursor_lnum(void)
+    வெறுமை
+check_cursor_lnum(வெறுமை)
 {
-    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+    எனில் (curwin->w_cursor.lnum > curbuf->b_ml.ml_வரி_மொத்தம்)
     {
 #ifdef FEAT_FOLDING
 	// If there is a closed fold at the end of the file, put the cursor in
 	// its first line.  Otherwise in the last line.
-	if (!hasFolding(curbuf->b_ml.ml_line_count,
-						&curwin->w_cursor.lnum, NULL))
+	எனில் (!hasFolding(curbuf->b_ml.ml_வரி_மொத்தம்,
+						&curwin->w_cursor.lnum, வெற்று))
 #endif
-	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	    curwin->w_cursor.lnum = curbuf->b_ml.ml_வரி_மொத்தம்;
     }
-    if (curwin->w_cursor.lnum <= 0)
+    எனில் (curwin->w_cursor.lnum <= 0)
 	curwin->w_cursor.lnum = 1;
 }
 
 /*
  * Make sure curwin->w_cursor.col is valid.
  */
-    void
-check_cursor_col(void)
+    வெறுமை
+check_cursor_col(வெறுமை)
 {
     check_cursor_col_win(curwin);
 }
@@ -552,63 +552,63 @@ check_cursor_col(void)
 /*
  * Make sure win->w_cursor.col is valid.
  */
-    void
+    வெறுமை
 check_cursor_col_win(win_T *win)
 {
     colnr_T      len;
     colnr_T      oldcol = win->w_cursor.col;
     colnr_T      oldcoladd = win->w_cursor.col + win->w_cursor.coladd;
-    unsigned int cur_ve_flags = get_ve_flags();
+    unsigned முழு cur_ve_flags = get_ve_flags();
 
     len = ml_get_buf_len(win->w_buffer, win->w_cursor.lnum);
-    if (len == 0)
+    எனில் (len == 0)
 	win->w_cursor.col = 0;
-    else if (win->w_cursor.col >= len)
+    இல்லையெனில் எனில் (win->w_cursor.col >= len)
     {
 	// Allow cursor past end-of-line when:
 	// - in Insert mode or restarting Insert mode
 	// - in Visual mode and 'selection' isn't "old"
 	// - 'virtualedit' is set
-	if ((State & MODE_INSERT) || restart_edit
+	எனில் ((State & MODE_செருகு) || restart_edit
 		|| (VIsual_active && *p_sel != 'o')
 		|| (cur_ve_flags & VE_ONEMORE)
 		|| virtual_active())
 	    win->w_cursor.col = len;
-	else
+	இல்லையெனில்
 	{
 	    win->w_cursor.col = len - 1;
 	    // Move the cursor to the head byte.
-	    if (has_mbyte)
+	    எனில் (has_mbyte)
 		mb_adjustpos(win->w_buffer, &win->w_cursor);
 	}
     }
-    else if (win->w_cursor.col < 0)
+    இல்லையெனில் எனில் (win->w_cursor.col < 0)
 	win->w_cursor.col = 0;
 
     // If virtual editing is on, we can leave the cursor on the old position,
     // only we must set it to virtual.  But don't do it when at the end of the
     // line.
-    if (oldcol == MAXCOL)
+    எனில் (oldcol == MAXCOL)
 	win->w_cursor.coladd = 0;
-    else if (cur_ve_flags == VE_ALL)
+    இல்லையெனில் எனில் (cur_ve_flags == VE_ALL)
     {
-	if (oldcoladd > win->w_cursor.col)
+	எனில் (oldcoladd > win->w_cursor.col)
 	{
 	    win->w_cursor.coladd = oldcoladd - win->w_cursor.col;
 
 	    // Make sure that coladd is not more than the char width.
 	    // Not for the last character, coladd is then used when the cursor
 	    // is actually after the last character.
-	    if (win->w_cursor.col + 1 < len)
+	    எனில் (win->w_cursor.col + 1 < len)
 	    {
-		int cs, ce;
+		முழு cs, ce;
 
-		getvcol(win, &win->w_cursor, &cs, NULL, &ce, 0);
-		if (win->w_cursor.coladd > ce - cs)
+		getvcol(win, &win->w_cursor, &cs, வெற்று, &ce, 0);
+		எனில் (win->w_cursor.coladd > ce - cs)
 		    win->w_cursor.coladd = ce - cs;
 	    }
 	}
-	else
+	இல்லையெனில்
 	    // avoid weird number when there is a miscalculation or overflow
 	    win->w_cursor.coladd = 0;
     }
@@ -617,8 +617,8 @@ check_cursor_col_win(win_T *win)
 /*
  * make sure curwin->w_cursor in on a valid character
  */
-    void
-check_cursor(void)
+    வெறுமை
+check_cursor(வெறுமை)
 {
     check_cursor_lnum();
     check_cursor_col();
@@ -628,20 +628,20 @@ check_cursor(void)
  * Check if VIsual position is valid, correct it if not.
  * Can be called when in Visual mode and a change has been made.
  */
-    void
-check_visual_pos(void)
+    வெறுமை
+check_visual_pos(வெறுமை)
 {
-    if (VIsual.lnum > curbuf->b_ml.ml_line_count)
+    எனில் (VIsual.lnum > curbuf->b_ml.ml_வரி_மொத்தம்)
     {
-	VIsual.lnum = curbuf->b_ml.ml_line_count;
+	VIsual.lnum = curbuf->b_ml.ml_வரி_மொத்தம்;
 	VIsual.col = 0;
 	VIsual.coladd = 0;
     }
-    else
+    இல்லையெனில்
     {
-	int len = ml_get_len(VIsual.lnum);
+	முழு len = ml_get_len(VIsual.lnum);
 
-	if (VIsual.col > len)
+	எனில் (VIsual.col > len)
 	{
 	    VIsual.col = len;
 	    VIsual.coladd = 0;
@@ -653,10 +653,10 @@ check_visual_pos(void)
  * Make sure curwin->w_cursor is not on the NUL at the end of the line.
  * Allow it when in Visual mode and 'selection' is not "old".
  */
-    void
-adjust_cursor_col(void)
+    வெறுமை
+adjust_cursor_col(வெறுமை)
 {
-    if (curwin->w_cursor.col > 0
+    எனில் (curwin->w_cursor.col > 0
 	    && (!VIsual_active || *p_sel == 'o')
 	    && gchar_cursor() == NUL)
 	--curwin->w_cursor.col;
@@ -667,14 +667,14 @@ adjust_cursor_col(void)
  * Adjust the cursor position if needed.
  * Return TRUE if the cursor was moved.
  */
-    int
+    முழு
 set_leftcol(colnr_T leftcol)
 {
-    int		retval = FALSE;
+    முழு		retval = FALSE;
 
     // Return quickly when there is no change.
-    if (curwin->w_leftcol == leftcol)
-	return FALSE;
+    எனில் (curwin->w_leftcol == leftcol)
+	திரும்பு FALSE;
     curwin->w_leftcol = leftcol;
 
     changed_cline_bef_curs();
@@ -683,42 +683,42 @@ set_leftcol(colnr_T leftcol)
 
     // If the cursor is right or left of the screen, move it to last or first
     // visible character.
-    long siso = get_sidescrolloff_value();
-    if (curwin->w_virtcol > (colnr_T)(lastcol - siso))
+    long siso = get_sidescrolloff_மதிப்பு();
+    எனில் (curwin->w_virtcol > (colnr_T)(lastcol - siso))
     {
 	retval = TRUE;
 	coladvance((colnr_T)(lastcol - siso));
     }
-    else if (curwin->w_virtcol < curwin->w_leftcol + siso)
+    இல்லையெனில் எனில் (curwin->w_virtcol < curwin->w_leftcol + siso)
     {
 	retval = TRUE;
-	(void)coladvance((colnr_T)(curwin->w_leftcol + siso));
+	(வெறுமை)coladvance((colnr_T)(curwin->w_leftcol + siso));
     }
 
     // If the start of the character under the cursor is not on the screen,
     // advance the cursor one more char.  If this fails (last char of the
     // line) adjust the scrolling.
     colnr_T	s, e;
-    getvvcol(curwin, &curwin->w_cursor, &s, NULL, &e, 0);
-    if (e > (colnr_T)lastcol)
+    getvvcol(curwin, &curwin->w_cursor, &s, வெற்று, &e, 0);
+    எனில் (e > (colnr_T)lastcol)
     {
 	retval = TRUE;
 	coladvance(s - 1);
     }
-    else if (s < curwin->w_leftcol)
+    இல்லையெனில் எனில் (s < curwin->w_leftcol)
     {
 	retval = TRUE;
-	if (coladvance(e + 1) == FAIL)	// there isn't another character
+	எனில் (coladvance(e + 1) == FAIL)	// there isn't another character
 	{
 	    curwin->w_leftcol = s;	// adjust w_leftcol instead
 	    changed_cline_bef_curs();
 	}
     }
 
-    if (retval)
+    எனில் (retval)
 	curwin->w_set_curswant = true;
     redraw_later(UPD_NOT_VALID);
-    return retval;
+    திரும்பு retval;
 }
 
 /*
@@ -728,49 +728,49 @@ set_leftcol(colnr_T leftcol)
  * "*option" is advanced to the next part.
  * The length is returned.
  */
-    int
+    முழு
 copy_option_part(
     char_u	**option,
     char_u	*buf,
-    int		maxlen,
-    char	*sep_chars)
+    முழு		maxlen,
+    எழுத்து	*sep_chars)
 {
-    int	    len = 0;
+    முழு	    len = 0;
     char_u  *p = *option;
 
     // skip '.' at start of option part, for 'suffixes'
-    if (*p == '.')
+    எனில் (*p == '.')
 	buf[len++] = *p++;
-    while (*p != NUL && vim_strchr((char_u *)sep_chars, *p) == NULL)
+    போது (*p != NUL && vim_strchr((char_u *)sep_chars, *p) == வெற்று)
     {
 	/*
 	 * Skip backslash before a separator character and space.
 	 */
-	if (p[0] == '\\' && vim_strchr((char_u *)sep_chars, p[1]) != NULL)
+	எனில் (p[0] == '\\' && vim_strchr((char_u *)sep_chars, p[1]) != வெற்று)
 	    ++p;
-	if (len < maxlen - 1)
+	எனில் (len < maxlen - 1)
 	    buf[len++] = *p;
 	++p;
     }
     buf[len] = NUL;
 
-    if (*p != NUL && *p != ',')	// skip non-standard separator
+    எனில் (*p != NUL && *p != ',')	// skip non-standard separator
 	++p;
     p = skip_to_option_part(p);	// p points to next file name
 
     *option = p;
-    return len;
+    திரும்பு len;
 }
 
-#if !defined(HAVE_MEMSET) && !defined(PROTO)
-    void *
-vim_memset(void *ptr, int c, size_t size)
+#எனில் !defined(HAVE_MEMSET) && !defined(PROTO)
+    வெறுமை *
+vim_memset(வெறுமை *ptr, முழு c, size_t size)
 {
-    char *p = ptr;
+    எழுத்து *p = ptr;
 
-    while (size-- > 0)
+    போது (size-- > 0)
 	*p++ = c;
-    return ptr;
+    திரும்பு ptr;
 }
 #endif
 
@@ -778,10 +778,10 @@ vim_memset(void *ptr, int c, size_t size)
  * Vim has its own isspace() function, because on some machines isspace()
  * can't handle characters above 128.
  */
-    int
-vim_isspace(int x)
+    முழு
+vim_isspace(முழு x)
 {
-    return ((x >= 9 && x <= 13) || x == ' ');
+    திரும்பு ((x >= 9 && x <= 13) || x == ' ');
 }
 
 /************************************************************************
@@ -793,7 +793,7 @@ vim_isspace(int x)
  * Some useful tables.
  */
 
-static struct modmasktable
+நிலையான கட்டமைப்பு modmasktable
 {
     short	mod_mask;	// Bit-mask for particular key modifier
     short	mod_flag;	// Bit(s) for particular key modifier
@@ -807,7 +807,7 @@ static struct modmasktable
     {MOD_MASK_MULTI_CLICK,	MOD_MASK_2CLICK,	(char_u)'2'},
     {MOD_MASK_MULTI_CLICK,	MOD_MASK_3CLICK,	(char_u)'3'},
     {MOD_MASK_MULTI_CLICK,	MOD_MASK_4CLICK,	(char_u)'4'},
-#if defined(MACOS_X) || defined(FEAT_GUI_GTK)
+#எனில் defined(MACOS_X) || defined(FEAT_GUI_GTK)
     {MOD_MASK_CMD,		MOD_MASK_CMD,		(char_u)'D'},
 #endif
     // 'A' must be the last one
@@ -820,9 +820,9 @@ static struct modmasktable
  * Shifted key terminal codes and their unshifted equivalent.
  * Don't add mouse codes here, they are handled separately!
  */
-#define MOD_KEYS_ENTRY_SIZE 5
+#define MOD_சாவிகள்_ENTRY_SIZE 5
 
-static char_u modifier_keys_table[] =
+நிலையான char_u modifier_சாவிகள்_table[] =
 {
 //  mod mask	    with modifier		without modifier
     MOD_MASK_SHIFT, '&', '9',			'@', '1',	// begin
@@ -833,15 +833,15 @@ static char_u modifier_keys_table[] =
     MOD_MASK_SHIFT, '*', '4',			'k', 'D',	// delete char
     MOD_MASK_SHIFT, '*', '5',			'k', 'L',	// delete line
     MOD_MASK_SHIFT, '*', '7',			'@', '7',	// end
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_END,	'@', '7',	// end
+    MOD_MASK_CTRL,  KS_EXTRA, (முழு)KE_C_END,	'@', '7',	// end
     MOD_MASK_SHIFT, '*', '9',			'@', '9',	// exit
     MOD_MASK_SHIFT, '*', '0',			'@', '0',	// find
     MOD_MASK_SHIFT, '#', '1',			'%', '1',	// help
     MOD_MASK_SHIFT, '#', '2',			'k', 'h',	// home
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_HOME,	'k', 'h',	// home
+    MOD_MASK_CTRL,  KS_EXTRA, (முழு)KE_C_HOME,	'k', 'h',	// home
     MOD_MASK_SHIFT, '#', '3',			'k', 'I',	// insert
     MOD_MASK_SHIFT, '#', '4',			'k', 'l',	// left arrow
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_LEFT,	'k', 'l',	// left arrow
+    MOD_MASK_CTRL,  KS_EXTRA, (முழு)KE_C_இடது,	'k', 'l',	// left arrow
     MOD_MASK_SHIFT, '%', 'a',			'%', '3',	// message
     MOD_MASK_SHIFT, '%', 'b',			'%', '4',	// move
     MOD_MASK_SHIFT, '%', 'c',			'%', '5',	// next
@@ -851,74 +851,74 @@ static char_u modifier_keys_table[] =
     MOD_MASK_SHIFT, '%', 'g',			'%', '0',	// redo
     MOD_MASK_SHIFT, '%', 'h',			'&', '3',	// replace
     MOD_MASK_SHIFT, '%', 'i',			'k', 'r',	// right arr.
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_RIGHT,	'k', 'r',	// right arr.
+    MOD_MASK_CTRL,  KS_EXTRA, (முழு)KE_C_வலது,	'k', 'r',	// right arr.
     MOD_MASK_SHIFT, '%', 'j',			'&', '5',	// resume
     MOD_MASK_SHIFT, '!', '1',			'&', '6',	// save
     MOD_MASK_SHIFT, '!', '2',			'&', '7',	// suspend
     MOD_MASK_SHIFT, '!', '3',			'&', '8',	// undo
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_UP,	'k', 'u',	// up arrow
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_DOWN,	'k', 'd',	// down arrow
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_UP,	'k', 'u',	// up arrow
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_DOWN,	'k', 'd',	// down arrow
 
 								// vt100 F1
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF1,	KS_EXTRA, (int)KE_XF1,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF2,	KS_EXTRA, (int)KE_XF2,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF3,	KS_EXTRA, (int)KE_XF3,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF4,	KS_EXTRA, (int)KE_XF4,
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_XF1,	KS_EXTRA, (முழு)KE_XF1,
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_XF2,	KS_EXTRA, (முழு)KE_XF2,
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_XF3,	KS_EXTRA, (முழு)KE_XF3,
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_XF4,	KS_EXTRA, (முழு)KE_XF4,
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F1,	'k', '1',	// F1
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F2,	'k', '2',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F3,	'k', '3',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F4,	'k', '4',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F5,	'k', '5',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F6,	'k', '6',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F7,	'k', '7',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F8,	'k', '8',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F9,	'k', '9',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F10,	'k', ';',	// F10
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F1,	'k', '1',	// F1
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F2,	'k', '2',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F3,	'k', '3',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F4,	'k', '4',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F5,	'k', '5',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F6,	'k', '6',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F7,	'k', '7',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F8,	'k', '8',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F9,	'k', '9',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F10,	'k', ';',	// F10
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F11,	'F', '1',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F12,	'F', '2',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F13,	'F', '3',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F14,	'F', '4',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F15,	'F', '5',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F16,	'F', '6',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F17,	'F', '7',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F18,	'F', '8',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F19,	'F', '9',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F20,	'F', 'A',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F11,	'F', '1',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F12,	'F', '2',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F13,	'F', '3',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F14,	'F', '4',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F15,	'F', '5',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F16,	'F', '6',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F17,	'F', '7',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F18,	'F', '8',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F19,	'F', '9',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F20,	'F', 'A',
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F21,	'F', 'B',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F22,	'F', 'C',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F23,	'F', 'D',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F24,	'F', 'E',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F25,	'F', 'F',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F26,	'F', 'G',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F27,	'F', 'H',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F28,	'F', 'I',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F29,	'F', 'J',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F30,	'F', 'K',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F21,	'F', 'B',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F22,	'F', 'C',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F23,	'F', 'D',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F24,	'F', 'E',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F25,	'F', 'F',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F26,	'F', 'G',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F27,	'F', 'H',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F28,	'F', 'I',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F29,	'F', 'J',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F30,	'F', 'K',
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F31,	'F', 'L',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F32,	'F', 'M',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F33,	'F', 'N',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F34,	'F', 'O',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F35,	'F', 'P',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F36,	'F', 'Q',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F37,	'F', 'R',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F31,	'F', 'L',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F32,	'F', 'M',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F33,	'F', 'N',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F34,	'F', 'O',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F35,	'F', 'P',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F36,	'F', 'Q',
+    MOD_MASK_SHIFT, KS_EXTRA, (முழு)KE_S_F37,	'F', 'R',
 
 							    // TAB pseudo code
-    MOD_MASK_SHIFT, 'k', 'B',			KS_EXTRA, (int)KE_TAB,
+    MOD_MASK_SHIFT, 'k', 'B',			KS_EXTRA, (முழு)KE_TAB,
 
     NUL
 };
 
-static struct key_name_entry
+நிலையான கட்டமைப்பு சாவி_name_entry
 {
-    int		enabled;	    // is this entry available (TRUE/FALSE)?
-    int		key;		    // special key code or ascii value
+    முழு		enabled;	    // is this entry available (TRUE/FALSE)?
+    முழு		சாவி;		    // special key code or ascii value
     string_T	name;		    // name of key
-    int		is_alt;		    // is an alternative name
-} key_names_table[] =
+    முழு		is_alt;		    // is an alternative name
+} சாவி_names_table[] =
 // Must be sorted by the 'name.string' field in ascending order because it is used by bsearch()!
 {
     {TRUE, K_BS, STR_LITERAL_INIT("BackSpace"), TRUE},
@@ -932,7 +932,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_DEC
     TRUE,
-#else
+#இல்லையெனில்
     FALSE,
 #endif
 	K_DEC_MOUSE, STR_LITERAL_INIT("DecMouse"), FALSE},
@@ -995,7 +995,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_JSB
     TRUE,
-#else
+#இல்லையெனில்
     FALSE,
 #endif
 	K_JSBTERM_MOUSE, STR_LITERAL_INIT("JsbMouse"), FALSE},
@@ -1022,7 +1022,7 @@ static struct key_name_entry
     {TRUE, K_KPAGEUP, STR_LITERAL_INIT("kPageUp"), FALSE},
     {TRUE, K_KPLUS, STR_LITERAL_INIT("kPlus"), FALSE},
     {TRUE, K_KPOINT, STR_LITERAL_INIT("kPoint"), FALSE},
-    {TRUE, K_LEFT, STR_LITERAL_INIT("Left"), FALSE},
+    {TRUE, K_இடது, STR_LITERAL_INIT("Left"), FALSE},
     {TRUE, K_LEFTDRAG, STR_LITERAL_INIT("LeftDrag"), FALSE},
     {TRUE, K_LEFTMOUSE, STR_LITERAL_INIT("LeftMouse"), FALSE},
     {TRUE, K_LEFTMOUSE_NM, STR_LITERAL_INIT("LeftMouseNM"), FALSE},
@@ -1041,7 +1041,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_NET
     TRUE,
-#else
+#இல்லையெனில்
     FALSE,
 #endif
 	K_NETTERM_MOUSE, STR_LITERAL_INIT("NetMouse"), FALSE},
@@ -1057,12 +1057,12 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_PTERM
     TRUE,
-#else
+#இல்லையெனில்
     FALSE,
 #endif
 	K_PTERM_MOUSE, STR_LITERAL_INIT("PtermMouse"), FALSE},
     {TRUE, CAR, STR_LITERAL_INIT("Return"), TRUE},
-    {TRUE, K_RIGHT, STR_LITERAL_INIT("Right"), FALSE},
+    {TRUE, K_வலது, STR_LITERAL_INIT("Right"), FALSE},
     {TRUE, K_RIGHTDRAG, STR_LITERAL_INIT("RightDrag"), FALSE},
     {TRUE, K_RIGHTMOUSE, STR_LITERAL_INIT("RightMouse"), FALSE},
     {TRUE, K_RIGHTRELEASE, STR_LITERAL_INIT("RightRelease"), FALSE},
@@ -1076,7 +1076,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_EVAL
     TRUE,
-#else
+#இல்லையெனில்
     FALSE,
 #endif
 	K_SNR, STR_LITERAL_INIT("SNR"), FALSE},
@@ -1088,7 +1088,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_URXVT
     TRUE,
-#else
+#இல்லையெனில்
     FALSE,
 #endif
 	K_URXVT_MOUSE, STR_LITERAL_INIT("UrxvtMouse"), FALSE},
@@ -1119,80 +1119,80 @@ static struct key_name_entry
  * Return the modifier mask bit (MOD_MASK_*) which corresponds to the given
  * modifier name ('S' for Shift, 'C' for Ctrl etc).
  */
-    static int
-name_to_mod_mask(int c)
+    நிலையான முழு
+name_to_mod_mask(முழு c)
 {
-    int	    i;
+    முழு	    i;
 
     c = TOUPPER_ASC(c);
-    for (i = 0; mod_mask_table[i].mod_mask != 0; i++)
-	if (c == mod_mask_table[i].name)
-	    return mod_mask_table[i].mod_flag;
-    return 0;
+    க்கு (i = 0; mod_mask_table[i].mod_mask != 0; i++)
+	எனில் (c == mod_mask_table[i].name)
+	    திரும்பு mod_mask_table[i].mod_flag;
+    திரும்பு 0;
 }
 
 /*
  * Check if if there is a special key code for "key" that includes the
  * modifiers specified.
  */
-    int
-simplify_key(int key, int *modifiers)
+    முழு
+simplify_சாவி(முழு சாவி, முழு *modifiers)
 {
-    int	    i;
-    int	    key0;
-    int	    key1;
+    முழு	    i;
+    முழு	    key0;
+    முழு	    key1;
 
-    if (!(*modifiers & (MOD_MASK_SHIFT | MOD_MASK_CTRL)))
-	return key;
+    எனில் (!(*modifiers & (MOD_MASK_SHIFT | MOD_MASK_CTRL)))
+	திரும்பு சாவி;
 
     // TAB is a special case
-    if (key == TAB && (*modifiers & MOD_MASK_SHIFT))
+    எனில் (சாவி == TAB && (*modifiers & MOD_MASK_SHIFT))
     {
 	*modifiers &= ~MOD_MASK_SHIFT;
-	return K_S_TAB;
+	திரும்பு K_S_TAB;
     }
-    key0 = KEY2TERMCAP0(key);
-    key1 = KEY2TERMCAP1(key);
-    for (i = 0; modifier_keys_table[i] != NUL; i += MOD_KEYS_ENTRY_SIZE)
+    key0 = KEY2TERMCAP0(சாவி);
+    key1 = KEY2TERMCAP1(சாவி);
+    க்கு (i = 0; modifier_சாவிகள்_table[i] != NUL; i += MOD_சாவிகள்_ENTRY_SIZE)
     {
-	if (key0 == modifier_keys_table[i + 3]
-		&& key1 == modifier_keys_table[i + 4]
-		&& (*modifiers & modifier_keys_table[i]))
+	எனில் (key0 == modifier_சாவிகள்_table[i + 3]
+		&& key1 == modifier_சாவிகள்_table[i + 4]
+		&& (*modifiers & modifier_சாவிகள்_table[i]))
 	{
-	    *modifiers &= ~modifier_keys_table[i];
-	    return TERMCAP2KEY(modifier_keys_table[i + 1],
-		    modifier_keys_table[i + 2]);
+	    *modifiers &= ~modifier_சாவிகள்_table[i];
+	    திரும்பு TERMCAP2_சாவி(modifier_சாவிகள்_table[i + 1],
+		    modifier_சாவிகள்_table[i + 2]);
 	}
     }
-    return key;
+    திரும்பு சாவி;
 }
 
 /*
  * Change <xHome> to <Home>, <xUp> to <Up>, etc.
  */
-    int
-handle_x_keys(int key)
+    முழு
+handle_x_சாவிகள்(முழு சாவி)
 {
-    switch (key)
+    தேர்வு (சாவி)
     {
-	case K_XUP:	return K_UP;
-	case K_XDOWN:	return K_DOWN;
-	case K_XLEFT:	return K_LEFT;
-	case K_XRIGHT:	return K_RIGHT;
-	case K_XHOME:	return K_HOME;
-	case K_ZHOME:	return K_HOME;
-	case K_XEND:	return K_END;
-	case K_ZEND:	return K_END;
-	case K_XF1:	return K_F1;
-	case K_XF2:	return K_F2;
-	case K_XF3:	return K_F3;
-	case K_XF4:	return K_F4;
-	case K_S_XF1:	return K_S_F1;
-	case K_S_XF2:	return K_S_F2;
-	case K_S_XF3:	return K_S_F3;
-	case K_S_XF4:	return K_S_F4;
+	நிலை K_XUP:	திரும்பு K_UP;
+	நிலை K_XDOWN:	திரும்பு K_DOWN;
+	நிலை K_XLEFT:	திரும்பு K_இடது;
+	நிலை K_XRIGHT:	திரும்பு K_வலது;
+	நிலை K_XHOME:	திரும்பு K_HOME;
+	நிலை K_ZHOME:	திரும்பு K_HOME;
+	நிலை K_XEND:	திரும்பு K_END;
+	நிலை K_ZEND:	திரும்பு K_END;
+	நிலை K_XF1:	திரும்பு K_F1;
+	நிலை K_XF2:	திரும்பு K_F2;
+	நிலை K_XF3:	திரும்பு K_F3;
+	நிலை K_XF4:	திரும்பு K_F4;
+	நிலை K_S_XF1:	திரும்பு K_S_F1;
+	நிலை K_S_XF2:	திரும்பு K_S_F2;
+	நிலை K_S_XF3:	திரும்பு K_S_F3;
+	நிலை K_S_XF4:	திரும்பு K_S_F4;
     }
-    return key;
+    திரும்பு சாவி;
 }
 
 /*
@@ -1200,55 +1200,55 @@ handle_x_keys(int key)
  * modifiers are down.
  */
     char_u *
-get_special_key_name(int c, int modifiers)
+get_special_சாவி_name(முழு c, முழு modifiers)
 {
-    static char_u string[MAX_KEY_NAME_LEN + 1];
-    int	    i, idx, len;
-    int	    table_idx;
+    நிலையான char_u string[MAX_சாவி_NAME_LEN + 1];
+    முழு	    i, idx, len;
+    முழு	    table_idx;
 
     string[0] = '<';
     idx = 1;
 
     // Key that stands for a normal character.
-    if (IS_SPECIAL(c) && KEY2TERMCAP0(c) == KS_KEY)
+    எனில் (IS_SPECIAL(c) && KEY2TERMCAP0(c) == KS_சாவி)
 	c = KEY2TERMCAP1(c);
 
     /*
      * Translate shifted special keys into unshifted keys and set modifier.
      * Same for CTRL and ALT modifiers.
      */
-    if (IS_SPECIAL(c))
+    எனில் (IS_SPECIAL(c))
     {
-	for (i = 0; modifier_keys_table[i] != 0; i += MOD_KEYS_ENTRY_SIZE)
-	    if (       KEY2TERMCAP0(c) == (int)modifier_keys_table[i + 1]
-		    && (int)KEY2TERMCAP1(c) == (int)modifier_keys_table[i + 2])
+	க்கு (i = 0; modifier_சாவிகள்_table[i] != 0; i += MOD_சாவிகள்_ENTRY_SIZE)
+	    எனில் (       KEY2TERMCAP0(c) == (முழு)modifier_சாவிகள்_table[i + 1]
+		    && (முழு)KEY2TERMCAP1(c) == (முழு)modifier_சாவிகள்_table[i + 2])
 	    {
-		modifiers |= modifier_keys_table[i];
-		c = TERMCAP2KEY(modifier_keys_table[i + 3],
-						   modifier_keys_table[i + 4]);
-		break;
+		modifiers |= modifier_சாவிகள்_table[i];
+		c = TERMCAP2_சாவி(modifier_சாவிகள்_table[i + 3],
+						   modifier_சாவிகள்_table[i + 4]);
+		நிறுத்து;
 	    }
     }
 
     // try to find the key in the special key table
-    table_idx = find_special_key_in_table(c);
+    table_idx = find_special_சாவி_in_table(c);
 
     /*
      * When not a known special key, and not a printable character, try to
      * extract modifiers.
      */
-    if (c > 0 && (*mb_char2len)(c) == 1)
+    எனில் (c > 0 && (*mb_char2len)(c) == 1)
     {
-	if (table_idx < 0
+	எனில் (table_idx < 0
 		&& (!vim_isprintc(c) || (c & 0x7f) == ' ')
 		&& (c & 0x80))
 	{
 	    c &= 0x7f;
 	    modifiers |= MOD_MASK_ALT;
 	    // try again, to find the un-alted key in the special key table
-	    table_idx = find_special_key_in_table(c);
+	    table_idx = find_special_சாவி_in_table(c);
 	}
-	if (table_idx < 0 && !vim_isprintc(c) && c < ' ')
+	எனில் (table_idx < 0 && !vim_isprintc(c) && c < ' ')
 	{
 	    c += '@';
 	    modifiers |= MOD_MASK_CTRL;
@@ -1256,17 +1256,17 @@ get_special_key_name(int c, int modifiers)
     }
 
     // translate the modifier into a string
-    for (i = 0; mod_mask_table[i].name != 'A'; i++)
-	if ((modifiers & mod_mask_table[i].mod_mask)
+    க்கு (i = 0; mod_mask_table[i].name != 'A'; i++)
+	எனில் ((modifiers & mod_mask_table[i].mod_mask)
 						== mod_mask_table[i].mod_flag)
 	{
 	    string[idx++] = mod_mask_table[i].name;
 	    string[idx++] = (char_u)'-';
 	}
 
-    if (table_idx < 0)		// unknown special key, may output t_xx
+    எனில் (table_idx < 0)		// unknown special key, may output t_xx
     {
-	if (IS_SPECIAL(c))
+	எனில் (IS_SPECIAL(c))
 	{
 	    string[idx++] = 't';
 	    string[idx++] = '_';
@@ -1274,37 +1274,37 @@ get_special_key_name(int c, int modifiers)
 	    string[idx++] = KEY2TERMCAP1(c);
 	}
 	// Not a special key, only modifiers, output directly
-	else
+	இல்லையெனில்
 	{
 	    len = (*mb_char2len)(c);
-	    if (len == 1 && vim_isprintc(c))
+	    எனில் (len == 1 && vim_isprintc(c))
 		string[idx++] = c;
-	    else if (has_mbyte && len > 1)
+	    இல்லையெனில் எனில் (has_mbyte && len > 1)
 		idx += (*mb_char2bytes)(c, string + idx);
-	    else
+	    இல்லையெனில்
 	    {
 		char_u	*s = transchar(c);
-		while (*s)
+		போது (*s)
 		    string[idx++] = *s++;
 	    }
 	}
     }
-    else		// use name of special key
+    இல்லையெனில்		// use name of special key
     {
 	string_T    *s;
 
-	s = &key_names_table[table_idx].name;
+	s = &சாவி_names_table[table_idx].name;
 
-	if (s->length + idx + 2 <= MAX_KEY_NAME_LEN)
+	எனில் (s->length + idx + 2 <= MAX_சாவி_NAME_LEN)
 	{
 	    STRCPY(string + idx, s->string);
-	    idx += (int)s->length;
+	    idx += (முழு)s->length;
 	}
     }
     string[idx++] = '>';
     string[idx] = NUL;
 
-    return string;
+    திரும்பு string;
 }
 
 /*
@@ -1313,22 +1313,22 @@ get_special_key_name(int c, int modifiers)
  * If there is a match, "srcp" is advanced to after the <> name.
  * "dst[]" must be big enough to hold the result (up to six characters)!
  */
-    int
+    முழு
 trans_special(
     char_u	**srcp,
     char_u	*dst,
-    int		flags,		// FSK_ values
-    int		escape_ks,	// escape K_SPECIAL bytes in the character
-    int		*did_simplify)  // FSK_SIMPLIFY and found <C-H> or <A-x>
+    முழு		flags,		// FSK_ values
+    முழு		escape_ks,	// escape K_SPECIAL bytes in the character
+    முழு		*did_simplify)  // FSK_SIMPLIFY and found <C-H> or <A-x>
 {
-    int		modifiers = 0;
-    int		key;
+    முழு		modifiers = 0;
+    முழு		சாவி;
 
-    key = find_special_key(srcp, &modifiers, flags, did_simplify);
-    if (key == 0)
-	return 0;
+    சாவி = find_special_சாவி(srcp, &modifiers, flags, did_simplify);
+    எனில் (சாவி == 0)
+	திரும்பு 0;
 
-    return special_to_buf(key, modifiers, escape_ks, dst);
+    திரும்பு special_to_buf(சாவி, modifiers, escape_ks, dst);
 }
 
 /*
@@ -1338,33 +1338,33 @@ trans_special(
  * The sequence is not NUL terminated.
  * This is how characters in a string are encoded.
  */
-    int
-special_to_buf(int key, int modifiers, int escape_ks, char_u *dst)
+    முழு
+special_to_buf(முழு சாவி, முழு modifiers, முழு escape_ks, char_u *dst)
 {
-    int		dlen = 0;
+    முழு		dlen = 0;
 
     // Put the appropriate modifier in a string
-    if (modifiers != 0)
+    எனில் (modifiers != 0)
     {
 	dst[dlen++] = K_SPECIAL;
 	dst[dlen++] = KS_MODIFIER;
 	dst[dlen++] = modifiers;
     }
 
-    if (IS_SPECIAL(key))
+    எனில் (IS_SPECIAL(சாவி))
     {
 	dst[dlen++] = K_SPECIAL;
-	dst[dlen++] = KEY2TERMCAP0(key);
-	dst[dlen++] = KEY2TERMCAP1(key);
+	dst[dlen++] = KEY2TERMCAP0(சாவி);
+	dst[dlen++] = KEY2TERMCAP1(சாவி);
     }
-    else if (escape_ks)
-	dlen = (int)(add_char2buf(key, dst + dlen) - dst);
-    else if (has_mbyte)
-	dlen += (*mb_char2bytes)(key, dst + dlen);
-    else
-	dst[dlen++] = key;
+    இல்லையெனில் எனில் (escape_ks)
+	dlen = (முழு)(add_char2buf(சாவி, dst + dlen) - dst);
+    இல்லையெனில் எனில் (has_mbyte)
+	dlen += (*mb_char2bytes)(சாவி, dst + dlen);
+    இல்லையெனில்
+	dst[dlen++] = சாவி;
 
-    return dlen;
+    திரும்பு dlen;
 }
 
 /*
@@ -1373,81 +1373,81 @@ special_to_buf(int key, int modifiers, int escape_ks, char_u *dst)
  * "srcp" is advanced to after the <> name.
  * returns 0 if there is no match.
  */
-    int
-find_special_key(
+    முழு
+find_special_சாவி(
     char_u	**srcp,
-    int		*modp,
-    int		flags,		// FSK_ values
-    int		*did_simplify)  // found <C-H> or <A-x>
+    முழு		*modp,
+    முழு		flags,		// FSK_ values
+    முழு		*did_simplify)  // found <C-H> or <A-x>
 {
     char_u	*last_dash;
     char_u	*end_of_name;
     char_u	*src;
     char_u	*bp;
-    int		in_string = flags & FSK_IN_STRING;
-    int		modifiers;
-    int		bit;
-    int		key;
+    முழு		in_string = flags & FSK_IN_STRING;
+    முழு		modifiers;
+    முழு		bit;
+    முழு		சாவி;
     uvarnumber_T	n;
-    int		l;
+    முழு		l;
 
     src = *srcp;
-    if (src[0] != '<')
-	return 0;
-    if (src[1] == '*')	    // <*xxx>: do not simplify
+    எனில் (src[0] != '<')
+	திரும்பு 0;
+    எனில் (src[1] == '*')	    // <*xxx>: do not simplify
 	++src;
 
     // Find end of modifier list
     last_dash = src;
-    for (bp = src + 1; *bp == '-' || vim_isNormalIDc(*bp); bp++)
+    க்கு (bp = src + 1; *bp == '-' || vim_isNormalIDc(*bp); bp++)
     {
-	if (*bp == '-')
+	எனில் (*bp == '-')
 	{
 	    last_dash = bp;
-	    if (bp[1] != NUL)
+	    எனில் (bp[1] != NUL)
 	    {
-		if (has_mbyte)
+		எனில் (has_mbyte)
 		    l = mb_ptr2len(bp + 1);
-		else
+		இல்லையெனில்
 		    l = 1;
 		// Anything accepted, like <C-?>.
 		// <C-"> or <M-"> are not special in strings as " is
 		// the string delimiter. With a backslash it works: <M-\">
-		if (!(in_string && bp[1] == '"') && bp[l + 1] == '>')
+		எனில் (!(in_string && bp[1] == '"') && bp[l + 1] == '>')
 		    bp += l;
-		else if (in_string && bp[1] == '\\' && bp[2] == '"'
+		இல்லையெனில் எனில் (in_string && bp[1] == '\\' && bp[2] == '"'
 							   && bp[3] == '>')
 		    bp += 2;
 	    }
 	}
-	if (bp[0] == 't' && bp[1] == '_' && bp[2] && bp[3])
+	எனில் (bp[0] == 't' && bp[1] == '_' && bp[2] && bp[3])
 	    bp += 3;	// skip t_xx, xx may be '-' or '>'
-	else if (STRNICMP(bp, "char-", 5) == 0)
+	இல்லையெனில் எனில் (STRNICMP(bp, "char-", 5) == 0)
 	{
-	    vim_str2nr(bp + 5, NULL, &l, STR2NR_ALL, NULL, NULL, 0, TRUE, NULL);
-	    if (l == 0)
+	    vim_str2nr(bp + 5, வெற்று, &l, STR2NR_ALL, வெற்று, வெற்று, 0, TRUE, வெற்று);
+	    எனில் (l == 0)
 	    {
 		emsg(_(e_invalid_argument));
-		return 0;
+		திரும்பு 0;
 	    }
 	    bp += l + 5;
-	    break;
+	    நிறுத்து;
 	}
     }
 
-    if (*bp == '>')	// found matching '>'
+    எனில் (*bp == '>')	// found matching '>'
     {
 	end_of_name = bp + 1;
 
 	// Which modifiers are given?
 	modifiers = 0x0;
-	for (bp = src + 1; bp < last_dash; bp++)
+	க்கு (bp = src + 1; bp < last_dash; bp++)
 	{
-	    if (*bp != '-')
+	    எனில் (*bp != '-')
 	    {
 		bit = name_to_mod_mask(*bp);
-		if (bit == 0x0)
-		    break;	// Illegal modifier name
+		எனில் (bit == 0x0)
+		    நிறுத்து;	// Illegal modifier name
 		modifiers |= bit;
 	    }
 	}
@@ -1455,39 +1455,39 @@ find_special_key(
 	/*
 	 * Legal modifier name.
 	 */
-	if (bp >= last_dash)
+	எனில் (bp >= last_dash)
 	{
-	    if (STRNICMP(last_dash + 1, "char-", 5) == 0
+	    எனில் (STRNICMP(last_dash + 1, "char-", 5) == 0
 						 && VIM_ISDIGIT(last_dash[6]))
 	    {
 		// <Char-123> or <Char-033> or <Char-0x33>
-		vim_str2nr(last_dash + 6, NULL, &l, STR2NR_ALL, NULL,
-							    &n, 0, TRUE, NULL);
-		if (l == 0)
+		vim_str2nr(last_dash + 6, வெற்று, &l, STR2NR_ALL, வெற்று,
+							    &n, 0, TRUE, வெற்று);
+		எனில் (l == 0)
 		{
 		    emsg(_(e_invalid_argument));
-		    return 0;
+		    திரும்பு 0;
 		}
-		key = (int)n;
+		சாவி = (முழு)n;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
-		int off = 1;
+		முழு off = 1;
 
 		// Modifier with single letter, or special key name.
-		if (in_string && last_dash[1] == '\\' && last_dash[2] == '"')
+		எனில் (in_string && last_dash[1] == '\\' && last_dash[2] == '"')
 		    off = 2;
-		if (has_mbyte)
+		எனில் (has_mbyte)
 		    l = mb_ptr2len(last_dash + off);
-		else
+		இல்லையெனில்
 		    l = 1;
-		if (modifiers != 0 && last_dash[l + off] == '>')
-		    key = PTR2CHAR(last_dash + off);
-		else
+		எனில் (modifiers != 0 && last_dash[l + off] == '>')
+		    சாவி = PTR2CHAR(last_dash + off);
+		இல்லையெனில்
 		{
-		    key = get_special_key_code(last_dash + off);
-		    if (!(flags & FSK_KEEP_X_KEY))
-			key = handle_x_keys(key);
+		    சாவி = get_special_சாவி_code(last_dash + off);
+		    எனில் (!(flags & FSK_KEEP_X_சாவி))
+			சாவி = handle_x_சாவிகள்(சாவி);
 		}
 	    }
 
@@ -1495,23 +1495,23 @@ find_special_key(
 	     * get_special_key_code() may return NUL for invalid
 	     * special key name.
 	     */
-	    if (key != NUL)
+	    எனில் (சாவி != NUL)
 	    {
 		/*
 		 * Only use a modifier when there is no special key code that
 		 * includes the modifier.
 		 */
-		key = simplify_key(key, &modifiers);
+		சாவி = simplify_சாவி(சாவி, &modifiers);
 
-		if ((flags & FSK_KEYCODE) == 0)
+		எனில் ((flags & FSK_KEYCODE) == 0)
 		{
 		    // don't want keycode, use single byte code
-		    if (key == K_BS)
-			key = BS;
-		    else if (key == K_DEL || key == K_KDEL)
-			key = DEL;
+		    எனில் (சாவி == K_BS)
+			சாவி = BS;
+		    இல்லையெனில் எனில் (சாவி == K_DEL || சாவி == K_KDEL)
+			சாவி = DEL;
 		}
-		else if (key == 27
+		இல்லையெனில் எனில் (சாவி == 27
 			&& (flags & FSK_FROM_PART) != 0
 			&& (kitty_protocol_state == KKPS_ENABLED
 			    || kitty_protocol_state == KKPS_DISABLED))
@@ -1520,27 +1520,27 @@ find_special_key(
 		    // Esc character.  For the simplified keys use the Esc
 		    // character and set did_simplify, then in the
 		    // non-simplified keys use K_ESC.
-		    if ((flags & FSK_SIMPLIFY) != 0)
+		    எனில் ((flags & FSK_SIMPLIFY) != 0)
 		    {
-			if (did_simplify != NULL)
+			எனில் (did_simplify != வெற்று)
 			    *did_simplify = TRUE;
 		    }
-		    else
-			key = K_ESC;
+		    இல்லையெனில்
+			சாவி = K_ESC;
 		}
 
 		// Normal Key with modifier: Try to make a single byte code.
-		if (!IS_SPECIAL(key))
-		    key = extract_modifiers(key, &modifiers,
+		எனில் (!IS_SPECIAL(சாவி))
+		    சாவி = extract_modifiers(சாவி, &modifiers,
 					   flags & FSK_SIMPLIFY, did_simplify);
 
 		*modp = modifiers;
 		*srcp = end_of_name;
-		return key;
+		திரும்பு சாவி;
 	    }
 	}
     }
-    return 0;
+    திரும்பு 0;
 }
 
 
@@ -1554,33 +1554,33 @@ find_special_key(
  * use "H".
  * Returns the possibly adjusted key.
  */
-    int
-may_adjust_key_for_ctrl(int modifiers, int key)
+    முழு
+may_adjust_சாவி_for_ctrl(முழு modifiers, முழு சாவி)
 {
-    if ((modifiers & MOD_MASK_CTRL) == 0)
-	return key;
+    எனில் ((modifiers & MOD_MASK_CTRL) == 0)
+	திரும்பு சாவி;
 
-    if (ASCII_ISALPHA(key))
+    எனில் (ASCII_ISALPHA(சாவி))
     {
 #ifdef FEAT_TERMINAL
-	check_no_reduce_keys();  // may update the no_reduce_keys flag
+	check_no_reduce_சாவிகள்();  // may update the no_reduce_keys flag
 #endif
-	return no_reduce_keys == 0 ? TOUPPER_ASC(key) : key;
+	திரும்பு no_reduce_சாவிகள் == 0 ? TOUPPER_ASC(சாவி) : சாவி;
     }
-    if (key == '2')
-	return '@';
-    if (key == '6')
-	return '^';
-    if (key == '-')
-	return '_';
+    எனில் (சாவி == '2')
+	திரும்பு '@';
+    எனில் (சாவி == '6')
+	திரும்பு '^';
+    எனில் (சாவி == '-')
+	திரும்பு '_';
 
     // On a Belgian keyboard AltGr $ is ']', on other keyboards '$' can only be
     // obtained with Shift.  Assume that '$' without shift implies a Belgian
     // keyboard, where CTRL-$ means CTRL-].
-    if (key == '$' && (modifiers & MOD_MASK_SHIFT) == 0)
-	return ']';
+    எனில் (சாவி == '$' && (modifiers & MOD_MASK_SHIFT) == 0)
+	திரும்பு ']';
 
-    return key;
+    திரும்பு சாவி;
 }
 
 /*
@@ -1591,27 +1591,27 @@ may_adjust_key_for_ctrl(int modifiers, int key)
  * This includes all printable ASCII characters except a-z.
  * Digits are included because with AZERTY the Shift key is used to get them.
  */
-    int
-may_remove_shift_modifier(int modifiers, int key)
+    முழு
+may_remove_shift_modifier(முழு modifiers, முழு சாவி)
 {
-    if ((modifiers == MOD_MASK_SHIFT
+    எனில் ((modifiers == MOD_MASK_SHIFT
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_ALT)
 #ifdef FEAT_GUI_GTK
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_CMD)
 #endif
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_META))
-	    && ((key >= '!' && key <= '/')
-		|| (key >= ':' && key <= 'Z')
-		|| vim_isdigit(key)
-		|| (key >= '[' && key <= '`')
-		|| (key >= '{' && key <= '~')))
-	return modifiers & ~MOD_MASK_SHIFT;
+	    && ((சாவி >= '!' && சாவி <= '/')
+		|| (சாவி >= ':' && சாவி <= 'Z')
+		|| vim_isdigit(சாவி)
+		|| (சாவி >= '[' && சாவி <= '`')
+		|| (சாவி >= '{' && சாவி <= '~')))
+	திரும்பு modifiers & ~MOD_MASK_SHIFT;
 
-    if (modifiers == (MOD_MASK_SHIFT | MOD_MASK_CTRL)
-		&& (key == '{' || key == '}' || key == '|'))
-	return modifiers & ~MOD_MASK_SHIFT;
+    எனில் (modifiers == (MOD_MASK_SHIFT | MOD_MASK_CTRL)
+		&& (சாவி == '{' || சாவி == '}' || சாவி == '|'))
+	திரும்பு modifiers & ~MOD_MASK_SHIFT;
 
-    return modifiers;
+    திரும்பு modifiers;
 }
 
 /*
@@ -1621,73 +1621,73 @@ may_remove_shift_modifier(int modifiers, int key)
  * When "simplify" is TRUE and Ctrl or Alt is removed from modifiers set
  * "did_simplify" when it's not NULL.
  */
-    int
-extract_modifiers(int key, int *modp, int simplify, int *did_simplify)
+    முழு
+extract_modifiers(முழு சாவி, முழு *modp, முழு simplify, முழு *did_simplify)
 {
-    int	modifiers = *modp;
+    முழு	modifiers = *modp;
 
 #ifdef MACOS_X
     // Command-key really special, no fancynest
-    if (!(modifiers & MOD_MASK_CMD))
+    எனில் (!(modifiers & MOD_MASK_CMD))
 #endif
-    if ((modifiers & MOD_MASK_SHIFT) && ASCII_ISALPHA(key))
+    எனில் ((modifiers & MOD_MASK_SHIFT) && ASCII_ISALPHA(சாவி))
     {
-	key = TOUPPER_ASC(key);
+	சாவி = TOUPPER_ASC(சாவி);
 	// With <C-S-a> we keep the shift modifier.
 	// With <S-a>, <A-S-a> and <S-A> we don't keep the shift modifier.
-	if (simplify || modifiers == MOD_MASK_SHIFT
+	எனில் (simplify || modifiers == MOD_MASK_SHIFT
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_ALT)
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_META))
 	    modifiers &= ~MOD_MASK_SHIFT;
     }
 
     // <C-H> and <C-h> mean the same thing, always use "H"
-    if ((modifiers & MOD_MASK_CTRL) && ASCII_ISALPHA(key))
-	key = TOUPPER_ASC(key);
+    எனில் ((modifiers & MOD_MASK_CTRL) && ASCII_ISALPHA(சாவி))
+	சாவி = TOUPPER_ASC(சாவி);
 
-    if (simplify && (modifiers & MOD_MASK_CTRL)
-	    && ((key >= '?' && key <= '_') || ASCII_ISALPHA(key)))
+    எனில் (simplify && (modifiers & MOD_MASK_CTRL)
+	    && ((சாவி >= '?' && சாவி <= '_') || ASCII_ISALPHA(சாவி)))
     {
-	key = Ctrl_chr(key);
+	சாவி = Ctrl_chr(சாவி);
 	modifiers &= ~MOD_MASK_CTRL;
 	// <C-@> is <Nul>
-	if (key == NUL)
-	    key = K_ZERO;
-	if (did_simplify != NULL)
+	எனில் (சாவி == NUL)
+	    சாவி = K_ZERO;
+	எனில் (did_simplify != வெற்று)
 	    *did_simplify = TRUE;
     }
 
 #ifdef MACOS_X
     // Command-key really special, no fancynest
-    if (!(modifiers & MOD_MASK_CMD))
+    எனில் (!(modifiers & MOD_MASK_CMD))
 #endif
-    if (simplify && (modifiers & MOD_MASK_ALT) && key < 0x80
+    எனில் (simplify && (modifiers & MOD_MASK_ALT) && சாவி < 0x80
 	    && !enc_dbcs)		// avoid creating a lead byte
     {
-	key |= 0x80;
+	சாவி |= 0x80;
 	modifiers &= ~MOD_MASK_ALT;	// remove the META modifier
-	if (did_simplify != NULL)
+	எனில் (did_simplify != வெற்று)
 	    *did_simplify = TRUE;
     }
 
     *modp = modifiers;
-    return key;
+    திரும்பு சாவி;
 }
 
 /*
  * Try to find key "c" in the special key table.
  * Return the index when found, -1 when not found.
  */
-    int
-find_special_key_in_table(int c)
+    முழு
+find_special_சாவி_in_table(முழு c)
 {
-    int	    i;
+    முழு	    i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(key_names_table); i++)
-	if (c == key_names_table[i].key && !key_names_table[i].is_alt)
-	    return key_names_table[i].enabled ? i : -1;
+    க்கு (i = 0; i < (முழு)ARRAY_LENGTH(சாவி_names_table); i++)
+	எனில் (c == சாவி_names_table[i].சாவி && !சாவி_names_table[i].is_alt)
+	    திரும்பு சாவி_names_table[i].enabled ? i : -1;
 
-    return -1;
+    திரும்பு -1;
 }
 
 
@@ -1700,38 +1700,38 @@ find_special_key_in_table(int c)
  * 'LeftMouse'.
  * These characters are identified by vim_isNormalIDc().
  */
-    static int
-cmp_key_name_entry(const void *a, const void *b)
+    நிலையான முழு
+cmp_சாவி_name_entry(மாறிலி வெறுமை *a, மாறிலி வெறுமை *b)
 {
-    char_u  *p1 = ((struct key_name_entry *)a)->name.string;
-    char_u  *p2 = ((struct key_name_entry *)b)->name.string;
-    int	    result = 0;
+    char_u  *p1 = ((கட்டமைப்பு சாவி_name_entry *)a)->name.string;
+    char_u  *p2 = ((கட்டமைப்பு சாவி_name_entry *)b)->name.string;
+    முழு	    result = 0;
 
-    if (p1 == p2)
-	return 0;
+    எனில் (p1 == p2)
+	திரும்பு 0;
 
-    while (vim_isNormalIDc(*p1) && *p2 != NUL)
+    போது (vim_isNormalIDc(*p1) && *p2 != NUL)
     {
-	if ((result = TOLOWER_ASC(*p1) - TOLOWER_ASC(*p2)) != 0)
-	    break;
+	எனில் ((result = TOLOWER_ASC(*p1) - TOLOWER_ASC(*p2)) != 0)
+	    நிறுத்து;
 	++p1;
 	++p2;
     }
 
-    if (result == 0)
+    எனில் (result == 0)
     {
-	if (*p2 == NUL)
+	எனில் (*p2 == NUL)
 	{
-	    if (vim_isNormalIDc(*p1))
+	    எனில் (vim_isNormalIDc(*p1))
 		result = 1;
 	}
-	else
+	இல்லையெனில்
 	{
 	    result = -1;
 	}
     }
 
-    return result;
+    திரும்பு result;
 }
 
 /*
@@ -1741,99 +1741,99 @@ cmp_key_name_entry(const void *a, const void *b)
  * termcap name.
  * Return the key code, or 0 if not found.
  */
-    int
-get_special_key_code(char_u *name)
+    முழு
+get_special_சாவி_code(char_u *name)
 {
     /*
      * If it's <t_xx> we get the code for xx from the termcap
      */
-    if (name[0] == 't' && name[1] == '_' && name[2] != NUL && name[3] != NUL)
+    எனில் (name[0] == 't' && name[1] == '_' && name[2] != NUL && name[3] != NUL)
     {
 	char_u  string[3];
 
 	string[0] = name[2];
 	string[1] = name[3];
 	string[2] = NUL;
-	if (add_termcap_entry(string, FALSE) == OK)
-	    return TERMCAP2KEY(name[2], name[3]);
+	எனில் (add_termcap_entry(string, FALSE) == OK)
+	    திரும்பு TERMCAP2_சாவி(name[2], name[3]);
     }
-    else
+    இல்லையெனில்
     {
-	struct key_name_entry	target;
-	struct key_name_entry	*entry;
+	கட்டமைப்பு சாவி_name_entry	target;
+	கட்டமைப்பு சாவி_name_entry	*entry;
 
 	target.enabled = TRUE;
-	target.key = 0;
+	target.சாவி = 0;
 	target.name.string = name;
 	target.name.length = 0;
 
-	entry = (struct key_name_entry *)bsearch(
+	entry = (கட்டமைப்பு சாவி_name_entry *)bsearch(
 	    &target,
-	    &key_names_table,
-	    ARRAY_LENGTH(key_names_table),
-	    sizeof(key_names_table[0]),
-	    cmp_key_name_entry);
-	if (entry != NULL && entry->enabled)
+	    &சாவி_names_table,
+	    ARRAY_LENGTH(சாவி_names_table),
+	    அளவு(சாவி_names_table[0]),
+	    cmp_சாவி_name_entry);
+	எனில் (entry != வெற்று && entry->enabled)
 	{
-	    int key = entry->key;
+	    முழு சாவி = entry->சாவி;
 	    // Both TAB and K_TAB have name "Tab", and it's unspecified which
 	    // one bsearch() will return.  TAB is the expected one.
-	    return key == K_TAB ? TAB : key;
+	    திரும்பு சாவி == K_TAB ? TAB : சாவி;
 	}
     }
 
-    return 0;
+    திரும்பு 0;
 }
 
     char_u *
-get_key_name(int i)
+get_சாவி_name(முழு i)
 {
-    if (i < 0 || i >= (int)ARRAY_LENGTH(key_names_table))
-	return NULL;
+    எனில் (i < 0 || i >= (முழு)ARRAY_LENGTH(சாவி_names_table))
+	திரும்பு வெற்று;
 
-    return key_names_table[i].name.string;
+    திரும்பு சாவி_names_table[i].name.string;
 }
 
 /*
  * Return the current end-of-line type: EOL_DOS, EOL_UNIX or EOL_MAC.
  */
-    int
+    முழு
 get_fileformat(buf_T *buf)
 {
-    int		c = *buf->b_p_ff;
+    முழு		c = *buf->b_p_ff;
 
-    if (buf->b_p_bin || c == 'u')
-	return EOL_UNIX;
-    if (c == 'm')
-	return EOL_MAC;
-    return EOL_DOS;
+    எனில் (buf->b_p_bin || c == 'u')
+	திரும்பு EOL_UNIX;
+    எனில் (c == 'm')
+	திரும்பு EOL_MAC;
+    திரும்பு EOL_DOS;
 }
 
 /*
  * Like get_fileformat(), but override 'fileformat' with "p" for "++opt=val"
  * argument.
  */
-    int
+    முழு
 get_fileformat_force(
     buf_T	*buf,
     exarg_T	*eap)	    // can be NULL!
 {
-    int		c;
+    முழு		c;
 
-    if (eap != NULL && eap->force_ff != 0)
+    எனில் (eap != வெற்று && eap->force_ff != 0)
 	c = eap->force_ff;
-    else
+    இல்லையெனில்
     {
-	if ((eap != NULL && eap->force_bin != 0)
+	எனில் ((eap != வெற்று && eap->force_bin != 0)
 			       ? (eap->force_bin == FORCE_BIN) : buf->b_p_bin)
-	    return EOL_UNIX;
+	    திரும்பு EOL_UNIX;
 	c = *buf->b_p_ff;
     }
-    if (c == 'u')
-	return EOL_UNIX;
-    if (c == 'm')
-	return EOL_MAC;
-    return EOL_DOS;
+    எனில் (c == 'u')
+	திரும்பு EOL_UNIX;
+    எனில் (c == 'm')
+	திரும்பு EOL_MAC;
+    திரும்பு EOL_DOS;
 }
 
 /*
@@ -1841,36 +1841,36 @@ get_fileformat_force(
  * Sets both 'textmode' and 'fileformat'.
  * Note: Does _not_ set global value of 'textmode'!
  */
-    void
+    வெறுமை
 set_fileformat(
-    int		t,
-    int		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
+    முழு		t,
+    முழு		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
 {
-    char	*p = NULL;
+    எழுத்து	*p = வெற்று;
 
-    switch (t)
+    தேர்வு (t)
     {
-    case EOL_DOS:
+    நிலை EOL_DOS:
 	p = FF_DOS;
 	curbuf->b_p_tx = TRUE;
-	break;
-    case EOL_UNIX:
+	நிறுத்து;
+    நிலை EOL_UNIX:
 	p = FF_UNIX;
 	curbuf->b_p_tx = FALSE;
-	break;
-    case EOL_MAC:
+	நிறுத்து;
+    நிலை EOL_MAC:
 	p = FF_MAC;
 	curbuf->b_p_tx = FALSE;
-	break;
+	நிறுத்து;
     }
-    if (p != NULL)
+    எனில் (p != வெற்று)
 	set_string_option_direct((char_u *)"ff", -1, (char_u *)p,
 						     OPT_FREE | opt_flags, 0);
 
     // This may cause the buffer to become (un)modified.
     check_status(curbuf);
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#எனில் defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
     need_maketitle = TRUE;	    // set window title later
@@ -1879,48 +1879,48 @@ set_fileformat(
 /*
  * Return the default fileformat from 'fileformats'.
  */
-    int
-default_fileformat(void)
+    முழு
+default_fileformat(வெறுமை)
 {
-    switch (*p_ffs)
+    தேர்வு (*p_ffs)
     {
-	case 'm':   return EOL_MAC;
-	case 'd':   return EOL_DOS;
+	நிலை 'm':   திரும்பு EOL_MAC;
+	நிலை 'd':   திரும்பு EOL_DOS;
     }
-    return EOL_UNIX;
+    திரும்பு EOL_UNIX;
 }
 
 /*
  * Call shell.	Calls mch_call_shell, with 'shellxquote' added.
  */
-    int
-call_shell(char_u *cmd, int opt)
+    முழு
+call_shell(char_u *cmd, முழு opt)
 {
-    int		retval;
+    முழு		retval;
 #ifdef FEAT_PROFILE
     proftime_T	wait_time;
 #endif
 
-    if (p_verbose > 3)
+    எனில் (p_verbose > 3)
     {
 	verbose_enter();
-	smsg(_("Calling shell to execute: \"%s\""), cmd == NULL ? p_sh : cmd);
-	msg_putchar_attr('\n', 0);
+	smsg(_("Calling shell to execute: \"%s\""), cmd == வெற்று ? p_sh : cmd);
+	செய்தி_putchar_attr('\n', 0);
 	cursor_on();
 	verbose_leave();
     }
 
 #ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    எனில் (do_profiling == PROF_YES)
 	prof_child_enter(&wait_time);
 #endif
 
-    if (*p_sh == NUL)
+    எனில் (*p_sh == NUL)
     {
 	emsg(_(e_shell_option_is_empty));
 	retval = -1;
     }
-    else
+    இல்லையெனில்
     {
 #ifdef FEAT_GUI_MSWIN
 	// Don't hide the pointer while executing a shell command.
@@ -1932,35 +1932,35 @@ call_shell(char_u *cmd, int opt)
 	// The external command may update a tags file, clear cached tags.
 	tag_freematch();
 
-	if (cmd == NULL || *p_sxq == NUL)
+	எனில் (cmd == வெற்று || *p_sxq == NUL)
 	    retval = mch_call_shell(cmd, opt);
-	else
+	இல்லையெனில்
 	{
 	    char_u  *ncmd;
 	    size_t  ncmdsize;
 	    char_u  *ecmd = cmd;
 
-	    if (*p_sxe != NUL && *p_sxq == '(')
+	    எனில் (*p_sxe != NUL && *p_sxq == '(')
 	    {
 		ecmd = vim_strsave_escaped_ext(cmd, p_sxe, '^', FALSE);
-		if (ecmd == NULL)
+		எனில் (ecmd == வெற்று)
 		    ecmd = cmd;
 	    }
 	    ncmdsize = STRLEN(ecmd) + STRLEN(p_sxq) * 2 + 1;
 	    ncmd = alloc(ncmdsize);
-	    if (ncmd != NULL)
+	    எனில் (ncmd != வெற்று)
 	    {
 		// When 'shellxquote' is ( append ).
 		// When 'shellxquote' is "( append )".
-		vim_snprintf((char *)ncmd, ncmdsize, "%s%s%s", p_sxq, ecmd, *p_sxq == '(' ? (char_u *)")"
+		vim_snprintf((எழுத்து *)ncmd, ncmdsize, "%s%s%s", p_sxq, ecmd, *p_sxq == '(' ? (char_u *)")"
 		    : *p_sxq == '"' && *(p_sxq+1) == '(' ? (char_u *)")\""
 		    : p_sxq);
 		retval = mch_call_shell(ncmd, opt);
 		vim_free(ncmd);
 	    }
-	    else
+	    இல்லையெனில்
 		retval = -1;
-	    if (ecmd != cmd)
+	    எனில் (ecmd != cmd)
 		vim_free(ecmd);
 	}
 #ifdef FEAT_GUI
@@ -1976,12 +1976,12 @@ call_shell(char_u *cmd, int opt)
 #ifdef FEAT_EVAL
     set_vim_var_nr(VV_SHELL_ERROR, (long)retval);
 # ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    எனில் (do_profiling == PROF_YES)
 	prof_child_exit(&wait_time);
 # endif
 #endif
 
-    return retval;
+    திரும்பு retval;
 }
 
 /*
@@ -1989,21 +1989,21 @@ call_shell(char_u *cmd, int opt)
  * equal to MODE_NORMAL State with a condition.  This function returns the real
  * State.
  */
-    int
-get_real_state(void)
+    முழு
+get_real_state(வெறுமை)
 {
-    if (State & MODE_NORMAL)
+    எனில் (State & MODE_NORMAL)
     {
-	if (VIsual_active)
+	எனில் (VIsual_active)
 	{
-	    if (VIsual_select)
-		return MODE_SELECT;
-	    return MODE_VISUAL;
+	    எனில் (VIsual_select)
+		திரும்பு MODE_SELECT;
+	    திரும்பு MODE_VISUAL;
 	}
-	else if (finish_op)
-	    return MODE_OP_PENDING;
+	இல்லையெனில் எனில் (finish_op)
+	    திரும்பு MODE_OP_PENDING;
     }
-    return State;
+    திரும்பு State;
 }
 
 /*
@@ -2011,10 +2011,10 @@ get_real_state(void)
  * Takes care of multi-byte characters.
  * "b" must point to the start of the file name
  */
-    int
+    முழு
 after_pathsep(char_u *b, char_u *p)
 {
-    return p > b && vim_ispathsep(p[-1])
+    திரும்பு p > b && vim_ispathsep(p[-1])
 			     && (!has_mbyte || (*mb_head_off)(b, p - 1) == 0);
 }
 
@@ -2022,7 +2022,7 @@ after_pathsep(char_u *b, char_u *p)
  * Return TRUE if file names "f1" and "f2" are in the same directory.
  * "f1" may be a short name, "f2" must be a full path.
  */
-    int
+    முழு
 same_directory(char_u *f1, char_u *f2)
 {
     char_u	ffname[MAXPATHL];
@@ -2030,17 +2030,17 @@ same_directory(char_u *f1, char_u *f2)
     char_u	*t2;
 
     // safety check
-    if (f1 == NULL || f2 == NULL)
-	return FALSE;
+    எனில் (f1 == வெற்று || f2 == வெற்று)
+	திரும்பு FALSE;
 
-    (void)vim_FullName(f1, ffname, MAXPATHL, FALSE);
+    (வெறுமை)vim_FullName(f1, ffname, MAXPATHL, FALSE);
     t1 = gettail_sep(ffname);
     t2 = gettail_sep(f2);
-    return (t1 - ffname == t2 - f2
-	     && pathcmp((char *)ffname, (char *)f2, (int)(t1 - ffname)) == 0);
+    திரும்பு (t1 - ffname == t2 - f2
+	     && pathcmp((எழுத்து *)ffname, (எழுத்து *)f2, (முழு)(t1 - ffname)) == 0);
 }
 
-#if defined(FEAT_SESSION) || defined(FEAT_AUTOCHDIR) \
+#எனில் defined(FEAT_SESSION) || defined(FEAT_AUTOCHDIR) \
 	|| defined(MSWIN) || defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_NETBEANS_INTG)
 /*
@@ -2048,72 +2048,72 @@ same_directory(char_u *f1, char_u *f2)
  * Caller must call shorten_fnames()!
  * Return OK or FAIL.
  */
-    int
-vim_chdirfile(char_u *fname, char *trigger_autocmd)
+    முழு
+vim_chdirfile(char_u *fname, எழுத்து *trigger_autocmd)
 {
     char_u	old_dir[MAXPATHL];
     char_u	new_dir[MAXPATHL];
 
-    if (mch_dirname(old_dir, MAXPATHL) != OK)
+    எனில் (mch_dirname(old_dir, MAXPATHL) != OK)
 	*old_dir = NUL;
 
     vim_strncpy(new_dir, fname, MAXPATHL - 1);
     *gettail_sep(new_dir) = NUL;
 
-    if (pathcmp((char *)old_dir, (char *)new_dir, -1) == 0)
+    எனில் (pathcmp((எழுத்து *)old_dir, (எழுத்து *)new_dir, -1) == 0)
 	// nothing to do
-	return OK;
+	திரும்பு OK;
 
-    if (trigger_autocmd != NULL)
+    எனில் (trigger_autocmd != வெற்று)
 	trigger_DirChangedPre((char_u *)trigger_autocmd, new_dir);
 
-    if (mch_chdir((char *)new_dir) != 0)
-	return FAIL;
+    எனில் (mch_chdir((எழுத்து *)new_dir) != 0)
+	திரும்பு FAIL;
 
-    if (trigger_autocmd != NULL)
+    எனில் (trigger_autocmd != வெற்று)
 	apply_autocmds(EVENT_DIRCHANGED, (char_u *)trigger_autocmd,
 						       new_dir, FALSE, curbuf);
-    return OK;
+    திரும்பு OK;
 }
 #endif
 
-#if defined(STAT_IGNORES_SLASH)
+#எனில் defined(STAT_IGNORES_SLASH)
 /*
  * Check if "name" ends in a slash and is not a directory.
  * Used for systems where stat() ignores a trailing slash on a file name.
  * The Vim code assumes a trailing slash is only ignored for a directory.
  */
-    static int
-illegal_slash(const char *name)
+    நிலையான முழு
+illegal_slash(மாறிலி எழுத்து *name)
 {
-    if (name[0] == NUL)
-	return FALSE;	    // no file name is not illegal
-    if (name[strlen(name) - 1] != '/')
-	return FALSE;	    // no trailing slash
-    if (mch_isdir((char_u *)name))
-	return FALSE;	    // trailing slash for a directory
-    return TRUE;
+    எனில் (name[0] == NUL)
+	திரும்பு FALSE;	    // no file name is not illegal
+    எனில் (name[strlen(name) - 1] != '/')
+	திரும்பு FALSE;	    // no trailing slash
+    எனில் (mch_isdir((char_u *)name))
+	திரும்பு FALSE;	    // trailing slash for a directory
+    திரும்பு TRUE;
 }
 
 /*
  * Special implementation of mch_stat() for Solaris.
  */
-    int
-vim_stat(const char *name, stat_T *stp)
+    முழு
+vim_stat(மாறிலி எழுத்து *name, stat_T *stp)
 {
     // On Solaris stat() accepts "file/" as if it was "file".  Return -1 if
     // the name ends in "/" and it's not a directory.
-    return illegal_slash(name) ? -1 : stat(name, stp);
+    திரும்பு illegal_slash(name) ? -1 : stat(name, stp);
 }
 #endif
 
-#if defined(CURSOR_SHAPE)
+#எனில் defined(CURSOR_SHAPE)
 
 /*
  * Handling of cursor and mouse pointer shapes in various modes.
  */
 
-cursorentry_T shape_table[SHAPE_IDX_COUNT] =
+cursorentry_T shape_table[SHAPE_IDX_மொத்தம்] =
 {
     // The values will be filled in from the 'guicursor' and 'mouseshape'
     // defaults when Vim starts.
@@ -2142,7 +2142,7 @@ cursorentry_T shape_table[SHAPE_IDX_COUNT] =
  * Table with names for mouse shapes.  Keep in sync with all the tables for
  * mch_set_mouse_shape()!.
  */
-static string_T mshape_names[] =
+நிலையான string_T mshape_names[] =
 {
     STR_LITERAL_INIT("arrow"),	// default, must be the first one
     STR_LITERAL_INIT("blank"),	// hidden
@@ -2160,10 +2160,10 @@ static string_T mshape_names[] =
     STR_LITERAL_INIT("question"),
     STR_LITERAL_INIT("rightup-arrow"),
     STR_LITERAL_INIT("up-arrow"),
-    {NULL, 0}
+    {வெற்று, 0}
 };
 
-#  define MSHAPE_NAMES_COUNT  (ARRAY_LENGTH(mshape_names) - 1)
+#  define MSHAPE_NAMES_மொத்தம்  (ARRAY_LENGTH(mshape_names) - 1)
 # endif
 
 /*
@@ -2171,88 +2171,88 @@ static string_T mshape_names[] =
  * ("what" is SHAPE_MOUSE).
  * Returns error message for an illegal option, NULL otherwise.
  */
-    char *
-parse_shape_opt(int what)
+    எழுத்து *
+parse_shape_opt(முழு what)
 {
     char_u	*modep;
     char_u	*colonp;
     char_u	*commap;
     char_u	*slashp;
     char_u	*p, *endp;
-    int		idx = 0;		// init for GCC
-    int		all_idx;
-    int		len;
-    int		i;
+    முழு		idx = 0;		// init for GCC
+    முழு		all_idx;
+    முழு		len;
+    முழு		i;
     long	n;
-    int		found_ve = FALSE;	// found "ve" flag
-    int		round;
+    முழு		found_ve = FALSE;	// found "ve" flag
+    முழு		round;
 
     /*
      * First round: check for errors; second round: do it for real.
      */
-    for (round = 1; round <= 2; ++round)
+    க்கு (round = 1; round <= 2; ++round)
     {
 	/*
 	 * Repeat for all comma separated parts.
 	 */
 # ifdef FEAT_MOUSESHAPE
-	if (what == SHAPE_MOUSE)
+	எனில் (what == SHAPE_MOUSE)
 	    modep = p_mouseshape;
-	else
+	இல்லையெனில்
 # endif
 	    modep = p_guicursor;
-	while (*modep != NUL)
+	போது (*modep != NUL)
 	{
 	    colonp = vim_strchr(modep, ':');
 	    commap = vim_strchr(modep, ',');
 
-	    if (colonp == NULL || (commap != NULL && commap < colonp))
-		return e_missing_colon_2;
-	    if (colonp == modep)
-		return e_illegal_mode;
+	    எனில் (colonp == வெற்று || (commap != வெற்று && commap < colonp))
+		திரும்பு e_missing_colon_2;
+	    எனில் (colonp == modep)
+		திரும்பு e_illegal_mode;
 
 	    /*
 	     * Repeat for all mode's before the colon.
 	     * For the 'a' mode, we loop to handle all the modes.
 	     */
 	    all_idx = -1;
-	    while (modep < colonp || all_idx >= 0)
+	    போது (modep < colonp || all_idx >= 0)
 	    {
-		if (all_idx < 0)
+		எனில் (all_idx < 0)
 		{
 		    // Find the mode.
-		    if (modep[1] == '-' || modep[1] == ':')
+		    எனில் (modep[1] == '-' || modep[1] == ':')
 			len = 1;
-		    else
+		    இல்லையெனில்
 			len = 2;
-		    if (len == 1 && TOLOWER_ASC(modep[0]) == 'a')
-			all_idx = SHAPE_IDX_COUNT - 1;
-		    else
+		    எனில் (len == 1 && TOLOWER_ASC(modep[0]) == 'a')
+			all_idx = SHAPE_IDX_மொத்தம் - 1;
+		    இல்லையெனில்
 		    {
-			for (idx = 0; idx < SHAPE_IDX_COUNT; ++idx)
-			    if (STRNICMP(modep, shape_table[idx].name, len)
+			க்கு (idx = 0; idx < SHAPE_IDX_மொத்தம்; ++idx)
+			    எனில் (STRNICMP(modep, shape_table[idx].name, len)
 									 == 0)
-				break;
-			if (idx == SHAPE_IDX_COUNT
+				நிறுத்து;
+			எனில் (idx == SHAPE_IDX_மொத்தம்
 				   || (shape_table[idx].used_for & what) == 0)
-			    return e_illegal_mode;
-			if (len == 2 && modep[0] == 'v' && modep[1] == 'e')
+			    திரும்பு e_illegal_mode;
+			எனில் (len == 2 && modep[0] == 'v' && modep[1] == 'e')
 			    found_ve = TRUE;
 		    }
 		    modep += len + 1;
 		}
 
-		if (all_idx >= 0)
+		எனில் (all_idx >= 0)
 		    idx = all_idx--;
-		else if (round == 2)
+		இல்லையெனில் எனில் (round == 2)
 		{
 # ifdef FEAT_MOUSESHAPE
-		    if (what == SHAPE_MOUSE)
+		    எனில் (what == SHAPE_MOUSE)
 		    {
 			// Set the default, for the missing parts
 			shape_table[idx].mshape = 0;
 		    }
-		    else
+		    இல்லையெனில்
 # endif
 		    {
 			// Set the defaults, for the missing parts
@@ -2264,34 +2264,34 @@ parse_shape_opt(int what)
 		}
 
 		// Parse the part after the colon
-		for (p = colonp + 1; *p && *p != ','; )
+		க்கு (p = colonp + 1; *p && *p != ','; )
 		{
 # ifdef FEAT_MOUSESHAPE
-		    if (what == SHAPE_MOUSE)
+		    எனில் (what == SHAPE_MOUSE)
 		    {
-			for (i = 0; ; ++i)
+			க்கு (i = 0; ; ++i)
 			{
-			    if (mshape_names[i].string == NULL)
+			    எனில் (mshape_names[i].string == வெற்று)
 			    {
-				if (!VIM_ISDIGIT(*p))
-				    return e_illegal_mouseshape;
-				if (round == 2)
+				எனில் (!VIM_ISDIGIT(*p))
+				    திரும்பு e_illegal_mouseshape;
+				எனில் (round == 2)
 				    shape_table[idx].mshape =
 					      getdigits(&p) + MSHAPE_NUMBERED;
-				else
-				    (void)getdigits(&p);
-				break;
+				இல்லையெனில்
+				    (வெறுமை)getdigits(&p);
+				நிறுத்து;
 			    }
-			    if (STRNICMP(p, mshape_names[i].string, mshape_names[i].length) == 0)
+			    எனில் (STRNICMP(p, mshape_names[i].string, mshape_names[i].length) == 0)
 			    {
-				if (round == 2)
+				எனில் (round == 2)
 				    shape_table[idx].mshape = i;
 				p += mshape_names[i].length;
-				break;
+				நிறுத்து;
 			    }
 			}
 		    }
-		    else // if (what == SHAPE_MOUSE)
+		    இல்லையெனில் // if (what == SHAPE_MOUSE)
 # endif
 		    {
 			/*
@@ -2299,99 +2299,99 @@ parse_shape_opt(int what)
 			 */
 			i = *p;
 			len = 0;
-			if (STRNICMP(p, "ver", 3) == 0)
+			எனில் (STRNICMP(p, "ver", 3) == 0)
 			    len = 3;
-			else if (STRNICMP(p, "hor", 3) == 0)
+			இல்லையெனில் எனில் (STRNICMP(p, "hor", 3) == 0)
 			    len = 3;
-			else if (STRNICMP(p, "blinkwait", 9) == 0)
+			இல்லையெனில் எனில் (STRNICMP(p, "blinkwait", 9) == 0)
 			    len = 9;
-			else if (STRNICMP(p, "blinkon", 7) == 0)
+			இல்லையெனில் எனில் (STRNICMP(p, "blinkon", 7) == 0)
 			    len = 7;
-			else if (STRNICMP(p, "blinkoff", 8) == 0)
+			இல்லையெனில் எனில் (STRNICMP(p, "blinkoff", 8) == 0)
 			    len = 8;
-			if (len != 0)
+			எனில் (len != 0)
 			{
 			    p += len;
-			    if (!VIM_ISDIGIT(*p))
-				return e_digit_expected;
+			    எனில் (!VIM_ISDIGIT(*p))
+				திரும்பு e_digit_expected;
 			    n = getdigits(&p);
-			    if (len == 3)   // "ver" or "hor"
+			    எனில் (len == 3)   // "ver" or "hor"
 			    {
-				if (n == 0)
-				    return e_illegal_percentage;
-				if (round == 2)
+				எனில் (n == 0)
+				    திரும்பு e_illegal_percentage;
+				எனில் (round == 2)
 				{
-				    if (TOLOWER_ASC(i) == 'v')
+				    எனில் (TOLOWER_ASC(i) == 'v')
 					shape_table[idx].shape = SHAPE_VER;
-				    else
+				    இல்லையெனில்
 					shape_table[idx].shape = SHAPE_HOR;
 				    shape_table[idx].percentage = n;
 				}
 			    }
-			    else if (round == 2)
+			    இல்லையெனில் எனில் (round == 2)
 			    {
-				if (len == 9)
+				எனில் (len == 9)
 				    shape_table[idx].blinkwait = n;
-				else if (len == 7)
+				இல்லையெனில் எனில் (len == 7)
 				    shape_table[idx].blinkon = n;
-				else
+				இல்லையெனில்
 				    shape_table[idx].blinkoff = n;
 			    }
 			}
-			else if (STRNICMP(p, "block", 5) == 0)
+			இல்லையெனில் எனில் (STRNICMP(p, "block", 5) == 0)
 			{
-			    if (round == 2)
+			    எனில் (round == 2)
 				shape_table[idx].shape = SHAPE_BLOCK;
 			    p += 5;
 			}
-			else	// must be a highlight group name then
+			இல்லையெனில்	// must be a highlight group name then
 			{
 			    endp = vim_strchr(p, '-');
-			    if (commap == NULL)		    // last part
+			    எனில் (commap == வெற்று)		    // last part
 			    {
-				if (endp == NULL)
+				எனில் (endp == வெற்று)
 				    endp = p + STRLEN(p);   // find end of part
 			    }
-			    else if (endp > commap || endp == NULL)
+			    இல்லையெனில் எனில் (endp > commap || endp == வெற்று)
 				endp = commap;
 			    slashp = vim_strchr(p, '/');
-			    if (slashp != NULL && slashp < endp)
+			    எனில் (slashp != வெற்று && slashp < endp)
 			    {
 				// "group/langmap_group"
-				i = syn_check_group(p, (int)(slashp - p));
+				i = syn_check_group(p, (முழு)(slashp - p));
 				p = slashp + 1;
 			    }
-			    if (round == 2)
+			    எனில் (round == 2)
 			    {
 				shape_table[idx].id = syn_check_group(p,
-							     (int)(endp - p));
+							     (முழு)(endp - p));
 				shape_table[idx].id_lm = shape_table[idx].id;
-				if (slashp != NULL && slashp < endp)
+				எனில் (slashp != வெற்று && slashp < endp)
 				    shape_table[idx].id = i;
 			    }
 			    p = endp;
 			}
 		    } // if (what != SHAPE_MOUSE)
 
-		    if (*p == '-')
+		    எனில் (*p == '-')
 			++p;
 		}
 	    }
 	    modep = p;
-	    if (*modep == ',')
+	    எனில் (*modep == ',')
 		++modep;
 	}
     }
 
     // If the 's' flag is not given, use the 'v' cursor for 's'
-    if (!found_ve)
+    எனில் (!found_ve)
     {
 # ifdef FEAT_MOUSESHAPE
-	if (what == SHAPE_MOUSE)
+	எனில் (what == SHAPE_MOUSE)
 	{
 	    shape_table[SHAPE_IDX_VE].mshape = shape_table[SHAPE_IDX_V].mshape;
 	}
-	else
+	இல்லையெனில்
 # endif
 	{
 	    shape_table[SHAPE_IDX_VE].shape = shape_table[SHAPE_IDX_V].shape;
@@ -2408,65 +2408,65 @@ parse_shape_opt(int what)
 	}
     }
 
-    return NULL;
+    திரும்பு வெற்று;
 }
 
-# if defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) \
+# எனில் defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) \
 	|| defined(FEAT_MOUSESHAPE)
 /*
  * Return the index into shape_table[] for the current mode.
  * When "mouse" is TRUE, consider indexes valid for the mouse pointer.
  */
-    int
-get_shape_idx(int mouse)
+    முழு
+get_shape_idx(முழு mouse)
 {
 #  ifdef FEAT_MOUSESHAPE
-    if (mouse && (State == MODE_HITRETURN || State == MODE_ASKMORE))
+    எனில் (mouse && (State == MODE_HITRETURN || State == MODE_ASKMORE))
     {
 #   ifdef FEAT_GUI
-	int x, y;
+	முழு x, y;
 	gui_mch_getmouse(&x, &y);
-	if (Y_2_ROW(y) == Rows - 1)
-	    return SHAPE_IDX_MOREL;
+	எனில் (Y_2_ROW(y) == Rows - 1)
+	    திரும்பு SHAPE_IDX_MOREL;
 #   endif
-	return SHAPE_IDX_MORE;
+	திரும்பு SHAPE_IDX_MORE;
     }
-    if (mouse && drag_status_line)
-	return SHAPE_IDX_SDRAG;
-    if (mouse && drag_sep_line)
-	return SHAPE_IDX_VDRAG;
+    எனில் (mouse && drag_status_வரி)
+	திரும்பு SHAPE_IDX_SDRAG;
+    எனில் (mouse && drag_sep_வரி)
+	திரும்பு SHAPE_IDX_VDRAG;
 #  endif
-    if (!mouse && State == MODE_SHOWMATCH)
-	return SHAPE_IDX_SM;
-    if (State & VREPLACE_FLAG)
-	return SHAPE_IDX_R;
-    if (State & REPLACE_FLAG)
-	return SHAPE_IDX_R;
-    if (State & MODE_INSERT)
-	return SHAPE_IDX_I;
-    if (State & MODE_CMDLINE)
+    எனில் (!mouse && State == MODE_SHOWMATCH)
+	திரும்பு SHAPE_IDX_SM;
+    எனில் (State & VREPLACE_FLAG)
+	திரும்பு SHAPE_IDX_R;
+    எனில் (State & REPLACE_FLAG)
+	திரும்பு SHAPE_IDX_R;
+    எனில் (State & MODE_செருகு)
+	திரும்பு SHAPE_IDX_I;
+    எனில் (State & MODE_CMDLINE)
     {
-	if (cmdline_at_end())
-	    return SHAPE_IDX_C;
-	if (cmdline_overstrike())
-	    return SHAPE_IDX_CR;
-	return SHAPE_IDX_CI;
+	எனில் (cmdline_at_end())
+	    திரும்பு SHAPE_IDX_C;
+	எனில் (cmdline_overstrike())
+	    திரும்பு SHAPE_IDX_CR;
+	திரும்பு SHAPE_IDX_CI;
     }
-    if (finish_op)
-	return SHAPE_IDX_O;
-    if (VIsual_active)
+    எனில் (finish_op)
+	திரும்பு SHAPE_IDX_O;
+    எனில் (VIsual_active)
     {
-	if (*p_sel == 'e')
-	    return SHAPE_IDX_VE;
-	else
-	    return SHAPE_IDX_V;
+	எனில் (*p_sel == 'e')
+	    திரும்பு SHAPE_IDX_VE;
+	இல்லையெனில்
+	    திரும்பு SHAPE_IDX_V;
     }
-    return SHAPE_IDX_N;
+    திரும்பு SHAPE_IDX_N;
 }
 # endif
 
-# if defined(FEAT_MOUSESHAPE)
-static int current_mouse_shape = 0;
+# எனில் defined(FEAT_MOUSESHAPE)
+நிலையான முழு current_mouse_shape = 0;
 
 /*
  * Set the mouse shape:
@@ -2475,40 +2475,40 @@ static int current_mouse_shape = 0;
  * If "shape" is -2, only update the shape when it's CLINE or STATUS (used
  * when the mouse moves off the status or command line).
  */
-    void
-update_mouseshape(int shape_idx)
+    வெறுமை
+update_mouseshape(முழு shape_idx)
 {
-    int new_mouse_shape;
+    முழு new_mouse_shape;
 
     // Only works in GUI mode.
-    if (!gui.in_use || gui.starting)
-	return;
+    எனில் (!gui.in_use || gui.starting)
+	திரும்பு;
 
     // Postpone the updating when more is to come.  Speeds up executing of
     // mappings.
-    if (shape_idx == -1 && char_avail())
+    எனில் (shape_idx == -1 && char_avail())
     {
 	postponed_mouseshape = TRUE;
-	return;
+	திரும்பு;
     }
 
     // When ignoring the mouse don't change shape on the statusline.
-    if (*p_mouse == NUL
+    எனில் (*p_mouse == NUL
 	    && (shape_idx == SHAPE_IDX_CLINE
 		|| shape_idx == SHAPE_IDX_STATUS
 		|| shape_idx == SHAPE_IDX_VSEP))
 	shape_idx = -2;
 
-    if (shape_idx == -2
+    எனில் (shape_idx == -2
 	    && current_mouse_shape != shape_table[SHAPE_IDX_CLINE].mshape
 	    && current_mouse_shape != shape_table[SHAPE_IDX_STATUS].mshape
 	    && current_mouse_shape != shape_table[SHAPE_IDX_VSEP].mshape)
-	return;
-    if (shape_idx < 0)
+	திரும்பு;
+    எனில் (shape_idx < 0)
 	new_mouse_shape = shape_table[get_shape_idx(TRUE)].mshape;
-    else
+    இல்லையெனில்
 	new_mouse_shape = shape_table[shape_idx].mshape;
-    if (new_mouse_shape != current_mouse_shape)
+    எனில் (new_mouse_shape != current_mouse_shape)
     {
 	mch_set_mouse_shape(new_mouse_shape);
 	current_mouse_shape = new_mouse_shape;
@@ -2519,18 +2519,18 @@ update_mouseshape(int shape_idx)
 
 #endif // CURSOR_SHAPE
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 /*
  * Mainly for tests: get the name of the current mouse shape.
  */
-    void
+    வெறுமை
 f_getmouseshape(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-# if defined(FEAT_MOUSESHAPE)
-    if (current_mouse_shape >= 0
-			      && current_mouse_shape < (int)MSHAPE_NAMES_COUNT)
+    rettv->vval.v_string = வெற்று;
+# எனில் defined(FEAT_MOUSESHAPE)
+    எனில் (current_mouse_shape >= 0
+			      && current_mouse_shape < (முழு)MSHAPE_NAMES_மொத்தம்)
 	rettv->vval.v_string = vim_strnsave(
 				  mshape_names[current_mouse_shape].string,
 				  mshape_names[current_mouse_shape].length);
@@ -2544,23 +2544,23 @@ f_getmouseshape(typval_T *argvars UNUSED, typval_T *rettv)
  * Change directory to "new_dir".  Search 'cdpath' for relative directory
  * names.
  */
-    int
+    முழு
 vim_chdir(char_u *new_dir)
 {
     char_u	*dir_name;
-    int		r;
-    char_u	*file_to_find = NULL;
-    char	*search_ctx = NULL;
+    முழு		r;
+    char_u	*file_to_find = வெற்று;
+    எழுத்து	*தேடல்_ctx = வெற்று;
 
-    dir_name = find_directory_in_path(new_dir, (int)STRLEN(new_dir),
-		     FNAME_MESS, curbuf->b_ffname, &file_to_find, &search_ctx);
+    dir_name = find_directory_in_path(new_dir, (முழு)STRLEN(new_dir),
+		     FNAME_MESS, curbuf->b_ffname, &file_to_find, &தேடல்_ctx);
     vim_free(file_to_find);
-    vim_findfile_cleanup(search_ctx);
-    if (dir_name == NULL)
-	return -1;
-    r = mch_chdir((char *)dir_name);
+    vim_findfile_cleanup(தேடல்_ctx);
+    எனில் (dir_name == வெற்று)
+	திரும்பு -1;
+    r = mch_chdir((எழுத்து *)dir_name);
     vim_free(dir_name);
-    return r;
+    திரும்பு r;
 }
 
 /*
@@ -2570,62 +2570,62 @@ vim_chdir(char_u *new_dir)
  * cache the result.
  * Returns OK or FAIL.
  */
-    int
-get_user_name(char_u *buf, int len)
+    முழு
+get_user_name(char_u *buf, முழு len)
 {
-    if (username == NULL)
+    எனில் (username == வெற்று)
     {
-	if (mch_get_user_name(buf, len) == FAIL)
-	    return FAIL;
+	எனில் (mch_get_user_name(buf, len) == FAIL)
+	    திரும்பு FAIL;
 	username = vim_strsave(buf);
     }
-    else
+    இல்லையெனில்
 	vim_strncpy(buf, username, len - 1);
-    return OK;
+    திரும்பு OK;
 }
 
-#if defined(EXITFREE)
+#எனில் defined(EXITFREE)
 /*
  * Free the memory allocated by get_user_name()
  */
-    void
-free_username(void)
+    வெறுமை
+free_username(வெறுமை)
 {
     vim_free(username);
 }
 #endif
 
-#if !defined(HAVE_QSORT) && !defined(PROTO)
+#எனில் !defined(HAVE_QSORT) && !defined(PROTO)
 /*
  * Our own qsort(), for systems that don't have it.
  * It's simple and slow.  From the K&R C book.
  */
-    void
+    வெறுமை
 qsort(
-    void	*base,
-    size_t	elm_count,
+    வெறுமை	*base,
+    size_t	elm_மொத்தம்,
     size_t	elm_size,
-    int (*cmp)(const void *, const void *))
+    முழு (*cmp)(மாறிலி வெறுமை *, மாறிலி வெறுமை *))
 {
     char_u	*buf;
     char_u	*p1;
     char_u	*p2;
-    int		i, j;
-    int		gap;
+    முழு		i, j;
+    முழு		gap;
 
     buf = alloc(elm_size);
-    if (buf == NULL)
-	return;
+    எனில் (buf == வெற்று)
+	திரும்பு;
 
-    for (gap = elm_count / 2; gap > 0; gap /= 2)
-	for (i = gap; i < elm_count; ++i)
-	    for (j = i - gap; j >= 0; j -= gap)
+    க்கு (gap = elm_மொத்தம் / 2; gap > 0; gap /= 2)
+	க்கு (i = gap; i < elm_மொத்தம்; ++i)
+	    க்கு (j = i - gap; j >= 0; j -= gap)
 	    {
 		// Compare the elements.
 		p1 = (char_u *)base + j * elm_size;
 		p2 = (char_u *)base + (j + gap) * elm_size;
-		if ((*cmp)((void *)p1, (void *)p2) <= 0)
-		    break;
+		எனில் ((*cmp)((வெறுமை *)p1, (வெறுமை *)p2) <= 0)
+		    நிறுத்து;
 		// Exchange the elements.
 		mch_memmove(buf, p1, elm_size);
 		mch_memmove(p1, p2, elm_size);
@@ -2662,96 +2662,96 @@ qsort(
  *  (history removed, not very interesting.  See the "screen" sources.)
  */
 
-#if !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(PROTO)
+#எனில் !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(PROTO)
 
 # define EXTRASIZE 5		// increment to add to env. size
 
-static int  envsize = -1;	// current size of environment
-extern char **environ;		// the global which is your env.
+நிலையான முழு  envsize = -1;	// current size of environment
+வெளி எழுத்து **environ;		// the global which is your env.
 
-static int  findenv(char *name); // look for a name in the env.
-static int  newenv(void);	// copy env. from stack to heap
-static int  moreenv(void);	// incr. size of env.
+நிலையான முழு  findenv(எழுத்து *name); // look for a name in the env.
+நிலையான முழு  newenv(வெறுமை);	// copy env. from stack to heap
+நிலையான முழு  moreenv(வெறுமை);	// incr. size of env.
 
-    int
-putenv(const char *string)
+    முழு
+putenv(மாறிலி எழுத்து *string)
 {
-    int	    i;
-    char    *p;
+    முழு	    i;
+    எழுத்து    *p;
 
-    if (envsize < 0)
+    எனில் (envsize < 0)
     {				// first time putenv called
-	if (newenv() < 0)	// copy env. to heap
-	    return -1;
+	எனில் (newenv() < 0)	// copy env. to heap
+	    திரும்பு -1;
     }
 
-    i = findenv((char *)string); // look for name in environment
+    i = findenv((எழுத்து *)string); // look for name in environment
 
-    if (i < 0)
+    எனில் (i < 0)
     {				// name must be added
-	for (i = 0; environ[i]; i++);
-	if (i >= (envsize - 1))
+	க்கு (i = 0; environ[i]; i++);
+	எனில் (i >= (envsize - 1))
 	{			// need new slot
-	    if (moreenv() < 0)
-		return -1;
+	    எனில் (moreenv() < 0)
+		திரும்பு -1;
 	}
 	p = alloc(strlen(string) + 1);
-	if (p == NULL)		// not enough core
-	    return -1;
+	எனில் (p == வெற்று)		// not enough core
+	    திரும்பு -1;
 	environ[i + 1] = 0;	// new end of env.
     }
-    else
+    இல்லையெனில்
     {				// name already in env.
 	p = vim_realloc(environ[i], strlen(string) + 1);
-	if (p == NULL)
-	    return -1;
+	எனில் (p == வெற்று)
+	    திரும்பு -1;
     }
     sprintf(p, "%s", string);	// copy into env.
     environ[i] = p;
 
-    return 0;
+    திரும்பு 0;
 }
 
-    static int
-findenv(char *name)
+    நிலையான முழு
+findenv(எழுத்து *name)
 {
-    char    *namechar, *envchar;
-    int	    i, found;
+    எழுத்து    *namechar, *envchar;
+    முழு	    i, found;
 
     found = 0;
-    for (i = 0; environ[i] && !found; i++)
+    க்கு (i = 0; environ[i] && !found; i++)
     {
 	envchar = environ[i];
 	namechar = name;
-	while (*namechar && *namechar != '=' && (*namechar == *envchar))
+	போது (*namechar && *namechar != '=' && (*namechar == *envchar))
 	{
 	    namechar++;
 	    envchar++;
 	}
 	found = ((*namechar == '\0' || *namechar == '=') && *envchar == '=');
     }
-    return found ? i - 1 : -1;
+    திரும்பு found ? i - 1 : -1;
 }
 
-    static int
-newenv(void)
+    நிலையான முழு
+newenv(வெறுமை)
 {
-    char    **env, *elem;
-    int	    i, esize;
+    எழுத்து    **env, *elem;
+    முழு	    i, esize;
 
-    for (i = 0; environ[i]; i++)
+    க்கு (i = 0; environ[i]; i++)
 	;
 
     esize = i + EXTRASIZE + 1;
-    env = ALLOC_MULT(char *, esize);
-    if (env == NULL)
-	return -1;
+    env = ALLOC_MULT(எழுத்து *, esize);
+    எனில் (env == வெற்று)
+	திரும்பு -1;
 
-    for (i = 0; environ[i]; i++)
+    க்கு (i = 0; environ[i]; i++)
     {
 	elem = alloc(strlen(environ[i]) + 1);
-	if (elem == NULL)
-	    return -1;
+	எனில் (elem == வெற்று)
+	    திரும்பு -1;
 	env[i] = elem;
 	strcpy(elem, environ[i]);
     }
@@ -2759,22 +2759,22 @@ newenv(void)
     env[i] = 0;
     environ = env;
     envsize = esize;
-    return 0;
+    திரும்பு 0;
 }
 
-    static int
-moreenv(void)
+    நிலையான முழு
+moreenv(வெறுமை)
 {
-    int	    esize;
-    char    **env;
+    முழு	    esize;
+    எழுத்து    **env;
 
     esize = envsize + EXTRASIZE;
-    env = vim_realloc((char *)environ, esize * sizeof (*env));
-    if (env == 0)
-	return -1;
+    env = vim_realloc((எழுத்து *)environ, esize * அளவு (*env));
+    எனில் (env == 0)
+	திரும்பு -1;
     environ = env;
     envsize = esize;
-    return 0;
+    திரும்பு 0;
 }
 
 # ifdef USE_VIMPTY_GETENV
@@ -2782,122 +2782,122 @@ moreenv(void)
  * Used for mch_getenv() for Mac.
  */
     char_u *
-vimpty_getenv(const char_u *string)
+vimpty_getenv(மாறிலி char_u *string)
 {
-    int i;
+    முழு i;
     char_u *p;
 
-    if (envsize < 0)
-	return NULL;
+    எனில் (envsize < 0)
+	திரும்பு வெற்று;
 
-    i = findenv((char *)string);
+    i = findenv((எழுத்து *)string);
 
-    if (i < 0)
-	return NULL;
+    எனில் (i < 0)
+	திரும்பு வெற்று;
 
     p = vim_strchr((char_u *)environ[i], '=');
-    return (p + 1);
+    திரும்பு (p + 1);
 }
 # endif
 
 #endif // !defined(HAVE_SETENV) && !defined(HAVE_PUTENV)
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#எனில் defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Return 0 for not writable, 1 for writable file, 2 for a dir which we have
  * rights to write into.
  */
-    int
+    முழு
 filewritable(char_u *fname)
 {
-    int		retval = 0;
-# if defined(UNIX) || defined(VMS)
-    int		perm = 0;
+    முழு		retval = 0;
+# எனில் defined(UNIX) || defined(VMS)
+    முழு		perm = 0;
 # endif
 
-# if defined(UNIX) || defined(VMS)
+# எனில் defined(UNIX) || defined(VMS)
     perm = mch_getperm(fname);
 # endif
-    if (
+    எனில் (
 # ifdef MSWIN
 	    mch_writable(fname) &&
-# else
-#  if defined(UNIX) || defined(VMS)
+# இல்லையெனில்
+#  எனில் defined(UNIX) || defined(VMS)
 	    (perm & 0222) &&
 #  endif
 # endif
-	    mch_access((char *)fname, W_OK) == 0
+	    mch_access((எழுத்து *)fname, W_OK) == 0
        )
     {
 	++retval;
-	if (mch_isdir(fname))
+	எனில் (mch_isdir(fname))
 	    ++retval;
     }
-    return retval;
+    திரும்பு retval;
 }
 #endif
 
-#if defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
+#எனில் defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
 /*
  * Read 2 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    முழு
 get2c(FILE *fd)
 {
-    int		c, n;
+    முழு		c, n;
 
     n = getc(fd);
-    if (n == EOF) return -1;
+    எனில் (n == EOF) திரும்பு -1;
     c = getc(fd);
-    if (c == EOF) return -1;
-    return (n << 8) + c;
+    எனில் (c == EOF) திரும்பு -1;
+    திரும்பு (n << 8) + c;
 }
 
 /*
  * Read 3 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    முழு
 get3c(FILE *fd)
 {
-    int		c, n;
+    முழு		c, n;
 
     n = getc(fd);
-    if (n == EOF) return -1;
+    எனில் (n == EOF) திரும்பு -1;
     c = getc(fd);
-    if (c == EOF) return -1;
+    எனில் (c == EOF) திரும்பு -1;
     n = (n << 8) + c;
     c = getc(fd);
-    if (c == EOF) return -1;
-    return (n << 8) + c;
+    எனில் (c == EOF) திரும்பு -1;
+    திரும்பு (n << 8) + c;
 }
 
 /*
  * Read 4 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    முழு
 get4c(FILE *fd)
 {
-    int		c;
+    முழு		c;
     // Use unsigned rather than int otherwise result is undefined
     // when left-shift sets the MSB.
     unsigned	n;
 
     c = getc(fd);
-    if (c == EOF) return -1;
+    எனில் (c == EOF) திரும்பு -1;
     n = (unsigned)c;
     c = getc(fd);
-    if (c == EOF) return -1;
+    எனில் (c == EOF) திரும்பு -1;
     n = (n << 8) + (unsigned)c;
     c = getc(fd);
-    if (c == EOF) return -1;
+    எனில் (c == EOF) திரும்பு -1;
     n = (n << 8) + (unsigned)c;
     c = getc(fd);
-    if (c == EOF) return -1;
+    எனில் (c == EOF) திரும்பு -1;
     n = (n << 8) + (unsigned)c;
-    return (int)n;
+    திரும்பு (முழு)n;
 }
 
 /*
@@ -2905,44 +2905,44 @@ get4c(FILE *fd)
  * Returns NULL when out of memory or unable to read that many bytes.
  */
     char_u *
-read_string(FILE *fd, int cnt)
+read_string(FILE *fd, முழு cnt)
 {
     char_u	*str;
-    int		i;
-    int		c;
+    முழு		i;
+    முழு		c;
 
     // allocate memory
     str = alloc(cnt + 1);
-    if (str == NULL)
-	return NULL;
+    எனில் (str == வெற்று)
+	திரும்பு வெற்று;
 
     // Read the string.  Quit when running into the EOF.
-    for (i = 0; i < cnt; ++i)
+    க்கு (i = 0; i < cnt; ++i)
     {
 	c = getc(fd);
-	if (c == EOF)
+	எனில் (c == EOF)
 	{
 	    vim_free(str);
-	    return NULL;
+	    திரும்பு வெற்று;
 	}
 	str[i] = c;
     }
     str[i] = NUL;
-    return str;
+    திரும்பு str;
 }
 
 /*
  * Write a number to file "fd", MSB first, in "len" bytes.
  */
-    int
-put_bytes(FILE *fd, long_u nr, int len)
+    முழு
+put_bytes(FILE *fd, long_u nr, முழு len)
 {
-    int	    i;
+    முழு	    i;
 
-    for (i = len - 1; i >= 0; --i)
-	if (putc((int)(nr >> (i * 8)), fd) == EOF)
-	    return FAIL;
-    return OK;
+    க்கு (i = len - 1; i >= 0; --i)
+	எனில் (putc((முழு)(nr >> (i * 8)), fd) == EOF)
+	    திரும்பு FAIL;
+    திரும்பு OK;
 }
 
 #endif
@@ -2953,12 +2953,12 @@ put_bytes(FILE *fd, long_u nr, int len)
  * Return time in msec since "start_tv".
  */
     long
-elapsed(struct timeval *start_tv)
+elapsed(கட்டமைப்பு timeval *start_tv)
 {
-    struct timeval  now_tv;
+    கட்டமைப்பு timeval  now_tv;
 
-    gettimeofday(&now_tv, NULL);
-    return (now_tv.tv_sec - start_tv->tv_sec) * 1000L
+    gettimeofday(&now_tv, வெற்று);
+    திரும்பு (now_tv.tv_sec - start_tv->tv_sec) * 1000L
 	 + (now_tv.tv_usec - start_tv->tv_usec) / 1000L;
 }
 # endif
@@ -2970,14 +2970,14 @@ elapsed(struct timeval *start_tv)
     long
 elapsed(DWORD start_tick)
 {
-    DWORD	now = GetTickCount();
+    DWORD	now = Get_Tick_மொத்தம்();
 
-    return (long)now - (long)start_tick;
+    திரும்பு (long)now - (long)start_tick;
 }
 # endif
 #endif
 
-#if defined(FEAT_JOB_CHANNEL) \
+#எனில் defined(FEAT_JOB_CHANNEL) \
 	|| (defined(UNIX) && (!defined(USE_SYSTEM) \
 	|| (defined(FEAT_GUI) && defined(FEAT_TERMINAL))))
 /*
@@ -2985,79 +2985,79 @@ elapsed(DWORD start_tick)
  * "argv" is an allocated array with "argc" entries and room for 4 more.
  * Returns FAIL when out of memory.
  */
-    int
-mch_parse_cmd(char_u *cmd, int use_shcf, char ***argv, int *argc)
+    முழு
+mch_parse_cmd(char_u *cmd, முழு use_shcf, எழுத்து ***argv, முழு *argc)
 {
-    int		i;
+    முழு		i;
     char_u	*p, *d;
-    int		inquote;
+    முழு		inquote;
 
     /*
      * Do this loop twice:
      * 1: find number of arguments
      * 2: separate them and build argv[]
      */
-    for (i = 1; i <= 2; ++i)
+    க்கு (i = 1; i <= 2; ++i)
     {
 	p = skipwhite(cmd);
 	inquote = FALSE;
 	*argc = 0;
-	while (*p != NUL)
+	போது (*p != NUL)
 	{
-	    if (i == 2)
-		(*argv)[*argc] = (char *)p;
+	    எனில் (i == 2)
+		(*argv)[*argc] = (எழுத்து *)p;
 	    ++*argc;
 	    d = p;
-	    while (*p != NUL && (inquote || (*p != ' ' && *p != TAB)))
+	    போது (*p != NUL && (inquote || (*p != ' ' && *p != TAB)))
 	    {
-		if (p[0] == '"')
+		எனில் (p[0] == '"')
 		    // quotes surrounding an argument and are dropped
 		    inquote = !inquote;
-		else
+		இல்லையெனில்
 		{
-		    if (rem_backslash(p))
+		    எனில் (rem_backslash(p))
 		    {
 			// First pass: skip over "\ " and "\"".
 			// Second pass: Remove the backslash.
 			++p;
 		    }
-		    if (i == 2)
+		    எனில் (i == 2)
 			*d++ = *p;
 		}
 		++p;
 	    }
-	    if (*p == NUL)
+	    எனில் (*p == NUL)
 	    {
-		if (i == 2)
+		எனில் (i == 2)
 		    *d++ = NUL;
-		break;
+		நிறுத்து;
 	    }
-	    if (i == 2)
+	    எனில் (i == 2)
 		*d++ = NUL;
 	    p = skipwhite(p + 1);
 	}
-	if (*argv == NULL)
+	எனில் (*argv == வெற்று)
 	{
-	    if (use_shcf)
+	    எனில் (use_shcf)
 	    {
 		// Account for possible multiple args in p_shcf.
 		p = p_shcf;
-		for (;;)
+		க்கு (;;)
 		{
 		    p = skiptowhite(p);
-		    if (*p == NUL)
-			break;
+		    எனில் (*p == NUL)
+			நிறுத்து;
 		    ++*argc;
 		    p = skipwhite(p);
 		}
 	    }
 
-	    *argv = ALLOC_MULT(char *, *argc + 4);
-	    if (*argv == NULL)	    // out of memory
-		return FAIL;
+	    *argv = ALLOC_MULT(எழுத்து *, *argc + 4);
+	    எனில் (*argv == வெற்று)	    // out of memory
+		திரும்பு FAIL;
 	}
     }
-    return OK;
+    திரும்பு OK;
 }
 
 /*
@@ -3065,63 +3065,63 @@ mch_parse_cmd(char_u *cmd, int use_shcf, char ***argv, int *argc)
  * "argv[argc]" is set to NULL;
  * Return FAIL when out of memory.
  */
-    int
-build_argv_from_string(char_u *cmd, char ***argv, int *argc)
+    முழு
+build_argv_from_string(char_u *cmd, எழுத்து ***argv, முழு *argc)
 {
     char_u	*cmd_copy;
-    int		i;
+    முழு		i;
 
     // Make a copy, parsing will modify "cmd".
     cmd_copy = vim_strsave(cmd);
-    if (cmd_copy == NULL
+    எனில் (cmd_copy == வெற்று
 	    || mch_parse_cmd(cmd_copy, FALSE, argv, argc) == FAIL)
     {
 	vim_free(cmd_copy);
-	return FAIL;
+	திரும்பு FAIL;
     }
-    for (i = 0; i < *argc; i++)
-	(*argv)[i] = (char *)vim_strsave((char_u *)(*argv)[i]);
-    (*argv)[*argc] = NULL;
+    க்கு (i = 0; i < *argc; i++)
+	(*argv)[i] = (எழுத்து *)vim_strsave((char_u *)(*argv)[i]);
+    (*argv)[*argc] = வெற்று;
     vim_free(cmd_copy);
-    return OK;
+    திரும்பு OK;
 }
 
 #endif
 
-#if defined(FEAT_EVAL)
+#எனில் defined(FEAT_EVAL)
 /*
  * Build "argv[argc]" from the list "l".
  * "argv[argc]" is set to NULL;
  * Return FAIL when out of memory.
  */
-    int
-build_argv_from_list(list_T *l, char ***argv, int *argc)
+    முழு
+build_argv_from_list(list_T *l, எழுத்து ***argv, முழு *argc)
 {
     listitem_T  *li;
     char_u	*s;
 
     // Pass argv[] to mch_call_shell().
-    *argv = ALLOC_MULT(char *, l->lv_len + 1);
-    if (*argv == NULL)
-	return FAIL;
+    *argv = ALLOC_MULT(எழுத்து *, l->lv_len + 1);
+    எனில் (*argv == வெற்று)
+	திரும்பு FAIL;
     *argc = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_பொருட்கள்(l, li)
     {
 	s = tv_get_string_chk(&li->li_tv);
-	if (s == NULL)
+	எனில் (s == வெற்று)
 	{
-	    int i;
+	    முழு i;
 
-	    for (i = 0; i < *argc; ++i)
+	    க்கு (i = 0; i < *argc; ++i)
 		VIM_CLEAR((*argv)[i]);
-	    (*argv)[0] = NULL;
-	    return FAIL;
+	    (*argv)[0] = வெற்று;
+	    திரும்பு FAIL;
 	}
-	(*argv)[*argc] = (char *)vim_strsave(s);
+	(*argv)[*argc] = (எழுத்து *)vim_strsave(s);
 	*argc += 1;
     }
-    (*argv)[*argc] = NULL;
-    return OK;
+    (*argv)[*argc] = வெற்று;
+    திரும்பு OK;
 }
 #endif
 
@@ -3134,58 +3134,58 @@ build_argv_from_list(list_T *l, char ***argv, int *argc)
  *      Use the wrong result because each result is different.
  * 3: Windows 10 insider preview (current latest logic)
  */
-    int
-get_special_pty_type(void)
+    முழு
+get_special_pty_type(வெறுமை)
 {
 #ifdef MSWIN
-    return get_conpty_type();
-#else
-    return 0;
+    திரும்பு get_conpty_type();
+#இல்லையெனில்
+    திரும்பு 0;
 #endif
 }
 
 // compare two keyvalue_T structs by case sensitive value
-    int
-cmp_keyvalue_value(const void *a, const void *b)
+    முழு
+cmp_keyvalue_மதிப்பு(மாறிலி வெறுமை *a, மாறிலி வெறுமை *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRCMP(kv1->value.string, kv2->value.string);
+    திரும்பு STRCMP(kv1->மதிப்பு.string, kv2->மதிப்பு.string);
 }
 
 // compare two keyvalue_T structs by value with length
-    int
-cmp_keyvalue_value_n(const void *a, const void *b)
+    முழு
+cmp_keyvalue_மதிப்பு_n(மாறிலி வெறுமை *a, மாறிலி வெறுமை *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRNCMP(kv1->value.string, kv2->value.string, MAX(kv1->value.length,
-		kv2->value.length));
+    திரும்பு STRNCMP(kv1->மதிப்பு.string, kv2->மதிப்பு.string, MAX(kv1->மதிப்பு.length,
+		kv2->மதிப்பு.length));
 }
 
 // compare two keyvalue_T structs by case insensitive value
-    int
-cmp_keyvalue_value_i(const void *a, const void *b)
+    முழு
+cmp_keyvalue_மதிப்பு_i(மாறிலி வெறுமை *a, மாறிலி வெறுமை *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRICMP(kv1->value.string, kv2->value.string);
+    திரும்பு STRICMP(kv1->மதிப்பு.string, kv2->மதிப்பு.string);
 }
 
 // compare two keyvalue_T structs by case insensitive ASCII value
 // with value.length
-    int
-cmp_keyvalue_value_ni(const void *a, const void *b)
+    முழு
+cmp_keyvalue_மதிப்பு_ni(மாறிலி வெறுமை *a, மாறிலி வெறுமை *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return vim_strnicmp_asc((char *)kv1->value.string,
-	    (char *)kv2->value.string, MAX(kv1->value.length,
-		    kv2->value.length));
+    திரும்பு vim_strnicmp_asc((எழுத்து *)kv1->மதிப்பு.string,
+	    (எழுத்து *)kv2->மதிப்பு.string, MAX(kv1->மதிப்பு.length,
+		    kv2->மதிப்பு.length));
 }
 
 /*
@@ -3195,112 +3195,112 @@ cmp_keyvalue_value_ni(const void *a, const void *b)
  *  - Each pair of blocks is merged in sorted order.
  *  - Merged blocks are reconnected to build the sorted list.
  */
-    void *
+    வெறுமை *
 mergesort_list(
-    void	*head,
-    void	*(*get_next)(void *),
-    void	(*set_next)(void *, void *),
-    void	*(*get_prev)(void *),
-    void	(*set_prev)(void *, void *),
-    int		(*compare)(const void *, const void *))
+    வெறுமை	*head,
+    வெறுமை	*(*get_next)(வெறுமை *),
+    வெறுமை	(*set_next)(வெறுமை *, வெறுமை *),
+    வெறுமை	*(*get_prev)(வெறுமை *),
+    வெறுமை	(*set_prev)(வெறுமை *, வெறுமை *),
+    முழு		(*compare)(மாறிலி வெறுமை *, மாறிலி வெறுமை *))
 {
-    if (!head || !get_next(head))
-	return head;
+    எனில் (!head || !get_next(head))
+	திரும்பு head;
 
     // Count length
-    int	    n = 0;
-    void*   curr = head;
-    while (curr)
+    முழு	    n = 0;
+    வெறுமை*   curr = head;
+    போது (curr)
     {
 	n++;
 	curr = get_next(curr);
     }
 
-    int	size;
-    for (size = 1; size < n; size *= 2)
+    முழு	size;
+    க்கு (size = 1; size < n; size *= 2)
     {
-	void*	new_head = NULL;
-	void*	tail = NULL;
+	வெறுமை*	new_head = வெற்று;
+	வெறுமை*	tail = வெற்று;
 	curr = head;
 
-	while (curr)
+	போது (curr)
 	{
 	    // Split two runs
-	    void    *left = curr;
-	    void    *right = left;
-	    int	    i;
-	    for (i = 0; i < size && right; ++i)
-		right = get_next(right);
+	    வெறுமை    *இடது = curr;
+	    வெறுமை    *வலது = இடது;
+	    முழு	    i;
+	    க்கு (i = 0; i < size && வலது; ++i)
+		வலது = get_next(வலது);
 
-	    void    *next = right;
-	    for (i = 0; i < size && next; ++i)
+	    வெறுமை    *next = வலது;
+	    க்கு (i = 0; i < size && next; ++i)
 		next = get_next(next);
 
 	    // Break links
-	    void    *l_end = right ? get_prev(right) : NULL;
-	    if (l_end)
-		set_next(l_end, NULL);
-	    if (right)
-		set_prev(right, NULL);
+	    வெறுமை    *l_end = வலது ? get_prev(வலது) : வெற்று;
+	    எனில் (l_end)
+		set_next(l_end, வெற்று);
+	    எனில் (வலது)
+		set_prev(வலது, வெற்று);
 
-	    void    *r_end = next ? get_prev(next) : NULL;
-	    if (r_end)
-		set_next(r_end, NULL);
-	    if (next)
-		set_prev(next, NULL);
+	    வெறுமை    *r_end = next ? get_prev(next) : வெற்று;
+	    எனில் (r_end)
+		set_next(r_end, வெற்று);
+	    எனில் (next)
+		set_prev(next, வெற்று);
 
 	    // Merge
-	    void    *merged = NULL;
-	    void    *merged_tail = NULL;
+	    வெறுமை    *merged = வெற்று;
+	    வெறுமை    *merged_tail = வெற்று;
 
-	    while (left || right)
+	    போது (இடது || வலது)
 	    {
-		void	*chosen = NULL;
-		if (!left)
+		வெறுமை	*chosen = வெற்று;
+		எனில் (!இடது)
 		{
-		    chosen = right;
-		    right = get_next(right);
+		    chosen = வலது;
+		    வலது = get_next(வலது);
 		}
-		else if (!right)
+		இல்லையெனில் எனில் (!வலது)
 		{
-		    chosen = left;
-		    left = get_next(left);
+		    chosen = இடது;
+		    இடது = get_next(இடது);
 		}
-		else if (compare(left, right) <= 0)
+		இல்லையெனில் எனில் (compare(இடது, வலது) <= 0)
 		{
-		    chosen = left;
-		    left = get_next(left);
+		    chosen = இடது;
+		    இடது = get_next(இடது);
 		}
-		else
+		இல்லையெனில்
 		{
-		    chosen = right;
-		    right = get_next(right);
+		    chosen = வலது;
+		    வலது = get_next(வலது);
 		}
 
-		if (merged_tail)
+		எனில் (merged_tail)
 		{
 		    set_next(merged_tail, chosen);
 		    set_prev(chosen, merged_tail);
 		    merged_tail = chosen;
 		}
-		else
+		இல்லையெனில்
 		{
 		    merged = merged_tail = chosen;
-		    set_prev(chosen, NULL);
+		    set_prev(chosen, வெற்று);
 		}
 	    }
 
 	    // Connect to full list
-	    if (!new_head)
+	    எனில் (!new_head)
 		new_head = merged;
-	    else
+	    இல்லையெனில்
 	    {
 		set_next(tail, merged);
 		set_prev(merged, tail);
 	    }
 
 	    // Move tail to end
-	    while (get_next(merged_tail))
+	    போது (get_next(merged_tail))
 		merged_tail = get_next(merged_tail);
 	    tail = merged_tail;
 
@@ -3310,29 +3310,29 @@ mergesort_list(
 	head = new_head;
     }
 
-    return head;
+    திரும்பு head;
 }
 
-static const char_u base64_table[] =
+நிலையான மாறிலி char_u base64_table[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static char_u base64_dec_table[256];
+நிலையான char_u base64_dec_table[256];
 
 #define BASE64_ENCODED_LEN(len) ((((len) + 2) / 3) * 4 + 1)
 
 /*
  * Initialize the base64 decoding table
  */
-    static void
-init_base64_dec_table(void)
+    நிலையான வெறுமை
+init_base64_dec_table(வெறுமை)
 {
-    static int base64_dec_tbl_initialized = FALSE;
+    நிலையான முழு base64_dec_tbl_initialized = FALSE;
 
-    if (base64_dec_tbl_initialized)
-	return;
+    எனில் (base64_dec_tbl_initialized)
+	திரும்பு;
 
-    vim_memset(base64_dec_table, 0xFF, sizeof(base64_dec_table));
-    for (size_t i = 0; i < sizeof(base64_table) - 1; i++)
+    vim_memset(base64_dec_table, 0xFF, அளவு(base64_dec_table));
+    க்கு (size_t i = 0; i < அளவு(base64_table) - 1; i++)
 	base64_dec_table[(char_u)base64_table[i]] = (char_u)i;
     base64_dec_table['='] = 0;
 
@@ -3345,11 +3345,11 @@ init_base64_dec_table(void)
  * of bytes written, excluding the NUL.
  */
     long
-base64_encode_buf(char_u *dst, const char_u *src, size_t len)
+base64_encode_buf(char_u *dst, மாறிலி char_u *src, size_t len)
 {
     size_t i, j;
 
-    for (i = 0, j = 0; i < len;)
+    க்கு (i = 0, j = 0; i < len;)
     {
 	size_t remaining = len - i;
 
@@ -3370,7 +3370,7 @@ base64_encode_buf(char_u *dst, const char_u *src, size_t len)
     }
 
     dst[j] = NUL;
-    return (long)j;
+    திரும்பு (long)j;
 }
 
 /*
@@ -3378,14 +3378,14 @@ base64_encode_buf(char_u *dst, const char_u *src, size_t len)
  * NULL on OOM.  Caller frees with vim_free().
  */
     char_u *
-base64_encode(const char_u *data, size_t len)
+base64_encode(மாறிலி char_u *data, size_t len)
 {
     char_u *encoded = alloc(BASE64_ENCODED_LEN(len));
 
-    if (encoded == NULL)
-	return NULL;
+    எனில் (encoded == வெற்று)
+	திரும்பு வெற்று;
     base64_encode_buf(encoded, data, len);
-    return encoded;
+    திரும்பு encoded;
 }
 
 /*
@@ -3393,71 +3393,71 @@ base64_encode(const char_u *data, size_t len)
  * "out" (appended byte-by-byte, e.g. a blob's bv_ga). Returns OK on success and
  * FAIL on failure.
  */
-    int
-base64_decode(const char_u *data, size_t len, garray_T *out)
+    முழு
+base64_decode(மாறிலி char_u *data, size_t len, garray_T *out)
 {
-    if (len == 0)
-	return OK;
+    எனில் (len == 0)
+	திரும்பு OK;
 
-    if (len % 4 != 0)
+    எனில் (len % 4 != 0)
     {
 	semsg(_(e_invalid_argument_str), data);
-	return FAIL;
+	திரும்பு FAIL;
     }
 
     init_base64_dec_table();
 
     size_t decoded_len = (len / 4) * 3;
-    if (data[len - 1] == '=')
+    எனில் (data[len - 1] == '=')
 	decoded_len--;
-    if (data[len - 2] == '=')
+    எனில் (data[len - 2] == '=')
 	decoded_len--;
 
     size_t i, j;
-    for (i = 0, j = 0; i < len;)
+    க்கு (i = 0, j = 0; i < len;)
     {
 	int_u sextet_a = base64_dec_table[(char_u)data[i++]];
 	int_u sextet_b = base64_dec_table[(char_u)data[i++]];
 	int_u sextet_c = base64_dec_table[(char_u)data[i++]];
 	int_u sextet_d = base64_dec_table[(char_u)data[i++]];
 
-	if (sextet_a == 0xFF || sextet_b == 0xFF || sextet_c == 0xFF
+	எனில் (sextet_a == 0xFF || sextet_b == 0xFF || sextet_c == 0xFF
 							|| sextet_d == 0xFF)
 	{
 	    semsg(_(e_invalid_argument_str), data);
 	    ga_clear(out);
-	    return FAIL;
+	    திரும்பு FAIL;
 	}
 
 	int_u triple = (sextet_a << 18) | (sextet_b << 12)
 						| (sextet_c << 6) | sextet_d;
 
-	if (j < decoded_len)
+	எனில் (j < decoded_len)
 	{
 	    ga_append(out, (triple >> 16) & 0xFF);
 	    j++;
 	}
-	if (j < decoded_len)
+	எனில் (j < decoded_len)
 	{
 	    ga_append(out, (triple >> 8) & 0xFF);
 	    j++;
 	}
-	if (j < decoded_len)
+	எனில் (j < decoded_len)
 	{
 	    ga_append(out, triple & 0xFF);
 	    j++;
 	}
 
-	if (j == decoded_len)
+	எனில் (j == decoded_len)
 	{
-	    if ((data[len - 2] == '=' && ((sextet_b & 0xF) != 0))
+	    எனில் ((data[len - 2] == '=' && ((sextet_b & 0xF) != 0))
 		|| ((data[len - 1] == '=') && ((sextet_c & 0x3) != 0)))
 	    {
 		semsg(_(e_invalid_argument_str), data);
 		ga_clear(out);
-		return FAIL;
+		திரும்பு FAIL;
 	    }
 	}
     }
-    return OK;
+    திரும்பு OK;
 }

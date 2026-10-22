@@ -11,37 +11,37 @@
  * Text properties implementation.  See ":help text-properties".
  */
 
-#include "vim.h"
+#அந்தர்பாவ "vim.h"
 
-#if defined(FEAT_PROP_POPUP)
+#எனில் defined(FEAT_PROP_POPUP)
 
-static void um_store_changes(unpacked_memline_T *um);
+நிலையான வெறுமை um_store_changes(unpacked_memline_T *um);
 
 /*
  * Free virtual text strings in a detached unpacked memline's props.
  */
-    static void
-um_free_vtext(textprop_T *props, int count)
+    நிலையான வெறுமை
+um_free_vtext(textprop_T *props, முழு மொத்தம்)
 {
-    for (int i = 0; i < count; ++i)
-	if (props[i].tp_flags & TP_FLAG_VTEXT_PTR)
+    க்கு (முழு i = 0; i < மொத்தம்; ++i)
+	எனில் (props[i].tp_flags & TP_FLAG_VTEXT_PTR)
 	    VIM_CLEAR(props[i].u.tp_text);
 }
 
 /*
  * Free memory used by an unpacked memline.
  */
-    static void
+    நிலையான வெறுமை
 um_free(unpacked_memline_T *um)
 {
-    if (um->detached)
+    எனில் (um->detached)
     {
 	VIM_CLEAR(um->text);
-	um_free_vtext(um->props, um->prop_count);
+	um_free_vtext(um->props, um->prop_மொத்தம்);
     }
     VIM_CLEAR(um->props);
     um->prop_size = 0;
-    um->prop_count = 0;
+    um->prop_மொத்தம் = 0;
     um->lnum = 0;
     um->detached = false;
 }
@@ -57,7 +57,7 @@ um_open(buf_T *buf)
 
     CLEAR_FIELD(um);
     um.buf = buf;
-    return um;
+    திரும்பு um;
 }
 
 /*
@@ -67,88 +67,88 @@ um_open(buf_T *buf)
  * Returns true on success, false on error (um becomes closed).
  */
     bool
-um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
+um_goto_வரி(unpacked_memline_T *um, linenr_T lnum, முழு extra_props)
 {
-    char_u	*line;
+    char_u	*வரி;
     size_t	textlen;
     size_t	propdata_len;
-    int		proplen;
+    முழு		proplen;
 
-    if (um->buf == NULL)
-	return false;
+    எனில் (um->buf == வெற்று)
+	திரும்பு false;
 
     // Store changes to the current line if any.
-    if (um->lnum > 0 && um->detached)
+    எனில் (um->lnum > 0 && um->detached)
 	um_store_changes(um);
     um_free(um);
 
-    if (lnum == 0)
-	return true;	// just unload
+    எனில் (lnum == 0)
+	திரும்பு true;	// just unload
 
-    line = ml_get_buf(um->buf, lnum, FALSE);
+    வரி = ml_get_buf(um->buf, lnum, FALSE);
     textlen = ml_get_buf_len(um->buf, lnum) + 1;
-    propdata_len = um->buf->b_ml.ml_line_len - textlen;
+    propdata_len = um->buf->b_ml.ml_வரி_len - textlen;
 
     um->lnum = lnum;
     um->text_size = (colnr_T)textlen;
-    um->text = line;
+    um->text = வரி;
 
-    if (propdata_len == 0)
-	return true;
+    எனில் (propdata_len == 0)
+	திரும்பு true;
 
     // New format: [prop_count (uint16)][textprop_T...][vtext...]
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    எனில் (propdata_len < PROP_மொத்தம்_SIZE + அளவு(textprop_T))
     {
 	emsg(e_text_property_info_corrupted);
-	um->buf = NULL;
-	return false;
+	um->buf = வெற்று;
+	திரும்பு false;
     }
 
-    uint16_t    prop_count;
-    char_u	    *count_ptr = line + textlen;
+    uint16_t    prop_மொத்தம்;
+    char_u	    *மொத்தம்_ptr = வரி + textlen;
     char_u	    *props_start;
 
-    mch_memmove(&prop_count, count_ptr, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    mch_memmove(&prop_மொத்தம், மொத்தம்_ptr, PROP_மொத்தம்_SIZE);
+    எனில் (!text_prop_மொத்தம்_valid(prop_மொத்தம், propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	um->buf = NULL;
-	return false;
+	um->buf = வெற்று;
+	திரும்பு false;
     }
-    proplen = (int)prop_count;
-    props_start = count_ptr + PROP_COUNT_SIZE;
+    proplen = (முழு)prop_மொத்தம்;
+    props_start = மொத்தம்_ptr + PROP_மொத்தம்_SIZE;
 
-    if (!text_prop_vtext_valid(props_start, proplen, propdata_len))
+    எனில் (!text_prop_vtext_valid(props_start, proplen, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	um->buf = NULL;
-	return false;
+	um->buf = வெற்று;
+	திரும்பு false;
     }
 
     um->props = ALLOC_MULT(textprop_T, proplen + extra_props);
-    if (um->props == NULL)
+    எனில் (um->props == வெற்று)
     {
-	um->buf = NULL;
-	return false;
+	um->buf = வெற்று;
+	திரும்பு false;
     }
     um->prop_size = proplen + extra_props;
-    um->prop_count = proplen;
-    mch_memmove(um->props, props_start, proplen * sizeof(textprop_T));
+    um->prop_மொத்தம் = proplen;
+    mch_memmove(um->props, props_start, proplen * அளவு(textprop_T));
 
     // Convert tp_text_offset to tp_text pointer for virtual text
     // props.
-    for (int i = 0; i < proplen; ++i)
+    க்கு (முழு i = 0; i < proplen; ++i)
     {
-	if (um->props[i].tp_id < 0 && um->props[i].u.tp_text_offset > 0)
+	எனில் (um->props[i].tp_id < 0 && um->props[i].u.tp_text_offset > 0)
 	{
-	    um->props[i].u.tp_text = count_ptr + um->props[i].u.tp_text_offset;
+	    um->props[i].u.tp_text = மொத்தம்_ptr + um->props[i].u.tp_text_offset;
 	    um->props[i].tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
-	    um->props[i].u.tp_text = NULL;
+	இல்லையெனில்
+	    um->props[i].u.tp_text = வெற்று;
     }
 
-    return true;
+    திரும்பு true;
 }
 
 /*
@@ -156,13 +156,13 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
  * Check um.buf != NULL for success.
  */
     unpacked_memline_T
-um_open_at(buf_T *buf, linenr_T lnum, int extra_props)
+um_open_at(buf_T *buf, linenr_T lnum, முழு extra_props)
 {
     unpacked_memline_T um = um_open(buf);
 
-    if (!um_goto_line(&um, lnum, extra_props))
-	um.buf = NULL;
-    return um;
+    எனில் (!um_goto_வரி(&um, lnum, extra_props))
+	um.buf = வெற்று;
+    திரும்பு um;
 }
 
 /*
@@ -170,43 +170,43 @@ um_open_at(buf_T *buf, linenr_T lnum, int extra_props)
  * strings to allocated memory (LOADED -> DETACHED).
  * Returns true on success.
  */
-    static bool
+    நிலையான bool
 um_detach(unpacked_memline_T *um)
 {
     char_u  *newtext;
 
-    if (um->detached || um->buf == NULL)
-	return um->detached;
+    எனில் (um->detached || um->buf == வெற்று)
+	திரும்பு um->detached;
 
     newtext = vim_strnsave(um->text, um->text_size - 1);
-    if (newtext == NULL)
+    எனில் (newtext == வெற்று)
     {
-	um->buf = NULL;
-	return false;
+	um->buf = வெற்று;
+	திரும்பு false;
     }
     um->text = newtext;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    க்கு (முழு i = 0; i < um->prop_மொத்தம்; ++i)
     {
-	if (um->props[i].tp_flags & TP_FLAG_VTEXT_PTR)
+	எனில் (um->props[i].tp_flags & TP_FLAG_VTEXT_PTR)
 	{
 	    char_u *copy = vim_strsave(um->props[i].u.tp_text);
 
-	    if (copy == NULL)
+	    எனில் (copy == வெற்று)
 	    {
-		for (int j = 0; j < i; ++j)
-		    if (um->props[j].tp_id < 0)
+		க்கு (முழு j = 0; j < i; ++j)
+		    எனில் (um->props[j].tp_id < 0)
 			VIM_CLEAR(um->props[j].u.tp_text);
 		VIM_CLEAR(um->text);
-		um->buf = NULL;
-		return false;
+		um->buf = வெற்று;
+		திரும்பு false;
 	    }
 	    um->props[i].u.tp_text = copy;
 	}
     }
 
     um->detached = true;
-    return true;
+    திரும்பு true;
 }
 
 /*
@@ -216,64 +216,64 @@ um_detach(unpacked_memline_T *um)
     bool
 um_set_text(unpacked_memline_T *um, char_u *text)
 {
-    if (um->buf == NULL)
-	return false;
-    if (um->detached)
+    எனில் (um->buf == வெற்று)
+	திரும்பு false;
+    எனில் (um->detached)
 	vim_free(um->text);
     um->text = text;
     um->text_size = (colnr_T)STRLEN(text) + 1;
     um->text_changed = true;
     um->detached = true;
-    return true;
+    திரும்பு true;
 }
 
 /*
  * Ensure there is space for at least "needed" more properties.
  * Returns true on success.
  */
-    static bool
-um_grow_props(unpacked_memline_T *um, int needed)
+    நிலையான bool
+um_grow_props(unpacked_memline_T *um, முழு needed)
 {
-    if (um->prop_count + needed <= um->prop_size)
-	return true;
+    எனில் (um->prop_மொத்தம் + needed <= um->prop_size)
+	திரும்பு true;
 
-    int	    new_size = um->prop_count + needed;
+    முழு	    new_size = um->prop_மொத்தம் + needed;
     textprop_T  *newprops = vim_realloc(um->props,
-					    new_size * sizeof(textprop_T));
-    if (newprops == NULL)
-	return false;
+					    new_size * அளவு(textprop_T));
+    எனில் (newprops == வெற்று)
+	திரும்பு false;
     um->props = newprops;
     um->prop_size = new_size;
 
-    return true;
+    திரும்பு true;
 }
 
 /*
  * Add a property to the end of the props array without sorting.
  * For virtual text props, u.tp_text ownership is transferred.
  */
-    static void
+    நிலையான வெறுமை
 um_add_prop(unpacked_memline_T *um, textprop_T *prop)
 {
-    if (um->buf == NULL)
-	return;
-    if (!um->detached && !um_detach(um))
-	return;
-    if (!um_grow_props(um, 1))
+    எனில் (um->buf == வெற்று)
+	திரும்பு;
+    எனில் (!um->detached && !um_detach(um))
+	திரும்பு;
+    எனில் (!um_grow_props(um, 1))
     {
-	um->buf = NULL;
-	return;
+	um->buf = வெற்று;
+	திரும்பு;
     }
-    um->props[um->prop_count++] = *prop;
+    um->props[um->prop_மொத்தம்++] = *prop;
 }
 
 /*
  * Reverse the order of all properties.
  */
-    void
+    வெறுமை
 um_reverse_props(unpacked_memline_T *um)
 {
-    for (int i = 0, j = um->prop_count - 1; i < j; ++i, --j)
+    க்கு (முழு i = 0, j = um->prop_மொத்தம் - 1; i < j; ++i, --j)
     {
 	textprop_T tmp = um->props[i];
 	um->props[i] = um->props[j];
@@ -287,45 +287,45 @@ um_reverse_props(unpacked_memline_T *um)
  * immediately in the DETACHED state.
  */
     unpacked_memline_T
-um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
+um_open_at_no_props(buf_T *buf, linenr_T lnum, முழு prop_மொத்தம்)
 {
     unpacked_memline_T um;
 
     CLEAR_FIELD(um);
     um.buf = buf;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    எனில் (lnum < 1 || lnum > buf->b_ml.ml_வரி_மொத்தம்)
     {
-	um.buf = NULL;
-	return um;
+	um.buf = வெற்று;
+	திரும்பு um;
     }
 
-    char_u *line = ml_get_buf(buf, lnum, FALSE);
-    char_u *text_copy = vim_strsave(line);
+    char_u *வரி = ml_get_buf(buf, lnum, FALSE);
+    char_u *text_copy = vim_strsave(வரி);
 
-    if (text_copy == NULL)
+    எனில் (text_copy == வெற்று)
     {
-	um.buf = NULL;
-	return um;
+	um.buf = வெற்று;
+	திரும்பு um;
     }
     um.lnum = lnum;
     um.text = text_copy;
     um.text_size = (colnr_T)STRLEN(text_copy) + 1;
     um.detached = true;
 
-    if (prop_count > 0)
+    எனில் (prop_மொத்தம் > 0)
     {
-	um.props = ALLOC_MULT(textprop_T, prop_count);
-	if (um.props == NULL)
+	um.props = ALLOC_MULT(textprop_T, prop_மொத்தம்);
+	எனில் (um.props == வெற்று)
 	{
 	    vim_free(um.text);
-	    um.buf = NULL;
-	    return um;
+	    um.buf = வெற்று;
+	    திரும்பு um;
 	}
-	um.prop_size = prop_count;
+	um.prop_size = prop_மொத்தம்;
     }
 
-    return um;
+    திரும்பு um;
 }
 
 /*
@@ -333,31 +333,31 @@ um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
  * Find a property on "lnum" in "buf" that matches "tp_id" and "tp_type",
  * and clear "flag_to_clear" (TP_FLAG_CONT_NEXT or TP_FLAG_CONT_PREV).
  */
-    static void
+    நிலையான வெறுமை
 clear_cont_flag_on_neighbor(buf_T *buf, linenr_T lnum,
-					int tp_id, int tp_type, int flag)
+					முழு tp_id, முழு tp_type, முழு flag)
 {
     unpacked_memline_T	neighbor;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
-	return;
+    எனில் (lnum < 1 || lnum > buf->b_ml.ml_வரி_மொத்தம்)
+	திரும்பு;
 
     neighbor = um_open_at(buf, lnum, 0);
-    if (neighbor.buf == NULL)
-	return;
+    எனில் (neighbor.buf == வெற்று)
+	திரும்பு;
 
-    for (int i = 0; i < neighbor.prop_count; ++i)
+    க்கு (முழு i = 0; i < neighbor.prop_மொத்தம்; ++i)
     {
 	textprop_T *p = &neighbor.props[i];
 
-	if (p->tp_id == tp_id && p->tp_type == tp_type && (p->tp_flags & flag))
+	எனில் (p->tp_id == tp_id && p->tp_type == tp_type && (p->tp_flags & flag))
 	{
-	    if (!neighbor.detached && !um_detach(&neighbor))
-		break;
+	    எனில் (!neighbor.detached && !um_detach(&neighbor))
+		நிறுத்து;
 	    // Re-get pointer after detach.
 	    p = &neighbor.props[i];
 	    p->tp_flags &= ~flag;
-	    break;
+	    நிறுத்து;
 	}
     }
     um_close(&neighbor);
@@ -368,27 +368,27 @@ clear_cont_flag_on_neighbor(buf_T *buf, linenr_T lnum,
  * Automatically detaches if needed.
  * Also adjusts continuation flags on neighboring lines.
  */
-    void
-um_delete_prop(unpacked_memline_T *um, int index)
+    வெறுமை
+um_delete_prop(unpacked_memline_T *um, முழு index)
 {
     textprop_T *prop;
 
-    if (um->buf == NULL || index < 0 || index >= um->prop_count)
-	return;
-    if (!um->detached && !um_detach(um))
-	return;
+    எனில் (um->buf == வெற்று || index < 0 || index >= um->prop_மொத்தம்)
+	திரும்பு;
+    எனில் (!um->detached && !um_detach(um))
+	திரும்பு;
 
     prop = &um->props[index];
 
     // Adjust continuation flags on neighboring lines before deleting.
-    if (prop->tp_flags & TP_FLAG_CONT_PREV)
+    எனில் (prop->tp_flags & TP_FLAG_CONT_PREV)
 	clear_cont_flag_on_neighbor(um->buf, um->lnum - 1,
 			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_NEXT);
-    if (prop->tp_flags & TP_FLAG_CONT_NEXT)
+    எனில் (prop->tp_flags & TP_FLAG_CONT_NEXT)
 	clear_cont_flag_on_neighbor(um->buf, um->lnum + 1,
 			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_PREV);
 
-    if (prop->tp_flags & TP_FLAG_VTEXT_PTR)
+    எனில் (prop->tp_flags & TP_FLAG_VTEXT_PTR)
 	VIM_CLEAR(prop->u.tp_text);
     prop->tp_flags |= TP_FLAG_DELETED;
 }
@@ -402,147 +402,147 @@ um_delete_prop(unpacked_memline_T *um, int index)
  * NOTE: Currently packs in the OLD format (no inline vtext) because
  * the read side has not been converted yet.
  */
-    static char_u *
-um_pack(unpacked_memline_T *um, int *packed_len)
+    நிலையான char_u *
+um_pack(unpacked_memline_T *um, முழு *packed_len)
 {
-    uint16_t	live_count = 0;
-    int		vtext_size = 0;
-    int		total_len;
+    uint16_t	live_மொத்தம் = 0;
+    முழு		vtext_size = 0;
+    முழு		total_len;
     char_u	*buf;
-    char_u	*count_dest;
+    char_u	*மொத்தம்_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    க்கு (முழு i = 0; i < um->prop_மொத்தம்; ++i)
     {
 	textprop_T *prop = &um->props[i];
 
-	if (prop->tp_flags & TP_FLAG_DELETED)
-	    continue;
-	++live_count;
-	if (prop->tp_flags & TP_FLAG_VTEXT_PTR)
+	எனில் (prop->tp_flags & TP_FLAG_DELETED)
+	    தொடர்;
+	++live_மொத்தம்;
+	எனில் (prop->tp_flags & TP_FLAG_VTEXT_PTR)
 	    vtext_size += prop->tp_len + 1;
     }
 
-    if (live_count == 0)
+    எனில் (live_மொத்தம் == 0)
     {
 	// No properties: just text, no prop_count header.
 	total_len = um->text_size;
 	buf = alloc(total_len);
-	if (buf == NULL)
-	    return NULL;
+	எனில் (buf == வெற்று)
+	    திரும்பு வெற்று;
 	*packed_len = total_len;
 	mch_memmove(buf, um->text, um->text_size);
-	return buf;
+	திரும்பு buf;
     }
 
     // Format: [text][NUL][prop_count][textprop_T...][vtext...]
-    total_len = um->text_size + (int)PROP_COUNT_SIZE
-		+ live_count * (int)sizeof(textprop_T) + vtext_size;
+    total_len = um->text_size + (முழு)PROP_மொத்தம்_SIZE
+		+ live_மொத்தம் * (முழு)அளவு(textprop_T) + vtext_size;
     buf = alloc(total_len);
-    if (buf == NULL)
-	return NULL;
+    எனில் (buf == வெற்று)
+	திரும்பு வெற்று;
     *packed_len = total_len;
 
     mch_memmove(buf, um->text, um->text_size);
 
-    count_dest = buf + um->text_size;
-    mch_memmove(count_dest, &live_count, PROP_COUNT_SIZE);
+    மொத்தம்_dest = buf + um->text_size;
+    mch_memmove(மொத்தம்_dest, &live_மொத்தம், PROP_மொத்தம்_SIZE);
 
-    prop_dest = count_dest + PROP_COUNT_SIZE;
-    vtext_dest = prop_dest + live_count * sizeof(textprop_T);
+    prop_dest = மொத்தம்_dest + PROP_மொத்தம்_SIZE;
+    vtext_dest = prop_dest + live_மொத்தம் * அளவு(textprop_T);
 
-    for (int i = 0; i < um->prop_count; ++i)
+    க்கு (முழு i = 0; i < um->prop_மொத்தம்; ++i)
     {
 	textprop_T prop = um->props[i];
 
-	if (prop.tp_flags & TP_FLAG_DELETED)
-	    continue;
+	எனில் (prop.tp_flags & TP_FLAG_DELETED)
+	    தொடர்;
 
-	if (prop.tp_id < 0 && (prop.tp_flags & TP_FLAG_VTEXT_PTR))
+	எனில் (prop.tp_id < 0 && (prop.tp_flags & TP_FLAG_VTEXT_PTR))
 	{
-	    int copysize = prop.tp_len + 1;
+	    முழு copysize = prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
-	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - மொத்தம்_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	இல்லையெனில்
 	    prop.u.tp_text_offset = 0;
 	prop.tp_flags &= ~(TP_FLAG_DELETED | TP_FLAG_VTEXT_PTR);
 
-	mch_memmove(prop_dest, &prop, sizeof(textprop_T));
-	prop_dest += sizeof(textprop_T);
+	mch_memmove(prop_dest, &prop, அளவு(textprop_T));
+	prop_dest += அளவு(textprop_T);
     }
 
-    return buf;
+    திரும்பு buf;
 }
 
 /*
  * Store changes to the current line back into the buffer's memline.
  */
-    static void
+    நிலையான வெறுமை
 um_store_changes(unpacked_memline_T *um)
 {
     char_u  *packed;
-    int	    packed_len;
+    முழு	    packed_len;
 
-    if (!um->detached || um->buf == NULL || um->lnum == 0)
-	return;
+    எனில் (!um->detached || um->buf == வெற்று || um->lnum == 0)
+	திரும்பு;
 
     packed = um_pack(um, &packed_len);
-    if (packed == NULL)
+    எனில் (packed == வெற்று)
     {
-	um->buf = NULL;
-	return;
+	um->buf = வெற்று;
+	திரும்பு;
     }
 
     // Flush any other dirty line before setting ours.  ml_get_buf()
     // with will_change=TRUE will flush the current dirty line and set
     // up for our line.
-    if (um->buf->b_ml.ml_line_lnum != um->lnum)
+    எனில் (um->buf->b_ml.ml_வரி_lnum != um->lnum)
 	ml_get_buf(um->buf, um->lnum, TRUE);
-    else if (!(um->buf->b_ml.ml_flags & ML_LINE_DIRTY))
-	(void)ml_get_buf(um->buf, um->lnum, TRUE);
+    இல்லையெனில் எனில் (!(um->buf->b_ml.ml_flags & ML_வரி_DIRTY))
+	(வெறுமை)ml_get_buf(um->buf, um->lnum, TRUE);
 
     // Free the detached text and vtext before switching to packed.
     vim_free(um->text);
-    um_free_vtext(um->props, um->prop_count);
+    um_free_vtext(um->props, um->prop_மொத்தம்);
 
-    if (um->buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	vim_free(um->buf->b_ml.ml_line_ptr);
-    um->buf->b_ml.ml_line_ptr = packed;
-    um->buf->b_ml.ml_line_len = packed_len;
-    um->buf->b_ml.ml_flags |= ML_LINE_DIRTY;
+    எனில் (um->buf->b_ml.ml_flags & (ML_வரி_DIRTY | ML_ALLOCATED))
+	vim_free(um->buf->b_ml.ml_வரி_ptr);
+    um->buf->b_ml.ml_வரி_ptr = packed;
+    um->buf->b_ml.ml_வரி_len = packed_len;
+    um->buf->b_ml.ml_flags |= ML_வரி_DIRTY;
 
     um->detached = false;
     um->text = packed;
     um->text_size = (colnr_T)STRLEN(packed) + 1;
-    um->buf->b_ml.ml_line_textlen = um->text_size;
+    um->buf->b_ml.ml_வரி_textlen = um->text_size;
 }
 
 /*
  * Close an unpacked memline, storing any changes.
  */
-    void
+    வெறுமை
 um_close(unpacked_memline_T *um)
 {
-    if (um->buf == NULL)
-	return;
-    if (um->detached && um->lnum > 0)
+    எனில் (um->buf == வெற்று)
+	திரும்பு;
+    எனில் (um->detached && um->lnum > 0)
 	um_store_changes(um);
     um_free(um);
-    um->buf = NULL;
+    um->buf = வெற்று;
 }
 
 /*
  * Abort an unpacked memline, discarding any changes.
  */
-    void
+    வெறுமை
 um_abort(unpacked_memline_T *um)
 {
     um_free(um);
-    um->buf = NULL;
+    um->buf = வெற்று;
 }
 
 /*
@@ -554,65 +554,65 @@ um_abort(unpacked_memline_T *um)
  */
 #define PT2HIKEY(p)  ((p)->pt_name)
 #define HIKEY2PT(p)   ((proptype_T *)((p) - offsetof(proptype_T, pt_name)))
-#define HI2PT(hi)      HIKEY2PT((hi)->hi_key)
+#define HI2PT(hi)      HIKEY2PT((hi)->hi_சாவி)
 
 // The global text property types.
-static hashtab_T *global_proptypes = NULL;
-static proptype_T **global_proparray = NULL;
+நிலையான hashtab_T *global_proptypes = வெற்று;
+நிலையான proptype_T **global_proparray = வெற்று;
 
 // The last used text property type ID.
-static int proptype_id = 0;
+நிலையான முழு proptype_id = 0;
 
 /*
  * Find a property type by name, return the hashitem.
  * Returns NULL if the item can't be found.
  */
-    static hashitem_T *
+    நிலையான hashitem_T *
 find_prop_type_hi(char_u *name, buf_T *buf)
 {
     hashtab_T	*ht;
     hashitem_T	*hi;
 
-    if (*name == NUL)
-	return NULL;
-    if (buf == NULL)
+    எனில் (*name == NUL)
+	திரும்பு வெற்று;
+    எனில் (buf == வெற்று)
 	ht = global_proptypes;
-    else
+    இல்லையெனில்
 	ht = buf->b_proptypes;
 
-    if (ht == NULL)
-	return NULL;
+    எனில் (ht == வெற்று)
+	திரும்பு வெற்று;
     hi = hash_find(ht, name);
-    if (HASHITEM_EMPTY(hi))
-	return NULL;
-    return hi;
+    எனில் (HASHITEM_EMPTY(hi))
+	திரும்பு வெற்று;
+    திரும்பு hi;
 }
 
 /*
  * Like find_prop_type_hi() but return the property type.
  */
-    static proptype_T *
+    நிலையான proptype_T *
 find_prop_type(char_u *name, buf_T *buf)
 {
     hashitem_T	*hi = find_prop_type_hi(name, buf);
 
-    if (hi == NULL)
-	return NULL;
-    return HI2PT(hi);
+    எனில் (hi == வெற்று)
+	திரும்பு வெற்று;
+    திரும்பு HI2PT(hi);
 }
 
 /*
  * Get the prop type ID of "name".
  * When not found return zero.
  */
-    int
+    முழு
 find_prop_type_id(char_u *name, buf_T *buf)
 {
     proptype_T *pt = find_prop_type(name, buf);
 
-    if (pt == NULL)
-	return 0;
-    return pt->pt_id;
+    எனில் (pt == வெற்று)
+	திரும்பு 0;
+    திரும்பு pt->pt_id;
 }
 
 /*
@@ -620,16 +620,16 @@ find_prop_type_id(char_u *name, buf_T *buf)
  * global types.
  * When not found gives an error message and returns NULL.
  */
-    static proptype_T *
+    நிலையான proptype_T *
 lookup_prop_type(char_u *name, buf_T *buf)
 {
     proptype_T *type = find_prop_type(name, buf);
 
-    if (type == NULL)
-	type = find_prop_type(name, NULL);
-    if (type == NULL)
+    எனில் (type == வெற்று)
+	type = find_prop_type(name, வெற்று);
+    எனில் (type == வெற்று)
 	semsg(_(e_property_type_str_does_not_exist), name);
-    return type;
+    திரும்பு type;
 }
 
 /*
@@ -639,50 +639,50 @@ lookup_prop_type(char_u *name, buf_T *buf)
  * If "bufnr" is valid or not present return OK.
  * When "arg" is not a dict or "bufnr" is invalid return FAIL.
  */
-    static int
+    நிலையான முழு
 get_bufnr_from_arg(typval_T *arg, buf_T **buf)
 {
     dictitem_T	*di;
 
-    if (arg->v_type != VAR_DICT)
+    எனில் (arg->v_type != VAR_DICT)
     {
 	emsg(_(e_dictionary_required));
-	return FAIL;
+	திரும்பு FAIL;
     }
-    if (arg->vval.v_dict == NULL)
-	return OK;  // NULL dict is like an empty dict
+    எனில் (arg->vval.v_dict == வெற்று)
+	திரும்பு OK;  // NULL dict is like an empty dict
     di = dict_find(arg->vval.v_dict, (char_u *)"bufnr", -1);
-    if (di != NULL && (di->di_tv.v_type != VAR_NUMBER
-					      || di->di_tv.vval.v_number != 0))
+    எனில் (di != வெற்று && (di->di_tv.v_type != VAR_எண்
+					      || di->di_tv.vval.v_எண் != 0))
     {
 	*buf = get_buf_arg(&di->di_tv);
-	if (*buf == NULL)
-	    return FAIL;
+	எனில் (*buf == வெற்று)
+	    திரும்பு FAIL;
     }
-    return OK;
+    திரும்பு OK;
 }
 
 /*
  * prop_add({lnum}, {col}, {props})
  */
-    void
+    வெறுமை
 f_prop_add(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	start_lnum;
     colnr_T	start_col;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+    எனில் (in_vim9script()
+	    && (check_for_எண்_arg(argvars, 0) == FAIL
+		|| check_for_எண்_arg(argvars, 1) == FAIL
 		|| check_for_dict_arg(argvars, 2) == FAIL))
-	return;
+	திரும்பு;
 
-    start_lnum = tv_get_number(&argvars[0]);
-    start_col = tv_get_number(&argvars[1]);
-    if (check_for_dict_arg(argvars, 2) == FAIL)
-	return;
+    start_lnum = tv_get_எண்(&argvars[0]);
+    start_col = tv_get_எண்(&argvars[1]);
+    எனில் (check_for_dict_arg(argvars, 2) == FAIL)
+	திரும்பு;
 
-    rettv->vval.v_number = prop_add_common(start_lnum, start_col,
+    rettv->vval.v_எண் = prop_add_common(start_lnum, start_col,
 				 argvars[2].vval.v_dict, curbuf, &argvars[2]);
 }
 
@@ -692,14 +692,14 @@ f_prop_add(typval_T *argvars, typval_T *rettv)
  * the buffer "buf" and assign identifier "id".
  * When "text" is not NULL store it as virtual text in the memline.
  */
-    static int
+    நிலையான முழு
 prop_add_one(
 	buf_T		*buf,
 	char_u		*type_name,
-	int		id,
+	முழு		id,
 	char_u		*text_arg,
-	int		text_padding_left,
-	int		text_flags,
+	முழு		text_padding_இடது,
+	முழு		text_flags,
 	linenr_T	start_lnum,
 	linenr_T	end_lnum,
 	colnr_T		start_col,
@@ -707,49 +707,49 @@ prop_add_one(
 {
     proptype_T	*type;
     linenr_T	lnum;
-    int		proplen;
-    char_u	*props = NULL;
+    முழு		proplen;
+    char_u	*props = வெற்று;
     char_u	*newprops;
     size_t	textlen;
     char_u	*newtext;
-    int		i;
+    முழு		i;
     textprop_T	tmp_prop;
     char_u	*text = text_arg;
-    int		res = FAIL;
+    முழு		res = FAIL;
 
     type = lookup_prop_type(type_name, buf);
-    if (type == NULL)
-	goto theend;
+    எனில் (type == வெற்று)
+	செல் theend;
 
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count)
+    எனில் (start_lnum < 1 || start_lnum > buf->b_ml.ml_வரி_மொத்தம்)
     {
-	semsg(_(e_invalid_line_number_nr), (long)start_lnum);
-	goto theend;
+	semsg(_(e_invalid_வரி_எண்_nr), (long)start_lnum);
+	செல் theend;
     }
-    if (end_lnum < start_lnum || end_lnum > buf->b_ml.ml_line_count)
+    எனில் (end_lnum < start_lnum || end_lnum > buf->b_ml.ml_வரி_மொத்தம்)
     {
-	semsg(_(e_invalid_line_number_nr), (long)end_lnum);
-	goto theend;
+	semsg(_(e_invalid_வரி_எண்_nr), (long)end_lnum);
+	செல் theend;
     }
 
-    if (buf->b_ml.ml_mfp == NULL)
+    எனில் (buf->b_ml.ml_mfp == வெற்று)
     {
 	emsg(_(e_cannot_add_text_property_to_unloaded_buffer));
-	goto theend;
+	செல் theend;
     }
 
-    if (text != NULL)
+    எனில் (text != வெற்று)
     {
 	char_u	    *p;
 
 	// change any control character (Tab, Newline, etc.) to a Space to make
 	// it simpler to compute the size
-	for (p = text; *p != NUL; MB_PTR_ADV(p))
-	    if (*p < ' ')
+	க்கு (p = text; *p != NUL; MB_PTR_ADV(p))
+	    எனில் (*p < ' ')
 		*p = ' ';
     }
 
-    for (lnum = start_lnum; lnum <= end_lnum; ++lnum)
+    க்கு (lnum = start_lnum; lnum <= end_lnum; ++lnum)
     {
 	colnr_T col;	    // start column use in tp_col
 	colnr_T sort_col;   // column where it appears
@@ -760,39 +760,39 @@ prop_add_one(
 	textlen = ml_get_buf_len(buf, lnum) + 1;
 
 	// prop_count is a uint16_t; stop before proplen + 1 wraps to zero.
-	if (proplen >= 0xffff)
+	எனில் (proplen >= 0xffff)
 	{
-	    emsg(_(e_too_many_text_properties_on_a_single_line));
-	    goto theend;
+	    emsg(_(e_too_many_text_properties_on_a_single_வரி));
+	    செல் theend;
 	}
 
-	if (lnum == start_lnum)
+	எனில் (lnum == start_lnum)
 	    col = start_col;
-	else
+	இல்லையெனில்
 	    col = 1;
-	if (col - 1 > (colnr_T)textlen && !(col == 0 && text_arg != NULL))
+	எனில் (col - 1 > (colnr_T)textlen && !(col == 0 && text_arg != வெற்று))
 	{
-	    semsg(_(e_invalid_column_number_nr), (long)start_col);
-	    goto theend;
+	    semsg(_(e_invalid_column_எண்_nr), (long)start_col);
+	    செல் theend;
 	}
 	sort_col = col;
 
-	if (lnum == end_lnum)
+	எனில் (lnum == end_lnum)
 	    length = end_col - col;
-	else
-	    length = (int)textlen - col + 1;
-	if (length > (long)textlen)
-	    length = (int)textlen;	// can include the end-of-line
-	if (length < 0)
+	இல்லையெனில்
+	    length = (முழு)textlen - col + 1;
+	எனில் (length > (long)textlen)
+	    length = (முழு)textlen;	// can include the end-of-line
+	எனில் (length < 0)
 	    length = 0;		// zero-width property
 
-	if (text_arg != NULL)
+	எனில் (text_arg != வெற்று)
 	{
 	    length = (long)STRLEN(text_arg);
-	    if (col == 0)
+	    எனில் (col == 0)
 	    {
 		col = MAXCOL;	// before or after the line
-		if ((text_flags & TP_FLAG_ALIGN_ABOVE) == 0)
+		எனில் ((text_flags & TP_FLAG_ALIGN_ABOVE) == 0)
 		    sort_col = MAXCOL;
 	    }
 	}
@@ -808,126 +808,126 @@ prop_add_one(
 			    | (lnum < end_lnum ? TP_FLAG_CONT_NEXT : 0)
 			    | ((type->pt_flags & PT_FLAG_INS_START_INCL)
 						     ? TP_FLAG_START_INCL : 0);
-	tmp_prop.tp_padleft = text_padding_left;
-	if (text_arg != NULL)
+	tmp_prop.tp_padleft = text_padding_இடது;
+	எனில் (text_arg != வெற்று)
 	    tmp_prop.u.tp_text = text_arg;
 
 	// Find the index where to insert the new property.
-	for (i = 0; i < proplen; ++i)
+	க்கு (i = 0; i < proplen; ++i)
 	{
 	    textprop_T	existing;
 	    colnr_T	prop_col;
 
-	    mch_memmove(&existing, props + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
+	    mch_memmove(&existing, props + i * அளவு(textprop_T),
+							   அளவு(textprop_T));
 	    prop_col = (existing.tp_flags & TP_FLAG_ALIGN_ABOVE)
 				? 0 : existing.tp_col;
-	    if (prop_col >= sort_col)
-		break;
+	    எனில் (prop_col >= sort_col)
+		நிறுத்து;
 	}
 
 	// Compute the sizes for the new memline format:
 	//   [text][NUL][prop_count][textprop_T...][vtext...]
 	uint16_t	new_propcount = (uint16_t)(proplen + 1);
-	int		vtext_total = 0;
-	int		new_line_len;
-	char_u	*count_dest;
+	முழு		vtext_total = 0;
+	முழு		new_வரி_len;
+	char_u	*மொத்தம்_dest;
 	char_u	*vtext_dest;
-	int		j;
+	முழு		j;
 
 	// Compute total vtext size from existing props.
-	for (j = 0; j < proplen; ++j)
+	க்கு (j = 0; j < proplen; ++j)
 	{
 	    textprop_T ep;
 
-	    mch_memmove(&ep, props + j * sizeof(textprop_T),
-							sizeof(textprop_T));
-	    if (ep.tp_id < 0 && ep.tp_len > 0)
+	    mch_memmove(&ep, props + j * அளவு(textprop_T),
+							அளவு(textprop_T));
+	    எனில் (ep.tp_id < 0 && ep.tp_len > 0)
 		vtext_total += ep.tp_len + 1;
 	}
 	// Add new vtext if this is a virtual text prop.
-	if (text_arg != NULL)
+	எனில் (text_arg != வெற்று)
 	    vtext_total += length + 1;
 
-	new_line_len = (int)textlen + (int)PROP_COUNT_SIZE
-			+ new_propcount * (int)sizeof(textprop_T)
+	new_வரி_len = (முழு)textlen + (முழு)PROP_மொத்தம்_SIZE
+			+ new_propcount * (முழு)அளவு(textprop_T)
 			+ vtext_total;
-	newtext = alloc(new_line_len);
-	if (newtext == NULL)
-	    goto theend;
+	newtext = alloc(new_வரி_len);
+	எனில் (newtext == வெற்று)
+	    செல் theend;
 
 	// Copy line text.
-	mch_memmove(newtext, buf->b_ml.ml_line_ptr, textlen);
+	mch_memmove(newtext, buf->b_ml.ml_வரி_ptr, textlen);
 
 	// Write prop_count.
-	count_dest = newtext + textlen;
-	mch_memmove(count_dest, &new_propcount, PROP_COUNT_SIZE);
+	மொத்தம்_dest = newtext + textlen;
+	mch_memmove(மொத்தம்_dest, &new_propcount, PROP_மொத்தம்_SIZE);
 
 	// Write properties: [0..i-1] existing, [i] new, [i..proplen-1]
 	// existing.
-	newprops = count_dest + PROP_COUNT_SIZE;
-	if (i > 0)
-	    mch_memmove(newprops, props, sizeof(textprop_T) * i);
+	newprops = மொத்தம்_dest + PROP_மொத்தம்_SIZE;
+	எனில் (i > 0)
+	    mch_memmove(newprops, props, அளவு(textprop_T) * i);
 	// new prop is written after vtext offsets are computed
-	if (i < proplen)
-	    mch_memmove(newprops + (i + 1) * sizeof(textprop_T),
-					props + i * sizeof(textprop_T),
-					sizeof(textprop_T) * (proplen - i));
+	எனில் (i < proplen)
+	    mch_memmove(newprops + (i + 1) * அளவு(textprop_T),
+					props + i * அளவு(textprop_T),
+					அளவு(textprop_T) * (proplen - i));
 
 	// Write vtext strings and set offsets.
-	vtext_dest = newprops + new_propcount * sizeof(textprop_T);
-	for (j = 0; j < new_propcount; ++j)
+	vtext_dest = newprops + new_propcount * அளவு(textprop_T);
+	க்கு (j = 0; j < new_propcount; ++j)
 	{
 	    textprop_T ep;
 
-	    if (j == i)
-		continue;  // handle new prop separately below
-	    mch_memmove(&ep, newprops + j * sizeof(textprop_T),
-		    sizeof(textprop_T));
-	    if (ep.tp_id < 0 && ep.tp_len > 0)
+	    எனில் (j == i)
+		தொடர்;  // handle new prop separately below
+	    mch_memmove(&ep, newprops + j * அளவு(textprop_T),
+		    அளவு(textprop_T));
+	    எனில் (ep.tp_id < 0 && ep.tp_len > 0)
 	    {
 		// Copy existing vtext from old memline data.
-		char_u *old_count = (char_u *)props - PROP_COUNT_SIZE;
-		char_u *old_vtext = old_count + ep.u.tp_text_offset;
+		char_u *old_மொத்தம்_2 = (char_u *)props - PROP_மொத்தம்_SIZE;
+		char_u *old_vtext = old_மொத்தம்_2 + ep.u.tp_text_offset;
 
 		mch_memmove(vtext_dest, old_vtext, ep.tp_len + 1);
-		ep.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
-		mch_memmove(newprops + j * sizeof(textprop_T), &ep,
-			sizeof(textprop_T));
+		ep.u.tp_text_offset = (colnr_T)(vtext_dest - மொத்தம்_dest);
+		mch_memmove(newprops + j * அளவு(textprop_T), &ep,
+			அளவு(textprop_T));
 		vtext_dest += ep.tp_len + 1;
 	    }
 	}
 
 	// Write new prop with vtext.
-	if (text_arg != NULL)
+	எனில் (text_arg != வெற்று)
 	{
-	    int copysize = tmp_prop.tp_len + 1;
+	    முழு copysize = tmp_prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, text_arg, copysize);
 	    tmp_prop.u.tp_text_offset =
-				    (colnr_T)(vtext_dest - count_dest);
+				    (colnr_T)(vtext_dest - மொத்தம்_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	இல்லையெனில்
 	    tmp_prop.u.tp_text_offset = 0;
 
-	mch_memmove(newprops + i * sizeof(textprop_T), &tmp_prop,
-							sizeof(textprop_T));
+	mch_memmove(newprops + i * அளவு(textprop_T), &tmp_prop,
+							அளவு(textprop_T));
 
-	if (buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(buf->b_ml.ml_line_ptr);
-	buf->b_ml.ml_line_ptr = newtext;
-	buf->b_ml.ml_line_len = new_line_len;
-	buf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	எனில் (buf->b_ml.ml_flags & (ML_வரி_DIRTY | ML_ALLOCATED))
+	    vim_free(buf->b_ml.ml_வரி_ptr);
+	buf->b_ml.ml_வரி_ptr = newtext;
+	buf->b_ml.ml_வரி_len = new_வரி_len;
+	buf->b_ml.ml_flags |= ML_வரி_DIRTY;
     }
 
-    changed_line_display_buf(buf);
-    changed_lines_buf(buf, start_lnum, end_lnum + 1, 0);
+    changed_வரி_display_buf(buf);
+    changed_வரிகள்_buf(buf, start_lnum, end_lnum + 1, 0);
     res = OK;
 
 theend:
     vim_free(text);
-    return res;
+    திரும்பு res;
 }
 
 /*
@@ -937,102 +937,102 @@ theend:
  * Second argument is a List where each item is a List with the following
  * entries: [lnum, start_col, end_col]
  */
-    void
+    வெறுமை
 f_prop_add_list(typval_T *argvars, typval_T *rettv UNUSED)
 {
     dict_T	*dict;
     char_u	*type_name;
     buf_T	*buf = curbuf;
-    int		id = 0;
+    முழு		id = 0;
     listitem_T	*li;
     list_T	*pos_list;
     linenr_T	start_lnum;
     colnr_T	start_col;
     linenr_T	end_lnum;
     colnr_T	end_col;
-    int		error = FALSE;
-    int		prev_did_emsg = did_emsg;
+    முழு		error = FALSE;
+    முழு		prev_did_emsg = did_emsg;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL
+    எனில் (check_for_dict_arg(argvars, 0) == FAIL
 	    || check_for_list_arg(argvars, 1) == FAIL)
-	return;
+	திரும்பு;
 
-    if (check_for_nonnull_list_arg(argvars, 1) == FAIL)
-	return;
+    எனில் (check_for_nonnull_list_arg(argvars, 1) == FAIL)
+	திரும்பு;
 
     dict = argvars[0].vval.v_dict;
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    எனில் (dict == வெற்று || !dict_has_சாவி(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
-	return;
+	திரும்பு;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "id"))
+    எனில் (dict_has_சாவி(dict, "id"))
     {
 	vimlong_T x;
-	x = dict_get_number(dict, "id");
-	if (x > INT_MAX || x  <= INT_MIN)
+	x = dict_get_எண்(dict, "id");
+	எனில் (x > INT_MAX || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
-	    return;
+	    திரும்பு;
 	}
-	id = (int)x;
+	id = (முழு)x;
     }
 
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
+    எனில் (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	திரும்பு;
 
     // This must be done _before_ we start adding properties because property
     // changes trigger buffer (memline) reorganisation, which needs this flag
     // to be correctly set.
     buf->b_has_textprop = true;  // this is never reset
-    FOR_ALL_LIST_ITEMS(argvars[1].vval.v_list, li)
+    FOR_ALL_LIST_பொருட்கள்(argvars[1].vval.v_list, li)
     {
-	if (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
+	எனில் (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == வெற்று)
 	{
 	    emsg(_(e_list_required));
-	    return;
+	    திரும்பு;
 	}
 
 	pos_list = li->li_tv.vval.v_list;
 	start_lnum = list_find_nr(pos_list, 0L, &error);
-	if (!error)
+	எனில் (!error)
 	    start_col = list_find_nr(pos_list, 1L, &error);
-	if (!error)
+	எனில் (!error)
 	    end_lnum = list_find_nr(pos_list, 2L, &error);
-	if (!error)
+	எனில் (!error)
 	    end_col = list_find_nr(pos_list, 3L, &error);
-	int this_id = id;
-	if (!error && pos_list->lv_len > 4)
+	முழு this_id = id;
+	எனில் (!error && pos_list->lv_len > 4)
 	    this_id = list_find_nr(pos_list, 4L, &error);
-	if (error || start_lnum <= 0 || start_col <= 0
+	எனில் (error || start_lnum <= 0 || start_col <= 0
 		  || end_lnum <= 0 || end_col <= 0)
 	{
-	    if (prev_did_emsg == did_emsg)
+	    எனில் (prev_did_emsg == did_emsg)
 		emsg(_(e_invalid_argument));
-	    return;
+	    திரும்பு;
 	}
-	if (prop_add_one(buf, type_name, this_id, NULL, 0, 0,
+	எனில் (prop_add_one(buf, type_name, this_id, வெற்று, 0, 0,
 			     start_lnum, end_lnum, start_col, end_col) == FAIL)
-	    return;
+	    திரும்பு;
     }
 
     redraw_buf_later(buf, UPD_VALID);
 }
 
 // Counter for virtual text property IDs (decremented for each new one).
-static int vt_id_counter = 0;
+நிலையான முழு vt_id_counter = 0;
 
 /*
  * Get the next ID to use for a textprop.
  */
-    static int
-get_textprop_id(void)
+    நிலையான முழு
+get_textprop_id(வெறுமை)
 {
-    if (vt_id_counter > 0)
+    எனில் (vt_id_counter > 0)
 	vt_id_counter = 0;
-    return --vt_id_counter;
+    திரும்பு --vt_id_counter;
 }
 
 /*
@@ -1041,7 +1041,7 @@ get_textprop_id(void)
  * it is NULL for popup_create().
  * Returns the "id" used for "text" or zero.
  */
-    int
+    முழு
 prop_add_common(
 	linenr_T    start_lnum,
 	colnr_T	    start_col,
@@ -1053,156 +1053,156 @@ prop_add_common(
     colnr_T	end_col;
     char_u	*type_name;
     buf_T	*buf = default_buf;
-    int		id = 0;
-    char_u	*text = NULL;
-    int		text_padding_left = 0;
-    int		flags = 0;
+    முழு		id = 0;
+    char_u	*text = வெற்று;
+    முழு		text_padding_இடது = 0;
+    முழு		flags = 0;
 
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    எனில் (dict == வெற்று || !dict_has_சாவி(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
-	goto theend;
+	செல் theend;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "end_lnum"))
+    எனில் (dict_has_சாவி(dict, "end_lnum"))
     {
-	end_lnum = dict_get_number(dict, "end_lnum");
-	if (end_lnum < start_lnum)
+	end_lnum = dict_get_எண்(dict, "end_lnum");
+	எனில் (end_lnum < start_lnum)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "end_lnum");
-	    goto theend;
+	    semsg(_(e_invalid_மதிப்பு_for_argument_str), "end_lnum");
+	    செல் theend;
 	}
     }
-    else
+    இல்லையெனில்
 	end_lnum = start_lnum;
 
-    if (dict_has_key(dict, "length"))
+    எனில் (dict_has_சாவி(dict, "length"))
     {
-	long length = dict_get_number(dict, "length");
+	long length = dict_get_எண்(dict, "length");
 
-	if (length < 0 || end_lnum > start_lnum)
+	எனில் (length < 0 || end_lnum > start_lnum)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "length");
-	    goto theend;
+	    semsg(_(e_invalid_மதிப்பு_for_argument_str), "length");
+	    செல் theend;
 	}
 	end_col = start_col + length;
     }
-    else if (dict_has_key(dict, "end_col"))
+    இல்லையெனில் எனில் (dict_has_சாவி(dict, "end_col"))
     {
-	end_col = dict_get_number(dict, "end_col");
-	if (end_col <= 0)
+	end_col = dict_get_எண்(dict, "end_col");
+	எனில் (end_col <= 0)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "end_col");
-	    goto theend;
+	    semsg(_(e_invalid_மதிப்பு_for_argument_str), "end_col");
+	    செல் theend;
 	}
     }
-    else if (start_lnum == end_lnum)
+    இல்லையெனில் எனில் (start_lnum == end_lnum)
 	end_col = start_col;
-    else
+    இல்லையெனில்
 	end_col = 1;
 
-    if (dict_has_key(dict, "id"))
+    எனில் (dict_has_சாவி(dict, "id"))
     {
 	vimlong_T x;
-	x = dict_get_number(dict, "id");
-	if (x > INT_MAX || x  <= INT_MIN)
+	x = dict_get_எண்(dict, "id");
+	எனில் (x > INT_MAX || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
-	    goto theend;
+	    செல் theend;
 	}
-	id = (int)x;
+	id = (முழு)x;
     }
 
-    if (dict_has_key(dict, "text"))
+    எனில் (dict_has_சாவி(dict, "text"))
     {
-	if (dict_has_key(dict, "length")
-		|| dict_has_key(dict, "end_col")
-		|| dict_has_key(dict, "end_lnum"))
+	எனில் (dict_has_சாவி(dict, "length")
+		|| dict_has_சாவி(dict, "end_col")
+		|| dict_has_சாவி(dict, "end_lnum"))
 	{
 	    emsg(_(e_cannot_use_length_endcol_and_endlnum_with_text));
-	    goto theend;
+	    செல் theend;
 	}
 
 	text = dict_get_string(dict, "text", TRUE);
-	if (text == NULL)
-	    goto theend;
+	எனில் (text == வெற்று)
+	    செல் theend;
 	// use a default length of 1 to make multiple props show up
 	end_col = start_col + 1;
 
-	if (dict_has_key(dict, "text_align"))
+	எனில் (dict_has_சாவி(dict, "text_align"))
 	{
 	    char_u *p = dict_get_string(dict, "text_align", FALSE);
 
-	    if (p == NULL)
-		goto theend;
-	    if (start_col != 0)
+	    எனில் (p == வெற்று)
+		செல் theend;
+	    எனில் (start_col != 0)
 	    {
 		emsg(_(e_can_only_use_text_align_when_column_is_zero));
-		goto theend;
+		செல் theend;
 	    }
-	    if (STRCMP(p, "right") == 0)
-		flags |= TP_FLAG_ALIGN_RIGHT;
-	    else if (STRCMP(p, "above") == 0)
+	    எனில் (STRCMP(p, "right") == 0)
+		flags |= TP_FLAG_ALIGN_வலது;
+	    இல்லையெனில் எனில் (STRCMP(p, "above") == 0)
 		flags |= TP_FLAG_ALIGN_ABOVE;
-	    else if (STRCMP(p, "below") == 0)
+	    இல்லையெனில் எனில் (STRCMP(p, "below") == 0)
 		flags |= TP_FLAG_ALIGN_BELOW;
-	    else if (STRCMP(p, "after") != 0)
+	    இல்லையெனில் எனில் (STRCMP(p, "after") != 0)
 	    {
-		semsg(_(e_invalid_value_for_argument_str_str), "text_align", p);
-		goto theend;
+		semsg(_(e_invalid_மதிப்பு_for_argument_str_str), "text_align", p);
+		செல் theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_padding_left"))
+	எனில் (dict_has_சாவி(dict, "text_padding_left"))
 	{
-	    text_padding_left = dict_get_number(dict, "text_padding_left");
-	    if (text_padding_left < 0)
+	    text_padding_இடது = dict_get_எண்(dict, "text_padding_left");
+	    எனில் (text_padding_இடது < 0)
 	    {
 		semsg(_(e_argument_must_be_positive_str), "text_padding_left");
-		goto theend;
+		செல் theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_wrap"))
+	எனில் (dict_has_சாவி(dict, "text_wrap"))
 	{
 	    char_u *p = dict_get_string(dict, "text_wrap", FALSE);
 
-	    if (p == NULL)
-		goto theend;
-	    if (STRCMP(p, "wrap") == 0)
+	    எனில் (p == வெற்று)
+		செல் theend;
+	    எனில் (STRCMP(p, "wrap") == 0)
 		flags |= TP_FLAG_WRAP;
-	    else if (STRCMP(p, "truncate") != 0)
+	    இல்லையெனில் எனில் (STRCMP(p, "truncate") != 0)
 	    {
-		semsg(_(e_invalid_value_for_argument_str_str), "text_wrap", p);
-		goto theend;
+		semsg(_(e_invalid_மதிப்பு_for_argument_str_str), "text_wrap", p);
+		செல் theend;
 	    }
 	}
     }
 
     // Column must be 1 or more for a normal text property; when "text" is
     // present zero means it goes after the line.
-    if (start_col < (text == NULL ? 1 : 0))
+    எனில் (start_col < (text == வெற்று ? 1 : 0))
     {
-	semsg(_(e_invalid_column_number_nr), (long)start_col);
-	goto theend;
+	semsg(_(e_invalid_column_எண்_nr), (long)start_col);
+	செல் theend;
     }
-    if (start_col > 0 && text_padding_left > 0)
+    எனில் (start_col > 0 && text_padding_இடது > 0)
     {
-	emsg(_(e_can_only_use_left_padding_when_column_is_zero));
-	goto theend;
+	emsg(_(e_can_only_use_இடது_padding_when_column_is_zero));
+	செல் theend;
     }
 
-    if (dict_arg != NULL && get_bufnr_from_arg(dict_arg, &buf) == FAIL)
-	goto theend;
+    எனில் (dict_arg != வெற்று && get_bufnr_from_arg(dict_arg, &buf) == FAIL)
+	செல் theend;
 
-    if (text != NULL)
+    எனில் (text != வெற்று)
 	// Always assign an internal negative id; ignore any user-provided id.
 	id = get_textprop_id();
-    else if (id < 0)
+    இல்லையெனில் எனில் (id < 0)
     {
 	emsg(_(e_cannot_use_negative_id));
-	goto theend;
+	செல் theend;
     }
 
     // This must be done _before_ we add the property because property changes
@@ -1210,15 +1210,15 @@ prop_add_common(
     // correctly set.
     buf->b_has_textprop = true;  // this is never reset
 
-    prop_add_one(buf, type_name, id, text, text_padding_left, flags,
+    prop_add_one(buf, type_name, id, text, text_padding_இடது, flags,
 				    start_lnum, end_lnum, start_col, end_col);
-    text = NULL;
+    text = வெற்று;
 
     redraw_buf_later(buf, UPD_VALID);
 
 theend:
     vim_free(text);
-    return id;
+    திரும்பு id;
 }
 
 /*
@@ -1227,48 +1227,48 @@ theend:
  * first one in "props" (note that it is not aligned, therefore the char_u
  * pointer).
  */
-    int
-get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
+    முழு
+get_text_props(buf_T *buf, linenr_T lnum, char_u **props, முழு will_change)
 {
     char_u	*text;
     size_t	textlen;
     size_t	propdata_len;
-    uint16_t	prop_count;
+    uint16_t	prop_மொத்தம்;
 
     // Be quick when no text property types have been defined for the buffer,
     // unless we are adding one.
-    if ((!buf->b_has_textprop && !will_change) || buf->b_ml.ml_mfp == NULL)
-	return 0;
+    எனில் ((!buf->b_has_textprop && !will_change) || buf->b_ml.ml_mfp == வெற்று)
+	திரும்பு 0;
 
     // Fetch the line to get the ml_line_len field updated.
     text = ml_get_buf(buf, lnum, will_change);
     textlen = ml_get_buf_len(buf, lnum) + 1;
-    propdata_len = buf->b_ml.ml_line_len - textlen;
-    if (propdata_len == 0)
-	return 0;
+    propdata_len = buf->b_ml.ml_வரி_len - textlen;
+    எனில் (propdata_len == 0)
+	திரும்பு 0;
 
     // Format: [prop_count (uint16)][textprop_T...][vtext...]
     // Lines without properties have no prop data at all.
     // prop_count is never zero.
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    எனில் (propdata_len < PROP_மொத்தம்_SIZE + அளவு(textprop_T))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	திரும்பு 0;
     }
-    mch_memmove(&prop_count, text + textlen, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    mch_memmove(&prop_மொத்தம், text + textlen, PROP_மொத்தம்_SIZE);
+    எனில் (!text_prop_மொத்தம்_valid(prop_மொத்தம், propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	திரும்பு 0;
     }
-    if (!text_prop_vtext_valid(text + textlen + PROP_COUNT_SIZE,
-					   (int)prop_count, propdata_len))
+    எனில் (!text_prop_vtext_valid(text + textlen + PROP_மொத்தம்_SIZE,
+					   (முழு)prop_மொத்தம், propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	திரும்பு 0;
     }
-    *props = text + textlen + PROP_COUNT_SIZE;
-    return (int)prop_count;
+    *props = text + textlen + PROP_மொத்தம்_SIZE;
+    திரும்பு (முழு)prop_மொத்தம்;
 }
 
 /*
@@ -1276,34 +1276,34 @@ get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
  * line "lnum".  A "right" aligned property also goes below after a "below" or
  * other "right" aligned property.
  */
-    int
-prop_count_above_below(buf_T *buf, linenr_T lnum)
+    முழு
+prop_மொத்தம்_above_below(buf_T *buf, linenr_T lnum)
 {
     char_u	*props;
-    int		count = get_text_props(buf, lnum, &props, FALSE);
-    int		result = 0;
+    முழு		மொத்தம் = get_text_props(buf, lnum, &props, FALSE);
+    முழு		result = 0;
     textprop_T	prop;
-    int		i;
-    int		next_right_goes_below = FALSE;
+    முழு		i;
+    முழு		next_வலது_goes_below = FALSE;
 
-    if (count == 0)
-	return 0;
-    for (i = 0; i < count; ++i)
+    எனில் (மொத்தம் == 0)
+	திரும்பு 0;
+    க்கு (i = 0; i < மொத்தம்; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(prop), sizeof(prop));
-	if (prop.tp_col == MAXCOL && text_prop_type_valid(buf, &prop))
+	mch_memmove(&prop, props + i * அளவு(prop), அளவு(prop));
+	எனில் (prop.tp_col == MAXCOL && text_prop_type_valid(buf, &prop))
 	{
-	    if ((prop.tp_flags & (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW))
-		    || (next_right_goes_below
-				     && (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)))
+	    எனில் ((prop.tp_flags & (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW))
+		    || (next_வலது_goes_below
+				     && (prop.tp_flags & TP_FLAG_ALIGN_வலது)))
 	    {
 		++result;
 	    }
-	    else if (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)
-		next_right_goes_below = TRUE;
+	    இல்லையெனில் எனில் (prop.tp_flags & TP_FLAG_ALIGN_வலது)
+		next_வலது_goes_below = TRUE;
 	}
     }
-    return result;
+    திரும்பு result;
 }
 
 /**
@@ -1313,44 +1313,44 @@ prop_count_above_below(buf_T *buf, linenr_T lnum)
  * When "last_line" is FALSE then text properties after the line are not
  * counted.
  */
-    int
-count_props(linenr_T lnum, int only_starting, int last_line)
+    முழு
+மொத்தம்_props(linenr_T lnum, முழு only_starting, முழு last_வரி)
 {
     char_u	*props;
-    int		proplen = get_text_props(curbuf, lnum, &props, 0);
-    int		result = proplen;
+    முழு		proplen = get_text_props(curbuf, lnum, &props, 0);
+    முழு		result = proplen;
     textprop_T	prop;
 
-    for (int i = 0; i < proplen; ++i)
+    க்கு (முழு i = 0; i < proplen; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(prop), sizeof(prop));
+	mch_memmove(&prop, props + i * அளவு(prop), அளவு(prop));
 	// A prop is dropped when in the first line and it continues from the
 	// previous line, or when not in the last line and it is virtual text
 	// after the line.
-	if ((only_starting && (prop.tp_flags & TP_FLAG_CONT_PREV))
-		|| (!last_line && prop.tp_col == MAXCOL))
+	எனில் ((only_starting && (prop.tp_flags & TP_FLAG_CONT_PREV))
+		|| (!last_வரி && prop.tp_col == MAXCOL))
 	    --result;
     }
-    return result;
+    திரும்பு result;
 }
 
-static textprop_T	*text_prop_compare_props;
-static buf_T		*text_prop_compare_buf;
+நிலையான textprop_T	*text_prop_compare_props;
+நிலையான buf_T		*text_prop_compare_buf;
 
 /*
  * Score for sorting on position of the text property: 0: above,
  * 1: after (default), 2: right, 3: below (comes last)
  */
-    static int
-text_prop_order(int flags)
+    நிலையான முழு
+text_prop_order(முழு flags)
 {
-    if (flags & TP_FLAG_ALIGN_ABOVE)
-	return 0;
-    if (flags & TP_FLAG_ALIGN_RIGHT)
-	return 2;
-    if (flags & TP_FLAG_ALIGN_BELOW)
-	return 3;
-    return 1;
+    எனில் (flags & TP_FLAG_ALIGN_ABOVE)
+	திரும்பு 0;
+    எனில் (flags & TP_FLAG_ALIGN_வலது)
+	திரும்பு 2;
+    எனில் (flags & TP_FLAG_ALIGN_BELOW)
+	திரும்பு 3;
+    திரும்பு 1;
 }
 
 /*
@@ -1358,73 +1358,73 @@ text_prop_order(int flags)
  * Return 1 if "s1" has priority over "s2", -1 if the other way around, zero if
  * both have the same priority.
  */
-    static int
-text_prop_compare(const void *s1, const void *s2)
+    நிலையான முழு
+text_prop_compare(மாறிலி வெறுமை *s1, மாறிலி வெறுமை *s2)
 {
-    int  idx1, idx2;
+    முழு  idx1, idx2;
     textprop_T	*tp1, *tp2;
     proptype_T  *pt1, *pt2;
     colnr_T col1, col2;
 
-    idx1 = *(int *)s1;
-    idx2 = *(int *)s2;
+    idx1 = *(முழு *)s1;
+    idx2 = *(முழு *)s2;
     tp1 = &text_prop_compare_props[idx1];
     tp2 = &text_prop_compare_props[idx2];
     col1 = tp1->tp_col;
     col2 = tp2->tp_col;
 
     // property that inserts text has priority over one that doesn't
-    if ((tp1->tp_id < 0) != (tp2->tp_id < 0))
-	return tp1->tp_id < 0 ? 1 : -1;
+    எனில் ((tp1->tp_id < 0) != (tp2->tp_id < 0))
+	திரும்பு tp1->tp_id < 0 ? 1 : -1;
 
-    if (col1 == MAXCOL || col2 == MAXCOL)
+    எனில் (col1 == MAXCOL || col2 == MAXCOL)
     {
-	int order1 = text_prop_order(tp1->tp_flags);
-	int order2 = text_prop_order(tp2->tp_flags);
+	முழு order1 = text_prop_order(tp1->tp_flags);
+	முழு order2 = text_prop_order(tp2->tp_flags);
 
 	// sort on order where it is added
-	if (order1 != order2)
-	    return order1 < order2 ? 1 : -1;
+	எனில் (order1 != order2)
+	    திரும்பு order1 < order2 ? 1 : -1;
     }
 
     // check highest priority, defined by the type
     pt1 = text_prop_type_by_id(text_prop_compare_buf, tp1->tp_type);
     pt2 = text_prop_type_by_id(text_prop_compare_buf, tp2->tp_type);
-    if (pt1 != pt2)
+    எனில் (pt1 != pt2)
     {
-	if (pt1 == NULL)
-	    return -1;
-	if (pt2 == NULL)
-	    return 1;
-	if (pt1->pt_priority != pt2->pt_priority)
-	    return pt1->pt_priority > pt2->pt_priority ? 1 : -1;
+	எனில் (pt1 == வெற்று)
+	    திரும்பு -1;
+	எனில் (pt2 == வெற்று)
+	    திரும்பு 1;
+	எனில் (pt1->pt_priority != pt2->pt_priority)
+	    திரும்பு pt1->pt_priority > pt2->pt_priority ? 1 : -1;
     }
 
     // same priority, one that starts first wins
-    if (col1 != col2)
-	return col1 < col2 ? 1 : -1;
+    எனில் (col1 != col2)
+	திரும்பு col1 < col2 ? 1 : -1;
 
     // for a property with text the id can be used as tie breaker
-    if (tp1->tp_id < 0)
-	return tp1->tp_id > tp2->tp_id ? 1 : -1;
+    எனில் (tp1->tp_id < 0)
+	திரும்பு tp1->tp_id > tp2->tp_id ? 1 : -1;
 
-    return 0;
+    திரும்பு 0;
 }
 
 /*
  * Sort "count" text properties using an array if indexes "idxs" into the list
  * of text props "props" for buffer "buf".
  */
-    void
+    வெறுமை
 sort_text_props(
 	buf_T	    *buf,
 	textprop_T  *props,
-	int	    *idxs,
-	int	    count)
+	முழு	    *idxs,
+	முழு	    மொத்தம்)
 {
     text_prop_compare_buf = buf;
     text_prop_compare_props = props;
-    qsort((void *)idxs, (size_t)count, sizeof(int), text_prop_compare);
+    qsort((வெறுமை *)idxs, (size_t)மொத்தம், அளவு(முழு), text_prop_compare);
 }
 
 /*
@@ -1432,39 +1432,39 @@ sort_text_props(
  * "wp"'s buffer.  Match "id" when it is > 0.  Returns false when not found.
  */
     bool
-find_prop_in_lines(
+find_prop_in_வரிகள்(
 	win_T	    *wp,
-	int	    type_id,
-	int	    id,
+	முழு	    type_id,
+	முழு	    id,
 	textprop_T  *prop,
 	linenr_T    *found_lnum,
 	linenr_T    first_lnum,
 	linenr_T    last_lnum)
 {
-    if (text_prop_type_by_id(wp->w_buffer, type_id) == NULL)
-	return false;
+    எனில் (text_prop_type_by_id(wp->w_buffer, type_id) == வெற்று)
+	திரும்பு false;
 
-    if (first_lnum < 1)
+    எனில் (first_lnum < 1)
 	first_lnum = 1;
-    if (last_lnum > wp->w_buffer->b_ml.ml_line_count)
-	last_lnum = wp->w_buffer->b_ml.ml_line_count;
+    எனில் (last_lnum > wp->w_buffer->b_ml.ml_வரி_மொத்தம்)
+	last_lnum = wp->w_buffer->b_ml.ml_வரி_மொத்தம்;
 
-    for (linenr_T lnum = first_lnum; lnum <= last_lnum; ++lnum)
+    க்கு (linenr_T lnum = first_lnum; lnum <= last_lnum; ++lnum)
     {
 	char_u	*props;
-	int	count = get_text_props(wp->w_buffer, lnum, &props, FALSE);
-	for (int i = 0; i < count; ++i)
+	முழு	மொத்தம் = get_text_props(wp->w_buffer, lnum, &props, FALSE);
+	க்கு (முழு i = 0; i < மொத்தம்; ++i)
 	{
-	    mch_memmove(prop, props + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
-	    if (prop->tp_type == type_id && (id <= 0 || prop->tp_id == id))
+	    mch_memmove(prop, props + i * அளவு(textprop_T),
+							   அளவு(textprop_T));
+	    எனில் (prop->tp_type == type_id && (id <= 0 || prop->tp_id == id))
 	    {
 		*found_lnum = lnum;
-		return true;
+		திரும்பு true;
 	    }
 	}
     }
-    return false;
+    திரும்பு false;
 }
 
 /*
@@ -1475,14 +1475,14 @@ find_prop_in_lines(
     bool
 find_visible_prop(
 	win_T	    *wp,
-	int	    type_id,
-	int	    id,
+	முழு	    type_id,
+	முழு	    id,
 	textprop_T  *prop,
 	linenr_T    *found_lnum)
 {
     // w_botline may not have been updated yet.
     validate_botline_win(wp);
-    return find_prop_in_lines(wp, type_id, id, prop, found_lnum,
+    திரும்பு find_prop_in_வரிகள்(wp, type_id, id, prop, found_lnum,
 					  wp->w_topline, wp->w_botline - 1);
 }
 
@@ -1493,82 +1493,82 @@ find_visible_prop(
  * For virtual text props, u.tp_text must point to the vtext string.
  * Only works for the current buffer.
  */
-    static void
-set_text_props(linenr_T lnum, textprop_T *tps, int count)
+    நிலையான வெறுமை
+set_text_props(linenr_T lnum, textprop_T *tps, முழு மொத்தம்)
 {
     char_u  *text;
     char_u  *newtext;
-    int	    textlen;
+    முழு	    textlen;
 
     text = ml_get(lnum);
     textlen = ml_get_len(lnum) + 1;
 
-    if (count == 0)
+    எனில் (மொத்தம் == 0)
     {
 	// No properties: just text.
 	newtext = alloc(textlen);
-	if (newtext == NULL)
-	    return;
+	எனில் (newtext == வெற்று)
+	    திரும்பு;
 	mch_memmove(newtext, text, textlen);
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(curbuf->b_ml.ml_line_ptr);
-	curbuf->b_ml.ml_line_ptr = newtext;
-	curbuf->b_ml.ml_line_len = textlen;
-	curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	எனில் (curbuf->b_ml.ml_flags & (ML_வரி_DIRTY | ML_ALLOCATED))
+	    vim_free(curbuf->b_ml.ml_வரி_ptr);
+	curbuf->b_ml.ml_வரி_ptr = newtext;
+	curbuf->b_ml.ml_வரி_len = textlen;
+	curbuf->b_ml.ml_flags |= ML_வரி_DIRTY;
     }
-    else
+    இல்லையெனில்
     {
 	// Build new format: [text][NUL][prop_count][props...][vtext...]
-	uint16_t    prop_count = (uint16_t)count;
-	int	    vtext_size = 0;
-	int	    total_len;
-	char_u	    *count_dest;
+	uint16_t    prop_மொத்தம் = (uint16_t)மொத்தம்;
+	முழு	    vtext_size = 0;
+	முழு	    total_len;
+	char_u	    *மொத்தம்_dest;
 	char_u	    *prop_dest;
 	char_u	    *vtext_dest;
-	int	    i;
+	முழு	    i;
 
-	for (i = 0; i < count; ++i)
-	    if (tps[i].tp_flags & TP_FLAG_VTEXT_PTR)
+	க்கு (i = 0; i < மொத்தம்; ++i)
+	    எனில் (tps[i].tp_flags & TP_FLAG_VTEXT_PTR)
 		vtext_size += tps[i].tp_len + 1;
 
-	total_len = textlen + (int)PROP_COUNT_SIZE
-		    + count * (int)sizeof(textprop_T) + vtext_size;
+	total_len = textlen + (முழு)PROP_மொத்தம்_SIZE
+		    + மொத்தம் * (முழு)அளவு(textprop_T) + vtext_size;
 	newtext = alloc(total_len);
-	if (newtext == NULL)
-	    return;
+	எனில் (newtext == வெற்று)
+	    திரும்பு;
 	mch_memmove(newtext, text, textlen);
 
-	count_dest = newtext + textlen;
-	mch_memmove(count_dest, &prop_count, PROP_COUNT_SIZE);
+	மொத்தம்_dest = newtext + textlen;
+	mch_memmove(மொத்தம்_dest, &prop_மொத்தம், PROP_மொத்தம்_SIZE);
 
-	prop_dest = count_dest + PROP_COUNT_SIZE;
-	vtext_dest = prop_dest + count * sizeof(textprop_T);
+	prop_dest = மொத்தம்_dest + PROP_மொத்தம்_SIZE;
+	vtext_dest = prop_dest + மொத்தம் * அளவு(textprop_T);
 
-	for (i = 0; i < count; ++i)
+	க்கு (i = 0; i < மொத்தம்; ++i)
 	{
 	    textprop_T prop = tps[i];
 
-	    if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	    எனில் (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	    {
-		int copysize = prop.tp_len + 1;
+		முழு copysize = prop.tp_len + 1;
 
 		mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 		vim_free(tps[i].u.tp_text);
-		tps[i].u.tp_text = NULL;
-		prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+		tps[i].u.tp_text = வெற்று;
+		prop.u.tp_text_offset = (colnr_T)(vtext_dest - மொத்தம்_dest);
 		vtext_dest += copysize;
 	    }
-	    else
+	    இல்லையெனில்
 		prop.u.tp_text_offset = 0;
-	    mch_memmove(prop_dest, &prop, sizeof(textprop_T));
-	    prop_dest += sizeof(textprop_T);
+	    mch_memmove(prop_dest, &prop, அளவு(textprop_T));
+	    prop_dest += அளவு(textprop_T);
 	}
 
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(curbuf->b_ml.ml_line_ptr);
-	curbuf->b_ml.ml_line_ptr = newtext;
-	curbuf->b_ml.ml_line_len = total_len;
-	curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	எனில் (curbuf->b_ml.ml_flags & (ML_வரி_DIRTY | ML_ALLOCATED))
+	    vim_free(curbuf->b_ml.ml_வரி_ptr);
+	curbuf->b_ml.ml_வரி_ptr = newtext;
+	curbuf->b_ml.ml_வரி_len = total_len;
+	curbuf->b_ml.ml_flags |= ML_வரி_DIRTY;
     }
 }
 
@@ -1583,105 +1583,105 @@ set_text_props(linenr_T lnum, textprop_T *tps, int count)
  * of the text including NUL.  "*new_len" is set to the new total length.
  */
     char_u *
-props_add_count_header(char_u *line, int line_len, int textlen, int *new_len)
+props_add_மொத்தம்_header(char_u *வரி, முழு வரி_len, முழு textlen, முழு *new_len)
 {
-    int		prop_bytes = line_len - textlen;
-    uint16_t	prop_count;
-    int		vtext_size = 0;
-    int		total;
+    முழு		prop_bytes = வரி_len - textlen;
+    uint16_t	prop_மொத்தம்;
+    முழு		vtext_size = 0;
+    முழு		total;
     char_u	*newline;
-    char_u	*count_dest;
+    char_u	*மொத்தம்_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
-    int		i;
+    முழு		i;
 
-    if (prop_bytes <= 0 || prop_bytes % sizeof(textprop_T) != 0)
+    எனில் (prop_bytes <= 0 || prop_bytes % அளவு(textprop_T) != 0)
     {
-	*new_len = line_len;
-	return NULL;
+	*new_len = வரி_len;
+	திரும்பு வெற்று;
     }
-    prop_count = (uint16_t)(prop_bytes / sizeof(textprop_T));
+    prop_மொத்தம் = (uint16_t)(prop_bytes / அளவு(textprop_T));
 
     // Calculate total vtext size.
-    for (i = 0; i < (int)prop_count; ++i)
+    க்கு (i = 0; i < (முழு)prop_மொத்தம்; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
-							sizeof(textprop_T));
-	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	mch_memmove(&prop, வரி + textlen + i * அளவு(textprop_T),
+							அளவு(textprop_T));
+	எனில் (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	    vtext_size += prop.tp_len + 1;
     }
 
-    total = textlen + (int)PROP_COUNT_SIZE + prop_bytes + vtext_size;
+    total = textlen + (முழு)PROP_மொத்தம்_SIZE + prop_bytes + vtext_size;
     newline = alloc(total);
-    if (newline == NULL)
-	return NULL;
+    எனில் (newline == வெற்று)
+	திரும்பு வெற்று;
     *new_len = total;
 
-    mch_memmove(newline, line, textlen);
-    count_dest = newline + textlen;
-    mch_memmove(count_dest, &prop_count, PROP_COUNT_SIZE);
-    prop_dest = count_dest + PROP_COUNT_SIZE;
+    mch_memmove(newline, வரி, textlen);
+    மொத்தம்_dest = newline + textlen;
+    mch_memmove(மொத்தம்_dest, &prop_மொத்தம், PROP_மொத்தம்_SIZE);
+    prop_dest = மொத்தம்_dest + PROP_மொத்தம்_SIZE;
     vtext_dest = prop_dest + prop_bytes;
 
-    for (i = 0; i < (int)prop_count; ++i)
+    க்கு (i = 0; i < (முழு)prop_மொத்தம்; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
-							sizeof(textprop_T));
-	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	mch_memmove(&prop, வரி + textlen + i * அளவு(textprop_T),
+							அளவு(textprop_T));
+	எனில் (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	{
-	    int copysize = prop.tp_len + 1;
+	    முழு copysize = prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 	    vim_free(prop.u.tp_text);
-	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - மொத்தம்_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	இல்லையெனில்
 	    prop.u.tp_text_offset = 0;
-	mch_memmove(prop_dest + i * sizeof(textprop_T), &prop,
-							sizeof(textprop_T));
+	mch_memmove(prop_dest + i * அளவு(textprop_T), &prop,
+							அளவு(textprop_T));
     }
-    return newline;
+    திரும்பு newline;
 }
 
 /*
  * Add "text_props" with "text_prop_count" text properties to line "lnum".
  */
-    void
-add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
+    வெறுமை
+add_text_props(linenr_T lnum, textprop_T *text_props, முழு text_prop_மொத்தம்)
 {
     unpacked_memline_T	um;
-    int			i;
+    முழு			i;
 
-    um = um_open_at(curbuf, lnum, text_prop_count);
-    if (um.buf == NULL)
-	return;
-    if (!um_detach(&um))
+    um = um_open_at(curbuf, lnum, text_prop_மொத்தம்);
+    எனில் (um.buf == வெற்று)
+	திரும்பு;
+    எனில் (!um_detach(&um))
     {
 	um_abort(&um);
-	return;
+	திரும்பு;
     }
 
     // Grow props array if needed.
-    if (um.prop_count + text_prop_count > um.prop_size)
+    எனில் (um.prop_மொத்தம் + text_prop_மொத்தம் > um.prop_size)
     {
 	textprop_T *newprops = vim_realloc(um.props,
-		(um.prop_count + text_prop_count) * sizeof(textprop_T));
-	if (newprops == NULL)
+		(um.prop_மொத்தம் + text_prop_மொத்தம்) * அளவு(textprop_T));
+	எனில் (newprops == வெற்று)
 	{
 	    um_abort(&um);
-	    return;
+	    திரும்பு;
 	}
 	um.props = newprops;
-	um.prop_size = um.prop_count + text_prop_count;
+	um.prop_size = um.prop_மொத்தம் + text_prop_மொத்தம்;
     }
 
-    for (i = 0; i < text_prop_count; ++i)
-	um.props[um.prop_count++] = text_props[i];
+    க்கு (i = 0; i < text_prop_மொத்தம்; ++i)
+	um.props[um.prop_மொத்தம்++] = text_props[i];
 
     um_close(&um);
 }
@@ -1689,120 +1689,120 @@ add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
 /*
  * Function passed to qsort() for sorting proptype_T on pt_id.
  */
-    static int
-compare_pt(const void *s1, const void *s2)
+    நிலையான முழு
+compare_pt(மாறிலி வெறுமை *s1, மாறிலி வெறுமை *s2)
 {
     proptype_T	*tp1 = *(proptype_T **)s1;
     proptype_T	*tp2 = *(proptype_T **)s2;
 
-    return tp1->pt_id == tp2->pt_id ? 0 : tp1->pt_id < tp2->pt_id ? -1 : 1;
+    திரும்பு tp1->pt_id == tp2->pt_id ? 0 : tp1->pt_id < tp2->pt_id ? -1 : 1;
 }
 
-    static proptype_T *
-find_type_by_id(hashtab_T *ht, proptype_T ***array, int id)
+    நிலையான proptype_T *
+find_type_by_id(hashtab_T *ht, proptype_T ***array, முழு id)
 {
-    int low = 0;
-    int high;
+    முழு கீழ் = 0;
+    முழு உயர்வு;
 
-    if (ht == NULL || ht->ht_used == 0)
-	return NULL;
+    எனில் (ht == வெற்று || ht->ht_used == 0)
+	திரும்பு வெற்று;
 
     // Make the lookup faster by creating an array with pointers to
     // hashtable entries, sorted on pt_id.
-    if (*array == NULL)
+    எனில் (*array == வெற்று)
     {
 	long	    todo;
 	hashitem_T  *hi;
-	int	    i = 0;
+	முழு	    i = 0;
 
 	*array = ALLOC_MULT(proptype_T *, ht->ht_used);
-	if (*array == NULL)
-	    return NULL;
+	எனில் (*array == வெற்று)
+	    திரும்பு வெற்று;
 	todo = (long)ht->ht_used;
-	FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	FOR_ALL_HASHTAB_பொருட்கள்(ht, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    எனில் (!HASHITEM_EMPTY(hi))
 	    {
 		(*array)[i++] = HI2PT(hi);
 		--todo;
 	    }
 	}
-	qsort((void *)*array, ht->ht_used, sizeof(proptype_T *), compare_pt);
+	qsort((வெறுமை *)*array, ht->ht_used, அளவு(proptype_T *), compare_pt);
     }
 
     // binary search in the sorted array
-    high = ht->ht_used;
-    while (high > low)
+    உயர்வு = ht->ht_used;
+    போது (உயர்வு > கீழ்)
     {
-	int m = (high + low) / 2;
+	முழு m = (உயர்வு + கீழ்) / 2;
 
-	if ((*array)[m]->pt_id == id)
-	    return (*array)[m];
-	if ((*array)[m]->pt_id > id)
-	    high = m;
-	else
-	    low = m + 1;
+	எனில் ((*array)[m]->pt_id == id)
+	    திரும்பு (*array)[m];
+	எனில் ((*array)[m]->pt_id > id)
+	    உயர்வு = m;
+	இல்லையெனில்
+	    கீழ் = m + 1;
     }
-    return NULL;
+    திரும்பு வெற்று;
 }
 
 /*
  * Fill 'dict' with text properties in 'prop'.
  */
-    static void
+    நிலையான வெறுமை
 prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
 {
     proptype_T *pt;
-    int buflocal = TRUE;
-    int virtualtext_prop = prop->tp_id < 0;
+    முழு buflocal = TRUE;
+    முழு virtualtext_prop = prop->tp_id < 0;
 
-    dict_add_number(dict, "col", (prop->tp_col == MAXCOL) ? 0 : prop->tp_col);
-    if (!virtualtext_prop)
+    dict_add_எண்(dict, "col", (prop->tp_col == MAXCOL) ? 0 : prop->tp_col);
+    எனில் (!virtualtext_prop)
     {
-	dict_add_number(dict, "length", prop->tp_len);
-	dict_add_number(dict, "id", prop->tp_id);
+	dict_add_எண்(dict, "length", prop->tp_len);
+	dict_add_எண்(dict, "id", prop->tp_id);
     }
-    dict_add_number(dict, "start", !(prop->tp_flags & TP_FLAG_CONT_PREV));
-    dict_add_number(dict, "end", !(prop->tp_flags & TP_FLAG_CONT_NEXT));
+    dict_add_எண்(dict, "start", !(prop->tp_flags & TP_FLAG_CONT_PREV));
+    dict_add_எண்(dict, "end", !(prop->tp_flags & TP_FLAG_CONT_NEXT));
 
     pt = find_type_by_id(buf->b_proptypes, &buf->b_proparray, prop->tp_type);
-    if (pt == NULL)
+    எனில் (pt == வெற்று)
     {
 	pt = find_type_by_id(global_proptypes, &global_proparray,
 								prop->tp_type);
 	buflocal = FALSE;
     }
-    if (pt != NULL)
+    எனில் (pt != வெற்று)
 	dict_add_string(dict, "type", pt->pt_name);
 
-    if (buflocal)
-	dict_add_number(dict, "type_bufnr", buf->b_fnum);
-    else
-	dict_add_number(dict, "type_bufnr", 0);
-    if (virtualtext_prop)
+    எனில் (buflocal)
+	dict_add_எண்(dict, "type_bufnr", buf->b_fnum);
+    இல்லையெனில்
+	dict_add_எண்(dict, "type_bufnr", 0);
+    எனில் (virtualtext_prop)
     {
-	string_T    text_align = {NULL, 0};
+	string_T    text_align = {வெற்று, 0};
 
 	// virtual text property - u.tp_text must be set by caller
 	dict_add_string(dict, "text", prop->u.tp_text);
 
 	// text_align
-	if (prop->tp_flags & TP_FLAG_ALIGN_RIGHT)
+	எனில் (prop->tp_flags & TP_FLAG_ALIGN_வலது)
 	    STR_LITERAL_SET(text_align, "right");
-	else if (prop->tp_flags & TP_FLAG_ALIGN_ABOVE)
+	இல்லையெனில் எனில் (prop->tp_flags & TP_FLAG_ALIGN_ABOVE)
 	    STR_LITERAL_SET(text_align, "above");
-	else if (prop->tp_flags & TP_FLAG_ALIGN_BELOW)
+	இல்லையெனில் எனில் (prop->tp_flags & TP_FLAG_ALIGN_BELOW)
 	    STR_LITERAL_SET(text_align, "below");
-	if (text_align.string != NULL)
+	எனில் (text_align.string != வெற்று)
 	    dict_add_string_len(dict, "text_align",
-		text_align.string, (int)text_align.length);
+		text_align.string, (முழு)text_align.length);
 
 	// text_wrap
-	if (prop->tp_flags & TP_FLAG_WRAP)
+	எனில் (prop->tp_flags & TP_FLAG_WRAP)
 	    dict_add_string_len(dict, "text_wrap",
 		(char_u *)"wrap", STRLEN_LITERAL("wrap"));
-	if (prop->tp_padleft != 0)
-	    dict_add_number(dict, "text_padding_left", prop->tp_padleft);
+	எனில் (prop->tp_padleft != 0)
+	    dict_add_எண்(dict, "text_padding_left", prop->tp_padleft);
     }
 }
 
@@ -1811,14 +1811,14 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
  * Returns NULL if not found.
  */
     proptype_T *
-text_prop_type_by_id(buf_T *buf, int id)
+text_prop_type_by_id(buf_T *buf, முழு id)
 {
     proptype_T *type;
 
     type = find_type_by_id(buf->b_proptypes, &buf->b_proparray, id);
-    if (type == NULL)
+    எனில் (type == வெற்று)
 	type = find_type_by_id(global_proptypes, &global_proparray, id);
-    return type;
+    திரும்பு type;
 }
 
 /*
@@ -1827,218 +1827,218 @@ text_prop_type_by_id(buf_T *buf, int id)
     bool
 text_prop_type_valid(buf_T *buf, textprop_T *prop)
 {
-    return text_prop_type_by_id(buf, prop->tp_type) != NULL;
+    திரும்பு text_prop_type_by_id(buf, prop->tp_type) != வெற்று;
 }
 
 /*
  * prop_clear({lnum} [, {lnum_end} [, {bufnr}]])
  */
-    void
+    வெறுமை
 f_prop_clear(typval_T *argvars, typval_T *rettv UNUSED)
 {
     linenr_T start;
     linenr_T end;
     linenr_T lnum;
     buf_T    *buf = curbuf;
-    int	    did_clear = FALSE;
+    முழு	    did_clear = FALSE;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+    எனில் (in_vim9script()
+	    && (check_for_எண்_arg(argvars, 0) == FAIL
+		|| check_for_opt_எண்_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	திரும்பு;
 
-    start = tv_get_number(&argvars[0]);
+    start = tv_get_எண்(&argvars[0]);
     end = start;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    எனில் (argvars[1].v_type != VAR_UNKNOWN)
     {
-	end = tv_get_number(&argvars[1]);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	end = tv_get_எண்(&argvars[1]);
+	எனில் (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    if (get_bufnr_from_arg(&argvars[2], &buf) == FAIL)
-		return;
+	    எனில் (get_bufnr_from_arg(&argvars[2], &buf) == FAIL)
+		திரும்பு;
 	}
     }
-    if (start < 1 || end < 1)
+    எனில் (start < 1 || end < 1)
     {
 	emsg(_(e_invalid_range));
-	return;
+	திரும்பு;
     }
 
     {
 	unpacked_memline_T um = um_open(buf);
 
-	for (lnum = start; lnum <= end; ++lnum)
+	க்கு (lnum = start; lnum <= end; ++lnum)
 	{
-	    int idx;
+	    முழு idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
-		break;
-	    if (!um_goto_line(&um, lnum, 0))
-		break;
-	    if (um.prop_count > 0)
+	    எனில் (lnum > buf->b_ml.ml_வரி_மொத்தம்)
+		நிறுத்து;
+	    எனில் (!um_goto_வரி(&um, lnum, 0))
+		நிறுத்து;
+	    எனில் (um.prop_மொத்தம் > 0)
 	    {
 		did_clear = TRUE;
-		for (idx = um.prop_count - 1; idx >= 0; --idx)
+		க்கு (idx = um.prop_மொத்தம் - 1; idx >= 0; --idx)
 		    um_delete_prop(&um, idx);
 	    }
 	}
 	um_close(&um);
     }
-    if (did_clear)
+    எனில் (did_clear)
 	redraw_buf_later(buf, UPD_NOT_VALID);
 }
 
 /*
  * prop_find({props} [, {direction}])
  */
-    void
+    வெறுமை
 f_prop_find(typval_T *argvars, typval_T *rettv)
 {
     pos_T       *cursor = &curwin->w_cursor;
     dict_T      *dict;
     buf_T       *buf = curbuf;
     dictitem_T  *di;
-    int		lnum_start;
-    int		start_pos_has_prop = 0;
-    int		seen_end = FALSE;
-    int		id = 0;
-    int		id_found = FALSE;
-    int		type_id = -1;
-    int		skipstart = FALSE;
-    int		lnum = -1;
-    int		col = -1;
-    int		dir = FORWARD;    // FORWARD == 1, BACKWARD == -1
-    int		both;
+    முழு		lnum_start;
+    முழு		start_pos_has_prop = 0;
+    முழு		seen_end = FALSE;
+    முழு		id = 0;
+    முழு		id_found = FALSE;
+    முழு		type_id = -1;
+    முழு		skipstart = FALSE;
+    முழு		lnum = -1;
+    முழு		col = -1;
+    முழு		dir = FORWARD;    // FORWARD == 1, BACKWARD == -1
+    முழு		both;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	திரும்பு;
     dict = argvars[0].vval.v_dict;
 
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
-    if (buf->b_ml.ml_mfp == NULL)
-	return;
+    எனில் (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	திரும்பு;
+    எனில் (buf->b_ml.ml_mfp == வெற்று)
+	திரும்பு;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    எனில் (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u      *dir_s = tv_get_string(&argvars[1]);
 
-	if (*dir_s == 'b')
+	எனில் (*dir_s == 'b')
 	    dir = BACKWARD;
-	else if (*dir_s != 'f')
+	இல்லையெனில் எனில் (*dir_s != 'f')
 	{
 	    emsg(_(e_invalid_argument));
-	    return;
+	    திரும்பு;
 	}
     }
 
     di = dict_find(dict, (char_u *)"lnum", -1);
-    if (di != NULL)
-	lnum = tv_get_number(&di->di_tv);
+    எனில் (di != வெற்று)
+	lnum = tv_get_எண்(&di->di_tv);
 
     di = dict_find(dict, (char_u *)"col", -1);
-    if (di != NULL)
-	col = tv_get_number(&di->di_tv);
+    எனில் (di != வெற்று)
+	col = tv_get_எண்(&di->di_tv);
 
-    if (lnum == -1)
+    எனில் (lnum == -1)
     {
 	lnum = cursor->lnum;
 	col = cursor->col + 1;
     }
-    else if (col == -1)
+    இல்லையெனில் எனில் (col == -1)
 	col = 1;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    எனில் (lnum < 1 || lnum > buf->b_ml.ml_வரி_மொத்தம்)
     {
 	emsg(_(e_invalid_range));
-	return;
+	திரும்பு;
     }
 
     skipstart = dict_get_bool(dict, "skipstart", 0);
 
-    if (dict_has_key(dict, "id"))
+    எனில் (dict_has_சாவி(dict, "id"))
     {
-	id = dict_get_number(dict, "id");
+	id = dict_get_எண்(dict, "id");
 	id_found = TRUE;
     }
-    if (dict_has_key(dict, "type"))
+    எனில் (dict_has_சாவி(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
 
-	if (type == NULL)
-	    return;
+	எனில் (type == வெற்று)
+	    திரும்பு;
 	type_id = type->pt_id;
     }
     both = dict_get_bool(dict, "both", FALSE);
-    if (!id_found && type_id == -1)
+    எனில் (!id_found && type_id == -1)
     {
 	emsg(_(e_need_at_least_one_of_id_or_type));
-	return;
+	திரும்பு;
     }
-    if (both && (!id_found || type_id == -1))
+    எனில் (both && (!id_found || type_id == -1))
     {
 	emsg(_(e_need_id_and_type_or_types_with_both));
-	return;
+	திரும்பு;
     }
 
     lnum_start = lnum;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    எனில் (rettv_dict_alloc(rettv) == FAIL)
+	திரும்பு;
 
-    while (1)
+    போது (1)
     {
 	char_u	*prop_start_ptr;
-	int	count = get_text_props(buf, lnum, &prop_start_ptr, FALSE);
-	int	    i;
+	முழு	மொத்தம் = get_text_props(buf, lnum, &prop_start_ptr, FALSE);
+	முழு	    i;
 	textprop_T  prop;
-	int	    prop_start;
-	int	    prop_end;
+	முழு	    prop_start;
+	முழு	    prop_end;
 
-	for (i = dir == BACKWARD ? count - 1 : 0; i >= 0 && i < count; i += dir)
+	க்கு (i = dir == BACKWARD ? மொத்தம் - 1 : 0; i >= 0 && i < மொத்தம்; i += dir)
 	{
-	    mch_memmove(&prop, prop_start_ptr + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
+	    mch_memmove(&prop, prop_start_ptr + i * அளவு(textprop_T),
+							   அளவு(textprop_T));
 	    // Convert offset to pointer for virtual text props.
-	    if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	    எனில் (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	    {
-		prop.u.tp_text = (prop_start_ptr - PROP_COUNT_SIZE)
+		prop.u.tp_text = (prop_start_ptr - PROP_மொத்தம்_SIZE)
 						    + prop.u.tp_text_offset;
 		prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	    }
-	    else
-		prop.u.tp_text = NULL;
+	    இல்லையெனில்
+		prop.u.tp_text = வெற்று;
 
 	    // For the very first line try to find the first property before or
 	    // after `col`, depending on the search direction.
-	    if (lnum == lnum_start)
+	    எனில் (lnum == lnum_start)
 	    {
 		bool is_floating_vtext = prop.tp_id < 0
 		    && prop.tp_col == MAXCOL;
-		if (dir == BACKWARD)
+		எனில் (dir == BACKWARD)
 		{
 		    // Virtual text with MAXCOL always matches any column
-		    if (!is_floating_vtext && prop.tp_col > col)
-			continue;
+		    எனில் (!is_floating_vtext && prop.tp_col > col)
+			தொடர்;
 		}
-		else if (!is_floating_vtext
+		இல்லையெனில் எனில் (!is_floating_vtext
 		    && prop.tp_col + prop.tp_len - (prop.tp_len != 0) < col)
-		    continue;
+		    தொடர்;
 	    }
-	    if (both ? prop.tp_id == id && prop.tp_type == type_id
+	    எனில் (both ? prop.tp_id == id && prop.tp_type == type_id
 		     : (id_found && prop.tp_id == id)
 						    || prop.tp_type == type_id)
 	    {
 		// Check if the starting position has text props.
-		if (lnum_start == lnum
+		எனில் (lnum_start == lnum
 			&& col >= prop.tp_col
 			&& (col <= prop.tp_col + prop.tp_len
 							 - (prop.tp_len != 0)))
@@ -2050,44 +2050,44 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 		// The property does not continue on the next line, it ends on
 		// this line.
 		prop_end = !(prop.tp_flags & TP_FLAG_CONT_NEXT);
-		if (!prop_start && prop_end && dir == FORWARD)
+		எனில் (!prop_start && prop_end && dir == FORWARD)
 		    seen_end = 1;
 
 		// Skip lines without the start flag.
-		if (!prop_start)
+		எனில் (!prop_start)
 		{
 		    // Always search backwards for start when search started
 		    // on a prop and we're not skipping.
-		    if (start_pos_has_prop && !skipstart)
+		    எனில் (start_pos_has_prop && !skipstart)
 			dir = BACKWARD;
-		    continue;
+		    தொடர்;
 		}
 
 		// If skipstart is true, skip the prop at start pos (even if
 		// continued from another line).
-		if (start_pos_has_prop && skipstart && !seen_end)
+		எனில் (start_pos_has_prop && skipstart && !seen_end)
 		{
 		    start_pos_has_prop = 0;
-		    continue;
+		    தொடர்;
 		}
 
 		prop_fill_dict(rettv->vval.v_dict, &prop, buf);
-		dict_add_number(rettv->vval.v_dict, "lnum", lnum);
+		dict_add_எண்(rettv->vval.v_dict, "lnum", lnum);
 
-		return;
+		திரும்பு;
 	    }
 	}
 
-	if (dir > 0)
+	எனில் (dir > 0)
 	{
-	    if (lnum >= buf->b_ml.ml_line_count)
-		break;
+	    எனில் (lnum >= buf->b_ml.ml_வரி_மொத்தம்)
+		நிறுத்து;
 	    lnum++;
 	}
-	else
+	இல்லையெனில்
 	{
-	    if (lnum <= 1)
-		break;
+	    எனில் (lnum <= 1)
+		நிறுத்து;
 	    lnum--;
 	}
     }
@@ -2096,16 +2096,16 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 /*
  * Returns TRUE if 'type_or_id' is in the 'types_or_ids' list.
  */
-    static int
-prop_type_or_id_in_list(int *types_or_ids, int len, int type_or_id)
+    நிலையான முழு
+prop_type_or_id_in_list(முழு *types_or_ids, முழு len, முழு type_or_id)
 {
-    int i;
+    முழு i;
 
-    for (i = 0; i < len; i++)
-	if (types_or_ids[i] == type_or_id)
-	    return TRUE;
+    க்கு (i = 0; i < len; i++)
+	எனில் (types_or_ids[i] == type_or_id)
+	    திரும்பு TRUE;
 
-    return FALSE;
+    திரும்பு FALSE;
 }
 
 /*
@@ -2117,51 +2117,51 @@ prop_type_or_id_in_list(int *types_or_ids, int len, int type_or_id)
  * If 'add_lnum' is TRUE, then add the line number also to the text property
  * dictionary.
  */
-    static void
-get_props_in_line(
+    நிலையான வெறுமை
+get_props_in_வரி(
 	buf_T		*buf,
 	linenr_T	lnum,
-	int		*prop_types,
-	int		prop_types_len,
-	int		*prop_ids,
-	int		prop_ids_len,
+	முழு		*prop_types,
+	முழு		prop_types_len,
+	முழு		*prop_ids,
+	முழு		prop_ids_len,
 	list_T		*retlist,
-	int		add_lnum)
+	முழு		add_lnum)
 {
     char_u	*props;
-    int		count;
-    int		i;
+    முழு		மொத்தம்;
+    முழு		i;
     textprop_T	prop;
 
-    count = get_text_props(buf, lnum, &props, FALSE);
-    for (i = 0; i < count; ++i)
+    மொத்தம் = get_text_props(buf, lnum, &props, FALSE);
+    க்கு (i = 0; i < மொத்தம்; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(textprop_T),
-		sizeof(textprop_T));
+	mch_memmove(&prop, props + i * அளவு(textprop_T),
+		அளவு(textprop_T));
 	// Convert offset to pointer for virtual text props.
-	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	எனில் (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	{
-	    prop.u.tp_text = (props - PROP_COUNT_SIZE)
+	    prop.u.tp_text = (props - PROP_மொத்தம்_SIZE)
 						+ prop.u.tp_text_offset;
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
-	    prop.u.tp_text = NULL;
-	if ((prop_types == NULL
+	இல்லையெனில்
+	    prop.u.tp_text = வெற்று;
+	எனில் ((prop_types == வெற்று
 		    || prop_type_or_id_in_list(prop_types, prop_types_len,
 			prop.tp_type))
-		&& (prop_ids == NULL
+		&& (prop_ids == வெற்று
 		    || prop_type_or_id_in_list(prop_ids, prop_ids_len,
 								 prop.tp_id)))
 	{
 	    dict_T *d = dict_alloc();
 
-	    if (d == NULL)
-		break;
+	    எனில் (d == வெற்று)
+		நிறுத்து;
 	    prop_fill_dict(d, &prop, buf);
-	    if (add_lnum)
-		dict_add_number(d, "lnum", lnum);
-	    if (list_append_dict(retlist, d) == FAIL)
+	    எனில் (add_lnum)
+		dict_add_எண்(d, "lnum", lnum);
+	    எனில் (list_append_dict(retlist, d) == FAIL)
 		dict_unref(d);
 	}
     }
@@ -2172,45 +2172,45 @@ get_props_in_line(
  * identifiers. Returns a pointer to the allocated array. Returns NULL on
  * error. 'num_types' is set to the number of returned property types.
  */
-    static int *
-get_prop_types_from_names(list_T *l, buf_T *buf, int *num_types)
+    நிலையான முழு *
+get_prop_types_from_names(list_T *l, buf_T *buf, முழு *இலக்கம்_types)
 {
-    int		*prop_types;
+    முழு		*prop_types;
     listitem_T	*li;
-    int		i;
+    முழு		i;
     char_u	*name;
     proptype_T	*type;
 
-    *num_types = 0;
+    *இலக்கம்_types = 0;
 
-    prop_types = ALLOC_MULT(int, list_len(l));
-    if (prop_types == NULL)
-	return NULL;
+    prop_types = ALLOC_MULT(முழு, list_len(l));
+    எனில் (prop_types == வெற்று)
+	திரும்பு வெற்று;
 
     i = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_பொருட்கள்(l, li)
     {
-	if (li->li_tv.v_type != VAR_STRING)
+	எனில் (li->li_tv.v_type != VAR_STRING)
 	{
 	    emsg(_(e_string_required));
-	    goto errret;
+	    செல் errret;
 	}
 	name = li->li_tv.vval.v_string;
-	if (name == NULL)
-	    goto errret;
+	எனில் (name == வெற்று)
+	    செல் errret;
 
 	type = lookup_prop_type(name, buf);
-	if (type == NULL)
-	    goto errret;
+	எனில் (type == வெற்று)
+	    செல் errret;
 	prop_types[i++] = type->pt_id;
     }
 
-    *num_types = i;
-    return prop_types;
+    *இலக்கம்_types = i;
+    திரும்பு prop_types;
 
 errret:
     VIM_CLEAR(prop_types);
-    return NULL;
+    திரும்பு வெற்று;
 }
 
 /*
@@ -2218,135 +2218,135 @@ errret:
  * identifiers.  Returns a pointer to the allocated array. Returns NULL on
  * error. 'num_ids' is set to the number of returned property identifiers.
  */
-    static int *
-get_prop_ids_from_list(list_T *l, int *num_ids)
+    நிலையான முழு *
+get_prop_ids_from_list(list_T *l, முழு *இலக்கம்_ids)
 {
-    int		*prop_ids;
+    முழு		*prop_ids;
     listitem_T	*li;
-    int		i = 0;
-    int		id;
-    int		error;
+    முழு		i = 0;
+    முழு		id;
+    முழு		error;
 
-    *num_ids = 0;
+    *இலக்கம்_ids = 0;
 
-    prop_ids = ALLOC_MULT(int, list_len(l));
-    if (prop_ids == NULL)
-	return NULL;
+    prop_ids = ALLOC_MULT(முழு, list_len(l));
+    எனில் (prop_ids == வெற்று)
+	திரும்பு வெற்று;
 
     CHECK_LIST_MATERIALIZE(l);
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_பொருட்கள்(l, li)
     {
 	error = FALSE;
-	id = tv_get_number_chk(&li->li_tv, &error);
-	if (error)
-	    goto errret;
+	id = tv_get_எண்_chk(&li->li_tv, &error);
+	எனில் (error)
+	    செல் errret;
 
 	prop_ids[i++] = id;
     }
 
-    *num_ids = i;
-    return prop_ids;
+    *இலக்கம்_ids = i;
+    திரும்பு prop_ids;
 
 errret:
     VIM_CLEAR(prop_ids);
-    return NULL;
+    திரும்பு வெற்று;
 }
 
 /*
  * prop_list({lnum} [, {bufnr}])
  */
-    void
+    வெறுமை
 f_prop_list(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
     linenr_T	start_lnum;
     linenr_T	end_lnum;
     buf_T	*buf = curbuf;
-    int		add_lnum = FALSE;
-    int		*prop_types = NULL;
-    int		prop_types_len = 0;
-    int		*prop_ids = NULL;
-    int		prop_ids_len = 0;
+    முழு		add_lnum = FALSE;
+    முழு		*prop_types = வெற்று;
+    முழு		prop_types_len = 0;
+    முழு		*prop_ids = வெற்று;
+    முழு		prop_ids_len = 0;
     list_T	*l;
     dictitem_T	*di;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    எனில் (in_vim9script()
+	    && (check_for_எண்_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    எனில் (rettv_list_alloc(rettv) == FAIL)
+	திரும்பு;
 
     // default: get text properties on current line
-    start_lnum = tv_get_number(&argvars[0]);
+    start_lnum = tv_get_எண்(&argvars[0]);
     end_lnum = start_lnum;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    எனில் (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d;
 
-	if (check_for_dict_arg(argvars, 1) == FAIL)
-	    return;
+	எனில் (check_for_dict_arg(argvars, 1) == FAIL)
+	    திரும்பு;
 	d = argvars[1].vval.v_dict;
 
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	எனில் (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    திரும்பு;
 
-	if (d != NULL && (di = dict_find(d, (char_u *)"end_lnum", -1)) != NULL)
+	எனில் (d != வெற்று && (di = dict_find(d, (char_u *)"end_lnum", -1)) != வெற்று)
 	{
-	    if (di->di_tv.v_type != VAR_NUMBER)
+	    எனில் (di->di_tv.v_type != VAR_எண்)
 	    {
-		emsg(_(e_number_required));
-		return;
+		emsg(_(e_எண்_required));
+		திரும்பு;
 	    }
-	    end_lnum = tv_get_number(&di->di_tv);
-	    if (end_lnum < 0)
+	    end_lnum = tv_get_எண்(&di->di_tv);
+	    எனில் (end_lnum < 0)
 		// negative end_lnum is used as an offset from the last buffer
-		// line
-		end_lnum = buf->b_ml.ml_line_count + end_lnum + 1;
-	    else if (end_lnum > buf->b_ml.ml_line_count)
-		end_lnum = buf->b_ml.ml_line_count;
+		//வரி
+		end_lnum = buf->b_ml.ml_வரி_மொத்தம் + end_lnum + 1;
+	    இல்லையெனில் எனில் (end_lnum > buf->b_ml.ml_வரி_மொத்தம்)
+		end_lnum = buf->b_ml.ml_வரி_மொத்தம்;
 	    add_lnum = TRUE;
 	}
-	if (d != NULL && (di = dict_find(d, (char_u *)"types", -1)) != NULL)
+	எனில் (d != வெற்று && (di = dict_find(d, (char_u *)"types", -1)) != வெற்று)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    எனில் (di->di_tv.v_type != VAR_LIST)
 	    {
 		emsg(_(e_list_required));
-		return;
+		திரும்பு;
 	    }
 
 	    l = di->di_tv.vval.v_list;
-	    if (l != NULL && list_len(l) > 0)
+	    எனில் (l != வெற்று && list_len(l) > 0)
 	    {
 		prop_types = get_prop_types_from_names(l, buf, &prop_types_len);
-		if (prop_types == NULL)
-		    return;
+		எனில் (prop_types == வெற்று)
+		    திரும்பு;
 	    }
 	}
-	if (d != NULL && (di = dict_find(d, (char_u *)"ids", -1)) != NULL)
+	எனில் (d != வெற்று && (di = dict_find(d, (char_u *)"ids", -1)) != வெற்று)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    எனில் (di->di_tv.v_type != VAR_LIST)
 	    {
 		emsg(_(e_list_required));
-		goto errret;
+		செல் errret;
 	    }
 
 	    l = di->di_tv.vval.v_list;
-	    if (l != NULL && list_len(l) > 0)
+	    எனில் (l != வெற்று && list_len(l) > 0)
 	    {
 		prop_ids = get_prop_ids_from_list(l, &prop_ids_len);
-		if (prop_ids == NULL)
-		    goto errret;
+		எனில் (prop_ids == வெற்று)
+		    செல் errret;
 	    }
 	}
     }
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count
+    எனில் (start_lnum < 1 || start_lnum > buf->b_ml.ml_வரி_மொத்தம்
 		|| end_lnum < 1 || end_lnum < start_lnum)
 	emsg(_(e_invalid_range));
-    else
-	for (lnum = start_lnum; lnum <= end_lnum; lnum++)
-	    get_props_in_line(buf, lnum, prop_types, prop_types_len,
+    இல்லையெனில்
+	க்கு (lnum = start_lnum; lnum <= end_lnum; lnum++)
+	    get_props_in_வரி(buf, lnum, prop_types, prop_types_len,
 		    prop_ids, prop_ids_len,
 		    rettv->vval.v_list, add_lnum);
 
@@ -2358,7 +2358,7 @@ errret:
 /*
  * prop_remove({props} [, {lnum} [, {lnum_end}]])
  */
-    void
+    வெறுமை
 f_prop_remove(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	start = 1;
@@ -2368,161 +2368,161 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
     linenr_T	last_changed = 0;
     dict_T	*dict;
     buf_T	*buf = curbuf;
-    int		do_all;
-    int		id = -MAXCOL;
-    int		type_id = -1;	    // for a single "type"
-    int		*type_ids = NULL;   // array, for a list of "types", allocated
-    int		num_type_ids = 0;   // number of elements in "type_ids"
-    int		both;
+    முழு		do_all;
+    முழு		id = -MAXCOL;
+    முழு		type_id = -1;	    // for a single "type"
+    முழு		*type_ids = வெற்று;   // array, for a list of "types", allocated
+    முழு		இலக்கம்_type_ids = 0;   // number of elements in "type_ids"
+    முழு		both;
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_எண் = 0;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_எண்_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_எண்_arg(argvars, 2) == FAIL)))
+	திரும்பு;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    எனில் (argvars[1].v_type != VAR_UNKNOWN)
     {
-	start = tv_get_number(&argvars[1]);
+	start = tv_get_எண்(&argvars[1]);
 	end = start;
-	if (argvars[2].v_type != VAR_UNKNOWN)
-	    end = tv_get_number(&argvars[2]);
-	if (start < 1 || end < 1)
+	எனில் (argvars[2].v_type != VAR_UNKNOWN)
+	    end = tv_get_எண்(&argvars[2]);
+	எனில் (start < 1 || end < 1)
 	{
 	    emsg(_(e_invalid_range));
-	    return;
+	    திரும்பு;
 	}
     }
 
     dict = argvars[0].vval.v_dict;
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
-    if (buf->b_ml.ml_mfp == NULL)
-	return;
+    எனில் (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	திரும்பு;
+    எனில் (buf->b_ml.ml_mfp == வெற்று)
+	திரும்பு;
 
     do_all = dict_get_bool(dict, "all", FALSE);
 
-    if (dict_has_key(dict, "id"))
-	id = dict_get_number(dict, "id");
+    எனில் (dict_has_சாவி(dict, "id"))
+	id = dict_get_எண்(dict, "id");
 
     // if a specific type was supplied "type": check that (and ignore "types".
     // Otherwise check against the list of "types".
-    if (dict_has_key(dict, "type"))
+    எனில் (dict_has_சாவி(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
 
-	if (type == NULL)
-	    return;
+	எனில் (type == வெற்று)
+	    திரும்பு;
 	type_id = type->pt_id;
     }
-    if (dict_has_key(dict, "types"))
+    எனில் (dict_has_சாவி(dict, "types"))
     {
 	typval_T types;
-	listitem_T *li = NULL;
+	listitem_T *li = வெற்று;
 
 	dict_get_tv(dict, "types", &types);
-	if (types.v_type == VAR_LIST && types.vval.v_list->lv_len > 0)
+	எனில் (types.v_type == VAR_LIST && types.vval.v_list->lv_len > 0)
 	{
-	    type_ids = alloc( sizeof(int) * types.vval.v_list->lv_len );
+	    type_ids = alloc( அளவு(முழு) * types.vval.v_list->lv_len );
 
-	    FOR_ALL_LIST_ITEMS(types.vval.v_list, li)
+	    FOR_ALL_LIST_பொருட்கள்(types.vval.v_list, li)
 	    {
 		proptype_T *prop_type;
 
-		if (li->li_tv.v_type != VAR_STRING)
-		    continue;
+		எனில் (li->li_tv.v_type != VAR_STRING)
+		    தொடர்;
 
 		prop_type = lookup_prop_type(li->li_tv.vval.v_string, buf);
 
-		if (!prop_type)
-		    goto cleanup_prop_remove;
+		எனில் (!prop_type)
+		    செல் cleanup_prop_remove;
 
-		type_ids[num_type_ids++] = prop_type->pt_id;
+		type_ids[இலக்கம்_type_ids++] = prop_type->pt_id;
 	    }
 	}
     }
     both = dict_get_bool(dict, "both", FALSE);
 
-    if (id == -MAXCOL && (type_id == -1 && num_type_ids == 0))
+    எனில் (id == -MAXCOL && (type_id == -1 && இலக்கம்_type_ids == 0))
     {
 	emsg(_(e_need_at_least_one_of_id_or_type));
-	goto cleanup_prop_remove;
+	செல் cleanup_prop_remove;
     }
-    if (both && (id == -MAXCOL || (type_id == -1 && num_type_ids == 0)))
+    எனில் (both && (id == -MAXCOL || (type_id == -1 && இலக்கம்_type_ids == 0)))
     {
 	emsg(_(e_need_id_and_type_or_types_with_both));
-	goto cleanup_prop_remove;
+	செல் cleanup_prop_remove;
     }
-    if (type_id != -1 && num_type_ids > 0)
+    எனில் (type_id != -1 && இலக்கம்_type_ids > 0)
     {
 	emsg(_(e_cannot_specify_both_type_and_types));
-	goto cleanup_prop_remove;
+	செல் cleanup_prop_remove;
     }
 
-    if (end == 0)
-	end = buf->b_ml.ml_line_count;
+    எனில் (end == 0)
+	end = buf->b_ml.ml_வரி_மொத்தம்;
 
     {
 	unpacked_memline_T um = um_open(buf);
 
-	for (lnum = start; lnum <= end; ++lnum)
+	க்கு (lnum = start; lnum <= end; ++lnum)
 	{
-	    int idx;
+	    முழு idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
-		break;
-	    if (!um_goto_line(&um, lnum, 0))
-		break;
+	    எனில் (lnum > buf->b_ml.ml_வரி_மொத்தம்)
+		நிறுத்து;
+	    எனில் (!um_goto_வரி(&um, lnum, 0))
+		நிறுத்து;
 
-	    for (idx = 0; idx < um.prop_count; ++idx)
+	    க்கு (idx = 0; idx < um.prop_மொத்தம்; ++idx)
 	    {
 		textprop_T  *prop = &um.props[idx];
-		int	    matches_id = 0;
-		int	    matches_type = 0;
+		முழு	    matches_id = 0;
+		முழு	    matches_type = 0;
 
-		if (prop->tp_flags & TP_FLAG_DELETED)
-		    continue;
+		எனில் (prop->tp_flags & TP_FLAG_DELETED)
+		    தொடர்;
 
 		matches_id = prop->tp_id == id;
-		if (num_type_ids > 0)
+		எனில் (இலக்கம்_type_ids > 0)
 		{
-		    int idx2;
+		    முழு idx2;
 
-		    for (idx2 = 0; !matches_type && idx2 < num_type_ids;
+		    க்கு (idx2 = 0; !matches_type && idx2 < இலக்கம்_type_ids;
 								      ++idx2)
 			matches_type = prop->tp_type == type_ids[idx2];
 		}
-		else
+		இல்லையெனில்
 		    matches_type = prop->tp_type == type_id;
 
-		if (both ? matches_id && matches_type
+		எனில் (both ? matches_id && matches_type
 			 : matches_id || matches_type)
 		{
 		    um_delete_prop(&um, idx);
 
-		    if (first_changed == 0)
+		    எனில் (first_changed == 0)
 			first_changed = lnum;
 		    last_changed = lnum;
-		    ++rettv->vval.v_number;
-		    if (!do_all)
-			break;
+		    ++rettv->vval.v_எண்;
+		    எனில் (!do_all)
+			நிறுத்து;
 		}
 	    }
 	}
 	um_close(&um);
     }
 
-    if (first_changed > 0)
+    எனில் (first_changed > 0)
     {
-	changed_line_display_buf(buf);
-	changed_lines_buf(buf, first_changed, last_changed + 1, 0);
+	changed_வரி_display_buf(buf);
+	changed_வரிகள்_buf(buf, first_changed, last_changed + 1, 0);
 	redraw_buf_later(buf, UPD_VALID);
     }
 
@@ -2533,135 +2533,135 @@ cleanup_prop_remove:
 /*
  * Common for f_prop_type_add() and f_prop_type_change().
  */
-    static void
-prop_type_set(typval_T *argvars, int add)
+    நிலையான வெறுமை
+prop_type_set(typval_T *argvars, முழு add)
 {
     char_u	*name;
-    buf_T	*buf = NULL;
+    buf_T	*buf = வெற்று;
     dict_T	*dict;
     dictitem_T  *di;
     proptype_T	*prop;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    எனில் (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	திரும்பு;
     }
 
-    if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	return;
+    எனில் (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	திரும்பு;
     dict = argvars[1].vval.v_dict;
 
     prop = find_prop_type(name, buf);
-    if (add)
+    எனில் (add)
     {
 	hashtab_T **htp;
 
-	if (prop != NULL)
+	எனில் (prop != வெற்று)
 	{
 	    semsg(_(e_property_type_str_already_defined), name);
-	    return;
+	    திரும்பு;
 	}
 	prop = alloc_clear(offsetof(proptype_T, pt_name) + STRLEN(name) + 1);
-	if (prop == NULL)
-	    return;
+	எனில் (prop == வெற்று)
+	    திரும்பு;
 	STRCPY(prop->pt_name, name);
 	prop->pt_id = ++proptype_id;
 	prop->pt_flags = PT_FLAG_COMBINE;
-	if (buf == NULL)
+	எனில் (buf == வெற்று)
 	{
 	    htp = &global_proptypes;
 	    VIM_CLEAR(global_proparray);
 	}
-	else
+	இல்லையெனில்
 	{
 	    htp = &buf->b_proptypes;
 	    VIM_CLEAR(buf->b_proparray);
 	}
-	if (*htp == NULL)
+	எனில் (*htp == வெற்று)
 	{
 	    *htp = ALLOC_ONE(hashtab_T);
-	    if (*htp == NULL)
+	    எனில் (*htp == வெற்று)
 	    {
 		vim_free(prop);
-		return;
+		திரும்பு;
 	    }
 	    hash_init(*htp);
 	}
 	hash_add(*htp, PT2HIKEY(prop), "prop type");
     }
-    else
+    இல்லையெனில்
     {
-	if (prop == NULL)
+	எனில் (prop == வெற்று)
 	{
 	    semsg(_(e_property_type_str_does_not_exist), name);
-	    return;
+	    திரும்பு;
 	}
     }
 
-    if (dict != NULL)
+    எனில் (dict != வெற்று)
     {
 	di = dict_find(dict, (char_u *)"highlight", -1);
-	if (di != NULL)
+	எனில் (di != வெற்று)
 	{
 	    char_u	*highlight;
-	    int		hl_id = 0;
+	    முழு		hl_id = 0;
 
 	    highlight = dict_get_string(dict, "highlight", FALSE);
-	    if (highlight != NULL && *highlight != NUL)
+	    எனில் (highlight != வெற்று && *highlight != NUL)
 		hl_id = syn_name2id(highlight);
-	    if (hl_id <= 0)
+	    எனில் (hl_id <= 0)
 	    {
 		semsg(_(e_unknown_highlight_group_name_str),
-			highlight == NULL ? (char_u *)"" : highlight);
-		return;
+			highlight == வெற்று ? (char_u *)"" : highlight);
+		திரும்பு;
 	    }
 	    prop->pt_hl_id = hl_id;
 	}
 
 	di = dict_find(dict, (char_u *)"combine", -1);
-	if (di != NULL)
+	எனில் (di != வெற்று)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    எனில் (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_COMBINE;
-	    else
+	    இல்லையெனில்
 		prop->pt_flags &= ~PT_FLAG_COMBINE;
 	}
 
 	di = dict_find(dict, (char_u *)"override", -1);
-	if (di != NULL)
+	எனில் (di != வெற்று)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    எனில் (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_OVERRIDE;
-	    else
+	    இல்லையெனில்
 		prop->pt_flags &= ~PT_FLAG_OVERRIDE;
 	}
 
 	di = dict_find(dict, (char_u *)"priority", -1);
-	if (di != NULL)
-	    prop->pt_priority = tv_get_number(&di->di_tv);
+	எனில் (di != வெற்று)
+	    prop->pt_priority = tv_get_எண்(&di->di_tv);
 
 	di = dict_find(dict, (char_u *)"start_incl", -1);
-	if (di != NULL)
+	எனில் (di != வெற்று)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    எனில் (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_INS_START_INCL;
-	    else
+	    இல்லையெனில்
 		prop->pt_flags &= ~PT_FLAG_INS_START_INCL;
 	}
 
 	di = dict_find(dict, (char_u *)"end_incl", -1);
-	if (di != NULL)
+	எனில் (di != வெற்று)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    எனில் (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_INS_END_INCL;
-	    else
+	    இல்லையெனில்
 		prop->pt_flags &= ~PT_FLAG_INS_END_INCL;
 	}
     }
@@ -2670,7 +2670,7 @@ prop_type_set(typval_T *argvars, int add)
 /*
  * prop_type_add({name}, {props})
  */
-    void
+    வெறுமை
 f_prop_type_add(typval_T *argvars, typval_T *rettv UNUSED)
 {
     prop_type_set(argvars, TRUE);
@@ -2679,7 +2679,7 @@ f_prop_type_add(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * prop_type_change({name}, {props})
  */
-    void
+    வெறுமை
 f_prop_type_change(typval_T *argvars, typval_T *rettv UNUSED)
 {
     prop_type_set(argvars, FALSE);
@@ -2688,44 +2688,44 @@ f_prop_type_change(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * prop_type_delete({name} [, {bufnr}])
  */
-    void
+    வெறுமை
 f_prop_type_delete(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u	*name;
-    buf_T	*buf = NULL;
+    buf_T	*buf = வெற்று;
     hashitem_T	*hi;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    எனில் (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	திரும்பு;
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    எனில் (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	எனில் (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    திரும்பு;
     }
 
     hi = find_prop_type_hi(name, buf);
-    if (hi == NULL)
-	return;
+    எனில் (hi == வெற்று)
+	திரும்பு;
 
     hashtab_T	*ht;
     proptype_T	*prop = HI2PT(hi);
 
-    if (buf == NULL)
+    எனில் (buf == வெற்று)
     {
 	ht = global_proptypes;
 	VIM_CLEAR(global_proparray);
     }
-    else
+    இல்லையெனில்
     {
 	ht = buf->b_proptypes;
 	VIM_CLEAR(buf->b_proparray);
@@ -2735,72 +2735,72 @@ f_prop_type_delete(typval_T *argvars, typval_T *rettv UNUSED)
 
     // currently visible text properties will disappear
     redraw_all_later(UPD_CLEAR);
-    changed_window_setting_buf(buf == NULL ? curbuf : buf);
+    changed_window_setting_buf(buf == வெற்று ? curbuf : buf);
 }
 
 /*
  * prop_type_get({name} [, {props}])
  */
-    void
+    வெறுமை
 f_prop_type_get(typval_T *argvars, typval_T *rettv)
 {
     char_u *name;
 
-    if (in_vim9script()
+    எனில் (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	திரும்பு;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    எனில் (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	திரும்பு;
     }
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    எனில் (rettv_dict_alloc(rettv) == FAIL)
+	திரும்பு;
 
-    proptype_T  *prop = NULL;
-    buf_T	    *buf = NULL;
+    proptype_T  *prop = வெற்று;
+    buf_T	    *buf = வெற்று;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    எனில் (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	எனில் (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    திரும்பு;
     }
 
     prop = find_prop_type(name, buf);
-    if (prop == NULL)
-	return;
+    எனில் (prop == வெற்று)
+	திரும்பு;
 
     dict_T *d = rettv->vval.v_dict;
 
-    if (prop->pt_hl_id > 0)
+    எனில் (prop->pt_hl_id > 0)
 	dict_add_string(d, "highlight", syn_id2name(prop->pt_hl_id));
-    dict_add_number(d, "priority", prop->pt_priority);
-    dict_add_number(d, "combine",
+    dict_add_எண்(d, "priority", prop->pt_priority);
+    dict_add_எண்(d, "combine",
 	    (prop->pt_flags & PT_FLAG_COMBINE) ? 1 : 0);
-    dict_add_number(d, "override",
+    dict_add_எண்(d, "override",
 	    (prop->pt_flags & PT_FLAG_OVERRIDE) ? 1 : 0);
-    dict_add_number(d, "start_incl",
+    dict_add_எண்(d, "start_incl",
 	    (prop->pt_flags & PT_FLAG_INS_START_INCL) ? 1 : 0);
-    dict_add_number(d, "end_incl",
+    dict_add_எண்(d, "end_incl",
 	    (prop->pt_flags & PT_FLAG_INS_END_INCL) ? 1 : 0);
-    if (buf != NULL)
-	dict_add_number(d, "bufnr", buf->b_fnum);
+    எனில் (buf != வெற்று)
+	dict_add_எண்(d, "bufnr", buf->b_fnum);
 }
 
-    static void
+    நிலையான வெறுமை
 list_types(hashtab_T *ht, list_T *l)
 {
     long	todo;
     hashitem_T	*hi;
 
     todo = (long)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_பொருட்கள்(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	எனில் (!HASHITEM_EMPTY(hi))
 	{
 	    proptype_T *prop = HI2PT(hi);
 
@@ -2813,47 +2813,47 @@ list_types(hashtab_T *ht, list_T *l)
 /*
  * prop_type_list([{bufnr}])
  */
-    void
+    வெறுமை
 f_prop_type_list(typval_T *argvars, typval_T *rettv)
 {
-    buf_T *buf = NULL;
+    buf_T *buf = வெற்று;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    எனில் (rettv_list_alloc(rettv) == FAIL)
+	திரும்பு;
 
-    if (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    எனில் (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
+	திரும்பு;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    எனில் (argvars[0].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	    return;
+	எனில் (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	    திரும்பு;
     }
-    if (buf == NULL)
+    எனில் (buf == வெற்று)
     {
-	if (global_proptypes != NULL)
+	எனில் (global_proptypes != வெற்று)
 	    list_types(global_proptypes, rettv->vval.v_list);
     }
-    else if (buf->b_proptypes != NULL)
+    இல்லையெனில் எனில் (buf->b_proptypes != வெற்று)
 	list_types(buf->b_proptypes, rettv->vval.v_list);
 }
 
 /*
  * Free all property types in "ht".
  */
-    static void
+    நிலையான வெறுமை
 clear_ht_prop_types(hashtab_T *ht)
 {
     long	todo;
     hashitem_T	*hi;
 
-    if (ht == NULL)
-	return;
+    எனில் (ht == வெற்று)
+	திரும்பு;
 
     todo = (long)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_பொருட்கள்(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	எனில் (!HASHITEM_EMPTY(hi))
 	{
 	    proptype_T *prop = HI2PT(hi);
 
@@ -2866,15 +2866,15 @@ clear_ht_prop_types(hashtab_T *ht)
     vim_free(ht);
 }
 
-#if defined(EXITFREE)
+#எனில் defined(EXITFREE)
 /*
  * Free all global property types.
  */
-    void
-clear_global_prop_types(void)
+    வெறுமை
+clear_global_prop_types(வெறுமை)
 {
     clear_ht_prop_types(global_proptypes);
-    global_proptypes = NULL;
+    global_proptypes = வெற்று;
     VIM_CLEAR(global_proparray);
 }
 #endif
@@ -2882,19 +2882,19 @@ clear_global_prop_types(void)
 /*
  * Free all property types for "buf".
  */
-    void
+    வெறுமை
 clear_buf_prop_types(buf_T *buf)
 {
     clear_ht_prop_types(buf->b_proptypes);
-    buf->b_proptypes = NULL;
+    buf->b_proptypes = வெற்று;
     VIM_CLEAR(buf->b_proparray);
 }
 
 // Struct used to return two values from adjust_prop().
-typedef struct
+வகைவரை கட்டமைப்பு
 {
-    int dirty;	    // if the property was changed
-    int can_drop;   // whether after this change, the prop may be removed
+    முழு dirty;	    // if the property was changed
+    முழு can_drop;   // whether after this change, the prop may be removed
 } adjustres_T;
 
 /*
@@ -2906,64 +2906,64 @@ typedef struct
  * APC_SUBSTITUTE:	Text is replaced, not inserted.
  * APC_INDENT:		Text is inserted before virtual text prop
  */
-    static adjustres_T
+    நிலையான adjustres_T
 adjust_prop(
 	textprop_T  *prop,
 	colnr_T	    col,
-	int	    added,
-	int	    flags)
+	முழு	    added,
+	முழு	    flags)
 {
     proptype_T	*pt;
-    int		start_incl;
-    int		end_incl;
-    int		droppable;
+    முழு		start_incl;
+    முழு		end_incl;
+    முழு		droppable;
     adjustres_T res = {TRUE, FALSE};
 
     // prop after end of the line doesn't move
-    if (prop->tp_col == MAXCOL)
+    எனில் (prop->tp_col == MAXCOL)
     {
 	res.dirty = FALSE;
-	return res;
+	திரும்பு res;
     }
 
     pt = text_prop_type_by_id(curbuf, prop->tp_type);
-    start_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_START_INCL))
+    start_incl = (pt != வெற்று && (pt->pt_flags & PT_FLAG_INS_START_INCL))
 				|| (flags & APC_SUBSTITUTE)
 				|| (prop->tp_flags & TP_FLAG_CONT_PREV);
-    if (prop->tp_id < 0 && (flags & APC_INDENT))
+    எனில் (prop->tp_id < 0 && (flags & APC_INDENT))
 	// when inserting indent just before a character with virtual text
 	// shift the text property
 	start_incl = FALSE;
-    end_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_END_INCL))
+    end_incl = (pt != வெற்று && (pt->pt_flags & PT_FLAG_INS_END_INCL))
 				|| (prop->tp_flags & TP_FLAG_CONT_NEXT);
     // do not drop zero-width props if they later can increase in size
     droppable = !(start_incl || end_incl);
 
-    if (added > 0)
+    எனில் (added > 0)
     {
-	if (col + 1 <= prop->tp_col
+	எனில் (col + 1 <= prop->tp_col
 		- (start_incl || (prop->tp_len == 0 && end_incl)))
 	    // Change is entirely before the text property: Only shift
 	    prop->tp_col += added;
-	else if (col + 1 < prop->tp_col + prop->tp_len + end_incl
+	இல்லையெனில் எனில் (col + 1 < prop->tp_col + prop->tp_len + end_incl
 		&& prop->tp_id >= 0)  // don't change length for virtual text
 	    // Insertion was inside text property
 	    prop->tp_len += added;
     }
-    else if (prop->tp_col > col + 1)
+    இல்லையெனில் எனில் (prop->tp_col > col + 1)
     {
-	if (prop->tp_col + added < col + 1)
+	எனில் (prop->tp_col + added < col + 1)
 	{
-	    if (prop->tp_id < 0)
+	    எனில் (prop->tp_id < 0)
 	    {
 		// Inline virtual text swallowed by the deletion.
 		res.can_drop = TRUE;
 	    }
-	    else
+	    இல்லையெனில்
 	    {
 		prop->tp_len += (prop->tp_col - 1 - col) + added;
 		prop->tp_col = col + 1;
-		if (prop->tp_len <= 0)
+		எனில் (prop->tp_len <= 0)
 		{
 		    prop->tp_len = 0;
 		    // Multiline properties with no text left should
@@ -2974,33 +2974,33 @@ adjust_prop(
 		}
 	    }
 	}
-	else
+	இல்லையெனில்
 	    prop->tp_col += added;
     }
-    else if (prop->tp_len > 0 && prop->tp_col + prop->tp_len > col
+    இல்லையெனில் எனில் (prop->tp_len > 0 && prop->tp_col + prop->tp_len > col
 	    && prop->tp_id >= 0)  // don't change length for virtual text
     {
-	if (added <= -MAXCOL)
+	எனில் (added <= -MAXCOL)
 	    // Delete everything from col to end of line.
 	    prop->tp_len = col - (prop->tp_col - 1);
-	else
+	இல்லையெனில்
 	{
-	    int after = col - added - (prop->tp_col - 1 + prop->tp_len);
+	    முழு after = col - added - (prop->tp_col - 1 + prop->tp_len);
 
 	    prop->tp_len += after > 0 ? added + after : added;
 	}
 	// A multiline property with no text left on this line
 	// should also be dropped.  When TP_FLAG_CONT_NEXT is set,
 	// tp_len == 1 means only the newline remains.
-	if (prop->tp_len <= 0 || ((prop->tp_flags & TP_FLAG_CONT_NEXT)
+	எனில் (prop->tp_len <= 0 || ((prop->tp_flags & TP_FLAG_CONT_NEXT)
 		    && prop->tp_len <= 1))
 	    res.can_drop = droppable || (prop->tp_flags
 			& (TP_FLAG_CONT_PREV | TP_FLAG_CONT_NEXT));
     }
-    else
+    இல்லையெனில்
 	res.dirty = FALSE;
 
-    return res;
+    திரும்பு res;
 }
 
 /*
@@ -3015,68 +3015,68 @@ adjust_prop(
  * Caller is expected to check b_has_textprop and "bytes_added" being non-zero.
  * Returns TRUE when props were changed.
  */
-    int
+    முழு
 adjust_prop_columns(
 	linenr_T    lnum,
 	colnr_T	    col,
-	int	    bytes_added,
-	int	    flags)
+	முழு	    bytes_added,
+	முழு	    flags)
 {
     unpacked_memline_T um;
-    int		dirty = FALSE;
-    int		ri;
+    முழு		dirty = FALSE;
+    முழு		ri;
 
-    if (text_prop_frozen > 0)
-	return FALSE;
+    எனில் (text_prop_frozen > 0)
+	திரும்பு FALSE;
 
     um = um_open_at(curbuf, lnum, 0);
-    if (um.buf == NULL || um.prop_count == 0)
+    எனில் (um.buf == வெற்று || um.prop_மொத்தம் == 0)
     {
 	um_abort(&um);
-	return FALSE;
+	திரும்பு FALSE;
     }
 
-    for (ri = 0; ri < um.prop_count; ++ri)
+    க்கு (ri = 0; ri < um.prop_மொத்தம்; ++ri)
     {
 	textprop_T	*prop = &um.props[ri];
 	adjustres_T	res;
 
 	res = adjust_prop(prop, col, bytes_added, flags);
-	if (res.dirty)
+	எனில் (res.dirty)
 	{
-	    if (!dirty)
+	    எனில் (!dirty)
 	    {
 		// Detach before u_savesub() so that all text and vtext
 		// pointers are allocated copies, immune to memline
 		// changes caused by u_savesub().
-		if (!um.detached && !um_detach(&um))
+		எனில் (!um.detached && !um_detach(&um))
 		{
 		    um_abort(&um);
-		    return FALSE;
+		    திரும்பு FALSE;
 		}
 		// Re-get prop pointer after detach (array may move).
 		prop = &um.props[ri];
 
-		if ((flags & APC_SAVE_FOR_UNDO)
+		எனில் ((flags & APC_SAVE_FOR_UNDO)
 					       && u_savesub(lnum) == FAIL)
 		{
 		    um_abort(&um);
-		    return FALSE;
+		    திரும்பு FALSE;
 		}
 	    }
 	    dirty = TRUE;
 	}
-	if (res.can_drop)
+	எனில் (res.can_drop)
 	{
 	    um_delete_prop(&um, ri);
-	    continue;
+	    தொடர்;
 	}
     }
-    if (dirty)
+    எனில் (dirty)
 	um_close(&um);
-    else
+    இல்லையெனில்
 	um_abort(&um);
-    return dirty;
+    திரும்பு dirty;
 }
 
 /*
@@ -3087,127 +3087,127 @@ adjust_prop_columns(
  * "deleted" is the number of bytes deleted.
  * "at_eol" is true if the split is after the end of the line.
  */
-    void
+    வெறுமை
 adjust_props_for_split(
 	linenr_T    lnum_props,
-	linenr_T    lnum_top,
-	int	    kept,
-	int	    deleted,
-	int	    at_eol)
+	linenr_T    lnum_உச்சி,
+	முழு	    kept,
+	முழு	    deleted,
+	முழு	    at_eol)
 {
     char_u	*props;
-    int		count;
+    முழு		மொத்தம்;
     garray_T    prevprop;
     garray_T    nextprop;
-    int		skipped = kept + deleted;
+    முழு		skipped = kept + deleted;
 
-    if (!curbuf->b_has_textprop)
-	return;
+    எனில் (!curbuf->b_has_textprop)
+	திரும்பு;
 
     // Get the text properties from "lnum_props".
-    count = get_text_props(curbuf, lnum_props, &props, FALSE);
-    ga_init2(&prevprop, sizeof(textprop_T), 10);
-    ga_init2(&nextprop, sizeof(textprop_T), 10);
+    மொத்தம் = get_text_props(curbuf, lnum_props, &props, FALSE);
+    ga_init2(&prevprop, அளவு(textprop_T), 10);
+    ga_init2(&nextprop, அளவு(textprop_T), 10);
 
     // count_ptr points to the prop_count field in the memline.
-    char_u *count_ptr = props - PROP_COUNT_SIZE;
+    char_u *மொத்தம்_ptr = props - PROP_மொத்தம்_SIZE;
 
     // Keep the relevant ones in the first line, reducing the length if needed.
     // Copy the ones that include the split to the second line.
     // Move the ones after the split to the second line.
-    for (int i = 0; i < count; ++i)
+    க்கு (முழு i = 0; i < மொத்தம்; ++i)
     {
 	textprop_T  prop;
 	proptype_T *pt;
-	int	    start_incl, end_incl;
-	int	    cont_prev, cont_next;
-	int	    prop_col;
+	முழு	    start_incl, end_incl;
+	முழு	    cont_prev, cont_next;
+	முழு	    prop_col;
 
 	// copy the prop to an aligned structure
-	mch_memmove(&prop, props + i * sizeof(textprop_T), sizeof(textprop_T));
+	mch_memmove(&prop, props + i * அளவு(textprop_T), அளவு(textprop_T));
 
 	// Convert offset to pointer and copy for virtual text props.
 	// Must copy because set_text_props() may invalidate memline data.
-	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	எனில் (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	{
-	    prop.u.tp_text = vim_strsave(count_ptr + prop.u.tp_text_offset);
+	    prop.u.tp_text = vim_strsave(மொத்தம்_ptr + prop.u.tp_text_offset);
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
-	    prop.u.tp_text = NULL;
+	இல்லையெனில்
+	    prop.u.tp_text = வெற்று;
 
 	pt = text_prop_type_by_id(curbuf, prop.tp_type);
-	start_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_START_INCL));
-	end_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_END_INCL));
+	start_incl = (pt != வெற்று && (pt->pt_flags & PT_FLAG_INS_START_INCL));
+	end_incl = (pt != வெற்று && (pt->pt_flags & PT_FLAG_INS_END_INCL));
 
 	// a text prop "above" behaves like it is on the first text column
 	prop_col = (prop.tp_flags & TP_FLAG_ALIGN_ABOVE) ? 1 : prop.tp_col;
 
-	if (prop_col == MAXCOL)
+	எனில் (prop_col == MAXCOL)
 	{
 	    cont_prev = at_eol;
 	    cont_next = !at_eol;
 	}
-	else
+	இல்லையெனில்
 	{
 	    // Floating virtual text (tp_col == MAXCOL) should not use
 	    // tp_len for continuation since tp_len holds the vtext
 	    // string length.
-	    int is_floating_vtext = (prop.tp_id < 0
+	    முழு is_floating_vtext = (prop.tp_id < 0
 						&& prop.tp_col == MAXCOL);
 
 	    cont_prev = prop_col + !start_incl <= kept;
-	    if (is_floating_vtext)
+	    எனில் (is_floating_vtext)
 		cont_next = FALSE;
-	    else
+	    இல்லையெனில்
 		cont_next = skipped <= prop_col + prop.tp_len - !end_incl;
 	}
 	// when a prop has text it is never copied
-	if (prop.tp_id < 0 && cont_next)
+	எனில் (prop.tp_id < 0 && cont_next)
 	    cont_prev = FALSE;
 
-	if (cont_prev && ga_grow(&prevprop, 1) == OK)
+	எனில் (cont_prev && ga_grow(&prevprop, 1) == OK)
 	{
 	    textprop_T *p = ((textprop_T *)prevprop.ga_data) + prevprop.ga_len;
-	    int is_vtext = (prop.tp_id < 0);
+	    முழு is_vtext = (prop.tp_id < 0);
 
 	    *p = prop;
 	    ++prevprop.ga_len;
-	    if (!is_vtext && p->tp_col + p->tp_len >= kept)
+	    எனில் (!is_vtext && p->tp_col + p->tp_len >= kept)
 		p->tp_len = kept - p->tp_col;
-	    if (cont_next)
+	    எனில் (cont_next)
 		p->tp_flags |= TP_FLAG_CONT_NEXT;
 	}
 
 	// Only add the property to the next line if the length is bigger than
 	// zero.
-	if (cont_next && ga_grow(&nextprop, 1) == OK)
+	எனில் (cont_next && ga_grow(&nextprop, 1) == OK)
 	{
 	    textprop_T *p = ((textprop_T *)nextprop.ga_data) + nextprop.ga_len;
-	    int is_vtext = (prop.tp_id < 0);
+	    முழு is_vtext = (prop.tp_id < 0);
 
 	    *p = prop;
 	    ++nextprop.ga_len;
-	    if (p->tp_col != MAXCOL)
+	    எனில் (p->tp_col != MAXCOL)
 	    {
-		if (p->tp_col > skipped)
+		எனில் (p->tp_col > skipped)
 		    p->tp_col -= skipped - 1;
-		else
+		இல்லையெனில்
 		{
-		    if (!is_vtext)
+		    எனில் (!is_vtext)
 			p->tp_len -= skipped - p->tp_col;
 		    p->tp_col = 1;
 		}
 	    }
-	    if (cont_prev)
+	    எனில் (cont_prev)
 		p->tp_flags |= TP_FLAG_CONT_PREV;
 	}
     }
 
-    set_text_props(lnum_top, (textprop_T *)prevprop.ga_data,
+    set_text_props(lnum_உச்சி, (textprop_T *)prevprop.ga_data,
 							    prevprop.ga_len);
     ga_clear(&prevprop);
-    set_text_props(lnum_top + 1, (textprop_T *)nextprop.ga_data,
+    set_text_props(lnum_உச்சி + 1, (textprop_T *)nextprop.ga_data,
 							    nextprop.ga_len);
     ga_clear(&nextprop);
 }
@@ -3217,55 +3217,55 @@ adjust_props_for_split(
  * Properties are added in reverse order; caller should call
  * um_reverse_props() after all lines are processed.
  */
-    void
+    வெறுமை
 prepend_joined_props(
 	unpacked_memline_T  *um,
 	linenr_T	    lnum,
-	int		    last_line,
+	முழு		    last_வரி,
 	long		    col,
-	int		    removed)
+	முழு		    removed)
 {
     unpacked_memline_T	r_um;
 
-    if (um->buf == NULL)
-	return;
+    எனில் (um->buf == வெற்று)
+	திரும்பு;
 
     r_um = um_open_at(um->buf, lnum, 0);
-    if (r_um.buf == NULL)
-	return;
-    if (!um_detach(&r_um))
+    எனில் (r_um.buf == வெற்று)
+	திரும்பு;
+    எனில் (!um_detach(&r_um))
     {
 	um_abort(&r_um);
-	return;
+	திரும்பு;
     }
 
-    for (int i = r_um.prop_count - 1; i >= 0; --i)
+    க்கு (முழு i = r_um.prop_மொத்தம் - 1; i >= 0; --i)
     {
 	textprop_T  *prop = &r_um.props[i];
-	int	    end;
+	முழு	    end;
 
-	if (prop->tp_col == MAXCOL && !last_line)
-	    continue;  // drop floating text for non-last lines
+	எனில் (prop->tp_col == MAXCOL && !last_வரி)
+	    தொடர்;  // drop floating text for non-last lines
 	end = !(prop->tp_flags & TP_FLAG_CONT_NEXT);
 
 	adjust_prop(prop, 0, -removed, 0);
 	adjust_prop(prop, -1, col, 0);
 
-	if (last_line || end)
+	எனில் (last_வரி || end)
 	{
 	    um_add_prop(um, prop);
-	    prop->u.tp_text = NULL;  // ownership transferred
+	    prop->u.tp_text = வெற்று;  // ownership transferred
 	}
-	else
+	இல்லையெனில்
 	{
 	    // Search for continuing prop in um.
 	    bool    found = false;
 
-	    for (int j = 0; j < um->prop_count; ++j)
+	    க்கு (முழு j = 0; j < um->prop_மொத்தம்; ++j)
 	    {
 		textprop_T *op = &um->props[j];
 
-		if ((op->tp_flags & TP_FLAG_CONT_PREV)
+		எனில் ((op->tp_flags & TP_FLAG_CONT_PREV)
 			&& op->tp_id == prop->tp_id
 			&& op->tp_type == prop->tp_type)
 		{
@@ -3273,10 +3273,10 @@ prepend_joined_props(
 		    op->tp_len += op->tp_col - prop->tp_col;
 		    op->tp_col = prop->tp_col;
 		    op->tp_flags = prop->tp_flags;
-		    break;
+		    நிறுத்து;
 		}
 	    }
-	    if (!found)
+	    எனில் (!found)
 		internal_error("text property above joined line not found");
 	}
     }
@@ -3286,17 +3286,17 @@ prepend_joined_props(
 /*
  * Remember in "gap" that "flag" was cleared on "prop", on the line "which".
  */
-    static void
-remember_cleared_prop(garray_T *gap, int which, textprop_T *prop, int flag)
+    நிலையான வெறுமை
+remember_cleared_prop(garray_T *gap, முழு which, textprop_T *prop, முழு flag)
 {
     undoprop_T	*up;
 
-    if (which == UNDOPROP_NONE)
-	return;
-    if (gap->ga_itemsize == 0)
-	ga_init2(gap, sizeof(undoprop_T), 4);
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    எனில் (which == UNDOPROP_NONE)
+	திரும்பு;
+    எனில் (gap->ga_itemsize == 0)
+	ga_init2(gap, அளவு(undoprop_T), 4);
+    எனில் (ga_grow(gap, 1) == FAIL)
+	திரும்பு;
     up = (undoprop_T *)gap->ga_data + gap->ga_len++;
     up->up_which = which;
     up->up_type = prop->tp_type;
@@ -3311,72 +3311,72 @@ remember_cleared_prop(garray_T *gap, int which, textprop_T *prop, int flag)
  * is cleared on the line above is remembered in "gap" as "above_which", on
  * the line below as "below_which".
  */
-    void
+    வெறுமை
 adjust_props_for_undo(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	garray_T    *gap,
-	int	    above_which,
-	int	    below_which)
+	முழு	    above_which,
+	முழு	    below_which)
 {
     unpacked_memline_T	above;
     unpacked_memline_T	below;
-    bool		*paired = NULL;
+    bool		*paired = வெற்று;
     bool		above_changed = false;
     bool		below_changed = false;
     bool		cont_next = false;
 
-    if (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_line_count)
-	return;
+    எனில் (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_வரி_மொத்தம்)
+	திரும்பு;
 
     above = um_open_at(buf, lnum, 0);
-    if (above.buf == NULL)
-	return;
-    for (int i = 0; i < above.prop_count; ++i)
-	if (above.props[i].tp_flags & TP_FLAG_CONT_NEXT)
+    எனில் (above.buf == வெற்று)
+	திரும்பு;
+    க்கு (முழு i = 0; i < above.prop_மொத்தம்; ++i)
+	எனில் (above.props[i].tp_flags & TP_FLAG_CONT_NEXT)
 	    cont_next = true;
     // Loading the line below may invalidate the text of "above", copy it when
     // it may have to be stored.
-    if (cont_next && !um_detach(&above))
+    எனில் (cont_next && !um_detach(&above))
     {
 	um_abort(&above);
-	return;
+	திரும்பு;
     }
 
     below = um_open_at(buf, lnum + 1, 0);
-    if (below.buf == NULL)
+    எனில் (below.buf == வெற்று)
     {
 	um_abort(&above);
-	return;
+	திரும்பு;
     }
-    if (below.prop_count > 0)
+    எனில் (below.prop_மொத்தம் > 0)
     {
-	paired = ALLOC_CLEAR_MULT(bool, below.prop_count);
-	if (paired == NULL)
-	    goto theend;
+	paired = ALLOC_CLEAR_MULT(bool, below.prop_மொத்தம்);
+	எனில் (paired == வெற்று)
+	    செல் theend;
     }
 
-    for (int i = 0; i < above.prop_count; ++i)
+    க்கு (முழு i = 0; i < above.prop_மொத்தம்; ++i)
     {
 	textprop_T  *prop = &above.props[i];
 	bool	    found = false;
 
-	if (!(prop->tp_flags & TP_FLAG_CONT_NEXT))
-	    continue;
-	for (int j = 0; j < below.prop_count; ++j)
+	எனில் (!(prop->tp_flags & TP_FLAG_CONT_NEXT))
+	    தொடர்;
+	க்கு (முழு j = 0; j < below.prop_மொத்தம்; ++j)
 	{
 	    textprop_T *next = &below.props[j];
 
-	    if (!paired[j] && (next->tp_flags & TP_FLAG_CONT_PREV)
+	    எனில் (!paired[j] && (next->tp_flags & TP_FLAG_CONT_PREV)
 		    && next->tp_id == prop->tp_id
 		    && next->tp_type == prop->tp_type)
 	    {
 		paired[j] = true;
 		found = true;
-		break;
+		நிறுத்து;
 	    }
 	}
-	if (!found)
+	எனில் (!found)
 	{
 	    prop->tp_flags &= ~TP_FLAG_CONT_NEXT;
 	    above_changed = true;
@@ -3384,12 +3384,12 @@ adjust_props_for_undo(
 	}
     }
 
-    for (int j = 0; j < below.prop_count; ++j)
+    க்கு (முழு j = 0; j < below.prop_மொத்தம்; ++j)
     {
-	if (!(below.props[j].tp_flags & TP_FLAG_CONT_PREV) || paired[j])
-	    continue;
-	if (!below.detached && !um_detach(&below))
-	    break;
+	எனில் (!(below.props[j].tp_flags & TP_FLAG_CONT_PREV) || paired[j])
+	    தொடர்;
+	எனில் (!below.detached && !um_detach(&below))
+	    நிறுத்து;
 	below.props[j].tp_flags &= ~TP_FLAG_CONT_PREV;
 	below_changed = true;
 	remember_cleared_prop(gap, below_which, &below.props[j],
@@ -3397,13 +3397,13 @@ adjust_props_for_undo(
     }
 
 theend:
-    if (below_changed)
+    எனில் (below_changed)
 	um_close(&below);
-    else
+    இல்லையெனில்
 	um_abort(&below);
-    if (above_changed)
+    எனில் (above_changed)
 	um_close(&above);
-    else
+    இல்லையெனில்
 	um_abort(&above);
     vim_free(paired);
 }
@@ -3413,58 +3413,58 @@ theend:
  * those cleared when the undo block was applied the other way.  A property
  * that is no longer there is skipped.
  */
-    void
+    வெறுமை
 restore_props_for_undo(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	garray_T    *gap,
-	int	    which)
+	முழு	    which)
 {
     unpacked_memline_T	um;
     bool		changed = false;
 
-    if (!buf->b_has_textprop || gap->ga_len == 0 || lnum < 1
-					  || lnum > buf->b_ml.ml_line_count)
-	return;
+    எனில் (!buf->b_has_textprop || gap->ga_len == 0 || lnum < 1
+					  || lnum > buf->b_ml.ml_வரி_மொத்தம்)
+	திரும்பு;
     um = um_open_at(buf, lnum, 0);
-    if (um.buf == NULL)
-	return;
-    for (int r = 0; r < gap->ga_len; ++r)
+    எனில் (um.buf == வெற்று)
+	திரும்பு;
+    க்கு (முழு r = 0; r < gap->ga_len; ++r)
     {
 	undoprop_T  *up = (undoprop_T *)gap->ga_data + r;
 
-	if (up->up_which != which)
-	    continue;
-	for (int i = 0; i < um.prop_count; ++i)
+	எனில் (up->up_which != which)
+	    தொடர்;
+	க்கு (முழு i = 0; i < um.prop_மொத்தம்; ++i)
 	{
 	    textprop_T *prop = &um.props[i];
 
-	    if (prop->tp_type != up->up_type || prop->tp_id != up->up_id
+	    எனில் (prop->tp_type != up->up_type || prop->tp_id != up->up_id
 		    || prop->tp_col != up->up_col
 		    || (prop->tp_flags & up->up_flag))
-		continue;
-	    if (!um.detached && !um_detach(&um))
-		goto theend;
+		தொடர்;
+	    எனில் (!um.detached && !um_detach(&um))
+		செல் theend;
 	    um.props[i].tp_flags |= up->up_flag;
 	    changed = true;
-	    break;
+	    நிறுத்து;
 	}
     }
 
 theend:
-    if (changed)
+    எனில் (changed)
 	um_close(&um);
-    else
+    இல்லையெனில்
 	um_abort(&um);
 }
 
     bool
-text_prop_count_valid(int prop_count, size_t propdata_len)
+text_prop_மொத்தம்_valid(முழு prop_மொத்தம், size_t propdata_len)
 {
-    if (propdata_len < PROP_COUNT_SIZE)
-	return false;
-    return (size_t)prop_count * sizeof(textprop_T)
-		    <= propdata_len - PROP_COUNT_SIZE;
+    எனில் (propdata_len < PROP_மொத்தம்_SIZE)
+	திரும்பு false;
+    திரும்பு (size_t)prop_மொத்தம் * அளவு(textprop_T)
+		    <= propdata_len - PROP_மொத்தம்_SIZE;
 }
 
 /*
@@ -3473,21 +3473,21 @@ text_prop_count_valid(int prop_count, size_t propdata_len)
  * "props" may be unaligned.
  */
     bool
-text_prop_vtext_valid(char_u *props, int prop_count, size_t propdata_len)
+text_prop_vtext_valid(char_u *props, முழு prop_மொத்தம், size_t propdata_len)
 {
-    for (int i = 0; i < prop_count; ++i)
+    க்கு (முழு i = 0; i < prop_மொத்தம்; ++i)
     {
 	textprop_T  prop;
 
-	mch_memmove(&prop, props + (size_t)i * sizeof(textprop_T),
-							  sizeof(textprop_T));
-	if (prop.tp_id >= 0 || prop.u.tp_text_offset <= 0)
-	    continue;
-	if (prop.tp_len < 0 || (size_t)prop.u.tp_text_offset
+	mch_memmove(&prop, props + (size_t)i * அளவு(textprop_T),
+							  அளவு(textprop_T));
+	எனில் (prop.tp_id >= 0 || prop.u.tp_text_offset <= 0)
+	    தொடர்;
+	எனில் (prop.tp_len < 0 || (size_t)prop.u.tp_text_offset
 				+ (size_t)prop.tp_len + 1 > propdata_len)
-	    return false;
+	    திரும்பு false;
     }
-    return true;
+    திரும்பு true;
 }
 
 #endif // FEAT_PROP_POPUP
