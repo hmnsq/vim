@@ -7,25 +7,25 @@
 //  Os (OptLev=s), W1, Zp8, env=Win32, ms_ext, c_ext
 //  error checks: none
 //@@MIDL_FILE_HEADING(  )
-#include "rpc.h"
-#include "rpcndr.h"
+#ضمن "rpc.h"
+#ضمن "rpcndr.h"
 #ifndef COM_NO_WINDOWS_H
-#include "windows.h"
-#include "ole2.h"
+#ضمن "windows.h"
+#ضمن "ole2.h"
 #endif //COM_NO_WINDOWS_H
 
 #ifndef __if_ole_h__
 #define __if_ole_h__
 
 #ifdef __cplusplus
-extern "C"{
+خارجي "C"{
 #endif
 
 // Forward Declarations
 
 #ifndef __IVim_FWD_DEFINED__
 #define __IVim_FWD_DEFINED__
-typedef interface IVim IVim;
+تعريفنوع interface IVim IVim;
 #endif	// __IVim_FWD_DEFINED__
 
 
@@ -33,21 +33,21 @@ typedef interface IVim IVim;
 #define __Vim_FWD_DEFINED__
 
 #ifdef __cplusplus
-typedef class Vim Vim;
-#else
-typedef struct Vim Vim;
+تعريفنوع class Vim Vim;
+#وإلا
+تعريفنوع بنية Vim Vim;
 #endif // __cplusplus
 
 #endif	// __Vim_FWD_DEFINED__
 
 
 // header files for imported files
-#include "oaidl.h"
+#ضمن "oaidl.h"
 
 #ifndef __MIDL_user_allocate_free_DEFINED__
 #define __MIDL_user_allocate_free_DEFINED__
-    void __RPC_FAR * __RPC_USER MIDL_user_allocate(size_t);
-    void __RPC_USER MIDL_user_free( void __RPC_FAR * );
+    فراغ __RPC_FAR * __RPC_USER MIDL_user_allocate(size_t);
+    فراغ __RPC_USER MIDL_user_free( فراغ __RPC_FAR * );
 #endif
 
 #ifndef __IVim_INTERFACE_DEFINED__
@@ -62,14 +62,14 @@ typedef struct Vim Vim;
 
 
 
-EXTERN_C const IID IID_IVim;
+EXTERN_C ثابت IID IID_IVim;
 
-#if defined(__cplusplus) && !defined(CINTERFACE)
+#𐡄𐡍 defined(__cplusplus) && !defined(CINTERFACE)
 
     interface DECLSPEC_UUID("0F0BFAE2-4C90-11d1-82D7-0004AC368519")
-    IVim : public IDispatch
+    IVim : عام IDispatch
     {
-    public:
+    عام:
 	virtual HRESULT STDMETHODCALLTYPE SendKeys(
 	    /* [in] */ BSTR keys) = 0;
 
@@ -77,23 +77,23 @@ EXTERN_C const IID IID_IVim;
 	    /* [in] */ BSTR expr,
 	    /* [retval][out] */ BSTR __RPC_FAR *result) = 0;
 
-	virtual HRESULT STDMETHODCALLTYPE SetForeground( void) = 0;
+	virtual HRESULT STDMETHODCALLTYPE SetForeground( فراغ) = 0;
 
 	virtual HRESULT STDMETHODCALLTYPE GetHwnd(
 	    /* [retval][out] */ UINT_PTR __RPC_FAR *result) = 0;
 
     };
 
-#else	// C style interface
+#وإلا	// C style interface
 
-    typedef struct IVimVtbl
+    تعريفنوع بنية IVimVtbl
     {
 	BEGIN_INTERFACE
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *QueryInterface )(
 	    IVim __RPC_FAR * This,
 	    /* [in] */ REFIID riid,
-	    /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject);
+	    /* [iid_is][out] */ فراغ __RPC_FAR *__RPC_FAR *ppvObject);
 
 	ULONG ( STDMETHODCALLTYPE __RPC_FAR *AddRef )(
 	    IVim __RPC_FAR * This);
@@ -151,7 +151,7 @@ EXTERN_C const IID IID_IVim;
 
     interface IVim
     {
-	CONST_VTBL struct IVimVtbl __RPC_FAR *lpVtbl;
+	CONST_VTBL بنية IVimVtbl __RPC_FAR *lpVtbl;
     };
 
 #ifdef COBJMACROS
@@ -204,7 +204,7 @@ HRESULT STDMETHODCALLTYPE IVim_SendKeys_Proxy(
     /* [in] */ BSTR keys);
 
 
-void __RPC_STUB IVim_SendKeys_Stub(
+فراغ __RPC_STUB IVim_SendKeys_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
@@ -217,7 +217,7 @@ HRESULT STDMETHODCALLTYPE IVim_Eval_Proxy(
     /* [retval][out] */ BSTR __RPC_FAR *result);
 
 
-void __RPC_STUB IVim_Eval_Stub(
+فراغ __RPC_STUB IVim_Eval_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
@@ -228,7 +228,7 @@ HRESULT STDMETHODCALLTYPE IVim_SetForeground_Proxy(
     IVim __RPC_FAR * This);
 
 
-void __RPC_STUB IVim_SetForeground_Stub(
+فراغ __RPC_STUB IVim_SetForeground_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
@@ -240,7 +240,7 @@ HRESULT STDMETHODCALLTYPE IVim_GetHwnd_Proxy(
     /* [retval][out] */ UINT_PTR __RPC_FAR *result);
 
 
-void __RPC_STUB IVim_GetHwnd_Stub(
+فراغ __RPC_STUB IVim_GetHwnd_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
@@ -264,10 +264,10 @@ void __RPC_STUB IVim_GetHwnd_Stub(
 
 
 
-EXTERN_C const IID LIBID_Vim;
+EXTERN_C ثابت IID LIBID_Vim;
 
 #ifdef __cplusplus
-EXTERN_C const CLSID CLSID_Vim;
+EXTERN_C ثابت CLSID CLSID_Vim;
 
 class DECLSPEC_UUID("0F0BFAE1-4C90-11d1-82D7-0004AC368519")
 Vim;
@@ -277,9 +277,9 @@ Vim;
 // Additional Prototypes for ALL interfaces
 
 unsigned long		  __RPC_USER  BSTR_UserSize(	 unsigned long __RPC_FAR *, unsigned long	     , BSTR __RPC_FAR * );
-unsigned char __RPC_FAR * __RPC_USER  BSTR_UserMarshal(  unsigned long __RPC_FAR *, unsigned char __RPC_FAR *, BSTR __RPC_FAR * );
-unsigned char __RPC_FAR * __RPC_USER  BSTR_UserUnmarshal(unsigned long __RPC_FAR *, unsigned char __RPC_FAR *, BSTR __RPC_FAR * );
-void			  __RPC_USER  BSTR_UserFree(	 unsigned long __RPC_FAR *, BSTR __RPC_FAR * );
+unsigned حرف __RPC_FAR * __RPC_USER  BSTR_UserMarshal(  unsigned long __RPC_FAR *, unsigned حرف __RPC_FAR *, BSTR __RPC_FAR * );
+unsigned حرف __RPC_FAR * __RPC_USER  BSTR_UserUnmarshal(unsigned long __RPC_FAR *, unsigned حرف __RPC_FAR *, BSTR __RPC_FAR * );
+فراغ			  __RPC_USER  BSTR_UserFree(	 unsigned long __RPC_FAR *, BSTR __RPC_FAR * );
 
 // end of Additional Prototypes
 

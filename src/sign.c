@@ -11,39 +11,39 @@
  * sign.c: functions for managing signs
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_SIGNS)
+#𐡄𐡍 defined(FEAT_SIGNS)
 
 /*
  * Struct to hold the sign properties.
  */
-typedef struct sign sign_T;
+تعريفنوع بنية sign sign_T;
 
-struct sign
+بنية sign
 {
     sign_T *sn_next; // next sign in list
-    int sn_typenr; // type number of sign
+    صحيح sn_typenr; // type number of sign
     char_u *sn_name; // name of sign
     char_u *sn_icon; // name of pixmap
 # ifdef FEAT_SIGN_ICONS
-    void *sn_image; // icon image
+    فراغ *sn_image; // icon image
 # endif
     char_u *sn_text; // text used instead of pixmap
-    int sn_line_hl; // highlight ID for line
-    int sn_text_hl; // highlight ID for text
-    int sn_cul_hl; // highlight ID for text on current line when 'cursorline' is set
-    int sn_num_hl; // highlight ID for line number
-    int sn_priority; // default priority of this sign, -1 means SIGN_DEF_PRIO
+    صحيح sn_line_hl; // highlight ID for line
+    صحيح sn_text_hl; // highlight ID for text
+    صحيح sn_cul_hl; // highlight ID for text on current line when 'cursorline' is set
+    صحيح sn_num_hl; // highlight ID for line number
+    صحيح sn_priority; // default priority of this sign, -1 means SIGN_DEF_PRIO
 };
 
-static sign_T *first_sign = NULL;
-static int next_sign_typenr = 1;
+ساكن sign_T *first_sign = عدم;
+ساكن صحيح next_sign_typenr = 1;
 
-static void sign_list_defined(sign_T *sp);
-static void sign_undefine(sign_T *sp, sign_T *sp_prev);
+ساكن فراغ sign_list_defined(sign_T *sp);
+ساكن فراغ sign_undefine(sign_T *sp, sign_T *sp_prev);
 
-static char *cmds[] = { "define",
+ساكن حرف *cmds[] = { "define",
 # define SIGNCMD_DEFINE 0
                         "undefine",
 # define SIGNCMD_UNDEFINE 1
@@ -55,21 +55,21 @@ static char *cmds[] = { "define",
 # define SIGNCMD_UNPLACE 4
                         "jump",
 # define SIGNCMD_JUMP 5
-                        NULL
+                        عدم
 # define SIGNCMD_LAST 6
 };
 
 # define FOR_ALL_SIGNS(sp) \
-     for ((sp) = first_sign; (sp) != NULL; (sp) = (sp)->sn_next)
+     لكل ((sp) = first_sign; (sp) != عدم; (sp) = (sp)->sn_next)
 
-static hashtab_T sg_table; // sign group (signgroup_T) hashtable
-static int next_sign_id = 1; // next sign id in the global group
+ساكن hashtab_T sg_table; // sign group (signgroup_T) hashtable
+ساكن صحيح next_sign_id = 1; // next sign id in the global group
 
 /*
  * Initialize data needed for managing signs
  */
-void
-init_signs(void)
+فراغ
+init_signs(فراغ)
 {
     hash_init(&sg_table); // sign group hash table
 }
@@ -78,49 +78,49 @@ init_signs(void)
  * A new sign in group 'groupname' is added. If the group is not present,
  * create it. Otherwise reference the group.
  */
-static signgroup_T *
+ساكن signgroup_T *
 sign_group_ref(char_u *groupname)
 {
     hash_T hash = hash_hash(groupname);
     hashitem_T *hi = hash_lookup(&sg_table, groupname, hash);
-    signgroup_T *group = NULL;
+    signgroup_T *group = عدم;
 
-    if (HASHITEM_EMPTY(hi))
+    𐡄𐡍 (HASHITEM_EMPTY(hi))
     {
         // new group
         group = alloc(offsetof(signgroup_T, sg_name) + STRLEN(groupname) + 1);
-        if (group == NULL)
-            return NULL;
+        𐡄𐡍 (group == عدم)
+            أرجع عدم;
 
         STRCPY(group->sg_name, groupname);
         group->sg_refcount = 1;
         group->sg_next_sign_id = 1;
         hash_add_item(&sg_table, hi, group->sg_name, hash);
     }
-    else
+    وإلا
     {
         // existing group
         group = HI2SG(hi);
         group->sg_refcount++;
     }
 
-    return group;
+    أرجع group;
 }
 
 /*
  * A sign in group 'groupname' is removed. If all the signs in this group are
  * removed, then remove the group.
  */
-static void
+ساكن فراغ
 sign_group_unref(char_u *groupname)
 {
     hashitem_T *hi = hash_find(&sg_table, groupname);
-    if (HASHITEM_EMPTY(hi))
-        return;
+    𐡄𐡍 (HASHITEM_EMPTY(hi))
+        أرجع;
 
     signgroup_T *group = HI2SG(hi);
     group->sg_refcount--;
-    if (group->sg_refcount == 0)
+    𐡄𐡍 (group->sg_refcount == 0)
     {
         // All the signs in this group are removed
         hash_remove(&sg_table, hi, "sign remove");
@@ -133,12 +133,12 @@ sign_group_unref(char_u *groupname)
  * A sign can either be in the global group (sign->se_group == NULL)
  * or in a named group. If 'group' is '*', then the sign is part of the group.
  */
-static int
+ساكن صحيح
 sign_in_group(sign_entry_T *sign, char_u *group)
 {
-    return ((group != NULL && STRCMP(group, "*") == 0) ||
-            (group == NULL && sign->se_group == NULL) ||
-            (group != NULL && sign->se_group != NULL &&
+    أرجع ((group != عدم && STRCMP(group, "*") == 0) ||
+            (group == عدم && sign->se_group == عدم) ||
+            (group != عدم && sign->se_group != عدم &&
              STRCMP(group, sign->se_group->sg_name) == 0));
 }
 
@@ -146,105 +146,105 @@ sign_in_group(sign_entry_T *sign, char_u *group)
  * Return TRUE if "sign" is to be displayed in window "wp".
  * If the group name starts with "PopUp" it only shows in a popup window.
  */
-static int
+ساكن صحيح
 sign_group_for_window(sign_entry_T *sign, win_T *wp)
 {
-    int for_popup = sign->se_group != NULL &&
+    صحيح for_popup = sign->se_group != عدم &&
                     STRNCMP("PopUp", sign->se_group->sg_name, 5) == 0;
 
-    return WIN_IS_POPUP(wp) ? for_popup : !for_popup;
+    أرجع WIN_IS_POPUP(wp) ? for_popup : !for_popup;
 }
 
 /*
  * Get the next free sign identifier in the specified group
  */
-static int
+ساكن صحيح
 sign_group_get_next_signid(buf_T *buf, char_u *groupname)
 {
-    int id = 1;
-    signgroup_T *group = NULL;
-    sign_entry_T *sign = NULL;
+    صحيح id = 1;
+    signgroup_T *group = عدم;
+    sign_entry_T *sign = عدم;
 
-    if (groupname != NULL)
+    𐡄𐡍 (groupname != عدم)
     {
         hashitem_T *hi = hash_find(&sg_table, groupname);
-        if (HASHITEM_EMPTY(hi))
-            return id;
+        𐡄𐡍 (HASHITEM_EMPTY(hi))
+            أرجع id;
         group = HI2SG(hi);
     }
 
     // Search for the next usable sign identifier
-    int found = FALSE;
-    while (!found)
+    صحيح found = FALSE;
+    طالما (!found)
     {
-        if (group == NULL)
+        𐡄𐡍 (group == عدم)
             id = next_sign_id++; // global group
-        else
+        وإلا
             id = group->sg_next_sign_id++;
 
         // Check whether this sign is already placed in the buffer
         found = TRUE;
         FOR_ALL_SIGNS_IN_BUF(buf, sign)
         {
-            if (id == sign->se_id && sign_in_group(sign, groupname))
+            𐡄𐡍 (id == sign->se_id && sign_in_group(sign, groupname))
             {
                 found = FALSE; // sign identifier is in use
-                break;
+                اكسر;
             }
         }
     }
 
-    return id;
+    أرجع id;
 }
 
 /*
  * Insert a new sign into the signlist for buffer 'buf' between the 'prev' and
  * 'next' signs.
  */
-static void
+ساكن فراغ
 insert_sign(buf_T *buf, // buffer to store sign in
             sign_entry_T *prev, // previous sign entry
             sign_entry_T *next, // next sign entry
-            int id, // sign ID
+            صحيح id, // sign ID
             char_u *group, // sign group; NULL for global group
-            int prio, // sign priority
+            صحيح prio, // sign priority
             linenr_T lnum, // line number which gets the mark
-            int typenr) // typenr of sign we are adding
+            صحيح typenr) // typenr of sign we are adding
 {
     sign_entry_T *newsign =
-        lalloc_id(sizeof(sign_entry_T), FALSE, aid_insert_sign);
-    if (newsign == NULL)
-        return;
+        lalloc_id(حجم(sign_entry_T), FALSE, aid_insert_sign);
+    𐡄𐡍 (newsign == عدم)
+        أرجع;
 
     newsign->se_id = id;
     newsign->se_lnum = lnum;
     newsign->se_typenr = typenr;
 
-    if (group != NULL)
+    𐡄𐡍 (group != عدم)
     {
         newsign->se_group = sign_group_ref(group);
-        if (newsign->se_group == NULL)
+        𐡄𐡍 (newsign->se_group == عدم)
         {
             vim_free(newsign);
-            return;
+            أرجع;
         }
     }
-    else
+    وإلا
     {
-        newsign->se_group = NULL;
+        newsign->se_group = عدم;
     }
 
     newsign->se_priority = prio;
     newsign->se_next = next;
     newsign->se_prev = prev;
-    if (next != NULL)
+    𐡄𐡍 (next != عدم)
         next->se_prev = newsign;
 
-    if (prev == NULL)
+    𐡄𐡍 (prev == عدم)
     {
         // When adding first sign need to redraw the windows to create the
         // column for signs.
-        if (buf->b_signlist == NULL)
+        𐡄𐡍 (buf->b_signlist == عدم)
         {
             redraw_buf_later(buf, UPD_NOT_VALID);
             changed_line_abv_curs();
@@ -253,11 +253,11 @@ insert_sign(buf_T *buf, // buffer to store sign in
         // first sign in signlist
         buf->b_signlist = newsign;
 # ifdef FEAT_NETBEANS_INTG
-        if (netbeans_active())
+        𐡄𐡍 (netbeans_active())
             buf->b_has_sign_column = true;
 # endif
     }
-    else
+    وإلا
     {
         prev->se_next = newsign;
     }
@@ -270,21 +270,21 @@ insert_sign(buf_T *buf, // buffer to store sign in
 /*
  * Insert a new sign sorted by line number and sign priority.
  */
-static void
+ساكن فراغ
 insert_sign_by_lnum_prio(buf_T *buf, // buffer to store sign in
                          sign_entry_T *prev, // previous sign entry
-                         int id, // sign ID
+                         صحيح id, // sign ID
                          char_u *group, // sign group; NULL for global group
-                         int prio, // sign priority
+                         صحيح prio, // sign priority
                          linenr_T lnum, // line number which gets the mark
-                         int typenr) // typenr of sign we are adding
+                         صحيح typenr) // typenr of sign we are adding
 {
     // keep signs sorted by lnum and by priority: insert new sign at
     // the proper position in the list for this lnum.
-    while (prev != NULL && prev->se_lnum == lnum && prev->se_priority <= prio)
+    طالما (prev != عدم && prev->se_lnum == lnum && prev->se_priority <= prio)
         prev = prev->se_prev;
 
-    sign_entry_T *sign = (prev == NULL) ? buf->b_signlist : prev->se_next;
+    sign_entry_T *sign = (prev == عدم) ? buf->b_signlist : prev->se_next;
 
     insert_sign(buf, prev, sign, id, group, prio, lnum, typenr);
 }
@@ -292,49 +292,49 @@ insert_sign_by_lnum_prio(buf_T *buf, // buffer to store sign in
 /*
  * Lookup a sign by typenr. Returns NULL if sign is not found.
  */
-static sign_T *
-find_sign_by_typenr(int typenr)
+ساكن sign_T *
+find_sign_by_typenr(صحيح typenr)
 {
-    sign_T *sp = NULL;
+    sign_T *sp = عدم;
     FOR_ALL_SIGNS(sp)
-        if (sp->sn_typenr == typenr)
-            return sp;
-    return NULL;
+        𐡄𐡍 (sp->sn_typenr == typenr)
+            أرجع sp;
+    أرجع عدم;
 }
 
 /*
  * Get the name of a sign by its typenr.
  */
-static char_u *
-sign_typenr2name(int typenr)
+ساكن char_u *
+sign_typenr2name(صحيح typenr)
 {
-    sign_T *sp = NULL;
+    sign_T *sp = عدم;
     FOR_ALL_SIGNS(sp)
-        if (sp->sn_typenr == typenr)
-            return sp->sn_name;
-    return (char_u *)_("[Deleted]");
+        𐡄𐡍 (sp->sn_typenr == typenr)
+            أرجع sp->sn_name;
+    أرجع (char_u *)_("[Deleted]");
 }
 
 /*
  * Return information about a sign in a Dict
  */
-static dict_T *
+ساكن dict_T *
 sign_get_info(sign_entry_T *sign)
 {
     dict_T *d = dict_alloc_id(aid_sign_getinfo);
-    if (d == NULL)
-        return NULL;
+    𐡄𐡍 (d == عدم)
+        أرجع عدم;
 
     dict_add_number(d, "id", sign->se_id);
-    if (sign->se_group == NULL)
+    𐡄𐡍 (sign->se_group == عدم)
         dict_add_string_len(d, "group", (char_u *)"", 0);
-    else
+    وإلا
         dict_add_string(d, "group", sign->se_group->sg_name);
     dict_add_number(d, "lnum", sign->se_lnum);
     dict_add_string(d, "name", sign_typenr2name(sign->se_typenr));
     dict_add_number(d, "priority", sign->se_priority);
 
-    return d;
+    أرجع d;
 }
 
 /*
@@ -342,69 +342,69 @@ sign_get_info(sign_entry_T *sign)
  * changing the priority of an already placed sign.  Assumes the signs in the
  * buffer are sorted by line number and priority.
  */
-static void
+ساكن فراغ
 sign_sort_by_prio_on_line(buf_T *buf, sign_entry_T *sign)
 {
     // If there is only one sign in the buffer or only one sign on the line or
     // the sign is already sorted by priority, then return.
-    if ((sign->se_prev == NULL || sign->se_prev->se_lnum != sign->se_lnum ||
+    𐡄𐡍 ((sign->se_prev == عدم || sign->se_prev->se_lnum != sign->se_lnum ||
          sign->se_prev->se_priority > sign->se_priority) &&
-        (sign->se_next == NULL || sign->se_next->se_lnum != sign->se_lnum ||
+        (sign->se_next == عدم || sign->se_next->se_lnum != sign->se_lnum ||
          sign->se_next->se_priority < sign->se_priority))
-        return;
+        أرجع;
 
     // One or more signs on the same line as 'sign'
     // Find a sign after which 'sign' should be inserted
 
     // First search backward for a sign with higher priority on the same line
     sign_entry_T *p = sign;
-    while (p->se_prev != NULL && p->se_prev->se_lnum == sign->se_lnum &&
+    طالما (p->se_prev != عدم && p->se_prev->se_lnum == sign->se_lnum &&
            p->se_prev->se_priority <= sign->se_priority)
         p = p->se_prev;
 
-    if (p == sign)
+    𐡄𐡍 (p == sign)
     {
         // Sign not found. Search forward for a sign with priority just before
         // 'sign'.
         p = sign->se_next;
-        while (p->se_next != NULL && p->se_next->se_lnum == sign->se_lnum &&
+        طالما (p->se_next != عدم && p->se_next->se_lnum == sign->se_lnum &&
                p->se_next->se_priority > sign->se_priority)
             p = p->se_next;
     }
 
     // Remove 'sign' from the list
-    if (buf->b_signlist == sign)
+    𐡄𐡍 (buf->b_signlist == sign)
         buf->b_signlist = sign->se_next;
 
-    if (sign->se_prev != NULL)
+    𐡄𐡍 (sign->se_prev != عدم)
         sign->se_prev->se_next = sign->se_next;
 
-    if (sign->se_next != NULL)
+    𐡄𐡍 (sign->se_next != عدم)
         sign->se_next->se_prev = sign->se_prev;
 
-    sign->se_prev = NULL;
-    sign->se_next = NULL;
+    sign->se_prev = عدم;
+    sign->se_next = عدم;
 
     // Re-insert 'sign' at the right place
-    if (p->se_priority <= sign->se_priority)
+    𐡄𐡍 (p->se_priority <= sign->se_priority)
     {
         // 'sign' has a higher priority and should be inserted before 'p'
         sign->se_prev = p->se_prev;
         sign->se_next = p;
         p->se_prev = sign;
-        if (sign->se_prev != NULL)
+        𐡄𐡍 (sign->se_prev != عدم)
             sign->se_prev->se_next = sign;
 
-        if (buf->b_signlist == p)
+        𐡄𐡍 (buf->b_signlist == p)
             buf->b_signlist = sign;
     }
-    else
+    وإلا
     {
         // 'sign' has a lower priority and should be inserted after 'p'
         sign->se_prev = p;
         sign->se_next = p->se_next;
         p->se_next = sign;
-        if (sign->se_next != NULL)
+        𐡄𐡍 (sign->se_next != عدم)
             sign->se_next->se_prev = sign;
     }
 }
@@ -412,41 +412,41 @@ sign_sort_by_prio_on_line(buf_T *buf, sign_entry_T *sign)
 /*
  * Add the sign into the signlist. Find the right spot to do it though.
  */
-static void
+ساكن فراغ
 buf_addsign(buf_T *buf, // buffer to store sign in
-            int id, // sign ID
+            صحيح id, // sign ID
             char_u *groupname, // sign group
-            int prio, // sign priority
+            صحيح prio, // sign priority
             linenr_T lnum, // line number which gets the mark
-            int typenr) // typenr of sign we are adding
+            صحيح typenr) // typenr of sign we are adding
 {
-    sign_entry_T *sign = NULL; // a sign in the signlist
-    sign_entry_T *prev = NULL; // the previous sign
+    sign_entry_T *sign = عدم; // a sign in the signlist
+    sign_entry_T *prev = عدم; // the previous sign
 
     // The list is sorted by line number.  When the last inserted sign is on a
     // strictly earlier line, resume the search from there instead of the head;
     // this makes placing many signs on distinct, ascending lines close to
     // linear.  Signs on the same line fall back to a scan from the head.
-    if (buf->b_sign_finger != NULL && buf->b_sign_finger->se_lnum < lnum)
+    𐡄𐡍 (buf->b_sign_finger != عدم && buf->b_sign_finger->se_lnum < lnum)
         prev = buf->b_sign_finger;
 
-    for (sign = (prev == NULL) ? buf->b_signlist : prev->se_next; sign != NULL;
+    لكل (sign = (prev == عدم) ? buf->b_signlist : prev->se_next; sign != عدم;
          sign = sign->se_next)
     {
-        if (lnum == sign->se_lnum && id == sign->se_id &&
+        𐡄𐡍 (lnum == sign->se_lnum && id == sign->se_id &&
             sign_in_group(sign, groupname))
         {
             // Update an existing sign
             sign->se_typenr = typenr;
             sign->se_priority = prio;
             sign_sort_by_prio_on_line(buf, sign);
-            return;
+            أرجع;
         }
-        else if (lnum < sign->se_lnum)
+        وإلا 𐡄𐡍 (lnum < sign->se_lnum)
         {
             insert_sign_by_lnum_prio(buf, prev, id, groupname, prio, lnum,
                                      typenr);
-            return;
+            أرجع;
         }
         prev = sign;
     }
@@ -458,26 +458,26 @@ buf_addsign(buf_T *buf, // buffer to store sign in
  * For an existing, placed sign "markId" change the type to "typenr".
  * Returns the line number of the sign, or zero if the sign is not found.
  */
-static linenr_T
+ساكن linenr_T
 buf_change_sign_type(buf_T *buf, // buffer to store sign in
-                     int markId, // sign ID
+                     صحيح markId, // sign ID
                      char_u *group, // sign group
-                     int typenr, // typenr of sign we are adding
-                     int prio) // sign priority
+                     صحيح typenr, // typenr of sign we are adding
+                     صحيح prio) // sign priority
 {
-    sign_entry_T *sign = NULL; // a sign in the signlist
+    sign_entry_T *sign = عدم; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
-        if (sign->se_id == markId && sign_in_group(sign, group))
+        𐡄𐡍 (sign->se_id == markId && sign_in_group(sign, group))
         {
             sign->se_typenr = typenr;
             sign->se_priority = prio;
             sign_sort_by_prio_on_line(buf, sign);
-            return sign->se_lnum;
+            أرجع sign->se_lnum;
         }
     }
 
-    return (linenr_T)0;
+    أرجع (linenr_T)0;
 }
 
 /*
@@ -485,21 +485,21 @@ buf_change_sign_type(buf_T *buf, // buffer to store sign in
  * 'buf'. Used when refreshing the screen. Returns TRUE if a sign is found on
  * 'lnum', FALSE otherwise.
  */
-int
+صحيح
 buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
 {
     CLEAR_POINTER(sattr);
 
     buf_T *buf = wp->w_buffer;
-    sign_entry_T *sign = NULL;
+    sign_entry_T *sign = عدم;
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
-            break;
+        𐡄𐡍 (sign->se_lnum > lnum)
+            اكسر;
 
-        if (sign->se_lnum == lnum
+        𐡄𐡍 (sign->se_lnum == lnum
 # ifdef FEAT_PROP_POPUP
             && sign_group_for_window(sign, wp)
 # endif
@@ -507,39 +507,39 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
         {
             sattr->sat_typenr = sign->se_typenr;
             sign_T *sp = find_sign_by_typenr(sign->se_typenr);
-            if (sp == NULL)
-                return FALSE;
+            𐡄𐡍 (sp == عدم)
+                أرجع FALSE;
 
 # ifdef FEAT_SIGN_ICONS
             sattr->sat_icon = sp->sn_image;
 # endif
             sattr->sat_text = sp->sn_text;
 
-            if (sattr->sat_text != NULL && sp->sn_text_hl > 0)
+            𐡄𐡍 (sattr->sat_text != عدم && sp->sn_text_hl > 0)
                 sattr->sat_texthl = syn_id2attr(sp->sn_text_hl);
 
-            if (sp->sn_line_hl > 0)
+            𐡄𐡍 (sp->sn_line_hl > 0)
                 sattr->sat_linehl = syn_id2attr(sp->sn_line_hl);
 
-            if (sp->sn_cul_hl > 0)
+            𐡄𐡍 (sp->sn_cul_hl > 0)
                 sattr->sat_culhl = syn_id2attr(sp->sn_cul_hl);
 
-            if (sp->sn_num_hl > 0)
+            𐡄𐡍 (sp->sn_num_hl > 0)
                 sattr->sat_numhl = syn_id2attr(sp->sn_num_hl);
 
             sattr->sat_priority = sign->se_priority;
 
             // If there is another sign next with the same priority, may
             // combine the text and the line highlighting.
-            if (sign->se_next != NULL &&
+            𐡄𐡍 (sign->se_next != عدم &&
                 sign->se_next->se_priority == sign->se_priority &&
                 sign->se_next->se_lnum == sign->se_lnum)
             {
                 sign_T *next_sp = find_sign_by_typenr(sign->se_next->se_typenr);
-                if (next_sp == NULL)
-                    return FALSE;
+                𐡄𐡍 (next_sp == عدم)
+                    أرجع FALSE;
 
-                if (sattr->sat_icon == NULL && sattr->sat_text == NULL)
+                𐡄𐡍 (sattr->sat_icon == عدم && sattr->sat_text == عدم)
                 {
 # ifdef FEAT_SIGN_ICONS
                     sattr->sat_icon = next_sp->sn_image;
@@ -547,22 +547,22 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
                     sattr->sat_text = next_sp->sn_text;
                 }
 
-                if (sp->sn_text_hl <= 0 && next_sp->sn_text_hl > 0)
+                𐡄𐡍 (sp->sn_text_hl <= 0 && next_sp->sn_text_hl > 0)
                     sattr->sat_texthl = syn_id2attr(next_sp->sn_text_hl);
 
-                if (sp->sn_line_hl <= 0 && next_sp->sn_line_hl > 0)
+                𐡄𐡍 (sp->sn_line_hl <= 0 && next_sp->sn_line_hl > 0)
                     sattr->sat_linehl = syn_id2attr(next_sp->sn_line_hl);
 
-                if (sp->sn_cul_hl <= 0 && next_sp->sn_cul_hl > 0)
+                𐡄𐡍 (sp->sn_cul_hl <= 0 && next_sp->sn_cul_hl > 0)
                     sattr->sat_culhl = syn_id2attr(next_sp->sn_cul_hl);
 
-                if (sp->sn_num_hl <= 0 && next_sp->sn_num_hl > 0)
+                𐡄𐡍 (sp->sn_num_hl <= 0 && next_sp->sn_num_hl > 0)
                     sattr->sat_numhl = syn_id2attr(next_sp->sn_num_hl);
             }
-            return TRUE;
+            أرجع TRUE;
         }
     }
-    return FALSE;
+    أرجع FALSE;
 }
 
 /*
@@ -578,30 +578,30 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
 linenr_T
 buf_delsign(buf_T *buf, // buffer sign is stored in
             linenr_T atlnum, // sign at this line, 0 - at any line
-            int id, // sign id
+            صحيح id, // sign id
             char_u *group) // sign group
 {
-    buf->b_sign_finger = NULL; // a removal invalidates the insertion finger
+    buf->b_sign_finger = عدم; // a removal invalidates the insertion finger
     // pointer to pointer to current sign
     sign_entry_T **lastp = &buf->b_signlist;
-    sign_entry_T *next = NULL; // the next sign in a b_signlist
+    sign_entry_T *next = عدم; // the next sign in a b_signlist
     linenr_T lnum = 0; // line number whose sign was deleted
 
-    for (sign_entry_T *sign = buf->b_signlist; sign != NULL; sign = next)
+    لكل (sign_entry_T *sign = buf->b_signlist; sign != عدم; sign = next)
     {
         next = sign->se_next;
 
-        if ((id == 0 || sign->se_id == id) &&
+        𐡄𐡍 ((id == 0 || sign->se_id == id) &&
             (atlnum == 0 || sign->se_lnum == atlnum) &&
             sign_in_group(sign, group))
         {
             *lastp = next;
-            if (next != NULL)
+            𐡄𐡍 (next != عدم)
                 next->se_prev = sign->se_prev;
 
             lnum = sign->se_lnum;
 
-            if (sign->se_group != NULL)
+            𐡄𐡍 (sign->se_group != عدم)
                 sign_group_unref(sign->se_group->sg_name);
 
             vim_free(sign);
@@ -611,11 +611,11 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
             // If deleting a sign with a specific identifier in a particular
             // group or deleting any sign at a particular line number, delete
             // only one sign.
-            if (group == NULL || (*group != '*' && id != 0) ||
+            𐡄𐡍 (group == عدم || (*group != '*' && id != 0) ||
                 (*group == '*' && atlnum != 0))
-                break;
+                اكسر;
         }
-        else
+        وإلا
         {
             lastp = &sign->se_next;
         }
@@ -623,13 +623,13 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
 
     // When deleting the last sign the cursor position may change, because the
     // sign columns no longer shows.  And the 'signcolumn' may be hidden.
-    if (buf->b_signlist == NULL)
+    𐡄𐡍 (buf->b_signlist == عدم)
     {
         redraw_buf_later(buf, UPD_NOT_VALID);
         changed_line_abv_curs();
     }
 
-    return lnum;
+    أرجع lnum;
 }
 
 /*
@@ -637,104 +637,104 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
  * the sign does not exist, return 0 as the line number. This will still let
  * the correct file get loaded.
  */
-int
+صحيح
 buf_findsign(buf_T *buf, // buffer to store sign in
-             int id, // sign ID
+             صحيح id, // sign ID
              char_u *group) // sign group
 {
-    sign_entry_T *sign = NULL; // a sign in the signlist
+    sign_entry_T *sign = عدم; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
-        if (sign->se_id == id && sign_in_group(sign, group))
-            return sign->se_lnum;
+        𐡄𐡍 (sign->se_id == id && sign_in_group(sign, group))
+            أرجع sign->se_lnum;
 
-    return 0;
+    أرجع 0;
 }
 
 /*
  * Return the sign at line 'lnum' in buffer 'buf'. Returns NULL if a sign is
  * not found at the line. If 'groupname' is NULL, searches in the global group.
  */
-static sign_entry_T *
+ساكن sign_entry_T *
 buf_getsign_at_line(buf_T *buf, // buffer whose sign we are searching for
                     linenr_T lnum, // line number of sign
                     char_u *groupname) // sign group name
 {
-    sign_entry_T *sign = NULL; // a sign in the signlist
+    sign_entry_T *sign = عدم; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
-            break;
+        𐡄𐡍 (sign->se_lnum > lnum)
+            اكسر;
 
-        if (sign->se_lnum == lnum && sign_in_group(sign, groupname))
-            return sign;
+        𐡄𐡍 (sign->se_lnum == lnum && sign_in_group(sign, groupname))
+            أرجع sign;
     }
 
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Return the identifier of the sign at line number 'lnum' in buffer 'buf'.
  */
-int
+صحيح
 buf_findsign_id(buf_T *buf, // buffer whose sign we are searching for
                 linenr_T lnum, // line number of sign
                 char_u *groupname) // sign group name
 {
     // a sign in the signlist
     sign_entry_T *sign = buf_getsign_at_line(buf, lnum, groupname);
-    if (sign != NULL)
-        return sign->se_id;
+    𐡄𐡍 (sign != عدم)
+        أرجع sign->se_id;
 
-    return 0;
+    أرجع 0;
 }
 
-# if defined(FEAT_NETBEANS_INTG)
+# 𐡄𐡍 defined(FEAT_NETBEANS_INTG)
 /*
  * See if a given type of sign exists on a specific line.
  */
-int
+صحيح
 buf_findsigntype_id(buf_T *buf, // buffer whose sign we are searching for
                     linenr_T lnum, // line number of sign
-                    int typenr) // sign type number
+                    صحيح typenr) // sign type number
 {
-    sign_entry_T *sign = NULL; // a sign in the signlist
+    sign_entry_T *sign = عدم; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
-            break;
+        𐡄𐡍 (sign->se_lnum > lnum)
+            اكسر;
 
-        if (sign->se_lnum == lnum && sign->se_typenr == typenr)
-            return sign->se_id;
+        𐡄𐡍 (sign->se_lnum == lnum && sign->se_typenr == typenr)
+            أرجع sign->se_id;
     }
 
-    return 0;
+    أرجع 0;
 }
 
-#  if defined(FEAT_SIGN_ICONS)
+#  𐡄𐡍 defined(FEAT_SIGN_ICONS)
 /*
  * Return the number of icons on the given line.
  */
-int
+صحيح
 buf_signcount(buf_T *buf, linenr_T lnum)
 {
-    int count = 0;
-    sign_entry_T *sign = NULL; // a sign in the signlist
+    صحيح count = 0;
+    sign_entry_T *sign = عدم; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
-            break;
+        𐡄𐡍 (sign->se_lnum > lnum)
+            اكسر;
 
-        if (sign->se_lnum == lnum && sign_get_image(sign->se_typenr) != NULL)
+        𐡄𐡍 (sign->se_lnum == lnum && sign_get_image(sign->se_typenr) != عدم)
             count++;
     }
 
-    return count;
+    أرجع count;
 }
 #  endif // FEAT_SIGN_ICONS
 # endif // FEAT_NETBEANS_INTG
@@ -743,13 +743,13 @@ buf_signcount(buf_T *buf, linenr_T lnum)
  * Delete signs in group 'group' in buffer "buf". If 'group' is '*', then
  * delete all the signs.
  */
-void
+فراغ
 buf_delete_signs(buf_T *buf, char_u *group)
 {
-    buf->b_sign_finger = NULL; // a removal invalidates the insertion finger
+    buf->b_sign_finger = عدم; // a removal invalidates the insertion finger
     // When deleting the last sign need to redraw the windows to remove the
     // sign column. Not when curwin is NULL (this means we're exiting).
-    if (buf->b_signlist != NULL && curwin != NULL)
+    𐡄𐡍 (buf->b_signlist != عدم && curwin != عدم)
     {
         redraw_buf_later(buf, UPD_NOT_VALID);
         changed_line_abv_curs();
@@ -757,24 +757,24 @@ buf_delete_signs(buf_T *buf, char_u *group)
 
     // pointer to pointer to current sign
     sign_entry_T **lastp = &buf->b_signlist;
-    sign_entry_T *next = NULL;
+    sign_entry_T *next = عدم;
 
-    for (sign_entry_T *sign = buf->b_signlist; sign != NULL; sign = next)
+    لكل (sign_entry_T *sign = buf->b_signlist; sign != عدم; sign = next)
     {
         next = sign->se_next;
-        if (sign_in_group(sign, group))
+        𐡄𐡍 (sign_in_group(sign, group))
         {
             *lastp = next;
 
-            if (next != NULL)
+            𐡄𐡍 (next != عدم)
                 next->se_prev = sign->se_prev;
 
-            if (sign->se_group != NULL)
+            𐡄𐡍 (sign->se_group != عدم)
                 sign_group_unref(sign->se_group->sg_name);
 
             vim_free(sign);
         }
-        else
+        وإلا
         {
             lastp = &sign->se_next;
         }
@@ -784,38 +784,38 @@ buf_delete_signs(buf_T *buf, char_u *group)
 /*
  * List placed signs for "rbuf".  If "rbuf" is NULL do it for all buffers.
  */
-static void
+ساكن فراغ
 sign_list_placed(buf_T *rbuf, char_u *sign_group)
 {
-    char lbuf[MSG_BUF_LEN];
-    char group[MSG_BUF_LEN];
+    حرف lbuf[MSG_BUF_LEN];
+    حرف group[MSG_BUF_LEN];
 
     msg_puts_title(_("\n--- Signs ---"));
     msg_putchar('\n');
 
-    buf_T *buf = (rbuf == NULL) ? firstbuf : rbuf;
-    while (buf != NULL && !got_int)
+    buf_T *buf = (rbuf == عدم) ? firstbuf : rbuf;
+    طالما (buf != عدم && !got_int)
     {
-        if (buf->b_signlist != NULL)
+        𐡄𐡍 (buf->b_signlist != عدم)
         {
             vim_snprintf(lbuf, MSG_BUF_LEN, _("Signs for %s:"), buf->b_fname);
             msg_puts_attr(lbuf, HL_ATTR(HLF_D));
             msg_putchar('\n');
         }
 
-        sign_entry_T *sign = NULL;
+        sign_entry_T *sign = عدم;
         FOR_ALL_SIGNS_IN_BUF(buf, sign)
         {
-            if (got_int)
-                break;
+            𐡄𐡍 (got_int)
+                اكسر;
 
-            if (!sign_in_group(sign, sign_group))
-                continue;
+            𐡄𐡍 (!sign_in_group(sign, sign_group))
+                استمر;
 
-            if (sign->se_group != NULL)
+            𐡄𐡍 (sign->se_group != عدم)
                 vim_snprintf(group, MSG_BUF_LEN, _("  group=%s"),
                              sign->se_group->sg_name);
-            else
+            وإلا
                 group[0] = '\0';
 
             vim_snprintf(lbuf, MSG_BUF_LEN,
@@ -827,8 +827,8 @@ sign_list_placed(buf_T *rbuf, char_u *sign_group)
             msg_putchar('\n');
         }
 
-        if (rbuf != NULL)
-            break;
+        𐡄𐡍 (rbuf != عدم)
+            اكسر;
 
         buf = buf->b_next;
     }
@@ -837,29 +837,29 @@ sign_list_placed(buf_T *rbuf, char_u *sign_group)
 /*
  * Adjust a placed sign for inserted/deleted lines.
  */
-void
+فراغ
 sign_mark_adjust(
     linenr_T    line1,
     linenr_T    line2,
     long        amount,
     long        amount_after)
 {
-    curbuf->b_sign_finger = NULL; // line changes may reorder, drop the finger
-    sign_entry_T *sign = NULL; // a sign in a b_signlist
+    curbuf->b_sign_finger = عدم; // line changes may reorder, drop the finger
+    sign_entry_T *sign = عدم; // a sign in a b_signlist
     FOR_ALL_SIGNS_IN_BUF(curbuf, sign)
     {
         // Ignore changes to lines after the sign
-        if (sign->se_lnum < line1)
-            continue;
+        𐡄𐡍 (sign->se_lnum < line1)
+            استمر;
 
         linenr_T new_lnum = sign->se_lnum;
 
-        if (sign->se_lnum <= line2)
+        𐡄𐡍 (sign->se_lnum <= line2)
         {
-            if (amount != MAXLNUM)
+            𐡄𐡍 (amount != MAXLNUM)
                 new_lnum += amount;
         }
-        else if (sign->se_lnum > line2)
+        وإلا 𐡄𐡍 (sign->se_lnum > line2)
         {
             // Lines inserted or deleted before the sign
             new_lnum += amount_after;
@@ -868,7 +868,7 @@ sign_mark_adjust(
         // If the new sign line number is past the last line in the buffer,
         // then don't adjust the line number. Otherwise, it will always be past
         // the last line and will not be visible.
-        if (new_lnum <= curbuf->b_ml.ml_line_count)
+        𐡄𐡍 (new_lnum <= curbuf->b_ml.ml_line_count)
             sign->se_lnum = new_lnum;
     }
 }
@@ -877,111 +877,111 @@ sign_mark_adjust(
  * Find index of a ":sign" subcmd from its name.
  * "*end_cmd" must be writable.
  */
-static int
+ساكن صحيح
 sign_cmd_idx(char_u *begin_cmd, // begin of sign subcmd
              char_u *end_cmd) // just after sign subcmd
 {
-    int idx = 0;
-    char save = *end_cmd;
+    صحيح idx = 0;
+    حرف save = *end_cmd;
     *end_cmd = NUL;
 
-    while (cmds[idx] != NULL && STRCMP(begin_cmd, cmds[idx]) != 0)
+    طالما (cmds[idx] != عدم && STRCMP(begin_cmd, cmds[idx]) != 0)
         ++idx;
 
     *end_cmd = save;
-    return idx;
+    أرجع idx;
 }
 
 /*
  * Find a sign by name. Also returns pointer to the previous sign.
  */
-static sign_T *
+ساكن sign_T *
 sign_find(char_u *name, sign_T **sp_prev)
 {
-    if (sp_prev != NULL)
-        *sp_prev = NULL;
+    𐡄𐡍 (sp_prev != عدم)
+        *sp_prev = عدم;
 
-    sign_T *sp = NULL;
+    sign_T *sp = عدم;
     FOR_ALL_SIGNS(sp)
     {
-        if (STRCMP(sp->sn_name, name) == 0)
-            break;
+        𐡄𐡍 (STRCMP(sp->sn_name, name) == 0)
+            اكسر;
 
-        if (sp_prev != NULL)
+        𐡄𐡍 (sp_prev != عدم)
             *sp_prev = sp;
     }
 
-    return sp;
+    أرجع sp;
 }
 
 /*
  * Allocate a new sign
  */
-static sign_T *
+ساكن sign_T *
 alloc_new_sign(char_u *name)
 {
-    int start = next_sign_typenr;
+    صحيح start = next_sign_typenr;
 
     // Allocate a new sign.
-    sign_T *sp = alloc_clear_id(sizeof(sign_T), aid_sign_define_by_name);
-    if (sp == NULL)
-        return NULL;
+    sign_T *sp = alloc_clear_id(حجم(sign_T), aid_sign_define_by_name);
+    𐡄𐡍 (sp == عدم)
+        أرجع عدم;
 
     // Check that next_sign_typenr is not already being used.
     // This only happens after wrapping around.  Hopefully
     // another one got deleted and we can use its number.
     sign_T *lp = first_sign;
-    while (lp != NULL)
+    طالما (lp != عدم)
     {
-        if (lp->sn_typenr == next_sign_typenr)
+        𐡄𐡍 (lp->sn_typenr == next_sign_typenr)
         {
             ++next_sign_typenr;
 
-            if (next_sign_typenr == MAX_TYPENR)
+            𐡄𐡍 (next_sign_typenr == MAX_TYPENR)
                 next_sign_typenr = 1;
 
-            if (next_sign_typenr == start)
+            𐡄𐡍 (next_sign_typenr == start)
             {
                 vim_free(sp);
                 emsg(_(e_too_many_signs_defined));
-                return NULL;
+                أرجع عدم;
             }
 
             lp = first_sign; // start all over
-            continue;
+            استمر;
         }
         lp = lp->sn_next;
     }
 
     sp->sn_typenr = next_sign_typenr;
 
-    if (++next_sign_typenr == MAX_TYPENR)
+    𐡄𐡍 (++next_sign_typenr == MAX_TYPENR)
         next_sign_typenr = 1; // wrap around
 
     sp->sn_name = vim_strsave(name);
-    if (sp->sn_name == NULL) // out of memory
+    𐡄𐡍 (sp->sn_name == عدم) // out of memory
     {
         vim_free(sp);
-        return NULL;
+        أرجع عدم;
     }
 
-    return sp;
+    أرجع sp;
 }
 
 /*
  * Initialize the icon information for a new sign
  */
-static void
+ساكن فراغ
 sign_define_init_icon(sign_T *sp, char_u *icon)
 {
     vim_free(sp->sn_icon);
     sp->sn_icon = vim_strsave(icon);
     backslash_halve(sp->sn_icon);
 # ifdef FEAT_SIGN_ICONS
-    if (gui.in_use)
+    𐡄𐡍 (gui.in_use)
     {
         out_flush();
-        if (sp->sn_image != NULL)
+        𐡄𐡍 (sp->sn_image != عدم)
             gui_mch_destroy_sign(sp->sn_image);
         sp->sn_image = gui_mch_register_sign(sp->sn_icon);
     }
@@ -991,17 +991,17 @@ sign_define_init_icon(sign_T *sp, char_u *icon)
 /*
  * Initialize the text for a new sign
  */
-static int
+ساكن صحيح
 sign_define_init_text(sign_T *sp, char_u *text)
 {
-    char_u *s = NULL;
-    char_u *endp = text + (int)STRLEN(text);
-    int cells = 0;
+    char_u *s = عدم;
+    char_u *endp = text + (صحيح)STRLEN(text);
+    صحيح cells = 0;
 
     // Remove backslashes so that it is possible to use a space.
-    for (s = text; s + 1 < endp; ++s)
+    لكل (s = text; s + 1 < endp; ++s)
     {
-        if (*s == '\\')
+        𐡄𐡍 (*s == '\\')
         {
             STRMOVE(s, s + 1);
             --endp;
@@ -1009,50 +1009,50 @@ sign_define_init_text(sign_T *sp, char_u *text)
     }
 
     // Count cells and check for non-printable chars
-    if (has_mbyte)
+    𐡄𐡍 (has_mbyte)
     {
-        for (s = text; s < endp; s += (*mb_ptr2len)(s))
+        لكل (s = text; s < endp; s += (*mb_ptr2len)(s))
         {
-            if (!vim_isprintc((*mb_ptr2char)(s)))
-                break;
+            𐡄𐡍 (!vim_isprintc((*mb_ptr2char)(s)))
+                اكسر;
 
             cells += (*mb_ptr2cells)(s);
         }
     }
-    else
+    وإلا
     {
-        for (s = text; s < endp; ++s)
+        لكل (s = text; s < endp; ++s)
         {
-            if (!vim_isprintc(*s))
-                break;
+            𐡄𐡍 (!vim_isprintc(*s))
+                اكسر;
         }
-        cells = (int)(s - text);
+        cells = (صحيح)(s - text);
     }
 
     // Currently sign text must be one or two display cells
-    if (s != endp || cells < 1 || cells > 2)
+    𐡄𐡍 (s != endp || cells < 1 || cells > 2)
     {
         semsg(_(e_invalid_sign_text_str), text);
-        return FAIL;
+        أرجع FAIL;
     }
 
     vim_free(sp->sn_text);
     // Allocate one byte more if we need to pad up
     // with a space.
-    int len = (int)(endp - text + ((cells == 1) ? 1 : 0));
+    صحيح len = (صحيح)(endp - text + ((cells == 1) ? 1 : 0));
     sp->sn_text = vim_strnsave(text, len);
 
     // For single character sign text, pad with a space.
-    if (sp->sn_text != NULL && cells == 1)
+    𐡄𐡍 (sp->sn_text != عدم && cells == 1)
         STRCPY(sp->sn_text + len - 1, " ");
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Define a new sign or update an existing sign
  */
-int
+صحيح
 sign_define_by_name(char_u *name,
                     char_u *icon,
                     char_u *linehl,
@@ -1060,129 +1060,129 @@ sign_define_by_name(char_u *name,
                     char_u *texthl,
                     char_u *culhl,
                     char_u *numhl,
-                    int prio)
+                    صحيح prio)
 {
-    sign_T *sp_prev = NULL;
+    sign_T *sp_prev = عدم;
     sign_T *sp = sign_find(name, &sp_prev);
-    if (sp == NULL)
+    𐡄𐡍 (sp == عدم)
     {
         sp = alloc_new_sign(name);
-        if (sp == NULL)
-            return FAIL;
+        𐡄𐡍 (sp == عدم)
+            أرجع FAIL;
 
         // add the new sign to the list of signs
-        if (sp_prev == NULL)
+        𐡄𐡍 (sp_prev == عدم)
             first_sign = sp;
-        else
+        وإلا
             sp_prev->sn_next = sp;
     }
-    else
+    وإلا
     {
-        win_T *wp = NULL;
+        win_T *wp = عدم;
         // Signs may already exist, a redraw is needed in windows with a
         // non-empty sign list.
         FOR_ALL_WINDOWS(wp)
         {
-            if (wp->w_buffer->b_signlist != NULL)
+            𐡄𐡍 (wp->w_buffer->b_signlist != عدم)
                 redraw_buf_later(wp->w_buffer, UPD_NOT_VALID);
         }
     }
 
     // set values for a defined sign.
-    if (icon != NULL)
+    𐡄𐡍 (icon != عدم)
         sign_define_init_icon(sp, icon);
 
-    if (text != NULL && (sign_define_init_text(sp, text) == FAIL))
-        return FAIL;
+    𐡄𐡍 (text != عدم && (sign_define_init_text(sp, text) == FAIL))
+        أرجع FAIL;
 
     sp->sn_priority = prio;
 
-    if (linehl != NULL)
+    𐡄𐡍 (linehl != عدم)
     {
-        if (*linehl == NUL)
+        𐡄𐡍 (*linehl == NUL)
             sp->sn_line_hl = 0;
-        else
-            sp->sn_line_hl = syn_check_group(linehl, (int)STRLEN(linehl));
+        وإلا
+            sp->sn_line_hl = syn_check_group(linehl, (صحيح)STRLEN(linehl));
     }
 
-    if (texthl != NULL)
+    𐡄𐡍 (texthl != عدم)
     {
-        if (*texthl == NUL)
+        𐡄𐡍 (*texthl == NUL)
             sp->sn_text_hl = 0;
-        else
-            sp->sn_text_hl = syn_check_group(texthl, (int)STRLEN(texthl));
+        وإلا
+            sp->sn_text_hl = syn_check_group(texthl, (صحيح)STRLEN(texthl));
     }
 
-    if (culhl != NULL)
+    𐡄𐡍 (culhl != عدم)
     {
-        if (*culhl == NUL)
+        𐡄𐡍 (*culhl == NUL)
             sp->sn_cul_hl = 0;
-        else
-            sp->sn_cul_hl = syn_check_group(culhl, (int)STRLEN(culhl));
+        وإلا
+            sp->sn_cul_hl = syn_check_group(culhl, (صحيح)STRLEN(culhl));
     }
 
-    if (numhl != NULL)
+    𐡄𐡍 (numhl != عدم)
     {
-        if (*numhl == NUL)
+        𐡄𐡍 (*numhl == NUL)
             sp->sn_num_hl = 0;
-        else
-            sp->sn_num_hl = syn_check_group(numhl, (int)STRLEN(numhl));
+        وإلا
+            sp->sn_num_hl = syn_check_group(numhl, (صحيح)STRLEN(numhl));
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Return TRUE if sign "name" exists.
  */
-int
+صحيح
 sign_exists_by_name(char_u *name)
 {
-    return sign_find(name, NULL) != NULL;
+    أرجع sign_find(name, عدم) != عدم;
 }
 
 /*
  * Free the sign specified by 'name'.
  */
-int
-sign_undefine_by_name(char_u *name, int give_error)
+صحيح
+sign_undefine_by_name(char_u *name, صحيح give_error)
 {
-    sign_T *sp_prev = NULL;
+    sign_T *sp_prev = عدم;
     sign_T *sp = sign_find(name, &sp_prev);
-    if (sp == NULL)
+    𐡄𐡍 (sp == عدم)
     {
-        if (give_error)
+        𐡄𐡍 (give_error)
             semsg(_(e_unknown_sign_str), name);
-        return FAIL;
+        أرجع FAIL;
     }
     sign_undefine(sp, sp_prev);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * List the signs matching 'name'
  */
-static void
+ساكن فراغ
 sign_list_by_name(char_u *name)
 {
-    sign_T *sp = sign_find(name, NULL);
-    if (sp != NULL)
+    sign_T *sp = sign_find(name, عدم);
+    𐡄𐡍 (sp != عدم)
         sign_list_defined(sp);
-    else
+    وإلا
         semsg(_(e_unknown_sign_str), name);
 }
 
-static void
-may_force_numberwidth_recompute(buf_T *buf, int unplace)
+ساكن فراغ
+may_force_numberwidth_recompute(buf_T *buf, صحيح unplace)
 {
-# if defined(FEAT_LINEBREAK)
-    tabpage_T *tp = NULL;
-    win_T *wp = NULL;
+# 𐡄𐡍 defined(FEAT_LINEBREAK)
+    tabpage_T *tp = عدم;
+    win_T *wp = عدم;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-        if (wp->w_buffer == buf && (wp->w_p_nu || wp->w_p_rnu) &&
+        𐡄𐡍 (wp->w_buffer == buf && (wp->w_p_nu || wp->w_p_rnu) &&
             (unplace || wp->w_nrwidth_width < 2) &&
             (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u'))
             wp->w_nrwidth_line_count = 0;
@@ -1193,52 +1193,52 @@ may_force_numberwidth_recompute(buf_T *buf, int unplace)
 /*
  * Place a sign at the specified file location or update a sign.
  */
-int
-sign_place(int *sign_id,
+صحيح
+sign_place(صحيح *sign_id,
            char_u *sign_group,
            char_u *sign_name,
            buf_T *buf,
            linenr_T lnum,
-           int prio)
+           صحيح prio)
 {
     // Check for reserved character '*' in group name
-    if (sign_group != NULL && (*sign_group == '*' || *sign_group == '\0'))
-        return FAIL;
+    𐡄𐡍 (sign_group != عدم && (*sign_group == '*' || *sign_group == '\0'))
+        أرجع FAIL;
 
-    sign_T *sp = NULL;
+    sign_T *sp = عدم;
     FOR_ALL_SIGNS(sp)
     {
-        if (STRCMP(sp->sn_name, sign_name) == 0)
-            break;
+        𐡄𐡍 (STRCMP(sp->sn_name, sign_name) == 0)
+            اكسر;
     }
 
-    if (sp == NULL)
+    𐡄𐡍 (sp == عدم)
     {
         semsg(_(e_unknown_sign_str), sign_name);
-        return FAIL;
+        أرجع FAIL;
     }
 
-    if (*sign_id == 0)
+    𐡄𐡍 (*sign_id == 0)
         *sign_id = sign_group_get_next_signid(buf, sign_group);
 
     // Use the default priority value for this sign.
-    if (prio == -1)
+    𐡄𐡍 (prio == -1)
         prio = (sp->sn_priority != -1) ? sp->sn_priority : SIGN_DEF_PRIO;
 
-    if (lnum > 0)
+    𐡄𐡍 (lnum > 0)
     {
         // ":sign place {id} line={lnum} name={name} file={fname}":
         // place a sign
         buf_addsign(buf, *sign_id, sign_group, prio, lnum, sp->sn_typenr);
     }
-    else
+    وإلا
     {
         // ":sign place {id} file={fname}": change sign type and/or priority
         lnum = buf_change_sign_type(buf, *sign_id, sign_group, sp->sn_typenr,
                                     prio);
     }
 
-    if (lnum > 0)
+    𐡄𐡍 (lnum > 0)
     {
         redraw_buf_line_later(buf, lnum);
 
@@ -1246,170 +1246,170 @@ sign_place(int *sign_id,
         // number column is less than 2, then force recomputing the width.
         may_force_numberwidth_recompute(buf, FALSE);
     }
-    else
+    وإلا
     {
         semsg(_(e_not_possible_to_change_sign_str), sign_name);
-        return FAIL;
+        أرجع FAIL;
     }
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Unplace the specified sign
  */
-static int
-sign_unplace(int sign_id, char_u *sign_group, buf_T *buf, linenr_T atlnum)
+ساكن صحيح
+sign_unplace(صحيح sign_id, char_u *sign_group, buf_T *buf, linenr_T atlnum)
 {
-    if (buf->b_signlist == NULL) // No signs in the buffer
-        return OK;
+    𐡄𐡍 (buf->b_signlist == عدم) // No signs in the buffer
+        أرجع OK;
 
-    if (sign_id == 0)
+    𐡄𐡍 (sign_id == 0)
     {
         // Delete all the signs in the specified buffer
         redraw_buf_later(buf, UPD_NOT_VALID);
         buf_delete_signs(buf, sign_group);
     }
-    else
+    وإلا
     {
         // Delete only the specified signs
         linenr_T lnum = buf_delsign(buf, atlnum, sign_id, sign_group);
-        if (lnum == 0)
-            return FAIL;
+        𐡄𐡍 (lnum == 0)
+            أرجع FAIL;
     }
 
     // When all the signs in a buffer are removed, force recomputing the
     // number column width (if enabled) in all the windows displaying the
     // buffer if 'signcolumn' is set to 'number' in that window.
-    if (buf->b_signlist == NULL)
+    𐡄𐡍 (buf->b_signlist == عدم)
         may_force_numberwidth_recompute(buf, TRUE);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Unplace the sign at the current cursor line.
  */
-static void
+ساكن فراغ
 sign_unplace_at_cursor(char_u *groupname)
 {
-    int id =
+    صحيح id =
         buf_findsign_id(curwin->w_buffer, curwin->w_cursor.lnum, groupname);
 
-    if (id > 0)
+    𐡄𐡍 (id > 0)
         sign_unplace(id, groupname, curwin->w_buffer, curwin->w_cursor.lnum);
-    else
+    وإلا
         emsg(_(e_missing_sign_number));
 }
 
 /*
  * Jump to a sign.
  */
-static linenr_T
-sign_jump(int sign_id, char_u *sign_group, buf_T *buf)
+ساكن linenr_T
+sign_jump(صحيح sign_id, char_u *sign_group, buf_T *buf)
 {
     linenr_T lnum = buf_findsign(buf, sign_id, sign_group);
-    if (lnum <= 0)
+    𐡄𐡍 (lnum <= 0)
     {
         semsg(_(e_invalid_sign_id_nr), sign_id);
-        return -1;
+        أرجع -1;
     }
 
     // goto a sign ...
-    if (buf_jump_open_win(buf) != NULL)
+    𐡄𐡍 (buf_jump_open_win(buf) != عدم)
     { // ... in a current window
         curwin->w_cursor.lnum = lnum;
         check_cursor_lnum();
         beginline(BL_WHITE);
     }
-    else
+    وإلا
     { // ... not currently in a window
-        if (buf->b_fname == NULL)
+        𐡄𐡍 (buf->b_fname == عدم)
         {
             emsg(_(e_cannot_jump_to_buffer_that_does_not_have_name));
-            return -1;
+            أرجع -1;
         }
         setpcmark();
-        if (do_ecmd(buf->b_fnum, NULL, NULL, NULL, lnum,
+        𐡄𐡍 (do_ecmd(buf->b_fnum, عدم, عدم, عدم, lnum,
                     buf_hide(curbuf) ? ECMD_HIDE : 0, curwin) == FAIL)
-            return -1;
+            أرجع -1;
     }
 # ifdef FEAT_FOLDING
     foldOpenCursor();
 # endif
 
-    return lnum;
+    أرجع lnum;
 }
 
 /*
  * ":sign define {name} ..." command
  */
-static void
+ساكن فراغ
 sign_define_cmd(char_u *sign_name, char_u *cmdline)
 {
-    char_u *arg = NULL;
+    char_u *arg = عدم;
     char_u *p = cmdline;
-    char_u *icon = NULL;
-    char_u *text = NULL;
-    char_u *linehl = NULL;
-    char_u *texthl = NULL;
-    char_u *culhl = NULL;
-    char_u *numhl = NULL;
-    int prio = -1;
-    int failed = FALSE;
+    char_u *icon = عدم;
+    char_u *text = عدم;
+    char_u *linehl = عدم;
+    char_u *texthl = عدم;
+    char_u *culhl = عدم;
+    char_u *numhl = عدم;
+    صحيح prio = -1;
+    صحيح failed = FALSE;
 
     // set values for a defined sign.
-    while (TRUE)
+    طالما (TRUE)
     {
         arg = skipwhite(p);
-        if (*arg == NUL)
-            break;
+        𐡄𐡍 (*arg == NUL)
+            اكسر;
 
         p = skiptowhite_esc(arg);
-        if (STRNCMP(arg, "icon=", 5) == 0)
+        𐡄𐡍 (STRNCMP(arg, "icon=", 5) == 0)
         {
             arg += 5;
             icon = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "text=", 5) == 0)
+        وإلا 𐡄𐡍 (STRNCMP(arg, "text=", 5) == 0)
         {
             arg += 5;
             text = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "linehl=", 7) == 0)
+        وإلا 𐡄𐡍 (STRNCMP(arg, "linehl=", 7) == 0)
         {
             arg += 7;
             linehl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "texthl=", 7) == 0)
+        وإلا 𐡄𐡍 (STRNCMP(arg, "texthl=", 7) == 0)
         {
             arg += 7;
             texthl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "culhl=", 6) == 0)
+        وإلا 𐡄𐡍 (STRNCMP(arg, "culhl=", 6) == 0)
         {
             arg += 6;
             culhl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "numhl=", 6) == 0)
+        وإلا 𐡄𐡍 (STRNCMP(arg, "numhl=", 6) == 0)
         {
             arg += 6;
             numhl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "priority=", 9) == 0)
+        وإلا 𐡄𐡍 (STRNCMP(arg, "priority=", 9) == 0)
         {
             arg += 9;
-            prio = atoi((char *)arg);
+            prio = atoi((حرف *)arg);
         }
-        else
+        وإلا
         {
             semsg(_(e_invalid_argument_str), arg);
             failed = TRUE;
-            break;
+            اكسر;
         }
     }
 
-    if (!failed)
+    𐡄𐡍 (!failed)
         sign_define_by_name(sign_name, icon, linehl, text, texthl, culhl, numhl,
                             prio);
 
@@ -1424,15 +1424,15 @@ sign_define_cmd(char_u *sign_name, char_u *cmdline)
 /*
  * ":sign place" command
  */
-static void
+ساكن فراغ
 sign_place_cmd(buf_T *buf,
                linenr_T lnum,
                char_u *sign_name,
-               int id,
+               صحيح id,
                char_u *group,
-               int prio)
+               صحيح prio)
 {
-    if (id <= 0)
+    𐡄𐡍 (id <= 0)
     {
         // List signs placed in a file/buffer
         //   :sign place file={fname}
@@ -1444,19 +1444,19 @@ sign_place_cmd(buf_T *buf,
         //   :sign place
         //   :sign place group={group}
         //   :sign place group=*
-        if (lnum >= 0 || sign_name != NULL || (group != NULL && *group == '\0'))
+        𐡄𐡍 (lnum >= 0 || sign_name != عدم || (group != عدم && *group == '\0'))
             emsg(_(e_invalid_argument));
-        else
+        وإلا
             sign_list_placed(buf, group);
     }
-    else
+    وإلا
     {
         // Place a new sign
-        if (sign_name == NULL || buf == NULL ||
-            (group != NULL && *group == '\0'))
+        𐡄𐡍 (sign_name == عدم || buf == عدم ||
+            (group != عدم && *group == '\0'))
         {
             emsg(_(e_invalid_argument));
-            return;
+            أرجع;
         }
 
         sign_place(&id, group, sign_name, buf, lnum, prio);
@@ -1466,22 +1466,22 @@ sign_place_cmd(buf_T *buf,
 /*
  * ":sign unplace" command
  */
-static void
+ساكن فراغ
 sign_unplace_cmd(buf_T *buf,
                  linenr_T lnum,
                  char_u *sign_name,
-                 int id,
+                 صحيح id,
                  char_u *group)
 {
-    if (lnum >= 0 || sign_name != NULL || (group != NULL && *group == '\0'))
+    𐡄𐡍 (lnum >= 0 || sign_name != عدم || (group != عدم && *group == '\0'))
     {
         emsg(_(e_invalid_argument));
-        return;
+        أرجع;
     }
 
-    if (id == -2)
+    𐡄𐡍 (id == -2)
     {
-        if (buf != NULL)
+        𐡄𐡍 (buf != عدم)
         {
             // :sign unplace * file={fname}
             // :sign unplace * group={group} file={fname}
@@ -1491,21 +1491,21 @@ sign_unplace_cmd(buf_T *buf,
             // :sign unplace * group=* buffer={nr}
             sign_unplace(0, group, buf, 0);
         }
-        else
+        وإلا
         {
             // :sign unplace *
             // :sign unplace * group={group}
             // :sign unplace * group=*
             FOR_ALL_BUFFERS(buf)
             {
-                if (buf->b_signlist != NULL)
+                𐡄𐡍 (buf->b_signlist != عدم)
                     buf_delete_signs(buf, group);
             }
         }
     }
-    else
+    وإلا
     {
-        if (buf != NULL)
+        𐡄𐡍 (buf != عدم)
         {
             // :sign unplace {id} file={fname}
             // :sign unplace {id} group={group} file={fname}
@@ -1515,15 +1515,15 @@ sign_unplace_cmd(buf_T *buf,
             // :sign unplace {id} group=* buffer={nr}
             sign_unplace(id, group, buf, 0);
         }
-        else
+        وإلا
         {
-            if (id == -1)
+            𐡄𐡍 (id == -1)
             {
                 // :sign unplace group={group}
                 // :sign unplace group=*
                 sign_unplace_at_cursor(group);
             }
-            else
+            وإلا
             {
                 // :sign unplace {id}
                 // :sign unplace {id} group={group}
@@ -1542,29 +1542,29 @@ sign_unplace_cmd(buf_T *buf,
  *   :sign jump {id} group={group} file={fname}
  *   :sign jump {id} group={group} buffer={nr}
  */
-static void
+ساكن فراغ
 sign_jump_cmd(buf_T *buf,
               linenr_T lnum,
               char_u *sign_name,
-              int id,
+              صحيح id,
               char_u *group)
 {
-    if (sign_name == NULL && group == NULL && id == -1)
+    𐡄𐡍 (sign_name == عدم && group == عدم && id == -1)
     {
         emsg(_(e_argument_required));
-        return;
+        أرجع;
     }
 
-    if (buf == NULL || (group != NULL && *group == '\0') || lnum >= 0 ||
-        sign_name != NULL)
+    𐡄𐡍 (buf == عدم || (group != عدم && *group == '\0') || lnum >= 0 ||
+        sign_name != عدم)
     {
         // File or buffer is not specified or an empty group is used
         // or a line number or a sign name is specified.
         emsg(_(e_invalid_argument));
-        return;
+        أرجع;
     }
 
-    (void)sign_jump(id, group, buf);
+    (فراغ)sign_jump(id, group, buf);
 }
 
 /*
@@ -1573,196 +1573,196 @@ sign_jump_cmd(buf_T *buf,
  * The supported arguments are: line={lnum} name={name} group={group}
  * priority={prio} and file={fname} or buffer={nr}.
  */
-static int
-parse_sign_cmd_args(int cmd,
+ساكن صحيح
+parse_sign_cmd_args(صحيح cmd,
                     char_u *arg,
                     char_u **sign_name,
-                    int *signid,
+                    صحيح *signid,
                     char_u **group,
-                    int *prio,
+                    صحيح *prio,
                     buf_T **buf,
                     linenr_T *lnum)
 {
     char_u *arg1 = arg;
-    char_u *filename = NULL;
-    int lnum_arg = FALSE;
+    char_u *filename = عدم;
+    صحيح lnum_arg = FALSE;
 
     // first arg could be placed sign id
-    if (VIM_ISDIGIT(*arg))
+    𐡄𐡍 (VIM_ISDIGIT(*arg))
     {
         *signid = getdigits(&arg);
-        if (!VIM_ISWHITE(*arg) && *arg != NUL)
+        𐡄𐡍 (!VIM_ISWHITE(*arg) && *arg != NUL)
         {
             *signid = -1;
             arg = arg1;
         }
-        else
+        وإلا
         {
             arg = skipwhite(arg);
         }
     }
 
-    while (*arg != NUL)
+    طالما (*arg != NUL)
     {
-        if (STRNCMP(arg, "line=", 5) == 0)
+        𐡄𐡍 (STRNCMP(arg, "line=", 5) == 0)
         {
             arg += 5;
-            *lnum = atoi((char *)arg);
+            *lnum = atoi((حرف *)arg);
             arg = skiptowhite(arg);
             lnum_arg = TRUE;
         }
-        else if (STRNCMP(arg, "*", 1) == 0 && cmd == SIGNCMD_UNPLACE)
+        وإلا 𐡄𐡍 (STRNCMP(arg, "*", 1) == 0 && cmd == SIGNCMD_UNPLACE)
         {
-            if (*signid != -1)
+            𐡄𐡍 (*signid != -1)
             {
                 emsg(_(e_invalid_argument));
-                return FAIL;
+                أرجع FAIL;
             }
             *signid = -2;
             arg = skiptowhite(arg + 1);
         }
-        else if (STRNCMP(arg, "name=", 5) == 0)
+        وإلا 𐡄𐡍 (STRNCMP(arg, "name=", 5) == 0)
         {
             arg += 5;
             char_u *name = arg;
             arg = skiptowhite(arg);
-            if (*arg != NUL)
+            𐡄𐡍 (*arg != NUL)
                 *arg++ = NUL;
 
-            while (name[0] == '0' && name[1] != NUL)
+            طالما (name[0] == '0' && name[1] != NUL)
                 ++name;
 
             *sign_name = name;
         }
-        else if (STRNCMP(arg, "group=", 6) == 0)
+        وإلا 𐡄𐡍 (STRNCMP(arg, "group=", 6) == 0)
         {
             arg += 6;
             *group = arg;
             arg = skiptowhite(arg);
-            if (*arg != NUL)
+            𐡄𐡍 (*arg != NUL)
                 *arg++ = NUL;
         }
-        else if (STRNCMP(arg, "priority=", 9) == 0)
+        وإلا 𐡄𐡍 (STRNCMP(arg, "priority=", 9) == 0)
         {
             arg += 9;
-            *prio = atoi((char *)arg);
+            *prio = atoi((حرف *)arg);
             arg = skiptowhite(arg);
         }
-        else if (STRNCMP(arg, "file=", 5) == 0)
+        وإلا 𐡄𐡍 (STRNCMP(arg, "file=", 5) == 0)
         {
             arg += 5;
             filename = arg;
             *buf = buflist_findname_exp(arg);
-            break;
+            اكسر;
         }
-        else if (STRNCMP(arg, "buffer=", 7) == 0)
+        وإلا 𐡄𐡍 (STRNCMP(arg, "buffer=", 7) == 0)
         {
             arg += 7;
             filename = arg;
-            *buf = buflist_findnr((int)getdigits(&arg));
+            *buf = buflist_findnr((صحيح)getdigits(&arg));
 
-            if (*skipwhite(arg) != NUL)
+            𐡄𐡍 (*skipwhite(arg) != NUL)
                 semsg(_(e_trailing_characters_str), arg);
 
-            break;
+            اكسر;
         }
-        else
+        وإلا
         {
             emsg(_(e_invalid_argument));
-            return FAIL;
+            أرجع FAIL;
         }
 
         arg = skipwhite(arg);
     }
 
-    if (filename != NULL && *buf == NULL)
+    𐡄𐡍 (filename != عدم && *buf == عدم)
     {
         semsg(_(e_invalid_buffer_name_str), filename);
-        return FAIL;
+        أرجع FAIL;
     }
 
     // If the filename is not supplied for the sign place or the sign jump
     // command, then use the current buffer.
-    if (filename == NULL &&
+    𐡄𐡍 (filename == عدم &&
         ((cmd == SIGNCMD_PLACE && lnum_arg) || cmd == SIGNCMD_JUMP))
         *buf = curwin->w_buffer;
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * ":sign" command
  */
-void
+فراغ
 ex_sign(exarg_T *eap)
 {
     char_u *arg = eap->arg;
 
     // Parse the subcommand.
     char_u *p = skiptowhite(arg);
-    int idx = sign_cmd_idx(arg, p);
-    if (idx == SIGNCMD_LAST)
+    صحيح idx = sign_cmd_idx(arg, p);
+    𐡄𐡍 (idx == SIGNCMD_LAST)
     {
         semsg(_(e_unknown_sign_command_str), arg);
-        return;
+        أرجع;
     }
     arg = skipwhite(p);
 
-    if (idx > SIGNCMD_LIST)
+    𐡄𐡍 (idx > SIGNCMD_LIST)
     {
-        char_u *sign_name = NULL;
-        int id = -1;
-        char_u *group = NULL;
-        int prio = -1;
-        buf_T *buf = NULL;
+        char_u *sign_name = عدم;
+        صحيح id = -1;
+        char_u *group = عدم;
+        صحيح prio = -1;
+        buf_T *buf = عدم;
         linenr_T lnum = -1;
 
         // Parse command line arguments
-        if (parse_sign_cmd_args(idx, arg, &sign_name, &id, &group, &prio, &buf,
+        𐡄𐡍 (parse_sign_cmd_args(idx, arg, &sign_name, &id, &group, &prio, &buf,
                                 &lnum) == FAIL)
-            return;
+            أرجع;
 
-        if (idx == SIGNCMD_PLACE)
+        𐡄𐡍 (idx == SIGNCMD_PLACE)
             sign_place_cmd(buf, lnum, sign_name, id, group, prio);
-        else if (idx == SIGNCMD_UNPLACE)
+        وإلا 𐡄𐡍 (idx == SIGNCMD_UNPLACE)
             sign_unplace_cmd(buf, lnum, sign_name, id, group);
-        else if (idx == SIGNCMD_JUMP)
+        وإلا 𐡄𐡍 (idx == SIGNCMD_JUMP)
             sign_jump_cmd(buf, lnum, sign_name, id, group);
 
-        return;
+        أرجع;
     }
 
     // Define, undefine or list signs.
-    if (idx == SIGNCMD_LIST && *arg == NUL)
+    𐡄𐡍 (idx == SIGNCMD_LIST && *arg == NUL)
     {
         // ":sign list": list all defined signs
-        for (sign_T *sp = first_sign; sp != NULL && !got_int; sp = sp->sn_next)
+        لكل (sign_T *sp = first_sign; sp != عدم && !got_int; sp = sp->sn_next)
             sign_list_defined(sp);
     }
-    else if (*arg == NUL)
+    وإلا 𐡄𐡍 (*arg == NUL)
     {
         emsg(_(e_missing_sign_name));
     }
-    else
+    وإلا
     {
 
         // Isolate the sign name.  If it's a number skip leading zeroes,
         // so that "099" and "99" are the same sign.  But keep "0".
         p = skiptowhite(arg);
-        if (*p != NUL)
+        𐡄𐡍 (*p != NUL)
             *p++ = NUL;
 
-        while (arg[0] == '0' && arg[1] != NUL)
+        طالما (arg[0] == '0' && arg[1] != NUL)
             ++arg;
 
         char_u *name = vim_strsave(arg);
 
-        if (idx == SIGNCMD_DEFINE)
+        𐡄𐡍 (idx == SIGNCMD_DEFINE)
             sign_define_cmd(name, p);
-        else if (idx == SIGNCMD_LIST)
+        وإلا 𐡄𐡍 (idx == SIGNCMD_LIST)
             // ":sign list {name}"
             sign_list_by_name(name);
-        else
+        وإلا
             // ":sign undefine {name}"
             sign_undefine_by_name(name, TRUE);
 
@@ -1773,57 +1773,57 @@ ex_sign(exarg_T *eap)
 /*
  * Return information about a specified sign
  */
-static void
+ساكن فراغ
 sign_getinfo(sign_T *sp, dict_T *retdict)
 {
     dict_add_string(retdict, "name", sp->sn_name);
 
-    if (sp->sn_icon != NULL)
+    𐡄𐡍 (sp->sn_icon != عدم)
         dict_add_string(retdict, "icon", sp->sn_icon);
 
-    if (sp->sn_text != NULL)
+    𐡄𐡍 (sp->sn_text != عدم)
         dict_add_string(retdict, "text", sp->sn_text);
 
-    if (sp->sn_priority > 0)
+    𐡄𐡍 (sp->sn_priority > 0)
         dict_add_number(retdict, "priority", sp->sn_priority);
 
-    if (sp->sn_line_hl > 0)
+    𐡄𐡍 (sp->sn_line_hl > 0)
     {
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_line_hl - 1, FALSE);
-        if (p == NULL)
+        char_u *p = get_highlight_name_ext(عدم, sp->sn_line_hl - 1, FALSE);
+        𐡄𐡍 (p == عدم)
             dict_add_string_len(retdict, "linehl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        وإلا
             dict_add_string(retdict, "linehl", p);
     }
 
-    if (sp->sn_text_hl > 0)
+    𐡄𐡍 (sp->sn_text_hl > 0)
     {
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_text_hl - 1, FALSE);
-        if (p == NULL)
+        char_u *p = get_highlight_name_ext(عدم, sp->sn_text_hl - 1, FALSE);
+        𐡄𐡍 (p == عدم)
             dict_add_string_len(retdict, "texthl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        وإلا
             dict_add_string(retdict, "texthl", p);
     }
 
-    if (sp->sn_cul_hl > 0)
+    𐡄𐡍 (sp->sn_cul_hl > 0)
     {
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_cul_hl - 1, FALSE);
-        if (p == NULL)
+        char_u *p = get_highlight_name_ext(عدم, sp->sn_cul_hl - 1, FALSE);
+        𐡄𐡍 (p == عدم)
             dict_add_string_len(retdict, "culhl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        وإلا
             dict_add_string(retdict, "culhl", p);
     }
 
-    if (sp->sn_num_hl > 0)
+    𐡄𐡍 (sp->sn_num_hl > 0)
     {
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_num_hl - 1, FALSE);
-        if (p == NULL)
+        char_u *p = get_highlight_name_ext(عدم, sp->sn_num_hl - 1, FALSE);
+        𐡄𐡍 (p == عدم)
             dict_add_string_len(retdict, "numhl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        وإلا
             dict_add_string(retdict, "numhl", p);
     }
 }
@@ -1832,48 +1832,48 @@ sign_getinfo(sign_T *sp, dict_T *retdict)
  * If 'name' is NULL, return a list of all the defined signs.
  * Otherwise, return information about the specified sign.
  */
-static void
+ساكن فراغ
 sign_getlist(char_u *name, list_T *retlist)
 {
     sign_T *sp = first_sign;
 
-    if (name != NULL)
+    𐡄𐡍 (name != عدم)
     {
-        sp = sign_find(name, NULL);
-        if (sp == NULL)
-            return;
+        sp = sign_find(name, عدم);
+        𐡄𐡍 (sp == عدم)
+            أرجع;
     }
 
-    for (; sp != NULL && !got_int; sp = sp->sn_next)
+    لكل (; sp != عدم && !got_int; sp = sp->sn_next)
     {
         dict_T *dict = dict_alloc_id(aid_sign_getlist);
-        if (dict == NULL)
-            return;
+        𐡄𐡍 (dict == عدم)
+            أرجع;
 
-        if (list_append_dict(retlist, dict) == FAIL)
+        𐡄𐡍 (list_append_dict(retlist, dict) == FAIL)
         {
             dict_unref(dict);
-            return;
+            أرجع;
         }
 
         sign_getinfo(sp, dict);
 
-        if (name != NULL) // handle only the specified sign
-            break;
+        𐡄𐡍 (name != عدم) // handle only the specified sign
+            اكسر;
     }
 }
 
 /*
  * Returns information about signs placed in a buffer as list of dicts.
  */
-void
+فراغ
 get_buffer_signs(buf_T *buf, list_T *l)
 {
-    sign_entry_T *sign = NULL;
+    sign_entry_T *sign = عدم;
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         dict_T *d = sign_get_info(sign);
-        if (d != NULL && list_append_dict(l, d) == FAIL)
+        𐡄𐡍 (d != عدم && list_append_dict(l, d) == FAIL)
             dict_unref(d);
     }
 }
@@ -1881,48 +1881,48 @@ get_buffer_signs(buf_T *buf, list_T *l)
 /*
  * Return information about all the signs placed in a buffer
  */
-static void
+ساكن فراغ
 sign_get_placed_in_buf(buf_T *buf,
                        linenr_T lnum,
-                       int sign_id,
+                       صحيح sign_id,
                        char_u *sign_group,
                        list_T *retlist)
 {
     dict_T *d = dict_alloc_id(aid_sign_getplaced_dict);
-    if (d == NULL)
-        return;
+    𐡄𐡍 (d == عدم)
+        أرجع;
 
-    if (list_append_dict(retlist, d) == FAIL)
+    𐡄𐡍 (list_append_dict(retlist, d) == FAIL)
     {
         dict_unref(d);
-        return;
+        أرجع;
     }
 
     dict_add_number(d, "bufnr", (long)buf->b_fnum);
 
     list_T *l = list_alloc_id(aid_sign_getplaced_list);
-    if (l == NULL)
-        return;
+    𐡄𐡍 (l == عدم)
+        أرجع;
 
-    if (dict_add_list(d, "signs", l) == FAIL)
+    𐡄𐡍 (dict_add_list(d, "signs", l) == FAIL)
     {
         list_unref(l);
-        return;
+        أرجع;
     }
 
-    sign_entry_T *sign = NULL;
+    sign_entry_T *sign = عدم;
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
-        if (!sign_in_group(sign, sign_group))
-            continue;
+        𐡄𐡍 (!sign_in_group(sign, sign_group))
+            استمر;
 
-        if ((lnum == 0 && sign_id == 0) ||
+        𐡄𐡍 ((lnum == 0 && sign_id == 0) ||
             (sign_id == 0 && lnum == sign->se_lnum) ||
             (lnum == 0 && sign_id == sign->se_id) ||
             (lnum == sign->se_lnum && sign_id == sign->se_id))
         {
             dict_T *sdict = sign_get_info(sign);
-            if (sdict != NULL && list_append_dict(l, sdict) == FAIL)
+            𐡄𐡍 (sdict != عدم && list_append_dict(l, sdict) == FAIL)
                 dict_unref(sdict);
         }
     }
@@ -1933,39 +1933,39 @@ sign_get_placed_in_buf(buf_T *buf,
  * sign placed at the line number. If 'lnum' is zero, return all the signs
  * placed in 'buf'. If 'buf' is NULL, return signs placed in all the buffers.
  */
-static void
+ساكن فراغ
 sign_get_placed(buf_T *buf,
                 linenr_T lnum,
-                int sign_id,
+                صحيح sign_id,
                 char_u *sign_group,
                 list_T *retlist)
 {
-    if (buf != NULL)
+    𐡄𐡍 (buf != عدم)
     {
         sign_get_placed_in_buf(buf, lnum, sign_id, sign_group, retlist);
     }
-    else
+    وإلا
     {
         FOR_ALL_BUFFERS(buf)
         {
-            if (buf->b_signlist != NULL)
+            𐡄𐡍 (buf->b_signlist != عدم)
                 sign_get_placed_in_buf(buf, 0, sign_id, sign_group, retlist);
         }
     }
 }
 
-# if defined(FEAT_SIGN_ICONS)
+# 𐡄𐡍 defined(FEAT_SIGN_ICONS)
 /*
  * Allocate the icons.  Called when the GUI has started.  Allows defining
  * signs before it starts.
  */
-void
-sign_gui_started(void)
+فراغ
+sign_gui_started(فراغ)
 {
-    sign_T *sp = NULL;
+    sign_T *sp = عدم;
     FOR_ALL_SIGNS(sp)
     {
-        if (sp->sn_icon != NULL)
+        𐡄𐡍 (sp->sn_icon != عدم)
             sp->sn_image = gui_mch_register_sign(sp->sn_icon);
     }
 }
@@ -1974,92 +1974,92 @@ sign_gui_started(void)
 /*
  * List one sign.
  */
-static void
+ساكن فراغ
 sign_list_defined(sign_T *sp)
 {
-    char lbuf[MSG_BUF_LEN];
+    حرف lbuf[MSG_BUF_LEN];
 
     smsg("sign %s", sp->sn_name);
 
-    if (sp->sn_icon != NULL)
+    𐡄𐡍 (sp->sn_icon != عدم)
     {
         msg_puts(" icon=");
         msg_outtrans(sp->sn_icon);
 # ifdef FEAT_SIGN_ICONS
-        if (sp->sn_image == NULL)
+        𐡄𐡍 (sp->sn_image == عدم)
             msg_puts(_(" (NOT FOUND)"));
-# else
+# وإلا
         msg_puts(_(" (not supported)"));
 # endif
     }
 
-    if (sp->sn_text != NULL)
+    𐡄𐡍 (sp->sn_text != عدم)
     {
         msg_puts(" text=");
         msg_outtrans(sp->sn_text);
     }
 
-    if (sp->sn_priority > 0)
+    𐡄𐡍 (sp->sn_priority > 0)
     {
         vim_snprintf(lbuf, MSG_BUF_LEN, " priority=%d", sp->sn_priority);
         msg_puts(lbuf);
     }
 
-    if (sp->sn_line_hl > 0)
+    𐡄𐡍 (sp->sn_line_hl > 0)
     {
         msg_puts(" linehl=");
 
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_line_hl - 1, FALSE);
-        if (p == NULL)
+        char_u *p = get_highlight_name_ext(عدم, sp->sn_line_hl - 1, FALSE);
+        𐡄𐡍 (p == عدم)
             msg_puts("NONE");
-        else
-            msg_puts((char *)p);
+        وإلا
+            msg_puts((حرف *)p);
     }
 
-    if (sp->sn_text_hl > 0)
+    𐡄𐡍 (sp->sn_text_hl > 0)
     {
         msg_puts(" texthl=");
 
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_text_hl - 1, FALSE);
-        if (p == NULL)
+        char_u *p = get_highlight_name_ext(عدم, sp->sn_text_hl - 1, FALSE);
+        𐡄𐡍 (p == عدم)
             msg_puts("NONE");
-        else
-            msg_puts((char *)p);
+        وإلا
+            msg_puts((حرف *)p);
     }
 
-    if (sp->sn_cul_hl > 0)
+    𐡄𐡍 (sp->sn_cul_hl > 0)
     {
         msg_puts(" culhl=");
 
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_cul_hl - 1, FALSE);
-        if (p == NULL)
+        char_u *p = get_highlight_name_ext(عدم, sp->sn_cul_hl - 1, FALSE);
+        𐡄𐡍 (p == عدم)
             msg_puts("NONE");
-        else
-            msg_puts((char *)p);
+        وإلا
+            msg_puts((حرف *)p);
     }
 
-    if (sp->sn_num_hl > 0)
+    𐡄𐡍 (sp->sn_num_hl > 0)
     {
         msg_puts(" numhl=");
 
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_num_hl - 1, FALSE);
-        if (p == NULL)
+        char_u *p = get_highlight_name_ext(عدم, sp->sn_num_hl - 1, FALSE);
+        𐡄𐡍 (p == عدم)
             msg_puts("NONE");
-        else
-            msg_puts((char *)p);
+        وإلا
+            msg_puts((حرف *)p);
     }
 }
 
 /*
  * Undefine a sign and free its memory.
  */
-static void
+ساكن فراغ
 sign_undefine(sign_T *sp, sign_T *sp_prev)
 {
     vim_free(sp->sn_name);
     vim_free(sp->sn_icon);
 # ifdef FEAT_SIGN_ICONS
-    if (sp->sn_image != NULL)
+    𐡄𐡍 (sp->sn_image != عدم)
     {
         out_flush();
         gui_mch_destroy_sign(sp->sn_image);
@@ -2067,39 +2067,39 @@ sign_undefine(sign_T *sp, sign_T *sp_prev)
 # endif
     vim_free(sp->sn_text);
 
-    if (sp_prev == NULL)
+    𐡄𐡍 (sp_prev == عدم)
         first_sign = sp->sn_next;
-    else
+    وإلا
         sp_prev->sn_next = sp->sn_next;
 
     vim_free(sp);
 }
 
-# if defined(FEAT_SIGN_ICONS)
-void *
-sign_get_image(int typenr) // the attribute which may have a sign
+# 𐡄𐡍 defined(FEAT_SIGN_ICONS)
+فراغ *
+sign_get_image(صحيح typenr) // the attribute which may have a sign
 {
-    sign_T *sp = NULL;
+    sign_T *sp = عدم;
     FOR_ALL_SIGNS(sp)
     {
-        if (sp->sn_typenr == typenr)
-            return sp->sn_image;
+        𐡄𐡍 (sp->sn_typenr == typenr)
+            أرجع sp->sn_image;
     }
-    return NULL;
+    أرجع عدم;
 }
 # endif
 
 /*
  * Undefine/free all signs.
  */
-void
-free_signs(void)
+فراغ
+free_signs(فراغ)
 {
-    while (first_sign != NULL)
-        sign_undefine(first_sign, NULL);
+    طالما (first_sign != عدم)
+        sign_undefine(first_sign, عدم);
 }
 
-static enum
+ساكن تعداد
 {
     EXP_SUBCMD, // expand :sign sub-commands
     EXP_DEFINE, // expand :sign define {name} args
@@ -2113,45 +2113,45 @@ static enum
 /*
  * Return the n'th sign name (used for command line completion)
  */
-static char_u *
-get_nth_sign_name(int idx)
+ساكن char_u *
+get_nth_sign_name(صحيح idx)
 {
-    int current_idx = 0;
-    sign_T *sp = NULL;
+    صحيح current_idx = 0;
+    sign_T *sp = عدم;
 
     // Complete with name of signs already defined
     FOR_ALL_SIGNS(sp)
     {
-        if (current_idx++ == idx)
-            return sp->sn_name;
+        𐡄𐡍 (current_idx++ == idx)
+            أرجع sp->sn_name;
     }
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Return the n'th sign group name (used for command line completion)
  */
-static char_u *
-get_nth_sign_group_name(int idx)
+ساكن char_u *
+get_nth_sign_group_name(صحيح idx)
 {
-    int current_idx = 0;
-    int todo = (int)sg_table.ht_used;
-    hashitem_T *hi = NULL;
+    صحيح current_idx = 0;
+    صحيح todo = (صحيح)sg_table.ht_used;
+    hashitem_T *hi = عدم;
 
     // Complete with name of sign groups already defined
     FOR_ALL_HASHTAB_ITEMS(&sg_table, hi, todo)
     {
-        if (!HASHITEM_EMPTY(hi))
+        𐡄𐡍 (!HASHITEM_EMPTY(hi))
         {
             --todo;
-            if (current_idx++ == idx)
+            𐡄𐡍 (current_idx++ == idx)
             {
                 signgroup_T *group = HI2SG(hi);
-                return group->sg_name;
+                أرجع group->sg_name;
             }
         }
     }
-    return NULL;
+    أرجع عدم;
 }
 
 /*
@@ -2159,53 +2159,53 @@ get_nth_sign_group_name(int idx)
  * expansion.
  */
 char_u *
-get_sign_name(expand_T *xp UNUSED, int idx)
+get_sign_name(expand_T *xp UNUSED, صحيح idx)
 {
-    switch (expand_what)
+    بدل (expand_what)
     {
-        case EXP_SUBCMD:
-            return (char_u *)cmds[idx];
-        case EXP_DEFINE:
+        حالة EXP_SUBCMD:
+            أرجع (char_u *)cmds[idx];
+        حالة EXP_DEFINE:
         {
-            char *define_arg[] = { "culhl=", "icon=",   "linehl=",   "numhl=",
-                                   "text=",  "texthl=", "priority=", NULL };
-            return (char_u *)define_arg[idx];
+            حرف *define_arg[] = { "culhl=", "icon=",   "linehl=",   "numhl=",
+                                   "text=",  "texthl=", "priority=", عدم };
+            أرجع (char_u *)define_arg[idx];
         }
-        case EXP_PLACE:
+        حالة EXP_PLACE:
         {
-            char *place_arg[] = { "line=", "name=",   "group=", "priority=",
-                                  "file=", "buffer=", NULL };
-            return (char_u *)place_arg[idx];
+            حرف *place_arg[] = { "line=", "name=",   "group=", "priority=",
+                                  "file=", "buffer=", عدم };
+            أرجع (char_u *)place_arg[idx];
         }
-        case EXP_LIST:
+        حالة EXP_LIST:
         {
-            char *list_arg[] = { "group=", "file=", "buffer=", NULL };
-            return (char_u *)list_arg[idx];
+            حرف *list_arg[] = { "group=", "file=", "buffer=", عدم };
+            أرجع (char_u *)list_arg[idx];
         }
-        case EXP_UNPLACE:
+        حالة EXP_UNPLACE:
         {
-            char *unplace_arg[] = { "group=", "file=", "buffer=", NULL };
-            return (char_u *)unplace_arg[idx];
+            حرف *unplace_arg[] = { "group=", "file=", "buffer=", عدم };
+            أرجع (char_u *)unplace_arg[idx];
         }
-        case EXP_SIGN_NAMES:
-            return get_nth_sign_name(idx);
-        case EXP_SIGN_GROUPS:
-            return get_nth_sign_group_name(idx);
-        default:
-            return NULL;
+        حالة EXP_SIGN_NAMES:
+            أرجع get_nth_sign_name(idx);
+        حالة EXP_SIGN_GROUPS:
+            أرجع get_nth_sign_group_name(idx);
+        افتراضي:
+            أرجع عدم;
     }
 }
 
 /*
  * Handle command line completion for :sign command.
  */
-void
+فراغ
 set_context_in_sign_cmd(expand_T *xp, char_u *arg)
 {
     char_u *p;
     char_u *end_subcmd;
     char_u *last;
-    int cmd_idx;
+    صحيح cmd_idx;
     char_u *begin_subcmd_args;
 
     // Default: expand subcommands.
@@ -2216,8 +2216,8 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
     end_subcmd = skiptowhite(arg);
     // expand subcmd name
     // :sign {subcmd}<CTRL-D>
-    if (*end_subcmd == NUL)
-        return;
+    𐡄𐡍 (*end_subcmd == NUL)
+        أرجع;
 
     cmd_idx = sign_cmd_idx(arg, end_subcmd);
 
@@ -2234,88 +2234,88 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
 
     // Loop until reaching last argument.
     p = begin_subcmd_args;
-    do
+    𐡏𐡁𐡃
     {
         p = skipwhite(p);
         last = p;
         p = skiptowhite(p);
     }
-    while (*p != NUL);
+    طالما (*p != NUL);
 
     p = vim_strchr(last, '=');
 
     // :sign define {name} {args}... {last}=
     //                               |     |
     //                            last     p
-    if (p == NULL)
+    𐡄𐡍 (p == عدم)
     {
         // Expand last argument name (before equal sign).
         xp->xp_pattern = last;
-        switch (cmd_idx)
+        بدل (cmd_idx)
         {
-            case SIGNCMD_DEFINE:
+            حالة SIGNCMD_DEFINE:
                 expand_what = EXP_DEFINE;
-                break;
-            case SIGNCMD_PLACE:
+                اكسر;
+            حالة SIGNCMD_PLACE:
                 // List placed signs
-                if (VIM_ISDIGIT(*begin_subcmd_args))
+                𐡄𐡍 (VIM_ISDIGIT(*begin_subcmd_args))
                     //   :sign place {id} {args}...
                     expand_what = EXP_PLACE;
-                else
+                وإلا
                     //   :sign place {args}...
                     expand_what = EXP_LIST;
-                break;
-            case SIGNCMD_LIST:
-            case SIGNCMD_UNDEFINE:
+                اكسر;
+            حالة SIGNCMD_LIST:
+            حالة SIGNCMD_UNDEFINE:
                 // :sign list <CTRL-D>
                 // :sign undefine <CTRL-D>
                 expand_what = EXP_SIGN_NAMES;
-                break;
-            case SIGNCMD_JUMP:
-            case SIGNCMD_UNPLACE:
+                اكسر;
+            حالة SIGNCMD_JUMP:
+            حالة SIGNCMD_UNPLACE:
                 expand_what = EXP_UNPLACE;
-                break;
-            default:
+                اكسر;
+            افتراضي:
                 xp->xp_context = EXPAND_NOTHING;
         }
     }
-    else
+    وإلا
     {
         // Expand last argument value (after equal sign).
         xp->xp_pattern = p + 1;
-        switch (cmd_idx)
+        بدل (cmd_idx)
         {
-            case SIGNCMD_DEFINE:
-                if (STRNCMP(last, "texthl", 6) == 0 ||
+            حالة SIGNCMD_DEFINE:
+                𐡄𐡍 (STRNCMP(last, "texthl", 6) == 0 ||
                     STRNCMP(last, "linehl", 6) == 0 ||
                     STRNCMP(last, "culhl", 5) == 0 ||
                     STRNCMP(last, "numhl", 5) == 0)
                     xp->xp_context = EXPAND_HIGHLIGHT;
-                else if (STRNCMP(last, "icon", 4) == 0)
+                وإلا 𐡄𐡍 (STRNCMP(last, "icon", 4) == 0)
                     xp->xp_context = EXPAND_FILES;
-                else
+                وإلا
                     xp->xp_context = EXPAND_NOTHING;
-                break;
-            case SIGNCMD_PLACE:
-                if (STRNCMP(last, "name", 4) == 0)
+                اكسر;
+            حالة SIGNCMD_PLACE:
+                𐡄𐡍 (STRNCMP(last, "name", 4) == 0)
                     expand_what = EXP_SIGN_NAMES;
-                else if (STRNCMP(last, "group", 5) == 0)
+                وإلا 𐡄𐡍 (STRNCMP(last, "group", 5) == 0)
                     expand_what = EXP_SIGN_GROUPS;
-                else if (STRNCMP(last, "file", 4) == 0)
+                وإلا 𐡄𐡍 (STRNCMP(last, "file", 4) == 0)
                     xp->xp_context = EXPAND_BUFFERS;
-                else
+                وإلا
                     xp->xp_context = EXPAND_NOTHING;
-                break;
-            case SIGNCMD_UNPLACE:
-            case SIGNCMD_JUMP:
-                if (STRNCMP(last, "group", 5) == 0)
+                اكسر;
+            حالة SIGNCMD_UNPLACE:
+            حالة SIGNCMD_JUMP:
+                𐡄𐡍 (STRNCMP(last, "group", 5) == 0)
                     expand_what = EXP_SIGN_GROUPS;
-                else if (STRNCMP(last, "file", 4) == 0)
+                وإلا 𐡄𐡍 (STRNCMP(last, "file", 4) == 0)
                     xp->xp_context = EXPAND_BUFFERS;
-                else
+                وإلا
                     xp->xp_context = EXPAND_NOTHING;
-                break;
-            default:
+                اكسر;
+            افتراضي:
                 xp->xp_context = EXPAND_NOTHING;
         }
     }
@@ -2325,31 +2325,31 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
  * Define a sign using the attributes in 'dict'. Returns 0 on success and -1 on
  * failure.
  */
-static int
+ساكن صحيح
 sign_define_from_dict(char_u *name_arg, dict_T *dict)
 {
-    char_u *name = NULL;
-    char_u *icon = NULL;
-    char_u *linehl = NULL;
-    char_u *text = NULL;
-    char_u *texthl = NULL;
-    char_u *culhl = NULL;
-    char_u *numhl = NULL;
-    int prio = -1;
-    int retval = -1;
+    char_u *name = عدم;
+    char_u *icon = عدم;
+    char_u *linehl = عدم;
+    char_u *text = عدم;
+    char_u *texthl = عدم;
+    char_u *culhl = عدم;
+    char_u *numhl = عدم;
+    صحيح prio = -1;
+    صحيح retval = -1;
 
-    if (name_arg == NULL && dict == NULL)
-        return retval;
+    𐡄𐡍 (name_arg == عدم && dict == عدم)
+        أرجع retval;
 
-    if (name_arg == NULL)
+    𐡄𐡍 (name_arg == عدم)
         name = dict_get_string(dict, "name", TRUE);
-    else
+    وإلا
         name = vim_strsave(name_arg);
 
-    if (name == NULL || name[0] == NUL)
-        goto cleanup;
+    𐡄𐡍 (name == عدم || name[0] == NUL)
+        اذهب cleanup;
 
-    if (dict != NULL)
+    𐡄𐡍 (dict != عدم)
     {
         icon = dict_get_string(dict, "icon", TRUE);
         linehl = dict_get_string(dict, "linehl", TRUE);
@@ -2360,7 +2360,7 @@ sign_define_from_dict(char_u *name_arg, dict_T *dict)
         prio = dict_get_number_def(dict, "priority", -1);
     }
 
-    if (sign_define_by_name(name, icon, linehl, text, texthl, culhl, numhl,
+    𐡄𐡍 (sign_define_by_name(name, icon, linehl, text, texthl, culhl, numhl,
                             prio) == OK)
         retval = 0;
 
@@ -2373,24 +2373,24 @@ cleanup:
     vim_free(culhl);
     vim_free(numhl);
 
-    return retval;
+    أرجع retval;
 }
 
 /*
  * Define multiple signs using attributes from list 'l' and store the return
  * values in 'retlist'.
  */
-static void
+ساكن فراغ
 sign_define_multiple(list_T *l, list_T *retlist)
 {
-    listitem_T *li = NULL;
+    listitem_T *li = عدم;
     FOR_ALL_LIST_ITEMS(l, li)
     {
-        int retval = -1;
+        صحيح retval = -1;
 
-        if (li->li_tv.v_type == VAR_DICT)
-            retval = sign_define_from_dict(NULL, li->li_tv.vval.v_dict);
-        else
+        𐡄𐡍 (li->li_tv.v_type == VAR_DICT)
+            retval = sign_define_from_dict(عدم, li->li_tv.vval.v_dict);
+        وإلا
             emsg(_(e_dictionary_required));
 
         list_append_number(retlist, retval);
@@ -2400,51 +2400,51 @@ sign_define_multiple(list_T *l, list_T *retlist)
 /*
  * "sign_define()" function
  */
-void
+فراغ
 f_sign_define(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && (check_for_string_or_list_arg(argvars, 0) == FAIL ||
+    𐡄𐡍 (in_vim9script() && (check_for_string_or_list_arg(argvars, 0) == FAIL ||
                             check_for_opt_dict_arg(argvars, 1) == FAIL))
-        return;
+        أرجع;
 
-    if (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
+    𐡄𐡍 (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
     {
         // Define multiple signs
-        if (rettv_list_alloc(rettv) == FAIL)
-            return;
+        𐡄𐡍 (rettv_list_alloc(rettv) == FAIL)
+            أرجع;
 
         sign_define_multiple(argvars[0].vval.v_list, rettv->vval.v_list);
-        return;
+        أرجع;
     }
 
     // Define a single sign
     rettv->vval.v_number = -1;
 
     char_u *name = tv_get_string_chk(&argvars[0]);
-    if (name == NULL)
-        return;
+    𐡄𐡍 (name == عدم)
+        أرجع;
 
-    if (check_for_opt_dict_arg(argvars, 1) == FAIL)
-        return;
+    𐡄𐡍 (check_for_opt_dict_arg(argvars, 1) == FAIL)
+        أرجع;
 
     rettv->vval.v_number = sign_define_from_dict(
-        name, argvars[1].v_type == VAR_DICT ? argvars[1].vval.v_dict : NULL);
+        name, argvars[1].v_type == VAR_DICT ? argvars[1].vval.v_dict : عدم);
 }
 
 /*
  * "sign_getdefined()" function
  */
-void
+فراغ
 f_sign_getdefined(typval_T *argvars, typval_T *rettv)
 {
-    if (rettv_list_alloc_id(rettv, aid_sign_getdefined) == FAIL)
-        return;
+    𐡄𐡍 (rettv_list_alloc_id(rettv, aid_sign_getdefined) == FAIL)
+        أرجع;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-        return;
+    𐡄𐡍 (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+        أرجع;
 
-    char_u *name = NULL;
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    char_u *name = عدم;
+    𐡄𐡍 (argvars[0].v_type != VAR_UNKNOWN)
         name = tv_get_string(&argvars[0]);
 
     sign_getlist(name, rettv->vval.v_list);
@@ -2453,65 +2453,65 @@ f_sign_getdefined(typval_T *argvars, typval_T *rettv)
 /*
  * "sign_getplaced()" function
  */
-void
+فراغ
 f_sign_getplaced(typval_T *argvars, typval_T *rettv)
 {
-    buf_T *buf = NULL;
+    buf_T *buf = عدم;
     linenr_T lnum = 0;
-    int sign_id = 0;
-    char_u *group = NULL;
+    صحيح sign_id = 0;
+    char_u *group = عدم;
 
-    if (rettv_list_alloc_id(rettv, aid_sign_getplaced) == FAIL)
-        return;
+    𐡄𐡍 (rettv_list_alloc_id(rettv, aid_sign_getplaced) == FAIL)
+        أرجع;
 
-    if (in_vim9script() && (check_for_opt_buffer_arg(argvars, 0) == FAIL ||
+    𐡄𐡍 (in_vim9script() && (check_for_opt_buffer_arg(argvars, 0) == FAIL ||
                             (argvars[0].v_type != VAR_UNKNOWN &&
                              check_for_opt_dict_arg(argvars, 1) == FAIL)))
-        return;
+        أرجع;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    𐡄𐡍 (argvars[0].v_type != VAR_UNKNOWN)
     {
         // get signs placed in the specified buffer
         buf = get_buf_arg(&argvars[0]);
-        if (buf == NULL)
-            return;
+        𐡄𐡍 (buf == عدم)
+            أرجع;
 
-        if (argvars[1].v_type != VAR_UNKNOWN)
+        𐡄𐡍 (argvars[1].v_type != VAR_UNKNOWN)
         {
-            if (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
-                return;
+            𐡄𐡍 (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
+                أرجع;
 
-            dictitem_T *di = NULL;
+            dictitem_T *di = عدم;
             dict_T *dict = argvars[1].vval.v_dict;
 
-            if ((di = dict_find(dict, (char_u *)"lnum", -1)) != NULL)
+            𐡄𐡍 ((di = dict_find(dict, (char_u *)"lnum", -1)) != عدم)
             {
                 // get signs placed at this line
-                int notanum = FALSE;
+                صحيح notanum = FALSE;
                 tv_get_number_chk(&di->di_tv, &notanum);
-                if (notanum)
-                    return;
+                𐡄𐡍 (notanum)
+                    أرجع;
 
                 lnum = tv_get_lnum(&di->di_tv);
             }
 
-            if ((di = dict_find(dict, (char_u *)"id", -1)) != NULL)
+            𐡄𐡍 ((di = dict_find(dict, (char_u *)"id", -1)) != عدم)
             {
                 // get sign placed with this identifier
-                int notanum = FALSE;
-                sign_id = (int)tv_get_number_chk(&di->di_tv, &notanum);
-                if (notanum)
-                    return;
+                صحيح notanum = FALSE;
+                sign_id = (صحيح)tv_get_number_chk(&di->di_tv, &notanum);
+                𐡄𐡍 (notanum)
+                    أرجع;
             }
 
-            if ((di = dict_find(dict, (char_u *)"group", -1)) != NULL)
+            𐡄𐡍 ((di = dict_find(dict, (char_u *)"group", -1)) != عدم)
             {
                 group = tv_get_string_chk(&di->di_tv);
-                if (group == NULL)
-                    return;
+                𐡄𐡍 (group == عدم)
+                    أرجع;
 
-                if (*group == '\0') // empty string means global group
-                    group = NULL;
+                𐡄𐡍 (*group == '\0') // empty string means global group
+                    group = عدم;
             }
         }
     }
@@ -2522,49 +2522,49 @@ f_sign_getplaced(typval_T *argvars, typval_T *rettv)
 /*
  * "sign_jump()" function
  */
-void
+فراغ
 f_sign_jump(typval_T *argvars, typval_T *rettv)
 {
-    char_u *sign_group = NULL;
+    char_u *sign_group = عدم;
     rettv->vval.v_number = -1;
 
-    if (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
+    𐡄𐡍 (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
                             check_for_string_arg(argvars, 1) == FAIL ||
                             check_for_buffer_arg(argvars, 2) == FAIL))
-        return;
+        أرجع;
 
-    int notanum = FALSE;
+    صحيح notanum = FALSE;
     // Sign identifier
-    int sign_id = (int)tv_get_number_chk(&argvars[0], &notanum);
-    if (notanum)
-        return;
+    صحيح sign_id = (صحيح)tv_get_number_chk(&argvars[0], &notanum);
+    𐡄𐡍 (notanum)
+        أرجع;
 
-    if (sign_id <= 0)
+    𐡄𐡍 (sign_id <= 0)
     {
         emsg(_(e_invalid_argument));
-        return;
+        أرجع;
     }
 
     // Sign group
     sign_group = tv_get_string_chk(&argvars[1]);
-    if (sign_group == NULL)
-        return;
+    𐡄𐡍 (sign_group == عدم)
+        أرجع;
 
-    if (sign_group[0] == '\0')
+    𐡄𐡍 (sign_group[0] == '\0')
     {
-        sign_group = NULL; // global sign group
+        sign_group = عدم; // global sign group
     }
-    else
+    وإلا
     {
         sign_group = vim_strsave(sign_group);
-        if (sign_group == NULL)
-            return;
+        𐡄𐡍 (sign_group == عدم)
+            أرجع;
     }
 
     // Buffer to place the sign
     buf_T *buf = get_buf_arg(&argvars[2]);
-    if (buf == NULL)
-        goto cleanup;
+    𐡄𐡍 (buf == عدم)
+        اذهب cleanup;
 
     rettv->vval.v_number = sign_jump(sign_id, sign_group, buf);
 
@@ -2576,160 +2576,160 @@ cleanup:
  * Place a new sign using the values specified in dict 'dict'. Returns the sign
  * identifier if successfully placed, otherwise returns 0.
  */
-static int
+ساكن صحيح
 sign_place_from_dict(typval_T *id_tv,
                      typval_T *group_tv,
                      typval_T *name_tv,
                      typval_T *buf_tv,
                      dict_T *dict)
 {
-    int sign_id = 0;
-    char_u *group = NULL;
-    char_u *sign_name = NULL;
-    buf_T *buf = NULL;
-    dictitem_T *di = NULL;
+    صحيح sign_id = 0;
+    char_u *group = عدم;
+    char_u *sign_name = عدم;
+    buf_T *buf = عدم;
+    dictitem_T *di = عدم;
     linenr_T lnum = 0;
-    int prio = -1;
-    int ret_sign_id = -1;
+    صحيح prio = -1;
+    صحيح ret_sign_id = -1;
 
     // sign identifier
-    if (id_tv == NULL)
+    𐡄𐡍 (id_tv == عدم)
     {
         di = dict_find(dict, (char_u *)"id", -1);
-        if (di != NULL)
+        𐡄𐡍 (di != عدم)
             id_tv = &di->di_tv;
     }
 
-    if (id_tv == NULL)
+    𐡄𐡍 (id_tv == عدم)
     {
         sign_id = 0;
     }
-    else
+    وإلا
     {
-        int notanum = FALSE;
+        صحيح notanum = FALSE;
         sign_id = tv_get_number_chk(id_tv, &notanum);
 
-        if (notanum)
-            return -1;
+        𐡄𐡍 (notanum)
+            أرجع -1;
 
-        if (sign_id < 0)
+        𐡄𐡍 (sign_id < 0)
         {
             emsg(_(e_invalid_argument));
-            return -1;
+            أرجع -1;
         }
     }
 
     // sign group
-    if (group_tv == NULL)
+    𐡄𐡍 (group_tv == عدم)
     {
         di = dict_find(dict, (char_u *)"group", -1);
-        if (di != NULL)
+        𐡄𐡍 (di != عدم)
             group_tv = &di->di_tv;
     }
 
-    if (group_tv == NULL)
+    𐡄𐡍 (group_tv == عدم)
     {
-        group = NULL; // global group
+        group = عدم; // global group
     }
-    else
+    وإلا
     {
         group = tv_get_string_chk(group_tv);
-        if (group == NULL)
-            goto cleanup;
+        𐡄𐡍 (group == عدم)
+            اذهب cleanup;
 
-        if (group[0] == '\0') // global sign group
+        𐡄𐡍 (group[0] == '\0') // global sign group
         {
-            group = NULL;
+            group = عدم;
         }
-        else
+        وإلا
         {
             group = vim_strsave(group);
-            if (group == NULL)
-                return -1;
+            𐡄𐡍 (group == عدم)
+                أرجع -1;
         }
     }
 
     // sign name
-    if (name_tv == NULL)
+    𐡄𐡍 (name_tv == عدم)
     {
         di = dict_find(dict, (char_u *)"name", -1);
-        if (di != NULL)
+        𐡄𐡍 (di != عدم)
             name_tv = &di->di_tv;
     }
 
-    if (name_tv == NULL)
-        goto cleanup;
+    𐡄𐡍 (name_tv == عدم)
+        اذهب cleanup;
 
     sign_name = tv_get_string_chk(name_tv);
-    if (sign_name == NULL)
-        goto cleanup;
+    𐡄𐡍 (sign_name == عدم)
+        اذهب cleanup;
 
     // buffer to place the sign
-    if (buf_tv == NULL)
+    𐡄𐡍 (buf_tv == عدم)
     {
         di = dict_find(dict, (char_u *)"buffer", -1);
-        if (di != NULL)
+        𐡄𐡍 (di != عدم)
             buf_tv = &di->di_tv;
     }
 
-    if (buf_tv == NULL)
-        goto cleanup;
+    𐡄𐡍 (buf_tv == عدم)
+        اذهب cleanup;
 
     buf = get_buf_arg(buf_tv);
-    if (buf == NULL)
-        goto cleanup;
+    𐡄𐡍 (buf == عدم)
+        اذهب cleanup;
 
     // line number of the sign
     di = dict_find(dict, (char_u *)"lnum", -1);
-    if (di != NULL)
+    𐡄𐡍 (di != عدم)
     {
         lnum = tv_get_lnum(&di->di_tv);
-        if (lnum <= 0)
+        𐡄𐡍 (lnum <= 0)
         {
             emsg(_(e_invalid_argument));
-            goto cleanup;
+            اذهب cleanup;
         }
     }
 
     // sign priority
     di = dict_find(dict, (char_u *)"priority", -1);
-    if (di != NULL)
+    𐡄𐡍 (di != عدم)
     {
-        int notanum = FALSE;
-        prio = (int)tv_get_number_chk(&di->di_tv, &notanum);
-        if (notanum)
-            goto cleanup;
+        صحيح notanum = FALSE;
+        prio = (صحيح)tv_get_number_chk(&di->di_tv, &notanum);
+        𐡄𐡍 (notanum)
+            اذهب cleanup;
     }
 
-    if (sign_place(&sign_id, group, sign_name, buf, lnum, prio) == OK)
+    𐡄𐡍 (sign_place(&sign_id, group, sign_name, buf, lnum, prio) == OK)
         ret_sign_id = sign_id;
 
 cleanup:
     vim_free(group);
 
-    return ret_sign_id;
+    أرجع ret_sign_id;
 }
 
 /*
  * "sign_place()" function
  */
-void
+فراغ
 f_sign_place(typval_T *argvars, typval_T *rettv)
 {
-    dict_T *dict = NULL;
+    dict_T *dict = عدم;
     rettv->vval.v_number = -1;
 
-    if (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
+    𐡄𐡍 (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
                             check_for_string_arg(argvars, 1) == FAIL ||
                             check_for_string_arg(argvars, 2) == FAIL ||
                             check_for_buffer_arg(argvars, 3) == FAIL ||
                             check_for_opt_dict_arg(argvars, 4) == FAIL))
-        return;
+        أرجع;
 
-    if (argvars[4].v_type != VAR_UNKNOWN)
+    𐡄𐡍 (argvars[4].v_type != VAR_UNKNOWN)
     {
-        if (check_for_nonnull_dict_arg(argvars, 4) == FAIL)
-            return;
+        𐡄𐡍 (check_for_nonnull_dict_arg(argvars, 4) == FAIL)
+            أرجع;
         dict = argvars[4].vval.v_dict;
     }
 
@@ -2740,28 +2740,28 @@ f_sign_place(typval_T *argvars, typval_T *rettv)
 /*
  * "sign_placelist()" function.  Place multiple signs.
  */
-void
+فراغ
 f_sign_placelist(typval_T *argvars, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-        return;
+    𐡄𐡍 (rettv_list_alloc(rettv) == FAIL)
+        أرجع;
 
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    𐡄𐡍 (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+        أرجع;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    𐡄𐡍 (check_for_list_arg(argvars, 0) == FAIL)
+        أرجع;
 
     // Process the List of sign attributes
-    listitem_T *li = NULL;
+    listitem_T *li = عدم;
     FOR_ALL_LIST_ITEMS(argvars[0].vval.v_list, li)
     {
-        int sign_id = -1;
+        صحيح sign_id = -1;
 
-        if (li->li_tv.v_type == VAR_DICT)
-            sign_id = sign_place_from_dict(NULL, NULL, NULL, NULL,
+        𐡄𐡍 (li->li_tv.v_type == VAR_DICT)
+            sign_id = sign_place_from_dict(عدم, عدم, عدم, عدم,
                                            li->li_tv.vval.v_dict);
-        else
+        وإلا
             emsg(_(e_dictionary_required));
 
         list_append_number(rettv->vval.v_list, sign_id);
@@ -2771,15 +2771,15 @@ f_sign_placelist(typval_T *argvars, typval_T *rettv)
 /*
  * Undefine multiple signs
  */
-static void
+ساكن فراغ
 sign_undefine_multiple(list_T *l, list_T *retlist)
 {
-    listitem_T *li = NULL;
+    listitem_T *li = عدم;
     FOR_ALL_LIST_ITEMS(l, li)
     {
-        int retval = -1;
+        صحيح retval = -1;
         char_u *name = tv_get_string_chk(&li->li_tv);
-        if (name != NULL && (sign_undefine_by_name(name, TRUE) == OK))
+        𐡄𐡍 (name != عدم && (sign_undefine_by_name(name, TRUE) == OK))
             retval = 0;
 
         list_append_number(retlist, retval);
@@ -2789,39 +2789,39 @@ sign_undefine_multiple(list_T *l, list_T *retlist)
 /*
  * "sign_undefine()" function
  */
-void
+فراغ
 f_sign_undefine(typval_T *argvars, typval_T *rettv)
 {
 
-    if (in_vim9script() && check_for_opt_string_or_list_arg(argvars, 0) == FAIL)
-        return;
+    𐡄𐡍 (in_vim9script() && check_for_opt_string_or_list_arg(argvars, 0) == FAIL)
+        أرجع;
 
-    if (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
+    𐡄𐡍 (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
     {
         // Undefine multiple signs
-        if (rettv_list_alloc(rettv) == FAIL)
-            return;
+        𐡄𐡍 (rettv_list_alloc(rettv) == FAIL)
+            أرجع;
 
         sign_undefine_multiple(argvars[0].vval.v_list, rettv->vval.v_list);
-        return;
+        أرجع;
     }
 
     rettv->vval.v_number = -1;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    𐡄𐡍 (argvars[0].v_type == VAR_UNKNOWN)
     {
         // Free all the signs
         free_signs();
         rettv->vval.v_number = 0;
     }
-    else
+    وإلا
     {
         // Free only the specified sign
         char_u *name = tv_get_string_chk(&argvars[0]);
-        if (name == NULL)
-            return;
+        𐡄𐡍 (name == عدم)
+            أرجع;
 
-        if (sign_undefine_by_name(name, TRUE) == OK)
+        𐡄𐡍 (sign_undefine_by_name(name, TRUE) == OK)
             rettv->vval.v_number = 0;
     }
 }
@@ -2830,68 +2830,68 @@ f_sign_undefine(typval_T *argvars, typval_T *rettv)
  * Unplace the sign with attributes specified in 'dict'. Returns 0 on success
  * and -1 on failure.
  */
-static int
+ساكن صحيح
 sign_unplace_from_dict(typval_T *group_tv, dict_T *dict)
 {
-    int sign_id = 0;
-    buf_T *buf = NULL;
-    char_u *group = NULL;
-    int retval = -1;
+    صحيح sign_id = 0;
+    buf_T *buf = عدم;
+    char_u *group = عدم;
+    صحيح retval = -1;
 
     // sign group
-    group = (group_tv != NULL) ? tv_get_string(group_tv)
+    group = (group_tv != عدم) ? tv_get_string(group_tv)
                                : dict_get_string(dict, "group", FALSE);
 
-    if (group != NULL)
+    𐡄𐡍 (group != عدم)
     {
-        if (group[0] == '\0') // global sign group
+        𐡄𐡍 (group[0] == '\0') // global sign group
         {
-            group = NULL;
+            group = عدم;
         }
-        else
+        وإلا
         {
             group = vim_strsave(group);
-            if (group == NULL)
-                return retval;
+            𐡄𐡍 (group == عدم)
+                أرجع retval;
         }
     }
 
-    if (dict != NULL)
+    𐡄𐡍 (dict != عدم)
     {
         dictitem_T *di = dict_find(dict, (char_u *)"buffer", -1);
-        if (di != NULL)
+        𐡄𐡍 (di != عدم)
         {
             buf = get_buf_arg(&di->di_tv);
-            if (buf == NULL)
-                goto cleanup;
+            𐡄𐡍 (buf == عدم)
+                اذهب cleanup;
         }
 
-        if (dict_has_key(dict, "id"))
+        𐡄𐡍 (dict_has_key(dict, "id"))
         {
             sign_id = dict_get_number(dict, "id");
-            if (sign_id <= 0)
+            𐡄𐡍 (sign_id <= 0)
             {
                 emsg(_(e_invalid_argument));
-                goto cleanup;
+                اذهب cleanup;
             }
         }
     }
 
-    if (buf == NULL)
+    𐡄𐡍 (buf == عدم)
     {
         // Delete the sign in all the buffers
         retval = 0;
         FOR_ALL_BUFFERS(buf)
-            if (sign_unplace(sign_id, group, buf, 0) != OK)
+            𐡄𐡍 (sign_unplace(sign_id, group, buf, 0) != OK)
                 retval = -1;
     }
-    else if (sign_unplace(sign_id, group, buf, 0) == OK)
+    وإلا 𐡄𐡍 (sign_unplace(sign_id, group, buf, 0) == OK)
         retval = 0;
 
 cleanup:
     vim_free(group);
 
-    return retval;
+    أرجع retval;
 }
 
 sign_entry_T *
@@ -2900,31 +2900,31 @@ get_first_valid_sign(win_T *wp)
     sign_entry_T *sign = wp->w_buffer->b_signlist;
 
 # ifdef FEAT_PROP_POPUP
-    while (sign != NULL && !sign_group_for_window(sign, wp))
+    طالما (sign != عدم && !sign_group_for_window(sign, wp))
         sign = sign->se_next;
 # endif
-    return sign;
+    أرجع sign;
 }
 
 /*
  * Return TRUE when window "wp" has a column to draw signs in.
  */
-int
+صحيح
 signcolumn_on(win_T *wp)
 {
     // If 'signcolumn' is set to 'number', signs are displayed in the 'number'
     // column (if present). Otherwise signs are to be displayed in the sign
     // column.
-    if (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u')
-        return get_first_valid_sign(wp) != NULL && !wp->w_p_nu && !wp->w_p_rnu;
+    𐡄𐡍 (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u')
+        أرجع get_first_valid_sign(wp) != عدم && !wp->w_p_nu && !wp->w_p_rnu;
 
-    if (*wp->w_p_scl == 'n')
-        return FALSE;
+    𐡄𐡍 (*wp->w_p_scl == 'n')
+        أرجع FALSE;
 
-    if (*wp->w_p_scl == 'y')
-        return TRUE;
+    𐡄𐡍 (*wp->w_p_scl == 'y')
+        أرجع TRUE;
 
-    return (get_first_valid_sign(wp) != NULL
+    أرجع (get_first_valid_sign(wp) != عدم
 # ifdef FEAT_NETBEANS_INTG
             || wp->w_buffer->b_has_sign_column
 # endif
@@ -2934,17 +2934,17 @@ signcolumn_on(win_T *wp)
 /*
  * "sign_unplace()" function
  */
-void
+فراغ
 f_sign_unplace(typval_T *argvars, typval_T *rettv)
 {
-    dict_T *dict = NULL;
+    dict_T *dict = عدم;
     rettv->vval.v_number = -1;
 
-    if ((check_for_string_arg(argvars, 0) == FAIL ||
+    𐡄𐡍 ((check_for_string_arg(argvars, 0) == FAIL ||
          check_for_opt_dict_arg(argvars, 1) == FAIL))
-        return;
+        أرجع;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    𐡄𐡍 (argvars[1].v_type != VAR_UNKNOWN)
         dict = argvars[1].vval.v_dict;
 
     rettv->vval.v_number = sign_unplace_from_dict(&argvars[0], dict);
@@ -2953,26 +2953,26 @@ f_sign_unplace(typval_T *argvars, typval_T *rettv)
 /*
  * "sign_unplacelist()" function
  */
-void
+فراغ
 f_sign_unplacelist(typval_T *argvars, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-        return;
+    𐡄𐡍 (rettv_list_alloc(rettv) == FAIL)
+        أرجع;
 
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    𐡄𐡍 (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+        أرجع;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    𐡄𐡍 (check_for_list_arg(argvars, 0) == FAIL)
+        أرجع;
 
-    listitem_T *li = NULL;
+    listitem_T *li = عدم;
     FOR_ALL_LIST_ITEMS(argvars[0].vval.v_list, li)
     {
-        int retval = -1;
+        صحيح retval = -1;
 
-        if (li->li_tv.v_type == VAR_DICT)
-            retval = sign_unplace_from_dict(NULL, li->li_tv.vval.v_dict);
-        else
+        𐡄𐡍 (li->li_tv.v_type == VAR_DICT)
+            retval = sign_unplace_from_dict(عدم, li->li_tv.vval.v_dict);
+        وإلا
             emsg(_(e_dictionary_required));
 
         list_append_number(rettv->vval.v_list, retval);

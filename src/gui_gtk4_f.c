@@ -7,18 +7,18 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
-#include <gtk/gtk.h>
-#include "gui_gtk4_f.h"
+#ضمن "vim.h"
+#ضمن <gtk/gtk.h>
+#ضمن "gui_gtk4_f.h"
 
 /*
  * Child widget at position (x, y).
  */
-typedef struct
+تعريفنوع بنية
 {
     GtkWidget	*widget;
-    int		x;
-    int		y;
+    صحيح		x;
+    صحيح		y;
 } VimFormChild;
 
 /*
@@ -27,7 +27,7 @@ typedef struct
  * so this is needed to take advantage of that. We don't use GtkFixed directly
  * since we need to override some vfuncs.
  */
-struct _VimForm
+بنية _VimForm
 {
     GtkWidget parent;
 
@@ -35,24 +35,24 @@ struct _VimForm
 
     // See vim_form_size_allocate()
     guint resize_idle_id;
-    int last_width;
-    int last_height;
+    صحيح last_width;
+    صحيح last_height;
 };
 
 G_DEFINE_TYPE(VimForm, vim_form, GTK_TYPE_WIDGET)
 
-static void vim_form_snapshot(GtkWidget *widget, GtkSnapshot *snapshot);
-static void vim_form_size_allocate(GtkWidget *widget, int width, int height, int baseline);
-static void vim_form_measure(GtkWidget *widget, GtkOrientation orientation, int for_size, int *minimum, int *natural, int *minimum_baseline, int *natural_baseline);
-static gboolean vim_form_contains(GtkWidget *widget, double x, double y);
+ساكن فراغ vim_form_snapshot(GtkWidget *widget, GtkSnapshot *snapshot);
+ساكن فراغ vim_form_size_allocate(GtkWidget *widget, صحيح width, صحيح height, صحيح baseline);
+ساكن فراغ vim_form_measure(GtkWidget *widget, GtkOrientation orientation, صحيح for_size, صحيح *minimum, صحيح *natural, صحيح *minimum_baseline, صحيح *natural_baseline);
+ساكن gboolean vim_form_contains(GtkWidget *widget, مزدوج x, مزدوج y);
 
-    static void
+    ساكن فراغ
 vim_form_dispose(GObject *obj)
 {
     VimForm *self = VIM_FORM(obj);
     GList   *ele = self->children;
 
-    while (ele != NULL)
+    طالما (ele != عدم)
     {
 	VimFormChild *child = ele->data;
 
@@ -61,12 +61,12 @@ vim_form_dispose(GObject *obj)
 	g_free(child);
     }
     g_list_free(self->children);
-    self->children = NULL;
+    self->children = عدم;
 
     G_OBJECT_CLASS(vim_form_parent_class)->dispose(obj);
 }
 
-    static void
+    ساكن فراغ
 vim_form_class_init(VimFormClass *class)
 {
     GtkWidgetClass  *widget_class = GTK_WIDGET_CLASS(class);
@@ -80,49 +80,49 @@ vim_form_class_init(VimFormClass *class)
     obj_class->dispose = vim_form_dispose;
 }
 
-    static void
+    ساكن فراغ
 vim_form_init(VimForm *self UNUSED)
 {
 }
 
     GtkWidget *
-vim_form_new(void)
+vim_form_new(فراغ)
 {
-    return g_object_new(VIM_TYPE_FORM, NULL);
+    أرجع g_object_new(VIM_TYPE_FORM, عدم);
 }
 
 /*
  * Transform the child
  */
-    static void
+    ساكن فراغ
 vim_form_position_child(VimForm	*self, VimFormChild *child)
 {
     GtkRequisition  requisition;
     GskTransform    *transform;
-    int		    w, h;
+    صحيح		    w, h;
 
-    gtk_widget_get_preferred_size(child->widget, &requisition, NULL);
+    gtk_widget_get_preferred_size(child->widget, &requisition, عدم);
     w = requisition.width;
     h = requisition.height;
 
     // If widget has no size request, use parent size
-    if (w <= 0)
+    𐡄𐡍 (w <= 0)
 	w = gtk_widget_get_width(GTK_WIDGET(self));
-    if (h <= 0)
+    𐡄𐡍 (h <= 0)
 	h = gtk_widget_get_height(GTK_WIDGET(self));
-    if (w <= 0) w = 1;
-    if (h <= 0) h = 1;
+    𐡄𐡍 (w <= 0) w = 1;
+    𐡄𐡍 (h <= 0) h = 1;
 
-    transform = gsk_transform_translate(NULL,
-	    &GRAPHENE_POINT_INIT((float)child->x, (float)child->y));
+    transform = gsk_transform_translate(عدم,
+	    &GRAPHENE_POINT_INIT((عائم)child->x, (عائم)child->y));
     gtk_widget_allocate(child->widget, w, h, -1, transform);
 }
 
 /*
  * Place the given widget at the point (x, y).
  */
-    void
-vim_form_put(VimForm *self, GtkWidget *widget, int x, int y)
+    فراغ
+vim_form_put(VimForm *self, GtkWidget *widget, صحيح x, صحيح y)
 {
     VimFormChild *child;
 
@@ -144,18 +144,18 @@ vim_form_put(VimForm *self, GtkWidget *widget, int x, int y)
  * Move the widget (which should have already been added using vim_form_put())
  * to the given point (x, y).
  */
-    void
-vim_form_move(VimForm *self, GtkWidget *widget, int x, int y)
+    فراغ
+vim_form_move(VimForm *self, GtkWidget *widget, صحيح x, صحيح y)
 {
-    for (GList *ele = self->children; ele != NULL; ele = ele->next)
+    لكل (GList *ele = self->children; ele != عدم; ele = ele->next)
     {
 	VimFormChild *child = ele->data;
-	if (child->widget == widget)
+	𐡄𐡍 (child->widget == widget)
 	{
 	    child->x = x;
 	    child->y = y;
 	    vim_form_position_child(self, child);
-	    return;
+	    أرجع;
 	}
     }
 }
@@ -163,7 +163,7 @@ vim_form_move(VimForm *self, GtkWidget *widget, int x, int y)
 /*
  * Move and resize the child.
  */
-    void
+    فراغ
 vim_form_move_resize(
 	VimForm	    *self,
 	GtkWidget   *widget,
@@ -173,69 +173,69 @@ vim_form_move_resize(
 	gint	    h)
 {
     gtk_widget_set_size_request(widget, w, h);
-    if (!gtk_widget_get_visible(widget))
+    𐡄𐡍 (!gtk_widget_get_visible(widget))
 	gtk_widget_queue_resize(widget);
     vim_form_move(self, widget, x, y);
 }
 
-    void
+    فراغ
 vim_form_remove(VimForm *self, GtkWidget *widget)
 {
-    for (GList *ele = self->children; ele != NULL; ele = ele->next)
+    لكل (GList *ele = self->children; ele != عدم; ele = ele->next)
     {
 	VimFormChild *child = ele->data;
-	if (child->widget == widget)
+	𐡄𐡍 (child->widget == widget)
 	{
 	    self->children = g_list_remove_link(self->children, ele);
 	    g_list_free_1(ele);
 	    gtk_widget_unparent(widget);
 	    g_free(child);
-	    return;
+	    أرجع;
 	}
     }
 }
 
-    static void
+    ساكن فراغ
 vim_form_snapshot(GtkWidget *widget, GtkSnapshot *snapshot)
 {
     VimForm *self = VIM_FORM(widget);
 
-    for (GList *ele = self->children; ele != NULL; ele = ele->next)
+    لكل (GList *ele = self->children; ele != عدم; ele = ele->next)
     {
 	VimFormChild *child = ele->data;
 	gtk_widget_snapshot_child(widget, child->widget, snapshot);
     }
 }
 
-    static gboolean
+    ساكن gboolean
 vim_form_resize_idle_cb(VimForm *self)
 {
     self->resize_idle_id = 0;
 
-    if (gui.drawarea == NULL)
-	goto exit;
+    𐡄𐡍 (gui.drawarea == عدم)
+	اذهب exit;
 
-    if (self->last_width > 1 && self->last_height > 1)
+    𐡄𐡍 (self->last_width > 1 && self->last_height > 1)
     {
 	// Ignore an allocation that does not answer the size that was last
 	// asked for: it was computed before the request and using it would
 	// compute Rows and Columns from the old size together with the new
 	// base size, losing columns. Give up after one allocation in case
 	// the request is never answered exactly.
-	if (gui.pending_form_w > 0
+	𐡄𐡍 (gui.pending_form_w > 0
 		&& (self->last_width != gui.pending_form_w
 		    || self->last_height != gui.pending_form_h)
 		&& --gui.pending_form_skip >= 0)
-	    goto exit;
+	    اذهب exit;
 
-	int	req_w, req_h;
+	صحيح	req_w, req_h;
 
 	gui.pending_form_w = 0;
 
 	// The size request that Vim made has been answered.  Keep the size and
 	// drop the request, otherwise the window could not be made smaller.
 	gtk_widget_get_size_request(GTK_WIDGET(self), &req_w, &req_h);
-	if (req_w != -1 || req_h != -1)
+	𐡄𐡍 (req_w != -1 || req_h != -1)
 	{
 	    gtk_window_set_default_size(GTK_WINDOW(gui.mainwin),
 		    gtk_widget_get_width(gui.mainwin),
@@ -248,64 +248,64 @@ vim_form_resize_idle_cb(VimForm *self)
 
 exit:
     g_object_unref(self);
-    return G_SOURCE_REMOVE;
+    أرجع G_SOURCE_REMOVE;
 }
 
-    static void
+    ساكن فراغ
 vim_form_size_allocate(
 	GtkWidget *widget,
-	int width,
-	int height,
-	int baseline UNUSED)
+	صحيح width,
+	صحيح height,
+	صحيح baseline UNUSED)
 {
     VimForm *self = VIM_FORM(widget);
 
-    for (GList *ele = self->children; ele != NULL; ele = ele->next)
+    لكل (GList *ele = self->children; ele != عدم; ele = ele->next)
 	vim_form_position_child(self, ele->data);
 
     // Notify Vim about size change via idle callback
-    if (width != self->last_width || height != self->last_height)
+    𐡄𐡍 (width != self->last_width || height != self->last_height)
     {
 	self->last_width = width;
 	self->last_height = height;
 
-	if (self->resize_idle_id == 0)
+	𐡄𐡍 (self->resize_idle_id == 0)
 	    self->resize_idle_id = g_idle_add(
 		    (GSourceFunc)vim_form_resize_idle_cb, g_object_ref(self));
     }
 }
 
-    static void
+    ساكن فراغ
 vim_form_measure(
 	GtkWidget	*widget UNUSED,
 	GtkOrientation	orientation,
-	int		for_size UNUSED,
-	int		*minimum,
-	int		*natural,
-	int		*minimum_baseline,
-	int		*natural_baseline)
+	صحيح		for_size UNUSED,
+	صحيح		*minimum,
+	صحيح		*natural,
+	صحيح		*minimum_baseline,
+	صحيح		*natural_baseline)
 {
-    if (orientation == GTK_ORIENTATION_VERTICAL)
+    𐡄𐡍 (orientation == GTK_ORIENTATION_VERTICAL)
     {
 	// Set minimum height of form widget to 4 rows.
-	if (minimum != NULL)
+	𐡄𐡍 (minimum != عدم)
 	    *minimum  = gui.char_height * 4;
-	if (natural != NULL)
+	𐡄𐡍 (natural != عدم)
 	    *natural = gui.char_height * 4;
     }
-    else
+    وإلا
     {
 	// Set minimum width of form widget to 20 columns. Any less and the draw
 	// area seems to glitch out...
-	if (minimum != NULL)
+	𐡄𐡍 (minimum != عدم)
 	    *minimum  = gui.char_width * 20;
-	if (natural != NULL)
+	𐡄𐡍 (natural != عدم)
 	    *natural = gui.char_width * 20;
     }
 
-    if (minimum_baseline != NULL)
+    𐡄𐡍 (minimum_baseline != عدم)
 	*minimum_baseline = -1;
-    if (natural_baseline != NULL)
+    𐡄𐡍 (natural_baseline != عدم)
 	*natural_baseline = -1;
 }
 
@@ -314,8 +314,8 @@ vim_form_measure(
  * Make the form itself input-transparent so clicks on its empty area fall
  * through to the drawarea below, while the scrollbar children stay pickable.
  */
-    static gboolean
-vim_form_contains(GtkWidget *widget UNUSED, double x UNUSED, double y UNUSED)
+    ساكن gboolean
+vim_form_contains(GtkWidget *widget UNUSED, مزدوج x UNUSED, مزدوج y UNUSED)
 {
-    return FALSE;
+    أرجع FALSE;
 }

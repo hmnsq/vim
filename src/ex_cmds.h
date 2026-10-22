@@ -71,7 +71,7 @@
 /*
  * values for cmd_addr_type
  */
-typedef enum {
+تعريفنوع تعداد {
     ADDR_LINES,		 // buffer line numbers
     ADDR_WINDOWS,	 // window number
     ADDR_ARGUMENTS,	 // argument number
@@ -88,7 +88,7 @@ typedef enum {
 #endif
 
 #ifndef DO_DECLARE_EXCMD
-typedef struct exarg exarg_T;
+تعريفنوع بنية exarg exarg_T;
 #endif
 
 /*
@@ -103,9 +103,9 @@ typedef struct exarg exarg_T;
 # define EXCMD(a, b, c, d, e) \
 	{(char_u *)b, STRLEN_LITERAL(b), c, (long_u)(d), e}
 
-typedef void (*ex_func_T) (exarg_T *eap);
+تعريفنوع فراغ (*ex_func_T) (exarg_T *eap);
 
-static struct cmdname
+ساكن بنية cmdname
 {
     char_u	*cmd_name;	// name of the command
     size_t	cmd_namelen;	// length of the command name
@@ -113,9 +113,9 @@ static struct cmdname
     long_u	cmd_argt;	// flags declared above
     cmd_addr_T	cmd_addr_type;	// flag for address type
 } cmdnames[] =
-#else
+#وإلا
 # define EXCMD(a, b, c, d, e)  a
-enum CMD_index
+تعداد CMD_index
 #endif
 {
 EXCMD(CMD_append,	"append",	ex_append,
@@ -1935,12 +1935,12 @@ EXCMD(CMD_decrement,	"--",		ex_incdec,
 };
 
 #ifndef DO_DECLARE_EXCMD
-typedef enum CMD_index cmdidx_T;
+تعريفنوع تعداد CMD_index cmdidx_T;
 
 /*
  * Arguments used for an Ex command.
  */
-struct exarg
+بنية exarg
 {
     char_u	*arg;		// argument of the command
     char_u	*nextcmd;	// next command (NULL if none)
@@ -1951,28 +1951,28 @@ struct exarg
 # endif
     cmdidx_T	cmdidx;		// the index for the command
     long	argt;		// flags for the command
-    int		skip;		// don't execute the command, only parse it
-    int		forceit;	// TRUE if ! present
-    int		addr_count;	// the number of addresses given
+    صحيح		skip;		// don't execute the command, only parse it
+    صحيح		forceit;	// TRUE if ! present
+    صحيح		addr_count;	// the number of addresses given
     linenr_T	line1;		// the first line number
     linenr_T	line2;		// the second line number or count
     cmd_addr_T	addr_type;	// type of the count/range
-    int		flags;		// extra flags after count: EXFLAG_
+    صحيح		flags;		// extra flags after count: EXFLAG_
     char_u	*do_ecmd_cmd;	// +command arg to be used in edited file
     linenr_T	do_ecmd_lnum;	// the line number in an edited file
-    int		append;		// TRUE with ":w >>file" command
-    int		usefilter;	// TRUE with ":w !command" and ":r!command"
-    int		amount;		// number of '>' or '<' for shift command
-    int		regname;	// register name (NUL if none)
-    int		force_bin;	// 0, FORCE_BIN or FORCE_NOBIN
-    int		read_edit;	// ++edit argument
-    int		force_ff;	// ++ff= argument (first char of argument)
-    int		force_enc;	// ++enc= argument (index in cmd[])
-    int		bad_char;	// BAD_KEEP, BAD_DROP or replacement byte
-    int		useridx;	// user command index
-    char	*errmsg;	// returned error message
-    char_u	*(*ea_getline)(int, void *, int, getline_opt_T);
-    void	*cookie;	// argument for getline()
+    صحيح		append;		// TRUE with ":w >>file" command
+    صحيح		usefilter;	// TRUE with ":w !command" and ":r!command"
+    صحيح		amount;		// number of '>' or '<' for shift command
+    صحيح		regname;	// register name (NUL if none)
+    صحيح		force_bin;	// 0, FORCE_BIN or FORCE_NOBIN
+    صحيح		read_edit;	// ++edit argument
+    صحيح		force_ff;	// ++ff= argument (first char of argument)
+    صحيح		force_enc;	// ++enc= argument (index in cmd[])
+    صحيح		bad_char;	// BAD_KEEP, BAD_DROP or replacement byte
+    صحيح		useridx;	// user command index
+    حرف	*errmsg;	// returned error message
+    char_u	*(*ea_getline)(صحيح, فراغ *, صحيح, getline_opt_T);
+    فراغ	*cookie;	// argument for getline()
 # ifdef FEAT_EVAL
     cstack_T	*cstack;	// condition stack for ":if" etc.
     class_T	*ea_class;		// Name of class being defined. Used by :class
